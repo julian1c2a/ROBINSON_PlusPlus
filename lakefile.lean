@@ -1,9 +1,8 @@
 import Lake
 open Lake DSL
 
--- Replace «ProjectName» with your project name (must match directory name)
--- and update the package name accordingly
-package «FOL» where
+-- The name of the project, must match the directory name.
+package «ROBINSON_PlusPlus» where
   -- Disable auto-implicit to enforce explicit type annotations everywhere
   moreServerArgs := #["-DautoImplicit=false"]
 
@@ -22,4 +21,4 @@ package «FOL» where
 -- ─────────────────────────────────────────────────────────────────────────────
 
 @[default_target]
-lean_lib «FOL» where
+lean_lib «ROBINSON_PlusPlus» where

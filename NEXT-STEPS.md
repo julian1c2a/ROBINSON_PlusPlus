@@ -1,120 +1,66 @@
-# Próximos Pasos — FOL
+# Próximos Pasos — ROBINSON_PlusPlus
 
-**Última actualización:** 2026-04-25 21:30
+**Última actualización:** 2026-05-08
 **Autor**: Julián Calderón Almendros
 
-> Este archivo hace un seguimiento de las fases de desarrollo planificadas para el proyecto de Lógica de Primer Orden (FOL).
-> **Nota:** Para el detalle exhaustivo de reglas lógicas y teoremas a demostrar, consulta [STARTING_FOL.md](STARTING_FOL.md).
+> Este archivo hace un seguimiento de las fases de desarrollo planificadas para el proyecto `ROBINSON_PlusPlus`, comenzando con el sistema `Minimal`.
+> **Nota:** La especificación detallada de axiomas y teoremas se encuentra en `TuplasFuncionesYListas.md`.
 
 ---
 
-## Fase 1: Fundamentos Lógicos (Deducción Natural)
+## Fase 1: Sistema `Minimal` — Fundamentos y Aritmética Básica
 
-**Objetivo**: Completar las reglas base de deducción en `FOL/FOL.lean`.
+**Objetivo**: Establecer la base axiomática y demostrar las propiedades aritméticas elementales (Bloques I-III).
 
 **Tareas**:
 
-- [x] Implementar la regla de Reductio ad Absurdum (RAA) en `Derives` para habilitar la lógica clásica.
-- [x] Implementar la regla de debilitamiento (Weakening).
-- [x] Refinar las reglas de cuantificadores ($\forall$ y $\exists$) con gestión de variables libres (índices de De Bruijn).
+- [ ] **Estructura del Proyecto**: Crear el directorio `ROBINSON_PlusPlus/Minimal/`.
+- [ ] **Axiomas**: Crear el módulo `Minimal/Axioms.lean` y formalizar los 22 axiomas del sistema.
+- [ ] **Bloque I (Aritmética)**: Crear `Minimal/Theorems/Block1.lean` y demostrar los Teoremas 1.1 a 3.11.
+- [ ] **Bloque II (Raíz Cuadrada)**: Crear `Minimal/Theorems/Block2.lean` y demostrar los Teoremas 4.1 a 4.6.
+- [ ] **Bloque III (div2/mod2)**: Crear `Minimal/Theorems/Block3.lean` y demostrar los Teoremas 5.1 a 5.10.
 
-**Dependencias**: Ninguna (Nivel 0)
+**Dependencias**: Proyecto `FOL` (estable).
 **Complejidad**: Media
 
 ---
 
-## Fase 2: Primeros Teoremas (Nivel 1 y 2)
+## Fase 2: Sistema `Minimal` — Función de Cantor
 
-**Objetivo**: Demostrar las tautologías fundamentales descritas en `STARTING_FOL.md`.
+**Objetivo**: Construir la función de apareamiento de Cantor (Bloque IV) y definir las tuplas (Bloque V).
 
-**Módulos propuestos**:
+**Tareas**:
 
-- [x] `FOL/Theorems/Impl.lean` — Tautologías de implicación (Identidad, K, S, Silogismo).
-- [x] `FOL/Theorems/Neg.lean` — Propiedades de la negación (Doble negación, Contrapositivas, Explosión).
+- [ ] **Bloque IV (Cantor)**: Crear `Minimal/Theorems/Block4.lean`.
+  - [ ] Demostrar el Lema de Paridad (Lema P1).
+  - [ ] Demostrar la totalidad, inyectividad y sobreyectividad de la función de Cantor (Teos C2, C6, C7).
+- [ ] **Bloque V (Tuplas)**: Crear `Minimal/Theorems/Block5.lean`.
+  - [ ] Introducir la notación `⟨x, y⟩`.
+  - [ ] Definir las proyecciones `[c].1`, `[c].2`.
+  - [ ] Demostrar los teoremas de isomorfismo (Teos C8-C11).
 
 **Dependencias**: Fase 1 completada.
-**Complejidad**: Media
+**Complejidad**: Alta
 
 ---
 
-## Fase 3: Conectivos Derivados y Cuantificadores (Nivel 3 y 4)
+## Fase 3: Sistema `Minimal` — Listas y Funciones
 
-**Objetivo**: Establecer y demostrar el comportamiento de $\land$, $\lor$, $\Leftrightarrow$ y la interacción de $\forall$ / $\exists$.
+**Objetivo**: Fundamentar las listas y las funciones discretas (Bloques VI-VII).
 
-**Módulos propuestos**:
+**Tareas**:
 
-- [x] `FOL/Theorems/Derived.lean` — Leyes de De Morgan, Conmutatividad, Tercio Excluso.
-- [x] `FOL/Theorems/Quantifiers.lean` — Dualidad y distribución de cuantificadores.
+- [ ] **Bloque VI (Listas)**: Crear `Minimal/Theorems/Block6.lean`.
+  - [ ] Definir `Nil` y `Cons`.
+  - [ ] Demostrar las propiedades fundamentales (Teos L1, L2).
+  - [ ] Añadir axiomas para `In` y `⊕` y demostrar sus propiedades.
+- [ ] **Bloque VII (Funciones)**: Crear `Minimal/Theorems/Block7.lean`.
+  - [ ] Definir el predicado `IsFunction`.
+  - [ ] Definir la evaluación `F(x)`.
+  - [ ] Demostrar el isomorfismo con relaciones funcionales (Teo F3).
 
 **Dependencias**: Fase 2 completada.
-**Complejidad**: Media / Alta (por la gestión de sustituciones y De Bruijn).
-
----
-
-## Fase 4: Automatización y Tácticas
-
-**Objetivo**: Facilitar la escritura de pruebas mediante metaprogramación o automatización básica en Lean 4.
-
-**Tareas**:
-
-- [x] Investigar la creación de una táctica que aplique `rewrite_at` automáticamente buscando posiciones válidas.
-- [x] Automatizar la regla de identidad y debilitamiento.
-- [x] Implementar macros finales para `derive_rewrite` y `derive_weaken`.
-
-**Dependencias**: Fase 3 completada.
-**Complejidad**: Alta
-
----
-
-## Fase 5: Metamatemática y Completitud
-
-**Objetivo**: Estudiar las propiedades formales del sistema deductivo y establecer la semántica completa de la Lógica de Primer Orden.
-
-**Tareas**:
-
-- [x] **Teorema de Deducción:** Demostrar que si $Γ, A \vdash B$, entonces $Γ \vdash A \Rightarrow B$.
-- [x] **Semántica y Modelos (Opción B):** Definir noción de modelo y relación de satisfacción ($\models$).
-- [x] **Teorema de Corrección (Soundness):** Demostrar que si $Γ \vdash A$, entonces $Γ \models A$.
-- [x] Demostrar los 5 lemas semánticos auxiliares en `Semantics.lean`.
-- [x] **Teorema de Completitud:** Demostrar que si $Γ \models A$, entonces $Γ \vdash A$.
-- [x] **Consistencia:** Demostrar la consistencia del sistema (`consistency_of_satisfiable`).
-- [x] **Teorema de Compacidad:** Demostrar que un conjunto de fórmulas es satisfacible si y solo si todo subconjunto finito lo es (`compactness_theorem`).
-
-**Dependencias**: Fase 1-4 completadas.
-**Complejidad**: Muy Alta
-
----
-
-## Fase 6: FOL con Igualdad (FOL=)
-
-**Objetivo**: Extender el lenguaje y el sistema deductivo para soportar el predicado de igualdad lógica (`=`).
-
-**Tareas**:
-
-- [x] Modificar la sintaxis en `FOL.lean` añadiendo el constructor de igualdad a `Formula` (`eq : Term → Term → Formula`).
-- [x] Añadir las reglas de inferencia para la igualdad (Reflexividad y Sustitución de Leibniz) en `Derives`.
-- [x] Actualizar la semántica en `Semantics.lean` para que la igualdad sintáctica coincida con la igualdad semántica del modelo.
-- [x] Adaptar las pruebas de Soundness y Completeness a la nueva sintaxis y reglas.
-
-**Dependencias**: Fase 5 completada.
-**Complejidad**: Alta
-
----
-
-## Fase 7: Fundamentación de la Aritmética y Gödelización
-
-**Objetivo**: Utilizar el sistema FOL= para construir una base para la aritmética, definir tuplas, listas y funciones, y establecer las bases para la autorreferencia.
-
-**Tareas**:
-
-- [ ] **Axiomatización**: Introducir los axiomas de la Aritmética de Peano (restringida, sin inducción general) en una nueva teoría.
-- [ ] **Codificación de Tuplas**: Implementar la función de apareamiento de Cantor para codificar pares de números naturales `⟨x,y⟩` como un único número.
-- [ ] **Codificación de Listas**: Definir listas finitas como una construcción sobre las tuplas (`Cons(h,t)`).
-- [ ] **Codificación de Funciones**: Definir funciones discretas como listas de pares (grafos funcionales).
-- [ ] **Gödelización**: Esbozar el mapeo de símbolos y fórmulas a números de Gödel, permitiendo que el sistema hable de sus propias fórmulas y derivaciones.
-
-**Dependencias**: Fase 6 completada.
-**Complejidad**: Muy Alta
+**Complejidad**: Media
 
 ---
 
@@ -122,10 +68,6 @@
 
 | Fase | Descripción | Estado |
 |-------|-------------|--------|
-| 1 | Fundamentos Lógicos | ✅ Completo |
-| 2 | Primeros Teoremas | ✅ Completo |
-| 3 | Conectivos y Cuantificadores | ✅ Completo |
-| 4 | Automatización | ✅ Completo |
-| 5 | Metamatemática | ✅ Completo |
-| 6 | FOL con Igualdad | ✅ Completo |
-| 7 | Fundamentación de la Aritmética | 🔄 En progreso |
+| 1 | Fundamentos y Aritmética | ❌ Pendiente |
+| 2 | Función de Cantor y Tuplas | ❌ Pendiente |
+| 3 | Listas y Funciones | ❌ Pendiente |

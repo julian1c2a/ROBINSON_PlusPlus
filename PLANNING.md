@@ -25,16 +25,10 @@ En lugar de expandir el proyecto `FOL` indefinidamente, adoptaremos una arquitec
 - **Descripción**: Provee una formalización completa y verificada de la Lógica de Primer Orden con Igualdad (`FOL=`).
 - **Estado**: Se considera una dependencia estable y completa. Su desarrollo futuro se limitará a correcciones o mejoras internas, pero su API se mantendrá estable.
 
-### Proyecto 2: `ROBINSON_PlusPlus` (Nuevo Proyecto)
+### Proyecto 2: `ROBINSON_PlusPlus` (Este Proyecto)
 
 - **Rol**: **Fundamento Aritmético**.
 - **Descripción**: Un proyecto dedicado a explorar y formalizar diferentes sistemas axiomáticos para la aritmética, construidos sobre `FOL=`. Su objetivo es fundar rigurosamente los números naturales y, a partir de ellos, las tuplas y listas.
-- **Dependencia**: `FOL`.
-
-### Proyecto 3: `FOL_Compiler` (Nuevo Proyecto)
-
-- **Rol**: **Especificación Material**.
-- **Descripción**: Un proyecto que implementa un parser y un "pretty-printer" para traducir entre una notación de texto de fórmulas lógicas y el tipo de datos `Formula` de Lean del proyecto `FOL`. Servirá como un modelo material y una herramienta de prueba.
 - **Dependencia**: `FOL`.
 
 ---
@@ -71,16 +65,7 @@ Esto se logrará demostrando que los axiomas de un nivel son teoremas en el nive
 
 ---
 
-## 4. El Proyecto `FOL_Compiler` en Detalle
-
-Este proyecto se centrará en la ingeniería de software para crear una interfaz tangible con nuestro sistema lógico.
-
-- **Objetivo**: Construir un parser que convierta `String → Formula` y un pretty-printer `Formula → String`.
-- **Justificación Fundacional**: Servirá para probar la paridad entre la especificación formal de `FOL=` y un "modelo material" cuyo universo de discurso es el **Universo de Herbrand** (el conjunto de todos los términos). Esto nos permitirá estudiar la relación entre nuestro sistema polimórfico (`Type u`) y un modelo concreto basado en la sintaxis.
-
----
-
-## 5. El Problema de la Especificación de Lean 4
+## 4. El Problema de la Especificación de Lean 4
 
 Un tema transversal a todos los proyectos fundacionales es la necesidad de ser explícitos sobre qué características del sistema anfitrión (Lean 4 y su Cálculo de Construcciones Inductivas) estamos utilizando.
 
@@ -91,14 +76,13 @@ Un tema transversal a todos los proyectos fundacionales es la necesidad de ser e
 
 ---
 
-## 6. Hoja de Ruta General
+## 5. Hoja de Ruta General
 
 1. **Estabilizar `FOL`**: Considerar la versión actual como `v1.0` y tratarla como una dependencia externa estable.
 2. **Iniciar `ROBINSON_PlusPlus`**:
     a. Crear el nuevo proyecto con `FOL` como dependencia.
     b. Establecer la estructura de directorios (`Minimal`, `Intermediate`, `Full`).
-    c. Comenzar la implementación de `Minimal/`, traduciendo los 22 axiomas y las primeras fases de `TuplasFuncionesYListas.md`.
-    d. El objetivo clave es llegar a la **fundamentación de las listas (Teo L1 y L2)**.
-3. **Iniciar `FOL_Compiler`**: Una vez la aritmética esté más avanzada, se puede abordar el parser.
-4. **Consolidación**: A largo plazo, los resultados de `ROBINSON_PlusPlus` permitirán refactorizar otros proyectos (como el proyecto Peano existente) para que se apoyen en una base formalmente verificada desde `FOL=`.
-5. **Futuro Lejano**: Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.
+    c. Comenzar la implementación de `Minimal/` según `NEXT-STEPS.md`, traduciendo los 22 axiomas y las primeras fases de `TuplasFuncionesYListas.md`.
+    d. El objetivo clave es llegar a la **fundamentación de las listas (Bloque VI)**.
+3. **Consolidación**: A largo plazo, los resultados de `ROBINSON_PlusPlus` permitirán refactorizar otros proyectos (como el proyecto Peano existente) para que se apoyen en una base formalmente verificada desde `FOL=`.
+4. **Futuro**: Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.
