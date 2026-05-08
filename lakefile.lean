@@ -19,12 +19,7 @@ package «FOL» where
 -- require peanolib from git
 --   "https://github.com/julian1c2a/Peano" @ "master"
 
--- Other dependency template:
--- require somedep from git
---   "https://github.com/user/repo" @ "main"
-
 -- ─────────────────────────────────────────────────────────────────────────────
 
 @[default_target]
 lean_lib «FOL» where
-
