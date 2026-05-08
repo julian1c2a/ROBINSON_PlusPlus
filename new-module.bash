@@ -53,11 +53,11 @@ fi
 
 # Get current year for copyright
 YEAR=$(date +%Y)
-AUTHOR=$(git config user.name 2>/dev/null || echo "Your Name")
+AUTHOR=$(git config user.name 2>/dev/null || echo "Julián Calderón Almendros")
 
 sed \
     -e "s/Copyright (c) 2025/Copyright (c) ${YEAR}/" \
-    -e "s/Author: Your Name/Author: ${AUTHOR}/" \
+    -e "s/Author: Julián Calderón Almendros/Author: ${AUTHOR}/" \
     -e "s/ProjectName\.ModuleName/${NAMESPACE_NAME}/g" \
     -e "s/import ProjectName\.Prelim/import ${PROJECT_NAME}.Prelim/" \
     "$TEMPLATE" > "$TARGET_FILE"

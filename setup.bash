@@ -8,8 +8,8 @@
 # What it does:
 #   1. Renames ProjectName/ directory and ProjectName.lean
 #   2. Replaces all "ProjectName" occurrences in all files
-#   3. Replaces "Your Name" with the provided author name
-#   4. Replaces github.com/your-username with actual username (optional)
+#   3. Replaces "Julián Calderón Almendros" with the provided author name
+#   4. Replaces github.com/julian1c2a with actual username (optional)
 #   5. Updates copyright year to current year
 #   6. Makes an initial commit with the new project name
 
@@ -27,9 +27,9 @@ fi
 
 NEW_NAME="$1"
 AUTHOR="$2"
-GH_USER="${3:-your-username}"
+GH_USER="${3:-julian1c2a}"
 YEAR=$(date +%Y)
-OLD_NAME="MyProject"
+OLD_NAME="ROBINSON_PlusPlus"
 
 # Validate: project name must be a valid Lean identifier
 if ! echo "$NEW_NAME" | grep -qE '^[A-Za-z][A-Za-z0-9_]*$'; then
@@ -89,15 +89,15 @@ for FILE in $TEXT_FILES; do
         CHANGED=true
     fi
 
-    # Replace "Your Name" → Author
-    if grep -qF "Your Name" "$FILE" 2>/dev/null; then
-        sed -i "s/Your Name/${AUTHOR}/g" "$FILE"
+    # Replace "Julián Calderón Almendros" → Author
+    if grep -qF "Julián Calderón Almendros" "$FILE" 2>/dev/null; then
+        sed -i "s/Julián Calderón Almendros/${AUTHOR}/g" "$FILE"
         CHANGED=true
     fi
 
-    # Replace "your-username" → GH_USER
-    if grep -qF "your-username" "$FILE" 2>/dev/null; then
-        sed -i "s/your-username/${GH_USER}/g" "$FILE"
+    # Replace "julian1c2a" → GH_USER
+    if grep -qF "julian1c2a" "$FILE" 2>/dev/null; then
+        sed -i "s/julian1c2a/${GH_USER}/g" "$FILE"
         CHANGED=true
     fi
 
@@ -107,10 +107,10 @@ for FILE in $TEXT_FILES; do
         CHANGED=true
     fi
 
-    # Replace "2025-01-01 00:00" timestamps → today
+    # Replace "2026-05-08 00:00" timestamps → today
     TODAY=$(date +%Y-%m-%d)
-    if grep -qF "2025-01-01 00:00" "$FILE" 2>/dev/null; then
-        sed -i "s/2025-01-01 00:00/${TODAY} 00:00/g" "$FILE"
+    if grep -qF "2026-05-08 00:00" "$FILE" 2>/dev/null; then
+        sed -i "s/2026-05-08 00:00/${TODAY} 00:00/g" "$FILE"
         CHANGED=true
     fi
 
