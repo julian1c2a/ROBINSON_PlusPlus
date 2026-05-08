@@ -64,29 +64,10 @@ sed \
 
 echo "✅ Created: $TARGET_FILE"
 
-# Add import to root module
-ROOT_FILE="${PROJECT_NAME}.lean"
-IMPORT_LINE="import ${IMPORT_NAME}"
-
-if grep -Fqx "$IMPORT_LINE" "$ROOT_FILE" 2>/dev/null; then
-    echo "   Import already in $ROOT_FILE (skipped)"
-else
-    # Unlock root file if locked
-    WAS_LOCKED=false
-    if grep -Fxq "$ROOT_FILE" locked_files.txt 2>/dev/null; then
-        WAS_LOCKED=true
-        bash git-lock.bash unlock "$ROOT_FILE"
-    fi
-
-    # Add import before the last line or after existing imports
-    echo "$IMPORT_LINE" >> "$ROOT_FILE"
-    echo "✅ Added import to $ROOT_FILE"
-
-    # Re-lock if it was locked
-    if [ "$WAS_LOCKED" = true ]; then
-        bash git-lock.bash lock "$ROOT_FILE"
-    fi
-fi
+# Regenerate root import file to include the new module.
+# This is better than appending, as it keeps imports sorted and barrel-aware.
+echo "Regenerating root import file to include the new module..."
+bash gen-root.bash
 
 echo ""
 echo "Next steps:"
