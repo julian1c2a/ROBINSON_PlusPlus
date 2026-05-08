@@ -1,63 +1,44 @@
-# ProjectName
+# ROBINSON_PlusPlus
 
 [![Lean 4](https://img.shields.io/badge/Lean-v4.28.0-blue)](https://leanprover.github.io/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](CURRENT-STATUS-PROJECT.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-[![Coverage](https://img.shields.io/badge/proofs-100%25%20complete-brightgreen)](CURRENT-STATUS-PROJECT.md)
+[![Coverage](https://img.shields.io/badge/proofs-in%20progress-yellow)](CURRENT-STATUS-PROJECT.md)
 
 > **Status**: See [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md) for complete details
 
-Una implementación formal de la **Lógica de Primer Orden (FOL)** en Lean 4, construida completamente desde cero sin dependencias de Mathlib.
+Una implementación formal de una **Aritmética Fundacional** en Lean 4, construida sobre una base de Lógica de Primer Orden (`FOL`) y sin dependencias de Mathlib.
 
 ## Description
 
-Este proyecto formaliza la sintaxis, semántica y metamatemática de la Lógica de Primer Orden clásica. El objetivo ha sido proporcionar una base rigurosa, computacionalmente clara y matemática del comportamiento del razonamiento lógico formal.
+Este proyecto está dedicado a explorar y formalizar diferentes sistemas axiomáticos para la aritmética. Su objetivo es fundar rigurosamente los números naturales y, a partir de ellos, construir estructuras de datos como tuplas y listas.
+
+La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 21 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, y con ella, una teoría de tuplas y listas.
 
 **Características principales:**
 
-- **Sintaxis Rigurosa**: Implementación de fórmulas y términos mediante índices de De Bruijn, resolviendo elegantemente el problema de la captura de variables en cuantificadores ($\forall, \exists$).
-- **Sistema Deductivo**: Formalización de un sistema de Deducción Natural extendido con reglas de reescritura locales.
-- **Automatización (Metaprogramación)**: Desarrollo de tácticas (`derive_hyp`, `derive_weaken`, `derive_rewrite`) utilizando el framework `MetaM` de Lean 4 para agilizar demostraciones.
-- **Semántica Tarskiana**: Definición precisa de Modelos, funciones de evaluación y la noción de satisfacción lógica ($\Gamma \models f$).
-
-**Hitos Metamatemáticos Demostrados:**
-
-1. Tautologías clásicas y equivalencias (Doble Negación, De Morgan, Dualidad de Cuantificadores).
-2. **Teorema de Deducción**.
-3. **Teorema de Corrección (Soundness Theorem)**: $\Gamma \vdash A \implies \Gamma \models A$.
-4. **Construcción de Henkin y Lema de Lindenbaum**.
-5. **Teorema de Completitud de Gödel**: $\Gamma \models A \implies \Gamma \vdash A$.
+- **Base Lógica Sólida**: Utiliza una implementación completa y verificada de Lógica de Primer Orden (`FOL`) como dependencia.
+- **Aritmética Minimalista**: Formaliza un sistema de 21 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
+- **Desarrollo Progresivo**: El proyecto está estructurado para avanzar desde sistemas débiles (`Minimal`) hacia sistemas más fuertes con principios de inducción (`Intermediate`, `Full`).
+- **Metaprogramación**: Hereda y utiliza las tácticas de automatización del proyecto `FOL` para agilizar las demostraciones.
 
 ## Modules
 
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
-| `Prelim.lean` | `top-level` | `Init.Classical` | ✅ Complete |
-| `FOL.lean` | `top-level` | `Prelim.lean` | ✅ Complete |
-| `Tactics.lean` | `top-level` | `FOL.lean` | ✅ Complete |
-| `Deduction.lean` | `FOL.Metamath.Deduction` | `FOL.lean`, `Tactics.lean` | ✅ Complete |
-| `Semantics.lean` | `FOL.Metamath.Semantics` | `FOL.lean` | ✅ Complete |
-| `Soundness.lean` | `FOL.Metamath.Soundness` | `Semantics.lean`, `Tactics.lean` | ✅ Complete |
-| `Completeness.lean` | `FOL.Metamath.Completeness` | `Semantics.lean`, `Deduction.lean` | ✅ Complete |
-| `Compacity.lean` | `FOL.Metamath.Compacity` | `Completeness.lean`, `Soundness.lean` | ✅ Complete |
+| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Complete |
+| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | 🔄 In progress |
 
 ## Project Structure
 
 ```text
-FOL/
-├── Prelim.lean              # Preliminary definitions
-├── FOL.lean                 # Syntax, De Bruijn, and Natural Deduction
-├── Tactics.lean             # Metaprogramming macros
-├── Deduction.lean           # Deduction Theorem
-├── Semantics.lean           # Semantic evaluation & Models
-├── Soundness.lean           # Soundness Theorem
-├── Completeness.lean        # Gödel's Completeness Theorem & Henkin construction
-├── Compacity.lean           # Compactness & Consistency Theorems
-└── Theorems/                # Logical equivalences & tautologies
-    ├── Impl.lean
-    ├── Neg.lean
-    ├── Derived.lean
-    └── Quantifiers.lean
+ROBINSON_PlusPlus/
+├── Minimal/
+│   ├── Axioms.lean            # Language and 21 axioms of the minimal system
+│   └── Theorems/
+│       └── Block1.lean        # Block I: Basic Arithmetic Proofs
+├── Intermediate/              # (Planned) System with restricted induction
+└── Full/                      # (Planned) System with full Peano induction
 ```
 
 > As the project grows, organize modules into thematic subdirectories.

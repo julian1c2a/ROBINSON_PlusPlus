@@ -1,6 +1,6 @@
-# Current Project Status — ProjectName
+# Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-04-25 21:30
+**Last updated:** 2026-05-08
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,14 +9,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 12 |
-| Modules with 0 sorry | 12 / 12 |
-| Total theorems proven | 64 |
-| Total definitions | 22 |
-| Total notations | 10 |
+| Total modules | 2 |
+| Modules with 0 sorry | 2 / 2 |
+| Total theorems proven | 28 |
+| Total definitions | ~43 |
+| Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
 | Lean version | v4.28.0 |
-| Naming convention | Mathlib-style (see NAMING-CONVENTIONS.md) |
+| Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
 ---
 
@@ -24,18 +24,8 @@
 
 | Module | Theorems | Definitions | Sorry | Status |
 |--------|----------|-------------|-------|--------|
-| `Prelim.lean` | 5 | 1 | 0 | ✅ Complete |
-| `FOL.lean` | 0 | 5 | 0 | ✅ Complete |
-| `Impl.lean` | 4 | 0 | 0 | ✅ Complete |
-| `Neg.lean` | 5 | 0 | 0 | ✅ Complete |
-| `Derived.lean` | 17 | 0 | 0 | ✅ Complete |
-| `Quantifiers.lean` | 10 | 0 | 0 | ✅ Complete |
-| `Tactics.lean` | 0 | 1 | 0 | ✅ Complete |
-| `Deduction.lean` | 1 | 0 | 0 | ✅ Complete |
-| `Semantics.lean` | 13 | 8 | 0 | ✅ Complete |
-| `Soundness.lean` | 1 | 0 | 0 | ✅ Complete |
-| `Completeness.lean`| 22 | 8 | 0 | ✅ Complete |
-| `Compacity.lean`   | 2 | 0 | 0 | ✅ Complete |
+| `Minimal/Axioms.lean` | 0 | 40 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block1.lean` | 28 | 3 | 0 | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -43,21 +33,18 @@
 
 ## Recent Achievements
 
-- Project initialized from lean4-project-template
-- Implemented core FOL definitions and natural deduction rules (Fase 1)
-- Proved Nivel 1 & 2 theorems (Impl, Neg) (Fase 2)
-- Proved Nivel 3 & 4 theorems (Derived, Quantifiers) (Fase 3)
-- Created robust automation tactics in `Tactics.lean` (Fase 4)
-- Demostrado Teorema de Deducción y Teorema de Corrección (Fase 5)
-- Formalizada la Semántica de Modelos y evaluación de fórmulas.
-- Demostrado el Teorema de Completitud de Gödel y Lema de Lindenbaum.
-- Alcanzados 0 sorries en todo el proyecto; demostrada Compacidad y Consistencia.
+- **Inicialización del Proyecto**: Se ha configurado `ROBINSON_PlusPlus` con `FOL` como dependencia.
+- **Axiomatización**: Se ha creado `Minimal/Axioms.lean` y se han formalizado los 21 axiomas del sistema.
+- **Bloque I (Fase 1)**: Demostrados los teoremas de evaluación de constantes (Teo 1.1 a 1.13).
+- **Bloque I (Fase 2)**: Demostrados los teoremas de identidades del 0 y del 1 (Teo 2.1 a 2.11), incluyendo las pruebas que dependen del orden.
 
 ---
 
 ## Pending Work
 
-- 🎉 **¡Proyecto Completado!** No hay tareas pendientes en la hoja de ruta actual.
+- **Bloque I (Fase 3)**: Demostrar los teoremas restantes sobre el orden (Teo 3.1 a 3.10).
+- **Bloque II**: Formalizar y demostrar los teoremas sobre la raíz cuadrada.
+- **Bloque III**: Formalizar y demostrar los teoremas sobre `div2` y `mod2`.
 
 ---
 

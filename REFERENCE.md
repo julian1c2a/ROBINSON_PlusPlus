@@ -1,6 +1,6 @@
-# Technical Reference — ProjectName
+# Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-04-25 21:30
+**Last updated:** 2026-05-08
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.28.0
 
@@ -55,13 +55,13 @@ Below are the keys for reading and searching theorems.
 
 *(Update this section as the project evolves. Example:)*
 
-✅ **Phase 3 completed** (2026-04-21): Names migrated to Mathlib conventions. All FOL modules follow naming conventions perfectly.
+🔄 **Fase 1 en progreso** (2026-05-08): Módulos iniciales creados.
 
 ---
 
 ## 📋 Compliance with AI-GUIDE.md
 
-This document complies with all requirements specified in [AI-GUIDE.md](AI-GUIDE.md):
+This document complies with all requirements specified in `AI-GUIDE.md`:
 
 ✅ **(1)** All `.lean` modules documented in section 1.1
 ✅ **(2)** Dependencies between modules (table with dependencies column)
@@ -88,18 +88,8 @@ This document complies with all requirements specified in [AI-GUIDE.md](AI-GUIDE
 
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
-| `Prelim.lean` | top-level | `Init.Classical` | ✅ Completo |
-| `FOL.lean` | top-level | none | ✅ Completo |
-| `Theorems/Impl.lean` | `FOL.Theorems.Impl` | `FOL.FOL`, `FOL.Prelim` | ✅ Completo |
-| `Theorems/Neg.lean` | `FOL.Theorems.Neg` | `FOL.FOL`, `FOL.Prelim` | ✅ Completo |
-| `Theorems/Derived.lean` | `FOL.Theorems.Derived`| `FOL.FOL`, `FOL.Prelim` | ✅ Completo |
-| `Theorems/Quantifiers.lean` | `FOL.Theorems.Quantifiers`| `FOL.FOL`, `FOL.Theorems.Impl`, `FOL.Theorems.Neg`, `FOL.Theorems.Derived` | ✅ Completo |
-| `Tactics.lean` | `FOL.Tactics` | `FOL.FOL`, `Lean` | ✅ Completo |
-| `Deduction.lean` | `FOL.Metamath.Deduction` | `FOL.FOL`, `FOL.Tactics` | ✅ Completo |
-| `Semantics.lean` | `FOL.Metamath.Semantics` | `FOL.FOL` | ✅ Completo |
-| `Soundness.lean` | `FOL.Metamath.Soundness` | `FOL.FOL`, `FOL.Metamath.Semantics`, `FOL.Tactics` | ✅ Completo |
-| `Completeness.lean` | `FOL.Metamath.Completeness` | `FOL.FOL`, `FOL.Semantics`, `FOL.Deduction`, `FOL.Theorems.Neg`, `FOL.Theorems.Quantifiers` | ✅ Completo |
-| `Compacity.lean` | `FOL.Metamath.Compacity` | `FOL.FOL`, `FOL.Semantics`, `FOL.Soundness`, `FOL.Completeness` | ✅ Completo |
+| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
+| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | 🔄 En progreso |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -109,31 +99,21 @@ This document complies with all requirements specified in [AI-GUIDE.md](AI-GUIDE
 
 ```mermaid
 graph TD
-    IC[Init.Classical] --> P[Prelim.lean]
-    P --> I[Theorems/Impl.lean]
-    F[FOL.lean] --> I
-    P --> N[Theorems/Neg.lean]
-    F --> N
-    P --> D[Theorems/Derived.lean]
-    F --> D
-    I --> Q[Theorems/Quantifiers.lean]
-    N --> Q
-    D --> Q
-    F --> Q
-    F --> T[Tactics.lean]
-    F --> Ded[Deduction.lean]
-    T --> Ded
-    F --> Sem[Semantics.lean]
-    Sem --> S[Soundness.lean]
-    F --> S
-    Sem --> C[Completeness.lean]
-    Ded --> C
-    N --> C
-    Q --> C
-    F --> C
-    C --> Comp[Compacity.lean]
-    S --> Comp
-    Sem --> Comp
+    subgraph "Project: FOL"
+        direction LR
+        FOL_FOL["FOL.lean"]
+        FOL_Tactics["Tactics.lean"]
+    end
+
+    subgraph "Project: ROBINSON_PlusPlus"
+        direction TB
+        Axioms["Minimal/Axioms.lean"]
+        Block1["Minimal/Theorems/Block1.lean"]
+    end
+
+    FOL_FOL --> Axioms
+    Axioms --> Block1
+    FOL_Tactics --> Block1
 ```
 
 *(Update this diagram as modules are added)*
