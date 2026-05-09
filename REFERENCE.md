@@ -90,7 +90,10 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
-| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔶 Partial |
+| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
+| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
+| `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -112,14 +115,18 @@ graph TD
         Block1["Minimal/Theorems/Block1.lean"]
         Block2["Minimal/Theorems/Block2.lean"]
         Block3["Minimal/Theorems/Block3.lean"]
+        Block4["Minimal/Theorems/Block4.lean"]
     end
 
     FOL_FOL --> Axioms
     Axioms --> Block1
     Axioms --> Block2
     Axioms --> Block3
+    Axioms --> Block4
     Block1 --> Block2
     Block1 --> Block3
+    Block1 --> Block4
+    Block3 --> Block4
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
     FOL_Tactics --> Block3
@@ -464,7 +471,8 @@ Demostraciones de los teoremas sobre la raíz cuadrada (Bloque II).
 - `sqrt_one`: $\sqrt{1} = 1$
 - `sqrt_unique_of_bounds`: $k^2 \le n \land n < (k+1)^2 \Rightarrow k = \sqrt{n}$
 - `succ_le_of_lt`: $a < b \Rightarrow \sigma(a) \le b$ (Teorema derivable)
-- `sq_le_mono`: $a \le b \Rightarrow a^2 \lbe
+- `sq_le_mono`: $a \le b \Rightarrow a^2 \le b^2$ (Teorema derivable, prueba omitida por longitud)
+
 ---
 
 ### 3.13 Minimal/Theorems/Block3.lean
@@ -493,6 +501,28 @@ Demostraciones de los teoremas sobre `div2` y `mod2` (Bloque III).
 - `mod2_four`: $mod2(4) = 0$
 - `div2_four`: $div2(4) = 2$
 - `mod2_range`: $\forall n, mod2(n) = 0 \lor mod2(n) = 1$
+
+---
+
+### 3.14 Minimal/Theorems/Block4.lean
+
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block4`
+**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `Minimal.Theorems.Block3`
+**Last updated**: 2026-05-09
+**Status**: 🔄 In progress
+**@axiom_system**: `Minimal`
+**@importance**: `high`
+
+Demostraciones de los teoremas sobre la función de apareamiento de Cantor (Bloque IV).
+
+#### Fase 6: Lema de Paridad (Lema P1)
+
+**Theorems**:
+
+- `w_mul_w_plus_one_eq_sq_w_add_w`: $\forall w, w(w+1) = w^2+w$
+- `parity_lemma_case_even`: $mod2(w)=0 \Rightarrow \exists k, w(w+1)=2k$
+- `parity_lemma_case_odd`: $mod2(w)=1 \Rightarrow \exists k, w(w+1)=2k$
+- `parity_lemma`: $\forall w, \exists k, w(w+1)=2k$
 
 ---
 

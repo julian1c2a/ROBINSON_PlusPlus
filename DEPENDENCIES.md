@@ -33,17 +33,22 @@ graph TD
         Block1["Minimal/Theorems/Block1.lean"]
         Block2["Minimal/Theorems/Block2.lean"]
         Block3["Minimal/Theorems/Block3.lean"]
+        Block4["Minimal/Theorems/Block4.lean"]
     end
 
     FOL_FOL --> Axioms
     Axioms --> Block1
     Axioms --> Block2
     Axioms --> Block3
+    Axioms --> Block4
     Block1 --> Block2
     Block1 --> Block3
+    Block1 --> Block4
+    Block3 --> Block4
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
     FOL_Tactics --> Block3
+    FOL_Tactics --> Block4
 ```
 
 *(Update this diagram as modules are added. Use subdirectory grouping:)*

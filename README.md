@@ -30,6 +30,7 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 21 a
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Block1` | ✅ Complete |
 | `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Block1` | ✅ Complete |
+| `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | 🔄 In progress |
 
 ## Project Structure
 
@@ -41,6 +42,7 @@ ROBINSON_PlusPlus/
 │       └── Block1.lean        # Block I: Basic Arithmetic Proofs
 │       └── Block2.lean        # Block II: Square Root Proofs
 │       └── Block3.lean        # Block III: div2/mod2 Proofs
+│       └── Block4.lean        # Block IV: Cantor Pairing Function Proofs
 ├── Intermediate/              # (Planned) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```

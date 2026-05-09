@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 4 |
+| Total modules | 5 |
 | Modules with 0 sorry | 4 / 4 |
-| Total theorems proven | 56 |
+| Total theorems proven | 60 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
@@ -28,6 +28,7 @@
 | `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block3.lean` | 11 | 0 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block4.lean` | 4 | 0 | 0 | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -35,6 +36,7 @@
 
 ## Recent Achievements
 
+- **Bloque IV (Fase 6)**: Demostrado el Lema de Paridad (Lema P1).
 - **Bloque II (Completado)**: Demostrado el lema de monotonicidad del cuadrado (`sq_le_mono`), eliminando el último `sorry` del proyecto. ¡El Bloque II está completo!
 - **Bloque III (Completado)**: Demostrados todos los teoremas sobre `div2` y `mod2` (Teo 5.1 a 5.10). ¡El Bloque III está completo!
 - **Bloque II (Fase 4)**: Completada la demostración de la unicidad de la raíz cuadrada (`sqrt_unique_of_bounds`), asumiendo los lemas de monotonía. El sistema axiomático se ha reducido a 21 axiomas.
@@ -48,7 +50,7 @@
 
 ## Pending Work
 
-- **Bloque IV**: Iniciar la formalización de la función de apareamiento de Cantor.
+- **Bloque IV**: Demostrar la totalidad, inyectividad y sobreyectividad de la función de Cantor.
 
 ---
 
