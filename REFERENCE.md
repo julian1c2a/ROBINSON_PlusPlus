@@ -90,7 +90,7 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
-| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔶 Partial |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -407,7 +407,7 @@ Metaprogramming and macros to automate repetitive natural deduction tasks.
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block1`
 **Dependencies**: `Minimal.Axioms`, `FOL.Tactics`, `FOL.Theorems.*`
 **Last updated**: 2026-05-09
-**Status**: ✅ Completo (con 2 axiomas adicionales)
+**Status**: ✅ Completo
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 
@@ -438,127 +438,32 @@ Demostraciones de los teoremas de aritmética básica (Bloque I).
 
 ---
 
+### 3.12 Minimal/Theorems/Block2.lean
+
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block2`
+**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `FOL.Tactics`
+**Last updated**: 2026-05-09
+**Status**: 🔶 Partial
+**@axiom_system**: `Minimal`
+**@importance**: `high`
+
+Demostraciones de los teoremas sobre la raíz cuadrada (Bloque II).
+
+#### Fase 4: Cotas y Unicidad de √ (Teo 4.1 - 4.6)
+
+**Theorems**:
+
+- `sqrt_sq_le`: $\forall n, (\sqrt{n})^2 \le n$
+- `lt_succ_sqrt_sq`: $\forall n, n < (\sigma(\sqrt{n}))^2$
+- `sq_eq_zero_imp_zero`: $n^2 = 0 \Rightarrow n = 0$
+- `sqrt_zero`: $\sqrt{0} = 0$
+- `sqrt_one`: $\sqrt{1} = 1$
+- `sqrt_unique_of_bounds`: $k^2 \le n \land n < (k+1)^2 \Rightarrow k = \sqrt{n}$
+- `succ_le_of_lt`: $a < b \Rightarrow \sigma(a) \le b$ (Teorema derivable)
+- `sq_le_mono`: $a \le b \Rightarrow a^2 \le b^2$ (Teorema derivable, prueba omitida por longitud)
+
+---
+
 ## 4. Theorems
 
 *(See Module Descriptions in §3 for individual theorems).*
-
----
-
-## 5. Notations
-
-| Symbol | Expands to | Module | Variants |
-|--------|-----------|--------|---------|
-| `∃! x, p` | `ExistsUnique (fun x => p)` | `Prelim.lean` | untyped only |
-| `∃¹ x, p` | `ExistsUnique (fun x => p)` | `Prelim.lean` | `∃¹ x`, `∃¹ (x)`, `∃¹ (x : T)`, `∃¹ x : T` |
-| `⊥` | `Formula.bottom` | `FOL.lean` | |
-| `⊤` | `top` | `FOL.lean` | |
-| `¬` | `neg` | `FOL.lean` | prefix |
-| ` ∧ ` | `land` | `FOL.lean` | infixr |
-| ` ∨ ` | `lor` | `FOL.lean` | infixr |
-| ` ⇒ ` | `Formula.impl` | `FOL.lean` | infixr |
-| ` ⇔ ` | `iff` | `FOL.lean` | infix |
-| `∀.` | `Formula.forall` | `FOL.lean` | prefix |
-| `∃.` | `ex` | `FOL.lean` | prefix |
-| `#` | `Term.var` | `FOL.lean` | prefix |
-| ` ⊢ ` | `Derives` | `FOL.lean` | infix |
-| ` ⊨ ` | `satisfies` | `Soundness.lean` | infix |
-
-**Note**: `∃!` overrides Lean's built-in notation. Use `∃¹` to avoid any macro conflicts.
-
----
-
-## 6. Exports
-
-### 6.1 Prelim.lean
-
-All names are top-level (no namespace), accessible wherever `Prelim.lean` is imported:
-
-```lean
--- Definitions
-ExistsUnique                -- Prop-valued predicate
-
--- Notation
-∃! x, p                    -- unique existence (overrides built-in)
-∃¹ x, p                    -- unique existence (safe, 4 variants)
-
--- Dot-notation API
-ExistsUnique.intro
-ExistsUnique.exists
-ExistsUnique.choose         -- noncomputable
-ExistsUnique.choose_spec
-ExistsUnique.unique
-
--- Peano-compatible aliases
-choose_unique               -- noncomputable
-choose_spec_unique
-choose_uniq
-```
-
-### 6.2 FOL.lean
-
-Top-level definitions:
-`Term`, `Formula`, `neg`, `top`, `lor`, `land`, `iff`, `ex`, `liftTerm`, `liftTerms`, `liftFormula`, `substTerm`, `substTerms`, `substFormula`, `Pos`, `getAt?`, `replaceAt`, `LocalRule`, `Derives`.
-
-### 6.3 Theorems/Impl.lean
-
-Exports from namespace `FOL.Theorems.Impl`:
-`id_impl`, `k_impl`, `s_impl`, `syllogism_impl`.
-
-### 6.4 Theorems/Neg.lean
-
-Exports from namespace `FOL.Theorems.Neg`:
-`explosion_impl`, `double_neg_intro`, `double_neg_elim`, `contrapositive_1`, `contrapositive_2`.
-
-### 6.5 Theorems/Derived.lean
-
-Exports from namespace `FOL.Theorems.Derived`:
-`and_intro`, `and_elim_left`, `and_elim_right`, `or_intro_left`, `or_intro_right`, `or_elim`, `excluded_middle`, `and_comm`, `or_comm`, `and_assoc`, `or_assoc`, `de_morgan_1_fwd`, `de_morgan_1_rev`, `de_morgan_1`, `de_morgan_2_fwd`, `de_morgan_2_rev`, `de_morgan_2`.
-
-### 6.6 Theorems/Quantifiers.lean
-
-Exports from namespace `FOL.Theorems.Quantifiers`:
-`subst_lift_cancel_formula`, `subst_distrib_and`, `lift_distrib_and`, `forall_dne`, `forall_not_impl_exists_not`, `forall_dni`, `exists_not_impl_forall_not`, `dual_forall_exists`, `forall_and_impl_and_forall`, `and_forall_impl_forall_and`, `distrib_forall_and`.
-
-### 6.7 Tactics.lean
-
-Metaprogramming macros globally registered into the environment:
-`derive_hyp`, `derive_rewrite`, `derive_weaken`, `derive_raa`, `getAllPositions`, `tryMem`.
-
-### 6.8 Deduction.lean
-
-Exports from namespace `FOL.Metamath.Deduction`:
-`deduction_theorem`.
-
-### 6.9 Semantics.lean
-
-Exports from namespace `FOL.Metamath.Semantics`:
-`eval_liftFormula_zero`, `eval_substFormula_zero`, `contextSatisfies_lift_zero`, `rule_soundness`, `replaceAt_soundness`, `updateEnv_zero`, `shiftEnv_updateEnv_comm`.
-
-### 6.10 Soundness.lean
-
-Exports from namespace `FOL.Metamath.Soundness`:
-`soundness`.
-
----
-
-## 7. Documentation Status
-
-### 7.1 Fully Projected Files
-
-- `Prelim.lean`
-- `FOL.lean`
-- `Theorems/Impl.lean`
-- `Theorems/Neg.lean`
-- `Theorems/Derived.lean`
-- `Theorems/Quantifiers.lean`
-- `Tactics.lean`
-- `Deduction.lean`
-- `Soundness.lean`
-
-### 7.2 Partially Projected Files
-
-- `Semantics.lean` (Awaiting proofs for semantic replacement lemmas)
-
-### 7.3 Notes
-
-*(None)*

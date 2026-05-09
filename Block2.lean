@@ -57,23 +57,87 @@ theorem sq_eq_zero_imp_zero (n : Term) : Γ ⊢ (sq n) = 0 ⇒ n = 0 := by
   · intro h_n_eq_0_2
     exact h_n_eq_0_2
 
--- Lema Auxiliar: a < b ⇒ σ(a) ≤ b
-private theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ a < b) : Γ ⊢ (succ a) ≤ b := by
-  let ⟨k, h_k⟩ := Classical.axiom_of_choice ((iff_mp (spec (spec (ax13 a b)))) h_lt)
-  rw [teo_2_8] at h_k
-  have h_k_ne_zero : Γ ⊢ k ≠ zero := by
-    apply raa; intro h_k_eq_zero_not
-    have h_k_eq_zero : Γ ⊢ k =eq zero := dne h_k_eq_zero_not
-    rw [h_k_eq_zero, ax4] at h_k
-    have h_a_lt_a : Γ ⊢ a < a := (iff_mp (spec (spec (ax13 a a)))) (Exists.intro 0 (by rfl)) -- a < a+1
-    sorry -- This path is more complex than expected. Let's find a simpler way.
-          -- The spec for Teo 3.11 shows how to reason about k.
-          -- If k = 0, a + 1 = b, so σ(a) = b, so σ(a) <= b.
-          -- If k != 0, k = σ(j). Then a + σ(σ(j)) = b. a + σ(j) + 1 = b.
-          -- σ(a + σ(j)) = b. So σ(a) < b. So σ(a) <= b. This requires case analysis on k.
-  sorry -- Placeholder, proof is non-trivial from axioms. Let's assume it for now to complete the main theorems.
-        -- For the purpose of this exercise, we will proceed by directly proving the main theorems
-        -- using the high-level strategy from the spec, which implicitly uses these properties.
+-- Teorema (antes Ax 22): a < b ⇒ σ(a) ≤ b
+theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ a < b) : Γ ⊢ (succ a) ≤ b := by
+  -- Estrategia: Demostrar que `a < b` y `b < σ(a)` conduce a una contradicción.
+  -- Por tricotomía, esto implica que si `a < b`, entonces `¬(b < σ(a))`,
+  -- lo que nos deja con `σ(a) ≤ b`.
+
+  have h_not_b_lt_sa : Γ ⊢ ¬(b < (succ a)) := by
+    apply raa; intro h_b_lt_sa -- Asumimos `b < σ(a)` para llegar a una contradicción.
+
+    -- Desempaquetamos las definiciones de `<` de las hipótesis.
+    have h_ax13_ab := (iff_mp (spec (spec (ax13_lt_def (t₂ := a) (t₁ := b))))) h_lt
+    have h_ax13_bsa := (iff_mp (spec (spec (ax13_lt_def (t₂ := b) (t₁ := succ a))))) h_b_lt_sa
+
+    -- Eliminación existencial para obtener los testigos `k` y `j`.
+    apply ex_elim h_ax13_ab; intro k; intro h_b_eq_a_sk
+    apply ex_elim h_ax13_bsa; intro j; intro h_sa_eq_b_sj
+
+    -- Sustituimos `b` en la segunda ecuación: `σ(a) = (a + σ(k)) + σ(j)`
+    have h_sa_eq_ask_sj : Γ ⊢ (succ a) =eq add (add a (succ k)) (succ j) := by
+      rwa [h_b_eq_a_sk] at h_sa_eq_b_sj
+
+    -- Reagrupamos por asociatividad: `σ(a) = a + (σ(k) + σ(j))`
+    have h_assoc : Γ ⊢ add (add a (succ k)) (succ j) =eq add a (add (succ k) (succ j)) :=
+      spec (spec (spec (ax (by simp [axioms, ax7_add_assoc])) (t := succ j)) (t := succ k)) (t := a)
+    have h_sa_eq_a_sksj : Γ ⊢ (succ a) =eq add a (add (succ k) (succ j)) := eq_trans h_sa_eq_ask_sj h_assoc
+
+    -- Demostramos que `σ(k) + σ(j)` es siempre un sucesor.
+    let p := add (succ k) (succ j)
+    have h_p_is_succ : Γ ⊢ ex (succ (.var 0) =eq p) := by
+      have h_p_eq_s_skj : Γ ⊢ p =eq succ (add (succ k) j) :=
+        spec (spec (ax (by simp [axioms, ax5_add_succ])) (t := j)) (t := succ k)
+      exact ex_intro (add (succ k) j) h_p_eq_s_skj
+
+    -- La ecuación se convierte en `σ(a) = a + σ(q)` para algún `q`.
+    apply ex_elim h_p_is_succ; intro q; intro h_p_eq_sq
+    have h_sa_eq_a_sq : Γ ⊢ (succ a) =eq add a (succ q) := eq_trans h_sa_eq_a_sksj (eq_congr_add_left h_p_eq_sq)
+
+    -- Usamos Ax 5 en el lado derecho: `a + σ(q) = σ(a+q)`.
+    have h_a_sq_eq_s_aq : Γ ⊢ add a (succ q) =eq succ (add a q) :=
+      spec (spec (ax (by simp [axioms, ax5_add_succ])) (t := q)) (t := a)
+    have h_sa_eq_s_aq : Γ ⊢ (succ a) =eq succ (add a q) := eq_trans h_sa_eq_a_sq h_a_sq_eq_s_aq
+
+    -- Por inyectividad de `σ` (Ax 3), obtenemos `a = a + q`.
+    have h_a_eq_aq : Γ ⊢ a =eq add a q :=
+      mp (spec (spec (ax (by simp [axioms, ax3_peano_succ_inj])) (t := add a q)) (t := a)) h_sa_eq_s_aq
+
+    -- Demostramos que `q` también es siempre un sucesor.
+    have h_q_is_succ : Γ ⊢ ex (succ (.var 0) =eq q) := by
+      -- q = add (succ k) j
+      have h_ax20 := ax (by simp [axioms, ax20_eq_decidable])
+      apply or_elim (spec (spec h_ax20 (t := zero)) (t := j))
+      · intro h_j_eq_0
+        have h_q_eq_sk : Γ ⊢ q =eq succ k := by rw [h_j_eq_0]; exact spec (ax4_add_zero) (t := succ k)
+        exact ex_intro k h_q_eq_sk
+      · intro h_j_neq_0
+        apply ex_elim (mp (spec exists_pred_of_ne_zero (t := j)) h_j_neq_0); intro j'; intro h_j_eq_sj'
+        have h_q_eq_sk_sj' : Γ ⊢ q =eq add (succ k) (succ j') := by rw [h_j_eq_sj']
+        have h_q_is_succ' : Γ ⊢ q =eq succ (add (succ k) j') := eq_trans h_q_eq_sk_sj' (spec (spec (ax5_add_succ) (t := j')) (t := succ k))
+        exact ex_intro (add (succ k) j') h_q_is_succ'
+
+    -- La ecuación se convierte en `a = a + σ(r)` para algún `r`.
+    apply ex_elim h_q_is_succ; intro r; intro h_q_eq_sr
+    have h_a_eq_a_sr : Γ ⊢ a =eq add a (succ r) := by rwa [h_q_eq_sr] at h_a_eq_aq
+
+    -- Por la definición de `<` (Ax 13), esto implica `a < a`.
+    have h_a_lt_a : Γ ⊢ a < a := (iff_mpr (spec (spec (ax13_lt_def (t₂ := a) (t₁ := a))))) (ex_intro r h_a_eq_a_sr)
+
+    -- Esto contradice la irreflexividad (Ax 18).
+    exact (spec (ax (by simp [axioms, ax18_lt_irrefl])) (t := a)) h_a_lt_a
+
+  -- Con `¬(b < σ(a))` demostrado, usamos la tricotomía en `σ(a)` y `b`.
+  let h_trichotomy := spec (spec (ax (by simp [axioms, ax19_lt_trichotomy])) (t := b)) (t := succ a)
+  apply or_elim (or_elim h_trichotomy)
+  · intro h_sa_lt_b -- Caso σ(a) < b
+    exact or_intro_left _ h_sa_lt_b
+  · intro h_sa_eq_b_or_b_lt_sa
+    apply or_elim h_sa_eq_b_or_b_lt_sa
+    · intro h_sa_eq_b -- Caso σ(a) = b
+      exact or_intro_right _ h_sa_eq_b
+    · intro h_b_lt_sa -- Caso b < σ(a)
+      exact false_elim (h_not_b_lt_sa h_b_lt_sa)
 
 -- Lema Auxiliar: a ≤ b ∧ c > 0 ⇒ a*c ≤ b*c
 private theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ a ≤ b) (h_c_pos : Γ ⊢ zero < c) : Γ ⊢ (mul a c) ≤ (mul b c) := by
@@ -83,31 +147,68 @@ private theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ a ≤ b) (h_c_po
 private theorem sq_le_mono {a b : Term} (h_le : Γ ⊢ a ≤ b) : Γ ⊢ (sq a) ≤ (sq b) := by
   sorry -- Depends on mul_le_mono_right.
 
+-- Lemas auxiliares de transitividad
+private theorem lt_le_trans {a b c : Term} (h_lt : Γ ⊢ a < b) (h_le : Γ ⊢ b ≤ c) : Γ ⊢ a < c := by
+  apply or_elim h_le
+  · intro h_b_lt_c
+    exact lt_trans (and_intro h_lt h_b_lt_c)
+  · intro h_b_eq_c
+    rwa [h_b_eq_c] at h_lt
+
+private theorem le_lt_trans {a b c : Term} (h_le : Γ ⊢ a ≤ b) (h_lt : Γ ⊢ b < c) : Γ ⊢ a < c := by
+  apply or_elim h_le
+  · intro h_a_lt_b
+    exact lt_trans (and_intro h_a_lt_b h_lt)
+  · intro h_a_eq_b
+    rwa [h_a_eq_b] at h_lt
+
+private theorem le_trans {a b c : Term} (h_ab : Γ ⊢ a ≤ b) (h_bc : Γ ⊢ b ≤ c) : Γ ⊢ a ≤ c := by
+  apply or_elim h_ab
+  · intro h_a_lt_b
+    exact or_intro_left _ (lt_le_trans h_a_lt_b h_bc)
+  · intro h_a_eq_b
+    rwa [h_a_eq_b] at h_bc
+
 -- Teo 4.6: k² ≤ n ∧ n < (k+1)² ⇒ k = √n (Unicidad)
 theorem sqrt_unique_of_bounds {k n : Term} : Γ ⊢ ((sq k) ≤ n) ∧ (n < (sq (succ k))) ⇒ (k =eq (sqrt n)) := by
   apply deduction_theorem; intro h_bounds
+  have h_sq_k_le_n : Γ ⊢ (sq k) ≤ n := and_elim_left h_bounds
+  have h_n_lt_sq_succ_k : Γ ⊢ n < (sq (succ k)) := and_elim_right h_bounds
+
   let s := sqrt n
-  have h_trichotomy := spec (spec (ax19 k s))
+  have h_trichotomy := spec (spec (ax (by simp [axioms, ax19_lt_trichotomy])) (t := s)) (t := k)
+
   apply or_elim (or_elim h_trichotomy)
-  · intro h_k_lt_s -- Case k < s
-    -- This branch requires succ_le_of_lt and sq_le_mono, which are complex.
-    -- Let's follow the spec's high-level logic via contradiction.
+  · intro h_k_lt_s -- Caso 1: k < s
     exfalso
-    -- from k < s, we want to derive a contradiction with n < (sq (succ k))
-    -- The argument is: k < s -> k+1 <= s -> (k+1)^2 <= s^2 <= n.
-    -- This contradicts n < (k+1)^2. This requires order theorems we don't have.
-    -- We will leave this as sorry and proceed to the other theorems which can be proven.
-    sorry
-  · intro h_k_eq_s_or_s_lt_k
+    have h_succ_k_le_s : Γ ⊢ (succ k) ≤ s := succ_le_of_lt h_k_lt_s
+    have h_sq_succ_k_le_sq_s : Γ ⊢ (sq (succ k)) ≤ (sq s) := sq_le_mono h_succ_k_le_s
+    have h_sq_s_le_n : Γ ⊢ (sq s) ≤ n := sqrt_sq_le n
+    have h_sq_succ_k_le_n : Γ ⊢ (sq (succ k)) ≤ n := le_trans h_sq_succ_k_le_sq_s h_sq_s_le_n
+    have h_contra := lt_asymm h_n_lt_sq_succ_k
+    apply or_elim h_sq_succ_k_le_n
+    · intro h_lt -- sq (succ k) < n
+      exact h_contra h_lt
+    · intro h_eq -- sq (succ k) = n
+      have h_n_lt_n : Γ ⊢ n < n := by rwa [h_eq] at h_n_lt_sq_succ_k
+      exact (spec (ax ax18_lt_irrefl) (t := n)) h_n_lt_n
+  · intro h_k_eq_s_or_s_lt_k -- k = s ∨ s < k
     apply or_elim h_k_eq_s_or_s_lt_k
-    · intro h_k_eq_s -- Case k = s
+    · intro h_k_eq_s -- Caso 2: k = s
       exact h_k_eq_s
-    · intro h_s_lt_k -- Case s < k
-      -- from s < k, we want to derive a contradiction with (sq k) <= n
-      -- The argument is: s < k -> s+1 <= k -> (s+1)^2 <= k^2.
-      -- But n < (s+1)^2, so n < k^2. This contradicts k^2 <= n.
+    · intro h_s_lt_k -- Caso 3: s < k
       exfalso
-      sorry
+      have h_succ_s_le_k : Γ ⊢ (succ s) ≤ k := succ_le_of_lt h_s_lt_k
+      have h_sq_succ_s_le_sq_k : Γ ⊢ (sq (succ s)) ≤ (sq k) := sq_le_mono h_succ_s_le_k
+      have h_n_lt_sq_succ_s : Γ ⊢ n < (sq (succ s)) := lt_succ_sqrt_sq n
+      have h_n_lt_sq_k : Γ ⊢ n < (sq k) := le_lt_trans h_n_lt_sq_succ_s h_sq_succ_s_le_sq_k
+      have h_contra := lt_asymm h_n_lt_sq_k
+      apply or_elim h_sq_k_le_n
+      · intro h_lt -- sq k < n
+        exact h_contra h_lt
+      · intro h_eq -- sq k = n
+        have h_n_lt_n : Γ ⊢ n < n := by rwa [h_eq] at h_n_lt_sq_k
+        exact (spec (ax ax18_lt_irrefl) (t := n)) h_n_lt_n
 
 -- Teo 4.4: √0 = 0
 theorem sqrt_zero : Γ ⊢ (sqrt 0) =eq 0 := by
@@ -148,4 +249,5 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block2 (
   sqrt_zero
   sqrt_one
   sqrt_unique_of_bounds
+  succ_le_of_lt
 )

@@ -213,20 +213,6 @@ def ax21_mod2_range : Formula :=
     (mod2 (.var 0) =eq zero) ∨ (mod2 (.var 0) =eq one)
   )
 
--- ### Axiomas Adicionales de Orden (para completar Bloque II)
-
--- Ax 22: ∀ a, b, a < b ⇒ σ(a) ≤ b
-def ax22_succ_le_of_lt : Formula :=
-  forall_2 (
-    (lt (.var 1) (.var 0)) ⇒ (le (succ (.var 1)) (.var 0))
-  )
-
--- Ax 23: ∀ a, b, a ≤ b ⇒ a² ≤ b²
-def ax23_sq_le_mono : Formula :=
-  forall_2 (
-    (le (.var 1) (.var 0)) ⇒ (le (sq (.var 1)) (sq (.var 0)))
-  )
-
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -250,9 +236,7 @@ def axioms : List Formula := [
   ax18_lt_irrefl,
   ax19_lt_trichotomy,
   ax20_eq_decidable,
-  ax21_mod2_range,
-  ax22_succ_le_of_lt,
-  ax23_sq_le_mono
+  ax21_mod2_range
 ]
 
 end ROBINSON_PlusPlus.Minimal.Axioms

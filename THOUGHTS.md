@@ -21,6 +21,46 @@
 
 ## Ideas and Alternatives
 
+## ¿Es necesario el axioma 22?
+
+El verdadero axioma 22 es $a < b ⟹ σ(a) ≤ b$.
+
+(A) Hipótesis: $a < b$
+(B) Tricotomía (Ax): $a < b ∨ a = b ∨ b < a$
+(C) $σ(a) < b ∨ σ(a) = b ∨ b < σ(a)$ Axioma de Tricotomía reescrito con $σ(a)$
+(D) $σ(a) ≤ b ∨ b < σ(a)$ Por la Definición de ≤
+
+De (A) y (D) demostramos que si $¬ (b < σ(a))$ entonces $σ(a) ≤ b$, lo que es exactamente el axioma 22.
+
+Vamos a suponer que (WH) $b < σ(a)$ y nuestra hipótesis inicial (IA) $a < b$.
+
+(IA) $a < b ⟺ ∃ c, a + σ(c) = b$ Por la Definición de <
+(B) $a + σ(c) = b$ Por (A)
+(C) $σ(a + σ(c)) = σ(b)$ Por la Definición de σ
+(D) $σ(a) + σ(c) = σ(b)$ Por la Definición de +
+(E) $a + σ(σ(c)) = σ(b)$ Por la Definición de σ y +
+
+Ahora desde (WH)
+(WH) $σ(b) < a$
+(K) $∃ e, σ(b) + σ(e) = a$ Por la Definición de <
+(L) $σ(b) = a + σ(σ(c))$ por (E).Symmetry de la igualdad
+(M) $(a + σ(σ(c))) + σ(e) = a$ por (L) y (K) Transistividad de la igualdad
+(N) $a + (σ(σ(c)) + σ(e)) = a$ por la Asociatividad de +
+(N) $a + σ(σ(c) + e) = a$ por la Definición de +
+(O) $a < a$ por la Definición de <
+(P) Contradicción con la irreflexividad de <.
+
+¬ WH ⇒ $σ(b) ≥ a$
+
+Pero una vez tenemos en 6. $σ(a) = a + σ(σ(k) + j)$, suponiendo $k=0$ y $j=0$, nos queda $suc(a) = a + suc(suc(0))$, y de aquí $suc(a) = suc(a + suc(0))$, y de ahí $a = a + suc(0)$, $a = suc (a + 0) = suc(a)$ contradictorio. Con $suc$ si podemos usar inducción. A lo que si hemos llegado es a $suc(a) = suc(a + (suc(k) + j))$. Y sabemos que el caso $j=0$ y $k=0$ no puede ser.  Sea $j \neq 0$, esto es, sea $j = suc(j')$. Entonces $suc(a) = suc(a + (suc(k) + suc(j'))) = suc(a + suc(suc(k+j')))$, $a = a + suc(suc(k+j'))$, de dónde $a < a$. Supongamos que $j=0$, y $k \neq 0$, esto es $k = suc(k')$
+
+$suc(a) = suc(a + (suc(k) + j))$ y $j=0$ y $k = suc(k')$
+
+Esto nos da $suc(a) = suc(a + (suc(suc(k')) + 0))$ y $a = a + suc(suc(k'))$, de dónde $a < a$.
+
+Ahora, suponiendo que k = suc(k') y j = suc(j') nos da $suc(a) = suc(a + (suc(suc(k')) + suc(j')))$, $a = a + (suc(suc(k')) + suc(j'))$, de dónde $a < a$.
+
+
 ### 2026-04-21 — Automatización de Tácticas (Fase 4)
 
 **Identidad y Debilitamiento**:

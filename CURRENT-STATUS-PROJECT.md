@@ -10,7 +10,7 @@
 | Metric | Value |
 |--------|-------|
 | Total modules | 3 |
-| Modules with 0 sorry | 3 / 3 |
+| Modules with 0 sorry | 1 / 3 |
 | Total theorems proven | 45 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
@@ -26,7 +26,7 @@
 |--------|----------|-------------|-------|--------|
 | `Minimal/Axioms.lean` | 0 | 40 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block2.lean` | 6 | 0 | 2 | 🔶 Partial |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -34,7 +34,7 @@
 
 ## Recent Achievements
 
-- **Bloque II (Fase 4)**: Demostrados los teoremas sobre la raíz cuadrada (Teo 4.1 a 4.6) bajo un sistema axiomático extendido (+2 axiomas de orden). El Bloque II está completo.
+- **Bloque II (Fase 4)**: Completada la demostración de la unicidad de la raíz cuadrada (`sqrt_unique_of_bounds`), asumiendo los lemas de monotonía. El sistema axiomático se ha reducido a 21 axiomas.
 - **Inicialización del Proyecto**: Se ha configurado `ROBINSON_PlusPlus` con `FOL` como dependencia.
 - **Axiomatización**: Se ha creado `Minimal/Axioms.lean` y se han formalizado los 21 axiomas del sistema.
 - **Bloque I (Fase 1)**: Demostrados los teoremas de evaluación de constantes (Teo 1.1 a 1.13).
