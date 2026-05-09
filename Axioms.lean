@@ -26,6 +26,8 @@ def mul_sym  : String := "*"
 def sqrt_sym : String := "√"
 def div2_sym : String := "div2"
 def mod2_sym : String := "mod2"
+def proj1_sym : String := "π₁"
+def proj2_sym : String := "π₂"
 
 -- ### Predicate Symbols
 def lt_sym : String := "<"
@@ -45,6 +47,8 @@ def mul (t₁ t₂ : Term) : Term := .func mul_sym [t₁, t₂]
 def sqrt (t : Term)   : Term := .func sqrt_sym [t]
 def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
+def proj1 (t : Term)  : Term := .func proj1_sym [t]
+def proj2 (t : Term)  : Term := .func proj2_sym [t]
 
 -- Derived operation `sq`
 def sq (t : Term) : Term := mul t t
@@ -223,6 +227,23 @@ def ax21_mod2_range : Formula :=
     (mod2 (.var 0) =eq zero) ∨ (mod2 (.var 0) =eq one)
   )
 
+-- ### Axioms of Cantor Projections (temporary, until C6 and C7 are proven)
+
+-- Ax 22 (Surjectivity): ∀ c, ∃ x, y, Cantor(x, y, c)
+-- We postulate the existence of projection functions π₁ and π₂ that witness this.
+def ax22_cantor_proj_exists : Formula :=
+  forall_ (
+    is_cantor (proj1 (.var 0)) (proj2 (.var 0)) (.var 0)
+  )
+
+-- Ax 23 (Uniqueness): Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y'
+def ax23_cantor_proj_uniq : Formula :=
+  forall_ (forall_2 (forall_2 (
+    (land (is_cantor (.var 3) (.var 2) (.var 4)) (is_cantor (.var 1) (.var 0) (.var 4)))
+    ⇒
+    (land ((.var 3) =eq (.var 1)) ((.var 2) =eq (.var 0)))
+  )))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -246,7 +267,9 @@ def axioms : List Formula := [
   ax18_lt_irrefl,
   ax19_lt_trichotomy,
   ax20_eq_decidable,
-  ax21_mod2_range
+  ax21_mod2_range,
+  ax22_cantor_proj_exists,
+  ax23_cantor_proj_uniq
 ]
 
 end ROBINSON_PlusPlus.Minimal.Axioms

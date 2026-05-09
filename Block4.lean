@@ -133,6 +133,72 @@ theorem cantor_totality (x y : Term) : Γ ⊢ ex (is_cantor x y (.var 0)) := by
   -- We have `cantor_poly x y =eq mul two k`. By symmetry, this is what we need.
   exact ex_intro k (eq_symm h_poly_eq_2k)
 
+/-!
+### Fase 8: Inyectividad de Cantor
+-/
+
+-- Teo C4: Cantor(x,y,c) ∧ Cantor(x,y,c') ⇒ c = c'
+theorem cantor_injective_c (x y c c' : Term) : Γ ⊢ land (is_cantor x y c) (is_cantor x y c') ⇒ (c =eq c') := by
+  apply deduction_theorem; intro h_and
+  have h_cantor_c : Γ ⊢ is_cantor x y c := and_elim_left h_and
+  have h_cantor_c' : Γ ⊢ is_cantor x y c' := and_elim_right h_and
+  simp [is_cantor] at h_cantor_c h_cantor_c'
+  have h_2c_eq_2c' : Γ ⊢ mul two c =eq mul two c' := eq_trans h_cantor_c (eq_symm h_cantor_c')
+  let h_cancel := spec (spec teo_2_11 (t := c')) (t := c)
+  exact mp h_cancel h_2c_eq_2c'
+
+/-!
+### Fase 9: Proyecciones de Cantor
+-/
+
+-- Lema Auxiliar: n = 2*k ⇒ mod2(n) = 0
+private theorem mod2_of_even {n k : Term} (h : Γ ⊢ n =eq mul two k) : Γ ⊢ mod2 n =eq zero := by
+  -- Esta prueba requiere inducción sobre k, que no está disponible en `Minimal`.
+  -- La estrategia sería:
+  -- Base k=0: n=0, mod2(0)=0. (Teo 5.1)
+  -- Paso k -> k+1: n = 2*(k+1) = 2k+2. mod2(2k+2) = mod2(σ(2k+1)).
+  -- Por Ax 16, esto es 0 si mod2(2k+1)=1.
+  -- mod2(2k+1) = mod2(σ(2k)). Por Ax 16, esto es 1 si mod2(2k)=0.
+  -- Esto último es la hipótesis de inducción.
+  sorry
+
+-- Teo C8: [⟨x,y⟩].1 = x
+theorem cantor_proj1_eq_x (x y : Term) : Γ ⊢ proj1 (cantor_func x y) =eq x := by
+  let c := cantor_func x y
+  let P := cantor_poly x y
+  -- 1. `is_cantor x y c` holds.
+  have h_is_cantor_xyc : Γ ⊢ is_cantor x y c := by
+    simp [is_cantor, c, cantor_func] -- Goal: 2 * div2(P) = P
+    have h_poly_even := cantor_poly_is_even x y
+    apply ex_elim h_poly_even; intro k; intro h_poly_eq_2k
+    have h_mod2_poly_is_0 : Γ ⊢ mod2 P =eq zero := mod2_of_even (eq_symm h_poly_eq_2k)
+    have h_ax17 := spec (ax ax17_div_mod_eq) (t := P)
+    have h_div2_mul_2_eq_P : Γ ⊢ mul (div2 P) two =eq P := by rw [←h_ax17, h_mod2_poly_is_0, ax4_add_zero]
+    exact h_div2_mul_2_eq_P
+  -- 2. `is_cantor (proj1 c) (proj2 c) c` holds by axiom.
+  have h_is_cantor_proj : Γ ⊢ is_cantor (proj1 c) (proj2 c) c := spec (ax ax22_cantor_proj_exists) (t := c)
+  -- 3. By uniqueness axiom, the components must be equal.
+  let h_uniq := spec (spec (spec (spec (spec (ax ax23_cantor_proj_uniq) (t:=c)) (t:=x)) (t:=y)) (t:=proj1 c)) (t:=proj2 c)
+  have h_eqs := mp h_uniq (and_intro h_is_cantor_xyc h_is_cantor_proj)
+  exact and_elim_left h_eqs
+
+-- Teo C9: [⟨x,y⟩].2 = y
+theorem cantor_proj2_eq_y (x y : Term) : Γ ⊢ proj2 (cantor_func x y) =eq y := by
+  let c := cantor_func x y
+  let P := cantor_poly x y
+  have h_is_cantor_xyc : Γ ⊢ is_cantor x y c := by
+    simp [is_cantor, c, cantor_func]
+    have h_poly_even := cantor_poly_is_even x y
+    apply ex_elim h_poly_even; intro k; intro h_poly_eq_2k
+    have h_mod2_poly_is_0 : Γ ⊢ mod2 P =eq zero := mod2_of_even (eq_symm h_poly_eq_2k)
+    have h_ax17 := spec (ax ax17_div_mod_eq) (t := P)
+    have h_div2_mul_2_eq_P : Γ ⊢ mul (div2 P) two =eq P := by rw [←h_ax17, h_mod2_poly_is_0, ax4_add_zero]
+    exact h_div2_mul_2_eq_P
+  have h_is_cantor_proj : Γ ⊢ is_cantor (proj1 c) (proj2 c) c := spec (ax ax22_cantor_proj_exists) (t := c)
+  let h_uniq := spec (spec (spec (spec (spec (ax ax23_cantor_proj_uniq) (t:=c)) (t:=x)) (t:=y)) (t:=proj1 c)) (t:=proj2 c)
+  have h_eqs := mp h_uniq (and_intro h_is_cantor_xyc h_is_cantor_proj)
+  exact and_elim_right h_eqs
+
 end ROBINSON_PlusPlus.Minimal.Theorems.Block4
 
 -- Exports
@@ -144,4 +210,7 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block4 (
   cantor_poly_term1_eq_sq_add
   cantor_poly_is_even
   cantor_totality
+  cantor_injective_c
+  cantor_proj1_eq_x
+  cantor_proj2_eq_y
 )

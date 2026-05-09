@@ -530,6 +530,15 @@ Demostraciones de los teoremas sobre la función de apareamiento de Cantor (Bloq
 - `cantor_poly_is_even`: $\forall x,y, \exists k, (x+y)(x+y+1)+2y = 2k$
 - `cantor_totality`: $\forall x,y, \exists c, Cantor(x,y,c)$
 
+#### Fase 8: Inyectividad de Cantor
+
+- `cantor_injective_c`: $Cantor(x,y,c) \land Cantor(x,y,c') \implies c = c'$
+
+#### Fase 9: Proyecciones de Cantor
+
+- `cantor_proj1_eq_x`: $[⟨x,y⟩].1 = x$
+- `cantor_proj2_eq_y`: $[⟨x,y⟩].2 = y$
+
 ---
 
 ## 4. Theorems

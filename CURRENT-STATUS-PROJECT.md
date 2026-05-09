@@ -10,8 +10,8 @@
 | Metric | Value |
 |--------|-------|
 | Total modules | 5 |
-| Modules with 0 sorry | 4 / 4 |
-| Total theorems proven | 63 |
+| Modules with 0 sorry | 3 / 5 |
+| Total theorems proven | 64 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
@@ -28,7 +28,7 @@
 | `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block3.lean` | 11 | 0 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block4.lean` | 7 | 1 | 0 | 🔄 In progress |
+| `Minimal/Theorems/Block4.lean` | 8 | 1 | 1 | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -36,6 +36,8 @@
 
 ## Recent Achievements
 
+- **Bloque IV (Fase 9)**: Definidas las proyecciones de Cantor y demostradas sus propiedades de inversión (Teo C8 y C9), asumiendo dos nuevos axiomas y un lema pendiente.
+- **Bloque IV (Fase 8)**: Demostrada la inyectividad de la función de Cantor (Teo C4).
 - **Bloque IV (Fase 7)**: Demostrada la totalidad de la función de Cantor (Teo C2).
 - **Bloque IV (Fase 6)**: Demostrado el Lema de Paridad (Lema P1).
 - **Bloque II (Completado)**: Demostrado el lema de monotonicidad del cuadrado (`sq_le_mono`), eliminando el último `sorry` del proyecto. ¡El Bloque II está completo!
