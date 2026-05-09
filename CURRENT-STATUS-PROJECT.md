@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-08
+**Last updated:** 2026-05-09
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,9 +9,9 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 2 |
-| Modules with 0 sorry | 2 / 2 |
-| Total theorems proven | 28 |
+| Total modules | 3 |
+| Modules with 0 sorry | 3 / 3 |
+| Total theorems proven | 45 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
@@ -25,7 +25,8 @@
 | Module | Theorems | Definitions | Sorry | Status |
 |--------|----------|-------------|-------|--------|
 | `Minimal/Axioms.lean` | 0 | 40 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block1.lean` | 28 | 3 | 0 | 🔄 In progress |
+| `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -33,17 +34,17 @@
 
 ## Recent Achievements
 
+- **Bloque II (Fase 4)**: Demostrados los teoremas sobre la raíz cuadrada (Teo 4.1 a 4.6) bajo un sistema axiomático extendido (+2 axiomas de orden). El Bloque II está completo.
 - **Inicialización del Proyecto**: Se ha configurado `ROBINSON_PlusPlus` con `FOL` como dependencia.
 - **Axiomatización**: Se ha creado `Minimal/Axioms.lean` y se han formalizado los 21 axiomas del sistema.
 - **Bloque I (Fase 1)**: Demostrados los teoremas de evaluación de constantes (Teo 1.1 a 1.13).
 - **Bloque I (Fase 2)**: Demostrados los teoremas de identidades del 0 y del 1 (Teo 2.1 a 2.11), incluyendo las pruebas que dependen del orden.
+- **Bloque I (Fase 3)**: Demostrados los teoremas de orden estricto y no estricto (Teo 3.1 a 3.11). El Bloque I está completo.
 
 ---
 
 ## Pending Work
 
-- **Bloque I (Fase 3)**: Demostrar los teoremas restantes sobre el orden (Teo 3.1 a 3.10).
-- **Bloque II**: Formalizar y demostrar los teoremas sobre la raíz cuadrada.
 - **Bloque III**: Formalizar y demostrar los teoremas sobre `div2` y `mod2`.
 
 ---

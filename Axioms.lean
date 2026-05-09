@@ -46,6 +46,9 @@ def sqrt (t : Term)   : Term := .func sqrt_sym [t]
 def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
 
+-- Derived operation `sq`
+def sq (t : Term) : Term := mul t t
+
 -- Derived constants `1` and `2`
 def one : Term := succ zero
 def two : Term := succ one
@@ -54,6 +57,7 @@ def two : Term := succ one
 
 -- Helper function to build atomic formulas
 def lt (t₁ t₂ : Term) : Formula := .atom lt_sym [t₁, t₂]
+def le (t₁ t₂ : Term) : Formula := (lt t₁ t₂) ∨ (t₁ =eq t₂)
 
 -- Helper for universal quantification over 1, 2, or 3 variables
 def forall_ (f : Formula) : Formula := .forall f
@@ -158,18 +162,13 @@ def ax13_lt_def : Formula :=
 -- Ax 14: ∀ n, (√n)² ≤ n
 def ax14_sqrt_le : Formula :=
   forall_ (
-    let sqrt_n := sqrt (.var 0)
-    let sqrt_n_sq := mul sqrt_n sqrt_n
-    (lt sqrt_n_sq (.var 0)) ∨ (sqrt_n_sq =eq (.var 0))
+    le (sq (sqrt (.var 0))) (.var 0)
   )
 
 -- Ax 15: ∀ n, n < (σ(√n))²
 def ax15_lt_succ_sqrt : Formula :=
   forall_ (
-    let sqrt_n := sqrt (.var 0)
-    let succ_sqrt_n := succ sqrt_n
-    let succ_sqrt_n_sq := mul succ_sqrt_n succ_sqrt_n
-    lt (.var 0) succ_sqrt_n_sq
+    lt (.var 0) (sq (succ (sqrt (.var 0))))
   )
 
 -- ### Axiomas de la División Entera por 2
@@ -214,9 +213,23 @@ def ax21_mod2_range : Formula :=
     (mod2 (.var 0) =eq zero) ∨ (mod2 (.var 0) =eq one)
   )
 
+-- ### Axiomas Adicionales de Orden (para completar Bloque II)
+
+-- Ax 22: ∀ a, b, a < b ⇒ σ(a) ≤ b
+def ax22_succ_le_of_lt : Formula :=
+  forall_2 (
+    (lt (.var 1) (.var 0)) ⇒ (le (succ (.var 1)) (.var 0))
+  )
+
+-- Ax 23: ∀ a, b, a ≤ b ⇒ a² ≤ b²
+def ax23_sq_le_mono : Formula :=
+  forall_2 (
+    (le (.var 1) (.var 0)) ⇒ (le (sq (.var 1)) (sq (.var 0)))
+  )
+
 -- ## Axiom Set
 
-/-- The complete list of 20 axioms for the Minimal system. -/
+/-- The complete list of axioms for the Minimal system. -/
 def axioms : List Formula := [
   ax2_peano_succ_neq_zero,
   ax3_peano_succ_inj,
@@ -237,7 +250,9 @@ def axioms : List Formula := [
   ax18_lt_irrefl,
   ax19_lt_trichotomy,
   ax20_eq_decidable,
-  ax21_mod2_range
+  ax21_mod2_range,
+  ax22_succ_le_of_lt,
+  ax23_sq_le_mono
 ]
 
 end ROBINSON_PlusPlus.Minimal.Axioms

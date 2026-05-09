@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-08
+**Last updated:** 2026-05-09
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.28.0
 
@@ -89,7 +89,8 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
-| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | 🔄 En progreso |
+| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -109,11 +110,15 @@ graph TD
         direction TB
         Axioms["Minimal/Axioms.lean"]
         Block1["Minimal/Theorems/Block1.lean"]
+        Block2["Minimal/Theorems/Block2.lean"]
     end
 
     FOL_FOL --> Axioms
     Axioms --> Block1
+    Axioms --> Block2
+    Block1 --> Block2
     FOL_Tactics --> Block1
+    FOL_Tactics --> Block2
 ```
 
 *(Update this diagram as modules are added)*
@@ -394,6 +399,42 @@ Metaprogramming and macros to automate repetitive natural deduction tasks.
 
 - `soundness`: Si $\Gamma \vdash f$, entonces $\Gamma \models f$.
   `theorem soundness {Γ f} (h : Γ ⊢ f) : Γ ⊨ f`
+
+---
+
+### 3.11 Minimal/Theorems/Block1.lean
+
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block1`
+**Dependencies**: `Minimal.Axioms`, `FOL.Tactics`, `FOL.Theorems.*`
+**Last updated**: 2026-05-09
+**Status**: ✅ Completo (con 2 axiomas adicionales)
+**@axiom_system**: `Minimal`
+**@importance**: `high`
+
+Demostraciones de los teoremas de aritmética básica (Bloque I).
+
+#### Fase 1: Evaluación de Constantes (Teo 1.1 - 1.13)
+
+*(13 teoremas, incluyendo `zero_ne_one`, `one_add_one_eq_two`, etc.)*
+
+#### Fase 2: Identidades del 0 y del 1 (Teo 2.1 - 2.11)
+
+*(11 teoremas, incluyendo `add_zero`, `zero_add`, `mul_one`, `one_mul`, `succ_eq_add_one`, `add_eq_zero_iff`, `mul_eq_zero_iff`)*
+
+#### Fase 3: Orden Estricto y No Estricto (Teo 3.1 - 3.11)
+
+**Theorems**:
+
+- `lt_succ_self`: $\forall n, n < \sigma(n)$
+- `zero_lt_one`, `one_lt_two`, `zero_lt_two`: Instancias de orden.
+- `lt_irrefl`: $\forall n, \neg(n < n)$
+- `ne_of_lt`: $n < m \Rightarrow n \neq m$
+- `zero_le`: $\forall n, 0 \le n$
+- `lt_trans`: $n < m \land m < p \Rightarrow n < p$
+- `lt_asymm`: $n < m \Rightarrow \neg(m < n)$
+- `le_antisymm`: $n \le m \land m \le n \Rightarrow n = m$
+- `lt_add_succ`: $\forall n, k, n < n + \sigma(k)$
+- `exists_pred_of_ne_zero`: $n \neq 0 \Rightarrow \exists m, \sigma(m) = n$
 
 ---
 

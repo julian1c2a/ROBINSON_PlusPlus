@@ -1,6 +1,6 @@
 # Próximos Pasos — ROBINSON_PlusPlus
 
-**Última actualización:** 2026-05-08
+**Última actualización:** 2026-05-09
 **Autor**: Julián Calderón Almendros
 
 > Este archivo hace un seguimiento de las fases de desarrollo planificadas para el proyecto `ROBINSON_PlusPlus`, comenzando con el sistema `Minimal`.
@@ -14,10 +14,10 @@
 
 **Tareas**:
 
-- [ ] **Estructura del Proyecto**: Crear el directorio `ROBINSON_PlusPlus/Minimal/`.
-- [ ] **Axiomas**: Crear el módulo `Minimal/Axioms.lean` y formalizar los 22 axiomas del sistema.
-- [ ] **Bloque I (Aritmética)**: Crear `Minimal/Theorems/Block1.lean` y demostrar los Teoremas 1.1 a 3.11.
-- [ ] **Bloque II (Raíz Cuadrada)**: Crear `Minimal/Theorems/Block2.lean` y demostrar los Teoremas 4.1 a 4.6.
+- [x] **Estructura del Proyecto**: Crear el directorio `ROBINSON_PlusPlus/Minimal/`.
+- [x] **Axiomas**: Crear el módulo `Minimal/Axioms.lean` y formalizar los 22 axiomas del sistema.
+- [x] **Bloque I (Aritmética)**: Crear `Minimal/Theorems/Block1.lean` y demostrar los Teoremas 1.1 a 3.11.
+- [ ] **Bloque II (Raíz Cuadrada)**: Crear `Minimal/Theorems/Block2.lean` y demostrar los Teoremas 4.1 a 4.6. (En progreso)
 - [ ] **Bloque III (div2/mod2)**: Crear `Minimal/Theorems/Block3.lean` y demostrar los Teoremas 5.1 a 5.10.
 
 **Dependencias**: Proyecto `FOL` (estable).
@@ -68,6 +68,7 @@
 
 | Fase | Descripción | Estado |
 |-------|-------------|--------|
-| 1 | Fundamentos y Aritmética | ❌ Pendiente |
+|-------|-------------|--------|
+| 1 | Fundamentos y Aritmética | ✅ Completado |
 | 2 | Función de Cantor y Tuplas | ❌ Pendiente |
 | 3 | Listas y Funciones | ❌ Pendiente |
