@@ -90,8 +90,7 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
-| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔶 Partial |
-| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 | `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 | `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | 🔄 In progress |
 
@@ -536,6 +535,7 @@ Demostraciones de los teoremas sobre la función de apareamiento de Cantor (Bloq
 
 #### Fase 9: Proyecciones de Cantor
 
+- `mod2_of_even`: $n = 2k \implies mod2(n) = 0$ (Lema auxiliar, ahora basado en Ax 24)
 - `cantor_proj1_eq_x`: $[⟨x,y⟩].1 = x$
 - `cantor_proj2_eq_y`: $[⟨x,y⟩].2 = y$
 

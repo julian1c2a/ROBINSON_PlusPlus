@@ -244,6 +244,13 @@ def ax23_cantor_proj_uniq : Formula :=
     (land ((.var 3) =eq (.var 1)) ((.var 2) =eq (.var 0)))
   )))
 
+-- Ax 24 (mod2 of even): ∀ n, k, n = 2*k → mod2(n) = 0
+-- This is a theorem in a system with induction, but required here.
+def ax24_mod2_of_even : Formula :=
+  forall_2 (
+    ((.var 1) =eq (mul two (.var 0))) ⇒ (mod2 (.var 1) =eq zero)
+  )
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -269,7 +276,8 @@ def axioms : List Formula := [
   ax20_eq_decidable,
   ax21_mod2_range,
   ax22_cantor_proj_exists,
-  ax23_cantor_proj_uniq
+  ax23_cantor_proj_uniq,
+  ax24_mod2_of_even
 ]
 
 end ROBINSON_PlusPlus.Minimal.Axioms

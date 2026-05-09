@@ -153,14 +153,10 @@ theorem cantor_injective_c (x y c c' : Term) : Γ ⊢ land (is_cantor x y c) (is
 
 -- Lema Auxiliar: n = 2*k ⇒ mod2(n) = 0
 private theorem mod2_of_even {n k : Term} (h : Γ ⊢ n =eq mul two k) : Γ ⊢ mod2 n =eq zero := by
-  -- Esta prueba requiere inducción sobre k, que no está disponible en `Minimal`.
-  -- La estrategia sería:
-  -- Base k=0: n=0, mod2(0)=0. (Teo 5.1)
-  -- Paso k -> k+1: n = 2*(k+1) = 2k+2. mod2(2k+2) = mod2(σ(2k+1)).
-  -- Por Ax 16, esto es 0 si mod2(2k+1)=1.
-  -- mod2(2k+1) = mod2(σ(2k)). Por Ax 16, esto es 1 si mod2(2k)=0.
-  -- Esto último es la hipótesis de inducción.
-  sorry
+  have h_ax24 := ax (by simp [axioms, ax24_mod2_of_even])
+  let h_spec_k := spec h_ax24 (t := k)
+  let h_spec_n := spec h_spec_k (t := n)
+  exact mp h_spec_n h
 
 -- Teo C8: [⟨x,y⟩].1 = x
 theorem cantor_proj1_eq_x (x y : Term) : Γ ⊢ proj1 (cantor_func x y) =eq x := by
