@@ -524,6 +524,12 @@ Demostraciones de los teoremas sobre la función de apareamiento de Cantor (Bloq
 - `parity_lemma_case_odd`: $mod2(w)=1 \Rightarrow \exists k, w(w+1)=2k$
 - `parity_lemma`: $\forall w, \exists k, w(w+1)=2k$
 
+#### Fase 7: Polinomio de Cantor y Totalidad
+
+- `cantor_poly_term1_eq_sq_add`: $\forall x,y, (x+y)(x+y+1) = (x+y)^2+(x+y)$
+- `cantor_poly_is_even`: $\forall x,y, \exists k, (x+y)(x+y+1)+2y = 2k$
+- `cantor_totality`: $\forall x,y, \exists c, Cantor(x,y,c)$
+
 ---
 
 ## 4. Theorems

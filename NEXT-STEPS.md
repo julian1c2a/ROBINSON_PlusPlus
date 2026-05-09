@@ -33,7 +33,8 @@
 
 - [x] **Bloque IV (Cantor)**: Crear `Minimal/Theorems/Block4.lean`.
   - [x] Demostrar el Lema de Paridad (Lema P1).
-  - [ ] Demostrar la totalidad, inyectividad y sobreyectividad de la función de Cantor (Teos C2, C6, C7).
+  - [x] Demostrar la totalidad de la función de Cantor (Teo C2).
+  - [ ] Demostrar la inyectividad y sobreyectividad de la función de Cantor (Teos C4, C6, C7).
 - [ ] **Bloque V (Tuplas)**: Crear `Minimal/Theorems/Block5.lean`.
   - [ ] Introducir la notación `⟨x, y⟩`.
   - [ ] Definir las proyecciones `[c].1`, `[c].2`.

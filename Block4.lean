@@ -36,6 +36,10 @@ def Γ := axioms
 ### Fase 6: Lema de Paridad
 -/
 
+-- Helper definition for w*(w+1)
+def w_w_plus_1 (w : Term) : Term :=
+  mul w (succ w)
+
 -- Teo 6.1: ∀ w, w*(w+1) = w² + w
 theorem w_mul_w_plus_one_eq_sq_w_add_w (w : Term) : Γ ⊢ mul w (succ w) =eq add (sq w) w := by
   have h_w_plus_1 : Γ ⊢ succ w =eq add w one := spec teo_2_8 (t := w)
@@ -47,7 +51,7 @@ theorem w_mul_w_plus_one_eq_sq_w_add_w (w : Term) : Γ ⊢ mul w (succ w) =eq ad
   exact eq_trans (eq_trans h_lhs h_distrib) h_rhs_expand
 
 -- Teo 6.2: mod2(w) = 0 ⇒ ∃ k, w*(w+1) = 2*k
-theorem parity_lemma_case_even (w : Term) : Γ ⊢ (mod2 w =eq zero) ⇒ ex (mul w (succ w) =eq mul two (.var 0)) := by
+theorem parity_lemma_case_even (w : Term) : Γ ⊢ (mod2 w =eq zero) ⇒ ex (w_w_plus_1 w =eq mul two (.var 0)) := by
   apply deduction_theorem; intro h_mod2_w_eq_zero
   have h_ax17_spec := spec (ax ax17_div_mod_eq) (t := w)
   have h_step1 : Γ ⊢ add (mul (div2 w) two) zero =eq w := eq_trans (eq_congr_add_left h_mod2_w_eq_zero) h_ax17_spec
@@ -63,7 +67,7 @@ theorem parity_lemma_case_even (w : Term) : Γ ⊢ (mod2 w =eq zero) ⇒ ex (mul
   exact ex_intro (mul (div2 w) (succ w)) h_final_eq
 
 -- Teo 6.3: mod2(w) = 1 ⇒ ∃ k, w*(w+1) = 2*k
-theorem parity_lemma_case_odd (w : Term) : Γ ⊢ (mod2 w =eq one) ⇒ ex (mul w (succ w) =eq mul two (.var 0)) := by
+theorem parity_lemma_case_odd (w : Term) : Γ ⊢ (mod2 w =eq one) ⇒ ex (w_w_plus_1 w =eq mul two (.var 0)) := by
   apply deduction_theorem; intro h_mod2_w_eq_one
   have h_ax17_spec := spec (ax ax17_div_mod_eq) (t := w)
   have h_w_eq_div2w_mul_2_add_1 : Γ ⊢ w =eq add (mul (div2 w) two) one := eq_trans (eq_symm (eq_congr_add_left h_mod2_w_eq_one)) (eq_symm h_ax17_spec)
@@ -94,13 +98,40 @@ theorem parity_lemma_case_odd (w : Term) : Γ ⊢ (mod2 w =eq one) ⇒ ex (mul w
   exact ex_intro (mul w (add (div2 w) one)) h_final_eq
 
 -- Lema P1: ∀ w, ∃ k, w*(w+1) = 2*k
-theorem parity_lemma (w : Term) : Γ ⊢ ex (mul w (succ w) =eq mul two (.var 0)) := by
+theorem parity_lemma (w : Term) : Γ ⊢ ex (w_w_plus_1 w =eq mul two (.var 0)) := by
   have h_range := spec mod2_range (t := w)
   apply or_elim h_range
   · intro h_mod2_eq_0
     exact parity_lemma_case_even w h_mod2_eq_0
   · intro h_mod2_eq_1
     exact parity_lemma_case_odd w h_mod2_eq_1
+
+/-!
+### Fase 7: Polinomio de Cantor y Totalidad
+-/
+
+-- Teo 7.1 (Lema C1): ∀ x,y, (x+y)*(x+y+1) = (x+y)² + (x+y)
+theorem cantor_poly_term1_eq_sq_add (x y : Term) : Γ ⊢ w_w_plus_1 (add x y) =eq add (sq (add x y)) (add x y) :=
+  w_mul_w_plus_one_eq_sq_w_add_w (add x y)
+
+-- Teo 7.2: ∀ x,y, ∃ k, (x+y)*(x+y+1) + 2*y = 2*k
+theorem cantor_poly_is_even (x y : Term) : Γ ⊢ ex (cantor_poly x y =eq mul two (.var 0)) := by
+  let w := add x y
+  have h_parity := parity_lemma w
+  apply ex_elim h_parity; intro j; intro h_ww1_eq_2j
+  have h_poly_def : Γ ⊢ cantor_poly x y =eq add (w_w_plus_1 w) (mul two y) := by simp [cantor_poly, w_w_plus_1]
+  have h_subst : Γ ⊢ cantor_poly x y =eq add (mul two j) (mul two y) := eq_trans h_poly_def (eq_congr_add_left h_ww1_eq_2j)
+  have h_distrib := spec (spec (spec (ax ax12_mul_distrib) (t := y)) (t := j)) (t := two)
+  have h_final : Γ ⊢ cantor_poly x y =eq mul two (add j y) := eq_trans h_subst h_distrib
+  exact ex_intro (add j y) h_final
+
+-- Teo C2: ∀ x,y, ∃ c, Cantor(x,y,c) (Totalidad)
+theorem cantor_totality (x y : Term) : Γ ⊢ ex (is_cantor x y (.var 0)) := by
+  have h_poly_even := cantor_poly_is_even x y
+  apply ex_elim h_poly_even; intro k; intro h_poly_eq_2k
+  -- The goal is `ex (mul two (.var 0) =eq cantor_poly x y)`
+  -- We have `cantor_poly x y =eq mul two k`. By symmetry, this is what we need.
+  exact ex_intro k (eq_symm h_poly_eq_2k)
 
 end ROBINSON_PlusPlus.Minimal.Theorems.Block4
 
@@ -110,4 +141,7 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block4 (
   parity_lemma_case_even
   parity_lemma_case_odd
   parity_lemma
+  cantor_poly_term1_eq_sq_add
+  cantor_poly_is_even
+  cantor_totality
 )

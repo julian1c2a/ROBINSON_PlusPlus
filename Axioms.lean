@@ -53,6 +53,16 @@ def sq (t : Term) : Term := mul t t
 def one : Term := succ zero
 def two : Term := succ one
 
+-- Cantor pairing function components
+def cantor_poly (x y : Term) : Term :=
+  add (mul (add x y) (succ (add x y))) (mul two y)
+
+def cantor_func (x y : Term) : Term :=
+  div2 (cantor_poly x y)
+
+def is_cantor (x y c : Term) : Formula :=
+  mul two c =eq cantor_poly x y
+
 -- ## Formula Constructors
 
 -- Helper function to build atomic formulas
