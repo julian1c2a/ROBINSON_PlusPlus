@@ -141,7 +141,48 @@ theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ a < b) : Γ ⊢ (succ a) ≤ b
 
 -- Lema Auxiliar: a ≤ b ∧ c > 0 ⇒ a*c ≤ b*c
 private theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ a ≤ b) (h_c_pos : Γ ⊢ zero < c) : Γ ⊢ (mul a c) ≤ (mul b c) := by
-  sorry -- Monotonicity of multiplication is also non-trivial and likely requires induction.
+  -- Estrategia: Descomponer a ≤ b en a = b ∨ a < b.
+  apply or_elim h_le
+  · intro h_a_lt_b -- Caso a < b
+    -- Queremos demostrar a*c ≤ b*c. Demostraremos el caso más fuerte a*c < b*c.
+    -- 1. De a < b, existe d tal que b = a + σ(d).
+    have h_ax13_ab := (iff_mp (spec (spec (ax13_lt_def (t₂ := a) (t₁ := b))))) h_a_lt_b
+    apply ex_elim h_ax13_ab; intro d; intro h_b_eq_a_sd
+
+    -- 2. Expandimos b*c = (a + σ(d))*c = a*c + σ(d)*c
+    have h_bc_eq_ac_sdc : Γ ⊢ mul b c =eq add (mul a c) (mul (succ d) c) := by
+      have h_comm_b := spec (spec (ax ax10_mul_comm) (t := c)) (t := b)
+      have h_comm_a := spec (spec (ax ax10_mul_comm) (t := c)) (t := a)
+      have h_comm_sd := spec (spec (ax ax10_mul_comm) (t := c)) (t := succ d)
+      have h_distrib := spec (spec (spec (ax ax12_mul_distrib) (t := succ d)) (t := a)) (t := c)
+      have h1 := eq_trans h_comm_b (eq_congr_mul_left h_b_eq_a_sd)
+      have h2 := eq_trans h1 h_distrib
+      have h3 := eq_congr_add_right (eq_symm h_comm_a)
+      have h4 := eq_congr_add_left (eq_symm h_comm_sd)
+      exact eq_trans (eq_trans h2 h3) h4
+
+    -- 3. Demostramos que σ(d)*c es un sucesor, ya que c > 0.
+    have h_c_neq_zero : Γ ⊢ neg (c =eq zero) := mp (spec (spec ne_of_lt)) h_c_pos
+    have h_c_is_succ : Γ ⊢ ex (succ (.var 0) =eq c) := mp (spec teo_3_11) h_c_neq_zero
+    apply ex_elim h_c_is_succ; intro k; intro h_c_eq_sk
+    have h_sdc_is_succ : Γ ⊢ ex (succ (.var 0) =eq mul (succ d) c) := by
+      have h_sdc_eq_sdsk : Γ ⊢ mul (succ d) c =eq mul (succ d) (succ k) := eq_congr_mul_left h_c_eq_sk
+      have h_term_eq_s : Γ ⊢ mul (succ d) (succ k) =eq succ (add (mul (succ d) k) d) := by
+        have h_ax9 := spec (spec (ax ax9_mul_succ) (t := k)) (t := succ d)
+        have h_ax5 := spec (spec (ax ax5_add_succ) (t := d)) (t := mul (succ d) k)
+        exact eq_trans h_ax9 h_ax5
+      exact ex_intro (add (mul (succ d) k) d) (eq_trans h_sdc_eq_sdsk h_term_eq_s)
+
+    -- 4. Como σ(d)*c = σ(j) para algún j, tenemos a*c < a*c + σ(d)*c = b*c.
+    apply ex_elim h_sdc_is_succ; intro j; intro h_sdc_eq_sj
+    have h_lt_spec := spec (spec lt_add_succ (t := j)) (t := mul a c)
+    have h_ac_lt_ac_sdc : Γ ⊢ lt (mul a c) (add (mul a c) (mul (succ d) c)) := eq_subst (eq_symm h_sdc_eq_sj) h_lt_spec
+    have h_ac_lt_bc : Γ ⊢ lt (mul a c) (mul b c) := eq_subst h_bc_eq_ac_sdc h_ac_lt_ac_sdc
+    exact or_intro_left _ h_ac_lt_bc
+
+  · intro h_a_eq_b -- Caso a = b
+    have h_ac_eq_bc : Γ ⊢ mul a c =eq mul b c := eq_congr_mul_right h_a_eq_b
+    exact or_intro_right _ h_ac_eq_bc
 
 -- Lema Auxiliar: a ≤ b ⇒ a² ≤ b²
 private theorem sq_le_mono {a b : Term} (h_le : Γ ⊢ a ≤ b) : Γ ⊢ (sq a) ≤ (sq b) := by
