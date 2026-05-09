@@ -28,6 +28,7 @@ def div2_sym : String := "div2"
 def mod2_sym : String := "mod2"
 def proj1_sym : String := "π₁"
 def proj2_sym : String := "π₂"
+def tau_sym : String := "τ"
 
 -- ### Predicate Symbols
 def lt_sym : String := "<"
@@ -49,6 +50,7 @@ def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
 def proj1 (t : Term)  : Term := .func proj1_sym [t]
 def proj2 (t : Term)  : Term := .func proj2_sym [t]
+def tau (t : Term)    : Term := .func tau_sym [t]
 
 -- Derived operation `sq`
 def sq (t : Term) : Term := mul t t
@@ -56,6 +58,7 @@ def sq (t : Term) : Term := mul t t
 -- Derived constants `1` and `2`
 def one : Term := succ zero
 def two : Term := succ one
+def eight : Term := mul two (mul two two) -- 2*4
 
 -- Cantor pairing function components
 def cantor_poly (x y : Term) : Term :=
@@ -251,6 +254,16 @@ def ax24_mod2_of_even : Formula :=
     ((.var 1) =eq (mul two (.var 0))) ⇒ (mod2 (.var 1) =eq zero)
   )
 
+-- ### Axioms of Predecessor Function
+
+-- Ax 25: τ(0) = 0
+def ax25_tau_zero : Formula :=
+  tau zero =eq zero
+
+-- Ax 26: ∀n, τ(σ(n)) = n
+def ax26_tau_succ : Formula :=
+  forall_ (tau (succ (.var 0)) =eq (.var 0))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -277,7 +290,9 @@ def axioms : List Formula := [
   ax21_mod2_range,
   ax22_cantor_proj_exists,
   ax23_cantor_proj_uniq,
-  ax24_mod2_of_even
+  ax24_mod2_of_even,
+  ax25_tau_zero,
+  ax26_tau_succ
 ]
 
 end ROBINSON_PlusPlus.Minimal.Axioms

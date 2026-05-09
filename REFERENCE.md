@@ -92,7 +92,8 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
 | `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 | `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
-| `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | 🔄 In progress |
+| `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | ✅ Completo |
+| `Minimal/Theorems/Block4_C5.lean`| `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5` | `Minimal.Axioms`, `Block1`, `Block2` | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -115,6 +116,7 @@ graph TD
         Block2["Minimal/Theorems/Block2.lean"]
         Block3["Minimal/Theorems/Block3.lean"]
         Block4["Minimal/Theorems/Block4.lean"]
+        Block4_C5["Minimal/Theorems/Block4_C5.lean"]
     end
 
     FOL_FOL --> Axioms
@@ -122,12 +124,16 @@ graph TD
     Axioms --> Block2
     Axioms --> Block3
     Axioms --> Block4
+    Axioms --> Block4_C5
     Block1 --> Block2
     Block1 --> Block3
     Block1 --> Block4
+    Block1 --> Block4_C5
+    Block2 --> Block4_C5
     Block3 --> Block4
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
+    FOL_Tactics --> Block4_C5
     FOL_Tactics --> Block3
 ```
 
