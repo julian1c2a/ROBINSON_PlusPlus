@@ -195,6 +195,30 @@ theorem cantor_proj2_eq_y (x y : Term) : Γ ⊢ proj2 (cantor_func x y) =eq y :=
   have h_eqs := mp h_uniq (and_intro h_is_cantor_xyc h_is_cantor_proj)
   exact and_elim_right h_eqs
 
+-- Teo C10: ⟨[c].1, [c].2⟩ = c
+theorem cantor_proj_inverse (c : Term) : Γ ⊢ cantor_func (proj1 c) (proj2 c) =eq c := by
+  let P' := cantor_poly (proj1 c) (proj2 c)
+  -- Goal is `div2(P') = c`
+
+  -- 1. From Ax 22, we have `is_cantor (proj1 c) (proj2 c) c`, which means `2*c = P'`.
+  have h_is_cantor_proj : Γ ⊢ is_cantor (proj1 c) (proj2 c) c :=
+    spec (ax ax22_cantor_proj_exists) (t := c)
+  have h_2c_eq_P' : Γ ⊢ mul two c =eq P' := by simp [is_cantor] at h_is_cantor_proj; exact h_is_cantor_proj
+
+  -- 2. From Ax 17, `(div2 P' * 2) + mod2 P' = P'`.
+  have h_ax17 := spec (ax ax17_div_mod_eq) (t := P')
+  -- Since `P' = 2*c`, `P'` is even, so `mod2 P' = 0` (by Ax 24).
+  have h_mod2_P'_eq_0 : Γ ⊢ mod2 P' =eq zero := mod2_of_even (eq_symm h_2c_eq_P')
+  -- Substitute into Ax 17: `(div2 P' * 2) + 0 = P'`, which simplifies to `div2 P' * 2 = P'`.
+  have h_div2P'_mul_2_eq_P' : Γ ⊢ mul (div2 P') two =eq P' := by
+    rw [←h_ax17, h_mod2_P'_eq_0, ax4_add_zero]
+
+  -- 3. We now have `div2 P' * 2 = 2 * c`. By cancellation (Teo 2.11), `div2 P' = c`.
+  have h_div2P'_mul_2_eq_2c : Γ ⊢ mul (div2 P') two =eq mul two c := eq_trans h_div2P'_mul_2_eq_P' h_2c_eq_P'
+  have h_comm := spec (spec (ax ax10_mul_comm) (t := two)) (t := div2 P')
+  have h_2_mul_div2P'_eq_2c : Γ ⊢ mul two (div2 P') =eq mul two c := eq_trans h_comm h_div2P'_mul_2_eq_2c
+  exact mp (spec (spec teo_2_11 (t := c)) (t := div2 P')) h_2_mul_div2P'_eq_2c
+
 end ROBINSON_PlusPlus.Minimal.Theorems.Block4
 
 -- Exports
@@ -209,4 +233,5 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block4 (
   cantor_injective_c
   cantor_proj1_eq_x
   cantor_proj2_eq_y
+  cantor_proj_inverse
 )

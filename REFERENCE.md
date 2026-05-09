@@ -538,6 +538,7 @@ Demostraciones de los teoremas sobre la función de apareamiento de Cantor (Bloq
 - `mod2_of_even`: $n = 2k \implies mod2(n) = 0$ (Lema auxiliar, ahora basado en Ax 24)
 - `cantor_proj1_eq_x`: $[⟨x,y⟩].1 = x$
 - `cantor_proj2_eq_y`: $[⟨x,y⟩].2 = y$
+- `cantor_proj_inverse`: $⟨[c].1, [c].2⟩ = c$
 
 ---
 

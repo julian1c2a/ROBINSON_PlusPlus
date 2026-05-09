@@ -11,7 +11,7 @@
 |--------|-------|
 | Total modules | 5 |
 | Modules with 0 sorry | 5 / 5 |
-| Total theorems proven | 64 |
+| Total theorems proven | 65 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
@@ -28,7 +28,7 @@
 | `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block3.lean` | 11 | 0 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block4.lean` | 8 | 1 | 0 | 🔄 In progress |
+| `Minimal/Theorems/Block4.lean` | 9 | 1 | 0 | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -36,6 +36,7 @@
 
 ## Recent Achievements
 
+- **Bloque IV (Fase 9)**: Demostrado el isomorfismo inverso de las proyecciones (Teo C10).
 - **Bloque IV (Refinamiento)**: Eliminado el `sorry` de `mod2_of_even` al postularlo como Axioma 24, completando formalmente las pruebas de las proyecciones (Teo C8 y C9).
 - **Bloque IV (Fase 9)**: Definidas las proyecciones de Cantor y demostradas sus propiedades de inversión (Teo C8 y C9), asumiendo dos nuevos axiomas y un lema pendiente.
 - **Bloque IV (Fase 8)**: Demostrada la inyectividad de la función de Cantor (Teo C4).

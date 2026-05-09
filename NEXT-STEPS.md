@@ -36,7 +36,7 @@
   - [x] Demostrar la totalidad de la función de Cantor (Teo C2).
   - [x] Demostrar la inyectividad de la función de Cantor (Teo C4).
   - [ ] Demostrar la sobreyectividad (Teo C6) y unicidad proyectiva (Teo C7).
-  - [x] Demostrar las propiedades de las proyecciones (Teos C8, C9).
+  - [x] Demostrar las propiedades de las proyecciones (Teos C8, C9, C10).
 - [ ] **Bloque V (Tuplas)**: Crear `Minimal/Theorems/Block5.lean`.
   - [ ] Introducir la notación `⟨x, y⟩`.
   - [ ] Definir las proyecciones `[c].1`, `[c].2`.
