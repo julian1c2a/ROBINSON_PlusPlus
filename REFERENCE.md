@@ -90,8 +90,7 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
-| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` |  Partial |
-| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -465,7 +464,35 @@ Demostraciones de los teoremas sobre la raíz cuadrada (Bloque II).
 - `sqrt_one`: $\sqrt{1} = 1$
 - `sqrt_unique_of_bounds`: $k^2 \le n \land n < (k+1)^2 \Rightarrow k = \sqrt{n}$
 - `succ_le_of_lt`: $a < b \Rightarrow \sigma(a) \le b$ (Teorema derivable)
-- `sq_le_mono`: $a \le b \Rightarrow a^2 \le b^2$ (Teorema derivable, prueba omitida por longitud)
+- `sq_le_mono`: $a \le b \Rightarrow a^2 \lbe
+---
+
+### 3.13 Minimal/Theorems/Block3.lean
+
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block3`
+**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`
+**Last updated**: 2026-05-09
+**Status**: ✅ Completo
+**@axiom_system**: `Minimal`
+**@importance**: `high`
+
+Demostraciones de los teoremas sobre `div2` y `mod2` (Bloque III).
+
+#### Fase 5: Valores de div2 y mod2 (Teo 5.1 - 5.10)
+
+**Theorems**:
+
+- `mod2_zero`: $mod2(0) = 0$
+- `div2_zero`: $div2(0) = 0$
+- `mod2_one`: $mod2(1) = 1$
+- `div2_one`: $div2(1) = 0$
+- `mod2_two`: $mod2(2) = 0$
+- `div2_two`: $div2(2) = 1$
+- `mod2_three`: $mod2(3) = 1$
+- `div2_three`: $div2(3) = 1$
+- `mod2_four`: $mod2(4) = 0$
+- `div2_four`: $div2(4) = 2$
+- `mod2_range`: $\forall n, mod2(n) = 0 \lor mod2(n) = 1$
 
 ---
 

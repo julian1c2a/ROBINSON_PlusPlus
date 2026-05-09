@@ -17,8 +17,8 @@
 - [x] **Estructura del Proyecto**: Crear el directorio `ROBINSON_PlusPlus/Minimal/`.
 - [x] **Axiomas**: Crear el módulo `Minimal/Axioms.lean` y formalizar los 22 axiomas del sistema.
 - [x] **Bloque I (Aritmética)**: Crear `Minimal/Theorems/Block1.lean` y demostrar los Teoremas 1.1 a 3.11.
-- [ ] **Bloque II (Raíz Cuadrada)**: Crear `Minimal/Theorems/Block2.lean` y demostrar los Teoremas 4.1 a 4.6. (En progreso)
-- [ ] **Bloque III (div2/mod2)**: Crear `Minimal/Theorems/Block3.lean` y demostrar los Teoremas 5.1 a 5.10. (En progreso)
+- [x] **Bloque II (Raíz Cuadrada)**: Crear `Minimal/Theorems/Block2.lean` y demostrar los Teoremas 4.1 a 4.6.
+- [x] **Bloque III (div2/mod2)**: Crear `Minimal/Theorems/Block3.lean` y demostrar los Teoremas 5.1 a 5.10.
 
 **Dependencias**: Proyecto `FOL` (estable).
 **Complejidad**: Media
@@ -67,7 +67,6 @@
 ## Resumen de Estado
 
 | Fase | Descripción | Estado |
-|-------|-------------|--------|
 |-------|-------------|--------|
 | 1 | Fundamentos y Aritmética | ✅ Completado |
 | 2 | Función de Cantor y Tuplas | ❌ Pendiente |
