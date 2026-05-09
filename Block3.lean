@@ -96,6 +96,82 @@ theorem div2_one : Γ ⊢ div2 one =eq zero := by
   · intro h_div2_eq_zero; exact h_div2_eq_zero
   · intro h_two_eq_zero; exact false_elim (h_two_neq_zero h_two_eq_zero)
 
+-- Teo 5.7: mod2(3) = 1
+theorem mod2_three : Γ ⊢ mod2 three =eq one := by
+  -- From Ax 16: mod2(n) = 0 ⇔ mod2(σ(n)) = 1. With n=2: mod2(2)=0 ⇔ mod2(3)=1
+  have h_ax16_spec := spec (ax (by simp [axioms, ax16_mod2_succ])) (t := two)
+  -- We have mod2(2) = 0 from Teo 5.5, so by iff we get mod2(3) = 1.
+  exact iff_mp h_ax16_spec mod2_two
+
+-- Teo 5.8: div2(3) = 1
+theorem div2_three : Γ ⊢ div2 three =eq one := by
+  -- From Ax 17: (div2(3) * 2) + mod2(3) = 3
+  have h_ax17_spec := spec (ax (by simp [axioms, ax17_div_mod_eq])) (t := three)
+  -- Substitute mod2(3) = 1 (Teo 5.7)
+  have h_step1 : Γ ⊢ add (mul (div2 three) two) one =eq three :=
+    eq_trans (eq_congr_add_left mod2_three) h_ax17_spec
+  -- From Teo 2.8, n + 1 = σ(n). So the LHS is σ(div2(3) * 2)
+  have h_lhs_eq_succ : Γ ⊢ add (mul (div2 three) two) one =eq succ (mul (div2 three) two) :=
+    eq_symm (spec teo_2_8 (t := mul (div2 three) two))
+  -- The equation becomes σ(div2(3) * 2) = 3 = σ(2)
+  have h_succ_eq_three : Γ ⊢ succ (mul (div2 three) two) =eq three := eq_trans (eq_symm h_lhs_eq_succ) h_step1
+  -- By injectivity of σ (Ax 3), div2(3) * 2 = 2
+  have h_mul_eq_two : Γ ⊢ mul (div2 three) two =eq two :=
+    mp (spec (spec (ax ax3_peano_succ_inj) (t := two)) (t := mul (div2 three) two)) h_succ_eq_three
+  -- We have 2 * 1 = 2 (Teo 1.9)
+  -- By commutativity on the LHS: 2 * div2(3) = 2
+  have h_comm_lhs := spec (spec (ax ax10_mul_comm) (t := two)) (t := div2 three)
+  have h_lhs_comm : Γ ⊢ mul two (div2 three) =eq two := eq_trans h_comm_lhs h_mul_eq_two
+  -- So we have 2 * div2(3) = 2 * 1
+  have h_eq_muls : Γ ⊢ mul two (div2 three) =eq mul two one := eq_trans h_lhs_comm (eq_symm teo_1_9)
+  -- By Teo 2.11 (cancellation), div2(3) = 1
+  exact mp (spec (spec teo_2_11 (t := one)) (t := div2 three)) h_eq_muls
+
+-- Teo 5.9: mod2(4) = 0
+theorem mod2_four : Γ ⊢ mod2 four =eq zero := by
+  -- From Ax 16: mod2(n) = 0 ⇔ mod2(σ(n)) = 1. With n=3: mod2(3)=0 ⇔ mod2(4)=1
+  have h_ax16_spec := spec (ax (by simp [axioms, ax16_mod2_succ])) (t := three)
+  -- We know mod2(3) = 1 (Teo 5.7). So the LHS of the iff, mod2(3)=0, is false.
+  have h_mod2_three_neq_zero : Γ ⊢ neg (mod2 three =eq zero) := by
+    apply raa; intro h_mod2_three_eq_zero
+    have h_one_eq_zero : Γ ⊢ one =eq zero := eq_trans (eq_symm mod2_three) h_mod2_three_eq_zero
+    exact teo_1_11 (eq_symm h_one_eq_zero)
+  -- Therefore, the RHS must be false: ¬(mod2(4) = 1)
+  have h_mod2_four_neq_one : Γ ⊢ neg (mod2 four =eq one) := (iff_false_right h_ax16_spec) h_mod2_three_neq_zero
+  -- From Ax 21: mod2(4) = 0 ∨ mod2(4) = 1
+  have h_ax21_spec := spec (ax (by simp [axioms, ax21_mod2_range])) (t := four)
+  -- By disjunctive syllogism, mod2(4) = 0
+  apply or_elim h_ax21_spec
+  · intro h_mod2_four_eq_zero
+    exact h_mod2_four_eq_zero
+  · intro h_mod2_four_eq_one
+    exact false_elim (h_mod2_four_neq_one h_mod2_four_eq_one)
+
+-- Teo 5.9: div2(4) = 2
+theorem div2_four : Γ ⊢ div2 four =eq two := by
+  -- From Ax 17: (div2(4) * 2) + mod2(4) = 4
+  have h_ax17_spec := spec (ax (by simp [axioms, ax17_div_mod_eq])) (t := four)
+  -- Substitute mod2(4) = 0 (Teo 5.9)
+  have h_step1 : Γ ⊢ add (mul (div2 four) two) zero =eq four :=
+    eq_trans (eq_congr_add_left mod2_four) h_ax17_spec
+  -- From Ax 4, n + 0 = n. So LHS is div2(4) * 2
+  have h_lhs_eq_mul : Γ ⊢ add (mul (div2 four) two) zero =eq mul (div2 four) two :=
+    spec (ax ax4_add_zero) (t := mul (div2 four) two)
+  -- So, div2(4) * 2 = 4
+  have h_mul_eq_four : Γ ⊢ mul (div2 four) two =eq four := eq_trans (eq_symm h_lhs_eq_mul) h_step1
+  -- We know 2 * 2 = 4 (Teo 1.10)
+  -- By commutativity on the LHS: 2 * div2(4) = 4
+  have h_comm_lhs := spec (spec (ax ax10_mul_comm) (t := two)) (t := div2 four)
+  have h_lhs_comm : Γ ⊢ mul two (div2 four) =eq four := eq_trans h_comm_lhs h_mul_eq_four
+  -- So we have 2 * div2(4) = 2 * 2
+  have h_eq_muls : Γ ⊢ mul two (div2 four) =eq mul two two := eq_trans h_lhs_comm (eq_symm teo_1_10)
+  -- By Teo 2.11 (cancellation), div2(4) = 2
+  exact mp (spec (spec teo_2_11 (t := two)) (t := div2 four)) h_eq_muls
+
+-- Teo 5.10: ∀ n, mod2(n) = 0 ∨ mod2(n) = 1
+theorem mod2_range : Γ ⊢ ax21_mod2_range :=
+  ax (by simp [axioms, ax21_mod2_range])
+
 end ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
 -- Exports
@@ -104,4 +180,11 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block3 (
   div2_zero
   mod2_one
   div2_one
+  mod2_two
+  div2_two
+  mod2_three
+  div2_three
+  mod2_four
+  div2_four
+  mod2_range
 )

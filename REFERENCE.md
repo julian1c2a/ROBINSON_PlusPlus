@@ -90,8 +90,8 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
-| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
-| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔄 In progress |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` |  Partial |
+| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -465,7 +465,7 @@ Demostraciones de los teoremas sobre la raíz cuadrada (Bloque II).
 - `sqrt_one`: $\sqrt{1} = 1$
 - `sqrt_unique_of_bounds`: $k^2 \le n \land n < (k+1)^2 \Rightarrow k = \sqrt{n}$
 - `succ_le_of_lt`: $a < b \Rightarrow \sigma(a) \le b$ (Teorema derivable)
-- `sq_le_mono`: $a \le b \Rightarrow a^2 \le b^2$ (Teorema derivable)
+- `sq_le_mono`: $a \le b \Rightarrow a^2 \le b^2$ (Teorema derivable, prueba omitida por longitud)
 
 ---
 

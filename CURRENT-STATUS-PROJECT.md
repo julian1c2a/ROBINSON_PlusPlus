@@ -11,7 +11,7 @@
 |--------|-------|
 | Total modules | 4 |
 | Modules with 0 sorry | 4 / 4 |
-| Total theorems proven | 51 |
+| Total theorems proven | 56 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
@@ -27,7 +27,7 @@
 | `Minimal/Axioms.lean` | 0 | 40 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block3.lean` | 6 | 0 | 0 | 🔄 In progress |
+| `Minimal/Theorems/Block3.lean` | 11 | 0 | 0 | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -36,7 +36,7 @@
 ## Recent Achievements
 
 - **Bloque II (Completado)**: Demostrado el lema de monotonicidad del cuadrado (`sq_le_mono`), eliminando el último `sorry` del proyecto. ¡El Bloque II está completo!
-- **Bloque III (Fase 5)**: Demostrados los teoremas sobre `div2` y `mod2` para 0, 1 y 2 (Teo 5.1 a 5.6).
+- **Bloque III (Completado)**: Demostrados todos los teoremas sobre `div2` y `mod2` (Teo 5.1 a 5.10). ¡El Bloque III está completo!
 - **Bloque II (Fase 4)**: Completada la demostración de la unicidad de la raíz cuadrada (`sqrt_unique_of_bounds`), asumiendo los lemas de monotonía. El sistema axiomático se ha reducido a 21 axiomas.
 - **Inicialización del Proyecto**: Se ha configurado `ROBINSON_PlusPlus` con `FOL` como dependencia.
 - **Axiomatización**: Se ha creado `Minimal/Axioms.lean` y se han formalizado los 21 axiomas del sistema.
@@ -48,7 +48,7 @@
 
 ## Pending Work
 
-- **Bloque III**: Completar la demostración de los teoremas sobre `div2` y `mod2` (Teo 5.3 a 5.10).
+- **Bloque IV**: Iniciar la formalización de la función de apareamiento de Cantor.
 
 ---
 
