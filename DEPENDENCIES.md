@@ -21,8 +21,29 @@ ProjectName.lean        # Root module
 
 ```mermaid
 graph TD
-    P[Prelim.lean]
-    Z[ProjectName.lean] --> P
+    subgraph "Project: FOL"
+        direction LR
+        FOL_FOL["FOL.lean"]
+        FOL_Tactics["Tactics.lean"]
+    end
+
+    subgraph "Project: ROBINSON_PlusPlus"
+        direction TB
+        Axioms["Minimal/Axioms.lean"]
+        Block1["Minimal/Theorems/Block1.lean"]
+        Block2["Minimal/Theorems/Block2.lean"]
+        Block3["Minimal/Theorems/Block3.lean"]
+    end
+
+    FOL_FOL --> Axioms
+    Axioms --> Block1
+    Axioms --> Block2
+    Axioms --> Block3
+    Block1 --> Block2
+    Block1 --> Block3
+    FOL_Tactics --> Block1
+    FOL_Tactics --> Block2
+    FOL_Tactics --> Block3
 ```
 
 *(Update this diagram as modules are added. Use subdirectory grouping:)*

@@ -27,7 +27,9 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 21 a
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Complete |
-| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | 🔄 In progress |
+| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Complete |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Block1` | 🔶 Partial |
+| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Block1` | 🔄 In progress |
 
 ## Project Structure
 
@@ -37,6 +39,8 @@ ROBINSON_PlusPlus/
 │   ├── Axioms.lean            # Language and 21 axioms of the minimal system
 │   └── Theorems/
 │       └── Block1.lean        # Block I: Basic Arithmetic Proofs
+│       └── Block2.lean        # Block II: Square Root Proofs
+│       └── Block3.lean        # Block III: div2/mod2 Proofs
 ├── Intermediate/              # (Planned) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```

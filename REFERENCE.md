@@ -91,6 +91,7 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 | `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
 | `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
 | `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔶 Partial |
+| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -111,14 +112,18 @@ graph TD
         Axioms["Minimal/Axioms.lean"]
         Block1["Minimal/Theorems/Block1.lean"]
         Block2["Minimal/Theorems/Block2.lean"]
+        Block3["Minimal/Theorems/Block3.lean"]
     end
 
     FOL_FOL --> Axioms
     Axioms --> Block1
     Axioms --> Block2
+    Axioms --> Block3
     Block1 --> Block2
+    Block1 --> Block3
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
+    FOL_Tactics --> Block3
 ```
 
 *(Update this diagram as modules are added)*
