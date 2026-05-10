@@ -196,14 +196,14 @@ private theorem lt_le_trans {a b c : Term} (h_lt : Γ ⊢ a < b) (h_le : Γ ⊢ 
   · intro h_b_eq_c
     rwa [h_b_eq_c] at h_lt
 
-private theorem le_lt_trans {a b c : Term} (h_le : Γ ⊢ a ≤ b) (h_lt : Γ ⊢ b < c) : Γ ⊢ a < c := by
+theorem le_lt_trans {a b c : Term} (h_le : Γ ⊢ a ≤ b) (h_lt : Γ ⊢ b < c) : Γ ⊢ a < c := by
   apply or_elim h_le
   · intro h_a_lt_b
     exact lt_trans (and_intro h_a_lt_b h_lt)
   · intro h_a_eq_b
     rwa [h_a_eq_b] at h_lt
 
-private theorem le_trans {a b c : Term} (h_ab : Γ ⊢ a ≤ b) (h_bc : Γ ⊢ b ≤ c) : Γ ⊢ a ≤ c := by
+theorem le_trans {a b c : Term} (h_ab : Γ ⊢ a ≤ b) (h_bc : Γ ⊢ b ≤ c) : Γ ⊢ a ≤ c := by
   apply or_elim h_ab
   · intro h_a_lt_b
     exact or_intro_left _ (lt_le_trans h_a_lt_b h_bc)
@@ -291,4 +291,7 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block2 (
   sqrt_one
   sqrt_unique_of_bounds
   succ_le_of_lt
+  lt_le_trans
+  le_lt_trans
+  le_trans
 )

@@ -37,6 +37,8 @@ En lugar de expandir el proyecto `FOL` indefinidamente, adoptaremos una arquitec
 
 ### 3.1. Filosofía y Justificación
 
+**Embedding desde FOL=**: Es crucial entender que el sistema `Minimal` no se construye desde cero. Se trata de una **extensión** del sistema `FOL=` (Lógica de Primer Orden con Igualdad) formalizado en el proyecto `FOL`. Esto significa que `Minimal` hereda toda la maquinaria lógica de `FOL=`, incluyendo las reglas de deducción natural y las propiedades de la igualdad. El sistema `Minimal` se limita a añadir los axiomas aritméticos sobre este fundamento lógico ya establecido.
+
 Este proyecto aborda la cuestión de "qué se necesita para construir X". La idea de empezar con un sistema minimalista (como la aritmética de Robinson o el sistema de 22 axiomas) no es proponerlo como el sistema final, sino como un ejercicio fundacional para responder a la pregunta: *¿Cuál es la base mínima de la que podemos derivar la función de Cantor y, por tanto, las tuplas y listas?*
 
 La aparente inconsistencia de usar recursión para `+` y `*` pero no para otras funciones es deliberada: se trata de un sistema "eximio" que nos fuerza a adoptar como axiomas propiedades (como la conmutatividad) que intuimos como "obvias" pero que no podemos demostrar sin inducción.
@@ -76,13 +78,66 @@ Un tema transversal a todos los proyectos fundacionales es la necesidad de ser e
 
 ---
 
-## 5. Hoja de Ruta General
+## 5. Plan de Desarrollo Detallado
 
-1. **Estabilizar `FOL`**: Considerar la versión actual como `v1.0` y tratarla como una dependencia externa estable.
-2. **Iniciar `ROBINSON_PlusPlus`**:
-    a. Crear el nuevo proyecto con `FOL` como dependencia.
-    b. Establecer la estructura de directorios (`Minimal`, `Intermediate`, `Full`).
-    c. Comenzar la implementación de `Minimal/` según `NEXT-STEPS.md`, traduciendo los 22 axiomas y las primeras fases de `TuplasFuncionesYListas.md`.
-    d. El objetivo clave es llegar a la **fundamentación de las listas (Bloque VI)**.
-3. **Consolidación**: A largo plazo, los resultados de `ROBINSON_PlusPlus` permitirán refactorizar otros proyectos (como el proyecto Peano existente) para que se apoyen en una base formalmente verificada desde `FOL=`.
-4. **Futuro**: Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.
+> Este plan de desarrollo sigue la especificación de `TuplasFuncionesYListas.md`.
+
+### Fase 1: Sistema `Minimal` — Fundamentos y Aritmética Básica
+
+**Objetivo**: Establecer la base axiomática y demostrar las propiedades aritméticas elementales (Bloques I-III).
+**Estado**: ✅ **Completado**
+
+**Tareas**:
+
+- [x] **Estructura del Proyecto**: Crear el directorio `ROBINSON_PlusPlus/Minimal/`.
+- [x] **Axiomas**: Crear el módulo `Minimal/Axioms.lean` y formalizar los axiomas del sistema.
+- [x] **Bloque I (Aritmética)**: Crear `Minimal/Theorems/Block1.lean` y demostrar los Teoremas 1.1 a 3.11.
+- [x] **Bloque II (Raíz Cuadrada)**: Crear `Minimal/Theorems/Block2.lean` y demostrar los Teoremas 4.1 a 4.6.
+- [x] **Bloque III (div2/mod2)**: Crear `Minimal/Theorems/Block3.lean` y demostrar los Teoremas 5.1 a 5.10.
+
+### Fase 2: Sistema `Minimal` — Función de Cantor
+
+**Objetivo**: Construir la función de apareamiento de Cantor (Bloque IV) y definir las tuplas (Bloque V).
+**Estado**: ✅ **Completado** (axiomáticamente)
+
+**Tareas**:
+
+- [x] **Bloque IV (Cantor)**: Crear `Minimal/Theorems/Block4.lean`.
+  - [x] Demostrar el Lema de Paridad (Lema P1).
+  - [x] Demostrar la totalidad de la función de Cantor (Teo C2).
+  - [x] Demostrar la inyectividad de la función de Cantor (Teo C4).
+  - [ ] **Demostrar el Lema C5 (existencia y unicidad de `w`)**. (En progreso)
+  - [ ] Demostrar la sobreyectividad (Teo C6) y unicidad proyectiva (Teo C7) para eliminar los axiomas temporales.
+  - [x] Demostrar las propiedades de las proyecciones (Teos C8, C9, C10) usando los axiomas temporales.
+- [x] **Bloque V (Tuplas)**: Crear `Minimal/Theorems/Block5.lean`.
+  - [x] Introducir la notación `pair` (alias de `cantor_func`).
+  - [x] Definir las proyecciones `π₁` y `π₂`.
+  - [x] Demostrar los teoremas de isomorfismo (Teos C8-C11).
+
+### Fase 3: Sistema `Minimal` — Listas y Funciones
+
+**Objetivo**: Fundamentar las listas y las funciones discretas (Bloques VI-VII).
+**Estado**: 🔄 **En progreso**
+
+**Tareas**:
+
+- [x] **Bloque VI (Listas)**: Crear `Minimal/Theorems/Block6.lean`.
+  - [x] Definir `Nil` y `Cons`.
+  - [x] Demostrar las propiedades fundamentales (Teos L1, L2).
+  - [x] Demostrar las propiedades de pertenencia (`In`).
+  - [x] Demostrar las propiedades de la concatenación (`⊕`). (Parcial, 2 sorries por depender de inducción)
+- [ ] **Bloque VII (Funciones)**: Crear `Minimal/Theorems/Block7.lean`.
+  - [ ] Definir el predicado `IsFunction`.
+  - [ ] Definir la evaluación `F(x)`.
+  - [ ] Demostrar el isomorfismo con relaciones funcionales (Teo F3).
+
+---
+
+## 6. Futuro y Consolidación
+
+Una vez completado el sistema `Minimal`, los siguientes pasos a largo plazo son:
+
+1. **Implementar el sistema `Intermediate`**: Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` son teoremas derivables de un principio de inducción restringido.
+2. **Implementar el sistema `Full`**: Demostrar que todos los axiomas temporales y propiedades meta-teóricas se vuelven teoremas en un sistema con inducción general.
+3. **Consolidación**: Usar los resultados de `ROBINSON_PlusPlus` para refactorizar otros proyectos y que se apoyen en una base formalmente verificada desde `FOL=`.
+4. **Nuevas Teorías**: Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.

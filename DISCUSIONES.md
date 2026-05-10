@@ -44,6 +44,46 @@ Esta sección desglosa el propósito y estatus de los axiomas de alto nivel del 
 *   **Axioma 26 (`ax26_tau_succ`)**: `∀n, τ(σ(n)) = n`
     *   **Propósito**: Define el paso recursivo de la función predecesor `τ`.
 
+DISCUSIÓN (¿Pueden los axiomas 25 y 26 pasar a ser definiciones + teoremas?):
+
+Def τ : ℕ → ℕ
+Def τ(0) := 0
+Def ∀ n, τ(σ(n)) := n
+
+Veamos que existe un natural `m` que cumple `τ(n) = m` para cada `n`. De hecho, `m = σ(n)` cumple esta propiedad:
+- Para `n = 0`, `τ(0) = 0` por el axioma 25, y `σ(0) = 1`, así que `τ(0) = 0` cumple la propiedad. Las dos reglas colapsan en exactamente el mismo número imagen.
+- Cualquier otro número `n` es de la forma `σ(k)` para algún `k`, y entonces `τ(σ(k)) = k` por la propia definición, y `σ(k)` cumple la propiedad. Por otra parte `∀ k, 0 ≠ σ(k)`, así que no hay casos adicionales a considerar.
+- Por lo tanto, `τ` es una función total y bien definida, y la definición solo usa los axiomas de `σ`. No se requiere ningún axioma adicional para definir `τ` de esta manera, y no hay contradicciones con los axiomas existentes. Por lo tanto, la función `τ` es perfectamente válida en el sistema `Minimal` con los axiomas dados. No usa inducción para estar perfectamente definida. 
+
+DISCUSIÓN (¿Puede el Axioma 20 pasar a ser un teorema?):
+
+El axioma 20 establece `∀ n, ∀ m, n = m ∨ n ≠ m`
+
+Vamos a pensarlo por casos:
+
+- Si `n` y `m` son el mismo número, entonces `n = m` es verdadero, y la disyunción se cumple.
+- Si `n` y `m` son números diferentes, entonces `n ≠ m` es verdadero, y la disyunción se cumple.
+- Supongo que el problema es que no se puede demostrar que `n = m` o `n ≠ m` para todos los números `n` y `m` sin usar inducción. Sin embargo voy a intentarlo:
+- Para `n = 0` y `m = 0`, `n = m` es verdadero, así que la disyunción se cumple.
+- Para `n = 0` y `m = σ(k)` para algún `k`, `n ≠ m` es verdadero, así que la disyunción se cumple, porque para todo `k`, `σ(k) ≠ 0`.
+- Idem si `n = σ(k)` y `m = 0`, entonces `n ≠ m` es verdadero, así que la disyunción se cumple.
+- Para `n = σ(k)` y `m = σ(l)`. Volvemos a tener dos casos:
+    - Si `k = l`, entonces `n = m` es verdadero, así que la disyunción se cumple.
+    - Si `k ≠ l`, entonces `n ≠ m` es verdadero, así que la disyunción se cumple.
+- ¿No tenemos para la igualdad un principio restringido de exclusión del tercero?
+
+DISCUSIÓN (¿Es el Axioma 20 un teorema?):
+
+Dice así: `∀ n, mod2(n) = 0 ∨ mod2(n) = 1`
+
+Yo creía que con la definición de `div2` y de `mod2` quedaba perfectamente claro que `mod2` solo podía tomar los valores 0 y 1, pero es cierto que no se ha demostrado formalmente. Sin embargo, creo que se puede demostrar sin usar inducción, simplemente por casos sobre la forma de `n`.
+
+Tenemos los siguientes axiomas para `div2` y `mod2`:
+Ax 16. $\forall n,\quad mod2(n) = 0 \iff mod2(\sigma(n)) = 1$
+Ax 17. $\forall n,\quad \bigl(div2(n) * 2\bigr) + mod2(n) = n$
+
+DISCUSIÓN ¿Como entonces se puede construir la incompletitud de Gödel en un sistema como Q (Aritmética de Robinson) con muchos menos axiomas que `Minimal`?
+
 ### Axiomas Temporales (Andamiaje)
 
 Estos axiomas se han añadido para poder avanzar, pero están destinados a ser eliminados una vez que se demuestren los teoremas correspondientes.
@@ -54,3 +94,5 @@ Estos axiomas se han añadido para poder avanzar, pero están destinados a ser e
     *   **Propósito**: Postula la **unicidad proyectiva** de la función de Cantor. Será eliminado cuando se demuestre el **Teorema C7**.
 *   **Axioma 24 (`ax24_mod2_of_even`)**: `n = 2*k → mod2(n) = 0`
     *   **Propósito**: Postula que el `mod2` de un número par es cero. Es un teorema en sistemas con inducción, pero se mantiene como axioma en `Minimal` porque su prueba formal requiere un sistema más fuerte.
+*   **Axioma 27 (`ax27_add_left_cancel`)**: `a+c = b+c → a=b`
+    *   **Propósito**: Postula la propiedad de cancelación por la izquierda para la suma. Es un teorema en sistemas con inducción, pero se requiere aquí para demostrar la unicidad proyectiva (Teo C7).

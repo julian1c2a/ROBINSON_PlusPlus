@@ -9,13 +9,13 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 6 |
-| Modules with 0 sorry | 5 / 6 |
-| Total theorems proven | 65 |
+| Total modules | 8 |
+| Modules with 0 sorry | 6 / 8 |
+| Total theorems proven | 76 |
 | Total definitions | ~43 |
 | Total notations | 0 (heredadas de FOL) |
 | Build status | ✅ Passing |
-| Lean version | v4.28.0 |
+| Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
 ---
@@ -26,10 +26,12 @@
 |--------|----------|-------------|-------|--------|
 | `Minimal/Axioms.lean` | 0 | 40 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block1.lean` | 39 | 3 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block2.lean` | 6 | 0 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block2.lean` | 9 | 0 | 0 | ✅ Complete |
 | `Minimal/Theorems/Block3.lean` | 11 | 0 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block4.lean` | 9 | 1 | 0 | ✅ Complete |
-| `Minimal/Theorems/Block4_C5.lean` | 0 | 1 | 1 | 🔄 In progress |
+| `Minimal/Theorems/Block4.lean` | 8 | 1 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block4_C5.lean` | 19 | 1 | 1 | 🔄 In progress |
+| `Minimal/Theorems/Block5.lean` | 4 | 0 | 0 | ✅ Complete |
+| `Minimal/Theorems/Block6.lean` | 5 | 0 | 2 | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -37,13 +39,9 @@
 
 ## Recent Achievements
 
-- **Bloque IV (Fase 9.1)**: Iniciada la demostración del Lema C5 con la prueba del lema auxiliar `2*div2(n) ≤ n`.
-- **Bloque IV (Fase 9)**: Demostrado el isomorfismo inverso de las proyecciones (Teo C10).
-- **Bloque IV (Refinamiento)**: Eliminado el `sorry` de `mod2_of_even` al postularlo como Axioma 24, completando formalmente las pruebas de las proyecciones (Teo C8 y C9).
-- **Bloque IV (Fase 9)**: Definidas las proyecciones de Cantor y demostradas sus propiedades de inversión (Teo C8 y C9), asumiendo dos nuevos axiomas y un lema pendiente.
-- **Bloque IV (Fase 8)**: Demostrada la inyectividad de la función de Cantor (Teo C4).
-- **Bloque IV (Fase 7)**: Demostrada la totalidad de la función de Cantor (Teo C2).
-- **Bloque IV (Fase 6)**: Demostrado el Lema de Paridad (Lema P1).
+- **Bloque IV (Fase 9.1)**: Continuada la demostración del Lema C5 con la adición de múltiples lemas auxiliares para la manipulación de desigualdades.
+- **Bloque VI (Listas)**: Definidas las listas y demostradas sus propiedades fundamentales (Fases 12-14).
+- **Bloque V (Tuplas)**: Establecido el isomorfismo de tuplas (Fase 11).
 - **Bloque II (Completado)**: Demostrado el lema de monotonicidad del cuadrado (`sq_le_mono`), eliminando el último `sorry` del proyecto. ¡El Bloque II está completo!
 - **Bloque III (Completado)**: Demostrados todos los teoremas sobre `div2` y `mod2` (Teo 5.1 a 5.10). ¡El Bloque III está completo!
 - **Bloque II (Fase 4)**: Completada la demostración de la unicidad de la raíz cuadrada (`sqrt_unique_of_bounds`), asumiendo los lemas de monotonía. El sistema axiomático se ha reducido a 21 axiomas.

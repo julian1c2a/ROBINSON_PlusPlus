@@ -94,6 +94,8 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 | `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
 | `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | ✅ Completo |
 | `Minimal/Theorems/Block4_C5.lean`| `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5` | `Minimal.Axioms`, `Block1`, `Block2` | 🔄 In progress |
+| `Minimal/Theorems/Block5.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block5` | `Minimal.Axioms`, `Block1`, `Block3`, `Block4` | ✅ Completo |
+| `Minimal/Theorems/Block6.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block6` | `Minimal.Axioms`, `Block1`, `Block5` | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -117,6 +119,8 @@ graph TD
         Block3["Minimal/Theorems/Block3.lean"]
         Block4["Minimal/Theorems/Block4.lean"]
         Block4_C5["Minimal/Theorems/Block4_C5.lean"]
+        Block5["Minimal/Theorems/Block5.lean"]
+        Block6["Minimal/Theorems/Block6.lean"]
     end
 
     FOL_FOL --> Axioms
@@ -125,13 +129,19 @@ graph TD
     Axioms --> Block3
     Axioms --> Block4
     Axioms --> Block4_C5
+    Axioms --> Block5
+    Axioms --> Block6
     Block1 --> Block2
     Block1 --> Block3
     Block1 --> Block4
     Block1 --> Block4_C5
+    Block1 --> Block5
+    Block1 --> Block6
     Block2 --> Block4_C5
-    Block3 --> Block4_C5
     Block3 --> Block4
+    Block3 --> Block5
+    Block4 --> Block5
+    Block5 --> Block6
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
     FOL_Tactics --> Block4_C5
@@ -515,7 +525,7 @@ Demostraciones de los teoremas sobre `div2` y `mod2` (Bloque III).
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block4`
 **Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `Minimal.Theorems.Block3`
 **Last updated**: 2026-05-09
-**Status**: 🔄 In progress
+**Status**: ✅ Completo
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 

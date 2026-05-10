@@ -29,9 +29,13 @@ def mod2_sym : String := "mod2"
 def proj1_sym : String := "π₁"
 def proj2_sym : String := "π₂"
 def tau_sym : String := "τ"
+def nil_sym : String := "Nil"
+def cons_sym : String := "Cons"
+def concat_sym : String := "⊕"
 
 -- ### Predicate Symbols
 def lt_sym : String := "<"
+def in_sym : String := "In"
 
 -- ### Constant Symbols
 def zero_sym : String := "0"
@@ -51,6 +55,8 @@ def mod2 (t : Term)   : Term := .func mod2_sym [t]
 def proj1 (t : Term)  : Term := .func proj1_sym [t]
 def proj2 (t : Term)  : Term := .func proj2_sym [t]
 def tau (t : Term)    : Term := .func tau_sym [t]
+def Cons (h t : Term) : Term := .func cons_sym [h, t]
+def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
 
 -- Derived operation `sq`
 def sq (t : Term) : Term := mul t t
@@ -70,11 +76,21 @@ def cantor_func (x y : Term) : Term :=
 def is_cantor (x y c : Term) : Formula :=
   mul two c =eq cantor_poly x y
 
+def pair (x y : Term) : Term :=
+  cantor_func x y
+
+-- List constructors
+def Nil : Term := zero
+-- The actual definition is `pair h (succ t)`, but we use an uninterpreted function
+-- symbol `Cons` governed by axioms to match the spec's abstract approach.
+-- The connection will be made via axioms.
+
 -- ## Formula Constructors
 
 -- Helper function to build atomic formulas
 def lt (t₁ t₂ : Term) : Formula := .atom lt_sym [t₁, t₂]
 def le (t₁ t₂ : Term) : Formula := (lt t₁ t₂) ∨ (t₁ =eq t₂)
+def In (x l : Term) : Formula := .atom in_sym [x, l]
 
 -- Helper for universal quantification over 1, 2, or 3 variables
 def forall_ (f : Formula) : Formula := .forall f
@@ -264,6 +280,37 @@ def ax25_tau_zero : Formula :=
 def ax26_tau_succ : Formula :=
   forall_ (tau (succ (.var 0)) =eq (.var 0))
 
+-- ### Axioms of Lists
+
+-- Ax L0: Connects Cons to the underlying pair definition
+def ax_L0_cons_def : Formula :=
+  forall_2 (Cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0)))
+
+-- Ax L1: In(x, Nil) is always false
+def ax_L1_in_nil : Formula :=
+  forall_ (neg (In (.var 0) Nil))
+
+-- Ax L2: Membership in a Cons list
+def ax_L2_in_cons : Formula :=
+  forall_3 (
+    In (.var 2) (Cons (.var 1) (.var 0)) ⇔ (lor ((.var 2) =eq (.var 1)) (In (.var 2) (.var 0)))
+  )
+
+-- Ax C1: Concatenation with Nil
+def ax_C1_concat_nil : Formula :=
+  forall_ (concat Nil (.var 0) =eq (.var 0))
+
+-- Ax C2: Concatenation with Cons
+def ax_C2_concat_cons : Formula :=
+  forall_3 (concat (Cons (.var 2) (.var 1)) (.var 0) =eq Cons (.var 2) (concat (.var 1) (.var 0)))
+
+-- Ax 27 (add_left_cancel): ∀ a,b,c, a+c = b+c → a=b
+-- This is a theorem in a system with induction, but required here for C7.
+def ax27_add_left_cancel : Formula :=
+  forall_3 (
+    (add (.var 2) (.var 0) =eq add (.var 1) (.var 0)) ⇒ ((.var 2) =eq (.var 1))
+  )
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -292,7 +339,13 @@ def axioms : List Formula := [
   ax23_cantor_proj_uniq,
   ax24_mod2_of_even,
   ax25_tau_zero,
-  ax26_tau_succ
+  ax26_tau_succ,
+  ax_L0_cons_def,
+  ax_L1_in_nil,
+  ax_L2_in_cons,
+  ax_C1_concat_nil,
+  ax_C2_concat_cons,
+  ax27_add_left_cancel -- This should be the last one for now
 ]
 
 end ROBINSON_PlusPlus.Minimal.Axioms
