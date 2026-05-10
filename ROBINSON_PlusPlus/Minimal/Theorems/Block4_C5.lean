@@ -37,7 +37,7 @@ def Γ := axioms
 
 -- Candidate for `w`
 def w_candidate (c : Term) : Term :=
-  div2 (tau (sqrt (add (mul eight c) one)))
+  div2 (pred (sqrt (add (mul eight c) one)))
 
 -- Lema Auxiliar: ∀ n, 2*div2(n) ≤ n
 private theorem lemma_2_div2_le_n (n : Term) : Γ ⊢ le (mul two (div2 n)) n := by sorry
@@ -96,7 +96,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land (le (mul (.var 0) (succ (.
     apply (iff_mpr (w_w1_le_2c_iff_sq_2w1_le_8c1 (w := w) (c := c)))
 
     let s := sqrt (add (mul eight c) one)
-    let p := tau s
+    let p := pred s
 
     -- From `sqrt` axiom, `s² ≤ 8c+1`. We prove `(2w+1)² ≤ s²` and use transitivity.
     apply le_trans (c := sq s)
@@ -120,7 +120,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land (le (mul (.var 0) (succ (.
       apply ex_elim h_s_is_succ; intro p_witness; intro h_s_eq_spw
       have h_p_eq_pw : Γ ⊢ p =eq p_witness := by
         have h_ax26 := spec (ax ax26_tau_succ) (t := p_witness)
-        simp [p, tau]; rwa [h_s_eq_spw] at h_ax26
+        simp [p, pred]; rwa [h_s_eq_spw] at h_ax26
       rw [←h_p_eq_pw] at h_s_eq_spw
 
       -- Goal is now `2*div2(p) + 1 ≤ σ(p)`
@@ -142,7 +142,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land (le (mul (.var 0) (succ (.
       apply (iff_mp h_equiv_lt)
       -- Goal: 8c+1 < (2w+3)²
       let s := sqrt (add (mul eight c) one)
-      let p := tau s
+      let p := pred s
 
       -- From `sqrt` axiom, `8c+1 < (s+1)²`. We prove `(s+1)² ≤ (2w+3)²` and use transitivity.
       apply le_lt_trans (lt_succ_sqrt_sq (add (mul eight c) one))
@@ -159,7 +159,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land (le (mul (.var 0) (succ (.
       apply ex_elim h_s_is_succ; intro p_witness; intro h_s_eq_spw
       have h_p_eq_pw : Γ ⊢ p =eq p_witness := by
         have h_ax26 := spec (ax ax26_tau_succ) (t := p_witness)
-        simp [p, tau]; rwa [h_s_eq_spw] at h_ax26
+        simp [p, pred]; rwa [h_s_eq_spw] at h_ax26
       rw [←h_p_eq_pw] at h_s_eq_spw
 
       -- Goal is now `σ(p)+1 ≤ 2*div2(p)+3`

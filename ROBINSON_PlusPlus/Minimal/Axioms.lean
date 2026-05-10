@@ -36,14 +36,14 @@ def div2_sym : String := "div2"
 def mod2_sym : String := "mod2"
 def proj1_sym : String := "π₁"
 def proj2_sym : String := "π₂"
-def tau_sym : String := "τ"
-def nil_sym : String := "Nil"
-def cons_sym : String := "Cons"
-def concat_sym : String := "⊕"
+def pred_sym : String := "τ"
+def nil_sym : String := "[]"
+def cons_sym : String := "::"
+def concat_sym : String := "##"
 
 -- ### Predicate Symbols
 def lt_sym : String := "<"
-def in_sym : String := "In"
+def in_sym : String := "∈"
 
 -- ### Constant Symbols
 def zero_sym : String := "0"
@@ -62,7 +62,7 @@ def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
 def proj1 (t : Term)  : Term := .func proj1_sym [t]
 def proj2 (t : Term)  : Term := .func proj2_sym [t]
-def tau (t : Term)    : Term := .func tau_sym [t]
+def pred (t : Term)    : Term := .func pred_sym [t]
 def Cons (h t : Term) : Term := .func cons_sym [h, t]
 def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
 
@@ -102,6 +102,7 @@ def le (t₁ t₂ : Term) : Formula := (lt t₁ t₂) ∨ (t₁ =eq t₂)
 scoped notation:50 t₁ " ≤ " t₂ => le t₁ t₂
 
 def In (x l : Term) : Formula := .atom in_sym [x, l]
+scoped notation:50 x " ∈ " l => In x l
 
 -- Helper for universal quantification over 1, 2, or 3 variables
 def forall_ (f : Formula) : Formula := .forall f
@@ -289,11 +290,11 @@ def ax24_mod2_of_even : Formula :=
 
 -- Ax 25: τ(0) = 0
 def ax25_tau_zero : Formula :=
-  tau zero =eq zero
+  pred zero =eq zero
 
 -- Ax 26: ∀n, τ(σ(n)) = n
 def ax26_tau_succ : Formula :=
-  forall_ (tau (succ (.var 0)) =eq (.var 0))
+  forall_ (pred (succ (.var 0)) =eq (.var 0))
 
 -- ### Axioms of Lists
 

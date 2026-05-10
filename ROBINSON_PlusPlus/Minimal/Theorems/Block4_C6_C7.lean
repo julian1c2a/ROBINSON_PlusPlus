@@ -44,8 +44,8 @@ theorem add_left_cancel {a b c : Term} (h : Γ ⊢ (add a c =eq add b c)) : Γ �
 
 -- Inverse functions (constructive definitions)
 def w_of_c (c : Term) : Term := w_candidate c
-def y_of_c (c : Term) : Term := tau (tau (mul two c)) -- Placeholder, needs subtraction
-def x_of_c (c : Term) : Term := tau (w_of_c c) -- Placeholder, needs subtraction
+def y_of_c (c : Term) : Term := pred (pred (mul two c)) -- Placeholder, needs subtraction
+def x_of_c (c : Term) : Term := pred (w_of_c c) -- Placeholder, needs subtraction
 
 -- Teo C6: ∀ c, ∃ x, ∃ y, Cantor(x,y,c) (Sobreyectividad)
 theorem cantor_surjectivity (c : Term) : Γ ⊢ ex (ex (is_cantor (.var 1) (.var 0) c)) := by
