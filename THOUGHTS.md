@@ -97,9 +97,6 @@ Ahora desde (H) e (J) tenemos:
 
 (S) Contradicción, por lo tanto $¬ (b < σ(a))$ y entonces $σ(a) ≤ b$.
 
-
-
-
 ### 2026-04-21 — Automatización de Tácticas (Fase 4)
 
 **Identidad y Debilitamiento**:
