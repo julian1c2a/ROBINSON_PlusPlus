@@ -15,7 +15,7 @@ import FOL.Theorems.Impl
 import FOL.Theorems.Neg
 import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
-import FOL.Metamath.Deduction
+import FOL.Deduction
 
 open FOL.FOL
 open FOL.Tactics

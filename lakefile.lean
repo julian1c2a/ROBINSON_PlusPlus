@@ -6,15 +6,17 @@ package «ROBINSON_PlusPlus» where
   -- Disable auto-implicit to enforce explicit type annotations everywhere
   moreServerArgs := #["-DautoImplicit=false"]
 
--- ── External dependencies (uncomment as needed) ──────────────────────────────
+-- ── External dependencies ────────────────────────────────────────────────────
+
+-- FOL: First-Order Logic with Equality (local sibling project)
+-- Provides: Term, Formula, Derives (⊢), substitution, equality rules, tactics
+require FOL from "../FOL"
 
 -- ZfcSetTheory: ZFC set theory in Lean 4, no Mathlib
--- Provides: SetUniverse, ExistsUnique, all ZFC axioms + constructions
 -- require ZfcSetTheory from git
 --   "https://github.com/julian1c2a/ZfcSetTheory" @ "master"
 
 -- PeanoNatLib: Peano natural numbers, no Mathlib
--- Provides: Peano.ℕ₀, Peano.Add, Peano.Mul, Peano.StrictOrder, ...
 -- require peanolib from git
 --   "https://github.com/julian1c2a/Peano" @ "master"
 

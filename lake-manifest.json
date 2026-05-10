@@ -1,5 +1,12 @@
 {"version": "1.1.0",
  "packagesDir": ".lake/packages",
- "packages": [],
- "name": "FOL",
+ "packages":
+ [{"type": "path",
+   "scope": "",
+   "name": "FOL",
+   "manifestFile": "lake-manifest.json",
+   "inherited": false,
+   "dir": "../FOL",
+   "configFile": "lakefile.lean"}],
+ "name": "ROBINSON_PlusPlus",
  "lakeDir": ".lake"}

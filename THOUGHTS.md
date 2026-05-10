@@ -21,6 +21,20 @@
 
 ## Ideas and Alternatives
 
+## 3.4. Signos que no aparecen en los alfabetos de FOL⁼ pero sí en los axiomas de `Minimal`
+
+- `+`, `*`, `σ`, `τ`, `div2`, `mod2`, `cantor_func` (o `pair`), `π₁`, `π₂`, `Nil`, `Cons`, `In`, `⊕`, `√` .
+
+- `tau_symb` podría cambiarse por `pred_symb` para ser más descriptivo.
+
+- De hecho, el sistema `Minimal`, debería de incluir también símbolos subíndices y superíndices, como $\{ \quad {}^1 , \quad {}^2, \quad {}^{-1}, \quad {}^{-2}, \quad {}_1, \quad {}_2, \ldots\quad \}$. De esta forma no nos haría falta un símbolo como `π₁` o `π₂`, directamente en el alfabeto, sino que tendríamos `π`, y los anteriores subíndices y superíndices para componer nombres de funciones, por ejemplo, o `i-ésimo` elemento de una lista o de un conjunto ordenado.
+
+- El símbolo `In` soy partidario de cambiarlo por `∈` infijo, y `⊕` por `##`. `Cons` podría sustituirse por `::` y `Nil` por `[]`.
+
+- De esta forma, el alfabeto de `Minimal` se mantendría más cercano a la notación  matemática estándar, aunque esto es una cuestión de estilo y no afecta a la fundamentación.
+
+- La función `div2` podría pasar a representarse como $/_2$, igual que `mod2` como `%_2`, para mantener la notación más cercana a la matemática estándar.
+
 ## ¿Es necesario el axioma 22?
 
 El verdadero axioma 22 es $a < b ⟹ σ(a) ≤ b$.
@@ -34,31 +48,56 @@ De (A) y (D) demostramos que si $¬ (b < σ(a))$ entonces $σ(a) ≤ b$, lo que 
 
 Vamos a suponer que (WH) $b < σ(a)$ y nuestra hipótesis inicial (IA) $a < b$.
 
-(IA) $a < b ⟺ ∃ c, a + σ(c) = b$ Por la Definición de <
+(IA) $a < b$
+
+(A) ∃ c, a + σ(c) = b$ Por (IA) + la Definición de <
+
 (B) $a + σ(c) = b$ Por (A)
-(C) $σ(a + σ(c)) = σ(b)$ Por la Definición de σ
-(D) $σ(a) + σ(c) = σ(b)$ Por la Definición de +
-(E) $a + σ(σ(c)) = σ(b)$ Por la Definición de σ y +
+
+(C) $σ(a + σ(c)) = σ(b)$ Por ser σ función (aplicación de σ a ambos lados de la igualdad)
+
+(D) $a + σ(σ(c)) = σ(b)$ Por la Definición de +
+
+(E) $σ(b) = a + σ(σ(c))$ Por (D) y Simetría de la igualdad
+
+(F) $σ(b) = σ(a + σ(c))$ Por (E) y la Definición de +
+
+(G) $b = a + σ(c)$ Por (F) y la Inyectividad de σ
+
+(H) $b = a + (c + σ(0))$ Por (F) y la Inyectividad de σ
 
 Ahora desde (WH)
-(WH) $σ(b) < a$
-(K) $∃ e, σ(b) + σ(e) = a$ Por la Definición de <
-(L) $σ(b) = a + σ(σ(c))$ por (E).Symmetry de la igualdad
-(M) $(a + σ(σ(c))) + σ(e) = a$ por (L) y (K) Transistividad de la igualdad
-(N) $a + (σ(σ(c)) + σ(e)) = a$ por la Asociatividad de +
-(N) $a + σ(σ(c) + e) = a$ por la Definición de +
-(O) $a < a$ por la Definición de <
-(P) Contradicción con la irreflexividad de <.
 
-¬ WH ⇒ $σ(b) ≥ a$
+Por el axioma de tricotomías $b < σ(a) ∨ b = σ(a) ∨ σ(a) < b$
+De las tres posibilidades supondremos la primera, será nuestra hipótesis de trabajo (WH) para llegar a una contradicción:
 
-Pero una vez tenemos en 6. $σ(a) = a + σ(σ(k) + j)$, suponiendo $k=0$ y $j=0$, nos queda $suc(a) = a + suc(suc(0))$, y de aquí $suc(a) = suc(a + suc(0))$, y de ahí $a = a + suc(0)$, $a = suc (a + 0) = suc(a)$ contradictorio. Con $suc$ si podemos usar inducción. A lo que si hemos llegado es a $suc(a) = suc(a + (suc(k) + j))$. Y sabemos que el caso $j=0$ y $k=0$ no puede ser.  Sea $j \neq 0$, esto es, sea $j = suc(j')$. Entonces $suc(a) = suc(a + (suc(k) + suc(j'))) = suc(a + suc(suc(k+j')))$, $a = a + suc(suc(k+j'))$, de dónde $a < a$. Supongamos que $j=0$, y $k \neq 0$, esto es $k = suc(k')$
+(WH) $b < σ(a)$
 
-$suc(a) = suc(a + (suc(k) + j))$ y $j=0$ y $k = suc(k')$
+(I) $∃ d, b + σ(d) = σ(a)$ Por WH y la Definición de <
 
-Esto nos da $suc(a) = suc(a + (suc(suc(k')) + 0))$ y $a = a + suc(suc(k'))$, de dónde $a < a$.
+(J) $b + σ(d) = a + σ(0)$ Por (I) y la Definición de +
 
-Ahora, suponiendo que k = suc(k') y j = suc(j') nos da $suc(a) = suc(a + (suc(suc(k')) + suc(j')))$, $a = a + (suc(suc(k')) + suc(j'))$, de dónde $a < a$.
+Ahora desde (H) e (J) tenemos:
+
+(K) $a + (c + σ(0)) = b$ Por (H) Simetría de la igualdad
+
+(L) $b + σ(d) = a + σ(0)$ Por (J)
+
+(N) $a + (σ(0) + c) = b$ Por (K) y Conmutatividad de la suma
+
+(M) $(a + σ(0)) + c = b$ Por (N) y Asociatividad de la suma
+
+(O) $(b + σ(d)) + c = b$ Por (M) y la Sustiotución de (J) en (M)
+
+(P) $b + (σ(d) + c) = b$ Por (O) y Asociatividad de la suma
+
+(Q) $b + σ(d + c) = b$ Por (P) y Conmutatividad de la suma
+
+(R) $b < b$ Por (Q) y la Definición de <
+
+(S) Contradicción, por lo tanto $¬ (b < σ(a))$ y entonces $σ(a) ≤ b$.
+
+
 
 
 ### 2026-04-21 — Automatización de Tácticas (Fase 4)

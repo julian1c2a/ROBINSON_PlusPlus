@@ -62,8 +62,22 @@ El proyecto se organizará en tres directorios principales, cada uno representan
 ### 3.3. Objetivo de Paridad
 
 El objetivo final de `ROBINSON_PlusPlus` es establecer formalmente los **embeddings** entre estos sistemas:
-`Minimal ⊂ Intermediate ⊂ Full`
+`FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`
 Esto se logrará demostrando que los axiomas de un nivel son teoremas en el nivel superior.
+
+### 3.4. Signos que no aparecen en los alfabetos de FOL⁼ pero sí en los axiomas de `Minimal`
+
+- `+`, `*`, `σ`, `τ`, `div2`, `mod2`, `cantor_func` (o `pair`), `π₁`, `π₂`, `Nil`, `Cons`, `In`, `⊕`, `√` .
+
+- `tau_symb` podría cambiarse por `pred_symb` para ser más descriptivo.
+
+- De hecho, el sistema `Minimal`, debería de incluir también símbolos subíndices y superíndices, como $\{ \quad {}^1 , \quad {}^2, \quad {}^{-1}, \quad {}^{-2}, \quad {}_1, \quad {}_2, \ldots\quad \}$. De esta forma no nos haría falta un símbolo como `π₁` o `π₂`, directamente en el alfabeto, sino que tendríamos `π`, y los anteriores subíndices y superíndices para componer nombres de funciones, por ejemplo, o `i-ésimo` elemento de una lista o de un conjunto ordenado.
+
+- El símbolo `In` soy partidario de cambiarlo por `∈` infijo, y `⊕` por `##`. `Cons` podría sustituirse por `::` y `Nil` por `[]`.
+
+- De esta forma, el alfabeto de `Minimal` se mantendría más cercano a la notación  matemática estándar, aunque esto es una cuestión de estilo y no afecta a la fundamentación.
+
+- La función `div2` podría pasar a representarse como $/_2$, igual que `mod2` como `%_2`, para mantener la notación más cercana a la matemática estándar.
 
 ---
 

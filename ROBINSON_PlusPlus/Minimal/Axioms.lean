@@ -4,9 +4,17 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 
-import FOL.FOL -- Assuming this is the import path for the FOL project
+import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬ ⇒ ⇔ ∀. ∃. ⊥ ⊤ #
+import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
 
 namespace ROBINSON_PlusPlus.Minimal.Axioms
+
+-- ## Notations & local aliases
+-- FOL usa ≐ para igualdad de términos en fórmulas; aquí usamos =eq como alias legible.
+scoped notation:50 t₁ " =eq " t₂ => Formula.eq t₁ t₂
+
+-- Formula.ex no está en scope sin `open Formula`; lo reexportamos aquí.
+abbrev ex := @Formula.ex
 
 /-!
 # Axioms of the Minimal Arithmetic System
@@ -90,6 +98,9 @@ def Nil : Term := zero
 -- Helper function to build atomic formulas
 def lt (t₁ t₂ : Term) : Formula := .atom lt_sym [t₁, t₂]
 def le (t₁ t₂ : Term) : Formula := (lt t₁ t₂) ∨ (t₁ =eq t₂)
+-- Alias de ≤ aritmético para Terms → Formula (sombrea ≤ de Prop dentro del namespace)
+scoped notation:50 t₁ " ≤ " t₂ => le t₁ t₂
+
 def In (x l : Term) : Formula := .atom in_sym [x, l]
 
 -- Helper for universal quantification over 1, 2, or 3 variables
@@ -256,6 +267,10 @@ def ax22_cantor_proj_exists : Formula :=
   )
 
 -- Ax 23 (Uniqueness): Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y'
+-- land/lor: versión funcional de ∧/∨ sobre Formula (para usar fuera de notación)
+def land (A B : Formula) : Formula := Formula.and A B
+def lor  (A B : Formula) : Formula := Formula.or  A B
+
 def ax23_cantor_proj_uniq : Formula :=
   forall_ (forall_2 (forall_2 (
     (land (is_cantor (.var 3) (.var 2) (.var 4)) (is_cantor (.var 1) (.var 0) (.var 4)))
@@ -347,5 +362,154 @@ def axioms : List Formula := [
   ax_C2_concat_cons,
   ax27_add_left_cancel -- This should be the last one for now
 ]
+
+-- ## Helper Theorems
+-- Estas herramientas son usadas en todos los archivos Block*.lean.
+
+/-- Obtiene un axioma del conjunto de axiomas por membresía en la lista. -/
+theorem ax {f : Formula} (h : f ∈ axioms) : axioms ⊢ f :=
+  Derives.hyp axioms f h
+
+/-- Especializa una fórmula ∀A con un término concreto t (un paso de sustitución). -/
+theorem spec {Γ : List Formula} {A : Formula} (h : Γ ⊢ Formula.forall A) (t : Term) :
+    Γ ⊢ substFormula 0 t A :=
+  Derives.elim_forall Γ A t h
+
+/-- Reflexividad: Γ ⊢ (t ≐ t) (funciona bajo igualdad definitional). -/
+theorem eq_refl {Γ : List Formula} (t : Term) : Γ ⊢ (t ≐ t) :=
+  Derives.refl Γ t
+
+/-- Simetría de la igualdad. -/
+theorem eq_symm {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) : Γ ⊢ (t₂ ≐ t₁) :=
+  FOL.derive_eq_symm h
+
+/-- Transitividad no-estándar: de t₁≐t₂ y t₁≐t₃, concluye t₂≐t₃ (sym + trans estándar). -/
+theorem eq_trans {Γ : List Formula} {t₁ t₂ t₃ : Term}
+    (h1 : Γ ⊢ (t₁ ≐ t₂)) (h2 : Γ ⊢ (t₁ ≐ t₃)) : Γ ⊢ (t₂ ≐ t₃) :=
+  FOL.derive_eq_trans (FOL.derive_eq_symm h1) h2
+
+/-- Congruencia: succ respeta la igualdad. -/
+theorem eq_congr_succ {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
+    Γ ⊢ (succ t₁ ≐ succ t₂) := by
+  -- Estrategia: Derives.subst con f = Formula.eq (succ (liftTerm 0 t₁)) (succ #0)
+  -- substFormula 0 s f  =  Formula.eq (succ t₁) (succ s)   para cualquier s : Term
+  --   LHS: substTerm 0 s (succ (liftTerm 0 t₁))
+  --       = succ (substTerms 0 s [liftTerm 0 t₁])
+  --       = succ [substTerm 0 s (liftTerm 0 t₁)]
+  --       = succ [t₁]                               (por FOL.substTerm_liftTerm)
+  --       = succ t₁
+  --   RHS: substTerm 0 s (succ (.var 0))
+  --       = succ (substTerms 0 s [.var 0])
+  --       = succ [substTerm 0 s (.var 0)]
+  --       = succ [s]                                (0 = 0 → ite_true)
+  --       = succ s
+  let f : Formula := Formula.eq (succ (liftTerm 0 t₁)) (succ (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ t₁) (succ s) := by
+    intro s
+    simp only [f, substFormula, succ, substTerm, substTerms,
+               FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (succ t₁))
+
+-- ## Additional Proof Helpers
+
+/-- Modus ponens: from Γ ⊢ A ⇒ B and Γ ⊢ A, conclude Γ ⊢ B. -/
+def mp {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇒ B)) (h2 : Γ ⊢ A) : Γ ⊢ B :=
+  Derives.elim_impl Γ A B h1 h2
+
+/-- Implication introduction (meta-level function → object-level implication). -/
+theorem imp_intro {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A → Γ ⊢ B) : Γ ⊢ (A ⇒ B) := by
+  sorry
+
+/-- Universal generalization: from (∀ n, Γ ⊢ substFormula 0 n A), conclude Γ ⊢ ∀A. -/
+theorem gen {Γ : List Formula} {A : Formula} (h : ∀ n : Term, Γ ⊢ substFormula 0 n A) :
+    Γ ⊢ Formula.forall A := by
+  sorry
+
+/-- Reductio ad absurdum (classical): from Γ ⊢ A → ⊥, conclude Γ ⊢ ¬A. -/
+theorem raa {Γ : List Formula} {A : Formula} (h : Γ ⊢ A → Γ ⊢ ⊥) : Γ ⊢ ¬A := by
+  sorry
+
+/-- Conjunction introduction. -/
+def and_intro {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ A) (h2 : Γ ⊢ B) : Γ ⊢ (A ∧ B) :=
+  Derives.intro_and Γ A B h1 h2
+
+/-- Left conjunction elimination. -/
+def and_elim_left {Γ : List Formula} {A B : Formula} (h : Γ ⊢ (A ∧ B)) : Γ ⊢ A :=
+  Derives.elim_and_l Γ A B h
+
+/-- Right conjunction elimination. -/
+def and_elim_right {Γ : List Formula} {A B : Formula} (h : Γ ⊢ (A ∧ B)) : Γ ⊢ B :=
+  Derives.elim_and_r Γ A B h
+
+/-- Left disjunction introduction. -/
+def or_intro_left {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A) : Γ ⊢ (A ∨ B) :=
+  Derives.intro_or_l Γ A B h
+
+/-- Right disjunction introduction. -/
+def or_intro_right {Γ : List Formula} {A B : Formula} (h : Γ ⊢ B) : Γ ⊢ (A ∨ B) :=
+  Derives.intro_or_r Γ A B h
+
+/-- Disjunction elimination (meta-level). -/
+theorem or_elim {Γ : List Formula} {A B C : Formula}
+    (h : Γ ⊢ (A ∨ B)) (h1 : Γ ⊢ A → Γ ⊢ C) (h2 : Γ ⊢ B → Γ ⊢ C) : Γ ⊢ C := by
+  sorry
+
+/-- False elimination (ex falso). -/
+def false_elim {Γ : List Formula} {A : Formula} (h : Γ ⊢ ⊥) : Γ ⊢ A :=
+  Derives.bot_elim Γ A h
+
+/-- Existential introduction. -/
+def ex_intro {Γ : List Formula} {A : Formula} (t : Term)
+    (h : Γ ⊢ substFormula 0 t A) : Γ ⊢ Formula.ex A :=
+  Derives.intro_ex Γ A t h
+
+/-- Existential elimination (meta-level). -/
+theorem ex_elim {Γ : List Formula} {A C : Formula}
+    (h : Γ ⊢ Formula.ex A)
+    (cont : ∀ t : Term, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C := by
+  sorry
+
+/-- Forward direction of biconditional. -/
+def iff_mp {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇔ B)) (h2 : Γ ⊢ A) : Γ ⊢ B :=
+  Derives.elim_impl Γ A B (Derives.elim_and_l Γ (A ⇒ B) (B ⇒ A) h1) h2
+
+/-- Backward direction of biconditional. -/
+def iff_mpr {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇔ B)) (h2 : Γ ⊢ B) : Γ ⊢ A :=
+  Derives.elim_impl Γ B A (Derives.elim_and_r Γ (A ⇒ B) (B ⇒ A) h1) h2
+
+/-- Equality substitution (used to rewrite equality hypotheses). -/
+theorem eq_subst {Γ : List Formula} {t₁ t₂ : Term} {A : Formula}
+    (heq : Γ ⊢ (t₁ ≐ t₂)) (hp : Γ ⊢ A) : Γ ⊢ A := by
+  sorry
+
+/-- Negation respects equality symmetry: ¬(b = a) → ¬(a = b). -/
+theorem eq_symm_neg {Γ : List Formula} {t₁ t₂ : Term}
+    (h : Γ ⊢ ¬(t₂ ≐ t₁)) : Γ ⊢ ¬(t₁ ≐ t₂) := by
+  sorry
+
+/-- Congruence: add respects equality in the right argument. -/
+theorem eq_congr_add_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
+    Γ ⊢ (add u t₁ ≐ add u t₂) := by
+  sorry
+
+/-- Congruence: add respects equality in the left argument. -/
+theorem eq_congr_add_right {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
+    Γ ⊢ (add t₁ u ≐ add t₂ u) := by
+  sorry
+
+/-- Congruence: mul respects equality in the right argument. -/
+theorem eq_congr_mul_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
+    Γ ⊢ (mul u t₁ ≐ mul u t₂) := by
+  sorry
+
+/-- Congruence: mul respects equality in the left argument. -/
+theorem eq_congr_mul_right {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
+    Γ ⊢ (mul t₁ u ≐ mul t₂ u) := by
+  sorry
+
+/-- Coercion: use Γ ⊢ A ⇒ B as a function Γ ⊢ A → Γ ⊢ B. -/
+instance {Γ : List Formula} {A B : Formula} :
+    CoeFun (Derives Γ (Formula.impl A B)) (fun _ => Derives Γ A → Derives Γ B) where
+  coe h ha := Derives.elim_impl Γ A B h ha
 
 end ROBINSON_PlusPlus.Minimal.Axioms
