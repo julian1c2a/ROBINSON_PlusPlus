@@ -35,7 +35,7 @@
   - [x] Demostrar el Lema de Paridad (Lema P1).
   - [x] Demostrar la totalidad de la función de Cantor (Teo C2).
   - [x] Demostrar la inyectividad de la función de Cantor (Teo C4).
-  - [ ] Demostrar el Lema C5 (existencia y unicidad de `w`).
+  - [ ] Demostrar el Lema C5 (existencia y unicidad de `w`). (En progreso)
   - [ ] Demostrar la sobreyectividad (Teo C6) y unicidad proyectiva (Teo C7) para eliminar los axiomas temporales.
   - [x] Demostrar las propiedades de las proyecciones (Teos C8, C9, C10) usando los axiomas temporales.
 - [ ] **Bloque V (Tuplas)**: Crear `Minimal/Theorems/Block5.lean`.

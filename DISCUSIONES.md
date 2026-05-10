@@ -26,3 +26,31 @@ La conclusión es que **ambos axiomas son redundantes** en un sistema completo, 
 ## Conclusión
 
 Los axiomas 22 y 23 son correctos en su afirmación, pero su estatus debería ser el de **teoremas**. Se mantienen temporalmente para permitir el desarrollo concurrente de las propiedades de las proyecciones mientras se completan las pruebas de sobreyectividad y unicidad de la función de Cantor.
+
+---
+
+## Análisis de los Axiomas 20-26
+
+Esta sección desglosa el propósito y estatus de los axiomas de alto nivel del sistema.
+
+### Axiomas Permanentes del Sistema `Minimal`
+
+*   **Axioma 20 (`ax20_eq_decidable`)**: `∀ n, m, n = m ∨ n ≠ m`
+    *   **Propósito**: Establece que la igualdad es decidible. Es fundamental para poder razonar por casos sobre si dos términos son iguales o no.
+*   **Axioma 21 (`ax21_mod2_range`)**: `∀ n, mod2(n) = 0 ∨ mod2(n) = 1`
+    *   **Propósito**: Define el rango de la función `mod2`. Es crucial para las pruebas de paridad, como el Lema P1.
+*   **Axioma 25 (`ax25_tau_zero`)**: `τ(0) = 0`
+    *   **Propósito**: Define el caso base de la función predecesor `τ`.
+*   **Axioma 26 (`ax26_tau_succ`)**: `∀n, τ(σ(n)) = n`
+    *   **Propósito**: Define el paso recursivo de la función predecesor `τ`.
+
+### Axiomas Temporales (Andamiaje)
+
+Estos axiomas se han añadido para poder avanzar, pero están destinados a ser eliminados una vez que se demuestren los teoremas correspondientes.
+
+*   **Axioma 22 (`ax22_cantor_proj_exists`)**: `∀ c, is_cantor (π₁ c) (π₂ c) c`
+    *   **Propósito**: Postula la **sobreyectividad** de la función de Cantor. Será eliminado cuando se demuestre el **Teorema C6**.
+*   **Axioma 23 (`ax23_cantor_proj_uniq`)**: `Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y'`
+    *   **Propósito**: Postula la **unicidad proyectiva** de la función de Cantor. Será eliminado cuando se demuestre el **Teorema C7**.
+*   **Axioma 24 (`ax24_mod2_of_even`)**: `n = 2*k → mod2(n) = 0`
+    *   **Propósito**: Postula que el `mod2` de un número par es cero. Es un teorema en sistemas con inducción, pero se mantiene como axioma en `Minimal` porque su prueba formal requiere un sistema más fuerte.

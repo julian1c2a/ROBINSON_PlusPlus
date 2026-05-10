@@ -37,7 +37,7 @@
 
 ## Recent Achievements
 
-- **Bloque IV (Fase 9.1)**: Iniciada la formalización del Lema C5 para la inversión de la función de Cantor.
+- **Bloque IV (Fase 9.1)**: Iniciada la demostración del Lema C5 con la prueba del lema auxiliar `2*div2(n) ≤ n`.
 - **Bloque IV (Fase 9)**: Demostrado el isomorfismo inverso de las proyecciones (Teo C10).
 - **Bloque IV (Refinamiento)**: Eliminado el `sorry` de `mod2_of_even` al postularlo como Axioma 24, completando formalmente las pruebas de las proyecciones (Teo C8 y C9).
 - **Bloque IV (Fase 9)**: Definidas las proyecciones de Cantor y demostradas sus propiedades de inversión (Teo C8 y C9), asumiendo dos nuevos axiomas y un lema pendiente.

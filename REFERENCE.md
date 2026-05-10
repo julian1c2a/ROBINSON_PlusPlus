@@ -130,6 +130,7 @@ graph TD
     Block1 --> Block4
     Block1 --> Block4_C5
     Block2 --> Block4_C5
+    Block3 --> Block4_C5
     Block3 --> Block4
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
