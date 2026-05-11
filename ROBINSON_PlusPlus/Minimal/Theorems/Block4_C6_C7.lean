@@ -13,6 +13,7 @@ import ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
 import FOL.FOL
 import FOL.Tactics
+import FOL.Theorems.Eq
 import FOL.Theorems.Impl
 import FOL.Theorems.Neg
 import FOL.Theorems.Derived
@@ -39,18 +40,59 @@ def Γ := axioms
 ### Fase 9.2: Sobreyectividad y Unicidad Proyectiva
 -/
 
--- Helper theorem for left cancellation on addition
+-- Lema A (privado): liftTerm 1 (liftTerm 0 t) = liftTerm 0 (liftTerm 0 t)
+-- Ambas expresiones incrementan TODOS los índices de variable en 2.
+-- Para .var n: liftTerm 0 da .var (n+1), liftTerm 1 sobre ese da .var (n+2).
+--              liftTerm 0 sobre .var (n+1) también da .var (n+2). ✓
+-- Necesario para que substTerm_liftTerm (c=1) pueda eliminar liftTerm 0 (liftTerm 0 a).
+mutual
+private theorem lift_01_eq_00 (t : Term) :
+    liftTerm 1 (liftTerm 0 t) = liftTerm 0 (liftTerm 0 t) := by
+  cases t with
+  | var n =>
+    -- Para n : Nat, el kernel reduce n < 0 = False definitionally
+    -- (Nat.ble (n+1) 0 = false por def, ya que n+1 = Nat.succ _).
+    -- Ambos lados = .var (n+2). Se cierra por reflexividad.
+    rfl
+  | func f ts =>
+    simp only [liftTerm]
+    congr 1
+    exact lift_01_eq_00_list ts
+
+private theorem lift_01_eq_00_list (ts : List Term) :
+    liftTerms 1 (liftTerms 0 ts) = liftTerms 0 (liftTerms 0 ts) := by
+  cases ts with
+  | nil => rfl
+  | cons t ts' =>
+    -- simp [liftTerms] despliega la lista concreta (a diferencia de unfold
+    -- que deja el match en la forma stuck para argumentos no-WHNF)
+    simp only [liftTerms]
+    rw [lift_01_eq_00 t, lift_01_eq_00_list ts']
+end
+
+-- Helper theorem for left cancellation on addition.
+-- Proof strategy: ax27_add_left_cancel = ∀a∀b∀c, (add a c = add b c) ⇒ a = b.
+-- Triple spec introduces liftTerm 0 (liftTerm 0 a) in the type.
+-- Using lift_01_eq_00 (Lema A) + FOL.substTerm_liftTerm, simp reduces the type
+-- to the desired formula.
 theorem add_left_cancel {a b c : Term}
   (h : Γ ⊢ ((add a c) =eq (add b c))) :
     Γ ⊢ (a =eq b) := by
-  -- BLOQUEADO: triple spec (spec (spec h_ax27 a) b) c no reduce para a b c abstractos.
-  -- El kernel produce: substFormula 0 c (substFormula 1 (liftTerm 0 b)
-  --   (substFormula 2 (liftTerm 0 (liftTerm 0 a)) f))
-  -- que NO es definitionally igual a ((add a c =eq add b c) ⇒ (a =eq b))
-  -- para a b c : Term abstractos (solo lo sería para términos cerrados).
-  -- La prueba correcta requiere lema de liftTerm sobre términos cerrados
-  -- o inducción sobre Term — ninguna factible en el sistema actual.
-  sorry
+  have h_ax27 := ax (by simp [axioms, ax27_add_left_cancel] : ax27_add_left_cancel ∈ axioms)
+  have h_imp : Γ ⊢ ((add a c =eq add b c) ⇒ (a =eq b)) := by
+    have h1 := spec h_ax27 a
+    have h2 := spec h1 b
+    have h3 := spec h2 c
+    -- simp (sin only) incluye ite_true, ite_false, aritmética Nat,
+    -- necesarias porque substFormula genera "0 + 1", "0 + 1 + 1" en vez de "1", "2".
+    -- lift_01_eq_00 convierte liftTerm 0 (liftTerm 0 a) → liftTerm 1 (liftTerm 0 a)
+    -- para que substTerm_liftTerm pueda disparar con c=1.
+    simp [substFormula, substTerm, substTerms,
+          liftTerm, liftTerms, add, add_sym,
+          ← lift_01_eq_00,
+          FOL.substTerm_liftTerm, FOL.substTerms_liftTerms] at h3
+    exact h3
+  exact mp h_imp h
 
 -- Inverse functions (constructive definitions)
 def w_of_c (c : Term) : Term := w_candidate c

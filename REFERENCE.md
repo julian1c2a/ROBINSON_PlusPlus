@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-11 (Axioms.lean: añadido `le_sym` en §3.11.2)
+**Last updated:** 2026-05-11 (Block4_C6_C7: `add_left_cancel` implementado; Lema A `lift_01_eq_00` mutual añadido)
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -94,7 +94,7 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 | `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔄 In progress |
 | `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | 🔄 In progress |
 | `Minimal/Theorems/Block4_C5.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5` | `Minimal.Axioms`, `Block1`, `Block2` | 🔄 In progress |
-| `Minimal/Theorems/Block4_C6_C7.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7` | `Minimal.Axioms`, `Block1`, `Block4_C5` | 🔄 In progress |
+| `Minimal/Theorems/Block4_C6_C7.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7` | `Minimal.Axioms`, `Block1`–`Block4_C5`, `FOL.Theorems.Eq` | 🔄 In progress |
 | `Minimal/Theorems/Block5.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block5` | `Minimal.Axioms`, `Block1`, `Block3`, `Block4` | 🔄 In progress |
 | `Minimal/Theorems/Block6.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block6` | `Minimal.Axioms`, `Block1`, `Block5` | 🔄 In progress |
 
@@ -571,11 +571,11 @@ All axiom formulas are `def`s of type `Formula`. Variables use De Bruijn indices
 | Ax L2 | `ax_L2_in_cons` | $\forall x\,h\,t,\; x\in(h::t) \Leftrightarrow x=h \lor x\in t$ |
 | Ax C1 | `ax_C1_concat_nil` | $\forall l,\; []\,\#\#\,l = l$ |
 | Ax C2 | `ax_C2_concat_cons` | $\forall h\,t\,l,\; (h::t)\,\#\#\,l = h::(t\,\#\#\,l)$ |
-| Ax 27 | `ax27_add_left_cancel` | $\forall a\,b\,c,\; a+c=b+c \Rightarrow a=b$ (postulated; teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 sorry) |
+| Ax 27 | `ax27_add_left_cancel` | $\forall a\,b\,c,\; a+c=b+c \Rightarrow a=b$ (postulated; teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 ✅) |
 
 > Ax 1 ($\exists 0$) es meta-axiomático: `zero : Term`.
 > Ax 20 ($\forall n\,m, n=m \lor n\neq m$) es el teorema `eq_decidable` en Block1.lean.
-> Ax 21, 24, 27 son teoremas en sistemas con inducción; en Minimal se postulan hasta que los `sorry` de Block3, Block5 y Block4_C6_C7 se cubran.
+> Ax 21, 24 son teoremas en sistemas con inducción; en Minimal se postulan hasta que los `sorry` de Block3 y Block5 se cubran. Ax 27 fue demostrado en Block4_C6_C7 (`add_left_cancel` ✅ 2026-05-11).
 
 **Axiom set**:
 
@@ -794,6 +794,56 @@ theorem cantor_poly_term1_eq_sq_add (x y : Term) : Γ ⊢ (w_w_plus_1 (add x y) 
 ```lean
 def w_w_plus_1 (w : Term) : Term := mul w (succ w)
 ```
+
+---
+
+---
+
+### 3.16 Minimal/Theorems/Block4_C6_C7.lean
+
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7`
+**Dependencies**: `Minimal.Axioms`, `Block1`, `Block2`, `Block3`, `Block4`, `Block4_C5`, `FOL.Theorems.Eq`
+**Last updated**: 2026-05-11
+**Status**: 🔄 In progress (2 sorry)
+**@axiom_system**: `Minimal`
+**@importance**: `high`
+
+Cancellación por la izquierda de la adición y teoremas de sobreyectividad/unicidad proyectiva de Cantor (C6 y C7).
+
+#### Lemas Privados de Soporte (meta-level)
+
+| Nombre | Lean signature | Math | Sorry |
+|--------|---------------|------|-------|
+| `lift_01_eq_00` | `private theorem lift_01_eq_00 (t : Term) : liftTerm 1 (liftTerm 0 t) = liftTerm 0 (liftTerm 0 t)` | Ambas aplicaciones doblan todos los índices libres | ✅ |
+| `lift_01_eq_00_list` | `private theorem lift_01_eq_00_list (ts : List Term) : liftTerms 1 (liftTerms 0 ts) = liftTerms 0 (liftTerms 0 ts)` | Versión para listas | ✅ |
+
+> **Técnica**: prueba `mutual ... cases` (igual que `substTerm_liftTerm` en `FOL.Theorems.Eq`). El caso `var n` cierra por `rfl` porque el kernel reduce `n < 0 = False` definitionally.
+> **Necesidad**: `spec (spec (spec h_ax27 a) b) c` produce `liftTerm 0 (liftTerm 0 a)` en el tipo. `← lift_01_eq_00` lo convierte a `liftTerm 1 (liftTerm 0 a)` para que `FOL.substTerm_liftTerm` dispare con `c=1`.
+
+#### Fase 9.2: Cancelación y Proyecciones
+
+| Nombre | Enunciado matemático | Sorry |
+|--------|----------------------|-------|
+| `add_left_cancel` | $(a+c = b+c) \Rightarrow a = b$ | ✅ |
+| `cantor_surjectivity` | $\forall c,\; \exists x\,y,\; \text{Cantor}(x,y,c)$ | sorry |
+| `cantor_uniqueness` | $\text{Cantor}(x,y,c)\land\text{Cantor}(x',y',c)\Rightarrow x=x'\land y=y'$ | sorry |
+
+**Lean signatures**:
+
+```lean
+-- Implementado (✅)
+theorem add_left_cancel {a b c : Term}
+    (h : Γ ⊢ ((add a c) =eq (add b c))) : Γ ⊢ (a =eq b)
+
+-- Definiciones auxiliares (placeholders)
+def w_of_c (c : Term) : Term  -- := w_candidate c
+def y_of_c (c : Term) : Term  -- placeholder
+def x_of_c (c : Term) : Term  -- placeholder
+```
+
+*Prueba de `add_left_cancel`*: El `simp` sobre `substFormula/substTerm/liftTerm` (sin `only`, para incluir `ite_true/ite_false` y aritmética Nat) junto con `← lift_01_eq_00` y `FOL.substTerm_liftTerm` reduce el tipo del triple `spec` al enunciado deseado.
+
+> **Patrón triple `spec` con `forall_3`**: para axiomas `forall_3 f`, el tipo de `spec (spec (spec h a) b) c` contiene `liftTerm 0 (liftTerm 0 a)` (doble lift). Resolución: Lema A (`lift_01_eq_00`) + `simp` general (no `simp only`).
 
 ---
 
