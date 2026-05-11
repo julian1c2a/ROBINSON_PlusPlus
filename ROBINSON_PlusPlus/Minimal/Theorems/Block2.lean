@@ -44,8 +44,58 @@ theorem sq_eq_zero_imp_zero (n : Term) : Γ ⊢ ((sq n =eq zero) ⇒ (n =eq zero
   sorry
 
 -- Teorema (antes Ax 22): a < b ⇒ σ(a) ≤ b
+-- Prueba siguiendo THOUGHTS.md §"¿Es necesario el axioma 22?"
 theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ ((succ a) ≤ b) := by
-  sorry
+  -- Paso 1: Tricotomía para σ(a) y b (ax19)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  have h_tric : Γ ⊢ (lt (succ a) b ∨ (succ a =eq b) ∨ lt b (succ a)) := by
+    have h := spec (spec h_ax19 (succ a)) b
+    -- h : Γ ⊢ substFormula 0 b (substFormula 1 (liftTerm 0 (succ a)) body19)
+    -- que computa a  lt(σa,b) ∨ (σa =eq b) ∨ lt(b,σa)
+    -- via FOL.substTerm_liftTerm (substTerm c s (liftTerm c t) = t)
+    -- y reducción de los índices de de Bruijn numéricos
+    simp [ax19_lt_trichotomy, forall_2, substFormula, substTerm, substTerms,
+          liftTerm, liftTerms, lt, succ, FOL.substTerm_liftTerm] at h
+    exact h
+  -- Paso 2: or_elim en modo táctico (el goal provee el tipo implícito B para or_intro_left/right)
+  apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_tric
+  · intro h1; exact ROBINSON_PlusPlus.Minimal.Axioms.or_intro_left h1   -- caso lt (succ a) b
+  · intro h23
+    apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h23
+    · intro h2; exact ROBINSON_PlusPlus.Minimal.Axioms.or_intro_right h2  -- caso succ a = b
+    · intro h_blt_sa
+      -- Paso 3: caso b < σ(a) — contradicción con h_lt : a < b
+      -- Vía ax13: ∃k', a + σ(k') = b   (de h_lt)
+      --           ∃k,  b + σ(k)  = σ(a) (de h_blt_sa)
+      -- Cadena (THOUGHTS.md):
+      --   (a + σ(k')) + σ(k) = σ(a)    [sustituyendo b]
+      --   σ((a + σ(k')) + k) = σ(a)    [ax5]
+      --   (a + σ(k')) + k = a           [ax3]
+      --   σ(k') + k = 0                 [ax7 + ax6 + ax27]
+      --   σ(k + k') = 0  ↯ ax2
+      exact false_elim (by
+        have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+        -- ax13 para (a, b): a < b ↔ ∃k', a + σ(k') = b
+        have h_ax13_ab := by
+          have h := spec (spec h_ax13 a) b
+          simp [ax13_lt_def, forall_2, substFormula, substTerm, substTerms,
+               liftTerm, liftTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at h
+          exact h
+        -- ax13 para (b, succ a): b < σ(a) ↔ ∃k, b + σ(k) = σ(a)
+        have h_ax13_bsa := by
+          have h := spec (spec h_ax13 b) (succ a)
+          simp [ax13_lt_def, forall_2, substFormula, substTerm, substTerms,
+               liftTerm, liftTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at h
+          exact h
+        -- Testigos existenciales
+        have h_ex_kp := iff_mp h_ax13_ab h_lt
+        have h_ex_k  := iff_mp h_ax13_bsa h_blt_sa
+        apply ex_elim h_ex_kp; intro kp h_kp
+        -- h_kp : Γ ⊢ substFormula 0 kp (add a (succ(.var 0)) =eq b)
+        apply ex_elim h_ex_k; intro k h_k
+        -- h_k  : Γ ⊢ substFormula 0 k  (add b (succ(.var 0)) =eq succ a)
+        -- Cadena aritmética → σ(k + kp) = 0 → contradice ax2
+        sorry)
 
 -- Lema Auxiliar: a ≤ b ∧ c > 0 ⇒ a*c ≤ b*c
 private theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ (a ≤ b)) (h_c_pos : Γ ⊢ lt zero c) : Γ ⊢ ((mul a c) ≤ (mul b c)) := by
