@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-05-11 (Axioms.lean: añadido `le_sym` en §3.11.2)
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -476,6 +476,7 @@ Define el lenguaje, los 30 axiomas del sistema minimal de aritmética y los help
 | `cons_sym` | `"::"` | function |
 | `concat_sym` | `"##"` | function |
 | `lt_sym` | `"<"` | predicate |
+| `le_sym` | `"≤"` | predicate |
 | `in_sym` | `"∈"` | predicate |
 | `zero_sym` | `"0"` | constant |
 
@@ -613,20 +614,24 @@ All operate over any context `Γ : List Formula`.
 | `ex_elim` | `theorem ex_elim (h : Γ ⊢ ∃.A) (cont : ∀ t, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C` | ∃-elim | sorry |
 | `iff_mp` | `def iff_mp (h1 : Γ ⊢ A⇔B) (h2 : Γ ⊢ A) : Γ ⊢ B` | ↔ mp | ✅ |
 | `iff_mpr` | `def iff_mpr (h1 : Γ ⊢ A⇔B) (h2 : Γ ⊢ B) : Γ ⊢ A` | ↔ mpr | ✅ |
-| `eq_subst` | `theorem eq_subst (heq : Γ ⊢ t₁≐t₂) (hp : Γ ⊢ A) : Γ ⊢ A` | eq subst | sorry |
-| `eq_symm_neg` | `theorem eq_symm_neg (h : Γ ⊢ ¬(t₂≐t₁)) : Γ ⊢ ¬(t₁≐t₂)` | neg sym | sorry |
-| `eq_congr_add_left` | `theorem eq_congr_add_left (h : Γ ⊢ t₁≐t₂) : Γ ⊢ add u t₁ ≐ add u t₂` | cong + right | sorry |
-| `eq_congr_add_right` | `theorem eq_congr_add_right (h : Γ ⊢ t₁≐t₂) : Γ ⊢ add t₁ u ≐ add t₂ u` | cong + left | sorry |
-| `eq_congr_mul_left` | `theorem eq_congr_mul_left (h : Γ ⊢ t₁≐t₂) : Γ ⊢ mul u t₁ ≐ mul u t₂` | cong * right | sorry |
-| `eq_congr_mul_right` | `theorem eq_congr_mul_right (h : Γ ⊢ t₁≐t₂) : Γ ⊢ mul t₁ u ≐ mul t₂ u` | cong * left | sorry |
+| `eq_subst` | `theorem eq_subst (heq : Γ ⊢ t₁≐t₂) (hp : Γ ⊢ A) : Γ ⊢ A` | eq subst (trivial: returns `hp`) | ✅ |
+| `eq_symm_neg` | `theorem eq_symm_neg (h : Γ ⊢ ¬(t₂≐t₁)) : Γ ⊢ ¬(t₁≐t₂)` | neg sym | ✅ |
+| `eq_congr_add_left` | `theorem eq_congr_add_left (h : Γ ⊢ t₁≐t₂) : Γ ⊢ add u t₁ ≐ add u t₂` | cong + right | ✅ |
+| `eq_congr_add_right` | `theorem eq_congr_add_right (h : Γ ⊢ t₁≐t₂) : Γ ⊢ add t₁ u ≐ add t₂ u` | cong + left | ✅ |
+| `eq_congr_mul_left` | `theorem eq_congr_mul_left (h : Γ ⊢ t₁≐t₂) : Γ ⊢ mul u t₁ ≐ mul u t₂` | cong * right | ✅ |
+| `eq_congr_mul_right` | `theorem eq_congr_mul_right (h : Γ ⊢ t₁≐t₂) : Γ ⊢ mul t₁ u ≐ mul t₂ u` | cong * left | ✅ |
 
 **CoeFun instance**: `Derives Γ (A⇒B)` coerces to `Derives Γ A → Derives Γ B`.
 
-> **Simp patterns** (confirmed working in Block2.lean):
+> **Patrón hS** (para usar `Derives.subst` con congruencias):
+> Para cada congruencia, se define una fórmula `f` con `liftTerm 0 u` para términos fijos y `.var 0` para el término que varía. La hipótesis `hS s : substFormula 0 s f = ...` se prueba con `simp [f, substFormula, ..., FOL.substTerm_liftTerm, if_true]`. Luego `(hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl ...)` completa la prueba.
+> **Patrón doble `spec`** (para axiomas con `forall_2`): para `spec (spec h_ax w₁) w₂`, la igualdad intermedia tras el primer spec es definitional (verificada por `rfl`) pero NO se simplifica por `simp`. Solución: definir `f3 : Formula` con `liftTerm 0 w₁` y `.var 0`, probar `hbody_eq : substFormula 0 w₁ (.forall body) = .forall f3 := rfl`, luego `hbody_eq ▸ spec h_ax w₁` para obtener `Γ ⊢ .forall f3`, y finalmente `(hS3 w₂) ▸ spec h_forall_f3 w₂`.
+> **Simp patterns** (confirmados en Block2.lean):
 >
 > - Ax13 (tiene `⇔`): `simp [ax13_lt_def, forall_2, substFormula, substTerm, substTerms, liftTerm, liftTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at h`
 > - Ax19 (sin `⇔`): `simp [ax19_lt_trichotomy, forall_2, substFormula, substTerm, substTerms, liftTerm, liftTerms, lt, succ, FOL.substTerm_liftTerm] at h`
 > - Regla: añadir `iff` al simp set cuando el axioma contiene `⇔`.
+> - **Para axiomas con `forall_2`**: `simp` en `spec (spec h t₁) t₂` NO reduce `substFormula (0+1) ...`. Usar el **patrón doble spec**.
 
 > **Nombres calificados obligatorios** en módulos que importan `FOL.Theorems.Derived`:
 > `ROBINSON_PlusPlus.Minimal.Axioms.or_intro_left`, `or_intro_right`, `or_elim`
@@ -728,9 +733,9 @@ Demostraciones de los teoremas sobre `div2` y `mod2` (Bloque III).
 ### 3.15 Minimal/Theorems/Block4.lean
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block4`
-**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `Minimal.Theorems.Block3`
+**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `Minimal.Theorems.Block3`, `FOL.Theorems.Eq`
 **Last updated**: 2026-05-11
-**Status**: 🔄 In progress (8 sorry)
+**Status**: 🔄 In progress (6 sorry)
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 
@@ -740,27 +745,55 @@ Demostraciones de los teoremas sobre la función de apareamiento de Cantor (Bloq
 
 **Theorems**:
 
-- `w_mul_w_plus_one_eq_sq_w_add_w`: $\forall w, w(w+1) = w^2+w$
-- `parity_lemma_case_even`: $mod2(w)=0 \Rightarrow \exists k, w(w+1)=2k$
-- `parity_lemma_case_odd`: $mod2(w)=1 \Rightarrow \exists k, w(w+1)=2k$
-- `parity_lemma`: $\forall w, \exists k, w(w+1)=2k$
+| Nombre | Enunciado matemático | Sorry |
+|--------|----------------------|-------|
+| `w_mul_w_plus_one_eq_sq_w_add_w` | $\forall w,\; w(w+1) = w^2+w$ | ✅ |
+| `parity_lemma_case_even` | $mod2(w)=0 \Rightarrow \exists k,\; w(w+1)=2k$ | sorry |
+| `parity_lemma_case_odd` | $mod2(w)=1 \Rightarrow \exists k,\; w(w+1)=2k$ | sorry |
+| `parity_lemma` | $\forall w,\; \exists k,\; w(w+1)=2k$ | sorry |
+
+**Lean signature** (implementado):
+
+```lean
+theorem w_mul_w_plus_one_eq_sq_w_add_w (w : Term) : Γ ⊢ (mul w (succ w) =eq add (sq w) w)
+```
+
+*Prueba*: Usa el **patrón doble spec** sobre `ax9_mul_succ` (`forall_2`): `hbody_eq : substFormula 0 w (.forall body) = .forall f3 := rfl`, luego `hS3` pattern para el segundo spec.
 
 #### Fase 7: Polinomio de Cantor y Totalidad
 
-- `cantor_poly_term1_eq_sq_add`: $\forall x,y, (x+y)(x+y+1) = (x+y)^2+(x+y)$
-- `cantor_poly_is_even`: $\forall x,y, \exists k, (x+y)(x+y+1)+2y = 2k$
-- `cantor_totality`: $\forall x,y, \exists c, Cantor(x,y,c)$
+| Nombre | Enunciado matemático | Sorry |
+|--------|----------------------|-------|
+| `cantor_poly_term1_eq_sq_add` | $\forall x,y,\; (x+y)(x+y+1) = (x+y)^2+(x+y)$ | ✅ |
+| `cantor_poly_is_even` | $\forall x,y,\; \exists k,\; (x+y)(x+y+1)+2y = 2k$ | sorry |
+| `cantor_totality` | $\forall x,y,\; \exists c,\; Cantor(x,y,c)$ | sorry |
+
+**Lean signature** (implementado):
+
+```lean
+theorem cantor_poly_term1_eq_sq_add (x y : Term) : Γ ⊢ (w_w_plus_1 (add x y) =eq add (sq (add x y)) (add x y))
+```
+
+*Prueba*: `w_mul_w_plus_one_eq_sq_w_add_w (add x y)`.
 
 #### Fase 8: Inyectividad de Cantor
 
-- `cantor_injective_c`: $Cantor(x,y,c) \land Cantor(x,y,c') \implies c = c'$
+| Nombre | Enunciado matemático | Sorry |
+|--------|----------------------|-------|
+| `cantor_injective_c` | $Cantor(x,y,c) \land Cantor(x,y,c') \implies c = c'$ | sorry |
 
 #### Fase 9: Proyecciones de Cantor
 
-- `mod2_of_even`: $n = 2k \implies mod2(n) = 0$ (Lema auxiliar, ahora basado en Ax 24)
-- `cantor_proj1_eq_x`: $[⟨x,y⟩].1 = x$
-- `cantor_proj2_eq_y`: $[⟨x,y⟩].2 = y$
-- `cantor_proj_inverse`: $⟨[c].1, [c].2⟩ = c$
+- `mod2_of_even`: $n = 2k \implies mod2(n) = 0$ (Lema auxiliar, basado en Ax 24)
+- `cantor_proj1_eq_x`: $[\langle x,y\rangle].1 = x$
+- `cantor_proj2_eq_y`: $[\langle x,y\rangle].2 = y$
+- `cantor_proj_inverse`: $\langle[c].1, [c].2\rangle = c$
+
+**Auxiliary definition**:
+
+```lean
+def w_w_plus_1 (w : Term) : Term := mul w (succ w)
+```
 
 ---
 

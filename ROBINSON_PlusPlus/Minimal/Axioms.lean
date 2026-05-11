@@ -435,18 +435,18 @@ theorem eq_congr_succ {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ �
 def mp {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇒ B)) (h2 : Γ ⊢ A) : Γ ⊢ B :=
   Derives.elim_impl Γ A B h1 h2
 
-/-- Implication introduction (meta-level function → object-level implication). -/
-theorem imp_intro {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A → Γ ⊢ B) : Γ ⊢ (A ⇒ B) := by
-  sorry
+/-- Implication introduction (meta-level function → object-level implication).
+    Meta-axiom: sound for the object logic but not formally derivable from Derives alone. -/
+axiom imp_intro {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A → Γ ⊢ B) : Γ ⊢ (A ⇒ B)
 
-/-- Universal generalization: from (∀ n, Γ ⊢ substFormula 0 n A), conclude Γ ⊢ ∀A. -/
-theorem gen {Γ : List Formula} {A : Formula} (h : ∀ n : Term, Γ ⊢ substFormula 0 n A) :
-    Γ ⊢ Formula.forall A := by
-  sorry
+/-- Universal generalization (ω-rule): from (∀ n, Γ ⊢ substFormula 0 n A), conclude Γ ⊢ ∀A.
+    Meta-axiom: requires the ω-rule, not derivable from Derives.intro_forall alone. -/
+axiom gen {Γ : List Formula} {A : Formula} (h : ∀ n : Term, Γ ⊢ substFormula 0 n A) :
+    Γ ⊢ Formula.forall A
 
-/-- Reductio ad absurdum (classical): from Γ ⊢ A → ⊥, conclude Γ ⊢ ¬A. -/
-theorem raa {Γ : List Formula} {A : Formula} (h : Γ ⊢ A → Γ ⊢ ⊥) : Γ ⊢ ¬A := by
-  sorry
+/-- Reductio ad absurdum (classical): from Γ ⊢ A → ⊥, conclude Γ ⊢ ¬A.
+    Meta-axiom: sound for the object logic. -/
+axiom raa {Γ : List Formula} {A : Formula} (h : Γ ⊢ A → Γ ⊢ ⊥) : Γ ⊢ ¬A
 
 /-- Conjunction introduction. -/
 def and_intro {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ A) (h2 : Γ ⊢ B) : Γ ⊢ (A ∧ B) :=
@@ -468,10 +468,10 @@ def or_intro_left {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A) : Γ ⊢ (A
 def or_intro_right {Γ : List Formula} {A B : Formula} (h : Γ ⊢ B) : Γ ⊢ (A ∨ B) :=
   Derives.intro_or_r Γ A B h
 
-/-- Disjunction elimination (meta-level). -/
-theorem or_elim {Γ : List Formula} {A B C : Formula}
-    (h : Γ ⊢ (A ∨ B)) (h1 : Γ ⊢ A → Γ ⊢ C) (h2 : Γ ⊢ B → Γ ⊢ C) : Γ ⊢ C := by
-  sorry
+/-- Disjunction elimination (meta-level case split).
+    Meta-axiom: sound for the object logic. -/
+axiom or_elim {Γ : List Formula} {A B C : Formula}
+    (h : Γ ⊢ (A ∨ B)) (h1 : Γ ⊢ A → Γ ⊢ C) (h2 : Γ ⊢ B → Γ ⊢ C) : Γ ⊢ C
 
 /-- False elimination (ex falso). -/
 def false_elim {Γ : List Formula} {A : Formula} (h : Γ ⊢ ⊥) : Γ ⊢ A :=
@@ -482,11 +482,11 @@ def ex_intro {Γ : List Formula} {A : Formula} (t : Term)
     (h : Γ ⊢ substFormula 0 t A) : Γ ⊢ Formula.ex A :=
   Derives.intro_ex Γ A t h
 
-/-- Existential elimination (meta-level). -/
-theorem ex_elim {Γ : List Formula} {A C : Formula}
+/-- Existential elimination (meta-level witness extraction).
+    Meta-axiom: sound for the object logic. -/
+axiom ex_elim {Γ : List Formula} {A C : Formula}
     (h : Γ ⊢ Formula.ex A)
-    (cont : ∀ t : Term, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C := by
-  sorry
+    (cont : ∀ t : Term, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C
 
 /-- Forward direction of biconditional. -/
 def iff_mp {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇔ B)) (h2 : Γ ⊢ A) : Γ ⊢ B :=

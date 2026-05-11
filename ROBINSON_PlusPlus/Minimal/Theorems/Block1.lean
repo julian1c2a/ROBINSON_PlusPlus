@@ -39,43 +39,141 @@ theorem teo_1_2 : Γ ⊢ (add zero one =eq one) := by
   exact eq_trans h_spec_n teo_1_1
 
 -- Teo 1.3: 1 + 1 = 2
-theorem teo_1_3 : Γ ⊢ (add one one =eq two) := by sorry
+-- Prueba: ax5(one,zero): 1+σ(0)=σ(1+0); ax4(one): 1+0=1; congr+trans → 1+1=2.
+theorem teo_1_3 : Γ ⊢ (add one one =eq two) := by
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  exact eq_trans (eq_symm (spec (spec h_ax5 one) zero)) (eq_congr_succ (spec h_ax4 one))
 
 -- Teo 1.4: 2 + 1 = 3
-theorem teo_1_4 : Γ ⊢ (add two one =eq three) := by sorry
+-- Prueba: ax5(two,zero): 2+1=σ(2+0); ax4(two): 2+0=2; congr → σ(2)=3.
+theorem teo_1_4 : Γ ⊢ (add two one =eq three) := by
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  exact eq_trans (eq_symm (spec (spec h_ax5 two) zero)) (eq_congr_succ (spec h_ax4 two))
 
 -- Teo 1.5: 1 + 2 = 3
-theorem teo_1_5 : Γ ⊢ (add one two =eq three) := by sorry
+-- Prueba: ax5(one,one): 1+σ(1)=σ(1+1); teo_1_3: 1+1=2; congr → σ(2)=3.
+theorem teo_1_5 : Γ ⊢ (add one two =eq three) := by
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  exact eq_trans (eq_symm (spec (spec h_ax5 one) one)) (eq_congr_succ teo_1_3)
 
 -- Teo 1.6: 3 + 1 = 4
-theorem teo_1_6 : Γ ⊢ (add three one =eq four) := by sorry
+-- Prueba: ax5(three,zero): 3+1=σ(3+0); ax4(three): 3+0=3; congr → σ(3)=4.
+theorem teo_1_6 : Γ ⊢ (add three one =eq four) := by
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  exact eq_trans (eq_symm (spec (spec h_ax5 three) zero)) (eq_congr_succ (spec h_ax4 three))
 
 -- Teo 1.7: 2 + 2 = 4
-theorem teo_1_7 : Γ ⊢ (add two two =eq four) := by sorry
+-- Prueba: ax5(two,one): 2+σ(1)=σ(2+1); teo_1_4: 2+1=3; congr → σ(3)=4.
+theorem teo_1_7 : Γ ⊢ (add two two =eq four) := by
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  exact eq_trans (eq_symm (spec (spec h_ax5 two) one)) (eq_congr_succ teo_1_4)
 
 -- Teo 1.8: 1 * 1 = 1
-theorem teo_1_8 : Γ ⊢ (mul one one =eq one) := by sorry
+-- Prueba: ax9(one,zero): 1*1=(1*0)+1; ax8(one): 1*0=0; teo_1_2: 0+1=1.
+theorem teo_1_8 : Γ ⊢ (mul one one =eq one) := by
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  have h_ax8 := ax (by simp [axioms] : ax8_mul_zero ∈ axioms)
+  -- mul one one = add(mul one zero) one
+  have h1 := spec (spec h_ax9 one) zero
+  -- add(mul one zero) one = add zero one
+  have h2 := eq_congr_add_right (u := one) (spec h_ax8 one)
+  -- mul one one = add zero one
+  have step1 := eq_trans (eq_symm h1) h2
+  -- mul one one = one  (via teo_1_2: 0+1=1)
+  exact eq_trans (eq_symm step1) teo_1_2
 
 -- Teo 1.9: 2 * 1 = 2
-theorem teo_1_9 : Γ ⊢ (mul two one =eq two) := by sorry
+-- Prueba: ax9(two,zero): 2*1=(2*0)+2; ax8(two): 2*0=0; ax6+ax4: 0+2=2.
+theorem teo_1_9 : Γ ⊢ (mul two one =eq two) := by
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  have h_ax8 := ax (by simp [axioms] : ax8_mul_zero ∈ axioms)
+  have h_ax6 := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  -- mul two one = add(mul two zero) two
+  have h1 := spec (spec h_ax9 two) zero
+  -- add(mul two zero) two = add zero two
+  have h2 := eq_congr_add_right (u := two) (spec h_ax8 two)
+  -- add zero two = two  (via add zero two = add two zero = two)
+  have h_zero_two : Γ ⊢ (add zero two =eq two) :=
+    eq_trans (eq_symm (spec (spec h_ax6 zero) two)) (spec h_ax4 two)
+  -- mul two one = add zero two
+  have step1 := eq_trans (eq_symm h1) h2
+  -- mul two one = two
+  exact eq_trans (eq_symm step1) h_zero_two
 
 -- Teo 1.10: 2 * 2 = 4
-theorem teo_1_10 : Γ ⊢ (mul two two =eq four) := by sorry
+-- Prueba: ax9(two,one): 2*2=(2*1)+2; teo_1_9: 2*1=2; teo_1_7: 2+2=4.
+theorem teo_1_10 : Γ ⊢ (mul two two =eq four) := by
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  -- mul two two = add(mul two one) two
+  have h1 := spec (spec h_ax9 two) one
+  -- add(mul two one) two = add two two
+  have h2 := eq_congr_add_right (u := two) teo_1_9
+  -- mul two two = add two two
+  have step1 := eq_trans (eq_symm h1) h2
+  -- mul two two = four  (via teo_1_7: 2+2=4)
+  exact eq_trans (eq_symm step1) teo_1_7
 
 -- Teo 1.11: 0 ≠ 1
-theorem teo_1_11 : Γ ⊢ neg (zero =eq one) := by sorry
+-- Prueba: ax2(zero): σ(0)≠0, i.e., 1≠0; eq_symm_neg → 0≠1.
+theorem teo_1_11 : Γ ⊢ neg (zero =eq one) := by
+  have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+  exact eq_symm_neg (spec h_ax2 zero)
 
 -- Teo 1.12: 1 ≠ 2
-theorem teo_1_12 : Γ ⊢ neg (one =eq two) := by sorry
+-- Prueba: si 1=2 entonces ax3 da 0=1, contradicción con teo_1_11.
+theorem teo_1_12 : Γ ⊢ neg (one =eq two) := by
+  have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
+  -- neg A = A ⇒ ⊥; construimos la derivación en el contexto extendido
+  refine Derives.intro_impl Γ (Formula.eq one two) Formula.bottom ?_
+  -- En contexto Γ' = one=two :: Γ:
+  have h_hyp := Derives.hyp (Formula.eq one two :: Γ) (Formula.eq one two) (List.Mem.head _)
+  -- ax3(zero,one): (one=two) ⇒ (zero=one)
+  have h_imp := Derives.weakening Γ (Formula.eq one two :: Γ) _
+    (spec (spec h_ax3 zero) one) (fun _ hx => List.Mem.tail _ hx)
+  -- teo_1_11 debilitado: neg(zero=one) en Γ'
+  have h_neg := Derives.weakening Γ (Formula.eq one two :: Γ) _
+    teo_1_11 (fun _ hx => List.Mem.tail _ hx)
+  exact mp h_neg (mp h_imp h_hyp)
 
 -- Teo 1.13: Desigualdades entre constantes
-theorem teo_1_13_1 : Γ ⊢ neg (zero =eq two) := by sorry
 
-theorem teo_1_13_2 : Γ ⊢ neg (zero =eq three) := by sorry
+-- 0 ≠ 2: ax2(one): σ(1)≠0, i.e., 2≠0; eq_symm_neg → 0≠2.
+theorem teo_1_13_1 : Γ ⊢ neg (zero =eq two) := by
+  have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+  exact eq_symm_neg (spec h_ax2 one)
 
-theorem teo_1_13_3 : Γ ⊢ neg (one =eq three) := by sorry
+-- 0 ≠ 3: ax2(two): σ(2)≠0, i.e., 3≠0; eq_symm_neg → 0≠3.
+theorem teo_1_13_2 : Γ ⊢ neg (zero =eq three) := by
+  have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+  exact eq_symm_neg (spec h_ax2 two)
 
-theorem teo_1_13_4 : Γ ⊢ neg (two =eq three) := by sorry
+-- 1 ≠ 3: si 1=3 entonces ax3 da 0=2, contradicción con teo_1_13_1.
+theorem teo_1_13_3 : Γ ⊢ neg (one =eq three) := by
+  have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
+  refine Derives.intro_impl Γ (Formula.eq one three) Formula.bottom ?_
+  have h_hyp := Derives.hyp (Formula.eq one three :: Γ) (Formula.eq one three) (List.Mem.head _)
+  -- ax3(zero,two): (one=three) ⇒ (zero=two)
+  have h_imp := Derives.weakening Γ (Formula.eq one three :: Γ) _
+    (spec (spec h_ax3 zero) two) (fun _ hx => List.Mem.tail _ hx)
+  have h_neg := Derives.weakening Γ (Formula.eq one three :: Γ) _
+    teo_1_13_1 (fun _ hx => List.Mem.tail _ hx)
+  exact mp h_neg (mp h_imp h_hyp)
+
+-- 2 ≠ 3: si 2=3 entonces ax3 da 1=2, contradicción con teo_1_12.
+theorem teo_1_13_4 : Γ ⊢ neg (two =eq three) := by
+  have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
+  refine Derives.intro_impl Γ (Formula.eq two three) Formula.bottom ?_
+  have h_hyp := Derives.hyp (Formula.eq two three :: Γ) (Formula.eq two three) (List.Mem.head _)
+  -- ax3(one,two): (two=three) ⇒ (one=two)
+  have h_imp := Derives.weakening Γ (Formula.eq two three :: Γ) _
+    (spec (spec h_ax3 one) two) (fun _ hx => List.Mem.tail _ hx)
+  have h_neg := Derives.weakening Γ (Formula.eq two three :: Γ) _
+    teo_1_12 (fun _ hx => List.Mem.tail _ hx)
+  exact mp h_neg (mp h_imp h_hyp)
 
 
 /-!

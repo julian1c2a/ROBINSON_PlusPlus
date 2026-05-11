@@ -40,7 +40,17 @@ def Γ := axioms
 -/
 
 -- Helper theorem for left cancellation on addition
-theorem add_left_cancel {a b c : Term} (h : Γ ⊢ (add a c =eq add b c)) : Γ ⊢ (a =eq b) := by sorry
+theorem add_left_cancel {a b c : Term}
+  (h : Γ ⊢ ((add a c) =eq (add b c))) :
+    Γ ⊢ (a =eq b) := by
+  -- BLOQUEADO: triple spec (spec (spec h_ax27 a) b) c no reduce para a b c abstractos.
+  -- El kernel produce: substFormula 0 c (substFormula 1 (liftTerm 0 b)
+  --   (substFormula 2 (liftTerm 0 (liftTerm 0 a)) f))
+  -- que NO es definitionally igual a ((add a c =eq add b c) ⇒ (a =eq b))
+  -- para a b c : Term abstractos (solo lo sería para términos cerrados).
+  -- La prueba correcta requiere lema de liftTerm sobre términos cerrados
+  -- o inducción sobre Term — ninguna factible en el sistema actual.
+  sorry
 
 -- Inverse functions (constructive definitions)
 def w_of_c (c : Term) : Term := w_candidate c
