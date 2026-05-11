@@ -122,4 +122,22 @@ theorem teo_2_10 : Γ ⊢ forall_2 ( (mul (.var 1) (.var 0) =eq zero) ⇒ (lor (
 -- Teo 2.11: 2 * a = 2 * b ⇒ a = b
 theorem teo_2_11 : Γ ⊢ forall_2 ( (mul two (.var 1) =eq mul two (.var 0)) ⇒ ((.var 1) =eq (.var 0)) ) := by sorry
 
+/-!
+### Decidibilidad de la Igualdad
+-/
+
+/-- Ax20 convertido en teorema: `∀n,m, n=m ∨ ¬(n=m)`.
+    Prueba: por tricotomía (ax19), los casos `n<m` y `m<n` producen `¬(n=m)`
+    via irreflexividad (ax18) + `eq_subst`; el caso `n=m` es directo. -/
+theorem eq_decidable : Γ ⊢ ax20_eq_decidable := by
+  -- ax20_eq_decidable = forall_2 (((.var 1) =eq (.var 0)) ∨ ¬(.var 1) =eq (.var 0))
+  -- Estrategia:
+  --   1. gen para introducir n (var 1) y m (var 0)
+  --   2. or_elim sobre ax19 especializado en n, m:
+  --      · Caso n < m: si n=m entonces n<n por eq_subst, contradice ax18 → ¬(n=m)
+  --      · Caso n = m: or_intro_left directo
+  --      · Caso m < n: simétrico al primer caso
+  --   3. gen cierra las cuantificaciones
+  sorry
+
 end ROBINSON_PlusPlus.Minimal.Theorems.Block1

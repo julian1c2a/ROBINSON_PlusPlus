@@ -93,6 +93,17 @@ def Nil : Term := zero
 -- symbol `Cons` governed by axioms to match the spec's abstract approach.
 -- The connection will be made via axioms.
 
+-- ## Display
+
+/-- Muestra un `Term` usando Oxford brackets ⟦⟧ para los argumentos de función.
+    Ejemplos: `σ⟦0⟧`, `+⟦σ⟦0⟧, σ⟦σ⟦0⟧⟧⟧`, `#0`. -/
+partial def termToString : Term → String
+  | .var n      => s!"#{n}"
+  | .func f []  => f
+  | .func f args => f ++ "⟦" ++ ", ".intercalate (args.map termToString) ++ "⟧"
+
+instance : ToString Term := ⟨termToString⟩
+
 -- ## Formula Constructors
 
 -- Helper function to build atomic formulas
@@ -349,7 +360,7 @@ def axioms : List Formula := [
   ax17_div_mod_eq,
   ax18_lt_irrefl,
   ax19_lt_trichotomy,
-  ax20_eq_decidable,
+  -- ax20_eq_decidable es ahora el teorema `eq_decidable` en Block1.lean
   ax21_mod2_range,
   ax22_cantor_proj_exists,
   ax23_cantor_proj_uniq,
