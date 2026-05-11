@@ -34,27 +34,27 @@ def Γ := axioms
 -/
 
 -- Teo L1: ∀ h,t, Cons(h,t) ≠ Nil
-theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (Cons h t =eq Nil) := by sorry
+theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (cons h t =eq nil) := by sorry
 
 -- Teo L2: Cons(h,t) = Cons(h',t') ⇒ h = h' ∧ t = t'
-theorem cons_inj {h t h' t' : Term} : Γ ⊢ (Cons h t =eq Cons h' t') ⇒ land (h =eq h') (t =eq t') := by sorry
+theorem cons_inj {h t h' t' : Term} : Γ ⊢ (cons h t =eq cons h' t') ⇒ land (h =eq h') (t =eq t') := by sorry
 
 /-!
 ### Fase 13: Pertenencia
 -/
 
 -- Teo L4: In(x, Cons(x, Nil))
-theorem in_cons_self_nil (x : Term) : Γ ⊢ In x (Cons x Nil) := by sorry
+theorem in_cons_self_nil (x : Term) : Γ ⊢ In x (cons x Nil) := by sorry
 
 -- Teo L5: In(x, Cons(h, Nil)) ⇒ x = h
-theorem in_cons_nil_imp_eq {x h : Term} : Γ ⊢ In x (Cons h Nil) ⇒ (x =eq h) := by sorry
+theorem in_cons_nil_imp_eq {x h : Term} : Γ ⊢ In x (cons h Nil) ⇒ (x =eq h) := by sorry
 
 /-!
 ### Fase 14: Concatenación
 -/
 
 -- Teo L6: [x] ⊕ [y] = [x,y]
-theorem concat_singletons (x y : Term) : Γ ⊢ (concat (Cons x Nil) (Cons y Nil) =eq Cons x (Cons y Nil)) := by sorry
+theorem concat_singletons (x y : Term) : Γ ⊢ (concat (cons x Nil) (cons y Nil) =eq cons x (cons y Nil)) := by sorry
 
 -- Teo L7: (L ⊕ M) ⊕ N = L ⊕ (M ⊕ N)
 theorem concat_assoc (L M N : Term) : Γ ⊢ (concat (concat L M) N =eq concat L (concat M N)) := by sorry

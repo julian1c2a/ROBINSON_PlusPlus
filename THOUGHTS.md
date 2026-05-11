@@ -154,8 +154,6 @@ a `τ` cualquier valor en `N`. Por tanto ax25/ax26 **son necesarios** en Minimal
 
 ## Estado de los axiomas ax21, ax24, ax27 (2026-05-11)
 
-## Estado de los axiomas ax21, ax24, ax27 (2026-05-11)
-
 Los tres son **necesarios en Minimal** porque sus versiones de teorema en los Block*
 son `sorry` pendientes que en el caso general requieren inducción:
 

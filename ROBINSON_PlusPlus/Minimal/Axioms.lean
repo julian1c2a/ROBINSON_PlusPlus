@@ -66,9 +66,7 @@ def mod2 (t : Term)   : Term := .func mod2_sym [t]
 def proj1 (t : Term)  : Term := .func proj1_sym [t]
 def proj2 (t : Term)  : Term := .func proj2_sym [t]
 def pred (t : Term)    : Term := .func pred_sym [t]
--- TODO NC-4: `Cons` debe renombrarse a `cons` (lowerCamelCase, como el resto de
--- constructores). Pendiente para evitar ruido de renombrado masivo en Block6.
-def Cons (h t : Term) : Term := .func cons_sym [h, t]
+def cons (h t : Term) : Term := .func cons_sym [h, t]
 def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
 
 -- Derived operation `sq`
@@ -93,9 +91,8 @@ def pair (x y : Term) : Term :=
   cantor_func x y
 
 -- List constructors
--- TODO NC-4: `Nil` debe renombrarse a `nil` (lowerCamelCase). Pendiente junto con `Cons`.
-def Nil : Term := zero
--- `Cons h t` es un constructor de lista con cabeza `h` y cola `t`. El símbolo de
+def nil : Term := zero
+-- `cons h t` es un constructor de lista con cabeza `h` y cola `t`. El símbolo de
 -- función es `cons_sym = "::"`, opaco; ax_L0_cons_def lo conecta con `pair h (succ t)`.
 
 -- ## Display
@@ -320,25 +317,25 @@ def ax26_pred_succ : Formula :=
 
 -- Ax L0: Connects Cons to the underlying pair definition
 def ax_L0_cons_def : Formula :=
-  forall_2 (Cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0)))
+  forall_2 (cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0)))
 
 -- Ax L1: In(x, Nil) is always false
 def ax_L1_in_nil : Formula :=
-  forall_ (neg (In (.var 0) Nil))
+  forall_ (neg (In (.var 0) nil))
 
 -- Ax L2: Membership in a Cons list
 def ax_L2_in_cons : Formula :=
   forall_3 (
-    In (.var 2) (Cons (.var 1) (.var 0)) ⇔ (lor ((.var 2) =eq (.var 1)) (In (.var 2) (.var 0)))
+    In (.var 2) (cons (.var 1) (.var 0)) ⇔ (lor ((.var 2) =eq (.var 1)) (In (.var 2) (.var 0)))
   )
 
 -- Ax C1: Concatenation with Nil
 def ax_C1_concat_nil : Formula :=
-  forall_ (concat Nil (.var 0) =eq (.var 0))
+  forall_ (concat nil (.var 0) =eq (.var 0))
 
 -- Ax C2: Concatenation with Cons
 def ax_C2_concat_cons : Formula :=
-  forall_3 (concat (Cons (.var 2) (.var 1)) (.var 0) =eq Cons (.var 2) (concat (.var 1) (.var 0)))
+  forall_3 (concat (cons (.var 2) (.var 1)) (.var 0) =eq cons (.var 2) (concat (.var 1) (.var 0)))
 
 -- Ax 27 (add_left_cancel): ∀ a,b,c, a+c = b+c → a=b
 -- Teorema en sistemas con inducción (inducción sobre c).

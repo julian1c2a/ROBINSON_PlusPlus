@@ -497,7 +497,7 @@ All definitions: computable, no termination proof.
 | `proj1 t` | `def proj1 (t : Term) : Term` | $\pi_1(t)$ |
 | `proj2 t` | `def proj2 (t : Term) : Term` | $\pi_2(t)$ |
 | `pred t` | `def pred (t : Term) : Term` | $\tau(t)$ |
-| `Cons h t` | `def Cons (h t : Term) : Term` | $h :: t$ — **TODO NC-4**: renombrar a `cons` |
+| `cons h t` | `def cons (h t : Term) : Term` | $h :: t$ |
 | `concat l₁ l₂` | `def concat (l₁ l₂ : Term) : Term` | $l_1 \,\#\#\, l_2$ |
 | `sq t` | `def sq (t : Term) : Term` | $t^2$ (= `mul t t`) |
 | `one` | `def one : Term` | $1$ (= `succ zero`) |
@@ -506,7 +506,7 @@ All definitions: computable, no termination proof.
 | `cantor_poly x y` | `def cantor_poly (x y : Term) : Term` | $(x+y)(x+y+1) + 2y$ |
 | `cantor_func x y` | `def cantor_func (x y : Term) : Term` | $\lfloor ((x+y)(x+y+1)+2y)/2 \rfloor$ |
 | `pair x y` | `def pair (x y : Term) : Term` | $\langle x,y \rangle$ (= `cantor_func x y`) |
-| `Nil` | `def Nil : Term` | $[]$ (= `zero`) — **TODO NC-4**: renombrar a `nil` |
+| `nil` | `def nil : Term` | $[]$ (= `zero`) |
 
 ---
 
