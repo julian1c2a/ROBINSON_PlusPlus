@@ -33,11 +33,17 @@ def Γ := axioms
 
 -- Teo 4.1: ∀ n, (√n)² ≤ n
 theorem sqrt_sq_le (n : Term) : Γ ⊢ ((sq (sqrt n)) ≤ n) := by
-  sorry
+  have h_ax14 := ax (by simp [axioms] : ax14_sqrt_le ∈ axioms)
+  have h := spec h_ax14 n
+  simp only [substFormula, substTerm, substTerms, le, lt, sq, mul, if_true] at h
+  exact h
 
 -- Teo 4.2: ∀ n, n < (σ(√n))²
 theorem lt_succ_sqrt_sq (n : Term) : Γ ⊢ lt n (sq (succ (sqrt n))) := by
-  sorry
+  have h_ax15 := ax (by simp [axioms] : ax15_lt_succ_sqrt ∈ axioms)
+  have h := spec h_ax15 n
+  simp only [substFormula, substTerm, substTerms, lt, sq, succ, mul, if_true] at h
+  exact h
 
 -- Teo 4.3: n² = 0 ⇒ n = 0
 theorem sq_eq_zero_imp_zero (n : Term) : Γ ⊢ ((sq n =eq zero) ⇒ (n =eq zero)) := by
@@ -54,7 +60,7 @@ theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ ((succ a) ≤
     -- que computa a  lt(σa,b) ∨ (σa =eq b) ∨ lt(b,σa)
     -- via FOL.substTerm_liftTerm (substTerm c s (liftTerm c t) = t)
     -- y reducción de los índices de de Bruijn numéricos
-    simp [ax19_lt_trichotomy, forall_2, substFormula, substTerm, substTerms,
+    simp [substFormula, substTerm, substTerms,
           liftTerm, liftTerms, lt, succ, FOL.substTerm_liftTerm] at h
     exact h
   -- Paso 2: or_elim en modo táctico (el goal provee el tipo implícito B para or_intro_left/right)
@@ -78,14 +84,14 @@ theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ ((succ a) ≤
         -- ax13 para (a, b): a < b ↔ ∃k', a + σ(k') = b
         have h_ax13_ab := by
           have h := spec (spec h_ax13 a) b
-          simp [ax13_lt_def, forall_2, substFormula, substTerm, substTerms,
-               liftTerm, liftTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at h
+          simp [substFormula, substTerm, substTerms,
+               lt, add, succ, iff, FOL.substTerm_liftTerm] at h
           exact h
         -- ax13 para (b, succ a): b < σ(a) ↔ ∃k, b + σ(k) = σ(a)
         have h_ax13_bsa := by
           have h := spec (spec h_ax13 b) (succ a)
-          simp [ax13_lt_def, forall_2, substFormula, substTerm, substTerms,
-               liftTerm, liftTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at h
+          simp [substFormula, substTerm, substTerms,
+               lt, add, succ, iff, FOL.substTerm_liftTerm] at h
           exact h
         -- Testigos existenciales
         have h_ex_kp := iff_mp h_ax13_ab h_lt

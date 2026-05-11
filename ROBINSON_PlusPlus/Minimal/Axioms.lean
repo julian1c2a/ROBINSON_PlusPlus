@@ -498,33 +498,58 @@ def iff_mpr {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇔ B)) (h2 : Γ
 
 /-- Equality substitution (used to rewrite equality hypotheses). -/
 theorem eq_subst {Γ : List Formula} {t₁ t₂ : Term} {A : Formula}
-    (heq : Γ ⊢ (t₁ ≐ t₂)) (hp : Γ ⊢ A) : Γ ⊢ A := by
-  sorry
+    (_heq : Γ ⊢ (t₁ ≐ t₂)) (hp : Γ ⊢ A) : Γ ⊢ A :=
+  hp
 
 /-- Negation respects equality symmetry: ¬(b = a) → ¬(a = b). -/
 theorem eq_symm_neg {Γ : List Formula} {t₁ t₂ : Term}
-    (h : Γ ⊢ ¬(t₂ ≐ t₁)) : Γ ⊢ ¬(t₁ ≐ t₂) := by
-  sorry
+    (h : Γ ⊢ ¬(t₂ ≐ t₁)) : Γ ⊢ ¬(t₁ ≐ t₂) :=
+  Derives.intro_impl Γ (Formula.eq t₁ t₂) Formula.bottom
+    (Derives.elim_impl (Formula.eq t₁ t₂ :: Γ) (Formula.eq t₂ t₁) Formula.bottom
+      (Derives.weakening Γ (Formula.eq t₁ t₂ :: Γ) _ h
+        (fun _ hx => List.Mem.tail _ hx))
+      (FOL.derive_eq_symm
+        (Derives.hyp (Formula.eq t₁ t₂ :: Γ) _ (List.Mem.head _))))
 
 /-- Congruence: add respects equality in the right argument. -/
 theorem eq_congr_add_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
     Γ ⊢ (add u t₁ ≐ add u t₂) := by
-  sorry
+  let f : Formula := Formula.eq (add (liftTerm 0 u) (liftTerm 0 t₁)) (add (liftTerm 0 u) (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add u t₁) (add u s) := by
+    intro s
+    simp only [f, substFormula, add, substTerm, substTerms,
+               FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (add u t₁))
 
 /-- Congruence: add respects equality in the left argument. -/
 theorem eq_congr_add_right {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
     Γ ⊢ (add t₁ u ≐ add t₂ u) := by
-  sorry
+  let f : Formula := Formula.eq (add (liftTerm 0 t₁) (liftTerm 0 u)) (add (.var 0) (liftTerm 0 u))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add t₁ u) (add s u) := by
+    intro s
+    simp only [f, substFormula, add, substTerm, substTerms,
+               FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (add t₁ u))
 
 /-- Congruence: mul respects equality in the right argument. -/
 theorem eq_congr_mul_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
     Γ ⊢ (mul u t₁ ≐ mul u t₂) := by
-  sorry
+  let f : Formula := Formula.eq (mul (liftTerm 0 u) (liftTerm 0 t₁)) (mul (liftTerm 0 u) (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul u t₁) (mul u s) := by
+    intro s
+    simp only [f, substFormula, mul, substTerm, substTerms,
+               FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (mul u t₁))
 
 /-- Congruence: mul respects equality in the left argument. -/
 theorem eq_congr_mul_right {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
     Γ ⊢ (mul t₁ u ≐ mul t₂ u) := by
-  sorry
+  let f : Formula := Formula.eq (mul (liftTerm 0 t₁) (liftTerm 0 u)) (mul (.var 0) (liftTerm 0 u))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul t₁ u) (mul s u) := by
+    intro s
+    simp only [f, substFormula, mul, substTerm, substTerms,
+               FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (mul t₁ u))
 
 /-- Coercion: use Γ ⊢ A ⇒ B as a function Γ ⊢ A → Γ ⊢ B. -/
 instance {Γ : List Formula} {A B : Formula} :
