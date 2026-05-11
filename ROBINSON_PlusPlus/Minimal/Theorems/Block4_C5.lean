@@ -119,7 +119,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land (le (mul (.var 0) (succ (.
       -- Establish s = σ(p)
       apply ex_elim h_s_is_succ; intro p_witness; intro h_s_eq_spw
       have h_p_eq_pw : Γ ⊢ p =eq p_witness := by
-        have h_ax26 := spec (ax ax26_tau_succ) (t := p_witness)
+        have h_ax26 := spec (ax ax26_pred_succ) (t := p_witness)
         simp [p, pred]; rwa [h_s_eq_spw] at h_ax26
       rw [←h_p_eq_pw] at h_s_eq_spw
 
@@ -158,7 +158,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land (le (mul (.var 0) (succ (.
       have h_s_is_succ : Γ ⊢ ex (succ (.var 0) =eq s) := mp (spec teo_3_11) (mp (spec ne_of_lt) h_s_pos)
       apply ex_elim h_s_is_succ; intro p_witness; intro h_s_eq_spw
       have h_p_eq_pw : Γ ⊢ p =eq p_witness := by
-        have h_ax26 := spec (ax ax26_tau_succ) (t := p_witness)
+        have h_ax26 := spec (ax ax26_pred_succ) (t := p_witness)
         simp [p, pred]; rwa [h_s_eq_spw] at h_ax26
       rw [←h_p_eq_pw] at h_s_eq_spw
 

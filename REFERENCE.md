@@ -1,8 +1,8 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-09
+**Last updated:** 2026-05-11
 **Author**: Julián Calderón Almendros
-**Lean version**: v4.28.0
+**Lean version**: v4.29.1
 
 ---
 
@@ -88,13 +88,14 @@ This document complies with all requirements specified in `AI-GUIDE.md`:
 
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
-| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Completo |
-| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Completo |
-| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
-| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | ✅ Completo |
-| `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | ✅ Completo |
-| `Minimal/Theorems/Block4_C5.lean`| `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5` | `Minimal.Axioms`, `Block1`, `Block2` | 🔄 In progress |
-| `Minimal/Theorems/Block5.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block5` | `Minimal.Axioms`, `Block1`, `Block3`, `Block4` | ✅ Completo |
+| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL`, `FOL.Theorems.Eq` | 🔄 In progress |
+| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | 🔄 In progress |
+| `Minimal/Theorems/Block2.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block2` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔄 In progress |
+| `Minimal/Theorems/Block3.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block3` | `Minimal.Axioms`, `Minimal.Theorems.Block1` | 🔄 In progress |
+| `Minimal/Theorems/Block4.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | 🔄 In progress |
+| `Minimal/Theorems/Block4_C5.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5` | `Minimal.Axioms`, `Block1`, `Block2` | 🔄 In progress |
+| `Minimal/Theorems/Block4_C6_C7.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7` | `Minimal.Axioms`, `Block1`, `Block4_C5` | 🔄 In progress |
+| `Minimal/Theorems/Block5.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block5` | `Minimal.Axioms`, `Block1`, `Block3`, `Block4` | 🔄 In progress |
 | `Minimal/Theorems/Block6.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block6` | `Minimal.Axioms`, `Block1`, `Block5` | 🔄 In progress |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -119,28 +120,33 @@ graph TD
         Block3["Minimal/Theorems/Block3.lean"]
         Block4["Minimal/Theorems/Block4.lean"]
         Block4_C5["Minimal/Theorems/Block4_C5.lean"]
+        Block4_C6_C7["Minimal/Theorems/Block4_C6_C7.lean"]
         Block5["Minimal/Theorems/Block5.lean"]
         Block6["Minimal/Theorems/Block6.lean"]
     end
 
     FOL_FOL --> Axioms
+    FOL_EqThm["FOL.Theorems.Eq"] --> Axioms
     Axioms --> Block1
     Axioms --> Block2
     Axioms --> Block3
     Axioms --> Block4
     Axioms --> Block4_C5
+    Axioms --> Block4_C6_C7
     Axioms --> Block5
     Axioms --> Block6
     Block1 --> Block2
     Block1 --> Block3
     Block1 --> Block4
     Block1 --> Block4_C5
+    Block1 --> Block4_C6_C7
     Block1 --> Block5
     Block1 --> Block6
     Block2 --> Block4_C5
     Block3 --> Block4
     Block3 --> Block5
     Block4 --> Block5
+    Block4_C5 --> Block4_C6_C7
     Block5 --> Block6
     FOL_Tactics --> Block1
     FOL_Tactics --> Block2
@@ -429,12 +435,210 @@ Metaprogramming and macros to automate repetitive natural deduction tasks.
 
 ---
 
-### 3.11 Minimal/Theorems/Block1.lean
+### 3.11 Minimal/Axioms.lean
+
+**Namespace**: `ROBINSON_PlusPlus.Minimal.Axioms`
+**Dependencies**: `FOL.FOL`, `FOL.Theorems.Eq`
+**Last updated**: 2026-05-11
+**Status**: 🔄 In progress (helpers con sorry)
+**@axiom_system**: `Minimal`
+**@importance**: `foundational`
+
+Define el lenguaje, los 30 axiomas del sistema minimal de aritmética y los helpers meta-nivel que se usan en todos los módulos Block*.
+
+---
+
+#### 3.11.1 Notations
+
+| Notation | Priority | Expands to |
+|----------|----------|------------|
+| `t₁ =eq t₂` | 50 | `Formula.eq t₁ t₂` |
+| `t₁ ≤ t₂` | 50 | `le t₁ t₂` (= `lt t₁ t₂ ∨ t₁ =eq t₂`) |
+| `x ∈ l` | 50 | `In x l` (= `Formula.atom "∈" [x, l]`) |
+| `abbrev ex` | — | `@Formula.ex` |
+
+---
+
+#### 3.11.2 Language Symbols (Strings)
+
+| Name | Value | Role |
+|------|-------|------|
+| `succ_sym` | `"σ"` | function |
+| `add_sym` | `"+"` | function |
+| `mul_sym` | `"*"` | function |
+| `sqrt_sym` | `"√"` | function |
+| `div2_sym` | `"/₂"` | function |
+| `mod2_sym` | `"%₂"` | function |
+| `proj1_sym` | `"π₁"` | function |
+| `proj2_sym` | `"π₂"` | function |
+| `pred_sym` | `"τ"` | function |
+| `nil_sym` | `"[]"` | function |
+| `cons_sym` | `"::"` | function |
+| `concat_sym` | `"##"` | function |
+| `lt_sym` | `"<"` | predicate |
+| `in_sym` | `"∈"` | predicate |
+| `zero_sym` | `"0"` | constant |
+
+---
+
+#### 3.11.3 Term Constructors
+
+All definitions: computable, no termination proof.
+
+| Name | Lean signature | Math |
+|------|---------------|------|
+| `zero` | `def zero : Term` | $0$ |
+| `succ t` | `def succ (t : Term) : Term` | $\sigma(t)$ |
+| `add t₁ t₂` | `def add (t₁ t₂ : Term) : Term` | $t_1 + t_2$ |
+| `mul t₁ t₂` | `def mul (t₁ t₂ : Term) : Term` | $t_1 \cdot t_2$ |
+| `sqrt t` | `def sqrt (t : Term) : Term` | $\sqrt{t}$ |
+| `div2 t` | `def div2 (t : Term) : Term` | $\lfloor t/2 \rfloor$ |
+| `mod2 t` | `def mod2 (t : Term) : Term` | $t \bmod 2$ |
+| `proj1 t` | `def proj1 (t : Term) : Term` | $\pi_1(t)$ |
+| `proj2 t` | `def proj2 (t : Term) : Term` | $\pi_2(t)$ |
+| `pred t` | `def pred (t : Term) : Term` | $\tau(t)$ |
+| `Cons h t` | `def Cons (h t : Term) : Term` | $h :: t$ |
+| `concat l₁ l₂` | `def concat (l₁ l₂ : Term) : Term` | $l_1 \,\#\#\, l_2$ |
+| `sq t` | `def sq (t : Term) : Term` | $t^2$ (= `mul t t`) |
+| `one` | `def one : Term` | $1$ (= `succ zero`) |
+| `two` | `def two : Term` | $2$ (= `succ one`) |
+| `eight` | `def eight : Term` | $8$ (= `mul two (mul two two)`) |
+| `cantor_poly x y` | `def cantor_poly (x y : Term) : Term` | $(x+y)(x+y+1) + 2y$ |
+| `cantor_func x y` | `def cantor_func (x y : Term) : Term` | $\lfloor ((x+y)(x+y+1)+2y)/2 \rfloor$ |
+| `pair x y` | `def pair (x y : Term) : Term` | $\langle x,y \rangle$ (= `cantor_func x y`) |
+| `Nil` | `def Nil : Term` | $[]$ (= `zero`) |
+
+---
+
+#### 3.11.4 Formula Constructors
+
+| Name | Lean signature | Math |
+|------|---------------|------|
+| `lt t₁ t₂` | `def lt (t₁ t₂ : Term) : Formula` | $t_1 < t_2$ |
+| `le t₁ t₂` | `def le (t₁ t₂ : Term) : Formula` | $t_1 \le t_2$ (= `lt t₁ t₂ ∨ t₁ =eq t₂`) |
+| `In x l` | `def In (x l : Term) : Formula` | $x \in l$ |
+| `is_cantor x y c` | `def is_cantor (x y c : Term) : Formula` | $2c = (x+y)(x+y+1)+2y$ |
+| `forall_ f` | `def forall_ (f : Formula) : Formula` | $\forall x.\, f$ |
+| `forall_2 f` | `def forall_2 (f : Formula) : Formula` | $\forall x\,y.\, f$ |
+| `forall_3 f` | `def forall_3 (f : Formula) : Formula` | $\forall x\,y\,z.\, f$ |
+| `land A B` | `def land (A B : Formula) : Formula` | $A \land B$ (alias `Formula.and`) |
+| `lor A B` | `def lor (A B : Formula) : Formula` | $A \lor B$ (alias `Formula.or`) |
+
+---
+
+#### 3.11.5 Display
+
+```lean
+partial def termToString : Term → String
+instance : ToString Term
+```
+
+---
+
+#### 3.11.6 Axiom Formulas
+
+All axiom formulas are `def`s of type `Formula`. Variables use De Bruijn indices: `.var 0` is the innermost bound variable.
+
+| Name | Lean name | Mathematical statement |
+|------|-----------|----------------------|
+| Ax 2 | `ax2_peano_succ_neq_zero` | $\forall n,\; \sigma(n) \neq 0$ |
+| Ax 3 | `ax3_peano_succ_inj` | $\forall n\,m,\; \sigma(n)=\sigma(m) \Rightarrow n=m$ |
+| Ax 4 | `ax4_add_zero` | $\forall n,\; n+0=n$ |
+| Ax 5 | `ax5_add_succ` | $\forall n\,m,\; n+\sigma(m)=\sigma(n+m)$ |
+| Ax 6 | `ax6_add_comm` | $\forall n\,m,\; n+m=m+n$ |
+| Ax 7 | `ax7_add_assoc` | $\forall n\,m\,k,\; (n+m)+k=n+(m+k)$ |
+| Ax 8 | `ax8_mul_zero` | $\forall n,\; n\cdot 0=0$ |
+| Ax 9 | `ax9_mul_succ` | $\forall n\,m,\; n\cdot\sigma(m)=(n\cdot m)+n$ |
+| Ax 10 | `ax10_mul_comm` | $\forall n\,m,\; n\cdot m=m\cdot n$ |
+| Ax 11 | `ax11_mul_assoc` | $\forall n\,m\,k,\; (n\cdot m)\cdot k=n\cdot(m\cdot k)$ |
+| Ax 12 | `ax12_mul_distrib` | $\forall n\,m\,k,\; n\cdot(m+k)=(n\cdot m)+(n\cdot k)$ |
+| Ax 13 | `ax13_lt_def` | $\forall n\,m,\; n<m \Leftrightarrow \exists k,\; n+\sigma(k)=m$ |
+| Ax 14 | `ax14_sqrt_le` | $\forall n,\; (\sqrt{n})^2 \le n$ |
+| Ax 15 | `ax15_lt_succ_sqrt` | $\forall n,\; n < (\sigma(\sqrt{n}))^2$ |
+| Ax 16 | `ax16_mod2_succ` | $\forall n,\; \%_2(n)=0 \Leftrightarrow \%_2(\sigma(n))=1$ |
+| Ax 17 | `ax17_div_mod_eq` | $\forall n,\; (/_2(n)\cdot 2)+\%_2(n)=n$ |
+| Ax 18 | `ax18_lt_irrefl` | $\forall n,\; \lnot(n<n)$ |
+| Ax 19 | `ax19_lt_trichotomy` | $\forall a\,b,\; a<b \lor a=b \lor b<a$ |
+| Ax 21 | `ax21_mod2_range` | $\forall n,\; \%_2(n)=0 \lor \%_2(n)=1$ |
+| Ax 22 | `ax22_cantor_proj_exists` | $\forall c,\; \text{is\_cantor}(\pi_1(c),\pi_2(c),c)$ (postulated) |
+| Ax 23 | `ax23_cantor_proj_uniq` | $\forall c\,x\,y\,x'\,y',\; \text{is\_cantor}(x,y,c)\land\text{is\_cantor}(x',y',c)\Rightarrow x=x'\land y=y'$ (postulated) |
+| Ax 24 | `ax24_mod2_of_even` | $\forall n\,k,\; n=2k \Rightarrow \%_2(n)=0$ (postulated) |
+| Ax 25 | `ax25_tau_zero` | $\tau(0)=0$ |
+| Ax 26 | `ax26_tau_succ` | $\forall n,\; \tau(\sigma(n))=n$ |
+| Ax L0 | `ax_L0_cons_def` | $\forall h\,t,\; h::t = \langle h, \sigma(t)\rangle$ |
+| Ax L1 | `ax_L1_in_nil` | $\forall x,\; \lnot(x\in[])$ |
+| Ax L2 | `ax_L2_in_cons` | $\forall x\,h\,t,\; x\in(h::t) \Leftrightarrow x=h \lor x\in t$ |
+| Ax C1 | `ax_C1_concat_nil` | $\forall l,\; []\,\#\#\,l = l$ |
+| Ax C2 | `ax_C2_concat_cons` | $\forall h\,t\,l,\; (h::t)\,\#\#\,l = h::(t\,\#\#\,l)$ |
+| Ax 27 | `ax27_add_left_cancel` | $\forall a\,b\,c,\; a+c=b+c \Rightarrow a=b$ (postulated) |
+
+> Ax 1 ($\exists 0$) es meta-axiomático: `zero : Term`.
+> Ax 20 ($\forall n\,m, n=m \lor n\neq m$) es el teorema `eq_decidable` en Block1.lean.
+
+**Axiom set**:
+
+```lean
+def axioms : List Formula
+```
+
+Contains all 30 axioms above (ax2 – ax27, axL0–axL2, axC1–axC2) ordered as in the source file.
+
+---
+
+#### 3.11.7 Helper Theorems / Definitions (meta-level)
+
+All operate over any context `Γ : List Formula`.
+
+| Name | Lean signature | Math | Sorry |
+|------|---------------|------|-------|
+| `ax` | `theorem ax {f} (h : f ∈ axioms) : axioms ⊢ f` | Membership → derivation | ✅ |
+| `spec` | `theorem spec {A} (h : Γ ⊢ ∀.A) (t : Term) : Γ ⊢ substFormula 0 t A` | $\forall$-elim | ✅ |
+| `eq_refl` | `theorem eq_refl (t : Term) : Γ ⊢ t ≐ t` | $t = t$ | ✅ |
+| `eq_symm` | `theorem eq_symm (h : Γ ⊢ t₁ ≐ t₂) : Γ ⊢ t₂ ≐ t₁` | symmetry | ✅ |
+| `eq_trans` | `theorem eq_trans (h1 : Γ ⊢ t₁≐t₂) (h2 : Γ ⊢ t₁≐t₃) : Γ ⊢ t₂≐t₃` | non-std trans | ✅ |
+| `eq_congr_succ` | `theorem eq_congr_succ (h : Γ ⊢ t₁≐t₂) : Γ ⊢ succ t₁ ≐ succ t₂` | cong σ | ✅ |
+| `mp` | `def mp (h1 : Γ ⊢ A⇒B) (h2 : Γ ⊢ A) : Γ ⊢ B` | modus ponens | ✅ |
+| `imp_intro` | `theorem imp_intro (h : Γ ⊢ A → Γ ⊢ B) : Γ ⊢ A⇒B` | impl intro | sorry |
+| `gen` | `theorem gen (h : ∀ n, Γ ⊢ substFormula 0 n A) : Γ ⊢ ∀.A` | ∀-intro | sorry |
+| `raa` | `theorem raa (h : Γ ⊢ A → Γ ⊢ ⊥) : Γ ⊢ ¬A` | RAA | sorry |
+| `and_intro` | `def and_intro (h1 : Γ ⊢ A) (h2 : Γ ⊢ B) : Γ ⊢ A∧B` | ∧-intro | ✅ |
+| `and_elim_left` | `def and_elim_left (h : Γ ⊢ A∧B) : Γ ⊢ A` | ∧-elim left | ✅ |
+| `and_elim_right` | `def and_elim_right (h : Γ ⊢ A∧B) : Γ ⊢ B` | ∧-elim right | ✅ |
+| `or_intro_left` | `def or_intro_left (h : Γ ⊢ A) : Γ ⊢ A∨B` | ∨-intro left | ✅ |
+| `or_intro_right` | `def or_intro_right (h : Γ ⊢ B) : Γ ⊢ A∨B` | ∨-intro right | ✅ |
+| `or_elim` | `theorem or_elim (h : Γ ⊢ A∨B) (h1 : Γ ⊢ A→Γ ⊢ C) (h2 : Γ ⊢ B→Γ ⊢ C) : Γ ⊢ C` | ∨-elim | sorry |
+| `false_elim` | `def false_elim (h : Γ ⊢ ⊥) : Γ ⊢ A` | ex falso | ✅ |
+| `ex_intro` | `def ex_intro (t) (h : Γ ⊢ substFormula 0 t A) : Γ ⊢ ∃.A` | ∃-intro | ✅ |
+| `ex_elim` | `theorem ex_elim (h : Γ ⊢ ∃.A) (cont : ∀ t, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C` | ∃-elim | sorry |
+| `iff_mp` | `def iff_mp (h1 : Γ ⊢ A⇔B) (h2 : Γ ⊢ A) : Γ ⊢ B` | ↔ mp | ✅ |
+| `iff_mpr` | `def iff_mpr (h1 : Γ ⊢ A⇔B) (h2 : Γ ⊢ B) : Γ ⊢ A` | ↔ mpr | ✅ |
+| `eq_subst` | `theorem eq_subst (heq : Γ ⊢ t₁≐t₂) (hp : Γ ⊢ A) : Γ ⊢ A` | eq subst | sorry |
+| `eq_symm_neg` | `theorem eq_symm_neg (h : Γ ⊢ ¬(t₂≐t₁)) : Γ ⊢ ¬(t₁≐t₂)` | neg sym | sorry |
+| `eq_congr_add_left` | `theorem eq_congr_add_left (h : Γ ⊢ t₁≐t₂) : Γ ⊢ add u t₁ ≐ add u t₂` | cong + right | sorry |
+| `eq_congr_add_right` | `theorem eq_congr_add_right (h : Γ ⊢ t₁≐t₂) : Γ ⊢ add t₁ u ≐ add t₂ u` | cong + left | sorry |
+| `eq_congr_mul_left` | `theorem eq_congr_mul_left (h : Γ ⊢ t₁≐t₂) : Γ ⊢ mul u t₁ ≐ mul u t₂` | cong * right | sorry |
+| `eq_congr_mul_right` | `theorem eq_congr_mul_right (h : Γ ⊢ t₁≐t₂) : Γ ⊢ mul t₁ u ≐ mul t₂ u` | cong * left | sorry |
+
+**CoeFun instance**: `Derives Γ (A⇒B)` coerces to `Derives Γ A → Derives Γ B`.
+
+> **Simp patterns** (confirmed working in Block2.lean):
+>
+> - Ax13 (tiene `⇔`): `simp [ax13_lt_def, forall_2, substFormula, substTerm, substTerms, liftTerm, liftTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at h`
+> - Ax19 (sin `⇔`): `simp [ax19_lt_trichotomy, forall_2, substFormula, substTerm, substTerms, liftTerm, liftTerms, lt, succ, FOL.substTerm_liftTerm] at h`
+> - Regla: añadir `iff` al simp set cuando el axioma contiene `⇔`.
+
+> **Nombres calificados obligatorios** en módulos que importan `FOL.Theorems.Derived`:
+> `ROBINSON_PlusPlus.Minimal.Axioms.or_intro_left`, `or_intro_right`, `or_elim`
+> (hay ambigüedad con `FOL.Theorems.Derived.or_intro_left` que es implicación objeto-nivel).
+
+---
+
+### 3.12 Minimal/Theorems/Block1.lean
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block1`
 **Dependencies**: `Minimal.Axioms`, `FOL.Tactics`, `FOL.Theorems.*`
-**Last updated**: 2026-05-09
-**Status**: ✅ Completo
+**Last updated**: 2026-05-11
+**Status**: 🔄 In progress (25 sorry)
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 
@@ -465,12 +669,12 @@ Demostraciones de los teoremas de aritmética básica (Bloque I).
 
 ---
 
-### 3.12 Minimal/Theorems/Block2.lean
+### 3.13 Minimal/Theorems/Block2.lean
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block2`
 **Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `FOL.Tactics`
-**Last updated**: 2026-05-09
-**Status**: ✅ Completo
+**Last updated**: 2026-05-11
+**Status**: 🔄 In progress (12 sorry)
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 
@@ -491,12 +695,12 @@ Demostraciones de los teoremas sobre la raíz cuadrada (Bloque II).
 
 ---
 
-### 3.13 Minimal/Theorems/Block3.lean
+### 3.14 Minimal/Theorems/Block3.lean
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block3`
 **Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`
-**Last updated**: 2026-05-09
-**Status**: ✅ Completo
+**Last updated**: 2026-05-11
+**Status**: 🔄 In progress (11 sorry)
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 
@@ -520,12 +724,12 @@ Demostraciones de los teoremas sobre `div2` y `mod2` (Bloque III).
 
 ---
 
-### 3.14 Minimal/Theorems/Block4.lean
+### 3.15 Minimal/Theorems/Block4.lean
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block4`
 **Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `Minimal.Theorems.Block3`
-**Last updated**: 2026-05-09
-**Status**: ✅ Completo
+**Last updated**: 2026-05-11
+**Status**: 🔄 In progress (8 sorry)
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 

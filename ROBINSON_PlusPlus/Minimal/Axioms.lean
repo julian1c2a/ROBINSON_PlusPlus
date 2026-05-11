@@ -36,6 +36,8 @@ def div2_sym : String := "/₂"
 def mod2_sym : String := "%₂"
 def proj1_sym : String := "π₁"
 def proj2_sym : String := "π₂"
+-- El símbolo de display del predecesor es "τ", pero los axiomas se nombran con el
+-- prefijo `pred_` (más legible que `tau_`). Ver ax25_pred_zero, ax26_pred_succ.
 def pred_sym : String := "τ"
 def nil_sym : String := "[]"
 def cons_sym : String := "::"
@@ -43,6 +45,7 @@ def concat_sym : String := "##"
 
 -- ### Predicate Symbols
 def lt_sym : String := "<"
+def le_sym : String := "≤"
 def in_sym : String := "∈"
 
 -- ### Constant Symbols
@@ -63,6 +66,8 @@ def mod2 (t : Term)   : Term := .func mod2_sym [t]
 def proj1 (t : Term)  : Term := .func proj1_sym [t]
 def proj2 (t : Term)  : Term := .func proj2_sym [t]
 def pred (t : Term)    : Term := .func pred_sym [t]
+-- TODO NC-4: `Cons` debe renombrarse a `cons` (lowerCamelCase, como el resto de
+-- constructores). Pendiente para evitar ruido de renombrado masivo en Block6.
 def Cons (h t : Term) : Term := .func cons_sym [h, t]
 def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
 
@@ -88,10 +93,10 @@ def pair (x y : Term) : Term :=
   cantor_func x y
 
 -- List constructors
+-- TODO NC-4: `Nil` debe renombrarse a `nil` (lowerCamelCase). Pendiente junto con `Cons`.
 def Nil : Term := zero
--- The actual definition is `pair h (succ t)`, but we use an uninterpreted function
--- symbol `Cons` governed by axioms to match the spec's abstract approach.
--- The connection will be made via axioms.
+-- `Cons h t` es un constructor de lista con cabeza `h` y cola `t`. El símbolo de
+-- función es `cons_sym = "::"`, opaco; ax_L0_cons_def lo conecta con `pair h (succ t)`.
 
 -- ## Display
 
@@ -291,20 +296,24 @@ def ax23_cantor_proj_uniq : Formula :=
   )))
 
 -- Ax 24 (mod2 of even): ∀ n, k, n = 2*k → mod2(n) = 0
--- This is a theorem in a system with induction, but required here.
+-- Teorema en sistemas con inducción (caso base + paso inductivo en k).
+-- En Minimal, se incluye como axioma. Ver `mod2_of_even` en Block5 (sorry pendiente).
 def ax24_mod2_of_even : Formula :=
   forall_2 (
     ((.var 1) =eq (mul two (.var 0))) ⇒ (mod2 (.var 1) =eq zero)
   )
 
 -- ### Axioms of Predecessor Function
+-- `pred` usa el símbolo opaco `pred_sym = "τ"`. Sin estos dos axiomas, cualquier
+-- función satisface el sistema (el símbolo no está fijado por los axiomas anteriores).
+-- Son necesarios para las pruebas de C5 (Block4_C5) que usan `spec (ax ax26_pred_succ)`.
 
--- Ax 25: τ(0) = 0
-def ax25_tau_zero : Formula :=
+-- Ax 25: pred(0) = 0
+def ax25_pred_zero : Formula :=
   pred zero =eq zero
 
--- Ax 26: ∀n, τ(σ(n)) = n
-def ax26_tau_succ : Formula :=
+-- Ax 26: ∀n, pred(σ(n)) = n
+def ax26_pred_succ : Formula :=
   forall_ (pred (succ (.var 0)) =eq (.var 0))
 
 -- ### Axioms of Lists
@@ -332,7 +341,8 @@ def ax_C2_concat_cons : Formula :=
   forall_3 (concat (Cons (.var 2) (.var 1)) (.var 0) =eq Cons (.var 2) (concat (.var 1) (.var 0)))
 
 -- Ax 27 (add_left_cancel): ∀ a,b,c, a+c = b+c → a=b
--- This is a theorem in a system with induction, but required here for C7.
+-- Teorema en sistemas con inducción (inducción sobre c).
+-- En Minimal, se incluye como axioma para C6/C7. Ver `add_left_cancel` en Block4_C6_C7 (sorry pendiente).
 def ax27_add_left_cancel : Formula :=
   forall_3 (
     (add (.var 2) (.var 0) =eq add (.var 1) (.var 0)) ⇒ ((.var 2) =eq (.var 1))
@@ -361,18 +371,18 @@ def axioms : List Formula := [
   ax18_lt_irrefl,
   ax19_lt_trichotomy,
   -- ax20_eq_decidable es ahora el teorema `eq_decidable` en Block1.lean
-  ax21_mod2_range,
+  ax21_mod2_range,    -- teorema en sistemas con inducción; `mod2_range` en Block3 (sorry)
   ax22_cantor_proj_exists,
   ax23_cantor_proj_uniq,
-  ax24_mod2_of_even,
-  ax25_tau_zero,
-  ax26_tau_succ,
+  ax24_mod2_of_even,  -- teorema en sistemas con inducción; `mod2_of_even` en Block5 (sorry)
+  ax25_pred_zero,
+  ax26_pred_succ,
   ax_L0_cons_def,
   ax_L1_in_nil,
   ax_L2_in_cons,
   ax_C1_concat_nil,
   ax_C2_concat_cons,
-  ax27_add_left_cancel -- This should be the last one for now
+  ax27_add_left_cancel -- teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 (sorry)
 ]
 
 -- ## Helper Theorems

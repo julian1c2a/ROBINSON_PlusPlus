@@ -617,18 +617,41 @@ Updated whenever naming conventions evolve.
 
 ### (27.) NEXT-STEPS.md
 
-A living document tracking planned development phases. Each phase includes:
+Tracks **immediate, well-demarcated steps** ready to be executed.
+Entries here are concrete, actionable, and short-horizon.
 
-- Name and objective
-- List of modules to create/modify
-- Dependencies on prior phases
-- Estimated complexity (simple/medium/complex)
+- Each entry has a clear precondition, action, and expected outcome.
+- Items migrate here from `PLANNING.md` only when they are mature enough to execute.
+- The AI assistant reads this file at the start of every work session to orient itself.
+- Updated after each task completes: remove done items, promote the next one from PLANNING.md.
+
+### (27b.) PLANNING.md
+
+Tracks **longer-horizon developments** — ideas and directions that need more thinking
+before they become executable steps.
+
+- Entries here describe intent, alternatives, and open questions — not commands.
+- Material from `THOUGHTS.md` dialogue is distilled here once it reaches sufficient clarity.
+- Items graduate to `NEXT-STEPS.md` only when: objective is clear, dependencies are known,
+  and no open design questions remain.
+- The AI assistant reads this file when the NEXT-STEPS queue is empty or when a user
+  asks for broader context.
 
 ### (28.) THOUGHTS.md
 
-An informal design journal for recording ideas, alternatives considered,
-open questions, and future directions. Not normative — purely exploratory.
-Useful for AI context on "why" decisions were made.
+A **dialogue file** between the user (Julián) and the AI assistant — not a list of commands.
+Its purpose is to induce reflection: new approaches, alternatives, open questions, doubts.
+
+**Protocol**:
+
+- The AI assistant **must read `THOUGHTS.md`** after completing any task (fix, documentation
+  update, proof step, etc.) before ending a response turn.
+- If `THOUGHTS.md` contains an unresolved question or a new direction, the assistant
+  **raises it as part of its reply** rather than silently ignoring it.
+- The file is updated collaboratively: the user adds ideas; the assistant responds by
+  commenting, refining, or proposing next actions.
+- Mature ideas from `THOUGHTS.md` move to `PLANNING.md`; executable plans move to `NEXT-STEPS.md`.
+- `THOUGHTS.md` is never normative — it never overrides a command or a rule in this file.
 
 ### (29.) Commands
 
