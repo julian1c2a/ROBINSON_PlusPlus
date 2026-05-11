@@ -497,7 +497,7 @@ All definitions: computable, no termination proof.
 | `proj1 t` | `def proj1 (t : Term) : Term` | $\pi_1(t)$ |
 | `proj2 t` | `def proj2 (t : Term) : Term` | $\pi_2(t)$ |
 | `pred t` | `def pred (t : Term) : Term` | $\tau(t)$ |
-| `Cons h t` | `def Cons (h t : Term) : Term` | $h :: t$ |
+| `Cons h t` | `def Cons (h t : Term) : Term` | $h :: t$ — **TODO NC-4**: renombrar a `cons` |
 | `concat l₁ l₂` | `def concat (l₁ l₂ : Term) : Term` | $l_1 \,\#\#\, l_2$ |
 | `sq t` | `def sq (t : Term) : Term` | $t^2$ (= `mul t t`) |
 | `one` | `def one : Term` | $1$ (= `succ zero`) |
@@ -506,7 +506,7 @@ All definitions: computable, no termination proof.
 | `cantor_poly x y` | `def cantor_poly (x y : Term) : Term` | $(x+y)(x+y+1) + 2y$ |
 | `cantor_func x y` | `def cantor_func (x y : Term) : Term` | $\lfloor ((x+y)(x+y+1)+2y)/2 \rfloor$ |
 | `pair x y` | `def pair (x y : Term) : Term` | $\langle x,y \rangle$ (= `cantor_func x y`) |
-| `Nil` | `def Nil : Term` | $[]$ (= `zero`) |
+| `Nil` | `def Nil : Term` | $[]$ (= `zero`) — **TODO NC-4**: renombrar a `nil` |
 
 ---
 
@@ -559,21 +559,22 @@ All axiom formulas are `def`s of type `Formula`. Variables use De Bruijn indices
 | Ax 17 | `ax17_div_mod_eq` | $\forall n,\; (/_2(n)\cdot 2)+\%_2(n)=n$ |
 | Ax 18 | `ax18_lt_irrefl` | $\forall n,\; \lnot(n<n)$ |
 | Ax 19 | `ax19_lt_trichotomy` | $\forall a\,b,\; a<b \lor a=b \lor b<a$ |
-| Ax 21 | `ax21_mod2_range` | $\forall n,\; \%_2(n)=0 \lor \%_2(n)=1$ |
+| Ax 21 | `ax21_mod2_range` | $\forall n,\; \%_2(n)=0 \lor \%_2(n)=1$ (postulated; teorema en sistemas con inducción; `mod2_range` en Block3 sorry) |
 | Ax 22 | `ax22_cantor_proj_exists` | $\forall c,\; \text{is\_cantor}(\pi_1(c),\pi_2(c),c)$ (postulated) |
 | Ax 23 | `ax23_cantor_proj_uniq` | $\forall c\,x\,y\,x'\,y',\; \text{is\_cantor}(x,y,c)\land\text{is\_cantor}(x',y',c)\Rightarrow x=x'\land y=y'$ (postulated) |
-| Ax 24 | `ax24_mod2_of_even` | $\forall n\,k,\; n=2k \Rightarrow \%_2(n)=0$ (postulated) |
-| Ax 25 | `ax25_tau_zero` | $\tau(0)=0$ |
-| Ax 26 | `ax26_tau_succ` | $\forall n,\; \tau(\sigma(n))=n$ |
+| Ax 24 | `ax24_mod2_of_even` | $\forall n\,k,\; n=2k \Rightarrow \%_2(n)=0$ (postulated; teorema en sistemas con inducción; `mod2_of_even` en Block5 sorry) |
+| Ax 25 | `ax25_pred_zero` | $\tau(0)=0$ |
+| Ax 26 | `ax26_pred_succ` | $\forall n,\; \tau(\sigma(n))=n$ |
 | Ax L0 | `ax_L0_cons_def` | $\forall h\,t,\; h::t = \langle h, \sigma(t)\rangle$ |
 | Ax L1 | `ax_L1_in_nil` | $\forall x,\; \lnot(x\in[])$ |
 | Ax L2 | `ax_L2_in_cons` | $\forall x\,h\,t,\; x\in(h::t) \Leftrightarrow x=h \lor x\in t$ |
 | Ax C1 | `ax_C1_concat_nil` | $\forall l,\; []\,\#\#\,l = l$ |
 | Ax C2 | `ax_C2_concat_cons` | $\forall h\,t\,l,\; (h::t)\,\#\#\,l = h::(t\,\#\#\,l)$ |
-| Ax 27 | `ax27_add_left_cancel` | $\forall a\,b\,c,\; a+c=b+c \Rightarrow a=b$ (postulated) |
+| Ax 27 | `ax27_add_left_cancel` | $\forall a\,b\,c,\; a+c=b+c \Rightarrow a=b$ (postulated; teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 sorry) |
 
 > Ax 1 ($\exists 0$) es meta-axiomático: `zero : Term`.
 > Ax 20 ($\forall n\,m, n=m \lor n\neq m$) es el teorema `eq_decidable` en Block1.lean.
+> Ax 21, 24, 27 son teoremas en sistemas con inducción; en Minimal se postulan hasta que los `sorry` de Block3, Block5 y Block4_C6_C7 se cubran.
 
 **Axiom set**:
 
