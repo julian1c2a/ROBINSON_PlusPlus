@@ -88,14 +88,14 @@ theorem add_left_cancel {a b c : Term}
     -- lift_01_eq_00 convierte liftTerm 0 (liftTerm 0 a) → liftTerm 1 (liftTerm 0 a)
     -- para que substTerm_liftTerm pueda disparar con c=1.
     simp [substFormula, substTerm, substTerms,
-          liftTerm, liftTerms, add, add_sym,
+          liftTerm, liftTerms, add, add_sym, zero, zero_sym,
           ← lift_01_eq_00,
           FOL.substTerm_liftTerm, FOL.substTerms_liftTerms] at h3
     exact h3
   exact mp h_imp h
 
 -- Inverse functions (constructive definitions)
-def w_of_c (c : Term) : Term := w_candidate c
+def w_of_c (c : Term) : Term := sqrt (add (mul eight c) one)
 def y_of_c (c : Term) : Term := pred (pred (mul two c)) -- Placeholder, needs subtraction
 def x_of_c (c : Term) : Term := pred (w_of_c c) -- Placeholder, needs subtraction
 
