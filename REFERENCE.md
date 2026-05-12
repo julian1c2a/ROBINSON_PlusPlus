@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-11 (Block4_C6_C7: `add_left_cancel` implementado; Lema A `lift_01_eq_00` mutual añadido)
+**Last updated:** 2026-05-12 (Block3: `div2_zero`, `div2_one`, `div2_two`, y auxiliares `div2_*_mul` + helpers privados demostrados; 2 sorries eliminados)
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -704,29 +704,119 @@ Demostraciones de los teoremas sobre la raíz cuadrada (Bloque II).
 ### 3.14 Minimal/Theorems/Block3.lean
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Theorems.Block3`
-**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`
-**Last updated**: 2026-05-11
-**Status**: 🔄 In progress (11 sorry)
+**Dependencies**: `Minimal.Axioms`, `Minimal.Theorems.Block1`, `FOL.FOL`, `FOL.Tactics`, `FOL.Theorems.*`
+**Last updated**: 2026-05-12
+**Status**: 🔄 In progress (3 sorry)
 **@axiom_system**: `Minimal`
 **@importance**: `high`
 
 Demostraciones de los teoremas sobre `div2` y `mod2` (Bloque III).
 
-#### Fase 5: Valores de div2 y mod2 (Teo 5.1 - 5.10)
+**Context alias**:
 
-**Theorems**:
+```lean
+def Γ := axioms   -- dentro del namespace Block3
+```
 
-- `mod2_zero`: $mod2(0) = 0$
-- `div2_zero`: $div2(0) = 0$
-- `mod2_one`: $mod2(1) = 1$
-- `div2_one`: $div2(1) = 0$
-- `mod2_two`: $mod2(2) = 0$
-- `div2_two`: $div2(2) = 1$
-- `mod2_three`: $mod2(3) = 1$
-- `div2_three`: $div2(3) = 1$
-- `mod2_four`: $mod2(4) = 0$
-- `div2_four`: $div2(4) = 2$
-- `mod2_range`: $\forall n, mod2(n) = 0 \lor mod2(n) = 1$
+---
+
+#### 3.14.1 Private Helpers (meta-level, not exported)
+
+##### `add_succ_left_ne_zero`
+
+**Math**: $\text{add}(\sigma(a), b) = 0 \Rightarrow \perp$
+
+**Lean signature**:
+
+```lean
+private theorem add_succ_left_ne_zero (a b : Term)
+    (h : Γ ⊢ (add (succ a) b =eq zero)) : Γ ⊢ Formula.bottom
+```
+
+**Strategy**: `ax6` → `add(σa)b = add b (σa)`; `ax5` → `= σ(add b a)`; `ax2` → `σ(add b a) ≠ 0`. Encadenado con `FOL.derive_eq_trans`.
+**Sorry**: ✅
+
+---
+
+##### `mul_succ_two_ne_zero`
+
+**Math**: $\text{mul}(\sigma(t), 2) = 0 \Rightarrow \perp$
+
+**Lean signature**:
+
+```lean
+private theorem mul_succ_two_ne_zero (t : Term)
+    (h : Γ ⊢ (mul (succ t) two =eq zero)) : Γ ⊢ Formula.bottom
+```
+
+**Strategy**: Desarrolla `mul(σt) 2` vía `ax9` dos veces y `ax8`/`ax5` para obtener `add(σ(add 0 t))(σt) = 0`, luego `add_succ_left_ne_zero`.
+**Sorry**: ✅
+
+---
+
+#### 3.14.2 Private Auxiliaries (not exported)
+
+| Name | Math | Strategy | Sorry |
+|------|------|----------|-------|
+| `div2_zero_mul` | $div2(0) \cdot 2 = 0$ | `ax17(0)` + `mod2_zero` + `ax4` | ✅ |
+| `div2_one_mul` | $div2(1) \cdot 2 = 0$ | `ax17(1)` + `mod2_one` + `ax5`/`ax4`/`ax3` | ✅ |
+| `div2_two_mul` | $div2(2) \cdot 2 = 2$ | `ax17(2)` + `mod2_two` + `ax4` | ✅ |
+
+**Lean signatures**:
+
+```lean
+private theorem div2_zero_mul : Γ ⊢ (mul (div2 zero) two =eq zero)
+private theorem div2_one_mul  : Γ ⊢ (mul (div2 one) two =eq zero)
+private theorem div2_two_mul  : Γ ⊢ (mul (div2 two) two =eq two)
+```
+
+> **Clave `div2_one_mul`**: Produce `succ(mul(div2 one) two) = one = succ 0` vía `ax5`/`ax4`; luego `ax3` extrae `mul(div2 one) two = 0`.
+> **Clave `div2_two_mul`**: `mod2_two = 0` + `ax4` dan directamente `mul(div2 two) two = two`.
+
+---
+
+#### 3.14.3 Public Theorems (exported)
+
+##### Fase 5: Valores de mod2 y div2 (Teo 5.1–5.10)
+
+| Nombre | Enunciado matemático | Lean signature | Sorry |
+|--------|----------------------|---------------|-------|
+| `mod2_zero` | $mod2(0) = 0$ | `theorem mod2_zero : Γ ⊢ (mod2 zero =eq zero)` | ✅ |
+| `mod2_one` | $mod2(1) = 1$ | `theorem mod2_one : Γ ⊢ (mod2 one =eq one)` | ✅ |
+| `mod2_two` | $mod2(2) = 0$ | `theorem mod2_two : Γ ⊢ (mod2 two =eq zero)` | ✅ |
+| `mod2_three` | $mod2(3) = 1$ | `theorem mod2_three : Γ ⊢ (mod2 three =eq one)` | ✅ |
+| `mod2_four` | $mod2(4) = 0$ | `theorem mod2_four : Γ ⊢ (mod2 four =eq zero)` | ✅ |
+| `div2_zero` | $div2(0) = 0$ | `theorem div2_zero : Γ ⊢ (div2 zero =eq zero)` | ✅ |
+| `div2_one` | $div2(1) = 0$ | `theorem div2_one : Γ ⊢ (div2 one =eq zero)` | ✅ |
+| `div2_two` | $div2(2) = 1$ | `theorem div2_two : Γ ⊢ (div2 two =eq one)` | sorry (caso $1 < div2(2)$) |
+| `div2_three` | $div2(3) = 1$ | `theorem div2_three : Γ ⊢ (div2 three =eq one)` | sorry |
+| `div2_four` | $div2(4) = 2$ | `theorem div2_four : Γ ⊢ (div2 four =eq two)` | sorry |
+| `mod2_range` | $\forall n,\; mod2(n)=0 \lor mod2(n)=1$ | `theorem mod2_range (n : Term) : Γ ⊢ ((mod2 n =eq zero) ∨ (mod2 n =eq one))` | ✅ |
+
+**Strategy summary**:
+
+- `mod2_zero`: `ax21(0)` + caso `mod2(0)=1` contradice `ax17(0)+ax5+ax4+ax2`.
+- `mod2_one`: `ax16(0)` + `mod2_zero`.
+- `mod2_two`: `ax21(2)` + caso `mod2(2)=1` contradice `ax16(1)→mod2(1)=0` vs `mod2_one`.
+- `mod2_three`: `ax16(2)` + `mod2_two`.
+- `mod2_four`: análogo a `mod2_two` con `mod2_three`.
+- `div2_zero`, `div2_one`: tricotomía de `ax19` sobre `div2(n)` vs `0`; casos `<0` y `>0` dan ⊥ vía `add_succ_left_ne_zero` / `mul_succ_two_ne_zero`.
+- `div2_two`: tricotomía sobre `div2(2)` vs `1`; caso `div2(2)<1` → sub-tricotomía vs `0` → ambas ramas ⊥; caso `1<div2(2)` → sorry.
+- `mod2_range`: directo de `ax21(n)`.
+
+> **Operador `eq_trans` no estándar** (CRÍTICO):
+> `eq_trans (h1 : Γ ⊢ t1=t2) (h2 : Γ ⊢ t1=t3) : Γ ⊢ t2=t3` (mismo LHS en ambos).
+> Para cadenas estándar `a=b, b=c → a=c`, usar `FOL.derive_eq_trans`.
+
+> **`eq_congr_mul_right` vs `eq_congr_add_right`**: para `mul(div2 two) two = mul zero two` usar `eq_congr_mul_right h_d2_zero` (no `eq_congr_add_right`).
+
+> **`h_mul_01` / `h_mul_02` pattern** (en `div2_two`, rama `div2(2)=0`):
+>
+> ```lean
+> FOL.derive_eq_trans h9_1 (FOL.derive_eq_trans (eq_congr_add_right h8_0) h4_0)
+> ```
+>
+> Encadena: `mul 0 1 = add(mul 0 0) 0 = add 0 0 = 0`.
 
 ---
 
