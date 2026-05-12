@@ -295,12 +295,197 @@ theorem sqrt_unique_of_bounds {k n : Term} : Γ ⊢ ((sq k ≤ n) ∧ lt n (sq (
   sorry
 
 -- Teo 4.4: √0 = 0
+-- Prueba: ax14 → sq(√0) ≤ 0. Caso sq(√0)<0: lt_zero_impossible → ↯.
+--         Caso sq(√0)=0: sq_eq_zero_imp_zero → √0=0.
 theorem sqrt_zero : Γ ⊢ ((sqrt zero) =eq zero) := by
-  sorry
+  -- ax14 con n=0: sq(√0) ≤ 0
+  have h_le : Γ ⊢ (sq (sqrt zero) ≤ zero) := sqrt_sq_le zero
+  -- Helper: lt x zero → ⊥
+  have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax2  := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+  have lt_zero_impossible : ∀ x : Term, axioms ⊢ lt x zero → axioms ⊢ ⊥ := fun x h_ltx0 => by
+    have hh := spec (spec h_ax13 x) zero
+    simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
+          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh
+    apply ex_elim (iff_mp hh h_ltx0)
+    intro k h_k
+    simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
+          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
+    have h_step : axioms ⊢ (add x (succ k) =eq succ (add x k)) := by
+      have hs := spec (spec h_ax5 x) k
+      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hs
+      exact hs
+    have h_neq0 : axioms ⊢ neg (succ (add x k) =eq zero) := by
+      have hn := spec h_ax2 (add x k)
+      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hn
+      exact hn
+    exact mp h_neq0 (eq_trans h_step h_k)
+  -- or_elim en sq(√0) < 0 ∨ sq(√0) = 0
+  apply Axioms.or_elim h_le
+  · intro h_lt
+    exact false_elim (lt_zero_impossible (sq (sqrt zero)) h_lt)
+  · intro h_eq
+    -- h_eq : sq(√0) = 0. Por sq_eq_zero_imp_zero: √0 = 0.
+    exact mp (sq_eq_zero_imp_zero (sqrt zero)) h_eq
 
 -- Teo 4.5: √1 = 1
+-- Prueba: tricotomía sobre √1 vs 1.
+--   Caso √1 = 1: directo.
+--   Caso √1 < 1: ax13 → ∃k, √1+σk=σ0; ax5+ax3+teo_2_9 → √1=0.
+--                Luego ax15 → 1 < sq(σ0) = sq(1) = 1*1 = 1 (teo_1_8) → 1<1 → ax18 ↯.
+--   Caso 1 < √1: requiere sq_le_mono (sorry).
 theorem sqrt_one : Γ ⊢ ((sqrt one) =eq one) := by
-  sorry
+  have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have h_ax2  := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+  have h_ax3  := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
+  have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  -- ax15 con n=1: 1 < sq(σ(√1))
+  have h_lt15 : Γ ⊢ lt one (sq (succ (sqrt one))) := lt_succ_sqrt_sq one
+  -- tricotomía sobre √1 vs 1
+  have h_tric : Γ ⊢ (lt (sqrt one) one ∨ ((sqrt one) =eq one) ∨ lt one (sqrt one)) := by
+    have h := spec (spec h_ax19 (sqrt one)) one
+    simp [substFormula, substTerm, substTerms, lt, succ, sqrt, liftTerm, liftTerms,
+          FOL.substTerm_liftTerm] at h
+    exact h
+  -- Helper: lt x zero → ⊥
+  have lt_zero_impossible : ∀ x : Term, axioms ⊢ lt x zero → axioms ⊢ ⊥ := fun x h_ltx0 => by
+    have hh := spec (spec h_ax13 x) zero
+    simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
+          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh
+    apply ex_elim (iff_mp hh h_ltx0)
+    intro k h_k
+    simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
+          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
+    have h_step : axioms ⊢ (add x (succ k) =eq succ (add x k)) := by
+      have hs := spec (spec h_ax5 x) k
+      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hs
+      exact hs
+    have h_neq0 : axioms ⊢ neg (succ (add x k) =eq zero) := by
+      have hn := spec h_ax2 (add x k)
+      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hn
+      exact hn
+    exact mp h_neq0 (eq_trans h_step h_k)
+  apply Axioms.or_elim h_tric
+  · -- Caso √1 < 1: derivamos √1=0, luego 1 < sq(1) = 1 → 1<1 → ↯
+    intro h_sqrt_lt_1
+    -- ax13 da ∃k, √1+σk=1=σ0
+    have hh := spec (spec h_ax13 (sqrt one)) one
+    simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
+          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh
+    apply ex_elim (iff_mp hh h_sqrt_lt_1)
+    intro k h_k
+    simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
+          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
+    -- h_k : √1 + σk = σ0 (= 1)
+    -- ax5: √1+σk = σ(√1+k), luego σ(√1+k) = σ0
+    have h_ax5_inst : axioms ⊢ (add (sqrt one) (succ k) =eq succ (add (sqrt one) k)) := by
+      have hs := spec (spec h_ax5 (sqrt one)) k
+      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hs
+      exact hs
+    have h_succ_eq : axioms ⊢ (succ (add (sqrt one) k) =eq succ zero) :=
+      eq_trans h_ax5_inst h_k
+    -- ax3: √1+k = 0
+    have h_ax3_inst : axioms ⊢
+        ((succ (add (sqrt one) k) =eq succ zero) ⇒ (add (sqrt one) k =eq zero)) := by
+      have hw := spec (spec h_ax3 (add (sqrt one) k)) zero
+      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hw
+      exact hw
+    have h_sum0 : axioms ⊢ (add (sqrt one) k =eq zero) := mp h_ax3_inst h_succ_eq
+    -- teo_2_9: √1=0 ∧ k=0
+    have h_teo29_inst : axioms ⊢
+        (add (sqrt one) k =eq zero) ⇒ (land ((sqrt one) =eq zero) (k =eq zero)) := by
+      have hs := spec (spec teo_2_9 (sqrt one)) k
+      simp [substFormula, substTerm, substTerms, add, zero, land, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hs
+      exact hs
+    have h_sqrt1_eq0 : axioms ⊢ ((sqrt one) =eq zero) :=
+      Axioms.and_elim_left (mp h_teo29_inst h_sum0)
+    -- Ahora: √1=0, luego σ(√1) = σ0 = 1
+    -- h_lt15: 1 < sq(σ(√1)) = sq(σ0) = sq(1) = 1*1 = 1
+    -- Derivamos la contradicción via ax13 sobre h_lt15:
+    -- ∃j, 1 + σj = sq(σ(√1)). Y sq(σ(√1)) = sq(1) = 1.
+    -- Luego 1 + σj = 1. Por ax5: σ(1+j) = 1 = σ0 → ax3 → 1+j=0 → teo_2_9 → 1=0 → ↯ ax2.
+    -- Primero derivamos sq(σ(√1)) = sq(1):
+    have h_succ_sqrt1_eq1 : axioms ⊢ (succ (sqrt one) =eq one) :=
+      eq_congr_succ h_sqrt1_eq0
+    -- sq(σ(√1)) = mul(σ(√1), σ(√1)) y σ(√1) = 1,
+    -- así sq(σ(√1)) = sq(1) via congruencia en ambos argumentos
+    have h_sq_succ_eq1 : axioms ⊢ (sq (succ (sqrt one)) =eq one) := by
+      unfold sq
+      -- mul (succ (sqrt one)) (succ (sqrt one)) = mul one (succ (sqrt one)) (por congr_right con h_succ_sqrt1_eq1)
+      have step1 : axioms ⊢ (mul (succ (sqrt one)) (succ (sqrt one)) =eq mul one (succ (sqrt one))) :=
+        eq_congr_mul_right h_succ_sqrt1_eq1
+      -- mul one (succ (sqrt one)) = mul one one (por congr_left con h_succ_sqrt1_eq1)
+      have step2 : axioms ⊢ (mul one (succ (sqrt one)) =eq mul one one) :=
+        eq_congr_mul_left h_succ_sqrt1_eq1
+      -- mul one one = one (teo_1_8)
+      have step3 : axioms ⊢ (mul one one =eq one) := teo_1_8
+      exact eq_trans (eq_trans step1 step2) step3
+    -- Ahora derivamos contradicción desde h_lt15 y h_sq_succ_eq1:
+    -- ax13: lt one (sq(σ(√1))) ↔ ∃j, one + σj = sq(σ(√1))
+    have h_lt15_ex : axioms ⊢ ex (add one (succ (.var 0)) =eq sq (succ (sqrt one))) := by
+      have h := spec (spec h_ax13 one) (sq (succ (sqrt one)))
+      simp [substFormula, substTerm, substTerms, lt, add, succ, one, iff, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm, FOL.substTerm_lift_comm] at h
+      exact iff_mp h h_lt15
+    apply ex_elim h_lt15_ex
+    intro j h_j
+    simp [substFormula, substTerm, substTerms, add, succ, one, liftTerm, liftTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_j
+    -- h_j: one + succ j = sq(σ(√1)) = one
+    have h_j_eq1 : axioms ⊢ (add one (succ j) =eq one) :=
+      eq_trans h_j h_sq_succ_eq1
+    -- ax5: one + succ j = succ(one + j)
+    have h_ax5_j : axioms ⊢ (add one (succ j) =eq succ (add one j)) := by
+      have hs := spec (spec h_ax5 one) j
+      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hs
+      exact hs
+    -- succ(one + j) = one = succ zero
+    have h_succ_eq0 : axioms ⊢ (succ (add one j) =eq succ zero) :=
+      eq_trans h_ax5_j h_j_eq1
+    -- ax3: one + j = 0
+    have h_ax3_j : axioms ⊢
+        ((succ (add one j) =eq succ zero) ⇒ (add one j =eq zero)) := by
+      have hw := spec (spec h_ax3 (add one j)) zero
+      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hw
+      exact hw
+    have h_one_j_0 : axioms ⊢ (add one j =eq zero) := mp h_ax3_j h_succ_eq0
+    -- teo_2_9: one=0 ∧ j=0
+    have h_teo29_j : axioms ⊢
+        (add one j =eq zero) ⇒ (land (one =eq zero) (j =eq zero)) := by
+      have hs := spec (spec teo_2_9 one) j
+      simp [substFormula, substTerm, substTerms, add, zero, land, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hs
+      exact hs
+    have h_one_eq0 : axioms ⊢ (one =eq zero) :=
+      Axioms.and_elim_left (mp h_teo29_j h_one_j_0)
+    -- ax2: ¬(succ zero = 0), i.e. ¬(one = 0)
+    have h_one_neq0 : axioms ⊢ neg (succ zero =eq zero) := by
+      have hn := spec h_ax2 zero
+      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
+            FOL.substTerm_liftTerm] at hn
+      exact hn
+    exact false_elim (mp h_one_neq0 h_one_eq0)
+  · intro h23
+    apply Axioms.or_elim h23
+    · -- Caso √1 = 1: directo
+      intro h_eq
+      exact h_eq
+    · -- Caso 1 < √1: requiere sq_le_mono para derivar sq(1) ≤ sq(√1) → 1 ≤ sq(√1)
+      -- pero sq(√1) ≤ 1 (ax14), así que sq(√1) = 1 = 2... contradicción no trivial.
+      intro _
+      sorry -- Requires sq_le_mono (which requires mul_le_mono_right)
 
 end ROBINSON_PlusPlus.Minimal.Theorems.Block2
 
