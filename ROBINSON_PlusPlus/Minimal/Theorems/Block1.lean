@@ -186,7 +186,16 @@ theorem teo_2_1 : Γ ⊢ ax4_add_zero :=
   ax (by simp [axioms, ax4_add_zero])
 
 -- Teo 2.2: ∀ n, 0 + n = n
-theorem teo_2_2 : Γ ⊢ forall_ (add zero (.var 0) =eq (.var 0)) := by sorry
+-- Prueba: ax6(zero,n): 0+n = n+0; ax4(n): n+0 = n.
+theorem teo_2_2 : Γ ⊢ forall_ (add zero (.var 0) =eq (.var 0)) := by
+  unfold Γ; apply gen; intro n
+  have h_ax6 := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  have h_zero := spec h_ax4 n
+  simp only [substFormula, substTerm, substTerms, add, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_zero
+  have h_comm := spec (spec h_ax6 zero) n
+  simp only [substFormula, substTerm, substTerms, add, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_comm
+  exact eq_trans h_comm h_zero
 
 -- Teo 2.3: ∀ n, n * 0 = 0
 -- Prueba: Ax 8.
@@ -194,19 +203,85 @@ theorem teo_2_3 : Γ ⊢ ax8_mul_zero :=
   ax (by simp [axioms, ax8_mul_zero])
 
 -- Teo 2.4: ∀ n, 0 * n = 0
-theorem teo_2_4 : Γ ⊢ forall_ (mul zero (.var 0) =eq zero) := by sorry
+-- Prueba: ax10(zero,n): 0*n = n*0; ax8(n): n*0 = 0.
+theorem teo_2_4 : Γ ⊢ forall_ (mul zero (.var 0) =eq zero) := by
+  unfold Γ; apply gen; intro n
+  have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
+  have h_ax8  := ax (by simp [axioms] : ax8_mul_zero ∈ axioms)
+  have h_zero := spec h_ax8 n
+  simp only [substFormula, substTerm, substTerms, mul, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_zero
+  have h_comm := spec (spec h_ax10 zero) n
+  simp only [substFormula, substTerm, substTerms, mul, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_comm
+  exact eq_trans h_comm h_zero
 
 -- Teo 2.5: ∀ n, n * 1 = n
-theorem teo_2_5 : Γ ⊢ forall_ (mul (.var 0) one =eq (.var 0)) := by sorry
+-- Prueba: ax9(n,0): n*σ(0)=(n*0)+n; ax8(n): n*0=0; teo_2_2(n): 0+n=n.
+theorem teo_2_5 : Γ ⊢ forall_ (mul (.var 0) one =eq (.var 0)) := by
+  unfold Γ; apply gen; intro n
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  have h_ax8 := ax (by simp [axioms] : ax8_mul_zero ∈ axioms)
+  -- n*1 = (n*0)+n
+  have h1 := spec (spec h_ax9 n) zero
+  simp only [substFormula, substTerm, substTerms, mul, zero, add, succ, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h1
+  -- n*0 = 0
+  have h_n0 := spec h_ax8 n
+  simp only [substFormula, substTerm, substTerms, mul, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_n0
+  -- (n*0)+n = 0+n
+  have h2 := eq_congr_add_right (u := n) h_n0
+  -- 0+n = n
+  have h3 := spec teo_2_2 n
+  simp only [substFormula, substTerm, substTerms, add, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h3
+  -- n*1 = 0+n via h1, h2; then = n via h3
+  exact eq_trans (eq_symm (eq_trans (eq_symm h1) h2)) h3
 
 -- Teo 2.6: ∀ n, 1 * n = n
-theorem teo_2_6 : Γ ⊢ forall_ (mul one (.var 0) =eq (.var 0)) := by sorry
+-- Prueba: ax10(one,n): 1*n = n*1; teo_2_5: n*1=n.
+theorem teo_2_6 : Γ ⊢ forall_ (mul one (.var 0) =eq (.var 0)) := by
+  unfold Γ; apply gen; intro n
+  have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
+  have h_comm := spec (spec h_ax10 one) n
+  simp only [substFormula, substTerm, substTerms, mul, zero, succ, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_comm
+  have h_n1 := spec teo_2_5 n
+  simp only [substFormula, substTerm, substTerms, mul, zero, succ, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_n1
+  exact eq_trans h_comm h_n1
 
 -- Teo 2.7: ∀ n, 2 * n = n + n
-theorem teo_2_7 : Γ ⊢ forall_ (mul two (.var 0) =eq add (.var 0) (.var 0)) := by sorry
+-- Prueba: ax10(two,n): 2*n=n*2; ax9(n,1): n*2=(n*1)+n; teo_2_5: n*1=n.
+theorem teo_2_7 : Γ ⊢ forall_ (mul two (.var 0) =eq add (.var 0) (.var 0)) := by
+  unfold Γ; apply gen; intro n
+  have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
+  have h_ax9  := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  -- 2*n = n*2
+  have h_comm := spec (spec h_ax10 two) n
+  simp only [substFormula, substTerm, substTerms, mul, zero, succ, add, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_comm
+  -- n*2 = (n*1)+n
+  have h_mul2 := spec (spec h_ax9 n) one
+  simp only [substFormula, substTerm, substTerms, mul, zero, succ, add, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_mul2
+  -- n*1 = n
+  have h_n1 := spec teo_2_5 n
+  simp only [substFormula, substTerm, substTerms, mul, zero, succ, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_n1
+  -- (n*1)+n = n+n
+  have h_n1n := eq_congr_add_right (u := n) h_n1
+  -- 2*n = n*2 = (n*1)+n = n+n
+  exact eq_trans h_comm (eq_trans h_mul2 h_n1n)
 
 -- Teo 2.8: ∀ n, σ(n) = n + 1
-theorem teo_2_8 : Γ ⊢ forall_ (succ (.var 0) =eq add (.var 0) one) := by sorry
+-- Prueba: ax5(n,0): n+σ(0)=σ(n+0); ax4(n): n+0=n; congr_succ.
+-- Entonces n+1 = n+σ(0) = σ(n+0) = σ(n), luego σ(n)=n+1.
+theorem teo_2_8 : Γ ⊢ forall_ (succ (.var 0) =eq add (.var 0) one) := by
+  unfold Γ; apply gen; intro n
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  -- n + 1 = σ(n + 0)
+  have h1 := spec (spec h_ax5 n) zero
+  simp only [substFormula, substTerm, substTerms, add, zero, succ, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h1
+  -- n + 0 = n
+  have h_n0 := spec h_ax4 n
+  simp only [substFormula, substTerm, substTerms, add, zero, liftTerm, liftTerms, FOL.substTerm_liftTerm, if_true, if_false, Nat.reduceEq, Nat.reduceLT, Nat.reduceBEq] at h_n0
+  -- σ(n + 0) = σ(n)
+  have h2 := eq_congr_succ h_n0
+  -- σ(n) = n + 1
+  exact eq_symm (eq_trans h1 h2)
 
 -- Teo 3.11 (Predecessor Axiom as Theorem)
 theorem teo_3_11 : Γ ⊢ forall_ (neg ((.var 0) =eq zero) ⇒ ex (succ (.var 0) =eq (.var 1))) := by sorry
