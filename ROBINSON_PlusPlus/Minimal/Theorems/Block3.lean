@@ -650,100 +650,100 @@ theorem div2_two : Γ ⊢ (div2 two =eq one) := by
           simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
           exact hh
         -- use h_mul_two and h9_2 to get: add(mul(succ t) one)(succ t) = two
-          have h_add_eq_two : Γ ⊢ (add (mul (succ (add one k)) one) (succ (add one k)) =eq two) :=
+        have h_add_eq_two : Γ ⊢ (add (mul (succ (add one k)) one) (succ (add one k)) =eq two) :=
             FOL.derive_eq_trans (eq_symm h9_2) h_mul_two
-          -- mul(succ t) one = add zero (succ t) = succ(add zero t)
-          have h_mul1_direct : Γ ⊢ (mul (succ (add one k)) one =eq succ (add zero (add one k))) := by
+        -- mul(succ t) one = add zero (succ t) = succ(add zero t)
+        have h_mul1_direct : Γ ⊢ (mul (succ (add one k)) one =eq succ (add zero (add one k))) := by
             have step1 : Γ ⊢ (mul (succ (add one k)) one =eq add zero (succ (add one k))) :=
               FOL.derive_eq_trans h9_1 (eq_congr_add_right h8)
             exact FOL.derive_eq_trans step1 h5_0t
-          -- add zero (add one k) = add one k [ax4 doesn't work; we need ax6+ax4]
-          -- ax6(zero, add one k): add zero (add one k) = add(add one k) zero
-          have h6_0t : Γ ⊢ (add zero (add one k) =eq add (add one k) zero) := by
+        -- add zero (add one k) = add one k [ax4 doesn't work; we need ax6+ax4]
+        -- ax6(zero, add one k): add zero (add one k) = add(add one k) zero
+        have h6_0t : Γ ⊢ (add zero (add one k) =eq add (add one k) zero) := by
             have hh := spec (spec h_ax6 zero) (add one k)
             simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- ax4(add one k): add(add one k) zero = add one k
-          have h4_t : Γ ⊢ (add (add one k) zero =eq add one k) := by
+        -- ax4(add one k): add(add one k) zero = add one k
+        have h4_t : Γ ⊢ (add (add one k) zero =eq add one k) := by
             have hh := spec h_ax4 (add one k)
             simp [substFormula, substTerm, substTerms, add, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- add zero (add one k) = add one k
-          have h_zero_t : Γ ⊢ (add zero (add one k) =eq add one k) :=
+        -- add zero (add one k) = add one k
+        have h_zero_t : Γ ⊢ (add zero (add one k) =eq add one k) :=
             FOL.derive_eq_trans h6_0t h4_t
-          -- mul(succ t) one = succ(add one k)
-          have h_mul1_succ : Γ ⊢ (mul (succ (add one k)) one =eq succ (add one k)) :=
+        -- mul(succ t) one = succ(add one k)
+        have h_mul1_succ : Γ ⊢ (mul (succ (add one k)) one =eq succ (add one k)) :=
             FOL.derive_eq_trans h_mul1_direct (eq_congr_succ h_zero_t)
-          -- add(succ(add one k))(succ(add one k)) = two  [congr_add_right h_mul1_succ + h_add_eq_two]
-          have h_succ_add_eq : Γ ⊢ (add (succ (add one k)) (succ (add one k)) =eq two) :=
+        -- add(succ(add one k))(succ(add one k)) = two  [congr_add_right h_mul1_succ + h_add_eq_two]
+        have h_succ_add_eq : Γ ⊢ (add (succ (add one k)) (succ (add one k)) =eq two) :=
             FOL.derive_eq_trans (eq_congr_add_right (eq_symm h_mul1_succ)) h_add_eq_two
-          -- ax5(succ(add one k), add one k): add(succ(add one k))(succ(add one k)) = succ(add(succ(add one k))(add one k))
-          have h5_ss : Γ ⊢ (add (succ (add one k)) (succ (add one k)) =eq succ (add (succ (add one k)) (add one k))) := by
+        -- ax5(succ(add one k), add one k): add(succ(add one k))(succ(add one k)) = succ(add(succ(add one k))(add one k))
+        have h5_ss : Γ ⊢ (add (succ (add one k)) (succ (add one k)) =eq succ (add (succ (add one k)) (add one k))) := by
             have hh := spec (spec h_ax5 (succ (add one k))) (add one k)
             simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- succ(add(succ(add one k))(add one k)) = two = succ one = succ(succ zero)
-          have h_succ_eq2 : Γ ⊢ (succ (add (succ (add one k)) (add one k)) =eq two) :=
+        -- succ(add(succ(add one k))(add one k)) = two = succ one = succ(succ zero)
+        have h_succ_eq2 : Γ ⊢ (succ (add (succ (add one k)) (add one k)) =eq two) :=
             FOL.derive_eq_trans (eq_symm h5_ss) h_succ_add_eq
-          -- ax3: add(succ(add one k))(add one k) = one
-          have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
-          have h3 : Γ ⊢ ((succ (add (succ (add one k)) (add one k)) =eq succ one) ⇒
+        -- ax3: add(succ(add one k))(add one k) = one
+        have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
+        have h3 : Γ ⊢ ((succ (add (succ (add one k)) (add one k)) =eq succ one) ⇒
               (add (succ (add one k)) (add one k) =eq one)) := by
             have hh := spec (spec h_ax3 (add (succ (add one k)) (add one k))) one
             simp [substFormula, substTerm, substTerms, succ, add, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          have h_sum_one : Γ ⊢ (add (succ (add one k)) (add one k) =eq one) :=
+        have h_sum_one : Γ ⊢ (add (succ (add one k)) (add one k) =eq one) :=
             mp h3 h_succ_eq2
-          -- add one k = succ k  [ax6(one,k) + ax5(k,zero) + ax4(k)]
-          -- ax6(one, k): add one k = add k one
-          have h6_1k : Γ ⊢ (add one k =eq add k one) := by
+        -- add one k = succ k  [ax6(one,k) + ax5(k,zero) + ax4(k)]
+        -- ax6(one, k): add one k = add k one
+        have h6_1k : Γ ⊢ (add one k =eq add k one) := by
             have hh := spec (spec h_ax6 one) k
             simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- ax5(k, zero): add k one = succ(add k zero)
-          have h5_k0 : Γ ⊢ (add k one =eq succ (add k zero)) := by
+        -- ax5(k, zero): add k one = succ(add k zero)
+        have h5_k0 : Γ ⊢ (add k one =eq succ (add k zero)) := by
             have hh := spec (spec h_ax5 k) zero
             simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- ax4(k): add k zero = k
-          have h4_k : Γ ⊢ (add k zero =eq k) := by
+        -- ax4(k): add k zero = k
+        have h4_k : Γ ⊢ (add k zero =eq k) := by
             have hh := spec h_ax4 k
             simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- add one k = succ k
-          have h_1k_succ : Γ ⊢ (add one k =eq succ k) :=
+        -- add one k = succ k
+        have h_1k_succ : Γ ⊢ (add one k =eq succ k) :=
             FOL.derive_eq_trans h6_1k (FOL.derive_eq_trans h5_k0 (eq_congr_succ h4_k))
-          -- add(succ(succ k))(succ k) = one  [congr h_1k_succ in h_sum_one]
-          have h_sum2 : Γ ⊢ (add (succ (succ k)) (succ k) =eq one) := by
+        -- add(succ(succ k))(succ k) = one  [congr h_1k_succ in h_sum_one]
+        have h_sum2 : Γ ⊢ (add (succ (succ k)) (succ k) =eq one) := by
             have step1 : Γ ⊢ (add (succ (add one k)) (add one k) =eq add (succ (succ k)) (add one k)) :=
               eq_congr_add_right (eq_congr_succ h_1k_succ)
             have step2 : Γ ⊢ (add (succ (succ k)) (add one k) =eq add (succ (succ k)) (succ k)) :=
               eq_congr_add_left (u := succ (succ k)) h_1k_succ
             exact FOL.derive_eq_trans (eq_symm (FOL.derive_eq_trans step1 step2)) h_sum_one
-          -- ax5(succ k, k): add(succ k)(succ k) = succ(add(succ k) k)... but we have add(succ(succ k))(succ k)
-          -- ax6(succ(succ k), succ k): add(succ(succ k))(succ k) = add(succ k)(succ(succ k))
-          -- Or more directly: add_succ_left_ne_zero with a=succ k, b=succ k
-          -- add(succ(succ k))(succ k) = one = succ zero → add_succ_left_ne_zero
-          have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
-          -- ax5(succ k, k): add(succ(succ k))(succ k) -- wait, ax5 is add x (succ y) = succ(add x y)
-          -- So we need ax5(succ k, succ k) ... no, ax5(X, Y): add X (succ Y) = succ(add X Y)
-          -- add(succ(succ k))(succ k) = add(succ(succ k))(succ k) -- this IS add X (succ Y) with X=succ(succ k), Y=k
-          have h5_ssk : Γ ⊢ (add (succ (succ k)) (succ k) =eq succ (add (succ (succ k)) k)) := by
+        -- ax5(succ k, k): add(succ k)(succ k) = succ(add(succ k) k)... but we have add(succ(succ k))(succ k)
+        -- ax6(succ(succ k), succ k): add(succ(succ k))(succ k) = add(succ k)(succ(succ k))
+        -- Or more directly: add_succ_left_ne_zero with a=succ k, b=succ k
+        -- add(succ(succ k))(succ k) = one = succ zero → add_succ_left_ne_zero
+        have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+        -- ax5(succ k, k): add(succ(succ k))(succ k) -- wait, ax5 is add x (succ y) = succ(add x y)
+        -- So we need ax5(succ k, succ k) ... no, ax5(X, Y): add X (succ Y) = succ(add X Y)
+        -- add(succ(succ k))(succ k) = add(succ(succ k))(succ k) -- this IS add X (succ Y) with X=succ(succ k), Y=k
+        have h5_ssk : Γ ⊢ (add (succ (succ k)) (succ k) =eq succ (add (succ (succ k)) k)) := by
             have hh := spec (spec h_ax5 (succ (succ k))) k
             simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
             exact hh
-          -- succ(add(succ(succ k)) k) = one = succ zero
-          have h_succ3 : Γ ⊢ (succ (add (succ (succ k)) k) =eq one) :=
+        -- succ(add(succ(succ k)) k) = one = succ zero
+        have h_succ3 : Γ ⊢ (succ (add (succ (succ k)) k) =eq one) :=
             FOL.derive_eq_trans (eq_symm h5_ssk) h_sum2
-          -- ax3: add(succ(succ k)) k = zero
-          have h3b : Γ ⊢ ((succ (add (succ (succ k)) k) =eq succ zero) ⇒
+        -- ax3: add(succ(succ k)) k = zero
+        have h3b : Γ ⊢ ((succ (add (succ (succ k)) k) =eq succ zero) ⇒
               (add (succ (succ k)) k =eq zero)) := by
             have hh := spec (spec h_ax3 (add (succ (succ k)) k)) zero
             simp [substFormula, substTerm, substTerms, succ, add, FOL.substTerm_liftTerm] at hh
             exact hh
-          have h_sum3 : Γ ⊢ (add (succ (succ k)) k =eq zero) := mp h3b h_succ3
-          -- add_succ_left_ne_zero: add(succ(succ k)) k = 0 → False
-          exact add_succ_left_ne_zero (succ k) k h_sum3)
+        have h_sum3 : Γ ⊢ (add (succ (succ k)) k =eq zero) := mp h3b h_succ3
+        -- add_succ_left_ne_zero: add(succ(succ k)) k = 0 → False
+        exact add_succ_left_ne_zero (succ k) k h_sum3)
 
 -- ─────────────────────────────────────────────────────────────────
 -- § Teo 5.8: div2(3) = 1
@@ -1190,11 +1190,11 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
             -- neg(zero = four): derive inline
             -- zero = four = succ three = succ(succ two) → ax2 → ⊥
             have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
-            have h_neg_0_four : Γ ⊢ (neg (zero =eq four)) := by
+            have h_neg_0_four : Γ ⊢ (neg (four =eq zero)) := by
               have hh := spec h_ax2 three
               simp [substFormula, substTerm, substTerms, neg, succ, three, two, one, FOL.substTerm_liftTerm] at hh
               exact hh
-            exact mp h_neg_0_four h_zero_four
+            exact mp h_neg_0_four (eq_symm h_zero_four)
           · -- 0 < div2(4): ∃j, div2(4) = succ(add 0 j). Then add(succ X) j = zero ⊥
             intro h_lt3
             have h_ax13_inst3 : Γ ⊢ (lt zero (div2 four) ⇔
@@ -1280,20 +1280,20 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
           -- ax3: succ zero = succ(succ(succ zero)) → ax3: zero = succ(succ zero) → ax2(succ zero) ⊥
           have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
           have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
-          have h3a : Γ ⊢ ((succ two =eq succ (succ (succ (succ zero)))) ⇒ (two =eq succ (succ (succ zero)))) := by
-            have hh := spec (spec h_ax3 two) (succ (succ (succ zero)))
+          have h3a : Γ ⊢ ((succ (succ zero) =eq succ (succ (succ (succ zero)))) ⇒ (succ zero =eq succ (succ (succ zero)))) := by
+            have hh := spec (spec h_ax3 (succ zero)) (succ (succ (succ zero)))
             simp [substFormula, substTerm, substTerms, succ, two, one, FOL.substTerm_liftTerm] at hh
             exact hh
-          have h3b : Γ ⊢ ((succ (succ zero) =eq succ (succ (succ zero))) ⇒ (succ zero =eq succ (succ zero))) := by
-            have hh := spec (spec h_ax3 (succ zero)) (succ (succ zero))
+          have h3b : Γ ⊢ ((succ zero =eq succ (succ (succ zero))) ⇒ (zero =eq succ (succ zero))) := by
+            have hh := spec (spec h_ax3 zero) (succ (succ zero))
             simp [substFormula, substTerm, substTerms, succ, two, one, FOL.substTerm_liftTerm] at hh
             exact hh
           have h3c : Γ ⊢ ((succ zero =eq succ (succ zero)) ⇒ (zero =eq succ zero)) := by
             have hh := spec (spec h_ax3 zero) (succ zero)
             simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at hh
             exact hh
-          have h_neg_0_succ : Γ ⊢ (neg (zero =eq succ zero)) := by
-            have hh := spec h_ax2 zero
+          have h_neg_0_succ : Γ ⊢ (neg (succ (succ zero) =eq zero)) := by
+            have hh := spec h_ax2 (succ zero)
             simp [substFormula, substTerm, substTerms, neg, succ, FOL.substTerm_liftTerm] at hh
             exact hh
           -- four = succ(succ(succ(succ zero))) = succ three = succ(succ two) = succ(succ(succ one)) = succ(succ(succ(succ zero)))
@@ -1311,14 +1311,11 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
             -- two = succ one = succ(succ zero), four = succ three = succ(succ(succ(succ zero)))
             show Γ ⊢ (two =eq four)
             exact h_two_four
-          have h_step1 : Γ ⊢ (two =eq succ (succ (succ zero))) :=
+          have h_step1 : Γ ⊢ (succ zero =eq succ (succ (succ zero))) :=
             mp h3a h_two_four_unfold
-          have h_step1' : Γ ⊢ (succ (succ zero) =eq succ (succ (succ zero))) := h_step1
-          have h_step2 : Γ ⊢ (succ zero =eq succ (succ zero)) :=
-            mp h3b h_step1'
-          have h_step3 : Γ ⊢ (zero =eq succ zero) :=
-            mp h3c h_step2
-          exact mp h_neg_0_succ h_step3
+          have h_step2 : Γ ⊢ (zero =eq succ (succ zero)) :=
+            mp h3b h_step1
+          exact mp h_neg_0_succ (eq_symm h_step2)
         · -- 1 < div2(4): ∃k', 1+succ(k') = div2(4). Similar to previous cases. → ⊥
           intro h_lt2
           exact false_elim (by
@@ -1442,19 +1439,18 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
               exact hh
             apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_tri_k'
             · intro h_k'_lt_zero
-              have h_ax13_k' : Γ ⊢ (lt k' zero ⇔ Formula.ex (add k' (succ (.var 0)) =eq zero)) := by
+              have h_ax13_k' : Γ ⊢ (lt k' zero ⇔ Formula.ex (add (liftTerm 0 k') (succ (.var 0)) =eq zero)) := by
                 have hh := spec (spec h_ax13 k') zero
-                simp [substFormula, substTerm, substTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at hh
+                simp [substFormula, substTerm, substTerms, lt, add, succ, iff, liftTerm, liftTerms,
+                      FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
                 exact hh
               apply ex_elim (iff_mp h_ax13_k' h_k'_lt_zero)
               intro m h_m
-              have h_redm : Γ ⊢ (add k' (succ m) =eq zero) := by
-                simp [substFormula, substTerm, substTerms, add, succ] at h_m
-                exact h_m
+              simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h_m
               exact add_succ_left_ne_zero m k' (by
                 have h6m := spec (spec h_ax6 k') (succ m)
                 simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h6m
-                exact eq_trans h6m h_redm)
+                exact eq_trans h6m h_m)
             · intro h_rest_k'
               apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_rest_k'
               · -- k' = 0: div2 four = succ(add one zero) = two. add two k = one. Sub-tri on k.
@@ -1468,18 +1464,18 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
                 have h_bot2 : Γ ⊢ ⊥ := by
                   apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_triKz
                   · intro h_k_lt
-                    have h_ax13Kz : Γ ⊢ (lt k zero ⇔ Formula.ex (add k (succ (.var 0)) =eq zero)) := by
+                    have h_ax13Kz : Γ ⊢ (lt k zero ⇔ Formula.ex (add (liftTerm 0 k) (succ (.var 0)) =eq zero)) := by
                       have hh := spec (spec h_ax13 k) zero
-                      simp [substFormula, substTerm, substTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at hh
+                      simp [substFormula, substTerm, substTerms, lt, add, succ, iff, liftTerm, liftTerms,
+                            FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
                       exact hh
                     apply ex_elim (iff_mp h_ax13Kz h_k_lt)
                     intro m h_m
-                    have h_redm : Γ ⊢ (add k (succ m) =eq zero) := by
-                      simp [substFormula, substTerm, substTerms, add, succ] at h_m; exact h_m
+                    simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h_m
                     exact add_succ_left_ne_zero m k (by
                       have h6m := spec (spec h_ax6 k) (succ m)
                       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h6m
-                      exact eq_trans h6m h_redm)
+                      exact eq_trans h6m h_m)
                   · intro h_restKz
                     apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_restKz
                     · -- k = 0: add(div2 four) 0 = div2 four = one → div2 four = one.
@@ -1492,7 +1488,7 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
                         exact hh
                       have h_d4_one2 : Γ ⊢ (div2 four =eq one) :=
                         FOL.derive_eq_trans (eq_symm h4_d4)
-                          (FOL.derive_eq_trans (eq_congr_add_left (u := div2 four) h_k_zero) h_sum_one)
+                          (FOL.derive_eq_trans (eq_congr_add_left (u := div2 four) (eq_symm h_k_zero)) h_sum_one)
                       -- h_d4k': div2 four = succ(add one k'). k' = 0. succ(add one 0) = succ one = two.
                       have h_add10 : Γ ⊢ (add one zero =eq one) := by
                         have hh := spec h_ax4 one
@@ -1509,35 +1505,50 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
                         have hh := spec (spec h_ax3 one) zero
                         simp [substFormula, substTerm, substTerms, succ, one, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      exact mp teo_1_11 (mp h3_21 h_two_one)
-                    · -- 0 < k: ∃K'', k = succ(add 0 K''). add(div2 four)(succ(add 0 K'')) = one.
-                      -- ax5: succ(add(div2 four)(add 0 K'')) = one = succ zero → ax3: = zero
-                      -- div2 four = succ(add one k') → add_succ_left_ne_zero ⊥
+                      exact mp teo_1_11 (eq_symm (mp h3_21 h_two_one))
+                    · -- 0 < k: derive ⊥ directly using div2 four = two and add two k = one
                       intro h_k_gt
-                      have h_ax13Kgt : Γ ⊢ (lt zero k ⇔ Formula.ex (add zero (succ (.var 0)) =eq k)) := by
-                        have hh := spec (spec h_ax13 zero) k
-                        simp [substFormula, substTerm, substTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at hh
+                      have h_add10' : Γ ⊢ (add one zero =eq one) := by
+                        have hh := spec h_ax4 one
+                        simp [substFormula, substTerm, substTerms, add, one, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      apply ex_elim (iff_mp h_ax13Kgt h_k_gt)
-                      intro K'' h_K''
-                      have h_K_eq : Γ ⊢ (add zero (succ K'') =eq k) := by
-                        simp [substFormula, substTerm, substTerms, add, succ] at h_K''; exact h_K''
-                      have h5_k'' : Γ ⊢ (add (div2 four) (add zero (succ K'')) =eq succ (add (div2 four) (add zero K''))) := by
-                        have hh := spec (spec h_ax5 (div2 four)) (add zero K'')
-                        simp [substFormula, substTerm, substTerms, add, succ, div2, four, three, two, FOL.substTerm_liftTerm] at hh
+                      have h_d4_two' : Γ ⊢ (div2 four =eq two) :=
+                        FOL.derive_eq_trans h_d4k'
+                          (eq_congr_succ (FOL.derive_eq_trans (eq_congr_add_left (u := one) h_k'_zero) h_add10'))
+                      have h_sum_two_k : Γ ⊢ (add two k =eq one) :=
+                        FOL.derive_eq_trans (eq_congr_add_right (eq_symm h_d4_two')) h_sum_one
+                      have h6_2k' : Γ ⊢ (add two k =eq add k two) := by
+                        have hh := spec (spec h_ax6 two) k
+                        simp [substFormula, substTerm, substTerms, add, two, one, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      have h_sum_one_k'' : Γ ⊢ (succ (add (div2 four) (add zero K'')) =eq one) :=
-                        FOL.derive_eq_trans (eq_symm h5_k'')
-                          (FOL.derive_eq_trans (eq_congr_add_left (u := div2 four) (eq_symm h_K_eq)) h_sum_one)
-                      have h3_k'' : Γ ⊢ ((succ (add (div2 four) (add zero K'')) =eq succ zero) ⇒
-                          (add (div2 four) (add zero K'') =eq zero)) := by
-                        have hh := spec (spec h_ax3 (add (div2 four) (add zero K''))) zero
-                        simp [substFormula, substTerm, substTerms, succ, add, div2, four, three, two, FOL.substTerm_liftTerm] at hh
+                      have h5_k1' : Γ ⊢ (add k two =eq succ (add k one)) := by
+                        have hh := spec (spec h_ax5 k) one
+                        simp [substFormula, substTerm, substTerms, add, succ, two, one, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      have h_d4k''_zero : Γ ⊢ (add (div2 four) (add zero K'') =eq zero) :=
-                        mp h3_k'' h_sum_one_k''
-                      exact add_succ_left_ne_zero (add one k') (add zero K'')
-                        (FOL.derive_eq_trans (eq_congr_add_right (eq_symm h_d4k')) h_d4k''_zero)
+                      have h5_k0' : Γ ⊢ (add k one =eq succ (add k zero)) := by
+                        have hh := spec (spec h_ax5 k) zero
+                        simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
+                        exact hh
+                      have h4_k' : Γ ⊢ (add k zero =eq k) := by
+                        have hh := spec h_ax4 k
+                        simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftTerm] at hh
+                        exact hh
+                      have h_two_k_succ' : Γ ⊢ (add two k =eq succ (succ k)) :=
+                        FOL.derive_eq_trans h6_2k' (FOL.derive_eq_trans h5_k1'
+                          (eq_congr_succ (FOL.derive_eq_trans h5_k0' (eq_congr_succ h4_k'))))
+                      have h_ssk_one' : Γ ⊢ (succ (succ k) =eq one) :=
+                        FOL.derive_eq_trans (eq_symm h_two_k_succ') h_sum_two_k
+                      have h3_ssk' : Γ ⊢ ((succ (succ k) =eq succ zero) ⇒ (succ k =eq zero)) := by
+                        have hh := spec (spec h_ax3 (succ k)) zero
+                        simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at hh
+                        exact hh
+                      have h_sk_zero' : Γ ⊢ (succ k =eq zero) := mp h3_ssk' h_ssk_one'
+                      have h_ax2_loc1 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+                      have h_neg_sk' : Γ ⊢ neg (succ k =eq zero) := by
+                        have hh := spec h_ax2_loc1 k
+                        simp [substFormula, substTerm, substTerms, neg, succ, FOL.substTerm_liftTerm] at hh
+                        exact hh
+                      exact mp h_neg_sk' h_sk_zero'
                 exact false_elim h_bot2
               · -- 0 < k': have h_d4k' : div2 four = succ(add one k'). Sub-tri on outer k.
                 intro h_lt3'
@@ -1548,18 +1559,18 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
                 have h_bot3 : Γ ⊢ ⊥ := by
                   apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_triK
                   · intro h_K_lt
-                    have h_ax13K : Γ ⊢ (lt k zero ⇔ Formula.ex (add k (succ (.var 0)) =eq zero)) := by
+                    have h_ax13K : Γ ⊢ (lt k zero ⇔ Formula.ex (add (liftTerm 0 k) (succ (.var 0)) =eq zero)) := by
                       have hh := spec (spec h_ax13 k) zero
-                      simp [substFormula, substTerm, substTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at hh
+                      simp [substFormula, substTerm, substTerms, lt, add, succ, iff, liftTerm, liftTerms,
+                            FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
                       exact hh
                     apply ex_elim (iff_mp h_ax13K h_K_lt)
                     intro m h_m
-                    have h_redm : Γ ⊢ (add k (succ m) =eq zero) := by
-                      simp [substFormula, substTerm, substTerms, add, succ] at h_m; exact h_m
+                    simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h_m
                     exact add_succ_left_ne_zero m k (by
                       have h6m := spec (spec h_ax6 k) (succ m)
                       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h6m
-                      exact eq_trans h6m h_redm)
+                      exact eq_trans h6m h_m)
                   · intro h_restK
                     apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_restK
                     · -- k = 0: add(div2 four) 0 = div2 four = one → div2 four = one.
@@ -1573,7 +1584,7 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
                         exact hh
                       have h_d4_one2 : Γ ⊢ (div2 four =eq one) :=
                         FOL.derive_eq_trans (eq_symm h4_d4)
-                          (FOL.derive_eq_trans (eq_congr_add_left (u := div2 four) h_K_zero) h_sum_one)
+                          (FOL.derive_eq_trans (eq_congr_add_left (u := div2 four) (eq_symm h_K_zero)) h_sum_one)
                       -- succ(add one k') = one → ax3: add one k' = zero
                       have h3_d4 : Γ ⊢ ((succ (add one k') =eq succ zero) ⇒ (add one k' =eq zero)) := by
                         have hh := spec (spec h_ax3 (add one k')) zero
@@ -1581,54 +1592,44 @@ theorem div2_four : Γ ⊢ (div2 four =eq two) := by
                         exact hh
                       have h_one_k'_zero : Γ ⊢ (add one k' =eq zero) :=
                         mp h3_d4 (eq_trans h_d4k' h_d4_one2)
-                      -- 0 < k' → ∃m, k' = succ(add 0 m). add one (succ(add 0 m)) = succ(add one (add 0 m)) ≠ 0 ⊥
-                      have h_ax13k'3 : Γ ⊢ (lt zero k' ⇔ Formula.ex (add zero (succ (.var 0)) =eq k')) := by
-                        have hh := spec (spec h_ax13 zero) k'
-                        simp [substFormula, substTerm, substTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at hh
+                      -- add one k' = zero but add one k' = succ k' ≠ zero (ax2)
+                      have h_ax2_loc2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+                      have h_neg_sk'2 : Γ ⊢ neg (succ k' =eq zero) := by
+                        have hh := spec h_ax2_loc2 k'
+                        simp [substFormula, substTerm, substTerms, neg, succ, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      apply ex_elim (iff_mp h_ax13k'3 h_lt3')
-                      intro m h_m
-                      have h_k'_eq : Γ ⊢ (add zero (succ m) =eq k') := by
-                        simp [substFormula, substTerm, substTerms, add, succ] at h_m; exact h_m
-                      have h5_1k' : Γ ⊢ (add one (add zero (succ m)) =eq succ (add one (add zero m))) := by
-                        have hh := spec (spec h_ax5 one) (add zero m)
+                      exact mp h_neg_sk'2 (eq_trans h_1k'_succ h_one_k'_zero)
+                    · -- 0 < k: derive ⊥ directly from h_d4k', h_sum_one, h_1k'_succ
+                      intro h_K_gt
+                      have h_sak'_k_one : Γ ⊢ (add (succ (add one k')) k =eq one) :=
+                        FOL.derive_eq_trans (eq_congr_add_right (eq_symm h_d4k')) h_sum_one
+                      have h6_sk'k : Γ ⊢ (add (succ (add one k')) k =eq add k (succ (add one k'))) := by
+                        have hh := spec (spec h_ax6 (succ (add one k'))) k
                         simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      have h_add_one_k' : Γ ⊢ (add one k' =eq succ (add one (add zero m))) :=
-                        FOL.derive_eq_trans (eq_congr_add_left (u := one) (eq_symm h_k'_eq)) h5_1k'
-                      have h_succ_zero : Γ ⊢ (succ (add one (add zero m)) =eq zero) :=
-                        FOL.derive_eq_trans (eq_symm h_add_one_k') h_one_k'_zero
-                      have h_ax2_inst := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
-                      have h_neg := spec h_ax2_inst (add one (add zero m))
-                      simp [substFormula, substTerm, substTerms, neg, succ, add, one, FOL.substTerm_liftTerm] at h_neg
-                      exact mp h_neg h_succ_zero
-                    · -- 0 < k: ∃K'', k = succ(add 0 K''). Same as before.
-                      intro h_K_gt
-                      have h_ax13K2 : Γ ⊢ (lt zero k ⇔ Formula.ex (add zero (succ (.var 0)) =eq k)) := by
-                        have hh := spec (spec h_ax13 zero) k
-                        simp [substFormula, substTerm, substTerms, lt, add, succ, iff, FOL.substTerm_liftTerm] at hh
+                      have h5_kak' : Γ ⊢ (add k (succ (add one k')) =eq succ (add k (add one k'))) := by
+                        have hh := spec (spec h_ax5 k) (add one k')
+                        simp [substFormula, substTerm, substTerms, add, succ, one, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      apply ex_elim (iff_mp h_ax13K2 h_K_gt)
-                      intro K'' h_K''
-                      have h_K_eq : Γ ⊢ (add zero (succ K'') =eq k) := by
-                        simp [substFormula, substTerm, substTerms, add, succ] at h_K''; exact h_K''
-                      have h5_k'' : Γ ⊢ (add (div2 four) (add zero (succ K'')) =eq succ (add (div2 four) (add zero K''))) := by
-                        have hh := spec (spec h_ax5 (div2 four)) (add zero K'')
-                        simp [substFormula, substTerm, substTerms, add, succ, div2, four, three, two, FOL.substTerm_liftTerm] at hh
+                      have h_succ_kak'_one : Γ ⊢ (succ (add k (add one k')) =eq one) :=
+                        FOL.derive_eq_trans (eq_symm h5_kak')
+                          (FOL.derive_eq_trans (eq_symm h6_sk'k) h_sak'_k_one)
+                      have h_kak'_ksk' : Γ ⊢ (add k (add one k') =eq add k (succ k')) :=
+                        eq_congr_add_left (u := k) h_1k'_succ
+                      have h_succ_ksk'_one : Γ ⊢ (succ (add k (succ k')) =eq one) :=
+                        FOL.derive_eq_trans (eq_symm (eq_congr_succ h_kak'_ksk')) h_succ_kak'_one
+                      have h3_ksk' : Γ ⊢ ((succ (add k (succ k')) =eq succ zero) ⇒ (add k (succ k') =eq zero)) := by
+                        have hh := spec (spec h_ax3 (add k (succ k'))) zero
+                        simp [substFormula, substTerm, substTerms, succ, add, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      have h_sum_one_k'' : Γ ⊢ (succ (add (div2 four) (add zero K'')) =eq one) :=
-                        FOL.derive_eq_trans (eq_symm h5_k'')
-                          (FOL.derive_eq_trans (eq_congr_add_left (u := div2 four) (eq_symm h_K_eq)) h_sum_one)
-                      have h3_k'' : Γ ⊢ ((succ (add (div2 four) (add zero K'')) =eq succ zero) ⇒
-                          (add (div2 four) (add zero K'') =eq zero)) := by
-                        have hh := spec (spec h_ax3 (add (div2 four) (add zero K''))) zero
-                        simp [substFormula, substTerm, substTerms, succ, add, div2, four, three, two, FOL.substTerm_liftTerm] at hh
+                      have h_ksk'_zero : Γ ⊢ (add k (succ k') =eq zero) := mp h3_ksk' h_succ_ksk'_one
+                      have h6_ksk' : Γ ⊢ (add k (succ k') =eq add (succ k') k) := by
+                        have hh := spec (spec h_ax6 k) (succ k')
+                        simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
                         exact hh
-                      have h_d4k''_zero : Γ ⊢ (add (div2 four) (add zero K'') =eq zero) :=
-                        mp h3_k'' h_sum_one_k''
-                      exact add_succ_left_ne_zero (add one k') (add zero K'')
-                        (FOL.derive_eq_trans (eq_congr_add_right (eq_symm h_d4k')) h_d4k''_zero)
-                exact false_elim h_bot3
+                      have h_pf_ksk' := FOL.derive_eq_trans (eq_symm h6_ksk') h_ksk'_zero
+                      exact add_succ_left_ne_zero k' k h_pf_ksk'
+                exact false_elim h_bot3)
     exact false_elim h_bot
   · intro h_rest
     apply ROBINSON_PlusPlus.Minimal.Axioms.or_elim h_rest
