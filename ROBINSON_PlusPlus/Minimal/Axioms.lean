@@ -345,6 +345,14 @@ def ax27_add_left_cancel : Formula :=
     (add (.var 2) (.var 0) =eq add (.var 1) (.var 0)) ⇒ ((.var 2) =eq (.var 1))
   )
 
+-- Ax 28 (mul_two_cancel): ∀ a, b, 2*a = 2*b → a=b
+-- Teorema en sistemas con inducción.
+-- En Minimal, se incluye como axioma para Block1 (teo_2_11).
+def ax28_mul_two_cancel : Formula :=
+  forall_2 (
+    (mul two (.var 1) =eq mul two (.var 0)) ⇒ ((.var 1) =eq (.var 0))
+  )
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -379,7 +387,8 @@ def axioms : List Formula := [
   ax_L2_in_cons,
   ax_C1_concat_nil,
   ax_C2_concat_cons,
-  ax27_add_left_cancel -- teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 (sorry)
+  ax27_add_left_cancel, -- teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 (sorry)
+  ax28_mul_two_cancel   -- teorema en sistemas con inducción; `teo_2_11` en Block1
 ]
 
 -- ## Helper Theorems
