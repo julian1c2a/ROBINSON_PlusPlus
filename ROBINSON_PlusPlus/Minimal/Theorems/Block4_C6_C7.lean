@@ -88,9 +88,9 @@ theorem add_left_cancel {a b c : Term}
     -- lift_01_eq_00 convierte liftTerm 0 (liftTerm 0 a) → liftTerm 1 (liftTerm 0 a)
     -- para que substTerm_liftTerm pueda disparar con c=1.
     simp [substFormula, substTerm, substTerms,
-          liftTerm, liftTerms, add, add_sym, zero, zero_sym,
+          add, add_sym,
           ← lift_01_eq_00,
-          FOL.substTerm_liftTerm, FOL.substTerms_liftTerms] at h3
+          FOL.substTerm_liftTerm] at h3
     exact h3
   exact mp h_imp h
 

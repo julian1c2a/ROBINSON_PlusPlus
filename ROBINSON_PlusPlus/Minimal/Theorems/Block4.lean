@@ -21,8 +21,6 @@ open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
-set_option linter.unusedSimpArgs false
-
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block4
 
 /-!
@@ -78,15 +76,13 @@ theorem parity_lemma_case_even (w : Term) :
                FOL.substTerm_liftTerm, if_true]
   have h17 : Γ ⊢ (add (mul (div2 w) two) (mod2 w) =eq w) := by
     have hh := spec (ax (by simp [axioms] : ax17_div_mod_eq ∈ axioms)) w
-    simp [substFormula, substTerm, substTerms, add, mul, div2, mod2, two, one,
-          FOL.substTerm_liftTerm] at hh; exact hh
+    simp [substFormula, substTerm, substTerms, add, mul, div2, mod2, two, one] at hh; exact hh
   have hca : Γ ⊢ (add (mul (div2 w) two) (mod2 w) =eq add (mul (div2 w) two) zero) :=
     eq_congr_add_left h
   have h3 : Γ ⊢ (add (mul (div2 w) two) zero =eq w) := eq_trans hca h17
   have h4 : Γ ⊢ (add (mul (div2 w) two) zero =eq mul (div2 w) two) := by
     have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) (mul (div2 w) two)
-    simp [substFormula, substTerm, substTerms, add, mul, div2, two, one,
-          FOL.substTerm_liftTerm] at hh; exact hh
+    simp [substFormula, substTerm, substTerms, add, mul, div2, two, one] at hh; exact hh
   have h5 : Γ ⊢ (mul (div2 w) two =eq w) := eq_trans h4 h3
   have h6 : Γ ⊢ (mul (div2 w) two =eq mul two (div2 w)) := by
     have hh := spec (spec (ax (by simp [axioms] : ax10_mul_comm ∈ axioms)) (div2 w)) two
@@ -112,8 +108,7 @@ theorem parity_lemma_case_odd (w : Term) :
                FOL.substTerm_liftTerm, if_true]
   have h17 : Γ ⊢ (add (mul (div2 w) two) (mod2 w) =eq w) := by
     have hh := spec (ax (by simp [axioms] : ax17_div_mod_eq ∈ axioms)) w
-    simp [substFormula, substTerm, substTerms, add, mul, div2, mod2, two, one,
-          FOL.substTerm_liftTerm] at hh; exact hh
+    simp [substFormula, substTerm, substTerms, add, mul, div2, mod2, two, one] at hh; exact hh
   have hca : Γ ⊢ (add (mul (div2 w) two) (mod2 w) =eq add (mul (div2 w) two) one) :=
     eq_congr_add_left h
   have h3 : Γ ⊢ (add (mul (div2 w) two) one =eq w) := eq_trans hca h17
@@ -138,8 +133,7 @@ theorem parity_lemma_case_odd (w : Term) :
   have h12 : Γ ⊢ (mul (mul two (succ (div2 w))) w =eq mul (succ w) w) := eq_congr_mul_right h11
   have h13 : Γ ⊢ (mul (succ w) w =eq mul w (succ w)) := by
     have hh := spec (spec (ax (by simp [axioms] : ax10_mul_comm ∈ axioms)) (succ w)) w
-    simp [substFormula, substTerm, substTerms, mul, succ, two, one,
-          FOL.substTerm_liftTerm] at hh; exact hh
+    simp [substFormula, substTerm, substTerms, mul, succ, FOL.substTerm_liftTerm] at hh; exact hh
   have h14 : Γ ⊢ (mul (mul two (succ (div2 w))) w =eq mul w (succ w)) :=
     FOL.derive_eq_trans h12 h13
   have h15 : Γ ⊢ (mul (mul two (succ (div2 w))) w =eq mul two (mul (succ (div2 w)) w)) := by

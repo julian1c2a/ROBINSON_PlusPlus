@@ -10,8 +10,6 @@ import FOL.Tactics
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block1
 
-set_option linter.unusedSimpArgs false
-
 open ROBINSON_PlusPlus.Minimal.Axioms
 
 -- The context for all theorems in this system is the set of axioms.
@@ -194,7 +192,7 @@ theorem teo_2_2 : Γ ⊢ forall_ (add zero (.var 0) =eq (.var 0)) := by
   have h_ax6 := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
   have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
   have h_zero := spec h_ax4 n
-  simp [substFormula, substTerm, substTerms, add, zero, FOL.substTerm_liftTerm] at h_zero
+  simp [substFormula, substTerm, substTerms, add, zero] at h_zero
   have h_comm := spec (spec h_ax6 zero) n
   simp [substFormula, substTerm, substTerms, add, zero, FOL.substTerm_liftTerm] at h_comm
   exact eq_trans (eq_symm h_comm) h_zero
@@ -211,7 +209,7 @@ theorem teo_2_4 : Γ ⊢ forall_ (mul zero (.var 0) =eq zero) := by
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   have h_ax8  := ax (by simp [axioms] : ax8_mul_zero ∈ axioms)
   have h_zero := spec h_ax8 n
-  simp [substFormula, substTerm, substTerms, mul, zero, FOL.substTerm_liftTerm] at h_zero
+  simp [substFormula, substTerm, substTerms, mul, zero] at h_zero
   have h_comm := spec (spec h_ax10 zero) n
   simp [substFormula, substTerm, substTerms, mul, zero, FOL.substTerm_liftTerm] at h_comm
   exact eq_trans (eq_symm h_comm) h_zero
@@ -227,12 +225,12 @@ theorem teo_2_5 : Γ ⊢ forall_ (mul (.var 0) one =eq (.var 0)) := by
   simp [substFormula, substTerm, substTerms, mul, zero, add, succ, FOL.substTerm_liftTerm] at h1
   -- n*0 = 0
   have h_n0 := spec h_ax8 n
-  simp [substFormula, substTerm, substTerms, mul, zero, FOL.substTerm_liftTerm] at h_n0
+  simp [substFormula, substTerm, substTerms, mul, zero] at h_n0
   -- (n*0)+n = 0+n
   have h2 := eq_congr_add_right (u := n) h_n0
   -- 0+n = n
   have h3 := spec teo_2_2 n
-  simp [substFormula, substTerm, substTerms, add, zero, FOL.substTerm_liftTerm] at h3
+  simp [substFormula, substTerm, substTerms, add, zero] at h3
   -- n*1 = 0+n via h1, h2; then = n via h3
   exact eq_trans (eq_symm (eq_trans (eq_symm h1) h2)) h3
 
@@ -242,9 +240,9 @@ theorem teo_2_6 : Γ ⊢ forall_ (mul one (.var 0) =eq (.var 0)) := by
   unfold Γ; apply gen; intro n
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   have h_comm := spec (spec h_ax10 one) n
-  simp [substFormula, substTerm, substTerms, mul, zero, succ, FOL.substTerm_liftTerm] at h_comm
+  simp [substFormula, substTerm, substTerms, mul, FOL.substTerm_liftTerm] at h_comm
   have h_n1 := spec teo_2_5 n
-  simp [substFormula, substTerm, substTerms, mul, zero, succ, FOL.substTerm_liftTerm] at h_n1
+  simp [substFormula, substTerm, substTerms, mul] at h_n1
   exact eq_trans (eq_symm h_comm) h_n1
 
 -- Teo 2.7: ∀ n, 2 * n = n + n
@@ -255,13 +253,13 @@ theorem teo_2_7 : Γ ⊢ forall_ (mul two (.var 0) =eq add (.var 0) (.var 0)) :=
   have h_ax9  := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
   -- 2*n = n*2
   have h_comm := spec (spec h_ax10 two) n
-  simp [substFormula, substTerm, substTerms, mul, zero, succ, add, FOL.substTerm_liftTerm] at h_comm
+  simp [substFormula, substTerm, substTerms, mul, FOL.substTerm_liftTerm] at h_comm
   -- n*2 = (n*1)+n
   have h_mul2 := spec (spec h_ax9 n) one
-  simp [substFormula, substTerm, substTerms, mul, zero, succ, add, FOL.substTerm_liftTerm] at h_mul2
+  simp [substFormula, substTerm, substTerms, mul, succ, add, FOL.substTerm_liftTerm] at h_mul2
   -- n*1 = n
   have h_n1 := spec teo_2_5 n
-  simp [substFormula, substTerm, substTerms, mul, zero, succ, FOL.substTerm_liftTerm] at h_n1
+  simp [substFormula, substTerm, substTerms, mul] at h_n1
   -- (n*1)+n = n+n
   have h_n1n := eq_congr_add_right (u := n) h_n1
   -- 2*n = n*2 = (n*1)+n = n+n
@@ -279,7 +277,7 @@ theorem teo_2_8 : Γ ⊢ forall_ (succ (.var 0) =eq add (.var 0) one) := by
   simp [substFormula, substTerm, substTerms, add, zero, succ, FOL.substTerm_liftTerm] at h1
   -- n + 0 = n
   have h_n0 := spec h_ax4 n
-  simp [substFormula, substTerm, substTerms, add, zero, FOL.substTerm_liftTerm] at h_n0
+  simp [substFormula, substTerm, substTerms, add, zero] at h_n0
   -- σ(n + 0) = σ(n)
   have h2 := eq_congr_succ h_n0
   -- σ(n) = n + 1
@@ -290,7 +288,7 @@ theorem teo_2_8 : Γ ⊢ forall_ (succ (.var 0) =eq add (.var 0) one) := by
 -- Caso 0<n: ax13 da ∃k, 0+σ(k)=n; teo_2_2 simplifica a σ(k)=n.
 theorem teo_3_11 : Γ ⊢ forall_ (neg ((.var 0) =eq zero) ⇒ ex (succ (.var 0) =eq (.var 1))) := by
   unfold Γ; apply gen; intro n
-  simp [substFormula, substTerm, substTerms, neg]
+  simp [substFormula, substTerm, neg]
   apply Axioms.imp_intro; intro h_neq
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   have h_tric : axioms ⊢ (lt n zero ∨ (n =eq zero) ∨ lt zero n) := by
@@ -304,20 +302,18 @@ theorem teo_3_11 : Γ ⊢ forall_ (neg ((.var 0) =eq zero) ⇒ ex (succ (.var 0)
   have lt_zero_impossible : ∀ x : Term, axioms ⊢ lt x zero → axioms ⊢ ⊥ := fun x h_ltx0 => by
     have hh := spec (spec h_ax13 x) zero
     simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh
+          FOL.substTerm_liftTerm] at hh
     apply ex_elim (iff_mp hh h_ltx0)
     intro k h_k
-    simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
+    simp [substFormula, substTerm, substTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
     have h_step : axioms ⊢ (add x (succ k) =eq succ (add x k)) := by
       have hs := spec (spec h_ax5 x) k
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hs
+      simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hs
       exact hs
     have h_neq0 : axioms ⊢ neg (succ (add x k) =eq zero) := by
       have hn := spec h_ax2 (add x k)
-      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm] at hn
+      simp [succ] at hn
       exact hn
     exact mp h_neq0 (eq_trans h_step h_k)
   apply or_elim h_tric
@@ -327,20 +323,18 @@ theorem teo_3_11 : Γ ⊢ forall_ (neg ((.var 0) =eq zero) ⇒ ex (succ (.var 0)
     · -- caso 0 < n: ax13 da ∃k, 0+σ(k)=n
       intro h_lt_zero_n
       have hh2 := spec (spec h_ax13 zero) n
-      simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh2
+      simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms] at hh2
       apply ex_elim (iff_mp hh2 h_lt_zero_n)
       intro k h_k
-      simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at h_k
+      simp [substFormula, substTerm, substTerms,
+            FOL.substTerm_liftTerm] at h_k
       have h_zero_add : axioms ⊢ (add zero (succ k) =eq succ k) := by
         have hs := spec teo_2_2 (succ k)
-        simp [substFormula, substTerm, substTerms, add, zero, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at hs
+        simp [substFormula, substTerm, substTerms, add, zero, succ] at hs
         exact hs
       have h_succ_k_n : axioms ⊢ (succ k =eq n) := eq_trans h_zero_add h_k
       apply ex_intro k
-      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
+      simp [substFormula, substTerm, substTerms, succ,
             FOL.substTerm_liftTerm]
       exact h_succ_k_n
 
@@ -358,20 +352,18 @@ theorem teo_2_9 : Γ ⊢ forall_2 ( (add (.var 1) (.var 0) =eq zero) ⇒ (land (
   have lt_zero_impossible : ∀ x : Term, axioms ⊢ lt x zero → axioms ⊢ ⊥ := fun x h_ltx0 => by
     have hh := spec (spec h_ax13 x) zero
     simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh
+          FOL.substTerm_liftTerm] at hh
     apply ex_elim (iff_mp hh h_ltx0)
     intro k h_k
-    simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
+    simp [substFormula, substTerm, substTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
     have h_step : axioms ⊢ (add x (succ k) =eq succ (add x k)) := by
       have hs := spec (spec h_ax5 x) k
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hs
+      simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hs
       exact hs
     have h_neq0 : axioms ⊢ neg (succ (add x k) =eq zero) := by
       have hn := spec h_ax2 (add x k)
-      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm] at hn
+      simp [succ] at hn
       exact hn
     exact mp h_neq0 (eq_trans h_step h_k)
   -- Tricotomía sobre b
@@ -388,21 +380,19 @@ theorem teo_2_9 : Γ ⊢ forall_2 ( (add (.var 1) (.var 0) =eq zero) ⇒ (land (
       · -- caso 0 < b: ∃k, 0+succ(k) = b, luego succ(k) = b, luego a+succ(k)=succ(a+k)=a+b=0 ⊥
         intro h_lt_0b
         have hh2 := spec (spec h_ax13 zero) b
-        simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-              FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh2
+        simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms] at hh2
         apply ex_elim (iff_mp hh2 h_lt_0b); intro k h_k
-        simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-              FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at h_k
+        simp [substFormula, substTerm, substTerms,
+              FOL.substTerm_liftTerm] at h_k
         -- h_k : add zero (succ k) = b
         have h_zero_add : axioms ⊢ (add zero (succ k) =eq succ k) := by
           have hs := spec teo_2_2 (succ k)
-          simp [substFormula, substTerm, substTerms, add, zero, succ, liftTerm, liftTerms,
-                FOL.substTerm_liftTerm] at hs
+          simp [substFormula, substTerm, substTerms, add, zero, succ] at hs
           exact hs
         have h_sk_b : axioms ⊢ (succ k =eq b) := eq_trans h_zero_add h_k
         -- a + succ(k) = succ(a+k) by ax5
         have h_as := spec (spec h_ax5 a) k
-        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+        simp [substFormula, substTerm, substTerms, add, succ,
               FOL.substTerm_liftTerm] at h_as
         -- a + b = a + succ(k) since succ(k) = b
         have h_ab_eq : axioms ⊢ (add a b =eq add a (succ k)) := eq_congr_add_left (eq_symm h_sk_b)
@@ -410,14 +400,12 @@ theorem teo_2_9 : Γ ⊢ forall_2 ( (add (.var 1) (.var 0) =eq zero) ⇒ (land (
         have h_s0 : axioms ⊢ (succ (add a k) =eq zero) :=
           eq_trans h_as (eq_trans h_ab_eq h_sum)
         have h_neg := spec h_ax2 (add a k)
-        simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at h_neg
+        simp [succ] at h_neg
         exact false_elim (mp h_neg h_s0)
   -- Paso 2: a = 0 usando b = 0 y h_sum
   have h_a_zero : axioms ⊢ (a =eq zero) := by
     have h_a0 := spec h_ax4 a
-    simp [substFormula, substTerm, substTerms, add, zero, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm] at h_a0
+    simp [substFormula, substTerm, substTerms, add, zero] at h_a0
     -- h_a0 : a + 0 = a; h_b_zero : b = 0; h_sum : a + b = 0
     -- a = a+0 = a+b = 0
     exact eq_trans h_a0 (eq_trans (eq_congr_add_left h_b_zero) h_sum)
@@ -439,19 +427,18 @@ theorem teo_2_10 : Γ ⊢ forall_2 ( (mul (.var 1) (.var 0) =eq zero) ⇒ (lor (
   have lt_zero_impossible : ∀ x : Term, axioms ⊢ lt x zero → axioms ⊢ ⊥ := fun x h_ltx0 => by
     have hh := spec (spec h_ax13 x) zero
     simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh
+          FOL.substTerm_liftTerm] at hh
     apply ex_elim (iff_mp hh h_ltx0); intro k h_k
-    simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
+    simp [substFormula, substTerm, substTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
     have h_step : axioms ⊢ (add x (succ k) =eq succ (add x k)) := by
       have hs := spec (spec h_ax5 x) k
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hs
+      simp [substFormula, substTerm, substTerms, add, succ,
+            FOL.substTerm_liftTerm] at hs
       exact hs
     have h_neq0 : axioms ⊢ neg (succ (add x k) =eq zero) := by
       have hn := spec h_ax2 (add x k)
-      simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm] at hn
+      simp [succ] at hn
       exact hn
     exact mp h_neq0 (eq_trans h_step h_k)
   -- Tricotomía sobre b
@@ -467,14 +454,13 @@ theorem teo_2_10 : Γ ⊢ forall_2 ( (mul (.var 1) (.var 0) =eq zero) ⇒ (lor (
     · -- caso 0 < b: extraer predecesor k con succ k = b via ex_elim
       intro h_lt_0b
       have hh2_b := spec (spec h_ax13 zero) b
-      simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh2_b
+      simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms] at hh2_b
       apply ex_elim (iff_mp hh2_b h_lt_0b); intro k h_k_raw
-      simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at h_k_raw
+      simp [substFormula, substTerm, substTerms,
+            FOL.substTerm_liftTerm] at h_k_raw
       have h_zero_add_k : axioms ⊢ (add zero (succ k) =eq succ k) := by
         have hs := spec teo_2_2 (succ k)
-        simp [substFormula, substTerm, substTerms, add, zero, succ, FOL.substTerm_liftTerm] at hs
+        simp [substFormula, substTerm, substTerms, add, zero, succ] at hs
         exact hs
       have h_sk_b : axioms ⊢ (succ k =eq b) := eq_trans h_zero_add_k h_k_raw
       -- Tricotomía sobre a
@@ -490,14 +476,13 @@ theorem teo_2_10 : Γ ⊢ forall_2 ( (mul (.var 1) (.var 0) =eq zero) ⇒ (lor (
         · -- caso 0 < a: extraer predecesor j con succ j = a via ex_elim
           intro h_lt_0a
           have hh2_a := spec (spec h_ax13 zero) a
-          simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms,
-                FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at hh2_a
+          simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff, liftTerm, liftTerms] at hh2_a
           apply ex_elim (iff_mp hh2_a h_lt_0a); intro j h_j_raw
-          simp [substFormula, substTerm, substTerms, add, succ, zero, liftTerm, liftTerms,
-                FOL.substTerm_lift_comm, FOL.substTerm_liftTerm] at h_j_raw
+          simp [substFormula, substTerm, substTerms,
+                FOL.substTerm_liftTerm] at h_j_raw
           have h_zero_add_j : axioms ⊢ (add zero (succ j) =eq succ j) := by
             have hs := spec teo_2_2 (succ j)
-            simp [substFormula, substTerm, substTerms, add, zero, succ, FOL.substTerm_liftTerm] at hs
+            simp [substFormula, substTerm, substTerms, add, zero, succ] at hs
             exact hs
           have h_sj_a : axioms ⊢ (succ j =eq a) := eq_trans h_zero_add_j h_j_raw
           -- a * b = succ(j) * succ(k) (ax9)
@@ -511,13 +496,12 @@ theorem teo_2_10 : Γ ⊢ forall_2 ( (mul (.var 1) (.var 0) =eq zero) ⇒ (lor (
           -- add(sj*k)(sj) = succ(sj*k+j)
           have h_add_succ : axioms ⊢ (add (mul (succ j) k) (succ j) =eq succ (add (mul (succ j) k) j)) := by
             have hs := spec (spec h_ax5 (mul (succ j) k)) j
-            simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+            simp [substFormula, substTerm, substTerms, add, succ,
                   FOL.substTerm_liftTerm] at hs
             exact hs
           have h_succ_neq0 : axioms ⊢ neg (succ (add (mul (succ j) k) j) =eq zero) := by
             have hn := spec h_ax2 (add (mul (succ j) k) j)
-            simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
-                  FOL.substTerm_liftTerm] at hn
+            simp [succ] at hn
             exact hn
           -- chain: succ(sj*k+j) = add(sj*k)(sj) = sj*sk = a*b = 0, contradicts ax2
           have h_chain : axioms ⊢ (succ (add (mul (succ j) k) j) =eq zero) :=
@@ -541,40 +525,40 @@ theorem eq_decidable : Γ ⊢ ax20_eq_decidable := by
   unfold Γ; unfold ax20_eq_decidable; unfold forall_2
   apply gen; intro n; apply gen; intro m
   -- Simplificamos el goal (substFormula aplicado) para obtener (n=m) ∨ ¬(n=m)
-  simp [substFormula, substTerm, substTerms, neg, liftTerm, liftTerms,
-             FOL.substTerm_liftTerm, if_true, if_false]
+  simp [substFormula, substTerm, neg,
+             FOL.substTerm_liftTerm]
   -- Ahora goal: axioms ⊢ (n =eq m) ∨ neg (n =eq m)
   -- Tricotomía: lt n m ∨ n=m ∨ lt m n
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   have h_tric : axioms ⊢ (lt n m ∨ (n =eq m) ∨ lt m n) := by
     have h := spec (spec h_ax19 n) m
-    simp [substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-               FOL.substTerm_liftTerm, if_true, if_false] at h
+    simp [substFormula, substTerm, substTerms, lt,
+               FOL.substTerm_liftTerm] at h
     exact h
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   -- Helper: derive contradiction from lt x x
   have lt_irrefl : ∀ x : Term, axioms ⊢ lt x x → axioms ⊢ ⊥ := fun x h_ltxx => by
     have h_irr := spec h_ax18 x
-    simp only [substFormula, lt, FOL.substTerm_liftTerm] at h_irr
+    simp only [lt] at h_irr
     exact mp h_irr h_ltxx
   -- Para los casos lt n m y lt m n: si n=m entonces lt n n, contradice irrefl
   -- f_n : la fórmula "lt n (.var 0)" con .var 0 como hueco para m
   let f_n := Formula.eq (liftTerm 0 n) (.var 0)
   have hS_m_fn : substFormula 0 m f_n = (n =eq m) := by
-    simp only [f_n, substFormula, substTerm, substTerms, liftTerm, liftTerms,
-               FOL.substTerm_liftTerm, if_true, if_false]
+    simp only [f_n, substFormula, substTerm,
+               FOL.substTerm_liftTerm, if_true]
   have hS_n_fn : substFormula 0 n f_n = (n =eq n) := by
-    simp only [f_n, substFormula, substTerm, substTerms, liftTerm, liftTerms,
-               FOL.substTerm_liftTerm, if_true, if_false]
+    simp only [f_n, substFormula, substTerm,
+               FOL.substTerm_liftTerm, if_true]
   -- Para lt n m caso: de h_eq : n=m y h_lt_nm : lt n m, deriva lt n n
   -- Approach: usando Derives.subst con la fórmula lt n (.var 0)
   let f_lt_n := Formula.atom lt_sym [liftTerm 0 n, .var 0]
   have hS_m_lt : substFormula 0 m f_lt_n = lt n m := by
-    simp only [f_lt_n, substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-               FOL.substTerm_liftTerm, if_true, if_false]
+    simp only [f_lt_n, substFormula, substTerm, substTerms, lt,
+               FOL.substTerm_liftTerm, if_true]
   have hS_n_lt : substFormula 0 n f_lt_n = lt n n := by
-    simp only [f_lt_n, substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-               FOL.substTerm_liftTerm, if_true, if_false]
+    simp only [f_lt_n, substFormula, substTerm, substTerms, lt,
+               FOL.substTerm_liftTerm, if_true]
   apply or_elim h_tric
   · -- caso lt n m → ¬(n=m)
     intro h_lt_nm
@@ -594,11 +578,11 @@ theorem eq_decidable : Γ ⊢ ax20_eq_decidable := by
       -- De h_eq: n=m y h_lt_mn: lt m n → lt m m (usando eq_symm h_eq: m=n, subst var 0 en lt m (.var 0))
       let f_lt_m := Formula.atom lt_sym [liftTerm 0 m, .var 0]
       have hS_n_lt_m : substFormula 0 n f_lt_m = lt m n := by
-        simp only [f_lt_m, substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-                   FOL.substTerm_liftTerm, if_true, if_false]
+        simp only [f_lt_m, substFormula, substTerm, substTerms, lt,
+                   FOL.substTerm_liftTerm, if_true]
       have hS_m_lt_m : substFormula 0 m f_lt_m = lt m m := by
-        simp only [f_lt_m, substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-                   FOL.substTerm_liftTerm, if_true, if_false]
+        simp only [f_lt_m, substFormula, substTerm, substTerms, lt,
+                   FOL.substTerm_liftTerm, if_true]
       have h_lt_mm : axioms ⊢ lt m m :=
         hS_m_lt_m ▸ Derives.subst axioms n m f_lt_m h_eq (hS_n_lt_m ▸ h_lt_mn)
       exact lt_irrefl m h_lt_mm
