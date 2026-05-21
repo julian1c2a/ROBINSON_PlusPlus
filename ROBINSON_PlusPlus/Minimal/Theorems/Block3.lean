@@ -23,6 +23,8 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
+set_option linter.unusedSimpArgs false
+
 /-!
 ## BLOQUE III — div2 Y mod2
 -/
