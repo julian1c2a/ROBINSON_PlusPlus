@@ -592,9 +592,65 @@ private theorem sq_lt_mono {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ lt (sq a
 -- MONOTONICITY OF w*(w+1)
 -- ============================================================
 
+-- a ≤ b → a*c ≤ b*c  (handles c = 0)
+private theorem le_mul_right {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mul a c) (mul b c) := by
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  have h_tric : Γ ⊢ (lt zero c ∨ (zero =eq c) ∨ lt c zero) := by
+    have hh := spec (spec h_ax19 zero) c
+    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at hh
+    exact hh
+  apply Axioms.or_elim h_tric
+  · intro h_c_pos
+    apply Axioms.or_elim h
+    · intro h_lt; exact Axioms.or_intro_left (mul_lt_mono_right h_lt h_c_pos)
+    · intro h_eq; exact Axioms.or_intro_right (eq_congr_mul_right h_eq)
+  · intro h23
+    apply Axioms.or_elim h23
+    · intro h_c0
+      apply Axioms.or_intro_right
+      have hac : Γ ⊢ (mul a c =eq zero) := by
+        have h2 : Γ ⊢ (mul a zero =eq zero) :=
+          FOL.derive_eq_trans (mul_comm' a zero) (by
+            have hz := spec teo_2_4 a
+            simp [substFormula, substTerm, substTerms, mul] at hz
+            exact hz)
+        exact FOL.derive_eq_trans (eq_congr_mul_left (eq_symm h_c0)) h2
+      have hbc : Γ ⊢ (mul b c =eq zero) := by
+        have h2 : Γ ⊢ (mul b zero =eq zero) :=
+          FOL.derive_eq_trans (mul_comm' b zero) (by
+            have hz := spec teo_2_4 b
+            simp [substFormula, substTerm, substTerms, mul] at hz
+            exact hz)
+        exact FOL.derive_eq_trans (eq_congr_mul_left (eq_symm h_c0)) h2
+      exact FOL.derive_eq_trans hac (eq_symm hbc)
+    · intro h_c_neg
+      have h_0lt0 := le_lt_trans (zero_le c) h_c_neg
+      have h_irr : axioms ⊢ neg (lt zero zero) := by
+        have hh := spec h_ax18 zero
+        simp [lt] at hh
+        exact hh
+      exact false_elim (mp h_irr h_0lt0)
+
+-- x ≤ y → c*x ≤ c*y
+private theorem le_mul_left {x y c : Term} (h : Γ ⊢ (x ≤ y)) : Γ ⊢ le (mul c x) (mul c y) := by
+  have hr : Γ ⊢ le (mul x c) (mul y c) := le_mul_right h
+  have hcx : Γ ⊢ (mul c x =eq mul x c) := mul_comm' c x
+  have hcy : Γ ⊢ (mul c y =eq mul y c) := mul_comm' c y
+  apply Axioms.or_elim hr
+  · intro h_lt
+    apply Axioms.or_intro_left
+    exact lt_le_trans (le_lt_trans (Axioms.or_intro_right hcx) h_lt)
+      (Axioms.or_intro_right (eq_symm hcy))
+  · intro h_eq
+    exact Axioms.or_intro_right
+      (FOL.derive_eq_trans (FOL.derive_eq_trans hcx h_eq) (eq_symm hcy))
+
 -- a ≤ b → a*(a+1) ≤ b*(b+1)
 private theorem mono_w_w1 {a b : Term} (h_le : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mul a (succ a)) (mul b (succ b)) := by
-  sorry
+  have h1 : Γ ⊢ le (mul a (succ a)) (mul b (succ a)) := le_mul_right h_le
+  have h2 : Γ ⊢ le (mul b (succ a)) (mul b (succ b)) := le_mul_left (succ_le_succ_of_le h_le)
+  exact le_trans h1 h2
 
 -- ============================================================
 -- AUXILIARY LEMMAS
@@ -650,12 +706,10 @@ private theorem p_le_two_div2p_plus_one (p : Term) : Γ ⊢ le p (add (mul two (
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
   have h_ax17 := ax (by simp [axioms] : ax17_div_mod_eq ∈ axioms)
   have h17 := spec h_ax17 p
-  simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm] at h17
+  simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two] at h17
   have h10 : axioms ⊢ (mul two (div2 p) =eq mul (div2 p) two) := by
     have h := spec (spec h_ax10 two) (div2 p)
-    simp [substFormula, substTerm, substTerms, mul, div2, two,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, div2, two] at h
     exact h
   -- div2(p)*2 + mod2(p) = p, so two*div2(p) + mod2(p) = p
   have h_sum : axioms ⊢ (add (mul two (div2 p)) (mod2 p) =eq p) :=
@@ -668,15 +722,14 @@ private theorem p_le_two_div2p_plus_one (p : Term) : Γ ⊢ le p (add (mul two (
       have h_sum0 : axioms ⊢ (add (mul two (div2 p)) zero =eq p) :=
         FOL.derive_eq_trans (eq_symm (eq_congr_add_left h_mod0)) h_sum
       have h4 := spec h_ax4 (mul two (div2 p))
-      simp [substFormula, substTerm, substTerms, mul, add, div2, two,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm] at h4
+      simp [substFormula, substTerm, substTerms, mul, add, div2, two] at h4
       exact eq_symm (eq_trans h4 h_sum0)
     -- two*div2(p) < two*div2(p)+1 with witness 0
     have h_lt : axioms ⊢ lt (mul two (div2 p)) (add (mul two (div2 p)) one) := by
       have h_iff := spec (spec h_ax13 (mul two (div2 p))) (add (mul two (div2 p)) one)
       simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
             liftTerm, liftTerms, FOL.substTerm_liftTerm,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff
+            FOL.substTerm_liftLift] at h_iff
       apply iff_mpr h_iff
       -- witness 0: two*div2(p) + succ 0 = two*div2(p) + 1
       have h_one : (one : Term) = succ zero := rfl
@@ -710,12 +763,128 @@ private theorem sq_mul_two (w : Term) : Γ ⊢ (sq (mul two w) =eq mul (mul two 
 -- Lema Auxiliar: (2w+1)² = 4w² + 4w + 1
 private theorem sq_2w_plus_1 (w : Term) : Γ ⊢ (sq (add (mul two w) one) =eq
     add (add (mul (mul two two) (sq w)) (mul (mul two two) w)) one) := by
-  sorry
+  unfold sq
+  -- Notation: A := mul two w, X := mul (mul two two) (sq w), M := mul (mul two two) w
+  -- Outer distribution: (A+1)(A+1) = (A+1)·A + (A+1)·1
+  have hdist := mul_distrib' (add (mul two w) one) (mul two w) one
+  -- (A+1)·A = A·A + 1·A
+  have hleft := mul_distrib_right' (mul two w) one (mul two w)
+  -- (A+1)·1 = A·1 + 1·1
+  have hright := mul_distrib_right' (mul two w) one one
+  -- A·A = (2·2)·w²
+  have hAA : Γ ⊢ (mul (mul two w) (mul two w) =eq mul (mul two two) (sq w)) := sq_mul_two w
+  -- 1·A = A
+  have h_oneA : Γ ⊢ (mul one (mul two w) =eq mul two w) := by
+    have h := spec teo_2_6 (mul two w)
+    simp [substFormula, substTerm, substTerms, mul] at h
+    exact h
+  -- A·1 = A
+  have h_Aone : Γ ⊢ (mul (mul two w) one =eq mul two w) := by
+    have h := spec teo_2_5 (mul two w)
+    simp [substFormula, substTerm, substTerms, mul] at h
+    exact h
+  -- 1·1 = 1
+  have h_oneone : Γ ⊢ (mul one one =eq one) := teo_1_8
+  -- 2·A = A + A
+  have h_2A : Γ ⊢ (mul two (mul two w) =eq add (mul two w) (mul two w)) := by
+    have h := spec teo_2_7 (mul two w)
+    simp [substFormula, substTerm, substTerms, mul, add] at h
+    exact h
+  -- (A+1)·A = (2·2)·w² + A
+  have hL : Γ ⊢ (mul (add (mul two w) one) (mul two w) =eq
+      add (mul (mul two two) (sq w)) (mul two w)) :=
+    FOL.derive_eq_trans hleft
+      (FOL.derive_eq_trans (eq_congr_add_right hAA) (eq_congr_add_left h_oneA))
+  -- (A+1)·1 = A + 1
+  have hR : Γ ⊢ (mul (add (mul two w) one) one =eq add (mul two w) one) :=
+    FOL.derive_eq_trans hright
+      (FOL.derive_eq_trans (eq_congr_add_right h_Aone) (eq_congr_add_left h_oneone))
+  -- (A+1)(A+1) = ((2·2)·w² + A) + (A + 1)
+  have hT1 : Γ ⊢ (mul (add (mul two w) one) (add (mul two w) one) =eq
+      add (add (mul (mul two two) (sq w)) (mul two w)) (add (mul two w) one)) :=
+    FOL.derive_eq_trans hdist
+      (FOL.derive_eq_trans (eq_congr_add_right hL) (eq_congr_add_left hR))
+  -- Regroup: ((X + A) + (A + 1)) = ((X + M) + 1)
+  have hAA_2A : Γ ⊢ (add (mul two w) (mul two w) =eq mul two (mul two w)) := eq_symm h_2A
+  have h_2A_M : Γ ⊢ (mul two (mul two w) =eq mul (mul two two) w) :=
+    eq_symm (mul_assoc' two two w)
+  have hRe : Γ ⊢ (add (add (mul (mul two two) (sq w)) (mul two w)) (add (mul two w) one) =eq
+      add (add (mul (mul two two) (sq w)) (mul (mul two two) w)) one) :=
+    FOL.derive_eq_trans
+      (add_assoc' (mul (mul two two) (sq w)) (mul two w) (add (mul two w) one))
+      (FOL.derive_eq_trans
+        (eq_congr_add_left (eq_symm (add_assoc' (mul two w) (mul two w) one)))
+        (FOL.derive_eq_trans
+          (eq_symm (add_assoc' (mul (mul two two) (sq w)) (add (mul two w) (mul two w)) one))
+          (FOL.derive_eq_trans
+            (eq_congr_add_right (eq_congr_add_left hAA_2A))
+            (eq_congr_add_right (eq_congr_add_left h_2A_M)))))
+  exact FOL.derive_eq_trans hT1 hRe
+
+-- a ≤ b, a = a', b = b' → a' ≤ b'
+private theorem le_rewrite {a a' b b' : Term} (h : Γ ⊢ (a ≤ b))
+    (ha : Γ ⊢ (a =eq a')) (hb : Γ ⊢ (b =eq b')) : Γ ⊢ (a' ≤ b') := by
+  apply Axioms.or_elim h
+  · intro h_lt
+    exact Axioms.or_intro_left
+      (lt_le_trans (le_lt_trans (Axioms.or_intro_right (eq_symm ha)) h_lt)
+        (Axioms.or_intro_right hb))
+  · intro h_eq
+    exact Axioms.or_intro_right
+      (FOL.derive_eq_trans (FOL.derive_eq_trans (eq_symm ha) h_eq) hb)
+
+-- a+1 ≤ b+1 → a ≤ b
+private theorem le_add_one_cancel {x y : Term} (h : Γ ⊢ (add x one ≤ add y one)) : Γ ⊢ (x ≤ y) := by
+  have hx : Γ ⊢ (succ x =eq add x one) := by
+    have hh := spec teo_2_8 x
+    simp [substFormula, substTerm, substTerms, succ, add] at hh
+    exact hh
+  have hy : Γ ⊢ (succ y =eq add y one) := by
+    have hh := spec teo_2_8 y
+    simp [substFormula, substTerm, substTerms, succ, add] at hh
+    exact hh
+  exact le_of_succ_le_succ (le_rewrite h (eq_symm hx) (eq_symm hy))
 
 -- Lema Auxiliar: w(w+1) ≤ 2c ↔ (2w+1)² ≤ 8c+1
 private theorem w_w1_le_2c_iff_sq_2w1_le_8c1 {w c : Term} :
     (Γ ⊢ le (mul w (succ w)) (mul two c)) ↔ (Γ ⊢ le (sq (add (mul two w) one)) (add (mul eight c) one)) := by
-  sorry
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  -- w(w+1) = w² + w
+  have h_wsucc : Γ ⊢ (mul w (succ w) =eq add (sq w) w) := by
+    have h := spec (spec h_ax9 w) w
+    simp [substFormula, substTerm, substTerms, mul, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    exact h
+  -- 4·w(w+1) = 4w² + 4w
+  have E1 : Γ ⊢ (mul (mul two two) (mul w (succ w)) =eq
+      add (mul (mul two two) (sq w)) (mul (mul two two) w)) :=
+    FOL.derive_eq_trans (eq_congr_mul_left h_wsucc) (mul_distrib' (mul two two) (sq w) w)
+  -- 8c = 4·(2c)
+  have E2 : Γ ⊢ (mul eight c =eq mul (mul two two) (mul two c)) :=
+    FOL.derive_eq_trans (eq_congr_mul_right (eq_symm (mul_assoc' two two two)))
+      (mul_assoc' (mul two two) two c)
+  -- 0 < 4
+  have h_four_pos : Γ ⊢ lt zero (mul two two) :=
+    lt_le_trans (lt_zero_succ three) (Axioms.or_intro_right (eq_symm teo_1_10))
+  constructor
+  · intro h
+    have h4 : Γ ⊢ le (mul (mul two two) (mul w (succ w))) (mul (mul two two) (mul two c)) :=
+      le_mul_left h
+    have h_pq : Γ ⊢ le (add (mul (mul two two) (sq w)) (mul (mul two two) w)) (mul eight c) :=
+      le_rewrite h4 E1 (eq_symm E2)
+    have h_pq1 : Γ ⊢ le
+        (add (add (mul (mul two two) (sq w)) (mul (mul two two) w)) one) (add (mul eight c) one) :=
+      le_add_const_of_le h_pq
+    exact le_rewrite h_pq1 (eq_symm (sq_2w_plus_1 w)) (eq_refl _)
+  · intro h
+    have h_pq1 : Γ ⊢ le
+        (add (add (mul (mul two two) (sq w)) (mul (mul two two) w)) one) (add (mul eight c) one) :=
+      le_rewrite h (sq_2w_plus_1 w) (eq_refl _)
+    have h_pq : Γ ⊢ le (add (mul (mul two two) (sq w)) (mul (mul two two) w)) (mul eight c) :=
+      le_add_one_cancel h_pq1
+    have h4 : Γ ⊢ le (mul (mul two two) (mul w (succ w))) (mul (mul two two) (mul two c)) :=
+      le_rewrite h_pq (eq_symm E1) E2
+    exact le_of_mul_le_mul_left h4 h_four_pos
 
 -- Lema Auxiliar: n ≥ 1 → √n > 0
 private theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ ⊢ lt zero (sqrt n) := by
@@ -725,8 +894,7 @@ private theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ
   -- Trichotomy: 0 < sqrt n ∨ 0 = sqrt n ∨ sqrt n < 0
   have h_tric : Γ ⊢ (lt zero (sqrt n) ∨ (zero =eq sqrt n) ∨ lt (sqrt n) zero) := by
     have h := spec (spec h_ax19 zero) (sqrt n)
-    simp [substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at h
     exact h
   apply Axioms.or_elim h_tric
   · intro h; exact h
@@ -752,8 +920,7 @@ private theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ
       have h_n_lt_n := lt_le_trans h_n_lt_1 h_n_ge_1
       have h_irr : axioms ⊢ neg (lt n n) := by
         have h := spec h_ax18 n
-        simp [substFormula, substTerm, substTerms, lt,
-              liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+        simp [lt] at h
         exact h
       exact mp h_irr h_n_lt_n
     · intro h_sqrt_lt_0
@@ -762,19 +929,61 @@ private theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ
       have h_0_lt_0 := le_lt_trans h_0_le_sqrt h_sqrt_lt_0
       have h_irr : axioms ⊢ neg (lt zero zero) := by
         have h := spec h_ax18 zero
-        simp [substFormula, substTerm, substTerms, lt, zero,
-              liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+        simp [lt] at h
         exact h
       exact mp h_irr h_0_lt_0
+
+-- Congruencia: pred respeta la igualdad (análogo a eq_congr_succ).
+private theorem eq_congr_pred {t₁ t₂ : Term} (h : Γ ⊢ (t₁ =eq t₂)) :
+    Γ ⊢ (pred t₁ =eq pred t₂) := by
+  let f : Formula := Formula.eq (pred (liftTerm 0 t₁)) (pred (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (pred t₁) (pred s) := by
+    intro s
+    simp only [f, substFormula, pred, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (pred t₁))
+
+-- a ≤ b → a² ≤ b²
+private theorem sq_le_mono' {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ le (sq a) (sq b) := by
+  apply Axioms.or_elim h
+  · intro h_lt; exact Axioms.or_intro_left (sq_lt_mono h_lt)
+  · intro h_eq
+    apply Axioms.or_intro_right
+    unfold sq
+    exact FOL.derive_eq_trans (eq_congr_mul_right h_eq) (eq_congr_mul_left h_eq)
+
+-- 0 < s → σ(pred s) = s
+private theorem succ_pred_of_pos {s : Term} (h_pos : Γ ⊢ lt zero s) : Γ ⊢ (succ (pred s) =eq s) := by
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax26 := ax (by simp [axioms] : ax26_pred_succ ∈ axioms)
+  -- s ≠ 0
+  have h_ne : Γ ⊢ neg (s =eq zero) := by
+    apply raa; intro h_s0
+    have h_lt00 : Γ ⊢ lt zero zero := lt_le_trans h_pos (Axioms.or_intro_right h_s0)
+    have h_irr : Γ ⊢ neg (lt zero zero) := by
+      have h := spec h_ax18 zero; simp [lt] at h; exact h
+    exact mp h_irr h_lt00
+  -- ∃ y, σ y = s
+  have h_311 := spec teo_3_11 s
+  simp [substFormula, substTerm, substTerms, succ, zero,
+        liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_311
+  have h_ex := mp h_311 h_ne
+  apply ex_elim h_ex; intro y h_y
+  simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at h_y
+  -- h_y : σ y = s.  pred s = pred (σ y) = y
+  have h_pred_sy : Γ ⊢ (pred s =eq y) := by
+    have h26 := spec h_ax26 y
+    simp [substFormula, substTerm, substTerms, pred, succ, FOL.substTerm_liftTerm] at h26
+    exact FOL.derive_eq_trans (eq_congr_pred (eq_symm h_y)) h26
+  exact FOL.derive_eq_trans (eq_congr_succ h_pred_sy) h_y
 
 -- ============================================================
 -- MAIN THEOREM: LEMA C5
 -- ============================================================
 
--- Teo 9.1 (Lema C5): ∀ c, ∃! w, w*(w+1) ≤ 2*c < (w+1)*(w+2)
+-- Teo 9.1 (Lema C5): ∀ c, ∃ w, w*(w+1) ≤ 2*c < (w+1)*(w+2)
 theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
-    (le (mul (.var 0) (succ (.var 0))) (mul two c))
-    (lt (mul two c) (mul (succ (.var 0)) (succ (succ (.var 0)))))) := by
+    (le (mul (.var 0) (succ (.var 0))) (mul two (liftTerm 0 c)))
+    (lt (mul two (liftTerm 0 c)) (mul (succ (.var 0)) (succ (succ (.var 0)))))) := by
   let w := w_candidate c
   -- === Part 1: Existence ===
   have h_existence_part1 : Γ ⊢ le (mul w (succ w)) (mul two c) := by
@@ -787,20 +996,223 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
     have h_sq_s_le_8c1 : Γ ⊢ le (sq s) (add (mul eight c) one) :=
       sqrt_sq_le (add (mul eight c) one)
     have h_sq_2w1_le_sq_s : Γ ⊢ le (sq (add (mul two w) one)) (sq s) := by
-      sorry
+      -- 1 ≤ 8c+1
+      have h_8c1_ge_1 : Γ ⊢ le one (add (mul eight c) one) :=
+        le_rewrite (le_add_const_of_le (zero_le (mul eight c))) teo_1_2 (eq_refl _)
+      -- 0 < s
+      have h_s_pos : Γ ⊢ lt zero s := sqrt_of_ge_1_is_pos h_8c1_ge_1
+      -- (pred s) + 1 = s
+      have h_succ_pred_s : Γ ⊢ (succ (pred s) =eq s) := succ_pred_of_pos h_s_pos
+      have h_t28 : Γ ⊢ (succ (pred s) =eq add (pred s) one) := by
+        have h := spec teo_2_8 (pred s)
+        simp [substFormula, substTerm, substTerms, succ, add] at h
+        exact h
+      have h_p1_eq_s : Γ ⊢ (add (pred s) one =eq s) :=
+        FOL.derive_eq_trans (eq_symm h_t28) h_succ_pred_s
+      -- 2·div2(p) ≤ p   (p = pred s, w = div2 p)
+      have h_2w_le_p : Γ ⊢ le (mul two w) (pred s) := lemma_2_div2_le_n (pred s)
+      -- (2w+1) ≤ (pred s)+1 = s
+      have h_2w1_le_p1 : Γ ⊢ le (add (mul two w) one) (add (pred s) one) :=
+        le_add_const_of_le h_2w_le_p
+      have h_2w1_le_s : Γ ⊢ le (add (mul two w) one) s :=
+        le_rewrite h_2w1_le_p1 (eq_refl _) h_p1_eq_s
+      exact sq_le_mono' h_2w1_le_s
     exact le_trans h_sq_2w1_le_sq_s h_sq_s_le_8c1
   have h_existence_part2 : Γ ⊢ lt (mul two c) (mul (succ w) (succ (succ w))) := by
-    sorry
+    let s := sqrt (add (mul eight c) one)
+    have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+    have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+    -- 2(w+1)+1 = σσ(2w+1)
+    have H3 : Γ ⊢ (add (mul two (succ w)) one =eq succ (succ (add (mul two w) one))) := by
+      have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+      have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+      have h9 : Γ ⊢ (mul two (succ w) =eq add (mul two w) two) := by
+        have h := spec (spec h_ax9 two) w
+        simp [substFormula, substTerm, substTerms, mul, add, succ,
+              liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+        exact h
+      have h5 : Γ ⊢ (add (mul two w) two =eq succ (add (mul two w) one)) := by
+        have h := spec (spec h_ax5 (mul two w)) one
+        simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h
+        exact h
+      have h28 : Γ ⊢ (succ (succ (add (mul two w) one)) =eq add (succ (add (mul two w) one)) one) := by
+        have h := spec teo_2_8 (succ (add (mul two w) one))
+        simp [substFormula, substTerm, substTerms, succ, add] at h
+        exact h
+      exact FOL.derive_eq_trans (eq_congr_add_right (FOL.derive_eq_trans h9 h5)) (eq_symm h28)
+    -- 1 ≤ 8c+1, 0 < s, σ(pred s) = s
+    have h_8c1_ge_1 : Γ ⊢ le one (add (mul eight c) one) :=
+      le_rewrite (le_add_const_of_le (zero_le (mul eight c))) teo_1_2 (eq_refl _)
+    have h_s_pos : Γ ⊢ lt zero s := sqrt_of_ge_1_is_pos h_8c1_ge_1
+    have h_succ_pred_s : Γ ⊢ (succ (pred s) =eq s) := succ_pred_of_pos h_s_pos
+    -- pred s ≤ 2w+1  →  s ≤ σ(2w+1)  →  σs ≤ σσ(2w+1) = 2(w+1)+1
+    have h_pred_le : Γ ⊢ le (pred s) (add (mul two w) one) := p_le_two_div2p_plus_one (pred s)
+    have h_s_le : Γ ⊢ le s (succ (add (mul two w) one)) :=
+      le_rewrite (succ_le_succ_of_le h_pred_le) h_succ_pred_s (eq_refl _)
+    have h_ss_le : Γ ⊢ le (succ s) (add (mul two (succ w)) one) :=
+      le_rewrite (succ_le_succ_of_le h_s_le) (eq_refl _) (eq_symm H3)
+    -- (σs)² ≤ (2(w+1)+1)²,  and  8c+1 < (σs)²
+    have h_sq_ss_le : Γ ⊢ le (sq (succ s)) (sq (add (mul two (succ w)) one)) := sq_le_mono' h_ss_le
+    have h_8c1_lt : Γ ⊢ lt (add (mul eight c) one) (sq (succ s)) :=
+      lt_succ_sqrt_sq (add (mul eight c) one)
+    have h_upper : Γ ⊢ lt (add (mul eight c) one) (sq (add (mul two (succ w)) one)) :=
+      lt_le_trans h_8c1_lt h_sq_ss_le
+    -- Trichotomy: if ¬(2c < (w+1)(w+2)) then (w+1)(w+2) ≤ 2c, contradicting via the iff
+    have h_irr : Γ ⊢ neg (lt (add (mul eight c) one) (add (mul eight c) one)) := by
+      have h := spec h_ax18 (add (mul eight c) one); simp [lt] at h; exact h
+    have h_tric : Γ ⊢ (lt (mul two c) (mul (succ w) (succ (succ w))) ∨
+        (mul two c =eq mul (succ w) (succ (succ w))) ∨
+        lt (mul (succ w) (succ (succ w))) (mul two c)) := by
+      have h := spec (spec h_ax19 (mul two c)) (mul (succ w) (succ (succ w)))
+      simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at h
+      exact h
+    apply Axioms.or_elim h_tric
+    · intro h_lt; exact h_lt
+    · intro h23
+      apply Axioms.or_elim h23
+      · intro h_eq
+        apply false_elim
+        have hYle : Γ ⊢ le (mul (succ w) (succ (succ w))) (mul two c) :=
+          Axioms.or_intro_right (eq_symm h_eq)
+        exact mp h_irr (lt_le_trans h_upper (w_w1_le_2c_iff_sq_2w1_le_8c1.mp hYle))
+      · intro h_gt
+        apply false_elim
+        have hYle : Γ ⊢ le (mul (succ w) (succ (succ w))) (mul two c) :=
+          Axioms.or_intro_left h_gt
+        exact mp h_irr (lt_le_trans h_upper (w_w1_le_2c_iff_sq_2w1_le_8c1.mp hYle))
   have h_existence : Γ ⊢ land (le (mul w (succ w)) (mul two c)) (lt (mul two c) (mul (succ w) (succ (succ w)))) :=
     Axioms.and_intro h_existence_part1 h_existence_part2
-  -- === Part 2: Uniqueness (a ≤ b → mul a (succ a) ≤ mul b (succ b)) ===
-  have h_uniqueness : Γ ⊢ Formula.forall ((land
-      (le (mul (.var 0) (succ (.var 0))) (mul two (liftTerm 0 c)))
-      (lt (mul two (liftTerm 0 c)) (mul (succ (.var 0)) (succ (succ (.var 0))))))
-    ⇒ ((.var 0) =eq liftTerm 0 w)) := by
-    sorry
-  -- Combine existence + uniqueness to give ∃!w
-  sorry
+  -- Witness w closes the existential (liftTerm 0 c cancels under the substitution)
+  apply ex_intro w
+  simp only [substFormula, substTerm, substTerms, land, le, lt, mul, succ,
+             FOL.substTerm_liftTerm]
+  exact h_existence
+
+-- Unicidad de C5: si w y w' satisfacen las cotas, entonces w = w'.
+theorem lemma_C5_unique {c w w' : Term}
+    (h_w  : Γ ⊢ land (le (mul w (succ w)) (mul two c))
+                     (lt (mul two c) (mul (succ w) (succ (succ w)))))
+    (h_w' : Γ ⊢ land (le (mul w' (succ w')) (mul two c))
+                     (lt (mul two c) (mul (succ w') (succ (succ w'))))) :
+    Γ ⊢ (w =eq w') := by
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  have h_w_lo  : Γ ⊢ le (mul w (succ w)) (mul two c) := Axioms.and_elim_left h_w
+  have h_w_hi  : Γ ⊢ lt (mul two c) (mul (succ w) (succ (succ w))) := Axioms.and_elim_right h_w
+  have h_w'_lo : Γ ⊢ le (mul w' (succ w')) (mul two c) := Axioms.and_elim_left h_w'
+  have h_w'_hi : Γ ⊢ lt (mul two c) (mul (succ w') (succ (succ w'))) := Axioms.and_elim_right h_w'
+  have h_tric : Γ ⊢ (lt w w' ∨ (w =eq w') ∨ lt w' w) := by
+    have h := spec (spec h_ax19 w) w'
+    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at h
+    exact h
+  apply Axioms.or_elim h_tric
+  · intro h_lt
+    apply false_elim
+    have h_mono : Γ ⊢ le (mul (succ w) (succ (succ w))) (mul w' (succ w')) :=
+      mono_w_w1 (succ_le_of_lt h_lt)
+    have h_chain : Γ ⊢ lt (mul (succ w) (succ (succ w))) (mul (succ w) (succ (succ w))) :=
+      le_lt_trans (le_trans h_mono h_w'_lo) h_w_hi
+    have h_irr : Γ ⊢ neg (lt (mul (succ w) (succ (succ w))) (mul (succ w) (succ (succ w)))) := by
+      have h := spec h_ax18 (mul (succ w) (succ (succ w))); simp [lt] at h; exact h
+    exact mp h_irr h_chain
+  · intro h23
+    apply Axioms.or_elim h23
+    · intro h_eq; exact h_eq
+    · intro h_lt
+      apply false_elim
+      have h_mono : Γ ⊢ le (mul (succ w') (succ (succ w'))) (mul w (succ w)) :=
+        mono_w_w1 (succ_le_of_lt h_lt)
+      have h_chain : Γ ⊢ lt (mul (succ w') (succ (succ w'))) (mul (succ w') (succ (succ w'))) :=
+        le_lt_trans (le_trans h_mono h_w_lo) h_w'_hi
+      have h_irr : Γ ⊢ neg (lt (mul (succ w') (succ (succ w'))) (mul (succ w') (succ (succ w')))) := by
+        have h := spec h_ax18 (mul (succ w') (succ (succ w'))); simp [lt] at h; exact h
+      exact mp h_irr h_chain
+
+-- a ≤ a + b
+private theorem le_self_add (a b : Term) : Γ ⊢ le a (add a b) := by
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  have h0 : Γ ⊢ le (add a zero) (add a b) := le_add_const_of_le_left (zero_le b)
+  have h4 : Γ ⊢ (add a zero =eq a) := by
+    have h := spec h_ax4 a
+    simp [substFormula, substTerm, substTerms, add] at h
+    exact h
+  exact le_rewrite h0 h4 (eq_refl _)
+
+-- lt a b, a = a', b = b' → lt a' b'
+private theorem lt_rewrite {a a' b b' : Term} (h : Γ ⊢ lt a b)
+    (ha : Γ ⊢ (a =eq a')) (hb : Γ ⊢ (b =eq b')) : Γ ⊢ lt a' b' :=
+  lt_le_trans (le_lt_trans (Axioms.or_intro_right (eq_symm ha)) h) (Axioms.or_intro_right hb)
+
+-- (w+1)(w+2) = w(w+1) + 2(w+1)
+private theorem expand_succ_succ (w : Term) :
+    Γ ⊢ (mul (succ w) (succ (succ w)) =eq add (mul w (succ w)) (mul two (succ w))) := by
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  have e1 : Γ ⊢ (mul (succ w) (succ (succ w)) =eq add (mul (succ w) (succ w)) (succ w)) := by
+    have h := spec (spec h_ax9 (succ w)) (succ w)
+    simp [substFormula, substTerm, substTerms, mul, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    exact h
+  have e2 : Γ ⊢ (mul (succ w) (succ w) =eq add (mul (succ w) w) (succ w)) := by
+    have h := spec (spec h_ax9 (succ w)) w
+    simp [substFormula, substTerm, substTerms, mul, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    exact h
+  have e3 : Γ ⊢ (mul (succ w) w =eq mul w (succ w)) := mul_comm' (succ w) w
+  have e4 : Γ ⊢ (add (succ w) (succ w) =eq mul two (succ w)) := by
+    have h := spec teo_2_7 (succ w)
+    simp [substFormula, substTerm, substTerms, mul, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    exact eq_symm h
+  have e12 : Γ ⊢ (mul (succ w) (succ (succ w)) =eq
+      add (add (mul w (succ w)) (succ w)) (succ w)) :=
+    FOL.derive_eq_trans e1
+      (eq_congr_add_right (FOL.derive_eq_trans e2 (eq_congr_add_right e3)))
+  have e5 : Γ ⊢ (add (add (mul w (succ w)) (succ w)) (succ w) =eq
+      add (mul w (succ w)) (add (succ w) (succ w))) := add_assoc' (mul w (succ w)) (succ w) (succ w)
+  exact FOL.derive_eq_trans e12 (FOL.derive_eq_trans e5 (eq_congr_add_left e4))
+
+-- Las cotas C5 para w = x+y, dadas por la ecuación de Cantor 2c = w(w+1) + 2y.
+theorem cantor_bounds {x y c : Term}
+    (h : Γ ⊢ (mul two c =eq add (mul (add x y) (succ (add x y))) (mul two y))) :
+    Γ ⊢ land (le (mul (add x y) (succ (add x y))) (mul two c))
+             (lt (mul two c) (mul (succ (add x y)) (succ (succ (add x y))))) := by
+  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
+  have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  -- Lower bound: w(w+1) ≤ w(w+1)+2y = 2c
+  have h_low : Γ ⊢ le (mul (add x y) (succ (add x y))) (mul two c) :=
+    le_rewrite (le_self_add (mul (add x y) (succ (add x y))) (mul two y)) (eq_refl _) (eq_symm h)
+  -- y ≤ x+y
+  have h_y_le_w : Γ ⊢ le y (add x y) :=
+    le_rewrite (le_self_add y x) (eq_refl _) (add_comm' y x)
+  have h_2y_le_2w : Γ ⊢ le (mul two y) (mul two (add x y)) := le_mul_left h_y_le_w
+  have h_add_le : Γ ⊢ le (add (mul (add x y) (succ (add x y))) (mul two y))
+      (add (mul (add x y) (succ (add x y))) (mul two (add x y))) :=
+    le_add_const_of_le_left h_2y_le_2w
+  -- 2w < 2(w+1)
+  have h_2w_lt : Γ ⊢ lt (mul two (add x y)) (mul two (succ (add x y))) := by
+    have h9 : Γ ⊢ (mul two (succ (add x y)) =eq add (mul two (add x y)) two) := by
+      have hh := spec (spec h_ax9 two) (add x y)
+      simp [substFormula, substTerm, substTerms, mul, add, succ,
+            liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+      exact hh
+    have hlt : Γ ⊢ lt (mul two (add x y)) (add (mul two (add x y)) two) := by
+      have h_iff := spec (spec h_ax13 (mul two (add x y))) (add (mul two (add x y)) two)
+      simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
+            liftTerm, liftTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff
+      apply iff_mpr h_iff
+      exact ex_intro one (by
+        simp [substFormula, substTerm, substTerms, add, succ, one, two,
+              liftTerm, liftTerms, FOL.substTerm_liftTerm]
+        exact eq_refl _)
+    exact lt_rewrite hlt (eq_refl _) (eq_symm h9)
+  have h_lt2 : Γ ⊢ lt (add (mul (add x y) (succ (add x y))) (mul two (add x y)))
+      (add (mul (add x y) (succ (add x y))) (mul two (succ (add x y)))) :=
+    lt_add_const_of_le_left h_2w_lt
+  have h_expand : Γ ⊢ (mul (succ (add x y)) (succ (succ (add x y))) =eq
+      add (mul (add x y) (succ (add x y))) (mul two (succ (add x y)))) := expand_succ_succ (add x y)
+  have h_high : Γ ⊢ lt (mul two c) (mul (succ (add x y)) (succ (succ (add x y)))) :=
+    lt_rewrite (le_lt_trans h_add_le h_lt2) (eq_symm h) (eq_symm h_expand)
+  exact Axioms.and_intro h_low h_high
 
 end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
@@ -808,4 +1220,6 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 export ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5 (
   w_candidate
   lemma_C5
+  lemma_C5_unique
+  cantor_bounds
 )

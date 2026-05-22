@@ -110,8 +110,53 @@ theorem cantor_surjectivity (c : Term) : Γ ⊢ ex (ex (is_cantor (.var 1) (.var
   -- This proof is a major undertaking and is left as sorry for now.
   sorry
 
+-- Conmutatividad de la suma (helper local).
+private theorem add_comm_c (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
+  have h := spec (spec (ax (by simp [axioms] : ax6_add_comm ∈ axioms)) a) b
+  simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+  exact h
+
 -- Teo C7: Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y' (Unicidad Proyectiva)
-theorem cantor_uniqueness (x y x' y' c : Term) : Γ ⊢ land (is_cantor x y c) (is_cantor x' y' c) ⇒ land (x =eq x') (y =eq y') := by sorry
+theorem cantor_uniqueness (x y x' y' c : Term) :
+    Γ ⊢ land (is_cantor x y c) (is_cantor x' y' c) ⇒ land (x =eq x') (y =eq y') := by
+  apply Axioms.imp_intro; intro h_land
+  have h_ax28 := ax (by simp [axioms] : ax28_mul_two_cancel ∈ axioms)
+  have h_xy : Γ ⊢ (mul two c =eq add (mul (add x y) (succ (add x y))) (mul two y)) :=
+    Axioms.and_elim_left h_land
+  have h_x'y' : Γ ⊢ (mul two c =eq add (mul (add x' y') (succ (add x' y'))) (mul two y')) :=
+    Axioms.and_elim_right h_land
+  -- C5 bounds + uniqueness ⇒ x+y = x'+y'
+  have h_w  := cantor_bounds h_xy
+  have h_w' := cantor_bounds h_x'y'
+  have h_w_eq : Γ ⊢ (add x y =eq add x' y') := lemma_C5_unique h_w h_w'
+  -- w(w+1) = w'(w'+1)
+  have h_W_eq : Γ ⊢ (mul (add x y) (succ (add x y)) =eq mul (add x' y') (succ (add x' y'))) :=
+    FOL.derive_eq_trans (eq_congr_mul_right h_w_eq) (eq_congr_mul_left (eq_congr_succ h_w_eq))
+  -- W + 2y = W + 2y'
+  have h_WW : Γ ⊢ (add (mul (add x y) (succ (add x y))) (mul two y) =eq
+      add (mul (add x y) (succ (add x y))) (mul two y')) :=
+    FOL.derive_eq_trans (FOL.derive_eq_trans (eq_symm h_xy) h_x'y')
+      (eq_congr_add_right (eq_symm h_W_eq))
+  -- conmutar + cancelar ⇒ 2y = 2y'
+  have h_2y_eq : Γ ⊢ (mul two y =eq mul two y') := by
+    have hcomm : Γ ⊢ (add (mul two y) (mul (add x y) (succ (add x y))) =eq
+        add (mul two y') (mul (add x y) (succ (add x y)))) :=
+      FOL.derive_eq_trans (add_comm_c (mul two y) (mul (add x y) (succ (add x y))))
+        (FOL.derive_eq_trans h_WW (add_comm_c (mul (add x y) (succ (add x y))) (mul two y')))
+    exact add_left_cancel hcomm
+  -- 2y = 2y' ⇒ y = y'
+  have h_y_eq : Γ ⊢ (y =eq y') := by
+    have h28 : Γ ⊢ ((mul two y =eq mul two y') ⇒ (y =eq y')) := by
+      have hh := spec (spec h_ax28 y) y'
+      simp [substFormula, substTerm, substTerms, mul, two, one, FOL.substTerm_liftTerm] at hh
+      exact hh
+    exact mp h28 h_2y_eq
+  -- x+y = x'+y ⇒ x = x'
+  have h_x_eq : Γ ⊢ (x =eq x') := by
+    have h_axy : Γ ⊢ (add x y =eq add x' y) :=
+      FOL.derive_eq_trans h_w_eq (eq_congr_add_left (eq_symm h_y_eq))
+    exact add_left_cancel h_axy
+  exact Axioms.and_intro h_x_eq h_y_eq
 
 end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 
