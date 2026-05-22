@@ -297,12 +297,9 @@ private theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ 
     -- a < b: ∃k, a + σk = b
     have h_iff_ab := spec (spec h_ax13 a) b
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff_ab
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff_ab
     apply ex_elim (iff_mp h_iff_ab h_lt); intro k h_k
-    simp [substFormula, substTerm, substTerms, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_k
+    simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] at h_k
     -- h_k : add a (succ k) = b. Goal: ∃k', succ a + σk' = succ b. Use k' = k.
     -- succ a + k = σ(a + k)  [via ax6+ax5+ax6]
     have h_sa_k : axioms ⊢ (add (succ a) k =eq succ (add a k)) := by
@@ -313,13 +310,11 @@ private theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ 
         exact h6
       have h5 : axioms ⊢ (add k (succ a) =eq succ (add k a)) := by
         have hs := spec (spec h_ax5 k) a
-        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at hs
+        simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hs
         exact hs
       have h6_2 : axioms ⊢ (add k a =eq add a k) := by
         have h6 := spec (spec h_ax6 k) a
-        simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at h6
+        simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftTerm] at h6
         exact h6
       exact FOL.derive_eq_trans h6_1 (FOL.derive_eq_trans h5 (eq_congr_succ h6_2))
     -- succ a + σk = σ(succ a + k) = σ(σ(a+k)) = σ(a + σk) = σb
@@ -330,8 +325,7 @@ private theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ 
       exact hs
     have h5_3 : axioms ⊢ (add a (succ k) =eq succ (add a k)) := by
       have hs := spec (spec h_ax5 a) k
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm] at hs
+      simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hs
       exact hs
     -- succ a + σk = σ(succ a + k) = σ(σ(a+k)) = σ(a+σk) = σb
     have h_chain : axioms ⊢ (add (succ a) (succ k) =eq succ b) :=
@@ -343,12 +337,10 @@ private theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ 
     have h_iff_sa_sb := spec (spec h_ax13 (succ a)) (succ b)
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
           liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff_sa_sb
+          FOL.substTerm_liftLift] at h_iff_sa_sb
     apply iff_mpr h_iff_sa_sb
     exact ex_intro k (by
-      simp [substFormula, substTerm, substTerms, add, succ,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm,
-            FOL.substTerm_lift_comm, FOL.substTerm_liftLift]
+      simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm]
       exact h_chain)
   · intro h_eq
     exact Axioms.or_intro_right (eq_congr_succ h_eq)
@@ -367,39 +359,33 @@ private theorem le_add_const_of_le {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ �
     apply Axioms.or_intro_left
     have h_iff := spec (spec h_ax13 a) b
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff
     apply ex_elim (iff_mp h_iff h_lt); intro k h_k
-    simp [substFormula, substTerm, substTerms, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_k
+    simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] at h_k
     -- (a + c) + σk = a + (c + σk) = a + (σk + c) = (a + σk) + c = b + c
     have h7_1 : axioms ⊢ (add (add a c) (succ k) =eq add a (add c (succ k))) := by
       have h7 := spec (spec (spec h_ax7 a) c) (succ k)
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h7
+      simp [substFormula, substTerm, substTerms, add, succ,
+            FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h7
       exact h7
     have h6_1 : axioms ⊢ (add c (succ k) =eq add (succ k) c) := by
       have h6 := spec (spec h_ax6 c) (succ k)
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm] at h6
+      simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at h6
       exact h6
     have h7_2_raw : axioms ⊢ (add (add a (succ k)) c =eq add a (add (succ k) c)) := by
       have h7 := spec (spec (spec h_ax7 a) (succ k)) c
       simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h7
+            FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h7
       exact h7
     have h_chain : axioms ⊢ (add (add a c) (succ k) =eq add b c) :=
       FOL.derive_eq_trans h7_1 (FOL.derive_eq_trans (eq_congr_add_left h6_1)
         (FOL.derive_eq_trans (eq_symm h7_2_raw) (eq_congr_add_right h_k)))
     have h_iff2 := spec (spec h_ax13 (add a c)) (add b c)
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff2
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff2
     apply iff_mpr h_iff2
     exact ex_intro k (by
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift]
+      simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm]
       exact h_chain)
   · intro h_eq
     exact Axioms.or_intro_right (eq_congr_add_right h_eq)
@@ -413,28 +399,24 @@ private theorem le_add_const_of_le_left {a b c : Term} (h : Γ ⊢ (a ≤ b)) : 
     apply Axioms.or_intro_left
     have h_iff := spec (spec h_ax13 a) b
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff
     apply ex_elim (iff_mp h_iff h_lt); intro k h_k
-    simp [substFormula, substTerm, substTerms, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_k
+    simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] at h_k
     -- (c + a) + σk = c + (a + σk) = c + b
     have h7 : axioms ⊢ (add (add c a) (succ k) =eq add c (add a (succ k))) := by
       have hh := spec (spec (spec h_ax7 c) a) (succ k)
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at hh
+      simp [substFormula, substTerm, substTerms, add, succ,
+            FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
       exact hh
     have h_chain : axioms ⊢ (add (add c a) (succ k) =eq add c b) :=
       FOL.derive_eq_trans h7 (eq_congr_add_left h_k)
     have h_iff2 := spec (spec h_ax13 (add c a)) (add c b)
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
           liftTerm, liftTerms, FOL.substTerm_liftTerm,
-          FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff2
+          FOL.substTerm_liftLift] at h_iff2
     apply iff_mpr h_iff2
     exact ex_intro k (by
-      simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-            FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift]
+      simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm]
       exact h_chain)
   · intro h_eq
     exact Axioms.or_intro_right (eq_congr_add_left h_eq)
@@ -479,8 +461,7 @@ private theorem le_of_mul_le_mul_right {a b c : Term} (h_le : Γ ⊢ le (mul a c
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   have h_tric : Γ ⊢ (lt a b ∨ (a =eq b) ∨ lt b a) := by
     have h := spec (spec h_ax19 a) b
-    simp [substFormula, substTerm, substTerms, lt, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at h
     exact h
   apply Axioms.or_elim h_tric
   · intro h_lt; exact Axioms.or_intro_left h_lt
@@ -493,8 +474,7 @@ private theorem le_of_mul_le_mul_right {a b c : Term} (h_le : Γ ⊢ le (mul a c
       have h_self_lt := le_lt_trans h_le h_mul_lt
       have h_irr : axioms ⊢ neg (lt (mul a c) (mul a c)) := by
         have h := spec h_ax18 (mul a c)
-        simp [substFormula, substTerm, substTerms, lt, mul,
-              liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+        simp [lt, mul] at h
         exact h
       exact mp h_irr h_self_lt
 
@@ -505,13 +485,11 @@ private theorem le_of_mul_le_mul_left {a b c : Term} (h_le : Γ ⊢ le (mul c a)
   -- mul c a = mul a c, mul c b = mul b c
   have h_ca : axioms ⊢ (mul c a =eq mul a c) := by
     have h := spec (spec h_ax10 c) a
-    simp [substFormula, substTerm, substTerms, mul, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, FOL.substTerm_liftTerm] at h
     exact h
   have h_cb : axioms ⊢ (mul c b =eq mul b c) := by
     have h := spec (spec h_ax10 c) b
-    simp [substFormula, substTerm, substTerms, mul, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, FOL.substTerm_liftTerm] at h
     exact h
   have h_le_right : axioms ⊢ le (mul a c) (mul b c) := by
     apply Axioms.or_elim h_le
@@ -735,9 +713,8 @@ private theorem p_le_two_div2p_plus_one (p : Term) : Γ ⊢ le p (add (mul two (
       have h_one : (one : Term) = succ zero := rfl
       rw [h_one]
       exact ex_intro zero (by
-        simp [substFormula, substTerm, substTerms, add, succ, zero,
-              liftTerm, liftTerms, FOL.substTerm_liftTerm,
-              FOL.substTerm_lift_comm, FOL.substTerm_liftLift]
+        simp [substFormula, substTerm, substTerms, succ, zero,
+              liftTerm, liftTerms, FOL.substTerm_liftTerm]
         exact eq_refl _)
     exact Axioms.or_intro_left (le_lt_trans (Axioms.or_intro_right h_eq) h_lt)
   · intro h_mod1
@@ -852,8 +829,7 @@ private theorem w_w1_le_2c_iff_sq_2w1_le_8c1 {w c : Term} :
   -- w(w+1) = w² + w
   have h_wsucc : Γ ⊢ (mul w (succ w) =eq add (sq w) w) := by
     have h := spec (spec h_ax9 w) w
-    simp [substFormula, substTerm, substTerms, mul, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, add, succ, FOL.substTerm_liftTerm] at h
     exact h
   -- 4·w(w+1) = 4w² + 4w
   have E1 : Γ ⊢ (mul (mul two two) (mul w (succ w)) =eq
@@ -964,15 +940,14 @@ private theorem succ_pred_of_pos {s : Term} (h_pos : Γ ⊢ lt zero s) : Γ ⊢ 
     exact mp h_irr h_lt00
   -- ∃ y, σ y = s
   have h_311 := spec teo_3_11 s
-  simp [substFormula, substTerm, substTerms, succ, zero,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_311
+  simp [substFormula, substTerm, substTerms, succ, zero] at h_311
   have h_ex := mp h_311 h_ne
   apply ex_elim h_ex; intro y h_y
-  simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at h_y
+  simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] at h_y
   -- h_y : σ y = s.  pred s = pred (σ y) = y
   have h_pred_sy : Γ ⊢ (pred s =eq y) := by
     have h26 := spec h_ax26 y
-    simp [substFormula, substTerm, substTerms, pred, succ, FOL.substTerm_liftTerm] at h26
+    simp [substFormula, substTerm, substTerms, pred, succ] at h26
     exact FOL.derive_eq_trans (eq_congr_pred (eq_symm h_y)) h26
   exact FOL.derive_eq_trans (eq_congr_succ h_pred_sy) h_y
 
@@ -1029,7 +1004,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
       have h9 : Γ ⊢ (mul two (succ w) =eq add (mul two w) two) := by
         have h := spec (spec h_ax9 two) w
         simp [substFormula, substTerm, substTerms, mul, add, succ,
-              liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+              FOL.substTerm_liftTerm] at h
         exact h
       have h5 : Γ ⊢ (add (mul two w) two =eq succ (add (mul two w) one)) := by
         have h := spec (spec h_ax5 (mul two w)) one
@@ -1160,8 +1135,7 @@ private theorem expand_succ_succ (w : Term) :
   have e3 : Γ ⊢ (mul (succ w) w =eq mul w (succ w)) := mul_comm' (succ w) w
   have e4 : Γ ⊢ (add (succ w) (succ w) =eq mul two (succ w)) := by
     have h := spec teo_2_7 (succ w)
-    simp [substFormula, substTerm, substTerms, mul, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, add, succ] at h
     exact eq_symm h
   have e12 : Γ ⊢ (mul (succ w) (succ (succ w)) =eq
       add (add (mul w (succ w)) (succ w)) (succ w)) :=
@@ -1193,7 +1167,7 @@ theorem cantor_bounds {x y c : Term}
     have h9 : Γ ⊢ (mul two (succ (add x y)) =eq add (mul two (add x y)) two) := by
       have hh := spec (spec h_ax9 two) (add x y)
       simp [substFormula, substTerm, substTerms, mul, add, succ,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+            FOL.substTerm_liftTerm] at hh
       exact hh
     have hlt : Γ ⊢ lt (mul two (add x y)) (add (mul two (add x y)) two) := by
       have h_iff := spec (spec h_ax13 (mul two (add x y))) (add (mul two (add x y)) two)
@@ -1201,7 +1175,7 @@ theorem cantor_bounds {x y c : Term}
             liftTerm, liftTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff
       apply iff_mpr h_iff
       exact ex_intro one (by
-        simp [substFormula, substTerm, substTerms, add, succ, one, two,
+        simp [substFormula, substTerm, substTerms, succ, one, two,
               liftTerm, liftTerms, FOL.substTerm_liftTerm]
         exact eq_refl _)
     exact lt_rewrite hlt (eq_refl _) (eq_symm h9)
