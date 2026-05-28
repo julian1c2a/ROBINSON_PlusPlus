@@ -10,8 +10,8 @@
 | Metric | Value |
 |--------|-------|
 | Total modules | 9 |
-| Modules sin sorry | 6 / 9 |
-| Sorry reales (total) | 13 (cantor_surjectivity + 5 stubs Block5 + 7 stubs Block6) |
+| Modules sin sorry | 7 / 9 |
+| Sorry reales (total) | 12 (5 stubs Block5 + 7 stubs Block6) |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
 | Axiomas matemáticos | 29 (ax2–ax17, ax21–ax29, list/concat) |
 | Total definitions | ~52 |
@@ -33,16 +33,20 @@
 | `Minimal/Theorems/Block3.lean` | 0 | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
 | `Minimal/Theorems/Block4.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block4_C5.lean` | 0 | ✅ Complete — `lemma_C5`, `lemma_C5_unique`, `cantor_bounds` |
-| `Minimal/Theorems/Block4_C6_C7.lean` | 1 | 🔄 `cantor_surjectivity` pendiente (infra `sub` ya en Axioms vía ax29) |
+| `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
 | `Minimal/Theorems/Block5.lean` | 5 | ❌ Stub (pares/proyecciones) |
 | `Minimal/Theorems/Block6.lean` | 7 | ❌ Stub (listas) |
-| **Total** | **13** | |
+| **Total** | **12** | |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
 ---
 
 ## Recent Achievements
+
+- **2026-05-27 — Block4_C6_C7 COMPLETO (0 sorrys)**: `cantor_surjectivity` cerrado. Construcción: `w` desde `lemma_C5`, `k` desde `parity_lemma w` (`w(w+1)=2k`), `y := sub c k` con `k ≤ c` (de `2k ≤ 2c` y `ax28`/`le_of_mul_le_mul_left`), `x := sub w y` con `y ≤ w` (tricotomía + contradicción usando `expand_succ_succ` y `h_w_hi`). Verificación de `is_cantor` por cadena ecuacional `(x+y)(x+y+1) = w(w+1) = 2k`, luego `2k + 2y = 2c` vía `ax29_sub_witness` + `ax12_mul_distrib`. Sentencia ajustada a `liftTerm 0 (liftTerm 0 c)` bajo ∃∃; cierre con `ex_intro x; ex_intro y; simp + FOL.substTerm_liftTerm/liftLift`.
+
+- **2026-05-27 — Infraestructura de resta añadida**: `sub_sym`, `def sub (a b)`, `ax29_sub_witness : ∀ a b, b ≤ a → b + (a − b) = a`. Permite cerrar `cantor_surjectivity` sin postular axiomas adicionales del estilo `sub_zero`/`sub_succ` (la unicidad determinada por el axioma testigo basta).
 
 - **2026-05-27 — Block4_C5 completo (0 sorrys)**: Demostrados `sq_2w_plus_1`, `w_w1_le_2c_iff_sq_2w1_le_8c1`, `mono_w_w1`, `h_sq_2w1_le_sq_s`, `h_existence_part2` (este último por contradicción reusando el iff). Sentencia de `lemma_C5` corregida a `liftTerm 0 c` (era bare `c`, mal-formada en De Bruijn) y cerrada con `ex_intro w`. Eliminado `h_uniqueness` (código muerto: la meta es `∃` no `∃!`). Exportados además `lemma_C5_unique` y `cantor_bounds`.
 
@@ -58,16 +62,9 @@
 
 ## Pending Work
 
-### Block4_C6_C7.lean (1 sorry)
-
-- **`cantor_surjectivity`**: BLOQUEADO sin infraestructura de resta. `x_of_c`/`y_of_c` están como placeholders. Necesita:
-  1. Símbolo y axiomas de resta (`sub_zero`, `sub_succ`, y un axioma testigo `add b (sub a b) =eq a` cuando `b ≤ a`).
-  2. Lema `sub_mul_two`: `sub (mul two a) (mul two b) =eq mul two (sub a b)`.
-  3. Construcción: `y = sub c k` donde `k` viene de `parity_lemma w` (cantor_poly par), `x = sub w y`.
-
 ### Block5.lean (5 sorrys)
 
-`mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`. Stub puro — depende de cantor_surjectivity + cantor_uniqueness (esta última ya disponible).
+`mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`. Stub puro — toda la infraestructura ya está disponible (`cantor_surjectivity` + `cantor_uniqueness` + `ax22_cantor_proj_exists`/`ax23_cantor_proj_uniq`).
 
 ### Block6.lean (7 sorrys)
 

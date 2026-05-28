@@ -111,30 +111,167 @@ def w_of_c (c : Term) : Term := w_candidate c
 def y_of_c (c : Term) : Term := sub c (div2 (mul (w_candidate c) (succ (w_candidate c))))
 def x_of_c (c : Term) : Term := sub (w_candidate c) (y_of_c c)
 
--- Teo C6: ∀ c, ∃ x, ∃ y, Cantor(x,y,c) (Sobreyectividad)
--- ESQUEMA DE PRUEBA (infraestructura ahora disponible — pendiente de redacción):
---   1. `cantor_uniqueness` + `lemma_C5 c` ⟹ obtenemos `w` con bounds en `h_w`.
---   2. `parity_lemma w` ⟹ ∃ k, w(w+1) = 2k. ex_elim para nombrar k, h_k.
---   3. Definimos y := sub c k. De ax29_sub_witness con (a := c, b := k):
---        si k ≤ c entonces k + (c − k) = c, i.e. k + y = c, i.e. 2k + 2y = 2c.
---      Para `k ≤ c`: de h_w.lo (w(w+1) ≤ 2c) y h_k (w(w+1) = 2k) ⟹ 2k ≤ 2c,
---      y por `le_of_mul_le_mul_left` (Block4_C5 exportado): k ≤ c.
---   4. Definimos x := sub w y. De ax29 con (a := w, b := y) y «y ≤ w»
---      (que se sigue de 2y < 2(w+1) usando h_w.hi y expand_succ_succ):
---      x + y = w.
---   5. Verificamos `is_cantor x y c`, i.e. 2c =eq (x+y)(x+y+1) + 2y:
---        (x+y)(x+y+1) = w(w+1) = 2k  [usando (4) y h_k]
---        2k + 2y = 2c                [por construcción en (3)]
---   6. `ex_intro x (ex_intro y ...)` cierra (cuidando los lifts en el ∃∃).
---
--- Infraestructura ya disponible para esta prueba:
---   - `lemma_C5`, `cantor_bounds`, `lemma_C5_unique` (Block4_C5)
---   - `parity_lemma` (Block4)
---   - `sub`, `ax29_sub_witness` (Axioms.lean)
---   - `add_left_cancel` (este módulo, ax27)
---   - `le_of_mul_le_mul_left`, `le_mul_left`, `eq_congr_*` (exportados)
-theorem cantor_surjectivity (c : Term) : Γ ⊢ ex (ex (is_cantor (.var 1) (.var 0) c)) := by
-  sorry
+-- Teo C6 (Sobreyectividad de Cantor): ∀ c, ∃ x, ∃ y, Cantor(x,y,c).
+-- Nota: `c` aparece como `liftTerm 0 (liftTerm 0 c)` bajo el doble binder ∃∃
+-- (forma De Bruijn correcta; al instanciar con `ex_intro x` luego `ex_intro y`,
+--  ambos lifts se cancelan vía `FOL.substTerm_liftTerm` y `FOL.substTerm_liftLift`).
+theorem cantor_surjectivity (c : Term) :
+    Γ ⊢ ex (ex (is_cantor (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 c)))) := by
+  have h_ax12 := ax (by simp [axioms] : ax12_mul_distrib ∈ axioms)
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  have h_ax29 := ax (by simp [axioms] : ax29_sub_witness ∈ axioms)
+  -- ============================================================
+  -- Paso 1: extraer w con cotas C5
+  -- ============================================================
+  have h_C5 := lemma_C5 c
+  apply ex_elim h_C5
+  intro w h_w_raw
+  simp [substFormula, substTerm, substTerms, land, le, lt, mul, succ,
+        FOL.substTerm_liftTerm] at h_w_raw
+  -- h_w_raw : land (le (mul w (succ w)) (mul two c))
+  --                (lt (mul two c) (mul (succ w) (succ (succ w))))
+  have h_w_lo : Γ ⊢ le (mul w (succ w)) (mul two c) := Axioms.and_elim_left h_w_raw
+  have h_w_hi : Γ ⊢ lt (mul two c) (mul (succ w) (succ (succ w))) :=
+    Axioms.and_elim_right h_w_raw
+  -- ============================================================
+  -- Paso 2: extraer k tal que w(w+1) = 2k (parity_lemma)
+  -- ============================================================
+  have h_par := parity_lemma w
+  apply ex_elim h_par
+  intro k h_k_raw
+  simp [substFormula, substTerm, substTerms, mul, succ,
+        FOL.substTerm_liftTerm] at h_k_raw
+  -- h_k_raw : mul w (succ w) =eq mul two k
+  -- ============================================================
+  -- Paso 3: k ≤ c y derivar 2k + 2y = 2c donde y = sub c k
+  -- ============================================================
+  have h_2k_le_2c : Γ ⊢ le (mul two k) (mul two c) :=
+    le_rewrite h_w_lo h_k_raw (eq_refl _)
+  have h_2_pos : Γ ⊢ lt zero two := lt_zero_succ one
+  have h_k_le_c : Γ ⊢ le k c := le_of_mul_le_mul_left h_2k_le_2c h_2_pos
+  -- ax29 (a:=c, b:=k): k ≤ c ⇒ k + (c − k) = c
+  have h_k_plus_y_eq_c : Γ ⊢ (add k (sub c k) =eq c) := by
+    have h_imp : Γ ⊢ (le k c ⇒ (add k (sub c k) =eq c)) := by
+      have h := spec (spec h_ax29 c) k
+      simp [substFormula, substTerm, substTerms, le, lt, add, sub,
+            liftTerm, liftTerms, FOL.substTerm_liftTerm,
+            FOL.substTerm_liftLift] at h
+      exact h
+    exact mp h_imp h_k_le_c
+  -- 2·(k + y) = 2k + 2y  [ax12 distribución]
+  have h_two_dist : Γ ⊢
+      (mul two (add k (sub c k)) =eq add (mul two k) (mul two (sub c k))) := by
+    have h := spec (spec (spec h_ax12 two) k) (sub c k)
+    simp [substFormula, substTerm, substTerms, mul, add, sub,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftLift] at h
+    exact h
+  -- 2·(k+y) = 2c (multiplicando la igualdad k+y=c por 2 a la izquierda)
+  have h_2_kpy_eq_2c : Γ ⊢ (mul two (add k (sub c k)) =eq mul two c) :=
+    eq_congr_mul_left h_k_plus_y_eq_c
+  -- 2k + 2y = 2c
+  have h_2k_plus_2y_eq_2c : Γ ⊢ (add (mul two k) (mul two (sub c k)) =eq mul two c) :=
+    FOL.derive_eq_trans (eq_symm h_two_dist) h_2_kpy_eq_2c
+  -- ============================================================
+  -- Paso 4: y ≤ w (por tricotomía y contradicción usando h_w_hi)
+  -- ============================================================
+  have h_y_le_w : Γ ⊢ le (sub c k) w := by
+    have h_tric : Γ ⊢ (lt (sub c k) w ∨ (sub c k =eq w) ∨ lt w (sub c k)) := by
+      have h := spec (spec h_ax19 (sub c k)) w
+      simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at h
+      exact h
+    apply Axioms.or_elim h_tric
+    · intro h_lt; exact Axioms.or_intro_left h_lt
+    · intro h23
+      apply Axioms.or_elim h23
+      · intro h_eq; exact Axioms.or_intro_right h_eq
+      · intro h_w_lt_y
+        -- w < y ⇒ succ w ≤ y ⇒ 2(succ w) ≤ 2y ⇒
+        --   w(w+1) + 2(succ w) ≤ w(w+1) + 2y = 2c
+        --   pero (w+1)(w+2) = w(w+1) + 2(succ w) y 2c < (w+1)(w+2) ⇒ contradicción
+        apply false_elim
+        have h_succ_w_le_y : Γ ⊢ le (succ w) (sub c k) := succ_le_of_lt h_w_lt_y
+        have h_2sw_le_2y : Γ ⊢ le (mul two (succ w)) (mul two (sub c k)) :=
+          le_mul_left h_succ_w_le_y
+        have h_chain : Γ ⊢ le
+            (add (mul w (succ w)) (mul two (succ w)))
+            (add (mul w (succ w)) (mul two (sub c k))) :=
+          le_add_const_of_le_left h_2sw_le_2y
+        -- (w+1)(w+2) =eq w(w+1) + 2(w+1)
+        have h_expand : Γ ⊢
+            (mul (succ w) (succ (succ w)) =eq add (mul w (succ w)) (mul two (succ w))) :=
+          expand_succ_succ w
+        -- add (mul w (succ w)) (mul two y) =eq mul two c
+        have h_rewrite_lhs : Γ ⊢
+            (add (mul w (succ w)) (mul two (sub c k)) =eq
+             add (mul two k) (mul two (sub c k))) :=
+          eq_congr_add_right h_k_raw
+        have h_eq_2c : Γ ⊢
+            (add (mul w (succ w)) (mul two (sub c k)) =eq mul two c) :=
+          FOL.derive_eq_trans h_rewrite_lhs h_2k_plus_2y_eq_2c
+        -- (w+1)(w+2) ≤ 2c
+        have h_ww1_le_2c : Γ ⊢ le (mul (succ w) (succ (succ w))) (mul two c) :=
+          le_rewrite h_chain (eq_symm h_expand) h_eq_2c
+        -- contradicción: 2c < (w+1)(w+2) ≤ 2c ⇒ 2c < 2c
+        have h_irr : Γ ⊢ neg (lt (mul two c) (mul two c)) := by
+          have h := spec h_ax18 (mul two c); simp [lt] at h; exact h
+        exact mp h_irr (lt_le_trans h_w_hi h_ww1_le_2c)
+  -- ============================================================
+  -- Paso 5: definir x = sub w y; derivar x + y = w; verificar is_cantor
+  -- ============================================================
+  -- ax29 (a:=w, b:=y): y ≤ w ⇒ y + (w − y) = w
+  have h_y_plus_x_eq_w : Γ ⊢ (add (sub c k) (sub w (sub c k)) =eq w) := by
+    have h_imp : Γ ⊢
+        (le (sub c k) w ⇒ (add (sub c k) (sub w (sub c k)) =eq w)) := by
+      have h := spec (spec h_ax29 w) (sub c k)
+      simp [substFormula, substTerm, substTerms, le, lt, add, sub,
+            liftTerm, liftTerms, FOL.substTerm_liftTerm,
+            FOL.substTerm_liftLift] at h
+      exact h
+    exact mp h_imp h_y_le_w
+  -- x + y = w  (conmutar)
+  have h_x_plus_y_eq_w : Γ ⊢ (add (sub w (sub c k)) (sub c k) =eq w) :=
+    FOL.derive_eq_trans (add_comm' (sub w (sub c k)) (sub c k)) h_y_plus_x_eq_w
+  -- cantor_poly x y =eq mul two c
+  -- (x+y)(x+y+1) =eq w(w+1) (congruencia con h_x_plus_y_eq_w)
+  have h_poly_left : Γ ⊢
+      (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))) =eq
+       mul w (succ w)) :=
+    FOL.derive_eq_trans (eq_congr_mul_right h_x_plus_y_eq_w)
+      (eq_congr_mul_left (eq_congr_succ h_x_plus_y_eq_w))
+  -- = 2k (vía h_k_raw)
+  have h_poly_left_2k : Γ ⊢
+      (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))) =eq
+       mul two k) :=
+    FOL.derive_eq_trans h_poly_left h_k_raw
+  -- cantor_poly x y =eq 2k + 2y
+  have h_cantor_poly_2k_2y : Γ ⊢
+      (add (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))))
+           (mul two (sub c k)) =eq
+       add (mul two k) (mul two (sub c k))) :=
+    eq_congr_add_right h_poly_left_2k
+  -- = mul two c
+  have h_cantor_eq : Γ ⊢
+      (add (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))))
+           (mul two (sub c k)) =eq
+       mul two c) :=
+    FOL.derive_eq_trans h_cantor_poly_2k_2y h_2k_plus_2y_eq_2c
+  -- is_cantor (sub w y) (sub c k) c := mul two c =eq cantor_poly (sub w y)(sub c k)
+  have h_is_cantor : Γ ⊢
+      (mul two c =eq
+       add (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))))
+           (mul two (sub c k))) :=
+    eq_symm h_cantor_eq
+  -- ============================================================
+  -- Paso 6: ex_intro x, ex_intro y; simp reduce el doble lift
+  -- ============================================================
+  apply ex_intro (sub w (sub c k))
+  apply ex_intro (sub c k)
+  simp [substFormula, substTerm, substTerms, is_cantor, cantor_poly,
+        mul, add, succ, two, one, zero, sub,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  exact h_is_cantor
 
 -- Conmutatividad de la suma (helper local).
 private theorem add_comm_c (a b : Term) : Γ ⊢ (add a b =eq add b a) := by

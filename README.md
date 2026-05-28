@@ -32,7 +32,7 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 28 a
 | `Minimal/Theorems/Block3.lean` | `Minimal.Theorems.Block3` | `Minimal.Axioms`, `Block1` | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
 | `Minimal/Theorems/Block4.lean` | `Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | ✅ Complete |
 | `Minimal/Theorems/Block4_C5.lean` | `Minimal.Theorems.Block4_C5` | `Block1`, `Block2`, `Block3` | ✅ Complete — `lemma_C5` (∃) + `lemma_C5_unique` + `cantor_bounds` |
-| `Minimal/Theorems/Block4_C6_C7.lean` | `Minimal.Theorems.Block4_C6_C7` | `Block1..4`, `Block4_C5` | 🔄 `add_left_cancel` ✅, `cantor_uniqueness` ✅, `cantor_surjectivity` ❌ (necesita resta) |
+| `Minimal/Theorems/Block4_C6_C7.lean` | `Minimal.Theorems.Block4_C6_C7` | `Block1..4`, `Block4_C5` | ✅ Complete — `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
 | `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1`, `Block3`, `Block4` | ❌ Stub — pares/proyecciones (5 sorrys) |
 | `Minimal/Theorems/Block6.lean` | `Minimal.Theorems.Block6` | `Block1`, `Block5` | ❌ Stub — listas (7 sorrys) |
 
@@ -152,4 +152,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-27 — Build ✅, 13 sorrys pendientes (1 en C6_C7, 5 en Block5, 7 en Block6). Los 5 `axiom` de Axioms.lean son meta-reglas, no sorrys.*
+*Last updated: 2026-05-27 — Build ✅, 12 sorrys pendientes (5 stubs Block5 + 7 stubs Block6). Block4_C6_C7 ya completo (cantor_surjectivity ✅). Los 5 `axiom` de Axioms.lean son meta-reglas, no sorrys.*
