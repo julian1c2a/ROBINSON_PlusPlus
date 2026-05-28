@@ -27,6 +27,8 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
+set_option linter.unusedSimpArgs false
+
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 
 /-!
@@ -94,20 +96,44 @@ theorem add_left_cancel {a b c : Term}
     exact h3
   exact mp h_imp h
 
--- Inverse functions (constructive definitions)
-def w_of_c (c : Term) : Term := sqrt (add (mul eight c) one)
-def y_of_c (c : Term) : Term := pred (pred (mul two c)) -- Placeholder, needs subtraction
-def x_of_c (c : Term) : Term := pred (w_of_c c) -- Placeholder, needs subtraction
+-- ============================================================================
+-- Inverse functions (constructive definitions using `sub` from Axioms.lean)
+-- ============================================================================
+-- `w_of_c c` recupera el `w` único del Lema C5: w = div2(pred(√(8c+1))).
+-- Coincide con `w_candidate` exportado por Block4_C5 (preferir aquel; este
+-- alias se mantiene por compatibilidad).
+def w_of_c (c : Term) : Term := w_candidate c
+
+-- Dado el `w` de C5 y `k` tal que w(w+1) = 2k (vía `parity_lemma`),
+-- definimos `y = c − k`, lo que da 2y = 2c − w(w+1) en el rango b ≤ a por ax29.
+-- En la prueba real, `k` se obtiene por `ex_elim (parity_lemma w)`; el alias
+-- a continuación es solo notacional para el caso «cerrado» en el que k = div2(w(w+1)).
+def y_of_c (c : Term) : Term := sub c (div2 (mul (w_candidate c) (succ (w_candidate c))))
+def x_of_c (c : Term) : Term := sub (w_candidate c) (y_of_c c)
 
 -- Teo C6: ∀ c, ∃ x, ∃ y, Cantor(x,y,c) (Sobreyectividad)
+-- ESQUEMA DE PRUEBA (infraestructura ahora disponible — pendiente de redacción):
+--   1. `cantor_uniqueness` + `lemma_C5 c` ⟹ obtenemos `w` con bounds en `h_w`.
+--   2. `parity_lemma w` ⟹ ∃ k, w(w+1) = 2k. ex_elim para nombrar k, h_k.
+--   3. Definimos y := sub c k. De ax29_sub_witness con (a := c, b := k):
+--        si k ≤ c entonces k + (c − k) = c, i.e. k + y = c, i.e. 2k + 2y = 2c.
+--      Para `k ≤ c`: de h_w.lo (w(w+1) ≤ 2c) y h_k (w(w+1) = 2k) ⟹ 2k ≤ 2c,
+--      y por `le_of_mul_le_mul_left` (Block4_C5 exportado): k ≤ c.
+--   4. Definimos x := sub w y. De ax29 con (a := w, b := y) y «y ≤ w»
+--      (que se sigue de 2y < 2(w+1) usando h_w.hi y expand_succ_succ):
+--      x + y = w.
+--   5. Verificamos `is_cantor x y c`, i.e. 2c =eq (x+y)(x+y+1) + 2y:
+--        (x+y)(x+y+1) = w(w+1) = 2k  [usando (4) y h_k]
+--        2k + 2y = 2c                [por construcción en (3)]
+--   6. `ex_intro x (ex_intro y ...)` cierra (cuidando los lifts en el ∃∃).
+--
+-- Infraestructura ya disponible para esta prueba:
+--   - `lemma_C5`, `cantor_bounds`, `lemma_C5_unique` (Block4_C5)
+--   - `parity_lemma` (Block4)
+--   - `sub`, `ax29_sub_witness` (Axioms.lean)
+--   - `add_left_cancel` (este módulo, ax27)
+--   - `le_of_mul_le_mul_left`, `le_mul_left`, `eq_congr_*` (exportados)
 theorem cantor_surjectivity (c : Term) : Γ ⊢ ex (ex (is_cantor (.var 1) (.var 0) c)) := by
-  -- The proof is constructive but highly complex.
-  -- 1. Use `lemma_C5` to get the unique `w`.
-  -- 2. Define `y` implicitly from `2c = w(w+1) + 2y`. This requires showing `w(w+1) <= 2c`
-  --    and that `2c - w(w+1)` is even.
-  -- 3. Define `x` implicitly from `w = x+y`.
-  -- 4. Verify that `is_cantor x y c` holds.
-  -- This proof is a major undertaking and is left as sorry for now.
   sorry
 
 -- Conmutatividad de la suma (helper local).

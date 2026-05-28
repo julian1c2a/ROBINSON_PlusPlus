@@ -20,6 +20,8 @@ open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
+set_option linter.unusedSimpArgs false
+
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
 /-!

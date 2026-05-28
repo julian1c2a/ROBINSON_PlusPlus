@@ -174,7 +174,7 @@ theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ ((succ a) ≤
       exact mp h_ax2_inst h_skp0
 
 -- Lema Auxiliar: ∀ n, 0 ≤ n
-private theorem zero_le (n : Term) : Γ ⊢ (zero ≤ n) := by
+theorem zero_le (n : Term) : Γ ⊢ (zero ≤ n) := by
   have h_ax2  := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
   have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
@@ -320,7 +320,7 @@ theorem le_trans {a b c : Term} (h_ab : Γ ⊢ (a ≤ b)) (h_bc : Γ ⊢ (b ≤ 
       exact Axioms.or_intro_right (eq_trans (eq_symm h_eq_ab) h_eq_bc)
 
 -- Lema Auxiliar: a ≤ b ∧ c > 0 ⇒ a*c ≤ b*c
-private theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ (a ≤ b)) (h_c_pos : Γ ⊢ lt zero c) :
+theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ (a ≤ b)) (h_c_pos : Γ ⊢ lt zero c) :
     Γ ⊢ ((mul a c) ≤ (mul b c)) := by
   have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_ax9  := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
@@ -431,7 +431,7 @@ private theorem mul_le_mono_right {a b c : Term} (h_le : Γ ⊢ (a ≤ b)) (h_c_
     exact Axioms.or_intro_right (eq_congr_mul_right h_eq_ab)
 
 -- Lema Auxiliar: a ≤ b ⇒ a² ≤ b²
-private theorem sq_le_mono {a b : Term} (h_le : Γ ⊢ (a ≤ b)) : Γ ⊢ ((sq a) ≤ (sq b)) := by
+theorem sq_le_mono {a b : Term} (h_le : Γ ⊢ (a ≤ b)) : Γ ⊢ ((sq a) ≤ (sq b)) := by
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   unfold sq
@@ -778,4 +778,7 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block2 (
   lt_le_trans
   le_lt_trans
   le_trans
+  zero_le
+  mul_le_mono_right
+  sq_le_mono
 )

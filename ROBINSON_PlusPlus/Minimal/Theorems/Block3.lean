@@ -21,11 +21,26 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 -- Block2 is not strictly needed for the first theorems, but will be for later ones.
 -- open ROBINSON_PlusPlus.Minimal.Theorems.Block2
 
+set_option linter.unusedSimpArgs false
+
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
 
 /-!
 ## BLOQUE III — div2 Y mod2
+
+**Nota de tamaño**: este módulo es deliberadamente extenso (~1900 líneas) porque
+el sistema **Minimal** no dispone de un esquema de inducción general. En lugar
+de probar `div2_succ_succ : div2 (σ(σ n)) = σ (div2 n)` para `n` arbitrario
+(que requeriría inducción), enumeramos los valores `div2_zero`, `div2_one`,
+`div2_two`, `div2_three`, `div2_four` … de uno en uno. Cada uno se reduce
+manualmente vía `ax17_div_mod_eq`, `ax_5_add_succ`, los teoremas de `Block1`,
+y arreglos de simp bajo binders.
+
+La única alternativa sin inducción sería postular `div2`/`mod2` como axiomas
+de comportamiento, lo cual contradice la filosofía Minimal (mínimo número de
+axiomas, máximo de derivaciones). Si en el futuro se migra a `Intermediate`
+con inducción restringida, este módulo se reduce a ~5 teoremas.
 -/
 
 -- The context for all theorems in this system is the set of axioms.

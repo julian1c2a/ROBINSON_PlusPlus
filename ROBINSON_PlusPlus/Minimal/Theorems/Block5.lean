@@ -22,6 +22,8 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4
 
+set_option linter.unusedSimpArgs false
+
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
 /-!

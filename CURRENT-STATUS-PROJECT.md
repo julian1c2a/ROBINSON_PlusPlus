@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-22
+**Last updated:** 2026-05-27
 **Author**: Julián Calderón Almendros
 
 ---
@@ -10,14 +10,16 @@
 | Metric | Value |
 |--------|-------|
 | Total modules | 9 |
-| Modules sin sorry | 4 / 9 |
-| Sorry activos (total) | 28 |
-| Total definitions | ~43 |
-| Build status | ✅ Passing (0 errores) |
+| Modules sin sorry | 6 / 9 |
+| Sorry reales (total) | 13 (cantor_surjectivity + 5 stubs Block5 + 7 stubs Block6) |
+| Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
+| Axiomas matemáticos | 29 (ax2–ax17, ax21–ax29, list/concat) |
+| Total definitions | ~52 |
+| Build status | ✅ Passing (0 errores, ~13 warnings sólo de sorry) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
-> **Nota**: Todos los módulos compilan sin errores. Los `sorry` son scaffolding de pruebas pendientes, no errores de tipado.
+> **Nota**: Todos los módulos compilan sin errores. Los 5 `axiom` declarations en `Axioms.lean` son meta-reglas de FOL (no provables, intencionales) y NO son `sorry`s.
 
 ---
 
@@ -25,52 +27,51 @@
 
 | Module | Sorry | Status |
 |--------|------:|--------|
-| `Minimal/Axioms.lean` | 5 | 🔶 Partial (meta-axioms: `imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
+| `Minimal/Axioms.lean` | 0 | ✅ Complete (5 `axiom` declarations son meta-reglas, no sorrys) |
 | `Minimal/Theorems/Block1.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | 0 | ✅ Complete |
-| `Minimal/Theorems/Block3.lean` | 0 | ✅ Complete |
+| `Minimal/Theorems/Block3.lean` | 0 | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
 | `Minimal/Theorems/Block4.lean` | 0 | ✅ Complete |
-| `Minimal/Theorems/Block4_C5.lean` | 8 | 🔄 In progress (Lema C5) |
-| `Minimal/Theorems/Block4_C6_C7.lean` | 3 | 🔄 In progress |
-| `Minimal/Theorems/Block5.lean` | 5 | ❌ Pending |
-| `Minimal/Theorems/Block6.lean` | 7 | ❌ Pending |
-| **Total** | **28** | |
+| `Minimal/Theorems/Block4_C5.lean` | 0 | ✅ Complete — `lemma_C5`, `lemma_C5_unique`, `cantor_bounds` |
+| `Minimal/Theorems/Block4_C6_C7.lean` | 1 | 🔄 `cantor_surjectivity` pendiente (infra `sub` ya en Axioms vía ax29) |
+| `Minimal/Theorems/Block5.lean` | 5 | ❌ Stub (pares/proyecciones) |
+| `Minimal/Theorems/Block6.lean` | 7 | ❌ Stub (listas) |
+| **Total** | **13** | |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
 ---
 
-## Recent Achievements (mayo 2026)
+## Recent Achievements
 
-- **Block4_C5.lean — compilación restaurada** (2026-05-22): Eliminados todos los errores de tipado del módulo (errores de `apply le_trans`, `Block2.Γ` vs `Block4_C5.Γ`, `neg_intro`, `Formula.forall_`, precedencia de `⊢` vs `≤`). El módulo ahora compila con 8 sorrys de scaffolding matemático pendiente. Build: ✅ exit code 0. Correcciones clave: `FOL.derive_eq_trans` para cadenas estándar a=b,b=c; `exact` en vez de `apply` para teoremas cross-módulo; paréntesis explícitos en tipos con `⊢ t ≤ t'`.
+- **2026-05-27 — Block4_C5 completo (0 sorrys)**: Demostrados `sq_2w_plus_1`, `w_w1_le_2c_iff_sq_2w1_le_8c1`, `mono_w_w1`, `h_sq_2w1_le_sq_s`, `h_existence_part2` (este último por contradicción reusando el iff). Sentencia de `lemma_C5` corregida a `liftTerm 0 c` (era bare `c`, mal-formada en De Bruijn) y cerrada con `ex_intro w`. Eliminado `h_uniqueness` (código muerto: la meta es `∃` no `∃!`). Exportados además `lemma_C5_unique` y `cantor_bounds`.
+
+- **2026-05-27 — Block4_C6_C7: `cantor_uniqueness` ✅**: Probado vía `cantor_bounds` + `lemma_C5_unique` + `add_left_cancel` + ax28. Helper local `add_comm_c`.
+
+- **2026-05-27 — Conflicto de merge en FOL resuelto**: `FOL/Theorems/Eq.lean` tenía marcadores `<<<<<<<`/`=======`/`>>>>>>>` sin resolver entre dos `mutual` blocks (`substTerm_liftTerm_succ` HEAD vs `substTerm_lift_comm` incoming). Conservados ambos. También arreglados errores menores en `FOL/Theorems/Quantifiers.lean` (sintaxis `<;> [tac; tac]` → `<;> first | tac | tac`).
 
 - **Block1–Block4 completados** (2026-05): Los cuatro bloques base (aritmética, raíz cuadrada, div2/mod2, auxiliares Cantor) están completamente probados sin sorrys.
 
 - **Block4_C6_C7.lean — `add_left_cancel`** (2026-05-11): Demostrado el teorema de cancelación por la izquierda. Lema A privado (`lift_01_eq_00`) para triple `spec` sobre axiomas `forall_3`.
 
-- **Block3.lean — `div2_*`, `mod2_*`** (2026-05-11/12): Todos los teoremas de div2 y mod2 demostrados. Correcciones clave: `eq_congr_mul_right` para `mul`; nombre calificado `ROBINSON_PlusPlus.Minimal.Axioms.or_elim`.
-
 ---
 
 ## Pending Work
 
-### Block4_C5.lean (8 sorrys)
+### Block4_C6_C7.lean (1 sorry)
 
-El Lema C5 establece `∀c, ∃!w, w(w+1) ≤ 2c < (w+1)(w+2)`. Los sorrys pendientes son:
+- **`cantor_surjectivity`**: BLOQUEADO sin infraestructura de resta. `x_of_c`/`y_of_c` están como placeholders. Necesita:
+  1. Símbolo y axiomas de resta (`sub_zero`, `sub_succ`, y un axioma testigo `add b (sub a b) =eq a` cuando `b ≤ a`).
+  2. Lema `sub_mul_two`: `sub (mul two a) (mul two b) =eq mul two (sub a b)`.
+  3. Construcción: `y = sub c k` donde `k` viene de `parity_lemma w` (cantor_poly par), `x = sub w y`.
 
-1. **`h_sq_2w1_le_sq_s`**: `(2w+1)² ≤ s²` donde `s = sqrt(8c+1)`. Requiere demostrar `2w+1 ≤ s` y la monotonía de cuadrados. Bloqueo: `substTerm 0 p_witness s` no se reduce por `simp` cuando `s` es variable libre bajo existencial.
-2. **`h_existence_part2`**: `2c < (w+1)(w+2)`. Requiere `w = div2(pred(sqrt(8c+1)))` y aritmética de cotas.
-3. **`h_uniqueness`**: Si `w'(w'+1) ≤ 2c < (w'+1)(w'+2)`, entonces `w' = w`. Prueba por tricotomía + monotonicidad de `g(n) = n(n+1)`. Bloqueo: `Block2.Γ` vs `Block4_C5.Γ` en `and_elim_*` y `lt_le_trans`.
-4. **Scaffolding final**: `∃!w` a partir de existencia + unicidad.
+### Block5.lean (5 sorrys)
 
-### Block4_C6_C7.lean (3 sorrys)
+`mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`. Stub puro — depende de cantor_surjectivity + cantor_uniqueness (esta última ya disponible).
 
-- `cantor_surjectivity`: Sobreyectividad de la función de Cantor; requiere aritmética de restas.
-- `cantor_uniqueness` (2 sorrys): Unicidad; estructura similar.
+### Block6.lean (7 sorrys)
 
-### Block5.lean (5 sorrys), Block6.lean (7 sorrys)
-
-Pares y listas; dependen de Block4_C5 y Block4_C6_C7 completos.
+`cons_neq_nil`, `cons_inj`, `in_cons_self_nil`, `in_cons_nil_imp_eq`, `concat_singletons`, `concat_assoc`, `in_concat_iff`. Stub puro — depende de Block5.
 
 ---
 

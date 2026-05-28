@@ -22,6 +22,8 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block2
 open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
+set_option linter.unusedSimpArgs false
+
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
 def Γ := axioms
@@ -34,7 +36,7 @@ def w_candidate (c : Term) : Term :=
 -- ============================================================
 
 -- 0 < σ(a): witness a gives 0 + σ(a) = σ(0 + a) = σ(a).
-private theorem lt_zero_succ (a : Term) : Γ ⊢ lt zero (succ a) := by
+theorem lt_zero_succ (a : Term) : Γ ⊢ lt zero (succ a) := by
   have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
   have h_0sa : axioms ⊢ (add zero (succ a) =eq succ a) := by
@@ -50,40 +52,8 @@ private theorem lt_zero_succ (a : Term) : Γ ⊢ lt zero (succ a) := by
     simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm]
     exact h_0sa)
 
--- 0 ≤ n for all n (re-proof of Block2 private zero_le).
-private theorem zero_le (n : Term) : Γ ⊢ (zero ≤ n) := by
-  have h_ax2  := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
-  have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
-  have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
-  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
-  have h_tric : Γ ⊢ (lt zero n ∨ (zero =eq n) ∨ lt n zero) := by
-    have h := spec (spec h_ax19 zero) n
-    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at h
-    exact h
-  apply Axioms.or_elim h_tric
-  · intro h_lt; exact Axioms.or_intro_left h_lt
-  · intro h23
-    apply Axioms.or_elim h23
-    · intro h_eq; exact Axioms.or_intro_right h_eq
-    · intro h_nlt0
-      apply false_elim
-      have hh := spec (spec h_ax13 n) zero
-      simp [substFormula, substTerm, substTerms, lt, add, succ, zero, iff,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
-      apply ex_elim (iff_mp hh h_nlt0); intro k h_k
-      simp [substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_k
-      have h_step : Γ ⊢ (add n (succ k) =eq succ (add n k)) := by
-        have hs := spec (spec h_ax5 n) k
-        simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hs
-        exact hs
-      have h_neq0 : Γ ⊢ neg (succ (add n k) =eq zero) := by
-        have hn := spec h_ax2 (add n k)
-        simp [succ] at hn
-        exact hn
-      exact mp h_neq0 (eq_trans h_step h_k)
-
 -- mul_lt_mono_right: a < b → 0 < c → a*c < b*c (re-proof of Block2 private).
-private theorem mul_lt_mono_right {a b c : Term} (h_lt : Γ ⊢ lt a b) (h_c_pos : Γ ⊢ lt zero c) :
+theorem mul_lt_mono_right {a b c : Term} (h_lt : Γ ⊢ lt a b) (h_c_pos : Γ ⊢ lt zero c) :
     Γ ⊢ lt (mul a c) (mul b c) := by
   have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_ax9  := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
@@ -169,35 +139,35 @@ private theorem mul_lt_mono_right {a b c : Term} (h_lt : Γ ⊢ lt a b) (h_c_pos
 -- ============================================================
 
 -- a * b = b * a  [ax10]
-private theorem mul_comm' (a b : Term) : Γ ⊢ (mul a b =eq mul b a) := by
+theorem mul_comm' (a b : Term) : Γ ⊢ (mul a b =eq mul b a) := by
   have h := spec (spec (ax (by simp [axioms] : ax10_mul_comm ∈ axioms)) a) b
   simp [substFormula, substTerm, substTerms, mul, liftTerm, liftTerms,
         FOL.substTerm_liftTerm] at h
   exact h
 
 -- (a * b) * c = a * (b * c)  [ax11]
-private theorem mul_assoc' (a b c : Term) : Γ ⊢ (mul (mul a b) c =eq mul a (mul b c)) := by
+theorem mul_assoc' (a b c : Term) : Γ ⊢ (mul (mul a b) c =eq mul a (mul b c)) := by
   have h := spec (spec (spec (ax (by simp [axioms] : ax11_mul_assoc ∈ axioms)) a) b) c
   simp [substFormula, substTerm, substTerms, mul, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h
   exact h
 
 -- a + b = b + a  [ax6]
-private theorem add_comm' (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
+theorem add_comm' (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
   have h := spec (spec (ax (by simp [axioms] : ax6_add_comm ∈ axioms)) a) b
   simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms,
         FOL.substTerm_liftTerm] at h
   exact h
 
 -- (a + b) + c = a + (b + c)  [ax7]
-private theorem add_assoc' (a b c : Term) : Γ ⊢ (add (add a b) c =eq add a (add b c)) := by
+theorem add_assoc' (a b c : Term) : Γ ⊢ (add (add a b) c =eq add a (add b c)) := by
   have h := spec (spec (spec (ax (by simp [axioms] : ax7_add_assoc ∈ axioms)) a) b) c
   simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h
   exact h
 
 -- a * (b + c) = a*b + a*c  [ax12]
-private theorem mul_distrib' (a b c : Term) :
+theorem mul_distrib' (a b c : Term) :
     Γ ⊢ (mul a (add b c) =eq add (mul a b) (mul a c)) := by
   have h := spec (spec (spec (ax (by simp [axioms] : ax12_mul_distrib ∈ axioms)) a) b) c
   simp [substFormula, substTerm, substTerms, mul, add, liftTerm, liftTerms,
@@ -205,7 +175,7 @@ private theorem mul_distrib' (a b c : Term) :
   exact h
 
 -- (a + b) * c = a*c + b*c  [right distributivity, via comm]
-private theorem mul_distrib_right' (a b c : Term) :
+theorem mul_distrib_right' (a b c : Term) :
     Γ ⊢ (mul (add a b) c =eq add (mul a c) (mul b c)) :=
   FOL.derive_eq_trans (mul_comm' (add a b) c)
     (FOL.derive_eq_trans (mul_distrib' c a b)
@@ -217,7 +187,7 @@ private theorem mul_distrib_right' (a b c : Term) :
 -- ============================================================
 
 -- σ(a) ≤ σ(b) → a ≤ b
-private theorem le_of_succ_le_succ {a b : Term} (h : Γ ⊢ ((succ a) ≤ (succ b))) : Γ ⊢ (a ≤ b) := by
+theorem le_of_succ_le_succ {a b : Term} (h : Γ ⊢ ((succ a) ≤ (succ b))) : Γ ⊢ (a ≤ b) := by
   have h_ax3  := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
   have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_ax6  := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
@@ -287,7 +257,7 @@ private theorem le_of_succ_le_succ {a b : Term} (h : Γ ⊢ ((succ a) ≤ (succ 
     exact mp h3 h_eq
 
 -- a ≤ b → σ(a) ≤ σ(b)
-private theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ ((succ a) ≤ (succ b)) := by
+theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ ((succ a) ≤ (succ b)) := by
   have h_ax5  := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_ax6  := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
@@ -350,7 +320,7 @@ private theorem succ_le_succ_of_le {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ 
 -- ============================================================
 
 -- a ≤ b → a + c ≤ b + c
-private theorem le_add_const_of_le {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ (add a c ≤ add b c) := by
+theorem le_add_const_of_le {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ (add a c ≤ add b c) := by
   have h_ax6  := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
   have h_ax7  := ax (by simp [axioms] : ax7_add_assoc ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
@@ -391,7 +361,7 @@ private theorem le_add_const_of_le {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ �
     exact Axioms.or_intro_right (eq_congr_add_right h_eq)
 
 -- a ≤ b → c + a ≤ c + b
-private theorem le_add_const_of_le_left {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ (add c a ≤ add c b) := by
+theorem le_add_const_of_le_left {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ (add c a ≤ add c b) := by
   have h_ax7  := ax (by simp [axioms] : ax7_add_assoc ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
   apply Axioms.or_elim h
@@ -422,7 +392,7 @@ private theorem le_add_const_of_le_left {a b c : Term} (h : Γ ⊢ (a ≤ b)) : 
     exact Axioms.or_intro_right (eq_congr_add_left h_eq)
 
 -- a < b → c + a < c + b
-private theorem lt_add_const_of_le_left {a b c : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (add c a) (add c b) := by
+theorem lt_add_const_of_le_left {a b c : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (add c a) (add c b) := by
   have h_ax7  := ax (by simp [axioms] : ax7_add_assoc ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
   have h_iff := spec (spec h_ax13 a) b
@@ -455,7 +425,7 @@ private theorem lt_add_const_of_le_left {a b c : Term} (h : Γ ⊢ lt a b) : Γ 
 -- ============================================================
 
 -- a*c ≤ b*c ∧ c > 0 → a ≤ b
-private theorem le_of_mul_le_mul_right {a b c : Term} (h_le : Γ ⊢ le (mul a c) (mul b c))
+theorem le_of_mul_le_mul_right {a b c : Term} (h_le : Γ ⊢ le (mul a c) (mul b c))
     (h_c_pos : Γ ⊢ lt zero c) : Γ ⊢ (a ≤ b) := by
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
@@ -479,7 +449,7 @@ private theorem le_of_mul_le_mul_right {a b c : Term} (h_le : Γ ⊢ le (mul a c
       exact mp h_irr h_self_lt
 
 -- c*a ≤ c*b ∧ c > 0 → a ≤ b
-private theorem le_of_mul_le_mul_left {a b c : Term} (h_le : Γ ⊢ le (mul c a) (mul c b))
+theorem le_of_mul_le_mul_left {a b c : Term} (h_le : Γ ⊢ le (mul c a) (mul c b))
     (h_c_pos : Γ ⊢ lt zero c) : Γ ⊢ (a ≤ b) := by
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   -- mul c a = mul a c, mul c b = mul b c
@@ -505,7 +475,7 @@ private theorem le_of_mul_le_mul_left {a b c : Term} (h_le : Γ ⊢ le (mul c a)
 -- ============================================================
 
 -- a < b → a² < b²
-private theorem sq_lt_mono {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ lt (sq a) (sq b) := by
+theorem sq_lt_mono {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ lt (sq a) (sq b) := by
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   unfold sq
@@ -571,7 +541,7 @@ private theorem sq_lt_mono {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ lt (sq a
 -- ============================================================
 
 -- a ≤ b → a*c ≤ b*c  (handles c = 0)
-private theorem le_mul_right {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mul a c) (mul b c) := by
+theorem le_mul_right {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mul a c) (mul b c) := by
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   have h_tric : Γ ⊢ (lt zero c ∨ (zero =eq c) ∨ lt c zero) := by
@@ -611,7 +581,7 @@ private theorem le_mul_right {a b c : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ le (
       exact false_elim (mp h_irr h_0lt0)
 
 -- x ≤ y → c*x ≤ c*y
-private theorem le_mul_left {x y c : Term} (h : Γ ⊢ (x ≤ y)) : Γ ⊢ le (mul c x) (mul c y) := by
+theorem le_mul_left {x y c : Term} (h : Γ ⊢ (x ≤ y)) : Γ ⊢ le (mul c x) (mul c y) := by
   have hr : Γ ⊢ le (mul x c) (mul y c) := le_mul_right h
   have hcx : Γ ⊢ (mul c x =eq mul x c) := mul_comm' c x
   have hcy : Γ ⊢ (mul c y =eq mul y c) := mul_comm' c y
@@ -625,7 +595,7 @@ private theorem le_mul_left {x y c : Term} (h : Γ ⊢ (x ≤ y)) : Γ ⊢ le (m
       (FOL.derive_eq_trans (FOL.derive_eq_trans hcx h_eq) (eq_symm hcy))
 
 -- a ≤ b → a*(a+1) ≤ b*(b+1)
-private theorem mono_w_w1 {a b : Term} (h_le : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mul a (succ a)) (mul b (succ b)) := by
+theorem mono_w_w1 {a b : Term} (h_le : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mul a (succ a)) (mul b (succ b)) := by
   have h1 : Γ ⊢ le (mul a (succ a)) (mul b (succ a)) := le_mul_right h_le
   have h2 : Γ ⊢ le (mul b (succ a)) (mul b (succ b)) := le_mul_left (succ_le_succ_of_le h_le)
   exact le_trans h1 h2
@@ -635,7 +605,7 @@ private theorem mono_w_w1 {a b : Term} (h_le : Γ ⊢ (a ≤ b)) : Γ ⊢ le (mu
 -- ============================================================
 
 -- Lema Auxiliar: ∀ n, 2*div2(n) ≤ n
-private theorem lemma_2_div2_le_n (n : Term) : Γ ⊢ le (mul two (div2 n)) n := by
+theorem lemma_2_div2_le_n (n : Term) : Γ ⊢ le (mul two (div2 n)) n := by
   have h_ax4  := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
@@ -678,7 +648,7 @@ private theorem lemma_2_div2_le_n (n : Term) : Γ ⊢ le (mul two (div2 n)) n :=
       exact h_sum_sz)
 
 -- p ≤ 2*div2(p) + 1 (needed for existence)
-private theorem p_le_two_div2p_plus_one (p : Term) : Γ ⊢ le p (add (mul two (div2 p)) one) := by
+theorem p_le_two_div2p_plus_one (p : Term) : Γ ⊢ le p (add (mul two (div2 p)) one) := by
   have h_ax4  := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
   have h_ax10 := ax (by simp [axioms] : ax10_mul_comm ∈ axioms)
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
@@ -724,7 +694,7 @@ private theorem p_le_two_div2p_plus_one (p : Term) : Γ ⊢ le p (add (mul two (
     exact Axioms.or_intro_right h_eq
 
 -- Lema Auxiliar: (2w)² = 4w²
-private theorem sq_mul_two (w : Term) : Γ ⊢ (sq (mul two w) =eq mul (mul two two) (sq w)) := by
+theorem sq_mul_two (w : Term) : Γ ⊢ (sq (mul two w) =eq mul (mul two two) (sq w)) := by
   unfold sq
   -- goal: mul (mul two w) (mul two w) =eq mul (mul two two) (mul w w)
   -- (2w)·2 = 2·(w·2) = 2·(2·w) = (2·2)·w
@@ -738,7 +708,7 @@ private theorem sq_mul_two (w : Term) : Γ ⊢ (sq (mul two w) =eq mul (mul two 
       (mul_assoc' (mul two two) w w))
 
 -- Lema Auxiliar: (2w+1)² = 4w² + 4w + 1
-private theorem sq_2w_plus_1 (w : Term) : Γ ⊢ (sq (add (mul two w) one) =eq
+theorem sq_2w_plus_1 (w : Term) : Γ ⊢ (sq (add (mul two w) one) =eq
     add (add (mul (mul two two) (sq w)) (mul (mul two two) w)) one) := by
   unfold sq
   -- Notation: A := mul two w, X := mul (mul two two) (sq w), M := mul (mul two two) w
@@ -799,7 +769,7 @@ private theorem sq_2w_plus_1 (w : Term) : Γ ⊢ (sq (add (mul two w) one) =eq
   exact FOL.derive_eq_trans hT1 hRe
 
 -- a ≤ b, a = a', b = b' → a' ≤ b'
-private theorem le_rewrite {a a' b b' : Term} (h : Γ ⊢ (a ≤ b))
+theorem le_rewrite {a a' b b' : Term} (h : Γ ⊢ (a ≤ b))
     (ha : Γ ⊢ (a =eq a')) (hb : Γ ⊢ (b =eq b')) : Γ ⊢ (a' ≤ b') := by
   apply Axioms.or_elim h
   · intro h_lt
@@ -811,7 +781,7 @@ private theorem le_rewrite {a a' b b' : Term} (h : Γ ⊢ (a ≤ b))
       (FOL.derive_eq_trans (FOL.derive_eq_trans (eq_symm ha) h_eq) hb)
 
 -- a+1 ≤ b+1 → a ≤ b
-private theorem le_add_one_cancel {x y : Term} (h : Γ ⊢ (add x one ≤ add y one)) : Γ ⊢ (x ≤ y) := by
+theorem le_add_one_cancel {x y : Term} (h : Γ ⊢ (add x one ≤ add y one)) : Γ ⊢ (x ≤ y) := by
   have hx : Γ ⊢ (succ x =eq add x one) := by
     have hh := spec teo_2_8 x
     simp [substFormula, substTerm, substTerms, succ, add] at hh
@@ -823,7 +793,7 @@ private theorem le_add_one_cancel {x y : Term} (h : Γ ⊢ (add x one ≤ add y 
   exact le_of_succ_le_succ (le_rewrite h (eq_symm hx) (eq_symm hy))
 
 -- Lema Auxiliar: w(w+1) ≤ 2c ↔ (2w+1)² ≤ 8c+1
-private theorem w_w1_le_2c_iff_sq_2w1_le_8c1 {w c : Term} :
+theorem w_w1_le_2c_iff_sq_2w1_le_8c1 {w c : Term} :
     (Γ ⊢ le (mul w (succ w)) (mul two c)) ↔ (Γ ⊢ le (sq (add (mul two w) one)) (add (mul eight c) one)) := by
   have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
   -- w(w+1) = w² + w
@@ -863,7 +833,7 @@ private theorem w_w1_le_2c_iff_sq_2w1_le_8c1 {w c : Term} :
     exact le_of_mul_le_mul_left h4 h_four_pos
 
 -- Lema Auxiliar: n ≥ 1 → √n > 0
-private theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ ⊢ lt zero (sqrt n) := by
+theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ ⊢ lt zero (sqrt n) := by
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   have h_lt_succ := lt_succ_sqrt_sq n
@@ -909,26 +879,8 @@ private theorem sqrt_of_ge_1_is_pos {n : Term} (h_n_ge_1 : Γ ⊢ le one n) : Γ
         exact h
       exact mp h_irr h_0_lt_0
 
--- Congruencia: pred respeta la igualdad (análogo a eq_congr_succ).
-private theorem eq_congr_pred {t₁ t₂ : Term} (h : Γ ⊢ (t₁ =eq t₂)) :
-    Γ ⊢ (pred t₁ =eq pred t₂) := by
-  let f : Formula := Formula.eq (pred (liftTerm 0 t₁)) (pred (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (pred t₁) (pred s) := by
-    intro s
-    simp only [f, substFormula, pred, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (pred t₁))
-
--- a ≤ b → a² ≤ b²
-private theorem sq_le_mono' {a b : Term} (h : Γ ⊢ (a ≤ b)) : Γ ⊢ le (sq a) (sq b) := by
-  apply Axioms.or_elim h
-  · intro h_lt; exact Axioms.or_intro_left (sq_lt_mono h_lt)
-  · intro h_eq
-    apply Axioms.or_intro_right
-    unfold sq
-    exact FOL.derive_eq_trans (eq_congr_mul_right h_eq) (eq_congr_mul_left h_eq)
-
 -- 0 < s → σ(pred s) = s
-private theorem succ_pred_of_pos {s : Term} (h_pos : Γ ⊢ lt zero s) : Γ ⊢ (succ (pred s) =eq s) := by
+theorem succ_pred_of_pos {s : Term} (h_pos : Γ ⊢ lt zero s) : Γ ⊢ (succ (pred s) =eq s) := by
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   have h_ax26 := ax (by simp [axioms] : ax26_pred_succ ∈ axioms)
   -- s ≠ 0
@@ -991,7 +943,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
         le_add_const_of_le h_2w_le_p
       have h_2w1_le_s : Γ ⊢ le (add (mul two w) one) s :=
         le_rewrite h_2w1_le_p1 (eq_refl _) h_p1_eq_s
-      exact sq_le_mono' h_2w1_le_s
+      exact sq_le_mono h_2w1_le_s
     exact le_trans h_sq_2w1_le_sq_s h_sq_s_le_8c1
   have h_existence_part2 : Γ ⊢ lt (mul two c) (mul (succ w) (succ (succ w))) := by
     let s := sqrt (add (mul eight c) one)
@@ -1027,7 +979,7 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
     have h_ss_le : Γ ⊢ le (succ s) (add (mul two (succ w)) one) :=
       le_rewrite (succ_le_succ_of_le h_s_le) (eq_refl _) (eq_symm H3)
     -- (σs)² ≤ (2(w+1)+1)²,  and  8c+1 < (σs)²
-    have h_sq_ss_le : Γ ⊢ le (sq (succ s)) (sq (add (mul two (succ w)) one)) := sq_le_mono' h_ss_le
+    have h_sq_ss_le : Γ ⊢ le (sq (succ s)) (sq (add (mul two (succ w)) one)) := sq_le_mono h_ss_le
     have h_8c1_lt : Γ ⊢ lt (add (mul eight c) one) (sq (succ s)) :=
       lt_succ_sqrt_sq (add (mul eight c) one)
     have h_upper : Γ ⊢ lt (add (mul eight c) one) (sq (add (mul two (succ w)) one)) :=
@@ -1104,7 +1056,7 @@ theorem lemma_C5_unique {c w w' : Term}
       exact mp h_irr h_chain
 
 -- a ≤ a + b
-private theorem le_self_add (a b : Term) : Γ ⊢ le a (add a b) := by
+theorem le_self_add (a b : Term) : Γ ⊢ le a (add a b) := by
   have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
   have h0 : Γ ⊢ le (add a zero) (add a b) := le_add_const_of_le_left (zero_le b)
   have h4 : Γ ⊢ (add a zero =eq a) := by
@@ -1114,12 +1066,12 @@ private theorem le_self_add (a b : Term) : Γ ⊢ le a (add a b) := by
   exact le_rewrite h0 h4 (eq_refl _)
 
 -- lt a b, a = a', b = b' → lt a' b'
-private theorem lt_rewrite {a a' b b' : Term} (h : Γ ⊢ lt a b)
+theorem lt_rewrite {a a' b b' : Term} (h : Γ ⊢ lt a b)
     (ha : Γ ⊢ (a =eq a')) (hb : Γ ⊢ (b =eq b')) : Γ ⊢ lt a' b' :=
   lt_le_trans (le_lt_trans (Axioms.or_intro_right (eq_symm ha)) h) (Axioms.or_intro_right hb)
 
 -- (w+1)(w+2) = w(w+1) + 2(w+1)
-private theorem expand_succ_succ (w : Term) :
+theorem expand_succ_succ (w : Term) :
     Γ ⊢ (mul (succ w) (succ (succ w)) =eq add (mul w (succ w)) (mul two (succ w))) := by
   have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
   have e1 : Γ ⊢ (mul (succ w) (succ (succ w)) =eq add (mul (succ w) (succ w)) (succ w)) := by
@@ -1192,8 +1144,35 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
 -- Exports
 export ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5 (
+  -- main theorems
   w_candidate
   lemma_C5
   lemma_C5_unique
   cantor_bounds
+  -- reusable order helpers
+  le_rewrite
+  lt_rewrite
+  le_self_add
+  le_add_one_cancel
+  le_add_const_of_le
+  le_add_const_of_le_left
+  lt_add_const_of_le_left
+  lt_zero_succ
+  le_of_succ_le_succ
+  succ_le_succ_of_le
+  succ_pred_of_pos
+  -- reusable arithmetic helpers
+  mul_lt_mono_right
+  le_mul_right
+  le_mul_left
+  le_of_mul_le_mul_right
+  le_of_mul_le_mul_left
+  sq_lt_mono
+  -- reusable ring algebra helpers
+  add_comm'
+  add_assoc'
+  mul_comm'
+  mul_assoc'
+  mul_distrib'
+  mul_distrib_right'
 )

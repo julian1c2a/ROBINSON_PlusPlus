@@ -7,6 +7,8 @@ License: MIT
 import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬ ⇒ ⇔ ∀. ∃. ⊥ ⊤ #
 import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
 
+set_option linter.unusedSimpArgs false
+
 namespace ROBINSON_PlusPlus.Minimal.Axioms
 
 -- ## Notations & local aliases
@@ -31,6 +33,7 @@ but it lacks a general induction principle.
 def succ_sym : String := "σ"
 def add_sym  : String := "+"
 def mul_sym  : String := "*"
+def sub_sym  : String := "−"   -- subtraction (monus): sub a b = max(a-b, 0)
 def sqrt_sym : String := "√"
 def div2_sym : String := "/₂"
 def mod2_sym : String := "%₂"
@@ -60,6 +63,7 @@ def zero : Term := .func zero_sym []
 def succ (t : Term)   : Term := .func succ_sym [t]
 def add (t₁ t₂ : Term) : Term := .func add_sym [t₁, t₂]
 def mul (t₁ t₂ : Term) : Term := .func mul_sym [t₁, t₂]
+def sub (t₁ t₂ : Term) : Term := .func sub_sym [t₁, t₂]
 def sqrt (t : Term)   : Term := .func sqrt_sym [t]
 def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
@@ -78,15 +82,33 @@ def two : Term := succ one
 def eight : Term := mul two (mul two two) -- 2*4
 
 -- Cantor pairing function components
+/-!
+Cantor's pairing function is defined as:
+  $π₁(x,y) = \frac { \frac {(x+y)(x+y+1)} {2} + y } {2}$
+  $π₂(x,y) = \frac { \frac {(x+y)(x+y+1)} {2} + y } {2} - (π₁(x,y) * 2)$
+-/
+
+/-!
+  $ \text{cantor_poly}(x,y) := (x + y) (x + y + 1) + 2y = 2c $  (definición de la relación Cantor(x,y,c))
+-/
 def cantor_poly (x y : Term) : Term :=
   add (mul (add x y) (succ (add x y))) (mul two y)
 
+/-!
+  $ \text{cantor_func}(x,y) := \frac { (x+y)(x+y+1) + 2y } {2} = c $  (definición de la función π₁(x,y))
+-/
 def cantor_func (x y : Term) : Term :=
   div2 (cantor_poly x y)
 
+/-!
+  $ \text{is_cantor}(x,y,c) := 2c = (x + y) (x + y + 1) + 2y $  (definición de la relación Cantor(x,y,c))
+-/
 def is_cantor (x y c : Term) : Formula :=
   mul two c =eq cantor_poly x y
 
+/-!
+  $ \text{pair}(x,y) := \pi_1(x,y) $  (definición de la función par(x,y))
+-/
 def pair (x y : Term) : Term :=
   cantor_func x y
 
@@ -353,6 +375,16 @@ def ax28_mul_two_cancel : Formula :=
     (mul two (.var 1) =eq mul two (.var 0)) ⇒ ((.var 1) =eq (.var 0))
   )
 
+-- Ax 29 (sub_witness): ∀ a b, b ≤ a → b + (a − b) = a
+-- Axioma testigo para la resta truncada (monus). En sistemas con inducción es
+-- teorema (induc. sobre b junto con sub_zero/sub_succ); en Minimal se postula.
+-- Determina `sub` salvo equivalencia en el rango b ≤ a; fuera del rango se deja
+-- sin especificar (la formulación `sub a b` para `b > a` no se usa en el proyecto).
+def ax29_sub_witness : Formula :=
+  forall_2 (
+    le (.var 0) (.var 1) ⇒ (add (.var 0) (sub (.var 1) (.var 0)) =eq (.var 1))
+  )
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -388,7 +420,8 @@ def axioms : List Formula := [
   ax_C1_concat_nil,
   ax_C2_concat_cons,
   ax27_add_left_cancel, -- teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 (sorry)
-  ax28_mul_two_cancel   -- teorema en sistemas con inducción; `teo_2_11` en Block1
+  ax28_mul_two_cancel,  -- teorema en sistemas con inducción; `teo_2_11` en Block1
+  ax29_sub_witness      -- axioma testigo de la resta truncada (monus)
 ]
 
 -- ## Helper Theorems
@@ -437,6 +470,16 @@ theorem eq_congr_succ {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ �
     simp only [f, substFormula, succ, substTerm, substTerms,
                FOL.substTerm_liftTerm, if_true]
   exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (succ t₁))
+
+/-- Congruencia: pred respeta la igualdad (análogo a `eq_congr_succ`). -/
+theorem eq_congr_pred {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
+    Γ ⊢ (pred t₁ ≐ pred t₂) := by
+  let f : Formula := Formula.eq (pred (liftTerm 0 t₁)) (pred (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (pred t₁) (pred s) := by
+    intro s
+    simp only [f, substFormula, pred, substTerm, substTerms,
+               FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (pred t₁))
 
 -- ## Additional Proof Helpers
 
