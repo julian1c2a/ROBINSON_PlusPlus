@@ -55,7 +55,7 @@ theorem mod2_of_even {n k : Term} (h : Γ ⊢ (n =eq mul two k)) : Γ ⊢ (mod2 
 -- Idea: cantor_poly es par (cantor_poly_is_even) ⇒ mod2 = 0 ⇒ por ax17
 -- div2(cantor_poly)·2 = cantor_poly, y mul_comm da 2·div2(cantor_poly) = cantor_poly.
 -- Por definición pair x y = div2 (cantor_poly x y).
-private theorem is_cantor_pair (x y : Term) :
+theorem is_cantor_pair (x y : Term) :
     Γ ⊢ (mul two (pair x y) =eq cantor_poly x y) := by
   -- 1. cantor_poly x y es par: ∃ k, cantor_poly x y =eq mul two k
   have h_even := cantor_poly_is_even x y
@@ -160,6 +160,8 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
 -- Exports
 export ROBINSON_PlusPlus.Minimal.Theorems.Block5 (
+  mod2_of_even
+  is_cantor_pair
   proj1_pair_eq_x
   proj2_pair_eq_y
   pair_proj_eq_c

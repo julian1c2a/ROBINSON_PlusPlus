@@ -11,7 +11,7 @@
 |--------|-------|
 | Total modules | 9 |
 | Modules sin sorry | 8 / 9 |
-| Sorry reales (total) | 7 (todos en Block6 — listas) |
+| Sorry reales (total) | 2 (concat_assoc, in_concat_iff — ambos requieren inducción) |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
 | Axiomas matemáticos | 29 (ax2–ax17, ax21–ax29, list/concat) |
 | Total definitions | ~52 |
@@ -34,15 +34,17 @@
 | `Minimal/Theorems/Block4.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block4_C5.lean` | 0 | ✅ Complete — `lemma_C5`, `lemma_C5_unique`, `cantor_bounds` |
 | `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
-| `Minimal/Theorems/Block5.lean` | 0 | ✅ `mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj` |
-| `Minimal/Theorems/Block6.lean` | 7 | ❌ Stub (listas) |
-| **Total** | **7** | |
+| `Minimal/Theorems/Block5.lean` | 0 | ✅ `mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
+| `Minimal/Theorems/Block6.lean` | 2 | 🔄 5/7 probados; `concat_assoc` y `in_concat_iff` requieren inducción genuina sobre L |
+| **Total** | **2** | |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
 ---
 
 ## Recent Achievements
+
+- **2026-05-27 — Block6 5/7 (sólo quedan los inductivos)**: Probados `cons_neq_nil` (vía ax_L0 + `is_cantor_pair` + teo_2_9 + ax9/ax5 + ax2), `cons_inj` (vía ax_L0 + `pair_inj` + ax3), `in_cons_self_nil` y `in_cons_nil_imp_eq` (vía ax_L2 triple-spec + ax_L1 para el caso falso), y `concat_singletons` (vía ax_C1 + ax_C2 + helper `eq_congr_cons_right`). Quedan `concat_assoc` y `in_concat_iff`: no derivables en Minimal sin inducción sobre L. Patrón del proyecto: postular como axiomas (candidatos a `ax_C3_concat_assoc` y `ax_L3_in_concat_iff`).
 
 - **2026-05-27 — Block5 COMPLETO (0 sorrys)**: Probados `mod2_of_even` (vía ax24), `proj1_pair_eq_x`, `proj2_pair_eq_y` (vía `cantor_uniqueness` + ax22 + lema clave `is_cantor_pair`), `pair_proj_eq_c` (vía `cantor_injective_c` + ax22 + `is_cantor_pair`), y `pair_inj` (vía `cantor_uniqueness` tras `eq_congr_mul_left` para transportar al mismo `c = pair x y`). Lema clave nuevo `is_cantor_pair (x y) : mul two (pair x y) =eq cantor_poly x y` derivado de `cantor_poly_is_even` + `mod2_of_even` + ax17 + ax4 + `mul_comm'`.
 
@@ -64,9 +66,9 @@
 
 ## Pending Work
 
-### Block6.lean (7 sorrys)
+### Block6.lean (2 sorrys)
 
-`cons_neq_nil`, `cons_inj`, `in_cons_self_nil`, `in_cons_nil_imp_eq`, `concat_singletons`, `concat_assoc`, `in_concat_iff`. Stub puro — depende de Block5.
+`concat_assoc` y `in_concat_iff` — ambos requieren **inducción genuina sobre L**, no derivables en Minimal. Candidatos a postularse como axiomas (siguiendo el patrón de ax21/ax24/ax27/ax28). Los otros 5 teoremas (`cons_neq_nil`, `cons_inj`, `in_cons_self_nil`, `in_cons_nil_imp_eq`, `concat_singletons`) ya probados.
 
 ---
 
