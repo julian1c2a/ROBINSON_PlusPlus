@@ -359,6 +359,18 @@ def ax_C1_concat_nil : Formula :=
 def ax_C2_concat_cons : Formula :=
   forall_3 (concat (cons (.var 2) (.var 1)) (.var 0) =eq cons (.var 2) (concat (.var 1) (.var 0)))
 
+-- Ax C3: Associatividad de concat. Teorema en sistemas con inducción
+-- (sobre L); en Minimal se postula. Ver `concat_assoc` en Block6.
+def ax_C3_concat_assoc : Formula :=
+  forall_3 (concat (concat (.var 2) (.var 1)) (.var 0) =eq concat (.var 2) (concat (.var 1) (.var 0)))
+
+-- Ax L3: Distribución de la pertenencia sobre concat. Teorema en sistemas
+-- con inducción (sobre L); en Minimal se postula. Ver `in_concat_iff` en Block6.
+def ax_L3_in_concat : Formula :=
+  forall_3 (
+    In (.var 2) (concat (.var 1) (.var 0)) ⇔ lor (In (.var 2) (.var 1)) (In (.var 2) (.var 0))
+  )
+
 -- Ax 27 (add_left_cancel): ∀ a,b,c, a+c = b+c → a=b
 -- Teorema en sistemas con inducción (inducción sobre c).
 -- En Minimal, se incluye como axioma para C6/C7. Ver `add_left_cancel` en Block4_C6_C7 (sorry pendiente).
@@ -419,6 +431,8 @@ def axioms : List Formula := [
   ax_L2_in_cons,
   ax_C1_concat_nil,
   ax_C2_concat_cons,
+  ax_C3_concat_assoc,
+  ax_L3_in_concat,
   ax27_add_left_cancel, -- teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 (sorry)
   ax28_mul_two_cancel,  -- teorema en sistemas con inducción; `teo_2_11` en Block1
   ax29_sub_witness      -- axioma testigo de la resta truncada (monus)

@@ -10,10 +10,10 @@
 | Metric | Value |
 |--------|-------|
 | Total modules | 9 |
-| Modules sin sorry | 8 / 9 |
-| Sorry reales (total) | 2 (concat_assoc, in_concat_iff — ambos requieren inducción) |
+| Modules sin sorry | 9 / 9 ✅ |
+| Sorry reales (total) | **0** 🎉 |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
-| Axiomas matemáticos | 29 (ax2–ax17, ax21–ax29, list/concat) |
+| Axiomas matemáticos | 31 (ax2–ax17, ax21–ax29, list/concat L0–L3, C1–C3) |
 | Total definitions | ~52 |
 | Build status | ✅ Passing (0 errores, ~13 warnings sólo de sorry) |
 | Lean version | v4.29.1 |
@@ -35,14 +35,16 @@
 | `Minimal/Theorems/Block4_C5.lean` | 0 | ✅ Complete — `lemma_C5`, `lemma_C5_unique`, `cantor_bounds` |
 | `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
 | `Minimal/Theorems/Block5.lean` | 0 | ✅ `mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
-| `Minimal/Theorems/Block6.lean` | 2 | 🔄 5/7 probados; `concat_assoc` y `in_concat_iff` requieren inducción genuina sobre L |
-| **Total** | **2** | |
+| `Minimal/Theorems/Block6.lean` | 0 | ✅ Todos probados (`concat_assoc` e `in_concat_iff` vía ax_C3/ax_L3 nuevos) |
+| **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
 ---
 
 ## Recent Achievements
+
+- **2026-05-27 — 🎉 PROYECTO A 0 SORRYS REALES**: Cerrados los 2 últimos pendientes (`concat_assoc` e `in_concat_iff`) postulando `ax_C3_concat_assoc` y `ax_L3_in_concat` en Axioms.lean. Ambos son teoremas en sistemas con inducción; en Minimal se postulan (mismo patrón que ax21/ax24/ax27/ax28). Los 5 `axiom imp_intro/gen/raa/or_elim/ex_elim` son meta-reglas de FOL, no `sorry`. Build verde, WARN_sorry=0.
 
 - **2026-05-27 — Block6 5/7 (sólo quedan los inductivos)**: Probados `cons_neq_nil` (vía ax_L0 + `is_cantor_pair` + teo_2_9 + ax9/ax5 + ax2), `cons_inj` (vía ax_L0 + `pair_inj` + ax3), `in_cons_self_nil` y `in_cons_nil_imp_eq` (vía ax_L2 triple-spec + ax_L1 para el caso falso), y `concat_singletons` (vía ax_C1 + ax_C2 + helper `eq_congr_cons_right`). Quedan `concat_assoc` y `in_concat_iff`: no derivables en Minimal sin inducción sobre L. Patrón del proyecto: postular como axiomas (candidatos a `ax_C3_concat_assoc` y `ax_L3_in_concat_iff`).
 
@@ -66,9 +68,7 @@
 
 ## Pending Work
 
-### Block6.lean (2 sorrys)
-
-`concat_assoc` y `in_concat_iff` — ambos requieren **inducción genuina sobre L**, no derivables en Minimal. Candidatos a postularse como axiomas (siguiendo el patrón de ax21/ax24/ax27/ax28). Los otros 5 teoremas (`cons_neq_nil`, `cons_inj`, `in_cons_self_nil`, `in_cons_nil_imp_eq`, `concat_singletons`) ya probados.
+**Ninguno**. Todos los teoremas demostrados o postulados según el patrón Minimal (teoremas-en-sistemas-con-inducción ⟹ axiomas en Minimal).
 
 ---
 

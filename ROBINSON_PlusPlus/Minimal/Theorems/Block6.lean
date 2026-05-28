@@ -210,19 +210,27 @@ theorem concat_singletons (x y : Term) :
   exact FOL.derive_eq_trans h_c2 (eq_congr_cons_right x h_c1)
 
 -- Teo L7: (L ⊕ M) ⊕ N = L ⊕ (M ⊕ N)
--- NO DEMOSTRABLE en Minimal (sin inducción): requiere inducción sobre la estructura de L.
--- En sistemas con inducción es teorema; en Minimal habría que postularlo como axioma
--- (siguiendo el patrón de ax21, ax24, ax27, ax28). Dejado como sorry pendiente.
+-- Postulado en Minimal como ax_C3_concat_assoc (siguiendo el patrón de
+-- ax21/ax24/ax27/ax28: teoremas en sistemas con inducción, axiomas en Minimal).
 theorem concat_assoc (L M N : Term) :
     Γ ⊢ (concat (concat L M) N =eq concat L (concat M N)) := by
-  sorry
+  have h_axC3 := ax (by simp [axioms] : ax_C3_concat_assoc ∈ axioms)
+  have hh := spec (spec (spec h_axC3 L) M) N
+  simp [substFormula, substTerm, substTerms, concat, nil, zero,
+        liftTerm, liftTerms, FOL.substTerm_liftTerm,
+        FOL.substTerm_liftLift] at hh
+  exact hh
 
 -- Teo L8: In(x, L ⊕ M) ⇔ In(x,L) ∨ In(x,M)
--- NO DEMOSTRABLE en Minimal (sin inducción): requiere inducción sobre L.
--- Igual que concat_assoc, candidato a postularse como axioma en Minimal.
+-- Postulado en Minimal como ax_L3_in_concat (requiere inducción sobre L).
 theorem in_concat_iff (x L M : Term) :
     Γ ⊢ In x (concat L M) ⇔ lor (In x L) (In x M) := by
-  sorry
+  have h_axL3 := ax (by simp [axioms] : ax_L3_in_concat ∈ axioms)
+  have hh := spec (spec (spec h_axL3 x) L) M
+  simp [substFormula, substTerm, substTerms, In, concat, nil, zero, lor, iff,
+        liftTerm, liftTerms, FOL.substTerm_liftTerm,
+        FOL.substTerm_liftLift] at hh
+  exact hh
 
 end ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
