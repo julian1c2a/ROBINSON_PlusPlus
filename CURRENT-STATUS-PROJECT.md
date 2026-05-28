@@ -10,8 +10,8 @@
 | Metric | Value |
 |--------|-------|
 | Total modules | 9 |
-| Modules sin sorry | 7 / 9 |
-| Sorry reales (total) | 12 (5 stubs Block5 + 7 stubs Block6) |
+| Modules sin sorry | 8 / 9 |
+| Sorry reales (total) | 7 (todos en Block6 — listas) |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
 | Axiomas matemáticos | 29 (ax2–ax17, ax21–ax29, list/concat) |
 | Total definitions | ~52 |
@@ -34,15 +34,17 @@
 | `Minimal/Theorems/Block4.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block4_C5.lean` | 0 | ✅ Complete — `lemma_C5`, `lemma_C5_unique`, `cantor_bounds` |
 | `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
-| `Minimal/Theorems/Block5.lean` | 5 | ❌ Stub (pares/proyecciones) |
+| `Minimal/Theorems/Block5.lean` | 0 | ✅ `mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj` |
 | `Minimal/Theorems/Block6.lean` | 7 | ❌ Stub (listas) |
-| **Total** | **12** | |
+| **Total** | **7** | |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
 ---
 
 ## Recent Achievements
+
+- **2026-05-27 — Block5 COMPLETO (0 sorrys)**: Probados `mod2_of_even` (vía ax24), `proj1_pair_eq_x`, `proj2_pair_eq_y` (vía `cantor_uniqueness` + ax22 + lema clave `is_cantor_pair`), `pair_proj_eq_c` (vía `cantor_injective_c` + ax22 + `is_cantor_pair`), y `pair_inj` (vía `cantor_uniqueness` tras `eq_congr_mul_left` para transportar al mismo `c = pair x y`). Lema clave nuevo `is_cantor_pair (x y) : mul two (pair x y) =eq cantor_poly x y` derivado de `cantor_poly_is_even` + `mod2_of_even` + ax17 + ax4 + `mul_comm'`.
 
 - **2026-05-27 — Block4_C6_C7 COMPLETO (0 sorrys)**: `cantor_surjectivity` cerrado. Construcción: `w` desde `lemma_C5`, `k` desde `parity_lemma w` (`w(w+1)=2k`), `y := sub c k` con `k ≤ c` (de `2k ≤ 2c` y `ax28`/`le_of_mul_le_mul_left`), `x := sub w y` con `y ≤ w` (tricotomía + contradicción usando `expand_succ_succ` y `h_w_hi`). Verificación de `is_cantor` por cadena ecuacional `(x+y)(x+y+1) = w(w+1) = 2k`, luego `2k + 2y = 2c` vía `ax29_sub_witness` + `ax12_mul_distrib`. Sentencia ajustada a `liftTerm 0 (liftTerm 0 c)` bajo ∃∃; cierre con `ex_intro x; ex_intro y; simp + FOL.substTerm_liftTerm/liftLift`.
 
@@ -61,10 +63,6 @@
 ---
 
 ## Pending Work
-
-### Block5.lean (5 sorrys)
-
-`mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`. Stub puro — toda la infraestructura ya está disponible (`cantor_surjectivity` + `cantor_uniqueness` + `ax22_cantor_proj_exists`/`ax23_cantor_proj_uniq`).
 
 ### Block6.lean (7 sorrys)
 
