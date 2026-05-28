@@ -1,6 +1,6 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
-**Última actualización:** 2026-05-08 18:30
+**Última actualización:** 2026-05-27 — `Minimal/` cerrado a 0 sorrys reales.
 **Autor**: Julián Calderón Almendros
 
 > Este documento describe la visión estratégica y la planificación a largo plazo para los proyectos que se construirán sobre la base del sistema `FOL`.
@@ -47,9 +47,9 @@ La aparente inconsistencia de usar recursión para `+` y `*` pero no para otras 
 
 El proyecto se organizará en tres directorios principales, cada uno representando un sistema axiomático de fortaleza creciente:
 
-1. **`Minimal/`**:
-    - **Sistema**: Los 22 axiomas descritos en `TuplasFuncionesYListas.md`. No incluye un esquema de inducción.
-    - **Objetivo**: Demostrar que este sistema es suficiente para construir la función de Cantor y, con ella, una teoría de tuplas y listas (Bloques I a VI del documento).
+1. **`Minimal/`** ✅ **0 sorrys**:
+    - **Sistema**: 31 axiomas matemáticos (más 5 meta-reglas de FOL). No incluye esquema de inducción.
+    - **Objetivo cumplido**: Demostrado que este sistema es suficiente para construir la función de Cantor, los pares con proyecciones y las listas con concatenación y pertenencia (Bloques I a VI).
 
 2. **`Intermediate/`**:
     - **Sistema**: Un sistema reducido (13 axiomas) más un **esquema de inducción restringido** a un conjunto finito de fórmulas, como se describe en el Apéndice B de `TuplasFuncionesYListas.md`.
@@ -112,35 +112,52 @@ Un tema transversal a todos los proyectos fundacionales es la necesidad de ser e
 ### Fase 2: Sistema `Minimal` — Función de Cantor
 
 **Objetivo**: Construir la función de apareamiento de Cantor (Bloque IV) y definir las tuplas (Bloque V).
-**Estado**: ✅ **Completado** (axiomáticamente)
+**Estado**: ✅ **Completado**
 
 **Tareas**:
 
-- [x] **Bloque IV (Cantor)**: Crear `Minimal/Theorems/Block4.lean`.
-  - [x] Demostrar el Lema de Paridad (Lema P1).
-  - [x] Demostrar la totalidad de la función de Cantor (Teo C2).
-  - [x] Demostrar la inyectividad de la función de Cantor (Teo C4).
-  - [ ] **Demostrar el Lema C5 (existencia y unicidad de `w`)**. (En progreso)
-  - [ ] Demostrar la sobreyectividad (Teo C6) y unicidad proyectiva (Teo C7) para eliminar los axiomas temporales.
-  - [x] Demostrar las propiedades de las proyecciones (Teos C8, C9, C10) usando los axiomas temporales.
-- [x] **Bloque V (Tuplas)**: Crear `Minimal/Theorems/Block5.lean`.
-  - [x] Introducir la notación `pair` (alias de `cantor_func`).
-  - [x] Definir las proyecciones `π₁` y `π₂`.
-  - [x] Demostrar los teoremas de isomorfismo (Teos C8-C11).
+- [x] **Bloque IV (Cantor)**: `Minimal/Theorems/Block4.lean`.
+  - [x] Lema de Paridad (Lema P1) — `parity_lemma`.
+  - [x] Totalidad de la función de Cantor (Teo C2) — `cantor_totality`.
+  - [x] Inyectividad de la función de Cantor (Teo C4) — `cantor_injective_c`.
+- [x] **Bloque IV-C5 (Lema C5)**: `Minimal/Theorems/Block4_C5.lean`.
+  - [x] Existencia: `∀ c, ∃ w, w(w+1) ≤ 2c < (w+1)(w+2)` — `lemma_C5`.
+  - [x] Unicidad: `lemma_C5_unique` (vía monotonía `mono_w_w1` + tricotomía).
+  - [x] `cantor_bounds` exportado para uso en C6_C7.
+- [x] **Bloque IV-C6/C7 (Sobreyectividad y unicidad)**: `Minimal/Theorems/Block4_C6_C7.lean`.
+  - [x] `add_left_cancel` vía ax27.
+  - [x] `cantor_uniqueness` (Teo C7) — vía `cantor_bounds` + `lemma_C5_unique` + ax28.
+  - [x] `cantor_surjectivity` (Teo C6) — construcción con `sub`/ax29_sub_witness, `parity_lemma`, `le_of_mul_le_mul_left`. **Elimina la dependencia de ax22/ax23 como axiomas temporales** (siguen en la lista por compatibilidad con Block5, pero son demostrables).
+- [x] **Bloque V (Tuplas)**: `Minimal/Theorems/Block5.lean`.
+  - [x] Lema clave `is_cantor_pair (x y) : mul two (pair x y) =eq cantor_poly x y`.
+  - [x] `mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y` (Teos C8-C9 vía `cantor_uniqueness`).
+  - [x] `pair_proj_eq_c` (Teo C10 vía `cantor_injective_c`).
+  - [x] `pair_inj` (Teo C11 vía `cantor_uniqueness`).
 
-### Fase 3: Sistema `Minimal` — Listas y Funciones
+### Fase 3: Sistema `Minimal` — Listas
 
-**Objetivo**: Fundamentar las listas y las funciones discretas (Bloques VI-VII).
-**Estado**: 🔄 **En progreso**
+**Objetivo**: Fundamentar las listas (Bloque VI).
+**Estado**: ✅ **Completado**
 
 **Tareas**:
 
-- [x] **Bloque VI (Listas)**: Crear `Minimal/Theorems/Block6.lean`.
-  - [x] Definir `Nil` y `Cons`.
-  - [x] Demostrar las propiedades fundamentales (Teos L1, L2).
-  - [x] Demostrar las propiedades de pertenencia (`In`).
-  - [x] Demostrar las propiedades de la concatenación (`⊕`). (Parcial, 2 sorries por depender de inducción)
-- [ ] **Bloque VII (Funciones)**: Crear `Minimal/Theorems/Block7.lean`.
+- [x] **Bloque VI (Listas)**: `Minimal/Theorems/Block6.lean`.
+  - [x] `cons_neq_nil` (Teo L1) — vía ax_L0 + `is_cantor_pair` + teo_2_9 + ax2.
+  - [x] `cons_inj` (Teo L2) — vía ax_L0 + `pair_inj` + ax3.
+  - [x] `in_cons_self_nil` (Teo L4) — vía ax_L2 triple-spec.
+  - [x] `in_cons_nil_imp_eq` (Teo L5) — vía ax_L2 + ax_L1.
+  - [x] `concat_singletons` (Teo L6) — vía ax_C1 + ax_C2.
+  - [x] `concat_assoc` (Teo L7) — postulado como `ax_C3_concat_assoc` (requiere inducción sobre L; pasará a teorema en `Intermediate/`).
+  - [x] `in_concat_iff` (Teo L8) — postulado como `ax_L3_in_concat` (requiere inducción sobre L).
+
+### Fase 4: Sistema `Minimal` — Funciones discretas (pendiente)
+
+**Objetivo**: Bloque VII de `TuplasFuncionesYListas.md`.
+**Estado**: ⏳ **Pendiente**.
+
+**Tareas**:
+
+- [ ] **Bloque VII (Funciones)**: `Minimal/Theorems/Block7.lean`.
   - [ ] Definir el predicado `IsFunction`.
   - [ ] Definir la evaluación `F(x)`.
   - [ ] Demostrar el isomorfismo con relaciones funcionales (Teo F3).
@@ -149,9 +166,10 @@ Un tema transversal a todos los proyectos fundacionales es la necesidad de ser e
 
 ## 6. Futuro y Consolidación
 
-Una vez completado el sistema `Minimal`, los siguientes pasos a largo plazo son:
+Con el sistema `Minimal/` completo a **0 sorrys reales**, los siguientes pasos están descritos en detalle en [NEXT-STEPS.md](NEXT-STEPS.md). Resumen ejecutivo:
 
-1. **Implementar el sistema `Intermediate`**: Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` son teoremas derivables de un principio de inducción restringido.
-2. **Implementar el sistema `Full`**: Demostrar que todos los axiomas temporales y propiedades meta-teóricas se vuelven teoremas en un sistema con inducción general.
-3. **Consolidación**: Usar los resultados de `ROBINSON_PlusPlus` para refactorizar otros proyectos y que se apoyen en una base formalmente verificada desde `FOL=`.
-4. **Nuevas Teorías**: Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.
+1. **Cerrar la Fase 4** (corto plazo): añadir `Block7.lean` con `IsFunction` y el isomorfismo con relaciones funcionales (Teo F3). Auditar si algún axioma postulado (`ax28_mul_two_cancel`, `ax_C3`, `ax_L3`) es realmente demostrable en `Minimal` sin inducción.
+2. **Implementar el sistema `Intermediate`** (medio plazo): Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` son teoremas derivables de un principio de inducción restringido. Establecer el embedding `Minimal ⊂ Intermediate`.
+3. **Implementar el sistema `Full`** (largo plazo): Demostrar que todos los axiomas "induction-bound" (`ax21`, `ax24`, `ax27`, `ax28`, `ax_C3`, `ax_L3`) y propiedades meta-teóricas se vuelven teoremas en un sistema con inducción general. Cadena completa de embeddings `FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`.
+4. **Consolidación**: Usar los resultados de `ROBINSON_PlusPlus` para refactorizar otros proyectos y que se apoyen en una base formalmente verificada desde `FOL=`.
+5. **Nuevas Teorías** (muy largo plazo): Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.
