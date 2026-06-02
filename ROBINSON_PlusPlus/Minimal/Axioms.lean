@@ -37,8 +37,10 @@ def sub_sym  : String := "−"   -- subtraction (monus): sub a b = max(a-b, 0)
 def sqrt_sym : String := "√"
 def div2_sym : String := "/₂"
 def mod2_sym : String := "%₂"
-def proj1_sym : String := "π₁"
-def proj2_sym : String := "π₂"
+-- proj1_sym, proj2_sym ELIMINADOS 2026-06-02: proj1/proj2 ya no son símbolos
+-- opacos del lenguaje, sino defs concretas en Block4_C6_C7 (proj1 := x_of_c,
+-- proj2 := y_of_c). Con ello ax22 deja de ser necesario (proj_is_cantor lo
+-- demuestra como teorema).
 -- El símbolo de display del predecesor es "τ", pero los axiomas se nombran con el
 -- prefijo `pred_` (más legible que `tau_`). Ver ax25_pred_zero, ax26_pred_succ.
 def pred_sym : String := "τ"
@@ -67,8 +69,8 @@ def sub (t₁ t₂ : Term) : Term := .func sub_sym [t₁, t₂]
 def sqrt (t : Term)   : Term := .func sqrt_sym [t]
 def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
-def proj1 (t : Term)  : Term := .func proj1_sym [t]
-def proj2 (t : Term)  : Term := .func proj2_sym [t]
+-- proj1, proj2 ELIMINADOS 2026-06-02: ahora son defs concretas en Block4_C6_C7
+-- (proj1 := x_of_c, proj2 := y_of_c), no símbolos opacos.
 def pred (t : Term)    : Term := .func pred_sym [t]
 def cons (h t : Term) : Term := .func cons_sym [h, t]
 def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
@@ -293,26 +295,15 @@ def ax21_mod2_range : Formula :=
     (mod2 (.var 0) =eq zero) ∨ (mod2 (.var 0) =eq one)
   )
 
--- ### Axioms of Cantor Projections (temporary, until C6 and C7 are proven)
+-- ax22_cantor_proj_exists, ax23_cantor_proj_uniq ELIMINADOS 2026-06-02:
+-- ax22 era el axioma "Skolem" que ataba proj1/proj2 opacos a is_cantor.
+-- Ahora proj1/proj2 son defs concretas (= x_of_c/y_of_c) en Block4_C6_C7, y
+-- el contenido de ax22 se prueba como teorema `proj_is_cantor` allí mismo.
+-- ax23 era cantor_uniqueness reescrito como axioma; nunca usado en código.
 
--- Ax 22 (Surjectivity): ∀ c, ∃ x, y, Cantor(x, y, c)
--- We postulate the existence of projection functions π₁ and π₂ that witness this.
-def ax22_cantor_proj_exists : Formula :=
-  forall_ (
-    is_cantor (proj1 (.var 0)) (proj2 (.var 0)) (.var 0)
-  )
-
--- Ax 23 (Uniqueness): Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y'
 -- land/lor: versión funcional de ∧/∨ sobre Formula (para usar fuera de notación)
 def land (A B : Formula) : Formula := Formula.and A B
 def lor  (A B : Formula) : Formula := Formula.or  A B
-
-def ax23_cantor_proj_uniq : Formula :=
-  forall_ (forall_2 (forall_2 (
-    (land (is_cantor (.var 3) (.var 2) (.var 4)) (is_cantor (.var 1) (.var 0) (.var 4)))
-    ⇒
-    (land ((.var 3) =eq (.var 1)) ((.var 2) =eq (.var 0)))
-  )))
 
 -- Ax 24 (mod2 of even): ∀ n, k, n = 2*k → mod2(n) = 0
 -- Teorema en sistemas con inducción (caso base + paso inductivo en k).
@@ -419,8 +410,9 @@ def axioms : List Formula := [
   ax19_lt_trichotomy,
   -- ax20_eq_decidable es ahora el teorema `eq_decidable` en Block1.lean
   ax21_mod2_range,    -- teorema en sistemas con inducción; `mod2_range` en Block3 (sorry)
-  ax22_cantor_proj_exists,
-  ax23_cantor_proj_uniq,
+  -- ax22_cantor_proj_exists, ax23_cantor_proj_uniq ELIMINADOS 2026-06-02:
+  -- proj1/proj2 ahora son defs concretas (Block4_C6_C7); ax22 se demuestra
+  -- como teorema `proj_is_cantor`. ax23 era cantor_uniqueness reescrito (nunca usado).
   ax24_mod2_of_even,  -- teorema en sistemas con inducción; `mod2_of_even` en Block5 (sorry)
   ax25_pred_zero,
   ax26_pred_succ,

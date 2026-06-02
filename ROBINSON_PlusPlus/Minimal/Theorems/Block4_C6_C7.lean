@@ -111,43 +111,73 @@ def w_of_c (c : Term) : Term := w_candidate c
 def y_of_c (c : Term) : Term := sub c (div2 (mul (w_candidate c) (succ (w_candidate c))))
 def x_of_c (c : Term) : Term := sub (w_candidate c) (y_of_c c)
 
--- Teo C6 (Sobreyectividad de Cantor): ∀ c, ∃ x, ∃ y, Cantor(x,y,c).
--- Nota: `c` aparece como `liftTerm 0 (liftTerm 0 c)` bajo el doble binder ∃∃
--- (forma De Bruijn correcta; al instanciar con `ex_intro x` luego `ex_intro y`,
---  ambos lifts se cancelan vía `FOL.substTerm_liftTerm` y `FOL.substTerm_liftLift`).
-theorem cantor_surjectivity (c : Term) :
-    Γ ⊢ ex (ex (is_cantor (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 c)))) := by
+-- ============================================================================
+-- Proyecciones concretas (sustituyen a los símbolos opacos `proj1`/`proj2` y
+-- al axioma ax22_cantor_proj_exists eliminados de Axioms.lean el 2026-06-02).
+-- ============================================================================
+def proj1 (c : Term) : Term := x_of_c c
+def proj2 (c : Term) : Term := y_of_c c
+
+-- Teo: ∀ c, is_cantor (proj1 c) (proj2 c) c (= contenido del antiguo ax22,
+-- ahora demostrado constructivamente).
+-- Estructura idéntica a `cantor_surjectivity` pero con testigos concretos
+-- (w := w_candidate c, k := div2 (mul w (succ w))) en lugar de ex_elim.
+theorem proj_is_cantor (c : Term) :
+    Γ ⊢ (mul two c =eq cantor_poly (proj1 c) (proj2 c)) := by
+  have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
   have h_ax12 := ax (by simp [axioms] : ax12_mul_distrib ∈ axioms)
+  have h_ax17 := ax (by simp [axioms] : ax17_div_mod_eq ∈ axioms)
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
   have h_ax29 := ax (by simp [axioms] : ax29_sub_witness ∈ axioms)
   -- ============================================================
-  -- Paso 1: extraer w con cotas C5
+  -- Testigos concretos (matchean def proj1/proj2/x_of_c/y_of_c)
   -- ============================================================
-  have h_C5 := lemma_C5 c
-  apply ex_elim h_C5
-  intro w h_w_raw
-  simp [substFormula, substTerm, substTerms, land, le, lt, mul, succ,
-        FOL.substTerm_liftTerm] at h_w_raw
-  -- h_w_raw : land (le (mul w (succ w)) (mul two c))
-  --                (lt (mul two c) (mul (succ w) (succ (succ w))))
-  have h_w_lo : Γ ⊢ le (mul w (succ w)) (mul two c) := Axioms.and_elim_left h_w_raw
+  let w : Term := w_candidate c
+  let k : Term := div2 (mul w (succ w))
+  -- proj1 c = x_of_c c = sub w (sub c k), proj2 c = y_of_c c = sub c k (defeq)
+  -- Cambiamos el goal al despliegue concreto para no depender de unfold
+  show Γ ⊢ (mul two c =eq cantor_poly (sub w (sub c k)) (sub c k))
+  -- ============================================================
+  -- Paso 1: c5_bounds para w (sin ex_elim)
+  -- ============================================================
+  have h_bounds := c5_bounds c
+  have h_w_lo : Γ ⊢ le (mul w (succ w)) (mul two c) := Axioms.and_elim_left h_bounds
   have h_w_hi : Γ ⊢ lt (mul two c) (mul (succ w) (succ (succ w))) :=
-    Axioms.and_elim_right h_w_raw
+    Axioms.and_elim_right h_bounds
   -- ============================================================
-  -- Paso 2: extraer k tal que w(w+1) = 2k (parity_lemma)
+  -- Paso 2: mul w (succ w) = mul two k  (vía parity_lemma + mod2_of_even + ax17 + ax4)
   -- ============================================================
-  have h_par := parity_lemma w
-  apply ex_elim h_par
-  intro k h_k_raw
-  simp [substFormula, substTerm, substTerms, mul, succ,
-        FOL.substTerm_liftTerm] at h_k_raw
-  -- h_k_raw : mul w (succ w) =eq mul two k
+  have h_w_w1_eq_2k : Γ ⊢ (mul w (succ w) =eq mul two k) := by
+    have h_par := parity_lemma w
+    apply ex_elim h_par
+    intro k' h_k'_raw
+    simp [substFormula, substTerm, substTerms, mul, succ,
+          FOL.substTerm_liftTerm] at h_k'_raw
+    -- h_k'_raw : mul w (succ w) =eq mul two k'
+    have h_mod0 : Γ ⊢ (mod2 (mul w (succ w)) =eq zero) := mod2_of_even h_k'_raw
+    have h17 : Γ ⊢ (add (mul (div2 (mul w (succ w))) two) (mod2 (mul w (succ w)))
+                    =eq mul w (succ w)) := by
+      have hh := spec h_ax17 (mul w (succ w))
+      simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two,
+            FOL.substTerm_liftTerm] at hh
+      exact hh
+    have h_sum0 : Γ ⊢ (add (mul (div2 (mul w (succ w))) two) zero =eq mul w (succ w)) :=
+      FOL.derive_eq_trans (eq_symm (eq_congr_add_left h_mod0)) h17
+    have h4 : Γ ⊢ (add (mul (div2 (mul w (succ w))) two) zero
+                  =eq mul (div2 (mul w (succ w))) two) := by
+      have hh := spec h_ax4 (mul (div2 (mul w (succ w))) two)
+      simp [substFormula, substTerm, substTerms, add, zero, mul, div2, two] at hh
+      exact hh
+    have h_div_eq : Γ ⊢ (mul (div2 (mul w (succ w))) two =eq mul w (succ w)) :=
+      FOL.derive_eq_trans (eq_symm h4) h_sum0
+    exact eq_symm (FOL.derive_eq_trans
+      (mul_comm' two (div2 (mul w (succ w)))) h_div_eq)
   -- ============================================================
-  -- Paso 3: k ≤ c y derivar 2k + 2y = 2c donde y = sub c k
+  -- Paso 3: k ≤ c y derivar 2k + 2y = 2c donde y = sub c k  (idéntico a cantor_surjectivity)
   -- ============================================================
   have h_2k_le_2c : Γ ⊢ le (mul two k) (mul two c) :=
-    le_rewrite h_w_lo h_k_raw (eq_refl _)
+    le_rewrite h_w_lo h_w_w1_eq_2k (eq_refl _)
   have h_2_pos : Γ ⊢ lt zero two := lt_zero_succ one
   have h_k_le_c : Γ ⊢ le k c := le_of_mul_le_mul_left h_2k_le_2c h_2_pos
   -- ax29 (a:=c, b:=k): k ≤ c ⇒ k + (c − k) = c
@@ -206,7 +236,7 @@ theorem cantor_surjectivity (c : Term) :
         have h_rewrite_lhs : Γ ⊢
             (add (mul w (succ w)) (mul two (sub c k)) =eq
              add (mul two k) (mul two (sub c k))) :=
-          eq_congr_add_right h_k_raw
+          eq_congr_add_right h_w_w1_eq_2k
         have h_eq_2c : Γ ⊢
             (add (mul w (succ w)) (mul two (sub c k)) =eq mul two c) :=
           FOL.derive_eq_trans h_rewrite_lhs h_2k_plus_2y_eq_2c
@@ -240,11 +270,11 @@ theorem cantor_surjectivity (c : Term) :
        mul w (succ w)) :=
     FOL.derive_eq_trans (eq_congr_mul_right h_x_plus_y_eq_w)
       (eq_congr_mul_left (eq_congr_succ h_x_plus_y_eq_w))
-  -- = 2k (vía h_k_raw)
+  -- = 2k (vía h_w_w1_eq_2k)
   have h_poly_left_2k : Γ ⊢
       (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))) =eq
        mul two k) :=
-    FOL.derive_eq_trans h_poly_left h_k_raw
+    FOL.derive_eq_trans h_poly_left h_w_w1_eq_2k
   -- cantor_poly x y =eq 2k + 2y
   have h_cantor_poly_2k_2y : Γ ⊢
       (add (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))))
@@ -258,20 +288,23 @@ theorem cantor_surjectivity (c : Term) :
        mul two c) :=
     FOL.derive_eq_trans h_cantor_poly_2k_2y h_2k_plus_2y_eq_2c
   -- is_cantor (sub w y) (sub c k) c := mul two c =eq cantor_poly (sub w y)(sub c k)
-  have h_is_cantor : Γ ⊢
-      (mul two c =eq
-       add (mul (add (sub w (sub c k)) (sub c k)) (succ (add (sub w (sub c k)) (sub c k))))
-           (mul two (sub c k))) :=
-    eq_symm h_cantor_eq
-  -- ============================================================
-  -- Paso 6: ex_intro x, ex_intro y; simp reduce el doble lift
-  -- ============================================================
-  apply ex_intro (sub w (sub c k))
-  apply ex_intro (sub c k)
+  -- = cantor_poly (proj1 c) (proj2 c) por def (defeq)
+  exact eq_symm h_cantor_eq
+
+-- Teo C6 (Sobreyectividad de Cantor): ∀ c, ∃ x, ∃ y, Cantor(x,y,c).
+-- Wrapper trivial de `proj_is_cantor` (que aporta los testigos concretos).
+-- Nota: `c` aparece como `liftTerm 0 (liftTerm 0 c)` bajo el doble binder ∃∃
+-- (forma De Bruijn correcta; al instanciar con `ex_intro (proj1 c)` luego
+-- `ex_intro (proj2 c)`, ambos lifts se cancelan vía `FOL.substTerm_liftTerm`
+-- y `FOL.substTerm_liftLift`).
+theorem cantor_surjectivity (c : Term) :
+    Γ ⊢ ex (ex (is_cantor (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 c)))) := by
+  apply ex_intro (proj1 c)
+  apply ex_intro (proj2 c)
   simp [substFormula, substTerm, substTerms, is_cantor, cantor_poly,
         mul, add, succ, two, one, zero, sub,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  exact h_is_cantor
+  exact proj_is_cantor c
 
 -- Conmutatividad de la suma (helper local).
 private theorem add_comm_c (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
@@ -324,6 +357,9 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 
 -- Exports
 export ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7 (
+  proj1
+  proj2
+  proj_is_cantor
   cantor_surjectivity
   cantor_uniqueness
 )

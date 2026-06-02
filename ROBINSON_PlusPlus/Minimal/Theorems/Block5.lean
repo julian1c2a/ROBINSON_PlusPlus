@@ -92,16 +92,12 @@ theorem is_cantor_pair (x y : Term) :
   exact FOL.derive_eq_trans h_comm h_div_eq
 
 -- Teo C8: [⟨x,y⟩].1 = x
--- Vía cantor_uniqueness con is_cantor_pair y ax22.
+-- Vía cantor_uniqueness con is_cantor_pair y proj_is_cantor (este último
+-- reemplaza al antiguo ax22, eliminado 2026-06-02).
 theorem proj1_pair_eq_x (x y : Term) : Γ ⊢ (proj1 (pair x y) =eq x) := by
-  have h_ax22 := ax (by simp [axioms] : ax22_cantor_proj_exists ∈ axioms)
   -- is_cantor (proj1 (pair x y))(proj2 (pair x y))(pair x y)
-  have h_proj : Γ ⊢ (mul two (pair x y) =eq cantor_poly (proj1 (pair x y)) (proj2 (pair x y))) := by
-    have hh := spec h_ax22 (pair x y)
-    simp [substFormula, substTerm, substTerms, is_cantor, cantor_poly,
-          mul, succ, add, two, one, zero, proj1, proj2,
-          FOL.substTerm_liftTerm] at hh
-    exact hh
+  have h_proj : Γ ⊢ (mul two (pair x y) =eq cantor_poly (proj1 (pair x y)) (proj2 (pair x y))) :=
+    proj_is_cantor (pair x y)
   -- is_cantor x y (pair x y)
   have h_xy : Γ ⊢ (mul two (pair x y) =eq cantor_poly x y) := is_cantor_pair x y
   -- cantor_uniqueness: x = proj1 (pair x y) ∧ y = proj2 (pair x y)
@@ -112,13 +108,8 @@ theorem proj1_pair_eq_x (x y : Term) : Γ ⊢ (proj1 (pair x y) =eq x) := by
 
 -- Teo C9: [⟨x,y⟩].2 = y
 theorem proj2_pair_eq_y (x y : Term) : Γ ⊢ (proj2 (pair x y) =eq y) := by
-  have h_ax22 := ax (by simp [axioms] : ax22_cantor_proj_exists ∈ axioms)
-  have h_proj : Γ ⊢ (mul two (pair x y) =eq cantor_poly (proj1 (pair x y)) (proj2 (pair x y))) := by
-    have hh := spec h_ax22 (pair x y)
-    simp [substFormula, substTerm, substTerms, is_cantor, cantor_poly,
-          mul, succ, add, two, one, zero, proj1, proj2,
-          FOL.substTerm_liftTerm] at hh
-    exact hh
+  have h_proj : Γ ⊢ (mul two (pair x y) =eq cantor_poly (proj1 (pair x y)) (proj2 (pair x y))) :=
+    proj_is_cantor (pair x y)
   have h_xy : Γ ⊢ (mul two (pair x y) =eq cantor_poly x y) := is_cantor_pair x y
   have h_uniq := cantor_uniqueness x y (proj1 (pair x y)) (proj2 (pair x y)) (pair x y)
   have h_eqs : Γ ⊢ land (x =eq proj1 (pair x y)) (y =eq proj2 (pair x y)) :=
@@ -126,16 +117,10 @@ theorem proj2_pair_eq_y (x y : Term) : Γ ⊢ (proj2 (pair x y) =eq y) := by
   exact eq_symm (Axioms.and_elim_right h_eqs)
 
 -- Teo C10: ⟨[c].1, [c].2⟩ = c
--- Vía cantor_injective_c con ax22 e is_cantor_pair (sobre proj1 c, proj2 c).
+-- Vía cantor_injective_c con proj_is_cantor e is_cantor_pair (sobre proj1 c, proj2 c).
 theorem pair_proj_eq_c (c : Term) : Γ ⊢ (pair (proj1 c) (proj2 c) =eq c) := by
-  have h_ax22 := ax (by simp [axioms] : ax22_cantor_proj_exists ∈ axioms)
   -- is_cantor (proj1 c)(proj2 c) c
-  have h_axc : Γ ⊢ (mul two c =eq cantor_poly (proj1 c) (proj2 c)) := by
-    have hh := spec h_ax22 c
-    simp [substFormula, substTerm, substTerms, is_cantor, cantor_poly,
-          mul, succ, add, two, one, zero, proj1, proj2,
-          FOL.substTerm_liftTerm] at hh
-    exact hh
+  have h_axc : Γ ⊢ (mul two c =eq cantor_poly (proj1 c) (proj2 c)) := proj_is_cantor c
   -- is_cantor (proj1 c)(proj2 c) (pair (proj1 c)(proj2 c))
   have h_pair : Γ ⊢ (mul two (pair (proj1 c) (proj2 c)) =eq cantor_poly (proj1 c) (proj2 c)) :=
     is_cantor_pair (proj1 c) (proj2 c)

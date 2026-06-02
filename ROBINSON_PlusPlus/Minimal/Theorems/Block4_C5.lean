@@ -907,11 +907,14 @@ theorem succ_pred_of_pos {s : Term} (h_pos : Γ ⊢ lt zero s) : Γ ⊢ (succ (p
 -- MAIN THEOREM: LEMA C5
 -- ============================================================
 
--- Teo 9.1 (Lema C5): ∀ c, ∃ w, w*(w+1) ≤ 2*c < (w+1)*(w+2)
-theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
-    (le (mul (.var 0) (succ (.var 0))) (mul two (liftTerm 0 c)))
-    (lt (mul two (liftTerm 0 c)) (mul (succ (.var 0)) (succ (succ (.var 0)))))) := by
+-- Las cotas C5 satisfechas concretamente por `w_candidate c`.
+-- Cuerpo extraído de `lemma_C5` para reutilización constructiva en `proj_is_cantor`
+-- (Block4_C6_C7), evitando el `ex_elim` que pierde el testigo específico.
+theorem c5_bounds (c : Term) :
+    Γ ⊢ land (le (mul (w_candidate c) (succ (w_candidate c))) (mul two c))
+             (lt (mul two c) (mul (succ (w_candidate c)) (succ (succ (w_candidate c))))) := by
   let w := w_candidate c
+  show Γ ⊢ land (le (mul w (succ w)) (mul two c)) (lt (mul two c) (mul (succ w) (succ (succ w))))
   -- === Part 1: Existence ===
   have h_existence_part1 : Γ ⊢ le (mul w (succ w)) (mul two c) := by
     apply (w_w1_le_2c_iff_sq_2w1_le_8c1.mpr)
@@ -1007,13 +1010,18 @@ theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
         have hYle : Γ ⊢ le (mul (succ w) (succ (succ w))) (mul two c) :=
           Axioms.or_intro_left h_gt
         exact mp h_irr (lt_le_trans h_upper (w_w1_le_2c_iff_sq_2w1_le_8c1.mp hYle))
-  have h_existence : Γ ⊢ land (le (mul w (succ w)) (mul two c)) (lt (mul two c) (mul (succ w) (succ (succ w)))) :=
-    Axioms.and_intro h_existence_part1 h_existence_part2
-  -- Witness w closes the existential (liftTerm 0 c cancels under the substitution)
-  apply ex_intro w
+  exact Axioms.and_intro h_existence_part1 h_existence_part2
+
+-- Teo 9.1 (Lema C5): ∀ c, ∃ w, w*(w+1) ≤ 2*c < (w+1)*(w+2)
+-- Versión existencial: wrapper trivial sobre `c5_bounds` (que da las cotas concretas
+-- para `w_candidate c`).
+theorem lemma_C5 (c : Term) : Γ ⊢ Formula.ex (land
+    (le (mul (.var 0) (succ (.var 0))) (mul two (liftTerm 0 c)))
+    (lt (mul two (liftTerm 0 c)) (mul (succ (.var 0)) (succ (succ (.var 0)))))) := by
+  apply ex_intro (w_candidate c)
   simp only [substFormula, substTerm, substTerms, land, le, lt, mul, succ,
              FOL.substTerm_liftTerm]
-  exact h_existence
+  exact c5_bounds c
 
 -- Unicidad de C5: si w y w' satisfacen las cotas, entonces w = w'.
 theorem lemma_C5_unique {c w w' : Term}
@@ -1146,6 +1154,7 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 export ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5 (
   -- main theorems
   w_candidate
+  c5_bounds
   lemma_C5
   lemma_C5_unique
   cantor_bounds
