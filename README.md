@@ -13,12 +13,12 @@ Una implementación formal de una **Aritmética Fundacional** en Lean 4, constru
 
 Este proyecto está dedicado a explorar y formalizar diferentes sistemas axiomáticos para la aritmética. Su objetivo es fundar rigurosamente los números naturales y, a partir de ellos, construir estructuras de datos como tuplas y listas.
 
-La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 31 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, y con ella, una teoría de tuplas y listas.
+La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, y con ella, una teoría de tuplas y listas.
 
 **Características principales:**
 
 - **Base Lógica Sólida**: Utiliza una implementación completa y verificada de Lógica de Primer Orden (`FOL`) como dependencia.
-- **Aritmética Minimalista**: Formaliza un sistema de 31 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
+- **Aritmética Minimalista**: Formaliza un sistema de 30 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
 - **Desarrollo Progresivo**: El proyecto está estructurado para avanzar desde sistemas débiles (`Minimal`) hacia sistemas más fuertes con principios de inducción (`Intermediate`, `Full`).
 - **Metaprogramación**: Hereda y utiliza las tácticas de automatización del proyecto `FOL` para agilizar las demostraciones.
 
@@ -41,7 +41,7 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 31 a
 ```text
 ROBINSON_PlusPlus/
 ├── Minimal/
-│   ├── Axioms.lean            # Lenguaje + 31 axiomas + 5 meta-axiomas (reglas de deducción)
+│   ├── Axioms.lean            # Lenguaje + 30 axiomas + 5 meta-axiomas (reglas de deducción)
 │   └── Theorems/
 │       ├── Block1.lean        # Block I: Aritmética básica, constantes
 │       ├── Block2.lean        # Block II: Raíz cuadrada, cotas, unicidad

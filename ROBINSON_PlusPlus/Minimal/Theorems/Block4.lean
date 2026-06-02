@@ -209,13 +209,12 @@ theorem cantor_totality (x y : Term) :
 -- Teo C4: Cantor(x,y,c) ∧ Cantor(x,y,c') ⇒ c = c'
 theorem cantor_injective_c (x y c c' : Term) : Γ ⊢ land (is_cantor x y c) (is_cantor x y c') ⇒ (c =eq c') := by
   apply Axioms.imp_intro; intro h_land
-  have h_ax28 := ax (by simp [axioms] : ax28_mul_two_cancel ∈ axioms)
   have h_c  := Axioms.and_elim_left h_land
   have h_c' := Axioms.and_elim_right h_land
   have h_eq : Γ ⊢ (mul two c =eq mul two c') :=
     FOL.derive_eq_trans h_c (eq_symm h_c')
   have h28 : Γ ⊢ ((mul two c =eq mul two c') ⇒ (c =eq c')) := by
-    have hh := spec (spec h_ax28 c) c'
+    have hh := spec (spec teo_2_11 c) c'
     simp [substFormula, substTerm, substTerms, mul, two, one,
           FOL.substTerm_liftTerm] at hh
     exact hh

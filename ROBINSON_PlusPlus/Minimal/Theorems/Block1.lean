@@ -267,6 +267,93 @@ theorem teo_2_7 : Γ ⊢ forall_ (mul two (.var 0) =eq add (.var 0) (.var 0)) :=
   -- 2*n = n*2 = (n*1)+n = n+n
   exact eq_trans (eq_symm (eq_trans (eq_symm h_comm) h_mul2)) h_n1n
 
+-- Helper para `teo_2_11`: 2*(σk) ≠ 0
+-- 2*(σk) = σk + σk = σ(σk + k) ≠ 0 (ax2). Sin inducción.
+theorem mul_two_succ_ne_zero (k : Term) : Γ ⊢ neg (mul two (succ k) =eq zero) := by
+  have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_t27 : Γ ⊢ (mul two (succ k) =eq add (succ k) (succ k)) := by
+    have hh := spec teo_2_7 (succ k)
+    simp [substFormula, substTerm, substTerms, mul, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+    exact hh
+  have h_a5 : Γ ⊢ (add (succ k) (succ k) =eq succ (add (succ k) k)) := by
+    have hh := spec (spec h_ax5 (succ k)) k
+    simp [substFormula, substTerm, substTerms, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+    exact hh
+  have h_chain : Γ ⊢ (mul two (succ k) =eq succ (add (succ k) k)) :=
+    FOL.derive_eq_trans h_t27 h_a5
+  apply raa; intro h_eq
+  have h_zero : Γ ⊢ (succ (add (succ k) k) =eq zero) :=
+    FOL.derive_eq_trans (eq_symm h_chain) h_eq
+  have h_neq : Γ ⊢ neg (succ (add (succ k) k) =eq zero) := by
+    have hh := spec h_ax2 (add (succ k) k)
+    simp [substFormula, substTerm, substTerms, succ, zero, FOL.substTerm_liftTerm] at hh
+    exact hh
+  exact mp h_neq h_zero
+
+-- Helper para `teo_2_11`: a < b ⇒ 2a < 2b (monotonía estricta de *2)
+-- Prueba sin inducción: si a + σk = b, entonces 2b = 2a + 2σk = 2a + σ(σk+k).
+-- Testigo para ax13: j := σk+k da 2a + σj = 2b.
+theorem mul_two_lt_mono {a b : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (mul two a) (mul two b) := by
+  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
+  have h_ax12 := ax (by simp [axioms] : ax12_mul_distrib ∈ axioms)
+  have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  -- a < b: ∃k, a + σk = b
+  have h_iff_ab :
+      Γ ⊢ ((lt a b) ⇔ ex (add (liftTerm 0 a) (succ (.var 0)) =eq liftTerm 0 b)) := by
+    have hh := spec (spec h_ax13 a) b
+    simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftLift] at hh
+    exact hh
+  have h_ex := iff_mp h_iff_ab h
+  apply ex_elim h_ex; intro k h_k_raw
+  simp [substFormula, substTerm, substTerms, add, succ,
+        liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_k_raw
+  -- 2b = 2(a + σk) = 2a + 2σk
+  have h_2b_eq : Γ ⊢ (mul two b =eq mul two (add a (succ k))) :=
+    eq_congr_mul_left (eq_symm h_k_raw)
+  have h_distrib : Γ ⊢
+      (mul two (add a (succ k)) =eq add (mul two a) (mul two (succ k))) := by
+    have hh := spec (spec (spec h_ax12 two) a) (succ k)
+    simp [substFormula, substTerm, substTerms, mul, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftLift] at hh
+    exact hh
+  have h_2b_chain : Γ ⊢ (mul two b =eq add (mul two a) (mul two (succ k))) :=
+    FOL.derive_eq_trans h_2b_eq h_distrib
+  -- 2*(σk) = σ(σk + k)
+  have h_2sk_succ : Γ ⊢ (mul two (succ k) =eq succ (add (succ k) k)) := by
+    have h_t27 : Γ ⊢ (mul two (succ k) =eq add (succ k) (succ k)) := by
+      have hh := spec teo_2_7 (succ k)
+      simp [substFormula, substTerm, substTerms, mul, add, succ,
+            liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+      exact hh
+    have h_a5 : Γ ⊢ (add (succ k) (succ k) =eq succ (add (succ k) k)) := by
+      have hh := spec (spec h_ax5 (succ k)) k
+      simp [substFormula, substTerm, substTerms, add, succ,
+            liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+      exact hh
+    exact FOL.derive_eq_trans h_t27 h_a5
+  -- 2b = 2a + σ(σk + k); testigo j := σk+k para ax13
+  have h_2b_succ : Γ ⊢ (mul two b =eq add (mul two a) (succ (add (succ k) k))) :=
+    FOL.derive_eq_trans h_2b_chain (eq_congr_add_left h_2sk_succ)
+  have h_iff_2a2b :
+      Γ ⊢ ((lt (mul two a) (mul two b)) ⇔
+            ex (add (liftTerm 0 (mul two a)) (succ (.var 0)) =eq liftTerm 0 (mul two b))) := by
+    have hh := spec (spec h_ax13 (mul two a)) (mul two b)
+    simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftLift] at hh
+    exact hh
+  apply iff_mpr h_iff_2a2b
+  exact ex_intro (add (succ k) k) (by
+    simp [substFormula, substTerm, substTerms, add, succ,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm]
+    exact eq_symm h_2b_succ)
+
 -- Teo 2.8: ∀ n, σ(n) = n + 1
 -- Prueba: ax5(n,0): n+σ(0)=σ(n+0); ax4(n): n+0=n; congr_succ.
 -- Entonces n+1 = n+σ(0) = σ(n+0) = σ(n), luego σ(n)=n+1.
@@ -511,10 +598,62 @@ theorem teo_2_10 : Γ ⊢ forall_2 ( (mul (.var 1) (.var 0) =eq zero) ⇒ (lor (
               (eq_symm h_add_succ) (eq_symm h_ax9_inst)) (eq_symm h_mul_ab)) h_mul
           exact false_elim (mp h_succ_neq0 h_chain)
 
--- Teo 2.11: 2 * a = 2 * b ⇒ a = b
--- Requiere inducción sobre N; en el sistema Minimal se obtiene del axioma ax28_mul_two_cancel.
-theorem teo_2_11 : Γ ⊢ forall_2 ( (mul two (.var 1) =eq mul two (.var 0)) ⇒ ((.var 1) =eq (.var 0)) ) :=
-  ax (by simp [axioms, ax28_mul_two_cancel] : ax28_mul_two_cancel ∈ axioms)
+-- Teo 2.11: 2 * a = 2 * b ⇒ a = b  (Cancelación por 2)
+-- Demostrado directamente SIN inducción y SIN el axioma ax28 (eliminado).
+-- Estrategia (TuplasFuncionesYListas.md §2.11): tricotomía (ax19) +
+-- monotonía estricta de *2 (mul_two_lt_mono) + irreflexividad (ax18).
+-- Los casos a<b y b<a llevan a 2a < 2b (resp. 2b < 2a); sustituyendo con
+-- h_eq: 2a=2b obtenemos lt 2a 2a, contradiciendo ax18.
+theorem teo_2_11 :
+    Γ ⊢ forall_2 ( (mul two (.var 1) =eq mul two (.var 0)) ⇒ ((.var 1) =eq (.var 0)) ) := by
+  unfold Γ; unfold forall_2
+  apply gen; intro a; apply gen; intro b
+  simp [substFormula, substTerm, substTerms, mul, two, one, succ,
+        liftTerm, liftTerms, FOL.substTerm_liftTerm]
+  apply Axioms.imp_intro; intro h_eq
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  have h_tric : axioms ⊢ (lt a b ∨ (a =eq b) ∨ lt b a) := by
+    have hh := spec (spec h_ax19 a) b
+    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at hh
+    exact hh
+  -- Irreflexividad para 2a
+  have h_irr_2a : axioms ⊢ neg (lt (mul two a) (mul two a)) := by
+    have hh := spec h_ax18 (mul two a)
+    simp [lt] at hh; exact hh
+  -- Helpers de sustitución (estilo eq_decidable, ver §Decidibilidad arriba)
+  let f_lt_2a : Formula := Formula.atom lt_sym [mul two (liftTerm 0 a), .var 0]
+  have hS_2b : substFormula 0 (mul two b) f_lt_2a = lt (mul two a) (mul two b) := by
+    simp only [f_lt_2a, substFormula, substTerm, substTerms, lt, mul, two, one, succ, zero,
+               FOL.substTerm_liftTerm, if_true]
+  have hS_2a : substFormula 0 (mul two a) f_lt_2a = lt (mul two a) (mul two a) := by
+    simp only [f_lt_2a, substFormula, substTerm, substTerms, lt, mul, two, one, succ, zero,
+               FOL.substTerm_liftTerm, if_true]
+  let f_lt_x2a : Formula := Formula.atom lt_sym [.var 0, mul two (liftTerm 0 a)]
+  have hS_x2a_2b : substFormula 0 (mul two b) f_lt_x2a = lt (mul two b) (mul two a) := by
+    simp only [f_lt_x2a, substFormula, substTerm, substTerms, lt, mul, two, one, succ, zero,
+               FOL.substTerm_liftTerm, if_true]
+  have hS_x2a_2a : substFormula 0 (mul two a) f_lt_x2a = lt (mul two a) (mul two a) := by
+    simp only [f_lt_x2a, substFormula, substTerm, substTerms, lt, mul, two, one, succ, zero,
+               FOL.substTerm_liftTerm, if_true]
+  apply or_elim h_tric
+  · intro h_a_lt_b
+    apply false_elim
+    have h_2a_lt_2b : axioms ⊢ lt (mul two a) (mul two b) := mul_two_lt_mono h_a_lt_b
+    have h_2a_lt_2a : axioms ⊢ lt (mul two a) (mul two a) :=
+      hS_2a ▸ Derives.subst axioms (mul two b) (mul two a) f_lt_2a (eq_symm h_eq)
+        (hS_2b ▸ h_2a_lt_2b)
+    exact mp h_irr_2a h_2a_lt_2a
+  · intro h23
+    apply or_elim h23
+    · intro h_eq_ab; exact h_eq_ab
+    · intro h_b_lt_a
+      apply false_elim
+      have h_2b_lt_2a : axioms ⊢ lt (mul two b) (mul two a) := mul_two_lt_mono h_b_lt_a
+      have h_2a_lt_2a : axioms ⊢ lt (mul two a) (mul two a) :=
+        hS_x2a_2a ▸ Derives.subst axioms (mul two b) (mul two a) f_lt_x2a (eq_symm h_eq)
+          (hS_x2a_2b ▸ h_2b_lt_2a)
+      exact mp h_irr_2a h_2a_lt_2a
 
 /-!
 ### Decidibilidad de la Igualdad

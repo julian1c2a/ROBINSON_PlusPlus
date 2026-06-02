@@ -379,13 +379,11 @@ def ax27_add_left_cancel : Formula :=
     (add (.var 2) (.var 0) =eq add (.var 1) (.var 0)) ⇒ ((.var 2) =eq (.var 1))
   )
 
--- Ax 28 (mul_two_cancel): ∀ a, b, 2*a = 2*b → a=b
--- Teorema en sistemas con inducción.
--- En Minimal, se incluye como axioma para Block1 (teo_2_11).
-def ax28_mul_two_cancel : Formula :=
-  forall_2 (
-    (mul two (.var 1) =eq mul two (.var 0)) ⇒ ((.var 1) =eq (.var 0))
-  )
+-- ELIMINADO 2026-06-02: ax28_mul_two_cancel era REDUNDANTE.
+-- La spec TuplasFuncionesYListas.md §Teo 2.11 muestra que es derivable sin inducción
+-- usando tricotomía (ax19), irreflexividad (ax18), distributividad (ax12) y monotonía
+-- estricta de *2 (probada vía ax13 + teo_2_7 + ax5 + ax2). La prueba directa está
+-- ahora en `teo_2_11` (Block1.lean), que ya NO delega a este axioma.
 
 -- Ax 29 (sub_witness): ∀ a b, b ≤ a → b + (a − b) = a
 -- Axioma testigo para la resta truncada (monus). En sistemas con inducción es
@@ -433,8 +431,8 @@ def axioms : List Formula := [
   ax_C2_concat_cons,
   ax_C3_concat_assoc,
   ax_L3_in_concat,
-  ax27_add_left_cancel, -- teorema en sistemas con inducción; `add_left_cancel` en Block4_C6_C7 (sorry)
-  ax28_mul_two_cancel,  -- teorema en sistemas con inducción; `teo_2_11` en Block1
+  ax27_add_left_cancel, -- teorema en sistemas con inducción; usado por `add_left_cancel` en Block4_C6_C7
+  -- ax28_mul_two_cancel ELIMINADO 2026-06-02: derivable sin inducción, ver `teo_2_11` en Block1.
   ax29_sub_witness      -- axioma testigo de la resta truncada (monus)
 ]
 

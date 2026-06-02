@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-05-27
+**Last updated:** 2026-06-02
 **Author**: Julián Calderón Almendros
 
 ---
@@ -13,7 +13,7 @@
 | Modules sin sorry | 9 / 9 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
-| Axiomas matemáticos | 31 (ax2–ax17, ax21–ax29, list/concat L0–L3, C1–C3) |
+| Axiomas matemáticos | **30** (ax2–ax17, ax21–ax27, ax29, list/concat L0–L3, C1–C3) — `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
 | Total definitions | ~52 |
 | Build status | ✅ Passing (0 errores, ~13 warnings sólo de sorry) |
 | Lean version | v4.29.1 |
@@ -43,6 +43,10 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-02 — `ax28_mul_two_cancel` ELIMINADO**: la spec `TuplasFuncionesYListas.md §Teo 2.11` ya proporcionaba la prueba sin inducción (tricotomía + irreflexividad + monotonía estricta de *2). Reprobado `teo_2_11` directamente en Block1 (con nuevos helpers `mul_two_succ_ne_zero` y `mul_two_lt_mono`). Refactorizados `cantor_injective_c` (Block4) y `cantor_uniqueness` (Block4_C6_C7) para usar `teo_2_11` real. Sistema reducido de 31 → **30 axiomas matemáticos**.
+
+- **2026-06-02 — REFERENCE.md proyectado**: reescritura completa, sustituyendo la versión severamente stale (todos los módulos marcados 🔄 In progress, fechado 2026-05-12). Ahora refleja 9/9 módulos ✅ Complete, 30 axiomas, lista de exports por módulo con signatura Lean + descripción matemática + dependencias.
 
 - **2026-05-27 — 🎉 PROYECTO A 0 SORRYS REALES**: Cerrados los 2 últimos pendientes (`concat_assoc` e `in_concat_iff`) postulando `ax_C3_concat_assoc` y `ax_L3_in_concat` en Axioms.lean. Ambos son teoremas en sistemas con inducción; en Minimal se postulan (mismo patrón que ax21/ax24/ax27/ax28). Los 5 `axiom imp_intro/gen/raa/or_elim/ex_elim` son meta-reglas de FOL, no `sorry`. Build verde, WARN_sorry=0.
 

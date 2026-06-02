@@ -283,7 +283,6 @@ private theorem add_comm_c (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
 theorem cantor_uniqueness (x y x' y' c : Term) :
     Γ ⊢ land (is_cantor x y c) (is_cantor x' y' c) ⇒ land (x =eq x') (y =eq y') := by
   apply Axioms.imp_intro; intro h_land
-  have h_ax28 := ax (by simp [axioms] : ax28_mul_two_cancel ∈ axioms)
   have h_xy : Γ ⊢ (mul two c =eq add (mul (add x y) (succ (add x y))) (mul two y)) :=
     Axioms.and_elim_left h_land
   have h_x'y' : Γ ⊢ (mul two c =eq add (mul (add x' y') (succ (add x' y'))) (mul two y')) :=
@@ -310,7 +309,7 @@ theorem cantor_uniqueness (x y x' y' c : Term) :
   -- 2y = 2y' ⇒ y = y'
   have h_y_eq : Γ ⊢ (y =eq y') := by
     have h28 : Γ ⊢ ((mul two y =eq mul two y') ⇒ (y =eq y')) := by
-      have hh := spec (spec h_ax28 y) y'
+      have hh := spec (spec teo_2_11 y) y'
       simp [substFormula, substTerm, substTerms, mul, two, one, FOL.substTerm_liftTerm] at hh
       exact hh
     exact mp h28 h_2y_eq

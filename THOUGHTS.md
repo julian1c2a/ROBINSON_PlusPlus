@@ -152,20 +152,16 @@ decidibilidad de `Pred`, lo cual requiere inducción o enumeración. En FOL sin 
 no podemos derivar ax25/ax26 de los axiomas de σ; los modelos no-standard pueden asignar
 a `τ` cualquier valor en `N`. Por tanto ax25/ax26 **son necesarios** en Minimal.
 
-## Estado de los axiomas ax21, ax24, ax27 (2026-05-11)
+## Estado de los axiomas ax21, ax24, ax27, ax28 (actualizado 2026-06-02)
 
-Los tres son **necesarios en Minimal** porque sus versiones de teorema en los Block*
-son `sorry` pendientes que en el caso general requieren inducción:
+| Axioma | Enunciado | "Teorema" en el código | Estado |
+|--------|-----------|------------------------|--------|
+| ax21 | `mod2(n) = 0 ∨ mod2(n) = 1` | `mod2_range` (Block3, delega a ax21) | **postulado** — requiere inducción |
+| ax24 | `n = 2k → mod2(n) = 0` | `mod2_of_even` (Block5, delega a ax24) | **postulado** — requiere inducción (auditar) |
+| ax27 | `a+c = b+c → a = b` | `add_left_cancel` (Block4_C6_C7, delega a ax27) | **postulado** — requiere inducción |
+| ~~ax28~~ | ~~`2a = 2b → a = b`~~ | `teo_2_11` (Block1) | **ELIMINADO 2026-06-02** — reprobado sin inducción usando tricotomía + irreflexividad + monotonía estricta de *2 |
 
-| Axioma | Enunciado | Teorema sorry | Requiere |
-|--------|-----------|--------------|----------|
-| ax21 | `mod2(n) = 0 ∨ mod2(n) = 1` | `mod2_range` (Block3) | inducción sobre n |
-| ax24 | `n = 2k → mod2(n) = 0` | `mod2_of_even` (Block5) | inducción sobre k |
-| ax27 | `a+c = b+c → a = b` | `add_left_cancel` (Block4_C6_C7) | inducción sobre c |
-
-Si y cuando los sorry se cubran con pruebas completas (independientes de ax21/ax24/ax27),
-se podrán comentar fuera de la lista `axioms` como se hizo con ax20. Hasta entonces,
-permanecen en la lista. Los comentarios en `Axioms.lean` ya reflejan este estado.
+**Patrón observado**: la propia spec `TuplasFuncionesYListas.md` ya contenía la prueba de teo_2_11 sin inducción (líneas 273–283). El comentario "Requiere inducción sobre N" del código era erróneo. Sospecha: ax24 podría tener un destino similar (a auditar — siguiente en NEXT-STEPS).
 
 ### 2026-04-21 — Automatización de Tácticas (Fase 4)
 

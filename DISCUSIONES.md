@@ -1,9 +1,15 @@
 # Discusión sobre Axiomas Temporales
 
-**Última actualización:** 2026-05-09
+**Última actualización:** 2026-06-02 — `ax28` ELIMINADO; ax22/ax23 pendientes (eliminables, próxima prioridad).
 **Autor**: Julián Calderón Almendros
 
 Este documento analiza la necesidad y redundancia de ciertos axiomas que se han introducido de forma temporal en el sistema `Minimal`.
+
+> **Estado actualizado (2026-06-02)**:
+>
+> - **ax22, ax23** (scaffolding Cantor): seguían en la lista pero **C6 (`cantor_surjectivity`) y C7 (`cantor_uniqueness`) ya están probados** desde 2026-05-27. Eliminables tras refactorizar Block5 para no hacer `spec h_ax22` (próxima recomendación priorizada).
+> - **ax27** (add_left_cancel): sigue siendo necesario sin inducción.
+> - ~~**ax28** (mul_two_cancel)~~: **ELIMINADO 2026-06-02**. La spec ya tenía la prueba sin inducción; reprobado como `teo_2_11` en Block1 (vía tricotomía + irreflexividad + monotonía estricta de *2).
 
 ## Análisis de los Axiomas 22 y 23
 
