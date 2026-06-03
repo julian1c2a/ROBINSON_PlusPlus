@@ -1,6 +1,6 @@
 # Discusión sobre Axiomas Temporales
 
-**Última actualización:** 2026-06-03 — ~~ax22~~, ~~ax23~~ ELIMINADOS (2026-06-02, commit `537fd68`); este doc queda como nota histórica.
+**Última actualización:** 2026-06-03 — ~~ax22~~, ~~ax23~~, ~~ax27~~, ~~ax28~~ ELIMINADOS; este doc queda como nota histórica.
 **Autor**: Julián Calderón Almendros
 
 Este documento analiza la necesidad y redundancia de ciertos axiomas que se han introducido de forma temporal en el sistema `Minimal`.
@@ -94,5 +94,4 @@ Estos axiomas se han añadido para poder avanzar, pero están destinados a ser e
 *   ~~**Axioma 23 (`ax23_cantor_proj_uniq`)**~~ — **ELIMINADO 2026-06-02**: el teorema `cantor_uniqueness` ya cubre la unicidad proyectiva sin necesidad de un axioma de respaldo.
 *   **Axioma 24 (`ax24_mod2_of_even`)**: `n = 2*k → mod2(n) = 0`
     *   **Propósito**: Postula que el `mod2` de un número par es cero. Es un teorema en sistemas con inducción, pero se mantiene como axioma en `Minimal` porque su prueba formal requiere un sistema más fuerte.
-*   **Axioma 27 (`ax27_add_left_cancel`)**: `a+c = b+c → a=b`
-    *   **Propósito**: Postula la propiedad de cancelación por la izquierda para la suma. Es un teorema en sistemas con inducción, pero se requiere aquí para demostrar la unicidad proyectiva (Teo C7).
+*   ~~**Axioma 27 (`ax27_add_left_cancel`)**~~ — **ELIMINADO 2026-06-03**: derivable en PA⁻ sin inducción. Prueba: por tricotomía (ax19) `a<b ∨ a=b ∨ b<a`; los casos estrictos llevan a `a+c < a+c` vía monotonía (`lt_add_const_of_le_left` + `add_comm'`) y contradicen ax18. Ahora es teorema `add_left_cancel` en `Block4_C6_C7`.

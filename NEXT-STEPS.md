@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-03 — `ax22`/`ax23` eliminados (proj1/proj2 ahora defs concretas); build verde restaurado tras mover `mod2_of_even` a Block4_C6_C7; sistema con **31 axiomas matemáticos** y 0 sorrys reales.
+**Last updated:** 2026-06-03 — `ax27_add_left_cancel` ELIMINADO (derivable en PA⁻); sistema con **30 axiomas matemáticos** y 0 sorrys reales.
 
 ---
 
@@ -8,7 +8,7 @@
 
 Build: ✅ `lake build` exit 0. **0 sorrys reales** en los 9 módulos. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas de FOL, no `:= sorry`.
 
-El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md): **31 axiomas matemáticos sin esquema de inducción son suficientes para construir la función de Cantor, las tuplas con proyecciones, y las listas con concatenación y pertenencia**.
+El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md): **30 axiomas matemáticos sin esquema de inducción son suficientes para construir la función de Cantor, las tuplas con proyecciones, y las listas con concatenación y pertenencia**.
 
 ---
 
@@ -34,13 +34,13 @@ Revisar si alguno de los axiomas matemáticos actuales es realmente **demostrabl
 | `ax21_mod2_range` | postulado | requiere inducción sobre `n` |
 | ~~`ax22_cantor_proj_exists`~~ | **ELIMINADO 2026-06-02** | proj1/proj2 ahora defs concretas; `proj_is_cantor` lo demuestra |
 | ~~`ax23_cantor_proj_uniq`~~ | **ELIMINADO 2026-06-02** | nunca usado; `cantor_uniqueness` ya probado |
-| `ax24_mod2_of_even` | postulado | requiere inducción sobre `k` (a auditar) |
-| `ax27_add_left_cancel` | postulado | requiere inducción sobre `c` |
+| `ax24_mod2_of_even` | postulado | requiere inducción sobre `k` (auditado 2026-06-03: irreducible) |
+| ~~`ax27_add_left_cancel`~~ | **ELIMINADO 2026-06-03** | derivable en PA⁻ vía tricotomía + monotonía + ax18 |
 | ~~`ax28_mul_two_cancel`~~ | **ELIMINADO 2026-06-02** | reprobado como `teo_2_11` sin inducción |
 | `ax_C3_concat_assoc` | postulado | requiere inducción sobre `L` |
 | `ax_L3_in_concat` | postulado | requiere inducción sobre `L` |
 
-**Próxima acción**: auditar `ax24_mod2_of_even` y arrancar `Block7.lean` (Funciones, `IsFunction`, Teo F3).
+**Próxima acción**: arrancar `Block7.lean` (Funciones, `IsFunction`, Teo F3). Los axiomas que quedan (`ax21`, `ax24`, `ax_C3`, `ax_L3`) son irreducibles sin inducción — todos requieren `n + m ≥ n ∀m` o equivalente. Ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) para el análisis completo.
 
 ### 1.3. Limpieza de simp args no usados
 

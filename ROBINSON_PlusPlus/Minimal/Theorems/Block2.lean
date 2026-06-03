@@ -82,7 +82,7 @@ theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ ((succ a) ≤
       have h_ax6  := ax (by simp [axioms] : ax6_add_comm ∈ axioms)
       have h_ax7  := ax (by simp [axioms] : ax7_add_assoc ∈ axioms)
       have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
-      have h_ax27 := ax (by simp [axioms] : ax27_add_left_cancel ∈ axioms)
+      have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
       -- Extract kp: ∃kp, a + σ(kp) = b
       have h_kp_iff := spec (spec h_ax13 a) b
       simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
@@ -129,49 +129,87 @@ theorem succ_le_of_lt {a b : Term} (h_lt : Γ ⊢ lt a b) : Γ ⊢ ((succ a) ≤
       -- a + σ(σ(kp)+k) = a + 1
       have h_mid3 : axioms ⊢ (add a (succ (add (succ kp) k)) =eq add a one) :=
         eq_trans (eq_symm h_mid2) h_sa_eq
-      -- Left-cancel a using commutativity + ax27 (right-cancel)
-      have h_comm_a_X : axioms ⊢ (add a (succ (add (succ kp) k)) =eq add (succ (add (succ kp) k)) a) := by
-        have hc := spec (spec h_ax6 a) (succ (add (succ kp) k))
+      -- Refactor 2026-06-03 (sin ax27): usa ax13+ax3+ax18 vía la identidad
+      -- "no hay X tal que a + σX = a". Esquema:
+      --   a + σ(σkp+k) = a + 1 = succ a
+      --   ⇒ succ(a + (σkp+k)) = succ a       (ax5 izq)
+      --   ⇒ a + (σkp+k) = a                  (ax3 inj)
+      --   ⇒ a + σ(k+kp) = a                  (ax6+ax5 reescribiendo σkp+k)
+      --   pero ax13 da lt a (a + σ(k+kp)) con testigo k+kp
+      --   ⇒ lt a a, contradice ax18.
+      -- LHS = succ(a + (σkp+k))  vía ax5
+      have h_LHS_eq : axioms ⊢
+          (add a (succ (add (succ kp) k)) =eq succ (add a (add (succ kp) k))) := by
+        have hh := spec (spec h_ax5 a) (add (succ kp) k)
         simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at hc
-        exact hc
-      have h_comm_a_one : axioms ⊢ (add a one =eq add one a) := by
-        have hc := spec (spec h_ax6 a) one
-        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at hc
-        exact hc
-      have h_mid3_flipped : axioms ⊢ (add (succ (add (succ kp) k)) a =eq add one a) :=
-        FOL.derive_eq_trans (FOL.derive_eq_symm h_comm_a_X)
-          (FOL.derive_eq_trans h_mid3 h_comm_a_one)
-      -- ax27 con x=σ(kp+k), y=one, z=a: add X a = add one a → X = one
-      have h_eq_one : axioms ⊢ (succ (add (succ kp) k) =eq one) := by
-        have hw := spec (spec (spec h_ax27 (succ (add (succ kp) k))) one) a
-        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at hw
-        exact mp hw h_mid3_flipped
-      have h_eq_succ0 : axioms ⊢ (succ (add (succ kp) k) =eq succ zero) := by
-        have : one = succ zero := rfl; rw [← this]; exact h_eq_one
-      have h_ax3_inst : axioms ⊢
-          ((succ (add (succ kp) k) =eq succ zero) ⇒ (add (succ kp) k =eq zero)) := by
-        have hw := spec (spec h_ax3 (add (succ kp) k)) zero
+              FOL.substTerm_liftTerm] at hh
+        exact hh
+      -- RHS = succ a  vía ax5 (a + σ0 = σ(a+0)) + ax4 (a+0=a); usamos `one = σ zero`
+      have h_RHS_eq : axioms ⊢ (add a one =eq succ a) := by
+        have h5 := spec (spec h_ax5 a) zero
+        simp [substFormula, substTerm, substTerms, add, succ, one, zero,
+              liftTerm, liftTerms, FOL.substTerm_liftTerm] at h5
+        -- h5 : a + succ zero =eq succ (a + zero), i.e., a + one = succ (a + zero)
+        have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+        have h4 : axioms ⊢ (add a zero =eq a) := by
+          have hh := spec h_ax4 a
+          simp [substFormula, substTerm, substTerms, add, zero] at hh
+          exact hh
+        exact FOL.derive_eq_trans h5 (eq_congr_succ h4)
+      -- succ(a + (σkp+k)) = succ a
+      have h_succ_eq : axioms ⊢ (succ (add a (add (succ kp) k)) =eq succ a) :=
+        FOL.derive_eq_trans (eq_symm h_LHS_eq) (FOL.derive_eq_trans h_mid3 h_RHS_eq)
+      -- ax3 inj: a + (σkp+k) = a
+      have h_a_X_eq_a : axioms ⊢ (add a (add (succ kp) k) =eq a) := by
+        have hw := spec (spec h_ax3 (add a (add (succ kp) k))) a
         simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
               FOL.substTerm_liftTerm, FOL.substTerm_lift_comm] at hw
-        exact hw
-      have h_sum0 : axioms ⊢ (add (succ kp) k =eq zero) := mp h_ax3_inst h_eq_succ0
-      have h_teo29_inst : axioms ⊢
-          (add (succ kp) k =eq zero) ⇒ (land (succ kp =eq zero) (k =eq zero)) := by
-        have hs := spec (spec teo_2_9 (succ kp)) k
-        simp [substFormula, substTerm, substTerms, add, zero, land, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at hs
-        exact hs
-      have h_skp0 : axioms ⊢ (succ kp =eq zero) :=
-        Axioms.and_elim_left (mp h_teo29_inst h_sum0)
-      have h_ax2_inst : axioms ⊢ neg (succ kp =eq zero) := by
-        have hn := spec h_ax2 kp
-        simp [substFormula, substTerm, substTerms, succ, liftTerm, liftTerms,
-              FOL.substTerm_liftTerm] at hn
-        exact hn
-      exact mp h_ax2_inst h_skp0
+        exact mp hw h_succ_eq
+      -- Reescribir σkp + k = σ(k + kp)  vía ax6 + ax5
+      have h_comm_kp_k : axioms ⊢ (add (succ kp) k =eq add k (succ kp)) := by
+        have hc := spec (spec h_ax6 (succ kp)) k
+        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+              FOL.substTerm_liftTerm] at hc
+        exact hc
+      have h_ax5_k_kp : axioms ⊢ (add k (succ kp) =eq succ (add k kp)) := by
+        have hh := spec (spec h_ax5 k) kp
+        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+              FOL.substTerm_liftTerm] at hh
+        exact hh
+      have h_inner_eq : axioms ⊢ (add (succ kp) k =eq succ (add k kp)) :=
+        FOL.derive_eq_trans h_comm_kp_k h_ax5_k_kp
+      -- a + σ(k+kp) = a
+      have h_a_plus_succ_eq_a : axioms ⊢ (add a (succ (add k kp)) =eq a) :=
+        FOL.derive_eq_trans (eq_congr_add_left (eq_symm h_inner_eq)) h_a_X_eq_a
+      -- ax13: lt a (a + σ(k+kp))  con testigo (k+kp)
+      have h_lt_a_aX : axioms ⊢ lt a (add a (succ (add k kp))) := by
+        have h_iff := spec (spec h_ax13 a) (add a (succ (add k kp)))
+        simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
+              liftTerm, liftTerms, FOL.substTerm_liftTerm,
+              FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff
+        apply iff_mpr h_iff
+        apply ex_intro (add k kp)
+        simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
+              FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift]
+        exact eq_refl _
+      -- Sustituir (a + σ(k+kp)) → a   vía Derives.subst
+      let f_lt_a : Formula := Formula.atom lt_sym [liftTerm 0 a, .var 0]
+      have hS_aX : substFormula 0 (add a (succ (add k kp))) f_lt_a
+          = lt a (add a (succ (add k kp))) := by
+        simp only [f_lt_a, substFormula, substTerm, substTerms, lt,
+                   FOL.substTerm_liftTerm, if_true]
+      have hS_a : substFormula 0 a f_lt_a = lt a a := by
+        simp only [f_lt_a, substFormula, substTerm, substTerms, lt,
+                   FOL.substTerm_liftTerm, if_true]
+      have h_lt_aa : axioms ⊢ lt a a :=
+        hS_a ▸ Derives.subst axioms (add a (succ (add k kp))) a f_lt_a
+              h_a_plus_succ_eq_a (hS_aX ▸ h_lt_a_aX)
+      -- Contradicción con ax18 (irreflexividad)
+      have h_irr_a : axioms ⊢ neg (lt a a) := by
+        have hh := spec h_ax18 a
+        simp [lt] at hh
+        exact hh
+      exact mp h_irr_a h_lt_aa
 
 -- Lema Auxiliar: ∀ n, 0 ≤ n
 theorem zero_le (n : Term) : Γ ⊢ (zero ≤ n) := by

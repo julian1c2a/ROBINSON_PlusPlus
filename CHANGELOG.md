@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-03 — `ax22`/`ax23` eliminados (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22). Build verde tras mover `mod2_of_even` a Block4_C6_C7 (resuelve dependencia circular). Sistema con **31 axiomas matemáticos** (recuento canónico: 24 aritméticos + 7 listas).
+**Last updated:** 2026-06-03 — `ax27_add_left_cancel` ELIMINADO (derivable en PA⁻). Sistema con **30 axiomas matemáticos** (23 aritméticos + 7 listas).
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,10 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Removed (2026-06-03)
+
+- **`ax27_add_left_cancel` ELIMINADO** — derivable en PA⁻ sin inducción. Prueba (style PA⁻): si `a+c=b+c`, por tricotomía (ax19) `a<b ∨ a=b ∨ b<a`; los casos estrictos llevan a `a+c < a+c` vía `lt_add_const_of_le_left` (Block4_C5) + `add_comm'` y contradicen ax18. Reescrito `add_left_cancel` (Block4_C6_C7) con esta prueba. Refactorizado `succ_le_of_lt` (Block2) para no depender de ax27: en su lugar usa `ax5+ax3` para llegar a `a + σ(k+kp) = a`, luego `ax13` da `lt a (a + σ(k+kp))`, sustituye y contradice ax18. Sistema reducido de **31 → 30 axiomas matemáticos** (23 aritméticos + 7 listas).
 
 ### Fixed (2026-06-03)
 

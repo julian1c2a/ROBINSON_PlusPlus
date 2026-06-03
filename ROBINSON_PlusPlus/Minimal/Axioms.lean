@@ -362,13 +362,12 @@ def ax_L3_in_concat : Formula :=
     In (.var 2) (concat (.var 1) (.var 0)) ⇔ lor (In (.var 2) (.var 1)) (In (.var 2) (.var 0))
   )
 
--- Ax 27 (add_left_cancel): ∀ a,b,c, a+c = b+c → a=b
--- Teorema en sistemas con inducción (inducción sobre c).
--- En Minimal, se incluye como axioma para C6/C7. Ver `add_left_cancel` en Block4_C6_C7 (sorry pendiente).
-def ax27_add_left_cancel : Formula :=
-  forall_3 (
-    (add (.var 2) (.var 0) =eq add (.var 1) (.var 0)) ⇒ ((.var 2) =eq (.var 1))
-  )
+-- ax27_add_left_cancel ELIMINADO 2026-06-03: derivable en PA⁻ (sin inducción).
+-- Prueba (style PA⁻): si a+c=b+c, por tricotomía (ax19) a<b ∨ a=b ∨ b<a; los casos
+-- estrictos llevan a a+c < a+c vía monotonía (lt_add_const_of_le_left + add_comm)
+-- y contradicen ax18 (irreflexividad). Ver `add_left_cancel` en Block4_C6_C7.
+-- Referencia: PA⁻ axiomatiza semirring discretamente ordenado, donde cancelación
+-- aditiva es teorema. Ver https://diagonalargument.com/2020/10/21/topics-in-nonstandard-arithmetic-6-the-axioms/.
 
 -- ELIMINADO 2026-06-02: ax28_mul_two_cancel era REDUNDANTE.
 -- La spec TuplasFuncionesYListas.md §Teo 2.11 muestra que es derivable sin inducción
@@ -423,7 +422,8 @@ def axioms : List Formula := [
   ax_C2_concat_cons,
   ax_C3_concat_assoc,
   ax_L3_in_concat,
-  ax27_add_left_cancel, -- teorema en sistemas con inducción; usado por `add_left_cancel` en Block4_C6_C7
+  -- ax27_add_left_cancel ELIMINADO 2026-06-03: derivable en PA⁻ vía tricotomía +
+  -- monotonía + irreflexividad. Ver `add_left_cancel` en Block4_C6_C7.
   -- ax28_mul_two_cancel ELIMINADO 2026-06-02: derivable sin inducción, ver `teo_2_11` en Block1.
   ax29_sub_witness      -- axioma testigo de la resta truncada (monus)
 ]

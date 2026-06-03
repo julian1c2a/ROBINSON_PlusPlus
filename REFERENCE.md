@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-03 — `Minimal/` a 0 sorrys reales; `ax22`/`ax23` eliminados (proj1/proj2 ahora son defs concretas en `Block4_C6_C7`, `proj_is_cantor` reemplaza ax22 como teorema); `ax28` eliminado (derivado en `teo_2_11`); sistema actual con **31 axiomas matemáticos** (24 aritméticos + 7 de listas) + 5 meta-reglas FOL.
+**Last updated:** 2026-06-03 — `Minimal/` a 0 sorrys reales; `ax27` eliminado (derivable en PA⁻ vía tricotomía + monotonía + ax18); `ax22`/`ax23` eliminados (proj1/proj2 son defs concretas; `proj_is_cantor` reemplaza ax22 como teorema); `ax28` eliminado (derivado en `teo_2_11`); sistema actual con **30 axiomas matemáticos** (23 aritméticos + 7 de listas) + 5 meta-reglas FOL.
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -186,7 +186,7 @@ scoped notation:50 x  " ∈ " l   => In x l
 abbrev ex := @Formula.ex
 ```
 
-#### 3.1.5 Axiomas matemáticos (31 axiomas en la lista `axioms`: 24 aritméticos + 7 listas)
+#### 3.1.5 Axiomas matemáticos (30 axiomas en la lista `axioms`: 23 aritméticos + 7 listas)
 
 | # | Nombre | Enunciado matemático |
 |---|---|---|
@@ -219,10 +219,10 @@ abbrev ex := @Formula.ex
 | Ax_C1 | `ax_C1_concat_nil` | ∀ L, nil ## L = L |
 | Ax_C2 | `ax_C2_concat_cons` | ∀ h, t, L, cons(h,t) ## L = cons(h, t##L) |
 | Ax_C3 | `ax_C3_concat_assoc` | ∀ L, M, N, (L##M)##N = L##(M##N) (requiere inducción) |
-| Ax 27 | `ax27_add_left_cancel` | ∀ a, b, c, a+c = b+c ⇒ a=b (requiere inducción) |
 | Ax 29 | `ax29_sub_witness` | ∀ a, b, b ≤ a ⇒ b + (a−b) = a |
 
 **Ax 20** (`ax20_eq_decidable`): definido pero NO en la lista — convertido en teorema `eq_decidable` (Block1).
+**Ax 27** (`ax27_add_left_cancel`): **ELIMINADO 2026-06-03** — derivable en PA⁻ vía tricotomía (ax19) + monotonía (`lt_add_const_of_le_left`) + irreflexividad (ax18). Ver `add_left_cancel` en `Block4_C6_C7`.
 **Ax 22** (`ax22_cantor_proj_exists`): **ELIMINADO 2026-06-02** — `proj1`/`proj2` ya no son símbolos opacos sino defs concretas en `Block4_C6_C7` (`proj1 := x_of_c`, `proj2 := y_of_c`). El contenido de ax22 se demuestra como teorema `proj_is_cantor` allí mismo.
 **Ax 23** (`ax23_cantor_proj_uniq`): **ELIMINADO 2026-06-02** — `cantor_uniqueness` (Block4_C6_C7) probado constructivamente; ax23 nunca se usó en código.
 **Ax 28** (`ax28_mul_two_cancel`): **ELIMINADO 2026-06-02** — derivable sin inducción, ver `teo_2_11` (Block1). El `def` permanece comentado en `Axioms.lean` como nota histórica.
@@ -456,7 +456,7 @@ def proj2 (c) : Term := y_of_c c    -- idem
 
 ```lean
 theorem add_left_cancel {a b c} (h : Γ⊢(add a c =eq add b c)) : Γ ⊢ (a =eq b)
-                                                          -- delega a ax27
+                                                          -- PA⁻ style: tricotomía + monotonía + ax18 (REEMPLAZA ax27, eliminado 2026-06-03)
 theorem mod2_of_even {n k} (h : Γ⊢(n =eq mul two k)) : Γ ⊢ (mod2 n =eq zero)
                                                           -- delega a ax24 (movido aquí desde Block5 el 2026-06-03)
 theorem proj_is_cantor (c) : Γ ⊢ (mul two c =eq cantor_poly (proj1 c) (proj2 c))

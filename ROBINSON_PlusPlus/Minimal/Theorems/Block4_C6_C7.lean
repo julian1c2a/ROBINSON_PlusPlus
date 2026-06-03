@@ -72,29 +72,45 @@ private theorem lift_01_eq_00_list (ts : List Term) :
     rw [lift_01_eq_00 t, lift_01_eq_00_list ts']
 end
 
--- Helper theorem for left cancellation on addition.
--- Proof strategy: ax27_add_left_cancel = ∀a∀b∀c, (add a c = add b c) ⇒ a = b.
--- Triple spec introduces liftTerm 0 (liftTerm 0 a) in the type.
--- Using lift_01_eq_00 (Lema A) + FOL.substTerm_liftTerm, simp reduces the type
--- to the desired formula.
+-- Cancelación por la izquierda de la suma (sin ax27, eliminado 2026-06-03).
+-- Prueba PA⁻ style: por tricotomía (ax19) `a<b ∨ a=b ∨ b<a`. Si `a<b`, por
+-- monotonía (`lt_add_const_of_le_left` + `add_comm'`) tenemos `a+c < b+c`;
+-- combinado con la hipótesis `a+c = b+c` resulta `a+c < a+c`, contradiciendo
+-- `ax18` (irreflexividad). Caso `b<a` simétrico.
 theorem add_left_cancel {a b c : Term}
   (h : Γ ⊢ ((add a c) =eq (add b c))) :
     Γ ⊢ (a =eq b) := by
-  have h_ax27 := ax (by simp [axioms, ax27_add_left_cancel] : ax27_add_left_cancel ∈ axioms)
-  have h_imp : Γ ⊢ ((add a c =eq add b c) ⇒ (a =eq b)) := by
-    have h1 := spec h_ax27 a
-    have h2 := spec h1 b
-    have h3 := spec h2 c
-    -- simp (sin only) incluye ite_true, ite_false, aritmética Nat,
-    -- necesarias porque substFormula genera "0 + 1", "0 + 1 + 1" en vez de "1", "2".
-    -- lift_01_eq_00 convierte liftTerm 0 (liftTerm 0 a) → liftTerm 1 (liftTerm 0 a)
-    -- para que substTerm_liftTerm pueda disparar con c=1.
-    simp [substFormula, substTerm, substTerms,
-          add, add_sym,
-          ← lift_01_eq_00,
-          FOL.substTerm_liftTerm] at h3
-    exact h3
-  exact mp h_imp h
+  have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
+  have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)
+  have h_tric : Γ ⊢ (lt a b ∨ (a =eq b) ∨ lt b a) := by
+    have hh := spec (spec h_ax19 a) b
+    simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at hh
+    exact hh
+  have h_irr_ac : Γ ⊢ neg (lt (add a c) (add a c)) := by
+    have hh := spec h_ax18 (add a c)
+    simp [lt] at hh; exact hh
+  apply Axioms.or_elim h_tric
+  · intro h_a_lt_b
+    apply false_elim
+    have h_lt_ca_cb : Γ ⊢ lt (add c a) (add c b) := lt_add_const_of_le_left h_a_lt_b
+    -- conmuta a `lt (add a c) (add b c)`
+    have h_lt_ac_bc : Γ ⊢ lt (add a c) (add b c) :=
+      lt_rewrite h_lt_ca_cb (add_comm' c a) (add_comm' c b)
+    -- sustituye `add b c → add a c` con la hipótesis `h` (eq_symm)
+    have h_lt_ac_ac : Γ ⊢ lt (add a c) (add a c) :=
+      lt_rewrite h_lt_ac_bc (eq_refl _) (eq_symm h)
+    exact mp h_irr_ac h_lt_ac_ac
+  · intro h23
+    apply Axioms.or_elim h23
+    · intro h_eq; exact h_eq
+    · intro h_b_lt_a
+      apply false_elim
+      have h_lt_cb_ca : Γ ⊢ lt (add c b) (add c a) := lt_add_const_of_le_left h_b_lt_a
+      have h_lt_bc_ac : Γ ⊢ lt (add b c) (add a c) :=
+        lt_rewrite h_lt_cb_ca (add_comm' c b) (add_comm' c a)
+      have h_lt_ac_ac : Γ ⊢ lt (add a c) (add a c) :=
+        lt_rewrite h_lt_bc_ac (eq_symm h) (eq_refl _)
+      exact mp h_irr_ac h_lt_ac_ac
 
 -- ============================================================================
 -- Inverse functions (constructive definitions using `sub` from Axioms.lean)

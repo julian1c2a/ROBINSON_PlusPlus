@@ -13,7 +13,7 @@
 | Modules sin sorry | 9 / 9 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
-| Axiomas matemáticos | **31** (24 aritméticos: ax2-19, ax21, ax24-27, ax29 + 7 listas: ax_L0-3, ax_C1-3) — `ax22`/`ax23` eliminados 2026-06-02 (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22); `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
+| Axiomas matemáticos | **30** (23 aritméticos: ax2-19, ax21, ax24-26, ax29 + 7 listas: ax_L0-3, ax_C1-3) — `ax27` eliminado 2026-06-03 (PA⁻ derivable); `ax22`/`ax23` eliminados 2026-06-02 (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22); `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
 | Total definitions | ~52 |
 | Build status | ✅ Passing (0 errores, ~13 warnings sólo de sorry) |
 | Lean version | v4.29.1 |
@@ -43,6 +43,8 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-03 — `ax27_add_left_cancel` ELIMINADO**: derivable en PA⁻ sin inducción (tricotomía + monotonía + irreflexividad). Reescrito `add_left_cancel` (Block4_C6_C7) con prueba PA⁻; refactorizado `succ_le_of_lt` (Block2) para usar truco `ax13 + ax3 + ax18` (deriva `lt a a` y contradice). Sistema reducido **31 → 30 axiomas matemáticos**.
 
 - **2026-06-03 — Build verde restaurado tras `537fd68`**: el commit del 2026-06-02 introdujo `proj_is_cantor` en `Block4_C6_C7` usando `mod2_of_even` (Block5), creando dependencia circular. Solución: mover `mod2_of_even` a `Block4_C6_C7` (justo antes de `proj_is_cantor`). Ningún cambio de prueba, solo de ubicación. **Recuento canónico rectificado: 31 axiomas** (los docs previos decían "30" por un error histórico de conteo; el sistema siempre tuvo 33 antes de eliminar ax22/ax23/ax28).
 
@@ -84,7 +86,7 @@
 
 ```
 ROBINSON_PlusPlus/Minimal/
-├── Axioms.lean              # 31 axiomas + helpers meta-level (5 sorry: reglas de deducción)
+├── Axioms.lean              # 30 axiomas + helpers meta-level (5 sorry: reglas de deducción)
 └── Theorems/
     ├── Block1.lean          # Aritmética básica, constantes, orden ✅
     ├── Block2.lean          # Raíz cuadrada, cotas, unicidad ✅
