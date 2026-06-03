@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-02
+**Last updated:** 2026-06-03
 **Author**: Julián Calderón Almendros
 
 ---
@@ -13,7 +13,7 @@
 | Modules sin sorry | 9 / 9 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
-| Axiomas matemáticos | **30** (ax2–ax17, ax21–ax27, ax29, list/concat L0–L3, C1–C3) — `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
+| Axiomas matemáticos | **31** (24 aritméticos: ax2-19, ax21, ax24-27, ax29 + 7 listas: ax_L0-3, ax_C1-3) — `ax22`/`ax23` eliminados 2026-06-02 (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22); `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
 | Total definitions | ~52 |
 | Build status | ✅ Passing (0 errores, ~13 warnings sólo de sorry) |
 | Lean version | v4.29.1 |
@@ -33,8 +33,8 @@
 | `Minimal/Theorems/Block3.lean` | 0 | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
 | `Minimal/Theorems/Block4.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block4_C5.lean` | 0 | ✅ Complete — `lemma_C5`, `lemma_C5_unique`, `cantor_bounds` |
-| `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
-| `Minimal/Theorems/Block5.lean` | 0 | ✅ `mod2_of_even`, `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
+| `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `mod2_of_even`, `proj1`/`proj2` (defs), `proj_is_cantor`, `cantor_uniqueness`, `cantor_surjectivity` |
+| `Minimal/Theorems/Block5.lean` | 0 | ✅ `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` (mod2_of_even movido a Block4_C6_C7 el 2026-06-03) |
 | `Minimal/Theorems/Block6.lean` | 0 | ✅ Todos probados (`concat_assoc` e `in_concat_iff` vía ax_C3/ax_L3 nuevos) |
 | **Total** | **0** | 🎉 |
 
@@ -44,7 +44,11 @@
 
 ## Recent Achievements
 
-- **2026-06-02 — `ax28_mul_two_cancel` ELIMINADO**: la spec `TuplasFuncionesYListas.md §Teo 2.11` ya proporcionaba la prueba sin inducción (tricotomía + irreflexividad + monotonía estricta de *2). Reprobado `teo_2_11` directamente en Block1 (con nuevos helpers `mul_two_succ_ne_zero` y `mul_two_lt_mono`). Refactorizados `cantor_injective_c` (Block4) y `cantor_uniqueness` (Block4_C6_C7) para usar `teo_2_11` real. Sistema reducido de 31 → **30 axiomas matemáticos**.
+- **2026-06-03 — Build verde restaurado tras `537fd68`**: el commit del 2026-06-02 introdujo `proj_is_cantor` en `Block4_C6_C7` usando `mod2_of_even` (Block5), creando dependencia circular. Solución: mover `mod2_of_even` a `Block4_C6_C7` (justo antes de `proj_is_cantor`). Ningún cambio de prueba, solo de ubicación. **Recuento canónico rectificado: 31 axiomas** (los docs previos decían "30" por un error histórico de conteo; el sistema siempre tuvo 33 antes de eliminar ax22/ax23/ax28).
+
+- **2026-06-02 — `ax22`/`ax23` ELIMINADOS** (commit `537fd68`, Claude Code Pro / Copilot Pro): `proj1`/`proj2` ya no son símbolos opacos del lenguaje sino `def proj1 (c) := x_of_c c` y `def proj2 (c) := y_of_c c` en `Block4_C6_C7`. El contenido de ax22 se demuestra constructivamente como teorema `proj_is_cantor`. `ax23` (`cantor_proj_uniq`) nunca se usó en código (la unicidad real estaba probada como `cantor_uniqueness`). `Block5` refactorizado para usar `proj_is_cantor` en lugar de `spec h_ax22`.
+
+- **2026-06-02 — `ax28_mul_two_cancel` ELIMINADO**: la spec `TuplasFuncionesYListas.md §Teo 2.11` ya proporcionaba la prueba sin inducción (tricotomía + irreflexividad + monotonía estricta de *2). Reprobado `teo_2_11` directamente en Block1 (con nuevos helpers `mul_two_succ_ne_zero` y `mul_two_lt_mono`). Refactorizados `cantor_injective_c` (Block4) y `cantor_uniqueness` (Block4_C6_C7) para usar `teo_2_11` real.
 
 - **2026-06-02 — REFERENCE.md proyectado**: reescritura completa, sustituyendo la versión severamente stale (todos los módulos marcados 🔄 In progress, fechado 2026-05-12). Ahora refleja 9/9 módulos ✅ Complete, 30 axiomas, lista de exports por módulo con signatura Lean + descripción matemática + dependencias.
 
@@ -80,7 +84,7 @@
 
 ```
 ROBINSON_PlusPlus/Minimal/
-├── Axioms.lean              # 30 axiomas + helpers meta-level (5 sorry: reglas de deducción)
+├── Axioms.lean              # 31 axiomas + helpers meta-level (5 sorry: reglas de deducción)
 └── Theorems/
     ├── Block1.lean          # Aritmética básica, constantes, orden ✅
     ├── Block2.lean          # Raíz cuadrada, cotas, unicidad ✅

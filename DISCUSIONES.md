@@ -1,37 +1,33 @@
 # Discusión sobre Axiomas Temporales
 
-**Última actualización:** 2026-06-02 — `ax28` ELIMINADO; ax22/ax23 pendientes (eliminables, próxima prioridad).
+**Última actualización:** 2026-06-03 — ~~ax22~~, ~~ax23~~ ELIMINADOS (2026-06-02, commit `537fd68`); este doc queda como nota histórica.
 **Autor**: Julián Calderón Almendros
 
 Este documento analiza la necesidad y redundancia de ciertos axiomas que se han introducido de forma temporal en el sistema `Minimal`.
 
-> **Estado actualizado (2026-06-02)**:
+> **Estado actualizado (2026-06-03)**:
 >
-> - **ax22, ax23** (scaffolding Cantor): seguían en la lista pero **C6 (`cantor_surjectivity`) y C7 (`cantor_uniqueness`) ya están probados** desde 2026-05-27. Eliminables tras refactorizar Block5 para no hacer `spec h_ax22` (próxima recomendación priorizada).
+> - ~~**ax22, ax23**~~ (scaffolding Cantor): **ELIMINADOS 2026-06-02** (commit `537fd68`). `proj1`/`proj2` ya no son símbolos opacos sino `def proj1 (c) := x_of_c c` y `def proj2 (c) := y_of_c c` en `Block4_C6_C7`. El contenido de ax22 se prueba como teorema `proj_is_cantor`. ax23 nunca se usó en código (la unicidad real estaba probada como `cantor_uniqueness`).
 > - **ax27** (add_left_cancel): sigue siendo necesario sin inducción.
 > - ~~**ax28** (mul_two_cancel)~~: **ELIMINADO 2026-06-02**. La spec ya tenía la prueba sin inducción; reprobado como `teo_2_11` en Block1 (vía tricotomía + irreflexividad + monotonía estricta de *2).
 
-## Análisis de los Axiomas 22 y 23
+## Análisis histórico de los Axiomas 22 y 23 (eliminados)
 
-Los axiomas 22 y 23 se introdujeron para poder definir las funciones de proyección `π₁` y `π₂` antes de haber demostrado formalmente que la función de apareamiento de Cantor es una biyección.
+Los axiomas 22 y 23 se introdujeron originalmente para poder definir las funciones de proyección `π₁` y `π₂` antes de haber demostrado formalmente que la función de apareamiento de Cantor es una biyección. La conclusión declarada era que **ambos axiomas son redundantes** y deberían ser teoremas — exactamente lo que ocurrió en el commit `537fd68` (2026-06-02).
 
-La conclusión es que **ambos axiomas son redundantes** en un sistema completo, ya que son equivalentes a teoremas que se deben demostrar. Sirven como andamiaje temporal.
-
-### Axioma 22: `ax22_cantor_proj_exists` (Sobreyectividad)
+### Axioma 22: `ax22_cantor_proj_exists` (Sobreyectividad) — ELIMINADO
 
 - **Enunciado del Axioma**: `∀ c, is_cantor (π₁ c) (π₂ c) c`
-- **Significado**: Para cualquier número `c`, existen un `x` y un `y` (que llamamos `π₁ c` y `π₂ c`) tales que `c` es el resultado de aplicarles la función de Cantor.
-- **Redundancia**: Este axioma es un postulado directo del **Teorema C6 (Sobreyectividad)**. La estrategia para demostrar C6, como se describe en `TuplasFuncionesYListas.md`, es construir explícitamente las funciones inversas que, dado `c`, encuentran `x` e `y`. Una vez demostrado el Teorema C6, este axioma se puede eliminar.
+- **Sustituto actual**: `def proj1 (c) := x_of_c c`, `def proj2 (c) := y_of_c c` en `Block4_C6_C7` (testigos concretos de `lemma_C5` + `parity_lemma` + `ax29_sub_witness`), y el teorema `proj_is_cantor (c) : Γ ⊢ mul two c =eq cantor_poly (proj1 c) (proj2 c)` lo demuestra constructivamente con la misma estructura que `cantor_surjectivity`.
 
-### Axioma 23: `ax23_cantor_proj_uniq` (Unicidad Proyectiva)
+### Axioma 23: `ax23_cantor_proj_uniq` (Unicidad Proyectiva) — ELIMINADO
 
 - **Enunciado del Axioma**: `Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y'`
-- **Significado**: Si dos pares `(x, y)` y `(x', y')` producen el mismo número `c` bajo la función de Cantor, entonces los pares deben ser idénticos.
-- **Redundancia**: Este axioma es un postulado directo del **Teorema C7 (Unicidad Proyectiva)**. La estrategia para demostrar C7 se basa en la unicidad del valor intermedio `w = x+y` que se obtiene en la inversión de la función. Una vez demostrado el Teorema C7, este axioma se puede eliminar.
+- **Sustituto actual**: el teorema `cantor_uniqueness` en `Block4_C6_C7`, probado vía `lemma_C5_unique` + `cantor_bounds` + `teo_2_11` (cancelación estricta de *2) + `add_left_cancel`. Ax23 nunca se utilizó en código.
 
-## Conclusión
+## Conclusión histórica (cumplida)
 
-Los axiomas 22 y 23 son correctos en su afirmación, pero su estatus debería ser el de **teoremas**. Se mantienen temporalmente para permitir el desarrollo concurrente de las propiedades de las proyecciones mientras se completan las pruebas de sobreyectividad y unicidad de la función de Cantor.
+Los axiomas 22 y 23 fueron correctos en su afirmación pero su estatus debía ser el de **teoremas**, como se cumplió el 2026-06-02. La eliminación reduce la superficie axiomática del sistema a **31 axiomas matemáticos** sin sacrificar ningún resultado.
 
 ---
 
@@ -94,10 +90,8 @@ DISCUSIÓN ¿Como entonces se puede construir la incompletitud de Gödel en un s
 
 Estos axiomas se han añadido para poder avanzar, pero están destinados a ser eliminados una vez que se demuestren los teoremas correspondientes.
 
-*   **Axioma 22 (`ax22_cantor_proj_exists`)**: `∀ c, is_cantor (π₁ c) (π₂ c) c`
-    *   **Propósito**: Postula la **sobreyectividad** de la función de Cantor. Será eliminado cuando se demuestre el **Teorema C6**.
-*   **Axioma 23 (`ax23_cantor_proj_uniq`)**: `Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y'`
-    *   **Propósito**: Postula la **unicidad proyectiva** de la función de Cantor. Será eliminado cuando se demuestre el **Teorema C7**.
+*   ~~**Axioma 22 (`ax22_cantor_proj_exists`)**~~ — **ELIMINADO 2026-06-02**: ahora teorema `proj_is_cantor` en `Block4_C6_C7`.
+*   ~~**Axioma 23 (`ax23_cantor_proj_uniq`)**~~ — **ELIMINADO 2026-06-02**: el teorema `cantor_uniqueness` ya cubre la unicidad proyectiva sin necesidad de un axioma de respaldo.
 *   **Axioma 24 (`ax24_mod2_of_even`)**: `n = 2*k → mod2(n) = 0`
     *   **Propósito**: Postula que el `mod2` de un número par es cero. Es un teorema en sistemas con inducción, pero se mantiene como axioma en `Minimal` porque su prueba formal requiere un sistema más fuerte.
 *   **Axioma 27 (`ax27_add_left_cancel`)**: `a+c = b+c → a=b`

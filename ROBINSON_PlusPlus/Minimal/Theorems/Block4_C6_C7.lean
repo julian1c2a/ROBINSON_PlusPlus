@@ -118,6 +118,18 @@ def x_of_c (c : Term) : Term := sub (w_candidate c) (y_of_c c)
 def proj1 (c : Term) : Term := x_of_c c
 def proj2 (c : Term) : Term := y_of_c c
 
+-- Lema Auxiliar: n = 2*k ⇒ mod2(n) = 0  (instancia directa de ax24).
+-- Movido aquí desde Block5 el 2026-06-03 para resolver dependencia circular
+-- (lo necesita `proj_is_cantor` abajo y Block5 importa este módulo).
+theorem mod2_of_even {n k : Term} (h : Γ ⊢ (n =eq mul two k)) : Γ ⊢ (mod2 n =eq zero) := by
+  have h_ax24 := ax (by simp [axioms] : ax24_mod2_of_even ∈ axioms)
+  have h_imp : Γ ⊢ ((n =eq mul two k) ⇒ (mod2 n =eq zero)) := by
+    have hh := spec (spec h_ax24 n) k
+    simp [substFormula, substTerm, substTerms, mul, two, one, mod2, zero,
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+    exact hh
+  exact mp h_imp h
+
 -- Teo: ∀ c, is_cantor (proj1 c) (proj2 c) c (= contenido del antiguo ax22,
 -- ahora demostrado constructivamente).
 -- Estructura idéntica a `cantor_surjectivity` pero con testigos concretos
@@ -359,6 +371,7 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 export ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7 (
   proj1
   proj2
+  mod2_of_even
   proj_is_cantor
   cantor_surjectivity
   cantor_uniqueness

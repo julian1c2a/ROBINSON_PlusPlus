@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-02 — `Minimal/` a 0 sorrys reales; `ax28` eliminado (derivado en `teo_2_11`); sistema actual con 30 axiomas matemáticos + 5 meta-reglas FOL.
+**Last updated:** 2026-06-03 — `Minimal/` a 0 sorrys reales; `ax22`/`ax23` eliminados (proj1/proj2 ahora son defs concretas en `Block4_C6_C7`, `proj_is_cantor` reemplaza ax22 como teorema); `ax28` eliminado (derivado en `teo_2_11`); sistema actual con **31 axiomas matemáticos** (24 aritméticos + 7 de listas) + 5 meta-reglas FOL.
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -186,7 +186,7 @@ scoped notation:50 x  " ∈ " l   => In x l
 abbrev ex := @Formula.ex
 ```
 
-#### 3.1.5 Axiomas matemáticos (30 axiomas en la lista `axioms`)
+#### 3.1.5 Axiomas matemáticos (31 axiomas en la lista `axioms`: 24 aritméticos + 7 listas)
 
 | # | Nombre | Enunciado matemático |
 |---|---|---|
@@ -209,8 +209,6 @@ abbrev ex := @Formula.ex
 | Ax 18 | `ax18_lt_irrefl` | ∀ n, ¬(n < n) |
 | Ax 19 | `ax19_lt_trichotomy` | ∀ a, b, a<b ∨ a=b ∨ b<a |
 | Ax 21 | `ax21_mod2_range` | ∀ n, mod2(n)=0 ∨ mod2(n)=1 |
-| Ax 22 | `ax22_cantor_proj_exists` | ∀ c, is_cantor(π₁(c), π₂(c), c) |
-| Ax 23 | `ax23_cantor_proj_uniq` | Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y' |
 | Ax 24 | `ax24_mod2_of_even` | ∀ n, k, n = 2k ⇒ mod2(n) = 0 |
 | Ax 25 | `ax25_pred_zero` | τ(0) = 0 |
 | Ax 26 | `ax26_pred_succ` | ∀ n, τ(σ(n)) = n |
@@ -225,6 +223,8 @@ abbrev ex := @Formula.ex
 | Ax 29 | `ax29_sub_witness` | ∀ a, b, b ≤ a ⇒ b + (a−b) = a |
 
 **Ax 20** (`ax20_eq_decidable`): definido pero NO en la lista — convertido en teorema `eq_decidable` (Block1).
+**Ax 22** (`ax22_cantor_proj_exists`): **ELIMINADO 2026-06-02** — `proj1`/`proj2` ya no son símbolos opacos sino defs concretas en `Block4_C6_C7` (`proj1 := x_of_c`, `proj2 := y_of_c`). El contenido de ax22 se demuestra como teorema `proj_is_cantor` allí mismo.
+**Ax 23** (`ax23_cantor_proj_uniq`): **ELIMINADO 2026-06-02** — `cantor_uniqueness` (Block4_C6_C7) probado constructivamente; ax23 nunca se usó en código.
 **Ax 28** (`ax28_mul_two_cancel`): **ELIMINADO 2026-06-02** — derivable sin inducción, ver `teo_2_11` (Block1). El `def` permanece comentado en `Axioms.lean` como nota histórica.
 
 #### 3.1.6 Meta-reglas FOL (5 `axiom`, ADR-008)
@@ -440,7 +440,7 @@ theorem add_comm' / add_assoc' / mul_comm' / mul_assoc' / mul_distrib' / mul_dis
 **Namespace**: `…Block4_C6_C7`
 **Status**: ✅ Complete
 **@importance**: `high`
-**Last updated**: 2026-06-02 (cantor_uniqueness ahora usa `teo_2_11` real)
+**Last updated**: 2026-06-03 (proj1/proj2 defs concretas; `proj_is_cantor` reemplaza ax22; `mod2_of_even` movido aquí desde Block5)
 
 #### Defs
 
@@ -448,6 +448,8 @@ theorem add_comm' / add_assoc' / mul_comm' / mul_assoc' / mul_distrib' / mul_dis
 def w_of_c (c) : Term := w_candidate c
 def y_of_c (c) : Term := sub c (div2 (mul (w_candidate c) (succ (w_candidate c))))
 def x_of_c (c) : Term := sub (w_candidate c) (y_of_c c)
+def proj1 (c) : Term := x_of_c c    -- ELIMINA ax22; antes era símbolo opaco en Axioms.lean
+def proj2 (c) : Term := y_of_c c    -- idem
 ```
 
 #### Exports
@@ -455,8 +457,12 @@ def x_of_c (c) : Term := sub (w_candidate c) (y_of_c c)
 ```lean
 theorem add_left_cancel {a b c} (h : Γ⊢(add a c =eq add b c)) : Γ ⊢ (a =eq b)
                                                           -- delega a ax27
+theorem mod2_of_even {n k} (h : Γ⊢(n =eq mul two k)) : Γ ⊢ (mod2 n =eq zero)
+                                                          -- delega a ax24 (movido aquí desde Block5 el 2026-06-03)
+theorem proj_is_cantor (c) : Γ ⊢ (mul two c =eq cantor_poly (proj1 c) (proj2 c))
+                                                          -- REEMPLAZA ax22 constructivamente
 theorem cantor_surjectivity (c) : Γ ⊢ ex (ex (is_cantor #1 #0 (liftTerm 0 (liftTerm 0 c))))
-                                                          -- Teo C6: ∀c, ∃x y, Cantor(x,y,c)
+                                                          -- Teo C6: ∀c, ∃x y, Cantor(x,y,c) (wrapper de proj_is_cantor)
 theorem cantor_uniqueness (x y x' y' c) :
     Γ ⊢ land (is_cantor x y c)(is_cantor x' y' c) ⇒ land (x=eq x')(y=eq y')
                                                           -- Teo C7
@@ -473,13 +479,13 @@ theorem cantor_uniqueness (x y x' y' c) :
 #### Exports
 
 ```lean
-theorem mod2_of_even {n k} (h : Γ⊢(n =eq mul two k)) : Γ ⊢ (mod2 n =eq zero)
-                                                          -- delega a ax24
+-- mod2_of_even FUE MOVIDO a Block4_C6_C7 (2026-06-03) para eliminar dependencia
+-- circular: lo necesita `proj_is_cantor` allí y Block5 importa C6_C7.
 theorem is_cantor_pair (x y) : Γ ⊢ (mul two (pair x y) =eq cantor_poly x y)
                                                           -- LEMA CLAVE: ∀x,y, is_cantor(x,y, pair x y)
-theorem proj1_pair_eq_x (x y) : Γ ⊢ (proj1 (pair x y) =eq x)        -- Teo C8
-theorem proj2_pair_eq_y (x y) : Γ ⊢ (proj2 (pair x y) =eq y)        -- Teo C9
-theorem pair_proj_eq_c (c)    : Γ ⊢ (pair (proj1 c)(proj2 c) =eq c) -- Teo C10
+theorem proj1_pair_eq_x (x y) : Γ ⊢ (proj1 (pair x y) =eq x)        -- Teo C8 (usa proj_is_cantor, ya no ax22)
+theorem proj2_pair_eq_y (x y) : Γ ⊢ (proj2 (pair x y) =eq y)        -- Teo C9 (usa proj_is_cantor)
+theorem pair_proj_eq_c (c)    : Γ ⊢ (pair (proj1 c)(proj2 c) =eq c) -- Teo C10 (usa proj_is_cantor)
 theorem pair_inj {x y x' y'} : Γ ⊢ (pair x y =eq pair x' y') ⇒ land (x=eq x')(y=eq y')
                                                           -- Teo C11
 ```
@@ -523,7 +529,7 @@ theorem in_concat_iff (x L M)   : Γ ⊢ In x (concat L M) ⇔ lor (In x L)(In x
 
 Ver `NEXT-STEPS.md` (Ejes 1–4). Resumen:
 
-1. **Eje 1 (corto)**: `Block7.lean` (Funciones, `IsFunction`, Teo F3); auditar `ax24` (mod2_of_even), `ax22`/`ax23` (proj scaffolding); eliminar duplicados.
+1. **Eje 1 (corto)**: `Block7.lean` (Funciones, `IsFunction`, Teo F3); auditar `ax24` (`mod2_of_even` ya en Block4_C6_C7); eliminar duplicados. (ax22/ax23 ya eliminados en 537fd68/2026-06-02.)
 2. **Eje 2 (medio)**: `Intermediate/` con inducción restringida; derivar ax6, 7, 10, 11, 12, 18, 19 como teoremas.
 3. **Eje 3 (largo)**: `Full/` con inducción general; derivar ax21, 24, 27, _C3, _L3.
 4. **Eje 4 (muy largo)**: CZF, cardinalidad, análisis constructivo.

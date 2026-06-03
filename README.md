@@ -13,12 +13,12 @@ Una implementación formal de una **Aritmética Fundacional** en Lean 4, constru
 
 Este proyecto está dedicado a explorar y formalizar diferentes sistemas axiomáticos para la aritmética. Su objetivo es fundar rigurosamente los números naturales y, a partir de ellos, construir estructuras de datos como tuplas y listas.
 
-La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, y con ella, una teoría de tuplas y listas.
+La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 31 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, y con ella, una teoría de tuplas y listas.
 
 **Características principales:**
 
 - **Base Lógica Sólida**: Utiliza una implementación completa y verificada de Lógica de Primer Orden (`FOL`) como dependencia.
-- **Aritmética Minimalista**: Formaliza un sistema de 30 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
+- **Aritmética Minimalista**: Formaliza un sistema de 31 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
 - **Desarrollo Progresivo**: El proyecto está estructurado para avanzar desde sistemas débiles (`Minimal`) hacia sistemas más fuertes con principios de inducción (`Intermediate`, `Full`).
 - **Metaprogramación**: Hereda y utiliza las tácticas de automatización del proyecto `FOL` para agilizar las demostraciones.
 
@@ -32,8 +32,8 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 a
 | `Minimal/Theorems/Block3.lean` | `Minimal.Theorems.Block3` | `Minimal.Axioms`, `Block1` | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
 | `Minimal/Theorems/Block4.lean` | `Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | ✅ Complete |
 | `Minimal/Theorems/Block4_C5.lean` | `Minimal.Theorems.Block4_C5` | `Block1`, `Block2`, `Block3` | ✅ Complete — `lemma_C5` (∃) + `lemma_C5_unique` + `cantor_bounds` |
-| `Minimal/Theorems/Block4_C6_C7.lean` | `Minimal.Theorems.Block4_C6_C7` | `Block1..4`, `Block4_C5` | ✅ Complete — `add_left_cancel`, `cantor_uniqueness`, `cantor_surjectivity` |
-| `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1..4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete — `mod2_of_even`, `proj1/2_pair`, `pair_proj_eq_c`, `pair_inj` |
+| `Minimal/Theorems/Block4_C6_C7.lean` | `Minimal.Theorems.Block4_C6_C7` | `Block1..4`, `Block4_C5` | ✅ Complete — `add_left_cancel`, `mod2_of_even`, `proj1`/`proj2` (defs), `proj_is_cantor`, `cantor_uniqueness`, `cantor_surjectivity` |
+| `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1..4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete — `proj1/2_pair`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
 | `Minimal/Theorems/Block6.lean` | `Minimal.Theorems.Block6` | `Block1`, `Block4`, `Block5` | ✅ Complete — listas, pertenencia, concat (assoc/in_concat vía ax_C3/ax_L3 postulados) |
 
 ## Project Structure
@@ -41,7 +41,7 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 a
 ```text
 ROBINSON_PlusPlus/
 ├── Minimal/
-│   ├── Axioms.lean            # Lenguaje + 30 axiomas + 5 meta-axiomas (reglas de deducción)
+│   ├── Axioms.lean            # Lenguaje + 31 axiomas + 5 meta-axiomas (reglas de deducción)
 │   └── Theorems/
 │       ├── Block1.lean        # Block I: Aritmética básica, constantes
 │       ├── Block2.lean        # Block II: Raíz cuadrada, cotas, unicidad

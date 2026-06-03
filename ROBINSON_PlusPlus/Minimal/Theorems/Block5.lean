@@ -41,15 +41,9 @@ def Γ := axioms
 ### Fase 11: Isomorfismo de Tuplas
 -/
 
--- Lema Auxiliar: n = 2*k ⇒ mod2(n) = 0  (instancia directa de ax24)
-theorem mod2_of_even {n k : Term} (h : Γ ⊢ (n =eq mul two k)) : Γ ⊢ (mod2 n =eq zero) := by
-  have h_ax24 := ax (by simp [axioms] : ax24_mod2_of_even ∈ axioms)
-  have h_imp : Γ ⊢ ((n =eq mul two k) ⇒ (mod2 n =eq zero)) := by
-    have hh := spec (spec h_ax24 n) k
-    simp [substFormula, substTerm, substTerms, mul, two, one, mod2, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
-    exact hh
-  exact mp h_imp h
+-- Lema Auxiliar `mod2_of_even` movido a Block4_C6_C7 el 2026-06-03 para evitar
+-- dependencia circular (lo necesita `proj_is_cantor` allí). Sigue disponible
+-- aquí vía `open Block4_C6_C7`.
 
 -- Lema clave: is_cantor x y (pair x y), i.e. 2·pair(x,y) = cantor_poly(x,y).
 -- Idea: cantor_poly es par (cantor_poly_is_even) ⇒ mod2 = 0 ⇒ por ax17
@@ -145,7 +139,6 @@ end ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
 -- Exports
 export ROBINSON_PlusPlus.Minimal.Theorems.Block5 (
-  mod2_of_even
   is_cantor_pair
   proj1_pair_eq_x
   proj2_pair_eq_y
