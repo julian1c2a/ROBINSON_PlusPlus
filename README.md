@@ -36,6 +36,7 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 a
 | `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1..4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete — `proj1/2_pair`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
 | `Minimal/Theorems/Block6.lean` | `Minimal.Theorems.Block6` | `Block1`, `Block4`, `Block5` | ✅ Complete — listas, pertenencia, concat (assoc/in_concat vía ax_C3/ax_L3 postulados) |
 | `Minimal/Theorems/Block7.lean` | `Minimal.Theorems.Block7` | `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete — `IsFunction`, `Functional`, F1/F2/F3 (Bloque VII spec) |
+| `Minimal/Theorems/Block8.lean` | `Minimal.Theorems.Block8` | `Block1`, `Block2`, `Block4_C5` | ✅ Complete — `Dvd`, `IsPrime`, lemas básicos (Bloque VIII Fase 17 parcial) |
 
 ## Project Structure
 
@@ -52,7 +53,8 @@ ROBINSON_PlusPlus/
 │       ├── Block4_C6_C7.lean  # add_left_cancel + Cantor sobreyectividad/unicidad
 │       ├── Block5.lean        # Pares y proyecciones (proj1/2_pair, pair_inj)
 │       ├── Block6.lean        # Listas (cons_neq_nil, concat_assoc, in_concat)
-│       └── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
+│       ├── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
+│       └── Block8.lean        # Primos (Dvd, IsPrime + lemas básicos)
 ├── Intermediate/              # (Planned) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```

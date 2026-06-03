@@ -48,6 +48,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block5.lean` | `…Block5` | `Axioms`, `Block1`, `Block3`, `Block4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete |
 | `Minimal/Theorems/Block6.lean` | `…Block6` | `Axioms`, `Block1`, `Block4`, `Block5` | ✅ Complete |
 | `Minimal/Theorems/Block7.lean` | `…Block7` | `Axioms`, `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete |
+| `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 parcial; Fases 18-19 fuera de scope `Minimal`) |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -547,6 +548,41 @@ theorem teo_F3 (F : Term) : IsFunction F ↔ Functional F               -- Teo F
 ```
 
 **Nota de estilo**: `IsFunction`/`Functional` son meta-predicados Lean (`Term → Prop`), no `Formula` con `forall_2/3`. Esto evita el manejo manual de De Bruijn (`liftTerm`/`substTerm`) en los cuantificadores externos; el contenido FOL queda en los cuerpos derivables (`axioms ⊢ ...`).
+
+---
+
+### 3.11 `Block8.lean` — Primos (Bloque VIII, Fase 17 parcial)
+
+**Namespace**: `…Block8`
+**Status**: ✅ Complete (alcance Fase 17 sin `IsFactorization` ni `Ax-P`)
+**@importance**: `medium`
+**Last updated**: 2026-06-03 (creado)
+
+#### Defs
+
+```lean
+def Dvd (a b : Term) : Prop := ∃ q : Term, axioms ⊢ (mul a q =eq b)   -- Def 25.a
+def IsPrime (p : Term) : Prop :=
+  (axioms ⊢ lt one p) ∧                                                 -- p ≥ 2
+  ∀ d : Term, Dvd d p → axioms ⊢ ((d =eq one) ∨ (d =eq p))             -- Def 25
+```
+
+#### Exports
+
+```lean
+theorem dvd_refl (a) : Dvd a a                                          -- testigo q := one
+theorem dvd_one  (a) : Dvd one a                                        -- testigo q := a
+theorem dvd_zero (a) : Dvd a zero                                       -- testigo q := zero
+theorem isPrime_zero_inconsistent : IsPrime zero → axioms ⊢ ⊥           -- lt one zero ⇒ ⊥
+theorem isPrime_one_inconsistent  : IsPrime one  → axioms ⊢ ⊥           -- lt one one ⇒ ax18
+```
+
+**Forma de los teoremas de no-primalidad**: NO podemos probar `¬IsPrime zero` directamente en Lean (requeriría meta-consistencia, que no demostramos). En su lugar, probamos "`IsPrime zero` derivaría `axioms ⊢ ⊥`" — el contenido genuino del enunciado.
+
+**Pendientes documentados en el header del módulo**:
+* **Def 26 `IsFactorization(f,n)`**: requiere extender el lenguaje con `pow` (potencia) y `prod_list` (producto sobre listas).
+* **Ax-P (TFA)**: la spec lo postula incluso en sistemas con inducción fuerte; decisión pendiente sobre añadirlo a `Minimal` o reservarlo para `Intermediate/Full`.
+* **Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem); fuera de scope de `Minimal`, corresponderían a un módulo `Meta/` futuro.
 
 ---
 

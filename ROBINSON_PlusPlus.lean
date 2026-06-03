@@ -10,7 +10,7 @@ Imports all public modules so that `import ROBINSON_PlusPlus` suffices.
 -- Lenguaje y axiomas del sistema aritmético Minimal
 import ROBINSON_PlusPlus.Minimal.Axioms
 
--- Bloques de teoremas (I–VII) sobre el sistema Minimal
+-- Bloques de teoremas (I–VIII) sobre el sistema Minimal
 import ROBINSON_PlusPlus.Minimal.Theorems.Block1
 import ROBINSON_PlusPlus.Minimal.Theorems.Block2
 import ROBINSON_PlusPlus.Minimal.Theorems.Block3
@@ -20,3 +20,4 @@ import ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 import ROBINSON_PlusPlus.Minimal.Theorems.Block5
 import ROBINSON_PlusPlus.Minimal.Theorems.Block6
 import ROBINSON_PlusPlus.Minimal.Theorems.Block7
+import ROBINSON_PlusPlus.Minimal.Theorems.Block8

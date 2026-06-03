@@ -9,8 +9,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 10 |
-| Modules sin sorry | 10 / 10 ✅ |
+| Total modules | 11 |
+| Modules sin sorry | 11 / 11 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
 | Axiomas matemáticos | **30** (23 aritméticos: ax2-19, ax21, ax24-26, ax29 + 7 listas: ax_L0-3, ax_C1-3) — `ax27` eliminado 2026-06-03 (PA⁻ derivable); `ax22`/`ax23` eliminados 2026-06-02 (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22); `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
@@ -37,6 +37,7 @@
 | `Minimal/Theorems/Block5.lean` | 0 | ✅ `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` (mod2_of_even movido a Block4_C6_C7 el 2026-06-03) |
 | `Minimal/Theorems/Block6.lean` | 0 | ✅ Todos probados (`concat_assoc` e `in_concat_iff` vía ax_C3/ax_L3 nuevos) |
 | `Minimal/Theorems/Block7.lean` | 0 | ✅ `IsFunction`, `Functional`, `teo_F1`, `teo_F2`, `teo_F3` (Bloque VII spec) |
+| `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `dvd_refl/one/zero`, `isPrime_*_inconsistent` (Bloque VIII Fase 17 parcial) |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -44,6 +45,8 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-03 — Block8 (BLOQUE VIII Fase 17 parcial — Primos) AÑADIDO**: `Dvd` (divisibilidad), `IsPrime` (Def 25), lemas básicos. Pendientes documentados en header: Def 26 `IsFactorization` (necesita `pow`/`prod_list`), Ax-P (TFA), Fases 18-19 (Gödelización → módulo `Meta/` futuro). Build verde, 0 sorrys.
 
 - **2026-06-03 — Block7 (BLOQUE VII Funciones Discretas) AÑADIDO**: nuevo módulo con `IsFunction`/`Functional` (meta-predicados Lean) y los 3 teoremas F1 (`IsFunction nil`), F2 (evaluación única `IsFunction F ∧ In ⟨x,y⟩ F ∧ In ⟨x,y'⟩ F → y=y'`), F3 (bicondicional `IsFunction ⟺ Functional`). Compiló a la primera, 0 sorrys. Cierra el alcance Cantor + Pares + Listas + Funciones declarado en `TuplasFuncionesYListas.md`.
 
@@ -99,12 +102,13 @@ ROBINSON_PlusPlus/Minimal/
     ├── Block4_C6_C7.lean    # add_left_cancel, proj1/2, proj_is_cantor, mod2_of_even ✅
     ├── Block5.lean          # Pares: proj1/2_pair, pair_proj, pair_inj, is_cantor_pair ✅
     ├── Block6.lean          # Listas: cons_neq_nil, cons_inj, concat_assoc, in_concat ✅
-    └── Block7.lean          # Funciones: IsFunction, Functional, F1/F2/F3 ✅
+    ├── Block7.lean          # Funciones: IsFunction, Functional, F1/F2/F3 ✅
+    └── Block8.lean          # Primos: Dvd, IsPrime + lemas básicos (Fase 17 parcial) ✅
 ```
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-03 — Build ✅, 0 sorrys, 30 axiomas, 10 módulos.*
+*Last updated: 2026-06-03 — Build ✅, 0 sorrys, 30 axiomas, 11 módulos.*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
