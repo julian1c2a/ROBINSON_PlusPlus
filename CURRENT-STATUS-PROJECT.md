@@ -9,8 +9,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 9 |
-| Modules sin sorry | 9 / 9 ✅ |
+| Total modules | 10 |
+| Modules sin sorry | 10 / 10 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
 | Axiomas matemáticos | **30** (23 aritméticos: ax2-19, ax21, ax24-26, ax29 + 7 listas: ax_L0-3, ax_C1-3) — `ax27` eliminado 2026-06-03 (PA⁻ derivable); `ax22`/`ax23` eliminados 2026-06-02 (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22); `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
@@ -36,6 +36,7 @@
 | `Minimal/Theorems/Block4_C6_C7.lean` | 0 | ✅ `add_left_cancel`, `mod2_of_even`, `proj1`/`proj2` (defs), `proj_is_cantor`, `cantor_uniqueness`, `cantor_surjectivity` |
 | `Minimal/Theorems/Block5.lean` | 0 | ✅ `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` (mod2_of_even movido a Block4_C6_C7 el 2026-06-03) |
 | `Minimal/Theorems/Block6.lean` | 0 | ✅ Todos probados (`concat_assoc` e `in_concat_iff` vía ax_C3/ax_L3 nuevos) |
+| `Minimal/Theorems/Block7.lean` | 0 | ✅ `IsFunction`, `Functional`, `teo_F1`, `teo_F2`, `teo_F3` (Bloque VII spec) |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -43,6 +44,8 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-03 — Block7 (BLOQUE VII Funciones Discretas) AÑADIDO**: nuevo módulo con `IsFunction`/`Functional` (meta-predicados Lean) y los 3 teoremas F1 (`IsFunction nil`), F2 (evaluación única `IsFunction F ∧ In ⟨x,y⟩ F ∧ In ⟨x,y'⟩ F → y=y'`), F3 (bicondicional `IsFunction ⟺ Functional`). Compiló a la primera, 0 sorrys. Cierra el alcance Cantor + Pares + Listas + Funciones declarado en `TuplasFuncionesYListas.md`.
 
 - **2026-06-03 — `ax27_add_left_cancel` ELIMINADO**: derivable en PA⁻ sin inducción (tricotomía + monotonía + irreflexividad). Reescrito `add_left_cancel` (Block4_C6_C7) con prueba PA⁻; refactorizado `succ_le_of_lt` (Block2) para usar truco `ax13 + ax3 + ax18` (deriva `lt a a` y contradice). Sistema reducido **31 → 30 axiomas matemáticos**.
 
@@ -93,14 +96,15 @@ ROBINSON_PlusPlus/Minimal/
     ├── Block3.lean          # div2, mod2 ✅
     ├── Block4.lean          # Lemas auxiliares de Cantor ✅
     ├── Block4_C5.lean       # Lema C5: ∃!w, w(w+1)≤2c<(w+1)(w+2) 🔄
-    ├── Block4_C6_C7.lean    # add_left_cancel ✅, Cantor surj/uniq 🔄
-    ├── Block5.lean          # Pares / función de Cantor ❌
-    └── Block6.lean          # Listas ❌
+    ├── Block4_C6_C7.lean    # add_left_cancel, proj1/2, proj_is_cantor, mod2_of_even ✅
+    ├── Block5.lean          # Pares: proj1/2_pair, pair_proj, pair_inj, is_cantor_pair ✅
+    ├── Block6.lean          # Listas: cons_neq_nil, cons_inj, concat_assoc, in_concat ✅
+    └── Block7.lean          # Funciones: IsFunction, Functional, F1/F2/F3 ✅
 ```
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-22 — Build ✅, 28 sorrys restantes (vs 60 stale en versión anterior)*
+*Last updated: 2026-06-03 — Build ✅, 0 sorrys, 30 axiomas, 10 módulos.*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

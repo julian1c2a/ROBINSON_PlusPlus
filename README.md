@@ -35,6 +35,7 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 a
 | `Minimal/Theorems/Block4_C6_C7.lean` | `Minimal.Theorems.Block4_C6_C7` | `Block1..4`, `Block4_C5` | ✅ Complete — `add_left_cancel`, `mod2_of_even`, `proj1`/`proj2` (defs), `proj_is_cantor`, `cantor_uniqueness`, `cantor_surjectivity` |
 | `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1..4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete — `proj1/2_pair`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
 | `Minimal/Theorems/Block6.lean` | `Minimal.Theorems.Block6` | `Block1`, `Block4`, `Block5` | ✅ Complete — listas, pertenencia, concat (assoc/in_concat vía ax_C3/ax_L3 postulados) |
+| `Minimal/Theorems/Block7.lean` | `Minimal.Theorems.Block7` | `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete — `IsFunction`, `Functional`, F1/F2/F3 (Bloque VII spec) |
 
 ## Project Structure
 
@@ -49,8 +50,9 @@ ROBINSON_PlusPlus/
 │       ├── Block4.lean        # Block IV: Cantor — totalidad e inyectividad
 │       ├── Block4_C5.lean     # Lema C5: ∃ w, w(w+1) ≤ 2c < (w+1)(w+2) ✅
 │       ├── Block4_C6_C7.lean  # add_left_cancel + Cantor sobreyectividad/unicidad
-│       ├── Block5.lean        # Pares y proyecciones (stub)
-│       └── Block6.lean        # Listas (stub)
+│       ├── Block5.lean        # Pares y proyecciones (proj1/2_pair, pair_inj)
+│       ├── Block6.lean        # Listas (cons_neq_nil, concat_assoc, in_concat)
+│       └── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
 ├── Intermediate/              # (Planned) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```

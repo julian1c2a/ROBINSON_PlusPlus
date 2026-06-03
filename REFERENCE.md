@@ -47,6 +47,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block4_C6_C7.lean` | `…Block4_C6_C7` | `Axioms`, `Block1`–`Block4_C5` | ✅ Complete |
 | `Minimal/Theorems/Block5.lean` | `…Block5` | `Axioms`, `Block1`, `Block3`, `Block4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete |
 | `Minimal/Theorems/Block6.lean` | `…Block6` | `Axioms`, `Block1`, `Block4`, `Block5` | ✅ Complete |
+| `Minimal/Theorems/Block7.lean` | `…Block7` | `Axioms`, `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -513,6 +514,39 @@ theorem concat_assoc (L M N)    : Γ ⊢ (concat (concat L M) N =eq concat L (co
 theorem in_concat_iff (x L M)   : Γ ⊢ In x (concat L M) ⇔ lor (In x L)(In x M)
                                                           -- Teo L8 (delega a ax_L3, inducción)
 ```
+
+---
+
+### 3.10 `Block7.lean` — Funciones discretas (Bloque VII)
+
+**Namespace**: `…Block7`
+**Status**: ✅ Complete
+**@importance**: `high`
+**Last updated**: 2026-06-03 (creado: cierra el alcance Cantor + Pares + Listas + Funciones de `TuplasFuncionesYListas.md`)
+
+#### Defs
+
+```lean
+def IsFunction (F : Term) : Prop :=
+  ∀ p1 p2 : Term, (axioms ⊢ In p1 F) → (axioms ⊢ In p2 F) →
+                  (axioms ⊢ (proj1 p1 =eq proj1 p2)) →
+                  (axioms ⊢ (p1 =eq p2))                              -- Def 21
+def Functional (F : Term) : Prop :=
+  ∀ x y y' : Term, (axioms ⊢ In (pair x y) F) → (axioms ⊢ In (pair x y') F) →
+                   (axioms ⊢ (y =eq y'))                              -- Def 24 (Map inlineado)
+```
+
+#### Exports
+
+```lean
+theorem teo_F1 : IsFunction nil                                       -- Teo F1 (vacuo vía ax_L1)
+theorem teo_F2 {F x y y'} (h_isF : IsFunction F)
+    (h_xy : Γ ⊢ In (pair x y) F) (h_xy' : Γ ⊢ In (pair x y') F) :
+    Γ ⊢ (y =eq y')                                                    -- Teo F2 (eval única)
+theorem teo_F3 (F : Term) : IsFunction F ↔ Functional F               -- Teo F3 (isomorfismo)
+```
+
+**Nota de estilo**: `IsFunction`/`Functional` son meta-predicados Lean (`Term → Prop`), no `Formula` con `forall_2/3`. Esto evita el manejo manual de De Bruijn (`liftTerm`/`substTerm`) en los cuantificadores externos; el contenido FOL queda en los cuerpos derivables (`axioms ⊢ ...`).
 
 ---
 

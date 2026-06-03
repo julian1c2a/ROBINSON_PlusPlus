@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-03 — `ax27_add_left_cancel` ELIMINADO (derivable en PA⁻); sistema con **30 axiomas matemáticos** y 0 sorrys reales.
+**Last updated:** 2026-06-03 — Block7 (Funciones discretas) AÑADIDO; `ax27_add_left_cancel` ELIMINADO (derivable en PA⁻); sistema con **30 axiomas matemáticos**, 10 módulos, 0 sorrys reales.
 
 ---
 
@@ -14,16 +14,9 @@ El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md)
 
 ## Eje 1 — Consolidar `Minimal/` (corto plazo)
 
-### 1.1. Bloque VII — Funciones discretas (nuevo módulo)
+### 1.1. ~~Bloque VII — Funciones discretas~~ ✅ COMPLETO (2026-06-03)
 
-Pendiente desde [PLANNING.md §5 Fase 3](PLANNING.md#fase-3-sistema-minimal--listas-y-funciones).
-
-- [ ] **Crear `Minimal/Theorems/Block7.lean`**.
-  - [ ] Definir el predicado `IsFunction (R : Term) : Formula` sobre relaciones funcionales (gráfica + univaluación).
-  - [ ] Definir la evaluación `F(x)` vía proyección de la única pareja con primera componente `x`.
-  - [ ] Demostrar el isomorfismo con relaciones funcionales (Teo F3 de `TuplasFuncionesYListas.md`).
-- **Dependencias**: Block5 (pares ↔ N) + Block6 (listas) — ambos completos.
-- **Bloqueos previstos**: ninguno mayor; es trabajo de codificación con la maquinaria ya disponible.
+- [x] **`Minimal/Theorems/Block7.lean`** creado con `IsFunction`, `Functional` (meta-predicados Lean) y los teoremas F1 (`IsFunction nil`), F2 (evaluación única), F3 (`IsFunction ⟺ Functional`). Spec: `TuplasFuncionesYListas.md §BLOQUE VII`. Build verde a la primera, 0 sorrys.
 
 ### 1.2. Auditar los axiomas "no-induction-bound"
 
@@ -40,7 +33,11 @@ Revisar si alguno de los axiomas matemáticos actuales es realmente **demostrabl
 | `ax_C3_concat_assoc` | postulado | requiere inducción sobre `L` |
 | `ax_L3_in_concat` | postulado | requiere inducción sobre `L` |
 
-**Próxima acción**: arrancar `Block7.lean` (Funciones, `IsFunction`, Teo F3). Los axiomas que quedan (`ax21`, `ax24`, `ax_C3`, `ax_L3`) son irreducibles sin inducción — todos requieren `n + m ≥ n ∀m` o equivalente. Ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) para el análisis completo.
+**Próxima acción**: con Block7 cerrado, el sistema `Minimal/` cubre completamente el alcance declarado en `TuplasFuncionesYListas.md` (Cantor + Pares + Listas + Funciones). Los axiomas restantes (`ax21`, `ax24`, `ax_C3`, `ax_L3`) son irreducibles sin inducción — ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md). Próximas opciones:
+
+1. **Bloque VIII (Primos + Gödelización)** — requiere `Ax-P` (TFA por inducción fuerte) según spec; nuevo axioma necesario.
+2. **`Intermediate/`** — añadir inducción restringida y derivar `ax21`, `ax24`, `ax_C3`, `ax_L3` como teoremas.
+3. **Limpieza** — desactivar `linter.unusedSimpArgs`, limpiar warnings, refactorizar simp args (§1.3 más abajo).
 
 ### 1.3. Limpieza de simp args no usados
 
