@@ -55,7 +55,8 @@ ROBINSON_PlusPlus/
 │       ├── Block6.lean        # Listas (cons_neq_nil, concat_assoc, in_concat)
 │       ├── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
 │       └── Block8.lean        # Primos y factorización (Dvd, IsPrime, IsFactorization, Ax-P TFA)
-├── Intermediate/              # (Planned) System with restricted induction
+├── Meta/                      # (Próximo, 2026-06-07+) Gödelización: G, ⌜·⌝, Teo G1, IsFormula, Dem
+├── Intermediate/              # (Planned, paralelo a Meta/) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```
 

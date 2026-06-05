@@ -12,46 +12,71 @@ El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md)
 
 ---
 
-## Eje 1 — Consolidar `Minimal/` (corto plazo)
+## Eje 1 — Consolidar `Minimal/` ✅ CERRADO (2026-06-06)
 
-### 1.1. ~~Bloque VII — Funciones discretas~~ ✅ COMPLETO (2026-06-03)
+Todos los hitos completados:
 
-- [x] **`Minimal/Theorems/Block7.lean`** creado con `IsFunction`, `Functional` (meta-predicados Lean) y los teoremas F1 (`IsFunction nil`), F2 (evaluación única), F3 (`IsFunction ⟺ Functional`). Spec: `TuplasFuncionesYListas.md §BLOQUE VII`. Build verde a la primera, 0 sorrys.
+- [x] **Bloque VII — Funciones discretas**: `Block7.lean` con `IsFunction`, `Functional`, F1/F2/F3 (2026-06-03).
+- [x] **Bloque VIII — Primos**: `Block8.lean` con `Dvd`, `IsPrime`, lemas básicos (2026-06-03).
+- [x] **Bloque VIII extendido — Factorización**: `pow`, `prod_pairs`, `IsFactorization`, `Ax-P` (TFA). Sistema 30 → **34 axiomas matemáticos** (2026-06-06). Auditoría profunda en [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4-3.5.
+- [x] **Limpieza warnings global**: 411 → 0 warnings RPP, linter `unusedSimpArgs true` global (2026-06-06).
+- [x] **Diagnóstico frente Gödel (Nivel A)**: `Minimal/` satisface las hipótesis de Gödel I; relación con TFA y EFA/I∆₀+Exp analizada en [GODEL-STATUS.md](GODEL-STATUS.md) y [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §5.5.
 
-### 1.2. Auditar los axiomas "no-induction-bound"
-
-Revisar si alguno de los axiomas matemáticos actuales es realmente **demostrable** en `Minimal/` sin inducción y se postula por error/comodidad. Candidatos a auditar (orden de probabilidad creciente de ser demostrables sin inducción):
+**Estado de auditoría de axiomas no-induction-bound** (resuelto):
 
 | Axioma | Estado | Comentario |
 | --- | --- | --- |
-| `ax21_mod2_range` | postulado | requiere inducción sobre `n` |
-| ~~`ax22_cantor_proj_exists`~~ | **ELIMINADO 2026-06-02** | proj1/proj2 ahora defs concretas; `proj_is_cantor` lo demuestra |
-| ~~`ax23_cantor_proj_uniq`~~ | **ELIMINADO 2026-06-02** | nunca usado; `cantor_uniqueness` ya probado |
-| `ax24_mod2_of_even` | postulado | requiere inducción sobre `k` (auditado 2026-06-03: irreducible) |
-| ~~`ax27_add_left_cancel`~~ | **ELIMINADO 2026-06-03** | derivable en PA⁻ vía tricotomía + monotonía + ax18 |
-| ~~`ax28_mul_two_cancel`~~ | **ELIMINADO 2026-06-02** | reprobado como `teo_2_11` sin inducción |
-| `ax_C3_concat_assoc` | postulado | requiere inducción sobre `L` |
-| `ax_L3_in_concat` | postulado | requiere inducción sobre `L` |
+| `ax21_mod2_range` | postulado | requiere inducción (irreducible — analizado en [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.2) |
+| `ax24_mod2_of_even` | postulado | requiere inducción sobre `k` (auditado 2026-06-03, irreducible) |
+| `ax_C3_concat_assoc` | postulado | requiere inducción sobre `L` (irreducible) |
+| `ax_L3_in_concat` | postulado | requiere inducción sobre `L` (irreducible) |
+| `ax_pow_zero`, `ax_pow_succ` | postulados | definicionales puros (recursión primitiva base — [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4.1) |
+| `ax_prodp_nil`, `ax_prodp_cons` | postulados | definicionales puros sobre listas (§3.4.2) |
+| `ax_p_tfa` (TFA) | meta-axioma | requiere inducción fuerte; pasa a teorema en `Full/` |
+| ~~`ax20`, `ax22`, `ax23`, `ax27`, `ax28`~~ | **ELIMINADOS** | derivables sin inducción o redundantes (ver CHANGELOG) |
 
-**Próxima acción** (sesión pendiente, 2026-06-04): retomar con:
+**Pendientes menores** (no bloquean cierre):
 
-1. **[3] Limpieza warnings (prioridad inmediata)**: simp args no usados (§1.3 abajo) + warnings MD060/MD024 en CHANGELOG/REFERENCE (no críticos).
-2. **[2] `Intermediate/`** — añadir inducción restringida, derivar `ax21`, `ax24`, `ax_C3`, `ax_L3` como teoremas. Diseño de partida en [PLANNING.md](PLANNING.md).
-3. **Bloque VIII extendido**: si se desea `IsFactorization` y/o `Ax-P` en `Minimal/`, primero hay que añadir al lenguaje: función `pow` (potencia) y `prod_list` (producto sobre listas) — son axiomas testigos adicionales. Ver header de `Block8.lean`. Las Fases 18-19 (Gödelización) corresponderían a un módulo `Meta/` futuro.
-
-### 1.3. Limpieza de simp args no usados
-
-Aunque el linter `unusedSimpArgs` está desactivado, hay ~46 args genuinamente no usados en simp calls que sobreviven a la sesión. Pasada de limpieza para reducir ruido:
-
-- [ ] Reactivar el linter temporalmente (`set_option linter.unusedSimpArgs true`).
-- [ ] Limpiar warnings reales en cada módulo.
-- [ ] Volver a desactivar el linter (sigue siendo poco fiable bajo binders existenciales).
+- Arreglar warning externo `FOL/Theorems/Eq.lean:130` (no es del proyecto RPP).
+- Más teoremas opcionales sobre `IsFactorization` usando `ax_p_tfa` (lema de Euclides, etc.) — diferibles a fase posterior.
 
 ---
 
-## Eje 2 — Sistema `Intermediate/` (medio plazo)
+## Eje 2 — Módulo `Meta/` (NUEVO, próximo activo 2026-06-07+)
 
-**Objetivo (PLANNING §3.2)**: Sistema reducido (~13 axiomas) + **esquema de inducción restringido** a un conjunto finito de fórmulas. Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` se vuelven **teoremas**.
+**Objetivo**: implementar Fases 18-19 del spec (`TuplasFuncionesYListas.md §BLOQUE VIII`) — Gödelización y autorreferencia. Diagnóstico completo y arquitectura en [GODEL-STATUS.md](GODEL-STATUS.md).
+
+**Decisión 2026-06-06**: `Meta/` arranca **al cerrar `Minimal/`**, no después de `Intermediate/`. Justificación: los niveles B-C (codificación + Dem) no requieren inducción, sólo meta-codificación. El nivel D (teoremas de incompletitud demostrados internamente) sí requiere `Intermediate/` o `Full/`.
+
+### 2.1. Nivel B — `Meta/Godel.lean` (primer hito)
+
+- [ ] **Asignación de Gödel** `G : símbolos → ℕ` (Def 27 spec). Función Lean concreta con tabla explícita (∀→2, ∃→3, =→10, +→20, etc.).
+- [ ] **Corner brackets** `⌜·⌝ : List símbolos → Term` (Def 28): `⌜s₁…sₖ⌝ := Cons(G(s₁), Cons(…Cons(G(sₖ), Nil)…))`.
+- [ ] **Teorema G1** (inyectividad): `⌜S⌝ = ⌜S'⌝ ⟹ S = S'`. Demostración: inducción meta sobre la longitud de la lista usando `cons_inj` (Block6) + inyectividad de `G`.
+
+**No introduce nuevos axiomas matemáticos** sobre `Minimal/`. Aprovecha `pow` + TFA para codificación primorial alternativa (ver [GODEL-STATUS.md](GODEL-STATUS.md) §3.1).
+
+### 2.2. Nivel C — `Meta/Provability.lean` (segundo hito)
+
+- [ ] Predicado `IsFormula(x)`: `x` es el código de Gödel de una fórmula bien formada.
+- [ ] Predicado `Dem(p, φ)`: `p` es el código de una demostración formal de `φ` en `Minimal`.
+- [ ] **Lema del punto fijo** (diagonalización): para todo `φ(x)` existe `ψ` tal que `Minimal ⊢ ψ ⇔ φ(⌜ψ⌝)`.
+- [ ] **Sentencia de Gödel** `G_Min := el punto fijo de "¬Dem(p, x)"`.
+
+Algunas propiedades meta-teoréticas de `Dem` (cierre por modus ponens, etc.) pueden postularse como **meta-axiomas** hasta tener `Intermediate/` con inducción para demostrarlas.
+
+### 2.3. Nivel D — `Meta/Incompleteness.lean` (requiere `Intermediate/` o `Full/`)
+
+- [ ] **Gödel I**: `Minimal ⊬ G_Min` y `Minimal ⊬ ¬G_Min` (asumiendo consistencia).
+- [ ] **Gödel II**: `Minimal ⊬ Con(Minimal)`.
+
+Esto se queda para más adelante; la formalización requiere inducción sobre la complejidad sintáctica de las demostraciones.
+
+---
+
+## Eje 3 — Sistema `Intermediate/` (medio plazo, paralelo a `Meta/`)
+
+**Objetivo (PLANNING §6.2)**: Sistema reducido (~22 axiomas) + **esquema de inducción restringido** a un conjunto finito de fórmulas (Ax-Ind sobre Φ con |Φ|=13). Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` se vuelven **teoremas**. Reducción esperada: 34 axiomas → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
 
 ### 2.1. Diseño previo
 
@@ -74,9 +99,9 @@ Aunque el linter `unusedSimpArgs` está desactivado, hay ~46 args genuinamente n
 
 ---
 
-## Eje 3 — Sistema `Full/` (largo plazo)
+## Eje 4 — Sistema `Full/` (largo plazo)
 
-**Objetivo (PLANNING §3.2)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax27, ax28, ax_C3, ax_L3, etc.) se vuelven teoremas.
+**Objetivo (PLANNING §6.3)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax_C3, ax_L3) y el meta-axioma `ax_p_tfa` (TFA) se vuelven teoremas. Habilita el **Nivel D** del frente Gödel: Gödel I y II demostrados internamente.
 
 ### 3.1. Diseño
 
@@ -91,7 +116,7 @@ Aunque el linter `unusedSimpArgs` está desactivado, hay ~46 args genuinamente n
 
 ---
 
-## Eje 4 — Más allá (muy largo plazo)
+## Eje 5 — Más allá (muy largo plazo)
 
 Sobre la base consolidada `Full/`:
 

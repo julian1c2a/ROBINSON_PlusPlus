@@ -202,11 +202,27 @@ Un tema transversal a todos los proyectos fundacionales es la necesidad de ser e
 
 ## 6. Futuro y Consolidación
 
-Con el sistema `Minimal/` **cerrado a 0 sorrys reales, 0 warnings RPP y 34 axiomas matemáticos** (Bloques I-VIII completos), los siguientes pasos están descritos en detalle en [NEXT-STEPS.md](NEXT-STEPS.md). Resumen ejecutivo:
+Con el sistema `Minimal/` **cerrado a 0 sorrys reales, 0 warnings RPP y 34 axiomas matemáticos** (Bloques I-VIII completos), los siguientes pasos están descritos en detalle en [NEXT-STEPS.md](NEXT-STEPS.md). Decisión clave 2026-06-06: **el frente `Meta/` arranca al cerrar `Minimal/`**, en paralelo o antes que `Intermediate/`, porque los niveles B y C de la Gödelización (meta-codificación + predicados de demostrabilidad) no requieren inducción. Ver [GODEL-STATUS.md](GODEL-STATUS.md) para el diagnóstico completo.
 
-### 6.1. Eje siguiente — Sistema `Intermediate` (medio plazo)
+Resumen ejecutivo de los ejes:
 
-**Estado**: 🔜 **Próxima fase activa**.
+### 6.1. Eje siguiente — Módulo `Meta/` (corto/medio plazo)
+
+**Estado**: 🔜 **Próxima fase activa** (arranque 2026-06-07).
+
+Implementar Fases 18-19 del spec (`TuplasFuncionesYListas.md §BLOQUE VIII`) en un módulo nuevo `ROBINSON_PlusPlus/Meta/`. Estructura planificada (ver [GODEL-STATUS.md](GODEL-STATUS.md) §2.2):
+
+- **Nivel B — `Meta/Godel.lean`**: asignación de Gödel `G : símbolos → ℕ` (Def 27), corner brackets `⌜·⌝` (Def 28), Teo G1 (inyectividad). **No requiere inducción**.
+- **Nivel C — `Meta/Provability.lean`**: predicados `IsFormula`, `Dem`, lema del punto fijo (diagonalización). Algunas propiedades meta-teoréticas podrán postularse como meta-axiomas hasta tener `Intermediate/`.
+- **Nivel D — `Meta/Incompleteness.lean`** (requiere `Intermediate/`): Gödel I y II formalizados internamente.
+
+**Por qué `Meta/` antes que `Intermediate/`**: las Fases 18-19 vienen inmediatamente tras la Fase 17 en la spec, y los niveles B+C no necesitan inducción. Esperar a `Intermediate/` retrasaría material que ya se puede formalizar.
+
+**Sinergia con TFA (Ax-P)**: la extensión del Bloque VIII (`pow`, `prod_pairs`, `Ax-P`) realizada 2026-06-06 **prepara explícitamente la codificación primorial de secuencias** usada en Gödel: `(a₁, …, aₖ) ↦ Π pᵢ^aᵢ` con descodificación única vía TFA. Ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §5.5.3 y [GODEL-STATUS.md](GODEL-STATUS.md) §3.
+
+### 6.2. Sistema `Intermediate` (medio plazo, paralelo a `Meta/`)
+
+**Estado**: 🔜 Siguiente eje matemático, puede empezar en paralelo con `Meta/`.
 
 Implementar el sistema con **esquema de inducción finito** (Ax-Ind sobre un conjunto Φ con |Φ|=13 fórmulas, según `TuplasFuncionesYListas.md §Apéndice B`). Demostrar como teoremas:
 
@@ -218,20 +234,17 @@ Reducción esperada: 34 axiomas matemáticos → ~22 axiomas + Ax-Ind(Φ) + Ax-P
 
 **Decisiones pendientes**:
 
-- ¿Mantener `pow`/`prod_pairs` como símbolos primitivos con sus 4 axiomas, o demostrarlos como definiciones recursivas? La spec §Apéndice B no lo aborda directamente.
-- ¿`Ax-P` (TFA) sigue como axioma en `Intermediate/` o pasa a teorema vía inducción fuerte? La spec sugiere que en `Intermediate/` con Ax-Ind(Φ) sigue siendo axioma (requiere inducción fuerte sobre fórmulas no acotadas, no cubierta por Φ).
+- ¿Mantener `pow`/`prod_pairs` como símbolos primitivos con sus 4 axiomas, o demostrarlos como definiciones recursivas? La spec §Apéndice B no lo aborda directamente; mi recomendación: mantenerlos primitivos (los 4 axiomas son definicionales puros — ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4).
+- ¿`Ax-P` (TFA) sigue como axioma en `Intermediate/` o pasa a teorema vía inducción fuerte? La spec sugiere que en `Intermediate/` con Ax-Ind(Φ) sigue siendo axioma (requiere inducción fuerte sobre fórmulas no acotadas, no cubierta por Φ). Pasa a teorema en `Full/`.
 
-### 6.2. Sistema `Full` (largo plazo)
+### 6.3. Sistema `Full` (largo plazo)
 
 Sistema canónico con **esquema de inducción general** sobre todas las fórmulas del lenguaje (§Apéndice C). Demostrar como teoremas:
 
 - **Ax-P (TFA)** vía inducción fuerte sobre `n`.
 - Todos los axiomas restantes que requieran inducción no acotada.
 - Cadena completa de embeddings `FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`.
-
-### 6.3. Módulo `Meta/` (largo plazo, scope separado)
-
-Para las Fases 18-19 del spec (Gödelización y autorreferencia): meta-codificación de símbolos (G : símbolos → ℕ), corner brackets ⌜·⌝, predicados `IsFormula` y `Dem`, teoremas G1 y Meta-G. Independiente de la jerarquía `Minimal ⊂ Intermediate ⊂ Full`; podría sentarse sobre cualquier nivel.
+- **Nivel D de `Meta/`**: Gödel I y II demostrados internamente (requiere la inducción de `Full/`).
 
 ### 6.4. Consolidación y nuevas teorías (muy largo plazo)
 
@@ -244,5 +257,5 @@ Para las Fases 18-19 del spec (Gödelización y autorreferencia): meta-codificac
 Pequeñas tareas de baja prioridad:
 
 - Arreglar el único warning externo: `FOL/Theorems/Eq.lean:130` (unusedSimpArg `hne`).
-- Auditar si `pow`/`prod_pairs` admiten reducción de axiomas (p.ej. derivar `ax_pow_succ` a partir de otros sin inducción — improbable).
+- Auditar si `pow`/`prod_pairs` admiten reducción de axiomas (descartado en [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4 — son irreducibles como recursión primitiva).
 - Más teoremas sobre `IsFactorization` usando `ax_p_tfa`: lema de Euclides, multiplicatividad, etc.

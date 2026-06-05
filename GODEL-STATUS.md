@@ -1,0 +1,152 @@
+# Frente Gödel — Estado y Roadmap
+
+**Last updated:** 2026-06-06 — Documento de diagnóstico previo al arranque del módulo `Meta/`.
+**Author:** Julián Calderón Almendros
+**Nivel del documento**: A (diagnóstico documental; no contiene código Lean).
+
+Este documento responde a la pregunta: *¿qué relación tiene el sistema `Minimal/` con los teoremas de incompletitud de Gödel, y qué se va a formalizar al respecto en `Meta/`?*
+
+---
+
+## 1 · ¿Satisface `Minimal` las hipótesis de Gödel I/II?
+
+El primer teorema de incompletitud de Gödel (Gödel I) se aplica a cualquier teoría `T` que cumpla:
+
+| Hipótesis | Significado | ¿La cumple `Minimal`? |
+|---|---|---|
+| **Recursivamente axiomatizable** | El conjunto de axiomas es decidible algorítmicamente | ✅ `axioms : List Formula` es una lista finita y explícita |
+| **Consistente** | No deriva `⊥` | ✅ Asumido (no demostrable internamente — Gödel II) |
+| **Expresividad aritmética** | Captura `+`, `·`, `<` con sus propiedades | ✅ Tiene los 34 axiomas matemáticos descritos en `MINIMAL-AXIOMS.md` |
+| **Suficiente fuerza** | Representa todas las funciones recursivas primitivas (o al menos las necesarias para la β-función de Gödel) | ⚠️ Discusión: ver §1.1 |
+
+### 1.1 La cuestión de la "suficiente fuerza"
+
+Gödel I exige que `T` represente formalmente todas las funciones recursivas primitivas (o que existan **alternativas equivalentes**, como una versión más débil con codificación primorial). Análisis:
+
+- **Q (Robinson)** ya es suficiente. Es el ejemplo canónico de "teoría minimal con Gödel I". Como `Minimal ⊇ Q-núcleo` (compartimos 6 axiomas básicos) y añadimos más estructura, **Minimal es a fortiori suficiente**.
+- **El TFA (Ax-P) en `Minimal`** facilita aún más la codificación: la **función β de Gödel** (que codifica secuencias finitas como un único número) tiene una alternativa más directa usando primos: una secuencia `(a₁, …, aₖ)` se codifica como `Π pᵢ^aᵢ` con `pᵢ` el `i`-ésimo primo. Esta codificación primorial requiere **exactamente lo que añadimos**: `pow`, `prod_pairs` y `Ax-P` (para garantizar unicidad de descodificación).
+- **Sin TFA**, la codificación de secuencias en `Minimal` sería posible solo vía Cantor pairing (que ya está) o listas (también). La adición de TFA da una **tercera ruta más natural** para Gödel.
+
+**Conclusión**: ✅ `Minimal` cumple las hipótesis de Gödel I sin reservas.
+
+### 1.2 Gödel II en `Minimal`
+
+Gödel II dice que `T` no puede demostrar su propia consistencia (`Con(T)`) si `T` es consistente y satisface ciertas condiciones de demostrabilidad. Para `Minimal`:
+
+- **Aplica** si y sólo si se puede formalizar internamente la consistencia (`Con(Minimal)`) como una fórmula del lenguaje.
+- Eso requiere `IsFormula`, `Dem`, y la sentencia `¬∃p, Dem(p, ⌜⊥⌝)`.
+- Estos predicados pertenecen al **nivel B-C** del frente Gödel (ver §3 abajo); en `Minimal/` puro **no están**.
+
+**Conclusión**: Gödel II aplica **estructuralmente** a `Minimal`, pero su formulación requiere material que arrancará en `Meta/`.
+
+---
+
+## 2 · ¿Qué se formaliza en este proyecto sobre Gödel?
+
+La spec original (`TuplasFuncionesYListas.md §BLOQUE VIII Fases 18-19`) define:
+
+- **Def 27**: Función de Gödel `G : Λ → ℕ` (asignación numérica inyectiva a los símbolos del lenguaje).
+- **Def 28**: Corner brackets `⌜s₁…sₖ⌝ := Cons(G(s₁), Cons(…Cons(G(sₖ), Nil)…))`.
+- **Teo G1**: Inyectividad de ⌜·⌝ — `⌜S⌝ = ⌜S'⌝ ⟹ S = S'`.
+- **Fase 19**: Predicados `IsFormula(x)`, `Dem(p, φ)`, lema del punto fijo (diagonalización), sentencia de Gödel.
+
+Estos contenidos **se moverán a un módulo nuevo `Meta/`** del proyecto, que arrancará al cerrar `Minimal/`.
+
+### 2.1 Por qué `Meta/` arranca al cerrar `Minimal/` (no después de `Intermediate/`)
+
+Hay dos consideraciones que apuntan al mismo lado:
+
+1. **Logística de spec**: las Fases 18-19 vienen inmediatamente después de la Fase 17 (Bloque VIII estándar). Mantener el orden de la spec ayuda a la trazabilidad.
+2. **Compromiso de scope**: lo que se formaliza en `Meta/` (G, ⌜·⌝, Teo G1) **no requiere inducción**. Es meta-codificación pura. Por tanto puede vivir sobre `Minimal/` sin esperar a `Intermediate/`.
+
+Lo que sí requiere `Intermediate/` o `Full/` es la **demostración** de Gödel I/II como teoremas internos. En `Minimal+Meta/` lo que tendremos es:
+
+- ✅ Codificación operativa.
+- ✅ Teo G1 (inyectividad de la asignación).
+- ⏳ `IsFormula`, `Dem` definidos pero las propiedades meta-teoréticas (existencia del punto fijo, sentencia de Gödel) postuladas como meta-axiomas o como conjeturas pendientes para `Intermediate/`.
+
+Esta separación es **deliberada**: queremos tener los enunciados de Gödel disponibles tan pronto como sea posible (en `Minimal+Meta/`), incluso si las demostraciones esperan a sistemas más fuertes.
+
+### 2.2 Niveles de ambición para `Meta/`
+
+El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía discutida en el repaso 2026-06-06):
+
+| Nivel | Contenido | Ubicación | Estado |
+|---|---|---|---|
+| **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
+| **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` (planificado) | 🔜 próximo |
+| **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` (planificado) | ⏳ pendiente |
+| **D** | Teoremas de incompletitud: Gödel I + II demostrados internamente | `Meta/Incompleteness.lean` (planificado, requiere `Intermediate/` o `Full/`) | ⏳ pendiente |
+
+La **arquitectura propuesta** para `Meta/`:
+
+```text
+Meta/
+├── Godel.lean              # Nivel B: G, ⌜·⌝, Teo G1
+├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo
+└── Incompleteness.lean     # Nivel D: Gödel I, Gödel II
+```
+
+Los niveles B y C **pueden coexistir con `Minimal/`** porque sólo usan meta-codificación. El nivel D requerirá la maquinaria de `Intermediate/` o `Full/` (inducción para las propiedades de `Dem`).
+
+---
+
+## 3 · TFA (Ax-P) y la codificación de Gödel
+
+Una observación clave del análisis 2026-06-06 (ver `MINIMAL-AXIOMS.md` §5.5.3): la extensión de `Minimal/` con `pow`, `prod_pairs` y TFA **prepara el terreno para Gödel** de manera natural.
+
+### 3.1 Codificación primorial de secuencias
+
+En la formalización clásica de Gödel, la codificación de secuencias usa la **función β** definida sobre el Teorema Chino del Resto. En `Minimal+Ax-P` tenemos una alternativa más limpia:
+
+> Una secuencia `(a₁, a₂, …, aₖ)` se codifica como `prod_pairs [(p₁, a₁), (p₂, a₂), …, (pₖ, aₖ)]`, donde `pᵢ` es el `i`-ésimo primo.
+
+La **descodificación** es única gracias al TFA (`ax_p_tfa`): dada una factorización, la lista de pares está determinada. Esto convierte la β-función en innecesaria para muchos propósitos de Gödelización.
+
+### 3.2 ¿Es Ax-P estrictamente necesario para Meta/Godel.lean?
+
+**No para el Nivel B** (G, ⌜·⌝, Teo G1). La inyectividad de ⌜·⌝ se demuestra por inducción sobre la longitud de la lista usando `cons_inj` (Block6.lean), que no necesita TFA.
+
+**Sí para usos avanzados** del Nivel C: si queremos demostrar propiedades sobre la decodificación de secuencias (longitud única, posiciones únicas), TFA es la herramienta natural.
+
+**Sí para conexión con la formalización clásica**: cualquier presentación moderna de Gödel I (por ejemplo Smullyan, Boolos) usa codificación primorial vía TFA.
+
+Decisión: **mantener TFA como meta-axioma en `Minimal/`** facilita Meta/ ahora y futuro.
+
+---
+
+## 4 · Lo que NO está en scope
+
+Para mantener el proyecto manejable, los siguientes temas se **declaran fuera de scope** explícitamente:
+
+| Tema | Razón |
+|---|---|
+| **Demostración interna de Gödel II** | Requiere condiciones de demostrabilidad de Löb, inducción fuerte, y maquinaria que va más allá de `Full/`. Posible proyecto independiente futuro. |
+| **Teorema de Rosser** (versión sin ω-consistencia) | Variante técnica de Gödel I; no añade contenido conceptual al proyecto. |
+| **Teoremas de indefinibilidad de Tarski** (definibilidad de la verdad) | Relacionado con Gödel pero ortogonal al objetivo de `Meta/`. |
+| **Teorías más fuertes** (PA + Π₁-reflection, ZFC, etc.) | Fuera del alcance de un proyecto sobre aritmética minimal. |
+
+---
+
+## 5 · Roadmap del frente Gödel
+
+| Fecha (planificada) | Hito | Módulo |
+|---|---|---|
+| **2026-06-06** | Cierre `Minimal/` con Ax-P y diagnóstico del frente Gödel (Nivel A) | `MINIMAL-AXIOMS.md` §5.5, este documento |
+| **2026-06-07+** | Arranque `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) | `Meta/Godel.lean` (nuevo) |
+| **TBD** | `Meta/Provability.lean` (Nivel C: IsFormula, Dem) | `Meta/Provability.lean` |
+| **TBD** | `Intermediate/` paralelo: derivación de los 9+3 axiomas inductivos | `Intermediate/Axioms.lean` |
+| **TBD** | `Meta/Incompleteness.lean` (Nivel D: Gödel I formalmente) | requiere `Intermediate/` |
+
+Los plazos para el Nivel C y D dependen del ritmo del proyecto; el Nivel B (Meta/Godel.lean) es el siguiente paso concreto al cerrar `Minimal/`.
+
+---
+
+## 6 · Referencias técnicas
+
+- Gödel, K. (1931). *Über formal unentscheidbare Sätze der Principia Mathematica und verwandter Systeme I*.
+- Smullyan, R. (1992). *Gödel's Incompleteness Theorems*. Oxford University Press. — Tratamiento moderno con codificación primorial.
+- Boolos, G., Burgess, J., Jeffrey, R. (2007). *Computability and Logic* (5ª ed.). Cambridge. — Capítulos 17-18 sobre representabilidad y Gödel.
+- [Incompleteness theorems — Stanford Encyclopedia of Philosophy](https://plato.stanford.edu/entries/goedel-incompleteness/)
+- [Gödel numbering — Wikipedia](https://en.wikipedia.org/wiki/G%C3%B6del_numbering)
+- Documentación interna: [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §5.5, [PLANNING.md](PLANNING.md) §6.3, [TuplasFuncionesYListas.md](TuplasFuncionesYListas.md) §BLOQUE VIII Fases 18-19.
