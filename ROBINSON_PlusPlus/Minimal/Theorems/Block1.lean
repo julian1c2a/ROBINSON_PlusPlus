@@ -8,7 +8,7 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 import FOL.FOL
 import FOL.Tactics
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block1
 
@@ -274,8 +274,7 @@ theorem mul_two_succ_ne_zero (k : Term) : Γ ⊢ neg (mul two (succ k) =eq zero)
   have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
   have h_t27 : Γ ⊢ (mul two (succ k) =eq add (succ k) (succ k)) := by
     have hh := spec teo_2_7 (succ k)
-    simp [substFormula, substTerm, substTerms, mul, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+    simp [substFormula, substTerm, substTerms, mul, add, succ] at hh
     exact hh
   have h_a5 : Γ ⊢ (add (succ k) (succ k) =eq succ (add (succ k) k)) := by
     have hh := spec (spec h_ax5 (succ k)) k
@@ -289,7 +288,7 @@ theorem mul_two_succ_ne_zero (k : Term) : Γ ⊢ neg (mul two (succ k) =eq zero)
     FOL.derive_eq_trans (eq_symm h_chain) h_eq
   have h_neq : Γ ⊢ neg (succ (add (succ k) k) =eq zero) := by
     have hh := spec h_ax2 (add (succ k) k)
-    simp [substFormula, substTerm, substTerms, succ, zero, FOL.substTerm_liftTerm] at hh
+    simp [succ, zero] at hh
     exact hh
   exact mp h_neq h_zero
 
@@ -305,13 +304,13 @@ theorem mul_two_lt_mono {a b : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (mul two a)
       Γ ⊢ ((lt a b) ⇔ ex (add (liftTerm 0 a) (succ (.var 0)) =eq liftTerm 0 b)) := by
     have hh := spec (spec h_ax13 a) b
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftTerm,
           FOL.substTerm_liftLift] at hh
     exact hh
   have h_ex := iff_mp h_iff_ab h
   apply ex_elim h_ex; intro k h_k_raw
   simp [substFormula, substTerm, substTerms, add, succ,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_k_raw
+        FOL.substTerm_liftTerm] at h_k_raw
   -- 2b = 2(a + σk) = 2a + 2σk
   have h_2b_eq : Γ ⊢ (mul two b =eq mul two (add a (succ k))) :=
     eq_congr_mul_left (eq_symm h_k_raw)
@@ -319,7 +318,7 @@ theorem mul_two_lt_mono {a b : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (mul two a)
       (mul two (add a (succ k)) =eq add (mul two a) (mul two (succ k))) := by
     have hh := spec (spec (spec h_ax12 two) a) (succ k)
     simp [substFormula, substTerm, substTerms, mul, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftTerm,
           FOL.substTerm_liftLift] at hh
     exact hh
   have h_2b_chain : Γ ⊢ (mul two b =eq add (mul two a) (mul two (succ k))) :=
@@ -328,8 +327,7 @@ theorem mul_two_lt_mono {a b : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (mul two a)
   have h_2sk_succ : Γ ⊢ (mul two (succ k) =eq succ (add (succ k) k)) := by
     have h_t27 : Γ ⊢ (mul two (succ k) =eq add (succ k) (succ k)) := by
       have hh := spec teo_2_7 (succ k)
-      simp [substFormula, substTerm, substTerms, mul, add, succ,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+      simp [substFormula, substTerm, substTerms, mul, add, succ] at hh
       exact hh
     have h_a5 : Γ ⊢ (add (succ k) (succ k) =eq succ (add (succ k) k)) := by
       have hh := spec (spec h_ax5 (succ k)) k
@@ -345,13 +343,13 @@ theorem mul_two_lt_mono {a b : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (mul two a)
             ex (add (liftTerm 0 (mul two a)) (succ (.var 0)) =eq liftTerm 0 (mul two b))) := by
     have hh := spec (spec h_ax13 (mul two a)) (mul two b)
     simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftTerm,
           FOL.substTerm_liftLift] at hh
     exact hh
   apply iff_mpr h_iff_2a2b
   exact ex_intro (add (succ k) k) (by
     simp [substFormula, substTerm, substTerms, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm]
+          FOL.substTerm_liftTerm]
     exact eq_symm h_2b_succ)
 
 -- Teo 2.8: ∀ n, σ(n) = n + 1
@@ -609,7 +607,7 @@ theorem teo_2_11 :
   unfold Γ; unfold forall_2
   apply gen; intro a; apply gen; intro b
   simp [substFormula, substTerm, substTerms, mul, two, one, succ,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm]
+        FOL.substTerm_liftTerm]
   apply Axioms.imp_intro; intro h_eq
   have h_ax18 := ax (by simp [axioms] : ax18_lt_irrefl ∈ axioms)
   have h_ax19 := ax (by simp [axioms] : ax19_lt_trichotomy ∈ axioms)

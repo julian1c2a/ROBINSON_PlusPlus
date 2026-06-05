@@ -22,7 +22,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block2
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
@@ -76,16 +76,14 @@ def IsPrime (p : Term) : Prop :=
 theorem dvd_refl (a : Term) : Dvd a a :=
   ⟨one, by
     have h := spec teo_2_5 a
-    simp [substFormula, substTerm, substTerms, mul, one, zero, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, one, zero, succ] at h
     exact h⟩
 
 /-- `Dvd one a` con testigo `q := a`. -/
 theorem dvd_one (a : Term) : Dvd one a :=
   ⟨a, by
     have h := spec teo_2_6 a
-    simp [substFormula, substTerm, substTerms, mul, one, zero, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+    simp [substFormula, substTerm, substTerms, mul, one, zero, succ] at h
     exact h⟩
 
 /-- `Dvd a zero` con testigo `q := zero` (todo número divide a 0). -/
@@ -115,23 +113,20 @@ theorem isPrime_zero_inconsistent (h_prime : IsPrime zero) : axioms ⊢ ⊥ := b
   -- spec ax13 en (one, zero): lt 1 0 ⇔ ∃k. 1 + σk = 0
   have h_iff := spec (spec h_ax13 one) zero
   simp [substFormula, substTerm, substTerms, lt, one, zero, succ, iff,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm,
-        FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff
+        liftTerm, liftTerms] at h_iff
   apply ex_elim (iff_mp h_iff h_lt_one_zero); intro k h_k
-  simp [substFormula, substTerm, substTerms, add, one, zero, succ,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_k
+  simp [substFormula, substTerm, substTerms, add] at h_k
   -- h_k : add (succ zero) (succ k) =eq zero. ax5 ⇒ succ(1+k) = 0 ⇒ contradicción ax2.
   have h_ax5_inst : axioms ⊢ (add one (succ k) =eq succ (add one k)) := by
     have hh := spec (spec h_ax5 one) k
     simp [substFormula, substTerm, substTerms, add, one, zero, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+          liftTerm, liftTerms] at hh
     exact hh
   have h_succ_eq_zero : axioms ⊢ (succ (add one k) =eq zero) :=
     FOL.derive_eq_trans (eq_symm h_ax5_inst) h_k
   have h_ax2_inst : axioms ⊢ neg (succ (add one k) =eq zero) := by
     have hh := spec h_ax2 (add one k)
-    simp [substFormula, substTerm, substTerms, succ, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+    simp [succ, zero] at hh
     exact hh
   exact mp h_ax2_inst h_succ_eq_zero
 

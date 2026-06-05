@@ -1,16 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git add -A)",
-      "Bash(git commit:*)",
-      "Bash(git push)",
-      "Bash(bash git-lock.bash list)",
-      "Bash(bash git-lock.bash lock:*)",
-      "Bash(bash git-lock.bash unlock:*)",
-      "Bash(chmod u+w locked_files.txt)",
-      "PowerShell($out = lake build 2>&1; $code = $LASTEXITCODE; \"ERR=\" + \\($out | Select-String -Pattern 'error' -SimpleMatch\\).Count; \"WARN=\" + \\($out | Select-String -Pattern 'warning:' -SimpleMatch\\).Count; \"EXIT=$code\")",
-      "PowerShell($out = lake build 2>&1; $out | Select-String -Pattern 'error:' -SimpleMatch -Context 0,3 | Select-Object -First 30; \"EXIT=$LASTEXITCODE\")",
-      "PowerShell($out = lake build 2>&1; $code = $LASTEXITCODE; \\($out | Select-String -Pattern 'error:' -SimpleMatch | Select-Object -First 20\\); \"ERR=\" + \\($out | Select-String -Pattern 'error:' -SimpleMatch\\).Count; \"EXIT=$code\")"
+      "Bash",
+      "PowerShell"
     ]
   }
 }

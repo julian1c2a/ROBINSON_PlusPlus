@@ -212,8 +212,7 @@ theorem proj_is_cantor (c : Term) :
     have h_imp : Γ ⊢ (le k c ⇒ (add k (sub c k) =eq c)) := by
       have h := spec (spec h_ax29 c) k
       simp [substFormula, substTerm, substTerms, le, lt, add, sub,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm,
-            FOL.substTerm_liftLift] at h
+            FOL.substTerm_liftTerm] at h
       exact h
     exact mp h_imp h_k_le_c
   -- 2·(k + y) = 2k + 2y  [ax12 distribución]
@@ -221,7 +220,7 @@ theorem proj_is_cantor (c : Term) :
       (mul two (add k (sub c k)) =eq add (mul two k) (mul two (sub c k))) := by
     have h := spec (spec (spec h_ax12 two) k) (sub c k)
     simp [substFormula, substTerm, substTerms, mul, add, sub,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftTerm,
           FOL.substTerm_liftLift] at h
     exact h
   -- 2·(k+y) = 2c (multiplicando la igualdad k+y=c por 2 a la izquierda)
@@ -283,8 +282,7 @@ theorem proj_is_cantor (c : Term) :
         (le (sub c k) w ⇒ (add (sub c k) (sub w (sub c k)) =eq w)) := by
       have h := spec (spec h_ax29 w) (sub c k)
       simp [substFormula, substTerm, substTerms, le, lt, add, sub,
-            liftTerm, liftTerms, FOL.substTerm_liftTerm,
-            FOL.substTerm_liftLift] at h
+            FOL.substTerm_liftTerm] at h
       exact h
     exact mp h_imp h_y_le_w
   -- x + y = w  (conmutar)
@@ -329,14 +327,14 @@ theorem cantor_surjectivity (c : Term) :
   apply ex_intro (proj1 c)
   apply ex_intro (proj2 c)
   simp [substFormula, substTerm, substTerms, is_cantor, cantor_poly,
-        mul, add, succ, two, one, zero, sub,
+        mul, add, succ, two, one, zero,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   exact proj_is_cantor c
 
 -- Conmutatividad de la suma (helper local).
 private theorem add_comm_c (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
   have h := spec (spec (ax (by simp [axioms] : ax6_add_comm ∈ axioms)) a) b
-  simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms, FOL.substTerm_liftTerm] at h
+  simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftTerm] at h
   exact h
 
 -- Teo C7: Cantor(x,y,c) ∧ Cantor(x',y',c) ⇒ x=x' ∧ y=y' (Unicidad Proyectiva)
