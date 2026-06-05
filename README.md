@@ -1,6 +1,6 @@
 # ROBINSON_PlusPlus
 
-[![Lean 4](https://img.shields.io/badge/Lean-v4.28.0-blue)](https://leanprover.github.io/)
+[![Lean 4](https://img.shields.io/badge/Lean-v4.29.1-blue)](https://leanprover.github.io/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](CURRENT-STATUS-PROJECT.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Coverage](https://img.shields.io/badge/proofs-in%20progress-yellow)](CURRENT-STATUS-PROJECT.md)
@@ -156,4 +156,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-05-27 — Build ✅ con **0 sorrys reales**. Proyecto COMPLETO: 9/9 módulos sin sorrys. Los 5 `axiom` de Axioms.lean son meta-reglas de FOL (no `:= sorry`).*
+*Last updated: 2026-06-05 — Build ✅ con **0 sorrys reales**. 11/11 módulos sin sorrys (Bloques I–VIII Fase 17 parcial). Sistema con **30 axiomas matemáticos** (23 aritméticos + 7 listas) tras eliminar ax22/ax23/ax27/ax28. Los 5 `axiom` de Axioms.lean son meta-reglas de FOL (no `:= sorry`).*

@@ -27,7 +27,7 @@ Los axiomas 22 y 23 se introdujeron originalmente para poder definir las funcion
 
 ## Conclusión histórica (cumplida)
 
-Los axiomas 22 y 23 fueron correctos en su afirmación pero su estatus debía ser el de **teoremas**, como se cumplió el 2026-06-02. La eliminación reduce la superficie axiomática del sistema a **31 axiomas matemáticos** sin sacrificar ningún resultado.
+Los axiomas 22 y 23 fueron correctos en su afirmación pero su estatus debía ser el de **teoremas**, como se cumplió el 2026-06-02. La eliminación, junto con la posterior de ax27 (2026-06-03) y ax28 (2026-06-02), reduce la superficie axiomática del sistema a **30 axiomas matemáticos** (23 aritméticos + 7 listas) sin sacrificar ningún resultado. Ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) para el análisis comparativo con Q (7 ax) y PA⁻ (16 ax).
 
 ---
 

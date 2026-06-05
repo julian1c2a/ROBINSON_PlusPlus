@@ -1,6 +1,6 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
-**Última actualización:** 2026-05-27 — `Minimal/` cerrado a 0 sorrys reales.
+**Última actualización:** 2026-06-05 — `Minimal/` cerrado a 0 sorrys reales con **30 axiomas matemáticos** (tras eliminación de ax22/ax23/ax27/ax28); 11 módulos (Bloques I–VIII Fase 17 parcial).
 **Autor**: Julián Calderón Almendros
 
 > Este documento describe la visión estratégica y la planificación a largo plazo para los proyectos que se construirán sobre la base del sistema `FOL`.
@@ -48,8 +48,8 @@ La aparente inconsistencia de usar recursión para `+` y `*` pero no para otras 
 El proyecto se organizará en tres directorios principales, cada uno representando un sistema axiomático de fortaleza creciente:
 
 1. **`Minimal/`** ✅ **0 sorrys**:
-    - **Sistema**: 31 axiomas matemáticos (más 5 meta-reglas de FOL). No incluye esquema de inducción.
-    - **Objetivo cumplido**: Demostrado que este sistema es suficiente para construir la función de Cantor, los pares con proyecciones y las listas con concatenación y pertenencia (Bloques I a VI).
+    - **Sistema**: **30 axiomas matemáticos** (23 aritméticos + 7 listas; tras eliminar ax22/ax23/ax27/ax28) más 5 meta-reglas de FOL (ADR-008). No incluye esquema de inducción.
+    - **Objetivo cumplido**: Demostrado que este sistema es suficiente para construir la función de Cantor, los pares con proyecciones, las listas con concatenación y pertenencia, las funciones discretas (`IsFunction`), y primos básicos (`Dvd`, `IsPrime`) — Bloques I a VIII Fase 17 parcial. Análisis comparativo con Q (7 ax) y PA⁻ (16 ax) en [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md).
 
 2. **`Intermediate/`**:
     - **Sistema**: Un sistema reducido (13 axiomas) más un **esquema de inducción restringido** a un conjunto finito de fórmulas, como se describe en el Apéndice B de `TuplasFuncionesYListas.md`.

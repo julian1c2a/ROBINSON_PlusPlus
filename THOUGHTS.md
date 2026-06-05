@@ -1,6 +1,6 @@
 # Thoughts — ProjectName
 
-**Last updated:** 2026-05-11
+**Last updated:** 2026-06-05
 **Author**: Julián Calderón Almendros
 
 > This is an informal design journal. Record ideas, alternatives considered,
@@ -152,16 +152,18 @@ decidibilidad de `Pred`, lo cual requiere inducción o enumeración. En FOL sin 
 no podemos derivar ax25/ax26 de los axiomas de σ; los modelos no-standard pueden asignar
 a `τ` cualquier valor en `N`. Por tanto ax25/ax26 **son necesarios** en Minimal.
 
-## Estado de los axiomas ax21, ax24, ax27, ax28 (actualizado 2026-06-02)
+## Estado de los axiomas ax21, ax24, ax27, ax28 (actualizado 2026-06-03)
 
 | Axioma | Enunciado | "Teorema" en el código | Estado |
 |--------|-----------|------------------------|--------|
-| ax21 | `mod2(n) = 0 ∨ mod2(n) = 1` | `mod2_range` (Block3, delega a ax21) | **postulado** — requiere inducción |
-| ax24 | `n = 2k → mod2(n) = 0` | `mod2_of_even` (Block5, delega a ax24) | **postulado** — requiere inducción (auditar) |
-| ax27 | `a+c = b+c → a = b` | `add_left_cancel` (Block4_C6_C7, delega a ax27) | **postulado** — requiere inducción |
+| ax21 | `mod2(n) = 0 ∨ mod2(n) = 1` | `mod2_range` (Block3, delega a ax21) | **postulado** — irreducible sin inducción (analizado en MINIMAL-AXIOMS.md §3.2) |
+| ax24 | `n = 2k → mod2(n) = 0` | `mod2_of_even` (Block4_C6_C7, delega a ax24) | **postulado** — irreducible sin inducción (auditado 2026-06-03, ver MINIMAL-AXIOMS.md §3.1) |
+| ~~ax27~~ | ~~`a+c = b+c → a = b`~~ | `add_left_cancel` (Block4_C6_C7) | **ELIMINADO 2026-06-03** — derivable en PA⁻ vía tricotomía (ax19) + monotonía (`lt_add_const_of_le_left`) + irreflexividad (ax18) |
 | ~~ax28~~ | ~~`2a = 2b → a = b`~~ | `teo_2_11` (Block1) | **ELIMINADO 2026-06-02** — reprobado sin inducción usando tricotomía + irreflexividad + monotonía estricta de *2 |
 
-**Patrón observado**: la propia spec `TuplasFuncionesYListas.md` ya contenía la prueba de teo_2_11 sin inducción (líneas 273–283). El comentario "Requiere inducción sobre N" del código era erróneo. Sospecha: ax24 podría tener un destino similar (a auditar — siguiente en NEXT-STEPS).
+**Patrón confirmado**: la spec `TuplasFuncionesYListas.md` ya contenía pruebas sin inducción de los axiomas eliminables. ax27 también fue eliminable, aunque por la vía PA⁻ (no la spec). Los **2 axiomas testigos aritméticos restantes** (`ax21`, `ax24`) están firmemente confirmados como irreducibles: el obstáculo común es el "lema fantasma" `∀n,m. n+m ≥ n` que no se demuestra sin inducción sobre `m`. Mismo veredicto para `ax_C3` y `ax_L3` (listas).
+
+**Eliminados extra** no listados arriba: `ax22_cantor_proj_exists` y `ax23_cantor_proj_uniq` (2026-06-02, commit `537fd68`) — proj1/proj2 ahora son defs concretas (`x_of_c`/`y_of_c`) en Block4_C6_C7; `proj_is_cantor` reemplaza ax22 como teorema; ax23 nunca se usó.
 
 ### 2026-04-21 — Automatización de Tácticas (Fase 4)
 
