@@ -48,7 +48,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block5.lean` | `…Block5` | `Axioms`, `Block1`, `Block3`, `Block4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete |
 | `Minimal/Theorems/Block6.lean` | `…Block6` | `Axioms`, `Block1`, `Block4`, `Block5` | ✅ Complete |
 | `Minimal/Theorems/Block7.lean` | `…Block7` | `Axioms`, `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete |
-| `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 parcial; Fases 18-19 fuera de scope `Minimal`) |
+| `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 completa con Ax-P TFA; Fases 18-19 fuera de scope `Minimal`) |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -110,10 +110,10 @@ graph TD
 ### 3.1 `Minimal/Axioms.lean`
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Axioms`
-**Status**: ✅ Complete
+**Status**: ✅ Complete — **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL.
 **@axiom_system**: `Minimal`
 **@importance**: `foundational`
-**Last updated**: 2026-06-02
+**Last updated**: 2026-06-06 (Bloque VIII ext.: +pow, +prod_pairs, +4 axiomas)
 
 #### 3.1.1 Language symbols
 
@@ -131,11 +131,15 @@ def pred_sym  : String := "τ"
 def nil_sym   : String := "[]"
 def cons_sym  : String := "::"
 def concat_sym: String := "##"
+def pow_sym   : String := "^"     -- 2026-06-06, Bloque VIII ext.
+def prodp_sym : String := "Π_p"   -- 2026-06-06, Bloque VIII ext.
 def lt_sym    : String := "<"
 def le_sym    : String := "≤"
 def in_sym    : String := "∈"
 def zero_sym  : String := "0"
 ```
+
+> **Nota 2026-06-02**: `proj1_sym`/`proj2_sym` ya **no son símbolos opacos** del lenguaje. `proj1`/`proj2` son ahora defs concretas en `Block4_C6_C7.lean` (`proj1 := x_of_c`, `proj2 := y_of_c`).
 
 #### 3.1.2 Term constructors (computable, no termination proof needed)
 
@@ -153,6 +157,8 @@ def proj2 (t : Term) : Term                    -- π₂(t)
 def pred  (t : Term) : Term                    -- τ(t)
 def cons  (h t : Term) : Term                  -- h :: t
 def concat (l₁ l₂ : Term) : Term               -- l₁ ## l₂
+def pow   (b e : Term) : Term                  -- b^e   (Bloque VIII ext.)
+def prod_pairs (l : Term) : Term               -- Π_p l (Bloque VIII ext.)
 def sq    (t : Term) : Term := mul t t         -- t²
 def one   : Term := succ zero
 def two   : Term := succ one
@@ -222,6 +228,10 @@ abbrev ex := @Formula.ex
 | Ax_C2 | `ax_C2_concat_cons` | ∀ h, t, L, cons(h,t) ## L = cons(h, t##L) |
 | Ax_C3 | `ax_C3_concat_assoc` | ∀ L, M, N, (L##M)##N = L##(M##N) (requiere inducción) |
 | Ax 29 | `ax29_sub_witness` | ∀ a, b, b ≤ a ⇒ b + (a−b) = a |
+| Ax-Pow-0 | `ax_pow_zero` | ∀ b, b^0 = 1 (Bloque VIII ext.) |
+| Ax-Pow-σ | `ax_pow_succ` | ∀ b, e, b^(σe) = b^e · b (Bloque VIII ext.) |
+| Ax-ProdP-nil | `ax_prodp_nil` | prod_pairs [] = 1 (Bloque VIII ext.) |
+| Ax-ProdP-cons | `ax_prodp_cons` | ∀ p, e, t, prod_pairs ((p,e)::t) = p^e · prod_pairs t (Bloque VIII ext.) |
 
 **Ax 20** (`ax20_eq_decidable`): definido pero NO en la lista — convertido en teorema `eq_decidable` (Block1).
 **Ax 27** (`ax27_add_left_cancel`): **ELIMINADO 2026-06-03** — derivable en PA⁻ vía tricotomía (ax19) + monotonía (`lt_add_const_of_le_left`) + irreflexividad (ax18). Ver `add_left_cancel` en `Block4_C6_C7`.
@@ -551,12 +561,12 @@ theorem teo_F3 (F : Term) : IsFunction F ↔ Functional F               -- Teo F
 
 ---
 
-### 3.11 `Block8.lean` — Primos (Bloque VIII, Fase 17 parcial)
+### 3.11 `Block8.lean` — Primos y factorización (Bloque VIII, Fase 17 completa)
 
 **Namespace**: `…Block8`
-**Status**: ✅ Complete (alcance Fase 17 sin `IsFactorization` ni `Ax-P`)
-**@importance**: `medium`
-**Last updated**: 2026-06-03 (creado)
+**Status**: ✅ Complete (Fase 17 completa con `IsFactorization` + `Ax-P` TFA)
+**@importance**: `high`
+**Last updated**: 2026-06-06 (extensión con Bloque VIII extendido)
 
 #### Defs
 
@@ -565,9 +575,14 @@ def Dvd (a b : Term) : Prop := ∃ q : Term, axioms ⊢ (mul a q =eq b)   -- Def
 def IsPrime (p : Term) : Prop :=
   (axioms ⊢ lt one p) ∧                                                 -- p ≥ 2
   ∀ d : Term, Dvd d p → axioms ⊢ ((d =eq one) ∨ (d =eq p))             -- Def 25
+
+def IsFactorization (f n : Term) : Prop :=
+  (axioms ⊢ (prod_pairs f =eq n)) ∧                                     -- Def 26
+  ∀ p e : Term, (axioms ⊢ In (pair p e) f) →
+    (IsPrime p ∧ axioms ⊢ lt zero e)
 ```
 
-#### Exports
+#### Exports — Divisibilidad y primalidad (Def 25)
 
 ```lean
 theorem dvd_refl (a) : Dvd a a                                          -- testigo q := one
@@ -577,12 +592,37 @@ theorem isPrime_zero_inconsistent : IsPrime zero → axioms ⊢ ⊥           --
 theorem isPrime_one_inconsistent  : IsPrime one  → axioms ⊢ ⊥           -- lt one one ⇒ ax18
 ```
 
+#### Exports — Potencia y producto sobre listas de pares (Bloque VIII ext.)
+
+```lean
+-- Instancias inmediatas de los axiomas (Axioms.lean):
+theorem pow_zero (b)         : Γ ⊢ (pow b zero =eq one)                 -- ax_pow_zero
+theorem pow_succ (b e)       : Γ ⊢ (pow b (succ e) =eq mul (pow b e) b) -- ax_pow_succ
+theorem prod_pairs_nil       : Γ ⊢ (prod_pairs nil =eq one)             -- ax_prodp_nil
+theorem prod_pairs_cons (p e t) :
+  Γ ⊢ (prod_pairs (cons (pair p e) t) =eq mul (pow p e) (prod_pairs t)) -- ax_prodp_cons
+```
+
+#### Exports — Factorización (Def 26 + Ax-P)
+
+```lean
+theorem isFactorization_nil_one : IsFactorization nil one
+  -- Caso base: [] factoriza al 1. Cuantificación sobre elementos vacuamente
+  -- satisfecha por explosión object-level vía ax_L1_in_nil.
+
+-- Meta-axioma (estilo imp_intro/gen/raa/or_elim/ex_elim):
+axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
+  ∃ f : Term, IsFactorization f n ∧
+    ∀ f' : Term, IsFactorization f' n → axioms ⊢ (f =eq f')
+```
+
 **Forma de los teoremas de no-primalidad**: NO podemos probar `¬IsPrime zero` directamente en Lean (requeriría meta-consistencia, que no demostramos). En su lugar, probamos "`IsPrime zero` derivaría `axioms ⊢ ⊥`" — el contenido genuino del enunciado.
 
-**Pendientes documentados en el header del módulo**:
-* **Def 26 `IsFactorization(f,n)`**: requiere extender el lenguaje con `pow` (potencia) y `prod_list` (producto sobre listas).
-* **Ax-P (TFA)**: la spec lo postula incluso en sistemas con inducción fuerte; decisión pendiente sobre añadirlo a `Minimal` o reservarlo para `Intermediate/Full`.
-* **Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem); fuera de scope de `Minimal`, corresponderían a un módulo `Meta/` futuro.
+**Sobre la formulación de `IsFactorization`**: meta-Prop combinando derivación object-level (`prod_pairs f =eq n`) con cuantificación meta-level sobre los pares `(p,e)` que aparecen como elementos de `f`. La permisividad sobre la forma de los elementos (no obliga a que sean literalmente `pair p e`) queda compensada por `ax_prodp_cons`, que sólo se activa en cabezas `pair p e`.
+
+**Sobre `Ax-P` (TFA)**: justificado en spec §Apéndice B.4 como axioma porque requiere inducción fuerte para ser derivable. En `Minimal/` se adopta meta-axiomáticamente (estilo `imp_intro`, etc.); en `Intermediate/` será un teorema mediante inducción fuerte sobre `n`.
+
+**Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem); fuera de scope de `Minimal`, corresponderían a un módulo `Meta/` futuro.
 
 ---
 
@@ -591,7 +631,7 @@ theorem isPrime_one_inconsistent  : IsPrime one  → axioms ⊢ ⊥           --
 - **Patrón `spec + simp`**: cada axioma instanciado vía `spec h_axN t` requiere un `simp` con simp-set propio según los binders del axioma. Para axiomas `forall_2` se necesita `liftTerm`/`FOL.substTerm_liftTerm`; para `forall_3`, además `FOL.substTerm_liftLift`. Ver `THOUGHTS.md` y `feedback_build_cache` en memoria de Claude.
 - **`Γ` por módulo**: cada módulo define `def Γ := axioms`. La unificación entre `Block2.Γ` y `Block4_C5.Γ` falla con `apply` pero pasa con `exact` (defeq).
 - **`=eq` no-estándar `eq_trans`**: `eq_trans (h1:a=b)(h2:a=c):b=c`. Para `a=b, b=c → a=c` usar `FOL.derive_eq_trans`.
-- **Linter `unusedSimpArgs` desactivado** en todos los módulos: genera falsos positivos con simps bajo binders existenciales donde `FOL.substTerm_lift*` sí disparan reducciones que el linter no traza.
+- **Linter `unusedSimpArgs` activo** en todos los módulos (2026-06-06): `set_option linter.unusedSimpArgs true` global. Tras un barrido de 411 → 0 warnings se confirmó que la mayoría de `liftTerm`/`liftTerms`/`FOL.substTerm_lift_comm` en simp-sets antiguos eran efectivamente innecesarios. Los que sí son cruciales (`FOL.substTerm_liftTerm`, `FOL.substTerm_liftLift` en simps bajo binders `forall_2`/`forall_3`) se conservan.
 
 ---
 
@@ -599,10 +639,11 @@ theorem isPrime_one_inconsistent  : IsPrime one  → axioms ⊢ ⊥           --
 
 Ver `NEXT-STEPS.md` (Ejes 1–4). Resumen:
 
-1. **Eje 1 (corto)**: `Block7.lean` (Funciones, `IsFunction`, Teo F3); auditar `ax24` (`mod2_of_even` ya en Block4_C6_C7); eliminar duplicados. (ax22/ax23 ya eliminados en 537fd68/2026-06-02.)
-2. **Eje 2 (medio)**: `Intermediate/` con inducción restringida; derivar ax6, 7, 10, 11, 12, 18, 19 como teoremas.
-3. **Eje 3 (largo)**: `Full/` con inducción general; derivar ax21, 24, 27, _C3, _L3.
-4. **Eje 4 (muy largo)**: CZF, cardinalidad, análisis constructivo.
+1. **Eje 1 (cerrado 2026-06-06)**: `Minimal/` completo. Block7 (Funciones, IsFunction/Functional/F1-F3), Block8 + extensión (Dvd, IsPrime, IsFactorization, Ax-P TFA, pow, prod_pairs). ax22/ax23/ax27/ax28 eliminados (537fd68/2026-06-02/2026-06-03). Linter `unusedSimpArgs true` global (411 → 0). Pendiente menor: warning externo `FOL/Theorems/Eq.lean:130`.
+2. **Eje 2 (siguiente)**: `Intermediate/` con esquema de inducción finito (Ax-Ind sobre Φ con |Φ|=13 fórmulas, §Apéndice B). Derivar como teoremas: ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax20, ax21 (9 axiomas algebraicos), más ax_C3, ax_L3, ax24 (vía inducción débil). Reducción esperada: 34 → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
+3. **Eje 3 (medio)**: `Full/` con inducción general; demostrar Ax-P (TFA) como teorema usando inducción fuerte sobre n. Sistema canónico: Peano puro + Defs derivadas.
+4. **Eje 4 (largo)**: `Meta/` para Fases 18-19 (Gödelización + autorreferencia); requiere meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem).
+5. **Eje 5 (muy largo)**: CZF, cardinalidad, análisis constructivo (fuera del scope inmediato del proyecto).
 
 ---
 

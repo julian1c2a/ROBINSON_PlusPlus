@@ -150,26 +150,99 @@ Un tema transversal a todos los proyectos fundacionales es la necesidad de ser e
   - [x] `concat_assoc` (Teo L7) — postulado como `ax_C3_concat_assoc` (requiere inducción sobre L; pasará a teorema en `Intermediate/`).
   - [x] `in_concat_iff` (Teo L8) — postulado como `ax_L3_in_concat` (requiere inducción sobre L).
 
-### Fase 4: Sistema `Minimal` — Funciones discretas (pendiente)
+### Fase 4: Sistema `Minimal` — Funciones discretas
 
 **Objetivo**: Bloque VII de `TuplasFuncionesYListas.md`.
-**Estado**: ⏳ **Pendiente**.
+**Estado**: ✅ **Completado** (2026-06-03).
 
 **Tareas**:
 
-- [ ] **Bloque VII (Funciones)**: `Minimal/Theorems/Block7.lean`.
-  - [ ] Definir el predicado `IsFunction`.
-  - [ ] Definir la evaluación `F(x)`.
-  - [ ] Demostrar el isomorfismo con relaciones funcionales (Teo F3).
+- [x] **Bloque VII (Funciones)**: `Minimal/Theorems/Block7.lean`.
+  - [x] Definir el predicado `IsFunction (f : Term) : Prop` (Def 21) como meta-Prop estilo Block7/8.
+  - [x] Definir la relación `Functional (f : Term) : Prop` (Def 24) con `Map` inlineado.
+  - [x] Teorema F1: `IsFunction nil` (la lista vacía es función trivial).
+  - [x] Teorema F2: evaluación única (de existir un par `(x, y)` en `f` cumpliendo `IsFunction`, `y` está determinado).
+  - [x] Teorema F3: isomorfismo `IsFunction ⟺ Functional`.
+
+### Fase 5: Sistema `Minimal` — Primos y factorización
+
+**Objetivo**: Bloque VIII de `TuplasFuncionesYListas.md` (Fase 17 completa con extensión del lenguaje).
+**Estado**: ✅ **Completado** (2026-06-03 parcial; 2026-06-06 extensión completa).
+
+**Tareas**:
+
+- [x] **Bloque VIII — Divisibilidad y primalidad** (Def 25): `Minimal/Theorems/Block8.lean`.
+  - [x] `Dvd a b : Prop` (Def 25.a): `∃ q, a·q = b`.
+  - [x] `IsPrime p : Prop` (Def 25): `p ≥ 2 ∧ ∀ d, Dvd d p → d=1 ∨ d=p`.
+  - [x] Lemas básicos: `dvd_refl`, `dvd_one`, `dvd_zero`, `isPrime_zero_inconsistent`, `isPrime_one_inconsistent`.
+- [x] **Bloque VIII extendido — Lenguaje** (2026-06-06): `Axioms.lean`.
+  - [x] Símbolos `pow_sym = "^"`, `prodp_sym = "Π_p"`.
+  - [x] Constructores `pow (b e : Term)`, `prod_pairs (l : Term)`.
+  - [x] 4 axiomas: `ax_pow_zero`, `ax_pow_succ`, `ax_prodp_nil`, `ax_prodp_cons`.
+  - [x] Sistema 30 → 34 axiomas matemáticos (25 aritm + 7 listas + 2 factorización).
+- [x] **Bloque VIII extendido — Factorización** (Def 26 + Ax-P TFA): `Block8.lean`.
+  - [x] Lemas básicos: `pow_zero`, `pow_succ`, `prod_pairs_nil`, `prod_pairs_cons`.
+  - [x] `IsFactorization (f n : Term) : Prop` (Def 26) como meta-Prop.
+  - [x] `isFactorization_nil_one`: caso base `IsFactorization nil one`.
+  - [x] Meta-axioma `ax_p_tfa` (TFA): existencia y unicidad de factorización para `n ≥ 1`.
+- [x] **Fases 18-19 (Gödelización, autorreferencia)**: documentadas como fuera de scope `Minimal/` (corresponden a un módulo `Meta/` futuro, no a `Intermediate/` ni `Full/`).
+
+### Fase 6: Sistema `Minimal` — Limpieza global
+
+**Objetivo**: Activar el linter `unusedSimpArgs` en todos los módulos y eliminar warnings residuales.
+**Estado**: ✅ **Completado** (2026-06-06).
+
+**Tareas**:
+
+- [x] Eliminar 411 warnings de `unusedSimpArgs` en `Block1` (22), `Block2` (274), `Block4_C5` (32), `Block4_C6_C7` (14), `Block5` (2), `Block6` (39), `Block7` (6), `Block8` (22).
+- [x] Activar `set_option linter.unusedSimpArgs true` en los 11 módulos.
+- [x] Build verde, 0 sorrys, 0 warnings RPP (único persistente: `FOL/Theorems/Eq.lean:130` en librería externa).
 
 ---
 
 ## 6. Futuro y Consolidación
 
-Con el sistema `Minimal/` completo a **0 sorrys reales**, los siguientes pasos están descritos en detalle en [NEXT-STEPS.md](NEXT-STEPS.md). Resumen ejecutivo:
+Con el sistema `Minimal/` **cerrado a 0 sorrys reales, 0 warnings RPP y 34 axiomas matemáticos** (Bloques I-VIII completos), los siguientes pasos están descritos en detalle en [NEXT-STEPS.md](NEXT-STEPS.md). Resumen ejecutivo:
 
-1. **Cerrar la Fase 4** (corto plazo): añadir `Block7.lean` con `IsFunction` y el isomorfismo con relaciones funcionales (Teo F3). Auditar si algún axioma postulado (`ax28_mul_two_cancel`, `ax_C3`, `ax_L3`) es realmente demostrable en `Minimal` sin inducción.
-2. **Implementar el sistema `Intermediate`** (medio plazo): Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` son teoremas derivables de un principio de inducción restringido. Establecer el embedding `Minimal ⊂ Intermediate`.
-3. **Implementar el sistema `Full`** (largo plazo): Demostrar que todos los axiomas "induction-bound" (`ax21`, `ax24`, `ax27`, `ax28`, `ax_C3`, `ax_L3`) y propiedades meta-teóricas se vuelven teoremas en un sistema con inducción general. Cadena completa de embeddings `FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`.
-4. **Consolidación**: Usar los resultados de `ROBINSON_PlusPlus` para refactorizar otros proyectos y que se apoyen en una base formalmente verificada desde `FOL=`.
-5. **Nuevas Teorías** (muy largo plazo): Con una base sólida para la aritmética y los conjuntos finitos (listas), el camino hacia teorías de conjuntos constructivas como la de Aczel (CZF) se vuelve mucho más claro.
+### 6.1. Eje siguiente — Sistema `Intermediate` (medio plazo)
+
+**Estado**: 🔜 **Próxima fase activa**.
+
+Implementar el sistema con **esquema de inducción finito** (Ax-Ind sobre un conjunto Φ con |Φ|=13 fórmulas, según `TuplasFuncionesYListas.md §Apéndice B`). Demostrar como teoremas:
+
+- **9 axiomas algebraicos** del sistema `Minimal`: ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax20, ax21.
+- **Axiomas postulados sin inducción débil**: ax_C3 (concat_assoc), ax_L3 (in_concat_iff), ax24 (mod2_of_even).
+- **Embedding formal** `Minimal ⊂ Intermediate`: cada axioma de Minimal es teorema en Intermediate.
+
+Reducción esperada: 34 axiomas matemáticos → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
+
+**Decisiones pendientes**:
+
+- ¿Mantener `pow`/`prod_pairs` como símbolos primitivos con sus 4 axiomas, o demostrarlos como definiciones recursivas? La spec §Apéndice B no lo aborda directamente.
+- ¿`Ax-P` (TFA) sigue como axioma en `Intermediate/` o pasa a teorema vía inducción fuerte? La spec sugiere que en `Intermediate/` con Ax-Ind(Φ) sigue siendo axioma (requiere inducción fuerte sobre fórmulas no acotadas, no cubierta por Φ).
+
+### 6.2. Sistema `Full` (largo plazo)
+
+Sistema canónico con **esquema de inducción general** sobre todas las fórmulas del lenguaje (§Apéndice C). Demostrar como teoremas:
+
+- **Ax-P (TFA)** vía inducción fuerte sobre `n`.
+- Todos los axiomas restantes que requieran inducción no acotada.
+- Cadena completa de embeddings `FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`.
+
+### 6.3. Módulo `Meta/` (largo plazo, scope separado)
+
+Para las Fases 18-19 del spec (Gödelización y autorreferencia): meta-codificación de símbolos (G : símbolos → ℕ), corner brackets ⌜·⌝, predicados `IsFormula` y `Dem`, teoremas G1 y Meta-G. Independiente de la jerarquía `Minimal ⊂ Intermediate ⊂ Full`; podría sentarse sobre cualquier nivel.
+
+### 6.4. Consolidación y nuevas teorías (muy largo plazo)
+
+- **Consolidación**: refactorizar otros proyectos (incluido `FOL`) sobre la base formalmente verificada de `ROBINSON_PlusPlus`.
+- **CZF y conjuntos constructivos**: con la base aritmética + listas + factorización, el camino hacia teorías de conjuntos constructivas (Aczel CZF) queda accesible.
+- **Análisis constructivo**: extender al continuo con la maquinaria aritmética desarrollada.
+
+### 6.5. Mantenimiento del scope `Minimal/`
+
+Pequeñas tareas de baja prioridad:
+
+- Arreglar el único warning externo: `FOL/Theorems/Eq.lean:130` (unusedSimpArg `hne`).
+- Auditar si `pow`/`prod_pairs` admiten reducción de axiomas (p.ej. derivar `ax_pow_succ` a partir de otros sin inducción — improbable).
+- Más teoremas sobre `IsFactorization` usando `ax_p_tfa`: lema de Euclides, multiplicatividad, etc.
