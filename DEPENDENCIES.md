@@ -18,7 +18,7 @@ ROBINSON_PlusPlus/                  # raíz del proyecto Lean
 ├── Intermediate_template.lean
 ├── Full_template.lean
 └── ROBINSON_PlusPlus/Minimal/
-    ├── Axioms.lean                 # Lenguaje + 30 axiomas + 5 meta-axiomas FOL (ADR-008)
+    ├── Axioms.lean                 # Lenguaje + 34 axiomas + 5 meta-axiomas FOL (ADR-008)
     └── Theorems/
         ├── Block1.lean             # Aritmética básica + teo_2_11 (cancelación *2)
         ├── Block2.lean             # Raíz cuadrada, sqrt_*, succ_le_of_lt, le/lt-trans
@@ -29,7 +29,7 @@ ROBINSON_PlusPlus/                  # raíz del proyecto Lean
         ├── Block5.lean             # Pares: proj1/2_pair, pair_proj_eq_c, pair_inj
         ├── Block6.lean             # Listas: cons_neq_nil, concat_assoc (vía ax_C3), in_concat (vía ax_L3)
         ├── Block7.lean             # Funciones: IsFunction, Functional, F1/F2/F3 (meta-Prop Lean)
-        └── Block8.lean             # Primos: Dvd, IsPrime, dvd_*, isPrime_*_inconsistent
+        └── Block8.lean             # Primos + factorización: Dvd, IsPrime, IsFactorization, pow/prod_pairs, Ax-P (TFA)
 ```
 
 ---
@@ -139,7 +139,7 @@ Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
 ### Level 0 — Foundation
 
 * `FOL.*` (proyecto sibling, dependencia local vía `lakefile.lean`).
-* `Minimal/Axioms.lean` — lenguaje + 30 axiomas + 5 meta-axiomas. Solo importa `FOL.FOL` y `FOL.Theorems.Eq`.
+* `Minimal/Axioms.lean` — lenguaje + 34 axiomas + 5 meta-axiomas FOL. Solo importa `FOL.FOL` y `FOL.Theorems.Eq`.
 
 ### Level 1 — Aritmética básica
 

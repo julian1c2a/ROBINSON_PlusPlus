@@ -47,6 +47,9 @@ def pred_sym : String := "τ"
 def nil_sym : String := "[]"
 def cons_sym : String := "::"
 def concat_sym : String := "##"
+-- Bloque VIII extendido: potencia y producto sobre listas de pares.
+def pow_sym  : String := "^"
+def prodp_sym : String := "Π_p"
 
 -- ### Predicate Symbols
 def lt_sym : String := "<"
@@ -74,6 +77,10 @@ def mod2 (t : Term)   : Term := .func mod2_sym [t]
 def pred (t : Term)    : Term := .func pred_sym [t]
 def cons (h t : Term) : Term := .func cons_sym [h, t]
 def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
+-- Bloque VIII extendido:
+-- `pow b e := b^e`. Producto sobre lista de pares: `prod_pairs [(p₁,e₁),...,(pₖ,eₖ)] := Π pᵢ^eᵢ`.
+def pow (b e : Term) : Term := .func pow_sym [b, e]
+def prod_pairs (l : Term) : Term := .func prodp_sym [l]
 
 -- Derived operation `sq`
 def sq (t : Term) : Term := mul t t
@@ -375,6 +382,34 @@ def ax_L3_in_concat : Formula :=
 -- estricta de *2 (probada vía ax13 + teo_2_7 + ax5 + ax2). La prueba directa está
 -- ahora en `teo_2_11` (Block1.lean), que ya NO delega a este axioma.
 
+-- ### Axiomas de la Potencia (Bloque VIII extendido)
+-- Definición recursiva de `pow` análoga a `*` (ax8/ax9).
+
+-- Ax-Pow-0: ∀ b, b^0 = 1
+def ax_pow_zero : Formula :=
+  forall_ (pow (.var 0) zero =eq one)
+
+-- Ax-Pow-σ: ∀ b, ∀ e, b^(σe) = b^e * b
+def ax_pow_succ : Formula :=
+  forall_2 (
+    pow (.var 1) (succ (.var 0)) =eq mul (pow (.var 1) (.var 0)) (.var 1)
+  )
+
+-- ### Axiomas del Producto sobre Listas de Pares (Bloque VIII extendido)
+-- `prod_pairs l` evalúa una lista de pares (p_i, e_i) como Π pᵢ^eᵢ.
+-- Sólo se especifica sobre listas cuyos elementos tienen la forma `pair p e`.
+
+-- Ax-ProdP-nil: prod_pairs [] = 1
+def ax_prodp_nil : Formula :=
+  prod_pairs nil =eq one
+
+-- Ax-ProdP-cons: ∀ p, ∀ e, ∀ t, prod_pairs ((p,e) :: t) = p^e * prod_pairs t
+def ax_prodp_cons : Formula :=
+  forall_3 (
+    prod_pairs (cons (pair (.var 2) (.var 1)) (.var 0)) =eq
+      mul (pow (.var 2) (.var 1)) (prod_pairs (.var 0))
+  )
+
 -- Ax 29 (sub_witness): ∀ a b, b ≤ a → b + (a − b) = a
 -- Axioma testigo para la resta truncada (monus). En sistemas con inducción es
 -- teorema (induc. sobre b junto con sub_zero/sub_succ); en Minimal se postula.
@@ -425,7 +460,12 @@ def axioms : List Formula := [
   -- ax27_add_left_cancel ELIMINADO 2026-06-03: derivable en PA⁻ vía tricotomía +
   -- monotonía + irreflexividad. Ver `add_left_cancel` en Block4_C6_C7.
   -- ax28_mul_two_cancel ELIMINADO 2026-06-02: derivable sin inducción, ver `teo_2_11` en Block1.
-  ax29_sub_witness      -- axioma testigo de la resta truncada (monus)
+  ax29_sub_witness,     -- axioma testigo de la resta truncada (monus)
+  -- Bloque VIII extendido (factorización): pow y prod_pairs.
+  ax_pow_zero,          -- b^0 = 1
+  ax_pow_succ,          -- b^(σe) = b^e * b
+  ax_prodp_nil,         -- prod_pairs [] = 1
+  ax_prodp_cons         -- prod_pairs ((p,e)::t) = p^e * prod_pairs t
 ]
 
 -- ## Helper Theorems

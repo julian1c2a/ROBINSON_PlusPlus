@@ -1,10 +1,12 @@
 # Análisis de Minimalidad del Sistema Axiomático `Minimal`
 
-**Last updated:** 2026-06-03
+**Last updated:** 2026-06-06
 **Author:** Julián Calderón Almendros
-**Estado:** 30 axiomas matemáticos (23 aritméticos + 7 listas) + 5 meta-reglas FOL, 0 sorrys reales.
+**Estado:** 34 axiomas matemáticos (25 aritméticos + 7 listas + 2 factorización) + 5 meta-reglas FOL + 1 meta-axioma Ax-P (TFA), 0 sorrys reales.
 
-Este documento recoge la información obtenida por **web research** y por **razonamiento sobre el sistema actual** para evaluar si el conjunto de 30 axiomas que sustenta `Minimal/` es minimal — o cerca de serlo — relativo a su objetivo de diseño: **construir aritmética de Cantor + tuplas + listas sin esquema de inducción**.
+Este documento recoge la información obtenida por **web research** y por **razonamiento sobre el sistema actual** para evaluar si el conjunto de 34 axiomas que sustenta `Minimal/` es minimal — o cerca de serlo — relativo a su objetivo de diseño: **construir aritmética de Cantor + tuplas + listas + factorización prima sin esquema de inducción**.
+
+> **Bloque VIII extendido (2026-06-06)**: añadidos `pow` y `prod_pairs` al lenguaje, 4 axiomas definitorios (`ax_pow_zero`, `ax_pow_succ`, `ax_prodp_nil`, `ax_prodp_cons`) y el meta-axioma `ax_p_tfa` (Teorema Fundamental de la Aritmética: existencia y unicidad de factorización para `n ≥ 1`). Spec §BLOQUE VIII Fase 17 cubierta por completo. Las Fases 18–19 (Gödelización) permanecen fuera del scope `Minimal/`.
 
 ---
 

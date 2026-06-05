@@ -27,27 +27,27 @@ set_option linter.unusedSimpArgs true
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
 /-!
-## BLOQUE VIII — PRIMOS
+## BLOQUE VIII — PRIMOS Y FACTORIZACIÓN
 
-Implementa **Def 25** (`Dvd` y `IsPrime`) y lemas básicos de divisibilidad y
-primalidad, siguiendo `TuplasFuncionesYListas.md §BLOQUE VIII Fase 17`.
+Implementa **Def 25** (`Dvd` y `IsPrime`), **Def 26** (`IsFactorization`) y
+**Ax-P** (TFA, Teorema Fundamental de la Aritmética), siguiendo
+`TuplasFuncionesYListas.md §BLOQUE VIII Fase 17`.
 
-**Alcance de esta fase**: `Dvd`, `IsPrime`, y los teoremas que no requieren
-extender el lenguaje. Quedan **pendientes** (necesitan extensión del lenguaje):
+**Estado del bloque**:
 
-* **Def 26 `IsFactorization(f,n)`**: requiere función de potencia `pow` y
-  producto sobre listas (`prod_list`) — ninguno está en el lenguaje base.
-* **Ax-P (TFA, ∀n≥1, ∃¹f. IsFactorization(f,n))**: la spec lo postula como
-  axioma incluso en sistemas con inducción fuerte; pendiente de decidir
-  si añadirlo a `Minimal` o reservarlo para `Intermediate/Full`.
-* **Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación
-  (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem). Fuera de scope del sistema
-  `Minimal`; corresponderían a un módulo `Meta/` futuro.
+* **Def 25 + lemas básicos**: completo (`Dvd`, `IsPrime`, refl/zero/one).
+* **Def 26 `IsFactorization`** + **Ax-P (TFA)**: completos. Requirieron extender
+  el lenguaje con `pow` y `prod_pairs` (ver `Axioms.lean`, +4 axiomas).
+* **Fases 18-19 (Gödelización, autorreferencia)**: **fuera de scope** del
+  sistema `Minimal`. Requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝,
+  IsFormula, Dem) y corresponderían a un módulo `Meta/` futuro.
 
-**Estilo de formalización**: igual que `Block7`, `Dvd` e `IsPrime` se definen
-como meta-predicados Lean (`Term → Prop` y `Term → Term → Prop`) parametrizados
-por cuantificación universal sobre `Term`. Esto evita el manejo manual de
-`liftTerm`/`substTerm` que aparecería al usar `forall_`/`ex` en FOL puro.
+**Estilo de formalización**: igual que `Block7`, los predicados `Dvd`,
+`IsPrime` e `IsFactorization` se definen como meta-Props (`Term → Prop`)
+parametrizados por cuantificación universal sobre `Term`. Esto evita el manejo
+manual de `liftTerm`/`substTerm` que aparecería al usar `forall_`/`ex` en FOL
+puro. `ax_p_tfa` es un meta-axioma en el estilo de `imp_intro`, `gen`, `raa`,
+`or_elim`, `ex_elim`: incrementable de 5 a 6 meta-axiomas si se cuenta como tal.
 -/
 
 def Γ := axioms
@@ -140,15 +140,120 @@ theorem isPrime_one_inconsistent (h_prime : IsPrime one) : axioms ⊢ ⊥ := by
     exact hh
   exact mp h_irr h_lt_one_one
 
+/-!
+### Fase 17 extendida: Potencia y producto sobre listas de pares
+
+Estos lemas son las instancias inmediatas de los nuevos axiomas
+`ax_pow_zero`, `ax_pow_succ`, `ax_prodp_nil`, `ax_prodp_cons`.
+Sirven como interfaz limpia para los demás bloques (evitan el `spec`+`simp`
+verbose en cada uso).
+-/
+
+/-- `b^0 = 1` (instancia de ax_pow_zero). -/
+theorem pow_zero (b : Term) : Γ ⊢ (pow b zero =eq one) := by
+  have h_ax := ax (by simp [axioms] : ax_pow_zero ∈ axioms)
+  have h := spec h_ax b
+  simp [substFormula, substTerm, substTerms, pow, zero, one, succ] at h
+  exact h
+
+/-- `b^(σe) = b^e * b` (instancia de ax_pow_succ). -/
+theorem pow_succ (b e : Term) : Γ ⊢ (pow b (succ e) =eq mul (pow b e) b) := by
+  have h_ax := ax (by simp [axioms] : ax_pow_succ ∈ axioms)
+  have h := spec (spec h_ax b) e
+  simp [substFormula, substTerm, substTerms, pow, mul, succ,
+        FOL.substTerm_liftTerm] at h
+  exact h
+
+/-- `prod_pairs [] = 1` (instancia de ax_prodp_nil). -/
+theorem prod_pairs_nil : Γ ⊢ (prod_pairs nil =eq one) :=
+  ax (by simp [axioms] : ax_prodp_nil ∈ axioms)
+
+/-- `prod_pairs ((p,e) :: t) = p^e * prod_pairs t` (instancia de ax_prodp_cons). -/
+theorem prod_pairs_cons (p e t : Term) :
+    Γ ⊢ (prod_pairs (cons (pair p e) t) =eq mul (pow p e) (prod_pairs t)) := by
+  have h_ax := ax (by simp [axioms] : ax_prodp_cons ∈ axioms)
+  have h := spec (spec (spec h_ax p) e) t
+  simp [substFormula, substTerm, substTerms, prod_pairs, cons, pair,
+        cantor_func, cantor_poly, div2, mul, add, succ, two, one, zero, pow,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h
+  exact h
+
+/-!
+### Def 26: IsFactorization
+
+`IsFactorization f n` significa: `f` es una lista de pares `(pᵢ, eᵢ)` tales que
+cada `pᵢ` es primo, cada `eᵢ ≥ 1`, y `Π pᵢ^eᵢ = n`.
+
+Se define como meta-Prop (estilo Block7/Block8): combina una derivación
+object-level (`prod_pairs f =eq n`) con cuantificación meta-level sobre los
+elementos de la lista (vía `In`).
+
+**Nota sobre la formulación**: la condición "cada elemento de f es un par
+(p,e) con p primo y e ≥ 1" se expresa como: `∀ p e, In (pair p e) f →
+IsPrime p ∧ e > 0`. Esto es permisivo (no obliga a que los elementos sean
+literalmente de la forma `pair p e`), pero la condición `prod_pairs f =eq n`
+es la que restringe la forma de `f`, ya que `ax_prodp_cons` sólo se activa
+en listas con cabeza `pair p e`. -/
+def IsFactorization (f n : Term) : Prop :=
+  (axioms ⊢ (prod_pairs f =eq n)) ∧
+  ∀ p e : Term, (axioms ⊢ In (pair p e) f) → (IsPrime p ∧ axioms ⊢ lt zero e)
+
+/-- **Lista vacía factoriza al 1**: `IsFactorization [] 1`.
+
+    Esto es el caso base del TFA (`Ax-P` requiere `n ≥ 1`, y `1` es el caso
+    límite — la factorización vacía da producto 1).
+
+    La condición sobre los elementos es vacuamente cierta: si tuviéramos una
+    derivación de `In (pair p e) nil`, junto con `ax_L1_in_nil` derivaríamos
+    object-level `⊥` y por explosión cualquier otra cosa. -/
+theorem isFactorization_nil_one : IsFactorization nil one := by
+  refine ⟨prod_pairs_nil, ?_⟩
+  intro p e h_in
+  have h_axL1 := ax (by simp [axioms] : ax_L1_in_nil ∈ axioms)
+  have h_not_in : axioms ⊢ neg (In (pair p e) nil) := by
+    have hh := spec h_axL1 (pair p e)
+    simp [In, nil, zero] at hh
+    exact hh
+  have h_bot : axioms ⊢ ⊥ := mp h_not_in h_in
+  -- Explosión object-level: derivamos toda subcomponente desde ⊥.
+  refine ⟨⟨false_elim h_bot, ?_⟩, false_elim h_bot⟩
+  intro _d _h_dvd
+  exact false_elim h_bot
+
+/-!
+### Ax-P (TFA): Teorema Fundamental de la Aritmética
+
+Para todo `n ≥ 1`, existe una **única** factorización (módulo igualdad
+provable) de `n` en primos.
+
+**Justificación**: en sistemas con inducción débil este resultado es un
+teorema (vía inducción fuerte sobre `n`); en el sistema `Minimal` (sin
+inducción) se adopta como **axioma**. Esto sigue la línea del spec
+§Bloque VIII Fase 17 y §Apéndice B.4.
+
+**Estilo**: meta-axioma (como `imp_intro`, `gen`, `raa`, `or_elim`,
+`ex_elim`). No es expresable directamente como `Formula` porque
+`IsFactorization` es meta-Prop. -/
+axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
+  ∃ f : Term, IsFactorization f n ∧
+    ∀ f' : Term, IsFactorization f' n → axioms ⊢ (f =eq f')
+
 end ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
 -- Exports
 export ROBINSON_PlusPlus.Minimal.Theorems.Block8 (
   Dvd
   IsPrime
+  IsFactorization
   dvd_refl
   dvd_one
   dvd_zero
   isPrime_zero_inconsistent
   isPrime_one_inconsistent
+  pow_zero
+  pow_succ
+  prod_pairs_nil
+  prod_pairs_cons
+  isFactorization_nil_one
+  ax_p_tfa
 )

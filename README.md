@@ -13,12 +13,12 @@ Una implementación formal de una **Aritmética Fundacional** en Lean 4, constru
 
 Este proyecto está dedicado a explorar y formalizar diferentes sistemas axiomáticos para la aritmética. Su objetivo es fundar rigurosamente los números naturales y, a partir de ellos, construir estructuras de datos como tuplas y listas.
 
-La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, y con ella, una teoría de tuplas y listas.
+La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 34 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, una teoría de tuplas y listas, y la formalización de la factorización prima (TFA vía Ax-P).
 
 **Características principales:**
 
 - **Base Lógica Sólida**: Utiliza una implementación completa y verificada de Lógica de Primer Orden (`FOL`) como dependencia.
-- **Aritmética Minimalista**: Formaliza un sistema de 30 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
+- **Aritmética Minimalista**: Formaliza un sistema de 34 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
 - **Desarrollo Progresivo**: El proyecto está estructurado para avanzar desde sistemas débiles (`Minimal`) hacia sistemas más fuertes con principios de inducción (`Intermediate`, `Full`).
 - **Metaprogramación**: Hereda y utiliza las tácticas de automatización del proyecto `FOL` para agilizar las demostraciones.
 
@@ -36,14 +36,14 @@ La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 30 a
 | `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1..4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete — `proj1/2_pair`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
 | `Minimal/Theorems/Block6.lean` | `Minimal.Theorems.Block6` | `Block1`, `Block4`, `Block5` | ✅ Complete — listas, pertenencia, concat (assoc/in_concat vía ax_C3/ax_L3 postulados) |
 | `Minimal/Theorems/Block7.lean` | `Minimal.Theorems.Block7` | `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete — `IsFunction`, `Functional`, F1/F2/F3 (Bloque VII spec) |
-| `Minimal/Theorems/Block8.lean` | `Minimal.Theorems.Block8` | `Block1`, `Block2`, `Block4_C5` | ✅ Complete — `Dvd`, `IsPrime`, lemas básicos (Bloque VIII Fase 17 parcial) |
+| `Minimal/Theorems/Block8.lean` | `Minimal.Theorems.Block8` | `Block1`, `Block2`, `Block4_C5` | ✅ Complete — `Dvd`, `IsPrime`, `IsFactorization`, `pow`/`prod_pairs` (Bloque VIII Fase 17 + Ax-P TFA) |
 
 ## Project Structure
 
 ```text
 ROBINSON_PlusPlus/
 ├── Minimal/
-│   ├── Axioms.lean            # Lenguaje + 30 axiomas + 5 meta-axiomas (reglas de deducción)
+│   ├── Axioms.lean            # Lenguaje + 34 axiomas + 5 meta-axiomas (reglas de deducción)
 │   └── Theorems/
 │       ├── Block1.lean        # Block I: Aritmética básica, constantes
 │       ├── Block2.lean        # Block II: Raíz cuadrada, cotas, unicidad
@@ -54,7 +54,7 @@ ROBINSON_PlusPlus/
 │       ├── Block5.lean        # Pares y proyecciones (proj1/2_pair, pair_inj)
 │       ├── Block6.lean        # Listas (cons_neq_nil, concat_assoc, in_concat)
 │       ├── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
-│       └── Block8.lean        # Primos (Dvd, IsPrime + lemas básicos)
+│       └── Block8.lean        # Primos y factorización (Dvd, IsPrime, IsFactorization, Ax-P TFA)
 ├── Intermediate/              # (Planned) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```
@@ -156,4 +156,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-05 — Build ✅ con **0 sorrys reales**. 11/11 módulos sin sorrys (Bloques I–VIII Fase 17 parcial). Sistema con **30 axiomas matemáticos** (23 aritméticos + 7 listas) tras eliminar ax22/ax23/ax27/ax28. Los 5 `axiom` de Axioms.lean son meta-reglas de FOL (no `:= sorry`).*
+*Last updated: 2026-06-06 — Build ✅ con **0 sorrys reales** y **0 warnings RPP**. 11/11 módulos sin sorrys (Bloques I–VIII Fase 17 completa). Sistema con **34 axiomas matemáticos** (25 aritméticos + 7 listas + 2 factorización) tras añadir `pow`/`prod_pairs` + `Ax-P` (TFA, Bloque VIII extendido). Los 5 `axiom` de Axioms.lean son meta-reglas de FOL + 1 meta-axioma TFA en Block8 (no `:= sorry`).*

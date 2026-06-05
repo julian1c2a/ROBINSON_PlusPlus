@@ -1,14 +1,14 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-03 — Block8 (Primos, Fase 17 parcial) y Block7 (Funciones discretas) AÑADIDOS; `ax27_add_left_cancel` ELIMINADO (derivable en PA⁻); sistema con **30 axiomas matemáticos**, 11 módulos, 0 sorrys reales.
+**Last updated:** 2026-06-06 — Bloque VIII extendido COMPLETO: añadidos `pow`, `prod_pairs`, `IsFactorization`, `Ax-P` (TFA). Sistema con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización), 11 módulos, 0 sorrys reales, 0 warnings.
 
 ---
 
 ## Situación actual
 
-Build: ✅ `lake build` exit 0. **0 sorrys reales** en los 9 módulos. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas de FOL, no `:= sorry`.
+Build: ✅ `lake build` exit 0. **0 sorrys reales** y **0 warnings RPP** en los 11 módulos. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas de FOL; `ax_p_tfa` en `Block8.lean` es un meta-axioma adicional (TFA). Ninguno es `:= sorry`.
 
-El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md): **30 axiomas matemáticos sin esquema de inducción son suficientes para construir la función de Cantor, las tuplas con proyecciones, y las listas con concatenación y pertenencia**.
+El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md): **34 axiomas matemáticos sin esquema de inducción son suficientes para construir la función de Cantor, las tuplas con proyecciones, las listas con concatenación y pertenencia, las funciones discretas, los primos y la factorización prima** (TFA vía Ax-P).
 
 ---
 
