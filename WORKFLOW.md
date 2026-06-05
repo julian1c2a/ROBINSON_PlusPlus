@@ -1,262 +1,177 @@
 # Development Workflow
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-04-20*
+**Last updated:** 2026-06-05 — Adaptado a flujo IA + opción legacy `git-lock.bash`.
 
-Complete guide for using this template — from initial setup to active development.
+Guía operativa para colaborar en este proyecto. Cubre los **dos modos** activos: sesiones con asistente IA (modo principal) y trabajo humano con `git-lock.bash` (legacy, opcional).
 
 ---
 
-## Part 1: Starting a New Project
+## Parte 1 — Setup inicial (una vez por máquina)
 
-### Step 1 — Clone the template
+### Requisitos
+
+* **Lean 4 v4.29.1** (gestionado por `elan`).
+* **`lake`** (incluido con Lean).
+* **`git`** y acceso al repo `julian1c2a/ROBINSON_PlusPlus`.
+* **FOL** clonado como proyecto sibling en `../FOL` (referenciado en `lakefile.lean`).
+
+### Clonar
 
 ```bash
-git clone https://github.com/julian1c2a/lean4-project-template ROBINSON_PlusPlus
+git clone https://github.com/julian1c2a/ROBINSON_PlusPlus.git
 cd ROBINSON_PlusPlus
+lake build         # verifica que compila (~23 jobs, ~1–3 min en caché fría)
 ```
 
-### Step 2 — Run setup
+### (Opcional) git hook legacy
+
+Solo si vas a trabajar en modo humano con bloqueos por archivo:
 
 ```bash
-bash setup.bash ROBINSON_PlusPlus "Your Full Name" your-github-username
-```
-
-This single command:
-
-- Renames `ProjectName/` → `ROBINSON_PlusPlus/` and `ProjectName.lean` → `ROBINSON_PlusPlus.lean`
-- Replaces all occurrences of `ProjectName`, `Julián Calderón Almendros`, `julian1c2a` in every file
-- Updates copyright year to the current year
-- Commits the result
-
-### Step 3 — Install the git hook
-
-```bash
-bash git-lock.bash init
-```
-
-This installs the pre-commit hook that:
-
-- Blocks commits that touch locked `.lean` files
-- Warns about `sorry` statements in staged files
-
-> **Note**: Run this once per machine/clone. The hook lives in `.git/hooks/` which is not versioned.
-
-> **Do NOT run `git init` or `lake init`.**
->
-> - `git init` is already done by `git clone` — running it again would reinitialize the repo and break the commit history.
-> - `lake init` would overwrite `lakefile.lean` with a bare default, losing the template configuration (`autoImplicit=false`, `globs`, commented dependencies).
->
-> If you activate a dependency in `lakefile.lean`, run `lake update` (not `lake init`) to fetch it:
->
-> ```bash
-> # After uncommenting a require block in lakefile.lean:
-> lake update   # downloads and registers the external package
-> lake build    # verify it compiles
-> ```
-
-### Step 4 — Create the GitHub repository and push
-
-```bash
-# Option A: with gh CLI
-gh repo create ROBINSON_PlusPlus --public --source=. --push
-
-# Option B: manually
-# Create repo on github.com, then:
-git remote add origin https://github.com/julian1c2a/ROBINSON_PlusPlus.git
-git push -u origin master
-```
-
-### Step 5 — Customize
-
-Edit these files before starting development:
-
-| File | What to update |
-|------|----------------|
-| `README.md` | Project description, module table |
-| `lakefile.lean` | Add external dependencies; uncomment `globs` if desired |
-| `DECISIONS.md` | Add project-specific design decisions |
-| `NAMING-CONVENTIONS.md` | Customize domain-specific naming rules and examples |
-| `NEXT-STEPS.md` | Define initial development phases |
-| `THOUGHTS.md` | Record design philosophy and initial decisions |
-| `LICENSE` | Verify author name and year |
-
----
-
-## Part 2: Daily Development Workflow
-
-### Starting a work session
-
-```bash
-# 1. Check which files are unlocked
-bash git-lock.bash list
-
-# If more than one file is unlocked from a previous session, lock all:
-# bash git-lock.bash lock ROBINSON_PlusPlus/SomeModule.lean
-
-# 2. Check current sorry status
-make sorry
-```
-
-### Creating a new module
-
-```bash
-# Creates ROBINSON_PlusPlus/ModuleName.lean from _template.lean
-# and adds the import to ROBINSON_PlusPlus.lean
-make new NAME=ModuleName
-
-# For nested modules:
-make new NAME=Algebra/Ring
-```
-
-Then edit the generated file. When done:
-
-```bash
-bash git-lock.bash lock ROBINSON_PlusPlus/ModuleName.lean
-```
-
-### Editing an existing module
-
-```bash
-# 1. Unlock the file
-bash git-lock.bash unlock ROBINSON_PlusPlus/ModuleName.lean
-
-# 2. Edit...
-
-# 3. Lock when done
-bash git-lock.bash lock ROBINSON_PlusPlus/ModuleName.lean
-```
-
-### The one-file rule
-
-> **At most one `.lean` file may be unlocked at any time.**
-
-If you need to switch to a different file mid-session:
-
-```bash
-bash git-lock.bash lock ROBINSON_PlusPlus/CurrentModule.lean
-bash git-lock.bash unlock ROBINSON_PlusPlus/NextModule.lean
-```
-
-### Building
-
-```bash
-make build          # compile full project
-make rebuild        # clean + compile
-```
-
-### Checking proofs
-
-```bash
-make sorry          # list all sorry in project
-make status         # lock status + sorry count
+bash git-lock.bash init    # instala pre-commit hook
 ```
 
 ---
 
-## Part 3: Commit Protocol
+## Parte 2 — Modo IA (flujo principal)
 
-### Before committing
+Sesiones colaborativas con Claude Code (u otro asistente). Sin locks por archivo; el control de cambios se hace por commits frecuentes + build verde como gate.
 
-```bash
-# 1. Verify only the intended files are unlocked
-bash git-lock.bash list
+### Ciclo de trabajo típico
 
-# 2. Check for sorry
-make sorry
+1. **Orientación**: el asistente lee `REFERENCE.md` (mapa del proyecto), `NEXT-STEPS.md` (qué toca ahora), `CURRENT-STATUS-PROJECT.md` (sorrys + módulos), `MEMORY.md` (checkpoints de sesiones previas).
+2. **Edición directa**: el asistente modifica `.lean` con la herramienta `Edit` o `Write`; cada cambio significativo seguido de `lake build` para detectar regresiones inmediatas.
+3. **Commit frecuente** tras cada milestone (un módulo cerrado, un axioma eliminado, una doc actualizada). Mensajes en formato `<tipo>(<scope>): <resumen>` siguiendo Conventional Commits informal.
+4. **Push** al final de cada milestone (no esperar al final de la sesión).
+5. **Doc sync** al cerrar un bloque de trabajo: actualizar `REFERENCE.md`, `CHANGELOG.md`, `CURRENT-STATUS-PROJECT.md`, `NEXT-STEPS.md` según los cambios.
+6. **Checkpoint** al cerrar sesión: guardar archivo en `memory/project_session_YYYY-MM-DD.md` con el estado y el siguiente paso, e indexarlo en `MEMORY.md`.
 
-# 3. Update REFERENCE.md
-#    Project modified .lean files → REFERENCE.md
-#    (See AI-GUIDE.md §12)
+### Gate de calidad
+
+* `lake build` debe pasar (exit 0) **antes de commitear**.
+* **0 sorrys reales** es la línea base del proyecto desde 2026-05-27 — cualquier sorry nuevo requiere justificación explícita en el commit.
+* Si el linter `unusedSimpArgs` está activo en el módulo editado, eliminar los args señalados o documentar por qué se conservan.
+
+### Comandos formales (definidos en `AI-GUIDE.md §29`)
+
+El usuario puede invocar estos verbos para que el asistente ejecute flujos predefinidos:
+
+| Comando | Qué hace |
+|---|---|
+| `dame situación` | Reporte read-only: build, sorries, módulos, último cambio. |
+| `actualiza doc` | Pasada completa de documentación tras una sesión de desarrollo. |
+| `proyecta` | Extrae exports nuevos a `REFERENCE.md`. |
+| `guarda y sube` | Build + commit + push. |
+
+### Convención de commits
+
+```text
+<tipo>(<scope>): <resumen corto>
+
+<cuerpo opcional explicando el porqué, decisiones, pendientes>
+
+Co-Authored-By: Claude Opus X.Y <noreply@anthropic.com>
 ```
 
-### Committing
+Tipos usados: `feat`, `fix`, `chore`, `docs`, `refactor`. Scope es típicamente el nombre del módulo (`Block7`, `Block4_C6_C7`) o `docs`.
+
+---
+
+## Parte 3 — Modo humano legacy (`git-lock.bash`)
+
+Flujo histórico con bloqueos explícitos por archivo (ADR-003). **No se usa en sesiones IA**, pero la infraestructura sigue disponible.
+
+### La regla de un solo archivo
+
+> **A lo sumo un `.lean` puede estar desbloqueado en cualquier momento.**
+
+### Ciclo
 
 ```bash
-# Stage specific files (avoid git add -A to prevent accidents)
-git add ROBINSON_PlusPlus/ModuleName.lean REFERENCE.md CHANGELOG.md
-
-git commit -m "feat: add ModuleName with N definitions and M theorems"
+bash git-lock.bash list                                # qué hay desbloqueado
+bash git-lock.bash unlock ROBINSON_PlusPlus/X.lean     # desbloquea para editar
+# … editar X.lean …
+bash git-lock.bash lock   ROBINSON_PlusPlus/X.lean     # bloquea al terminar
 ```
 
-### After committing — lock all modified .lean files
+Si cambias de archivo a mitad de sesión: lock el actual antes de unlock el siguiente.
+
+### Pre-commit hook
+
+Bloquea commits que toquen archivos en `locked_files.txt` (o `frozen_files.txt`). Instalado con `bash git-lock.bash init`.
+
+### Freeze permanente
+
+Módulos completos pueden marcarse como permanentemente inmutables (`bash git-lock.bash freeze`). Las extensiones se hacen vía `*Ext.lean` (ver `AI-GUIDE.md §21`).
+
+---
+
+## Parte 4 — Toolchain
 
 ```bash
-bash git-lock.bash lock ROBINSON_PlusPlus/ModuleName.lean
-
-# Commit the updated locked_files.txt
-git add locked_files.txt
-git commit -m "chore: lock ModuleName after completion"
-```
-
-### Ending a session
-
-```bash
-# Lock ALL modified .lean files
-bash git-lock.bash list   # verify none remain unlocked
-
-git push origin master
+# Actualizar Lean (verifica build + commit automático al éxito)
+bash update-toolchain.bash v4.x.x
 ```
 
 ---
 
-## Part 4: Updating the Lean Toolchain
+## Parte 5 — Mantenimiento
+
+### Regenerar el barrel root
 
 ```bash
-# Try a new version — automatically builds and commits on success
-bash update-toolchain.bash v4.29.0
+bash gen-root.bash    # escanea ROBINSON_PlusPlus/ y reescribe ROBINSON_PlusPlus.lean
+```
 
-# On failure it restores the previous version automatically
+Si añades un módulo manualmente (sin `new-module.bash`), corre esto para sincronizar el import.
+
+### Crear nuevo módulo desde plantilla
+
+```bash
+bash new-module.bash ModuleName          # crea ROBINSON_PlusPlus/ModuleName.lean
+bash new-module.bash Topic/SubModule     # crea ROBINSON_PlusPlus/Topic/SubModule.lean
+```
+
+### Verificar estado
+
+```bash
+lake build           # ¿compila? (gate básico)
+bash check-sorry.bash    # cuenta sorries reales
+bash git-lock.bash list  # qué archivos están en estado lock/frozen
 ```
 
 ---
 
-## Part 5: Regenerating the Root Module
+## Parte 6 — Estructura de archivos clave
 
-If you add/remove modules manually without using `new-module.bash`:
-
-```bash
-bash gen-root.bash
-```
-
-This scans `ROBINSON_PlusPlus/` for all `.lean` files (excluding `_template.lean`) and rewrites `ROBINSON_PlusPlus.lean` with the full import list.
-
----
-
-## Part 6: AI Assistant Sessions (Claude Code / Aider)
-
-When starting a session with an AI assistant:
-
-1. **Point to AI-GUIDE.md** — the AI reads this first
-2. **Point to REFERENCE.md** — the AI uses this instead of loading all `.lean` files
-3. **Remind the one-file rule** — unlock only the target module
-4. **At session end** — AI locks all modified files and updates `REFERENCE.md`, `CHANGELOG.md`
-
-Key commands to tell the AI:
-
-```
-bash git-lock.bash list             # what is currently unlocked?
-bash git-lock.bash unlock File.lean # unlock for editing
-bash git-lock.bash lock File.lean   # lock after completion
-make sorry                          # any sorry left?
-```
+| Archivo | Propósito |
+|---|---|
+| `AI-GUIDE.md` | **Lee primero**: protocolos, naming, comandos formales. |
+| `REFERENCE.md` | Mapa técnico del proyecto (módulos, defs, teoremas, axiomas). |
+| `NEXT-STEPS.md` | Qué toca hacer ahora. Actualizado por sesión. |
+| `CHANGELOG.md` | Historia cronológica de cambios. |
+| `CURRENT-STATUS-PROJECT.md` | Snapshot del build + métricas. |
+| `DEPENDENCIES.md` | Grafo de dependencias verificado contra imports. |
+| `MINIMAL-AXIOMS.md` | Análisis comparativo del sistema axiomático vs Q/PA⁻. |
+| `DECISIONS.md` | ADRs (decisiones arquitectónicas). |
+| `THOUGHTS.md` | Diario informal (no normativo). |
+| `DISCUSIONES.md` | Discusión histórica sobre axiomas eliminados. |
+| `PLANNING.md` | Plan estratégico de largo plazo. |
+| `TuplasFuncionesYListas.md` | Spec fundacional (inmutable). |
+| `NAMING-CONVENTIONS.md` | Convenciones Mathlib-style con 12 reglas. |
+| `WORKFLOW.md` | Este archivo. |
 
 ---
 
-## Quick Reference
+## Parte 7 — Diferencias respecto a la versión anterior
 
-```bash
-bash setup.bash Name "Author" user   # initialize new project
-bash git-lock.bash init              # install git hook (once per clone)
-bash git-lock.bash list              # show locked files
-bash git-lock.bash lock File.lean    # lock a file
-bash git-lock.bash unlock File.lean  # unlock a file
-make new NAME=Module                 # create new module
-make build                           # compile
-make sorry                           # check for sorry
-make status                          # lock + sorry status
-bash gen-root.bash                   # regenerate root imports
-bash update-toolchain.bash vX.Y.Z    # update Lean version
-```
-n.bash vX.Y.Z    # update Lean version
-```
+Esta revisión (2026-06-05) reconoce que el modo de trabajo dominante es la colaboración con IA, no el flujo humano con `git-lock.bash`. Cambios:
+
+* **Modo IA** documentado como flujo principal (Parte 2), no como nota a pie.
+* **`git-lock.bash` movido a "Parte 3 — legacy"**: sigue funcional para sesiones humanas pero deja de presentarse como obligatorio.
+* **Eliminado** el "Step 1 — Clone the template" / "Step 2 — Run setup": el proyecto ya existe, no hay setup desde plantilla.
+* **Añadidos** comandos formales (`dame situación`, `actualiza doc`, etc.) que el usuario invoca por nombre — son la verdadera interfaz cuando trabajas con el asistente.
+* **Convención de commits** explicitada con ejemplos Conventional + `Co-Authored-By` para sesiones IA.
+
+Si quieres recuperar la versión template original, sigue en el historial git (`git log --all WORKFLOW.md`).
