@@ -27,7 +27,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 
@@ -142,7 +142,7 @@ theorem mod2_of_even {n k : Term} (h : Γ ⊢ (n =eq mul two k)) : Γ ⊢ (mod2 
   have h_imp : Γ ⊢ ((n =eq mul two k) ⇒ (mod2 n =eq zero)) := by
     have hh := spec (spec h_ax24 n) k
     simp [substFormula, substTerm, substTerms, mul, two, one, mod2, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+          FOL.substTerm_liftTerm] at hh
     exact hh
   exact mp h_imp h
 
@@ -187,8 +187,7 @@ theorem proj_is_cantor (c : Term) :
     have h17 : Γ ⊢ (add (mul (div2 (mul w (succ w))) two) (mod2 (mul w (succ w)))
                     =eq mul w (succ w)) := by
       have hh := spec h_ax17 (mul w (succ w))
-      simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two,
-            FOL.substTerm_liftTerm] at hh
+      simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two] at hh
       exact hh
     have h_sum0 : Γ ⊢ (add (mul (div2 (mul w (succ w))) two) zero =eq mul w (succ w)) :=
       FOL.derive_eq_trans (eq_symm (eq_congr_add_left h_mod0)) h17

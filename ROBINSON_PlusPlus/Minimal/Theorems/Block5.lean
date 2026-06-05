@@ -26,7 +26,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block4
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
@@ -55,7 +55,7 @@ theorem is_cantor_pair (x y : Term) :
   have h_even := cantor_poly_is_even x y
   apply ex_elim h_even
   intro k h_k_raw
-  simp [substFormula, substTerm, substTerms, mul, succ, add, two, one, zero,
+  simp [substFormula, substTerm, substTerms, mul, succ, two, one, zero,
         FOL.substTerm_liftTerm] at h_k_raw
   -- h_k_raw : cantor_poly x y =eq mul two k
   -- 2. mod2 (cantor_poly x y) = 0
@@ -64,8 +64,7 @@ theorem is_cantor_pair (x y : Term) :
   have h_ax17 := ax (by simp [axioms] : ax17_div_mod_eq ∈ axioms)
   have h17 : Γ ⊢ (add (mul (div2 (cantor_poly x y)) two) (mod2 (cantor_poly x y)) =eq cantor_poly x y) := by
     have hh := spec h_ax17 (cantor_poly x y)
-    simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two,
-          FOL.substTerm_liftTerm] at hh
+    simp [substFormula, substTerm, substTerms, div2, mul, add, mod2, two] at hh
     exact hh
   -- 4. Sustituir mod2 = 0 en h17
   have h_sum0 : Γ ⊢ (add (mul (div2 (cantor_poly x y)) two) zero =eq cantor_poly x y) :=

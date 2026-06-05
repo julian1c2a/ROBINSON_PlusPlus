@@ -24,7 +24,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block4
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
 open ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block7
 
@@ -69,8 +69,7 @@ theorem teo_F1 : IsFunction nil := by
   have h_axL1 := ax (by simp [axioms] : ax_L1_in_nil ∈ axioms)
   have h_neg_in_p1 : axioms ⊢ neg (In p1 nil) := by
     have hh := spec h_axL1 p1
-    simp [substFormula, substTerm, substTerms, In, nil, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+    simp [In, nil, zero] at hh
     exact hh
   exact false_elim (mp h_neg_in_p1 h_in_p1)
 
