@@ -22,7 +22,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4
 open ROBINSON_PlusPlus.Minimal.Theorems.Block5
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
@@ -53,7 +53,7 @@ theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (cons h t =eq nil) := by
     have hh := spec (spec h_axL0 h) t
     simp [substFormula, substTerm, substTerms, cons, pair, cantor_func, div2,
           cantor_poly, mul, add, succ, two, one, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+          FOL.substTerm_liftTerm] at hh
     exact hh
   -- pair h (succ t) =eq zero
   have h_pair_zero := FOL.derive_eq_trans (eq_symm h_cons_pair) h_eq
@@ -72,7 +72,7 @@ theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (cons h t =eq nil) := by
   have h_t29 := by
     have hh := spec (spec teo_2_9 (mul (add h (succ t)) (succ (add h (succ t))))) (mul two (succ t))
     simp [substFormula, substTerm, substTerms, add, mul, succ, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
     exact hh
   have h_split := mp h_t29 h_cp_zero
   have h_2st_zero : Γ ⊢ (mul two (succ t) =eq zero) := Axioms.and_elim_right h_split
@@ -80,16 +80,16 @@ theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (cons h t =eq nil) := by
   have h9 : Γ ⊢ (mul two (succ t) =eq add (mul two t) two) := by
     have hh := spec (spec h_ax9 two) t
     simp [substFormula, substTerm, substTerms, mul, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
+          FOL.substTerm_liftTerm] at hh
     exact hh
   -- add x two = succ(succ x): ax5(x,succ zero) + ax5(x,zero) + ax4
   have h_add_two_eq_succsucc : Γ ⊢ (add (mul two t) two =eq succ (succ (mul two t))) := by
     have h_a := spec (spec h_ax5 (mul two t)) one
     simp [substFormula, substTerm, substTerms, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_a
+          FOL.substTerm_liftTerm] at h_a
     have h_b := spec (spec h_ax5 (mul two t)) zero
     simp [substFormula, substTerm, substTerms, add, succ,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at h_b
+          FOL.substTerm_liftTerm] at h_b
     have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
     have h_c := spec h_ax4 (mul two t)
     simp [substFormula, substTerm, substTerms, add, zero] at h_c
@@ -101,7 +101,7 @@ theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (cons h t =eq nil) := by
     FOL.derive_eq_trans (eq_symm h_2st_succsucc) h_2st_zero
   have h_neq : Γ ⊢ neg (succ (succ (mul two t)) =eq zero) := by
     have hh := spec h_ax2 (succ (mul two t))
-    simp [substFormula, substTerm, substTerms, succ, zero, FOL.substTerm_liftTerm] at hh
+    simp [succ, zero] at hh
     exact hh
   exact mp h_neq h_succsucc_zero
 
@@ -116,13 +116,13 @@ theorem cons_inj {h t h' t' : Term} : Γ ⊢ (cons h t =eq cons h' t') ⇒ land 
     have hh := spec (spec h_axL0 h) t
     simp [substFormula, substTerm, substTerms, cons, pair, cantor_func, div2,
           cantor_poly, mul, add, succ, two, one, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+          FOL.substTerm_liftTerm] at hh
     exact hh
   have h_l0_h't' := by
     have hh := spec (spec h_axL0 h') t'
     simp [substFormula, substTerm, substTerms, cons, pair, cantor_func, div2,
           cantor_poly, mul, add, succ, two, one, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+          FOL.substTerm_liftTerm] at hh
     exact hh
   have h_pair_eq :=
     FOL.derive_eq_trans (eq_symm h_l0_ht) (FOL.derive_eq_trans h_eq h_l0_h't')
@@ -145,8 +145,8 @@ theorem in_cons_self_nil (x : Term) : Γ ⊢ In x (cons x nil) := by
   have h_axL2 := ax (by simp [axioms] : ax_L2_in_cons ∈ axioms)
   have h_iff := by
     have hh := spec (spec (spec h_axL2 x) x) nil
-    simp [substFormula, substTerm, substTerms, In, cons, succ, zero, nil, lor, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+    simp [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
+          FOL.substTerm_liftTerm,
           FOL.substTerm_liftLift] at hh
     exact hh
   exact iff_mpr h_iff (Axioms.or_intro_left (eq_refl x))
@@ -159,8 +159,8 @@ theorem in_cons_nil_imp_eq {x h : Term} : Γ ⊢ In x (cons h nil) ⇒ (x =eq h)
   have h_axL2 := ax (by simp [axioms] : ax_L2_in_cons ∈ axioms)
   have h_iff := by
     have hh := spec (spec (spec h_axL2 x) h) nil
-    simp [substFormula, substTerm, substTerms, In, cons, succ, zero, nil, lor, iff,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm,
+    simp [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
+          FOL.substTerm_liftTerm,
           FOL.substTerm_liftLift] at hh
     exact hh
   have h_disj := iff_mp h_iff h_in
@@ -170,7 +170,7 @@ theorem in_cons_nil_imp_eq {x h : Term} : Γ ⊢ In x (cons h nil) ⇒ (x =eq h)
     apply false_elim
     have h_not_in_nil : Γ ⊢ neg (In x nil) := by
       have hh := spec h_axL1 x
-      simp [substFormula, substTerm, substTerms, In, nil, zero, FOL.substTerm_liftTerm] at hh
+      simp [In, nil, zero] at hh
       exact hh
     exact mp h_not_in_nil h_in_nil
 
@@ -204,8 +204,7 @@ theorem concat_singletons (x y : Term) :
   -- concat nil (cons y nil) =eq cons y nil  [ax_C1]
   have h_c1 : Γ ⊢ (concat nil (cons y nil) =eq cons y nil) := by
     have hh := spec h_axC1 (cons y nil)
-    simp [substFormula, substTerm, substTerms, concat, cons, nil, zero,
-          FOL.substTerm_liftTerm] at hh
+    simp [substFormula, substTerm, substTerms, concat, cons, nil, zero] at hh
     exact hh
   exact FOL.derive_eq_trans h_c2 (eq_congr_cons_right x h_c1)
 
@@ -216,8 +215,8 @@ theorem concat_assoc (L M N : Term) :
     Γ ⊢ (concat (concat L M) N =eq concat L (concat M N)) := by
   have h_axC3 := ax (by simp [axioms] : ax_C3_concat_assoc ∈ axioms)
   have hh := spec (spec (spec h_axC3 L) M) N
-  simp [substFormula, substTerm, substTerms, concat, nil, zero,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm,
+  simp [substFormula, substTerm, substTerms, concat,
+        FOL.substTerm_liftTerm,
         FOL.substTerm_liftLift] at hh
   exact hh
 
@@ -227,8 +226,8 @@ theorem in_concat_iff (x L M : Term) :
     Γ ⊢ In x (concat L M) ⇔ lor (In x L) (In x M) := by
   have h_axL3 := ax (by simp [axioms] : ax_L3_in_concat ∈ axioms)
   have hh := spec (spec (spec h_axL3 x) L) M
-  simp [substFormula, substTerm, substTerms, In, concat, nil, zero, lor, iff,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm,
+  simp [substFormula, substTerm, substTerms, In, concat, lor, iff,
+        FOL.substTerm_liftTerm,
         FOL.substTerm_liftLift] at hh
   exact hh
 

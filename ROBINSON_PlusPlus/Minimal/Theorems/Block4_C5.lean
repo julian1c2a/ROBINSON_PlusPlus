@@ -22,7 +22,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block2
 open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
-set_option linter.unusedSimpArgs false
+set_option linter.unusedSimpArgs true
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
@@ -141,37 +141,37 @@ theorem mul_lt_mono_right {a b c : Term} (h_lt : Γ ⊢ lt a b) (h_c_pos : Γ �
 -- a * b = b * a  [ax10]
 theorem mul_comm' (a b : Term) : Γ ⊢ (mul a b =eq mul b a) := by
   have h := spec (spec (ax (by simp [axioms] : ax10_mul_comm ∈ axioms)) a) b
-  simp [substFormula, substTerm, substTerms, mul, liftTerm, liftTerms,
+  simp [substFormula, substTerm, substTerms, mul,
         FOL.substTerm_liftTerm] at h
   exact h
 
 -- (a * b) * c = a * (b * c)  [ax11]
 theorem mul_assoc' (a b c : Term) : Γ ⊢ (mul (mul a b) c =eq mul a (mul b c)) := by
   have h := spec (spec (spec (ax (by simp [axioms] : ax11_mul_assoc ∈ axioms)) a) b) c
-  simp [substFormula, substTerm, substTerms, mul, liftTerm, liftTerms,
-        FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h
+  simp [substFormula, substTerm, substTerms, mul,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h
   exact h
 
 -- a + b = b + a  [ax6]
 theorem add_comm' (a b : Term) : Γ ⊢ (add a b =eq add b a) := by
   have h := spec (spec (ax (by simp [axioms] : ax6_add_comm ∈ axioms)) a) b
-  simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms,
+  simp [substFormula, substTerm, substTerms, add,
         FOL.substTerm_liftTerm] at h
   exact h
 
 -- (a + b) + c = a + (b + c)  [ax7]
 theorem add_assoc' (a b c : Term) : Γ ⊢ (add (add a b) c =eq add a (add b c)) := by
   have h := spec (spec (spec (ax (by simp [axioms] : ax7_add_assoc ∈ axioms)) a) b) c
-  simp [substFormula, substTerm, substTerms, add, liftTerm, liftTerms,
-        FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h
+  simp [substFormula, substTerm, substTerms, add,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h
   exact h
 
 -- a * (b + c) = a*b + a*c  [ax12]
 theorem mul_distrib' (a b c : Term) :
     Γ ⊢ (mul a (add b c) =eq add (mul a b) (mul a c)) := by
   have h := spec (spec (spec (ax (by simp [axioms] : ax12_mul_distrib ∈ axioms)) a) b) c
-  simp [substFormula, substTerm, substTerms, mul, add, liftTerm, liftTerms,
-        FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h
+  simp [substFormula, substTerm, substTerms, mul, add,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h
   exact h
 
 -- (a + b) * c = a*c + b*c  [right distributivity, via comm]
@@ -397,27 +397,25 @@ theorem lt_add_const_of_le_left {a b c : Term} (h : Γ ⊢ lt a b) : Γ ⊢ lt (
   have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
   have h_iff := spec (spec h_ax13 a) b
   simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm,
-        FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at h_iff
   apply ex_elim (iff_mp h_iff h); intro k h_k
-  simp [substFormula, substTerm, substTerms, add, succ,
-        liftTerm, liftTerms, FOL.substTerm_liftTerm,
-        FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_k
+  simp [substFormula, substTerm, substTerms,
+        FOL.substTerm_liftTerm] at h_k
   have h7 : axioms ⊢ (add (add c a) (succ k) =eq add c (add a (succ k))) := by
     have hh := spec (spec (spec h_ax7 c) a) (succ k)
-    simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at hh
+    simp [substFormula, substTerm, substTerms, add, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
     exact hh
   have h_chain : axioms ⊢ (add (add c a) (succ k) =eq add c b) :=
     FOL.derive_eq_trans h7 (eq_congr_add_left h_k)
   have h_iff2 := spec (spec h_ax13 (add c a)) (add c b)
   simp [substFormula, substTerm, substTerms, lt, add, succ, iff,
         liftTerm, liftTerms, FOL.substTerm_liftTerm,
-        FOL.substTerm_lift_comm, FOL.substTerm_liftLift] at h_iff2
+        FOL.substTerm_liftLift] at h_iff2
   apply iff_mpr h_iff2
   exact ex_intro k (by
-    simp [substFormula, substTerm, substTerms, add, succ, liftTerm, liftTerms,
-          FOL.substTerm_liftTerm, FOL.substTerm_lift_comm, FOL.substTerm_liftLift]
+    simp [substFormula, substTerm, substTerms,
+          FOL.substTerm_liftTerm]
     exact h_chain)
 
 -- ============================================================
