@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-06 — Block8 **+10 teoremas** (álgebra de `Dvd` + corolarios TFA); **`Meta/Godel.lean` creado** (Nivel B Gödelización: G, ⌜·⌝, Teo G1). Linter `unusedSimpArgs false` global; warning `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). Sistema con **34 axiomas matemáticos**, **12 módulos**, 0 sorrys reales, 0 warnings (incl. FOL externo).
+**Last updated:** 2026-06-06 — **`Meta/Provability.lean` creado (Nivel C Gödelización: `formCode`+inyectividad, `IsFormula`, `Provable`, `Dem`, lema del punto fijo, sentencia de Gödel)**. Previo en la sesión: Block8 +10 teoremas, `Meta/Godel.lean` (Nivel B), linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. Sistema con **34 axiomas matemáticos** + 5 meta-axiomas Gödel Nivel C, **13 módulos**, 0 sorrys, 0 warnings.
 
 ---
 
@@ -42,7 +42,7 @@ Todos los hitos completados:
 
 ---
 
-## Eje 2 — Módulo `Meta/` (Nivel B ✅ 2026-06-06; próximo Nivel C)
+## Eje 2 — Módulo `Meta/` (Niveles B y C ✅ 2026-06-06; próximo Nivel D)
 
 **Objetivo**: implementar Fases 18-19 del spec (`TuplasFuncionesYListas.md §BLOQUE VIII`) — Gödelización y autorreferencia. Diagnóstico completo y arquitectura en [GODEL-STATUS.md](GODEL-STATUS.md).
 
@@ -56,14 +56,15 @@ Todos los hitos completados:
 
 **No introduce nuevos axiomas matemáticos** sobre `Minimal/`. Aprovecha `pow` + TFA para codificación primorial alternativa (ver [GODEL-STATUS.md](GODEL-STATUS.md) §3.1).
 
-### 2.2. Nivel C — `Meta/Provability.lean` (segundo hito)
+### 2.2. Nivel C — `Meta/Provability.lean` (segundo hito) ✅ COMPLETADO 2026-06-06
 
-- [ ] Predicado `IsFormula(x)`: `x` es el código de Gödel de una fórmula bien formada.
-- [ ] Predicado `Dem(p, φ)`: `p` es el código de una demostración formal de `φ` en `Minimal`.
-- [ ] **Lema del punto fijo** (diagonalización): para todo `φ(x)` existe `ψ` tal que `Minimal ⊢ ψ ⇔ φ(⌜ψ⌝)`.
-- [ ] **Sentencia de Gödel** `G_Min := el punto fijo de "¬Dem(p, x)"`.
+- [x] **Codificación estructural** de Gödel: `formCode : Formula → Term` (+ `termCode`/`termsCode`/`strCode`/`charsCode`), con **inyectividad demostrada** (`formCode_injective`, `termCode_injective`, … vía `injection`, consistency-free).
+- [x] Predicado `IsFormula(x)` (Def 29): `∃ φ, x = formCode φ`. + `Provable x` y el teorema real `provable_formCode_iff` (`Provable ⌜φ⌝ ↔ axioms ⊢ φ`).
+- [x] Predicado `Dem(d, x)` (Def 30) — **meta-axioma** (codifica árboles de derivación, requiere Nivel D). + **Teo Meta** `dem_iff_provable` (`axioms ⊢ φ ↔ ∃ d, Dem d ⌜φ⌝`), meta-axioma.
+- [x] **Lema del punto fijo** (`diagonal_lemma`): `∀ φ, ∃ ψ, ⊢ ψ ⇔ φ[⌜ψ⌝]` — meta-axioma.
+- [x] **Sentencia de Gödel** `goedelSentence` := punto fijo de `¬provFormula`; `goedelSentence_fixedpoint` (`⊢ G_Min ⇔ ¬Prov(⌜G_Min⌝)`) demostrado a partir de `diagonal_lemma`. `provFormula`/`provFormula_repr` postulados.
 
-Algunas propiedades meta-teoréticas de `Dem` (cierre por modus ponens, etc.) pueden postularse como **meta-axiomas** hasta tener `Intermediate/` con inducción para demostrarlas.
+**Meta-axiomas nuevos (5)**: `Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`. Justificados: la aritmetización de demostraciones y la diagonalización requieren inducción → pasarán a teoremas en el **Nivel D** (`Intermediate/`/`Full/`). Lo demostrado sin postular: toda la codificación + inyectividad + `provable_formCode_iff`.
 
 ### 2.3. Nivel D — `Meta/Incompleteness.lean` (requiere `Intermediate/` o `Full/`)
 

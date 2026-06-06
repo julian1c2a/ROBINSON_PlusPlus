@@ -1,0 +1,13 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+
+Barrel file for `Meta/` — Gödelización del sistema `Minimal`.
+Public API:
+  · Godel        (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
+  · Provability  (Nivel C): formCode, IsFormula, Provable, Dem, diagonal_lemma,
+                            goedelSentence
+-/
+import ROBINSON_PlusPlus.Meta.Godel
+import ROBINSON_PlusPlus.Meta.Provability

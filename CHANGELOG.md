@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-06 — Block8 **+10 teoremas** (álgebra de `Dvd`, corolarios TFA) + nuevo **`Meta/Godel.lean`** (Nivel B Gödelización: G, ⌜·⌝, Teo G1). Linter `unusedSimpArgs false` global; warning `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). **34 axiomas matemáticos**, **12 módulos**, build verde 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-06 — Nuevo **`Meta/Provability.lean`** (Nivel C Gödelización: codificación estructural + inyectividad, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel). Previo: Block8 +10 teoremas, `Meta/Godel.lean` (Nivel B), linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** + 5 meta-axiomas Gödel, **13 módulos**, build verde 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,19 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-06) — `Meta/Provability.lean` (Nivel C: demostrabilidad y diagonalización)
+
+- **NUEVO módulo `Meta/Provability.lean`** (namespace `ROBINSON_PlusPlus.Meta.Provability`), Fase 19 del spec. Construye sobre `Meta/Godel.lean`.
+  - **Codificación estructural de Gödel** de la sintaxis FOL: `charsCode`/`strCode` (símbolos vía lista de caracteres), `termCode`/`termsCode` (mutuos, por el anidamiento `func : String → List Term → Term`), y `formCode : Formula → Term` (tag por constructor: ⊥=2, atom=3, eq=4, impl=5, ∀=6, ∧=7, ∨=8, ∃=9).
+  - **Inyectividad demostrada (consistency-free)**: `charsCode_injective`, `strCode_injective`, `termCode_injective`/`termsCode_injective` (mutuos), `formCode_injective` — vía `injection` + inducción estructural; sin postular nada.
+  - **Def 29** `IsFormula (x) := ∃ φ, x = formCode φ`; `Provable (x) := ∃ φ, x = formCode φ ∧ axioms ⊢ φ`; **teorema real** `provable_formCode_iff : Provable ⌜φ⌝ ↔ axioms ⊢ φ` (vía `formCode_injective`).
+  - **Def 30** `Dem : Term → Term → Prop` (meta-axioma) + **Teo Meta** `dem_iff_provable : axioms ⊢ φ ↔ ∃ d, Dem d ⌜φ⌝` (meta-axioma).
+  - **Lema del punto fijo** `diagonal_lemma : ∀ φ, ∃ ψ, ⊢ ψ ⇔ φ[⌜ψ⌝]` (meta-axioma); `provFormula`/`provFormula_repr` (predicado de demostrabilidad object-level + representabilidad, meta-axiomas).
+  - **Sentencia de Gödel** `goedelSentence` (punto fijo de `¬provFormula`) + `goedelSentence_fixedpoint : ⊢ G_Min ⇔ ¬Prov(⌜G_Min⌝)` (demostrado a partir de `diagonal_lemma`).
+  - **5 meta-axiomas nuevos** (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`): la aritmetización de demostraciones y la diagonalización requieren inducción → teoremas en el **Nivel D** (`Intermediate/`/`Full/`). El Nivel D (Gödel I/II internos) queda pendiente.
+- **Barrel `Meta.lean`** creado (agrega `Meta.Godel` + `Meta.Provability`); el barrel raíz importa `ROBINSON_PlusPlus.Meta`.
+- Build: **26 jobs, 0 errores, 0 warnings, 0 sorrys**. 13 módulos.
 
 ### Added (2026-06-06) — Block8 corolarios (Dvd/TFA) + `Meta/Godel.lean` (Nivel B)
 

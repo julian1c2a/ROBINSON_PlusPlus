@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-06 — `Minimal/` a 0 sorrys reales con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL + meta-axioma `ax_p_tfa` (TFA). Bloque VIII +10 teoremas (álgebra de `Dvd`, corolarios TFA). Nuevo módulo `Meta/Godel.lean` (Nivel B Gödelización: G, ⌜·⌝, Teo G1). Linter `unusedSimpArgs false` global; warning externo `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). 12 módulos, build verde 0 warnings.
+**Last updated:** 2026-06-06 — `Minimal/` a 0 sorrys reales con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL + meta-axioma `ax_p_tfa` (TFA). Bloque VIII +10 teoremas (álgebra de `Dvd`, corolarios TFA). Nuevos módulos `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) y `Meta/Provability.lean` (Nivel C: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel; +5 meta-axiomas Gödel). Linter `unusedSimpArgs false` global; warning externo `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). **13 módulos**, build verde 0 warnings.
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -50,6 +50,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block7.lean` | `…Block7` | `Axioms`, `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete |
 | `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 + Ax-P TFA; +10 teoremas: álgebra de `Dvd` y corolarios TFA) |
 | `Meta/Godel.lean` | `…Meta.Godel` | `Axioms`, `Block6` | ✅ Complete (Nivel B: `G`, `⌜·⌝`, Teo G1) |
+| `Meta/Provability.lean` | `…Meta.Provability` | `Axioms`, `Meta.Godel`, `FOL.*` | ✅ Complete (Nivel C: `formCode`, `IsFormula`, `Dem`, `diagonal_lemma`, `goedelSentence`) |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -702,6 +703,62 @@ Ver `GODEL-STATUS.md` §2.
 
 ---
 
+### 3.13 `Meta/Provability.lean` — Demostrabilidad Nivel C (Fase 19)
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.Provability`
+**Status**: ✅ Complete (Nivel C: codificación de la sintaxis + Def 29/30 + diagonalización)
+**@importance**: `high`
+**@axiom_system**: `none` (meta-codificación; añade **5 meta-axiomas** de Gödel)
+**Last updated**: 2026-06-06 (creado)
+**Dependencias**: `Axioms`, `Meta.Godel`, `FOL.FOL`/`FOL.Theorems.*`.
+
+#### Defs (codificación estructural de Gödel)
+
+```lean
+def charsCode : List Char → Term          -- cadena de caracteres
+def strCode   : String → Term             -- símbolo (vía s.toList)
+mutual
+  def termCode  : Term → Term             -- var n ↦ ⟨0,n⟩ ; func s ts ↦ ⟨1, strCode s, termsCode ts⟩
+  def termsCode : List Term → Term
+end
+def formCode : Formula → Term             -- tags: ⊥2 atom3 eq4 impl5 ∀6 ∧7 ∨8 ∃9
+def IsFormula (x : Term) : Prop := ∃ φ : Formula, x = formCode φ                 -- Def 29
+def Provable  (x : Term) : Prop := ∃ φ : Formula, (x = formCode φ) ∧ (axioms ⊢ φ)
+noncomputable def goedelSentence : Formula                                        -- punto fijo de ¬Prov
+```
+
+#### Exports — demostrado (consistency-free)
+
+```lean
+theorem charsCode_injective {l l'} : charsCode l = charsCode l' → l = l'
+theorem strCode_injective   {s t}  : strCode s = strCode t → s = t
+theorem termCode_injective  {t t'} : termCode t = termCode t' → t = t'      -- (mutuo)
+theorem termsCode_injective {ts ts'} : termsCode ts = termsCode ts' → ts = ts'
+theorem formCode_injective  {φ φ'} : formCode φ = formCode φ' → φ = φ'      -- Teo G1 (fórmulas)
+theorem isFormula_formCode  (φ) : IsFormula (formCode φ)
+theorem provable_formCode_iff (φ) : Provable (formCode φ) ↔ (axioms ⊢ φ)
+theorem goedelSentence_fixedpoint :
+  axioms ⊢ (goedelSentence ⇔ substFormula 0 (formCode goedelSentence) (neg provFormula))
+```
+
+#### Meta-axiomas (postulados, estilo `ax_p_tfa`; pasan a teoremas en Nivel D)
+
+```lean
+axiom Dem : Term → Term → Prop                                              -- Def 30
+axiom dem_iff_provable (φ) : (axioms ⊢ φ) ↔ ∃ d, Dem d (formCode φ)         -- Teo Meta
+axiom provFormula : Formula                                                 -- Prov(x) object-level
+axiom provFormula_repr (φ) : (axioms ⊢ substFormula 0 (formCode φ) provFormula) ↔ (axioms ⊢ φ)
+axiom diagonal_lemma (φ) : ∃ ψ, axioms ⊢ (ψ ⇔ substFormula 0 (formCode ψ) φ) -- punto fijo
+```
+
+**Sobre el alcance**: toda la **codificación + inyectividad** y `provable_formCode_iff` se
+demuestran sin postular nada. La **aritmetización de `Dem`**, la **representabilidad** y el
+**lema de diagonalización** requieren inducción y se adoptan como meta-axiomas (Nivel C según
+`GODEL-STATUS.md` §2.2). El **Nivel D** (Gödel I/II: `Minimal ⊬ G_Min`, `⊬ Con`) requiere
+`Intermediate/`/`Full/` y queda pendiente.
+
+---
+
 ## 4 · Patterns notables y deuda técnica
 
 - **Patrón `spec + simp`**: cada axioma instanciado vía `spec h_axN t` requiere un `simp` con simp-set propio según los binders del axioma. Para axiomas `forall_2` se necesita `liftTerm`/`FOL.substTerm_liftTerm`; para `forall_3`, además `FOL.substTerm_liftLift`. Ver `THOUGHTS.md` y `feedback_build_cache` en memoria de Claude.
@@ -716,7 +773,7 @@ Ver `GODEL-STATUS.md` §2.
 Ver `NEXT-STEPS.md` (Ejes 1–5) y `GODEL-STATUS.md`. Resumen:
 
 1. **Eje 1 (cerrado 2026-06-06)**: `Minimal/` completo. Block7 (Funciones), Block8 + extensión (Dvd, IsPrime, IsFactorization, Ax-P TFA, pow, prod_pairs) + 10 teoremas (álgebra de `Dvd`, corolarios TFA). ax22/ax23/ax27/ax28 eliminados. Linter `unusedSimpArgs false` global. Warning externo `FOL/Eq.lean:130` cerrado.
-2. **Eje 2 (`Meta/`, en curso)**: Gödelización. **Nivel B ✅** (`Meta/Godel.lean`: G, ⌜·⌝, Teo G1). **Próximo: Nivel C** (`Meta/Provability.lean`: IsFormula, Dem, lema del punto fijo). El Nivel D (Gödel I/II internos) requiere `Intermediate/`/`Full/`.
+2. **Eje 2 (`Meta/`, en curso)**: Gödelización. **Nivel B ✅** (`Meta/Godel.lean`) y **Nivel C ✅** (`Meta/Provability.lean`: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo `diagonal_lemma`, sentencia de Gödel `goedelSentence`; props profundas como 5 meta-axiomas). **Próximo: Nivel D** (Gödel I/II internos: `Minimal ⊬ G_Min`, `⊬ Con`), que requiere `Intermediate/`/`Full/`.
 3. **Eje 3 (`Intermediate/`, medio, paralelo a `Meta/`)**: esquema de inducción finito (Ax-Ind sobre Φ con |Φ|=13, §Apéndice B). Derivar como teoremas ax6/7/10/11/12/18/19/20/21 + ax_C3/ax_L3/ax24. Reducción esperada: 34 → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
 4. **Eje 4 (`Full/`, largo)**: inducción general; demostrar Ax-P (TFA) como teorema vía inducción fuerte sobre n. Habilita el Nivel D de `Meta/`.
 5. **Eje 5 (muy largo)**: CZF, cardinalidad, análisis constructivo (fuera del scope inmediato).

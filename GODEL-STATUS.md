@@ -1,6 +1,6 @@
 # Frente Gödel — Estado y Roadmap
 
-**Last updated:** 2026-06-06 — **Nivel B implementado** (`Meta/Godel.lean`: G, ⌜·⌝, Teo G1). Documento de diagnóstico del frente Gödel; próximo paso Nivel C (`Meta/Provability.lean`).
+**Last updated:** 2026-06-06 — **Niveles B y C implementados** (`Meta/Godel.lean`: G, ⌜·⌝, Teo G1; `Meta/Provability.lean`: formCode, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel). Las propiedades profundas del Nivel C (Dem, diagonalización, representabilidad) se adoptan como **meta-axiomas** según lo previsto. Próximo: Nivel D (requiere `Intermediate/`/`Full/`).
 **Author:** Julián Calderón Almendros
 **Nivel del documento**: A (diagnóstico documental; no contiene código Lean).
 
@@ -63,7 +63,7 @@ Lo que sí requiere `Intermediate/` o `Full/` es la **demostración** de Gödel 
 
 - ✅ Codificación operativa.
 - ✅ Teo G1 (inyectividad de la asignación).
-- ⏳ `IsFormula`, `Dem` definidos pero las propiedades meta-teoréticas (existencia del punto fijo, sentencia de Gödel) postuladas como meta-axiomas o como conjeturas pendientes para `Intermediate/`.
+- ✅ `IsFormula`, `Provable`, `Dem` definidos (`Meta/Provability.lean`); `provable_formCode_iff` demostrado. El lema del punto fijo (`diagonal_lemma`), la sentencia de Gödel `goedelSentence` y la representabilidad (`provFormula_repr`, `dem_iff_provable`) se adoptan como **meta-axiomas** (su demostración requiere Nivel D).
 
 Esta separación es **deliberada**: queremos tener los enunciados de Gödel disponibles tan pronto como sea posible (en `Minimal+Meta/`), incluso si las demostraciones esperan a sistemas más fuertes.
 
@@ -75,7 +75,7 @@ El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía dis
 |---|---|---|---|
 | **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
 | **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` ✅ | ✅ 2026-06-06 |
-| **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` (planificado) | ⏳ pendiente |
+| **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` ✅ | ✅ 2026-06-06 (props profundas como meta-axiomas) |
 | **D** | Teoremas de incompletitud: Gödel I + II demostrados internamente | `Meta/Incompleteness.lean` (planificado, requiere `Intermediate/` o `Full/`) | ⏳ pendiente |
 
 La **arquitectura propuesta** para `Meta/`:
@@ -83,7 +83,7 @@ La **arquitectura propuesta** para `Meta/`:
 ```text
 Meta/
 ├── Godel.lean              # Nivel B: G, ⌜·⌝, Teo G1  ✅ (2026-06-06)
-├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo  (próximo)
+├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo, G_Min  ✅ (2026-06-06)
 └── Incompleteness.lean     # Nivel D: Gödel I, Gödel II  (requiere Intermediate/Full)
 ```
 
@@ -134,7 +134,7 @@ Para mantener el proyecto manejable, los siguientes temas se **declaran fuera de
 |---|---|---|
 | **2026-06-06** | Cierre `Minimal/` con Ax-P y diagnóstico del frente Gödel (Nivel A) | `MINIMAL-AXIOMS.md` §5.5, este documento |
 | **2026-06-06** | ✅ `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) **completado** | `Meta/Godel.lean` |
-| **TBD** | `Meta/Provability.lean` (Nivel C: IsFormula, Dem) | `Meta/Provability.lean` |
+| **2026-06-06** | ✅ `Meta/Provability.lean` (Nivel C: IsFormula, Provable, Dem, punto fijo, G_Min) **completado** | `Meta/Provability.lean` |
 | **TBD** | `Intermediate/` paralelo: derivación de los 9+3 axiomas inductivos | `Intermediate/Axioms.lean` |
 | **TBD** | `Meta/Incompleteness.lean` (Nivel D: Gödel I formalmente) | requiere `Intermediate/` |
 

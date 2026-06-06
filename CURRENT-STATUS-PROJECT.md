@@ -9,10 +9,10 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 12 (Minimal/ 11 + Meta/Godel) |
-| Modules sin sorry | 12 / 12 ✅ |
+| Total modules | 13 (Minimal/ 11 + Meta/Godel + Meta/Provability) |
+| Modules sin sorry | 13 / 13 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (TFA) en Block8 |
+| Meta-axiomas (no son sorry) | 5 FOL (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (Block8) + 5 Gödel Nivel C (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`) |
 | Axiomas matemáticos | **34** (25 aritm + 7 listas + 2 factorización; `pow`/`prod_pairs` + 4 axiomas añadidos 2026-06-06; `ax22`/`ax23`/`ax27`/`ax28` eliminados) |
 | Total definitions | ~60 |
 | Build status | ✅ Passing (0 errores, **0 warnings**, 0 sorrys) |
@@ -39,6 +39,7 @@
 | `Minimal/Theorems/Block7.lean` | 0 | ✅ `IsFunction`, `Functional`, `teo_F1`, `teo_F2`, `teo_F3` (Bloque VII spec) |
 | `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `IsFactorization`, `ax_p_tfa` (TFA), pow/prod_pairs + **10 teoremas** (álgebra de `Dvd`, corolarios TFA) — Bloque VIII Fase 17 completa |
 | `Meta/Godel.lean` | 0 | ✅ Nivel B Gödelización: `Sym`, `gNat`, `numeral`, `G`, `encode` (`⌜·⌝`), `encode_injective` (Teo G1) |
+| `Meta/Provability.lean` | 0 | ✅ Nivel C: `formCode`+inyectividad, `IsFormula`, `Provable` (+iff), `Dem`, `diagonal_lemma`, `goedelSentence` (props profundas = meta-axiomas) |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -46,6 +47,8 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-06 — `Meta/Provability.lean` (Nivel C Gödelización) AÑADIDO**: codificación estructural de Gödel de la sintaxis FOL (`formCode`/`termCode`/`strCode`) con **inyectividad demostrada** (consistency-free, vía `injection`); `IsFormula`, `Provable` + teorema `provable_formCode_iff`; `Dem` + Teo Meta `dem_iff_provable`; lema del punto fijo `diagonal_lemma`; sentencia de Gödel `goedelSentence` + `goedelSentence_fixedpoint`. 5 meta-axiomas nuevos (Dem, dem_iff_provable, provFormula, provFormula_repr, diagonal_lemma) para las propiedades profundas (Nivel D). Barrel `Meta.lean` creado. Build verde, 0 sorrys.
 
 - **2026-06-06 — `Meta/Godel.lean` (Nivel B Gödelización) AÑADIDO**: nuevo módulo `ROBINSON_PlusPlus.Meta.Godel` con Def 27 (`Sym`, `gNat`+`gNat_injective`, `numeral`+`numeral_injective`, `G`+`G_injective`), Def 28 (`encode`/`⌜·⌝`), y Teo G1 (`encode_injective`, meta-inyectividad consistency-free vía `injection`; + versiones object-level `encode_cons_inj`/`encode_cons_neq_nil` vía Block6). No añade axiomas matemáticos. Build verde a la primera. Ver `GODEL-STATUS.md`.
 
@@ -114,13 +117,15 @@ ROBINSON_PlusPlus/
 │       ├── Block6.lean      # Listas: cons_neq_nil, cons_inj, concat_assoc, in_concat ✅
 │       ├── Block7.lean      # Funciones: IsFunction, Functional, F1/F2/F3 ✅
 │       └── Block8.lean      # Primos+factorización: Dvd, IsPrime, IsFactorization, Ax-P TFA, +10 teoremas ✅
+├── Meta.lean               # Barrel de Meta/ (Godel + Provability)
 └── Meta/
-    └── Godel.lean           # Nivel B Gödelización: G, ⌜·⌝, Teo G1 (encode_injective) ✅
+    ├── Godel.lean           # Nivel B Gödelización: G, ⌜·⌝, Teo G1 (encode_injective) ✅
+    └── Provability.lean     # Nivel C: formCode+iny., IsFormula, Provable, Dem, punto fijo, G_Min ✅
 ```
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-06 — Build ✅, 0 sorrys, 0 warnings, 34 axiomas, 12 módulos.*
+*Last updated: 2026-06-06 — Build ✅, 0 sorrys, 0 warnings, 34 axiomas + 11 meta-axiomas, 13 módulos.*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
