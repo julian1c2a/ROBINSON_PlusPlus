@@ -79,6 +79,8 @@ Esto se queda para más adelante; la formalización requiere inducción sobre la
 
 **Objetivo (PLANNING §6.2)**: Sistema reducido (~22 axiomas) + **esquema de inducción restringido** a un conjunto finito de fórmulas (Ax-Ind sobre Φ con |Φ|=13). Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` se vuelven **teoremas**. Reducción esperada: 34 axiomas → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
 
+> **✅ Prototipo de inducción validado (2026-06-06)** — `Intermediate/Induction.lean`. Meta-axioma `peano_induction` (forma híbrida estilo `gen`) + derivación por inducción de `zero_add`, `succ_add` (multivariable con `liftTerm`) y **`add_comm` = `ax6` como teorema** (`add_comm_thm : ⊢ ax6_add_comm`), usando sólo `ax4`/`ax5` (no `ax6`). **Hallazgo**: la inducción **general** (sobre cualquier `φ`) se formula y usa con la misma facilidad; restringir a Φ añade burocracia sin simplificar las pruebas algebraicas → técnicamente `Full/` (inducción general) es el camino de menor fricción; `Intermediate/` (Φ finito) aporta valor conceptual (gradación), no técnico. **Decisión Intermediate-vs-Full pendiente** a la luz de esto.
+
 ### 2.1. Diseño previo
 
 - [ ] **Decidir la formalización del esquema de inducción restringido** en Lean. Opciones:

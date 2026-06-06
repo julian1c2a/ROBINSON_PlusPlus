@@ -24,3 +24,6 @@ import ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
 -- Meta: Gödelización (Nivel B codificación + Nivel C demostrabilidad). Ver GODEL-STATUS.md
 import ROBINSON_PlusPlus.Meta
+
+-- Intermediate: prototipo de inducción (peano_induction + add_comm derivado). Ver NEXT-STEPS Eje 3
+import ROBINSON_PlusPlus.Intermediate.Induction

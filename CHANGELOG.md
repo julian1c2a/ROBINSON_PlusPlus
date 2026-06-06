@@ -10,6 +10,16 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added (2026-06-06) — `Intermediate/Induction.lean` (prototipo de inducción)
+
+- **NUEVO módulo prototipo `Intermediate/Induction.lean`** (namespace `ROBINSON_PlusPlus.Intermediate`), para validar la viabilidad del esquema de inducción antes de comprometerse con la estructura de `Intermediate/` (Φ finito) o `Full/` (inducción general).
+  - Meta-axioma **`peano_induction`** (forma híbrida: paso meta, conclusión object-level, análoga a `gen`/`ex_elim`): de `φ(0)` y `∀n (⊢φ(n) → ⊢φ(σn))` concluye `⊢ ∀n φ(n)`.
+  - **`zero_add_ind`** (`∀n, 0+n=n` por inducción, **sin `ax6`** — a diferencia de `teo_2_2`).
+  - **`succ_add_ind`** (`∀a n, σa+n = σ(a+n)`, inducción multivariable con `liftTerm` para el parámetro).
+  - **`add_comm_ind`** + **`add_comm_thm : axioms ⊢ ax6_add_comm`**: `ax6` (postulado en `Minimal`) **derivado como teorema** por inducción usando sólo `ax4`/`ax5`. Primer eslabón del embedding `Minimal ⊂ Intermediate`.
+  - **Hallazgo**: la inducción general se formula/usa igual de fácil que una restringida a Φ; `Full/` (general) sería el camino de menor fricción técnica, `Intermediate/` (Φ finito) aporta valor conceptual. Decisión Intermediate-vs-Full pendiente.
+- Build: **27 jobs, 0 errores, 0 warnings, 0 sorrys**. 14 módulos (incl. prototipo).
+
 ### Added (2026-06-06) — `Meta/Provability.lean` (Nivel C: demostrabilidad y diagonalización)
 
 - **NUEVO módulo `Meta/Provability.lean`** (namespace `ROBINSON_PlusPlus.Meta.Provability`), Fase 19 del spec. Construye sobre `Meta/Godel.lean`.
