@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-06 — Bloque VIII extendido COMPLETO: añadidos `pow`, `prod_pairs`, `IsFactorization`, `Ax-P` (TFA). Sistema con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización), 11 módulos, 0 sorrys reales, 0 warnings.
+**Last updated:** 2026-06-06 — Block8 **+10 teoremas** (álgebra de `Dvd` + corolarios TFA); **`Meta/Godel.lean` creado** (Nivel B Gödelización: G, ⌜·⌝, Teo G1). Linter `unusedSimpArgs false` global; warning `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). Sistema con **34 axiomas matemáticos**, **12 módulos**, 0 sorrys reales, 0 warnings (incl. FOL externo).
 
 ---
 
@@ -37,22 +37,22 @@ Todos los hitos completados:
 
 **Pendientes menores** (no bloquean cierre):
 
-- Arreglar warning externo `FOL/Theorems/Eq.lean:130` (no es del proyecto RPP).
-- Más teoremas opcionales sobre `IsFactorization` usando `ax_p_tfa` (lema de Euclides, etc.) — diferibles a fase posterior.
+- ✅ ~~Arreglar warning externo `FOL/Theorems/Eq.lean:130`~~ — **RESUELTO 2026-06-06** (eliminado el simp arg `hne` no usado en `substTerm_liftLift`; commit `9888c58` en el repo FOL). Build global con **0 warnings** (incl. FOL externo).
+- ✅ ~~Más teoremas sobre `IsFactorization`/`Dvd` usando `ax_p_tfa`~~ — **HECHO 2026-06-06**: +10 teoremas en Block8 (álgebra de `Dvd`: `dvd_trans`, `dvd_mul_right/left`, `dvd_mul_of_dvd_left/right`, `dvd_add`; corolarios TFA: `factorization_exists/unique`, `lt_zero_one`, `factorization_one_eq_nil`). Lema de Euclides y multiplicatividad **fuera de scope** (requieren `prod_pairs_concat` → inducción).
 
 ---
 
-## Eje 2 — Módulo `Meta/` (NUEVO, próximo activo 2026-06-07+)
+## Eje 2 — Módulo `Meta/` (Nivel B ✅ 2026-06-06; próximo Nivel C)
 
 **Objetivo**: implementar Fases 18-19 del spec (`TuplasFuncionesYListas.md §BLOQUE VIII`) — Gödelización y autorreferencia. Diagnóstico completo y arquitectura en [GODEL-STATUS.md](GODEL-STATUS.md).
 
 **Decisión 2026-06-06**: `Meta/` arranca **al cerrar `Minimal/`**, no después de `Intermediate/`. Justificación: los niveles B-C (codificación + Dem) no requieren inducción, sólo meta-codificación. El nivel D (teoremas de incompletitud demostrados internamente) sí requiere `Intermediate/` o `Full/`.
 
-### 2.1. Nivel B — `Meta/Godel.lean` (primer hito)
+### 2.1. Nivel B — `Meta/Godel.lean` (primer hito) ✅ COMPLETADO 2026-06-06
 
-- [ ] **Asignación de Gödel** `G : símbolos → ℕ` (Def 27 spec). Función Lean concreta con tabla explícita (∀→2, ∃→3, =→10, +→20, etc.).
-- [ ] **Corner brackets** `⌜·⌝ : List símbolos → Term` (Def 28): `⌜s₁…sₖ⌝ := Cons(G(s₁), Cons(…Cons(G(sₖ), Nil)…))`.
-- [ ] **Teorema G1** (inyectividad): `⌜S⌝ = ⌜S'⌝ ⟹ S = S'`. Demostración: inducción meta sobre la longitud de la lista usando `cons_inj` (Block6) + inyectividad de `G`.
+- [x] **Asignación de Gödel** `G : símbolos → ℕ` (Def 27 spec). `inductive Sym` (12 símbolos) + `gNat` (tabla ∀→2, ∃→3, =→10, …, m→111) + `gNat_injective`; `numeral`+`numeral_injective`; `G := numeral ∘ gNat` + `G_injective`.
+- [x] **Corner brackets** `⌜·⌝ : List Sym → Term` (Def 28): `encode [] = nil`, `encode (s::S) = cons (G s) (encode S)`; notación scoped `⌜·⌝`.
+- [x] **Teorema G1** (inyectividad): `encode_injective` (meta-inyectividad consistency-free, vía `injection` + inducción estructural) + versiones object-level `encode_cons_inj` (usa `cons_inj`, Block6) y `encode_cons_neq_nil`. Ver `GODEL-STATUS.md` §2 sobre la elección meta vs objeto.
 
 **No introduce nuevos axiomas matemáticos** sobre `Minimal/`. Aprovecha `pow` + TFA para codificación primorial alternativa (ver [GODEL-STATUS.md](GODEL-STATUS.md) §3.1).
 

@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-03
+**Last updated:** 2026-06-06
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,13 +9,13 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 11 |
-| Modules sin sorry | 11 / 11 ✅ |
+| Total modules | 12 (Minimal/ 11 + Meta/Godel) |
+| Modules sin sorry | 12 / 12 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) |
-| Axiomas matemáticos | **30** (23 aritméticos: ax2-19, ax21, ax24-26, ax29 + 7 listas: ax_L0-3, ax_C1-3) — `ax27` eliminado 2026-06-03 (PA⁻ derivable); `ax22`/`ax23` eliminados 2026-06-02 (proj1/proj2 ahora defs concretas; `proj_is_cantor` reemplaza ax22); `ax28` eliminado 2026-06-02 (derivable, ver `teo_2_11`) |
-| Total definitions | ~52 |
-| Build status | ✅ Passing (0 errores, ~13 warnings sólo de sorry) |
+| Meta-axiomas en Axioms (no son sorry) | 5 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (TFA) en Block8 |
+| Axiomas matemáticos | **34** (25 aritm + 7 listas + 2 factorización; `pow`/`prod_pairs` + 4 axiomas añadidos 2026-06-06; `ax22`/`ax23`/`ax27`/`ax28` eliminados) |
+| Total definitions | ~60 |
+| Build status | ✅ Passing (0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
@@ -37,7 +37,8 @@
 | `Minimal/Theorems/Block5.lean` | 0 | ✅ `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` (mod2_of_even movido a Block4_C6_C7 el 2026-06-03) |
 | `Minimal/Theorems/Block6.lean` | 0 | ✅ Todos probados (`concat_assoc` e `in_concat_iff` vía ax_C3/ax_L3 nuevos) |
 | `Minimal/Theorems/Block7.lean` | 0 | ✅ `IsFunction`, `Functional`, `teo_F1`, `teo_F2`, `teo_F3` (Bloque VII spec) |
-| `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `dvd_refl/one/zero`, `isPrime_*_inconsistent` (Bloque VIII Fase 17 parcial) |
+| `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `IsFactorization`, `ax_p_tfa` (TFA), pow/prod_pairs + **10 teoremas** (álgebra de `Dvd`, corolarios TFA) — Bloque VIII Fase 17 completa |
+| `Meta/Godel.lean` | 0 | ✅ Nivel B Gödelización: `Sym`, `gNat`, `numeral`, `G`, `encode` (`⌜·⌝`), `encode_injective` (Teo G1) |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -45,6 +46,14 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-06 — `Meta/Godel.lean` (Nivel B Gödelización) AÑADIDO**: nuevo módulo `ROBINSON_PlusPlus.Meta.Godel` con Def 27 (`Sym`, `gNat`+`gNat_injective`, `numeral`+`numeral_injective`, `G`+`G_injective`), Def 28 (`encode`/`⌜·⌝`), y Teo G1 (`encode_injective`, meta-inyectividad consistency-free vía `injection`; + versiones object-level `encode_cons_inj`/`encode_cons_neq_nil` vía Block6). No añade axiomas matemáticos. Build verde a la primera. Ver `GODEL-STATUS.md`.
+
+- **2026-06-06 — Block8 +10 teoremas**: álgebra de `Dvd` (`dvd_trans`, `dvd_mul_right/left`, `dvd_mul_of_dvd_left/right`, `dvd_add`) y corolarios del TFA (`factorization_exists/unique`, `lt_zero_one`, `factorization_one_eq_nil`). Euclides/multiplicatividad fuera de scope (requieren `prod_pairs_concat` → inducción).
+
+- **2026-06-06 — Linter `unusedSimpArgs` a `false` global + warning FOL cerrado**: los 12 módulos pasan a `set_option linter.unusedSimpArgs false`. Cerrado el último warning externo `FOL/Theorems/Eq.lean:130` (commit FOL `9888c58`). Build global con 0 warnings.
+
+- **2026-06-06 — Bloque VIII extendido (Fase 17 completa)**: `Axioms.lean` +`pow`/`prod_pairs` y 4 axiomas (sistema 30→34); `Block8.lean` +`IsFactorization` (Def 26) + meta-axioma `ax_p_tfa` (TFA). Limpieza de warnings previa 411→0.
 
 - **2026-06-03 — Block8 (BLOQUE VIII Fase 17 parcial — Primos) AÑADIDO**: `Dvd` (divisibilidad), `IsPrime` (Def 25), lemas básicos. Pendientes documentados en header: Def 26 `IsFactorization` (necesita `pow`/`prod_list`), Ax-P (TFA), Fases 18-19 (Gödelización → módulo `Meta/` futuro). Build verde, 0 sorrys.
 
@@ -91,24 +100,27 @@
 ## Architecture
 
 ```
-ROBINSON_PlusPlus/Minimal/
-├── Axioms.lean              # 30 axiomas + helpers meta-level (5 sorry: reglas de deducción)
-└── Theorems/
-    ├── Block1.lean          # Aritmética básica, constantes, orden ✅
-    ├── Block2.lean          # Raíz cuadrada, cotas, unicidad ✅
-    ├── Block3.lean          # div2, mod2 ✅
-    ├── Block4.lean          # Lemas auxiliares de Cantor ✅
-    ├── Block4_C5.lean       # Lema C5: ∃!w, w(w+1)≤2c<(w+1)(w+2) 🔄
-    ├── Block4_C6_C7.lean    # add_left_cancel, proj1/2, proj_is_cantor, mod2_of_even ✅
-    ├── Block5.lean          # Pares: proj1/2_pair, pair_proj, pair_inj, is_cantor_pair ✅
-    ├── Block6.lean          # Listas: cons_neq_nil, cons_inj, concat_assoc, in_concat ✅
-    ├── Block7.lean          # Funciones: IsFunction, Functional, F1/F2/F3 ✅
-    └── Block8.lean          # Primos: Dvd, IsPrime + lemas básicos (Fase 17 parcial) ✅
+ROBINSON_PlusPlus/
+├── Minimal/
+│   ├── Axioms.lean          # 34 axiomas + pow/prod_pairs + 5 meta-reglas FOL
+│   └── Theorems/
+│       ├── Block1.lean      # Aritmética básica, constantes, orden ✅
+│       ├── Block2.lean      # Raíz cuadrada, cotas, unicidad ✅
+│       ├── Block3.lean      # div2, mod2 ✅
+│       ├── Block4.lean      # Lemas auxiliares de Cantor ✅
+│       ├── Block4_C5.lean   # Lema C5: ∃!w, w(w+1)≤2c<(w+1)(w+2) ✅
+│       ├── Block4_C6_C7.lean# add_left_cancel, proj1/2, proj_is_cantor, mod2_of_even ✅
+│       ├── Block5.lean      # Pares: proj1/2_pair, pair_proj, pair_inj, is_cantor_pair ✅
+│       ├── Block6.lean      # Listas: cons_neq_nil, cons_inj, concat_assoc, in_concat ✅
+│       ├── Block7.lean      # Funciones: IsFunction, Functional, F1/F2/F3 ✅
+│       └── Block8.lean      # Primos+factorización: Dvd, IsPrime, IsFactorization, Ax-P TFA, +10 teoremas ✅
+└── Meta/
+    └── Godel.lean           # Nivel B Gödelización: G, ⌜·⌝, Teo G1 (encode_injective) ✅
 ```
 
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-03 — Build ✅, 0 sorrys, 30 axiomas, 11 módulos.*
+*Last updated: 2026-06-06 — Build ✅, 0 sorrys, 0 warnings, 34 axiomas, 12 módulos.*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

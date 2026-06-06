@@ -22,7 +22,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block2
 open ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
-set_option linter.unusedSimpArgs true
+set_option linter.unusedSimpArgs false
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
@@ -92,6 +92,71 @@ theorem dvd_zero (a : Term) : Dvd a zero :=
     have h := spec teo_2_3 a
     simp [substFormula, substTerm, substTerms, mul, zero] at h
     exact h⟩
+
+/-!
+### Álgebra de `Dvd` (sin inducción)
+
+Propiedades algebraicas de la divisibilidad que se derivan del puro álgebra de
+`mul`/`add` (`mul_assoc'`, `mul_comm'`, `mul_distrib'` de Block4_C5) más la
+congruencia de la igualdad (`eq_congr_mul_*`, `eq_congr_add_*` de Axioms).
+**Ninguna requiere inducción.**
+-/
+
+/-- **Transitividad** de `Dvd`: `a ∣ b → b ∣ c → a ∣ c`. Testigo `q₁·q₂`.
+
+    `a·(q₁·q₂) = (a·q₁)·q₂ = b·q₂ = c` (asociatividad + congruencia + hipótesis). -/
+theorem dvd_trans {a b c : Term} (hab : Dvd a b) (hbc : Dvd b c) : Dvd a c := by
+  obtain ⟨q₁, hq₁⟩ := hab
+  obtain ⟨q₂, hq₂⟩ := hbc
+  refine ⟨mul q₁ q₂, ?_⟩
+  have h₁ : axioms ⊢ (mul a (mul q₁ q₂) =eq mul (mul a q₁) q₂) :=
+    eq_symm (mul_assoc' a q₁ q₂)
+  have h₂ : axioms ⊢ (mul (mul a q₁) q₂ =eq mul b q₂) := eq_congr_mul_right hq₁
+  exact FOL.derive_eq_trans (FOL.derive_eq_trans h₁ h₂) hq₂
+
+/-- `a ∣ a·b`. Testigo `b` (reflexividad). -/
+theorem dvd_mul_right (a b : Term) : Dvd a (mul a b) :=
+  ⟨b, Derives.refl axioms (mul a b)⟩
+
+/-- `b ∣ a·b`. Testigo `a` (vía conmutatividad `b·a = a·b`). -/
+theorem dvd_mul_left (a b : Term) : Dvd b (mul a b) :=
+  ⟨a, by exact mul_comm' b a⟩
+
+/-- `a ∣ b → a ∣ b·c`. Testigo `q·c`.  `a·(q·c) = (a·q)·c = b·c`. -/
+theorem dvd_mul_of_dvd_left {a b : Term} (h : Dvd a b) (c : Term) :
+    Dvd a (mul b c) := by
+  obtain ⟨q, hq⟩ := h
+  refine ⟨mul q c, ?_⟩
+  have h₁ : axioms ⊢ (mul a (mul q c) =eq mul (mul a q) c) :=
+    eq_symm (mul_assoc' a q c)
+  have h₂ : axioms ⊢ (mul (mul a q) c =eq mul b c) := eq_congr_mul_right hq
+  exact FOL.derive_eq_trans h₁ h₂
+
+/-- `a ∣ c → a ∣ b·c`. Testigo `q·b`.  `a·(q·b) = (a·q)·b = c·b = b·c`. -/
+theorem dvd_mul_of_dvd_right {a c : Term} (h : Dvd a c) (b : Term) :
+    Dvd a (mul b c) := by
+  obtain ⟨q, hq⟩ := h
+  refine ⟨mul q b, ?_⟩
+  have h₁ : axioms ⊢ (mul a (mul q b) =eq mul (mul a q) b) :=
+    eq_symm (mul_assoc' a q b)
+  have h₂ : axioms ⊢ (mul (mul a q) b =eq mul c b) := eq_congr_mul_right hq
+  have h₃ : axioms ⊢ (mul c b =eq mul b c) := mul_comm' c b
+  exact FOL.derive_eq_trans (FOL.derive_eq_trans h₁ h₂) h₃
+
+/-- `a ∣ b → a ∣ c → a ∣ b+c`. Testigo `q₁+q₂` (vía distributividad).
+
+    `a·(q₁+q₂) = a·q₁ + a·q₂ = b + c`. -/
+theorem dvd_add {a b c : Term} (hb : Dvd a b) (hc : Dvd a c) :
+    Dvd a (add b c) := by
+  obtain ⟨q₁, hq₁⟩ := hb
+  obtain ⟨q₂, hq₂⟩ := hc
+  refine ⟨add q₁ q₂, ?_⟩
+  have h₁ : axioms ⊢ (mul a (add q₁ q₂) =eq add (mul a q₁) (mul a q₂)) :=
+    mul_distrib' a q₁ q₂
+  have h₂ : axioms ⊢ (add (mul a q₁) (mul a q₂) =eq add b (mul a q₂)) :=
+    eq_congr_add_right hq₁
+  have h₃ : axioms ⊢ (add b (mul a q₂) =eq add b c) := eq_congr_add_left hq₂
+  exact FOL.derive_eq_trans (FOL.derive_eq_trans h₁ h₂) h₃
 
 /-!
 ### Lemas básicos de `IsPrime`
@@ -238,6 +303,52 @@ axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
   ∃ f : Term, IsFactorization f n ∧
     ∀ f' : Term, IsFactorization f' n → axioms ⊢ (f =eq f')
 
+/-!
+### Corolarios del TFA (`ax_p_tfa`)
+
+Consecuencias inmediatas del Teorema Fundamental de la Aritmética. **No
+introducen axiomas nuevos**: sólo proyectan la existencia y la unicidad
+contenidas en `ax_p_tfa`.
+
+**Fuera de scope `Minimal/`** (requieren inducción / `Intermediate/` o `Full/`):
+el **lema de Euclides** (`IsPrime p → p ∣ a·b → p ∣ a ∨ p ∣ b`) y la
+**multiplicatividad** (`prod_pairs (concat f g) = prod_pairs f · prod_pairs g`)
+necesitan `prod_pairs_concat`, que es una recursión sobre la lista no demostrable
+sin inducción. Se difieren a sistemas con esquema de inducción. -/
+
+/-- **Existencia de factorización** para `n ≥ 1`: proyección directa del TFA. -/
+theorem factorization_exists (n : Term) (h : axioms ⊢ lt zero n) :
+    ∃ f : Term, IsFactorization f n := by
+  obtain ⟨f, hf, _⟩ := ax_p_tfa n h
+  exact ⟨f, hf⟩
+
+/-- **Unicidad de factorización** para `n ≥ 1`: dos factorizaciones cualesquiera
+    de `n` son provablemente iguales. Se obtiene de la unicidad del TFA pasando
+    por la factorización canónica `g`: `g =eq f` y `g =eq f'` dan `f =eq f'`
+    (vía `eq_trans` no estándar). -/
+theorem factorization_unique {n f f' : Term} (h : axioms ⊢ lt zero n)
+    (hf : IsFactorization f n) (hf' : IsFactorization f' n) :
+    axioms ⊢ (f =eq f') := by
+  obtain ⟨g, _hg, huniq⟩ := ax_p_tfa n h
+  exact eq_trans (huniq f hf) (huniq f' hf')
+
+/-- `0 < 1`. Testigo `k := 0` en `ax13`: `0 + σ0 = 1` (es `teo_1_2`). -/
+theorem lt_zero_one : axioms ⊢ lt zero one := by
+  have h_ax13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have h_iff := spec (spec h_ax13 zero) one
+  simp [substFormula, substTerm, substTerms, lt, one, zero, succ, iff,
+        liftTerm, liftTerms] at h_iff
+  refine iff_mpr h_iff (ex_intro zero ?_)
+  simp [substFormula, substTerm, substTerms, add, zero]
+  exact teo_1_2
+
+/-- **La factorización de `1` es la lista vacía**: `IsFactorization f 1 → f =eq []`.
+    Une `isFactorization_nil_one` con la unicidad del TFA (`1 ≥ 1` vía
+    `lt_zero_one`). -/
+theorem factorization_one_eq_nil {f : Term} (hf : IsFactorization f one) :
+    axioms ⊢ (f =eq nil) :=
+  factorization_unique lt_zero_one hf isFactorization_nil_one
+
 end ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
 -- Exports
@@ -248,6 +359,12 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block8 (
   dvd_refl
   dvd_one
   dvd_zero
+  dvd_trans
+  dvd_mul_right
+  dvd_mul_left
+  dvd_mul_of_dvd_left
+  dvd_mul_of_dvd_right
+  dvd_add
   isPrime_zero_inconsistent
   isPrime_one_inconsistent
   pow_zero
@@ -256,4 +373,8 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block8 (
   prod_pairs_cons
   isFactorization_nil_one
   ax_p_tfa
+  factorization_exists
+  factorization_unique
+  lt_zero_one
+  factorization_one_eq_nil
 )

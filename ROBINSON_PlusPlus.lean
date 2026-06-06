@@ -21,3 +21,6 @@ import ROBINSON_PlusPlus.Minimal.Theorems.Block5
 import ROBINSON_PlusPlus.Minimal.Theorems.Block6
 import ROBINSON_PlusPlus.Minimal.Theorems.Block7
 import ROBINSON_PlusPlus.Minimal.Theorems.Block8
+
+-- Meta: Gödelización (Nivel B — codificación). Ver GODEL-STATUS.md
+import ROBINSON_PlusPlus.Meta.Godel

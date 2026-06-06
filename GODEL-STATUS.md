@@ -1,6 +1,6 @@
 # Frente Gödel — Estado y Roadmap
 
-**Last updated:** 2026-06-06 — Documento de diagnóstico previo al arranque del módulo `Meta/`.
+**Last updated:** 2026-06-06 — **Nivel B implementado** (`Meta/Godel.lean`: G, ⌜·⌝, Teo G1). Documento de diagnóstico del frente Gödel; próximo paso Nivel C (`Meta/Provability.lean`).
 **Author:** Julián Calderón Almendros
 **Nivel del documento**: A (diagnóstico documental; no contiene código Lean).
 
@@ -74,7 +74,7 @@ El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía dis
 | Nivel | Contenido | Ubicación | Estado |
 |---|---|---|---|
 | **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
-| **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` (planificado) | 🔜 próximo |
+| **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` ✅ | ✅ 2026-06-06 |
 | **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` (planificado) | ⏳ pendiente |
 | **D** | Teoremas de incompletitud: Gödel I + II demostrados internamente | `Meta/Incompleteness.lean` (planificado, requiere `Intermediate/` o `Full/`) | ⏳ pendiente |
 
@@ -82,9 +82,9 @@ La **arquitectura propuesta** para `Meta/`:
 
 ```text
 Meta/
-├── Godel.lean              # Nivel B: G, ⌜·⌝, Teo G1
-├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo
-└── Incompleteness.lean     # Nivel D: Gödel I, Gödel II
+├── Godel.lean              # Nivel B: G, ⌜·⌝, Teo G1  ✅ (2026-06-06)
+├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo  (próximo)
+└── Incompleteness.lean     # Nivel D: Gödel I, Gödel II  (requiere Intermediate/Full)
 ```
 
 Los niveles B y C **pueden coexistir con `Minimal/`** porque sólo usan meta-codificación. El nivel D requerirá la maquinaria de `Intermediate/` o `Full/` (inducción para las propiedades de `Dem`).
@@ -105,7 +105,7 @@ La **descodificación** es única gracias al TFA (`ax_p_tfa`): dada una factoriz
 
 ### 3.2 ¿Es Ax-P estrictamente necesario para Meta/Godel.lean?
 
-**No para el Nivel B** (G, ⌜·⌝, Teo G1). La inyectividad de ⌜·⌝ se demuestra por inducción sobre la longitud de la lista usando `cons_inj` (Block6.lean), que no necesita TFA.
+**No para el Nivel B** (G, ⌜·⌝, Teo G1). En la implementación (`Meta/Godel.lean`), la inyectividad plena `encode_injective` se establece a nivel **meta** (inducción estructural Lean + inyectividad de los constructores `cons`/`func`/`G` vía `injection`), sin TFA ni consistencia; la versión object-level `encode_cons_inj` reutiliza `cons_inj` (Block6.lean). Pasar de la object-level a la conclusión meta `S = S'` sí requeriría `Con(axioms)`, por lo que esa conexión interna se difiere al Nivel C/D.
 
 **Sí para usos avanzados** del Nivel C: si queremos demostrar propiedades sobre la decodificación de secuencias (longitud única, posiciones únicas), TFA es la herramienta natural.
 
@@ -133,12 +133,12 @@ Para mantener el proyecto manejable, los siguientes temas se **declaran fuera de
 | Fecha (planificada) | Hito | Módulo |
 |---|---|---|
 | **2026-06-06** | Cierre `Minimal/` con Ax-P y diagnóstico del frente Gödel (Nivel A) | `MINIMAL-AXIOMS.md` §5.5, este documento |
-| **2026-06-07+** | Arranque `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) | `Meta/Godel.lean` (nuevo) |
+| **2026-06-06** | ✅ `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) **completado** | `Meta/Godel.lean` |
 | **TBD** | `Meta/Provability.lean` (Nivel C: IsFormula, Dem) | `Meta/Provability.lean` |
 | **TBD** | `Intermediate/` paralelo: derivación de los 9+3 axiomas inductivos | `Intermediate/Axioms.lean` |
 | **TBD** | `Meta/Incompleteness.lean` (Nivel D: Gödel I formalmente) | requiere `Intermediate/` |
 
-Los plazos para el Nivel C y D dependen del ritmo del proyecto; el Nivel B (Meta/Godel.lean) es el siguiente paso concreto al cerrar `Minimal/`.
+Los plazos para el Nivel C y D dependen del ritmo del proyecto; con el **Nivel B completado** (2026-06-06, `Meta/Godel.lean`), el siguiente paso concreto es el **Nivel C** (`Meta/Provability.lean`: IsFormula, Dem, lema del punto fijo).
 
 ---
 

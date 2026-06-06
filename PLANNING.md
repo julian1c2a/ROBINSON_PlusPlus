@@ -256,6 +256,6 @@ Sistema canónico con **esquema de inducción general** sobre todas las fórmula
 
 Pequeñas tareas de baja prioridad:
 
-- Arreglar el único warning externo: `FOL/Theorems/Eq.lean:130` (unusedSimpArg `hne`).
+- ✅ ~~Arreglar el único warning externo: `FOL/Theorems/Eq.lean:130` (unusedSimpArg `hne`)~~ — **RESUELTO 2026-06-06** (commit `9888c58` en el repo FOL). Build global con 0 warnings.
 - Auditar si `pow`/`prod_pairs` admiten reducción de axiomas (descartado en [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4 — son irreducibles como recursión primitiva).
 - Más teoremas sobre `IsFactorization` usando `ax_p_tfa`: lema de Euclides, multiplicatividad, etc.

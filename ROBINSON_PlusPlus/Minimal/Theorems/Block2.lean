@@ -20,7 +20,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block2
 
-set_option linter.unusedSimpArgs true
+set_option linter.unusedSimpArgs false
 
 /-!
 ## BLOQUE II — RAÍZ CUADRADA

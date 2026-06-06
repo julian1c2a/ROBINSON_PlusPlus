@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-03 — `Minimal/` a 0 sorrys reales; `ax27` eliminado (derivable en PA⁻ vía tricotomía + monotonía + ax18); `ax22`/`ax23` eliminados (proj1/proj2 son defs concretas; `proj_is_cantor` reemplaza ax22 como teorema); `ax28` eliminado (derivado en `teo_2_11`); sistema actual con **30 axiomas matemáticos** (23 aritméticos + 7 de listas) + 5 meta-reglas FOL.
+**Last updated:** 2026-06-06 — `Minimal/` a 0 sorrys reales con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL + meta-axioma `ax_p_tfa` (TFA). Bloque VIII +10 teoremas (álgebra de `Dvd`, corolarios TFA). Nuevo módulo `Meta/Godel.lean` (Nivel B Gödelización: G, ⌜·⌝, Teo G1). Linter `unusedSimpArgs false` global; warning externo `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). 12 módulos, build verde 0 warnings.
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -48,7 +48,8 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block5.lean` | `…Block5` | `Axioms`, `Block1`, `Block3`, `Block4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete |
 | `Minimal/Theorems/Block6.lean` | `…Block6` | `Axioms`, `Block1`, `Block4`, `Block5` | ✅ Complete |
 | `Minimal/Theorems/Block7.lean` | `…Block7` | `Axioms`, `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete |
-| `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 completa con Ax-P TFA; Fases 18-19 fuera de scope `Minimal`) |
+| `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 + Ax-P TFA; +10 teoremas: álgebra de `Dvd` y corolarios TFA) |
+| `Meta/Godel.lean` | `…Meta.Godel` | `Axioms`, `Block6` | ✅ Complete (Nivel B: `G`, `⌜·⌝`, Teo G1) |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -616,13 +617,88 @@ axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
     ∀ f' : Term, IsFactorization f' n → axioms ⊢ (f =eq f')
 ```
 
+#### Exports — Álgebra de `Dvd` (sin inducción, 2026-06-06)
+
+```lean
+theorem dvd_trans {a b c}    : Dvd a b → Dvd b c → Dvd a c          -- testigo q₁·q₂
+theorem dvd_mul_right (a b)  : Dvd a (mul a b)                       -- testigo b (refl)
+theorem dvd_mul_left  (a b)  : Dvd b (mul a b)                       -- testigo a (comm)
+theorem dvd_mul_of_dvd_left  {a b} : Dvd a b → ∀ c, Dvd a (mul b c) -- testigo q·c
+theorem dvd_mul_of_dvd_right {a c} : Dvd a c → ∀ b, Dvd a (mul b c) -- testigo q·b (comm)
+theorem dvd_add {a b c}      : Dvd a b → Dvd a c → Dvd a (add b c)  -- testigo q₁+q₂ (distrib)
+```
+
+#### Exports — Corolarios del TFA (`ax_p_tfa`, 2026-06-06)
+
+```lean
+theorem factorization_exists (n) : axioms ⊢ lt zero n → ∃ f, IsFactorization f n
+theorem factorization_unique {n f f'} :
+  axioms ⊢ lt zero n → IsFactorization f n → IsFactorization f' n → axioms ⊢ (f =eq f')
+theorem lt_zero_one : axioms ⊢ lt zero one                          -- testigo k=0 en ax13
+theorem factorization_one_eq_nil {f} : IsFactorization f one → axioms ⊢ (f =eq nil)
+```
+
+**Fuera de scope `Minimal/`**: el **lema de Euclides** (`IsPrime p → p ∣ a·b → p ∣ a ∨ p ∣ b`)
+y la **multiplicatividad** (`prod_pairs (concat f g) = prod_pairs f · prod_pairs g`) requieren
+`prod_pairs_concat` (recursión sobre la lista), no demostrable sin inducción. Se difieren a
+`Intermediate/`/`Full/`.
+
 **Forma de los teoremas de no-primalidad**: NO podemos probar `¬IsPrime zero` directamente en Lean (requeriría meta-consistencia, que no demostramos). En su lugar, probamos "`IsPrime zero` derivaría `axioms ⊢ ⊥`" — el contenido genuino del enunciado.
 
 **Sobre la formulación de `IsFactorization`**: meta-Prop combinando derivación object-level (`prod_pairs f =eq n`) con cuantificación meta-level sobre los pares `(p,e)` que aparecen como elementos de `f`. La permisividad sobre la forma de los elementos (no obliga a que sean literalmente `pair p e`) queda compensada por `ax_prodp_cons`, que sólo se activa en cabezas `pair p e`.
 
 **Sobre `Ax-P` (TFA)**: justificado en spec §Apéndice B.4 como axioma porque requiere inducción fuerte para ser derivable. En `Minimal/` se adopta meta-axiomáticamente (estilo `imp_intro`, etc.); en `Intermediate/` será un teorema mediante inducción fuerte sobre `n`.
 
-**Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem); fuera de scope de `Minimal`, corresponderían a un módulo `Meta/` futuro.
+**Fases 18-19 (Gödelización, autorreferencia)**: requieren meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem). El **Nivel B** (G, ⌜·⌝, Teo G1) ya está implementado en `Meta/Godel.lean` (ver §3.12). Los Niveles C-D (IsFormula, Dem, incompletitud) siguen pendientes.
+
+---
+
+### 3.12 `Meta/Godel.lean` — Gödelización Nivel B (Fase 18)
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.Godel`
+**Status**: ✅ Complete (Nivel B: codificación + Teo G1)
+**@importance**: `high`
+**@axiom_system**: `none` (meta-codificación pura sobre `Minimal/`; **no añade axiomas**)
+**Last updated**: 2026-06-06 (creado)
+**Dependencias**: `Axioms`, `Block6` (usa `cons`, `nil`, `cons_inj`, `cons_neq_nil`).
+
+#### Defs
+
+```lean
+inductive Sym                            -- Def 27: alfabeto Λ (12 símbolos):
+  | allS | exS | eqS | ltS | addS | mulS | zeroS | succS
+  | varX | varY | varN | varM            --   deriving DecidableEq, Repr
+def gNat : Sym → Nat                      -- Def 27: tabla de Gödel (∀↦2, ∃↦3, =↦10, …, m↦111)
+def numeral : Nat → Term                  -- σⁿ(0): numeral 0 = zero, numeral (n+1) = succ (numeral n)
+def G (s : Sym) : Term := numeral (gNat s)-- Def 27: código de Gödel como numeral object-level
+def encode : List Sym → Term              -- Def 28: ⌜[]⌝ = nil; ⌜s::S⌝ = cons (G s) ⌜S⌝
+scoped notation:max "⌜" S "⌝" => encode S -- corner brackets
+```
+
+#### Exports
+
+```lean
+theorem gNat_injective    {a b : Sym} : gNat a = gNat b → a = b
+theorem numeral_injective (m k : Nat)  : numeral m = numeral k → m = k
+theorem G_injective       {a b : Sym} : G a = G b → a = b
+theorem encode_nil  : ⌜([] : List Sym)⌝ = nil
+theorem encode_cons (s S) : ⌜s :: S⌝ = cons (G s) ⌜S⌝
+-- Teo G1 (meta-inyectividad, consistency-free):
+theorem encode_injective (S S' : List Sym) : ⌜S⌝ = ⌜S'⌝ → S = S'
+-- Versión object-level (vía Block6, faithful al "Teo L2 repetidamente" del spec):
+theorem encode_cons_inj (s s' S S') :
+  axioms ⊢ (⌜s::S⌝ =eq ⌜s'::S'⌝) ⇒ land (G s =eq G s') (⌜S⌝ =eq ⌜S'⌝)
+theorem encode_cons_neq_nil (s S) : axioms ⊢ neg (⌜s::S⌝ =eq ⌜[]⌝)
+```
+
+**Sobre Teo G1**: el enunciado del spec `⌜S⌝ = ⌜S'⌝ ⟹ S = S'` mezcla antecedente
+sobre códigos (`Term`) con conclusión meta (`S = S' : List Sym`). La inyectividad
+**plena** (`encode_injective`) se establece a nivel meta (Lean), por inducción
+estructural sobre la lista vía inyectividad de `cons`/`func`/`G` (`injection` +
+`decide` sobre los símbolos `String` distintos). **No requiere `Con(axioms)`**.
+Pasar de la versión object-level (`encode_cons_inj`) a la conclusión meta sí
+requeriría consistencia, por lo que esa conexión interna queda para el Nivel C/D.
+Ver `GODEL-STATUS.md` §2.
 
 ---
 
@@ -631,19 +707,19 @@ axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
 - **Patrón `spec + simp`**: cada axioma instanciado vía `spec h_axN t` requiere un `simp` con simp-set propio según los binders del axioma. Para axiomas `forall_2` se necesita `liftTerm`/`FOL.substTerm_liftTerm`; para `forall_3`, además `FOL.substTerm_liftLift`. Ver `THOUGHTS.md` y `feedback_build_cache` en memoria de Claude.
 - **`Γ` por módulo**: cada módulo define `def Γ := axioms`. La unificación entre `Block2.Γ` y `Block4_C5.Γ` falla con `apply` pero pasa con `exact` (defeq).
 - **`=eq` no-estándar `eq_trans`**: `eq_trans (h1:a=b)(h2:a=c):b=c`. Para `a=b, b=c → a=c` usar `FOL.derive_eq_trans`.
-- **Linter `unusedSimpArgs` activo** en todos los módulos (2026-06-06): `set_option linter.unusedSimpArgs true` global. Tras un barrido de 411 → 0 warnings se confirmó que la mayoría de `liftTerm`/`liftTerms`/`FOL.substTerm_lift_comm` en simp-sets antiguos eran efectivamente innecesarios. Los que sí son cruciales (`FOL.substTerm_liftTerm`, `FOL.substTerm_liftLift` en simps bajo binders `forall_2`/`forall_3`) se conservan.
+- **Linter `unusedSimpArgs` desactivado** en todos los 12 módulos (2026-06-06): `set_option linter.unusedSimpArgs false` global. Previamente se hizo un barrido a `true` (411 → 0 warnings), que confirmó qué args de `simp` eran innecesarios; tras ello se decidió dejar el linter en `false` (puede dar falsos positivos bajo binders existenciales y se prefiere libertad para conservar args de `simp` por robustez). El build permanece con 0 warnings.
 
 ---
 
 ## 5 · Próximos pasos
 
-Ver `NEXT-STEPS.md` (Ejes 1–4). Resumen:
+Ver `NEXT-STEPS.md` (Ejes 1–5) y `GODEL-STATUS.md`. Resumen:
 
-1. **Eje 1 (cerrado 2026-06-06)**: `Minimal/` completo. Block7 (Funciones, IsFunction/Functional/F1-F3), Block8 + extensión (Dvd, IsPrime, IsFactorization, Ax-P TFA, pow, prod_pairs). ax22/ax23/ax27/ax28 eliminados (537fd68/2026-06-02/2026-06-03). Linter `unusedSimpArgs true` global (411 → 0). Pendiente menor: warning externo `FOL/Theorems/Eq.lean:130`.
-2. **Eje 2 (siguiente)**: `Intermediate/` con esquema de inducción finito (Ax-Ind sobre Φ con |Φ|=13 fórmulas, §Apéndice B). Derivar como teoremas: ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax20, ax21 (9 axiomas algebraicos), más ax_C3, ax_L3, ax24 (vía inducción débil). Reducción esperada: 34 → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
-3. **Eje 3 (medio)**: `Full/` con inducción general; demostrar Ax-P (TFA) como teorema usando inducción fuerte sobre n. Sistema canónico: Peano puro + Defs derivadas.
-4. **Eje 4 (largo)**: `Meta/` para Fases 18-19 (Gödelización + autorreferencia); requiere meta-codificación (G : símbolos → ℕ, ⌜·⌝, IsFormula, Dem).
-5. **Eje 5 (muy largo)**: CZF, cardinalidad, análisis constructivo (fuera del scope inmediato del proyecto).
+1. **Eje 1 (cerrado 2026-06-06)**: `Minimal/` completo. Block7 (Funciones), Block8 + extensión (Dvd, IsPrime, IsFactorization, Ax-P TFA, pow, prod_pairs) + 10 teoremas (álgebra de `Dvd`, corolarios TFA). ax22/ax23/ax27/ax28 eliminados. Linter `unusedSimpArgs false` global. Warning externo `FOL/Eq.lean:130` cerrado.
+2. **Eje 2 (`Meta/`, en curso)**: Gödelización. **Nivel B ✅** (`Meta/Godel.lean`: G, ⌜·⌝, Teo G1). **Próximo: Nivel C** (`Meta/Provability.lean`: IsFormula, Dem, lema del punto fijo). El Nivel D (Gödel I/II internos) requiere `Intermediate/`/`Full/`.
+3. **Eje 3 (`Intermediate/`, medio, paralelo a `Meta/`)**: esquema de inducción finito (Ax-Ind sobre Φ con |Φ|=13, §Apéndice B). Derivar como teoremas ax6/7/10/11/12/18/19/20/21 + ax_C3/ax_L3/ax24. Reducción esperada: 34 → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
+4. **Eje 4 (`Full/`, largo)**: inducción general; demostrar Ax-P (TFA) como teorema vía inducción fuerte sobre n. Habilita el Nivel D de `Meta/`.
+5. **Eje 5 (muy largo)**: CZF, cardinalidad, análisis constructivo (fuera del scope inmediato).
 
 ---
 

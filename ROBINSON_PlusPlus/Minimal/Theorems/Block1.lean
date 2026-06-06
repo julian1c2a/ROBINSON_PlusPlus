@@ -8,7 +8,7 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 import FOL.FOL
 import FOL.Tactics
 
-set_option linter.unusedSimpArgs true
+set_option linter.unusedSimpArgs false
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block1
 

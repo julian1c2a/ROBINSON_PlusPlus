@@ -22,7 +22,7 @@ open ROBINSON_PlusPlus.Minimal.Theorems.Block1
 open ROBINSON_PlusPlus.Minimal.Theorems.Block2
 open ROBINSON_PlusPlus.Minimal.Theorems.Block3
 
-set_option linter.unusedSimpArgs true
+set_option linter.unusedSimpArgs false
 
 namespace ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
 
