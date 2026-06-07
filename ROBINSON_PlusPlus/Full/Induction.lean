@@ -62,6 +62,76 @@ theorem substTerms_subst_succ_lift (m : Term) (ts : List Term) :
     rw [substTerm_subst_succ_lift m t, substTerms_subst_succ_lift m ts']
 end
 
+/-! ### Composición generalizada (offset arbitrario) — para fórmulas con `∀`/`∃` -/
+
+mutual
+theorem substTerm_subst_succ_lift_gen (c : Nat) (m t : Term) :
+    substTerm c m (substTerm c (succ (.var c)) (liftTerm (c + 1) t)) = substTerm c (succ m) t := by
+  cases t with
+  | var j =>
+    rcases Nat.lt_trichotomy j c with hlt | heq | hgt
+    · have e1 : j < c + 1 := by omega
+      simp [liftTerm, substTerm, substTerms, succ, e1,
+            show ¬ j = c from by omega, show ¬ j > c from by omega, hlt]
+    · subst heq
+      simp [liftTerm, substTerm, substTerms, succ, show j < j + 1 from by omega]
+    · have e1 : ¬ j < c + 1 := by omega
+      simp [liftTerm, substTerm, substTerms, succ, e1,
+            show ¬ (j + 1 = c) from by omega, show j + 1 > c from by omega,
+            show ¬ (j = c) from by omega, hgt]
+  | func f ts =>
+    simp only [liftTerm, substTerm]
+    congr 1
+    exact substTerms_subst_succ_lift_gen c m ts
+theorem substTerms_subst_succ_lift_gen (c : Nat) (m : Term) (ts : List Term) :
+    substTerms c m (substTerms c (succ (.var c)) (liftTerms (c + 1) ts)) = substTerms c (succ m) ts := by
+  cases ts with
+  | nil => simp [liftTerms, substTerms]
+  | cons t ts' =>
+    simp only [liftTerms, substTerms]
+    rw [substTerm_subst_succ_lift_gen c m t, substTerms_subst_succ_lift_gen c m ts']
+end
+
+/-- Composición generalizada para **toda** fórmula (cualquier offset). -/
+theorem substFormula_succ_lift_gen (c : Nat) (m : Term) (φ : Formula) :
+    substFormula c m (substFormula c (succ (.var c)) (liftFormula (c + 1) φ))
+      = substFormula c (succ m) φ := by
+  induction φ generalizing c m with
+  | bottom => rfl
+  | atom p ts =>
+      simp only [liftFormula, substFormula]
+      rw [substTerms_subst_succ_lift_gen]
+  | eq t u =>
+      simp only [liftFormula, substFormula]
+      rw [substTerm_subst_succ_lift_gen, substTerm_subst_succ_lift_gen]
+  | impl a b iha ihb =>
+      simp only [liftFormula, substFormula]
+      rw [iha c m, ihb c m]
+  | «forall» a iha =>
+      exact congrArg Formula.forall (iha (c + 1) (liftTerm 0 m))
+  | and a b iha ihb =>
+      simp only [liftFormula, substFormula]
+      rw [iha c m, ihb c m]
+  | or a b iha ihb =>
+      simp only [liftFormula, substFormula]
+      rw [iha c m, ihb c m]
+  | ex a iha =>
+      exact congrArg Formula.ex (iha (c + 1) (liftTerm 0 m))
+
+/-- Composición a offset 0 (la usada por el paso de inducción). -/
+theorem substFormula_succ_lift (n : Term) (φ : Formula) :
+    substFormula 0 n (substFormula 0 (succ (.var 0)) (liftFormula 1 φ)) = substFormula 0 (succ n) φ :=
+  substFormula_succ_lift_gen 0 n φ
+
+/-- Reduce el cuerpo del paso de inducción para **cualquier** `φ` a `φ(n) ⇒ φ(σn)`. -/
+theorem step_reduce (n : Term) (φ : Formula) :
+    substFormula 0 n (Formula.impl φ (substFormula 0 (succ (.var 0)) (liftFormula 1 φ)))
+      = Formula.impl (substFormula 0 n φ) (substFormula 0 (succ n) φ) := by
+  show Formula.impl (substFormula 0 n φ)
+        (substFormula 0 n (substFormula 0 (succ (.var 0)) (liftFormula 1 φ)))
+     = Formula.impl (substFormula 0 n φ) (substFormula 0 (succ n) φ)
+  rw [substFormula_succ_lift]
+
 /-- Composición para fórmulas de igualdad (suficiente: las fórmulas de inducción
     algebraica son ecuaciones, sin cuantificadores internos). -/
 theorem substFormula_eq_succ_lift (n t u : Term) :
