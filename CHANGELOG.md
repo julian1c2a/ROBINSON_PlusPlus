@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-07 — Nuevo **`Full/Induction.lean`** (inducción general **object-level lift-aware**; resuelto el obstáculo De Bruijn; **`ax6` derivado como teorema**). Previo: prototipo `Intermediate/Induction.lean` (inducción meta), `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** + meta-axiomas (Gödel + inducción), **15 módulos**, build verde 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-07 — **`Full/Induction.lean`** (inducción general **object-level lift-aware**): **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) + ax18 (lt_irrefl) derivados como teoremas**; composición De Bruijn generalizada (`step_reduce` para fórmulas no-ecuacionales). Previo: prototipo `Intermediate/Induction.lean` (inducción meta), `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción), **15 módulos**, build verde (28 jobs) 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
