@@ -576,4 +576,84 @@ theorem lt_succ_of_lt (a b : Term) (h : axioms ⊢ lt b a) : axioms ⊢ lt b (su
   -- goal: add b (succ (succ k)) =eq succ a
   exact FOL.derive_eq_trans (add_succ2 b (succ k)) (eq_congr_succ hk)
 
+/-- `0 < σk` (testigo `k`: `0 + σk = σk` por `zero_add`). -/
+theorem zero_lt_succ (k : Term) : axioms ⊢ lt zero (succ k) := by
+  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have hiff := spec (spec h13 zero) (succ k)
+  simp [substFormula, substTerm, substTerms, lt, zero, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+  apply iff_mpr hiff
+  apply ex_intro k
+  simp [substFormula, substTerm, substTerms, add, zero, succ,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  have hh := spec zero_add (succ k)
+  simp [substFormula, substTerm, substTerms, add, zero, succ] at hh
+  exact hh
+
+/-- `∀b, b = 0 ∨ ∃k, b = σk` (cero o sucesor) por inducción. -/
+theorem zero_or_succ_ax :
+    axioms ⊢ Formula.forall (lor (.var 0 =eq zero) (ex (.var 1 =eq succ (.var 0)))) := by
+  apply induction_object
+  · -- base: 0 = 0 ∨ ...
+    apply Minimal.Axioms.or_intro_left
+    exact Derives.refl axioms zero
+  · apply gen; intro n
+    rw [step_reduce]
+    apply Minimal.Axioms.imp_intro; intro _ih
+    apply Minimal.Axioms.or_intro_right
+    apply ex_intro n
+    simp [substFormula, substTerm, substTerms, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    exact Derives.refl axioms (succ n)
+
+private theorem succ_add2 (x y : Term) : axioms ⊢ (add (succ x) y =eq succ (add x y)) := by
+  have hh := spec (succ_add x) y
+  simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
+
+/-- `a < b → σa < b ∨ σa = b` (casando el testigo `k` con `zero_or_succ`). -/
+theorem lt_succ_cases (a b : Term) (h : axioms ⊢ lt a b) :
+    axioms ⊢ lor (lt (succ a) b) (succ a =eq b) := by
+  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have hiffab := spec (spec h13 a) b
+  simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffab
+  apply ex_elim (iff_mp hiffab h); intro k hk
+  simp [substFormula, substTerm, substTerms, add, succ,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
+  -- hk : add a (succ k) =eq b
+  have hzos := spec zero_or_succ_ax k
+  simp [substFormula, substTerm, substTerms, zero, succ,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hzos
+  apply Minimal.Axioms.or_elim hzos
+  · -- k = 0  →  σa = b
+    intro hk0
+    apply Minimal.Axioms.or_intro_right
+    have h1 : axioms ⊢ (add a (succ k) =eq succ a) :=
+      FOL.derive_eq_trans (eq_congr_add_left (eq_congr_succ hk0))
+        (FOL.derive_eq_trans (add_succ2 a zero) (eq_congr_succ (add_zero1 a)))
+    exact eq_trans h1 hk
+  · -- k = σj  →  σa < b
+    intro hex
+    apply ex_elim hex; intro j hj
+    simp [substFormula, substTerm, substTerms, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hj
+    -- hj : k =eq succ j
+    apply Minimal.Axioms.or_intro_left
+    have hiffsab := spec (spec h13 (succ a)) b
+    simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffsab
+    apply iff_mpr hiffsab
+    apply ex_intro j
+    simp [substFormula, substTerm, substTerms, add, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    -- goal: add (succ a) (succ j) =eq b
+    have hN : axioms ⊢ (add a (succ k) =eq add a (succ (succ j))) :=
+      eq_congr_add_left (eq_congr_succ hj)
+    have hM : axioms ⊢ (add a (succ (succ j)) =eq succ (succ (add a j))) :=
+      FOL.derive_eq_trans (add_succ2 a (succ j)) (eq_congr_succ (add_succ2 a j))
+    have hL : axioms ⊢ (add (succ a) (succ j) =eq succ (succ (add a j))) :=
+      FOL.derive_eq_trans (add_succ2 (succ a) j) (eq_congr_succ (succ_add2 a j))
+    have hAk : axioms ⊢ (add a (succ k) =eq succ (succ (add a j))) := FOL.derive_eq_trans hN hM
+    exact FOL.derive_eq_trans hL (eq_trans hAk hk)
+
 end ROBINSON_PlusPlus.Full
