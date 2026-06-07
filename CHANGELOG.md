@@ -17,7 +17,15 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   - **Lema de composición De Bruijn** (resuelve el obstáculo): `substTerm_subst_succ_lift`/`substTerms_subst_succ_lift` (`substTerm 0 m (substTerm 0 (σ#0) (liftTerm 1 t)) = substTerm 0 (σm) t`), `substFormula_eq_succ_lift`, `step_eq_reduce`.
   - **`induction_object`**: empaquetado object-level (doble `mp` sobre `ax_induction`).
   - Derivados **en forma object-level pura**: `zero_add`, `succ_add` (multivariable), `add_comm_ax`, y **`add_comm_thm : axioms ⊢ ax6_add_comm`** — `ax6` (postulado en `Minimal`) es ahora teorema. Sin usar `ax6`.
-- Build: **28 jobs, 0 errores, 0 warnings, 0 sorrys**. 15 módulos.
+
+### Added (2026-06-07) — Full: más axiomas derivados + limpieza
+
+- **`add_assoc_ax`** (= `ax7`): `∀c, (a+b)+c = a+(b+c)` por inducción object-level (2 parámetros). `ax7` derivado como teorema (queda pendiente sólo el empaquetado `∀³` literal, por ajuste De Bruijn de niveles).
+- **`zero_mul`**: `∀n, 0·n = 0` (base de la cadena `mul`, vía `ax8`/`ax9`/`ax4`).
+- **Limpieza**: eliminados los directorios stray root-level `Full/`, `Intermediate/`, `Minimal/` (solo contenían `_template.lean` genéricos; el código real vive en `ROBINSON_PlusPlus/`).
+- Pendiente (cadena `mul`): `succ_mul` → `mul_comm` (ax10) → `mul_distrib` (ax12) → `mul_assoc` (ax11), que requieren reordenamiento de `+` vía `add_assoc`/`add_comm` ya derivados. Luego: axiomas no-ecuacionales (ax18/19/21/24, ax_C3/L3, requieren generalizar la composición a `∨`/`∃`/`¬`), Ax-P (TFA) por inducción fuerte, y Gödel Nivel D.
+
+### Added (2026-06-06) — `Intermediate/Induction.lean` (prototipo de inducción)
 
 ### Added (2026-06-06) — `Intermediate/Induction.lean` (prototipo de inducción)
 
