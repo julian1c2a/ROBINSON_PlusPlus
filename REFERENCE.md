@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-06 — `Minimal/` a 0 sorrys reales con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL + meta-axioma `ax_p_tfa` (TFA). Bloque VIII +10 teoremas (álgebra de `Dvd`, corolarios TFA). Nuevos módulos `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) y `Meta/Provability.lean` (Nivel C: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel; +5 meta-axiomas Gödel). Inducción: prototipo `Intermediate/Induction.lean` (meta) y `Full/Induction.lean` (object-level lift-aware) donde **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) y ax18 (lt_irrefl) ya son teoremas**. Linter `unusedSimpArgs false` global; warning externo `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). **15 módulos**, build verde 0 warnings (28 jobs).
+**Last updated:** 2026-06-07 — `Minimal/` a 0 sorrys reales con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL + meta-axioma `ax_p_tfa` (TFA). Bloque VIII +10 teoremas (álgebra de `Dvd`, corolarios TFA). Nuevos módulos `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) y `Meta/Provability.lean` (Nivel C: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel; +5 meta-axiomas Gödel). Inducción: prototipo `Intermediate/Induction.lean` (meta) y `Full/Induction.lean` (object-level lift-aware) donde **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) y ax18/ax19 (orden: irreflexividad + tricotomía) ya son teoremas**. Linter `unusedSimpArgs false` global; warning externo `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). **15 módulos**, build verde 0 warnings (28 jobs).
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -52,7 +52,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Meta/Godel.lean` | `…Meta.Godel` | `Axioms`, `Block6` | ✅ Complete (Nivel B: `G`, `⌜·⌝`, Teo G1) |
 | `Meta/Provability.lean` | `…Meta.Provability` | `Axioms`, `Meta.Godel`, `FOL.*` | ✅ Complete (Nivel C: `formCode`, `IsFormula`, `Dem`, `diagonal_lemma`, `goedelSentence`) |
 | `Intermediate/Induction.lean` | `…Intermediate` | `Axioms`, `Block1`, `FOL.*` | ✅ Prototipo (inducción meta `peano_induction`; `add_comm` derivado) |
-| `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | 🔄 En curso (inducción general object-level; ax6/7/10/11/12/18 derivados) |
+| `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | 🔄 En curso (inducción general object-level; ax6/7/10/11/12/18/19 derivados) |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
@@ -794,7 +794,7 @@ aporta valor conceptual (la gradación). Por eso el trabajo serio sigue en `Full
 ### 3.15 `Full/Induction.lean` — Inducción general object-level (Eje 4)
 
 **Namespace**: `ROBINSON_PlusPlus.Full`
-**Status**: 🔄 En curso (object-level lift-aware; algebraicos ecuacionales + ax18 hechos)
+**Status**: 🔄 En curso (object-level lift-aware; algebraicos ecuacionales + ax18/ax19 (orden) hechos)
 **@importance**: `high`
 **@axiom_system**: `Full` (inducción general como axioma object-level)
 **Last updated**: 2026-06-07
@@ -824,17 +824,21 @@ theorem add_assoc_ax (a b) : axioms ⊢ ∀. (add (add a b) #0 =eq add a (add b 
 theorem mul_comm_thm   : axioms ⊢ ax10_mul_comm     -- ax10  (vía mul_comm_ax; zero_mul, succ_mul)
 theorem mul_assoc_ax (a b) : axioms ⊢ ∀. (mul (mul a b) #0 =eq mul a (mul b #0))   -- ax11
 theorem mul_distrib_ax (a b) : axioms ⊢ ∀. (mul a (add b #0) =eq add (mul a b) (mul a #0))  -- ax12
-theorem lt_irrefl_thm  : axioms ⊢ ax18_lt_irrefl    -- ax18  (primer no-ecuacional)
--- Lemas de orden auxiliares (hacia ax19):
+theorem lt_irrefl_thm     : axioms ⊢ ax18_lt_irrefl       -- ax18 (orden, irreflexividad)
+theorem lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy   -- ax19 (orden, tricotomía)
+-- Lemas de orden auxiliares:
 theorem lt_succ_self (a)     : axioms ⊢ lt a (σ a)
 theorem not_lt_zero (a)      : axioms ⊢ neg (lt a zero)
 theorem lt_succ_of_lt (a b)  : axioms ⊢ lt b a → axioms ⊢ lt b (σ a)
+theorem zero_lt_succ (k)     : axioms ⊢ lt zero (σ k)
+theorem zero_or_succ_ax      : axioms ⊢ ∀. ((#0 =eq zero) ∨ ∃. (#1 =eq σ #0))
+theorem lt_succ_cases (a b)  : axioms ⊢ lt a b → axioms ⊢ (lt (σ a) b ∨ (σ a =eq b))
 ```
 
-**Pendiente**: ax19 (tricotomía — falta `zero_or_succ`, `lt_succ_cases`, ensamblaje
-3-vías), ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas), Ax-P (TFA,
-inducción fuerte), y el Nivel D de Gödel. Empaquetado `⊢ axN` literal directo para
-`∀²` (ax6, ax10, ax18); para `∀³` (ax7, ax11, ax12) la derivación `_ax` ya está.
+**Pendiente**: ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas, distinta
+de la de Nat), Ax-P (TFA, inducción fuerte), y el Nivel D de Gödel. Empaquetado
+`⊢ axN` literal directo para `∀¹`/`∀²` (ax6, ax10, ax18, ax19); para `∀³` (ax7, ax11,
+ax12) la derivación `_ax` ya está.
 
 ---
 
@@ -854,7 +858,7 @@ Ver `NEXT-STEPS.md` (Ejes 1–5) y `GODEL-STATUS.md`. Resumen:
 1. **Eje 1 (cerrado 2026-06-06)**: `Minimal/` completo. Block7 (Funciones), Block8 + extensión (Dvd, IsPrime, IsFactorization, Ax-P TFA, pow, prod_pairs) + 10 teoremas (álgebra de `Dvd`, corolarios TFA). ax22/ax23/ax27/ax28 eliminados. Linter `unusedSimpArgs false` global. Warning externo `FOL/Eq.lean:130` cerrado.
 2. **Eje 2 (`Meta/`, en curso)**: Gödelización. **Nivel B ✅** (`Meta/Godel.lean`) y **Nivel C ✅** (`Meta/Provability.lean`: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo `diagonal_lemma`, sentencia de Gödel `goedelSentence`; props profundas como 5 meta-axiomas). **Próximo: Nivel D** (Gödel I/II internos: `Minimal ⊬ G_Min`, `⊬ Con`), que requiere `Intermediate/`/`Full/`.
 3. **Eje 3 (`Intermediate/`)**: prototipo `Intermediate/Induction.lean` ✅ (inducción meta; `add_comm` derivado). Hallazgo: la inducción general (Full) es de menor fricción técnica; `Intermediate/` queda como ejercicio conceptual de la gradación.
-4. **Eje 4 (`Full/`, EN CURSO)**: inducción general **object-level**. ✅ Derivados como teoremas: ax6, ax7, ax10, ax11, ax12 (algebraicos ecuacionales) y ax18 (lt_irrefl); composición De Bruijn generalizada (`step_reduce` admite fórmulas no-ecuacionales). Pendiente: ax19 (tricotomía), ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas), Ax-P (TFA) por inducción fuerte → habilita el **Nivel D** de Gödel.
+4. **Eje 4 (`Full/`, EN CURSO)**: inducción general **object-level**. ✅ Derivados como teoremas: ax6, ax7, ax10, ax11, ax12 (algebraicos ecuacionales) y ax18 (lt_irrefl) + ax19 (tricotomía); composición De Bruijn generalizada (`step_reduce` admite fórmulas no-ecuacionales). Pendiente: ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas), Ax-P (TFA) por inducción fuerte → habilita el **Nivel D** de Gödel.
 5. **Eje 5 (muy largo)**: CZF, cardinalidad, análisis constructivo (fuera del scope inmediato).
 
 ---

@@ -41,7 +41,7 @@
 | `Meta/Godel.lean` | 0 | ✅ Nivel B Gödelización: `Sym`, `gNat`, `numeral`, `G`, `encode` (`⌜·⌝`), `encode_injective` (Teo G1) |
 | `Meta/Provability.lean` | 0 | ✅ Nivel C: `formCode`+inyectividad, `IsFormula`, `Provable` (+iff), `Dem`, `diagonal_lemma`, `goedelSentence` (props profundas = meta-axiomas) |
 | `Intermediate/Induction.lean` | 0 | ✅ Prototipo: `peano_induction` (meta), `zero_add_ind`, `succ_add_ind`, `add_comm_thm` |
-| `Full/Induction.lean` | 0 | 🔄 Inducción general object-level: `ax_induction`, composición generalizada, ax6/7/10/11/12/18 derivados + lemas de orden |
+| `Full/Induction.lean` | 0 | 🔄 Inducción general object-level: `ax_induction`, composición generalizada, ax6/7/10/11/12/18/19 derivados + lemas de orden |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -49,6 +49,8 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-07 — `Full/Induction.lean`: ax19 (tricotomía del orden) derivado**: `lt_trichotomy_ax`/`lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy`, por inducción object-level sobre `a` con `∀b` interno y `or_elim` 3-vías. Nuevos lemas de orden auxiliares: `zero_lt_succ`, `zero_or_succ_ax` (`∀n. n=0 ∨ ∃k. n=σk`), `lt_succ_cases` (`a<b → σa<b ∨ σa=b`) y `lt_intro`. Con ax18, el **fragmento de orden de PA⁻ queda derivado de la inducción**. Build verde (28 jobs, 0 sorrys/warnings).
 
 - **2026-06-07 — `Full/Induction.lean`: inducción general object-level + axiomas derivados**: inducción general como **axioma object-level** (`ax_induction`), codificación lift-aware de `φ(σn)` y **composición De Bruijn generalizada** (`substFormula_succ_lift_gen` + `step_reduce`, que admite fórmulas no-ecuacionales). Derivados como **teoremas** (sin usar el axioma respectivo): **ax6** (add_comm), **ax7** (add_assoc), **ax10** (mul_comm), **ax11** (mul_assoc), **ax12** (mul_distrib) — algebraicos ecuacionales — y **ax18** (lt_irrefl) — primer no-ecuacional. + lemas de orden auxiliares (`lt_succ_self`, `not_lt_zero`, `lt_succ_of_lt`). Build verde (28 jobs).
 
@@ -102,7 +104,7 @@
 
 ## Pending Work
 
-**`Minimal/` y `Meta/` (Niveles B, C) completos.** Trabajo activo en `Full/` (Eje 4, inducción general): pendientes **ax19** (tricotomía — falta `zero_or_succ`, `lt_succ_cases`, ensamblaje 3-vías), **ax21/24** (mod2), **listas** (ax_C3/ax_L3 — esquema de inducción sobre listas), **Ax-P** (TFA) por inducción fuerte; luego **Nivel D** de Gödel (Gödel I/II internos). La infraestructura (`step_reduce` general) ya soporta fórmulas no-ecuacionales.
+**`Minimal/` y `Meta/` (Niveles B, C) completos.** Trabajo activo en `Full/` (Eje 4, inducción general): orden ya derivado (**ax18** irreflexividad + **ax19** tricotomía, con lemas auxiliares `zero_lt_succ`/`zero_or_succ_ax`/`lt_succ_cases`/`lt_intro`); pendientes **ax21/24** (mod2), **listas** (ax_C3/ax_L3 — esquema de inducción sobre listas), **Ax-P** (TFA) por inducción fuerte; luego **Nivel D** de Gödel (Gödel I/II internos). La infraestructura (`step_reduce` general) ya soporta fórmulas no-ecuacionales.
 
 ---
 

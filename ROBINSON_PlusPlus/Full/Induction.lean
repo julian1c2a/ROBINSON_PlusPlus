@@ -656,4 +656,77 @@ theorem lt_succ_cases (a b : Term) (h : axioms ⊢ lt a b) :
     have hAk : axioms ⊢ (add a (succ k) =eq succ (succ (add a j))) := FOL.derive_eq_trans hN hM
     exact FOL.derive_eq_trans hL (eq_trans hAk hk)
 
+/-- Construcción de `lt` desde un testigo: `a + σk = b → a < b`. -/
+private theorem lt_intro (a b k : Term) (h : axioms ⊢ (add a (succ k) =eq b)) :
+    axioms ⊢ lt a b := by
+  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have hiff := spec (spec h13 a) b
+  simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+  apply iff_mpr hiff
+  apply ex_intro k
+  simp [substFormula, substTerm, substTerms, add, succ,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  exact h
+
+/-! ### `lt_trichotomy` (= `ax19`) — ensamblaje por inducción sobre `a` -/
+
+theorem lt_trichotomy_ax :
+    axioms ⊢ Formula.forall (Formula.forall
+      (lor (lt (.var 1) (.var 0)) (lor (.var 1 =eq .var 0) (lt (.var 0) (.var 1))))) := by
+  apply induction_object
+  · -- base: ∀b, 0<b ∨ 0=b ∨ b<0
+    apply gen; intro b
+    simp [substFormula, substTerm, substTerms, lt, lor, zero, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    have hzos := spec zero_or_succ_ax b
+    simp [substFormula, substTerm, substTerms, zero, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hzos
+    apply Minimal.Axioms.or_elim hzos
+    · -- b = 0  →  0 = b (medio)
+      intro hb0
+      exact Minimal.Axioms.or_intro_right (Minimal.Axioms.or_intro_left (eq_symm hb0))
+    · -- b = σk  →  0 < b (izquierda)
+      intro hex
+      apply ex_elim hex; intro k hbk
+      simp [substFormula, substTerm, substTerms, succ,
+            FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hbk
+      apply Minimal.Axioms.or_intro_left
+      apply lt_intro zero b k
+      have hz := spec zero_add (succ k)
+      simp [substFormula, substTerm, substTerms, add, zero, succ] at hz
+      exact FOL.derive_eq_trans hz (eq_symm hbk)
+  · -- paso: T(a,·) → T(σa,·)
+    apply gen; intro a
+    rw [step_reduce]
+    apply Minimal.Axioms.imp_intro; intro ih
+    apply gen; intro b
+    simp [substFormula, substTerm, substTerms, lt, lor, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    have htab := spec ih b
+    simp [substFormula, substTerm, substTerms, lt, lor, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at htab
+    apply Minimal.Axioms.or_elim htab
+    · -- a < b  →  σa < b ∨ σa = b
+      intro hab
+      apply Minimal.Axioms.or_elim (lt_succ_cases a b hab)
+      · intro h; exact Minimal.Axioms.or_intro_left h
+      · intro h; exact Minimal.Axioms.or_intro_right (Minimal.Axioms.or_intro_left h)
+    · intro hrest
+      apply Minimal.Axioms.or_elim hrest
+      · -- a = b  →  b < σa (derecha)
+        intro hab
+        apply Minimal.Axioms.or_intro_right; apply Minimal.Axioms.or_intro_right
+        apply lt_intro b (succ a) zero
+        exact FOL.derive_eq_trans
+          (FOL.derive_eq_trans (add_succ2 b zero) (eq_congr_succ (add_zero1 b)))
+          (eq_congr_succ (eq_symm hab))
+      · -- b < a  →  b < σa (derecha)
+        intro hba
+        apply Minimal.Axioms.or_intro_right; apply Minimal.Axioms.or_intro_right
+        exact lt_succ_of_lt a b hba
+
+/-- **`ax19` (tricotomía)** es teorema en `Full`: `⊢ ∀a ∀b, a<b ∨ a=b ∨ b<a`. -/
+theorem lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy := lt_trichotomy_ax
+
 end ROBINSON_PlusPlus.Full

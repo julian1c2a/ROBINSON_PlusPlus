@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-07 — **`Full/Induction.lean`** (inducción general **object-level lift-aware**): **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) + ax18 (lt_irrefl) derivados como teoremas**; composición De Bruijn generalizada (`step_reduce` para fórmulas no-ecuacionales). Previo: prototipo `Intermediate/Induction.lean` (inducción meta), `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción), **15 módulos**, build verde (28 jobs) 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-07 — **`Full/Induction.lean`** (inducción general **object-level lift-aware**): **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) + ax18/ax19 (orden) derivados como teoremas**; composición De Bruijn generalizada (`step_reduce` para fórmulas no-ecuacionales). Previo: prototipo `Intermediate/Induction.lean` (inducción meta), `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción), **15 módulos**, build verde (28 jobs) 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,12 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-07) — Full: ax19 (tricotomía) derivado
+
+- **`lt_trichotomy_ax` / `lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy`**: `∀a ∀b, a<b ∨ a=b ∨ b<a` derivado por inducción object-level (inducción sobre `a`, `∀b` interno, `or_elim` de 3 vías). Lemas auxiliares nuevos: `zero_lt_succ` (0<σk), `zero_or_succ_ax` (`∀b, b=0 ∨ ∃k b=σk`, por inducción con `∨`/`∃`), `lt_succ_cases` (`a<b → σa<b ∨ σa=b`, casando el testigo), `lt_intro` (construcción de `lt` desde testigo), `succ_add2`.
+- Con ax18, **los dos axiomas de orden (ax18, ax19) son ahora teoremas en `Full`**. Acumulado derivado: **ax6, ax7, ax10, ax11, ax12, ax18, ax19**.
+- Pendiente: ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas), Ax-P (TFA), Gödel D.
 
 ### Added (2026-06-07) — `Full/Induction.lean` (inducción general object-level, lift-aware)
 
