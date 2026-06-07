@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-06 — Nuevo **`Meta/Provability.lean`** (Nivel C Gödelización: codificación estructural + inyectividad, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel). Previo: Block8 +10 teoremas, `Meta/Godel.lean` (Nivel B), linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** + 5 meta-axiomas Gödel, **13 módulos**, build verde 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-07 — Nuevo **`Full/Induction.lean`** (inducción general **object-level lift-aware**; resuelto el obstáculo De Bruijn; **`ax6` derivado como teorema**). Previo: prototipo `Intermediate/Induction.lean` (inducción meta), `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** + meta-axiomas (Gödel + inducción), **15 módulos**, build verde 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-07) — `Full/Induction.lean` (inducción general object-level, lift-aware)
+
+- **NUEVO módulo `Full/Induction.lean`** (namespace `ROBINSON_PlusPlus.Full`): inducción general como **axioma object-level** (diseño elegido por el usuario: la inducción entra solo como axioma; las pruebas usan `mp`/`gen`/`imp_intro`, sin meta-inducción).
+  - **`ax_induction (φ) : axioms ⊢ inductionFormula φ`** — esquema general. `inductionFormula` codifica `φ(σn)` de forma **lift-aware** como `substFormula 0 (σ#0) (liftFormula 1 φ)` (preserva variables-parámetro; la versión ingenua las decrementaba, rompiendo el caso multivariable).
+  - **Lema de composición De Bruijn** (resuelve el obstáculo): `substTerm_subst_succ_lift`/`substTerms_subst_succ_lift` (`substTerm 0 m (substTerm 0 (σ#0) (liftTerm 1 t)) = substTerm 0 (σm) t`), `substFormula_eq_succ_lift`, `step_eq_reduce`.
+  - **`induction_object`**: empaquetado object-level (doble `mp` sobre `ax_induction`).
+  - Derivados **en forma object-level pura**: `zero_add`, `succ_add` (multivariable), `add_comm_ax`, y **`add_comm_thm : axioms ⊢ ax6_add_comm`** — `ax6` (postulado en `Minimal`) es ahora teorema. Sin usar `ax6`.
+- Build: **28 jobs, 0 errores, 0 warnings, 0 sorrys**. 15 módulos.
 
 ### Added (2026-06-06) — `Intermediate/Induction.lean` (prototipo de inducción)
 

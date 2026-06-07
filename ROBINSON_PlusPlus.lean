@@ -27,3 +27,6 @@ import ROBINSON_PlusPlus.Meta
 
 -- Intermediate: prototipo de inducción (peano_induction + add_comm derivado). Ver NEXT-STEPS Eje 3
 import ROBINSON_PlusPlus.Intermediate.Induction
+
+-- Full: inducción general object-level (lift-aware); ax6 derivado como teorema. Ver NEXT-STEPS Eje 4
+import ROBINSON_PlusPlus.Full.Induction
