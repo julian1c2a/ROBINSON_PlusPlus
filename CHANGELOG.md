@@ -21,9 +21,9 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 ### Added (2026-06-07) — Full: más axiomas derivados + limpieza
 
 - **`add_assoc_ax`** (= `ax7`): `∀c, (a+b)+c = a+(b+c)` por inducción object-level (2 parámetros). `ax7` derivado como teorema (queda pendiente sólo el empaquetado `∀³` literal, por ajuste De Bruijn de niveles).
-- **`zero_mul`**: `∀n, 0·n = 0` (base de la cadena `mul`, vía `ax8`/`ax9`/`ax4`).
+- **Cadena `mul` completa** (object-level): `zero_mul`, `succ_mul`, **`mul_comm_ax`/`mul_comm_thm` (= ax10)**, **`mul_distrib_ax` (= ax12)**, **`mul_assoc_ax` (= ax11)**. Con esto **TODOS los axiomas algebraicos ECUACIONALES de Minimal son teoremas en Full**: ax6, ax7, ax10, ax11, ax12. Helpers de instanciación añadidos (`add_zero1`, `add_succ2`, `add_assoc3`, `add_comm2`, `mul_zero1`, `mul_succ2`, `zero_mul1`, `succ_mul2`, `mul_distrib3`).
 - **Limpieza**: eliminados los directorios stray root-level `Full/`, `Intermediate/`, `Minimal/` (solo contenían `_template.lean` genéricos; el código real vive en `ROBINSON_PlusPlus/`).
-- Pendiente (cadena `mul`): `succ_mul` → `mul_comm` (ax10) → `mul_distrib` (ax12) → `mul_assoc` (ax11), que requieren reordenamiento de `+` vía `add_assoc`/`add_comm` ya derivados. Luego: axiomas no-ecuacionales (ax18/19/21/24, ax_C3/L3, requieren generalizar la composición a `∨`/`∃`/`¬`), Ax-P (TFA) por inducción fuerte, y Gödel Nivel D.
+- Pendiente: axiomas **no-ecuacionales** (ax18/19 orden, ax21/24 mod2 — requieren generalizar la composición a `∨`/`∃`/`¬`), **listas** (ax_C3/ax_L3 — requieren un esquema de inducción sobre listas, distinto del de Nat), **Ax-P** (TFA) por inducción fuerte, y **Gödel Nivel D**. Empaquetado `⊢ axN` literal sale directo para `∀²` (ax6, ax10); para `∀³` (ax7, ax11, ax12) queda pendiente un helper n-ario (la derivación sustantiva `_ax` ya está).
 
 ### Added (2026-06-06) — `Intermediate/Induction.lean` (prototipo de inducción)
 
