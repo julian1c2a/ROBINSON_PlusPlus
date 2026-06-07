@@ -470,4 +470,60 @@ theorem mul_assoc_ax (a b : Term) :
       FOL.derive_eq_trans (eq_congr_mul_left (u := a) (mul_succ2 b n)) (mul_distrib3 a (mul b n) b)
     exact FOL.derive_eq_trans hL (eq_symm hR)
 
+/-! ### `lt_irrefl` (= `ax18`) — primer axioma NO ecuacional, vía `step_reduce` general -/
+
+theorem lt_irrefl_ax : axioms ⊢ Formula.forall (neg (lt (.var 0) (.var 0))) := by
+  apply induction_object
+  · -- base: ¬(0 < 0)
+    show axioms ⊢ neg (lt zero zero)
+    apply raa; intro hlt
+    have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+    have hiff := spec (spec h13 zero) zero
+    simp [substFormula, substTerm, substTerms, lt, zero, succ, iff, liftTerm, liftTerms] at hiff
+    apply ex_elim (iff_mp hiff hlt); intro k hk
+    simp [substFormula, substTerm, substTerms, add, zero, succ] at hk
+    -- hk : add zero (succ k) =eq zero
+    have hz : axioms ⊢ (add zero (succ k) =eq succ k) := by
+      have hh := spec zero_add (succ k)
+      simp [substFormula, substTerm, substTerms, add, zero, succ] at hh; exact hh
+    have hne : axioms ⊢ neg (succ k =eq zero) := by
+      have hh := spec (ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)) k
+      simp [succ, zero] at hh; exact hh
+    exact mp hne (eq_trans hz hk)
+  · apply gen; intro n
+    rw [step_reduce]
+    apply Minimal.Axioms.imp_intro; intro ih
+    have ih' : axioms ⊢ neg (lt n n) := ih
+    show axioms ⊢ neg (lt (succ n) (succ n))
+    apply raa; intro hlt
+    have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+    have hiff := spec (spec h13 (succ n)) (succ n)
+    simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+    apply ex_elim (iff_mp hiff hlt); intro k hk
+    simp [substFormula, substTerm, substTerms, add, succ,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
+    -- hk : add (succ n) (succ k) =eq succ n
+    have hsa : axioms ⊢ (add (succ n) (succ k) =eq succ (add n (succ k))) := by
+      have hh := spec (succ_add n) (succ k)
+      simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
+    have heq1 : axioms ⊢ (succ (add n (succ k)) =eq succ n) := eq_trans hsa hk
+    have h3i : axioms ⊢ ((succ (add n (succ k)) =eq succ n) ⇒ (add n (succ k) =eq n)) := by
+      have hh := spec (spec (ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)) (add n (succ k))) n
+      simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at hh; exact hh
+    have hnn : axioms ⊢ (add n (succ k) =eq n) := mp h3i heq1
+    have hiffn := spec (spec h13 n) n
+    simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+          FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffn
+    have hltnn : axioms ⊢ lt n n := by
+      apply iff_mpr hiffn
+      apply ex_intro k
+      simp [substFormula, substTerm, substTerms, add, succ,
+            FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      exact hnn
+    exact mp ih' hltnn
+
+/-- **`ax18` (lt_irrefl)** es teorema en `Full`: `⊢ ∀a, ¬(a < a)`. -/
+theorem lt_irrefl_thm : axioms ⊢ ax18_lt_irrefl := lt_irrefl_ax
+
 end ROBINSON_PlusPlus.Full
