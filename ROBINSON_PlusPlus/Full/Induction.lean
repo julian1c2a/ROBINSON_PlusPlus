@@ -526,4 +526,54 @@ theorem lt_irrefl_ax : axioms ⊢ Formula.forall (neg (lt (.var 0) (.var 0))) :=
 /-- **`ax18` (lt_irrefl)** es teorema en `Full`: `⊢ ∀a, ¬(a < a)`. -/
 theorem lt_irrefl_thm : axioms ⊢ ax18_lt_irrefl := lt_irrefl_ax
 
+/-! ### Lemas de orden auxiliares (hacia la tricotomía `ax19`) -/
+
+/-- `a < σa` (testigo `k = 0` en ax13: `a + σ0 = σa`). -/
+theorem lt_succ_self (a : Term) : axioms ⊢ lt a (succ a) := by
+  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have hiff := spec (spec h13 a) (succ a)
+  simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+  apply iff_mpr hiff
+  apply ex_intro zero
+  simp [substFormula, substTerm, substTerms, add, succ, zero,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  exact FOL.derive_eq_trans (add_succ2 a zero) (eq_congr_succ (add_zero1 a))
+
+/-- `¬(a < 0)` (nada es menor que cero: `a + σk = 0` contradice `ax2`). -/
+theorem not_lt_zero (a : Term) : axioms ⊢ neg (lt a zero) := by
+  apply raa; intro hlt
+  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have hiff := spec (spec h13 a) zero
+  simp [substFormula, substTerm, substTerms, lt, zero, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+  apply ex_elim (iff_mp hiff hlt); intro k hk
+  simp [substFormula, substTerm, substTerms, add, succ, zero,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
+  -- hk : add a (succ k) =eq zero
+  have h5 : axioms ⊢ (add a (succ k) =eq succ (add a k)) := add_succ2 a k
+  have hne : axioms ⊢ neg (succ (add a k) =eq zero) := by
+    have hh := spec (ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)) (add a k)
+    simp [succ, zero] at hh; exact hh
+  exact mp hne (eq_trans h5 hk)
+
+/-- `b < a → b < σa` (testigo `σk` desde el de `b<a`). -/
+theorem lt_succ_of_lt (a b : Term) (h : axioms ⊢ lt b a) : axioms ⊢ lt b (succ a) := by
+  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have hiffa := spec (spec h13 b) a
+  simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffa
+  apply ex_elim (iff_mp hiffa h); intro k hk
+  simp [substFormula, substTerm, substTerms, add, succ,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
+  -- hk : add b (succ k) =eq a
+  have hiffsa := spec (spec h13 b) (succ a)
+  simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffsa
+  apply iff_mpr hiffsa
+  apply ex_intro (succ k)
+  simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  -- goal: add b (succ (succ k)) =eq succ a
+  exact FOL.derive_eq_trans (add_succ2 b (succ k)) (eq_congr_succ hk)
+
 end ROBINSON_PlusPlus.Full
