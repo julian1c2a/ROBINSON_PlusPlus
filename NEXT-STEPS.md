@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-11 — **`Full/Lists.lean` (Eje 4)**: ax_C3 (concat_assoc) y ax_L3 (in_concat) **derivados como teoremas en Full** vía meta-axioma `ax_list_induction` (inducción estructural sobre listas). Estado del fragmento aritmético + listas de Minimal derivado en Full: ax6/7/10–12 (algebraicos), ax18/19 (orden), ax21/24 (mod2), ax_C3/L3 (listas) ✅. Previo en la misma sesión: `Full/Mod2.lean` (Opción C.2), `Intermediate/` eliminado. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2 + inducción listas), **16 módulos** (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2 + Full/Lists), 0 sorrys, 0 warnings (29 jobs).
+**Last updated:** 2026-06-11 — **`Full/StrongInduction.lean` (Eje 4 F1)**: `strong_induction` (course-of-values) **DERIVADA de `ax_induction` sin axioma nuevo** + lema clave `substFormula_liftFormula` + `lt_succ_split`. Primera pieza hacia Ax-P/TFA. Previo en la misma sesión: `Full/Lists.lean` (ax_C3/L3 vía `ax_list_induction`), `Full/Mod2.lean` (ax21/24, Opción C.2), `Intermediate/` eliminado. Estado fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2 + inducción listas), **17 módulos** (Minimal/ 11 + Meta×2 + Full/Induction + Full/Mod2 + Full/Lists + Full/StrongInduction), 0 sorrys, 0 warnings (30 jobs).
 
 ---
 
@@ -91,16 +91,21 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 
 **Objetivo (PLANNING §6.3)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax_C3, ax_L3) y el meta-axioma `ax_p_tfa` (TFA) se vuelven teoremas. Habilita el **Nivel D** del frente Gödel: Gödel I y II demostrados internamente.
 
-### 3.1. Diseño
+### 4.1. Roadmap de Ax-P / TFA (en curso)
 
-- [ ] **Esquema de inducción universal**: meta-axioma `induction (φ : Formula) : (φ(0) ⇒ (∀n, φ(n) ⇒ φ(σn)) ⇒ ∀n, φ(n))`.
-- [ ] Mínimo de axiomas de Peano (los 6 clásicos: σ inyectivo, σ ≠ 0, + y · por recursión, inducción).
+Derivar `ax_p_tfa` (TFA) como teorema. Descomposición en 6 fases:
 
-### 3.2. Plan
+- [x] **F1 — Inducción fuerte** (`Full/StrongInduction.lean`, 2026-06-11): `strong_induction` (course-of-values) **derivada de `ax_induction` sin axioma nuevo**, vía motivo auxiliar `ψ(k):=∀m,m<k⇒φ(m)`. + `substFormula_liftFormula` (lema clave subst-deshace-lift) + `lt_succ_split`. **Alcance**: predicados object-level (`φ : Formula`). Para la meta-Prop `IsFactorization` hará falta un puente meta `strong_induction_meta` (φ : Term → Prop) — NO derivable de `ax_induction`, será meta-axioma (análogo a `ax_list_induction`).
+- [ ] **F2 — Algoritmo de la división**: `∀n d, d>0 → ∃!q r, n = q·d + r ∧ r < d`. Por inducción fuerte en n. (~250 LOC)
+- [ ] **F3 — Existencia de factor primo**: `∀n, n>1 → ∃p, IsPrime p ∧ p∣n`. Por buen-ordenamiento (mínimo divisor >1 es primo). (~200 LOC)
+- [ ] **F4 — Existencia de factorización**: por inducción fuerte. n=1→vacía; n>1→factor primo p + factorizar n/p. (~300 LOC). **Requiere el puente meta** de F1.
+- [ ] **F5 — Lema de Euclides**: `IsPrime p ∧ p∣a·b → p∣a ∨ p∣b`. (~200 LOC)
+- [ ] **F6 — Unicidad** + `ax_p_tfa_thm`: por inducción + Euclides + cancelación. (~300 LOC)
 
-- [ ] Crear `Full/Axioms.lean`.
-- [ ] Re-demostrar como teoremas: `mod2_range`, `mod2_of_even`, `add_left_cancel`, `mul_two_cancel`, `concat_assoc`, `in_concat_iff`, y todos los algebraicos de `Intermediate/`.
-- [ ] **Cadena completa de embeddings**: `FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`.
+### 4.2. Restantes tras TFA
+
+- [ ] **Nivel D Gödel** (`Meta/Incompleteness.lean`): desbloqueado por TFA. Gödel I + II internos.
+- [ ] **Cadena de embeddings**: `FOL⁼ ⊂ Minimal ⊂ Full`.
 
 ---
 
