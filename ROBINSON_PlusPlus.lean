@@ -39,3 +39,7 @@ import ROBINSON_PlusPlus.Full.Mod2
 -- Full: listas — ax_C3 (concat_assoc) y ax_L3 (in_concat) derivados vía
 -- meta-axioma ax_list_induction (2026-06-11).
 import ROBINSON_PlusPlus.Full.Lists
+
+-- Full: inducción fuerte (course-of-values) DERIVADA de ax_induction
+-- (sin axioma nuevo). Base para Ax-P (TFA). Ver NEXT-STEPS Eje 4 F1.
+import ROBINSON_PlusPlus.Full.StrongInduction
