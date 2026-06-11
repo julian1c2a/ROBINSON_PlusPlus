@@ -9,11 +9,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 15 (Minimal/ 11 + Meta/Godel + Meta/Provability + Intermediate/Induction + Full/Induction) |
+| Total modules | 15 (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2) |
 | Modules sin sorry | 15 / 15 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Meta-axiomas (no son sorry) | 5 FOL (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (Block8) + 5 Gödel Nivel C (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`) + inducción: `peano_induction` (Intermediate prototipo), `ax_induction` (Full, esquema general) |
-| Axiomas matemáticos | **34** en `Minimal/` (25 aritm + 7 listas + 2 factorización); en `Full/` ax6/7/10/11/12/18 ya son **teoremas** vía `ax_induction` |
+| Meta-axiomas (no son sorry) | 5 FOL (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (Block8) + 5 Gödel Nivel C (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`) + 2 inducción/mod2 (Full): `ax_induction` (esquema general), `ax_mod2_alternation` (recursión completa de mod2) |
+| Axiomas matemáticos | **34** en `Minimal/` (25 aritm + 7 listas + 2 factorización); en `Full/` **ax6/7/10/11/12/18/19/21/24** ya son **teoremas** vía `ax_induction` (+ `ax_mod2_alternation` para ax21/24) |
 | Total definitions | ~85 |
 | Build status | ✅ Passing (28 jobs, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
@@ -40,8 +40,8 @@
 | `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `IsFactorization`, `ax_p_tfa` (TFA), pow/prod_pairs + **10 teoremas** (álgebra de `Dvd`, corolarios TFA) — Bloque VIII Fase 17 completa |
 | `Meta/Godel.lean` | 0 | ✅ Nivel B Gödelización: `Sym`, `gNat`, `numeral`, `G`, `encode` (`⌜·⌝`), `encode_injective` (Teo G1) |
 | `Meta/Provability.lean` | 0 | ✅ Nivel C: `formCode`+inyectividad, `IsFormula`, `Provable` (+iff), `Dem`, `diagonal_lemma`, `goedelSentence` (props profundas = meta-axiomas) |
-| `Intermediate/Induction.lean` | 0 | ✅ Prototipo: `peano_induction` (meta), `zero_add_ind`, `succ_add_ind`, `add_comm_thm` |
-| `Full/Induction.lean` | 0 | 🔄 Inducción general object-level: `ax_induction`, composición generalizada, ax6/7/10/11/12/18/19 derivados + lemas de orden |
+| `Full/Induction.lean` | 0 | 🔄 Inducción general object-level: `ax_induction`, composición generalizada, **ax6/7/10/11/12/18/19** derivados + lemas de orden |
+| `Full/Mod2.lean` | 0 | ✅ Opción C.2 (2026-06-11): `ax_mod2_alternation` + **ax21 (mod2_range) y ax24 (mod2_of_even) derivados como teoremas** |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -50,11 +50,13 @@
 
 ## Recent Achievements
 
+- **2026-06-11 — `Intermediate/` ELIMINADO + `Full/Mod2.lean` (Opción C.2)**: borrado el módulo prototipo `Intermediate/Induction.lean` y el directorio (decisión 2026-06-11: el sistema con Φ finito es caso particular de Full, mantener un nivel separado era burocracia conceptual). Nuevo módulo `Full/Mod2.lean` (290 líneas) con `ax_mod2_alternation : ∀n, mod2(σn)+mod2(n)=1` y derivación de **ax21 (mod2_range) y ax24 (mod2_of_even) como teoremas**. Auditoría 2026-06-11 (en `MINIMAL-AXIOMS.md §3.2`) documenta el hallazgo: `ax16+ax17` dejan `mod2` subdeterminado (modelos no estándar con mod2≥2 cumplen ambos), por eso `ax21` no es derivable sin axioma extra. Conservativo respecto a Minimal. Build verde (28 jobs).
+
 - **2026-06-07 — `Full/Induction.lean`: ax19 (tricotomía del orden) derivado**: `lt_trichotomy_ax`/`lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy`, por inducción object-level sobre `a` con `∀b` interno y `or_elim` 3-vías. Nuevos lemas de orden auxiliares: `zero_lt_succ`, `zero_or_succ_ax` (`∀n. n=0 ∨ ∃k. n=σk`), `lt_succ_cases` (`a<b → σa<b ∨ σa=b`) y `lt_intro`. Con ax18, el **fragmento de orden de PA⁻ queda derivado de la inducción**. Build verde (28 jobs, 0 sorrys/warnings).
 
 - **2026-06-07 — `Full/Induction.lean`: inducción general object-level + axiomas derivados**: inducción general como **axioma object-level** (`ax_induction`), codificación lift-aware de `φ(σn)` y **composición De Bruijn generalizada** (`substFormula_succ_lift_gen` + `step_reduce`, que admite fórmulas no-ecuacionales). Derivados como **teoremas** (sin usar el axioma respectivo): **ax6** (add_comm), **ax7** (add_assoc), **ax10** (mul_comm), **ax11** (mul_assoc), **ax12** (mul_distrib) — algebraicos ecuacionales — y **ax18** (lt_irrefl) — primer no-ecuacional. + lemas de orden auxiliares (`lt_succ_self`, `not_lt_zero`, `lt_succ_of_lt`). Build verde (28 jobs).
 
-- **2026-06-07 — `Intermediate/Induction.lean`: prototipo de inducción**: meta-axioma `peano_induction` (forma híbrida) + derivación de `zero_add`, `succ_add`, `add_comm` (= ax6). Hallazgo: la inducción general (Full) es de menor fricción técnica que la restringida a Φ → el trabajo serio continúa en `Full/`; `Intermediate/` queda como ejercicio conceptual de la gradación.
+- **2026-06-07 — `Intermediate/Induction.lean`: prototipo de inducción** (luego eliminado 2026-06-11): meta-axioma `peano_induction` (forma híbrida) + derivación de `zero_add`, `succ_add`, `add_comm` (= ax6). Hallazgo confirmado: la inducción general (Full) es de menor fricción técnica que la restringida a Φ → el trabajo continúa en `Full/`. Tras el prototipo, el módulo se elimina como conceptualmente redundante (caso finito de Full).
 
 - **2026-06-06 — `Meta/Provability.lean` (Nivel C Gödelización) AÑADIDO**: codificación estructural de Gödel de la sintaxis FOL (`formCode`/`termCode`/`strCode`) con **inyectividad demostrada** (consistency-free, vía `injection`); `IsFormula`, `Provable` + teorema `provable_formCode_iff`; `Dem` + Teo Meta `dem_iff_provable`; lema del punto fijo `diagonal_lemma`; sentencia de Gödel `goedelSentence` + `goedelSentence_fixedpoint`. 5 meta-axiomas nuevos (Dem, dem_iff_provable, provFormula, provFormula_repr, diagonal_lemma) para las propiedades profundas (Nivel D). Barrel `Meta.lean` creado. Build verde, 0 sorrys.
 
@@ -129,10 +131,9 @@ ROBINSON_PlusPlus/
 ├── Meta/
 │   ├── Godel.lean           # Nivel B Gödelización: G, ⌜·⌝, Teo G1 (encode_injective) ✅
 │   └── Provability.lean     # Nivel C: formCode+iny., IsFormula, Provable, Dem, punto fijo, G_Min ✅
-├── Intermediate/
-│   └── Induction.lean       # Prototipo inducción meta: peano_induction, add_comm ✅
 └── Full/
-    └── Induction.lean       # Inducción general object-level: ax6/7/10/11/12/18 derivados 🔄
+    ├── Induction.lean       # Inducción general object-level: ax6/7/10/11/12/18/19 derivados 🔄
+    └── Mod2.lean            # Opción C.2 (2026-06-11): ax_mod2_alternation + ax21/24 derivados ✅
 ```
 
 ---

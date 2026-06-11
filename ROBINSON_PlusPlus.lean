@@ -25,8 +25,13 @@ import ROBINSON_PlusPlus.Minimal.Theorems.Block8
 -- Meta: Gödelización (Nivel B codificación + Nivel C demostrabilidad). Ver GODEL-STATUS.md
 import ROBINSON_PlusPlus.Meta
 
--- Intermediate: prototipo de inducción (peano_induction + add_comm derivado). Ver NEXT-STEPS Eje 3
-import ROBINSON_PlusPlus.Intermediate.Induction
+-- Intermediate/ ELIMINADO 2026-06-11: el sistema con Φ finito es el caso particular
+-- de Full/ con inducción general. Toda la inducción vive ahora en Full/Induction.lean.
 
--- Full: inducción general object-level (lift-aware); ax6 derivado como teorema. Ver NEXT-STEPS Eje 4
+-- Full: inducción general object-level (lift-aware). Axiomas algebraicos (ax6-ax12)
+-- y de orden (ax18, ax19) derivados como teoremas. Ver NEXT-STEPS Eje 4.
 import ROBINSON_PlusPlus.Full.Induction
+
+-- Full: mod2 — ax21 (mod2_range) y ax24 (mod2_of_even) derivados vía
+-- ax_mod2_alternation (Opción C.2, 2026-06-11).
+import ROBINSON_PlusPlus.Full.Mod2

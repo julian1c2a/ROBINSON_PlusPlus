@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-07 — **`Full/Induction.lean`** (inducción general **object-level lift-aware**): **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) + ax18/ax19 (orden) derivados como teoremas**; composición De Bruijn generalizada (`step_reduce` para fórmulas no-ecuacionales). Previo: prototipo `Intermediate/Induction.lean` (inducción meta), `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, linter `unusedSimpArgs false` global, warning `FOL/Eq.lean:130` cerrado. **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción), **15 módulos**, build verde (28 jobs) 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-11 — **`Full/Mod2.lean` (Opción C.2)**: `ax21_mod2_range` y `ax24_mod2_of_even` **derivados como teoremas en Full** vía nuevo axioma `ax_mod2_alternation`. `Intermediate/` **ELIMINADO** (decisión 2026-06-11: caso finito de Full). Previo (2026-06-07): `Full/Induction.lean` con ax6/ax7/ax10/ax11/ax12/ax18/ax19 derivados. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2), **15 módulos** (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2), build verde (28 jobs) 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,23 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-11) — Full: ax21 y ax24 derivados (Opción C.2)
+
+- **NUEVO módulo `Full/Mod2.lean`** (290 líneas) — caracterización completa de la recursión de `mod2` y derivación de los dos axiomas restantes del fragmento aritmético de `Minimal`:
+  - **Nuevo axioma de Full**: `ax_mod2_alternation : axioms ⊢ ∀n, mod2(σn) + mod2(n) = 1`. Conservativo respecto a Minimal (allí derivable de `ax21 + ax16 + teo_1_3`).
+  - **`mod2_zero_aux : axioms ⊢ mod2(0) = 0`** — re-probado en Full **sin usar `ax21`**, sólo `ax17 + teo_2_9`. (Block3.mod2_zero usa case-split sobre `ax21`.)
+  - **Helpers**: `eq_congr_mod2` (congruencia de `mod2`), `a_plus_one_eq_one` (`a + 1 = 1 → a = 0` por `ax3+ax4+ax5`).
+  - **`mod2_range_thm : axioms ⊢ ax21_mod2_range`**: `∀n, mod2(n) = 0 ∨ mod2(n) = 1`. Por inducción object-level con base `mod2_zero_aux` + paso usando `ax_mod2_alternation` con case-split sobre la IH.
+  - **`mod2_two_k_eq_zero_ax` + `mod2_of_even_thm : axioms ⊢ ax24_mod2_of_even`**: `∀n k, n = 2k → mod2(n) = 0`. Por inducción sobre k (motivo `mod2(2k) = 0`), usando ax9 para reescribir `2·σk = 2k + 2 = σσ(2k)` y dos aplicaciones de alternancia. Luego se generaliza a `∀n k, n = 2k → mod2(n) = 0` vía `eq_congr_mod2`.
+- **Auditoría en `MINIMAL-AXIOMS.md §3.2` actualizada**: documenta el hallazgo de que `ax16` sólo captura media alternancia (`mod2(n)=0 ⇔ mod2(σn)=1` no implica `mod2(n)=1 → mod2(σn)=0`) y que `ax16+ax17` dejan `mod2` subdeterminado (modelos no estándar con `mod2(σn) ≥ 2` cumplen ambos). Por eso `ax21` carga información independiente, no derivable sin un axioma extra como `ax_mod2_alternation`.
+- Estado del fragmento aritmético de Minimal derivado en Full: **ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax21, ax24** ✅. Pendientes: ax_C3, ax_L3 (listas — inducción sobre listas codificadas vía Cantor), Ax-P (TFA — inducción fuerte), Gödel D.
+
+### Removed (2026-06-11) — `Intermediate/` eliminado
+
+- **`Intermediate/Induction.lean` BORRADO** + directorio `Intermediate/` eliminado. **Justificación** (decisión 2026-06-11): el prototipo confirmó que la inducción general (esquema sobre `φ` arbitrario en Full) no añade fricción técnica sobre la restringida (Φ finito). Cualquier instancia inductiva concreta que necesitemos se postula directamente en `Full/`. Mantener un nivel separado para Φ finito era **burocracia conceptual** sin valor técnico.
+- **Cadena de embeddings simplificada**: `FOL⁼ ⊂ Minimal ⊂ Full` (sin `Intermediate` intermedio).
+- Referencias a Intermediate actualizadas en `ROBINSON_PlusPlus.lean` (root barrel), `PLANNING.md §6`, `NEXT-STEPS.md` Eje 3.
 
 ### Added (2026-06-07) — Full: ax19 (tricotomía) derivado
 

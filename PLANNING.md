@@ -220,30 +220,42 @@ Implementar Fases 18-19 del spec (`TuplasFuncionesYListas.md §BLOQUE VIII`) en 
 
 **Sinergia con TFA (Ax-P)**: la extensión del Bloque VIII (`pow`, `prod_pairs`, `Ax-P`) realizada 2026-06-06 **prepara explícitamente la codificación primorial de secuencias** usada en Gödel: `(a₁, …, aₖ) ↦ Π pᵢ^aᵢ` con descodificación única vía TFA. Ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §5.5.3 y [GODEL-STATUS.md](GODEL-STATUS.md) §3.
 
-### 6.2. Sistema `Intermediate` (medio plazo, paralelo a `Meta/`)
+### ~~6.2. Sistema `Intermediate`~~ ❌ ELIMINADO (2026-06-11)
 
-**Estado**: 🔜 Siguiente eje matemático, puede empezar en paralelo con `Meta/`.
+**Decisión 2026-06-11**: `Intermediate/` se descarta como sistema autónomo por **redundancia conceptual**. Un sistema con esquema de inducción restringido a Φ finito **es matemáticamente el caso particular** de `Full/` (cualquier instancia inductiva concreta se postula directamente en `Full/`, sin estructura adicional). El prototipo `Intermediate/Induction.lean` confirmó que la inducción general no añade fricción técnica sobre la restringida.
 
-Implementar el sistema con **esquema de inducción finito** (Ax-Ind sobre un conjunto Φ con |Φ|=13 fórmulas, según `TuplasFuncionesYListas.md §Apéndice B`). Demostrar como teoremas:
+Toda la agenda de Intermediate (derivar ax6, ax7, ax10–12, ax18, ax19, ax21, ax24, ax_C3, ax_L3 como teoremas) **se cumple directamente en `Full/`**. Resultados actuales (ver §6.3): ax6, ax7, ax10–12, ax18, ax19, ax21, ax24 ya son teoremas en Full.
 
-- **9 axiomas algebraicos** del sistema `Minimal`: ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax20, ax21.
-- **Axiomas postulados sin inducción débil**: ax_C3 (concat_assoc), ax_L3 (in_concat_iff), ax24 (mod2_of_even).
-- **Embedding formal** `Minimal ⊂ Intermediate`: cada axioma de Minimal es teorema en Intermediate.
+### 6.3. Sistema `Full` (en curso — único eje matemático tras la eliminación de Intermediate)
 
-Reducción esperada: 34 axiomas matemáticos → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
+**Estado**: 🟢 En curso activo. Ver [Eje 4 de NEXT-STEPS.md](NEXT-STEPS.md) y [`Full/Induction.lean`](ROBINSON_PlusPlus/Full/Induction.lean) + [`Full/Mod2.lean`](ROBINSON_PlusPlus/Full/Mod2.lean).
 
-**Decisiones pendientes**:
+Sistema con **esquema de inducción general object-level** (`ax_induction`) sobre cualquier fórmula del lenguaje. Todos los axiomas postulados en `Minimal/` que requieran inducción se derivan aquí como teoremas.
 
-- ¿Mantener `pow`/`prod_pairs` como símbolos primitivos con sus 4 axiomas, o demostrarlos como definiciones recursivas? La spec §Apéndice B no lo aborda directamente; mi recomendación: mantenerlos primitivos (los 4 axiomas son definicionales puros — ver [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4).
-- ¿`Ax-P` (TFA) sigue como axioma en `Intermediate/` o pasa a teorema vía inducción fuerte? La spec sugiere que en `Intermediate/` con Ax-Ind(Φ) sigue siendo axioma (requiere inducción fuerte sobre fórmulas no acotadas, no cubierta por Φ). Pasa a teorema en `Full/`.
+**Estado de derivación de axiomas de Minimal como teoremas en Full**:
 
-### 6.3. Sistema `Full` (largo plazo)
+| Axioma | Teorema | Módulo |
+|---|---|---|
+| ax6 | `add_comm_thm` | Full/Induction.lean |
+| ax7 | (vía `add_assoc_ax`) | Full/Induction.lean |
+| ax10 | `mul_comm_thm` | Full/Induction.lean |
+| ax11 | (vía `mul_assoc_ax`) | Full/Induction.lean |
+| ax12 | (vía `mul_distrib_ax`) | Full/Induction.lean |
+| ax18 | `lt_irrefl_thm` | Full/Induction.lean |
+| ax19 | `lt_trichotomy_thm` | Full/Induction.lean |
+| **ax21** | `mod2_range_thm` | **Full/Mod2.lean ✅ (2026-06-11)** |
+| **ax24** | `mod2_of_even_thm` | **Full/Mod2.lean ✅ (2026-06-11)** |
+| ax_C3 | ⏳ pendiente | (necesita inducción sobre listas) |
+| ax_L3 | ⏳ pendiente | (necesita inducción sobre listas) |
+| Ax-P (TFA) | ⏳ pendiente | (necesita inducción fuerte) |
 
-Sistema canónico con **esquema de inducción general** sobre todas las fórmulas del lenguaje (§Apéndice C). Demostrar como teoremas:
+**Axiomas extra de Full** (no en Minimal, añadidos para cerrar ax21):
 
-- **Ax-P (TFA)** vía inducción fuerte sobre `n`.
-- Todos los axiomas restantes que requieran inducción no acotada.
-- Cadena completa de embeddings `FOL⁼ ⊂ Minimal ⊂ Intermediate ⊂ Full`.
+- `ax_mod2_alternation : ∀n, mod2(σn)+mod2(n)=1` (Opción C.2, 2026-06-11). Conservativo respecto a Minimal: derivable allí de ax21+ax16+teo_1_3.
+
+**Habilita**:
+
+- Cadena de embeddings `FOL⁼ ⊂ Minimal ⊂ Full` (sin Intermediate intermedio).
 - **Nivel D de `Meta/`**: Gödel I y II demostrados internamente (requiere la inducción de `Full/`).
 
 ### 6.4. Consolidación y nuevas teorías (muy largo plazo)

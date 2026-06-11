@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-07 — **`Full/Induction.lean` (Eje 4, en curso)**: inducción general object-level; **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) + ax18 (lt_irrefl) ya son teoremas**; composición De Bruijn generalizada. Previo en la sesión: prototipo `Intermediate/Induction.lean`, `Meta/Provability.lean` (Nivel C), `Meta/Godel.lean` (Nivel B), Block8 +10 teoremas, warning `FOL/Eq.lean:130` cerrado. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción), **15 módulos**, 0 sorrys, 0 warnings (28 jobs).
+**Last updated:** 2026-06-11 — **`Full/Mod2.lean` (Eje 4, Opción C.2)**: ax21 (mod2_range) y ax24 (mod2_of_even) **derivados como teoremas en Full** vía `ax_mod2_alternation` + inducción object-level. `Intermediate/` **eliminado** (decisión 2026-06-11: caso finito de Full). Previo: ax6/ax7/ax10/ax11/ax12 (algebraicos), ax18 (lt_irrefl), ax19 (lt_trichotomy) ya derivados; Meta/Godel.lean (B), Meta/Provability.lean (C), Block8 +10 teoremas. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2), **15 módulos** (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2), 0 sorrys, 0 warnings (28 jobs).
 
 ---
 
@@ -75,36 +75,19 @@ Esto se queda para más adelante; la formalización requiere inducción sobre la
 
 ---
 
-## Eje 3 — Sistema `Intermediate/` (medio plazo, paralelo a `Meta/`)
+## ~~Eje 3 — Sistema `Intermediate/`~~ ❌ ELIMINADO (2026-06-11)
 
-**Objetivo (PLANNING §6.2)**: Sistema reducido (~22 axiomas) + **esquema de inducción restringido** a un conjunto finito de fórmulas (Ax-Ind sobre Φ con |Φ|=13). Demostrar que los 9 axiomas algebraicos y de orden del sistema `Minimal` se vuelven **teoremas**. Reducción esperada: 34 axiomas → ~22 axiomas + Ax-Ind(Φ) + Ax-P.
+**Decisión 2026-06-11**: `Intermediate/` se elimina por **redundancia conceptual**. El sistema con esquema de inducción restringido a Φ finito **es el caso particular** de `Full/` (cualquier instancia inductiva concreta que necesitemos se obtiene postulando sólo la φ pertinente en `Full/`, sin necesidad de un sistema separado). El prototipo `Intermediate/Induction.lean` confirmó que la inducción general no añade fricción técnica sobre la restringida — por lo tanto no hay coste por colapsar los dos niveles.
 
-> **✅ Prototipo de inducción validado (2026-06-06)** — `Intermediate/Induction.lean`. Meta-axioma `peano_induction` (forma híbrida estilo `gen`) + derivación por inducción de `zero_add`, `succ_add` (multivariable con `liftTerm`) y **`add_comm` = `ax6` como teorema** (`add_comm_thm : ⊢ ax6_add_comm`), usando sólo `ax4`/`ax5` (no `ax6`). **Hallazgo**: la inducción **general** (sobre cualquier `φ`) se formula y usa con la misma facilidad; restringir a Φ añade burocracia sin simplificar las pruebas algebraicas → técnicamente `Full/` (inducción general) es el camino de menor fricción; `Intermediate/` (Φ finito) aporta valor conceptual (gradación), no técnico. **Decisión Intermediate-vs-Full pendiente** a la luz de esto.
+Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, ax18, ax19, ax21, ax24, ax_C3, ax_L3 como teoremas) **se desarrolla directamente en `Full/`**. Resultados actuales en Full: ax6, ax7, ax10, ax11, ax12, ax18, ax19, **ax21, ax24** ✅ (ver Eje 4).
 
-### 2.1. Diseño previo
-
-- [ ] **Decidir la formalización del esquema de inducción restringido** en Lean. Opciones:
-  - (a) Familia indexada de axiomas `induction_phi : Formula` por cada fórmula `φ` del conjunto finito.
-  - (b) Un único esquema parametrizado por una etiqueta `Fin n` enumerando los `φ`s.
-  - (c) Función Lean a nivel meta `induction (φ : Formula) : Γ ⊢ ... ⇒ ...` con guard sobre `φ`.
-
-### 2.2. Estructura mínima
-
-- [ ] Crear `Intermediate/Axioms.lean` (13 axiomas + esquema de inducción restringido).
-- [ ] `Intermediate/Theorems/` con un módulo por cada axioma algebraico de `Minimal` que aquí pasa a ser teorema:
-  - `add_comm` (ax6), `add_assoc` (ax7), `mul_comm` (ax10), `mul_assoc` (ax11), `mul_distrib` (ax12), `lt_irrefl` (ax18), `lt_trichotomy` (ax19), `sqrt_le` (ax14), `lt_succ_sqrt` (ax15).
-- [ ] **Embedding `Minimal ⊂ Intermediate`**: módulo que demuestra que toda derivación en `Minimal.axioms` se transporta a `Intermediate.axioms`.
-
-### 2.3. Embedding de `Minimal/` en `Intermediate/`
-
-- [ ] Demostrar que cada axioma de `Minimal/` es teorema en `Intermediate/`.
-- [ ] Establecer formalmente `Minimal.axioms ⊆ Intermediate.theorems`.
+`Intermediate/Induction.lean` y el directorio `Intermediate/` quedan **borrados** del repositorio.
 
 ---
 
 ## Eje 4 — Sistema `Full/` (EN CURSO — arranque object-level 2026-06-07)
 
-> **✅ Arranque `Full/Induction.lean` (2026-06-07)** — Inducción general como **axioma object-level** (`ax_induction : ⊢ inductionFormula φ`), con codificación **lift-aware** de `φ(σn)` (`substFormula 0 (σ#0) (liftFormula 1 φ)`, que preserva parámetros). Resuelto el obstáculo De Bruijn con el **lema de composición** `substTerm_subst_succ_lift` (`substTerm 0 m (substTerm 0 (σ#0) (liftTerm 1 t)) = substTerm 0 (σm) t`) + `step_eq_reduce`. Derivados **en forma object-level pura** (sólo `ax_induction` + `mp`/`gen`/`imp_intro`, sin meta-inducción en las pruebas): `zero_add`, `succ_add` (multivariable), `add_comm_ax`, y **`add_comm_thm : ⊢ ax6_add_comm`** (¡ax6 es teorema!). **Axiomas algebraicos ecuacionales TODOS derivados (2026-06-07)**: ax6 (add_comm), ax7 (add_assoc), ax10 (mul_comm), ax11 (mul_assoc), ax12 (mul_distrib) — object-level, vía helpers de instanciación. **Composición De Bruijn generalizada** (`substFormula_succ_lift_gen` + `step_reduce` general) → inducción object-level sobre fórmulas con `∨`/`∃`/`¬`/`∀`. **`ax18` (lt_irrefl) derivado** (primer no-ecuacional, `lt_irrefl_thm : ⊢ ax18_lt_irrefl`). **`ax19` (tricotomía) derivado (2026-06-07)**: `lt_trichotomy_thm : ⊢ ax19_lt_trichotomy`, por inducción object-level sobre `a` + `∀b` interno + `or_elim` 3-vías, con lemas auxiliares `zero_lt_succ`, `zero_or_succ_ax`, `lt_succ_cases`, `lt_intro`. **El fragmento de orden de PA⁻ (ax18+ax19) queda derivado de la inducción.** Siguiente: ax21/24 (mod2), listas (ax_C3/L3 — inducción sobre listas), Ax-P (inducción fuerte), Gödel Nivel D.
+> **✅ `Full/Induction.lean` + `Full/Mod2.lean` (2026-06-07 + 2026-06-11)** — Inducción general como **axioma object-level** (`ax_induction : ⊢ inductionFormula φ`), con codificación **lift-aware** de `φ(σn)`. Composición De Bruijn generalizada (`substFormula_succ_lift_gen` + `step_reduce`). **Derivados como teoremas en forma object-level pura**: `zero_add`, `succ_add` (multivariable), `add_comm_ax`/`add_comm_thm` (= ax6), `add_assoc_ax` (= ax7), `mul_comm`/`mul_assoc`/`mul_distrib` (= ax10/ax11/ax12), `lt_irrefl_thm` (= ax18), `lt_trichotomy_thm` (= ax19), y — **2026-06-11** vía Opción C.2 con axioma extra `ax_mod2_alternation : ∀n, mod2(σn)+mod2(n)=1` — `mod2_range_thm : ⊢ ax21_mod2_range` y `mod2_of_even_thm : ⊢ ax24_mod2_of_even`. Lemas auxiliares relevantes: `mod2_zero_aux` (re-derivado sin ax21 usando ax17+teo_2_9), `a_plus_one_eq_one`, `eq_congr_mod2`, `mod2_two_k_eq_zero_ax`. **`Intermediate/` eliminado** (caso finito de Full). Siguiente: listas (ax_C3/L3 — inducción sobre listas codificadas vía Cantor), Ax-P (TFA con inducción fuerte), Gödel Nivel D.
 
 **Objetivo (PLANNING §6.3)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax_C3, ax_L3) y el meta-axioma `ax_p_tfa` (TFA) se vuelven teoremas. Habilita el **Nivel D** del frente Gödel: Gödel I y II demostrados internamente.
 
