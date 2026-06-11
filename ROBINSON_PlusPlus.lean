@@ -35,3 +35,7 @@ import ROBINSON_PlusPlus.Full.Induction
 -- Full: mod2 — ax21 (mod2_range) y ax24 (mod2_of_even) derivados vía
 -- ax_mod2_alternation (Opción C.2, 2026-06-11).
 import ROBINSON_PlusPlus.Full.Mod2
+
+-- Full: listas — ax_C3 (concat_assoc) y ax_L3 (in_concat) derivados vía
+-- meta-axioma ax_list_induction (2026-06-11).
+import ROBINSON_PlusPlus.Full.Lists

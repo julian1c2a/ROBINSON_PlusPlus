@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-11 — **`Full/Mod2.lean` (Opción C.2)**: `ax21_mod2_range` y `ax24_mod2_of_even` **derivados como teoremas en Full** vía nuevo axioma `ax_mod2_alternation`. `Intermediate/` **ELIMINADO** (decisión 2026-06-11: caso finito de Full). Previo (2026-06-07): `Full/Induction.lean` con ax6/ax7/ax10/ax11/ax12/ax18/ax19 derivados. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2), **15 módulos** (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2), build verde (28 jobs) 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-11 — **`Full/Lists.lean`**: `ax_C3_concat_assoc` y `ax_L3_in_concat` **derivados como teoremas en Full** vía meta-axioma `ax_list_induction` (estilo `imp_intro`/`gen`, inducción estructural sobre listas parametrizada por `φ : Term → Formula`). Previo en la misma sesión: `Full/Mod2.lean` (Opción C.2 con ax21/24), `Intermediate/` eliminado. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2 + inducción listas), **16 módulos** (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2 + Full/Lists), build verde (29 jobs) 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,22 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-11) — Full/Lists.lean: ax_C3 y ax_L3 derivados (inducción estructural)
+
+- **NUEVO módulo `Full/Lists.lean`** (330 líneas) — derivación de los dos axiomas de listas postulados en Minimal vía meta-axioma de inducción estructural:
+  - **NUEVO meta-axioma `ax_list_induction`** (estilo `imp_intro`/`gen`/`or_elim`):
+    ```lean
+    axiom ax_list_induction {Γ} (φ : Term → Formula)
+      (base : Γ ⊢ φ nil)
+      (step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)) :
+      ∀ L, Γ ⊢ φ L
+    ```
+    Parametrizado por función Lean `φ : Term → Formula` (no `Formula → Formula` como `ax_induction`). Más limpio: evita el manejo De Bruijn de los dos binders ∀h ∀t que requeriría una versión object-level. Conclusión sobre **todos** los Terms (no solo listas) — análogo a cómo `ax_induction` decide tratar Term como generado libremente por 0 y σ. (Observación: con 3 binders esta forma generalizaría a inducción sobre ordinales / W-types arbitrarios.)
+  - **Helpers de congruencia**: `eq_congr_cons_right_full` (cons respeta `=` en arg derecho), `eq_congr_concat_left/right` (concat respeta `=` en ambos args), `eq_subst_in` (substituye igualdad bajo predicado `In`), helper local `iff_intro` (construye `iff` desde dos meta-implicaciones).
+  - **`concat_assoc_pointwise` + `concat_assoc_thm : ⊢ ax_C3_concat_assoc`** — `(L##M)##N = L##(M##N)` por inducción estructural en L con M, N como parámetros Lean. Base nil: `ax_C1` doble + congruencia. Paso cons: `ax_C2` triple + IH + `eq_congr_cons_right_full`.
+  - **`in_concat_pointwise` + `in_concat_thm : ⊢ ax_L3_in_concat`** — `In(x, L##M) ⇔ In(x,L) ∨ In(x,M)` por inducción estructural en L con x, M como parámetros. Base nil: `ax_L1` (¬In x nil) + `ax_C1`. Paso cons: `ax_C2` (concat fuera) + `ax_L2` (membership recursiva) + IH + asociatividad de `∨`. Prueba completa de las dos direcciones del `⇔`.
+- **Cobertura del fragmento de Minimal en Full**: ax6/7/10/11/12 (algebraicos), ax18/19 (orden), ax21/24 (mod2), **ax_C3/L3 (listas)** ✅. Pendientes: Ax-P (TFA, inducción fuerte), Gödel Nivel D.
 
 ### Added (2026-06-11) — Full: ax21 y ax24 derivados (Opción C.2)
 

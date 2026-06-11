@@ -9,11 +9,11 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 15 (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2) |
-| Modules sin sorry | 15 / 15 ✅ |
+| Total modules | 16 (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2 + Full/Lists) |
+| Modules sin sorry | 16 / 16 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Meta-axiomas (no son sorry) | 5 FOL (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (Block8) + 5 Gödel Nivel C (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`) + 2 inducción/mod2 (Full): `ax_induction` (esquema general), `ax_mod2_alternation` (recursión completa de mod2) |
-| Axiomas matemáticos | **34** en `Minimal/` (25 aritm + 7 listas + 2 factorización); en `Full/` **ax6/7/10/11/12/18/19/21/24** ya son **teoremas** vía `ax_induction` (+ `ax_mod2_alternation` para ax21/24) |
+| Meta-axiomas (no son sorry) | 5 FOL (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (Block8) + 5 Gödel Nivel C (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`) + 3 Full: `ax_induction` (esquema general), `ax_mod2_alternation` (recursión mod2), `ax_list_induction` (inducción estructural listas) |
+| Axiomas matemáticos | **34** en `Minimal/` (25 aritm + 7 listas + 2 factorización); en `Full/` **ax6/7/10/11/12/18/19/21/24/_C3/_L3** ya son **teoremas** vía `ax_induction` (+ `ax_mod2_alternation` para mod2, `ax_list_induction` para listas) |
 | Total definitions | ~85 |
 | Build status | ✅ Passing (28 jobs, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
@@ -42,6 +42,7 @@
 | `Meta/Provability.lean` | 0 | ✅ Nivel C: `formCode`+inyectividad, `IsFormula`, `Provable` (+iff), `Dem`, `diagonal_lemma`, `goedelSentence` (props profundas = meta-axiomas) |
 | `Full/Induction.lean` | 0 | 🔄 Inducción general object-level: `ax_induction`, composición generalizada, **ax6/7/10/11/12/18/19** derivados + lemas de orden |
 | `Full/Mod2.lean` | 0 | ✅ Opción C.2 (2026-06-11): `ax_mod2_alternation` + **ax21 (mod2_range) y ax24 (mod2_of_even) derivados como teoremas** |
+| `Full/Lists.lean` | 0 | ✅ Listas (2026-06-11): meta-axioma `ax_list_induction` + **ax_C3 (concat_assoc) y ax_L3 (in_concat) derivados como teoremas** |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -49,6 +50,8 @@
 ---
 
 ## Recent Achievements
+
+- **2026-06-11 — `Full/Lists.lean`: ax_C3 y ax_L3 derivados (inducción estructural)**: nuevo módulo (330 líneas) con **meta-axioma `ax_list_induction`** (estilo `imp_intro`/`gen`, parametrizado por `φ : Term → Formula`, conclusión sobre todos los Terms). Helpers de congruencia (`eq_congr_cons_right_full`, `eq_congr_concat_left/right`, `eq_subst_in`) + helper local `iff_intro`. **`concat_assoc_thm : ⊢ ax_C3_concat_assoc`** y **`in_concat_thm : ⊢ ax_L3_in_concat`** derivados por inducción estructural sobre L. Cobertura del fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Build verde (29 jobs). Pendientes: Ax-P (TFA, inducción fuerte), Gödel Nivel D.
 
 - **2026-06-11 — `Intermediate/` ELIMINADO + `Full/Mod2.lean` (Opción C.2)**: borrado el módulo prototipo `Intermediate/Induction.lean` y el directorio (decisión 2026-06-11: el sistema con Φ finito es caso particular de Full, mantener un nivel separado era burocracia conceptual). Nuevo módulo `Full/Mod2.lean` (290 líneas) con `ax_mod2_alternation : ∀n, mod2(σn)+mod2(n)=1` y derivación de **ax21 (mod2_range) y ax24 (mod2_of_even) como teoremas**. Auditoría 2026-06-11 (en `MINIMAL-AXIOMS.md §3.2`) documenta el hallazgo: `ax16+ax17` dejan `mod2` subdeterminado (modelos no estándar con mod2≥2 cumplen ambos), por eso `ax21` no es derivable sin axioma extra. Conservativo respecto a Minimal. Build verde (28 jobs).
 
@@ -132,8 +135,9 @@ ROBINSON_PlusPlus/
 │   ├── Godel.lean           # Nivel B Gödelización: G, ⌜·⌝, Teo G1 (encode_injective) ✅
 │   └── Provability.lean     # Nivel C: formCode+iny., IsFormula, Provable, Dem, punto fijo, G_Min ✅
 └── Full/
-    ├── Induction.lean       # Inducción general object-level: ax6/7/10/11/12/18/19 derivados 🔄
-    └── Mod2.lean            # Opción C.2 (2026-06-11): ax_mod2_alternation + ax21/24 derivados ✅
+    ├── Induction.lean       # Inducción general object-level: ax6/7/10/11/12/18/19 derivados ✅
+    ├── Mod2.lean            # Opción C.2 (2026-06-11): ax_mod2_alternation + ax21/24 derivados ✅
+    └── Lists.lean           # Listas (2026-06-11): ax_list_induction + ax_C3/L3 derivados ✅
 ```
 
 ---

@@ -245,13 +245,14 @@ Sistema con **esquema de inducción general object-level** (`ax_induction`) sobr
 | ax19 | `lt_trichotomy_thm` | Full/Induction.lean |
 | **ax21** | `mod2_range_thm` | **Full/Mod2.lean ✅ (2026-06-11)** |
 | **ax24** | `mod2_of_even_thm` | **Full/Mod2.lean ✅ (2026-06-11)** |
-| ax_C3 | ⏳ pendiente | (necesita inducción sobre listas) |
-| ax_L3 | ⏳ pendiente | (necesita inducción sobre listas) |
+| **ax_C3** | `concat_assoc_thm` | **Full/Lists.lean ✅ (2026-06-11)** |
+| **ax_L3** | `in_concat_thm` | **Full/Lists.lean ✅ (2026-06-11)** |
 | Ax-P (TFA) | ⏳ pendiente | (necesita inducción fuerte) |
 
-**Axiomas extra de Full** (no en Minimal, añadidos para cerrar ax21):
+**Axiomas extra de Full** (no en Minimal, añadidos para cerrar los derivados):
 
 - `ax_mod2_alternation : ∀n, mod2(σn)+mod2(n)=1` (Opción C.2, 2026-06-11). Conservativo respecto a Minimal: derivable allí de ax21+ax16+teo_1_3.
+- `ax_list_induction (φ : Term → Formula) (base) (step) : ∀L, Γ ⊢ φ L` (meta-axioma, 2026-06-11). Inducción estructural sobre listas estilo `imp_intro`/`gen`. La conclusión es sobre todos los Terms (no solo listas), reflejando una elección de Full de tratar Term como generado por nil/cons (análogo a cómo `ax_induction` lo trata como generado por 0/σ).
 
 **Habilita**:
 
