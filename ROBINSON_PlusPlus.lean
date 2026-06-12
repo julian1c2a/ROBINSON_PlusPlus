@@ -50,3 +50,6 @@ import ROBINSON_PlusPlus.Full.Numerals
 
 -- Full: cuantificación acotada — le_numeral_split (d ≤ numeral n ⇒ casos finitos).
 import ROBINSON_PlusPlus.Full.Bounded
+
+-- Full: divisibilidad representada — numeral_dvd + divisor_le.
+import ROBINSON_PlusPlus.Full.Divisibility
