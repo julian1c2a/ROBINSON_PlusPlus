@@ -59,3 +59,9 @@ import ROBINSON_PlusPlus.Full.Primality
 
 -- Full: división con resto sobre numerales (trivial vía homomorfismo).
 import ROBINSON_PlusPlus.Full.Division
+
+-- Full: teoría de números META pura ℕ (sin Mathlib) — IsPrimeNat, factor primo, factorización.
+import ROBINSON_PlusPlus.Full.PrimeFactor
+
+-- Full: factorización (existencia) transferida al object — tfa_exists_numeral.
+import ROBINSON_PlusPlus.Full.Factorization
