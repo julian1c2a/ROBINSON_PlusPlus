@@ -76,7 +76,7 @@ El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía dis
 | **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
 | **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` ✅ | ✅ 2026-06-06 |
 | **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` ✅ | ✅ 2026-06-06 (props profundas como meta-axiomas) |
-| **D** | Teoremas de incompletitud: Gödel I + II demostrados internamente | `Meta/Incompleteness.lean` (planificado, requiere `Intermediate/` o `Full/`) | ⏳ pendiente |
+| **D** | Teoremas de incompletitud: Gödel I (mitad esencial) demostrado internamente | `Meta/Incompleteness.lean` ✅ | 🟡 2026-06-12 (Gödel I mitad esencial; otra mitad + Gödel II pendientes) |
 
 La **arquitectura propuesta** para `Meta/`:
 
@@ -84,8 +84,37 @@ La **arquitectura propuesta** para `Meta/`:
 Meta/
 ├── Godel.lean              # Nivel B: G, ⌜·⌝, Teo G1  ✅ (2026-06-06)
 ├── Provability.lean        # Nivel C: IsFormula, Dem, punto fijo, G_Min  ✅ (2026-06-06)
-└── Incompleteness.lean     # Nivel D: Gödel I, Gödel II  (requiere Intermediate/Full)
+└── Incompleteness.lean     # Nivel D: Gödel I mitad esencial  🟡 (2026-06-12)
 ```
+
+### Nivel D — estado detallado (2026-06-12)
+
+`Meta/Incompleteness.lean` deriva la **mitad esencial del Primer Teorema** a
+partir de las condiciones de demostrabilidad postuladas en el Nivel C:
+
+- ✅ **`goedel_first_unprovable`** : `Consistent → ¬(axioms ⊢ goedelSentence)`.
+  Si el sistema es consistente, la sentencia de Gödel `G` no es demostrable.
+  Prueba: `⊢ G` → (D1, `provFormula_repr`) `⊢ Prov(⌜G⌝)`; punto fijo
+  (`goedelSentence_fixedpoint`) da `⊢ ¬Prov(⌜G⌝)`; `mp` → `⊢ ⊥`.
+- ✅ **`goedel_first_true`** : `G` es verdadera-pero-indemostrable (su código
+  no es `Provable`, que es exactamente lo que `G` afirma).
+- ✅ **`incompleteness`** : `Consistent → ∃ φ, ¬(axioms ⊢ φ)`.
+
+**Pendiente** (requieren más, documentado en `Incompleteness.lean`):
+
+- ⏳ **Otra mitad de Gödel I** (`⊬ ¬G`): necesita **ω-consistencia** (Gödel) o
+  eliminación de doble negación object-level (FOL aquí es **intuicionista** —
+  la DNE sólo está con `doubleNegAxiom` en contexto), o el **truco de Rosser**.
+- ⏳ **Gödel II** (`⊬ Con`): necesita las condiciones **D2** (`Prov(⌜A⇒B⌝) ⇒
+  Prov(⌜A⌝)⇒Prov(⌜B⌝)`) y **D3** (`Prov(⌜A⌝) ⇒ Prov(⌜Prov(⌜A⌝)⌝)`), no
+  postuladas en el Nivel C.
+
+**Sutileza ω-lógica** (honestidad): el sistema de RPP usa la meta-regla `gen`
+(ω-regla, `FOL/MetaRules.lean`), que hace `axioms ⊢` no finitariamente r.e. El
+Nivel D deriva la **lógica** de Gödel I *dadas* las condiciones de
+demostrabilidad como postulados — el ejercicio estándar de libro. La
+justificación de esos postulados para el sistema concreto (finitario vs
+ω-lógico) es una discusión meta-teórica separada.
 
 Los niveles B y C **pueden coexistir con `Minimal/`** porque sólo usan meta-codificación. El nivel D requerirá la maquinaria de `Intermediate/` o `Full/` (inducción para las propiedades de `Dem`).
 

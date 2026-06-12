@@ -120,8 +120,11 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 
 ### 4.2. Restantes tras TFA
 
-- [ ] **Nivel D Gödel** (`Meta/Incompleteness.lean`): desbloqueado por TFA. Gödel I + II internos.
+- [x] **Nivel D Gödel — mitad esencial** (`Meta/Incompleteness.lean`, 2026-06-12): `goedel_first_unprovable` (`Consistent → ⊬ G`), `goedel_first_true`, `incompleteness`. Derivado de las condiciones D1 + diagonalización del Nivel C.
+- [ ] **Gödel I otra mitad** (`⊬ ¬G`): necesita ω-consistencia / DNE object-level (FOL intuicionista) / Rosser.
+- [ ] **Gödel II** (`⊬ Con`): necesita condiciones D2, D3 (no postuladas en Nivel C).
 - [ ] **Cadena de embeddings**: `FOL⁼ ⊂ Minimal ⊂ Full`.
+- [ ] **[Deuda menor]** Refactor meta-axiomas FOL → ✅ HECHO 2026-06-12 (`FOL/MetaRules.lean`).
 
 ---
 
