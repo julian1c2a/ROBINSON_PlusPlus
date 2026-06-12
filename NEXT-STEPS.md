@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-11 — **`Full/StrongInduction.lean` (Eje 4 F1)**: `strong_induction` (course-of-values) **DERIVADA de `ax_induction` sin axioma nuevo** + lema clave `substFormula_liftFormula` + `lt_succ_split`. Primera pieza hacia Ax-P/TFA. Previo en la misma sesión: `Full/Lists.lean` (ax_C3/L3 vía `ax_list_induction`), `Full/Mod2.lean` (ax21/24, Opción C.2), `Intermediate/` eliminado. Estado fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2 + inducción listas), **17 módulos** (Minimal/ 11 + Meta×2 + Full/Induction + Full/Mod2 + Full/Lists + Full/StrongInduction), 0 sorrys, 0 warnings (30 jobs).
+**Last updated:** 2026-06-11 — **Capa de representabilidad (cimientos hacia TFA)**: tras detectar la obstrucción foundational (Muros 1/2: FOL= no da testigos meta ni case-split meta), reencuadre **numerales + representabilidad** (Gödel-aware, reutiliza Peano). HECHO: `Full/Numerals.lean` (homomorfismo `numeral_add/mul/pow`, `numeral_lt`, `numeral_ne`), `Full/Bounded.lean` (`le_numeral_split`: acotado → casos finitos), `Full/Divisibility.lean` (`numeral_dvd`, `divisor_le`). Previo: F1 `Full/StrongInduction.lean`, `Full/Lists.lean`, `Full/Mod2.lean`, `Intermediate/` eliminado. Fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas, **20 módulos** (Minimal/ 11 + Meta×2 + Full ×7: Induction, Mod2, Lists, StrongInduction, Numerals, Bounded, Divisibility), 0 sorrys, 0 warnings (33 jobs).
 
 ---
 
@@ -91,16 +91,25 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 
 **Objetivo (PLANNING §6.3)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax_C3, ax_L3) y el meta-axioma `ax_p_tfa` (TFA) se vuelven teoremas. Habilita el **Nivel D** del frente Gödel: Gödel I y II demostrados internamente.
 
-### 4.1. Roadmap de Ax-P / TFA (en curso)
+### 4.1. Roadmap de Ax-P / TFA — reencuadre **numerales + representabilidad** (2026-06-11)
 
-Derivar `ax_p_tfa` (TFA) como teorema. Descomposición en 6 fases:
+**Obstrucción foundational detectada** al intentar F2 meta-nivel: en FOL=, (Muro 1) los existenciales object no dan testigos meta — `ex_elim` sólo concluye `axioms ⊢ C`; y (Muro 2) las disyunciones object (tricotomía) no se eliminan a conclusión meta. Por eso `strong_induction_meta` con case-split **no funciona**, y derivar el `ax_p_tfa` *meta* de Block8 con testigos usables es **equivalente a la maquinaria de representabilidad de Gödel** (no hay atajo).
 
-- [x] **F1 — Inducción fuerte** (`Full/StrongInduction.lean`, 2026-06-11): `strong_induction` (course-of-values) **derivada de `ax_induction` sin axioma nuevo**, vía motivo auxiliar `ψ(k):=∀m,m<k⇒φ(m)`. + `substFormula_liftFormula` (lema clave subst-deshace-lift) + `lt_succ_split`. **Alcance**: predicados object-level (`φ : Formula`). Para la meta-Prop `IsFactorization` hará falta un puente meta `strong_induction_meta` (φ : Term → Prop) — NO derivable de `ax_induction`, será meta-axioma (análogo a `ax_list_induction`).
-- [ ] **F2 — Algoritmo de la división**: `∀n d, d>0 → ∃!q r, n = q·d + r ∧ r < d`. Por inducción fuerte en n. (~250 LOC)
-- [ ] **F3 — Existencia de factor primo**: `∀n, n>1 → ∃p, IsPrime p ∧ p∣n`. Por buen-ordenamiento (mínimo divisor >1 es primo). (~200 LOC)
-- [ ] **F4 — Existencia de factorización**: por inducción fuerte. n=1→vacía; n>1→factor primo p + factorizar n/p. (~300 LOC). **Requiere el puente meta** de F1.
-- [ ] **F5 — Lema de Euclides**: `IsPrime p ∧ p∣a·b → p∣a ∨ p∣b`. (~200 LOC)
-- [ ] **F6 — Unicidad** + `ax_p_tfa_thm`: por inducción + Euclides + cancelación. (~300 LOC)
+**Decisión (Opción A, Gödel-aware)**: como Gödel Nivel D necesita representabilidad de todos modos, se construye esa capa una vez y TFA cae como corolario. Se trabaja sobre **numerales** (`numeral n = σⁿ(0)`) con **cómputo meta en ℕ + transferencia** vía homomorfismo. Disuelve los dos muros (lo decisional/constructivo ocurre en ℕ). Reutiliza Peano como cómputo meta.
+
+**Capa de representabilidad (cimientos) — HECHO 2026-06-11**:
+
+- [x] **F1 — Inducción fuerte object** (`Full/StrongInduction.lean`): `strong_induction` derivada de `ax_induction` sin axioma nuevo + `substFormula_liftFormula` + `lt_succ_split`.
+- [x] **Numerales** (`Full/Numerals.lean`): `numeral : ℕ → Term` + homomorfismo `numeral_add/mul/pow`, orden `numeral_lt`, separación `numeral_ne`. El puente meta↔object.
+- [x] **Cuantificación acotada** (`Full/Bounded.lean`): `le_numeral_split` — `d ≤ numeral n` ⇒ casos finitos `d = numeral i`. Convierte ∀ acotado en análisis finito.
+- [x] **Divisibilidad** (`Full/Divisibility.lean`): `numeral_dvd` (meta ∣ → object Dvd) + `divisor_le` (divisor de positivo es ≤).
+
+**Capa de teoría de números (pendiente)**:
+
+- [ ] **Primalidad representada**: `isPrime_numeral` — `p` primo (meta) ⇒ `IsPrime (numeral p)`. Vía `le_numeral_split` (acotar divisor) + `divisor_le` + split anidado sobre el cofactor. (~150 LOC)
+- [ ] **División sobre numerales**: cómputo meta `n = q·d+r` + transferencia. (Trivial con homomorfismo; ya no necesita inducción fuerte object.)
+- [ ] **Factor primo / factorización**: `tfa_numeral` — `k ≥ 2` (meta) ⇒ factorización object de `numeral k`. Cómputo en ℕ (reusando Peano) + transferencia primorial (`numeral_pow`).
+- [ ] **Unicidad** + relación con `ax_p_tfa` de Block8 (versión numeral; la versión ∀-Term general queda como idealización).
 
 ### 4.2. Restantes tras TFA
 
