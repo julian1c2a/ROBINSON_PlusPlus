@@ -108,6 +108,40 @@ theorem numeral_mul (a b : Nat) :
       numeral_add (a * k) a
     exact FOL.derive_eq_trans (FOL.derive_eq_trans h9 hcongr) hhom
 
+/-! ### Homomorfismo de la potencia -/
+
+private theorem pow_zero_t (a : Term) : axioms ⊢ (pow a zero =eq one) := by
+  have hh := spec (ax (by simp [axioms] : ax_pow_zero ∈ axioms)) a
+  simp [substFormula, substTerm, substTerms, pow, zero, one, succ] at hh; exact hh
+
+private theorem pow_succ_t (a b : Term) :
+    axioms ⊢ (pow a (succ b) =eq mul (pow a b) a) := by
+  have hh := spec (spec (ax (by simp [axioms] : ax_pow_succ ∈ axioms)) a) b
+  simp [substFormula, substTerm, substTerms, pow, mul, succ, FOL.substTerm_liftTerm] at hh
+  exact hh
+
+/-- `axioms ⊢ numeral a ^ numeral b = numeral (a ^ b)`. Por inducción meta en `b`.
+    Base de la codificación primorial de secuencias para Gödel. -/
+theorem numeral_pow (a b : Nat) :
+    axioms ⊢ (pow (numeral a) (numeral b) =eq numeral (a ^ b)) := by
+  induction b with
+  | zero =>
+    -- pow (numeral a) zero =eq one = numeral 1 = numeral (a^0)
+    exact pow_zero_t (numeral a)
+  | succ k ih =>
+    -- pow (numeral a)(succ (numeral k)) =eq mul (pow (numeral a)(numeral k)) (numeral a)
+    -- = mul (numeral (a^k)) (numeral a) = numeral (a^k * a) = numeral (a^(k+1))
+    show axioms ⊢ (pow (numeral a) (succ (numeral k)) =eq numeral (a ^ k * a))
+    have hps : axioms ⊢ (pow (numeral a) (succ (numeral k)) =eq
+                         mul (pow (numeral a) (numeral k)) (numeral a)) :=
+      pow_succ_t (numeral a) (numeral k)
+    have hcongr : axioms ⊢ (mul (pow (numeral a) (numeral k)) (numeral a) =eq
+                            mul (numeral (a ^ k)) (numeral a)) :=
+      eq_congr_mul_right (u := numeral a) ih
+    have hhom : axioms ⊢ (mul (numeral (a ^ k)) (numeral a) =eq numeral (a ^ k * a)) :=
+      numeral_mul (a ^ k) a
+    exact FOL.derive_eq_trans (FOL.derive_eq_trans hps hcongr) hhom
+
 /-! ### Orden: `a < b` meta ⇒ `lt (numeral a) (numeral b)` object -/
 
 /-- `a < b` (meta) ⇒ `axioms ⊢ lt (numeral a) (numeral b)`.
