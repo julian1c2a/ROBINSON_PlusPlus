@@ -43,3 +43,7 @@ import ROBINSON_PlusPlus.Full.Lists
 -- Full: inducción fuerte (course-of-values) DERIVADA de ax_induction
 -- (sin axioma nuevo). Base para Ax-P (TFA). Ver NEXT-STEPS Eje 4 F1.
 import ROBINSON_PlusPlus.Full.StrongInduction
+
+-- Full: numerales — puente meta↔object (numeral : ℕ → Term) + homomorfismo
+-- de +, ·, <. Cimiento de la representabilidad (camino Gödel-aware a TFA).
+import ROBINSON_PlusPlus.Full.Numerals
