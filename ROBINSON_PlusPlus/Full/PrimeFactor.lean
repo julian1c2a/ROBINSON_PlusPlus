@@ -93,4 +93,114 @@ theorem primeFactorList : ∀ n : Nat, 1 ≤ n →
         rw [natProd_cons, hps'_prod]
         exact Nat.mul_div_cancel' hp_dvd
 
+/-! ### Lema de Euclides y UNICIDAD de la factorización (ℕ) -/
+
+/-- **Euclides**: `p` primo, `p ∣ a·b` ⇒ `p ∣ a ∨ p ∣ b`. Vía coprimalidad
+    (core: `Nat.Coprime.dvd_of_dvd_mul_left`); si `p ∤ a` entonces `gcd p a = 1`
+    (porque `gcd p a ∣ p` primo y `≠ p`). -/
+theorem euclid {p a b : Nat} (hp : IsPrimeNat p) (hdvd : p ∣ a * b) :
+    p ∣ a ∨ p ∣ b := by
+  by_cases ha : p ∣ a
+  · exact Or.inl ha
+  · have hcop : Nat.Coprime p a := by
+      have hg : Nat.gcd p a ∣ p := Nat.gcd_dvd_left p a
+      rcases hp.2 (Nat.gcd p a) hg with h1 | hpp
+      · exact h1
+      · exact absurd (hpp ▸ Nat.gcd_dvd_right p a) ha
+    exact Or.inr (hcop.dvd_of_dvd_mul_left hdvd)
+
+/-- Dos primos con `p ∣ q` son iguales. -/
+theorem prime_dvd_prime_eq {p q : Nat} (hp : IsPrimeNat p) (hq : IsPrimeNat q)
+    (hpq : p ∣ q) : p = q := by
+  rcases hq.2 p hpq with h1 | h
+  · exact absurd h1 (by have := hp.1; omega)
+  · exact h
+
+/-- **Euclides iterado**: un primo que divide al producto de una lista divide a
+    algún elemento. -/
+theorem euclid_list {p : Nat} (hp : IsPrimeNat p) :
+    ∀ qs : List Nat, p ∣ natProd qs → ∃ q ∈ qs, p ∣ q := by
+  intro qs
+  induction qs with
+  | nil =>
+    intro h
+    have h1 := Nat.eq_one_of_dvd_one h
+    have := hp.1; omega
+  | cons a as ih =>
+    intro h
+    rcases euclid hp h with ha | hrest
+    · exact ⟨a, List.mem_cons_self, ha⟩
+    · obtain ⟨q, hq_mem, hpq⟩ := ih hrest
+      exact ⟨q, List.mem_cons_of_mem a hq_mem, hpq⟩
+
+/-- `q ∈ qs ⇒ natProd qs = q · natProd (qs.erase q)`. -/
+theorem natProd_erase : ∀ (qs : List Nat) (q : Nat), q ∈ qs →
+    natProd qs = q * natProd (qs.erase q) := by
+  intro qs
+  induction qs with
+  | nil => intro q hq; cases hq
+  | cons a as ih =>
+    intro q hq
+    by_cases haq : a = q
+    · subst haq; simp [List.erase_cons_head]
+    · have hq_as : q ∈ as := by
+        rcases List.mem_cons.mp hq with h | h
+        · exact absurd h.symm haq
+        · exact h
+      have herase : (a :: as).erase q = a :: as.erase q := by
+        simp [haq]
+      rw [herase, natProd_cons, natProd_cons, ih q hq_as]
+      exact Nat.mul_left_comm a q _
+
+/-- Producto `1` con factores `≥ 2` ⇒ lista vacía. -/
+theorem natProd_eq_one_imp_nil : ∀ (qs : List Nat), (∀ q ∈ qs, 2 ≤ q) →
+    natProd qs = 1 → qs = [] := by
+  intro qs
+  cases qs with
+  | nil => intro _ _; rfl
+  | cons a as =>
+    intro hge h
+    have ha1 : a = 1 := Nat.eq_one_of_dvd_one ⟨natProd as, h.symm⟩
+    have := hge a List.mem_cons_self; omega
+
+/-- **Unicidad (multiplicidades)**: dos factorizaciones primas del mismo `n`
+    tienen cada primo con la misma multiplicidad. Por inducción en `ps`,
+    cancelando un primo común (Euclides + `natProd_erase`). -/
+theorem count_unique : ∀ (ps qs : List Nat),
+    (∀ p ∈ ps, IsPrimeNat p) → (∀ q ∈ qs, IsPrimeNat q) →
+    natProd ps = natProd qs → ∀ r, List.count r ps = List.count r qs := by
+  intro ps
+  induction ps with
+  | nil =>
+    intro qs _ hqs hprod r
+    have hqs_nil : qs = [] :=
+      natProd_eq_one_imp_nil qs (fun q hq => (hqs q hq).1) hprod.symm
+    subst hqs_nil; rfl
+  | cons p ps' ih =>
+    intro qs hps hqs hprod r
+    have hp_prime : IsPrimeNat p := hps p List.mem_cons_self
+    have hp_pos : 0 < p := by have := hp_prime.1; omega
+    have hp_dvd : p ∣ natProd qs := ⟨natProd ps', by rw [← hprod, natProd_cons]⟩
+    obtain ⟨q, hq_mem, hpq⟩ := euclid_list hp_prime qs hp_dvd
+    have hq_prime : IsPrimeNat q := hqs q hq_mem
+    have hpq_eq : p = q := prime_dvd_prime_eq hp_prime hq_prime hpq
+    subst hpq_eq
+    have herase : natProd qs = p * natProd (qs.erase p) := natProd_erase qs p hq_mem
+    have hcancel : natProd ps' = natProd (qs.erase p) := by
+      apply Nat.eq_of_mul_eq_mul_left hp_pos
+      calc p * natProd ps' = natProd (p :: ps') := (natProd_cons p ps').symm
+        _ = natProd qs := hprod
+        _ = p * natProd (qs.erase p) := herase
+    have hps' : ∀ x ∈ ps', IsPrimeNat x := fun x hx => hps x (List.mem_cons_of_mem p hx)
+    have hqs' : ∀ x ∈ qs.erase p, IsPrimeNat x := fun x hx => hqs x (List.mem_of_mem_erase hx)
+    have ih_r := ih (qs.erase p) hps' hqs' hcancel r
+    rw [List.count_cons, (List.perm_cons_erase hq_mem).count_eq r, List.count_cons, ih_r]
+
+/-- **Unicidad (permutación)**: dos factorizaciones primas del mismo `n` son
+    permutaciones una de la otra. Es el TFA-unicidad en `ℕ`. -/
+theorem factorization_perm_unique (ps qs : List Nat)
+    (hps : ∀ p ∈ ps, IsPrimeNat p) (hqs : ∀ q ∈ qs, IsPrimeNat q)
+    (hprod : natProd ps = natProd qs) : ps.Perm qs :=
+  List.perm_iff_count.mpr (count_unique ps qs hps hqs hprod)
+
 end ROBINSON_PlusPlus.Full
