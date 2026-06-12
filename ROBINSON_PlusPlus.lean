@@ -53,3 +53,6 @@ import ROBINSON_PlusPlus.Full.Bounded
 
 -- Full: divisibilidad representada — numeral_dvd + divisor_le.
 import ROBINSON_PlusPlus.Full.Divisibility
+
+-- Full: primalidad representada — isPrime_numeral.
+import ROBINSON_PlusPlus.Full.Primality
