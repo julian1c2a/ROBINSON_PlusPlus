@@ -6,6 +6,7 @@ License: MIT
 
 import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬ ⇒ ⇔ ∀. ∃. ⊥ ⊤ #
 import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
+import FOL.MetaRules    -- meta-reglas ω de deducción (imp_intro, gen, raa, or_elim, ex_elim, wrappers)
 
 set_option linter.unusedSimpArgs false
 
@@ -526,71 +527,17 @@ theorem eq_congr_pred {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ �
   exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (pred t₁))
 
 -- ## Additional Proof Helpers
-
-/-- Modus ponens: from Γ ⊢ A ⇒ B and Γ ⊢ A, conclude Γ ⊢ B. -/
-def mp {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇒ B)) (h2 : Γ ⊢ A) : Γ ⊢ B :=
-  Derives.elim_impl Γ A B h1 h2
-
-/-- Implication introduction (meta-level function → object-level implication).
-    Meta-axiom: sound for the object logic but not formally derivable from Derives alone. -/
-axiom imp_intro {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A → Γ ⊢ B) : Γ ⊢ (A ⇒ B)
-
-/-- Universal generalization (ω-rule): from (∀ n, Γ ⊢ substFormula 0 n A), conclude Γ ⊢ ∀A.
-    Meta-axiom: requires the ω-rule, not derivable from Derives.intro_forall alone. -/
-axiom gen {Γ : List Formula} {A : Formula} (h : ∀ n : Term, Γ ⊢ substFormula 0 n A) :
-    Γ ⊢ Formula.forall A
-
-/-- Reductio ad absurdum (classical): from Γ ⊢ A → ⊥, conclude Γ ⊢ ¬A.
-    Meta-axiom: sound for the object logic. -/
-axiom raa {Γ : List Formula} {A : Formula} (h : Γ ⊢ A → Γ ⊢ ⊥) : Γ ⊢ ¬A
-
-/-- Conjunction introduction. -/
-def and_intro {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ A) (h2 : Γ ⊢ B) : Γ ⊢ (A ∧ B) :=
-  Derives.intro_and Γ A B h1 h2
-
-/-- Left conjunction elimination. -/
-def and_elim_left {Γ : List Formula} {A B : Formula} (h : Γ ⊢ (A ∧ B)) : Γ ⊢ A :=
-  Derives.elim_and_l Γ A B h
-
-/-- Right conjunction elimination. -/
-def and_elim_right {Γ : List Formula} {A B : Formula} (h : Γ ⊢ (A ∧ B)) : Γ ⊢ B :=
-  Derives.elim_and_r Γ A B h
-
-/-- Left disjunction introduction. -/
-def or_intro_left {Γ : List Formula} {A B : Formula} (h : Γ ⊢ A) : Γ ⊢ (A ∨ B) :=
-  Derives.intro_or_l Γ A B h
-
-/-- Right disjunction introduction. -/
-def or_intro_right {Γ : List Formula} {A B : Formula} (h : Γ ⊢ B) : Γ ⊢ (A ∨ B) :=
-  Derives.intro_or_r Γ A B h
-
-/-- Disjunction elimination (meta-level case split).
-    Meta-axiom: sound for the object logic. -/
-axiom or_elim {Γ : List Formula} {A B C : Formula}
-    (h : Γ ⊢ (A ∨ B)) (h1 : Γ ⊢ A → Γ ⊢ C) (h2 : Γ ⊢ B → Γ ⊢ C) : Γ ⊢ C
-
-/-- False elimination (ex falso). -/
-def false_elim {Γ : List Formula} {A : Formula} (h : Γ ⊢ ⊥) : Γ ⊢ A :=
-  Derives.bot_elim Γ A h
-
-/-- Existential introduction. -/
-def ex_intro {Γ : List Formula} {A : Formula} (t : Term)
-    (h : Γ ⊢ substFormula 0 t A) : Γ ⊢ Formula.ex A :=
-  Derives.intro_ex Γ A t h
-
-/-- Existential elimination (meta-level witness extraction).
-    Meta-axiom: sound for the object logic. -/
-axiom ex_elim {Γ : List Formula} {A C : Formula}
-    (h : Γ ⊢ Formula.ex A)
-    (cont : ∀ t : Term, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C
-
-/-- Forward direction of biconditional. -/
-def iff_mp {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇔ B)) (h2 : Γ ⊢ A) : Γ ⊢ B :=
-  Derives.elim_impl Γ A B (Derives.elim_and_l Γ (A ⇒ B) (B ⇒ A) h1) h2
-
-/-- Backward direction of biconditional. -/
-def iff_mpr {Γ : List Formula} {A B : Formula} (h1 : Γ ⊢ (A ⇔ B)) (h2 : Γ ⊢ B) : Γ ⊢ A :=
-  Derives.elim_impl Γ B A (Derives.elim_and_r Γ (A ⇒ B) (B ⇒ A) h1) h2
+--
+-- Las meta-reglas de deducción (5 meta-axiomas ω — `imp_intro`, `gen`, `raa`,
+-- `or_elim`, `ex_elim` — y los wrappers derivables `mp`, `and_intro`,
+-- `and_elim_left/right`, `or_intro_left/right`, `false_elim`, `ex_intro`,
+-- `iff_mp`, `iff_mpr`) son **lógica pura de FOL=** y viven ahora en
+-- `FOL/MetaRules.lean` (refactor 2026-06-12, ver ADR-008 y
+-- MINIMAL-AXIOMS.md §3.5.1). Se **re-exportan** aquí para que todo el código
+-- existente (`Minimal.Axioms.or_elim`, `open Minimal.Axioms`, …) siga
+-- resolviendo sin cambios.
+export FOL.MetaRules (mp imp_intro gen raa and_intro and_elim_left and_elim_right
+  or_intro_left or_intro_right or_elim false_elim ex_intro ex_elim iff_mp iff_mpr)
 
 /-- Equality substitution (used to rewrite equality hypotheses). -/
 theorem eq_subst {Γ : List Formula} {t₁ t₂ : Term} {A : Formula}
