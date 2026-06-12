@@ -100,14 +100,19 @@ partir de las condiciones de demostrabilidad postuladas en el Nivel C:
   no es `Provable`, que es exactamente lo que `G` afirma).
 - ✅ **`incompleteness`** : `Consistent → ∃ φ, ¬(axioms ⊢ φ)`.
 
-**Pendiente** (requieren más, documentado en `Incompleteness.lean`):
+- ✅ **Gödel II** (`goedel_second`, 2026-06-12): `Consistent → ¬(axioms ⊢ Con)`
+  con `Con := ¬Prov(⌜⊥⌝)`. **Postulando D2 y D3** (condiciones de
+  Hilbert-Bernays-Löb; D1 ya estaba vía `provFormula_repr`). Lema crucial
+  `con_imp_goedelSentence : ⊢ (Con ⇒ G)` (Gödel I formalizado), derivado de
+  D1/D2/D3 + punto fijo. Notable: toda la cadena (incl. contrapositiva) se
+  construye con `imp_intro`/`mp`, **sin DNE object-level** — funciona en el FOL
+  intuicionista.
+
+**Pendiente** (requiere más, documentado en `Incompleteness.lean`):
 
 - ⏳ **Otra mitad de Gödel I** (`⊬ ¬G`): necesita **ω-consistencia** (Gödel) o
   eliminación de doble negación object-level (FOL aquí es **intuicionista** —
   la DNE sólo está con `doubleNegAxiom` en contexto), o el **truco de Rosser**.
-- ⏳ **Gödel II** (`⊬ Con`): necesita las condiciones **D2** (`Prov(⌜A⇒B⌝) ⇒
-  Prov(⌜A⌝)⇒Prov(⌜B⌝)`) y **D3** (`Prov(⌜A⌝) ⇒ Prov(⌜Prov(⌜A⌝)⌝)`), no
-  postuladas en el Nivel C.
 
 **Sutileza ω-lógica** (honestidad): el sistema de RPP usa la meta-regla `gen`
 (ω-regla, `FOL/MetaRules.lean`), que hace `axioms ⊢` no finitariamente r.e. El
