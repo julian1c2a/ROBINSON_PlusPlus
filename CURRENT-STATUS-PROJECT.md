@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-07
+**Last updated:** 2026-06-12
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,17 +9,18 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 16 (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2 + Full/Lists) |
-| Modules sin sorry | 16 / 16 ✅ |
+| Total modules | 25 (Minimal/ 11 + Meta/ 3 [Godel, Provability, Incompleteness] + Full/ 11) |
+| Modules sin sorry | 25 / 25 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Meta-axiomas (no son sorry) | 5 FOL (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + `ax_p_tfa` (Block8) + 5 Gödel Nivel C (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma`) + 3 Full: `ax_induction` (esquema general), `ax_mod2_alternation` (recursión mod2), `ax_list_induction` (inducción estructural listas) |
-| Axiomas matemáticos | **34** en `Minimal/` (25 aritm + 7 listas + 2 factorización); en `Full/` **ax6/7/10/11/12/18/19/21/24/_C3/_L3** ya son **teoremas** vía `ax_induction` (+ `ax_mod2_alternation` para mod2, `ax_list_induction` para listas) |
-| Total definitions | ~85 |
-| Build status | ✅ Passing (28 jobs, 0 errores, **0 warnings**, 0 sorrys) |
+| Meta-reglas FOL (ω) | 5 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) — refactor 2026-06-12, re-export desde `Minimal.Axioms` |
+| Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C); `D2`/`D3` (Incompleteness D) |
+| Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
+| Gödel | **A, B, C, D** ✅ — Nivel D: Gödel I (mitad esencial) + **Gödel II** (`goedel_second`, vía D2/D3) |
+| Build status | ✅ Passing (**39 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
-> **Nota**: Todos los módulos compilan sin errores. Los 5 `axiom` declarations en `Axioms.lean` son meta-reglas de FOL (no provables, intencionales) y NO son `sorry`s.
+> **Nota**: Todos los módulos compilan sin errores. Las 5 meta-reglas ω y los meta-axiomas matemáticos son `axiom` (intencionales, no provables), NO `sorry`s (ADR-008).
 
 ---
 

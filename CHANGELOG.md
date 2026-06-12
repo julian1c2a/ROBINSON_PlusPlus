@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-11 — **`Full/Lists.lean`**: `ax_C3_concat_assoc` y `ax_L3_in_concat` **derivados como teoremas en Full** vía meta-axioma `ax_list_induction` (estilo `imp_intro`/`gen`, inducción estructural sobre listas parametrizada por `φ : Term → Formula`). Previo en la misma sesión: `Full/Mod2.lean` (Opción C.2 con ax21/24), `Intermediate/` eliminado. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas (Gödel + inducción + alternancia mod2 + inducción listas), **16 módulos** (Minimal/ 11 + Meta/Godel + Meta/Provability + Full/Induction + Full/Mod2 + Full/Lists), build verde (29 jobs) 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-12 — **TFA completo + Gödel I/II + refactor meta-reglas**. `Full/` cierra el **Teorema Fundamental de la Aritmética** (`tfa_numeral`: existencia object ∧ unicidad ℕ) sobre una capa de **representabilidad** (numerales + homomorfismo + Euclides), autocontenido sin Mathlib/Peano. `Meta/Incompleteness.lean` (Nivel D): **Gödel I** mitad esencial + **Gödel II** (postulando D2/D3). Las 5 meta-reglas ω de deducción se movieron a **`FOL/MetaRules.lean`** (re-export desde `Minimal.Axioms`). **25 módulos** (Minimal 11 + Meta 3 + Full 11), build verde (39 jobs) 0 warnings / 0 sorrys.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,26 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-12) — Gödel Nivel D: Incompletitud (Meta/Incompleteness.lean)
+
+- **Gödel I (mitad esencial)**: `goedel_first_unprovable : Consistent → ⊬ goedelSentence` (si el sistema es consistente, `G` no es demostrable), `goedel_first_true` (`G` verdadera-pero-indemostrable), `incompleteness`. Derivado de D1 (`provFormula_repr`) + diagonalización (`goedelSentence_fixedpoint`) del Nivel C.
+- **Gödel II**: `goedel_second : Consistent → ⊬ consistencyFormula` (`Con := ¬Prov(⌜⊥⌝)`). **Postulando D2 y D3** (Hilbert-Bernays-Löb). Lema crucial `con_imp_goedelSentence : ⊢ (Con ⇒ G)` (Gödel I formalizado). Toda la cadena HBL (incl. contrapositiva) con `imp_intro`/`mp`, **sin DNE object-level** → funciona en el FOL intuicionista.
+- Pendiente: otra mitad de Gödel I (`⊬ ¬G`, vía ω-consistencia/Rosser).
+
+### Changed (2026-06-12) — refactor: meta-reglas ω → FOL/MetaRules.lean
+
+- Las 5 meta-axiomas ω (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) + wrappers de `Derives` (`mp`, `and_*`, `or_intro_*`, `false_elim`, `ex_intro`, `iff_*`) movidos de `Minimal/Axioms.lean` (lógica pura conviviendo con axiomas aritméticos) a **`FOL/MetaRules.lean`** (namespace `FOL.MetaRules`). `Minimal.Axioms` los **re-exporta** → cero churn en sitios de uso. FOL gana la ω-regla como axioma (documentado). Commits: FOL `084dbd2`, RPP `5fc89bb`.
+
+### Added (2026-06-12) — Full: TFA completo + capa de representabilidad
+
+- **Reencuadre numerales + representabilidad** (Gödel-aware): tras detectar que `ax_p_tfa` (meta de Block8) no admite discharge constructivo (object existenciales no dan testigos meta; disyunciones object no se eliminan a meta), se trabaja sobre **numerales** (`numeral n = σⁿ(0)`) con cómputo meta en ℕ + transferencia por homomorfismo.
+- **`Full/Numerals.lean`**: `numeral` + homomorfismo `numeral_add/mul/pow`, orden `numeral_lt`, separación `numeral_ne`.
+- **`Full/StrongInduction.lean`**: `strong_induction` (course-of-values) **DERIVADA de `ax_induction` sin axioma nuevo** + `substFormula_liftFormula` + `lt_succ_split`.
+- **`Full/Bounded.lean`**: `le_numeral_split` (cuantificación acotada → casos finitos).
+- **`Full/Divisibility.lean`**: `numeral_dvd`, `divisor_le`. **`Full/Division.lean`**: `division_numeral`. **`Full/Primality.lean`**: `isPrime_numeral`.
+- **`Full/PrimeFactor.lean`** (ℕ pura, sin Mathlib): `exists_prime_factor`, `primeFactorList`, **lema de Euclides** (`euclid` vía `Nat.Coprime.dvd_of_dvd_mul`), unicidad (`count_unique`, `factorization_perm_unique` vía `List.perm_cons_erase`).
+- **`Full/Factorization.lean`**: `toTerm`, `prod_pairs_toTerm`, **`tfa_numeral`** — TFA completo (existencia object ∧ unicidad ℕ). El `ax_p_tfa` de Block8 queda como forma idealizada.
 
 ### Added (2026-06-11) — Full/Lists.lean: ax_C3 y ax_L3 derivados (inducción estructural)
 

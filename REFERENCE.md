@@ -51,12 +51,22 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 + Ax-P TFA; +10 teoremas: álgebra de `Dvd` y corolarios TFA) |
 | `Meta/Godel.lean` | `…Meta.Godel` | `Axioms`, `Block6` | ✅ Complete (Nivel B: `G`, `⌜·⌝`, Teo G1) |
 | `Meta/Provability.lean` | `…Meta.Provability` | `Axioms`, `Meta.Godel`, `FOL.*` | ✅ Complete (Nivel C: `formCode`, `IsFormula`, `Dem`, `diagonal_lemma`, `goedelSentence`) |
-| `Intermediate/Induction.lean` | `…Intermediate` | `Axioms`, `Block1`, `FOL.*` | ✅ Prototipo (inducción meta `peano_induction`; `add_comm` derivado) |
-| `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | 🔄 En curso (inducción general object-level; ax6/7/10/11/12/18/19 derivados) |
+| `Meta/Incompleteness.lean` | `…Meta.Incompleteness` | `Axioms`, `Meta.Godel`, `Meta.Provability`, `FOL.*` | ✅ Complete (Nivel D: Gödel I mitad esencial + Gödel II vía D2/D3) |
+| `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | ✅ ax6/7/10/11/12/18/19 derivados |
+| `Full/Mod2.lean` | `…Full` | `Axioms`, `Block1`, `Full.Induction` | ✅ ax21/ax24 (Opción C.2) |
+| `Full/Lists.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ ax_C3/ax_L3 (`ax_list_induction`) |
+| `Full/StrongInduction.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ inducción fuerte DERIVADA |
+| `Full/Numerals.lean` | `…Full` | `Axioms`, `Block1`, `Full.Induction` | ✅ puente `numeral` + homomorfismo |
+| `Full/Bounded.lean` | `…Full` | `Axioms`, `Full.{Induction,StrongInduction,Numerals}` | ✅ `le_numeral_split` |
+| `Full/Divisibility.lean` | `…Full` | `Axioms`, `Block1`, `Block8`, `Full.*` | ✅ `numeral_dvd`, `divisor_le` |
+| `Full/Division.lean` | `…Full` | `Axioms`, `Full.Numerals` | ✅ `division_numeral` |
+| `Full/PrimeFactor.lean` | `…Full` | (ℕ pura, sin imports) | ✅ factor primo + factorización + **Euclides + unicidad** |
+| `Full/Primality.lean` | `…Full` | `Axioms`, `Block1`, `Block8`, `Full.*` | ✅ `isPrime_numeral` |
+| `Full/Factorization.lean` | `…Full` | `Axioms`, `Block8`, `Full.{Numerals,PrimeFactor}` | ✅ **`tfa_numeral`** (TFA completo) |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
-**Sorrys reales totales**: 0. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas FOL declaradas con `axiom`, no `:= sorry` (ver `DECISIONS.md` ADR-008).
+**Total**: 25 módulos fuente (Minimal 11 + Meta 3 + Full 11), build verde **39 jobs**, **0 sorrys, 0 warnings**. Las meta-reglas ω de deducción (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) viven en `FOL/MetaRules.lean` (refactor 2026-06-12, re-export desde `Minimal.Axioms`); son `axiom`, no `:= sorry` (ADR-008). Meta-axiomas adicionales: `ax_p_tfa` (Block8), `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full), `Dem`/`diagonal_lemma`/`provFormula`/`provFormula_repr`/`dem_iff_provable` (Provability), `D2`/`D3` (Incompleteness).
 
 ---
 
@@ -761,84 +771,133 @@ demuestran sin postular nada. La **aritmetización de `Dem`**, la **representabi
 
 ---
 
-### 3.14 `Intermediate/Induction.lean` — Prototipo de inducción (Eje 3)
-
-**Namespace**: `ROBINSON_PlusPlus.Intermediate`
-**Status**: ✅ Prototipo (validación de viabilidad de la inducción)
-**@importance**: `medium`
-**@axiom_system**: `Intermediate` (añade el esquema de inducción)
-**Last updated**: 2026-06-06 (creado)
-**Dependencias**: `Axioms`, `Block1`, `FOL.*`.
-
-Prototipo para decidir Intermediate-vs-Full. Usa la inducción en **forma meta**
-(paso meta, conclusión object), que maneja el caso multivariable directamente.
-
-```lean
--- Meta-axioma (forma híbrida, análoga a `gen`):
-axiom peano_induction (φ : Formula)
-    (base : axioms ⊢ substFormula 0 zero φ)
-    (step : ∀ n, axioms ⊢ substFormula 0 n φ → axioms ⊢ substFormula 0 (succ n) φ) :
-    axioms ⊢ Formula.forall φ
-theorem zero_add_ind  : axioms ⊢ ∀. (add zero #0 =eq #0)                 -- sin ax6
-theorem succ_add_ind (a) : axioms ⊢ ∀. (add (σ a) #0 =eq σ (add a #0))   -- multivariable
-theorem add_comm_ind (a) : axioms ⊢ ∀. (add a #0 =eq add #0 a)
-theorem add_comm_thm     : axioms ⊢ ax6_add_comm                          -- ax6 como teorema
-```
-
-**Hallazgo**: la inducción general (Full) se formula/usa con la misma facilidad
-que una restringida a Φ → `Full/` es el camino de menor fricción; `Intermediate/`
-aporta valor conceptual (la gradación). Por eso el trabajo serio sigue en `Full/`.
-
----
-
-### 3.15 `Full/Induction.lean` — Inducción general object-level (Eje 4)
+### 3.14 `Full/` — Inducción general, representabilidad y TFA (Eje 4)
 
 **Namespace**: `ROBINSON_PlusPlus.Full`
-**Status**: 🔄 En curso (object-level lift-aware; algebraicos ecuacionales + ax18/ax19 (orden) hechos)
+**Status**: ✅ Fragmento aritmético + listas de Minimal derivado; **TFA completo**
 **@importance**: `high`
-**@axiom_system**: `Full` (inducción general como axioma object-level)
-**Last updated**: 2026-06-07
-**Dependencias**: `Axioms`, `FOL.*`.
+**@axiom_system**: `Full` (inducción general como axioma object-level + meta-axiomas)
+**Last updated**: 2026-06-12
+**Módulos** (11): `Induction`, `Mod2`, `Lists`, `StrongInduction`, `Numerals`, `Bounded`, `Divisibility`, `Division`, `PrimeFactor`, `Primality`, `Factorization`.
 
-`Full` añade la inducción general como **axioma object-level** (`ax_induction`);
-las pruebas son derivaciones object-level (`mp`/`gen`/`imp_intro`), sin regla
-meta de inducción. `φ(σn)` se codifica lift-aware para preservar parámetros.
+> **Nota histórica**: `Intermediate/Induction.lean` (prototipo de inducción meta, Eje 3) fue **eliminado 2026-06-11**: el sistema con Φ finito es el caso particular de Full con inducción general, sin valor técnico añadido. Toda la inducción vive en `Full/`.
 
-#### Esquema e infraestructura
+#### `Full/Induction.lean` — inducción general object-level
 
 ```lean
 def inductionFormula (φ : Formula) : Formula                 -- φ(0) ⇒ ((∀n φ(n)⇒φ(σn)) ⇒ ∀n φ(n))
 axiom ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ
-theorem induction_object {φ} (base step) : axioms ⊢ Formula.forall φ   -- doble mp sobre ax_induction
--- Composición De Bruijn (resuelve el caso multivariable):
-theorem substTerm_subst_succ_lift_gen (c m t)  : substTerm c m (substTerm c (σ#c) (liftTerm (c+1) t)) = substTerm c (σm) t
-theorem substFormula_succ_lift_gen (c m φ)     : substFormula c m (substFormula c (σ#c) (liftFormula (c+1) φ)) = substFormula c (σm) φ
-theorem step_reduce (n φ) : substFormula 0 n (φ ⇒ substFormula 0 (σ#0)(liftFormula 1 φ)) = (substFormula 0 n φ ⇒ substFormula 0 (σn) φ)
+theorem induction_object {φ} (base step) : axioms ⊢ Formula.forall φ
+-- Composición De Bruijn lift-aware (caso multivariable):
+theorem substFormula_succ_lift_gen / step_reduce …
+-- Axiomas de Minimal derivados como TEOREMAS:
+theorem add_comm_thm : axioms ⊢ ax6_add_comm        -- ax6 ;  add_assoc_ax (ax7)
+theorem mul_comm_thm : axioms ⊢ ax10_mul_comm       -- ax10 ; mul_assoc_ax (ax11), mul_distrib_ax (ax12)
+theorem lt_irrefl_thm : axioms ⊢ ax18_lt_irrefl     -- ax18 ; lt_trichotomy_thm (ax19)
+-- + lemas de orden: lt_succ_self, not_lt_zero, lt_succ_of_lt, zero_lt_succ, zero_or_succ_ax, lt_succ_cases
 ```
 
-#### Axiomas de `Minimal` derivados como teoremas
+#### `Full/Mod2.lean` — ax21, ax24 (Opción C.2)
 
 ```lean
-theorem add_comm_thm   : axioms ⊢ ax6_add_comm      -- ax6   (vía add_comm_ax; zero_add, succ_add)
-theorem add_assoc_ax (a b) : axioms ⊢ ∀. (add (add a b) #0 =eq add a (add b #0))   -- ax7
-theorem mul_comm_thm   : axioms ⊢ ax10_mul_comm     -- ax10  (vía mul_comm_ax; zero_mul, succ_mul)
-theorem mul_assoc_ax (a b) : axioms ⊢ ∀. (mul (mul a b) #0 =eq mul a (mul b #0))   -- ax11
-theorem mul_distrib_ax (a b) : axioms ⊢ ∀. (mul a (add b #0) =eq add (mul a b) (mul a #0))  -- ax12
-theorem lt_irrefl_thm     : axioms ⊢ ax18_lt_irrefl       -- ax18 (orden, irreflexividad)
-theorem lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy   -- ax19 (orden, tricotomía)
--- Lemas de orden auxiliares:
-theorem lt_succ_self (a)     : axioms ⊢ lt a (σ a)
-theorem not_lt_zero (a)      : axioms ⊢ neg (lt a zero)
-theorem lt_succ_of_lt (a b)  : axioms ⊢ lt b a → axioms ⊢ lt b (σ a)
-theorem zero_lt_succ (k)     : axioms ⊢ lt zero (σ k)
-theorem zero_or_succ_ax      : axioms ⊢ ∀. ((#0 =eq zero) ∨ ∃. (#1 =eq σ #0))
-theorem lt_succ_cases (a b)  : axioms ⊢ lt a b → axioms ⊢ (lt (σ a) b ∨ (σ a =eq b))
+axiom ax_mod2_alternation : axioms ⊢ ∀. (add (mod2 (σ #0)) (mod2 #0) =eq one)  -- caracteriza mod2
+theorem mod2_range_thm   : axioms ⊢ ax21_mod2_range      -- ax21 (inducción + alternancia)
+theorem mod2_of_even_thm : axioms ⊢ ax24_mod2_of_even    -- ax24
 ```
 
-**Pendiente**: ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas, distinta
-de la de Nat), Ax-P (TFA, inducción fuerte), y el Nivel D de Gödel. Empaquetado
-`⊢ axN` literal directo para `∀¹`/`∀²` (ax6, ax10, ax18, ax19); para `∀³` (ax7, ax11,
-ax12) la derivación `_ax` ya está.
+Hallazgo: `ax16`+`ax17` dejan `mod2` subdeterminado (modelos con `mod2(σn)≥2`); `ax_mod2_alternation` lo cierra. Conservativo respecto a Minimal.
+
+#### `Full/Lists.lean` — ax_C3, ax_L3 (inducción estructural sobre listas)
+
+```lean
+axiom ax_list_induction (φ : Term → Formula) (base : Γ ⊢ φ nil)
+    (step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)) : ∀ L, Γ ⊢ φ L     -- meta-axioma
+theorem concat_assoc_thm : axioms ⊢ ax_C3_concat_assoc   -- ax_C3
+theorem in_concat_thm    : axioms ⊢ ax_L3_in_concat      -- ax_L3
+```
+
+#### Capa de representabilidad (camino Gödel-aware a TFA)
+
+Reencuadre 2026-06-11: en vez del slog object-level De Bruijn, se trabaja sobre **numerales** (`numeral n = σⁿ(0)`) con cómputo meta en ℕ + transferencia por homomorfismo. Disuelve los "Muros" (FOL= no da testigos meta ni case-split meta).
+
+```lean
+-- Full/StrongInduction.lean — inducción fuerte DERIVADA de ax_induction (sin axioma nuevo)
+theorem substFormula_liftFormula (φ c s) : substFormula c s (liftFormula c φ) = φ
+theorem lt_succ_split (m n) : axioms ⊢ lt m (σ n) → axioms ⊢ lor (lt m n) (m =eq n)
+theorem strong_induction (φ : Formula) (step) : ∀ n, axioms ⊢ substFormula 0 n φ
+-- Full/Numerals.lean — puente meta↔object
+def numeral : Nat → Term                                       -- n ↦ σⁿ(0)
+theorem numeral_add / numeral_mul / numeral_pow                -- homomorfismo +, ·, ^
+theorem numeral_lt {a b} (h : a < b) : axioms ⊢ lt (numeral a) (numeral b)
+theorem numeral_ne {a b} (h : a ≠ b) : axioms ⊢ neg (numeral a =eq numeral b)
+-- Full/Bounded.lean — cuantificación acotada → casos finitos
+theorem le_numeral_split (d C) : ∀ n, axioms ⊢ le d (numeral n) →
+    (∀ i, Nat.le i n → axioms ⊢ (d =eq numeral i) → axioms ⊢ C) → axioms ⊢ C
+-- Full/Divisibility.lean
+theorem numeral_dvd {a b} (h : a ∣ b) : Dvd (numeral a) (numeral b)
+theorem divisor_le (d q n) : axioms ⊢ (mul d q =eq n) → axioms ⊢ lt zero n → axioms ⊢ le d n
+-- Full/Division.lean
+theorem division_numeral (n d) (hd : 0 < d) :
+    (axioms ⊢ numeral n =eq add (mul (numeral (n/d)) (numeral d)) (numeral (n%d)))
+    ∧ (axioms ⊢ lt (numeral (n%d)) (numeral d))
+-- Full/Primality.lean
+theorem isPrime_numeral (p) (hp2 : 2 ≤ p) (hpd : ∀ a, a∣p → a=1∨a=p) : IsPrime (numeral p)
+```
+
+#### `Full/PrimeFactor.lean` — teoría de números META (ℕ pura, sin Mathlib) + TFA
+
+```lean
+def IsPrimeNat (p) : Prop := 2 ≤ p ∧ ∀ a, a∣p → a=1 ∨ a=p
+def natProd : List Nat → Nat
+theorem exists_prime_factor (n) (hn : 2 ≤ n) : ∃ p, IsPrimeNat p ∧ p ∣ n      -- inducción fuerte
+theorem primeFactorList (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p) ∧ natProd ps = n
+-- Euclides + UNICIDAD (vía Nat.Coprime.dvd_of_dvd_mul, List.perm_cons_erase):
+theorem euclid (hp : IsPrimeNat p) : p ∣ a*b → p∣a ∨ p∣b
+theorem count_unique / factorization_perm_unique : dos factorizaciones del mismo n son permutaciones
+```
+
+#### `Full/Factorization.lean` — TFA transferido al object
+
+```lean
+def toTerm : List Nat → Term                                   -- lista de pares (numeral p, one)
+theorem prod_pairs_toTerm (ps) : axioms ⊢ (prod_pairs (toTerm ps) =eq numeral (natProd ps))
+theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
+    ∧ (axioms ⊢ prod_pairs (toTerm ps) =eq numeral n)                   -- EXISTENCIA (object)
+    ∧ (∀ qs, (∀ q∈qs, IsPrimeNat q) → natProd qs = n → ps.Perm qs)      -- UNICIDAD (ℕ)
+```
+
+**TFA completo** (existencia object ∧ unicidad ℕ), autocontenido sin Mathlib/Peano. El `ax_p_tfa` de Block8 queda como forma *idealizada* (membership object + testigo object, no discharge constructivo por el "Muro 1"); `tfa_numeral` es la realización equivalente para todos los usos reales.
+
+**Axiomas extra de Full**: `ax_induction`, `ax_mod2_alternation`, `ax_list_induction`. **Estado del fragmento de Minimal en Full**: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅ + TFA ✅.
+
+---
+
+### 3.15 `Meta/Incompleteness.lean` — Incompletitud Nivel D (Fase 19)
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.Incompleteness`
+**Status**: ✅ Gödel I (mitad esencial) + Gödel II (postulando D2/D3)
+**@importance**: `high`
+**Last updated**: 2026-06-12
+**Dependencias**: `Axioms`, `Meta/Godel`, `Meta/Provability`, `FOL.*`.
+
+Deriva los teoremas de incompletitud a partir de las condiciones de demostrabilidad del Nivel C (D1 vía `provFormula_repr`; diagonalización vía `goedelSentence_fixedpoint`) + D2/D3 postuladas.
+
+```lean
+noncomputable def provCode (φ) : Formula := substFormula 0 (formCode φ) provFormula   -- Prov(⌜φ⌝)
+def Consistent : Prop := ¬ (axioms ⊢ Formula.bottom)
+-- Primer Teorema (mitad esencial):
+theorem goedel_first_unprovable (hcon : Consistent) : ¬ (axioms ⊢ goedelSentence)
+theorem goedel_first_true (hcon) : ¬ Provable (formCode goedelSentence)   -- G verdadera-pero-indemostrable
+theorem incompleteness (hcon) : ∃ φ, ¬ (axioms ⊢ φ)
+-- Segundo Teorema (postulando D2, D3):
+axiom D2 (A B) : axioms ⊢ (provCode (A ⇒ B) ⇒ (provCode A ⇒ provCode B))
+axiom D3 (A)   : axioms ⊢ (provCode A ⇒ provCode (provCode A))
+noncomputable def consistencyFormula : Formula := neg (provCode Formula.bottom)   -- Con := ¬Prov(⌜⊥⌝)
+theorem con_imp_goedelSentence : axioms ⊢ (consistencyFormula ⇒ goedelSentence)   -- Gödel I formalizado
+theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)       -- ⊬ Con
+```
+
+**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level** — funciona en el FOL intuicionista de aquí. **Pendiente**: la otra mitad de Gödel I (`⊬ ¬G`) necesita ω-consistencia / DNE / Rosser. La sutileza ω-lógica del sistema se discute en `GODEL-STATUS.md`.
 
 ---
 
@@ -853,13 +912,13 @@ ax12) la derivación `_ax` ya está.
 
 ## 5 · Próximos pasos
 
-Ver `NEXT-STEPS.md` (Ejes 1–5) y `GODEL-STATUS.md`. Resumen:
+Ver `NEXT-STEPS.md` y `GODEL-STATUS.md`. Resumen (estado 2026-06-12):
 
-1. **Eje 1 (cerrado 2026-06-06)**: `Minimal/` completo. Block7 (Funciones), Block8 + extensión (Dvd, IsPrime, IsFactorization, Ax-P TFA, pow, prod_pairs) + 10 teoremas (álgebra de `Dvd`, corolarios TFA). ax22/ax23/ax27/ax28 eliminados. Linter `unusedSimpArgs false` global. Warning externo `FOL/Eq.lean:130` cerrado.
-2. **Eje 2 (`Meta/`, en curso)**: Gödelización. **Nivel B ✅** (`Meta/Godel.lean`) y **Nivel C ✅** (`Meta/Provability.lean`: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo `diagonal_lemma`, sentencia de Gödel `goedelSentence`; props profundas como 5 meta-axiomas). **Próximo: Nivel D** (Gödel I/II internos: `Minimal ⊬ G_Min`, `⊬ Con`), que requiere `Intermediate/`/`Full/`.
-3. **Eje 3 (`Intermediate/`)**: prototipo `Intermediate/Induction.lean` ✅ (inducción meta; `add_comm` derivado). Hallazgo: la inducción general (Full) es de menor fricción técnica; `Intermediate/` queda como ejercicio conceptual de la gradación.
-4. **Eje 4 (`Full/`, EN CURSO)**: inducción general **object-level**. ✅ Derivados como teoremas: ax6, ax7, ax10, ax11, ax12 (algebraicos ecuacionales) y ax18 (lt_irrefl) + ax19 (tricotomía); composición De Bruijn generalizada (`step_reduce` admite fórmulas no-ecuacionales). Pendiente: ax21/24 (mod2), listas (ax_C3/ax_L3 — inducción sobre listas), Ax-P (TFA) por inducción fuerte → habilita el **Nivel D** de Gödel.
-5. **Eje 5 (muy largo)**: CZF, cardinalidad, análisis constructivo (fuera del scope inmediato).
+1. **`Minimal/` ✅ cerrado**: Bloques I–VIII + extensión TFA. ax22/ax23/ax27/ax28 eliminados.
+2. **`Full/` ✅**: inducción general object-level + capa de representabilidad. Fragmento de Minimal derivado como teoremas: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3. **TFA completo** (`tfa_numeral`: existencia object ∧ unicidad ℕ), autocontenido sin Mathlib/Peano. `Intermediate/` eliminado (caso particular de Full).
+3. **`Meta/` ✅ (Niveles A–D)**: Gödelización completa. B (codificación + Teo G1), C (demostrabilidad + diagonalización), **D** (`Meta/Incompleteness.lean`): **Gödel I** mitad esencial (`goedel_first_unprovable`, `goedel_first_true`) + **Gödel II** (`goedel_second`, postulando D2/D3).
+4. **Refactor**: 5 meta-reglas ω de deducción movidas a `FOL/MetaRules.lean` (re-export desde `Minimal.Axioms`, cero churn).
+5. **Pendiente**: otra mitad de Gödel I (`⊬ ¬G`, vía ω-consistencia/Rosser); proyecto hermano `FOL_CompStructs` (listas/tuplas como base de Peano/AczelSetTheory); CZF / análisis constructivo (muy largo plazo).
 
 ---
 

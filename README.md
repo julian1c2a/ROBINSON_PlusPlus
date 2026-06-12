@@ -157,4 +157,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-06 — Build ✅ con **0 sorrys reales** y **0 warnings RPP**. 11/11 módulos sin sorrys (Bloques I–VIII Fase 17 completa). Sistema con **34 axiomas matemáticos** (25 aritméticos + 7 listas + 2 factorización) tras añadir `pow`/`prod_pairs` + `Ax-P` (TFA, Bloque VIII extendido). Los 5 `axiom` de Axioms.lean son meta-reglas de FOL + 1 meta-axioma TFA en Block8 (no `:= sorry`).*
+*Last updated: 2026-06-12 — Build ✅ **0 sorrys, 0 warnings** (39 jobs). **25 módulos** (Minimal/ 11 + Meta/ 3 + Full/ 11). **Minimal/** (34 axiomas, sin inducción) cierra Bloques I–VIII + TFA. **Full/** (inducción general) deriva como teoremas ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 y cierra el **Teorema Fundamental de la Aritmética** (`tfa_numeral`, existencia ∧ unicidad, autocontenido sin Mathlib/Peano). **Meta/** formaliza la Gödelización completa: codificación, demostrabilidad, y los **dos Teoremas de Incompletitud** (Gödel I mitad esencial + Gödel II vía D2/D3). Las 5 meta-reglas ω de deducción viven en `FOL/MetaRules.lean`.*
