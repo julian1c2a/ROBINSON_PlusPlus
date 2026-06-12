@@ -236,7 +236,7 @@ Recuento ajustado: el bloque factorización tiene **2 axiomas aritméticos** (`p
 
 Son declaraciones Lean `axiom name : Type` que el sistema **no demuestra** pero **postula como ciertas**. Se dividen en dos sub-clases:
 
-**Reglas del cálculo deductivo** (5, en `Axioms.lean`):
+**Reglas del cálculo deductivo** (5, en `FOL/MetaRules.lean` desde 2026-06-12):
 
 | Meta-axioma | Tipo | Rol |
 |---|---|---|
@@ -246,7 +246,7 @@ Son declaraciones Lean `axiom name : Type` que el sistema **no demuestra** pero 
 | `or_elim` | Eliminación meta-nivel de ∨ | Case split meta |
 | `ex_elim` | Eliminación meta-nivel de ∃ | Extracción de testigo |
 
-Estos **no son axiomas matemáticos**: son **reglas del cálculo deductivo** que normalmente vivirían como constructores de `Derives` pero que aquí se externalizan como meta-axiomas Lean por economía. Filosóficamente son equivalentes a una formulación de la deducción natural en estilo Hilbert + reglas estructurales. Documentado en ADR-008.
+Estos **no son axiomas matemáticos**: son **reglas del cálculo deductivo** en **formulación meta-función / ω-regla**. **Refactor 2026-06-12**: extraídos de `Minimal/Axioms.lean` (donde eran lógica pura conviviendo con los axiomas aritméticos) a `FOL/MetaRules.lean` (namespace `FOL.MetaRules`); `Minimal.Axioms` los **re-exporta** para compatibilidad. No son derivables de los constructores de `Derives` (la hipótesis meta-función no se reduce a hipótesis-en-contexto). Junto con `gen` (ω-regla) axiomatizan "demostrabilidad = verdad en el modelo estándar ℕ": el sistema es **sólido y completo relativo a ℕ** (ω-lógica, estrictamente más fuerte que FOL= finitaria). Los constructores finitarios y sólidos para *todo* modelo son `Derives.intro_impl`/`elim_or`/`elim_ex`/`intro_forall`. Documentado en ADR-008.
 
 **Axioma matemático meta-codificado** (1, en `Block8.lean`):
 
