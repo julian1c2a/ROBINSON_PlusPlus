@@ -91,4 +91,30 @@ theorem tfa_exists_numeral (n : Nat) (hn : 1 ≤ n) :
   rw [hprod] at h
   exact h
 
+/-- **TFA — existencia ∧ unicidad (sobre numerales)**. Para todo `n ≥ 1`:
+    existe una factorización prima `ps` cuyo encoding object cumple
+    `prod_pairs (toTerm ps) = numeral n` (**existencia**, object), y toda
+    factorización prima de `n` es una permutación de `ps` (**unicidad**, ℕ).
+
+    Es la realización constructiva del TFA sobre numerales. La unicidad se
+    enuncia con la hipótesis meta `natProd qs = n` (no object): así no requiere
+    reflejar igualdad de numerales (que necesitaría `Con(axioms)`). El
+    `ax_p_tfa` de `Block8` (meta-axioma con membership object y testigo único
+    object) queda como la forma *idealizada* — no discharge constructivo por
+    el Muro 1. -/
+theorem tfa_numeral (n : Nat) (hn : 1 ≤ n) :
+    ∃ ps : List Nat, And (∀ p ∈ ps, IsPrimeNat p)
+      (And (axioms ⊢ (prod_pairs (toTerm ps) =eq numeral n))
+           (∀ qs : List Nat, (∀ q ∈ qs, IsPrimeNat q) → natProd qs = n →
+              ps.Perm qs)) := by
+  obtain ⟨ps, hprime, hprod⟩ := primeFactorList n hn
+  refine ⟨ps, hprime, ?_, ?_⟩
+  · -- existencia object
+    have h := prod_pairs_toTerm ps
+    rw [hprod] at h
+    exact h
+  · -- unicidad (ℕ)
+    intro qs hqs hqs_prod
+    exact factorization_perm_unique ps qs hprime hqs (hprod.trans hqs_prod.symm)
+
 end ROBINSON_PlusPlus.Full
