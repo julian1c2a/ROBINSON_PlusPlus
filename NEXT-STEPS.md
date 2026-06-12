@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-11 — **Capa de representabilidad (cimientos hacia TFA)**: tras detectar la obstrucción foundational (Muros 1/2: FOL= no da testigos meta ni case-split meta), reencuadre **numerales + representabilidad** (Gödel-aware, reutiliza Peano). HECHO: `Full/Numerals.lean` (homomorfismo `numeral_add/mul/pow`, `numeral_lt`, `numeral_ne`), `Full/Bounded.lean` (`le_numeral_split`: acotado → casos finitos), `Full/Divisibility.lean` (`numeral_dvd`, `divisor_le`). Previo: F1 `Full/StrongInduction.lean`, `Full/Lists.lean`, `Full/Mod2.lean`, `Intermediate/` eliminado. Fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas, **20 módulos** (Minimal/ 11 + Meta×2 + Full ×7: Induction, Mod2, Lists, StrongInduction, Numerals, Bounded, Divisibility), 0 sorrys, 0 warnings (33 jobs).
+**Last updated:** 2026-06-12 — **TFA-existencia CERRADA** (sobre numerales, autocontenido sin Mathlib/Peano). Capa de teoría de números completa sobre la representabilidad: `Full/Primality.lean` (`isPrime_numeral`), `Full/Division.lean` (`division_numeral`), `Full/PrimeFactor.lean` (ℕ pura: `exists_prime_factor`, `primeFactorList`), `Full/Factorization.lean` (`tfa_exists_numeral`). Sobre los cimientos: `Numerals` (homomorfismo `+,·,^,<,≠`), `Bounded` (`le_numeral_split`), `Divisibility` (`numeral_dvd`, `divisor_le`), F1 `StrongInduction`. Reencuadre **numerales + representabilidad** (Gödel-aware) que disuelve los Muros 1/2. Fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas, **24 módulos** (Minimal/ 11 + Meta×2 + Full ×11), 0 sorrys, 0 warnings (37 jobs). **Pendiente TFA**: unicidad (forma canónica).
 
 ---
 
@@ -104,12 +104,16 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 - [x] **Cuantificación acotada** (`Full/Bounded.lean`): `le_numeral_split` — `d ≤ numeral n` ⇒ casos finitos `d = numeral i`. Convierte ∀ acotado en análisis finito.
 - [x] **Divisibilidad** (`Full/Divisibility.lean`): `numeral_dvd` (meta ∣ → object Dvd) + `divisor_le` (divisor de positivo es ≤).
 
-**Capa de teoría de números (pendiente)**:
+**Capa de teoría de números — HECHO 2026-06-12**:
 
-- [ ] **Primalidad representada**: `isPrime_numeral` — `p` primo (meta) ⇒ `IsPrime (numeral p)`. Vía `le_numeral_split` (acotar divisor) + `divisor_le` + split anidado sobre el cofactor. (~150 LOC)
-- [ ] **División sobre numerales**: cómputo meta `n = q·d+r` + transferencia. (Trivial con homomorfismo; ya no necesita inducción fuerte object.)
-- [ ] **Factor primo / factorización**: `tfa_numeral` — `k ≥ 2` (meta) ⇒ factorización object de `numeral k`. Cómputo en ℕ (reusando Peano) + transferencia primorial (`numeral_pow`).
-- [ ] **Unicidad** + relación con `ax_p_tfa` de Block8 (versión numeral; la versión ∀-Term general queda como idealización).
+- [x] **Primalidad representada** (`Full/Primality.lean`): `isPrime_numeral` — `p` primo (meta, hipótesis `2≤p` + divisores triviales, sin Mathlib) ⇒ `IsPrime (numeral p)`. Vía `divisor_le` + `le_numeral_split` + split anidado sobre el cofactor.
+- [x] **División con resto** (`Full/Division.lean`): `division_numeral` — `numeral n = numeral(n/d)·numeral d + numeral(n%d)`, `numeral(n%d) < numeral d`. Trivial vía homomorfismo (cómputo `n/d`, `n%d` en ℕ).
+- [x] **Factor primo + factorización META** (`Full/PrimeFactor.lean`, ℕ pura sin Mathlib): `exists_prime_factor` (∀ n≥2, ∃ factor primo) + `primeFactorList` (∀ n≥1, ∃ lista plana de primos con producto n), por inducción fuerte (`Nat.strongRecOn`).
+- [x] **TFA-existencia transferida** (`Full/Factorization.lean`): `toTerm` (encoding lista de pares `(numeral p, 1)`), `prod_pairs_toTerm` (`⊢ prod_pairs (toTerm ps) =eq numeral (natProd ps)`), y **`tfa_exists_numeral`** — `∀ n≥1, ∃ ps, (∀p∈ps, IsPrimeNat p) ∧ ⊢ prod_pairs (toTerm ps) =eq numeral n`. Autocontenido (sin Peano).
+
+**Pendiente — UNICIDAD (forma canónica)**:
+
+- [ ] **Unicidad**: forma canónica `P × ℕ₁` con primos **distintos y ordenados** (la existencia usa lista plana con repetición; unicidad necesita canonicidad). + relación con `ax_p_tfa` de Block8 (versión numeral; la ∀-Term general queda como idealización por Muro 1).
 
 ### 4.2. Restantes tras TFA
 
