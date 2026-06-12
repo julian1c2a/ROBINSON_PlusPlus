@@ -47,3 +47,6 @@ import ROBINSON_PlusPlus.Full.StrongInduction
 -- Full: numerales — puente meta↔object (numeral : ℕ → Term) + homomorfismo
 -- de +, ·, <. Cimiento de la representabilidad (camino Gödel-aware a TFA).
 import ROBINSON_PlusPlus.Full.Numerals
+
+-- Full: cuantificación acotada — le_numeral_split (d ≤ numeral n ⇒ casos finitos).
+import ROBINSON_PlusPlus.Full.Bounded
