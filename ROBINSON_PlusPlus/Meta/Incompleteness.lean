@@ -92,6 +92,78 @@ theorem incompleteness (hcon : Consistent) :
     ∃ φ : Formula, ¬ (axioms ⊢ φ) :=
   ⟨goedelSentence, goedel_first_unprovable hcon⟩
 
+/-!
+### Segundo Teorema de Incompletitud (postulando D2, D3)
+
+Con las condiciones de Hilbert-Bernays-Löb completas (D1 ya disponible vía
+`provFormula_repr`; **D2** y **D3** postuladas aquí), se deriva Gödel II.
+
+La fórmula de **consistencia** es `Con := ¬Prov(⌜⊥⌝)`. Gödel II: si `axioms` es
+consistente, **no demuestra su propia consistencia**.
+
+Crucial: toda la cadena de implicaciones (incluida la contrapositiva) se
+construye con `imp_intro`/`mp` — **no se necesita DNE object-level**, así que
+funciona en el FOL intuicionista de aquí.
+-/
+
+/-- **D2** (condición de demostrabilidad): la demostrabilidad distribuye sobre
+    la implicación. `⊢ Prov(⌜A⇒B⌝) ⇒ (Prov(⌜A⌝) ⇒ Prov(⌜B⌝))`. Meta-axioma. -/
+axiom D2 (A B : Formula) :
+    axioms ⊢ (provCode (Formula.impl A B) ⇒ (provCode A ⇒ provCode B))
+
+/-- **D3** (condición de demostrabilidad): la demostrabilidad es provablemente
+    provable. `⊢ Prov(⌜A⌝) ⇒ Prov(⌜Prov(⌜A⌝)⌝)`. Meta-axioma. -/
+axiom D3 (A : Formula) :
+    axioms ⊢ (provCode A ⇒ provCode (provCode A))
+
+/-- **Fórmula de consistencia** `Con := ¬Prov(⌜⊥⌝)`. -/
+noncomputable def consistencyFormula : Formula := neg (provCode Formula.bottom)
+
+/-- **Gödel I formalizado**: `⊢ Con ⇒ G`. El sistema demuestra "si soy
+    consistente entonces `G`". Derivado de D1 (necesitación), D2, D3 y el punto
+    fijo. Es el corazón del Segundo Teorema. -/
+theorem con_imp_goedelSentence :
+    axioms ⊢ (consistencyFormula ⇒ goedelSentence) := by
+  -- abreviaturas: PG = Prov(⌜G⌝), PBot = Prov(⌜⊥⌝)
+  -- punto fijo: ⊢ G ⇔ ¬PG  (defeq con la forma sustituida)
+  have hfp : axioms ⊢ (goedelSentence ⇔ neg (provCode goedelSentence)) :=
+    goedelSentence_fixedpoint
+  have fp_fwd : axioms ⊢ (goedelSentence ⇒ neg (provCode goedelSentence)) :=
+    Minimal.Axioms.and_elim_left hfp
+  have fp_bwd : axioms ⊢ (neg (provCode goedelSentence) ⇒ goedelSentence) :=
+    Minimal.Axioms.and_elim_right hfp
+  -- D1 (necesitación): ⊢ (G ⇒ ¬PG) → ⊢ Prov(⌜G ⇒ ¬PG⌝)
+  have nec1 : axioms ⊢ provCode (Formula.impl goedelSentence (neg (provCode goedelSentence))) :=
+    (provFormula_repr _).mpr fp_fwd
+  -- D2(G, ¬PG): ⊢ Prov(⌜G⇒¬PG⌝) ⇒ (PG ⇒ Prov(⌜¬PG⌝))
+  have step_a : axioms ⊢ (provCode goedelSentence ⇒ provCode (neg (provCode goedelSentence))) :=
+    mp (D2 goedelSentence (neg (provCode goedelSentence))) nec1
+  -- D2(PG, ⊥): ⊢ Prov(⌜¬PG⌝) ⇒ (Prov(⌜PG⌝) ⇒ Prov(⌜⊥⌝))
+  have step_b : axioms ⊢ (provCode goedelSentence ⇒
+      (provCode (provCode goedelSentence) ⇒ provCode Formula.bottom)) :=
+    imp_intro (fun hpg =>
+      mp (D2 (provCode goedelSentence) Formula.bottom) (mp step_a hpg))
+  -- D3(G): ⊢ PG ⇒ Prov(⌜PG⌝)
+  have d3 : axioms ⊢ (provCode goedelSentence ⇒ provCode (provCode goedelSentence)) :=
+    D3 goedelSentence
+  -- combinando: ⊢ PG ⇒ PBot
+  have pg_imp_pbot : axioms ⊢ (provCode goedelSentence ⇒ provCode Formula.bottom) :=
+    imp_intro (fun hpg => mp (mp step_b hpg) (mp d3 hpg))
+  -- contrapositiva + punto fijo: ⊢ Con ⇒ G   (Con = ¬PBot)
+  exact imp_intro (fun hcon =>
+    mp fp_bwd (imp_intro (fun hpg => mp hcon (mp pg_imp_pbot hpg))))
+
+/-- **Segundo Teorema de Incompletitud de Gödel**: si `axioms` es consistente,
+    **no demuestra su propia consistencia** (`⊬ Con`).
+
+    Prueba: si `⊢ Con`, entonces (por `con_imp_goedelSentence` + mp) `⊢ G`; pero
+    por el Primer Teorema (`goedel_first_unprovable`) `⊬ G` bajo consistencia —
+    contradicción. -/
+theorem goedel_second (hcon : Consistent) :
+    ¬ (axioms ⊢ consistencyFormula) := by
+  intro hConProvable
+  exact goedel_first_unprovable hcon (mp con_imp_goedelSentence hConProvable)
+
 end ROBINSON_PlusPlus.Meta.Incompleteness
 
 -- Exports: Nivel D
@@ -101,4 +173,9 @@ export ROBINSON_PlusPlus.Meta.Incompleteness (
   goedel_first_unprovable
   goedel_first_true
   incompleteness
+  D2
+  D3
+  consistencyFormula
+  con_imp_goedelSentence
+  goedel_second
 )
