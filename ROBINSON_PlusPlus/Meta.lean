@@ -5,9 +5,12 @@ License: MIT
 
 Barrel file for `Meta/` — Gödelización del sistema `Minimal`.
 Public API:
-  · Godel        (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
-  · Provability  (Nivel C): formCode, IsFormula, Provable, Dem, diagonal_lemma,
-                            goedelSentence
+  · Godel          (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
+  · Provability    (Nivel C): formCode, IsFormula, Provable, Dem, diagonal_lemma,
+                              goedelSentence
+  · Incompleteness (Nivel D): goedel_first_unprovable, goedel_first_true,
+                              incompleteness (Primer Teorema, mitad esencial)
 -/
 import ROBINSON_PlusPlus.Meta.Godel
 import ROBINSON_PlusPlus.Meta.Provability
+import ROBINSON_PlusPlus.Meta.Incompleteness
