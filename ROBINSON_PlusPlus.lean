@@ -56,3 +56,6 @@ import ROBINSON_PlusPlus.Full.Divisibility
 
 -- Full: primalidad representada — isPrime_numeral.
 import ROBINSON_PlusPlus.Full.Primality
+
+-- Full: división con resto sobre numerales (trivial vía homomorfismo).
+import ROBINSON_PlusPlus.Full.Division
