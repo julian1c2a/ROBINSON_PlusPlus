@@ -84,10 +84,35 @@ theorem goedel_first_true (hcon : Consistent) :
   rw [provable_formCode_iff]
   exact goedel_first_unprovable hcon
 
+/-- **Primer Teorema de Incompletitud (otra mitad)**: si `axioms` es
+    consistente, la **negación** de la sentencia de Gödel tampoco es demostrable.
+
+    Usa lógica clásica (`dne`, en `FOL/MetaRules.lean`). Prueba: de `⊢ ¬G` y el
+    punto fijo (`¬Prov(⌜G⌝) ⇒ G`) sale `⊢ ¬¬Prov(⌜G⌝)`; por `dne`,
+    `⊢ Prov(⌜G⌝)`; por reflexión (`provFormula_repr`), `⊢ G`; con `⊢ ¬G` da `⊥`,
+    contra la consistencia. -/
+theorem goedel_first_unrefutable (hcon : Consistent) :
+    ¬ (axioms ⊢ neg goedelSentence) := by
+  intro hNotG
+  -- punto fijo: ⊢ ¬Prov(⌜G⌝) ⇒ G
+  have fp_bwd : axioms ⊢ (neg (provCode goedelSentence) ⇒ goedelSentence) :=
+    Minimal.Axioms.and_elim_right goedelSentence_fixedpoint
+  -- ⊢ ¬¬Prov(⌜G⌝)
+  have hnnpg : axioms ⊢ neg (neg (provCode goedelSentence)) :=
+    imp_intro (fun hnpg => mp hNotG (mp fp_bwd hnpg))
+  -- dne: ⊢ Prov(⌜G⌝); reflexión: ⊢ G
+  have hG : axioms ⊢ goedelSentence :=
+    (provFormula_repr goedelSentence).mp (Minimal.Axioms.dne hnnpg)
+  exact hcon (mp hNotG hG)
+
+/-- **Incompletitud / indecidibilidad de `G`**: bajo consistencia, ni `G` ni
+    `¬G` son demostrables — `G` es **indecidible**. (Primer Teorema completo.) -/
+theorem goedel_first_undecidable (hcon : Consistent) :
+    And (¬ (axioms ⊢ goedelSentence)) (¬ (axioms ⊢ neg goedelSentence)) :=
+  ⟨goedel_first_unprovable hcon, goedel_first_unrefutable hcon⟩
+
 /-- **Incompletitud**: bajo consistencia, existe una sentencia indemostrable —
-    a saber, la sentencia de Gödel. (`axioms` no es negación-completa por la
-    vía de `G`; la sentencia es indecidible salvo refinamiento con
-    ω-consistencia para la otra mitad.) -/
+    a saber, la sentencia de Gödel. -/
 theorem incompleteness (hcon : Consistent) :
     ∃ φ : Formula, ¬ (axioms ⊢ φ) :=
   ⟨goedelSentence, goedel_first_unprovable hcon⟩
@@ -172,6 +197,8 @@ export ROBINSON_PlusPlus.Meta.Incompleteness (
   Consistent
   goedel_first_unprovable
   goedel_first_true
+  goedel_first_unrefutable
+  goedel_first_undecidable
   incompleteness
   D2
   D3

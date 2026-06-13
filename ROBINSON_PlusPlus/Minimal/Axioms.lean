@@ -536,7 +536,7 @@ theorem eq_congr_pred {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ �
 -- MINIMAL-AXIOMS.md §3.5.1). Se **re-exportan** aquí para que todo el código
 -- existente (`Minimal.Axioms.or_elim`, `open Minimal.Axioms`, …) siga
 -- resolviendo sin cambios.
-export FOL.MetaRules (mp imp_intro gen raa and_intro and_elim_left and_elim_right
+export FOL.MetaRules (mp imp_intro gen raa dne and_intro and_elim_left and_elim_right
   or_intro_left or_intro_right or_elim false_elim ex_intro ex_elim iff_mp iff_mpr)
 
 /-- Equality substitution (used to rewrite equality hypotheses). -/
