@@ -76,7 +76,7 @@ El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía dis
 | **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
 | **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` ✅ | ✅ 2026-06-06 |
 | **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` ✅ | ✅ 2026-06-06 (props profundas como meta-axiomas) |
-| **D** | Teoremas de incompletitud: Gödel I (mitad esencial) demostrado internamente | `Meta/Incompleteness.lean` ✅ | 🟡 2026-06-12 (Gödel I mitad esencial; otra mitad + Gödel II pendientes) |
+| **D** | Teoremas de incompletitud: Gödel I (completo) + Gödel II demostrados internamente | `Meta/Incompleteness.lean` ✅ | ✅ 2026-06-13 (Gödel I completo: `⊬G ∧ ⊬¬G`; Gödel II vía D2/D3) |
 
 La **arquitectura propuesta** para `Meta/`:
 
@@ -108,11 +108,17 @@ partir de las condiciones de demostrabilidad postuladas en el Nivel C:
   construye con `imp_intro`/`mp`, **sin DNE object-level** — funciona en el FOL
   intuicionista.
 
-**Pendiente** (requiere más, documentado en `Incompleteness.lean`):
+- ✅ **Gödel I completo** (`goedel_first_unrefutable` + `goedel_first_undecidable`,
+  2026-06-13): `Consistent → ⊬ ¬G`, luego `⊬ G ∧ ⊬ ¬G` (`G` **indecidible**).
+  Resuelto añadiendo **`dne`** (eliminación de doble negación clásica) a
+  `FOL/MetaRules.lean`. Diagnóstico: el obstáculo no era ω-consistencia sino el
+  **intuicionismo** del FOL (`¬¬Prov⌜G⌝ → Prov⌜G⌝` no es intuicionista); Rosser
+  habría sido peor (Muro 1 + comparación acotada de pruebas). `dne` es el
+  setting clásico estándar de Gödel, sólido para ℕ (coherente con la ω-lógica).
+  Prueba: `⊢ ¬G` → (punto fijo) `⊢ ¬¬Prov⌜G⌝` → (`dne`) `⊢ Prov⌜G⌝` →
+  (reflexión) `⊢ G` → `⊥`.
 
-- ⏳ **Otra mitad de Gödel I** (`⊬ ¬G`): necesita **ω-consistencia** (Gödel) o
-  eliminación de doble negación object-level (FOL aquí es **intuicionista** —
-  la DNE sólo está con `doubleNegAxiom` en contexto), o el **truco de Rosser**.
+**Pendiente** (documentado):
 
 **Sutileza ω-lógica** (honestidad): el sistema de RPP usa la meta-regla `gen`
 (ω-regla, `FOL/MetaRules.lean`), que hace `axioms ⊢` no finitariamente r.e. El
