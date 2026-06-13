@@ -4,11 +4,15 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Hilbert
+import ROBINSON_PlusPlus.Meta.Godel
+import ROBINSON_PlusPlus.Meta.Provability
 
 import FOL.FOL
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.Godel
+open ROBINSON_PlusPlus.Meta.Provability
 
 set_option linter.unusedSimpArgs false
 
@@ -380,5 +384,65 @@ theorem prf_to_derivation {φ : Formula} (h : Prf φ) : ∃ rs, Derivation rs φ
     Esta es la versión "datos" de `Prf`, base para el `Dem` concreto (coding). -/
 theorem prf_iff_derivation {φ : Formula} : Prf φ ↔ ∃ rs, Derivation rs φ :=
   ⟨prf_to_derivation, fun ⟨_, hd⟩ => derivation_to_prf hd⟩
+
+/-! ### Codificación de Gödel de las demostraciones y `Dem` concreto  (Fase 1c)
+
+Cada `Rule` se codifica como `⟨tag, payload…⟩` (con `cons`/`nil`/`numeral` y los
+codificadores `formCode`/`termCode` de `Meta/Provability.lean`); una `List Rule`
+como una lista codificada. Con eso definimos `Dem d x` **concreta** (reemplaza el
+postulado opaco): "`d` es el código de una derivación-secuencia en la que aparece
+la fórmula de código `x`". El tracking `(∃ d, Dem d ⌜φ⌝) ↔ Prf φ` sale de
+`prf_iff_derivation` + `formCode_injective`; no requiere decodificador (la forma
+Δ₀/decidible pertenece a la Fase 2, donde se construye el objeto `demFormula`). -/
+
+/-- Código de Gödel de una regla: `⟨tag, args codificados…⟩`. -/
+def ruleCode : Rule → Term
+  | .p1 A B => cons (numeral 0) (cons (formCode A) (cons (formCode B) nil))
+  | .p2 A B C => cons (numeral 1) (cons (formCode A) (cons (formCode B) (cons (formCode C) nil)))
+  | .c1 A B => cons (numeral 2) (cons (formCode A) (cons (formCode B) nil))
+  | .c2 A B => cons (numeral 3) (cons (formCode A) (cons (formCode B) nil))
+  | .c3 A B => cons (numeral 4) (cons (formCode A) (cons (formCode B) nil))
+  | .j1 A B => cons (numeral 5) (cons (formCode A) (cons (formCode B) nil))
+  | .j2 A B => cons (numeral 6) (cons (formCode A) (cons (formCode B) nil))
+  | .j3 A B C => cons (numeral 7) (cons (formCode A) (cons (formCode B) (cons (formCode C) nil)))
+  | .efq A => cons (numeral 8) (cons (formCode A) nil)
+  | .q1 A t => cons (numeral 9) (cons (formCode A) (cons (termCode t) nil))
+  | .q2 A t => cons (numeral 10) (cons (formCode A) (cons (termCode t) nil))
+  | .q3 A B => cons (numeral 11) (cons (formCode A) (cons (formCode B) nil))
+  | .eqrefl t => cons (numeral 12) (cons (termCode t) nil)
+  | .leibniz A t₁ t₂ =>
+      cons (numeral 13) (cons (formCode A) (cons (termCode t₁) (cons (termCode t₂) nil)))
+  | .p3 A => cons (numeral 14) (cons (formCode A) nil)
+  | .thy k => cons (numeral 15) (cons (numeral k) nil)
+  | .mp i j => cons (numeral 16) (cons (numeral i) (cons (numeral j) nil))
+  | .gen i => cons (numeral 17) (cons (numeral i) nil)
+
+/-- Código de Gödel de una demostración-secuencia (lista de reglas). -/
+def rulesCode : List Rule → Term
+  | [] => nil
+  | r :: rs => cons (ruleCode r) (rulesCode rs)
+
+/-- **Predicado de demostración concreto** `Dem d x`: `d` es el código de una
+    derivación-secuencia válida en la que aparece la fórmula de código `x`.
+    Reemplaza el `Dem` postulado de `Meta/Provability.lean`. -/
+def Dem (d x : Term) : Prop :=
+  ∃ rs : List Rule, ∃ φ : Formula,
+    And (d = rulesCode rs) (And (x = formCode φ) (Derivation rs φ))
+
+/-- **Demostrabilidad codificada**: existe un código de demostración de `x`. -/
+def ProvableH (x : Term) : Prop := ∃ d : Term, Dem d x
+
+/-- **Tracking (fidelidad del `Dem` concreto)**: la demostrabilidad codificada de
+    `⌜φ⌝` coincide con la demostrabilidad de Hilbert `Prf φ`. Reemplaza el
+    postulado `dem_iff_provable` (restringido a `⊢ᴴ`). -/
+theorem dem_tracks (φ : Formula) : ProvableH (formCode φ) ↔ Prf φ := by
+  unfold ProvableH Dem
+  rw [prf_iff_derivation]
+  constructor
+  · rintro ⟨_, rs, ψ, _, hx, hder⟩
+    rw [formCode_injective hx]
+    exact ⟨rs, hder⟩
+  · rintro ⟨rs, hder⟩
+    exact ⟨rulesCode rs, rs, φ, rfl, rfl, hder⟩
 
 end ROBINSON_PlusPlus.Meta.HilbertSeq

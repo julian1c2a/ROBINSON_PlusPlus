@@ -152,7 +152,7 @@ incompleto y Gödel aplica.)
 |---|---|---|
 | **0** | `Meta/Hilbert.lean`: `Prf₀`/`Prf` + puentes `prf0_to_derives`/`prf_to_derives` + consistencia transferida | ✅ |
 | **1a/b** | `Meta/HilbertSeq.lean`: `Rule`, verificador decidible `checkProof`, `Derivation`, **solidez + completitud** ⟹ `Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ |
-| **1c** | `Meta/HilbertSeq.lean` (cont.): coding `Rule`/`List Rule` → `Term`, `Dem : Term → Term → Prop` **concreto** + tracking `(∃ d, Dem d ⌜φ⌝) ↔ Prf φ` | 🟡 en curso |
+| **1c** | `Meta/HilbertSeq.lean` (cont.): coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto** + `dem_tracks : (∃ d, Dem d ⌜φ⌝) ↔ Prf φ` (solo axiomas estándar de Lean) | ✅ |
 | **2** | `Meta/ProvFormulaConcrete.lean`: `demFormula` (Δ₀) representa `Dem`; `provFormula := ∃ demFormula`; representabilidad Δ₀ | ⬜ |
 | **3** | **D1** real: `Prf φ → Prf (Prov⌜φ⌝)` (necesitación vía Σ₁-completitud) | ⬜ |
 | **4** | **D2** real: combinador MP sobre códigos + internalización | ⬜ |
