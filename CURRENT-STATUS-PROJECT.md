@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-12
+**Last updated:** 2026-06-13
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,14 +9,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 25 (Minimal/ 11 + Meta/ 3 [Godel, Provability, Incompleteness] + Full/ 11) |
-| Modules sin sorry | 25 / 25 ✅ |
+| Total modules | 29 (Minimal/ 11 + Meta/ 7 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith] + Full/ 11) |
+| Modules sin sorry | 29 / 29 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Meta-reglas FOL (ω) | 5 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) — refactor 2026-06-12, re-export desde `Minimal.Axioms` |
-| Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C); `D2`/`D3` (Incompleteness D) |
+| Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
+| Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C, **legacy**); `D2`/`D3` (Incompleteness D, **legacy**); 6 ecuaciones recursivas de coding (SubstArith, **definicionales** — a integrar en `Minimal.axioms`) |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
-| Gödel | **A, B, C, D** ✅ — Nivel D: Gödel I (mitad esencial) + **Gödel II** (`goedel_second`, vía D2/D3) |
-| Build status | ✅ Passing (**39 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
+| Gödel | **A, B, C, D** ✅ (I completo + II vía D2/D3 postulados). **Nivel D REAL en curso**: aritmetización honesta de D1–D3 sobre cálculo de Hilbert finitario `Prf` — Fases 0, 1, 2.1, 2.2t hechas |
+| Build status | ✅ Passing (**43 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 

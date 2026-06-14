@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-12 — **TFA completo + Gödel I/II + refactor meta-reglas**. `Full/` cierra el **Teorema Fundamental de la Aritmética** (`tfa_numeral`: existencia object ∧ unicidad ℕ) sobre una capa de **representabilidad** (numerales + homomorfismo + Euclides), autocontenido sin Mathlib/Peano. `Meta/Incompleteness.lean` (Nivel D): **Gödel I** mitad esencial + **Gödel II** (postulando D2/D3). Las 5 meta-reglas ω de deducción se movieron a **`FOL/MetaRules.lean`** (re-export desde `Minimal.Axioms`). **25 módulos** (Minimal 11 + Meta 3 + Full 11), build verde (39 jobs) 0 warnings / 0 sorrys.
+**Last updated:** 2026-06-13 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). Cálculo de Hilbert finitario nuevo `Prf` (paralelo al ω-sistema), verificador decidible de demostraciones, `Dem` concreto, y arranque de la aritmetización de la sustitución. **29 módulos** (Minimal 11 + Meta 7 + Full 11), build verde (**43 jobs**), 0 sorrys. Base previa: TFA completo + Gödel I/II.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,16 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-13) — Gödel Nivel D REAL: aritmetización de D1–D3 (Opción A)
+
+Conversión de D1/D2/D3 de meta-axiomas opacos a teoremas. Como el `axioms ⊢` del proyecto usa la **ω-regla** (no r.e.; `provFormula` imposible por Tarski), Gödel se aplica a un **cálculo de Hilbert finitario nuevo, en paralelo**. Plan en [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
+
+- **Fase 0** (`Meta/Hilbert.lean`): `Prf₀` (Hilbert intuicionista) + `Prf` (clásico). Puentes `prf0_to_derives`/`prf_to_derives : Prf φ → axioms ⊢ φ` con **solo constructores de `Derives`**; `dne` aislado en un único punto (esquema P3), verificado por `#print axioms` (diferencia exacta entre puentes = `{dne}`). `consistentH_of_omega`.
+- **Fase 1** (`Meta/HilbertSeq.lean`): `Rule` + verificador decidible `checkProof` + `Derivation`; solidez `derivation_to_prf` + completitud `prf_to_derivation` ⟹ `prf_iff_derivation`. Coding `ruleCode`/`rulesCode`, `Dem` **concreto**, `dem_tracks : (∃d, Dem d ⌜φ⌝) ↔ Prf φ` (reemplaza `Dem`/`dem_iff_provable`; solo axiomas estándar de Lean).
+- **Fase 2.1** (`Meta/CodeArith.lean`): `numeral_bridge` + `gnum_ne`/`gnum_lt`/`gnum_add`/`gnum_mul`/`gnum_refl`.
+- **Fase 2.2 nivel término** (`Meta/SubstArith.lean`): funciones object `substtc`/`substtsc` + congruencias de `cons` + ecuaciones recursivas (6 **axiomas definicionales**, a integrar en `Minimal.axioms`) + `substTerm_arith`/`substTerms_arith` (cómputo de la sustitución sobre códigos, inducción meta mutua).
+- **Pendiente**: Fase 2.2 nivel fórmula (binders), 2.3 (stepConcl), 2.4 (demFormula Σ₁), 2.5 (representabilidad), Fase 3 (D1 real).
 
 ### Added (2026-06-12) — Gödel Nivel D: Incompletitud (Meta/Incompleteness.lean)
 

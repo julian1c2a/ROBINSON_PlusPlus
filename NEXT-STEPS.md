@@ -1,6 +1,8 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-12 — **TFA COMPLETO CERRADO** (existencia object ∧ unicidad ℕ, sobre numerales, autocontenido sin Mathlib/Peano): `tfa_numeral` (`Full/Factorization.lean`). Unicidad ℕ vía Euclides (`Full/PrimeFactor.lean`: `euclid`, `factorization_perm_unique`). Capa de teoría de números completa sobre la representabilidad: `Primality` (`isPrime_numeral`), `Division` (`division_numeral`), `PrimeFactor` (ℕ pura: factor primo, factorización, **Euclides + unicidad**), `Factorization` (`tfa_exists_numeral`, `tfa_numeral`). Cimientos: `Numerals` (homomorfismo `+,·,^,<,≠`), `Bounded` (`le_numeral_split`), `Divisibility` (`numeral_dvd`, `divisor_le`), F1 `StrongInduction`. Reencuadre **numerales + representabilidad** (Gödel-aware) disuelve los Muros 1/2. Fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas, **24 módulos** (Minimal/ 11 + Meta×2 + Full ×11), 0 sorrys, 0 warnings (37 jobs). **Próximo**: Gödel Nivel D (Meta/Incompleteness) sobre esta base; o consolidar.
+**Last updated:** 2026-06-13 — **GÖDEL NIVEL D REAL — EN CURSO** (aritmetización honesta de D1–D3, Opción A). El `axioms ⊢` del proyecto usa la ω-regla (no r.e.; Tarski), así que Gödel se aplica a un **cálculo de Hilbert finitario nuevo, en paralelo** (`Meta/Hilbert.lean`), que sí es r.e. Hecho: **Fase 0** (Prf₀/Prf + puentes constructor-puros con `dne` aislado en un único punto, verificado por `#print axioms`), **Fase 1** (verificador decidible `checkProof`, equivalencia `Prf φ ↔ ∃rs Derivation`, coding + `Dem` concreto + `dem_tracks` — reemplazan los postulados `Dem`/`dem_iff_provable`), **Fase 2.1** (`CodeArith`: puente de numerales + aritmética de códigos) y **Fase 2.2 nivel término** (`SubstArith`: `substTerm` aritmetizado como función object + lema de cómputo por inducción meta; 6 axiomas **definicionales** = ecuaciones recursivas, a integrar en `Minimal.axioms`). **29 módulos** (Minimal 11 + Meta 7 + Full 11), **43 jobs**, 0 sorrys. **Próximo**: Fase 2.2 nivel fórmula (binders) → 2.3 stepConcl → 2.4 demFormula → 2.5 representabilidad → Fase 3 (D1 real). Ver [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
+
+**(2026-06-12)** — **TFA COMPLETO CERRADO** (existencia object ∧ unicidad ℕ, sobre numerales, autocontenido sin Mathlib/Peano): `tfa_numeral` (`Full/Factorization.lean`). Unicidad ℕ vía Euclides (`Full/PrimeFactor.lean`: `euclid`, `factorization_perm_unique`). Capa de teoría de números completa sobre la representabilidad: `Primality` (`isPrime_numeral`), `Division` (`division_numeral`), `PrimeFactor` (ℕ pura: factor primo, factorización, **Euclides + unicidad**), `Factorization` (`tfa_exists_numeral`, `tfa_numeral`). Cimientos: `Numerals` (homomorfismo `+,·,^,<,≠`), `Bounded` (`le_numeral_split`), `Divisibility` (`numeral_dvd`, `divisor_le`), F1 `StrongInduction`. Reencuadre **numerales + representabilidad** (Gödel-aware) disuelve los Muros 1/2. Fragmento aritmético + listas de Minimal en Full: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅. Sistema con **34 axiomas matemáticos** en Minimal + meta-axiomas, **24 módulos** (Minimal/ 11 + Meta×2 + Full ×11), 0 sorrys, 0 warnings (37 jobs). **Próximo**: Gödel Nivel D (Meta/Incompleteness) sobre esta base; o consolidar.
 
 ---
 
@@ -124,7 +126,28 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 - [x] **Gödel II** (`goedel_second`, 2026-06-12): `Consistent → ⊬ Con` (`Con := ¬Prov(⌜⊥⌝)`). **Postulando D2/D3**; lema crucial `con_imp_goedelSentence : ⊢ Con⇒G`.
 - [x] **Gödel I completo** (`goedel_first_unrefutable`, `goedel_first_undecidable`, 2026-06-13): `⊬ ¬G`, luego `⊬ G ∧ ⊬ ¬G` (G indecidible). Vía **`dne`** (DNE clásica añadida a `FOL/MetaRules.lean`) + reflexión. El obstáculo era el intuicionismo del FOL, no ω-consistencia; Rosser habría sido peor.
 - [ ] **Cadena de embeddings**: `FOL⁼ ⊂ Minimal ⊂ Full`.
-- [ ] **[Deuda menor]** Refactor meta-axiomas FOL → ✅ HECHO 2026-06-12 (`FOL/MetaRules.lean`).
+- [x] **[Deuda menor]** Refactor meta-axiomas FOL → ✅ HECHO 2026-06-12 (`FOL/MetaRules.lean`).
+
+---
+
+## Eje 4.3 — Gödel Nivel D REAL: aritmetización de D1–D3 (EN CURSO, 2026-06-13)
+
+**Motivación**: D1/D2/D3 estaban **postulados** (meta-axiomas opacos). El `provFormula_repr` bicondicional era además imposible por Tarski (rastrea verdad en ℕ). Decisión (Opción A): **aritmetización total** — `demFormula` será una `Formula` Σ₁ concreta con `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]` demostrada. Plan completo y descomposición en [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
+
+**Reencuadre clave**: el `axioms ⊢` del proyecto usa la **ω-regla** `gen` (premisas infinitas) → no es r.e. → no aritmetizable. Por eso Gödel se aplica a un **cálculo de Hilbert finitario `⊢ᴴ` nuevo, en paralelo**; el ω-sistema queda intacto.
+
+- [x] **Fase 0** (`Meta/Hilbert.lean`): `Prf₀` (Hilbert intuicionista) + `Prf` (clásico). Puentes `prf0_to_derives`/`prf_to_derives : Prf φ → axioms ⊢ φ` usando **solo constructores de `Derives`**; `dne` aparece en **un único punto** (esquema P3), verificado por `#print axioms` (diferencia exacta entre ambos puentes = `{dne}`). `consistentH_of_omega`: la consistencia se hereda.
+- [x] **Fase 1** (`Meta/HilbertSeq.lean`): `Rule` (líneas anotadas, evita invertir la sustitución) + verificador decidible `checkProof` + `Derivation`. **Solidez** `derivation_to_prf` + **completitud** `prf_to_derivation` (con `checkAux_append`/`checkAux_shift` para combinar subpruebas) ⟹ `prf_iff_derivation : Prf φ ↔ ∃ rs, Derivation rs φ`. Coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto**, `dem_tracks : (∃d, Dem d ⌜φ⌝) ↔ Prf φ` (reemplaza `Dem`/`dem_iff_provable` postulados; solo axiomas estándar de Lean).
+- [x] **Fase 2.1** (`Meta/CodeArith.lean`): `numeral_bridge` (Meta.Godel.numeral = Full.numeral) + `gnum_ne`/`gnum_lt`/`gnum_add`/`gnum_mul`/`gnum_refl` (aritmética de códigos re-expuesta de `Full.Numerals`).
+- [x] **Fase 2.2 nivel término** (`Meta/SubstArith.lean`): funciones object `substtc`/`substtsc` + congruencias de `cons` + ecuaciones recursivas (6 **axiomas definicionales**, estilo `pow`/`prod_pairs`) + `substTerm_arith`/`substTerms_arith` (cómputo `⊢ substtc ⌜v⌝ ⌜s⌝ ⌜t⌝ = ⌜substTerm v s t⌝`) por inducción meta mutua.
+- [ ] **Fase 2.2 nivel fórmula**: `liftFormula`/`substFormula` con binders (∀/∃, `v→v+1`, lift del substituyendo). Mismo patrón, más casos.
+- [ ] **Fase 2.3**: aritmetizar `stepConcl` → predicado object `StepOK`.
+- [ ] **Fase 2.4**: aritmetizar `checkProof` → `Chk`; definir `demFormula := ∃ … Chk …` (Σ₁).
+- [ ] **Fase 2.5**: representabilidad positiva `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]` por inducción sobre `Derivation`.
+- [ ] **Fase 3 (D1)**: necesitación `Prf φ → ⊢ᴴ Prov(⌜φ⌝)` ⟹ Gödel I sin postular D1.
+- [ ] **Fases 4–5 (D2, D3)**: combinador MP; esquema de inducción + Σ₁-completitud provable; + representabilidad **negativa** (para reflexión).
+
+> **Pendiente de integración**: las ecuaciones recursivas de las funciones de coding (hoy `axiom` en `SubstArith`) deben moverse a `Minimal.axioms` (extensión definicional conservadora) para que `⊢ᴴ` también las tenga. Paso mecánico de cierre de la Fase 2.
 
 ---
 

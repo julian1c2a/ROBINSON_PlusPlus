@@ -176,6 +176,40 @@ Fases 0–3 ⟹ **Gödel I sin postulados**. Fases 4–5 ⟹ Gödel II/Löb sin 
 
 ---
 
+## 7 · Fase 2 — descomposición (aritmetización total, Opción A)
+
+Decisión 2026-06-13: **aritmetización total** — `demFormula` será una `Formula`
+Σ₁ concreta que internaliza `checkProof`, con `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]`
+demostrada (no postulada). Es el mayor bloque del proyecto; se construye por
+sub-pasos verificados.
+
+**Observación que acota el esfuerzo de D1:** para la **necesitación** (Fase 3,
+D1) basta la dirección **positiva** `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]`. En una
+demostración válida concreta todas las comparaciones de igualdad del verificador
+**aciertan**, luego se resuelven por reflexividad/aritmética de numerales; la
+**distinción** de códigos (dirección negativa) sólo hace falta para la reflexión
+(Gödel I-soundness / parte de D3), y se difiere.
+
+**Motor (patrón `Full.Numerals`):** la **inducción meta** (en Lean) demuestra
+hechos de **cómputo object-level**; `⊢ᴴ` no necesita inducción, sólo las
+ecuaciones recursivas de cada función object. Cada operación del coding se
+axiomatiza como función object (símbolo + ecuaciones, estilo `pow`/`prod_pairs`)
+y su corrección sobre entradas concretas se prueba por inducción meta.
+
+| Sub-paso | Contenido | Estado |
+|---|---|---|
+| **2.1** | `Meta/CodeArith.lean`: puente `numeral_bridge`, separación `gnum_ne`, orden `gnum_lt`, homomorfismos `gnum_add/mul`, reflexividad `gnum_refl` | ✅ |
+| **2.2t** | `Meta/SubstArith.lean` (nivel **término**): funciones object `substtc`/`substtsc`, congruencias de `cons`, ecuaciones recursivas (6 axiomas **definicionales**), y `substTerm_arith`/`substTerms_arith` por inducción meta mutua | ✅ |
+| **2.2f** | nivel **fórmula**: `liftFormula`/`substFormula` con la complicación del lift bajo binders (∀/∃, `v→v+1`); mismo patrón | ⬜ |
+| **2.3** | Aritmetización de `stepConcl` (por regla) → predicado object `StepOK` + cómputo sobre líneas concretas | ⬜ |
+| **2.4** | Aritmetización de `checkProof` → predicado `Chk(p)`; definición `demFormula := ∃ … Chk …` (Σ₁) | ⬜ |
+| **2.5** | **Representabilidad positiva** `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]` por inducción sobre `Derivation` | ⬜ |
+| **2.6** | (diferido, para reflexión/D3) representabilidad negativa `¬Dem d x → ⊢ᴴ ¬demFormula[…]` | ⬜ |
+
+> Honestidad de scope: 2.2 (aritmetización de la sustitución De Bruijn) es el
+> núcleo duro; requiere extender el lenguaje object con funciones de coding y sus
+> axiomas recursivos. Es trabajo de varias sesiones.
+
 ## 6 · Referencias
 
 - O'Connor, R. (2005). *Essential Incompleteness of Arithmetic Verified by Coq.*

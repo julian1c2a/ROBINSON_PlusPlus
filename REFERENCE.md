@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-07 — `Minimal/` a 0 sorrys reales con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL + meta-axioma `ax_p_tfa` (TFA). Bloque VIII +10 teoremas (álgebra de `Dvd`, corolarios TFA). Nuevos módulos `Meta/Godel.lean` (Nivel B: G, ⌜·⌝, Teo G1) y `Meta/Provability.lean` (Nivel C: formCode + inyectividad, IsFormula, Provable, Dem, lema del punto fijo, sentencia de Gödel; +5 meta-axiomas Gödel). Inducción: prototipo `Intermediate/Induction.lean` (meta) y `Full/Induction.lean` (object-level lift-aware) donde **ax6/ax7/ax10/ax11/ax12 (algebraicos ecuacionales) y ax18/ax19 (orden: irreflexividad + tricotomía) ya son teoremas**. Linter `unusedSimpArgs false` global; warning externo `FOL/Eq.lean:130` cerrado (commit FOL `9888c58`). **15 módulos**, build verde 0 warnings (28 jobs).
+**Last updated:** 2026-06-13 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). 4 módulos `Meta/` nuevos: `Hilbert.lean` (cálculo de Hilbert finitario `Prf₀`/`Prf` + puentes constructor-puros con `dne` aislado), `HilbertSeq.lean` (verificador decidible `checkProof` + `Prf φ ↔ ∃rs Derivation` + `Dem` concreto + `dem_tracks`), `CodeArith.lean` (puente de numerales + aritmética de códigos), `SubstArith.lean` (Fase 2.2 nivel término: `substTerm` aritmetizado + cómputo). Base previa: TFA completo (`tfa_numeral`) + Gödel I/II (`Meta/Incompleteness`) + `Full/` (inducción general, representabilidad). Sistema con **34 axiomas matemáticos** en Minimal + meta-reglas FOL; **29 módulos** (Minimal 11 + Meta 7 + Full 11), 0 sorrys, **43 jobs**. Nota: `SubstArith` añade 6 axiomas **definicionales** (ecuaciones recursivas de las funciones de coding, a integrar en `Minimal.axioms`). Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -51,7 +51,11 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Minimal/Theorems/Block8.lean` | `…Block8` | `Axioms`, `Block1`, `Block2`, `Block4_C5` | ✅ Complete (Fase 17 + Ax-P TFA; +10 teoremas: álgebra de `Dvd` y corolarios TFA) |
 | `Meta/Godel.lean` | `…Meta.Godel` | `Axioms`, `Block6` | ✅ Complete (Nivel B: `G`, `⌜·⌝`, Teo G1) |
 | `Meta/Provability.lean` | `…Meta.Provability` | `Axioms`, `Meta.Godel`, `FOL.*` | ✅ Complete (Nivel C: `formCode`, `IsFormula`, `Dem`, `diagonal_lemma`, `goedelSentence`) |
-| `Meta/Incompleteness.lean` | `…Meta.Incompleteness` | `Axioms`, `Meta.Godel`, `Meta.Provability`, `FOL.*` | ✅ Complete (Nivel D: Gödel I mitad esencial + Gödel II vía D2/D3) |
+| `Meta/Incompleteness.lean` | `…Meta.Incompleteness` | `Axioms`, `Meta.Godel`, `Meta.Provability`, `FOL.*` | ✅ Complete (Nivel D: Gödel I + Gödel II vía D2/D3 postulados) |
+| `Meta/Hilbert.lean` | `…Meta.Hilbert` | `Axioms`, `FOL.*` | ✅ Nivel D real F0: `Prf₀`/`Prf` + puentes (`dne` aislado) |
+| `Meta/HilbertSeq.lean` | `…Meta.HilbertSeq` | `Meta.Hilbert`, `Meta.Godel`, `Meta.Provability` | ✅ Nivel D real F1: `checkProof`, `prf_iff_derivation`, `Dem` concreto, `dem_tracks` |
+| `Meta/CodeArith.lean` | `…Meta.CodeArith` | `Meta.Godel`, `Full.Numerals` | ✅ Nivel D real F2.1: `numeral_bridge`, `gnum_*` |
+| `Meta/SubstArith.lean` | `…Meta.SubstArith` | `Meta.Provability`, `Meta.CodeArith` | 🟡 Nivel D real F2.2t: `substtc`/`substtsc` + `substTerm_arith` (6 axiomas definicionales) |
 | `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | ✅ ax6/7/10/11/12/18/19 derivados |
 | `Full/Mod2.lean` | `…Full` | `Axioms`, `Block1`, `Full.Induction` | ✅ ax21/ax24 (Opción C.2) |
 | `Full/Lists.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ ax_C3/ax_L3 (`ax_list_induction`) |
@@ -897,7 +901,57 @@ theorem con_imp_goedelSentence : axioms ⊢ (consistencyFormula ⇒ goedelSenten
 theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)       -- ⊬ Con
 ```
 
-**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level** — funciona en el FOL intuicionista de aquí. **Pendiente**: la otra mitad de Gödel I (`⊬ ¬G`) necesita ω-consistencia / DNE / Rosser. La sutileza ω-lógica del sistema se discute en `GODEL-STATUS.md`.
+**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level**. La otra mitad de Gödel I (`⊬ ¬G`) se cerró 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`).
+
+---
+
+### 3.16 Nivel D REAL — aritmetización de D1–D3 (Fases 0–2.2t)
+
+Conversión de D1/D2/D3 de **postulados** a **teoremas** sobre un cálculo de Hilbert finitario nuevo. Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md). El `axioms ⊢` del proyecto usa la ω-regla (no r.e.), así que Gödel se aplica a `Prf` (finitario, paralelo); el ω-sistema queda intacto.
+
+**`Meta/Hilbert.lean`** (Fase 0) — namespace `…Meta.Hilbert`:
+```lean
+theorem subst_lift_same (f) (c) (s) : substFormula c s (liftFormula c f) = f
+inductive Prf₀ : Formula → Prop   -- Hilbert intuicionista (P1/P2, C, J, efq, Q1-3, refl, leibniz, thy, mp, gen)
+inductive Prf  : Formula → Prop   -- clásico: incl (Prf₀) + p3 (DNE) + mp + gen
+theorem prf0_to_derives : Prf₀ φ → axioms ⊢ φ   -- SOLO constructores de Derives (sin dne)
+theorem prf_to_derives  : Prf φ → axioms ⊢ φ    -- + dne en un único punto (esquema p3)
+theorem consistentH_of_omega : ¬(axioms ⊢ ⊥) → ¬ Prf ⊥
+-- #print axioms: prf0 sin dne; prf con FOL.MetaRules.dne (diferencia exacta = {dne})
+```
+
+**`Meta/HilbertSeq.lean`** (Fase 1) — namespace `…Meta.HilbertSeq`:
+```lean
+inductive Rule   -- líneas anotadas (evita invertir la sustitución)
+def checkProof : List Rule → Option (List Formula)   -- verificador decidible (DecidableEq Term/Formula)
+def Derivation (rs) (φ) : Prop := ∃ L, checkProof rs = some L ∧ φ ∈ L
+theorem derivation_to_prf : Derivation rs φ → Prf φ            -- solidez
+theorem prf_to_derivation : Prf φ → ∃ rs, Derivation rs φ       -- completitud (checkAux_append/_shift)
+theorem prf_iff_derivation : Prf φ ↔ ∃ rs, Derivation rs φ
+def ruleCode : Rule → Term ;  def rulesCode : List Rule → Term  -- coding de Gödel
+def Dem (d x : Term) : Prop  -- "d codifica derivación válida con la fórmula de código x" (concreto)
+def ProvableH (x : Term) : Prop := ∃ d, Dem d x
+theorem dem_tracks (φ) : ProvableH (formCode φ) ↔ Prf φ         -- reemplaza dem_iff_provable
+```
+
+**`Meta/CodeArith.lean`** (Fase 2.1) — namespace `…Meta.CodeArith`:
+```lean
+theorem numeral_bridge (n) : Meta.Godel.numeral n = Full.numeral n
+theorem gnum_ne {a b} (h : a ≠ b) : axioms ⊢ neg (numeral a =eq numeral b)   -- separación
+theorem gnum_lt {a b} (h : a < b) : axioms ⊢ lt (numeral a) (numeral b)
+theorem gnum_add (a b) : axioms ⊢ (add (numeral a) (numeral b) =eq numeral (a+b))   -- + gnum_mul, gnum_refl
+```
+
+**`Meta/SubstArith.lean`** (Fase 2.2 nivel término) — namespace `…Meta.SubstArith`:
+```lean
+theorem congr_cons_head / congr_cons_tail   -- congruencia de cons (patrón eq_congr)
+theorem pred_numeral (m) : axioms ⊢ (pred (numeral (m+1)) =eq numeral m)
+def varc / funcc / substtc / substtsc   -- funciones object de coding y sustitución
+-- 6 axiomas DEFINICIONALES (ecuaciones recursivas; integrar en Minimal.axioms):
+axiom substtc_var_eq / _var_gt / _var_lt / _func ;  axiom substtsc_nil / _cons
+theorem substTerm_arith (v) (s) (t) : axioms ⊢ (substtc (numeral v) (termCode s) (termCode t) =eq termCode (substTerm v s t))
+theorem substTerms_arith ...   -- mutuo; cómputo object de la sustitución (nivel término)
+```
 
 ---
 
