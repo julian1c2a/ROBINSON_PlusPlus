@@ -457,6 +457,68 @@ def ax_substtsc_cons : Formula :=
   forall_4 (substtsc (.var 3) (.var 2) (cons (.var 1) (.var 0))
     =eq cons (substtc (.var 3) (.var 2) (.var 1)) (substtsc (.var 3) (.var 2) (.var 0)))
 
+-- Desplazamiento (lift) De Bruijn aritmetizado sobre códigos de término / lista.
+/-- Lift aritmetizado sobre códigos de término. -/
+def liftc (c t : Term) : Term := Term.func "liftc" [c, t]
+/-- Lift aritmetizado sobre códigos de lista de términos. -/
+def liftsc (c t : Term) : Term := Term.func "liftsc" [c, t]
+
+-- Ecuaciones recursivas de `liftTerm`. Para el caso `n ≥ c` usamos la condición
+-- equivalente `c < n+1` (`lt c (succ n)`), evitando `le`.
+def ax_liftc_var_lt : Formula :=
+  forall_2 ((lt (.var 0) (.var 1)) ⇒ (liftc (.var 1) (varc (.var 0)) =eq varc (.var 0)))
+def ax_liftc_var_ge : Formula :=
+  forall_2 ((lt (.var 1) (succ (.var 0))) ⇒ (liftc (.var 1) (varc (.var 0)) =eq varc (succ (.var 0))))
+def ax_liftc_func : Formula :=
+  forall_3 (liftc (.var 2) (funcc (.var 1) (.var 0)) =eq funcc (.var 1) (liftsc (.var 2) (.var 0)))
+def ax_liftsc_nil : Formula :=
+  forall_ (liftsc (.var 0) nil =eq nil)
+def ax_liftsc_cons : Formula :=
+  forall_3 (liftsc (.var 2) (cons (.var 1) (.var 0))
+    =eq cons (liftc (.var 2) (.var 1)) (liftsc (.var 2) (.var 0)))
+
+-- Constructores de código de fórmula (tags 2..9, espejo de `formCode`, numeral-free).
+def botc : Term := cons (succ (succ zero)) nil
+def atomc (pc tsc : Term) : Term := cons (succ (succ (succ zero))) (cons pc (cons tsc nil))
+def eqc (a b : Term) : Term := cons (succ (succ (succ (succ zero)))) (cons a (cons b nil))
+def implc (a b : Term) : Term := cons (succ (succ (succ (succ (succ zero))))) (cons a (cons b nil))
+def forallc (a : Term) : Term := cons (succ (succ (succ (succ (succ (succ zero)))))) (cons a nil)
+def andc (a b : Term) : Term :=
+  cons (succ (succ (succ (succ (succ (succ (succ zero))))))) (cons a (cons b nil))
+def orc (a b : Term) : Term :=
+  cons (succ (succ (succ (succ (succ (succ (succ (succ zero)))))))) (cons a (cons b nil))
+def exc (a : Term) : Term :=
+  cons (succ (succ (succ (succ (succ (succ (succ (succ (succ zero))))))))) (cons a nil)
+
+/-- Sustitución aritmetizada sobre códigos de **fórmula**. -/
+def substfc (v t f : Term) : Term := Term.func "substfc" [v, t, f]
+
+-- Ecuaciones recursivas de `substFormula` (8 constructores; los binders ∀/∃
+-- incrementan el nivel con `succ` y desplazan el substituyendo con `liftc zero`).
+def ax_substfc_bottom : Formula :=
+  forall_2 (substfc (.var 1) (.var 0) botc =eq botc)
+def ax_substfc_atom : Formula :=
+  forall_4 (substfc (.var 3) (.var 2) (atomc (.var 1) (.var 0))
+    =eq atomc (.var 1) (substtsc (.var 3) (.var 2) (.var 0)))
+def ax_substfc_eq : Formula :=
+  forall_4 (substfc (.var 3) (.var 2) (eqc (.var 1) (.var 0))
+    =eq eqc (substtc (.var 3) (.var 2) (.var 1)) (substtc (.var 3) (.var 2) (.var 0)))
+def ax_substfc_impl : Formula :=
+  forall_4 (substfc (.var 3) (.var 2) (implc (.var 1) (.var 0))
+    =eq implc (substfc (.var 3) (.var 2) (.var 1)) (substfc (.var 3) (.var 2) (.var 0)))
+def ax_substfc_forall : Formula :=
+  forall_3 (substfc (.var 2) (.var 1) (forallc (.var 0))
+    =eq forallc (substfc (succ (.var 2)) (liftc zero (.var 1)) (.var 0)))
+def ax_substfc_and : Formula :=
+  forall_4 (substfc (.var 3) (.var 2) (andc (.var 1) (.var 0))
+    =eq andc (substfc (.var 3) (.var 2) (.var 1)) (substfc (.var 3) (.var 2) (.var 0)))
+def ax_substfc_or : Formula :=
+  forall_4 (substfc (.var 3) (.var 2) (orc (.var 1) (.var 0))
+    =eq orc (substfc (.var 3) (.var 2) (.var 1)) (substfc (.var 3) (.var 2) (.var 0)))
+def ax_substfc_ex : Formula :=
+  forall_3 (substfc (.var 2) (.var 1) (exc (.var 0))
+    =eq exc (substfc (succ (.var 2)) (liftc zero (.var 1)) (.var 0)))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -510,7 +572,20 @@ def axioms : List Formula := [
   ax_substtc_var_lt,
   ax_substtc_func,
   ax_substtsc_nil,
-  ax_substtsc_cons
+  ax_substtsc_cons,
+  ax_liftc_var_lt,
+  ax_liftc_var_ge,
+  ax_liftc_func,
+  ax_liftsc_nil,
+  ax_liftsc_cons,
+  ax_substfc_bottom,
+  ax_substfc_atom,
+  ax_substfc_eq,
+  ax_substfc_impl,
+  ax_substfc_forall,
+  ax_substfc_and,
+  ax_substfc_or,
+  ax_substfc_ex
 ]
 
 -- ## Helper Theorems

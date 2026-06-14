@@ -194,6 +194,198 @@ theorem substTerms_arith (v : Nat) (s : Term) : ∀ (ts : List Term),
       exact FOL.derive_eq_trans hstep (FOL.derive_eq_trans (congr_cons_head ih1) (congr_cons_tail ih2))
 end
 
+/-! ### `liftTerm` aritmetizado (2.2f-a; necesario para los binders de `substFormula`) -/
+
+theorem liftc_var_lt (c n : Term) :
+    axioms ⊢ ((lt n c) ⇒ (liftc c (varc n) =eq varc n)) := by
+  have hh := spec (spec (ax (show ax_liftc_var_lt ∈ axioms by simp [axioms])) c) n
+  simp [ax_liftc_var_lt, substFormula, substTerm, substTerms, liftc, varc, cons, nil, zero, succ, lt,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftc_var_ge (c n : Term) :
+    axioms ⊢ ((lt c (succ n)) ⇒ (liftc c (varc n) =eq varc (succ n))) := by
+  have hh := spec (spec (ax (show ax_liftc_var_ge ∈ axioms by simp [axioms])) c) n
+  simp [ax_liftc_var_ge, substFormula, substTerm, substTerms, liftc, varc, cons, nil, zero, succ, lt,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftc_func (c sc tsc : Term) :
+    axioms ⊢ (liftc c (funcc sc tsc) =eq funcc sc (liftsc c tsc)) := by
+  have hh := spec (spec (spec (ax (show ax_liftc_func ∈ axioms by simp [axioms])) c) sc) tsc
+  simp [ax_liftc_func, substFormula, substTerm, substTerms, liftc, liftsc, funcc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftsc_nil (c : Term) :
+    axioms ⊢ (liftsc c nil =eq nil) := by
+  have hh := spec (ax (show ax_liftsc_nil ∈ axioms by simp [axioms])) c
+  simp [ax_liftsc_nil, substFormula, substTerm, substTerms, liftsc, nil, zero,
+    FOL.substTerm_liftTerm] at hh
+  exact hh
+
+theorem liftsc_cons (c h t : Term) :
+    axioms ⊢ (liftsc c (cons h t) =eq cons (liftc c h) (liftsc c t)) := by
+  have hh := spec (spec (spec (ax (show ax_liftsc_cons ∈ axioms by simp [axioms])) c) h) t
+  simp [ax_liftsc_cons, substFormula, substTerm, substTerms, liftsc, liftc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+mutual
+/-- **Cómputo de `liftTerm`**: `liftc` sobre códigos calcula el código de `liftTerm c t`. -/
+theorem liftTerm_arith (c : Nat) : ∀ (t : Term),
+    axioms ⊢ (liftc (numeral c) (termCode t) =eq termCode (liftTerm c t))
+  | .var n => by
+      show axioms ⊢ (liftc (numeral c) (varc (numeral n)) =eq termCode (liftTerm c (.var n)))
+      by_cases hlt : n < c
+      · have hsub : liftTerm c (.var n) = .var n := by simp [liftTerm, hlt]
+        rw [hsub]
+        exact mp (liftc_var_lt (numeral c) (numeral n)) (gnum_lt hlt)
+      · have hsub : liftTerm c (.var n) = .var (n + 1) := by simp [liftTerm, hlt]
+        rw [hsub]
+        exact mp (liftc_var_ge (numeral c) (numeral n)) (gnum_lt (by omega : c < n + 1))
+  | .func sym ts => by
+      show axioms ⊢ (liftc (numeral c) (funcc (strCode sym) (termsCode ts))
+        =eq termCode (liftTerm c (.func sym ts)))
+      have hstep := liftc_func (numeral c) (strCode sym) (termsCode ts)
+      have hih := liftTerms_arith c ts
+      have hcongr : axioms ⊢ (funcc (strCode sym) (liftsc (numeral c) (termsCode ts))
+          =eq funcc (strCode sym) (termsCode (liftTerms c ts))) := by
+        unfold funcc
+        apply congr_cons_tail; apply congr_cons_tail; apply congr_cons_head
+        exact hih
+      exact FOL.derive_eq_trans hstep hcongr
+
+/-- **Cómputo de `liftTerms`** (lista), mutuo con `liftTerm_arith`. -/
+theorem liftTerms_arith (c : Nat) : ∀ (ts : List Term),
+    axioms ⊢ (liftsc (numeral c) (termsCode ts) =eq termsCode (liftTerms c ts))
+  | [] => liftsc_nil (numeral c)
+  | t :: ts => by
+      show axioms ⊢ (liftsc (numeral c) (cons (termCode t) (termsCode ts))
+        =eq termsCode (liftTerms c (t :: ts)))
+      have hstep := liftsc_cons (numeral c) (termCode t) (termsCode ts)
+      have ih1 := liftTerm_arith c t
+      have ih2 := liftTerms_arith c ts
+      exact FOL.derive_eq_trans hstep (FOL.derive_eq_trans (congr_cons_head ih1) (congr_cons_tail ih2))
+end
+
+/-! ### `substFormula` aritmetizado (2.2f-b): ecuaciones (teoremas) -/
+
+theorem substfc_bottom (v t : Term) :
+    axioms ⊢ (substfc v t botc =eq botc) := by
+  have hh := spec (spec (ax (show ax_substfc_bottom ∈ axioms by simp [axioms])) v) t
+  simp [ax_substfc_bottom, substFormula, substTerm, substTerms, substfc, botc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem substfc_atom (v t pc tsc : Term) :
+    axioms ⊢ (substfc v t (atomc pc tsc) =eq atomc pc (substtsc v t tsc)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substfc_atom ∈ axioms by simp [axioms])) v) t) pc) tsc
+  simp [ax_substfc_atom, substFormula, substTerm, substTerms, substfc, substtsc, atomc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
+
+theorem substfc_eq (v t a b : Term) :
+    axioms ⊢ (substfc v t (eqc a b) =eq eqc (substtc v t a) (substtc v t b)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substfc_eq ∈ axioms by simp [axioms])) v) t) a) b
+  simp [ax_substfc_eq, substFormula, substTerm, substTerms, substfc, substtc, eqc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
+
+theorem substfc_impl (v t a b : Term) :
+    axioms ⊢ (substfc v t (implc a b) =eq implc (substfc v t a) (substfc v t b)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substfc_impl ∈ axioms by simp [axioms])) v) t) a) b
+  simp [ax_substfc_impl, substFormula, substTerm, substTerms, substfc, implc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
+
+theorem substfc_and (v t a b : Term) :
+    axioms ⊢ (substfc v t (andc a b) =eq andc (substfc v t a) (substfc v t b)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substfc_and ∈ axioms by simp [axioms])) v) t) a) b
+  simp [ax_substfc_and, substFormula, substTerm, substTerms, substfc, andc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
+
+theorem substfc_or (v t a b : Term) :
+    axioms ⊢ (substfc v t (orc a b) =eq orc (substfc v t a) (substfc v t b)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substfc_or ∈ axioms by simp [axioms])) v) t) a) b
+  simp [ax_substfc_or, substFormula, substTerm, substTerms, substfc, orc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
+
+theorem substfc_forall (v t a : Term) :
+    axioms ⊢ (substfc v t (forallc a) =eq forallc (substfc (succ v) (liftc zero t) a)) := by
+  have hh := spec (spec (spec (ax (show ax_substfc_forall ∈ axioms by simp [axioms])) v) t) a
+  simp [ax_substfc_forall, substFormula, substTerm, substTerms, substfc, liftc, forallc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem substfc_ex (v t a : Term) :
+    axioms ⊢ (substfc v t (exc a) =eq exc (substfc (succ v) (liftc zero t) a)) := by
+  have hh := spec (spec (spec (ax (show ax_substfc_ex ∈ axioms by simp [axioms])) v) t) a
+  simp [ax_substfc_ex, substFormula, substTerm, substTerms, substfc, liftc, exc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-! ### Congruencias para los constructores de código (vía `cons`) y `substfc` -/
+
+/-- Congruencia en el 1er argumento de un constructor binario `cons T (cons · (cons _ nil))`. -/
+theorem congr_bin1 {T x x' y : Term} (h : axioms ⊢ (x =eq x')) :
+    axioms ⊢ (cons T (cons x (cons y nil)) =eq cons T (cons x' (cons y nil))) :=
+  congr_cons_tail (congr_cons_head h)
+/-- Congruencia en el 2º argumento de un constructor binario. -/
+theorem congr_bin2 {T x y y' : Term} (h : axioms ⊢ (y =eq y')) :
+    axioms ⊢ (cons T (cons x (cons y nil)) =eq cons T (cons x (cons y' nil))) :=
+  congr_cons_tail (congr_cons_tail (congr_cons_head h))
+/-- Congruencia en el argumento de un constructor unario `cons T (cons · nil)`. -/
+theorem congr_un {T x x' : Term} (h : axioms ⊢ (x =eq x')) :
+    axioms ⊢ (cons T (cons x nil) =eq cons T (cons x' nil)) :=
+  congr_cons_tail (congr_cons_head h)
+
+/-- Congruencia de `substfc` en el 2º argumento (el substituyendo). -/
+theorem congr_substfc_arg2 {x z a b : Term} (h : axioms ⊢ (a =eq b)) :
+    axioms ⊢ (substfc x a z =eq substfc x b z) := by
+  let f : Formula := Formula.eq (substfc (liftTerm 0 x) (liftTerm 0 a) (liftTerm 0 z))
+                                 (substfc (liftTerm 0 x) (.var 0) (liftTerm 0 z))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (substfc x a z) (substfc x s z) := by
+    intro s
+    simp only [f, substFormula, substfc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ Derives.subst axioms a b f h ((hS a) ▸ Derives.refl axioms (substfc x a z))
+
+/-! ### Lema de cómputo de `substFormula` (nivel fórmula), por recursión en `f` -/
+
+/-- **Cómputo de `substFormula`**: la función object `substfc` calcula el código de
+    `substFormula v s f`. Recursión estructural en `f`; los binders ∀/∃ recurren
+    con nivel `v+1` y substituyendo `liftTerm 0 s` (vía `liftTerm_arith`). -/
+theorem substFormula_arith : ∀ (v : Nat) (s : Term) (f : Formula),
+    axioms ⊢ (substfc (numeral v) (termCode s) (formCode f) =eq formCode (substFormula v s f))
+  | v, s, .bottom => substfc_bottom (numeral v) (termCode s)
+  | v, s, .atom p ts =>
+      FOL.derive_eq_trans (substfc_atom (numeral v) (termCode s) (strCode p) (termsCode ts))
+        (congr_bin2 (substTerms_arith v s ts))
+  | v, s, .eq a b =>
+      FOL.derive_eq_trans (substfc_eq (numeral v) (termCode s) (termCode a) (termCode b))
+        (FOL.derive_eq_trans (congr_bin1 (substTerm_arith v s a)) (congr_bin2 (substTerm_arith v s b)))
+  | v, s, .impl a b =>
+      FOL.derive_eq_trans (substfc_impl (numeral v) (termCode s) (formCode a) (formCode b))
+        (FOL.derive_eq_trans (congr_bin1 (substFormula_arith v s a)) (congr_bin2 (substFormula_arith v s b)))
+  | v, s, .and a b =>
+      FOL.derive_eq_trans (substfc_and (numeral v) (termCode s) (formCode a) (formCode b))
+        (FOL.derive_eq_trans (congr_bin1 (substFormula_arith v s a)) (congr_bin2 (substFormula_arith v s b)))
+  | v, s, .or a b =>
+      FOL.derive_eq_trans (substfc_or (numeral v) (termCode s) (formCode a) (formCode b))
+        (FOL.derive_eq_trans (congr_bin1 (substFormula_arith v s a)) (congr_bin2 (substFormula_arith v s b)))
+  | v, s, .forall a =>
+      FOL.derive_eq_trans (substfc_forall (numeral v) (termCode s) (formCode a))
+        (congr_un (FOL.derive_eq_trans
+          (congr_substfc_arg2 (x := succ (numeral v)) (z := formCode a) (liftTerm_arith 0 s))
+          (substFormula_arith (v + 1) (liftTerm 0 s) a)))
+  | v, s, .ex a =>
+      FOL.derive_eq_trans (substfc_ex (numeral v) (termCode s) (formCode a))
+        (congr_un (FOL.derive_eq_trans
+          (congr_substfc_arg2 (x := succ (numeral v)) (z := formCode a) (liftTerm_arith 0 s))
+          (substFormula_arith (v + 1) (liftTerm 0 s) a)))
+
 end ROBINSON_PlusPlus.Meta.SubstArith
 
 export ROBINSON_PlusPlus.Meta.SubstArith (
@@ -208,4 +400,24 @@ export ROBINSON_PlusPlus.Meta.SubstArith (
   substtsc_cons
   substTerm_arith
   substTerms_arith
+  liftc_var_lt
+  liftc_var_ge
+  liftc_func
+  liftsc_nil
+  liftsc_cons
+  liftTerm_arith
+  liftTerms_arith
+  substfc_bottom
+  substfc_atom
+  substfc_eq
+  substfc_impl
+  substfc_and
+  substfc_or
+  substfc_forall
+  substfc_ex
+  congr_bin1
+  congr_bin2
+  congr_un
+  congr_substfc_arg2
+  substFormula_arith
 )

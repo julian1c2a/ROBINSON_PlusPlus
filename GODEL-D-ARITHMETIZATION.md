@@ -200,7 +200,7 @@ y su corrección sobre entradas concretas se prueba por inducción meta.
 |---|---|---|
 | **2.1** | `Meta/CodeArith.lean`: puente `numeral_bridge`, separación `gnum_ne`, orden `gnum_lt`, homomorfismos `gnum_add/mul`, reflexividad `gnum_refl` | ✅ |
 | **2.2t** | `Meta/SubstArith.lean` (nivel **término**): funciones object `substtc`/`substtsc` + ecuaciones recursivas **integradas en `Minimal.axioms`** (re-derivadas como teoremas vía `ax`+`spec`; `substTerm_arith` depende solo de axiomas estándar de Lean) + congruencias de `cons` + `substTerm_arith`/`substTerms_arith` por inducción meta mutua. Lema auxiliar `substTerm_liftLiftLift` (triple lift, para `forall_4`) | ✅ |
-| **2.2f** | nivel **fórmula**: `liftFormula`/`substFormula` con la complicación del lift bajo binders (∀/∃, `v→v+1`); mismo patrón | ⬜ |
+| **2.2f** | nivel **fórmula** (`Meta/SubstArith.lean` + `Minimal/Axioms.lean`): `liftc`/`liftsc` (lift aritmetizado) + `substfc` (8 constructores de código `botc`..`exc`) + 13 ecuaciones recursivas **en `Minimal.axioms`** (re-derivadas como teoremas) + `liftTerm_arith` + `substFormula_arith` (binders ∀/∃ con `succ`-nivel y `liftc zero`-substituyendo). `substFormula_arith` depende solo de axiomas estándar de Lean | ✅ |
 | **2.3** | Aritmetización de `stepConcl` (por regla) → predicado object `StepOK` + cómputo sobre líneas concretas | ⬜ |
 | **2.4** | Aritmetización de `checkProof` → predicado `Chk(p)`; definición `demFormula := ∃ … Chk …` (Σ₁) | ⬜ |
 | **2.5** | **Representabilidad positiva** `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]` por inducción sobre `Derivation` | ⬜ |
