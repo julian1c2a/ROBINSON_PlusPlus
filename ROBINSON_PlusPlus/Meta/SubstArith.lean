@@ -64,40 +64,81 @@ theorem pred_numeral (m : Nat) : axioms ⊢ (pred (numeral (m + 1)) =eq numeral 
     FOL.substTerm_liftTerm] at hh
   exact hh
 
-/-! ### Funciones object de coding y de sustitución -/
+/- Cancelación de **triple lift** (espejo de `FOL.substTerm_liftLift`, un nivel
+   más): sustituir en `c+2` un término triplemente desplazado en `c` devuelve el
+   doblemente desplazado. Necesaria para instanciar axiomas `forall_4` (la
+   primera variable atraviesa 3 binders ⟹ triple lift). -/
+mutual
+theorem substTerm_liftLiftLift (t : Term) (c : Nat) (s : Term) :
+    substTerm (c + 2) s (liftTerm c (liftTerm c (liftTerm c t))) = liftTerm c (liftTerm c t) := by
+  cases t with
+  | var n =>
+      by_cases h1 : n < c
+      · simp [liftTerm, substTerm, h1, show ¬ n = c + 2 from by omega, show ¬ n > c + 2 from by omega]
+      · have h2 : ¬ n + 1 < c := by omega
+        have h3 : ¬ n + 1 + 1 < c := by omega
+        have hgt : n + 1 + 1 + 1 > c + 2 := by omega
+        simp [liftTerm, substTerm, h1, h2, h3, hgt]
+        omega
+  | func f ts =>
+      simp only [liftTerm, substTerm]; congr 1; exact substTerms_liftLiftLift ts c s
+theorem substTerms_liftLiftLift (ts : List Term) (c : Nat) (s : Term) :
+    substTerms (c + 2) s (liftTerms c (liftTerms c (liftTerms c ts))) = liftTerms c (liftTerms c ts) := by
+  cases ts with
+  | nil => simp [liftTerms, substTerms]
+  | cons t ts' =>
+      simp only [liftTerms, substTerms, List.cons.injEq]
+      exact ⟨substTerm_liftLiftLift t c s, substTerms_liftLiftLift ts' c s⟩
+end
 
-/-- Código de una variable: `⟨0, n⟩`. (`= termCode (.var n)` cuando `n = numeral k`.) -/
-def varc (n : Term) : Term := cons (numeral 0) (cons n nil)
+/-! ### Ecuaciones recursivas de la sustitución (TEOREMAS, desde `Minimal.axioms`)
 
-/-- Código de una aplicación de función: `⟨1, sym, ts⟩`. -/
-def funcc (sc tsc : Term) : Term := cons (numeral 1) (cons sc (cons tsc nil))
+Las funciones `varc`/`funcc`/`substtc`/`substtsc` y sus **ecuaciones recursivas**
+viven en `Minimal/Axioms.lean` (extensión definicional, entradas de `axioms`).
+Aquí derivamos las formas Lean-parametrizadas instanciando los axiomas object
+(`forall_n`) vía `ax` + `spec` (patrón de Block6). Ya **no hay `axiom` local**. -/
 
-/-- Sustitución aritmetizada sobre códigos de **término**. -/
-def substtc (v s c : Term) : Term := Term.func "substtc" [v, s, c]
+theorem substtc_var_eq (v s n : Term) :
+    axioms ⊢ ((v =eq n) ⇒ (substtc v s (varc n) =eq s)) := by
+  have hh := spec (spec (spec (ax (show ax_substtc_var_eq ∈ axioms by simp [axioms])) v) s) n
+  simp [ax_substtc_var_eq, substFormula, substTerm, substTerms, substtc, varc, cons, nil, zero, succ,
+    lt, pred, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
 
-/-- Sustitución aritmetizada sobre códigos de **lista de términos**. -/
-def substtsc (v s c : Term) : Term := Term.func "substtsc" [v, s, c]
+theorem substtc_var_gt (v s n : Term) :
+    axioms ⊢ ((lt v n) ⇒ (substtc v s (varc n) =eq varc (pred n))) := by
+  have hh := spec (spec (spec (ax (show ax_substtc_var_gt ∈ axioms by simp [axioms])) v) s) n
+  simp [ax_substtc_var_gt, substFormula, substTerm, substTerms, substtc, varc, cons, nil, zero, succ,
+    lt, pred, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
 
-/-! ### Ecuaciones recursivas (extensión definicional; integrar en `Minimal.axioms`) -/
+theorem substtc_var_lt (v s n : Term) :
+    axioms ⊢ ((lt n v) ⇒ (substtc v s (varc n) =eq varc n)) := by
+  have hh := spec (spec (spec (ax (show ax_substtc_var_lt ∈ axioms by simp [axioms])) v) s) n
+  simp [ax_substtc_var_lt, substFormula, substTerm, substTerms, substtc, varc, cons, nil, zero, succ,
+    lt, pred, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
 
-/-- `var` con índice igual al nivel: se reemplaza por el substituyendo. -/
-axiom substtc_var_eq (v s n : Term) :
-    axioms ⊢ ((v =eq n) ⇒ (substtc v s (varc n) =eq s))
-/-- `var` con índice mayor que el nivel: decrementa (`pred`). -/
-axiom substtc_var_gt (v s n : Term) :
-    axioms ⊢ ((lt v n) ⇒ (substtc v s (varc n) =eq varc (pred n)))
-/-- `var` con índice menor que el nivel: queda igual. -/
-axiom substtc_var_lt (v s n : Term) :
-    axioms ⊢ ((lt n v) ⇒ (substtc v s (varc n) =eq varc n))
-/-- `func`: la sustitución desciende a los argumentos. -/
-axiom substtc_func (v s sc tsc : Term) :
-    axioms ⊢ (substtc v s (funcc sc tsc) =eq funcc sc (substtsc v s tsc))
-/-- lista vacía. -/
-axiom substtsc_nil (v s : Term) :
-    axioms ⊢ (substtsc v s nil =eq nil)
-/-- lista `cons`: sustituye cabeza y cola. -/
-axiom substtsc_cons (v s h t : Term) :
-    axioms ⊢ (substtsc v s (cons h t) =eq cons (substtc v s h) (substtsc v s t))
+theorem substtc_func (v s sc tsc : Term) :
+    axioms ⊢ (substtc v s (funcc sc tsc) =eq funcc sc (substtsc v s tsc)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substtc_func ∈ axioms by simp [axioms])) v) s) sc) tsc
+  simp [ax_substtc_func, substFormula, substTerm, substTerms, substtc, substtsc, funcc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
+
+theorem substtsc_nil (v s : Term) :
+    axioms ⊢ (substtsc v s nil =eq nil) := by
+  have hh := spec (spec (ax (show ax_substtsc_nil ∈ axioms by simp [axioms])) v) s
+  simp [ax_substtsc_nil, substFormula, substTerm, substTerms, substtsc, nil, zero,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem substtsc_cons (v s h t : Term) :
+    axioms ⊢ (substtsc v s (cons h t) =eq cons (substtc v s h) (substtsc v s t)) := by
+  have hh := spec (spec (spec (spec (ax (show ax_substtsc_cons ∈ axioms by simp [axioms])) v) s) h) t
+  simp [ax_substtsc_cons, substFormula, substTerm, substTerms, substtsc, substtc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift, substTerms_liftLiftLift] at hh
+  exact hh
 
 /-! ### Lema de cómputo (nivel término), por inducción meta mutua -/
 
@@ -159,10 +200,12 @@ export ROBINSON_PlusPlus.Meta.SubstArith (
   congr_cons_head
   congr_cons_tail
   pred_numeral
-  varc
-  funcc
-  substtc
-  substtsc
+  substtc_var_eq
+  substtc_var_gt
+  substtc_var_lt
+  substtc_func
+  substtsc_nil
+  substtsc_cons
   substTerm_arith
   substTerms_arith
 )

@@ -421,6 +421,42 @@ def ax29_sub_witness : Formula :=
     le (.var 0) (.var 1) ⇒ (add (.var 0) (sub (.var 1) (.var 0)) =eq (.var 1))
   )
 
+-- ### Funciones de codificación y sustitución aritmetizada (Meta Nivel D, Fase 2)
+-- Extensión definicional para la aritmetización del predicado de demostración de
+-- Gödel. `varc`/`funcc` son los códigos de `Term.var`/`Term.func` (tags 0 / 1 =
+-- `zero` / `succ zero`); `substtc`/`substtsc` son la sustitución De Bruijn sobre
+-- códigos de término / lista de términos. Sus **ecuaciones recursivas** se añaden
+-- a `axioms` (abajo) — extensión definicional conservadora, estilo `pow`/`prod_pairs`.
+
+/-- Código de `Term.var n`: `⟨0, n⟩`. -/
+def varc (n : Term) : Term := cons zero (cons n nil)
+/-- Código de `Term.func`: `⟨1, sym, ts⟩`. -/
+def funcc (sc tsc : Term) : Term := cons (succ zero) (cons sc (cons tsc nil))
+/-- Sustitución aritmetizada sobre códigos de término. -/
+def substtc (v s c : Term) : Term := Term.func "substtc" [v, s, c]
+/-- Sustitución aritmetizada sobre códigos de lista de términos. -/
+def substtsc (v s c : Term) : Term := Term.func "substtsc" [v, s, c]
+
+/-- Cuantificación universal cuádruple (De Bruijn). -/
+def forall_4 (f : Formula) : Formula := .forall (.forall (.forall (.forall f)))
+
+-- Ecuaciones recursivas de la sustitución. Convención `forall_n`: el primer
+-- `spec` instancia el índice más alto (`var (n-1)`).
+def ax_substtc_var_eq : Formula :=
+  forall_3 (((.var 2) =eq (.var 0)) ⇒ (substtc (.var 2) (.var 1) (varc (.var 0)) =eq (.var 1)))
+def ax_substtc_var_gt : Formula :=
+  forall_3 ((lt (.var 2) (.var 0)) ⇒ (substtc (.var 2) (.var 1) (varc (.var 0)) =eq varc (pred (.var 0))))
+def ax_substtc_var_lt : Formula :=
+  forall_3 ((lt (.var 0) (.var 2)) ⇒ (substtc (.var 2) (.var 1) (varc (.var 0)) =eq varc (.var 0)))
+def ax_substtc_func : Formula :=
+  forall_4 (substtc (.var 3) (.var 2) (funcc (.var 1) (.var 0))
+    =eq funcc (.var 1) (substtsc (.var 3) (.var 2) (.var 0)))
+def ax_substtsc_nil : Formula :=
+  forall_2 (substtsc (.var 1) (.var 0) nil =eq nil)
+def ax_substtsc_cons : Formula :=
+  forall_4 (substtsc (.var 3) (.var 2) (cons (.var 1) (.var 0))
+    =eq cons (substtc (.var 3) (.var 2) (.var 1)) (substtsc (.var 3) (.var 2) (.var 0)))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -466,7 +502,15 @@ def axioms : List Formula := [
   ax_pow_zero,          -- b^0 = 1
   ax_pow_succ,          -- b^(σe) = b^e * b
   ax_prodp_nil,         -- prod_pairs [] = 1
-  ax_prodp_cons         -- prod_pairs ((p,e)::t) = p^e * prod_pairs t
+  ax_prodp_cons,        -- prod_pairs ((p,e)::t) = p^e * prod_pairs t
+  -- Nivel D (Fase 2): ecuaciones recursivas de la sustitución aritmetizada
+  -- (extensión definicional conservadora; ver `Meta/SubstArith.lean`).
+  ax_substtc_var_eq,
+  ax_substtc_var_gt,
+  ax_substtc_var_lt,
+  ax_substtc_func,
+  ax_substtsc_nil,
+  ax_substtsc_cons
 ]
 
 -- ## Helper Theorems
