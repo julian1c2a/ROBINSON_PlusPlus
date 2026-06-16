@@ -542,6 +542,23 @@ def ax_liftfc_or : Formula :=
 def ax_liftfc_ex : Formula :=
   forall_2 (liftfc (.var 1) (exc (.var 0)) =eq exc (liftfc (succ (.var 1)) (.var 0)))
 
+-- ### Verificador object de demostraciones (Fase 2.4)
+-- Numeral local (= `Meta.Godel.numeral`; usado para las etiquetas de regla 0..17)
+-- y extractores `carc`/`cdrc` (cabeza/cola de `cons`) para leer las líneas.
+
+/-- Numeral De Bruijn `σⁿ(0)` (copia local en `Minimal`; coincide con `Godel.numeral`). -/
+def numeralM : Nat → Term
+  | 0     => zero
+  | n + 1 => succ (numeralM n)
+
+/-- Cabeza de un `cons`. -/
+def carc (l : Term) : Term := Term.func "carc" [l]
+/-- Cola de un `cons`. -/
+def cdrc (l : Term) : Term := Term.func "cdrc" [l]
+
+def ax_carc : Formula := forall_2 (carc (cons (.var 1) (.var 0)) =eq (.var 1))
+def ax_cdrc : Formula := forall_2 (cdrc (cons (.var 1) (.var 0)) =eq (.var 0))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -616,7 +633,9 @@ def axioms : List Formula := [
   ax_liftfc_forall,
   ax_liftfc_and,
   ax_liftfc_or,
-  ax_liftfc_ex
+  ax_liftfc_ex,
+  ax_carc,
+  ax_cdrc
 ]
 
 -- ## Helper Theorems

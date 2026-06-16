@@ -19,3 +19,4 @@ import ROBINSON_PlusPlus.Meta.HilbertSeq
 import ROBINSON_PlusPlus.Meta.CodeArith
 import ROBINSON_PlusPlus.Meta.SubstArith
 import ROBINSON_PlusPlus.Meta.StepArith
+import ROBINSON_PlusPlus.Meta.CheckArith
