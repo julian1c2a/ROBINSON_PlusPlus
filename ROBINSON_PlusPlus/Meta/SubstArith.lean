@@ -386,6 +386,90 @@ theorem substFormula_arith : ∀ (v : Nat) (s : Term) (f : Formula),
           (congr_substfc_arg2 (x := succ (numeral v)) (z := formCode a) (liftTerm_arith 0 s))
           (substFormula_arith (v + 1) (liftTerm 0 s) a)))
 
+/-! ### `liftFormula` aritmetizado (para el esquema Q3) -/
+
+theorem liftfc_bottom (c : Term) :
+    axioms ⊢ (liftfc c botc =eq botc) := by
+  have hh := spec (ax (show ax_liftfc_bottom ∈ axioms by simp [axioms])) c
+  simp [ax_liftfc_bottom, substFormula, substTerm, substTerms, liftfc, botc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm] at hh
+  exact hh
+
+theorem liftfc_atom (c pc tsc : Term) :
+    axioms ⊢ (liftfc c (atomc pc tsc) =eq atomc pc (liftsc c tsc)) := by
+  have hh := spec (spec (spec (ax (show ax_liftfc_atom ∈ axioms by simp [axioms])) c) pc) tsc
+  simp [ax_liftfc_atom, substFormula, substTerm, substTerms, liftfc, liftsc, atomc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftfc_eq (c a b : Term) :
+    axioms ⊢ (liftfc c (eqc a b) =eq eqc (liftc c a) (liftc c b)) := by
+  have hh := spec (spec (spec (ax (show ax_liftfc_eq ∈ axioms by simp [axioms])) c) a) b
+  simp [ax_liftfc_eq, substFormula, substTerm, substTerms, liftfc, liftc, eqc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftfc_impl (c a b : Term) :
+    axioms ⊢ (liftfc c (implc a b) =eq implc (liftfc c a) (liftfc c b)) := by
+  have hh := spec (spec (spec (ax (show ax_liftfc_impl ∈ axioms by simp [axioms])) c) a) b
+  simp [ax_liftfc_impl, substFormula, substTerm, substTerms, liftfc, implc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftfc_and (c a b : Term) :
+    axioms ⊢ (liftfc c (andc a b) =eq andc (liftfc c a) (liftfc c b)) := by
+  have hh := spec (spec (spec (ax (show ax_liftfc_and ∈ axioms by simp [axioms])) c) a) b
+  simp [ax_liftfc_and, substFormula, substTerm, substTerms, liftfc, andc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftfc_or (c a b : Term) :
+    axioms ⊢ (liftfc c (orc a b) =eq orc (liftfc c a) (liftfc c b)) := by
+  have hh := spec (spec (spec (ax (show ax_liftfc_or ∈ axioms by simp [axioms])) c) a) b
+  simp [ax_liftfc_or, substFormula, substTerm, substTerms, liftfc, orc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftfc_forall (c a : Term) :
+    axioms ⊢ (liftfc c (forallc a) =eq forallc (liftfc (succ c) a)) := by
+  have hh := spec (spec (ax (show ax_liftfc_forall ∈ axioms by simp [axioms])) c) a
+  simp [ax_liftfc_forall, substFormula, substTerm, substTerms, liftfc, forallc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+theorem liftfc_ex (c a : Term) :
+    axioms ⊢ (liftfc c (exc a) =eq exc (liftfc (succ c) a)) := by
+  have hh := spec (spec (ax (show ax_liftfc_ex ∈ axioms by simp [axioms])) c) a
+  simp [ax_liftfc_ex, substFormula, substTerm, substTerms, liftfc, exc, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- **Cómputo de `liftFormula`**: `liftfc` calcula el código de `liftFormula c f`. -/
+theorem liftFormula_arith : ∀ (c : Nat) (f : Formula),
+    axioms ⊢ (liftfc (numeral c) (formCode f) =eq formCode (liftFormula c f))
+  | c, .bottom => liftfc_bottom (numeral c)
+  | c, .atom p ts =>
+      FOL.derive_eq_trans (liftfc_atom (numeral c) (strCode p) (termsCode ts))
+        (congr_bin2 (liftTerms_arith c ts))
+  | c, .eq a b =>
+      FOL.derive_eq_trans (liftfc_eq (numeral c) (termCode a) (termCode b))
+        (FOL.derive_eq_trans (congr_bin1 (liftTerm_arith c a)) (congr_bin2 (liftTerm_arith c b)))
+  | c, .impl a b =>
+      FOL.derive_eq_trans (liftfc_impl (numeral c) (formCode a) (formCode b))
+        (FOL.derive_eq_trans (congr_bin1 (liftFormula_arith c a)) (congr_bin2 (liftFormula_arith c b)))
+  | c, .and a b =>
+      FOL.derive_eq_trans (liftfc_and (numeral c) (formCode a) (formCode b))
+        (FOL.derive_eq_trans (congr_bin1 (liftFormula_arith c a)) (congr_bin2 (liftFormula_arith c b)))
+  | c, .or a b =>
+      FOL.derive_eq_trans (liftfc_or (numeral c) (formCode a) (formCode b))
+        (FOL.derive_eq_trans (congr_bin1 (liftFormula_arith c a)) (congr_bin2 (liftFormula_arith c b)))
+  | c, .forall a =>
+      FOL.derive_eq_trans (liftfc_forall (numeral c) (formCode a))
+        (congr_un (liftFormula_arith (c + 1) a))
+  | c, .ex a =>
+      FOL.derive_eq_trans (liftfc_ex (numeral c) (formCode a))
+        (congr_un (liftFormula_arith (c + 1) a))
+
 end ROBINSON_PlusPlus.Meta.SubstArith
 
 export ROBINSON_PlusPlus.Meta.SubstArith (
@@ -420,4 +504,13 @@ export ROBINSON_PlusPlus.Meta.SubstArith (
   congr_un
   congr_substfc_arg2
   substFormula_arith
+  liftfc_bottom
+  liftfc_atom
+  liftfc_eq
+  liftfc_impl
+  liftfc_and
+  liftfc_or
+  liftfc_forall
+  liftfc_ex
+  liftFormula_arith
 )

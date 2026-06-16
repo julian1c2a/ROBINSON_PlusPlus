@@ -519,6 +519,29 @@ def ax_substfc_ex : Formula :=
   forall_3 (substfc (.var 2) (.var 1) (exc (.var 0))
     =eq exc (substfc (succ (.var 2)) (liftc zero (.var 1)) (.var 0)))
 
+/-- Lift aritmetizado sobre códigos de **fórmula** (necesario para el esquema Q3,
+    que usa `liftFormula 0 B`). -/
+def liftfc (c f : Term) : Term := Term.func "liftfc" [c, f]
+
+-- Ecuaciones recursivas de `liftFormula` (los binders ∀/∃ incrementan el nivel
+-- con `succ`; átomos/igualdades usan `liftc`/`liftsc`).
+def ax_liftfc_bottom : Formula :=
+  forall_ (liftfc (.var 0) botc =eq botc)
+def ax_liftfc_atom : Formula :=
+  forall_3 (liftfc (.var 2) (atomc (.var 1) (.var 0)) =eq atomc (.var 1) (liftsc (.var 2) (.var 0)))
+def ax_liftfc_eq : Formula :=
+  forall_3 (liftfc (.var 2) (eqc (.var 1) (.var 0)) =eq eqc (liftc (.var 2) (.var 1)) (liftc (.var 2) (.var 0)))
+def ax_liftfc_impl : Formula :=
+  forall_3 (liftfc (.var 2) (implc (.var 1) (.var 0)) =eq implc (liftfc (.var 2) (.var 1)) (liftfc (.var 2) (.var 0)))
+def ax_liftfc_forall : Formula :=
+  forall_2 (liftfc (.var 1) (forallc (.var 0)) =eq forallc (liftfc (succ (.var 1)) (.var 0)))
+def ax_liftfc_and : Formula :=
+  forall_3 (liftfc (.var 2) (andc (.var 1) (.var 0)) =eq andc (liftfc (.var 2) (.var 1)) (liftfc (.var 2) (.var 0)))
+def ax_liftfc_or : Formula :=
+  forall_3 (liftfc (.var 2) (orc (.var 1) (.var 0)) =eq orc (liftfc (.var 2) (.var 1)) (liftfc (.var 2) (.var 0)))
+def ax_liftfc_ex : Formula :=
+  forall_2 (liftfc (.var 1) (exc (.var 0)) =eq exc (liftfc (succ (.var 1)) (.var 0)))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -585,7 +608,15 @@ def axioms : List Formula := [
   ax_substfc_forall,
   ax_substfc_and,
   ax_substfc_or,
-  ax_substfc_ex
+  ax_substfc_ex,
+  ax_liftfc_bottom,
+  ax_liftfc_atom,
+  ax_liftfc_eq,
+  ax_liftfc_impl,
+  ax_liftfc_forall,
+  ax_liftfc_and,
+  ax_liftfc_or,
+  ax_liftfc_ex
 ]
 
 -- ## Helper Theorems
