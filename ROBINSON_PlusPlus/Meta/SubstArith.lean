@@ -91,6 +91,34 @@ theorem substTerms_liftLiftLift (ts : List Term) (c : Nat) (s : Term) :
       exact ⟨substTerm_liftLiftLift t c s, substTerms_liftLiftLift ts' c s⟩
 end
 
+/- Cancelación de **cuádruple lift** (para instanciar axiomas `forall_5`: la
+   primera variable atraviesa 4 binders). -/
+mutual
+theorem substTerm_liftLiftLiftLift (t : Term) (c : Nat) (s : Term) :
+    substTerm (c + 3) s (liftTerm c (liftTerm c (liftTerm c (liftTerm c t))))
+      = liftTerm c (liftTerm c (liftTerm c t)) := by
+  cases t with
+  | var n =>
+      by_cases h1 : n < c
+      · simp [liftTerm, substTerm, h1, show ¬ n = c + 3 from by omega, show ¬ n > c + 3 from by omega]
+      · have h2 : ¬ n + 1 < c := by omega
+        have h3 : ¬ n + 1 + 1 < c := by omega
+        have h4 : ¬ n + 1 + 1 + 1 < c := by omega
+        have hgt : n + 1 + 1 + 1 + 1 > c + 3 := by omega
+        simp [liftTerm, substTerm, h1, h2, h3, h4, hgt]
+        omega
+  | func f ts =>
+      simp only [liftTerm, substTerm]; congr 1; exact substTerms_liftLiftLiftLift ts c s
+theorem substTerms_liftLiftLiftLift (ts : List Term) (c : Nat) (s : Term) :
+    substTerms (c + 3) s (liftTerms c (liftTerms c (liftTerms c (liftTerms c ts))))
+      = liftTerms c (liftTerms c (liftTerms c ts)) := by
+  cases ts with
+  | nil => simp [liftTerms, substTerms]
+  | cons t ts' =>
+      simp only [liftTerms, substTerms, List.cons.injEq]
+      exact ⟨substTerm_liftLiftLiftLift t c s, substTerms_liftLiftLiftLift ts' c s⟩
+end
+
 /-! ### Ecuaciones recursivas de la sustitución (TEOREMAS, desde `Minimal.axioms`)
 
 Las funciones `varc`/`funcc`/`substtc`/`substtsc` y sus **ecuaciones recursivas**

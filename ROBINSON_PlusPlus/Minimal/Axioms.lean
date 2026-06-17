@@ -559,6 +559,83 @@ def cdrc (l : Term) : Term := Term.func "cdrc" [l]
 def ax_carc : Formula := forall_2 (carc (cons (.var 1) (.var 0)) =eq (.var 1))
 def ax_cdrc : Formula := forall_2 (cdrc (cons (.var 1) (.var 0)) =eq (.var 0))
 
+/-- Cuantificación universal quíntuple. -/
+def forall_5 (f : Formula) : Formula := .forall (forall_4 f)
+
+/-- Verificador de demostraciones-secuencia: `validProofFn checked rest` recorre
+    `rest` recomputando la conclusión de cada línea y acumulando en `checked`;
+    devuelve la lista final de conclusiones para una demostración válida. -/
+def validProofFn (checked rest : Term) : Term := Term.func "validProofFn" [checked, rest]
+
+-- Ecuaciones de `validProofFn`. Una línea es `cons (numeralM K) (cons p₁ (… nil)))`;
+-- la etiqueta K (embebida en el patrón) distingue la regla (axiomas incondicionales
+-- para los esquemas lógicos; MP/Gen condicionados por pertenencia `In`). Parámetros
+-- directos por binders. Orden de binders: `checked` el más externo, `rest` el más
+-- interno (`.var 0`).
+def ax_vpf_nil : Formula := forall_ (validProofFn (.var 0) nil =eq (.var 0))
+
+-- 2 parámetros (a=.var 2, b=.var 1): checked=.var 3, rest=.var 0.
+def ax_vpf_p1 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 0) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (.var 2) (implc (.var 1) (.var 2))) nil)) (.var 0))
+def ax_vpf_c1 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 2) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (.var 2) (implc (.var 1) (andc (.var 2) (.var 1)))) nil)) (.var 0))
+def ax_vpf_c2 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 3) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (andc (.var 2) (.var 1)) (.var 2)) nil)) (.var 0))
+def ax_vpf_c3 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 4) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (andc (.var 2) (.var 1)) (.var 1)) nil)) (.var 0))
+def ax_vpf_j1 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 5) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (.var 2) (orc (.var 2) (.var 1))) nil)) (.var 0))
+def ax_vpf_j2 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 6) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (.var 1) (orc (.var 2) (.var 1))) nil)) (.var 0))
+-- q1/q2/q3 (2 parámetros: A=.var 2, t/B=.var 1).
+def ax_vpf_q1 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 9) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (forallc (.var 2)) (substfc zero (.var 1) (.var 2))) nil)) (.var 0))
+def ax_vpf_q2 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 10) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (substfc zero (.var 1) (.var 2)) (exc (.var 2))) nil)) (.var 0))
+def ax_vpf_q3 : Formula :=
+  forall_4 (validProofFn (.var 3) (cons (cons (numeralM 11) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+    validProofFn (concat (.var 3) (cons (implc (forallc (implc (.var 2) (liftfc zero (.var 1)))) (implc (exc (.var 2)) (.var 1))) nil)) (.var 0))
+-- 3 parámetros (a=.var 3, b=.var 2, c=.var 1): checked=.var 4, rest=.var 0.
+def ax_vpf_p2 : Formula :=
+  forall_5 (validProofFn (.var 4) (cons (cons (numeralM 1) (cons (.var 3) (cons (.var 2) (cons (.var 1) nil)))) (.var 0)) =eq
+    validProofFn (concat (.var 4) (cons (implc (implc (.var 3) (implc (.var 2) (.var 1))) (implc (implc (.var 3) (.var 2)) (implc (.var 3) (.var 1)))) nil)) (.var 0))
+def ax_vpf_j3 : Formula :=
+  forall_5 (validProofFn (.var 4) (cons (cons (numeralM 7) (cons (.var 3) (cons (.var 2) (cons (.var 1) nil)))) (.var 0)) =eq
+    validProofFn (concat (.var 4) (cons (implc (orc (.var 3) (.var 2)) (implc (implc (.var 3) (.var 1)) (implc (implc (.var 2) (.var 1)) (.var 1)))) nil)) (.var 0))
+-- leibniz (3 parámetros: A=.var 3, t₁=.var 2, t₂=.var 1).
+def ax_vpf_leibniz : Formula :=
+  forall_5 (validProofFn (.var 4) (cons (cons (numeralM 13) (cons (.var 3) (cons (.var 2) (cons (.var 1) nil)))) (.var 0)) =eq
+    validProofFn (concat (.var 4) (cons (implc (eqc (.var 2) (.var 1)) (implc (substfc zero (.var 2) (.var 3)) (substfc zero (.var 1) (.var 3)))) nil)) (.var 0))
+-- 1 parámetro (a=.var 1): checked=.var 2, rest=.var 0.
+def ax_vpf_efq : Formula :=
+  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 8) (cons (.var 1) nil)) (.var 0)) =eq
+    validProofFn (concat (.var 2) (cons (implc botc (.var 1)) nil)) (.var 0))
+def ax_vpf_eqrefl : Formula :=
+  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 12) (cons (.var 1) nil)) (.var 0)) =eq
+    validProofFn (concat (.var 2) (cons (eqc (.var 1) (.var 1)) nil)) (.var 0))
+def ax_vpf_p3 : Formula :=
+  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 14) (cons (.var 1) nil)) (.var 0)) =eq
+    validProofFn (concat (.var 2) (cons (implc (implc (implc (.var 1) botc) botc) (.var 1)) nil)) (.var 0))
+-- MP (conclB=.var 2, premiseA=.var 1): condicional por pertenencia.
+def ax_vpf_mp : Formula :=
+  forall_4 ((In (implc (.var 1) (.var 2)) (.var 3)) ⇒
+    ((In (.var 1) (.var 3)) ⇒
+      (validProofFn (.var 3) (cons (cons (numeralM 16) (cons (.var 2) (cons (.var 1) nil))) (.var 0)) =eq
+        validProofFn (concat (.var 3) (cons (.var 2) nil)) (.var 0))))
+-- Gen (body=.var 1): condicional por pertenencia.
+def ax_vpf_gen : Formula :=
+  forall_3 ((In (.var 1) (.var 2)) ⇒
+    (validProofFn (.var 2) (cons (cons (numeralM 17) (cons (.var 1) nil)) (.var 0)) =eq
+      validProofFn (concat (.var 2) (cons (forallc (.var 1)) nil)) (.var 0)))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -635,7 +712,25 @@ def axioms : List Formula := [
   ax_liftfc_or,
   ax_liftfc_ex,
   ax_carc,
-  ax_cdrc
+  ax_cdrc,
+  ax_vpf_nil,
+  ax_vpf_p1,
+  ax_vpf_p2,
+  ax_vpf_c1,
+  ax_vpf_c2,
+  ax_vpf_c3,
+  ax_vpf_j1,
+  ax_vpf_j2,
+  ax_vpf_j3,
+  ax_vpf_efq,
+  ax_vpf_q1,
+  ax_vpf_q2,
+  ax_vpf_q3,
+  ax_vpf_eqrefl,
+  ax_vpf_leibniz,
+  ax_vpf_p3,
+  ax_vpf_mp,
+  ax_vpf_gen
 ]
 
 -- ## Helper Theorems
