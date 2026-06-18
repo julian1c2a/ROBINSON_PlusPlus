@@ -9,14 +9,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 31 (Minimal/ 11 + Meta/ 9 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith, StepArith, CheckArith] + Full/ 11) |
-| Modules sin sorry | 31 / 31 ✅ |
+| Total modules | 32 (Minimal/ 11 + Meta/ 10 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith, StepArith, CheckArith, Representability] + Full/ 11) |
+| Modules sin sorry | 32 / 32 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
 | Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C, **legacy**); `D2`/`D3` (Incompleteness D, **legacy**). Las 6 ecuaciones recursivas de coding (`substtc`/`substtsc`) están **integradas en `Minimal.axioms`** (extensión definicional) — `SubstArith` sin `axiom` local |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
-| Gödel | **A, B, C, D** ✅ (I completo + II vía D2/D3 postulados). **Nivel D REAL en curso**: aritmetización honesta de D1–D3 sobre Hilbert finitario `Prf` — Fases 0–1, 2.1–2.4 hechas (sustitución/lift De Bruijn + verificador object `validProofFn` + `provFormulaC` Σ₁); falta regla `thy` + representabilidad (2.5) |
-| Build status | ✅ Passing (**45 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
+| Gödel | **A, B, C, D** ✅ (I completo + II vía D2/D3 postulados). **Nivel D REAL en curso**: aritmetización honesta de D1–D3 sobre Hilbert finitario `Prf` — **Fase 2 completa** (0–1, 2.1–2.5): sustitución/lift De Bruijn + verificador object `validProofFn` (18 reglas, `thy` incl.) + `provFormulaC` Σ₁ + **representabilidad positiva** `repr_pos : Prf φ → axioms ⊢ provCodeC φ` (`Meta/Representability.lean`, `#print axioms` = solo estándar). Próximo: Fase 3 (envolver `repr_pos` como D1); 2.6 reflexión diferida |
+| Build status | ✅ Passing (**46 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 

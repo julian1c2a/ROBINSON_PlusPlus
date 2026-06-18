@@ -153,8 +153,8 @@ incompleto y Gödel aplica.)
 | **0** | `Meta/Hilbert.lean`: `Prf₀`/`Prf` + puentes `prf0_to_derives`/`prf_to_derives` + consistencia transferida | ✅ |
 | **1a/b** | `Meta/HilbertSeq.lean`: `Rule`, verificador decidible `checkProof`, `Derivation`, **solidez + completitud** ⟹ `Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ |
 | **1c** | `Meta/HilbertSeq.lean` (cont.): coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto** + `dem_tracks : (∃ d, Dem d ⌜φ⌝) ↔ Prf φ` (solo axiomas estándar de Lean) | ✅ |
-| **2** | Aritmetización (CodeArith/SubstArith/StepArith/CheckArith): sustitución y lift De Bruijn como funciones object, verificador `validProofFn`, `provFormulaC` Σ₁. Desglose y estado fino en **§7**. | 🟡 (2.1–2.4 ✅ — verificador completo, 18 reglas; falta 2.5) |
-| **3** | **D1** real: `Prf φ → Prf (Prov⌜φ⌝)` (necesitación vía Σ₁-completitud) | ⬜ |
+| **2** | Aritmetización (CodeArith/SubstArith/StepArith/CheckArith/Representability): sustitución y lift De Bruijn como funciones object, verificador `validProofFn`, `provFormulaC` Σ₁, **representabilidad positiva** `repr_pos`. Desglose y estado fino en **§7**. | ✅ (2.1–2.5 ✅; 2.6 negativa diferida) |
+| **3** | **D1** real: `Prf φ → axioms ⊢ provCodeC φ` (necesitación) — **desbloqueado por `repr_pos`** | 🟡 (núcleo `repr_pos` ✅; falta envolver como D1) |
 | **4** | **D2** real: combinador MP sobre códigos + internalización | ⬜ |
 | **5** | **D3** real: + esquema de inducción `IND`; Σ₁-completitud *provable* | ⬜ |
 
@@ -205,7 +205,7 @@ y su corrección sobre entradas concretas se prueba por inducción meta.
 | **2.4-c** | `Meta/CheckArith.lean` (cimientos): `numeralM` (`= Godel.numeral`), extractores `carc`/`cdrc` + cómputo | ✅ |
 | **2.4-v** | verificador `validProofFn` + `forall_5` + **17 ecuaciones** en `Minimal.axioms` (params directos por binders, etiqueta de regla embebida; MP/Gen condicionales por `In`); `substTerm_liftLiftLiftLift` (4-lift); 17 step lemmas `vpf_*`; **`provFormulaC := ∃p, In x (validProofFn nil p)`** (Σ₁) + `provCodeC` | ✅ |
 | **2.4-thy** | regla `thy` (axiomas de teoría): **nudo de capas resuelto** sin `formCode` a nivel Minimal. La línea `thy` **transporta el código** del axioma (no su índice); `ruleCode (.thy k)` emite `formCode (axioms[k])` y `ax_vpf_thy` (incondicional, en `Minimal.axioms`) lo anexa tal cual — `validProofFn` no enumera `axioms`. Bakear `In c axiomsCode` aquí daría **ciclo definicional** (`ax_vpf_thy ∈ axioms`, `axiomsCode ∋ formCode(ax_vpf_thy)`), así que la **solidez** de `thy` (que `c` sea un axioma real) se difiere a 2.6 como la dirección negativa; `thy` es el único punto incondicional. Verificador **completo: 18 reglas** | ✅ |
-| **2.5** | **Representabilidad positiva** `Dem d x → ⊢ᴴ provCodeC φ`: construir el proof object desde la `Derivation` meta + computar `validProofFn` con las step lemmas | ⬜ |
+| **2.5** | **Representabilidad positiva** ✅ `Meta/Representability.lean`: `repr_pos : Prf φ → axioms ⊢ provCodeC φ`. Encoder object **a medida** `proofCode`/`lineCode` (las líneas `mp`/`gen`/`thy` transportan códigos de fórmulas resueltos, alineado con `validProofFn`; el `ruleCode` de 1c era por índices). Inducción de seguimiento `vpf_run` (18 casos; Q1/Q2/Q3/Leibniz vía `*_concl_code` + `liftFormula_arith`; MP/Gen descargan la pertenencia con `In_listFormCode`). Ensamblaje por `intro_ex` (el lift de `provFormulaC` se cancela con la sustitución del testigo, sin necesitar clausura de `formCode`). `#print axioms repr_pos` = solo `propext/Classical.choice/Quot.sound` | ✅ |
 | **2.6** | (diferido, para reflexión/D3) representabilidad negativa `¬Dem d x → ⊢ᴴ ¬provCodeC φ` | ⬜ |
 
 > Honestidad de scope: 2.2 (aritmetización de la sustitución De Bruijn) es el
