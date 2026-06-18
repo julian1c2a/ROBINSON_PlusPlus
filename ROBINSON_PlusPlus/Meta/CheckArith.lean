@@ -202,17 +202,17 @@ theorem vpf_gen (checked body rest : Term)
     nil, zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact mp hh h1
 
-/-- Paso `thy` (axioma de teoría, tag 15): **incondicional**, anexa el código `c`
-    transportado por la línea. La línea proviene de `ruleCode (.thy k)`, que ya
-    transporta `formCode (axioms[k])`; aquí `c` es ese código. La solidez (que `c`
-    sea de un axioma real) es la dirección negativa, diferida a 2.6. -/
-theorem vpf_thy (checked c rest : Term) :
+/-- Paso `thy` (axioma de teoría, tag 15): **condicional** a que el código `c`
+    transportado por la línea pertenezca a `axiomsCodeT` (el código de la teoría
+    `coreAxioms`). Así el verificador solo acepta como axioma de teoría los códigos
+    de axiomas REALES ⟹ `provCodeC` es fiel. -/
+theorem vpf_thy (checked c rest : Term) (h : axioms ⊢ In c axiomsCodeT) :
     axioms ⊢ (validProofFn checked (cons (cons (numeralM 15) (cons c nil)) rest) =eq
       validProofFn (concat checked (cons c nil)) rest) := by
   have hh := spec (spec (spec (ax (show ax_vpf_thy ∈ axioms by simp [axioms])) checked) c) rest
-  simp [ax_vpf_thy, substFormula, substTerm, substTerms, validProofFn, concat, numeralM, cons, nil,
-    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
-  exact hh
+  simp [ax_vpf_thy, substFormula, substTerm, substTerms, validProofFn, concat, In, in_sym, axiomsCodeT,
+    numeralM, cons, nil, zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact mp hh h
 
 /-! ### Fórmula de demostrabilidad object Σ₁ -/
 

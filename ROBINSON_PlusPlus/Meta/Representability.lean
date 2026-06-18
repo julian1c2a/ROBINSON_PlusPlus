@@ -138,6 +138,42 @@ theorem In_listFormCode {g : Formula} : ∀ {l : List Formula},
       · subst heq; exact in_cons_head (formCode g) (listFormCode xs)
       · exact in_cons_tail (formCode x) (In_listFormCode htail)
 
+/-! ### Puente `formCodeM = formCode`
+
+La codificación local de `Minimal` (`formCodeM`, con `numeralM`) coincide con la
+de `Meta/Provability` (`formCode`, con `Godel.numeral`); vía `numeralM_eq`. Permite
+relacionar `axiomsCodeT` (anclado a `listFormCodeM coreAxioms`) con la pertenencia
+`In_listFormCode` (que usa `formCode`). -/
+
+theorem charsCodeM_eq : ∀ cs : List Char, charsCodeM cs = charsCode cs
+  | []      => rfl
+  | _ :: cs => by simp only [charsCodeM, charsCode, numeralM_eq, charsCodeM_eq cs]
+
+theorem strCodeM_eq (s : String) : strCodeM s = strCode s := charsCodeM_eq s.toList
+
+mutual
+theorem termCodeM_eq : ∀ t : Term, termCodeM t = termCode t
+  | .var _    => by simp only [termCodeM, termCode, numeralM_eq]
+  | .func s ts => by simp only [termCodeM, termCode, numeralM_eq, strCodeM_eq, termsCodeM_eq ts]
+theorem termsCodeM_eq : ∀ ts : List Term, termsCodeM ts = termsCode ts
+  | []      => rfl
+  | t :: ts => by simp only [termsCodeM, termsCode, termCodeM_eq t, termsCodeM_eq ts]
+end
+
+theorem formCodeM_eq : ∀ φ : Formula, formCodeM φ = formCode φ
+  | .bottom    => by simp only [formCodeM, formCode, numeralM_eq]
+  | .atom _ _  => by simp only [formCodeM, formCode, numeralM_eq, strCodeM_eq, termsCodeM_eq]
+  | .eq _ _    => by simp only [formCodeM, formCode, numeralM_eq, termCodeM_eq]
+  | .impl a b  => by simp only [formCodeM, formCode, numeralM_eq, formCodeM_eq a, formCodeM_eq b]
+  | .forall a  => by simp only [formCodeM, formCode, numeralM_eq, formCodeM_eq a]
+  | .and a b   => by simp only [formCodeM, formCode, numeralM_eq, formCodeM_eq a, formCodeM_eq b]
+  | .or a b    => by simp only [formCodeM, formCode, numeralM_eq, formCodeM_eq a, formCodeM_eq b]
+  | .ex a      => by simp only [formCodeM, formCode, numeralM_eq, formCodeM_eq a]
+
+theorem listFormCodeM_eq : ∀ L : List Formula, listFormCodeM L = listFormCode L
+  | []      => rfl
+  | f :: fs => by simp only [listFormCodeM, listFormCode, formCodeM_eq f, listFormCodeM_eq fs]
+
 /-! ### Encoder object de demostraciones (a medida de `validProofFn`) -/
 
 /-- Código object de una línea, dada la conclusión `f` ya computada y el
@@ -289,8 +325,19 @@ theorem vpf_run (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc =
               subst hf; simp only [lineCode]
               exact vpf_p3 (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))
           | thy k =>
+              have hmem : f ∈ coreAxioms := List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
               simp only [lineCode]
-              exact vpf_thy (listFormCode acc) (formCode f) (proofCode rs (acc ++ [f]))
+              refine vpf_thy (listFormCode acc) (formCode f) (proofCode rs (acc ++ [f])) ?_
+              -- objetivo: `axioms ⊢ In ⌜f⌝ axiomsCodeT`, vía el anclaje + pertenencia
+              have hanchor : axioms ⊢ (axiomsCodeT =eq listFormCode coreAxioms) := by
+                have h0 : axioms ⊢ (axiomsCodeT =eq listFormCodeM coreAxioms) :=
+                  ax (show ax_axiomsCodeT ∈ axioms by simp [axioms])
+                rwa [listFormCodeM_eq] at h0
+              have hin : axioms ⊢ In (formCode f) (listFormCode coreAxioms) := In_listFormCode hmem
+              have ht := Derives.subst axioms (listFormCode coreAxioms) axiomsCodeT
+                (In (liftTerm 0 (formCode f)) (.var 0)) (FOL.derive_eq_symm hanchor)
+                (by simpa [substFormula, substTerm, substTerms, In, FOL.substTerm_liftTerm] using hin)
+              simpa [substFormula, substTerm, substTerms, In, FOL.substTerm_liftTerm] using ht
           | mp i j =>
               -- f = conclusión del MP; fi = acc[i] = (fj ⇒ f), fj = acc[j]
               rcases hi : acc[i]? with _ | fi

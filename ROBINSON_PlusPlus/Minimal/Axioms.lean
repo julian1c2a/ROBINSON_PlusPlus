@@ -551,6 +551,113 @@ def numeralM : Nat → Term
   | 0     => zero
   | n + 1 => succ (numeralM n)
 
+/-! ### Codificación de Gödel a nivel `Minimal` (`formCodeM`)
+
+Copia local de la codificación `formCode` de `Meta/Provability.lean`, escrita con
+`numeralM` (que `Minimal` sí tiene). Necesaria para expresar, **dentro de
+`Minimal.axioms`**, el código object de los axiomas de la teoría (`axiomsCodeT`)
+y así dar una regla `thy` **sólida** (que solo acepta códigos de axiomas reales).
+El puente `formCodeM = formCode` se demuestra a nivel Meta. -/
+
+/-- Código de una lista de caracteres (nivel `Minimal`). -/
+def charsCodeM : List Char → Term
+  | []      => nil
+  | c :: cs => cons (numeralM c.toNat) (charsCodeM cs)
+
+/-- Código de un símbolo `String` (nivel `Minimal`). -/
+def strCodeM (s : String) : Term := charsCodeM s.toList
+
+/- Código de Gödel de términos (nivel `Minimal`), mutuo con `termsCodeM`. -/
+mutual
+def termCodeM : Term → Term
+  | .var n     => cons (numeralM 0) (cons (numeralM n) nil)
+  | .func s ts => cons (numeralM 1) (cons (strCodeM s) (cons (termsCodeM ts) nil))
+def termsCodeM : List Term → Term
+  | []      => nil
+  | t :: ts => cons (termCodeM t) (termsCodeM ts)
+end
+
+/-- Código de Gödel de fórmulas (nivel `Minimal`); espejo de `formCode`. -/
+def formCodeM : Formula → Term
+  | .bottom          => cons (numeralM 2) nil
+  | .atom p ts       => cons (numeralM 3) (cons (strCodeM p) (cons (termsCodeM ts) nil))
+  | .eq t u          => cons (numeralM 4) (cons (termCodeM t) (cons (termCodeM u) nil))
+  | .impl a b        => cons (numeralM 5) (cons (formCodeM a) (cons (formCodeM b) nil))
+  | Formula.forall a => cons (numeralM 6) (cons (formCodeM a) nil)
+  | .and a b         => cons (numeralM 7) (cons (formCodeM a) (cons (formCodeM b) nil))
+  | .or a b          => cons (numeralM 8) (cons (formCodeM a) (cons (formCodeM b) nil))
+  | .ex a            => cons (numeralM 9) (cons (formCodeM a) nil)
+
+/-- Código object de una lista de fórmulas (nivel `Minimal`). -/
+def listFormCodeM : List Formula → Term
+  | []      => nil
+  | f :: fs => cons (formCodeM f) (listFormCodeM fs)
+
+/-! ### Clausura De Bruijn de los códigos `formCodeM`
+
+Los códigos no contienen variables libres ⟹ `liftTerm` es la identidad sobre
+ellos. Se prueban por **inducción estructural** (no por `rfl`/cómputo del kernel),
+lo cual es esencial: los códigos de símbolos (`σ`, `∈`, …) contienen numerales
+gigantes (`numeralM` del codepoint Unicode) que harían explotar cualquier `rfl`.
+Necesarias para `axioms_lift_eq` (con `ax_axiomsCodeT` en `axioms`). -/
+
+theorem liftTerm_nil (c : Nat) : liftTerm c nil = nil := rfl
+
+theorem liftTerm_numeralM (c n : Nat) : liftTerm c (numeralM n) = numeralM n := by
+  induction n with
+  | zero => rfl
+  | succ k ih => simp only [numeralM, succ, liftTerm, liftTerms, ih]
+
+theorem liftTerm_charsCodeM (c : Nat) : ∀ cs : List Char, liftTerm c (charsCodeM cs) = charsCodeM cs
+  | []      => rfl
+  | _ :: cs => by
+      simp only [charsCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_charsCodeM c cs]
+
+theorem liftTerm_strCodeM (c : Nat) (s : String) : liftTerm c (strCodeM s) = strCodeM s :=
+  liftTerm_charsCodeM c s.toList
+
+mutual
+theorem liftTerm_termCodeM (c : Nat) : ∀ t : Term, liftTerm c (termCodeM t) = termCodeM t
+  | .var _    => by simp only [termCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil]
+  | .func s ts => by
+      simp only [termCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_strCodeM,
+        liftTerm_nil, liftTerm_termsCodeM c ts]
+theorem liftTerm_termsCodeM (c : Nat) : ∀ ts : List Term, liftTerm c (termsCodeM ts) = termsCodeM ts
+  | []      => rfl
+  | t :: ts => by
+      simp only [termsCodeM, cons, liftTerm, liftTerms, liftTerm_termCodeM c t, liftTerm_termsCodeM c ts]
+end
+
+theorem liftTerm_formCodeM (c : Nat) : ∀ φ : Formula, liftTerm c (formCodeM φ) = formCodeM φ
+  | .bottom    => by simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil]
+  | .atom _ _  => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_strCodeM,
+        liftTerm_nil, liftTerm_termsCodeM]
+  | .eq _ _    => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil, liftTerm_termCodeM]
+  | .impl a b  => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil,
+        liftTerm_formCodeM c a, liftTerm_formCodeM c b]
+  | .forall a  => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil,
+        liftTerm_formCodeM c a]
+  | .and a b   => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil,
+        liftTerm_formCodeM c a, liftTerm_formCodeM c b]
+  | .or a b    => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil,
+        liftTerm_formCodeM c a, liftTerm_formCodeM c b]
+  | .ex a      => by
+      simp only [formCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_nil,
+        liftTerm_formCodeM c a]
+
+theorem liftTerm_listFormCodeM (c : Nat) : ∀ L : List Formula,
+    liftTerm c (listFormCodeM L) = listFormCodeM L
+  | []      => rfl
+  | f :: fs => by
+      simp only [listFormCodeM, cons, liftTerm, liftTerms, liftTerm_formCodeM c f,
+        liftTerm_listFormCodeM c fs]
+
 /-- Cabeza de un `cons`. -/
 def carc (l : Term) : Term := Term.func "carc" [l]
 /-- Cola de un `cons`. -/
@@ -635,16 +742,47 @@ def ax_vpf_gen : Formula :=
   forall_3 ((In (.var 1) (.var 2)) ⇒
     (validProofFn (.var 2) (cons (cons (numeralM 17) (cons (.var 1) nil)) (.var 0)) =eq
       validProofFn (concat (.var 2) (cons (forallc (.var 1)) nil)) (.var 0)))
--- Thy (c=.var 1, el código del axioma de teoría): incondicional, anexa `c` tal
--- cual. La línea TRANSPORTA el código del axioma (no su índice), de modo que el
--- verificador no necesita enumerar `axioms`. La SOLIDEZ (que `c` sea realmente el
--- código de un axioma) es la dirección negativa, diferida a 2.6 (ver
--- GODEL-D-ARITHMETIZATION §7): `thy` es el único punto incondicional del
--- verificador. Bakear la comprobación `In c axiomsCode` aquí crearía un ciclo
--- definicional (este axioma ∈ `axioms`, y `axiomsCode ∋ formCode(este axioma)`).
+/-! ### Teoría-objeto `coreAxioms` y su código `axiomsCodeT`
+
+`thy` recorre los **34 axiomas matemáticos** (`coreAxioms`), NO las ecuaciones de
+coding (`codingAxioms`, maquinaria de verificación). `axiomsCodeT` es el código
+object de esa lista; se declara **opaco** (símbolo `Term.func "axiomsCodeT" []`)
+y se ancla por el axioma `ax_axiomsCodeT` a `listFormCodeM coreAxioms`, para que
+la sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida).
+
+Evita el **ciclo**: `axiomsCodeT`/`ax_axiomsCodeT` referencian `coreAxioms`, que
+**no** contiene `ax_vpf_thy` ni `ax_axiomsCodeT`; por eso `axiomsCodeT` no se
+contiene a sí mismo. -/
+
+/-- Los 34 axiomas **matemáticos** de la teoría (sin las ecuaciones de coding). Es
+    `axioms` truncada antes del bloque Nivel D (ver `axioms_eq`). -/
+def coreAxioms : List Formula := [
+  ax2_peano_succ_neq_zero, ax3_peano_succ_inj, ax4_add_zero, ax5_add_succ,
+  ax6_add_comm, ax7_add_assoc, ax8_mul_zero, ax9_mul_succ, ax10_mul_comm,
+  ax11_mul_assoc, ax12_mul_distrib, ax13_lt_def, ax14_sqrt_le, ax15_lt_succ_sqrt,
+  ax16_mod2_succ, ax17_div_mod_eq, ax18_lt_irrefl, ax19_lt_trichotomy,
+  ax21_mod2_range, ax24_mod2_of_even, ax25_pred_zero, ax26_pred_succ,
+  ax_L0_cons_def, ax_L1_in_nil, ax_L2_in_cons, ax_C1_concat_nil, ax_C2_concat_cons,
+  ax_C3_concat_assoc, ax_L3_in_concat, ax29_sub_witness, ax_pow_zero, ax_pow_succ,
+  ax_prodp_nil, ax_prodp_cons
+]
+
+/-- Código object (opaco) de la teoría `coreAxioms`. Anclado por `ax_axiomsCodeT`. -/
+def axiomsCodeT : Term := Term.func "axiomsCodeT" []
+
+/-- Anclaje: `axiomsCodeT` es el código de la lista de axiomas de la teoría. -/
+def ax_axiomsCodeT : Formula := axiomsCodeT =eq listFormCodeM coreAxioms
+
+-- Thy (c=.var 1, el código del axioma de teoría): **condicional** a que `c`
+-- pertenezca a `axiomsCodeT` (el código de `coreAxioms`). Así el verificador solo
+-- acepta como axioma de teoría los códigos de axiomas REALES → `provCodeC` es fiel
+-- (no demostrable para `φ` arbitraria). `axiomsCodeT` es opaco ⟹ la sustitución
+-- sobre él es trivial. (La dirección negativa plena —probar `¬In c …` para no
+-- axiomas— sigue en 2.6.)
 def ax_vpf_thy : Formula :=
-  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
-    validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0))
+  forall_3 ((In (.var 1) axiomsCodeT) ⇒
+    (validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
+      validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0)))
 
 -- ## Axiom Set
 
@@ -741,8 +879,41 @@ def axioms : List Formula := [
   ax_vpf_p3,
   ax_vpf_mp,
   ax_vpf_gen,
-  ax_vpf_thy
+  ax_vpf_thy,
+  ax_axiomsCodeT
 ]
+
+/-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
+    matemática). `axioms = coreAxioms ++ codingAxioms` (por `rfl`, ver
+    `axioms_eq`). -/
+def codingAxioms : List Formula := [
+  ax_substtc_var_eq, ax_substtc_var_gt, ax_substtc_var_lt, ax_substtc_func,
+  ax_substtsc_nil, ax_substtsc_cons, ax_liftc_var_lt, ax_liftc_var_ge, ax_liftc_func,
+  ax_liftsc_nil, ax_liftsc_cons, ax_substfc_bottom, ax_substfc_atom, ax_substfc_eq,
+  ax_substfc_impl, ax_substfc_forall, ax_substfc_and, ax_substfc_or, ax_substfc_ex,
+  ax_liftfc_bottom, ax_liftfc_atom, ax_liftfc_eq, ax_liftfc_impl, ax_liftfc_forall,
+  ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
+  ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
+  ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
+  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_axiomsCodeT
+]
+
+/-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/
+theorem axioms_eq : axioms = coreAxioms ++ codingAxioms := rfl
+
+/-- Todo axioma de la teoría está en `axioms`. -/
+theorem coreAxioms_subset_axioms : coreAxioms ⊆ axioms :=
+  axioms_eq ▸ List.subset_append_left _ _
+
+/-- Pertenencia a la teoría implica pertenencia a `axioms`. -/
+theorem mem_axioms_of_mem_core {f : Formula} (h : f ∈ coreAxioms) : f ∈ axioms :=
+  coreAxioms_subset_axioms h
+
+/-- `ax_axiomsCodeT` es invariante bajo desplazamiento (su único subtérmino no
+    trivial, `listFormCodeM coreAxioms`, es cerrado). Aísla el término gigante en
+    la prueba de `axioms_lift_eq`. -/
+theorem ax_axiomsCodeT_lift : liftFormula 0 ax_axiomsCodeT = ax_axiomsCodeT := by
+  simp only [ax_axiomsCodeT, liftFormula, axiomsCodeT, liftTerm, liftTerms, liftTerm_listFormCodeM]
 
 -- ## Helper Theorems
 -- Estas herramientas son usadas en todos los archivos Block*.lean.

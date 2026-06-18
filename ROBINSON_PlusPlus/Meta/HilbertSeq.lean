@@ -123,7 +123,7 @@ def stepConcl (earlier : List Formula) : Rule → Option Formula
   | .eqrefl t => some (t ≐ t)
   | .leibniz A t₁ t₂ => some ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
   | .p3 A => some (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
-  | .thy k => axioms[k]?
+  | .thy k => coreAxioms[k]?
   | .mp i j => (earlier[i]?).bind (fun fi => (earlier[j]?).bind (fun fj => mpConcl fi fj))
   | .gen i => (earlier[i]?).map Formula.forall
 
@@ -413,11 +413,11 @@ def ruleCode : Rule → Term
   | .leibniz A t₁ t₂ =>
       cons (numeral 13) (cons (formCode A) (cons (termCode t₁) (cons (termCode t₂) nil)))
   | .p3 A => cons (numeral 14) (cons (formCode A) nil)
-  -- La línea `thy` TRANSPORTA el código del axioma (no el índice `k`): así el
-  -- verificador object `validProofFn` lo anexa sin enumerar `axioms` (ver
-  -- `ax_vpf_thy` y GODEL-D-ARITHMETIZATION §7, 2.4-thy). En una derivación válida
-  -- `k` está en rango, luego `axioms.getD k ⊥ = axioms[k]` = la conclusión real.
-  | .thy k => cons (numeral 15) (cons (formCode (axioms.getD k Formula.bottom)) nil)
+  -- La línea `thy` TRANSPORTA el código del axioma (no el índice `k`). `thy`
+  -- recorre `coreAxioms` (la teoría matemática), no las ecuaciones de coding (ver
+  -- `ax_vpf_thy` y GODEL-D-ARITHMETIZATION §7). En una derivación válida `k` está
+  -- en rango, luego `coreAxioms.getD k ⊥ = coreAxioms[k]` = la conclusión real.
+  | .thy k => cons (numeral 15) (cons (formCode (coreAxioms.getD k Formula.bottom)) nil)
   | .mp i j => cons (numeral 16) (cons (numeral i) (cons (numeral j) nil))
   | .gen i => cons (numeral 17) (cons (numeral i) nil)
 
