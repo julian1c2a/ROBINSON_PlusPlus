@@ -635,6 +635,16 @@ def ax_vpf_gen : Formula :=
   forall_3 ((In (.var 1) (.var 2)) ⇒
     (validProofFn (.var 2) (cons (cons (numeralM 17) (cons (.var 1) nil)) (.var 0)) =eq
       validProofFn (concat (.var 2) (cons (forallc (.var 1)) nil)) (.var 0)))
+-- Thy (c=.var 1, el código del axioma de teoría): incondicional, anexa `c` tal
+-- cual. La línea TRANSPORTA el código del axioma (no su índice), de modo que el
+-- verificador no necesita enumerar `axioms`. La SOLIDEZ (que `c` sea realmente el
+-- código de un axioma) es la dirección negativa, diferida a 2.6 (ver
+-- GODEL-D-ARITHMETIZATION §7): `thy` es el único punto incondicional del
+-- verificador. Bakear la comprobación `In c axiomsCode` aquí crearía un ciclo
+-- definicional (este axioma ∈ `axioms`, y `axiomsCode ∋ formCode(este axioma)`).
+def ax_vpf_thy : Formula :=
+  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
+    validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0))
 
 -- ## Axiom Set
 
@@ -730,7 +740,8 @@ def axioms : List Formula := [
   ax_vpf_leibniz,
   ax_vpf_p3,
   ax_vpf_mp,
-  ax_vpf_gen
+  ax_vpf_gen,
+  ax_vpf_thy
 ]
 
 -- ## Helper Theorems

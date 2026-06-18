@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-13 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). 4 módulos `Meta/` nuevos: `Hilbert.lean` (cálculo de Hilbert finitario `Prf₀`/`Prf` + puentes constructor-puros con `dne` aislado), `HilbertSeq.lean` (verificador decidible `checkProof` + `Prf φ ↔ ∃rs Derivation` + `Dem` concreto + `dem_tracks`), `CodeArith.lean` (puente de numerales + aritmética de códigos), `SubstArith.lean` (Fase 2.2 nivel término: `substTerm` aritmetizado + cómputo). Base previa: TFA completo (`tfa_numeral`) + Gödel I/II (`Meta/Incompleteness`) + `Full/` (inducción general, representabilidad). Sistema con **34 axiomas matemáticos** + **6 ecuaciones de coding** (extensión definicional para Gödel: `substtc`/`substtsc`) en Minimal + meta-reglas FOL; **29 módulos** (Minimal 11 + Meta 7 + Full 11), 0 sorrys, **43 jobs**. `SubstArith` re-deriva las ecuaciones como teoremas (sin `axiom` local). Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
+**Last updated:** 2026-06-17 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). 6 módulos `Meta/` nuevos: `Hilbert.lean` (cálculo de Hilbert finitario `Prf₀`/`Prf` + puentes con `dne` aislado), `HilbertSeq.lean` (verificador decidible + `Prf φ ↔ ∃rs Derivation` + `Dem` concreto + `dem_tracks`), `CodeArith.lean` (aritmética de códigos), `SubstArith.lean` (sustitución/lift De Bruijn aritmetizados: `substTerm`/`substFormula`/`liftTerm`/`liftFormula`), `StepArith.lean` (reconocimiento de instancias de axioma), `CheckArith.lean` (verificador object `validProofFn` + `provFormulaC` Σ₁). Toda la maquinaria De Bruijn + el verificador de demostraciones internalizados como **extensión definicional** de `Minimal.axioms` (re-derivadas como teoremas; sin `axiom` Lean local). Base previa: TFA completo + Gödel I/II + `Full/`. **31 módulos** (Minimal 11 + Meta 9 + Full 11), 0 sorrys, **45 jobs**. Pendiente Nivel D: regla `thy` (nudo de capas formCode/Minimal) + representabilidad (2.5). Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -55,7 +55,9 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 | `Meta/Hilbert.lean` | `…Meta.Hilbert` | `Axioms`, `FOL.*` | ✅ Nivel D real F0: `Prf₀`/`Prf` + puentes (`dne` aislado) |
 | `Meta/HilbertSeq.lean` | `…Meta.HilbertSeq` | `Meta.Hilbert`, `Meta.Godel`, `Meta.Provability` | ✅ Nivel D real F1: `checkProof`, `prf_iff_derivation`, `Dem` concreto, `dem_tracks` |
 | `Meta/CodeArith.lean` | `…Meta.CodeArith` | `Meta.Godel`, `Full.Numerals` | ✅ Nivel D real F2.1: `numeral_bridge`, `gnum_*` |
-| `Meta/SubstArith.lean` | `…Meta.SubstArith` | `Meta.Provability`, `Meta.CodeArith` | 🟡 Nivel D real F2.2t: `substTerm_arith` (ecuaciones de coding en `Minimal.axioms`; 0 axiom local) |
+| `Meta/SubstArith.lean` | `…Meta.SubstArith` | `Meta.Provability`, `Meta.CodeArith` | ✅ Nivel D real F2.2: `substTerm_arith`/`substFormula_arith`/`liftTerm_arith`/`liftFormula_arith` (ecuaciones en `Minimal.axioms`) |
+| `Meta/StepArith.lean` | `…Meta.StepArith` | `Meta.SubstArith` | ✅ Nivel D real F2.3: `q1/q2/leibniz_concl_code` (reconocimiento de instancias de axioma) |
+| `Meta/CheckArith.lean` | `…Meta.CheckArith` | `Meta.StepArith` | ✅ Nivel D real F2.4: `validProofFn` (17 step lemmas) + `provFormulaC` Σ₁ |
 | `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | ✅ ax6/7/10/11/12/18/19 derivados |
 | `Full/Mod2.lean` | `…Full` | `Axioms`, `Block1`, `Full.Induction` | ✅ ax21/ax24 (Opción C.2) |
 | `Full/Lists.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ ax_C3/ax_L3 (`ax_list_induction`) |
@@ -953,7 +955,26 @@ theorem substTerm_liftLiftLift   -- cancelación de triple lift (para instanciar
 theorem substtc_var_eq / _var_gt / _var_lt / _func ;  theorem substtsc_nil / _cons
 theorem substTerm_arith (v) (s) (t) : axioms ⊢ (substtc (numeral v) (termCode s) (termCode t) =eq termCode (substTerm v s t))
 theorem substTerms_arith ...   -- mutuo; cómputo object de la sustitución (nivel término)
--- #print axioms substTerm_arith = solo axiomas estándar de Lean (0 postulados nuevos)
+theorem liftTerm_arith / liftFormula_arith ; theorem substFormula_arith   -- nivel fórmula (con binders)
+-- lemas de lift: substTerm_liftLiftLift (3-lift), substTerm_liftLiftLiftLift (4-lift)
+-- #print axioms substFormula_arith = solo axiomas estándar de Lean (0 postulados nuevos)
+```
+
+**`Meta/StepArith.lean`** (Fase 2.3) — `…Meta.StepArith`:
+```lean
+theorem q1_concl_code / q2_concl_code / leibniz_concl_code   -- el código de la conclusión de
+  -- los esquemas de sustitución, reconstruido con substfc, coincide con formCode (vía substFormula_arith)
+```
+
+**`Meta/CheckArith.lean`** (Fase 2.4) — `…Meta.CheckArith`:
+```lean
+theorem numeralM_eq (n) : numeralM n = Godel.numeral n
+theorem carc_cons / cdrc_cons   -- cómputo de los extractores cabeza/cola
+-- 17 step lemmas del verificador (re-derivadas de Minimal.axioms):
+theorem vpf_nil/p1/p2/c1/c2/c3/j1/j2/j3/efq/q1/q2/q3/eqrefl/leibniz/p3   -- incondicionales
+theorem vpf_mp (… h1 h2) / vpf_gen (… h1)   -- condicionales por pertenencia In
+def provFormulaC : Formula := Formula.ex (In (var 1) (validProofFn nil (var 0)))   -- demostrabilidad Σ₁
+noncomputable def provCodeC (φ) := substFormula 0 (formCode φ) provFormulaC
 ```
 
 ---

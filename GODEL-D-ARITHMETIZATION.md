@@ -153,7 +153,7 @@ incompleto y Gödel aplica.)
 | **0** | `Meta/Hilbert.lean`: `Prf₀`/`Prf` + puentes `prf0_to_derives`/`prf_to_derives` + consistencia transferida | ✅ |
 | **1a/b** | `Meta/HilbertSeq.lean`: `Rule`, verificador decidible `checkProof`, `Derivation`, **solidez + completitud** ⟹ `Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ |
 | **1c** | `Meta/HilbertSeq.lean` (cont.): coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto** + `dem_tracks : (∃ d, Dem d ⌜φ⌝) ↔ Prf φ` (solo axiomas estándar de Lean) | ✅ |
-| **2** | `Meta/ProvFormulaConcrete.lean`: `demFormula` (Δ₀) representa `Dem`; `provFormula := ∃ demFormula`; representabilidad Δ₀ | ⬜ |
+| **2** | Aritmetización (CodeArith/SubstArith/StepArith/CheckArith): sustitución y lift De Bruijn como funciones object, verificador `validProofFn`, `provFormulaC` Σ₁. Desglose y estado fino en **§7**. | 🟡 (2.1–2.4 ✅ — verificador completo, 18 reglas; falta 2.5) |
 | **3** | **D1** real: `Prf φ → Prf (Prov⌜φ⌝)` (necesitación vía Σ₁-completitud) | ⬜ |
 | **4** | **D2** real: combinador MP sobre códigos + internalización | ⬜ |
 | **5** | **D3** real: + esquema de inducción `IND`; Σ₁-completitud *provable* | ⬜ |
@@ -201,10 +201,12 @@ y su corrección sobre entradas concretas se prueba por inducción meta.
 | **2.1** | `Meta/CodeArith.lean`: puente `numeral_bridge`, separación `gnum_ne`, orden `gnum_lt`, homomorfismos `gnum_add/mul`, reflexividad `gnum_refl` | ✅ |
 | **2.2t** | `Meta/SubstArith.lean` (nivel **término**): funciones object `substtc`/`substtsc` + ecuaciones recursivas **integradas en `Minimal.axioms`** (re-derivadas como teoremas vía `ax`+`spec`; `substTerm_arith` depende solo de axiomas estándar de Lean) + congruencias de `cons` + `substTerm_arith`/`substTerms_arith` por inducción meta mutua. Lema auxiliar `substTerm_liftLiftLift` (triple lift, para `forall_4`) | ✅ |
 | **2.2f** | nivel **fórmula** (`Meta/SubstArith.lean` + `Minimal/Axioms.lean`): `liftc`/`liftsc` (lift aritmetizado) + `substfc` (8 constructores de código `botc`..`exc`) + 13 ecuaciones recursivas **en `Minimal.axioms`** (re-derivadas como teoremas) + `liftTerm_arith` + `substFormula_arith` (binders ∀/∃ con `succ`-nivel y `liftc zero`-substituyendo). `substFormula_arith` depende solo de axiomas estándar de Lean | ✅ |
-| **2.3** | Aritmetización de `stepConcl` (por regla) → predicado object `StepOK` + cómputo sobre líneas concretas | ⬜ |
-| **2.4** | Aritmetización de `checkProof` → predicado `Chk(p)`; definición `demFormula := ∃ … Chk …` (Σ₁) | ⬜ |
-| **2.5** | **Representabilidad positiva** `Dem d x → ⊢ᴴ demFormula[⌜d⌝,⌜x⌝]` por inducción sobre `Derivation` | ⬜ |
-| **2.6** | (diferido, para reflexión/D3) representabilidad negativa `¬Dem d x → ⊢ᴴ ¬demFormula[…]` | ⬜ |
+| **2.3** | `Meta/StepArith.lean`: reconocimiento de instancias de axioma — `q1/q2/leibniz_concl_code` (esquemas de sustitución, vía `substFormula_arith`); los proposicionales son definicionales (refl); MP/Gen van con la secuencia (2.4) | ✅ |
+| **2.4-c** | `Meta/CheckArith.lean` (cimientos): `numeralM` (`= Godel.numeral`), extractores `carc`/`cdrc` + cómputo | ✅ |
+| **2.4-v** | verificador `validProofFn` + `forall_5` + **17 ecuaciones** en `Minimal.axioms` (params directos por binders, etiqueta de regla embebida; MP/Gen condicionales por `In`); `substTerm_liftLiftLiftLift` (4-lift); 17 step lemmas `vpf_*`; **`provFormulaC := ∃p, In x (validProofFn nil p)`** (Σ₁) + `provCodeC` | ✅ |
+| **2.4-thy** | regla `thy` (axiomas de teoría): **nudo de capas resuelto** sin `formCode` a nivel Minimal. La línea `thy` **transporta el código** del axioma (no su índice); `ruleCode (.thy k)` emite `formCode (axioms[k])` y `ax_vpf_thy` (incondicional, en `Minimal.axioms`) lo anexa tal cual — `validProofFn` no enumera `axioms`. Bakear `In c axiomsCode` aquí daría **ciclo definicional** (`ax_vpf_thy ∈ axioms`, `axiomsCode ∋ formCode(ax_vpf_thy)`), así que la **solidez** de `thy` (que `c` sea un axioma real) se difiere a 2.6 como la dirección negativa; `thy` es el único punto incondicional. Verificador **completo: 18 reglas** | ✅ |
+| **2.5** | **Representabilidad positiva** `Dem d x → ⊢ᴴ provCodeC φ`: construir el proof object desde la `Derivation` meta + computar `validProofFn` con las step lemmas | ⬜ |
+| **2.6** | (diferido, para reflexión/D3) representabilidad negativa `¬Dem d x → ⊢ᴴ ¬provCodeC φ` | ⬜ |
 
 > Honestidad de scope: 2.2 (aritmetización de la sustitución De Bruijn) es el
 > núcleo duro; requiere extender el lenguaje object con funciones de coding y sus

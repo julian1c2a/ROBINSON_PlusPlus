@@ -1,6 +1,6 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
-**Última actualización:** 2026-06-06 — `Minimal/` cerrado a 0 sorrys reales y 0 warnings con **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización); 11 módulos (Bloques I–VIII Fase 17 completa con Ax-P TFA).
+**Última actualización:** 2026-06-17 — Estado global: **31 módulos** (Minimal 11 + Meta 9 + Full 11), 45 jobs, 0 sorrys. `Minimal/` cerrado (34 axiomas matemáticos); `Full/` deriva el fragmento inductivo + TFA completo; `Meta/` tiene Gödel I/II (Nivel D clásico) y el **Nivel D REAL en curso** (aritmetización honesta de D1–D3: sustitución/lift De Bruijn + verificador object `validProofFn` + `provFormulaC` Σ₁; pendiente regla `thy` + representabilidad 2.5). Estado fino: [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [NEXT-STEPS.md](NEXT-STEPS.md), [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md). (El resto de este documento refleja el plan original centrado en `Minimal/`, 2026-06-06.)
 **Autor**: Julián Calderón Almendros
 
 > Este documento describe la visión estratégica y la planificación a largo plazo para los proyectos que se construirán sobre la base del sistema `FOL`.

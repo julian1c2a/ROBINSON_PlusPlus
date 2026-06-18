@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-13 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). Cálculo de Hilbert finitario nuevo `Prf` (paralelo al ω-sistema), verificador decidible de demostraciones, `Dem` concreto, y arranque de la aritmetización de la sustitución. **29 módulos** (Minimal 11 + Meta 7 + Full 11), build verde (**43 jobs**), 0 sorrys. Base previa: TFA completo + Gödel I/II.
+**Last updated:** 2026-06-17 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). Cálculo de Hilbert finitario `Prf`, verificador decidible, `Dem` concreto, **sustitución/lift De Bruijn aritmetizados** (substTerm/substFormula/liftTerm/liftFormula), reconocimiento de instancias de axioma, y **verificador object `validProofFn`** (17 reglas) + fórmula de demostrabilidad Σ₁ `provFormulaC`. Todo como extensión definicional de `Minimal.axioms` (sin postulados nuevos). **31 módulos** (Minimal 11 + Meta 9 + Full 11), build verde (**45 jobs**), 0 sorrys. Pendiente: regla `thy` + representabilidad (2.5).
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,15 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-17) — Gödel Nivel D REAL: Fases 2.2f–2.4 (sustitución + verificador object)
+
+Continuación de la aritmetización. Todo como **extensión definicional** de `Minimal.axioms` (ecuaciones re-derivadas como teoremas; `#print axioms` = solo axiomas estándar de Lean).
+
+- **Fase 2.2 nivel fórmula** (`SubstArith` + `Minimal/Axioms`): `liftc`/`liftsc`/`substfc`/`liftfc` + constructores de código de fórmula (`botc`..`exc`) + 13 ecuaciones; `substFormula_arith`/`liftFormula_arith` (binders ∀/∃). Lemas de lift `substTerm_liftLiftLift`/`substTerm_liftLiftLiftLift` (3/4-lift).
+- **Fase 2.3** (`Meta/StepArith.lean`): `q1/q2/leibniz_concl_code` — reconocimiento de instancias de los esquemas de sustitución vía `substFormula_arith` (los proposicionales son definicionales).
+- **Fase 2.4** (`Meta/CheckArith.lean` + `Minimal/Axioms`): `numeralM`, extractores `carc`/`cdrc`; **`validProofFn`** + `forall_5` + **17 ecuaciones** del verificador de demostraciones (params directos por binders; MP/Gen condicionados por `In`) + 17 step lemmas `vpf_*`; **`provFormulaC := ∃p, In x (validProofFn nil p)`** — fórmula de demostrabilidad Σ₁ concreta (reemplaza el `provFormula` postulado) + `provCodeC`.
+- **Pendiente**: regla `thy` (nudo de capas `formCode`/Minimal) + representabilidad positiva (2.5).
 
 ### Added (2026-06-13) — Gödel Nivel D REAL: aritmetización de D1–D3 (Opción A)
 

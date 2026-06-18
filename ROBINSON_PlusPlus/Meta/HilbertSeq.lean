@@ -413,7 +413,11 @@ def ruleCode : Rule → Term
   | .leibniz A t₁ t₂ =>
       cons (numeral 13) (cons (formCode A) (cons (termCode t₁) (cons (termCode t₂) nil)))
   | .p3 A => cons (numeral 14) (cons (formCode A) nil)
-  | .thy k => cons (numeral 15) (cons (numeral k) nil)
+  -- La línea `thy` TRANSPORTA el código del axioma (no el índice `k`): así el
+  -- verificador object `validProofFn` lo anexa sin enumerar `axioms` (ver
+  -- `ax_vpf_thy` y GODEL-D-ARITHMETIZATION §7, 2.4-thy). En una derivación válida
+  -- `k` está en rango, luego `axioms.getD k ⊥ = axioms[k]` = la conclusión real.
+  | .thy k => cons (numeral 15) (cons (formCode (axioms.getD k Formula.bottom)) nil)
   | .mp i j => cons (numeral 16) (cons (numeral i) (cons (numeral j) nil))
   | .gen i => cons (numeral 17) (cons (numeral i) nil)
 

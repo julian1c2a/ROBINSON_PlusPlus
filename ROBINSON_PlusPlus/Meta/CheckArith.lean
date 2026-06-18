@@ -202,6 +202,18 @@ theorem vpf_gen (checked body rest : Term)
     nil, zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact mp hh h1
 
+/-- Paso `thy` (axioma de teoría, tag 15): **incondicional**, anexa el código `c`
+    transportado por la línea. La línea proviene de `ruleCode (.thy k)`, que ya
+    transporta `formCode (axioms[k])`; aquí `c` es ese código. La solidez (que `c`
+    sea de un axioma real) es la dirección negativa, diferida a 2.6. -/
+theorem vpf_thy (checked c rest : Term) :
+    axioms ⊢ (validProofFn checked (cons (cons (numeralM 15) (cons c nil)) rest) =eq
+      validProofFn (concat checked (cons c nil)) rest) := by
+  have hh := spec (spec (spec (ax (show ax_vpf_thy ∈ axioms by simp [axioms])) checked) c) rest
+  simp [ax_vpf_thy, substFormula, substTerm, substTerms, validProofFn, concat, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
 /-! ### Fórmula de demostrabilidad object Σ₁ -/
 
 /-- **Predicado de demostrabilidad object** (Σ₁): `∃ p, In x (validProofFn nil p)`
@@ -239,4 +251,5 @@ export ROBINSON_PlusPlus.Meta.CheckArith (
   vpf_p3
   vpf_mp
   vpf_gen
+  vpf_thy
 )
