@@ -154,7 +154,7 @@ incompleto y Gödel aplica.)
 | **1a/b** | `Meta/HilbertSeq.lean`: `Rule`, verificador decidible `checkProof`, `Derivation`, **solidez + completitud** ⟹ `Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ |
 | **1c** | `Meta/HilbertSeq.lean` (cont.): coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto** + `dem_tracks : (∃ d, Dem d ⌜φ⌝) ↔ Prf φ` (solo axiomas estándar de Lean) | ✅ |
 | **2** | Aritmetización (CodeArith/SubstArith/StepArith/CheckArith/Representability): sustitución y lift De Bruijn como funciones object, verificador `validProofFn`, `provFormulaC` Σ₁, **representabilidad positiva** `repr_pos`. Desglose y estado fino en **§7**. | ✅ (2.1–2.5 ✅; 2.6 negativa diferida) |
-| **3** | **D1** real: `Prf φ → axioms ⊢ provCodeC φ` (necesitación) — **desbloqueado por `repr_pos`** | 🟡 (núcleo `repr_pos` ✅; falta envolver como D1) |
+| **3** | **D1** real (`Meta/Necessitation.lean`): `d1/necessitation : Prf φ → axioms ⊢ provCodeC φ` (= `repr_pos` como condición HBL) + **Gödel I real (indemostrabilidad) modular** `goedel_first_unprovable_real` (usa D1 honesto; toma el punto fijo como hipótesis — el lema diagonal para `provCodeC` es 2.6/representabilidad de sustitución) | ✅ (D1 ✅; lema diagonal pendiente) |
 | **4** | **D2** real: combinador MP sobre códigos + internalización | ⬜ |
 | **5** | **D3** real: + esquema de inducción `IND`; Σ₁-completitud *provable* | ⬜ |
 

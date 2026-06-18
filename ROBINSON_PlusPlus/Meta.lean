@@ -21,3 +21,4 @@ import ROBINSON_PlusPlus.Meta.SubstArith
 import ROBINSON_PlusPlus.Meta.StepArith
 import ROBINSON_PlusPlus.Meta.CheckArith
 import ROBINSON_PlusPlus.Meta.Representability
+import ROBINSON_PlusPlus.Meta.Necessitation
