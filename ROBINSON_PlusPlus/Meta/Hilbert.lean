@@ -62,6 +62,7 @@ theorem subst_lift_same (f : Formula) : ∀ (c : Nat) (s : Term),
   | or a b iha ihb => intro c s; simp only [liftFormula, substFormula]; rw [iha, ihb]
   | ex a iha => intro c s; simp only [liftFormula, substFormula]; rw [iha]
 
+set_option maxRecDepth 20000 in
 /-- Los axiomas de `Minimal` son **sentencias cerradas**: desplazarlos es la
     identidad. Los axiomas matemáticos y la mayoría de las ecuaciones de coding se
     cierran por cómputo (`rfl`); el axioma `ax_axiomsCodeT` (que contiene el código
@@ -70,7 +71,9 @@ theorem subst_lift_same (f : Formula) : ∀ (c : Nat) (s : Term),
 theorem axioms_lift_eq : axioms.map (liftFormula 0) = axioms := by
   -- Expone el `map` y reescribe el término gigante `liftFormula 0 ax_axiomsCodeT`
   -- a `ax_axiomsCodeT` (idéntico en ambos lados); el `rfl` final solo computa el
-  -- lift sobre los axiomas pequeños, nunca sobre el código gigante.
+  -- lift sobre los axiomas pequeños. `maxRecDepth` cubre los numerales de símbolos
+  -- (`σ` = codepoint 963) en `ax_tc_succ`; el código realmente gigante
+  -- (`listFormCodeM coreAxioms`) nunca se computa (lo cubre `ax_axiomsCodeT_lift`).
   simp only [axioms, List.map_cons, List.map_nil, ax_axiomsCodeT_lift]
   rfl
 

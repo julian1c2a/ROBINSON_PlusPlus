@@ -658,6 +658,65 @@ theorem liftTerm_listFormCodeM (c : Nat) : ∀ L : List Formula,
       simp only [listFormCodeM, cons, liftTerm, liftTerms, liftTerm_formCodeM c f,
         liftTerm_listFormCodeM c fs]
 
+/-! ### Clausura por `substTerm` (espejo de la de `liftTerm`)
+
+`substTerm` también es identidad sobre los códigos `formCodeM` (cerrados). Igual
+que arriba, por inducción estructural (no `rfl`, por los numerales gigantes).
+Necesarias para re-derivar las ecuaciones de `tcFn` vía `spec` (que sustituye). -/
+
+theorem substTerm_nil (v : Nat) (s : Term) : substTerm v s nil = nil := rfl
+
+theorem substTerm_numeralM (v : Nat) (s : Term) (n : Nat) : substTerm v s (numeralM n) = numeralM n := by
+  induction n with
+  | zero => rfl
+  | succ k ih => simp only [numeralM, succ, substTerm, substTerms, ih]
+
+theorem substTerm_charsCodeM (v : Nat) (s : Term) :
+    ∀ cs : List Char, substTerm v s (charsCodeM cs) = charsCodeM cs
+  | []      => rfl
+  | _ :: cs => by
+      simp only [charsCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_charsCodeM v s cs]
+
+theorem substTerm_strCodeM (v : Nat) (s : Term) (str : String) :
+    substTerm v s (strCodeM str) = strCodeM str :=
+  substTerm_charsCodeM v s str.toList
+
+mutual
+theorem substTerm_termCodeM (v : Nat) (s : Term) : ∀ t : Term, substTerm v s (termCodeM t) = termCodeM t
+  | .var _    => by simp only [termCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil]
+  | .func sy ts => by
+      simp only [termCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_strCodeM,
+        substTerm_nil, substTerm_termsCodeM v s ts]
+theorem substTerm_termsCodeM (v : Nat) (s : Term) : ∀ ts : List Term, substTerm v s (termsCodeM ts) = termsCodeM ts
+  | []      => rfl
+  | t :: ts => by
+      simp only [termsCodeM, cons, substTerm, substTerms, substTerm_termCodeM v s t,
+        substTerm_termsCodeM v s ts]
+end
+
+theorem substTerm_formCodeM (v : Nat) (s : Term) : ∀ φ : Formula, substTerm v s (formCodeM φ) = formCodeM φ
+  | .bottom    => by simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil]
+  | .atom _ _  => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_strCodeM,
+        substTerm_nil, substTerm_termsCodeM]
+  | .eq _ _    => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil, substTerm_termCodeM]
+  | .impl a b  => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil,
+        substTerm_formCodeM v s a, substTerm_formCodeM v s b]
+  | .forall a  => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil,
+        substTerm_formCodeM v s a]
+  | .and a b   => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil,
+        substTerm_formCodeM v s a, substTerm_formCodeM v s b]
+  | .or a b    => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil,
+        substTerm_formCodeM v s a, substTerm_formCodeM v s b]
+  | .ex a      => by
+      simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil,
+        substTerm_formCodeM v s a]
+
 /-- Cabeza de un `cons`. -/
 def carc (l : Term) : Term := Term.func "carc" [l]
 /-- Cola de un `cons`. -/
@@ -665,6 +724,33 @@ def cdrc (l : Term) : Term := Term.func "cdrc" [l]
 
 def ax_carc : Formula := forall_2 (carc (cons (.var 1) (.var 0)) =eq (.var 1))
 def ax_cdrc : Formula := forall_2 (cdrc (cons (.var 1) (.var 0)) =eq (.var 0))
+
+/-! ### Función «código del código» `tcFn` (para el lema diagonal, Fase 4)
+
+`tcFn` computa `termCode` sobre **códigos** (términos cerrados construidos solo
+con `cons`/`succ`/`zero`). Sus 3 ecuaciones espejan la cláusula `.func` de
+`termCode` para los símbolos `::`/`σ`/`0`:
+
+* `termCode (func s ts) = ⟨1, strCode s, termsCode ts⟩`.
+
+Es la única pieza que falta para representar la **diagonalización** (substituir el
+código de una fórmula en sí misma necesita el código de ese código). El puente
+`tcFn (formCode ψ) = termCode (formCode ψ)` (`tc_arith`) se prueba por inducción
+meta en `Meta/Diagonal.lean`. -/
+def tcFn (t : Term) : Term := Term.func "tcFn" [t]
+
+-- `termCode zero = ⟨1, strCode "0", []⟩`  (nil = zero, termsCode [] = nil)
+def ax_tc_zero : Formula :=
+  tcFn zero =eq cons (numeralM 1) (cons (strCodeM zero_sym) (cons nil nil))
+-- `termCode (σ x) = ⟨1, strCode "σ", [termCode x]⟩`
+def ax_tc_succ : Formula :=
+  forall_ (tcFn (succ (.var 0)) =eq
+    cons (numeralM 1) (cons (strCodeM succ_sym) (cons (cons (tcFn (.var 0)) nil) nil)))
+-- `termCode (a :: b) = ⟨1, strCode "::", [termCode a, termCode b]⟩`
+def ax_tc_cons : Formula :=
+  forall_2 (tcFn (cons (.var 1) (.var 0)) =eq
+    cons (numeralM 1) (cons (strCodeM cons_sym)
+      (cons (cons (tcFn (.var 1)) (cons (tcFn (.var 0)) nil)) nil)))
 
 /-- Cuantificación universal quíntuple. -/
 def forall_5 (f : Formula) : Formula := .forall (forall_4 f)
@@ -880,7 +966,10 @@ def axioms : List Formula := [
   ax_vpf_mp,
   ax_vpf_gen,
   ax_vpf_thy,
-  ax_axiomsCodeT
+  ax_axiomsCodeT,
+  ax_tc_zero,
+  ax_tc_succ,
+  ax_tc_cons
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -895,7 +984,8 @@ def codingAxioms : List Formula := [
   ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
-  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_axiomsCodeT
+  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_axiomsCodeT,
+  ax_tc_zero, ax_tc_succ, ax_tc_cons
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/
