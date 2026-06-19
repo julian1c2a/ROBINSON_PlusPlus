@@ -172,7 +172,7 @@ Fases 0–3 ⟹ **Gödel I sin postulados**. Fases 4–5 ⟹ Gödel II/Löb sin 
 | `provFormula : Formula` (axiom, opaco) | def concreta Σ₁ | 2 |
 | `provFormula_repr` bicondicional (axiom) | **sólo necesitación** (la reflexión muere por Tarski) | 3 |
 | `D2`, `D3` (axiom) | teoremas | 4, 5 |
-| `diagonal_lemma` (axiom) | teorema (representabilidad de la sustitución) — **cimientos ✅** (`Meta/Diagonal.lean`: `tcFn` «código del código» + `tc_numeral`); falta `tc_arith`/`diagTerm`/punto fijo | 4 |
+| `diagonal_lemma` (axiom) | teorema (representabilidad de la sustitución) — **casi ✅** (`Meta/Diagonal.lean`: `tc_arith`/`tc_form` «código del código» + `diag_arith` diagonalización representable); falta solo el **punto fijo** (composición de sustituciones De Bruijn) | 4 |
 
 ---
 

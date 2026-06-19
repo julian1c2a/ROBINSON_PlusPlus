@@ -83,6 +83,75 @@ theorem tc_numeral : ∀ n : Nat, axioms ⊢ (tcFn (numeral n) =eq termCode (num
         FOL.derive_eq_trans hstep hcongr
       simpa only [numeral, termCode, termsCode] using this
 
+/-! ### `tc_arith`: `tcFn` computa `termCode` sobre TODO código
+
+Lema clave de recursión `tc_of_cons`: si `tcFn` computa `termCode` en `a` y `b`,
+lo hace en `cons a b`. Con él, la familia `tc_chars`/`tc_str`/`tc_term`/`tc_form`
+sale por composición directa siguiendo la estructura de cada codificador. -/
+
+/-- Congruencia en los dos hijos de un nodo `func`-2 codificado
+    (`⟨1, S, [A, B]⟩`). -/
+theorem congr_tc2 {S A A' B B' : Term} (hA : axioms ⊢ (A =eq A')) (hB : axioms ⊢ (B =eq B')) :
+    axioms ⊢ (cons (numeral 1) (cons S (cons (cons A (cons B nil)) nil)) =eq
+              cons (numeral 1) (cons S (cons (cons A' (cons B' nil)) nil))) :=
+  congr_cons_tail (congr_cons_tail (congr_cons_head
+    (FOL.derive_eq_trans (congr_cons_head hA) (congr_cons_tail (congr_cons_head hB)))))
+
+/-- **Recursión de `tc_arith`**: `tcFn` respeta `cons`. -/
+theorem tc_of_cons {a b : Term} (ha : axioms ⊢ (tcFn a =eq termCode a))
+    (hb : axioms ⊢ (tcFn b =eq termCode b)) :
+    axioms ⊢ (tcFn (cons a b) =eq termCode (cons a b)) :=
+  FOL.derive_eq_trans (tc_cons a b) (congr_tc2 ha hb)
+
+/-- `tcFn (charsCode cs) = ⌜charsCode cs⌝`. -/
+theorem tc_chars : ∀ cs : List Char, axioms ⊢ (tcFn (charsCode cs) =eq termCode (charsCode cs))
+  | []      => tc_zero
+  | c :: cs => tc_of_cons (tc_numeral c.toNat) (tc_chars cs)
+
+/-- `tcFn (strCode s) = ⌜strCode s⌝`. -/
+theorem tc_str (s : String) : axioms ⊢ (tcFn (strCode s) =eq termCode (strCode s)) :=
+  tc_chars s.toList
+
+mutual
+/-- `tcFn (termCode t) = ⌜termCode t⌝`. -/
+theorem tc_term : ∀ t : Term, axioms ⊢ (tcFn (termCode t) =eq termCode (termCode t))
+  | .var n     => tc_of_cons (tc_numeral 0) (tc_of_cons (tc_numeral n) tc_zero)
+  | .func s ts => tc_of_cons (tc_numeral 1) (tc_of_cons (tc_str s) (tc_of_cons (tc_terms ts) tc_zero))
+/-- `tcFn (termsCode ts) = ⌜termsCode ts⌝`. -/
+theorem tc_terms : ∀ ts : List Term, axioms ⊢ (tcFn (termsCode ts) =eq termCode (termsCode ts))
+  | []      => tc_zero
+  | t :: ts => tc_of_cons (tc_term t) (tc_terms ts)
+end
+
+/-- **`tc_arith`**: `tcFn (formCode φ) = ⌜formCode φ⌝` (el «código del código»). -/
+theorem tc_form : ∀ φ : Formula, axioms ⊢ (tcFn (formCode φ) =eq termCode (formCode φ))
+  | .bottom    => tc_of_cons (tc_numeral 2) tc_zero
+  | .atom p ts => tc_of_cons (tc_numeral 3) (tc_of_cons (tc_str p) (tc_of_cons (tc_terms ts) tc_zero))
+  | .eq t u    => tc_of_cons (tc_numeral 4) (tc_of_cons (tc_term t) (tc_of_cons (tc_term u) tc_zero))
+  | .impl a b  => tc_of_cons (tc_numeral 5) (tc_of_cons (tc_form a) (tc_of_cons (tc_form b) tc_zero))
+  | .forall a  => tc_of_cons (tc_numeral 6) (tc_of_cons (tc_form a) tc_zero)
+  | .and a b   => tc_of_cons (tc_numeral 7) (tc_of_cons (tc_form a) (tc_of_cons (tc_form b) tc_zero))
+  | .or a b    => tc_of_cons (tc_numeral 8) (tc_of_cons (tc_form a) (tc_of_cons (tc_form b) tc_zero))
+  | .ex a      => tc_of_cons (tc_numeral 9) (tc_of_cons (tc_form a) tc_zero)
+
+/-! ### Función de diagonalización representada (`diagTerm` / `diag_arith`) -/
+
+/-- **Auto-aplicación**: `ψ` con su propio código sustituido en su variable libre 0. -/
+def selfApp (ψ : Formula) : Formula := substFormula 0 (formCode ψ) ψ
+
+/-- **Término de diagonalización** (variable libre 0): aplicado a `⌜ψ⌝` produce
+    (provablemente) `⌜selfApp ψ⌝`. Usa `tcFn` (código del código) y `substfc`. -/
+def diagTerm : Term := substfc (numeral 0) (tcFn (Term.var 0)) (Term.var 0)
+
+/-- **Representabilidad de la diagonalización**: `diagTerm[⌜ψ⌝] = ⌜selfApp ψ⌝`.
+    Es `tc_form` (código del código) + `substFormula_arith` (sustitución). -/
+theorem diag_arith (ψ : Formula) :
+    axioms ⊢ (substTerm 0 (formCode ψ) diagTerm =eq formCode (selfApp ψ)) := by
+  have key : axioms ⊢
+      (substfc (numeral 0) (tcFn (formCode ψ)) (formCode ψ) =eq formCode (selfApp ψ)) :=
+    FOL.derive_eq_trans (congr_substfc_arg2 (tc_form ψ)) (substFormula_arith 0 (formCode ψ) ψ)
+  exact key
+
 end ROBINSON_PlusPlus.Meta.Diagonal
 
 export ROBINSON_PlusPlus.Meta.Diagonal (
@@ -90,4 +159,13 @@ export ROBINSON_PlusPlus.Meta.Diagonal (
   tc_succ
   tc_cons
   tc_numeral
+  tc_of_cons
+  tc_chars
+  tc_str
+  tc_term
+  tc_terms
+  tc_form
+  selfApp
+  diagTerm
+  diag_arith
 )
