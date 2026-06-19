@@ -154,7 +154,8 @@ incompleto y Gödel aplica.)
 | **1a/b** | `Meta/HilbertSeq.lean`: `Rule`, verificador decidible `checkProof`, `Derivation`, **solidez + completitud** ⟹ `Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ |
 | **1c** | `Meta/HilbertSeq.lean` (cont.): coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto** + `dem_tracks : (∃ d, Dem d ⌜φ⌝) ↔ Prf φ` (solo axiomas estándar de Lean) | ✅ |
 | **2** | Aritmetización (CodeArith/SubstArith/StepArith/CheckArith/Representability): sustitución y lift De Bruijn como funciones object, verificador `validProofFn`, `provFormulaC` Σ₁, **representabilidad positiva** `repr_pos`. Desglose y estado fino en **§7**. | ✅ (2.1–2.5 ✅; 2.6 negativa diferida) |
-| **3** | **D1** real (`Meta/Necessitation.lean`): `d1/necessitation : Prf φ → axioms ⊢ provCodeC φ` (= `repr_pos` como condición HBL) + **Gödel I real (indemostrabilidad) modular** `goedel_first_unprovable_real` (usa D1 honesto; toma el punto fijo como hipótesis — el lema diagonal para `provCodeC` es 2.6/representabilidad de sustitución) | ✅ (D1 ✅; lema diagonal pendiente) |
+| **3** | **D1** real (`Meta/Necessitation.lean`): `d1/necessitation : Prf φ → axioms ⊢ provCodeC φ` (= `repr_pos`) + Gödel I modular `goedel_first_unprovable_real` | ✅ |
+| **3.5** | **Lema diagonal real** (`Meta/Diagonal.lean`): `tc_arith` + `diag_arith` + `godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G` ⟹ **`goedel_first_real : ConsistentOmega → ¬ Prf G`** — **Gödel I real SIN hipótesis ni postulados** (`#print axioms` = solo `imp_intro`/`dne`/`subst_lift_cancel_formula` del ω-sistema, ningún `diagonal_lemma`/`provFormula`/D2/D3) | ✅ |
 | **4** | **D2** real: combinador MP sobre códigos + internalización | ⬜ |
 | **5** | **D3** real: + esquema de inducción `IND`; Σ₁-completitud *provable* | ⬜ |
 
@@ -172,7 +173,7 @@ Fases 0–3 ⟹ **Gödel I sin postulados**. Fases 4–5 ⟹ Gödel II/Löb sin 
 | `provFormula : Formula` (axiom, opaco) | def concreta Σ₁ | 2 |
 | `provFormula_repr` bicondicional (axiom) | **sólo necesitación** (la reflexión muere por Tarski) | 3 |
 | `D2`, `D3` (axiom) | teoremas | 4, 5 |
-| `diagonal_lemma` (axiom) | teorema (representabilidad de la sustitución) — **casi ✅** (`Meta/Diagonal.lean`: `tc_arith`/`tc_form` «código del código» + `diag_arith` diagonalización representable); falta solo el **punto fijo** (composición de sustituciones De Bruijn) | 4 |
+| `diagonal_lemma` (axiom) | **✅ teorema** (`Meta/Diagonal.lean`): `tc_arith`/`tc_form` «código del código» + `diag_arith` + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`** (punto fijo real). El paso de composición De Bruijn se resuelve para el `φ` concreto vía `substTerm_lift_comm` | 4 ✅ |
 
 ---
 

@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Representability
+import ROBINSON_PlusPlus.Meta.Necessitation
 
 import FOL.FOL
 import FOL.Theorems.Eq
@@ -14,6 +15,8 @@ open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.Representability
+open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.Necessitation
 
 set_option linter.unusedSimpArgs false
 
@@ -152,6 +155,52 @@ theorem diag_arith (ψ : Formula) :
     FOL.derive_eq_trans (congr_substfc_arg2 (tc_form ψ)) (substFormula_arith 0 (formCode ψ) ψ)
   exact key
 
+/-! ### Punto fijo (lema diagonal) y Primer Teorema de Gödel real
+
+Para el predicado concreto de Gödel `godelPred = ¬provFormulaC` (una variable
+libre, sin variables libres ≥ 1) la composición de sustituciones se reduce con un
+único `substTerm_lift_comm` (no hace falta el lema general De Bruijn). -/
+
+/-- **Leibniz para fórmulas**: de `t₁ = t₂` se obtiene `φ[t₁] ⇔ φ[t₂]`. -/
+theorem subst_eq_iff {t₁ t₂ : Term} (φ : Formula) (h : axioms ⊢ (t₁ =eq t₂)) :
+    axioms ⊢ (substFormula 0 t₁ φ ⇔ substFormula 0 t₂ φ) :=
+  FOL.MetaRules.and_intro
+    (imp_intro (fun hp => Derives.subst axioms t₁ t₂ φ h hp))
+    (imp_intro (fun hp => Derives.subst axioms t₂ t₁ φ (FOL.derive_eq_symm h) hp))
+
+/-- Predicado de Gödel `¬Prov(·)` (variable libre 0). -/
+def godelPred : Formula := neg provFormulaC
+
+/-- Predicado diagonalizado `β` (variable libre 0). -/
+def godelBeta : Formula := substFormula 0 diagTerm godelPred
+
+/-- **Sentencia de Gödel real** `G = β(⌜β⌝)`. -/
+noncomputable def godelC : Formula := selfApp godelBeta
+
+/-- Composición de sustituciones para `godelPred` (sin var libre ≥ 1): se reduce
+    con `substTerm_lift_comm`. -/
+theorem godel_comp (s : Term) :
+    substFormula 0 s godelBeta = substFormula 0 (substTerm 0 s diagTerm) godelPred := by
+  simp [godelBeta, godelPred, neg, provFormulaC, substFormula, substTerm, substTerms,
+    In, validProofFn, nil, zero, FOL.substTerm_liftTerm, FOL.substTerm_lift_comm]
+
+/-- **Lema diagonal (punto fijo) real**: `⊢ G ⇔ ¬Prov(⌜G⌝)`. Reemplaza el postulado
+    `diagonal_lemma`/`goedelSentence_fixedpoint` para el predicado **concreto**
+    `provCodeC`. -/
+theorem godelC_fixedpoint : axioms ⊢ (godelC ⇔ neg (provCodeC godelC)) := by
+  have hiff := subst_eq_iff godelPred (diag_arith godelBeta)
+  rw [← godel_comp (formCode godelBeta)] at hiff
+  -- `substFormula 0 ⌜β⌝ β = selfApp β = G`; `substFormula 0 ⌜G⌝ godelPred = ¬provCodeC G`
+  simpa only [godelC, selfApp, godelPred, provCodeC, neg, substFormula] using hiff
+
+/-- **Primer Teorema de Incompletitud de Gödel — REAL** (mitad de
+    indemostrabilidad): si la teoría es consistente, la sentencia de Gödel `G`
+    (construida con el predicado de demostrabilidad **concreto** `provCodeC`) **no**
+    es demostrable en el cálculo finitario `Prf`. Sin postular el lema diagonal ni
+    las condiciones de demostrabilidad. -/
+theorem goedel_first_real (hcon : ConsistentOmega) : ¬ Prf godelC :=
+  goedel_first_unprovable_real hcon godelC_fixedpoint
+
 end ROBINSON_PlusPlus.Meta.Diagonal
 
 export ROBINSON_PlusPlus.Meta.Diagonal (
@@ -168,4 +217,10 @@ export ROBINSON_PlusPlus.Meta.Diagonal (
   selfApp
   diagTerm
   diag_arith
+  subst_eq_iff
+  godelPred
+  godelBeta
+  godelC
+  godelC_fixedpoint
+  goedel_first_real
 )
