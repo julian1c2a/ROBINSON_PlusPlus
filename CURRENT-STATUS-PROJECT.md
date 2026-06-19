@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-17
+**Last updated:** 2026-06-19
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,14 +9,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 32 (Minimal/ 11 + Meta/ 10 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith, StepArith, CheckArith, Representability] + Full/ 11) |
-| Modules sin sorry | 32 / 32 ✅ |
+| Total modules | 35 (Minimal/ 11 + Meta/ 13 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith, StepArith, CheckArith, Representability, Necessitation, Diagonal, CodeDistinct] + Full/ 11) |
+| Modules sin sorry | 35 / 35 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
 | Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C, **legacy**); `D2`/`D3` (Incompleteness D, **legacy**). Las 6 ecuaciones recursivas de coding (`substtc`/`substtsc`) están **integradas en `Minimal.axioms`** (extensión definicional) — `SubstArith` sin `axiom` local |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
-| Gödel | **A, B, C, D** ✅ (I completo + II vía D2/D3 postulados). **Nivel D REAL en curso**: aritmetización honesta de D1–D3 sobre Hilbert finitario `Prf` — **Fase 2 completa** (0–1, 2.1–2.5): sustitución/lift De Bruijn + verificador object `validProofFn` (18 reglas, `thy` incl.) + `provFormulaC` Σ₁ + **representabilidad positiva** `repr_pos : Prf φ → axioms ⊢ provCodeC φ` (`Meta/Representability.lean`, `#print axioms` = solo estándar). Próximo: Fase 3 (envolver `repr_pos` como D1); 2.6 reflexión diferida |
-| Build status | ✅ Passing (**46 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
+| Gödel | **A, B, C, D** ✅ (legacy I/II vía D2/D3 postulados). **Nivel D REAL — Gödel I REAL sin postulados**: cadena completa sobre Hilbert finitario `Prf` — verificador `validProofFn` (18 reglas, sólido vía `coreAxioms`) + `repr_pos`/**D1** (`Meta/Necessitation.lean`) + **lema diagonal real** `tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G` (`Meta/Diagonal.lean`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (`#print axioms` = solo ω-reglas ambiente; NINGÚN `diagonal_lemma`/`provFormula`/D2/D3). Además **aritmética negativa de códigos** `formCode_ne` (`Meta/CodeDistinct.lean`). Pendiente: `⊢¬provCodeC` (Π₁, necesita inducción Fase 5) + D2/D3 → Gödel II |
+| Build status | ✅ Passing (**49 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 

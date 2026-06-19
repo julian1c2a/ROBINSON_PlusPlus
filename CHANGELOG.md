@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-17 — **Gödel Nivel D REAL en curso** (aritmetización honesta de D1–D3). Cálculo de Hilbert finitario `Prf`, verificador decidible, `Dem` concreto, **sustitución/lift De Bruijn aritmetizados** (substTerm/substFormula/liftTerm/liftFormula), reconocimiento de instancias de axioma, y **verificador object `validProofFn`** (17 reglas) + fórmula de demostrabilidad Σ₁ `provFormulaC`. Todo como extensión definicional de `Minimal.axioms` (sin postulados nuevos). **31 módulos** (Minimal 11 + Meta 9 + Full 11), build verde (**45 jobs**), 0 sorrys. Pendiente: regla `thy` + representabilidad (2.5).
+**Last updated:** 2026-06-19 — **Gödel Nivel D REAL — Primer Teorema de Gödel REAL sin postulados**. Cadena completa: verificador object `validProofFn` sólido (18 reglas, `thy` vía `coreAxioms`) + `repr_pos`/D1 + lema diagonal real (`tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** + aritmética negativa de códigos `formCode_ne`. `#print axioms` de los resultados = solo ω-reglas ambiente; ningún `diagonal_lemma`/`provFormula`/D2/D3. **35 módulos** (Minimal 11 + Meta 13 + Full 11), build verde (**49 jobs**), 0 sorrys. Pendiente: `⊢¬provCodeC` (necesita inducción Fase 5) + D2/D3 → Gödel II.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,27 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-19) — Gödel Nivel D REAL: Primer Teorema de Gödel REAL (sin postulados)
+
+Cierre del bloque grande de Nivel D real. `#print axioms` de cada resultado = solo
+axiomas estándar de Lean + las ω-reglas ambiente del sistema (`imp_intro`/`dne`/…);
+**ningún** `diagonal_lemma`/`provFormula`/`D2`/`D3`.
+
+- **Fase 2.4-thy + soundness de `thy`**: verificador `validProofFn` completo (18 reglas).
+  `provCodeC` fiel: `thy` recorre `coreAxioms` (34 axiomas matemáticos), condicional a
+  `In c axiomsCodeT`. `formCodeM` (codificación a nivel `Minimal`) + clausura De Bruijn
+  estructural (`liftTerm_formCodeM`, por los numerales gigantes de símbolos Unicode).
+- **Fase 2.5** (`Meta/Representability.lean`): `repr_pos : Prf φ → axioms ⊢ provCodeC φ`
+  (representabilidad positiva) vía encoder object a medida `proofCode`/`lineCode` + `vpf_run`.
+- **Fase 3** (`Meta/Necessitation.lean`): `d1`/`necessitation` (= `repr_pos` como
+  condición HBL) + `goedel_first_unprovable_real` (Gödel I modular).
+- **Lema diagonal real** (`Meta/Diagonal.lean`): `tcFn` «código del código» + `tc_arith`
+  + `diag_arith` (diagonalización representable) + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`**
+  + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (Primer Teorema de Gödel real,
+  mitad de indemostrabilidad, sin hipótesis ni postulados).
+- **Fase 2.6 cimiento** (`Meta/CodeDistinct.lean`): aritmética negativa `formCode_ne`
+  (la teoría refuta igualdades de códigos distintos) + familia term/str/chars + primitivos.
 
 ### Added (2026-06-17) — Gödel Nivel D REAL: Fases 2.2f–2.4 (sustitución + verificador object)
 
