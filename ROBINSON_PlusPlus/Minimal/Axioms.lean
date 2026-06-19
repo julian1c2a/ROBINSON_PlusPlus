@@ -870,6 +870,22 @@ def ax_vpf_thy : Formula :=
     (validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
       validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0)))
 
+-- Inducción (a = .var 1, código del predicado φ): **incondicional** (todo esquema
+-- de inducción es axioma legítimo de la aritmética, IΣ₁). El verificador
+-- reconstruye el código de `inductionFormula φ` a partir de `⌜φ⌝` con
+-- `substfc`/`liftfc` y los códigos cerrados de `O` (`termCodeM zero`) y de `σ#0`
+-- (`termCodeM (succ #0)`). La **fidelidad** la da `ind_concl_code` (Meta/Induction):
+-- la reconstrucción `=eq formCode (inductionFormula φ)`, y `Full.ax_induction` la
+-- hace **sólida**. Tag 18. (`termCodeM (succ #0)` es un código CERRADO: `termCodeM`
+-- consume el `Term.var 0` codificándolo, no es la variable ligada por `forall_3`.)
+def ax_vpf_ind : Formula :=
+  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 18) (cons (.var 1) nil)) (.var 0)) =eq
+    validProofFn (concat (.var 2)
+      (cons (implc (substfc zero (termCodeM zero) (.var 1))
+               (implc (forallc (implc (.var 1)
+                         (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) (.var 1)))))
+                      (forallc (.var 1)))) nil)) (.var 0))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -966,6 +982,7 @@ def axioms : List Formula := [
   ax_vpf_mp,
   ax_vpf_gen,
   ax_vpf_thy,
+  ax_vpf_ind,
   ax_axiomsCodeT,
   ax_tc_zero,
   ax_tc_succ,
@@ -984,7 +1001,7 @@ def codingAxioms : List Formula := [
   ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
-  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_axiomsCodeT,
+  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_axiomsCodeT,
   ax_tc_zero, ax_tc_succ, ax_tc_cons
 ]
 

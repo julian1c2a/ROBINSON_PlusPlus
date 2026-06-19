@@ -214,6 +214,23 @@ theorem vpf_thy (checked c rest : Term) (h : axioms ⊢ In c axiomsCodeT) :
     numeralM, cons, nil, zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact mp hh h
 
+/-- Paso `ind` (esquema de inducción, tag 18): **incondicional**. La línea
+    transporta el código `a` del predicado φ; el verificador reconstruye el código
+    de `inductionFormula φ` con `substfc`/`liftfc` y los códigos cerrados de `O`
+    (`termCodeM zero`) y `σ#0` (`termCodeM (succ #0)`). La fidelidad
+    (`reconstrucción =eq formCode (inductionFormula φ)`) la cierra `ind_concl_code`
+    en `Representability`; la solidez, `Full.ax_induction`. -/
+theorem vpf_ind (checked a rest : Term) :
+    axioms ⊢ (validProofFn checked (cons (cons (numeralM 18) (cons a nil)) rest) =eq
+      validProofFn (concat checked (cons (implc (substfc zero (termCodeM zero) a)
+        (implc (forallc (implc a (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) a))))
+               (forallc a))) nil)) rest) := by
+  have hh := spec (spec (spec (ax (show ax_vpf_ind ∈ axioms by simp [axioms])) checked) a) rest
+  simp [ax_vpf_ind, substFormula, substTerm, substTerms, validProofFn, concat, implc, forallc, substfc, liftfc,
+    numeralM, cons, nil, zero, succ, substTerm_termCodeM, substTerm_numeralM, substTerm_nil,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
 /-! ### Fórmula de demostrabilidad object Σ₁ -/
 
 /-- **Predicado de demostrabilidad object** (Σ₁): `∃ p, In x (validProofFn nil p)`
@@ -252,4 +269,5 @@ export ROBINSON_PlusPlus.Meta.CheckArith (
   vpf_mp
   vpf_gen
   vpf_thy
+  vpf_ind
 )

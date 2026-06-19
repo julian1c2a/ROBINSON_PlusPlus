@@ -94,6 +94,7 @@ inductive Rule where
   | eqrefl (t : Term)
   | leibniz (A : Formula) (t₁ t₂ : Term)
   | p3 (A : Formula)
+  | ind (A : Formula)
   | thy (k : Nat)
   | mp (i j : Nat)
   | gen (i : Nat)
@@ -123,6 +124,7 @@ def stepConcl (earlier : List Formula) : Rule → Option Formula
   | .eqrefl t => some (t ≐ t)
   | .leibniz A t₁ t₂ => some ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
   | .p3 A => some (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
+  | .ind A => some (Full.inductionFormula A)
   | .thy k => coreAxioms[k]?
   | .mp i j => (earlier[i]?).bind (fun fi => (earlier[j]?).bind (fun fj => mpConcl fi fj))
   | .gen i => (earlier[i]?).map Formula.forall
@@ -187,6 +189,7 @@ theorem stepConcl_prf {acc : List Formula} {r : Rule} {f : Formula}
   | leibniz A t₁ t₂ =>
       simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.leibniz A t₁ t₂)
   | p3 A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.p3 A
+  | ind A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.ind A
   | thy k =>
       simp only [stepConcl] at h
       exact Prf.incl (Prf₀.thy f (List.mem_of_getElem? h))
@@ -371,6 +374,7 @@ theorem prf_to_derivation {φ : Formula} (h : Prf φ) : ∃ rs, Derivation rs φ
   induction h with
   | incl h0 => exact prf0_to_derivation h0
   | p3 A => exact ⟨_, derivation_single (r := Rule.p3 A) rfl⟩
+  | ind A => exact ⟨_, derivation_single (r := Rule.ind A) rfl⟩
   | mp A B _ _ ih1 ih2 =>
       obtain ⟨rs1, hd1⟩ := ih1
       obtain ⟨rs2, hd2⟩ := ih2
@@ -413,6 +417,7 @@ def ruleCode : Rule → Term
   | .leibniz A t₁ t₂ =>
       cons (numeral 13) (cons (formCode A) (cons (termCode t₁) (cons (termCode t₂) nil)))
   | .p3 A => cons (numeral 14) (cons (formCode A) nil)
+  | .ind A => cons (numeral 18) (cons (formCode A) nil)
   -- La línea `thy` TRANSPORTA el código del axioma (no el índice `k`). `thy`
   -- recorre `coreAxioms` (la teoría matemática), no las ecuaciones de coding (ver
   -- `ax_vpf_thy` y GODEL-D-ARITHMETIZATION §7). En una derivación válida `k` está

@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Minimal.Axioms
+import ROBINSON_PlusPlus.Full.Induction
 
 import FOL.FOL
 import FOL.Theorems.Impl
@@ -157,12 +158,14 @@ theorem prf0_to_derives {φ : Formula} (h : Prf₀ φ) : axioms ⊢ φ := by
 
 /-! ### Capa clásica `Prf` -/
 
-/-- **Cálculo de Hilbert clásico**: la capa intuicionista (`incl`) más el
-    esquema **DNE** (`p3`), cerrado bajo MP y GEN. Clásico, coherente con el
-    `dne` del proyecto, sólido para ℕ. Es r.e. (Fase 1). -/
+/-- **Cálculo de Hilbert clásico**: la capa intuicionista (`incl`), el esquema
+    **DNE** (`p3`) y el **esquema de inducción** (`ind`, IΣ₁), cerrado bajo MP y
+    GEN. Clásico, coherente con el `dne` y la inducción del proyecto, sólido para
+    ℕ. Es r.e. (Fase 1). -/
 inductive Prf : Formula → Prop where
   | incl {φ : Formula} : Prf₀ φ → Prf φ
   | p3 (A : Formula) : Prf (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
+  | ind (A : Formula) : Prf (Full.inductionFormula A)
   | mp (A B : Formula) : Prf (A ⇒ B) → Prf A → Prf B
   | gen (A : Formula) : Prf A → Prf (Formula.forall A)
 
@@ -180,6 +183,10 @@ theorem prf_to_derives {φ : Formula} (h : Prf φ) : axioms ⊢ φ := by
       -- ⭐ EL ÚNICO USO DE `dne` (lógica clásica) en todo el puente.
       apply Derives.intro_impl
       exact Minimal.Axioms.dne (Derives.hyp _ _ (List.Mem.head _))
+  | ind A =>
+      -- Esquema de inducción: axioma legítimo de la aritmética (IΣ₁), sólido vía
+      -- `Full.ax_induction` (misma `Minimal.axioms`; `Meta` importa `Full`).
+      exact Full.ax_induction A
   | mp A B _ _ ihAB ihA => exact Derives.elim_impl _ A B ihAB ihA
   | gen A _ ihA =>
       apply Derives.intro_forall

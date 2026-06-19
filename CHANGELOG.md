@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-19 — **Gödel Nivel D REAL — Primer Teorema de Gödel REAL sin postulados**. Cadena completa: verificador object `validProofFn` sólido (18 reglas, `thy` vía `coreAxioms`) + `repr_pos`/D1 + lema diagonal real (`tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** + aritmética negativa de códigos `formCode_ne`. `#print axioms` de los resultados = solo ω-reglas ambiente; ningún `diagonal_lemma`/`provFormula`/D2/D3. **35 módulos** (Minimal 11 + Meta 13 + Full 11), build verde (**49 jobs**), 0 sorrys. Pendiente: `⊢¬provCodeC` (necesita inducción Fase 5) + D2/D3 → Gödel II.
+**Last updated:** 2026-06-19 — **Gödel Nivel D REAL — Primer Teorema de Gödel REAL sin postulados + regla de inducción integrada (IΣ₁)**. Cadena completa: verificador object `validProofFn` sólido (**19 reglas**, `thy` vía `coreAxioms`, `ind` vía `Full.ax_induction`) + `repr_pos`/D1 + lema diagonal real (`tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** + aritmética negativa de códigos `formCode_ne`. **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind` sólida + `vpf_ind` + `vpf_run`): `provCodeC` rastrea **IΣ₁**. `repr_pos`/`vpf_ind` `#print axioms` = estándar; `goedel_first_real` cita además `Full.ax_induction` (honesto: Prf modela IΣ₁); ningún `diagonal_lemma`/`provFormula`/D2/D3. **36 módulos** (Minimal 11 + Meta 14 + Full 11), build verde (**50 jobs**), 0 sorrys. Pendiente: D2/D3 → Gödel II; ⊬¬G (reflexión).
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,25 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-19) — Gödel Nivel D REAL: integración de la regla de inducción (IΣ₁)
+
+Vertical slice atómica que añade el **esquema de inducción** al cálculo aritmetizado,
+para que `provCodeC` rastree **IΣ₁** (prerequisito de D2/D3 → Gödel II). `#print axioms`
+de `repr_pos`/`vpf_ind` = solo estándar; `goedel_first_real` cita además
+`Full.ax_induction` (axioma legítimo de aritmética; **ningún** postulado gödeliano).
+
+- **`Meta/Hilbert.lean`**: `Prf.ind (A) : Prf (Full.inductionFormula A)`; soundness
+  `prf_to_derives` vía `Full.ax_induction` (Meta importa Full, misma `Minimal.axioms`).
+- **`Meta/HilbertSeq.lean`**: `Rule.ind` (tag 18) en `stepConcl`/`stepConcl_prf`/
+  `prf_to_derivation`/`ruleCode`; `shiftRule`/`stepConcl_shift` cubiertos por catch-all/`rfl`.
+- **`Minimal/Axioms.lean`**: **`ax_vpf_ind`** (incondicional — todo esquema de inducción es
+  axioma legítimo), reconstruye el código de `inductionFormula φ` desde `⌜φ⌝` con códigos
+  cerrados `termCodeM zero`/`termCodeM (succ #0)` (gestionados por clausura
+  `substTerm_termCodeM`/`liftTerm_termCodeM`, sin numeral gigante). Añadido a `axioms`/`codingAxioms`.
+- **`Meta/CheckArith.lean`**: step-lemma `vpf_ind`. **Verificador: 19 reglas.**
+- **`Meta/Representability.lean`**: `lineCode` + caso `ind` de `vpf_run` (puente
+  `termCodeM_eq` → `ind_concl_code`). `repr_pos` sigue honesto.
 
 ### Added (2026-06-19) — Gödel Nivel D REAL: Primer Teorema de Gödel REAL (sin postulados)
 

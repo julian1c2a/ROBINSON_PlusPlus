@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.CheckArith
 import ROBINSON_PlusPlus.Meta.HilbertSeq
+import ROBINSON_PlusPlus.Meta.Induction
 import ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
 import FOL.FOL
@@ -23,6 +24,7 @@ open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.StepArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.HilbertSeq
+open ROBINSON_PlusPlus.Meta.Induction
 
 set_option linter.unusedSimpArgs false
 
@@ -197,6 +199,7 @@ def lineCode (acc : List Formula) (f : Formula) : Rule → Term
   | .leibniz A t₁ t₂ =>
       cons (numeral 13) (cons (formCode A) (cons (termCode t₁) (cons (termCode t₂) nil)))
   | .p3 A => cons (numeral 14) (cons (formCode A) nil)
+  | .ind A => cons (numeral 18) (cons (formCode A) nil)
   | .thy _ => cons (numeral 15) (cons (formCode f) nil)
   | .mp _ j => cons (numeral 16) (cons (formCode f) (cons (formCode ((acc[j]?).getD Formula.bottom)) nil))
   | .gen i => cons (numeral 17) (cons (formCode ((acc[i]?).getD Formula.bottom)) nil)
@@ -324,6 +327,15 @@ theorem vpf_run (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc =
                 simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
               subst hf; simp only [lineCode]
               exact vpf_p3 (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))
+          | ind A =>
+              have hf : f = Full.inductionFormula A := by
+                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+              subst hf; simp only [lineCode]
+              refine FOL.derive_eq_trans
+                (vpf_ind (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))) ?_
+              refine congr_vpf_checked (congr_concat2 (congr_cons_head ?_))
+              rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
+              exact ind_concl_code A
           | thy k =>
               have hmem : f ∈ coreAxioms := List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
               simp only [lineCode]
