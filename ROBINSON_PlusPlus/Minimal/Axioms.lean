@@ -968,6 +968,82 @@ def ax_lineWF_thy : Formula :=
 def ax_premsOf_thy : Formula :=
   forall_ (premsOf (cons (.var 0) (cons (numeralM 15) nil)) =eq nil)
 
+/-! ### `lineWF`/`premsOf` de los esquemas PROPOSICIONALES (tags 0–8,12,14)
+
+Para esquemas, `lineWF (cons concl justif) ⇔ (concl =eq ⌜reconstrucción⌝)` —
+fidelidad: la conclusión debe ser la instancia correcta del esquema (si fuese `⊤`
+se podría fabricar `⊢ provCodeC' ⊥`). `premsOf = nil` (sin premisas de contexto).
+Las reconstrucciones reproducen el RHS de los `ax_vpf_*`. -/
+
+-- P1: concl ⇔ a ⇒ (b ⇒ a)
+def ax_lineWF_p1 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 0) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (.var 1) (implc (.var 0) (.var 1))))
+def ax_premsOf_p1 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 0) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- P2: concl ⇔ (a⇒(b⇒c)) ⇒ ((a⇒b)⇒(a⇒c))
+def ax_lineWF_p2 : Formula :=
+  forall_4 (lineWF (cons (.var 3) (cons (numeralM 1) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) ⇔
+    ((.var 3) =eq implc (implc (.var 2) (implc (.var 1) (.var 0)))
+      (implc (implc (.var 2) (.var 1)) (implc (.var 2) (.var 0)))))
+def ax_premsOf_p2 : Formula :=
+  forall_4 (premsOf (cons (.var 3) (cons (numeralM 1) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
+-- C1: concl ⇔ a ⇒ (b ⇒ (a∧b))
+def ax_lineWF_c1 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 2) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (.var 1) (implc (.var 0) (andc (.var 1) (.var 0)))))
+def ax_premsOf_c1 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 2) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- C2: concl ⇔ (a∧b) ⇒ a
+def ax_lineWF_c2 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 3) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (andc (.var 1) (.var 0)) (.var 1)))
+def ax_premsOf_c2 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 3) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- C3: concl ⇔ (a∧b) ⇒ b
+def ax_lineWF_c3 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 4) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (andc (.var 1) (.var 0)) (.var 0)))
+def ax_premsOf_c3 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 4) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- J1: concl ⇔ a ⇒ (a∨b)
+def ax_lineWF_j1 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 5) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (.var 1) (orc (.var 1) (.var 0))))
+def ax_premsOf_j1 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 5) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- J2: concl ⇔ b ⇒ (a∨b)
+def ax_lineWF_j2 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 6) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (.var 0) (orc (.var 1) (.var 0))))
+def ax_premsOf_j2 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 6) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- J3: concl ⇔ (a∨b) ⇒ ((a⇒c) ⇒ ((b⇒c) ⇒ c))
+def ax_lineWF_j3 : Formula :=
+  forall_4 (lineWF (cons (.var 3) (cons (numeralM 7) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) ⇔
+    ((.var 3) =eq implc (orc (.var 2) (.var 1))
+      (implc (implc (.var 2) (.var 0)) (implc (implc (.var 1) (.var 0)) (.var 0)))))
+def ax_premsOf_j3 : Formula :=
+  forall_4 (premsOf (cons (.var 3) (cons (numeralM 7) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
+-- EFQ: concl ⇔ ⊥ ⇒ a
+def ax_lineWF_efq : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 8) (cons (.var 0) nil))) ⇔
+    ((.var 1) =eq implc botc (.var 0)))
+def ax_premsOf_efq : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 8) (cons (.var 0) nil))) =eq nil)
+-- EQREFL: concl ⇔ t ≐ t
+def ax_lineWF_eqrefl : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 12) (cons (.var 0) nil))) ⇔
+    ((.var 1) =eq eqc (.var 0) (.var 0)))
+def ax_premsOf_eqrefl : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 12) (cons (.var 0) nil))) =eq nil)
+-- P3: concl ⇔ ((a⇒⊥)⇒⊥) ⇒ a
+def ax_lineWF_p3 : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 14) (cons (.var 0) nil))) ⇔
+    ((.var 1) =eq implc (implc (implc (.var 0) botc) botc) (.var 0)))
+def ax_premsOf_p3 : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 14) (cons (.var 0) nil))) =eq nil)
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -1080,7 +1156,11 @@ def axioms : List Formula := [
   ax_lineWF_gen,
   ax_premsOf_gen,
   ax_lineWF_thy,
-  ax_premsOf_thy
+  ax_premsOf_thy,
+  ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
+  ax_lineWF_c1, ax_premsOf_c1, ax_lineWF_c2, ax_premsOf_c2, ax_lineWF_c3, ax_premsOf_c3,
+  ax_lineWF_j1, ax_premsOf_j1, ax_lineWF_j2, ax_premsOf_j2, ax_lineWF_j3, ax_premsOf_j3,
+  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1098,7 +1178,11 @@ def codingAxioms : List Formula := [
   ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_axiomsCodeT,
   ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
   ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
-  ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy
+  ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
+  ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
+  ax_lineWF_c1, ax_premsOf_c1, ax_lineWF_c2, ax_premsOf_c2, ax_lineWF_c3, ax_premsOf_c3,
+  ax_lineWF_j1, ax_premsOf_j1, ax_lineWF_j2, ax_premsOf_j2, ax_lineWF_j3, ax_premsOf_j3,
+  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/
