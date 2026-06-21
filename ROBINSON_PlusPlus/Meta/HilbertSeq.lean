@@ -125,7 +125,7 @@ def stepConcl (earlier : List Formula) : Rule → Option Formula
   | .leibniz A t₁ t₂ => some ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
   | .p3 A => some (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
   | .ind A => some (Full.inductionFormula A)
-  | .thy k => coreAxioms[k]?
+  | .thy k => axioms[k]?
   | .mp i j => (earlier[i]?).bind (fun fi => (earlier[j]?).bind (fun fj => mpConcl fi fj))
   | .gen i => (earlier[i]?).map Formula.forall
 
@@ -422,7 +422,7 @@ def ruleCode : Rule → Term
   -- recorre `coreAxioms` (la teoría matemática), no las ecuaciones de coding (ver
   -- `ax_vpf_thy` y GODEL-D-ARITHMETIZATION §7). En una derivación válida `k` está
   -- en rango, luego `coreAxioms.getD k ⊥ = coreAxioms[k]` = la conclusión real.
-  | .thy k => cons (numeral 15) (cons (formCode (coreAxioms.getD k Formula.bottom)) nil)
+  | .thy k => cons (numeral 15) (cons (formCode (axioms.getD k Formula.bottom)) nil)
   | .mp i j => cons (numeral 16) (cons (numeral i) (cons (numeral j) nil))
   | .gen i => cons (numeral 17) (cons (numeral i) nil)
 

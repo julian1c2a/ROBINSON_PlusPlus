@@ -65,17 +65,11 @@ theorem subst_lift_same (f : Formula) : ∀ (c : Nat) (s : Term),
 
 set_option maxRecDepth 20000 in
 /-- Los axiomas de `Minimal` son **sentencias cerradas**: desplazarlos es la
-    identidad. Los axiomas matemáticos y la mayoría de las ecuaciones de coding se
-    cierran por cómputo (`rfl`); el axioma `ax_axiomsCodeT` (que contiene el código
-    gigante `listFormCodeM coreAxioms`) se aísla y se cierra por `ax_axiomsCodeT_lift`
-    (clausura estructural, sin `rfl`). -/
+    identidad. Ya no hay ancla gigante (`ax_axiomsCodeT` eliminado; `axiomsCodeT` es
+    opaco), así que el lift de cada axioma se cierra por cómputo (`rfl`).
+    `maxRecDepth` cubre los numerales de símbolos (`σ` = codepoint 963). -/
 theorem axioms_lift_eq : axioms.map (liftFormula 0) = axioms := by
-  -- Expone el `map` y reescribe el término gigante `liftFormula 0 ax_axiomsCodeT`
-  -- a `ax_axiomsCodeT` (idéntico en ambos lados); el `rfl` final solo computa el
-  -- lift sobre los axiomas pequeños. `maxRecDepth` cubre los numerales de símbolos
-  -- (`σ` = codepoint 963) en `ax_tc_succ`; el código realmente gigante
-  -- (`listFormCodeM coreAxioms`) nunca se computa (lo cubre `ax_axiomsCodeT_lift`).
-  simp only [axioms, List.map_cons, List.map_nil, ax_axiomsCodeT_lift]
+  simp only [axioms, List.map_cons, List.map_nil]
   rfl
 
 /-! ### Capa intuicionista `Prf₀` -/
@@ -101,7 +95,7 @@ inductive Prf₀ : Formula → Prop where
   | eqrefl (t : Term) : Prf₀ (t ≐ t)
   | leibniz (A : Formula) (t₁ t₂ : Term) :
       Prf₀ ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
-  | thy (a : Formula) : List.Mem a coreAxioms → Prf₀ a
+  | thy (a : Formula) : List.Mem a axioms → Prf₀ a
   | mp (A B : Formula) : Prf₀ (A ⇒ B) → Prf₀ A → Prf₀ B
   | gen (A : Formula) : Prf₀ A → Prf₀ (Formula.forall A)
 
@@ -149,7 +143,7 @@ theorem prf0_to_derives {φ : Formula} (h : Prf₀ φ) : axioms ⊢ φ := by
       exact Derives.subst _ t₁ t₂ A
         (Derives.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
         (Derives.hyp _ _ (List.Mem.head _))
-  | thy a ha => exact Derives.hyp _ a (mem_axioms_of_mem_core ha)
+  | thy a ha => exact Derives.hyp _ a ha
   | mp A B _ _ ihAB ihA => exact Derives.elim_impl _ A B ihAB ihA
   | gen A _ ihA =>
       apply Derives.intro_forall

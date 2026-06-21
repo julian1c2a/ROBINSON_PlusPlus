@@ -905,11 +905,12 @@ def coreAxioms : List Formula := [
   ax_prodp_nil, ax_prodp_cons
 ]
 
-/-- Código object (opaco) de la teoría `coreAxioms`. Anclado por `ax_axiomsCodeT`. -/
+/-- Código object (opaco) de la teoría. Su contenido positivo (qué códigos
+    contiene) lo fija el meta-axioma `ax_inAxC` (más abajo): el código de todo
+    axioma de `axioms` pertenece a `axiomsCodeT`. Mantenerlo **opaco** evita
+    anclarlo a un literal gigante `listFormCodeM axioms` (auto-referencia +
+    término astronómico). -/
 def axiomsCodeT : Term := Term.func "axiomsCodeT" []
-
-/-- Anclaje: `axiomsCodeT` es el código de la lista de axiomas de la teoría. -/
-def ax_axiomsCodeT : Formula := axiomsCodeT =eq listFormCodeM coreAxioms
 
 -- Thy (c=.var 1, el código del axioma de teoría): **condicional** a que `c`
 -- pertenezca a `axiomsCodeT` (el código de `coreAxioms`). Así el verificador solo
@@ -1181,7 +1182,6 @@ def axioms : List Formula := [
   ax_vpf_gen,
   ax_vpf_thy,
   ax_vpf_ind,
-  ax_axiomsCodeT,
   ax_tc_zero,
   ax_tc_succ,
   ax_tc_cons,
@@ -1217,7 +1217,7 @@ def codingAxioms : List Formula := [
   ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
-  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_axiomsCodeT,
+  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind,
   ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
   ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
   ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
@@ -1240,11 +1240,14 @@ theorem coreAxioms_subset_axioms : coreAxioms ⊆ axioms :=
 theorem mem_axioms_of_mem_core {f : Formula} (h : f ∈ coreAxioms) : f ∈ axioms :=
   coreAxioms_subset_axioms h
 
-/-- `ax_axiomsCodeT` es invariante bajo desplazamiento (su único subtérmino no
-    trivial, `listFormCodeM coreAxioms`, es cerrado). Aísla el término gigante en
-    la prueba de `axioms_lift_eq`. -/
-theorem ax_axiomsCodeT_lift : liftFormula 0 ax_axiomsCodeT = ax_axiomsCodeT := by
-  simp only [ax_axiomsCodeT, liftFormula, axiomsCodeT, liftTerm, liftTerms, liftTerm_listFormCodeM]
+/-- **Contenido de `axiomsCodeT`** (meta-axioma, estilo `imp_intro`/`gen`): el código
+    `formCodeM a` de **todo axioma** `a ∈ axioms` pertenece a `axiomsCodeT`. Reemplaza
+    el anclaje `ax_axiomsCodeT` (literal gigante `listFormCodeM`): mantiene `axiomsCodeT`
+    **opaco** y fija solo su contenido **positivo** (suficiente para `repr_pos'`/D1 y la
+    necesitación; la dirección negativa —que SOLO los axiomas estén— no se postula).
+    Conservativo respecto a la teoría matemática (la maquinaria de coding es extensión
+    definicional). -/
+axiom ax_inAxC (a : Formula) (h : a ∈ axioms) : axioms ⊢ In (formCodeM a) axiomsCodeT
 
 -- ## Helper Theorems
 -- Estas herramientas son usadas en todos los archivos Block*.lean.

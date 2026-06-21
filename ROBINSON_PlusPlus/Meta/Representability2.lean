@@ -129,12 +129,12 @@ theorem In_runFn_of_mem {rs : List Rule} {L : List Formula} {φ : Formula}
 
 /-! ### chainOk-tracking (validez de la cadena) -/
 
-/-- Anclaje del código de la teoría (reusado en el caso `thy`). -/
-private theorem axiomsCodeT_anchor :
-    axioms ⊢ (axiomsCodeT =eq listFormCode coreAxioms) := by
-  have h0 : axioms ⊢ (axiomsCodeT =eq listFormCodeM coreAxioms) :=
-    ax (show ax_axiomsCodeT ∈ axioms by simp [axioms])
-  rwa [listFormCodeM_eq] at h0
+/-- Pertenencia del código de un axioma a `axiomsCodeT` (vía meta-axioma `ax_inAxC`
+    + puente `formCodeM_eq`). Reusado en el caso `thy`. -/
+private theorem inAxiomsCodeT {f : Formula} (hmem : f ∈ axioms) :
+    axioms ⊢ In (formCode f) axiomsCodeT := by
+  have h0 : axioms ⊢ In (formCodeM f) axiomsCodeT := ax_inAxC f hmem
+  rwa [formCodeM_eq] at h0
 
 /-- **chainOk-tracking**: `proofCode' rs acc` es una cadena válida desde `⌜acc⌝`.
     Inducción sobre `rs`; cada línea cumple `lineOk` (esquemas: `lineWF` reconstrucción
@@ -275,12 +275,12 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                 rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
                 exact FOL.derive_eq_symm (ind_concl_code A)
             | thy k =>
-                have hmem : f ∈ coreAxioms :=
+                have hmem : f ∈ axioms :=
                   List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
                 simp only [lineCode', lineJustif]
                 refine Minimal.Axioms.and_intro (iff_mpr (lineWF_thy _) ?_)
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_thy _)) (allIn_nil (listFormCode acc)))
-                exact Full.eq_subst_in (FOL.derive_eq_symm axiomsCodeT_anchor) (In_listFormCode hmem)
+                exact inAxiomsCodeT hmem
             | mp i j =>
                 rcases hi : acc[i]? with _ | fi
                 · simp [stepConcl, hi] at hsc

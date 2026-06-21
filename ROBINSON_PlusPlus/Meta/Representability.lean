@@ -337,19 +337,12 @@ theorem vpf_run (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc =
               rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
               exact ind_concl_code A
           | thy k =>
-              have hmem : f ∈ coreAxioms := List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
+              have hmem : f ∈ axioms := List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
               simp only [lineCode]
               refine vpf_thy (listFormCode acc) (formCode f) (proofCode rs (acc ++ [f])) ?_
-              -- objetivo: `axioms ⊢ In ⌜f⌝ axiomsCodeT`, vía el anclaje + pertenencia
-              have hanchor : axioms ⊢ (axiomsCodeT =eq listFormCode coreAxioms) := by
-                have h0 : axioms ⊢ (axiomsCodeT =eq listFormCodeM coreAxioms) :=
-                  ax (show ax_axiomsCodeT ∈ axioms by simp [axioms])
-                rwa [listFormCodeM_eq] at h0
-              have hin : axioms ⊢ In (formCode f) (listFormCode coreAxioms) := In_listFormCode hmem
-              have ht := Derives.subst axioms (listFormCode coreAxioms) axiomsCodeT
-                (In (liftTerm 0 (formCode f)) (.var 0)) (FOL.derive_eq_symm hanchor)
-                (by simpa [substFormula, substTerm, substTerms, In, FOL.substTerm_liftTerm] using hin)
-              simpa [substFormula, substTerm, substTerms, In, FOL.substTerm_liftTerm] using ht
+              -- objetivo: `axioms ⊢ In ⌜f⌝ axiomsCodeT`, vía el meta-axioma `ax_inAxC`
+              have h0 : axioms ⊢ In (formCodeM f) axiomsCodeT := ax_inAxC f hmem
+              rwa [formCodeM_eq] at h0
           | mp i j =>
               -- f = conclusión del MP; fi = acc[i] = (fj ⇒ f), fj = acc[j]
               rcases hi : acc[i]? with _ | fi

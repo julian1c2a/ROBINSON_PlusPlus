@@ -168,10 +168,12 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
     vía **D2 real** + **D3 postulado** (`axiom d3`) + hipótesis explícitas honestas
     (`fp_bwd` punto fijo, `nec1` necesitación, `hgi` ⊬G ω). Mejora sobre legacy (postulaba D2 y D3).
   - **Camino a Gödel II 100% real** (descubierto al analizar D3):
-    - [ ] **Refactor `Prf.thy → axioms`**: que el cálculo de Hilbert use TODO `axioms` (core++coding),
-      y `axiomsCodeT` codifique `axioms`. La teoría razona sobre su propia maquinaria (como IΣ₁).
-      Prerequisito de la necesitación del punto fijo Y de D3. Re-probar caso thy de
-      `repr_pos'`/`chainOk_track`/`prf0_to_derives`.
+    - [x] **Refactor `Prf.thy → axioms`** ✅ (2026-06-21): `Prf₀.thy` recorre todo `axioms`
+      (core++coding); la teoría razona sobre su propia maquinaria (como IΣ₁). Ancla gigante
+      `ax_axiomsCodeT` ELIMINADA, `axiomsCodeT` opaco, nuevo meta-axioma
+      `ax_inAxC (a ∈ axioms) : ⊢ In (formCodeM a) axiomsCodeT` (sin término gigante ni
+      auto-referencia; sonda validó el lift en un paso). Fixes thy en
+      `Hilbert`/`HilbertSeq`/`Representability`/`Representability2`. Build 55 jobs.
     - [ ] **Punto fijo real para `provCodeC'`** (adaptar `Diagonal.lean`: `godelC'`/`godelC'_fixedpoint`)
       → suministra `fp_bwd`; necesitación `nec1` real (vía `repr_pos'` tras el refactor); `hgi` (⊬G ω).
     - [ ] **R6 — D3 real** (Σ₁-completitud provable): `⊢ ∀q. (R(q) ⇒ Prov(⌜R(q)⌝))` por inducción
