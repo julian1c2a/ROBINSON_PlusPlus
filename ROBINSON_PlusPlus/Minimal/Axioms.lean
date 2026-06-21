@@ -938,6 +938,36 @@ def ax_vpf_ind : Formula :=
                          (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) (.var 1)))))
                       (forallc (.var 1)))) nil)) (.var 0))
 
+/-! ### `lineWF` / `premsOf` por regla (validez de líneas del verificador `runFn`)
+
+Para el verificador estructural `runFn` (Nivel D real, hacia D2/D3): cada línea es
+`cons ⌜concl⌝ justif`. `lineWF line` es la validez INDEPENDIENTE del contexto;
+`premsOf line` la lista de premisas que deben estar en el contexto (vía `allIn`).
+Aquí van las reglas de **inferencia** (mp/gen) y `thy`; las de esquema (cuya
+conclusión se reconstruye del payload) se añaden con el encoder de `repr_pos'`. -/
+
+-- MP: línea `cons ⌜B⌝ (cons 16 (cons ⌜A⌝ nil))`. Validez = premisas `⌜A⇒B⌝`, `⌜A⌝`
+-- en contexto (vía `premsOf`); `lineWF` incondicional.
+def ax_lineWF_mp : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 16) (cons (.var 0) nil))))
+def ax_premsOf_mp : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 16) (cons (.var 0) nil))) =eq
+    cons (implc (.var 0) (.var 1)) (cons (.var 0) nil))
+
+-- Gen: línea `cons (∀body) (cons 17 (cons body nil))`. Premisa = `body` en contexto.
+def ax_lineWF_gen : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))))
+def ax_premsOf_gen : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))) =eq
+    cons (.var 0) nil)
+
+-- Thy: línea `cons ⌜ax⌝ (cons 15 nil)`. `lineWF` = el código pertenece a `axiomsCodeT`
+-- (independiente del contexto); sin premisas.
+def ax_lineWF_thy : Formula :=
+  forall_ (lineWF (cons (.var 0) (cons (numeralM 15) nil)) ⇔ In (.var 0) axiomsCodeT)
+def ax_premsOf_thy : Formula :=
+  forall_ (premsOf (cons (.var 0) (cons (numeralM 15) nil)) =eq nil)
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -1044,7 +1074,13 @@ def axioms : List Formula := [
   ax_allIn_nil,
   ax_allIn_cons,
   ax_chainOk_nil,
-  ax_chainOk_cons
+  ax_chainOk_cons,
+  ax_lineWF_mp,
+  ax_premsOf_mp,
+  ax_lineWF_gen,
+  ax_premsOf_gen,
+  ax_lineWF_thy,
+  ax_premsOf_thy
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1061,7 +1097,8 @@ def codingAxioms : List Formula := [
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
   ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_axiomsCodeT,
   ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
-  ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons
+  ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
+  ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/

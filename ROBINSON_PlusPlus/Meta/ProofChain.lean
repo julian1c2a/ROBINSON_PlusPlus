@@ -270,6 +270,14 @@ theorem chainOk_subst2 {c p₁ p₂ : Term} (h : axioms ⊢ (p₁ =eq p₂))
     intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS p₂) ▸ Derives.subst axioms p₁ p₂ f h ((hS p₁) ▸ hok)
 
+/-- Congruencia de `allIn` en el 2º argumento (lista). -/
+theorem allIn_subst2 {c L₁ L₂ : Term} (h : axioms ⊢ (L₁ =eq L₂))
+    (hok : axioms ⊢ allIn c L₁) : axioms ⊢ allIn c L₂ := by
+  let f : Formula := allIn (liftTerm 0 c) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = allIn c s := by
+    intro s; simp only [f, allIn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS L₂) ▸ Derives.subst axioms L₁ L₂ f h ((hS L₁) ▸ hok)
+
 /-- **Monotonía de `In` por la derecha**: `In x L → In x (L ++ M)`. Inducción sobre `L`. -/
 theorem In_mono_right (x M L : Term) (h : axioms ⊢ In x L) : axioms ⊢ In x (concat L M) := by
   have key := Full.ax_list_induction (fun K => Formula.impl (In x K) (In x (concat K M)))
@@ -475,6 +483,95 @@ theorem chainOk_mono (c0 c p : Term) (h : axioms ⊢ chainOk c p) :
       exact iff_mpr (chainOk_cons (concat c0 c) h t) (Minimal.Axioms.and_intro hA' hB')
   exact mp (monoChainProp_spec key c) h
 
+/-! ### R4 — predicado de demostrabilidad nuevo `provCodeC'` + validez de reglas -/
+
+/-- **Predicado de demostrabilidad object (estructural)** Σ₁:
+    `∃p, chainOk nil p ∧ In x (runFn nil p)` — "existe una cadena de prueba válida
+    `p` cuyas conclusiones contienen `x`". Reemplaza `provFormulaC` (validProofFn)
+    por el verificador estructural, apto para D2/D3. -/
+def provFormulaC' : Formula :=
+  Formula.ex (land (chainOk nil (.var 0)) (In (.var 1) (runFn nil (.var 0))))
+
+/-- `Prov'(⌜φ⌝)` estructural. -/
+noncomputable def provCodeC' (φ : Formula) : Formula := substFormula 0 (formCode φ) provFormulaC'
+
+/-- Validez (independiente del contexto) de una línea **mp**: incondicional. -/
+theorem lineWF_mp (concl premA : Term) :
+    axioms ⊢ lineWF (cons concl (cons (numeralM 16) (cons premA nil))) := by
+  have hh := spec (spec (ax (show ax_lineWF_mp ∈ axioms by simp [axioms])) concl) premA
+  simpa [ax_lineWF_mp, substFormula, substTerm, substTerms, lineWF, numeralM, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+
+/-- Premisas de una línea **mp**: `[⌜A⇒B⌝, ⌜A⌝]`. -/
+theorem premsOf_mp (concl premA : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 16) (cons premA nil))) =eq
+      cons (implc premA concl) (cons premA nil)) := by
+  have hh := spec (spec (ax (show ax_premsOf_mp ∈ axioms by simp [axioms])) concl) premA
+  simp [ax_premsOf_mp, substFormula, substTerm, substTerms, premsOf, implc, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- Validez de una línea **gen**: incondicional. -/
+theorem lineWF_gen (concl body : Term) :
+    axioms ⊢ lineWF (cons concl (cons (numeralM 17) (cons body nil))) := by
+  have hh := spec (spec (ax (show ax_lineWF_gen ∈ axioms by simp [axioms])) concl) body
+  simpa [ax_lineWF_gen, substFormula, substTerm, substTerms, lineWF, numeralM, cons, nil, zero, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+
+/-- Premisas de una línea **gen**: `[body]`. -/
+theorem premsOf_gen (concl body : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 17) (cons body nil))) =eq cons body nil) := by
+  have hh := spec (spec (ax (show ax_premsOf_gen ∈ axioms by simp [axioms])) concl) body
+  simp [ax_premsOf_gen, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- Validez de una línea **thy**: el código es un axioma de la teoría. -/
+theorem lineWF_thy (concl : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 15) nil)) ⇔ In concl axiomsCodeT) := by
+  have hh := spec (ax (show ax_lineWF_thy ∈ axioms by simp [axioms])) concl
+  simp [ax_lineWF_thy, substFormula, substTerm, substTerms, lineWF, In, axiomsCodeT, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- Premisas de una línea **thy**: ninguna. -/
+theorem premsOf_thy (concl : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 15) nil)) =eq nil) := by
+  have hh := spec (ax (show ax_premsOf_thy ∈ axioms by simp [axioms])) concl
+  simp [ax_premsOf_thy, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-! ### Empaquetado de `provCodeC'` (intro/elim del `∃`) -/
+
+/-- **Introducción** de `provCodeC' φ`: exhibe una cadena `p` válida que concluye `⌜φ⌝`. -/
+theorem provCodeC'_intro (φ : Formula) (p : Term)
+    (h1 : axioms ⊢ chainOk nil p) (h2 : axioms ⊢ In (formCode φ) (runFn nil p)) :
+    axioms ⊢ provCodeC' φ := by
+  have hbody : axioms ⊢ land (chainOk nil p) (In (formCode φ) (runFn nil p)) :=
+    Minimal.Axioms.and_intro h1 h2
+  have hex := Derives.intro_ex axioms
+    (land (chainOk nil (.var 0)) (In (liftTerm 0 (formCode φ)) (runFn nil (.var 0)))) p
+    (by simpa [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+          FOL.substTerm_liftTerm] using hbody)
+  simpa [provCodeC', provFormulaC', substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+    FOL.substTerm_liftTerm] using hex
+
+/-- **Eliminación** de `provCodeC' φ`: para probar `C`, basta hacerlo dado un testigo
+    `p` con `chainOk nil p` y `In ⌜φ⌝ (runFn nil p)`. -/
+theorem provCodeC'_elim {φ : Formula} {C : Formula} (h : axioms ⊢ provCodeC' φ)
+    (k : ∀ p : Term, axioms ⊢ chainOk nil p → axioms ⊢ In (formCode φ) (runFn nil p) →
+      axioms ⊢ C) : axioms ⊢ C := by
+  have h' : axioms ⊢ Formula.ex (land (chainOk nil (.var 0)) (In (liftTerm 0 (formCode φ)) (runFn nil (.var 0)))) := by
+    simpa [provCodeC', provFormulaC', substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+      FOL.substTerm_liftTerm] using h
+  apply Minimal.Axioms.ex_elim h'
+  intro p hp
+  have hp' : axioms ⊢ land (chainOk nil p) (In (formCode φ) (runFn nil p)) := by
+    simpa [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+      FOL.substTerm_liftTerm] using hp
+  exact k p (Minimal.Axioms.and_elim_left hp') (Minimal.Axioms.and_elim_right hp')
+
 end ROBINSON_PlusPlus.Meta.ProofChain
 
 export ROBINSON_PlusPlus.Meta.ProofChain (
@@ -497,8 +594,19 @@ export ROBINSON_PlusPlus.Meta.ProofChain (
   concat_nil_right
   chainOk_subst1
   chainOk_subst2
+  allIn_subst2
   In_mono_right
   runFn_weaken
   chainOk_concat
   chainOk_mono
+  provFormulaC'
+  provCodeC'
+  lineWF_mp
+  premsOf_mp
+  lineWF_gen
+  premsOf_gen
+  lineWF_thy
+  premsOf_thy
+  provCodeC'_intro
+  provCodeC'_elim
 )

@@ -26,3 +26,4 @@ import ROBINSON_PlusPlus.Meta.Diagonal
 import ROBINSON_PlusPlus.Meta.CodeDistinct
 import ROBINSON_PlusPlus.Meta.Induction
 import ROBINSON_PlusPlus.Meta.ProofChain
+import ROBINSON_PlusPlus.Meta.DerivCond
