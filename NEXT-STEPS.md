@@ -164,7 +164,20 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
     validez de las 19 reglas (`lineWF`/`premsOf`, fieles). `#print axioms` = solo estándar.
   - [x] **R5 — D2** (`Meta/DerivCond.lean`): `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)`
     (`r = p++q++[mp]`, vía `chainOk_concat`/`chainOk_mono`/`runFn_concat`/`runFn_weaken`).
-  - [ ] **R6 — D3** (Σ₁-completitud provable — internaliza `repr_pos'`, lo más duro).
+  - [x] **Gödel II — núcleo lógico** (`Meta/GodelTwo.lean`): `con_imp_godel'`/`goedel_second'`
+    vía **D2 real** + **D3 postulado** (`axiom d3`) + hipótesis explícitas honestas
+    (`fp_bwd` punto fijo, `nec1` necesitación, `hgi` ⊬G ω). Mejora sobre legacy (postulaba D2 y D3).
+  - **Camino a Gödel II 100% real** (descubierto al analizar D3):
+    - [ ] **Refactor `Prf.thy → axioms`**: que el cálculo de Hilbert use TODO `axioms` (core++coding),
+      y `axiomsCodeT` codifique `axioms`. La teoría razona sobre su propia maquinaria (como IΣ₁).
+      Prerequisito de la necesitación del punto fijo Y de D3. Re-probar caso thy de
+      `repr_pos'`/`chainOk_track`/`prf0_to_derives`.
+    - [ ] **Punto fijo real para `provCodeC'`** (adaptar `Diagonal.lean`: `godelC'`/`godelC'_fixedpoint`)
+      → suministra `fp_bwd`; necesitación `nec1` real (vía `repr_pos'` tras el refactor); `hgi` (⊬G ω).
+    - [ ] **R6 — D3 real** (Σ₁-completitud provable): `⊢ ∀q. (R(q) ⇒ Prov(⌜R(q)⌝))` por inducción
+      OBJECT sobre `q` (internaliza `repr_pos'`/`chainOk_track`) + ∃-intro interno + ex_elim.
+      La pieza más grande del proyecto. (NOTA: `d3_of_sigma1` en `Reflection.lean` fue descomposición
+      errónea —ex_elim sobre witness opaco—; superada por este plan.)
   - [ ] **R7**: replicar `con_imp_goedelSentence`/`goedel_second` con `provCodeC'`/`godelC` → **Gödel II real** (`⊬ Con`).
 - [ ] **⊬¬G real** (reflexión / ω-soundness) + representabilidad **negativa** plena.
 

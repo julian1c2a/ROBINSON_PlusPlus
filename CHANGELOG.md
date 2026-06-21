@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-21 — **Gödel Nivel D REAL — D1 y D2 reales (HBL) sobre el verificador estructural `provCodeC'`**. Tras el rediseño `runFn`/`chainOk` (R1–R3), se cierran las dos primeras condiciones de derivabilidad de Hilbert-Bernays-Löb como **teoremas internos** (no postulados) para el predicado estructural fiel `provCodeC' := ∃p. chainOk nil p ∧ In x (runFn nil p)`: **D2** `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)` (`Meta/DerivCond.lean`, ensamblando `p++q++[mp]`), y **D1 = `repr_pos'`** `Prf φ → ⊢ provCodeC' φ` (`Meta/Representability2.lean`: encoder `proofCode'` + `runFn_track` + `chainOk_track` 19-casos + validez de las 19 reglas `lineWF`/`premsOf`). `#print axioms repr_pos'` = SOLO `[propext, Classical.choice, Quot.sound]`; `d2` = estándar + ω-reglas; **ningún postulado de derivabilidad**. **39 módulos** (Minimal 11 + Meta 17 + Full 11), build verde (**53 jobs**), 0 sorrys. Pendiente: **D3** (Σ₁-completitud provable) + punto fijo para `provCodeC'` → **Gödel II real**.
+**Last updated:** 2026-06-21 — **Gödel Nivel D REAL — Segundo Teorema de Gödel (núcleo lógico) sobre `provCodeC'`, con D1/D2 reales y D3 postulado**. Sobre el verificador estructural (`runFn`/`chainOk`), con **D1** (`repr_pos'`) y **D2** (`d2`) ya REALES, se cierra el **núcleo lógico de Gödel II** (`Meta/GodelTwo.lean`): `con_imp_godel' : ⊢ Con' ⇒ G` (Gödel I formalizado interno) y `goedel_second' : ¬(⊢ Con')`, usando D2 real + **D3 como único axioma gödeliano** (`d3`) + hipótesis explícitas honestas para el punto fijo (`fp_bwd`), la necesitación (`nec1`) y la indemostrabilidad ω de G (`hgi`). `#print axioms goedel_second'` = estándar + ω-reglas + ax_list_induction + `d3`; **sin** `diagonal_lemma`/`provFormula`/D2-legacy — MEJORA sobre el `goedel_second` legacy (que postulaba D2 **y** D3). Además D3 reducida lógicamente (`Meta/Reflection.lean`: combinadores `pcc_*`). **41 módulos** (Minimal 11 + Meta 19 + Full 11), build verde (**55 jobs**), 0 sorrys. Camino a Gödel II 100% real (registrado): refactor `Prf.thy → axioms` + punto fijo `provCodeC'` + D3 real (Σ₁-completitud provable). Tras el rediseño `runFn`/`chainOk` (R1–R3), se cierran las dos primeras condiciones de derivabilidad de Hilbert-Bernays-Löb como **teoremas internos** (no postulados) para el predicado estructural fiel `provCodeC' := ∃p. chainOk nil p ∧ In x (runFn nil p)`: **D2** `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)` (`Meta/DerivCond.lean`, ensamblando `p++q++[mp]`), y **D1 = `repr_pos'`** `Prf φ → ⊢ provCodeC' φ` (`Meta/Representability2.lean`: encoder `proofCode'` + `runFn_track` + `chainOk_track` 19-casos + validez de las 19 reglas `lineWF`/`premsOf`). `#print axioms repr_pos'` = SOLO `[propext, Classical.choice, Quot.sound]`; `d2` = estándar + ω-reglas; **ningún postulado de derivabilidad**. **39 módulos** (Minimal 11 + Meta 17 + Full 11), build verde (**53 jobs**), 0 sorrys. Pendiente: **D3** (Σ₁-completitud provable) + punto fijo para `provCodeC'` → **Gödel II real**.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,25 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-21) — Gödel Nivel D REAL: Segundo Teorema de Gödel (núcleo lógico) + reducción D3
+
+Cierre del **núcleo lógico de Gödel II** sobre el predicado estructural `provCodeC'`,
+con la cadena Hilbert-Bernays-Löb (**D1 y D2 reales**, **D3 postulado**).
+
+- **`Meta/GodelTwo.lean`**: `axiom d3 (φ) : ⊢ provCodeC' φ ⇒ provCodeC' (provCodeC' φ)`
+  (único postulado gödeliano). **`con_imp_godel' (G) (fp_bwd) (nec1) : ⊢ Con' ⇒ G`**
+  (Gödel I formalizado interno) y **`goedel_second' (G) (fp_bwd) (nec1) (hgi) : ¬(⊢ Con')`**,
+  vía **D2 real** (`d2`) + `d3` + hipótesis explícitas honestas (`fp_bwd` punto fijo,
+  `nec1` necesitación, `hgi` ⊬G ω). `#print axioms` = estándar + ω-reglas + ax_list_induction
+  + `d3`; sin `diagonal_lemma`/`provFormula`/D2-legacy. MEJORA sobre legacy (postulaba D2 y D3).
+- **`Meta/Reflection.lean`**: combinadores lógicos internos de la demostrabilidad
+  `pcc_mp`/`pcc_prf`/`pcc_andIntro`/`pcc_exIntro` (vía `d2`/`repr_pos'`). (La reducción
+  `d3_of_sigma1` resultó descomposición errónea —ver análisis D3—; queda superada.)
+- **Análisis de D3** (registrado): la prueba real de D3 (Σ₁-completitud provable por
+  inducción object internalizando `repr_pos'`) requiere antes unificar `Prf.thy → axioms`
+  (la teoría razona sobre su propia maquinaria, como IΣ₁); mismo refactor habilita la
+  necesitación del punto fijo. Camino a Gödel II 100% real documentado en NEXT-STEPS.
 
 ### Added (2026-06-21) — Gödel Nivel D REAL: D1 y D2 reales (HBL) sobre `provCodeC'` (Fases R4–R5)
 
