@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-21 — **Gödel Nivel D REAL — hacia D2/D3/Gödel II: verificador estructural `runFn` (rediseño honesto, Fases R1–R3)**. La `validProofFn` opaca/condicional sirve para la dirección positiva (Gödel I real) pero **bloquea** el razonamiento sobre testigos de prueba arbitrarios que D2/D3 exigen. Nuevo verificador `runFn` con líneas que llevan su conclusión incorporada (`line = cons ⌜concl⌝ justif`) → reduce uniformemente vía `carc`, habilitando inducción object-level. Entregado (`Meta/ProofChain.lean`): **compositividad** `runFn c (p++s) =eq runFn (runFn c p) s`, **debilitamiento** `runFn c p =eq c ++ runFn nil p`, predicados `allIn`/`lineWF`/`premsOf`/`lineOk`/`chainOk`, **composición** `chainOk c (p++s) ⇔ chainOk c p ∧ chainOk (runFn c p) s` y **monotonía** (`In_mono`/`In_mono_right`/`allIn_mono`/`lineOk_mono`/`chainOk_mono`) — toda la álgebra de cadenas para testigos ARBITRARIOS, por `Full.ax_list_induction` con acumulador ∀-object. Honesto (`#print axioms` = estándar + ω-reglas + ax_list_induction). **37 módulos** (Minimal 11 + Meta 15 + Full 11), build verde (**51 jobs**), 0 sorrys. (Gödel I real + regla `ind`/IΣ₁ ya cerrados; ver entradas previas.) Pendiente: R4 (re-`repr_pos` con `provCodeC'`) → **D2 → D3 → Gödel II real**.
+**Last updated:** 2026-06-21 — **Gödel Nivel D REAL — D1 y D2 reales (HBL) sobre el verificador estructural `provCodeC'`**. Tras el rediseño `runFn`/`chainOk` (R1–R3), se cierran las dos primeras condiciones de derivabilidad de Hilbert-Bernays-Löb como **teoremas internos** (no postulados) para el predicado estructural fiel `provCodeC' := ∃p. chainOk nil p ∧ In x (runFn nil p)`: **D2** `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)` (`Meta/DerivCond.lean`, ensamblando `p++q++[mp]`), y **D1 = `repr_pos'`** `Prf φ → ⊢ provCodeC' φ` (`Meta/Representability2.lean`: encoder `proofCode'` + `runFn_track` + `chainOk_track` 19-casos + validez de las 19 reglas `lineWF`/`premsOf`). `#print axioms repr_pos'` = SOLO `[propext, Classical.choice, Quot.sound]`; `d2` = estándar + ω-reglas; **ningún postulado de derivabilidad**. **39 módulos** (Minimal 11 + Meta 17 + Full 11), build verde (**53 jobs**), 0 sorrys. Pendiente: **D3** (Σ₁-completitud provable) + punto fijo para `provCodeC'` → **Gödel II real**.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,29 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-21) — Gödel Nivel D REAL: D1 y D2 reales (HBL) sobre `provCodeC'` (Fases R4–R5)
+
+Cierre de las dos primeras condiciones de Hilbert-Bernays-Löb como **teoremas internos**
+(no postulados) para el verificador estructural `runFn`/`chainOk`. Predicado fiel
+`provCodeC' := ∃p. chainOk nil p ∧ In x (runFn nil p)`.
+
+- **D2** (`Meta/DerivCond.lean`): `d2 : ⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)`.
+  De testigos `p`,`q` se ensambla `r = p ++ q ++ [mp]`; `chainOk nil r` (vía
+  `chainOk_concat`/`chainOk_mono`/`lineWF_mp`/`premsOf_mp` + `In_mono`/`In_mono_right`/
+  `runFn_weaken`) y `In ⌜B⌝ (runFn nil r)` (`runFn_concat`/`carc`). `#print axioms` =
+  estándar + ω-reglas; ningún postulado.
+- **D1 = `repr_pos'`** (`Meta/Representability2.lean`): `Prf φ → ⊢ provCodeC' φ`.
+  Encoder `lineJustif`/`lineCode'` (`cons ⌜concl⌝ justif`) + `proofCode'`; `runFn_track`
+  (RULE-AGNÓSTICO, mitad `In ⌜φ⌝`) + `chainOk_track` (inducción ~19-casos, validez de
+  cada línea). `#print axioms repr_pos'` = SOLO `[propext, Classical.choice, Quot.sound]`.
+- **Validez de las 19 reglas** (`Minimal/Axioms` + `Meta/ProofChain`): `lineWF`/`premsOf`
+  para mp/gen/thy + los 16 esquemas. `lineWF` de esquema ⇔ `concl =eq reconstrucción`
+  (fidelidad: si fuese `⊤` se podría fabricar `⊢ provCodeC' ⊥` y Gödel II sería hueco);
+  proposicionales por `refl`/defeq, q/leibniz vía `*_concl_code`, ind vía `ind_concl_code`.
+- Helpers `provCodeC'_intro/_elim`, `allIn_subst2`, `chainOk_subst1/2`.
+
+Pendiente: **D3** (Σ₁-completitud provable) + punto fijo para `provCodeC'` → **Gödel II real**.
 
 ### Added (2026-06-21) — Gödel Nivel D REAL: verificador estructural `runFn` (rediseño hacia D2/D3, Fases R1–R3)
 

@@ -12,9 +12,12 @@ import FOL.Theorems.Eq
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.SubstArith
+open ROBINSON_PlusPlus.Meta.StepArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.HilbertSeq
 open ROBINSON_PlusPlus.Meta.Representability
+open ROBINSON_PlusPlus.Meta.Induction
 open ROBINSON_PlusPlus.Meta.ProofChain
 
 set_option linter.unusedSimpArgs false
@@ -124,6 +127,210 @@ theorem In_runFn_of_mem {rs : List Rule} {L : List Formula} {φ : Formula}
     simpa [listFormCode] using runFn_track rs [] L hchk
   exact Full.eq_subst_in (FOL.derive_eq_symm htrack) (In_listFormCode hmem)
 
+/-! ### chainOk-tracking (validez de la cadena) -/
+
+/-- Anclaje del código de la teoría (reusado en el caso `thy`). -/
+private theorem axiomsCodeT_anchor :
+    axioms ⊢ (axiomsCodeT =eq listFormCode coreAxioms) := by
+  have h0 : axioms ⊢ (axiomsCodeT =eq listFormCodeM coreAxioms) :=
+    ax (show ax_axiomsCodeT ∈ axioms by simp [axioms])
+  rwa [listFormCodeM_eq] at h0
+
+/-- **chainOk-tracking**: `proofCode' rs acc` es una cadena válida desde `⌜acc⌝`.
+    Inducción sobre `rs`; cada línea cumple `lineOk` (esquemas: `lineWF` reconstrucción
+    vía `*_concl_code`/`refl`, `premsOf=nil`; mp/gen: premisas en contexto vía
+    `In_listFormCode`; thy: código en `axiomsCodeT`). -/
+theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc = some L →
+    axioms ⊢ chainOk (listFormCode acc) (proofCode' rs acc) := by
+  induction rs with
+  | nil =>
+      intro acc L _
+      simpa [proofCode'] using chainOk_nil (listFormCode acc)
+  | cons r rs ih =>
+      intro acc L h
+      cases hsc : stepConcl acc r with
+      | none => simp [checkAux, hsc] at h
+      | some f =>
+          have hcheck : checkAux rs (acc ++ [f]) = some L := by
+            have h2 := h; simp only [checkAux, hsc] at h2; exact h2
+          have ihf := ih (acc ++ [f]) L hcheck
+          rw [show proofCode' (r :: rs) acc = cons (lineCode' acc f r) (proofCode' rs (acc ++ [f]))
+                from by simp [proofCode', hsc]]
+          refine iff_mpr (chainOk_cons (listFormCode acc) (lineCode' acc f r)
+            (proofCode' rs (acc ++ [f]))) ?_
+          refine Minimal.Axioms.and_intro ?lineOk ?rest
+          case rest =>
+            -- contexto siguiente = ⌜acc⌝ ++ [carc lineCode'] =eq ⌜acc++[f]⌝
+            have hC : axioms ⊢
+                (concat (listFormCode acc) (cons (carc (lineCode' acc f r)) nil) =eq
+                  listFormCode (acc ++ [f])) :=
+              FOL.derive_eq_trans
+                (Full.eq_congr_concat_left (congr_cons_head (carc_cons (formCode f) (lineJustif acc r))))
+                (concat_listFormCode_singleton acc f)
+            exact chainOk_subst1 (FOL.derive_eq_symm hC) ihf
+          case lineOk =>
+            cases r with
+            | p1 A B =>
+                have hf : f = (A ⇒ (B ⇒ A)) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_p1 _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_p1 _ _ _)) (allIn_nil (listFormCode acc)))
+            | p2 A B C =>
+                have hf : f = ((A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C))) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_p2 _ _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_p2 _ _ _ _)) (allIn_nil (listFormCode acc)))
+            | c1 A B =>
+                have hf : f = (A ⇒ (B ⇒ (A ∧ B))) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_c1 _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_c1 _ _ _)) (allIn_nil (listFormCode acc)))
+            | c2 A B =>
+                have hf : f = ((A ∧ B) ⇒ A) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_c2 _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_c2 _ _ _)) (allIn_nil (listFormCode acc)))
+            | c3 A B =>
+                have hf : f = ((A ∧ B) ⇒ B) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_c3 _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_c3 _ _ _)) (allIn_nil (listFormCode acc)))
+            | j1 A B =>
+                have hf : f = (A ⇒ (A ∨ B)) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_j1 _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_j1 _ _ _)) (allIn_nil (listFormCode acc)))
+            | j2 A B =>
+                have hf : f = (B ⇒ (A ∨ B)) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_j2 _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_j2 _ _ _)) (allIn_nil (listFormCode acc)))
+            | j3 A B C =>
+                have hf : f = ((A ∨ B) ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C))) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_j3 _ _ _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_j3 _ _ _ _)) (allIn_nil (listFormCode acc)))
+            | efq A =>
+                have hf : f = (⊥ ⇒ A) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_efq _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_efq _ _)) (allIn_nil (listFormCode acc)))
+            | q1 A t =>
+                have hf : f = ((Formula.forall A) ⇒ substFormula 0 t A) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro
+                  (iff_mpr (lineWF_q1 _ _ _) (FOL.derive_eq_symm (q1_concl_code A t)))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_q1 _ _ _)) (allIn_nil (listFormCode acc)))
+            | q2 A t =>
+                have hf : f = (substFormula 0 t A ⇒ Formula.ex A) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro
+                  (iff_mpr (lineWF_q2 _ _ _) (FOL.derive_eq_symm (q2_concl_code A t)))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_q2 _ _ _)) (allIn_nil (listFormCode acc)))
+            | q3 A B =>
+                have hf : f = ((Formula.forall (A ⇒ liftFormula 0 B)) ⇒ ((Formula.ex A) ⇒ B)) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_q3 _ _ _) ?_)
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_q3 _ _ _)) (allIn_nil (listFormCode acc)))
+                -- formCode q3-concl =eq implc (forallc (implc A (liftfc zero B))) (implc (exc A) B)
+                exact FOL.derive_eq_symm
+                  (congr_bin1 (congr_un (congr_bin2 (liftFormula_arith 0 B))))
+            | eqrefl t =>
+                have hf : f = (t ≐ t) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_eqrefl _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_eqrefl _ _)) (allIn_nil (listFormCode acc)))
+            | leibniz A t₁ t₂ =>
+                have hf : f = ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A)) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro
+                  (iff_mpr (lineWF_leibniz _ _ _ _) (FOL.derive_eq_symm (leibniz_concl_code A t₁ t₂)))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_leibniz _ _ _ _)) (allIn_nil (listFormCode acc)))
+            | p3 A =>
+                have hf : f = (((A ⇒ ⊥) ⇒ ⊥) ⇒ A) := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                exact Minimal.Axioms.and_intro (iff_mpr (lineWF_p3 _ _) (Derives.refl axioms _))
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_p3 _ _)) (allIn_nil (listFormCode acc)))
+            | ind A =>
+                have hf : f = Full.inductionFormula A := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_ind _ _) ?_)
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_ind _ _)) (allIn_nil (listFormCode acc)))
+                rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
+                exact FOL.derive_eq_symm (ind_concl_code A)
+            | thy k =>
+                have hmem : f ∈ coreAxioms :=
+                  List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
+                simp only [lineCode', lineJustif]
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_thy _) ?_)
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_thy _)) (allIn_nil (listFormCode acc)))
+                exact Full.eq_subst_in (FOL.derive_eq_symm axiomsCodeT_anchor) (In_listFormCode hmem)
+            | mp i j =>
+                rcases hi : acc[i]? with _ | fi
+                · simp [stepConcl, hi] at hsc
+                rcases hj : acc[j]? with _ | fj
+                · simp [stepConcl, hi, hj] at hsc
+                rcases hm : mpConcl fi fj with _ | fmp
+                · simp [stepConcl, hi, hj, hm] at hsc
+                have hffmp : f = fmp := by
+                  simp only [stepConcl, hi, hj, hm, Option.bind_some, Option.some.injEq] at hsc
+                  exact hsc.symm
+                subst hffmp
+                have hfi_eq : fi = (fj ⇒ f) := mpConcl_eq hm
+                simp only [lineCode', lineJustif, hj, Option.getD_some]
+                refine Minimal.Axioms.and_intro (lineWF_mp _ _) ?_
+                refine allIn_subst2 (FOL.derive_eq_symm (premsOf_mp (formCode f) (formCode fj))) ?_
+                refine iff_mpr (allIn_cons (listFormCode acc) (implc (formCode fj) (formCode f))
+                  (cons (formCode fj) nil)) ?_
+                refine Minimal.Axioms.and_intro ?_ ?_
+                · have hin : axioms ⊢ In (formCode fi) (listFormCode acc) :=
+                    In_listFormCode (List.mem_of_getElem? hi)
+                  rw [hfi_eq] at hin; exact hin
+                · refine iff_mpr (allIn_cons (listFormCode acc) (formCode fj) nil) ?_
+                  exact Minimal.Axioms.and_intro (In_listFormCode (List.mem_of_getElem? hj))
+                    (allIn_nil (listFormCode acc))
+            | gen i =>
+                rcases hi : acc[i]? with _ | fi
+                · simp [stepConcl, hi] at hsc
+                have hf : f = Formula.forall fi := by
+                  simp only [stepConcl, hi, Option.map_some, Option.some.injEq] at hsc
+                  exact hsc.symm
+                subst hf
+                simp only [lineCode', lineJustif, hi, Option.getD_some]
+                refine Minimal.Axioms.and_intro (lineWF_gen _ _) ?_
+                refine allIn_subst2 (FOL.derive_eq_symm (premsOf_gen (formCode (Formula.forall fi))
+                  (formCode fi))) ?_
+                refine iff_mpr (allIn_cons (listFormCode acc) (formCode fi) nil) ?_
+                exact Minimal.Axioms.and_intro (In_listFormCode (List.mem_of_getElem? hi))
+                  (allIn_nil (listFormCode acc))
+
+/-! ### Representabilidad positiva (D1) con el verificador estructural -/
+
+/-- **`repr_pos'` (D1 real, estructural)**: toda demostración de Hilbert `Prf φ` se
+    internaliza como `axioms ⊢ provCodeC' φ`. Combina `chainOk_track` (validez) y
+    `runFn_track`/`In_runFn_of_mem` (la conclusión `⌜φ⌝` aparece). -/
+theorem repr_pos' {φ : Formula} (h : Prf φ) : axioms ⊢ provCodeC' φ := by
+  obtain ⟨rs, L, hchk, hmem⟩ := prf_iff_derivation.mp h
+  have hchk' : checkAux rs [] = some L := by simpa [checkProof] using hchk
+  exact provCodeC'_intro φ (proofCode' rs [])
+    (chainOk_track rs [] L hchk') (In_runFn_of_mem hchk' hmem)
+
 end ROBINSON_PlusPlus.Meta.Representability2
 
 export ROBINSON_PlusPlus.Meta.Representability2 (
@@ -132,4 +339,6 @@ export ROBINSON_PlusPlus.Meta.Representability2 (
   proofCode'
   runFn_track
   In_runFn_of_mem
+  chainOk_track
+  repr_pos'
 )

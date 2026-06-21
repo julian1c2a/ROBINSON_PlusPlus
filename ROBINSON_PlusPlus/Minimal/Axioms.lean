@@ -1044,6 +1044,46 @@ def ax_lineWF_p3 : Formula :=
 def ax_premsOf_p3 : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 14) (cons (.var 0) nil))) =eq nil)
 
+/-! ### `lineWF`/`premsOf` de los esquemas de SUSTITUCIÓN (q1/q2/q3/leibniz/ind)
+
+Reconstrucciones con `substfc`/`liftfc` (espejo de los `ax_vpf_*`); la fidelidad
+se cierra con los `*_concl_code` (StepArith) y `ind_concl_code` (Induction). -/
+
+-- Q1 (tag 9, [A,t]): concl ⇔ (∀A) ⇒ A[t]
+def ax_lineWF_q1 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 9) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (forallc (.var 1)) (substfc zero (.var 0) (.var 1))))
+def ax_premsOf_q1 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 9) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- Q2 (tag 10, [A,t]): concl ⇔ A[t] ⇒ ∃A
+def ax_lineWF_q2 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 10) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (substfc zero (.var 0) (.var 1)) (exc (.var 1))))
+def ax_premsOf_q2 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 10) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- Q3 (tag 11, [A,B]): concl ⇔ (∀(A ⇒ ↑B)) ⇒ ((∃A) ⇒ B)
+def ax_lineWF_q3 : Formula :=
+  forall_3 (lineWF (cons (.var 2) (cons (numeralM 11) (cons (.var 1) (cons (.var 0) nil)))) ⇔
+    ((.var 2) =eq implc (forallc (implc (.var 1) (liftfc zero (.var 0)))) (implc (exc (.var 1)) (.var 0))))
+def ax_premsOf_q3 : Formula :=
+  forall_3 (premsOf (cons (.var 2) (cons (numeralM 11) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- LEIBNIZ (tag 13, [A,t₁,t₂]): concl ⇔ (t₁≐t₂) ⇒ (A[t₁] ⇒ A[t₂])
+def ax_lineWF_leibniz : Formula :=
+  forall_4 (lineWF (cons (.var 3) (cons (numeralM 13) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) ⇔
+    ((.var 3) =eq implc (eqc (.var 1) (.var 0))
+      (implc (substfc zero (.var 1) (.var 2)) (substfc zero (.var 0) (.var 2)))))
+def ax_premsOf_leibniz : Formula :=
+  forall_4 (premsOf (cons (.var 3) (cons (numeralM 13) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
+-- IND (tag 18, [a]): concl ⇔ reconstrucción de inducción (códigos cerrados de O y σ#0)
+def ax_lineWF_ind : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 18) (cons (.var 0) nil))) ⇔
+    ((.var 1) =eq implc (substfc zero (termCodeM zero) (.var 0))
+      (implc (forallc (implc (.var 0)
+                (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) (.var 0)))))
+             (forallc (.var 0)))))
+def ax_premsOf_ind : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 18) (cons (.var 0) nil))) =eq nil)
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -1160,7 +1200,9 @@ def axioms : List Formula := [
   ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
   ax_lineWF_c1, ax_premsOf_c1, ax_lineWF_c2, ax_premsOf_c2, ax_lineWF_c3, ax_premsOf_c3,
   ax_lineWF_j1, ax_premsOf_j1, ax_lineWF_j2, ax_premsOf_j2, ax_lineWF_j3, ax_premsOf_j3,
-  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3
+  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3,
+  ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
+  ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1182,7 +1224,9 @@ def codingAxioms : List Formula := [
   ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
   ax_lineWF_c1, ax_premsOf_c1, ax_lineWF_c2, ax_premsOf_c2, ax_lineWF_c3, ax_premsOf_c3,
   ax_lineWF_j1, ax_premsOf_j1, ax_lineWF_j2, ax_premsOf_j2, ax_lineWF_j3, ax_premsOf_j3,
-  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3
+  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3,
+  ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
+  ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/

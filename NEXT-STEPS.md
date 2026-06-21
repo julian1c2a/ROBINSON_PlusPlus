@@ -159,10 +159,12 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
     **monotonía** `In_mono`/`allIn_mono`/`lineOk_mono` (para línea arbitraria).
   - [x] **R3**: `concat_nil_right`, `In_mono_right`, **debilitamiento** `runFn c p =eq c++runFn nil p`,
     **composición** `chainOk c (p++s) ⇔ chainOk c p ∧ chainOk (runFn c p) s`, `chainOk_mono`.
-  - [ ] **R4**: re-probar `repr_pos` con el nuevo `provCodeC' := ∃p. chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)`
-    (`lineWF`/`premsOf` por regla + encoder `proofCode'` + inducción de seguimiento).
-  - [ ] **R5 — D2** (clausura concat+mp: `r = p++q++[mp]`, vía `chainOk_concat`/`chainOk_mono`/`runFn_concat`/`runFn_weaken`).
-  - [ ] **R6 — D3** (Σ₁-completitud provable — internaliza `repr_pos`, lo más duro).
+  - [x] **R4 — D1 = `repr_pos'`** (`Meta/Representability2.lean`): `Prf φ → ⊢ provCodeC' φ`.
+    Encoder `proofCode'` + `runFn_track` (rule-agnóstico) + `chainOk_track` (19-casos) +
+    validez de las 19 reglas (`lineWF`/`premsOf`, fieles). `#print axioms` = solo estándar.
+  - [x] **R5 — D2** (`Meta/DerivCond.lean`): `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)`
+    (`r = p++q++[mp]`, vía `chainOk_concat`/`chainOk_mono`/`runFn_concat`/`runFn_weaken`).
+  - [ ] **R6 — D3** (Σ₁-completitud provable — internaliza `repr_pos'`, lo más duro).
   - [ ] **R7**: replicar `con_imp_goedelSentence`/`goedel_second` con `provCodeC'`/`godelC` → **Gödel II real** (`⊬ Con`).
 - [ ] **⊬¬G real** (reflexión / ω-soundness) + representabilidad **negativa** plena.
 

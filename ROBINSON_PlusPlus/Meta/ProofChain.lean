@@ -709,6 +709,88 @@ theorem premsOf_p3 (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-! ### `lineWF`/`premsOf` de los esquemas de sustitución (teoremas) -/
+
+/-- Q1. -/
+theorem lineWF_q1 (concl A t : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 9) (cons A (cons t nil)))) ⇔
+      (concl =eq implc (forallc A) (substfc zero t A))) := by
+  have hh := spec (spec (spec (ax (show ax_lineWF_q1 ∈ axioms by simp [axioms])) concl) A) t
+  simp [ax_lineWF_q1, substFormula, substTerm, substTerms, lineWF, implc, forallc, substfc, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem premsOf_q1 (concl A t : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 9) (cons A (cons t nil)))) =eq nil) := by
+  have hh := spec (spec (spec (ax (show ax_premsOf_q1 ∈ axioms by simp [axioms])) concl) A) t
+  simp [ax_premsOf_q1, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
+/-- Q2. -/
+theorem lineWF_q2 (concl A t : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 10) (cons A (cons t nil)))) ⇔
+      (concl =eq implc (substfc zero t A) (exc A))) := by
+  have hh := spec (spec (spec (ax (show ax_lineWF_q2 ∈ axioms by simp [axioms])) concl) A) t
+  simp [ax_lineWF_q2, substFormula, substTerm, substTerms, lineWF, implc, exc, substfc, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem premsOf_q2 (concl A t : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 10) (cons A (cons t nil)))) =eq nil) := by
+  have hh := spec (spec (spec (ax (show ax_premsOf_q2 ∈ axioms by simp [axioms])) concl) A) t
+  simp [ax_premsOf_q2, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
+/-- Q3. -/
+theorem lineWF_q3 (concl A B : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 11) (cons A (cons B nil)))) ⇔
+      (concl =eq implc (forallc (implc A (liftfc zero B))) (implc (exc A) B))) := by
+  have hh := spec (spec (spec (ax (show ax_lineWF_q3 ∈ axioms by simp [axioms])) concl) A) B
+  simp [ax_lineWF_q3, substFormula, substTerm, substTerms, lineWF, implc, forallc, exc, liftfc, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem premsOf_q3 (concl A B : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 11) (cons A (cons B nil)))) =eq nil) := by
+  have hh := spec (spec (spec (ax (show ax_premsOf_q3 ∈ axioms by simp [axioms])) concl) A) B
+  simp [ax_premsOf_q3, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
+/-- LEIBNIZ. -/
+theorem lineWF_leibniz (concl A t₁ t₂ : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 13) (cons A (cons t₁ (cons t₂ nil))))) ⇔
+      (concl =eq implc (eqc t₁ t₂) (implc (substfc zero t₁ A) (substfc zero t₂ A)))) := by
+  have hh := spec (spec (spec (spec (ax (show ax_lineWF_leibniz ∈ axioms by simp [axioms])) concl) A) t₁) t₂
+  simp [ax_lineWF_leibniz, substFormula, substTerm, substTerms, lineWF, implc, eqc, substfc, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift,
+    substTerm_liftLiftLiftLift] at hh
+  exact hh
+theorem premsOf_leibniz (concl A t₁ t₂ : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 13) (cons A (cons t₁ (cons t₂ nil))))) =eq nil) := by
+  have hh := spec (spec (spec (spec (ax (show ax_premsOf_leibniz ∈ axioms by simp [axioms])) concl) A) t₁) t₂
+  simp [ax_premsOf_leibniz, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift,
+    substTerm_liftLiftLiftLift] at hh
+  exact hh
+
+/-- IND (códigos cerrados `termCodeM`, gestionados por clausura como en `vpf_ind`). -/
+theorem lineWF_ind (concl a : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 18) (cons a nil))) ⇔
+      (concl =eq implc (substfc zero (termCodeM zero) a)
+        (implc (forallc (implc a (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) a))))
+               (forallc a)))) := by
+  have hh := spec (spec (ax (show ax_lineWF_ind ∈ axioms by simp [axioms])) concl) a
+  simp [ax_lineWF_ind, substFormula, substTerm, substTerms, lineWF, implc, forallc, substfc, liftfc,
+    numeralM, cons, nil, zero, succ, iff, substTerm_termCodeM, substTerm_numeralM, substTerm_nil,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem premsOf_ind (concl a : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 18) (cons a nil))) =eq nil) := by
+  have hh := spec (spec (ax (show ax_premsOf_ind ∈ axioms by simp [axioms])) concl) a
+  simp [ax_premsOf_ind, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
 /-! ### Empaquetado de `provCodeC'` (intro/elim del `∃`) -/
 
 /-- **Introducción** de `provCodeC' φ`: exhibe una cadena `p` válida que concluye `⌜φ⌝`. -/
