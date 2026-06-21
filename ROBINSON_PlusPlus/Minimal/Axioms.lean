@@ -725,6 +725,58 @@ def cdrc (l : Term) : Term := Term.func "cdrc" [l]
 def ax_carc : Formula := forall_2 (carc (cons (.var 1) (.var 0)) =eq (.var 1))
 def ax_cdrc : Formula := forall_2 (cdrc (cons (.var 1) (.var 0)) =eq (.var 0))
 
+/-! ### Verificador estructural `runFn` (Nivel D real — Fase R, D2/D3)
+
+`runFn checked rest` acumula las **conclusiones** de una secuencia de líneas;
+cada línea lleva su conclusión incorporada como cabeza (`line = cons ⌜concl⌝
+justif`), de modo que `runFn` **reduce uniformemente** vía `carc` sobre la
+estructura `cons`/`nil`, **sin depender de la regla de la línea**. Esto es lo que
+permite la **inducción object-level** (compositividad/debilitamiento) que D2/D3
+necesitan y que la `validProofFn` condicional bloqueaba. La validez de cada línea
+se separa en el predicado `chainOk` (Fase R2). -/
+def runFn (checked rest : Term) : Term := Term.func "runFn" [checked, rest]
+
+/-- `runFn c nil = c`. -/
+def ax_runFn_nil : Formula := forall_ (runFn (.var 0) nil =eq (.var 0))
+/-- `runFn c (cons line rest) = runFn (concat c [carc line]) rest` (incondicional). -/
+def ax_runFn_cons : Formula :=
+  forall_3 (runFn (.var 2) (cons (.var 1) (.var 0)) =eq
+    runFn (concat (.var 2) (cons (carc (.var 1)) nil)) (.var 0))
+
+/-! ### Validez de líneas y cadenas: `allIn`, `lineWF`, `premsOf`, `lineOk`, `chainOk`
+
+La validez de una línea se separa en (1) `lineWF line` — bien-formación
+**independiente del contexto** (la conclusión casa con el esquema; para `thy`, el
+código pertenece a `axiomsCodeT`); (2) `allIn c (premsOf line)` — las premisas que
+la regla referencia (`premsOf`, p.ej. `[⌜A⇒B⌝, ⌜A⌝]` para `mp`) están en el
+contexto `c`. `allIn` recurre **uniformemente** sobre su lista, de modo que la
+**monotonía en el contexto** (`lineOk c line ⇒ lineOk (c'++c) line`) es demostrable
+para líneas ARBITRARIAS — clave para `chainOk`-monotonía y D2. -/
+
+/-- `allIn c L`: todo elemento de la lista `L` pertenece (`In`) a `c`. -/
+def allIn (c L : Term) : Formula := Formula.atom "allIn" [c, L]
+/-- `lineWF line`: bien-formación de la línea independiente del contexto. -/
+def lineWF (line : Term) : Formula := Formula.atom "lineWF" [line]
+/-- `premsOf line`: lista de premisas (códigos de fórmula) que la línea referencia. -/
+def premsOf (line : Term) : Term := Term.func "premsOf" [line]
+/-- `lineOk c line`: la línea es válida en el contexto `c`. -/
+def lineOk (c line : Term) : Formula := land (lineWF line) (allIn c (premsOf line))
+/-- `chainOk c p`: la secuencia `p` es una demostración válida desde el acumulador `c`. -/
+def chainOk (c p : Term) : Formula := Formula.atom "chainOk" [c, p]
+
+/-- `allIn c nil` (vacuamente cierto). -/
+def ax_allIn_nil : Formula := forall_ (allIn (.var 0) nil)
+/-- `allIn c (cons x t) ⇔ In x c ∧ allIn c t`. -/
+def ax_allIn_cons : Formula :=
+  forall_3 (allIn (.var 2) (cons (.var 1) (.var 0)) ⇔
+    land (In (.var 1) (.var 2)) (allIn (.var 2) (.var 0)))
+/-- `chainOk c nil` (la cadena vacía es válida). -/
+def ax_chainOk_nil : Formula := forall_ (chainOk (.var 0) nil)
+/-- `chainOk c (cons line rest) ⇔ lineOk c line ∧ chainOk (c ++ [carc line]) rest`. -/
+def ax_chainOk_cons : Formula :=
+  forall_3 (chainOk (.var 2) (cons (.var 1) (.var 0)) ⇔
+    land (lineOk (.var 2) (.var 1)) (chainOk (concat (.var 2) (cons (carc (.var 1)) nil)) (.var 0)))
+
 /-! ### Función «código del código» `tcFn` (para el lema diagonal, Fase 4)
 
 `tcFn` computa `termCode` sobre **códigos** (términos cerrados construidos solo
@@ -986,7 +1038,13 @@ def axioms : List Formula := [
   ax_axiomsCodeT,
   ax_tc_zero,
   ax_tc_succ,
-  ax_tc_cons
+  ax_tc_cons,
+  ax_runFn_nil,
+  ax_runFn_cons,
+  ax_allIn_nil,
+  ax_allIn_cons,
+  ax_chainOk_nil,
+  ax_chainOk_cons
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1002,7 +1060,8 @@ def codingAxioms : List Formula := [
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
   ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_axiomsCodeT,
-  ax_tc_zero, ax_tc_succ, ax_tc_cons
+  ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
+  ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/

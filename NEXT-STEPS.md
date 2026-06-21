@@ -149,7 +149,21 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 - [x] **Lema diagonal real** (`Meta/Diagonal.lean`): `tcFn`/`tc_arith` + `diag_arith` + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`** + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (sin postulados gödelianos).
 - [x] **Fase 2.6 cimiento** (`Meta/CodeDistinct.lean`): aritmética negativa de códigos `formCode_ne` + familia.
 - [x] **Fase 5 — regla `ind` INTEGRADA** (`Meta/Induction.lean` + stack): `ind_concl_code` + `Prf.ind`/`Rule.ind`/**`ax_vpf_ind`** sólida + `vpf_ind` + caso ind de `vpf_run`. **Verificador: 19 reglas.** `provCodeC` rastrea **IΣ₁**. `repr_pos`/`vpf_ind` `#print axioms` = estándar; `goedel_first_real` cita además `Full.ax_induction` (honesto: Prf modela IΣ₁).
-- [ ] **D2** (concatenación de pruebas + mp interno) y **D3** (Σ₁-completitud provable, internaliza `repr_pos`) → **Gödel II real** (`⊬ Con`).
+- **D2/D3 → Gödel II real — rediseño honesto del verificador (EN CURSO, 2026-06-21)**.
+  Hallazgo: `validProofFn` (opaca/condicional) sirve para la dirección positiva pero
+  **bloquea** la inducción sobre testigos de prueba arbitrarios que D2/D3 exigen. Nuevo
+  verificador estructural `runFn` (líneas `cons ⌜concl⌝ justif`, reduce vía `carc`).
+  - [x] **R1** (`Meta/ProofChain.lean`): `runFn` + ecuaciones + **compositividad**
+    `runFn c (p++s) =eq runFn (runFn c p) s` (inducción con acumulador ∀-object).
+  - [x] **R2**: predicados `allIn`/`lineWF`/`premsOf`/`lineOk`/`chainOk` + ecuaciones +
+    **monotonía** `In_mono`/`allIn_mono`/`lineOk_mono` (para línea arbitraria).
+  - [x] **R3**: `concat_nil_right`, `In_mono_right`, **debilitamiento** `runFn c p =eq c++runFn nil p`,
+    **composición** `chainOk c (p++s) ⇔ chainOk c p ∧ chainOk (runFn c p) s`, `chainOk_mono`.
+  - [ ] **R4**: re-probar `repr_pos` con el nuevo `provCodeC' := ∃p. chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)`
+    (`lineWF`/`premsOf` por regla + encoder `proofCode'` + inducción de seguimiento).
+  - [ ] **R5 — D2** (clausura concat+mp: `r = p++q++[mp]`, vía `chainOk_concat`/`chainOk_mono`/`runFn_concat`/`runFn_weaken`).
+  - [ ] **R6 — D3** (Σ₁-completitud provable — internaliza `repr_pos`, lo más duro).
+  - [ ] **R7**: replicar `con_imp_goedelSentence`/`goedel_second` con `provCodeC'`/`godelC` → **Gödel II real** (`⊬ Con`).
 - [ ] **⊬¬G real** (reflexión / ω-soundness) + representabilidad **negativa** plena.
 
 > **Integración ✅ (2026-06-13)**: las ecuaciones recursivas de las funciones de coding están ahora en `Minimal.axioms` (extensión definicional conservadora), por lo que `⊢ᴴ` también las tiene (vía `Prf.thy`). Ya no hay `axiom` local en `SubstArith`.

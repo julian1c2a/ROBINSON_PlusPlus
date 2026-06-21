@@ -9,14 +9,14 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | 36 (Minimal/ 11 + Meta/ 14 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith, StepArith, CheckArith, Representability, Necessitation, Diagonal, CodeDistinct, Induction] + Full/ 11) |
-| Modules sin sorry | 36 / 36 ✅ |
+| Total modules | 37 (Minimal/ 11 + Meta/ 15 [Godel, Provability, Incompleteness, Hilbert, HilbertSeq, CodeArith, SubstArith, StepArith, CheckArith, Representability, Necessitation, Diagonal, CodeDistinct, Induction, ProofChain] + Full/ 11) |
+| Modules sin sorry | 37 / 37 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
 | Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C, **legacy**); `D2`/`D3` (Incompleteness D, **legacy**). Las 6 ecuaciones recursivas de coding (`substtc`/`substtsc`) están **integradas en `Minimal.axioms`** (extensión definicional) — `SubstArith` sin `axiom` local |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
-| Gödel | **A, B, C, D** ✅ (legacy I/II vía D2/D3 postulados). **Nivel D REAL — Gödel I REAL sin postulados**: cadena completa sobre Hilbert finitario `Prf` — verificador `validProofFn` (**19 reglas**, sólido vía `coreAxioms`; `ind` vía `Full.ax_induction`) + `repr_pos`/**D1** (`Meta/Necessitation.lean`) + **lema diagonal real** `tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G` (`Meta/Diagonal.lean`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (`#print axioms` = ω-reglas ambiente + `Full.ax_induction`; NINGÚN `diagonal_lemma`/`provFormula`/D2/D3). **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind`/`vpf_ind`, `Meta/Induction.lean` + stack): `provCodeC` rastrea **IΣ₁**. Además **aritmética negativa de códigos** `formCode_ne` (`Meta/CodeDistinct.lean`). Pendiente: D2/D3 → Gödel II; ⊬¬G (reflexión) |
-| Build status | ✅ Passing (**50 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
+| Gödel | **A, B, C, D** ✅ (legacy I/II vía D2/D3 postulados). **Nivel D REAL — Gödel I REAL sin postulados**: cadena completa sobre Hilbert finitario `Prf` — verificador `validProofFn` (**19 reglas**, sólido vía `coreAxioms`; `ind` vía `Full.ax_induction`) + `repr_pos`/**D1** (`Meta/Necessitation.lean`) + **lema diagonal real** `tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G` (`Meta/Diagonal.lean`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (`#print axioms` = ω-reglas ambiente + `Full.ax_induction`; NINGÚN `diagonal_lemma`/`provFormula`/D2/D3). **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind`/`vpf_ind`, `Meta/Induction.lean` + stack): `provCodeC` rastrea **IΣ₁**. Además **aritmética negativa de códigos** `formCode_ne` (`Meta/CodeDistinct.lean`). **Hacia D2/D3/Gödel II — verificador estructural `runFn`** (`Meta/ProofChain.lean`, Fases R1–R3): compositividad/debilitamiento de `runFn` + predicados `chainOk`/`lineOk`/`allIn` + composición/monotonía de `chainOk` (álgebra de cadenas de prueba para testigos ARBITRARIOS, que la `validProofFn` opaca impedía). Pendiente: R4 (re-`repr_pos` con `provCodeC'`) → D2 → D3 → Gödel II; ⊬¬G (reflexión) |
+| Build status | ✅ Passing (**51 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.29.1 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 

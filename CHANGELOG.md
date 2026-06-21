@@ -1,6 +1,6 @@
 # Changelog
 
-**Last updated:** 2026-06-19 — **Gödel Nivel D REAL — Primer Teorema de Gödel REAL sin postulados + regla de inducción integrada (IΣ₁)**. Cadena completa: verificador object `validProofFn` sólido (**19 reglas**, `thy` vía `coreAxioms`, `ind` vía `Full.ax_induction`) + `repr_pos`/D1 + lema diagonal real (`tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** + aritmética negativa de códigos `formCode_ne`. **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind` sólida + `vpf_ind` + `vpf_run`): `provCodeC` rastrea **IΣ₁**. `repr_pos`/`vpf_ind` `#print axioms` = estándar; `goedel_first_real` cita además `Full.ax_induction` (honesto: Prf modela IΣ₁); ningún `diagonal_lemma`/`provFormula`/D2/D3. **36 módulos** (Minimal 11 + Meta 14 + Full 11), build verde (**50 jobs**), 0 sorrys. Pendiente: D2/D3 → Gödel II; ⊬¬G (reflexión).
+**Last updated:** 2026-06-21 — **Gödel Nivel D REAL — hacia D2/D3/Gödel II: verificador estructural `runFn` (rediseño honesto, Fases R1–R3)**. La `validProofFn` opaca/condicional sirve para la dirección positiva (Gödel I real) pero **bloquea** el razonamiento sobre testigos de prueba arbitrarios que D2/D3 exigen. Nuevo verificador `runFn` con líneas que llevan su conclusión incorporada (`line = cons ⌜concl⌝ justif`) → reduce uniformemente vía `carc`, habilitando inducción object-level. Entregado (`Meta/ProofChain.lean`): **compositividad** `runFn c (p++s) =eq runFn (runFn c p) s`, **debilitamiento** `runFn c p =eq c ++ runFn nil p`, predicados `allIn`/`lineWF`/`premsOf`/`lineOk`/`chainOk`, **composición** `chainOk c (p++s) ⇔ chainOk c p ∧ chainOk (runFn c p) s` y **monotonía** (`In_mono`/`In_mono_right`/`allIn_mono`/`lineOk_mono`/`chainOk_mono`) — toda la álgebra de cadenas para testigos ARBITRARIOS, por `Full.ax_list_induction` con acumulador ∀-object. Honesto (`#print axioms` = estándar + ω-reglas + ax_list_induction). **37 módulos** (Minimal 11 + Meta 15 + Full 11), build verde (**51 jobs**), 0 sorrys. (Gödel I real + regla `ind`/IΣ₁ ya cerrados; ver entradas previas.) Pendiente: R4 (re-`repr_pos` con `provCodeC'`) → **D2 → D3 → Gödel II real**.
 **Author**: Julián Calderón Almendros
 
 All notable changes to this project will be documented in this file.
@@ -9,6 +9,31 @@ Format based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Added (2026-06-21) — Gödel Nivel D REAL: verificador estructural `runFn` (rediseño hacia D2/D3, Fases R1–R3)
+
+Hacia **D2/D3 → Gödel II real**. Hallazgo: `validProofFn` es total/opaca con ecuaciones
+**condicionales** → solo reduce sobre códigos concretos (basta para `repr_pos`/Gödel I)
+pero **bloquea** la inducción object-level sobre testigos de prueba ARBITRARIOS que D2/D3
+exigen (`vpf c (cons h t)` no reduce para `h` arbitrario). Solución: nuevo verificador
+**estructuralmente recursivo** en `Meta/ProofChain.lean` (+ axiomas en `Minimal.axioms`),
+con líneas que llevan su conclusión incorporada (`line = cons ⌜concl⌝ justif`), de modo
+que `runFn` reduce uniformemente vía `carc`. Todo honesto (`#print axioms` = estándar +
+ω-reglas `gen`/`imp_intro` + `Full.ax_list_induction`; ningún postulado gödeliano).
+
+- **Fase R1** — `runFn` (`ax_runFn_nil/cons`, incondicionales) + `runFn_nil/cons` +
+  congruencias + **compositividad** `runFn c (p++s) =eq runFn (runFn c p) s`, por
+  `ax_list_induction` con el **acumulador generalizado como ∀-object** (los `liftTerm 0`
+  se cancelan con la sustitución de `gen`). Valida el mecanismo del rediseño.
+- **Fase R2** — predicados object `allIn`, `lineWF`, `premsOf`, `lineOk := lineWF ∧ allIn`,
+  `chainOk` (+ ecuaciones `ax_allIn_nil/cons`, `ax_chainOk_nil/cons`). **Monotonía en
+  contexto** `In_mono`/`allIn_mono`/`lineOk_mono` (para línea ARBITRARIA: la parte
+  dependiente del contexto es `allIn`, uniformemente recursiva).
+- **Fase R3** — `concat_nil_right`, congruencias `chainOk_subst1/2`, `In_mono_right`,
+  **debilitamiento** `runFn c p =eq c ++ runFn nil p`, **composición**
+  `chainOk c (p++s) ⇔ chainOk c p ∧ chainOk (runFn c p) s`, **monotonía** `chainOk_mono`.
+  Toda la álgebra de cadenas de prueba para testigos arbitrarios — lo que `validProofFn`
+  impedía. Base lista para **D2** (clausura concat+mp).
 
 ### Added (2026-06-19) — Gödel Nivel D REAL: integración de la regla de inducción (IΣ₁)
 
