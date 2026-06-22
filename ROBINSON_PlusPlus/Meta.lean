@@ -29,5 +29,6 @@ import ROBINSON_PlusPlus.Meta.ProofChain
 import ROBINSON_PlusPlus.Meta.DerivCond
 import ROBINSON_PlusPlus.Meta.Representability2
 import ROBINSON_PlusPlus.Meta.Reflection
+import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
