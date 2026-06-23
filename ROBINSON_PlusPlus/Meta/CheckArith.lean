@@ -231,6 +231,16 @@ theorem vpf_ind (checked a rest : Term) :
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+/-- QCONF (tag 19, [P,C]): paso de `validProofFn` para el confinamiento ∀. -/
+theorem vpf_qconf (checked P C rest : Term) :
+    axioms ⊢ (validProofFn checked (cons (cons (numeralM 19) (cons P (cons C nil))) rest) =eq
+      validProofFn (concat checked (cons (implc (forallc (implc (liftfc zero P) C))
+        (implc P (forallc C))) nil)) rest) := by
+  have hh := spec (spec (spec (spec (ax (show ax_vpf_qconf ∈ axioms by simp [axioms])) checked) P) C) rest
+  simp [ax_vpf_qconf, substFormula, substTerm, substTerms, validProofFn, concat, implc, forallc, liftfc, numeralM,
+    cons, nil, zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
 /-! ### Fórmula de demostrabilidad object Σ₁ -/
 
 /-- **Predicado de demostrabilidad object** (Σ₁): `∃ p, In x (validProofFn nil p)`
@@ -270,4 +280,5 @@ export ROBINSON_PlusPlus.Meta.CheckArith (
   vpf_gen
   vpf_thy
   vpf_ind
+  vpf_qconf
 )

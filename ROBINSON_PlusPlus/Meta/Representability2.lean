@@ -61,6 +61,7 @@ def lineJustif (acc : List Formula) : Rule → Term
       cons (numeralM 13) (cons (formCode A) (cons (termCode t₁) (cons (termCode t₂) nil)))
   | .p3 A => cons (numeralM 14) (cons (formCode A) nil)
   | .ind A => cons (numeralM 18) (cons (formCode A) nil)
+  | .qconf P C => cons (numeralM 19) (cons (formCode P) (cons (formCode C) nil))
   | .thy _ => cons (numeralM 15) nil
   | .mp _ j => cons (numeralM 16) (cons (formCode ((acc[j]?).getD Formula.bottom)) nil)
   | .gen i => cons (numeralM 17) (cons (formCode ((acc[i]?).getD Formula.bottom)) nil)
@@ -274,6 +275,14 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_ind _ _)) (allIn_nil (listFormCode acc)))
                 rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
                 exact FOL.derive_eq_symm (ind_concl_code A)
+            | qconf P C =>
+                have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula P C := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_qconf _ _ _) ?_)
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_qconf _ _ _)) (allIn_nil (listFormCode acc)))
+                exact FOL.derive_eq_symm
+                  (congr_bin1 (congr_un (congr_bin1 (liftFormula_arith 0 P))))
             | thy k =>
                 have hmem : f ∈ axioms :=
                   List.mem_of_getElem? (by simpa only [stepConcl] using hsc)

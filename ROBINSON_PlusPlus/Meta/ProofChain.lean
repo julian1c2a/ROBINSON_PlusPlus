@@ -791,6 +791,21 @@ theorem premsOf_ind (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-- QCONF (tag 19, [P,C]): confinamiento ∀. -/
+theorem lineWF_qconf (concl P C : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 19) (cons P (cons C nil)))) ⇔
+      (concl =eq implc (forallc (implc (liftfc zero P) C)) (implc P (forallc C)))) := by
+  have hh := spec (spec (spec (ax (show ax_lineWF_qconf ∈ axioms by simp [axioms])) concl) P) C
+  simp [ax_lineWF_qconf, substFormula, substTerm, substTerms, lineWF, implc, forallc, liftfc, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem premsOf_qconf (concl P C : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 19) (cons P (cons C nil)))) =eq nil) := by
+  have hh := spec (spec (spec (ax (show ax_premsOf_qconf ∈ axioms by simp [axioms])) concl) P) C
+  simp [ax_premsOf_qconf, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
 /-! ### Empaquetado de `provCodeC'` (intro/elim del `∃`) -/
 
 /-- **Introducción** de `provCodeC' φ`: exhibe una cadena `p` válida que concluye `⌜φ⌝`. -/

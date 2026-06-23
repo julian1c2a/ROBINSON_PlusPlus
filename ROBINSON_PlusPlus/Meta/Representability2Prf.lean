@@ -243,6 +243,14 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_ind _ _)) (prf_allIn_nil (listFormCode acc)))
                 rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
                 exact prf_eq_symm (prf_ind_concl_code A)
+            | qconf P C =>
+                have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula P C := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                refine prf_and_intro (prf_iff_mpr (prf_lineWF_qconf _ _ _) ?_)
+                  (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_qconf _ _ _)) (prf_allIn_nil (listFormCode acc)))
+                exact prf_eq_symm
+                  (prf_congr_bin1 (prf_congr_un (prf_congr_bin1 (prf_liftFormula_arith 0 P))))
             | thy k =>
                 have hmem : f ∈ axioms :=
                   List.mem_of_getElem? (by simpa only [stepConcl] using hsc)

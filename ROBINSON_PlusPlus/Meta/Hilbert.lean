@@ -189,6 +189,7 @@ inductive Prf : Formula → Prop where
   | incl {φ : Formula} : Prf₀ φ → Prf φ
   | p3 (A : Formula) : Prf (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
   | ind (A : Formula) : Prf (Full.inductionFormula A)
+  | qconf (P C : Formula) : Prf (confinementFormula P C)
   | mp (A B : Formula) : Prf (A ⇒ B) → Prf A → Prf B
   | gen (A : Formula) : Prf A → Prf (Formula.forall A)
 
@@ -210,6 +211,10 @@ theorem prf_to_derives {φ : Formula} (h : Prf φ) : axioms ⊢ φ := by
       -- Esquema de inducción: axioma legítimo de la aritmética (IΣ₁), sólido vía
       -- `Full.ax_induction` (misma `Minimal.axioms`; `Meta` importa `Full`).
       exact Full.ax_induction A
+  | qconf P C =>
+      -- Confinamiento ∀: teorema de `Derives` (lógica de primer orden, ver
+      -- `confinement_derives`), sólido y conservativo.
+      exact confinement_derives P C
   | mp A B _ _ ihAB ihA => exact Derives.elim_impl _ A B ihAB ihA
   | gen A _ ihA =>
       apply Derives.intro_forall

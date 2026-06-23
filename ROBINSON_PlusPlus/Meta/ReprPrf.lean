@@ -530,6 +530,21 @@ theorem prf_premsOf_ind (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-- QCONF (tag 19, [P,C]): confinamiento ∀, en `Prf`. -/
+theorem prf_lineWF_qconf (concl P C : Term) :
+    Prf (lineWF (cons concl (cons (numeralM 19) (cons P (cons C nil)))) ⇔
+      (concl =eq implc (forallc (implc (liftfc zero P) C)) (implc P (forallc C)))) := by
+  have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_lineWF_qconf ∈ axioms by simp [axioms])) concl) P) C
+  simp [ax_lineWF_qconf, substFormula, substTerm, substTerms, lineWF, implc, forallc, liftfc, numeralM,
+    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem prf_premsOf_qconf (concl P C : Term) :
+    Prf (premsOf (cons concl (cons (numeralM 19) (cons P (cons C nil)))) =eq nil) := by
+  have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_qconf ∈ axioms by simp [axioms])) concl) P) C
+  simp [ax_premsOf_qconf, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
 end ROBINSON_PlusPlus.Meta.ReprPrf
 
 export ROBINSON_PlusPlus.Meta.ReprPrf (
@@ -601,4 +616,6 @@ export ROBINSON_PlusPlus.Meta.ReprPrf (
   prf_premsOf_leibniz
   prf_lineWF_ind
   prf_premsOf_ind
+  prf_lineWF_qconf
+  prf_premsOf_qconf
 )
