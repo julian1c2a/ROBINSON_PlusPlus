@@ -150,6 +150,35 @@ theorem prf0_to_derives {φ : Formula} (h : Prf₀ φ) : axioms ⊢ φ := by
       rw [axioms_lift_eq]
       exact ihA
 
+/-! ### Esquema de confinamiento ∀ (para el teorema de deducción de `Prf`) -/
+
+/-- **Fórmula de confinamiento ∀** (la variable ligada no ocurre en el antecedente
+    `P`, codificada como `liftFormula 0 P`): `(∀(↑P ⇒ C)) ⇒ (P ⇒ ∀C)`. Es el
+    esquema lógico que cierra el caso `gen` del teorema de deducción de un cálculo
+    de Hilbert. Logicamente válido (teorema de `Derives`, ver `confinement_derives`);
+    se añadirá como esquema de `Prf`/regla del verificador. -/
+def confinementFormula (P C : Formula) : Formula :=
+  (Formula.forall (liftFormula 0 P ⇒ C)) ⇒ (P ⇒ Formula.forall C)
+
+/-- **Confinamiento ∀ es teorema de `Derives`** (cálculo finitario con contexto):
+    derivación De Bruijn directa (intro_impl×2 + intro_forall + elim_forall a `#0`
+    con cancelación `subst_lift_cancel_formula`, espejo del caso `q3` de
+    `prf0_to_derives`). Justifica el esquema `Prf.qconf` vía el puente. -/
+theorem confinement_derives (P C : Formula) : axioms ⊢ confinementFormula P C := by
+  apply Derives.intro_impl
+  apply Derives.intro_impl
+  apply Derives.intro_forall
+  apply Derives.elim_impl (A := liftFormula 0 P)
+  · have h := Derives.elim_forall
+      (((P :: (Formula.forall (liftFormula 0 P ⇒ C)) :: axioms).map (liftFormula 0)))
+      (liftFormula 1 (liftFormula 0 P) ⇒ liftFormula 1 C) (.var 0)
+      (Derives.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+    rw [show substFormula 0 (.var 0) (liftFormula 1 (liftFormula 0 P) ⇒ liftFormula 1 C)
+          = (liftFormula 0 P ⇒ C) from by
+          simp only [substFormula]; rw [subst_lift_cancel_formula, subst_lift_cancel_formula]] at h
+    exact h
+  · exact Derives.hyp _ _ (List.Mem.head _)
+
 /-! ### Capa clásica `Prf` -/
 
 /-- **Cálculo de Hilbert clásico**: la capa intuicionista (`incl`), el esquema
