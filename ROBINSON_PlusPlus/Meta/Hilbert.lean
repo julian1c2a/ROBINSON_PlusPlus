@@ -242,6 +242,7 @@ inductive Prf : Formula → Prop where
   | p3 (A : Formula) : Prf (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
   | ind (A : Formula) : Prf (Full.inductionFormula A)
   | qconf (P C : Formula) : Prf (confinementFormula P C)
+  | listInd (A : Formula) : Prf (listInductionFormula A)
   | mp (A B : Formula) : Prf (A ⇒ B) → Prf A → Prf B
   | gen (A : Formula) : Prf A → Prf (Formula.forall A)
 
@@ -267,6 +268,10 @@ theorem prf_to_derives {φ : Formula} (h : Prf φ) : axioms ⊢ φ := by
       -- Confinamiento ∀: teorema de `Derives` (lógica de primer orden, ver
       -- `confinement_derives`), sólido y conservativo.
       exact confinement_derives P C
+  | listInd A =>
+      -- Inducción estructural de listas: teorema de `Derives` vía la regla ω
+      -- `ax_list_induction` (ver `list_induction_derives`); axioma legítimo, sólido.
+      exact list_induction_derives A
   | mp A B _ _ ihAB ihA => exact Derives.elim_impl _ A B ihAB ihA
   | gen A _ ihA =>
       apply Derives.intro_forall

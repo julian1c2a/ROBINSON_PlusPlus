@@ -241,6 +241,20 @@ theorem vpf_qconf (checked P C rest : Term) :
     cons, nil, zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
   exact hh
 
+/-- LISTIND (tag 20, [A]): paso de `validProofFn` para la inducción de listas. -/
+theorem vpf_listInd (checked a rest : Term) :
+    axioms ⊢ (validProofFn checked (cons (cons (numeralM 20) (cons a nil)) rest) =eq
+      validProofFn (concat checked (cons (implc (substfc zero (termCodeM nil) a)
+        (implc (forallc (forallc (implc (liftfc (succ zero) a)
+                  (substfc zero (termCodeM (cons (.var 1) (.var 0)))
+                    (liftfc (succ (succ zero)) (liftfc (succ zero) a))))))
+               (forallc a))) nil)) rest) := by
+  have hh := spec (spec (spec (ax (show ax_vpf_listInd ∈ axioms by simp [axioms])) checked) a) rest
+  simp [ax_vpf_listInd, substFormula, substTerm, substTerms, validProofFn, concat, implc, forallc, substfc, liftfc,
+    numeralM, cons, nil, zero, succ, substTerm_termCodeM, substTerm_numeralM, substTerm_nil,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+
 /-! ### Fórmula de demostrabilidad object Σ₁ -/
 
 /-- **Predicado de demostrabilidad object** (Σ₁): `∃ p, In x (validProofFn nil p)`
@@ -281,4 +295,5 @@ export ROBINSON_PlusPlus.Meta.CheckArith (
   vpf_thy
   vpf_ind
   vpf_qconf
+  vpf_listInd
 )

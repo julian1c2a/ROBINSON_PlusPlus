@@ -944,6 +944,15 @@ def ax_vpf_qconf : Formula :=
     validProofFn (concat (.var 3)
       (cons (implc (forallc (implc (liftfc zero (.var 2)) (.var 1)))
                    (implc (.var 2) (forallc (.var 1)))) nil)) (.var 0))
+-- LISTIND (tag 20, [A]): concl ⇔ inducción de listas (códigos cerrados de nil y cons#1#0)
+def ax_vpf_listInd : Formula :=
+  forall_3 (validProofFn (.var 2) (cons (cons (numeralM 20) (cons (.var 1) nil)) (.var 0)) =eq
+    validProofFn (concat (.var 2)
+      (cons (implc (substfc zero (termCodeM nil) (.var 1))
+               (implc (forallc (forallc (implc (liftfc (succ zero) (.var 1))
+                         (substfc zero (termCodeM (cons (.var 1) (.var 0)))
+                           (liftfc (succ (succ zero)) (liftfc (succ zero) (.var 1)))))))
+                      (forallc (.var 1)))) nil)) (.var 0))
 
 /-! ### `lineWF` / `premsOf` por regla (validez de líneas del verificador `runFn`)
 
@@ -1097,6 +1106,16 @@ def ax_lineWF_qconf : Formula :=
                         (implc (.var 1) (forallc (.var 0)))))
 def ax_premsOf_qconf : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 19) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
+-- LISTIND (tag 20, [A]): concl ⇔ inducción de listas (códigos cerrados de nil y cons#1#0)
+def ax_lineWF_listInd : Formula :=
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 20) (cons (.var 0) nil))) ⇔
+    ((.var 1) =eq implc (substfc zero (termCodeM nil) (.var 0))
+      (implc (forallc (forallc (implc (liftfc (succ zero) (.var 0))
+                (substfc zero (termCodeM (cons (.var 1) (.var 0)))
+                  (liftfc (succ (succ zero)) (liftfc (succ zero) (.var 0)))))))
+             (forallc (.var 0)))))
+def ax_premsOf_listInd : Formula :=
+  forall_2 (premsOf (cons (.var 1) (cons (numeralM 20) (cons (.var 0) nil))) =eq nil)
 
 -- ## Axiom Set
 
@@ -1196,6 +1215,7 @@ def axioms : List Formula := [
   ax_vpf_thy,
   ax_vpf_ind,
   ax_vpf_qconf,
+  ax_vpf_listInd,
   ax_tc_zero,
   ax_tc_succ,
   ax_tc_cons,
@@ -1217,7 +1237,8 @@ def axioms : List Formula := [
   ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3,
   ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
   ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
-  ax_lineWF_qconf, ax_premsOf_qconf
+  ax_lineWF_qconf, ax_premsOf_qconf,
+  ax_lineWF_listInd, ax_premsOf_listInd
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1232,7 +1253,7 @@ def codingAxioms : List Formula := [
   ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
-  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf,
+  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf, ax_vpf_listInd,
   ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
   ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
   ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
@@ -1242,7 +1263,8 @@ def codingAxioms : List Formula := [
   ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3,
   ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
   ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
-  ax_lineWF_qconf, ax_premsOf_qconf
+  ax_lineWF_qconf, ax_premsOf_qconf,
+  ax_lineWF_listInd, ax_premsOf_listInd
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/

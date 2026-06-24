@@ -513,6 +513,42 @@ theorem prf_ind_concl_code (φ : Formula) :
   exact prf_eq_trans (prf_congr_bin1 base_eq)
     (prf_congr_bin2 (prf_congr_bin1 (prf_congr_un (prf_congr_bin2 step_eq))))
 
+/-- Congruencia de `liftfc` en su 2º argumento, en `Prf`. -/
+theorem prf_congr_liftfc_arg2 {c a b : Term} (h : Prf (a =eq b)) :
+    Prf (liftfc c a =eq liftfc c b) := by
+  let f : Formula := Formula.eq (liftfc (liftTerm 0 c) (liftTerm 0 a)) (liftfc (liftTerm 0 c) (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftfc c a) (liftfc c s) := by
+    intro s; simp only [f, liftfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftfc c a))
+
+/-- Reconstrucción del código de la inducción de listas para `A`, en `Prf`. -/
+theorem prf_listInd_concl_code (A : Formula) :
+    Prf (
+      implc (substfc (numeral 0) (termCode nil) (formCode A))
+        (implc (forallc (forallc (implc (liftfc (numeral 1) (formCode A))
+                  (substfc (numeral 0) (termCode (cons (.var 1) (.var 0)))
+                    (liftfc (numeral 2) (liftfc (numeral 1) (formCode A)))))))
+               (forallc (formCode A)))
+      =eq formCode (listInductionFormula A)) := by
+  have base_eq : Prf
+      (substfc (numeral 0) (termCode nil) (formCode A) =eq formCode (substFormula 0 nil A)) :=
+    prf_substFormula_arith 0 nil A
+  have ante_eq : Prf
+      (liftfc (numeral 1) (formCode A) =eq formCode (liftFormula 1 A)) :=
+    prf_liftFormula_arith 1 A
+  have lift2_eq : Prf
+      (liftfc (numeral 2) (liftfc (numeral 1) (formCode A)) =eq formCode (liftFormula 2 (liftFormula 1 A))) :=
+    prf_eq_trans (prf_congr_liftfc_arg2 (prf_liftFormula_arith 1 A)) (prf_liftFormula_arith 2 (liftFormula 1 A))
+  have conseq_eq : Prf
+      (substfc (numeral 0) (termCode (cons (.var 1) (.var 0)))
+          (liftfc (numeral 2) (liftfc (numeral 1) (formCode A)))
+        =eq formCode (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 A)))) :=
+    prf_eq_trans (prf_congr_substfc_arg3 lift2_eq)
+      (prf_substFormula_arith 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 A)))
+  exact prf_eq_trans (prf_congr_bin1 base_eq)
+    (prf_congr_bin2 (prf_congr_bin1 (prf_congr_un (prf_congr_un
+      (prf_eq_trans (prf_congr_bin1 ante_eq) (prf_congr_bin2 conseq_eq))))))
+
 end ROBINSON_PlusPlus.Meta.ArithPrf
 
 export ROBINSON_PlusPlus.Meta.ArithPrf (
@@ -534,4 +570,5 @@ export ROBINSON_PlusPlus.Meta.ArithPrf (
   prf_q2_concl_code
   prf_leibniz_concl_code
   prf_ind_concl_code
+  prf_listInd_concl_code
 )

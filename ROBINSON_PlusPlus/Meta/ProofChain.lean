@@ -791,6 +791,26 @@ theorem premsOf_ind (concl a : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-- LISTIND (tag 20, [A]): inducción de listas (códigos cerrados de nil y cons#1#0). -/
+theorem lineWF_listInd (concl a : Term) :
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 20) (cons a nil))) ⇔
+      (concl =eq implc (substfc zero (termCodeM nil) a)
+        (implc (forallc (forallc (implc (liftfc (succ zero) a)
+                  (substfc zero (termCodeM (cons (.var 1) (.var 0)))
+                    (liftfc (succ (succ zero)) (liftfc (succ zero) a))))))
+               (forallc a)))) := by
+  have hh := spec (spec (ax (show ax_lineWF_listInd ∈ axioms by simp [axioms])) concl) a
+  simp [ax_lineWF_listInd, substFormula, substTerm, substTerms, lineWF, implc, forallc, substfc, liftfc,
+    numeralM, cons, nil, zero, succ, iff, substTerm_termCodeM, substTerm_numeralM, substTerm_nil,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, substTerm_liftLiftLift] at hh
+  exact hh
+theorem premsOf_listInd (concl a : Term) :
+    axioms ⊢ (premsOf (cons concl (cons (numeralM 20) (cons a nil))) =eq nil) := by
+  have hh := spec (spec (ax (show ax_premsOf_listInd ∈ axioms by simp [axioms])) concl) a
+  simp [ax_premsOf_listInd, substFormula, substTerm, substTerms, premsOf, numeralM, cons, nil,
+    zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
 /-- QCONF (tag 19, [P,C]): confinamiento ∀. -/
 theorem lineWF_qconf (concl P C : Term) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 19) (cons P (cons C nil)))) ⇔

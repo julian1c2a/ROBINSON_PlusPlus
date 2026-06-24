@@ -62,6 +62,7 @@ def lineJustif (acc : List Formula) : Rule → Term
   | .p3 A => cons (numeralM 14) (cons (formCode A) nil)
   | .ind A => cons (numeralM 18) (cons (formCode A) nil)
   | .qconf P C => cons (numeralM 19) (cons (formCode P) (cons (formCode C) nil))
+  | .listInd A => cons (numeralM 20) (cons (formCode A) nil)
   | .thy _ => cons (numeralM 15) nil
   | .mp _ j => cons (numeralM 16) (cons (formCode ((acc[j]?).getD Formula.bottom)) nil)
   | .gen i => cons (numeralM 17) (cons (formCode ((acc[i]?).getD Formula.bottom)) nil)
@@ -283,6 +284,14 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_qconf _ _ _)) (allIn_nil (listFormCode acc)))
                 exact FOL.derive_eq_symm
                   (congr_bin1 (congr_un (congr_bin1 (liftFormula_arith 0 P))))
+            | listInd A =>
+                have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula A := by
+                  simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+                subst hf; simp only [lineCode', lineJustif]
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_listInd _ _) ?_)
+                  (allIn_subst2 (FOL.derive_eq_symm (premsOf_listInd _ _)) (allIn_nil (listFormCode acc)))
+                rw [termCodeM_eq nil, termCodeM_eq (cons (Term.var 1) (Term.var 0))]
+                exact FOL.derive_eq_symm (ROBINSON_PlusPlus.Meta.ListInductionArith.listInd_concl_code A)
             | thy k =>
                 have hmem : f ∈ axioms :=
                   List.mem_of_getElem? (by simpa only [stepConcl] using hsc)

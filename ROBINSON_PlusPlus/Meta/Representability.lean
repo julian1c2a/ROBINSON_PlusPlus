@@ -6,6 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.CheckArith
 import ROBINSON_PlusPlus.Meta.HilbertSeq
 import ROBINSON_PlusPlus.Meta.Induction
+import ROBINSON_PlusPlus.Meta.ListInductionArith
 import ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
 import FOL.FOL
@@ -201,6 +202,7 @@ def lineCode (acc : List Formula) (f : Formula) : Rule → Term
   | .p3 A => cons (numeral 14) (cons (formCode A) nil)
   | .ind A => cons (numeral 18) (cons (formCode A) nil)
   | .qconf P C => cons (numeral 19) (cons (formCode P) (cons (formCode C) nil))
+  | .listInd A => cons (numeral 20) (cons (formCode A) nil)
   | .thy _ => cons (numeral 15) (cons (formCode f) nil)
   | .mp _ j => cons (numeral 16) (cons (formCode f) (cons (formCode ((acc[j]?).getD Formula.bottom)) nil))
   | .gen i => cons (numeral 17) (cons (formCode ((acc[i]?).getD Formula.bottom)) nil)
@@ -345,6 +347,15 @@ theorem vpf_run (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc =
                 (vpf_qconf (listFormCode acc) (formCode P) (formCode C) (proofCode rs (acc ++ [_]))) ?_
               exact congr_vpf_checked (congr_concat2 (congr_cons_head
                 (congr_bin1 (congr_un (congr_bin1 (liftFormula_arith 0 P))))))
+          | listInd A =>
+              have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula A := by
+                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
+              subst hf; simp only [lineCode]
+              refine FOL.derive_eq_trans
+                (vpf_listInd (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))) ?_
+              refine congr_vpf_checked (congr_concat2 (congr_cons_head ?_))
+              rw [termCodeM_eq nil, termCodeM_eq (cons (Term.var 1) (Term.var 0))]
+              exact ROBINSON_PlusPlus.Meta.ListInductionArith.listInd_concl_code A
           | thy k =>
               have hmem : f ∈ axioms := List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
               simp only [lineCode]

@@ -35,6 +35,7 @@ inductive PrfH : List Formula → Formula → Prop where
   | p3 (Γ : List Formula) (A : Formula) : PrfH Γ (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
   | ind (Γ : List Formula) (A : Formula) : PrfH Γ (Full.inductionFormula A)
   | qconf (Γ : List Formula) (P C : Formula) : PrfH Γ (confinementFormula P C)
+  | listInd (Γ : List Formula) (A : Formula) : PrfH Γ (listInductionFormula A)
   | mp (Γ : List Formula) (A B : Formula) : PrfH Γ (A ⇒ B) → PrfH Γ A → PrfH Γ B
   | gen (Γ : List Formula) (A : Formula) :
       PrfH (Γ.map (liftFormula 0)) A → PrfH Γ (Formula.forall A)
@@ -69,6 +70,7 @@ theorem deduction_aux {Δ B} (h : PrfH Δ B) : ∀ A Γ, Δ = A :: Γ → PrfH �
   | p3 Δ' A0 => intro A Γ hΔ; subst hΔ; exact prfH_weaken (PrfH.p3 Γ A0)
   | ind Δ' A0 => intro A Γ hΔ; subst hΔ; exact prfH_weaken (PrfH.ind Γ A0)
   | qconf Δ' P C => intro A Γ hΔ; subst hΔ; exact prfH_weaken (PrfH.qconf Γ P C)
+  | listInd Δ' A0 => intro A Γ hΔ; subst hΔ; exact prfH_weaken (PrfH.listInd Γ A0)
   | mp Δ' C B' hCB hC ihCB ihC =>
       intro A Γ hΔ; subst hΔ
       exact prfH_s_app (ihCB A Γ rfl) (ihC A Γ rfl)
@@ -90,6 +92,7 @@ theorem prfH_nil_to_prf : ∀ {Γ φ}, PrfH Γ φ → Γ = [] → Prf φ := by
   | p3 Δ' A0 => intro _; exact Prf.p3 A0
   | ind Δ' A0 => intro _; exact Prf.ind A0
   | qconf Δ' P C => intro _; exact Prf.qconf P C
+  | listInd Δ' A0 => intro _; exact Prf.listInd A0
   | mp Δ' A0 B0 hAB hA ihAB ihA => intro hΓ; subst hΓ; exact Prf.mp A0 B0 (ihAB rfl) (ihA rfl)
   | gen Δ' A0 hsub ih => intro hΓ; subst hΓ; exact Prf.gen A0 (ih (by simp))
 
@@ -100,6 +103,7 @@ theorem prf_to_prfH {φ} (h : Prf φ) : ∀ Γ, PrfH Γ φ := by
   | p3 A => intro Γ; exact PrfH.p3 Γ A
   | ind A => intro Γ; exact PrfH.ind Γ A
   | qconf P C => intro Γ; exact PrfH.qconf Γ P C
+  | listInd A => intro Γ; exact PrfH.listInd Γ A
   | mp A B hAB hA ihAB ihA => intro Γ; exact PrfH.mp Γ A B (ihAB Γ) (ihA Γ)
   | gen A hA ih => intro Γ; exact PrfH.gen Γ A (ih (Γ.map (liftFormula 0)))
 
