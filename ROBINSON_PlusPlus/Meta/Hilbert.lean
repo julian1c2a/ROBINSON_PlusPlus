@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Minimal.Axioms
 import ROBINSON_PlusPlus.Full.Induction
+import ROBINSON_PlusPlus.Full.Lists
 
 import FOL.FOL
 import FOL.Theorems.Impl
@@ -178,6 +179,57 @@ theorem confinement_derives (P C : Formula) : axioms ⊢ confinementFormula P C 
           simp only [substFormula]; rw [subst_lift_cancel_formula, subst_lift_cancel_formula]] at h
     exact h
   · exact Derives.hyp _ _ (List.Mem.head _)
+
+/-! ### Esquema de inducción de listas (para los lemas de cadena en `Prf`) -/
+
+/-- **Fórmula de inducción estructural sobre listas** (esquema objeto, análogo binario
+    de `Full.inductionFormula`): `Φ[nil] ⇒ ((∀h ∀t (Φ[t] ⇒ Φ[cons h t])) ⇒ ∀L Φ[L])`.
+    El consecuente del paso usa `C' = substFormula 0 (cons #1 #0) (liftFormula 2 (liftFormula 1 Φ))`
+    (slot ← `cons h t` bajo los dos binders; identidad De Bruijn vía Barendregt). -/
+def listInductionFormula (Φ : Formula) : Formula :=
+  Formula.impl (substFormula 0 nil Φ)
+    (Formula.impl
+      (Formula.forall (Formula.forall
+        (Formula.impl
+          (liftFormula 1 Φ)
+          (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ))))))
+      (Formula.forall Φ))
+
+/-- **Inducción de listas es teorema de `Derives`** (vía la regla ω `ax_list_induction`
+    + ω-gen): la identidad del paso (antecedente `Φ[t]` vía `subst_lift_same`; consecuente
+    `Φ[cons h t]` vía Barendregt `subst_subst_comm_succ` + `subst_subst_lift_gen`) reduce
+    `∀h∀t (Φ[t]⇒Φ[cons h t])` a la forma que `ax_list_induction` consume. Justifica el
+    esquema `Prf.listInd`/regla del verificador. -/
+theorem list_induction_derives (Φ : Formula) : axioms ⊢ listInductionFormula Φ := by
+  apply Minimal.Axioms.imp_intro; intro hbase
+  apply Minimal.Axioms.imp_intro; intro hstep
+  refine Minimal.Axioms.gen ?_
+  intro L
+  refine ROBINSON_PlusPlus.Full.ax_list_induction (fun L' => substFormula 0 L' Φ) hbase ?step L
+  intro h t IH
+  have e2 := spec (spec hstep h) t
+  have ha : substFormula 0 t (substFormula 1 (liftTerm 0 h) (liftFormula 1 Φ)) = substFormula 0 t Φ := by
+    rw [subst_lift_same]
+  have hc : substFormula 0 t (substFormula 1 (liftTerm 0 h)
+      (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ))))
+      = substFormula 0 (cons h t) Φ := by
+    rw [FOL.subst_subst_comm_succ (j := 0),
+        show substTerm 1 (liftTerm 0 h) (cons (.var 1) (.var 0)) = cons (liftTerm 0 h) (.var 0) from by
+          simp [cons, substTerm, substTerms],
+        subst_lift_same, FOL.subst_subst_lift_gen,
+        show substTerm 0 t (cons (liftTerm 0 h) (.var 0)) = cons h t from by
+          simp [cons, substTerm, substTerms, FOL.substTerm_liftTerm]]
+  have key : substFormula 0 t (substFormula 1 (liftTerm 0 h)
+      (Formula.impl (liftFormula 1 Φ)
+        (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ)))))
+      = Formula.impl (substFormula 0 t Φ) (substFormula 0 (cons h t) Φ) := by
+    show Formula.impl (substFormula 0 t (substFormula 1 (liftTerm 0 h) (liftFormula 1 Φ)))
+                      (substFormula 0 t (substFormula 1 (liftTerm 0 h)
+                        (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ)))))
+       = Formula.impl (substFormula 0 t Φ) (substFormula 0 (cons h t) Φ)
+    rw [ha, hc]
+  rw [key] at e2
+  exact mp e2 IH
 
 /-! ### Capa clásica `Prf` -/
 
