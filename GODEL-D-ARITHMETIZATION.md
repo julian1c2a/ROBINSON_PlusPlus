@@ -1,7 +1,7 @@
 # Frente Gödel — Nivel D real: aritmetización de D1–D3
 
 **Created:** 2026-06-13 · **Author:** Julián Calderón Almendros
-**Status:** 🟡 en construcción (Fase 0)
+**Status (2026-06-24):** 🟢 muy avanzado — **Gödel I real + D1 real (⊢ y finitaria `Prf`) + D2 real ⊢ COMPLETOS**; **teorema de deducción finitario** y **regla de confinamiento ∀ `qconf`** integrados; **fix de solidez FOL** (axioma De Bruijn falso → teorema). **En curso:** Gödel II finitario (`goedel_second_prf : ConsistentH → ¬ Prf Con'`) — bloqueado en el **lema de Barendregt** (composición subst–subst niveles mixtos) → inducción de listas en `Prf` (`Prf.listInd`) → `d2_prf`/`d3_prf`. 47 módulos, 60 jobs, 0 sorrys. (El plan por fases de abajo es la hoja de ruta original; ver [NEXT-STEPS.md](NEXT-STEPS.md)/[CHANGELOG.md](CHANGELOG.md) para el detalle vivo.)
 **Decisión:** Opción **A** (aritmetización real) — ver §0.
 
 Este documento especifica el plan para convertir las condiciones de
