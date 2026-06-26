@@ -136,7 +136,98 @@ theorem norm_s (z s : Term) :
     _ = liftTerm 0 (liftTerm 1 (liftTerm 0 s)) := FOL.substTerm_liftTerm _ 0 z
     _ = liftTerm 2 (liftTerm 0 (liftTerm 0 s)) := hW.symm
 
+/-! ### Helpers `PrfH` de conjunción / bicondicional -/
+
+theorem PrfH_and_intro {Γ : List Formula} {A B : Formula} (ha : PrfH Γ A) (hb : PrfH Γ B) :
+    PrfH Γ (land A B) :=
+  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c1 A B)) ha) hb
+
+theorem PrfH_and_elim_left {Γ : List Formula} {A B : Formula} (h : PrfH Γ (land A B)) : PrfH Γ A :=
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c2 A B)) h
+
+theorem PrfH_and_elim_right {Γ : List Formula} {A B : Formula} (h : PrfH Γ (land A B)) : PrfH Γ B :=
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c3 A B)) h
+
+/-- `iff`-mp con un bicondicional **cerrado** (`Prf`) y una hipótesis `PrfH`. -/
+theorem PrfH_iff_mp {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) (ha : PrfH Γ A) :
+    PrfH Γ B :=
+  PrfH.mp Γ _ _ (prf_to_prfH (prf_and_elim_left hiff) Γ) ha
+
+theorem PrfH_iff_mpr {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) (hb : PrfH Γ B) :
+    PrfH Γ A :=
+  PrfH.mp Γ _ _ (prf_to_prfH (prf_and_elim_right hiff) Γ) hb
+
+/-- Simetría de `=eq` en `PrfH`. -/
+theorem PrfH_eq_symm {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) : PrfH Γ (b =eq a) := by
+  let f : Formula := Formula.eq (.var 0) (liftTerm 0 a)
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq s a := by
+    intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl a) Γ)
+
+/-- Congruencia de `concat` en el 2º argumento, en `PrfH`. -/
+theorem PrfH_congr_concat_left {Γ : List Formula} {u t₁ t₂ : Term} (h : PrfH Γ (t₁ =eq t₂)) :
+    PrfH Γ (concat u t₁ =eq concat u t₂) := by
+  let f : Formula := Formula.eq (concat (liftTerm 0 u) (liftTerm 0 t₁)) (concat (liftTerm 0 u) (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (concat u t₁) (concat u s) := by
+    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (concat u t₁)) Γ)
+
+/-- Congruencia de `chainOk` en el 1er argumento (acumulador), en `PrfH`. -/
+theorem PrfH_chainOk_subst1 {Γ : List Formula} {c₁ c₂ p : Term} (h : PrfH Γ (c₁ =eq c₂))
+    (hok : PrfH Γ (chainOk c₁ p)) : PrfH Γ (chainOk c₂ p) := by
+  let f : Formula := chainOk (.var 0) (liftTerm 0 p)
+  have hS : ∀ s : Term, substFormula 0 s f = chainOk s p := by
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS c₂) ▸ PrfH_leibniz_subst (A := f) h ((hS c₁) ▸ hok)
+
+/-- Congruencia de `chainOk` en el 2º argumento (cadena), en `PrfH`. -/
+theorem PrfH_chainOk_subst2 {Γ : List Formula} {c p₁ p₂ : Term} (h : PrfH Γ (p₁ =eq p₂))
+    (hok : PrfH Γ (chainOk c p₁)) : PrfH Γ (chainOk c p₂) := by
+  let f : Formula := chainOk (liftTerm 0 c) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = chainOk c s := by
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS p₂) ▸ PrfH_leibniz_subst (A := f) h ((hS p₁) ▸ hok)
+
 /-! ### Lemas de cadena en `Prf` -/
+
+/-- Congruencia de `concat` en el 1er argumento. -/
+theorem prf_congr_concat_first {u₁ u₂ t : Term} (h : Prf (u₁ =eq u₂)) :
+    Prf (concat u₁ t =eq concat u₂ t) := by
+  let f : Formula := Formula.eq (concat (liftTerm 0 u₁) (liftTerm 0 t)) (concat (.var 0) (liftTerm 0 t))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (concat u₁ t) (concat s t) := by
+    intro s; simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS u₂) ▸ prf_leibniz_subst (A := f) h ((hS u₁) ▸ prf_refl (concat u₁ t))
+
+/-- **Asociatividad de `concat` en `Prf`**: `(L ++ M) ++ N =eq L ++ (M ++ N)`.
+    Inducción de listas sobre `L` (profundidad 1; `M`,`N` con `liftTerm 0`, normaliza con `norm21`). -/
+theorem prf_concat_assoc (M N L : Term) :
+    Prf (concat (concat L M) N =eq concat L (concat M N)) := by
+  have key : Prf (Formula.forall (Formula.eq
+      (concat (concat (.var 0) (liftTerm 0 M)) (liftTerm 0 N))
+      (concat (.var 0) (concat (liftTerm 0 M) (liftTerm 0 N))))) := by
+    refine prf_list_induction _ ?base ?step
+    · have hb : Prf (concat (concat nil M) N =eq concat nil (concat M N)) :=
+        prf_eq_trans (prf_congr_concat_first (prf_concat_nil_eq M))
+          (prf_eq_symm (prf_concat_nil_eq (concat M N)))
+      simpa only [substFormula, substTerm, substTerms, concat, nil, FOL.substTerm_liftTerm] using hb
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        concat, cons, nil, norm21]
+      refine prf_deduction ?_
+      have IH : PrfH _ (concat (concat (.var 0) (liftTerm 1 (liftTerm 0 M))) (liftTerm 1 (liftTerm 0 N))
+          =eq concat (.var 0) (concat (liftTerm 1 (liftTerm 0 M)) (liftTerm 1 (liftTerm 0 N)))) :=
+        prfH_hyp_self _
+      -- LHS: concat (concat (cons #1 #0) Mc) Nc → cons #1 (concat (concat #0 Mc) Nc)
+      refine PrfH_eq_trans (PrfH_eq_trans
+        (prf_to_prfH (prf_congr_concat_first (t := liftTerm 1 (liftTerm 0 N))
+          (prf_concat_cons_eq (.var 1) (.var 0) (liftTerm 1 (liftTerm 0 M)))) _)
+        (prf_to_prfH (prf_concat_cons_eq (.var 1)
+          (concat (.var 0) (liftTerm 1 (liftTerm 0 M))) (liftTerm 1 (liftTerm 0 N))) _))
+        (PrfH_eq_trans (PrfH_congr_cons_tail IH) (prf_to_prfH (prf_eq_symm
+          (prf_concat_cons_eq (.var 1) (.var 0)
+            (concat (liftTerm 1 (liftTerm 0 M)) (liftTerm 1 (liftTerm 0 N))))) _))
+  have hL := prf_spec key L
+  simpa only [substFormula, substTerm, substTerms, concat, FOL.substTerm_liftTerm] using hL
 
 /-- `concat X nil =eq X` en `Prf` (inducción de listas sobre `X`). -/
 theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
@@ -160,7 +251,7 @@ theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
 /-- **Monotonía de `In` (contexto izq.)** en `Prf`: `Prf (In x c) → Prf (In x (concat c0 c))`.
     Inducción de listas sobre `c0`; `x`,`c` van con `liftTerm 0` (evitan capturar el
     slot de la lista). -/
-theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)) := by
+theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (concat c0 c))) := by
   have key : Prf (Formula.forall (Formula.impl (In (liftTerm 0 x) (liftTerm 0 c))
       (In (liftTerm 0 x) (concat (.var 0) (liftTerm 0 c))))) := by
     refine prf_list_induction _ ?base ?step
@@ -185,9 +276,10 @@ theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)
       exact PrfH_eq_subst_in
         (prf_to_prfH (prf_eq_symm (prf_concat_cons_eq (.var 1) (.var 0) (liftTerm 1 (liftTerm 0 c)))) _) hcons
   have hkey := prf_spec key c0
-  have hk2 : Prf (Formula.impl (In x c) (In x (concat c0 c))) := by
-    simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
-  exact prf_mp hk2 h
+  simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
+
+theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)) :=
+  prf_mp (prf_In_mono_imp x c c0) h
 
 /-- Eliminación de la disyunción en `PrfH` (vía `Prf₀.j3` + teorema de deducción). -/
 theorem PrfH_or_elim {Γ : List Formula} {A B C : Formula} (hor : PrfH Γ (lor A B))
@@ -268,6 +360,56 @@ theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat 
     simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
   exact prf_mp hk2 h
 
+/-- **Monotonía de `allIn` (contexto izq.)** en `Prf` (implicación): `allIn c M ⇒ allIn (c0 ++ c) M`.
+    Inducción sobre `M`; usa `prf_In_mono_imp`. -/
+theorem prf_allIn_mono_imp (c c0 M : Term) :
+    Prf (Formula.impl (allIn c M) (allIn (concat c0 c) M)) := by
+  have key : Prf (Formula.forall (Formula.impl
+      (allIn (liftTerm 0 c) (.var 0))
+      (allIn (concat (liftTerm 0 c0) (liftTerm 0 c)) (.var 0)))) := by
+    refine prf_list_induction _ ?base ?step
+    · have hb : Prf (Formula.impl (allIn c nil) (allIn (concat c0 c) nil)) :=
+        prf_deduction (prf_to_prfH (prf_allIn_nil (concat c0 c)) _)
+      simpa only [substFormula, substTerm, substTerms, allIn, concat, nil, FOL.substTerm_liftTerm] using hb
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        allIn, concat, cons, nil, norm21]
+      refine prf_deduction (deduction_aux ?_
+        (allIn (liftTerm 1 (liftTerm 0 c)) (cons (.var 1) (.var 0)))
+        [Formula.impl (allIn (liftTerm 1 (liftTerm 0 c)) (.var 0))
+            (allIn (concat (liftTerm 1 (liftTerm 0 c0)) (liftTerm 1 (liftTerm 0 c))) (.var 0))] rfl)
+      let Cs : Term := liftTerm 1 (liftTerm 0 c)
+      let C0s : Term := liftTerm 1 (liftTerm 0 c0)
+      let A : Formula := allIn Cs (cons (.var 1) (.var 0))
+      let IHf : Formula := Formula.impl (allIn Cs (.var 0)) (allIn (concat C0s Cs) (.var 0))
+      have hsplit : PrfH [A, IHf] (land (In (.var 1) Cs) (allIn Cs (.var 0))) :=
+        PrfH_iff_mp (prf_allIn_cons Cs (.var 1) (.var 0)) (PrfH.hyp _ _ (List.Mem.head _))
+      have hIn : PrfH [A, IHf] (In (.var 1) (concat C0s Cs)) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_In_mono_imp (.var 1) Cs C0s) _) (PrfH_and_elim_left hsplit)
+      have hrest : PrfH [A, IHf] (allIn (concat C0s Cs) (.var 0)) :=
+        PrfH.mp _ _ _ (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))) (PrfH_and_elim_right hsplit)
+      exact PrfH_iff_mpr (prf_allIn_cons (concat C0s Cs) (.var 1) (.var 0))
+        (PrfH_and_intro hIn hrest)
+  have hkey := prf_spec key M
+  simpa only [substFormula, substTerm, substTerms, allIn, concat, FOL.substTerm_liftTerm] using hkey
+
+/-- **Monotonía de `lineOk` (contexto izq.)** en `Prf` (implicación):
+    `lineOk c line ⇒ lineOk (c0 ++ c) line` (la parte `lineWF` es independiente del contexto). -/
+theorem prf_lineOk_mono_imp (c c0 line : Term) :
+    Prf (Formula.impl (lineOk c line) (lineOk (concat c0 c) line)) := by
+  refine prf_deduction ?_
+  refine PrfH_and_intro (PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.head _))) ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_allIn_mono_imp c c0 (premsOf line)) _)
+    (PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.head _)))
+
+/-- Congruencia de `chainOk` en el 2º argumento (cadena). -/
+theorem prf_chainOk_subst2 {c p₁ p₂ : Term} (h : Prf (p₁ =eq p₂)) (hok : Prf (chainOk c p₁)) :
+    Prf (chainOk c p₂) := by
+  let f : Formula := chainOk (liftTerm 0 c) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = chainOk c s := by
+    intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS p₂) ▸ prf_leibniz_subst (A := f) h ((hS p₁) ▸ hok)
+
 /-! ### Lemas de cadena con acumulador `∀c` interno (compositividad de `runFn`)
 
 Los lemas `runFn_concat`/`chainOk_concat`/`chainOk_mono` generalizan el acumulador como
@@ -345,7 +487,226 @@ theorem prf_runFn_concat (c p s : Term) :
               (prf_runFn_cons (.var 0) (.var 2) (.var 1)))) _)))
   exact prfCompPred_spec (prf_spec key p) c
 
+/-- Predicado inductivo de monotonía de `chainOk` con acumulador `∀` object.
+    `Ψ(p) = ∀c. chainOk c p ⇒ chainOk (c0 ++ c) p` (lista `p`). -/
+def prfMonoPred (c0 : Term) : Formula :=
+  Formula.forall (Formula.impl
+    (chainOk (.var 0) (.var 1))
+    (chainOk (concat (liftTerm 0 (liftTerm 0 c0)) (.var 0)) (.var 1)))
+
+theorem prfMonoPred_spec {c0 p : Term} (h : Prf (substFormula 0 p (prfMonoPred c0))) (c : Term) :
+    Prf (Formula.impl (chainOk c p) (chainOk (concat c0 c) p)) := by
+  have hc := prf_spec h c
+  simpa [prfMonoPred, substFormula, substTerm, substTerms, chainOk, concat,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
+
+/-- **Monotonía de `chainOk` en el contexto** en `Prf` (implicación, keystone d2):
+    `chainOk c p ⇒ chainOk (c0 ++ c) p`. Inducción sobre `p` (acumulador `∀c`;
+    usa `lineOk_mono`, `concat_assoc`, patrón confinación/`norm32`/`norm_s`). -/
+theorem prf_chainOk_mono_imp (c0 c p : Term) :
+    Prf (Formula.impl (chainOk c p) (chainOk (concat c0 c) p)) := by
+  have key : Prf (Formula.forall (prfMonoPred c0)) := by
+    refine prf_list_induction (prfMonoPred c0) ?base ?step
+    · refine Prf.gen _ ?_
+      simp only [prfMonoPred, substFormula, substTerm, substTerms, chainOk, concat, nil,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      exact prf_deduction (prf_to_prfH (prf_chainOk_nil _) _)
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [prfMonoPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        chainOk, concat, cons, nil, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
+        Nat.reduceSub, reduceIte, norm32]
+      refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
+      refine prf_deduction (deduction_aux ?_ (chainOk (.var 0) (cons (.var 2) (.var 1)))
+        [liftFormula 0 (Formula.forall (Formula.impl (chainOk (.var 0) (.var 1))
+          (chainOk (concat (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))) (.var 0)) (.var 1))))] rfl)
+      let CTX : List Formula := [chainOk (.var 0) (cons (.var 2) (.var 1)),
+        liftFormula 0 (Formula.forall (Formula.impl (chainOk (.var 0) (.var 1))
+          (chainOk (concat (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))) (.var 0)) (.var 1))))]
+      have hsplit : PrfH CTX (land (lineOk (.var 0) (.var 2))
+          (chainOk (concat (.var 0) (cons (carc (.var 2)) nil)) (.var 1))) :=
+        PrfH_iff_mp (prf_chainOk_cons (.var 0) (.var 2) (.var 1)) (PrfH.hyp _ _ (List.Mem.head _))
+      have hA : PrfH CTX (lineOk (concat (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))) (.var 0)) (.var 2)) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_lineOk_mono_imp (.var 0)
+          (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))) (.var 2)) _) (PrfH_and_elim_left hsplit)
+      have ihc := PrfH_spec
+          (A := liftFormula 1 (Formula.impl (chainOk (.var 0) (.var 1))
+            (chainOk (concat (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))) (.var 0)) (.var 1))))
+          (Γ := CTX)
+          (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+          (concat (.var 0) (cons (carc (.var 2)) nil))
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        chainOk, concat, cons, nil, carc, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
+        FOL.substTerm_liftLift] at ihc
+      have hB := PrfH.mp _ _ _ ihc (PrfH_and_elim_right hsplit)
+      have hB' := PrfH_chainOk_subst1 (prf_to_prfH (prf_eq_symm
+        (prf_concat_assoc (.var 0) (cons (carc (.var 2)) nil)
+          (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))))) _) hB
+      exact PrfH_iff_mpr (prf_chainOk_cons
+        (concat (liftTerm 2 (liftTerm 0 (liftTerm 0 c0))) (.var 0)) (.var 2) (.var 1))
+        (PrfH_and_intro hA hB')
+  exact prfMonoPred_spec (prf_spec key p) c
+
+/-- Predicado inductivo de debilitamiento de `runFn`. `Ψ(p) = ∀c. runFn c p =eq c ++ runFn nil p`. -/
+def prfWeakPred : Formula :=
+  Formula.forall (Formula.eq (runFn (.var 0) (.var 1)) (concat (.var 0) (runFn nil (.var 1))))
+
+theorem prfWeakPred_spec {p : Term} (h : Prf (substFormula 0 p prfWeakPred)) (c : Term) :
+    Prf (runFn c p =eq concat c (runFn nil p)) := by
+  have hc := prf_spec h c
+  simpa [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
+
+/-- **Debilitamiento de `runFn` en `Prf`**: `runFn c p =eq c ++ runFn nil p`. Inducción sobre
+    `p` (acumulador `∀c`; usa `concat_assoc`, patrón confinación). -/
+theorem prf_runFn_weaken (c p : Term) : Prf (runFn c p =eq concat c (runFn nil p)) := by
+  have key : Prf (Formula.forall prfWeakPred) := by
+    refine prf_list_induction prfWeakPred ?base ?step
+    · refine Prf.gen _ ?_
+      simp only [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      exact prf_eq_trans (prf_runFn_nil _) (prf_eq_symm (prf_eq_trans
+        (prf_congr_concat_left (prf_runFn_nil nil)) (prf_concat_nil_right _)))
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [prfWeakPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        runFn, concat, cons, nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
+        Nat.reduceSub, reduceIte, norm32]
+      refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
+      refine prf_deduction ?_
+      let IH0 : Formula := liftFormula 0 (Formula.forall (Formula.eq (runFn (.var 0) (.var 1))
+        (concat (.var 0) (runFn nil (.var 1)))))
+      have ih1 := PrfH_spec (A := liftFormula 1 (Formula.eq (runFn (.var 0) (.var 1))
+            (concat (.var 0) (runFn nil (.var 1))))) (Γ := [IH0])
+          (PrfH.hyp _ _ (List.Mem.head _)) (concat (.var 0) (cons (carc (.var 2)) nil))
+      have ih2 := PrfH_spec (A := liftFormula 1 (Formula.eq (runFn (.var 0) (.var 1))
+            (concat (.var 0) (runFn nil (.var 1))))) (Γ := [IH0])
+          (PrfH.hyp _ _ (List.Mem.head _)) (cons (carc (.var 2)) nil)
+      simp only [IH0, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        runFn, concat, cons, nil, zero, carc, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at ih1 ih2
+      -- Lhs: runFn #0 (cons #2 #1) =eq concat #0 (concat [carc #2] (runFn nil #1))
+      have Lhs := PrfH_eq_trans (prf_to_prfH (prf_runFn_cons (.var 0) (.var 2) (.var 1)) [IH0])
+        (PrfH_eq_trans ih1 (prf_to_prfH (prf_concat_assoc (cons (carc (.var 2)) nil)
+          (runFn nil (.var 1)) (.var 0)) [IH0]))
+      -- Rin: runFn nil (cons #2 #1) =eq concat [carc #2] (runFn nil #1)
+      have Rin := PrfH_eq_trans (prf_to_prfH (prf_runFn_cons nil (.var 2) (.var 1)) [IH0])
+        (PrfH_eq_trans (prf_to_prfH (prf_congr_runFn_1 (rest := .var 1)
+          (prf_concat_nil_eq (cons (carc (.var 2)) nil))) [IH0]) ih2)
+      exact PrfH_eq_trans Lhs (PrfH_eq_symm (PrfH_congr_concat_left (u := .var 0) Rin))
+  exact prfWeakPred_spec (prf_spec key p) c
+
+/-- Cuerpo de la HI de `prf_chainOk_concat` (el `∀`-body del predicado, con `⇔` ya desplegado
+    a `∧` de dos `⇒`). Definido aparte para que `simp` lo despliegue al normalizar el `spec`. -/
+private def ccIHbody (s : Term) : Formula :=
+  land
+    (Formula.impl (chainOk (.var 0) (concat (.var 1) (liftTerm 2 (liftTerm 0 (liftTerm 0 s)))))
+      (land (chainOk (.var 0) (.var 1))
+        (chainOk (runFn (.var 0) (.var 1)) (liftTerm 2 (liftTerm 0 (liftTerm 0 s))))))
+    (Formula.impl (land (chainOk (.var 0) (.var 1))
+        (chainOk (runFn (.var 0) (.var 1)) (liftTerm 2 (liftTerm 0 (liftTerm 0 s)))))
+      (chainOk (.var 0) (concat (.var 1) (liftTerm 2 (liftTerm 0 (liftTerm 0 s))))))
+
+/-- Predicado inductivo de composición de `chainOk` con acumulador `∀` object.
+    `Ψ(p) = ∀c. chainOk c (p++s) ⇔ chainOk c p ∧ chainOk (runFn c p) s`. -/
+def prfCompChainPred (s : Term) : Formula :=
+  Formula.forall
+    ((chainOk (.var 0) (concat (.var 1) (liftTerm 0 (liftTerm 0 s)))) ⇔
+      land (chainOk (.var 0) (.var 1)) (chainOk (runFn (.var 0) (.var 1)) (liftTerm 0 (liftTerm 0 s))))
+
+theorem prfCompChainPred_spec {s p : Term} (h : Prf (substFormula 0 p (prfCompChainPred s))) (c : Term) :
+    Prf ((chainOk c (concat p s)) ⇔ land (chainOk c p) (chainOk (runFn c p) s)) := by
+  have hc := prf_spec h c
+  simpa [prfCompChainPred, substFormula, substTerm, substTerms, chainOk, runFn, concat, land, iff,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
+
+/-- **Composición de `chainOk` en `Prf`** (keystone d2): `chainOk c (p++s) ⇔
+    chainOk c p ∧ chainOk (runFn c p) s`. Inducción sobre `p` (acumulador `∀c`;
+    patrón confinación/`norm32`/`norm_s`). -/
+theorem prf_chainOk_concat (c p s : Term) :
+    Prf ((chainOk c (concat p s)) ⇔ land (chainOk c p) (chainOk (runFn c p) s)) := by
+  have key : Prf (Formula.forall (prfCompChainPred s)) := by
+    refine prf_list_induction (prfCompChainPred s) ?base ?step
+    · refine Prf.gen _ ?_
+      simp only [prfCompChainPred, substFormula, substTerm, substTerms, liftTerm, liftTerms,
+        chainOk, runFn, concat, nil, zero, iff, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, norm_s, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      refine prf_and_intro (prf_deduction ?fwd) (prf_deduction ?bwd)
+      case fwd =>
+        have hS : PrfH [chainOk (.var 0) (concat nil (liftTerm 0 s))] (chainOk (.var 0) (liftTerm 0 s)) :=
+          PrfH_chainOk_subst2 (prf_to_prfH (prf_concat_nil_eq (liftTerm 0 s)) _)
+            (PrfH.hyp _ _ (List.Mem.head _))
+        refine PrfH_and_intro (prf_to_prfH (prf_chainOk_nil (.var 0)) _) ?_
+        exact PrfH_chainOk_subst1 (prf_to_prfH (prf_eq_symm (prf_runFn_nil (.var 0))) _) hS
+      case bwd =>
+        have hyp : PrfH [land (chainOk (.var 0) nil) (chainOk (runFn (.var 0) nil) (liftTerm 0 s))]
+            (land (chainOk (.var 0) nil) (chainOk (runFn (.var 0) nil) (liftTerm 0 s))) :=
+          PrfH.hyp _ _ (List.Mem.head _)
+        have hS := PrfH_chainOk_subst1 (prf_to_prfH (prf_runFn_nil (.var 0)) _)
+          (PrfH_and_elim_right hyp)
+        exact PrfH_chainOk_subst2 (prf_to_prfH (prf_eq_symm (prf_concat_nil_eq (liftTerm 0 s))) _) hS
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [prfCompChainPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+        chainOk, runFn, concat, cons, nil, iff, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, norm32]
+      refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
+      refine prf_deduction ?_
+      let S : Term := liftTerm 2 (liftTerm 0 (liftTerm 0 s))
+      refine PrfH_and_intro ?fwd ?bwd
+      · -- forward
+        let FCTX : List Formula := [chainOk (.var 0) (concat (cons (.var 2) (.var 1)) S),
+          liftFormula 0 (Formula.forall (ccIHbody s))]
+        refine deduction_aux ?_ (chainOk (.var 0) (concat (cons (.var 2) (.var 1)) S))
+          [liftFormula 0 (Formula.forall (ccIHbody s))] rfl
+        have ihc := PrfH_spec (A := liftFormula 1 (ccIHbody s)) (Γ := FCTX)
+            (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+            (concat (.var 0) (cons (carc (.var 2)) nil))
+        unfold ccIHbody at ihc
+        simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+          chainOk, runFn, concat, cons, nil, carc, zero, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+          Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftLift] at ihc
+        have h1 : PrfH FCTX (chainOk (.var 0) (cons (.var 2) (concat (.var 1) S))) :=
+          PrfH_chainOk_subst2 (prf_to_prfH (prf_concat_cons_eq (.var 2) (.var 1) S) _)
+            (PrfH.hyp _ _ (List.Mem.head _))
+        have hsplit := PrfH_iff_mp (prf_chainOk_cons (.var 0) (.var 2) (concat (.var 1) S)) h1
+        have hBC := PrfH.mp _ _ _ (PrfH_and_elim_left ihc) (PrfH_and_elim_right hsplit)
+        refine PrfH_and_intro
+          (PrfH_iff_mpr (prf_chainOk_cons (.var 0) (.var 2) (.var 1))
+            (PrfH_and_intro (PrfH_and_elim_left hsplit) (PrfH_and_elim_left hBC))) ?_
+        exact PrfH_chainOk_subst1 (prf_to_prfH (prf_eq_symm
+          (prf_runFn_cons (.var 0) (.var 2) (.var 1))) _) (PrfH_and_elim_right hBC)
+      · -- backward
+        let BCTX : List Formula := [land (chainOk (.var 0) (cons (.var 2) (.var 1)))
+            (chainOk (runFn (.var 0) (cons (.var 2) (.var 1))) S),
+          liftFormula 0 (Formula.forall (ccIHbody s))]
+        refine deduction_aux ?_ (land (chainOk (.var 0) (cons (.var 2) (.var 1)))
+            (chainOk (runFn (.var 0) (cons (.var 2) (.var 1))) S))
+          [liftFormula 0 (Formula.forall (ccIHbody s))] rfl
+        have ihc := PrfH_spec (A := liftFormula 1 (ccIHbody s)) (Γ := BCTX)
+            (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+            (concat (.var 0) (cons (carc (.var 2)) nil))
+        unfold ccIHbody at ihc
+        simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+          chainOk, runFn, concat, cons, nil, carc, zero, land, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+          Nat.reduceGT, Nat.reduceSub, reduceIte, norm32, norm_s, FOL.substTerm_liftTerm,
+          FOL.substTerm_liftLift] at ihc
+        have hcons : PrfH BCTX (chainOk (.var 0) (cons (.var 2) (.var 1))) :=
+          PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.head _))
+        have hrun : PrfH BCTX (chainOk (runFn (.var 0) (cons (.var 2) (.var 1))) S) :=
+          PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.head _))
+        have hsplit := PrfH_iff_mp (prf_chainOk_cons (.var 0) (.var 2) (.var 1)) hcons
+        have hC := PrfH_chainOk_subst1 (prf_to_prfH (prf_runFn_cons (.var 0) (.var 2) (.var 1)) _) hrun
+        have hrec := PrfH.mp _ _ _ (PrfH_and_elim_right ihc)
+          (PrfH_and_intro (PrfH_and_elim_right hsplit) hC)
+        have hbig := PrfH_iff_mpr (prf_chainOk_cons (.var 0) (.var 2) (concat (.var 1) S))
+          (PrfH_and_intro (PrfH_and_elim_left hsplit) hrec)
+        exact PrfH_chainOk_subst2 (prf_to_prfH (prf_eq_symm
+          (prf_concat_cons_eq (.var 2) (.var 1) S)) _) hbig
+  exact prfCompChainPred_spec (prf_spec key p) c
+
 end ROBINSON_PlusPlus.Meta.ChainPrf
 
 export ROBINSON_PlusPlus.Meta.ChainPrf
-  (prf_list_induction prf_concat_nil_right prf_In_mono prf_In_mono_right prf_runFn_concat)
+  (prf_list_induction prf_concat_nil_right prf_In_mono prf_In_mono_imp prf_In_mono_right
+   prf_concat_assoc prf_allIn_mono_imp prf_lineOk_mono_imp prf_chainOk_subst2
+   prf_runFn_concat prf_chainOk_mono_imp prf_runFn_weaken prf_chainOk_concat)
