@@ -118,6 +118,21 @@ theorem prf_ex_elim_imp {A C : Formula} (h : PrfH [A] (liftFormula 0 C)) :
     Prf (Formula.ex A ⇒ C) :=
   Prf.mp _ _ (Prf.incl (Prf₀.q3 A C)) (Prf.gen _ (prf_deduction h))
 
+/-- **Introducción del ∃ en `PrfH`** (vía `q2`): de `PrfH Γ (A[t])` sale `PrfH Γ (∃A)`. -/
+theorem PrfH_ex_intro {Γ : List Formula} {A : Formula} (t : Term)
+    (h : PrfH Γ (substFormula 0 t A)) : PrfH Γ (Formula.ex A) :=
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.q2 A t)) h
+
+/-- **Eliminación del ∃ en `PrfH`** (vía `q3`+`gen`+deducción): de `PrfH Γ (∃A)` y
+    `PrfH (A :: Γ.map ↑) (↑C)` sale `PrfH Γ C`. Permite eliminar testigos anidados
+    dentro de un contexto `PrfH` (esencial para `d2_prf`, dos `∃` anidados). -/
+theorem PrfH_ex_elim {Γ : List Formula} {A C : Formula} (hex : PrfH Γ (Formula.ex A))
+    (hbody : PrfH (A :: Γ.map (liftFormula 0)) (liftFormula 0 C)) : PrfH Γ C :=
+  PrfH.mp Γ _ _
+    (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.q3 A C))
+      (PrfH.gen Γ (A ⇒ liftFormula 0 C) (deduction_aux hbody A (Γ.map (liftFormula 0)) rfl)))
+    hex
+
 end ROBINSON_PlusPlus.Meta.HilbertDeduction
 
 export ROBINSON_PlusPlus.Meta.HilbertDeduction (
@@ -128,4 +143,6 @@ export ROBINSON_PlusPlus.Meta.HilbertDeduction (
   prf_to_prfH
   prf_deduction
   prf_ex_elim_imp
+  PrfH_ex_intro
+  PrfH_ex_elim
 )

@@ -188,6 +188,18 @@ theorem PrfH_chainOk_subst2 {Γ : List Formula} {c p₁ p₂ : Term} (h : PrfH �
     intro s; simp only [f, chainOk, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS p₂) ▸ PrfH_leibniz_subst (A := f) h ((hS p₁) ▸ hok)
 
+/-- Congruencia de `allIn` en el 2º argumento (lista), en `PrfH`. -/
+theorem PrfH_allIn_subst2 {Γ : List Formula} {c L₁ L₂ : Term} (h : PrfH Γ (L₁ =eq L₂))
+    (hok : PrfH Γ (allIn c L₁)) : PrfH Γ (allIn c L₂) := by
+  let f : Formula := allIn (liftTerm 0 c) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = allIn c s := by
+    intro s; simp only [f, allIn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS L₂) ▸ PrfH_leibniz_subst (A := f) h ((hS L₁) ▸ hok)
+
+/-- `In x t → In x (cons hd t)` ya estaba; aquí `In x (cons x t)` en `PrfH`. -/
+theorem PrfH_in_cons_head {Γ : List Formula} (x t : Term) : PrfH Γ (In x (cons x t)) :=
+  prf_to_prfH (prf_in_cons_head x t) Γ
+
 /-! ### Lemas de cadena en `Prf` -/
 
 /-- Congruencia de `concat` en el 1er argumento. -/
@@ -313,7 +325,8 @@ theorem prf_not_in_nil (x : Term) : Prf (Formula.impl (In x nil) Formula.bottom)
 /-- **Monotonía de `In` por la derecha** en `Prf`: `Prf (In x L) → Prf (In x (concat L M))`.
     Inducción de listas sobre `L`; `base` vía explosión (`In x nil` es falso), `step`
     vía `or_elim` sobre la descomposición de `ax_L2`. -/
-theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat L M)) := by
+theorem prf_In_mono_right_imp (x M L : Term) :
+    Prf (Formula.impl (In x L) (In x (concat L M))) := by
   have key : Prf (Formula.forall (Formula.impl (In (liftTerm 0 x) (.var 0))
       (In (liftTerm 0 x) (concat (.var 0) (liftTerm 0 M))))) := by
     refine prf_list_induction _ ?base ?step
@@ -356,9 +369,10 @@ theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat 
           PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
         exact PrfH_in_cons_tail (.var 1) (PrfH.mp _ _ _ hIH hin)
   have hkey := prf_spec key L
-  have hk2 : Prf (Formula.impl (In x L) (In x (concat L M))) := by
-    simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
-  exact prf_mp hk2 h
+  simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
+
+theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat L M)) :=
+  prf_mp (prf_In_mono_right_imp x M L) h
 
 /-- **Monotonía de `allIn` (contexto izq.)** en `Prf` (implicación): `allIn c M ⇒ allIn (c0 ++ c) M`.
     Inducción sobre `M`; usa `prf_In_mono_imp`. -/
@@ -708,5 +722,7 @@ end ROBINSON_PlusPlus.Meta.ChainPrf
 
 export ROBINSON_PlusPlus.Meta.ChainPrf
   (prf_list_induction prf_concat_nil_right prf_In_mono prf_In_mono_imp prf_In_mono_right
-   prf_concat_assoc prf_allIn_mono_imp prf_lineOk_mono_imp prf_chainOk_subst2
-   prf_runFn_concat prf_chainOk_mono_imp prf_runFn_weaken prf_chainOk_concat)
+   prf_In_mono_right_imp prf_concat_assoc prf_allIn_mono_imp prf_lineOk_mono_imp prf_chainOk_subst2
+   prf_runFn_concat prf_chainOk_mono_imp prf_runFn_weaken prf_chainOk_concat
+   PrfH_and_intro PrfH_and_elim_left PrfH_and_elim_right PrfH_iff_mp PrfH_iff_mpr
+   PrfH_chainOk_subst1 PrfH_chainOk_subst2 PrfH_allIn_subst2 PrfH_eq_subst_in PrfH_in_cons_head)

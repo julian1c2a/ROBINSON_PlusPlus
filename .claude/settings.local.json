@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash",
-      "PowerShell"
+      "PowerShell",
+      "PowerShell($p = Get-Process -Name lake,lean,lean-language-server -ErrorAction SilentlyContinue; if \\($p\\) { $p | Select-Object Id,ProcessName,@{N='Min';E={[math]::Round\\(\\(\\(Get-Date\\)-$_.StartTime\\).TotalMinutes,1\\)}} | Format-Table -AutoSize } else { \"no lake/lean processes\" })"
     ]
   }
 }

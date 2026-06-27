@@ -35,5 +35,6 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.ArithPrf
 import ROBINSON_PlusPlus.Meta.Representability2Prf
 import ROBINSON_PlusPlus.Meta.ChainPrf
+import ROBINSON_PlusPlus.Meta.DerivCondPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
