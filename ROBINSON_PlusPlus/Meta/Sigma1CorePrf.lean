@@ -13,6 +13,8 @@ open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ProofChain
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf
 
@@ -140,6 +142,49 @@ theorem pcc_in_objList_of_mem (x : Term) (elems : List Term) :
       | head => exact pcc_in_head x (objList es)
       | tail _ hmem => exact prf_mp (pcc_in_tail e x (objList es)) (ih hmem)
 
+/-! ### Tracking de `runFn` sobre cadenas explícitas → `objList` de conclusiones
+
+`runFn c (cons line rest) = runFn (c ++ [carc line]) rest` acumula la **conclusión**
+`carc line` de cada línea. Luego `runFn` sobre una cadena explícita `objList lines`
+computa (=eq) el `objList` de las conclusiones `lines.map carc`. Con ello, la reflexión
+de `In` sobre la lista de conclusiones (`pcc_in_objList_of_mem`) se transporta —vía
+Leibniz object + `pcc_imp`— a la reflexión de `In x (runFn nil (objList lines))`. Es la
+Σ₁-completitud de `In` para **testigos concretos** (cadenas de prueba explícitas). -/
+
+/-- **Tracking `runFn` → `objList`** (acumulador general): `runFn c (objList lines)` computa
+    `concat c (objList (lines.map carc))`. Meta-inducción en `lines` (usa `runFn_cons`,
+    asociatividad de `concat` y `concat [h] X =eq cons h X`). -/
+theorem prf_runFn_objList : ∀ (lines : List Term) (c : Term),
+    Prf (runFn c (objList lines) =eq concat c (objList (lines.map carc)))
+  | [], c => by exact prf_eq_trans (prf_runFn_nil c) (prf_eq_symm (prf_concat_nil_right c))
+  | line :: rest, c => by
+      have hstep := prf_runFn_cons c line (objList rest)
+      have hih := prf_runFn_objList rest (concat c (cons (carc line) nil))
+      have hassoc := prf_concat_assoc (cons (carc line) nil) (objList (rest.map carc)) c
+      have hcons := prf_concat_cons_eq (carc line) nil (objList (rest.map carc))
+      have hnil := prf_concat_nil_eq (objList (rest.map carc))
+      have hconsFull := prf_eq_trans hcons (prf_congr_cons_tail hnil)
+      have hcongr := prf_congr_concat_left (u := c) hconsFull
+      exact prf_eq_trans hstep (prf_eq_trans hih (prf_eq_trans hassoc hcongr))
+
+/-- **Tracking `runFn nil` → `objList`**: `runFn nil (objList lines) =eq objList (lines.map carc)`. -/
+theorem prf_runFn_nil_objList (lines : List Term) :
+    Prf (runFn nil (objList lines) =eq objList (lines.map carc)) :=
+  prf_eq_trans (prf_runFn_objList lines nil) (prf_concat_nil_eq (objList (lines.map carc)))
+
+/-- **Reflexión de `In` sobre `runFn` de una cadena explícita** (Σ₁-completitud de `In`
+    para testigos concretos): si `x` es (meta-)miembro de las conclusiones `lines.map carc`,
+    entonces `provCodeC'(In x (runFn nil (objList lines)))`. Reflexión sobre `objList`
+    (`pcc_in_objList_of_mem`) + transporte por el tracking (`=eq` Leibniz object + `pcc_imp`). -/
+theorem pcc_in_runFn_objList (x : Term) (lines : List Term)
+    (hmem : List.Mem x (lines.map carc)) :
+    Prf (provCodeC' (In x (runFn nil (objList lines)))) := by
+  have hrefl := pcc_in_objList_of_mem x (lines.map carc) hmem
+  have heq := prf_eq_symm (prf_runFn_nil_objList lines)
+  have himp : Prf (In x (objList (lines.map carc)) ⇒ In x (runFn nil (objList lines))) :=
+    prf_deduction (PrfH_eq_subst_in (prf_to_prfH heq _) (prfH_hyp_self _))
+  exact prf_mp (pcc_imp himp) hrefl
+
 end ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
@@ -147,4 +192,5 @@ export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
   prf_congr_inFormCodeFn prf_provFromCode_In_congr
   prf_provCodeC'_In_of_tracked prf_provCodeC'_In_formCode_of_tracked
   objList pcc_in_objList_of_mem
+  prf_runFn_objList prf_runFn_nil_objList pcc_in_runFn_objList
 )
