@@ -1094,6 +1094,23 @@ theorem pcc_allIn_cons (c x t) : Prf (provCodeC' (In x c) ⇒
 --   La Σ₁-completitud real (`hC`/`hI`) debe reformularse al nivel del código object (tcFn/substfc).
 ```
 
+**`Meta/TcArithPrf.lean`** (Fase 5, cimiento código object) — namespace `…Meta.TcArithPrf`: porte
+finitario de la cadena `tc_arith` de `Diagonal.lean` (ω) → `Prf`. `tcFn` (función object,
+`Minimal/Axioms.lean`) computa `termCode`.
+```lean
+theorem prf_tc_zero : Prf (tcFn zero =eq termCode zero)
+theorem prf_tc_succ (x) : Prf (tcFn (succ x) =eq cons (numeral 1) (cons (strCode succ_sym) (cons (cons (tcFn x) nil) nil)))
+theorem prf_tc_cons (a b) : Prf (tcFn (cons a b) =eq ⌜::·⌝[tcFn a, tcFn b])
+theorem prf_tc_numeral (n) : Prf (tcFn (numeral n) =eq termCode (numeral n))   -- inducción meta
+theorem prf_tc_of_cons {a b} (ha : Prf (tcFn a =eq termCode a)) (hb : Prf (tcFn b =eq termCode b))
+  : Prf (tcFn (cons a b) =eq termCode (cons a b))
+theorem prf_tc_chars / prf_tc_str / prf_tc_term / prf_tc_terms   -- mutuas
+theorem prf_tc_form (φ) : Prf (tcFn (formCode φ) =eq termCode (formCode φ))   -- código del código
+-- #print axioms = [propext, Classical.choice, Quot.sound]
+-- Cimiento del enfoque de código object: `tcFn` es función object con congruencia Leibniz
+-- (a diferencia de la `termCode` meta que causa la obstrucción Tarski).
+```
+
 ---
 
 ## 4 · Patterns notables y deuda técnica
