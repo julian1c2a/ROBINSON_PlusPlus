@@ -190,6 +190,17 @@ def provInTrackedFn (xc Lc : Term) : Formula := provFromCode (inFormCodeFn xc Lc
 > El resto del documento detalla **Opción B** como ruta principal y marca los puntos donde,
 > si B se atasca, se escala a A.
 
+> **DECISIÓN (2026‑07‑05): Opción A.** Análisis posterior confirma que el `∃`‑intro interno
+> (`PrfH_pcc_exIntro`) produce **inherentemente** `formCode(A[0:=testigo])`; para el testigo
+> abstracto eso reabsorbe la variable (`varc 0`), y la costura de B (`tcFn p =eq termCode p`) **no
+> es enunciable** para `p` abstracto (`termCode p` meta‑stuck). Es una duda que **rompe la prueba
+> entera**, no un detalle. Por el criterio «ante duda que pueda traer problemas → A», se adopta
+> **Opción A**: rastreo uniforme desde la raíz (`provFormulaC'ₜ`/`provCodeC'ₜ` con `tcFn`/`substfc`)
+> + re‑derivación de **D1ₜ**. D2 (`pcc_imp`) y el lema diagonal se reutilizan sin cambio estructural.
+> Orden de fases A: **A‑F1** ladrillos `tcFn`‑código (computación `tcFn=termCode` sobre las formas
+> de lista/cadena) → **A‑F2** `provFormulaC'ₜ`/`provCodeC'ₜ` + puente con `provCodeC'` → **A‑F3**
+> `repr_pos'_prfₜ` (D1ₜ) → **A‑F4** `d3_prfₜ` (∃‑intro rastreado nativo) → **A‑F5** `goedel_second_prf`.
+
 ### 4.3 Nuevos lemas (firmas objetivo, Opción B)
 
 ```lean

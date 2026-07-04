@@ -185,6 +185,33 @@ theorem pcc_in_runFn_objList (x : Term) (lines : List Term)
     prf_deduction (PrfH_eq_subst_in (prf_to_prfH heq _) (prfH_hyp_self _))
   exact prf_mp (pcc_imp himp) hrefl
 
+/-! ### A‑F1 — `tcFn` computa `termCode` sobre las formas de lista de conclusiones
+
+Hacia la capa rastreada uniforme (Opción A): `tcFn` (código del código, función object con
+congruencia Leibniz) computa `termCode` sobre cualquier `objList` de **códigos** cuyos elementos
+ya cumplan `tcFn = termCode`. En particular sobre `objList` de `formCode`s (la forma exacta de la
+lista de conclusiones que produce `runFn`), cerrando el 2º argumento del puente rastreado
+`prf_provCodeC'_In_formCode_of_tracked` (que exige `tcFn L =eq termCode L`). -/
+
+/-- `tcFn = termCode` sobre `objList` de una lista de **códigos** que ya cumplen `tcFn = termCode`
+    (meta-inducción; base `nil` vía `prf_tc_zero`, paso vía `prf_tc_of_cons`). -/
+theorem prf_tc_objList (cs : List Term)
+    (h : ∀ c, List.Mem c cs → Prf (tcFn c =eq termCode c)) :
+    Prf (tcFn (objList cs) =eq termCode (objList cs)) := by
+  induction cs with
+  | nil => exact prf_tc_zero
+  | cons c rest ih =>
+      exact prf_tc_of_cons (h c (List.Mem.head _))
+        (ih (fun d hd => h d (List.Mem.tail _ hd)))
+
+/-- **`tcFn = termCode` sobre `objList` de `formCode`s** (la forma de la lista de conclusiones):
+    especialización de `prf_tc_objList` con `prf_tc_form` en cada elemento. -/
+theorem prf_tc_objList_formCode (φs : List Formula) :
+    Prf (tcFn (objList (φs.map formCode)) =eq termCode (objList (φs.map formCode))) := by
+  induction φs with
+  | nil => exact prf_tc_zero
+  | cons φ rest ih => exact prf_tc_of_cons (prf_tc_form φ) ih
+
 end ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
@@ -193,4 +220,5 @@ export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
   prf_provCodeC'_In_of_tracked prf_provCodeC'_In_formCode_of_tracked
   objList pcc_in_objList_of_mem
   prf_runFn_objList prf_runFn_nil_objList pcc_in_runFn_objList
+  prf_tc_objList prf_tc_objList_formCode
 )
