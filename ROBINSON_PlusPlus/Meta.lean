@@ -39,5 +39,6 @@ import ROBINSON_PlusPlus.Meta.DerivCondPrf
 import ROBINSON_PlusPlus.Meta.ReflectionPrf
 import ROBINSON_PlusPlus.Meta.Sigma1Prf
 import ROBINSON_PlusPlus.Meta.TcArithPrf
+import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo

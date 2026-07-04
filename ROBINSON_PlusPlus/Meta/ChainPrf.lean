@@ -221,7 +221,8 @@ theorem prf_concat_assoc (M N L : Term) :
     · have hb : Prf (concat (concat nil M) N =eq concat nil (concat M N)) :=
         prf_eq_trans (prf_congr_concat_first (prf_concat_nil_eq M))
           (prf_eq_symm (prf_concat_nil_eq (concat M N)))
-      simpa only [substFormula, substTerm, substTerms, concat, nil, FOL.substTerm_liftTerm] using hb
+      simpa only [substFormula, substTerm, substTerms, concat, nil, zero, if_true,
+        FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         concat, cons, nil, norm21]
@@ -239,7 +240,7 @@ theorem prf_concat_assoc (M N L : Term) :
           (prf_concat_cons_eq (.var 1) (.var 0)
             (concat (liftTerm 1 (liftTerm 0 M)) (liftTerm 1 (liftTerm 0 N))))) _))
   have hL := prf_spec key L
-  simpa only [substFormula, substTerm, substTerms, concat, FOL.substTerm_liftTerm] using hL
+  simpa only [substFormula, substTerm, substTerms, concat, if_true, FOL.substTerm_liftTerm] using hL
 
 /-- `concat X nil =eq X` en `Prf` (inducción de listas sobre `X`). -/
 theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
@@ -258,7 +259,7 @@ theorem prf_concat_nil_right (X : Term) : Prf (concat X nil =eq X) := by
       exact PrfH_eq_trans hcc (PrfH_congr_cons_tail IH)
   have hX := prf_spec key X
   show Prf (concat X nil =eq X)
-  simpa [substFormula, substTerm, substTerms, concat, nil, FOL.substTerm_liftTerm] using hX
+  simpa [substFormula, substTerm, substTerms, concat, nil, zero, FOL.substTerm_liftTerm] using hX
 
 /-- **Monotonía de `In` (contexto izq.)** en `Prf`: `Prf (In x c) → Prf (In x (concat c0 c))`.
     Inducción de listas sobre `c0`; `x`,`c` van con `liftTerm 0` (evitan capturar el
@@ -270,7 +271,8 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
     · have hb : Prf (Formula.impl (In x c) (In x (concat nil c))) :=
         prf_deduction (PrfH_eq_subst_in
           (prf_to_prfH (prf_eq_symm (prf_concat_nil_eq c)) _) (prfH_hyp_self _))
-      simpa only [substFormula, substTerm, substTerms, In, concat, nil, FOL.substTerm_liftTerm] using hb
+      simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, if_true,
+        FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         In, concat, cons, nil, norm21]
@@ -288,7 +290,7 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
       exact PrfH_eq_subst_in
         (prf_to_prfH (prf_eq_symm (prf_concat_cons_eq (.var 1) (.var 0) (liftTerm 1 (liftTerm 0 c)))) _) hcons
   have hkey := prf_spec key c0
-  simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
+  simpa only [substFormula, substTerm, substTerms, In, concat, if_true, FOL.substTerm_liftTerm] using hkey
 
 theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)) :=
   prf_mp (prf_In_mono_imp x c c0) h
@@ -335,7 +337,8 @@ theorem prf_In_mono_right_imp (x M L : Term) :
         refine prf_deduction ?_
         exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (In x (concat nil M))))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil x) _) (prfH_hyp_self _))
-      simpa only [substFormula, substTerm, substTerms, In, concat, nil, FOL.substTerm_liftTerm] using hb
+      simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, if_true,
+        FOL.substTerm_liftTerm] using hb
     · -- step
       refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
@@ -369,7 +372,7 @@ theorem prf_In_mono_right_imp (x M L : Term) :
           PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
         exact PrfH_in_cons_tail (.var 1) (PrfH.mp _ _ _ hIH hin)
   have hkey := prf_spec key L
-  simpa only [substFormula, substTerm, substTerms, In, concat, FOL.substTerm_liftTerm] using hkey
+  simpa only [substFormula, substTerm, substTerms, In, concat, if_true, FOL.substTerm_liftTerm] using hkey
 
 theorem prf_In_mono_right (x M L : Term) (h : Prf (In x L)) : Prf (In x (concat L M)) :=
   prf_mp (prf_In_mono_right_imp x M L) h
@@ -384,7 +387,8 @@ theorem prf_allIn_mono_imp (c c0 M : Term) :
     refine prf_list_induction _ ?base ?step
     · have hb : Prf (Formula.impl (allIn c nil) (allIn (concat c0 c) nil)) :=
         prf_deduction (prf_to_prfH (prf_allIn_nil (concat c0 c)) _)
-      simpa only [substFormula, substTerm, substTerms, allIn, concat, nil, FOL.substTerm_liftTerm] using hb
+      simpa only [substFormula, substTerm, substTerms, allIn, concat, nil, zero, if_true,
+        FOL.substTerm_liftTerm] using hb
     · refine Prf.gen _ (Prf.gen _ ?_)
       simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
         allIn, concat, cons, nil, norm21]
@@ -405,7 +409,7 @@ theorem prf_allIn_mono_imp (c c0 M : Term) :
       exact PrfH_iff_mpr (prf_allIn_cons (concat C0s Cs) (.var 1) (.var 0))
         (PrfH_and_intro hIn hrest)
   have hkey := prf_spec key M
-  simpa only [substFormula, substTerm, substTerms, allIn, concat, FOL.substTerm_liftTerm] using hkey
+  simpa only [substFormula, substTerm, substTerms, allIn, concat, if_true, FOL.substTerm_liftTerm] using hkey
 
 /-- **Monotonía de `lineOk` (contexto izq.)** en `Prf` (implicación):
     `lineOk c line ⇒ lineOk (c0 ++ c) line` (la parte `lineWF` es independiente del contexto). -/
@@ -568,7 +572,7 @@ def prfWeakPred : Formula :=
 theorem prfWeakPred_spec {p : Term} (h : Prf (substFormula 0 p prfWeakPred)) (c : Term) :
     Prf (runFn c p =eq concat c (runFn nil p)) := by
   have hc := prf_spec h c
-  simpa [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil,
+  simpa [prfWeakPred, substFormula, substTerm, substTerms, runFn, concat, nil, zero,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hc
 
 /-- **Debilitamiento de `runFn` en `Prf`**: `runFn c p =eq c ++ runFn nil p`. Inducción sobre

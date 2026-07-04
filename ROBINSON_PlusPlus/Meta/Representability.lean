@@ -413,8 +413,8 @@ theorem repr_pos {φ : Formula} (h : Prf φ) : axioms ⊢ provCodeC φ := by
     simpa [substFormula, substTerm, substTerms, In, validProofFn, nil, FOL.substTerm_liftTerm] using ht
   have hex := Derives.intro_ex axioms (In (liftTerm 0 (formCode φ)) (validProofFn nil (.var 0)))
     (proofCode rs [])
-    (by simpa [substFormula, substTerm, substTerms, In, validProofFn, nil, FOL.substTerm_liftTerm] using hin2)
-  simpa [provCodeC, provFormulaC, substFormula, substTerm, substTerms, In, validProofFn, nil,
+    (by simpa [substFormula, substTerm, substTerms, In, validProofFn, nil, zero, FOL.substTerm_liftTerm] using hin2)
+  simpa [provCodeC, provFormulaC, substFormula, substTerm, substTerms, In, validProofFn, nil, zero,
     FOL.substTerm_liftTerm] using hex
 
 end ROBINSON_PlusPlus.Meta.Representability

@@ -74,7 +74,7 @@ theorem prf_tc_numeral : ∀ n : Nat, Prf (tcFn (numeral n) =eq termCode (numera
           cons (numeral 1) (cons (strCode succ_sym)
             (cons (cons (termCode (numeral n)) nil) nil))) :=
         prf_eq_trans hstep hcongr
-      simpa only [numeral, termCode, termsCode] using this
+      simpa only [numeral, succ, termCode, termsCode] using this
 
 /-- Congruencia en los dos hijos de un nodo `func`-2 codificado. -/
 theorem prf_congr_tc2 {S A A' B B' : Term} (hA : Prf (A =eq A')) (hB : Prf (B =eq B')) :
@@ -127,9 +127,19 @@ theorem prf_tc_form : ∀ φ : Formula, Prf (tcFn (formCode φ) =eq termCode (fo
                     (prf_tc_of_cons (prf_tc_form a) (prf_tc_of_cons (prf_tc_form b) prf_tc_zero))
   | .ex a      => prf_tc_of_cons (prf_tc_numeral 9) (prf_tc_of_cons (prf_tc_form a) prf_tc_zero)
 
+/-- **Congruencia de `tcFn`** en `Prf` (Leibniz object): `x =eq y → tcFn x =eq tcFn y`.
+    A diferencia de `termCode` (meta), `tcFn` es una **función object** y respeta la igualdad
+    demostrable. Es la pieza que habilita rastrear el testigo por código object. -/
+theorem prf_congr_tcFn {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (tcFn t₁ =eq tcFn t₂) := by
+  let f : Formula := Formula.eq (tcFn (liftTerm 0 t₁)) (tcFn (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (tcFn t₁) (tcFn s) := by
+    intro s; simp only [f, substFormula, tcFn, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (tcFn t₁))
+
 end ROBINSON_PlusPlus.Meta.TcArithPrf
 
 export ROBINSON_PlusPlus.Meta.TcArithPrf (
   prf_tc_zero prf_tc_succ prf_tc_cons prf_tc_numeral prf_tc_of_cons
   prf_tc_chars prf_tc_str prf_tc_term prf_tc_terms prf_tc_form
+  prf_congr_tcFn
 )

@@ -80,20 +80,23 @@ theorem d3_prf_of_sigma1 (φ : Formula)
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_formCode]
   -- ctx: [chainOk nil #0 ∧ In ⌜φ⌝ (runFn nil #0)] ; goal: provCodeC' (provCodeC' φ)
-  let Γ : List Formula := [land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))]
-  have hChain : PrfH Γ (chainOk nil (.var 0)) :=
+  have hChain : PrfH [land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))]
+      (chainOk nil (.var 0)) :=
     PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.head _))
-  have hIn : PrfH Γ (In (formCode φ) (runFn nil (.var 0))) :=
+  have hIn : PrfH [land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))]
+      (In (formCode φ) (runFn nil (.var 0))) :=
     PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.head _))
-  have hPC : PrfH Γ (provCodeC' (chainOk nil (.var 0))) :=
+  have hPC : PrfH [land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))]
+      (provCodeC' (chainOk nil (.var 0))) :=
     PrfH.mp _ _ _ (prf_to_prfH (hC (.var 0)) _) hChain
-  have hPI : PrfH Γ (provCodeC' (In (formCode φ) (runFn nil (.var 0)))) :=
+  have hPI : PrfH [land (chainOk nil (.var 0)) (In (formCode φ) (runFn nil (.var 0)))]
+      (provCodeC' (In (formCode φ) (runFn nil (.var 0)))) :=
     PrfH.mp _ _ _ (prf_to_prfH (hI (formCode φ) (runFn nil (.var 0))) _) hIn
   have hAnd := PrfH_pcc_andIntro hPC hPI
   exact PrfH_pcc_exIntro
     (land (chainOk nil (.var 0)) (In (liftTerm 0 (formCode φ)) (runFn nil (.var 0)))) (.var 0)
     (by simpa only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-          FOL.substTerm_liftTerm] using hAnd)
+          if_true, FOL.substTerm_liftTerm] using hAnd)
 
 end ROBINSON_PlusPlus.Meta.ReflectionPrf
 

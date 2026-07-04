@@ -84,7 +84,7 @@ theorem tc_numeral : ∀ n : Nat, axioms ⊢ (tcFn (numeral n) =eq termCode (num
           cons (numeral 1) (cons (strCode succ_sym)
             (cons (cons (termCode (numeral n)) nil) nil))) :=
         FOL.derive_eq_trans hstep hcongr
-      simpa only [numeral, termCode, termsCode] using this
+      simpa only [numeral, succ, termCode, termsCode] using this
 
 /-! ### `tc_arith`: `tcFn` computa `termCode` sobre TODO código
 
