@@ -212,6 +212,28 @@ theorem prf_tc_objList_formCode (φs : List Formula) :
   | nil => exact prf_tc_zero
   | cons φ rest ih => exact prf_tc_of_cons (prf_tc_form φ) ih
 
+/-! ### A‑F2 — puente: reflexión RASTREADA con testigo‑código = `provCodeC'` real
+
+Mecanismo central de la Opción A. La reflexión de una fórmula sustituida se puede expresar con
+**código object** `substfc (numeral 0) (tcFn p) (formCode A)` (sustitución object del código del
+testigo `tcFn p` en el código `⌜A⌝`), y **coincide** con la `provCodeC'(A[0:=p])` real siempre que
+el testigo `p` sea un **código** (`tcFn p =eq termCode p`). Prueba: `prf_substFormula_arith`
+(el `substfc` object computa la `substFormula` meta sobre códigos) + congruencia `substfc`
+(`prf_congr_substfc_arg2`) del testigo + transporte por igualdad de códigos (`prf_provCode_congr`).
+El `tcFn` **NO se absorbe** (es slot‑término genuino), a diferencia de la `formCode` meta. -/
+
+/-- **Puente rastreado→real de la Opción A**: si el testigo `p` es un código (`tcFn p =eq termCode p`)
+    y la reflexión RASTREADA `provFromCode(substfc 0 (tcFn p) ⌜A⌝)` es derivable, entonces la
+    reflexión real `provCodeC'(A[0:=p])` lo es. -/
+theorem prf_provCodeC'_of_tracked_witness (A : Formula) (p : Term)
+    (hp : Prf (tcFn p =eq termCode p))
+    (h : Prf (provFromCode (substfc (numeral 0) (tcFn p) (formCode A)))) :
+    Prf (provCodeC' (substFormula 0 p A)) := by
+  have harith := prf_substFormula_arith 0 p A
+  have hcongr := prf_congr_substfc_arg2 (x := numeral 0) (z := formCode A) hp
+  have hchain := prf_eq_trans hcongr harith
+  exact prf_mp (prf_provCode_congr hchain) h
+
 end ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
@@ -221,4 +243,5 @@ export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
   objList pcc_in_objList_of_mem
   prf_runFn_objList prf_runFn_nil_objList pcc_in_runFn_objList
   prf_tc_objList prf_tc_objList_formCode
+  prf_provCodeC'_of_tracked_witness
 )
