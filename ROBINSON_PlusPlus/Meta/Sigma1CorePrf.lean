@@ -111,10 +111,40 @@ theorem prf_provCodeC'_In_formCode_of_tracked {φ : Formula} {L : Term}
     Prf (provCodeC' (In (formCode φ) L)) :=
   prf_provCodeC'_In_of_tracked (prf_tc_form φ) hL h
 
+/-! ### Reflexión de `In` sobre listas explícitas (por meta-pertenencia)
+
+Núcleo inductivo de `hI` para el caso en que la lista de conclusiones es una `cons`-lista
+concreta (lo que produce `runFn` al evaluar el testigo). La reflexión de `In` sobre una lista
+explícita se resuelve por **meta-inducción** en la lista, usando los combinadores object
+`pcc_in_head`/`pcc_in_tail`/`pcc_in_nil`. Sortea la obstrucción de reflexión de igualdad:
+en el caso cabeza el elemento **es** `x` (igualdad Lean, no `x =eq e` object), así que
+`pcc_in_head` aplica **incondicionalmente**. -/
+
+/-- Lista object (`cons`/`nil`) a partir de una lista meta de términos. -/
+def objList : List Term → Term
+  | []      => nil
+  | e :: es => cons e (objList es)
+
+/-- **Reflexión de `In` sobre una lista explícita** por meta-pertenencia: si `x` es
+    (meta-)miembro de `elems`, entonces `provCodeC'(In x (objList elems))` es demostrable.
+    Meta-inducción en `elems`; cabeza vía `pcc_in_head` (el elemento es `x`), cola vía
+    `pcc_in_tail` + HI. (Se usa `List.Mem` explícito: `∈` está sobrecargado como el `In`
+    object por la notación scoped de `Minimal.Axioms`.) -/
+theorem pcc_in_objList_of_mem (x : Term) (elems : List Term) :
+    List.Mem x elems → Prf (provCodeC' (In x (objList elems))) := by
+  induction elems with
+  | nil => intro h; cases h
+  | cons e es ih =>
+      intro h
+      cases h with
+      | head => exact pcc_in_head x (objList es)
+      | tail _ hmem => exact prf_mp (pcc_in_tail e x (objList es)) (ih hmem)
+
 end ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
   inFormCodeFn inFormCodeFn_termCode provCodeC'_In_eq
   prf_congr_inFormCodeFn prf_provFromCode_In_congr
   prf_provCodeC'_In_of_tracked prf_provCodeC'_In_formCode_of_tracked
+  objList pcc_in_objList_of_mem
 )
