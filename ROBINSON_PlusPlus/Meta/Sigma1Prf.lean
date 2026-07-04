@@ -39,6 +39,48 @@ inductivo final (`hI`/`hC` para testigo abstracto) necesita aún la inducción o
 sobre el código con seguimiento aritmético (`substfc`/`tcFn`) — "la bestia" (Fase 5).
 -/
 
+/-! ### Demostrabilidad parametrizada por el código + transporte por igualdad de códigos
+
+`provFromCode c` = "el código `c` (de una fórmula) es demostrable". Se relaciona con
+`provCodeC'` por `provCodeC' φ = provFromCode (formCode φ)` (definicional). A diferencia
+de `provCodeC'(In x #0)` (donde el código **absorbe** la variable object), aquí `c` es
+un **slot-término genuino** del predicado, así que la demostrabilidad **respeta la
+igualdad de códigos** vía Leibniz object (`prf_provCode_congr`). Este es el transporte
+que parte la reflexión de igualdad. -/
+
+/-- Demostrabilidad de un **código de fórmula** `c` (no de una fórmula meta). -/
+def provFromCode (c : Term) : Formula := substFormula 0 c provFormulaC'
+
+/-- `provCodeC' φ` es `provFromCode` del código de `φ` (definicional). -/
+theorem provCodeC'_eq_provFromCode (φ : Formula) :
+    provCodeC' φ = provFromCode (formCode φ) := rfl
+
+/-- **Transporte de la demostrabilidad por igualdad de códigos** (Leibniz object):
+    de `Prf (c₁ =eq c₂)` sale `Prf (provFromCode c₁ ⇒ provFromCode c₂)`. El código `c`
+    aparece como término honesto, no absorbido — por eso Leibniz funciona aquí. -/
+theorem prf_provCode_congr {c₁ c₂ : Term} (h : Prf (c₁ =eq c₂)) :
+    Prf (provFromCode c₁ ⇒ provFromCode c₂) :=
+  prf_mp (Prf.incl (Prf₀.leibniz provFormulaC' c₁ c₂)) h
+
+/-- **Reflexión de igualdad REDUCIDA** al puente de doble-codificación: dada la implicación
+    object `(x=eq y) ⇒ (formCode(x=eq x) =eq formCode(x=eq y))` (igualdad de los *códigos*
+    de las fórmulas, que se reduce a `termCode x =eq termCode y` — el puente `termCode`/`tcFn`,
+    la pieza irreducible), vale la **reflexión de igualdad** `(x=eq y) ⇒ provCodeC'(x=eq y)`.
+    Transporte (`prf_provCode_congr`) de la demostrabilidad de la reflexividad `provCodeC'(x=eq x)`. -/
+theorem pcc_eq_of_codeEq (x y : Term)
+    (hcode : Prf ((x =eq y) ⇒ (formCode (Formula.eq x x) =eq formCode (Formula.eq x y)))) :
+    Prf ((x =eq y) ⇒ provCodeC' (x =eq y)) := by
+  refine prf_deduction ?_
+  -- de la hipótesis `x=eq y`: igualdad de los códigos
+  have hcodeEq : PrfH [x =eq y] (formCode (Formula.eq x x) =eq formCode (Formula.eq x y)) :=
+    PrfH.mp _ _ _ (prf_to_prfH hcode _) (prfH_hyp_self _)
+  -- `provCodeC'(x=eq x)` demostrable (reflexividad)
+  have hrefl : PrfH [x =eq y] (provFromCode (formCode (Formula.eq x x))) :=
+    prf_to_prfH (repr_pos'_prf (prf_refl x)) _
+  -- transporta por el código vía Leibniz object (`provFromCode`)
+  exact PrfH.mp _ _ _
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcodeEq) hrefl
+
 /-! ### Combinador clave: elevar implicaciones object a implicaciones de demostrabilidad -/
 
 /-- **MP interno como esquema** (`pcc_imp`): de una implicación object cerrada
@@ -135,6 +177,7 @@ theorem pcc_allIn_cons (c x t : Term) :
 end ROBINSON_PlusPlus.Meta.Sigma1Prf
 
 export ROBINSON_PlusPlus.Meta.Sigma1Prf (
+  provFromCode provCodeC'_eq_provFromCode prf_provCode_congr pcc_eq_of_codeEq
   pcc_imp pcc_imp2 prf_in_cons_tail_imp prf_in_cons_head_imp
   pcc_in_head pcc_in_tail pcc_in_head_eq pcc_in_nil
   pcc_chainOk_nil prf_chainOk_cons_imp pcc_chainOk_cons

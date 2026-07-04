@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-24 — **Gödel Nivel D REAL — D1 finitaria completa (`repr_pos'_prf`) + teorema de deducción finitario + regla `qconf` + fix de solidez FOL**. Re-nivelación de la cadena HBL a `Prf`: **`repr_pos'_prf : Prf φ → Prf (provCodeC' φ)`** (`Meta/ArithPrf.lean` porte finitario de toda la aritmetización; `Meta/Representability2Prf.lean` tracking; `Meta/ReprPrf.lean` primitivos+esquemas; `#print axioms` = estándar + `prf_inAxC`). **`Meta/HilbertDeduction.lean`**: cálculo con contexto `PrfH` + teorema de deducción (`prf_deduction`) + eliminación del ∃ (`prf_ex_elim_imp`), caso `gen` cerrado vía el esquema de **confinamiento ∀ `qconf`** (`confinementFormula`/`confinement_derives` en `Hilbert.lean`; `Prf.qconf`/`Rule.qconf` integrados en el verificador, doble aritmetización legacy+runFn). **Fix de solidez (FOL):** `subst_lift_cancel_formula` era un `axiom` general FALSO → ahora **teorema** restringido verdadero; toolkit De Bruijn nuevo en `FOL/Theorems/Eq.lean` (`substFormula_lift_comm`, `liftTerm_comm_zero`, `subst_subst_lift_gen`, `substTerm_lift_comm_zero`, `substTerm_subst_lift_gen`). **47 módulos**, 0 sorrys, **60 jobs**. Pendiente Gödel II 100% real: **lema de Barendregt** (subst–subst niveles mixtos) → inducción de listas en `Prf` → `d2_prf`/`d3_prf`/`goedel_second_prf : ConsistentH → ¬ Prf Con'`. — (hito previo) **Primer Teorema de Gödel REAL sin postulados**. Cadena completa sobre el cálculo de Hilbert finitario `Prf`: `Hilbert`/`HilbertSeq` (cálculo + verificador decidible + `dem_tracks`), `CodeArith`/`SubstArith`/`StepArith` (aritmética de códigos + sustitución/lift De Bruijn), `CheckArith` (verificador object `validProofFn` **19 reglas** + `provFormulaC` Σ₁), **`Representability`** (`repr_pos : Prf φ → axioms ⊢ provCodeC φ`), **`Necessitation`** (D1 + Gödel I modular), **`Diagonal`** (`tc_arith` código-del-código + `diag_arith` + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`** + **`goedel_first_real`**), **`CodeDistinct`** (aritmética negativa `formCode_ne`), **`Induction`** (`ind_concl_code` → regla `ind` integrada, IΣ₁). Soundness de `thy` vía `coreAxioms`/`formCodeM` (`provCodeC` fiel). **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind`/`vpf_ind`): `provCodeC` rastrea **IΣ₁**. Todo extensión definicional de `Minimal.axioms`; `#print axioms` de los resultados Gödel = ω-reglas ambiente + `Full.ax_induction` (axioma legítimo de aritmética), **ningún postulado de derivabilidad**. **Hacia D2/D3/Gödel II** — verificador estructural **`runFn`/`chainOk`** (`Meta/ProofChain.lean`, R1–R3) + **D1 y D2 reales sobre `provCodeC'`**: **D2** (`Meta/DerivCond.lean`, `d2`) y **D1 = `repr_pos'`** (`Meta/Representability2.lean`, `Prf φ → ⊢ provCodeC' φ`; `#print axioms` = solo estándar) con validez fiel de las 19 reglas (`lineWF`/`premsOf`). **Gödel II — núcleo lógico** (`Meta/GodelTwo.lean`): `con_imp_godel'`/`goedel_second'` vía **D2 real** + **D3 postulado** (`d3`) + hipótesis explícitas (punto fijo, necesitación, ⊬G ω); mejora sobre legacy (postulaba D2 y D3). **Refactor `Prf.thy → axioms`** ✅ (`axiomsCodeT` opaco + `ax_inAxC`). **Punto fijo real** ✅ `godelC'_fixedpoint` + **Gödel I real estructural** `goedel_first_real'` (`Meta/DiagonalTwo.lean`). **42 módulos** (Minimal 11 + Meta 20 + Full 11), 0 sorrys, **56 jobs**. Pendiente Gödel II 100% real: **re-nivelar la cadena HBL a `Prf`** (Gödel II = `¬ Prf Con'`; `provCodeC'` rastrea Prf, no ω) + **D3 real** (Σ₁-completitud provable). Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
+**Last updated:** 2026-06-28 23:59 — **Gödel II finitario en `Prf` — D1/D2 reales + D3 reducida + infraestructura de reflexión Σ₁** (ver §3.17). Cadena HBL sobre `Prf`: **D1** `repr_pos'_prf`, **teorema de deducción** `prf_deduction`/`prf_ex_elim_imp` + `∃` en `PrfH` (`PrfH_ex_intro/elim`), reglas `qconf`/`listInd`/`ind` en el verificador, los **10 lemas de cadena** (`ChainPrf`, paso 8, vía `norm32`/`norm_s`/confinación), **D2** `d2_prf` (`Meta/DerivCondPrf.lean`, `#print axioms` = `[propext, choice, Quot.sound]`), **D3 reducida** `d3_prf_of_sigma1` (`Meta/ReflectionPrf.lean`, reduce D3 a la Σ₁-completitud `hC`/`hI`), e **infraestructura de reflexión Σ₁** (`Meta/Sigma1Prf.lean`: `pcc_imp` + combinadores `In`/`chainOk`/`allIn` + transporte `prf_provCode_congr`). **~52 módulos**, 0 sorrys, **65 jobs**, toolchain `v4.29.1`. Pendiente Gödel II 100% real: el **núcleo duro de D3** (Σ₁-completitud provable del verificador, reformulada al nivel del código object `tcFn`/`substfc` — "la bestia", Fase 5) → `goedel_second_prf : ConsistentH → ¬ Prf Con'`. — (hito previo, 2026-06-24) **Gödel Nivel D REAL — D1 finitaria completa (`repr_pos'_prf`) + teorema de deducción finitario + regla `qconf` + fix de solidez FOL**. Re-nivelación de la cadena HBL a `Prf`: **`repr_pos'_prf : Prf φ → Prf (provCodeC' φ)`** (`Meta/ArithPrf.lean` porte finitario de toda la aritmetización; `Meta/Representability2Prf.lean` tracking; `Meta/ReprPrf.lean` primitivos+esquemas; `#print axioms` = estándar + `prf_inAxC`). **`Meta/HilbertDeduction.lean`**: cálculo con contexto `PrfH` + teorema de deducción (`prf_deduction`) + eliminación del ∃ (`prf_ex_elim_imp`), caso `gen` cerrado vía el esquema de **confinamiento ∀ `qconf`** (`confinementFormula`/`confinement_derives` en `Hilbert.lean`; `Prf.qconf`/`Rule.qconf` integrados en el verificador, doble aritmetización legacy+runFn). **Fix de solidez (FOL):** `subst_lift_cancel_formula` era un `axiom` general FALSO → ahora **teorema** restringido verdadero; toolkit De Bruijn nuevo en `FOL/Theorems/Eq.lean` (`substFormula_lift_comm`, `liftTerm_comm_zero`, `subst_subst_lift_gen`, `substTerm_lift_comm_zero`, `substTerm_subst_lift_gen`). **47 módulos**, 0 sorrys, **60 jobs**. Pendiente Gödel II 100% real: **lema de Barendregt** (subst–subst niveles mixtos) → inducción de listas en `Prf` → `d2_prf`/`d3_prf`/`goedel_second_prf : ConsistentH → ¬ Prf Con'`. — (hito previo) **Primer Teorema de Gödel REAL sin postulados**. Cadena completa sobre el cálculo de Hilbert finitario `Prf`: `Hilbert`/`HilbertSeq` (cálculo + verificador decidible + `dem_tracks`), `CodeArith`/`SubstArith`/`StepArith` (aritmética de códigos + sustitución/lift De Bruijn), `CheckArith` (verificador object `validProofFn` **19 reglas** + `provFormulaC` Σ₁), **`Representability`** (`repr_pos : Prf φ → axioms ⊢ provCodeC φ`), **`Necessitation`** (D1 + Gödel I modular), **`Diagonal`** (`tc_arith` código-del-código + `diag_arith` + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`** + **`goedel_first_real`**), **`CodeDistinct`** (aritmética negativa `formCode_ne`), **`Induction`** (`ind_concl_code` → regla `ind` integrada, IΣ₁). Soundness de `thy` vía `coreAxioms`/`formCodeM` (`provCodeC` fiel). **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind`/`vpf_ind`): `provCodeC` rastrea **IΣ₁**. Todo extensión definicional de `Minimal.axioms`; `#print axioms` de los resultados Gödel = ω-reglas ambiente + `Full.ax_induction` (axioma legítimo de aritmética), **ningún postulado de derivabilidad**. **Hacia D2/D3/Gödel II** — verificador estructural **`runFn`/`chainOk`** (`Meta/ProofChain.lean`, R1–R3) + **D1 y D2 reales sobre `provCodeC'`**: **D2** (`Meta/DerivCond.lean`, `d2`) y **D1 = `repr_pos'`** (`Meta/Representability2.lean`, `Prf φ → ⊢ provCodeC' φ`; `#print axioms` = solo estándar) con validez fiel de las 19 reglas (`lineWF`/`premsOf`). **Gödel II — núcleo lógico** (`Meta/GodelTwo.lean`): `con_imp_godel'`/`goedel_second'` vía **D2 real** + **D3 postulado** (`d3`) + hipótesis explícitas (punto fijo, necesitación, ⊬G ω); mejora sobre legacy (postulaba D2 y D3). **Refactor `Prf.thy → axioms`** ✅ (`axiomsCodeT` opaco + `ax_inAxC`). **Punto fijo real** ✅ `godelC'_fixedpoint` + **Gödel I real estructural** `goedel_first_real'` (`Meta/DiagonalTwo.lean`). **42 módulos** (Minimal 11 + Meta 20 + Full 11), 0 sorrys, **56 jobs**. Pendiente Gödel II 100% real: **re-nivelar la cadena HBL a `Prf`** (Gödel II = `¬ Prf Con'`; `provCodeC'` rastrea Prf, no ω) + **D3 real** (Σ₁-completitud provable). Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md).
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.29.1
 
@@ -986,6 +986,112 @@ theorem vpf_nil/p1/p2/c1/c2/c3/j1/j2/j3/efq/q1/q2/q3/eqrefl/leibniz/p3   -- inco
 theorem vpf_mp (… h1 h2) / vpf_gen (… h1)   -- condicionales por pertenencia In
 def provFormulaC : Formula := Formula.ex (In (var 1) (validProofFn nil (var 0)))   -- demostrabilidad Σ₁
 noncomputable def provCodeC (φ) := substFormula 0 (formCode φ) provFormulaC
+```
+
+---
+
+### 3.17 Gödel II finitario en `Prf` — cadena HBL sobre `provCodeC'` (Fases 3–5)
+
+Re-nivelación de la cadena Hilbert-Bernays-Löb al cálculo finitario `Prf` (Gödel II es
+`¬ Prf Con'`; `provCodeC'` rastrea `Prf`, no ω). Predicado estructural fiel
+`provCodeC' φ := ∃p, chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)` (`Meta/ProofChain.lean`).
+
+**`Meta/HilbertDeduction.lean`** — namespace `…Meta.HilbertDeduction`:
+```lean
+inductive PrfH : List Formula → Formula → Prop   -- cálculo con contexto (espejo de Prf + hyp)
+theorem deduction_aux {Δ B} (h : PrfH Δ B) : ∀ A Γ, Δ = A :: Γ → PrfH Γ (A ⇒ B)
+theorem prf_deduction {A B} (h : PrfH [A] B) : Prf (A ⇒ B)
+theorem prf_ex_elim_imp {A C} (h : PrfH [A] (liftFormula 0 C)) : Prf (Formula.ex A ⇒ C)
+theorem prf_to_prfH {φ} (h : Prf φ) : ∀ Γ, PrfH Γ φ  ;  theorem prfH_hyp_self (A) : PrfH [A] A
+theorem PrfH_ex_intro {Γ A} (t) (h : PrfH Γ (substFormula 0 t A)) : PrfH Γ (Formula.ex A)   -- q2
+theorem PrfH_ex_elim {Γ A C} (hex : PrfH Γ (Formula.ex A))
+  (hbody : PrfH (A :: Γ.map (liftFormula 0)) (liftFormula 0 C)) : PrfH Γ C                   -- q3+gen
+-- #print axioms prf_deduction/prf_ex_elim_imp = [propext, Classical.choice, Quot.sound]
+```
+
+**`Meta/ArithPrf.lean`** / **`Meta/Representability2Prf.lean`** / **`Meta/ReprPrf.lean`** (Fase 3, D1):
+```lean
+theorem prf_substTerm_arith / prf_substTerms_arith / prf_liftTerm_arith   -- aritmética de códigos en Prf
+theorem prf_congr_substfc_arg2 / _arg3   -- congruencias de substfc
+theorem provCodeC'_intro_prf (φ) (p) (h1 : Prf (chainOk nil p)) (h2 : Prf (In (formCode φ) (runFn nil p)))
+  : Prf (provCodeC' φ)
+theorem repr_pos'_prf {φ} (h : Prf φ) : Prf (provCodeC' φ)   -- D1 finitaria (necesitación)
+-- ReprPrf: prf_runFn_nil/cons, prf_congr_runFn_1/2, prf_chainOk_nil/cons/subst1, prf_allIn_nil/cons,
+--   prf_in_cons_head/tail, prf_eq_trans/symm, prf_concat_nil_eq/cons_eq, prf_carc_cons, 32 lineWF/premsOf
+-- #print axioms repr_pos'_prf = [propext, Classical.choice, Quot.sound, prf_inAxC]
+```
+
+**`Meta/ChainPrf.lean`** (Fase 4, paso 8) — namespace `…Meta.ChainPrf`: **10 lemas de cadena en `Prf`**
+vía el eliminador de inducción de listas + normalización De Bruijn + confinación.
+```lean
+theorem prf_list_induction (Φ) (base : Prf (substFormula 0 nil Φ)) (step) : Prf (Formula.forall Φ)
+theorem norm21 (s t) : substTerm 0 s (liftTerm 2 (liftTerm 1 (liftTerm 0 t))) = liftTerm 1 (liftTerm 0 t)
+theorem norm32 (z t) : substTerm 1 z (liftTerm 3 (liftTerm 2 (liftTerm 0 (liftTerm 0 t))))
+  = liftTerm 2 (liftTerm 0 (liftTerm 0 t))                       -- profundidad 2 (para ∀c interno)
+theorem norm_s (z s) : substTerm 0 z (liftTerm 1 (liftTerm 2 (liftTerm 0 (liftTerm 0 s))))
+  = liftTerm 2 (liftTerm 0 (liftTerm 0 s))                       -- cancela lift de confinación
+theorem prf_concat_nil_right (X) : Prf (concat X nil =eq X)  ;  theorem prf_concat_assoc (M N L)
+theorem prf_In_mono (x c c0) (h : Prf (In x c)) : Prf (In x (concat c0 c))  ;  prf_In_mono_imp
+theorem prf_In_mono_right (x M L) (h : Prf (In x L)) : Prf (In x (concat L M))  ;  prf_In_mono_right_imp
+theorem prf_allIn_mono_imp / prf_lineOk_mono_imp / prf_chainOk_subst2
+theorem prf_runFn_concat (c p s) : Prf (runFn c (concat p s) =eq runFn (runFn c p) s)   -- keystone
+theorem prf_chainOk_mono_imp (c0 c p) : Prf (chainOk c p ⇒ chainOk (concat c0 c) p)
+theorem prf_runFn_weaken (c p) : Prf (runFn c p =eq concat c (runFn nil p))
+theorem prf_chainOk_concat (c p s) : Prf (chainOk c (concat p s) ⇔ land (chainOk c p) (chainOk (runFn c p) s))
+-- helpers PrfH: PrfH_spec, PrfH_and_intro/elim, PrfH_iff_mp/mpr, PrfH_eq_trans/symm,
+--   PrfH_or_elim, PrfH_congr_cons_head/tail/concat_left, PrfH_chainOk_subst1/2, PrfH_allIn_subst2,
+--   PrfH_eq_subst_in, PrfH_in_cons_head/tail
+-- #print axioms de todos = [propext, Classical.choice, Quot.sound]
+```
+
+**`Meta/DerivCondPrf.lean`** (Fase 4, D2) — namespace `…Meta.DerivCondPrf`:
+```lean
+theorem liftTerm_numeral / liftTerm_charsCode / liftTerm_strCode / liftTerm_termCode / liftTerm_formCode
+  -- clausura: los códigos de Gödel son cerrados (invariantes bajo liftTerm)
+theorem liftFormula_provCodeC' (c) (φ) : liftFormula c (provCodeC' φ) = provCodeC' φ
+theorem d2_prf (A B) : Prf (provCodeC' (A ⇒ B) ⇒ (provCodeC' A ⇒ provCodeC' B))   -- D2 finitaria real
+-- #print axioms d2_prf = [propext, Classical.choice, Quot.sound]   (sin postulados, ni prf_inAxC)
+```
+
+**`Meta/ReflectionPrf.lean`** (Fase 5, D3 reducida) — namespace `…Meta.ReflectionPrf`:
+```lean
+theorem PrfH_pcc_mp {Γ A B} (h1 : PrfH Γ (provCodeC' (A ⇒ B))) (h2 : PrfH Γ (provCodeC' A))
+  : PrfH Γ (provCodeC' B)                                        -- MP interno (D2), versión PrfH
+theorem PrfH_pcc_prf {Γ φ} (h : Prf φ) : PrfH Γ (provCodeC' φ)   -- D1 interno
+theorem PrfH_pcc_andIntro / PrfH_pcc_exIntro                     -- ∧-intro (c1) / ∃-intro (q2) internos
+theorem d3_prf_of_sigma1 (φ)
+  (hC : ∀ p, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p)))
+  (hI : ∀ x L, Prf (In x L ⇒ provCodeC' (In x L)))
+  : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))               -- D3 reducida a la Σ₁-completitud
+-- #print axioms d3_prf_of_sigma1 = [propext, Classical.choice, Quot.sound, prf_inAxC]
+```
+
+**`Meta/Sigma1Prf.lean`** (Fase 5, núcleo de D3) — namespace `…Meta.Sigma1Prf`: infraestructura de
+reflexión Σ₁ (hacia `hC`/`hI`).
+```lean
+theorem pcc_imp {A B} (h : Prf (A ⇒ B)) : Prf (provCodeC' A ⇒ provCodeC' B)   -- MP interno como esquema
+theorem pcc_imp2 {A B C} (h : Prf (A ⇒ (B ⇒ C))) : Prf (provCodeC' A ⇒ (provCodeC' B ⇒ provCodeC' C))
+def provFromCode (c : Term) : Formula := substFormula 0 c provFormulaC'   -- demostrabilidad de un código
+theorem provCodeC'_eq_provFromCode (φ) : provCodeC' φ = provFromCode (formCode φ)
+theorem prf_provCode_congr {c₁ c₂} (h : Prf (c₁ =eq c₂)) : Prf (provFromCode c₁ ⇒ provFromCode c₂)
+  -- la demostrabilidad respeta la igualdad de códigos (Leibniz object; [propext, choice, Quot.sound])
+theorem pcc_eq_of_codeEq (x y)
+  (hcode : Prf ((x =eq y) ⇒ (formCode (Formula.eq x x) =eq formCode (Formula.eq x y))))
+  : Prf ((x =eq y) ⇒ provCodeC' (x =eq y))   -- reflexión de igualdad REDUCIDA a la igualdad de códigos
+theorem pcc_in_head (x t) : Prf (provCodeC' (In x (cons x t)))   -- reflexión de In (base cabeza)
+theorem pcc_in_tail (hd x t) : Prf (provCodeC' (In x t) ⇒ provCodeC' (In x (cons hd t)))
+theorem pcc_in_head_eq (hd x t) : Prf (provCodeC' (x =eq hd) ⇒ provCodeC' (In x (cons hd t)))
+theorem pcc_in_nil (x) : Prf (In x nil ⇒ provCodeC' (In x nil))
+theorem pcc_chainOk_nil (c) : Prf (provCodeC' (chainOk c nil))
+theorem pcc_chainOk_cons (c line rest) : Prf (provCodeC' (lineOk c line) ⇒
+  (provCodeC' (chainOk (concat c (cons (carc line) nil)) rest) ⇒ provCodeC' (chainOk c (cons line rest))))
+theorem pcc_allIn_nil (c) : Prf (provCodeC' (allIn c nil))
+theorem pcc_allIn_cons (c x t) : Prf (provCodeC' (In x c) ⇒
+  (provCodeC' (allIn c t) ⇒ provCodeC' (allIn c (cons x t))))
+-- #print axioms pcc_imp = [propext, Classical.choice, Quot.sound, prf_inAxC]
+-- NOTA (núcleo duro pendiente): la reflexión de igualdad universal `∀x y` es indemostrable
+--   (obstrucción Tarski: `termCode` es meta, no object; solo vale para términos-código vía tcFn).
+--   La Σ₁-completitud real (`hC`/`hI`) debe reformularse al nivel del código object (tcFn/substfc).
 ```
 
 ---
