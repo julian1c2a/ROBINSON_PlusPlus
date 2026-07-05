@@ -14,11 +14,13 @@
 
 **Estado (2026-07-05, ~54 módulos, 68 jobs, Lean v4.31.0, 0 sorrys):**
 - ✅ D1 (`repr_pos'_prf`), D2 (`d2_prf`), y `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).
-- ✅ Opción A: **A‑F1** (`prf_tc_objList*`), **A‑F2** (`prf_provCodeC'_of_tracked_witness`, mecanismo central), **A‑F3 arrancado** (verificado que el verificador acepta líneas‑axioma Q2 con testigo‑código arbitrario; `prf_lineOk_q2` hecho), **A‑F4 cimientos** (`ExIntroCodePrf.lean`: clausuras De Bruijn `liftTerm_exc`/`liftFormula_provFromCode_exc`/`liftTerm_substfc`).
+- ✅ Opción A: **A‑F1** (`prf_tc_objList*`), **A‑F2** (`prf_provCodeC'_of_tracked_witness`, mecanismo central), **A‑F3 COMPLETO** (`pcc_exIntro_code (Ac w) (hAc hw) : Prf (provFromCode(substfc zero w Ac) ⇒ provFromCode(exc Ac))` en `ExIntroCodePrf.lean`; ensamblaje `p ++ [q2line, mpline]`, `#print axioms` = `[propext, choice, Quot.sound]` sin postulados), **A‑F4 cimientos** (clausuras De Bruijn `liftTerm_exc`/`liftFormula_provFromCode_exc`/`liftTerm_substfc`).
 
-**Próxima acción concreta (pieza grande, tipo `d2_prf`):**
-- **`pcc_exIntro_code (Ac w) : Prf (provFromCode(substfc zero w Ac) ⇒ provFromCode(exc Ac))`** — ensamblaje de cadena `q ++ [q2line, mpline]` (álgebra idéntica a la 2ª mitad de `d2_prf`), con la receta ya escrita en `Meta/ExIntroCodePrf.lean`. CUIDADO De Bruijn: lift de `Ac`/`w` bajo el binder ∃; reusar `liftTerm_formCode` + clausuras. `Ac`/`w` deben ser cerrados a TODO nivel (`Ac = formCode` ✓; ojo con `w = tcFn p` con `p` abstracto al integrar en d3).
-- Luego: **`hI_tracked`/`hC_tracked`** por inducción object (consecuente `substfc 0 (tcFn p)` rastrea `p`) → **`d3_prf`** → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
+**Próxima acción concreta:**
+
+- **`hI_tracked`/`hC_tracked`** por inducción object (consecuente `substfc 0 (tcFn p)` rastrea `p`), usando `pcc_exIntro_code` para el ∃‑intro rastreado del testigo → **`d3_prf`** → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
+
+> **Nota de ensamblaje `pcc_exIntro_code` (reusar en `hI/hC_tracked`):** el colapso De Bruijn tiene DOS ubicaciones con tratamiento OPUESTO. (1) Contexto post‑`prf_ex_elim_imp`: `liftTerm 0 (substfc zero w Ac)` NO tiene subst externa que lo cancele → colapsar con un `simp only [liftTerm_substfc …]` PREVIO al `simp` grande, MIENTRAS `zero` es literal (el patrón de la clausura lleva `zero`; si el `simp` grande lo despliega a `Term.func zero_sym []` el patrón deja de casar). (2) Target post‑`PrfH_ex_intro`: el slot `liftTerm 0 (exc Ac)` SÍ se cancela con la subst externa `substTerm 0 r (·)` vía `FOL.substTerm_liftTerm` → NO pre‑colapsar ahí. Recordatorio: `substTerm v s (.var v) = s` sin lift (FOL.lean:82).
 
 **Recordatorios de build (ver `feedback_*`):** compilar SIEMPRE desde RPP bajo v4.31.0 (nunca `cd FOL && lake build`); un build "Replayed" de caché puede ocultar errores en ediciones sin commitear.
 
