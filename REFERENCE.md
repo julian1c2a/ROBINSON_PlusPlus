@@ -1148,9 +1148,36 @@ theorem prf_provCodeC'_of_tracked_witness (A p) (hp : Prf (tcFn p =eq termCode p
   (h : Prf (provFromCode (substfc (numeral 0) (tcFn p) (formCode A)))) : Prf (provCodeC' (substFormula 0 p A))
   -- reflexión rastreada con testigo-código = provCodeC' real; el tcFn NO se absorbe (slot-término genuino)
 -- #print axioms = [propext, Classical.choice, Quot.sound]  (pcc_* añaden prf_inAxC, ancla de coding benigna)
--- MURO (Opción A en curso): hI/hC genéricos exigen redefinir la reflexión al nivel del código object
---   (substfc/tcFn rastreando el testigo). Ver GODEL-D3-TRACKED-DESIGN.md. A‑F1/A‑F2 hechos; falta
---   pcc_exIntro_code (∃-intro a nivel código, d2_prf-style) + hI/hC rastreados por inducción.
+theorem prf_lineOk_q2 (c Ac w) : Prf (lineOk c (cons (implc (substfc zero w Ac) (exc Ac))
+  (cons (numeralM 10) (cons Ac (cons w nil)))))   -- línea-axioma Q2 válida en cualquier contexto (A‑F3 base)
+```
+
+**`Meta/ExIntroCodePrf.lean`** (A‑F3/A‑F4) — namespace `…Meta.ExIntroCodePrf`: ∃‑intro de la
+regla Q2 al nivel de CÓDIGO + clausuras De Bruijn.
+
+```lean
+theorem liftTerm_exc (Ac) (hAc : ∀ c, liftTerm c Ac = Ac) : ∀ c, liftTerm c (exc Ac) = exc Ac
+theorem liftFormula_provFromCode_exc (Ac) (hAc) : liftFormula 0 (provFromCode (exc Ac)) = provFromCode (exc Ac)
+theorem liftTerm_substfc (Ac w) (hAc) (hw) : ∀ c, liftTerm c (substfc zero w Ac) = substfc zero w Ac
+theorem pcc_exIntro_code (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, liftTerm c w = w)
+  : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))
+  -- ∃-intro Q2 a nivel código, testigo-código arbitrario CERRADO; ensamblaje p ++ [q2line, mpline]
+  -- (tipo d2_prf). #print axioms = [propext, Classical.choice, Quot.sound] (sin postulados)
+```
+
+**`Meta/Sigma1TrackedPrf.lean`** (verificación RIESGO‑1) — namespace `…Meta.Sigma1TrackedPrf`:
+el ∃‑intro rastreado (`pcc_exIntro_code`, L1) cierra hasta `provCodeC'(∃A)` para testigo CERRADO.
+
+```lean
+theorem pcc_exIntro_code_bridge (A p) (hpc : ∀ c, liftTerm c p = p)
+  (h : Prf (provFromCode (substfc zero (tcFn p) (formCode A)))) : Prf (provCodeC' (Formula.ex A))
+  -- reconciliación definicional exc ⌜A⌝ = ⌜∃A⌝ (numeral 9 = succ⁹ zero)
+theorem pcc_exIntro_code_objList (A lines) (hclosed) (h) : Prf (provCodeC' (Formula.ex A))
+-- #print axioms = [propext, Classical.choice, Quot.sound]
+-- MURO (testigo ABSTRACTO): tcFn #0 NO es cerrado (hw falla) y todo combinador base produce
+--   termCode meta (transporte a tcFn stuck para lista abstracta) → hI_tracked abstracto exige la
+--   Opción A DE RAÍZ (provFormulaC'ₜ/provCodeC'ₜ con tcFn + D1ₜ). Ver GODEL-D3-TRACKED-DESIGN.md §4.2.
+--   Limpieza F7 BLOQUEADA hasta goedel_second_prf real (GodelTwo.goedel_second' aún usa axiom d3).
 ```
 
 ---

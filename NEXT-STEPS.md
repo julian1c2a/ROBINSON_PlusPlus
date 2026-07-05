@@ -12,15 +12,20 @@
 3. **`GODEL-D3-TRACKED-DESIGN.md`** — diseño detallado del refactor (diagnóstico del muro, Opción A vs B, fases A‑F0…A‑F7, riesgos).
 4. **`Meta/ExIntroCodePrf.lean`** — receta detallada, en comentarios, del ensamblaje de la próxima pieza.
 
-**Estado (2026-07-05, ~54 módulos, 68 jobs, Lean v4.31.0, 0 sorrys):**
+**Estado (2026-07-05b, ~56 módulos, 69 jobs, Lean v4.31.0, 0 sorrys):**
 - ✅ D1 (`repr_pos'_prf`), D2 (`d2_prf`), y `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).
-- ✅ Opción A: **A‑F1** (`prf_tc_objList*`), **A‑F2** (`prf_provCodeC'_of_tracked_witness`, mecanismo central), **A‑F3 COMPLETO** (`pcc_exIntro_code (Ac w) (hAc hw) : Prf (provFromCode(substfc zero w Ac) ⇒ provFromCode(exc Ac))` en `ExIntroCodePrf.lean`; ensamblaje `p ++ [q2line, mpline]`, `#print axioms` = `[propext, choice, Quot.sound]` sin postulados), **A‑F4 cimientos** (clausuras De Bruijn `liftTerm_exc`/`liftFormula_provFromCode_exc`/`liftTerm_substfc`).
+- ✅ Opción A: **A‑F1** (`prf_tc_objList*`), **A‑F2** (`prf_provCodeC'_of_tracked_witness`, mecanismo central), **A‑F3 COMPLETO** (`pcc_exIntro_code (Ac w) (hAc hw) : Prf (provFromCode(substfc zero w Ac) ⇒ provFromCode(exc Ac))` en `ExIntroCodePrf.lean`; `#print axioms` = `[propext, choice, Quot.sound]`), **A‑F4 cimientos** (clausuras De Bruijn). **Verificación concreta RIESGO‑1** (`Meta/Sigma1TrackedPrf.lean`): `pcc_exIntro_code_bridge`/`_objList` — el ∃‑intro rastreado cierra hasta `provCodeC'(∃A)` para testigo **cerrado**.
 
-**Próxima acción concreta:**
+**⚠ HALLAZGO (muro del testigo abstracto):** el puente cierra sólo para testigos **cerrados** (`tcFn p` cerrado sii `p` lo es → `hw` de `pcc_exIntro_code` se descarga). Para el testigo **abstracto** (`p = #0` tras `prf_ex_elim_imp`), `tcFn #0` NO es cerrado (`hw` falla) y, además, todo combinador base (`pcc_in_*`/`pcc_imp`/D1) produce códigos vía `termCode` **meta**; transportar a `tcFn` exige `tcFn L =eq termCode L`, **meta‑stuck para `L` abstracta**. **Conclusión: `hI_tracked` abstracto requiere la Opción A DE RAÍZ** (redefinir `provFormulaC'ₜ`/`provCodeC'ₜ` con `tcFn`/`substfc` desde el cuerpo Σ₁ + re‑derivar D1ₜ `repr_pos'_prfₜ`), no un lema incremental. Ver `GODEL-D3-TRACKED-DESIGN.md` §4.2.
 
-- **`hI_tracked`/`hC_tracked`** por inducción object (consecuente `substfc 0 (tcFn p)` rastrea `p`), usando `pcc_exIntro_code` para el ∃‑intro rastreado del testigo → **`d3_prf`** → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
+**Próxima acción concreta (Opción A de raíz):**
 
-> **Nota de ensamblaje `pcc_exIntro_code` (reusar en `hI/hC_tracked`):** el colapso De Bruijn tiene DOS ubicaciones con tratamiento OPUESTO. (1) Contexto post‑`prf_ex_elim_imp`: `liftTerm 0 (substfc zero w Ac)` NO tiene subst externa que lo cancele → colapsar con un `simp only [liftTerm_substfc …]` PREVIO al `simp` grande, MIENTRAS `zero` es literal (el patrón de la clausura lleva `zero`; si el `simp` grande lo despliega a `Term.func zero_sym []` el patrón deja de casar). (2) Target post‑`PrfH_ex_intro`: el slot `liftTerm 0 (exc Ac)` SÍ se cancela con la subst externa `substTerm 0 r (·)` vía `FOL.substTerm_liftTerm` → NO pre‑colapsar ahí. Recordatorio: `substTerm v s (.var v) = s` sin lift (FOL.lean:82).
+1. **`provFormulaC'ₜ`/`provCodeC'ₜ`** — cuerpo Σ₁ con el código de la conclusión rastreado por `tcFn` del testigo (no `varc 0`). + puente object `provCodeC' ↔ provCodeC'ₜ` para φ concreta (vía `prf_tc_form`, sin rehacer diagonal).
+2. **D1ₜ `repr_pos'_prfₜ : Prf φ → Prf (provCodeC'ₜ φ)`** — necesitación con testigo rastreado (re‑derivar `chainOk_track`/`runFn_track` en la capa `tcFn`).
+3. **`hI_tracked`/`hC_tracked`** por inducción object (consecuente `provFromCode(inFormCodeFn (tcFn·)(tcFn·))`, que **sí depende de `p`**; usar `prf_tc_cons` —computa `tcFn(cons a b)` abstractamente— + `prf_congr_tcFn`) → **`d3_prfₜ`** (∃‑intro rastreado nativo con `pcc_exIntro_code`) → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
+4. **Limpieza F7 BLOQUEADA** hasta (3): `GodelTwo.goedel_second'` aún depende de `axiom d3`; retirar los postulados legacy ahora rompería el núcleo actual de Gödel II.
+
+> **Nota De Bruijn (reusar en `hI/hC_tracked`):** colapso de lift con DOS ubicaciones OPUESTAS. (1) Contexto post‑`prf_ex_elim_imp`: `liftTerm 0 (substfc zero w Ac)` sin subst externa → colapsar con `simp only [liftTerm_substfc …]` PREVIO al `simp` grande, MIENTRAS `zero` es literal. (2) Target post‑`PrfH_ex_intro`: `liftTerm 0 (exc Ac)` se cancela con la subst externa `substTerm 0 r (·)` (`FOL.substTerm_liftTerm`) → NO pre‑colapsar. (`substTerm v s (.var v) = s` sin lift, FOL.lean:82.)
 
 **Recordatorios de build (ver `feedback_*`):** compilar SIEMPRE desde RPP bajo v4.31.0 (nunca `cd FOL && lake build`); un build "Replayed" de caché puede ocultar errores en ediciones sin commitear.
 

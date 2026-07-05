@@ -10,6 +10,35 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added (2026-07-05b) — Opción A: A‑F3 `pcc_exIntro_code` + verificación concreta (RIESGO‑1)
+
+- **`Meta/ExIntroCodePrf.lean`** — **A‑F3 COMPLETO**: **`pcc_exIntro_code (Ac w) (hAc hw) :
+  Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))`** — la regla Q2 (`A[t] ⇒ ∃A`)
+  reflejada al nivel de **código** con testigo‑código arbitrario (cerrado). Ensamblaje tipo
+  `d2_prf`: un testigo (`p = #0` de la hipótesis) + dos líneas apendizadas (línea‑axioma Q2 vía
+  `prf_lineOk_q2` + línea MP); álgebra de cadena idéntica a la 2ª mitad de `d2_prf`.
+  `#print axioms` = `[propext, Classical.choice, Quot.sound]` (sin postulados, ni `prf_inAxC`).
+  - **Hallazgo De Bruijn (reusable):** dos ubicaciones con tratamiento OPUESTO del colapso de
+    lift. (1) Contexto post‑`prf_ex_elim_imp`: `liftTerm 0 (substfc zero w Ac)` sin subst externa
+    → colapsar con `simp only [liftTerm_substfc …]` PREVIO al `simp` grande, MIENTRAS `zero` es
+    literal (el patrón de la clausura lleva `zero`). (2) Target post‑`PrfH_ex_intro`:
+    `liftTerm 0 (exc Ac)` se cancela con la subst externa `substTerm 0 r (·)` (`substTerm_liftTerm`)
+    → NO pre‑colapsar. (`substTerm v s (.var v) = s` sin lift, `FOL.lean:82`.)
+- **`Meta/Sigma1TrackedPrf.lean`** (NUEVO) — **verificación del ∃‑intro rastreado para testigos
+  CONCRETOS** (checkpoint RIESGO‑1 del diseño §7.1): **`pcc_exIntro_code_bridge`** (de
+  `provFromCode(substfc 0 (tcFn p) ⌜A⌝)` con `p` cerrado sale `provCodeC'(∃A)`, vía
+  `pcc_exIntro_code` + reconciliación definicional `exc ⌜A⌝ = ⌜∃A⌝` porque `numeral 9 = succ⁹ zero`)
+  + `pcc_exIntro_code_objList` (instancia con `objList lines`). `#print axioms` = estándar.
+- **HALLAZGO (el muro del testigo abstracto):** el puente cierra para testigos **cerrados**
+  (`tcFn p` cerrado sii `p` lo es → `hw` se descarga). Para el testigo **abstracto** (`p = #0`),
+  `tcFn #0` NO es cerrado y `hw` FALLA; además todo combinador base (`pcc_in_*`/`pcc_imp`/D1)
+  produce códigos vía `termCode` **meta**, y transportar a `tcFn` exige `tcFn L =eq termCode L`,
+  **meta‑stuck para `L` abstracta**. Conclusión: **`hI_tracked` abstracto requiere la Opción A de
+  raíz** (redefinir `provFormulaC'ₜ`/`provCodeC'ₜ` con `tcFn`/`substfc` + re‑derivar D1ₜ), no un
+  lema incremental. **Limpieza F7 (retirar `GodelTwo.d3`/legacy) sigue BLOQUEADA** hasta que
+  `goedel_second_prf` sea real (`goedel_second'` aún depende de `axiom d3`).
+- Build verde (**69 jobs**), 0 sorrys, Lean v4.31.0.
+
 ### Added (2026-07-05) — Opción A (D3 con testigo rastreado): A‑F1/A‑F2 + diseño
 
 - **`GODEL-D3-TRACKED-DESIGN.md`** (NUEVO) — diseño detallado del predicado de demostrabilidad con
