@@ -38,6 +38,11 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
   lema incremental. **Limpieza F7 (retirar `GodelTwo.d3`/legacy) sigue BLOQUEADA** hasta que
   `goedel_second_prf` sea real (`goedel_second'` aún depende de `axiom d3`).
 - Build verde (**69 jobs**), 0 sorrys, Lean v4.31.0.
+- **`Meta/TrackedCorePrf.lean`** (NUEVO) — arranque **Opción A de raíz**: **`liftFormula_provFromCode
+  (k c) (hc : ∀lvl, liftTerm lvl c = c)`** (clausura genérica de `provFromCode c` para código
+  cerrado arbitrario; generaliza `liftFormula_provCodeC'`/`liftFormula_provFromCode_exc`). Cimiento
+  de **D1ₜ** y del MP/∃ a nivel de código. Scaffold detallado del port D1ₜ (`repr_pos'_prfₜ`, el
+  cuello de botella) en `GODEL-D3-TRACKED-DESIGN.md` §10. Build verde (**70 jobs**), 0 sorrys.
 
 ### Added (2026-07-05) — Opción A (D3 con testigo rastreado): A‑F1/A‑F2 + diseño
 

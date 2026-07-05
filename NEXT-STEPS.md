@@ -18,12 +18,14 @@
 
 **⚠ HALLAZGO (muro del testigo abstracto):** el puente cierra sólo para testigos **cerrados** (`tcFn p` cerrado sii `p` lo es → `hw` de `pcc_exIntro_code` se descarga). Para el testigo **abstracto** (`p = #0` tras `prf_ex_elim_imp`), `tcFn #0` NO es cerrado (`hw` falla) y, además, todo combinador base (`pcc_in_*`/`pcc_imp`/D1) produce códigos vía `termCode` **meta**; transportar a `tcFn` exige `tcFn L =eq termCode L`, **meta‑stuck para `L` abstracta**. **Conclusión: `hI_tracked` abstracto requiere la Opción A DE RAÍZ** (redefinir `provFormulaC'ₜ`/`provCodeC'ₜ` con `tcFn`/`substfc` desde el cuerpo Σ₁ + re‑derivar D1ₜ `repr_pos'_prfₜ`), no un lema incremental. Ver `GODEL-D3-TRACKED-DESIGN.md` §4.2.
 
-**Próxima acción concreta (Opción A de raíz):**
+**Próxima acción concreta (Opción A de raíz — plan detallado en `GODEL-D3-TRACKED-DESIGN.md` §10):**
 
-1. **`provFormulaC'ₜ`/`provCodeC'ₜ`** — cuerpo Σ₁ con el código de la conclusión rastreado por `tcFn` del testigo (no `varc 0`). + puente object `provCodeC' ↔ provCodeC'ₜ` para φ concreta (vía `prf_tc_form`, sin rehacer diagonal).
-2. **D1ₜ `repr_pos'_prfₜ : Prf φ → Prf (provCodeC'ₜ φ)`** — necesitación con testigo rastreado (re‑derivar `chainOk_track`/`runFn_track` en la capa `tcFn`).
-3. **`hI_tracked`/`hC_tracked`** por inducción object (consecuente `provFromCode(inFormCodeFn (tcFn·)(tcFn·))`, que **sí depende de `p`**; usar `prf_tc_cons` —computa `tcFn(cons a b)` abstractamente— + `prf_congr_tcFn`) → **`d3_prfₜ`** (∃‑intro rastreado nativo con `pcc_exIntro_code`) → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
-4. **Limpieza F7 BLOQUEADA** hasta (3): `GodelTwo.goedel_second'` aún depende de `axiom d3`; retirar los postulados legacy ahora rompería el núcleo actual de Gödel II.
+0. ✅ **HECHO** `Meta/TrackedCorePrf.lean`: **`liftFormula_provFromCode`** (clausura genérica de `provFromCode c` para código cerrado arbitrario; cimiento de D1ₜ y del MP/∃ a nivel código).
+1. **D1ₜ `repr_pos'_prfₜ`** (el port GRANDE, multi‑sesión, cuello de botella): re‑derivar la representabilidad de `Representability2Prf.lean` (`proofCode'`/`runFn_track`/`chainOk_track` 19 casos) **emitiendo códigos `tcFn`** (object) en vez de `termCode` (meta) donde el argumento pueda ser abstracto. Motor: `prf_tc_cons`+`prf_congr_tcFn` (computan/congruencian `tcFn` ABSTRACTAMENTE). Constructores `tcFn`‑based por forma (`inFormCodeFn` ya existe para `In`; faltan `chainOk`/`land`/`lineOk`/`allIn`/`runFn`) con congruencia + clausura (`liftFormula_provFromCode`). Ver §10.2.
+2. **Combinadores rastreados** (`pcc_in_*`/`pcc_chainOk_*` sobre `provFromCode(inFormCodeFn (tcFn·)(tcFn·))`) — ya NO stuck una vez D1ₜ emite `tcFn` — → **`hI_tracked`/`hC_tracked`** por inducción object → **`d3_prf`** (∃‑intro con `pcc_exIntro_code`, ∧‑intro rastreado) → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
+3. **Limpieza F7 BLOQUEADA** hasta (2): `GodelTwo.goedel_second'` aún depende de `axiom d3`; retirar los postulados legacy ahora rompería el núcleo actual de Gödel II.
+
+> **Por qué D1ₜ es ineludible (verificado 2026‑07‑05b):** para el testigo abstracto, producir `provFromCode(código‑tcFn con lista abstracta)` desde D1 (`repr_pos'`) exige transportar `termCode L → tcFn L`, **stuck** para `L` abstracta (el elemento concreto `⌜φ⌝` sí transporta vía `prf_tc_form`). No hay atajo: hay que emitir `tcFn` nativamente en la representabilidad.
 
 > **Nota De Bruijn (reusar en `hI/hC_tracked`):** colapso de lift con DOS ubicaciones OPUESTAS. (1) Contexto post‑`prf_ex_elim_imp`: `liftTerm 0 (substfc zero w Ac)` sin subst externa → colapsar con `simp only [liftTerm_substfc …]` PREVIO al `simp` grande, MIENTRAS `zero` es literal. (2) Target post‑`PrfH_ex_intro`: `liftTerm 0 (exc Ac)` se cancela con la subst externa `substTerm 0 r (·)` (`FOL.substTerm_liftTerm`) → NO pre‑colapsar. (`substTerm v s (.var v) = s` sin lift, FOL.lean:82.)
 

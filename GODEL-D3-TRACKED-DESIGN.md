@@ -375,6 +375,57 @@ Con `d3_prf` cerrado, la cola es mecánica y ya prevista:
 
 ---
 
-*Fin del diseño. Ruta recomendada: Opción B, fases F1→F7, verificando L1 y el paso inductivo en
-testigos concretos (`objList lines`) antes del testigo abstracto; escalar a Opción A sólo si
-RIESGO‑1 se materializa.*
+## 10 · Plan de ejecución de la Opción A DE RAÍZ (D1ₜ) — confirmado 2026‑07‑05b
+
+**RIESGO‑1 se materializó** (verificación concreta en `Meta/Sigma1TrackedPrf.lean`): el ∃‑intro
+rastreado (`pcc_exIntro_code`) cierra para testigos **cerrados**, pero para el testigo **abstracto**
+`tcFn #0` no es cerrado y —lo decisivo— TODO combinador base (`pcc_in_*`/`pcc_imp`/D1 `repr_pos'`)
+emite el código vía **`termCode` meta**; transportar el 2º argumento (la lista abstracta `L`) de
+`termCode L` a `tcFn L` está **stuck**. El 1º argumento (elemento `⌜φ⌝`, concreto) sí transporta
+(`prf_tc_form`). **Conclusión firme: no hay atajo por D1+transporte.** Se ejecuta **Opción A de raíz**.
+
+### 10.1 Pieza hecha (cimiento)
+
+- `Meta/TrackedCorePrf.lean` — **`liftFormula_provFromCode (k c) (hc : ∀lvl, liftTerm lvl c = c)`**:
+  clausura genérica de `provFromCode c` para código cerrado arbitrario (generaliza
+  `liftFormula_provCodeC'` y `liftFormula_provFromCode_exc`). La usan D1ₜ y el MP/∃ a nivel código.
+
+### 10.2 D1ₜ — reconstruir la representabilidad emitiendo códigos `tcFn` (el port grande)
+
+Objetivo: **`repr_pos'_prfₜ`** que refleje átomos con el 2º argumento (lista) codificado por `tcFn`
+(no `termCode`), de modo que el consecuente **dependa del testigo** y la inducción sobre `p` funcione.
+
+Fuente a portar: `Meta/Representability2Prf.lean` (`proofCode'`, `prf_runFn_track`,
+`prf_chainOk_track` 19 casos, `provCodeC'_intro_prf`). Sustituir en la construcción del código de
+la prueba la `termCode` (meta) por **`tcFn`** (object) allí donde el argumento pueda ser abstracto
+(la lista de conclusiones / el testigo). Piezas concretas:
+
+1. **Constructores de código `tcFn`‑based** para cada forma que emite el tracking: `inFormCodeFn`
+   (ya existe, para `In`) + análogos para `chainOk`/`land`/`lineOk`/`allIn`/`runFn`, con sus
+   **congruencias** (patrón `prf_congr_inFormCodeFn`) y **clausura** (`liftFormula_provFromCode`).
+2. **`prf_tc_cons`/`prf_congr_tcFn`** (ya existen, computan/congruencian `tcFn` ABSTRACTAMENTE) son
+   el motor: `tcFn (cons a b)` se expresa por `tcFn a`, `tcFn b` sin exigir que sean códigos.
+3. **`runFn_trackₜ`/`chainOk_trackₜ`**: espejo de los 19 casos pero produciendo `provFromCode`
+   de códigos `tcFn`. El caso base y el paso usan los combinadores rastreados (§10.3).
+4. **`repr_pos'_prfₜ`**: ensamblaje final. `#print axioms` esperado = `[propext, choice, Quot.sound,
+   prf_inAxC]` (igual que `repr_pos'_prf`).
+
+### 10.3 Combinadores rastreados (F1, ahora sí sobre D1ₜ)
+
+Con D1ₜ disponible, `pcc_in_head/tail/nil` y `pcc_chainOk_*` en versión
+`provFromCode(inFormCodeFn (tcFn·)(tcFn·))` se derivan (ya no stuck, porque D1ₜ emite `tcFn`).
+Luego **`hI_tracked`/`hC_tracked`** por inducción object sobre `p` (`prf_list_induction`), con el
+consecuente rastreado (§4.4). Cierre `d3_prf` (∃‑intro con `pcc_exIntro_code`, ∧‑intro rastreado)
+→ punto fijo (`godelC_fixedpoint`) + necesitación → **`goedel_second_prf`** → limpieza F7.
+
+### 10.4 Orden de commits (cada uno verde)
+
+`liftFormula_provFromCode` ✅ → constructores `tcFn` + congruencias/clausura → `runFn_trackₜ`/
+`chainOk_trackₜ` → `repr_pos'_prfₜ` (D1ₜ) → combinadores rastreados → `hI/hC_tracked` → `d3_prf` →
+`goedel_second_prf` → F7.
+
+---
+
+*Fin del diseño. Ruta CONFIRMADA (2026‑07‑05b): **Opción A de raíz** (§10). El cimiento
+`liftFormula_provFromCode` está hecho; el port `repr_pos'_prfₜ` (D1ₜ, §10.2) es el trabajo grande
+restante y es multi‑sesión.*
