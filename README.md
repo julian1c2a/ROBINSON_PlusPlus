@@ -1,6 +1,6 @@
 # ROBINSON_PlusPlus
 
-[![Lean 4](https://img.shields.io/badge/Lean-v4.29.1-blue)](https://leanprover.github.io/)
+[![Lean 4](https://img.shields.io/badge/Lean-v4.31.0-blue)](https://leanprover.github.io/)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](CURRENT-STATUS-PROJECT.md)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 [![Coverage](https://img.shields.io/badge/proofs-in%20progress-yellow)](CURRENT-STATUS-PROJECT.md)
@@ -55,7 +55,7 @@ ROBINSON_PlusPlus/
 │       ├── Block6.lean        # Listas (cons_neq_nil, concat_assoc, in_concat)
 │       ├── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
 │       └── Block8.lean        # Primos y factorización (Dvd, IsPrime, IsFactorization, Ax-P TFA)
-├── Meta/                      # (Próximo, 2026-06-07+) Gödelización: G, ⌜·⌝, Teo G1, IsFormula, Dem
+├── Meta/                      # Gödelización + Gödel I/II en `Prf`: G, ⌜·⌝, incompletitud, cadena HBL (D1/D2, D3 en curso)
 ├── Intermediate/              # (Planned, paralelo a Meta/) System with restricted induction
 └── Full/                      # (Planned) System with full Peano induction
 ```
@@ -157,4 +157,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-06-27 — Build ✅ **0 sorrys** (63 jobs). **~50 módulos** (Minimal/ 11 + Meta/ 27 + Full/ 11 + barrels). **Minimal/** (34 axiomas, sin inducción) cierra Bloques I–VIII + TFA. **Full/** (inducción general) deriva ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 y cierra el **Teorema Fundamental de la Aritmética** (`tfa_numeral`). **Meta/** formaliza la Gödelización completa: codificación, demostrabilidad, los **dos Teoremas de Incompletitud**, y el **Nivel D REAL** sobre un cálculo de Hilbert finitario `Prf`. **Primer Teorema de Gödel REAL sin postulados**: verificador `validProofFn`/`runFn` sólido → `repr_pos`/D1 → **lema diagonal real** (`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) → **`goedel_first_real : ConsistentOmega → ¬ Prf G`**. **Hacia Gödel II REAL**: D1 finitaria (`repr_pos'_prf`), teorema de deducción finitario (`HilbertDeduction`), reglas `qconf`/`listInd`/`ind` integradas, los **10 lemas de cadena en `Prf`** (paso 8), y **`d2_prf` — D2 finitaria real** (`Prf (provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B))`, `#print axioms` = `[propext, choice, Quot.sound]`, sin postulados). Pendiente: `d3_prf` (Σ₁-completitud) → `goedel_second_prf : ConsistentH → ¬ Prf Con'`. Ver `GODEL-D-ARITHMETIZATION.md`. Las meta-reglas ω viven en `FOL/MetaRules.lean`.*
+*Last updated: 2026-07-05 — Build ✅ **0 sorrys** (67 jobs), Lean **v4.31.0** (política: última estable). **~54 módulos** (Minimal/ 11 + Meta/ 30 + Full/ 11 + barrels). **Minimal/** (34 axiomas, sin inducción) cierra Bloques I–VIII + TFA. **Full/** (inducción general) deriva ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 y cierra el **Teorema Fundamental de la Aritmética** (`tfa_numeral`). **Meta/** formaliza la Gödelización completa: codificación, demostrabilidad, los **dos Teoremas de Incompletitud**, y el **Nivel D REAL** sobre un cálculo de Hilbert finitario `Prf`. **Primer Teorema de Gödel REAL sin postulados**: verificador `validProofFn`/`runFn` sólido → `repr_pos`/D1 → **lema diagonal real** (`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) → **`goedel_first_real : ConsistentOmega → ¬ Prf G`**. **Hacia Gödel II REAL**: **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) finitarias reales sin postulados; **D3** reducida (`d3_prf_of_sigma1`) a la Σ₁-completitud del verificador (`hC`/`hI`). En curso (**Opción A**, ver `GODEL-D3-TRACKED-DESIGN.md`): predicado de demostrabilidad con **testigo rastreado** (`tcFn`/`substfc`) para cerrar `hI`/`hC` → `d3_prf` → `goedel_second_prf : ConsistentH → ¬ Prf Con'`. Las meta-reglas ω viven en `FOL/MetaRules.lean`.*
