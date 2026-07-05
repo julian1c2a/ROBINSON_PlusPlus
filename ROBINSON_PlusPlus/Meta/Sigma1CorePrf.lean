@@ -234,6 +234,25 @@ theorem prf_provCodeC'_of_tracked_witness (A : Formula) (p : Term)
   have hchain := prf_eq_trans hcongr harith
   exact prf_mp (prf_provCode_congr hchain) h
 
+/-! ### A‑F3 — hacia `pcc_exIntro_code` (∃‑intro a nivel de código)
+
+**Verificación (2026‑07‑05):** el verificador SÍ acepta líneas‑axioma **Q2** con testigo‑código
+arbitrario: `ax_lineWF_q2` da `lineWF ⌜concl,10,A,t⌝ ⇔ (concl =eq implc (substfc 0 t A) (exc A))`
+y `ax_premsOf_q2` da `premsOf = nil` (axioma, sin premisas de contexto). Por tanto una línea Q2
+con `t := tcFn p` (código arbitrario) es **incondicionalmente válida** y concluye
+`implc (substfc 0 (tcFn p) ⌜A⌝) (exc ⌜A⌝)` = `⌜A[tcFn p] ⇒ ∃A⌝`. Primer ladrillo: la validez de
+la línea Q2 en cualquier contexto (`lineOk`), precursor del ensamblaje tipo `d2_prf`. -/
+
+/-- **Validez de una línea Q2** en cualquier contexto `c`: `lineOk c (q2line)` donde
+    `q2line = ⟨implc (substfc 0 w Ac) (exc Ac), 10, Ac, w⟩`. `lineWF` por `prf_lineWF_q2`
+    (reflexividad de la conclusión), sin premisas (`prf_premsOf_q2` → `allIn c nil`). -/
+theorem prf_lineOk_q2 (c Ac w : Term) :
+    Prf (lineOk c (cons (implc (substfc zero w Ac) (exc Ac))
+      (cons (numeralM 10) (cons Ac (cons w nil))))) :=
+  prf_and_intro
+    (prf_iff_mpr (prf_lineWF_q2 _ Ac w) (prf_refl _))
+    (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q2 _ Ac w)) (prf_allIn_nil c))
+
 end ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
@@ -244,4 +263,5 @@ export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
   prf_runFn_objList prf_runFn_nil_objList pcc_in_runFn_objList
   prf_tc_objList prf_tc_objList_formCode
   prf_provCodeC'_of_tracked_witness
+  prf_lineOk_q2
 )
