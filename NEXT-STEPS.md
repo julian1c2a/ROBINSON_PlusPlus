@@ -8,9 +8,9 @@
 
 **Para arrancar una sesión nueva, leer en este orden:**
 1. **`MEMORY.md`** (índice de memoria; carga los `project_*.md` / `feedback_*.md`) — estado global y hallazgos.
-2. **Este `NEXT-STEPS.md`** (cabecera "Last updated: 2026-07-05") — qué está hecho y qué sigue.
-3. **`GODEL-D3-TRACKED-DESIGN.md`** — diseño detallado del refactor (diagnóstico del muro, Opción A vs B, fases A‑F0…A‑F7, riesgos).
-4. **`Meta/ExIntroCodePrf.lean`** — receta detallada, en comentarios, del ensamblaje de la próxima pieza.
+2. **Este `NEXT-STEPS.md`** (bloque de reanudación + "Last updated: 2026-07-05b") — qué está hecho y qué sigue.
+3. **`GODEL-D3-TRACKED-DESIGN.md` §10** — plan de ejecución de la **Opción A de raíz** (D1ₜ): por qué es ineludible + orden de commits (§10.4).
+4. **`Meta/TrackedCorePrf.lean`** (cimiento D1ₜ hecho) y **`Meta/Representability2Prf.lean`** (la fuente a portar a la capa `tcFn`).
 
 **Estado (2026-07-05b, ~56 módulos, 69 jobs, Lean v4.31.0, 0 sorrys):**
 - ✅ D1 (`repr_pos'_prf`), D2 (`d2_prf`), y `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).
