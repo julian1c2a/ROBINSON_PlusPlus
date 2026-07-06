@@ -497,7 +497,67 @@ primer paso NO es código sino la **decisión de codificación del testigo (§11
 
 ---
 
-*Fin del diseño. Ruta CONFIRMADA (2026‑07‑05c): la **Opción A `tcFn` (§10) queda descartada** para
-el paso abstracto (§11.2); la vía genuina es la **Σ₁‑completitud provable estándar** (§11.3), cuyo
-primer paso es fijar la codificación del testigo‑como‑número. Alternativa honesta siempre
-disponible: consolidar Gödel II módulo el axioma D3 (§11.4).*
+## 12 · Diseño de la codificación del testigo (2026‑07‑05d)
+
+**Encargo:** fijar cómo se codifica el testigo (cadena de prueba) para la Σ₁‑completitud provable.
+
+### 12.1 Hallazgo central: la codificación del testigo ≡ la representación del verificador
+
+La decisión NO es aislable. La Σ₁‑completitud provable estándar exige que `δ(φ,p)` sea **genuinamente
+Δ₀‑sobre‑números** (cuantificadores acotados sobre una secuencia codificada por número), porque la
+inducción de provable Δ₀‑completitud es **estructural sobre la fórmula** y su caso atómico usa
+**evaluación provable de términos numéricos**. Pero nuestro verificador (`runFn`/`chainOk`/`In`/`carc`/
+`cdrc`) es **recursión estructural sobre listas `cons`/`nil`**, SIN indexación numérica ni
+cuantificación acotada (verificado: sólo existen `carc`/`cdrc`, no `len`/`nth`/`_lt_len`). Es decir,
+`δ` **no está en forma Δ₀‑sobre‑números**, y la maquinaria estándar no se le aplica directamente.
+
+### 12.2 Por qué la inducción de listas naíf (mantener el testigo‑lista) NO cierra
+
+Intento: probar `⊢ ∀p (In ⌜φ⌝ (runFn nil p) → provFromCode(substfc 0 (tcFn p) ⌜In ⌜φ⌝ (runFn nil ·)⌝))`
+por inducción object sobre `p`. En **concreto** `p₀` el consecuente =eq `provCodeC'(In ⌜φ⌝ (runFn nil p₀))`
+(vía `substFormula_arith` + `tcFn p₀ =eq termCode p₀`), demostrable (`pcc_in_runFn_objList`). Pero el
+**paso** `p = cons line rest`, caso cola, requiere pasar de la IH
+`provFromCode(substfc 0 (tcFn rest) ⌜body⌝)` al objetivo `provFromCode(substfc 0 (tcFn (cons line rest)) ⌜body⌝)`:
+son códigos con **testigos DISTINTOS** (`tcFn rest` vs `tcFn (cons line rest)`) → codifican fórmulas
+distintas (`In ⌜φ⌝ (runFn nil rest)` vs `In ⌜φ⌝ (runFn nil (cons line rest))`). `pcc_imp` (D2+D1) sube
+implicaciones object PERO sobre el **mismo** código sustituido; aquí el testigo cambia, así que no aplica.
+La monotonía object `In x (runFn nil rest) ⇒ In x (runFn nil (cons line rest))` existe, pero su reflexión
+mezcla dos sustituciones‑testigo → no hay combinador que lo cierre. **Confirmado: la vía testigo‑lista +
+`substfc`/`tcFn` no cierra el paso inductivo** (mismo muro que §11.2, ahora en el paso cola).
+
+### 12.3 Opciones de codificación (con tradeoffs honestos)
+
+| Opción | Idea | Coste | Riesgo |
+|---|---|---|---|
+| **12‑A · β‑función / secuencia** | Codificar la cadena como UN número (secuencia Gödel β), re‑expresar `runFn`/`chainOk`/`In`/`carc` como fórmulas **Δ₀‑sobre‑números** (∃/∀ acotados + `β`). Aplicar provable Δ₀‑completitud estándar. | **Alto**: nuevo verificador numérico + re‑derivar D1 para él (o probar equivalencia con el de listas). | Bajo (es la construcción de libro; **funciona seguro**). |
+| **12‑B · testigo‑lista + inducción** | Mantener listas, inducción object sobre `p`. | Medio | **Alto → descartada** (§12.2: paso cola no cierra). |
+| **12‑C · tracking por POSICIÓN** | Reflejar `In ⌜φ⌝ (runFn nil p)` vía la **posición** `i` de `⌜φ⌝` (∃ acotado, testigo = número `i`, que `num` maneja limpio), no el testigo‑lista entero. | Medio‑alto: exige `len`/`nth` object + su Δ₀‑ización + relación con `carc`/`cdrc`. | Medio (aún necesita indexación numérica que no existe). |
+
+### 12.4 Recomendación
+
+**12‑A (β‑función)** es la única con riesgo bajo y es la construcción canónica. Implica reconocer que
+**cerrar D3 real = dotar al verificador de una capa numérica Δ₀** (indexación acotada + β), sobre la
+que la Σ₁‑completitud provable es mecánica‑estándar. Es un desarrollo grande (varias sesiones) y de
+hecho **coincide en gran parte con la Opción 3** (reformular el verificador sobre números) — la
+codificación del testigo y la representación del verificador son la misma decisión (§12.1).
+
+**Plan 12‑A por fases (cada una verde):**
+
+1. **Capa numérica de listas**: `lenc`/`nthc` object (longitud/índice de una lista‑código) + ecuaciones
+   (recursión `carc`/`cdrc`) + `In x L ⇔ ∃i<lenc L. nthc L i =eq x` (caracterización acotada).
+2. **β / secuencia**: reusar la codificación existente (las listas YA son números‑código) — probar que
+   `runFn`/`chainOk` se expresan con `∃/∀` acotados sobre índices (Δ₀).
+3. **`num` (numeral‑de) + `substfc`‑var‑equations**: provable evaluación de términos y provable
+   Δ₀‑completitud atómica (`=`,`<`,`In`‑acotado).
+4. **Inducción estructural Δ₀‑completitud** → `⊢ ∀p (δ(φ,p) → Prov(⌜δ(φ,ṗ)⌝))`.
+5. **∃‑intro** (`pcc_exIntro_code`) → `d3_prf` → `goedel_second_prf` → F7.
+
+**Alternativa (§11.4):** si el coste de 12‑A no compensa, consolidar Gödel II módulo el axioma D3 es un
+cierre honesto y publicable.
+
+---
+
+*Fin del diseño. Estado 2026‑07‑05d: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
+(§12.2); vía recomendada **12‑A (β‑función / capa numérica Δ₀ del verificador)** — grande pero segura;
+alternativa honesta = Gödel II módulo axioma D3 (§11.4). La codificación del testigo ≡ dotar al
+verificador de indexación numérica acotada (§12.1).*
