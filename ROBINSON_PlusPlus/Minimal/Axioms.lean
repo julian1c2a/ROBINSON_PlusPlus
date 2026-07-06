@@ -725,6 +725,31 @@ def cdrc (l : Term) : Term := Term.func "cdrc" [l]
 def ax_carc : Formula := forall_2 (carc (cons (.var 1) (.var 0)) =eq (.var 1))
 def ax_cdrc : Formula := forall_2 (cdrc (cons (.var 1) (.var 0)) =eq (.var 0))
 
+/-! ### Capa numérica de listas: longitud `lenc` e índice `nthc` (Nivel D, D3 vía Σ₁-completitud)
+
+Hacia la **Σ₁-completitud provable** (D3 real, plan `GODEL-D3-TRACKED-DESIGN.md` §12‑A): dotar al
+verificador de listas de una **capa numérica Δ₀** (longitud e indexación acotada), sobre la que la
+membresía `In` admite la caracterización acotada `In x L ⇔ ∃ i < lenc L. nthc L i =eq x`. Son
+funciones object con recursión estructural sobre `cons`/`nil` (extensión definicional conservadora,
+como `carc`/`cdrc`). -/
+
+/-- Longitud (número de elementos) de una lista‑código. -/
+def lenc (l : Term) : Term := Term.func "lenc" [l]
+/-- `i`-ésimo elemento (base 0) de una lista‑código. -/
+def nthc (l i : Term) : Term := Term.func "nthc" [l, i]
+
+/-- `lenc nil = 0`. -/
+def ax_lenc_nil : Formula := lenc nil =eq zero
+/-- `lenc (cons h t) = σ (lenc t)`. -/
+def ax_lenc_cons : Formula :=
+  forall_2 (lenc (cons (.var 1) (.var 0)) =eq succ (lenc (.var 0)))
+/-- `nthc (cons h t) 0 = h`. -/
+def ax_nthc_zero : Formula :=
+  forall_2 (nthc (cons (.var 1) (.var 0)) zero =eq (.var 1))
+/-- `nthc (cons h t) (σ i) = nthc t i`. -/
+def ax_nthc_succ : Formula :=
+  forall_3 (nthc (cons (.var 2) (.var 1)) (succ (.var 0)) =eq nthc (.var 1) (.var 0))
+
 /-! ### Verificador estructural `runFn` (Nivel D real — Fase R, D2/D3)
 
 `runFn checked rest` acumula las **conclusiones** de una secuencia de líneas;
@@ -1238,7 +1263,8 @@ def axioms : List Formula := [
   ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
   ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
   ax_lineWF_qconf, ax_premsOf_qconf,
-  ax_lineWF_listInd, ax_premsOf_listInd
+  ax_lineWF_listInd, ax_premsOf_listInd,
+  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1264,7 +1290,8 @@ def codingAxioms : List Formula := [
   ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
   ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
   ax_lineWF_qconf, ax_premsOf_qconf,
-  ax_lineWF_listInd, ax_premsOf_listInd
+  ax_lineWF_listInd, ax_premsOf_listInd,
+  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/
