@@ -15,6 +15,7 @@ open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.Sigma1CorePrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -52,8 +53,82 @@ theorem liftFormula_provFromCode (k : Nat) (c : Term) (hc : ∀ lvl, liftTerm lv
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hc]
 
+/-!
+### Constructores de código `tcFn`‑based para átomos binarios (§10.2, paso 1)
+
+Todas las formas que el tracking refleja son **átomos binarios** `Formula.atom s [a, b]`
+(`In`/`chainOk`/`allIn`), con el mismo esqueleto de código `⟨3, ⌜s⌝, [⌜a⌝, ⌜b⌝]⟩`. Generalizamos
+el `inFormCodeFn` de `Sigma1CorePrf` (que era el caso `In`) a un **constructor object único**
+`atom2CodeFn s a b`, con su puente definicional con `formCode`, su **congruencia** Leibniz y su
+**clausura** (cerrado si los argumentos lo son). Son las piezas que D1ₜ emitirá para reflejar
+`chainOk`/`In`/`allIn` con los argumentos rastreados por `tcFn` (en vez de `termCode` meta). -/
+
+/-- Constructor object del código de un **átomo binario** `Formula.atom s [a, b]` a partir de los
+    códigos `a`, `b` de sus argumentos: `⟨3, ⌜s⌝, [a, b]⟩`. Generaliza `inFormCodeFn` (s = `∈`). -/
+def atom2CodeFn (s : String) (a b : Term) : Term :=
+  cons (numeral 3) (cons (strCode s) (cons (cons a (cons b nil)) nil))
+
+/-- **Puente definicional**: con los códigos meta `termCode` de los argumentos, `atom2CodeFn`
+    coincide con `formCode` del átomo (por definición de `formCode` sobre `.atom`). -/
+theorem atom2CodeFn_termCode (s : String) (a b : Term) :
+    atom2CodeFn s (termCode a) (termCode b) = formCode (Formula.atom s [a, b]) := rfl
+
+/-- `inFormCodeFn` es la instancia `s = in_sym` de `atom2CodeFn` (definicional). -/
+theorem inFormCodeFn_eq_atom2 (xc Lc : Term) :
+    inFormCodeFn xc Lc = atom2CodeFn in_sym xc Lc := rfl
+
+/-- **Clausura** de `atom2CodeFn s a b` bajo `liftTerm`: cerrado si `a`, `b` lo son
+    (el resto — `numeral 3`/`strCode s`/`cons`/`nil` — es cerrado). -/
+theorem liftTerm_atom2CodeFn (s : String) (a b : Term)
+    (ha : ∀ lvl, liftTerm lvl a = a) (hb : ∀ lvl, liftTerm lvl b = b) :
+    ∀ lvl, liftTerm lvl (atom2CodeFn s a b) = atom2CodeFn s a b := by
+  intro lvl
+  simp only [atom2CodeFn, cons, nil, zero, liftTerm, liftTerms,
+    liftTerm_numeral, liftTerm_strCode, ha lvl, hb lvl]
+
+/-- **Congruencia** de `atom2CodeFn` en ambos argumentos (`Prf`). -/
+theorem prf_congr_atom2CodeFn {s : String} {a a' b b' : Term}
+    (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
+    Prf (atom2CodeFn s a b =eq atom2CodeFn s a' b') := by
+  unfold atom2CodeFn
+  exact prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head
+    (prf_eq_trans (prf_congr_cons_head ha) (prf_congr_cons_tail (prf_congr_cons_head hb)))))
+
+/-- **Transporte** de la demostrabilidad de un átomo binario por igualdad de los códigos de sus
+    argumentos (Leibniz object vía `provFromCode`). Generaliza `prf_provFromCode_In_congr`. -/
+theorem prf_provFromCode_atom2_congr {s : String} {a a' b b' : Term}
+    (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
+    Prf (provFromCode (atom2CodeFn s a b) ⇒ provFromCode (atom2CodeFn s a' b')) :=
+  prf_provCode_congr (prf_congr_atom2CodeFn ha hb)
+
+/-- **Clausura** de `provFromCode (atom2CodeFn s a b)` bajo `liftFormula` (args cerrados). -/
+theorem liftFormula_provFromCode_atom2 (k : Nat) (s : String) (a b : Term)
+    (ha : ∀ lvl, liftTerm lvl a = a) (hb : ∀ lvl, liftTerm lvl b = b) :
+    liftFormula k (provFromCode (atom2CodeFn s a b)) = provFromCode (atom2CodeFn s a b) :=
+  liftFormula_provFromCode k (atom2CodeFn s a b) (liftTerm_atom2CodeFn s a b ha hb)
+
+/-! ### Instancias `chainOk` / `allIn` (los otros átomos del cuerpo Σ₁) -/
+
+/-- Constructor object del código de `chainOk c p` desde los códigos `cc`, `pc`. -/
+def chainOkCodeFn (cc pc : Term) : Term := atom2CodeFn "chainOk" cc pc
+
+/-- Puente `chainOkCodeFn (termCode c) (termCode p) = formCode (chainOk c p)` (rfl). -/
+theorem chainOkCodeFn_termCode (c p : Term) :
+    chainOkCodeFn (termCode c) (termCode p) = formCode (chainOk c p) := rfl
+
+/-- Constructor object del código de `allIn c L` desde los códigos `cc`, `Lc`. -/
+def allInCodeFn (cc Lc : Term) : Term := atom2CodeFn "allIn" cc Lc
+
+/-- Puente `allInCodeFn (termCode c) (termCode L) = formCode (allIn c L)` (rfl). -/
+theorem allInCodeFn_termCode (c L : Term) :
+    allInCodeFn (termCode c) (termCode L) = formCode (allIn c L) := rfl
+
 end ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
 export ROBINSON_PlusPlus.Meta.TrackedCorePrf (
   liftFormula_provFromCode
+  atom2CodeFn atom2CodeFn_termCode inFormCodeFn_eq_atom2
+  liftTerm_atom2CodeFn prf_congr_atom2CodeFn prf_provFromCode_atom2_congr
+  liftFormula_provFromCode_atom2
+  chainOkCodeFn chainOkCodeFn_termCode allInCodeFn allInCodeFn_termCode
 )
