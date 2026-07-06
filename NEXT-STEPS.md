@@ -20,10 +20,11 @@
 
 **Próxima acción concreta (Opción A de raíz — plan detallado en `GODEL-D3-TRACKED-DESIGN.md` §10):**
 
-0. ✅ **HECHO** `Meta/TrackedCorePrf.lean`: **`liftFormula_provFromCode`** (clausura genérica de `provFromCode c` para código cerrado arbitrario; cimiento de D1ₜ y del MP/∃ a nivel código).
-1. **D1ₜ `repr_pos'_prfₜ`** (el port GRANDE, multi‑sesión, cuello de botella): re‑derivar la representabilidad de `Representability2Prf.lean` (`proofCode'`/`runFn_track`/`chainOk_track` 19 casos) **emitiendo códigos `tcFn`** (object) en vez de `termCode` (meta) donde el argumento pueda ser abstracto. Motor: `prf_tc_cons`+`prf_congr_tcFn` (computan/congruencian `tcFn` ABSTRACTAMENTE). Constructores `tcFn`‑based por forma (`inFormCodeFn` ya existe para `In`; faltan `chainOk`/`land`/`lineOk`/`allIn`/`runFn`) con congruencia + clausura (`liftFormula_provFromCode`). Ver §10.2.
-2. **Combinadores rastreados** (`pcc_in_*`/`pcc_chainOk_*` sobre `provFromCode(inFormCodeFn (tcFn·)(tcFn·))`) — ya NO stuck una vez D1ₜ emite `tcFn` — → **`hI_tracked`/`hC_tracked`** por inducción object → **`d3_prf`** (∃‑intro con `pcc_exIntro_code`, ∧‑intro rastreado) → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
-3. **Limpieza F7 BLOQUEADA** hasta (2): `GodelTwo.goedel_second'` aún depende de `axiom d3`; retirar los postulados legacy ahora rompería el núcleo actual de Gödel II.
+0. ✅ **HECHO** (commit `fac8668`) `Meta/TrackedCorePrf.lean`: **`liftFormula_provFromCode`** (clausura genérica de `provFromCode c` para código cerrado arbitrario).
+1. ✅ **HECHO** (commit `7fb9052`) **constructores `tcFn`‑based**: `atom2CodeFn` (generaliza `inFormCodeFn` a átomos‑2) + puente `formCode` + `inFormCodeFn_eq_atom2` + congruencia + clausura + transporte + `chainOkCodeFn`/`allInCodeFn`. §10.4 pasos 1‑2.
+2. ⏳ **SIGUIENTE — `runFn_trackₜ`/`chainOk_trackₜ`** (el port PROFUNDO, semánticamente sutil): espejo de `prf_runFn_track`/`prf_chainOk_track` (19 casos) de `Representability2Prf.lean`, pero construyendo el código de la conclusión/lista con `atom2CodeFn`+`tcFn` (object) en vez de `formCode`/`termCode` (meta). AQUÍ se decide la semántica del rastreo (el testigo se sigue por `tcFn`, no se congela como `varc 0`). Motor: `prf_tc_cons`/`prf_congr_tcFn` (abstractos) + los constructores del paso 1. Ver §10.2/§10.4.
+3. **`repr_pos'_prfₜ`** (D1ₜ, ensamblaje) → **combinadores rastreados** → **`hI_tracked`/`hC_tracked`** por inducción object → **`d3_prf`** (∃‑intro con `pcc_exIntro_code`, ∧‑intro rastreado) → **`goedel_second_prf : ConsistentH → ¬ Prf Con'`**.
+4. **Limpieza F7 BLOQUEADA** hasta (3): `GodelTwo.goedel_second'` aún depende de `axiom d3`; retirar los postulados legacy ahora rompería el núcleo actual de Gödel II.
 
 > **Por qué D1ₜ es ineludible (verificado 2026‑07‑05b):** para el testigo abstracto, producir `provFromCode(código‑tcFn con lista abstracta)` desde D1 (`repr_pos'`) exige transportar `termCode L → tcFn L`, **stuck** para `L` abstracta (el elemento concreto `⌜φ⌝` sí transporta vía `prf_tc_form`). No hay atajo: hay que emitir `tcFn` nativamente en la representabilidad.
 

@@ -420,9 +420,17 @@ consecuente rastreado (§4.4). Cierre `d3_prf` (∃‑intro con `pcc_exIntro_cod
 
 ### 10.4 Orden de commits (cada uno verde)
 
-`liftFormula_provFromCode` ✅ → constructores `tcFn` + congruencias/clausura → `runFn_trackₜ`/
-`chainOk_trackₜ` → `repr_pos'_prfₜ` (D1ₜ) → combinadores rastreados → `hI/hC_tracked` → `d3_prf` →
-`goedel_second_prf` → F7.
+1. `liftFormula_provFromCode` ✅ (commit `fac8668`)
+2. **constructores `tcFn`‑based** (`atom2CodeFn` + puente/`inFormCodeFn_eq_atom2`/congruencia/
+   clausura/transporte + `chainOkCodeFn`/`allInCodeFn`) ✅ (commit `7fb9052`)
+3. **`runFn_trackₜ`/`chainOk_trackₜ`** ⏳ SIGUIENTE (el port profundo, semánticamente sutil):
+   espejo de `prf_runFn_track`/`prf_chainOk_track` (19 casos) de `Representability2Prf`, pero el
+   código de la conclusión/lista se construye con `atom2CodeFn`+`tcFn` (object) en vez de
+   `formCode`/`termCode` (meta). Aquí se decide la semántica: el testigo se rastrea por `tcFn`
+   (no se congela como `varc 0`). Usa `prf_tc_cons`/`prf_congr_tcFn` (abstractos) + los
+   constructores del paso 2.
+4. `repr_pos'_prfₜ` (D1ₜ) → 5. combinadores rastreados → 6. `hI/hC_tracked` → 7. `d3_prf` →
+   8. `goedel_second_prf` → 9. F7.
 
 ---
 
