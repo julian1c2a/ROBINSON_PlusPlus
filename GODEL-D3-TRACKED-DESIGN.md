@@ -434,6 +434,70 @@ consecuente rastreado (§4.4). Cierre `d3_prf` (∃‑intro con `pcc_exIntro_cod
 
 ---
 
-*Fin del diseño. Ruta CONFIRMADA (2026‑07‑05b): **Opción A de raíz** (§10). El cimiento
-`liftFormula_provFromCode` está hecho; el port `repr_pos'_prfₜ` (D1ₜ, §10.2) es el trabajo grande
-restante y es multi‑sesión.*
+## 11 · Investigación de atajos (2026‑07‑05c) — resultado: NO hay atajo; la vía es la Σ₁‑completitud estándar
+
+Antes de embarcar la construcción estándar se investigaron a fondo posibles atajos. **Resultado
+riguroso: D3 es irreducible a D1/D2 y el enfoque `tcFn` no cierra.** Detalle:
+
+### 11.1 El «atajo por teorema de deducción» es IMPOSIBLE (verificado)
+
+Tentación: en `con_imp_godel'`, `imp_intro (fun hpg => … d3 …)` usa `hpg : ⊢ provCodeC' G` como
+hipótesis; ¿podría `d3 G` sustituirse por D1 (`repr_pos'`) aplicada a `hpg`? **No.** D1 tiene tipo
+**`repr_pos'_prf (h : Prf φ) : Prf (provCodeC' φ)`** y `repr_pos' (h : Prf φ) : ⊢ provCodeC' φ` —
+la entrada es un **`Prf` CERRADO** (derivación finitaria sin contexto). `hpg` es una **hipótesis de
+contexto** (deducción), no un `Prf` cerrado. La versión con contexto de D1 —`PrfH Γ φ → PrfH Γ
+(provCodeC' φ)`— **es FALSA**: `φ` derivable DESDE una hipótesis no implica `provCodeC' φ` (que
+afirma que `φ` tiene una prueba CERRADA). Justo esa brecha «hipótesis ⇒ prueba cerrada» ES el
+contenido de D3 (D1 formalizada). Conclusión: **D3 no se deriva de D1/D2/deducción** (coherente con
+que Gödel II necesita HBL completo / Löb; hecho estándar).
+
+### 11.2 Por qué `tcFn` (Opción A §10) NO cierra la inducción abstracta
+
+Sondeo del caso cabeza de `hI_tracked` (§10.3): el consecuente rastreado
+`provFromCode(atom2CodeFn in_sym (tcFn ⌜φ⌝)(tcFn (cons h R)))` codifica una fórmula identificable
+con el teorema `In ⌜φ⌝ (cons h R)` **sólo si** `tcFn (cons h R) =eq termCode (cons h R)` — **stuck
+para `R` abstracto** (`tcFn` NO tiene ecuación de variable: sólo `zero`/`succ`/`cons`, verificado).
+`prf_tc_cons` computa la ESTRUCTURA de `tcFn(cons h R)` abstractamente, pero no salva la igualdad
+con `termCode`. ⇒ `tcFn` reflejaría una fórmula mal identificada → `provFromCode` indemostrable.
+**El enfoque `tcFn` de §10 queda descartado para el paso inductivo abstracto.** (Los constructores
+`atom2CodeFn`, `7fb9052`, siguen siendo infraestructura válida —congruencia/clausura de códigos—.)
+
+### 11.3 La vía genuina: Σ₁‑completitud provable estándar (`substfc` + `num`)
+
+Es la D3 de libro (Hilbert‑Bernays). **Clave que la distingue de `tcFn`:** `substfc`/`substtc`
+**SÍ tiene ecuaciones de recursión para variables** (`ax_substtc_var_eq/gt/lt`, `ax_liftc_var_*`,
+verificado en `Minimal/Axioms`), justo lo que falta a `tcFn`. Eso permite manipular el código
+numeral‑sustituido `substfc 0 (num p) ⌜θ⌝` para `p` abstracto en la inducción.
+
+Ingredientes (✅ = ya existe en el repo):
+- ✅ `substfc` + ecuaciones (incl. variables) + `prf_substFormula_arith` (`ArithPrf`).
+- ✅ `pcc_exIntro_code` (∃‑intro interno a nivel código) para el paso `Prov(⌜θ(ṗ)⌝) → Prov(⌜∃p θ⌝)`.
+- ✅ inducción object `prf_list_induction` (`listInd`).
+- ✅ reflexión de `In` para testigos CONCRETOS (`pcc_in_runFn_objList`) — base del caso Δ₀ atómico.
+- ❓ **`num` (función object «numeral de»)** con `num(código) =eq numeral‑que‑representa‑ese‑código`
+  y sus ecuaciones — **a construir** (o reusar `numeral`/`tcFn` restringido a numerales, `prf_tc_numeral`).
+- ❌ **provable Δ₀‑completitud del verificador** `⊢ ∀p (δ(φ,p) → Prov(⌜δ(φ,ṗ)⌝))`, `δ = chainOk ∧ In`,
+  por inducción sobre `p` con `substfc`‑var‑equations — **el núcleo grande pendiente**.
+- ❌ ensamblaje `d3_prf` + `goedel_second_prf`.
+
+**Sutileza a resolver primero (bloqueante de diseño):** el testigo `p` es una LISTA object
+(`cons`/`nil`); `num` (numeral‑de) lo aplana a un numeral unario y `runFn nil (numeral …)` NO
+reduce (runFn recurre sobre `cons`/`nil`). Hay que decidir la codificación del testigo‑como‑número
+(β‑función / secuencia) para que `runFn`/`chainOk`/`In` operen sobre él vía decodificación
+representable — o reformular `δ` sobre números. **Esta decisión de codificación es el primer paso
+de §11 y debe fijarse antes de codificar.**
+
+### 11.4 Marco honesto del estado
+
+El proyecto ya tiene **Gödel I REAL sin postulados**, **D1 y D2 REALES**, y **Gödel II módulo un
+único axioma D3 claramente marcado** (`GodelTwo.goedel_second'`). D3 = Σ₁‑completitud provable es
+**notoriamente la pieza más dura** de formalizar Gödel II (lo es también en Isabelle/Coq). El
+estado actual es excelente y publicable. Cerrar D3 es un desarrollo grande (varias sesiones) cuyo
+primer paso NO es código sino la **decisión de codificación del testigo (§11.3 sutileza)**.
+
+---
+
+*Fin del diseño. Ruta CONFIRMADA (2026‑07‑05c): la **Opción A `tcFn` (§10) queda descartada** para
+el paso abstracto (§11.2); la vía genuina es la **Σ₁‑completitud provable estándar** (§11.3), cuyo
+primer paso es fijar la codificación del testigo‑como‑número. Alternativa honesta siempre
+disponible: consolidar Gödel II módulo el axioma D3 (§11.4).*
