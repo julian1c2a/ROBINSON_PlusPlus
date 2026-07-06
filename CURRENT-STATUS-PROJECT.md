@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-07-05
+**Last updated:** 2026-07-05d
 **Author**: Julián Calderón Almendros
 
 ---
@@ -16,7 +16,7 @@
 | Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C, **legacy**); `D2`/`D3` (Incompleteness D, **legacy**); `ax_inAxC` (⊢) / `prf_inAxC` (Prf) — pertenencia de coding a `axiomsCodeT`; `qconf`/`Full.ax_induction` integrados como reglas del verificador (esquemas, no postulados gödelianos). Las 6 ecuaciones recursivas de coding (`substtc`/`substtsc`) están **integradas en `Minimal.axioms`** (extensión definicional) — `SubstArith` sin `axiom` local |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
 | Gödel | **A, B, C, D** ✅ (legacy I/II vía D2/D3 postulados). **Nivel D REAL — Gödel I REAL sin postulados**: cadena completa sobre Hilbert finitario `Prf` — verificador `validProofFn` (**19 reglas**, sólido vía `coreAxioms`; `ind` vía `Full.ax_induction`) + `repr_pos`/**D1** (`Meta/Necessitation.lean`) + **lema diagonal real** `tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G` (`Meta/Diagonal.lean`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (`#print axioms` = ω-reglas ambiente + `Full.ax_induction`; NINGÚN `diagonal_lemma`/`provFormula`/D2/D3). **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind`/`vpf_ind`, `Meta/Induction.lean` + stack): `provCodeC` rastrea **IΣ₁**. Además **aritmética negativa de códigos** `formCode_ne` (`Meta/CodeDistinct.lean`). **Hacia D2/D3/Gödel II — verificador estructural `runFn`/`chainOk`** (`Meta/ProofChain.lean`, R1–R3) + **D1 y D2 reales sobre `provCodeC'`**: **D2** `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)` (`Meta/DerivCond.lean`) y **D1 = `repr_pos' : Prf φ → ⊢ provCodeC' φ`** (`Meta/Representability2.lean`; `#print axioms` = solo estándar), con validez de las 19 reglas (`lineWF`/`premsOf` fieles). **Gödel II — núcleo lógico ✅ con D3 POSTULADO** (`Meta/GodelTwo.lean`): `con_imp_godel'`/`goedel_second'` vía **D2 real** + `d3` (único axioma gödeliano) + hipótesis explícitas (punto fijo, necesitación, ⊬G ω); mejora sobre legacy (postulaba D2 y D3). **Refactor `Prf.thy → axioms` ✅** (`Prf` razona sobre su propia maquinaria; `axiomsCodeT` opaco + meta-axioma `ax_inAxC`). **Punto fijo real ✅** `godelC'_fixedpoint : ⊢ godelC' ⇔ ¬provCodeC' godelC'` (`Meta/DiagonalTwo.lean`, sin postulados) + **Gödel I real estructural** `goedel_first_real' : ConsistentOmega → ¬ Prf godelC'`. **Re-nivelación a `Prf` (2026-06-23/24):** **D1 finitaria COMPLETA** `repr_pos'_prf : Prf φ → Prf (provCodeC' φ)` (`Meta/ArithPrf.lean` + `Meta/Representability2Prf.lean` + `Meta/ReprPrf.lean`; `#print axioms` = estándar + `prf_inAxC`). **Teorema de deducción finitario** `Meta/HilbertDeduction.lean` (`PrfH` + `prf_deduction` + `prf_ex_elim_imp`). **Regla de confinamiento ∀ `qconf`** integrada en el verificador (`Prf.qconf`/`Rule.qconf` + aritmetización doble). **Fix de solidez FOL:** `subst_lift_cancel_formula` era un `axiom` FALSO → ahora teorema (forma restringida verdadera). **Toolkit De Bruijn** (`FOL/Theorems/Eq.lean`: `substFormula_lift_comm`, `liftTerm_comm_zero`, `subst_subst_lift_gen`…). Pendiente Gödel II 100% real: **lema de Barendregt** → inducción de listas en `Prf` → `d2_prf`/`d3_prf`/`goedel_second_prf : ConsistentH → ¬ Prf Con'` |
-| Build status | ✅ Passing (**69 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
+| Build status | ✅ Passing (**71 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
@@ -51,6 +51,18 @@
 ---
 
 ## Recent Achievements
+
+- **2026-07-05c/d — D3: investigación de atajos (§11–§12) + arranque Σ₁‑completitud estándar (12‑A fase 1a)**:
+  Investigación rigurosa: **no hay atajo para D3** (atajo por teorema de deducción imposible — D1
+  exige `Prf` cerrado, D1‑con‑contexto es falsa = esa brecha es D3; enfoque `tcFn` descartado —
+  `tcFn L =eq termCode L` stuck para `L` abstracta). Hallazgo central: **codificar el testigo ≡
+  representar el verificador** sobre números (Δ₀), pero el verificador es estructural sobre listas.
+  Decidida la **Opción 12‑A (capa numérica Δ₀ del verificador)**. **Fase 1a hecha**: `lenc`/`nthc`
+  (longitud/índice de lista‑código) — defs + 4 axiomas en `Minimal/Axioms` (extensión conservadora,
+  `axioms_eq` rfl preservado, **build entero verde: verificador/D1 intactos**) + ecuaciones `Prf`
+  (`Meta/NumListPrf.lean`). Además `Meta/TrackedCorePrf.lean` extendido con `atom2CodeFn` (infra de
+  códigos). Diseño completo en `GODEL-D3-TRACKED-DESIGN.md` §11–§12. Build verde (**71 jobs**),
+  0 sorrys, v4.31.0. Siguiente: fase 1b (caracterización acotada de `In`).
 
 - **2026-07-05b — Gödel II / Opción A: A‑F3 `pcc_exIntro_code` + verificación concreta RIESGO‑1**:
   `Meta/ExIntroCodePrf.lean` cierra la **A‑F3** (∃‑intro de la regla Q2 al nivel de código con

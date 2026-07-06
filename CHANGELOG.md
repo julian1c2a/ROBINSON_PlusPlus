@@ -10,6 +10,36 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added (2026-07-05c/d) — D3: investigación de atajos (§11–§12) + arranque Σ₁‑completitud (12‑A fase 1a)
+
+- **`Meta/TrackedCorePrf.lean`** (extensión) — constructores de código object para átomos binarios:
+  **`atom2CodeFn s a b`** (generaliza `inFormCodeFn` a `In`/`chainOk`/`allIn`) + puente `formCode`
+  (`atom2CodeFn_termCode`, `inFormCodeFn_eq_atom2`, rfl) + **congruencia** (`prf_congr_atom2CodeFn`) +
+  **clausura** (`liftTerm_atom2CodeFn`, `liftFormula_provFromCode_atom2`) + **transporte**
+  (`prf_provFromCode_atom2_congr`) + `chainOkCodeFn`/`allInCodeFn`. Infra de códigos, `#print axioms`
+  = estándar.
+- **INVESTIGACIÓN §11–§12 (`GODEL-D3-TRACKED-DESIGN.md`)** — resultado: **NO hay atajo para D3**.
+  (§11.1) atajo por teorema de deducción IMPOSIBLE (D1 `repr_pos'`/`repr_pos'_prf` exigen `Prf`
+  CERRADO; D1‑con‑contexto es FALSA = esa brecha ES D3). (§11.2/§12.2) enfoque `tcFn` DESCARTADO
+  (caso cabeza/cola de la inducción exige `tcFn L =eq termCode L`, stuck para `L` abstracta).
+  (§12.1) hallazgo central: **codificación del testigo ≡ representación del verificador** (la
+  Σ₁‑completitud estándar exige `δ` Δ₀‑sobre‑NÚMEROS; el verificador es estructural sobre listas
+  `carc`/`cdrc`, sin `len`/`nth`). Recomendación (§12.4) = **Opción 12‑A (capa numérica Δ₀ del
+  verificador)**, construcción de libro, plan por 5 fases. Alternativa honesta: Gödel II módulo el
+  axioma D3 (ya publicable: Gödel I real + D1/D2 reales).
+- **12‑A FASE 1a — capa numérica de listas `lenc`/`nthc`**:
+  - **`Minimal/Axioms.lean`** (extensión definicional conservadora, patrón `carc`/`cdrc`):
+    `lenc l := func "lenc" [l]`, `nthc l i := func "nthc" [l, i]` + 4 axiomas (`ax_lenc_nil`/
+    `ax_lenc_cons`/`ax_nthc_zero`/`ax_nthc_succ`) añadidos a `axioms` y `codingAxioms` (`axioms_eq`
+    rfl preservado). **Build entero verde tras el cambio de núcleo**: verificador
+    (`prf_iff_derivation`), D1 (`repr_pos'`) y toda la cadena Gödel intactos (la maquinaria genérica
+    `thy`/`prf_inAxC` absorbe los axiomas nuevos).
+  - **`Meta/NumListPrf.lean`** (NUEVO): ecuaciones `Prf` `prf_lenc_nil`/`prf_lenc_cons`/
+    `prf_nthc_zero`/`prf_nthc_succ` (re‑derivadas de `axioms` vía `prf_ax`+`prf_spec`, patrón
+    `prf_carc_cons`).
+  - **SIGUIENTE (fase 1b)**: caracterización acotada `In x L ⇔ ∃ i < lenc L. nthc L i =eq x`.
+- Build verde (**71 jobs**), 0 sorrys, Lean v4.31.0.
+
 ### Added (2026-07-05b) — Opción A: A‑F3 `pcc_exIntro_code` + verificación concreta (RIESGO‑1)
 
 - **`Meta/ExIntroCodePrf.lean`** — **A‑F3 COMPLETO**: **`pcc_exIntro_code (Ac w) (hAc hw) :
