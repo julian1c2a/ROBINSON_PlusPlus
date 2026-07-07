@@ -97,22 +97,31 @@ theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n))
   simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff, Nat.reduceGT,
     reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
 
-/-- **`0 < σn`** en `Prf` (testigo `k = n` en `∃k. 0 + σk = σn`, cerrado con
-    `prf_add_succ_t` + `prf_add_zero_left`). Patrón `prf_numeral_lt`. -/
-theorem prf_zero_lt_succ (n : Term) : Prf (lt zero (succ n)) := by
-  have h13 := prf_ax (show ax13_lt_def ∈ axioms by simp [axioms])
-  have hiff := prf_spec (prf_spec h13 zero) (succ n)
+/-- **Introducción de `<` desde un testigo** en `PrfH`: de `add a (σk) =eq b` sale `lt a b`
+    (`k` es el testigo del `∃k. a + σk = b` de `ax13_lt_def`). -/
+theorem PrfH_lt_intro {Γ : List Formula} (a b k : Term)
+    (h : PrfH Γ (add a (succ k) =eq b)) : PrfH Γ (lt a b) := by
+  have hiff := prf_spec (prf_spec (prf_ax (show ax13_lt_def ∈ axioms by simp [axioms])) a) b
   simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
-  refine prf_iff_mpr hiff ?_
-  refine prf_ex_intro n ?_
-  simp [substFormula, substTerm, substTerms, add, succ, zero,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  show Prf (add zero (succ n) =eq succ n)
-  exact prf_eq_trans (prf_add_succ_t zero n) (prf_eq_congr_succ (prf_add_zero_left n))
+  refine PrfH_iff_mpr hiff ?_
+  refine PrfH_ex_intro k ?_
+  simp only [substFormula, substTerm, substTerms, add, succ, zero, Nat.reduceEqDiff, reduceIte,
+    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  exact h
+
+/-- Introducción de `<` desde un testigo, versión `Prf` (cerrada). -/
+theorem prf_lt_intro (a b k : Term) (h : Prf (add a (succ k) =eq b)) : Prf (lt a b) :=
+  prfH_nil_to_prf (PrfH_lt_intro (Γ := []) a b k (prf_to_prfH h [])) rfl
+
+/-- **`0 < σn`** en `Prf` (testigo `k = n`; `add 0 (σn) = σ(0+n) = σn`). -/
+theorem prf_zero_lt_succ (n : Term) : Prf (lt zero (succ n)) :=
+  prf_lt_intro zero (succ n) n
+    (prf_eq_trans (prf_add_succ_t zero n) (prf_eq_congr_succ (prf_add_zero_left n)))
 
 end ROBINSON_PlusPlus.Meta.NatArithPrf
 
 export ROBINSON_PlusPlus.Meta.NatArithPrf (
-  PrfH_eq_congr_succ prf_nat_induction prf_add_zero_left prf_zero_lt_succ
+  PrfH_eq_congr_succ prf_nat_induction prf_add_zero_left norm11 prf_add_succ_left
+  PrfH_lt_intro prf_lt_intro prf_zero_lt_succ
 )
