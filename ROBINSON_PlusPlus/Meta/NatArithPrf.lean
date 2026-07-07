@@ -67,6 +67,36 @@ theorem prf_add_zero_left (n : Term) : Prf (add zero n =eq n) := by
   simpa only [substFormula, substTerm, substTerms, add, zero, Nat.reduceEqDiff, Nat.reduceGT,
     reduceIte, if_true, FOL.substTerm_liftTerm] using hn
 
+/-- Normalización De Bruijn de un binder: el parámetro `t` (protegido por `liftTerm 0`)
+    vuelve intacto tras `substTerm 0 s (liftTerm 1 ·)` del `step` de `prf_nat_induction`. -/
+theorem norm11 (s t : Term) : substTerm 0 s (liftTerm 1 (liftTerm 0 t)) = liftTerm 0 t := by
+  rw [(FOL.liftTerm_comm_zero t 0).symm]
+  exact FOL.substTerm_liftTerm (liftTerm 0 t) 0 s
+
+/-- **`σm + n = σ(m + n)`** en `Prf` (add por la izquierda; inducción sobre `n`, NO
+    derivable sin inducción). -/
+theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n)) := by
+  have key : Prf (Formula.forall (Formula.eq
+      (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0))))) := by
+    refine prf_nat_induction _ ?base ?step
+    · simp only [substFormula, substTerm, substTerms, add, succ, zero, Nat.reduceEqDiff,
+        reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      exact prf_eq_trans (prf_add_zero_t (succ m))
+        (prf_eq_symm (prf_eq_congr_succ (prf_add_zero_t m)))
+    · refine Prf.gen _ ?_
+      simp only [substFormula, substTerm, substTerms, add, succ, liftFormula, liftTerm, liftTerms,
+        zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte, if_true,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift, norm11]
+      refine prf_deduction ?_
+      have ih : PrfH [Formula.eq (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0)))]
+          (add (succ (liftTerm 0 m)) (.var 0) =eq succ (add (liftTerm 0 m) (.var 0))) := prfH_hyp_self _
+      exact PrfH_eq_trans (prf_to_prfH (prf_add_succ_t (succ (liftTerm 0 m)) (.var 0)) _)
+        (PrfH_eq_trans (PrfH_eq_congr_succ ih)
+          (prf_to_prfH (prf_eq_symm (prf_eq_congr_succ (prf_add_succ_t (liftTerm 0 m) (.var 0)))) _))
+  have hn := prf_spec key n
+  simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff, Nat.reduceGT,
+    reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
+
 /-- **`0 < σn`** en `Prf` (testigo `k = n` en `∃k. 0 + σk = σn`, cerrado con
     `prf_add_succ_t` + `prf_add_zero_left`). Patrón `prf_numeral_lt`. -/
 theorem prf_zero_lt_succ (n : Term) : Prf (lt zero (succ n)) := by
