@@ -45,6 +45,21 @@ theorem liftFormula_boundedIn (x L : Term) :
   simp only [boundedIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc,
     Nat.reduceAdd, Nat.reduceLT, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
 
+/-- `liftFormula` atraviesa `boundedIn` (general en el nivel `k`). Vía `liftTerm_comm_zero`. -/
+theorem liftFormula_boundedIn_gen (k : Nat) (x L : Term) :
+    liftFormula k (boundedIn x L) = boundedIn (liftTerm k x) (liftTerm k L) := by
+  simp only [boundedIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc,
+    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+
+/-- `substFormula` atraviesa `boundedIn`. Vía `FOL.substTerm_lift_comm_zero`. -/
+theorem substFormula_boundedIn (v : Nat) (s x L : Term) :
+    substFormula v s (boundedIn x L) = boundedIn (substTerm v s x) (substTerm v s L) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftTerm,
+    liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
+    FOL.substTerm_lift_comm_zero]
+
 /-! ### Congruencias de `lt` (Leibniz object) -/
 
 /-- Congruencia de `lt` en el 2º argumento (cota). -/
@@ -226,12 +241,91 @@ theorem prf_boundedIn_cons (x hd t : Term) :
           (prf_to_prfH (prf_nthc_succ (liftTerm 0 hd) (liftTerm 0 t) (pred (.var 0))) _)))
         heq
 
+/-! ### Las dos inducciones de listas y el `⇔` -/
+
+/-- **Dirección ⇒**: `In x L ⇒ ∃ i < lenc L. nthc L i =eq x`. Inducción de listas sobre `L`
+    (`prf_list_induction`); base `nil` por explosión, paso `cons` por `ax_L2` + los helpers
+    cabeza/cola. El parámetro `x` va con `liftTerm 0` y se normaliza con `norm21`. -/
+theorem prf_boundedIn_of_In (x L : Term) : Prf (In x L ⇒ boundedIn x L) := by
+  have key : Prf (Formula.forall (Formula.impl (In (liftTerm 0 x) (.var 0))
+      (boundedIn (liftTerm 0 x) (.var 0)))) := by
+    refine prf_list_induction _ ?base ?step
+    · have hb : Prf (Formula.impl (In x nil) (boundedIn x nil)) :=
+        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (boundedIn x nil)))
+          (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil x) _) (prfH_hyp_self _)))
+      simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
+        FOL.substTerm_liftTerm, if_true] using hb
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms, In,
+        cons, liftFormula_boundedIn_gen, substFormula_boundedIn, norm21,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      refine prf_deduction (deduction_aux ?_
+        (In (liftTerm 1 (liftTerm 0 x)) (cons (.var 1) (.var 0)))
+        [Formula.impl (In (liftTerm 1 (liftTerm 0 x)) (.var 0))
+          (boundedIn (liftTerm 1 (liftTerm 0 x)) (.var 0))] rfl)
+      let X : Term := liftTerm 1 (liftTerm 0 x)
+      let IHf : Formula := Formula.impl (In X (.var 0)) (boundedIn X (.var 0))
+      let A : Formula := In X (cons (.var 1) (.var 0))
+      have hsplit : PrfH [A, IHf] (lor (X =eq (.var 1)) (In X (.var 0))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_in_cons_iff X (.var 1) (.var 0))) _)
+          (PrfH.hyp _ _ (List.Mem.head _))
+      refine PrfH_or_elim hsplit ?_ ?_
+      · exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_head X (.var 1) (.var 0)) _)
+          (PrfH.hyp _ _ (List.Mem.head _))
+      · exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_tail X (.var 1) (.var 0)) _)
+          (PrfH.mp _ _ _ (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+            (PrfH.hyp _ _ (List.Mem.head _)))
+  have hL := prf_spec key L
+  simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
+    FOL.substTerm_liftTerm, if_true] using hL
+
+/-- **Dirección ⇐**: `(∃ i < lenc L. nthc L i =eq x) ⇒ In x L`. Inducción de listas;
+    base `nil` por explosión (`prf_boundedIn_nil`), paso `cons` por `prf_boundedIn_cons`. -/
+theorem prf_In_of_boundedIn (x L : Term) : Prf (boundedIn x L ⇒ In x L) := by
+  have key : Prf (Formula.forall (Formula.impl (boundedIn (liftTerm 0 x) (.var 0))
+      (In (liftTerm 0 x) (.var 0)))) := by
+    refine prf_list_induction _ ?base ?step
+    · have hb : Prf (Formula.impl (boundedIn x nil) (In x nil)) :=
+        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (In x nil)))
+          (PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_nil x) _) (prfH_hyp_self _)))
+      simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
+        FOL.substTerm_liftTerm, if_true] using hb
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms, In,
+        cons, liftFormula_boundedIn_gen, substFormula_boundedIn, norm21,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      refine prf_deduction (deduction_aux ?_
+        (boundedIn (liftTerm 1 (liftTerm 0 x)) (cons (.var 1) (.var 0)))
+        [Formula.impl (boundedIn (liftTerm 1 (liftTerm 0 x)) (.var 0))
+          (In (liftTerm 1 (liftTerm 0 x)) (.var 0))] rfl)
+      let X : Term := liftTerm 1 (liftTerm 0 x)
+      let IHf : Formula := Formula.impl (boundedIn X (.var 0)) (In X (.var 0))
+      let A : Formula := boundedIn X (cons (.var 1) (.var 0))
+      have hsplit : PrfH [A, IHf] (lor (Formula.eq X (.var 1)) (boundedIn X (.var 0))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_cons X (.var 1) (.var 0)) _)
+          (PrfH.hyp _ _ (List.Mem.head _))
+      refine PrfH_or_elim hsplit ?_ ?_
+      · exact PrfH_eq_subst_in (PrfH_congr_cons_head (PrfH.hyp _ _ (List.Mem.head _)))
+          (prf_to_prfH (prf_in_cons_head X (.var 0)) _)
+      · exact PrfH_in_cons_tail (.var 1)
+          (PrfH.mp _ _ _ (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+            (PrfH.hyp _ _ (List.Mem.head _)))
+  have hL := prf_spec key L
+  simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
+    FOL.substTerm_liftTerm, if_true] using hL
+
+/-- **CARACTERIZACIÓN ACOTADA DE `In`** (§12‑A fase 1b, objetivo):
+    `In x L ⇔ ∃ i < lenc L. nthc L i =eq x`. Pone la pertenencia en forma **Δ₀ acotada**. -/
+theorem prf_In_iff_boundedIn (x L : Term) : Prf (In x L ⇔ boundedIn x L) :=
+  prf_and_intro (prf_boundedIn_of_In x L) (prf_In_of_boundedIn x L)
+
 end ROBINSON_PlusPlus.Meta.BoundedInPrf
 
 export ROBINSON_PlusPlus.Meta.BoundedInPrf (
-  boundedIn liftFormula_boundedIn prf_lt_subst2 PrfH_lt_subst2 PrfH_lt_subst1
-  PrfH_eq_congr_nthc2
+  boundedIn liftFormula_boundedIn liftFormula_boundedIn_gen substFormula_boundedIn
+  prf_lt_subst2 PrfH_lt_subst2 PrfH_lt_subst1 PrfH_eq_congr_nthc2
   prf_boundedIn_head prf_boundedIn_tail
   prf_pred_succ prf_eq_congr_pred PrfH_eq_congr_pred prf_zero_or_eq_succ_pred
   prf_boundedIn_nil prf_boundedIn_cons
+  prf_boundedIn_of_In prf_In_of_boundedIn prf_In_iff_boundedIn
 )
