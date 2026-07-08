@@ -604,8 +604,73 @@ numérica de listas (`lenc`/`nthc`, ya hecha en fase 1) es suficiente. Léase §
 
 ---
 
+## 14 · Fase 2: lado `In` CERRADO; plan preciso del lado `chainOk`
+
+### 14.1 Lado `In` — hecho (`Meta/RunFnBoundedPrf.lean`, commits `4685366`/`ffbcdb9`/`05cc4ab`)
+
+```lean
+prf_runFn_nil_cons : runFn nil (cons line rest) =eq cons (carc line) (runFn nil rest)
+prf_lenc_runFn     : lenc (runFn nil p) =eq lenc p
+prf_nthc_runFn     : i < lenc p ⇒ nthc (runFn nil p) i =eq carc (nthc p i)
+prf_In_runFn_iff   : In y (runFn nil p) ⇔ ∃ i < lenc p. carc (nthc p i) =eq y   -- ← payoff
+```
+
+Todos `[propext, choice, Quot.sound]`. La cota es **`lenc p`**: acotado sobre `p` directamente.
+
+`prf_nthc_runFn` usó el patrón de **`∀i` interno** (la HI se aplica en `pred i`) → 3 binders en el
+`step` + confinación `Prf.qconf` + `PrfH_spec`, igual que `prf_runFn_concat` en `ChainPrf`.
+
+### 14.2 Lado `chainOk` — la forma acotada objetivo
+
+El acumulador se elimina **generalizando en `c`**: cada premisa está o bien ya en el contexto
+inicial `c`, o bien es la conclusión de una línea **anterior**.
+
+```
+chainOkB c p  :=  ∀ i < lenc p.
+    ( lineWF (nthc p i)
+      ∧ ∀ j < lenc (premsOf (nthc p i)).
+          ( In (nthc (premsOf (nthc p i)) j) c
+            ∨ ∃ k < i. carc (nthc p k) =eq nthc (premsOf (nthc p i)) j ) )
+```
+
+**Objetivo:** `chainOk c p ⇔ chainOkB c p` (y para `c = nil` el disyunto izquierdo es falso,
+quedando la forma Δ₀ pura). Por inducción de listas sobre `p` con **`∀c` interno** (patrón `qconf`).
+
+### 14.3 Sub‑lemas necesarios (todos con patrón ya validado)
+
+1. **`allIn c L ⇔ ∀ j < lenc L. In (nthc L j) c`** (caracterización acotada de `allIn`; espejo ∀ de
+   `prf_In_iff_boundedIn`). Piezas: `prf_boundedAllIn_head` (spec en `0`), `prf_boundedAllIn_tail`
+   (spec en `σj`), `prf_boundedAllIn_cons`, más las dos inducciones.
+   **Nota de patrón:** para probar un `∀` como CONSECUENTE bajo contexto, usar **`Prf.qconf`**
+   (`A ⇒ ∀C` desde `∀(↑A ⇒ C)`), nunca `PrfH.gen` (liftea el contexto). Para instanciar el `∀` de
+   una HIPÓTESIS, `PrfH_spec` (no liftea).
+2. **`In y (concat c (cons x nil)) ⇔ In y c ∨ y =eq x`** (de `ax_L3_in_concat` + `ax_L2`).
+3. **Split del `∃k < σj`**: `(∃ k < σj. carc (nthc (cons line rest) k) =eq y)
+   ⇔ (carc line =eq y ∨ ∃ k < j. carc (nthc rest k) =eq y)` (case‑split de `k` con
+   `prf_zero_or_eq_succ_pred` + `prf_nthc_zero`/`prf_nthc_succ`).
+4. **Inducción principal** `∀c. (chainOk c p ⇔ chainOkB c p)`, paso `cons` usando
+   `prf_chainOk_cons` (`chainOk c (cons line rest) ⇔ lineOk c line ∧ chainOk (c++[carc line]) rest`)
+   + (1) + (2) + (3): el índice `i = 0` da `lineOk c line`, e `i = σj` reindexa a `chainOkB (c++[carc line]) rest`.
+
+**No veo obstrucción** en ninguno de los cuatro; (4) es el más pesado (dos niveles de
+cuantificación acotada dentro del predicado inductivo). **Aún NO verificado en código.**
+
+### 14.4 Lecciones De Bruijn acumuladas (reusar)
+
+- `∃`‑elim de una **hipótesis** → lema `Prf` autónomo con **`prf_ex_elim_imp`** (lift simple).
+  Nunca `PrfH_ex_elim` (liftea el contexto → doble lift).
+- `∀`‑intro como **consecuente** → **`Prf.qconf`**. `∀`‑elim de una **hipótesis** → `PrfH_spec`.
+- Case‑split de un índice bajo `PrfH` **sin `∃`** → `prf_zero_or_eq_succ_pred` (testigo `pred i`).
+- Empujar `liftFormula`/`substFormula` a través de un predicado con `∃`/`∀` interno requiere un
+  lema propio (`liftFormula_boundedIn_gen`, `substFormula_boundedIn`, `liftFormula_boundedCarcIn`):
+  **no es defeq** (`liftTerm 1 (liftTerm 0 ·)` vs `liftTerm 0 (liftTerm 0 ·)` los iguala
+  `FOL.liftTerm_comm_zero`, que es teorema).
+- En un `have`, `PrfH _ (…)` **no infiere Γ**: nombrar el contexto con `let`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑08: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
-(§12.2); vía = **12‑A capa numérica Δ₀** (§12.4), con **fase 1 COMPLETA** (`lenc`/`nthc` +
-`prf_In_iff_boundedIn`) y **el riesgo de la fase 2 CERRADO** (§13: `runFn nil` es un map; no hace
-falta β‑función). Queda: `nthc`‑`runFn`, reformulación acotada de `chainOk`, y fases 3‑5.
-Alternativa honesta siempre disponible = Gödel II módulo axioma D3 (§11.4).*
+(§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fase 1 COMPLETA** (`lenc`/`nthc` +
+`prf_In_iff_boundedIn`). **Fase 2: riesgo CERRADO** (§13, no hace falta β‑función) y **lado `In`
+CERRADO** (§14.1). Queda el **lado `chainOk`** (§14.2‑14.3, plan preciso, sin obstrucción vista pero
+sin verificar) y las fases 3‑5. Alternativa honesta siempre disponible = Gödel II módulo axioma D3 (§11.4).*
