@@ -204,10 +204,82 @@ theorem prf_nthc_runFn (p i : Term) :
     nil, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
     reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hi
 
+/-! ### Forma acotada de «pertenecer a las conclusiones de `p`»
+
+Payoff de la Fase 2 para el lado `In`: `In y (runFn nil p) ⇔ ∃ i < lenc p. carc (nthc p i) =eq y`.
+La cota es `lenc p` (no `lenc (runFn nil p)`), es decir, **acotado sobre `p` directamente**. Es la
+pieza que la reformulación de `chainOk` usa para su «∃ k < i» (premisa = conclusión de línea previa). -/
+
+/-- `∃ i < lenc p. carc (nthc p i) =eq y` (con `i = #0` bajo el `∃`). -/
+def boundedCarcIn (y p : Term) : Formula :=
+  Formula.ex (land (lt (.var 0) (liftTerm 0 (lenc p)))
+                   (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)))
+
+/-- Clausura De Bruijn de `boundedCarcIn` (vía `liftTerm_comm_zero`; NO es defeq). -/
+theorem liftFormula_boundedCarcIn (y p : Term) :
+    liftFormula 0 (boundedCarcIn y p) = boundedCarcIn (liftTerm 0 y) (liftTerm 0 p) := by
+  simp only [boundedCarcIn, liftFormula, liftTerm, liftTerms, land, lt, nthc, lenc, carc,
+    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+
+/-- ⇐ : `(∃ i < lenc p. carc (nthc p i) =eq y) ⇒ In y (runFn nil p)`. -/
+theorem prf_In_runFn_of_boundedCarcIn (y p : Term) :
+    Prf (boundedCarcIn y p ⇒ In y (runFn nil p)) := by
+  refine prf_ex_elim_imp ?_
+  let C : Formula := land (lt (.var 0) (liftTerm 0 (lenc p)))
+    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
+  show PrfH [C] (In (liftTerm 0 y) (runFn nil (liftTerm 0 p)))
+  have hlt : PrfH [C] (lt (.var 0) (lenc (liftTerm 0 p))) :=
+    PrfH_and_elim_left (prfH_hyp_self C)
+  have hcarc : PrfH [C] (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)) :=
+    PrfH_and_elim_right (prfH_hyp_self C)
+  refine PrfH.mp _ _ _
+    (prf_to_prfH (prf_In_of_boundedIn (liftTerm 0 y) (runFn nil (liftTerm 0 p))) _) ?_
+  refine PrfH_ex_intro (.var 0) ?_
+  simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc, runFn,
+    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+  refine PrfH_and_intro ?_ ?_
+  · exact PrfH_lt_subst2 (prf_to_prfH (prf_eq_symm (prf_lenc_runFn (liftTerm 0 p))) _) hlt
+  · exact PrfH_eq_trans
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_runFn (liftTerm 0 p) (.var 0)) _) hlt) hcarc
+
+/-- ⇒ : `In y (runFn nil p) ⇒ (∃ i < lenc p. carc (nthc p i) =eq y)`. -/
+theorem prf_boundedCarcIn_of_In_runFn (y p : Term) :
+    Prf (In y (runFn nil p) ⇒ boundedCarcIn y p) := by
+  refine prf_deduction ?_
+  have hb : PrfH [In y (runFn nil p)] (boundedIn y (runFn nil p)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_of_In y (runFn nil p)) _) (prfH_hyp_self _)
+  refine PrfH.mp _ _ _ (prf_to_prfH ?_ _) hb
+  -- boundedIn y (runFn nil p) ⇒ boundedCarcIn y p  (a nivel Prf, ∃-elim con lift simple)
+  refine prf_ex_elim_imp ?_
+  rw [liftFormula_boundedCarcIn]
+  let D : Formula := land (lt (.var 0) (liftTerm 0 (lenc (runFn nil p))))
+    (Formula.eq (nthc (liftTerm 0 (runFn nil p)) (.var 0)) (liftTerm 0 y))
+  show PrfH [D] (boundedCarcIn (liftTerm 0 y) (liftTerm 0 p))
+  have hlt : PrfH [D] (lt (.var 0) (liftTerm 0 (lenc (runFn nil p)))) :=
+    PrfH_and_elim_left (prfH_hyp_self D)
+  have hnth : PrfH [D] (Formula.eq (nthc (liftTerm 0 (runFn nil p)) (.var 0)) (liftTerm 0 y)) :=
+    PrfH_and_elim_right (prfH_hyp_self D)
+  have hltp : PrfH [D] (lt (.var 0) (lenc (liftTerm 0 p))) :=
+    PrfH_lt_subst2 (prf_to_prfH (prf_lenc_runFn (liftTerm 0 p)) _) hlt
+  refine PrfH_ex_intro (.var 0) ?_
+  simp only [boundedCarcIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, carc, runFn,
+    nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
+  refine PrfH_and_intro hltp ?_
+  exact PrfH_eq_trans
+    (PrfH_eq_symm (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_runFn (liftTerm 0 p) (.var 0)) _) hltp))
+    hnth
+
+/-- **Forma acotada de la pertenencia a las conclusiones** (payoff Fase 2, lado `In`):
+    `In y (runFn nil p) ⇔ ∃ i < lenc p. carc (nthc p i) =eq y`. -/
+theorem prf_In_runFn_iff (y p : Term) : Prf (In y (runFn nil p) ⇔ boundedCarcIn y p) :=
+  prf_and_intro (prf_boundedCarcIn_of_In_runFn y p) (prf_In_runFn_of_boundedCarcIn y p)
+
 end ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 
 export ROBINSON_PlusPlus.Meta.RunFnBoundedPrf (
   prf_eq_congr_lenc PrfH_eq_congr_lenc prf_runFn_nil_cons prf_lenc_runFn
   PrfH_eq_congr_carc PrfH_eq_congr_nthc1 nthRunPred nthRunPred_base nthRunPred_step
   prf_nthc_runFn
+  boundedCarcIn liftFormula_boundedCarcIn
+  prf_In_runFn_of_boundedCarcIn prf_boundedCarcIn_of_In_runFn prf_In_runFn_iff
 )
