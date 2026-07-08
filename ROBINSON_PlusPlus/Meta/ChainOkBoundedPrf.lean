@@ -205,6 +205,199 @@ theorem prf_boundedCarcLt_cons_succ_iff (y line rest j : Term) :
     · exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedCarcLt_cons_of_tail y line rest j) _)
         (PrfH.hyp _ _ (List.Mem.head _))
 
+/-! ### (a) Forma acotada de `allIn`
+
+`allIn c L ⇔ ∀ j < lenc L. In (nthc L j) c`.
+
+Todo el manejo del `∀j` (introducción por **`Prf.qconf`**, eliminación por `PrfH_spec`) se confina
+en cuatro lemas `Prf` autónomos sobre `boundedAllIn`; las dos inducciones de lista quedan entonces
+triviales — mismo reparto que `prf_boundedIn_head/tail/nil/cons` en la fase 1b. -/
+
+/-- Congruencia de `In` en el **primer** argumento (elemento). -/
+theorem PrfH_eq_subst_in1 {Γ : List Formula} {x₁ x₂ L : Term}
+    (h : PrfH Γ (x₁ =eq x₂)) (hin : PrfH Γ (In x₁ L)) : PrfH Γ (In x₂ L) := by
+  let f : Formula := In (.var 0) (liftTerm 0 L)
+  have hS : ∀ s : Term, substFormula 0 s f = In s L := by
+    intro s; simp only [f, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS x₂) ▸ PrfH_leibniz_subst (A := f) h ((hS x₁) ▸ hin)
+
+/-- `∀ j < lenc L. In (nthc L j) c` (el `j` es `#0` bajo el `∀`). -/
+def boundedAllIn (c L : Term) : Formula :=
+  Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+    (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c)))
+
+/-- Clausura De Bruijn de `boundedAllIn` (vía `liftTerm_comm_zero`; NO es defeq). -/
+theorem liftFormula_boundedAllIn_gen (k : Nat) (c L : Term) :
+    liftFormula k (boundedAllIn c L) = boundedAllIn (liftTerm k c) (liftTerm k L) := by
+  simp only [boundedAllIn, liftFormula, liftTerm, liftTerms, lt, nthc, lenc, In,
+    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+
+/-- `substFormula` atraviesa `boundedAllIn` (vía `substTerm_lift_comm_zero`). -/
+theorem substFormula_boundedAllIn (v : Nat) (s c L : Term) :
+    substFormula v s (boundedAllIn c L) = boundedAllIn (substTerm v s c) (substTerm v s L) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [boundedAllIn, substFormula, substTerm, substTerms, lt, nthc, lenc, In, liftTerm,
+    liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
+    FOL.substTerm_lift_comm_zero]
+
+/-- Base: `boundedAllIn c nil` es vacuamente cierto (`¬ j < lenc nil = 0`). -/
+theorem prf_boundedAllIn_nil (c : Term) : Prf (boundedAllIn c nil) := by
+  refine Prf.gen _ ?_
+  simp only [boundedAllIn, lt, lenc, nthc, In, nil, zero, liftTerm, liftTerms]
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
+      (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
+
+/-- Proyección cabeza: instancia el `∀j` en `j = 0` (`0 < σ(lenc t)`, `nthc (cons hd t) 0 = hd`). -/
+theorem prf_boundedAllIn_cons_head (c hd t : Term) :
+    Prf (boundedAllIn c (cons hd t) ⇒ In hd c) := by
+  refine prf_deduction ?_
+  have hA : PrfH [boundedAllIn c (cons hd t)] (boundedAllIn c (cons hd t)) := prfH_hyp_self _
+  have h0 := PrfH_spec hA zero
+  simp only [boundedAllIn, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
+    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] at h0
+  have hb : PrfH [boundedAllIn c (cons hd t)] (lt zero (lenc (cons hd t))) :=
+    prf_to_prfH (prf_lt_subst2 (prf_eq_symm (prf_lenc_cons hd t)) (prf_zero_lt_succ (lenc t))) _
+  exact PrfH_eq_subst_in1 (prf_to_prfH (prf_nthc_zero hd t) _) (PrfH.mp _ _ _ h0 hb)
+
+/-- Proyección cola: reindexa `j ↦ σj` (usa `Prf.qconf` para el `∀` del consecuente). -/
+theorem prf_boundedAllIn_cons_tail (c hd t : Term) :
+    Prf (boundedAllIn c (cons hd t) ⇒ boundedAllIn c t) := by
+  have hq := Prf.qconf (boundedAllIn c (cons hd t))
+    (Formula.impl (lt (.var 0) (liftTerm 0 (lenc t)))
+      (In (nthc (liftTerm 0 t) (.var 0)) (liftTerm 0 c)))
+  refine prf_mp hq (Prf.gen _ ?_)
+  rw [liftFormula_boundedAllIn_gen]
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc t))) _ rfl)
+  let Ac : Formula := boundedAllIn (liftTerm 0 c) (liftTerm 0 (cons hd t))
+  let B : Formula := lt (.var 0) (liftTerm 0 (lenc t))
+  have hA : PrfH [B, Ac] Ac := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hB : PrfH [B, Ac] B := PrfH.hyp _ _ (List.Mem.head _)
+  have hs := PrfH_spec hA (succ (.var 0))
+  simp only [Ac, boundedAllIn, substFormula, substTerm, substTerms, lt, lenc, nthc, In, succ,
+    Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] at hs
+  have hlt : PrfH [B, Ac] (lt (succ (.var 0)) (lenc (liftTerm 0 (cons hd t)))) :=
+    PrfH_lt_subst2 (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 t))) _)
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 t))) _) hB)
+  exact PrfH_eq_subst_in1
+    (prf_to_prfH (prf_nthc_succ (liftTerm 0 hd) (liftTerm 0 t) (.var 0)) _)
+    (PrfH.mp _ _ _ hs hlt)
+
+/-- Reintroducción: `In hd c ∧ boundedAllIn c t ⇒ boundedAllIn c (cons hd t)`.
+    `Prf.qconf` para el `∀j` del consecuente; case-split de `j` con `prf_zero_or_eq_succ_pred`. -/
+theorem prf_boundedAllIn_cons (c hd t : Term) :
+    Prf (land (In hd c) (boundedAllIn c t) ⇒ boundedAllIn c (cons hd t)) := by
+  have hq := Prf.qconf (land (In hd c) (boundedAllIn c t))
+    (Formula.impl (lt (.var 0) (liftTerm 0 (lenc (cons hd t))))
+      (In (nthc (liftTerm 0 (cons hd t)) (.var 0)) (liftTerm 0 c)))
+  refine prf_mp hq (Prf.gen _ ?_)
+  have hland : liftFormula 0 (land (In hd c) (boundedAllIn c t))
+      = land (In (liftTerm 0 hd) (liftTerm 0 c)) (liftFormula 0 (boundedAllIn c t)) := rfl
+  rw [hland, liftFormula_boundedAllIn_gen]
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc (cons hd t)))) _ rfl)
+  let P : Formula :=
+    land (In (liftTerm 0 hd) (liftTerm 0 c)) (boundedAllIn (liftTerm 0 c) (liftTerm 0 t))
+  let B : Formula := lt (.var 0) (liftTerm 0 (lenc (cons hd t)))
+  let Z : Formula := Formula.eq (.var 0) zero
+  let S : Formula := Formula.eq (.var 0) (succ (pred (.var 0)))
+  show PrfH [B, P] (In (nthc (liftTerm 0 (cons hd t)) (.var 0)) (liftTerm 0 c))
+  refine PrfH_or_elim (prf_to_prfH (prf_zero_or_eq_succ_pred (.var 0)) _) ?_ ?_
+  · -- j = 0 : la cabeza
+    have hz : PrfH [Z, B, P] Z := PrfH.hyp _ _ (List.Mem.head _)
+    have hIn : PrfH [Z, B, P] (In (liftTerm 0 hd) (liftTerm 0 c)) :=
+      PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    exact PrfH_eq_subst_in1
+      (PrfH_eq_symm (PrfH_eq_trans (PrfH_eq_congr_nthc2 hz)
+        (prf_to_prfH (prf_nthc_zero (liftTerm 0 hd) (liftTerm 0 t)) _))) hIn
+  · -- j = σ(pred j) : la cola, vía la hipótesis acotada instanciada en `pred j`
+    have hs : PrfH [S, B, P] S := PrfH.hyp _ _ (List.Mem.head _)
+    have hB : PrfH [S, B, P] B := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hP : PrfH [S, B, P] P :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+    have hbAI : PrfH [S, B, P] (boundedAllIn (liftTerm 0 c) (liftTerm 0 t)) :=
+      PrfH_and_elim_right hP
+    have hltJ : PrfH [S, B, P] (lt (pred (.var 0)) (lenc (liftTerm 0 t))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (liftTerm 0 t))) _)
+        (PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 t)) _)
+          (PrfH_lt_subst1 hs hB))
+    have hspec := PrfH_spec hbAI (pred (.var 0))
+    simp only [boundedAllIn, substFormula, substTerm, substTerms, lt, lenc, nthc, In, pred,
+      Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] at hspec
+    exact PrfH_eq_subst_in1
+      (PrfH_eq_symm (PrfH_eq_trans (PrfH_eq_congr_nthc2 hs)
+        (prf_to_prfH (prf_nthc_succ (liftTerm 0 hd) (liftTerm 0 t) (pred (.var 0))) _)))
+      (PrfH.mp _ _ _ hspec hltJ)
+
+/-- `liftFormula`/`substFormula` atraviesan `allIn` (definicional: es un átomo). -/
+theorem liftFormula_allIn (k : Nat) (c L : Term) :
+    liftFormula k (allIn c L) = allIn (liftTerm k c) (liftTerm k L) := rfl
+
+theorem substFormula_allIn (v : Nat) (s c L : Term) :
+    substFormula v s (allIn c L) = allIn (substTerm v s c) (substTerm v s L) := rfl
+
+/-- Dirección ⇒ : `allIn c L ⇒ ∀ j < lenc L. In (nthc L j) c` (inducción de listas sobre `L`). -/
+theorem prf_boundedAllIn_of_allIn (c L : Term) : Prf (allIn c L ⇒ boundedAllIn c L) := by
+  have key : Prf (Formula.forall (Formula.impl (allIn (liftTerm 0 c) (.var 0))
+      (boundedAllIn (liftTerm 0 c) (.var 0)))) := by
+    refine prf_list_induction _ ?base ?step
+    · have hb : Prf (Formula.impl (allIn c nil) (boundedAllIn c nil)) :=
+        prf_deduction (prf_to_prfH (prf_boundedAllIn_nil c) _)
+      simpa only [substFormula, substFormula_allIn, substFormula_boundedAllIn, substTerm,
+        substTerms, nil, zero, reduceIte, if_true, FOL.substTerm_liftTerm] using hb
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [liftFormula, liftFormula_allIn, liftFormula_boundedAllIn_gen, substFormula,
+        substFormula_allIn, substFormula_boundedAllIn, liftTerm, liftTerms, substTerm, substTerms,
+        Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, norm21]
+      let C : Term := liftTerm 1 (liftTerm 0 c)
+      refine prf_deduction (deduction_aux ?_ (allIn C (cons (.var 1) (.var 0))) _ rfl)
+      let A : Formula := allIn C (cons (.var 1) (.var 0))
+      let IH : Formula := Formula.impl (allIn C (.var 0)) (boundedAllIn C (.var 0))
+      have hsplit : PrfH [A, IH] (land (In (.var 1) C) (allIn C (.var 0))) :=
+        PrfH_iff_mp (prf_allIn_cons C (.var 1) (.var 0)) (PrfH.hyp _ _ (List.Mem.head _))
+      have hTail : PrfH [A, IH] (boundedAllIn C (.var 0)) :=
+        PrfH.mp _ _ _ (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+          (PrfH_and_elim_right hsplit)
+      exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedAllIn_cons C (.var 1) (.var 0)) _)
+        (PrfH_and_intro (PrfH_and_elim_left hsplit) hTail)
+  have hkey := prf_spec key L
+  simpa only [substFormula, substFormula_allIn, substFormula_boundedAllIn, substTerm, substTerms,
+    reduceIte, if_true, FOL.substTerm_liftTerm] using hkey
+
+/-- Dirección ⇐ : `(∀ j < lenc L. In (nthc L j) c) ⇒ allIn c L` (inducción de listas sobre `L`). -/
+theorem prf_allIn_of_boundedAllIn (c L : Term) : Prf (boundedAllIn c L ⇒ allIn c L) := by
+  have key : Prf (Formula.forall (Formula.impl (boundedAllIn (liftTerm 0 c) (.var 0))
+      (allIn (liftTerm 0 c) (.var 0)))) := by
+    refine prf_list_induction _ ?base ?step
+    · have hb : Prf (Formula.impl (boundedAllIn c nil) (allIn c nil)) :=
+        prf_deduction (prf_to_prfH (prf_allIn_nil c) _)
+      simpa only [substFormula, substFormula_allIn, substFormula_boundedAllIn, substTerm,
+        substTerms, nil, zero, reduceIte, if_true, FOL.substTerm_liftTerm] using hb
+    · refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [liftFormula, liftFormula_allIn, liftFormula_boundedAllIn_gen, substFormula,
+        substFormula_allIn, substFormula_boundedAllIn, liftTerm, liftTerms, substTerm, substTerms,
+        Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, norm21]
+      let C : Term := liftTerm 1 (liftTerm 0 c)
+      refine prf_deduction (deduction_aux ?_ (boundedAllIn C (cons (.var 1) (.var 0))) _ rfl)
+      let A : Formula := boundedAllIn C (cons (.var 1) (.var 0))
+      let IH : Formula := Formula.impl (boundedAllIn C (.var 0)) (allIn C (.var 0))
+      have hA : PrfH [A, IH] A := PrfH.hyp _ _ (List.Mem.head _)
+      have hHead : PrfH [A, IH] (In (.var 1) C) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_boundedAllIn_cons_head C (.var 1) (.var 0)) _) hA
+      have hTail : PrfH [A, IH] (allIn C (.var 0)) :=
+        PrfH.mp _ _ _ (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+          (PrfH.mp _ _ _ (prf_to_prfH (prf_boundedAllIn_cons_tail C (.var 1) (.var 0)) _) hA)
+      exact PrfH_iff_mpr (prf_allIn_cons C (.var 1) (.var 0)) (PrfH_and_intro hHead hTail)
+  have hkey := prf_spec key L
+  simpa only [substFormula, substFormula_allIn, substFormula_boundedAllIn, substTerm, substTerms,
+    reduceIte, if_true, FOL.substTerm_liftTerm] using hkey
+
+/-- **(a)** `allIn c L ⇔ ∀ j < lenc L. In (nthc L j) c` — la forma acotada de `allIn`,
+    con la que `lineOk` se vuelve Δ₀ sobre índices. -/
+theorem prf_allIn_iff_boundedAllIn (c L : Term) : Prf (allIn c L ⇔ boundedAllIn c L) :=
+  prf_and_intro (prf_boundedAllIn_of_allIn c L) (prf_allIn_of_boundedAllIn c L)
+
 end ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 
 export ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf (
@@ -212,4 +405,8 @@ export ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf (
   boundedCarcLt boundedCarcIn_eq_boundedCarcLt liftFormula_boundedCarcLt
   prf_boundedCarcLt_cons_of_tail prf_boundedCarcLt_cons_of_head
   prf_boundedCarcLt_cons_succ_iff
+  PrfH_eq_subst_in1 boundedAllIn liftFormula_boundedAllIn_gen substFormula_boundedAllIn
+  prf_boundedAllIn_nil prf_boundedAllIn_cons_head prf_boundedAllIn_cons_tail
+  prf_boundedAllIn_cons prf_boundedAllIn_of_allIn prf_allIn_of_boundedAllIn
+  prf_allIn_iff_boundedAllIn
 )
