@@ -548,6 +548,154 @@ theorem substFormula_chainOkB (v : Nat) (s c p : Term) :
     liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
     FOL.substTerm_lift_comm_zero]
 
+/-! ### (d) escalón 2: las dos mitades del paso `cons` (`i = 0` y `i = σi'`)
+
+`lineOkB` con la línea **desacoplada** del índice, para poder transportarla por Leibniz
+(`nthc (cons line rest) 0 =eq line`, `nthc (cons line rest) (σi) =eq nthc rest i`). -/
+
+/-- `lineOkB` con la línea `X` como parámetro explícito: `lineOkB c p i = lineOkBAt c p i (nthc p i)`. -/
+def lineOkBAt (c p i X : Term) : Formula :=
+  land (lineWF X) (boundedPremsIn c p i (premsOf X))
+
+theorem lineOkB_eq_at (c p i : Term) : lineOkB c p i = lineOkBAt c p i (nthc p i) := rfl
+
+/-- Congruencia (Leibniz) de `lineOkBAt` en la línea `X`. -/
+theorem PrfH_congr_lineOkBAt {Γ : List Formula} {c p i X₁ X₂ : Term}
+    (h : PrfH Γ (X₁ =eq X₂)) (hL : PrfH Γ (lineOkBAt c p i X₁)) : PrfH Γ (lineOkBAt c p i X₂) := by
+  let f : Formula := lineOkBAt (liftTerm 0 c) (liftTerm 0 p) (liftTerm 0 i) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = lineOkBAt c p i s := by
+    intro s
+    simp only [f, lineOkBAt, land, substFormula, substFormula_boundedPremsIn, substTerm,
+      substTerms, lineWF, premsOf, FOL.substTerm_liftTerm, if_true]
+  exact (hS X₂) ▸ PrfH_leibniz_subst (A := f) h ((hS X₁) ▸ hL)
+
+/-- Cota `0`: no hay líneas anteriores, luego `boundedPremsIn` colapsa a `boundedAllIn`. -/
+theorem prf_boundedPremsIn_zero_iff (c p L : Term) :
+    Prf (boundedPremsIn c p zero L ⇔ boundedAllIn c L) := by
+  refine prf_and_intro ?_ ?_
+  · -- ⇒ : el disyunto `∃k<0` es absurdo
+    have hq := Prf.qconf (boundedPremsIn c p zero L)
+      (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+        (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c)))
+    refine prf_mp hq (Prf.gen _ ?_)
+    rw [liftFormula_boundedPremsIn]
+    refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc L))) _ rfl)
+    let A0 : Formula :=
+      boundedPremsIn (liftTerm 0 c) (liftTerm 0 p) (liftTerm 0 zero) (liftTerm 0 L)
+    let B0 : Formula := lt (.var 0) (liftTerm 0 (lenc L))
+    have hA : PrfH [B0, A0] A0 := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hB : PrfH [B0, A0] B0 := PrfH.hyp _ _ (List.Mem.head _)
+    have hs := PrfH_spec hA (.var 0)
+    simp only [A0, boundedPremsIn, substFormula, substFormula_boundedCarcLt, substTerm, substTerms,
+      lt, lenc, nthc, In, lor, reduceIte, if_true, FOL.substTerm_liftTerm] at hs
+    refine PrfH_or_elim (PrfH.mp _ _ _ hs hB) ?_ ?_
+    · exact PrfH.hyp _ _ (List.Mem.head _)
+    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+        (PrfH.mp _ _ _ (prf_to_prfH
+          (prf_boundedCarcLt_zero (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p)) _)
+          (PrfH.hyp _ _ (List.Mem.head _)))
+  · -- ⇐ : se introduce el disyunto izquierdo
+    have hq := Prf.qconf (boundedAllIn c L)
+      (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+        (lor (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c))
+             (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p) (liftTerm 0 zero))))
+    refine prf_mp hq (Prf.gen _ ?_)
+    rw [liftFormula_boundedAllIn_gen]
+    refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc L))) _ rfl)
+    let A0 : Formula := boundedAllIn (liftTerm 0 c) (liftTerm 0 L)
+    let B0 : Formula := lt (.var 0) (liftTerm 0 (lenc L))
+    have hA : PrfH [B0, A0] A0 := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hB : PrfH [B0, A0] B0 := PrfH.hyp _ _ (List.Mem.head _)
+    have hs := PrfH_spec hA (.var 0)
+    simp only [A0, boundedAllIn, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
+      reduceIte, if_true, FOL.substTerm_liftTerm] at hs
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.mp _ _ _ hs hB)
+
+/-- **Mitad `i = 0`**: la línea `0` de `line :: rest` no tiene líneas anteriores, así que su
+    validez acotada es exactamente `lineOk c line` (usa (a) y `prf_boundedPremsIn_zero_iff`). -/
+theorem prf_lineOkB_zero_iff (c line rest : Term) :
+    Prf (lineOkB c (cons line rest) zero ⇔ lineOk c line) := by
+  refine prf_and_intro ?_ ?_
+  · refine prf_deduction ?_
+    have hAt : PrfH [lineOkB c (cons line rest) zero]
+        (lineOkBAt c (cons line rest) zero line) :=
+      PrfH_congr_lineOkBAt (prf_to_prfH (prf_nthc_zero line rest) _) (prfH_hyp_self _)
+    refine PrfH_and_intro (PrfH_and_elim_left hAt) ?_
+    exact PrfH_iff_mpr (prf_allIn_iff_boundedAllIn c (premsOf line))
+      (PrfH_iff_mp (prf_boundedPremsIn_zero_iff c (cons line rest) (premsOf line))
+        (PrfH_and_elim_right hAt))
+  · refine prf_deduction ?_
+    have hAt : PrfH [lineOk c line] (lineOkBAt c (cons line rest) zero line) := by
+      refine PrfH_and_intro (PrfH_and_elim_left (prfH_hyp_self _)) ?_
+      exact PrfH_iff_mpr (prf_boundedPremsIn_zero_iff c (cons line rest) (premsOf line))
+        (PrfH_iff_mp (prf_allIn_iff_boundedAllIn c (premsOf line))
+          (PrfH_and_elim_right (prfH_hyp_self _)))
+    exact PrfH_congr_lineOkBAt (prf_to_prfH (prf_eq_symm (prf_nthc_zero line rest)) _) hAt
+
+/-- Reindexado de `boundedPremsIn` al pasar de `line :: rest` (índice `σi`) a `rest` (índice `i`):
+    es el **lema puntual** `prf_premOk_cons_iff` transportado bajo el `∀j`. -/
+theorem prf_boundedPremsIn_cons_succ_iff (c line rest i L : Term) :
+    Prf (boundedPremsIn c (cons line rest) (succ i) L
+      ⇔ boundedPremsIn (concat c (cons (carc line) nil)) rest i L) := by
+  refine prf_and_intro ?_ ?_
+  · have hq := Prf.qconf (boundedPremsIn c (cons line rest) (succ i) L)
+      (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+        (lor (In (nthc (liftTerm 0 L) (.var 0))
+                 (liftTerm 0 (concat c (cons (carc line) nil))))
+             (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 rest) (liftTerm 0 i))))
+    refine prf_mp hq (Prf.gen _ ?_)
+    rw [liftFormula_boundedPremsIn]
+    refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc L))) _ rfl)
+    let A0 : Formula := boundedPremsIn (liftTerm 0 c) (liftTerm 0 (cons line rest))
+      (liftTerm 0 (succ i)) (liftTerm 0 L)
+    let B0 : Formula := lt (.var 0) (liftTerm 0 (lenc L))
+    have hA : PrfH [B0, A0] A0 := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hB : PrfH [B0, A0] B0 := PrfH.hyp _ _ (List.Mem.head _)
+    have hs := PrfH_spec hA (.var 0)
+    simp only [A0, boundedPremsIn, substFormula, substFormula_boundedCarcLt, substTerm, substTerms,
+      lt, lenc, nthc, In, lor, reduceIte, if_true, FOL.substTerm_liftTerm] at hs
+    exact PrfH_iff_mp (prf_premOk_cons_iff (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c)
+      (liftTerm 0 line) (liftTerm 0 rest) (liftTerm 0 i)) (PrfH.mp _ _ _ hs hB)
+  · have hq := Prf.qconf (boundedPremsIn (concat c (cons (carc line) nil)) rest i L)
+      (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+        (lor (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c))
+             (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 (cons line rest))
+               (liftTerm 0 (succ i)))))
+    refine prf_mp hq (Prf.gen _ ?_)
+    rw [liftFormula_boundedPremsIn]
+    refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc L))) _ rfl)
+    let A0 : Formula := boundedPremsIn (liftTerm 0 (concat c (cons (carc line) nil)))
+      (liftTerm 0 rest) (liftTerm 0 i) (liftTerm 0 L)
+    let B0 : Formula := lt (.var 0) (liftTerm 0 (lenc L))
+    have hA : PrfH [B0, A0] A0 := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hB : PrfH [B0, A0] B0 := PrfH.hyp _ _ (List.Mem.head _)
+    have hs := PrfH_spec hA (.var 0)
+    simp only [A0, boundedPremsIn, substFormula, substFormula_boundedCarcLt, substTerm, substTerms,
+      lt, lenc, nthc, In, lor, reduceIte, if_true, FOL.substTerm_liftTerm] at hs
+    exact PrfH_iff_mpr (prf_premOk_cons_iff (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c)
+      (liftTerm 0 line) (liftTerm 0 rest) (liftTerm 0 i)) (PrfH.mp _ _ _ hs hB)
+
+/-- **Mitad `i = σi'`**: la línea `σi'` de `line :: rest` es la línea `i'` de `rest`, y sus premisas
+    admisibles son las mismas si el acumulador absorbe `carc line`. -/
+theorem prf_lineOkB_cons_succ_iff (c line rest i : Term) :
+    Prf (lineOkB c (cons line rest) (succ i)
+      ⇔ lineOkB (concat c (cons (carc line) nil)) rest i) := by
+  refine prf_and_intro ?_ ?_
+  · refine prf_deduction ?_
+    have hAt : PrfH [lineOkB c (cons line rest) (succ i)]
+        (lineOkBAt c (cons line rest) (succ i) (nthc rest i)) :=
+      PrfH_congr_lineOkBAt (prf_to_prfH (prf_nthc_succ line rest i) _) (prfH_hyp_self _)
+    refine PrfH_and_intro (PrfH_and_elim_left hAt) ?_
+    exact PrfH_iff_mp (prf_boundedPremsIn_cons_succ_iff c line rest i (premsOf (nthc rest i)))
+      (PrfH_and_elim_right hAt)
+  · refine prf_deduction ?_
+    have hAt : PrfH [lineOkB (concat c (cons (carc line) nil)) rest i]
+        (lineOkBAt c (cons line rest) (succ i) (nthc rest i)) := by
+      refine PrfH_and_intro (PrfH_and_elim_left (prfH_hyp_self _)) ?_
+      exact PrfH_iff_mpr (prf_boundedPremsIn_cons_succ_iff c line rest i (premsOf (nthc rest i)))
+        (PrfH_and_elim_right (prfH_hyp_self _))
+    exact PrfH_congr_lineOkBAt (prf_to_prfH (prf_eq_symm (prf_nthc_succ line rest i)) _) hAt
+
 /-- Base: `chainOkB c nil` es vacuamente cierto (`¬ i < lenc nil = 0`). -/
 theorem prf_chainOkB_nil (c : Term) : Prf (chainOkB c nil) := by
   refine Prf.gen _ ?_
@@ -556,6 +704,186 @@ theorem prf_chainOkB_nil (c : Term) : Prf (chainOkB c nil) := by
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
+
+/-! ### (d) escalón 3: `chainOkB` sobre `cons`, y la inducción principal -/
+
+/-- Congruencia (Leibniz) de `lineOkB` en el índice `i`. -/
+theorem PrfH_congr_lineOkB_i {Γ : List Formula} {c p i₁ i₂ : Term}
+    (h : PrfH Γ (i₁ =eq i₂)) (hL : PrfH Γ (lineOkB c p i₁)) : PrfH Γ (lineOkB c p i₂) := by
+  let f : Formula := lineOkB (liftTerm 0 c) (liftTerm 0 p) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = lineOkB c p s := by
+    intro s
+    simp only [f, substFormula_lineOkB, substTerm, reduceIte, if_true, FOL.substTerm_liftTerm]
+  exact (hS i₂) ▸ PrfH_leibniz_subst (A := f) h ((hS i₁) ▸ hL)
+
+/-- Proyección cabeza: instancia el `∀i` en `i = 0`. -/
+theorem prf_chainOkB_cons_head (c line rest : Term) :
+    Prf (chainOkB c (cons line rest) ⇒ lineOk c line) := by
+  refine prf_deduction ?_
+  have hA : PrfH [chainOkB c (cons line rest)] (chainOkB c (cons line rest)) := prfH_hyp_self _
+  have h0 := PrfH_spec hA zero
+  simp only [chainOkB, substFormula, substFormula_lineOkB, substTerm, substTerms, lt, lenc,
+    reduceIte, if_true, FOL.substTerm_liftTerm] at h0
+  have hb : PrfH [chainOkB c (cons line rest)] (lt zero (lenc (cons line rest))) :=
+    prf_to_prfH (prf_lt_subst2 (prf_eq_symm (prf_lenc_cons line rest))
+      (prf_zero_lt_succ (lenc rest))) _
+  exact PrfH_iff_mp (prf_lineOkB_zero_iff c line rest) (PrfH.mp _ _ _ h0 hb)
+
+/-- Proyección cola: reindexa `i ↦ σi` y absorbe `carc line` en el acumulador. -/
+theorem prf_chainOkB_cons_tail (c line rest : Term) :
+    Prf (chainOkB c (cons line rest) ⇒ chainOkB (concat c (cons (carc line) nil)) rest) := by
+  have hq := Prf.qconf (chainOkB c (cons line rest))
+    (Formula.impl (lt (.var 0) (liftTerm 0 (lenc rest)))
+      (lineOkB (liftTerm 0 (concat c (cons (carc line) nil))) (liftTerm 0 rest) (.var 0)))
+  refine prf_mp hq (Prf.gen _ ?_)
+  rw [liftFormula_chainOkB]
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc rest))) _ rfl)
+  let A0 : Formula := chainOkB (liftTerm 0 c) (liftTerm 0 (cons line rest))
+  let B0 : Formula := lt (.var 0) (liftTerm 0 (lenc rest))
+  have hA : PrfH [B0, A0] A0 := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hB : PrfH [B0, A0] B0 := PrfH.hyp _ _ (List.Mem.head _)
+  have hs := PrfH_spec hA (succ (.var 0))
+  simp only [A0, chainOkB, substFormula, substFormula_lineOkB, substTerm, substTerms, lt, lenc,
+    reduceIte, if_true, FOL.substTerm_liftTerm] at hs
+  have hlt : PrfH [B0, A0] (lt (succ (.var 0)) (lenc (liftTerm 0 (cons line rest)))) :=
+    PrfH_lt_subst2 (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 line) (liftTerm 0 rest))) _)
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 rest))) _) hB)
+  exact PrfH_iff_mp
+    (prf_lineOkB_cons_succ_iff (liftTerm 0 c) (liftTerm 0 line) (liftTerm 0 rest) (.var 0))
+    (PrfH.mp _ _ _ hs hlt)
+
+/-- Reintroducción: `lineOk c line ∧ chainOkB (c ++ [carc line]) rest ⇒ chainOkB c (line :: rest)`.
+    `Prf.qconf` para el `∀i`; case-split de `i` con `prf_zero_or_eq_succ_pred`. -/
+theorem prf_chainOkB_cons_intro (c line rest : Term) :
+    Prf (land (lineOk c line) (chainOkB (concat c (cons (carc line) nil)) rest)
+      ⇒ chainOkB c (cons line rest)) := by
+  have hq := Prf.qconf (land (lineOk c line) (chainOkB (concat c (cons (carc line) nil)) rest))
+    (Formula.impl (lt (.var 0) (liftTerm 0 (lenc (cons line rest))))
+      (lineOkB (liftTerm 0 c) (liftTerm 0 (cons line rest)) (.var 0)))
+  refine prf_mp hq (Prf.gen _ ?_)
+  have hland :
+      liftFormula 0 (land (lineOk c line) (chainOkB (concat c (cons (carc line) nil)) rest))
+      = land (lineOk (liftTerm 0 c) (liftTerm 0 line))
+             (liftFormula 0 (chainOkB (concat c (cons (carc line) nil)) rest)) := rfl
+  rw [hland, liftFormula_chainOkB]
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc (cons line rest)))) _ rfl)
+  let P0 : Formula := land (lineOk (liftTerm 0 c) (liftTerm 0 line))
+    (chainOkB (liftTerm 0 (concat c (cons (carc line) nil))) (liftTerm 0 rest))
+  let B0 : Formula := lt (.var 0) (liftTerm 0 (lenc (cons line rest)))
+  let Z : Formula := Formula.eq (.var 0) zero
+  let S : Formula := Formula.eq (.var 0) (succ (pred (.var 0)))
+  show PrfH [B0, P0] (lineOkB (liftTerm 0 c) (liftTerm 0 (cons line rest)) (.var 0))
+  refine PrfH_or_elim (prf_to_prfH (prf_zero_or_eq_succ_pred (.var 0)) _) ?_ ?_
+  · -- i = 0 : es la línea `line`
+    have hz : PrfH [Z, B0, P0] Z := PrfH.hyp _ _ (List.Mem.head _)
+    have hline : PrfH [Z, B0, P0] (lineOk (liftTerm 0 c) (liftTerm 0 line)) :=
+      PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    refine PrfH_congr_lineOkB_i (PrfH_eq_symm hz) ?_
+    exact PrfH_iff_mpr
+      (prf_lineOkB_zero_iff (liftTerm 0 c) (liftTerm 0 line) (liftTerm 0 rest)) hline
+  · -- i = σ(pred i) : es la línea `pred i` de `rest`, bajo el acumulador ampliado
+    have hs : PrfH [S, B0, P0] S := PrfH.hyp _ _ (List.Mem.head _)
+    have hB : PrfH [S, B0, P0] B0 := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hP : PrfH [S, B0, P0] P0 :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+    have hchain : PrfH [S, B0, P0]
+        (chainOkB (liftTerm 0 (concat c (cons (carc line) nil))) (liftTerm 0 rest)) :=
+      PrfH_and_elim_right hP
+    have hltJ : PrfH [S, B0, P0] (lt (pred (.var 0)) (lenc (liftTerm 0 rest))) :=
+      PrfH.mp _ _ _
+        (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (liftTerm 0 rest))) _)
+        (PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 line) (liftTerm 0 rest)) _)
+          (PrfH_lt_subst1 hs hB))
+    have hspec := PrfH_spec hchain (pred (.var 0))
+    simp only [chainOkB, substFormula, substFormula_lineOkB, substTerm, substTerms, lt, lenc,
+      reduceIte, if_true, FOL.substTerm_liftTerm] at hspec
+    refine PrfH_congr_lineOkB_i (PrfH_eq_symm hs) ?_
+    exact PrfH_iff_mpr
+      (prf_lineOkB_cons_succ_iff (liftTerm 0 c) (liftTerm 0 line) (liftTerm 0 rest)
+        (pred (.var 0)))
+      (PrfH.mp _ _ _ hspec hltJ)
+
+/-- **Paso `cons` de la forma acotada**, espejo exacto de `ax_chainOk_cons`:
+    `chainOkB c (line :: rest) ⇔ lineOk c line ∧ chainOkB (c ++ [carc line]) rest`. -/
+theorem prf_chainOkB_cons_iff (c line rest : Term) :
+    Prf (chainOkB c (cons line rest)
+      ⇔ land (lineOk c line) (chainOkB (concat c (cons (carc line) nil)) rest)) := by
+  refine prf_and_intro ?_ ?_
+  · refine prf_deduction ?_
+    exact PrfH_and_intro
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_chainOkB_cons_head c line rest) _) (prfH_hyp_self _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_chainOkB_cons_tail c line rest) _) (prfH_hyp_self _))
+  · exact prf_chainOkB_cons_intro c line rest
+
+/-! #### La inducción principal (acumulador `∀c` **interno**) -/
+
+/-- Predicado inductivo: `Ψ(p) = ∀c. (chainOk c p ⇔ chainOkB c p)` (lista `p` = `#1`, `c` = `#0`).
+    El acumulador va **dentro** del `∀`: en el paso `cons` la HI se usa en `c ++ [carc line]`. -/
+def chainBPred : Formula :=
+  Formula.forall (iff (chainOk (.var 0) (.var 1)) (chainOkB (.var 0) (.var 1)))
+
+/-- **(d)** `chainOk c p ⇔ chainOkB c p` — el acumulador desaparece.
+
+`chainOkB c p := ∀ i < lenc p. (lineWF (nthc p i) ∧ ∀ j < lenc (premsOf (nthc p i)).
+   (In (nthc (premsOf (nthc p i)) j) c  ∨  ∃ k < i. carc (nthc p k) =eq nthc (premsOf (nthc p i)) j))`
+
+es la formulación Δ₀ clásica de «demostración»: cada premisa está en el contexto inicial `c`
+o es la conclusión de una línea **anterior**. -/
+theorem prf_chainOk_iff_chainOkB (c p : Term) : Prf (chainOk c p ⇔ chainOkB c p) := by
+  have key : Prf (Formula.forall chainBPred) := by
+    refine prf_list_induction chainBPred ?base ?step
+    · -- base: p = nil (ambos lados son teoremas)
+      have hb : Prf (iff (chainOk (.var 0) nil) (chainOkB (.var 0) nil)) :=
+        prf_and_intro (prf_deduction (prf_to_prfH (prf_chainOkB_nil (.var 0)) _))
+          (prf_deduction (prf_to_prfH (prf_chainOk_nil (.var 0)) _))
+      refine Prf.gen _ ?_
+      simpa only [chainBPred, substFormula, substFormula_chainOkB, substTerm, substTerms,
+        chainOk, iff, land, nil, zero, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceEqDiff,
+        Nat.reduceGT, Nat.reduceSub, reduceIte, if_true] using hb
+    · -- paso: `cons` (confinación `qconf`; la HI se instancia en `c ++ [carc #2]`)
+      refine Prf.gen _ (Prf.gen _ ?_)
+      simp only [chainBPred, liftFormula, liftFormula_chainOkB, substFormula,
+        substFormula_chainOkB, liftTerm, liftTerms, substTerm, substTerms, chainOk, iff, land,
+        Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true]
+      refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
+      refine prf_deduction ?_
+      let Q : Formula := Formula.forall
+        (iff (chainOk (.var 0) (.var 2)) (chainOkB (.var 0) (.var 2)))
+      let A1 : Formula := chainOk (.var 0) (cons (.var 2) (.var 1))
+      let A2 : Formula := chainOkB (.var 0) (cons (.var 2) (.var 1))
+      show PrfH [Q] (iff A1 A2)
+      let cx : Term := concat (.var 0) (cons (carc (.var 2)) nil)
+      refine PrfH_and_intro (deduction_aux ?_ A1 _ rfl) (deduction_aux ?_ A2 _ rfl)
+      · -- chainOk c (line :: rest) ⇒ chainOkB c (line :: rest)
+        have ihc : PrfH [A1, Q] (iff (chainOk cx (.var 1)) (chainOkB cx (.var 1))) := by
+          have h := PrfH_spec (Γ := [A1, Q])
+            (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))) cx
+          simpa only [Q, substFormula, substFormula_chainOkB, substTerm, substTerms, chainOk,
+            iff, land, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+            reduceIte, if_true] using h
+        have hsplit : PrfH [A1, Q] (land (lineOk (.var 0) (.var 2)) (chainOk cx (.var 1))) :=
+          PrfH_iff_mp (prf_chainOk_cons (.var 0) (.var 2) (.var 1)) (PrfH.hyp _ _ (List.Mem.head _))
+        refine PrfH_iff_mpr (prf_chainOkB_cons_iff (.var 0) (.var 2) (.var 1)) ?_
+        refine PrfH_and_intro (PrfH_and_elim_left hsplit) ?_
+        exact PrfH.mp _ _ _ (PrfH_and_elim_left ihc) (PrfH_and_elim_right hsplit)
+      · -- chainOkB c (line :: rest) ⇒ chainOk c (line :: rest)
+        have ihc : PrfH [A2, Q] (iff (chainOk cx (.var 1)) (chainOkB cx (.var 1))) := by
+          have h := PrfH_spec (Γ := [A2, Q])
+            (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))) cx
+          simpa only [Q, substFormula, substFormula_chainOkB, substTerm, substTerms, chainOk,
+            iff, land, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+            reduceIte, if_true] using h
+        have hsplit : PrfH [A2, Q] (land (lineOk (.var 0) (.var 2)) (chainOkB cx (.var 1))) :=
+          PrfH_iff_mp (prf_chainOkB_cons_iff (.var 0) (.var 2) (.var 1))
+            (PrfH.hyp _ _ (List.Mem.head _))
+        refine PrfH_iff_mpr (prf_chainOk_cons (.var 0) (.var 2) (.var 1)) ?_
+        refine PrfH_and_intro (PrfH_and_elim_left hsplit) ?_
+        exact PrfH.mp _ _ _ (PrfH_and_elim_right ihc) (PrfH_and_elim_right hsplit)
+  have hp := prf_spec key p
+  have hc := prf_spec hp c
+  simpa only [chainBPred, substFormula, substFormula_chainOkB, substTerm, substTerms, chainOk,
+    iff, land, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    FOL.substTerm_liftTerm] using hc
 
 end ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 
@@ -573,4 +901,9 @@ export ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf (
   liftFormula_boundedPremsIn substFormula_boundedPremsIn
   liftFormula_lineOkB substFormula_lineOkB
   liftFormula_chainOkB substFormula_chainOkB prf_chainOkB_nil
+  lineOkBAt lineOkB_eq_at PrfH_congr_lineOkBAt PrfH_congr_lineOkB_i
+  prf_boundedPremsIn_zero_iff prf_lineOkB_zero_iff
+  prf_boundedPremsIn_cons_succ_iff prf_lineOkB_cons_succ_iff
+  prf_chainOkB_cons_head prf_chainOkB_cons_tail prf_chainOkB_cons_intro
+  prf_chainOkB_cons_iff chainBPred prf_chainOk_iff_chainOkB
 )
