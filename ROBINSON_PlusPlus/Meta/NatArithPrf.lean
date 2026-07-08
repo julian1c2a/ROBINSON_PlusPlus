@@ -119,9 +119,88 @@ theorem prf_zero_lt_succ (n : Term) : Prf (lt zero (succ n)) :=
   prf_lt_intro zero (succ n) n
     (prf_eq_trans (prf_add_succ_t zero n) (prf_eq_congr_succ (prf_add_zero_left n)))
 
+/-- **Desplegado de `<`**: `lt a b ⇔ ∃k. a + σk = b` (instancia de `ax13_lt_def`, con el
+    cuerpo del `∃` ya reducido: bajo el binder, `a`,`b` aparecen con un `liftTerm 0`). -/
+theorem prf_lt_iff (a b : Term) :
+    Prf (lt a b ⇔ Formula.ex (Formula.eq (add (liftTerm 0 a) (succ (.var 0))) (liftTerm 0 b))) := by
+  have hiff := prf_spec (prf_spec (prf_ax (show ax13_lt_def ∈ axioms by simp [axioms])) a) b
+  simp [substFormula, substTerm, substTerms, lt, add, succ, iff, liftTerm, liftTerms,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
+  exact hiff
+
+/-- **`m < n ⇒ σm < σn`** en `Prf`. Mismo testigo `k`: de `m + σk = n` sale
+    `σm + σk = σ(m + σk) = σn` (`prf_add_succ_left` + congruencia `succ`).
+    El `∃`-elim va por **`prf_ex_elim_imp`** (lift simple, casa con el `↑m`/`↑n` del cuerpo);
+    `PrfH_ex_elim` NO sirve aquí porque liftea además el contexto (doble lift). -/
+theorem prf_succ_lt_succ_of_lt (m n : Term) : Prf (lt m n ⇒ lt (succ m) (succ n)) := by
+  have himp : Prf (Formula.ex (Formula.eq (add (liftTerm 0 m) (succ (.var 0))) (liftTerm 0 n))
+      ⇒ lt (succ m) (succ n)) := by
+    refine prf_ex_elim_imp ?_
+    show PrfH [Formula.eq (add (liftTerm 0 m) (succ (.var 0))) (liftTerm 0 n)]
+      (lt (succ (liftTerm 0 m)) (succ (liftTerm 0 n)))
+    refine PrfH_lt_intro (succ (liftTerm 0 m)) (succ (liftTerm 0 n)) (.var 0) ?_
+    -- add (σ↑m) (σ#0) =eq σ(add ↑m (σ#0)) =eq σ↑n
+    exact PrfH_eq_trans
+      (prf_to_prfH (prf_add_succ_left (liftTerm 0 m) (succ (.var 0))) _)
+      (PrfH_eq_congr_succ (prfH_hyp_self _))
+  exact prf_deduction
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (PrfH_iff_mp (prf_lt_iff m n) (prfH_hyp_self _)))
+
+/-! ### Peano 2/3 en `Prf` (σ ≠ 0, σ inyectiva) y las dos piezas restantes de `<` -/
+
+/-- `σn ≠ 0` en `Prf` (`ax2_peano_succ_neq_zero`). -/
+theorem prf_succ_ne_zero (n : Term) : Prf (neg (succ n =eq zero)) := by
+  have hh := prf_spec (prf_ax (show ax2_peano_succ_neq_zero ∈ axioms by simp [axioms])) n
+  simp [ax2_peano_succ_neq_zero, substFormula, substTerm, substTerms, neg, succ, zero,
+    FOL.substTerm_liftTerm] at hh
+  exact hh
+
+/-- `σa = σb ⇒ a = b` en `Prf` (`ax3_peano_succ_inj`). -/
+theorem prf_succ_inj (a b : Term) : Prf ((succ a =eq succ b) ⇒ (a =eq b)) := by
+  have hh := prf_spec (prf_spec (prf_ax (show ax3_peano_succ_inj ∈ axioms by simp [axioms])) a) b
+  simp [ax3_peano_succ_inj, substFormula, substTerm, substTerms, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- **`¬ (n < 0)`** en `Prf`: de `n + σk = 0` sale `σ(n+k) = 0`, contra `ax2`. -/
+theorem prf_not_lt_zero (n : Term) : Prf (lt n zero ⇒ Formula.bottom) := by
+  have himp : Prf (Formula.ex (Formula.eq (add (liftTerm 0 n) (succ (.var 0))) (liftTerm 0 zero))
+      ⇒ Formula.bottom) := by
+    refine prf_ex_elim_imp ?_
+    show PrfH [Formula.eq (add (liftTerm 0 n) (succ (.var 0))) zero] Formula.bottom
+    have hsz : PrfH [Formula.eq (add (liftTerm 0 n) (succ (.var 0))) zero]
+        (succ (add (liftTerm 0 n) (.var 0)) =eq zero) :=
+      PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_add_succ_t (liftTerm 0 n) (.var 0))) _)
+        (prfH_hyp_self _)
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero (add (liftTerm 0 n) (.var 0))) _) hsz
+  exact prf_deduction
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (PrfH_iff_mp (prf_lt_iff n zero) (prfH_hyp_self _)))
+
+/-- **`σm < σn ⇒ m < n`** (converso de `prf_succ_lt_succ_of_lt`): de `σm + σk = σn` sale
+    `σ(m + σk) = σn` (`prf_add_succ_left`), y por inyectividad de `σ`, `m + σk = n`. -/
+theorem prf_lt_of_succ_lt_succ (m n : Term) : Prf (lt (succ m) (succ n) ⇒ lt m n) := by
+  have himp : Prf (Formula.ex (Formula.eq
+      (add (liftTerm 0 (succ m)) (succ (.var 0))) (liftTerm 0 (succ n))) ⇒ lt m n) := by
+    refine prf_ex_elim_imp ?_
+    show PrfH [Formula.eq (add (succ (liftTerm 0 m)) (succ (.var 0))) (succ (liftTerm 0 n))]
+      (lt (liftTerm 0 m) (liftTerm 0 n))
+    have hs : PrfH [Formula.eq (add (succ (liftTerm 0 m)) (succ (.var 0))) (succ (liftTerm 0 n))]
+        (succ (add (liftTerm 0 m) (succ (.var 0))) =eq succ (liftTerm 0 n)) :=
+      PrfH_eq_trans
+        (prf_to_prfH (prf_eq_symm (prf_add_succ_left (liftTerm 0 m) (succ (.var 0)))) _)
+        (prfH_hyp_self _)
+    refine PrfH_lt_intro (liftTerm 0 m) (liftTerm 0 n) (.var 0) ?_
+    exact PrfH.mp _ _ _
+      (prf_to_prfH (prf_succ_inj (add (liftTerm 0 m) (succ (.var 0))) (liftTerm 0 n)) _) hs
+  exact prf_deduction (PrfH.mp _ _ _ (prf_to_prfH himp _)
+    (PrfH_iff_mp (prf_lt_iff (succ m) (succ n)) (prfH_hyp_self _)))
+
 end ROBINSON_PlusPlus.Meta.NatArithPrf
 
 export ROBINSON_PlusPlus.Meta.NatArithPrf (
-  PrfH_eq_congr_succ prf_nat_induction prf_add_zero_left norm11 prf_add_succ_left
-  PrfH_lt_intro prf_lt_intro prf_zero_lt_succ
+  PrfH_eq_congr_succ prf_nat_induction norm11
+  prf_add_zero_left prf_add_succ_left
+  prf_lt_iff PrfH_lt_intro prf_lt_intro
+  prf_succ_ne_zero prf_succ_inj
+  prf_zero_lt_succ prf_succ_lt_succ_of_lt prf_lt_of_succ_lt_succ prf_not_lt_zero
 )
