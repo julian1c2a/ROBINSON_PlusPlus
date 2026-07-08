@@ -108,6 +108,23 @@ theorem liftFormula_boundedCarcLt (y p b : Term) :
   simp only [boundedCarcLt, liftFormula, liftTerm, liftTerms, land, lt, nthc, carc,
     Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
 
+/-- `liftFormula` atraviesa `boundedCarcLt` (general en el nivel `k`). -/
+theorem liftFormula_boundedCarcLt_gen (k : Nat) (y p b : Term) :
+    liftFormula k (boundedCarcLt y p b)
+      = boundedCarcLt (liftTerm k y) (liftTerm k p) (liftTerm k b) := by
+  simp only [boundedCarcLt, liftFormula, liftTerm, liftTerms, land, lt, nthc, carc,
+    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+
+/-- `substFormula` atraviesa `boundedCarcLt` (vía `substTerm_lift_comm_zero`). -/
+theorem substFormula_boundedCarcLt (v : Nat) (s y p b : Term) :
+    substFormula v s (boundedCarcLt y p b)
+      = boundedCarcLt (substTerm v s y) (substTerm v s p) (substTerm v s b) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [boundedCarcLt, substFormula, substTerm, substTerms, land, lt, nthc, carc, liftTerm,
+    liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
+    FOL.substTerm_lift_comm_zero]
+
 /-! ### (c) Split del `∃ k < σj` sobre una lista `cons` -/
 
 /-- Cola → todo: `(∃ k < j. carc (nthc rest k) =eq y) ⇒ (∃ k < σj. carc (nthc (cons line rest) k) =eq y)`
@@ -398,15 +415,162 @@ theorem prf_allIn_of_boundedAllIn (c L : Term) : Prf (boundedAllIn c L ⇒ allIn
 theorem prf_allIn_iff_boundedAllIn (c L : Term) : Prf (allIn c L ⇔ boundedAllIn c L) :=
   prf_and_intro (prf_boundedAllIn_of_allIn c L) (prf_allIn_of_boundedAllIn c L)
 
+/-! ### (d) La forma acotada de `chainOk` — escalón 1: piezas puntuales y definiciones
+
+Objetivo final: `chainOk c p ⇔ chainOkB c p`, donde el **acumulador desaparece**: una premisa de
+la línea `i` está o bien en el contexto inicial `c`, o bien es la conclusión (`carc`) de alguna
+línea **anterior** (`∃ k < i`). Es la formulación Δ₀ clásica de «demostración».
+
+Este escalón entrega las piezas que **no** necesitan inducción: el `∃k<0` vacío, y el **lema
+puntual** que fusiona (b) y (c) — el corazón aritmético del paso `cons`. -/
+
+/-- `∃ k < 0. …` es falso. -/
+theorem prf_boundedCarcLt_zero (y p : Term) :
+    Prf (boundedCarcLt y p zero ⇒ Formula.bottom) := by
+  refine prf_ex_elim_imp ?_
+  show PrfH [land (lt (.var 0) (liftTerm 0 zero))
+      (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))] Formula.bottom
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
+    (PrfH_and_elim_left (prfH_hyp_self _))
+
+/-- **Lema puntual (b)+(c)** — el corazón del paso `cons` de (d).
+
+`y` es una premisa admisible para la línea `σi` de `line :: rest` con contexto `c`
+**syss** lo es para la línea `i` de `rest` con el contexto ampliado `c ++ [carc line]`:
+
+`In y c ∨ (∃k<σi. carc (nthc (line::rest) k) =eq y)
+   ⇔  In y (c ++ [carc line]) ∨ (∃k<i. carc (nthc rest k) =eq y)`
+
+⇒ usa (c) para partir el `∃k<σi` y (b) para absorber `carc line` en el contexto;
+⇐ usa (b) para extraer `carc line` y las reintroducciones de (c). -/
+theorem prf_premOk_cons_iff (y c line rest i : Term) :
+    Prf (lor (In y c) (boundedCarcLt y (cons line rest) (succ i))
+      ⇔ lor (In y (concat c (cons (carc line) nil))) (boundedCarcLt y rest i)) := by
+  let cx : Term := concat c (cons (carc line) nil)
+  refine prf_and_intro ?_ ?_
+  · -- ⇒
+    refine prf_deduction ?_
+    refine PrfH_or_elim (prfH_hyp_self
+      (lor (In y c) (boundedCarcLt y (cons line rest) (succ i)))) ?_ ?_
+    · -- In y c : va al contexto ampliado
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) ?_
+      refine PrfH_iff_mpr (prf_in_concat_singleton_iff y c (carc line)) ?_
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+    · -- ∃k<σi : se parte por (c)
+      let Hb : Formula := boundedCarcLt y (cons line rest) (succ i)
+      let H : Formula := lor (In y c) Hb
+      have hsplit : PrfH [Hb, H] (lor (Formula.eq (carc line) y) (boundedCarcLt y rest i)) :=
+        PrfH_iff_mp (prf_boundedCarcLt_cons_succ_iff y line rest i)
+          (PrfH.hyp _ _ (List.Mem.head _))
+      refine PrfH_or_elim hsplit ?_ ?_
+      · -- carc line =eq y : entra en el contexto ampliado (por (b))
+        refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) ?_
+        refine PrfH_iff_mpr (prf_in_concat_singleton_iff y c (carc line)) ?_
+        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
+          (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
+      · -- ∃k<i sobre rest
+        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+  · -- ⇐
+    refine prf_deduction ?_
+    refine PrfH_or_elim (prfH_hyp_self (lor (In y cx) (boundedCarcLt y rest i))) ?_ ?_
+    · -- In y (c ++ [carc line]) : se abre por (b)
+      let Hi : Formula := In y cx
+      let H : Formula := lor Hi (boundedCarcLt y rest i)
+      have hsplit : PrfH [Hi, H] (lor (In y c) (Formula.eq y (carc line))) :=
+        PrfH_iff_mp (prf_in_concat_singleton_iff y c (carc line))
+          (PrfH.hyp _ _ (List.Mem.head _))
+      refine PrfH_or_elim hsplit ?_ ?_
+      · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+      · refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+        exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedCarcLt_cons_of_head y line rest i) _)
+          (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
+    · -- ∃k<i sobre rest : se reindexa k ↦ σk
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedCarcLt_cons_of_tail y line rest i) _)
+        (PrfH.hyp _ _ (List.Mem.head _))
+
+/-! #### Definiciones de la capa acotada -/
+
+/-- `∀ j < lenc L. (In (nthc L j) c ∨ ∃ k < i. carc (nthc p k) =eq nthc L j)`:
+    todas las premisas de la lista `L` son admisibles para la línea `i` de `p` bajo `c`. -/
+def boundedPremsIn (c p i L : Term) : Formula :=
+  Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+    (lor (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c))
+         (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p) (liftTerm 0 i))))
+
+/-- La línea `i`-ésima de `p` es válida bajo `c` **sin acumulador**. -/
+def lineOkB (c p i : Term) : Formula :=
+  land (lineWF (nthc p i)) (boundedPremsIn c p i (premsOf (nthc p i)))
+
+/-- **`chainOkB c p`** := `∀ i < lenc p. lineOkB c p i`. Forma Δ₀ de `chainOk c p`. -/
+def chainOkB (c p : Term) : Formula :=
+  Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 (lenc p)))
+    (lineOkB (liftTerm 0 c) (liftTerm 0 p) (.var 0)))
+
+/-! #### Clausuras De Bruijn de la capa acotada -/
+
+theorem liftFormula_boundedPremsIn (k : Nat) (c p i L : Term) :
+    liftFormula k (boundedPremsIn c p i L)
+      = boundedPremsIn (liftTerm k c) (liftTerm k p) (liftTerm k i) (liftTerm k L) := by
+  simp only [boundedPremsIn, liftFormula, liftFormula_boundedCarcLt_gen, liftTerm, liftTerms,
+    lt, lenc, nthc, In, lor, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+
+theorem substFormula_boundedPremsIn (v : Nat) (s c p i L : Term) :
+    substFormula v s (boundedPremsIn c p i L)
+      = boundedPremsIn (substTerm v s c) (substTerm v s p) (substTerm v s i) (substTerm v s L) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [boundedPremsIn, substFormula, substFormula_boundedCarcLt, substTerm, substTerms,
+    lt, lenc, nthc, In, lor, liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ,
+    reduceIte, if_true, FOL.substTerm_lift_comm_zero]
+
+theorem liftFormula_lineOkB (k : Nat) (c p i : Term) :
+    liftFormula k (lineOkB c p i) = lineOkB (liftTerm k c) (liftTerm k p) (liftTerm k i) := by
+  simp only [lineOkB, land, liftFormula, liftFormula_boundedPremsIn, liftTerm, liftTerms,
+    lineWF, nthc, premsOf]
+
+theorem substFormula_lineOkB (v : Nat) (s c p i : Term) :
+    substFormula v s (lineOkB c p i)
+      = lineOkB (substTerm v s c) (substTerm v s p) (substTerm v s i) := by
+  simp only [lineOkB, land, substFormula, substFormula_boundedPremsIn, substTerm, substTerms,
+    lineWF, nthc, premsOf]
+
+theorem liftFormula_chainOkB (k : Nat) (c p : Term) :
+    liftFormula k (chainOkB c p) = chainOkB (liftTerm k c) (liftTerm k p) := by
+  simp only [chainOkB, liftFormula, liftFormula_lineOkB, liftTerm, liftTerms, lt, lenc,
+    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
+
+theorem substFormula_chainOkB (v : Nat) (s c p : Term) :
+    substFormula v s (chainOkB c p) = chainOkB (substTerm v s c) (substTerm v s p) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [chainOkB, substFormula, substFormula_lineOkB, substTerm, substTerms, lt, lenc,
+    liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
+    FOL.substTerm_lift_comm_zero]
+
+/-- Base: `chainOkB c nil` es vacuamente cierto (`¬ i < lenc nil = 0`). -/
+theorem prf_chainOkB_nil (c : Term) : Prf (chainOkB c nil) := by
+  refine Prf.gen _ ?_
+  simp only [chainOkB, lt, lenc, nil, zero, liftTerm, liftTerms]
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
+      (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
+
 end ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 
 export ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf (
   prf_in_concat_iff prf_in_cons_nil_iff prf_in_concat_singleton_iff
   boundedCarcLt boundedCarcIn_eq_boundedCarcLt liftFormula_boundedCarcLt
+  liftFormula_boundedCarcLt_gen substFormula_boundedCarcLt
   prf_boundedCarcLt_cons_of_tail prf_boundedCarcLt_cons_of_head
-  prf_boundedCarcLt_cons_succ_iff
+  prf_boundedCarcLt_cons_succ_iff prf_boundedCarcLt_zero
   PrfH_eq_subst_in1 boundedAllIn liftFormula_boundedAllIn_gen substFormula_boundedAllIn
   prf_boundedAllIn_nil prf_boundedAllIn_cons_head prf_boundedAllIn_cons_tail
   prf_boundedAllIn_cons prf_boundedAllIn_of_allIn prf_allIn_of_boundedAllIn
   prf_allIn_iff_boundedAllIn
+  prf_premOk_cons_iff boundedPremsIn lineOkB chainOkB
+  liftFormula_boundedPremsIn substFormula_boundedPremsIn
+  liftFormula_lineOkB substFormula_lineOkB
+  liftFormula_chainOkB substFormula_chainOkB prf_chainOkB_nil
 )
