@@ -557,7 +557,55 @@ cierre honesto y publicable.
 
 ---
 
-*Fin del diseño. Estado 2026‑07‑05d: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
-(§12.2); vía recomendada **12‑A (β‑función / capa numérica Δ₀ del verificador)** — grande pero segura;
-alternativa honesta = Gödel II módulo axioma D3 (§11.4). La codificación del testigo ≡ dotar al
-verificador de indexación numérica acotada (§12.1).*
+## 13 · SONDEO de la Fase 2 (2026‑07‑08) — veredicto: **NO hace falta β‑función**
+
+**Pregunta.** §12.3 temía que `runFn`, al ser **recursión con acumulador**, exigiera codificación de
+secuencias (β‑función) para expresarse con cuantificadores acotados. Era el único paso del plan 12‑A
+con riesgo de diseño sin verificar.
+
+### 13.1 Resultado (verificado en código, `Meta/RunFnBoundedPrf.lean`)
+
+**`runFn nil p` no es una recursión con acumulador: es el *map* de `carc` sobre `p`.** Probado:
+
+```lean
+theorem prf_runFn_nil_cons (line rest) :        -- ← LEMA DECISIVO
+  Prf (runFn nil (cons line rest) =eq cons (carc line) (runFn nil rest))
+theorem prf_lenc_runFn (p) : Prf (lenc (runFn nil p) =eq lenc p)
+```
+
+(cadena: `prf_runFn_cons` → `prf_concat_nil_eq` → **`prf_runFn_weaken`** (saca el acumulador fuera)
+→ `prf_concat_cons_eq`. `#print axioms` = `[propext, choice, Quot.sound]`.)
+
+**Consecuencia:** el acumulador **nunca hay que construirlo ni codificarlo**.
+
+- `In x (runFn nil p)` queda **acotado por `lenc p`** (vía `prf_In_iff_boundedIn` + `prf_lenc_runFn`).
+- En `chainOk`, el acumulador de la línea `i` es «las conclusiones anteriores», y sólo se usa a
+  través de `In y (·)`; eso se reescribe como **`∃ k < i. carc (nthc p k) =eq y`** — acotado sobre `p`.
+
+Es la formulación Δ₀ clásica de «demostración = sucesión de líneas, cada una justificada por
+líneas anteriores». **Sin β‑función, sin capa de secuencias.** El riesgo de §12.3 queda **cerrado**.
+
+### 13.2 Lo que SÍ queda de Fase 2 (trabajo real, patrón conocido)
+
+1. **`nthc (runFn nil p) i =eq carc (nthc p i)`** (para `i < lenc p`). Requiere inducción con **`∀i`
+   interno** en el predicado inductivo → patrón `norm32`/`norm_s`/confinación‑`qconf` **ya usado tres
+   veces en `ChainPrf.lean`** (`prf_runFn_concat`, `prf_chainOk_mono_imp`, `prf_runFn_weaken`).
+2. **Reformulación acotada de `chainOk nil p`**:
+   `∀ i < lenc p. ( lineWF (nthc p i) ∧ ∀ j < lenc (premsOf (nthc p i)). ∃ k < i. carc (nthc p k) =eq nthc (premsOf (nthc p i)) j )`
+   y probar la equivalencia con `chainOk nil p` por inducción. El acumulador‑prefijo se elimina
+   con el `∃ k < i`. **Esta equivalencia es el único punto que aún no he verificado en código**
+   (no veo obstrucción, pero no está probado).
+
+### 13.3 Corrección a §12.3/§12.4
+
+La recomendación 12‑A sigue en pie, pero **su descripción como «β‑función» era pesimista**: la capa
+numérica de listas (`lenc`/`nthc`, ya hecha en fase 1) es suficiente. Léase §12.4 fase 2 como
+«reformulación acotada» y no como «codificación de secuencias».
+
+---
+
+*Fin del diseño. Estado 2026‑07‑08: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
+(§12.2); vía = **12‑A capa numérica Δ₀** (§12.4), con **fase 1 COMPLETA** (`lenc`/`nthc` +
+`prf_In_iff_boundedIn`) y **el riesgo de la fase 2 CERRADO** (§13: `runFn nil` es un map; no hace
+falta β‑función). Queda: `nthc`‑`runFn`, reformulación acotada de `chainOk`, y fases 3‑5.
+Alternativa honesta siempre disponible = Gödel II módulo axioma D3 (§11.4).*

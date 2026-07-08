@@ -46,5 +46,6 @@ import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 import ROBINSON_PlusPlus.Meta.NumListPrf
 import ROBINSON_PlusPlus.Meta.NatArithPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
+import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
