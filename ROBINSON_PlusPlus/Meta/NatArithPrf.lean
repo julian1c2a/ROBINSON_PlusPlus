@@ -195,12 +195,37 @@ theorem prf_lt_of_succ_lt_succ (m n : Term) : Prf (lt (succ m) (succ n) ⇒ lt m
   exact prf_deduction (PrfH.mp _ _ _ (prf_to_prfH himp _)
     (PrfH_iff_mp (prf_lt_iff (succ m) (succ n)) (prfH_hyp_self _)))
 
+/-- **`n = 0 ∨ ∃k. n = σk`** en `Prf` (cero-o-sucesor; porte de `Full.zero_or_succ_ax`,
+    que solo existía a nivel `axioms ⊢`). Necesario para el análisis por casos sobre un
+    índice. Por `prf_nat_induction` (el paso no usa la HI). -/
+theorem prf_zero_or_succ (n : Term) :
+    Prf (lor (Formula.eq n zero) (Formula.ex (Formula.eq (liftTerm 0 n) (succ (.var 0))))) := by
+  have key : Prf (Formula.forall (lor (Formula.eq (.var 0) zero)
+      (Formula.ex (Formula.eq (.var 1) (succ (.var 0)))))) := by
+    refine prf_nat_induction _ ?base ?step
+    · show Prf (lor (Formula.eq zero zero) (Formula.ex (Formula.eq zero (succ (.var 0)))))
+      exact prf_or_intro_left (prf_refl zero)
+    · refine Prf.gen _ ?_
+      simp only [substFormula, substTerm, substTerms, lor, zero, succ, liftFormula, liftTerm,
+        liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+        reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      refine prf_deduction (prf_to_prfH ?_ _)
+      refine prf_or_intro_right ?_
+      refine prf_ex_intro (.var 0) ?_
+      simp only [substFormula, substTerm, substTerms, succ, Nat.reduceEqDiff, Nat.reduceGT,
+        reduceIte, if_true]
+      exact prf_refl _
+  have hn := prf_spec key n
+  simpa only [substFormula, substTerm, substTerms, lor, zero, succ, Nat.reduceAdd, Nat.reduceLT,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hn
+
 end ROBINSON_PlusPlus.Meta.NatArithPrf
 
 export ROBINSON_PlusPlus.Meta.NatArithPrf (
   PrfH_eq_congr_succ prf_nat_induction norm11
   prf_add_zero_left prf_add_succ_left
   prf_lt_iff PrfH_lt_intro prf_lt_intro
-  prf_succ_ne_zero prf_succ_inj
+  prf_succ_ne_zero prf_succ_inj prf_zero_or_succ
   prf_zero_lt_succ prf_succ_lt_succ_of_lt prf_lt_of_succ_lt_succ prf_not_lt_zero
 )
