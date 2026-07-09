@@ -18,7 +18,8 @@
 
 - ✅ **Gödel I REAL** sin postulados (`goedel_first_real'`); **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales; `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).
 - ✅ **12‑A fases 1a/1b/2**: el verificador (`chainOk c p` y `In · (runFn nil p)`) está **expresado en la capa numérica Δ₀ y sin acumulador**. Era el único punto del plan sin verificar en código; ya no queda ninguno.
-- ⏳ **Fases 3‑5**: `num` (numeral‑de) + evaluación provable → Δ₀‑completitud atómica → inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` → `goedel_second_prf : ConsistentH → ¬ Prf Con'`.
+- 🔄 **Fase 3 ARRANCADA** (`Meta/Sigma1BoundedPrf.lean`, §15 del diseño): **puente `d3_prf_of_reflect_bounded`** — D3 reducida (vía `pcc_imp` + los `⇔` de fase 1/2) a reflejar la forma **Δ₀ acotada** `boundedIn`/`chainOkB` (`prf_hI_of_reflect_boundedIn`, `prf_hC_of_reflect_chainOkB`). La obstrucción de Tarski queda reubicada en el **átomo** `nthc L i =eq x`, que resuelven las ecuaciones de variable de `substfc`.
+- ⏳ **Fases 3 (núcleo)‑5**: reflexión de átomos (`=eq`/`<`/`lineWF`) con `num`/`substfc`‑var‑equations → reflexión de cuantificadores acotados → inducción estructural sobre `boundedIn`/`chainOkB` → `hbI`/`hbC` → `d3_prf` → `goedel_second_prf`.
 - ⚠ **Nota honesta:** 12‑A ≈ portar la Σ₁‑completitud provable de IΣ₁; es trabajo de varias sesiones. **Alternativa siempre disponible:** consolidar Gödel II *módulo el axioma D3* (`goedel_second'`) — estado ya publicable.
 - 🧹 **F7a ✅ HECHA** (2026‑07‑09): 14→7 `axiom`; `Meta/Incompleteness.lean` eliminado + 5 postulados de `Provability` retirados; registro en `AXIOMS.md`. **F7b** (`GodelTwo.d3`) bloqueada hasta D3 real.
 

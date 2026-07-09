@@ -675,8 +675,61 @@ cuantificación acotada dentro del predicado inductivo). **Aún NO verificado en
 
 ---
 
-*Fin del diseño. Estado 2026‑07‑08: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
-(§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fase 1 COMPLETA** (`lenc`/`nthc` +
-`prf_In_iff_boundedIn`). **Fase 2: riesgo CERRADO** (§13, no hace falta β‑función) y **lado `In`
-CERRADO** (§14.1). Queda el **lado `chainOk`** (§14.2‑14.3, plan preciso, sin obstrucción vista pero
-sin verificar) y las fases 3‑5. Alternativa honesta siempre disponible = Gödel II módulo axioma D3 (§11.4).*
+## 15 · Fase 3 (arranque, 2026‑07‑09): D3 reducida a reflejar la forma Δ₀ ACOTADA
+
+Con la **fase 2 completa**, el §11.3 («`num` + evaluación provable») se re‑ancla en el mundo
+acotado. La D3 reducida `d3_prf_of_sigma1` pedía dos lemas de **Σ₁‑completitud provable**:
+
+```text
+hI : ∀ x L,  Prf (In x L      ⇒ provCodeC' (In x L))
+hC : ∀ p,    Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p))
+```
+
+### 15.1 Puente arquitectónico — HECHO (`Meta/Sigma1BoundedPrf.lean`)
+
+Como la fase 1/2 dio los `⇔` (`prf_In_iff_boundedIn`, `prf_chainOk_iff_chainOkB`) y `pcc_imp`
+sube implicaciones object a `provCodeC'` (vía D2+D1), `hI`/`hC` se **reducen a reflejar la forma
+acotada**:
+
+```lean
+prf_hI_of_reflect_boundedIn (hbI : ∀ x L, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L)))
+  : ∀ x L, Prf (In x L ⇒ provCodeC' (In x L))
+prf_hC_of_reflect_chainOkB  (hbC : ∀ p, Prf (chainOkB nil p ⇒ provCodeC' (chainOkB nil p)))
+  : ∀ p, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p))
+d3_prf_of_reflect_bounded (φ) (hbC) (hbI)  -- = d3_prf, reduciendo a la forma Δ₀ acotada
+```
+
+`[propext, choice, Quot.sound, prf_inAxC]`. **Payoff:** basta reflejar `boundedIn`/`chainOkB`.
+
+### 15.2 Dónde vive ahora la obstrucción de Tarski (y qué la resuelve)
+
+Reflejar `boundedIn x L` = `∃ i < lenc L. nthc L i =eq x` **no dissuelve** la obstrucción, la
+**reubica en el átomo** `nthc L i =eq x` (para `L`, `x` abstractos, `formCode(nthc L i =eq x)`
+contiene `termCode (nthc L i)`, **meta‑stuck**). Y ESTO es exactamente lo que resuelven las
+**ecuaciones de variable de `substfc`** (`ax_substtc_var_eq/gt/lt`, ausentes en `tcFn`): permiten
+reflejar el átomo tras sustituir el numeral del testigo. Por eso el §11.3 («`num` + provable
+evaluation») sigue siendo la vía correcta — pero ahora aplicado **solo a los átomos** de la forma
+acotada, no a un verificador numérico entero.
+
+### 15.3 Lo que queda de fase 3‑5 (orden)
+
+1. **`num` (numeral‑de) + reflexión de átomos** (fase 3, núcleo): `Prf (θ ⇒ provCodeC' θ)` para
+   `θ ∈ {t₁ =eq t₂, t₁ < t₂, lineWF t}` vía `substfc`‑var‑equations. Reusar `pcc_eq_of_codeEq`,
+   `prf_substFormula_arith`, `prf_tc_numeral`.
+2. **Reflexión de cuantificadores acotados** (fase 4): combinadores
+   `∀ i < b. provCodeC' θ(i) ⊢ provCodeC' (∀ i < b. θ)` y la versión `∃` (con `pcc_exIntro_code`).
+3. **Inducción estructural** sobre `boundedIn`/`chainOkB` (fase 5) ensamblando 1+2 → `hbI`/`hbC`
+   → `d3_prf_of_reflect_bounded` → `d3_prf` → `goedel_second_prf`.
+
+**No veo obstrucción** en 1‑3; (1) es el primer trabajo real de código (reflexión atómica con
+`substfc`). El puente §15.1 garantiza que ese trabajo **basta**.
+
+---
+
+*Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
+(§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
+`prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
+sin acumulador). **Fase 3 ARRANCADA** (§15: puente `d3_prf_of_reflect_bounded` — D3 reducida a
+reflejar la forma acotada). Quedan el núcleo de fase 3 (reflexión atómica con `substfc`), fase 4
+(cuantificadores acotados) y fase 5 (inducción estructural). Alternativa honesta siempre disponible
+= Gödel II módulo axioma D3 (§11.4).*
