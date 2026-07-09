@@ -711,18 +711,41 @@ reflejar el átomo tras sustituir el numeral del testigo. Por eso el §11.3 («`
 evaluation») sigue siendo la vía correcta — pero ahora aplicado **solo a los átomos** de la forma
 acotada, no a un verificador numérico entero.
 
-### 15.3 Lo que queda de fase 3‑5 (orden)
+### 15.3 Reflexión atómica RASTREADA — `=eq` HECHO (`Meta/Sigma1AtomPrf.lean`)
 
-1. **`num` (numeral‑de) + reflexión de átomos** (fase 3, núcleo): `Prf (θ ⇒ provCodeC' θ)` para
-   `θ ∈ {t₁ =eq t₂, t₁ < t₂, lineWF t}` vía `substfc`‑var‑equations. Reusar `pcc_eq_of_codeEq`,
-   `prf_substFormula_arith`, `prf_tc_numeral`.
-2. **Reflexión de cuantificadores acotados** (fase 4): combinadores
-   `∀ i < b. provCodeC' θ(i) ⊢ provCodeC' (∀ i < b. θ)` y la versión `∃` (con `pcc_exIntro_code`).
-3. **Inducción estructural** sobre `boundedIn`/`chainOkB` (fase 5) ensamblando 1+2 → `hbI`/`hbC`
-   → `d3_prf_of_reflect_bounded` → `d3_prf` → `goedel_second_prf`.
+**Hallazgo clave (confirmado en código):** la reflexión de `t =eq u` para `t`, `u` **abstractos**
+es **imposible libre de muro** (Tarski): `termCode t =eq termCode u` NO se sigue de `t =eq u`
+(`termCode` no tiene congruencia object). La salida Hilbert‑Bernays es **rastrear** los argumentos
+con `tcFn` (que SÍ tiene congruencia, `prf_congr_tcFn`) y **descargar** el puente
+`tcFn t =eq termCode t` cuando `t` es numeral (`prf_tc_numeral`) — en la inducción de fase 5. Esto
+espeja exactamente el toolkit rastreado de `In` (`prf_provCodeC'_In_of_tracked`, `Sigma1CorePrf`).
 
-**No veo obstrucción** en 1‑3; (1) es el primer trabajo real de código (reflexión atómica con
-`substfc`). El puente §15.1 garantiza que ese trabajo **basta**.
+Toolkit `=eq` entregado (`[propext, choice, Quot.sound]`, la reflexividad `+ prf_inAxC`):
+
+```lean
+def eqCodeFn (a b) := ⟨4, a, b⟩                       -- eqCodeFn (termCode t)(termCode u) = formCode(t=u)
+prf_congr_eqCodeFn / prf_provFromCode_eq_congr        -- congruencia + transporte (Leibniz object)
+liftTerm_eqCodeFn / liftFormula_provFromCode_eq       -- clausuras
+prf_provCodeC'_eq_of_tracked (ht : tc =eq termCode t)(hu)(h : provFromCode(eqCodeFn tc uc))
+  : provCodeC'(t =eq u)                               -- reflexión rastreada (espejo de In)
+prf_provFromCode_eqCodeFn_refl_of_tracked (ht : tc =eq termCode t) : provFromCode(eqCodeFn tc tc)
+```
+
+### 15.4 Lo que queda de fase 3‑5 (orden)
+
+1. **Reflexividad libre de muro** (mejora): `provFromCode (eqCodeFn c c)` para código `c` **abstracto**
+   construyendo un testigo del verificador para el axioma de reflexividad (estructural: ambos lados
+   `=eq c`), sin el puente `tcFn c =eq termCode c`. Elimina la hipótesis de tracking de la reflexividad.
+2. **Átomos `<` y `lineWF`**: `<` = `∃k. a+σk=b` (no es átomo — se reduce a `=eq` + `∃` acotado);
+   `lineWF t` es un átomo‑1 → constructor `atom1CodeFn` análogo a `eqCodeFn`.
+3. **Reflexión de cuantificadores acotados** (fase 4): `∀ i < b. provCodeC' θ(i) ⊢ provCodeC'(∀ i<b.θ)`
+   y la versión `∃` (con `pcc_exIntro_code`).
+4. **Inducción estructural** sobre `boundedIn`/`chainOkB` (fase 5) ensamblando 1‑3, descargando el
+   puente `tcFn·=eq termCode·` con `prf_tc_numeral` → `hbI`/`hbC` → `d3_prf_of_reflect_bounded`
+   → `d3_prf` → `goedel_second_prf`.
+
+**No veo obstrucción** en 1‑4. El puente §15.1 garantiza que basta reflejar la forma acotada; el
+toolkit `=eq` de §15.3 es el primer átomo del cuerpo.
 
 ---
 

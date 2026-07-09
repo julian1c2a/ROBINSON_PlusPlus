@@ -54,5 +54,6 @@ import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 import ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 import ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf
+import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
