@@ -6,14 +6,19 @@ License: MIT
 Barrel file for `Meta/` — Gödelización del sistema `Minimal`.
 Public API:
   · Godel          (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
-  · Provability    (Nivel C): formCode, IsFormula, Provable, Dem, diagonal_lemma,
-                              goedelSentence
-  · Incompleteness (Nivel D): goedel_first_unprovable, goedel_first_true,
-                              incompleteness (Primer Teorema, mitad esencial)
+  · Provability    (Nivel C): formCode, IsFormula, Provable (núcleo real de codificación)
+  · Nivel D REAL: verificador estructural (provCodeC'/chainOk/runFn) + D1/D2 reales +
+    punto fijo real (godelC'_fixedpoint) + Gödel I real (goedel_first_real') +
+    Gödel II (goedel_second', módulo el axioma d3).
+
+  Nota (F7a, 2026‑07‑09): retirada la capa Gödel LEGACY postulada — el módulo
+  `Meta/Incompleteness.lean` (Gödel I/II vía D2/D3 postulados) y los 7 postulados
+  que consumía (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/
+  `diagonal_lemma` en Provability + `D2`/`D3` en Incompleteness). La cadena real no
+  los citaba (auditado con `#print axioms`).
 -/
 import ROBINSON_PlusPlus.Meta.Godel
 import ROBINSON_PlusPlus.Meta.Provability
-import ROBINSON_PlusPlus.Meta.Incompleteness
 import ROBINSON_PlusPlus.Meta.Hilbert
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.HilbertSeq

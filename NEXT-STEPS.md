@@ -14,13 +14,13 @@
 4. **`REFERENCE.md` §3.18** — proyección completa de la capa Δ₀ (`NumListPrf`, `NatArithPrf`, `BoundedInPrf`, `RunFnBoundedPrf`, `ChainOkBoundedPrf`).
 5. **`ESCALANDO_EL_PROYECTO.md`** — enlace con el proyecto hermano DeepArith sobre el kernel FOL⁼ común.
 
-**Estado (2026-07-08, 61 módulos, 75 jobs, Lean v4.31.0, 0 errores, 0 warnings, 0 sorrys):**
+**Estado (2026-07-09, 60 módulos, 74 jobs, Lean v4.31.0, 0 errores, 0 warnings, 0 sorrys; 7 `axiom` tras F7a — ver `AXIOMS.md`):**
 
 - ✅ **Gödel I REAL** sin postulados (`goedel_first_real'`); **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales; `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).
 - ✅ **12‑A fases 1a/1b/2**: el verificador (`chainOk c p` y `In · (runFn nil p)`) está **expresado en la capa numérica Δ₀ y sin acumulador**. Era el único punto del plan sin verificar en código; ya no queda ninguno.
 - ⏳ **Fases 3‑5**: `num` (numeral‑de) + evaluación provable → Δ₀‑completitud atómica → inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` → `goedel_second_prf : ConsistentH → ¬ Prf Con'`.
 - ⚠ **Nota honesta:** 12‑A ≈ portar la Σ₁‑completitud provable de IΣ₁; es trabajo de varias sesiones. **Alternativa siempre disponible:** consolidar Gödel II *módulo el axioma D3* (`goedel_second'`) — estado ya publicable.
-- 🧹 **F7a** (retirar 7 postulados legacy, 14→7 `axiom`) **viable ya**, independiente de D3. **F7b** (`GodelTwo.d3`) bloqueada.
+- 🧹 **F7a ✅ HECHA** (2026‑07‑09): 14→7 `axiom`; `Meta/Incompleteness.lean` eliminado + 5 postulados de `Provability` retirados; registro en `AXIOMS.md`. **F7b** (`GodelTwo.d3`) bloqueada hasta D3 real.
 
 > **HISTÓRICO (contexto de cómo se llegó aquí).** Lo que sigue en este bloque documenta el camino descartado (`tcFn`/Opción A) y el diagnóstico que llevó a 12‑A. Se conserva porque explica *por qué* la vía actual es ineludible; **no es la tarea abierta**.
 

@@ -34,9 +34,9 @@ sistema finitario de Hilbert `Prf` y su predicado de demostrabilidad object
 > **D1 (necesitación):** `Prf φ ⟹ axioms ⊢ Prov(⌜φ⌝)`.
 
 Es decir, *si `φ` es demostrable en el sistema finitario, la teoría verificadora
-demuestra el enunciado aritmetizado «`⌜φ⌝` es demostrable»*. Esto **reemplaza la
-dirección `.mpr` del postulado `provFormula_repr`** (`Meta/Incompleteness.lean`,
-legacy) por un teorema.
+demuestra el enunciado aritmetizado «`⌜φ⌝` es demostrable»*. Es la dirección
+`.mpr` de la antigua condición D1 (que la capa legacy postulaba como
+`provFormula_repr`, retirada en F7a el 2026‑07‑09) probada aquí **como teorema**.
 
 **Asimetría honesta (Tarski).** Sólo se obtiene esta dirección. La recíproca
 (*reflexión*: `axioms ⊢ Prov(⌜φ⌝) ⟹ …`) muere por la indefinibilidad de la

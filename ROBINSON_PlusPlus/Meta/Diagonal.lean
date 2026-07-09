@@ -184,9 +184,9 @@ theorem godel_comp (s : Term) :
   simp [godelBeta, godelPred, neg, provFormulaC, substFormula, substTerm, substTerms,
     In, validProofFn, nil, zero, FOL.substTerm_liftTerm, FOL.substTerm_lift_comm]
 
-/-- **Lema diagonal (punto fijo) real**: `⊢ G ⇔ ¬Prov(⌜G⌝)`. Reemplaza el postulado
-    `diagonal_lemma`/`goedelSentence_fixedpoint` para el predicado **concreto**
-    `provCodeC`. -/
+/-- **Lema diagonal (punto fijo) real**: `⊢ G ⇔ ¬Prov(⌜G⌝)`, teorema para el
+    predicado **concreto** `provCodeC` (la capa legacy lo postulaba como
+    `diagonal_lemma`/`goedelSentence_fixedpoint`, retirada en F7a). -/
 theorem godelC_fixedpoint : axioms ⊢ (godelC ⇔ neg (provCodeC godelC)) := by
   have hiff := subst_eq_iff godelPred (diag_arith godelBeta)
   rw [← godel_comp (formCode godelBeta)] at hiff

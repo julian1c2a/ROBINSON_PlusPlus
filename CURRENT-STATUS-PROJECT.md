@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-07-08
+**Last updated:** 2026-07-09
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,17 +9,17 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **61** (Minimal/ 11 + Meta/ 39 + Full/ 11) + barrel `Meta.lean` |
-| Modules sin sorry | 61 / 61 ✅ |
+| Total modules | **60** (Minimal/ 11 + Meta/ 38 + Full/ 11) + barrel `Meta.lean` |
+| Modules sin sorry | 60 / 60 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Declaraciones `axiom` de Lean | **14** (meta-reglas ω + meta-axiomas matemáticos + 7 postulados legacy de `Provability`/`Incompleteness` **retirables ya** — ver F7a abajo). Ninguna es un `sorry` (ADR-008) |
+| Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-008) |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
-| Meta-axiomas matemáticos | `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` (Provability C, **legacy**); `D2`/`D3` (Incompleteness D, **legacy**); `ax_inAxC` (⊢) / `prf_inAxC` (Prf) — pertenencia de coding a `axiomsCodeT`; `qconf`/`Full.ax_induction` integrados como reglas del verificador (esquemas, no postulados gödelianos). Las 6 ecuaciones recursivas de coding (`substtc`/`substtsc`) están **integradas en `Minimal.axioms`** (extensión definicional) — `SubstArith` sin `axiom` local |
+| Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `ax_inAxC` (⊢) / `prf_inAxC` (Prf) — pertenencia de coding a `axiomsCodeT`; `d3` (GodelTwo, único gödeliano vivo). Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
 | Gödel | **A, B, C, D** ✅ (legacy I/II vía D2/D3 postulados). **Nivel D REAL — Gödel I REAL sin postulados**: cadena completa sobre Hilbert finitario `Prf` — verificador `validProofFn` (**19 reglas**, sólido vía `coreAxioms`; `ind` vía `Full.ax_induction`) + `repr_pos`/**D1** (`Meta/Necessitation.lean`) + **lema diagonal real** `tc_arith`→`diag_arith`→`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G` (`Meta/Diagonal.lean`) + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (`#print axioms` = ω-reglas ambiente + `Full.ax_induction`; NINGÚN `diagonal_lemma`/`provFormula`/D2/D3). **Regla `ind` integrada** (`Prf.ind`/`Rule.ind`/`ax_vpf_ind`/`vpf_ind`, `Meta/Induction.lean` + stack): `provCodeC` rastrea **IΣ₁**. Además **aritmética negativa de códigos** `formCode_ne` (`Meta/CodeDistinct.lean`). **Hacia D2/D3/Gödel II — verificador estructural `runFn`/`chainOk`** (`Meta/ProofChain.lean`, R1–R3) + **D1 y D2 reales sobre `provCodeC'`**: **D2** `⊢ provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B)` (`Meta/DerivCond.lean`) y **D1 = `repr_pos' : Prf φ → ⊢ provCodeC' φ`** (`Meta/Representability2.lean`; `#print axioms` = solo estándar), con validez de las 19 reglas (`lineWF`/`premsOf` fieles). **Gödel II — núcleo lógico ✅ con D3 POSTULADO** (`Meta/GodelTwo.lean`): `con_imp_godel'`/`goedel_second'` vía **D2 real** + `d3` (único axioma gödeliano) + hipótesis explícitas (punto fijo, necesitación, ⊬G ω); mejora sobre legacy (postulaba D2 y D3). **Refactor `Prf.thy → axioms` ✅** (`Prf` razona sobre su propia maquinaria; `axiomsCodeT` opaco + meta-axioma `ax_inAxC`). **Punto fijo real ✅** `godelC'_fixedpoint : ⊢ godelC' ⇔ ¬provCodeC' godelC'` (`Meta/DiagonalTwo.lean`, sin postulados) + **Gödel I real estructural** `goedel_first_real' : ConsistentOmega → ¬ Prf godelC'`. **Re-nivelación a `Prf` (2026-06-23/24):** **D1 finitaria COMPLETA** `repr_pos'_prf : Prf φ → Prf (provCodeC' φ)` (`Meta/ArithPrf.lean` + `Meta/Representability2Prf.lean` + `Meta/ReprPrf.lean`; `#print axioms` = estándar + `prf_inAxC`). **Teorema de deducción finitario** `Meta/HilbertDeduction.lean` (`PrfH` + `prf_deduction` + `prf_ex_elim_imp`). **Regla de confinamiento ∀ `qconf`** integrada en el verificador (`Prf.qconf`/`Rule.qconf` + aritmetización doble). **Fix de solidez FOL:** `subst_lift_cancel_formula` era un `axiom` FALSO → ahora teorema (forma restringida verdadera). **Toolkit De Bruijn** (`FOL/Theorems/Eq.lean`: `substFormula_lift_comm`, `liftTerm_comm_zero`, `subst_subst_lift_gen`…). Pendiente Gödel II 100% real: **lema de Barendregt** → inducción de listas en `Prf` → `d2_prf`/`d3_prf`/`goedel_second_prf : ConsistentH → ¬ Prf Con'` |
-| Build status | ✅ Passing (**75 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
+| Build status | ✅ Passing (**74 jobs**, 0 errores, **0 warnings**, 0 sorrys) |
 | D3 / plan 12‑A | Fases **1a ✅ 1b ✅ 2 ✅** — el verificador (`chainOk`, `In · (runFn nil p)`) ya está expresado en la **capa numérica Δ₀** y **sin acumulador**. Ningún punto del plan queda sin verificar en código. Quedan fases 3‑5 → `d3_prf` → `goedel_second_prf` |
-| Limpieza F7 | **F7a viable ya** (auditoría con `#print axioms`: `goedel_second'` NO cita `diagonal_lemma`/`provFormula_repr`/`Dem`/`Incompleteness.D2`/`D3` → esos 7 postulados legacy son retirables, 14→7 `axiom`). **F7b bloqueada** (`GodelTwo.d3` sí es portante) |
+| Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
@@ -43,7 +43,7 @@
 | `Minimal/Theorems/Block7.lean` | 0 | ✅ `IsFunction`, `Functional`, `teo_F1`, `teo_F2`, `teo_F3` (Bloque VII spec) |
 | `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `IsFactorization`, `ax_p_tfa` (TFA), pow/prod_pairs + **10 teoremas** (álgebra de `Dvd`, corolarios TFA) — Bloque VIII Fase 17 completa |
 | `Meta/Godel.lean` | 0 | ✅ Nivel B Gödelización: `Sym`, `gNat`, `numeral`, `G`, `encode` (`⌜·⌝`), `encode_injective` (Teo G1) |
-| `Meta/Provability.lean` | 0 | ✅ Nivel C: `formCode`+inyectividad, `IsFormula`, `Provable` (+iff), `Dem`, `diagonal_lemma`, `goedelSentence` (props profundas = meta-axiomas) |
+| `Meta/Provability.lean` | 0 | ✅ Nivel C (núcleo real): `formCode`+inyectividad, `IsFormula`, `Provable` (+`provable_formCode_iff`). Capa legacy (`Dem`/`diagonal_lemma`/`goedelSentence`/…) retirada en F7a |
 | `Meta/NumListPrf.lean` | 0 | ✅ 12‑A/1a: `prf_lenc_nil/cons`, `prf_nthc_zero/succ` |
 | `Meta/NatArithPrf.lean` | 0 | ✅ 12‑A/1b: toolkit de `<` en `Prf` (`prf_nat_induction`, `prf_add_zero_left`, `prf_lt_iff`, `prf_succ_lt_succ_of_lt`, `prf_not_lt_zero`, …) |
 | `Meta/BoundedInPrf.lean` | 0 | ✅ 12‑A/1b: **`prf_In_iff_boundedIn`** + `prf_zero_or_eq_succ_pred` |
@@ -59,6 +59,16 @@
 ---
 
 ## Recent Achievements
+
+- **2026-07-09 — F7a: retirada la capa Gödel legacy (14 → 7 `axiom`)**:
+  Auditado con `#print axioms` que la cadena real (`goedel_first_real'`, `d2_prf`, `goedel_second'`)
+  no cita ninguno de los 7 postulados legacy. **Eliminado** el módulo `Meta/Incompleteness.lean`
+  (Gödel I/II vía D2/D3 postulados) y retirados los 5 postulados de `Meta/Provability.lean`
+  (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma` + `goedelSentence`/
+  `goedelSentence_fixedpoint`); se conserva el núcleo real de codificación (`formCode`/`IsFormula`/
+  `Provable`). Nuevo **`AXIOMS.md`** (registro autoritativo de los 7 axiomas restantes + las 6
+  meta-reglas ω de FOL). Cadena real verificada intacta. **F7b** (retirar `d3`) sigue bloqueada
+  hasta D3 real. Build verde (**74 jobs**), 0 sorrys, v4.31.0.
 
 - **2026-07-08 — 12‑A FASES 1b y 2 COMPLETAS: el verificador ya es Δ₀ y sin acumulador**:
   Cerrado el **único punto de diseño del plan 12‑A que no estaba verificado en código**.
@@ -177,8 +187,8 @@ construcción por el plan **12‑A** (`GODEL-D3-TRACKED-DESIGN.md` §12–§14):
 no queda ningún punto del plan sin verificar en código. **Alternativa siempre disponible**: consolidar
 Gödel II **módulo el axioma D3** (`goedel_second'`), estado ya publicable.
 
-Trabajo de limpieza independiente: **F7a** (retirar los 7 postulados legacy de
-`Provability`/`Incompleteness`, 14→7 `axiom`) es viable ya. **F7b** (`GodelTwo.d3`) espera a D3 real.
+Trabajo de limpieza: **F7a ✅ HECHA** (2026-07-09; 14→7 `axiom`, `Meta/Incompleteness.lean`
+eliminado + 5 postulados de `Provability`). **F7b** (`GodelTwo.d3`) espera a D3 real (12‑A fase 5).
 
 ---
 
@@ -199,11 +209,10 @@ ROBINSON_PlusPlus/
 │       ├── Block6.lean      # Listas: cons_neq_nil, cons_inj, concat_assoc, in_concat ✅
 │       ├── Block7.lean      # Funciones: IsFunction, Functional, F1/F2/F3 ✅
 │       └── Block8.lean      # Primos+factorización: Dvd, IsPrime, IsFactorization, Ax-P TFA, +10 teoremas ✅
-├── Meta.lean                # Barrel de Meta/ (39 módulos)
-├── Meta/                    # Niveles B–D + Nivel D REAL (39 módulos)
+├── Meta.lean                # Barrel de Meta/ (38 módulos)
+├── Meta/                    # Nivel B + Nivel C (núcleo real) + Nivel D REAL (38 módulos)
 │   ├── Godel.lean           # Nivel B: G, ⌜·⌝, Teo G1 (encode_injective) ✅
-│   ├── Provability.lean     # Nivel C: formCode+iny., IsFormula, Provable, Dem, punto fijo ✅  [legacy]
-│   ├── Incompleteness.lean  # Nivel D legacy (Gödel I/II vía D2/D3 postulados)                [legacy]
+│   ├── Provability.lean     # Nivel C núcleo real: formCode+iny., IsFormula, Provable ✅ (legacy retirada F7a)
 │   ├── Hilbert.lean … CheckArith.lean         # cálculo finitario Prf + verificador (19 reglas)
 │   ├── Representability.lean … Diagonal.lean  # D1 + punto fijo + goedel_first_real
 │   ├── ProofChain.lean … DiagonalTwo.lean     # verificador estructural runFn/chainOk + Gödel I real'
@@ -225,6 +234,6 @@ ROBINSON_PlusPlus/
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-07-08 — Build ✅ (75 jobs), 0 errores, 0 sorrys, 0 warnings, 61 módulos, Lean v4.31.0. 12‑A fases 1a/1b/2 completas: el verificador ya es Δ₀ y sin acumulador.*
+*Last updated: 2026-07-09 — Build ✅ (74 jobs), 0 errores, 0 sorrys, 0 warnings, 60 módulos, Lean v4.31.0. F7a: 14 → 7 axiomas (registro en AXIOMS.md). 12‑A fases 1a/1b/2 completas.*
 
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)

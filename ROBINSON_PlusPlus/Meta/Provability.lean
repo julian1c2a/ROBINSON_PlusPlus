@@ -216,54 +216,23 @@ theorem provable_formCode_iff (φ : Formula) : Provable (formCode φ) ↔ (axiom
   · intro hφ; exact ⟨φ, rfl, hφ⟩
 
 /-!
-### Def 30 — `Dem`, y la Teo Meta (postulados)
+### Nivel C — sólo el núcleo real de codificación
 
-Lo siguiente requiere la **aritmetización de las demostraciones** y/o el
-**lema de diagonalización**, no demostrables en `Minimal` sin inducción. Se
-postulan como **meta-axiomas** (estilo `ax_p_tfa`, `imp_intro`, …). Pasarán a
-teoremas en el Nivel D (sobre `Intermediate/`/`Full/`). Ver `GODEL-STATUS.md`.
+> **Nota (F7a, 2026‑07‑09).** Este módulo definía además una capa **legacy** de
+> demostrabilidad postulada (`Dem`, `dem_iff_provable`, `provFormula`,
+> `provFormula_repr`, `diagonal_lemma`, `goedelSentence`,
+> `goedelSentence_fixedpoint`) que alimentaba a `Meta/Incompleteness.lean`
+> (Gödel I/II vía D2/D3 postulados). Auditado con `#print axioms`, la cadena
+> **real** (`goedel_first_real'`, `d2_prf`, `goedel_second'`) **no cita** ninguno
+> de esos símbolos; solo los usaba la capa legacy. Ambos se han retirado. La
+> demostrabilidad **real** vive en el verificador estructural
+> (`provCodeC'`/`chainOk`/`runFn`, `Meta/ProofChain.lean` y siguientes) y el punto
+> fijo real en `godelC'_fixedpoint` (`Meta/DiagonalTwo.lean`).
 -/
-
-/-- **Def 30** — `Dem d x`: `d` codifica una demostración cuya última línea es la
-    fórmula de código `x`. Relación postulada (su construcción codifica árboles
-    de derivación: aritmetización + inducción, Nivel D). -/
-axiom Dem : Term → Term → Prop
-
-/-- **Teo Meta** (spec Fase 19): el sistema expresa su propia derivabilidad —
-    `axioms ⊢ φ ↔ ∃ d, Dem d ⌜φ⌝`. Meta-axioma. -/
-axiom dem_iff_provable (φ : Formula) :
-    (axioms ⊢ φ) ↔ ∃ d : Term, Dem d (formCode φ)
-
-/-- Fórmula object-level `Prov(x)` con variable libre `0`, que expresa "el código
-    `x` es demostrable". Postulada (su construcción aritmetiza `Dem`). -/
-axiom provFormula : Formula
-
-/-- **Representabilidad de la demostrabilidad**: `⊢ Prov(⌜φ⌝) ↔ ⊢ φ`.
-    Meta-axioma (condición de demostrabilidad D1; requiere Nivel D). -/
-axiom provFormula_repr (φ : Formula) :
-    (axioms ⊢ substFormula 0 (formCode φ) provFormula) ↔ (axioms ⊢ φ)
-
-/-- **Lema del punto fijo (diagonalización)**: para toda fórmula `φ` con variable
-    libre `0` existe una sentencia `ψ` tal que `⊢ ψ ⇔ φ[⌜ψ⌝]`. Meta-axioma
-    (la construcción diagonal requiere representabilidad de la sustitución). -/
-axiom diagonal_lemma (φ : Formula) :
-    ∃ ψ : Formula, axioms ⊢ (ψ ⇔ substFormula 0 (formCode ψ) φ)
-
-/-- **Sentencia de Gödel** `G_Min`: punto fijo de `¬Prov(x)`, i.e. una sentencia
-    que afirma su propia indemostrabilidad. Obtenida del lema de diagonalización
-    aplicado a `¬provFormula`. -/
-noncomputable def goedelSentence : Formula :=
-  (diagonal_lemma (neg provFormula)).choose
-
-/-- Propiedad de punto fijo de la sentencia de Gödel:
-    `⊢ G_Min ⇔ (¬Prov(x))[⌜G_Min⌝]`, es decir `⊢ G_Min ⇔ ¬Prov(⌜G_Min⌝)`. -/
-theorem goedelSentence_fixedpoint :
-    axioms ⊢ (goedelSentence ⇔ substFormula 0 (formCode goedelSentence) (neg provFormula)) :=
-  (diagonal_lemma (neg provFormula)).choose_spec
 
 end ROBINSON_PlusPlus.Meta.Provability
 
--- Exports: API pública del Nivel C de demostrabilidad
+-- Exports: API pública del Nivel C de codificación (núcleo real, sin legacy)
 export ROBINSON_PlusPlus.Meta.Provability (
   charsCode
   strCode
@@ -279,11 +248,4 @@ export ROBINSON_PlusPlus.Meta.Provability (
   isFormula_formCode
   Provable
   provable_formCode_iff
-  Dem
-  dem_iff_provable
-  provFormula
-  provFormula_repr
-  diagonal_lemma
-  goedelSentence
-  goedelSentence_fixedpoint
 )
