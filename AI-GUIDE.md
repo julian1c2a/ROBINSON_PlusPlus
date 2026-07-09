@@ -448,7 +448,7 @@ Each subdirectory groups related modules and corresponds to a sub-namespace.
 
 Example structure:
 
-```
+```text
 ProjectName/
 ├── Prelim.lean               # Level 0: foundations
 ├── _template.lean            # Template (not imported)
@@ -750,7 +750,7 @@ structured picture of the project's current state in a single response.
 
 **Output format** (always in this order):
 
-```
+```text
 ## Situación — YYYY-MM-DD
 
 ### Build

@@ -1,0 +1,29 @@
+{
+  // Configuración de markdownlint para ROBINSON_PlusPlus.
+  // Codifica las convenciones DELIBERADAS de la documentación de este proyecto;
+  // solo se desactivan reglas de estilo que chocan con esas convenciones. Las
+  // reglas estructurales (fences, listas, blockquotes, lenguaje de código) SÍ se
+  // aplican y se corrigen en el contenido.
+  "default": true,
+
+  // MD013 — line-length. DESACTIVADA a propósito. La doc de este proyecto usa
+  // entradas de una sola línea muy largas (el CHANGELOG registra cada hito como
+  // un párrafo continuo de 300–440 caracteres; REFERENCE.md hace lo mismo en la
+  // cabecera). Envolver a 80 columnas destruiría el formato histórico y el diff
+  // sería ilegible. Convención fija del repo.
+  "MD013": false,
+
+  // MD060 — table-column-style. DESACTIVADA. Todas las tablas del proyecto usan
+  // el estilo compacto (`|---|---|` sin espacios de relleno). Es uniforme y
+  // deliberado; MD060 pediría reformatear cada tabla de cada documento.
+  "MD060": false,
+
+  // MD024 — no-duplicate-heading. DESACTIVADA. El CHANGELOG (formato Keep a
+  // Changelog) repite por diseño encabezados como `### Added` y sub-bloques con
+  // el mismo texto entre versiones.
+  "MD024": false,
+
+  // MD004 — ul-style. DESACTIVADA. Se permite mezclar `-` y `+` en listas
+  // anidadas para distinguir niveles visualmente en los docs largos.
+  "MD004": false
+}

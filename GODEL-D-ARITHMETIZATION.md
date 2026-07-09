@@ -15,7 +15,7 @@ demostrabilidad de Hilbert-Bernays-Löb **D1, D2, D3** de *meta-axiomas* (estado
 El sistema de demostrabilidad actual del proyecto, `axioms ⊢ φ` (`Derives` +
 meta-reglas de `FOL/MetaRules.lean`), incluye la **ω-regla** `gen`:
 
-```
+```text
 gen : (∀ n : Term, Γ ⊢ A[n]) → Γ ⊢ ∀A      -- premisas INFINITAS
 ```
 
@@ -63,7 +63,7 @@ Lenguaje: el de `FOL.FOL` (De Bruijn; `⊥, atom, ≐, ⇒, ∀, ∧, ∨, ∃` 
 
 **Esquemas de axiomas** (para todas las `Formula` A,B,C y `Term` t):
 
-```
+```text
 Proposicionales
   P1   A ⇒ (B ⇒ A)
   P2   (A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C))
@@ -92,7 +92,7 @@ Teoría
 
 **Reglas:**
 
-```
+```text
 MP    de ⊢ᴴ (A ⇒ B) y ⊢ᴴ A   concluye ⊢ᴴ B
 GEN   de ⊢ᴴ A                concluye ⊢ᴴ (∀A)
 ```

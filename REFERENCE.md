@@ -934,6 +934,7 @@ theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)  
 Conversión de D1/D2/D3 de **postulados** a **teoremas** sobre un cálculo de Hilbert finitario nuevo. Plan: [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md). El `axioms ⊢` del proyecto usa la ω-regla (no r.e.), así que Gödel se aplica a `Prf` (finitario, paralelo); el ω-sistema queda intacto.
 
 **`Meta/Hilbert.lean`** (Fase 0) — namespace `…Meta.Hilbert`:
+
 ```lean
 theorem subst_lift_same (f) (c) (s) : substFormula c s (liftFormula c f) = f
 inductive Prf₀ : Formula → Prop   -- Hilbert intuicionista (P1/P2, C, J, efq, Q1-3, refl, leibniz, thy, mp, gen)
@@ -945,6 +946,7 @@ theorem consistentH_of_omega : ¬(axioms ⊢ ⊥) → ¬ Prf ⊥
 ```
 
 **`Meta/HilbertSeq.lean`** (Fase 1) — namespace `…Meta.HilbertSeq`:
+
 ```lean
 inductive Rule   -- líneas anotadas (evita invertir la sustitución)
 def checkProof : List Rule → Option (List Formula)   -- verificador decidible (DecidableEq Term/Formula)
@@ -959,6 +961,7 @@ theorem dem_tracks (φ) : ProvableH (formCode φ) ↔ Prf φ         -- reemplaz
 ```
 
 **`Meta/CodeArith.lean`** (Fase 2.1) — namespace `…Meta.CodeArith`:
+
 ```lean
 theorem numeral_bridge (n) : Meta.Godel.numeral n = Full.numeral n
 theorem gnum_ne {a b} (h : a ≠ b) : axioms ⊢ neg (numeral a =eq numeral b)   -- separación
@@ -969,6 +972,7 @@ theorem gnum_add (a b) : axioms ⊢ (add (numeral a) (numeral b) =eq numeral (a+
 **`Minimal/Axioms.lean`** (extensión definicional para coding): `varc`/`funcc` (códigos de `Term.var`/`Term.func`), `substtc`/`substtsc` (sustitución aritmetizada), `forall_4`, y 6 ecuaciones recursivas `ax_substtc_*`/`ax_substtsc_*` añadidas a `axioms`.
 
 **`Meta/SubstArith.lean`** (Fase 2.2 nivel término) — namespace `…Meta.SubstArith`:
+
 ```lean
 theorem congr_cons_head / congr_cons_tail   -- congruencia de cons (patrón eq_congr)
 theorem pred_numeral (m) : axioms ⊢ (pred (numeral (m+1)) =eq numeral m)
@@ -983,12 +987,14 @@ theorem liftTerm_arith / liftFormula_arith ; theorem substFormula_arith   -- niv
 ```
 
 **`Meta/StepArith.lean`** (Fase 2.3) — `…Meta.StepArith`:
+
 ```lean
 theorem q1_concl_code / q2_concl_code / leibniz_concl_code   -- el código de la conclusión de
   -- los esquemas de sustitución, reconstruido con substfc, coincide con formCode (vía substFormula_arith)
 ```
 
 **`Meta/CheckArith.lean`** (Fase 2.4) — `…Meta.CheckArith`:
+
 ```lean
 theorem numeralM_eq (n) : numeralM n = Godel.numeral n
 theorem carc_cons / cdrc_cons   -- cómputo de los extractores cabeza/cola
@@ -1008,6 +1014,7 @@ Re-nivelación de la cadena Hilbert-Bernays-Löb al cálculo finitario `Prf` (G�
 `provCodeC' φ := ∃p, chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)` (`Meta/ProofChain.lean`).
 
 **`Meta/HilbertDeduction.lean`** — namespace `…Meta.HilbertDeduction`:
+
 ```lean
 inductive PrfH : List Formula → Formula → Prop   -- cálculo con contexto (espejo de Prf + hyp)
 theorem deduction_aux {Δ B} (h : PrfH Δ B) : ∀ A Γ, Δ = A :: Γ → PrfH Γ (A ⇒ B)
@@ -1021,6 +1028,7 @@ theorem PrfH_ex_elim {Γ A C} (hex : PrfH Γ (Formula.ex A))
 ```
 
 **`Meta/ArithPrf.lean`** / **`Meta/Representability2Prf.lean`** / **`Meta/ReprPrf.lean`** (Fase 3, D1):
+
 ```lean
 theorem prf_substTerm_arith / prf_substTerms_arith / prf_liftTerm_arith   -- aritmética de códigos en Prf
 theorem prf_congr_substfc_arg2 / _arg3   -- congruencias de substfc
@@ -1034,6 +1042,7 @@ theorem repr_pos'_prf {φ} (h : Prf φ) : Prf (provCodeC' φ)   -- D1 finitaria 
 
 **`Meta/ChainPrf.lean`** (Fase 4, paso 8) — namespace `…Meta.ChainPrf`: **10 lemas de cadena en `Prf`**
 vía el eliminador de inducción de listas + normalización De Bruijn + confinación.
+
 ```lean
 theorem prf_list_induction (Φ) (base : Prf (substFormula 0 nil Φ)) (step) : Prf (Formula.forall Φ)
 theorem norm21 (s t) : substTerm 0 s (liftTerm 2 (liftTerm 1 (liftTerm 0 t))) = liftTerm 1 (liftTerm 0 t)
@@ -1056,6 +1065,7 @@ theorem prf_chainOk_concat (c p s) : Prf (chainOk c (concat p s) ⇔ land (chain
 ```
 
 **`Meta/DerivCondPrf.lean`** (Fase 4, D2) — namespace `…Meta.DerivCondPrf`:
+
 ```lean
 theorem liftTerm_numeral / liftTerm_charsCode / liftTerm_strCode / liftTerm_termCode / liftTerm_formCode
   -- clausura: los códigos de Gödel son cerrados (invariantes bajo liftTerm)
@@ -1065,6 +1075,7 @@ theorem d2_prf (A B) : Prf (provCodeC' (A ⇒ B) ⇒ (provCodeC' A ⇒ provCodeC
 ```
 
 **`Meta/ReflectionPrf.lean`** (Fase 5, D3 reducida) — namespace `…Meta.ReflectionPrf`:
+
 ```lean
 theorem PrfH_pcc_mp {Γ A B} (h1 : PrfH Γ (provCodeC' (A ⇒ B))) (h2 : PrfH Γ (provCodeC' A))
   : PrfH Γ (provCodeC' B)                                        -- MP interno (D2), versión PrfH
@@ -1079,6 +1090,7 @@ theorem d3_prf_of_sigma1 (φ)
 
 **`Meta/Sigma1Prf.lean`** (Fase 5, núcleo de D3) — namespace `…Meta.Sigma1Prf`: infraestructura de
 reflexión Σ₁ (hacia `hC`/`hI`).
+
 ```lean
 theorem pcc_imp {A B} (h : Prf (A ⇒ B)) : Prf (provCodeC' A ⇒ provCodeC' B)   -- MP interno como esquema
 theorem pcc_imp2 {A B C} (h : Prf (A ⇒ (B ⇒ C))) : Prf (provCodeC' A ⇒ (provCodeC' B ⇒ provCodeC' C))
@@ -1108,6 +1120,7 @@ theorem pcc_allIn_cons (c x t) : Prf (provCodeC' (In x c) ⇒
 **`Meta/TcArithPrf.lean`** (Fase 5, cimiento código object) — namespace `…Meta.TcArithPrf`: porte
 finitario de la cadena `tc_arith` de `Diagonal.lean` (ω) → `Prf`. `tcFn` (función object,
 `Minimal/Axioms.lean`) computa `termCode`.
+
 ```lean
 theorem prf_tc_zero : Prf (tcFn zero =eq termCode zero)
 theorem prf_tc_succ (x) : Prf (tcFn (succ x) =eq cons (numeral 1) (cons (strCode succ_sym) (cons (cons (tcFn x) nil) nil)))
@@ -1128,6 +1141,7 @@ primera piedra de la reformulación de `hI` al nivel del código object. El obst
 `formCode (In x L)` contiene `termCode L` (**meta**, stuck para `L` abstracta); la salida es
 construir el código del átomo con una **función object** de los códigos de sus argumentos, para
 que la demostrabilidad respete su igualdad (Leibniz object vía `provFromCode`).
+
 ```lean
 def inFormCodeFn (xc Lc : Term) : Term := cons (numeral 3) (cons (strCode in_sym) (cons (cons xc (cons Lc nil)) nil))
   -- constructor object del código del átomo In: ⟨3, ⌜∈⌝, [xc, Lc]⟩
@@ -1199,6 +1213,7 @@ theorem pcc_exIntro_code_objList (A lines) (hclosed) (h) : Prf (provCodeC' (Form
 > constructores `atom2CodeFn` y `pcc_exIntro_code` siguen siendo infraestructura válida.
 
 **`Meta/TrackedCorePrf.lean`** — namespace `…Meta.TrackedCorePrf`: clausura genérica de `provFromCode`
+
 + constructores de código object para átomos binarios (generaliza `inFormCodeFn`).
 
 ```lean

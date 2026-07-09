@@ -72,7 +72,7 @@
 
 The name describes **what is proved**, not how. Hypotheses are added with `_of_`:
 
-```
+```text
 -- Pattern: A → B → C
 -- Name:    c_of_a_of_b
 -- Order:   conclusion_of_hypothesis1_of_hypothesis2
@@ -86,7 +86,7 @@ The name describes **what is proved**, not how. Hypotheses are added with `_of_`
 
 ### RULE 2 — Biconditionals carry suffix `_iff`
 
-```
+```text
 -- Theorem: x ∈ (𝒫 A) ↔ x ⊆ A
 -- Name:    mem_powerset_iff
 --          ^^^ ^^^^^^^^ ^^^
@@ -97,7 +97,7 @@ The name describes **what is proved**, not how. Hypotheses are added with `_of_`
 
 The `_wc` suffix (if used historically) is replaced by Mathlib convention:
 
-```
+```text
 -- For forward direction of an iff:
 --    inter_eq_empty_iff_disjoint.mp
 -- For backward direction:
@@ -108,7 +108,7 @@ The `_wc` suffix (if used historically) is replaced by Mathlib convention:
 
 ### RULE 4 — Algebraic properties → short axiomatic name
 
-```
+```text
 -- commutativity:   union_comm, inter_comm
 -- associativity:   inter_assoc, union_assoc
 -- absorption:      union_inter_self
@@ -136,7 +136,7 @@ The `_wc` suffix (if used historically) is replaced by Mathlib convention:
 
 ### RULE 5 — Predicates as prefix, operations in infix order
 
-```
+```text
 -- Predicate as prefix:   isNat_zero (not zero_is_nat)
 -- Exception:             succ_injective (_injective, _surjective are always suffix)
 ```
@@ -152,14 +152,14 @@ The `_wc` suffix (if used historically) is replaced by Mathlib convention:
 
 ### RULE 7 — Definitions with `Is` for Prop predicates
 
-```
+```text
 -- Definition (Prop): def IsNat (n : U) : Prop := ...     (UpperCamelCase)
 -- In theorem names:  isNat_zero, isNat_succ, isNat_of_mem (lowerCamelCase in snake_case)
 ```
 
 ### RULE 8 — Functions/constructors non-Prop: `lowerCamelCase`
 
-```
+```text
 -- powerset (not PowerSetOf)  — lowerCamelCase, remove "Of"
 -- union (not BinUnion)       — "Bin" removed (binary by arity)
 -- sep (not SpecSet)          — "sep" = Mathlib standard for separation
@@ -171,7 +171,7 @@ The `_wc` suffix (if used historically) is replaced by Mathlib convention:
 
 The pattern `X_is_specified` is replaced by `mem_X_iff`:
 
-```
+```text
 -- mem_succ_iff      (was: successor_is_specified)
 -- mem_inter_iff     (was: BinInter_is_specified)
 -- mem_union_iff     (was: BinUnion_is_specified)
@@ -181,7 +181,7 @@ The pattern `X_is_specified` is replaced by `mem_X_iff`:
 
 ### RULE 10 — Uniqueness and existence
 
-```
+```text
 -- inter_unique      (was: BinInterUniqueSet)
 -- powerset_unique   (was: PowerSetExistsUnique)
 -- sUnion_unique     (was: UnionExistsUnique)
@@ -189,14 +189,14 @@ The pattern `X_is_specified` is replaced by `mem_X_iff`:
 
 ### RULE 11 — Names with `_left` / `_right`
 
-```
+```text
 -- subset_union_left    — A ⊆ (A ∪ B), subset is left argument
 -- subset_union_right   — B ⊆ (A ∪ B), subset is right argument
 ```
 
 ### RULE 12 — Named theorems (proper names)
 
-```
+```text
 -- cantor_no_surjection          — proper name + description (OK in Mathlib)
 -- cantor_schroeder_bernstein    — proper name (kept as-is)
 ```

@@ -83,7 +83,7 @@ y luego se toma `formCode`.** Ahí nace la absorción (§2).
 
 Intentando `hI` por inducción de listas, la meta **base** (tras sustituir `#0 := nil`) es:
 
-```
+```text
 ⊢ᴴ  substFormula 0 nil ( (In (liftTerm 0 x) #0)  ⇒  provCodeC'(In (liftTerm 0 x) #0) )
 ```
 
@@ -190,12 +190,15 @@ def provInTrackedFn (xc Lc : Term) : Formula := provFromCode (inFormCodeFn xc Lc
 > El resto del documento detalla **Opción B** como ruta principal y marca los puntos donde,
 > si B se atasca, se escala a A.
 
+<!-- -->
+
 > **DECISIÓN (2026‑07‑05): Opción A.** Análisis posterior confirma que el `∃`‑intro interno
 > (`PrfH_pcc_exIntro`) produce **inherentemente** `formCode(A[0:=testigo])`; para el testigo
 > abstracto eso reabsorbe la variable (`varc 0`), y la costura de B (`tcFn p =eq termCode p`) **no
 > es enunciable** para `p` abstracto (`termCode p` meta‑stuck). Es una duda que **rompe la prueba
 > entera**, no un detalle. Por el criterio «ante duda que pueda traer problemas → A», se adopta
 > **Opción A**: rastreo uniforme desde la raíz (`provFormulaC'ₜ`/`provCodeC'ₜ` con `tcFn`/`substfc`)
+>
 > + re‑derivación de **D1ₜ**. D2 (`pcc_imp`) y el lema diagonal se reutilizan sin cambio estructural.
 > Orden de fases A: **A‑F1** ladrillos `tcFn`‑código (computación `tcFn=termCode` sobre las formas
 > de lista/cadena) → **A‑F2** `provFormulaC'ₜ`/`provCodeC'ₜ` + puente con `provCodeC'` → **A‑F3**
@@ -234,9 +237,11 @@ Para `hI_tracked` con `p` abstracto necesitamos reflejar `In ⌜φ⌝ (runFn nil
 
 1. **Inducción object sobre `p`** (regla `listInd` del verificador, ya integrada:
    `prf_list_induction`), con un predicado **rastreado**:
-   ```
+
+   ```text
    Ψ(p) := In ⌜φ⌝ (runFn nil p) ⇒ provFromCode (inFormCodeFn (tcFn ⌜φ⌝) (tcFn (runFn nil p)))
    ```
+
    El consecuente usa **`tcFn (runFn nil p)`**, que **sí depende** de `p` (función object del
    testigo), evitando la absorción.
 2. **Base** `p := nil`: `runFn nil nil =eq nil`; `In ⌜φ⌝ nil` es falso ⇒ explosión.
@@ -470,6 +475,7 @@ verificado en `Minimal/Axioms`), justo lo que falta a `tcFn`. Eso permite manipu
 numeral‑sustituido `substfc 0 (num p) ⌜θ⌝` para `p` abstracto en la inducción.
 
 Ingredientes (✅ = ya existe en el repo):
+
 - ✅ `substfc` + ecuaciones (incl. variables) + `prf_substFormula_arith` (`ArithPrf`).
 - ✅ `pcc_exIntro_code` (∃‑intro interno a nivel código) para el paso `Prov(⌜θ(ṗ)⌝) → Prov(⌜∃p θ⌝)`.
 - ✅ inducción object `prf_list_induction` (`listInd`).
@@ -625,7 +631,7 @@ Todos `[propext, choice, Quot.sound]`. La cota es **`lenc p`**: acotado sobre `p
 El acumulador se elimina **generalizando en `c`**: cada premisa está o bien ya en el contexto
 inicial `c`, o bien es la conclusión de una línea **anterior**.
 
-```
+```text
 chainOkB c p  :=  ∀ i < lenc p.
     ( lineWF (nthc p i)
       ∧ ∀ j < lenc (premsOf (nthc p i)).

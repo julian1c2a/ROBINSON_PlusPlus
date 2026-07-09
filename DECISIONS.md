@@ -146,10 +146,12 @@ Mantener los cinco como `axiom` en Lean, con las siguientes clasificaciones:
 
 1. **Soundness práctica**: En todos los usos en `Block1.lean`–`Block4.lean`, la hipótesis meta-nivel
    siempre recibe un argumento genuino (nunca vacuo). Por ejemplo:
+
    ```lean
    apply Axioms.imp_intro; intro h_neq   -- h_neq : Γ ⊢ A es una hipótesis real
    apply or_elim h_tric; · intro h_lt    -- h_lt viene de un caso real de la disyunción
    ```
+
    El patrón de uso garantiza que `h` nunca se invoca vacuosamente en esta base de código.
 
 2. **Validez aritmética**: El contexto `Γ` en ROBINSON_PlusPlus siempre es el conjunto fijo de
@@ -191,6 +193,7 @@ axiom subst_lift_cancel_formula (f : Formula) (v : Nat) (t : Term) :
 ```
 
 Este enunciado es **falso** para `t` arbitrario. Contraejemplo:
+
 - `f = .atom "P" [#0]`, `v = 0`, `t = .func "zero" []`
 - `liftFormula 1 f = .atom "P" [#0]` (la variable 0 < 1 no se levanta)
 - `substFormula 0 zero (.atom "P" [#0]) = .atom "P" [zero] ≠ .atom "P" [#0]`
@@ -204,11 +207,13 @@ theorem subst_lift_cancel_formula (f : Formula) (v : Nat) :
 ```
 
 La clave es que `t` debe ser exactamente `.var v`. Con ese `t`:
+
 - `liftFormula (v+1)` levanta variables ≥ v+1; la variable `v` no se toca.
 - `substFormula v (.var v)` reemplaza `#v` con `.var v` (identidad) y decrementa variables > v.
 - El resultado recupera la fórmula original exactamente.
 
 La demostración procede por inducción estructural en `f`, usando:
+
 - `FOL.substTerm_liftTerm_succ` y `FOL.substTerms_liftTerms_succ` (añadidos a `FOL/Theorems/Eq.lean`)
 - En los casos `forall`/`ex`: `liftTerm 0 (.var v) = .var (v+1)` permite aplicar la IH con `v+1`
 
@@ -217,6 +222,7 @@ La demostración procede por inducción estructural en `f`, usando:
 (ya que `#0 = .var 0`). Los `rw [subst_lift_cancel_formula] at h` existentes no cambian.
 
 **Consecuencias**:
+
 - `subst_lift_cancel_formula` ya no es un axioma en FOL — es un teorema probado.
 - `subst_distrib_and` y `lift_distrib_and` (también axiomas en Quantifiers.lean) se probaron
   simultáneamente como `rfl` (hold por definición).

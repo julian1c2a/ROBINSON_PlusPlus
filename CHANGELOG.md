@@ -768,12 +768,14 @@ Conversión de D1/D2/D3 de meta-axiomas opacos a teoremas. Como el `axioms ⊢` 
 
 - **NUEVO módulo `Full/Lists.lean`** (330 líneas) — derivación de los dos axiomas de listas postulados en Minimal vía meta-axioma de inducción estructural:
   - **NUEVO meta-axioma `ax_list_induction`** (estilo `imp_intro`/`gen`/`or_elim`):
+
     ```lean
     axiom ax_list_induction {Γ} (φ : Term → Formula)
       (base : Γ ⊢ φ nil)
       (step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)) :
       ∀ L, Γ ⊢ φ L
     ```
+
     Parametrizado por función Lean `φ : Term → Formula` (no `Formula → Formula` como `ax_induction`). Más limpio: evita el manejo De Bruijn de los dos binders ∀h ∀t que requeriría una versión object-level. Conclusión sobre **todos** los Terms (no solo listas) — análogo a cómo `ax_induction` decide tratar Term como generado libremente por 0 y σ. (Observación: con 3 binders esta forma generalizaría a inducción sobre ordinales / W-types arbitrarios.)
   - **Helpers de congruencia**: `eq_congr_cons_right_full` (cons respeta `=` en arg derecho), `eq_congr_concat_left/right` (concat respeta `=` en ambos args), `eq_subst_in` (substituye igualdad bajo predicado `In`), helper local `iff_intro` (construye `iff` desde dos meta-implicaciones).
   - **`concat_assoc_pointwise` + `concat_assoc_thm : ⊢ ax_C3_concat_assoc`** — `(L##M)##N = L##(M##N)` por inducción estructural en L con M, N como parámetros Lean. Base nil: `ax_C1` doble + congruencia. Paso cons: `ax_C2` triple + IH + `eq_congr_cons_right_full`.

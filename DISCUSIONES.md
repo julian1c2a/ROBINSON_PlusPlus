@@ -37,14 +37,14 @@ Esta sección desglosa el propósito y estatus de los axiomas de alto nivel del 
 
 ### Axiomas Permanentes del Sistema `Minimal`
 
-*   **Axioma 20 (`ax20_eq_decidable`)**: `∀ n, m, n = m ∨ n ≠ m`
-    *   **Propósito**: Establece que la igualdad es decidible. Es fundamental para poder razonar por casos sobre si dos términos son iguales o no.
-*   **Axioma 21 (`ax21_mod2_range`)**: `∀ n, mod2(n) = 0 ∨ mod2(n) = 1`
-    *   **Propósito**: Define el rango de la función `mod2`. Es crucial para las pruebas de paridad, como el Lema P1.
-*   **Axioma 25 (`ax25_tau_zero`)**: `τ(0) = 0`
-    *   **Propósito**: Define el caso base de la función predecesor `τ`.
-*   **Axioma 26 (`ax26_tau_succ`)**: `∀n, τ(σ(n)) = n`
-    *   **Propósito**: Define el paso recursivo de la función predecesor `τ`.
+* **Axioma 20 (`ax20_eq_decidable`)**: `∀ n, m, n = m ∨ n ≠ m`
+  * **Propósito**: Establece que la igualdad es decidible. Es fundamental para poder razonar por casos sobre si dos términos son iguales o no.
+* **Axioma 21 (`ax21_mod2_range`)**: `∀ n, mod2(n) = 0 ∨ mod2(n) = 1`
+  * **Propósito**: Define el rango de la función `mod2`. Es crucial para las pruebas de paridad, como el Lema P1.
+* **Axioma 25 (`ax25_tau_zero`)**: `τ(0) = 0`
+  * **Propósito**: Define el caso base de la función predecesor `τ`.
+* **Axioma 26 (`ax26_tau_succ`)**: `∀n, τ(σ(n)) = n`
+  * **Propósito**: Define el paso recursivo de la función predecesor `τ`.
 
 DISCUSIÓN (¿Pueden los axiomas 25 y 26 pasar a ser definiciones + teoremas?):
 
@@ -53,9 +53,10 @@ Def τ(0) := 0
 Def ∀ n, τ(σ(n)) := n
 
 Veamos que existe un natural `m` que cumple `τ(n) = m` para cada `n`. De hecho, `m = σ(n)` cumple esta propiedad:
+
 - Para `n = 0`, `τ(0) = 0` por el axioma 25, y `σ(0) = 1`, así que `τ(0) = 0` cumple la propiedad. Las dos reglas colapsan en exactamente el mismo número imagen.
 - Cualquier otro número `n` es de la forma `σ(k)` para algún `k`, y entonces `τ(σ(k)) = k` por la propia definición, y `σ(k)` cumple la propiedad. Por otra parte `∀ k, 0 ≠ σ(k)`, así que no hay casos adicionales a considerar.
-- Por lo tanto, `τ` es una función total y bien definida, y la definición solo usa los axiomas de `σ`. No se requiere ningún axioma adicional para definir `τ` de esta manera, y no hay contradicciones con los axiomas existentes. Por lo tanto, la función `τ` es perfectamente válida en el sistema `Minimal` con los axiomas dados. No usa inducción para estar perfectamente definida. 
+- Por lo tanto, `τ` es una función total y bien definida, y la definición solo usa los axiomas de `σ`. No se requiere ningún axioma adicional para definir `τ` de esta manera, y no hay contradicciones con los axiomas existentes. Por lo tanto, la función `τ` es perfectamente válida en el sistema `Minimal` con los axiomas dados. No usa inducción para estar perfectamente definida.
 
 DISCUSIÓN (¿Puede el Axioma 20 pasar a ser un teorema?):
 
@@ -70,8 +71,8 @@ Vamos a pensarlo por casos:
 - Para `n = 0` y `m = σ(k)` para algún `k`, `n ≠ m` es verdadero, así que la disyunción se cumple, porque para todo `k`, `σ(k) ≠ 0`.
 - Idem si `n = σ(k)` y `m = 0`, entonces `n ≠ m` es verdadero, así que la disyunción se cumple.
 - Para `n = σ(k)` y `m = σ(l)`. Volvemos a tener dos casos:
-    - Si `k = l`, entonces `n = m` es verdadero, así que la disyunción se cumple.
-    - Si `k ≠ l`, entonces `n ≠ m` es verdadero, así que la disyunción se cumple.
+  - Si `k = l`, entonces `n = m` es verdadero, así que la disyunción se cumple.
+  - Si `k ≠ l`, entonces `n ≠ m` es verdadero, así que la disyunción se cumple.
 - ¿No tenemos para la igualdad un principio restringido de exclusión del tercero?
 
 DISCUSIÓN (¿Es el Axioma 20 un teorema?):
@@ -90,8 +91,8 @@ DISCUSIÓN ¿Como entonces se puede construir la incompletitud de Gödel en un s
 
 Estos axiomas se han añadido para poder avanzar, pero están destinados a ser eliminados una vez que se demuestren los teoremas correspondientes.
 
-*   ~~**Axioma 22 (`ax22_cantor_proj_exists`)**~~ — **ELIMINADO 2026-06-02**: ahora teorema `proj_is_cantor` en `Block4_C6_C7`.
-*   ~~**Axioma 23 (`ax23_cantor_proj_uniq`)**~~ — **ELIMINADO 2026-06-02**: el teorema `cantor_uniqueness` ya cubre la unicidad proyectiva sin necesidad de un axioma de respaldo.
-*   **Axioma 24 (`ax24_mod2_of_even`)**: `n = 2*k → mod2(n) = 0`
-    *   **Propósito**: Postula que el `mod2` de un número par es cero. Es un teorema en sistemas con inducción, pero se mantiene como axioma en `Minimal` porque su prueba formal requiere un sistema más fuerte.
-*   ~~**Axioma 27 (`ax27_add_left_cancel`)**~~ — **ELIMINADO 2026-06-03**: derivable en PA⁻ sin inducción. Prueba: por tricotomía (ax19) `a<b ∨ a=b ∨ b<a`; los casos estrictos llevan a `a+c < a+c` vía monotonía (`lt_add_const_of_le_left` + `add_comm'`) y contradicen ax18. Ahora es teorema `add_left_cancel` en `Block4_C6_C7`.
+* ~~**Axioma 22 (`ax22_cantor_proj_exists`)**~~ — **ELIMINADO 2026-06-02**: ahora teorema `proj_is_cantor` en `Block4_C6_C7`.
+* ~~**Axioma 23 (`ax23_cantor_proj_uniq`)**~~ — **ELIMINADO 2026-06-02**: el teorema `cantor_uniqueness` ya cubre la unicidad proyectiva sin necesidad de un axioma de respaldo.
+* **Axioma 24 (`ax24_mod2_of_even`)**: `n = 2*k → mod2(n) = 0`
+  * **Propósito**: Postula que el `mod2` de un número par es cero. Es un teorema en sistemas con inducción, pero se mantiene como axioma en `Minimal` porque su prueba formal requiere un sistema más fuerte.
+* ~~**Axioma 27 (`ax27_add_left_cancel`)**~~ — **ELIMINADO 2026-06-03**: derivable en PA⁻ sin inducción. Prueba: por tricotomía (ax19) `a<b ∨ a=b ∨ b<a`; los casos estrictos llevan a `a+c < a+c` vía monotonía (`lt_add_const_of_le_left` + `add_comm'`) y contradicen ax18. Ahora es teorema `add_left_cancel` en `Block4_C6_C7`.

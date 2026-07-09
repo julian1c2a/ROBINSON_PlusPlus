@@ -116,7 +116,7 @@ la necesidad de los axiomas.
 
 ---
 
-*(Borrador original del análisis, conservado para referencia:)*
+### Borrador original del análisis (conservado para referencia)
 
 El axioma 25 establece que `τ(0) = 0`, y el axioma 26 establece que `∀ n, τ(σ(n)) = n`. Estos axiomas definen completamente la función predecesor `τ` en términos de los axiomas de `σ`.
 
