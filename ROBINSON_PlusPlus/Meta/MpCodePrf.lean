@@ -143,15 +143,30 @@ Primer uso real del toolkit: un axioma `∀x. φ(x)` de `axioms` tiene su códig
 (`repr_pos'_prf` sobre `prf_ax`), y el ∀‑elim de código lo **instancia en cualquier código‑testigo
 `w`, incluso abierto**. Es el paso que la **evaluación provable** repite sobre `ax4`/`ax5`. -/
 
-/-- **Instanciación de un axioma universal codificado**: si `∀φ ∈ axioms`, entonces para todo
-    código‑testigo `w` (abierto o cerrado) el código sustituido `substfc zero w ⌜φ⌝` es demostrable.
+/-- **Instanciación de un TEOREMA universal codificado**: de `Prf (∀φ)` sale que, para todo
+    código‑testigo `w` (abierto o cerrado), el código sustituido `substfc zero w ⌜φ⌝` es demostrable.
 
-    `formCode (Formula.forall φ) = forallc (formCode φ)` (definicional). -/
+    `formCode (Formula.forall φ) = forallc (formCode φ)` (definicional). Es la forma general:
+    `pcc_axiom_inst` es el caso `h = prf_ax hmem`. Sirve para internalizar **cualquier** teorema
+    universal de la teoría objeto (p. ej. la transitividad de `=`), no sólo los axiomas. -/
+theorem pcc_thm_inst (φ : Formula) (h : Prf (Formula.forall φ)) (w : Term) :
+    Prf (provFromCode (substfc zero w (formCode φ))) :=
+  prf_mp (pcc_forallElim_code_open (formCode φ) w) (repr_pos'_prf h)
+
+/-- **Instanciación de un TEOREMA `∀∀φ` codificado** (dos testigos, ambos pueden ser abiertos). -/
+theorem pcc_thm_inst2 (φ : Formula) (h : Prf (forall_2 φ)) (w₁ w₂ : Term) :
+    Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) := by
+  have h0 : Prf (provFromCode (formCode (forall_2 φ))) := repr_pos'_prf h
+  have h1 : Prf (provFromCode (substfc zero w₁ (forallc (formCode φ)))) :=
+    prf_mp (pcc_forallElim_code_open (forallc (formCode φ)) w₁) h0
+  have h2 : Prf (provFromCode (forallc (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
+    prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (formCode φ))) h1
+  exact prf_mp (pcc_forallElim_code_open _ w₂) h2
+
+/-- **Instanciación de un axioma universal codificado** (caso `h = prf_ax hmem` de `pcc_thm_inst`). -/
 theorem pcc_axiom_inst (φ : Formula) (hmem : Formula.forall φ ∈ axioms) (w : Term) :
     Prf (provFromCode (substfc zero w (formCode φ))) :=
-  prf_mp
-    (pcc_forallElim_code' (formCode φ) w (fun c => liftTerm_formCode c φ))
-    (repr_pos'_prf (prf_ax hmem))
+  pcc_thm_inst φ (prf_ax hmem) w
 
 /-- Instancia codificada de **`ax4_add_zero`** (`∀n. n + 0 = n`): el caso base de la evaluación
     provable de `+`. Testigo‑código `w` arbitrario (puede ser `tcFn` de una variable ligada). -/
@@ -169,16 +184,8 @@ theorem pcc_ax4_inst (w : Term) :
     por tanto **no es cerrado** cuando `w₁` es abierto. Por eso hace falta `pcc_forallElim_code_open`
     (sin `hAc`), no `pcc_forallElim_code'`. -/
 theorem pcc_axiom_inst2 (φ : Formula) (hmem : forall_2 φ ∈ axioms) (w₁ w₂ : Term) :
-    Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) := by
-  have h0 : Prf (provFromCode (formCode (forall_2 φ))) := repr_pos'_prf (prf_ax hmem)
-  -- 1) ∀-elim externo con `w₁`
-  have h1 : Prf (provFromCode (substfc zero w₁ (forallc (formCode φ)))) :=
-    prf_mp (pcc_forallElim_code_open (forallc (formCode φ)) w₁) h0
-  -- 2) empuja el `substfc` bajo el binder (levanta el testigo)
-  have h2 : Prf (provFromCode (forallc (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
-    prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (formCode φ))) h1
-  -- 3) ∀-elim interno con `w₂` (cuerpo ABIERTO: contiene `w₁`)
-  exact prf_mp (pcc_forallElim_code_open _ w₂) h2
+    Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
+  pcc_thm_inst2 φ (prf_ax hmem) w₁ w₂
 
 /-- Instancia codificada de **`ax5_add_succ`** (`∀n∀m. n + σm = σ(n+m)`): el paso inductivo de la
     evaluación provable de `+`. Ambos testigos‑código arbitrarios (pueden ser abiertos). -/
@@ -190,6 +197,6 @@ theorem pcc_ax5_inst (w₁ w₂ : Term) :
 end ROBINSON_PlusPlus.Meta.MpCodePrf
 
 export ROBINSON_PlusPlus.Meta.MpCodePrf (
-  liftTerm_implc pcc_mp_code pcc_mp_code_apply pcc_axiom_inst pcc_ax4_inst
-  pcc_axiom_inst2 pcc_ax5_inst
+  liftTerm_implc pcc_mp_code pcc_mp_code_apply
+  pcc_thm_inst pcc_thm_inst2 pcc_axiom_inst pcc_axiom_inst2 pcc_ax4_inst pcc_ax5_inst
 )

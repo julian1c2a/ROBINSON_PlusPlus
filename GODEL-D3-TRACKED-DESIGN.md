@@ -1378,6 +1378,61 @@ codificado (`repr_pos'_prf h`) en vez de un axioma (`repr_pos'_prf (prf_ax hmem)
 
 ---
 
+## 25 · `pcc_thm_inst` y el **LEIBNIZ codificado libre de muro**
+
+### 25.1 `pcc_thm_inst` — internalizar cualquier teorema universal
+
+```lean
+pcc_thm_inst  (f) (h : Prf (Formula.forall f)) (w)
+  : Prf (provFromCode (substfc zero w (formCode f)))
+pcc_thm_inst2 (f) (h : Prf (forall_2 f)) (w1 w2)
+```
+
+Generaliza `pcc_axiom_inst`/`pcc_axiom_inst2`, que pasan a ser **corolarios** (`h := prf_ax hmem`).
+Sirve para internalizar **cualquier** teorema universal de la teoría objeto, no sólo los axiomas.
+`[propext, choice, Quot.sound, prf_inAxC]` (el `prf_inAxC` viene de `repr_pos'_prf`).
+
+### 25.2 Hallazgo: `prf_lineWF_leibniz` es ESTRUCTURAL
+
+```text
+lineWF <concl, 13, A, t1, t2>  <->  concl =eq implc (eqc t1 t2) (implc (substfc 0 t1 A) (substfc 0 t2 A))
+```
+
+sin premisas y con **códigos arbitrarios** `A`, `t1`, `t2` — exactamente como la línea EQREFL (§15.4)
+y las líneas Q1/Q2 (§19.1). Luego el **Leibniz codificado** se demuestra con un testigo de **una sola
+línea**, **libre de muro**:
+
+```lean
+leibnizLine (Ac t1 t2)
+prf_lineOk_leibniz / prf_chainOk_leibniz / prf_in_runFn_leibniz
+pcc_leibniz_code (Ac t1 t2)
+  : Prf (provFromCode (implc (eqc t1 t2) (implc (substfc 0 t1 Ac) (substfc 0 t2 Ac))))
+```
+
+`[propext, choice, Quot.sound]` — **sin `prf_inAxC`** (no pasa por `repr_pos'`). **Verificado** con
+códigos abiertos: `pcc_leibniz_code (#0) (tcFn a) (tcFn b)` typechequea.
+
+**Consecuencia:** la lógica ecuacional interna (transitividad, congruencias) sale de
+`pcc_leibniz_code` + `pcc_mp_code`, **sin** teoremas codificados ni `∀`-elim triple.
+
+### 25.3 El siguiente ladrillo: `pcc_mp_code_open`
+
+Para **aplicar** `pcc_leibniz_code` hace falta `pcc_mp_code` dos veces. Pero `pcc_mp_code` exige
+**códigos cerrados** (`hAc`/`hBc`), y los nuestros contienen `tcFn #0` (la variable de la inducción),
+que **no** lo es. Es **la cuarta vez** que una hipótesis de clausura estorba (`hw` §17, `hAc` §22).
+Como en los casos anteriores, se arregla **arrastrando los lifts**: `liftFormula_provFromCode_open`
+traslada el lift al código, y el ensamblaje `p ++ q ++ [mpline]` pasa con `lift Ac`, `lift Bc`.
+
+### 25.4 Orden
+
+1. **`pcc_mp_code_open`** (sin `hAc`/`hBc`).
+2. **`pcc_eq_trans_code`** y **`pcc_congr_succ_code`** desde `pcc_leibniz_code` + `pcc_mp_code_open`.
+3. **Paso inductivo de `+`** -> evaluación provable de `+` COMPLETA.
+4. Misma receta para `lenc`/`nthc`/`carc`/`runFn`; luego `<`, cuantificadores acotados, inducción
+   estructural -> `hbI`/`hbC` -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y

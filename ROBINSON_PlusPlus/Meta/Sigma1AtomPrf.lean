@@ -166,6 +166,55 @@ theorem prf_provFromCode_eqCodeFn_refl (c : Term) : Prf (provFromCode (eqCodeFn 
   prf_provFromCode_intro (eqCodeFn c c) (cons (eqreflLine c) nil)
     (prf_chainOk_eqrefl c) (prf_in_runFn_eqrefl c)
 
+/-! ### LEIBNIZ a nivel de código — también LIBRE DE MURO
+
+`prf_lineWF_leibniz` es **estructural**, igual que la línea EQREFL y las líneas Q1/Q2:
+
+```text
+lineWF ⟨concl, 13, A, t₁, t₂⟩ ⇔ concl =eq implc (eqc t₁ t₂) (implc (substfc 0 t₁ A) (substfc 0 t₂ A))
+```
+
+sin premisas y con **códigos arbitrarios** `A`, `t₁`, `t₂`. Luego el **Leibniz codificado** se
+demuestra con un testigo de **una sola línea**, exactamente como la reflexividad (§15.4). Con él y
+`pcc_mp_code` se obtiene toda la **lógica ecuacional interna** sobre códigos (transitividad,
+congruencias), sin pasar por teoremas codificados ni por `∀`‑elim triple. -/
+
+/-- **Línea‑axioma LEIBNIZ** para los códigos `Ac`, `t₁`, `t₂`: `⟨concl, 13, Ac, t₁, t₂⟩`. -/
+def leibnizLine (Ac t₁ t₂ : Term) : Term :=
+  cons (implc (eqc t₁ t₂) (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac)))
+    (cons (numeralM 13) (cons Ac (cons t₁ (cons t₂ nil))))
+
+/-- La línea LEIBNIZ es válida en cualquier contexto (`lineWF` por reflexividad, sin premisas). -/
+theorem prf_lineOk_leibniz (c Ac t₁ t₂ : Term) : Prf (lineOk c (leibnizLine Ac t₁ t₂)) :=
+  prf_and_intro
+    (prf_iff_mpr (prf_lineWF_leibniz _ Ac t₁ t₂) (prf_refl _))
+    (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_leibniz _ Ac t₁ t₂)) (prf_allIn_nil c))
+
+/-- La cadena de una sola línea LEIBNIZ es válida desde `nil`. -/
+theorem prf_chainOk_leibniz (Ac t₁ t₂ : Term) :
+    Prf (chainOk nil (cons (leibnizLine Ac t₁ t₂) nil)) :=
+  prf_iff_mpr (prf_chainOk_cons nil (leibnizLine Ac t₁ t₂) nil)
+    (prf_and_intro (prf_lineOk_leibniz nil Ac t₁ t₂) (prf_chainOk_nil _))
+
+/-- La conclusión de la cadena LEIBNIZ. -/
+theorem prf_in_runFn_leibniz (Ac t₁ t₂ : Term) :
+    Prf (In (implc (eqc t₁ t₂) (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac)))
+      (runFn nil (cons (leibnizLine Ac t₁ t₂) nil))) := by
+  have hrun : Prf (runFn nil (cons (leibnizLine Ac t₁ t₂) nil)
+      =eq cons (implc (eqc t₁ t₂) (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) nil) :=
+    prf_eq_trans (prf_runFn_cons nil (leibnizLine Ac t₁ t₂) nil)
+      (prf_eq_trans (prf_runFn_nil _)
+        (prf_eq_trans (prf_concat_nil_eq _)
+          (prf_congr_cons_head (prf_carc_cons _ _))))
+  exact prf_eq_subst_in (prf_eq_symm hrun) (prf_in_cons_head _ nil)
+
+/-- **LEIBNIZ a nivel de código, LIBRE DE MURO**: para códigos `Ac`, `t₁`, `t₂` **arbitrarios**,
+    `⊢ Prov(⌜ (t₁ = t₂) ⇒ (Ac[t₁] ⇒ Ac[t₂]) ⌝)`. Testigo: la cadena de una línea `[⟨…,13,…⟩]`. -/
+theorem pcc_leibniz_code (Ac t₁ t₂ : Term) :
+    Prf (provFromCode (implc (eqc t₁ t₂) (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac)))) :=
+  prf_provFromCode_intro _ (cons (leibnizLine Ac t₁ t₂) nil)
+    (prf_chainOk_leibniz Ac t₁ t₂) (prf_in_runFn_leibniz Ac t₁ t₂)
+
 /-! ### Reflexión de la igualdad con código `tcFn` — también LIBRE DE MURO
 
 Con la reflexividad libre de muro como base, la reflexión de `t =eq u` **al nivel del código
@@ -303,6 +352,7 @@ export ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (
   prf_provFromCode_intro eqreflLine prf_lineOk_eqrefl prf_chainOk_eqrefl
   prf_in_runFn_eqrefl prf_provFromCode_eqCodeFn_refl
   PrfH_congr_tcFn PrfH_congr_eqCodeFn pcc_eq_tracked pcc_eq_of_tc_bridge
+  leibnizLine prf_lineOk_leibniz prf_chainOk_leibniz prf_in_runFn_leibniz pcc_leibniz_code
   atom1CodeFn atom1CodeFn_termCode liftTerm_atom1CodeFn prf_congr_atom1CodeFn
   prf_provFromCode_atom1_congr liftFormula_provFromCode_atom1
   lineWFCodeFn lineWFCodeFn_termCode provCodeC'_lineWF_eq prf_provCodeC'_lineWF_of_tracked
