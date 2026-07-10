@@ -6,6 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
+import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -18,6 +19,7 @@ open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
+open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -98,9 +100,123 @@ theorem pcc_eval_add_zero (a : Term) : Prf (provFromCode (evalAddCode a zero)) :
       (prf_congr_eqCodeFn (prf_congr_addcT (prf_refl (tcFn a)) hz) ha))
     (pcc_ax4_computed a)
 
+/-! ### (B) Cómputo de la instancia codificada de `ax5`
+
+`substCodeF 1 W₁` sobre el cuerpo de `ax5` **computa por `rfl`**:
+
+```text
+substCodeF 1 W₁ (ȧ + σv₀ = σ(ȧ + v₀))  =  eqCodeFn (addcT W₁ (succcT ⌜v₀⌝)) (succcT (addcT W₁ ⌜v₀⌝))
+```
+
+Así que la composición **no necesita una inducción general** sobre fórmulas (§22.3 (B)): basta
+computar el `substfc` externo sobre ese código explícito, con (A) (`prf_substtc_tcFn`) para que el
+`W₁` incrustado sobreviva intacto. -/
+
+/-- Código object del término `σ x` desde el código `x`: `⟨1, ⌜σ⌝, [x]⟩`. -/
+def succcT (x : Term) : Term := funcc (strCode succ_sym) (cons x nil)
+
+/-- `prf_tc_succ` dice exactamente `tcFn (σx) =eq succcT (tcFn x)` (definicional). -/
+theorem prf_tc_succ' (x : Term) : Prf (tcFn (succ x) =eq succcT (tcFn x)) := prf_tc_succ x
+
+/-- Congruencia de `succcT`. -/
+theorem prf_congr_succcT {x y : Term} (h : Prf (x =eq y)) : Prf (succcT x =eq succcT y) :=
+  prf_congr_funcc2 (prf_congr_cons_head h)
+
+/-! #### `substtc` atraviesa los constructores de código de término -/
+
+/-- `substtc` sobre un `funcc` de **un** argumento. -/
+theorem prf_substtc_funcc1 (v W sc x : Term) :
+    Prf (substtc v W (funcc sc (cons x nil)) =eq funcc sc (cons (substtc v W x) nil)) :=
+  prf_eq_trans (prf_substtc_func v W sc (cons x nil))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_substtsc_cons v W x nil)
+        (prf_congr_cons_tail (prf_substtsc_nil v W))))
+
+/-- `substtc` sobre un `funcc` de **dos** argumentos. -/
+theorem prf_substtc_funcc2 (v W sc x y : Term) :
+    Prf (substtc v W (funcc sc (cons x (cons y nil)))
+      =eq funcc sc (cons (substtc v W x) (cons (substtc v W y) nil))) :=
+  prf_eq_trans (prf_substtc_func v W sc (cons x (cons y nil)))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_substtsc_cons v W x (cons y nil))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_substtsc_cons v W y nil)
+            (prf_congr_cons_tail (prf_substtsc_nil v W))))))
+
+/-- `substtc` sobre `succcT`. -/
+theorem prf_substtc_succcT (v W x : Term) :
+    Prf (substtc v W (succcT x) =eq succcT (substtc v W x)) :=
+  prf_substtc_funcc1 v W (strCode succ_sym) x
+
+/-- `substtc` sobre `addcT`. -/
+theorem prf_substtc_addcT (v W x y : Term) :
+    Prf (substtc v W (addcT x y) =eq addcT (substtc v W x) (substtc v W y)) :=
+  prf_substtc_funcc2 v W (strCode add_sym) x y
+
+/-- `substtc zero W ⌜v₀⌝ =eq W` (la variable de código `0` recibe el testigo). -/
+theorem prf_substtc_varc0 (W : Term) : Prf (substtc zero W (varc (numeral 0)) =eq W) :=
+  prf_mp (prf_substtc_var_eq zero W (numeral 0)) (prf_refl zero)
+
+/-! #### La instancia de `ax5`, computada -/
+
+/-- **Instancia codificada de `ax5` ya computada**: `⊢ Prov(⌜ȧ + σḃ = σ(ȧ + ḃ)⌝)`.
+
+    De `pcc_ax5_inst (tcFn a) (tcFn b)`, normalizando el `liftc zero (tcFn a)` con (A)
+    (`prf_liftc_tcFn`) y computando el `substfc` externo sobre el código explícito, donde (A)
+    (`prf_substtc_tcFn`) garantiza que el `tcFn a` incrustado sobrevive intacto. -/
+theorem pcc_ax5_computed (a b : Term) :
+    Prf (provFromCode
+      (eqCodeFn (addcT (tcFn a) (succcT (tcFn b))) (succcT (addcT (tcFn a) (tcFn b))))) := by
+  -- abreviaturas
+  let W1 : Term := liftc zero (tcFn a)
+  let B : Term := tcFn b
+  -- (1) el `substfc` INTERNO se computa (y `substCodeF 1 W1 (cuerpo) ` es `rfl`)
+  have hin : Prf (substfc (succ zero) W1
+      (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0))))
+      =eq eqCodeFn (addcT W1 (succcT (varc (numeral 0))))
+                   (succcT (addcT W1 (varc (numeral 0))))) :=
+    prf_substfc_arith_open 1 W1 (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0)))
+  -- (2) (A): `liftc zero (tcFn a) =eq tcFn a` ⇒ normaliza `W1 → tcFn a` dentro del código
+  have hnorm : Prf (eqCodeFn (addcT W1 (succcT (varc (numeral 0))))
+                             (succcT (addcT W1 (varc (numeral 0))))
+      =eq eqCodeFn (addcT (tcFn a) (succcT (varc (numeral 0))))
+                   (succcT (addcT (tcFn a) (varc (numeral 0))))) := by
+    have hA : Prf (W1 =eq tcFn a) := prf_liftc_tcFn a
+    exact prf_congr_eqCodeFn
+      (prf_congr_addcT hA (prf_refl _))
+      (prf_congr_succcT (prf_congr_addcT hA (prf_refl _)))
+  -- (3) el `substfc` EXTERNO sobre el código explícito
+  have hout : Prf (substfc zero B
+      (eqCodeFn (addcT (tcFn a) (succcT (varc (numeral 0))))
+                (succcT (addcT (tcFn a) (varc (numeral 0)))))
+      =eq eqCodeFn (addcT (tcFn a) (succcT B)) (succcT (addcT (tcFn a) B))) := by
+    refine prf_eq_trans
+      (prf_substfc_eq zero B (addcT (tcFn a) (succcT (varc (numeral 0))))
+        (succcT (addcT (tcFn a) (varc (numeral 0))))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · -- lado izquierdo: ȧ + σ v₀  ↦  ȧ + σ ḃ
+      refine prf_eq_trans (prf_substtc_addcT zero B (tcFn a) (succcT (varc (numeral 0)))) ?_
+      refine prf_congr_addcT (prf_substtc_tcFn B a) ?_
+      exact prf_eq_trans (prf_substtc_succcT zero B (varc (numeral 0)))
+        (prf_congr_succcT (prf_substtc_varc0 B))
+    · -- lado derecho: σ(ȧ + v₀)  ↦  σ(ȧ + ḃ)
+      refine prf_eq_trans (prf_substtc_succcT zero B (addcT (tcFn a) (varc (numeral 0)))) ?_
+      refine prf_congr_succcT ?_
+      exact prf_eq_trans (prf_substtc_addcT zero B (tcFn a) (varc (numeral 0)))
+        (prf_congr_addcT (prf_substtc_tcFn B a) (prf_substtc_varc0 B))
+  -- (4) ensamblar: transporta la instancia de `ax5` por toda la cadena de igualdades de código
+  have hchain : Prf (substfc zero B (substfc (succ zero) W1
+      (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0)))))
+      =eq eqCodeFn (addcT (tcFn a) (succcT B)) (succcT (addcT (tcFn a) B))) :=
+    prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
+  exact prf_mp (prf_provCode_congr hchain) (pcc_ax5_inst (tcFn a) B)
+
 end ROBINSON_PlusPlus.Meta.EvalArithPrf
 
 export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   addcT addcT_termCode prf_congr_addcT
   evalAddCode pcc_ax4_computed pcc_eval_add_zero
+  succcT prf_tc_succ' prf_congr_succcT
+  prf_substtc_funcc1 prf_substtc_funcc2 prf_substtc_succcT prf_substtc_addcT prf_substtc_varc0
+  pcc_ax5_computed
 )

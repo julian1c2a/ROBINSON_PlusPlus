@@ -1285,6 +1285,99 @@ Con (A) además `liftc zero w1 =eq w1`, lo que simplifica el enunciado de `pcc_a
 
 ---
 
+## 23 · (A) El código de un numeral es CERRADO — `Meta/NumCodeClosedPrf.lean`
+
+```lean
+prf_liftc_tcFn   (a)   : Prf (liftc zero (tcFn a) =eq tcFn a)
+prf_substtc_tcFn (W a) : Prf (substtc zero W (tcFn a) =eq tcFn a)
+```
+
+`[propext, choice, Quot.sound]` — **sin `prf_inAxC`**: la inducción interna no pasa por `repr_pos'`.
+
+**Primera inducción interna del proyecto.** No hay axioma que diga que `tcFn a` es un código cerrado
+(`tcFn` sólo tiene `ax_tc_zero`/`ax_tc_succ`/`ax_tc_cons`), pero se deriva con `prf_nat_induction`:
+
+* **base**: `tcFn 0 = ⌜0⌝` (`prf_tc_zero`) es un código **concreto**; `liftc`/`substtc` lo atraviesan
+  (`prf_liftc_func`/`prf_liftsc_nil`, y para `substtc` basta `prf_substtc_arith_open` de §20).
+* **paso**: `tcFn (σx) = succc (tcFn x)` (`prf_tc_succ`); `liftc`/`substtc` atraviesan el `funcc`
+  (`prf_liftc_func`/`prf_substtc_func` + las ecuaciones de lista) y bajan a la HI.
+
+Infra nueva: `prf_congr_liftc`, `PrfH_congr_liftc`, `prf_congr_substtc3`, `PrfH_congr_substtc3`,
+`prf_congr_funcc2`, `PrfH_congr_funcc2`.
+
+---
+
+## 24 · (B) La instancia de `ax5`, computada — y qué pide el paso inductivo
+
+### 24.1 (B) NO necesitaba la inducción general sobre fórmulas
+
+§22.3 (B) pedía una composición `substfc . substCodeF` por inducción estructural en `φ`. **No hace
+falta**: el cuerpo de `ax5` es una fórmula **concreta**, y
+
+```text
+substCodeF 1 W1 (v1 + σv0 = σ(v1 + v0))
+  =  eqCodeFn (addcT W1 (succcT ⌜v0⌝)) (succcT (addcT W1 ⌜v0⌝))        -- ¡por `rfl`!
+```
+
+Basta computar el `substfc` **externo** sobre ese código explícito, con (A) (`prf_substtc_tcFn`) para
+que el `tcFn a` incrustado sobreviva intacto, y (A) (`prf_liftc_tcFn`) para normalizar
+`liftc zero (tcFn a) -> tcFn a`.
+
+```lean
+succcT (x) := funcc (strCode succ_sym) (cons x nil)      -- código de `σ x`
+prf_tc_succ' (x) : tcFn (succ x) =eq succcT (tcFn x)     -- definicional
+prf_substtc_funcc1 / prf_substtc_funcc2                  -- substtc atraviesa funcc (1 y 2 args)
+prf_substtc_succcT / prf_substtc_addcT / prf_substtc_varc0
+pcc_ax5_computed (a b) : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT (tcFn b)))
+                                                     (succcT (addcT (tcFn a) (tcFn b)))))
+```
+
+es decir **`|- Prov( <a. + σ b.  =  σ(a. + b.)> )`**. `[propext, choice, Quot.sound, prf_inAxC]`.
+
+### 24.2 Qué pide EXACTAMENTE el paso inductivo de `+`
+
+Objetivo: `Prov(<a. + (σb).  =  (a + σb).>)` desde la HI `Prov(<a. + b.  =  (a+b).>)`.
+
+Normalizando los **códigos** (con `prf_tc_succ'`, `prf_add_succ_t` y `prf_congr_tcFn`):
+
+```text
+(σb).       =eq  succcT b.
+(a + σb).   =eq  succcT ((a+b).)
+```
+
+luego el objetivo es `Prov( <a. + σ b.  =  σ((a+b).)> )`. Y tenemos:
+
+```text
+(B)   Prov( <a. + σ b.   =  σ(a. + b.)> )
+(HI)  Prov( <a. + b.     =  (a+b).>     )
+```
+
+Para cerrarlo hace falta **razonar dentro de `Prov`** con dos reglas sobre códigos arbitrarios:
+
+```lean
+pcc_congr_succ_code (X Y) : Prov(<X = Y>) -> Prov(<σX = σY>)
+pcc_eq_trans_code   (X Y Z) : Prov(<X = Y>) -> Prov(<Y = Z>) -> Prov(<X = Z>)
+```
+
+(la primera aplicada a la HI da `Prov(<σ(a.+b.) = σ((a+b).)>)`; la segunda la encadena con (B)).
+
+**Ambas son derivables, sin obstrucción.** La teoría objeto **demuestra** las clausuras universales
+correspondientes (son teoremas, vía `Prf0.leibniz`/`eqrefl`), luego `repr_pos'_prf` da sus **códigos**
+demostrables, y se instancian en los códigos `X`,`Y`,`Z` (**abiertos**) con
+`pcc_forallElim_code_open` + `pcc_mp_code`, computando los `substfc` con `prf_substfc_arith_open` y
+(A). Ladrillo auxiliar: **`pcc_thm_inst`** — variante de `pcc_axiom_inst` que instancia un **teorema**
+codificado (`repr_pos'_prf h`) en vez de un axioma (`repr_pos'_prf (prf_ax hmem)`).
+
+### 24.3 Orden
+
+1. **`pcc_thm_inst`** (instanciar teoremas codificados) + `pcc_thm_inst2`/`inst3`.
+2. **`pcc_congr_succ_code`** y **`pcc_eq_trans_code`** (lógica ecuacional interna sobre códigos).
+3. **Paso inductivo de `+`** -> `prf_nat_induction` -> evaluación provable de `+` COMPLETA.
+4. Misma receta para `lenc`/`nthc`/`carc`/`runFn`; luego `<`, cuantificadores acotados, inducción
+   estructural -> `hbI`/`hbC` -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
