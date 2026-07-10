@@ -846,6 +846,68 @@ la fase 1a.
 
 **Es una decisión matemática (amplía la teoría objeto): requiere sanción explícita.**
 
+### 16.5 RESUELTO (2026‑07‑10, sancionado)
+
+`ax_lineWF_inv` añadido a `Minimal/Axioms.lean` (`lineTag`, `tagDisj`, y el axioma), al final de
+`axioms` **y** `codingAxioms`. Cierre `Prf`: **`prf_lineWF_inv (line) : Prf (lineWF line ⇒ tagDisj line 20)`**
+(`Meta/Sigma1AtomPrf.lean`).
+
+Verificación tras tocar el núcleo (build 76 jobs verde):
+
+- `axioms_eq : axioms = coreAxioms ++ codingAxioms` sigue siendo **`rfl`**.
+- **La cadena real NO cambia**: `goedel_second'` sigue citando sólo `d3`; `d2_prf` limpio;
+  `repr_pos'_prf` = estándar + `prf_inAxC`.
+- Es un `def ax_*` de la teoría objeto: **los 7 `axiom` de Lean de `AXIOMS.md` no cambian**.
+
+---
+
+## 17 · SEGUNDA OBSTRUCCIÓN: el `∃`‑intro de código exige testigo CERRADO
+
+**Hallazgo (2026‑07‑10).** Al arrancar la rama `hbI` (que creíamos libre) aparece un bloqueo:
+
+```lean
+pcc_exIntro_code (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, liftTerm c w = w)
+  : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))
+```
+
+La hipótesis **`hw` exige que el código del testigo `w` sea cerrado**. Pero en
+`hbI : ∀ x L, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L))`, tras el `∃`‑elim del antecedente
+(`prf_ex_elim_imp`) el testigo es la variable ligada `#0`, y `tcFn #0` **no es cerrado** ⇒ `hw` no se
+descarga. **Es el mismo muro que RIESGO‑1** (`Meta/Sigma1TrackedPrf.lean`), reaparecido en la forma
+acotada. Corrige la afirmación de §16.3 («`hbI` no bloqueado»): **ambas ramas, `hbI` y `hbC`, pasan
+por aquí.**
+
+### 17.1 Por qué es reparable (no es Tarski)
+
+`hw` se usa en **un solo punto** del proof de `pcc_exIntro_code`: colapsar
+`liftTerm 0 (substfc zero w Ac)` en el antecedente (vía `liftTerm_substfc`). Sin `w` cerrado eso no
+colapsa, pero **sí es expresable**:
+
+```text
+liftTerm 0 (substfc zero w Ac)  =  substfc zero (liftTerm 0 w) Ac        (Ac cerrado por hAc)
+```
+
+Es decir: en vez de *colapsar* el lift del testigo, hay que **arrastrarlo**. La línea‑axioma Q2 que
+el testigo construye pasa a ser `⟨implc (substfc zero (↑w) Ac) (exc Ac), 10, Ac, ↑w⟩`, y la
+conclusión `exc Ac` sigue siendo cerrada (que es lo único que el objetivo `provFromCode (exc Ac)`
+necesita). Nada aquí toca `termCode` ni la obstrucción de Tarski.
+
+### 17.2 Brick siguiente (único, desbloquea las DOS ramas)
+
+**`pcc_exIntro_code'`**: generalización **lift‑aware** de `pcc_exIntro_code`, **sin `hw`**:
+
+```lean
+pcc_exIntro_code' (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac)
+  : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))
+```
+
+Requiere rehacer el ensamblaje de la cadena `p ++ [q2line, mpline]` arrastrando `liftTerm 0 w`
+(donde hoy hay un `simp only [liftTerm_substfc …]`). Con él caen:
+
+1. **`hbI`** (`boundedIn`: átomos `=eq` ✅ cerrado + `<` reducible a `=eq` + `∃` acotado).
+2. **`hbC`** (`chainOkB`: además `lineWF` ✅ desbloqueado por `ax_lineWF_inv`, §16.5).
+3. → `d3_prf_of_reflect_bounded` → `d3_prf` → `goedel_second_prf`.
+
 ---
 
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
