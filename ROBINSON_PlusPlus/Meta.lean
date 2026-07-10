@@ -60,5 +60,6 @@ import ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 import ROBINSON_PlusPlus.Meta.EvalArithPrf
+import ROBINSON_PlusPlus.Meta.EvalListPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
