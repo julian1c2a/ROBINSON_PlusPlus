@@ -161,8 +161,59 @@ theorem pcc_lt_intro_open (a b K : Term)
     Prf (provFromCode (ltCodeFn (tcFn a) (tcFn b))) :=
   prf_mp (pcc_lt_intro_open_imp a b K) h
 
+/-- `liftTerm` atraviesa `ltCodeFn` con argumentos `tcFn`. -/
+theorem liftTerm_ltCodeFn_tcFn (s t : Term) (c : Nat) :
+    liftTerm c (ltCodeFn (tcFn s) (tcFn t))
+      = ltCodeFn (tcFn (liftTerm c s)) (tcFn (liftTerm c t)) := by
+  simp only [ltCodeFn, atom2CodeFn, tcFn, cons, nil, zero, liftTerm, liftTerms,
+    liftTerm_numeral, liftTerm_strCode]
+
+/-! ### REFLEXIÓN DEL ÁTOMO `<` DESDE HIPÓTESIS -/
+
+/-- **REFLEXIÓN DEL ÁTOMO `<` desde su hipótesis** (completitud‑Δ₀ provable del átomo `<`):
+    `⊢ (s < t) ⇒ provFromCode (ltCodeFn (tcFn s) (tcFn t))`, para `s`, `t` **arbitrarios**.
+
+    `ax13` da un testigo `k` con `s + σk = t` (`∃`‑elim de la hipótesis); `pcc_eval_add` evalúa el
+    sumatorio simbólico `ṡ + σ(k̇)` al numeral del valor `(s+σk)˙`, que la hipótesis identifica con
+    `ṫ` (`prf_congr_tcFn`); `pcc_lt_intro_open` cierra. **Ésta es la base atómica de la
+    completitud‑Δ₀ provable para el orden.** -/
+theorem pcc_lt_tracked (s t : Term) :
+    Prf ((lt s t) ⇒ provFromCode (ltCodeFn (tcFn s) (tcFn t))) := by
+  refine prf_deduction ?_
+  have hiff : PrfH [lt s t]
+      (Formula.ex (Formula.eq (add (liftTerm 0 s) (succ (.var 0))) (liftTerm 0 t))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_lt_iff s t)) _) (prfH_hyp_self _)
+  refine PrfH_ex_elim hiff ?_
+  rw [liftFormula_provFromCode_open, liftTerm_ltCodeFn_tcFn]
+  -- ctx: [add ↑s (σ#0) = ↑t, ↑(lt s t)] ; objetivo: provFromCode (ltCodeFn ⌜↑s⌝ ⌜↑t⌝)
+  let s' : Term := liftTerm 0 s
+  let t' : Term := liftTerm 0 t
+  let Γ : List Formula :=
+    [Formula.eq (add s' (succ (.var 0))) t', liftFormula 0 (lt s t)]
+  -- `pcc_eval_add s' (σ#0)` transportado por `(σ#0)˙ = σ(#0˙)`
+  have heval : Prf (provFromCode (eqCodeFn (addcT (tcFn s') (succcT (tcFn (.var 0))))
+      (tcFn (add s' (succ (.var 0)))))) :=
+    prf_mp (prf_provCode_congr
+      (prf_congr_eqCodeFn (prf_congr_addcT (prf_refl _) (prf_tc_succ' (.var 0))) (prf_refl _)))
+      (pcc_eval_add s' (succ (.var 0)))
+  -- bajo Γ: `(s'+σ#0)˙ = ṫ'`
+  have hcong : PrfH Γ (tcFn (add s' (succ (.var 0))) =eq tcFn t') :=
+    PrfH_congr_tcFn (PrfH.hyp _ _ (List.Mem.head _))
+  have hcodeq : PrfH Γ
+      (eqCodeFn (addcT (tcFn s') (succcT (tcFn (.var 0)))) (tcFn (add s' (succ (.var 0))))
+        =eq eqCodeFn (addcT (tcFn s') (succcT (tcFn (.var 0)))) (tcFn t')) :=
+    PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) hcong
+  -- transporta `heval` a `Prov(⌜ ṡ' + σ(#0˙) = ṫ' ⌝)` (Leibniz sobre `provFormulaC'`)
+  have h2 : PrfH Γ (provFromCode (eqCodeFn (addcT (tcFn s') (succcT (tcFn (.var 0)))) (tcFn t'))) :=
+    PrfH.mp _ _ _
+      (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcodeq)
+      (prf_to_prfH heval _)
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (pcc_lt_intro_open_imp s' t' (tcFn (.var 0))) _) h2
+
 end ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 
 export ROBINSON_PlusPlus.Meta.Delta0ReflectPrf (
   liftTerm_exc_open pcc_exIntro_code_open pcc_lt_intro_open_imp pcc_lt_intro_open
+  liftTerm_ltCodeFn_tcFn pcc_lt_tracked
 )

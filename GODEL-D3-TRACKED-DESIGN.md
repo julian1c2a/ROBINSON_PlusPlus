@@ -1720,6 +1720,59 @@ Esa es la ultima fase (induccion estructural):
 
 ---
 
+## 31 · COMPLETITUD-Δ₀ PROVABLE (arranque) - reflexion de los atomos desde hipotesis
+
+Direccion elegida para cerrar D3: completitud-Σ₁ provable por induccion interna. `Meta/Delta0ReflectPrf.lean`.
+
+### 31.1 El desbloqueo: `pcc_eval_add` es el puente simbolo<->valor
+
+Parecia que `<` sobre terminos abstractos chocaba con el muro (tcFn no distribuye sobre +). Pero
+`pcc_eval_add` (probado por induccion interna, §27) demuestra, **para a, b ARBITRARIOS**:
+
+```text
+addcT (tcFn a) (tcFn b)  =eq  tcFn (add a b)      [dentro de Prov]
+```
+
+es decir, el termino simbolico y el numeral del valor son provablemente iguales COMO CODIGOS. Ese es
+el puente que faltaba.
+
+### 31.2 `exists`-intro sin clausura (keystone)
+
+`pcc_lt_intro` exigia a, b cerrados por la clausura `hAc` del `exists`-intro. Es el mismo artefacto de
+§26: se elimina arrastrando el lift.
+
+```lean
+pcc_exIntro_code_open (Ac w) : provFromCode (substfc 0 w Ac) => provFromCode (exc Ac)   -- SIN hAc
+```
+
+Espejo de `pcc_exIntro_code'` con `liftFormula_provFromCode_open` + `liftTerm_exc_open` +
+`liftTerm_substfc_open2`; el ensamblaje pasa verbatim con `Ac -> liftTerm 0 Ac`.
+`[propext, choice, Quot.sound]` -- estructural. De ahi `pcc_lt_intro_open` (sin cierre de a, b).
+
+### 31.3 Reflexion de los DOS atomos Δ₀ desde hipotesis
+
+```lean
+pcc_eq_tracked (t u) : (t =eq u) => provFromCode (eqCodeFn (tcFn t) (tcFn u))    -- ya existia (§15.4)
+pcc_lt_tracked (s t) : (lt s t) => provFromCode (ltCodeFn (tcFn s) (tcFn t))     -- NUEVO
+```
+
+para `t, u, s, t` **arbitrarios**. `=eq` via congruencia de tcFn + reflexividad libre de muro. `<` via
+ax13 (`exists k. s+sigma k=t`, `exists`-elim de la hipotesis), `pcc_eval_add s (sigma k)` para evaluar
+el sumatorio simbolico al numeral del valor, `prf_congr_tcFn` para identificar `(s+sigma k). = t.`, y
+`pcc_lt_intro_open`. Ambos `[propext, choice, Quot.sound, prf_inAxC]`.
+
+**Esta es la base atomica de la completitud-Δ₀ provable.**
+
+### 31.4 Lo que queda
+
+1. Casos composicionales: `and`/`or` (con las lineas C libres de muro §30) e `impl`/`not`.
+2. Cuantificadores acotados: `exists i<b`/`forall i<b`; el `forall i<b` NECESITA induccion acotada
+   interna sobre la cota (el punto realmente duro que queda).
+3. Ensamblar la reflexion de `boundedIn`/`chainOkB` -> `hbI`/`hbC` (posiblemente reformulando el
+   target sobre tcFn) -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
