@@ -14,6 +14,9 @@ open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.TrackedCorePrf
+open ROBINSON_PlusPlus.Meta.ProofChain
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ChainPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -92,10 +95,9 @@ theorem prf_provCodeC'_eq_of_tracked {t u tc uc : Term}
     Prf (provCodeC' (Formula.eq t u)) :=
   prf_mp (prf_provFromCode_eq_congr ht hu) h
 
-/-- **Reflexividad rastreada**: `provFromCode (eqCodeFn (tcFn t) (tcFn t))` — la igualdad
-    reflexiva codificada con `tcFn` es demostrable. Se obtiene de la reflexión de `t =eq t`
-    (teorema, `repr_pos'_prf (prf_refl t)`) transportada por `tcFn t =eq termCode t`... salvo el
-    puente meta: se enuncia rastreado y el puente lo descarga la fase 5 (numerales). -/
+/-- **Reflexividad rastreada** (versión débil, con puente): se obtiene de la reflexión de `t =eq t`
+    (teorema, `repr_pos'_prf (prf_refl t)`) transportada por `tc =eq termCode t`.
+    **Superada** por `prf_provFromCode_eqCodeFn_refl` (libre de muro), que no necesita el puente. -/
 theorem prf_provFromCode_eqCodeFn_refl_of_tracked {t tc : Term}
     (ht : Prf (tc =eq termCode t)) :
     Prf (provFromCode (eqCodeFn tc tc)) := by
@@ -105,11 +107,123 @@ theorem prf_provFromCode_eqCodeFn_refl_of_tracked {t tc : Term}
   -- transporta `eqCodeFn (termCode t)(termCode t) ⇒ eqCodeFn tc tc` por `tc =eq termCode t` (simétrico)
   exact prf_mp (prf_provFromCode_eq_congr (prf_eq_symm ht) (prf_eq_symm ht)) hrefl
 
+/-! ### Reflexividad LIBRE DE MURO (§15.4 punto 1)
+
+La reflexión de `provFromCode (eqCodeFn c c)` para código `c` **abstracto** NO necesita el puente
+`c =eq termCode t`: se construye directamente un **testigo del verificador** de una sola línea, la
+**línea-axioma EQREFL** `⟨eqCodeFn c c, 12, c⟩`.
+
+La clave es que el verificador comprueba `lineWF` **estructuralmente**:
+`prf_lineWF_eqrefl (concl t) : lineWF ⟨concl, 12, t⟩ ⇔ (concl =eq eqc t t)`
+— y `eqc t t` es exactamente `eqCodeFn t t`. Con `concl := eqCodeFn c c` y `t := c` la condición es
+**pura reflexividad** (`prf_refl`), válida para `c` arbitrario. No interviene `termCode`. -/
+
+/-- `eqCodeFn` es el constructor object `eqc` del verificador (definicional: `numeral 4 = σ⁴0`). -/
+theorem eqCodeFn_eq_eqc (a b : Term) : eqCodeFn a b = eqc a b := rfl
+
+/-- **Introductor de `provFromCode` desde un testigo de prueba**, a nivel de CÓDIGO arbitrario
+    (versión de `provCodeC'_intro_prf` sin pasar por `formCode`). -/
+theorem prf_provFromCode_intro (d p : Term)
+    (h1 : Prf (chainOk nil p)) (h2 : Prf (In d (runFn nil p))) :
+    Prf (provFromCode d) := by
+  have hbody : Prf (land (chainOk nil p) (In d (runFn nil p))) := prf_and_intro h1 h2
+  have hex : Prf (Formula.ex (land (chainOk nil (.var 0))
+      (In (liftTerm 0 d) (runFn nil (.var 0))))) :=
+    prf_ex_intro (A := land (chainOk nil (.var 0)) (In (liftTerm 0 d) (runFn nil (.var 0)))) p
+      (by simpa [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+            FOL.substTerm_liftTerm] using hbody)
+  simpa [provFromCode, provFormulaC', substFormula, substTerm, substTerms, land, chainOk, In, runFn,
+    nil, zero, FOL.substTerm_liftTerm] using hex
+
+/-- **Línea-axioma EQREFL** para el código `c`: `⟨eqCodeFn c c, 12, c⟩` (regla 12 = `eqrefl`). -/
+def eqreflLine (c : Term) : Term := cons (eqCodeFn c c) (cons (numeralM 12) (cons c nil))
+
+/-- La línea EQREFL es válida en cualquier contexto: `lineWF` es **pura reflexividad**
+    (`eqCodeFn c c =eq eqc c c`, defeq) y no tiene premisas (`premsOf =eq nil`). -/
+theorem prf_lineOk_eqrefl (c : Term) : Prf (lineOk nil (eqreflLine c)) :=
+  prf_and_intro
+    (prf_iff_mpr (prf_lineWF_eqrefl (eqCodeFn c c) c) (prf_refl (eqCodeFn c c)))
+    (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_eqrefl (eqCodeFn c c) c)) (prf_allIn_nil nil))
+
+/-- La cadena de una sola línea EQREFL es válida desde `nil`. -/
+theorem prf_chainOk_eqrefl (c : Term) : Prf (chainOk nil (cons (eqreflLine c) nil)) :=
+  prf_iff_mpr (prf_chainOk_cons nil (eqreflLine c) nil)
+    (prf_and_intro (prf_lineOk_eqrefl c) (prf_chainOk_nil _))
+
+/-- La conclusión de la cadena EQREFL es `eqCodeFn c c`. -/
+theorem prf_in_runFn_eqrefl (c : Term) :
+    Prf (In (eqCodeFn c c) (runFn nil (cons (eqreflLine c) nil))) := by
+  have hrun : Prf (runFn nil (cons (eqreflLine c) nil) =eq cons (eqCodeFn c c) nil) :=
+    prf_eq_trans (prf_runFn_cons nil (eqreflLine c) nil)
+      (prf_eq_trans (prf_runFn_nil _)
+        (prf_eq_trans (prf_concat_nil_eq _)
+          (prf_congr_cons_head (prf_carc_cons (eqCodeFn c c) _))))
+  exact prf_eq_subst_in (prf_eq_symm hrun) (prf_in_cons_head (eqCodeFn c c) nil)
+
+/-- **Reflexividad LIBRE DE MURO**: `provFromCode (eqCodeFn c c)` para código `c` **arbitrario**,
+    sin hipótesis de tracking. Testigo: la cadena de una línea `[⟨eqCodeFn c c, 12, c⟩]`. -/
+theorem prf_provFromCode_eqCodeFn_refl (c : Term) : Prf (provFromCode (eqCodeFn c c)) :=
+  prf_provFromCode_intro (eqCodeFn c c) (cons (eqreflLine c) nil)
+    (prf_chainOk_eqrefl c) (prf_in_runFn_eqrefl c)
+
+/-! ### Reflexión de la igualdad con código `tcFn` — también LIBRE DE MURO
+
+Con la reflexividad libre de muro como base, la reflexión de `t =eq u` **al nivel del código
+rastreado `tcFn`** ya no necesita ningún puente: de `t =eq u` sale `tcFn t =eq tcFn u`
+(congruencia de `tcFn`, `prf_congr_tcFn`), y se transporta por Leibniz object. El muro de Tarski
+queda **confinado al último paso** `provFromCode (eqCodeFn (tcFn t) (tcFn u)) → provCodeC' (t =eq u)`,
+que exige `tcFn t =eq termCode t` — descargable con numerales (`prf_tc_numeral`) en la fase 5. -/
+
+/-- Congruencia de `tcFn` en `PrfH` (Leibniz object). -/
+theorem PrfH_congr_tcFn {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (t₁ =eq t₂)) :
+    PrfH Γ (tcFn t₁ =eq tcFn t₂) := by
+  let f : Formula := Formula.eq (tcFn (liftTerm 0 t₁)) (tcFn (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (tcFn t₁) (tcFn s) := by
+    intro s
+    simp only [f, tcFn, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (tcFn t₁)) Γ)
+
+/-- Congruencia de `eqCodeFn` en ambos argumentos, en `PrfH`. -/
+theorem PrfH_congr_eqCodeFn {Γ : List Formula} {a a' b b' : Term}
+    (ha : PrfH Γ (a =eq a')) (hb : PrfH Γ (b =eq b')) :
+    PrfH Γ (eqCodeFn a b =eq eqCodeFn a' b') := by
+  unfold eqCodeFn
+  exact PrfH_congr_cons_tail
+    (PrfH_eq_trans (PrfH_congr_cons_head ha) (PrfH_congr_cons_tail (PrfH_congr_cons_head hb)))
+
+/-- **Reflexión de la igualdad al nivel del código rastreado, LIBRE DE MURO**:
+    `Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))`, para `t`, `u` **arbitrarios**.
+    Base = reflexividad libre de muro; paso = congruencia de `tcFn` + Leibniz object. -/
+theorem pcc_eq_tracked (t u : Term) :
+    Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u))) := by
+  refine prf_deduction ?_
+  have hbase : PrfH [t =eq u] (provFromCode (eqCodeFn (tcFn t) (tcFn t))) :=
+    prf_to_prfH (prf_provFromCode_eqCodeFn_refl (tcFn t)) _
+  have htc : PrfH [t =eq u] (tcFn t =eq tcFn u) := PrfH_congr_tcFn (prfH_hyp_self _)
+  have hcode : PrfH [t =eq u] (eqCodeFn (tcFn t) (tcFn t) =eq eqCodeFn (tcFn t) (tcFn u)) :=
+    PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl (tcFn t)) _) htc
+  exact PrfH.mp _ _ _
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcode) hbase
+
+/-- **Reflexión completa del átomo `=eq`** cuando los términos están rastreados por `tcFn`
+    (puente `tcFn t =eq termCode t`, descargable con numerales vía `prf_tc_numeral`):
+    `Prf ((t =eq u) ⇒ provCodeC' (t =eq u))`. Compone `pcc_eq_tracked` con el transporte. -/
+theorem pcc_eq_of_tc_bridge (t u : Term)
+    (ht : Prf (tcFn t =eq termCode t)) (hu : Prf (tcFn u =eq termCode u)) :
+    Prf ((t =eq u) ⇒ provCodeC' (Formula.eq t u)) := by
+  refine prf_deduction ?_
+  have h1 : PrfH [t =eq u] (provFromCode (eqCodeFn (tcFn t) (tcFn u))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_tracked t u) _) (prfH_hyp_self _)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provFromCode_eq_congr ht hu) _) h1
+
 end ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (
-  eqCodeFn eqCodeFn_termCode provCodeC'_eq_eq
+  eqCodeFn eqCodeFn_termCode provCodeC'_eq_eq eqCodeFn_eq_eqc
   liftTerm_eqCodeFn prf_congr_eqCodeFn prf_provFromCode_eq_congr
   liftFormula_provFromCode_eq
   prf_provCodeC'_eq_of_tracked prf_provFromCode_eqCodeFn_refl_of_tracked
+  prf_provFromCode_intro eqreflLine prf_lineOk_eqrefl prf_chainOk_eqrefl
+  prf_in_runFn_eqrefl prf_provFromCode_eqCodeFn_refl
+  PrfH_congr_tcFn PrfH_congr_eqCodeFn pcc_eq_tracked pcc_eq_of_tc_bridge
 )

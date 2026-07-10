@@ -731,21 +731,58 @@ prf_provCodeC'_eq_of_tracked (ht : tc =eq termCode t)(hu)(h : provFromCode(eqCod
 prf_provFromCode_eqCodeFn_refl_of_tracked (ht : tc =eq termCode t) : provFromCode(eqCodeFn tc tc)
 ```
 
-### 15.4 Lo que queda de fase 3‑5 (orden)
+### 15.4 Reflexividad LIBRE DE MURO — HECHA, y el átomo `=eq` cerrado sin muro
 
-1. **Reflexividad libre de muro** (mejora): `provFromCode (eqCodeFn c c)` para código `c` **abstracto**
-   construyendo un testigo del verificador para el axioma de reflexividad (estructural: ambos lados
-   `=eq c`), sin el puente `tcFn c =eq termCode c`. Elimina la hipótesis de tracking de la reflexividad.
-2. **Átomos `<` y `lineWF`**: `<` = `∃k. a+σk=b` (no es átomo — se reduce a `=eq` + `∃` acotado);
-   `lineWF t` es un átomo‑1 → constructor `atom1CodeFn` análogo a `eqCodeFn`.
-3. **Reflexión de cuantificadores acotados** (fase 4): `∀ i < b. provCodeC' θ(i) ⊢ provCodeC'(∀ i<b.θ)`
+**Idea que lo desbloquea:** el verificador comprueba `lineWF` **estructuralmente**. La línea‑axioma
+EQREFL es `⟨concl, 12, t⟩` y su condición es (`prf_lineWF_eqrefl`):
+
+```text
+lineWF ⟨concl, 12, t⟩  ⇔  concl =eq eqc t t
+```
+
+y `eqc a b` es **literalmente** `eqCodeFn a b` (`numeral 4 = σ⁴0`). Tomando `concl := eqCodeFn c c`
+y `t := c`, la condición es **pura reflexividad** (`prf_refl`), válida para `c` **arbitrario**:
+`termCode` no aparece por ningún lado. El testigo es la cadena de **una sola línea**
+`p := [⟨eqCodeFn c c, 12, c⟩]`.
+
+```lean
+def eqreflLine (c) := cons (eqCodeFn c c) (cons (numeralM 12) (cons c nil))
+prf_lineOk_eqrefl / prf_chainOk_eqrefl / prf_in_runFn_eqrefl
+prf_provFromCode_intro (d p) (chainOk nil p) (In d (runFn nil p)) : provFromCode d
+prf_provFromCode_eqCodeFn_refl (c) : Prf (provFromCode (eqCodeFn c c))   -- ← LIBRE DE MURO
+```
+
+**Payoff — el átomo `=eq` queda cerrado sin muro** al nivel del código rastreado: de `t =eq u` sale
+`tcFn t =eq tcFn u` (congruencia de `tcFn`) y se transporta por Leibniz object sobre la base
+reflexiva:
+
+```lean
+PrfH_congr_tcFn / PrfH_congr_eqCodeFn
+pcc_eq_tracked (t u) : Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))   -- LIBRE DE MURO
+pcc_eq_of_tc_bridge (t u) (ht : tcFn t =eq termCode t) (hu) : Prf ((t =eq u) ⇒ provCodeC' (t =eq u))
+```
+
+Los tres: `#print axioms = [propext, choice, Quot.sound]` — al no pasar ya por `repr_pos'`,
+**desaparece incluso la dependencia de `prf_inAxC`**.
+
+**El muro de Tarski queda confinado al último paso** (`pcc_eq_of_tc_bridge`): el puente
+`tcFn t =eq termCode t`, descargable con **numerales** (`prf_tc_numeral`) en la inducción de fase 5.
+Eso es exactamente lo que la construcción de Hilbert‑Bernays predice, y ya no hay nada más que
+resolver en el átomo de igualdad.
+
+### 15.5 Lo que queda de fase 3‑5 (orden)
+
+1. **Átomos `<` y `lineWF`**: `<` = `∃k. a+σk=b` (no es átomo — se reduce a `=eq` + `∃` acotado);
+   `lineWF t` es un átomo‑1 → constructor `atom1CodeFn` análogo a `eqCodeFn`. El átomo `In` ya tiene
+   su toolkit (`Sigma1CorePrf`).
+2. **Reflexión de cuantificadores acotados** (fase 4): `∀ i < b. provCodeC' θ(i) ⊢ provCodeC'(∀ i<b.θ)`
    y la versión `∃` (con `pcc_exIntro_code`).
-4. **Inducción estructural** sobre `boundedIn`/`chainOkB` (fase 5) ensamblando 1‑3, descargando el
+3. **Inducción estructural** sobre `boundedIn`/`chainOkB` (fase 5) ensamblando 1‑2, descargando el
    puente `tcFn·=eq termCode·` con `prf_tc_numeral` → `hbI`/`hbC` → `d3_prf_of_reflect_bounded`
    → `d3_prf` → `goedel_second_prf`.
 
-**No veo obstrucción** en 1‑4. El puente §15.1 garantiza que basta reflejar la forma acotada; el
-toolkit `=eq` de §15.3 es el primer átomo del cuerpo.
+**No veo obstrucción** en 1‑3. El puente §15.1 garantiza que basta reflejar la forma acotada; el
+átomo `=eq` (§15.3‑§15.4) es el primero del cuerpo y está cerrado libre de muro.
 
 ---
 

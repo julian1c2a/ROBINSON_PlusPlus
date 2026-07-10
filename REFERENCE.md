@@ -1484,14 +1484,38 @@ theorem prf_provCodeC'_eq_of_tracked {t u tc uc}
   (ht : Prf (tc =eq termCode t)) (hu : Prf (uc =eq termCode u)) (h : Prf (provFromCode (eqCodeFn tc uc)))
   : Prf (provCodeC' (Formula.eq t u))                     -- reflexión rastreada (espejo de In)
 theorem prf_provFromCode_eqCodeFn_refl_of_tracked {t tc} (ht : Prf (tc =eq termCode t))
-  : Prf (provFromCode (eqCodeFn tc tc))                   -- reflexividad rastreada
--- #print axioms = [propext, Classical.choice, Quot.sound]  (la reflexividad + prf_inAxC)
+  : Prf (provFromCode (eqCodeFn tc tc))                   -- reflexividad rastreada (superada, ver abajo)
 ```
 
-**Estado de fase 3‑5** (plan detallado en `GODEL-D3-TRACKED-DESIGN.md` §15.4): ✅ puente + átomo
-`=eq`; ⏳ reflexividad **libre de muro** (testigo del verificador para el axioma refl, sin tracking),
-átomos `<`/`lineWF` (`atom1CodeFn`), reflexión de cuantificadores acotados (∀/∃), e inducción
-estructural sobre `boundedIn`/`chainOkB` → `hbI`/`hbC` → `d3_prf` → `goedel_second_prf`.
+**Reflexividad LIBRE DE MURO** (§15.4 del diseño). El verificador comprueba `lineWF`
+**estructuralmente**: `prf_lineWF_eqrefl (concl t) : lineWF ⟨concl, 12, t⟩ ⇔ (concl =eq eqc t t)`,
+y `eqc a b` es **literalmente** `eqCodeFn a b` (`numeral 4 = σ⁴0`). Con `concl := eqCodeFn c c`,
+`t := c`, la condición es **pura reflexividad** para `c` **arbitrario** — sin `termCode`. Testigo:
+la cadena de **una sola línea** `[⟨eqCodeFn c c, 12, c⟩]`.
+
+```lean
+theorem eqCodeFn_eq_eqc (a b) : eqCodeFn a b = eqc a b   -- rfl
+def eqreflLine (c) : Term := cons (eqCodeFn c c) (cons (numeralM 12) (cons c nil))
+theorem prf_lineOk_eqrefl / prf_chainOk_eqrefl / prf_in_runFn_eqrefl
+theorem prf_provFromCode_intro (d p) (h1 : Prf (chainOk nil p)) (h2 : Prf (In d (runFn nil p)))
+  : Prf (provFromCode d)                                  -- introductor a nivel de código arbitrario
+theorem prf_provFromCode_eqCodeFn_refl (c) : Prf (provFromCode (eqCodeFn c c))   -- ← LIBRE DE MURO
+theorem PrfH_congr_tcFn / PrfH_congr_eqCodeFn
+theorem pcc_eq_tracked (t u) : Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))  -- LIBRE DE MURO
+theorem pcc_eq_of_tc_bridge (t u) (ht : Prf (tcFn t =eq termCode t)) (hu)
+  : Prf ((t =eq u) ⇒ provCodeC' (Formula.eq t u))          -- muro confinado al puente (numerales, fase 5)
+-- #print axioms de los tres = [propext, Classical.choice, Quot.sound]  (¡ni siquiera prf_inAxC!)
+```
+
+Al no pasar ya por `repr_pos'`, **desaparece incluso la dependencia de `prf_inAxC`**. El **muro de
+Tarski queda confinado al último paso**: el puente `tcFn t =eq termCode t`, descargable con
+**numerales** (`prf_tc_numeral`) en la inducción de fase 5 — exactamente como predice
+Hilbert‑Bernays.
+
+**Estado de fase 3‑5** (plan en `GODEL-D3-TRACKED-DESIGN.md` §15.5): ✅ puente + átomo `=eq` cerrado
+libre de muro; ⏳ átomos `<`/`lineWF` (`atom1CodeFn`; `<` se reduce a `=eq` + `∃` acotado), reflexión
+de cuantificadores acotados (∀/∃), e inducción estructural sobre `boundedIn`/`chainOkB` → `hbI`/`hbC`
+→ `d3_prf` → `goedel_second_prf`.
 
 ---
 
