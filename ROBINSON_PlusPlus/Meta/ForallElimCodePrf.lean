@@ -49,6 +49,19 @@ theorem liftTerm_forallc (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) :
   intro c
   simp only [forallc, cons, nil, zero, succ, liftTerm, liftTerms, hAc c]
 
+/-- **Versión lift‑aware (cuerpo `Ac` ABIERTO)**: el lift **atraviesa** `forallc` (tag cerrado). -/
+theorem liftTerm_forallc_open (Ac : Term) :
+    ∀ c, liftTerm c (forallc Ac) = forallc (liftTerm c Ac) := by
+  intro c
+  simp only [forallc, cons, nil, zero, succ, liftTerm, liftTerms]
+
+/-- **Versión lift‑aware (cuerpo `Ac` y testigo `w` ABIERTOS)**: el lift atraviesa
+    `substfc zero · ·` y cae sobre ambos (`zero` es cerrado). Generaliza `liftTerm_substfc_open`. -/
+theorem liftTerm_substfc_open2 (Ac w : Term) :
+    ∀ c, liftTerm c (substfc zero w Ac) = substfc zero (liftTerm c w) (liftTerm c Ac) := by
+  intro c
+  simp only [substfc, zero, liftTerm, liftTerms]
+
 /-- **Validez de una línea Q1** en cualquier contexto `c`:
     `q1line = ⟨implc (forallc Ac) (substfc zero w Ac), 9, Ac, w⟩`. `lineWF` por reflexividad de la
     conclusión (`prf_lineWF_q1`), sin premisas (`prf_premsOf_q1` → `allIn c nil`). -/
@@ -64,34 +77,36 @@ theorem prf_lineOk_q1 (c Ac w : Term) :
     `substfc zero w Ac`. Sólo pide `Ac` cerrado (`hAc`).
 
     Ensamblaje `r = p ++ [q1line, mpline]`, espejo de `pcc_exIntro_code'`. -/
-theorem pcc_forallElim_code' (Ac w : Term)
-    (hAc : ∀ c, liftTerm c Ac = Ac) :
+theorem pcc_forallElim_code_open (Ac w : Term) :
     Prf (provFromCode (forallc Ac) ⇒ provFromCode (substfc zero w Ac)) := by
   -- elimina el ∃ externo de `provFromCode (forallc Ac)`; testigo `p = #0`
   refine prf_ex_elim_imp ?_
-  -- el CONSECUENTE tiene código abierto: su lift se traslada al código (no se colapsa)
+  -- CONSECUENTE con código abierto: el lift se traslada al código y cae sobre `w` y `Ac`
   rw [liftFormula_provFromCode_open 0 (substfc zero w Ac),
-    liftTerm_substfc_open Ac hAc w 0]
-  -- el ANTECEDENTE tiene código cerrado (`forallc Ac`)
-  simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, liftTerm_forallc Ac hAc]
-  -- ctx: [chainOk nil #0 ∧ In (forallc Ac) (runFn nil #0)] ; meta: provFromCode (substfc zero ↑w Ac)
-  refine PrfH_ex_intro
-    (concat (.var 0)
-      (cons (cons (implc (forallc Ac) (substfc zero (liftTerm 0 w) Ac))
-              (cons (numeralM 9) (cons Ac (cons (liftTerm 0 w) nil))))
-        (cons (cons (substfc zero (liftTerm 0 w) Ac)
-          (cons (numeralM 16) (cons (forallc Ac) nil))) nil))) ?_
+    liftTerm_substfc_open2 Ac w 0]
+  -- ANTECEDENTE: el lift atraviesa `forallc` y cae sobre `Ac`
+  simp only [liftTerm_forallc_open Ac]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  -- abreviaturas (`w'` = testigo LIFTEADO)
+  -- ctx: [chainOk nil #0 ∧ In (forallc ↑Ac) (runFn nil #0)] ; meta: provFromCode (substfc zero ↑w ↑Ac)
+  refine PrfH_ex_intro
+    (concat (.var 0)
+      (cons (cons (implc (forallc (liftTerm 0 Ac))
+                    (substfc zero (liftTerm 0 w) (liftTerm 0 Ac)))
+              (cons (numeralM 9) (cons (liftTerm 0 Ac) (cons (liftTerm 0 w) nil))))
+        (cons (cons (substfc zero (liftTerm 0 w) (liftTerm 0 Ac))
+          (cons (numeralM 16) (cons (forallc (liftTerm 0 Ac)) nil))) nil))) ?_
+  simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  -- abreviaturas (`Ac'`/`w'` = cuerpo y testigo LIFTEADOS)
+  let Ac' : Term := liftTerm 0 Ac
   let w' : Term := liftTerm 0 w
-  let Aall : Term := forallc Ac
-  let Bsub : Term := substfc zero w' Ac
+  let Aall : Term := forallc Ac'
+  let Bsub : Term := substfc zero w' Ac'
   let p_ : Term := (.var 0)
-  let q1line : Term := cons (implc Aall Bsub) (cons (numeralM 9) (cons Ac (cons w' nil)))
+  let q1line : Term := cons (implc Aall Bsub) (cons (numeralM 9) (cons Ac' (cons w' nil)))
   let mpline : Term := cons Bsub (cons (numeralM 16) (cons Aall nil))
   let tl : Term := cons q1line (cons mpline nil)
   let Γ : List Formula := [land (chainOk nil p_) (In Aall (runFn nil p_))]
@@ -118,7 +133,7 @@ theorem pcc_forallElim_code' (Ac w : Term)
     refine PrfH_iff_mpr (prf_chainOk_concat nil p_ tl) (PrfH_and_intro hpChain ?_)
     refine PrfH_iff_mpr (prf_chainOk_cons Cp q1line (cons mpline nil)) (PrfH_and_intro ?_ ?_)
     · -- lineOk Cp q1line (línea‑axioma Q1)
-      exact prf_to_prfH (prf_lineOk_q1 Cp Ac w') Γ
+      exact prf_to_prfH (prf_lineOk_q1 Cp Ac' w') Γ
     · -- chainOk Cp1 [mpline]
       refine PrfH_iff_mpr (prf_chainOk_cons Cp1 mpline nil)
         (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
@@ -130,7 +145,7 @@ theorem pcc_forallElim_code' (Ac w : Term)
       · -- In (implc Aall Bsub) Cp1  (= carc q1line, apendizada por la línea Q1)
         have hcarc : Prf (cons (implc Aall Bsub) nil =eq cons (carc q1line) nil) :=
           prf_congr_cons_head (prf_eq_symm
-            (prf_carc_cons (implc Aall Bsub) (cons (numeralM 9) (cons Ac (cons w' nil)))))
+            (prf_carc_cons (implc Aall Bsub) (cons (numeralM 9) (cons Ac' (cons w' nil)))))
         exact prf_to_prfH
           (prf_In_mono (implc Aall Bsub) (cons (carc q1line) nil) Cp
             (prf_eq_subst_in hcarc (prf_in_cons_head (implc Aall Bsub) nil))) Γ
@@ -141,8 +156,19 @@ theorem pcc_forallElim_code' (Ac w : Term)
           (prf_to_prfH (prf_In_mono_right_imp Aall (cons (carc q1line) nil) Cp) Γ) hpIn
   exact PrfH_and_intro hChainR hInB
 
+/-- **Corolario (compatibilidad)**: la versión con cuerpo `Ac` cerrado. La hipótesis `hAc` ya **no se
+    usa** — era, como `hw` en `pcc_exIntro_code` (§17), un artefacto de colapsar los lifts en vez de
+    arrastrarlos. Su eliminación es **imprescindible** para `pcc_axiom_inst2`: en la segunda
+    eliminación el cuerpo es `substfc (σ0) (liftc 0 w₁) ⌜φ⌝`, que contiene el testigo `w₁` y por tanto
+    **no es cerrado** cuando `w₁` es abierto (p. ej. `tcFn #0`). -/
+theorem pcc_forallElim_code' (Ac w : Term)
+    (_hAc : ∀ c, liftTerm c Ac = Ac) :
+    Prf (provFromCode (forallc Ac) ⇒ provFromCode (substfc zero w Ac)) :=
+  pcc_forallElim_code_open Ac w
+
 end ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 
 export ROBINSON_PlusPlus.Meta.ForallElimCodePrf (
-  liftTerm_forallc prf_lineOk_q1 pcc_forallElim_code'
+  liftTerm_forallc liftTerm_forallc_open liftTerm_substfc_open2
+  prf_lineOk_q1 pcc_forallElim_code_open pcc_forallElim_code'
 )

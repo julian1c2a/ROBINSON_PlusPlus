@@ -16,6 +16,8 @@ open ROBINSON_PlusPlus.Meta.Representability2Prf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.TrackedCorePrf
+open ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -157,8 +159,37 @@ theorem pcc_ax4_inst (w : Term) :
     Prf (provFromCode (substfc zero w (formCode (add (.var 0) zero =eq (.var 0))))) :=
   pcc_axiom_inst _ (show ax4_add_zero ∈ axioms by simp [axioms]) w
 
+/-- **Instanciación de un axioma `∀∀φ` codificado** (dos testigos).
+
+    `formCode (forall_2 φ) = forallc (forallc (formCode φ))` (definicional). Se elimina el `∀` externo
+    con `w₁`, se empuja el `substfc` bajo el binder (`prf_substfc_forall`, que **levanta el testigo**:
+    `liftc zero w₁`), y se elimina el `∀` interno con `w₂`.
+
+    **Nota:** el cuerpo de la segunda eliminación, `substfc (σ0) (liftc 0 w₁) ⌜φ⌝`, contiene `w₁` y
+    por tanto **no es cerrado** cuando `w₁` es abierto. Por eso hace falta `pcc_forallElim_code_open`
+    (sin `hAc`), no `pcc_forallElim_code'`. -/
+theorem pcc_axiom_inst2 (φ : Formula) (hmem : forall_2 φ ∈ axioms) (w₁ w₂ : Term) :
+    Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) := by
+  have h0 : Prf (provFromCode (formCode (forall_2 φ))) := repr_pos'_prf (prf_ax hmem)
+  -- 1) ∀-elim externo con `w₁`
+  have h1 : Prf (provFromCode (substfc zero w₁ (forallc (formCode φ)))) :=
+    prf_mp (pcc_forallElim_code_open (forallc (formCode φ)) w₁) h0
+  -- 2) empuja el `substfc` bajo el binder (levanta el testigo)
+  have h2 : Prf (provFromCode (forallc (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
+    prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (formCode φ))) h1
+  -- 3) ∀-elim interno con `w₂` (cuerpo ABIERTO: contiene `w₁`)
+  exact prf_mp (pcc_forallElim_code_open _ w₂) h2
+
+/-- Instancia codificada de **`ax5_add_succ`** (`∀n∀m. n + σm = σ(n+m)`): el paso inductivo de la
+    evaluación provable de `+`. Ambos testigos‑código arbitrarios (pueden ser abiertos). -/
+theorem pcc_ax5_inst (w₁ w₂ : Term) :
+    Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
+      (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0))))))) :=
+  pcc_axiom_inst2 _ (show ax5_add_succ ∈ axioms by simp [axioms]) w₁ w₂
+
 end ROBINSON_PlusPlus.Meta.MpCodePrf
 
 export ROBINSON_PlusPlus.Meta.MpCodePrf (
   liftTerm_implc pcc_mp_code pcc_mp_code_apply pcc_axiom_inst pcc_ax4_inst
+  pcc_axiom_inst2 pcc_ax5_inst
 )

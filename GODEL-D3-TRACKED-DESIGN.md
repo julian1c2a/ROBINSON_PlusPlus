@@ -1218,6 +1218,73 @@ del valor**. Sólo coinciden porque la teoría objeto prueba `add a 0 =eq a` y `
 
 ---
 
+## 22 · `pcc_axiom_inst2` (hecho) y el hueco preciso del paso inductivo de `+`
+
+### 22.1 `hAc` TAMBIÉN era innecesaria — `pcc_forallElim_code_open`
+
+Al ir a instanciar `ax5` (`forall_2`) aparece que **la segunda eliminación tiene el cuerpo abierto**:
+tras `prf_substfc_forall`, el cuerpo es `substfc (σ0) (liftc 0 w1) formCode-φ`, que **contiene `w1`** y por
+tanto no es cerrado cuando `w1` lo es (p. ej. `tcFn #0`). Así que `hAc` también sobra:
+
+```lean
+liftTerm_forallc_open   (Ac)    : liftTerm c (forallc Ac) = forallc (liftTerm c Ac)
+liftTerm_substfc_open2  (Ac w)  : liftTerm c (substfc zero w Ac) = substfc zero (lift w) (lift Ac)
+pcc_forallElim_code_open (Ac w) : provFromCode (forallc Ac) => provFromCode (substfc zero w Ac)
+```
+
+Mismo patrón que §17 (arrastrar los lifts en vez de colapsarlos). `[propext, choice, Quot.sound]`.
+`pcc_forallElim_code'` queda como corolario (retrocompatible). **Tercera vez que una hipótesis de
+clausura resulta ser un artefacto**: `hw` (§17), `hAc` (aquí).
+
+### 22.2 `pcc_axiom_inst2` / `pcc_ax5_inst` — HECHOS
+
+```lean
+pcc_axiom_inst2 (φ) (hmem : forall_2 φ ∈ axioms) (w1 w2)
+  : Prf (provFromCode (substfc zero w2 (substfc (succ zero) (liftc zero w1) (formCode φ))))
+pcc_ax5_inst (w1 w2)      -- instancia de `ax5 : ∀n∀m. n + σm = σ(n+m)`
+```
+
+`[propext, choice, Quot.sound, prf_inAxC]`. **Verificado** con dos testigos abiertos:
+`pcc_ax5_inst (tcFn a) (tcFn b)` typechequea.
+
+### 22.3 EL HUECO del paso inductivo (sondeo verificado)
+
+Para **usar** `pcc_ax5_inst` hay que computar el **doble** `substfc`:
+
+- El **interno** sí se computa: `prf_substfc_arith_open 1 (liftc zero w1) φ` da
+  `substCodeF 1 (liftc zero w1) φ`. OK
+- El **externo** actúa sobre `substCodeF 1 (liftc 0 w1) φ`, que **no es `formCode` de nada meta**.
+  `prf_substfc_arith_open` **no aplica**. FALTA
+
+Faltan dos ladrillos:
+
+**(A) El código de un numeral es CERRADO** — `liftc` y `substtc` lo dejan invariante:
+
+```lean
+prf_liftc_tcFn   : forall a. liftc c (tcFn a) =eq tcFn a
+prf_substtc_tcFn : forall a. substtc v w (tcFn a) =eq tcFn a
+```
+
+**No hay axioma**, pero **sí es derivable por inducción interna** (`prf_nat_induction`) usando
+`ax_tc_zero` (base: `tcFn 0` es el código concreto y cerrado de `0`) y `ax_tc_succ`
+(paso: `tcFn (σx) = succc (tcFn x)`, con `prf_liftc_func`/`ax_substtc_func` y la HI). Es exactamente
+el hecho estándar «`num a` es un término cerrado del lenguaje codificado».
+
+**(B) Composición**: `substfc 0 w2 (substCodeF 1 w1 φ) =eq substCodeF2 w1 w2 φ`, por inducción
+estructural en `φ`, con la hipótesis de que `w1` es `substtc`-invariante (que da (A)).
+
+Con (A) además `liftc zero w1 =eq w1`, lo que simplifica el enunciado de `pcc_ax5_inst`.
+
+### 22.4 Orden
+
+1. **(A)** `prf_liftc_tcFn` / `prf_substtc_tcFn` (inducción interna). <- siguiente
+2. **(B)** composición `substfc` sobre `substCodeF`.
+3. **Paso inductivo de `+`** -> evaluación provable de `+` completa.
+4. Misma receta para `lenc`/`nthc`/`carc`/`runFn`; luego `<`, cuantificadores acotados, inducción
+   estructural -> `hbI`/`hbC` -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
