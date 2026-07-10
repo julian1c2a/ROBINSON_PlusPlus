@@ -53,6 +53,20 @@ theorem liftFormula_provFromCode (k : Nat) (c : Term) (hc : ∀ lvl, liftTerm lv
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hc]
 
+/-- **Versión para códigos ABIERTOS**: sin exigir `c` cerrado, el `liftFormula` sobre
+    `provFromCode c` se traslada al **código**: `liftFormula k (provFromCode c) = provFromCode (↑c)`.
+    (El cuerpo Σ₁ `provFormulaC'` es cerrado; el único slot es `c`, que aparece bajo un binder — de
+    ahí `liftTerm_comm_zero`.) Generaliza `liftFormula_provFromCode` (caso `c` cerrado).
+
+    Es la pieza que necesita el **∀‑elim de código** (`prf_lineWF_q1` es estructural, igual que la
+    línea Q2), donde el código abierto cae en el CONSECUENTE — al revés que en `pcc_exIntro_code'`. -/
+theorem liftFormula_provFromCode_open (k : Nat) (c : Term) :
+    liftFormula k (provFromCode c) = provFromCode (liftTerm k c) := by
+  simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftFormula,
+    liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd, Nat.reduceLT,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, ← FOL.liftTerm_comm_zero]
+
 /-!
 ### Constructores de código `tcFn`‑based para átomos binarios (§10.2, paso 1)
 
@@ -126,7 +140,7 @@ theorem allInCodeFn_termCode (c L : Term) :
 end ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
 export ROBINSON_PlusPlus.Meta.TrackedCorePrf (
-  liftFormula_provFromCode
+  liftFormula_provFromCode liftFormula_provFromCode_open
   atom2CodeFn atom2CodeFn_termCode inFormCodeFn_eq_atom2
   liftTerm_atom2CodeFn prf_congr_atom2CodeFn prf_provFromCode_atom2_congr
   liftFormula_provFromCode_atom2

@@ -945,6 +945,71 @@ Con §16.5 (`ax_lineWF_inv`) y §17.2 (`pcc_exIntro_code'`), **no queda obstrucc
 
 ---
 
+## 18 · La reflexión de `<` NO es un ladrillo pequeño: aterriza en la evaluación provable
+
+**Sondeo (2026‑07‑10), verificado compilando.** `lt a b := .atom lt_sym [a, b]`, definido por
+`ax13_lt_def : lt a b ⇔ ∃k. a + σk = b`. Parecía que reflejar `<` era inmediato: `=eq` está cerrado
+libre de muro (§15.4) y el `∃`‑intro de código admite testigo abierto (§17.2). **No lo es.**
+
+### 18.1 Lo que SÍ tenemos (ambos typechequean)
+
+```lean
+-- (A) reflexión rastreada de la igualdad, LIBRE DE MURO
+pcc_eq_tracked (add a (succ k)) b
+  : Prf ((add a (succ k) =eq b) ⇒ provFromCode (eqCodeFn (tcFn (add a (succ k))) (tcFn b)))
+
+-- (B) ∃-intro de código con testigo ABIERTO
+pcc_exIntro_code' Ac (tcFn k) hAc
+  : Prf (provFromCode (substfc zero (tcFn k) Ac) ⇒ provFromCode (exc Ac))
+```
+
+### 18.2 Por qué (A) no encaja en (B)
+
+Para componerlos haría falta
+
+```text
+substfc zero (tcFn k) Ac   =eq   eqCodeFn (tcFn (add a (succ k))) (tcFn b)
+```
+
+donde `Ac` es el código del cuerpo `↑a + σ#0 = ↑b`. Pero:
+
+- `tcFn` (= `num`, «numeral‑de») sólo tiene **tres** ecuaciones: `ax_tc_zero`, `ax_tc_succ`,
+  `ax_tc_cons`. No computa sobre `add`, `nthc`, `lenc`, `runFn`, …
+- **Y no debe computar sobre ellas.** `tcFn (add a (succ k))` es el código del **numeral del valor**
+  `a + σk`; el cuerpo del `∃` de `ax13` necesita el código del **término simbólico** `ȧ + σj̇`.
+  Son **códigos distintos**.
+
+El puente entre ambos es precisamente
+
+```text
+⊢ Prov( ⌜ ȧ + σk̇  =  (a + σk)˙ ⌝ )
+```
+
+es decir, que la teoría objeto **demuestre internamente que la suma de numerales evalúa al numeral
+de la suma**. Eso es la **evaluación provable** (`num` + provable evaluation) que §11.3 nombró como
+el núcleo de la fase 3. No es un lema pequeño: se prueba por **inducción interna** sobre el numeral.
+
+### 18.3 Consecuencia para el plan
+
+`<` **no es un átomo aparte que reflejar**: es `∃` + `=eq` + **evaluación provable de `+`**. Por tanto
+el orden correcto de las fases 3‑5 es:
+
+1. **Evaluación provable** (fase 3, núcleo real): `⊢ Prov(⌜ṫ = v̇⌝)` para términos `t` construidos con
+   los símbolos del cuerpo Δ₀ (`+`, `σ`, `lenc`, `nthc`, `carc`, `runFn`) evaluados en numerales.
+   Requiere inducción interna. **Es «la bestia».**
+2. **Reflexión de `<`** — corolario de (1) + `=eq` (§15.4) + `∃`‑intro de código (§17.2).
+3. **Cuantificadores acotados** (∀/∃) e **inducción estructural** → `hbI`/`hbC` → `d3_prf`.
+
+### 18.4 Ladrillo entregado hacia (1)
+
+**`liftFormula_provFromCode_open (k c) : liftFormula k (provFromCode c) = provFromCode (liftTerm k c)`**
+(`Meta/TrackedCorePrf.lean`) — generaliza `liftFormula_provFromCode` a **códigos abiertos**. La
+necesita el **∀‑elim de código** (`prf_lineWF_q1` es estructural, igual que la línea Q2), donde el
+código abierto cae en el **consecuente** — al revés que en `pcc_exIntro_code'`. El ∀‑elim de código es
+imprescindible para **instanciar axiomas codificados** (p. ej. `ax13`) dentro de la prueba interna.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
