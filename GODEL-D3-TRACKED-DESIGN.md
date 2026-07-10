@@ -1569,6 +1569,89 @@ lo cancela. (`FOL.substTerm_liftLift` NO aplica aqui: su patron es `substTerm (c
 
 ---
 
+## 28 · EVALUACION PROVABLE DE LISTAS (`carc`, `cdrc`, `lenc`)
+
+Misma receta que §27, en `Meta/EvalListPrf.lean`:
+
+```lean
+pcc_eval_carc (h t) : Prov(< carc (cons h t). = h. >)
+pcc_eval_cdrc (h t) : Prov(< cdrc (cons h t). = t. >)
+pcc_eval_lenc (L)   : Prov(< lenc L. = (lenc L). >)    -- L ARBITRARIO
+```
+
+`carc`/`cdrc` NO necesitan induccion (sus axiomas `forall_2` fijan el valor en un `cons`): se
+instancia el axioma codificado (`pcc_axiom_inst2`) con testigos `tcFn h`, `tcFn t`, se computa el
+`substfc` (interno con `prf_substfc_arith_open`, externo a mano con (A) para que los `tcFn`
+sobrevivan) y se transporta `consT h. t. -> (cons h t).` con `prf_tc_cons'`.
+
+`lenc` SI recurre sobre la lista => **induccion object de listas** (`prf_list_induction`): base
+`pcc_eval_lenc_nil`, paso `pcc_eval_lenc_cons_imp` (congruencia interna de `sigma` sobre la HI +
+transitividad interna con `ax_lenc_cons` codificado). Transparencia del codigo con
+`substTerm_evalLencCode`/`liftTerm_evalLencCode`/`substFormula_evalLencPred`.
+
+Constructores `carcT`/`cdrcT`/`lencT`/`consT` con sus congruencias, interaccion con `substtc`
+(`prf_substtc_carcT`/...) e invariancias (`substtc_inv_carcT`/...).
+
+`nthc`/`runFn`: la recursion de `nthc` es **doble** (lista e indice) y `runFn` es el verificador
+estructural mismo; ambas evaluaciones pertenecen a la fase 5 (induccion estructural), no a la capa
+de atomos.
+
+## 29 · REFLEXION DEL ATOMO `<`  (`= ∃ + =eq + evaluacion provable`)
+
+`<` no es primitivo: `ax13_lt_def` da `n < m  <=>  ∃k. n + σk = m`. Reflejarlo es por tanto
+**`∃`-intro + `=eq` + evaluacion provable de `+`**. `Meta/EvalLtPrf.lean`:
+
+```lean
+pcc_lt_intro (a b K) (ha hb) (h : Prov(< a. + σK = b. >)) : Prov(< a. < b. >)
+```
+
+`[propext, choice, Quot.sound, prf_inAxC]`.
+
+### 29.1 La direccion `<=` de `ax13`, como teorema object CERRADO
+
+```lean
+ltBwd : Prf (forall_2 ((∃k. n+σk=m) => n<m))     -- [propext, choice, Quot.sound]
+```
+
+por deduccion + `∃`-elim + `PrfH_lt_intro`. Es la mitad `mpr` de `ax13`, generalizada.
+
+### 29.2 Codificacion RASTREADA (sin muro de Tarski)
+
+`pcc_thm_inst2 ltBwd (tcFn a) (tcFn b)` da el codigo del teorema instanciado en forma **substfc**,
+que se computa con `prf_substfc_arith_open` (interno) + `prf_substfc_impl`/`_ex`/`_eq`/`_atom`
+(externo). El `substCodeF 1 w phiLtBwd` sale por `rfl`:
+
+```text
+implc (exc (eqCodeFn (addcT (liftc 0 w) (succcT ⌜v0⌝)) ⌜v1⌝)) (atom2CodeFn "<" w ⌜v0⌝)
+```
+
+Resultado: `pcc_ltBwd_computed (a b) : Prov(< (∃k. a. + σk = b.) => a. < b. >)`, **todo en `tcFn`**,
+sin `termCode`, sin muro.
+
+**Sutileza de nivel:** el `substfc` externo baja bajo el `∃`-binder (`prf_substfc_ex`), asi que actua
+a **nivel 1**. Eso obliga a la invariancia de `tcFn a` bajo `substtc` a nivel arbitrario, no solo 0.
+Se anaden `prf_substtc_tcFn_zero_at`/`_succ_imp_at`/`_all_at`/`_at` (mismo esquema de §23, con el
+nivel `numeral k` parametrizado; requiere `substTerm_numeral`/`liftTerm_numeral` en los simp).
+
+### 29.3 Ensamblaje
+
+`exBodyc A B := eqCodeFn (addcT A (succcT ⌜v0⌝)) B` (el cuerpo `∃`, abierto en `⌜v0⌝`).
+
+1. `prf_substfc_exBodyc`: `substfc 0 K (exBodyc A B) =eq eqCodeFn (addcT A (σK)) B`, transporta el
+   testigo `h` a `Prov(< substfc 0 K (exBodyc A B) >)`.
+2. `∃`-intro codificado `pcc_exIntro_code'` (testigo `K`, `exBodyc` cerrado por
+   `liftTerm_exBodyc`): `Prov(< exc (exBodyc A B) >)`.
+3. MP interno `pcc_mp_code_apply` con `pcc_ltBwd_computed`: `Prov(< ltCodeFn A B >)`.
+
+### 29.4 Lo que queda
+
+1. Cuantificadores acotados a nivel de codigo (`boundedIn`, `boundedCarcLt`, `boundedAllIn` usan
+   `∃i<b`/`∀i<b`) — **unica zona aun no sondeada**.
+2. Induccion estructural sobre la forma acotada -> `hbI`/`hbC` -> `d3_prf_of_reflect_bounded` ->
+   `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
