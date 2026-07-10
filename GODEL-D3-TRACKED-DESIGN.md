@@ -1000,6 +1000,8 @@ el orden correcto de las fases 3‑5 es:
 2. **Reflexión de `<`** — corolario de (1) + `=eq` (§15.4) + `∃`‑intro de código (§17.2).
 3. **Cuantificadores acotados** (∀/∃) e **inducción estructural** → `hbI`/`hbC` → `d3_prf`.
 
+### 18.5 → ver §19: el andamiaje interno ya está construido
+
 ### 18.4 Ladrillo entregado hacia (1)
 
 **`liftFormula_provFromCode_open (k c) : liftFormula k (provFromCode c) = provFromCode (liftTerm k c)`**
@@ -1007,6 +1009,81 @@ el orden correcto de las fases 3‑5 es:
 necesita el **∀‑elim de código** (`prf_lineWF_q1` es estructural, igual que la línea Q2), donde el
 código abierto cae en el **consecuente** — al revés que en `pcc_exIntro_code'`. El ∀‑elim de código es
 imprescindible para **instanciar axiomas codificados** (p. ej. `ax13`) dentro de la prueba interna.
+
+---
+
+## 19 · Sistema de prueba INTERNO a nivel de código (andamiaje de la evaluación provable)
+
+**Hecho (2026‑07‑10).** La evaluación provable necesita razonar **dentro** de la demostrabilidad, con
+códigos que ya **no** son `formCode` de nada meta (salen de `substfc zero w Ac`). Se ha construido el
+juego completo de reglas a nivel de código.
+
+| Regla | Lema | Módulo | Testigo | `#print axioms` |
+|---|---|---|---|---|
+| `∃`‑intro (Q2) | `pcc_exIntro_code'` | `ExIntroCodePrf` | **abierto** | `[propext, choice, Quot.sound]` |
+| `∀`‑elim (Q1) | `pcc_forallElim_code'` | `ForallElimCodePrf` | **abierto** | `[propext, choice, Quot.sound]` |
+| MP | `pcc_mp_code` | `MpCodePrf` | — | `[propext, choice, Quot.sound]` |
+| Axioma de la teoría | `pcc_axiom_inst` | `MpCodePrf` | **abierto** | `+ prf_inAxC` |
+
+### 19.1 `pcc_forallElim_code'` — la asimetría con Q2
+
+```lean
+pcc_forallElim_code' (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac)
+  : Prf (provFromCode (forallc Ac) ⇒ provFromCode (substfc zero w Ac))
+```
+
+`prf_lineWF_q1 (concl A t) : lineWF ⟨concl, 9, A, t⟩ ⇔ (concl =eq implc (forallc A) (substfc zero t A))`
+es **estructural** (sin `termCode`), igual que la línea Q2 ⇒ admite `A`, `t` arbitrarios. Testigo de
+cadena `r = p ++ [q1line, mpline]`, espejo de `pcc_exIntro_code'`.
+
+**Asimetría:** en Q2 el código abierto cae en el **antecedente** (se arrastra su lift, §17.1); en Q1
+cae en el **consecuente**, y ahí hace falta `liftFormula_provFromCode_open` (§18.4).
+
+### 19.2 `pcc_mp_code` — D2 para códigos arbitrarios
+
+```lean
+pcc_mp_code (Ac Bc) (hAc) (hBc)
+  : Prf (provFromCode (implc Ac Bc) ⇒ (provFromCode Ac ⇒ provFromCode Bc))
+```
+
+Porte de `d2_prf` con `Ac`/`Bc` en lugar de `formCode A`/`formCode B` y las clausuras `hAc`/`hBc` en
+lugar de `liftTerm_formCode`. **Escollo (mismo que `pcc_exIntro_code`):** en el `simp` posterior a
+`PrfH_ex_intro` **no** hay que colapsar `liftTerm 0 Bc` — se cancela con la subst externa
+`substTerm 0 r (·)`; incluir `hBc` allí rompe la prueba.
+
+### 19.3 `pcc_axiom_inst` — instanciar axiomas codificados
+
+```lean
+pcc_axiom_inst (φ) (hmem : Formula.forall φ ∈ axioms) (w)
+  : Prf (provFromCode (substfc zero w (formCode φ)))
+```
+
+(usa `formCode (Formula.forall φ) = forallc (formCode φ)`, definicional). **Verificado** con testigo
+abierto:
+
+```lean
+example : Prf (provFromCode (substfc zero (tcFn #0) (formCode (add #0 zero =eq #0)))) :=
+  pcc_ax4_inst (tcFn #0)          -- ✓ typechequea
+```
+
+### 19.4 Lo que queda de la evaluación provable
+
+El caso **`σ` es gratis**: `ax_tc_succ` (`prf_tc_succ`) ya dice `tcFn (succ x) =eq succc (tcFn x)`.
+
+Falta el caso **`+`** (y luego `lenc`/`nthc`/`carc`/`runFn`), enunciado internamente y probado por
+**inducción interna** sobre el segundo sumando (`add` recurre por la derecha):
+
+```text
+⊢ ∀b.  Prov( ⌜ ȧ + ḃ  =  (a + b)˙ ⌝ )
+```
+
+- **Base** `b = 0`: instancia codificada de `ax4` (`pcc_ax4_inst`) + congruencia de `tcFn`.
+- **Paso** `b → σb`: instancia codificada de `ax5` + `pcc_mp_code` + la HI + `prf_tc_succ`.
+- La inducción es `prf_nat_induction` sobre la fórmula `provFromCode (…)` con `#0` libre; los lifts
+  se empujan con **`liftFormula_provFromCode_open`**.
+
+**No queda obstrucción conocida**: las reglas internas están todas disponibles y admiten testigos
+abiertos, que era el bloqueo estructural.
 
 ---
 
