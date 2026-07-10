@@ -1652,6 +1652,74 @@ nivel `numeral k` parametrizado; requiere `substTerm_numeral`/`liftTerm_numeral`
 
 ---
 
+## 30 · CUANTIFICADORES ACOTADOS a nivel de codigo
+
+Los cuantificadores acotados del verificador Delta_0 son azucar sobre `and`, `=>`, `<`, `exists`,
+`forall`:
+
+```text
+exists i<b. phi(i)  ==  exists i. (i < b) and phi(i)
+forall i<b. phi(i)  ==  forall i. (i < b) => phi(i)
+```
+
+`Meta/EvalBoundedPrf.lean` refleja esto reusando piezas ya construidas.
+
+### 30.1 Logica proposicional `and` interna — lineas C1/C2/C3 LIBRES DE MURO
+
+`prf_lineWF_c1`/`_c2`/`_c3` (tags 2/3/4) son **estructurales** y de **0 premisas** (`premsOf =eq nil`),
+igual que EQREFL/LEIBNIZ (§15.4). Asi que dan combinadores de una linea:
+
+```lean
+pcc_c1_code (Ac Bc) : Prov(< Ac => Bc => (Ac and Bc) >)
+pcc_c2_code (Ac Bc) : Prov(< (Ac and Bc) => Ac >)
+pcc_c3_code (Ac Bc) : Prov(< (Ac and Bc) => Bc >)
+```
+
+y con `pcc_mp_code_apply`:
+
+```lean
+pcc_and_intro_code (ha hb) : Prov(< Ac and Bc >)
+pcc_and_elim_left_code (h)  : Prov(< Ac >)
+pcc_and_elim_right_code (h) : Prov(< Bc >)
+```
+
+Todos `[propext, choice, Quot.sound]` — **sin `prf_inAxC`** (no tocan ningun axioma object).
+Auxiliar generico `pcc_axline`: linea de 0 premisas con `lineWF` descargado + `carc =eq concl`.
+
+### 30.2 `exists i<B`-INTRO y `forall i<B`-ELIM
+
+```lean
+bdExCode  (B Phic) := exc (andc (ltCodeFn v0 B) Phic)         -- exists i. (i<B) and phi(i)
+bdAllCode (B Phic) := forallc (implc (ltCodeFn v0 B) Phic)    -- forall i. (i<B) => phi(i)
+
+pcc_bdEx_intro (B Phic K) (hBcl hBinv hPcl)
+    (hlt : Prov(<K<B>)) (hphi : Prov(<phi(K)>))          : Prov(< bdExCode B Phic >)
+pcc_bdAll_elim (B Phic K) (hBinv)
+    (hall : Prov(< bdAllCode B Phic >)) (hlt : Prov(<K<B>)) : Prov(< phi(K) >)
+```
+
+- **`exists`-intro acotado** = `and`-intro (`pcc_and_intro_code` de `hlt` y `hphi`) +
+  `exists`-intro (`pcc_exIntro_code'`, cuerpo cerrado por `B`/`Phic` cerrados). El `substfc zero K`
+  sobre el cuerpo se computa: `prf_substfc_ltCodeFn_varc0` (el `v0` recibe `K`, `B` invariante).
+- **`forall`-elim acotado** = `forall`-elim (`pcc_forallElim_code_open`, testigo `K`) + MP interno
+  (`pcc_mp_code_apply`) con `Prov(<K<B>)`.
+
+Ambos `[propext, choice, Quot.sound]`.
+
+### 30.3 Lo que queda
+
+La **INTRODUCCION** del `forall` acotado (necesaria para `hbC`: `forall i<b. phi => Prov(...)`
+partiendo de `forall i<b. Prov(phi(i))`) requiere **induccion acotada interna** sobre la cota `b`.
+Esa es la ultima fase (induccion estructural):
+
+1. `hbI` (reflexion de `boundedIn` = `exists i<lenc L. nthc L i = x`): via `pcc_bdEx_intro` con el
+   testigo abstracto que da el `exists`-elim object de la hipotesis, reflejando `<` (`pcc_lt_intro`)
+   y `nthc L i = x` (evaluacion provable / `=eq`).
+2. `hbC` (reflexion de `chainOkB`, que usa `boundedAllIn`/`boundedCarcLt`): induccion acotada.
+3. `d3_prf_of_reflect_bounded (hbC) (hbI)` -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
