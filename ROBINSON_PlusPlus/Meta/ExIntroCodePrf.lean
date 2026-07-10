@@ -52,6 +52,14 @@ theorem liftTerm_substfc (Ac w : Term) (hAc : ∀ c, liftTerm c Ac = Ac) (hw : �
   intro c
   simp only [substfc, zero, liftTerm, liftTerms, hAc c, hw c]
 
+/-- **Versión lift‑aware (testigo `w` ABIERTO)**: sin exigir `w` cerrado, el lift **atraviesa**
+    `substfc zero · Ac` y queda sobre el testigo (`zero` es cerrado; `Ac` lo es por `hAc`).
+    Es la pieza que permite **arrastrar** el lift del testigo en vez de colapsarlo (§17.1). -/
+theorem liftTerm_substfc_open (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) (w : Term) :
+    ∀ c, liftTerm c (substfc zero w Ac) = substfc zero (liftTerm c w) Ac := by
+  intro c
+  simp only [substfc, zero, liftTerm, liftTerms, hAc c]
+
 /-!
 ### `pcc_exIntro_code` (∃‑intro a nivel de CÓDIGO)
 
@@ -68,33 +76,36 @@ de `d2_prf`. -/
     nivel (`hAc`, `hw`), de la demostrabilidad del código sustituido `substfc zero w Ac` sale la
     demostrabilidad del código del existencial `exc Ac`. Es el ladrillo que la Opción A necesita
     para el ∃‑intro rastreado del testigo en `d3`. -/
-theorem pcc_exIntro_code (Ac w : Term)
-    (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, liftTerm c w = w) :
+theorem pcc_exIntro_code' (Ac w : Term)
+    (hAc : ∀ c, liftTerm c Ac = Ac) :
     Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac)) := by
   -- elimina el ∃ externo de `provFromCode (substfc zero w Ac)`; testigo `p = #0`
   refine prf_ex_elim_imp ?_
   rw [liftFormula_provFromCode_exc Ac hAc]
-  -- colapsa `liftTerm 0 (substfc zero w Ac)` MIENTRAS `zero` es literal (patrón con `zero`)
-  simp only [liftTerm_substfc Ac w hAc hw]
+  -- NO colapsamos el lift del testigo: lo ARRASTRAMOS (`w` puede ser abierto).
+  -- Debe hacerse MIENTRAS `zero` es literal (patrón con `zero`), antes del `simp` grande.
+  simp only [liftTerm_substfc_open Ac hAc w]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  -- ctx: [chainOk nil #0 ∧ In Ain (runFn nil #0)] ; meta: provFromCode (exc Ac)
-  -- testigo `r = p ++ [q2line, mpline]`
+  -- ctx: [chainOk nil #0 ∧ In Ain (runFn nil #0)] con `Ain = substfc zero (↑w) Ac`
+  -- testigo `r = p ++ [q2line, mpline]`  (el testigo‑código de la línea Q2 es `↑w`)
   refine PrfH_ex_intro
     (concat (.var 0)
-      (cons (cons (implc (substfc zero w Ac) (exc Ac))
-              (cons (numeralM 10) (cons Ac (cons w nil))))
-        (cons (cons (exc Ac) (cons (numeralM 16) (cons (substfc zero w Ac) nil))) nil))) ?_
+      (cons (cons (implc (substfc zero (liftTerm 0 w) Ac) (exc Ac))
+              (cons (numeralM 10) (cons Ac (cons (liftTerm 0 w) nil))))
+        (cons (cons (exc Ac)
+          (cons (numeralM 16) (cons (substfc zero (liftTerm 0 w) Ac) nil))) nil))) ?_
   -- el slot `liftTerm 0 (exc Ac)` se cancela con la subst externa `substTerm 0 r (·)` (`substTerm_liftTerm`)
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  -- abreviaturas
-  let Ain : Term := substfc zero w Ac
+  -- abreviaturas  (`w'` = testigo LIFTEADO; es el que la línea Q2 lleva como argumento)
+  let w' : Term := liftTerm 0 w
+  let Ain : Term := substfc zero w' Ac
   let Bex : Term := exc Ac
   let p_ : Term := (.var 0)
-  let q2line : Term := cons (implc Ain Bex) (cons (numeralM 10) (cons Ac (cons w nil)))
+  let q2line : Term := cons (implc Ain Bex) (cons (numeralM 10) (cons Ac (cons w' nil)))
   let mpline : Term := cons Bex (cons (numeralM 16) (cons Ain nil))
   let tl : Term := cons q2line (cons mpline nil)
   let Γ : List Formula := [land (chainOk nil p_) (In Ain (runFn nil p_))]
@@ -122,7 +133,7 @@ theorem pcc_exIntro_code (Ac w : Term)
     refine PrfH_iff_mpr (prf_chainOk_concat nil p_ tl) (PrfH_and_intro hpChain ?_)
     refine PrfH_iff_mpr (prf_chainOk_cons Cp q2line (cons mpline nil)) (PrfH_and_intro ?_ ?_)
     · -- lineOk Cp q2line (línea‑axioma Q2)
-      exact prf_to_prfH (prf_lineOk_q2 Cp Ac w) Γ
+      exact prf_to_prfH (prf_lineOk_q2 Cp Ac w') Γ
     · -- chainOk Cp1 [mpline]
       refine PrfH_iff_mpr (prf_chainOk_cons Cp1 mpline nil)
         (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
@@ -134,7 +145,7 @@ theorem pcc_exIntro_code (Ac w : Term)
       · -- In (implc Ain Bex) Cp1  (= carc q2line, apendizada por la línea Q2)
         have hcarc : Prf (cons (implc Ain Bex) nil =eq cons (carc q2line) nil) :=
           prf_congr_cons_head (prf_eq_symm
-            (prf_carc_cons (implc Ain Bex) (cons (numeralM 10) (cons Ac (cons w nil)))))
+            (prf_carc_cons (implc Ain Bex) (cons (numeralM 10) (cons Ac (cons w' nil)))))
         exact prf_to_prfH
           (prf_In_mono (implc Ain Bex) (cons (carc q2line) nil) Cp
             (prf_eq_subst_in hcarc (prf_in_cons_head (implc Ain Bex) nil))) Γ
@@ -145,9 +156,17 @@ theorem pcc_exIntro_code (Ac w : Term)
           (prf_to_prfH (prf_In_mono_right_imp Ain (cons (carc q2line) nil) Cp) Γ) hpIn
   exact PrfH_and_intro hChainR hInB
 
+/-- **Corolario (compatibilidad)**: la versión con testigo **cerrado** es un caso particular de
+    `pcc_exIntro_code'`. La hipótesis `hw` ya **no se usa**: era un artefacto de colapsar el lift
+    del testigo en vez de arrastrarlo (§17.1). -/
+theorem pcc_exIntro_code (Ac w : Term)
+    (hAc : ∀ c, liftTerm c Ac = Ac) (_hw : ∀ c, liftTerm c w = w) :
+    Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac)) :=
+  pcc_exIntro_code' Ac w hAc
+
 end ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 
 export ROBINSON_PlusPlus.Meta.ExIntroCodePrf (
-  liftTerm_exc liftFormula_provFromCode_exc liftTerm_substfc
-  pcc_exIntro_code
+  liftTerm_exc liftFormula_provFromCode_exc liftTerm_substfc liftTerm_substfc_open
+  pcc_exIntro_code' pcc_exIntro_code
 )

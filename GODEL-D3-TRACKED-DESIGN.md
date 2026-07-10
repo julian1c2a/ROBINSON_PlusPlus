@@ -892,21 +892,56 @@ el testigo construye pasa a ser `⟨implc (substfc zero (↑w) Ac) (exc Ac), 10,
 conclusión `exc Ac` sigue siendo cerrada (que es lo único que el objetivo `provFromCode (exc Ac)`
 necesita). Nada aquí toca `termCode` ni la obstrucción de Tarski.
 
-### 17.2 Brick siguiente (único, desbloquea las DOS ramas)
-
-**`pcc_exIntro_code'`**: generalización **lift‑aware** de `pcc_exIntro_code`, **sin `hw`**:
+### 17.2 RESUELTA (2026‑07‑10): `pcc_exIntro_code'` — `hw` era innecesaria
 
 ```lean
-pcc_exIntro_code' (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac)
+pcc_exIntro_code' (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac)   -- ¡SIN hw!
   : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))
 ```
 
-Requiere rehacer el ensamblaje de la cadena `p ++ [q2line, mpline]` arrastrando `liftTerm 0 w`
-(donde hoy hay un `simp only [liftTerm_substfc …]`). Con él caen:
+La pieza que lo hace posible:
 
-1. **`hbI`** (`boundedIn`: átomos `=eq` ✅ cerrado + `<` reducible a `=eq` + `∃` acotado).
-2. **`hbC`** (`chainOkB`: además `lineWF` ✅ desbloqueado por `ax_lineWF_inv`, §16.5).
-3. → `d3_prf_of_reflect_bounded` → `d3_prf` → `goedel_second_prf`.
+```lean
+liftTerm_substfc_open (Ac) (hAc) (w) : ∀ c, liftTerm c (substfc zero w Ac) = substfc zero (liftTerm c w) Ac
+```
+
+El lift **atraviesa** `substfc zero · Ac` y queda sobre el testigo (`zero` es cerrado; `Ac` lo es por
+`hAc`). Con eso, el contexto tras `prf_ex_elim_imp` es **idéntico** al de antes con `w' := liftTerm 0 w`,
+y el ensamblaje `p ++ [q2line, mpline]` pasa **verbatim** (la línea‑axioma Q2 `prf_lineOk_q2 Cp Ac w'`
+admite cualquier testigo). La conclusión `exc Ac` sigue cerrada, que es lo único que el objetivo
+`provFromCode (exc Ac)` necesita.
+
+`#print axioms pcc_exIntro_code' = [propext, choice, Quot.sound]`. El antiguo `pcc_exIntro_code` se
+conserva como **corolario** (su `hw` queda como argumento no usado): retrocompatible, build verde.
+
+**Verificado explícitamente** que el testigo puede ser una **variable ligada** y su **código
+rastreado**:
+
+```lean
+example (Ac) (hAc) : Prf (provFromCode (substfc zero (tcFn #0) Ac) ⇒ provFromCode (exc Ac)) :=
+  pcc_exIntro_code' Ac (tcFn #0) hAc          -- ✓ typechequea
+```
+
+### 17.3 Qué cae exactamente de RIESGO‑1 (con precisión)
+
+RIESGO‑1 (§4.2/§11.2) tenía **dos** mitades:
+
+| Mitad | Estado |
+|---|---|
+| (a) `tcFn #0` no es cerrado ⇒ `hw` falla | ✅ **DISUELTA** por `pcc_exIntro_code'` |
+| (b) transporte `tcFn L =eq termCode L` (Tarski) | ⚠ **sigue viva**, pero **confinada** al último paso (§15.4), descargable con numerales (`prf_tc_numeral`) en la inducción de fase 5 |
+
+No hay sobre‑afirmación: (b) es la obstrucción de Tarski genuina y su lugar correcto es el puente.
+
+### 17.4 Camino libre
+
+Con §16.5 (`ax_lineWF_inv`) y §17.2 (`pcc_exIntro_code'`), **no queda obstrucción conocida**:
+
+1. **`hbI`** (`boundedIn`): átomos `=eq` ✅ (§15.4) + `<` (reducible a `=eq` + `∃` acotado) + `∃`‑intro
+   de código con testigo abierto ✅.
+2. **`hbC`** (`chainOkB`): además `lineWF` ✅ (§16.5) + `In` ✅ (`Sigma1CorePrf`).
+3. Reflexión de cuantificadores acotados (∀/∃) + inducción estructural (fase 5, con `prf_tc_numeral`
+   descargando el puente (b)) → `d3_prf_of_reflect_bounded` → `d3_prf` → `goedel_second_prf`.
 
 ---
 
