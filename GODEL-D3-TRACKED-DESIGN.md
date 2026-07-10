@@ -1087,6 +1087,86 @@ abiertos, que era el bloqueo estructural.
 
 ---
 
+## 20 · Primer paso REAL de la evaluación provable: `substfc` con testigo‑código arbitrario
+
+**Hecho (2026‑07‑10), `Meta/SubstCodeOpenPrf.lean`.**
+
+### 20.1 El hueco
+
+`pcc_axiom_inst` (§19.3) entrega `provFromCode (substfc zero w (formCode φ))` con `w = tcFn a`. Para
+**usarlo** hay que computar ese `substfc`. La única herramienta existente exigía que el código
+sustituido fuese `termCode s` para una `s` **meta**:
+
+```lean
+prf_substFormula_arith (v s f) : substfc (numeral v) (termCode s) (formCode f) =eq formCode (substFormula v s f)
+```
+
+y `tcFn a` **no** es `termCode` de nada meta. Ese era el único hueco.
+
+### 20.2 Por qué salió barato
+
+En las pruebas originales `termCode s` viaja como argumento **opaco**: se pasa tal cual a
+`prf_substtc_var_eq/gt/lt`, que están enunciadas para `s` **cualquiera** — son las «ecuaciones de
+variable» de `substtc` que §11.3 señaló (y que `tcFn` no tiene). Sólo cambia el lado derecho.
+
+### 20.3 Contenido
+
+Funciones meta (código de `t`/`f` con el hueco de la variable `v` relleno por el **código** `w`):
+
+```lean
+mutual
+  def substCodeT (v w) : Term → Term
+    | .var n => if n = v then w else if n > v then varc ⌜n-1⌝ else varc ⌜n⌝   -- decremento De Bruijn
+    | .func sym ts => funcc (strCode sym) (substCodeTs v w ts)
+  def substCodeTs (v w) : List Term → Term
+end
+def substCodeF (v w) : Formula → Term      -- 8 casos, espejo de formCode
+  | .forall a => ⟨6, substCodeF (v+1) (liftc zero w) a⟩   -- ¡el testigo se LEVANTA bajo el binder!
+  | .ex a     => ⟨9, substCodeF (v+1) (liftc zero w) a⟩
+  | …
+```
+
+Los dos lemas (misma estructura de casos que los originales, `[propext, choice, Quot.sound]`):
+
+```lean
+prf_substtc_arith_open (v w) : ∀ t, Prf (substtc ⌜v⌝ w ⌜t⌝ =eq substCodeT v w t)
+prf_substtsc_arith_open (v w) : ∀ ts, …
+prf_substfc_arith_open : ∀ v w f, Prf (substfc ⌜v⌝ w ⌜f⌝ =eq substCodeF v w f)
+```
+
+Chequeo de cordura (no duplicamos teoría): `substCodeT v (termCode s) t = termCode (substTerm v s t)`
+(`substCodeT_termCode`), que recupera `prf_substTerm_arith`.
+
+### 20.4 Confirmación De Bruijn
+
+`prf_substfc_forall`/`_ex` dicen `substfc v t (forallc a) =eq forallc (substfc (σv) (liftc zero t) a)`:
+al entrar bajo un binder el **testigo se levanta**. Es la confirmación *a posteriori* de por qué el
+`∀`‑elim de código (§19.1) **debía** admitir testigos abiertos: aun instanciando un axioma cerrado,
+el testigo interno acaba abierto.
+
+### 20.5 Payoff verificado
+
+```lean
+-- la función meta COMPUTA (rfl):
+substCodeF 0 w (add #0 zero =eq #0)  =  ⟨4, addcT w ⌜0⌝, w⟩
+
+-- y la instancia de `ax4` CODIFICADO ya es usable:
+Prf (provFromCode ⟨4, addcT (tcFn a) ⌜0⌝, tcFn a⟩)                       -- = Prov(⌜ȧ + 0 = ȧ⌝)
+  := prf_mp (prf_provCode_congr (prf_substfc_arith_open 0 (tcFn a) _)) (pcc_ax4_inst (tcFn a))
+```
+
+### 20.6 Siguiente
+
+1. **Cerrar la base de `+`**: de `Prov(⌜ȧ + 0 = ȧ⌝)` a `Prov(⌜ȧ + 0̇ = (a+0)˙⌝)` con `prf_tc_zero`
+   (`tcFn zero =eq ⌜0⌝`) y `prf_congr_tcFn` sobre `ax4` object (`tcFn (add a zero) =eq tcFn a`),
+   transportando con `prf_provCode_congr`.
+2. **`pcc_axiom_inst2`** (axiomas `forall_2`, como `ax5`): `pcc_forallElim_code'` dos veces +
+   `prf_substfc_forall`.
+3. **Paso inductivo de `+`** y luego `lenc`/`nthc`/`carc`/`runFn`; después `<`, cuantificadores
+   acotados, inducción estructural → `hbI`/`hbC` → `d3_prf` → `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
