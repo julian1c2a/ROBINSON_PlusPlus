@@ -1167,6 +1167,57 @@ Prf (provFromCode ⟨4, addcT (tcFn a) ⌜0⌝, tcFn a⟩)                      
 
 ---
 
+## 21 · Evaluación provable: **BASE de `+` cerrada** (`Meta/EvalArithPrf.lean`)
+
+**Hecho (2026‑07‑10).** Primera aritmética real demostrada **dentro** de `Prov`.
+
+### 21.1 Qué se demuestra
+
+```lean
+def addcT (x y) : Term := funcc (strCode add_sym) (cons x (cons y nil))   -- código de `x + y`
+theorem addcT_termCode (a b) : addcT (termCode a) (termCode b) = termCode (add a b)   -- rfl
+theorem prf_congr_addcT
+
+def evalAddCode (a b) : Term := eqCodeFn (addcT (tcFn a) (tcFn b)) (tcFn (add a b))
+--   = código de   ⌜ ȧ + ḃ  =  (a+b)˙ ⌝
+
+theorem pcc_eval_add_zero (a) : Prf (provFromCode (evalAddCode a zero))   -- ← BASE, b = 0
+```
+
+`[propext, choice, Quot.sound, prf_inAxC]` (el `prf_inAxC` entra por `repr_pos'`; es uno de los 7
+axiomas legítimos de `AXIOMS.md`, no un postulado gödeliano).
+
+### 21.2 Cómo encajan las tres secciones anteriores
+
+```text
+pcc_ax4_inst (tcFn a)                     -- §19.3: instancia de `ax4` CODIFICADO, testigo `tcFn a`
+   ⇓  prf_substfc_arith_open 0 (tcFn a) _ -- §20:   COMPUTA el substfc (testigo arbitrario)
+Prov(⌜ ȧ + ⌜0⌝ = ȧ ⌝)                     -- = pcc_ax4_computed
+   ⇓  prf_provCode_congr  (Leibniz de códigos)
+Prov(⌜ ȧ + 0̇ = (a+0)˙ ⌝)                 -- = pcc_eval_add_zero
+```
+
+El último transporte usa dos igualdades de **códigos**:
+
+- `⌜0⌝ =eq tcFn zero` — `prf_tc_zero` (simétrico);
+- `tcFn a =eq tcFn (add a zero)` — `prf_congr_tcFn` sobre `prf_add_zero_t : add a 0 =eq a`.
+
+**Obsérvese la asimetría que hace no‑trivial la evaluación provable:** el lado izquierdo del código
+(`addcT (tcFn a) (tcFn b)`) es el **término simbólico**; el derecho (`tcFn (add a b)`) es el **numeral
+del valor**. Sólo coinciden porque la teoría objeto prueba `add a 0 =eq a` y `tcFn` tiene congruencia.
+
+### 21.3 Siguiente
+
+1. **`pcc_axiom_inst2`** — instanciar axiomas `forall_2` (como `ax5 : ∀n∀m. n + σm = σ(n+m)`):
+   `pcc_forallElim_code'` dos veces + `prf_substfc_forall` (que **levanta el testigo** bajo el binder).
+2. **Paso inductivo de `+`**: `evalAddCode a (succ b)` desde `evalAddCode a b`, con `ax5` codificado,
+   `pcc_mp_code` y `prf_tc_succ` (el caso `σ` es gratis). Inducción `prf_nat_induction` sobre
+   `Formula.forall (provFromCode (evalAddCode ↑a #0))`; lifts vía `liftFormula_provFromCode_open`.
+3. Misma receta para `lenc`/`nthc`/`carc`/`runFn`; después `<`, cuantificadores acotados, inducción
+   estructural → `hbI`/`hbC` → `d3_prf` → `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
