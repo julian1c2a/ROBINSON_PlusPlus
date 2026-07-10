@@ -1506,6 +1506,69 @@ Falta sólo la **forma implicación** de los combinadores (hoy toman hipótesis 
 
 ---
 
+## 27 · EVALUACION PROVABLE DE `+` — **COMPLETA**
+
+Primera evaluacion provable cerrada del proyecto. `Meta/EvalArithPrf.lean`:
+
+```lean
+pcc_eval_add (a b) : Prf (provFromCode (evalAddCode a b))
+   -- <  a. + b.  =  (a+b).  >   para a, b ARBITRARIOS
+```
+
+`[propext, choice, Quot.sound, prf_inAxC]` (el `prf_inAxC` entra por `pcc_ax4_inst`/`pcc_ax5_inst`).
+
+### 27.1 Formas IMPLICACION de los combinadores
+
+`prf_nat_induction` pide el paso como `Prf (Phi => Phi[sigma#0])`, no como funcion `Prf -> Prf`. Los
+combinadores internos ya son implicaciones por dentro (`pcc_mp_code_open`), asi que basta reordenar
+con `prf_deduction` + `PrfH.mp` sobre `prf_to_prfH`:
+
+```lean
+pcc_leibniz_apply_imp   (Ac t1 t2) (h1) : Prov(<t1=t2>) => Prov(<Ac[t2]>)
+pcc_eq_trans_code_imp   (X Y Z) (hX) (h1) : Prov(<Y=Z>) => Prov(<X=Z>)
+pcc_congr_succ_code_imp (X Y) (hX)        : Prov(<X=Y>) => Prov(<sigma X = sigma Y>)
+```
+
+### 27.2 El paso inductivo
+
+```lean
+pcc_eval_add_succ_imp (a b) : Prov(< a. + b. = (a+b). >) => Prov(< a. + (sigma b). = (a + sigma b). >)
+```
+
+Cadena: `pcc_congr_succ_code_imp` sobre la HI, `pcc_eq_trans_code_imp` con (B) (`pcc_ax5_computed`),
+y transporte final de codigos con `prf_congr_eqCodeFn` (usando `prf_tc_succ'` a la izquierda y
+`prf_congr_tcFn (prf_add_succ_t a b)` a la derecha). Las invariancias `substtc` las descarga
+`substtc_inv_addcT (substtc_inv_tcFn a) (substtc_inv_succcT (substtc_inv_tcFn b))`.
+
+### 27.3 La induccion object
+
+El transporte de `substFormula`/`liftFormula` **cae sobre el codigo** y `evalAddCode` es transparente
+(sus constantes — `numeral 4`, `strCode +`, `cons`, `nil` — son cerradas):
+
+```lean
+substTerm_provFromCode_open / liftFormula_provFromCode_open   (Meta/TrackedCorePrf.lean)
+substTerm_numeral / substTerm_strCode                          (Meta/DerivCondPrf.lean, NUEVOS)
+substTerm_evalAddCode / liftTerm_evalAddCode                   (transparencia de evalAddCode)
+substFormula_evalAddPred / step_evalAddPred                    (las dos ecuaciones que pide prf_nat_induction)
+```
+
+Con eso `prf_eval_add_all a : Prf (forall b. evalAddPred a)` es literalmente
+`prf_nat_induction` con base `pcc_eval_add_zero` y paso `pcc_eval_add_succ_imp`, y `pcc_eval_add`
+sale por `prf_spec`.
+
+**Truco De Bruijn nuevo:** en el paso, `liftTerm 1 (liftTerm 0 a)` se reescribe a
+`liftTerm 0 (liftTerm 0 a)` con `<- FOL.liftTerm_comm_zero a 0` y entonces `FOL.substTerm_liftTerm`
+lo cancela. (`FOL.substTerm_liftLift` NO aplica aqui: su patron es `substTerm (c+1) s (lift c (lift c t))`.)
+
+### 27.4 Lo que queda
+
+1. Misma receta para `sigma` (gratis), `lenc`, `nthc`, `carc`, `runFn` sobre numerales.
+2. `<` (= `exists` + `=eq` + evaluacion provable, §18).
+3. **Cuantificadores acotados** a nivel de codigo — unica zona aun no sondeada.
+4. Induccion estructural -> `hbI`/`hbC` -> `d3_prf_of_reflect_bounded` -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y

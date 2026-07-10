@@ -67,6 +67,19 @@ theorem liftFormula_provFromCode_open (k : Nat) (c : Term) :
     Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ, if_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift, ← FOL.liftTerm_comm_zero]
 
+/-- **`substFormula` atraviesa `provFromCode`** y cae sobre el código:
+    `substFormula v s (provFromCode c) = provFromCode (substTerm v s c)`.
+    (El cuerpo Σ₁ es cerrado; el código está bajo un binder, de ahí `substTerm_lift_comm_zero`.)
+    La necesita la **inducción object** sobre una fórmula de la forma `provFromCode (…#0…)`. -/
+theorem substFormula_provFromCode_open (v : Nat) (s c : Term) :
+    substFormula v s (provFromCode c) = provFromCode (substTerm v s c) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [provFromCode, provFormulaC', substFormula, substTerm, substTerms, liftTerm,
+    liftTerms, land, chainOk, In, runFn, nil, zero, hz, hz2, if_false, Nat.reduceAdd,
+    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
+    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, FOL.substTerm_lift_comm_zero]
+
 /-!
 ### Constructores de código `tcFn`‑based para átomos binarios (§10.2, paso 1)
 
@@ -140,7 +153,7 @@ theorem allInCodeFn_termCode (c L : Term) :
 end ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
 export ROBINSON_PlusPlus.Meta.TrackedCorePrf (
-  liftFormula_provFromCode liftFormula_provFromCode_open
+  liftFormula_provFromCode liftFormula_provFromCode_open substFormula_provFromCode_open
   atom2CodeFn atom2CodeFn_termCode inFormCodeFn_eq_atom2
   liftTerm_atom2CodeFn prf_congr_atom2CodeFn prf_provFromCode_atom2_congr
   liftFormula_provFromCode_atom2

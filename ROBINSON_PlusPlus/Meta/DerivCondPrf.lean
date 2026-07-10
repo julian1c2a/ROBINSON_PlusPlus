@@ -45,6 +45,27 @@ theorem liftTerm_charsCode (c : Nat) : ∀ l : List Char, liftTerm c (charsCode 
 theorem liftTerm_strCode (c : Nat) (s : String) : liftTerm c (strCode s) = strCode s :=
   liftTerm_charsCode c s.toList
 
+/-! Duales bajo `substTerm`: los códigos base son **cerrados**, luego la sustitución los atraviesa
+    sin tocarlos. Los necesita la **inducción object** sobre fórmulas `provFromCode (…#0…)`, donde
+    tras `substFormula_provFromCode_open` hay que computar el `substTerm` sobre el código. -/
+
+theorem substTerm_numeral (v : Nat) (s : Term) : ∀ n : Nat, substTerm v s (numeral n) = numeral n
+  | 0 => rfl
+  | n + 1 => by
+      have ih := substTerm_numeral v s n
+      simp only [numeral, succ, substTerm, substTerms, ih]
+
+theorem substTerm_charsCode (v : Nat) (s : Term) :
+    ∀ l : List Char, substTerm v s (charsCode l) = charsCode l
+  | [] => rfl
+  | _ :: cs => by
+      simp only [charsCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_charsCode v s cs]
+
+theorem substTerm_strCode (v : Nat) (s : Term) (str : String) :
+    substTerm v s (strCode str) = strCode str :=
+  substTerm_charsCode v s str.toList
+
 mutual
 theorem liftTerm_termCode (c : Nat) : ∀ t : Term, liftTerm c (termCode t) = termCode t
   | .var _ => by simp only [termCode, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeral]

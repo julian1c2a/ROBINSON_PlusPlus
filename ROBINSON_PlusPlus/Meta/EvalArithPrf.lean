@@ -20,6 +20,8 @@ open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -283,6 +285,158 @@ theorem substtc_inv_addcT {X Y : Term}
     ∀ W, Prf (substtc zero W (addcT X Y) =eq addcT X Y) :=
   fun W => prf_eq_trans (prf_substtc_addcT zero W X Y) (prf_congr_addcT (hX W) (hY W))
 
+/-! ### Formas IMPLICACIÓN de los combinadores internos
+
+`prf_nat_induction` exige el paso como `Prf (Φ ⇒ Φ[σ#0])`, no como una función `Prf → Prf`. Los
+combinadores internos ya son implicaciones por dentro (`pcc_mp_code_open`), así que basta reordenar. -/
+
+/-- Leibniz aplicado, en forma implicación sobre la **igualdad** (la premisa `Ac[t₁]` va cerrada). -/
+theorem pcc_leibniz_apply_imp (Ac t₁ t₂ : Term)
+    (h1 : Prf (provFromCode (substfc zero t₁ Ac))) :
+    Prf (provFromCode (eqc t₁ t₂) ⇒ provFromCode (substfc zero t₂ Ac)) := by
+  have hI : Prf (provFromCode (eqc t₁ t₂)
+      ⇒ provFromCode (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) :=
+    prf_mp (pcc_mp_code_open (eqc t₁ t₂)
+      (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) (pcc_leibniz_code Ac t₁ t₂)
+  refine prf_deduction ?_
+  have himp := PrfH.mp _ _ _ (prf_to_prfH hI _) (prfH_hyp_self (provFromCode (eqc t₁ t₂)))
+  exact PrfH.mp _ _ _
+    (PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (substfc zero t₁ Ac) (substfc zero t₂ Ac)) _)
+      himp)
+    (prf_to_prfH h1 _)
+
+/-- **Transitividad interna**, en forma implicación sobre la segunda igualdad. -/
+theorem pcc_eq_trans_code_imp (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (h1 : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (eqc Y Z) ⇒ provFromCode (eqc X Z)) := by
+  let Ac : Term := eqc X (varc (numeral 0))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc X t) := fun t =>
+    prf_eq_trans (prf_substfc_eq zero t X (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hX t) (prf_substtc_varc0 t))
+  have hY : Prf (provFromCode (substfc zero Y Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp Y))) h1
+  have himp : Prf (provFromCode (eqc Y Z) ⇒ provFromCode (substfc zero Z Ac)) :=
+    pcc_leibniz_apply_imp Ac Y Z hY
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Z)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+
+/-- **Congruencia interna de `σ`**, en forma implicación. -/
+theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (succcT X) (succcT Y))) := by
+  let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
+    intro t
+    refine prf_eq_trans (prf_substfc_eq zero t (succcT X) (succcT (varc (numeral 0)))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_succcT zero t X) (prf_congr_succcT (hX t))
+    · exact prf_eq_trans (prf_substtc_succcT zero t (varc (numeral 0)))
+        (prf_congr_succcT (prf_substtc_varc0 t))
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
+      (prf_provFromCode_eqCodeFn_refl (succcT X))
+  have himp : Prf (provFromCode (eqc X Y) ⇒ provFromCode (substfc zero Y Ac)) :=
+    pcc_leibniz_apply_imp Ac X Y hAX
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
+
+/-! ### PASO INDUCTIVO de `+` -/
+
+/-- **Paso inductivo de la evaluación provable de `+`**:
+    `⊢ Prov(⌜ȧ + ḃ = (a+b)˙⌝) ⇒ Prov(⌜ȧ + (σb)˙ = (a+σb)˙⌝)`.
+
+    Cadena: `pcc_congr_succ_code_imp` sobre la HI, luego `pcc_eq_trans_code_imp` con (B)
+    (`pcc_ax5_computed`), y finalmente transporte de códigos con `prf_tc_succ'` y `prf_congr_tcFn`
+    sobre `prf_add_succ_t` (`add a (σb) =eq σ(a+b)`). -/
+theorem pcc_eval_add_succ_imp (a b : Term) :
+    Prf (provFromCode (evalAddCode a b) ⇒ provFromCode (evalAddCode a (succ b))) := by
+  -- invariancias `substtc` (descargadas por (A) + ecuaciones de `funcc`)
+  have hinvAB : ∀ W, Prf (substtc zero W (addcT (tcFn a) (tcFn b)) =eq addcT (tcFn a) (tcFn b)) :=
+    substtc_inv_addcT (substtc_inv_tcFn a) (substtc_inv_tcFn b)
+  have hinvX : ∀ W, Prf (substtc zero W (addcT (tcFn a) (succcT (tcFn b)))
+      =eq addcT (tcFn a) (succcT (tcFn b))) :=
+    substtc_inv_addcT (substtc_inv_tcFn a) (substtc_inv_succcT (substtc_inv_tcFn b))
+  -- HI ⇒ `Prov(⌜σ(ȧ+ḃ) = σ((a+b)˙)⌝)`
+  have hcs : Prf (provFromCode (eqc (addcT (tcFn a) (tcFn b)) (tcFn (add a b)))
+      ⇒ provFromCode (eqc (succcT (addcT (tcFn a) (tcFn b))) (succcT (tcFn (add a b))))) :=
+    pcc_congr_succ_code_imp _ _ hinvAB
+  -- (B) + transitividad
+  have htr : Prf (provFromCode (eqc (succcT (addcT (tcFn a) (tcFn b))) (succcT (tcFn (add a b))))
+      ⇒ provFromCode (eqc (addcT (tcFn a) (succcT (tcFn b))) (succcT (tcFn (add a b))))) :=
+    pcc_eq_trans_code_imp _ _ _ hinvX (pcc_ax5_computed a b)
+  -- transporte final de códigos: `succcT ḃ =eq (σb)˙` y `σ((a+b)˙) =eq (a+σb)˙`
+  have hcode : Prf (eqc (addcT (tcFn a) (succcT (tcFn b))) (succcT (tcFn (add a b)))
+      =eq evalAddCode a (succ b)) :=
+    prf_congr_eqCodeFn
+      (prf_congr_addcT (prf_refl (tcFn a)) (prf_eq_symm (prf_tc_succ' b)))
+      (prf_eq_symm (prf_eq_trans (prf_congr_tcFn (prf_add_succ_t a b)) (prf_tc_succ' (add a b))))
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr hcode) _)
+    (PrfH.mp _ _ _ (prf_to_prfH htr _)
+      (PrfH.mp _ _ _ (prf_to_prfH hcs _) (prfH_hyp_self _)))
+
+/-! ### Inducción object: la evaluación provable de `+`, COMPLETA
+
+`prf_nat_induction` trabaja con `substFormula`/`liftFormula` sobre el predicado. Con
+`substFormula_provFromCode_open` / `liftFormula_provFromCode_open` todo cae **sobre el código**, y
+`evalAddCode` es transparente a `substTerm`/`liftTerm` (sus constantes — `numeral 4`, `strCode +`,
+`cons`, `nil` — son cerradas). Esos dos lemas de transporte hacen la inducción rutinaria. -/
+
+/-- `substTerm` atraviesa `evalAddCode` (las constantes de código son cerradas). -/
+theorem substTerm_evalAddCode (v : Nat) (s X Y : Term) :
+    substTerm v s (evalAddCode X Y)
+      = evalAddCode (substTerm v s X) (substTerm v s Y) := by
+  simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
+    substTerm, substTerms, substTerm_numeral, substTerm_strCode]
+
+/-- `liftTerm` atraviesa `evalAddCode`. -/
+theorem liftTerm_evalAddCode (k : Nat) (X Y : Term) :
+    liftTerm k (evalAddCode X Y) = evalAddCode (liftTerm k X) (liftTerm k Y) := by
+  simp only [evalAddCode, eqCodeFn, addcT, succcT, funcc, tcFn, add, cons, nil, zero, succ,
+    liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
+
+/-- Predicado inductivo `Ψ(b) = Prov(⌜ȧ + ḃ = (a+b)˙⌝)` (`b` = `#0`; `a` liftado). -/
+def evalAddPred (a : Term) : Formula := provFromCode (evalAddCode (liftTerm 0 a) (.var 0))
+
+/-- Instanciar `Ψ` en un término `b` devuelve exactamente `provFromCode (evalAddCode a b)`. -/
+theorem substFormula_evalAddPred (a b : Term) :
+    substFormula 0 b (evalAddPred a) = provFromCode (evalAddCode a b) := by
+  simp only [evalAddPred, substFormula_provFromCode_open, substTerm_evalAddCode, substTerm,
+    reduceIte, FOL.substTerm_liftTerm]
+
+/-- El paso de `prf_nat_induction` sobre `Ψ`: el `liftFormula 1` seguido del `substFormula 0 (σ#0)`
+    devuelve `Ψ` con el argumento `σ#0` (el `a` liftado sobrevive: `↑₁↑₀a` es `↑₀↑₀a` por
+    `liftTerm_comm_zero`, y el `substTerm 0` lo cancela). -/
+theorem step_evalAddPred (a : Term) :
+    substFormula 0 (succ (.var 0)) (liftFormula 1 (provFromCode (evalAddCode (liftTerm 0 a) (.var 0))))
+      = provFromCode (evalAddCode (liftTerm 0 a) (succ (.var 0))) := by
+  rw [liftFormula_provFromCode_open, liftTerm_evalAddCode, substFormula_provFromCode_open,
+    substTerm_evalAddCode, ← FOL.liftTerm_comm_zero a 0, FOL.substTerm_liftTerm]
+  simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
+
+/-- **EVALUACIÓN PROVABLE DE `+` (∀ object)**: `⊢ ∀b. Prov(⌜ȧ + ḃ = (a+b)˙⌝)`.
+
+    Inducción interna (`prf_nat_induction`): base `pcc_eval_add_zero`, paso `pcc_eval_add_succ_imp`.
+    Es la **primera** evaluación provable completa del proyecto: cierra el hueco que §18 identificó
+    como «la bestia» para el símbolo `+`. -/
+theorem prf_eval_add_all (a : Term) : Prf (Formula.forall (evalAddPred a)) := by
+  refine prf_nat_induction (evalAddPred a) ?base ?step
+  · rw [substFormula_evalAddPred]
+    exact pcc_eval_add_zero a
+  · refine Prf.gen _ ?_
+    show Prf (Formula.impl (provFromCode (evalAddCode (liftTerm 0 a) (.var 0)))
+      (substFormula 0 (succ (.var 0))
+        (liftFormula 1 (provFromCode (evalAddCode (liftTerm 0 a) (.var 0))))))
+    rw [step_evalAddPred]
+    exact pcc_eval_add_succ_imp (liftTerm 0 a) (.var 0)
+
+/-- **EVALUACIÓN PROVABLE DE `+`**: `⊢ Prov(⌜ȧ + ḃ = (a+b)˙⌝)` para `a`, `b` **arbitrarios**.
+    Instancia del `∀` object. -/
+theorem pcc_eval_add (a b : Term) : Prf (provFromCode (evalAddCode a b)) := by
+  have h := prf_spec (prf_eval_add_all a) b
+  rwa [substFormula_evalAddPred] at h
+
 end ROBINSON_PlusPlus.Meta.EvalArithPrf
 
 export ROBINSON_PlusPlus.Meta.EvalArithPrf (
@@ -293,4 +447,7 @@ export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   pcc_ax5_computed
   pcc_leibniz_apply pcc_eq_trans_code pcc_congr_succ_code
   substtc_inv_tcFn substtc_inv_succcT substtc_inv_addcT
+  pcc_leibniz_apply_imp pcc_eq_trans_code_imp pcc_congr_succ_code_imp
+  substTerm_evalAddCode liftTerm_evalAddCode evalAddPred substFormula_evalAddPred
+  step_evalAddPred pcc_eval_add_succ_imp prf_eval_add_all pcc_eval_add
 )
