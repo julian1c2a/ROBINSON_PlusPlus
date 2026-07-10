@@ -280,6 +280,19 @@ theorem prf_provCodeC'_lineWF_of_tracked {t tc : Term}
     Prf (provCodeC' (lineWF t)) :=
   prf_mp (prf_provFromCode_atom1_congr ht) h
 
+/-! ### Inversión de `lineWF` en `Prf` (cierre del axioma `ax_lineWF_inv`, §16.4)
+
+Desbloquea la reflexión de `lineWF` para líneas **abstractas**: de `lineWF t` se extrae la etiqueta
+(una de las 21), y con ella el bicondicional `ax_lineWF_*` correspondiente determina la condición
+estructural — una **disyunción finita de átomos `=eq`**, que ya sabemos reflejar (`pcc_eq_tracked`). -/
+
+/-- Cierre `Prf` de `ax_lineWF_inv`: `lineWF line ⇒ (⋁_{k=0}^{20} lineTag line =eq numeralM k)`. -/
+theorem prf_lineWF_inv (line : Term) :
+    Prf (Formula.impl (lineWF line) (tagDisj line 20)) := by
+  have hh := prf_spec (prf_ax (show ax_lineWF_inv ∈ axioms by simp [axioms])) line
+  simpa [ax_lineWF_inv, tagDisj, lineTag, lineWF, nthc, numeralM, lor, succ, zero,
+    substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] using hh
+
 end ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (
@@ -293,4 +306,5 @@ export ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (
   atom1CodeFn atom1CodeFn_termCode liftTerm_atom1CodeFn prf_congr_atom1CodeFn
   prf_provFromCode_atom1_congr liftFormula_provFromCode_atom1
   lineWFCodeFn lineWFCodeFn_termCode provCodeC'_lineWF_eq prf_provCodeC'_lineWF_of_tracked
+  prf_lineWF_inv
 )

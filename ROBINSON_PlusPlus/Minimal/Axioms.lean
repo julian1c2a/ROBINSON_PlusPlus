@@ -1142,6 +1142,32 @@ def ax_lineWF_listInd : Formula :=
 def ax_premsOf_listInd : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 20) (cons (.var 0) nil))) =eq nil)
 
+/-! ### Inversión de `lineWF` (completitud del verificador sobre la etiqueta de regla)
+
+Los 21 axiomas `ax_lineWF_*` son bicondicionales **indexados por la etiqueta de regla**
+(`numeralM 0 … numeralM 20`): caracterizan `lineWF` sobre líneas con etiqueta *conocida*, pero
+dejan `lineWF` **indeterminado** sobre líneas con cualquier otra etiqueta. Eso basta para D1/D2 y
+Gödel I (que solo usan líneas concretas), pero **impide reflejar `lineWF t` para `t` abstracto**
+(la teoría no puede extraer la etiqueta de `t`), bloqueando la Σ₁‑completitud provable de `chainOk`.
+
+`ax_lineWF_inv` cierra la laguna: **si una línea es bien‑formada, su etiqueta es una de las 21**.
+Junto con los 21 bicondicionales, deja `lineWF` (y, conocida la etiqueta, `premsOf`) **totalmente
+determinado**. Es verdadero en el modelo pretendido (el verificador solo acepta las 21 reglas), y es
+un axioma **de la teoría objeto** (un `def ax_*` de la lista `axioms`), no un postulado gödeliano.
+Ver `GODEL-D3-TRACKED-DESIGN.md` §16. -/
+
+/-- Etiqueta de regla de una línea `⟨concl, tag, args…⟩`: el elemento de índice `1`. -/
+def lineTag (line : Term) : Term := nthc line (succ zero)
+
+/-- Disyunción `lineTag L = 0 ∨ lineTag L = 1 ∨ … ∨ lineTag L = n`. -/
+def tagDisj (L : Term) : Nat → Formula
+  | 0 => lineTag L =eq numeralM 0
+  | n + 1 => lor (lineTag L =eq numeralM (n + 1)) (tagDisj L n)
+
+/-- **Inversión de `lineWF`**: `∀line. lineWF line ⇒ (⋁_{k=0}^{20} lineTag line =eq numeralM k)`. -/
+def ax_lineWF_inv : Formula :=
+  forall_ (Formula.impl (lineWF (.var 0)) (tagDisj (.var 0) 20))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -1264,7 +1290,8 @@ def axioms : List Formula := [
   ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
   ax_lineWF_qconf, ax_premsOf_qconf,
   ax_lineWF_listInd, ax_premsOf_listInd,
-  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ
+  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
+  ax_lineWF_inv
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1291,7 +1318,8 @@ def codingAxioms : List Formula := [
   ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
   ax_lineWF_qconf, ax_premsOf_qconf,
   ax_lineWF_listInd, ax_premsOf_listInd,
-  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ
+  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
+  ax_lineWF_inv
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/
