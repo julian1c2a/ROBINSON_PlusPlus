@@ -781,8 +781,70 @@ resolver en el átomo de igualdad.
    puente `tcFn·=eq termCode·` con `prf_tc_numeral` → `hbI`/`hbC` → `d3_prf_of_reflect_bounded`
    → `d3_prf` → `goedel_second_prf`.
 
-**No veo obstrucción** en 1‑3. El puente §15.1 garantiza que basta reflejar la forma acotada; el
-átomo `=eq` (§15.3‑§15.4) es el primero del cuerpo y está cerrado libre de muro.
+**Obstrucción encontrada en (1)** — ver §16.
+
+---
+
+## 16 · OBSTRUCCIÓN: `lineWF` / `premsOf` no están determinados (falta axioma de inversión)
+
+**Hallazgo (2026‑07‑10), verificado sobre `Minimal/Axioms.lean`.** Al atacar el átomo `lineWF` de
+`chainOkB` aparece una obstrucción **real**, distinta de la de Tarski.
+
+### 16.1 El hecho
+
+- `lineWF t := Formula.atom "lineWF" [t]` es un **átomo primitivo**.
+- Sus **21 axiomas** (`ax_lineWF_mp`, …, `ax_lineWF_listInd`) son bicondicionales **indexados por la
+  etiqueta de regla**: `lineWF ⟨concl, numeralM k, args…⟩ ⇔ <condición estructural>`, con
+  `k ∈ {0,…,20}`.
+- **NO existe axioma de inversión / completitud** (`lineWF t ⇒ la etiqueta de t está en {0..20}`).
+- `premsOf` (símbolo de función) tiene exactamente el mismo patrón: 21 ecuaciones por etiqueta, sin
+  inversión.
+
+**Consecuencia:** para una línea `t` con etiqueta fuera de `{0..20}` (p. ej. `numeralM 21`), o con
+etiqueta no numeral, **`lineWF t` queda indeterminado** por los axiomas. Luego
+
+```lean
+Prf (lineWF t ⇒ provCodeC' (lineWF t))     -- ← NO derivable para `t` abstracto
+```
+
+porque de la hipótesis `lineWF t` la teoría **no puede extraer la etiqueta** de `t`, y sin etiqueta
+no puede reconstruir la prueba interna de la condición estructural.
+
+### 16.2 Por qué `chainOk` sí y `lineWF` no
+
+`chainOk` tiene `ax_chainOk_nil` + `ax_chainOk_cons` (recursión sobre `nil`/`cons`) y el esquema
+`ax_list_induction` cuantifica sobre **todo `Term`**. Por tanto `chainOk` **sí** está determinado y
+su reflexión se ataca por inducción de listas. `lineWF`, en cambio, discrimina sobre un **numeral**
+(la etiqueta), y no hay ningún axioma que acote ese numeral.
+
+### 16.3 Alcance
+
+Esto **no afecta a la solidez** de nada ya demostrado (D1/D2/Gödel I siguen intactos: sólo usan
+`lineWF` sobre líneas **concretas**, con etiqueta conocida). Afecta sólo a la **reflexión de `hbC`**
+(`chainOkB`), que necesita `lineWF` para líneas abstractas.
+
+**`hbI` NO está afectado:** `boundedIn x L = ∃ i < lenc L. nthc L i =eq x` sólo contiene los átomos
+`=eq` (cerrado, §15.4) y `<` (reducible a `=eq` + `∃` acotado). La rama `hbI` puede seguir sin tocar
+la axiomática.
+
+### 16.4 Arreglo mínimo propuesto
+
+Añadir **un** axioma de inversión a `Minimal/Axioms.lean` (precedente exacto: la capa `lenc`/`nthc`
+de la fase 1a — es un `def ax_*` de la teoría objeto, **no** una declaración `axiom` de Lean, así que
+los 7 `axiom` de `AXIOMS.md` **no cambian**):
+
+```lean
+def ax_lineWF_inv : Formula :=      -- ∀line. lineWF line ⇒ (⋁_{k=0}^{20} nthc line 1 =eq numeralM k)
+```
+
+Con él, `lineWF` queda **totalmente determinado** (inversión + los 21 bicondicionales), `premsOf`
+también (conocida la etiqueta, su ecuación aplica), y la reflexión de `lineWF t` se reduce a reflejar
+una **disyunción finita de átomos `=eq`** — que ya sabemos hacer (`pcc_eq_tracked`).
+
+Debe añadirse a **`axioms` y `codingAxioms`** (para preservar `axioms_eq` por `rfl`), igual que en
+la fase 1a.
+
+**Es una decisión matemática (amplía la teoría objeto): requiere sanción explícita.**
 
 ---
 

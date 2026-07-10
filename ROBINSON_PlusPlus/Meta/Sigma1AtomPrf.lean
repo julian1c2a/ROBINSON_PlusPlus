@@ -216,6 +216,70 @@ theorem pcc_eq_of_tc_bridge (t u : Term)
     PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_tracked t u) _) (prfH_hyp_self _)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provFromCode_eq_congr ht hu) _) h1
 
+/-! ### Átomos unarios: `atom1CodeFn` (constructor object del código de `Formula.atom s [a]`)
+
+Necesario para el átomo `lineWF t = Formula.atom "lineWF" [t]` del cuerpo de `chainOkB`.
+Espeja `atom2CodeFn` (`Meta/TrackedCorePrf.lean`), que cubre los átomos binarios (`In`,
+`chainOk`, `allIn`). -/
+
+/-- Constructor object del código de un **átomo unario** `Formula.atom s [a]` desde el código `a`
+    de su argumento: `⟨3, ⌜s⌝, [a]⟩`. -/
+def atom1CodeFn (s : String) (a : Term) : Term :=
+  cons (numeral 3) (cons (strCode s) (cons (cons a nil) nil))
+
+/-- **Puente definicional** con `formCode` (por definición de `formCode` sobre `.atom`). -/
+theorem atom1CodeFn_termCode (s : String) (a : Term) :
+    atom1CodeFn s (termCode a) = formCode (Formula.atom s [a]) := rfl
+
+/-- **Clausura** de `atom1CodeFn s a` bajo `liftTerm`: cerrado si `a` lo es. -/
+theorem liftTerm_atom1CodeFn (s : String) (a : Term)
+    (ha : ∀ lvl, liftTerm lvl a = a) :
+    ∀ lvl, liftTerm lvl (atom1CodeFn s a) = atom1CodeFn s a := by
+  intro lvl
+  simp only [atom1CodeFn, cons, nil, zero, liftTerm, liftTerms,
+    liftTerm_numeral, liftTerm_strCode, ha lvl]
+
+/-- **Congruencia** de `atom1CodeFn` en su argumento (`Prf`). -/
+theorem prf_congr_atom1CodeFn {s : String} {a a' : Term} (ha : Prf (a =eq a')) :
+    Prf (atom1CodeFn s a =eq atom1CodeFn s a') := by
+  unfold atom1CodeFn
+  exact prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head (prf_congr_cons_head ha)))
+
+/-- **Transporte** de la demostrabilidad de un átomo unario por igualdad del código de su
+    argumento (Leibniz object vía `provFromCode`). -/
+theorem prf_provFromCode_atom1_congr {s : String} {a a' : Term} (ha : Prf (a =eq a')) :
+    Prf (provFromCode (atom1CodeFn s a) ⇒ provFromCode (atom1CodeFn s a')) :=
+  prf_provCode_congr (prf_congr_atom1CodeFn ha)
+
+/-- **Clausura** de `provFromCode (atom1CodeFn s a)` bajo `liftFormula` (arg cerrado). -/
+theorem liftFormula_provFromCode_atom1 (k : Nat) (s : String) (a : Term)
+    (ha : ∀ lvl, liftTerm lvl a = a) :
+    liftFormula k (provFromCode (atom1CodeFn s a)) = provFromCode (atom1CodeFn s a) :=
+  liftFormula_provFromCode k (atom1CodeFn s a) (liftTerm_atom1CodeFn s a ha)
+
+/-- Constructor object del código de `lineWF t` desde el código `tc` de `t`. -/
+def lineWFCodeFn (tc : Term) : Term := atom1CodeFn "lineWF" tc
+
+/-- Puente `lineWFCodeFn (termCode t) = formCode (lineWF t)` (rfl). -/
+theorem lineWFCodeFn_termCode (t : Term) :
+    lineWFCodeFn (termCode t) = formCode (lineWF t) := rfl
+
+/-- `provCodeC' (lineWF t)` es `provFromCode` del código con `termCode` (definicional). -/
+theorem provCodeC'_lineWF_eq (t : Term) :
+    provCodeC' (lineWF t) = provFromCode (lineWFCodeFn (termCode t)) := rfl
+
+/-- **Reflexión RASTREADA del átomo `lineWF`** (transporte; espejo de `=eq`/`In`).
+
+    ⚠ **NOTA (obstrucción, ver `GODEL-D3-TRACKED-DESIGN.md` §16):** este es el *transporte*, no la
+    *producción*. A diferencia de `=eq` (cuya reflexividad es un axioma, ⇒ reflexión libre de muro),
+    `lineWF` es un **átomo primitivo** cuyos 21 axiomas son bicondicionales indexados por etiqueta de
+    regla, **sin axioma de inversión**. Por eso `Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))`
+    **no es derivable** para `t` abstracto: de `lineWF t` la teoría no puede extraer la etiqueta. -/
+theorem prf_provCodeC'_lineWF_of_tracked {t tc : Term}
+    (ht : Prf (tc =eq termCode t)) (h : Prf (provFromCode (lineWFCodeFn tc))) :
+    Prf (provCodeC' (lineWF t)) :=
+  prf_mp (prf_provFromCode_atom1_congr ht) h
+
 end ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 
 export ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (
@@ -226,4 +290,7 @@ export ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (
   prf_provFromCode_intro eqreflLine prf_lineOk_eqrefl prf_chainOk_eqrefl
   prf_in_runFn_eqrefl prf_provFromCode_eqCodeFn_refl
   PrfH_congr_tcFn PrfH_congr_eqCodeFn pcc_eq_tracked pcc_eq_of_tc_bridge
+  atom1CodeFn atom1CodeFn_termCode liftTerm_atom1CodeFn prf_congr_atom1CodeFn
+  prf_provFromCode_atom1_congr liftFormula_provFromCode_atom1
+  lineWFCodeFn lineWFCodeFn_termCode provCodeC'_lineWF_eq prf_provCodeC'_lineWF_of_tracked
 )
