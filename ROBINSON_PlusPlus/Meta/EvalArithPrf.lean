@@ -211,6 +211,78 @@ theorem pcc_ax5_computed (a b : Term) :
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   exact prf_mp (prf_provCode_congr hchain) (pcc_ax5_inst (tcFn a) B)
 
+/-! ### Lógica ecuacional INTERNA sobre códigos (§25.4)
+
+Con **`pcc_leibniz_code`** (Leibniz codificado, testigo de una línea, §25.2) y **`pcc_mp_code_open`**
+(MP con códigos abiertos, §25.3) se razona ecuacionalmente **dentro de `Prov`**.
+
+Una restricción real: al sustituir en el código‑contexto `Ac`, el `substtc` alcanza también los
+subtérminos ya presentes. Por eso los lemas piden que el código fijo sea **`substtc`‑invariante**
+(`∀ W, substtc zero W X =eq X`), hipótesis que (A) (`prf_substtc_tcFn`) y las ecuaciones de `funcc`
+descargan para todos los códigos que construimos (`tcFn`, `addcT`, `succcT`). -/
+
+/-- **Leibniz codificado, aplicado**: de `Prov(⌜t₁ = t₂⌝)` y `Prov(⌜Ac[t₁]⌝)` sale `Prov(⌜Ac[t₂]⌝)`.
+    Dos usos de `pcc_mp_code_open` sobre `pcc_leibniz_code`. -/
+theorem pcc_leibniz_apply (Ac t₁ t₂ : Term)
+    (heq : Prf (provFromCode (eqc t₁ t₂)))
+    (h1 : Prf (provFromCode (substfc zero t₁ Ac))) :
+    Prf (provFromCode (substfc zero t₂ Ac)) :=
+  pcc_mp_code_apply
+    (pcc_mp_code_apply (pcc_leibniz_code Ac t₁ t₂) heq)
+    h1
+
+/-- **Transitividad interna de `=`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜Y=Z⌝) → Prov(⌜X=Z⌝)`.
+    Leibniz con el contexto `Ac := (X = v₀)`, sustituyendo `v₀ ↦ Y` y luego `v₀ ↦ Z`. -/
+theorem pcc_eq_trans_code (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (h1 : Prf (provFromCode (eqc X Y))) (h2 : Prf (provFromCode (eqc Y Z))) :
+    Prf (provFromCode (eqc X Z)) := by
+  let Ac : Term := eqc X (varc (numeral 0))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc X t) := fun t =>
+    prf_eq_trans (prf_substfc_eq zero t X (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hX t) (prf_substtc_varc0 t))
+  have hY : Prf (provFromCode (substfc zero Y Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp Y))) h1
+  have hZ : Prf (provFromCode (substfc zero Z Ac)) := pcc_leibniz_apply Ac Y Z h2 hY
+  exact prf_mp (prf_provCode_congr (hcomp Z)) hZ
+
+/-- **Congruencia interna de `σ`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜σX = σY⌝)`.
+    Leibniz con el contexto `Ac := (σX = σv₀)`; la base `Ac[X]` es la **reflexividad codificada**
+    (`prf_provFromCode_eqCodeFn_refl`, libre de muro). -/
+theorem pcc_congr_succ_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (heq : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (eqc (succcT X) (succcT Y))) := by
+  let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
+    intro t
+    refine prf_eq_trans (prf_substfc_eq zero t (succcT X) (succcT (varc (numeral 0)))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_succcT zero t X) (prf_congr_succcT (hX t))
+    · exact prf_eq_trans (prf_substtc_succcT zero t (varc (numeral 0)))
+        (prf_congr_succcT (prf_substtc_varc0 t))
+  have hrefl : Prf (provFromCode (eqc (succcT X) (succcT X))) :=
+    prf_provFromCode_eqCodeFn_refl (succcT X)
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) hrefl
+  have hAY : Prf (provFromCode (substfc zero Y Ac)) := pcc_leibniz_apply Ac X Y heq hAX
+  exact prf_mp (prf_provCode_congr (hcomp Y)) hAY
+
+/-! #### Invariancias `substtc` de los códigos que usamos (descargan `hX`) -/
+
+/-- `tcFn a` es `substtc`‑invariante (es (A), `prf_substtc_tcFn`). -/
+theorem substtc_inv_tcFn (a : Term) : ∀ W, Prf (substtc zero W (tcFn a) =eq tcFn a) :=
+  fun W => prf_substtc_tcFn W a
+
+/-- `succcT X` es `substtc`‑invariante si `X` lo es. -/
+theorem substtc_inv_succcT {X : Term} (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    ∀ W, Prf (substtc zero W (succcT X) =eq succcT X) :=
+  fun W => prf_eq_trans (prf_substtc_succcT zero W X) (prf_congr_succcT (hX W))
+
+/-- `addcT X Y` es `substtc`‑invariante si `X` e `Y` lo son. -/
+theorem substtc_inv_addcT {X Y : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
+    ∀ W, Prf (substtc zero W (addcT X Y) =eq addcT X Y) :=
+  fun W => prf_eq_trans (prf_substtc_addcT zero W X Y) (prf_congr_addcT (hX W) (hY W))
+
 end ROBINSON_PlusPlus.Meta.EvalArithPrf
 
 export ROBINSON_PlusPlus.Meta.EvalArithPrf (
@@ -219,4 +291,6 @@ export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   succcT prf_tc_succ' prf_congr_succcT
   prf_substtc_funcc1 prf_substtc_funcc2 prf_substtc_succcT prf_substtc_addcT prf_substtc_varc0
   pcc_ax5_computed
+  pcc_leibniz_apply pcc_eq_trans_code pcc_congr_succ_code
+  substtc_inv_tcFn substtc_inv_succcT substtc_inv_addcT
 )

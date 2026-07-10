@@ -44,70 +44,83 @@ theorem liftTerm_implc (Ac Bc : Term)
   intro c
   simp only [implc, cons, nil, zero, succ, liftTerm, liftTerms, hAc c, hBc c]
 
-/-- **MP a nivel de código** (D2 para códigos cerrados arbitrarios):
-    `Prov(⌜Ac ⇒ Bc⌝) ⇒ (Prov(⌜Ac⌝) ⇒ Prov(⌜Bc⌝))`.
+/-- **Versión lift‑aware (`Ac`, `Bc` ABIERTOS)**: el lift atraviesa `implc` (tag cerrado). -/
+theorem liftTerm_implc_open (Ac Bc : Term) :
+    ∀ c, liftTerm c (implc Ac Bc) = implc (liftTerm c Ac) (liftTerm c Bc) := by
+  intro c
+  simp only [implc, cons, nil, zero, succ, liftTerm, liftTerms]
 
-    Ensamblaje `r = p ++ q ++ [mpline]`, espejo exacto de `d2_prf`, con `Ac`/`Bc` en lugar de
-    `formCode A`/`formCode B` y las clausuras `hAc`/`hBc` en lugar de `liftTerm_formCode`. -/
-theorem pcc_mp_code (Ac Bc : Term)
-    (hAc : ∀ c, liftTerm c Ac = Ac) (hBc : ∀ c, liftTerm c Bc = Bc) :
+/-- **MP a nivel de código, con códigos ABIERTOS** (§25.3):
+    `Prov(⌜Ac ⇒ Bc⌝) ⇒ (Prov(⌜Ac⌝) ⇒ Prov(⌜Bc⌝))`, **sin** exigir `Ac`, `Bc` cerrados.
+
+    Ensamblaje `r = p ++ q ++ [mpline]`, espejo de `d2_prf`. La clausura `hAc`/`hBc` era, como `hw`
+    (§17) y `hAc` en el `∀`‑elim (§22), un **artefacto de colapsar los lifts**: aquí se **arrastran**
+    (`liftFormula_provFromCode_open` los traslada al código, `liftTerm_implc_open` los mete bajo el
+    `implc`). Tras los dos `∃`‑elim los códigos quedan **doblemente lifteados** (`↑↑Ac`, `↑↑Bc`), y el
+    resto de la prueba pasa verbatim con ellos. -/
+theorem pcc_mp_code_open (Ac Bc : Term) :
     Prf (provFromCode (implc Ac Bc) ⇒ (provFromCode Ac ⇒ provFromCode Bc)) := by
-  have hLA : ∀ k, liftFormula k (provFromCode Ac) = provFromCode Ac :=
-    fun k => liftFormula_provFromCode k Ac hAc
-  have hLB : ∀ k, liftFormula k (provFromCode Bc) = provFromCode Bc :=
-    fun k => liftFormula_provFromCode k Bc hBc
-  have hLI : ∀ c, liftTerm c (implc Ac Bc) = implc Ac Bc := liftTerm_implc Ac Bc hAc hBc
   -- elimina el ∃ externo de `provFromCode (implc Ac Bc)`; testigo `p = #0`
   refine prf_ex_elim_imp ?_
-  simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
-    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hLI, liftFormula, hLA, hLB]
-  -- ctx: [P_AB[p=#0]] ; goal: provFromCode Ac ⇒ provFromCode Bc
-  refine deduction_aux ?_ (provFromCode Ac)
-    [land (chainOk nil (.var 0)) (In (implc Ac Bc) (runFn nil (.var 0)))] rfl
-  -- elimina el ∃ de `provFromCode Ac` (testigo `q = #0`)
-  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
-  simp only [List.map_cons, List.map_nil, liftFormula, liftTerm, liftTerms,
-    substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
-    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
-    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift, hLI, hLA, hLB, hAc, hBc]
-  -- testigo `r = p ++ q ++ [mpline]`,  mpline = ⟨Bc, 16, Ac⟩
-  refine PrfH_ex_intro
-    (concat (.var 1) (concat (.var 0)
-      (cons (cons Bc (cons (numeralM 16) (cons Ac nil))) nil))) ?_
-  -- NO colapsar aquí `liftTerm 0 Bc`: se cancela con la subst externa `substTerm 0 r (·)`
-  -- (`FOL.substTerm_liftTerm`). Incluir `hBc` lo destruiría (mismo escollo que `pcc_exIntro_code`).
+  -- CONSECUENTE: el lift se traslada a los códigos
+  have hC : liftFormula 0 (provFromCode Ac ⇒ provFromCode Bc)
+      = (provFromCode (liftTerm 0 Ac) ⇒ provFromCode (liftTerm 0 Bc)) := by
+    simp only [liftFormula, liftFormula_provFromCode_open]
+  rw [hC]
+  -- ANTECEDENTE: el lift atraviesa el `implc`
+  simp only [liftTerm_implc_open Ac Bc]
   simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  -- abreviaturas
-  let Γ : List Formula := [land (chainOk nil (.var 0)) (In Ac (runFn nil (.var 0))),
-    provFromCode Ac,
-    land (chainOk nil (.var 1)) (In (implc Ac Bc) (runFn nil (.var 1)))]
+  -- ctx: [P_AB[p=#0]] ; goal: provFromCode ↑Ac ⇒ provFromCode ↑Bc
+  refine deduction_aux ?_ (provFromCode (liftTerm 0 Ac))
+    [land (chainOk nil (.var 0))
+      (In (implc (liftTerm 0 Ac) (liftTerm 0 Bc)) (runFn nil (.var 0)))] rfl
+  -- elimina el ∃ de `provFromCode ↑Ac` (testigo `q = #0`); el contexto se liftea otra vez
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil, liftFormula, liftFormula_provFromCode_open,
+    liftTerm_implc_open, liftTerm, liftTerms,
+    substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero, Nat.reduceAdd,
+    Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, Nat.zero_lt_succ,
+    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  -- abreviaturas: los códigos van DOBLEMENTE lifteados
+  let A2 : Term := liftTerm 0 (liftTerm 0 Ac)
+  let B2 : Term := liftTerm 0 (liftTerm 0 Bc)
+  -- testigo `r = p ++ q ++ [mpline]`,  mpline = ⟨B2, 16, A2⟩
+  refine PrfH_ex_intro
+    (concat (.var 1) (concat (.var 0)
+      (cons (cons B2 (cons (numeralM 16) (cons A2 nil))) nil))) ?_
+  -- NO colapsar aquí `liftTerm 0 B2`: se cancela con la subst externa `substTerm 0 r (·)`
+  simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  let Γ : List Formula := [land (chainOk nil (.var 0)) (In A2 (runFn nil (.var 0))),
+    provFromCode A2,
+    land (chainOk nil (.var 1)) (In (implc A2 B2) (runFn nil (.var 1)))]
   let p_ : Term := (.var 1)
   let q_ : Term := (.var 0)
-  let mpline : Term := cons Bc (cons (numeralM 16) (cons Ac nil))
+  let mpline : Term := cons B2 (cons (numeralM 16) (cons A2 nil))
   let Cpq : Term := runFn (runFn nil p_) q_
   have hqChain : PrfH Γ (chainOk nil q_) :=
     PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.head _))
-  have hqIn : PrfH Γ (In Ac (runFn nil q_)) :=
+  have hqIn : PrfH Γ (In A2 (runFn nil q_)) :=
     PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.head _))
   have hpChain : PrfH Γ (chainOk nil p_) :=
     PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
-  have hpIn : PrfH Γ (In (implc Ac Bc) (runFn nil p_)) :=
+  have hpIn : PrfH Γ (In (implc A2 B2) (runFn nil p_)) :=
     PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
-  have hCpq_mp : Prf (runFn Cpq (cons mpline nil) =eq concat Cpq (cons Bc nil)) :=
+  have hCpq_mp : Prf (runFn Cpq (cons mpline nil) =eq concat Cpq (cons B2 nil)) :=
     prf_eq_trans (prf_runFn_cons Cpq mpline nil)
       (prf_eq_trans (prf_runFn_nil _)
         (prf_congr_concat_left (prf_congr_cons_head
-          (prf_carc_cons Bc (cons (numeralM 16) (cons Ac nil))))))
+          (prf_carc_cons B2 (cons (numeralM 16) (cons A2 nil))))))
   have hRunR : Prf (runFn nil (concat p_ (concat q_ (cons mpline nil))) =eq
-      concat Cpq (cons Bc nil)) :=
+      concat Cpq (cons B2 nil)) :=
     prf_eq_trans (prf_runFn_concat nil p_ (concat q_ (cons mpline nil)))
       (prf_eq_trans (prf_runFn_concat (runFn nil p_) q_ (cons mpline nil)) hCpq_mp)
-  have hInB : PrfH Γ (In Bc (runFn nil (concat p_ (concat q_ (cons mpline nil))))) :=
+  have hInB : PrfH Γ (In B2 (runFn nil (concat p_ (concat q_ (cons mpline nil))))) :=
     prf_to_prfH (prf_eq_subst_in (prf_eq_symm hRunR)
-      (prf_In_mono Bc (cons Bc nil) Cpq (prf_in_cons_head Bc nil))) Γ
+      (prf_In_mono B2 (cons B2 nil) Cpq (prf_in_cons_head B2 nil))) Γ
   have hChainR : PrfH Γ (chainOk nil (concat p_ (concat q_ (cons mpline nil)))) := by
     refine PrfH_iff_mpr (prf_chainOk_concat nil p_ (concat q_ (cons mpline nil)))
       (PrfH_and_intro hpChain ?_)
@@ -117,25 +130,31 @@ theorem pcc_mp_code (Ac Bc : Term)
         (PrfH.mp Γ _ _ (prf_to_prfH (prf_chainOk_mono_imp (runFn nil p_) nil q_) Γ) hqChain)
     · refine PrfH_iff_mpr (prf_chainOk_cons Cpq mpline nil)
         (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
-      refine PrfH_and_intro (prf_to_prfH (prf_lineWF_mp Bc Ac) Γ) ?_
-      refine PrfH_allIn_subst2 (prf_to_prfH (prf_eq_symm (prf_premsOf_mp Bc Ac)) Γ) ?_
-      refine PrfH_iff_mpr (prf_allIn_cons Cpq (implc Ac Bc) (cons Ac nil))
+      refine PrfH_and_intro (prf_to_prfH (prf_lineWF_mp B2 A2) Γ) ?_
+      refine PrfH_allIn_subst2 (prf_to_prfH (prf_eq_symm (prf_premsOf_mp B2 A2)) Γ) ?_
+      refine PrfH_iff_mpr (prf_allIn_cons Cpq (implc A2 B2) (cons A2 nil))
         (PrfH_and_intro ?_ ?_)
       · exact PrfH_eq_subst_in (prf_to_prfH (prf_eq_symm (prf_runFn_weaken (runFn nil p_) q_)) Γ)
-          (PrfH.mp Γ _ _ (prf_to_prfH (prf_In_mono_right_imp (implc Ac Bc) (runFn nil q_)
+          (PrfH.mp Γ _ _ (prf_to_prfH (prf_In_mono_right_imp (implc A2 B2) (runFn nil q_)
             (runFn nil p_)) Γ) hpIn)
-      · refine PrfH_iff_mpr (prf_allIn_cons Cpq Ac nil)
+      · refine PrfH_iff_mpr (prf_allIn_cons Cpq A2 nil)
           (PrfH_and_intro ?_ (prf_to_prfH (prf_allIn_nil _) Γ))
         exact PrfH_eq_subst_in (prf_to_prfH (prf_eq_symm (prf_runFn_weaken (runFn nil p_) q_)) Γ)
-          (PrfH.mp Γ _ _ (prf_to_prfH (prf_In_mono_imp Ac (runFn nil q_) (runFn nil p_)) Γ) hqIn)
+          (PrfH.mp Γ _ _ (prf_to_prfH (prf_In_mono_imp A2 (runFn nil q_) (runFn nil p_)) Γ) hqIn)
   exact PrfH_and_intro hChainR hInB
 
-/-- **MP interno como esquema, a nivel de código** (aplicación directa). -/
+/-- **Corolario (compatibilidad)**: la versión con `Ac`, `Bc` cerrados. Las hipótesis `hAc`/`hBc` ya
+    **no se usan** (cuarto artefacto de clausura; ver `hw` §17, `hAc` §22). -/
+theorem pcc_mp_code (Ac Bc : Term)
+    (_hAc : ∀ c, liftTerm c Ac = Ac) (_hBc : ∀ c, liftTerm c Bc = Bc) :
+    Prf (provFromCode (implc Ac Bc) ⇒ (provFromCode Ac ⇒ provFromCode Bc)) :=
+  pcc_mp_code_open Ac Bc
+
+/-- **MP interno como esquema, a nivel de código** (aplicación directa, códigos ABIERTOS). -/
 theorem pcc_mp_code_apply {Ac Bc : Term}
-    (hAc : ∀ c, liftTerm c Ac = Ac) (hBc : ∀ c, liftTerm c Bc = Bc)
     (himp : Prf (provFromCode (implc Ac Bc))) (ha : Prf (provFromCode Ac)) :
     Prf (provFromCode Bc) :=
-  prf_mp (prf_mp (pcc_mp_code Ac Bc hAc hBc) himp) ha
+  prf_mp (prf_mp (pcc_mp_code_open Ac Bc) himp) ha
 
 /-! ### Instanciación de axiomas CODIFICADOS de la teoría
 
@@ -197,6 +216,6 @@ theorem pcc_ax5_inst (w₁ w₂ : Term) :
 end ROBINSON_PlusPlus.Meta.MpCodePrf
 
 export ROBINSON_PlusPlus.Meta.MpCodePrf (
-  liftTerm_implc pcc_mp_code pcc_mp_code_apply
+  liftTerm_implc liftTerm_implc_open pcc_mp_code_open pcc_mp_code pcc_mp_code_apply
   pcc_thm_inst pcc_thm_inst2 pcc_axiom_inst pcc_axiom_inst2 pcc_ax4_inst pcc_ax5_inst
 )

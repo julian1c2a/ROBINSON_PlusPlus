@@ -1433,6 +1433,79 @@ traslada el lift al código, y el ensamblaje `p ++ q ++ [mpline]` pasa con `lift
 
 ---
 
+## 26 · `pcc_mp_code_open` y la LÓGICA ECUACIONAL INTERNA sobre códigos
+
+### 26.1 `hAc`/`hBc` eran el **cuarto** artefacto de clausura
+
+```lean
+liftTerm_implc_open (Ac Bc) : liftTerm c (implc Ac Bc) = implc (liftTerm c Ac) (liftTerm c Bc)
+pcc_mp_code_open    (Ac Bc) : provFromCode (implc Ac Bc) => (provFromCode Ac => provFromCode Bc)
+```
+
+**sin** `hAc`/`hBc`. Se arrastran los lifts: `liftFormula_provFromCode_open` los traslada al código y
+`liftTerm_implc_open` los mete bajo el `implc`. Tras los **dos** `∃`-elim los códigos quedan
+**doblemente lifteados** (`↑↑Ac`, `↑↑Bc`) y el ensamblaje `p ++ q ++ [mpline]` pasa verbatim.
+`[propext, choice, Quot.sound]`. `pcc_mp_code` queda como corolario; `pcc_mp_code_apply` pierde las
+hipótesis.
+
+**Recuento de artefactos de clausura:** `hw` (§17), `hAc` del `∀`-elim (§22), `hAc`/`hBc` del MP
+(aquí). Los tres tenían la misma cura: **arrastrar los lifts, no colapsarlos**.
+
+### 26.2 La lógica ecuacional interna
+
+Con `pcc_leibniz_code` (§25.2) + `pcc_mp_code_open`:
+
+```lean
+pcc_leibniz_apply (Ac t1 t2) (heq : Prov(<t1=t2>)) (h1 : Prov(<Ac[t1]>)) : Prov(<Ac[t2]>)
+pcc_eq_trans_code (X Y Z) (hX) (h1 : Prov(<X=Y>)) (h2 : Prov(<Y=Z>)) : Prov(<X=Z>)
+pcc_congr_succ_code (X Y) (hX) (heq : Prov(<X=Y>)) : Prov(<sigma X = sigma Y>)
+```
+
+Todos `[propext, choice, Quot.sound]`.
+
+- **Transitividad**: Leibniz con el contexto `Ac := (X = v0)`.
+- **Congruencia de `sigma`**: Leibniz con `Ac := (sigma X = sigma v0)`, y la base `Ac[X]` es la
+  **reflexividad codificada** (`prf_provFromCode_eqCodeFn_refl`, libre de muro, §15.4).
+
+**Restricción real (`hX`).** Al sustituir en el código-contexto `Ac`, el `substtc` alcanza también los
+subtérminos ya presentes. Por eso los lemas piden que el código fijo `X` sea **`substtc`-invariante**
+(`forall W, substtc zero W X =eq X`). No es un muro: (A) (§23) lo da para `tcFn a`, y las ecuaciones
+de `funcc` lo propagan:
+
+```lean
+substtc_inv_tcFn (a)          : forall W, substtc zero W (tcFn a) =eq tcFn a
+substtc_inv_succcT (hX)       : ... (succcT X) ...
+substtc_inv_addcT  (hX) (hY)  : ... (addcT X Y) ...
+```
+
+Verificado: `substtc_inv_addcT (substtc_inv_tcFn a) (substtc_inv_succcT (substtc_inv_tcFn b))`
+descarga la invariancia de `addcT (tcFn a) (succcT (tcFn b))`, el código real de la inducción.
+
+### 26.3 Lo que queda
+
+El **paso inductivo de `+`** ya encaja pieza a pieza (verificado en sondeo):
+
+```text
+(B)  Prov(<a. + sigma b.       =  sigma(a. + b.)>)          -- pcc_ax5_computed
+(HI) Prov(<a. + b.             =  (a+b).>)
+     --pcc_congr_succ_code-->  Prov(<sigma(a. + b.) = sigma((a+b).)>)
+     --pcc_eq_trans_code-->    Prov(<a. + sigma b.  = sigma((a+b).)>)
+     --prf_provCode_congr-->   Prov(<a. + (sigma b).  =  (a + sigma b).>)   = evalAddCode a (sigma b)
+```
+
+(el último transporte usa `prf_tc_succ'` y `prf_congr_tcFn` sobre `prf_add_succ_t`).
+
+Falta sólo la **forma implicación** de los combinadores (hoy toman hipótesis `Prf`, y la inducción
+`prf_nat_induction` necesita `Prf (Phi => Phi[sigma])`), es decir versiones `PrfH`/`_imp` de
+`pcc_congr_succ_code` y `pcc_eq_trans_code`. Luego:
+
+1. `pcc_eval_add_succ_imp` -> `prf_nat_induction` -> **evaluación provable de `+` COMPLETA**.
+2. Misma receta para `lenc`/`nthc`/`carc`/`runFn`.
+3. `<` (= `∃` + `=eq` + evaluación provable, §18).
+4. Cuantificadores acotados; inducción estructural -> `hbI`/`hbC` -> `d3_prf` -> `goedel_second_prf`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
