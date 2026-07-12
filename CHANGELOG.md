@@ -10,6 +10,29 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Fixed (2026-07-12) — SOLIDEZ del verificador: la linea GEN era incondicional
+
+**Bug critico de solidez** (descubierto al preparar el `forall i<b`): `ax_lineWF_gen` (tag 17) hacia
+`lineWF <concl, 17, body>` valida para conclusion ARBITRARIA, y su `premsOf` es solo `[body]` -- nada
+ligaba `concl`. Resultado: desde cualquier `body` en `checked` el verificador concluia cualquier
+formula. Testigo SIN sorry (`[propext, Classical.choice, Quot.sound]`): una cadena EQREFL + GEN que
+concluye `botc`, dando `Prf (provFromCode botc)`. Es decir, `Prov` era TOTAL (probaba `Prov(<phi>)`
+para toda `phi`), lo que vaciaba de contenido Godel II y el programa D3.
+
+**Fix** (sancionado): `ax_lineWF_gen` pasa a bicondicional, como todos los demas esquemas:
+
+```lean
+ax_lineWF_gen : forall_2 (lineWF <v1, 17, v0> <=> (v1 =eq forallc v0))
+```
+
+Actualizados `prf_lineWF_gen` (ReprPrf) y `lineWF_gen` (ProofChain) a la forma `<=>`, y sus dos usos
+en D1 (`Representability2Prf`/`Representability2`) via `iff_mpr ... (refl)` -- los pasos GEN reales
+concluyen `forallc body`, luego la completitud se preserva. `ax_lineWF_mp` (tambien incondicional) es
+SOLIDO: su `premsOf` incluye `implc premA concl`, que liga la conclusion.
+
+Verificado: exploit muerto; `goedel_first_real'`/`goedel_second'`/`repr_pos'_prf` con los MISMOS
+axiomas de antes, 0 sorrys. Build 85 jobs.
+
 ### Added (2026-07-10q) — §31.3: **reflexion de los DOS atomos Delta_0 desde hipotesis**
 
 `Meta/Delta0ReflectPrf.lean`. Con `pcc_exIntro_code_open` + `pcc_eval_add`:

@@ -513,12 +513,13 @@ theorem premsOf_mp (concl premA : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
-/-- Validez de una línea **gen**: incondicional. -/
+/-- Validez de una línea **gen**: la conclusión debe ser `forallc body` (bicondicional). -/
 theorem lineWF_gen (concl body : Term) :
-    axioms ⊢ lineWF (cons concl (cons (numeralM 17) (cons body nil))) := by
+    axioms ⊢ (lineWF (cons concl (cons (numeralM 17) (cons body nil))) ⇔
+      (concl =eq forallc body)) := by
   have hh := spec (spec (ax (show ax_lineWF_gen ∈ axioms by simp [axioms])) concl) body
-  simpa [ax_lineWF_gen, substFormula, substTerm, substTerms, lineWF, numeralM, cons, nil, zero, succ,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+  simpa [ax_lineWF_gen, substFormula, substTerm, substTerms, lineWF, forallc, numeralM, cons, nil,
+    zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
 
 /-- Premisas de una línea **gen**: `[body]`. -/
 theorem premsOf_gen (concl body : Term) :

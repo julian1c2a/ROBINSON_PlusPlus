@@ -257,10 +257,11 @@ theorem prf_premsOf_mp (concl premA : Term) :
   exact hh
 
 theorem prf_lineWF_gen (concl body : Term) :
-    Prf (lineWF (cons concl (cons (numeralM 17) (cons body nil)))) := by
+    Prf (lineWF (cons concl (cons (numeralM 17) (cons body nil))) ⇔
+      (concl =eq forallc body)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_lineWF_gen ∈ axioms by simp [axioms])) concl) body
-  simpa [ax_lineWF_gen, substFormula, substTerm, substTerms, lineWF, numeralM, cons, nil, zero, succ,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+  simpa [ax_lineWF_gen, substFormula, substTerm, substTerms, lineWF, forallc, numeralM, cons, nil,
+    zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
 
 theorem prf_premsOf_gen (concl body : Term) :
     Prf (premsOf (cons concl (cons (numeralM 17) (cons body nil))) =eq cons body nil) := by

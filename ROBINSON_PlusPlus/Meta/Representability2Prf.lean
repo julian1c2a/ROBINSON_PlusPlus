@@ -298,7 +298,9 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                   exact hsc.symm
                 subst hf
                 simp only [lineCode', lineJustif, hi, Option.getD_some]
-                refine prf_and_intro (prf_lineWF_gen _ _) ?_
+                refine prf_and_intro
+                  (prf_iff_mpr (prf_lineWF_gen (formCode (Formula.forall fi)) (formCode fi))
+                    (prf_refl _)) ?_
                 refine prf_allIn_subst2 (prf_eq_symm (prf_premsOf_gen (formCode (Formula.forall fi))
                   (formCode fi))) ?_
                 refine prf_iff_mpr (prf_allIn_cons (listFormCode acc) (formCode fi) nil) ?_

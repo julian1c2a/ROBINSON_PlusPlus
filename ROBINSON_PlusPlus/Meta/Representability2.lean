@@ -331,7 +331,9 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                   exact hsc.symm
                 subst hf
                 simp only [lineCode', lineJustif, hi, Option.getD_some]
-                refine Minimal.Axioms.and_intro (lineWF_gen _ _) ?_
+                refine Minimal.Axioms.and_intro
+                  (iff_mpr (lineWF_gen (formCode (Formula.forall fi)) (formCode fi))
+                    (Derives.refl axioms _)) ?_
                 refine allIn_subst2 (FOL.derive_eq_symm (premsOf_gen (formCode (Formula.forall fi))
                   (formCode fi))) ?_
                 refine iff_mpr (allIn_cons (listFormCode acc) (formCode fi) nil) ?_

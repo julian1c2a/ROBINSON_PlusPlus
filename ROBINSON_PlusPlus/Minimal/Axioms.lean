@@ -996,8 +996,11 @@ def ax_premsOf_mp : Formula :=
     cons (implc (.var 0) (.var 1)) (cons (.var 0) nil))
 
 -- Gen: línea `cons (∀body) (cons 17 (cons body nil))`. Premisa = `body` en contexto.
+-- La conclusión DEBE ser `forallc body` (bicondicional, como los demás esquemas): de lo contrario el
+-- verificador aceptaría concluir cualquier fórmula desde una premisa en `checked` (insólido).
 def ax_lineWF_gen : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))))
+  forall_2 (lineWF (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))) ⇔
+    ((.var 1) =eq forallc (.var 0)))
 def ax_premsOf_gen : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))) =eq
     cons (.var 0) nil)
