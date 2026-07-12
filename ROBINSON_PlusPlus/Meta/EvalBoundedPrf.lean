@@ -123,6 +123,40 @@ theorem pcc_and_elim_right_code {Ac Bc : Term}
     (h : Prf (provFromCode (andc Ac Bc))) : Prf (provFromCode Bc) :=
   pcc_mp_code_apply (pcc_c3_code Ac Bc) h
 
+/-! ### `∨`‑intro a nivel de código — líneas‑axioma J1/J2, libres de muro -/
+
+/-- **Línea‑axioma J1** (`∨`‑intro izq): `⟨implc a (orc a b), 5, a, b⟩`. -/
+def j1Line (a b : Term) : Term :=
+  cons (implc a (orc a b)) (cons (numeralM 5) (cons a (cons b nil)))
+
+/-- **Línea‑axioma J2** (`∨`‑intro der): `⟨implc b (orc a b), 6, a, b⟩`. -/
+def j2Line (a b : Term) : Term :=
+  cons (implc b (orc a b)) (cons (numeralM 6) (cons a (cons b nil)))
+
+/-- **J1 codificado, libre de muro**: `⊢ Prov(⌜Ac ⇒ (Ac ∨ Bc)⌝)`. -/
+theorem pcc_j1_code (Ac Bc : Term) :
+    Prf (provFromCode (implc Ac (orc Ac Bc))) :=
+  pcc_axline (implc Ac (orc Ac Bc)) (j1Line Ac Bc)
+    (prf_iff_mpr (prf_lineWF_j1 (implc Ac (orc Ac Bc)) Ac Bc) (prf_refl _))
+    (prf_carc_cons _ _) (prf_premsOf_j1 (implc Ac (orc Ac Bc)) Ac Bc)
+
+/-- **J2 codificado, libre de muro**: `⊢ Prov(⌜Bc ⇒ (Ac ∨ Bc)⌝)`. -/
+theorem pcc_j2_code (Ac Bc : Term) :
+    Prf (provFromCode (implc Bc (orc Ac Bc))) :=
+  pcc_axline (implc Bc (orc Ac Bc)) (j2Line Ac Bc)
+    (prf_iff_mpr (prf_lineWF_j2 (implc Bc (orc Ac Bc)) Ac Bc) (prf_refl _))
+    (prf_carc_cons _ _) (prf_premsOf_j2 (implc Bc (orc Ac Bc)) Ac Bc)
+
+/-- **`∨`‑intro izquierdo a nivel de código**: de `Prov(⌜Ac⌝)` sale `Prov(⌜Ac ∨ Bc⌝)`. -/
+theorem pcc_or_introL_code {Ac Bc : Term}
+    (h : Prf (provFromCode Ac)) : Prf (provFromCode (orc Ac Bc)) :=
+  pcc_mp_code_apply (pcc_j1_code Ac Bc) h
+
+/-- **`∨`‑intro derecho a nivel de código**: de `Prov(⌜Bc⌝)` sale `Prov(⌜Ac ∨ Bc⌝)`. -/
+theorem pcc_or_introR_code {Ac Bc : Term}
+    (h : Prf (provFromCode Bc)) : Prf (provFromCode (orc Ac Bc)) :=
+  pcc_mp_code_apply (pcc_j2_code Ac Bc) h
+
 /-! ### Congruencia de `andc` y cómputo de `substfc` sobre `ltCodeFn` -/
 
 theorem prf_congr_andc {a a' b b' : Term} (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
@@ -216,6 +250,7 @@ end ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 export ROBINSON_PlusPlus.Meta.EvalBoundedPrf (
   c1Line c2Line c3Line pcc_c1_code pcc_c2_code pcc_c3_code
   pcc_and_intro_code pcc_and_elim_left_code pcc_and_elim_right_code
+  j1Line j2Line pcc_j1_code pcc_j2_code pcc_or_introL_code pcc_or_introR_code
   prf_congr_andc prf_substfc_ltCodeFn_varc0
   bdExCode bdAllCode pcc_bdEx_intro pcc_bdAll_elim
 )

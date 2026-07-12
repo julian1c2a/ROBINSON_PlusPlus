@@ -211,9 +211,61 @@ theorem pcc_lt_tracked (s t : Term) :
   exact PrfH.mp _ _ _
     (prf_to_prfH (pcc_lt_intro_open_imp s' t' (tcFn (.var 0))) _) h2
 
+/-! ### Casos COMPOSICIONALES `∧` / `∨`
+
+La reflexión de una fórmula Δ₀ se compone de las reflexiones de sus partes. Con `Ac`/`Bc` los códigos
+(rastreados) de `φ`/`ψ`, y `hφ : φ ⇒ provFromCode Ac`, `hψ : ψ ⇒ provFromCode Bc`:
+
+* `∧`: `∧`‑elim object de la hipótesis + `pcc_and_intro_code` (§30);
+* `∨`: `∨`‑elim object (`PrfH_or_elim`) + `pcc_or_introL_code`/`pcc_or_introR_code` (§30).
+
+Ambos combinadores son **agnósticos del código** (`Ac`, `Bc` arbitrarios) y sólo suben las
+reflexiones de las partes. -/
+
+open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
+
+/-- **Reflexión composicional de `∧`**: de las reflexiones de `φ` y `ψ` (a códigos `Ac`, `Bc`) sale
+    la de `φ ∧ ψ` (al código `andc Ac Bc`). -/
+theorem pcc_reflect_and (φ ψ : Formula) (Ac Bc : Term)
+    (hφ : Prf (φ ⇒ provFromCode Ac)) (hψ : Prf (ψ ⇒ provFromCode Bc)) :
+    Prf ((φ ∧ ψ) ⇒ provFromCode (andc Ac Bc)) := by
+  refine prf_deduction ?_
+  have ha : PrfH [φ ∧ ψ] (provFromCode Ac) :=
+    PrfH.mp _ _ _ (prf_to_prfH hφ _) (PrfH_and_elim_left (prfH_hyp_self _))
+  have hb : PrfH [φ ∧ ψ] (provFromCode Bc) :=
+    PrfH.mp _ _ _ (prf_to_prfH hψ _) (PrfH_and_elim_right (prfH_hyp_self _))
+  -- de `pcc_c1_code` (⌜Ac ⇒ Bc ⇒ Ac∧Bc⌝), dos pasos de MP interno
+  have step1 : Prf (provFromCode Ac ⇒ provFromCode (implc Bc (andc Ac Bc))) :=
+    prf_mp (pcc_mp_code_open Ac (implc Bc (andc Ac Bc))) (pcc_c1_code Ac Bc)
+  have hImplBc : PrfH [φ ∧ ψ] (provFromCode (implc Bc (andc Ac Bc))) :=
+    PrfH.mp _ _ _ (prf_to_prfH step1 _) ha
+  have hBcToAnd : PrfH [φ ∧ ψ] (provFromCode Bc ⇒ provFromCode (andc Ac Bc)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open Bc (andc Ac Bc)) _) hImplBc
+  exact PrfH.mp _ _ _ hBcToAnd hb
+
+/-- **Reflexión composicional de `∨`**: de las reflexiones de `φ` y `ψ` sale la de `φ ∨ ψ` (al código
+    `orc Ac Bc`), por `∨`‑elim object. -/
+theorem pcc_reflect_or (φ ψ : Formula) (Ac Bc : Term)
+    (hφ : Prf (φ ⇒ provFromCode Ac)) (hψ : Prf (ψ ⇒ provFromCode Bc)) :
+    Prf ((lor φ ψ) ⇒ provFromCode (orc Ac Bc)) := by
+  refine prf_deduction ?_
+  refine PrfH_or_elim (prfH_hyp_self (lor φ ψ)) ?_ ?_
+  · -- caso φ:  Prov Ac  →  Prov(orc Ac Bc)   [J1]
+    have ha : PrfH [φ, lor φ ψ] (provFromCode Ac) :=
+      PrfH.mp _ _ _ (prf_to_prfH hφ _) (PrfH.hyp _ _ (List.Mem.head _))
+    exact PrfH.mp _ _ _
+      (prf_to_prfH (prf_mp (pcc_mp_code_open Ac (orc Ac Bc)) (pcc_j1_code Ac Bc)) _) ha
+  · -- caso ψ:  Prov Bc  →  Prov(orc Ac Bc)   [J2]
+    have hb : PrfH [ψ, lor φ ψ] (provFromCode Bc) :=
+      PrfH.mp _ _ _ (prf_to_prfH hψ _) (PrfH.hyp _ _ (List.Mem.head _))
+    exact PrfH.mp _ _ _
+      (prf_to_prfH (prf_mp (pcc_mp_code_open Bc (orc Ac Bc)) (pcc_j2_code Ac Bc)) _) hb
+
 end ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 
 export ROBINSON_PlusPlus.Meta.Delta0ReflectPrf (
   liftTerm_exc_open pcc_exIntro_code_open pcc_lt_intro_open_imp pcc_lt_intro_open
   liftTerm_ltCodeFn_tcFn pcc_lt_tracked
+  pcc_reflect_and pcc_reflect_or
 )
