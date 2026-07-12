@@ -13,6 +13,7 @@ open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
@@ -96,8 +97,49 @@ theorem pcc_bddDot_imp_inDot (φ : Formula) :
       (formCode (In (formCode φ) (runFn nil (.var 0))))
   exact prf_mp (prf_provCode_congr hbridge) hthm
 
+/-! ### Step B (puente) — `bddCarcDot φ` como `bdExCode` con argumentos DOTADOS
+
+El código dotado del antecedente `boundedCarcIn` es un `∃` acotado codificado (`bdExCode`) con:
+* cota `bdCarcB = lencT (liftc 0 ṗ)` (el `liftc 0` viene del binder de `substfc`);
+* cuerpo `bdCarcPhic φ = eqCodeFn (carcT (nthcT (liftc 0 ṗ) ⌜v₀⌝)) ⌜φ⌝` (con `⌜φ⌝ = termCode (formCode φ)`,
+  reducido vía `substCodeT_closed`).
+
+Establece `bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ)`: `prf_substfc_arith_open` lleva la forma
+`substfc` a `substCodeF`, y `substCodeF_boundedCarcIn` (ecuación META, rfl salvo la reducción del
+`formCode φ` cerrado) la identifica con `bdExCode`. -/
+
+/-- Cota (dotada, bajo el binder) del `∃` acotado de `boundedCarcIn`: `lencT (liftc 0 ṗ)`. -/
+noncomputable def bdCarcB : Term := lencT (liftc zero (tcFn (.var 0)))
+
+/-- Cuerpo (dotado) del `∃` acotado: `carcT (nthcT (liftc 0 ṗ) ⌜v₀⌝) = ⌜φ⌝`. -/
+noncomputable def bdCarcPhic (φ : Formula) : Term :=
+  eqCodeFn (carcT (nthcT (liftc zero (tcFn (.var 0))) (varc (numeral 0)))) (termCode (formCode φ))
+
+/-- **Forma META del código dotado de `boundedCarcIn`** (rfl salvo `substCodeT_closed` sobre el
+    `formCode φ` cerrado): `substCodeF 0 ṗ (boundedCarcIn ⌜φ⌝ #0) = bdExCode bdCarcB (bdCarcPhic φ)`. -/
+theorem substCodeF_boundedCarcIn (φ : Formula) :
+    substCodeF 0 (tcFn (.var 0)) (boundedCarcIn (formCode φ) (.var 0))
+      = bdExCode bdCarcB (bdCarcPhic φ) := by
+  have key : substCodeT 1 (liftc zero (tcFn (.var 0))) (liftTerm 0 (formCode φ))
+      = termCode (formCode φ) := by
+    rw [liftTerm_formCode]
+    exact substCodeT_closed 1 (liftc zero (tcFn (.var 0))) (formCode φ)
+      (fun c => liftTerm_formCode c φ)
+  simp only [boundedCarcIn, land, lt, lenc, carc, nthc, liftTerm, liftTerms, Nat.lt_irrefl,
+    reduceIte, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, substCodeF, substCodeT,
+    substCodeTs, bdExCode, bdCarcB, bdCarcPhic, exc, andc, numeral, ltCodeFn, atom2CodeFn, eqCodeFn,
+    lencT, carcT, nthcT, funcc, varc, key]
+
+/-- **`bddCarcDot φ` es `bdExCode` con argumentos dotados** (versión `Prf`): compone
+    `prf_substfc_arith_open` (forma `substfc` → `substCodeF`) con `substCodeF_boundedCarcIn`. -/
+theorem prf_bddCarcDot_eq (φ : Formula) :
+    Prf (bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ)) := by
+  have h := prf_substfc_arith_open 0 (tcFn (.var 0)) (boundedCarcIn (formCode φ) (.var 0))
+  rwa [substCodeF_boundedCarcIn φ] at h
+
 end ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 export ROBINSON_PlusPlus.Meta.D3InDotPrf (
   pcc_bdEx_intro_open inBwdBody bddCarcDot pcc_bddDot_imp_inDot
+  bdCarcB bdCarcPhic substCodeF_boundedCarcIn prf_bddCarcDot_eq
 )
