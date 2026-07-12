@@ -1773,6 +1773,57 @@ el sumatorio simbolico al numeral del valor, `prf_congr_tcFn` para identificar `
 
 ---
 
+## 32 · CASOS COMPOSICIONALES `and`/`or` + GEN interno + ladrillo aritmetico
+
+- Lineas J1/J2 libres de muro (`pcc_j1_code`/`pcc_j2_code`, `pcc_or_introL/R_code`) y combinadores
+  `pcc_reflect_and` / `pcc_reflect_or` (agnosticos del codigo). `[propext, choice, Quot.sound]`.
+- `pcc_gen_code (body) : provFromCode body => provFromCode (forallc body)` -- GEN interno, apendiza
+  una linea GEN (valida el fix de solidez, la linea 17 corregida). Estructural.
+- `prf_lt_succ_split (i b) : lt i (sigma b) => lor (lt i b) (i =eq b)` -- via el testigo k de
+  i+sigma k = sigma b (prf_zero_or_eq_succ_pred, SIN exists-elim interno). Ladrillo del forall-i<b.
+
+## 33 · DECISION (B): reformular el target sobre la forma PUNTEADA (dot-notation)
+
+Al montar el `forall i<b` y el ensamblaje se confirmo que `provCodeC' = provFromCode . formCode`
+codifica el ESQUEMA ABIERTO (variables como `varc n`), que para formulas abiertas (x,L,p abstractos
+en hbI/hbC) es en general **falso**. La completitud-Sigma1 provable de formulas abiertas usa en la
+literatura (Hajek-Pudlak, Paulson) la **notacion-punto** de Feferman: `Prov(<phi(x.)>)`, sustituyendo
+cada variable libre por el numeral de su valor via `num(x) = tcFn(x)`. Es decir, la capa tracked
+(tcFn) YA construida es la formulacion canonica; `formCode` puro solo sirve para sentencias.
+
+### 33.1 Keystone validado
+
+```text
+formCode(provCodeC' phi)  =  exc(formCode(bodyF phi))          (rfl salvo numeral 9 = sigma^9 0)
+  bodyF phi := chainOk nil #0  and  In <phi> (runFn nil #0)     (#0 = p, el testigo del exists)
+```
+
+Por tanto `pcc_exIntro_code_open (formCode(bodyF phi)) (tcFn #0)` lleva
+
+```text
+provFromCode( substfc 0 (tcFn #0) (formCode(bodyF phi)) )   -- reflexion PUNTEADA del cuerpo
+   ==>  provFromCode( exc(formCode(bodyF phi)) ) = provCodeC'(provCodeC' phi)   -- target de d3
+```
+
+**La codificacion punteada reutiliza `substCodeF`**: dotar la variable 0 = `substfc 0 (tcFn #0) .`,
+computable por `prf_substfc_arith_open 0 (tcFn #0) .`. El `substfc` distribuye sobre `and`
+(`prf_substfc_and`), asi que la reflexion punteada del cuerpo = `pcc_and_intro_code` de las dos
+reflexiones punteadas de los atomos `chainOk nil #0` e `In <phi> (runFn nil #0)`.
+
+### 33.2 Ladrillos restantes de (B)
+
+1. **`d3_prf_of_dotted`** (keystone, disenado): exists-elim de la hipotesis + `pcc_and_intro_code` +
+   `pcc_exIntro_code_open` (testigo `tcFn #0`). Reduce d3 a las reflexiones PUNTEADAS de `chainOk`/`In`.
+2. **hC_dot / hI_dot**: reflexion punteada de `chainOk nil p` e `In <phi> (runFn nil p)` con p
+   abstracto. El 2do arg `runFn nil p` es COMPUESTO => necesita la **evaluacion provable de `runFn`**
+   (fase estructural diferida) para reducir el termino simbolico al valor. Es la pieza dura restante.
+3. **forall-i<b-intro**: ley de sucesor acotada codificada (usa `prf_lt_succ_split` + `pcc_gen_code`)
+   + base + induccion interna. Necesaria para reflejar `boundedAllIn` dentro de `chainOkB`.
+4. Sustituir `d3_prf_of_reflect_bounded` por la version punteada => `d3_prf` => `goedel_second_prf`;
+   F7b retira `axiom d3`.
+
+---
+
 *Fin del diseño. Estado 2026‑07‑09: `tcFn` (§10) descartado (§11.2); testigo‑lista naíf descartado
 (§12.2); vía = **12‑A capa numérica Δ₀** (§12.4). **Fases 1 y 2 COMPLETAS** (`lenc`/`nthc` +
 `prf_In_iff_boundedIn` + `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB`; el verificador ya es Δ₀ y
