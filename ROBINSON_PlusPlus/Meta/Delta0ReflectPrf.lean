@@ -134,6 +134,59 @@ theorem pcc_exIntro_code_open (Ac w : Term) :
           (prf_to_prfH (prf_In_mono_right_imp Ain (cons (carc q2line) nil) Cp) Γ) hpIn
   exact PrfH_and_intro hChainR hInB
 
+/-- **GEN a nivel de código** (reflexión de la regla GEN, ahora que la línea 17 es sólida): para
+    `body` **arbitrario** (abierto), `Prf (provFromCode body ⇒ provFromCode (forallc body))`.
+
+    La cadena de `provFromCode body` ya tiene `body` en `checked`; se le apendiza **una línea GEN**
+    `⟨forallc ↑body, 17, ↑body⟩`, cuya premisa `↑body` está en `checked` y cuya `lineWF` vale por
+    reflexividad (`concl =eq forallc ↑body`, tras el fix de solidez). Arrastra el lift como
+    `pcc_exIntro_code_open`. -/
+theorem pcc_gen_code (body : Term) :
+    Prf (provFromCode body ⇒ provFromCode (forallc body)) := by
+  refine prf_ex_elim_imp ?_
+  rw [liftFormula_provFromCode_open 0 (forallc body), liftTerm_forallc_open body 0]
+  simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  refine PrfH_ex_intro
+    (concat (.var 0)
+      (cons (cons (forallc (liftTerm 0 body))
+              (cons (numeralM 17) (cons (liftTerm 0 body) nil))) nil)) ?_
+  simp only [substFormula, substTerm, substTerms, land, chainOk, In, runFn, nil, zero,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  let B' : Term := liftTerm 0 body
+  let genline : Term := cons (forallc B') (cons (numeralM 17) (cons B' nil))
+  let p_ : Term := (.var 0)
+  let Γ : List Formula := [land (chainOk nil p_) (In B' (runFn nil p_))]
+  let Cp : Term := runFn nil p_
+  let tl : Term := cons genline nil
+  have hpChain : PrfH Γ (chainOk nil p_) :=
+    PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.head _))
+  have hpIn : PrfH Γ (In B' (runFn nil p_)) :=
+    PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.head _))
+  have hmp : Prf (runFn Cp tl =eq concat Cp (cons (forallc B') nil)) :=
+    prf_eq_trans (prf_runFn_cons Cp genline nil)
+      (prf_eq_trans (prf_runFn_nil _)
+        (prf_congr_concat_left (prf_congr_cons_head
+          (prf_carc_cons (forallc B') (cons (numeralM 17) (cons B' nil))))))
+  have hRunR : Prf (runFn nil (concat p_ tl) =eq concat Cp (cons (forallc B') nil)) :=
+    prf_eq_trans (prf_runFn_concat nil p_ tl) hmp
+  have hInB : PrfH Γ (In (forallc B') (runFn nil (concat p_ tl))) :=
+    prf_to_prfH (prf_eq_subst_in (prf_eq_symm hRunR)
+      (prf_In_mono (forallc B') (cons (forallc B') nil) Cp
+        (prf_in_cons_head (forallc B') nil))) Γ
+  have hChainR : PrfH Γ (chainOk nil (concat p_ tl)) := by
+    refine PrfH_iff_mpr (prf_chainOk_concat nil p_ tl) (PrfH_and_intro hpChain ?_)
+    refine PrfH_iff_mpr (prf_chainOk_cons Cp genline nil)
+      (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
+    refine PrfH_and_intro
+      (prf_to_prfH (prf_iff_mpr (prf_lineWF_gen (forallc B') B') (prf_refl _)) Γ) ?_
+    refine PrfH_allIn_subst2 (prf_to_prfH (prf_eq_symm (prf_premsOf_gen (forallc B') B')) Γ) ?_
+    refine PrfH_iff_mpr (prf_allIn_cons Cp B' nil)
+      (PrfH_and_intro hpIn (prf_to_prfH (prf_allIn_nil _) Γ))
+  exact PrfH_and_intro hChainR hInB
+
 /-! ### `<` desde el testigo, código rastreado (`pcc_lt_intro` sin clausura) -/
 
 /-- **Reflexión de `<` con `a`, `b` ABIERTOS, en forma implicación**: de `Prov(⌜ ȧ + σK = ḃ ⌝)` sale
@@ -265,7 +318,7 @@ theorem pcc_reflect_or (φ ψ : Formula) (Ac Bc : Term)
 end ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 
 export ROBINSON_PlusPlus.Meta.Delta0ReflectPrf (
-  liftTerm_exc_open pcc_exIntro_code_open pcc_lt_intro_open_imp pcc_lt_intro_open
+  liftTerm_exc_open pcc_exIntro_code_open pcc_gen_code pcc_lt_intro_open_imp pcc_lt_intro_open
   liftTerm_ltCodeFn_tcFn pcc_lt_tracked
   pcc_reflect_and pcc_reflect_or
 )
