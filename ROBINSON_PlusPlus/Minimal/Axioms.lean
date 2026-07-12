@@ -1171,6 +1171,15 @@ def tagDisj (L : Term) : Nat → Formula
 def ax_lineWF_inv : Formula :=
   forall_ (Formula.impl (lineWF (.var 0)) (tagDisj (.var 0) 20))
 
+/-- **Buena‑formación estructural de `lineWF`**: una línea bien‑formada es un `cons` (reconstruible
+    de su cabeza `carc` y su cola `cdrc`). Companion de `ax_lineWF_inv`: toda línea de esquema
+    `⟨concl, tag, args⟩` cumple `carc = concl`, `cdrc = cons tag args`, luego
+    `line = cons (carc line) (cdrc line)`. **Refuerza** `lineWF` (no lo debilita), así que no afecta
+    la solidez del verificador. La necesita la evaluación de `carc (nthc p i)` (que solo evalúa sobre
+    `cons`) en la reflexión punteada del átomo `In` (ruta B, `hI_dot`). -/
+def ax_lineWF_cons : Formula :=
+  forall_ (Formula.impl (lineWF (.var 0)) ((.var 0) =eq cons (carc (.var 0)) (cdrc (.var 0))))
+
 -- ## Axiom Set
 
 /-- The complete list of axioms for the Minimal system. -/
@@ -1294,7 +1303,7 @@ def axioms : List Formula := [
   ax_lineWF_qconf, ax_premsOf_qconf,
   ax_lineWF_listInd, ax_premsOf_listInd,
   ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
-  ax_lineWF_inv
+  ax_lineWF_inv, ax_lineWF_cons
 ]
 
 /-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
@@ -1322,7 +1331,7 @@ def codingAxioms : List Formula := [
   ax_lineWF_qconf, ax_premsOf_qconf,
   ax_lineWF_listInd, ax_premsOf_listInd,
   ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
-  ax_lineWF_inv
+  ax_lineWF_inv, ax_lineWF_cons
 ]
 
 /-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/

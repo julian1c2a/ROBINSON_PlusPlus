@@ -10,6 +10,29 @@ this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.htm
 
 ## [Unreleased]
 
+### Added (2026-07-12b) — §36: buena-formacion estructural de lineas (ax_lineWF_cons) + chainOk => cons
+
+Nuevo axioma object (SANCIONADO por el usuario): ax_lineWF_cons.
+
+  def ax_lineWF_cons : forall_ (lineWF #0 => #0 =eq cons (carc #0) (cdrc #0))
+
+Una linea bien-formada es un cons (reconstruible de carc/cdrc). Companion de
+ax_lineWF_inv; REFUERZA lineWF (no lo debilita), no afecta la solidez del verificador.
+Anadido al final de axioms y codingAxioms (axioms_eq sigue por rfl). Los 7 axiom de
+Lean NO cambian. Verificado: goedel_first_real'/goedel_second' con los MISMOS axiomas.
+
+Meta/LineWFConsPrf.lean:
+  prf_lineWF_cons (line) : lineWF line => line =eq cons (carc line) (cdrc line)
+  prf_chainOk_lineWF (p i) : chainOk nil p => i < lenc p => lineWF (nthc p i)
+    -- via chainOkB (prf_chainOk_iff_chainOkB) + and-elim (lineOkB = lineWF ... ^ ...)
+  prf_line_is_cons (p i) : chainOk nil p => i < lenc p =>
+      nthc p i =eq cons (carc (nthc p i)) (cdrc (nthc p i))
+
+Es la pieza que resuelve la partialidad de carc sobre lineas abstractas: dado chainOk,
+la linea es cons, luego carc (nthc p i) evalua (pcc_eval_carc) en hI_dot.
+
+[propext, Classical.choice, Quot.sound]. Build 89 jobs, 0 sorrys, Lean v4.31.0.
+
 ### Fixed (2026-07-12) — SOLIDEZ del verificador: la linea GEN era incondicional
 
 **Bug critico de solidez** (descubierto al preparar el `forall i<b`): `ax_lineWF_gen` (tag 17) hacia
