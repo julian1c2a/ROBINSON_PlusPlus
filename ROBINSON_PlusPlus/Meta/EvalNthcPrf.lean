@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
+import ROBINSON_PlusPlus.Meta.EvalLtPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -20,6 +21,8 @@ open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 open ROBINSON_PlusPlus.Meta.EvalArithPrf
 open ROBINSON_PlusPlus.Meta.EvalListPrf
 open ROBINSON_PlusPlus.Meta.EvalRunFnPrf
+open ROBINSON_PlusPlus.Meta.EvalLtPrf
+open ROBINSON_PlusPlus.Meta.NatArithPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -94,8 +97,81 @@ theorem pcc_nthc_zero_code (h t : Term) :
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst2 BODY (show ax_nthc_zero ∈ axioms by simp [axioms]) (tcFn h) T)
 
+/-- **Ecuación `succ` de `nthc` CODIFICADA**:
+    `⊢ Prov(⌜nthc(cons ḣ ṫ, σ ı̇) = nthc(ṫ, ı̇)⌝)`.
+    De `pcc_axiom_inst3` de `ax_nthc_succ` (`forall_3`, testigos `tcFn h`, `tcFn t`, `tcFn i`),
+    computando el `substfc` **triple** sobre el código explícito: el interno (nivel 2) por
+    `prf_substfc_arith_open`, el de nivel 1 con testigo levantado (`liftc 0 (tcFn t)`, normalizado por
+    (A) e invariancia `substtc`‑nivel‑1 de `tcFn h`), y el externo (nivel 0). -/
+theorem pcc_nthc_succ_code (h t i : Term) :
+    Prf (provFromCode (eqCodeFn
+      (nthcT (consT (tcFn h) (tcFn t)) (succcT (tcFn i)))
+      (nthcT (tcFn t) (tcFn i)))) := by
+  let W2 : Term := liftc zero (liftc zero (tcFn h))
+  let W1 : Term := liftc zero (tcFn t)
+  let W0 : Term := tcFn i
+  let BODY : Formula := nthc (cons (.var 2) (.var 1)) (succ (.var 0)) =eq nthc (.var 1) (.var 0)
+  have hin : Prf (substfc (succ (succ zero)) W2 (formCode BODY)
+      =eq eqCodeFn (nthcT (consT W2 (varc (numeral 1))) (succcT (varc (numeral 0))))
+                   (nthcT (varc (numeral 1)) (varc (numeral 0)))) :=
+    prf_substfc_arith_open 2 W2 BODY
+  have hA2 : Prf (W2 =eq tcFn h) :=
+    prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn h)) (prf_liftc_tcFn h)
+  have hnorm : Prf (eqCodeFn (nthcT (consT W2 (varc (numeral 1))) (succcT (varc (numeral 0))))
+                             (nthcT (varc (numeral 1)) (varc (numeral 0)))
+      =eq eqCodeFn (nthcT (consT (tcFn h) (varc (numeral 1))) (succcT (varc (numeral 0))))
+                   (nthcT (varc (numeral 1)) (varc (numeral 0)))) :=
+    prf_congr_eqCodeFn
+      (prf_congr_nthcT (prf_congr_consT hA2 (prf_refl _)) (prf_refl _)) (prf_refl _)
+  have hmid : Prf (substfc (succ zero) W1
+      (eqCodeFn (nthcT (consT (tcFn h) (varc (numeral 1))) (succcT (varc (numeral 0))))
+                (nthcT (varc (numeral 1)) (varc (numeral 0))))
+      =eq eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) (succcT (varc (numeral 0))))
+                   (nthcT (tcFn t) (varc (numeral 0)))) := by
+    have hv1 : Prf (substtc (succ zero) W1 (varc (numeral 1)) =eq tcFn t) :=
+      prf_eq_trans (prf_mp (prf_substtc_var_eq (succ zero) W1 (numeral 1)) (prf_refl _))
+        (prf_liftc_tcFn t)
+    have hv0 : Prf (substtc (succ zero) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
+      prf_mp (prf_substtc_var_lt (succ zero) W1 (numeral 0)) (prf_zero_lt_succ zero)
+    have hh : Prf (substtc (succ zero) W1 (tcFn h) =eq tcFn h) := prf_substtc_tcFn_at 1 W1 h
+    refine prf_eq_trans (prf_substfc_eq (succ zero) W1 _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_nthcT (succ zero) W1 (consT (tcFn h) (varc (numeral 1)))
+        (succcT (varc (numeral 0)))) ?_
+      refine prf_congr_nthcT ?_ ?_
+      · exact prf_eq_trans (prf_substtc_consT (succ zero) W1 (tcFn h) (varc (numeral 1)))
+          (prf_congr_consT hh hv1)
+      · exact prf_eq_trans (prf_substtc_succcT (succ zero) W1 (varc (numeral 0)))
+          (prf_congr_succcT hv0)
+    · refine prf_eq_trans (prf_substtc_nthcT (succ zero) W1 (varc (numeral 1)) (varc (numeral 0))) ?_
+      exact prf_congr_nthcT hv1 hv0
+  have hout : Prf (substfc zero W0
+      (eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) (succcT (varc (numeral 0))))
+                (nthcT (tcFn t) (varc (numeral 0))))
+      =eq eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) (succcT (tcFn i)))
+                   (nthcT (tcFn t) (tcFn i))) := by
+    refine prf_eq_trans (prf_substfc_eq zero W0 _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_nthcT zero W0 (consT (tcFn h) (tcFn t))
+        (succcT (varc (numeral 0)))) ?_
+      refine prf_congr_nthcT ?_ ?_
+      · exact prf_eq_trans (prf_substtc_consT zero W0 (tcFn h) (tcFn t))
+          (prf_congr_consT (prf_substtc_tcFn W0 h) (prf_substtc_tcFn W0 t))
+      · exact prf_eq_trans (prf_substtc_succcT zero W0 (varc (numeral 0)))
+          (prf_congr_succcT (prf_substtc_varc0 W0))
+    · refine prf_eq_trans (prf_substtc_nthcT zero W0 (tcFn t) (varc (numeral 0))) ?_
+      exact prf_congr_nthcT (prf_substtc_tcFn W0 t) (prf_substtc_varc0 W0)
+  have hchain : Prf (substfc zero W0 (substfc (succ zero) W1 (substfc (succ (succ zero)) W2
+      (formCode BODY)))
+      =eq eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) (succcT (tcFn i)))
+                   (nthcT (tcFn t) (tcFn i))) :=
+    prf_eq_trans (prf_congr_substfc_arg3
+      (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hmid)) hout
+  exact prf_mp (prf_provCode_congr hchain)
+    (pcc_axiom_inst3 BODY (show ax_nthc_succ ∈ axioms by simp [axioms]) (tcFn h) (tcFn t) (tcFn i))
+
 end ROBINSON_PlusPlus.Meta.EvalNthcPrf
 
 export ROBINSON_PlusPlus.Meta.EvalNthcPrf (
-  nthcT prf_congr_nthcT prf_substtc_nthcT pcc_nthc_zero_code
+  nthcT prf_congr_nthcT prf_substtc_nthcT pcc_nthc_zero_code pcc_nthc_succ_code
 )
