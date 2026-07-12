@@ -69,5 +69,6 @@ import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 import ROBINSON_PlusPlus.Meta.EvalNthcPrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
 import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+import ROBINSON_PlusPlus.Meta.D3InDotPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
