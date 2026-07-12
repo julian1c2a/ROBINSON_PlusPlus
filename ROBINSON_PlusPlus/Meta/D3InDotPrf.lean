@@ -68,8 +68,36 @@ theorem pcc_bdEx_intro_open (B Phic K : Term)
     prf_mp (prf_provCode_congr (prf_eq_symm hsub)) hand
   exact prf_mp (pcc_exIntro_code_open (andc (ltCodeFn (varc (numeral 0)) B) Phic) K) hant
 
+/-! ### Step A — la implicación ⇐ CODIFICADA (`boundedCarcIn ⌜φ⌝ ṗ ⇒ In ⌜φ⌝ (runFn nil ṗ)`)
+
+El teorema objeto `prf_In_runFn_of_boundedCarcIn ⌜φ⌝ #0` se generaliza (`Prf.gen`) y se instancia
+DOTADO (`pcc_thm_inst`, testigo `tcFn #0`). Distribuyendo `substfc` sobre el `implc`
+(`prf_substfc_impl`), el consecuente es **exactamente `inDot φ`** (por definición de `inDot`) y el
+antecedente es `bddCarcDot φ` (código dotado de `boundedCarcIn`). -/
+
+/-- Cuerpo objeto de la implicación ⇐ (con `p = #0`): `boundedCarcIn ⌜φ⌝ #0 ⇒ In ⌜φ⌝ (runFn nil #0)`. -/
+noncomputable def inBwdBody (φ : Formula) : Formula :=
+  Formula.impl (boundedCarcIn (formCode φ) (.var 0)) (In (formCode φ) (runFn nil (.var 0)))
+
+/-- Código DOTADO del antecedente `boundedCarcIn ⌜φ⌝ #0` (con `p = #0 ↦ tcFn #0`). -/
+noncomputable def bddCarcDot (φ : Formula) : Term :=
+  substfc zero (tcFn (.var 0)) (formCode (boundedCarcIn (formCode φ) (.var 0)))
+
+/-- **Step A**: `⊢ Prov(⌜ bddCarcDot φ ⇒ inDot φ ⌝)`. Instancia dotada del teorema ⇐, con `substfc`
+    distribuido sobre el `implc`; el consecuente coincide con `inDot φ` por definición. -/
+theorem pcc_bddDot_imp_inDot (φ : Formula) :
+    Prf (provFromCode (implc (bddCarcDot φ) (inDot φ))) := by
+  have hthm : Prf (provFromCode (substfc zero (tcFn (.var 0)) (formCode (inBwdBody φ)))) :=
+    pcc_thm_inst (inBwdBody φ) (Prf.gen _ (prf_In_runFn_of_boundedCarcIn (formCode φ) (.var 0)))
+      (tcFn (.var 0))
+  have hbridge : Prf (substfc zero (tcFn (.var 0)) (formCode (inBwdBody φ))
+      =eq implc (bddCarcDot φ) (inDot φ)) :=
+    prf_substfc_impl zero (tcFn (.var 0)) (formCode (boundedCarcIn (formCode φ) (.var 0)))
+      (formCode (In (formCode φ) (runFn nil (.var 0))))
+  exact prf_mp (prf_provCode_congr hbridge) hthm
+
 end ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 export ROBINSON_PlusPlus.Meta.D3InDotPrf (
-  pcc_bdEx_intro_open
+  pcc_bdEx_intro_open inBwdBody bddCarcDot pcc_bddDot_imp_inDot
 )
