@@ -1,754 +1,487 @@
-# AI Assistant Guide — Documentation Standards
+# Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-**Last updated:** 2026-04-20 00:00
-**Author**: Julián Calderón Almendros
+**Última actualización:** 2026-07-12
+**Autor:** Julián Calderón Almendros
 
-This document establishes requirements and standards for technical documentation of this Lean 4 project.
+> Este documento define lo **universal**: aplica a cualquier proyecto Lean 4 que nazca
+> de esta plantilla, sin cambios. Lo **específico de un proyecto concreto** (sus
+> MANDATORIES, sus ADRs, sus decisiones de arquitectura matemática) va en `DECISIONS.md`,
+> no aquí. Si al copiar esta plantilla sientes la tentación de añadir aquí una regla
+> que solo aplica a tu proyecto, no lo hagas — va en `DECISIONS.md` §MANDATORIES.
 
-> **This file is the first document an AI assistant should read.**
-> It defines the project's documentation protocol, naming conventions,
-> file locking policy, and compliance checklist. Read it fully before
-> touching any `.lean` file or documentation.
-
----
-
-## Requirements for REFERENCE.md
-
-### (0.) **This documentation is technical, not user-facing.** It is a reference for AI assistants and experienced Lean 4 developers. Clear, precise, complete — but not pedagogical
-
-### (1.) **Lean modules**: List all `.lean` files in both root and subdirectories, with location, namespace, dependencies, and documentation status
-
-### (2.) **Module dependencies**: Each module must clearly document which modules it depends on, and which modules depend on it. Critical for AI navigation without loading the full project
-
-### (3.) **Namespaces and their relationships**: Namespaces are not necessarily equal to modules. Document which namespaces exist, which modules they belong to, and how they relate
-
-### (4.) **Introduced definitions**: For each module and namespace, document all definitions with location, dependencies, mathematical notation, and Lean 4 signature
-
-#### (4.1.) **How to document definitions**: Include the Lean 4 signature plus mathematical notation (no explanations — the audience is mathematicians and Lean 4 experts). Include module, namespace, and dependencies
-
-#### (4.2.) **Computability**: Indicate whether the definition is computable or noncomputable, and whether it has a boolean counterpart, and if it is decidable or not
-
-#### (4.3.) **Well-foundedness**: Indicate whether the definition includes a termination proof (*terminated by*)
-
-#### (4.4.) **Notation**: Record introduced notation: infix/prefix/other, symbols used, priorities, so it can be used correctly in proofs and documentation
-
-### (5.) **Introduced axioms and their references**: Each axiom must document its location (module, namespace, declaration order) and relationship to definitions
-
-### (6.) For **axioms** and **definitions**, provide
-
-#### (6.1.) **Mathematical notation** (not Lean code) for human readability. No explanations — mathematical language suffices
-
-#### (6.2.) **Lean 4 signature** for correct usage in proofs and constructions
-
-#### (6.3.) **Dependencies** required to build the definition or axiom
-
-### (7.) Main theorems **without proof of any kind**, with reference to location (module, namespace, declaration order)
-
-#### (7.1.) **Mathematical notation** (not Lean code)
-
-#### (7.2.) **Lean 4 signature**
-
-#### (7.3.) **Dependencies** required to prove the theorem
-
-### (8.) **Nothing unproven goes in REFERENCE.md** — no pending theorems, no TODOs in this file. Only what is already proven or constructed in `.lean` files
-
-### (9.) **Update REFERENCE.md each time you load a `.lean` file** and find something new. Record the date and the last modification date of the `.lean` file for traceability
-
-### (10.) **REFERENCE.md must be self-sufficient** — enough to write new modules or documentation without loading the full project. This file **REFERENCE.md** is the primary purpose of the file for AI assistants
-
-### (11.) **When reading a `.lean` file, add or verify its REFERENCE.md header comment** reminding the reader to project the file
-
-### (12.) **"Projecting" a `.lean` file into REFERENCE.md** means updating REFERENCE.md with all relevant information proven or constructed in that file, following the points above
-
-### (13.) **Relevant information** means all non-private definitions, notations, axioms, theorems, and any other content necessary to understand the project, use it as reference, or build further proofs
-
-### (14.) **Everything exportable in a `.lean` module must be projected into REFERENCE.md** and must appear in the module's export block
+Este archivo es el **primer documento** que un asistente de IA debe leer. Define el
+protocolo de documentación del proyecto, las convenciones de nomenclatura (por
+referencia a `NAMING-CONVENTIONS.md`), la política de bloqueo de archivos, el formato
+de código y los comandos interactivos disponibles. **Léelo completamente antes de
+modificar cualquier archivo `.lean` o de documentación.**
 
 ---
 
-## Timestamps
+## 0. Sistema REFERENCE — Arquitectura en Árbol
 
-### (15.) All technical documentation files must include timestamps in `YYYY-MM-DD HH:MM` format (ISO 8601 abbreviated)
+### (0.) Naturaleza de la documentación
 
-Applied to: REFERENCE.md, CHANGELOG.md, DEPENDENCIES.md, CURRENT-STATUS-PROJECT.md, and any technical summary file.
+Esta documentación es puramente técnica, no para usuarios finales. Es una referencia
+para asistentes de IA y desarrolladores experimentados de Lean 4. Debe ser clara,
+precisa y completa, pero no pedagógica — cero explicaciones de lo que ya dicen los
+nombres bien elegidos.
 
-Purpose: Track how outdated a file is relative to REFERENCE.md, even within a single work session.
+### (0.5.) REFERENCE.md es un SISTEMA, no un fichero único
+
+**Regla fundamental, incumplida con frecuencia: `REFERENCE.md` NUNCA debe crecer como
+un único fichero monolítico.** Es el índice raíz de un árbol de documentos
+interconectados:
+
+- **Índice raíz** (`PROJECT_ROOT/REFERENCE.md`): catálogo general (tabla §1 con todos
+  los módulos, una fila por fichero `.lean`) y mapa de navegación hacia los nodos
+  temáticos. No contiene el detalle exhaustivo de cada definición/teorema — eso vive
+  en los nodos.
+- **Nodos temáticos** (`PROJECT_ROOT/doc/REFERENCE-{campo-temático}.md`): un fichero
+  por rama matemática o subsistema (p. ej. `REFERENCE-Arithmetic.md`,
+  `REFERENCE-GroupTheory.md`, `REFERENCE-Rationals.md`). Ahí van las firmas Lean 4,
+  la notación matemática, las dependencias y el detalle de cada símbolo exportado.
+- **Navegación fuerte obligatoria** — cada nodo temático **DEBE**:
+  - enlazar de vuelta al índice raíz (`[REFERENCE.md](../REFERENCE.md)`);
+  - enlazar de forma cruzada a otros nodos temáticos relacionados (no dejar nodos
+    aislados — si `REFERENCE-Rationals.md` depende de `REFERENCE-Arithmetic.md`, debe
+    decirlo y enlazarlo explícitamente, y viceversa);
+  - enlazar a los ficheros `.lean` concretos que documenta.
+- La fila de cada módulo en la tabla §1 del índice raíz **debe enlazar** a su nodo
+  temático correspondiente (no solo nombrarlo en texto plano).
+- Cuando un subsistema crece lo bastante para tener su propio nodo temático y aún no
+  lo tiene, **crear el nodo antes de seguir añadiendo filas sueltas al índice raíz**.
+  Un índice raíz que intenta documentar el detalle completo de +100 módulos en una
+  sola tabla deja de ser navegable — ese es exactamente el síntoma a evitar.
+
+### (1.) Catálogo de módulos Lean
+
+El índice raíz (`REFERENCE.md`) debe listar todos los archivos `.lean` (en la raíz del
+proyecto y subdirectorios) con su ubicación, espacio de nombres (*namespace*),
+dependencias, estado, y enlace a su nodo temático correspondiente.
+
+### (2.) Dependencias de módulos
+
+Cada módulo debe documentar claramente (en su nodo temático) de qué módulos depende y
+qué módulos dependen de él. Crítico para que la IA navegue sin cargar el proyecto
+completo.
+
+### (3.) Espacios de nombres (Namespaces)
+
+Los namespaces no son necesariamente iguales a los módulos. Documentar qué namespaces
+existen, a qué módulos pertenecen y cómo se relacionan. Todos derivan del namespace
+raíz del proyecto.
+
+### (4.) Definiciones introducidas
+
+Para cada módulo y namespace, documentar todas las definiciones en su nodo temático:
+
+- **(4.1) Firma y notación**: firma exacta en Lean 4 más la notación matemática pura
+  (sin explicaciones — el público son matemáticos y expertos en Lean 4).
+- **(4.2) Computabilidad**: si es `computable` o `noncomputable`, si tiene contraparte
+  booleana, y si es decidible.
+- **(4.3) Buena fundación**: si incluye prueba de terminación (`termination_by`).
+- **(4.4) Notación**: notaciones introducidas (infijo, prefijo, macros), símbolos y
+  prioridades.
+
+### (5.) Axiomas introducidos
+
+Cada axioma documenta su ubicación (módulo, namespace, orden de declaración) y su
+relación con las definiciones.
+
+### (6.) Formato estricto para axiomas y definiciones
+
+Siempre:
+
+- **(6.1)** Notación matemática pura (legibilidad humana, sin explicaciones).
+- **(6.2)** Firma exacta en Lean 4.
+- **(6.3)** Dependencias necesarias para construir la definición o el axioma.
+
+### (7.) Teoremas (sin pruebas)
+
+Los teoremas principales se documentan **sin ningún tipo de prueba**, solo con:
+
+- **(7.1)** Notación matemática.
+- **(7.2)** Firma exacta en Lean 4.
+- **(7.3)** Dependencias necesarias para probar el teorema.
+
+### (8.) Prohibición de contenido no probado
+
+**Cero contenido no probado entra en el sistema REFERENCE.** Cero TODOs, cero teoremas
+pendientes, cero `sorry` documentados como si estuvieran cerrados. Solo lo que ya
+compila y está demostrado en los ficheros `.lean`.
+
+### (9.) Trazabilidad y actualización
+
+Actualizar el nodo temático correspondiente cada vez que se modifique un fichero
+`.lean`. Registrar la fecha de la actualización **y** la fecha de última modificación
+del `.lean` proyectado, para poder detectar desincronización.
+
+### (10.) Autosuficiencia
+
+El sistema REFERENCE completo (índice + nodos) debe bastar para escribir nuevos
+módulos o pruebas **sin cargar el resto del proyecto**.
+
+### (11.) Recordatorio de proyección
+
+Al leer un fichero `.lean`, añadir o verificar su comentario de cabecera que recuerda
+proyectarlo a REFERENCE.md.
+
+### (12.) Qué significa "proyectar"
+
+"Proyectar" un `.lean` significa trasladar todo lo público (el bloque `export`) al
+nodo temático que le corresponde, siguiendo los puntos (1)–(10).
+
+### (13.) Qué es "información relevante"
+
+Toda definición, notación, axioma y teorema no privado, y cualquier otro contenido
+necesario para entender el proyecto, usarlo como referencia, o construir pruebas
+sobre él.
+
+### (14.) Todo lo exportable debe proyectarse
+
+Todo lo que aparezca en un bloque `export` de un `.lean` **DEBE** estar proyectado en
+su nodo temático de REFERENCE.md.
 
 ---
 
-## Authorship and License
+## Formato y Estilo de Código
 
-### (16.) All principal documentation files (README.md, REFERENCE.md, CURRENT-STATUS-PROJECT.md) must clearly state the author
+### (15.) Argumentos implícitos y alineación
 
-### (17.) Credits visible in README.md: educational resources, bibliographic references, AI tools used
-
-### (18.) License: MIT. Indicated in LICENSE, README.md, CURRENT-STATUS-PROJECT.md footer, and README.md badge
-
-### (19.) **All `.lean` files must include a copyright header** before any `import`
+Para mantener la legibilidad en firmas complejas, las declaraciones largas se dividen.
+`:=` y `by` van tabulados o en líneas separadas de forma limpia:
 
 ```lean
-/-
-Copyright (c) 2026. All rights reserved.
-Author: Julián Calderón Almendros
-License: MIT
--/
+private theorem singleton_eq_pair {a b c : Type}
+  (h : singleton a = pair b c) :
+    a = b ∧ a = c
+      := by
+  ...
 ```
 
-Placement: lines 1–5 of every `.lean` file, no exceptions (including the root module).
-
----
-
-## File Locking System
-
-`git-lock.bash` implements two levels of write protection.
-
-### Protection levels
-
-| Level | Command | Reversible | Purpose |
-| ------- | --------- | ---------- | ------- |
-| **Lock** | `lock` / `unlock` | Yes | One-file-at-a-time during development |
-| **Freeze** | `freeze` / `thaw --confirm` | Emergency only | Module completed — immutable forever |
-
-Tracking files:
-
-- `locked_files.txt` — all locked files (lock + freeze)
-- `frozen_files.txt` — permanently frozen modules only
-
-### (20.) Session locking protocol
-
-At most one `.lean` file unlocked at any time.
-
-```bash
-bash git-lock.bash lock   ProjectName/Module.lean   # temporary lock
-bash git-lock.bash unlock ProjectName/Module.lean   # temporary unlock
-bash git-lock.bash list                             # show all locked and frozen files
-bash git-lock.bash init                             # install/reinstall pre-commit hook
-```
-
-Session protocol:
-
-1. **Session start**: Run `list`. Lock all files except the target.
-2. **Switching files**: Lock the current file **before** unlocking the next.
-3. **Session end**: Lock **all** modified `.lean` files. Commit `locked_files.txt`.
-4. **Pre-commit hook**: Blocks commits touching locked or frozen files.
-
-Violation: If more than one file is unlocked, lock all and restart with the correct file.
-
-### (21.) Module freeze protocol — immutable completed modules
-
-When a module reaches ✅ Complete status in REFERENCE.md, it must be **frozen**.
-A frozen module is permanently immutable: it cannot be unlocked, only extended.
-
-```bash
-bash git-lock.bash freeze ProjectName/Module.lean   # mark as permanently frozen
-bash git-lock.bash list                              # shows [frozen] vs [locked]
-```
-
-**Attempting to unlock a frozen module is blocked** with a message pointing to
-the extension protocol. The pre-commit hook also blocks any staged changes to
-frozen files, distinguishing them from ordinary locked files.
-
-**Emergency only** — thawing a frozen module:
-
-```bash
-bash git-lock.bash thaw ProjectName/Module.lean --confirm
-```
-
-The `--confirm` flag is required. After thawing, update REFERENCE.md status
-and document the reason for reopening the module.
-
-#### Extension protocol for frozen modules
-
-When a frozen module `Foo.lean` needs new content:
-
-1. Create `FooExt.lean` in the same directory.
-
-2. Import the frozen module and reopen its namespace:
-
-   ```lean
-   /-
-   Copyright (c) YYYY. All rights reserved.
-   Author: Julián Calderón Almendros
-   License: MIT
-   -/
-   import ProjectName.Foo
-
-   namespace ProjectName   -- same namespace as Foo.lean
-   -- new definitions and theorems here
-   end ProjectName
-   ```
-
-3. Add `FooExt.lean` to `ProjectName.lean` (root import) and to REFERENCE.md.
-
-4. `Foo.lean` remains frozen and untouched.
-
-**Naming rule** (see NC-1): extension files follow `UpperCamelCase`:
-
-| Base module | Extension |
-| ----------- | --------- |
-| `Prelim.lean` | `PrelimExt.lean` |
-| `CoreAxioms.lean` | `CoreAxiomsExt.lean` |
-| `Ordinals.lean` | `OrdinalsArithmetic.lean` (content-named preferred) |
-
-Content-named extensions (`OrdinalsArithmetic.lean`, `OrdinalsLimit.lean`) are
-preferred over numbered ones (`OrdinalsExt1.lean`) when the topic is clear.
-
-#### REFERENCE.md status codes with freeze
-
-| Code | Meaning |
-| ---- | ------- |
-| ✅ Complete | Fully projected. May still be locked (temporary). |
-| 🧊 Frozen | Permanently frozen. Extensions only via `*Ext.lean`. |
-| 🔶 Partial | Documented partially. |
-| 🔄 In progress | Actively being developed. |
-| ❌ Pending | Not yet started. |
-
-A module transitions: 🔄 → 🔶 → ✅ → 🧊. The 🧊 state is final.
-
----
-
-## Available Scripts
-
-| Script | Purpose |
-| ------ | ------- |
-| `bash git-lock.bash lock/unlock <file>` | Temporary file lock |
-| `bash git-lock.bash freeze <file>` | Permanent module freeze |
-| `bash git-lock.bash thaw <file> --confirm` | Emergency unfreeze |
-| `bash git-lock.bash list` | Show locked and frozen files |
-| `bash git-lock.bash init` | Install/reinstall pre-commit hook |
-| `bash new-module.bash ModuleName` | Create new module from template |
-| `bash gen-root.bash` | Regenerate root import file |
-| `bash check-sorry.bash` | Find all sorry statements |
-| `bash update-toolchain.bash v4.x.x` | Update Lean toolchain with build verification |
-| `make help` | Show all Makefile targets |
-
----
-
-## Naming Conventions
-
-These rules apply to all `.lean` files in this project. Names are in **English**.
-The scheme follows Mathlib4 conventions.
-
-> **A separate file `NAMING-CONVENTIONS.md`** contains extended examples,
-> detailed rules (12 formation rules), a symbol-to-word dictionary, and
-> migration tables. That file is the canonical reference for renaming.
-> The summary below is kept in sync with it.
-
----
-
-### Symbol-to-Word Dictionary (quick reference)
-
-| Symbol | Name | | Symbol | Name | | Symbol | Name |
-|--------|------|---|--------|------|---|--------|------|
-| ∈ | `mem` | | ∪ | `union` | | + | `add` |
-| ∉ | `not_mem` | | ∩ | `inter` | | * | `mul` |
-| ⊆ | `subset` | | ⋃ | `sUnion` | | - | `sub`/`neg` |
-| ⊂ | `ssubset` | | ⋂ | `sInter` | | / | `div` |
-| 𝒫 | `powerset` | | \ | `sdiff` | | ^ | `pow` |
-| σ | `succ` | | △ | `symmDiff` | | ∣ | `dvd` |
-| ∅ | `empty` | | ᶜ | `compl` | | ≤ | `le` |
-| = | `eq` | | ⟂ | `disjoint` | | < | `lt` |
-| ≠ | `ne` | | ↔ | `iff` | | 0 | `zero` |
-| ¬ | `not` | | → | `of` | | 1 | `one` |
-
-### Theorem Name Formation Rules (summary)
-
-1. **Conclusion first, hypotheses with `_of_`**: `c_of_a_of_b` — conclusion goes first, then `_of_hypothesis`
-2. **Biconditionals carry `_iff`**: `mem_powerset_iff` (∈ 𝒫 ↔ ⊆)
-3. **Use `.mp`/`.mpr` instead of `_wc` suffixes**: `inter_eq_empty_iff_disjoint.mp`
-4. **Algebraic properties → axiomatic suffix**: `union_comm`, `inter_assoc`, `subset_refl`
-5. **Predicates as prefix, operations in infix order**: `isNat_zero` (not `zero_is_nat`)
-6. **Standard abbreviations**: `pos` (> 0), `neg` (< 0), `nonpos` (≤ 0), `nonneg` (≥ 0)
-7. **`Is` prefix for Prop definitions**: `def IsNat` (UpperCamelCase); in theorem names → `lowerCamelCase`: `isNat_zero`
-8. **Functions/constructors**: `lowerCamelCase` — `powerset`, `union`, `sep`, `comp`
-9. **Specification pattern**: `mem_X_iff` — `mem_succ_iff`, `mem_inter_iff`, `mem_union_iff`
-10. **Uniqueness/existence**: `inter_unique`, `powerset_unique`
-11. **Lateral variants**: `_left`/`_right` — `subset_union_left`, `union_inter_distrib_left`
-12. **Named theorems**: proper names kept as-is — `cantor_no_surjection`, `cantor_schroeder_bernstein`
-
-### Standard Axiomatic Suffixes
-
-| Suffix | Meaning | | Suffix | Meaning |
-|--------|---------|---|--------|---------|
-| `_comm` | commutativity | | `_self` | op with itself |
-| `_assoc` | associativity | | `_left`/`_right` | lateral variant |
-| `_refl` | reflexivity | | `_cancel` | cancellation |
-| `_trans` | transitivity | | `_mono` | monotonicity |
-| `_antisymm` | antisymmetry | | `_inj` | injectivity (iff) |
-| `_symm` | symmetry | | `_injective` | injectivity (pred) |
-| `_irrefl` | irreflexivity | | `_surjective` | surjectivity |
-
----
-
-### (NC-1) Modules (`.lean` files)
-
-`UpperCamelCase`. Named after mathematical content, not technical role.
-
-| Pattern | Example |
-| ------- | ------- |
-| `UpperCamelCase.lean` | `Prelim.lean`, `CoreAxioms.lean`, `Ordinals.lean` |
-
-- Root entry point: `ProjectName.lean` — imports only, no definitions.
-- Template: `_template.lean` — underscore prefix marks non-imported utility files.
-- Extension of frozen module: `FooExt.lean` — imports `Foo.lean`, reopens its namespace.
-- Content-named extensions preferred: `OrdinalsArithmetic.lean` over `OrdinalsExt1.lean`.
-
----
-
-### (NC-2) Namespaces
-
-`UpperCamelCase`. Mirror the module file hierarchy.
-
-| Level | Pattern | Example |
-| ----- | ------- | ------- |
-| Root | `ProjectName` | `namespace ProjectName` |
-| Sub | `ProjectName.Topic` | `namespace ProjectName.Ordinals` |
-
-- One namespace per module as a rule.
-- Do not create sub-namespaces solely for grouping within a file — use `section` instead.
-- `private` declarations do not need their own namespace.
-
----
-
-### (NC-3) Types and Prop-predicates (`def` returning `Type` or `Prop`)
-
-`UpperCamelCase`. Matches Mathlib's convention for `IsEmpty`, `IsClosed`, `Finset`, etc.
-
-| Kind | Example |
-| ---- | ------- |
-| Sort/Type | `Class`, `Ordinal` |
-| Prop predicate | `IsSet`, `IsEmpty`, `IsFun` |
-
----
-
-### (NC-4) Functions and term-level definitions (`def` returning a value)
-
-`lowerCamelCase`.
-
-| Kind | Example |
-| ---- | ------- |
-| Constructor | `oPair`, `succ` |
-| Accessor | `dom`, `img`, `fst`, `snd` |
-
----
-
-### (NC-5) Axioms
-
-Prefix `PROJ_` (replace with a short project-specific uppercase tag) + `UpperCamelCase` descriptor.
-The prefix signals axiomatic (unproven) status and distinguishes axioms from theorems at a glance.
-
-| Pattern | Example (project tag `MK`) |
-| ------- | -------------------------- |
-| `TAG_ShortName` | `MK_Ext`, `MK_Found`, `MK_Pair` |
-| `TAG_Compound` | `MK_GlobalChoice`, `MK_CAC` |
-
-Rules:
-
-- Tag always uppercase, followed immediately by the descriptor (no extra underscores).
-- Choose short, stable descriptors: `Ext`, `Found`, `Pair`, `Union`, `Pow`, `Inf`, `Comp`, `Repl`.
-- Keep the tag consistent across the whole project.
-
----
-
-### (NC-6) Exportable theorems and lemmas
-
-Follow Mathlib4's **subject\_predicate** pattern, all `lowerCamelCase` with underscores.
-
-```text
-[subject]_[predicate]
-[subject]_[predicate]_[object]
-[subject]_[predicate]_of_[hypothesis]
-```
-
-Standard suffixes:
-
-| Suffix | Meaning | Example |
-| ------ | ------- | ------- |
-| `_iff` | biconditional | `mem_pair_iff` |
-| `_eq` | equality | `empty_eq` |
-| `_of_` | follows from | `isSet_of_mem` |
-| `_mem` | membership | `pair_mem` |
-| `_subset` | inclusion | `inter_subset_left` |
-| `_ne` | inequality | `succ_ne_empty` |
-| `_unique` | uniqueness | `empty_unique` |
-| `_exists` | existence | `pair_exists` |
-
----
-
-### (NC-7) Private and auxiliary declarations
-
-Use the `private` keyword. Optionally append `_aux` for intermediate steps.
+### (16.) Excepción de una línea (one-liner term-mode)
+
+Si la declaración completa (nombre, parámetros, tipo, `:=` y cuerpo) cabe en una sola
+línea (≤ 90 caracteres) y la prueba es un término trivial, se prefiere la forma
+compacta:
 
 ```lean
-private lemma foo_of_bar_aux : … := …
-private def witnessFor_aux : … := …
+theorem subset_refl (A : Type) : A ⊆ A := fun _ h => h
 ```
 
-- `_aux` suffix is optional but recommended when the lemma is a stepping stone within a proof.
-- Never export `_aux` names.
+### (16b.) Regla de directorio raíz (No-Root Rule)
+
+**NUNCA** crear módulos de trabajo (ficheros `.lean` con teoremas, definiciones, etc.)
+en el directorio raíz del repositorio (donde está `lakefile.lean`). Todo módulo de
+trabajo vive dentro del directorio del proyecto (p. ej. `ProjectName/`) o en
+subdirectorios temáticos dentro de él. El único `.lean` permitido en la raíz es el
+módulo raíz autogenerado (`ProjectName.lean`, vía `gen-root.bash`) y el ejecutable
+(`Main.lean`) si existe.
+
+**Ficheros scratch/temporales de sesión (`scratch*.lean`, `temp_*.lean`, `fix_*.py`,
+`fix-*.ps1`) nunca se commitean.** Van en `.gitignore` desde el primer commit del
+proyecto (ver plantilla de `.gitignore` de este repositorio). Si necesitas
+experimentar, hazlo en uno de esos ficheros y bórralo (o dótalo de nombre definitivo e
+impórtalo) antes de terminar la sesión — nunca lo dejes `git add`eado "por si acaso".
 
 ---
 
-### (NC-8) Notations
+## Arquitectura de Exportaciones y Directorios
 
-Document every introduced notation in REFERENCE.md §5 with: symbol, priority, scope, expansion.
+### (17.) Bloques de exportación (*export blocks*)
 
-Rules:
-
-- Prefer `local notation` inside namespaces to avoid global pollution.
-- Follow Mathlib Unicode conventions where a standard symbol exists (∈, ⊆, ∅, ⟨⟩).
-- Custom symbols must be declared `local` unless they are the project's primary notation
-  and will never conflict with Mathlib imports.
-- Priority: follow Lean 4 defaults (50 for relations, 65 for arithmetic operators).
-
----
-
-### (NC-9) Section names
-
-`UpperCamelCase`, descriptive.
-
-```lean
-section Extensionality
-section PairingLemmas
-section FoundationConsequences
-```
-
----
-
-### (NC-10) Summary table
-
-| Entity | Convention | Example |
-| ------ | ---------- | ------- |
-| Module (`.lean` file) | `UpperCamelCase` | `CoreAxioms.lean` |
-| Namespace | `UpperCamelCase` | `ProjectName`, `ProjectName.Ordinals` |
-| Type / Prop predicate | `UpperCamelCase` | `IsSet`, `IsFun` |
-| Function / value def | `lowerCamelCase` | `oPair`, `dom` |
-| Axiom | `TAG_ShortName` | `MK_Ext`, `ZF_Sep` |
-| Exportable theorem | `subject_predicate` | `mem_pair_iff` |
-| Private / auxiliary | `private` + optional `_aux` | `private lemma foo_aux` |
-| Section | `UpperCamelCase` | `section Pairing` |
-| Notation | `local notation` preferred | `local notation:50 …` |
-
----
-
-## Compliance
-
-Verify that REFERENCE.md, `.lean` files, and documentation files comply with all points
-(0–21), export/glob rules (23, 30–33), and naming conventions (NC-1–NC-10) before
-considering documentation complete and up to date.
-
----
-
-## Directory Structure and Subdirectories
-
-### (22.) Module organization by subdirectory
-
-As the project grows, organize modules into **thematic subdirectories** inside `ProjectName/`.
-Each subdirectory groups related modules and corresponds to a sub-namespace.
-
-Example structure:
-
-```text
-ProjectName/
-├── Prelim.lean               # Level 0: foundations
-├── _template.lean            # Template (not imported)
-├── Core/
-│   └── Basic.lean            # ProjectName.Core.Basic
-├── Axiom/
-│   ├── Extension.lean        # ProjectName.Axiom.Extension
-│   └── Pairing.lean          # ProjectName.Axiom.Pairing
-├── Nat/
-│   ├── Basic.lean            # ProjectName.Nat.Basic
-│   ├── Add.lean              # ProjectName.Nat.Add
-│   └── Mul.lean              # ProjectName.Nat.Mul
-└── BoolAlg/
-    ├── Basic.lean             # ProjectName.BoolAlg.Basic
-    └── Complete.lean          # ProjectName.BoolAlg.Complete
-```
-
-Rules:
-
-- Subdirectory names: `UpperCamelCase`, matching the sub-namespace.
-- Each subdirectory may have a `Basic.lean` for foundational definitions of that area.
-- `new-module.bash` supports paths: `bash new-module.bash Nat/Add` creates `ProjectName/Nat/Add.lean`.
-- `gen-root.bash` automatically scans subdirectories.
-- Namespace mirrors path: `ProjectName/Nat/Add.lean` → `namespace ProjectName.Nat.Add`.
-
-### (23.) Barrel modules (mandatory for subdirectories)
-
-Every subdirectory containing 2 or more `.lean` modules **MUST** have a barrel file.
-The barrel file:
-
-- Sits at the same level as the directory, named `DirName.lean` (e.g., `Operations.lean` for `Operations/`).
-- Imports ALL production sub-modules in the directory (excludes `test_*.lean` and `Test*.lean`).
-- Contains NO definitions, theorems, or proofs — only `import` statements and an optional header comment.
-- Serves as the **single import point** for the subdirectory.
-
-```lean
--- ProjectName/Operations.lean (barrel file)
-import ProjectName.Operations.Union
-import ProjectName.Operations.Intersection
-import ProjectName.Operations.Setminus
--- ... all production modules in Operations/
-```
-
-The root barrel file (`ProjectName.lean`) **prefers barrel imports** over individual
-sub-modules when a barrel exists:
-
-```lean
--- ProjectName.lean (root barrel)
-import ProjectName.CList          -- barrel for CList/
-import ProjectName.Operations     -- barrel for Operations/
-import ProjectName.Axioms         -- barrel for Axioms/
-import ProjectName.HFSets         -- top-level module (no barrel needed)
-import ProjectName.Notation       -- top-level module
-```
-
-`gen-root.bash` detects barrel files and emits the barrel import instead of listing
-each sub-module individually.
-
----
-
-## Export/Glob Architecture
-
-### (30.) Export blocks in leaf modules
-
-Every production module (not barrels, not test files) **MUST** end with an `export` block
-that lists all public (non-private) definitions, theorems, lemmas, and instances from the
-module's namespace. This makes declarations available to importers without requiring
-`open Namespace`.
-
-**Pattern:**
+Todo módulo de producción (hoja, no barrel) **DEBE** terminar con un bloque `export`
+que liste todas las definiciones, teoremas y lemas públicos:
 
 ```lean
 namespace MyNamespace
 
 def myDef : Type := ...
-
 theorem myTheorem : ... := ...
 
 end MyNamespace
 
--- Export: all public declarations from this module
+-- Export: todas las declaraciones públicas de este módulo
 export MyNamespace (myDef myTheorem)
 ```
 
-**Rules:**
+Reglas:
 
-1. The `export` statement goes AFTER `end namespace`, at the top level of the file.
-2. List ALL non-private `def`, `theorem`, `lemma`, `instance` names.
-3. Do NOT export `private` declarations, `_aux` helpers, or intermediate lemmas prefixed with `private`.
-4. Keep the export list **sorted alphabetically** within each namespace.
-5. If a module contributes to multiple namespaces, use one `export` per namespace.
-6. `notation`, `macro`, `syntax` are NOT listed in `export` — they propagate automatically on `import`.
+1. El `export` va DESPUÉS de `end namespace`, a nivel de fichero.
+2. Lista TODOS los `def`/`theorem`/`lemma`/`instance` no privados.
+3. NUNCA exportar declaraciones `private` ni auxiliares con sufijo `_aux`.
+4. Lista alfabética dentro de cada namespace.
+5. Si un módulo contribuye a varios namespaces, un `export` por namespace.
+6. `notation`/`macro`/`syntax` NO se listan en `export` — se propagan solas al
+   importar.
 
-**Effect:** After `import ProjectName.Axioms.Union`, downstream code can write
-`mem_union` directly instead of `MyNamespace.mem_union`.
+El bloque `export` es la **lista canónica** de la API pública de un módulo: añadir,
+renombrar o borrar una declaración pública exige actualizar el `export` (y, por (14),
+proyectarlo a REFERENCE.md).
 
-### (31.) Export block maintenance
+### (18.) Archivos "barrel" (paraguas)
 
-- **Adding** a new public declaration requires adding it to the `export` block.
-- **Renaming** a declaration requires updating the `export` block.
-- **Deleting** a public declaration requires removing it from the `export` block.
-- When **projecting** a module to REFERENCE.md (§14), verify the export list matches.
-- The export list is the **canonical list** of a module's public API.
+Cualquier subdirectorio con 2+ módulos **DEBE** tener un fichero barrel al mismo nivel
+que el directorio (p. ej. `Algebra.lean` para `Algebra/`) que importe todos sus
+submódulos. Los barrels **no contienen código**, solo `import` (y opcionalmente un
+comentario catalogando la API pública del directorio). El barrel raíz del proyecto
+(`ProjectName.lean`) prefiere importar barrels de subdirectorio en vez de listar cada
+submódulo suelto. `gen-root.bash` detecta barrels automáticamente.
 
-### (32.) Barrel files and exports
+### (19.) Organización por subdirectorios temáticos
 
-Barrel files (`DirName.lean`) do **not** add their own `export` blocks — the leaf modules
-handle their own exports. The barrel file's sole job is aggregation via `import`.
-
-However, a barrel file **may** include a top-level comment cataloguing the public API:
-
-```lean
--- ProjectName/Operations.lean
--- Public API: union, inter, setminus, pair, powerset, symDiff, orderedPair,
---             sep, sUnion, dom, range, comp, image, ...
-import ProjectName.Operations.Union
-import ProjectName.Operations.Intersection
--- ...
-```
-
-### (33.) Template compliance
-
-The `_template.lean` file must reflect the export pattern. Section 4 ("Exports") in the
-template shows the `export` block after `end namespace`. New modules created by
-`new-module.bash` inherit this structure.
+A medida que el proyecto crece, organizar los módulos en subdirectorios temáticos
+(`UpperCamelCase`, reflejando el sub-namespace). Cada subdirectorio puede tener su
+propio `Basic.lean` fundacional. `new-module.bash Nat/Add` crea
+`ProjectName/Nat/Add.lean` con namespace `ProjectName.Nat.Add`.
 
 ---
 
-## Annotation System for REFERENCE.md
+## Sistema de Bloqueo de Archivos
 
-### (24.) Module-level annotations
+`git-lock.bash` implementa dos niveles de protección de escritura. **Este sistema
+existe para ser usado de verdad, no para quedar documentado y vacío** — si
+`locked_files.txt`/`frozen_files.txt` llevan vacíos varias sesiones seguidas pese a
+haber módulos "✅ Completos", el protocolo no se está siguiendo.
 
-Each module entry in REFERENCE.md §3 may include the following metadata:
+| Nivel | Comando | Reversible | Propósito |
+|---|---|---|---|
+| **Lock** | `lock` / `unlock` | Sí | Un solo fichero desbloqueado a la vez durante el desarrollo |
+| **Freeze** | `freeze` / `thaw --confirm` | Solo en emergencia | Módulo terminado — inmutable para siempre |
+
+> **Nota de plataforma**: en Windows/NTFS, `chmod a-w` (usado internamente por
+> `git-lock.bash`) **no impide realmente la escritura del fichero** — el lock es un
+> contrato social reforzado por el hook `pre-commit` (que sí bloquea el commit), no
+> una protección real del sistema de ficheros. No asumas que "está bloqueado" significa
+> "no se puede editar"; significa "el commit fallará si lo tocas sin desbloquearlo
+> antes".
+
+### (20.) Protocolo de bloqueo de sesión
+
+Como máximo un `.lean` desbloqueado en cada momento.
+
+```bash
+bash git-lock.bash lock   ProjectName/Module.lean   # bloqueo temporal
+bash git-lock.bash unlock ProjectName/Module.lean   # desbloqueo temporal
+bash git-lock.bash list                             # lista bloqueados y congelados
+bash git-lock.bash init                             # instala/reinstala el hook pre-commit
+```
+
+Protocolo de sesión:
+
+1. **Inicio de sesión**: ejecutar `list`. Desbloquear solo el fichero objetivo.
+2. **Cambio de fichero**: bloquear el actual ANTES de desbloquear el siguiente.
+3. **Fin de sesión**: bloquear todos los ficheros modificados. Commitear
+   `locked_files.txt`.
+4. El hook `pre-commit` bloquea commits que toquen ficheros bloqueados o congelados.
+
+### (21.) Protocolo de congelado (freeze) de módulos completos
+
+Cuando un módulo alcanza estado ✅ Completo en REFERENCE.md, debe **congelarse**. Un
+módulo congelado es inmutable para siempre: no se puede desbloquear, solo extender.
+
+```bash
+bash git-lock.bash freeze ProjectName/Module.lean
+bash git-lock.bash thaw   ProjectName/Module.lean --confirm   # solo emergencias
+```
+
+**Protocolo de extensión de un módulo congelado** `Foo.lean`:
+
+1. Crear `FooExt.lean` (o, mejor, un nombre semántico como `FooDivisibility.lean`) en
+   el mismo directorio.
+2. Importar el módulo congelado y reabrir su namespace.
+3. Añadir `FooExt.lean` al barrel/raíz y a REFERENCE.md.
+4. `Foo.lean` permanece congelado e intacto.
+
+**Códigos de estado en REFERENCE.md:**
+
+| Código | Significado |
+|---|---|
+| 🔄 En progreso | En desarrollo activo |
+| 🔶 Parcial | Documentado parcialmente |
+| ✅ Completo | Proyectado por completo. Puede seguir bloqueado (temporal) |
+| 🧊 Congelado | Congelado para siempre. Solo extensible vía `*Ext.lean` |
+
+Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
+
+---
+
+## Scripts Disponibles
+
+| Script | Propósito |
+|---|---|
+| `bash git-lock.bash lock/unlock <file>` | Bloqueo temporal |
+| `bash git-lock.bash freeze/thaw <file>` | Congelado permanente / deshielo de emergencia |
+| `bash git-lock.bash list` | Lista de bloqueados y congelados |
+| `bash git-lock.bash init` | Instala/reinstala el hook pre-commit |
+| `bash new-module.bash NombreModulo` | Crea un módulo nuevo desde la plantilla |
+| `bash gen-root.bash` | Regenera el fichero de importación raíz |
+| `bash check-sorry.bash` | Localiza todos los `sorry` (excluyendo comentarios) |
+| `bash update-toolchain.bash vX.Y.Z` | Actualiza el toolchain de Lean con verificación de build |
+| `make help` | Lista los targets del Makefile |
+
+---
+
+## Trazabilidad y Documentación Anexa
+
+### (22.) Marcas de tiempo
+
+Todos los ficheros de documentación técnica (`REFERENCE.md` y sus nodos, `CHANGELOG.md`,
+`DEPENDENCIES.md`, `CURRENT-STATUS-PROJECT.md`, y cualquier resumen técnico) deben
+incluir una marca de tiempo bajo el título en formato `YYYY-MM-DD HH:MM` (ISO 8601
+abreviado) — **no solo `YYYY-MM-DD`**: la hora permite detectar desincronización
+incluso dentro de una misma sesión de trabajo.
+
+### (23.) Autoría y licencia
+
+- README.md, REFERENCE.md y CURRENT-STATUS-PROJECT.md declaran el autor.
+- Créditos visibles en README.md: recursos educativos, referencias bibliográficas,
+  herramientas de IA usadas.
+- Licencia MIT, indicada en `LICENSE`, `README.md` (pie y badge) y el pie de
+  `CURRENT-STATUS-PROJECT.md`.
+- Todo fichero `.lean`, sin excepción, empieza con cabecera de copyright antes de
+  cualquier `import`:
+
+```lean
+/-
+Copyright (c) YYYY. All rights reserved.
+Author: [Nombre del Autor]
+License: MIT
+-/
+```
+
+### (24.) Anotaciones de módulo para REFERENCE.md
+
+**A nivel de módulo** (en la tabla §1 o en el nodo temático):
 
 ```markdown
 **@axiom_system**: `ZFC` | `Peano` | `BoolAlg` | `none`
 **@importance**: `foundational` | `high` | `medium` | `low`
 ```
 
-- `@axiom_system`: Which formal system the module primarily belongs to.
-- `@importance`: How critical the module is to the project's dependency chain.
+### (25.) Anotaciones de teorema para REFERENCE.md
 
-### (25.) Theorem-level annotations
-
-Individual theorems or definitions in REFERENCE.md may be annotated:
+**A nivel de teorema/definición** (en el nodo temático):
 
 ```markdown
 **@importance**: `high` | `medium` | `low`
 ```
 
-- `high`: Used by 3+ other modules, or is a key axiom/definition.
-- `medium`: Used by 1–2 other modules.
-- `low`: Internal utility, only used within its own module.
+`high` = usado por 3+ módulos o es un axioma/definición clave; `medium` = usado por
+1–2 módulos; `low` = utilidad interna, solo usada dentro de su propio módulo. Ayuda a
+la IA a priorizar qué cargar.
 
-Purpose: Helps AI assistants prioritize which theorems to load for context.
+### (26.) Ficheros de referencia cruzada
 
----
+| Fichero | Propósito |
+|---|---|
+| `REFERENCE.md` + `doc/REFERENCE-*.md` | Sistema de referencia en árbol (ver §0.5) |
+| `NAMING-CONVENTIONS.md` | Diccionario de nombres + 12 reglas de formación (nombres en inglés, prosa en español) |
+| `DECISIONS.md` | ADRs formales + sección **MANDATORIES** con las directivas no negociables *de este proyecto concreto* |
+| `DEPENDENCIES.md` | Grafo y tabla maestra de dependencias entre módulos |
+| `PLANNING.md` | Visión a largo plazo — ideas y direcciones que aún necesitan madurar |
+| `NEXT-STEPS.md` | Pasos inmediatos y concretos, listos para ejecutar (nombre canónico con guión — nunca `NEXT_STEPS.md`) |
+| `THOUGHTS.md` | Diario de diálogo diseño usuario↔IA — nunca normativo, nunca sustituye una regla de esta guía |
+| `WORKFLOW.md` | Metodología operativa de Git, IA y Lean |
+| `CURRENT-STATUS-PROJECT.md` | Snapshot en vivo del build, jobs y estado de módulos |
+| `CHANGELOG.md` | Historial de cambios |
 
-## Cross-Reference Files
-
-### (26.) NAMING-CONVENTIONS.md
-
-A standalone file with the full naming dictionary, 12 formation rules,
-migration tables, and detailed examples. Canonical reference for renaming.
-Updated whenever naming conventions evolve.
-
-### (27.) NEXT-STEPS.md
-
-Tracks **immediate, well-demarcated steps** ready to be executed.
-Entries here are concrete, actionable, and short-horizon.
-
-- Each entry has a clear precondition, action, and expected outcome.
-- Items migrate here from `PLANNING.md` only when they are mature enough to execute.
-- The AI assistant reads this file at the start of every work session to orient itself.
-- Updated after each task completes: remove done items, promote the next one from PLANNING.md.
-
-### (27b.) PLANNING.md
-
-Tracks **longer-horizon developments** — ideas and directions that need more thinking
-before they become executable steps.
-
-- Entries here describe intent, alternatives, and open questions — not commands.
-- Material from `THOUGHTS.md` dialogue is distilled here once it reaches sufficient clarity.
-- Items graduate to `NEXT-STEPS.md` only when: objective is clear, dependencies are known,
-  and no open design questions remain.
-- The AI assistant reads this file when the NEXT-STEPS queue is empty or when a user
-  asks for broader context.
-
-### (28.) THOUGHTS.md
-
-A **dialogue file** between the user (Julián) and the AI assistant — not a list of commands.
-Its purpose is to induce reflection: new approaches, alternatives, open questions, doubts.
-
-**Protocol**:
-
-- The AI assistant **must read `THOUGHTS.md`** after completing any task (fix, documentation
-  update, proof step, etc.) before ending a response turn.
-- If `THOUGHTS.md` contains an unresolved question or a new direction, the assistant
-  **raises it as part of its reply** rather than silently ignoring it.
-- The file is updated collaboratively: the user adds ideas; the assistant responds by
-  commenting, refining, or proposing next actions.
-- Mature ideas from `THOUGHTS.md` move to `PLANNING.md`; executable plans move to `NEXT-STEPS.md`.
-- `THOUGHTS.md` is never normative — it never overrides a command or a rule in this file.
-
-### (29.) Commands
-
-A set of high-level instructions that trigger a predefined multi-step workflow.
-Commands are addressed to the AI assistant and named using a short verb phrase.
-Each command is defined in this section (§29) with its exact steps.
-
-> To invoke a command, write its name in the chat, e.g.: **`actualiza doc`**
+`PLANNING.md` → `NEXT-STEPS.md`: los ítems migran solo cuando están lo bastante
+maduros para ejecutarse (objetivo claro, dependencias conocidas, sin preguntas de
+diseño abiertas). `THOUGHTS.md` → `PLANNING.md`: las ideas maduran ahí antes de
+convertirse en plan.
 
 ---
 
-## Commands
+## Comandos Interactivos para la IA
+
+La IA debe obedecer estos comandos exactos cuando el usuario los invoque en el chat.
 
 ### `actualiza doc`
 
-**Purpose**: Full documentation pass — synchronize all living documentation files
-with the current state of the codebase after a development session.
+**Propósito:** pasada completa de documentación — sincronizar todos los ficheros
+vivos con el estado real del código tras una sesión de desarrollo.
 
-**Steps** (execute in order):
+**Pasos (en orden):**
 
-1. **Run the build** and record the result:
-   - `lake build` — note the number of jobs, errors, sorry count, and any warnings.
+1. Ejecutar `lake build` — anotar jobs, errores, `sorry`, warnings.
+2. Leer el estado previo de `NEXT-STEPS.md`, `CHANGELOG.md`, `CURRENT-STATUS-PROJECT.md`.
+3. Identificar qué cambió: qué `sorry` se cerraron, qué módulos/teoremas se añadieron,
+   qué módulos cambiaron de estado (🔄→🔶→✅→🧊).
+4. Actualizar `CHANGELOG.md`: nueva entrada `[YYYY-MM-DD]` con los cambios de la sesión.
+5. Actualizar `NEXT-STEPS.md`: mover lo completado, refrescar la tabla de `sorry`
+   vigentes (fichero:línea).
+6. Actualizar `CURRENT-STATUS-PROJECT.md`: snapshot de build y tabla de estado de
+   módulos.
+7. Actualizar el árbol de directorios de este fichero (§22) si hubo cambios
+   estructurales.
+8. Proyectar a REFERENCE.md los ficheros `.lean` tocados en la sesión (§1–§14).
+9. **Verificar consistencia**: el recuento de `sorry` debe coincidir entre
+   `NEXT-STEPS.md`, `CHANGELOG.md` y `check-sorry.bash`; toda declaración pública
+   nueva aparece en su bloque `export`.
+10. Reportar en el chat un resumen breve: `sorry` cerrados, declaraciones nuevas,
+    ficheros tocados, `sorry` restantes y su ubicación.
 
-2. **Read the current state** of these files (to diff against later):
-   - `NEXT-STEPS.md` — current sorry table and phase status.
-   - `CHANGELOG.md` — latest entry date.
-   - `CURRENT-STATUS-PROJECT.md` — build snapshot and module status table.
-   - `AI-GUIDE.md` — directory structure block inside § 22.
+### `actualiza_documentacion`
 
-3. **Identify what changed** since the last documentation update:
-   - Which sorries were closed (compare `check-sorry.bash` output vs NEXT-STEPS.md table).
-   - Which new theorems, definitions, or modules were added.
-   - Which modules changed status (🔄 → 🔶 → ✅ → 🧊).
-   - Current build numbers (jobs, errors, sorry count).
+**Propósito:** sincronizar los documentos de alto nivel (estado, dependencias,
+decisiones, flujo), no el detalle técnico módulo a módulo.
 
-4. **Update `CHANGELOG.md`**:
-   - Add a new `### Added (YYYY-MM-DD)` block under `## [Unreleased]`.
-   - List every closed sorry, new declaration, and structural change.
-   - Include build stats: jobs, errors, sorry count, warnings.
-   - Follow the existing entry format (bullet points grouped by module).
+**Ficheros afectados:** `README.md`, `CURRENT-STATUS-PROJECT.md`, `DECISIONS.md`,
+`DEPENDENCIES.md`, `WORKFLOW.md`.
 
-5. **Update `NEXT-STEPS.md`**:
-   - Update `**Last updated:**` timestamp.
-   - Update § 1 "Estado Actual" snapshot: build status, error count, sorry count.
-   - Update § 1.1 "Completado recientemente": move closed items here.
-   - Update § 1.2 "Sorries vigentes": remove closed sorries; update line numbers for open ones.
-   - Update priority sections if the next objective changed.
+**Pasos:** ejecutar `lake build` para datos frescos → actualizar
+`CURRENT-STATUS-PROJECT.md` → actualizar métricas de `README.md` → añadir un ADR nuevo
+a `DECISIONS.md` si hubo una decisión arquitectónica → revisar `DEPENDENCIES.md` si se
+crearon/movieron módulos → revisar `WORKFLOW.md` si la sesión reveló una regla
+operativa nueva.
 
-6. **Update `CURRENT-STATUS-PROJECT.md`**:
-   - Update `**Last updated:**` timestamp.
-   - Update build snapshot block: date, jobs, errors, sorry count.
-   - Update the module status table: mark newly completed modules ✅ or 🧊.
+### `pon_al_dia_el_plan`
 
-7. **Update `AI-GUIDE.md` § 22 directory structure block** (if modules were added/removed):
-   - Update the tree listing.
-   - Update the sorry count annotations (e.g., `[ 3 sorry ]` → `[ 2 sorry ]`).
-   - Update the "Current structure" date.
+**Propósito:** limpiar y sincronizar la planificación, eliminando el ruido de tareas
+ya completadas — **aplicar con disciplina**, no dejar que `NEXT-STEPS.md`/`PLANNING.md`
+crezcan indefinidamente con entradas históricas ya resueltas.
 
-8. **Update `REFERENCE.md`** for every `.lean` file modified in the session:
-   - Project new public declarations following rules §1–§14.
-   - Update module status codes.
-   - Add timestamps.
+**Ficheros afectados:** `NEXT-STEPS.md`, `PLANNING.md`, `THOUGHTS.md`.
 
-9. **Verify consistency**:
-   - Sorry count in NEXT-STEPS.md = sorry count in CHANGELOG.md = `check-sorry.bash` output.
-   - All new public declarations appear in their module's `export` block.
-   - REFERENCE.md timestamps are newer than the `.lean` file timestamps for modified modules.
+**Pasos:** cruzar lo logrado en la sesión con `THOUGHTS.md`/`PLANNING.md` → purgar de
+`NEXT-STEPS.md` todo lo ya hecho → promover objetivos maduros de `PLANNING.md` a
+`NEXT-STEPS.md`.
 
-10. **Report a brief summary** to the user:
-    - Sorries closed this session.
-    - New declarations added.
-    - Files updated.
-    - Remaining sorries and their location.
+### `revisa_pensamientos`
 
-**Files touched by this command** (in order of update):
-`CHANGELOG.md` → `NEXT-STEPS.md` → `CURRENT-STATUS-PROJECT.md` → `AI-GUIDE.md` → `REFERENCE.md`
+**Propósito:** analizar `THOUGHTS.md` y proponer próximos pasos, sin modificar ficheros.
 
-**Note**: Steps 4–8 may be done in parallel when changes are independent across modules.
-Never overwrite content from prior sessions — only prepend new entries or update
-clearly demarcated snapshot blocks.
+**Pasos:** leer `THOUGHTS.md` íntegro → categorizar las ideas (decisiones pendientes,
+refactors imaginados, dudas) → responder en el chat qué ideas están maduras para pasar
+a `NEXT-STEPS.md`, cuáles necesitan más pensamiento, y posibles respuestas a los
+dilemas planteados.
 
----
+**Protocolo pasivo:** la IA debe leer `THOUGHTS.md` tras completar cualquier tarea
+(fix, doc, paso de prueba) antes de cerrar su turno; si hay una pregunta sin resolver,
+la plantea en su respuesta en vez de ignorarla en silencio. `THOUGHTS.md` nunca es
+normativo — nunca invalida una regla de esta guía.
+
+### `compila_y_comprueba`
+
+**Propósito:** comprobación exhaustiva con registro verboso.
+
+**Ficheros afectados:** `build_report.txt` (se sobrescribe en cada llamada).
+
+**Pasos:** ejecutar `lake build` completo → capturar toda la salida → volcarla en
+`build_report.txt` → informar en el chat del resultado global (éxito/fallo, nº de
+errores) invitando a revisar el fichero para más detalle.
 
 ### `dame situación`
 
-**Purpose**: Instant read-only status report. No files are modified. Gives a complete,
-structured picture of the project's current state in a single response.
+**Propósito:** informe de solo lectura del estado actual. No modifica ningún fichero.
 
-**Steps** (all read-only, execute in parallel where possible):
+**Pasos (en paralelo cuando sea posible):** `check-sorry.bash` → `lake build` (jobs,
+errores, warnings) → leer la tabla de `sorry` vigentes de `NEXT-STEPS.md` → leer la
+tabla de estado de módulos de `CURRENT-STATUS-PROJECT.md` → leer la última entrada de
+`CHANGELOG.md`.
 
-1. **Run `check-sorry.bash`** — get the current sorry count and file locations.
-2. **Run `lake build`** — confirm 0 errors; record job count and warning count.
-3. **Read `NEXT-STEPS.md` § 1.2** — get the canonical sorry table (names + lines).
-4. **Read `CURRENT-STATUS-PROJECT.md`** — get the module status table.
-5. **Read `CHANGELOG.md`** — get the most recent entry to know what changed last.
-
-**Output format** (always in this order):
+**Formato de salida (siempre en este orden):**
 
 ```text
 ## Situación — YYYY-MM-DD
@@ -763,7 +496,7 @@ structured picture of the project's current state in a single response.
 
 ### Último cambio documentado
 - Fecha: YYYY-MM-DD
-- Resumen: <primera línea del último bloque CHANGELOG>
+- Resumen: <primera línea del último bloque de CHANGELOG.md>
 
 ### Módulos con estado incompleto
 | Módulo | Estado | Bloqueado por |
@@ -771,41 +504,60 @@ structured picture of the project's current state in a single response.
 | ...    | ...    | ...           |
 
 ### Próximo objetivo
-<Extraído de NEXT-STEPS.md § 2>
+<extraído de NEXT-STEPS.md>
 ```
-
-**Files read** (none modified):
-`check-sorry.bash` output → `NEXT-STEPS.md` → `CURRENT-STATUS-PROJECT.md` → `CHANGELOG.md`
-
----
 
 ### `proyecta`
 
-**Purpose**: Extract all new or modified non-private definitions, notations, axioms, and theorems from the currently locked or modified `.lean` files and project them into `REFERENCE.md`.
+**Propósito:** actualización local del sistema REFERENCE para un fichero o sesión
+concreta.
 
-**Steps** (execute in order):
+**Pasos:** identificar los `.lean` modificados en la sesión → extraer su bloque
+`export` → traducir cada símbolo a notación matemática + firma Lean 4 + dependencias
+(§1–§14) → insertarlos en el nodo temático correspondiente de `doc/REFERENCE-*.md` →
+actualizar el índice raíz `REFERENCE.md` si es un nodo nuevo → verificar que todo lo
+del `export` block quedó proyectado y que nada privado se filtró.
 
-1. **Identify modified modules**: Identify all `.lean` files that have been modified during the current session (or that the user explicitly indicates).
-2. **Extract public symbols**: For each modified file, extract its full `export` block.
-3. **Draft the projection**: Translate each exported symbol into its mathematical notation and Lean 4 signature as described in rules §4 to §7. Note its dependencies.
-4. **Update `REFERENCE.md`**: Locate the module's section in `REFERENCE.md`. Insert the newly extracted symbols in the correct subsections. Update the module's modification timestamp in `REFERENCE.md`.
-5. **Verify**: Ensure every symbol in the `export` block now appears in `REFERENCE.md` and no private symbols are exposed.
+### `repasa_y_proyecta`
 
-**Files touched by this command**: `REFERENCE.md`
+**Propósito:** sincronización masiva y profunda de todo el árbol REFERENCE.
+
+**Pasos:** recorrer módulo a módulo todo el proyecto → por cada `.lean`, leer su
+`export` y verificar que cada símbolo está bien documentado en su nodo temático →
+detectar y eliminar "elementos fantasma" (declaraciones borradas, renombradas o vueltas
+`private` en el código que siguen documentadas como vigentes) → asegurar coherencia de
+fechas, jerarquía de dependencias y enlaces de navegación fuerte → actualizar el
+índice raíz.
+
+### `guarda_y_sube`
+
+**Propósito:** flujo de Git seguro y ciclo completo de actualización del repositorio
+preservando los bloqueos locales.
+
+**Pasos exactos:**
+
+1. Ejecutar `lake build` para garantizar que no hay errores de compilación.
+2. Desbloquear los ficheros `.lean` en los que se ha trabajado:
+   `bash git-lock.bash unlock modulo_1.lean ... modulo_n.lean`
+3. Añadir los cambios al staging area (ficheros concretos, evitar `git add -A`/`*`
+   ciego si el conjunto de cambios no se ha revisado antes con `git status`).
+4. Crear el commit: `git commit -m "mensaje muy descriptivo de lo hecho"`.
+5. Subir al remoto: `git push`.
+6. Volver a bloquear los mismos ficheros por seguridad:
+   `bash git-lock.bash lock modulo_1.lean ... modulo_n.lean`
 
 ---
 
-### `guarda y sube`
+## Lista de Cumplimiento
 
-**Purpose**: Automate the standard workflow for safely saving work, committing it, pushing it to the remote repository, and resetting the locks for the next task.
+Antes de dar por completa y al día la documentación de una sesión, verificar que
+`REFERENCE.md` (+ nodos), los ficheros `.lean` y el resto de documentación cumplen:
 
-**Steps** (execute in order):
-
-1. **Verify build**: Ensure the project compiles by running `lake build`.
-2. **Unlock files**: Run `bash git-lock.bash unlock <file>` for all currently locked `.lean` files.
-3. **Stage changes**: Run `git add .` to stage all modified files (including documentation, scripts, and code).
-4. **Commit**: Run `git commit -m "<Summary of changes>"` using the standard commit format based on the session's work. Propose the commit message to the user or generate it autonomously based on the changes if confident.
-5. **Push**: Run `git push` to upload the changes to the current branch.
-6. **Relock files**: Run `bash git-lock.bash lock <file>` on the active files you were working on to resume the session safely.
-
-**Files touched by this command**: git state, `locked_files.txt` (via `git-lock.bash`)
+- [ ] Puntos (0)–(26) de esta guía.
+- [ ] Reglas de exportación (§17 «Bloques de exportación», §18 «Barrels»).
+- [ ] `NAMING-CONVENTIONS.md` (diccionario de símbolos, REGLA 1–12 de formación de
+      nombres, y §5–§8 de estructura de archivos/namespaces/variables/typeclasses).
+- [ ] Ningún placeholder `YYYY-MM-DD`/`[Nombre del Autor]` sin rellenar en documentos
+      que ya no son plantilla (si esto ES la plantilla, déjalos — son intencionales).
+- [ ] `locked_files.txt`/`frozen_files.txt` reflejan el estado real de la sesión, no
+      quedan vacíos por inercia.

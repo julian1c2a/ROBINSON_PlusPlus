@@ -53,7 +53,7 @@ Sesiones colaborativas con Claude Code (u otro asistente). Sin locks por archivo
 * **0 sorrys reales** es la línea base del proyecto desde 2026-05-27 — cualquier sorry nuevo requiere justificación explícita en el commit.
 * Si el linter `unusedSimpArgs` está activo en el módulo editado, eliminar los args señalados o documentar por qué se conservan.
 
-### Comandos formales (definidos en `AI-GUIDE.md §29`)
+### Comandos formales (definidos en `AI-GUIDE.md`, sección "Comandos Interactivos para la IA")
 
 El usuario puede invocar estos verbos para que el asistente ejecute flujos predefinidos:
 

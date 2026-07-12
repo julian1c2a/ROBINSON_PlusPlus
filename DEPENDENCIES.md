@@ -1,13 +1,24 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-**Last updated:** 2026-06-05
+**Last updated:** 2026-06-05 (grafo `Minimal/`) — nota de alcance añadida 2026-07-12
 **Author**: Julián Calderón Almendros
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
 
+> ⚠️ **Alcance real (nota 2026-07-12)**: lo que sigue documenta con detalle **solo
+> `Minimal/`** (Axioms + Block1–8, 11 módulos). **`Meta/` (53 módulos a 2026-07-12,
+> el andamiaje meta-teórico de Gödel II) y `Full/` (11 módulos) no están cubiertos
+> aquí** — nunca se documentaron a este nivel de detalle. Dado el tamaño ya alcanzado
+> (77 ficheros `.lean` en total), añadir aquí un grafo módulo-a-módulo de `Meta/`
+> tendría el mismo problema que `AI-GUIDE.md` §0.5 advierte: quedaría desactualizado
+> de inmediato. Candidato prioritario para adoptar el ADR-007 de `DECISIONS.md` (árbol
+> `doc/REFERENCE-{tema}.md`) y una vista de nivel de subsistema en vez de intentar
+> mantener el grafo de `Meta/` módulo a módulo aquí. Mientras tanto, usar
+> `REFERENCE.md` §3.1–3.2x o `lake graph` para el estado completo y al día.
+
 ---
 
-## Project Structure
+## Project Structure (`Minimal/` — ver nota de alcance arriba)
 
 ```text
 ROBINSON_PlusPlus/                  # raíz del proyecto Lean

@@ -61,7 +61,7 @@ ROBINSON_PlusPlus/
 ```
 
 > As the project grows, organize modules into thematic subdirectories.
-> See AI-GUIDE.md §22 for the directory organization protocol.
+> See AI-GUIDE.md §19 for the directory organization protocol.
 
 ## Installation
 
