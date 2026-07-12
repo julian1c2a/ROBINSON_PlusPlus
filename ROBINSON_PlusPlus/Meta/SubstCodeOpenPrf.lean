@@ -200,10 +200,47 @@ theorem substCodeTs_termsCode (v : Nat) (s : Term) : ∀ ts : List Term,
 
 end
 
+/-! ### Sustitución de código sobre términos **cerrados** (sin variables libres)
+
+Si `t` es cerrado (invariante bajo todo `liftTerm c`), entonces `substCodeT v w t = termCode t`
+para cualquier `v`, `w`: no hay variable que sustituir, así que la función de código coincide con la
+codificación literal. Es la pieza que reduce `substCodeT 0 W (formCode φ) = termCode (formCode φ)`
+(un `formCode φ` es siempre cerrado, `liftTerm_formCode`), necesaria para la reflexión punteada de
+`In` en `hI_dot`. -/
+mutual
+
+/-- `substCodeT` sobre un término **cerrado** coincide con `termCode`. -/
+theorem substCodeT_closed (v : Nat) (w : Term) :
+    ∀ t : Term, (∀ c : Nat, liftTerm c t = t) → substCodeT v w t = termCode t
+  | .var n, ht => by
+      have h := ht 0
+      simp only [liftTerm] at h
+      rw [if_neg (by omega)] at h
+      injection h with hn
+      omega
+  | .func s ts, ht => by
+      have hts : ∀ c, liftTerms c ts = ts := fun c => by
+        have h := ht c; simp only [liftTerm, Term.func.injEq] at h; exact h.2
+      simp only [substCodeT, termCode, funcc, numeral, substCodeTs_closed v w ts hts]
+
+/-- Versión para listas de términos cerrados. -/
+theorem substCodeTs_closed (v : Nat) (w : Term) :
+    ∀ ts : List Term, (∀ c : Nat, liftTerms c ts = ts) → substCodeTs v w ts = termsCode ts
+  | [], _ => rfl
+  | t :: ts, hts => by
+      have ht : ∀ c, liftTerm c t = t := fun c => by
+        have h := hts c; simp only [liftTerms, List.cons.injEq] at h; exact h.1
+      have hts' : ∀ c, liftTerms c ts = ts := fun c => by
+        have h := hts c; simp only [liftTerms, List.cons.injEq] at h; exact h.2
+      simp only [substCodeTs, termsCode, substCodeT_closed v w t ht, substCodeTs_closed v w ts hts']
+
+end
+
 end ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 
 export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
   substCodeT substCodeTs substCodeF
   prf_substtc_arith_open prf_substtsc_arith_open prf_substfc_arith_open
   substCodeT_termCode substCodeTs_termsCode
+  substCodeT_closed substCodeTs_closed
 )
