@@ -23,6 +23,12 @@ open ROBINSON_PlusPlus.Meta.EvalListPrf
 open ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 open ROBINSON_PlusPlus.Meta.EvalLtPrf
 open ROBINSON_PlusPlus.Meta.NatArithPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.BoundedInPrf
+open ROBINSON_PlusPlus.Meta.TrackedCorePrf
+open ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -170,8 +176,63 @@ theorem pcc_nthc_succ_code (h t i : Term) :
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst3 BODY (show ax_nthc_succ ∈ axioms by simp [axioms]) (tcFn h) (tcFn t) (tcFn i))
 
+/-! ### La inducción ACOTADA de `nthc` (`∀p∀i. i<lenc p ⇒ Prov(⌜nthc(ṗ,ı̇) = (nthc p i)˙⌝)`)
+
+Mismo esqueleto que `prf_nthc_runFn` (`RunFnBoundedPrf`): predicado con `∀i` **interno** (la HI se usa
+en `pred i`), `step` con confinación `qconf` + `PrfH_spec`, y `case-split` de `i` con
+`prf_zero_or_eq_succ_pred`. La diferencia: el consecuente es `provFromCode (evalNthcCode p i)`, así
+que las igualdades de código se transportan **dentro de `Prov`** (Leibniz sobre `provFormulaC'`,
+patrón `pcc_lt_tracked`) reflejando `pcc_nthc_zero_code`/`pcc_nthc_succ_code`. -/
+
+/-- Código de la evaluación acotada de `nthc`: `nthc(ṗ,ı̇) = (nthc p i)˙`. -/
+noncomputable def evalNthcCode (p i : Term) : Term :=
+  eqCodeFn (nthcT (tcFn p) (tcFn i)) (tcFn (nthc p i))
+
+theorem substTerm_evalNthcCode (v : Nat) (s p i : Term) :
+    substTerm v s (evalNthcCode p i) = evalNthcCode (substTerm v s p) (substTerm v s i) := by
+  simp only [evalNthcCode, eqCodeFn, nthcT, funcc, tcFn, nthc, cons, nil, zero, succ,
+    substTerm, substTerms, substTerm_numeral, substTerm_strCode]
+
+theorem liftTerm_evalNthcCode (k : Nat) (p i : Term) :
+    liftTerm k (evalNthcCode p i) = evalNthcCode (liftTerm k p) (liftTerm k i) := by
+  simp only [evalNthcCode, eqCodeFn, nthcT, funcc, tcFn, nthc, cons, nil, zero, succ,
+    liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
+
+/-- Predicado inductivo: `Ψ(p) = ∀i. (i < lenc p ⇒ provFromCode (evalNthcCode p i))`
+    (lista `p` = `#1` bajo el `∀i`; `i` = `#0`). -/
+noncomputable def nthcEvalPred : Formula :=
+  Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 1)))
+    (provFromCode (evalNthcCode (.var 1) (.var 0))))
+
+/-- Caso base: `p = nil` (vacuo, `i < lenc nil = 0`). -/
+theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
+  refine Prf.gen _ ?_
+  simp only [nthcEvalPred, substFormula_provFromCode_open, substTerm_evalNthcCode,
+    substFormula, substTerm, substTerms, lt, lenc, nil, zero, Nat.reduceEqDiff,
+    reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
+      (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
+
+/-- Transporte de `provFromCode` por igualdad de código bajo contexto (Leibniz sobre
+    `provFormulaC'`). -/
+theorem PrfH_provCode_congr {Γ : List Formula} {C₁ C₂ : Term}
+    (h : PrfH Γ (C₁ =eq C₂)) (hp : PrfH Γ (provFromCode C₁)) : PrfH Γ (provFromCode C₂) :=
+  PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' C₁ C₂)) h) hp
+
+/-- Congruencia de `nthcT` en `PrfH`. -/
+theorem PrfH_congr_nthcT {Γ : List Formula} {x x' y y' : Term}
+    (hx : PrfH Γ (x =eq x')) (hy : PrfH Γ (y =eq y')) :
+    PrfH Γ (nthcT x y =eq nthcT x' y') := by
+  unfold nthcT funcc
+  exact PrfH_congr_cons_tail (PrfH_congr_cons_tail (PrfH_congr_cons_head
+    (PrfH_eq_trans (PrfH_congr_cons_head hx) (PrfH_congr_cons_tail (PrfH_congr_cons_head hy)))))
+
 end ROBINSON_PlusPlus.Meta.EvalNthcPrf
 
 export ROBINSON_PlusPlus.Meta.EvalNthcPrf (
   nthcT prf_congr_nthcT prf_substtc_nthcT pcc_nthc_zero_code pcc_nthc_succ_code
+  evalNthcCode substTerm_evalNthcCode liftTerm_evalNthcCode nthcEvalPred nthcEvalPred_base
+  PrfH_provCode_congr PrfH_congr_nthcT
 )
