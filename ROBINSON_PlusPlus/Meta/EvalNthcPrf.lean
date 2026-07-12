@@ -32,6 +32,7 @@ open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
+set_option maxRecDepth 8000
 
 namespace ROBINSON_PlusPlus.Meta.EvalNthcPrf
 
@@ -228,6 +229,93 @@ theorem PrfH_congr_nthcT {Γ : List Formula} {x x' y y' : Term}
   unfold nthcT funcc
   exact PrfH_congr_cons_tail (PrfH_congr_cons_tail (PrfH_congr_cons_head
     (PrfH_eq_trans (PrfH_congr_cons_head hx) (PrfH_congr_cons_tail (PrfH_congr_cons_head hy)))))
+
+/-- `nthcT X Y` es `substtc`‑invariante si `X`, `Y` lo son. -/
+theorem substtc_inv_nthcT {X Y : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
+    ∀ W, Prf (substtc zero W (nthcT X Y) =eq nthcT X Y) :=
+  fun W => prf_eq_trans (prf_substtc_nthcT zero W X Y) (prf_congr_nthcT (hX W) (hY W))
+
+/-- **Paso `cons`** de la inducción acotada: análisis de casos `i = 0 / σ(pred i)`
+    (`prf_zero_or_eq_succ_pred`), reflejando `pcc_nthc_zero_code` (base) y `pcc_nthc_succ_code` + HI
+    (`pcc_eq_trans_code_imp`) en el caso sucesor, transportando por igualdad de código bajo contexto
+    (`PrfH_provCode_congr`). Confinación `qconf` + `PrfH_spec` (la HI es `∀i`), como `prf_nthc_runFn`. -/
+theorem nthcEvalPred_step :
+    Prf (Formula.forall (Formula.forall (Formula.impl (liftFormula 1 nthcEvalPred)
+      (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nthcEvalPred)))))) := by
+  refine Prf.gen _ (Prf.gen _ ?_)
+  simp only [nthcEvalPred, liftFormula_provFromCode_open, substFormula_provFromCode_open,
+    liftTerm_evalNthcCode, substTerm_evalNthcCode, liftFormula, liftTerm, liftTerms,
+    substFormula, substTerm, substTerms, lt, lenc, cons, zero,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+  refine prf_mp (Prf.qconf _ _) (Prf.gen _ ?_)
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (lenc (cons (.var 2) (.var 1)))) _ rfl)
+  let P0 : Formula := Formula.forall (Formula.impl (lt (.var 0) (lenc (.var 2)))
+    (provFromCode (evalNthcCode (.var 2) (.var 0))))
+  let A0 : Formula := lt (.var 0) (lenc (cons (.var 2) (.var 1)))
+  refine PrfH_or_elim (prf_to_prfH (prf_zero_or_eq_succ_pred (.var 0)) _) ?_ ?_
+  · -- i = 0
+    have hz : PrfH [Formula.eq (.var 0) zero, A0, P0] (Formula.eq (.var 0) zero) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hbase : PrfH [Formula.eq (.var 0) zero, A0, P0]
+        (provFromCode (eqCodeFn (nthcT (consT (tcFn (.var 2)) (tcFn (.var 1))) (termCode zero))
+          (tcFn (.var 2)))) := prf_to_prfH (pcc_nthc_zero_code (.var 2) (.var 1)) _
+    refine PrfH_provCode_congr ?_ hbase
+    refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT ?_ ?_) ?_
+    · exact prf_to_prfH (prf_eq_symm (prf_tc_cons' (.var 2) (.var 1))) _
+    · exact PrfH_eq_trans (prf_to_prfH (prf_eq_symm prf_tc_zero) _)
+        (PrfH_congr_tcFn (PrfH_eq_symm hz))
+    · exact PrfH_eq_symm (PrfH_eq_trans (PrfH_congr_tcFn (PrfH_eq_congr_nthc2 hz))
+        (prf_to_prfH (prf_congr_tcFn (prf_nthc_zero (.var 2) (.var 1))) _))
+  · -- i = σ(pred i)
+    have hs : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+        (Formula.eq (.var 0) (succ (pred (.var 0)))) := PrfH.hyp _ _ (List.Mem.head _)
+    have hlt : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0] A0 :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hP : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0] P0 :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+    have ihj := PrfH_spec hP (pred (.var 0))
+    simp only [P0, liftFormula_provFromCode_open, substFormula_provFromCode_open,
+      substTerm_evalNthcCode, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+      lt, lenc, pred, cons, zero, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff,
+      Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftTerm,
+      FOL.substTerm_liftLift] at ihj
+    have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+        (lt (pred (.var 0)) (lenc (.var 1))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
+        (PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+          (PrfH_lt_subst1 hs hlt))
+    have ihEval := PrfH.mp _ _ _ ihj hltJ
+    let X : Term := nthcT (consT (tcFn (.var 2)) (tcFn (.var 1))) (succcT (tcFn (pred (.var 0))))
+    let Y : Term := nthcT (tcFn (.var 1)) (tcFn (pred (.var 0)))
+    let Z : Term := tcFn (nthc (.var 1) (pred (.var 0)))
+    have hX : ∀ W, Prf (substtc zero W X =eq X) :=
+      substtc_inv_nthcT (substtc_inv_consT (substtc_inv_tcFn (.var 2)) (substtc_inv_tcFn (.var 1)))
+        (substtc_inv_succcT (substtc_inv_tcFn (pred (.var 0))))
+    have hXZ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
+        (provFromCode (eqc X Z)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_trans_code_imp X Y Z hX
+        (pcc_nthc_succ_code (.var 2) (.var 1) (pred (.var 0)))) _) ihEval
+    refine PrfH_provCode_congr ?_ hXZ
+    refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT ?_ ?_) ?_
+    · exact prf_to_prfH (prf_eq_symm (prf_tc_cons' (.var 2) (.var 1))) _
+    · exact PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_tc_succ' (pred (.var 0)))) _)
+        (PrfH_congr_tcFn (PrfH_eq_symm hs))
+    · exact PrfH_eq_symm (PrfH_eq_trans (PrfH_congr_tcFn (PrfH_eq_congr_nthc2 hs))
+        (prf_to_prfH (prf_congr_tcFn (prf_nthc_succ (.var 2) (.var 1) (pred (.var 0)))) _))
+
+/-- **EVALUACIÓN ACOTADA DE `nthc`**: `⊢ (i < lenc p) ⇒ Prov(⌜nthc(ṗ,ı̇) = (nthc p i)˙⌝)`, para
+    `p`, `i` **arbitrarios**. Inducción de listas (`nthcEvalPred_base`/`_step`) + `prf_spec`. -/
+theorem pcc_eval_nthc (p i : Term) :
+    Prf ((lt i (lenc p)) ⇒ provFromCode (evalNthcCode p i)) := by
+  have key : Prf (Formula.forall nthcEvalPred) :=
+    prf_list_induction nthcEvalPred nthcEvalPred_base nthcEvalPred_step
+  have hi := prf_spec (prf_spec key p) i
+  simpa only [nthcEvalPred, substFormula_provFromCode_open, substTerm_evalNthcCode,
+    substFormula, substTerm, substTerms, lt, lenc, nil, zero, Nat.reduceAdd, Nat.reduceGT,
+    Nat.reduceSub, Nat.reduceEqDiff, reduceIte, if_true, FOL.substTerm_liftTerm,
+    FOL.substTerm_liftLift] using hi
 
 end ROBINSON_PlusPlus.Meta.EvalNthcPrf
 
