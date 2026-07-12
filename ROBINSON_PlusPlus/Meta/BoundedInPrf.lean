@@ -162,6 +162,78 @@ theorem prf_zero_or_eq_succ_pred (n : Term) :
   · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
       (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _)))
 
+/-! ### Ley de sucesor de `<` : `i < σb ⇒ i < b ∨ i = b`
+
+Necesaria para el paso inductivo de la **introducción del `∀` acotado** (`∀i<σb ⇔ ∀i<b ∧ ·(b)`).
+El testigo `k` de `i + σk = σb` decide el caso: `k = 0` da `i = b`; `k = σ(pred k)` da `i < b`
+(testigo `pred k`). Sin `∃`‑elim interno (usa `prf_zero_or_eq_succ_pred`). -/
+
+/-- Auxiliar: del testigo `k` con `i + σk = σb`, decide `i < b ∨ i = b`. -/
+theorem prf_lt_succ_helper (i b k : Term) :
+    Prf ((add i (succ k) =eq succ b) ⇒ lor (lt i b) (Formula.eq i b)) := by
+  refine prf_deduction ?_
+  refine PrfH_or_elim (prf_to_prfH (prf_zero_or_eq_succ_pred k) _) ?zc ?sc
+  · -- k = 0  ⇒  i = b
+    have hk0 := (PrfH.hyp [Formula.eq k zero, add i (succ k) =eq succ b] _ (List.Mem.head _))
+    have hadd := (PrfH.hyp [Formula.eq k zero, add i (succ k) =eq succ b] _
+      (List.Mem.tail _ (List.Mem.head _)))
+    have hadd0 : PrfH [Formula.eq k zero, add i (succ k) =eq succ b]
+        (add i (succ zero) =eq succ b) := by
+      have hL := PrfH_leibniz_subst
+        (A := Formula.eq (add (liftTerm 0 i) (succ (.var 0))) (succ (liftTerm 0 b))) hk0
+        (show PrfH _ (substFormula 0 k
+          (Formula.eq (add (liftTerm 0 i) (succ (.var 0))) (succ (liftTerm 0 b)))) by
+          simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff,
+            Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] using hadd)
+      simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff,
+        Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] using hL
+    have hcomp : Prf (add i (succ zero) =eq succ i) :=
+      prf_eq_trans (prf_add_succ_t i zero)
+        (prfH_nil_to_prf (PrfH_eq_congr_succ (prf_to_prfH (prf_add_zero_t i) [])) rfl)
+    have hsi : PrfH [Formula.eq k zero, add i (succ k) =eq succ b] (succ i =eq succ b) :=
+      PrfH_eq_trans (prf_to_prfH (prf_eq_symm hcomp) _) hadd0
+    have hib : PrfH [Formula.eq k zero, add i (succ k) =eq succ b] (Formula.eq i b) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj i b) _) hsi
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 (lt i b) (Formula.eq i b))) hib
+  · -- k = σ(pred k)  ⇒  lt i b  (testigo pred k)
+    have hks := (PrfH.hyp [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b] _
+      (List.Mem.head _))
+    have hadd := (PrfH.hyp [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b] _
+      (List.Mem.tail _ (List.Mem.head _)))
+    have hadd2 : PrfH [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b]
+        (add i (succ (succ (pred k))) =eq succ b) := by
+      have hL := PrfH_leibniz_subst
+        (A := Formula.eq (add (liftTerm 0 i) (succ (.var 0))) (succ (liftTerm 0 b))) hks
+        (show PrfH _ (substFormula 0 k
+          (Formula.eq (add (liftTerm 0 i) (succ (.var 0))) (succ (liftTerm 0 b)))) by
+          simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff,
+            Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] using hadd)
+      simpa only [substFormula, substTerm, substTerms, add, succ, Nat.reduceEqDiff,
+        Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm] using hL
+    have hsplit : PrfH [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b]
+        (succ (add i (succ (pred k))) =eq succ b) :=
+      PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_add_succ_t i (succ (pred k)))) _) hadd2
+    have hib : PrfH [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b]
+        (add i (succ (pred k)) =eq b) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj (add i (succ (pred k))) b) _) hsplit
+    have hlt : PrfH [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b] (lt i b) :=
+      PrfH_lt_intro i b (pred k) hib
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 (lt i b) (Formula.eq i b))) hlt
+
+/-- **`i < σb ⇒ i < b ∨ i = b`** (ley de sucesor de `<`). -/
+theorem prf_lt_succ_split (i b : Term) :
+    Prf (lt i (succ b) ⇒ lor (lt i b) (Formula.eq i b)) := by
+  have himp : Prf (Formula.ex (Formula.eq (add (liftTerm 0 i) (succ (.var 0)))
+      (liftTerm 0 (succ b))) ⇒ lor (lt i b) (Formula.eq i b)) := by
+    refine prf_ex_elim_imp ?_
+    show PrfH [Formula.eq (add (liftTerm 0 i) (succ (.var 0))) (succ (liftTerm 0 b))]
+      (lor (lt (liftTerm 0 i) (liftTerm 0 b)) (Formula.eq (liftTerm 0 i) (liftTerm 0 b)))
+    exact PrfH.mp _ _ _
+      (prf_to_prfH (prf_lt_succ_helper (liftTerm 0 i) (liftTerm 0 b) (.var 0)) _)
+      (prfH_hyp_self _)
+  exact prf_deduction
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (PrfH_iff_mp (prf_lt_iff i (succ b)) (prfH_hyp_self _)))
+
 /-! ### Dirección ⇐ : base `nil` -/
 
 /-- **Base `nil` (⇐)**: `boundedIn x nil` es falso (`lenc nil = 0`, y `¬ i < 0`). -/
@@ -326,6 +398,7 @@ export ROBINSON_PlusPlus.Meta.BoundedInPrf (
   prf_lt_subst2 PrfH_lt_subst2 PrfH_lt_subst1 PrfH_eq_congr_nthc2
   prf_boundedIn_head prf_boundedIn_tail
   prf_pred_succ prf_eq_congr_pred PrfH_eq_congr_pred prf_zero_or_eq_succ_pred
+  prf_lt_succ_helper prf_lt_succ_split
   prf_boundedIn_nil prf_boundedIn_cons
   prf_boundedIn_of_In prf_In_of_boundedIn prf_In_iff_boundedIn
 )
