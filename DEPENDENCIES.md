@@ -14,7 +14,7 @@ Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos
 > de inmediato. Candidato prioritario para adoptar el ADR-007 de `DECISIONS.md` (árbol
 > `doc/REFERENCE-{tema}.md`) y una vista de nivel de subsistema en vez de intentar
 > mantener el grafo de `Meta/` módulo a módulo aquí. Mientras tanto, usar
-> `REFERENCE.md` §3.1–3.2x o `lake graph` para el estado completo y al día.
+> los nodos temáticos `doc/REFERENCE-*.md` (§3.1–§3.20) o `lake graph` para el estado completo y al día.
 
 ---
 
@@ -201,7 +201,9 @@ Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
 
 ## Exports by Module
 
-Ver `REFERENCE.md` §3.1–§3.11 para listas completas de exports por módulo. Resumen:
+Ver los nodos temáticos [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md) /
+[`REFERENCE-Arithmetic.md`](doc/REFERENCE-Arithmetic.md) (§3.1–§3.11) para listas completas de exports
+por módulo. Resumen:
 
 | Módulo | # defs públicas | # teoremas exportados |
 |---|---:|---:|

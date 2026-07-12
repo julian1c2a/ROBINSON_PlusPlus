@@ -4,7 +4,7 @@
 > **Autor:** Julián Calderón Almendros (con asistencia).
 > **Ámbito:** `ROBINSON_PlusPlus/Meta/*` — capa `Prf` (Hilbert finitario) de Gödel II.
 > **Precondición de build:** todo el proyecto compila (67 jobs, 0 sorrys) bajo Lean `v4.31.0`.
-> **Documentos hermanos:** [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md), [GODEL-STATUS.md](GODEL-STATUS.md), [REFERENCE.md](REFERENCE.md) §3.17.
+> **Documentos hermanos:** [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md), [GODEL-STATUS.md](GODEL-STATUS.md), [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.17–§3.20 (nodo temático del árbol REFERENCE).
 
 ---
 

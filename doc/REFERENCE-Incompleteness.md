@@ -1,0 +1,745 @@
+# REFERENCE — Incompletitud Nivel D · Gödel I/II, D1–D3, Σ₁-completitud provable · ROBINSON_PlusPlus
+
+> **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5). Es el subsistema **activo**
+> del proyecto. Índice raíz: [REFERENCE.md](../REFERENCE.md).
+> **Nodos relacionados:** [Gödelización](REFERENCE-Godelization.md) (`formCode`/`provCodeC'`, base de
+> todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
+> `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral`
+> → reglas `ind`/`listInd`).
+> **Ficheros `.lean`:** la cadena `Meta/` desde `Hilbert.lean` hasta `D3InDotPrf.lean` (ver la tabla de
+> módulos §1 del [índice raíz](../REFERENCE.md); barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)).
+
+**Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
+`Prf` — Gödel I real (`goedel_first_real'`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
+(`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3 por el plan 12‑A
+(Σ₁‑completitud provable: capa Δ₀ del verificador + evaluación provable + reflexión punteada, ruta B).
+**Last updated:** 2026-07-12 · Lean v4.31.0.
+
+---
+
+## Descripción de módulos
+
+### 3.15 `Meta/Incompleteness.lean` — Incompletitud Nivel D (Fase 19)
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.Incompleteness`
+**Status**: ✅ Gödel I (mitad esencial) + Gödel II (postulando D2/D3)
+**@importance**: `high`
+**Last updated**: 2026-06-12
+**Dependencias**: `Axioms`, `Meta/Godel`, `Meta/Provability`, `FOL.*`.
+
+Deriva los teoremas de incompletitud a partir de las condiciones de demostrabilidad del Nivel C (D1 vía `provFormula_repr`; diagonalización vía `goedelSentence_fixedpoint`) + D2/D3 postuladas.
+
+```lean
+noncomputable def provCode (φ) : Formula := substFormula 0 (formCode φ) provFormula   -- Prov(⌜φ⌝)
+def Consistent : Prop := ¬ (axioms ⊢ Formula.bottom)
+-- Primer Teorema (mitad esencial):
+theorem goedel_first_unprovable (hcon : Consistent) : ¬ (axioms ⊢ goedelSentence)
+theorem goedel_first_true (hcon) : ¬ Provable (formCode goedelSentence)   -- G verdadera-pero-indemostrable
+theorem incompleteness (hcon) : ∃ φ, ¬ (axioms ⊢ φ)
+-- Segundo Teorema (postulando D2, D3):
+axiom D2 (A B) : axioms ⊢ (provCode (A ⇒ B) ⇒ (provCode A ⇒ provCode B))
+axiom D3 (A)   : axioms ⊢ (provCode A ⇒ provCode (provCode A))
+noncomputable def consistencyFormula : Formula := neg (provCode Formula.bottom)   -- Con := ¬Prov(⌜⊥⌝)
+theorem con_imp_goedelSentence : axioms ⊢ (consistencyFormula ⇒ goedelSentence)   -- Gödel I formalizado
+theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)       -- ⊬ Con
+```
+
+**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level**. La otra mitad de Gödel I (`⊬ ¬G`) se cerró 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`).
+
+---
+
+### 3.16 Nivel D REAL — aritmetización de D1–D3 (Fases 0–2.2t)
+
+Conversión de D1/D2/D3 de **postulados** a **teoremas** sobre un cálculo de Hilbert finitario nuevo. Plan: [GODEL-D-ARITHMETIZATION.md](../GODEL-D-ARITHMETIZATION.md). El `axioms ⊢` del proyecto usa la ω-regla (no r.e.), así que Gödel se aplica a `Prf` (finitario, paralelo); el ω-sistema queda intacto.
+
+**`Meta/Hilbert.lean`** (Fase 0) — namespace `…Meta.Hilbert`:
+
+```lean
+theorem subst_lift_same (f) (c) (s) : substFormula c s (liftFormula c f) = f
+inductive Prf₀ : Formula → Prop   -- Hilbert intuicionista (P1/P2, C, J, efq, Q1-3, refl, leibniz, thy, mp, gen)
+inductive Prf  : Formula → Prop   -- clásico: incl (Prf₀) + p3 (DNE) + mp + gen
+theorem prf0_to_derives : Prf₀ φ → axioms ⊢ φ   -- SOLO constructores de Derives (sin dne)
+theorem prf_to_derives  : Prf φ → axioms ⊢ φ    -- + dne en un único punto (esquema p3)
+theorem consistentH_of_omega : ¬(axioms ⊢ ⊥) → ¬ Prf ⊥
+-- #print axioms: prf0 sin dne; prf con FOL.MetaRules.dne (diferencia exacta = {dne})
+```
+
+**`Meta/HilbertSeq.lean`** (Fase 1) — namespace `…Meta.HilbertSeq`:
+
+```lean
+inductive Rule   -- líneas anotadas (evita invertir la sustitución)
+def checkProof : List Rule → Option (List Formula)   -- verificador decidible (DecidableEq Term/Formula)
+def Derivation (rs) (φ) : Prop := ∃ L, checkProof rs = some L ∧ φ ∈ L
+theorem derivation_to_prf : Derivation rs φ → Prf φ            -- solidez
+theorem prf_to_derivation : Prf φ → ∃ rs, Derivation rs φ       -- completitud (checkAux_append/_shift)
+theorem prf_iff_derivation : Prf φ ↔ ∃ rs, Derivation rs φ
+def ruleCode : Rule → Term ;  def rulesCode : List Rule → Term  -- coding de Gödel
+def Dem (d x : Term) : Prop  -- "d codifica derivación válida con la fórmula de código x" (concreto)
+def ProvableH (x : Term) : Prop := ∃ d, Dem d x
+theorem dem_tracks (φ) : ProvableH (formCode φ) ↔ Prf φ         -- reemplaza dem_iff_provable
+```
+
+**`Meta/CodeArith.lean`** (Fase 2.1) — namespace `…Meta.CodeArith`:
+
+```lean
+theorem numeral_bridge (n) : Meta.Godel.numeral n = Full.numeral n
+theorem gnum_ne {a b} (h : a ≠ b) : axioms ⊢ neg (numeral a =eq numeral b)   -- separación
+theorem gnum_lt {a b} (h : a < b) : axioms ⊢ lt (numeral a) (numeral b)
+theorem gnum_add (a b) : axioms ⊢ (add (numeral a) (numeral b) =eq numeral (a+b))   -- + gnum_mul, gnum_refl
+```
+
+**`Minimal/Axioms.lean`** (extensión definicional para coding): `varc`/`funcc` (códigos de `Term.var`/`Term.func`), `substtc`/`substtsc` (sustitución aritmetizada), `forall_4`, y 6 ecuaciones recursivas `ax_substtc_*`/`ax_substtsc_*` añadidas a `axioms`.
+
+**`Meta/SubstArith.lean`** (Fase 2.2 nivel término) — namespace `…Meta.SubstArith`:
+
+```lean
+theorem congr_cons_head / congr_cons_tail   -- congruencia de cons (patrón eq_congr)
+theorem pred_numeral (m) : axioms ⊢ (pred (numeral (m+1)) =eq numeral m)
+theorem substTerm_liftLiftLift   -- cancelación de triple lift (para instanciar forall_4)
+-- ecuaciones recursivas re-derivadas como TEOREMAS (de Minimal.axioms, vía ax+spec):
+theorem substtc_var_eq / _var_gt / _var_lt / _func ;  theorem substtsc_nil / _cons
+theorem substTerm_arith (v) (s) (t) : axioms ⊢ (substtc (numeral v) (termCode s) (termCode t) =eq termCode (substTerm v s t))
+theorem substTerms_arith ...   -- mutuo; cómputo object de la sustitución (nivel término)
+theorem liftTerm_arith / liftFormula_arith ; theorem substFormula_arith   -- nivel fórmula (con binders)
+-- lemas de lift: substTerm_liftLiftLift (3-lift), substTerm_liftLiftLiftLift (4-lift)
+-- #print axioms substFormula_arith = solo axiomas estándar de Lean (0 postulados nuevos)
+```
+
+**`Meta/StepArith.lean`** (Fase 2.3) — `…Meta.StepArith`:
+
+```lean
+theorem q1_concl_code / q2_concl_code / leibniz_concl_code   -- el código de la conclusión de
+  -- los esquemas de sustitución, reconstruido con substfc, coincide con formCode (vía substFormula_arith)
+```
+
+**`Meta/CheckArith.lean`** (Fase 2.4) — `…Meta.CheckArith`:
+
+```lean
+theorem numeralM_eq (n) : numeralM n = Godel.numeral n
+theorem carc_cons / cdrc_cons   -- cómputo de los extractores cabeza/cola
+-- 17 step lemmas del verificador (re-derivadas de Minimal.axioms):
+theorem vpf_nil/p1/p2/c1/c2/c3/j1/j2/j3/efq/q1/q2/q3/eqrefl/leibniz/p3   -- incondicionales
+theorem vpf_mp (… h1 h2) / vpf_gen (… h1)   -- condicionales por pertenencia In
+def provFormulaC : Formula := Formula.ex (In (var 1) (validProofFn nil (var 0)))   -- demostrabilidad Σ₁
+noncomputable def provCodeC (φ) := substFormula 0 (formCode φ) provFormulaC
+```
+
+---
+
+### 3.17 Gödel II finitario en `Prf` — cadena HBL sobre `provCodeC'` (Fases 3–5)
+
+Re-nivelación de la cadena Hilbert-Bernays-Löb al cálculo finitario `Prf` (Gödel II es
+`¬ Prf Con'`; `provCodeC'` rastrea `Prf`, no ω). Predicado estructural fiel
+`provCodeC' φ := ∃p, chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)` (`Meta/ProofChain.lean`).
+
+**`Meta/HilbertDeduction.lean`** — namespace `…Meta.HilbertDeduction`:
+
+```lean
+inductive PrfH : List Formula → Formula → Prop   -- cálculo con contexto (espejo de Prf + hyp)
+theorem deduction_aux {Δ B} (h : PrfH Δ B) : ∀ A Γ, Δ = A :: Γ → PrfH Γ (A ⇒ B)
+theorem prf_deduction {A B} (h : PrfH [A] B) : Prf (A ⇒ B)
+theorem prf_ex_elim_imp {A C} (h : PrfH [A] (liftFormula 0 C)) : Prf (Formula.ex A ⇒ C)
+theorem prf_to_prfH {φ} (h : Prf φ) : ∀ Γ, PrfH Γ φ  ;  theorem prfH_hyp_self (A) : PrfH [A] A
+theorem PrfH_ex_intro {Γ A} (t) (h : PrfH Γ (substFormula 0 t A)) : PrfH Γ (Formula.ex A)   -- q2
+theorem PrfH_ex_elim {Γ A C} (hex : PrfH Γ (Formula.ex A))
+  (hbody : PrfH (A :: Γ.map (liftFormula 0)) (liftFormula 0 C)) : PrfH Γ C                   -- q3+gen
+-- #print axioms prf_deduction/prf_ex_elim_imp = [propext, Classical.choice, Quot.sound]
+```
+
+**`Meta/ArithPrf.lean`** / **`Meta/Representability2Prf.lean`** / **`Meta/ReprPrf.lean`** (Fase 3, D1):
+
+```lean
+theorem prf_substTerm_arith / prf_substTerms_arith / prf_liftTerm_arith   -- aritmética de códigos en Prf
+theorem prf_congr_substfc_arg2 / _arg3   -- congruencias de substfc
+theorem provCodeC'_intro_prf (φ) (p) (h1 : Prf (chainOk nil p)) (h2 : Prf (In (formCode φ) (runFn nil p)))
+  : Prf (provCodeC' φ)
+theorem repr_pos'_prf {φ} (h : Prf φ) : Prf (provCodeC' φ)   -- D1 finitaria (necesitación)
+-- ReprPrf: prf_runFn_nil/cons, prf_congr_runFn_1/2, prf_chainOk_nil/cons/subst1, prf_allIn_nil/cons,
+--   prf_in_cons_head/tail, prf_eq_trans/symm, prf_concat_nil_eq/cons_eq, prf_carc_cons, 32 lineWF/premsOf
+-- #print axioms repr_pos'_prf = [propext, Classical.choice, Quot.sound, prf_inAxC]
+```
+
+**`Meta/ChainPrf.lean`** (Fase 4, paso 8) — namespace `…Meta.ChainPrf`: **10 lemas de cadena en `Prf`**
+vía el eliminador de inducción de listas + normalización De Bruijn + confinación.
+
+```lean
+theorem prf_list_induction (Φ) (base : Prf (substFormula 0 nil Φ)) (step) : Prf (Formula.forall Φ)
+theorem norm21 (s t) : substTerm 0 s (liftTerm 2 (liftTerm 1 (liftTerm 0 t))) = liftTerm 1 (liftTerm 0 t)
+theorem norm32 (z t) : substTerm 1 z (liftTerm 3 (liftTerm 2 (liftTerm 0 (liftTerm 0 t))))
+  = liftTerm 2 (liftTerm 0 (liftTerm 0 t))                       -- profundidad 2 (para ∀c interno)
+theorem norm_s (z s) : substTerm 0 z (liftTerm 1 (liftTerm 2 (liftTerm 0 (liftTerm 0 s))))
+  = liftTerm 2 (liftTerm 0 (liftTerm 0 s))                       -- cancela lift de confinación
+theorem prf_concat_nil_right (X) : Prf (concat X nil =eq X)  ;  theorem prf_concat_assoc (M N L)
+theorem prf_In_mono (x c c0) (h : Prf (In x c)) : Prf (In x (concat c0 c))  ;  prf_In_mono_imp
+theorem prf_In_mono_right (x M L) (h : Prf (In x L)) : Prf (In x (concat L M))  ;  prf_In_mono_right_imp
+theorem prf_allIn_mono_imp / prf_lineOk_mono_imp / prf_chainOk_subst2
+theorem prf_runFn_concat (c p s) : Prf (runFn c (concat p s) =eq runFn (runFn c p) s)   -- keystone
+theorem prf_chainOk_mono_imp (c0 c p) : Prf (chainOk c p ⇒ chainOk (concat c0 c) p)
+theorem prf_runFn_weaken (c p) : Prf (runFn c p =eq concat c (runFn nil p))
+theorem prf_chainOk_concat (c p s) : Prf (chainOk c (concat p s) ⇔ land (chainOk c p) (chainOk (runFn c p) s))
+-- helpers PrfH: PrfH_spec, PrfH_and_intro/elim, PrfH_iff_mp/mpr, PrfH_eq_trans/symm,
+--   PrfH_or_elim, PrfH_congr_cons_head/tail/concat_left, PrfH_chainOk_subst1/2, PrfH_allIn_subst2,
+--   PrfH_eq_subst_in, PrfH_in_cons_head/tail
+-- #print axioms de todos = [propext, Classical.choice, Quot.sound]
+```
+
+**`Meta/DerivCondPrf.lean`** (Fase 4, D2) — namespace `…Meta.DerivCondPrf`:
+
+```lean
+theorem liftTerm_numeral / liftTerm_charsCode / liftTerm_strCode / liftTerm_termCode / liftTerm_formCode
+  -- clausura: los códigos de Gödel son cerrados (invariantes bajo liftTerm)
+theorem liftFormula_provCodeC' (c) (φ) : liftFormula c (provCodeC' φ) = provCodeC' φ
+theorem d2_prf (A B) : Prf (provCodeC' (A ⇒ B) ⇒ (provCodeC' A ⇒ provCodeC' B))   -- D2 finitaria real
+-- #print axioms d2_prf = [propext, Classical.choice, Quot.sound]   (sin postulados, ni prf_inAxC)
+```
+
+**`Meta/ReflectionPrf.lean`** (Fase 5, D3 reducida) — namespace `…Meta.ReflectionPrf`:
+
+```lean
+theorem PrfH_pcc_mp {Γ A B} (h1 : PrfH Γ (provCodeC' (A ⇒ B))) (h2 : PrfH Γ (provCodeC' A))
+  : PrfH Γ (provCodeC' B)                                        -- MP interno (D2), versión PrfH
+theorem PrfH_pcc_prf {Γ φ} (h : Prf φ) : PrfH Γ (provCodeC' φ)   -- D1 interno
+theorem PrfH_pcc_andIntro / PrfH_pcc_exIntro                     -- ∧-intro (c1) / ∃-intro (q2) internos
+theorem d3_prf_of_sigma1 (φ)
+  (hC : ∀ p, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p)))
+  (hI : ∀ x L, Prf (In x L ⇒ provCodeC' (In x L)))
+  : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))               -- D3 reducida a la Σ₁-completitud
+-- #print axioms d3_prf_of_sigma1 = [propext, Classical.choice, Quot.sound, prf_inAxC]
+```
+
+**`Meta/Sigma1Prf.lean`** (Fase 5, núcleo de D3) — namespace `…Meta.Sigma1Prf`: infraestructura de
+reflexión Σ₁ (hacia `hC`/`hI`).
+
+```lean
+theorem pcc_imp {A B} (h : Prf (A ⇒ B)) : Prf (provCodeC' A ⇒ provCodeC' B)   -- MP interno como esquema
+theorem pcc_imp2 {A B C} (h : Prf (A ⇒ (B ⇒ C))) : Prf (provCodeC' A ⇒ (provCodeC' B ⇒ provCodeC' C))
+def provFromCode (c : Term) : Formula := substFormula 0 c provFormulaC'   -- demostrabilidad de un código
+theorem provCodeC'_eq_provFromCode (φ) : provCodeC' φ = provFromCode (formCode φ)
+theorem prf_provCode_congr {c₁ c₂} (h : Prf (c₁ =eq c₂)) : Prf (provFromCode c₁ ⇒ provFromCode c₂)
+  -- la demostrabilidad respeta la igualdad de códigos (Leibniz object; [propext, choice, Quot.sound])
+theorem pcc_eq_of_codeEq (x y)
+  (hcode : Prf ((x =eq y) ⇒ (formCode (Formula.eq x x) =eq formCode (Formula.eq x y))))
+  : Prf ((x =eq y) ⇒ provCodeC' (x =eq y))   -- reflexión de igualdad REDUCIDA a la igualdad de códigos
+theorem pcc_in_head (x t) : Prf (provCodeC' (In x (cons x t)))   -- reflexión de In (base cabeza)
+theorem pcc_in_tail (hd x t) : Prf (provCodeC' (In x t) ⇒ provCodeC' (In x (cons hd t)))
+theorem pcc_in_head_eq (hd x t) : Prf (provCodeC' (x =eq hd) ⇒ provCodeC' (In x (cons hd t)))
+theorem pcc_in_nil (x) : Prf (In x nil ⇒ provCodeC' (In x nil))
+theorem pcc_chainOk_nil (c) : Prf (provCodeC' (chainOk c nil))
+theorem pcc_chainOk_cons (c line rest) : Prf (provCodeC' (lineOk c line) ⇒
+  (provCodeC' (chainOk (concat c (cons (carc line) nil)) rest) ⇒ provCodeC' (chainOk c (cons line rest))))
+theorem pcc_allIn_nil (c) : Prf (provCodeC' (allIn c nil))
+theorem pcc_allIn_cons (c x t) : Prf (provCodeC' (In x c) ⇒
+  (provCodeC' (allIn c t) ⇒ provCodeC' (allIn c (cons x t))))
+-- #print axioms pcc_imp = [propext, Classical.choice, Quot.sound, prf_inAxC]
+-- NOTA (núcleo duro pendiente): la reflexión de igualdad universal `∀x y` es indemostrable
+--   (obstrucción Tarski: `termCode` es meta, no object; solo vale para términos-código vía tcFn).
+--   La Σ₁-completitud real (`hC`/`hI`) debe reformularse al nivel del código object (tcFn/substfc).
+```
+
+**`Meta/TcArithPrf.lean`** (Fase 5, cimiento código object) — namespace `…Meta.TcArithPrf`: porte
+finitario de la cadena `tc_arith` de `Diagonal.lean` (ω) → `Prf`. `tcFn` (función object,
+`Minimal/Axioms.lean`) computa `termCode`.
+
+```lean
+theorem prf_tc_zero : Prf (tcFn zero =eq termCode zero)
+theorem prf_tc_succ (x) : Prf (tcFn (succ x) =eq cons (numeral 1) (cons (strCode succ_sym) (cons (cons (tcFn x) nil) nil)))
+theorem prf_tc_cons (a b) : Prf (tcFn (cons a b) =eq ⌜::·⌝[tcFn a, tcFn b])
+theorem prf_tc_numeral (n) : Prf (tcFn (numeral n) =eq termCode (numeral n))   -- inducción meta
+theorem prf_tc_of_cons {a b} (ha : Prf (tcFn a =eq termCode a)) (hb : Prf (tcFn b =eq termCode b))
+  : Prf (tcFn (cons a b) =eq termCode (cons a b))
+theorem prf_tc_chars / prf_tc_str / prf_tc_term / prf_tc_terms   -- mutuas
+theorem prf_tc_form (φ) : Prf (tcFn (formCode φ) =eq termCode (formCode φ))   -- código del código
+theorem prf_congr_tcFn {t₁ t₂} (h : Prf (t₁ =eq t₂)) : Prf (tcFn t₁ =eq tcFn t₂)   -- congruencia Leibniz object
+-- #print axioms = [propext, Classical.choice, Quot.sound]
+-- Cimiento del enfoque de código object: `tcFn` es función object con congruencia Leibniz
+-- (a diferencia de la `termCode` meta que causa la obstrucción Tarski).
+```
+
+**`Meta/Sigma1CorePrf.lean`** (Fase 5, capa de código object para `In`) — namespace `…Meta.Sigma1CorePrf`:
+primera piedra de la reformulación de `hI` al nivel del código object. El obstáculo es que
+`formCode (In x L)` contiene `termCode L` (**meta**, stuck para `L` abstracta); la salida es
+construir el código del átomo con una **función object** de los códigos de sus argumentos, para
+que la demostrabilidad respete su igualdad (Leibniz object vía `provFromCode`).
+
+```lean
+def inFormCodeFn (xc Lc : Term) : Term := cons (numeral 3) (cons (strCode in_sym) (cons (cons xc (cons Lc nil)) nil))
+  -- constructor object del código del átomo In: ⟨3, ⌜∈⌝, [xc, Lc]⟩
+theorem inFormCodeFn_termCode (x L) : inFormCodeFn (termCode x) (termCode L) = formCode (In x L)   -- puente rfl
+theorem provCodeC'_In_eq (x L) : provCodeC' (In x L) = provFromCode (inFormCodeFn (termCode x) (termCode L))   -- rfl
+theorem prf_congr_inFormCodeFn {xc xc' Lc Lc'} (hx : Prf (xc =eq xc')) (hL : Prf (Lc =eq Lc'))
+  : Prf (inFormCodeFn xc Lc =eq inFormCodeFn xc' Lc')   -- congruencia en ambos args
+theorem prf_provFromCode_In_congr {xc xc' Lc Lc'} (hx : Prf (xc =eq xc')) (hL : Prf (Lc =eq Lc'))
+  : Prf (provFromCode (inFormCodeFn xc Lc) ⇒ provFromCode (inFormCodeFn xc' Lc'))   -- transporte por igualdad de códigos
+theorem prf_provCodeC'_In_of_tracked {x L xc Lc} (hx : Prf (xc =eq termCode x)) (hL : Prf (Lc =eq termCode L))
+  (h : Prf (provFromCode (inFormCodeFn xc Lc))) : Prf (provCodeC' (In x L))   -- puente rastreado → provCodeC'
+theorem prf_provCodeC'_In_formCode_of_tracked {φ L} (hL : Prf (tcFn L =eq termCode L))
+  (h : Prf (provFromCode (inFormCodeFn (tcFn (formCode φ)) (tcFn L)))) : Prf (provCodeC' (In (formCode φ) L))
+  -- especialización x=⌜φ⌝ (1er arg cerrado por prf_tc_form)
+-- — Reflexión de In sobre listas explícitas + tracking runFn→objList (testigos CONCRETOS) —
+def objList : List Term → Term            -- objList [] = nil ; objList (e::es) = cons e (objList es)
+theorem pcc_in_objList_of_mem (x) (elems) : List.Mem x elems → Prf (provCodeC' (In x (objList elems)))
+  -- reflexión de In por META-pertenencia (cabeza = pcc_in_head INCONDICIONAL; sortea reflexión de igualdad)
+theorem prf_runFn_objList (lines c) : Prf (runFn c (objList lines) =eq concat c (objList (lines.map carc)))
+theorem prf_runFn_nil_objList (lines) : Prf (runFn nil (objList lines) =eq objList (lines.map carc))  -- axiomas puros
+theorem pcc_in_runFn_objList (x lines) (hmem : List.Mem x (lines.map carc))
+  : Prf (provCodeC' (In x (runFn nil (objList lines))))   -- = hI para testigos CONCRETOS
+-- — A‑F1: tcFn = termCode sobre la forma de la lista de conclusiones —
+theorem prf_tc_objList (cs) (h : ∀ c, List.Mem c cs → Prf (tcFn c =eq termCode c))
+  : Prf (tcFn (objList cs) =eq termCode (objList cs))
+theorem prf_tc_objList_formCode (φs) : Prf (tcFn (objList (φs.map formCode)) =eq termCode (objList (φs.map formCode)))
+-- — A‑F2: puente RASTREADO→real (mecanismo central de la Opción A) —
+theorem prf_provCodeC'_of_tracked_witness (A p) (hp : Prf (tcFn p =eq termCode p))
+  (h : Prf (provFromCode (substfc (numeral 0) (tcFn p) (formCode A)))) : Prf (provCodeC' (substFormula 0 p A))
+  -- reflexión rastreada con testigo-código = provCodeC' real; el tcFn NO se absorbe (slot-término genuino)
+-- #print axioms = [propext, Classical.choice, Quot.sound]  (pcc_* añaden prf_inAxC, ancla de coding benigna)
+theorem prf_lineOk_q2 (c Ac w) : Prf (lineOk c (cons (implc (substfc zero w Ac) (exc Ac))
+  (cons (numeralM 10) (cons Ac (cons w nil)))))   -- línea-axioma Q2 válida en cualquier contexto (A‑F3 base)
+```
+
+**`Meta/ExIntroCodePrf.lean`** (A‑F3/A‑F4) — namespace `…Meta.ExIntroCodePrf`: ∃‑intro de la
+regla Q2 al nivel de CÓDIGO + clausuras De Bruijn.
+
+```lean
+theorem liftTerm_exc (Ac) (hAc : ∀ c, liftTerm c Ac = Ac) : ∀ c, liftTerm c (exc Ac) = exc Ac
+theorem liftFormula_provFromCode_exc (Ac) (hAc) : liftFormula 0 (provFromCode (exc Ac)) = provFromCode (exc Ac)
+theorem liftTerm_substfc (Ac w) (hAc) (hw) : ∀ c, liftTerm c (substfc zero w Ac) = substfc zero w Ac
+theorem pcc_exIntro_code (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, liftTerm c w = w)
+  : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))
+  -- ∃-intro Q2 a nivel código, testigo-código arbitrario CERRADO; ensamblaje p ++ [q2line, mpline]
+  -- (tipo d2_prf). #print axioms = [propext, Classical.choice, Quot.sound] (sin postulados)
+```
+
+**`Meta/Sigma1TrackedPrf.lean`** (verificación RIESGO‑1) — namespace `…Meta.Sigma1TrackedPrf`:
+el ∃‑intro rastreado (`pcc_exIntro_code`, L1) cierra hasta `provCodeC'(∃A)` para testigo CERRADO.
+
+```lean
+theorem pcc_exIntro_code_bridge (A p) (hpc : ∀ c, liftTerm c p = p)
+  (h : Prf (provFromCode (substfc zero (tcFn p) (formCode A)))) : Prf (provCodeC' (Formula.ex A))
+  -- reconciliación definicional exc ⌜A⌝ = ⌜∃A⌝ (numeral 9 = succ⁹ zero)
+theorem pcc_exIntro_code_objList (A lines) (hclosed) (h) : Prf (provCodeC' (Formula.ex A))
+-- #print axioms = [propext, Classical.choice, Quot.sound]
+-- MURO (testigo ABSTRACTO): tcFn #0 NO es cerrado (hw falla) y todo combinador base produce
+--   termCode meta (transporte a tcFn stuck para lista abstracta) → hI_tracked abstracto exige la
+--   Opción A DE RAÍZ (provFormulaC'ₜ/provCodeC'ₜ con tcFn + D1ₜ). Ver GODEL-D3-TRACKED-DESIGN.md §4.2.
+--   Limpieza F7 BLOQUEADA hasta goedel_second_prf real (GodelTwo.goedel_second' aún usa axiom d3).
+```
+
+> **NOTA (2026‑07‑05c/d):** el enfoque `tcFn` (§3.17 arriba, Opción A §10 del diseño) quedó
+> **DESCARTADO** para el testigo abstracto (investigación §11–§12 de `GODEL-D3-TRACKED-DESIGN.md`;
+> el caso cabeza/cola de la inducción exige `tcFn L =eq termCode L`, stuck para `L` abstracta). Se
+> verificó además que **no hay atajo** por teorema de deducción (D1 exige `Prf` cerrado). Vía
+> genuina = **Σ₁‑completitud provable estándar (12‑A: capa numérica Δ₀ del verificador)**. Los
+> constructores `atom2CodeFn` y `pcc_exIntro_code` siguen siendo infraestructura válida.
+
+**`Meta/TrackedCorePrf.lean`** — namespace `…Meta.TrackedCorePrf`: clausura genérica de `provFromCode`
+
++ constructores de código object para átomos binarios (generaliza `inFormCodeFn`).
+
+```lean
+theorem liftFormula_provFromCode (k c) (hc : ∀ lvl, liftTerm lvl c = c)
+  : liftFormula k (provFromCode c) = provFromCode c   -- clausura genérica (código cerrado arbitrario)
+def atom2CodeFn (s a b : Term) : Term := ⟨3, strCode s, [a, b]⟩   -- código de Formula.atom s [a,b]
+theorem atom2CodeFn_termCode (s a b) : atom2CodeFn s (termCode a)(termCode b) = formCode (.atom s [a,b])  -- rfl
+theorem inFormCodeFn_eq_atom2 (xc Lc) : inFormCodeFn xc Lc = atom2CodeFn in_sym xc Lc   -- rfl
+theorem liftTerm_atom2CodeFn (s a b) (ha hb) : ∀ lvl, liftTerm lvl (atom2CodeFn s a b) = atom2CodeFn s a b
+theorem prf_congr_atom2CodeFn {s a a' b b'} (ha : Prf (a =eq a')) (hb : Prf (b =eq b'))
+  : Prf (atom2CodeFn s a b =eq atom2CodeFn s a' b')
+theorem prf_provFromCode_atom2_congr {s a a' b b'} (ha) (hb)
+  : Prf (provFromCode (atom2CodeFn s a b) ⇒ provFromCode (atom2CodeFn s a' b'))
+theorem liftFormula_provFromCode_atom2 (k s a b) (ha hb) : liftFormula k (provFromCode (atom2CodeFn s a b)) = provFromCode (atom2CodeFn s a b)
+def chainOkCodeFn (cc pc) := atom2CodeFn "chainOk" cc pc   -- + chainOkCodeFn_termCode (rfl)
+def allInCodeFn (cc Lc) := atom2CodeFn "allIn" cc Lc        -- + allInCodeFn_termCode (rfl)
+```
+
+**`Meta/NumListPrf.lean`** — namespace `…Meta.NumListPrf`: capa numérica de listas en `Prf`
+(D3 vía Σ₁‑completitud, §12‑A fase 1a). Ecuaciones `Prf` de `lenc`/`nthc` (re‑derivadas de `axioms`).
+
+```lean
+theorem prf_lenc_nil : Prf (lenc nil =eq zero)
+theorem prf_lenc_cons (h t) : Prf (lenc (cons h t) =eq succ (lenc t))
+theorem prf_nthc_zero (h t) : Prf (nthc (cons h t) zero =eq h)
+theorem prf_nthc_succ (h t i) : Prf (nthc (cons h t) (succ i) =eq nthc t i)
+```
+
+**Nuevas defs/axiomas en `Minimal/Axioms.lean`** (extensión definicional conservadora, capa numérica
+de listas para D3, §12‑A): `lenc l := func "lenc" [l]`, `nthc l i := func "nthc" [l, i]`; axiomas
+`ax_lenc_nil` (`lenc nil = 0`), `ax_lenc_cons` (`lenc (cons h t) = σ (lenc t)`), `ax_nthc_zero`
+(`nthc (cons h t) 0 = h`), `ax_nthc_succ` (`nthc (cons h t) (σ i) = nthc t i`). Añadidos a `axioms`
+y `codingAxioms` (`axioms_eq` rfl preservado; verificador/`prf_iff_derivation`/D1 intactos).
+
+---
+
+### 3.18 Σ₁‑completitud provable — capa numérica Δ₀ del verificador (plan 12‑A)
+
+**Por qué existe esta capa.** El núcleo duro de D3 es la Σ₁‑completitud *provable* del verificador
+(`hC`/`hI` de `d3_prf_of_sigma1`). La construcción estándar exige que el cuerpo `δ` del predicado
+Σ₁ sea **Δ₀ sobre números** (cuantificadores acotados por términos). Pero el verificador de este
+proyecto es **estructural sobre listas** (`carc`/`cdrc`, sin `len`/`nth`) — de ahí el hallazgo
+central de §12.1 de `GODEL-D3-TRACKED-DESIGN.md`: **codificar el testigo ≡ representar el
+verificador**. La Opción 12‑A construye la capa numérica que falta.
+
+Fases y estado:
+
+| Fase | Contenido | Estado |
+|------|-----------|--------|
+| 1a | `lenc`/`nthc` (long./índice de lista‑código): defs + 4 axiomas + ecuaciones `Prf` | ✅ |
+| 1b | toolkit aritmético de `<` en `Prf` → `In x L ⇔ ∃ i < lenc L. nthc L i =eq x` | ✅ |
+| 2 | forma Δ₀ del verificador: `In · (runFn nil p)` y `chainOk c p` | ✅ |
+| 3 | `num` (numeral‑de) + evaluación provable | ⏳ |
+| 4 | Δ₀‑completitud atómica (aquí entran las ecuaciones de variable de `substfc`) | ⏳ |
+| 5 | inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` → `goedel_second_prf` | ⏳ |
+
+**`Meta/NumListPrf.lean`** — ver §3.17 (ecuaciones `Prf` de `lenc`/`nthc`).
+
+---
+
+**`Meta/NatArithPrf.lean`** (fase 1b, cimiento) — namespace `…Meta.NatArithPrf`: **toolkit aritmético
+de `<` en `Prf`**. Fue el descubrimiento de escala de la fase 1b: como `lt a b := ∃k. a + σk = b`
+(`ax13_lt_def`) y `add` recurre **por la derecha** (`ax4`/`ax5`), la identidad izquierda `0 + n = n`
+**no es teorema de Q** — hay que reconstruirla con `Prf.ind`. Todo lo demás cuelga de ahí.
+
+```lean
+theorem prf_nat_induction (Φ) (base : Prf (substFormula 0 zero Φ))
+  (step : Prf (∀ (Φ ⇒ substFormula 0 (succ #0) (liftFormula 1 Φ)))) : Prf (Formula.forall Φ)
+  -- eliminador de inducción natural (envuelve `Prf.ind` / `Full.inductionFormula`)
+theorem norm11 (s t) : substTerm 0 s (liftTerm 1 (liftTerm 0 t)) = liftTerm 0 t  -- norm De Bruijn 1 binder
+theorem prf_add_zero_left  (n)   : Prf (add zero n =eq n)            -- NO es teorema de Q: usa Prf.ind
+theorem prf_add_succ_left  (m n) : Prf (add (succ m) n =eq succ (add m n))
+theorem prf_lt_iff (a b) : Prf (lt a b ⇔ ∃ (add ↑a (succ #0) =eq ↑b))   -- despliegue de ax13
+theorem PrfH_lt_intro {Γ} (a b k) (h : PrfH Γ (add a (succ k) =eq b)) : PrfH Γ (lt a b)
+theorem prf_lt_intro (a b k) (h : Prf (add a (succ k) =eq b)) : Prf (lt a b)
+theorem prf_succ_ne_zero (n) : Prf ((succ n =eq zero) ⇒ ⊥)   ;  theorem prf_succ_inj (m n)
+theorem prf_zero_or_succ (n) : Prf (lor (n =eq zero) (∃ (↑n =eq succ #0)))
+theorem prf_zero_lt_succ (n)          : Prf (lt zero (succ n))
+theorem prf_succ_lt_succ_of_lt (m n)  : Prf (lt m n ⇒ lt (succ m) (succ n))
+theorem prf_lt_of_succ_lt_succ (m n)  : Prf (lt (succ m) (succ n) ⇒ lt m n)
+theorem prf_not_lt_zero (n)           : Prf (lt n zero ⇒ ⊥)
+theorem PrfH_eq_congr_succ {Γ t₁ t₂} (h : PrfH Γ (t₁ =eq t₂)) : PrfH Γ (succ t₁ =eq succ t₂)
+-- #print axioms de todos = [propext, Classical.choice, Quot.sound]
+```
+
+**Lección De Bruijn (reusar):** para eliminar un `∃` de una **hipótesis** usar `prf_ex_elim_imp`
+(lift simple, casa con el `↑a`/`↑b` que ya trae el cuerpo del `∃`), **nunca `PrfH_ex_elim`** (liftea
+además el contexto → doble lift). Y al desplegar `ax13_lt_def` hay que incluir `add` en el simp‑set.
+
+---
+
+**`Meta/BoundedInPrf.lean`** (fase 1b, objetivo) — namespace `…Meta.BoundedInPrf`: la
+**caracterización acotada de `In`**.
+
+```lean
+def boundedIn (x L : Term) : Formula :=            -- ∃ i < lenc L. nthc L i =eq x   (i = #0)
+  Formula.ex (land (lt #0 ↑(lenc L)) (nthc ↑L #0 =eq ↑x))
+theorem liftFormula_boundedIn / liftFormula_boundedIn_gen / substFormula_boundedIn
+  -- NO son defeq: bajo el ∃, `liftFormula 1` da `liftTerm 1 (liftTerm 0 ·)` y `boundedIn ↑x ↑L`
+  -- da `liftTerm 0 (liftTerm 0 ·)`; los iguala `FOL.liftTerm_comm_zero` (teorema)
+theorem prf_lt_subst2 / PrfH_lt_subst2 / PrfH_lt_subst1 / PrfH_eq_congr_nthc2   -- congruencias de lt/nthc
+theorem prf_boundedIn_head (x hd t) : Prf ((x =eq hd) ⇒ boundedIn x (cons hd t))   -- testigo i = 0
+theorem prf_boundedIn_tail (x hd t) : Prf (boundedIn x t ⇒ boundedIn x (cons hd t)) -- testigo i = σj
+theorem prf_boundedIn_nil  (x)      : Prf (boundedIn x nil ⇒ ⊥)
+theorem prf_boundedIn_cons (x hd t) : Prf (boundedIn x (cons hd t) ⇒ lor (x =eq hd) (boundedIn x t))
+theorem prf_pred_succ (n) : Prf (pred (succ n) =eq n)  ;  prf_eq_congr_pred / PrfH_eq_congr_pred
+theorem prf_zero_or_eq_succ_pred (n) : Prf (lor (n =eq zero) (n =eq succ (pred n)))
+theorem prf_boundedIn_of_In / prf_In_of_boundedIn
+theorem prf_In_iff_boundedIn (x L) : Prf (In x L ⇔ boundedIn x L)     -- ← objetivo de la fase 1b
+-- #print axioms = [propext, Classical.choice, Quot.sound]
+```
+
+**TRUCOS clave (reusar):** (1) los `∃`‑elim van en **lemas `Prf` autónomos** (`prf_ex_elim_imp`) y se
+aplican con `PrfH.mp` dentro de la inducción. (2) Para partir por casos un índice dentro de un
+contexto `PrfH` **sin `∃`**, usar el **predecesor** (`prf_zero_or_eq_succ_pred`): el testigo del caso
+`i = σ(pred i)` es directamente `pred i`.
+
+---
+
+**`Meta/RunFnBoundedPrf.lean`** (fase 2, lado `In`) — namespace `…Meta.RunFnBoundedPrf`.
+
+**Hallazgo que abarató la fase 2 (§13 del diseño): NO hace falta β‑función.** `runFn nil p` **no es
+una recursión con acumulador: es el *map* de `carc` sobre `p`**. La cadena
+`prf_runFn_cons` → `prf_concat_nil_eq` → **`prf_runFn_weaken`** (saca el acumulador fuera) →
+`prf_concat_cons_eq` lo demuestra. En consecuencia el acumulador **nunca hay que construirlo**, y la
+pertenencia a las conclusiones queda acotada por `lenc p` directamente.
+
+```lean
+theorem prf_eq_congr_lenc / PrfH_eq_congr_lenc / PrfH_eq_congr_carc / PrfH_eq_congr_nthc1
+theorem prf_runFn_nil_cons (line rest) :                     -- ← lema decisivo (§13)
+  Prf (runFn nil (cons line rest) =eq cons (carc line) (runFn nil rest))
+theorem prf_lenc_runFn (p) : Prf (lenc (runFn nil p) =eq lenc p)
+def nthRunPred : Formula                                     -- Ψ(p) = ∀i. (i < lenc p ⇒ …)  (∀i INTERNO)
+theorem nthRunPred_base / nthRunPred_step                    -- step: Prf.qconf + PrfH_spec + pred
+theorem prf_nthc_runFn (p i) : Prf (lt i (lenc p) ⇒ (nthc (runFn nil p) i =eq carc (nthc p i)))
+def boundedCarcIn (y p : Term) : Formula := ∃ k < lenc p. carc (nthc p k) =eq y
+theorem liftFormula_boundedCarcIn
+theorem prf_In_runFn_of_boundedCarcIn / prf_boundedCarcIn_of_In_runFn
+theorem prf_In_runFn_iff (y p) : Prf (In y (runFn nil p) ⇔ boundedCarcIn y p)   -- ← PAYOFF, cota `lenc p`
+-- #print axioms = [propext, Classical.choice, Quot.sound]
+```
+
+---
+
+**`Meta/ChainOkBoundedPrf.lean`** (fase 2, lado `chainOk`) — namespace `…Meta.ChainOkBoundedPrf`:
+**el acumulador desaparece**.
+
+```lean
+-- (b) absorción de una conclusión en el acumulador
+theorem prf_in_concat_iff (x L M) : Prf (In x (concat L M) ⇔ lor (In x L) (In x M))   -- cierre de ax_L3
+theorem prf_in_cons_nil_iff (y x) : Prf (In y (cons x nil) ⇔ (y =eq x))
+theorem prf_in_concat_singleton_iff (y c x) : Prf (In y (concat c [x]) ⇔ lor (In y c) (y =eq x))
+
+-- (0) cota ARBITRARIA (en `chainOk` la cota es el índice de la línea, no `lenc p`)
+def boundedCarcLt (y p b : Term) : Formula := ∃ k < b. carc (nthc p k) =eq y
+theorem boundedCarcIn_eq_boundedCarcLt (y p) : boundedCarcIn y p = boundedCarcLt y p (lenc p)   -- rfl
+theorem liftFormula_boundedCarcLt / liftFormula_boundedCarcLt_gen / substFormula_boundedCarcLt
+theorem prf_boundedCarcLt_zero (y p) : Prf (boundedCarcLt y p zero ⇒ ⊥)
+
+-- (c) split del ∃k<σj sobre `cons`
+theorem prf_boundedCarcLt_cons_of_head (y line rest j) : Prf ((carc line =eq y) ⇒ boundedCarcLt y (cons line rest) (succ j))
+theorem prf_boundedCarcLt_cons_of_tail (y line rest j) : Prf (boundedCarcLt y rest j ⇒ boundedCarcLt y (cons line rest) (succ j))
+theorem prf_boundedCarcLt_cons_succ_iff (y line rest j) :
+  Prf (boundedCarcLt y (cons line rest) (succ j) ⇔ lor (carc line =eq y) (boundedCarcLt y rest j))
+
+-- (a) forma acotada de `allIn`
+def boundedAllIn (c L : Term) : Formula := ∀ j < lenc L. In (nthc L j) c
+theorem PrfH_eq_subst_in1 {Γ x₁ x₂ L} (h : PrfH Γ (x₁ =eq x₂)) (hin : PrfH Γ (In x₁ L)) : PrfH Γ (In x₂ L)
+  -- congruencia de `In` en el ELEMENTO (la previa `PrfH_eq_subst_in` sustituye la LISTA)
+theorem liftFormula_boundedAllIn_gen / substFormula_boundedAllIn / liftFormula_allIn / substFormula_allIn
+theorem prf_boundedAllIn_nil / _cons_head / _cons_tail / _cons     -- todo el ∀j confinado aquí (Prf.qconf)
+theorem prf_boundedAllIn_of_allIn / prf_allIn_of_boundedAllIn      -- las dos inducciones de lista
+theorem prf_allIn_iff_boundedAllIn (c L) : Prf (allIn c L ⇔ boundedAllIn c L)      -- ← (a)
+
+-- (d) el teorema de la fase 2
+theorem prf_premOk_cons_iff (y c line rest i) :                    -- ← LEMA PUNTUAL: fusiona (b) y (c)
+  Prf (lor (In y c) (boundedCarcLt y (cons line rest) (succ i))
+    ⇔ lor (In y (concat c [carc line])) (boundedCarcLt y rest i))
+def boundedPremsIn (c p i L : Term) : Formula   -- ∀ j < lenc L. (In (nthc L j) c ∨ ∃ k < i. carc (nthc p k) =eq nthc L j)
+def lineOkB (c p i : Term) : Formula := land (lineWF (nthc p i)) (boundedPremsIn c p i (premsOf (nthc p i)))
+def chainOkB (c p : Term) : Formula := ∀ i < lenc p. lineOkB c p i
+def lineOkBAt (c p i X : Term) : Formula     -- línea DESACOPLADA del índice (para Leibniz)
+theorem lineOkB_eq_at (c p i) : lineOkB c p i = lineOkBAt c p i (nthc p i)   -- rfl
+theorem PrfH_congr_lineOkBAt / PrfH_congr_lineOkB_i                          -- Leibniz en X / en i
+theorem liftFormula_boundedPremsIn / substFormula_boundedPremsIn
+theorem liftFormula_lineOkB / substFormula_lineOkB / liftFormula_chainOkB / substFormula_chainOkB
+theorem prf_boundedPremsIn_zero_iff (c p L) : Prf (boundedPremsIn c p zero L ⇔ boundedAllIn c L)
+theorem prf_lineOkB_zero_iff (c line rest) : Prf (lineOkB c (cons line rest) zero ⇔ lineOk c line)
+theorem prf_boundedPremsIn_cons_succ_iff (c line rest i L) :
+  Prf (boundedPremsIn c (cons line rest) (succ i) L ⇔ boundedPremsIn (concat c [carc line]) rest i L)
+theorem prf_lineOkB_cons_succ_iff (c line rest i) :
+  Prf (lineOkB c (cons line rest) (succ i) ⇔ lineOkB (concat c [carc line]) rest i)
+theorem prf_chainOkB_nil (c) : Prf (chainOkB c nil)
+theorem prf_chainOkB_cons_head / _cons_tail / _cons_intro
+theorem prf_chainOkB_cons_iff (c line rest) :                       -- espejo exacto de ax_chainOk_cons
+  Prf (chainOkB c (cons line rest) ⇔ land (lineOk c line) (chainOkB (concat c [carc line]) rest))
+def chainBPred : Formula := ∀c. (chainOk c #1 ⇔ chainOkB c #1)      -- acumulador ∀c INTERNO
+theorem prf_chainOk_iff_chainOkB (c p) : Prf (chainOk c p ⇔ chainOkB c p)   -- ← (d), FASE 2 COMPLETA
+-- #print axioms de todos = [propext, Classical.choice, Quot.sound]
+```
+
+Desplegando las definiciones, (d) dice exactamente:
+
+```text
+chainOk c p  ⇔  ∀ i < lenc p.  lineWF (nthc p i)
+                             ∧ ∀ j < lenc (premsOf (nthc p i)).
+                                 ( In (nthc (premsOf (nthc p i)) j) c
+                                 ∨ ∃ k < i. carc (nthc p k) =eq nthc (premsOf (nthc p i)) j )
+```
+
+— la formulación Δ₀ de libro: *cada premisa está en el contexto inicial o es la conclusión de una
+línea anterior*. La demostración generaliza el acumulador como `∀c` **interno** e instancia la HI en
+`c ++ [carc line]`; el paso `cons` se apoya en el lema puntual `prf_premOk_cons_iff`.
+
+**Lecciones De Bruijn acumuladas (§14.4 del diseño, REUSAR):**
+
+- `∃`‑elim de una **hipótesis** → lema `Prf` autónomo con `prf_ex_elim_imp` (nunca `PrfH_ex_elim`).
+- `∀`‑intro como **consecuente** → `Prf.qconf` (nunca `PrfH.gen`); `∀`‑elim de hipótesis → `PrfH_spec`.
+- Case‑split de un índice bajo `PrfH` sin `∃` → `prf_zero_or_eq_succ_pred` (testigo `pred i`).
+- Empujar `lift`/`subst` a través de un predicado con `∃`/`∀` interno **necesita lema propio**
+  (no es defeq; los iguala `FOL.liftTerm_comm_zero` / `FOL.substTerm_lift_comm_zero`).
+- En un `have`, `PrfH _ (…)` no infiere `Γ` → nombrar el contexto con `let`.
+- `liftFormula 0 (lor A B)` **no se destapa con `rw`** → introducir un `have hlor : … := rfl` explícito
+  antes de reescribir el lema de lift del predicado.
+- `prfH_weaken` **no** es debilitamiento de contexto (es `Γ ⊢ B → Γ ⊢ A ⇒ B`); para usar una HI en un
+  contexto extendido, re‑derivarla con `PrfH_spec` sobre la hipótesis en posición `tail`.
+
+---
+
+### 3.19 Fase 3 — D3 reducida a la forma acotada + reflexión atómica rastreada
+
+Con la fase 2 completa (§3.18), la Σ₁‑completitud provable (`hI`/`hC` de `d3_prf_of_sigma1`) se
+ataca sobre la forma **Δ₀ acotada** y por reflexión de sus **átomos**.
+
+**`Meta/Sigma1BoundedPrf.lean`** (fase 3, puente) — namespace `…Meta.Sigma1BoundedPrf`. Como la
+fase 1/2 dio los `⇔` y `pcc_imp` sube implicaciones object a `provCodeC'` (D2+D1), `hI`/`hC` se
+reducen a reflejar la forma acotada `boundedIn`/`chainOkB`.
+
+```lean
+prf_hI_of_reflect_boundedIn (hbI : ∀ x L, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L)))
+  : ∀ x L, Prf (In x L ⇒ provCodeC' (In x L))
+prf_hC_of_reflect_chainOkB (hbC : ∀ p, Prf (chainOkB nil p ⇒ provCodeC' (chainOkB nil p)))
+  : ∀ p, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p))
+d3_prf_of_reflect_bounded (φ) (hbC) (hbI) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))  -- = d3_prf
+-- #print axioms = [propext, Classical.choice, Quot.sound, prf_inAxC]
+```
+
+**`Meta/Sigma1AtomPrf.lean`** (fase 3, núcleo) — namespace `…Meta.Sigma1AtomPrf`. Toolkit
+**rastreado** del átomo de igualdad `t =eq u` (átomo base de `boundedIn`: `nthc L i =eq x`), espejo
+exacto del toolkit de `In` (`prf_provCodeC'_In_of_tracked`, §3.17).
+
+**Por qué rastreado (Tarski):** reflejar `t =eq u` para `t`, `u` **abstractos** es imposible libre
+de muro — `provCodeC'(t=eq u)` contiene `termCode t` (meta, sin congruencia object) y `termCode t
+=eq termCode u` no se sigue de `t=eq u`. Se codifican los argumentos con `tcFn` (que SÍ tiene
+congruencia Leibniz object, `prf_congr_tcFn`); el puente `tcFn t =eq termCode t` lo descarga la
+inducción de fase 5 cuando `t` es numeral (`prf_tc_numeral`).
+
+```lean
+def eqCodeFn (a b : Term) : Term := cons (numeral 4) (cons a (cons b nil))   -- ⟨4, a, b⟩
+theorem eqCodeFn_termCode (t u) : eqCodeFn (termCode t) (termCode u) = formCode (Formula.eq t u)  -- rfl
+theorem provCodeC'_eq_eq (t u) : provCodeC' (Formula.eq t u) = provFromCode (eqCodeFn (termCode t) (termCode u))  -- rfl
+theorem prf_congr_eqCodeFn (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) : Prf (eqCodeFn a b =eq eqCodeFn a' b')
+theorem prf_provFromCode_eq_congr (ha) (hb) : Prf (provFromCode (eqCodeFn a b) ⇒ provFromCode (eqCodeFn a' b'))
+theorem liftTerm_eqCodeFn / liftFormula_provFromCode_eq   -- clausuras De Bruijn (args cerrados)
+theorem prf_provCodeC'_eq_of_tracked {t u tc uc}
+  (ht : Prf (tc =eq termCode t)) (hu : Prf (uc =eq termCode u)) (h : Prf (provFromCode (eqCodeFn tc uc)))
+  : Prf (provCodeC' (Formula.eq t u))                     -- reflexión rastreada (espejo de In)
+theorem prf_provFromCode_eqCodeFn_refl_of_tracked {t tc} (ht : Prf (tc =eq termCode t))
+  : Prf (provFromCode (eqCodeFn tc tc))                   -- reflexividad rastreada (superada, ver abajo)
+```
+
+**Reflexividad LIBRE DE MURO** (§15.4 del diseño). El verificador comprueba `lineWF`
+**estructuralmente**: `prf_lineWF_eqrefl (concl t) : lineWF ⟨concl, 12, t⟩ ⇔ (concl =eq eqc t t)`,
+y `eqc a b` es **literalmente** `eqCodeFn a b` (`numeral 4 = σ⁴0`). Con `concl := eqCodeFn c c`,
+`t := c`, la condición es **pura reflexividad** para `c` **arbitrario** — sin `termCode`. Testigo:
+la cadena de **una sola línea** `[⟨eqCodeFn c c, 12, c⟩]`.
+
+```lean
+theorem eqCodeFn_eq_eqc (a b) : eqCodeFn a b = eqc a b   -- rfl
+def eqreflLine (c) : Term := cons (eqCodeFn c c) (cons (numeralM 12) (cons c nil))
+theorem prf_lineOk_eqrefl / prf_chainOk_eqrefl / prf_in_runFn_eqrefl
+theorem prf_provFromCode_intro (d p) (h1 : Prf (chainOk nil p)) (h2 : Prf (In d (runFn nil p)))
+  : Prf (provFromCode d)                                  -- introductor a nivel de código arbitrario
+theorem prf_provFromCode_eqCodeFn_refl (c) : Prf (provFromCode (eqCodeFn c c))   -- ← LIBRE DE MURO
+theorem PrfH_congr_tcFn / PrfH_congr_eqCodeFn
+theorem pcc_eq_tracked (t u) : Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))  -- LIBRE DE MURO
+theorem pcc_eq_of_tc_bridge (t u) (ht : Prf (tcFn t =eq termCode t)) (hu)
+  : Prf ((t =eq u) ⇒ provCodeC' (Formula.eq t u))          -- muro confinado al puente (numerales, fase 5)
+-- #print axioms de los tres = [propext, Classical.choice, Quot.sound]  (¡ni siquiera prf_inAxC!)
+```
+
+Al no pasar ya por `repr_pos'`, **desaparece incluso la dependencia de `prf_inAxC`**. El **muro de
+Tarski queda confinado al último paso**: el puente `tcFn t =eq termCode t`, descargable con
+**numerales** (`prf_tc_numeral`) en la inducción de fase 5 — exactamente como predice
+Hilbert‑Bernays.
+
+**Estado de fase 3‑5** (plan en `GODEL-D3-TRACKED-DESIGN.md` §15.5): ✅ puente + átomo `=eq` cerrado
+libre de muro; ⏳ átomos `<`/`lineWF` (`atom1CodeFn`; `<` se reduce a `=eq` + `∃` acotado), reflexión
+de cuantificadores acotados (∀/∃), e inducción estructural sobre `boundedIn`/`chainOkB` → `hbI`/`hbC`
+→ `d3_prf` → `goedel_second_prf`.
+
+---
+
+### 3.20 Fase 3 (continuación) — sistema de prueba interno, evaluación provable y **ruta B dotada**
+
+Tras el arranque de fase 3 (§3.19), la Σ₁‑completitud provable se ataca construyendo un **sistema de
+prueba interno a nivel de código** y la **evaluación provable** de las funciones del verificador,
+reformulando el target sobre la **notación‑punto de Feferman** (`num = tcFn`, "ruta B") — la
+formulación canónica para fórmulas con variables libres. Plan en `GODEL-D3-TRACKED-DESIGN.md`
+§19–§38. **Estado 2026‑07‑12 (HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
+
+#### 3.20.1 Sistema de prueba interno a nivel de código (§19, §25, §26)
+
+`Meta/ExIntroCodePrf`, `Meta/ForallElimCodePrf`, `Meta/MpCodePrf`. Las cuatro reglas del cálculo,
+todas con **testigo/código abierto** (los artefactos de clausura `hw`/`hAc`/`hBc` eran innecesarios;
+se arrastran los lifts vía `liftFormula_provFromCode_open`).
+
+```lean
+theorem pcc_exIntro_code' (Ac w) (hAc : ∀ c, liftTerm c Ac = Ac) : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))
+theorem pcc_exIntro_code_open (Ac w) : Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac))   -- SIN clausura (keystone §31)
+theorem pcc_forallElim_code_open (Ac w) : Prf (provFromCode (forallc Ac) ⇒ provFromCode (substfc zero w Ac))
+theorem pcc_mp_code_open (Ac Bc) : Prf (provFromCode (implc Ac Bc) ⇒ provFromCode Ac ⇒ provFromCode Bc)
+theorem pcc_thm_inst  (φ) (h : Prf (Formula.forall φ)) (w) : Prf (provFromCode (substfc zero w (formCode φ)))
+theorem pcc_thm_inst2 (φ) (h : Prf (forall_2 φ)) (w₁ w₂)   -- + pcc_thm_inst3, corolarios pcc_axiom_inst/inst2/inst3
+theorem pcc_leibniz_code (Ac t₁ t₂) : Prf (provFromCode (eqc t₁ t₂) ⇒ provFromCode (substfc zero t₁ Ac) ⇒ provFromCode (substfc zero t₂ Ac))
+```
+
+Con `pcc_leibniz_code` + `pcc_mp_code_open` sale la **lógica ecuacional interna** (`pcc_leibniz_apply`,
+`pcc_eq_trans_code`, `pcc_congr_succ_code`), con la restricción de que el código fijo sea
+`substtc`‑invariante (`substtc_inv_tcFn`, `substtc_inv_succcT`, `substtc_inv_addcT`).
+
+#### 3.20.2 Sustitución de código con testigo abierto (§20) y código de numeral cerrado (§23)
+
+`Meta/SubstCodeOpenPrf`, `Meta/NumCodeClosedPrf`.
+
+```lean
+def substCodeT (v w) : Term → Term       -- función meta: sustitución-de-código sobre términos
+def substCodeF (v w) : Formula → Term     -- ídem sobre fórmulas (bajo binder el testigo se lifta: liftc zero w)
+theorem prf_substfc_arith_open (v w f) : Prf (substfc (numeral v) w (formCode f) =eq substCodeF v w f)   -- testigo-código ARBITRARIO
+theorem substCodeT_termCode (v s) : ∀ t, substCodeT v (termCode s) t = termCode (substTerm v s t)
+theorem substCodeT_closed (v w) : ∀ t, (∀ c, liftTerm c t = t) → substCodeT v w t = termCode t   -- NUEVO (§38): substCodeT de término cerrado = termCode
+theorem prf_liftc_tcFn (a)    : Prf (liftc zero (tcFn a) =eq tcFn a)      -- «el código de un numeral es cerrado» (1ª inducción interna)
+theorem prf_substtc_tcFn (W a) : Prf (substtc zero W (tcFn a) =eq tcFn a)
+```
+
+#### 3.20.3 Evaluación provable (§21, §24, §27, §28, §35, §37)
+
+`Meta/EvalArithPrf`, `Meta/EvalListPrf`, `Meta/EvalLtPrf`, `Meta/EvalBoundedPrf`, `Meta/EvalRunFnPrf`,
+`Meta/EvalNthcPrf`, `Meta/EvalCarcNthcPrf`. Asimetría clave: el lado izquierdo del código es el
+**término simbólico**; el derecho, el **numeral del valor**; coinciden porque la teoría prueba la
+ecuación y `tcFn` tiene congruencia.
+
+```lean
+theorem pcc_eval_add (a b) : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (tcFn b)) (tcFn (add a b))))   -- ⌜ȧ+ḃ = (a+b)˙⌝
+theorem pcc_eval_carc / pcc_eval_cdrc / pcc_eval_lenc                                                     -- listas (§28)
+def bdExCode (B Phic) : Term := exc (andc (ltCodeFn (varc (numeral 0)) B) Phic)                           -- código de ∃i<B. φ(i)
+theorem pcc_bdEx_intro (B Phic K) (hBcl hBinv hPcl hlt hphi) : Prf (provFromCode (bdExCode B Phic))       -- ∃i<B-intro (cerrado)
+theorem pcc_bdAll_elim (B Phic K) (hBinv hall hlt) : Prf (provFromCode (substfc zero K Phic))             -- ∀i<B-elim
+theorem pcc_eval_nthc (p i) : Prf (lt i (lenc p) ⇒ provFromCode (evalNthcCode p i))                       -- nthc(ṗ,ı̇)=(nthc p i)˙ (inducción acotada, §35)
+theorem pcc_eval_carc_nthc (p i) : Prf (chainOk nil p ⇒ lt i (lenc p) ⇒                                   -- carc(nthc(ṗ,ı̇))=(carc(nthc p i))˙ (§37)
+  provFromCode (eqCodeFn (carcT (nthcT (tcFn p) (tcFn i))) (tcFn (carc (nthc p i)))))
+```
+
+#### 3.20.4 Reflexión Δ₀ atómica y composicional (§29–§32)
+
+`Meta/Delta0ReflectPrf`, `Meta/Sigma1AtomPrf`. Reflexiones `⊢ (átomo) ⇒ provFromCode (código tracked)`
+para términos arbitrarios, más los casos composicionales.
+
+```lean
+theorem pcc_eq_tracked (t u) : Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))     -- átomo = (libre de muro)
+theorem pcc_lt_tracked (s t) : Prf ((lt s t) ⇒ provFromCode (ltCodeFn (tcFn s) (tcFn t)))       -- átomo < (∃-elim + pcc_lt_intro_open)
+theorem pcc_reflect_and / pcc_reflect_or (φ ψ Ac Bc) (hφ hψ)                                     -- composicional ∧/∨ (agnóstico del código)
+theorem pcc_gen_code (Ac) (h : ∀ w, Prf (provFromCode (substfc zero w Ac))) : Prf (provFromCode (forallc Ac))
+```
+
+#### 3.20.5 Ruta B dotada — D3 reducida a las reflexiones **punteadas** (§33–§38)
+
+`Meta/D3DottedPrf`, `Meta/LineWFConsPrf`, `Meta/D3InDotPrf`. **Keystone:** `formCode (provCodeC' φ) =
+exc (formCode (bodyF φ))` con `bodyF φ = chainOk nil #0 ∧ In ⌜φ⌝ (runFn nil #0)`; el `∃`‑intro dotado
+(`pcc_exIntro_code_open`, testigo `tcFn #0`) lleva la reflexión punteada del cuerpo al target de D3.
+
+```lean
+def bodyF (φ) : Formula := land (chainOk nil #0) (In (formCode φ) (runFn nil #0))
+abbrev inDot (φ) : Term := substfc zero (tcFn #0) (formCode (In (formCode φ) (runFn nil #0)))    -- código punteado del átomo In
+theorem d3_prf_of_dotted_atoms (φ) (hC : Prf (chainOk nil #0 ⇒ provFromCode chainOkDot))
+  (hI : Prf (In (formCode φ) (runFn nil #0) ⇒ provFromCode (inDot φ))) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))  -- = d3_prf
+theorem prf_line_is_cons (p i) : Prf (chainOk nil p ⇒ lt i (lenc p) ⇒                            -- vía ax_lineWF_cons (sancionado)
+  (nthc p i =eq cons (carc (nthc p i)) (cdrc (nthc p i))))
+```
+
+**`hI_dot` (reflexión punteada de `In`) — 4/5 ladrillos hechos** (`Meta/D3InDotPrf`; objetivo
+`chainOk nil #0 ⇒ In ⌜φ⌝ (runFn nil #0) ⇒ provFromCode (inDot φ)`, patrón `pcc_lt_tracked` con la
+implicación objeto codificada):
+
+```lean
+theorem pcc_bdEx_intro_open (B Phic K) (hBinv) (hlt) (hphi) : Prf (provFromCode (bdExCode B Phic))   -- ∃i<B-intro SIN clausura (p libre dotado)
+theorem pcc_bddDot_imp_inDot (φ) : Prf (provFromCode (implc (bddCarcDot φ) (inDot φ)))                 -- Step A: implicación ⇐ codificada
+theorem prf_bddCarcDot_eq (φ) : Prf (bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ))                 -- Step B (puente): código dotado = bdExCode
+theorem substCodeF_boundedCarcIn (φ) : substCodeF 0 (tcFn #0) (boundedCarcIn (formCode φ) #0) = bdExCode bdCarcB (bdCarcPhic φ)
+```
+
+**FALTA** (núcleo de Step B, ~80‑120 líneas): reflejar `provFromCode (bdExCode bdCarcB (bdCarcPhic φ))`
+desde `chainOk`+`boundedCarcIn` (`PrfH_ex_elim` del `∃` acotado → cota `pcc_lt_tracked`/`pcc_eval_lenc`
+→ cuerpo `pcc_eq_tracked`/`pcc_eval_carc_nthc`/`prf_tc_form` → `pcc_bdEx_intro_open` → transportes
+`prf_liftc_tcFn`) → MP interno con Step A → `hI_dot`. Luego `hC_dot`, `d3_prf`, `goedel_second_prf`,
+F7b (retira `axiom d3`, 7→6). Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
+
+---
+
+← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md)
