@@ -76,8 +76,61 @@ theorem d3_prf_of_dotted (φ : Formula)
   exact PrfH.mp _ _ _
     (prf_to_prfH (pcc_exIntro_code_open (formCode (bodyF φ)) (tcFn (.var 0))) _) hb
 
+/-! ### Descomposición de `hbody` en los dos átomos punteados
+
+`formCode (bodyF φ) = andc (formCode (chainOk nil #0)) (formCode (In ⌜φ⌝ (runFn nil #0)))` (rfl), y
+`substfc` distribuye sobre `andc` (`prf_substfc_and`). Así que la reflexión punteada del cuerpo es
+`pcc_and_intro_code` de las reflexiones punteadas de los dos átomos. -/
+
+/-- Reflexión punteada de `chainOk nil #0` (código dotado del átomo, `p = #0 ↦ tcFn #0`). -/
+abbrev chainOkDot : Term := substfc zero (tcFn (.var 0)) (formCode (chainOk nil (.var 0)))
+
+/-- Reflexión punteada de `In ⌜φ⌝ (runFn nil #0)`. -/
+abbrev inDot (φ : Formula) : Term :=
+  substfc zero (tcFn (.var 0)) (formCode (In (formCode φ) (runFn nil (.var 0))))
+
+/-- **`hbody` a partir de los dos átomos punteados**: dadas las reflexiones punteadas de
+    `chainOk nil #0` (`hC`) e `In ⌜φ⌝ (runFn nil #0)` (`hI`), se obtiene `hbody`. -/
+theorem hbody_of_atoms (φ : Formula)
+    (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot))
+    (hI : Prf (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ))) :
+    Prf (bodyF φ ⇒ provFromCode (substfc zero (tcFn (.var 0)) (formCode (bodyF φ)))) := by
+  refine prf_deduction ?_
+  have hc : PrfH [bodyF φ] (chainOk nil (.var 0)) := PrfH_and_elim_left (prfH_hyp_self _)
+  have hi : PrfH [bodyF φ] (In (formCode φ) (runFn nil (.var 0))) :=
+    PrfH_and_elim_right (prfH_hyp_self _)
+  have hCp : PrfH [bodyF φ] (provFromCode chainOkDot) := PrfH.mp _ _ _ (prf_to_prfH hC _) hc
+  have hIp : PrfH [bodyF φ] (provFromCode (inDot φ)) := PrfH.mp _ _ _ (prf_to_prfH hI _) hi
+  -- `∧`-intro a nivel de código (pcc_c1_code + dos pcc_mp_code_open, patrón de pcc_reflect_and)
+  have step1 : Prf (provFromCode chainOkDot
+      ⇒ provFromCode (implc (inDot φ) (andc chainOkDot (inDot φ)))) :=
+    prf_mp (pcc_mp_code_open chainOkDot (implc (inDot φ) (andc chainOkDot (inDot φ))))
+      (pcc_c1_code chainOkDot (inDot φ))
+  have hImplY : PrfH [bodyF φ] (provFromCode (implc (inDot φ) (andc chainOkDot (inDot φ)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH step1 _) hCp
+  have hYtoAnd : PrfH [bodyF φ]
+      (provFromCode (inDot φ) ⇒ provFromCode (andc chainOkDot (inDot φ))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (inDot φ) (andc chainOkDot (inDot φ))) _) hImplY
+  have hand : PrfH [bodyF φ] (provFromCode (andc chainOkDot (inDot φ))) :=
+    PrfH.mp _ _ _ hYtoAnd hIp
+  -- transporte: `substfc 0 (tcFn #0) (formCode (bodyF φ)) =eq andc chainOkDot (inDot φ)`
+  have hbridge : Prf (substfc zero (tcFn (.var 0)) (formCode (bodyF φ))
+      =eq andc chainOkDot (inDot φ)) :=
+    prf_substfc_and zero (tcFn (.var 0)) (formCode (chainOk nil (.var 0)))
+      (formCode (In (formCode φ) (runFn nil (.var 0))))
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hbridge)) _) hand
+
+/-- **D3 reducida a las reflexiones punteadas de los DOS átomos** (`chainOk`, `In`): composición de
+    `hbody_of_atoms` con `d3_prf_of_dotted`. Es el interfaz que `hC_dot`/`hI_dot` deben cumplir. -/
+theorem d3_prf_of_dotted_atoms (φ : Formula)
+    (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot))
+    (hI : Prf (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_dotted φ (hbody_of_atoms φ hC hI)
+
 end ROBINSON_PlusPlus.Meta.D3DottedPrf
 
 export ROBINSON_PlusPlus.Meta.D3DottedPrf (
   bodyF formCode_provCodeC'_eq d3_prf_of_dotted
+  chainOkDot inDot hbody_of_atoms d3_prf_of_dotted_atoms
 )
