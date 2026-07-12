@@ -75,8 +75,87 @@ theorem pcc_eval_runFn_nil : Prf (provFromCode (evalRunCode nil)) := by
       (prf_congr_eqCodeFn (prf_congr_funcc2 (prf_congr_cons_tail (prf_congr_cons_head hb))) hr))
     pcc_ax_runFn_nil_computed
 
+/-! ### La RECURSIÓN de `runFn` codificada (paso de la evaluación)
+
+`prf_runFn_nil_cons` (`runFn nil (cons h t) = cons (carc h)(runFn nil t)`) codificada en forma
+rastreada vía `pcc_thm_inst2` + `prf_substfc_arith_open` (patrón `pcc_ax5_computed`). Es la pieza que
+el paso inductivo de la evaluación de `runFn` necesita **dentro de `Prov`** (el `runFnT` es opaco: no
+evalúa por congruencia de código, hace falta la recursión reflejada). -/
+
+/-- Versión `forall_2` (object) de `prf_runFn_nil_cons`, para codificar con `pcc_thm_inst2`. -/
+theorem prf_runFn_nil_cons_forall :
+    Prf (forall_2 (Formula.eq (runFn nil (cons (.var 1) (.var 0)))
+      (cons (carc (.var 1)) (runFn nil (.var 0))))) :=
+  Prf.gen _ (Prf.gen _ (prf_runFn_nil_cons (.var 1) (.var 0)))
+
+/-- Congruencia de `runFnT` en ambos argumentos. -/
+theorem prf_congr_runFnT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
+    Prf (runFnT x y =eq runFnT x' y') :=
+  prf_congr_funcc2 (prf_eq_trans (prf_congr_cons_head hx)
+    (prf_congr_cons_tail (prf_congr_cons_head hy)))
+
+/-- `substtc` atraviesa `runFnT` (funcc de 2 argumentos). -/
+theorem prf_substtc_runFnT (v W x y : Term) :
+    Prf (substtc v W (runFnT x y) =eq runFnT (substtc v W x) (substtc v W y)) :=
+  prf_substtc_funcc2 v W (strCode "runFn") x y
+
+/-- `substtc` deja invariante `termCode nil` (código cerrado; `nil = zero`). -/
+theorem prf_substtc_termCode_nil (W : Term) :
+    Prf (substtc zero W (termCode nil) =eq termCode nil) :=
+  prf_substtc_arith_open 0 W zero
+
+/-- **RECURSIÓN de `runFn` CODIFICADA**: `⊢ Prov(⌜runFn(⌜nil⌝, cons ḣ ṫ) = cons (carc ḣ)(runFn(⌜nil⌝, ṫ))⌝)`.
+    De `pcc_thm_inst2 prf_runFn_nil_cons_forall (tcFn h)(tcFn t)`, computando el doble `substfc` sobre
+    el código explícito y normalizando `liftc (tcFn h)` con (A). -/
+theorem pcc_runFn_cons_code (h t : Term) :
+    Prf (provFromCode (eqCodeFn (runFnT (termCode nil) (consT (tcFn h) (tcFn t)))
+      (consT (carcT (tcFn h)) (runFnT (termCode nil) (tcFn t))))) := by
+  let W1 : Term := liftc zero (tcFn h)
+  let T : Term := tcFn t
+  let BODY : Formula := Formula.eq (runFn nil (cons (.var 1) (.var 0)))
+    (cons (carc (.var 1)) (runFn nil (.var 0)))
+  have hin : Prf (substfc (succ zero) W1 (formCode BODY)
+      =eq eqCodeFn (runFnT (termCode nil) (consT W1 (varc (numeral 0))))
+                   (consT (carcT W1) (runFnT (termCode nil) (varc (numeral 0))))) :=
+    prf_substfc_arith_open 1 W1 BODY
+  have hA : Prf (W1 =eq tcFn h) := prf_liftc_tcFn h
+  have hnorm : Prf (eqCodeFn (runFnT (termCode nil) (consT W1 (varc (numeral 0))))
+                             (consT (carcT W1) (runFnT (termCode nil) (varc (numeral 0))))
+      =eq eqCodeFn (runFnT (termCode nil) (consT (tcFn h) (varc (numeral 0))))
+                   (consT (carcT (tcFn h)) (runFnT (termCode nil) (varc (numeral 0))))) :=
+    prf_congr_eqCodeFn
+      (prf_congr_runFnT (prf_refl _) (prf_congr_consT hA (prf_refl _)))
+      (prf_congr_consT (prf_congr_carcT hA) (prf_refl _))
+  have hout : Prf (substfc zero T
+      (eqCodeFn (runFnT (termCode nil) (consT (tcFn h) (varc (numeral 0))))
+                (consT (carcT (tcFn h)) (runFnT (termCode nil) (varc (numeral 0)))))
+      =eq eqCodeFn (runFnT (termCode nil) (consT (tcFn h) T))
+                   (consT (carcT (tcFn h)) (runFnT (termCode nil) T))) := by
+    refine prf_eq_trans (prf_substfc_eq zero T _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans
+        (prf_substtc_runFnT zero T (termCode nil) (consT (tcFn h) (varc (numeral 0)))) ?_
+      refine prf_congr_runFnT (prf_substtc_termCode_nil T) ?_
+      refine prf_eq_trans (prf_substtc_consT zero T (tcFn h) (varc (numeral 0))) ?_
+      exact prf_congr_consT (prf_substtc_tcFn T h) (prf_substtc_varc0 T)
+    · refine prf_eq_trans
+        (prf_substtc_consT zero T (carcT (tcFn h)) (runFnT (termCode nil) (varc (numeral 0)))) ?_
+      refine prf_congr_consT ?_ ?_
+      · exact prf_eq_trans (prf_substtc_carcT zero T (tcFn h))
+          (prf_congr_carcT (prf_substtc_tcFn T h))
+      · refine prf_eq_trans (prf_substtc_runFnT zero T (termCode nil) (varc (numeral 0))) ?_
+        exact prf_congr_runFnT (prf_substtc_termCode_nil T) (prf_substtc_varc0 T)
+  have hchain : Prf (substfc zero T (substfc (succ zero) W1 (formCode BODY))
+      =eq eqCodeFn (runFnT (termCode nil) (consT (tcFn h) T))
+                   (consT (carcT (tcFn h)) (runFnT (termCode nil) T))) :=
+    prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
+  exact prf_mp (prf_provCode_congr hchain)
+    (pcc_thm_inst2 BODY prf_runFn_nil_cons_forall (tcFn h) T)
+
 end ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 
 export ROBINSON_PlusPlus.Meta.EvalRunFnPrf (
   runFnT evalRunCode pcc_ax_runFn_nil_computed pcc_eval_runFn_nil
+  prf_runFn_nil_cons_forall prf_congr_runFnT prf_substtc_runFnT prf_substtc_termCode_nil
+  pcc_runFn_cons_code
 )
