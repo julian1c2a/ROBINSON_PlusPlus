@@ -76,7 +76,7 @@ El frente Gödel se descompone en cuatro niveles (idénticos a la taxonomía dis
 | **A** | Discusión documental: hipótesis Gödel, scope, relación TFA ↔ Gödel | Este documento + `MINIMAL-AXIOMS.md` §5.5 | ✅ 2026-06-06 |
 | **B** | Meta-codificación: `G : sym → ℕ`, ⌜·⌝, Teo G1 (inyectividad) | `Meta/Godel.lean` ✅ | ✅ 2026-06-06 |
 | **C** | Predicados de demostrabilidad: `IsFormula`, `Dem`, lema del punto fijo | `Meta/Provability.lean` ✅ | ✅ 2026-06-06 (props profundas como meta-axiomas) |
-| **D** | Teoremas de incompletitud: Gödel I (completo) + Gödel II demostrados internamente | `Meta/Incompleteness.lean` ✅ | ✅ 2026-06-13 (Gödel I completo: `⊬G ∧ ⊬¬G`; Gödel II vía D2/D3) |
+| **D** | Teoremas de incompletitud | **cadena REAL** (`Meta/DiagonalTwo.lean`, `Meta/GodelTwo.lean`) | 🔶 **Gödel I: sólo `⊬G`** (`goedel_first_real'`, ω‑consistencia). **Gödel II**: `goedel_second'`, módulo `axiom d3`. ⚠ La mitad `⊬¬G` **NO está en la cadena real** — ver nota abajo |
 
 La **arquitectura propuesta** para `Meta/`:
 
@@ -108,8 +108,32 @@ partir de las condiciones de demostrabilidad postuladas en el Nivel C:
   construye con `imp_intro`/`mp`, **sin DNE object-level** — funciona en el FOL
   intuicionista.
 
-- ✅ **Gödel I completo** (`goedel_first_unrefutable` + `goedel_first_undecidable`,
-  2026-06-13): `Consistent → ⊬ ¬G`, luego `⊬ G ∧ ⊬ ¬G` (`G` **indecidible**).
+- ⚠️ **CORRECCIÓN DE AUDITORÍA (2026-07-13, `repasa_y_proyecta`): la mitad `⊬¬G` NO está en la
+  cadena real.** Se demostró el 2026-06-13 (`goedel_first_unrefutable` / `goedel_first_undecidable`,
+  vía `dne` clásica), pero **en la capa LEGACY** (`Meta/Incompleteness.lean`, que postulaba D2 y D3),
+  y esa capa se **RETIRÓ en F7a** (commit `f03eacf`, 2026-07-09) junto con el módulo. Hoy **esos dos
+  teoremas no existen en el código**. La cadena real establece **sólo `⊬G`** (`goedel_first_real'`,
+  `Meta/DiagonalTwo.lean`).
+
+- 🚫 **NO recuperar F7a — fue un ARREGLO DE SOLIDEZ, no una limpieza.** La prueba legacy descansaba en
+  `provFormula_repr`, postulado como **bicondicional** `(axioms ⊢ Prov⌜φ⌝) ↔ (axioms ⊢ φ)`. La
+  dirección **`.mp`** (`⊢Prov⌜φ⌝ → ⊢φ`) es la **representabilidad NEGATIVA / reflexión**, que **NO se
+  sigue de la consistencia simple** — exige ω‑consistencia/soundness. Pero el teorema se enunciaba bajo
+  **`Consistent`** (consistencia simple) ⇒ **afirmaba MÁS de lo que Gödel permite** (por eso existe
+  **Rosser**: para obtener ambas mitades desde consistencia simple hay que **cambiar de sentencia**).
+  `provFormula_repr` era, pues, un **postulado falso en general** — misma familia que
+  `subst_lift_cancel_formula` (axioma FOL general FALSO) y `ax_lineWF_gen` (incondicional ⇒ `Prov`
+  total). Restaurarlo reintroduciría el postulado malo.
+
+- ⏳ **TAREA ABIERTA (independiente de D3): construir `repr_neg`.** Para re‑derivar `⊬¬G` **con la
+  hipótesis honesta** falta la **representabilidad NEGATIVA**, que **no existe** en la cadena real:
+  `repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ`. Con ella el argumento se porta tal cual
+  (~8 líneas): `⊢¬G` →(punto fijo) `⊢¬¬Prov⌜G⌝` →(`dne`) `⊢Prov⌜G⌝` →(**`repr_neg`**) `⊢G` →(con `⊢¬G`)
+  `⊥`. Ya están el **punto fijo real** (`godelC'_fixedpoint`), **D1** (`repr_pos'_prf`) y `dne`.
+  `repr_neg` debería salir de la **fidelidad del verificador** + `ConsistentOmega`; hay groundwork en
+  `Meta/CodeDistinct.lean` («aritmética negativa de códigos»).
+- 📜 **(histórico, capa legacy retirada)** Lo que se probó el 2026-06-13 fue:
+  `Consistent → ⊬ ¬G`, luego `⊬ G ∧ ⊬ ¬G` (`G` **indecidible**).
   Resuelto añadiendo **`dne`** (eliminación de doble negación clásica) a
   `FOL/MetaRules.lean`. Diagnóstico: el obstáculo no era ω-consistencia sino el
   **intuicionismo** del FOL (`¬¬Prov⌜G⌝ → Prov⌜G⌝` no es intuicionista); Rosser

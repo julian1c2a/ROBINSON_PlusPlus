@@ -14,6 +14,20 @@
 4. **`doc/REFERENCE-Incompleteness.md` §3.18–§3.20** (nodo temático del árbol REFERENCE) — proyección completa de la capa Δ₀ (`NumListPrf`, `NatArithPrf`, `BoundedInPrf`, `RunFnBoundedPrf`, `ChainOkBoundedPrf`) + evaluación provable + ruta B dotada (`D3InDotPrf`).
 5. **`ESCALANDO_EL_PROYECTO.md`** — enlace con el proyecto hermano DeepArith sobre el kernel FOL⁼ común.
 
+> ⚠️ **AUDITORÍA 2026-07-13 (`repasa_y_proyecta`) — HALLAZGO DE SOLIDEZ.** La mitad **`⊬¬G`** de Gödel I
+> (indecidibilidad) **NO está en la cadena real**: se probó en la capa LEGACY (`Meta/Incompleteness.lean`)
+> y se retiró en **F7a** (`f03eacf`). **NO recuperar F7a** — fue un *arreglo de solidez*: la prueba legacy
+> descansaba en `provFormula_repr`, postulado como bicondicional, cuya dirección `.mp`
+> (`⊢Prov⌜φ⌝ → ⊢φ`, representabilidad **negativa**) **no se sigue de la consistencia simple** — y el
+> teorema se enunciaba bajo `Consistent`, afirmando **más de lo que Gödel permite** (por eso existe
+> Rosser). Era un **postulado falso en general**, misma familia que `subst_lift_cancel_formula` y
+> `ax_lineWF_gen`.
+>
+> **TAREA ABIERTA (independiente de D3):** construir **`repr_neg : ConsistentOmega → Prf (provCodeC' φ)
+> → Prf φ`** (no existe). Con ella + el punto fijo real (`godelC'_fixedpoint`) + `dne`, el argumento de
+> ~8 líneas se porta y se recupera la indecidibilidad **con la hipótesis honesta**. Groundwork en
+> `Meta/CodeDistinct.lean`. Ver `GODEL-STATUS.md`.
+
 **Estado (2026-07-09, 60 módulos, 74 jobs, Lean v4.31.0, 0 errores, 0 warnings, 0 sorrys; 7 `axiom` tras F7a — ver `AXIOMS.md`):**
 
 - ✅ **Gödel I REAL** sin postulados (`goedel_first_real'`); **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales; `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).

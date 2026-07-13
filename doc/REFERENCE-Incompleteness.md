@@ -44,7 +44,14 @@ theorem con_imp_goedelSentence : axioms ⊢ (consistencyFormula ⇒ goedelSenten
 theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)       -- ⊬ Con
 ```
 
-**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level**. La otra mitad de Gödel I (`⊬ ¬G`) se cerró 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`).
+**Clave**: toda la cadena HBL de Gödel II (incl. la contrapositiva) se construye con `imp_intro`/`mp`, **sin DNE object-level**.
+
+> ⚠️ **Corrección de auditoría (2026-07-13).** Aquí se afirmaba que la otra mitad de Gödel I (`⊬ ¬G`)
+> quedó cerrada el 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`).
+> **Eso era cierto sólo en la capa LEGACY** (`Meta/Incompleteness.lean`, que postulaba D2/D3), y esa capa
+> se **RETIRÓ en F7a** (`f03eacf`): **esos dos teoremas ya no existen en el código**. La cadena real
+> establece **sólo `⊬G`** (`goedel_first_real'`, ω‑consistencia). La **indecidibilidad de `G` está
+> PENDIENTE** de re‑derivar sobre la cadena real (tarea abierta, independiente de D3).
 
 ---
 
@@ -755,11 +762,103 @@ theorem d3_prf_of_chainOkDot (φ) (hC : Prf (chainOk nil #0 ⇒ provFromCode cha
    sobre `pcc_eval_carc_nthc` — que consume `chainOk`, y por eso `hI` debe recibirlo (`hbody_of_atoms`
    reestructurado).
 
-**FALTA — `hC_dot`, el último punto duro**: `chainOkB nil p = ∀i<lenc p. lineOkB nil p i`, así que pide
-la **INTRODUCCIÓN del `∀` acotado a nivel de código** = **inducción acotada interna** sobre la cota
-(`pcc_gen_code` + `prf_lt_succ_split` + base + paso) — justo lo que §3.20.3 dejó pendiente
-(`pcc_bdAll_elim` existe; la intro no). Luego `d3_prf` → `goedel_second_prf` → F7b (retira `axiom d3`,
-7→6). Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
+#### 3.20.6 LÓGICA PROPOSICIONAL e INDUCCIÓN **internas** a nivel de código (§39)
+
+`Meta/PropCodePrf.lean`. **Hallazgo:** las líneas‑axioma proposicionales del verificador **y la de
+INDUCCIÓN** son TODAS **estructurales** (bicondicional `lineWF` con códigos **arbitrarios** y
+`premsOf = nil`, igual que EQREFL/Q1/Q2/LEIBNIZ, §3.20.1) ⇒ cada una se demuestra con un testigo de
+**una sola línea** (`pcc_axline`) y sale **libre de muro** (`[propext, choice, Quot.sound]`).
+
+| tag | línea | esquema |
+|:---:|:------|:--------|
+| 0 | `p1` | `A ⇒ (B ⇒ A)` (K) |
+| 1 | `p2` | `(A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C))` (S) |
+| 7 | `j3` | `(A ∨ B) ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C))` — **`∨`‑elim** |
+| 8 | `efq` | `⊥ ⇒ A` |
+| 18 | `ind` | `A[0] ⇒ (∀x. A[x] ⇒ A[σx]) ⇒ ∀x. A[x]` — **inducción** |
+
+```lean
+theorem pcc_p1_code (Ac Bc) : Prf (provFromCode (implc Ac (implc Bc Ac)))
+theorem pcc_p2_code (Ac Bc Cc) : Prf (provFromCode (implc (implc Ac (implc Bc Cc)) (implc (implc Ac Bc) (implc Ac Cc))))
+theorem pcc_j3_code (Ac Bc Cc) : Prf (provFromCode (implc (orc Ac Bc) (implc (implc Ac Cc) (implc (implc Bc Cc) Cc))))
+theorem pcc_efq_code (Ac) : Prf (provFromCode (implc botc Ac))
+noncomputable def indConcl (Ac) : Term                      -- A[0] ⇒ (∀x. A[x] ⇒ A[σx]) ⇒ ∀x. A[x]
+theorem pcc_ind_code (Ac) : Prf (provFromCode (indConcl Ac))   -- ★ INDUCCIÓN interna, código arbitrario
+-- derivadas del cálculo implicacional (P1 + P2 + MP):
+theorem pcc_weaken_code (Ac Bc) (h : Prov(⌜Bc⌝)) : Prf (provFromCode (implc Ac Bc))
+theorem pcc_imp_trans_code (Ac Bc Cc) (h1 h2) : Prf (provFromCode (implc Ac Cc))   -- silogismo hipotético
+theorem pcc_or_elim_imp_code (Ac Bc Cc) (h1 h2) : Prf (provFromCode (implc (orc Ac Bc) Cc))
+theorem pcc_or_elim_code (Ac Bc Cc) (hor h1 h2) : Prf (provFromCode Cc)
+```
+
+**Consecuencia:** junto con lo ya existente (MP, `∀`‑elim, `∃`‑intro, gen, Leibniz, `∧`, `∨`‑intro),
+**`Prov` dispone YA de lógica completa**. `pcc_ind_code` es el desbloqueo de `hC_dot`.
+
+#### 3.20.7 INTRODUCCIÓN del `∀` acotado (§40) — keystone de `hC_dot`
+
+`Meta/BdAllIntroPrf.lean`. La pieza que §3.20.3 dejó pendiente (`pcc_bdAll_elim` existía; la **intro**
+NO) y que `hC_dot` necesita.
+
+```lean
+theorem pcc_bdAll_base (Psi) : Prf (provFromCode (implc (ltCodeFn ⌜v₀⌝ (tcFn zero)) Psi))   -- vacuo (EFQ)
+def splitSchema : Formula                                                                    -- #0 = i, #1 = b
+theorem pcc_lt_succ_split_code (b) :                                                         -- split codificado (VOLTEADO)
+  Prf (provFromCode (implc (ltCodeFn ⌜v₀⌝ (tcFn (succ b))) (orc (ltCodeFn ⌜v₀⌝ (tcFn b)) (eqCodeFn (tcFn b) ⌜v₀⌝))))
+theorem pcc_bdAll_step  (Psi b) (hPsiId) (hIH) (hb) : …
+theorem PrfH_bdAll_step (Psi b) (hPsiId) (hIH) (hb) : …          -- el paso vive bajo contexto
+noncomputable def bdAllPred (CF bndF PsiF p) : Formula            -- predicado de la inducción (b = #0, p lifteado)
+theorem pcc_bdAll_intro (CF bndF PsiF p) (…conmutaciones lift/subst…) (hPsiId) (hbody) :
+  Prf (CF p ⇒ provFromCode (bdAllCode (tcFn (bndF p)) (PsiF p)))  -- ★ LA INTRO
+-- auxiliares
+theorem prf_lt_succ_of_lt (m n) : Prf (lt m n ⇒ lt m (succ n))
+theorem prf_lt_succ_self (n)    : Prf (lt n (succ n))
+theorem prf_lt_succ_split' (i b) : Prf (lt i (succ b) ⇒ lor (lt i b) (Formula.eq b i))   -- VOLTEADO: `b = i`
+theorem pcc_eq_symm_code_internal (X Y) (hX) : Prf (provFromCode (implc (eqc X Y) (eqc Y X)))
+theorem prf_congr_orc / prf_congr_substfc3 / PrfH_congr_substfc3
+theorem PrfH_weaken_code / PrfH_imp_trans_code / PrfH_or_elim_imp_code
+```
+
+**Las cinco decisiones/obstrucciones que costaron:**
+
+1. **NO se induce sobre el testigo** (`Ac[x] ⇒ Ac[σx]` es **FALSO**: `φ(σx)` no se sigue de `φ(x)`),
+   sino sobre la **COTA**, a nivel **objeto**, con guarda `b < σbnd`: la guarda da `b < bnd` y de ahí
+   `hbody` entrega el `Prov(⌜φ(ḃ)⌝)` que el paso necesita.
+2. La **disyunción finita de casos** (Hájek‑Pudlák, `i=0̄ ∨ … ∨ i=(n−1)̄`) **NO sirve**: la cota
+   `lenc p` con `p` **abstracto** **no es un numeral concreto** ⇒ hay que inducir de verdad.
+3. `pcc_gen_code` toma el body **abierto** ⇒ se induce sobre el **CUERPO ABIERTO** y se aplica `gen`
+   **una sola vez al final** (evita el *round‑trip* `∀`‑elim).
+4. **Obstrucción `hPsiId`**: `substfc` **DECREMENTA** las variables superiores (`prf_substtc_var_gt`),
+   luego `substfc 0 ⌜v₀⌝ Psi` **sólo es la identidad** si la única code‑var de `Psi` es `⌜v₀⌝`. Se pasa
+   como hipótesis y se descarga estructuralmente. (Por lo mismo, el split se **voltea en el objeto**:
+   la simetría interna exige el 1er arg `substtc`‑invariante, y `⌜v₀⌝` no lo es.)
+5. **Obstrucción De Bruijn del ensamblaje**: el binder de la inducción **desplaza** las variables
+   libres ⇒ dentro del `gen` hace falta `hbody` en **`↑p`**, no en `p`. Resuelto **parametrizando
+   sobre `p`** (`CF`/`bndF`/`PsiF` como funciones + conmutación de `liftTerm`/`substTerm`) — mismo
+   patrón que resolvió el `∃`‑elim de `hI_dot`.
+
+#### 3.20.8 Lo que FALTA para cerrar D3
+
+**Toda la maquinaria existe ya**; lo que queda es composición, pero es mucha.
+
+```text
+chainOkB c p  = ∀i<lenc p. lineOkB c p i                        ← ∀ acotado  ✅ pcc_bdAll_intro
+lineOkB c p i = lineWF (nthc p i) ∧ boundedPremsIn c p i (premsOf (nthc p i))
+boundedPremsIn c p i L = ∀j<lenc L. ( In (nthc L j) c  ∨  ∃k<i. carc (nthc p k) = nthc L j )
+                          ↑ ∀ acotado ANIDADO    ↑ ∨       ↑ ∃ acotado
+```
+
+* **∀i** y **∀j (anidado)**: `pcc_bdAll_intro` ✅ (dos aplicaciones) · **∧**: `pcc_reflect_and` ✅ ·
+  **∨**: `pcc_reflect_or` ✅ · **∃k**: `pcc_bdEx_intro_open` ✅ (de `hI_dot`).
+* **`In x nil`** es **refutable** ⇒ el disyunto izquierdo sale por **ex falso** (barato).
+* **átomo `carc (nthc p k) = nthc L j`**: `pcc_eq_tracked` + `pcc_eval_carc_nthc` + `pcc_eval_nthc` ✅.
+* ⚠️ **átomo `lineWF` — SUBPROYECTO**: reflejarlo dotado exige recorrer los **21 casos de tag**
+  (`prf_lineWF_inv` da la disyunción `tagDisj`; en cada caso hay que reflejar su **ecuación
+  estructural** y aplicar el **bicondicional codificado** `ax_lineWF_<tag>` vía `pcc_thm_inst`).
+* Faltan además las **evaluaciones de `premsOf`** (y `lenc`/`nthc` sobre él) y los **cómputos
+  `substCodeF`** de `chainOkB`/`lineOkB`/`boundedPremsIn` (patrón `substCodeT_closed`).
+
+Luego `d3_prf := d3_prf_of_chainOkDot φ hC_dot` → `goedel_second_prf` → **F7b retira `axiom d3` (7→6)**.
+Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
 
 ---
 
