@@ -4,7 +4,60 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
 
-**Última tarea abierta:** cerrar **D3 / Segundo Teorema de Gödel** vía la **Σ₁‑completitud provable estándar** (plan **12‑A**: capa numérica Δ₀ del verificador). **Fases 1a, 1b y 2 ✅ COMPLETAS** (2026‑07‑08) — **quedan las fases 3, 4 y 5**.
+**Estado 2026‑07‑13 · HEAD `41c72e1` · build 93 jobs · 79 módulos (Minimal 11 + Meta 57 + Full 11) ·
+Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.md`).**
+
+---
+
+## 🎯 LO QUE QUEDA (3 tareas, por orden de valor)
+
+> Nada de esto es una incógnita: de las tres se sabe **exactamente** cómo se hace. Lo que queda es
+> volumen, no diseño.
+
+### ① `repr_neg` — recuperar la INDECIDIBILIDAD (⊬¬G) · *independiente de D3* · **mejor ratio**
+
+```lean
+repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ        -- ⟵ NO EXISTE. Construir.
+```
+
+Hoy la cadena real sólo da **`⊬G`** (`goedel_first_real'`). La mitad **`⊬¬G`** **no está** (ver la
+⚠️ AUDITORÍA abajo: se probó en la capa legacy con un **postulado falso** y se retiró en F7a — **no
+recuperar F7a**).
+
+**Con `repr_neg`, el argumento se porta tal cual (~8 líneas):**
+`⊢¬G` →(punto fijo) `⊢¬¬Prov⌜G⌝` →(`dne`) `⊢Prov⌜G⌝` →(**`repr_neg`**) `⊢G` →(con `⊢¬G`) `⊥`.
+
+*Ya está todo lo demás*: punto fijo real (`godelC'_fixedpoint`), **D1** (`repr_pos'_prf`), `dne` (en
+`FOL/MetaRules`). `repr_neg` debe salir de la **fidelidad del verificador** + `ConsistentOmega`
+(`:= ¬(axioms ⊢ ⊥)`). Groundwork: `Meta/CodeDistinct.lean` («aritmética negativa de códigos»).
+
+### ② Átomo `lineWF` dotado — **SUBPROYECTO** (el bloque grande de `hC_dot`)
+
+Reflejar `lineWF X` punteado exige recorrer los **21 casos de tag**: `prf_lineWF_inv` da la disyunción
+`tagDisj`; en **cada** caso hay que (a) reflejar su **ecuación estructural** (`pcc_eq_tracked` +
+evaluaciones de los constructores de código) y (b) aplicar el **bicondicional codificado**
+`ax_lineWF_<tag>` vía `pcc_thm_inst`. Varios cientos de líneas, mecánico pero largo.
+
+**Faltan además** (misma tarea): evaluaciones provables de **`premsOf`** (y de `lenc`/`nthc` sobre él),
+y los **cómputos `substCodeF`** de `chainOkB`/`lineOkB`/`boundedPremsIn` (patrón `substCodeT_closed`).
+
+### ③ Componer `hC_dot` → `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`)
+
+**D3 ya está reducida a UN SOLO lema:** `d3_prf_of_chainOkDot (φ) (hC)`. Todo lo demás está hecho.
+
+```text
+chainOkB c p  = ∀i<lenc p. lineOkB c p i                       ← ✅ pcc_bdAll_intro  (§40)
+lineOkB c p i = lineWF (nthc p i)  ∧  boundedPremsIn …          ← ② arriba   ✅ pcc_reflect_and
+boundedPremsIn = ∀j<lenc L. ( In (nthc L j) nil ∨ ∃k<i. carc (nthc p k) = nthc L j )
+                  ✅ pcc_bdAll_intro   ✅ ex-falso   ✅ pcc_reflect_or   ✅ pcc_bdEx_intro_open
+                                                        y el átomo: ✅ pcc_eq_tracked +
+                                                        pcc_eval_carc_nthc + pcc_eval_nthc
+```
+
+Falta también **codificar el ⇐** (`chainOkB nil p ⇒ chainOk nil p`, de `prf_chainOk_iff_chainOkB`):
+patrón Step A, barato. **Estimación honesta de ②+③: 2‑4 sesiones.**
+
+---
 
 **Para arrancar una sesión nueva, leer en este orden:**
 
@@ -28,7 +81,12 @@
 > ~8 líneas se porta y se recupera la indecidibilidad **con la hipótesis honesta**. Groundwork en
 > `Meta/CodeDistinct.lean`. Ver `GODEL-STATUS.md`.
 
-**Estado (2026-07-09, 60 módulos, 74 jobs, Lean v4.31.0, 0 errores, 0 warnings, 0 sorrys; 7 `axiom` tras F7a — ver `AXIOMS.md`):**
+---
+
+## 📜 REGISTRO CRONOLÓGICO (§15–§40) — cómo se llegó aquí
+
+> **El estado ACTUAL y lo que queda están ARRIBA** (93 jobs, 79 módulos). Lo que sigue es el histórico
+> de hitos, en orden de construcción; las cifras de cada entrada son las **de su momento**, no las de hoy.
 
 - ✅ **Gödel I REAL** sin postulados (`goedel_first_real'`); **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales; `d3_prf_of_sigma1` (D3 reducida a `hC`/`hI`).
 - ✅ **12‑A fases 1a/1b/2**: el verificador (`chainOk c p` y `In · (runFn nil p)`) está **expresado en la capa numérica Δ₀ y sin acumulador**. Era el único punto del plan sin verificar en código; ya no queda ninguno.
@@ -246,7 +304,15 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 
 - [x] **Nivel D Gödel — Gödel I (mitad esencial)** (`Meta/Incompleteness.lean`, 2026-06-12): `goedel_first_unprovable` (`Consistent → ⊬ G`), `goedel_first_true`, `incompleteness`. Derivado de D1 + diagonalización del Nivel C.
 - [x] **Gödel II** (`goedel_second`, 2026-06-12): `Consistent → ⊬ Con` (`Con := ¬Prov(⌜⊥⌝)`). **Postulando D2/D3**; lema crucial `con_imp_goedelSentence : ⊢ Con⇒G`.
-- [x] **Gödel I completo** (`goedel_first_unrefutable`, `goedel_first_undecidable`, 2026-06-13): `⊬ ¬G`, luego `⊬ G ∧ ⊬ ¬G` (G indecidible). Vía **`dne`** (DNE clásica añadida a `FOL/MetaRules.lean`) + reflexión. El obstáculo era el intuicionismo del FOL, no ω-consistencia; Rosser habría sido peor.
+- [ ] ⚠️ **Gödel I completo — REVERTIDO por la auditoría 2026-07-13.** Se marcó ✅ el 2026-06-13
+      (`goedel_first_unrefutable`, `goedel_first_undecidable`: `⊬¬G`, luego `⊬G ∧ ⊬¬G`, G indecidible),
+      **pero en la capa LEGACY**, apoyándose en el postulado **falso en general** `provFormula_repr`
+      (su dirección `.mp` es la representabilidad **negativa**, que NO se sigue de la consistencia
+      simple — y el teorema se enunciaba bajo `Consistent`). **F7a lo retiró, y con razón: era un
+      arreglo de solidez.** Hoy la cadena real da **sólo `⊬G`**.
+      **Sigue vigente el diagnóstico**: el obstáculo es el **intuicionismo** del FOL, no la
+      ω‑consistencia; Rosser habría sido peor. **Pendiente:** construir `repr_neg` (tarea ① del bloque
+      «LO QUE QUEDA») y re‑derivarlo con la hipótesis honesta.
 - [ ] **Cadena de embeddings**: `FOL⁼ ⊂ Minimal ⊂ Full`.
 - [x] **[Deuda menor]** Refactor meta-axiomas FOL → ✅ HECHO 2026-06-12 (`FOL/MetaRules.lean`).
 

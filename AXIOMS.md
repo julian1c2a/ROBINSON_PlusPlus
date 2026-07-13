@@ -108,7 +108,15 @@ goedel_second'      : [propext, choice, Quot.sound,
 ```
 
 Ningún postulado gödeliano salvo `d3` en `goedel_second'` (F7b, pendiente de D3
-real). Gödel I es **real y sin postulado gödeliano alguno**.
+real).
+
+**Gödel I — precisión (auditoría 2026-07-13):** la mitad **`⊬G`** (`goedel_first_real'`) es **real y
+sin postulado gödeliano alguno** ✅. La mitad **`⊬¬G`** (indecidibilidad) **NO está en la cadena real**:
+se probó en la capa LEGACY (`Meta/Incompleteness.lean`) apoyándose en `provFormula_repr` —postulado
+**bicondicional** cuya dirección `.mp` (representabilidad **negativa**) **no se sigue de la
+consistencia simple**—, y se retiró en **F7a** junto con el módulo. **No revertir F7a: fue un arreglo
+de solidez.** Para recuperarla honestamente falta construir
+`repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ`. Ver `GODEL-STATUS.md`.
 
 ---
 
