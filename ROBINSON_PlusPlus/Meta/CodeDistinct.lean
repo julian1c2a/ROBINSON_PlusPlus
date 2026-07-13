@@ -31,9 +31,22 @@ La dirección negativa (reflexión / D3 / `⊬¬G`) reposa sobre que la teoría
 (`cons_ne_head`/`cons_ne_tail`/`neg_symm`) y, sobre ellos, `formCode_ne`
 (refutación de igualdad de códigos de fórmulas distintas) por inducción meta.
 
-**Alcance honesto:** el resultado «titular» `⊢ ¬provCodeC φ` para `φ`
-indemostrable es **Π₁** (`∀p, ¬In ⌜φ⌝ (validProofFn nil p)`) y requiere el
-**esquema de inducción** (Fase 5); esto es solo el cimiento aritmético.
+**⚠️ CORRECCIÓN 2026‑07‑13 (auditoría).** Aquí se decía que el resultado «titular»
+`⊢ ¬provCodeC φ` para `φ` indemostrable (Π₁, `∀p. ¬In ⌜φ⌝ (…)`) se obtendría con
+el **esquema de inducción** (Fase 5). **Ese plan es IMPOSIBLE**: para `φ = ⊥`
+—indemostrable si la teoría es consistente— `⊢ ¬provCodeC ⊥` es **literalmente
+`Con(T)`**, que por **Gödel II** la teoría NO demuestra. (Para `φ = G` tampoco: por
+el punto fijo, `⊢ ¬provCodeC' G` ⟺ `⊢ G`, y `⊬ G`.) La vía «la teoría refuta la
+demostrabilidad» está **cerrada por Gödel**, no por falta de trabajo.
+
+**Alcance honesto (real).** Este módulo es el cimiento aritmético de la dirección
+negativa, pero ésta **sólo puede cerrarse a nivel META**: la **reflexión**
+(`(axioms ⊢ provCodeC' φ) → Prf φ`) es una hipótesis meta —la ω‑consistencia
+clásica— y así se enuncia, **explícita**, en `Meta/DiagonalTwo.lean`
+(`Reflects` / `goedel_first_undecidable_real'`). Descargarla exige ω‑consistencia
+**+ Δ₀‑completitud NEGATIVA del verificador en testigos CONCRETOS** (cerrados) —
+el espejo de `repr_pos'`, y sí alcanzable, a diferencia de la versión Π₁ universal.
+`formCode_ne` es la base de eso.
 -/
 
 /-- Simetría de la refutación de igualdad. -/
