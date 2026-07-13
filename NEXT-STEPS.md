@@ -38,17 +38,40 @@ Full.ax_induction, Full.ax_list_induction, ax_inAxC]` — **cero postulados göd
 > `CodeDistinct.lean` tenía escrito (probar `⊢ ¬provCodeC φ` «con el esquema de inducción, Fase 5»)
 > **era imposible** — ya corregido en el módulo.
 
-**LO QUE QUEDA de ①** (opcional; el teorema ya es real): **descargar `Reflects`** desde una hipótesis
-honesta. Vía única viable:
+**LO QUE QUEDA de ①** — ✅ **la REDUCCIÓN ya está hecha** (`Meta/OmegaReflect.lean`, HEAD `f53dd4e`):
 
-1. **ω‑consistencia** como hipótesis **META** (definirla explícitamente; NO es `ConsistentOmega`).
-2. **Δ₀‑completitud NEGATIVA del verificador en testigos CONCRETOS (cerrados)**: si un list‑term cerrado
-   `t` no es una prueba real de `φ`, entonces `axioms ⊢ ¬(chainOk nil t ∧ In ⌜φ⌝ (runFn nil t))`.
-   Es el **espejo de `repr_pos'`** y **sí es alcanzable** (chequeo estructural finito), a diferencia de
-   la versión Π₁ universal. Cimiento: `formCode_ne` (`Meta/CodeDistinct.lean`).
+```lean
+def OmegaConsistent : Prop := …   -- ω-consistencia CLÁSICA, hipótesis META explícita
+def NegVerifier    : Prop := ∀ φ, ¬ Prf φ → ∀ l, StdChain l → axioms ⊢ neg (Verifies φ (objList l))
+theorem reflects_of_omega (hω : OmegaConsistent) (hneg : NegVerifier) (φ) : Reflects φ
+theorem goedel_first_undecidable_omega (hcon) (hω) (hneg) : ¬ Prf godelC' ∧ ¬ Prf (neg godelC')
+```
 
-Con (1)+(2), ω‑consistencia se viola y sale `Prf φ`. **Magnitud realista: comparable a `repr_pos'`
-(D1), o sea varios módulos.** No bloquea nada más.
+**Valor:** la reflexión deja de ser un enunciado **bloqueado por Gödel** y pasa a ser **`NegVerifier`,
+un enunciado Δ₀ concreto**, más una hipótesis clásica y **visible**. `OmegaConsistent` **no** es
+`ConsistentOmega`: es estrictamente más fuerte, es lo que Gödel exige, y es creíble (toda teoría
+**sólida** la cumple).
+
+**Falta sólo `NegVerifier`** — es un **proyecto real** (magnitud ~D1, varios módulos). Estado de sus
+piezas:
+
+| Pieza | Estado |
+|:--|:--|
+| `prf_iff_derivation : Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ existe |
+| `chainOk_track` / `runFn_track` (**positiva**: `checkAux` ok ⟹ `⊢ chainOk`) | ✅ existe (núcleo de D1) |
+| **Solidez estructural del verificador** (cadena válida ⟹ `Prf`) | ❌ **NO existe — pieza CRÍTICA** |
+| `In` **negativo** (`⌜φ⌝ ∉ L` ⟹ `⊢ ¬ In ⌜φ⌝ L`) | ❌ no existe (base: `formCode_ne` ✅) |
+| **Decodificador** `Term → Option (List Rule)` (inverso de `proofCode'`) | ❌ no existe |
+
+**Dificultad de fondo:** `NegVerifier` cuantifica sobre **cualquier** list‑term cerrado, y **la mayoría
+NO están en la imagen de `proofCode'`** (son basura). Para cada uno hay que: **decodificarlo**; si no
+decodifica, **refutar `chainOk` estructuralmente** — lo que exige la **inversión de los 21 tags**
+(`ax_lineWF_inv` + distinción de códigos). Si decodifica, correr `checkAux`: si falla, refutar; si pasa
+y `⌜φ⌝` está entre las conclusiones, entonces `Prf φ` (`derivation_to_prf`) — contra la hipótesis.
+
+> 🔗 **SINERGIA con ②:** la refutación estructural de los **21 tags** es la **misma maquinaria** que la
+> reflexión del átomo `lineWF` que necesita `hC_dot` (tarea ②), en dirección negativa. Conviene
+> construirlas juntas.
 
 ### ② Átomo `lineWF` dotado — **SUBPROYECTO** (el bloque grande de `hC_dot`)
 
