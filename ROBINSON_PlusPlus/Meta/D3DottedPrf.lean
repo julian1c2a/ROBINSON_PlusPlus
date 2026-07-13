@@ -90,17 +90,24 @@ abbrev inDot (φ : Formula) : Term :=
   substfc zero (tcFn (.var 0)) (formCode (In (formCode φ) (runFn nil (.var 0))))
 
 /-- **`hbody` a partir de los dos átomos punteados**: dadas las reflexiones punteadas de
-    `chainOk nil #0` (`hC`) e `In ⌜φ⌝ (runFn nil #0)` (`hI`), se obtiene `hbody`. -/
+    `chainOk nil #0` (`hC`) e `In ⌜φ⌝ (runFn nil #0)` (`hI`), se obtiene `hbody`.
+
+    Nota (§38): `hI` recibe **también** `chainOk nil #0`. No es gratuito: la reflexión punteada de
+    `In` evalúa `carc (nthc p i)` (`pcc_eval_carc_nthc`), y esa evaluación exige que la línea `i` sea
+    un `cons`, hecho que sólo provee `chainOk` (`prf_line_is_cons`). En el contexto `[bodyF φ]` ambas
+    conjunciones están disponibles, así que pasarlas es inmediato. -/
 theorem hbody_of_atoms (φ : Formula)
     (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot))
-    (hI : Prf (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ))) :
+    (hI : Prf (chainOk nil (.var 0) ⇒
+      (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ)))) :
     Prf (bodyF φ ⇒ provFromCode (substfc zero (tcFn (.var 0)) (formCode (bodyF φ)))) := by
   refine prf_deduction ?_
   have hc : PrfH [bodyF φ] (chainOk nil (.var 0)) := PrfH_and_elim_left (prfH_hyp_self _)
   have hi : PrfH [bodyF φ] (In (formCode φ) (runFn nil (.var 0))) :=
     PrfH_and_elim_right (prfH_hyp_self _)
   have hCp : PrfH [bodyF φ] (provFromCode chainOkDot) := PrfH.mp _ _ _ (prf_to_prfH hC _) hc
-  have hIp : PrfH [bodyF φ] (provFromCode (inDot φ)) := PrfH.mp _ _ _ (prf_to_prfH hI _) hi
+  have hIp : PrfH [bodyF φ] (provFromCode (inDot φ)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hI _) hc) hi
   -- `∧`-intro a nivel de código (pcc_c1_code + dos pcc_mp_code_open, patrón de pcc_reflect_and)
   have step1 : Prf (provFromCode chainOkDot
       ⇒ provFromCode (implc (inDot φ) (andc chainOkDot (inDot φ)))) :=
@@ -124,7 +131,8 @@ theorem hbody_of_atoms (φ : Formula)
     `hbody_of_atoms` con `d3_prf_of_dotted`. Es el interfaz que `hC_dot`/`hI_dot` deben cumplir. -/
 theorem d3_prf_of_dotted_atoms (φ : Formula)
     (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot))
-    (hI : Prf (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ))) :
+    (hI : Prf (chainOk nil (.var 0) ⇒
+      (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ)))) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_dotted φ (hbody_of_atoms φ hC hI)
 

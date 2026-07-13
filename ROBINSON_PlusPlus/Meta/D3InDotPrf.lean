@@ -25,6 +25,13 @@ open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 open ROBINSON_PlusPlus.Meta.EvalNthcPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 open ROBINSON_PlusPlus.Meta.D3DottedPrf
+open ROBINSON_PlusPlus.Meta.EvalArithPrf
+open ROBINSON_PlusPlus.Meta.EvalLtPrf
+open ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+open ROBINSON_PlusPlus.Meta.TrackedCorePrf
+open ROBINSON_PlusPlus.Meta.ExIntroCodePrf
+open ROBINSON_PlusPlus.Meta.TcArithPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -69,6 +76,98 @@ theorem pcc_bdEx_intro_open (B Phic K : Term)
     prf_mp (prf_provCode_congr (prf_eq_symm hsub)) hand
   exact prf_mp (pcc_exIntro_code_open (andc (ltCodeFn (varc (numeral 0)) B) Phic) K) hant
 
+/-! ### Combinadores internos bajo CONTEXTO (`PrfH`)
+
+El núcleo de Step B extrae el testigo con `PrfH_ex_elim`, así que todas las reflexiones viven bajo
+contexto: hacen falta las versiones `PrfH` del `∧`-intro y del `∃i<B`-intro internos, más la
+**simetría interna de `=`** (que no existía: `pcc_eq_trans_code`/`pcc_congr_succ_code` sí, symm no).
+La simetría es imprescindible para la COTA — `tcFn (lenc p)` y `lencT ṗ` sólo son iguales *dentro* de
+`Prov` (es la evaluación provable), y Leibniz transporta en la dirección contraria a la que hace falta. -/
+
+/-- **Simetría interna de `=` a nivel de código**, en `PrfH`: `Prov(⌜X=Y⌝) → Prov(⌜Y=X⌝)`.
+    Leibniz con el contexto `Ac := (v₀ = X)`; la base `Ac[X]` es la reflexividad codificada. -/
+theorem PrfH_eq_symm_code {Γ : List Formula} (X Y : Term)
+    (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (heq : PrfH Γ (provFromCode (eqc X Y))) : PrfH Γ (provFromCode (eqc Y X)) := by
+  let Ac : Term := eqc (varc (numeral 0)) X
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc t X) := fun t =>
+    prf_eq_trans (prf_substfc_eq zero t (varc (numeral 0)) X)
+      (prf_congr_eqCodeFn (prf_substtc_varc0 t) (hX t))
+  have hrefl : Prf (provFromCode (eqc X X)) := prf_provFromCode_eqCodeFn_refl X
+  have hAX : PrfH Γ (provFromCode (substfc zero X Ac)) :=
+    prf_to_prfH (prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) hrefl) _
+  have hAY : PrfH Γ (provFromCode (substfc zero Y Ac)) := PrfH_leibniz_apply Ac X Y heq hAX
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _) hAY
+
+/-- `∧`-intro interno a nivel de código, en `PrfH` (patrón de `hbody_of_atoms`: `pcc_c1_code` + dos MP). -/
+theorem PrfH_and_intro_code {Γ : List Formula} (Ac Bc : Term)
+    (ha : PrfH Γ (provFromCode Ac)) (hb : PrfH Γ (provFromCode Bc)) :
+    PrfH Γ (provFromCode (andc Ac Bc)) := by
+  have step1 : Prf (provFromCode Ac ⇒ provFromCode (implc Bc (andc Ac Bc))) :=
+    prf_mp (pcc_mp_code_open Ac (implc Bc (andc Ac Bc))) (pcc_c1_code Ac Bc)
+  exact PrfH_mp_code_apply (PrfH.mp _ _ _ (prf_to_prfH step1 _) ha) hb
+
+/-- **`∃i<B`-intro OPEN, versión `PrfH`** (la que usa el núcleo de Step B: cota y cuerpo se reflejan
+    bajo el contexto del `∃`-elim). -/
+theorem PrfH_bdEx_intro_open {Γ : List Formula} (B Phic K : Term)
+    (hBinv : ∀ W, Prf (substtc zero W B =eq B))
+    (hlt : PrfH Γ (provFromCode (ltCodeFn K B)))
+    (hphi : PrfH Γ (provFromCode (substfc zero K Phic))) :
+    PrfH Γ (provFromCode (bdExCode B Phic)) := by
+  have hand : PrfH Γ (provFromCode (andc (ltCodeFn K B) (substfc zero K Phic))) :=
+    PrfH_and_intro_code _ _ hlt hphi
+  have hsub : Prf (substfc zero K (andc (ltCodeFn (varc (numeral 0)) B) Phic)
+      =eq andc (ltCodeFn K B) (substfc zero K Phic)) :=
+    prf_eq_trans (prf_substfc_and zero K _ _)
+      (prf_congr_andc (prf_substfc_ltCodeFn_varc0 B K hBinv) (prf_refl _))
+  have hant : PrfH Γ (provFromCode (substfc zero K (andc (ltCodeFn (varc (numeral 0)) B) Phic))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hsub)) _) hand
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (pcc_exIntro_code_open (andc (ltCodeFn (varc (numeral 0)) B) Phic) K) _) hant
+
+/-! ### Toolkit De Bruijn / `substtc` para el testigo dotado
+
+El `∃`-elim **liftea** `p` (de `#0` a `#1`), así que los lemas fijados en `#0` no aplicarían después:
+todo lo dotado se generaliza sobre un testigo `p` **arbitrario** (igual que `pcc_lt_tracked` hace con
+`s`,`t`), y estos lemas garantizan que el lift atraviesa `tcFn`/`inDot`/`bddCarcDot` moviendo `p`. -/
+
+/-- El lift atraviesa `tcFn` (es `Term.func "tcFn" [·]`). -/
+theorem liftTerm_tcFn (c : Nat) (t : Term) : liftTerm c (tcFn t) = tcFn (liftTerm c t) := by
+  simp only [tcFn, liftTerm, liftTerms]
+
+/-- `liftc 0 (tcFn a)` es `substtc`-invariante (vía `prf_liftc_tcFn` + `prf_substtc_tcFn`). -/
+theorem substtc_inv_liftc_tcFn (a : Term) :
+    ∀ W, Prf (substtc zero W (liftc zero (tcFn a)) =eq liftc zero (tcFn a)) := fun W =>
+  prf_eq_trans (prf_congr_substtc3 (prf_liftc_tcFn a))
+    (prf_eq_trans (prf_substtc_tcFn W a) (prf_eq_symm (prf_liftc_tcFn a)))
+
+/-- `termCode (formCode φ)` es `substtc`-invariante (el código de un código es cerrado; se descarga
+    con `prf_tc_form` + la invariancia de `tcFn`). -/
+theorem substtc_inv_termCode_formCode (φ : Formula) :
+    ∀ W, Prf (substtc zero W (termCode (formCode φ)) =eq termCode (formCode φ)) := fun W =>
+  prf_eq_trans (prf_congr_substtc3 (prf_eq_symm (prf_tc_form φ)))
+    (prf_eq_trans (prf_substtc_tcFn W (formCode φ)) (prf_tc_form φ))
+
+/-- Espejo de `prf_substfc_ltCodeFn_varc0`: el hueco `⌜v₀⌝` en la **segunda** posición
+    (`substfc 0 K (A < ⌜v₀⌝) =eq (A < K)`). Lo necesita el Leibniz de la cota. -/
+theorem prf_substfc_ltCodeFn_snd (A K : Term)
+    (hAinv : ∀ W, Prf (substtc zero W A =eq A)) :
+    Prf (substfc zero K (ltCodeFn A (varc (numeral 0))) =eq ltCodeFn A K) := by
+  have hts : Prf (substtsc zero K (cons A (cons (varc (numeral 0)) nil))
+      =eq cons A (cons K nil)) :=
+    prf_eq_trans (prf_substtsc_cons zero K A (cons (varc (numeral 0)) nil))
+      (prf_eq_trans (prf_congr_cons_head (hAinv K))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_substtsc_cons zero K (varc (numeral 0)) nil)
+            (prf_eq_trans (prf_congr_cons_head (prf_substtc_varc0 K))
+              (prf_congr_cons_tail (prf_substtsc_nil zero K))))))
+  refine prf_eq_trans (prf_substfc_atom zero K (strCode lt_sym)
+    (cons A (cons (varc (numeral 0)) nil))) ?_
+  show Prf (atomc (strCode lt_sym) (substtsc zero K (cons A (cons (varc (numeral 0)) nil)))
+    =eq atomc (strCode lt_sym) (cons A (cons K nil)))
+  unfold atomc
+  exact prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head hts))
+
 /-! ### Step A — la implicación ⇐ CODIFICADA (`boundedCarcIn ⌜φ⌝ ṗ ⇒ In ⌜φ⌝ (runFn nil ṗ)`)
 
 El teorema objeto `prf_In_runFn_of_boundedCarcIn ⌜φ⌝ #0` se generaliza (`Prf.gen`) y se instancia
@@ -80,22 +179,50 @@ antecedente es `bddCarcDot φ` (código dotado de `boundedCarcIn`). -/
 noncomputable def inBwdBody (φ : Formula) : Formula :=
   Formula.impl (boundedCarcIn (formCode φ) (.var 0)) (In (formCode φ) (runFn nil (.var 0)))
 
-/-- Código DOTADO del antecedente `boundedCarcIn ⌜φ⌝ #0` (con `p = #0 ↦ tcFn #0`). -/
-noncomputable def bddCarcDot (φ : Formula) : Term :=
-  substfc zero (tcFn (.var 0)) (formCode (boundedCarcIn (formCode φ) (.var 0)))
+/-- Código DOTADO del átomo `In`, con testigo `p` **arbitrario**. `inDot φ = inDotAt φ #0` (rfl).
+    Nota: el `formCode` codifica siempre el **esquema** (con `#0` en el hueco de `p`); lo único que
+    varía es el testigo dotado `tcFn p`. -/
+noncomputable def inDotAt (φ : Formula) (p : Term) : Term :=
+  substfc zero (tcFn p) (formCode (In (formCode φ) (runFn nil (.var 0))))
 
-/-- **Step A**: `⊢ Prov(⌜ bddCarcDot φ ⇒ inDot φ ⌝)`. Instancia dotada del teorema ⇐, con `substfc`
-    distribuido sobre el `implc`; el consecuente coincide con `inDot φ` por definición. -/
-theorem pcc_bddDot_imp_inDot (φ : Formula) :
-    Prf (provFromCode (implc (bddCarcDot φ) (inDot φ))) := by
-  have hthm : Prf (provFromCode (substfc zero (tcFn (.var 0)) (formCode (inBwdBody φ)))) :=
+/-- Código DOTADO del antecedente `boundedCarcIn`, con testigo `p` **arbitrario**. -/
+noncomputable def bddCarcDotAt (φ : Formula) (p : Term) : Term :=
+  substfc zero (tcFn p) (formCode (boundedCarcIn (formCode φ) (.var 0)))
+
+/-- Código dotado del antecedente en `p = #0` (el que consume `hbody_of_atoms`). -/
+noncomputable def bddCarcDot (φ : Formula) : Term := bddCarcDotAt φ (.var 0)
+
+theorem inDot_eq_inDotAt (φ : Formula) : inDot φ = inDotAt φ (.var 0) := rfl
+
+/-- El lift atraviesa `inDotAt` moviendo el testigo (`formCode` es cerrado, `liftTerm_substfc_open`). -/
+theorem liftTerm_inDotAt (c : Nat) (φ : Formula) (p : Term) :
+    liftTerm c (inDotAt φ p) = inDotAt φ (liftTerm c p) := by
+  unfold inDotAt
+  rw [liftTerm_substfc_open _ (fun k => liftTerm_formCode k _) (tcFn p) c, liftTerm_tcFn]
+
+/-- El lift atraviesa `bddCarcDotAt` moviendo el testigo. -/
+theorem liftTerm_bddCarcDotAt (c : Nat) (φ : Formula) (p : Term) :
+    liftTerm c (bddCarcDotAt φ p) = bddCarcDotAt φ (liftTerm c p) := by
+  unfold bddCarcDotAt
+  rw [liftTerm_substfc_open _ (fun k => liftTerm_formCode k _) (tcFn p) c, liftTerm_tcFn]
+
+/-- **Step A** (testigo arbitrario): `⊢ Prov(⌜ bddCarcDotAt φ p ⇒ inDotAt φ p ⌝)`. Instancia dotada
+    del teorema ⇐ (`Prf.gen` + `pcc_thm_inst` con testigo `tcFn p`), con `substfc` distribuido sobre
+    el `implc`; el consecuente coincide con `inDotAt φ p` por definición. -/
+theorem pcc_bddDot_imp_inDot_at (φ : Formula) (p : Term) :
+    Prf (provFromCode (implc (bddCarcDotAt φ p) (inDotAt φ p))) := by
+  have hthm : Prf (provFromCode (substfc zero (tcFn p) (formCode (inBwdBody φ)))) :=
     pcc_thm_inst (inBwdBody φ) (Prf.gen _ (prf_In_runFn_of_boundedCarcIn (formCode φ) (.var 0)))
-      (tcFn (.var 0))
-  have hbridge : Prf (substfc zero (tcFn (.var 0)) (formCode (inBwdBody φ))
-      =eq implc (bddCarcDot φ) (inDot φ)) :=
-    prf_substfc_impl zero (tcFn (.var 0)) (formCode (boundedCarcIn (formCode φ) (.var 0)))
+      (tcFn p)
+  have hbridge : Prf (substfc zero (tcFn p) (formCode (inBwdBody φ))
+      =eq implc (bddCarcDotAt φ p) (inDotAt φ p)) :=
+    prf_substfc_impl zero (tcFn p) (formCode (boundedCarcIn (formCode φ) (.var 0)))
       (formCode (In (formCode φ) (runFn nil (.var 0))))
   exact prf_mp (prf_provCode_congr hbridge) hthm
+
+/-- Step A en `p = #0`. -/
+theorem pcc_bddDot_imp_inDot (φ : Formula) :
+    Prf (provFromCode (implc (bddCarcDot φ) (inDot φ))) := pcc_bddDot_imp_inDot_at φ (.var 0)
 
 /-! ### Step B (puente) — `bddCarcDot φ` como `bdExCode` con argumentos DOTADOS
 
@@ -109,37 +236,187 @@ Establece `bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ)`: `prf_substfc_ari
 `formCode φ` cerrado) la identifica con `bdExCode`. -/
 
 /-- Cota (dotada, bajo el binder) del `∃` acotado de `boundedCarcIn`: `lencT (liftc 0 ṗ)`. -/
-noncomputable def bdCarcB : Term := lencT (liftc zero (tcFn (.var 0)))
+noncomputable def bdCarcBAt (p : Term) : Term := lencT (liftc zero (tcFn p))
 
 /-- Cuerpo (dotado) del `∃` acotado: `carcT (nthcT (liftc 0 ṗ) ⌜v₀⌝) = ⌜φ⌝`. -/
-noncomputable def bdCarcPhic (φ : Formula) : Term :=
-  eqCodeFn (carcT (nthcT (liftc zero (tcFn (.var 0))) (varc (numeral 0)))) (termCode (formCode φ))
+noncomputable def bdCarcPhicAt (φ : Formula) (p : Term) : Term :=
+  eqCodeFn (carcT (nthcT (liftc zero (tcFn p)) (varc (numeral 0)))) (termCode (formCode φ))
+
+/-- La cota dotada es `substtc`-invariante (descarga el `hBinv` de `pcc_bdEx_intro_open`). -/
+theorem substtc_inv_bdCarcBAt (p : Term) :
+    ∀ W, Prf (substtc zero W (bdCarcBAt p) =eq bdCarcBAt p) :=
+  substtc_inv_lencT (substtc_inv_liftc_tcFn p)
 
 /-- **Forma META del código dotado de `boundedCarcIn`** (rfl salvo `substCodeT_closed` sobre el
-    `formCode φ` cerrado): `substCodeF 0 ṗ (boundedCarcIn ⌜φ⌝ #0) = bdExCode bdCarcB (bdCarcPhic φ)`. -/
-theorem substCodeF_boundedCarcIn (φ : Formula) :
-    substCodeF 0 (tcFn (.var 0)) (boundedCarcIn (formCode φ) (.var 0))
-      = bdExCode bdCarcB (bdCarcPhic φ) := by
-  have key : substCodeT 1 (liftc zero (tcFn (.var 0))) (liftTerm 0 (formCode φ))
+    `formCode φ` cerrado). El testigo `tcFn p` es **arbitrario**: la fórmula codificada es siempre el
+    esquema con `#0`, así que la computación de `substCodeF` no depende de `p`. -/
+theorem substCodeF_boundedCarcIn_at (φ : Formula) (p : Term) :
+    substCodeF 0 (tcFn p) (boundedCarcIn (formCode φ) (.var 0))
+      = bdExCode (bdCarcBAt p) (bdCarcPhicAt φ p) := by
+  have key : substCodeT 1 (liftc zero (tcFn p)) (liftTerm 0 (formCode φ))
       = termCode (formCode φ) := by
     rw [liftTerm_formCode]
-    exact substCodeT_closed 1 (liftc zero (tcFn (.var 0))) (formCode φ)
+    exact substCodeT_closed 1 (liftc zero (tcFn p)) (formCode φ)
       (fun c => liftTerm_formCode c φ)
   simp only [boundedCarcIn, land, lt, lenc, carc, nthc, liftTerm, liftTerms, Nat.lt_irrefl,
     reduceIte, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, substCodeF, substCodeT,
-    substCodeTs, bdExCode, bdCarcB, bdCarcPhic, exc, andc, numeral, ltCodeFn, atom2CodeFn, eqCodeFn,
-    lencT, carcT, nthcT, funcc, varc, key]
+    substCodeTs, bdExCode, bdCarcBAt, bdCarcPhicAt, exc, andc, numeral, ltCodeFn, atom2CodeFn,
+    eqCodeFn, lencT, carcT, nthcT, funcc, varc, key]
 
-/-- **`bddCarcDot φ` es `bdExCode` con argumentos dotados** (versión `Prf`): compone
-    `prf_substfc_arith_open` (forma `substfc` → `substCodeF`) con `substCodeF_boundedCarcIn`. -/
-theorem prf_bddCarcDot_eq (φ : Formula) :
-    Prf (bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ)) := by
-  have h := prf_substfc_arith_open 0 (tcFn (.var 0)) (boundedCarcIn (formCode φ) (.var 0))
-  rwa [substCodeF_boundedCarcIn φ] at h
+/-- **`bddCarcDotAt φ p` es `bdExCode` con argumentos dotados** (versión `Prf`): compone
+    `prf_substfc_arith_open` (forma `substfc` → `substCodeF`) con `substCodeF_boundedCarcIn_at`. -/
+theorem prf_bddCarcDot_eq_at (φ : Formula) (p : Term) :
+    Prf (bddCarcDotAt φ p =eq bdExCode (bdCarcBAt p) (bdCarcPhicAt φ p)) := by
+  have h := prf_substfc_arith_open 0 (tcFn p) (boundedCarcIn (formCode φ) (.var 0))
+  rwa [substCodeF_boundedCarcIn_at φ p] at h
+
+/-! ### NÚCLEO de Step B — reflexión punteada del `∃` acotado
+
+`chainOk nil p ⇒ boundedCarcIn ⌜φ⌝ p ⇒ Prov(⌜ bddCarcDotAt φ p ⌝)`. Espejo de `pcc_lt_tracked`:
+
+1. **`PrfH_ex_elim`** del `∃` acotado extrae el testigo `i = #0` y **liftea `p`** (de ahí que todo lo
+   dotado esté generalizado sobre `p`); la meta lifteada es `provFromCode (bddCarcDotAt φ ↑p)` gracias
+   a `liftFormula_provFromCode_open` + `liftTerm_bddCarcDotAt`.
+2. **COTA** `i < lenc ↑p` ⟶ `Prov(⌜ ı̇ < lencT (liftc 0 ↑ṗ) ⌝)`: `pcc_lt_tracked` da la cota con
+   `tcFn (lenc ↑p)`, que hay que transportar a `lencT` — y eso **sólo vale dentro de `Prov`** (es la
+   evaluación provable `pcc_eval_lenc`), en la dirección contraria a Leibniz ⟹ **simetría interna**
+   (`PrfH_eq_symm_code`) + Leibniz con `Ac := (ı̇ < ⌜v₀⌝)` (`prf_substfc_ltCodeFn_snd`).
+3. **CUERPO** `carc (nthc ↑p i) = ⌜φ⌝` ⟶ `Prov(⌜ carcT (nthcT (liftc 0 ↑ṗ) ı̇) = ⌜φ⌝ ⌝)`: aquí NO hace
+   falta simetría — `pcc_eval_carc_nthc` (que consume `chainOk`) da la evaluación, y la hipótesis del
+   `∃` es una igualdad **objeto**, así que basta congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form`
+   + cancelación del `liftc` con `prf_liftc_tcFn`) y `PrfH_provCode_congr`.
+4. **`PrfH_bdEx_intro_open`** (testigo `K = ı̇`) ensambla, y `prf_bddCarcDot_eq_at` transporta a la
+   forma `substfc` del código dotado. -/
+
+/-- **NÚCLEO de Step B**: la reflexión punteada del `∃` acotado `boundedCarcIn`. -/
+theorem pcc_bddCarcDot_reflect (φ : Formula) (p : Term) :
+    Prf (chainOk nil p ⇒ (boundedCarcIn (formCode φ) p ⇒ provFromCode (bddCarcDotAt φ p))) := by
+  refine prf_deduction (deduction_aux ?_ (boundedCarcIn (formCode φ) p) [chainOk nil p] rfl)
+  have hex : PrfH [boundedCarcIn (formCode φ) p, chainOk nil p]
+      (boundedCarcIn (formCode φ) p) := PrfH.hyp _ _ (List.Mem.head _)
+  refine PrfH_ex_elim hex ?_
+  rw [liftFormula_provFromCode_open, liftTerm_bddCarcDotAt]
+  -- el `∃`-elim lifteó `p` a `↑p := liftTerm 0 p`; el testigo del `∃` es `i = #0`
+  let exBody : Formula := land (lt (.var 0) (liftTerm 0 (lenc p)))
+    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 (formCode φ)))
+  let Γ' : List Formula :=
+    [exBody, liftFormula 0 (boundedCarcIn (formCode φ) p), liftFormula 0 (chainOk nil p)]
+  show PrfH Γ' (provFromCode (bddCarcDotAt φ (liftTerm 0 p)))
+  have hC : PrfH Γ' exBody := PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH Γ' (lt (.var 0) (lenc (liftTerm 0 p))) := PrfH_and_elim_left hC
+  have hbody : PrfH Γ'
+      (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 (formCode φ))) :=
+    PrfH_and_elim_right hC
+  have hchain : PrfH Γ' (chainOk nil (liftTerm 0 p)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  -- COTA: `pcc_lt_tracked` + evaluación de `lenc` transportada (simetría interna + Leibniz)
+  have hlt1 : PrfH Γ' (provFromCode (ltCodeFn (tcFn (.var 0)) (tcFn (lenc (liftTerm 0 p))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked (.var 0) (lenc (liftTerm 0 p))) _) hlt
+  have hBeq : Prf (provFromCode (eqc (bdCarcBAt (liftTerm 0 p)) (tcFn (lenc (liftTerm 0 p))))) :=
+    prf_mp (prf_provCode_congr
+      (prf_congr_eqCodeFn (prf_congr_lencT (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 p))))
+        (prf_refl _)))
+      (pcc_eval_lenc (liftTerm 0 p))
+  have hBsym : PrfH Γ'
+      (provFromCode (eqc (tcFn (lenc (liftTerm 0 p))) (bdCarcBAt (liftTerm 0 p)))) :=
+    PrfH_eq_symm_code _ _ (substtc_inv_bdCarcBAt (liftTerm 0 p)) (prf_to_prfH hBeq _)
+  have hcompLt : ∀ t : Term, Prf (substfc zero t (ltCodeFn (tcFn (.var 0)) (varc (numeral 0)))
+      =eq ltCodeFn (tcFn (.var 0)) t) := fun t =>
+    prf_substfc_ltCodeFn_snd (tcFn (.var 0)) t (substtc_inv_tcFn (.var 0))
+  have hA1 : PrfH Γ' (provFromCode (substfc zero (tcFn (lenc (liftTerm 0 p)))
+      (ltCodeFn (tcFn (.var 0)) (varc (numeral 0))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcompLt _))) _) hlt1
+  have hA2 : PrfH Γ' (provFromCode (substfc zero (bdCarcBAt (liftTerm 0 p))
+      (ltCodeFn (tcFn (.var 0)) (varc (numeral 0))))) :=
+    PrfH_leibniz_apply _ _ _ hBsym hA1
+  have hltB : PrfH Γ' (provFromCode (ltCodeFn (tcFn (.var 0)) (bdCarcBAt (liftTerm 0 p)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcompLt _)) _) hA2
+  -- CUERPO: `pcc_eval_carc_nthc` (consume `chainOk`) + congruencia OBJETO (sin simetría interna)
+  have hev : PrfH Γ' (provFromCode (eqCodeFn
+      (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
+      (tcFn (carc (nthc (liftTerm 0 p) (.var 0)))))) :=
+    PrfH.mp _ _ _
+      (PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_carc_nthc (liftTerm 0 p) (.var 0)) _) hchain) hlt
+  have hTC : Prf (tcFn (liftTerm 0 (formCode φ)) =eq termCode (formCode φ)) := by
+    rw [liftTerm_formCode]; exact prf_tc_form φ
+  have htc : PrfH Γ' (tcFn (carc (nthc (liftTerm 0 p) (.var 0))) =eq termCode (formCode φ)) :=
+    PrfH_eq_trans (PrfH_congr_tcFn hbody) (prf_to_prfH hTC _)
+  have hlc : Prf (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0)))
+      =eq carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0)))) :=
+    prf_congr_carcT (prf_congr_nthcT (prf_liftc_tcFn (liftTerm 0 p)) (prf_refl _))
+  have hcodeq : PrfH Γ' (eqCodeFn (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
+        (tcFn (carc (nthc (liftTerm 0 p) (.var 0))))
+      =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+        (termCode (formCode φ))) :=
+    PrfH_congr_eqCodeFn (prf_to_prfH (prf_eq_symm hlc) _) htc
+  have hphi0 : PrfH Γ' (provFromCode (eqCodeFn
+      (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+      (termCode (formCode φ)))) :=
+    PrfH_provCode_congr hcodeq hev
+  have hcompPhi : Prf (substfc zero (tcFn (.var 0)) (bdCarcPhicAt φ (liftTerm 0 p))
+      =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+        (termCode (formCode φ))) := by
+    unfold bdCarcPhicAt
+    refine prf_eq_trans (prf_substfc_eq zero (tcFn (.var 0)) _ _) ?_
+    refine prf_congr_eqCodeFn ?_ (substtc_inv_termCode_formCode φ (tcFn (.var 0)))
+    refine prf_eq_trans (prf_substtc_carcT zero (tcFn (.var 0)) _) ?_
+    refine prf_congr_carcT ?_
+    refine prf_eq_trans (prf_substtc_nthcT zero (tcFn (.var 0)) _ _) ?_
+    exact prf_congr_nthcT (substtc_inv_liftc_tcFn (liftTerm 0 p) (tcFn (.var 0)))
+      (prf_substtc_varc0 (tcFn (.var 0)))
+  have hphi : PrfH Γ' (provFromCode (substfc zero (tcFn (.var 0))
+      (bdCarcPhicAt φ (liftTerm 0 p)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hcompPhi)) _) hphi0
+  -- ENSAMBLAJE
+  have hbd : PrfH Γ' (provFromCode
+      (bdExCode (bdCarcBAt (liftTerm 0 p)) (bdCarcPhicAt φ (liftTerm 0 p)))) :=
+    PrfH_bdEx_intro_open (bdCarcBAt (liftTerm 0 p)) (bdCarcPhicAt φ (liftTerm 0 p))
+      (tcFn (.var 0)) (substtc_inv_bdCarcBAt (liftTerm 0 p)) hltB hphi
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_bddCarcDot_eq_at φ (liftTerm 0 p)))) _) hbd
+
+/-! ### `hI_dot` — la reflexión punteada del átomo `In`
+
+Composición final: `In ⌜φ⌝ (runFn nil p)` ⟹ (`prf_boundedCarcIn_of_In_runFn`) `boundedCarcIn ⌜φ⌝ p`
+⟹ (núcleo) `Prov(⌜bddCarcDotAt φ p⌝)` ⟹ (**MP interno** con Step A) `Prov(⌜inDotAt φ p⌝)`. -/
+
+/-- **`hI_dot` (testigo arbitrario)**: `chainOk nil p ⇒ In ⌜φ⌝ (runFn nil p) ⇒ Prov(⌜In ⌜φ⌝ (runFn nil ṗ)⌝)`. -/
+theorem hI_dot_at (φ : Formula) (p : Term) :
+    Prf (chainOk nil p ⇒ (In (formCode φ) (runFn nil p) ⇒ provFromCode (inDotAt φ p))) := by
+  refine prf_deduction (deduction_aux ?_ (In (formCode φ) (runFn nil p)) [chainOk nil p] rfl)
+  have hIn : PrfH [In (formCode φ) (runFn nil p), chainOk nil p]
+      (In (formCode φ) (runFn nil p)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hchain : PrfH [In (formCode φ) (runFn nil p), chainOk nil p] (chainOk nil p) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hbc : PrfH [In (formCode φ) (runFn nil p), chainOk nil p]
+      (boundedCarcIn (formCode φ) p) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_boundedCarcIn_of_In_runFn (formCode φ) p) _) hIn
+  have hant : PrfH [In (formCode φ) (runFn nil p), chainOk nil p]
+      (provFromCode (bddCarcDotAt φ p)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_bddCarcDot_reflect φ p) _) hchain) hbc
+  exact PrfH_mp_code_apply (prf_to_prfH (pcc_bddDot_imp_inDot_at φ p) _) hant
+
+/-- **`hI_dot`** (en `p = #0`): el segundo de los dos átomos punteados que pide `d3_prf_of_dotted_atoms`. -/
+theorem hI_dot (φ : Formula) :
+    Prf (chainOk nil (.var 0) ⇒
+      (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ))) :=
+  hI_dot_at φ (.var 0)
+
+/-- **PAYOFF (§38): D3 queda reducida a `hC_dot` SOLO** — la reflexión punteada de `chainOk`.
+    El átomo `In` ya está cerrado (`hI_dot`). -/
+theorem d3_prf_of_chainOkDot (φ : Formula)
+    (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot)) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_dotted_atoms φ hC (hI_dot φ)
 
 end ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 export ROBINSON_PlusPlus.Meta.D3InDotPrf (
-  pcc_bdEx_intro_open inBwdBody bddCarcDot pcc_bddDot_imp_inDot
-  bdCarcB bdCarcPhic substCodeF_boundedCarcIn prf_bddCarcDot_eq
+  pcc_bdEx_intro_open PrfH_eq_symm_code PrfH_and_intro_code PrfH_bdEx_intro_open
+  liftTerm_tcFn substtc_inv_liftc_tcFn substtc_inv_termCode_formCode prf_substfc_ltCodeFn_snd
+  inBwdBody inDotAt bddCarcDotAt bddCarcDot inDot_eq_inDotAt
+  liftTerm_inDotAt liftTerm_bddCarcDotAt
+  pcc_bddDot_imp_inDot_at pcc_bddDot_imp_inDot
+  bdCarcBAt bdCarcPhicAt substtc_inv_bdCarcBAt substCodeF_boundedCarcIn_at prf_bddCarcDot_eq_at
+  pcc_bddCarcDot_reflect hI_dot_at hI_dot d3_prf_of_chainOkDot
 )
