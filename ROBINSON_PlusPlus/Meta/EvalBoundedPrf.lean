@@ -67,7 +67,7 @@ def c3Line (a b : Term) : Term :=
 /-- Genérico: una línea‑axioma cuya conclusión es la cabeza `concl` (`carc line =eq concl`), con
     `lineWF` ya descargado y **sin premisas** (`premsOf =eq nil`), da `provFromCode concl`.
     Encapsula el patrón EQREFL/LEIBNIZ (§15.4). -/
-private theorem pcc_axline (concl line : Term)
+theorem pcc_axline (concl line : Term)
     (hWF : Prf (lineWF line))
     (hcarc : Prf (carc line =eq concl))
     (hprems : Prf (premsOf line =eq nil)) :
@@ -248,6 +248,7 @@ theorem pcc_bdAll_elim (B Phic K : Term)
 end ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 
 export ROBINSON_PlusPlus.Meta.EvalBoundedPrf (
+  pcc_axline
   c1Line c2Line c3Line pcc_c1_code pcc_c2_code pcc_c3_code
   pcc_and_intro_code pcc_and_elim_left_code pcc_and_elim_right_code
   j1Line j2Line pcc_j1_code pcc_j2_code pcc_or_introL_code pcc_or_introR_code
