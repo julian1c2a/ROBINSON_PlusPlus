@@ -14,22 +14,41 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > Nada de esto es una incógnita: de las tres se sabe **exactamente** cómo se hace. Lo que queda es
 > volumen, no diseño.
 
-### ① `repr_neg` — recuperar la INDECIDIBILIDAD (⊬¬G) · *independiente de D3* · **mejor ratio**
+### ① ⊬¬G — **HECHO** ✅ · descargar `Reflects` es lo que queda (y NO por donde se creía)
+
+**Ya está (`Meta/DiagonalTwo.lean`, HEAD `c9c4607`), sin ningún postulado gödeliano:**
 
 ```lean
-repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ        -- ⟵ NO EXISTE. Construir.
+abbrev Reflects (G) : Prop := (axioms ⊢ provCodeC' G) → Prf G     -- hipótesis META, EXPLÍCITA
+theorem goedel_first_unrefutable_real' (hcon) (hfp) (hrefl) : ¬ Prf (neg G)
+theorem goedel_first_undecidable_real'  (hcon) (hrefl) : ¬ Prf godelC' ∧ ¬ Prf (neg godelC')
 ```
 
-Hoy la cadena real sólo da **`⊬G`** (`goedel_first_real'`). La mitad **`⊬¬G`** **no está** (ver la
-⚠️ AUDITORÍA abajo: se probó en la capa legacy con un **postulado falso** y se retiró en F7a — **no
-recuperar F7a**).
+`#print axioms` = `[propext, choice, Quot.sound, FOL.MetaRules.{dne,gen,imp_intro},
+Full.ax_induction, Full.ax_list_induction, ax_inAxC]` — **cero postulados gödelianos**.
 
-**Con `repr_neg`, el argumento se porta tal cual (~8 líneas):**
-`⊢¬G` →(punto fijo) `⊢¬¬Prov⌜G⌝` →(`dne`) `⊢Prov⌜G⌝` →(**`repr_neg`**) `⊢G` →(con `⊢¬G`) `⊥`.
+> ⛔ **HALLAZGO: `repr_neg` NO se sigue de `ConsistentOmega`. Está CERRADO POR GÖDEL.**
+> La reflexión **no puede derivarse dentro de la teoría**: haría falta `⊢ ¬provCodeC' φ` para `φ`
+> indemostrable, y con **`φ = ⊥`** eso es **literalmente `Con(T)`** — indemostrable por **Gödel II**.
+> (Con `φ = G` tampoco: por el punto fijo `⊢ ¬provCodeC' G ⟺ ⊢ G`, y `⊬G`.) Además la ω‑regla `gen`
+> cuantifica sobre **todo `Term`** (no sólo numerales), así que tampoco se aplica desde hechos sobre
+> testigos concretos: para una variable libre `x`, `⊢ ¬A(x)` **es** la universal — circular.
+> **Por eso `Reflects` se deja como hipótesis META explícita** (como la ω‑consistencia clásica, y como
+> `goedel_second'` hace con las suyas) en vez de esconderla en un postulado. Y por eso el plan que
+> `CodeDistinct.lean` tenía escrito (probar `⊢ ¬provCodeC φ` «con el esquema de inducción, Fase 5»)
+> **era imposible** — ya corregido en el módulo.
 
-*Ya está todo lo demás*: punto fijo real (`godelC'_fixedpoint`), **D1** (`repr_pos'_prf`), `dne` (en
-`FOL/MetaRules`). `repr_neg` debe salir de la **fidelidad del verificador** + `ConsistentOmega`
-(`:= ¬(axioms ⊢ ⊥)`). Groundwork: `Meta/CodeDistinct.lean` («aritmética negativa de códigos»).
+**LO QUE QUEDA de ①** (opcional; el teorema ya es real): **descargar `Reflects`** desde una hipótesis
+honesta. Vía única viable:
+
+1. **ω‑consistencia** como hipótesis **META** (definirla explícitamente; NO es `ConsistentOmega`).
+2. **Δ₀‑completitud NEGATIVA del verificador en testigos CONCRETOS (cerrados)**: si un list‑term cerrado
+   `t` no es una prueba real de `φ`, entonces `axioms ⊢ ¬(chainOk nil t ∧ In ⌜φ⌝ (runFn nil t))`.
+   Es el **espejo de `repr_pos'`** y **sí es alcanzable** (chequeo estructural finito), a diferencia de
+   la versión Π₁ universal. Cimiento: `formCode_ne` (`Meta/CodeDistinct.lean`).
+
+Con (1)+(2), ω‑consistencia se viola y sale `Prf φ`. **Magnitud realista: comparable a `repr_pos'`
+(D1), o sea varios módulos.** No bloquea nada más.
 
 ### ② Átomo `lineWF` dotado — **SUBPROYECTO** (el bloque grande de `hC_dot`)
 
