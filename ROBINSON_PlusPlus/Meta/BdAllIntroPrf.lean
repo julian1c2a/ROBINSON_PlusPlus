@@ -27,6 +27,9 @@ open ROBINSON_PlusPlus.Meta.EvalLtPrf
 open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 open ROBINSON_PlusPlus.Meta.PropCodePrf
 open ROBINSON_PlusPlus.Meta.D3InDotPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
+open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -235,10 +238,179 @@ theorem pcc_bdAll_step (Psi b : Term)
     pcc_or_elim_imp_code _ _ Psi hIH hcaseB
   exact pcc_imp_trans_code _ _ Psi (pcc_lt_succ_split_code b) hor
 
+/-! ### Versiones `PrfH` de los combinadores internos
+
+El paso de la inducción vive **bajo contexto** (las hipótesis `chainOk`/guarda/HI son del `PrfH`), así
+que hacen falta las versiones `PrfH` del debilitamiento, el silogismo y el `∨`‑elim internos. Todas
+salen de `PrfH_mp_code_apply` + los axiomas `Prf` inyectados con `prf_to_prfH`. -/
+
+theorem PrfH_weaken_code {Γ : List Formula} (Ac Bc : Term)
+    (h : PrfH Γ (provFromCode Bc)) : PrfH Γ (provFromCode (implc Ac Bc)) :=
+  PrfH_mp_code_apply (prf_to_prfH (pcc_p1_code Bc Ac) _) h
+
+theorem PrfH_imp_trans_code {Γ : List Formula} (Ac Bc Cc : Term)
+    (h1 : PrfH Γ (provFromCode (implc Ac Bc))) (h2 : PrfH Γ (provFromCode (implc Bc Cc))) :
+    PrfH Γ (provFromCode (implc Ac Cc)) :=
+  PrfH_mp_code_apply
+    (PrfH_mp_code_apply (prf_to_prfH (pcc_p2_code Ac Bc Cc) _)
+      (PrfH_weaken_code Ac (implc Bc Cc) h2))
+    h1
+
+theorem PrfH_or_elim_imp_code {Γ : List Formula} (Ac Bc Cc : Term)
+    (h1 : PrfH Γ (provFromCode (implc Ac Cc))) (h2 : PrfH Γ (provFromCode (implc Bc Cc))) :
+    PrfH Γ (provFromCode (implc (orc Ac Bc) Cc)) := by
+  have hstep1 : PrfH Γ (provFromCode (implc (orc Ac Bc) (implc (implc Bc Cc) Cc))) :=
+    PrfH_mp_code_apply
+      (PrfH_mp_code_apply (prf_to_prfH (pcc_p2_code (orc Ac Bc) (implc Ac Cc)
+        (implc (implc Bc Cc) Cc)) _) (prf_to_prfH (pcc_j3_code Ac Bc Cc) _))
+      (PrfH_weaken_code (orc Ac Bc) (implc Ac Cc) h1)
+  exact PrfH_mp_code_apply
+    (PrfH_mp_code_apply (prf_to_prfH (pcc_p2_code (orc Ac Bc) (implc Bc Cc) Cc) _) hstep1)
+    (PrfH_weaken_code (orc Ac Bc) (implc Bc Cc) h2)
+
+/-- **PASO, versión `PrfH`** (la que consume la inducción objeto). -/
+theorem PrfH_bdAll_step {Γ : List Formula} (Psi b : Term)
+    (hPsiId : Prf (substfc zero (varc (numeral 0)) Psi =eq Psi))
+    (hIH : PrfH Γ (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn b)) Psi)))
+    (hb : PrfH Γ (provFromCode (substfc zero (tcFn b) Psi))) :
+    PrfH Γ (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (succ b))) Psi)) := by
+  have hleib2 : Prf (provFromCode (implc (eqc (tcFn b) (varc (numeral 0)))
+      (implc (substfc zero (tcFn b) Psi) Psi))) :=
+    prf_mp (prf_provCode_congr
+      (prf_congr_implc (prf_refl _) (prf_congr_implc (prf_refl _) hPsiId)))
+      (pcc_leibniz_code Psi (tcFn b) (varc (numeral 0)))
+  have hcaseB : PrfH Γ (provFromCode (implc (eqc (tcFn b) (varc (numeral 0))) Psi)) :=
+    PrfH_mp_code_apply
+      (PrfH_mp_code_apply (prf_to_prfH (pcc_p2_code (eqc (tcFn b) (varc (numeral 0)))
+        (substfc zero (tcFn b) Psi) Psi) _) (prf_to_prfH hleib2 _))
+      (PrfH_weaken_code (eqc (tcFn b) (varc (numeral 0))) (substfc zero (tcFn b) Psi) hb)
+  have hor : PrfH Γ (provFromCode (implc
+      (orc (ltCodeFn (varc (numeral 0)) (tcFn b)) (eqCodeFn (tcFn b) (varc (numeral 0)))) Psi)) :=
+    PrfH_or_elim_imp_code _ _ Psi hIH hcaseB
+  exact PrfH_imp_trans_code _ _ Psi (prf_to_prfH (pcc_lt_succ_split_code b) _) hor
+
+/-! ### La INTRODUCCIÓN del `∀` acotado -/
+
+/-- `n < σn` (testigo `k = 0`: `n + σ0 = σ(n+0) = σn`). -/
+theorem prf_lt_succ_self (n : Term) : Prf (lt n (succ n)) :=
+  prf_lt_intro n (succ n) zero
+    (prf_eq_trans (prf_add_succ_t n zero) (prf_eq_congr_succ (prf_add_zero_t n)))
+
+/-- Predicado de la inducción: la cota es `b = #0`; el parámetro `p` aparece **lifteado** (`#1`),
+    que es exactamente el desplazamiento que introduce el binder. -/
+noncomputable def bdAllPred (CF : Term → Formula) (bndF PsiF : Term → Term) (p : Term) : Formula :=
+  Formula.impl (CF (liftTerm 0 p))
+    (Formula.impl (lt (.var 0) (succ (bndF (liftTerm 0 p))))
+      (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (.var 0)))
+        (PsiF (liftTerm 0 p)))))
+
+/-- **INTRODUCCIÓN del `∀` acotado a nivel de código** (§40, keystone de `hC_dot`).
+
+    **Parametrizada sobre `p`** (`CF`/`bndF`/`PsiF` son funciones de `p`, con las conmutaciones de
+    `liftTerm`/`substTerm`): el binder de la inducción **desplaza** las variables libres, así que
+    dentro del `gen` todo aparece con `↑p` — y es `hbody` en `↑p` (no en `p`) lo que hace falta. Es el
+    mismo patrón que resolvió el `∃`‑elim de `hI_dot`.
+
+    La condición `CF` (en la aplicación, `chainOk nil p`) se **arrastra como antecedente**: el paso la
+    necesita en cada `b` para invocar `hbody`. -/
+theorem pcc_bdAll_intro
+    (CF : Term → Formula) (bndF PsiF : Term → Term) (p : Term)
+    (hCl : ∀ k q, liftFormula k (CF q) = CF (liftTerm k q))
+    (hCs : ∀ v t q, substFormula v t (CF q) = CF (substTerm v t q))
+    (hbl : ∀ k q, liftTerm k (bndF q) = bndF (liftTerm k q))
+    (hbs : ∀ v t q, substTerm v t (bndF q) = bndF (substTerm v t q))
+    (hPl : ∀ k q, liftTerm k (PsiF q) = PsiF (liftTerm k q))
+    (hPs : ∀ v t q, substTerm v t (PsiF q) = PsiF (substTerm v t q))
+    (hPsiId : ∀ q, Prf (substfc zero (varc (numeral 0)) (PsiF q) =eq PsiF q))
+    (hbody : ∀ q i, Prf (CF q ⇒ (lt i (bndF q)
+      ⇒ provFromCode (substfc zero (tcFn i) (PsiF q))))) :
+    Prf (CF p ⇒ provFromCode (bdAllCode (tcFn (bndF p)) (PsiF p))) := by
+  have hind : Prf (Formula.forall (bdAllPred CF bndF PsiF p)) := by
+    refine prf_nat_induction _ ?base ?step
+    · have heq : substFormula 0 zero (bdAllPred CF bndF PsiF p)
+          = Formula.impl (CF p) (Formula.impl (lt zero (succ (bndF p)))
+              (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn zero)) (PsiF p)))) := by
+        simp only [bdAllPred, substFormula, substTerm, substTerms,
+          substFormula_provFromCode_open, lt, tcFn, ltCodeFn, atom2CodeFn, varc, implc, cons, nil,
+          zero, succ, substTerm_strCode, substTerm_numeral, reduceIte, if_true,
+          hCs, hbs, hPs, FOL.substTerm_liftTerm]
+      rw [heq]
+      exact prf_deduction (prf_to_prfH
+        (prf_deduction (prf_to_prfH (pcc_bdAll_base (PsiF p)) _)) _)
+    · have heq : substFormula 0 (succ (.var 0)) (liftFormula 1 (bdAllPred CF bndF PsiF p))
+          = Formula.impl (CF (liftTerm 0 p))
+              (Formula.impl (lt (succ (.var 0)) (succ (bndF (liftTerm 0 p))))
+                (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (succ (.var 0))))
+                  (PsiF (liftTerm 0 p))))) := by
+        simp only [bdAllPred, liftFormula, liftTerm, liftTerms, substFormula, substTerm, substTerms,
+          liftFormula_provFromCode_open, substFormula_provFromCode_open,
+          lt, tcFn, ltCodeFn, atom2CodeFn, varc, implc, cons, nil, zero, succ,
+          substTerm_strCode, substTerm_numeral, liftTerm_strCode, liftTerm_numeral,
+          reduceIte, if_true, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, Nat.reduceAdd,
+          Nat.reduceLT, ← FOL.liftTerm_comm_zero,
+          hCl, hCs, hbl, hbs, hPl, hPs, FOL.substTerm_liftTerm]
+      rw [heq]
+      refine Prf.gen _ ?_
+      unfold bdAllPred
+      refine prf_deduction (deduction_aux (deduction_aux ?_
+        (lt (succ (.var 0)) (succ (bndF (liftTerm 0 p))))
+        [CF (liftTerm 0 p),
+         Formula.impl (CF (liftTerm 0 p)) (Formula.impl (lt (.var 0) (succ (bndF (liftTerm 0 p))))
+           (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (.var 0)))
+             (PsiF (liftTerm 0 p)))))] rfl)
+        (CF (liftTerm 0 p))
+        [Formula.impl (CF (liftTerm 0 p)) (Formula.impl (lt (.var 0) (succ (bndF (liftTerm 0 p))))
+           (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (.var 0)))
+             (PsiF (liftTerm 0 p)))))] rfl)
+      let IHf : Formula := Formula.impl (CF (liftTerm 0 p))
+        (Formula.impl (lt (.var 0) (succ (bndF (liftTerm 0 p))))
+          (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (.var 0)))
+            (PsiF (liftTerm 0 p)))))
+      let Γ' : List Formula :=
+        [lt (succ (.var 0)) (succ (bndF (liftTerm 0 p))), CF (liftTerm 0 p), IHf]
+      show PrfH Γ' (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (succ (.var 0))))
+        (PsiF (liftTerm 0 p))))
+      have hsig : PrfH Γ' (lt (succ (.var 0)) (succ (bndF (liftTerm 0 p)))) :=
+        PrfH.hyp _ _ (List.Mem.head _)
+      have hC : PrfH Γ' (CF (liftTerm 0 p)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+      have hIH : PrfH Γ' IHf :=
+        PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+      have hlt : PrfH Γ' (lt (.var 0) (bndF (liftTerm 0 p))) :=
+        PrfH.mp _ _ _ (prf_to_prfH
+          (prf_lt_of_succ_lt_succ (.var 0) (bndF (liftTerm 0 p))) _) hsig
+      have hltS : PrfH Γ' (lt (.var 0) (succ (bndF (liftTerm 0 p)))) :=
+        PrfH.mp _ _ _ (prf_to_prfH
+          (prf_lt_succ_of_lt (.var 0) (bndF (liftTerm 0 p))) _) hlt
+      have hIHapp : PrfH Γ' (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (.var 0)))
+          (PsiF (liftTerm 0 p)))) :=
+        PrfH.mp _ _ _ (PrfH.mp _ _ _ hIH hC) hltS
+      have hb : PrfH Γ' (provFromCode (substfc zero (tcFn (.var 0)) (PsiF (liftTerm 0 p)))) :=
+        PrfH.mp _ _ _ (PrfH.mp _ _ _
+          (prf_to_prfH (hbody (liftTerm 0 p) (.var 0)) _) hC) hlt
+      exact PrfH_bdAll_step (PsiF (liftTerm 0 p)) (.var 0) (hPsiId (liftTerm 0 p)) hIHapp hb
+  -- instanciar en `b := bndF p`, descargar la guarda (`bndF p < σ(bndF p)`) y generalizar dentro
+  have hspec := prf_spec hind (bndF p)
+  have heq2 : substFormula 0 (bndF p) (bdAllPred CF bndF PsiF p)
+      = Formula.impl (CF p) (Formula.impl (lt (bndF p) (succ (bndF p)))
+          (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (bndF p))) (PsiF p)))) := by
+    simp only [bdAllPred, substFormula, substTerm, substTerms,
+      substFormula_provFromCode_open, lt, tcFn, ltCodeFn, atom2CodeFn, varc, implc, cons, nil,
+      zero, succ, substTerm_strCode, substTerm_numeral, reduceIte, if_true,
+      hCs, hbs, hPs, FOL.substTerm_liftTerm]
+  rw [heq2] at hspec
+  refine prf_deduction ?_
+  have hopen : PrfH [CF p] (provFromCode
+      (implc (ltCodeFn (varc (numeral 0)) (tcFn (bndF p))) (PsiF p))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hspec _) (prfH_hyp_self _))
+      (prf_to_prfH (prf_lt_succ_self (bndF p)) _)
+  exact PrfH.mp _ _ _ (prf_to_prfH (pcc_gen_code _) _) hopen
+
 end ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
   prf_congr_orc PrfH_congr_substfc3 prf_congr_substfc3
   prf_lt_succ_of_lt prf_lt_succ_split' pcc_eq_symm_code_internal
   pcc_bdAll_base splitSchema pcc_lt_succ_split_code pcc_bdAll_step
+  PrfH_weaken_code PrfH_imp_trans_code PrfH_or_elim_imp_code PrfH_bdAll_step
+  prf_lt_succ_self bdAllPred pcc_bdAll_intro
 )
