@@ -1,6 +1,17 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
-**Última actualización:** 2026-06-27 — Estado global: **~50 módulos** (Minimal 11 + Meta 27 + Full 11), **63 jobs**, 0 sorrys. `Minimal/` cerrado (34 axiomas matemáticos); `Full/` deriva el fragmento inductivo + TFA completo; `Meta/` tiene Gödel I/II clásico (legacy, D2/D3 postulados) y el **Nivel D REAL muy avanzado**: **Gödel I real sin postulados gödelianos** (`goedel_first_real`/`goedel_first_real'`), **D1 real ⊢ y finitaria `Prf`** (`repr_pos'`, `repr_pos'_prf`), **teorema de deducción finitario** (`HilbertDeduction` + `∃` en `PrfH`: `PrfH_ex_intro`/`PrfH_ex_elim`), reglas `qconf`/`listInd`/`ind` integradas en el verificador, los **10 lemas de cadena en `Prf`** (paso 8: `runFn_concat`/`chainOk_concat`/`chainOk_mono`/`In_mono`/… vía `norm32`/`norm_s`/confinación), **`d2_prf` — D2 finitaria real** (`Prf (provCodeC'(A⇒B) ⇒ (provCodeC' A ⇒ provCodeC' B))`, sin postulados), y **D3 finitaria REDUCIDA** (`d3_prf_of_sigma1` en `ReflectionPrf.lean`: reduce D3 a dos lemas de Σ₁-completitud del verificador `hC`/`hI`, aislando el núcleo duro). Pendiente para **Gödel II finitario real** (`goedel_second_prf : ConsistentH → ¬ Prf Con'`): el **núcleo duro de D3** (`hI` —tratable, inducción de listas— y `hC` —difícil—, la Σ₁-completitud provable por inducción object sobre el testigo) → `d3_prf := d3_prf_of_sigma1 φ hC hI` → punto fijo/necesitación en `Prf` → `goedel_second_prf`. Estado fino: [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [NEXT-STEPS.md](NEXT-STEPS.md), [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md). (El resto de este documento refleja el plan original centrado en `Minimal/`, 2026-06-06.)
+**Última actualización:** 2026-07-13 — Estado global: **79 módulos** (Minimal 11 + Meta 57 + Full 11), **94 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
+
+**Gödel I — COMPLETO** (`goedel_first_undecidable_real'`): `⊬G ∧ ⊬¬G`, **sin ningún postulado gödeliano**, con la **reflexión como hipótesis META explícita** (`Reflects`), reducida a **ω‑consistencia clásica + `NegVerifier`** (`Meta/OmegaReflect.lean`). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales. **Gödel II** (`goedel_second'`) montado, **módulo `axiom d3`**.
+
+**Dos frentes abiertos, ambos con plan escrito y sin incógnitas de diseño:**
+
+1. 📄 **[PLAN-NEGVERIFIER.md](PLAN-NEGVERIFIER.md)** — descargar `NegVerifier` (solidez estructural del verificador + decodificador + inversión de los 21 tags) ⇒ cierra la **indecidibilidad de `G`** desde la ω‑consistencia, y nada más. *~8‑11 sesiones.*
+2. **D3** — reducida a **UN SOLO lema** (`d3_prf_of_chainOkDot`): falta el cuerpo `lineOkB` de `hC_dot` ⇒ `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`). *~2‑4 sesiones.*
+
+> 🔗 **Los dos frentes COMPARTEN** el análisis de los **21 tags** de `lineWF` (positivo para D3, negativo para `NegVerifier`): conviene construirlo **una sola vez**. Ver `PLAN-NEGVERIFIER.md` §5.
+
+Estado fino: [NEXT-STEPS.md](NEXT-STEPS.md) (🎯 LO QUE QUEDA), [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [GODEL-STATUS.md](GODEL-STATUS.md), [AXIOMS.md](AXIOMS.md). *(El resto de este documento refleja el plan original centrado en `Minimal/`, 2026-06-06.)*
 **Autor**: Julián Calderón Almendros
 
 > Este documento describe la visión estratégica y la planificación a largo plazo para los proyectos que se construirán sobre la base del sistema `FOL`.

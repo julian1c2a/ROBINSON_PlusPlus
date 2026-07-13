@@ -52,8 +52,19 @@ un enunciado Δ₀ concreto**, más una hipótesis clásica y **visible**. `Omeg
 `ConsistentOmega`: es estrictamente más fuerte, es lo que Gödel exige, y es creíble (toda teoría
 **sólida** la cumple).
 
-**Falta sólo `NegVerifier`** — es un **proyecto real** (magnitud ~D1, varios módulos). Estado de sus
-piezas:
+**Falta sólo `NegVerifier`** — es un **proyecto real** (magnitud ~D1, varios módulos).
+
+> 📄 **PLAN DETALLADO Y EJECUTABLE: [`PLAN-NEGVERIFIER.md`](PLAN-NEGVERIFIER.md)** — arquitectura de
+> 6 módulos, orden de ejecución, estimaciones, criterios de aceptación y **trampas conocidas**.
+> Incluye **dos hallazgos que hay que atender ANTES de codificar**:
+> * ⚠️ **`StdChain` debe ser CANÓNICO, no «cerrado»** (`add zero zero =eq zero` es demostrable ⇒ la
+>   igualdad de términos cerrados NO es refutable). Fix bloqueante en `Meta/OmegaReflect.lean`.
+> * 🔬 **SONDEO DE SOLIDEZ obligatorio** antes del módulo E: los esquemas `ax_lineWF_<tag>`
+>   cuantifican sobre códigos **arbitrarios**; hay que descartar que el verificador objeto acepte
+>   cadenas basura que «prueben» `⌜φ⌝` sin `Prf φ`. Si las aceptara, sería un **bug de solidez del
+>   proyecto**, no del plan.
+
+Estado de sus piezas:
 
 | Pieza | Estado |
 |:--|:--|
@@ -107,7 +118,9 @@ patrón Step A, barato. **Estimación honesta de ②+③: 2‑4 sesiones.**
 2. **Este `NEXT-STEPS.md`** (bloque de reanudación + "Last updated") — qué está hecho y qué sigue.
 3. **`GODEL-D3-TRACKED-DESIGN.md` §12–§14** — plan 12‑A por fases, veredicto del sondeo de la fase 2 (§13) y **§14.4 lecciones De Bruijn acumuladas** (leer SIEMPRE antes de escribir `PrfH`).
 4. **`doc/REFERENCE-Incompleteness.md` §3.18–§3.20** (nodo temático del árbol REFERENCE) — proyección completa de la capa Δ₀ (`NumListPrf`, `NatArithPrf`, `BoundedInPrf`, `RunFnBoundedPrf`, `ChainOkBoundedPrf`) + evaluación provable + ruta B dotada (`D3InDotPrf`).
-5. **`ESCALANDO_EL_PROYECTO.md`** — enlace con el proyecto hermano DeepArith sobre el kernel FOL⁼ común.
+5. **`PLAN-NEGVERIFIER.md`** — plan detallado de la tarea ① (solidez estructural del verificador +
+   decodificador + inversión de los 21 tags). **Leerlo antes de tocar `NegVerifier`.**
+6. **`ESCALANDO_EL_PROYECTO.md`** — enlace con el proyecto hermano DeepArith sobre el kernel FOL⁼ común.
 
 > ⚠️ **AUDITORÍA 2026-07-13 (`repasa_y_proyecta`) — HALLAZGO DE SOLIDEZ.** La mitad **`⊬¬G`** de Gödel I
 > (indecidibilidad) **NO está en la cadena real**: se probó en la capa LEGACY (`Meta/Incompleteness.lean`)
