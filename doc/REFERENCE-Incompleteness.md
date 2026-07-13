@@ -723,22 +723,43 @@ theorem prf_line_is_cons (p i) : Prf (chainOk nil p ⇒ lt i (lenc p) ⇒       
   (nthc p i =eq cons (carc (nthc p i)) (cdrc (nthc p i))))
 ```
 
-**`hI_dot` (reflexión punteada de `In`) — 4/5 ladrillos hechos** (`Meta/D3InDotPrf`; objetivo
-`chainOk nil #0 ⇒ In ⌜φ⌝ (runFn nil #0) ⇒ provFromCode (inDot φ)`, patrón `pcc_lt_tracked` con la
-implicación objeto codificada):
+**`hI_dot` — COMPLETO ✅** (`Meta/D3InDotPrf`). El átomo `In` está cerrado, y con él **D3 queda
+reducida a UN SOLO lema**: la reflexión punteada de `chainOk`.
 
 ```lean
 theorem pcc_bdEx_intro_open (B Phic K) (hBinv) (hlt) (hphi) : Prf (provFromCode (bdExCode B Phic))   -- ∃i<B-intro SIN clausura (p libre dotado)
-theorem pcc_bddDot_imp_inDot (φ) : Prf (provFromCode (implc (bddCarcDot φ) (inDot φ)))                 -- Step A: implicación ⇐ codificada
-theorem prf_bddCarcDot_eq (φ) : Prf (bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ))                 -- Step B (puente): código dotado = bdExCode
-theorem substCodeF_boundedCarcIn (φ) : substCodeF 0 (tcFn #0) (boundedCarcIn (formCode φ) #0) = bdExCode bdCarcB (bdCarcPhic φ)
+theorem PrfH_eq_symm_code (X Y) (hX) (heq) : PrfH Γ (provFromCode (eqc Y X))                          -- SIMETRÍA interna (nueva; la exige la cota)
+theorem PrfH_bdEx_intro_open (B Phic K) (hBinv) (hlt) (hphi) : PrfH Γ (provFromCode (bdExCode B Phic))
+theorem pcc_bddDot_imp_inDot_at (φ p) : Prf (provFromCode (implc (bddCarcDotAt φ p) (inDotAt φ p)))   -- Step A (testigo arbitrario)
+theorem prf_bddCarcDot_eq_at (φ p) : Prf (bddCarcDotAt φ p =eq bdExCode (bdCarcBAt p) (bdCarcPhicAt φ p))
+theorem pcc_bddCarcDot_reflect (φ p) :                                                                 -- ★ NÚCLEO de Step B
+  Prf (chainOk nil p ⇒ boundedCarcIn (formCode φ) p ⇒ provFromCode (bddCarcDotAt φ p))
+theorem hI_dot (φ) : Prf (chainOk nil #0 ⇒ In ⌜φ⌝ (runFn nil #0) ⇒ provFromCode (inDot φ))
+theorem d3_prf_of_chainOkDot (φ) (hC : Prf (chainOk nil #0 ⇒ provFromCode chainOkDot)) :
+  Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))                                                       -- ★ D3 ⇐ hC_dot SOLO
 ```
 
-**FALTA** (núcleo de Step B, ~80‑120 líneas): reflejar `provFromCode (bdExCode bdCarcB (bdCarcPhic φ))`
-desde `chainOk`+`boundedCarcIn` (`PrfH_ex_elim` del `∃` acotado → cota `pcc_lt_tracked`/`pcc_eval_lenc`
-→ cuerpo `pcc_eq_tracked`/`pcc_eval_carc_nthc`/`prf_tc_form` → `pcc_bdEx_intro_open` → transportes
-`prf_liftc_tcFn`) → MP interno con Step A → `hI_dot`. Luego `hC_dot`, `d3_prf`, `goedel_second_prf`,
-F7b (retira `axiom d3`, 7→6). Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
+**Tres hallazgos del núcleo** (patrón `pcc_lt_tracked` con la implicación objeto codificada):
+
+1. El **`PrfH_ex_elim` liftea `p`** (`#0`→`#1`) ⇒ los lemas fijados en `#0` no aplican después: hubo que
+   **generalizar todo lo dotado sobre `p` arbitrario**. Clave: el `formCode` codifica siempre el
+   **esquema** (con `#0` en el hueco de `p`); lo único que varía es el testigo `tcFn p`, así que la
+   computación de `substCodeF` no cambia. Con `liftFormula_provFromCode_open` + `liftTerm_bddCarcDotAt`
+   la meta lifteada es *la misma con `↑p`*.
+2. La **COTA exigió SIMETRÍA INTERNA** (que no existía): `pcc_lt_tracked` da la cota con `tcFn (lenc ↑p)`,
+   pero el código dotado pide `lencT (liftc 0 ↑ṗ)` — y **sólo son iguales DENTRO de `Prov`** (es la
+   evaluación provable `pcc_eval_lenc`), en la dirección contraria a la que transporta Leibniz. De ahí
+   `PrfH_eq_symm_code` + `prf_substfc_ltCodeFn_snd` (hueco `⌜v₀⌝` en 2ª posición).
+3. El **CUERPO NO necesita simetría**: la hipótesis del `∃` es una igualdad **objeto**, así que basta
+   congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form` + `prf_liftc_tcFn`) + `PrfH_provCode_congr`
+   sobre `pcc_eval_carc_nthc` — que consume `chainOk`, y por eso `hI` debe recibirlo (`hbody_of_atoms`
+   reestructurado).
+
+**FALTA — `hC_dot`, el último punto duro**: `chainOkB nil p = ∀i<lenc p. lineOkB nil p i`, así que pide
+la **INTRODUCCIÓN del `∀` acotado a nivel de código** = **inducción acotada interna** sobre la cota
+(`pcc_gen_code` + `prf_lt_succ_split` + base + paso) — justo lo que §3.20.3 dejó pendiente
+(`pcc_bdAll_elim` existe; la intro no). Luego `d3_prf` → `goedel_second_prf` → F7b (retira `axiom d3`,
+7→6). Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
 
 ---
 
