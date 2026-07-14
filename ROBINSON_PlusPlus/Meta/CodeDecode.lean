@@ -328,11 +328,111 @@ theorem decodeTerms_inj {c : Term} {ts : List Term} (h : decodeTerms c = some ts
           | [_], h => unfold decodeTerms at h; simp at h
           | _ :: _ :: _ :: _, h => unfold decodeTerms at h; simp at h
 
+
+/-- **INYECTIVIDAD de `decodeForm`** — la dirección crítica del módulo A
+    (`formCodeM_of_decodeForm` en `PLAN-NEGVERIFIER.md` §4): si un término **decodifica** a `φ`,
+    ES **exactamente** `formCodeM φ`. Junto con el round‑trip, `decodeForm` es una **biyección** entre
+    los códigos de fórmula y las fórmulas.
+
+    Prueba: `decodeForm.induct` da **22 casos**. Los **8 productivos** (uno por tag: `⊥` 2, `atom` 3,
+    `=eq` 4, `⇒` 5, `∀` 6, `∧` 7, `∨` 8, `∃` 9) se cierran reflejando la ecuación estructural con
+    `decodeNat_inj` / `decodeStr_inj` / `decodeTerm_inj` / `decodeTerms_inj` y las IH; los **14
+    restantes** (guard falso, sub‑decodificación fallida, forma no‑código) son vacíos y caen con un
+    reductor uniforme. Nótese `unfold` (limpio) en vez de `simp only [decodeForm]` (kernel‑frágil, ver
+    la nota de arriba). -/
+theorem decodeForm_inj : ∀ {c : Term} {φ : Formula}, decodeForm c = some φ → c = formCodeM φ := by
+  intro c
+  induction c using decodeForm.induct with
+  | case1 hd c3 htag hg =>                              -- ⊥ (tag 2)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, htag, hg] at h
+      injection h with h; subst h
+      have e0 := decodeNat_inj htag; have hc3 := eq_of_beq hg
+      subst e0 hc3; simp only [formCodeM, cons, nil, zero]
+  | case3 hd c2 hp c3 hts c4 htag hg =>                 -- atom (tag 3)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, Option.bind, Option.map, htag, hg] at h
+      rcases hstr : decodeStr hp with _ | p
+      · rw [hstr] at h; simp at h
+      · rw [hstr] at h; simp only [Option.bind] at h
+        rcases hdts : decodeTerms hts with _ | ts
+        · rw [hdts] at h; simp at h
+        · rw [hdts] at h; simp only [Option.map] at h; injection h with h; subst h
+          have e0 := decodeNat_inj htag; have e1 := decodeStr_inj hstr
+          have e2 := decodeTerms_inj hdts
+          simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨⟨hc2, hc3⟩, hc4⟩ := hg
+          subst e0 e1 e2 hc2 hc3 hc4; simp only [formCodeM, cons, nil, zero]
+  | case5 hd c2 ha c3 hb c4 htag hg =>                  -- =eq (tag 4)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, Option.bind, Option.map, htag, hg] at h
+      rcases hda : decodeTerm ha with _ | a
+      · rw [hda] at h; simp at h
+      · rw [hda] at h; simp only [Option.bind] at h
+        rcases hdb : decodeTerm hb with _ | b
+        · rw [hdb] at h; simp at h
+        · rw [hdb] at h; simp only [Option.map] at h; injection h with h; subst h
+          have e0 := decodeNat_inj htag; have e1 := decodeTerm_inj hda
+          have e2 := decodeTerm_inj hdb
+          simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨⟨hc2, hc3⟩, hc4⟩ := hg
+          subst e0 e1 e2 hc2 hc3 hc4; simp only [formCodeM, cons, nil, zero]
+  | case7 hd c2 ha c3 hb c4 htag hg a b hdb hda iha ihb =>   -- ⇒ (tag 5)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, htag, hg, hda, hdb] at h
+      injection h with h; subst h
+      have e0 := decodeNat_inj htag; have e1 := iha hda; have e2 := ihb hdb
+      simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨⟨hc2, hc3⟩, hc4⟩ := hg
+      subst e0 e1 e2 hc2 hc3 hc4; simp only [formCodeM, cons, nil, zero]
+  | case10 hd c2 ha c3 htag hg ih =>                    -- ∀ (tag 6)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, Option.bind, Option.map, htag, hg] at h
+      rcases hf : decodeForm ha with _ | a
+      · rw [hf] at h; simp at h
+      · rw [hf] at h; simp only [Option.map] at h; injection h with h; subst h
+        have e0 := decodeNat_inj htag; have e1 := ih hf
+        simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨hc2, hc3⟩ := hg
+        subst e0 e1 hc2 hc3; simp only [formCodeM, cons, nil, zero]
+  | case12 hd c2 ha c3 hb c4 htag hg a b hdb hda iha ihb =>  -- ∧ (tag 7)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, htag, hg, hda, hdb] at h
+      injection h with h; subst h
+      have e0 := decodeNat_inj htag; have e1 := iha hda; have e2 := ihb hdb
+      simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨⟨hc2, hc3⟩, hc4⟩ := hg
+      subst e0 e1 e2 hc2 hc3 hc4; simp only [formCodeM, cons, nil, zero]
+  | case15 hd c2 ha c3 hb c4 htag hg a b hdb hda iha ihb =>  -- ∨ (tag 8)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, htag, hg, hda, hdb] at h
+      injection h with h; subst h
+      have e0 := decodeNat_inj htag; have e1 := iha hda; have e2 := ihb hdb
+      simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨⟨hc2, hc3⟩, hc4⟩ := hg
+      subst e0 e1 e2 hc2 hc3 hc4; simp only [formCodeM, cons, nil, zero]
+  | case18 hd c2 ha c3 htag hg ih =>                    -- ∃ (tag 9)
+      intro φ h
+      unfold decodeForm at h
+      simp only [if_true, Option.bind, Option.map, htag, hg] at h
+      rcases hf : decodeForm ha with _ | a
+      · rw [hf] at h; simp at h
+      · rw [hf] at h; simp only [Option.map] at h; injection h with h; subst h
+        have e0 := decodeNat_inj htag; have e1 := ih hf
+        simp only [Bool.and_eq_true, beq_iff_eq] at hg; obtain ⟨hc2, hc3⟩ := hg
+        subst e0 e1 hc2 hc3; simp only [formCodeM, cons, nil, zero]
+  | _ =>                                                -- todos los NO productivos
+      intro φ h
+      (try unfold decodeForm at h)
+      simp only [if_true, Option.bind, Option.map, *] at h
+      (try exact absurd h (by simp))
+
 end ROBINSON_PlusPlus.Meta.CodeDecode
 
 export ROBINSON_PlusPlus.Meta.CodeDecode (
   decodeNat decodeNat_numeralM decodeNat_inj
   decodeChars decodeStr decodeChars_charsCodeM decodeStr_strCodeM decodeChars_inj decodeStr_inj
   decodeTerm decodeTerms decodeTerm_termCodeM decodeTerms_termsCodeM decodeTerm_inj decodeTerms_inj
-  decodeForm decodeForm_formCodeM
+  decodeForm decodeForm_formCodeM decodeForm_inj
 )

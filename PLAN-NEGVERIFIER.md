@@ -71,7 +71,9 @@ por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no bast
 | **0** | 🔬 Sondeo de solidez | ✅ **HECHO** (este veredicto) |
 | **0.5** | **Concretar `axiomsCodeT`** (opción 1: ancla de igualdad, net‑0 axiomas) | ✅ **HECHO** (`cb62c1e`) |
 | **1** | Fix `StdChain` = «con forma de código» (`IsCodeShaped`, NO «canónico») | ✅ **HECHO** (`bc84c5a`) |
-| A–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
+| **A.1** | `CodeDecode`: decodificador de **fórmulas** + round‑trips + **inyectividad** | ✅ **HECHO** (`dbd9249`, `9b178ae`, +`decodeForm_inj`) |
+| **A.2** | `CodeDecode`: decodificador de **cadenas** (`decodeRule`/`decodeLine`/`decodeChain`) | ⏳ **← SIGUIENTE** |
+| B–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
 
 **Paso 0.5 — opciones (a decidir con el usuario):**
 
@@ -231,6 +233,46 @@ es el **puente objeto → meta** (decodificador + acuerdo negativo), no una soli
 ---
 
 ## 4 · MÓDULO A — `Meta/CodeDecode.lean` · el DECODIFICADOR
+
+> ### ✅ A.1 HECHO (2026‑07‑14) — `decodeForm` es una BIYECCIÓN verificada
+>
+> `Meta/CodeDecode.lean` (~330 líneas). **Todo** `[propext, Classical.choice, Quot.sound]`.
+>
+> | Decodificador | round‑trip | **inyectividad** |
+> |:--|:--|:--|
+> | `decodeNat : Term → Option Nat` | `decodeNat_numeralM` | `decodeNat_inj` |
+> | `decodeChars` / `decodeStr` | `decodeChars_charsCodeM` / `decodeStr_strCodeM` | `decodeChars_inj` / `decodeStr_inj` |
+> | `decodeTerm` / `decodeTerms` (**mutuos**) | `decodeTerm_termCodeM` / `decodeTerms_termsCodeM` | `decodeTerm_inj` / `decodeTerms_inj` |
+> | `decodeForm` (9 tags) | `decodeForm_formCodeM` | **`decodeForm_inj`** ← *la «dirección crítica»* |
+>
+> Nótese que **NO hizo falta la hipótesis `IsCodeShaped c`** que este plan anticipaba: los
+> decodificadores son estructuralmente rígidos, así que `decodeForm c = some φ → c = formCodeM φ`
+> vale para **todo** `c : Term`. (El guard de char, abajo, es lo que lo hace cierto.)
+>
+> #### ⚠️ Dos trampas REALES encontradas — no re‑descubrirlas
+>
+> 1. **Kernel + `DecidableEq String`.** `split` / `rw` / `simp only [decodeX]` **manuales** sobre un
+>    `if s == sym` fabrican un cast `congrFun'` que **el núcleo RECHAZA**
+>    (`(kernel) application type mismatch`). **No es un error de la prueba: es del término generado.**
+>    Se sortea así:
+>    * **inducción funcional** (`fun_induction decodeX c`) — genera los casos **ya reducidos**;
+>    * para las **mutuas** `fun_induction` no está disponible, **pero `decodeTerm.induct` SÍ EXISTE**:
+>      se invoca con `induction c using decodeTerm.induct (motive_2 := …)`, dando el `motive_2`
+>      explícito (la inyectividad de `decodeTerms`); el companion `decodeTerms_inj` se prueba con
+>      `decodeTerms.induct (motive_1 := fun _ => True)` reusando `decodeTerm_inj`;
+>    * **`unfold decodeX at h`** (limpio) en vez de `simp only [decodeX] at h` (frágil).
+> 2. **`Char.ofNat` CLAMPA ⇒ `decodeChars` NO era inyectiva.** Un numeral fuera del rango Unicode
+>    decodifica a un char cuyo `toNat` **ya no vuelve**. Hubo que añadir el guard
+>    `(Char.ofNat code).toNat == code`. El round‑trip lo cumple gratis (`Char.ofNat_toNat`).
+>
+> **Recetas reutilizables** (valen tal cual para `decodeChain`): `decodeForm.induct` da **22 casos**;
+> los **8 productivos** (uno por tag) se cierran con `unfold` + `simp only [if_true, htag, hg, …] at h`
+> + `decodeX_inj`/IH + `subst` + `simp only [formCodeM, cons, nil, zero]`; los **14 restantes** (guard
+> falso / sub‑decodificación fallida / forma no‑código) son vacíos y caen con un **reductor uniforme**:
+> `intro φ h; (try unfold decodeForm at h); simp only [if_true, Option.bind, Option.map, *] at h;
+> (try exact absurd h (by simp))`.
+
+### ⏳ A.2 — lo que QUEDA del módulo A: el decodificador de CADENAS
 
 **Objetivo:** invertir el codificador sobre términos **canónicos**.
 

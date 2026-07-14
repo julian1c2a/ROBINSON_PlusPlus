@@ -4,8 +4,36 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
 
-**Estado 2026‑07‑13 · HEAD `41c72e1` · build 93 jobs · 79 módulos (Minimal 11 + Meta 57 + Full 11) ·
+**Estado 2026‑07‑14 · build 96 jobs · 81 módulos (Minimal 11 + Meta 59 + Full 11) ·
 Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.md`).**
+
+> ### 🔖 ÚLTIMO AVANCE (2026‑07‑14): **MÓDULO A (decodificador) — MITAD DE FÓRMULAS CERRADA** ✅
+>
+> `Meta/CodeDecode.lean` (nuevo, ~330 líneas, todo `[propext, choice, Quot.sound]`):
+> **`decodeForm` es una BIYECCIÓN verificada** entre códigos de fórmula y fórmulas.
+>
+> | | round‑trip (`decode (code v) = some v`) | **inyectividad** (`decode c = some v → c = code v`) |
+> |:--|:--|:--|
+> | `decodeNat` | ✅ `decodeNat_numeralM` | ✅ `decodeNat_inj` |
+> | `decodeChars` / `decodeStr` | ✅ `decodeChars_charsCodeM` / `decodeStr_strCodeM` | ✅ `decodeChars_inj` / `decodeStr_inj` |
+> | `decodeTerm` / `decodeTerms` (mutuos) | ✅ `decodeTerm_termCodeM` / `decodeTerms_termsCodeM` | ✅ `decodeTerm_inj` / `decodeTerms_inj` |
+> | `decodeForm` (9 tags) | ✅ `decodeForm_formCodeM` | ✅ **`decodeForm_inj`** ← *la «dirección crítica» del plan* |
+>
+> **▶ SIGUIENTE PASO CONCRETO (mañana):** completar el módulo A con el **decodificador de CADENAS** —
+> `decodeRule` / `decodeLine` / `decodeChain` (inversos de `lineJustif` / `lineCode'` / `proofCode'`,
+> en `Meta/Representability2.lean`) + el round‑trip `decodeChain (proofCode' rs []) = some rs`.
+> Ojo: `mp`/`gen`/`thy` referencian líneas anteriores **por índice** ⇒ `decodeRule` necesita el
+> **acumulador** (`List Formula`). Ver `PLAN-NEGVERIFIER.md` §4.
+>
+> **⚠️ DOS TRAMPAS YA DIAGNOSTICADAS — no re‑descubrirlas** (documentadas dentro de `CodeDecode.lean`):
+> 1. **Kernel + `DecidableEq String`.** `split` / `rw` / `simp` **manuales** sobre un `if s == sym`
+>    fabrican un cast `congrFun'` que **el núcleo RECHAZA** (`application type mismatch`). Se sortea
+>    con **inducción funcional** (`fun_induction`, o `foo.induct` para las mutuas — que sí existe,
+>    con `motive_2` explícito), que genera los casos **ya reducidos**; y con **`unfold … at h`**
+>    (limpio) en vez de `simp only [decodeX] at h` (frágil).
+> 2. **`Char.ofNat` CLAMPA.** Sin guard, `decodeChars` **no es inyectiva** (un numeral fuera del rango
+>    Unicode decodifica a un char cuyo `toNat` ya no vuelve). Hubo que añadir el guard
+>    `(Char.ofNat code).toNat == code`; el round‑trip lo cumple gratis por `Char.ofNat_toNat`.
 
 ---
 
@@ -83,9 +111,12 @@ Estado de sus piezas:
 |:--|:--|
 | `prf_iff_derivation : Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ existe |
 | `chainOk_track` / `runFn_track` (**positiva**: `checkAux` ok ⟹ `⊢ chainOk`) | ✅ existe (núcleo de D1) |
-| **Solidez estructural del verificador** (cadena válida ⟹ `Prf`) | ❌ **NO existe — pieza CRÍTICA** |
-| `In` **negativo** (`⌜φ⌝ ∉ L` ⟹ `⊢ ¬ In ⌜φ⌝ L`) | ❌ no existe (base: `formCode_ne` ✅) |
-| **Decodificador** `Term → Option (List Rule)` (inverso de `proofCode'`) | ❌ no existe |
+| **Solidez estructural del verificador** (cadena válida ⟹ `Prf`) | ❌ **NO existe — pieza CRÍTICA** (módulo E) |
+| `In` **negativo** (`⌜φ⌝ ∉ L` ⟹ `⊢ ¬ In ⌜φ⌝ L`) | ❌ no existe (módulo D; base: `formCode_ne` ✅) |
+| **Decodificador de FÓRMULAS** `Term → Option Formula` (inverso de `formCodeM`) | ✅ **HECHO** (`Meta/CodeDecode.lean`) — round‑trip **e inyectividad** (`decodeForm_inj`) |
+| **Decodificador de CADENAS** `Term → Option (List Rule)` (inverso de `proofCode'`) | ⏳ **← EMPEZAR AQUÍ** (resto del módulo A) |
+| `neg_In_axiomsCodeT` (`⊬φ` ⟹ `⊢ ¬ In ⌜φ⌝ axiomsCodeT`) | ✅ **HECHO** (`Meta/AxiomListCode.lean`, paso 0.5) |
+| `StdChain` = «con forma de código» (`IsCodeShaped`) | ✅ **HECHO** (`Meta/OmegaReflect.lean`, paso 1) |
 
 **Dificultad de fondo:** `NegVerifier` cuantifica sobre **cualquier** list‑term cerrado, y **la mayoría
 NO están en la imagen de `proofCode'`** (son basura). Para cada uno hay que: **decodificarlo**; si no
