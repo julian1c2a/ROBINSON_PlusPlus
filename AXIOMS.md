@@ -1,6 +1,6 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-**Last updated:** 2026-07-09 — **F7a completada: 14 → 7 `axiom` de Lean.**
+**Last updated:** 2026-07-13 — **`axiomsCodeT` concretado (opción 1): `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0 axiomas; desbloquea la dirección negativa (`⊬¬G`).** (previo 2026-07-09: F7a, 14 → 7 `axiom`.)
 **Author:** Julián Calderón Almendros
 
 Registro autoritativo de **todas** las declaraciones `axiom` de Lean que sostienen
@@ -45,10 +45,14 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
   es un axioma-puente que permite derivar `ax21`/`ax24` como teoremas.
 - **Teoría objeto (4).** `ax_p_tfa` es el TFA; teorema en presencia de inducción,
   enunciado como axioma en la capa `Minimal` (que carece de ella).
-- **Anclas de codificación (5–6).** Extensión **conservadora**: afirman que el
-  código de un axioma pertenece a la lista opaca `axiomsCodeT`. Una por cálculo
-  (`⊢` y `Prf`). Sustituyen a un ancla gigante anterior (`ax_axiomsCodeT`) por un
-  contenido positivo sin término explícito.
+- **Anclas de codificación (5–6).** Extensión **conservadora**. `ax_axiomsCodeT_eq`
+  (cálculo `⊢`) es una **igualdad**: `axiomsCodeT` ES el código de la lista de
+  axiomas — da **ambas** direcciones (positiva `ax_inAxC`, ahora **teorema**; y
+  negativa `neg_In_axiomsCodeT`, que SÓLO los axiomas están). El término gigante
+  `listFormCodeM axioms` **no se materializa** en las pruebas (recursión estructural,
+  `Meta/AxiomListCode.lean`), evitando el coste que retiró el `ax_axiomsCodeT`
+  original en `7ae7b7b`. `prf_inAxC` (cálculo `Prf`) sigue siendo el ancla positiva
+  finitaria (intacta).
 - **Postulado gödeliano vivo (7).** `d3` es la única condición de derivabilidad
   aún postulada. Su prueba real (Σ₁-completitud provable del verificador) es el
   objetivo del plan **12‑A** (`GODEL-D3-TRACKED-DESIGN.md` §12–§14); fases 1a/1b/2
