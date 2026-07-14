@@ -18,7 +18,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 > - **Teoría objeto vs metateoría.** Los esquemas aritméticos son de la teoría
 >   objeto; `d3` es metamatemático (sobre demostrabilidad). Son niveles distintos.
 > - **Dos cálculos.** `Derives` (`⊢`) y `Prf` necesitan cada uno su ancla de
->   codificación (`ax_inAxC` / `prf_inAxC`); no son un duplicado a fusionar.
+>   codificación (`ax_axiomsCodeT_eq` / `prf_inAxC`); no son un duplicado a fusionar.
 >
 > Este fichero es el «sitio único» **documental**: la fuente de verdad sobre el
 > inventario, aunque el código mantenga cada axioma en su capa correcta.
@@ -33,7 +33,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 | 2 | `ax_list_induction` | `Full/Lists.lean` | Esquema de inducción | Inducción estructural sobre listas del objeto |
 | 3 | `ax_mod2_alternation` | `Full/Mod2.lean` | Esquema de inducción | `∀n. mod2(σn)+mod2(n)=1`; con él se derivan ax21/ax24 como **teoremas** |
 | 4 | `ax_p_tfa` | `Minimal/Theorems/Block8.lean` | Teoría objeto | Teorema Fundamental de la Aritmética (teorema en Full, postulado en Minimal) |
-| 5 | `ax_inAxC` | `Minimal/Axioms.lean` | Ancla de codificación | `a ∈ axioms → axioms ⊢ In (formCodeM a) axiomsCodeT` (extensión conservadora, cálculo `⊢`) |
+| 5 | `ax_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) |
 | 6 | `prf_inAxC` | `Meta/Representability2Prf.lean` | Ancla de codificación | Análogo de (5) para el cálculo finitario `Prf` |
 | 7 | `d3` | `Meta/GodelTwo.lean` | Postulado gödeliano | **Única pieza pendiente**: condición D3 de Hilbert-Bernays-Löb para `provCodeC'`. En construcción por el plan 12‑A |
 
@@ -101,7 +101,7 @@ teoremas (`goedel_first_unprovable`, `incompleteness`, `con_imp_goedelSentence`,
 ```text
 goedel_first_real'  : [propext, choice, Quot.sound,
                        FOL.MetaRules.{dne, gen, imp_intro},
-                       Full.ax_induction, Full.ax_list_induction, ax_inAxC]
+                       Full.ax_induction, Full.ax_list_induction, ax_axiomsCodeT_eq]
 goedel_second'      : [propext, choice, Quot.sound,
                        FOL.MetaRules.{ex_elim, gen, imp_intro, or_elim},
                        Full.ax_list_induction, d3]

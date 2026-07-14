@@ -1345,14 +1345,17 @@ theorem coreAxioms_subset_axioms : coreAxioms ⊆ axioms :=
 theorem mem_axioms_of_mem_core {f : Formula} (h : f ∈ coreAxioms) : f ∈ axioms :=
   coreAxioms_subset_axioms h
 
-/-- **Contenido de `axiomsCodeT`** (meta-axioma, estilo `imp_intro`/`gen`): el código
-    `formCodeM a` de **todo axioma** `a ∈ axioms` pertenece a `axiomsCodeT`. Reemplaza
-    el anclaje `ax_axiomsCodeT` (literal gigante `listFormCodeM`): mantiene `axiomsCodeT`
-    **opaco** y fija solo su contenido **positivo** (suficiente para `repr_pos'`/D1 y la
-    necesitación; la dirección negativa —que SOLO los axiomas estén— no se postula).
-    Conservativo respecto a la teoría matemática (la maquinaria de coding es extensión
-    definicional). -/
-axiom ax_inAxC (a : Formula) (h : a ∈ axioms) : axioms ⊢ In (formCodeM a) axiomsCodeT
+/-- **Anclaje de `axiomsCodeT`** (meta-axioma, extensión definicional): `axiomsCodeT` **es** el código
+    de la lista de axiomas. Reemplaza al meta-axioma `ax_inAxC` (que fijaba **sólo** el contenido
+    positivo); esta igualdad da **AMBAS** direcciones — la positiva `ax_inAxC` (derivada abajo, para
+    `repr_pos'`/D1) **y la negativa** (que SÓLO los axiomas están, `Meta/AxiomListCode.lean`), necesaria
+    para la completitud‑Δ₀ NEGATIVA del verificador (`⊬¬G`, `PLAN-NEGVERIFIER.md` opción 1).
+
+    Conservativo (le da un valor a un átomo opaco; `listFormCodeM axioms` menciona `axiomsCodeT` sólo
+    por su **nombre** —`termCodeM` del átomo—, no por su valor, luego NO es circular). El término
+    gigante NO se materializa en las pruebas: se decide por recursión estructural sobre la lista
+    (`prf_In_listFormCodeM` / `prf_not_In_listFormCodeM`). -/
+axiom ax_axiomsCodeT_eq : axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)
 
 -- ## Helper Theorems
 -- Estas herramientas son usadas en todos los archivos Block*.lean.
@@ -1365,6 +1368,42 @@ theorem ax {f : Formula} (h : f ∈ axioms) : axioms ⊢ f :=
 theorem spec {Γ : List Formula} {A : Formula} (h : Γ ⊢ Formula.forall A) (t : Term) :
     Γ ⊢ substFormula 0 t A :=
   Derives.elim_forall Γ A t h
+
+/-! ### Pertenencia POSITIVA al código de una lista + `ax_inAxC` derivado
+
+`ax_inAxC` (antes meta-axioma) es ahora un **teorema**, derivado del anclaje `ax_axiomsCodeT_eq` +
+la pertenencia positiva `prf_In_listFormCodeM` (recursión estructural sobre la lista, **sin
+materializar** el código gigante). -/
+
+/-- `In x (cons h t) ⇔ (x ≐ h) ∨ In x t` a nivel `⊢` (instancia de `ax_L2_in_cons`). -/
+theorem prf_in_cons_iff_D (x h t : Term) :
+    axioms ⊢ (In x (cons h t) ⇔ lor (x =eq h) (In x t)) := by
+  have hh := spec (spec (spec (ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) h) t
+  simpa [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+
+/-- **Pertenencia POSITIVA** al código de una lista (inductivo sobre `L`, no materializa el gigante). -/
+theorem prf_In_listFormCodeM (f : Formula) :
+    ∀ (L : List Formula), List.Mem f L → axioms ⊢ In (formCodeM f) (listFormCodeM L)
+  | [], hmem => by cases hmem
+  | g :: gs, hmem => by
+      show axioms ⊢ In (formCodeM f) (cons (formCodeM g) (listFormCodeM gs))
+      refine FOL.MetaRules.iff_mpr (prf_in_cons_iff_D (formCodeM f) (formCodeM g) (listFormCodeM gs)) ?_
+      rcases List.mem_cons.mp hmem with heq | htail
+      · subst heq; exact FOL.MetaRules.or_intro_left (Derives.refl axioms _)
+      · exact FOL.MetaRules.or_intro_right (prf_In_listFormCodeM f gs htail)
+
+/-- **Contenido POSITIVO de `axiomsCodeT`** (antes meta-axioma `ax_inAxC`, ahora **teorema**): el
+    código de todo axioma pertenece a `axiomsCodeT`. Deriva de `ax_axiomsCodeT_eq` + `prf_In_listFormCodeM`
+    por sustitución (`Derives.subst`) sobre el segundo argumento de `In`. -/
+theorem ax_inAxC (a : Formula) (h : a ∈ axioms) : axioms ⊢ In (formCodeM a) axiomsCodeT := by
+  have key : ∀ t : Term, substFormula 0 t (In (formCodeM a) (.var 0)) = In (formCodeM a) t := fun t => by
+    simp [In, substFormula, substTerm, substTerms, substTerm_formCodeM, FOL.substTerm_liftTerm]
+  have hpos : axioms ⊢ substFormula 0 (listFormCodeM axioms) (In (formCodeM a) (.var 0)) := by
+    rw [key]; exact prf_In_listFormCodeM a axioms h
+  have hsub := Derives.subst axioms (listFormCodeM axioms) axiomsCodeT (In (formCodeM a) (.var 0))
+    (FOL.derive_eq_symm ax_axiomsCodeT_eq) hpos
+  rwa [key] at hsub
 
 /-- Reflexividad: Γ ⊢ (t ≐ t) (funciona bajo igualdad definitional). -/
 theorem eq_refl {Γ : List Formula} (t : Term) : Γ ⊢ (t ≐ t) :=
