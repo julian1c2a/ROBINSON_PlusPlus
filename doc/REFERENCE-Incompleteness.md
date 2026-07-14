@@ -862,4 +862,56 @@ Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
 
 ---
 
+### 3.21 `⊬¬G` — Gödel I COMPLETO (§41) y `axiomsCodeT` concretado (§42)
+
+Paralelo a D3 (independiente de él): **la otra mitad de Gödel I**, la indecidibilidad de `G`.
+
+#### 3.21.1 `Meta/OmegaReflect.lean` (§41) — `G` INDECIDIBLE, sin postulados gödelianos
+
+La cadena real daba **sólo `⊬G`** (`goedel_first_real'`); la mitad `⊬¬G` vivía en la capa legacy
+(sobre el postulado **falso** `provFormula_repr`) y se retiró en F7a. Se reconstruye **con la reflexión
+como hipótesis META explícita** (no escondida en un postulado):
+
+```lean
+abbrev Reflects (G) : Prop := (axioms ⊢ provCodeC' G) → Prf G          -- representabilidad NEGATIVA
+theorem goedel_first_unrefutable_real' (hcon) (hfp) (hrefl : Reflects G) : ¬ Prf (neg G)
+theorem goedel_first_undecidable_real'  (hcon) (hrefl : Reflects godelC') : ¬ Prf godelC' ∧ ¬ Prf (neg godelC')
+-- reducción de la hipótesis a piezas honestas:
+def OmegaConsistent : Prop := …   -- ω-consistencia CLÁSICA (NO es ConsistentOmega); testigos ESTÁNDAR = objList de canónicos
+def NegVerifier    : Prop := ∀ φ, ¬ Prf φ → ∀ l, StdChain l → axioms ⊢ neg (Verifies φ (objList l))
+theorem reflects_of_omega (hω : OmegaConsistent) (hneg : NegVerifier) (φ) : Reflects φ
+theorem goedel_first_undecidable_omega (hcon) (hω) (hneg) : ¬ Prf godelC' ∧ ¬ Prf (neg godelC')
+```
+
+`#print axioms goedel_first_undecidable_real'` = `[propext, choice, Quot.sound, MetaRules.{dne,gen,
+imp_intro}, ax_induction, ax_list_induction, ax_axiomsCodeT_eq]` — **ni un postulado gödeliano**.
+
+> ⛔ **`repr_neg` NO se sigue de la consistencia (cerrado por Gödel).** `⊢ ¬provCodeC' φ` para `φ`
+> indemostrable es, con `φ = ⊥`, **`Con(T)`** — indemostrable por Gödel II. Por eso la reflexión es
+> **hipótesis META** (la ω‑consistencia clásica), no un teorema interno. Descargarla (`NegVerifier`)
+> es un enunciado **Δ₀** sobre testigos concretos — plan en `PLAN-NEGVERIFIER.md`.
+
+#### 3.21.2 `Meta/AxiomListCode.lean` + anclaje (§42) — `axiomsCodeT` concretado
+
+El sondeo de solidez (`PLAN-NEGVERIFIER.md` §🔬) halló que **`axiomsCodeT` era opaco** (sólo dirección
+positiva `ax_inAxC`), lo que impedía refutar `In v0 axiomsCodeT` y **bloqueaba `NegVerifier`**. Opción
+1: concretar el anclaje, **net‑0 axiomas de Lean**.
+
+```lean
+-- Minimal/Axioms.lean:  axiom ax_inAxC  →  axiom ax_axiomsCodeT_eq : axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)
+theorem ax_inAxC (a) (h : a ∈ axioms) : axioms ⊢ In (formCodeM a) axiomsCodeT   -- AHORA teorema (del ancla)
+theorem prf_In_listFormCodeM (f) : ∀ L, List.Mem f L → axioms ⊢ In (formCodeM f) (listFormCodeM L)  -- positivo, no materializa
+-- Meta/AxiomListCode.lean:
+theorem prf_not_In_listFormCodeM (φ) : ∀ L, ¬ List.Mem φ L → axioms ⊢ neg (In (formCode φ) (listFormCodeM L))
+theorem neg_In_axiomsCodeT (φ) (hnp : ¬ Prf φ) : axioms ⊢ neg (In (formCode φ) axiomsCodeT)   -- ★ espejo NEGATIVO de ax_inAxC
+```
+
+**Clave de rendimiento:** el término gigante `listFormCodeM axioms` (que costaba ~40 s materializado y
+motivó retirar el `axiomsCodeT` concreto en `7ae7b7b`) **no se expande** — la pertenencia se decide por
+**recursión estructural sobre la lista abstracta** (`ax_L1`/`ax_L2` + `formCode_ne`); y `φ ∉ axioms` se
+obtiene de `¬Prf φ` vía `prf_ax`, **sin comparación sintáctica** (medido: 4 s). `neg_In_axiomsCodeT` es
+la pieza que **desbloquea el módulo D de `NegVerifier`**.
+
+---
+
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md)
