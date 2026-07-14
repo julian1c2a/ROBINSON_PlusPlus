@@ -71,15 +71,47 @@ theorem subst_provBody (φ : Formula) (t : Term) :
   simp only [provBody, Verifies, substFormula, substTerm, substTerms, land, chainOk, In, runFn,
     nil, zero, FOL.substTerm_liftTerm, reduceIte, if_true]
 
-/-! ### 1 · ω‑CONSISTENCIA (hipótesis META, explícita) -/
+/-! ### 1 · ω‑CONSISTENCIA (hipótesis META, explícita) — testigos «con forma de código» -/
 
-/-- Un término es **CERRADO** (invariante bajo todo lift): denota un objeto del modelo estándar. -/
-def IsClosed (x : Term) : Prop := ∀ k, liftTerm k x = x
+/-- **Términos CON FORMA DE CÓDIGO**: los generados por los constructores del lenguaje de códigos
+    (`numeralM` para tags/numerales, `strCodeM` para símbolos, `nil`, `cons`). Es la imagen sintáctica
+    de `formCodeM`/`termCodeM`/`listFormCodeM`/`lineCode'`/`proofCode'` — precisamente los testigos que
+    el `∃` de `provCodeC'` usa (cadenas de prueba codificadas).
+
+    ⚠️ **Por qué NO «cerrado» ni «canónico genérico».** La def anterior `IsClosed x := ∀k, liftTerm k
+    x = x` era **inservible**: la igualdad de términos cerrados **no es refutable** (`add zero zero =eq
+    zero` es demostrable). Y «canónico» tampoco: `cons h t =eq pair h (succ t)` (`ax_L0_cons_def`) hace
+    que un `cons` **sea un número**, luego `cons a b` puede igualar un `numeralM` (p.ej.
+    `cons 0̇ [] =eq 2̇`). La refutabilidad **NO** es genérica sobre `IsCodeShaped`.
+
+    **Cómo se refuta entonces** (clave del módulo D de `NegVerifier`, `PLAN-NEGVERIFIER.md`): las
+    comparaciones de `NegVerifier` son **PARALELAS POR TIPO** — `formCode φ` contra `formCode ψ`
+    (cabeza‑tag contra cabeza‑tag), nunca `cons` contra `numeral` en la misma ranura. Sobre esa
+    disciplina de tipos, `formCode_ne`/`termCode_ne`/`cons_ne_head`/`cons_ne_tail`/`strCode_ne`
+    (`Meta/CodeDistinct.lean`) **sí** deciden la desigualdad. El lema de distinción de líneas
+    (`lineCode_ne`, análogo de `formCode_ne`) es parte del módulo D. -/
+inductive IsCodeShaped : Term → Prop
+  | numeral (n : Nat) : IsCodeShaped (numeralM n)
+  | strCode (s : String) : IsCodeShaped (strCodeM s)
+  | nil : IsCodeShaped nil
+  | cons {h t : Term} : IsCodeShaped h → IsCodeShaped t → IsCodeShaped (cons h t)
+
+/-- Con forma de código ⟹ **cerrado** (invariante bajo todo lift): los códigos no tienen variables
+    libres. Recupera lo único que `IsClosed` aportaba de cierto. -/
+theorem IsCodeShaped.isClosed {x : Term} (hx : IsCodeShaped x) : ∀ k, liftTerm k x = x := by
+  intro k
+  induction hx with
+  | numeral n => exact liftTerm_numeralM k n
+  | strCode s => exact liftTerm_strCodeM k s
+  | nil => rfl
+  | @cons h t _ _ ih_h ih_t =>
+      show Term.func cons_sym [liftTerm k h, liftTerm k t] = Term.func cons_sym [h, t]
+      rw [ih_h, ih_t]
 
 /-- **Testigos ESTÁNDAR** del `∃` de `provCodeC'`: los términos‑lista `objList l` con **todos sus
-    elementos CERRADOS**. Es el papel que en la ω‑consistencia clásica juegan los **numerales**: los
-    términos que denotan objetos del **modelo estándar**. -/
-def StdChain (l : List Term) : Prop := ∀ x ∈ l, IsClosed x
+    elementos CON FORMA DE CÓDIGO**. Es el papel que en la ω‑consistencia clásica juegan los
+    **numerales** — aquí, las **codificaciones de pruebas** (imagen de `proofCode'`). -/
+def StdChain (l : List Term) : Prop := ∀ x ∈ l, IsCodeShaped x
 
 /-- **ω‑CONSISTENCIA** (hipótesis META, la clásica): la teoría **no demuestra un `∃` mientras refuta
     TODOS sus testigos estándar**.
@@ -140,6 +172,6 @@ end ROBINSON_PlusPlus.Meta.OmegaReflect
 
 export ROBINSON_PlusPlus.Meta.OmegaReflect (
   provBody provFromCode_eq_ex provCodeC'_eq_ex Verifies subst_provBody
-  IsClosed StdChain OmegaConsistent NegVerifier
+  IsCodeShaped StdChain OmegaConsistent NegVerifier
   reflects_of_omega goedel_first_undecidable_omega
 )
