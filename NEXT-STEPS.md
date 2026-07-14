@@ -63,6 +63,19 @@ un enunciado Δ₀ concreto**, más una hipótesis clásica y **visible**. `Omeg
 >   cuantifican sobre códigos **arbitrarios**; hay que descartar que el verificador objeto acepte
 >   cadenas basura que «prueben» `⌜φ⌝` sin `Prf φ`. Si las aceptara, sería un **bug de solidez del
 >   proyecto**, no del plan.
+>
+> ✅ **SONDEO EJECUTADO (2026‑07‑14) — veredicto en `PLAN-NEGVERIFIER.md` (§🔬):**
+> **(A)** el verificador es **SÓLIDO** — los 21 tags están ligados (20 por ⇔, `mp` por `premsOf`),
+> `thy` sólo inyecta axiomas reales, y la realidad hereditaria (rigidez+inyectividad de `formCode`)
+> cierra el argumento. **No hay bug; el módulo E es viable.**
+> **(B) HALLAZGO que BLOQUEA `NegVerifier`:** `axiomsCodeT` es un átomo **OPACO** con sólo
+> dirección positiva (`ax_inAxC`) ⇒ **no se puede refutar `In v0 axiomsCodeT`** ⇒ el módulo D no
+> puede refutar líneas `thy` basura ⇒ **`NegVerifier` NO es demostrable con `axiomsCodeT` opaco**.
+> **No es insoldez** — es que la teoría no “sabe” que `axiomsCodeT` = sus axiomas (fue concreto y
+> se retiró en `7ae7b7b` por rendimiento). **(C)** el fix de `StdChain` que planeé («canónico») es
+> **falso** (`cons` es una pareja de Cantor, `ax_L0_cons_def`).
+> **⟹ NUEVO PASO BLOQUEANTE 0.5 (requiere SANCIÓN):** concretar `axiomsCodeT` — recomendado un
+> ancla negativa `ax_notInAxC` (dual de `ax_inAxC`). Ver `PLAN-NEGVERIFIER.md` §🔬.
 
 Estado de sus piezas:
 

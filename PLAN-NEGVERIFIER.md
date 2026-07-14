@@ -7,7 +7,87 @@
 > **Referencias:** `NEXT-STEPS.md` (bloque 🎯 LO QUE QUEDA, tarea ①) · `PLANNING.md` ·
 > `Meta/OmegaReflect.lean` (la reducción, ya hecha) · `GODEL-STATUS.md`
 >
-> **Autor:** Julián Calderón Almendros · **Creado:** 2026‑07‑13 · **Estado:** plan, sin ejecutar
+> **Autor:** Julián Calderón Almendros · **Creado:** 2026‑07‑13 · **Estado:** SONDEO HECHO (2026‑07‑14)
+
+---
+
+## 🔬 VEREDICTO DEL SONDEO DE SOLIDEZ (2026‑07‑14) — LEER PRIMERO
+
+El sondeo (§0/§8 de este plan) se ejecutó **antes** de escribir código. Dos resultados, uno esperado y
+uno **inesperado que reordena el plan**.
+
+### A) SOLIDEZ ✅ CONFIRMADA — el verificador NO acepta pruebas de indemostrables
+
+* **Los 21 tags están TODOS ligados.** 20 vía **⇔** (`lineWF ⟨concl,tag,args⟩ ⇔ concl =eq
+  <forma‑estructural>(args)`: la conclusión queda forzada a la forma exacta de los args). El único
+  incondicional es **`mp`**, ligado por **`premsOf`**: `premsOf ⟨v1,16,v0⟩ = [implc v0 v1, v0]`, o sea
+  la conclusión `v1` sólo vale si `v0⇒v1` y `v0` están demostradas antes. **No queda ningún tag con
+  conclusión libre** — que era exactamente el bug de `gen` (`feedback-verifier-soundness`), ya
+  arreglado.
+* **`thy` sólo inyecta axiomas reales.** `lineWF ⟨v0,15⟩ ⇔ In v0 axiomsCodeT`, y la única vía para
+  probar `In · axiomsCodeT` es `ax_inAxC`, que **sólo** da la pertenencia para axiomas **reales**. No
+  se puede probar `In basura axiomsCodeT`.
+* **Realidad hereditaria.** `formCode` es **estructuralmente rígido e inyectivo** (`formCode φ =
+  cons (numeral tag_φ) args`), así que si la conclusión de una línea‑axioma es un `formCode φ` real,
+  sus args quedan **forzados** a ser `formCode` reales; y `mp` propaga realidad de la conclusión a las
+  premisas. Por inducción, ninguna cadena aceptada produce un `formCode φ` con `⊬φ`.
+
+**⟹ El módulo E (`VerifierSound`) es VIABLE. No hay bug de solidez. NO hay que reforzar esquemas.**
+
+### B) ⛔ HALLAZGO INESPERADO — `axiomsCodeT` es OPACO, y eso BLOQUEA `NegVerifier` (no es insoldez)
+
+`axiomsCodeT := Term.func "axiomsCodeT" []` es un **átomo totalmente opaco**, con **sólo** dirección
+positiva (`ax_inAxC` / `prf_inAxC`). **No existe** ninguna forma de **refutar** `In v0 axiomsCodeT`.
+
+**Consecuencia para el plan:** el **módulo D** necesita refutar `chainOk nil t` para cadenas basura.
+Una cadena con una línea **`thy` basura** `⟨v0,15⟩` exige, para refutarla, `axioms ⊢ neg (In v0
+axiomsCodeT)` — **imposible con `axiomsCodeT` opaco**. Peor: si `formCode φ` (φ indemostrable pero
+no‑axioma) aparece **sólo** como conclusión de una línea `thy`, refutar la cadena requiere
+`axioms ⊢ neg (In (formCode φ) axiomsCodeT)`, que tampoco se puede. **⟹ `NegVerifier` NO es demostrable
+mientras `axiomsCodeT` sea opaco.**
+
+**Esto NO es insoldez.** El verificador es sólido (§A). Es una **limitación de la codificación de la
+teoría**: la teoría **no “sabe” que `axiomsCodeT` contiene sólo axiomas** (es la ω‑incompletitud de su
+propio predicado de axioma). Es el análogo exacto de que Gödel exige un **predicado de axioma
+decidible/refutable**, no meramente r.e.
+
+**Historia:** `axiomsCodeT` **fue concreto** (`=eq listFormCodeM coreAxioms`) y se **retiró en
+`7ae7b7b`** por rendimiento (término gigante, problemas de lift), sustituido por el opaco + `ax_inAxC`.
+Las piezas siguen: `formCodeM`, `listFormCodeM`, `coreAxioms`, y `axioms` es una **lista finita
+concreta** (~35 entradas).
+
+### C) COROLARIO — el fix de `StdChain` que planeé (§1) es FALSO
+
+`cons h t =eq pair h (succ t)` **está en `axioms`** (`ax_L0_cons_def`), y **`nil := zero`**. Luego un
+`cons` **es un número** (una pareja de Cantor): **`canon_ne` es FALSO** — un `cons` puede ser
+provablemente igual a un numeral. La clase «canónico» NO sirve. La clase correcta es **«con forma de
+código»** (cons‑árboles con **cabeza numeral‑tag**), donde la comparación es **rígida y paralela** —
+por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no basta hasta resolver (B).**
+
+### ⟹ REORDENAMIENTO DEL PLAN (nuevo camino crítico)
+
+| Paso | Qué | Estado |
+|:--|:--|:--|
+| **0** | 🔬 Sondeo de solidez | ✅ **HECHO** (este veredicto) |
+| **0.5** | **Concretar `axiomsCodeT`** (dirección negativa) — **BLOQUEANTE, requiere SANCIÓN** | ⛔ nuevo |
+| **1** | Fix `StdChain` = «con forma de código» (NO «canónico»); redefinir el análogo de `canon_ne` | ⏳ |
+| A–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
+
+**Paso 0.5 — opciones (a decidir con el usuario):**
+
+1. **Recuperar `axiomsCodeT =eq listFormCodeM coreAxioms`** como **teorema/axioma‑ancla** (revertir
+   parcialmente `7ae7b7b`). Da la refutación por `formCode_ne` contra cada axioma. Riesgo: el problema
+   de rendimiento/lift que motivó su retirada — habría que confinarlo (no expandir el término gigante
+   en cada prueba).
+2. **Añadir un ancla NEGATIVA** `ax_notInAxC : a ∉ axioms → axioms ⊢ neg (In (formCodeM a) axiomsCodeT)`
+   (meta‑axioma dual de `ax_inAxC`). Más barato y confinado, pero **añade un `axiom`** (hay que
+   justificarlo: es conservador si `axiomsCodeT` denota exactamente la lista de axiomas).
+3. **Reformular `provCodeC'`** para que `thy` referencie los axiomas por **índice acotado** en vez de
+   por pertenencia a un código opaco — cambio estructural mayor.
+
+> **Recomendación:** opción **2** (ancla negativa) — es la dual exacta de `ax_inAxC`, que ya existe y ya
+> se acepta; mantiene el confinamiento; y su lectura es evidentemente conservadora. **Pero toca las
+> anclas de codificación ⟹ requiere sanción explícita del usuario** (regla del proyecto).
 
 ---
 
@@ -34,7 +114,13 @@ para `φ = ⊥` es `Con(T)`): aquí el testigo es **concreto**, y el chequeo es 
 
 ---
 
-## 1 · ⚠️ CORRECCIÓN PREVIA REQUERIDA — `StdChain` debe ser **CANÓNICO**, no «cerrado»
+## 1 · `StdChain` — clase de testigos correcta
+
+> ⚠️ **SUPERSEDIDO POR EL VEREDICTO (§C arriba).** Esta sección proponía «canónico» — **también es
+> incorrecto**: `cons h t =eq pair h (succ t)` (`ax_L0_cons_def`) hace que un `cons` **sea un número**,
+> luego `canon_ne` es **FALSO**. La clase correcta es **«con forma de código»** (cons‑árboles con
+> **cabeza numeral‑tag**), y **el fix queda supeditado al paso 0.5** (`axiomsCodeT`). Lo de abajo se
+> conserva como registro del razonamiento (incluida la refutación del «cerrado»).
 
 **Hay un error en la definición actual de `OmegaReflect.lean` que hay que arreglar ANTES de nada.**
 
