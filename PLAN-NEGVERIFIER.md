@@ -70,7 +70,7 @@ por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no bast
 |:--|:--|:--|
 | **0** | 🔬 Sondeo de solidez | ✅ **HECHO** (este veredicto) |
 | **0.5** | **Concretar `axiomsCodeT`** (opción 1: ancla de igualdad, net‑0 axiomas) | ✅ **HECHO** (`cb62c1e`) |
-| **1** | Fix `StdChain` = «con forma de código» (NO «canónico»); redefinir el análogo de `canon_ne` | ⏳ |
+| **1** | Fix `StdChain` = «con forma de código» (`IsCodeShaped`, NO «canónico») | ✅ **HECHO** (`bc84c5a`) |
 | A–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
 
 **Paso 0.5 — opciones (a decidir con el usuario):**
