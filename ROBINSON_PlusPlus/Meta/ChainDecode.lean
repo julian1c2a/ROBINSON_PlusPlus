@@ -34,7 +34,12 @@ Lo correcto —y lo que `VerifierSound` (módulo E) necesita— es la **SECCIÓN
 `decodeChain t = some rs → proofCode' rs [] = t ∧ checkProof rs ≠ none`. Los índices se recuperan
 **por búsqueda** en el acumulador (`findIdx`). Para los **18 tags limpios** el retract SÍ vale
 (`decodeRule_lineJustif_clean`); para `thy`/`mp`/`gen`, la sección bajo well‑formedness
-(`decodeRule_{thy,mp,gen}_section`). **Falta** ensamblar la sección a nivel de `decodeChain`.
+(`decodeRule_{thy,mp,gen}_section`).
+
+**Ensamblado (`decodeChain_checkProof`/`decodeChain_prf`):** de hecho lo que el módulo E necesita NO es
+el retract sintáctico `proofCode' rs = t` (que `peelArgs` no garantiza para códigos con «cola basura»),
+sino la **SOLIDEZ**: `decodeChain t = some rs → checkProof rs ≠ none`, y de ahí `Prf` de cada conclusión
+vía `derivation_to_prf`. La clave es que `decodeLine` **verifica** `stepConcl acc r = some f`.
 
 ### Nota de rendimiento
 
@@ -169,11 +174,15 @@ def decodeRule (acc : List Formula) (f : Formula) (jT : Term) : Option Rule :=
   | [] => none
 
 /-- Inverso de `lineCode' acc f r = cons ⌜f⌝ (lineJustif acc r)`: decodifica la
-    conclusión (cabeza) y la regla. -/
+    conclusión (cabeza) y la regla, **verificando** que la regla concluye la cabeza
+    (`stepConcl acc r = some f`). Ese chequeo es lo que garantiza que el acumulador que
+    `decodeChainAux` hila coincide con el de `checkAux` ⟹ la cadena decodificada **verifica**. -/
 def decodeLine (acc : List Formula) : Term → Option (Formula × Rule)
   | .func cs [conclT, justifT] =>
       if cs == cons_sym then
-        (decodeForm conclT).bind fun f => (decodeRule acc f justifT).map fun r => (f, r)
+        (decodeForm conclT).bind fun f =>
+          (decodeRule acc f justifT).bind fun r =>
+            if stepConcl acc r = some f then some (f, r) else none
       else none
   | _ => none
 
@@ -303,6 +312,76 @@ theorem decodeRule_gen_section (acc : List Formula) (f : Formula) (i : Nat)
          cons (numeralM 17) (cons (formCode (acc[i]?.getD Formula.bottom)) nil)
     rw [findIdx_sound g0 acc i' hi', hi]
 
+
+/-! ### Ensamblaje: la cadena decodificada VERIFICA (solidez) ⟹ puente a `Prf`
+
+La pieza que `VerifierSound` (módulo E) consume: si `decodeChain` acepta un código, las reglas que
+produce **son una derivación válida** (`checkProof` tiene éxito), y por tanto —vía la solidez meta ya
+existente `derivation_to_prf`— cada una de sus conclusiones es `Prf`. Clave: `decodeLine` verifica
+`stepConcl acc r = some f`, así que el acumulador que `decodeChainAux` hila coincide con el de
+`checkAux`. (Ojo: esto es **solidez**, no el retract sintáctico `proofCode' rs = t`, que `peelArgs`
+no garantiza para códigos con «cola basura».) -/
+
+/-- `decodeLine` sólo acepta líneas cuya regla **concluye** la cabeza. -/
+theorem decodeLine_sound {acc : List Formula} {lineT : Term} {f : Formula} {r : Rule}
+    (h : decodeLine acc lineT = some (f, r)) : stepConcl acc r = some f := by
+  cases lineT with
+  | var n => simp [decodeLine] at h
+  | func cs args =>
+      match args, h with
+      | [], h => simp [decodeLine] at h
+      | [_], h => simp [decodeLine] at h
+      | [conclT, justifT], h =>
+          simp only [decodeLine] at h
+          by_cases hcs : (cs == cons_sym) = true
+          · rw [if_pos hcs] at h
+            rcases hcf : decodeForm conclT with _ | f'
+            · rw [hcf] at h; simp at h
+            · rw [hcf] at h; simp only [Option.bind] at h
+              rcases hdr : decodeRule acc f' justifT with _ | r'
+              · rw [hdr] at h; simp at h
+              · rw [hdr] at h; simp only [Option.bind] at h
+                by_cases hst : stepConcl acc r' = some f'
+                · rw [if_pos hst] at h; injection h with h; rw [Prod.mk.injEq] at h
+                  obtain ⟨hf, hr⟩ := h; subst hf hr; exact hst
+                · rw [if_neg hst] at h; simp at h
+          · rw [if_neg hcs] at h; simp at h
+      | _ :: _ :: _ :: _, h => simp [decodeLine] at h
+
+/-- **Solidez de `decodeChainAux`**: una cadena decodificada verifica bajo su acumulador. -/
+theorem decodeChainAux_checkAux (t : Term) (acc : List Formula) :
+    ∀ (rs : List Rule), decodeChainAux acc t = some rs → ∃ L, checkAux rs acc = some L := by
+  fun_induction decodeChainAux acc t with
+  | case1 acc s hs =>
+      intro rs h; simp only [Option.some.injEq] at h; subst h
+      exact ⟨acc, by simp [checkAux]⟩
+  | case2 acc s hs => intro rs h; simp at h
+  | case3 acc s lineT rest hs ih =>
+      intro rs h
+      rcases hl : decodeLine acc lineT with _ | ⟨f, r⟩
+      · rw [hl] at h; simp at h
+      · rw [hl] at h; simp only [Option.bind] at h
+        rcases hc : decodeChainAux (acc ++ [f]) rest with _ | rs'
+        · rw [hc] at h; simp at h
+        · rw [hc] at h; simp only [Option.map] at h; injection h with h; subst h
+          have hstep : stepConcl acc r = some f := decodeLine_sound hl
+          obtain ⟨L, hL⟩ := ih (f, r) rs' hc
+          exact ⟨L, by simp only [checkAux, hstep, hL]⟩
+  | case4 acc s lineT rest hs => intro rs h; simp at h
+  | case5 t acc h1 h2 => intro rs h; simp at h
+
+/-- **Solidez de `decodeChain`**: lo que decodifica es una **derivación válida**. -/
+theorem decodeChain_checkProof {t : Term} {rs : List Rule}
+    (h : decodeChain t = some rs) : ∃ L, checkProof rs = some L :=
+  decodeChainAux_checkAux t [] rs h
+
+/-- **Puente a `Prf`** (lo que consume el módulo E): si `φ` está entre las conclusiones de una cadena
+    que `decodeChain` acepta, entonces `Prf φ`. -/
+theorem decodeChain_prf {t : Term} {rs : List Rule} {φ : Formula}
+    (h : decodeChain t = some rs) (hmem : ∀ L, checkProof rs = some L → φ ∈ L) : Prf φ := by
+  obtain ⟨L, hL⟩ := decodeChain_checkProof h
+  exact derivation_to_prf ⟨L, hL, hmem L hL⟩
+
 end ROBINSON_PlusPlus.Meta.ChainDecode
 
 export ROBINSON_PlusPlus.Meta.ChainDecode (
@@ -313,4 +392,5 @@ export ROBINSON_PlusPlus.Meta.ChainDecode (
   findIdx findIdx_sound findIdx_isSome_of_getElem
   decodeRule_thy_eq decodeRule_mp_eq decodeRule_gen_eq
   decodeRule_thy_section decodeRule_mp_section decodeRule_gen_section
+  decodeLine_sound decodeChainAux_checkAux decodeChain_checkProof decodeChain_prf
 )

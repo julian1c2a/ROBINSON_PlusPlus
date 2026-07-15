@@ -19,18 +19,25 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > | `decodeTerm` / `decodeTerms` (mutuos) | ✅ `decodeTerm_termCodeM` / `decodeTerms_termsCodeM` | ✅ `decodeTerm_inj` / `decodeTerms_inj` |
 > | `decodeForm` (9 tags) | ✅ `decodeForm_formCodeM` | ✅ **`decodeForm_inj`** ← *la «dirección crítica» del plan* |
 >
-> **▶ A.2 EN CURSO — `Meta/ChainDecode.lean`:** decodificador de CADENAS (inversos de `lineJustif` /
-> `lineCode'` / `proofCode'`). **HECHO:** `peelArgs`, `decodeRule`/`decodeLine`/`decodeChain`,
-> `DecidableEq Term`/`Formula` + `findIdx` (buscador de índices con corrección), el **retract de los
-> 18 tags limpios** (`decodeRule_lineJustif_clean`) y **la SECCIÓN de `thy`/`mp`/`gen`**
-> (`decodeRule_{thy,mp,gen}_section`: bajo well‑formedness recuperan un `r'` que tiene éxito, es sólido
-> y re‑codifica). **FALTA:** ensamblar la sección a nivel de `decodeChain`
-> (`decodeChain t = some rs → proofCode' rs [] = t ∧ checkProof rs ≠ none`) — hilar el acumulador y
-> componer las 21 secciones de línea.
+> **▶ MÓDULO A COMPLETO — `Meta/CodeDecode.lean` + `Meta/ChainDecode.lean`.**
+> Fórmulas (A.1) = biyección; cadenas (A.2) = `peelArgs`, `decodeRule`/`decodeLine`/`decodeChain`,
+> `DecidableEq Term`/`Formula` + `findIdx` (con corrección), retract de los 18 tags limpios, sección de
+> `thy`/`mp`/`gen`, y el **ENSAMBLADO**:
+> ```lean
+> decodeChain_checkProof : decodeChain t = some rs → ∃ L, checkProof rs = some L   -- SOLIDEZ
+> decodeChain_prf : decodeChain t = some rs → (∀ L, checkProof rs = some L → φ ∈ L) → Prf φ
+> ```
+> Lo que el módulo E consume es la **solidez** (cadena decodificada ⟹ derivación válida ⟹ `Prf` vía
+> `derivation_to_prf`), NO el retract sintáctico `proofCode' rs = t` (que `peelArgs` no da para códigos
+> con «cola basura»). Clave: `decodeLine` verifica `stepConcl acc r = some f`.
 >
-> **⚠️ HALLAZGO que corrige el plan:** `lineJustif` es **lossy** para `thy`/`mp`/`gen` (descarta los
-> índices) ⇒ el round‑trip `decodeChain (proofCode' rs) = some rs` (*retract*) es **FALSO**; lo
-> correcto es la **sección**. Detalle en `PLAN-NEGVERIFIER.md` §4 y en la cabecera de `ChainDecode.lean`.
+> **⚠️ HALLAZGO que corrigió el plan:** `lineJustif` es **lossy** para `thy`/`mp`/`gen` (descarta los
+> índices) ⇒ el round‑trip `decodeChain (proofCode' rs) = some rs` (*retract*) es **FALSO**. Detalle
+> en `PLAN-NEGVERIFIER.md` §4 y en la cabecera de `ChainDecode.lean`.
+>
+> **▶ SIGUIENTE:** MÓDULO B (`LineWFCases`, los 21 tags — **compartido con `hC_dot`/D3**), luego C
+> (`⊢ ¬lineWF`), D (`runFn`/`¬In`/`¬chainOk`) y E (`VerifierSound`, el punto de riesgo ALTO — necesita
+> un sondeo de solidez antes de codificar). `decodeChain_prf` es la pieza que E ensambla.
 >
 > **⚠️ DOS TRAMPAS YA DIAGNOSTICADAS — no re‑descubrirlas** (documentadas dentro de `CodeDecode.lean`):
 > 1. **Kernel + `DecidableEq String`.** `split` / `rw` / `simp` **manuales** sobre un `if s == sym`
