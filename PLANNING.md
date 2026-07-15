@@ -1,12 +1,12 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
-**Última actualización:** 2026-07-13 — Estado global: **79 módulos** (Minimal 11 + Meta 57 + Full 11), **94 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
+**Última actualización:** 2026-07-14 — Estado global: **83 módulos** (Minimal 11 + Meta 61 + Full 11), **97 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`). **MÓDULO A de `NegVerifier` COMPLETO (§43):** el decodificador (`Meta/CodeDecode.lean` biyección de fórmulas + `Meta/ChainDecode.lean` cadenas + ensamblado `decodeChain_prf`). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
 
 **Gödel I — COMPLETO** (`goedel_first_undecidable_real'`): `⊬G ∧ ⊬¬G`, **sin ningún postulado gödeliano**, con la **reflexión como hipótesis META explícita** (`Reflects`), reducida a **ω‑consistencia clásica + `NegVerifier`** (`Meta/OmegaReflect.lean`). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales. **Gödel II** (`goedel_second'`) montado, **módulo `axiom d3`**.
 
 **Dos frentes abiertos, ambos con plan escrito y sin incógnitas de diseño:**
 
-1. 📄 **[PLAN-NEGVERIFIER.md](PLAN-NEGVERIFIER.md)** — descargar `NegVerifier` (solidez estructural del verificador + decodificador + inversión de los 21 tags) ⇒ cierra la **indecidibilidad de `G`** desde la ω‑consistencia, y nada más. *~8‑11 sesiones.*
+1. 📄 **[PLAN-NEGVERIFIER.md](PLAN-NEGVERIFIER.md)** — descargar `NegVerifier` (solidez estructural del verificador + decodificador + inversión de los 21 tags) ⇒ cierra la **indecidibilidad de `G`** desde la ω‑consistencia, y nada más. **Módulo A (decodificador) COMPLETO** (`decodeChain_prf` = cadena aceptada ⟹ `Prf`); **siguiente = módulo B** (los 21 tags, compartido con `hC_dot`/D3). *~7‑10 sesiones restantes.*
 2. **D3** — reducida a **UN SOLO lema** (`d3_prf_of_chainOkDot`): falta el cuerpo `lineOkB` de `hC_dot` ⇒ `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`). *~2‑4 sesiones.*
 
 > 🔗 **Los dos frentes COMPARTEN** el análisis de los **21 tags** de `lineWF` (positivo para D3, negativo para `NegVerifier`): conviene construirlo **una sola vez**. Ver `PLAN-NEGVERIFIER.md` §5.

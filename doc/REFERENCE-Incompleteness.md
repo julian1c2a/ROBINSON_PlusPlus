@@ -912,6 +912,90 @@ motivó retirar el `axiomsCodeT` concreto en `7ae7b7b`) **no se expande** — la
 obtiene de `¬Prf φ` vía `prf_ax`, **sin comparación sintáctica** (medido: 4 s). `neg_In_axiomsCodeT` es
 la pieza que **desbloquea el módulo D de `NegVerifier`**.
 
+### 3.22 `Meta/CodeDecode.lean` + `Meta/ChainDecode.lean` (§43) — el DECODIFICADOR (módulo A de `NegVerifier`)
+
+Inversos **computables** de los codificadores de Gödel y de prueba. Es el puente **objeto → meta** que
+`VerifierSound` (módulo E) necesita: de un testigo aceptado se recupera —de forma verificada— la
+derivación real. Plan: `PLAN-NEGVERIFIER.md` §4.
+
+#### 3.22.1 `Meta/CodeDecode.lean` (§43·A.1) — `decodeForm` es una BIYECCIÓN
+
+Recursión estructural directa sobre `Term` (terminación inferida). Cada decodificador tiene su
+**round‑trip** (`decode ∘ code = some`) y su **inyectividad** (`decode c = some v → c = code v`); juntas
+dan la biyección.
+
+```lean
+def decodeNat   : Term → Option Nat            -- σⁿ0 ↦ n
+def decodeChars : Term → Option (List Char)    -- guard (Char.ofNat code).toNat == code  ⟵ imprescindible
+def decodeStr   : Term → Option String         -- (decodeChars ·).map String.ofList
+mutual def decodeTerm : Term → Option Term  def decodeTerms : Term → Option (List Term) end
+def decodeForm  : Term → Option Formula        -- los 9 tags (⊥ 2 · atom 3 · =eq 4 · ⇒ 5 · ∀ 6 · ∧ 7 · ∨ 8 · ∃ 9)
+
+theorem decodeNat_numeralM (n)  : decodeNat  (numeralM n)  = some n
+theorem decodeStr_strCodeM (s)  : decodeStr  (strCodeM s)  = some s
+theorem decodeTerm_termCodeM(t) : decodeTerm (termCodeM t) = some t   -- mutuo con decodeTerms_termsCodeM
+theorem decodeForm_formCodeM(φ) : decodeForm (formCodeM φ) = some φ
+theorem decodeNat_inj  {t n} : decodeNat  t = some n → t = numeralM n
+theorem decodeStr_inj  {c s} : decodeStr  c = some s → c = strCodeM s
+theorem decodeTerm_inj {c t} : decodeTerm c = some t → c = termCodeM t   -- mutuo con decodeTerms_inj
+theorem decodeForm_inj {c φ} : decodeForm c = some φ → c = formCodeM φ    -- ★ la «dirección crítica»
+```
+
+> **No hizo falta la hipótesis `IsCodeShaped c`** que el plan anticipaba: los decodificadores son
+> estructuralmente rígidos ⟹ la inyectividad vale para **todo** `c : Term`.
+>
+> ⚠️ **Dos trampas reales** (ver [[feedback-lean-kernel-ite-string]]):
+> 1. **Kernel + `DecidableEq String`.** `split`/`rw`/`simp only [decodeX]` **manuales** sobre `if s == sym`
+>    fabrican un cast `congrFun'` que **el núcleo RECHAZA**. Se sortea con **inducción funcional**
+>    (`fun_induction`; para las mutuas `decodeTerm.induct` con `motive_2` explícito) + `unfold … at h`.
+> 2. **`Char.ofNat` CLAMPA** ⟹ `decodeChars` no es inyectiva sin el guard `(Char.ofNat code).toNat == code`
+>    (el round‑trip lo cumple gratis por `Char.ofNat_toNat`).
+
+#### 3.22.2 `Meta/ChainDecode.lean` (§43·A.2) — decodificador de CADENAS + solidez
+
+Invierte `lineJustif`/`lineCode'`/`proofCode'` (`Representability2.lean`). El justif se **pela** a
+`List Term` (`peelArgs`) para matchear `(tag : Nat, args)` — un `match` sobre las 21 formas anidadas de
+`Term` reventaría el `whnf` (`String.decEq`).
+
+```lean
+def peelArgs   : Term → List Term                              -- cons a (cons b nil) ↦ [a, b]
+def decodeRule : List Formula → Formula → Term → Option Rule   -- inverso de lineJustif (dada la conclusión)
+def decodeLine : List Formula → Term → Option (Formula × Rule) -- ⟵ VERIFICA stepConcl acc r = some f
+def decodeChain: Term → Option (List Rule)                     -- inverso de proofCode' (hila el acumulador)
+
+-- Igualdad decidible y buscador de índices (Term/Formula sólo derivan BEq anidado; sin DecidableEq/LawfulBEq):
+instance : DecidableEq Term      -- construido a mano (mutuo);  deriving instance DecidableEq for Formula
+def findIdx (f) : List Formula → Option Nat                     -- buscador propio con `=` (no List.idxOf?/BEq)
+theorem findIdx_sound / findIdx_isSome_of_getElem              -- corrección del buscador
+
+theorem decodeRule_lineJustif_clean (acc f r) (hcl : cleanRule r) :   -- RETRACT de los 18 tags limpios
+    decodeRule acc f (lineJustif acc r) = some r
+theorem decodeRule_{thy,mp,gen}_section (acc f …) (hstep : stepConcl acc r = some f) :   -- SECCIÓN de los 3 lossy
+    ∃ r', decodeRule acc f (lineJustif acc r) = some r'
+        ∧ stepConcl acc r' = some f ∧ lineJustif acc r' = lineJustif acc r
+```
+
+**Ensamblado (la pieza que consume el módulo E):**
+
+```lean
+theorem decodeLine_sound        : decodeLine acc lineT = some (f,r) → stepConcl acc r = some f
+theorem decodeChain_checkProof  : decodeChain t = some rs → ∃ L, checkProof rs = some L   -- ★ SOLIDEZ
+theorem decodeChain_prf         : decodeChain t = some rs →
+                                    (∀ L, checkProof rs = some L → φ ∈ L) → Prf φ         -- vía derivation_to_prf
+```
+
+> ⚠️ **HALLAZGO que corrige el plan.** `lineJustif` es **LOSSY** para `thy`/`mp`/`gen` (descarta los
+> índices: `thy k ↦ cons 15̇ nil`; `mp`/`gen` guardan la premisa resuelta, no el índice). Por tanto el
+> round‑trip `decodeChain (proofCode' rs) = some rs` (**retract**) es **FALSO**. Lo que el módulo E
+> necesita **no** es el retract sintáctico `proofCode' rs = t` (que `peelArgs` no da para códigos con
+> «cola basura»), sino la **SOLIDEZ**: una cadena que `decodeChain` acepta es una **derivación válida**,
+> y de ahí `Prf` de cada conclusión vía `derivation_to_prf` (solidez meta ya existente). La pieza que lo
+> hace cierto es que `decodeLine` **verifica** `stepConcl acc r = some f` (con `DecidableEq Formula`).
+
+**Dependencias:** `CodeDecode` ⇐ `Minimal.Axioms`. `ChainDecode` ⇐ `CodeDecode` + `Representability2`
+(`Rule`/`stepConcl`/`checkProof`/`Derivation`/`derivation_to_prf`, `lineJustif`/`proofCode'`) + los
+puentes `formCodeM_eq`/`termCodeM_eq` (`Representability`). Todo `[propext, choice, Quot.sound]`.
+
 ---
 
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md)

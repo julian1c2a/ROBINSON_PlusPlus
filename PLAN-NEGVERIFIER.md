@@ -72,8 +72,9 @@ por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no bast
 | **0.5** | **Concretar `axiomsCodeT`** (opción 1: ancla de igualdad, net‑0 axiomas) | ✅ **HECHO** (`cb62c1e`) |
 | **1** | Fix `StdChain` = «con forma de código» (`IsCodeShaped`, NO «canónico») | ✅ **HECHO** (`bc84c5a`) |
 | **A.1** | `CodeDecode`: decodificador de **fórmulas** + round‑trips + **inyectividad** | ✅ **HECHO** (`dbd9249`, `9b178ae`, +`decodeForm_inj`) |
-| **A.2** | `CodeDecode`: decodificador de **cadenas** (`decodeRule`/`decodeLine`/`decodeChain`) | ⏳ **← SIGUIENTE** |
-| B–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
+| **A.2** | `ChainDecode`: decodificador de **cadenas** + secciones + **ensamblado** (`decodeChain_checkProof`/`decodeChain_prf`) | ✅ **HECHO** (`ababab2`…`adcff7e`) |
+| **B** | `LineWFCases` (los 21 tags — **compartido con `hC_dot`/D3**) | ⏳ **← SIGUIENTE** |
+| C–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
 
 **Paso 0.5 — opciones (a decidir con el usuario):**
 
