@@ -5,8 +5,10 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
+import ROBINSON_PlusPlus.Meta.AxiomListCode
 
 open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 
@@ -164,8 +166,59 @@ theorem prf_premsOf_tag (k : Nat) (concl : Term) (args : List Term) (L : Term)
   · injection h with h; subst h; simpa only [objList] using prf_premsOf_listInd concl _
   · simp at h
 
+
+/-! ### Paso 2 — la dirección NEGATIVA (lo que consume el módulo C)
+
+Contraposición del `.mp` de cada bicondicional: si la ecuación estructural es **refutable**, la línea
+**no** es bien formada. Se dan en `⊢` (Derives) además de en `Prf` porque los inputs reales del módulo
+C (`formCode_ne` y compañía, `neg_In_axiomsCodeT`) son de **nivel `⊢`**.
+
+⚠️ **`mp` (16) NO se puede refutar por `lineWF`** — su esquema es **incondicional**, luego
+`lineWF ⟨concl,16,a⟩` es SIEMPRE demostrable. La refutación de una línea `mp` mala **tiene que ir por
+`premsOf`/`boundedPremsIn`** (las premisas no están disponibles), nunca por `lineWF`. Es el precio de
+que `mp` esté ligado por `premsOf` en vez de por un `⇔` (`PLAN-NEGVERIFIER.md` §🔬 A).
+-/
+
+/-- Silogismo hipotético en `Prf` (composición de implicaciones). -/
+theorem prf_imp_trans {a b c : Formula} (h1 : Prf (a ⇒ b)) (h2 : Prf (b ⇒ c)) : Prf (a ⇒ c) :=
+  prf_mp (prf_mp (Prf.incl (Prf₀.p2 a b c)) (prf_mp (Prf.incl (Prf₀.p1 (b ⇒ c) a)) h2)) h1
+
+/-- Silogismo hipotético en `⊢` (nivel Derives). -/
+theorem derives_imp_trans {a b c : Formula}
+    (h1 : axioms ⊢ (a ⇒ b)) (h2 : axioms ⊢ (b ⇒ c)) : axioms ⊢ (a ⇒ c) :=
+  FOL.MetaRules.mp (FOL.MetaRules.mp FOL.Theorems.Impl.syllogism_impl h1) h2
+
+/-- **NEGATIVA uniforme (19 tags estructurales), en `Prf`.** -/
+theorem prf_lineWF_neg_of_tag (k : Nat) (concl : Term) (args : List Term) (e : Term)
+    (h : tagConcl k args = some e) (hne : Prf (neg (concl =eq e))) :
+    Prf (neg (lineWF (cons concl (cons (numeralM k) (objList args))))) :=
+  prf_imp_trans (prf_and_elim_left (prf_lineWF_tag k concl args e h)) hne
+
+/-- **NEGATIVA uniforme (19 tags estructurales), en `⊢`** — la que consume el módulo C
+    (sus inputs, `formCode_ne` y compañía, son de nivel `⊢`). -/
+theorem derives_lineWF_neg_of_tag (k : Nat) (concl : Term) (args : List Term) (e : Term)
+    (h : tagConcl k args = some e) (hne : axioms ⊢ neg (concl =eq e)) :
+    axioms ⊢ neg (lineWF (cons concl (cons (numeralM k) (objList args)))) :=
+  derives_imp_trans
+    (FOL.MetaRules.and_elim_left (prf_to_derives (prf_lineWF_tag k concl args e h))) hne
+
+/-- **NEGATIVA de `thy` (15)**: fuera de `tagConcl`; va por `In … axiomsCodeT`. -/
+theorem derives_lineWF_neg_thy (concl : Term) (hne : axioms ⊢ neg (In concl axiomsCodeT)) :
+    axioms ⊢ neg (lineWF (cons concl (cons (numeralM 15) nil))) :=
+  derives_imp_trans
+    (FOL.MetaRules.and_elim_left (prf_to_derives (prf_lineWF_thy concl))) hne
+
+/-- **Payoff concreto**: una línea `thy` cuya conclusión NO es demostrable queda REFUTADA.
+    Compone con `neg_In_axiomsCodeT` (§42). -/
+theorem derives_lineWF_neg_thy_of_not_prf (φ : Formula) (hnp : ¬ Prf φ) :
+    axioms ⊢ neg (lineWF (cons (formCode φ) (cons (numeralM 15) nil))) :=
+  derives_lineWF_neg_thy (formCode φ) (neg_In_axiomsCodeT φ hnp)
+
 end ROBINSON_PlusPlus.Meta.LineWFCases
 
 export ROBINSON_PlusPlus.Meta.LineWFCases (
   tagArity tagConcl tagPrems prf_lineWF_tag prf_premsOf_tag
+  prf_imp_trans derives_imp_trans
+  prf_lineWF_neg_of_tag derives_lineWF_neg_of_tag
+  derives_lineWF_neg_thy derives_lineWF_neg_thy_of_not_prf
 )
