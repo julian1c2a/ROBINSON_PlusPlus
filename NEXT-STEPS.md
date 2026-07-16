@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
 
-**Estado 2026‑07‑14 · build 96 jobs · 81 módulos (Minimal 11 + Meta 59 + Full 11) ·
+**Estado 2026‑07‑14 · build 99 jobs · 85 módulos (Minimal 11 + Meta 63 + Full 11) ·
 Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.md`).**
 
 > ### 🔖 ÚLTIMO AVANCE (2026‑07‑14): **MÓDULO A (decodificador) — MITAD DE FÓRMULAS CERRADA** ✅
@@ -35,9 +35,36 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > índices) ⇒ el round‑trip `decodeChain (proofCode' rs) = some rs` (*retract*) es **FALSO**. Detalle
 > en `PLAN-NEGVERIFIER.md` §4 y en la cabecera de `ChainDecode.lean`.
 >
-> **▶ SIGUIENTE:** MÓDULO B (`LineWFCases`, los 21 tags — **compartido con `hC_dot`/D3**), luego C
-> (`⊢ ¬lineWF`), D (`runFn`/`¬In`/`¬chainOk`) y E (`VerifierSound`, el punto de riesgo ALTO — necesita
-> un sondeo de solidez antes de codificar). `decodeChain_prf` es la pieza que E ensambla.
+> **▶ MÓDULO B EN CURSO (§44, `Meta/LineWFCases.lean`)** — la tabla de los 21 tags.
+> **HECHO:** `tagArity`/`tagConcl`/`tagPrems` + envoltorios `prf_lineWF_tag`/`prf_premsOf_tag`; la
+> **dirección negativa** (`derives_lineWF_neg_of_tag`, y `derives_lineWF_neg_thy_of_not_prf` que ya
+> **refuta** una línea `thy` de conclusión indemostrable); y la **des‑duplicación** del nivel `⊢`
+> (`Meta/LineWFDerives.lean`: los 42 `lineWF_*`/`premsOf_*` que `ProofChain` probaba **por segunda vez**
+> pasan a ser `prf_to_derives` de sus gemelos; `ProofChain` 870→540; D1/D2 con axiomas intactos).
+>
+> ⚠️ **`tagConcl` cubre 19, NO 21**: `thy` (15) va por `In … axiomsCodeT` (no es ecuación) y `mp` (16)
+> es **INCONDICIONAL** ⟹ **`mp` no se puede refutar por `lineWF`**, sólo por `premsOf`/`boundedPremsIn`.
+> **NO es el mismo corte que en el módulo A** (allí los raros eran `thy`/`mp`/`gen`; aquí `gen` SÍ es
+> estructural).
+>
+> ### 🔖 SIGUIENTE PASO CONCRETO: **B.3b — reformular los 21 `ax_lineWF_<tag>` a ACCESORES**
+> **SANCIONADO por el usuario (net‑0 axiomas).** Sin esto, `lineWF` **NO es reflejable sobre líneas
+> abstractas** y `hC_dot`/D3 sigue bloqueado: `pcc_bdAll_intro` introduce el `∀i` con el cuerpo
+> **abierto**, así que hay que tratar `lineWF (nthc p i)` con `p`,`i` abstractos — y de `lineWF t` la
+> teoría **no puede recuperar la forma de `t`** (`ax_lineWF_cons` sólo da el cons de primer nivel;
+> `carc`/`cdrc`/`nthc` sólo computan sobre `cons` explícitos). Los **accesores sortean la aridad**.
+> ```lean
+> -- de:  ∀concl a b. lineWF (cons concl (cons 0̇ (cons a (cons b nil)))) ⇔ (concl =eq implc a (implc b a))
+> -- a:   ∀line. (lineTag line =eq 0̇) ⇒
+>           (lineWF line ⇔ (carc line =eq implc (nthc line 2̇) (implc (nthc line 3̇) (nthc line 2̇))))
+> ```
+> **Toolkit ya validado con p1 (~18 líneas/tag)**: `prf_lineWF_iff_transport` (vale para los 21 —
+> `lineWF L` es un **átomo sin binders** ⟹ el cancel lift/subst va por `substTerm_liftTerm`; ⚠️ **el
+> cancel general a nivel fórmula es FALSO**, ver `FOL/Theorems/Quantifiers.lean`), `prf_congr_implc`, y
+> copias locales de `prf_nthc_zero/succ` (`NumListPrf` es **posterior** a `ReprPrf`). Los 21
+> `prf_lineWF_<tag>` **conservan su enunciado** (pasan a ser teoremas del axioma nuevo).
+> Luego **B.3c** = `pcc_lineWF_tracked` → `hC_dot`. Después C, D, E (`VerifierSound`, riesgo ALTO —
+> exige sondeo antes de codificar; `decodeChain_prf` es la pieza que E ensambla) y F.
 >
 > **⚠️ DOS TRAMPAS YA DIAGNOSTICADAS — no re‑descubrirlas** (documentadas dentro de `CodeDecode.lean`):
 > 1. **Kernel + `DecidableEq String`.** `split` / `rw` / `simp` **manuales** sobre un `if s == sym`

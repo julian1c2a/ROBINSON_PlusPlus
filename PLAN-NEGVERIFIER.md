@@ -73,7 +73,11 @@ por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no bast
 | **1** | Fix `StdChain` = «con forma de código» (`IsCodeShaped`, NO «canónico») | ✅ **HECHO** (`bc84c5a`) |
 | **A.1** | `CodeDecode`: decodificador de **fórmulas** + round‑trips + **inyectividad** | ✅ **HECHO** (`dbd9249`, `9b178ae`, +`decodeForm_inj`) |
 | **A.2** | `ChainDecode`: decodificador de **cadenas** + secciones + **ensamblado** (`decodeChain_checkProof`/`decodeChain_prf`) | ✅ **HECHO** (`ababab2`…`adcff7e`) |
-| **B** | `LineWFCases` (los 21 tags — **compartido con `hC_dot`/D3**) | ⏳ **← SIGUIENTE** |
+| **B.1** | `LineWFCases`: tabla (`tagArity`/`tagConcl`/`tagPrems`) + envoltorios uniformes | ✅ **HECHO** (`2c03993`) |
+| **B.2** | `LineWFCases`: dirección **negativa** (sirve a C) | ✅ **HECHO** (`722dff9`) |
+| **B.3a** | Des‑duplicar los 42 `lineWF_*`/`premsOf_*` de `⊢` (`LineWFDerives`) | ✅ **HECHO** (`d536f19`) |
+| **B.3b** | **Reformular los 21 `ax_lineWF_<tag>` a ACCESORES** (net‑0 axiomas, SANCIONADO) | ⏳ **← SIGUIENTE** |
+| **B.3c** | `pcc_lineWF_tracked` (reflexión punteada, sirve a `hC_dot`/D3) | ⏳ (depende de B.3b) |
 | C–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
 
 **Paso 0.5 — opciones (a decidir con el usuario):**

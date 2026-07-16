@@ -996,6 +996,95 @@ theorem decodeChain_prf         : decodeChain t = some rs →
 (`Rule`/`stepConcl`/`checkProof`/`Derivation`/`derivation_to_prf`, `lineJustif`/`proofCode'`) + los
 puentes `formCodeM_eq`/`termCodeM_eq` (`Representability`). Todo `[propext, choice, Quot.sound]`.
 
+### 3.23 `Meta/LineWFCases.lean` + `Meta/LineWFDerives.lean` (§44) — los 21 TAGS (módulo B de `NegVerifier`)
+
+Módulo B del plan: la tabla **ejecutable** de los 21 esquemas de línea, indexada por la etiqueta `k`.
+Es la pieza de **mayor apalancamiento** porque está **COMPARTIDA** por los dos frentes, en direcciones
+opuestas: **D3/`hC_dot`** (positiva: `lineWF X ⇒ Prov ⌜lineWF Ẋ⌝`) y **`NegVerifier`/módulo C**
+(negativa: `¬lineWF X ⇒ ⊢ ¬lineWF X`).
+
+> 🔎 **La revisión previa evitó rehacer trabajo**: los 21 `prf_lineWF_<tag>`/`prf_premsOf_<tag>` **ya
+> existían** (`Meta/ReprPrf.lean`), y `prf_lineWF_inv` (inversión a `tagDisj`, los 21 disyuntos)
+> también (`Meta/Sigma1AtomPrf.lean`). Módulo B **no era** «construir los 21 esquemas» sino
+> **uniformizarlos**: la tabla permite a sus consumidores un case‑split mecánico sobre `k` en vez de
+> escribir 21 casos cada uno.
+
+#### 3.23.1 `Meta/LineWFCases.lean` — la tabla y sus dos direcciones
+
+```lean
+def tagArity : Nat → Nat                               -- aridad del justif por tag
+def tagConcl : Nat → List Term → Option Term           -- reconstrucción estructural (19 tags)
+def tagPrems : Nat → Term → List Term → Option Term    -- premisas de contexto (los 21)
+theorem prf_lineWF_tag  (h : tagConcl k args = some e) :
+    Prf (lineWF (cons concl (cons (numeralM k) (objList args))) ⇔ (concl =eq e))
+theorem prf_premsOf_tag (h : tagPrems k concl args = some L) :
+    Prf (premsOf (cons concl (cons (numeralM k) (objList args))) =eq L)
+-- dirección NEGATIVA (módulo C). En `⊢` además de en `Prf`: los inputs reales
+-- (`formCode_ne`, `neg_In_axiomsCodeT`) son de nivel `⊢`.
+theorem prf_imp_trans / derives_imp_trans                     -- silogismo hipotético (no existían)
+theorem derives_lineWF_neg_of_tag (h : tagConcl k args = some e)
+    (hne : axioms ⊢ neg (concl =eq e)) : axioms ⊢ neg (lineWF ⟨concl,k,args⟩)
+theorem derives_lineWF_neg_thy_of_not_prf (φ) (hnp : ¬ Prf φ) :   -- ★ compone con `neg_In_axiomsCodeT`
+    axioms ⊢ neg (lineWF (cons (formCode φ) (cons (numeralM 15) nil)))
+```
+
+> ⚠️ **Los 21 esquemas NO son uniformes — `tagConcl` cubre 19, no 21.**
+> * **19 estructurales** (los 18 de esquema **y `gen`**): `lineWF ⟨concl,k,args⟩ ⇔ (concl =eq <expr>(args))`.
+> * **`thy` (15)**: su RHS es `In concl axiomsCodeT` — una **pertenencia**, no una ecuación.
+> * **`mp` (16)**: `lineWF` es **INCONDICIONAL**; queda ligado por `premsOf`.
+>
+> **Ojo al matiz**: NO es el mismo corte que en el módulo A, donde los «raros» eran `thy`/`mp`/`gen`
+> (codificación *lossy*); aquí **`gen` sí es estructural**. `tagPrems` sí cubre los 21.
+>
+> ⚠️ **`mp` NO se puede refutar por `lineWF`** (su esquema es incondicional ⟹ `lineWF ⟨concl,16,a⟩` es
+> SIEMPRE demostrable). Refutar una línea `mp` mala **tiene que ir por `premsOf`/`boundedPremsIn`**.
+> Condiciona el árbol de casos del módulo C.
+
+#### 3.23.2 `Meta/LineWFDerives.lean` — des-duplicación del nivel `⊢`
+
+Los 42 enunciados (21 `lineWF_*` + 21 `premsOf_*`) vivían en `Meta/ProofChain.lean` **probados por
+segunda vez desde los mismos axiomas** que sus gemelos `prf_*`. Aquí son lo que siempre fueron: el
+transporte por **`prf_to_derives : Prf φ → axioms ⊢ φ`**. Enunciados **idénticos**; namespace
+`ProofChain` conservado ⟹ los consumidores (`Representability2` = D1, `DerivCond` = D2) sólo cambian un
+`import`. `ProofChain`: 870 → 540 líneas. `repr_pos'_prf`/`d2_prf` conservan sus axiomas exactos.
+
+#### 3.23.3 ⛔ Paso 3 (`pcc_lineWF_tracked`) BLOQUEADO — los esquemas exigen reformulación
+
+La reflexión punteada del átomo (lo que `hC_dot` espera) debe tratar `lineWF (nthc p i)` con `p`,`i`
+**abstractos** (`pcc_bdAll_intro` introduce el `∀i` con el cuerpo **abierto**). Y con los axiomas
+actuales **la teoría no puede recuperar la forma de una línea abstracta**:
+
+| Axioma | Da | Falta |
+|:--|:--|:--|
+| `ax_lineWF_inv` | el tag es uno de los 21 | — |
+| `ax_lineWF_cons` | `line =eq cons (carc line) (cdrc line)` | sólo el cons de **primer nivel** |
+| `ax_carc`/`ax_cdrc`/`ax_nthc_*` | computan **sólo sobre `cons` explícitos** | no reducen sobre `t` abstracto |
+| los 21 `ax_lineWF_<tag>` | LHS con la **forma exacta** | inaplicables a `t` abstracto |
+
+De `lineWF t` se obtiene `t = cons (carc t) (cdrc t)` y `carc (cdrc t) = k̇`, pero **no** que `cdrc t`
+sea un `cons` ⟹ `ax_lineWF_<k>` no se puede instanciar en `t`. (La nota de `Sigma1AtomPrf.lean` que
+dice que `prf_lineWF_inv` «desbloquea» la reflexión abstracta está **incompleta**: el tag es necesario
+pero **no suficiente**; falta la forma.)
+
+**Salida SANCIONADA (net‑0 axiomas):** reformular los 21 `ax_lineWF_<tag>` a **forma con ACCESORES**:
+
+```lean
+-- en vez de:  ∀concl a b. lineWF (cons concl (cons 0̇ (cons a (cons b nil)))) ⇔ (concl =eq implc a (implc b a))
+-- pasa a:     ∀line. (lineTag line =eq 0̇) ⇒
+--                (lineWF line ⇔ (carc line =eq implc (nthc line 2̇) (implc (nthc line 3̇) (nthc line 2̇))))
+```
+
+Los accesores **sortean la aridad** (están definidos para toda línea), que es justo lo que bloqueaba.
+Es sólido por **realidad hereditaria** (§🔬 A del plan) y los 21 `prf_lineWF_<tag>` conservan su
+enunciado, pasando a ser teoremas del nuevo axioma.
+
+**Estado:** **fase 1 HECHA** (la des-duplicación de §3.23.2, que reduce la reformulación de 42
+re‑pruebas a 21 y de 2 toolkits a 1). **Fase 2 PENDIENTE**: reformular los 21 axiomas + re‑probar los
+21 `prf_lineWF_<tag>`. Toolkit ya validado con p1 (~18 líneas/tag): `prf_lineWF_iff_transport` (vale
+para los 21 — `lineWF L` es un **átomo sin binders**, así que el cancel lift/subst va por
+`substTerm_liftTerm`; **el cancel general a nivel fórmula es FALSO**, ver `FOL/Theorems/Quantifiers.lean`),
+`prf_congr_implc`, y copias locales de `prf_nthc_zero/succ` (`NumListPrf` es posterior a `ReprPrf`).
+
 ---
 
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md)
