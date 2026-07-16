@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ProofChain
+import ROBINSON_PlusPlus.Meta.LineWFDerives
 import ROBINSON_PlusPlus.Meta.Representability
 
 import FOL.FOL

@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ProofChain
+import ROBINSON_PlusPlus.Meta.LineWFDerives
 
 import FOL.FOL
 import FOL.Theorems.Eq
