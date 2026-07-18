@@ -62,6 +62,22 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 >    denso** («subproyecto de 21 casos de tag»).
 > **ARRANCAR por `eqrefl` (tag 12)**: su producción libre de muro `prf_provFromCode_eqCodeFn_refl` ya
 > existe. Cerrar ese caso valida el patrón del paso 4 y mide el coste real por tag antes del batch.
+>
+> **▶ ARRANQUE DE `eqrefl` HECHO (2026‑07‑14):** enunciado fijado
+> (`pcc_lineWF_tracked (t) : Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))`, typechequea); los
+> **pasos 1–5 validados** (inversión + bicondicional‑accesor + reflejar el `=eq` con `pcc_eq_tracked`
+> compila). **Aislado el PASO 6** (la pieza densa que falta), con enunciado EXACTO:
+> ```lean
+> -- transporte codificado del bicondicional ax_lineWF_eqrefl:
+> provFromCode (eqCodeFn (tcFn (carc t)) (tcFn (eqc (nthc t 2̇) (nthc t 2̇))))
+>   ⇒ provFromCode (lineWFCodeFn (tcFn t))
+> ```
+> Construirlo: reflejar el axioma `ax_lineWF_eqrefl` a nivel de código (vía `thy`), instanciarlo en
+> `tcFn t` (`pcc_thm_inst`), descargar la hipótesis del tag codificada, obtener el bicondicional
+> codificado y aplicar `iff.mpr` codificado. Es **común a los 21 casos** (sólo cambia el axioma y la
+> `expr_k`). ⚠️ Nota De Bruijn: hará falta la forma **accesor‑abstracta** del bicondicional
+> (instanciar `ax_lineWF_<k>` en `t` SIN reconstruir a forma explícita), distinta de la
+> `prf_lineWF_<k>` que B.3b dejó (ésa reconstruye la forma explícita).
 > Después C, D, E (`VerifierSound`, riesgo ALTO — sondeo antes; `decodeChain_prf` es la pieza que E
 > ensambla) y F.
 > exige sondeo antes de codificar; `decodeChain_prf` es la pieza que E ensambla) y F.
