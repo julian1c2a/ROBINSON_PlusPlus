@@ -78,6 +78,18 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > `expr_k`). ⚠️ Nota De Bruijn: hará falta la forma **accesor‑abstracta** del bicondicional
 > (instanciar `ax_lineWF_<k>` en `t` SIN reconstruir a forma explícita), distinta de la
 > `prf_lineWF_<k>` que B.3b dejó (ésa reconstruye la forma explícita).
+>
+> **▶ PASO 6 DESRIESGADO (2026‑07‑14):** reflejar `ax_lineWF_eqrefl` con `pcc_thm_inst` (testigo
+> `tcFn t`) produce el bicondicional codificado con forma
+> `provFromCode (substfc zero (tcFn t) (formCode <cuerpo accesor>))` — **la MISMA forma que
+> `hI_dot`/`bddCarcDot` ya dominan** (`inDotAt φ p = substfc zero (tcFn p) (formCode …)`). Y la
+> maquinaria de tracking de accesores **existe**: `pcc_eval_carc_nthc` evalúa `carc(nthc …)` rastreado
+> (`D3InDotPrf` la usa para el `∃i<lenc p. carc(nthc p i)=⌜φ⌝`). **⟹ el paso 6 NO está bloqueado por
+> puentes inexistentes** (el riesgo que se temía); es **composición densa** de: `pcc_thm_inst` (el
+> bicondicional codificado) → distribuir `substfc` sobre `implc`/`iff` (`substCodeF`) → `pcc_mp_code_open`
+> (MP interno) → antecedente del tag por `pcc_eq_tracked`+`pcc_eval_*` → `iff.mpr` codificado con el `=eq`
+> del paso 5. **Es un caso de sesión dedicada, no de minutos.** Arrancar componiendo estas piezas para
+> `eqrefl`; una vez cerrado, los otros 20 casos son el mismo esqueleto cambiando axioma y `expr_k`.
 > Después C, D, E (`VerifierSound`, riesgo ALTO — sondeo antes; `decodeChain_prf` es la pieza que E
 > ensambla) y F.
 > exige sondeo antes de codificar; `decodeChain_prf` es la pieza que E ensambla) y F.
