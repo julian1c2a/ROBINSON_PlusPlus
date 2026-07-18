@@ -999,8 +999,8 @@ def ax_premsOf_mp : Formula :=
 -- La conclusión DEBE ser `forallc body` (bicondicional, como los demás esquemas): de lo contrario el
 -- verificador aceptaría concluir cualquier fórmula desde una premisa en `checked` (insólido).
 def ax_lineWF_gen : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))) ⇔
-    ((.var 1) =eq forallc (.var 0)))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 17)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq forallc (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_gen : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 17) (cons (.var 0) nil))) =eq
     cons (.var 0) nil)
@@ -1034,64 +1034,62 @@ def ax_premsOf_p1 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 0) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- P2: concl ⇔ (a⇒(b⇒c)) ⇒ ((a⇒b)⇒(a⇒c))
 def ax_lineWF_p2 : Formula :=
-  forall_4 (lineWF (cons (.var 3) (cons (numeralM 1) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) ⇔
-    ((.var 3) =eq implc (implc (.var 2) (implc (.var 1) (.var 0)))
-      (implc (implc (.var 2) (.var 1)) (implc (.var 2) (.var 0)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 1)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (implc (nthc (.var 0) (numeralM 2)) (implc (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 4)))) (implc (implc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3))) (implc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 4)))))))
 def ax_premsOf_p2 : Formula :=
   forall_4 (premsOf (cons (.var 3) (cons (numeralM 1) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
 -- C1: concl ⇔ a ⇒ (b ⇒ (a∧b))
 def ax_lineWF_c1 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 2) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (.var 1) (implc (.var 0) (andc (.var 1) (.var 0)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 2)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (nthc (.var 0) (numeralM 2)) (implc (nthc (.var 0) (numeralM 3)) (andc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3)))))))
 def ax_premsOf_c1 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 2) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- C2: concl ⇔ (a∧b) ⇒ a
 def ax_lineWF_c2 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 3) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (andc (.var 1) (.var 0)) (.var 1)))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 3)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (andc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3))) (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_c2 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 3) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- C3: concl ⇔ (a∧b) ⇒ b
 def ax_lineWF_c3 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 4) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (andc (.var 1) (.var 0)) (.var 0)))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 4)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (andc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3))) (nthc (.var 0) (numeralM 3)))))
 def ax_premsOf_c3 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 4) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- J1: concl ⇔ a ⇒ (a∨b)
 def ax_lineWF_j1 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 5) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (.var 1) (orc (.var 1) (.var 0))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 5)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (nthc (.var 0) (numeralM 2)) (orc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3))))))
 def ax_premsOf_j1 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 5) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- J2: concl ⇔ b ⇒ (a∨b)
 def ax_lineWF_j2 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 6) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (.var 0) (orc (.var 1) (.var 0))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 6)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (nthc (.var 0) (numeralM 3)) (orc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3))))))
 def ax_premsOf_j2 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 6) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- J3: concl ⇔ (a∨b) ⇒ ((a⇒c) ⇒ ((b⇒c) ⇒ c))
 def ax_lineWF_j3 : Formula :=
-  forall_4 (lineWF (cons (.var 3) (cons (numeralM 7) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) ⇔
-    ((.var 3) =eq implc (orc (.var 2) (.var 1))
-      (implc (implc (.var 2) (.var 0)) (implc (implc (.var 1) (.var 0)) (.var 0)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 7)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (orc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 3))) (implc (implc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 4))) (implc (implc (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 4))) (nthc (.var 0) (numeralM 4)))))))
 def ax_premsOf_j3 : Formula :=
   forall_4 (premsOf (cons (.var 3) (cons (numeralM 7) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
 -- EFQ: concl ⇔ ⊥ ⇒ a
 def ax_lineWF_efq : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 8) (cons (.var 0) nil))) ⇔
-    ((.var 1) =eq implc botc (.var 0)))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 8)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (botc) (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_efq : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 8) (cons (.var 0) nil))) =eq nil)
 -- EQREFL: concl ⇔ t ≐ t
 def ax_lineWF_eqrefl : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 12) (cons (.var 0) nil))) ⇔
-    ((.var 1) =eq eqc (.var 0) (.var 0)))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 12)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq eqc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_eqrefl : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 12) (cons (.var 0) nil))) =eq nil)
 -- P3: concl ⇔ ((a⇒⊥)⇒⊥) ⇒ a
 def ax_lineWF_p3 : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 14) (cons (.var 0) nil))) ⇔
-    ((.var 1) =eq implc (implc (implc (.var 0) botc) botc) (.var 0)))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 14)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (implc (implc (nthc (.var 0) (numeralM 2)) (botc)) (botc)) (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_p3 : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 14) (cons (.var 0) nil))) =eq nil)
 
@@ -1102,53 +1100,44 @@ se cierra con los `*_concl_code` (StepArith) y `ind_concl_code` (Induction). -/
 
 -- Q1 (tag 9, [A,t]): concl ⇔ (∀A) ⇒ A[t]
 def ax_lineWF_q1 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 9) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (forallc (.var 1)) (substfc zero (.var 0) (.var 1))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 9)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (forallc (nthc (.var 0) (numeralM 2))) (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))))))
 def ax_premsOf_q1 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 9) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- Q2 (tag 10, [A,t]): concl ⇔ A[t] ⇒ ∃A
 def ax_lineWF_q2 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 10) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (substfc zero (.var 0) (.var 1)) (exc (.var 1))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 10)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))) (exc (nthc (.var 0) (numeralM 2))))))
 def ax_premsOf_q2 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 10) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- Q3 (tag 11, [A,B]): concl ⇔ (∀(A ⇒ ↑B)) ⇒ ((∃A) ⇒ B)
 def ax_lineWF_q3 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 11) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (forallc (implc (.var 1) (liftfc zero (.var 0)))) (implc (exc (.var 1)) (.var 0))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 11)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (forallc (implc (nthc (.var 0) (numeralM 2)) (liftfc (zero) (nthc (.var 0) (numeralM 3))))) (implc (exc (nthc (.var 0) (numeralM 2))) (nthc (.var 0) (numeralM 3))))))
 def ax_premsOf_q3 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 11) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- LEIBNIZ (tag 13, [A,t₁,t₂]): concl ⇔ (t₁≐t₂) ⇒ (A[t₁] ⇒ A[t₂])
 def ax_lineWF_leibniz : Formula :=
-  forall_4 (lineWF (cons (.var 3) (cons (numeralM 13) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) ⇔
-    ((.var 3) =eq implc (eqc (.var 1) (.var 0))
-      (implc (substfc zero (.var 1) (.var 2)) (substfc zero (.var 0) (.var 2)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 13)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (eqc (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 4))) (implc (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))) (substfc (zero) (nthc (.var 0) (numeralM 4)) (nthc (.var 0) (numeralM 2)))))))
 def ax_premsOf_leibniz : Formula :=
   forall_4 (premsOf (cons (.var 3) (cons (numeralM 13) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
 -- IND (tag 18, [a]): concl ⇔ reconstrucción de inducción (códigos cerrados de O y σ#0)
 def ax_lineWF_ind : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 18) (cons (.var 0) nil))) ⇔
-    ((.var 1) =eq implc (substfc zero (termCodeM zero) (.var 0))
-      (implc (forallc (implc (.var 0)
-                (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) (.var 0)))))
-             (forallc (.var 0)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 18)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (substfc (zero) (termCodeM zero) (nthc (.var 0) (numeralM 2))) (implc (forallc (implc (nthc (.var 0) (numeralM 2)) (substfc (zero) (termCodeM (succ (.var 0))) (liftfc (succ zero) (nthc (.var 0) (numeralM 2)))))) (forallc (nthc (.var 0) (numeralM 2)))))))
 def ax_premsOf_ind : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 18) (cons (.var 0) nil))) =eq nil)
 -- QCONF (tag 19, [P,C]): concl ⇔ (∀(↑P ⇒ C)) ⇒ (P ⇒ ∀C)  (confinamiento ∀)
 def ax_lineWF_qconf : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 19) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (forallc (implc (liftfc zero (.var 1)) (.var 0)))
-                        (implc (.var 1) (forallc (.var 0)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 19)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (forallc (implc (liftfc (zero) (nthc (.var 0) (numeralM 2))) (nthc (.var 0) (numeralM 3)))) (implc (nthc (.var 0) (numeralM 2)) (forallc (nthc (.var 0) (numeralM 3)))))))
 def ax_premsOf_qconf : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 19) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- LISTIND (tag 20, [A]): concl ⇔ inducción de listas (códigos cerrados de nil y cons#1#0)
 def ax_lineWF_listInd : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 20) (cons (.var 0) nil))) ⇔
-    ((.var 1) =eq implc (substfc zero (termCodeM nil) (.var 0))
-      (implc (forallc (forallc (implc (liftfc (succ zero) (.var 0))
-                (substfc zero (termCodeM (cons (.var 1) (.var 0)))
-                  (liftfc (succ (succ zero)) (liftfc (succ zero) (.var 0)))))))
-             (forallc (.var 0)))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 20)
+    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (substfc (zero) (termCodeM nil) (nthc (.var 0) (numeralM 2))) (implc (forallc (forallc (implc (liftfc (succ zero) (nthc (.var 0) (numeralM 2))) (substfc (zero) (termCodeM (cons (.var 1) (.var 0))) (liftfc (succ (succ zero)) (liftfc (succ zero) (nthc (.var 0) (numeralM 2)))))))) (forallc (nthc (.var 0) (numeralM 2)))))))
 def ax_premsOf_listInd : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 20) (cons (.var 0) nil))) =eq nil)
 
