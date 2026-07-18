@@ -47,23 +47,23 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > **NO es el mismo corte que en el módulo A** (allí los raros eran `thy`/`mp`/`gen`; aquí `gen` SÍ es
 > estructural).
 >
-> ### 🔖 SIGUIENTE PASO CONCRETO: **B.3b — reformular los 21 `ax_lineWF_<tag>` a ACCESORES**
-> **SANCIONADO por el usuario (net‑0 axiomas).** Sin esto, `lineWF` **NO es reflejable sobre líneas
-> abstractas** y `hC_dot`/D3 sigue bloqueado: `pcc_bdAll_intro` introduce el `∀i` con el cuerpo
-> **abierto**, así que hay que tratar `lineWF (nthc p i)` con `p`,`i` abstractos — y de `lineWF t` la
-> teoría **no puede recuperar la forma de `t`** (`ax_lineWF_cons` sólo da el cons de primer nivel;
-> `carc`/`cdrc`/`nthc` sólo computan sobre `cons` explícitos). Los **accesores sortean la aridad**.
-> ```lean
-> -- de:  ∀concl a b. lineWF (cons concl (cons 0̇ (cons a (cons b nil)))) ⇔ (concl =eq implc a (implc b a))
-> -- a:   ∀line. (lineTag line =eq 0̇) ⇒
->           (lineWF line ⇔ (carc line =eq implc (nthc line 2̇) (implc (nthc line 3̇) (nthc line 2̇))))
-> ```
-> **Toolkit ya validado con p1 (~18 líneas/tag)**: `prf_lineWF_iff_transport` (vale para los 21 —
-> `lineWF L` es un **átomo sin binders** ⟹ el cancel lift/subst va por `substTerm_liftTerm`; ⚠️ **el
-> cancel general a nivel fórmula es FALSO**, ver `FOL/Theorems/Quantifiers.lean`), `prf_congr_implc`, y
-> copias locales de `prf_nthc_zero/succ` (`NumListPrf` es **posterior** a `ReprPrf`). Los 21
-> `prf_lineWF_<tag>` **conservan su enunciado** (pasan a ser teoremas del axioma nuevo).
-> Luego **B.3c** = `pcc_lineWF_tracked` → `hC_dot`. Después C, D, E (`VerifierSound`, riesgo ALTO —
+> ### 🔖 SIGUIENTE PASO CONCRETO: **B.3c — `pcc_lineWF_tracked`** (el átomo `lineWF` punteado)
+> **B.3a/B.3b HECHO**: nivel `⊢` des‑duplicado (`Meta/LineWFDerives.lean`) y los **19 `ax_lineWF`
+> estructurales reformulados a ACCESORES** (net‑0 axiomas; los 21 `prf_lineWF_<tag>` conservan
+> enunciado; D1/D2 intactos). Con eso `lineWF` ya es **reflejable sobre líneas abstractas**.
+>
+> **B.3c** = `pcc_lineWF_tracked (t) : Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))` — la
+> reflexión punteada que `hC_dot` consume. Plan (diseño §16), **21 casos** de reflexión codificada:
+> 1. `prf_lineWF_inv t` da `⋁_{k} (lineTag t =eq k̇)` → `PrfH_or_elim` de 21 ramas.
+> 2. En la rama `k`: el bicondicional‑accesor `prf_lineWF_<k>` reduce `lineWF t` a `carc t =eq expr_k`.
+> 3. Reflejar ese `=eq` con **`pcc_eq_tracked`** (libre de muro).
+> 4. **Transportar de vuelta** reflejando `ax_lineWF_<k>` a nivel de código (patrón
+>    `PropCodePrf.pcc_p1_code`/`pcc_ind_code`) + `pcc_thm_inst`/`pcc_mp_code`. **Paso 4 = el corazón
+>    denso** («subproyecto de 21 casos de tag»).
+> **ARRANCAR por `eqrefl` (tag 12)**: su producción libre de muro `prf_provFromCode_eqCodeFn_refl` ya
+> existe. Cerrar ese caso valida el patrón del paso 4 y mide el coste real por tag antes del batch.
+> Después C, D, E (`VerifierSound`, riesgo ALTO — sondeo antes; `decodeChain_prf` es la pieza que E
+> ensambla) y F.
 > exige sondeo antes de codificar; `decodeChain_prf` es la pieza que E ensambla) y F.
 >
 > **⚠️ DOS TRAMPAS YA DIAGNOSTICADAS — no re‑descubrirlas** (documentadas dentro de `CodeDecode.lean`):

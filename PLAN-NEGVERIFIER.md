@@ -76,8 +76,8 @@ por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no bast
 | **B.1** | `LineWFCases`: tabla (`tagArity`/`tagConcl`/`tagPrems`) + envoltorios uniformes | ✅ **HECHO** (`2c03993`) |
 | **B.2** | `LineWFCases`: dirección **negativa** (sirve a C) | ✅ **HECHO** (`722dff9`) |
 | **B.3a** | Des‑duplicar los 42 `lineWF_*`/`premsOf_*` de `⊢` (`LineWFDerives`) | ✅ **HECHO** (`d536f19`) |
-| **B.3b** | **Reformular los 21 `ax_lineWF_<tag>` a ACCESORES** (net‑0 axiomas, SANCIONADO) | ⏳ **← SIGUIENTE** |
-| **B.3c** | `pcc_lineWF_tracked` (reflexión punteada, sirve a `hC_dot`/D3) | ⏳ (depende de B.3b) |
+| **B.3b** | Reformular los 19 `ax_lineWF` estructurales a ACCESORES (net‑0 axiomas) | ✅ **HECHO** (`e33eef0`,`5bc0dbc`) |
+| **B.3c** | `pcc_lineWF_tracked` (reflexión punteada, sirve a `hC_dot`/D3) | ⏳ **← SIGUIENTE** (21 casos; arrancar por `eqrefl`) |
 | C–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
 
 **Paso 0.5 — opciones (a decidir con el usuario):**

@@ -1048,11 +1048,11 @@ transporte por **`prf_to_derives : Prf φ → axioms ⊢ φ`**. Enunciados **id�
 `ProofChain` conservado ⟹ los consumidores (`Representability2` = D1, `DerivCond` = D2) sólo cambian un
 `import`. `ProofChain`: 870 → 540 líneas. `repr_pos'_prf`/`d2_prf` conservan sus axiomas exactos.
 
-#### 3.23.3 ⛔ Paso 3 (`pcc_lineWF_tracked`) BLOQUEADO — los esquemas exigen reformulación
+#### 3.23.3 Paso 3 — los esquemas a ACCESORES (`ax_lineWF_<tag>` **B.3b HECHO**) → `pcc_lineWF_tracked` (B.3c)
 
 La reflexión punteada del átomo (lo que `hC_dot` espera) debe tratar `lineWF (nthc p i)` con `p`,`i`
-**abstractos** (`pcc_bdAll_intro` introduce el `∀i` con el cuerpo **abierto**). Y con los axiomas
-actuales **la teoría no puede recuperar la forma de una línea abstracta**:
+**abstractos** (`pcc_bdAll_intro` introduce el `∀i` con el cuerpo **abierto**). Y con los axiomas en su
+forma **explícita** original **la teoría no podía recuperar la forma de una línea abstracta**:
 
 | Axioma | Da | Falta |
 |:--|:--|:--|
@@ -1078,12 +1078,25 @@ Los accesores **sortean la aridad** (están definidos para toda línea), que es 
 Es sólido por **realidad hereditaria** (§🔬 A del plan) y los 21 `prf_lineWF_<tag>` conservan su
 enunciado, pasando a ser teoremas del nuevo axioma.
 
-**Estado:** **fase 1 HECHA** (la des-duplicación de §3.23.2, que reduce la reformulación de 42
-re‑pruebas a 21 y de 2 toolkits a 1). **Fase 2 PENDIENTE**: reformular los 21 axiomas + re‑probar los
-21 `prf_lineWF_<tag>`. Toolkit ya validado con p1 (~18 líneas/tag): `prf_lineWF_iff_transport` (vale
-para los 21 — `lineWF L` es un **átomo sin binders**, así que el cancel lift/subst va por
-`substTerm_liftTerm`; **el cancel general a nivel fórmula es FALSO**, ver `FOL/Theorems/Quantifiers.lean`),
-`prf_congr_implc`, y copias locales de `prf_nthc_zero/succ` (`NumListPrf` es posterior a `ReprPrf`).
+**B.3a HECHO** (`d536f19`): des-duplicación de §3.23.2 (reduce la reformulación de 42 re‑pruebas a 21 y
+de 2 toolkits a 1). **B.3b HECHO** (`e33eef0`, `5bc0dbc`): **los 19 esquemas estructurales reformulados
+a accesores** (`p1 p2 c1 c2 c3 j1 j2 j3 efq q1 q2 q3 eqrefl leibniz p3 ind qconf listInd gen`; `thy` va
+por `In` y `mp` es incondicional ⟹ NO se reforman). Net‑0 axiomas; los 21 `prf_lineWF_<tag>` conservan
+su enunciado (`[propext, choice, Quot.sound]`); D1/D2 con axiomas intactos. Generados mecánicamente.
+Toolkit en `ReprPrf`: `prf_lineWF_iff_transport` (vale para los 21 — `lineWF L` es un **átomo sin
+binders** ⟹ el cancel lift/subst va por `substTerm_liftTerm`; ⚠️ **el cancel general a nivel fórmula es
+FALSO**, `FOL/Theorems/Quantifiers.lean`), `prf_congr_bin1/bin2/un/bin` (des‑duplicadas de `ArithPrf`),
+copias privadas `prf_congr_substfc_a2/a3_loc`/`prf_congr_liftfc_a2_loc`/`prf_nthc_zero/succ_loc`.
+Escollos: `ind`/`listInd` (términos gigantes) exigieron `have hy` explícito + `maxRecDepth 16000`.
+
+**B.3c PENDIENTE — `pcc_lineWF_tracked`** (`Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))`, el
+átomo `lineWF` punteado que `hC_dot` consume). Ahora **desbloqueado** por B.3b. Plan (diseño §16), 21
+casos: (1) `prf_lineWF_inv t` da `⋁_{k} (lineTag t =eq k̇)` → `PrfH_or_elim`; (2) en la rama `k`, el
+bicondicional‑accesor `prf_lineWF_<k>` reduce `lineWF t` a `carc t =eq expr_k` (un `=eq`); (3) reflejar
+ese `=eq` con `pcc_eq_tracked` (libre de muro); (4) **transportar de vuelta** reflejando `ax_lineWF_<k>`
+a nivel de código (patrón `PropCodePrf.pcc_p1_code`/`pcc_ind_code`) + `pcc_thm_inst`/`pcc_mp_code`. El
+paso 4 es el corazón denso (el «subproyecto de 21 casos de tag»). Arrancar por `eqrefl` (tag 12): su
+producción libre de muro `prf_provFromCode_eqCodeFn_refl` ya existe como referencia.
 
 ---
 
