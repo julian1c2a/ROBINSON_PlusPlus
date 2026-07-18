@@ -52,15 +52,8 @@ theorem prf_eq_congr_succ {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (su
 
 /-! ### Congruencias de constructor en `Prf` (vía `cons`) y `substfc` -/
 
-theorem prf_congr_bin1 {T x x' y : Term} (h : Prf (x =eq x')) :
-    Prf (cons T (cons x (cons y nil)) =eq cons T (cons x' (cons y nil))) :=
-  prf_congr_cons_tail (prf_congr_cons_head h)
-theorem prf_congr_bin2 {T x y y' : Term} (h : Prf (y =eq y')) :
-    Prf (cons T (cons x (cons y nil)) =eq cons T (cons x (cons y' nil))) :=
-  prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head h))
-theorem prf_congr_un {T x x' : Term} (h : Prf (x =eq x')) :
-    Prf (cons T (cons x nil) =eq cons T (cons x' nil)) :=
-  prf_congr_cons_tail (prf_congr_cons_head h)
+-- `prf_congr_bin1`/`prf_congr_bin2`/`prf_congr_un` se movieron a `Meta/ReprPrf.lean` (§44), donde los
+-- necesitan las re-pruebas de `prf_lineWF_<tag>` en forma de accesores. Aquí se heredan por el import.
 
 /-- Congruencia de `substfc` en el 2º argumento (el substituyendo). -/
 theorem prf_congr_substfc_arg2 {x z a b : Term} (h : Prf (a =eq b)) :
@@ -554,9 +547,6 @@ end ROBINSON_PlusPlus.Meta.ArithPrf
 export ROBINSON_PlusPlus.Meta.ArithPrf (
   prf_ex_intro
   prf_eq_congr_succ
-  prf_congr_bin1
-  prf_congr_bin2
-  prf_congr_un
   prf_congr_substfc_arg2
   prf_congr_substfc_arg3
   prf_gnum_lt

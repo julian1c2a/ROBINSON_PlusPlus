@@ -176,6 +176,67 @@ theorem prf_carc_cons (h t : Term) : Prf (carc (cons h t) =eq h) := by
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-! ### §44 — toolkit para los esquemas `lineWF` en forma de ACCESORES
+
+Los `ax_lineWF_<tag>` están en forma de accesores (`carc`/`nthc`), no de forma explícita: es lo que los
+hace aplicables a líneas **abstractas** (§44, `Meta/LineWFCases.lean`, §3.23.3 de la doc). Recuperar el
+enunciado explícito exige (i) computar los accesores y (ii) **transportar** el bicondicional. `prf_nthc_*`
+vive en `NumListPrf`, POSTERIOR a este módulo ⟹ copias locales; y las congruencias de constructor
+(`ArithPrf`, también posterior) se reconstruyen aquí desde `prf_congr_cons_head/tail`. -/
+
+/-- `nthc (cons h t) 0 = h` (copia local; `NumListPrf` es posterior). -/
+private theorem prf_nthc_zero_loc (h t : Term) : Prf (nthc (cons h t) zero =eq h) := by
+  have hh := prf_spec (prf_spec (prf_ax (show ax_nthc_zero ∈ axioms by simp [axioms])) h) t
+  simpa [ax_nthc_zero, substFormula, substTerm, substTerms, nthc, cons, zero,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+
+/-- `nthc (cons h t) (σ i) = nthc t i` (copia local). -/
+private theorem prf_nthc_succ_loc (h t i : Term) :
+    Prf (nthc (cons h t) (succ i) =eq nthc t i) := by
+  have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_nthc_succ ∈ axioms by simp [axioms])) h) t) i
+  simpa [ax_nthc_succ, substFormula, substTerm, substTerms, nthc, cons, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+
+/-- Congruencia binaria genérica en el tag `T` (sirve para `eqc`/`implc`/`andc`/`orc`), arg 1. -/
+theorem prf_congr_bin1 {T x x' y : Term} (h : Prf (x =eq x')) :
+    Prf (cons T (cons x (cons y nil)) =eq cons T (cons x' (cons y nil))) :=
+  prf_congr_cons_tail (prf_congr_cons_head h)
+/-- Congruencia binaria genérica, arg 2. -/
+theorem prf_congr_bin2 {T x y y' : Term} (h : Prf (y =eq y')) :
+    Prf (cons T (cons x (cons y nil)) =eq cons T (cons x (cons y' nil))) :=
+  prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head h))
+/-- Congruencia unaria genérica (sirve para `forallc`/`exc`). -/
+theorem prf_congr_un {T x x' : Term} (h : Prf (x =eq x')) :
+    Prf (cons T (cons x nil) =eq cons T (cons x' nil)) :=
+  prf_congr_cons_tail (prf_congr_cons_head h)
+
+/-- Congruencia binaria completa (ambos args). -/
+theorem prf_congr_bin {T x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
+    Prf (cons T (cons x (cons y nil)) =eq cons T (cons x' (cons y' nil))) :=
+  prf_eq_trans (prf_congr_bin1 hx) (prf_congr_bin2 hy)
+
+-- (los wrappers por‑constructor `prf_congr_implc`/`andc`/… se omiten: colisionan con copias
+-- locales de módulos posteriores; las pruebas usan las genéricas `prf_congr_bin`/`prf_congr_un`.)
+
+/-- Transporte de `lineWF L ⇔ (x =eq y)` por igualdades provables en ambos lados. Vale para los 21
+    tags: `lineWF L` es un ÁTOMO (sin binders) ⟹ el cancel lift/subst va por `substTerm_liftTerm`
+    (el cancel general a nivel fórmula es FALSO, ver `FOL/Theorems/Quantifiers.lean`). -/
+theorem prf_lineWF_iff_transport {L x x' y y' : Term}
+    (h : Prf (lineWF L ⇔ (x =eq y))) (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
+    Prf (lineWF L ⇔ (x' =eq y')) := by
+  have h1 : Prf (lineWF L ⇔ (x' =eq y)) := by
+    let A : Formula := iff (lineWF (liftTerm 0 L)) (Formula.eq (.var 0) (liftTerm 0 y))
+    have hS : ∀ s : Term, substFormula 0 s A = iff (lineWF L) (Formula.eq s y) := by
+      intro s
+      simp only [A, iff, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+    exact (hS x') ▸ prf_leibniz_subst (A := A) hx ((hS x) ▸ h)
+  let B : Formula := iff (lineWF (liftTerm 0 L)) (Formula.eq (liftTerm 0 x') (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s B = iff (lineWF L) (Formula.eq x' s) := by
+    intro s
+    simp only [B, iff, lineWF, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS y') ▸ prf_leibniz_subst (A := B) hy ((hS y) ▸ h1)
+
+
 theorem prf_concat_nil_eq (X : Term) : Prf (concat nil X =eq X) := by
   have hh := prf_spec (prf_ax (show ax_C1_concat_nil ∈ axioms by simp [axioms])) X
   simp [ax_C1_concat_nil, substFormula, substTerm, substTerms, concat, nil, zero] at hh
@@ -286,14 +347,27 @@ theorem prf_premsOf_thy (concl : Term) :
 
 /-! ### `lineWF`/`premsOf` de los esquemas proposicionales en `Prf` (porte de ProofChain) -/
 
-/-- P1. -/
+/-- P1. Recuperado del axioma en forma de accesores (§44): instanciar en la línea explícita,
+    descargar la hipótesis del tag (`nthc L 1 =eq 0`) por cómputo, y transportar los accesores
+    (`carc L → concl`, `nthc L 2/3 → a/b`). -/
 theorem prf_lineWF_p1 (concl a b : Term) :
     Prf (lineWF (cons concl (cons (numeralM 0) (cons a (cons b nil)))) ⇔
       (concl =eq implc a (implc b a))) := by
-  have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_lineWF_p1 ∈ axioms by simp [axioms])) concl) a) b
-  simp [ax_lineWF_p1, substFormula, substTerm, substTerms, lineWF, implc, numeralM, cons, nil,
-    zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
-  exact hh
+  have hax := prf_spec (prf_ax (show ax_lineWF_p1 ∈ axioms by simp [axioms]))
+    (cons concl (cons (numeralM 0) (cons a (cons b nil))))
+  simp only [ax_lineWF_p1, substFormula, substTerm, substTerms, lineWF, carc, nthc, implc,
+    numeralM, cons, nil, zero, succ, iff, FOL.substTerm_liftTerm] at hax
+  have htag : Prf (nthc (cons concl (cons (numeralM 0) (cons a (cons b nil)))) (succ zero)
+      =eq numeralM 0) :=
+    prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
+  have hc : Prf (carc (cons concl (cons (numeralM 0) (cons a (cons b nil)))) =eq concl) :=
+    prf_carc_cons _ _
+  have h2 : Prf (nthc (cons concl (cons (numeralM 0) (cons a (cons b nil)))) (numeralM 2) =eq a) :=
+    prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))
+  have h3 : Prf (nthc (cons concl (cons (numeralM 0) (cons a (cons b nil)))) (numeralM 3) =eq b) :=
+    prf_eq_trans (prf_nthc_succ_loc _ _ _)
+      (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)))
+  exact prf_lineWF_iff_transport (prf_mp hax htag) hc (prf_congr_bin h2 (prf_congr_bin h3 h2))
 theorem prf_premsOf_p1 (concl a b : Term) :
     Prf (premsOf (cons concl (cons (numeralM 0) (cons a (cons b nil)))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_spec (prf_ax (show ax_premsOf_p1 ∈ axioms by simp [axioms])) concl) a) b
@@ -569,6 +643,8 @@ theorem prf_premsOf_qconf (concl P C : Term) :
 end ROBINSON_PlusPlus.Meta.ReprPrf
 
 export ROBINSON_PlusPlus.Meta.ReprPrf (
+  prf_congr_bin1 prf_congr_bin2 prf_congr_un prf_congr_bin
+  prf_lineWF_iff_transport
   prf_ax
   prf_spec
   prf_mp

@@ -1019,10 +1019,17 @@ fidelidad: la conclusión debe ser la instancia correcta del esquema (si fuese `
 se podría fabricar `⊢ provCodeC' ⊥`). `premsOf = nil` (sin premisas de contexto).
 Las reconstrucciones reproducen el RHS de los `ax_vpf_*`. -/
 
--- P1: concl ⇔ a ⇒ (b ⇒ a)
+-- P1: concl ⇔ a ⇒ (b ⇒ a).
+-- ⚠️ Forma con ACCESORES (`carc`/`nthc`), NO con forma explícita: es lo que la hace aplicable a una
+-- línea ABSTRACTA (de `lineWF t` con `t` abstracto la teoría no puede recuperar la forma de `t` —no hay
+-- axioma que la dé—, pero los accesores están siempre definidos). Equivalente al esquema explícito
+-- sobre las líneas que el encoder produce; su `prf_lineWF_p1` (§44, `ReprPrf`) recupera el enunciado
+-- explícito. Los args van en `nthc line 2̇/3̇/…`; el tag se descarga con `lineTag line =eq k̇`.
 def ax_lineWF_p1 : Formula :=
-  forall_3 (lineWF (cons (.var 2) (cons (numeralM 0) (cons (.var 1) (cons (.var 0) nil)))) ⇔
-    ((.var 2) =eq implc (.var 1) (implc (.var 0) (.var 1))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 0)
+    (lineWF (.var 0) ⇔
+      ((carc (.var 0)) =eq implc (nthc (.var 0) (numeralM 2))
+        (implc (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))))))
 def ax_premsOf_p1 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 0) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
 -- P2: concl ⇔ (a⇒(b⇒c)) ⇒ ((a⇒b)⇒(a⇒c))
