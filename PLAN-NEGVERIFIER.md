@@ -77,7 +77,7 @@ por eso `formCode_ne` funciona y `canon_ne` no. **Pero incluso esa clase no bast
 | **B.2** | `LineWFCases`: dirección **negativa** (sirve a C) | ✅ **HECHO** (`722dff9`) |
 | **B.3a** | Des‑duplicar los 42 `lineWF_*`/`premsOf_*` de `⊢` (`LineWFDerives`) | ✅ **HECHO** (`d536f19`) |
 | **B.3b** | Reformular los 19 `ax_lineWF` estructurales a ACCESORES (net‑0 axiomas) | ✅ **HECHO** (`e33eef0`,`5bc0dbc`) |
-| **B.3c** | `pcc_lineWF_tracked` (reflexión punteada, sirve a `hC_dot`/D3) | ⏳ **← SIGUIENTE** (21 casos; arrancar por `eqrefl`) |
+| **B.3c** | `pcc_lineWF_tracked` (reflexión punteada, sirve a `hC_dot`/D3) | 🔄 **EN CURSO** (eqrefl: columna vertebral del paso 6 ✅; falta evaluación provable de antecedentes + inversión ×21) |
 | C–F | resto del plan (abajo), con la clase de testigos corregida | ⏳ |
 
 **Paso 0.5 — opciones (a decidir con el usuario):**

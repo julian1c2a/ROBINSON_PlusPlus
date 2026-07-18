@@ -1089,14 +1089,26 @@ FALSO**, `FOL/Theorems/Quantifiers.lean`), `prf_congr_bin1/bin2/un/bin` (des‑d
 copias privadas `prf_congr_substfc_a2/a3_loc`/`prf_congr_liftfc_a2_loc`/`prf_nthc_zero/succ_loc`.
 Escollos: `ind`/`listInd` (términos gigantes) exigieron `have hy` explícito + `maxRecDepth 16000`.
 
-**B.3c PENDIENTE — `pcc_lineWF_tracked`** (`Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))`, el
-átomo `lineWF` punteado que `hC_dot` consume). Ahora **desbloqueado** por B.3b. Plan (diseño §16), 21
-casos: (1) `prf_lineWF_inv t` da `⋁_{k} (lineTag t =eq k̇)` → `PrfH_or_elim`; (2) en la rama `k`, el
-bicondicional‑accesor `prf_lineWF_<k>` reduce `lineWF t` a `carc t =eq expr_k` (un `=eq`); (3) reflejar
-ese `=eq` con `pcc_eq_tracked` (libre de muro); (4) **transportar de vuelta** reflejando `ax_lineWF_<k>`
-a nivel de código (patrón `PropCodePrf.pcc_p1_code`/`pcc_ind_code`) + `pcc_thm_inst`/`pcc_mp_code`. El
-paso 4 es el corazón denso (el «subproyecto de 21 casos de tag»). Arrancar por `eqrefl` (tag 12): su
-producción libre de muro `prf_provFromCode_eqCodeFn_refl` ya existe como referencia.
+**B.3c EN CURSO — `pcc_lineWF_tracked`** (el átomo `lineWF` punteado que `hC_dot` consume). Desbloqueado
+por B.3b. Enunciado (refinado al arrancar — la **forma dotada** `substfc zero (tcFn t) (formCode …)`,
+análoga exacta a `inDot`, NO `lineWFCodeFn (tcFn t)`):
+`Prf (lineWF t ⇒ provFromCode (substfc zero (tcFn t) (formCode (lineWF #0))))`. Plan (diseño §16),
+21 casos: (1) `prf_lineWF_inv t` da `⋁_{k} (lineTag t =eq k̇)` → `PrfH_or_elim`; (2) en la rama `k`, el
+bicondicional‑accesor reduce `lineWF t` a `carc t =eq expr_k`; (3) reflejar ese `=eq`; (4) **transportar
+de vuelta** por el bicondicional codificado (el corazón denso, «subproyecto de 21 casos»).
+
+**Arranque de `eqrefl` (tag 12), progreso:**
+* **Pasos 1–3 validados** (inversión + bicondicional‑accesor + `pcc_eq_tracked`).
+* **PASO 4 — columna vertebral CONSTRUIDA y compilando** (`[propext, choice, Quot.sound, prf_inAxC]`),
+  confirmando la plantilla `pcc_bddDot_imp_inDot`: **`hbwd`** = `∀.(tag ⇒ (=eq ⇒ lineWF))` (dirección ⇐
+  currificada bajo el tag: `Prf.gen` + `prf_deduction`×2 + `iff.mpr` interno vía `Prf₀.c3`); y
+  **`paso6_backbone`** = `Prov(⌜implc TAG_dot (implc EQ_dot LWF_dot)⌝)` (reflejar `hbwd` con
+  `pcc_thm_inst` testigo `tcFn t` → distribuir `substfc` con `prf_substfc_impl`×2 → `prf_provCode_congr`).
+  Código exacto en `NEXT-STEPS.md`.
+* **FALTA (capa densa restante):** reflejar `TAG_dot`/`EQ_dot` (= `Prov(⌜nthc t 1 =eq 12⌝)` y
+  `Prov(⌜carc t =eq …⌝)`) vía **evaluación provable** (`pcc_eval_nthc`/`pcc_eval_carc_nthc`, DENTRO de
+  `Prov` bajo cota `i<lenc` — NO `pcc_eq_tracked` directo, que sería **Tarski**); dos `pcc_mp_code_open`;
+  y envolver con la inversión (`PrfH_or_elim`×21). Es un bloque denso en sí (como `bddCarcDot`).
 
 ---
 
