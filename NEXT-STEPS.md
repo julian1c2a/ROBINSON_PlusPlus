@@ -90,6 +90,29 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > (MP interno) → antecedente del tag por `pcc_eq_tracked`+`pcc_eval_*` → `iff.mpr` codificado con el `=eq`
 > del paso 5. **Es un caso de sesión dedicada, no de minutos.** Arrancar componiendo estas piezas para
 > `eqrefl`; una vez cerrado, los otros 20 casos son el mismo esqueleto cambiando axioma y `expr_k`.
+>
+> **▶ COLUMNA VERTEBRAL DEL PASO 6 CONSTRUIDA (2026‑07‑14, compila limpio, `[propext,choice,Quot.sound,prf_inAxC]`).**
+> Confirma la plantilla `pcc_bddDot_imp_inDot`. Código de referencia (para eqrefl; probar en un módulo
+> tras `MpCodePrf`+`ArithPrf`+`Sigma1AtomPrf`):
+> ```lean
+> abbrev TAG : Formula := nthc (.var 0) (succ zero) =eq numeralM 12
+> abbrev EQ  : Formula := carc (.var 0) =eq eqc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 2))
+> abbrev LWF : Formula := lineWF (.var 0)
+> abbrev TAG_dot (t) : Term := substfc zero (tcFn t) (formCode TAG)   -- idem EQ_dot, LWF_dot
+> -- hbwd: ∀.(TAG ⇒ (EQ ⇒ LWF)) — dirección ⇐ del bicondicional, currificada bajo el tag:
+> --   Prf.gen; prf_spec del axioma ax_lineWF_eqrefl (accesor) en .var 0; prf_deduction×2;
+> --   iff.mpr interno con c3 (Prf₀.c3) + MP.  [COMPILA]
+> -- paso6_backbone: Prf (provFromCode (implc (TAG_dot t) (implc (EQ_dot t) (LWF_dot t)))):
+> --   pcc_thm_inst (TAG⇒(EQ⇒LWF)) hbwd (tcFn t)  →  prf_substfc_impl ×2 (distribuye substfc)
+> --   →  prf_provCode_congr.  [COMPILA]
+> ```
+> **FALTA (la capa densa restante):** (a) reflejar `TAG_dot t` = `Prov(⌜nthc t 1 =eq 12⌝)` y `EQ_dot t`
+> = `Prov(⌜carc t =eq eqc(nthc t 2)(nthc t 2)⌝)` vía **evaluación provable** (`pcc_eval_nthc` /
+> `pcc_eval_carc_nthc`, que operan DENTRO de `Prov` bajo cota `i<lenc`; de `lineWF t` sale la cota y la
+> estructura de `t`); (b) dos `pcc_mp_code_open` (MP interno con TAG_dot y EQ_dot) → `provFromCode (LWF_dot t)`;
+> (c) envolver con la inversión `prf_lineWF_inv` (`PrfH_or_elim` ×21) para el teorema completo. ⚠️ El
+> encaje forma‑`substfc`/forma‑`tcFn` NO va por `pcc_eq_tracked` directo (sería Tarski) sino por la
+> evaluación provable — que es justo lo que `pcc_eval_*` resuelve.
 > Después C, D, E (`VerifierSound`, riesgo ALTO — sondeo antes; `decodeChain_prf` es la pieza que E
 > ensambla) y F.
 > exige sondeo antes de codificar; `decodeChain_prf` es la pieza que E ensambla) y F.
