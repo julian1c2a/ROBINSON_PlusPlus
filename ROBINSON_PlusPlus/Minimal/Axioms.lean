@@ -1080,10 +1080,12 @@ def ax_lineWF_efq : Formula :=
     (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq implc (botc) (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_efq : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 8) (cons (.var 0) nil))) =eq nil)
--- EQREFL: concl ⇔ t ≐ t
+-- EQREFL: concl ⇔ t ≐ t.  Esquema ESTRICTO (A): añade `lenc = 3` (estructura canónica de la
+-- línea `⟨concl, 12, arg⟩`), que fuerza las cotas `1 < lenc`, `2 < lenc` de la reflexión punteada.
 def ax_lineWF_eqrefl : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 12)
-    (lineWF (.var 0) ⇔ ((carc (.var 0)) =eq eqc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 2)))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 3)
+      ((carc (.var 0)) =eq eqc (nthc (.var 0) (numeralM 2)) (nthc (.var 0) (numeralM 2)))))
 def ax_premsOf_eqrefl : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 12) (cons (.var 0) nil))) =eq nil)
 -- P3: concl ⇔ ((a⇒⊥)⇒⊥) ⇒ a

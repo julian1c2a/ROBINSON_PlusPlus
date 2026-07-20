@@ -6,12 +6,16 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+import ROBINSON_PlusPlus.Meta.EvalListPrf
+import ROBINSON_PlusPlus.Meta.EvalBoundedPrf
+import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.Sigma1Prf
 open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
@@ -19,6 +23,9 @@ open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.EvalLtPrf
 open ROBINSON_PlusPlus.Meta.EvalNthcPrf
+open ROBINSON_PlusPlus.Meta.EvalListPrf
+open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
+open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 
 set_option linter.unusedSimpArgs false
@@ -54,10 +61,17 @@ Tarski) sino por **evaluación provable** (`pcc_eval_nthc` / `pcc_eval_carc_nthc
 DENTRO de `Prov` bajo cota) — que es justo lo que resuelven los `pcc_eval_*`.
 -/
 
-/-! ### Los tres componentes del bicondicional `ax_lineWF_eqrefl`, sobre la línea abstracta `#0` -/
+/-! ### Los componentes del bicondicional `ax_lineWF_eqrefl` (ESTRICTO), sobre la línea abstracta `#0`
+
+Tras el plan (A) — esquema estricto — el `⇔` tiene RHS `lencEqrefl ∧ eqEqrefl`: la cláusula
+canónica de longitud (`lenc #0 = 3̇`, que fuerza las cotas de sub‑índice) **y** la condición
+estructural. -/
 
 /-- Antecedente de etiqueta del caso `eqrefl`: `nthc #0 1 = 12̇`. -/
 def tagEqrefl : Formula := nthc (.var 0) (succ zero) =eq numeralM 12
+
+/-- Cláusula canónica de longitud (plan A): `lenc #0 = 3̇`. -/
+def lencEqrefl : Formula := lenc (.var 0) =eq numeralM 3
 
 /-- Condición estructural del caso `eqrefl`: `carc #0 = eqc (nthc #0 2) (nthc #0 2)`. -/
 def eqEqrefl : Formula :=
@@ -66,37 +80,42 @@ def eqEqrefl : Formula :=
 /-- La conclusión del bicondicional: `lineWF #0`. -/
 def lwfVar : Formula := lineWF (.var 0)
 
-/-- El axioma‑accesor, reexpresado con los tres componentes (definicional). -/
+/-- El axioma‑accesor estricto, reexpresado con sus componentes (definicional). -/
 theorem ax_lineWF_eqrefl_eq :
-    ax_lineWF_eqrefl = Formula.forall (Formula.impl tagEqrefl (lwfVar ⇔ eqEqrefl)) := rfl
+    ax_lineWF_eqrefl
+      = Formula.forall (Formula.impl tagEqrefl (lwfVar ⇔ Formula.and lencEqrefl eqEqrefl)) := rfl
 
 /-! ### Paso 6a — dirección `⇐` del bicondicional, currificada bajo el tag
 
-De `ax_lineWF_eqrefl : ∀. (TAG ⇒ (LWF ⇔ EQ))` sale `∀. (TAG ⇒ (EQ ⇒ LWF))`: se instancia en
-`#0` (sustitución identidad), se descargan las dos hipótesis con el teorema de deducción y se
-toma la segunda componente del `⇔` con `Prf₀.c3` (`iff.mpr` interno). -/
+De `ax_lineWF_eqrefl : ∀. (TAG ⇒ (LWF ⇔ (LENC ∧ EQ)))` sale `∀. (TAG ⇒ ((LENC ∧ EQ) ⇒ LWF))`:
+se instancia en `#0`, se descargan las dos hipótesis con deducción y se toma la 2ª componente del
+`⇔` con `Prf₀.c3` (`iff.mpr` interno). -/
 
-/-- **Dirección `⇐` del bicondicional `ax_lineWF_eqrefl`, currificada bajo el tag.** -/
+/-- **Dirección `⇐` del bicondicional `ax_lineWF_eqrefl` estricto, currificada bajo el tag.** -/
 theorem prf_lineWF_eqrefl_bwd :
-    Prf (Formula.forall (Formula.impl tagEqrefl (Formula.impl eqEqrefl lwfVar))) := by
+    Prf (Formula.forall (Formula.impl tagEqrefl
+      (Formula.impl (Formula.and lencEqrefl eqEqrefl) lwfVar))) := by
   refine Prf.gen _ ?_
   refine prf_deduction ?_
-  refine deduction_aux ?_ eqEqrefl [tagEqrefl] rfl
-  -- ctx `[EQ, TAG]` ⊢ `LWF`
-  have hax : PrfH [eqEqrefl, tagEqrefl] (Formula.impl tagEqrefl (lwfVar ⇔ eqEqrefl)) := by
+  refine deduction_aux ?_ (Formula.and lencEqrefl eqEqrefl) [tagEqrefl] rfl
+  -- ctx `[LENC ∧ EQ, TAG]` ⊢ `LWF`
+  have hax : PrfH [Formula.and lencEqrefl eqEqrefl, tagEqrefl]
+      (Formula.impl tagEqrefl (lwfVar ⇔ Formula.and lencEqrefl eqEqrefl)) := by
     have hh := prf_spec (prf_ax (show ax_lineWF_eqrefl ∈ axioms by simp [axioms])) (.var 0)
-    have hid : Prf (Formula.impl tagEqrefl (lwfVar ⇔ eqEqrefl)) := by
-      simpa [ax_lineWF_eqrefl, tagEqrefl, eqEqrefl, lwfVar, iff, lineWF, carc, nthc, eqc,
-        numeralM, succ, zero, cons, nil, substFormula, substTerm, substTerms,
+    have hid : Prf (Formula.impl tagEqrefl (lwfVar ⇔ Formula.and lencEqrefl eqEqrefl)) := by
+      simpa [ax_lineWF_eqrefl, tagEqrefl, lencEqrefl, eqEqrefl, lwfVar, iff, lineWF, carc, lenc,
+        nthc, eqc, numeralM, succ, zero, cons, nil, substFormula, substTerm, substTerms,
         FOL.substTerm_liftTerm] using hh
     exact prf_to_prfH hid _
   -- MP con el tag (2ª hipótesis del contexto) ⇒ el bicondicional
-  have hiff : PrfH [eqEqrefl, tagEqrefl] (lwfVar ⇔ eqEqrefl) :=
+  have hiff : PrfH [Formula.and lencEqrefl eqEqrefl, tagEqrefl]
+      (lwfVar ⇔ Formula.and lencEqrefl eqEqrefl) :=
     PrfH.mp _ _ _ hax (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
-  -- `c3` = 2ª componente del `⇔` = la dirección `EQ ⇒ LWF`
-  have hmpr : PrfH [eqEqrefl, tagEqrefl] (Formula.impl eqEqrefl lwfVar) :=
+  -- `c3` = 2ª componente del `⇔` = la dirección `(LENC ∧ EQ) ⇒ LWF`
+  have hmpr : PrfH [Formula.and lencEqrefl eqEqrefl, tagEqrefl]
+      (Formula.impl (Formula.and lencEqrefl eqEqrefl) lwfVar) :=
     PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hiff
-  -- MP con la condición estructural (1ª hipótesis del contexto)
+  -- MP con `LENC ∧ EQ` (1ª hipótesis del contexto)
   exact PrfH.mp _ _ _ hmpr (PrfH.hyp _ _ (List.Mem.head _))
 
 /-! ### Paso 6b — el bicondicional TRANSPORTADO al nivel del código, instanciado en `tcFn t`
@@ -107,29 +126,37 @@ theorem prf_lineWF_eqrefl_bwd :
 /-- Código del antecedente de etiqueta, punteado en la línea `t`. -/
 def tagDot (t : Term) : Term := substfc zero (tcFn t) (formCode tagEqrefl)
 
+/-- Código de la cláusula canónica de longitud, punteado en la línea `t`. -/
+def lencDot (t : Term) : Term := substfc zero (tcFn t) (formCode lencEqrefl)
+
 /-- Código de la condición estructural, punteado en la línea `t`. -/
 def eqDot (t : Term) : Term := substfc zero (tcFn t) (formCode eqEqrefl)
 
 /-- Código de `lineWF`, punteado en la línea `t`. -/
 def lwfDot (t : Term) : Term := substfc zero (tcFn t) (formCode lwfVar)
 
-/-- **COLUMNA VERTEBRAL DEL PASO 6**: el bicondicional (dirección `⇐`) transportado al nivel
-    del código y punteado en `t`:
+/-- **COLUMNA VERTEBRAL DEL PASO 6** (esquema estricto): el bicondicional (dirección `⇐`)
+    transportado al nivel del código y punteado en `t`:
 
-    `Prov(⌜TAG_dot t ⇒ (EQ_dot t ⇒ LWF_dot t)⌝)`
+    `Prov(⌜TAG_dot t ⇒ ((LENC_dot t ∧ EQ_dot t) ⇒ LWF_dot t)⌝)`
 
-    Es la plantilla `pcc_bddDot_imp_inDot`, **común a los 21 casos de etiqueta**: sólo cambian
-    el axioma‑accesor y la `expr_k` de la condición estructural. -/
+    Es la plantilla común a los 21 casos de etiqueta: sólo cambian el axioma‑accesor y `expr_k`. -/
 theorem paso6_backbone (t : Term) :
-    Prf (provFromCode (implc (tagDot t) (implc (eqDot t) (lwfDot t)))) := by
+    Prf (provFromCode
+      (implc (tagDot t) (implc (andc (lencDot t) (eqDot t)) (lwfDot t)))) := by
   have h := pcc_thm_inst _ prf_lineWF_eqrefl_bwd (tcFn t)
   refine prf_mp (prf_provCode_congr ?_) h
-  -- distribuye el `substfc` sobre los dos `implc`
-  exact prf_eq_trans
+  -- distribuye el `substfc` sobre `implc`, el `andc` interno y el `implc` interno
+  refine prf_eq_trans
     (prf_substfc_impl zero (tcFn t) (formCode tagEqrefl)
-      (formCode (Formula.impl eqEqrefl lwfVar)))
-    (prf_congr_implc (prf_refl _)
-      (prf_substfc_impl zero (tcFn t) (formCode eqEqrefl) (formCode lwfVar)))
+      (formCode (Formula.impl (Formula.and lencEqrefl eqEqrefl) lwfVar))) ?_
+  refine prf_congr_implc (prf_refl _) ?_
+  refine prf_eq_trans
+    (prf_substfc_impl zero (tcFn t) (formCode (Formula.and lencEqrefl eqEqrefl))
+      (formCode lwfVar)) ?_
+  exact prf_congr_implc
+    (prf_substfc_and zero (tcFn t) (formCode lencEqrefl) (formCode eqEqrefl))
+    (prf_refl _)
 
 /-! ### Paso 6c — los códigos punteados, EVALUADOS
 
@@ -361,6 +388,40 @@ theorem pcc_eqDot (t : Term) :
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_eqDot_eq t))) _) hfin
 
+/-! ### Paso 6d bis — el punteado de LONGITUD `LENC_dot` (cláusula canónica del plan A)
+
+`lencDot t` se evalúa a la forma rastreada `lencT (tcFn t)`, y se **produce** con `pcc_eval_lenc`
+(incondicional) reescribiendo el valor `(lenc t)˙ = 3̇` con la igualdad externa `lenc t = 3̇` (que
+sale de la dirección `⇒` del accesor estricto). -/
+
+/-- **`LENC_dot` evaluado**: `substfc 0 (tcFn t) ⌜lenc #0 = 3̇⌝ = ⌜lencT ṫ = 3̇⌝`. -/
+theorem prf_lencDot_eq (t : Term) :
+    Prf (lencDot t =eq eqCodeFn (lencT (tcFn t)) (termCode (numeralM 3))) := by
+  unfold lencDot lencEqrefl
+  refine prf_eq_trans (prf_substfc_eq zero (tcFn t) _ _) ?_
+  refine prf_congr_eqCodeFn ?_ (substtc_inv_termCode_of_tc (prf_tc_numeral 3) (tcFn t))
+  exact prf_eq_trans (prf_substtc_lencT zero (tcFn t) (varc (numeral 0)))
+    (prf_congr_lencT (prf_substtc_varc0 (tcFn t)))
+
+/-- **`Prov(LENC_dot t)`** a partir de la igualdad de longitud externa `lenc t = 3̇`. -/
+theorem pcc_lencDot (t : Term) :
+    Prf ((lenc t =eq numeralM 3) ⇒ provFromCode (lencDot t)) := by
+  refine prf_deduction ?_
+  have hev : PrfH [lenc t =eq numeralM 3]
+      (provFromCode (eqCodeFn (lencT (tcFn t)) (tcFn (lenc t)))) :=
+    prf_to_prfH (pcc_eval_lenc t) _
+  have hval : PrfH [lenc t =eq numeralM 3] (tcFn (lenc t) =eq termCode (numeralM 3)) :=
+    PrfH_eq_trans (PrfH_congr_tcFn (prfH_hyp_self _)) (prf_to_prfH (prf_tc_numeral 3) _)
+  have hev2 : PrfH [lenc t =eq numeralM 3]
+      (provFromCode (eqCodeFn (lencT (tcFn t)) (termCode (numeralM 3)))) :=
+    PrfH_provCode_congr (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) hval) hev
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_lencDot_eq t))) _) hev2
+
+/-- Orden estricto entre numerales `numeralM` (vía `numeralM_eq` + `prf_gnum_lt`). -/
+theorem prf_lt_numeralM {a b : Nat} (h : a < b) : Prf (lt (numeralM a) (numeralM b)) := by
+  rw [numeralM_eq, numeralM_eq]; exact prf_gnum_lt h
+
 /-! ### Paso 6e — `lwfDot t` es el código que pide la reflexión punteada
 
 `lwfDot t = substfc 0 (tcFn t) ⌜lineWF #0⌝` y `lineWFCodeFn (tcFn t)` coinciden: es el mismo
@@ -386,46 +447,44 @@ código) dan `Prov(⌜LWF_dot t⌝)` = `provFromCode (lineWFCodeFn (tcFn t))` �
 reflexión punteada del átomo `lineWF` en el caso `eqrefl`. -/
 
 /-- **CASO `eqrefl` de `pcc_lineWF_tracked`** (paso 6 completo salvo la inversión de tag).
-    Bajo la etiqueta `nthc t 1 = 12̇` y la buena‑formación estructural (`lineWF t` + las cotas
-    `1 < lenc t`, `2 < lenc t` + la condición `carc t = eqc (nthc t 2) (nthc t 2)`), la línea
-    refleja su código punteado. Las hipótesis se descargarán en `pcc_lineWF_tracked` (paso c). -/
+    Bajo la etiqueta `nthc t 1 = 12̇` y la buena‑formación estricta (`lineWF t` + la longitud
+    canónica `lenc t = 3̇` + la condición `carc t = eqc (nthc t 2)(nthc t 2)`), la línea refleja su
+    código punteado. Las **cotas ya NO son hipótesis**: se derivan de `lenc t = 3̇`. -/
 theorem pcc_lineWF_tracked_eqrefl (t : Term)
     (hlw : Prf (lineWF t))
     (htag : Prf (nthc t (succ zero) =eq numeralM 12))
-    (hb1 : Prf (lt (succ zero) (lenc t)))
-    (hb2 : Prf (lt (numeralM 2) (lenc t)))
+    (hlenc : Prf (lenc t =eq numeralM 3))
     (heq : Prf (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :
     Prf (provFromCode (lineWFCodeFn (tcFn t))) := by
-  -- los dos punteados, producidos con evaluación provable
-  have hTag : Prf (provFromCode (tagDot t)) :=
-    prf_mp (prf_mp (pcc_tagDot t) hb1) htag
-  have hEq : Prf (provFromCode (eqDot t)) :=
-    prf_mp (prf_mp (prf_mp (pcc_eqDot t) hlw) hb2) heq
-  -- MP interno ×2 sobre la columna vertebral
-  have hImp : Prf (provFromCode (implc (eqDot t) (lwfDot t))) :=
+  -- cotas de sub‑índice, DERIVADAS de la longitud canónica
+  have hb1 : Prf (lt (succ zero) (lenc t)) :=
+    prf_lt_subst2 (prf_eq_symm hlenc) (prf_lt_numeralM (a := 1) (b := 3) (by omega))
+  have hb2 : Prf (lt (numeralM 2) (lenc t)) :=
+    prf_lt_subst2 (prf_eq_symm hlenc) (prf_lt_numeralM (a := 2) (b := 3) (by omega))
+  -- los tres punteados
+  have hTag : Prf (provFromCode (tagDot t)) := prf_mp (prf_mp (pcc_tagDot t) hb1) htag
+  have hLenc : Prf (provFromCode (lencDot t)) := prf_mp (pcc_lencDot t) hlenc
+  have hEq : Prf (provFromCode (eqDot t)) := prf_mp (prf_mp (prf_mp (pcc_eqDot t) hlw) hb2) heq
+  -- `∧`‑intro interno + MP interno ×2 sobre la columna vertebral
+  have hAnd : Prf (provFromCode (andc (lencDot t) (eqDot t))) := pcc_and_intro_code hLenc hEq
+  have hImp : Prf (provFromCode (implc (andc (lencDot t) (eqDot t)) (lwfDot t))) :=
     pcc_mp_code_apply (paso6_backbone t) hTag
-  have hLwf : Prf (provFromCode (lwfDot t)) := pcc_mp_code_apply hImp hEq
-  -- `lwfDot t = lineWFCodeFn (tcFn t)`
+  have hLwf : Prf (provFromCode (lwfDot t)) := pcc_mp_code_apply hImp hAnd
   exact prf_mp (prf_provCode_congr (prf_lwfDot_eq t)) hLwf
 
-/-! ### Paso 6g — (c) parcial: descarga de `heq` vía el accesor (reflector POR RAMA)
+/-! ### Paso 6g — (c) para `eqrefl`: reflector POR RAMA, **sin hipótesis de cota**
 
-Del accesor `ax_lineWF_eqrefl` en la dirección `⇒` (`iff.mp` = `Prf₀.c2`): bajo `lineWF t` y el
-tag `nthc t 1 = 12̇`, la condición estructural `carc t = eqc (nthc t 2)(nthc t 2)` **se deriva**
-(no hace falta como hipótesis). Queda el **reflector por rama** que el `or_elim` ×21 (paso c final)
-invocará en el disyunto `eqrefl`: toma `lineWF t` y el tag, y produce la reflexión punteada.
+Del accesor ESTRICTO `ax_lineWF_eqrefl` en la dirección `⇒` (`iff.mp` = `Prf₀.c2`): bajo `lineWF t`
+y el tag `nthc t 1 = 12̇`, el RHS `(lenc t = 3̇) ∧ (carc t = eqc (nthc t 2)(nthc t 2))` **se deriva
+entero**. Su primer conjunto da la longitud canónica ⇒ las cotas; el segundo, la condición
+estructural. **Ya no hay hipótesis de cota** (el plan A las cerró de raíz). Es el reflector que el
+`or_elim` ×21 invocará en el disyunto `eqrefl`. -/
 
-⚠️ **Las cotas `1 < lenc t` / `2 < lenc t` siguen como hipótesis**: NO son derivables de `lineWF t`
-+ tag con la axiomática actual (`nthc` no tiene ecuación fuera de rango ⇒ no hay `nthc_oob`; el
-accesor `ax_lineWF_eqrefl` es un `⇔` que no fuerza la longitud de la línea). Es el único hueco real
-que resta del paso 6 — decisión de diseño pendiente (línea canónica vs. reforzar la inversión). -/
-
-/-- **Reflector por rama, caso `eqrefl`** (dirección `⇒` del accesor descargada): asumido el tag
-    `nthc t 1 = 12̇` (que el `or_elim` de `prf_lineWF_inv` provee en este disyunto) y las cotas,
-    `lineWF t` refleja su código punteado — **sin** pedir la condición estructural (se deriva). -/
-theorem pcc_lineWF_tracked_eqrefl_imp (t : Term)
-    (hb1 : Prf (lt (succ zero) (lenc t)))
-    (hb2 : Prf (lt (numeralM 2) (lenc t))) :
+/-- **Reflector por rama, caso `eqrefl`** (accesor estricto, dirección `⇒` descargada): asumido sólo
+    el tag `nthc t 1 = 12̇` (que el `or_elim` de `prf_lineWF_inv` provee en este disyunto), `lineWF t`
+    refleja su código punteado. **Sin** hipótesis de cota ni de condición estructural: todo se deriva
+    del RHS estricto `(lenc t = 3̇) ∧ EQ`. -/
+theorem pcc_lineWF_tracked_eqrefl_imp (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 12) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 12) [lineWF t] rfl)
@@ -433,39 +492,54 @@ theorem pcc_lineWF_tracked_eqrefl_imp (t : Term)
   let Γ : List Formula := [nthc t (succ zero) =eq numeralM 12, lineWF t]
   have hlw : PrfH Γ (lineWF t) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have htagH : PrfH Γ (nthc t (succ zero) =eq numeralM 12) := PrfH.hyp _ _ (List.Mem.head _)
-  -- accesor `ax_lineWF_eqrefl` instanciado en `t`, dirección directa (`iff.mp` = c2)
+  -- accesor ESTRICTO instanciado en `t`, dirección directa (`iff.mp` = c2)
   have hacc : Prf (Formula.impl (nthc t (succ zero) =eq numeralM 12)
-      (lineWF t ⇔ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))))) := by
+      (lineWF t ⇔ Formula.and (lenc t =eq numeralM 3)
+        (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))))) := by
     have hh := prf_spec (prf_ax (show ax_lineWF_eqrefl ∈ axioms by simp [axioms])) t
-    simpa [ax_lineWF_eqrefl, iff, lineWF, carc, nthc, eqc, numeralM, succ, zero, cons, nil,
+    simpa [ax_lineWF_eqrefl, iff, lineWF, carc, lenc, nthc, eqc, numeralM, succ, zero, cons, nil,
       substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] using hh
-  -- `lineWF t ⇔ EQ` (bajo el tag), luego `heq : EQ` por `iff.mp` + `lineWF t`
-  have hiff : PrfH Γ (lineWF t ⇔ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :=
+  have hiff : PrfH Γ (lineWF t ⇔ Formula.and (lenc t =eq numeralM 3)
+      (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :=
     PrfH.mp _ _ _ (prf_to_prfH hacc _) htagH
-  have heqH : PrfH Γ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) :=
+  -- del RHS estricto: longitud canónica + condición estructural
+  have hand : PrfH Γ (Formula.and (lenc t =eq numeralM 3)
+      (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :=
     PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
-  -- producción de los dos punteados (con las cotas + tag + heq derivada)
+  have hlencH : PrfH Γ (lenc t =eq numeralM 3) :=
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+  have heqH : PrfH Γ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) :=
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+  -- cotas DERIVADAS de la longitud canónica (en `PrfH`)
+  have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
+    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+      (prf_to_prfH (prf_lt_numeralM (a := 1) (b := 3) (by omega)) _)
+  have hb2 : PrfH Γ (lt (numeralM 2) (lenc t)) :=
+    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+      (prf_to_prfH (prf_lt_numeralM (a := 2) (b := 3) (by omega)) _)
+  -- los tres punteados producidos en el contexto
   have hTag : PrfH Γ (provFromCode (tagDot t)) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_tagDot t) _)
-      (prf_to_prfH hb1 _)) htagH
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_tagDot t) _) hb1) htagH
+  have hLenc : PrfH Γ (provFromCode (lencDot t)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_lencDot t) _) hlencH
   have hEq : PrfH Γ (provFromCode (eqDot t)) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_eqDot t) _) hlw)
-      (prf_to_prfH hb2 _)) heqH
-  -- MP interno ×2 sobre la columna vertebral + `lwfDot = lineWFCodeFn`
-  have hImp : PrfH Γ (provFromCode (implc (eqDot t) (lwfDot t))) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (tagDot t) _) _)
-      (prf_to_prfH (paso6_backbone t) _)) hTag
-  have hLwf : PrfH Γ (provFromCode (lwfDot t)) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (eqDot t) _) _) hImp) hEq
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_eqDot t) _) hlw) hb2) heqH
+  -- `∧`‑intro interno + MP interno ×2 + `lwfDot = lineWFCodeFn`
+  have hAnd : PrfH Γ (provFromCode (andc (lencDot t) (eqDot t))) :=
+    PrfH_and_intro_code (lencDot t) (eqDot t) hLenc hEq
+  have hImp : PrfH Γ (provFromCode (implc (andc (lencDot t) (eqDot t)) (lwfDot t))) :=
+    PrfH_mp_code_apply (prf_to_prfH (paso6_backbone t) _) hTag
+  have hLwf : PrfH Γ (provFromCode (lwfDot t)) := PrfH_mp_code_apply hImp hAnd
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_lwfDot_eq t)) _) hLwf
 
 end ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (
-  tagEqrefl eqEqrefl lwfVar ax_lineWF_eqrefl_eq prf_lineWF_eqrefl_bwd
-  tagDot eqDot lwfDot paso6_backbone
+  tagEqrefl lencEqrefl eqEqrefl lwfVar ax_lineWF_eqrefl_eq prf_lineWF_eqrefl_bwd
+  tagDot lencDot eqDot lwfDot paso6_backbone
   substtc_inv_termCode_of_tc eqcT eqcT_termCode prf_congr_eqcT prf_substtc_eqcT
   prf_tagDot_eq prf_eqDot_eq prf_tc_eqc pcc_congr_eqcT_diag_code_imp
+  prf_lencDot_eq pcc_lencDot prf_lt_numeralM
   pcc_tagDot pcc_eqDot prf_lwfDot_eq pcc_lineWF_tracked_eqrefl
   pcc_lineWF_tracked_eqrefl_imp
 )

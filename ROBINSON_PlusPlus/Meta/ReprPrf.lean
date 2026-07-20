@@ -198,6 +198,37 @@ private theorem prf_nthc_succ_loc (h t i : Term) :
   simpa [ax_nthc_succ, substFormula, substTerm, substTerms, nthc, cons, succ,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
 
+/-- `lenc nil = 0` (copia local; `NumListPrf` es posterior). -/
+private theorem prf_lenc_nil_loc : Prf (lenc nil =eq zero) := by
+  simpa [ax_lenc_nil] using prf_ax (show ax_lenc_nil ∈ axioms by simp [axioms])
+
+/-- `lenc (cons h t) = σ (lenc t)` (copia local). -/
+private theorem prf_lenc_cons_loc (h t : Term) : Prf (lenc (cons h t) =eq succ (lenc t)) := by
+  have hh := prf_spec (prf_spec (prf_ax (show ax_lenc_cons ∈ axioms by simp [axioms])) h) t
+  simpa [ax_lenc_cons, substFormula, substTerm, substTerms, lenc, cons, succ,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+
+/-- Congruencia de `succ` (copia local; `ArithPrf` es posterior). -/
+private theorem prf_eq_congr_succ_loc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :
+    Prf (succ t₁ =eq succ t₂) := by
+  let f : Formula := Formula.eq (succ (liftTerm 0 t₁)) (succ (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ t₁) (succ s) := by
+    intro s
+    simp only [f, substFormula, succ, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (succ t₁))
+
+/-- **Elimina un conjunto izquierdo DEMOSTRABLE de una equivalencia** (esquemas ESTRICTOS, plan A):
+    de `A ⇔ (P ∧ Q)` y `⊢ P` sale `A ⇔ Q`. Genérico — lo comparten los 21 esquemas `lineWF`
+    estrictos, donde `P` = la cláusula canónica (`lenc = len_k`), demostrable en cada línea concreta. -/
+theorem prf_iff_drop_left_conj {A P Q : Formula} (h : Prf (A ⇔ Formula.and P Q)) (hP : Prf P) :
+    Prf (A ⇔ Q) := by
+  have imp_trans : ∀ {a b c : Formula}, Prf (a ⇒ b) → Prf (b ⇒ c) → Prf (a ⇒ c) := by
+    intro a b c hab hbc
+    exact prf_mp (prf_mp (Prf.incl (Prf₀.p2 a b c))
+      (prf_mp (Prf.incl (Prf₀.p1 (b ⇒ c) a)) hbc)) hab
+  refine prf_and_intro (imp_trans (prf_and_elim_left h) (Prf.incl (Prf₀.c3 P Q))) ?_
+  exact imp_trans (prf_mp (Prf.incl (Prf₀.c1 P Q)) hP) (prf_and_elim_right h)
+
 /-- Congruencia binaria genérica en el tag `T` (sirve para `eqc`/`implc`/`andc`/`orc`), arg 1. -/
 theorem prf_congr_bin1 {T x x' y : Term} (h : Prf (x =eq x')) :
     Prf (cons T (cons x (cons y nil)) =eq cons T (cons x' (cons y nil))) :=
@@ -576,7 +607,14 @@ theorem prf_lineWF_eqrefl (concl t : Term) :
   have htag : Prf (nthc (cons concl (cons (numeralM 12) (cons t (nil)))) (succ zero) =eq numeralM 12) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
   have hc : Prf (carc (cons concl (cons (numeralM 12) (cons t (nil)))) =eq concl) := prf_carc_cons _ _
   have h_t : Prf (nthc (cons concl (cons (numeralM 12) (cons t (nil)))) (numeralM 2) =eq t) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _))
-  exact prf_lineWF_iff_transport (prf_mp hax htag) hc (prf_congr_bin (h_t) (h_t))
+  -- (A) esquema ESTRICTO: la línea canónica tiene `lenc = 3`; se descarga el conjunto extra.
+  have hlenc : Prf (lenc (cons concl (cons (numeralM 12) (cons t (nil)))) =eq numeralM 3) :=
+    prf_eq_trans (prf_lenc_cons_loc _ _)
+      (prf_eq_congr_succ_loc (prf_eq_trans (prf_lenc_cons_loc _ _)
+        (prf_eq_congr_succ_loc (prf_eq_trans (prf_lenc_cons_loc _ _)
+          (prf_eq_congr_succ_loc prf_lenc_nil_loc)))))
+  exact prf_lineWF_iff_transport
+    (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc (prf_congr_bin (h_t) (h_t))
 theorem prf_premsOf_eqrefl (concl t : Term) :
     Prf (premsOf (cons concl (cons (numeralM 12) (cons t nil))) =eq nil) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_premsOf_eqrefl ∈ axioms by simp [axioms])) concl) t

@@ -134,7 +134,29 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > `pcc_mp_code_apply`×2, cerrando con `prf_lwfDot_eq` (`lwfDot t =eq lineWFCodeFn (tcFn t)`). **Es el
 > caso `eqrefl` de `pcc_lineWF_tracked` completo salvo las hipótesis** (tag, cotas, condición).
 >
-> **▶ (c) PARCIAL HECHA (2026‑07‑20): reflector POR RAMA con `heq` descargada.**
+> **▶ PLAN (A) — ESQUEMA ESTRICTO — HECHO PARA `eqrefl` (2026‑07‑20). CIERRA EL HUECO DE LAS COTAS.**
+> Sancionado (A): `ax_lineWF_eqrefl` (en `Minimal/Axioms.lean`) ahora tiene RHS estricto
+> `lineWF #0 ⇔ ((lenc #0 = 3̇) ∧ (carc #0 = eqc (nthc #0 2)(nthc #0 2)))`. La cláusula canónica
+> `lenc = 3̇` **fuerza las cotas** `1 < lenc t`, `2 < lenc t`, que antes eran un hueco irresoluble.
+> - **Núcleo intacto**: `axioms_eq` sigue `rfl`; **cadena real sin cambios** — D1 `repr_pos'_prf`
+>   `[propext,choice,Quot.sound,prf_inAxC]`, D2 `d2_prf` `[…,Quot.sound]`, `goedel_second'` cita sólo
+>   `d3`. El accesor concreto `prf_lineWF_eqrefl` **conserva su enunciado** (helper genérico
+>   `prf_iff_drop_left_conj` descarga el conjunto `lenc=3` en la línea concreta) ⇒ D1/B.2/B.3b no
+>   cambian de enunciado. Único módulo reescrito: `Meta/LineWFTrackedPrf.lean`.
+> - **Backbone a 3 partes**: `paso6_backbone` = `Prov(⌜TAG_dot ⇒ ((LENC_dot ∧ EQ_dot) ⇒ LWF_dot)⌝)`.
+>   Nuevo punteado `LENC_dot` producido con **`pcc_eval_lenc`** (incondicional) + reescritura del valor
+>   por `lenc t = 3̇`; ensamblado con `∧`‑intro interno (`PrfH_and_intro_code`).
+> - **`pcc_lineWF_tracked_eqrefl_imp (t) : Prf (lineWF t ⇒ ((nthc t 1 = 12̇) ⇒ provFromCode
+>   (lineWFCodeFn (tcFn t))))` — SIN HIPÓTESIS DE COTA.** El accesor estricto (dirección `⇒`) da el RHS
+>   entero; el 1.er conjunto `lenc t = 3̇` ⇒ cotas (`prf_lt_numeralM`+`PrfH_lt_subst2`), el 2.º ⇒ `heq`.
+>   `[propext,choice,Quot.sound,prf_inAxC]`.
+>
+> **FALTA de (c):** (1) los **otros 20 tags** — replicar el patrón estricto (añadir `lenc = len_k` a
+> cada `ax_lineWF_<k>`, arreglar su `prf_lineWF_<k>` con `prf_iff_drop_left_conj`, y su reflector
+> punteado); nótese que `len_k` varía (thy=2, la mayoría=3, p2/j3/leibniz=4/5). (2) El **`or_elim` ×21**
+> (`prf_lineWF_inv` da la disyunción de tags; cada rama invoca su `pcc_lineWF_tracked_<k>_imp`).
+>
+> **(histórico) (c) PARCIAL (2026‑07‑20): reflector POR RAMA con `heq` descargada.**
 > `pcc_lineWF_tracked_eqrefl_imp (t) (hb1)(hb2)
 > : Prf (lineWF t ⇒ ((nthc t 1 = 12̇) ⇒ provFromCode (lineWFCodeFn (tcFn t))))` — instancia el
 > accesor `ax_lineWF_eqrefl` en `t` y **deriva** la condición estructural (`heq`) por `iff.mp`
