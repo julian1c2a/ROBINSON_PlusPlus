@@ -120,7 +120,28 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > (`eqc a b` es un `cons`‑árbol, no un `.func` ⇒ necesita constructor object propio, con
 > `prf_congr_eqcT`/`prf_substtc_eqcT`).
 >
-> **FALTA (la capa densa restante):** (a‑bis) *producir* `Prov(TAG_dot t)` y `Prov(EQ_dot t)` aplicando
+> **▶ (a‑bis) + (b) HECHOS (2026‑07‑20, `Meta/LineWFTrackedPrf.lean`, 100 jobs,
+> `[propext,choice,Quot.sound,prf_inAxC]`).**
+> **(a‑bis) — PRODUCCIÓN de los punteados vía evaluación provable** (NO `pcc_eq_tracked` directo):
+> `pcc_tagDot` (bajo `1 < lenc t` y la igualdad de tag ⇒ `Prov(TAG_dot t)`, con `pcc_eval_nthc` +
+> `PrfH_congr_tcFn` + `prf_tc_numeral`) y `pcc_eqDot` (bajo `lineWF t` + `2 < lenc t` + la condición
+> estructural ⇒ `Prov(EQ_dot t)`, encadenando `pcc_eval_carc` [línea es `cons` vía `prf_lineWF_cons`]
+> + `pcc_eval_nthc` + `prf_tc_eqc` + la congruencia diagonal `pcc_congr_eqcT_diag_code_imp`). Piezas
+> nuevas: `prf_tc_eqc` (`tcFn(eqc a b) = eqcT(tcFn a)(tcFn b)`), `pcc_congr_eqcT_diag_code_imp`
+> (Leibniz interno con **dos** huecos `⌜v₀⌝`, que es lo que pide `eqrefl`: `t ≐ t`).
+> **(b) — MP interno ×2**: `pcc_lineWF_tracked_eqrefl (t) (hlw)(htag)(hb1)(hb2)(heq)
+> : Prf (provFromCode (lineWFCodeFn (tcFn t)))` — de `paso6_backbone` + los dos punteados, vía
+> `pcc_mp_code_apply`×2, cerrando con `prf_lwfDot_eq` (`lwfDot t =eq lineWFCodeFn (tcFn t)`). **Es el
+> caso `eqrefl` de `pcc_lineWF_tracked` completo salvo las hipótesis** (tag, cotas, condición).
+>
+> **FALTA sólo (c) — descargar las hipótesis + envolver la inversión** para el teorema `∀t` sin
+> premisas: de `lineWF t`, la inversión `prf_lineWF_inv` da la disyunción de 21 tags; en la rama
+> `eqrefl` el tag `nthc t 1 = 12̇` es la condición de rama, y el accesor `ax_lineWF_eqrefl` da la
+> condición estructural (`heq`) por `iff.mp`. **Punto abierto real:** las cotas `1 < lenc t` /
+> `2 < lenc t` — hay que derivarlas de `lineWF t` (¿lema de longitud mínima por tag?, o reforzar el
+> accesor). Luego los **otros 20 tags** replican `pcc_lineWF_tracked_eqrefl` cambiando axioma/`expr_k`.
+>
+> **(referencia histórica de la capa densa)** (a‑bis) *producir* `Prov(TAG_dot t)` y `Prov(EQ_dot t)` aplicando
 > = `Prov(⌜carc t =eq eqc(nthc t 2)(nthc t 2)⌝)` vía **evaluación provable** (`pcc_eval_nthc` /
 > `pcc_eval_carc_nthc`, que operan DENTRO de `Prov` bajo cota `i<lenc`; de `lineWF t` sale la cota y la
 > estructura de `t`); (b) dos `pcc_mp_code_open` (MP interno con TAG_dot y EQ_dot) → `provFromCode (LWF_dot t)`;

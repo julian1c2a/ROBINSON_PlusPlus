@@ -6,6 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+import ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -17,6 +18,8 @@ open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.EvalLtPrf
+open ROBINSON_PlusPlus.Meta.EvalNthcPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -202,9 +205,215 @@ theorem prf_eqDot_eq (t : Term) :
         (prf_congr_nthcT (prf_substtc_varc0 (tcFn t))
           (substtc_inv_termCode_of_tc (prf_tc_numeral 2) (tcFn t)))
 
+/-! ### Paso 6d — PRODUCCIÓN de los punteados: `Prov(TAG_dot t)` y `Prov(EQ_dot t)`
+
+Aquí entra la **evaluación provable**: `pcc_eval_nthc` calcula `nthc(ṫ,ı̇)` *dentro de `Prov`* bajo
+la cota `i < lenc t`, y la hipótesis de la rama (la igualdad `=eq` del paso 5) se transporta al
+código con la congruencia de `tcFn` (`PrfH_congr_tcFn`) + el puente de numerales
+(`prf_tc_numeral`).
+
+⚠️ **Esto NO es `pcc_eq_tracked` aplicado al átomo** (eso sería Tarski: el código absorbería la
+forma sintáctica). La igualdad `=eq` se usa sólo para reescribir el **valor** `(nthc t 1)˙` dentro
+de un `Prov` que la evaluación ya produjo.
+
+Las cotas (`1 < lenc t`, `2 < lenc t`) van como **hipótesis explícitas**, igual que `chainOk`/cota
+en `pcc_eval_carc_nthc`: se descargan aguas arriba, desde `lineWF t`. -/
+
+/-- **Ecuación `tc` del árbol `eqc`**: `tcFn (eqc a b) = eqcT (tcFn a) (tcFn b)`. Es `prf_tc_cons'`
+    tres veces (el árbol `⟨4,a,b⟩`), con `4̇` y `nil` descargados por `prf_tc_numeral`/`prf_tc_zero`. -/
+theorem prf_tc_eqc (a b : Term) :
+    Prf (tcFn (eqc a b) =eq eqcT (tcFn a) (tcFn b)) := by
+  unfold eqc eqcT
+  refine prf_eq_trans (prf_tc_cons' _ _) ?_
+  refine prf_congr_consT (prf_tc_numeral 4) ?_
+  refine prf_eq_trans (prf_tc_cons' _ _) ?_
+  refine prf_congr_consT (prf_refl _) ?_
+  refine prf_eq_trans (prf_tc_cons' _ _) ?_
+  exact prf_congr_consT (prf_refl _) prf_tc_zero
+
+/-- **Congruencia DIAGONAL de `eqcT` DENTRO de `Prov`**: de `Prov(⌜X = Y⌝)` sale
+    `Prov(⌜eqc(X,X) = eqc(Y,Y)⌝)`. Mismo patrón que `pcc_congr_carcT_code_imp`, con el contexto
+    de código llevando **dos huecos** `⌜v₀⌝` — ambos reciben el mismo testigo al sustituir, que es
+    justo lo que pide `eqrefl` (`t ≐ t`, el mismo término a los dos lados). -/
+theorem pcc_congr_eqcT_diag_code_imp (X Y : Term)
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (eqcT X X) (eqcT Y Y))) := by
+  let Ac : Term := eqc (eqcT X X) (eqcT (varc (numeral 0)) (varc (numeral 0)))
+  have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (eqcT X X) (eqcT t t)) := by
+    intro t
+    refine prf_eq_trans (prf_substfc_eq zero t (eqcT X X)
+      (eqcT (varc (numeral 0)) (varc (numeral 0)))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_eqcT t X X) (prf_congr_eqcT (hX t) (hX t))
+    · exact prf_eq_trans (prf_substtc_eqcT t (varc (numeral 0)) (varc (numeral 0)))
+        (prf_congr_eqcT (prf_substtc_varc0 t) (prf_substtc_varc0 t))
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
+      (prf_provFromCode_eqCodeFn_refl (eqcT X X))
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+
+/-- **`Prov(TAG_dot t)`**: bajo la cota `1 < lenc t`, la igualdad de etiqueta `nthc t 1 = 12̇`
+    produce el código punteado del antecedente de tag, DENTRO de `Prov`. -/
+theorem pcc_tagDot (t : Term) :
+    Prf (lt (succ zero) (lenc t) ⇒
+      ((nthc t (succ zero) =eq numeralM 12) ⇒ provFromCode (tagDot t))) := by
+  refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 12)
+    [lt (succ zero) (lenc t)] rfl)
+  have hbound : PrfH [nthc t (succ zero) =eq numeralM 12, lt (succ zero) (lenc t)]
+      (lt (succ zero) (lenc t)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have htag : PrfH [nthc t (succ zero) =eq numeralM 12, lt (succ zero) (lenc t)]
+      (nthc t (succ zero) =eq numeralM 12) := PrfH.hyp _ _ (List.Mem.head _)
+  -- evaluación provable de `nthc` bajo la cota
+  have hev : PrfH [nthc t (succ zero) =eq numeralM 12, lt (succ zero) (lenc t)]
+      (provFromCode (eqCodeFn (nthcT (tcFn t) (tcFn (succ zero)))
+        (tcFn (nthc t (succ zero))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc t (succ zero)) _) hbound
+  -- reescritura del VALOR con la igualdad de la rama (congruencia de `tcFn`)
+  have hcodeq : PrfH [nthc t (succ zero) =eq numeralM 12, lt (succ zero) (lenc t)]
+      (eqCodeFn (nthcT (tcFn t) (tcFn (succ zero))) (tcFn (nthc t (succ zero)))
+        =eq eqCodeFn (nthcT (tcFn t) (termCode (succ zero))) (termCode (numeralM 12))) :=
+    PrfH_congr_eqCodeFn
+      (PrfH_congr_nthcT (prf_to_prfH (prf_refl _) _) (prf_to_prfH (prf_tc_numeral 1) _))
+      (PrfH_eq_trans (PrfH_congr_tcFn htag) (prf_to_prfH (prf_tc_numeral 12) _))
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_tagDot_eq t))) _)
+    (PrfH_provCode_congr hcodeq hev)
+
+/-- **`Prov(EQ_dot t)`**: bajo `lineWF t` (que da la estructura `cons` de la línea) y la cota
+    `2 < lenc t`, la condición estructural del caso `eqrefl` produce su código punteado DENTRO de
+    `Prov`.
+
+    Cadena: `pcc_eval_carc` evalúa `carc(ṫ)` (usando que la línea es un `cons`), `pcc_eval_nthc`
+    evalúa `nthc(ṫ,2̇)`, la hipótesis `=eq` reescribe el valor vía `prf_tc_eqc`, y el encaje final
+    es la congruencia diagonal `pcc_congr_eqcT_diag_code_imp` + Leibniz interno. -/
+theorem pcc_eqDot (t : Term) :
+    Prf (lineWF t ⇒ (lt (numeralM 2) (lenc t) ⇒
+      ((carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) ⇒
+        provFromCode (eqDot t)))) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))
+    [lt (numeralM 2) (lenc t), lineWF t] rfl)
+    (lt (numeralM 2) (lenc t)) [lineWF t] rfl)
+  -- Γ = [EQ, cota, lineWF t]
+  have hlw : PrfH [carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)),
+      lt (numeralM 2) (lenc t), lineWF t] (lineWF t) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hbound : PrfH [carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)),
+      lt (numeralM 2) (lenc t), lineWF t] (lt (numeralM 2) (lenc t)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hEQ : PrfH [carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)),
+      lt (numeralM 2) (lenc t), lineWF t]
+      (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  -- abreviaturas: `V` = valor rastreado de `nthc t 2`; `N` = su forma EVALUADA
+  let V : Term := tcFn (nthc t (numeralM 2))
+  let N : Term := nthcT (tcFn t) (termCode (numeralM 2))
+  have hNinv : ∀ W, Prf (substtc zero W N =eq N) :=
+    substtc_inv_nthcT (substtc_inv_tcFn t)
+      (substtc_inv_termCode_of_tc (prf_tc_numeral 2))
+  -- (1) la línea es un `cons` (reflejo de `ax_lineWF_cons`)
+  have hcons := PrfH.mp _ _ _ (prf_to_prfH (prf_lineWF_cons t) _) hlw
+  -- (2) evaluación provable de `carc`, transportada de `cons (carc t) (cdrc t)` a `t`
+  have hcarc0 := prf_to_prfH (pcc_eval_carc (carc t) (cdrc t))
+    [carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)),
+     lt (numeralM 2) (lenc t), lineWF t]
+  have hcarc : PrfH _ (provFromCode (eqc (carcT (tcFn t)) (tcFn (carc t)))) :=
+    PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn (PrfH_congr_carcT (PrfH_congr_tcFn (PrfH_eq_symm hcons)))
+        (prf_to_prfH (prf_refl _) _)) hcarc0
+  -- (3) la hipótesis `=eq` reescribe el VALOR: `(carc t)˙ = eqcT(V,V)`
+  have hEQtc : PrfH _ (tcFn (carc t) =eq eqcT V V) :=
+    PrfH_eq_trans (PrfH_congr_tcFn hEQ) (prf_to_prfH (prf_tc_eqc _ _) _)
+  have hcarc2 : PrfH _ (provFromCode (eqc (carcT (tcFn t)) (eqcT V V))) :=
+    PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) hEQtc) hcarc
+  -- (4) evaluación provable de `nthc` bajo la cota, normalizada a `N`
+  have hevN0 := PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc t (numeralM 2)) _) hbound
+  have hevN : PrfH _ (provFromCode (eqc N V)) :=
+    PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn
+        (PrfH_congr_nthcT (prf_to_prfH (prf_refl _) _)
+          (prf_to_prfH (prf_tc_numeral 2) _))
+        (prf_to_prfH (prf_refl _) _)) hevN0
+  -- (5) simetría interna + congruencia diagonal: `Prov(eqcT(V,V) = eqcT(N,N))`
+  have hdiag : PrfH _ (provFromCode (eqc (eqcT V V) (eqcT N N))) :=
+    PrfH.mp _ _ _
+      (prf_to_prfH (pcc_congr_eqcT_diag_code_imp V N (substtc_inv_tcFn _)) _)
+      (PrfH_eq_symm_code N V hNinv hevN)
+  -- (6) transitividad interna (Leibniz con el hueco en la 2ª posición)
+  have hCinv : ∀ W, Prf (substtc zero W (carcT (tcFn t)) =eq carcT (tcFn t)) := fun W =>
+    prf_eq_trans (prf_substtc_carcT zero W (tcFn t))
+      (prf_congr_carcT (substtc_inv_tcFn t W))
+  have hcompA : ∀ w : Term,
+      Prf (substfc zero w (eqc (carcT (tcFn t)) (varc (numeral 0)))
+        =eq eqc (carcT (tcFn t)) w) := fun w =>
+    prf_eq_trans (prf_substfc_eq zero w (carcT (tcFn t)) (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hCinv w) (prf_substtc_varc0 w))
+  have hfin : PrfH _ (provFromCode (eqc (carcT (tcFn t)) (eqcT N N))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcompA (eqcT N N))) _)
+      (PrfH_leibniz_apply (eqc (carcT (tcFn t)) (varc (numeral 0))) (eqcT V V) (eqcT N N)
+        hdiag
+        (PrfH.mp _ _ _
+          (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcompA (eqcT V V)))) _) hcarc2))
+  -- (7) de vuelta a la forma `substfc` del código punteado
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_eqDot_eq t))) _) hfin
+
+/-! ### Paso 6e — `lwfDot t` es el código que pide la reflexión punteada
+
+`lwfDot t = substfc 0 (tcFn t) ⌜lineWF #0⌝` y `lineWFCodeFn (tcFn t)` coinciden: es el mismo
+`substfc` sobre el átomo unario, con el hueco `⌜v₀⌝` recibiendo `tcFn t`. -/
+
+/-- `lwfDot t =eq lineWFCodeFn (tcFn t)`. -/
+theorem prf_lwfDot_eq (t : Term) :
+    Prf (lwfDot t =eq lineWFCodeFn (tcFn t)) := by
+  show Prf (substfc zero (tcFn t) (atomc (strCode "lineWF") (cons (varc (numeral 0)) nil))
+    =eq atomc (strCode "lineWF") (cons (tcFn t) nil))
+  refine prf_eq_trans (prf_substfc_atom zero (tcFn t) (strCode "lineWF")
+    (cons (varc (numeral 0)) nil)) ?_
+  refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+  refine prf_eq_trans (prf_substtsc_cons zero (tcFn t) (varc (numeral 0)) nil) ?_
+  exact prf_eq_trans (prf_congr_cons_head (prf_substtc_varc0 (tcFn t)))
+    (prf_congr_cons_tail (prf_substtsc_nil zero (tcFn t)))
+
+/-! ### Paso 6f — MP interno ×2: de la columna vertebral + los punteados a `Prov(lineWF)`
+
+Con `paso6_backbone` (`Prov(⌜TAG_dot ⇒ (EQ_dot ⇒ LWF_dot)⌝)`) y los dos punteados producidos
+(`pcc_tagDot`, `pcc_eqDot`), dos aplicaciones de `pcc_mp_code_apply` (MP interno a nivel de
+código) dan `Prov(⌜LWF_dot t⌝)` = `provFromCode (lineWFCodeFn (tcFn t))` — que es exactamente la
+reflexión punteada del átomo `lineWF` en el caso `eqrefl`. -/
+
+/-- **CASO `eqrefl` de `pcc_lineWF_tracked`** (paso 6 completo salvo la inversión de tag).
+    Bajo la etiqueta `nthc t 1 = 12̇` y la buena‑formación estructural (`lineWF t` + las cotas
+    `1 < lenc t`, `2 < lenc t` + la condición `carc t = eqc (nthc t 2) (nthc t 2)`), la línea
+    refleja su código punteado. Las hipótesis se descargarán en `pcc_lineWF_tracked` (paso c). -/
+theorem pcc_lineWF_tracked_eqrefl (t : Term)
+    (hlw : Prf (lineWF t))
+    (htag : Prf (nthc t (succ zero) =eq numeralM 12))
+    (hb1 : Prf (lt (succ zero) (lenc t)))
+    (hb2 : Prf (lt (numeralM 2) (lenc t)))
+    (heq : Prf (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :
+    Prf (provFromCode (lineWFCodeFn (tcFn t))) := by
+  -- los dos punteados, producidos con evaluación provable
+  have hTag : Prf (provFromCode (tagDot t)) :=
+    prf_mp (prf_mp (pcc_tagDot t) hb1) htag
+  have hEq : Prf (provFromCode (eqDot t)) :=
+    prf_mp (prf_mp (prf_mp (pcc_eqDot t) hlw) hb2) heq
+  -- MP interno ×2 sobre la columna vertebral
+  have hImp : Prf (provFromCode (implc (eqDot t) (lwfDot t))) :=
+    pcc_mp_code_apply (paso6_backbone t) hTag
+  have hLwf : Prf (provFromCode (lwfDot t)) := pcc_mp_code_apply hImp hEq
+  -- `lwfDot t = lineWFCodeFn (tcFn t)`
+  exact prf_mp (prf_provCode_congr (prf_lwfDot_eq t)) hLwf
+
 end ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (
   tagEqrefl eqEqrefl lwfVar ax_lineWF_eqrefl_eq prf_lineWF_eqrefl_bwd
   tagDot eqDot lwfDot paso6_backbone
+  substtc_inv_termCode_of_tc eqcT eqcT_termCode prf_congr_eqcT prf_substtc_eqcT
+  prf_tagDot_eq prf_eqDot_eq prf_tc_eqc pcc_congr_eqcT_diag_code_imp
+  pcc_tagDot pcc_eqDot prf_lwfDot_eq pcc_lineWF_tracked_eqrefl
 )
