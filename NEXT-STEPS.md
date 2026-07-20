@@ -4,8 +4,38 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
 
-**Estado 2026‑07‑14 · build 99 jobs · 85 módulos (Minimal 11 + Meta 63 + Full 11) ·
-Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.md`).**
+**Estado 2026‑07‑20 · HEAD `e09f63e` · build 101 jobs · Lean v4.31.0 · 0 errores / 0 warnings /
+0 sorrys.**
+
+> ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
+>
+> **⚠️ FOOTPRINT CAMBIÓ (`25d255b`):** nuevo `axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq
+> listFormCodeM axioms)` (espejo `Prf` del `ax_axiomsCodeT_eq` de `⊢`) ⇒ **`prf_inAxC` es ahora
+> TEOREMA** (derivado; net‑0 axiomas). **D1 `repr_pos'_prf` cita ahora `prf_axiomsCodeT_eq`** (antes
+> `prf_inAxC`); `d2_prf` limpio; `goedel_second'` sigue citando sólo `d3`. Cadena real intacta.
+>
+> **DÓNDE ESTAMOS:** B.3c = `pcc_lineWF_tracked (t) : Prf (lineWF t ⇒ provFromCode (lineWFCodeFn
+> (tcFn t)))` (reflexión punteada de `lineWF`, 21 tags, que consume `hC_dot` → D3). Módulo A +
+> B.1/B.2/B.3a/B.3b **cerrados**.
+> - **✅ `eqrefl` (tag 12) CERRADO** — PLAN (A) esquema estricto (`Meta/LineWFTrackedPrf.lean`):
+>   `ax_lineWF_eqrefl` ahora `lineWF #0 ⇔ ((lenc #0 = 3̇) ∧ (carc #0 = eqc …))`; la cláusula `lenc`
+>   fuerza las cotas de sub‑índice (hueco real cerrado). ⇒ `pcc_lineWF_tracked_eqrefl_imp (t)` SIN
+>   hipótesis de cota. Accesor concreto conserva enunciado (`prf_iff_drop_left_conj`).
+> - **✅ `In`‑REFLECT de `axiomsCodeT` CERRADO** (`Meta/InAxiomsCodePrf.lean`) — era el nudo
+>   `NegVerifier` (8‑11 sesiones); NO bloqueado por Tarski (código rastreado `carcT(tcFn·)`):
+>   `pcc_in_head_swap`+`pcc_in_tail_tracked`+**`pcc_In_lfc_tracked`** (recursión sobre lista de
+>   axiomas ABSTRACTA)+**`pcc_In_axiomsCodeT_tracked`** (`In y axiomsCodeT ⇒ Prov(⌜In yc axiomsCodeT~⌝)`,
+>   `yc` rastreado invariante + `hbr : Prov(yc = tcFn y)`).
+>
+> **▶ MAÑANA — cerrar `thy`** (mecánico, espejo de `eqrefl`; todas las piezas duras hechas):
+> instanciar `pcc_In_axiomsCodeT_tracked` con `yc = carcT(tcFn t)`, `y = carc t`, `hbr` de
+> `pcc_eval_carc` (+ probar `carcT(tcFn t)` `substtc`‑invariante); strict schema `thy` (`lenc = 2`,
+> forma explícita en `Minimal/Axioms.lean:1010`); backbone; `pcc_lineWF_tracked_thy`.
+> **Después:** `mp` (tag 16, explícita, incondicional) + 17 tags `=eq` (clones de `eqrefl`, conviene
+> helper genérico) + `or_elim` ×21 (`prf_lineWF_inv`). Detalle en el bloque «🔖 SIGUIENTE PASO
+> CONCRETO» más abajo.
+
+**Histórico (2026‑07‑14) · 85 módulos · 7 `axiom` de Lean (`AXIOMS.md`):**
 
 > ### 🔖 ÚLTIMO AVANCE (2026‑07‑14): **MÓDULO A (decodificador) — MITAD DE FÓRMULAS CERRADA** ✅
 >
