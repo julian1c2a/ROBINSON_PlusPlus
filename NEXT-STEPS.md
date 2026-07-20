@@ -151,10 +151,26 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 >   entero; el 1.er conjunto `lenc t = 3̇` ⇒ cotas (`prf_lt_numeralM`+`PrfH_lt_subst2`), el 2.º ⇒ `heq`.
 >   `[propext,choice,Quot.sound,prf_inAxC]`.
 >
-> **FALTA de (c):** (1) los **otros 20 tags** — replicar el patrón estricto (añadir `lenc = len_k` a
-> cada `ax_lineWF_<k>`, arreglar su `prf_lineWF_<k>` con `prf_iff_drop_left_conj`, y su reflector
-> punteado); nótese que `len_k` varía (thy=2, la mayoría=3, p2/j3/leibniz=4/5). (2) El **`or_elim` ×21**
-> (`prf_lineWF_inv` da la disyunción de tags; cada rama invoca su `pcc_lineWF_tracked_<k>_imp`).
+> **▶ CASO `thy` — In‑REFLECT ARRANCADO (2026‑07‑20, `Meta/InAxiomsCodePrf.lean`).**
+> Investigado a fondo: `thy` (tag 15) NO es un clon de `eqrefl` — usa la forma EXPLÍCITA + condición
+> **`In (carc) axiomsCodeT`** (membresía). Su reflexión = **Σ₁‑completitud positiva de la pertenencia
+> a axiomas** = groundwork de `NegVerifier`. **Hallazgo clave: NO está bloqueada por Tarski** — el
+> destino usa `carcT (tcFn t)` (código RASTREADO, evaluable con `pcc_eval_carc`), no `termCode
+> (carc t)` (stuck). En el disyunto cabeza `carc t = f̄` (f axioma concreto), la cadena
+> `carcT(tcFn t)→tcFn(carc t)→tcFn(f̄)→termCode(f̄)` deja el argumento concreto ⇒ pertenencia libre.
+> **Entregado (libre de muro):** `pcc_inAxiomsCodeT_concrete (f∈axioms) : Prf (provCodeC'(In ⌜f⌝
+> axiomsCodeT))` — el *payload* del caso cabeza (`repr_pos'_prf` de `prf_inAxC`).
+> **FALTA (el grueso NegVerifier):** la recursión `pcc_In_lfc_tracked` sobre la lista de axiomas
+> ABSTRACTA (sin materializar): cabeza = `pcc_in_head` + swap de código por `pcc_leibniz_code` DENTRO
+> de `Prov` (con `hbr` + `pcc_eq_tracked` + `repr_pos'(prf_tc_form)`); cola = recursión + extensión
+> rastreada (reflejo de `ax_L2_in_cons` vía `pcc_thm_inst`). Luego puente `axiomsCodeT ↔ listFormCodeM
+> axioms` dentro de `Prov` (Leibniz reflejada de `ax_axiomsCodeT_eq`) + evaluación de `carc t`. Diseño
+> completo documentado en la cabecera de `Meta/InAxiomsCodePrf.lean`. `[…,prf_inAxC]`, 101 jobs.
+>
+> **FALTA de (c):** (1) **`thy`**: cerrar la recursión `pcc_In_lfc_tracked` (arriba) → strict schema
+> `lenc=2` → reflector. (2) **`mp`** (tag 16, forma explícita, `lineWF` incondicional). (3) los **17
+> tags `=eq`** — clones de `eqrefl` (helper genérico: `lenc = len_k`, la mayoría=3, p2/j3/leibniz=4/5).
+> (4) El **`or_elim` ×21** (`prf_lineWF_inv` da los tags; cada rama su `pcc_lineWF_tracked_<k>_imp`).
 >
 > **(histórico) (c) PARCIAL (2026‑07‑20): reflector POR RAMA con `heq` descargada.**
 > `pcc_lineWF_tracked_eqrefl_imp (t) (hb1)(hb2)
