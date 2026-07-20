@@ -408,6 +408,57 @@ theorem pcc_lineWF_tracked_eqrefl (t : Term)
   -- `lwfDot t = lineWFCodeFn (tcFn t)`
   exact prf_mp (prf_provCode_congr (prf_lwfDot_eq t)) hLwf
 
+/-! ### Paso 6g — (c) parcial: descarga de `heq` vía el accesor (reflector POR RAMA)
+
+Del accesor `ax_lineWF_eqrefl` en la dirección `⇒` (`iff.mp` = `Prf₀.c2`): bajo `lineWF t` y el
+tag `nthc t 1 = 12̇`, la condición estructural `carc t = eqc (nthc t 2)(nthc t 2)` **se deriva**
+(no hace falta como hipótesis). Queda el **reflector por rama** que el `or_elim` ×21 (paso c final)
+invocará en el disyunto `eqrefl`: toma `lineWF t` y el tag, y produce la reflexión punteada.
+
+⚠️ **Las cotas `1 < lenc t` / `2 < lenc t` siguen como hipótesis**: NO son derivables de `lineWF t`
++ tag con la axiomática actual (`nthc` no tiene ecuación fuera de rango ⇒ no hay `nthc_oob`; el
+accesor `ax_lineWF_eqrefl` es un `⇔` que no fuerza la longitud de la línea). Es el único hueco real
+que resta del paso 6 — decisión de diseño pendiente (línea canónica vs. reforzar la inversión). -/
+
+/-- **Reflector por rama, caso `eqrefl`** (dirección `⇒` del accesor descargada): asumido el tag
+    `nthc t 1 = 12̇` (que el `or_elim` de `prf_lineWF_inv` provee en este disyunto) y las cotas,
+    `lineWF t` refleja su código punteado — **sin** pedir la condición estructural (se deriva). -/
+theorem pcc_lineWF_tracked_eqrefl_imp (t : Term)
+    (hb1 : Prf (lt (succ zero) (lenc t)))
+    (hb2 : Prf (lt (numeralM 2) (lenc t))) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 12) ⇒
+      provFromCode (lineWFCodeFn (tcFn t)))) := by
+  refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 12) [lineWF t] rfl)
+  -- Γ = [tag, lineWF t]
+  let Γ : List Formula := [nthc t (succ zero) =eq numeralM 12, lineWF t]
+  have hlw : PrfH Γ (lineWF t) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have htagH : PrfH Γ (nthc t (succ zero) =eq numeralM 12) := PrfH.hyp _ _ (List.Mem.head _)
+  -- accesor `ax_lineWF_eqrefl` instanciado en `t`, dirección directa (`iff.mp` = c2)
+  have hacc : Prf (Formula.impl (nthc t (succ zero) =eq numeralM 12)
+      (lineWF t ⇔ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))))) := by
+    have hh := prf_spec (prf_ax (show ax_lineWF_eqrefl ∈ axioms by simp [axioms])) t
+    simpa [ax_lineWF_eqrefl, iff, lineWF, carc, nthc, eqc, numeralM, succ, zero, cons, nil,
+      substFormula, substTerm, substTerms, FOL.substTerm_liftTerm] using hh
+  -- `lineWF t ⇔ EQ` (bajo el tag), luego `heq : EQ` por `iff.mp` + `lineWF t`
+  have hiff : PrfH Γ (lineWF t ⇔ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH hacc _) htagH
+  have heqH : PrfH Γ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
+  -- producción de los dos punteados (con las cotas + tag + heq derivada)
+  have hTag : PrfH Γ (provFromCode (tagDot t)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_tagDot t) _)
+      (prf_to_prfH hb1 _)) htagH
+  have hEq : PrfH Γ (provFromCode (eqDot t)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_eqDot t) _) hlw)
+      (prf_to_prfH hb2 _)) heqH
+  -- MP interno ×2 sobre la columna vertebral + `lwfDot = lineWFCodeFn`
+  have hImp : PrfH Γ (provFromCode (implc (eqDot t) (lwfDot t))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (tagDot t) _) _)
+      (prf_to_prfH (paso6_backbone t) _)) hTag
+  have hLwf : PrfH Γ (provFromCode (lwfDot t)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_mp_code_open (eqDot t) _) _) hImp) hEq
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_lwfDot_eq t)) _) hLwf
+
 end ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (
@@ -416,4 +467,5 @@ export ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (
   substtc_inv_termCode_of_tc eqcT eqcT_termCode prf_congr_eqcT prf_substtc_eqcT
   prf_tagDot_eq prf_eqDot_eq prf_tc_eqc pcc_congr_eqcT_diag_code_imp
   pcc_tagDot pcc_eqDot prf_lwfDot_eq pcc_lineWF_tracked_eqrefl
+  pcc_lineWF_tracked_eqrefl_imp
 )

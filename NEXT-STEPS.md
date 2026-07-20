@@ -134,12 +134,26 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > `pcc_mp_code_apply`×2, cerrando con `prf_lwfDot_eq` (`lwfDot t =eq lineWFCodeFn (tcFn t)`). **Es el
 > caso `eqrefl` de `pcc_lineWF_tracked` completo salvo las hipótesis** (tag, cotas, condición).
 >
-> **FALTA sólo (c) — descargar las hipótesis + envolver la inversión** para el teorema `∀t` sin
-> premisas: de `lineWF t`, la inversión `prf_lineWF_inv` da la disyunción de 21 tags; en la rama
-> `eqrefl` el tag `nthc t 1 = 12̇` es la condición de rama, y el accesor `ax_lineWF_eqrefl` da la
-> condición estructural (`heq`) por `iff.mp`. **Punto abierto real:** las cotas `1 < lenc t` /
-> `2 < lenc t` — hay que derivarlas de `lineWF t` (¿lema de longitud mínima por tag?, o reforzar el
-> accesor). Luego los **otros 20 tags** replican `pcc_lineWF_tracked_eqrefl` cambiando axioma/`expr_k`.
+> **▶ (c) PARCIAL HECHA (2026‑07‑20): reflector POR RAMA con `heq` descargada.**
+> `pcc_lineWF_tracked_eqrefl_imp (t) (hb1)(hb2)
+> : Prf (lineWF t ⇒ ((nthc t 1 = 12̇) ⇒ provFromCode (lineWFCodeFn (tcFn t))))` — instancia el
+> accesor `ax_lineWF_eqrefl` en `t` y **deriva** la condición estructural (`heq`) por `iff.mp`
+> (`Prf₀.c2`) desde `lineWF t` + el tag; ya **no** la pide como hipótesis. Es el reflector que el
+> `or_elim` ×21 invocará en el disyunto `eqrefl`. `[propext,choice,Quot.sound,prf_inAxC]`.
+>
+> **FALTA de (c):**
+> 1. **⚠️ LAS COTAS `1 < lenc t` / `2 < lenc t` — HUECO REAL, decisión de diseño.** NO son derivables
+>    de `lineWF t` + tag con la axiomática actual: `nthc` no tiene ecuación fuera de rango (no hay
+>    `nthc_oob`), y `ax_lineWF_eqrefl` es un `⇔` que no fuerza la longitud de la línea. Opciones:
+>    (A) **reforzar el esquema** eqrefl para que `lineWF` de una línea eqrefl **exija** la estructura
+>        canónica de 3 elementos `cons concl (cons 12̇ (cons arg nil))` (toca axiomática ⇒ sanción);
+>    (B) enunciar `pcc_lineWF_tracked` sólo sobre **líneas canónicas** y que `hC_dot` provea la
+>        canonicidad; (C) añadir `ax_nthc_oob` (`i ≥ lenc t ⇒ nthc t i = 0`) para que
+>        `nthc t 1 = 12̇ ≠ 0` fuerce `1 < lenc t` (toca axiomática ⇒ sanción). La forma **explícita**
+>        de B.3b (`lineWF_eqrefl : lineWF (cons concl (cons 12̇ (cons t nil))) ⇔ …`, longitud 3) ya
+>        da las cotas gratis — pista de que (A)/(B) son el camino natural.
+> 2. Los **otros 20 tags**: replicar `pcc_lineWF_tracked_eqrefl_imp` cambiando axioma/`expr_k`.
+> 3. El **`or_elim` ×21** (`prf_lineWF_inv` da la disyunción; cada rama invoca su reflector).
 >
 > **(referencia histórica de la capa densa)** (a‑bis) *producir* `Prov(TAG_dot t)` y `Prov(EQ_dot t)` aplicando
 > = `Prov(⌜carc t =eq eqc(nthc t 2)(nthc t 2)⌝)` vía **evaluación provable** (`pcc_eval_nthc` /
