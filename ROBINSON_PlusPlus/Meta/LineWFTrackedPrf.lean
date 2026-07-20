@@ -128,6 +128,80 @@ theorem paso6_backbone (t : Term) :
     (prf_congr_implc (prf_refl _)
       (prf_substfc_impl zero (tcFn t) (formCode eqEqrefl) (formCode lwfVar)))
 
+/-! ### Paso 6c — los códigos punteados, EVALUADOS
+
+`tagDot`/`eqDot` son `substfc`‑aplicaciones sin reducir. Aquí se calculan a la forma
+*rastreada* (`nthcT (tcFn t) …`) que consumen `pcc_eval_nthc` / `pcc_eval_carc_nthc`. Es pura
+distribución de `substfc`/`substtc` sobre los constructores de código, con el hueco `⌜v₀⌝`
+recibiendo `tcFn t` (`prf_substtc_varc0`) y los subcódigos cerrados invariantes. -/
+
+/-- `termCode a` es `substtc`‑invariante cuando `a` está **rastreado** (`tcFn a =eq termCode a`):
+    el código de un código es cerrado. Generaliza `substtc_inv_termCode_formCode`. -/
+theorem substtc_inv_termCode_of_tc {a : Term} (htc : Prf (tcFn a =eq termCode a)) :
+    ∀ W, Prf (substtc zero W (termCode a) =eq termCode a) := fun W =>
+  prf_eq_trans (prf_congr_substtc3 (prf_eq_symm htc))
+    (prf_eq_trans (prf_substtc_tcFn W a) htc)
+
+/-- **`TAG_dot` evaluado**: `substfc 0 (tcFn t) ⌜nthc #0 1 = 12̇⌝ = ⌜nthc(ṫ,1̇) = 12̇⌝`.
+    El hueco `⌜v₀⌝` recibe `tcFn t`; los numerales `1̇`/`12̇` son cerrados (`prf_tc_numeral`). -/
+theorem prf_tagDot_eq (t : Term) :
+    Prf (tagDot t =eq
+      eqCodeFn (nthcT (tcFn t) (termCode (succ zero))) (termCode (numeralM 12))) := by
+  unfold tagDot tagEqrefl
+  refine prf_eq_trans (prf_substfc_eq zero (tcFn t) _ _) ?_
+  refine prf_congr_eqCodeFn ?_ (substtc_inv_termCode_of_tc (prf_tc_numeral 12) (tcFn t))
+  refine prf_eq_trans (prf_substtc_nthcT zero (tcFn t) _ _) ?_
+  exact prf_congr_nthcT (prf_substtc_varc0 (tcFn t))
+    (substtc_inv_termCode_of_tc (prf_tc_numeral 1) (tcFn t))
+
+/-! #### El código de `eqc`
+
+A diferencia de `carc`/`nthc` (que son `.func`, con constructor `carcT`/`nthcT`), `eqc a b` es un
+**`cons`‑árbol** (`⟨4, a, b⟩`), luego su código es un árbol de `consT`. Se le da constructor
+object propio, `eqcT`, con su congruencia y su distribución de `substtc`. -/
+
+/-- Constructor object del código de `eqc a b` desde los códigos `a`, `b` de sus argumentos. -/
+def eqcT (a b : Term) : Term :=
+  consT (termCode (numeralM 4)) (consT a (consT b (termCode nil)))
+
+/-- Puente definicional con `termCode`. -/
+theorem eqcT_termCode (a b : Term) : eqcT (termCode a) (termCode b) = termCode (eqc a b) := rfl
+
+/-- Congruencia de `eqcT` en ambos argumentos. -/
+theorem prf_congr_eqcT {a a' b b' : Term} (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
+    Prf (eqcT a b =eq eqcT a' b') := by
+  unfold eqcT
+  exact prf_congr_consT (prf_refl _) (prf_congr_consT ha (prf_congr_consT hb (prf_refl _)))
+
+/-- `substtc` distribuye sobre `eqcT` (los subcódigos `4̇` y `⌜nil⌝` son cerrados). -/
+theorem prf_substtc_eqcT (W a b : Term) :
+    Prf (substtc zero W (eqcT a b) =eq eqcT (substtc zero W a) (substtc zero W b)) := by
+  unfold eqcT
+  refine prf_eq_trans (prf_substtc_consT zero W _ _) ?_
+  refine prf_congr_consT (substtc_inv_termCode_of_tc (prf_tc_numeral 4) W) ?_
+  refine prf_eq_trans (prf_substtc_consT zero W _ _) ?_
+  refine prf_congr_consT (prf_refl _) ?_
+  refine prf_eq_trans (prf_substtc_consT zero W _ _) ?_
+  exact prf_congr_consT (prf_refl _) (substtc_inv_termCode_of_tc prf_tc_zero W)
+
+/-- **`EQ_dot` evaluado**: `substfc 0 (tcFn t) ⌜carc #0 = eqc (nthc #0 2) (nthc #0 2)⌝`
+    `= ⌜carc(ṫ) = eqc(nthc(ṫ,2̇), nthc(ṫ,2̇))⌝`. Misma distribución que `TAG_dot`, un nivel
+    más profunda (el `eqc` anidado). -/
+theorem prf_eqDot_eq (t : Term) :
+    Prf (eqDot t =eq eqCodeFn (carcT (tcFn t))
+      (eqcT (nthcT (tcFn t) (termCode (numeralM 2)))
+            (nthcT (tcFn t) (termCode (numeralM 2))))) := by
+  unfold eqDot eqEqrefl
+  refine prf_eq_trans (prf_substfc_eq zero (tcFn t) _ _) ?_
+  refine prf_congr_eqCodeFn ?_ ?_
+  · exact prf_eq_trans (prf_substtc_carcT zero (tcFn t) _)
+      (prf_congr_carcT (prf_substtc_varc0 (tcFn t)))
+  · refine prf_eq_trans (prf_substtc_eqcT (tcFn t) _ _) ?_
+    refine prf_congr_eqcT ?_ ?_ <;>
+      exact prf_eq_trans (prf_substtc_nthcT zero (tcFn t) _ _)
+        (prf_congr_nthcT (prf_substtc_varc0 (tcFn t))
+          (substtc_inv_termCode_of_tc (prf_tc_numeral 2) (tcFn t)))
+
 end ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (

@@ -106,7 +106,21 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > --   pcc_thm_inst (TAG⇒(EQ⇒LWF)) hbwd (tcFn t)  →  prf_substfc_impl ×2 (distribuye substfc)
 > --   →  prf_provCode_congr.  [COMPILA]
 > ```
-> **FALTA (la capa densa restante):** (a) reflejar `TAG_dot t` = `Prov(⌜nthc t 1 =eq 12⌝)` y `EQ_dot t`
+> **▶ MATERIALIZADA + EVALUACIÓN DE LOS PUNTEADOS (2026‑07‑20, `Meta/LineWFTrackedPrf.lean`, 100 jobs).**
+> La columna vertebral **ya no vive sólo en este documento**: los 3 commits anteriores de B.3c tocaron
+> *sólo* `NEXT-STEPS.md` (el probe era gitignored), así que se materializó en módulo fuente y la
+> verifica el build. Contiene: `tagEqrefl`/`eqEqrefl`/`lwfVar` (+`ax_lineWF_eqrefl_eq`, rfl),
+> **`prf_lineWF_eqrefl_bwd`** (`[propext,choice,Quot.sound]`), `tagDot`/`eqDot`/`lwfDot` y
+> **`paso6_backbone`** (`[propext,choice,Quot.sound,prf_inAxC]`).
+> **Y avanza (a)** con la mitad *estructural*: los códigos punteados **EVALUADOS** a forma rastreada
+> — `prf_tagDot_eq` (`substfc 0 (tcFn t) ⌜nthc #0 1 = 12̇⌝ = ⌜nthc(ṫ,1̇) = 12̇⌝`) y `prf_eqDot_eq`
+> (idem con el `eqc` anidado) — que es justo la forma que consumen `pcc_eval_nthc`/`pcc_eval_carc_nthc`.
+> Piezas nuevas reutilizables por los otros 20 tags: `substtc_inv_termCode_of_tc` (generaliza
+> `substtc_inv_termCode_formCode` a cualquier `a` rastreado) y la familia **`eqcT`**
+> (`eqc a b` es un `cons`‑árbol, no un `.func` ⇒ necesita constructor object propio, con
+> `prf_congr_eqcT`/`prf_substtc_eqcT`).
+>
+> **FALTA (la capa densa restante):** (a‑bis) *producir* `Prov(TAG_dot t)` y `Prov(EQ_dot t)` aplicando
 > = `Prov(⌜carc t =eq eqc(nthc t 2)(nthc t 2)⌝)` vía **evaluación provable** (`pcc_eval_nthc` /
 > `pcc_eval_carc_nthc`, que operan DENTRO de `Prov` bajo cota `i<lenc`; de `lineWF t` sale la cota y la
 > estructura de `t`); (b) dos `pcc_mp_code_open` (MP interno con TAG_dot y EQ_dot) → `provFromCode (LWF_dot t)`;
