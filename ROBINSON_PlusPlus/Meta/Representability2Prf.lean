@@ -95,12 +95,30 @@ theorem prf_In_runFn_of_mem {rs : List Rule} {L : List Formula} {φ : Formula}
 
 /-! ### Pertenencia de códigos de axioma a `axiomsCodeT`, en `Prf`
 
-Meta-axioma **finitario** análogo de `ax_inAxC` (que vive a nivel `axioms ⊢` en
-`Minimal/Axioms.lean`): el constante opaco `axiomsCodeT` del verificador contiene
-los códigos de todos los axiomas. Es el postulado de codificación al nivel del
-cálculo `Prf`. (Mismo contenido que `ax_inAxC`; no derivable de él porque el puente
-`Prf → ⊢` es de una sola dirección.) -/
-axiom prf_inAxC (a : Formula) (h : a ∈ axioms) : Prf (In (formCodeM a) axiomsCodeT)
+**Meta-axioma de codificación finitario** `prf_axiomsCodeT_eq`: el anclaje del constante opaco
+`axiomsCodeT` a la lista explícita `listFormCodeM axioms`, a nivel del cálculo `Prf` (espejo de
+`ax_axiomsCodeT_eq`, que vive a nivel `axioms ⊢`; no derivable de él porque `Prf → ⊢` es de una
+sola dirección). Es **el único postulado de codificación** de la capa `Prf`: con él, `prf_inAxC`
+(la pertenencia de cada código de axioma) pasa a ser **TEOREMA** — igual que en `⊢` `ax_inAxC` se
+deriva del anclaje `ax_axiomsCodeT_eq`. -/
+axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
+
+/-- **Pertenencia POSITIVA en `Prf`** de un código de fórmula a `listFormCodeM L` (recursión
+    estructural sobre `L`, sin materializar el término): cabeza = `prf_in_cons_head`, cola =
+    `prf_in_cons_tail`. Espejo `Prf` de `prf_In_listFormCodeM` (nivel `⊢`). -/
+theorem prf_In_listFormCodeM_prf (φ : Formula) :
+    ∀ (L : List Formula), List.Mem φ L → Prf (In (formCodeM φ) (listFormCodeM L))
+  | [], hmem => by cases hmem
+  | g :: gs, hmem => by
+      rcases List.mem_cons.mp hmem with rfl | htail
+      · exact prf_in_cons_head (formCodeM φ) (listFormCodeM gs)
+      · exact prf_in_cons_tail (formCodeM g) (prf_In_listFormCodeM_prf φ gs htail)
+
+/-- **`prf_inAxC` — ahora TEOREMA** (antes meta-axioma): la pertenencia del código de un axioma a
+    `axiomsCodeT`, derivada del anclaje `prf_axiomsCodeT_eq` + la pertenencia positiva a la lista
+    explícita (`prf_In_listFormCodeM_prf`) + Leibniz en el 2º argumento de `In` (`prf_eq_subst_in`). -/
+theorem prf_inAxC (a : Formula) (h : a ∈ axioms) : Prf (In (formCodeM a) axiomsCodeT) :=
+  prf_eq_subst_in (prf_eq_symm prf_axiomsCodeT_eq) (prf_In_listFormCodeM_prf a axioms h)
 
 /-- Pertenencia del código de un axioma a `axiomsCodeT` en `Prf` (vía `prf_inAxC`
     + puente `formCodeM_eq`). Reusado en el caso `thy`. -/
