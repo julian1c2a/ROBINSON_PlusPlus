@@ -160,12 +160,24 @@ Lean v4.31.0 · 0 errores / 0 warnings / 0 sorrys · 7 `axiom` de Lean (`AXIOMS.
 > `carcT(tcFn t)→tcFn(carc t)→tcFn(f̄)→termCode(f̄)` deja el argumento concreto ⇒ pertenencia libre.
 > **Entregado (libre de muro):** `pcc_inAxiomsCodeT_concrete (f∈axioms) : Prf (provCodeC'(In ⌜f⌝
 > axiomsCodeT))` — el *payload* del caso cabeza (`repr_pos'_prf` de `prf_inAxC`).
-> **FALTA (el grueso NegVerifier):** la recursión `pcc_In_lfc_tracked` sobre la lista de axiomas
-> ABSTRACTA (sin materializar): cabeza = `pcc_in_head` + swap de código por `pcc_leibniz_code` DENTRO
-> de `Prov` (con `hbr` + `pcc_eq_tracked` + `repr_pos'(prf_tc_form)`); cola = recursión + extensión
-> rastreada (reflejo de `ax_L2_in_cons` vía `pcc_thm_inst`). Luego puente `axiomsCodeT ↔ listFormCodeM
-> axioms` dentro de `Prov` (Leibniz reflejada de `ax_axiomsCodeT_eq`) + evaluación de `carc t`. Diseño
-> completo documentado en la cabecera de `Meta/InAxiomsCodePrf.lean`. `[…,prf_inAxC]`, 101 jobs.
+> **▶ In‑REFLECT de `axiomsCodeT` CERRADO (2026‑07‑20) — el nudo `NegVerifier` (8‑11 sesiones) hecho.**
+> `Meta/InAxiomsCodePrf.lean`, `[…,prf_axiomsCodeT_eq]`, 101 jobs. La Σ₁‑completitud rastreada de la
+> pertenencia a axiomas, **sin muro de Tarski** (código rastreado `carcT (tcFn ·)`):
+> - `pcc_in_tail_tracked` (cola, reflejo del In‑cons vía `pcc_thm_inst`) + `pcc_in_head_swap`
+>   (cabeza: `pcc_in_head` libre + swap `termCode a → yc` por Leibniz DENTRO de `Prov`, cadena
+>   `yc=tcFn y=tcFn a=termCode a` sólo con códigos `tcFn`).
+> - **`pcc_In_lfc_tracked`** — recursión sobre la lista de axiomas ABSTRACTA (sin materializar):
+>   `In y (listFormCodeM L) ⇒ Prov(⌜In yc (listFormCodeM L)~⌝)`.
+> - **`pcc_In_axiomsCodeT_tracked`** — reflexión sobre `axiomsCodeT` opaco, componiendo la recursión
+>   con el anclaje `prf_axiomsCodeT_eq` en LOS DOS lados (object `In y axiomsCodeT → In y
+>   (listFormCodeM axioms)`; código dentro de `Prov` por Leibniz reflejada del anclaje).
+> **Refactor de footprint (net‑0):** nuevo `axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq
+> listFormCodeM axioms)` (espejo `Prf` del `ax_axiomsCodeT_eq` de `⊢`) ⇒ `prf_inAxC` pasa a TEOREMA.
+> D1 cita ahora `prf_axiomsCodeT_eq` (antes `prf_inAxC`); `goedel_second'` sigue citando sólo `d3`.
+>
+> **FALTA sólo el ENSAMBLAJE de `thy`** (mecánico, espejo de `eqrefl`): instanciar
+> `pcc_In_axiomsCodeT_tracked` con `yc = carcT (tcFn t)`, `y = carc t`, `hbr` de `pcc_eval_carc`
+> (+ `carcT(tcFn t)` invariante); strict schema `thy` (`lenc = 2`); backbone; `pcc_lineWF_tracked_thy`.
 >
 > **FALTA de (c):** (1) **`thy`**: cerrar la recursión `pcc_In_lfc_tracked` (arriba) → strict schema
 > `lenc=2` → reflector. (2) **`mp`** (tag 16, forma explícita, `lineWF` incondicional). (3) los **17
