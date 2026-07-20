@@ -107,6 +107,23 @@ theorem prf_substfc_inFormCode_hole1 (t Lc : Term)
   exact prf_eq_trans (prf_substtsc_cons zero t Lc nil)
     (prf_eq_trans (prf_congr_cons_head (hLinv t)) (prf_congr_cons_tail (prf_substtsc_nil zero t)))
 
+/-- `substfc 0 t (inFormCodeFn yc ⌜v₀⌝) =eq inFormCodeFn yc t` (con `yc` `substtc`‑invariante):
+    hueco en el 2º argumento (la lista‑código), para el puente `axiomsCodeT`. -/
+theorem prf_substfc_inFormCode_hole2 (yc t : Term)
+    (hycinv : ∀ W, Prf (substtc zero W yc =eq yc)) :
+    Prf (substfc zero t (inFormCodeFn yc (varc (numeral 0))) =eq inFormCodeFn yc t) := by
+  show Prf (substfc zero t (atomc (strCode in_sym) (cons yc (cons (varc (numeral 0)) nil)))
+    =eq atomc (strCode in_sym) (cons yc (cons t nil)))
+  refine prf_eq_trans
+    (prf_substfc_atom zero t (strCode in_sym) (cons yc (cons (varc (numeral 0)) nil))) ?_
+  refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+  refine prf_eq_trans (prf_substtsc_cons zero t yc (cons (varc (numeral 0)) nil)) ?_
+  refine prf_eq_trans (prf_congr_cons_head (hycinv t)) ?_
+  refine prf_congr_cons_tail ?_
+  exact prf_eq_trans (prf_substtsc_cons zero t (varc (numeral 0)) nil)
+    (prf_eq_trans (prf_congr_cons_head (prf_substtc_varc0 t))
+      (prf_congr_cons_tail (prf_substtsc_nil zero t)))
+
 /-! ### `listFormCodeM L` es un CÓDIGO: `tcFn` lo computa (recursión sobre `L`) -/
 
 /-- `tcFn (listFormCodeM L) =eq termCode (listFormCodeM L)` — el código de la lista de axiomas es
@@ -233,10 +250,46 @@ theorem pcc_In_lfc_tracked (yc y : Term)
             (substtc_inv_termCode_listFormCodeM (f :: fs))) _)
           (PrfH.mp _ _ _ (prf_to_prfH hrec _) (PrfH.hyp _ _ (List.Mem.head _)))
 
+/-! ### Puente `axiomsCodeT ↔ listFormCodeM axioms` + reflexión rastreada sobre `axiomsCodeT`
+
+`axiomsCodeT` es opaco; se ancla a `listFormCodeM axioms` por `prf_axiomsCodeT_eq`. El puente se
+aplica en los DOS lados: la hipótesis object (`In y axiomsCodeT → In y (listFormCodeM axioms)`,
+Leibniz object) y el código dentro de `Prov` (swap del 2º argumento del átomo `In`, Leibniz
+reflejada del anclaje). -/
+
+/-- **Reflexión RASTREADA de la pertenencia a `axiomsCodeT`**: con `yc` `substtc`‑invariante y el
+    puente `Prov(yc = tcFn y)`, de `In y axiomsCodeT` sale `Prov(⌜In yc axiomsCodeT~⌝)`. Compone la
+    recursión `pcc_In_lfc_tracked` con el anclaje `prf_axiomsCodeT_eq` en ambos lados. -/
+theorem pcc_In_axiomsCodeT_tracked (yc y : Term)
+    (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
+    (hbr : Prf (provFromCode (eqCodeFn yc (tcFn y)))) :
+    Prf (In y axiomsCodeT ⇒ provFromCode (inFormCodeFn yc (termCode axiomsCodeT))) := by
+  refine prf_deduction ?_
+  -- lado OBJECT: In y axiomsCodeT → In y (listFormCodeM axioms)
+  have hlist : PrfH [In y axiomsCodeT] (In y (listFormCodeM axioms)) :=
+    PrfH_eq_subst_in (prf_to_prfH prf_axiomsCodeT_eq _) (prfH_hyp_self _)
+  -- recursión
+  have hrec : PrfH [In y axiomsCodeT]
+      (provFromCode (inFormCodeFn yc (termCode (listFormCodeM axioms)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_In_lfc_tracked yc y hycinv hbr axioms) _) hlist
+  -- lado CÓDIGO (dentro de Prov): swap termCode(listFormCodeM axioms) → termCode axiomsCodeT
+  let Ac : Term := inFormCodeFn yc (varc (numeral 0))
+  have heq : PrfH [In y axiomsCodeT]
+      (provFromCode (eqc (termCode (listFormCodeM axioms)) (termCode axiomsCodeT))) :=
+    prf_to_prfH (repr_pos'_prf (prf_eq_symm prf_axiomsCodeT_eq)) _
+  have h1 : PrfH [In y axiomsCodeT]
+      (provFromCode (substfc zero (termCode (listFormCodeM axioms)) Ac)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
+      (prf_substfc_inFormCode_hole2 yc (termCode (listFormCodeM axioms)) hycinv))) _) hrec
+  have h2 : PrfH [In y axiomsCodeT] (provFromCode (substfc zero (termCode axiomsCodeT) Ac)) :=
+    PrfH_leibniz_apply Ac (termCode (listFormCodeM axioms)) (termCode axiomsCodeT) heq h1
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_substfc_inFormCode_hole2 yc (termCode axiomsCodeT) hycinv)) _) h2
+
 end ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 
 export ROBINSON_PlusPlus.Meta.InAxiomsCodePrf (
-  pcc_inAxiomsCodeT_concrete prf_substfc_inFormCode_hole1
+  pcc_inAxiomsCodeT_concrete prf_substfc_inFormCode_hole1 prf_substfc_inFormCode_hole2
   prf_tc_listFormCodeM substtc_inv_termCode_of_tc substtc_inv_termCode_listFormCodeM
-  pcc_in_tail_tracked pcc_in_head_swap pcc_In_lfc_tracked
+  pcc_in_tail_tracked pcc_in_head_swap pcc_In_lfc_tracked pcc_In_axiomsCodeT_tracked
 )
