@@ -7,6 +7,7 @@ import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 import ROBINSON_PlusPlus.Meta.Representability2Prf
 import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+import ROBINSON_PlusPlus.Meta.D3InDotPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -24,6 +25,7 @@ open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 open ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.EvalNthcPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+open ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.Representability2Prf
 
 set_option linter.unusedSimpArgs false
@@ -151,10 +153,90 @@ theorem pcc_in_tail_tracked (yc a t : Term)
       (prf_substfc_inFormCode_hole1 yc (termCode (cons a t)) hat)
   exact prf_mp (pcc_mp_code_open _ _) (prf_mp (prf_provCode_congr hcode) hinst)
 
+/-! ### Combinador rastreado de CABEZA: el paso que ESQUIVA Tarski
+
+En el disyunto `y =eq a` (con `a = formCodeM f` un código concreto), la pertenencia cabeza
+`pcc_in_head` es libre (`a` ES la cabeza). El *swap* del código `termCode a → yc` se hace por
+Leibniz DENTRO de `Prov` (`PrfH_leibniz_apply`), con la igualdad de códigos armada de:
+`yc =[hbr] tcFn y =[pcc_eq_tracked, y=a] tcFn a =[prf_tc_form] termCode a`. Como todo va con los
+códigos RASTREADOS (`tcFn`), no aparece `termCode y` para `y` abstracto — no hay muro de Tarski. -/
+
+/-- **Cabeza rastreada**: bajo `y =eq a` (con `a` código, `tcFn a = termCode a`) y el puente
+    `Prov(yc = tcFn y)`, la pertenencia `Prov(⌜In yc (cons a t)~⌝)` es demostrable. -/
+theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
+    (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
+    (haform : Prf (tcFn a =eq termCode a))
+    (hatinv : ∀ W, Prf (substtc zero W (termCode (cons a t)) =eq termCode (cons a t)))
+    (hbr : PrfH Γ (provFromCode (eqCodeFn yc (tcFn y))))
+    (hya : PrfH Γ (y =eq a)) :
+    PrfH Γ (provFromCode (inFormCodeFn yc (termCode (cons a t)))) := by
+  -- pertenencia cabeza (código `termCode a` en la 1ª posición)
+  have hhead : PrfH Γ (provFromCode (inFormCodeFn (termCode a) (termCode (cons a t)))) :=
+    prf_to_prfH (pcc_in_head a t) _
+  -- cadena de códigos:  yc = tcFn y = tcFn a = termCode a
+  have heq2 : PrfH Γ (provFromCode (eqCodeFn (tcFn y) (tcFn a))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_tracked y a) _) hya
+  have heq3 : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))) :=
+    prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl (tcFn a)) haform))
+      (prf_provFromCode_eqCodeFn_refl (tcFn a))
+  have hyc_ta : PrfH Γ (provFromCode (eqc yc (tcFn a))) :=
+    PrfH_eq_trans_code yc (tcFn y) (tcFn a) hycinv hbr heq2
+  have hyc_tca : PrfH Γ (provFromCode (eqc yc (termCode a))) :=
+    PrfH_eq_trans_code yc (tcFn a) (termCode a) hycinv hyc_ta (prf_to_prfH heq3 _)
+  have hsym : PrfH Γ (provFromCode (eqc (termCode a) yc)) :=
+    PrfH_eq_symm_code yc (termCode a) hycinv hyc_tca
+  -- Leibniz interno: swap  termCode a → yc  en la 1ª posición del átomo `In`
+  let Ac : Term := inFormCodeFn (varc (numeral 0)) (termCode (cons a t))
+  have h1 : PrfH Γ (provFromCode (substfc zero (termCode a) Ac)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
+      (prf_substfc_inFormCode_hole1 (termCode a) (termCode (cons a t)) hatinv))) _) hhead
+  have h2 : PrfH Γ (provFromCode (substfc zero yc Ac)) :=
+    PrfH_leibniz_apply Ac (termCode a) yc hsym h1
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_substfc_inFormCode_hole1 yc (termCode (cons a t)) hatinv)) _) h2
+
+/-! ### La RECURSIÓN: reflexión rastreada de `In y (listFormCodeM L)` sobre `L` abstracta
+
+Combina cabeza y cola sin materializar la lista gigante: `prf_in_cons_iff` parte cada nivel en
+`y = cabeza ∨ In y cola`, la cabeza cierra con `pcc_in_head_swap` (esquiva Tarski), la cola por
+recursión + `pcc_in_tail_tracked`. -/
+
+/-- **Reflexión RASTREADA de la pertenencia a `listFormCodeM L`** (recursión sobre `L`): con `yc`
+    código `substtc`‑invariante y el puente `Prov(yc = tcFn y)`, de `In y (listFormCodeM L)` sale
+    `Prov(⌜In yc (listFormCodeM L)~⌝)`. Núcleo de la Σ₁‑completitud de pertenencia a axiomas. -/
+theorem pcc_In_lfc_tracked (yc y : Term)
+    (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
+    (hbr : Prf (provFromCode (eqCodeFn yc (tcFn y)))) :
+    ∀ L : List Formula,
+      Prf (In y (listFormCodeM L) ⇒
+        provFromCode (inFormCodeFn yc (termCode (listFormCodeM L))))
+  | [] => by
+      refine prf_deduction ?_
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+        (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (prfH_hyp_self _))
+  | f :: fs => by
+      refine prf_deduction ?_
+      have hor : PrfH [In y (cons (formCodeM f) (listFormCodeM fs))]
+          (lor (y =eq formCodeM f) (In y (listFormCodeM fs))) :=
+        PrfH_iff_mp (prf_in_cons_iff y (formCodeM f) (listFormCodeM fs)) (prfH_hyp_self _)
+      refine PrfH_or_elim hor ?_ ?_
+      · -- cabeza: `y = formCodeM f`
+        exact pcc_in_head_swap yc y (formCodeM f) (listFormCodeM fs) hycinv
+          (by rw [formCodeM_eq]; exact prf_tc_form f)
+          (substtc_inv_termCode_listFormCodeM (f :: fs))
+          (prf_to_prfH hbr _) (PrfH.hyp _ _ (List.Mem.head _))
+      · -- cola: `In y (listFormCodeM fs)`, recursión
+        have hrec := pcc_In_lfc_tracked yc y hycinv hbr fs
+        exact PrfH.mp _ _ _
+          (prf_to_prfH (pcc_in_tail_tracked yc (formCodeM f) (listFormCodeM fs)
+            (substtc_inv_termCode_listFormCodeM fs)
+            (substtc_inv_termCode_listFormCodeM (f :: fs))) _)
+          (PrfH.mp _ _ _ (prf_to_prfH hrec _) (PrfH.hyp _ _ (List.Mem.head _)))
+
 end ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 
 export ROBINSON_PlusPlus.Meta.InAxiomsCodePrf (
   pcc_inAxiomsCodeT_concrete prf_substfc_inFormCode_hole1
   prf_tc_listFormCodeM substtc_inv_termCode_of_tc substtc_inv_termCode_listFormCodeM
-  pcc_in_tail_tracked
+  pcc_in_tail_tracked pcc_in_head_swap pcc_In_lfc_tracked
 )
