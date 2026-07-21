@@ -1007,8 +1007,16 @@ def ax_premsOf_gen : Formula :=
 
 -- Thy: línea `cons ⌜ax⌝ (cons 15 nil)`. `lineWF` = el código pertenece a `axiomsCodeT`
 -- (independiente del contexto); sin premisas.
+-- THY: la línea es un axioma de la teoría.  Esquema ESTRICTO (A) con ACCESORES: añade la cláusula
+-- canónica `lenc = 2` (la línea `⟨concl, 15⟩` tiene exactamente dos componentes), que fuerza la
+-- cota de sub‑índice `1 < lenc` de la reflexión punteada.  La forma con accesores es la que lo hace
+-- aplicable a una línea ABSTRACTA (de `lineWF t` con `t` abstracto la teoría no puede recuperar la
+-- forma de `t`; los accesores, en cambio, están siempre definidos).  `prf_lineWF_thy` (`ReprPrf`)
+-- recupera el enunciado explícito, así que D1/D2 no cambian.
 def ax_lineWF_thy : Formula :=
-  forall_ (lineWF (cons (.var 0) (cons (numeralM 15) nil)) ⇔ In (.var 0) axiomsCodeT)
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 15)
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 2)
+      (In (carc (.var 0)) axiomsCodeT)))
 def ax_premsOf_thy : Formula :=
   forall_ (premsOf (cons (.var 0) (cons (numeralM 15) nil)) =eq nil)
 

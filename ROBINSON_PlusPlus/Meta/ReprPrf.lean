@@ -293,6 +293,19 @@ theorem prf_lineWF_iff_transport {L x x' y y' : Term}
   exact (hS y') ▸ prf_leibniz_subst (A := B) hy ((hS y) ▸ h1)
 
 
+/-- Transporte de `lineWF L ⇔ In x C` por una igualdad provable en el ELEMENTO. Análogo de
+    `prf_lineWF_iff_transport` para el átomo `In` — lo pide el esquema estricto de `thy`, cuyo RHS
+    no es un `=eq` sino la pertenencia `In (carc L) axiomsCodeT`. -/
+theorem prf_lineWF_iff_transport_in {L x x' C : Term}
+    (h : Prf (lineWF L ⇔ In x C)) (hx : Prf (x =eq x')) :
+    Prf (lineWF L ⇔ In x' C) := by
+  let A : Formula := iff (lineWF (liftTerm 0 L)) (In (.var 0) (liftTerm 0 C))
+  have hS : ∀ s : Term, substFormula 0 s A = iff (lineWF L) (In s C) := by
+    intro s
+    simp only [A, iff, lineWF, In, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm,
+      if_true]
+  exact (hS x') ▸ prf_leibniz_subst (A := A) hx ((hS x) ▸ h)
+
 theorem prf_concat_nil_eq (X : Term) : Prf (concat nil X =eq X) := by
   have hh := prf_spec (prf_ax (show ax_C1_concat_nil ∈ axioms by simp [axioms])) X
   simp [ax_C1_concat_nil, substFormula, substTerm, substTerms, concat, nil, zero] at hh
@@ -391,12 +404,24 @@ theorem prf_premsOf_gen (concl body : Term) :
     zero, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-- THY. Recuperado del axioma en forma de accesores + cláusula canónica (esquema ESTRICTO):
+    instanciar en la línea explícita, descargar el tag por cómputo, eliminar el conjunto
+    `lenc = 2̇` (demostrable en la línea canónica) y transportar `carc L → concl`. -/
 theorem prf_lineWF_thy (concl : Term) :
     Prf (lineWF (cons concl (cons (numeralM 15) nil)) ⇔ In concl axiomsCodeT) := by
-  have hh := prf_spec (prf_ax (show ax_lineWF_thy ∈ axioms by simp [axioms])) concl
-  simp [ax_lineWF_thy, substFormula, substTerm, substTerms, lineWF, In, axiomsCodeT, numeralM,
-    cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
-  exact hh
+  have hax := prf_spec (prf_ax (show ax_lineWF_thy ∈ axioms by simp [axioms]))
+    (cons concl (cons (numeralM 15) nil))
+  simp only [ax_lineWF_thy, substFormula, substTerm, substTerms, lineWF, In, axiomsCodeT, carc,
+    nthc, lenc, numeralM, cons, nil, zero, succ, iff, FOL.substTerm_liftTerm] at hax
+  have htag : Prf (nthc (cons concl (cons (numeralM 15) nil)) (succ zero) =eq numeralM 15) :=
+    prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
+  have hc : Prf (carc (cons concl (cons (numeralM 15) nil)) =eq concl) := prf_carc_cons _ _
+  have hlenc : Prf (lenc (cons concl (cons (numeralM 15) nil)) =eq numeralM 2) :=
+    prf_eq_trans (prf_lenc_cons_loc _ _)
+      (prf_eq_congr_succ_loc (prf_eq_trans (prf_lenc_cons_loc _ _)
+        (prf_eq_congr_succ_loc prf_lenc_nil_loc)))
+  exact prf_lineWF_iff_transport_in
+    (prf_iff_drop_left_conj (prf_mp hax htag) hlenc) hc
 
 theorem prf_premsOf_thy (concl : Term) :
     Prf (premsOf (cons concl (cons (numeralM 15) nil)) =eq nil) := by
@@ -792,6 +817,7 @@ end ROBINSON_PlusPlus.Meta.ReprPrf
 export ROBINSON_PlusPlus.Meta.ReprPrf (
   prf_congr_bin1 prf_congr_bin2 prf_congr_un prf_congr_bin
   prf_lineWF_iff_transport
+  prf_lineWF_iff_transport_in
   prf_ax
   prf_spec
   prf_mp
