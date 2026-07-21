@@ -81,6 +81,7 @@ import ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 import ROBINSON_PlusPlus.Meta.LineWFThyPrf
 import ROBINSON_PlusPlus.Meta.LineWFMpPrf
+import ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.OmegaReflect
 import ROBINSON_PlusPlus.Meta.GodelTwo
