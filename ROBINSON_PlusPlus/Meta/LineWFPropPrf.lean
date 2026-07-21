@@ -16,7 +16,7 @@ open ROBINSON_PlusPlus.Meta.CodeTreeReflect
 namespace ROBINSON_PlusPlus.Meta.LineWFPropPrf
 
 /-!
-## META — NIVEL D real (B.3c): los 9 tags PROPOSICIONALES, por árbol
+## META — NIVEL D real (B.3c): los tags de ÁRBOL PURO (9 proposicionales + `gen`)
 
 Con `CodeTreeReflect` cada tag estructural se reduce a **declarar su árbol** y comprobar que el
 esquema estricto coincide definicionalmente con la forma que el chasis espera. El coste por tag
@@ -121,13 +121,24 @@ theorem pcc_lineWF_tracked_p3_imp (t : Term) :
   pcc_lineWF_tracked_of_tree tP3 t
     (ax_p3_eq ▸ prf_ax (show ax_lineWF_p3 ∈ axioms by simp [axioms])) (Nat.le_refl _) (by decide)
 
+/-- GEN (tag 17, longitud 3): `∀ body`. Único de los cuantificacionales que es árbol **puro**
+    (los demás llevan `substfc`/`liftfc`, que no son constructores de código sino funciones objeto). -/
+def tGen : CTree := .un 6 (.leaf 2)
+theorem ax_gen_eq : ax_lineWF_gen
+    = Formula.forall (Formula.impl (tagF 17) (lwfVar ⇔ Formula.and (lencF 3) (condOf tGen))) := rfl
+theorem pcc_lineWF_tracked_gen_imp (t : Term) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 17) ⇒
+      provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_tree tGen t
+    (ax_gen_eq ▸ prf_ax (show ax_lineWF_gen ∈ axioms by simp [axioms])) (Nat.le_refl _) (by decide)
+
 end ROBINSON_PlusPlus.Meta.LineWFPropPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFPropPrf (
-  tP1 tP2 tC1 tC2 tC3 tJ1 tJ2 tJ3 tP3
-  ax_p1_eq ax_p2_eq ax_c1_eq ax_c2_eq ax_c3_eq ax_j1_eq ax_j2_eq ax_j3_eq ax_p3_eq
+  tP1 tP2 tC1 tC2 tC3 tJ1 tJ2 tJ3 tP3 tGen
+  ax_p1_eq ax_p2_eq ax_c1_eq ax_c2_eq ax_c3_eq ax_j1_eq ax_j2_eq ax_j3_eq ax_p3_eq ax_gen_eq
   pcc_lineWF_tracked_p1_imp pcc_lineWF_tracked_p2_imp
   pcc_lineWF_tracked_c1_imp pcc_lineWF_tracked_c2_imp pcc_lineWF_tracked_c3_imp
   pcc_lineWF_tracked_j1_imp pcc_lineWF_tracked_j2_imp pcc_lineWF_tracked_j3_imp
-  pcc_lineWF_tracked_p3_imp
+  pcc_lineWF_tracked_p3_imp pcc_lineWF_tracked_gen_imp
 )
