@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
 
-**Estado 2026‑07‑20 · HEAD `124d293` · build 101 jobs · 87 módulos (Minimal 11 + Meta 65 + Full 11) · Lean v4.31.0 · 0 errores / 0 warnings /
+**Estado 2026‑07‑21 · HEAD `4b3bb53` · build 108 jobs · 94 módulos (Minimal 11 + Meta 72 + Full 11) · Lean v4.31.0 · 0 errores / 0 warnings /
 0 sorrys.**
 
 > ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
@@ -76,6 +76,62 @@
 > es **INCONDICIONAL** ⟹ **`mp` no se puede refutar por `lineWF`**, sólo por `premsOf`/`boundedPremsIn`.
 > **NO es el mismo corte que en el módulo A** (allí los raros eran `thy`/`mp`/`gen`; aquí `gen` SÍ es
 > estructural).
+>
+> ### 🔖 SIGUIENTE PASO CONCRETO: **`substfcT`/`liftfcT` rastreados** → los 7 tags que faltan
+>
+> **B.3c va por 14 de 21 tags.** ✅ Cerrados: `eqrefl`(12) `thy`(15) `mp`(16) `efq`(8) `gen`(17)
+> y los 9 proposicionales `p1 p2 c1 c2 c3 j1 j2 j3 p3`.
+>
+> **Las tres piezas genéricas que lo hicieron posible** (leer en este orden si se retoma):
+> 1. **CHASIS** — `Meta/LineWFSchemaPrf.lean`. `pcc_lineWF_tracked_of_schema` es el ensamblaje
+>    final; factoriza `schema_bwd`, `schema_backbone`, los punteados de tag/longitud (genéricos en
+>    `k`/`n`), los puentes `pcc_{carc,nthc}D_bridge` y las cotas desde la longitud canónica.
+> 2. **KIT** — `Meta/CodeCtorKit.lean`. `nulT`/`unT`/`binT` parametrizados por **tag y aridad**:
+>    todos los constructores de código (`botc`=2, `eqc`=4, `implc`=5, `forallc`=6, `andc`=7,
+>    `orc`=8, `exc`=9) son el mismo `cons`‑árbol. Incluye la congruencia **dentro de `Prov`**.
+>    (`eqcT` de `LineWFTrackedPrf` es hoy `binT 4`.)
+> 3. **ÁRBOL** — `Meta/CodeTreeReflect.lean`. `CTree` reifica los RHS y `PrfH_dotVN` prueba la
+>    reflexión **por inducción, una sola vez**. Con esto **cada tag son TRES declaraciones**
+>    (literal del árbol + un `rfl` + una llamada). Ver `Meta/LineWFPropPrf.lean` como plantilla.
+>
+> **▶ LO QUE FALTA — 7 tags: `q1`(9) `q2`(10) `q3`(11) `leibniz`(13) `ind`(18) `qconf`(19)
+> `listInd`(20).** ⚠️ **NO son más de lo mismo.** Sus RHS llevan `substfc`/`liftfc` **dentro** del
+> árbol, y ésas **no son constructores de código** (no son `cons`‑árboles) sino **funciones OBJETO**,
+> del mismo tipo que `carc`/`nthc`. Verificado (2026‑07‑21) que **no existe** su contrapartida
+> rastreada: no hay `substfcT`/`liftfcT`, ni `prf_tc_substfc`, ni `prf_substtc_substfc`. Los dos
+> únicos lemas `Prf` con `substfc` en el mundo rastreado (`prf_substfc_ltCodeFn_varc0`,
+> `prf_substfc_exBodyc`) son sobre la sustitución **externa** del código punteado — otra cosa.
+>
+> **Plan del incremento** (mismo tipo de trabajo que fue el kit, pero para funciones objeto):
+> construir `substfcT`/`liftfcT` con (a) su ecuación `tc` (`prf_tc_substfc`), (b) su distribución
+> de `substtc`, (c) su congruencia interna en `Prov`; luego **añadir dos constructores a `CTree`**
+> (`sub c a b` / `lift c a`) extendiendo las 6 pruebas por inducción de `CodeTreeReflect`. Hecho
+> eso, los 7 caen tan baratos como los 14.
+>
+> **Después de los 21:** el **`or_elim` ×21** (`prf_lineWF_inv` da la disyunción de tags) para
+> ensamblar `pcc_lineWF_tracked` → `hC_dot` → `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`).
+>
+> #### Trampas ya diagnosticadas en este frente (NO volver a tropezar)
+> * `numeralM k` y `Godel.numeral k` **NO son defeq** para `k` variable (`numeralM_eq` va por
+>   inducción). Con literales reducen — por eso no aparece hasta que algo se hace genérico en `k`.
+> * `substFormula 0 #0 C ≠ C` para `C` ABIERTA: `substFormula` **decrementa** los índices
+>   superiores. Por eso el chasis toma `hC` como hipótesis explícita (cada tag la da con `rfl`).
+> * **`≤` resuelve al orden OBJETO** (sobre `Term`) con `Minimal.Axioms` abierto, y el error es
+>   opaco (*«type expected, got (n : Nat)»*). Escribir `Nat.le … n`. Además `Nat.le` crudo **no
+>   tiene instancia `Decidable`** ⇒ descargar cotas con `Nat.le_refl`, no con `decide`.
+> * `substTerm_numeralM`/`liftTerm_numeralM` **ya existen** en `Minimal/Axioms.lean`: no
+>   redefinirlos (hace el nombre ambiguo en los módulos cliente).
+> * `set` (Mathlib) **no está disponible**: usar `let`.
+>
+> #### Nota de solidez registrada
+> Los 21 esquemas están hoy en **forma ESTRICTA uniforme** (cláusula canónica `lenc = ṅ`, con `ṅ` =
+> máx índice + 1, derivada del propio esquema — no elegida). **Net‑0 axiomas: siguen 7.** Los 21
+> `prf_lineWF_<tag>` conservan su enunciado exacto (`prf_iff_drop_left_conj`), así que D1/D2 no
+> cambian. Con `mp` estricto **se revisa el hallazgo B.2**: una línea `mp` de forma incorrecta
+> (longitud ≠ 3) **sí** es refutable por `lineWF`; las premisas siguen exigiendo `premsOf`.
+> `NegVerifier` gana una vía de refutación, no la pierde.
+>
+> <details><summary>Histórico: el plan original de B.3c (21 casos a mano) — superado</summary>
 >
 > ### 🔖 SIGUIENTE PASO CONCRETO: **B.3c — `pcc_lineWF_tracked`** (el átomo `lineWF` punteado)
 > **B.3a/B.3b HECHO**: nivel `⊢` des‑duplicado (`Meta/LineWFDerives.lean`) y los **19 `ax_lineWF`
@@ -191,7 +247,7 @@
 > **Entregado (libre de muro):** `pcc_inAxiomsCodeT_concrete (f∈axioms) : Prf (provCodeC'(In ⌜f⌝
 > axiomsCodeT))` — el *payload* del caso cabeza (`repr_pos'_prf` de `prf_inAxC`).
 > **▶ In‑REFLECT de `axiomsCodeT` CERRADO (2026‑07‑20) — el nudo `NegVerifier` (8‑11 sesiones) hecho.**
-> `Meta/InAxiomsCodePrf.lean`, `[…,prf_axiomsCodeT_eq]`, 101 jobs. La Σ₁‑completitud rastreada de la
+> `Meta/InAxiomsCodePrf.lean`, `[…,prf_axiomsCodeT_eq]`, 101 jobs en su momento. La Σ₁‑completitud rastreada de la
 > pertenencia a axiomas, **sin muro de Tarski** (código rastreado `carcT (tcFn ·)`):
 > - `pcc_in_tail_tracked` (cola, reflejo del In‑cons vía `pcc_thm_inst`) + `pcc_in_head_swap`
 >   (cabeza: `pcc_in_head` libre + swap `termCode a → yc` por Leibniz DENTRO de `Prov`, cadena
@@ -255,6 +311,8 @@
 > 2. **`Char.ofNat` CLAMPA.** Sin guard, `decodeChars` **no es inyectiva** (un numeral fuera del rango
 >    Unicode decodifica a un char cuyo `toNat` ya no vuelve). Hubo que añadir el guard
 >    `(Char.ofNat code).toNat == code`; el round‑trip lo cumple gratis por `Char.ofNat_toNat`.
+
+> </details>
 
 ---
 
