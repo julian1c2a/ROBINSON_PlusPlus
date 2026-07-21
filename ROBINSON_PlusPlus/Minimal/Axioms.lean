@@ -989,8 +989,15 @@ conclusión se reconstruye del payload) se añaden con el encoder de `repr_pos'`
 
 -- MP: línea `cons ⌜B⌝ (cons 16 (cons ⌜A⌝ nil))`. Validez = premisas `⌜A⇒B⌝`, `⌜A⌝`
 -- en contexto (vía `premsOf`); `lineWF` incondicional.
+-- MP: línea `cons concl (cons 16 (cons premA nil))`.  Esquema ESTRICTO (A) con ACCESORES, pero su
+-- RHS es SÓLO la cláusula canónica `lenc = 3`: a diferencia de los esquemas proposicionales, `mp`
+-- **no impone condición alguna sobre la conclusión** — la fidelidad de `mp` la liga ÍNTEGRAMENTE
+-- `ax_premsOf_mp` (exige `implc premA concl` y `premA` entre las premisas de contexto).  Añadir la
+-- longitud sólo restringe la FORMA de la línea, no lo que se puede concluir: no toca la solidez.
+-- La cláusula es lo que hace derivable la cota `1 < lenc` de la reflexión punteada.
 def ax_lineWF_mp : Formula :=
-  forall_2 (lineWF (cons (.var 1) (cons (numeralM 16) (cons (.var 0) nil))))
+  forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 16)
+    (lineWF (.var 0) ⇔ (lenc (.var 0) =eq numeralM 3)))
 def ax_premsOf_mp : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 16) (cons (.var 0) nil))) =eq
     cons (implc (.var 0) (.var 1)) (cons (.var 0) nil))

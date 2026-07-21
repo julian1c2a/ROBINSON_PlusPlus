@@ -372,11 +372,25 @@ theorem prf_In_listFormCode {g : Formula} : ∀ {l : List Formula},
 
 /-! ### Validez `Prf` de las reglas de inferencia (mp/gen/thy) -/
 
+/-- MP. Recuperado del axioma en forma de accesores + cláusula canónica (esquema ESTRICTO):
+    instanciar en la línea explícita, descargar el tag por cómputo, y aplicar `iff.mpr` a la
+    longitud `lenc = 3̇` (demostrable en la línea canónica). El enunciado sigue siendo
+    **incondicional**, como antes. -/
 theorem prf_lineWF_mp (concl premA : Term) :
     Prf (lineWF (cons concl (cons (numeralM 16) (cons premA nil)))) := by
-  have hh := prf_spec (prf_spec (prf_ax (show ax_lineWF_mp ∈ axioms by simp [axioms])) concl) premA
-  simpa [ax_lineWF_mp, substFormula, substTerm, substTerms, lineWF, numeralM, cons, nil, zero, succ,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
+  have hax := prf_spec (prf_ax (show ax_lineWF_mp ∈ axioms by simp [axioms]))
+    (cons concl (cons (numeralM 16) (cons premA nil)))
+  simp only [ax_lineWF_mp, substFormula, substTerm, substTerms, lineWF, lenc, nthc,
+    numeralM, cons, nil, zero, succ, iff, FOL.substTerm_liftTerm] at hax
+  have htag : Prf (nthc (cons concl (cons (numeralM 16) (cons premA nil))) (succ zero)
+      =eq numeralM 16) :=
+    prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
+  have hlenc : Prf (lenc (cons concl (cons (numeralM 16) (cons premA nil))) =eq numeralM 3) :=
+    prf_eq_trans (prf_lenc_cons_loc _ _)
+      (prf_eq_congr_succ_loc (prf_eq_trans (prf_lenc_cons_loc _ _)
+        (prf_eq_congr_succ_loc (prf_eq_trans (prf_lenc_cons_loc _ _)
+          (prf_eq_congr_succ_loc prf_lenc_nil_loc)))))
+  exact prf_iff_mpr (prf_mp hax htag) hlenc
 
 theorem prf_premsOf_mp (concl premA : Term) :
     Prf (premsOf (cons concl (cons (numeralM 16) (cons premA nil))) =eq

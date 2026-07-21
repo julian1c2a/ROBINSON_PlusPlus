@@ -37,8 +37,12 @@ Leyendo `Minimal/Axioms.lean`:
   Éstos son los que `tagConcl` tabula.
 * **`thy` (15)**: `lineWF ⟨concl, 15⟩ ⇔ **In concl axiomsCodeT**` — el RHS **no es una ecuación**, es una
   pertenencia ⟹ fuera de `tagConcl` (`none`).
-* **`mp` (16)**: `lineWF` es **INCONDICIONAL** (no hay `⇔`); queda ligado por `premsOf` ⟹ fuera de
-  `tagConcl` (`none`). Es exactamente lo que el sondeo de solidez constató (`PLAN-NEGVERIFIER.md` §🔬 A).
+* **`mp` (16)**: su RHS **no es una ecuación estructural** — la conclusión la liga íntegramente
+  `premsOf` ⟹ fuera de `tagConcl` (`none`). Es lo que el sondeo de solidez constató
+  (`PLAN-NEGVERIFIER.md` §🔬 A).
+  ⚠️ **ACTUALIZADO (B.3c, `mp` estricto):** `ax_lineWF_mp` ya **no** es incondicional — hoy es
+  `∀. (nthc #0 1 = 16̇) ⇒ (lineWF #0 ⇔ (lenc #0 = 3̇))`. Sigue sin ligar la conclusión (por eso
+  sigue fuera de `tagConcl`), pero **sí liga la FORMA**. Ver la nota de la dirección negativa abajo.
 
 ⚠️ **Ojo al matiz** frente al módulo A: allí los «raros» eran `thy`/`mp`/`gen` (codificación *lossy*);
 aquí son **`thy`/`mp`** — `gen` **sí** es estructural. **No es el mismo corte.**
@@ -173,10 +177,16 @@ Contraposición del `.mp` de cada bicondicional: si la ecuación estructural es 
 **no** es bien formada. Se dan en `⊢` (Derives) además de en `Prf` porque los inputs reales del módulo
 C (`formCode_ne` y compañía, `neg_In_axiomsCodeT`) son de **nivel `⊢`**.
 
-⚠️ **`mp` (16) NO se puede refutar por `lineWF`** — su esquema es **incondicional**, luego
-`lineWF ⟨concl,16,a⟩` es SIEMPRE demostrable. La refutación de una línea `mp` mala **tiene que ir por
-`premsOf`/`boundedPremsIn`** (las premisas no están disponibles), nunca por `lineWF`. Es el precio de
-que `mp` esté ligado por `premsOf` en vez de por un `⇔` (`PLAN-NEGVERIFIER.md` §🔬 A).
+⚠️ **`mp` (16): matiz REVISADO en B.3c.** Cuando se escribió este módulo, `ax_lineWF_mp` era
+**incondicional** y por tanto `mp` **no era refutable por `lineWF` en absoluto**. Con el esquema
+ESTRICTO adoptado en B.3c (`Meta/LineWFMpPrf.lean`),
+`ax_lineWF_mp : ∀. (nthc #0 1 = 16̇) ⇒ (lineWF #0 ⇔ (lenc #0 = 3̇))`, la situación es:
+* una línea `mp` **de forma incorrecta** (longitud ≠ 3) **SÍ** se refuta por `lineWF`;
+* una línea `mp` bien formada pero **sin sus premisas** disponibles sigue exigiendo la refutación por
+  **`premsOf`/`boundedPremsIn`** — `lineWF` no dice nada de la conclusión, por diseño.
+O sea: `NegVerifier` **gana** una vía de refutación, no la pierde. La solidez no cambia (restringir la
+forma de la línea no altera qué puede concluirse). Los envoltorios negativos de este módulo **no** se
+han extendido a `mp`; hacerlo es trabajo pendiente barato si el módulo C lo necesita.
 -/
 
 /-- Silogismo hipotético en `Prf` (composición de implicaciones). -/
