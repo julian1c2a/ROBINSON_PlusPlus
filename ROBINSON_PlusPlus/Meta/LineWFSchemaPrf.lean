@@ -73,15 +73,8 @@ El chasis cuantifica sobre `k`/`n : Nat`, así que necesita los puentes de numer
 (`numeralM_eq` se prueba por inducción, no por `rfl`); con literales reducen, pero aquí no.
 De ahí que cada puente tenga que reescribir explícitamente con `numeralM_eq`. -/
 
-@[simp] theorem substTerm_numeralM (c : Nat) (s : Term) :
-    ∀ k : Nat, substTerm c s (numeralM k) = numeralM k
-  | 0 => rfl
-  | k + 1 => by simp only [numeralM, succ, substTerm, substTerms, substTerm_numeralM c s k]
-
-@[simp] theorem liftTerm_numeralM (c : Nat) :
-    ∀ k : Nat, liftTerm c (numeralM k) = numeralM k
-  | 0 => rfl
-  | k + 1 => by simp only [numeralM, succ, liftTerm, liftTerms, liftTerm_numeralM c k]
+-- ⚠️ `substTerm_numeralM` y `liftTerm_numeralM` **ya existen** en `Minimal/Axioms.lean`; no se
+-- reintroducen aquí (duplicarlos hacía ambiguo el nombre en los módulos cliente).
 
 /-- Puente `tc` del numeral con índice abierto. -/
 theorem prf_tc_numeralM (k : Nat) : Prf (tcFn (numeralM k) =eq termCode (numeralM k)) := by
@@ -253,8 +246,11 @@ theorem schema_bwd (k n : Nat) (C : Formula)
   refine deduction_aux ?_ (Formula.and (lencF n) C) [tagF k] rfl
   have hspec : Prf (Formula.impl (tagF k) (lwfVar ⇔ Formula.and (lencF n) C)) := by
     have hh := prf_spec hax (.var 0)
-    simpa [tagF, lencF, lwfVar, iff, lineWF, lenc, nthc, numeralM, succ, zero, cons, nil,
-      substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, hC] using hh
+    -- ⚠️ NO se pone `numeralM` en el conjunto: desplegarlo impide que `substTerm_numeralM`
+    -- dispare, y el `substTerm 0 #0 (numeralM ·)` se queda sin reducir.
+    simpa [tagF, lencF, lwfVar, iff, lineWF, lenc, nthc, succ, zero, cons, nil,
+      substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, substTerm_numeralM,
+      hC] using hh
   have hiff : PrfH [Formula.and (lencF n) C, tagF k] (lwfVar ⇔ Formula.and (lencF n) C) :=
     PrfH.mp _ _ _ (prf_to_prfH hspec _) (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hiff)
@@ -339,7 +335,7 @@ theorem pcc_lineWF_tracked_of_schema {k n : Nat} {C : Formula} (t : Term)
 end ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFSchemaPrf (
-  substTerm_numeralM liftTerm_numeralM prf_tc_numeralM substtc_inv_termCode_numeralM
+  prf_tc_numeralM substtc_inv_termCode_numeralM
   tagF lencF substFormula_tagF substFormula_lencF substFormula_lwfVar
   tagD lencD condD prf_tagD_eq prf_lencD_eq pcc_tagD pcc_lencD
   substtc_inv_carcT_tcFn substtc_inv_nthcT_tcFn pcc_carcD_bridge pcc_nthcD_bridge
