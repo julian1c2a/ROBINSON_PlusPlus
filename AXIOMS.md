@@ -1,6 +1,6 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-**Last updated:** 2026-07-13 — **`axiomsCodeT` concretado (opción 1): `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0 axiomas; desbloquea la dirección negativa (`⊬¬G`).** (previo 2026-07-09: F7a, 14 → 7 `axiom`.)
+**Last updated:** 2026-07-20 — **`prf_inAxC` → `prf_axiomsCodeT_eq`** (espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.)
 **Author:** Julián Calderón Almendros
 
 Registro autoritativo de **todas** las declaraciones `axiom` de Lean que sostienen
@@ -18,7 +18,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 > - **Teoría objeto vs metateoría.** Los esquemas aritméticos son de la teoría
 >   objeto; `d3` es metamatemático (sobre demostrabilidad). Son niveles distintos.
 > - **Dos cálculos.** `Derives` (`⊢`) y `Prf` necesitan cada uno su ancla de
->   codificación (`ax_axiomsCodeT_eq` / `prf_inAxC`); no son un duplicado a fusionar.
+>   codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`); no son un duplicado a fusionar.
 >
 > Este fichero es el «sitio único» **documental**: la fuente de verdad sobre el
 > inventario, aunque el código mantenga cada axioma en su capa correcta.
@@ -34,7 +34,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 | 3 | `ax_mod2_alternation` | `Full/Mod2.lean` | Esquema de inducción | `∀n. mod2(σn)+mod2(n)=1`; con él se derivan ax21/ax24 como **teoremas** |
 | 4 | `ax_p_tfa` | `Minimal/Theorems/Block8.lean` | Teoría objeto | Teorema Fundamental de la Aritmética (teorema en Full, postulado en Minimal) |
 | 5 | `ax_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) |
-| 6 | `prf_inAxC` | `Meta/Representability2Prf.lean` | Ancla de codificación | Análogo de (5) para el cálculo finitario `Prf` |
+| 6 | `prf_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`Prf (axiomsCodeT =eq listFormCodeM axioms)`** — espejo `Prf` de (5) para el cálculo finitario. **Reemplaza a `prf_inAxC`** (2026‑07‑20, `25d255b`), que pasa a ser **teorema** derivado (**net‑0 axiomas**). D1 `repr_pos'_prf` cita ahora éste |
 | 7 | `d3` | `Meta/GodelTwo.lean` | Postulado gödeliano | **Única pieza pendiente**: condición D3 de Hilbert-Bernays-Löb para `provCodeC'`. En construcción por el plan 12‑A |
 
 ### Detalle por familia
@@ -51,8 +51,11 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
   negativa `neg_In_axiomsCodeT`, que SÓLO los axiomas están). El término gigante
   `listFormCodeM axioms` **no se materializa** en las pruebas (recursión estructural,
   `Meta/AxiomListCode.lean`), evitando el coste que retiró el `ax_axiomsCodeT`
-  original en `7ae7b7b`. `prf_inAxC` (cálculo `Prf`) sigue siendo el ancla positiva
-  finitaria (intacta).
+  original en `7ae7b7b`. **`prf_axiomsCodeT_eq`** (cálculo `Prf`) es su espejo exacto:
+  desde 2026‑07‑20 (`25d255b`) sustituye al antiguo `prf_inAxC` —que era sólo
+  positivo y ahora es **teorema** derivado—, también **net‑0 axiomas**. Lo exige el
+  `In`‑reflect de `axiomsCodeT` (`Meta/InAxiomsCodePrf.lean`), que necesita las **dos**
+  direcciones dentro de `Prf`.
 - **Postulado gödeliano vivo (7).** `d3` es la única condición de derivabilidad
   aún postulada. Su prueba real (Σ₁-completitud provable del verificador) es el
   objetivo del plan **12‑A** (`GODEL-D3-TRACKED-DESIGN.md` §12–§14); fases 1a/1b/2
