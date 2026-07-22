@@ -102,6 +102,13 @@
 > únicos lemas `Prf` con `substfc` en el mundo rastreado (`prf_substfc_ltCodeFn_varc0`,
 > `prf_substfc_exBodyc`) son sobre la sustitución **externa** del código punteado — otra cosa.
 >
+> ⚠️ **NO confundir con `substCodeT`/`substCodeF`** (`Meta/SubstCodeOpenPrf.lean`), que **sí**
+> existen pero son funciones **META** (recursión Lean sobre `Term`/`Formula`: «código de `t` con la
+> variable `v` rellena por el código `w`»). No sirven aquí: en los 7 tags los argumentos de
+> `substfc` son **términos objeto abstractos** (accesores `nthc #0 i` sobre la línea abstracta), que
+> una función meta no puede recorrer. Lo que falta es el constructor **objeto** rastreado.
+> (Comprobado 2026‑07‑22; la similitud de nombres es una trampa real.)
+>
 > **Plan del incremento** (mismo tipo de trabajo que fue el kit, pero para funciones objeto):
 > construir `substfcT`/`liftfcT` con (a) su ecuación `tc` (`prf_tc_substfc`), (b) su distribución
 > de `substtc`, (c) su congruencia interna en `Prov`; luego **añadir dos constructores a `CTree`**
