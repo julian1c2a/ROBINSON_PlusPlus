@@ -109,11 +109,48 @@
 > una función meta no puede recorrer. Lo que falta es el constructor **objeto** rastreado.
 > (Comprobado 2026‑07‑22; la similitud de nombres es una trampa real.)
 >
-> **Plan del incremento** (mismo tipo de trabajo que fue el kit, pero para funciones objeto):
+> ### ⛔ CORRECCIÓN (2026‑07‑22): el plan de abajo era ERRÓNEO EN SU FORMA — **no ejecutarlo**
+>
+> Se planificó «construir `substfcT`/`liftfcT` con su ecuación `tc`». **Esa ecuación no puede
+> existir.** Diagnóstico verificado:
+>
+> * `tcFn` está axiomatizado **sólo** sobre `zero`/`succ`/`cons` (`ax_tc_zero`, `ax_tc_succ`,
+>   `ax_tc_cons`) — los tres **CONSTRUCTORES** de códigos. La ley `tcFn (cons a b) =eq
+>   consT (tcFn a) (tcFn b)` vale **porque `cons` es un constructor**: el código del valor de una
+>   aplicación de constructor ES el constructor‑código aplicado a los códigos.
+> * `substfc`/`liftfc` **no son constructores**, son funciones DEFINIDAS. Un axioma análogo
+>   `ax_tc_substfc : tcFn (substfc v t f) = substfcT (tcFn v) (tcFn t) (tcFn f)` sería **FALSO**:
+>   iguala el código de un **valor** (izquierda) con el código de una **expresión** (derecha).
+>   ⚠️ Añadirlo rompería la solidez — es justo el tipo de error de [[feedback-verifier-soundness]].
+> * No hay ni habrá `prf_tc_carc`/`prf_tc_nthc` tampoco (comprobado): los accesores rastreados
+>   **no van por `tc`**, van por **EVALUACIÓN PROVABLE** (`pcc_eval_carc`, `pcc_eval_nthc`, …), que
+>   internaliza con `pcc_thm_inst` la ecuación objeto que computa la función.
+>
+> **Lo que realmente hace falta es `pcc_eval_substfc` / `pcc_eval_liftfc`**, y eso es mucho más caro
+> que un kit: `pcc_eval_carc` funciona porque `carc` tiene UNA ecuación definitoria instanciable en
+> un patrón `cons` explícito; `substfc` se define por **recursión sobre los 8 constructores de
+> fórmula, con binders**, y en los 7 tags se aplica a un código **ABSTRACTO** (`nthc #0 2`) ⟹ su
+> evaluación provable exige **inducción interna sobre códigos de fórmula dentro de `Prov`**.
+> Pertenece a la familia de `pcc_eval_runFn`/`pcc_bdAll_intro` («la bestia» del §18), no a la del kit.
+> Todos los `prf_substfc_*` existentes (`_and`, `_atom`, `_eq`, `_impl`, `_forall`, …) computan
+> `substfc` **sólo sobre constructores de código explícitos**; ninguno sobre un código abstracto.
+>
+> **Opciones a decidir antes de seguir** (ninguna ejecutada):
+> 1. **Construir `pcc_eval_substfc`/`_liftfc`** por inducción interna. Camino honesto a 21/21; coste
+>    alto, comparable a `pcc_bdAll_intro`.
+> 2. **Reformular los 7 esquemas** para sacar `substfc` del árbol de reconstrucción y dejarlo como
+>    ecuación lateral sobre un argumento extra de la línea. ⚠️ Hay que comprobar si esa ecuación
+>    lateral es reflejable (¿`pcc_eq_tracked`?) o si sólo mueve el problema de sitio.
+> 3. **Reordenar el frente**: dejar B.3c al 14/21 y atacar antes otra pieza (p. ej. `or_elim` ×21
+>    parcial, o el frente ① `repr_neg`), volviendo aquí con más maquinaria.
+>
+> <details><summary>Plan original (ERRÓNEO, conservado como registro)</summary>
+>
 > construir `substfcT`/`liftfcT` con (a) su ecuación `tc` (`prf_tc_substfc`), (b) su distribución
 > de `substtc`, (c) su congruencia interna en `Prov`; luego **añadir dos constructores a `CTree`**
 > (`sub c a b` / `lift c a`) extendiendo las 6 pruebas por inducción de `CodeTreeReflect`. Hecho
 > eso, los 7 caen tan baratos como los 14.
+> </details>
 >
 > **Después de los 21:** el **`or_elim` ×21** (`prf_lineWF_inv` da la disyunción de tags) para
 > ensamblar `pcc_lineWF_tracked` → `hC_dot` → `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`).
