@@ -1,6 +1,6 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-**Last updated:** 2026-07-20 — **`prf_inAxC` → `prf_axiomsCodeT_eq`** (espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.)
+**Last updated:** 2026-07-22 — **nueva §1.1: por qué la inducción de `Full/` es el mínimo teórico de Gödel II** (Q no satisface D2/D3; reparto verificado con `#print axioms`: D1 y D2 limpios, Gödel I/II usan `Full.ax_induction`+`ax_list_induction`). Sin cambios en el inventario: siguen **7**. — (previo 2026-07-20) **`prf_inAxC` → `prf_axiomsCodeT_eq`** (espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.)
 **Author:** Julián Calderón Almendros
 
 Registro autoritativo de **todas** las declaraciones `axiom` de Lean que sostienen
@@ -43,6 +43,50 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
   `Full` añade sobre el débil `Minimal`. No pueden vivir en `Minimal/` sin destruir
   la frontera de diseño (Minimal = sin inducción general). `ax_mod2_alternation`
   es un axioma-puente que permite derivar `ax21`/`ax24` como teoremas.
+  **No son andamiaje opcional: son el mínimo teórico de Gödel II — ver §1.1.**
+
+### 1.1 · Por qué la inducción es IMPRESCINDIBLE (y no un lujo del formalizador)
+
+> Pregunta recurrente: *si `Minimal` ≈ Robinson Q y Q es esencialmente indecidible,
+> ¿no debería alcanzarse Gödel II sin inducción?* **No.** Y conviene dejarlo escrito
+> porque el diseño en dos capas invita a pensar lo contrario.
+
+**Hecho clásico.** Q es Σ₁‑completa *externamente*, pero **no satisface las condiciones
+de derivabilidad de Hilbert–Bernays–Löb**: en particular **no prueba su propia
+Σ₁‑completitud** (D3). Gödel II requiere D1–D3, y para D2/D3 hace falta inducción —
+IΣ₁ (o EA/IΔ₀+exp) es el mínimo habitual. Gödel **I** sí llega sobre Q (vía Rosser);
+Gödel **II**, no. Por tanto *«Gödel II sobre Q sin inducción»* no es un objetivo
+pendiente de este proyecto: es un **enunciado falso**.
+
+**Dónde entra exactamente, verificado con `#print axioms`** (no por conjetura):
+
+| resultado | ¿usa `Full.ax_induction` / `ax_list_induction`? |
+|---|---|
+| **D1** `repr_pos'_prf` | **NO** — limpio (sólo el ancla de codificación) |
+| **D2** `d2_prf` | **NO** — limpio (`[propext, choice, Quot.sound]`) |
+| `goedel_first_real'` | **SÍ** |
+| `goedel_second'` | **SÍ** (+ el `d3` pendiente) |
+
+El reparto encaja con la teoría: **D1 es la Σ₁‑completitud *externa*** (aplicar el
+verificador a una derivación concreta = cómputo finito, sin inducción); **D3 es la
+Σ₁‑completitud *provable*** — razonar dentro de la teoría sobre *todas* las líneas y
+sobre funciones recursivas de la sintaxis (`substfc`, `runFn`, …), y **eso exige
+inducción**. Es exactamente el muro con el que se topó B.3c en los tags `q1`/`q2`/`q3`/
+`leibniz`/`ind`/`qconf`/`listInd` (ver `NEXT-STEPS.md`).
+
+**Consecuencia arquitectónica (importante, y no obvia).** `ax_induction` tiene la forma
+`axioms ⊢ inductionFormula φ`: **extiende la relación de derivabilidad del objeto**. Es
+decir, la teoría cuya demostrabilidad aritmetiza `provCodeC'` **no es Q pelada, es
+Q++ + inducción** (perfil IΣ₁) siempre que la cadena cite esos axiomas. `Minimal/` sigue
+siendo la *lista* de axiomas débil y la frontera de diseño se mantiene, pero el sujeto
+del teorema de incompletitud, en la cadena real, es el sistema **con** inducción.
+Esto es lo correcto y lo esperado — sólo faltaba decirlo explícitamente.
+
+**Corolario práctico:** al construir la Σ₁‑completitud provable **está permitido y es
+necesario** usar la inducción de `Full/`. Lo que *no* está permitido es añadir axiomas
+*nuevos* para esquivarla; en particular, la inducción fuerte sobre **códigos** es
+**derivable sin axiomas nuevos** (`ax_L0_cons_def` ancla `cons h t = pair h (succ t)`
+con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`).
 - **Teoría objeto (4).** `ax_p_tfa` es el TFA; teorema en presencia de inducción,
   enunciado como axioma en la capa `Minimal` (que carece de ella).
 - **Anclas de codificación (5–6).** Extensión **conservadora**. `ax_axiomsCodeT_eq`
