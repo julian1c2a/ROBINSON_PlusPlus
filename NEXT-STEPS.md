@@ -146,30 +146,46 @@
 > Y **eliminar** la condición para que el árbol quede puro es **INSÓLIDO**: `q1` podría concluir
 > `∀x.φ ⇒ ψ` con `ψ` arbitraria — el fallo exacto de `ax_lineWF_gen` ([[feedback-verifier-soundness]]).
 >
-> **① tiene una obstrucción no prevista: NO HAY INDUCCIÓN ESTRUCTURAL SOBRE CÓDIGOS.**
-> * `cons` es un **símbolo de función abstracto** (`.func cons_sym [h,t]`), **no** una codificación
->   aritmética ⟹ los códigos no son números con medida, y no hay inducción fuerte por tamaño.
+> **① necesita inducción sobre códigos — pero ES DERIVABLE, sin axioma nuevo.**
+>
+> ⛔ **CORRECCIÓN (misma sesión):** primero se afirmó aquí que «`cons` es un símbolo abstracto ⟹ los
+> códigos no son números con medida». **ERROR.** `cons_sym` es opaco como símbolo, **pero
+> `ax_L0_cons_def` lo ancla a la aritmética**: `cons h t = pair h (succ t)` con
+> `pair = cantor_func` (emparejamiento de Cantor, `Minimal/Axioms.lean:122`). ⟹ **los códigos SÍ
+> son números**, existe medida, y la inducción fuerte sobre el numeral se deriva de `ax_induction`
+> (que ya existe en `Full/`). **NO hace falta (1b) ni ningún axioma nuevo: net‑0.**
+> * La inducción de listas (`ax_list_induction`) sí es insuficiente por sí sola: su paso es
+>   `∀h t. φ t → φ (cons h t)` — induce sobre el **espinazo**, sin IH sobre la cabeza `h`, y
+>   `substfc` recurre en las **cabezas**. Por eso hay que ir por la vía aritmética.
 > * La única inducción de listas disponible (`ax_list_induction` / `prf_list_induction`) tiene paso
 >   **`∀h t. φ t → φ (cons h t)`**: induce sobre el **ESPINAZO (la cola)**, con la cabeza `h`
 >   universalmente cuantificada y **sin hipótesis de inducción sobre `h`**.
 > * Pero `substfc v t f` **recurre en las CABEZAS**: `⟨5,a,b⟩` es `cons 5̇ (cons a (cons b nil))` y
 >   las subfórmulas `a`, `b` son cabezas. La inducción de espinazo **no da IH sobre ellas**.
 >
-> ⟹ **`pcc_eval_substfc` no es sólo caro: hoy no es demostrable**, falta el principio de inducción.
-> Antes de ① hay que decidir **cómo obtener inducción bien fundada sobre códigos**:
-> * (1a) añadir una función objeto de **tamaño/profundidad** `sizec` con sus axiomas y probar
->   `sizec a < sizec (cons a b)`, para hacer inducción fuerte sobre el numeral (usa `ax_induction`,
->   que sí existe); o
-> * (1b) añadir un **axioma de inducción estructural sobre árboles de código** (análogo a
->   `ax_list_induction` pero con IH en cabeza y cola).
-> Ambas son **adiciones de axioma** ⟹ requieren sanción y análisis de solidez propio.
+> ⟹ **RUTA (1a), sin axiomas nuevos:** (i) probar la monotonía del emparejamiento de Cantor
+> (`h ≤ pair h (succ t)`, `t < pair h (succ t)`) ⟹ **sub‑código < código**, apoyándose en lo que ya
+> hay en `Minimal/Theorems/Block5.lean` (`is_cantor_pair`, `cantor_uniqueness`, `cantor_poly`);
+> (ii) derivar **inducción fuerte** del `ax_induction` ordinario (truco estándar: inducir sobre
+> `∀y ≤ x. φ(y)`, usando el aparato acotado ya existente); (iii) con eso, `pcc_eval_substfc` /
+> `pcc_eval_liftfc` por inducción sobre el código. ⚠️ (i) es trabajo real (aritmética de Cantor en
+> Q++), pero es **teoría de números, no metamatemática**, y no toca la solidez del verificador.
+>
+> **Nota foundacional (respuesta a «¿esto exige inducción?»): SÍ, y es lo esperado.** Gödel II no es
+> alcanzable sobre Q sola — es un resultado clásico: Q **no** satisface D2/D3 (la Σ₁‑completitud
+> *provable* requiere inducción; hace falta IΣ₁/EA). La cadena real de este proyecto **ya vive en
+> `Full`**: `#print axioms goedel_second'` y `goedel_first_real'` citan **`Full.ax_induction` y
+> `Full.ax_list_induction`**. Nótese el reparto fino, verificado: **D1 (`repr_pos'_prf`) y D2
+> (`d2_prf`) NO usan inducción** — son limpios; la inducción entra en el punto fijo/Gödel I y en D3.
+> Encaja con la teoría: D1 es Σ₁‑completitud *externa* (cómputo finito); D3 es la *provable*.
+> ⟹ **No hay que replantear nada**: `Minimal` es la teoría OBJETO que se aritmetiza, `Full` es donde
+> vive la prueba. Lo único que cambia es que conviene **decirlo explícitamente** en `AXIOMS.md`.
 >
 > **Opciones a decidir antes de seguir** (ninguna ejecutada):
-> 1. **Habilitar inducción sobre códigos** (1a `sizec` + inducción fuerte, ó 1b axioma de inducción
->    estructural) y **luego** `pcc_eval_substfc`/`_liftfc`. Camino a 21/21. Coste alto y **requiere
->    sancionar un axioma nuevo**.
-> 2. ~~Reformular los 7 esquemas~~ — **DESCARTADA** (ver arriba: no ahorra, y la variante que sí
->    ahorraría es insólida).
+> 1. **RUTA ELEGIDA — (1a) aritmética, net‑0 axiomas:** monotonía de Cantor ⟹ sub‑código < código ⟹
+>    inducción fuerte desde `ax_induction` ⟹ `pcc_eval_substfc`/`_liftfc` ⟹ los 7 tags.
+> 2. ~~Reformular los 7 esquemas~~ — **DESCARTADA** (no ahorra; la variante que sí ahorraría es insólida).
+> 2b. ~~Axioma de inducción estructural~~ — **INNECESARIA** (la vía aritmética es net‑0).
 > 3. **Reordenar el frente**: dejar B.3c al 14/21 y atacar antes otra pieza (p. ej. el `or_elim` ×21
 >    sobre los 14 cerrados, o el frente ① `repr_neg`), volviendo aquí con más maquinaria.
 >
