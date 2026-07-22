@@ -169,7 +169,7 @@ theorem substtc_inv_dotN (t : Term) :
 /-- `dotV` es `substtc`‑invariante. -/
 theorem substtc_inv_dotV (t : Term) :
     ∀ (T : CTree) (W : Term), Prf (substtc zero W (T.dotV t) =eq T.dotV t)
-  | .leaf i, W => substtc_inv_tcFn _ W
+  | .leaf _, W => substtc_inv_tcFn _ W
   | .nul m, W => prf_substtc_nulT m W
   | .un m a, W =>
       prf_eq_trans (prf_substtc_unT m W (a.dotV t)) (prf_congr_unT (substtc_inv_dotV t a W))
