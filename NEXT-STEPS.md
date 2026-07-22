@@ -135,14 +135,43 @@
 > Todos los `prf_substfc_*` existentes (`_and`, `_atom`, `_eq`, `_impl`, `_forall`, …) computan
 > `substfc` **sólo sobre constructores de código explícitos**; ninguno sobre un código abstracto.
 >
+> ### 🔬 INVESTIGACIÓN 2026‑07‑22 — ② DESCARTADA, y ① tiene una obstrucción MÁS PROFUNDA
+>
+> **② (reformular los 7 esquemas) — DESCARTADA, no ahorra nada.** La reflexión de una ecuación
+> lateral va por `pcc_eq_tracked (t u) : (t =eq u) ⇒ Prov(⌜ṫ = u̇⌝)`, que devuelve **ambos lados como
+> `tcFn ·`** (código del VALOR). Sacar `substfc` a una condición lateral
+> (`nthc #0 4 = substfc 0 (nthc #0 3) (nthc #0 2)`) da `Prov(… = tcFn (substfc …))`, y el código
+> objetivo sigue necesitando `substfcT …` (código de la EXPRESIÓN, porque `formCode` es sintáctica).
+> El hueco es **el mismo** `pcc_eval_substfc`: ② sólo lo cambia de sitio.
+> Y **eliminar** la condición para que el árbol quede puro es **INSÓLIDO**: `q1` podría concluir
+> `∀x.φ ⇒ ψ` con `ψ` arbitraria — el fallo exacto de `ax_lineWF_gen` ([[feedback-verifier-soundness]]).
+>
+> **① tiene una obstrucción no prevista: NO HAY INDUCCIÓN ESTRUCTURAL SOBRE CÓDIGOS.**
+> * `cons` es un **símbolo de función abstracto** (`.func cons_sym [h,t]`), **no** una codificación
+>   aritmética ⟹ los códigos no son números con medida, y no hay inducción fuerte por tamaño.
+> * La única inducción de listas disponible (`ax_list_induction` / `prf_list_induction`) tiene paso
+>   **`∀h t. φ t → φ (cons h t)`**: induce sobre el **ESPINAZO (la cola)**, con la cabeza `h`
+>   universalmente cuantificada y **sin hipótesis de inducción sobre `h`**.
+> * Pero `substfc v t f` **recurre en las CABEZAS**: `⟨5,a,b⟩` es `cons 5̇ (cons a (cons b nil))` y
+>   las subfórmulas `a`, `b` son cabezas. La inducción de espinazo **no da IH sobre ellas**.
+>
+> ⟹ **`pcc_eval_substfc` no es sólo caro: hoy no es demostrable**, falta el principio de inducción.
+> Antes de ① hay que decidir **cómo obtener inducción bien fundada sobre códigos**:
+> * (1a) añadir una función objeto de **tamaño/profundidad** `sizec` con sus axiomas y probar
+>   `sizec a < sizec (cons a b)`, para hacer inducción fuerte sobre el numeral (usa `ax_induction`,
+>   que sí existe); o
+> * (1b) añadir un **axioma de inducción estructural sobre árboles de código** (análogo a
+>   `ax_list_induction` pero con IH en cabeza y cola).
+> Ambas son **adiciones de axioma** ⟹ requieren sanción y análisis de solidez propio.
+>
 > **Opciones a decidir antes de seguir** (ninguna ejecutada):
-> 1. **Construir `pcc_eval_substfc`/`_liftfc`** por inducción interna. Camino honesto a 21/21; coste
->    alto, comparable a `pcc_bdAll_intro`.
-> 2. **Reformular los 7 esquemas** para sacar `substfc` del árbol de reconstrucción y dejarlo como
->    ecuación lateral sobre un argumento extra de la línea. ⚠️ Hay que comprobar si esa ecuación
->    lateral es reflejable (¿`pcc_eq_tracked`?) o si sólo mueve el problema de sitio.
-> 3. **Reordenar el frente**: dejar B.3c al 14/21 y atacar antes otra pieza (p. ej. `or_elim` ×21
->    parcial, o el frente ① `repr_neg`), volviendo aquí con más maquinaria.
+> 1. **Habilitar inducción sobre códigos** (1a `sizec` + inducción fuerte, ó 1b axioma de inducción
+>    estructural) y **luego** `pcc_eval_substfc`/`_liftfc`. Camino a 21/21. Coste alto y **requiere
+>    sancionar un axioma nuevo**.
+> 2. ~~Reformular los 7 esquemas~~ — **DESCARTADA** (ver arriba: no ahorra, y la variante que sí
+>    ahorraría es insólida).
+> 3. **Reordenar el frente**: dejar B.3c al 14/21 y atacar antes otra pieza (p. ej. el `or_elim` ×21
+>    sobre los 14 cerrados, o el frente ① `repr_neg`), volviendo aquí con más maquinaria.
 >
 > <details><summary>Plan original (ERRÓNEO, conservado como registro)</summary>
 >
