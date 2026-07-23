@@ -48,8 +48,51 @@ theorem prf_cons_def (h t : Term) : Prf (cons h t =eq pair h (succ t)) := by
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
   exact hh
 
+/-! ### Paso 2 — copias locales por ORDEN DE IMPORTS
+
+⚠️ **Defecto detectado por verificación adversarial** (y confirmado con el compilador): dos lemas
+que parecían disponibles **no están en scope aquí**.
+
+* `prf_lt_succ_self` vive en `Meta/BdAllIntroPrf.lean:295`, y ese módulo importa `D3InDotPrf` +
+  `PropCodePrf` — la **cima** de la pila D3. `CantorMonoPrf` está en la **base**
+  (`NatMulPrf → NatOrderPrf → NatArithPrf`). Importarlo invertiría la capa y arriesga ciclo con
+  los consumidores previstos de esta monotonía (los 7 tags de `lineWF`).
+* `prf_lt_subst2` (nivel `Prf`) vive en `Meta/BoundedInPrf.lean`, también posterior.
+  (`PrfH_lt_subst2` sí está, por la copia local de `NatOrderPrf`.)
+
+Se hacen copias locales con sufijo `_cm`. **No se exportan con el nombre original**: `Meta.lean`
+importa ambos módulos y coincidir crearía ambigüedad en la raíz — la misma trampa que ya costó
+`substTerm_numeralM`. -/
+
+/-- `n < σn` — copia local (el original está aguas abajo, ver nota de sección). -/
+theorem prf_lt_succ_self_cm (n : Term) : Prf (lt n (succ n)) :=
+  prf_lt_intro n (succ n) zero
+    (prf_eq_trans (prf_add_succ_t n zero) (prf_eq_congr_succ (prf_add_zero_t n)))
+
+/-- Sustitución en el 2º argumento de `<` a nivel `Prf` — copia local. -/
+theorem prf_lt_subst2_cm {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hlt : Prf (lt a b₁)) :
+    Prf (lt a b₂) := by
+  let f : Formula := lt (liftTerm 0 a) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
+    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
+
+/-! ### Paso 3 — aritmética de `one` y `two`
+
+`one = σ0` y `two = σone` son **defeq**, así que estos dos salen de `ax4`/`ax5`/`ax8`/`ax9` sin
+inducción. `prf_mul_two` es el que convierte «el doble» en una suma, que es como se manipula la
+ecuación de `ax17` (`div2(n)·two + mod2(n) = n`). -/
+
+/-- `n + 1 = σn`. -/
+theorem prf_add_one (n : Term) : Prf (add n one =eq succ n) :=
+  prf_eq_trans (prf_add_succ_t n zero) (prf_eq_congr_succ (prf_add_zero_t n))
+
+/-- `n · 2 = n + n`. -/
+theorem prf_mul_two (n : Term) : Prf (mul n two =eq add n n) :=
+  prf_eq_trans (prf_mul_succ n one) (prf_eq_congr_add1 n (prf_mul_one n))
+
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
-  prf_cons_def
+  prf_cons_def prf_lt_succ_self_cm prf_lt_subst2_cm prf_add_one prf_mul_two
 )
