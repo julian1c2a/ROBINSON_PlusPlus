@@ -182,6 +182,44 @@
 > vive la prueba. Lo único que cambia es que conviene **decirlo explícitamente** en `AXIOMS.md`.
 >
 > **Opciones a decidir antes de seguir** (ninguna ejecutada):
+> ### 📏 COSTE DE (1a), MEDIDO (2026‑07‑23) — tiene un PRERREQUISITO grande
+>
+> Al arrancar (1a) se mide el gap real. La cadena es
+> `Cantor monótono` → `sub‑código < código` → `inducción fuerte` → `pcc_eval_substfc`.
+> El eslabón 1 necesita aritmética de **`mul`/`le`/transitividad**, y ahí está el problema:
+>
+> * **A nivel `⊢` (Derives) SÍ existe**: `Minimal/Theorems/Block3‑5` tienen ~24 teoremas
+>   (`le_mul_left`, `le_mul_right`, `le_trans`, `lt_le_trans`, `le_self_add`,
+>   `le_add_const_of_le`, `le_of_mul_le_mul_left`, `is_cantor_pair`, `cantor_uniqueness`, …).
+> * **A nivel `Prf` NO está portado**: `Meta/NatArithPrf.lean` sólo tiene lo básico de `lt`
+>   (`prf_lt_iff`, `prf_lt_intro`, `prf_zero_lt_succ`, `prf_succ_lt_succ_of_lt`,
+>   `prf_not_lt_zero`, `prf_nat_induction`, `prf_succ_inj`, `prf_zero_or_succ`).
+>   **Cero teoremas de `mul`, cero de `le`.**
+> * ⚠️ **No hay puente `⊢ → Prf`** (`Derives` tiene la ω‑regla; sólo existe `prf_to_derives`).
+>   Los ~24 hay que **re‑probarlos** en `Prf`, como se hizo con `Meta/ArithPrf.lean`. Es
+>   mecánico (esas pruebas no usan la ω‑regla) pero es **volumen real**.
+> * `le` no es primitivo: `le a b := lt a b ∨ a =eq b` (`Axioms.lean:145`) ⟹ cada lema de `le`
+>   arrastra manejo de disyunción interna.
+>
+> **Descomposición de (1a) en entregables independientes:**
+> | # | entregable | depende de |
+> |---|---|---|
+> | i‑a | `Meta/NatOrderPrf.lean`: `le` en `Prf` (refl, trans, `lt_le_trans`, `le_self_add`, …) | — |
+> | i‑b | `Meta/NatMulPrf.lean`: `mul` en `Prf` (`le_mul_left/right`, distributividad) | i‑a |
+> | i‑c | `prf_cantor_mono`: `h < cons h t` y `t < cons h t` vía `2·pair = (x+y)(x+y+1)+2y` | i‑b |
+> | ii | `prf_strong_induction` desde `prf_nat_induction` (inducir sobre `∀y ≤ x. φ(y)`) | i‑a |
+> | iii | `pcc_eval_substfc` / `pcc_eval_liftfc` por inducción sobre el código | i‑c, ii |
+> | iv | 2 constructores en `CTree` + los 7 tags | iii |
+>
+> **Estimación honesta: varias sesiones.** i‑a/i‑b son un porte tedioso pero de riesgo bajo;
+> iii es el riesgo real (es «la bestia», familia `pcc_bdAll_intro`).
+>
+> **Alternativa a considerar antes de empezar (③):** el `or_elim` ×21 y `hC_dot` **no** están
+> bloqueados por esto en su estructura — sólo faltarían 7 de las 21 ramas. Podría montarse el
+> ensamblaje completo dejando los 7 como hipótesis explícitas, comprobando que TODO lo demás
+> encaja, y volver a (1a) sabiendo que es lo único que queda. Reduce el riesgo de construir
+> i‑a…iii y descubrir después un problema aguas abajo.
+>
 > 1. **RUTA ELEGIDA — (1a) aritmética, net‑0 axiomas:** monotonía de Cantor ⟹ sub‑código < código ⟹
 >    inducción fuerte desde `ax_induction` ⟹ `pcc_eval_substfc`/`_liftfc` ⟹ los 7 tags.
 > 2. ~~Reformular los 7 esquemas~~ — **DESCARTADA** (no ahorra; la variante que sí ahorraría es insólida).
