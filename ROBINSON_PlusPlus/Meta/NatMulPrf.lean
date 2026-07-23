@@ -204,6 +204,67 @@ theorem prf_add_le_mono_right (x y u : Term) : Prf (le x y ⇒ le (add x u) (add
     exact PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (add x u) (add y u)) _)
       (PrfH_eq_congr_add1 u (PrfH.hyp _ _ (List.Mem.head _)))
 
+/-! ### Monotonía multiplicativa (i‑c)
+
+`x ≤ y ⟹ x·c ≤ y·c`, por inducción sobre `c` usando `x·σc = x·c + x` (`ax9`) y la monotonía
+aditiva en **ambos** argumentos. La hipótesis `x ≤ y` se mete **dentro** de la fórmula de
+inducción (no se puede dejar fuera: `prf_nat_induction` pide base y paso como `Prf` cerrados). -/
+
+/-- `u ≤ v ⟹ a + u ≤ a + v` — simétrico de `prf_add_le_mono_right`, vía conmutatividad. -/
+theorem prf_add_le_mono_left (a u v : Term) : Prf (le u v ⇒ le (add a u) (add a v)) := by
+  refine prf_deduction ?_
+  have h : PrfH [le u v] (le (add u a) (add v a)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono_right u v a) _) (prfH_hyp_self _)
+  exact PrfH_le_subst2 (prf_to_prfH (prf_add_comm v a) _)
+    (PrfH_le_subst1 (prf_to_prfH (prf_add_comm u a) _) h)
+
+/-- **Monotonía aditiva en ambos argumentos**: `x ≤ y ⟹ u ≤ v ⟹ x + u ≤ y + v`. -/
+theorem prf_add_le_mono (x y u v : Term) :
+    Prf (le x y ⇒ (le u v ⇒ le (add x u) (add y v))) := by
+  refine prf_deduction (deduction_aux ?_ (le u v) [le x y] rfl)
+  have h1 : PrfH [le u v, le x y] (le (add x u) (add y u)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono_right x y u) _)
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+  have h2 : PrfH [le u v, le x y] (le (add y u) (add y v)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono_left y u v) _) (PrfH.hyp _ _ (List.Mem.head _))
+  exact PrfH.mp _ _ _
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans (add x u) (add y u) (add y v)) _) h1) h2
+
+/-- **Monotonía multiplicativa**: `x ≤ y ⟹ x·c ≤ y·c`. -/
+theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul y c)) := by
+  have key : Prf (Formula.forall (Formula.impl (le (liftTerm 0 x) (liftTerm 0 y))
+      (le (mul (liftTerm 0 x) (.var 0)) (mul (liftTerm 0 y) (.var 0))))) := by
+    refine prf_nat_induction _ ?base ?step
+    · -- `x·0 = 0 = y·0`
+      simp only [substFormula, substTerm, substTerms, le, lt, lor, mul, zero,
+        Nat.reduceEqDiff, reduceIte, if_true, FOL.substTerm_liftTerm]
+      refine prf_mp (Prf.incl (Prf₀.p1 _ (le x y))) ?_
+      exact prf_le_subst2 (prf_eq_symm (prf_mul_zero y))
+        (prf_le_subst1 (prf_eq_symm (prf_mul_zero x)) (prf_le_refl zero))
+    · refine Prf.gen _ ?_
+      simp only [substFormula, substTerm, substTerms, le, lt, lor, mul, succ, liftFormula,
+        liftTerm, liftTerms, norm11, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte,
+        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      refine prf_deduction (deduction_aux ?_ (le (liftTerm 0 x) (liftTerm 0 y)) _ rfl)
+      -- Γ = [x ≤ y, IH] — hay que escribirlo: los `_` no lo infieren
+      let Δ : List Formula := [le (liftTerm 0 x) (liftTerm 0 y),
+        Formula.impl (le (liftTerm 0 x) (liftTerm 0 y))
+          (le (mul (liftTerm 0 x) (.var 0)) (mul (liftTerm 0 y) (.var 0)))]
+      have hxy : PrfH Δ (le (liftTerm 0 x) (liftTerm 0 y)) := PrfH.hyp _ _ (List.Mem.head _)
+      have hih : PrfH Δ (le (mul (liftTerm 0 x) (.var 0)) (mul (liftTerm 0 y) (.var 0))) :=
+        PrfH.mp _ _ _ (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))) hxy
+      -- `x·σn = x·n + x ≤ y·n + y = y·σn`
+      have hsum : PrfH Δ (le (add (mul (liftTerm 0 x) (.var 0)) (liftTerm 0 x))
+          (add (mul (liftTerm 0 y) (.var 0)) (liftTerm 0 y))) :=
+        PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono
+          (mul (liftTerm 0 x) (.var 0)) (mul (liftTerm 0 y) (.var 0))
+          (liftTerm 0 x) (liftTerm 0 y)) _) hih) hxy
+      exact PrfH_le_subst2 (prf_to_prfH (prf_eq_symm (prf_mul_succ (liftTerm 0 y) (.var 0))) _)
+        (PrfH_le_subst1 (prf_to_prfH (prf_eq_symm (prf_mul_succ (liftTerm 0 x) (.var 0))) _) hsum)
+  have hc := prf_spec key c
+  simpa only [substFormula, substTerm, substTerms, le, lt, lor, mul, Nat.reduceEqDiff, reduceIte,
+    if_true, FOL.substTerm_liftTerm] using hc
+
 end ROBINSON_PlusPlus.Meta.NatMulPrf
 
 export ROBINSON_PlusPlus.Meta.NatMulPrf (
@@ -212,4 +273,5 @@ export ROBINSON_PlusPlus.Meta.NatMulPrf (
   prf_zero_mul prf_mul_one
   prf_le_add_self prf_le_self_add prf_le_mul_succ
   prf_div_mod_eq prf_mod2_range prf_add_le_mono_right
+  prf_add_le_mono_left prf_add_le_mono prf_mul_le_mono_right
 )

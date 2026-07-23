@@ -137,6 +137,24 @@ theorem PrfH_le_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a�
     simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
 
+/-- Sustitución en el 1er argumento de `≤`, a nivel `Prf`. -/
+theorem prf_le_subst1 {a₁ a₂ b : Term} (h : Prf (a₁ =eq a₂)) (hle : Prf (le a₁ b)) :
+    Prf (le a₂ b) := by
+  let f : Formula := le (.var 0) (liftTerm 0 b)
+  have hS : ∀ s : Term, substFormula 0 s f = le s b := by
+    intro s
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS a₂) ▸ prf_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
+
+/-- Sustitución en el 2º argumento de `≤`, a nivel `Prf`. -/
+theorem prf_le_subst2 {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hle : Prf (le a b₁)) :
+    Prf (le a b₂) := by
+  let f : Formula := le (liftTerm 0 a) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = le a s := by
+    intro s
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
+
 /-- Sustitución en el segundo argumento de `≤`, en contexto. -/
 theorem PrfH_le_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
     (hle : PrfH Γ (le a b₁)) : PrfH Γ (le a b₂) := by
@@ -281,7 +299,7 @@ end ROBINSON_PlusPlus.Meta.NatOrderPrf
 export ROBINSON_PlusPlus.Meta.NatOrderPrf (
   prf_eq_congr_add1 prf_eq_congr_add2 PrfH_eq_congr_add2
   prf_add_assoc prf_add_comm
-  PrfH_eq_congr_add1 PrfH_le_subst1 PrfH_le_subst2 PrfH_lt_subst1 PrfH_lt_subst2
+  PrfH_eq_congr_add1 PrfH_le_subst1 PrfH_le_subst2 prf_le_subst1 prf_le_subst2 PrfH_lt_subst1 PrfH_lt_subst2
   prf_le_of_lt prf_le_of_eq prf_le_refl
   prf_lt_add_succ prf_succ_add_succ prf_lt_add_succ_of_lt
   prf_lt_trans_swap prf_lt_trans prf_lt_le_trans prf_le_lt_trans prf_le_trans
