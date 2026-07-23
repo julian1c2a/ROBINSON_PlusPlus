@@ -161,10 +161,32 @@ theorem prf_not_le_succ_self (w : Term) : Prf (le (succ w) w ⇒ Formula.bottom)
         (prf_to_prfH (prf_lt_succ_self_cm w) _)
     exact PrfH_absurd_lt w hww
 
+/-! ### Pasos 7–8 — el término CUADRÁTICO de Cantor domina al doble
+
+La clave de la mitad izquierda: `cantor_poly h (σt)` contiene `s·σs` con `s = h + σt`, y hay que
+ver que eso ya supera a `2h+2`. Se hace en dos escalones, evitando la **monotonía estricta del
+producto** (que no existe en el catálogo y costaría construir).
+
+⚠️ **La hipótesis `a = σk` es OBLIGATORIA** en esta forma, no un adorno: el catálogo sólo ofrece
+`prf_le_mul_succ a k : le a (a·σk)`, es decir, la cota necesita que el multiplicador sea
+**un sucesor**. Se suministra siempre desde `prf_add_succ_t h t` (que da `s = σ(h+t)`). -/
+
+/-- **`a ≤ a·a`**, para `a` un sucesor. -/
+theorem prf_le_self_mul_self {a k : Term} (h : Prf (a =eq succ k)) : Prf (le a (mul a a)) :=
+  prf_le_subst2 (prf_eq_congr_mul2 a (prf_eq_symm h)) (prf_le_mul_succ a k)
+
+/-- **`a + a ≤ a·σa`**, para `a` un sucesor. Es el escalón donde el término cuadrático de Cantor
+    domina al doble; usa sólo monotonía aditiva, no monotonía estricta del producto. -/
+theorem prf_le_double_self_mul_succ {a k : Term} (h : Prf (a =eq succ k)) :
+    Prf (le (add a a) (mul a (succ a))) :=
+  prf_le_subst2 (prf_eq_symm (prf_mul_succ a a))
+    (prf_mp (prf_add_le_mono_right a (mul a a) a) (prf_le_self_mul_self h))
+
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
   prf_cons_def prf_lt_succ_self_cm prf_lt_subst2_cm prf_add_one prf_mul_two
   prf_or_elim prf_le_zero_one prf_le_mod2_one
   prf_le_succ_succ prf_not_le_succ_self
+  prf_le_self_mul_self prf_le_double_self_mul_succ
 )
