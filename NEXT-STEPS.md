@@ -219,6 +219,31 @@
 > `cantor_poly_is_even` (para pasar de `2·div2(n) + mod2(n) = n` a la igualdad exacta).
 > Estimación: **~10‑15 lemas** de aritmética, todos de riesgo bajo pero volumen real.
 > | ii | `prf_strong_induction` desde `prf_nat_induction` (inducir sobre `∀y ≤ x. φ(y)`) | i‑a |
+>
+> ✅ **i‑a, i‑b, i‑c HECHOS** (2026‑07‑23). `prf_cantor_mono_left/right` cerrados, **net‑0 axiomas**,
+> footprint `[propext, choice, Quot.sound]`. No hicieron falta `ax11`/`ax12`/`ax24` ni
+> `cantor_poly_is_even`: basta `mod2 ≤ 1` y tratar `2·σt` como opaco.
+>
+> 🔎 **HALLAZGO sobre ii (2026‑07‑23): existe un PLANO COMPLETO.**
+> `ROBINSON_PlusPlus/Full/StrongInduction.lean` ya tiene la inducción fuerte **entera** a nivel `⊢`
+> (`strong_induction`, línea 173), con toda la maquinaria De Bruijn resuelta. **Es importable desde
+> `Meta/`** (verificado: `import ROBINSON_PlusPlus.Full.StrongInduction` compila y
+> `ROBINSON_PlusPlus.Full.substFormula_liftFormula` queda accesible).
+> * **Reutilizable tal cual**: `substFormula_liftFormula (φ c s) : substFormula c s (liftFormula c φ) = φ`
+>   — es un lema **de nivel Lean**, independiente del cálculo. Era la pieza De Bruijn crítica.
+> * **Hay que re‑declarar** (son `private`): `PSI` (línea 145) y `psi_at` (149). Son definiciones
+>   triviales, pero copiarlas exige abrir el fichero.
+> * **Hay que re‑probar en `Prf`**: el ensamblaje (usa `induction_object`/`gen`/`imp_intro` de
+>   `Derives`; en `Prf` van `prf_nat_induction`/`Prf.gen`/`prf_deduction`) y `lt_succ_split`
+>   (línea 92) — aunque para éste ya está **`prf_le_of_lt_succ`** (ii.1, hecho), que es su forma `≤`.
+> * ⚠️ **Pregunta de diseño ABIERTA, resolver antes de portar**: el `strong_induction` de `Full` usa
+>   una formulación **META** (`∀ n : Term, (∀ m : Term, axioms ⊢ lt m n → …) → …`), mucho más barata
+>   que la objeto. **No está verificado que esa forma sirva para (iii)**: en `pcc_eval_substfc` los
+>   sub‑códigos son `carc c`/`nthc c i` sobre un `c` ABSTRACTO, y habría que disponer de
+>   `Prf (lt (nthc c i) c)` — que **no** es lo que da `prf_cantor_mono` (éste da
+>   `lt h (cons h t)`, con el código ya presentado como `cons`). Puede hacer falta un puente
+>   `lineWF`/`ax_lineWF_cons` → forma `cons`, o bien la formulación objeto. **Sondear (iii) con un
+>   caso mínimo ANTES de portar (ii)**, para no portar la forma equivocada.
 > | iii | `pcc_eval_substfc` / `pcc_eval_liftfc` por inducción sobre el código | i‑c, ii |
 > | iv | 2 constructores en `CTree` + los 7 tags | iii |
 >
