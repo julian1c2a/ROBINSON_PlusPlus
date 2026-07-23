@@ -120,9 +120,51 @@ theorem prf_le_mod2_one (n : Term) : Prf (le (mod2 n) one) := by
     exact PrfH_le_subst1 (PrfH_eq_symm (prfH_hyp_self (Formula.eq (mod2 n) one)))
       (prf_to_prfH (prf_le_refl one) _)
 
+/-! ### Paso 5 — monotonía de `σ` sobre `≤`
+
+`a ≤ b ⟹ σa ≤ σb`. Sus dos mitades ya existían (`prf_succ_lt_succ_of_lt` para `<`, la congruencia
+para `=`) pero el lema combinado no. -/
+
+/-- **`a ≤ b ⟹ σa ≤ σb`**. -/
+theorem prf_le_succ_succ (a b : Term) : Prf (le a b ⇒ le (succ a) (succ b)) := by
+  refine prf_deduction ?_
+  refine PrfH_or_elim (prfH_hyp_self (le a b)) ?_ ?_
+  · -- rama `a < b`
+    have hlt : PrfH (lt a b :: [le a b]) (lt (succ a) (succ b)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_succ_lt_succ_of_lt a b) _) (PrfH.hyp _ _ (List.Mem.head _))
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt (succ a) (succ b)) _) hlt
+  · -- rama `a = b`
+    have heq : PrfH (Formula.eq a b :: [le a b]) (succ a =eq succ b) :=
+      PrfH_eq_congr_succ (PrfH.hyp _ _ (List.Mem.head _))
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (succ a) (succ b)) _) heq
+
+/-! ### Paso 6 — el núcleo contradictorio: `¬ (σw ≤ w)`
+
+Es el lema que cierra el argumento por contradicción de las dos mitades: cuando la hipótesis
+`cons h t ≤ h` se propaga por la ecuación de Cantor, desemboca exactamente en `σσz ≤ σz`, o sea
+en una instancia de éste. Ambas ramas mueren en `w < w` (irreflexividad). -/
+
+/-- **`σw ≤ w ⟹ ⊥`**. -/
+theorem prf_not_le_succ_self (w : Term) : Prf (le (succ w) w ⇒ Formula.bottom) := by
+  refine prf_deduction ?_
+  refine PrfH_or_elim (prfH_hyp_self (le (succ w) w)) ?_ ?_
+  · -- rama `σw < w`: con `w < σw` da `w < w`
+    have hww : PrfH (lt (succ w) w :: [le (succ w) w]) (lt w w) :=
+      PrfH.mp _ _ _
+        (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_trans w (succ w) w) _)
+          (prf_to_prfH (prf_lt_succ_self_cm w) _))
+        (PrfH.hyp _ _ (List.Mem.head _))
+    exact PrfH_absurd_lt w hww
+  · -- rama `σw = w`: reescribe `w < σw` a `w < w`
+    have hww : PrfH (Formula.eq (succ w) w :: [le (succ w) w]) (lt w w) :=
+      PrfH_lt_subst2 (PrfH.hyp _ _ (List.Mem.head _))
+        (prf_to_prfH (prf_lt_succ_self_cm w) _)
+    exact PrfH_absurd_lt w hww
+
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
   prf_cons_def prf_lt_succ_self_cm prf_lt_subst2_cm prf_add_one prf_mul_two
   prf_or_elim prf_le_zero_one prf_le_mod2_one
+  prf_le_succ_succ prf_not_le_succ_self
 )
