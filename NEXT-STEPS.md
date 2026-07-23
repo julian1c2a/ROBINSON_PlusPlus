@@ -245,6 +245,48 @@
 >   `lineWF`/`ax_lineWF_cons` → forma `cons`, o bien la formulación objeto. **Sondear (iii) con un
 >   caso mínimo ANTES de portar (ii)**, para no portar la forma equivocada.
 > | iii | `pcc_eval_substfc` / `pcc_eval_liftfc` por inducción sobre el código | i‑c, ii |
+>
+> 🚨 **SONDEO DE (iii) — 2026‑07‑23, workflow de 11 agentes. DOS RESULTADOS NEGATIVOS.**
+>
+> **(A) La vía «extender `CTree`» está MUERTA, y se sabe exactamente por qué.**
+> Añadir constructores `substF`/`liftF` a `CTree` es *necesario* (sin ellos no se declaran los 7
+> árboles) y cierra **6 de las 7** inducciones de `Meta/CodeTreeReflect.lean` gratis. Pero rompe en
+> la séptima, `PrfH_dotVN`, de forma **irreparable**: la obligación `prf_tc_objAt` pide
+> `Prf (tcFn (substfc v A B) =eq substfcT v̇ Ȧ Ḃ)` — **el axioma PROHIBIDO y FALSO**. En el modelo
+> estándar el izquierdo es un `cons`‑árbol (`⟨1,⌜"::"⌝,…⟩`) y el derecho es `⟨1,⌜"substfc"⌝,…⟩`, y
+> `"substfc" ≠ "::"`. Los dos extremos (`dotV` opaco, `dotN` forzado por el esquema, que escribe
+> literalmente `substfc`) no dejan **ninguna** libertad de diseño, y el hueco entre ellos **es**
+> `pcc_eval_substfc`. Razón de fondo: `CTree` describe la **sintaxis de la expresión**, pero
+> `substfc` recurre sobre el **valor** de su 3er argumento, que en los 7 tags es una **hoja**
+> (`nthc t k`, caja negra para el árbol).
+>
+> **(B) La vía «inducción fuerte» funciona, pero NO es net‑0: exige ≥12 AXIOMAS OBJETO nuevos.**
+> Hacen falta predicados de buena formación `isTermCode`/`isTermsCode`/`isFormCode` con sus
+> cláusulas de generación e inversión. El revisor de solidez lo marca **grave** y con razón:
+> llamar a eso «net‑0 axiomas de Lean» sería un **re‑encuadre que oculta el resultado**, porque
+> amplían `axioms` y **por tanto amplían `Prov`** — es decir, cambian la teoría cuya demostrabilidad
+> se aritmetiza, justo lo que `AXIOMS.md` obliga a sancionar.
+>
+> **`metaBasta = false`, confirmado por AMBOS diseñadores con tres razones independientes:**
+> (1) el análisis por los 8 constructores es una **disyunción OBJETO**, y toda rama vive bajo
+> `PrfH Γ`; la HI meta de `Full.strong_induction` exige premisa **cerrada** ⟹ inaplicable.
+> (2) los casos con binder cambian los parámetros (`substfc v s (forallc a) = forallc (substfc (σv)
+> (liftc 0 s) a)`), así que la HI debe estar **∀‑cuantificada en `v` y `s` a nivel objeto**.
+> (3) `Full/StrongInduction` está sobre `Derives`; sirve de **guion**, no de teorema importable.
+> ⟹ **(ii) hay que portarlo en forma OBJETO**, no meta. Parar antes de portarlo fue correcto.
+>
+> **Falsas alarmas ya resueltas** (los otros dos «graves»): `prf_lt_succ_self` y `prf_lt_subst2`
+> fuera del cierre de imports — ya cubiertos por `prf_lt_succ_self_cm`/`prf_lt_subst2_cm` y por la
+> copia local de `NatOrderPrf.lean:177`.
+>
+> **DECISIÓN PENDIENTE DEL USUARIO** (ninguna opción ejecutada):
+> 1. **Sancionar los predicados de buena formación** (≥12 axiomas objeto) y seguir por (B).
+>    Requiere análisis de conservatividad propio y entrada en `AXIOMS.md`.
+> 2. **Buscar una vía sin predicados**: ¿puede la inducción fuerte sobre el **número** prescindir
+>    de `isFormCode`, decidiendo la forma del código por otros medios? (El módulo A ya tiene
+>    `decodeForm`, pero es **meta**, no objeto.) **No explorado.**
+> 3. **Reordenar el frente**: dejar B.3c en 14/21 y atacar `repr_neg` u otra pieza.
+
 > | iv | 2 constructores en `CTree` + los 7 tags | iii |
 >
 > **Estimación honesta: varias sesiones.** i‑a/i‑b son un porte tedioso pero de riesgo bajo;
