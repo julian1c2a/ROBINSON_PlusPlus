@@ -221,6 +221,84 @@ theorem prf_le_two_succ_h_cantor (h t : Term) :
         (prf_le_succ_h_s h t)) (prf_le_succ_h_s h t)))
     (prf_le_double_s_cantor h t)
 
+/-! ### Paso 11a — las dos identidades que hacen encajar la contradicción
+
+El argumento por contradicción desemboca en `σh + σh ≤ h·2 + 1`, y hay que reconocer ahí una
+instancia de `prf_not_le_succ_self` (`σw ≤ w`). Estas dos igualdades son las que lo revelan, con
+`w := σ(h+h)`:
+
+* `σa + σa = σσ(a+a)`  — o sea `σw`
+* `n·2 + 1 = σ(n+n)`   — o sea `w` -/
+
+/-- `σa + σa = σσ(a+a)`. (`σa + σa = σ(σa + a)` por `ax5`, y `σa + a = σ(a+a)` por
+    `prf_add_succ_left`.) -/
+theorem prf_succ_add_succ_eq (a : Term) :
+    Prf (add (succ a) (succ a) =eq succ (succ (add a a))) :=
+  prf_eq_trans (prf_add_succ_t (succ a) a) (prf_eq_congr_succ (prf_add_succ_left a a))
+
+/-- `n·2 + 1 = σ(n+n)`. -/
+theorem prf_mul_two_add_one (n : Term) :
+    Prf (add (mul n two) one =eq succ (add n n)) :=
+  prf_eq_trans (prf_eq_congr_add1 one (prf_mul_two n)) (prf_add_one (add n n))
+
+/-! ### Paso 11b — la ecuación de `ax17` en términos de `cons`
+
+`ax17` habla de `div2 n`. Como `cons h t = pair h (σt)` y `pair h (σt)` **es defeq** a
+`div2 (cantor_poly h (σt))` (los tres `def` de `pair`/`cantor_func`/`cantor_poly` son planos),
+la ecuación se reescribe con `prf_cons_def` para que hable de `cons h t`. -/
+
+/-- Abreviatura: el polinomio de Cantor de la línea `⟨h,t⟩`. -/
+abbrev cpOf (h t : Term) : Term :=
+  add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))
+
+/-- **`cons h t = div2 (cantor_poly h (σt))`** — `prf_cons_def` con el lado derecho ya desplegado
+    (es pura reducción definicional: `pair → cantor_func → cantor_poly`). -/
+theorem prf_cons_div2 (h t : Term) : Prf (cons h t =eq div2 (cpOf h t)) :=
+  prf_cons_def h t
+
+/-- **La ecuación de `ax17` para `cons`**: `(cons h t)·2 + mod2(cp) = cp`. -/
+theorem prf_cons_div_mod (h t : Term) :
+    Prf (add (mul (cons h t) two) (mod2 (cpOf h t)) =eq cpOf h t) :=
+  prf_eq_trans
+    (prf_eq_congr_add1 (mod2 (cpOf h t)) (prf_eq_congr_mul1 two (prf_cons_div2 h t)))
+    (prf_div_mod_eq (cpOf h t))
+
+/-! ### Paso 11c — la CONTRADICCIÓN: `cons h t ≤ h ⟹ ⊥`
+
+Cadena: si `C := cons h t` cumpliera `C ≤ h`, entonces `C·2 ≤ h·2`; sumando la cota del resto
+(`mod2 ≤ 1`) queda `C·2 + mod2(cp) ≤ h·2 + 1`, y el lado izquierdo **es** `cp` (paso 11b). Pero el
+paso 10 da `σh + σh ≤ cp`. Componiendo: `σh + σh ≤ h·2 + 1`, que por las identidades de 11a es
+exactamente `σw ≤ w` con `w = σ(h+h)`. -/
+
+/-- **`cons h t ≤ h ⟹ ⊥`**. -/
+theorem prf_bot_of_le_cons (h t : Term) : Prf (le (cons h t) h ⇒ Formula.bottom) := by
+  refine prf_deduction ?_
+  let Γ : List Formula := [le (cons h t) h]
+  -- (1) el doble, monótono
+  have hC2 : PrfH Γ (le (mul (cons h t) two) (mul h two)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_mul_le_mono_right (cons h t) h two) _) (prfH_hyp_self _)
+  -- (2) + la cota del resto
+  have hsum : PrfH Γ (le (add (mul (cons h t) two) (mod2 (cpOf h t)))
+      (add (mul h two) one)) :=
+    PrfH.mp _ _ _
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono (mul (cons h t) two) (mul h two)
+        (mod2 (cpOf h t)) one) _) hC2)
+      (prf_to_prfH (prf_le_mod2_one (cpOf h t)) _)
+  -- (3) el lado izquierdo ES `cp` (ax17 reescrito)
+  have hcp : PrfH Γ (le (cpOf h t) (add (mul h two) one)) :=
+    PrfH_le_subst1 (prf_to_prfH (prf_cons_div_mod h t) _) hsum
+  -- (4) pero `2(σh) ≤ cp`
+  have htr : PrfH Γ (le (add (succ h) (succ h)) (add (mul h two) one)) :=
+    PrfH.mp _ _ _
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans (add (succ h) (succ h)) (cpOf h t)
+        (add (mul h two) one)) _) (prf_to_prfH (prf_le_two_succ_h_cantor h t) _))
+      hcp
+  -- (5) reconocer `σw ≤ w` con `w = σ(h+h)`
+  have hfin : PrfH Γ (le (succ (succ (add h h))) (succ (add h h))) :=
+    PrfH_le_subst2 (prf_to_prfH (prf_mul_two_add_one h) _)
+      (PrfH_le_subst1 (prf_to_prfH (prf_succ_add_succ_eq h) _) htr)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_le_succ_self (succ (add h h))) _) hfin
+
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
@@ -229,4 +307,6 @@ export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
   prf_le_succ_succ prf_not_le_succ_self
   prf_le_self_mul_self prf_le_double_self_mul_succ
   prf_le_double_s_cantor prf_le_succ_h_s prf_le_two_succ_h_cantor
+  prf_succ_add_succ_eq prf_mul_two_add_one
+  cpOf prf_cons_div2 prf_cons_div_mod prf_bot_of_le_cons
 )
