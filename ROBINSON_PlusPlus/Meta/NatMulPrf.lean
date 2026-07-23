@@ -80,6 +80,15 @@ theorem prf_eq_congr_mul2 {t₁ t₂ : Term} (c : Term) (h : Prf (t₁ =eq t₂)
     simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (mul c t₁))
 
+/-- Congruencia de `·` en el primer argumento, en contexto. -/
+theorem PrfH_eq_congr_mul1 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
+    (h : PrfH Γ (t₁ =eq t₂)) : PrfH Γ (mul t₁ c =eq mul t₂ c) := by
+  let f : Formula := Formula.eq (mul (liftTerm 0 t₁) (liftTerm 0 c)) (mul (.var 0) (liftTerm 0 c))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul t₁ c) (mul s c) := by
+    intro s
+    simp only [f, substFormula, mul, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (mul t₁ c)) Γ)
+
 /-! ### Identidad izquierda del producto
 
 `0 · n = 0` **no** es axioma (`ax8` da `n · 0 = 0`, y `mul` recurre por la derecha), pero sale
@@ -265,13 +274,72 @@ theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul
   simpa only [substFormula, substTerm, substTerms, le, lt, lor, mul, Nat.reduceEqDiff, reduceIte,
     if_true, FOL.substTerm_liftTerm] using hc
 
+/-! ### Irreflexividad, tricotomía y CANCELACIÓN multiplicativa
+
+`ax18_lt_irrefl` y `ax19_lt_trichotomy` son axiomas pero **no estaban portados** a `Prf`. Con
+ellos, la cancelación (`x·c < y·c ⟹ x < y`) sale por tricotomía: los otros dos casos
+(`x = y` y `y < x`) contradicen la hipótesis vía irreflexividad. Recuérdese `neg A = A ⇒ ⊥`. -/
+
+/-- `¬ (a < a)` — `ax18_lt_irrefl`. -/
+theorem prf_lt_irrefl (a : Term) : Prf (neg (lt a a)) := by
+  have hh := prf_spec (prf_ax (show ax18_lt_irrefl ∈ axioms by simp [axioms])) a
+  simp [ax18_lt_irrefl, substFormula, substTerm, substTerms, neg, lt,
+    FOL.substTerm_liftTerm] at hh
+  exact hh
+
+/-- Tricotomía — `ax19_lt_trichotomy`. -/
+theorem prf_lt_trichotomy (a b : Term) :
+    Prf (lor (lt a b) (lor (a =eq b) (lt b a))) := by
+  have hh := prf_spec (prf_spec (prf_ax (show ax19_lt_trichotomy ∈ axioms by simp [axioms])) a) b
+  simp [ax19_lt_trichotomy, substFormula, substTerm, substTerms, lor, lt,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- De una contradicción `a < a` sale cualquier cosa (irreflexividad + ex falso). -/
+theorem PrfH_absurd_lt {Γ : List Formula} {C : Formula} (a : Term)
+    (h : PrfH Γ (lt a a)) : PrfH Γ C :=
+  PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq C))
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_irrefl a) _) h)
+
+/-- **CANCELACIÓN multiplicativa**: `x·c < y·c ⟹ x < y`. Recíproca de la monotonía; sale por
+    tricotomía sobre `x`,`y`: si `x = y` la hipótesis da `x·c < x·c`; si `y < x`, la monotonía da
+    `y·c ≤ x·c` y con la hipótesis sale otra vez `x·c < x·c`. -/
+theorem prf_lt_of_mul_lt_mul_right (x y c : Term) :
+    Prf (lt (mul x c) (mul y c) ⇒ lt x y) := by
+  refine prf_deduction ?_
+  have hyp : PrfH [lt (mul x c) (mul y c)] (lt (mul x c) (mul y c)) := prfH_hyp_self _
+  refine PrfH_or_elim (prf_to_prfH (prf_lt_trichotomy x y) _) ?_ ?_
+  · -- `x < y`: es la conclusión
+    exact PrfH.hyp _ _ (List.Mem.head _)
+  · refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_ ?_
+    · -- `x = y`: la hipótesis se vuelve `x·c < x·c`
+      let Δ₁ : List Formula := [Formula.eq x y, lor (Formula.eq x y) (lt y x),
+        lt (mul x c) (mul y c)]
+      have heq : PrfH Δ₁ (mul y c =eq mul x c) :=
+        PrfH_eq_symm (PrfH_eq_congr_mul1 c (PrfH.hyp _ _ (List.Mem.head _)))
+      exact PrfH_absurd_lt (mul x c)
+        (PrfH_lt_subst2 heq (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
+    · -- `y < x`: monotonía da `y·c ≤ x·c`, y con la hipótesis `x·c < x·c`
+      let Δ₂ : List Formula := [lt y x, lor (Formula.eq x y) (lt y x),
+        lt (mul x c) (mul y c)]
+      have hle : PrfH Δ₂ (le (mul y c) (mul x c)) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_mul_le_mono_right y x c) _)
+          (PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt y x) _) (PrfH.hyp _ _ (List.Mem.head _)))
+      have hlt : PrfH Δ₂ (lt (mul x c) (mul x c)) :=
+        PrfH.mp _ _ _
+          (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_le_trans (mul x c) (mul y c) (mul x c)) _)
+            (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
+          hle
+      exact PrfH_absurd_lt (mul x c) hlt
+
 end ROBINSON_PlusPlus.Meta.NatMulPrf
 
 export ROBINSON_PlusPlus.Meta.NatMulPrf (
   prf_mul_zero prf_mul_succ prf_mul_comm
-  prf_eq_congr_mul1 prf_eq_congr_mul2
+  prf_eq_congr_mul1 prf_eq_congr_mul2 PrfH_eq_congr_mul1
   prf_zero_mul prf_mul_one
   prf_le_add_self prf_le_self_add prf_le_mul_succ
   prf_div_mod_eq prf_mod2_range prf_add_le_mono_right
   prf_add_le_mono_left prf_add_le_mono prf_mul_le_mono_right
+  prf_lt_irrefl prf_lt_trichotomy PrfH_absurd_lt prf_lt_of_mul_lt_mul_right
 )
