@@ -1,0 +1,70 @@
+/-
+Copyright (c) 2026. All rights reserved.
+Author: Julián Calderón Almendros
+License: MIT
+-/
+import ROBINSON_PlusPlus.Meta.CantorMonoPrf
+
+open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.ArithPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.NatArithPrf
+open ROBINSON_PlusPlus.Meta.NatOrderPrf
+open ROBINSON_PlusPlus.Meta.NatMulPrf
+open ROBINSON_PlusPlus.Meta.CantorMonoPrf
+
+set_option linter.unusedSimpArgs false
+set_option maxHeartbeats 1000000
+
+namespace ROBINSON_PlusPlus.Meta.StrongInductionPrf
+
+/-!
+## META — NIVEL D real: INDUCCIÓN FUERTE en `Prf` (entregable **ii** de la ruta 1a)
+
+Con `prf_cantor_mono` (i‑c) ya se sabe que **sub‑código < código**. Falta el principio que lo
+consume: inducción **fuerte** (por curso de valores), derivada de la ordinaria
+(`prf_nat_induction`, que es `Prf.ind`) sin axiomas nuevos.
+
+**Destino:** `pcc_eval_substfc` (iii), que recurre sobre los constructores de una fórmula
+codificada — o sea sobre sub‑códigos, que son estrictamente menores pero **no** el predecesor.
+-/
+
+/-! ### Paso ii.1 — `m < σn ⟹ m ≤ n`
+
+⚠️ **La vía corta.** El camino «natural» es analizar casos sobre el testigo (`k = 0` ⟹ igualdad,
+`k = σj` ⟹ desigualdad estricta), pero eso obliga a **anidar** una eliminación de `∃` dentro de
+otra ya levantada, con dos niveles de De Bruijn.
+
+No hace falta: del testigo sale directamente `m + k = n`, y `prf_le_self_add` ya dice
+`m ≤ m + k`; basta **reescribir el lado derecho**. Una sola eliminación de `∃` y ningún caso. -/
+
+/-- **`m < σn ⟹ m ≤ n`** — discreción del orden, sin análisis de casos. -/
+theorem prf_le_of_lt_succ (m n : Term) : Prf (lt m (succ n) ⇒ le m n) := by
+  have himp : Prf (Formula.ex (Formula.eq (add (liftTerm 0 m) (succ (.var 0)))
+      (liftTerm 0 (succ n))) ⇒ le m n) := by
+    refine prf_ex_elim_imp ?_
+    show PrfH [Formula.eq (add (liftTerm 0 m) (succ (.var 0))) (succ (liftTerm 0 n))]
+      (le (liftTerm 0 m) (liftTerm 0 n))
+    -- de `↑m + σ#0 = σ↑n` sale `σ(↑m + #0) = σ↑n`, luego `↑m + #0 = ↑n`
+    have hsucc : PrfH [Formula.eq (add (liftTerm 0 m) (succ (.var 0))) (succ (liftTerm 0 n))]
+        (succ (add (liftTerm 0 m) (.var 0)) =eq succ (liftTerm 0 n)) :=
+      PrfH_eq_trans
+        (prf_to_prfH (prf_eq_symm (prf_add_succ_t (liftTerm 0 m) (.var 0))) _)
+        (prfH_hyp_self _)
+    have heq : PrfH [Formula.eq (add (liftTerm 0 m) (succ (.var 0))) (succ (liftTerm 0 n))]
+        (add (liftTerm 0 m) (.var 0) =eq liftTerm 0 n) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj (add (liftTerm 0 m) (.var 0)) (liftTerm 0 n)) _)
+        hsucc
+    -- y `m ≤ m + k` reescrito por esa igualdad da `m ≤ n`
+    exact PrfH_le_subst2 heq (prf_to_prfH (prf_le_self_add (liftTerm 0 m) (.var 0)) _)
+  exact prf_deduction
+    (PrfH.mp _ _ _ (prf_to_prfH himp _) (PrfH_iff_mp (prf_lt_iff m (succ n)) (prfH_hyp_self _)))
+
+end ROBINSON_PlusPlus.Meta.StrongInductionPrf
+
+export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
+  prf_le_of_lt_succ
+)
