@@ -52,6 +52,7 @@ import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 import ROBINSON_PlusPlus.Meta.NumListPrf
 import ROBINSON_PlusPlus.Meta.NatArithPrf
 import ROBINSON_PlusPlus.Meta.NatOrderPrf
+import ROBINSON_PlusPlus.Meta.NatMulPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 import ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf

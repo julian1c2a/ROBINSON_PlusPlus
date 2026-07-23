@@ -70,43 +70,28 @@ theorem PrfH_eq_congr_add2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
 
 /-! ### Asociatividad de `+`
 
-Pieza base del resto: la transitividad de `<` la necesita para componer testigos
-(`a + σk = b` y `b + σj = c` ⟹ `a + σ(k + σj) = c`). Inducción sobre el **tercer** argumento
-—el que `add` consume—, con los otros dos como parámetros protegidos por `liftTerm 0` y
-devueltos intactos por `norm11`. -/
+⚠️ **CORRECCIÓN (2026‑07‑23).** La primera versión de este lema se probó **por inducción**, lo cual
+era **trabajo innecesario**: `ax7_add_assoc` es un **axioma de la teoría** (está en la lista
+`axioms`, `Minimal/Axioms.lean:1205`), igual que `ax6_add_comm`, y las leyes de `mul` (`ax8`–`ax12`).
+Lo que hay que probar por inducción es sólo lo que **no** es axioma (p. ej. `0 + n = n`, porque
+`add` recurre por la derecha). Se deja la instanciación directa. -/
 
-/-- **Asociatividad de `+`** en `Prf`: `(a + b) + c = a + (b + c)`. -/
+/-- **Asociatividad de `+`** en `Prf` — instancia de `ax7_add_assoc`. -/
 theorem prf_add_assoc (a b c : Term) :
     Prf (add (add a b) c =eq add a (add b c)) := by
-  have key : Prf (Formula.forall (Formula.eq
-      (add (add (liftTerm 0 a) (liftTerm 0 b)) (.var 0))
-      (add (liftTerm 0 a) (add (liftTerm 0 b) (.var 0))))) := by
-    refine prf_nat_induction _ ?base ?step
-    · -- ⚠️ el `liftTerm 0 a` de un parámetro ABSTRACTO no reduce solo: hay que `simp` antes
-      simp only [substFormula, substTerm, substTerms, add, zero, Nat.reduceEqDiff, reduceIte,
-        if_true, FOL.substTerm_liftTerm]
-      exact prf_eq_trans (prf_add_zero_t (add a b))
-        (prf_eq_symm (prf_eq_congr_add2 a (prf_add_zero_t b)))
-    · refine Prf.gen _ ?_
-      simp only [substFormula, substTerm, substTerms, add, succ, liftFormula, liftTerm, liftTerms,
-        norm11, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, reduceIte,
-        FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-      refine prf_deduction ?_
-      have ih := prfH_hyp_self (Formula.eq
-        (add (add (liftTerm 0 a) (liftTerm 0 b)) (.var 0))
-        (add (liftTerm 0 a) (add (liftTerm 0 b) (.var 0))))
-      -- `(a+b)+σn = σ((a+b)+n) = σ(a+(b+n)) = a+σ(b+n) = a+(b+σn)`
-      refine PrfH_eq_trans
-        (prf_to_prfH (prf_add_succ_t (add (liftTerm 0 a) (liftTerm 0 b)) (.var 0)) _) ?_
-      refine PrfH_eq_trans (PrfH_eq_congr_succ ih) ?_
-      refine PrfH_eq_trans
-        (prf_to_prfH (prf_eq_symm (prf_add_succ_t (liftTerm 0 a)
-          (add (liftTerm 0 b) (.var 0)))) _) ?_
-      exact PrfH_eq_congr_add2 (liftTerm 0 a)
-        (prf_to_prfH (prf_eq_symm (prf_add_succ_t (liftTerm 0 b) (.var 0))) _)
-  have hc := prf_spec key c
-  simpa only [substFormula, substTerm, substTerms, add, Nat.reduceEqDiff, reduceIte, if_true,
-    FOL.substTerm_liftTerm] using hc
+  have hh := prf_spec (prf_spec (prf_spec
+    (prf_ax (show ax7_add_assoc ∈ axioms by simp [axioms])) a) b) c
+  simp [ax7_add_assoc, substFormula, substTerm, substTerms, add,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- **Conmutatividad de `+`** en `Prf` — instancia de `ax6_add_comm`. -/
+theorem prf_add_comm (a b : Term) : Prf (add a b =eq add b a) := by
+  have hh := prf_spec (prf_spec
+    (prf_ax (show ax6_add_comm ∈ axioms by simp [axioms])) a) b
+  simp [ax6_add_comm, substFormula, substTerm, substTerms, add,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
 
 /-! ### Introducción de `≤`
 
@@ -151,6 +136,15 @@ theorem PrfH_le_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a�
     intro s
     simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hle)
+
+/-- Sustitución en el segundo argumento de `≤`, en contexto. -/
+theorem PrfH_le_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
+    (hle : PrfH Γ (le a b₁)) : PrfH Γ (le a b₂) := by
+  let f : Formula := le (liftTerm 0 a) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = le a s := by
+    intro s
+    simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
 /-- Sustitución en el 1er argumento de `<`, en contexto. ⚠️ Copia local: el original vive en
     `Meta/BoundedInPrf.lean`, que es **posterior** a este módulo en la cadena de imports. -/
@@ -286,8 +280,8 @@ end ROBINSON_PlusPlus.Meta.NatOrderPrf
 
 export ROBINSON_PlusPlus.Meta.NatOrderPrf (
   prf_eq_congr_add1 prf_eq_congr_add2 PrfH_eq_congr_add2
-  prf_add_assoc
-  PrfH_eq_congr_add1 PrfH_le_subst1 PrfH_lt_subst1 PrfH_lt_subst2
+  prf_add_assoc prf_add_comm
+  PrfH_eq_congr_add1 PrfH_le_subst1 PrfH_le_subst2 PrfH_lt_subst1 PrfH_lt_subst2
   prf_le_of_lt prf_le_of_eq prf_le_refl
   prf_lt_add_succ prf_succ_add_succ prf_lt_add_succ_of_lt
   prf_lt_trans_swap prf_lt_trans prf_lt_le_trans prf_le_lt_trans prf_le_trans
