@@ -91,8 +91,38 @@ theorem prf_add_one (n : Term) : Prf (add n one =eq succ n) :=
 theorem prf_mul_two (n : Term) : Prf (mul n two =eq add n n) :=
   prf_eq_trans (prf_mul_succ n one) (prf_eq_congr_add1 n (prf_mul_one n))
 
+/-! ### Paso 4 — `mod2 n ≤ 1`
+
+La cota del resto. Es lo que permite pasar de la ecuación exacta de `ax17`
+(`div2(n)·2 + mod2(n) = n`) a una **desigualdad** utilizable, y con ello **evitar
+`cantor_poly_is_even`** (`ax24`), que era la pieza más incierta del plan original: no hace falta
+saber que `cantor_poly` es par, basta acotar su resto. -/
+
+/-- Eliminación de la disyunción con las dos ramas ya cerradas (azúcar sobre `j3`; hoy se escribe
+    inline en varios sitios). -/
+theorem prf_or_elim {A B C : Formula} (hor : Prf (lor A B))
+    (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ C)) : Prf C :=
+  prf_mp (prf_mp (prf_mp (Prf.incl (Prf₀.j3 A B C)) hor) h1) h2
+
+/-- `0 ≤ 1`. (`one = σ0` es defeq, así que `prf_zero_lt_succ zero` ya **es** `lt zero one`.) -/
+theorem prf_le_zero_one : Prf (le zero one) :=
+  prf_mp (prf_le_of_lt zero one) (prf_zero_lt_succ zero)
+
+/-- **`mod2 n ≤ 1`** — de `ax21_mod2_range` por casos. -/
+theorem prf_le_mod2_one (n : Term) : Prf (le (mod2 n) one) := by
+  refine prf_or_elim (prf_mod2_range n) ?_ ?_
+  · -- rama `mod2 n = 0`
+    refine prf_deduction ?_
+    exact PrfH_le_subst1 (PrfH_eq_symm (prfH_hyp_self (Formula.eq (mod2 n) zero)))
+      (prf_to_prfH prf_le_zero_one _)
+  · -- rama `mod2 n = 1`
+    refine prf_deduction ?_
+    exact PrfH_le_subst1 (PrfH_eq_symm (prfH_hyp_self (Formula.eq (mod2 n) one)))
+      (prf_to_prfH (prf_le_refl one) _)
+
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
   prf_cons_def prf_lt_succ_self_cm prf_lt_subst2_cm prf_add_one prf_mul_two
+  prf_or_elim prf_le_zero_one prf_le_mod2_one
 )
