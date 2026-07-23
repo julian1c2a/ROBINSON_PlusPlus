@@ -207,6 +207,17 @@
 > | i‑a | `Meta/NatOrderPrf.lean`: `le` en `Prf` (refl, trans, `lt_le_trans`, `le_self_add`, …) | — |
 > | i‑b | `Meta/NatMulPrf.lean`: `mul` en `Prf` (`le_mul_left/right`, distributividad) | i‑a |
 > | i‑c | `prf_cantor_mono`: `h < cons h t` y `t < cons h t` vía `2·pair = (x+y)(x+y+1)+2y` | i‑b |
+>
+> ⚠️ **REVISIÓN de i‑c (2026‑07‑23): NO es un porte, es DESARROLLO ORIGINAL.** Comprobado que el
+> orden sobre `pair` **no existe tampoco a nivel `⊢`**: `Block5` tiene `is_cantor_pair`,
+> `proj1/proj2_pair_eq`, `pair_proj_eq_c`, `pair_inj` — todo **ecuacional**, ninguna desigualdad.
+> Hay que construir la cadena entera. Bosquejo verificado a mano (no formalizado):
+> con `s = h + σt`, `2·cons h t = s·σs + 2σt`; de `prf_lt_add_succ` sale `h < s`, luego `s ≥ σh`,
+> luego `s·σs ≥ (h+1)(h+2) ≥ 2h+2 > 2h`; y de `2·x > 2·h` se concluye `x > h` por **cancelación
+> multiplicativa** (`le_of_mul_le_mul_left`, que existe en `⊢` y **habría que portar**).
+> Piezas que faltan para eso: monotonía multiplicativa (`x ≤ y ⟹ x·c ≤ y·c`), cancelación, y
+> `cantor_poly_is_even` (para pasar de `2·div2(n) + mod2(n) = n` a la igualdad exacta).
+> Estimación: **~10‑15 lemas** de aritmética, todos de riesgo bajo pero volumen real.
 > | ii | `prf_strong_induction` desde `prf_nat_induction` (inducir sobre `∀y ≤ x. φ(y)`) | i‑a |
 > | iii | `pcc_eval_substfc` / `pcc_eval_liftfc` por inducción sobre el código | i‑c, ii |
 > | iv | 2 constructores en `CTree` + los 7 tags | iii |

@@ -145,6 +145,65 @@ theorem prf_le_mul_succ (a k : Term) : Prf (le a (mul a (succ k))) :=
     (prf_to_prfH (prf_eq_symm (prf_mul_succ a k)) _) (prfH_hyp_self _)))
     (prf_le_add_self (mul a k) a)
 
+/-! ### Puentes `div2`/`mod2` (instancias de axioma) — cimiento de i‑c
+
+Los tres son instanciación directa: `ax17_div_mod_eq`, `ax21_mod2_range` y `ax24_mod2_of_even`
+están en la lista `axioms`. Son el cimiento del cálculo con `pair = div2 ∘ cantor_poly`. -/
+
+/-- `div2(n)·2 + mod2(n) = n` — `ax17_div_mod_eq`. -/
+theorem prf_div_mod_eq (n : Term) :
+    Prf (add (mul (div2 n) two) (mod2 n) =eq n) := by
+  have hh := prf_spec (prf_ax (show ax17_div_mod_eq ∈ axioms by simp [axioms])) n
+  simp [ax17_div_mod_eq, substFormula, substTerm, substTerms, add, mul, div2, mod2, two, one,
+    succ, zero, FOL.substTerm_liftTerm] at hh
+  exact hh
+
+/-- `mod2 n = 0 ∨ mod2 n = 1` — `ax21_mod2_range`. -/
+theorem prf_mod2_range (n : Term) :
+    Prf (lor (mod2 n =eq zero) (mod2 n =eq one)) := by
+  have hh := prf_spec (prf_ax (show ax21_mod2_range ∈ axioms by simp [axioms])) n
+  simp [ax21_mod2_range, substFormula, substTerm, substTerms, mod2, one, succ, zero,
+    FOL.substTerm_liftTerm] at hh
+  exact hh
+
+/-! ### Monotonía aditiva
+
+`x ≤ y ⟹ x + u ≤ y + u`. Es la pieza reutilizable que pide la monotonía del producto (y con
+ella, Cantor). Se hace por `or_elim` sobre `≤`: la rama `=` es congruencia, la rama `<`
+transporta el testigo (`x + σk = y` ⟹ `(x+u) + σk = y+u`, usando conmutatividad y asociatividad). -/
+
+/-- **`x ≤ y ⟹ x + u ≤ y + u`**. -/
+theorem prf_add_le_mono_right (x y u : Term) : Prf (le x y ⇒ le (add x u) (add y u)) := by
+  refine prf_deduction ?_
+  have hle : PrfH [le x y] (lor (lt x y) (Formula.eq x y)) := prfH_hyp_self _
+  refine PrfH_or_elim hle ?_ ?_
+  · -- rama `x < y`: transporta el testigo
+    have hlt : PrfH (lt x y :: [le x y]) (lt x y) := PrfH.hyp _ _ (List.Mem.head _)
+    have hstep : PrfH (lt x y :: [le x y]) (lt (add x u) (add y u)) := by
+      have himp : Prf (lt x y ⇒ lt (add x u) (add y u)) := by
+        have hgen : Prf (Formula.ex (Formula.eq (add (liftTerm 0 x) (succ (.var 0)))
+            (liftTerm 0 y)) ⇒ lt (add x u) (add y u)) := by
+          refine prf_ex_elim_imp ?_
+          show PrfH [Formula.eq (add (liftTerm 0 x) (succ (.var 0))) (liftTerm 0 y)]
+            (lt (add (liftTerm 0 x) (liftTerm 0 u)) (add (liftTerm 0 y) (liftTerm 0 u)))
+          refine PrfH_lt_intro _ _ (.var 0) ?_
+          -- `(↑x+↑u) + σ#0 = (↑x + σ#0) + ↑u = ↑y + ↑u`
+          refine PrfH_eq_trans (prf_to_prfH (prf_add_assoc (liftTerm 0 x) (liftTerm 0 u)
+            (succ (.var 0))) _) ?_
+          refine PrfH_eq_trans (prf_to_prfH (prf_eq_congr_add2 (liftTerm 0 x)
+            (prf_add_comm (liftTerm 0 u) (succ (.var 0)))) _) ?_
+          refine PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_add_assoc (liftTerm 0 x)
+            (succ (.var 0)) (liftTerm 0 u))) _) ?_
+          exact PrfH_eq_congr_add1 (liftTerm 0 u)
+            (prfH_hyp_self (Formula.eq (add (liftTerm 0 x) (succ (.var 0))) (liftTerm 0 y)))
+        exact prf_deduction (PrfH.mp _ _ _ (prf_to_prfH hgen _)
+          (PrfH_iff_mp (prf_lt_iff x y) (prfH_hyp_self _)))
+      exact PrfH.mp _ _ _ (prf_to_prfH himp _) hlt
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt (add x u) (add y u)) _) hstep
+  · -- rama `x = y`: congruencia
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (add x u) (add y u)) _)
+      (PrfH_eq_congr_add1 u (PrfH.hyp _ _ (List.Mem.head _)))
+
 end ROBINSON_PlusPlus.Meta.NatMulPrf
 
 export ROBINSON_PlusPlus.Meta.NatMulPrf (
@@ -152,4 +211,5 @@ export ROBINSON_PlusPlus.Meta.NatMulPrf (
   prf_eq_congr_mul1 prf_eq_congr_mul2
   prf_zero_mul prf_mul_one
   prf_le_add_self prf_le_self_add prf_le_mul_succ
+  prf_div_mod_eq prf_mod2_range prf_add_le_mono_right
 )
