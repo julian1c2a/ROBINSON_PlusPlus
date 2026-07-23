@@ -182,6 +182,45 @@ theorem prf_le_double_self_mul_succ {a k : Term} (h : Prf (a =eq succ k)) :
   prf_le_subst2 (prf_eq_symm (prf_mul_succ a a))
     (prf_mp (prf_add_le_mono_right a (mul a a) a) (prf_le_self_mul_self h))
 
+/-! ### Pasos 9–10 — de `s+s` a `cantor_poly`, y de ahí a `2(σh)`
+
+Con `s := h + σt`, `cantor_poly h (σt) = s·σs + 2·σt`. Dos observaciones que abaratan el tramo:
+
+* El sumando `2·σt` se trata como **OPACO**: sólo hace falta que *esté* (`a ≤ a + x`), no calcularlo.
+  Por eso **`ax11`/`ax12`** (asociatividad y distributividad del producto) **no hacen falta**.
+* `s` es un sucesor por `prf_add_succ_t h t` (`s = σ(h+t)`), que es justo la hipótesis que exigen
+  los pasos 7–8. -/
+
+/-- **`s + s ≤ cantor_poly h (σt)`** con `s = h + σt`. El término cuadrático acota el doble, y el
+    sumando `2·σt` sólo se añade. -/
+theorem prf_le_double_s_cantor (h t : Term) :
+    Prf (le (add (add h (succ t)) (add h (succ t)))
+           (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t)))) :=
+  prf_mp
+    (prf_mp (prf_le_trans (add (add h (succ t)) (add h (succ t)))
+        (mul (add h (succ t)) (succ (add h (succ t))))
+        (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))))
+      (prf_le_double_self_mul_succ (k := add h t) (prf_add_succ_t h t)))
+    (prf_le_self_add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t)))
+
+/-- **`σh ≤ s`** con `s = h + σt`: `h ≤ h + t`, se sube con `σ`, y se reescribe la cola. -/
+theorem prf_le_succ_h_s (h t : Term) : Prf (le (succ h) (add h (succ t))) :=
+  prf_le_subst2 (prf_eq_symm (prf_add_succ_t h t))
+    (prf_mp (prf_le_succ_succ h (add h t)) (prf_le_self_add h t))
+
+/-- **`σh + σh ≤ cantor_poly h (σt)`** — monotonía aditiva doble sobre `σh ≤ s`, compuesta con
+    el paso 9. Es la cota `2(σh) = 2h+2` que la contradicción final necesita. -/
+theorem prf_le_two_succ_h_cantor (h t : Term) :
+    Prf (le (add (succ h) (succ h))
+           (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t)))) :=
+  prf_mp
+    (prf_mp (prf_le_trans (add (succ h) (succ h))
+        (add (add h (succ t)) (add h (succ t)))
+        (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))))
+      (prf_mp (prf_mp (prf_add_le_mono (succ h) (add h (succ t)) (succ h) (add h (succ t)))
+        (prf_le_succ_h_s h t)) (prf_le_succ_h_s h t)))
+    (prf_le_double_s_cantor h t)
+
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
 export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
@@ -189,4 +228,5 @@ export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
   prf_or_elim prf_le_zero_one prf_le_mod2_one
   prf_le_succ_succ prf_not_le_succ_self
   prf_le_self_mul_self prf_le_double_self_mul_succ
+  prf_le_double_s_cantor prf_le_succ_h_s prf_le_two_succ_h_cantor
 )
