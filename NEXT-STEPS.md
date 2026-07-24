@@ -246,6 +246,46 @@
 >   caso mínimo ANTES de portar (ii)**, para no portar la forma equivocada.
 > | iii | `pcc_eval_substfc` / `pcc_eval_liftfc` por inducción sobre el código | i‑c, ii |
 >
+> 🔬 **EXPLORACIÓN DE (2) — 2026‑07‑24, 2º workflow (11 agentes). VEREDICTO: (2) NO EXISTE.**
+>
+> Se probaron **4 rutas predicate‑free independientes**. Tres fallan de plano (backbone
+> alternativo, disyunción derivada, evitar‑substfc). La cuarta («substfc simbólico») se declaró
+> **viable con sólo 2 axiomas** (`ax_tc_substfc`, `ax_tc_liftfc`) presentados como «misma categoría
+> que `ax_tc_cons`, verdaderos, sin coste de solidez» — pero la **refutación adversarial la tumbó
+> 3/3, con «axioma oculto» marcado por los 3**, y el agente de imposibilidad concluye `True`.
+>
+> **⚠️ FALSO POSITIVO ATRAPADO — y verificado a mano contra el código (linchpin de solidez).**
+> `ax_tc_substfc : tcFn (substfc v s f) =eq substfcT (tcFn v)(tcFn s)(tcFn f)` **NO es de la
+> categoría de `ax_tc_cons`: hace la teoría INCONSISTENTE.** Derivación:
+> 1. `ax_substfc_impl` (axioma YA existente, `Axioms.lean:506`): `substfc v s (implc a b) =eq
+>    implc (substfc v s a)(substfc v s b)` — la teoría **interpreta** `substfc`, no es opaco.
+> 2. `tcFn` respeta `=eq` (congruencia Leibniz, `PrfH_congr_tcFn`) ⟹
+>    `tcFn (substfc v s (implc a b)) =eq tcFn (implc …)`.
+> 3. LHS por `ax_tc_substfc` = `substfcT …` = `funcc ⌜"substfc"⌝ …`, cabeza `⟨1, ⌜"substfc"⌝, …⟩`.
+> 4. RHS por `ax_tc_cons` (`implc` ES un `cons`, `Axioms.lean:827`) = `⟨1, ⌜cons_sym="::"⌝, …⟩`.
+> 5. ⟹ la teoría prueba `⟨1,⌜"substfc"⌝,…⟩ =eq ⟨1,⌜"::"⌝,…⟩`, y `cons_ne_head`/`formCode_ne`
+>    (aritmética negativa de códigos, YA existe) prueba su **negación** ⟹ **`⊥`**.
+> Un `Prov` inconsistente probaría `Prov(⌜⊥⌝)` y **aniquila toda la construcción de Gödel**.
+> El error del agente: tratar `substfc` como símbolo **opaco** ignorando que `ax_substfc_*` ya lo
+> **interpreta** como productor de `cons`‑árboles. **Esto VINDICA la decisión de `15dccda`**
+> (abandonar `substfcT`): era correcta.
+>
+> **CONCLUSIÓN FIRME: no hay ruta sin axioma objeto de buena‑formación** para el target actual.
+> Evidencia convergente: 3 rutas fallan, la 4ª es inconsistente (refutada 3/3), imposibilidad
+> `True`, y derivación manual contra el código.
+>
+> **DOS matices honestos que el agente de imposibilidad dejó abiertos (NO explorados):**
+> * **Reformular el TARGET de los 7 esquemas** para que `substfc` **no aparezca** en la
+>   reconstrucción (que nunca haya que evaluarlo). Es opción‑(1)‑adyacente (toca esquemas, requiere
+>   sanción) pero podría ser más barato que los predicados. Distinto de la «② reformular» ya
+>   descartada, que sólo movía el `substfc` de sitio; aquí sería **eliminarlo** del árbol.
+> * El **mínimo axiomático de (1) es < 12**: las 16 ecuaciones `ax_substfc_*`/`ax_liftfc_*`/
+>   `ax_substtc_*` ya existen (0 nuevas), la inducción fuerte se **deriva** (0 nueva); lo
+>   genuinamente nuevo es **el predicado de buena‑formación + su inversión estructural**.
+>   Mismo coste de solidez (amplía `Prov`), pero menos superficie que la estimación inicial.
+>
+> ---
+>
 > 🚨 **SONDEO DE (iii) — 2026‑07‑23, workflow de 11 agentes. DOS RESULTADOS NEGATIVOS.**
 >
 > **(A) La vía «extender `CTree`» está MUERTA, y se sabe exactamente por qué.**
