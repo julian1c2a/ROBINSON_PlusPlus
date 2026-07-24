@@ -36,7 +36,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 
 **El detalle exhaustivo (firmas Lean 4, dependencias por módulo, notación) vive en los nodos
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
-REFERENCE, `AI-GUIDE.md` §0.5). **94 módulos fuente** (Minimal 11 + Meta 72 + Full 11) + barrels.
+REFERENCE, `AI-GUIDE.md` §0.5). **99 módulos fuente** (Minimal 11 + Meta 77 + Full 11) + barrels.
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)
 
@@ -114,8 +114,8 @@ Cadena `Meta/` (orden del barrel `Meta.lean`). Detalle en el nodo §3.15–§3.2
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
-> Build verde **108 jobs**, 0 errores, **0 warnings, 0 sorrys** (2026-07-21, Lean v4.31.0). **94 módulos
-> fuente** (Minimal 11 + Meta 72 + Full 11). **7 `axiom` de Lean** (tras
+> Build verde **113 jobs**, 0 errores, **0 warnings, 0 sorrys** (2026-07-24, Lean v4.31.0). **99 módulos
+> fuente** (Minimal 11 + Meta 77 + Full 11). **7 `axiom` de Lean** (tras
 > F7a): 3 esquemas de inducción (`Full/`), TFA (`Block8`), 2 anclas de codificación, y `d3` (único
 > postulado gödeliano vivo, retirable con D3 real). Inventario en **`AXIOMS.md`**. Ninguna es un
 > `sorry` (ADR-008).
@@ -210,7 +210,7 @@ los ficheros `.lean` que documenta. El subsistema **activo** es [Incompletitud](
 Ver `NEXT-STEPS.md` (punto de reanudación), `GODEL-D3-TRACKED-DESIGN.md` (plan 12‑A) y
 `ESCALANDO_EL_PROYECTO.md` (enlace con el proyecto hermano DeepArith sobre el kernel FOL⁼ común).
 
-**Estado 2026-07-21 · HEAD `4b3bb53`.** Build **108 jobs**, **94 módulos**, 0 sorrys, 7 `axiom` de Lean (`AXIOMS.md`; anclas = `ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq` — `prf_inAxC` es hoy **teorema**).
+**Estado 2026-07-24 · HEAD `d8e9152`.** Build **113 jobs**, **99 módulos**, 0 sorrys, 7 `axiom` de Lean (`AXIOMS.md`; anclas = `ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq` — `prf_inAxC` es hoy **teorema**).
 
 1. **Gödel I — sólo `⊬G`** (`goedel_first_real'`, `Meta/DiagonalTwo.lean`), real y sin postulados, vía
    ω‑consistencia.
