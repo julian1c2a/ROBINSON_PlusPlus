@@ -274,6 +274,18 @@
 > Evidencia convergente: 3 rutas fallan, la 4ª es inconsistente (refutada 3/3), imposibilidad
 > `True`, y derivación manual contra el código.
 >
+> **⛔ PUERTA (a) CERRADA (2026‑07‑25, sondeo de 8 agentes) — IMPOSIBILIDAD ESTRUCTURAL.**
+> Reformular los 7 esquemas para ELIMINAR `substfc` del árbol reflejado, net‑0 y sólido, **no
+> existe**. Dicotomía exhaustiva (dos bisagras verificadas a mano: `Rule.q1` toma término
+> ARBITRARIO en `Hilbert.lean:93`; `substFormula` es recursión sobre los 8 constructores): la
+> solidez ata `carc` a la instancia correcta, que **contiene `A[t]`**; o queda LIGADA (función /
+> ecuación / premsOf / átomo relacional `subst`) ⟹ muro `CTree` (axiomas), o queda LIBRE ⟹ insólido
+> (bug `ax_lineWF_gen`). Las 3 propuestas (premsOf, fVarización, átomo relacional) colapsan al mismo
+> núcleo. La fVarización además rompe completitud (D1/Gödel I). Detalle en [[project-substfc-wall]].
+>
+> **⟹ SÓLO QUEDAN (1) y (3), deliverables DISTINTOS. Recomendación: (3) `repr_neg` AHORA (net‑0,
+> avanza `⊬¬G`); (1) `isFormCode` después, como paso consciente para Gödel II. Nunca (a).**
+>
 > **DOS matices honestos que el agente de imposibilidad dejó abiertos (NO explorados):**
 > * **Reformular el TARGET de los 7 esquemas** para que `substfc` **no aparezca** en la
 >   reconstrucción (que nunca haya que evaluarlo). Es opción‑(1)‑adyacente (toca esquemas, requiere
