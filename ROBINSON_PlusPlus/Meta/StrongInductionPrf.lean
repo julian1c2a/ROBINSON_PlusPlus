@@ -153,6 +153,23 @@ theorem psi_step_motive (Φ : Formula) :
     Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub, succ]
   rw [liftFormula_swap Φ 1, substFormula_liftFormula]
 
+/-! ### Paso ii.3b — ENSAMBLADURA de `prf_strong_induction` (PENDIENTE, pieza acotada)
+
+Con las piezas ii.1/ii.2/ii.3a **todas verdes**, el teorema final
+`prf_strong_induction (Φ) (step : Prf (∀ (PSI Φ ⇒ Φ))) : ∀ t, Prf (substFormula 0 t Φ)`
+está a UNA ensambladura. Estructura (traducción de `Full.strong_induction`):
+* `hall : Prf (∀ (PSI Φ))` por `prf_nat_induction (PSI Φ)`:
+  - **base** ✅ resuelta: `rw [psi_at]`, `Prf.gen`, `lt #0 0 → ⊥` por `prf_not_lt_zero` + `efq`.
+  - **paso**: `Prf.gen`, `rw [psi_step_motive]`, `prf_deduction`, `PrfH.gen`, `deduction_aux`.
+    GOAL INTERNO EXACTO (verificado con `trace_state`):
+      `PrfH [lt #0 (succ #1), liftFormula 0 (PSI Φ)] (liftFormula 1 Φ)`   (#0 = m, #1 = n)
+    Falta: `or_elim` del split `prf_le_of_lt_succ #0 #1` (`m<n ∨ m=n`); rama `m<n` extrae de la
+    hipótesis `↑(PSI Φ)` vía instanciación bajo contexto; rama `m=n` usa `step` en `#1`. ⚠️ Requiere
+    una **variante `PrfH` de `prf_psi_elim`** (el actual es `Prf` cerrado) y matching De Bruijn del
+    cuerpo `liftFormula 1 Φ` — trabajo INTERACTIVO, no a ciegas.
+* **conclusión** ✅ clara: `intro t; prf_psi_elim Φ (σt) t (prf_spec hall (σt)) (prf_lt_succ_self_cm t)`.
+-/
+
 end ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
 export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
