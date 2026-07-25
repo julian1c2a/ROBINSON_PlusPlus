@@ -153,22 +153,36 @@ theorem psi_step_motive (Φ : Formula) :
     Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub, succ]
   rw [liftFormula_swap Φ 1, substFormula_liftFormula]
 
-/-! ### Paso ii.3b — ENSAMBLADURA de `prf_strong_induction` (PENDIENTE, pieza acotada)
+/-! ### Paso ii.3b — ENSAMBLADURA (PENDIENTE) — diagnóstico PRECISO de lo que falta
 
-Con las piezas ii.1/ii.2/ii.3a **todas verdes**, el teorema final
-`prf_strong_induction (Φ) (step : Prf (∀ (PSI Φ ⇒ Φ))) : ∀ t, Prf (substFormula 0 t Φ)`
-está a UNA ensambladura. Estructura (traducción de `Full.strong_induction`):
-* `hall : Prf (∀ (PSI Φ))` por `prf_nat_induction (PSI Φ)`:
-  - **base** ✅ resuelta: `rw [psi_at]`, `Prf.gen`, `lt #0 0 → ⊥` por `prf_not_lt_zero` + `efq`.
-  - **paso**: `Prf.gen`, `rw [psi_step_motive]`, `prf_deduction`, `PrfH.gen`, `deduction_aux`.
-    GOAL INTERNO EXACTO (verificado con `trace_state`):
-      `PrfH [lt #0 (succ #1), liftFormula 0 (PSI Φ)] (liftFormula 1 Φ)`   (#0 = m, #1 = n)
-    Falta: `or_elim` del split `prf_le_of_lt_succ #0 #1` (`m<n ∨ m=n`); rama `m<n` extrae de la
-    hipótesis `↑(PSI Φ)` vía instanciación bajo contexto; rama `m=n` usa `step` en `#1`. ⚠️ Requiere
-    una **variante `PrfH` de `prf_psi_elim`** (el actual es `Prf` cerrado) y matching De Bruijn del
-    cuerpo `liftFormula 1 Φ` — trabajo INTERACTIVO, no a ciegas.
-* **conclusión** ✅ clara: `intro t; prf_psi_elim Φ (σt) t (prf_spec hall (σt)) (prf_lt_succ_self_cm t)`.
--/
+Piezas ii.1/ii.2/ii.3a **verdes**. Base y conclusión de `prf_strong_induction` **resueltas**.
+Falta sólo el interior del paso, y estos son los hechos **medidos** (con `trace_state`), no
+conjeturas:
+
+* GOAL INTERNO (tras `Prf.gen` + `rw [psi_step_motive]` + `prf_deduction` + `PrfH.gen` +
+  `deduction_aux`):
+    `PrfH [lt #0 (σ#1), liftFormula 0 (PSI Φ)] (liftFormula 1 Φ)`   (#0 = m, #1 = n)
+* `hsplit` ✅ disponible: `prf_le_of_lt_succ #0 #1` da `lt #0 #1 ∨ #0 =eq #1`.
+* **Rama A** (`m<n`) ✅ resuelta en sondeo: instanciar la hipótesis `↑(PSI Φ)` con `Prf₀.q1` en `#0`
+  da `substFormula 0 #0 (liftFormula 1 (lt #0 #1 ⇒ liftFormula 1 Φ))`, que cierra con
+  `subst_lift_cancel_formula` + MP con la hipótesis de rama.
+* **Rama B** (`m=n`) ⛔ **el bloqueo real, y NO es reescritura**. `step` instanciado en `#1`
+  (`prf_spec step (.var 1)`) da `substFormula 0 #1 (PSI Φ) ⇒ substFormula 0 #1 Φ`. Pero:
+  - `substFormula 0 #1 (PSI Φ) ≠ liftFormula 0 (PSI Φ)`  (medido: cuerpos `Φ` vs `↑↑Φ`)
+  - `substFormula 0 #1 Φ ≠ liftFormula 1 Φ`              (medido: falso en general)
+  ⟹ las formas **no encajan por reescritura**; hay que **reestructurar**: o reformular `PSI` para
+  que el motivo del paso produzca directamente la forma `subst`, o dar una variante de `psi_at`
+  para `liftFormula 0` y una versión `PrfH` de `prf_psi_elim` con matching explícito.
+
+⚠️ **Falsa alarma descartada** (comprobada): `psi_at_succ0` (cuerpo `Φ`) y `psi_step_motive`
+(cuerpo `↑Φ`) NO se contradicen — hablan de `subst (σ#0) (PSI Φ)` y de
+`subst (σ#0) (liftFormula 1 (PSI Φ))` respectivamente; la diferencia de cuerpo **es** el lift que
+introduce el paso de `prf_nat_induction`. Ambos son correctos.
+
+Recomendación para retomar: **reformular `PSI`** (p. ej. con el índice de inducción en `#0` y el
+cuantificado en `#1`, o parametrizando) de modo que hipótesis y goal del paso caigan en la MISMA
+forma (`subst` o `lift`, no mezcladas). Es lo que evita esta fricción de raíz. -/
+
 
 end ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
