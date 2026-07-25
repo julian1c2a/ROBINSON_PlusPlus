@@ -15,6 +15,7 @@ open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.NatOrderPrf
 open ROBINSON_PlusPlus.Meta.NatMulPrf
 open ROBINSON_PlusPlus.Meta.CantorMonoPrf
+open FOL
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -104,26 +105,58 @@ theorem prf_psi_elim (Φ : Formula) (t m : Term)
   simp [substFormula, substTerm, substTerms, lt, FOL.substTerm_liftTerm] at hspec
   exact prf_mp hspec h_lt
 
-/-! ### Paso ii.3 — INDUCCIÓN FUERTE en forma OBJETO (PENDIENTE — porte De Bruijn)
+/-! ### Paso ii.3a — lift‑swap De Bruijn (`liftFormula (c+1)∘liftFormula c = liftFormula c²`)
 
-`prf_strong_induction (Φ) (step : Prf (∀ (PSI Φ ⇒ Φ))) : ∀ t, Prf (substFormula 0 t Φ)`.
-Guion (de `Full.strong_induction`): probar `Prf (∀ (PSI Φ))` por `prf_nat_induction`, y concluir
-`Φ(t)` de `ψ(σt)` con `t < σt` (`prf_psi_elim` + `prf_lt_succ_self_cm`).
+La pieza que faltaba para el paso de la inducción: `substFormula 0 (σ#0) (liftFormula 1 (PSI Φ))`
+(la forma del paso de `prf_nat_induction`) no reducía porque el lift externo deja
+`liftFormula 2 (liftFormula 1 Φ)`, y ningún lema FOL cubría esa disposición (subst por DEBAJO del
+lift). Se cierra con este **lift‑swap** + `substFormula_liftFormula`. -/
 
-**BLOQUEO (2026‑07‑25): el PASO inductivo es un porte De Bruijn denso.** Full lo resuelve con
-`apply gen; intro n; rw [step_reduce]` — pero eso usa la **ω‑regla** (`gen` de `Derives` convierte
-el `∀` OBJETO en un `∀` META sobre términos, y ahí `step_reduce n` aplica). `Prf.gen` es finitario:
-deja el cuerpo con `#0` LIBRE, y `step_reduce` (que pide el `substFormula 0 n` externo) **no aplica**.
-Falta la reducción `substFormula 0 (succ #0) (liftFormula 1 (PSI Φ)) = ψ(σ#0)` bajo el binder, que
-hay que probar a mano (inducción sobre la estructura / `substFormula_liftFormula`). La base y la
-conclusión ya están claras (ver git stash / historial de la sesión); sólo falta esa igualdad y el
-`or_elim` interno del split `m < σn ⟹ m<n ∨ m=n` (ya disponible como `prf_le_of_lt_succ`).
-⚠️ Requiere trabajo INTERACTIVO (ver goals), no a ciegas: es exactamente el pozo De Bruijn que el
-proyecto advierte. NO usar `set` (Mathlib) — ver [[feedback-lean-notation-traps]]. -/
+mutual
+/-- Swap de lifts a nivel término (mutual con listas, patrón de `substTerm_liftLift`). -/
+theorem liftTerm_swap (t : Term) (c : Nat) :
+    liftTerm (c+1) (liftTerm c t) = liftTerm c (liftTerm c t) := by
+  cases t with
+  | var n =>
+      by_cases h : n < c
+      · simp [liftTerm, h, show n < c+1 from by omega]
+      · simp [liftTerm, h, show ¬ n+1 < c from by omega, show ¬ n+1 < c+1 from by omega]
+  | func f ts => simp only [liftTerm]; congr 1; exact liftTerms_swap ts c
+/-- Swap de lifts a nivel lista de términos. -/
+theorem liftTerms_swap (ts : List Term) (c : Nat) :
+    liftTerms (c+1) (liftTerms c ts) = liftTerms c (liftTerms c ts) := by
+  cases ts with
+  | nil => simp [liftTerms]
+  | cons t ts' =>
+      simp only [liftTerms, List.cons.injEq]; exact ⟨liftTerm_swap t c, liftTerms_swap ts' c⟩
+end
+
+/-- **Swap de lifts a nivel fórmula**: `liftFormula (c+1) (liftFormula c Φ) = liftFormula c (liftFormula c Φ)`. -/
+theorem liftFormula_swap (Φ : Formula) (c : Nat) :
+    liftFormula (c+1) (liftFormula c Φ) = liftFormula c (liftFormula c Φ) := by
+  induction Φ generalizing c with
+  | bottom => rfl
+  | atom p ts => simp only [liftFormula]; congr 1; exact liftTerms_swap ts c
+  | eq a b => simp only [liftFormula]; rw [liftTerm_swap, liftTerm_swap]
+  | impl a b iha ihb => simp only [liftFormula]; rw [iha, ihb]
+  | «forall» a ih => simp only [liftFormula]; rw [ih]
+  | and a b iha ihb => simp only [liftFormula]; rw [iha, ihb]
+  | or a b iha ihb => simp only [liftFormula]; rw [iha, ihb]
+  | ex a ih => simp only [liftFormula]; rw [ih]
+
+/-- **La reducción del motivo del paso**: `substFormula 0 (σ#0) (liftFormula 1 (PSI Φ)) = ψ(σ#0)`
+    con el cuerpo `liftFormula 1 Φ`. Cierra con el lift‑swap + `substFormula_liftFormula`. -/
+theorem psi_step_motive (Φ : Formula) :
+    substFormula 0 (succ (.var 0)) (liftFormula 1 (PSI Φ))
+      = Formula.forall (Formula.impl (lt (.var 0) (succ (.var 1))) (liftFormula 1 Φ)) := by
+  simp only [PSI, lt, liftFormula, substFormula, liftTerms, liftTerm, substTerms, substTerm,
+    Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub, succ]
+  rw [liftFormula_swap Φ 1, substFormula_liftFormula]
 
 end ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
 export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
   prf_le_of_lt_succ
   substFormula_liftFormula PSI psi_at prf_psi_elim
+  liftTerm_swap liftTerms_swap liftFormula_swap psi_step_motive
 )
