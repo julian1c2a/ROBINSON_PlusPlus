@@ -7,6 +7,27 @@
 **Estado 2026‑07‑26 · HEAD `3a4f91e` · build 113 jobs · 99 módulos (Minimal 11 + Meta 77 + Full 11) · Lean v4.31.0 · 0 errores / 0 warnings /
 0 sorrys · 7 `axiom` (NADA sancionado).**
 
+> ### 🚨 BLOQUEO CRÍTICO (2026‑07‑26): **`axioms ⊢ ⊥` — LA TEORÍA OBJETO ES INCONSISTENTE**
+>
+> Verificado **en el compilador** (no sólo por agentes): `boom : axioms ⊢ Formula.bottom` compila
+> con footprint **sancionado y sin `sorryAx`**. Derivación en 5 pasos:
+> `prf_cantor_mono_left` da `0 < cons 0 nil` ⟹ `succ_pred_of_pos` lo vuelve un **sucesor** ⟹
+> `ax_tc_succ` y `ax_tc_cons` obligan a `tcFn` de **ese mismo valor** a ser `⟨1,⌜"σ"⌝,…⟩` y
+> `⟨1,⌜"::"⌝,…⟩` a la vez ⟹ `cons_ne_head`/`strCode_ne` ⟹ `⊥`.
+>
+> **Causa raíz:** `ax_L0_cons_def` (`Axioms.lean:340`) identifica `cons h t = pair h (σt)`, luego
+> `cons` **NO es un constructor opaco: es un número**. La nota archivada que decía «`ax_tc_cons`
+> vale porque `cons` es un constructor» queda **REFUTADA** — es el **mismo error de categoría** que
+> `ax_tc_substfc`, que ya se descartó por inconsistente el 2026‑07‑24.
+>
+> ⚠️ **No lo introdujo `prf_cantor_mono`** (net‑0, derivado de axiomas existentes): era **latente**;
+> i‑c sólo lo hizo visible. **El ingrediente a nivel `Prf` existe** (`prf_succ_pred_of_pos`
+> compila) ⟹ tratar `Prf ⊢ ⊥` como **PROBABLE** hasta refutarlo.
+>
+> ⛔ **CONGELADA la opción (1) y toda sanción de axiomas.** Decisión previa e ineludible:
+> **qué es `tcFn`**. Detalle, alcance y candidatos de reparación en
+> [[project-inconsistencia-tcfn-cons]].
+>
 > ### ⏸️ DOS FRENTES ABIERTOS AL CERRAR EL 2026‑07‑26 — leer antes de seguir
 >
 > **(A) `prf_strong_induction` (entregable ii) — al 90 %.** ii.1/ii.2/ii.3a **verdes**; base,
