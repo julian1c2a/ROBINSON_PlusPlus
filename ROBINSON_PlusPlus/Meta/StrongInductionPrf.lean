@@ -153,36 +153,86 @@ theorem psi_step_motive (Φ : Formula) :
     Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub, succ]
   rw [liftFormula_swap Φ 1, substFormula_liftFormula]
 
-/-! ### Paso ii.3b — ENSAMBLADURA (PENDIENTE) — diagnóstico PRECISO de lo que falta
+/-! ### Paso ii.3b — ENSAMBLADURA: `prf_strong_induction` COMPLETO
 
-Piezas ii.1/ii.2/ii.3a **verdes**. Base y conclusión de `prf_strong_induction` **resueltas**.
-Falta sólo el interior del paso, y estos son los hechos **medidos** (con `trace_state`), no
-conjeturas:
+**Resuelto (2026‑07‑26) verificando la afirmación del sondeo de diseño.** Aquel decía que «no hay
+que reformular `PSI`, la rama B falla porque `Φ` se dejó ARBITRARIO». **Verificado: acertaba en el
+diagnóstico, pero sólo a medias en el remedio.** Con la hipótesis `hΦ : liftFormula 1 Φ = Φ`
+(«`Φ` no tiene libres por encima del índice de inducción»):
 
-* GOAL INTERNO (tras `Prf.gen` + `rw [psi_step_motive]` + `prf_deduction` + `PrfH.gen` +
-  `deduction_aux`):
-    `PrfH [lt #0 (σ#1), liftFormula 0 (PSI Φ)] (liftFormula 1 Φ)`   (#0 = m, #1 = n)
-* `hsplit` ✅ disponible: `prf_le_of_lt_succ #0 #1` da `lt #0 #1 ∨ #0 =eq #1`.
-* **Rama A** (`m<n`) ✅ resuelta en sondeo: instanciar la hipótesis `↑(PSI Φ)` con `Prf₀.q1` en `#0`
-  da `substFormula 0 #0 (liftFormula 1 (lt #0 #1 ⇒ liftFormula 1 Φ))`, que cierra con
-  `subst_lift_cancel_formula` + MP con la hipótesis de rama.
-* **Rama B** (`m=n`) ⛔ **el bloqueo real, y NO es reescritura**. `step` instanciado en `#1`
-  (`prf_spec step (.var 1)`) da `substFormula 0 #1 (PSI Φ) ⇒ substFormula 0 #1 Φ`. Pero:
-  - `substFormula 0 #1 (PSI Φ) ≠ liftFormula 0 (PSI Φ)`  (medido: cuerpos `Φ` vs `↑↑Φ`)
-  - `substFormula 0 #1 Φ ≠ liftFormula 1 Φ`              (medido: falso en general)
-  ⟹ las formas **no encajan por reescritura**; hay que **reestructurar**: o reformular `PSI` para
-  que el motivo del paso produzca directamente la forma `subst`, o dar una variante de `psi_at`
-  para `liftFormula 0` y una versión `PrfH` de `prf_psi_elim` con matching explícito.
+* la discrepancia (a) —`liftFormula 0 (PSI Φ)` vs `substFormula 0 #1 (PSI Φ)`— **SÍ desaparece**
+  (`psi_lift_eq_subst`), que era el bloqueo estructural;
+* la discrepancia (b) —`substFormula 0 #1 Φ` vs `liftFormula 1 Φ`— **NO desaparece, y no debe**:
+  son `Φ(n)` y `Φ(m)`, y se transportan con **Leibniz** usando la hipótesis de rama `m = n`
+  (exactamente lo que hace `Full.strong_induction` con `Derives.subst`).
 
-⚠️ **Falsa alarma descartada** (comprobada): `psi_at_succ0` (cuerpo `Φ`) y `psi_step_motive`
-(cuerpo `↑Φ`) NO se contradicen — hablan de `subst (σ#0) (PSI Φ)` y de
-`subst (σ#0) (liftFormula 1 (PSI Φ))` respectivamente; la diferencia de cuerpo **es** el lift que
-introduce el paso de `prf_nat_induction`. Ambos son correctos.
+⟹ **`PSI` se queda como está** y las 4 piezas verdes previas no se re‑prueban. `hΦ` es inofensiva
+para (iii): el predicado de `pcc_eval_substfc` cuantifica `v`/`s` **internamente**, luego sólo tiene
+libre el código sobre el que se induce. -/
 
-Recomendación para retomar: **reformular `PSI`** (p. ej. con el índice de inducción en `#0` y el
-cuantificado en `#1`, o parametrizando) de modo que hipótesis y goal del paso caigan en la MISMA
-forma (`subst` o `lift`, no mezcladas). Es lo que evita esta fricción de raíz. -/
+theorem subst1_id (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) (s : Term) :
+    substFormula 1 s Φ = Φ := by
+  have h := substFormula_liftFormula Φ 1 s; rw [hΦ] at h; exact h
+theorem subst0_var0_id (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    substFormula 0 (.var 0) Φ = Φ := by
+  have h := FOL.Theorems.Quantifiers.subst_lift_cancel_formula Φ 0
+  rw [hΦ] at h; exact h
+theorem psi_lift_eq_subst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    liftFormula 0 (PSI Φ) = substFormula 0 (.var 1) (PSI Φ) := by
+  simp only [PSI, liftFormula, substFormula, lt, liftTerms, liftTerm, substTerms, substTerm,
+    Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, hΦ, subst1_id Φ hΦ]
 
+theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
+    (step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) :
+    ∀ t : Term, Prf (substFormula 0 t Φ) := by
+  have hall : Prf (Formula.forall (PSI Φ)) := by
+    refine prf_nat_induction (PSI Φ) ?base ?step
+    · rw [psi_at]
+      refine Prf.gen _ (prf_deduction ?_)
+      have hlt0 : PrfH [lt (.var 0) (liftTerm 0 zero)] (lt (.var 0) zero) := by
+        simpa only [liftTerm, liftTerms, zero] using prfH_hyp_self (lt (.var 0) (liftTerm 0 zero))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+        (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt0)
+    · refine Prf.gen _ ?_
+      rw [psi_step_motive]
+      refine prf_deduction ?_
+      refine PrfH.gen [PSI Φ] (Formula.impl (lt (.var 0) (succ (.var 1))) (liftFormula 1 Φ)) ?_
+      refine deduction_aux ?_ (lt (.var 0) (succ (.var 1))) [liftFormula 0 (PSI Φ)] rfl
+      have hsplit : PrfH [lt (.var 0) (succ (.var 1)), liftFormula 0 (PSI Φ)]
+          (lor (lt (.var 0) (.var 1)) ((.var 0) =eq (.var 1))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt_succ (.var 0) (.var 1)) _)
+          (PrfH.hyp _ _ (List.Mem.head _))
+      refine PrfH_or_elim hsplit ?brA ?brB
+      case brA =>
+        rw [hΦ]
+        let ΓA : List Formula := [lt (.var 0) (.var 1), lt (.var 0) (succ (.var 1)),
+          liftFormula 0 (PSI Φ)]
+        have hpsi : PrfH ΓA (liftFormula 0 (PSI Φ)) :=
+          PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+        have hinst := PrfH.mp _ _ _ (PrfH.incl0 ΓA _ (Prf₀.q1 _ (.var 0))) hpsi
+        simp only [PSI, liftFormula, substFormula, lt, liftTerms, liftTerm, substTerms, substTerm,
+          Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub,
+          hΦ, subst1_id Φ hΦ, subst0_var0_id Φ hΦ] at hinst
+        exact PrfH.mp _ _ _ hinst (PrfH.hyp _ _ (List.Mem.head _))
+      case brB =>
+        rw [hΦ]
+        let ΓB : List Formula := [Formula.eq (.var 0) (.var 1), lt (.var 0) (succ (.var 1)),
+          liftFormula 0 (PSI Φ)]
+        have hst : Prf (Formula.impl (substFormula 0 (.var 1) (PSI Φ))
+            (substFormula 0 (.var 1) Φ)) := by
+          simpa only [substFormula] using prf_spec step (.var 1)
+        have hpsi : PrfH ΓB (substFormula 0 (.var 1) (PSI Φ)) := by
+          rw [← psi_lift_eq_subst Φ hΦ]
+          exact PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+        have hphi_n : PrfH ΓB (substFormula 0 (.var 1) Φ) :=
+          PrfH.mp _ _ _ (prf_to_prfH hst _) hpsi
+        have hsym : PrfH ΓB ((.var 1 : Term) =eq (.var 0)) :=
+          PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _))
+        have hgoal := PrfH_leibniz_subst (A := Φ) hsym hphi_n
+        rw [subst0_var0_id Φ hΦ] at hgoal
+        exact hgoal
+  intro t
+  exact prf_psi_elim Φ (succ t) t (prf_spec hall (succ t)) (prf_lt_succ_self_cm t)
 
 end ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
@@ -190,4 +240,5 @@ export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
   prf_le_of_lt_succ
   substFormula_liftFormula PSI psi_at prf_psi_elim
   liftTerm_swap liftTerms_swap liftFormula_swap psi_step_motive
+  subst1_id subst0_var0_id psi_lift_eq_subst prf_strong_induction
 )
