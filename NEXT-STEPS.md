@@ -4,8 +4,25 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
 
-**Estado 2026‑07‑24 · HEAD `d8e9152` · build 113 jobs · 99 módulos (Minimal 11 + Meta 77 + Full 11) · Lean v4.31.0 · 0 errores / 0 warnings /
-0 sorrys.**
+**Estado 2026‑07‑26 · HEAD `3a4f91e` · build 113 jobs · 99 módulos (Minimal 11 + Meta 77 + Full 11) · Lean v4.31.0 · 0 errores / 0 warnings /
+0 sorrys · 7 `axiom` (NADA sancionado).**
+
+> ### ⏸️ DOS FRENTES ABIERTOS AL CERRAR EL 2026‑07‑26 — leer antes de seguir
+>
+> **(A) `prf_strong_induction` (entregable ii) — al 90 %.** ii.1/ii.2/ii.3a **verdes**; base,
+> conclusión y **rama A** resueltas. Bloquea **sólo la rama B** del paso interno, con diagnóstico
+> medido en `Meta/StrongInductionPrf.lean:156‑178`. ⚠️ **ANTES de tocar `PSI`**: los 3 diseñadores
+> del sondeo de (1) afirman que **NO hay que reformularlo** — que la rama B falla porque `Φ` se dejó
+> **arbitrario**, no por `PSI`, y que con `Φ` sin libres por encima del índice las dos discrepancias
+> medidas desaparecen. **Verificar esa afirmación primero**: si es cierta, ahorra re‑probar 4 piezas
+> verdes; si es falsa, hay que reestructurar como dice el diagnóstico del módulo.
+>
+> **(B) Sondeo de diseño de la opción (1) — 14/15 agentes, la SÍNTESIS se perdió.** El workflow
+> `wf_fcc9ada8-f18` se detuvo antes de emitir el paquete de sanción. **Recuperable barato** con
+> `Workflow({scriptPath: ".../design-option-1-wf_fcc9ada8-f18.js", resumeFromRunId: "wf_fcc9ada8-f18"})`
+> — los 14 terminados replican desde caché. Resultados ya recogidos en [[project-substfc-wall]]
+> (convergencia (1a)/(1b), 8/8 sin insolidez, segundo muro real, y el hallazgo verificado a mano de
+> que `chainOk`/`allIn` viven en `codingAxioms`). **Nada sancionado: `Minimal/Axioms.lean` intacto.**
 
 > ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
 >
