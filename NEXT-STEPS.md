@@ -15,6 +15,17 @@
 > `ax_tc_succ` y `ax_tc_cons` obligan a `tcFn` de **ese mismo valor** a ser `⟨1,⌜"σ"⌝,…⟩` y
 > `⟨1,⌜"::"⌝,…⟩` a la vez ⟹ `cons_ne_head`/`strCode_ne` ⟹ `⊥`.
 >
+> **✅ ALCANCE RESUELTO: EL DAÑO LLEGA A `Prf`.** `prf_smoking_gun` compila —`Prf` prueba
+> `⟨1,⌜σ⌝,…⟩ =eq ⟨1,⌜::⌝,…⟩`— con footprint `[propext, choice, Quot.sound]`: **sin meta‑reglas ω,
+> sin `ax_induction`, sin `sorryAx`**. No es culpa de `Full` ni de la capa ω: es del **núcleo**.
+> ⟹ D1 (`repr_pos'_prf`) lo mete en `Prov` ⟹ **verificador insólido**, **Gödel II vacío**,
+> `ConsistentH`/`ConsistentOmega` **refutables**.
+>
+> **Culpable mínimo (aislado):** `ax_L0_cons_def` + `ax_tc_succ` + `ax_tc_cons`, los tres en
+> **`coreAxioms`**. La aritmética pura (Peano, `+`, `·`, `<`, Cantor, `div2`) **no está tocada**:
+> ℕ la modela. Enfermedad: **`tcFn` es función sobre VALORES pero está axiomatizada por recursión
+> sobre SINTAXIS**, y en ℕ el mismo valor es a la vez `cons a b` y `σk` ⟹ **ni ℕ es modelo**.
+>
 > **Causa raíz:** `ax_L0_cons_def` (`Axioms.lean:340`) identifica `cons h t = pair h (σt)`, luego
 > `cons` **NO es un constructor opaco: es un número**. La nota archivada que decía «`ax_tc_cons`
 > vale porque `cons` es un constructor» queda **REFUTADA** — es el **mismo error de categoría** que
