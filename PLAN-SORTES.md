@@ -170,6 +170,71 @@ un piloto: **un** solo sitio de `InAxiomsCodePrf` re‑probado por la vía numer
 
 ---
 
+## 4ter · PILOTO DE LA FASE 2 (2026‑07‑27) — ✅ cierra, y **parte los sitios en dos familias**
+
+Piloto en `Probe/PilotoAislado.lean` (no es módulo de producción). Compila, **0 errores, 0 avisos**,
+footprint `[propext, Classical.choice, Quot.sound]` — **sin `sorryAx`**.
+
+### Cómo se verificó la independencia (el crawler de dependencias NO sirve)
+
+Un auditor de constantes transitivas da **falsos negativos**: Lean 4.31 devuelve `value? = NONE`
+para teoremas importados (medido), así que sólo recorre **tipos**, no pruebas. Se descartó.
+
+En su lugar, **aislamiento por importaciones**, que sí es concluyente:
+
+* `SubstCodeOpenPrf` (27 módulos) y `DerivCondPrf` (32) **no alcanzan** `TcArithPrf`; `InAxiomsCodePrf`
+  (61) sí — verificado con cierre transitivo del grafo de imports.
+* El piloto importa **sólo** esos dos ⟹ `prf_tc_form`/`_of_cons`/`_cons`/`_term` **no existen en su
+  entorno** ⟹ no puede usarlos. Comprobado por máquina con `#noExiste` (falla si alguien los mete).
+
+### Lo que el piloto cierra
+
+`substtc_inv_termCode_listFormCodeM` con **tipo idéntico** al de producción, por la vía estructural:
+`prf_substtc_arith_open` (sólo ecuaciones de variable de `substtc`) + `substCodeT_closed`
+(`listFormCodeM L` es cerrado). Más el caso general
+
+```lean
+substtc_inv_termCode_closed (a) (ha : ∀ c, liftTerm c a = a) (W) :
+    Prf (substtc zero W (termCode a) =eq termCode a)
+```
+
+que **sustituye a `substtc_inv_termCode_of_tc` eliminando su hipótesis `tcFn a =eq termCode a`** —
+justo la que obligaba a la lectura sintáctica.
+
+### ⚠️ Lo que el piloto DESTAPA: los 20 sitios son de dos clases, y sólo una está cerrada
+
+| familia | enunciado | ¿resuelta? |
+|---|---|---|
+| **invariancia** | `substtc W (termCode a) =eq termCode a` | ✅ **sí, net‑0, compilado** |
+| **puente** | `tcFn a =eq termCode a` | ❌ **no** |
+
+Sitios de la familia **puente** (los duros): `InAxiomsCodePrf:185` (`haform` de `pcc_in_head_swap`),
+`D3InDotPrf:340`, `Sigma1CorePrf:114`, `:204`, `:213`.
+
+El puente dice **«el código RASTREADO (`tcFn a`, que produce la maquinaria punteada) es el código
+ESTÁTICO (`termCode a`, que produce el meta)»**. Es exactamente el punto donde las dos lecturas
+tienen que coincidir — y por §4bis no pueden, mientras `⌜φ⌝` sea un **árbol**.
+
+### La salida, y su precio
+
+Con `⌜φ⌝` representado como **numeral**, el puente pasa a ser
+`tcFn (numeralM N) =eq termCode (numeralM N)`, que es **`prf_tc_numeral`: ya demostrado, y sólo usa
+`zero`/`succ`**. El puente se recupera *gratis* — pero exige:
+
+1. `codeNat : Formula → Nat` — **no existe**;
+2. `formCode φ =eq numeralM (codeNat φ)` — exige **evaluación provable del emparejamiento de
+   Cantor** sobre numerales concretos. **Verificado que NO existe** ningún lema
+   `cons (numeral a) (numeral b) =eq numeral k` en el repo. Es el grueso real de la fase 2.
+   (El instrumental aritmético para hacerlo sí está: `NatMulPrf`, `div2`/`mod2` vía `ax17`/`ax21`.)
+
+⚠️ **A vigilar, no verificado:** `N` crece como el emparejamiento de Cantor iterado, así que la
+prueba objeto que denota `prf_tc_numeral (codeNat φ)` tiene longitud astronómica. En Lean todo queda
+**simbólico** (nunca se normaliza `numeral (codeNat φ)`), luego la formalización no se rompe; pero
+antes de comprometerse hay que comprobar que las **cotas** de la capa acotada (`boundedCarcIn`)
+toleran ese tamaño.
+
+---
+
 ## 5 · Plan por fases (independiente de A1/A2)
 
 | fase | entregable | verificación |
