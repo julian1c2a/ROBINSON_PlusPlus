@@ -235,6 +235,95 @@ toleran ese tamaño.
 
 ---
 
+## 4quater · MEDICIÓN (2026‑07‑27): la cota, las magnitudes, y el radio real del daño
+
+### Respuesta a «¿a cuánto habría que elevar `boundedCarcIn`?» → **a nada**
+
+```lean
+-- RunFnBoundedPrf.lean:214
+def boundedCarcIn (y p : Term) : Formula :=
+  Formula.ex (land (lt (.var 0) (liftTerm 0 (lenc p))) …)
+--                                            ^^^^^^ la cota es `lenc p`
+```
+
+La cota es **`lenc p`** — el **número de líneas** de la lista, no la magnitud de los códigos. Es
+**paramétrica**: se adapta sola. Barrido de todas las cotas del proyecto (`boundedIn`,
+`boundedCarcLt`, `boundedAllIn`, `boundedPremsIn`, `bdExCode`, `bdAllCode`): **ninguna es un numeral
+concreto**. No hay nada que elevar.
+
+### Las magnitudes sí son brutales (medidas, `Probe/Magnitud.lean`)
+
+Con `cons h t = ((h+σt)(h+σt+1) + 2σt)/2`, cada `cons` **eleva al cuadrado**:
+
+| fórmula | prof. `cons` | nodos | log₂(N) |
+|---|---:|---:|---:|
+| `⊥` | 1 | 1 | 3,6 |
+| `0 = 0` | 6 | 11 | 300 |
+| `0=0 ⇒ 0=0` | 9 | 25 | 2 395 |
+| `ax_L0_cons_def` | 35 | 98 | **3,85 × 10¹⁰** |
+| `ax_tc_cons` | 260 | 704 | **8,66 × 10⁷⁸** |
+| `ax_tc_succ` | **3 873** | 4 905 | **desborda un `double`** |
+
+**Causa diagnosticada, y es corregible:** el estallido lo dominan los **numerales unarios de los
+puntos de código Unicode**, no la estructura de la fórmula. `σ` es U+03C3 = **963**, así que
+`strCodeM "σ"` mete un `numeralM 963`, y su `termCode` anida 963×3 ≈ 2 889 niveles de `cons`.
+Eso explica que `ax_tc_succ` (prof. 3 873) desborde mientras `ax_L0_cons_def` (prof. 35) no.
+**Codificar los símbolos por índice de tabla (0…40) en vez de por Unicode recortaría la profundidad
+unas 100×** — barato e independiente de todo lo demás.
+
+### ⚠️ El riesgo real NO es la cota
+
+Es si **`codeNat φ` se mantiene SIMBÓLICO** en los términos de prueba de Lean. `numeral (codeNat φ)`
+y `prf_tc_numeral (codeNat φ)` son aplicaciones bien formadas mientras Lean **no** intente reducir
+`codeNat φ`. Si algún paso fuerza su evaluación a literal, nada de eso tipa. **Eso es lo que hay que
+sondear, no la cota.**
+
+### ✅ La mejor noticia: **Gödel I está estructuralmente limpio**
+
+Alcanzabilidad transitiva de `TcArithPrf` sobre los 100 módulos:
+
+* **33 contaminados** (pueden alcanzarlo) — toda la capa `Eval*`/`LineWF*`/`Sigma1*`/`D3*`.
+* **66 libres** — y ahí están **`DiagonalTwo` (`goedel_first_real'`), `GodelTwo`,
+  `Representability2Prf` (D1) y `ReflectionPrf`**.
+
+⟹ **La prueba de Gödel I no puede estar usando la familia `tc`.** Reparados los axiomas,
+**sobrevive sin re‑demostrar nada**. Hoy es **vacua** (su hipótesis `ConsistentOmega` es refutable
+en la teoría inconsistente), pero eso lo cura la reparación, no trabajo de prueba.
+El daño está **confinado a la capa rastreada**.
+
+---
+
+## 4quinquies · SONDEOS PROPUESTOS (por prioridad)
+
+### S1 · Quitar `ax_tc_cons` y reconstruir — **el más informativo, hacer PRIMERO**
+En rama aparte, eliminar `ax_tc_cons` de `coreAxioms` y `lake build`. Da la lista **exacta** de lo
+que rompe, en vez de la cota superior de 33 módulos que da la alcanzabilidad. Es reversible
+(`git checkout`) y no sanciona nada. **Sin esto, cualquier plan de reparación va a ciegas.**
+
+### S2 · ¿`isFormCode` resuelve LOS DOS muros? — **el que puede cambiar la estrategia**
+El muro de `substfc` pedía un predicado de buena‑formación (`isFormCode`, < 12 axiomas); el puente
+`tc` pide distinguir **árbol** de **numeral**. **Son la misma carencia.** Si un solo paquete de
+axiomas cierra ambos, la economía cambia por completo: dejaría de ser «−1 axioma pero pierdo la capa
+rastreada» y pasaría a ser «+N axiomas que desbloquean B.3c **y** reparan `tc`».
+Ver [[project-substfc-wall]] — **hay que evaluarlo antes de comprometerse con la vía numeral.**
+
+### S3 · ¿Se mantiene simbólico `codeNat φ`? — decide si la vía numeral existe
+Escribir `codeNat : Formula → Nat`, elaborar `prf_tc_numeral (codeNat φ)` y comprobar que Lean **no**
+reduce. Medir tiempo de elaboración y `maxRecDepth`. Barato, y si falla **mata la vía numeral**.
+
+### S4 · Evaluación provable de Cantor sobre numerales — el grueso técnico
+`prf_cons_eval (a b : Nat) : Prf (cons (numeral a) (numeral b) =eq numeral (consN a b))`.
+Pregunta clave: ¿sale por inducción **objeto** (net‑0, `a`/`b` abstractos) o sólo por inducción
+**meta** (término de profundidad `a`)? Sólo lo primero sirve.
+
+### S5 · Recodificar símbolos por índice — ganancia independiente
+Sustituir el punto Unicode por un índice de tabla en `strCode`/`strCodeM`. Recorte ~100× en
+profundidad. No depende de ninguna decisión anterior y **beneficia a todas las vías**.
+
+**Orden recomendado: S1 → S2 → (según S2) S3 → S4. S5 en cualquier momento.**
+
+---
+
 ## 5 · Plan por fases (independiente de A1/A2)
 
 | fase | entregable | verificación |
