@@ -1,7 +1,52 @@
-# PLAN — Separación de tipos: reparar la inconsistencia de `tcFn`
+# PLAN — Reparar la inconsistencia de `tcFn`
 
-**Creado:** 2026‑07‑27 · **Estado:** diseño, pendiente de decisión sobre el NIVEL de tipado
-**Contexto:** ver memoria `project-inconsistencia-tcfn-cons` y `AXIOMS.md`.
+**Creado:** 2026‑07‑27 · **Última medición:** 2026‑07‑27 (sondeos S1–S5 + piloto diagonal)
+**Contexto:** memoria `project-inconsistencia-tcfn-cons`, `AXIOMS.md`, `sondeos/README.md`.
+
+---
+
+## 🟢 LEER ESTO PRIMERO — estado vigente y qué secciones están SUPERADAS
+
+Este documento se escribió por capas y **las secciones posteriores invalidan a las anteriores**.
+Orden de autoridad: **§4septies > §4sexies > §4quater > §4bis > §3**.
+
+### Lo que está VERIFICADO EN EL COMPILADOR
+
+| hecho | dónde |
+|---|---|
+| La teoría objeto es **inconsistente**: `axioms ⊢ ⊥`, footprint sancionado, sin `sorryAx` | sesión previa |
+| El daño entra a Gödel I **por un solo sitio**: el **lema diagonal** (`godelC'_fixedpoint` cita exactamente `[propext, choice, Quot.sound, imp_intro, tc_cons]`) | §4sexies (S1) |
+| **D1 (`repr_pos'_prf`) está LIMPIO**, y el argumento de Gödel (`goedel_first_unprovable_real'`, `_unrefutable_real'`) también: son **modulares** | §4sexies (S1) |
+| La familia **INVARIANCIA** se re‑prueba sin la lectura sintáctica | §4ter |
+| `codeNat φ` **se mantiene simbólico**: Lean nunca lo reduce | §4sexies (S3) |
+| ✅ **El punto fijo SOBREVIVE con códigos numerales**, footprint del original **menos `tc_cons`** | **§4septies** |
+| ✅ Las dos representaciones son intercambiables **en un paso de Leibniz** ⟹ D1 y la cadena existente se transfieren | **§4septies** |
+
+### ⛔ Lo que está DESCARTADO (no re‑litigar)
+
+* **§3 «partir `tcFn` en dos símbolos» — INSUFICIENTE.** `tcCode` necesitaría las dos recursiones
+  (las hojas de un árbol de código son numerales) ⟹ reproduce el mismo `⊥`. Ver §4bis.
+* **§4bis «eliminar `ax_tc_cons`» — NO ES OPCIÓN.** Decapita el lema diagonal: el «código del
+  código» **es** lo que la diagonalización exige. Ver §4sexies (S1).
+* **§4quater «Gödel I está estructuralmente limpio» — FALSO.** Fue un falso negativo de la
+  heurística de `import`s. Ver §4sexies (S1) y la trampa nº1 de `sondeos/README.md`.
+* **Un paquete de buena‑formación NO repara `tc`** (S2, 17 agentes, 4/4 ángulos). `substfc` pide un
+  reconocedor **extensional**; `tc` pide una distinción **intensional**. Ver §4sexies.
+* **Opción B (tipos por axiomas en el lenguaje mono‑sortido)** — imposible, §2.
+* **Puerta (a) del muro `substfc`** — imposibilidad estructural, ver `project-substfc-wall`.
+
+### ▶ LA VÍA VIVA, y lo único que falta
+
+**Representar `⌜φ⌝` como NUMERAL en lugar de como árbol `cons`.** Con eso `tcFn` se queda **sólo**
+con la lectura numeral (`ax_tc_zero`/`ax_tc_succ`), que es consistente y tiene modelo en ℕ.
+
+Todo el diseño está pilotado **salvo una pieza**:
+
+```lean
+prf_div2_numeral   -- div2 (numeral (2*m)) =eq numeral m   ← LO ÚNICO QUE FALTA
+```
+
+de la que cuelgan `prf_cons_eval` → `prf_formCode_numeral` (= `hFN`, ya asumida y pilotada).
 
 ---
 

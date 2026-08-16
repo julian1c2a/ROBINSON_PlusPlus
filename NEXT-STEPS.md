@@ -2,59 +2,82 @@
 
 ---
 
-## ▶ PUNTO DE REANUDACIÓN (para retomar el trabajo — leer PRIMERO)
+## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑07‑26 · HEAD `3a4f91e` · build 113 jobs · 99 módulos (Minimal 11 + Meta 77 + Full 11) · Lean v4.31.0 · 0 errores / 0 warnings /
-0 sorrys · 7 `axiom` (NADA sancionado).**
+**Estado 2026‑07‑27 · HEAD `3b6b2ef` · `master` verde, 113 jobs · Lean v4.31.0 · 0 errores / 0 warnings /
+0 sorrys · 7 `axiom` · `Minimal/Axioms.lean` INTACTO (NADA sancionado).**
 
-> ### 🚨 BLOQUEO CRÍTICO (2026‑07‑26): **`axioms ⊢ ⊥` — LA TEORÍA OBJETO ES INCONSISTENTE**
+> ## 🚨 LA TEORÍA OBJETO SIGUE SIENDO INCONSISTENTE (`axioms ⊢ ⊥`, verificado en compilador)
 >
-> Verificado **en el compilador** (no sólo por agentes): `boom : axioms ⊢ Formula.bottom` compila
-> con footprint **sancionado y sin `sorryAx`**. Derivación en 5 pasos:
-> `prf_cantor_mono_left` da `0 < cons 0 nil` ⟹ `succ_pred_of_pos` lo vuelve un **sucesor** ⟹
-> `ax_tc_succ` y `ax_tc_cons` obligan a `tcFn` de **ese mismo valor** a ser `⟨1,⌜"σ"⌝,…⟩` y
-> `⟨1,⌜"::"⌝,…⟩` a la vez ⟹ `cons_ne_head`/`strCode_ne` ⟹ `⊥`.
+> **Pero hoy se ha localizado el daño con precisión y se ha PILOTADO la reparación.**
+> Documento maestro: **`PLAN-SORTES.md` — leer su cabecera «🟢 LEER ESTO PRIMERO»**, que dice qué
+> secciones están superadas. Experimentos compilados: **`sondeos/`** (con `README.md`).
 >
-> **✅ ALCANCE RESUELTO: EL DAÑO LLEGA A `Prf`.** `prf_smoking_gun` compila —`Prf` prueba
-> `⟨1,⌜σ⌝,…⟩ =eq ⟨1,⌜::⌝,…⟩`— con footprint `[propext, choice, Quot.sound]`: **sin meta‑reglas ω,
-> sin `ax_induction`, sin `sorryAx`**. No es culpa de `Full` ni de la capa ω: es del **núcleo**.
-> ⟹ D1 (`repr_pos'_prf`) lo mete en `Prov` ⟹ **verificador insólido**, **Gödel II vacío**,
-> `ConsistentH`/`ConsistentOmega` **refutables**.
+> ### ✅ LO QUE SE ESTABLECIÓ HOY (todo verificado en el compilador)
 >
-> **Culpable mínimo (aislado):** `ax_L0_cons_def` + `ax_tc_succ` + `ax_tc_cons`, los tres en
-> **`coreAxioms`**. La aritmética pura (Peano, `+`, `·`, `<`, Cantor, `div2`) **no está tocada**:
-> ℕ la modela. Enfermedad: **`tcFn` es función sobre VALORES pero está axiomatizada por recursión
-> sobre SINTAXIS**, y en ℕ el mismo valor es a la vez `cons a b` y `σk` ⟹ **ni ℕ es modelo**.
+> 1. **El daño entra a Gödel I por UN SOLO SITIO: el LEMA DIAGONAL.**
+>    `godelC'_fixedpoint` cita **exactamente** `[propext, choice, Quot.sound, imp_intro, tc_cons]`.
+> 2. **D1 (`repr_pos'_prf`) está LIMPIO**, y el argumento de Gödel también
+>    (`goedel_first_unprovable_real'`, `goedel_first_unrefutable_real'`): son **modulares**, se
+>    ensucian sólo al *descargar* el punto fijo. `goedel_second'` cita sólo `d3`.
+> 3. **⛔ «Quitar `ax_tc_cons`» NO ES OPCIÓN**: decapita la diagonalización. El «código del
+>    código» **es** lo que Gödel exige. El puente hay que **REPARARLO**.
+> 4. **✅ EL PUNTO FIJO SOBREVIVE CON CÓDIGOS NUMERALES** (`sondeos/PilotoDiagonal.lean`):
+>    `godelCN_fixedpoint` tiene el footprint del original **menos `tc_cons`**. Y
+>    `provCode_transfer` da la equivalencia con la representación en árbol en **un** paso de
+>    Leibniz ⇒ **D1 y la cadena existente se transfieren sin re‑demostrarse**.
+> 5. **S2 (17 agentes): un paquete `isFormCode` NO repara `tc`.** `substfc` pide un reconocedor
+>    **extensional**; `tc` pide una distinción **intensional**. Son presupuestos disjuntos y **en
+>    serie**, no en paralelo.
 >
-> **Causa raíz:** `ax_L0_cons_def` (`Axioms.lean:340`) identifica `cons h t = pair h (σt)`, luego
-> `cons` **NO es un constructor opaco: es un número**. La nota archivada que decía «`ax_tc_cons`
-> vale porque `cons` es un constructor» queda **REFUTADA** — es el **mismo error de categoría** que
-> `ax_tc_substfc`, que ya se descartó por inconsistente el 2026‑07‑24.
+> ### ▶▶ LO QUE HAY QUE HACER AL RETOMAR (por orden)
 >
-> ⚠️ **No lo introdujo `prf_cantor_mono`** (net‑0, derivado de axiomas existentes): era **latente**;
-> i‑c sólo lo hizo visible. **El ingrediente a nivel `Prf` existe** (`prf_succ_pred_of_pos`
-> compila) ⟹ tratar `Prf ⊢ ⊥` como **PROBABLE** hasta refutarlo.
+> **(1) `prf_div2_numeral` — LA ÚNICA PIEZA QUE FALTA de la reparación para Gödel I.**
+> `Prf (div2 (numeral (2*m)) =eq numeral m)`, en forma **OBJETO** (`x` abstracto ⇒ vale para todo).
+> Argumento de **paridad**: `ax17_div_mod_eq` + `ax21_mod2_range` + cancelación, partiendo por
+> `prf_mod2_range`; el caso `mod2 = 1` se refuta por tricotomía. Instrumental **completo**:
+> `prf_lt_trichotomy`, `prf_lt_of_mul_lt_mul_right`, `prf_div_mod_eq`, `prf_mod2_range`,
+> `prf_zero_or_eq_succ_pred`, `prf_succ_ne_zero`. **Primer eslabón YA COMPILADO** y net‑0 en
+> `sondeos/S4.lean`: `prf_add_eq_zero_right (a b) : Prf ((add a b =eq zero) ⇒ (b =eq zero))`.
+> De él cuelgan `prf_cons_eval` → `prf_formCode_numeral` (= la `hFN` ya pilotada).
 >
-> ⛔ **CONGELADA la opción (1) y toda sanción de axiomas.** Decisión previa e ineludible:
-> **qué es `tcFn`**. Detalle, alcance y candidatos de reparación en
-> [[project-inconsistencia-tcfn-cons]].
+> **(2) PILOTAR LA CAPA RASTREADA** (el siguiente riesgo, aún **sin pilotar**). Los 14 tags y
+> `hI_dot` usan `tcFn` sobre códigos **ABSTRACTOS**, no sobre `formCode φ` concreto ⇒ la
+> transferencia por Leibniz **no es automática**. Pilotar **un solo tag** con `hFN` asumida,
+> igual que se hizo con el diagonal, **antes** de dar la reparación por completa.
 >
-> ### ⏸️ DOS FRENTES ABIERTOS AL CERRAR EL 2026‑07‑26 — leer antes de seguir
+> **(3) Ejecutar la reparación**: retirar `ax_tc_cons`, sustituir `tc_form` por la cadena numeral,
+> reconstruir. La rama `sondeo/s1-sin-ax-tc-cons` (`4b3492f`, **NO MERGEAR**) ya midió que sólo
+> hay **2 fallos directos**.
 >
-> **(A) `prf_strong_induction` (entregable ii) — al 90 %.** ii.1/ii.2/ii.3a **verdes**; base,
-> conclusión y **rama A** resueltas. Bloquea **sólo la rama B** del paso interno, con diagnóstico
-> medido en `Meta/StrongInductionPrf.lean:156‑178`. ⚠️ **ANTES de tocar `PSI`**: los 3 diseñadores
-> del sondeo de (1) afirman que **NO hay que reformularlo** — que la rama B falla porque `Φ` se dejó
-> **arbitrario**, no por `PSI`, y que con `Φ` sin libres por encima del índice las dos discrepancias
-> medidas desaparecen. **Verificar esa afirmación primero**: si es cierta, ahorra re‑probar 4 piezas
-> verdes; si es falsa, hay que reestructurar como dice el diagnóstico del módulo.
+> **(4) S5 — EN PARALELO, sin riesgo ni dependencias.** Recodificar los símbolos por **índice de
+> tabla** en vez de por punto Unicode: suma 19 068 → 45, **recorte 424×**. Hoy
+> `consDepth (formCode ax_tc_succ) = 3873` porque `σ` es U+03C3 = 963.
 >
-> **(B) Sondeo de diseño de la opción (1) — 14/15 agentes, la SÍNTESIS se perdió.** El workflow
-> `wf_fcc9ada8-f18` se detuvo antes de emitir el paquete de sanción. **Recuperable barato** con
-> `Workflow({scriptPath: ".../design-option-1-wf_fcc9ada8-f18.js", resumeFromRunId: "wf_fcc9ada8-f18"})`
-> — los 14 terminados replican desde caché. Resultados ya recogidos en [[project-substfc-wall]]
-> (convergencia (1a)/(1b), 8/8 sin insolidez, segundo muro real, y el hallazgo verificado a mano de
-> que `chainOk`/`allIn` viven en `codingAxioms`). **Nada sancionado: `Minimal/Axioms.lean` intacto.**
+> **(5) SÓLO DESPUÉS**: el paquete `isFormCode` para el muro de `substfc` (3 axiomas netos, no
+> «<12»). ⚠️ Con la **corrección R‑6 de S2**: la enmienda «obvia» de los 7 esquemas es
+> **incorrecta en 4 de 7** — `ind`(18)/`listInd`(20) tienen `lenc = 3` (no existe casilla 3) y
+> `q3`(11)/`qconf`(19) llevan códigos de **fórmula** donde `isTermCode` es **refutable**, lo que
+> cerraría B.3c 21/21 **ex falso**. Detalle en `PLAN-SORTES.md` §4sexies.
+>
+> ### ⚠️ DOS TRAMPAS METODOLÓGICAS APRENDIDAS HOY (no repetir)
+>
+> * **La alcanzabilidad por `import` da FALSOS NEGATIVOS**, y me hizo afirmar en falso que Gödel I
+>   estaba limpio. Un **crawler de dependencias tampoco sirve**: Lean 4.31 da `value? = NONE` para
+>   teoremas importados (sólo recorre tipos). **La técnica buena**: convertir el puente sospechoso
+>   en **`axiom` de Lean** y dejar que `#print axioms` delate a sus consumidores.
+> * **No lanzar sondeos contra un árbol que cambia.** El workflow de S2 corrió mientras la rama S1
+>   tenía `ax_tc_cons` retirado y dos diseños leyeron el árbol mutado.
+>
+> ### ⏸️ FRENTES QUE SIGUEN ABIERTOS DE ANTES (congelados tras la inconsistencia)
+>
+> **(A) `prf_strong_induction` (entregable ii) — al 90 %.** ii.1/ii.2/ii.3a verdes; bloquea sólo la
+> rama B, diagnóstico en `Meta/StrongInductionPrf.lean:156‑178`. ⚠️ **ANTES de tocar `PSI`**:
+> verificar la afirmación de los diseñadores de que **NO hay que reformularlo** (que la rama B falla
+> porque `Φ` se dejó arbitrario). Si es cierta, ahorra re‑probar 4 piezas verdes.
+>
+> **(B) `repr_neg` / `NegVerifier` para `⊬¬G`** — independiente, ver `PLAN-NEGVERIFIER.md`.
+> ⚠️ NO recuperar F7a (ver [[project-godel-first-complete]]).
 
 > ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
 >
