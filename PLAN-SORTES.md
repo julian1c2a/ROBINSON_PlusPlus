@@ -324,6 +324,80 @@ profundidad. No depende de ninguna decisión anterior y **beneficia a todas las 
 
 ---
 
+## 4sexies · RESULTADOS DE LOS SONDEOS (2026‑07‑27)
+
+### ⛔ S1 — el radio exacto, y **invalida «quitar `ax_tc_cons`»**
+
+Experimento en rama `sondeo/s1-sin-ax-tc-cons` (commit `4b3492f`, **NO MERGEAR**): `ax_tc_cons`
+fuera de `axioms`, y los dos puentes que lo consumen (`TcArithPrf.prf_tc_cons`, `Diagonal.tc_cons`)
+convertidos en **axiomas de Lean**, para que el árbol compile y `#print axioms` delate
+mecánicamente a sus consumidores **sin falsos negativos**.
+
+*Sólo **2 fallos directos*** (`TcArithPrf:54`, `Diagonal:61`); con los dos como axioma el árbol
+entero compila (113 jobs). Auditoría:
+
+| | resultado |
+|---|---|
+| **limpio** | `repr_pos'_prf` (**D1**), `goedel_first_unprovable_real'`, `goedel_first_unrefutable_real'`, `goedel_second'` (cita `d3`), `d3_prf_of_dotted_atoms` |
+| **sucio** | **`godelC'_fixedpoint`**, `goedel_first_real'`, `goedel_first_undecidable_real'`, los 14 tags `pcc_lineWF_tracked_*`, `hI_dot`, `d3_prf_of_chainOkDot`, `prf_tc_form`, `prf_tc_listFormCodeM`, `prf_tc_objList` |
+
+`godelC'_fixedpoint` cita **exactamente** `[propext, choice, Quot.sound, imp_intro, tc_cons]`.
+⟹ **la única puerta de entrada del daño a Gödel I es el LEMA DIAGONAL.** El argumento de Gödel y
+D1 son **modulares** y sobreviven intactos: `goedel_first_real'` sólo se ensucia al *descargar* el
+punto fijo.
+
+> **⛔ CONCLUSIÓN QUE INVALIDA §4bis: «quitar `ax_tc_cons`» NO ES UNA OPCIÓN.**
+> `godelC'_fixedpoint` usa `diag_arith` → `tc_form` = **el código del código**
+> (`Diagonal.lean:124‑145`). Eso **es** la diagonalización: para construir `G = β(⌜β⌝)` la teoría
+> tiene que computar el código de un término que ya es un código. La lectura **sintáctica** no es un
+> accidente de la capa rastreada — **es lo que Gödel exige**. El puente hay que **REPARARLO**.
+
+> ⚠️ **Corrige también §4quater:** allí dije que Gödel I estaba estructuralmente limpio, por
+> alcanzabilidad de importaciones. Sólo miré `TcArithPrf` y se me escapó `Diagonal`, que tiene el
+> mismo puente en la capa ω. **La heurística de imports da falsos negativos; sólo `#print axioms`
+> es concluyente.**
+
+### ✅ S3 — `codeNat φ` SÍ se mantiene simbólico
+
+`codeNat` escrito **total y estructural** (si fuera `partial` sería opaca y el sondeo no probaría
+nada). Los 6 teoremas elaboran **al instante**, footprint `[propext, choice, Quot.sound]`:
+`φ` abstracta, `φ` concreta (`ax_tc_zero`), **el peor caso** (`ax_tc_succ`), y encadenado por
+congruencia con argumento concreto. **Lean nunca reduce `codeNat φ`.** La vía numeral es viable
+del lado de Lean.
+
+### 🔬 S4 — cadena identificada; falta **una** pieza
+
+| paso | estado |
+|---|---|
+| (1) `cons h t =eq div2 (cpOf h t)` | ✅ existe (`prf_cons_div2`) |
+| (2) `cpOf ā b̄ =eq numeral P` | ✅ existen (`prf_numeral_add`/`_mul`) |
+| (3) **`div2 (numeral P) =eq numeral (P/2)`** | ❌ **NO existe** |
+
+(3) es un argumento de **paridad** vía `ax17_div_mod_eq` + `ax21_mod2_range` + cancelación.
+Instrumental completo y disponible (`prf_lt_trichotomy`, `prf_lt_of_mul_lt_mul_right`,
+`prf_div_mod_eq`, `prf_mod2_range`). **Primer eslabón ya COMPILADO** (net‑0,
+`[propext, choice, Quot.sound]`):
+
+```lean
+prf_add_eq_zero_right (a b) : Prf ((add a b =eq zero) ⇒ (b =eq zero))
+```
+
+⟹ vía **abierta**, ~20 líneas por lema, en forma **objeto** (`x` abstracto ⟹ vale para todo `a,b`).
+
+### 📏 S5 — el recorte por índice de símbolo: **424×**
+
+| | valor |
+|---|---|
+| suma de puntos Unicode de los 10 símbolos | **19 068** |
+| con índices `0…9` | **45** |
+| profundidad `cons` de `formCode`: `ax_tc_succ` / `ax_tc_cons` / `ax_tc_zero` / `ax_L0_cons_def` | 3 873 / 260 / 211 / 35 |
+
+Independiente de toda decisión anterior y beneficia a **todas** las vías.
+
+### S2 — en curso (workflow de 16 agentes)
+
+---
+
 ## 5 · Plan por fases (independiente de A1/A2)
 
 | fase | entregable | verificación |
