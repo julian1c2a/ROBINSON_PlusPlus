@@ -448,7 +448,60 @@ El workflow corrió **mientras yo tenía la rama S1 con `ax_tc_cons` retirado**.
 diseños leyeron el árbol mutado y afirmaron que ya estaba fuera. **La síntesis lo detectó (R‑1) y
 verificó contra `master` `df55d0a`**, pero los sondeos no deben lanzarse contra un árbol que cambia.
 
-### ▶ SECUENCIA RESULTANTE (S2 la fija)
+## 4septies · ✅ PILOTO DEL LEMA DIAGONAL BAJO CÓDIGOS NUMERALES — **PASA**
+
+*El riesgo nº1 de S2, resuelto en POSITIVO.* Orden invertido a propósito: se pilota **antes** de S4,
+asumiendo su resultado como axioma de Lean, para no arriesgar ~20 lemas sin saber dónde enchufarlos.
+
+**Lo asumido, y nada más** (`Probe/PilotoDiagonal.lean`):
+
+```lean
+axiom codeN : Formula → Nat                                    -- abstracto a propósito
+axiom hFN (φ) : axioms ⊢ (numeral (codeN φ) =eq formCode φ)    -- ← LA SALIDA DE S4
+```
+
+**Resultados, con footprint verificado:**
+
+| teorema | footprint | ¿`tc_cons`? |
+|---|---|---|
+| `diag_arith_num` | `[propext, choice, codeN, hFN, Quot.sound]` | **NO** |
+| `godelCN_fixedpoint` | `[…, imp_intro]` | **NO** |
+| `provCode_transfer` | `[…, imp_intro]` | **NO** |
+
+Compárese con el original: `godelC'_fixedpoint` = `[propext, choice, Quot.sound, imp_intro, tc_cons]`.
+**Footprint idéntico menos `tc_cons`**, más las dos hipótesis.
+
+**Por qué funciona — y por qué el temor de S2 era infundado.** S2 avisaba de que
+`substFormula_arith` «no aplicaría» sobre códigos numerales. Es falso: su firma es
+
+```lean
+substFormula_arith (v : Nat) (s : Term) (f : Formula) :
+    axioms ⊢ (substfc (numeral v) (termCode s) (formCode f) =eq formCode (substFormula v s f))
+```
+
+y **`s` es ARBITRARIO** ⟹ traga un numeral sin más. La cadena queda:
+
+```
+substTerm 0 ⌜ψ⌝ₙ diagTerm
+  = substfc 0 (tcFn ⌜ψ⌝ₙ) ⌜ψ⌝ₙ
+  ─[tc_numeral  ← SÓLO ax_tc_zero/ax_tc_succ, la lectura CONSISTENTE]→ substfc 0 (termCode ⌜ψ⌝ₙ) ⌜ψ⌝ₙ
+  ─[hFN ψ, congr arg3]→ substfc 0 (termCode ⌜ψ⌝ₙ) (formCode ψ)
+  ─[substFormula_arith 0 ⌜ψ⌝ₙ ψ]→ formCode (substFormula 0 ⌜ψ⌝ₙ ψ) = formCode (selfAppN ψ)
+  ─[hFN⁻¹]→ ⌜selfAppN ψ⌝ₙ
+```
+
+`godelPred`, `godelBeta`, `diagTerm` y `godel_comp` **no cambian** — ninguno menciona la
+representación, y `godel_comp` vale para `s` arbitrario. **No hay refundación: son ~30 líneas.**
+
+**Y la transferencia es de UN paso:** `provCode_transfer φ : axioms ⊢ (provCodeN φ ⇔ provCodeC φ)`,
+que es literalmente `subst_eq_iff provFormulaC (hFN φ)`. ⟹ **D1 (`repr_pos'`) y toda la cadena
+existente se transfieren componiendo con este bicondicional, sin re‑demostrarse.**
+
+⚠️ **Lo que NO establece:** `hFN` está **asumido**, no probado — eso es S4. Y la capa **rastreada**
+(los 14 tags, `hI_dot`) no se ha pilotado: usa `tcFn` sobre códigos abstractos, no sobre `formCode φ`
+concreto, y ahí la transferencia por Leibniz no es automática.
+
+### ▶ SECUENCIA RESULTANTE (S2 la fija; el piloto la reordena)
 
 **El frente `tc` es BLOQUEANTE y va primero** — todo lo que se cierre encima de `axioms ⊢ ⊥` es vacuo.
 
