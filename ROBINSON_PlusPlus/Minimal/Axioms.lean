@@ -1294,7 +1294,9 @@ def axioms : List Formula := [
   ax_vpf_listInd,
   ax_tc_zero,
   ax_tc_succ,
-  ax_tc_cons,
+  -- SONDEO S1 (rama sondeo/s1-sin-ax-tc-cons): `ax_tc_cons` RETIRADO para medir el radio
+  -- exacto del daño. NO MERGEAR. Ver PLAN-SORTES.md §4quinquies.
+  -- ax_tc_cons,
   ax_runFn_nil,
   ax_runFn_cons,
   ax_allIn_nil,
@@ -1332,7 +1334,7 @@ def codingAxioms : List Formula := [
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
   ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf, ax_vpf_listInd,
-  ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
+  ax_tc_zero, ax_tc_succ, ax_runFn_nil, ax_runFn_cons,   -- S1: ax_tc_cons retirado
   ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
   ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
   ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,

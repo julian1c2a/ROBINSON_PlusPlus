@@ -54,16 +54,11 @@ theorem tc_succ (x : Term) :
   exact h
 
 /-- `tcFn (a :: b) = ⌜::·⌝[tcFn a, tcFn b]` (espejo de `termCode (cons a b)`). -/
-theorem tc_cons (a b : Term) :
+-- SONDEO S1: convertido en AXIOMA DE LEAN. NO MERGEAR.
+axiom tc_cons (a b : Term) :
     axioms ⊢ (tcFn (cons a b) =eq
       cons (numeral 1) (cons (strCode cons_sym)
-        (cons (cons (tcFn a) (cons (tcFn b) nil)) nil))) := by
-  have h := spec (spec (ax (show ax_tc_cons ∈ axioms by simp [axioms])) a) b
-  simp [ax_tc_cons, substFormula, substTerm, substTerms, tcFn, cons, nil, zero,
-    substTerm_numeralM, substTerm_strCodeM, substTerm_nil, FOL.substTerm_liftTerm,
-    FOL.substTerm_liftLift] at h
-  simp only [numeralM_eq, strCodeM_eq] at h
-  exact h
+        (cons (cons (tcFn a) (cons (tcFn b) nil)) nil)))
 
 /-! ### `tcFn` computa `termCode` sobre numerales -/
 

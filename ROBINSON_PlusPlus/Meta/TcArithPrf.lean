@@ -47,16 +47,12 @@ theorem prf_tc_succ (x : Term) :
   exact h
 
 /-- `tcFn (a :: b) = ⌜::·⌝[tcFn a, tcFn b]`. -/
-theorem prf_tc_cons (a b : Term) :
+-- SONDEO S1: `prf_tc_cons` convertido en AXIOMA DE LEAN para que el arbol compile y
+-- `#print axioms` delate MECANICAMENTE a todos sus consumidores. NO MERGEAR.
+axiom prf_tc_cons (a b : Term) :
     Prf (tcFn (cons a b) =eq
       cons (numeral 1) (cons (strCode cons_sym)
-        (cons (cons (tcFn a) (cons (tcFn b) nil)) nil))) := by
-  have h := prf_spec (prf_spec (prf_ax (show ax_tc_cons ∈ axioms by simp [axioms])) a) b
-  simp [ax_tc_cons, substFormula, substTerm, substTerms, tcFn, cons, nil, zero,
-    substTerm_numeralM, substTerm_strCodeM, substTerm_nil, FOL.substTerm_liftTerm,
-    FOL.substTerm_liftLift] at h
-  simp only [numeralM_eq, strCodeM_eq] at h
-  exact h
+        (cons (cons (tcFn a) (cons (tcFn b) nil)) nil)))
 
 /-- **Cómputo de `tcFn` sobre numerales**: `tcFn (numeral n) = ⌜numeral n⌝` (inducción meta). -/
 theorem prf_tc_numeral : ∀ n : Nat, Prf (tcFn (numeral n) =eq termCode (numeral n))
