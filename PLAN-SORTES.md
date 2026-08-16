@@ -394,7 +394,72 @@ prf_add_eq_zero_right (a b) : Prf ((add a b =eq zero) ⇒ (b =eq zero))
 
 Independiente de toda decisión anterior y beneficia a **todas** las vías.
 
-### S2 — en curso (workflow de 16 agentes)
+### ⛔ S2 — **NO.** Un solo paquete NO cierra los dos frentes (17 agentes; 4/4 ángulos, 3 sobreviven refutación)
+
+**Razón de fondo:** las dos carencias tienen **forma lógica distinta**. `substfc` pide un
+**reconocedor extensional** (un subconjunto de ℕ sobre el que hacer análisis de casos); `tc` pide que
+**una función tome dos valores en un mismo punto** (distinción **intensional**: qué sintaxis
+escribimos para el número 9). Un predicado *es* un subconjunto: **no separa lo que no está separado
+en los valores**.
+
+Ningún paquete **aditivo** puede reparar `tc` (monotonía: `ax_tc_*` no mencionan predicado alguno).
+Y las tres variantes de **guarda** mueren:
+
+| variante | resultado |
+|---|---|
+| guardar sólo `cons` | **INCONSISTENTE**. Testigo `varc zero = cons 0 (cons 0 nil)`, valor **9**: la guarda se cumple, y `prf_cantor_mono_left` lo hace sucesor ⟹ `ax_tc_succ` sin guardar dispara ⟹ ⊥ |
+| guardar sólo `succ` | **INÚTIL**: `prf_tc_numeral` es esquema meta ∀n instanciado con `n` libre; la guarda no es descargable uniformemente |
+| guardar **ambas** | **consistente** (modelo en ℕ por recursión fuerte) **pero mata Gödel I**: `prf_tc_numeral` muere justo en los valores‑código 2,4,7,9,12… que son los TAGS que `prf_tc_form` consume |
+
+#### ⚠️ R‑3 — la vía numeral **NO es un drop‑in** (corrige la lectura optimista de S3)
+
+Con `prf_formCode_numeral φ : Prf (formCode φ =eq numeralM N)`, la congruencia `prf_congr_tcFn`
+(`TcArithPrf.lean:133`) + `prf_tc_numeral N` dan `tcFn (formCode φ) =eq termCode (numeral N)`;
+pero `prf_tc_form φ` da `=eq termCode (formCode φ)`. `formCode φ` es siempre `cons _ _` y
+`numeral N` es `σᴺ0` ⟹ cabezas `"::"` vs `"σ"` ⟹ `termCode_ne` (`CodeDistinct.lean:97`) ⟹ **⊥**.
+
+> **La vía numeral sólo es coherente si `prf_tc_form` MUERE** — y S1 mostró que eso **decapita el
+> lema diagonal**. S3 probó que Lean aguanta `codeNat` simbólico (cierto), pero eso es condición
+> **necesaria, no suficiente**: `prf_tc_form` hay que **sustituirlo**, no conservarlo, y la
+> diagonalización hay que **refundarla**.
+
+#### 🚩 R‑6 — la enmienda «obvia» de los 7 esquemas es INCORRECTA en 4 de 7
+
+* `ind`(18) y `listInd`(20) tienen **`lenc = 3`: no existe casilla 3.** `nthc L 3` cae en `nthc nil zero`,
+  sin axioma ⟹ término indeterminado ⟹ `isTermCode` de él es **independiente** ⟹ **ninguna línea de
+  inducción sería certificable** (rompe además `PropCodePrf.lean:137`).
+* `q3`(11) y `qconf`(19) llevan **códigos de FÓRMULA** en la casilla 3 ⟹ `isTermCode` ahí es
+  **refutable** ⟹ la teoría probaría **`¬lineWF` de líneas genuinas**, y los 7 reflectores se
+  cerrarían **ex falso**: B.3c en verde 21/21 con un verificador que ya no certifica ∃‑elim ni
+  inducción. Es el incidente `ax_lineWF_gen` **en espejo**.
+
+#### El paquete, si aun así se quiere (sólo para `substfc`)
+
+**3 axiomas netos** (mejor que los «< 12» estimados): `ax_isTermCode_iff`, `ax_isTermsCode_iff`,
+`ax_isFormCode_iff` (inversión por los 8 constructores) + los 7 esquemas **enmendados**, no añadidos.
+Verificado que `isFormCode`/`isTermCode`/`isTermsCode` tienen **0 ocurrencias** hoy.
+⚠️ La enmienda **cuesta D1**: `repr_pos'_prf` consume la dirección ⇐ de los 7 bicondicionales
+(`Representability2Prf.lean:220,227,233,248,260,268,276`) ⟹ hace falta `prf_isFormCode_formCode`
+(argumentado net‑0, **0 líneas escritas**).
+
+#### ⚠️ Nota metodológica (fallo mío)
+
+El workflow corrió **mientras yo tenía la rama S1 con `ax_tc_cons` retirado**. Dos de los cuatro
+diseños leyeron el árbol mutado y afirmaron que ya estaba fuera. **La síntesis lo detectó (R‑1) y
+verificó contra `master` `df55d0a`**, pero los sondeos no deben lanzarse contra un árbol que cambia.
+
+### ▶ SECUENCIA RESULTANTE (S2 la fija)
+
+**El frente `tc` es BLOQUEANTE y va primero** — todo lo que se cierre encima de `axioms ⊢ ⊥` es vacuo.
+
+1. **S4 paso 3** (`prf_div2_numeral`) → `prf_cons_eval`. ~20 líneas, net‑0, instrumental completo.
+2. **🚩 PILOTO DEL LEMA DIAGONAL bajo códigos numerales** — *el riesgo mayor, sin pilotar*.
+   `diag_arith` (`Diagonal.lean:150‑157`) compone `congr_substfc_arg2 (tc_form ψ)` con
+   `substFormula_arith 0 (formCode ψ) ψ`; con códigos numerales el primer factor aterriza en
+   `termCode (numeral N)` y **`substFormula_arith` no aplica**. **Si esto no sale, la vía numeral no
+   existe.** Pilotar en UN solo φ antes de tocar `Minimal/Axioms.lean`.
+3. Reparación del puente → **sólo entonces** el paquete `isFormCode`.
+4. **S5 en paralelo** (recorte 424×): único trabajo sin riesgo ni dependencias.
 
 ---
 
