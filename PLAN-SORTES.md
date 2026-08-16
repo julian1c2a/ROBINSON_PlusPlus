@@ -89,6 +89,87 @@ Añadir sortes a `Term`/`Formula`/`Derives`.
 
 ---
 
+## 4bis · ⛔ RESULTADO DE LA FASE 1 (2026‑07‑27) — **§3 es INSUFICIENTE**
+
+Decisión tomada: **A1**. Ejecutada la clasificación. El resultado **invalida la reparación de §3**
+y hay que corregirla. Lo que sigue sustituye a §3.
+
+### Los números reales
+
+`grep` daba 1175, pero eso contaba identificadores que *contienen* `tcFn` (`prf_congr_tcFn`, …).
+Extrayendo el argumento con paréntesis balanceados (`scripts/clasifica_tcfn.py`):
+
+| | sitios | % |
+|---|---:|---:|
+| **aplicaciones reales `tcFn <arg>`** | **899** | 100 |
+| argumento = **variable abstracta** | 683 | 76 % |
+| argumento aritmético (`succ`,`add`,`zero`,`lenc`…) | 77 | 9 % |
+| argumento proyección (`carc`,`nthc`) | 48 | 5 % |
+| argumento constructor de código (`cons`,`formCode`…) | 34 | 4 % |
+
+**El 76 % no se clasifica por sintaxis.** El papel lo fija la **intención del módulo**, no el
+argumento. Y ahí está el hallazgo.
+
+### Las dos lecturas — ambas VIVAS y ambas cargando peso
+
+| lectura | qué es `tcFn a` | recursión | dónde |
+|---|---|---|---|
+| **NUMERAL** | código del numeral `σᵃ0` | `zero`/`succ` | `NumCodeClosedPrf.lean:31` lo dice **literalmente**; toda la capa punteada (683 sitios) |
+| **SINTÁCTICA** | código del **término** `a` leído como árbol | `cons` | `prf_tc_form`/`prf_tc_term`/`prf_tc_str` (`TcArithPrf.lean:102‑128`) |
+
+Son **incompatibles**: `formCode φ` es un **árbol `cons` de numerales** (`Provability.lean:55‑61`),
+cuyo *valor* es un número N; la lectura numeral daría `⌜σᴺ0⌝` y la sintáctica el código del árbol.
+Números distintos. **No hay función Nat‑valuada de codificación en el proyecto** (verificado): los
+códigos son **siempre** árboles.
+
+### ⛔ Por qué partir el símbolo NO basta
+
+`tcCode` necesitaría **las dos recursiones**, no sólo la de `cons`:
+
+```lean
+-- TcArithPrf.lean:103
+prf_tc_term (.var n) = prf_tc_of_cons (prf_tc_numeral 0) (prf_tc_of_cons (prf_tc_numeral n) prf_tc_zero)
+--                                     ^^^^^^^^^^^^^^^^ recursión SUCC, dentro de un nodo cons
+```
+
+Las **hojas** de un árbol de código son numerales ⟹ `tcCode` debe computar sobre numerales ⟹
+necesita `succ`. Y `succ` + `cons` **en un mismo símbolo es exactamente el `boom` ya verificado**
+(la demostración es la misma con el constante renombrada). Con sólo `cons`, `tcCode (numeral 2)`
+daría `⟨1,⌜::⌝,…⟩` porque `2 = cons 0 nil`, mientras `termCode (numeral 2)` tiene cabeza `⌜σ⌝` ⟹
+`prf_tc_numeral` sería **falso** para `tcCode` ⟹ `prf_tc_form` no se recupera.
+
+> **⚠️ Corrección a §3: partir `tcFn` en dos símbolos salva la capa punteada (`tcNum`) pero NO
+> salva `prf_tc_form`.** La lectura sintáctica no es reparable por renombrado.
+
+### La raíz, en una frase
+
+`tcFn` pide a la teoría objeto ver **información intensional que los números no llevan**: qué
+término *escribimos* para denotar N. Con los códigos representados como **árboles `cons`** esa
+información se pierde en el valor. Con los códigos representados como **numerales** no se pierde,
+porque el numeral **es** canónico.
+
+### Reparación revisada
+
+**`tcFn` := sólo la lectura NUMERAL. Se ELIMINA `ax_tc_cons`.**
+
+* **Coste en axiomas: −1. Ninguno nuevo.** (Contra los «< 12 axiomas» de la otra vía.)
+* **Consistente**, con modelo: `n ↦ ⌜σⁿ0⌝`, total sobre ℕ.
+* **Salva** los 683 sitios variable y toda la capa punteada sin tocarlos.
+* **Rompe** `prf_tc_of_cons`/`_term`/`_terms`/`_str`/`_chars`/`_form` y sus consumidores:
+  **20 sitios en 4 módulos** (`D3InDotPrf` 6, `InAxiomsCodePrf` 7, `Sigma1CorePrf` 6,
+  `TrackedCorePrf` 1) — no 899.
+* **Exige** representar `⌜φ⌝` como **numeral** donde se le aplique `tcFn`: construir
+  `codeNat : Formula → Nat` y `formCode φ =eq numeralM (codeNat φ)` (mismo valor, vía
+  `ax_L0_cons_def`). Entonces `prf_tc_form` **se vuelve** `prf_tc_numeral` — que sólo usa
+  `zero`/`succ`.
+
+⚠️ **Lo que NO está verificado y decide la fase 2:** que esos 20 sitios se re‑prueben con la
+representación numeral. La evaluación provable del emparejamiento de Cantor sobre `codeNat` es
+finita y mecánica, pero **no está compilada**. Antes de tocar `Minimal/Axioms.lean` hay que cerrar
+un piloto: **un** solo sitio de `InAxiomsCodePrf` re‑probado por la vía numeral.
+
+---
+
 ## 5 · Plan por fases (independiente de A1/A2)
 
 | fase | entregable | verificación |
