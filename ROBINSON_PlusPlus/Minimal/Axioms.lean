@@ -1294,7 +1294,12 @@ def axioms : List Formula := [
   ax_vpf_listInd,
   ax_tc_zero,
   ax_tc_succ,
-  ax_tc_cons,
+  -- REPARACION (rama reparacion/c-godel-i-consistente): `ax_tc_cons` RETIRADO.
+  -- Es la ecuacion que hacia INCONSISTENTE la teoria: `tcFn` no puede recurrir a la vez
+  -- sobre estructura NUMERAL (ax_tc_succ) y sobre estructura de CODIGO (ax_tc_cons),
+  -- porque en N el mismo valor es ambas cosas (`cons 0 nil = 2 = sigma sigma 0`).
+  -- El lema diagonal se reconstruye sin ella en `Meta/DiagonalNumeral.lean`.
+  -- ax_tc_cons,
   ax_runFn_nil,
   ax_runFn_cons,
   ax_allIn_nil,
@@ -1332,7 +1337,7 @@ def codingAxioms : List Formula := [
   ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
   ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
   ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf, ax_vpf_listInd,
-  ax_tc_zero, ax_tc_succ, ax_tc_cons, ax_runFn_nil, ax_runFn_cons,
+  ax_tc_zero, ax_tc_succ, ax_runFn_nil, ax_runFn_cons,   -- ax_tc_cons RETIRADO (ver arriba)
   ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
   ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
   ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
