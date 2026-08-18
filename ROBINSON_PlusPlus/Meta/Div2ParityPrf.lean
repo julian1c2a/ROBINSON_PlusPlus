@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.NatMulPrf
 import ROBINSON_PlusPlus.Meta.CantorMonoPrf
+import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -16,6 +17,7 @@ open ROBINSON_PlusPlus.Meta.NatArithPrf
 open ROBINSON_PlusPlus.Meta.NatOrderPrf
 open ROBINSON_PlusPlus.Meta.NatMulPrf
 open ROBINSON_PlusPlus.Meta.CantorMonoPrf
+open ROBINSON_PlusPlus.Meta.StrongInductionPrf
 
 set_option maxHeartbeats 1000000
 
@@ -33,8 +35,8 @@ Gödel I (ver `sondeos/README.md` y la memoria `project-reparacion-via-numeral`)
 | paso | enunciado | estado |
 |---|---|---|
 | **L1** | `lt x y ⇒ lt (x·2) (y·2)` | ✅ **este módulo** |
-| L2 | `(x·2 =eq y·2) ⇒ (x =eq y)` | pendiente |
-| L3 | `mod2 (x·2) =eq zero` | pendiente |
+| **L2** | `(x·2 =eq y·2) ⇒ (x =eq y)` | ✅ **este módulo** |
+| **L3** | `mod2 (x·2) =eq zero` | ✅ **este módulo** |
 | L4 | `div2 (x·2) =eq x` | pendiente |
 | L5 | `div2 (numeral (2m)) =eq numeral m` | pendiente |
 
@@ -140,10 +142,89 @@ theorem prf_mul_two_lt_mono (x y : Term) :
   exact prf_deduction
     (PrfH.mp _ _ _ (prf_to_prfH himp _) (PrfH_iff_mp (prf_lt_iff x y) (prfH_hyp_self _)))
 
+/-! ### L2 — cancelación del doble
+
+Por tricotomía: las dos ramas estrictas se cierran con **L1** más `prf_lt_irrefl`; la del medio
+**es** la conclusión. -/
+
+/-- **L2** — `x·2 = y·2 ⟹ x = y`. -/
+theorem prf_mul_two_cancel (x y : Term) :
+    Prf ((mul x two =eq mul y two) ⇒ (x =eq y)) := by
+  refine prf_deduction ?_
+  refine PrfH_or_elim (prf_to_prfH (prf_lt_trichotomy x y) _) ?_ ?_
+  · -- `x < y` ⟹ `x·2 < y·2`, y con la hipótesis sale `y·2 < y·2`
+    have hxy : PrfH [lt x y, mul x two =eq mul y two] (lt x y) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have heq : PrfH [lt x y, mul x two =eq mul y two] (mul x two =eq mul y two) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hlt : PrfH [lt x y, mul x two =eq mul y two] (lt (mul x two) (mul y two)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_mul_two_lt_mono x y) _) hxy
+    exact PrfH_absurd_lt (mul y two) (PrfH_lt_subst1 heq hlt)
+  · refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_ ?_
+    · -- `x = y`: es la conclusión
+      exact PrfH.hyp _ _ (List.Mem.head _)
+    · -- `y < x`: simétrico
+      have hyx : PrfH [lt y x, lor (Formula.eq x y) (lt y x), mul x two =eq mul y two]
+          (lt y x) := PrfH.hyp _ _ (List.Mem.head _)
+      have heq : PrfH [lt y x, lor (Formula.eq x y) (lt y x), mul x two =eq mul y two]
+          (mul x two =eq mul y two) :=
+        PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+      have hlt : PrfH [lt y x, lor (Formula.eq x y) (lt y x), mul x two =eq mul y two]
+          (lt (mul y two) (mul x two)) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_mul_two_lt_mono y x) _) hyx
+      exact PrfH_absurd_lt (mul y two) (PrfH_lt_subst2 heq hlt)
+
+/-! ### L3 — el doble es PAR
+
+`ax17` da `D·2 + M = x·2` con `D = div2 (x·2)`, `M = mod2 (x·2)`; `ax21` da `M ∈ {0,1}`.
+Si `M = 1` entonces `σ(D·2) = x·2`, y de ahí:
+
+* `D·2 < x·2` ⟹ (cancelación multiplicativa, `prf_lt_of_mul_lt_mul_right`) `D < x`;
+* `x·2 = σ(D·2) < σσ(D·2) = (σD)·2` ⟹ `x < σD` ⟹ (`prf_le_of_lt_succ`) `x ≤ D`;
+
+y `D < x ≤ D` da `D < D`. **No usa L1**: le basta la cancelación que ya existía. -/
+
+/-- **L3** — `mod2 (x·2) = 0`. -/
+theorem prf_mod2_double (x : Term) : Prf (mod2 (mul x two) =eq zero) := by
+  refine prf_or_elim (prf_mod2_range (mul x two)) (prf_deduction (prfH_hyp_self _)) ?_
+  refine prf_deduction ?_
+  let D : Term := div2 (mul x two)
+  let M : Term := mod2 (mul x two)
+  let Γ : List Formula := [M =eq one]
+  have hM : PrfH Γ (M =eq one) := prfH_hyp_self _
+  -- `σ(D·2) = x·2`
+  have hkey : PrfH Γ (succ (mul D two) =eq mul x two) := by
+    have h1 : PrfH Γ (add (mul D two) M =eq add (mul D two) one) :=
+      PrfH_eq_congr_add2 (mul D two) hM
+    have h2 : PrfH Γ (add (mul D two) M =eq succ (mul D two)) :=
+      PrfH_eq_trans h1 (prf_to_prfH (prf_add_one (mul D two)) _)
+    exact PrfH_eq_trans (PrfH_eq_symm h2) (prf_to_prfH (prf_div_mod_eq (mul x two)) _)
+  -- `D < x`
+  have hDx : PrfH Γ (lt D x) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_mul_lt_mul_right D x two) _)
+      (PrfH_lt_subst2 hkey (prf_to_prfH (prf_lt_succ_self_cm (mul D two)) _))
+  -- `(σD)·2 = σσ(D·2)`
+  have hms : Prf (mul (succ D) two =eq succ (succ (mul D two))) :=
+    prf_eq_trans (prf_mul_comm (succ D) two)
+      (prf_eq_trans (prf_mul_succ two D)
+        (prf_eq_trans (prf_eq_congr_add1 two (prf_mul_comm two D))
+          (prf_eq_trans (prf_add_succ_t (mul D two) one)
+            (prf_eq_congr_succ (prf_add_one (mul D two))))))
+  -- `x·2 < (σD)·2` ⟹ `x < σD` ⟹ `x ≤ D`
+  have hle : PrfH Γ (le x D) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt_succ x D) _)
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_mul_lt_mul_right x (succ D) two) _)
+        (PrfH_lt_subst2 (prf_to_prfH (prf_eq_symm hms) _)
+          (PrfH_lt_subst1 hkey (prf_to_prfH (prf_lt_succ_self_cm (succ (mul D two))) _))))
+  -- `D < x ≤ D` ⟹ `D < D` ⟹ ex falso
+  exact PrfH_absurd_lt D
+    (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_le_trans D x D) _) hDx) hle)
+
 end ROBINSON_PlusPlus.Meta.Div2ParityPrf
 
 export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
   prf_mul_distrib PrfH_eq_congr_mul2
   prf_numeral_mul prf_gnum_mul
   prf_mul_two_lt_mono
+  prf_mul_two_cancel prf_mod2_double
 )
