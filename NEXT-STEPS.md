@@ -4,59 +4,84 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑07‑27 · HEAD `acdc36a` · `master` verde, 85 jobs · Lean v4.31.0 · 0 errores /
-0 warnings / 0 sorrys · 72 módulos activos + 31 en `cuarentena/`.**
+**Estado 2026‑07‑27 · HEAD `a1c6d4d` · `master` limpio y verde · Lean v4.31.0**
+**95 jobs · 82 módulos activos (Minimal 11 + Meta 59 + Full 11) + 21 en `cuarentena/` · 9 `sondeos/`**
+**7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 5 coincidencias de `sorry` son
+comentarios; tres se refieren a otro proyecto).
 
-> ## ✅ LA INCONSISTENCIA CONOCIDA ESTÁ REPARADA (2026‑07‑27)
+> ## ✅ LA INCONSISTENCIA CONOCIDA ESTÁ REPARADA
 >
-> `ax_tc_cons` **RETIRADO** de `axioms`. Era la ecuación que hacía que `tcFn` recurriera a la vez
+> `ax_tc_cons` **RETIRADO** de `axioms`. Era la ecuación que obligaba a `tcFn` a recurrir a la vez
 > sobre estructura NUMERAL y sobre estructura de CÓDIGO — imposible, porque en ℕ el mismo valor es
 > ambas cosas (`cons 0 nil = 2 = σσ0`). El lema diagonal está reconstruido por la **vía NUMERAL**
-> en `Meta/DiagonalNumeral.lean`.
+> (`Meta/DiagonalNumeral.lean`).
 >
-> ⚠️ **NO es una prueba de consistencia.** Se ha retirado la inconsistencia **conocida y
-> localizada**. Que no haya otras es lo que sugiere la auditoría de familias de axiomas, pero eso
-> fue una auditoría, **no una demostración**. `ConsistentOmega` deja de ser refutable por esta vía;
-> no se afirma que sea cierta.
+> ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> ### ✅ LO QUE HAY, verificado con `#print axioms`
+> ### Lo que hay, verificado con `#print axioms`
 >
 > | | |
 > |---|---|
 > | **`goedel_first_numeral`** | `ConsistentOmega → ¬Prf godelCN` — **Gödel I** |
+> | `goedel_first_undecidable_numeral` | `… → Reflects godelCN → ⊬G ∧ ⊬¬G` |
+> | `goedel_first_undecidable_omega` | lo mismo desde ω‑consistencia (`OmegaReflect`) |
 > | `repr_pos'_prf` | **D1**, intacta |
-> | `goedel_first_unprovable_real'` / `_unrefutable_real'` | modulares, intactos |
 > | `prf_formCode_numeral` | `formCode φ =eq numeral (codeNat φ)`, net‑0 |
 > | `prf_div2_numeral`, `prf_cons_eval` | la cadena aritmética, net‑0 |
 >
 > Footprint de Gödel I: `[propext, choice, Quot.sound, dne, gen, imp_intro, ax_induction,
 > ax_list_induction, ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
+
+> ## ▶▶ DÓNDE SE RETOMA: **frente (a.2)**, la escalera
 >
-> ### ⏸️ LO QUE QUEDÓ FUERA: D3 y Gödel II
+> **Objetivo:** `pcc_dot_cons (h t) : Prf (provFromCode (eqCodeFn (tcFn (cons h t)) (consT (tcFn h) (tcFn t))))`
+> — el `prf_cons_eval` **internalizado y para argumentos ABSTRACTOS**. Con él vuelven las 6 raíces
+> que quedan en cuarentena, y con ellas D3 y Gödel II.
 >
-> **31 módulos en `cuarentena/`** (los 14 tags, `hI_dot`, el chasis `CTree`, el KIT). **No borrados.**
-> Dependen de la lectura sintáctica de `tcFn`, incompatible con la numeral — medido en
-> `sondeos/PilotoRastreada.lean`. Leer **`cuarentena/README.md`**.
+> ### 🎯 ESTADO DE LA ESCALERA — **2 de 4 resueltos**
 >
-> ### ▶▶ EL FRENTE ABIERTO: **(a)** — ¿vuelve la capa rastreada?
+> | peldaño | estado | dónde |
+> |---|---|---|
+> | `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ **HECHO** | `Meta/EvalArithPrf.lean` — `pcc_eval_add`, por `prf_nat_induction`, ~440 líneas. Footprint limpio **tras** la reparación |
+> | `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ⏳ **SIGUIENTE** | por construir; **plantilla exacta = `EvalArithPrf`**. Su paso inductivo (`x·σy = x·y + x`) se apoya en el peldaño de `+`, que ya está |
+> | `div2` | ✅ **atajo, sin inducción** | `sondeos/Div2Gen.lean`: `prf_div2_double_all` (`Prf.gen` sobre `prf_div2_double`, net‑0) + `pcc_thm_inst` |
+> | `Prov(⌈ (cons h t)˙ = cons(ḧ,ṫ) ⌉)` | ⏳ ensamblaje | vía `pcc_axiom_inst ax_L0_cons_def` + `cpOf` + los tres anteriores |
 >
-> El nudo es `pcc_eval_carc (h t)` con `h`,`t` **ABSTRACTOS**, que usa
-> `prf_tc_cons' h t : tcFn (cons h t) =eq consT (tcFn h) (tcFn t)` — falso bajo la lectura numeral.
+> ### ▶ EL SIGUIENTE PASO CONCRETO: `pcc_eval_mul`
 >
-> **La pregunta del sondeo (a):** ¿se puede probar `pcc_eval_carc` con **inducción interna** en vez
-> de con la ecuación `tc` sintáctica? **`PrfH.ind` y `PrfH.listInd` EXISTEN**
-> (`Meta/HilbertDeduction.lean:32‑41`), así que la herramienta está. Es la Σ₁‑completitud
-> internalizada, o sea el núcleo duro de D3 en Hilbert‑Bernays.
+> Copiar la estructura de `Meta/EvalArithPrf.lean` (que hace `+`) para `·`:
+> `evalMulCode a b := eqCodeFn (mulcT (tcFn a) (tcFn b)) (tcFn (mul a b))`, base `b = 0` con
+> `pcc_axiom_inst ax8_mul_zero`, paso con `ax9_mul_succ` (`x·σy = x·y + x`) apoyado en
+> **`pcc_eval_add`**, y cierre con `prf_nat_induction`. Las piezas de transporte dentro de `Prov`
+> (`pcc_leibniz_apply`, `pcc_eq_trans_code`, `pcc_congr_succ_code`, `substtc_inv_*`) **ya existen**
+> en `EvalArithPrf` y son reutilizables.
 >
-> **Dato que abarata (a):** los **13 sitios** críticos embudan en **5 lemas** (`prf_tc_cons'`,
-> `prf_tc_nul/un/bin`, `prf_tc_eqc`). Si se encuentra sustituto para esos 5, **el chasis vuelve sin
-> tocarse**.
+> ### Estado de la cuarentena: **21 módulos**, 6 raíces
 >
-> ### Otros frentes, sin cambios
+> Raíces: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`, `InAxiomsCodePrf`,
+> `LineWFTrackedPrf`. **`EvalListPrf` es el keystone actual**: bloquea a 9 de los 15 no‑raíz.
+> Ver `cuarentena/README.md` y `PLAN-FRENTE-A.md`.
+
+> ### ⚠️ TRAMPAS METODOLÓGICAS — caras, no repetir
 >
-> **`repr_neg` / `NegVerifier` para `⊬¬G`** — independiente, ver `PLAN-NEGVERIFIER.md`.
+> 1. **La alcanzabilidad por `import` da FALSOS NEGATIVOS.** Me hizo afirmar en falso que Gödel I
+>    estaba limpio. Un **crawler de dependencias tampoco vale**: Lean 4.31 da `value? = NONE` para
+>    teoremas importados, o sea sólo recorre tipos. **La técnica buena**: convertir el puente
+>    sospechoso en **`axiom` de Lean** y leer `#print axioms`. Meter siempre un **control positivo**.
+> 2. **No lanzar sondeos contra un árbol que cambia.** El workflow S2 corrió mientras una rama tenía
+>    `ax_tc_cons` retirado y dos diseños leyeron el árbol mutado.
+> 3. **`lake build` puede dar VERDE sin construir lo que crees.** La `lean_lib` sólo construye lo
+>    **alcanzable desde el módulo raíz**: mover ficheros a `Meta/` sin añadir el `import` en
+>    `Meta.lean` los deja fuera del build. **Señal de alarma: el número de jobs no cambia.**
+> 4. **Filtrar comentarios de bloque** al buscar usos de un identificador: contar menciones en
+>    documentación infló una cuarentena de 31 a 72 módulos.
+
+> ### ⏸️ Otros frentes, sin cambios
+>
+> **`repr_neg` / `NegVerifier` para `⊬¬G`** — independiente, `PLAN-NEGVERIFIER.md`.
 > ⚠️ NO recuperar F7a (ver [[project-godel-first-complete]]).
-> **`prf_strong_induction`** al 90 % (rama B); ver `Meta/StrongInductionPrf.lean:156‑178`.
+> **`prf_strong_induction`** al 90 % (rama B); `Meta/StrongInductionPrf.lean:156‑178`.
+> **El LIBRO**: ver `PLAN-LIBRO.md`, Parte IV reescrita con el episodio de hoy.
 
 > ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
 >

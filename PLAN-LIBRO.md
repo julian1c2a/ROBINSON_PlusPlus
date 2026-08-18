@@ -64,17 +64,63 @@ extracción los vuelca a `.tex` antes de compilar. Nada de copiar‑pegar.
    *Material:* `AXIOMS.md` §1.1 (ya escrito).
 
 ### Parte IV — Lo que no sale en los libros ← **el núcleo original**
+
+> **Reescrita el 2026‑07‑27.** La sesión de ese día produjo el material más valioso del libro: una
+> inconsistencia real, su diagnóstico, **cuatro reparaciones que no funcionan**, la que sí, y el
+> coste. Nada de esto aparece en los manuales, porque los manuales presentan el resultado ya limpio.
+
 10. **El muro de `substfc`** — cuando una función objeto no se puede evaluar sobre un código
     abstracto. *Material:* memoria `project-substfc-wall`.
-11. **Una inconsistencia latente** — la historia completa: `tcFn` axiomatizado por recursión sobre
-    **sintaxis** cuando sólo puede depender de **valores**; `cons 0 nil = 2 = σσ0`; la derivación de
-    `⊥`; y el hecho de que un teorema *net‑0* la volviera visible.
-    *Material:* memoria `project-inconsistencia-tcfn-cons` + este episodio.
-12. **La reparación por tipos** — separar `Num` de `Code`, y por qué los tipos no *parchean* el
-    error sino que lo hacen **inexpresable**.
-13. **Método** — qué funcionó al formalizar: trocear y compilar entre pasos, verificación
-    adversarial, `#print axioms` como auditoría, y por qué «lo verifiqué yo» no es opcional.
-    *Material:* memorias `feedback-*`.
+
+11. **Una inconsistencia latente.** La derivación en cinco pasos; `cons 0 nil = 2 = σσ0`; el error de
+    categoría (`tcFn` es una operación sobre **sintaxis** declarada como función **objeto**, que sólo
+    puede depender de **valores**). **La lección central:** la inconsistencia era **latente desde el
+    principio**, y la hizo visible un teorema *net‑0* — `prf_cantor_mono`, que no añadía nada. El
+    peligro no estaba en lo que se añadía, sino en lo que ya estaba.
+    *Material:* memoria `project-inconsistencia-tcfn-cons`.
+
+12. **Cómo se localiza el daño** — capítulo **metodológico**, y quizá el más útil para el lector.
+    Por qué fallan las dos técnicas obvias: la alcanzabilidad por `import` da **falsos negativos**
+    (me hizo afirmar en falso que Gödel I estaba limpio), y un crawler de dependencias **no funciona
+    en Lean 4**, porque `value?` devuelve `NONE` para teoremas importados y sólo recorre tipos.
+    La técnica que sí vale: **convertir el puente sospechoso en `axiom` de Lean y leer
+    `#print axioms`**, con un **control positivo** que debe salir contaminado.
+    Resultado: el daño entra a Gödel I **por un solo sitio**, el lema diagonal.
+    *Material:* memoria `feedback-auditoria-footprint`, `sondeos/README.md`.
+
+13. **Cuatro reparaciones que no funcionan** — el capítulo de **valor negativo**, el que ahorra meses:
+    * **Partir el símbolo en dos** (`tcNum`/`tcCode`): insuficiente, porque las **hojas** de un
+      árbol de código son numerales, luego `tcCode` necesitaría las dos recursiones y reproduce el
+      mismo ⊥.
+    * **Quitar el axioma sin más**: **decapita la diagonalización**. El «código del código» no es un
+      accidente de la implementación — es lo que Gödel **exige** para construir `G = β(⌈β⌉)`.
+    * **Relativizar por axiomas** en el lenguaje mono‑sortido: imposible; la tricotomía y el orden
+      prueban `∀x. x=0 ∨ ∃k. x=σk` **sin inducción**, así que no hay sitio para un `cons` que no sea
+      ni cero ni sucesor.
+    * **Un paquete de buena‑formación** (`isFormCode`): no repara `tc`. **La razón es bonita y
+      general**: `substfc` pide un reconocedor **extensional** (un subconjunto de ℕ); `tc` pide una
+      distinción **intensional** (qué sintaxis escribimos para el número 9). Un predicado *es* un
+      subconjunto: no separa lo que no está separado en los valores.
+
+14. **La reparación: códigos como numerales.** Por qué el numeral **es** canónico y el árbol no.
+    La aritmética **sin división** (números triangulares) que hace exacta la mitad del polinomio de
+    Cantor. Y una lección de **método de ingeniería**: se **pilotó antes de ejecutar**, asumiendo el
+    resultado costoso como axioma de Lean para comprobar que la cadena cerraba — evitando invertir
+    ~20 lemas sin saber dónde enchufarlos. *Material:* `sondeos/PilotoDiagonal.lean`,
+    `sondeos/DescargaHFN.lean`, memoria `project-reparacion-via-numeral`.
+
+15. **Lo que se pierde, y por qué «perder» es la palabra equivocada.** 31 módulos a cuarentena: los
+    14 tags, `hI_dot`, el chasis. Eran teoremas **correctos** sobre una teoría que probaba ⊥, o sea
+    **vacuos**. El capítulo trata la pregunta incómoda: *¿qué significa haber demostrado algo sobre
+    una teoría inconsistente?* Y cómo se recupera: **keystone** y **niveles** (argumentos concretos
+    vs abstractos). *Material:* `cuarentena/README.md`, `PLAN-FRENTE-A.md`.
+
+16. **Método** — qué funcionó al formalizar: trocear y compilar entre pasos; verificación
+    adversarial; `#print axioms` como auditoría; y las **trampas caras**, todas reales:
+    no lanzar sondeos contra un árbol que cambia; `lake build` puede dar **verde sin construir lo
+    que crees** (la `lean_lib` sólo construye lo alcanzable desde el módulo raíz — señal de alarma:
+    el número de jobs no cambia); y filtrar **comentarios de bloque** al buscar usos, o una
+    cuarentena de 31 se infla a 72. *Material:* memorias `feedback-*`.
 
 ### Apéndices
 - A. Inventario de axiomas con su justificación (`AXIOMS.md`).
