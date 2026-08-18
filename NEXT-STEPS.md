@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑07‑27 · HEAD `3b6b2ef` · `master` verde, 113 jobs · Lean v4.31.0 · 0 errores / 0 warnings /
+**Estado 2026‑07‑27 · HEAD `7ee4ba8` · `master` verde, 113 jobs · Lean v4.31.0 · 0 errores / 0 warnings /
 0 sorrys · 7 `axiom` · `Minimal/Axioms.lean` INTACTO (NADA sancionado).**
 
 > ## 🚨 LA TEORÍA OBJETO SIGUE SIENDO INCONSISTENTE (`axioms ⊢ ⊥`, verificado en compilador)
@@ -40,6 +40,20 @@
 > `prf_zero_or_eq_succ_pred`, `prf_succ_ne_zero`. **Primer eslabón YA COMPILADO** y net‑0 en
 > `sondeos/S4.lean`: `prf_add_eq_zero_right (a b) : Prf ((add a b =eq zero) ⇒ (b =eq zero))`.
 > De él cuelgan `prf_cons_eval` → `prf_formCode_numeral` (= la `hFN` ya pilotada).
+>
+> **Descomposición recomendada** (trocear y compilar entre pasos, que es el método que funciona):
+> ```
+> L1 prf_mul_two_lt_mono (x y) : Prf (lt x y ⇒ lt (mul x two) (mul y two))     ← el caballo de batalla
+> L2 prf_mul_two_cancel  (x y) : Prf ((mul x two =eq mul y two) ⇒ (x =eq y))   ← L1 + tricotomía
+> L3 prf_mod2_double     (x)   : Prf (mod2 (mul x two) =eq zero)               ← ax17 + ax21 + L1
+> L4 prf_div2_double     (x)   : Prf (div2 (mul x two) =eq x)                  ← ax17 + L3 + L2
+> L5 prf_div2_numeral    (m)   : Prf (div2 (numeral (2*m)) =eq numeral m)      ← instancia de L4
+> ```
+> ⚠️ **HUECO ADICIONAL detectado 2026‑07‑27 (no estaba registrado):** **`prf_numeral_mul` NO existe
+> a nivel `Prf`** — sólo `prf_numeral_add` (`Meta/ArithPrf.lean:93`). La versión ω está en
+> `Full/Numerals.lean:92` pero es de la capa `Derives`. **Hay que portarlo** (inducción meta en `b`,
+> con `prf_mul_succ` + `prf_numeral_add`, espejo exacto de `prf_numeral_add`, ~10 líneas).
+> Nota: `two = succ one = numeral 2` es **defeq**, así que L4 → L5 no necesita puente.
 >
 > **(2) PILOTAR LA CAPA RASTREADA** (el siguiente riesgo, aún **sin pilotar**). Los 14 tags y
 > `hI_dot` usan `tcFn` sobre códigos **ABSTRACTOS**, no sobre `formCode φ` concreto ⇒ la
