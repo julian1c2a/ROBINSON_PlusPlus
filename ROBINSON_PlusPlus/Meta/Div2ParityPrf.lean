@@ -24,7 +24,7 @@ set_option maxHeartbeats 1000000
 namespace ROBINSON_PlusPlus.Meta.Div2ParityPrf
 
 /-!
-## META — PARIDAD y `div2`: primer tramo hacia `prf_cons_eval`
+## META — PARIDAD y `div2`: **cadena COMPLETA** hacia `prf_cons_eval`
 
 Frente **S4** de `PLAN-SORTES.md`: la evaluación provable del emparejamiento de Cantor sobre
 numerales, que es lo único que separa a la reparación de la inconsistencia de estar completa para
@@ -37,8 +37,8 @@ Gödel I (ver `sondeos/README.md` y la memoria `project-reparacion-via-numeral`)
 | **L1** | `lt x y ⇒ lt (x·2) (y·2)` | ✅ **este módulo** |
 | **L2** | `(x·2 =eq y·2) ⇒ (x =eq y)` | ✅ **este módulo** |
 | **L3** | `mod2 (x·2) =eq zero` | ✅ **este módulo** |
-| L4 | `div2 (x·2) =eq x` | pendiente |
-| L5 | `div2 (numeral (2m)) =eq numeral m` | pendiente |
+| **L4** | `div2 (x·2) =eq x` | ✅ **este módulo** |
+| **L5** | `div2 (numeral (2m)) =eq numeral m` | ✅ **este módulo — HITO de S4** |
 
 Todo en forma **OBJETO** (`x` abstracto ⟹ vale para todos los numerales a la vez) y **net‑0**:
 `ax9`, `ax10`, `ax12`, `ax13` y `ax17`/`ax21` ya son axiomas de la teoría, así que portarlos a `Prf`
@@ -220,6 +220,48 @@ theorem prf_mod2_double (x : Term) : Prf (mod2 (mul x two) =eq zero) := by
   exact PrfH_absurd_lt D
     (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_le_trans D x D) _) hDx) hle)
 
+/-! ### P2 — congruencia de `div2` (Leibniz objeto)
+
+No existía a nivel `Prf` (la de `Full/Mod2.lean` es de la capa ω). -/
+
+/-- `t₁ = t₂ ⟹ div2 t₁ = div2 t₂`. -/
+theorem prf_eq_congr_div2 {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :
+    Prf (div2 t₁ =eq div2 t₂) := by
+  let f : Formula := Formula.eq (div2 (liftTerm 0 t₁)) (div2 (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (div2 t₁) (div2 s) := by
+    intro s
+    simp only [f, substFormula, div2, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (div2 t₁))
+
+/-! ### L4 — `div2` deshace el doble
+
+`ax17` da `D·2 + M = x·2` con `D = div2 (x·2)`; **L3** pone `M = 0`, luego `D·2 = x·2`; y **L2**
+cancela. Tres líneas de cadena: todo el trabajo estaba en L1–L3. -/
+
+/-- **L4** — `div2 (x·2) = x`. -/
+theorem prf_div2_double (x : Term) : Prf (div2 (mul x two) =eq x) := by
+  let D : Term := div2 (mul x two)
+  have h1 : Prf (add (mul D two) (mod2 (mul x two)) =eq add (mul D two) zero) :=
+    prf_eq_congr_add2 (mul D two) (prf_mod2_double x)
+  have h2 : Prf (add (mul D two) zero =eq mul D two) := prf_add_zero_t (mul D two)
+  have h3 : Prf (mul D two =eq mul x two) :=
+    prf_eq_trans (prf_eq_symm (prf_eq_trans h1 h2)) (prf_div_mod_eq (mul x two))
+  exact prf_mp (prf_mul_two_cancel D x) h3
+
+/-! ### L5 — la forma NUMERAL: **el hito del frente S4**
+
+Instancia de L4 en `numeral m`, cruzada con `prf_gnum_mul m 2` (`numeral 2 = two` es **defeq**).
+Es la pieza de la que cuelgan `prf_cons_eval` → `prf_formCode_numeral` (= la `hFN` que el piloto
+del lema diagonal, `sondeos/PilotoDiagonal.lean`, asumía). -/
+
+/-- **L5** — `div2 (numeral (2m)) = numeral m`. **La pieza que faltaba de la reparación.** -/
+theorem prf_div2_numeral (m : Nat) : Prf (div2 (numeral (2 * m)) =eq numeral m) := by
+  have hmul : Prf (mul (numeral m) two =eq numeral (2 * m)) := by
+    have h := prf_gnum_mul m 2
+    rw [Nat.mul_comm m 2] at h
+    exact h
+  exact prf_eq_trans (prf_eq_congr_div2 (prf_eq_symm hmul)) (prf_div2_double (numeral m))
+
 end ROBINSON_PlusPlus.Meta.Div2ParityPrf
 
 export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
@@ -227,4 +269,5 @@ export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
   prf_numeral_mul prf_gnum_mul
   prf_mul_two_lt_mono
   prf_mul_two_cancel prf_mod2_double
+  prf_eq_congr_div2 prf_div2_double prf_div2_numeral
 )
