@@ -55,19 +55,8 @@ theorem godel_comp' (s : Term) :
   simp [godelBeta', godelPred', neg, provFormulaC', substFormula, substTerm, substTerms,
     land, chainOk, In, runFn, nil, zero, FOL.substTerm_liftTerm, FOL.substTerm_lift_comm]
 
-/-- **Lema diagonal (punto fijo) real para `provCodeC'`**: `⊢ G' ⇔ ¬Prov'(⌜G'⌝)`. -/
-theorem godelC'_fixedpoint : axioms ⊢ (godelC' ⇔ neg (provCodeC' godelC')) := by
-  have hiff := subst_eq_iff godelPred' (diag_arith godelBeta')
-  rw [← godel_comp' (formCode godelBeta')] at hiff
-  simpa only [godelC', selfApp, godelPred', provCodeC', provFormulaC', neg, substFormula] using hiff
-
-/-- Dirección hacia atrás del punto fijo (la hipótesis `fp_bwd` de `goedel_second'`). -/
-theorem godelC'_fp_bwd : axioms ⊢ (neg (provCodeC' godelC') ⇒ godelC') :=
-  Minimal.Axioms.and_elim_right godelC'_fixedpoint
-
-/-- Dirección hacia delante del punto fijo. -/
-theorem godelC'_fp_fwd : axioms ⊢ (godelC' ⇒ neg (provCodeC' godelC')) :=
-  Minimal.Axioms.and_elim_left godelC'_fixedpoint
+-- [REPARACION] `godelC'_fixedpoint` y sus dos direcciones RETIRADOS: usaban `diag_arith`,
+-- o sea `tc_form`. Sustituidos por `Meta/DiagonalNumeral.godelCN_fixedpoint`.
 
 /-! ### Primer Teorema de Gödel REAL para el predicado estructural `provCodeC'` -/
 
@@ -85,12 +74,8 @@ theorem goedel_first_unprovable_real' {G : Formula}
   have hNotProv : axioms ⊢ neg (provCodeC' G) := mp fp_fwd hGder
   exact hcon (mp hNotProv hProv)
 
-/-- **Primer Teorema de Incompletitud de Gödel — REAL (predicado estructural)**: si
-    la teoría es consistente, la sentencia de Gödel `godelC'` (construida con el
-    verificador estructural `runFn`/`chainOk`) **no** es demostrable en `Prf`.
-    Combina el punto fijo real (`godelC'_fixedpoint`) con D1 real (`repr_pos'`). -/
-theorem goedel_first_real' (hcon : ConsistentOmega) : ¬ Prf godelC' :=
-  goedel_first_unprovable_real' hcon godelC'_fixedpoint
+-- [REPARACION] `goedel_first_real'` RETIRADO (descargaba el punto fijo roto).
+-- Sustituido por `Meta/DiagonalNumeral.goedel_first_numeral`.
 
 /-! ## La otra mitad de Gödel I (`⊬¬G`) — con la REFLEXIÓN como hipótesis EXPLÍCITA
 
@@ -136,28 +121,10 @@ theorem goedel_first_unrefutable_real' {G : Formula}
   have hProv : axioms ⊢ provCodeC' G := FOL.MetaRules.dne hnn
   exact goedel_first_unprovable_real' hcon hfp (hrefl hProv)
 
-/-- **PRIMER TEOREMA DE GÖDEL — `G` es INDECIDIBLE** (`⊬G ∧ ⊬¬G`), real y **sin postulados
-    gödelianos**, con la reflexión explícita. Combina `goedel_first_real'` (la mitad ya cerrada, que
-    NO necesita reflexión) con `goedel_first_unrefutable_real'`. -/
-theorem goedel_first_undecidable_real'
-    (hcon : ConsistentOmega) (hrefl : Reflects godelC') :
-    (¬ Prf godelC') ∧ (¬ Prf (neg godelC')) :=
-  ⟨goedel_first_real' hcon,
-   goedel_first_unrefutable_real' hcon godelC'_fixedpoint hrefl⟩
+-- [REPARACION] `goedel_first_undecidable_real'` RETIRADO (usaba goedel_first_real').
 
 end ROBINSON_PlusPlus.Meta.DiagonalTwo
 
 export ROBINSON_PlusPlus.Meta.DiagonalTwo (
-  godelPred'
-  godelBeta'
-  godelC'
-  godel_comp'
-  godelC'_fixedpoint
-  godelC'_fp_bwd
-  godelC'_fp_fwd
-  goedel_first_unprovable_real'
-  goedel_first_real'
-  Reflects
-  goedel_first_unrefutable_real'
-  goedel_first_undecidable_real'
+  godelPred' godelBeta' godelC' godel_comp' goedel_first_unprovable_real' Reflects goedel_first_unrefutable_real'
 )

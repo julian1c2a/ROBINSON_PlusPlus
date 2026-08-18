@@ -53,17 +53,8 @@ theorem tc_succ (x : Term) :
   simp only [numeralM_eq, strCodeM_eq] at h
   exact h
 
-/-- `tcFn (a :: b) = ⌜::·⌝[tcFn a, tcFn b]` (espejo de `termCode (cons a b)`). -/
-theorem tc_cons (a b : Term) :
-    axioms ⊢ (tcFn (cons a b) =eq
-      cons (numeral 1) (cons (strCode cons_sym)
-        (cons (cons (tcFn a) (cons (tcFn b) nil)) nil))) := by
-  have h := spec (spec (ax (show ax_tc_cons ∈ axioms by simp [axioms])) a) b
-  simp [ax_tc_cons, substFormula, substTerm, substTerms, tcFn, cons, nil, zero,
-    substTerm_numeralM, substTerm_strCodeM, substTerm_nil, FOL.substTerm_liftTerm,
-    FOL.substTerm_liftLift] at h
-  simp only [numeralM_eq, strCodeM_eq] at h
-  exact h
+-- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
+-- Sustituida por la via NUMERAL: ver `Meta/CodeNumeralPrf.lean` y `Meta/DiagonalNumeral.lean`.
 
 /-! ### `tcFn` computa `termCode` sobre numerales -/
 
@@ -100,42 +91,8 @@ theorem congr_tc2 {S A A' B B' : Term} (hA : axioms ⊢ (A =eq A')) (hB : axioms
   congr_cons_tail (congr_cons_tail (congr_cons_head
     (FOL.derive_eq_trans (congr_cons_head hA) (congr_cons_tail (congr_cons_head hB)))))
 
-/-- **Recursión de `tc_arith`**: `tcFn` respeta `cons`. -/
-theorem tc_of_cons {a b : Term} (ha : axioms ⊢ (tcFn a =eq termCode a))
-    (hb : axioms ⊢ (tcFn b =eq termCode b)) :
-    axioms ⊢ (tcFn (cons a b) =eq termCode (cons a b)) :=
-  FOL.derive_eq_trans (tc_cons a b) (congr_tc2 ha hb)
-
-/-- `tcFn (charsCode cs) = ⌜charsCode cs⌝`. -/
-theorem tc_chars : ∀ cs : List Char, axioms ⊢ (tcFn (charsCode cs) =eq termCode (charsCode cs))
-  | []      => tc_zero
-  | c :: cs => tc_of_cons (tc_numeral c.toNat) (tc_chars cs)
-
-/-- `tcFn (strCode s) = ⌜strCode s⌝`. -/
-theorem tc_str (s : String) : axioms ⊢ (tcFn (strCode s) =eq termCode (strCode s)) :=
-  tc_chars s.toList
-
-mutual
-/-- `tcFn (termCode t) = ⌜termCode t⌝`. -/
-theorem tc_term : ∀ t : Term, axioms ⊢ (tcFn (termCode t) =eq termCode (termCode t))
-  | .var n     => tc_of_cons (tc_numeral 0) (tc_of_cons (tc_numeral n) tc_zero)
-  | .func s ts => tc_of_cons (tc_numeral 1) (tc_of_cons (tc_str s) (tc_of_cons (tc_terms ts) tc_zero))
-/-- `tcFn (termsCode ts) = ⌜termsCode ts⌝`. -/
-theorem tc_terms : ∀ ts : List Term, axioms ⊢ (tcFn (termsCode ts) =eq termCode (termsCode ts))
-  | []      => tc_zero
-  | t :: ts => tc_of_cons (tc_term t) (tc_terms ts)
-end
-
-/-- **`tc_arith`**: `tcFn (formCode φ) = ⌜formCode φ⌝` (el «código del código»). -/
-theorem tc_form : ∀ φ : Formula, axioms ⊢ (tcFn (formCode φ) =eq termCode (formCode φ))
-  | .bottom    => tc_of_cons (tc_numeral 2) tc_zero
-  | .atom p ts => tc_of_cons (tc_numeral 3) (tc_of_cons (tc_str p) (tc_of_cons (tc_terms ts) tc_zero))
-  | .eq t u    => tc_of_cons (tc_numeral 4) (tc_of_cons (tc_term t) (tc_of_cons (tc_term u) tc_zero))
-  | .impl a b  => tc_of_cons (tc_numeral 5) (tc_of_cons (tc_form a) (tc_of_cons (tc_form b) tc_zero))
-  | .forall a  => tc_of_cons (tc_numeral 6) (tc_of_cons (tc_form a) tc_zero)
-  | .and a b   => tc_of_cons (tc_numeral 7) (tc_of_cons (tc_form a) (tc_of_cons (tc_form b) tc_zero))
-  | .or a b    => tc_of_cons (tc_numeral 8) (tc_of_cons (tc_form a) (tc_of_cons (tc_form b) tc_zero))
-  | .ex a      => tc_of_cons (tc_numeral 9) (tc_of_cons (tc_form a) tc_zero)
+-- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
+-- Sustituida por la via NUMERAL: ver `Meta/CodeNumeralPrf.lean` y `Meta/DiagonalNumeral.lean`.
 
 /-! ### Función de diagonalización representada (`diagTerm` / `diag_arith`) -/
 
@@ -146,14 +103,8 @@ def selfApp (ψ : Formula) : Formula := substFormula 0 (formCode ψ) ψ
     (provablemente) `⌜selfApp ψ⌝`. Usa `tcFn` (código del código) y `substfc`. -/
 def diagTerm : Term := substfc (numeral 0) (tcFn (Term.var 0)) (Term.var 0)
 
-/-- **Representabilidad de la diagonalización**: `diagTerm[⌜ψ⌝] = ⌜selfApp ψ⌝`.
-    Es `tc_form` (código del código) + `substFormula_arith` (sustitución). -/
-theorem diag_arith (ψ : Formula) :
-    axioms ⊢ (substTerm 0 (formCode ψ) diagTerm =eq formCode (selfApp ψ)) := by
-  have key : axioms ⊢
-      (substfc (numeral 0) (tcFn (formCode ψ)) (formCode ψ) =eq formCode (selfApp ψ)) :=
-    FOL.derive_eq_trans (congr_substfc_arg2 (tc_form ψ)) (substFormula_arith 0 (formCode ψ) ψ)
-  exact key
+-- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
+-- Sustituida por la via NUMERAL: ver `Meta/CodeNumeralPrf.lean` y `Meta/DiagonalNumeral.lean`.
 
 /-! ### Punto fijo (lema diagonal) y Primer Teorema de Gödel real
 
@@ -184,43 +135,11 @@ theorem godel_comp (s : Term) :
   simp [godelBeta, godelPred, neg, provFormulaC, substFormula, substTerm, substTerms,
     In, validProofFn, nil, zero, FOL.substTerm_liftTerm, FOL.substTerm_lift_comm]
 
-/-- **Lema diagonal (punto fijo) real**: `⊢ G ⇔ ¬Prov(⌜G⌝)`, teorema para el
-    predicado **concreto** `provCodeC` (la capa legacy lo postulaba como
-    `diagonal_lemma`/`goedelSentence_fixedpoint`, retirada en F7a). -/
-theorem godelC_fixedpoint : axioms ⊢ (godelC ⇔ neg (provCodeC godelC)) := by
-  have hiff := subst_eq_iff godelPred (diag_arith godelBeta)
-  rw [← godel_comp (formCode godelBeta)] at hiff
-  -- `substFormula 0 ⌜β⌝ β = selfApp β = G`; `substFormula 0 ⌜G⌝ godelPred = ¬provCodeC G`
-  simpa only [godelC, selfApp, godelPred, provCodeC, neg, substFormula] using hiff
-
-/-- **Primer Teorema de Incompletitud de Gödel — REAL** (mitad de
-    indemostrabilidad): si la teoría es consistente, la sentencia de Gödel `G`
-    (construida con el predicado de demostrabilidad **concreto** `provCodeC`) **no**
-    es demostrable en el cálculo finitario `Prf`. Sin postular el lema diagonal ni
-    las condiciones de demostrabilidad. -/
-theorem goedel_first_real (hcon : ConsistentOmega) : ¬ Prf godelC :=
-  goedel_first_unprovable_real hcon godelC_fixedpoint
+-- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
+-- Sustituida por la via NUMERAL: ver `Meta/CodeNumeralPrf.lean` y `Meta/DiagonalNumeral.lean`.
 
 end ROBINSON_PlusPlus.Meta.Diagonal
 
 export ROBINSON_PlusPlus.Meta.Diagonal (
-  tc_zero
-  tc_succ
-  tc_cons
-  tc_numeral
-  tc_of_cons
-  tc_chars
-  tc_str
-  tc_term
-  tc_terms
-  tc_form
-  selfApp
-  diagTerm
-  diag_arith
-  subst_eq_iff
-  godelPred
-  godelBeta
-  godelC
-  godelC_fixedpoint
-  goedel_first_real
+  tc_zero tc_succ tc_numeral selfApp diagTerm subst_eq_iff godelPred godelBeta godelC
 )
