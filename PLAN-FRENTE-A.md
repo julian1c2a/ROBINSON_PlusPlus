@@ -116,7 +116,39 @@ existente.
 `OmegaReflect` necesitó un añadido: `goedel_first_undecidable_numeral` (análogo de
 `goedel_first_undecidable_real'`, retirado con el punto fijo roto), y reapuntar a `godelCN`.
 
-### ▶ (a.2) — el muro, ya enunciable
+### ▶ (a.2) — **la escalera está a mitad, y mejor de lo estimado**
+
+Al recuperar `EvalArithPrf` de la cuarentena apareció que **el primer peldaño YA ESTABA HECHO**, y
+justo por la técnica propuesta (`prf_nat_induction`):
+
+```lean
+evalAddCode a b = eqCodeFn (addcT (tcFn a) (tcFn b)) (tcFn (add a b))
+pcc_eval_add (a b) : Prf (provFromCode (evalAddCode a b))     -- ∀ a b ARBITRARIOS
+```
+
+o sea `⊢ Prov(⌈ ȧ + ḇ = (a+b)˙ ⌉)`. Footprint verificado tras la reparación:
+`[propext, choice, Quot.sound, prf_axiomsCodeT_eq]` — **sin `tc_cons`**. Son ~440 líneas
+(`Meta/EvalArithPrf.lean`) y sirven de **plantilla exacta** para los demás peldaños.
+
+Y el peldaño `div2` **no necesita inducción**: `pcc_thm_inst` internaliza cualquier teorema‑∀
+OBJETO, y `prf_div2_double` (de `Div2ParityPrf`) sube a ∀ objeto con `Prf.gen`
+(`sondeos/Div2Gen.lean`, net‑0):
+
+```lean
+prf_div2_double_all : Prf (∀. div2 (· · two) =eq ·)      -- Prf.gen, net-0
+pcc_thm_inst : ∀ φ, Prf (∀. φ) → ∀ w, Prf (provFromCode (substfc zero w (formCode φ)))
+```
+
+#### Estado de la escalera
+
+| peldaño | estado |
+|---|---|
+| `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ **HECHO** (`pcc_eval_add`) |
+| `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ⏳ por construir, **plantilla en `EvalArithPrf`** |
+| `div2` | ✅ **resuelto por atajo** (`Prf.gen` + `pcc_thm_inst`), sin inducción |
+| `Prov(⌈ (cons h t)˙ = cons(ḧ,ṫ) ⌉)` | ⏳ ensamblaje vía `ax_L0_cons_def` + `cpOf` |
+
+#### Lo que queda enunciable ahora
 
 Quedan **6 raíces** en cuarentena: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`,
 `InAxiomsCodePrf`, `LineWFTrackedPrf`. Y **`EvalListPrf` es el nuevo keystone**: bloquea a 9 de los
