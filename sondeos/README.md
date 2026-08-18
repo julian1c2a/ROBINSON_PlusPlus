@@ -14,7 +14,8 @@ lake env lean sondeos/<fichero>.lean      # desde la raíz de RPP, NUNCA desde F
 
 | fichero | sondeo | resultado |
 |---|---|---|
-| **`PilotoDiagonal.lean`** | **piloto del lema diagonal** | ✅ **EL MÁS IMPORTANTE.** El punto fijo de Gödel **sobrevive** con códigos NUMERALES. `godelCN_fixedpoint` tiene el footprint del original **menos `tc_cons`**. Asume sólo `hFN` (= la salida de S4). Además `provCode_transfer` da la equivalencia con la representación en árbol en **un** paso de Leibniz. |
+| **`DescargaHFN.lean`** | **la comprobación final** | ✅ **EL MÁS IMPORTANTE.** Rehace el piloto con `hFN` **DEMOSTRADA** (vía `Meta/CodeNumeralPrf.lean`). `godelCN_fixedpoint` compila **sin `codeN`, sin `hFN` y sin `tc_cons`**. La vía numeral deja de ser condicional. |
+| `PilotoDiagonal.lean` | piloto del lema diagonal (histórico: con `hFN` asumida) | El punto fijo de Gödel **sobrevive** con códigos NUMERALES. `godelCN_fixedpoint` tiene el footprint del original **menos `tc_cons`**. Asume sólo `hFN` (= la salida de S4). Además `provCode_transfer` da la equivalencia con la representación en árbol en **un** paso de Leibniz. |
 | `S4.lean` | S4 · evaluación de Cantor | Primer eslabón compilado y net‑0: `prf_add_eq_zero_right`. Falta `prf_div2_numeral`. |
 | `S3S5.lean` | S3 · simbolismo + S5 · magnitudes | `codeNat` **total y estructural**; 6 teoremas elaboran al instante — Lean **nunca** reduce `codeNat φ`. Y las medidas de S5 (Unicode 19 068 vs índices 45). |
 | `PilotoAislado.lean` | fase 2 · familia INVARIANCIA | `substtc_inv_termCode_*` **sin** la lectura sintáctica. Independencia probada por **aislamiento de importaciones**, comprobada por máquina con `#noExiste`. |

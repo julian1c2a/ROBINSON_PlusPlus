@@ -39,14 +39,19 @@
 > `prf_div2_numeral`. De paso cubrió cuatro huecos que no estaban registrados: `prf_mul_distrib`
 > (`ax12`), `prf_numeral_mul`/`prf_gnum_mul`, `PrfH_eq_congr_mul2` y `prf_eq_congr_div2`.
 >
-> **▶ (1bis) LO QUE FALTA AHORA: `prf_cons_eval` → `prf_formCode_numeral`.**
-> * `prf_cons_eval (a b : Nat) : Prf (cons (numeral a) (numeral b) =eq numeral (consN a b))`.
->   Cadena: `prf_cons_div2` (ya existe) → evaluar `cpOf` con `prf_numeral_add`/`prf_gnum_mul`
->   (ya existen) → **`prf_div2_numeral`** (ya existe). Falta comprobar que el polinomio de Cantor
->   sale con la forma `2*m` exacta que L5 pide.
-> * `prf_formCode_numeral (φ) : Prf (formCode φ =eq numeralM (codeNat φ))` por **meta‑recursión**
->   sobre `formCode`/`termCode`/`strCode`, usando `prf_cons_eval` en cada nodo.
->   Eso **descarga la `hFN`** que el piloto del lema diagonal asumía.
+> **✅ (1bis) `prf_cons_eval` y `prf_formCode_numeral` — HECHOS** (`Meta/CodeNumeralPrf.lean`,
+> net‑0). `Prf (formCode φ =eq numeral (codeNat φ))`. La aritmética sale **sin división**:
+> `consN` vía números triangulares (`triN`) da `2·consN a b = cpOf ā b̄` como identidad `Nat`,
+> que es justo la forma `2*m` que `prf_div2_numeral` pide. Quinto hueco cubierto: `prf_gnum_add`.
+>
+> **✅ (1ter) `hFN` DESCARGADA — la vía numeral ya NO es condicional** (`sondeos/DescargaHFN.lean`).
+> Rehecho el piloto del lema diagonal con `hFN` **demostrada**: `godelCN_fixedpoint` compila con
+> footprint `[propext, choice, Quot.sound, dne, gen, imp_intro, ax_induction, ax_list_induction]`
+> — **sin `codeN`, sin `hFN`, SIN `tc_cons`**. Los cuatro extras vienen de `prf_to_derives`
+> (el puente `Prf`→`⊢`) y son los MISMOS que `goedel_first_real'` ya citaba: no hay regresión.
+>
+> ⚠️ **Esto NO hace consistente la teoría todavía**: `ax_tc_cons` sigue en `axioms`. Lo que queda
+> establecido es que, **al retirarlo**, este punto fijo sobrevive mientras el actual muere.
 >
 > **(2) PILOTAR LA CAPA RASTREADA** (el siguiente riesgo, aún **sin pilotar**). Los 14 tags y
 > `hI_dot` usan `tcFn` sobre códigos **ABSTRACTOS**, no sobre `formCode φ` concreto ⇒ la
