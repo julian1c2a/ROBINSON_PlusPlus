@@ -54,6 +54,7 @@ import ROBINSON_PlusPlus.Meta.NatArithPrf
 import ROBINSON_PlusPlus.Meta.NatOrderPrf
 import ROBINSON_PlusPlus.Meta.NatMulPrf
 import ROBINSON_PlusPlus.Meta.CantorMonoPrf
+import ROBINSON_PlusPlus.Meta.Div2ParityPrf
 import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
