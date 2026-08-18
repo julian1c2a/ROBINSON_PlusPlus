@@ -4,92 +4,59 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑07‑27 · HEAD `ef29497`+ · `master` verde, 113 jobs · Lean v4.31.0 · 0 errores / 0 warnings /
-0 sorrys · 7 `axiom` · `Minimal/Axioms.lean` INTACTO (NADA sancionado).**
+**Estado 2026‑07‑27 · HEAD `acdc36a` · `master` verde, 85 jobs · Lean v4.31.0 · 0 errores /
+0 warnings / 0 sorrys · 72 módulos activos + 31 en `cuarentena/`.**
 
-> ## 🚨 LA TEORÍA OBJETO SIGUE SIENDO INCONSISTENTE (`axioms ⊢ ⊥`, verificado en compilador)
+> ## ✅ LA INCONSISTENCIA CONOCIDA ESTÁ REPARADA (2026‑07‑27)
 >
-> **Pero hoy se ha localizado el daño con precisión y se ha PILOTADO la reparación.**
-> Documento maestro: **`PLAN-SORTES.md` — leer su cabecera «🟢 LEER ESTO PRIMERO»**, que dice qué
-> secciones están superadas. Experimentos compilados: **`sondeos/`** (con `README.md`).
+> `ax_tc_cons` **RETIRADO** de `axioms`. Era la ecuación que hacía que `tcFn` recurriera a la vez
+> sobre estructura NUMERAL y sobre estructura de CÓDIGO — imposible, porque en ℕ el mismo valor es
+> ambas cosas (`cons 0 nil = 2 = σσ0`). El lema diagonal está reconstruido por la **vía NUMERAL**
+> en `Meta/DiagonalNumeral.lean`.
 >
-> ### ✅ LO QUE SE ESTABLECIÓ HOY (todo verificado en el compilador)
+> ⚠️ **NO es una prueba de consistencia.** Se ha retirado la inconsistencia **conocida y
+> localizada**. Que no haya otras es lo que sugiere la auditoría de familias de axiomas, pero eso
+> fue una auditoría, **no una demostración**. `ConsistentOmega` deja de ser refutable por esta vía;
+> no se afirma que sea cierta.
 >
-> 1. **El daño entra a Gödel I por UN SOLO SITIO: el LEMA DIAGONAL.**
->    `godelC'_fixedpoint` cita **exactamente** `[propext, choice, Quot.sound, imp_intro, tc_cons]`.
-> 2. **D1 (`repr_pos'_prf`) está LIMPIO**, y el argumento de Gödel también
->    (`goedel_first_unprovable_real'`, `goedel_first_unrefutable_real'`): son **modulares**, se
->    ensucian sólo al *descargar* el punto fijo. `goedel_second'` cita sólo `d3`.
-> 3. **⛔ «Quitar `ax_tc_cons`» NO ES OPCIÓN**: decapita la diagonalización. El «código del
->    código» **es** lo que Gödel exige. El puente hay que **REPARARLO**.
-> 4. **✅ EL PUNTO FIJO SOBREVIVE CON CÓDIGOS NUMERALES** (`sondeos/PilotoDiagonal.lean`):
->    `godelCN_fixedpoint` tiene el footprint del original **menos `tc_cons`**. Y
->    `provCode_transfer` da la equivalencia con la representación en árbol en **un** paso de
->    Leibniz ⇒ **D1 y la cadena existente se transfieren sin re‑demostrarse**.
-> 5. **S2 (17 agentes): un paquete `isFormCode` NO repara `tc`.** `substfc` pide un reconocedor
->    **extensional**; `tc` pide una distinción **intensional**. Son presupuestos disjuntos y **en
->    serie**, no en paralelo.
+> ### ✅ LO QUE HAY, verificado con `#print axioms`
 >
-> ### ▶▶ LO QUE HAY QUE HACER AL RETOMAR (por orden)
+> | | |
+> |---|---|
+> | **`goedel_first_numeral`** | `ConsistentOmega → ¬Prf godelCN` — **Gödel I** |
+> | `repr_pos'_prf` | **D1**, intacta |
+> | `goedel_first_unprovable_real'` / `_unrefutable_real'` | modulares, intactos |
+> | `prf_formCode_numeral` | `formCode φ =eq numeral (codeNat φ)`, net‑0 |
+> | `prf_div2_numeral`, `prf_cons_eval` | la cadena aritmética, net‑0 |
 >
-> **✅ (1) `prf_div2_numeral` — HECHO** (`Meta/Div2ParityPrf.lean`, net‑0).
-> `Prf (div2 (numeral (2*m)) =eq numeral m)`. La cadena L1–L5 está **completa**, toda en forma
-> OBJETO y con footprint `[propext, choice, Quot.sound]`:
-> `prf_mul_two_lt_mono` · `prf_mul_two_cancel` · `prf_mod2_double` · `prf_div2_double` ·
-> `prf_div2_numeral`. De paso cubrió cuatro huecos que no estaban registrados: `prf_mul_distrib`
-> (`ax12`), `prf_numeral_mul`/`prf_gnum_mul`, `PrfH_eq_congr_mul2` y `prf_eq_congr_div2`.
+> Footprint de Gödel I: `[propext, choice, Quot.sound, dne, gen, imp_intro, ax_induction,
+> ax_list_induction, ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
 >
-> **✅ (1bis) `prf_cons_eval` y `prf_formCode_numeral` — HECHOS** (`Meta/CodeNumeralPrf.lean`,
-> net‑0). `Prf (formCode φ =eq numeral (codeNat φ))`. La aritmética sale **sin división**:
-> `consN` vía números triangulares (`triN`) da `2·consN a b = cpOf ā b̄` como identidad `Nat`,
-> que es justo la forma `2*m` que `prf_div2_numeral` pide. Quinto hueco cubierto: `prf_gnum_add`.
+> ### ⏸️ LO QUE QUEDÓ FUERA: D3 y Gödel II
 >
-> **✅ (1ter) `hFN` DESCARGADA — la vía numeral ya NO es condicional** (`sondeos/DescargaHFN.lean`).
-> Rehecho el piloto del lema diagonal con `hFN` **demostrada**: `godelCN_fixedpoint` compila con
-> footprint `[propext, choice, Quot.sound, dne, gen, imp_intro, ax_induction, ax_list_induction]`
-> — **sin `codeN`, sin `hFN`, SIN `tc_cons`**. Los cuatro extras vienen de `prf_to_derives`
-> (el puente `Prf`→`⊢`) y son los MISMOS que `goedel_first_real'` ya citaba: no hay regresión.
+> **31 módulos en `cuarentena/`** (los 14 tags, `hI_dot`, el chasis `CTree`, el KIT). **No borrados.**
+> Dependen de la lectura sintáctica de `tcFn`, incompatible con la numeral — medido en
+> `sondeos/PilotoRastreada.lean`. Leer **`cuarentena/README.md`**.
 >
-> ⚠️ **Esto NO hace consistente la teoría todavía**: `ax_tc_cons` sigue en `axioms`. Lo que queda
-> establecido es que, **al retirarlo**, este punto fijo sobrevive mientras el actual muere.
+> ### ▶▶ EL FRENTE ABIERTO: **(a)** — ¿vuelve la capa rastreada?
 >
-> **(2) PILOTAR LA CAPA RASTREADA** (el siguiente riesgo, aún **sin pilotar**). Los 14 tags y
-> `hI_dot` usan `tcFn` sobre códigos **ABSTRACTOS**, no sobre `formCode φ` concreto ⇒ la
-> transferencia por Leibniz **no es automática**. Pilotar **un solo tag** con `hFN` asumida,
-> igual que se hizo con el diagonal, **antes** de dar la reparación por completa.
+> El nudo es `pcc_eval_carc (h t)` con `h`,`t` **ABSTRACTOS**, que usa
+> `prf_tc_cons' h t : tcFn (cons h t) =eq consT (tcFn h) (tcFn t)` — falso bajo la lectura numeral.
 >
-> **(3) Ejecutar la reparación**: retirar `ax_tc_cons`, sustituir `tc_form` por la cadena numeral,
-> reconstruir. La rama `sondeo/s1-sin-ax-tc-cons` (`4b3492f`, **NO MERGEAR**) ya midió que sólo
-> hay **2 fallos directos**.
+> **La pregunta del sondeo (a):** ¿se puede probar `pcc_eval_carc` con **inducción interna** en vez
+> de con la ecuación `tc` sintáctica? **`PrfH.ind` y `PrfH.listInd` EXISTEN**
+> (`Meta/HilbertDeduction.lean:32‑41`), así que la herramienta está. Es la Σ₁‑completitud
+> internalizada, o sea el núcleo duro de D3 en Hilbert‑Bernays.
 >
-> **(4) S5 — EN PARALELO, sin riesgo ni dependencias.** Recodificar los símbolos por **índice de
-> tabla** en vez de por punto Unicode: suma 19 068 → 45, **recorte 424×**. Hoy
-> `consDepth (formCode ax_tc_succ) = 3873` porque `σ` es U+03C3 = 963.
+> **Dato que abarata (a):** los **13 sitios** críticos embudan en **5 lemas** (`prf_tc_cons'`,
+> `prf_tc_nul/un/bin`, `prf_tc_eqc`). Si se encuentra sustituto para esos 5, **el chasis vuelve sin
+> tocarse**.
 >
-> **(5) SÓLO DESPUÉS**: el paquete `isFormCode` para el muro de `substfc` (3 axiomas netos, no
-> «<12»). ⚠️ Con la **corrección R‑6 de S2**: la enmienda «obvia» de los 7 esquemas es
-> **incorrecta en 4 de 7** — `ind`(18)/`listInd`(20) tienen `lenc = 3` (no existe casilla 3) y
-> `q3`(11)/`qconf`(19) llevan códigos de **fórmula** donde `isTermCode` es **refutable**, lo que
-> cerraría B.3c 21/21 **ex falso**. Detalle en `PLAN-SORTES.md` §4sexies.
+> ### Otros frentes, sin cambios
 >
-> ### ⚠️ DOS TRAMPAS METODOLÓGICAS APRENDIDAS HOY (no repetir)
->
-> * **La alcanzabilidad por `import` da FALSOS NEGATIVOS**, y me hizo afirmar en falso que Gödel I
->   estaba limpio. Un **crawler de dependencias tampoco sirve**: Lean 4.31 da `value? = NONE` para
->   teoremas importados (sólo recorre tipos). **La técnica buena**: convertir el puente sospechoso
->   en **`axiom` de Lean** y dejar que `#print axioms` delate a sus consumidores.
-> * **No lanzar sondeos contra un árbol que cambia.** El workflow de S2 corrió mientras la rama S1
->   tenía `ax_tc_cons` retirado y dos diseños leyeron el árbol mutado.
->
-> ### ⏸️ FRENTES QUE SIGUEN ABIERTOS DE ANTES (congelados tras la inconsistencia)
->
-> **(A) `prf_strong_induction` (entregable ii) — al 90 %.** ii.1/ii.2/ii.3a verdes; bloquea sólo la
-> rama B, diagnóstico en `Meta/StrongInductionPrf.lean:156‑178`. ⚠️ **ANTES de tocar `PSI`**:
-> verificar la afirmación de los diseñadores de que **NO hay que reformularlo** (que la rama B falla
-> porque `Φ` se dejó arbitrario). Si es cierta, ahorra re‑probar 4 piezas verdes.
->
-> **(B) `repr_neg` / `NegVerifier` para `⊬¬G`** — independiente, ver `PLAN-NEGVERIFIER.md`.
+> **`repr_neg` / `NegVerifier` para `⊬¬G`** — independiente, ver `PLAN-NEGVERIFIER.md`.
 > ⚠️ NO recuperar F7a (ver [[project-godel-first-complete]]).
+> **`prf_strong_induction`** al 90 % (rama B); ver `Meta/StrongInductionPrf.lean:156‑178`.
 
 > ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
 >
