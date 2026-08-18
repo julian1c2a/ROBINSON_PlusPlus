@@ -5,8 +5,10 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
+import ROBINSON_PlusPlus.Meta.DiagonalNumeral
 
 open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.ProofChain
@@ -165,8 +167,8 @@ theorem reflects_of_omega (hω : OmegaConsistent) (hneg : NegVerifier) (φ : For
     clásica), sin ningún postulado gödeliano. Sólo queda por construir `NegVerifier` (Δ₀, alcanzable). -/
 theorem goedel_first_undecidable_omega
     (hcon : ConsistentOmega) (hω : OmegaConsistent) (hneg : NegVerifier) :
-    (¬ Prf godelC') ∧ (¬ Prf (neg godelC')) :=
-  goedel_first_undecidable_real' hcon (reflects_of_omega hω hneg godelC')
+    (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN)) :=
+  goedel_first_undecidable_numeral hcon (reflects_of_omega hω hneg godelCN)
 
 end ROBINSON_PlusPlus.Meta.OmegaReflect
 

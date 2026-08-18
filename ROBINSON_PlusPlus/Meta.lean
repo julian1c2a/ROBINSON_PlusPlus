@@ -53,6 +53,16 @@ import ROBINSON_PlusPlus.Meta.CantorMonoPrf
 import ROBINSON_PlusPlus.Meta.Div2ParityPrf
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 import ROBINSON_PlusPlus.Meta.DiagonalNumeral
+import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
+import ROBINSON_PlusPlus.Meta.EvalArithPrf
+import ROBINSON_PlusPlus.Meta.ExIntroCodePrf
+import ROBINSON_PlusPlus.Meta.ForallElimCodePrf
+import ROBINSON_PlusPlus.Meta.LineWFCases
+import ROBINSON_PlusPlus.Meta.MpCodePrf
+import ROBINSON_PlusPlus.Meta.OmegaReflect
+import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
+import ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf
+import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf

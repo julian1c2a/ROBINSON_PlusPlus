@@ -119,10 +119,19 @@ theorem godelCN_fixedpoint : axioms ⊢ (godelCN ⇔ neg (provCodeC' godelCN)) :
 theorem goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN :=
   goedel_first_unprovable_real' hcon godelCN_fixedpoint
 
+/-- **Gödel I — `Gₙ` INDECIDIBLE**, con la reflexión como hipótesis explícita.
+    Análogo numeral de `goedel_first_undecidable_real'`, que se retiró con el punto fijo roto. -/
+theorem goedel_first_undecidable_numeral
+    (hcon : ConsistentOmega) (hrefl : Reflects godelCN) :
+    (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN)) :=
+  ⟨goedel_first_numeral hcon,
+   goedel_first_unrefutable_real' hcon godelCN_fixedpoint hrefl⟩
+
 end ROBINSON_PlusPlus.Meta.DiagonalNumeral
 
 export ROBINSON_PlusPlus.Meta.DiagonalNumeral (
   hFN selfAppN provCodeN godelCN
   diag_arith_num godelCN_fixedpoint_N provCode_transfer
   neg_congr_iff iff_trans godelCN_fixedpoint goedel_first_numeral
+  goedel_first_undecidable_numeral
 )

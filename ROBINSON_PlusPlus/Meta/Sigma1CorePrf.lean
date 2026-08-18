@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Sigma1Prf
 import ROBINSON_PlusPlus.Meta.TcArithPrf
+import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -17,6 +18,7 @@ open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -104,14 +106,24 @@ theorem prf_provCodeC'_In_of_tracked {x L xc Lc : Term}
     Prf (provCodeC' (In x L)) :=
   prf_mp (prf_provFromCode_In_congr hx hL) h
 
-/-- Especialización al uso real (`x = ⌜φ⌝` un código concreto, `L` un término-código):
-    con `tcFn (formCode φ) =eq termCode (formCode φ)` (= `prf_tc_form`) para el 1er arg
-    y `tcFn L =eq termCode L` para el 2º, la demostrabilidad rastreada da `provCodeC'`. -/
+/-- Especialización al uso real, **por la vía NUMERAL** (refundado 2026‑07‑27).
+
+    Antes se apoyaba en `prf_tc_form`, o sea en `ax_tc_cons`, la ecuación que hacía INCONSISTENTE
+    la teoría. Ahora el código de la fórmula se escribe como **numeral**, y entonces el puente
+    `tcFn = termCode` es `prf_tc_numeral`, que sólo usa `ax_tc_zero`/`ax_tc_succ`.
+
+    ⚠️ **El enunciado CAMBIA**: concluye sobre `In (numeral (codeNat φ)) L`, no sobre
+    `In (formCode φ) L`. Ambas son equivalentes vía `prf_formCode_numeral`; quien consuma este
+    lema debe componer con esa igualdad. -/
 theorem prf_provCodeC'_In_formCode_of_tracked {φ : Formula} {L : Term}
     (hL : Prf (tcFn L =eq termCode L))
     (h : Prf (provFromCode (inFormCodeFn (tcFn (formCode φ)) (tcFn L)))) :
-    Prf (provCodeC' (In (formCode φ) L)) :=
-  prf_provCodeC'_In_of_tracked (prf_tc_form φ) hL h
+    Prf (provCodeC' (In (numeral (codeNat φ)) L)) := by
+  have hb : Prf (tcFn (formCode φ) =eq tcFn (numeral (codeNat φ))) :=
+    prf_congr_tcFn (prf_formCode_numeral φ)
+  have h' : Prf (provFromCode (inFormCodeFn (tcFn (numeral (codeNat φ))) (tcFn L))) :=
+    prf_mp (prf_provFromCode_In_congr hb (prf_refl _)) h
+  exact prf_provCodeC'_In_of_tracked (prf_tc_numeral (codeNat φ)) hL h'
 
 /-! ### Reflexión de `In` sobre listas explícitas (por meta-pertenencia)
 
@@ -126,6 +138,11 @@ en el caso cabeza el elemento **es** `x` (igualdad Lean, no `x =eq e` object), a
 def objList : List Term → Term
   | []      => nil
   | e :: es => cons e (objList es)
+
+/-- Valor `Nat` de `objList` (espejo exacto, con `consN` de `CodeNumeralPrf`). -/
+def objListN : List Nat → Nat
+  | []      => 0
+  | n :: ns => consN n (objListN ns)
 
 /-- **Reflexión de `In` sobre una lista explícita** por meta-pertenencia: si `x` es
     (meta-)miembro de `elems`, entonces `provCodeC'(In x (objList elems))` es demostrable.
@@ -193,24 +210,28 @@ ya cumplan `tcFn = termCode`. En particular sobre `objList` de `formCode`s (la f
 lista de conclusiones que produce `runFn`), cerrando el 2º argumento del puente rastreado
 `prf_provCodeC'_In_formCode_of_tracked` (que exige `tcFn L =eq termCode L`). -/
 
-/-- `tcFn = termCode` sobre `objList` de una lista de **códigos** que ya cumplen `tcFn = termCode`
-    (meta-inducción; base `nil` vía `prf_tc_zero`, paso vía `prf_tc_of_cons`). -/
-theorem prf_tc_objList (cs : List Term)
-    (h : ∀ c, List.Mem c cs → Prf (tcFn c =eq termCode c)) :
-    Prf (tcFn (objList cs) =eq termCode (objList cs)) := by
-  induction cs with
-  | nil => exact prf_tc_zero
-  | cons c rest ih =>
-      exact prf_tc_of_cons (h c (List.Mem.head _))
-        (ih (fun d hd => h d (List.Mem.tail _ hd)))
+/-- **`objList` de una lista de códigos ES un numeral** (refundado 2026‑07‑27).
 
-/-- **`tcFn = termCode` sobre `objList` de `formCode`s** (la forma de la lista de conclusiones):
-    especialización de `prf_tc_objList` con `prf_tc_form` en cada elemento. -/
+    Sustituye a `prf_tc_objList`, que usaba `prf_tc_of_cons` (o sea `ax_tc_cons`). El paso
+    inductivo es ahora `prf_cons_eval_of`, que evalúa el `cons` cuando sus dos hijos ya son
+    numerales. -/
+theorem prf_objList_numeral {α : Type} (f : α → Term) (g : α → Nat)
+    (hf : ∀ a, Prf (f a =eq numeral (g a))) : ∀ xs : List α,
+    Prf (objList (xs.map f) =eq numeral (objListN (xs.map g)))
+  | []      => prf_refl _
+  | x :: xs => prf_cons_eval_of (hf x) (prf_objList_numeral f g hf xs)
+
+/-- Instancia sobre códigos de fórmula. -/
+theorem prf_objList_formCode_numeral (φs : List Formula) :
+    Prf (objList (φs.map formCode) =eq numeral (objListN (φs.map codeNat))) :=
+  prf_objList_numeral formCode codeNat prf_formCode_numeral φs
+
+/-- **Sustituto numeral de `prf_tc_objList_formCode`**. ⚠️ El enunciado CAMBIA: el lado derecho
+    es `termCode (numeral N)`, no `termCode (objList …)`. -/
 theorem prf_tc_objList_formCode (φs : List Formula) :
-    Prf (tcFn (objList (φs.map formCode)) =eq termCode (objList (φs.map formCode))) := by
-  induction φs with
-  | nil => exact prf_tc_zero
-  | cons φ rest ih => exact prf_tc_of_cons (prf_tc_form φ) ih
+    Prf (tcFn (objList (φs.map formCode)) =eq
+         termCode (numeral (objListN (φs.map codeNat)))) :=
+  prf_eq_trans (prf_congr_tcFn (prf_objList_formCode_numeral φs)) (prf_tc_numeral _)
 
 /-! ### A‑F2 — puente: reflexión RASTREADA con testigo‑código = `provCodeC'` real
 
@@ -261,7 +282,7 @@ export ROBINSON_PlusPlus.Meta.Sigma1CorePrf (
   prf_provCodeC'_In_of_tracked prf_provCodeC'_In_formCode_of_tracked
   objList pcc_in_objList_of_mem
   prf_runFn_objList prf_runFn_nil_objList pcc_in_runFn_objList
-  prf_tc_objList prf_tc_objList_formCode
+  objListN prf_objList_numeral prf_objList_formCode_numeral prf_tc_objList_formCode
   prf_provCodeC'_of_tracked_witness
   prf_lineOk_q2
 )

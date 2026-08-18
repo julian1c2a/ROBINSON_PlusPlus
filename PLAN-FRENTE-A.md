@@ -98,7 +98,36 @@ existente.
 
 ## Estado
 
-* (a.1) — **no empezado**.
-* (a.2) — **no empezado**; bloqueado por (a.1) para su enunciado.
-* Lo verificado hasta aquí es el **mapa**: keystone, dos niveles, y que la herramienta de inducción
-  interna sobrevivió.
+### ✅ (a.1) — HECHO (2026‑07‑27). Build **95 jobs**, cuarentena **31 → 21**.
+
+`Sigma1CorePrf` refundado con códigos estáticos numerales, net‑0. Tres declaraciones cambiadas:
+
+| antes | ahora |
+|---|---|
+| `prf_provCodeC'_In_formCode_of_tracked` vía `prf_tc_form` | vía `prf_tc_numeral`; ⚠️ concluye sobre `In (numeral (codeNat φ)) L` |
+| `prf_tc_objList` vía `prf_tc_of_cons` | `prf_objList_numeral` vía `prf_cons_eval_of` |
+| `prf_tc_objList_formCode` | idem, con `termCode (numeral N)` a la derecha |
+
+**Recuperados además 9 módulos** que sólo dependían del keystone: `EvalArithPrf`, `ExIntroCodePrf`,
+`ForallElimCodePrf`, `LineWFCases`, **`MpCodePrf`** (`pcc_axiom_inst`), `OmegaReflect`,
+**`Sigma1AtomPrf`** (`eqCodeFn`), `Sigma1TrackedPrf`, `TrackedCorePrf`.
+⇒ **el prerrequisito de (a.2) ya está cubierto.**
+
+`OmegaReflect` necesitó un añadido: `goedel_first_undecidable_numeral` (análogo de
+`goedel_first_undecidable_real'`, retirado con el punto fijo roto), y reapuntar a `godelCN`.
+
+### ▶ (a.2) — el muro, ya enunciable
+
+Quedan **6 raíces** en cuarentena: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`,
+`InAxiomsCodePrf`, `LineWFTrackedPrf`. Y **`EvalListPrf` es el nuevo keystone**: bloquea a 9 de los
+15 no‑raíz restantes.
+
+El objetivo sigue siendo `pcc_dot_cons`, y **ahora SÍ se puede enunciar**, porque `pcc_axiom_inst`
+y `eqCodeFn` han vuelto.
+
+### ⚠️ Trampa encontrada al ejecutar (a.1)
+
+`lake build` dio **verde con 85 jobs** después de mover 9 módulos a `Meta/`… porque los `import`
+en `Meta.lean` **no se habían escrito**: la `lean_lib` sólo construye lo **alcanzable desde el
+módulo raíz**, así que los ficheros estaban en el sitio pero fuera del build. **Señal de alarma:
+el número de jobs NO cambió al añadir módulos.** Comprobar siempre que el conteo se mueve.
