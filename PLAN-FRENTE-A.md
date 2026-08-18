@@ -1,0 +1,104 @@
+# FRENTE (a) — ¿vuelve la capa rastreada? (D3 y Gödel II)
+
+**Abierto:** 2026‑07‑27, tras ejecutar la reparación (`master`, HEAD `d6552b9`, 85 jobs).
+**Contexto:** `cuarentena/README.md`, `sondeos/PilotoRastreada.lean`, `PLAN-SORTES.md`.
+
+---
+
+## La pregunta
+
+Retirar `ax_tc_cons` dejó 31 módulos en `cuarentena/`. **¿Se pueden recuperar sin reintroducir la
+inconsistencia?** La vía candidata es probar la **Σ₁‑completitud internalizada** con **inducción
+interna** en vez de con la ecuación `tc` sintáctica.
+
+**La herramienta existe**: `PrfH.ind`/`PrfH.listInd` (`Meta/HilbertDeduction.lean:32‑41`) y su
+eliminador `prf_nat_induction` (`Meta/NatArithPrf.lean:44`) **sobrevivieron** a la cuarentena.
+
+---
+
+## Resultado 1 · `Sigma1CorePrf` es el KEYSTONE
+
+Medido sobre el grafo de importaciones de `cuarentena/`: **los 24 módulos no‑raíz dependen de
+`Sigma1CorePrf`. Todos, sin excepción.** No hay ninguno recuperable de forma independiente.
+
+⟹ **Cualquier recuperación empieza necesariamente por ahí.**
+
+## Resultado 2 · La cuarentena se parte en DOS niveles, y sólo uno es un muro
+
+| nivel | módulos | qué usan | ¿lo cubre la vía numeral? |
+|---|---|---|---|
+| **1 — argumentos CONCRETOS** | `Sigma1CorePrf`, `InAxiomsCodePrf`, `D3InDotPrf` | `prf_tc_form` / `prf_tc_of_cons` sobre `formCode φ` y `objList cs` (**estructura concreta**) | ✅ **SÍ** |
+| **2 — argumentos ABSTRACTOS** | `EvalListPrf`, `EvalNthcPrf`, `CodeCtorKit`, `LineWFTrackedPrf` | `prf_tc_cons' h t` con `h`,`t` **abstractos** | ⛔ **el muro** |
+
+### Por qué el nivel 1 sí sale
+
+Los usos son del patrón `Prf (tcFn X =eq termCode X)` con `X` de estructura concreta. La vía numeral
+da el mismo puente con el **código estático cambiado**:
+
+```lean
+prf_formCode_numeral φ : Prf (formCode φ =eq numeral (codeNat φ))   -- YA demostrado, net-0
+prf_tc_numeral N       : Prf (tcFn (numeral N) =eq termCode (numeral N))
+⟹ tcFn (formCode φ) =eq termCode (numeral (codeNat φ))
+```
+
+Lo que cambia es **el código estático dentro de los enunciados** (`termCode (formCode φ)` pasa a
+`termCode (numeral (codeNat φ))`), y `provCode_transfer` (`Meta/DiagonalNumeral.lean`) puentea las
+dos representaciones en **un** paso de Leibniz.
+
+### Por qué el nivel 2 es un muro
+
+`pcc_eval_carc (h t)` necesita `tcFn (cons h t) =eq consT (tcFn h) (tcFn t)` con `h`,`t`
+**abstractos**. Medido en `sondeos/PilotoRastreada.lean`: bajo la lectura numeral eso daría un
+código de cabeza `⌜σ⌝` igual a uno de cabeza `⌜::⌝`. **Es falso, no sólo indemostrable.**
+
+---
+
+## El plan
+
+### (a.1) — Refundar `Sigma1CorePrf` con códigos estáticos numerales
+
+Bounded y mecánico: sustituir `prf_tc_form φ` por la cadena numeral, y propagar el cambio de código
+estático por los enunciados. **Desbloquea estructuralmente los 24 módulos no‑raíz.**
+Después, igual con `InAxiomsCodePrf` y `D3InDotPrf`.
+
+⚠️ **Cambia enunciados**, no sólo pruebas: hay que revisar que lo que consume cada lema siga
+encajando, o componer con `provCode_transfer`.
+
+### (a.2) — El muro: la Σ₁‑completitud internalizada
+
+El objetivo exacto:
+
+```lean
+pcc_dot_cons (h t : Term) :
+    Prf (provFromCode (eqCodeFn (tcFn (cons h t)) (consT (tcFn h) (tcFn t))))
+```
+
+o sea `⊢ Prov(⌜ (cons h t)˙ = cons(ḣ, ṫ) ⌝)` — el `prf_cons_eval` **internalizado y para argumentos
+abstractos**. Con él, `pcc_eval_carc` se reconstruye como `pcc_axiom_inst ax_carc` + este puente, y
+los 4 módulos del nivel 2 vuelven.
+
+**La escalera propuesta**, cada peldaño por `prf_nat_induction`:
+
+```
+Prov(⌜ ẋ + ẏ = (x+y)˙ ⌝)        ← inducción en y; usa ax_tc_succ y x + σy = σ(x+y)
+Prov(⌜ ẋ · ẏ = (x·y)˙ ⌝)        ← inducción en y, apoyada en la anterior
+Prov(⌜ div2(ẋ) = (div2 x)˙ ⌝)
+Prov(⌜ (cons h t)˙ = cons(ḣ,ṫ) ⌝)   ← de las anteriores vía cpOf
+```
+
+**El primer peldaño (`+`) es el sondeo decisivo**: si sale, la escalera es viable y (a) también; si
+bloquea, D3 y Gödel II quedan fuera por esta vía.
+
+⚠️ **Prerrequisito práctico:** `pcc_axiom_inst` (`cuarentena/MpCodePrf.lean`) y `eqCodeFn`
+(`cuarentena/Sigma1AtomPrf.lean`) están en cuarentena, y ambos dependen de `Sigma1CorePrf`.
+**Por eso (a.1) va antes que (a.2)**: sin él, (a.2) ni siquiera se puede enunciar con la maquinaria
+existente.
+
+---
+
+## Estado
+
+* (a.1) — **no empezado**.
+* (a.2) — **no empezado**; bloqueado por (a.1) para su enunciado.
+* Lo verificado hasta aquí es el **mapa**: keystone, dos niveles, y que la herramienta de inducción
+  interna sobrevivió.
