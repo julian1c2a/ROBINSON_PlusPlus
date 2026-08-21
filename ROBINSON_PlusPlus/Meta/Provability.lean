@@ -223,11 +223,15 @@ theorem provable_formCode_iff (φ : Formula) : Provable (formCode φ) ↔ (axiom
 > `provFormula_repr`, `diagonal_lemma`, `goedelSentence`,
 > `goedelSentence_fixedpoint`) que alimentaba a `Meta/Incompleteness.lean`
 > (Gödel I/II vía D2/D3 postulados). Auditado con `#print axioms`, la cadena
-> **real** (`goedel_first_real'`, `d2_prf`, `goedel_second'`) **no cita** ninguno
-> de esos símbolos; solo los usaba la capa legacy. Ambos se han retirado. La
-> demostrabilidad **real** vive en el verificador estructural
-> (`provCodeC'`/`chainOk`/`runFn`, `Meta/ProofChain.lean` y siguientes) y el punto
-> fijo real en `godelC'_fixedpoint` (`Meta/DiagonalTwo.lean`).
+> **real** (`d2_prf`, `goedel_second'`) **no cita** ninguno de esos símbolos; solo
+> los usaba la capa legacy. Ambos se han retirado. La demostrabilidad **real** vive
+> en el verificador estructural (`provCodeC'`/`chainOk`/`runFn`,
+> `Meta/ProofChain.lean` y siguientes).
+>
+> ⚠️ **ACTUALIZADO 2026‑08‑19:** `goedel_first_real'` y `godelC'_fixedpoint` **ya no
+> existen** (dependían de `ax_tc_cons`, retirado por inconsistente). Gödel I vive como
+> **`goedel_first_numeral`** y el punto fijo como **`godelCN_fixedpoint`**, ambos en
+> `Meta/DiagonalNumeral.lean`.
 -/
 
 end ROBINSON_PlusPlus.Meta.Provability

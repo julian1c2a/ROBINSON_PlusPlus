@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑07‑27 · HEAD `a1c6d4d` · `master` limpio y verde · Lean v4.31.0**
+**Estado 2026‑08‑19 · HEAD `a1c6d4d` · `master` limpio y verde · Lean v4.31.0**
 **95 jobs · 82 módulos activos (Minimal 11 + Meta 59 + Full 11) + 21 en `cuarentena/` · 9 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 5 coincidencias de `sorry` son
 comentarios; tres se refieren a otro proyecto).

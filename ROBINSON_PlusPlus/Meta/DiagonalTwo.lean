@@ -29,11 +29,19 @@ namespace ROBINSON_PlusPlus.Meta.DiagonalTwo
 Instancia la maquinaria diagonal **genérica** de `Meta/Diagonal.lean` (`diagTerm`,
 `diag_arith`, `selfApp`, `subst_eq_iff`) con el predicado de demostrabilidad
 **estructural** `provFormulaC'` (verificador `runFn`/`chainOk`), produciendo la
-sentencia de Gödel `godelC'` y su **punto fijo real**:
+sentencia de Gödel `godelC'`.
 
-> `godelC'_fixedpoint : ⊢ godelC' ⇔ ¬ provCodeC' godelC'`
-
-Suministra la hipótesis `fp_bwd` de `goedel_second'` (`Meta/GodelTwo.lean`). El
+> ⚠️ **ACTUALIZADO 2026‑08‑19 (reparación de la inconsistencia).** `godelC'_fixedpoint` **se ha
+> RETIRADO**: dependía de `diag_arith` → `tc_form`, o sea de `ax_tc_cons`, la ecuación que hacía
+> INCONSISTENTE la teoría. El punto fijo vive ahora en **`Meta/DiagonalNumeral.lean`**, sobre la
+> sentencia **numeral** `godelCN`:
+>
+> `godelCN_fixedpoint : ⊢ godelCN ⇔ ¬ provCodeC' godelCN`
+>
+> ⟹ **`godelC'` es hoy una definición sin punto fijo.** Lo que se usa es `godelCN`.
+> Lo que SÍ sobrevive de este módulo son los dos teoremas **modulares**
+> (`goedel_first_unprovable_real'` / `_unrefutable_real'`), que toman el punto fijo como
+> **hipótesis** y por eso no se vieron afectados. El
 único punto delicado es la composición de sustituciones (`godel_comp'`): como
 `godelPred'` no tiene variables libres ≥ 1, se reduce con un único
 `substTerm_lift_comm` (igual que en `Meta/Diagonal.lean`).

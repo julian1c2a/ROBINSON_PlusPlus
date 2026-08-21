@@ -106,7 +106,7 @@ theorem prf_provCodeC'_In_of_tracked {x L xc Lc : Term}
     Prf (provCodeC' (In x L)) :=
   prf_mp (prf_provFromCode_In_congr hx hL) h
 
-/-- Especialización al uso real, **por la vía NUMERAL** (refundado 2026‑07‑27).
+/-- Especialización al uso real, **por la vía NUMERAL** (refundado 2026‑08‑19).
 
     Antes se apoyaba en `prf_tc_form`, o sea en `ax_tc_cons`, la ecuación que hacía INCONSISTENTE
     la teoría. Ahora el código de la fórmula se escribe como **numeral**, y entonces el puente
@@ -210,7 +210,7 @@ ya cumplan `tcFn = termCode`. En particular sobre `objList` de `formCode`s (la f
 lista de conclusiones que produce `runFn`), cerrando el 2º argumento del puente rastreado
 `prf_provCodeC'_In_formCode_of_tracked` (que exige `tcFn L =eq termCode L`). -/
 
-/-- **`objList` de una lista de códigos ES un numeral** (refundado 2026‑07‑27).
+/-- **`objList` de una lista de códigos ES un numeral** (refundado 2026‑08‑19).
 
     Sustituye a `prf_tc_objList`, que usaba `prf_tc_of_cons` (o sea `ax_tc_cons`). El paso
     inductivo es ahora `prf_cons_eval_of`, que evalúa el `cons` cuando sus dos hijos ya son

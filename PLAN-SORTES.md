@@ -1,6 +1,6 @@
 # PLAN — Reparar la inconsistencia de `tcFn`
 
-**Creado:** 2026‑07‑27 · **Última medición:** 2026‑07‑27 (sondeos S1–S5 + piloto diagonal)
+**Creado:** 2026‑08‑19 · **Última medición:** 2026‑08‑19 (sondeos S1–S5 + piloto diagonal)
 **Contexto:** memoria `project-inconsistencia-tcfn-cons`, `AXIOMS.md`, `sondeos/README.md`.
 
 ---
@@ -71,7 +71,7 @@ Y `cons 0 nil = pair 0 (σ0) = 2 = σσ0` — **mismo valor, dos sintaxis** ⟹ 
 
 | hecho | verificación |
 |---|---|
-| Sólo `tc` está infectada; ninguna otra familia | auditoría completa de axiomas (2026‑07‑27) |
+| Sólo `tc` está infectada; ninguna otra familia | auditoría completa de axiomas (2026‑08‑19) |
 | **Opción B (tipos por axiomas en el lenguaje mono‑sortido) es IMPOSIBLE** | `OptionBProbe3` compila: `ax13 + ax19 + ax6 + ax4` prueban `∀x. x=0 ∨ ∃k. x=σk` **sin inducción** ⟹ no hay sitio para un `cons` que no sea 0‑ni‑sucesor |
 | La separación en dos símbolos es bien‑formada | `Probe/Sortes.lean` compila; `tcNumFn ≠ tcCodeFn` demostrable |
 | Alcance: **1175 usos de `tcFn` en 32 módulos** | `grep` |
@@ -134,7 +134,7 @@ Añadir sortes a `Term`/`Formula`/`Derives`.
 
 ---
 
-## 4bis · ⛔ RESULTADO DE LA FASE 1 (2026‑07‑27) — **§3 es INSUFICIENTE**
+## 4bis · ⛔ RESULTADO DE LA FASE 1 (2026‑08‑19) — **§3 es INSUFICIENTE**
 
 Decisión tomada: **A1**. Ejecutada la clasificación. El resultado **invalida la reparación de §3**
 y hay que corregirla. Lo que sigue sustituye a §3.
@@ -215,7 +215,7 @@ un piloto: **un** solo sitio de `InAxiomsCodePrf` re‑probado por la vía numer
 
 ---
 
-## 4ter · PILOTO DE LA FASE 2 (2026‑07‑27) — ✅ cierra, y **parte los sitios en dos familias**
+## 4ter · PILOTO DE LA FASE 2 (2026‑08‑19) — ✅ cierra, y **parte los sitios en dos familias**
 
 Piloto en `Probe/PilotoAislado.lean` (no es módulo de producción). Compila, **0 errores, 0 avisos**,
 footprint `[propext, Classical.choice, Quot.sound]` — **sin `sorryAx`**.
@@ -280,7 +280,7 @@ toleran ese tamaño.
 
 ---
 
-## 4quater · MEDICIÓN (2026‑07‑27): la cota, las magnitudes, y el radio real del daño
+## 4quater · MEDICIÓN (2026‑08‑19): la cota, las magnitudes, y el radio real del daño
 
 ### Respuesta a «¿a cuánto habría que elevar `boundedCarcIn`?» → **a nada**
 
@@ -369,7 +369,7 @@ profundidad. No depende de ninguna decisión anterior y **beneficia a todas las 
 
 ---
 
-## 4sexies · RESULTADOS DE LOS SONDEOS (2026‑07‑27)
+## 4sexies · RESULTADOS DE LOS SONDEOS (2026‑08‑19)
 
 ### ⛔ S1 — el radio exacto, y **invalida «quitar `ax_tc_cons`»**
 

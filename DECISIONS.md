@@ -1,6 +1,24 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Última actualización:** 2026-07-12
+> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+>
+> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
+> → [cuarentena/README.md](cuarentena/README.md).
+>
+> * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
+>   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
+> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   **numeral** `godelCN`.
+> * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
+> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+>
+> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
+> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
+> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+
+**Última actualización:** 2026-08-21 12:00
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta
@@ -315,6 +333,87 @@ cambian.
 ---
 
 ## Plantilla para nuevas decisiones
+
+## ADR-012: Los códigos de Gödel se representan como NUMERALES, no como árboles `cons`
+
+**Fecha:** 2026-08-18 · **Estado:** aceptada e implementada (`master`)
+
+### Contexto
+
+`axioms ⊢ ⊥`, verificado en el compilador. El símbolo objeto `tcFn` («código del código») tenía dos
+ecuaciones que recurren sobre estructuras **incompatibles**: `ax_tc_zero`/`ax_tc_succ` sobre la
+estructura **NUMERAL** y `ax_tc_cons` sobre la estructura de **CÓDIGO**. Como `ax_L0_cons_def`
+identifica `cons h t = pair h (σt)`, en ℕ el mismo valor es ambas cosas (`cons 0 nil = 2 = σσ0`),
+luego `tcFn` de ese valor debía ser dos códigos distintos a la vez.
+
+**Diagnóstico de fondo:** `tcFn` pide a la teoría objeto ver información **intensional** que los
+números no llevan — *qué término escribimos* para denotar N.
+
+### Alternativas consideradas y descartadas (todas con evidencia)
+
+| alternativa | por qué no |
+|---|---|
+| Partir `tcFn` en `tcNum`/`tcCode` | **Insuficiente**: las hojas de un árbol de código son numerales, luego `tcCode` necesitaría las dos recursiones y reproduce el mismo ⊥ |
+| Retirar `ax_tc_cons` sin más | **Decapita la diagonalización**: el «código del código» es lo que Gödel exige para `G = β(⌈β⌉)` |
+| Relativizar por axiomas (opción B) | **Imposible**: tricotomía + orden prueban `∀x. x=0 ∨ ∃k. x=σk` **sin inducción** |
+| Paquete de buena‑formación (`isFormCode`) | **No repara `tc`**: `substfc` pide un reconocedor **extensional**, `tc` una distinción **intensional** |
+| Sortes en el kernel FOL | **Cambia el teorema**: pasaría a ser la incompletitud de una teoría bi‑sortida, no de la aritmética |
+
+### Decisión
+
+Escribir `⌈φ⌉` como **numeral** (`numeral (codeNat φ)`) y dejar `tcFn` **sólo** con la lectura
+numeral (`ax_tc_zero`/`ax_tc_succ`), que es consistente y tiene modelo explícito en ℕ
+(`n ↦ ⌈σⁿ0⌉`). `ax_tc_cons` se retira de `axioms`.
+
+**Coste en axiomas: −1. Ninguno nuevo.**
+
+La pieza que lo hace posible es `prf_formCode_numeral : Prf (formCode φ =eq numeral (codeNat φ))`,
+que se apoya en `prf_cons_eval` → `prf_div2_numeral`. La aritmética sale **sin división**: `consN`
+se define con **números triangulares**, de modo que `2·consN a b = cpOf ā b̄` es una identidad `Nat`
+directa, sin razonar sobre divisibilidad.
+
+### Consecuencias
+
+* **Gödel I sobrevive**: `goedel_first_numeral`, con la base sancionada de siempre **menos
+  `tc_cons`**. D1 y el argumento modular **no se re‑demostraron**: son modulares.
+* `provCode_transfer` puentea las dos representaciones en **un** paso de Leibniz.
+* **D3 y Gödel II salen de la cadena activa** (ver ADR-013).
+* ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+
+---
+
+## ADR-013: La capa rastreada se pone en CUARENTENA, no se borra
+
+**Fecha:** 2026-08-18 · **Estado:** aceptada e implementada
+
+### Contexto
+
+La reparación de ADR-012 rompe 31 módulos: los 14 tags de `pcc_lineWF_tracked`, `hI_dot`, el chasis
+`CTree`, el KIT. Todos dependen de `prf_tc_cons'` — y `pcc_eval_carc (h t)` lo usa sobre argumentos
+**ABSTRACTOS**, donde la ecuación es **falsa** bajo la lectura numeral (medido en
+`sondeos/PilotoRastreada.lean`: daría un código de cabeza `⌈σ⌉` igual a uno de cabeza `⌈::⌉`).
+
+### Decisión
+
+Mover esos módulos a **`cuarentena/`** (fuera del build, dentro del repo). **No borrarlos.**
+
+### Justificación
+
+Sus teoremas son **formalmente correctos** pero se demostraron sobre una teoría que probaba `⊥`:
+eran **vacuos**. Apartarlos no pierde trabajo — reconoce que el suelo cedía. Y el análisis del grafo
+mostró que la recuperación es **estructurada**, no un rescate ciego:
+
+* hay un **keystone** (refundarlo desbloquea en cascada — `Sigma1CorePrf` devolvió **10 módulos**);
+* la cuarentena se parte en **dos niveles**: argumentos **concretos** (la vía numeral los cubre) y
+  argumentos **abstractos** (el muro real);
+* los 13 sitios críticos embudan en **5 lemas**.
+
+⚠️ Refundar **cambia enunciados**, no sólo pruebas: los códigos estáticos pasan de
+`termCode (formCode φ)` a `termCode (numeral (codeNat φ))`.
+
+Ver `cuarentena/README.md` y `PLAN-FRENTE-A.md`.
+
+---
 
 ## ADR-NNN: [Título]
 

@@ -1,6 +1,6 @@
 # FRENTE (a) — ¿vuelve la capa rastreada? (D3 y Gödel II)
 
-**Abierto:** 2026‑07‑27, tras ejecutar la reparación (`master`, HEAD `d6552b9`, 85 jobs).
+**Abierto:** 2026‑08‑19, tras ejecutar la reparación (`master`, HEAD `d6552b9`, 85 jobs).
 **Contexto:** `cuarentena/README.md`, `sondeos/PilotoRastreada.lean`, `PLAN-SORTES.md`.
 
 ---
@@ -98,7 +98,7 @@ existente.
 
 ## Estado
 
-### ✅ (a.1) — HECHO (2026‑07‑27). Build **95 jobs**, cuarentena **31 → 21**.
+### ✅ (a.1) — HECHO (2026‑08‑19). Build **95 jobs**, cuarentena **31 → 21**.
 
 `Sigma1CorePrf` refundado con códigos estáticos numerales, net‑0. Tres declaraciones cambiadas:
 

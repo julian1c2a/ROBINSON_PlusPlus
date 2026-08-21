@@ -1,5 +1,23 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
+> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+>
+> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
+> → [cuarentena/README.md](cuarentena/README.md).
+>
+> * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
+>   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
+> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   **numeral** `godelCN`.
+> * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
+> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+>
+> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
+> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
+> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+
 **Última actualización:** 2026-07-24 (HEAD `d8e9152`) — Estado global: **99 módulos** (Minimal 11 + Meta 77 + Full 11), **113 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`). **MÓDULO A de `NegVerifier` COMPLETO (§43)** (decodificador: biyección de fórmulas + cadenas + `decodeChain_prf`). **MÓDULO B en curso (§44)**: tabla de los 21 tags + dirección negativa ✅; nivel `⊢` des‑duplicado ✅; **19 `ax_lineWF` estructurales a accesores ✅** (net‑0); **B.3c EN CURSO**: `pcc_lineWF_tracked` — **`eqrefl` (tag 12) CERRADO** vía esquema ESTRICTO (`Meta/LineWFTrackedPrf.lean`) y el **`In`‑reflect de `axiomsCodeT` CERRADO** (`Meta/InAxiomsCodePrf.lean`, el nudo de `NegVerifier`); faltan `thy` (mecánico), `mp`, los 17 tags `=eq` y el `or_elim` ×21 → `hC_dot`. **Refactor de anclas**: `prf_axiomsCodeT_eq` nuevo, `prf_inAxC` pasa a teorema (net‑0, siguen 7). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
 
 **Gödel I — COMPLETO** (`goedel_first_undecidable_real'`): `⊬G ∧ ⊬¬G`, **sin ningún postulado gödeliano**, con la **reflexión como hipótesis META explícita** (`Reflects`), reducida a **ω‑consistencia clásica + `NegVerifier`** (`Meta/OmegaReflect.lean`). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales. **Gödel II** (`goedel_second'`) montado, **módulo `axiom d3`**.

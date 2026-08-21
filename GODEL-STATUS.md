@@ -1,5 +1,23 @@
 # Frente Gödel — Estado y Roadmap
 
+> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+>
+> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
+> → [cuarentena/README.md](cuarentena/README.md).
+>
+> * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
+>   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
+> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   **numeral** `godelCN`.
+> * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
+> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+>
+> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
+> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
+> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+
 **Last updated:** 2026-07-20 — ⚠️ **DOCUMENTO HISTÓRICO/DIAGNÓSTICO.** El estado vivo está en [NEXT-STEPS.md](NEXT-STEPS.md) (bloque «🎯 LO QUE QUEDA»), [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [AXIOMS.md](AXIOMS.md) y [CHANGELOG.md](CHANGELOG.md); si algo de aquí discrepa, **mandan esos**. Resumen al día: **Gödel I da SÓLO `⊬G`** (`goedel_first_real'`, real y sin postulado gödeliano alguno) — **la mitad `⊬¬G` NO está en la cadena real** (ver la corrección de auditoría 2026-07-13 en §N de abajo); su reducción existe (`reflects_of_omega`: `Reflects ⇐ ω‑consistencia + `NegVerifier`) pero **`NegVerifier` aún no está construido** (`PLAN-NEGVERIFIER.md`: módulo A ✅ COMPLETO, módulo B en curso). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales sobre el cálculo finitario `Prf`. **Gödel II** (`goedel_second'`) montado **módulo el único postulado gödeliano vivo, `axiom d3`**, ya reducido a UN SOLO lema (`d3_prf_of_chainOkDot`). **7 `axiom` de Lean** — el ancla de codificación es hoy `ax_axiomsCodeT_eq` (⊢) / `prf_axiomsCodeT_eq` (`Prf`); **el `ax_inAxC` que se cita más abajo ya NO es axioma, es teorema**. Build **101 jobs**, **87 módulos**, 0 sorrys, Lean v4.31.0. — (previo 2026-06-24) **NIVEL D REAL muy avanzado** (este documento, escrito 2026-06-06, describía el Nivel C con meta-axiomas; el proyecto ha progresado mucho — el contenido §1–§N de abajo es histórico). Estado actual: **Gödel I REAL sin postulados gödelianos** sobre el cálculo de Hilbert **finitario `Prf`** (`goedel_first_real`/`goedel_first_real'`; `#print axioms` = ω-reglas ambiente + `Full.ax_induction` + `ax_inAxC`, **sin** `diagonal_lemma`/`provFormula`/D2/D3). **D1 real** a nivel ⊢ (`repr_pos'`) **y finitario** (`repr_pos'_prf : Prf φ → Prf (provCodeC' φ)`). **D2 real ⊢** (`d2`). **Teorema de deducción finitario** (`Meta/HilbertDeduction.lean`) + **regla de confinamiento ∀ `qconf`** integrada en el verificador. **Fix de solidez FOL**: `subst_lift_cancel_formula` (axioma falso) → teorema. La vía clásica/legacy (Gödel I/II con `Dem`/`provFormula`/D2/D3 postulados) coexiste como andamiaje. **Pendiente para Gödel II 100% real** (`goedel_second_prf : ConsistentH → ¬ Prf Con'`): lema de Barendregt → inducción de listas en `Prf` → `d2_prf`/`d3_prf`. Estado vivo: [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [NEXT-STEPS.md](NEXT-STEPS.md), [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md), [CHANGELOG.md](CHANGELOG.md). — (histórico, 2026-06-06) Niveles B y C implementados con meta-axiomas.
 **Author:** Julián Calderón Almendros
 **Nivel del documento**: A (diagnóstico documental; no contiene código Lean).

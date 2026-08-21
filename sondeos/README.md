@@ -1,4 +1,4 @@
-# `sondeos/` — experimentos verificados de la sesión 2026‑07‑27
+# `sondeos/` — experimentos verificados de la sesión 2026‑08‑19
 
 **NO son módulos de producción y NO entran en el build de `lake`** (la `lean_lib` está enraizada en
 `ROBINSON_PlusPlus/`; estos ficheros quedan fuera). Se versionan porque **contienen resultados

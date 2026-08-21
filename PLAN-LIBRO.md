@@ -1,6 +1,6 @@
 # PLAN — Libro en LaTeX: *Incompletitud, formalizada*
 
-**Creado:** 2026‑07‑27 · **Estado:** plan aprobado, sin ejecutar · **Autor:** Julián Calderón Almendros
+**Creado:** 2026‑08‑19 · **Estado:** plan aprobado, sin ejecutar · **Autor:** Julián Calderón Almendros
 
 ---
 
@@ -65,7 +65,7 @@ extracción los vuelca a `.tex` antes de compilar. Nada de copiar‑pegar.
 
 ### Parte IV — Lo que no sale en los libros ← **el núcleo original**
 
-> **Reescrita el 2026‑07‑27.** La sesión de ese día produjo el material más valioso del libro: una
+> **Reescrita el 2026‑08‑19.** La sesión de ese día produjo el material más valioso del libro: una
 > inconsistencia real, su diagnóstico, **cuatro reparaciones que no funcionan**, la que sí, y el
 > coste. Nada de esto aparece en los manuales, porque los manuales presentan el resultado ya limpio.
 

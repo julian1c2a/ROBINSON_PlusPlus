@@ -37,7 +37,12 @@ estructural `provCodeC'`, con la cadena de Hilbert-Bernays-Löb:
   además requiere unificar `Prf.thy → axioms` (el verificador como teoría). Ver
   `project_godel_nivel_d_real` / análisis de D3.
 
-Las dos condiciones restantes —el **punto fijo** (`godelC' ⇔ ¬provCodeC' godelC'`)
+⚠️ **ACTUALIZADO 2026‑08‑19:** el punto fijo disponible es ahora `godelCN_fixedpoint`
+(`Meta/DiagonalNumeral.lean`), sobre la sentencia **numeral** `godelCN`; el de `godelC'` se retiró
+con `ax_tc_cons`. `goedel_second'` **no se ve afectado**: es modular, toma `fp_bwd` como hipótesis.
+Para instanciarlo hay que usar `godelCN` y su `and_elim_right godelCN_fixedpoint`.
+
+Las dos condiciones restantes —el **punto fijo** (`godelCN ⇔ ¬provCodeC' godelCN`)
 y la **necesitación** del condicional del punto fijo, junto con la
 **indemostrabilidad ω** de `G` (mitad de Gödel I a nivel ω)— se exponen como
 **hipótesis explícitas** (no se postulan a la ligera): su realización honesta

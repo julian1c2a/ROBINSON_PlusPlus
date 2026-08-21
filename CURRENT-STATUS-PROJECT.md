@@ -1,6 +1,24 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-**Last updated:** 2026-07-24 (HEAD `d8e9152`)
+> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+>
+> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
+> → [cuarentena/README.md](cuarentena/README.md).
+>
+> * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
+>   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
+> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   **numeral** `godelCN`.
+> * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
+> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+>
+> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
+> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
+> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+
+**Last updated:** 2026-08-21 12:00 (HEAD `cf774f9`+)   ← auditoría; datos de build de 2026-08-19 00:44
 **Author**: Julián Calderón Almendros
 
 ---
@@ -9,8 +27,8 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **85** (Minimal/ 11 + Meta/ 63 + Full/ 11) + barrel `Meta.lean` |
-| Modules sin sorry | 85 / 85 ✅ |
+| Total modules | **82 activos** (Minimal/ 11 + Meta/ 59 + Full/ 11) + barrel `Meta.lean` · **+21 en `cuarentena/`** |
+| Modules sin sorry | 82 / 82 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-008) |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
