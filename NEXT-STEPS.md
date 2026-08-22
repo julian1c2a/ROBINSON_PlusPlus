@@ -4,10 +4,10 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑19 · HEAD `a1c6d4d` · `master` limpio y verde · Lean v4.31.0**
-**95 jobs · 82 módulos activos (Minimal 11 + Meta 59 + Full 11) + 21 en `cuarentena/` · 9 `sondeos/`**
-**7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 5 coincidencias de `sorry` son
-comentarios; tres se refieren a otro proyecto).
+**Estado 2026‑08‑22 23:42 · `master` limpio y verde · Lean v4.31.0**
+**97 jobs · 83 módulos activos (Minimal 11 + Meta 61 + Full 11) + 21 en `cuarentena/` · 9 `sondeos/`**
+**7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
+comentarios).
 
 > ## ✅ LA INCONSISTENCIA CONOCIDA ESTÁ REPARADA
 >
@@ -32,29 +32,51 @@ comentarios; tres se refieren a otro proyecto).
 > Footprint de Gödel I: `[propext, choice, Quot.sound, dne, gen, imp_intro, ax_induction,
 > ax_list_induction, ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
 
-> ## ▶▶ DÓNDE SE RETOMA: **frente (a.2)**, la escalera
+> ## ✅✅ LA ESCALERA (a.2) ESTÁ **COMPLETA — 4 de 4**
 >
-> **Objetivo:** `pcc_dot_cons (h t) : Prf (provFromCode (eqCodeFn (tcFn (cons h t)) (consT (tcFn h) (tcFn t))))`
-> — el `prf_cons_eval` **internalizado y para argumentos ABSTRACTOS**. Con él vuelven las 6 raíces
-> que quedan en cuarentena, y con ellas D3 y Gödel II.
+> `pcc_dot_cons` **HECHO** (`Meta/DotConsPrf.lean`, 2026‑08‑22), footprint
+> `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]` — la base sancionada, **sin `tc_cons`**:
 >
-> ### 🎯 ESTADO DE LA ESCALERA — **2 de 4 resueltos**
+> ```lean
+> pcc_dot_cons (h t : Term) :
+>     Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t))))
+> ```
+>
+> o sea `⊢ Prov(⌜ cons(ḣ,ṫ) = (cons h t)˙ ⌝)` — el `prf_cons_eval` **internalizado y para argumentos
+> ABSTRACTOS**.
 >
 > | peldaño | estado | dónde |
 > |---|---|---|
-> | `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ **HECHO** | `Meta/EvalArithPrf.lean` — `pcc_eval_add`, por `prf_nat_induction`, ~440 líneas. Footprint limpio **tras** la reparación |
-> | `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ✅ **HECHO** | `Meta/EvalMulPrf.lean` — `pcc_eval_mul`, net‑0 salvo `prf_axiomsCodeT_eq` (igual que `+`). **Consume `pcc_eval_add`** en el paso |
-> | `div2` | ✅ **atajo, sin inducción** | `sondeos/Div2Gen.lean`: `prf_div2_double_all` (`Prf.gen` sobre `prf_div2_double`, net‑0) + `pcc_thm_inst` |
-> | `Prov(⌈ (cons h t)˙ = cons(ḧ,ṫ) ⌉)` | ⏳ ensamblaje | vía `pcc_axiom_inst ax_L0_cons_def` + `cpOf` + los tres anteriores |
+> | `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ | `Meta/EvalArithPrf.lean` — `pcc_eval_add`, por `prf_nat_induction`, ~440 líneas |
+> | `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ✅ | `Meta/EvalMulPrf.lean` — `pcc_eval_mul`. **Consume `pcc_eval_add`** en el paso |
+> | `div2` | ✅ **atajo, sin inducción** | `prf_div2_double_all` (`Prf.gen` sobre `prf_div2_double`) + `pcc_thm_inst` |
+> | `Prov(⌈ cons(ḣ,ṫ) = (cons h t)˙ ⌉)` | ✅ | `Meta/DotConsPrf.lean` — ensamblaje en 3 fases, **sin inducción nueva** |
 >
-> ### ▶ EL SIGUIENTE PASO CONCRETO: `pcc_eval_mul`
+> ### Cómo salió (y por qué fue barato)
 >
-> Copiar la estructura de `Meta/EvalArithPrf.lean` (que hace `+`) para `·`:
-> `evalMulCode a b := eqCodeFn (mulcT (tcFn a) (tcFn b)) (tcFn (mul a b))`, base `b = 0` con
-> `pcc_axiom_inst ax8_mul_zero`, paso con `ax9_mul_succ` (`x·σy = x·y + x`) apoyado en
-> **`pcc_eval_add`**, y cierre con `prf_nat_induction`. Las piezas de transporte dentro de `Prov`
-> (`pcc_leibniz_apply`, `pcc_eq_trans_code`, `pcc_congr_succ_code`, `substtc_inv_*`) **ya existen**
-> en `EvalArithPrf` y son reutilizables.
+> `cons` **no tiene ecuaciones recursivas propias**: `ax_L0_cons_def` lo define como
+> `div2 (cantor_poly h (σt))`, o sea puro `+`, `·` y `div2`, los tres ya internalizados. Así que el
+> peldaño es **ensamblaje**, no inducción. Tres fases, todas verdes a la primera:
+>
+> * **(A)** `substCodeF` **computa por `rfl`** sobre el cuerpo de `ax_L0_cons_def`, igual que sobre
+>   `ax5`/`ax9` (`prf_substfc_arith_open`). Era la pregunta arriesgada; salió que sí.
+> * **(B)** el polinomio se evalúa dentro de `Prov` en **cinco pasos**, alternando reescrituras
+>   internas (`pcc_rw`) con reescrituras **de código**, que son gratis (`succcT (tcFn x) = tcFn (σx)`
+>   es `prf_tc_succ'`, y `tcFn` es congruente ⇒ todo teorema OBJETO se «dota» sin coste).
+> * **(C)** el `div2` se cancela contra `prf_div2_double` vía `pcc_thm_inst`; el puente con el
+>   polinomio es **`prf_cons_double`** (`Div2ParityPrf`), que es objeto y se dota con `prf_congr_tcFn`.
+>
+> 🔑 **La idea que abarató (B):** el polinomio `(x+y)·σ(x+y)+2y` menciona `x+y` **dos veces**.
+> Reescribir por posiciones exigiría congruencias a cada profundidad — pero `substfc` sustituye
+> **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
+> contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
+> patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena**
+>
+> El objetivo por el que se construyó la escalera. `pcc_eval_carc` se reconstruye ahora como
+> `pcc_axiom_inst ax_carc` + `pcc_dot_cons`, y con él deberían caer las 6 raíces. **Empezar por
+> `EvalListPrf`**, que es el keystone (bloquea 9 de los 15 no‑raíz).
 >
 > ### Estado de la cuarentena: **21 módulos**, 6 raíces
 >

@@ -146,16 +146,45 @@ pcc_thm_inst : ∀ φ, Prf (∀. φ) → ∀ w, Prf (provFromCode (substfc zero 
 | `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ **HECHO** (`pcc_eval_add`) |
 | `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ✅ **HECHO** (`Meta/EvalMulPrf.lean`, `pcc_eval_mul`) |
 | `div2` | ✅ **resuelto por atajo** (`Prf.gen` + `pcc_thm_inst`), sin inducción |
-| `Prov(⌈ (cons h t)˙ = cons(ḧ,ṫ) ⌉)` | ⏳ ensamblaje vía `ax_L0_cons_def` + `cpOf` |
+| `Prov(⌈ cons(ḣ,ṫ) = (cons h t)˙ ⌉)` | ✅ **HECHO** (`Meta/DotConsPrf.lean`, `pcc_dot_cons`) |
 
-#### Lo que queda enunciable ahora
+### ✅ (a.2) — **COMPLETA** (2026‑08‑22 23:42). Build **97 jobs**.
 
-Quedan **6 raíces** en cuarentena: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`,
-`InAxiomsCodePrf`, `LineWFTrackedPrf`. Y **`EvalListPrf` es el nuevo keystone**: bloquea a 9 de los
-15 no‑raíz restantes.
+```lean
+pcc_dot_cons (h t : Term) :
+    Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t))))
+```
 
-El objetivo sigue siendo `pcc_dot_cons`, y **ahora SÍ se puede enunciar**, porque `pcc_axiom_inst`
-y `eqCodeFn` han vuelto.
+Footprint `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]` — la base sancionada, **sin
+`tc_cons`**. Igual que `pcc_eval_add` y `pcc_eval_mul`.
+
+**No hizo falta inducción nueva.** `cons` no tiene ecuaciones recursivas propias: `ax_L0_cons_def` lo
+define como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, los tres ya internalizados. El
+peldaño es **ensamblaje**, en tres fases:
+
+| fase | qué | resultado |
+|---|---|---|
+| **A** | ¿computa `substCodeF` por `rfl` sobre el cuerpo de `ax_L0_cons_def`? (la pregunta arriesgada) | **Sí**, igual que sobre `ax5`/`ax9`. `prf_axL0_body_computes` |
+| **B** | evaluar el polinomio dentro de `Prov` | 5 pasos, alternando `pcc_rw` (interno) con reescrituras **de código** (gratis) |
+| **C** | cancelar el `div2` | `pcc_thm_inst` sobre `prf_div2_double_all`; puente `prf_cons_double`, dotado con `prf_congr_tcFn` |
+
+#### Las dos lecciones que abarataron el ensamblaje
+
+1. **Todo teorema OBJETO se «dota» gratis.** `tcFn` es un símbolo de función, así que
+   `prf_congr_tcFn` transporta cualquier `Prf (a =eq b)` a `Prf (ȧ =eq ḃ)` a nivel de código, **sin
+   entrar en `Prov`**. Por eso `prf_cons_double` (`(cons h t)·2 = cpOf h t`, `Div2ParityPrf`) sirve
+   de puente sin coste, y por eso los pasos `σ(ẋ) ⟶ (σx)˙` son gratis (`prf_tc_succ'`).
+2. **`substfc` sustituye TODAS las ocurrencias del hueco.** El polinomio `(x+y)·σ(x+y)+2y` menciona
+   `x+y` dos veces; reescribir por posiciones exigiría congruencias a cada profundidad. Con el
+   contexto `Ac := C[v₀]` un **único** `pcc_leibniz_apply` cierra las dos. `pcc_rw` empaqueta el
+   patrón y sirve para cualquier evaluación futura dentro de `Prov`.
+
+#### ▶ Lo siguiente: repatriar la cuarentena
+
+Quedan **6 raíces**: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`, `InAxiomsCodePrf`,
+`LineWFTrackedPrf`. **`EvalListPrf` es el keystone**: bloquea a 9 de los 15 no‑raíz restantes.
+
+`pcc_eval_carc` se reconstruye como `pcc_axiom_inst ax_carc` + `pcc_dot_cons`.
 
 ### ⚠️ Trampa encontrada al ejecutar (a.1)
 

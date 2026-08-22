@@ -14,7 +14,42 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
+> **Último build verificado:** 97 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑22 23:42).
+
+---
+
+## 2026-08-22 23:42 — ✅ La ESCALERA (a.2) COMPLETA: `pcc_dot_cons`
+
+**`Meta/DotConsPrf.lean`** (nuevo). Cierra el cuarto y último peldaño de la escalera de
+Σ₁‑completitud internalizada:
+
+```lean
+pcc_dot_cons (h t : Term) :
+    Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t))))
+```
+
+o sea `⊢ Prov(⌜ cons(ḣ,ṫ) = (cons h t)˙ ⌝)` — `prf_cons_eval` **internalizado y para argumentos
+ABSTRACTOS**. Footprint `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]`: la base sancionada,
+**sin `tc_cons`**, igual que `pcc_eval_add` y `pcc_eval_mul`.
+
+**No hizo falta inducción nueva.** `cons` no tiene ecuaciones recursivas propias — `ax_L0_cons_def`
+lo define como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, ya internalizados. Tres fases:
+
+* **(A)** `prf_axL0_body_computes`: `substCodeF` **computa por `rfl`** sobre el cuerpo de
+  `ax_L0_cons_def`, igual que sobre `ax5`/`ax9`. Era la pregunta arriesgada de la fase.
+* **(B)** el polinomio de Cantor se evalúa dentro de `Prov` en **cinco** pasos.
+* **(C)** el `div2` se cancela con `pcc_thm_inst` sobre `prf_div2_double_all`; el puente es
+  `prf_cons_double` (`Div2ParityPrf`).
+
+Dos herramientas nuevas, reutilizables: **`pcc_rw`** (reescritura interna en un hueco de
+código‑contexto) y **`pcc_rw_div2`** (su molde para `L = div2(D ·)`).
+
+**Lecciones:** (1) todo teorema OBJETO se «dota» **gratis** con `prf_congr_tcFn`, sin entrar en
+`Prov`; (2) `substfc` sustituye **todas** las ocurrencias del hueco, así que un único
+`pcc_leibniz_apply` cubre las repeticiones del polinomio — de ahí 5 pasos y no 15.
+
+**Siguiente:** repatriar las 6 raíces de `cuarentena/`, empezando por el keystone `EvalListPrf`.
+`pcc_eval_carc` = `pcc_axiom_inst ax_carc` + `pcc_dot_cons`.
 > **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
 > **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
 

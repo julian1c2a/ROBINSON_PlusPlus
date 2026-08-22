@@ -71,6 +71,7 @@ import ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 import ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf
 import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+import ROBINSON_PlusPlus.Meta.DotConsPrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
 import ROBINSON_PlusPlus.Meta.AxiomListCode
 import ROBINSON_PlusPlus.Meta.CodeDecode
