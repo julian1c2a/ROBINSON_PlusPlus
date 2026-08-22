@@ -144,7 +144,7 @@ pcc_thm_inst : ∀ φ, Prf (∀. φ) → ∀ w, Prf (provFromCode (substfc zero 
 | peldaño | estado |
 |---|---|
 | `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ **HECHO** (`pcc_eval_add`) |
-| `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ⏳ por construir, **plantilla en `EvalArithPrf`** |
+| `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ✅ **HECHO** (`Meta/EvalMulPrf.lean`, `pcc_eval_mul`) |
 | `div2` | ✅ **resuelto por atajo** (`Prf.gen` + `pcc_thm_inst`), sin inducción |
 | `Prov(⌈ (cons h t)˙ = cons(ḧ,ṫ) ⌉)` | ⏳ ensamblaje vía `ax_L0_cons_def` + `cpOf` |
 

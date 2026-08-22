@@ -43,7 +43,7 @@ comentarios; tres se refieren a otro proyecto).
 > | peldaño | estado | dónde |
 > |---|---|---|
 > | `Prov(⌈ ẋ + ỳ = (x+y)˙ ⌉)` | ✅ **HECHO** | `Meta/EvalArithPrf.lean` — `pcc_eval_add`, por `prf_nat_induction`, ~440 líneas. Footprint limpio **tras** la reparación |
-> | `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ⏳ **SIGUIENTE** | por construir; **plantilla exacta = `EvalArithPrf`**. Su paso inductivo (`x·σy = x·y + x`) se apoya en el peldaño de `+`, que ya está |
+> | `Prov(⌈ ẋ · ỳ = (x·y)˙ ⌉)` | ✅ **HECHO** | `Meta/EvalMulPrf.lean` — `pcc_eval_mul`, net‑0 salvo `prf_axiomsCodeT_eq` (igual que `+`). **Consume `pcc_eval_add`** en el paso |
 > | `div2` | ✅ **atajo, sin inducción** | `sondeos/Div2Gen.lean`: `prf_div2_double_all` (`Prf.gen` sobre `prf_div2_double`, net‑0) + `pcc_thm_inst` |
 > | `Prov(⌈ (cons h t)˙ = cons(ḧ,ṫ) ⌉)` | ⏳ ensamblaje | vía `pcc_axiom_inst ax_L0_cons_def` + `cpOf` + los tres anteriores |
 >
