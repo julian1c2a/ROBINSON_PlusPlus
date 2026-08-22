@@ -79,8 +79,12 @@ theorem goedel_second (hcon : Consistent) : ¬ (axioms ⊢ consistencyFormula)  
 > quedó cerrada el 2026-06-13 vía `dne` clásica (`goedel_first_unrefutable`/`goedel_first_undecidable`).
 > **Eso era cierto sólo en la capa LEGACY** (`Meta/Incompleteness.lean`, que postulaba D2/D3), y esa capa
 > se **RETIRÓ en F7a** (`f03eacf`): **esos dos teoremas ya no existen en el código**. La cadena real
-> establece **sólo `⊬G`** (`goedel_first_real'`, ω‑consistencia). La **indecidibilidad de `G` está
-> PENDIENTE** de re‑derivar sobre la cadena real (tarea abierta, independiente de D3).
+> establece **sólo `⊬G`**. La **indecidibilidad de `G` está PENDIENTE** de re‑derivar sobre la cadena
+> real (tarea abierta, independiente de D3).
+>
+> ↻ **Actualización 2026‑08‑23:** el `goedel_first_real'` que esta nota citaba como «la cadena real»
+> **tampoco existe ya** — cayó con la reparación (ADR‑012). Hoy `⊬G` es **`goedel_first_numeral`**
+> (§3.24.5). El diagnóstico de la nota sigue siendo válido palabra por palabra: falta `NegVerifier`.
 
 ---
 
