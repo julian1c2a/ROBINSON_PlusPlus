@@ -22,6 +22,7 @@ lake env lean sondeos/<fichero>.lean      # desde la raíz de RPP, NUNCA desde F
 | `PilotoAislado.lean` | fase 2 · familia INVARIANCIA | `substtc_inv_termCode_*` **sin** la lectura sintáctica. Independencia probada por **aislamiento de importaciones**, comprobada por máquina con `#noExiste`. |
 | `Magnitud.lean` | S5 · profundidad | `consDepth (formCode ax_tc_succ) = 3873`; log₂(N) de `ax_tc_cons` ≈ 8,66 × 10⁷⁸. |
 | `S1Audit.lean` | S1 · auditoría | ⚠️ **Sólo compila en la rama `sondeo/s1-sin-ax-tc-cons`** (necesita `prf_tc_cons`/`tc_cons` como axiomas de Lean). En `master` no. |
+| `CarcPayoff.lean` | (a.2) · **el rédito de `pcc_dot_cons`** | ✅ **`pcc_eval_carc` RECUPERADO**, mismo enunciado y mismo footprint. El viejo (`cuarentena/EvalListPrf.lean:123`) cerraba con `prf_tc_cons'` — el puente que murió con la reparación; la sustitución es **un único `pcc_rw` con `pcc_dot_cons`**, y los pasos 1‑3 quedan intactos. Confirma que el keystone `EvalListPrf` es repatriable. |
 
 ## ⚠️ Dos trampas metodológicas aprendidas hoy (no repetir)
 

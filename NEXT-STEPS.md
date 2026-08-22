@@ -72,11 +72,17 @@ comentarios).
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
 >
-> ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena**
+> ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena** — el rédito ya está VERIFICADO
 >
-> El objetivo por el que se construyó la escalera. `pcc_eval_carc` se reconstruye ahora como
-> `pcc_axiom_inst ax_carc` + `pcc_dot_cons`, y con él deberían caer las 6 raíces. **Empezar por
-> `EvalListPrf`**, que es el keystone (bloquea 9 de los 15 no‑raíz).
+> **`sondeos/CarcPayoff.lean`: `pcc_eval_carc` YA VUELVE**, con el mismo enunciado y el mismo
+> footprint. El viejo (`cuarentena/EvalListPrf.lean:123`) cerraba con `prf_tc_cons'` — el puente que
+> murió con la reparación — y la sustitución es **un único `pcc_rw` con `pcc_dot_cons`**; los pasos
+> 1‑3 (instancia de `ax_carc` + los dos `substfc` computados) quedan **intactos**.
+>
+> ⇒ **Empezar por `EvalListPrf`**, el keystone (bloquea 9 de los 15 no‑raíz). El patrón de arreglo
+> es mecánico: **buscar cada `prf_tc_cons'` y sustituirlo por `pcc_rw` + `pcc_dot_cons`**. Ojo: el
+> transporte pasa de ser **de código** (fuera de `Prov`) a ser **interno** (dentro de `Prov`), así
+> que hay que dar el contexto `G` y su ecuación de `substfc` — trivial con los `prf_substtc_*`.
 >
 > ### Estado de la cuarentena: **21 módulos**, 6 raíces
 >
