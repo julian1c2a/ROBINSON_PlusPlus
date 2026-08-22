@@ -1,15 +1,17 @@
 # PLAN — Libro en LaTeX: *Incompletitud, formalizada*
 
-**Creado:** 2026‑08‑19 · **Estado:** plan aprobado, sin ejecutar · **Autor:** Julián Calderón Almendros
+**Creado:** 2026‑08‑19 · **Revisado:** 2026‑08‑22 23:55 · **Estado:** plan aprobado, **fase 0 sin
+arrancar** · **Autor:** Julián Calderón Almendros
 
 ---
 
 ## 1 · Contexto y propósito
 
-El proyecto `ROBINSON_PlusPlus` lleva ~99 módulos Lean 4 formalizando los teoremas de
-incompletitud de Gödel sobre un kernel FOL⁼ propio. Todo el conocimiento acumulado vive hoy en
-**26 ficheros `.md`** que son **notas de trabajo**, no exposición: `NEXT-STEPS.md` es un puntero de
-reanudación, `CHANGELOG.md` un diario, `DECISIONS.md` un registro de ADRs.
+El proyecto `ROBINSON_PlusPlus` lleva **83 módulos Lean 4 activos** (+21 en cuarentena, +10 sondeos)
+formalizando los teoremas de incompletitud de Gödel sobre un kernel FOL⁼ propio. Todo el
+conocimiento acumulado vive hoy en **24 ficheros `.md`** que son **notas de trabajo**, no
+exposición: `NEXT-STEPS.md` es un puntero de reanudación, `CHANGELOG.md` un diario, `DECISIONS.md`
+un registro de ADRs.
 
 El libro convierte ese material en una **obra expositiva** con tres hilos entretejidos en todo
 momento:
@@ -58,10 +60,21 @@ extracción los vuelca a `.tex` antes de compilar. Nada de copiar‑pegar.
 6. **Representabilidad y D1** — de `Prf φ` a `Prov(⌜φ⌝)`.
 
 ### Parte III — Los teoremas
-7. **El lema diagonal y Gödel I** — punto fijo real, `goedel_first_real'`.
+7. **El lema diagonal y Gödel I** — punto fijo real, **`godelCN_fixedpoint`** → **`goedel_first_numeral`**.
+   ⚠️ El código va escrito como **numeral** (capítulo 14 explica por qué); y el capítulo debe decir
+   que sólo se tiene **`⊬G`**: la indecidibilidad (`⊬¬G`) sigue **abierta** — ver capítulo 9bis.
 8. **Las condiciones de derivabilidad** — D1, D2 y el muro de D3.
 9. **La inducción como precio** — por qué Q sola no basta y `Full` es imprescindible.
    *Material:* `AXIOMS.md` §1.1 (ya escrito).
+
+9bis. **La mitad que falta: `⊬¬G`** ← **añadido 2026‑08‑22**. Casi todos los libros enuncian Gödel I
+   como *«G es indecidible»* y despachan la segunda mitad en un párrafo. En la formalización **no es
+   un párrafo**: `⊬G` sale de la consistencia, pero `⊬¬G` necesita **reflexión** — de
+   `Prov(⌜φ⌝)` volver a `φ` —, y eso exige un **verificador negativo** que no se obtiene gratis.
+   El capítulo cuenta: (a) que el proyecto llegó a «tenerlo» y era **falso** (`provFormula_repr`,
+   retirado en F7a); (b) que el obstáculo de fondo es el **intuicionismo** del kernel FOL, no la
+   ω‑consistencia; (c) que **Rosser sería peor**, no mejor, en este marco.
+   *Material:* `PLAN-NEGVERIFIER.md`, memoria `project-godel-first-complete`, `GODEL-STATUS.md`.
 
 ### Parte IV — Lo que no sale en los libros ← **el núcleo original**
 
@@ -115,12 +128,38 @@ extracción los vuelca a `.tex` antes de compilar. Nada de copiar‑pegar.
     una teoría inconsistente?* Y cómo se recupera: **keystone** y **niveles** (argumentos concretos
     vs abstractos). *Material:* `cuarentena/README.md`, `PLAN-FRENTE-A.md`.
 
-16. **Método** — qué funcionó al formalizar: trocear y compilar entre pasos; verificación
-    adversarial; `#print axioms` como auditoría; y las **trampas caras**, todas reales:
-    no lanzar sondeos contra un árbol que cambia; `lake build` puede dar **verde sin construir lo
-    que crees** (la `lean_lib` sólo construye lo alcanzable desde el módulo raíz — señal de alarma:
-    el número de jobs no cambia); y filtrar **comentarios de bloque** al buscar usos, o una
-    cuarentena de 31 se infla a 72. *Material:* memorias `feedback-*`.
+16. **La reconstrucción: internalizar en vez de reescribir** ← **añadido 2026‑08‑22**.
+    El capítulo que cierra el arco de la Parte IV, y el que tiene **moraleja positiva**. Roto el
+    puente `prf_tc_cons'`, había dos vías: reescribir los 21 módulos caídos uno a uno, o **reconstruir
+    el puente dentro de `Prov`** con un solo teorema. Se eligió la segunda ([ADR‑014](DECISIONS.md)).
+    * **Por qué se pudo:** `cons` **no tiene ecuaciones recursivas propias** — `ax_L0_cons_def` lo
+      define por `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, ya internalizados. Lo que
+      parecía un quinto peldaño de inducción resultó ser **ensamblaje**. *Lección general: antes de
+      inducir, mirar si el símbolo está definido o es primitivo.*
+    * **Las dos técnicas que lo abarataron**, ambas exportables a cualquier formalización con una
+      capa de códigos:
+      1. **Dotar un teorema OBJETO es gratis.** `tcFn` es un símbolo de función ⇒ es congruente ⇒
+         cualquier `⊢ a = b` sube a `⊢ ȧ = ḃ` **a nivel de código, sin entrar en `Prov`**. La mitad
+         del trabajo que parecía «interno» no lo era.
+      2. **La sustitución cubre todas las ocurrencias del hueco.** El polinomio de Cantor menciona
+         `x+y` dos veces; con el contexto `Ac := C[v₀]` un **único** paso de Leibniz cierra las dos.
+         Cinco pasos en vez de quince.
+    * **Y el método:** el rédito se **verificó antes de celebrarlo** — `sondeos/CarcPayoff.lean`
+      reconstruye `pcc_eval_carc` con el mismo enunciado y footprint. «Debería desbloquear» no es un
+      resultado; «desbloquea, aquí está compilado» sí.
+    *Material:* `Meta/DotConsPrf.lean`, `sondeos/CarcPayoff.lean`,
+    `doc/REFERENCE-Incompleteness.md` §3.25, memoria `project-escalera-sigma1`.
+
+17. **Método** — qué funcionó al formalizar: trocear y compilar entre pasos; **probar primero lo más
+    arriesgado** (la fase A de `pcc_dot_cons` preguntaba si `substCodeF` computa por `rfl`: si no,
+    todo lo demás sobraba); verificación adversarial; `#print axioms` como auditoría; y las
+    **trampas caras**, todas reales: no lanzar sondeos contra un árbol que cambia; `lake build` puede
+    dar **verde sin construir lo que crees** (la `lean_lib` sólo construye lo alcanzable desde el
+    módulo raíz — señal de alarma: el número de jobs no cambia); filtrar **comentarios de bloque** al
+    buscar usos, o una cuarentena de 31 se infla a 72; y el fallo de documentación que descubrió la
+    auditoría del 2026‑08‑22: **los documentos de estado se actualizan por su banner y no por su
+    cuerpo** — un ADR llevaba un mes diciendo «no implementado» sobre algo hecho.
+    *Material:* memorias `feedback-*`.
 
 ### Apéndices
 - A. Inventario de axiomas con su justificación (`AXIOMS.md`).
@@ -156,16 +195,26 @@ libro/
 
 ## 5 · Orden de ejecución
 
-| fase | entregable | por qué en este orden |
-|---|---|---|
-| **0** | esqueleto `libro/` + `Makefile` + un capítulo piloto | validar la cadena LaTeX **y** el extractor antes de escribir |
-| **1** | `scripts/extraer.py` + capítulo 2 (kernel) | el kernel es estable y no está afectado por la inconsistencia |
-| **2** | Parte IV, capítulos 11 y 12 | **escribir ahora, mientras el episodio está fresco** — es el material más valioso y el más fácil de perder |
-| **3** | Partes I–III | exposición sistemática; se apoya en `doc/REFERENCE-*.md` ya escritos |
-| **4** | Apéndices y bibliografía | mecánico |
+| fase | entregable | estado | por qué en este orden |
+|---|---|---|---|
+| **0** | esqueleto `libro/` + `Makefile` + un capítulo piloto | ⏳ **sin arrancar** | validar la cadena LaTeX **y** el extractor antes de escribir |
+| **1** | `scripts/extraer.py` + capítulo 2 (kernel) | ⏳ | el kernel es estable y no está afectado por la inconsistencia |
+| **2** | Parte IV, capítulos 11–13 y 16 | ⏳ | **escribir ahora, mientras el episodio está fresco** — es el material más valioso y el más fácil de perder |
+| **3** | Partes I–III (+ 9bis) | ⏳ | exposición sistemática; se apoya en `doc/REFERENCE-*.md` ya escritos |
+| **4** | Apéndices y bibliografía | ⏳ | mecánico |
 
 ⚠️ **La fase 2 va deliberadamente antes que la I–III.** El capítulo de la inconsistencia se escribe
-mejor ahora que dentro de seis meses, y no depende de que la reparación esté terminada.
+mejor ahora que dentro de seis meses.
+
+✅ **La Parte IV ya no depende de nada**: el arco completo — inconsistencia → diagnóstico → cuatro
+reparaciones fallidas → la que funciona → la cuarentena → **la reconstrucción** (cap. 16) — está
+cerrado y compilando. Era la única razón por la que la fase 2 podía quedarse a medias.
+
+**Materia prima ya disponible, verificada y citable** (nada de esto hay que reconstruirlo):
+`sondeos/` (10 experimentos compilados, con su `README.md`), `cuarentena/README.md` (grafo de
+recuperación), `DECISIONS.md` ADR‑012/013/014, `doc/REFERENCE-Incompleteness.md` §3.24–§3.25, y las
+memorias `project-inconsistencia-tcfn-cons`, `project-reparacion-via-numeral`,
+`project-escalera-sigma1`, `feedback-auditoria-footprint`.
 
 ---
 
@@ -173,13 +222,27 @@ mejor ahora que dentro de seis meses, y no depende de que la reparación esté t
 
 El libro **no bloquea ni es bloqueado** por la reparación de la inconsistencia:
 
-- Partes I–III describen lo que **ya está probado y compila** (kernel, Q++, verificador, Gödel I).
-- La Parte IV documenta el problema **y** su reparación; el capítulo 12 se completa cuando la vía
-  de tipos esté implementada.
-- ⚠️ **Aviso editorial obligatorio:** mientras la reparación no esté hecha, el libro debe decir
-  explícitamente que la teoría objeto **en su forma actual es inconsistente**, y que los resultados
-  de la Parte III son formalmente correctos pero **vacuos** sobre ella. Publicar Gödel I sin esa
-  advertencia sería engañoso.
+- Partes I–III describen lo que **ya está probado y compila** (kernel, Q++, verificador, Gödel I
+  vía `goedel_first_numeral`).
+- La Parte IV documenta el problema, su reparación (capítulos 11–15) **y la reconstrucción**
+  (capítulo 16). El arco está **cerrado narrativamente**: se puede escribir entero hoy.
+
+### ⚠️ Aviso editorial obligatorio — **reformulado 2026‑08‑22**
+
+La versión anterior de este aviso decía *«mientras la reparación no esté hecha, el libro debe decir
+que la teoría objeto es inconsistente»*. **La reparación está hecha** (2026‑08‑18/19), así que el
+aviso cambia — y el nuevo es más delicado, no menos:
+
+> El libro **debe decir explícitamente** que lo que se retiró fue la inconsistencia **conocida y
+> localizada** (`ax_tc_cons`), y que **eso no es una prueba de consistencia** de Q++ extendido.
+> Gödel I (`goedel_first_numeral`) es un teorema real sobre la teoría **reparada**; presentarlo como
+> «Gödel I sobre una teoría consistente» sería engañoso, igual que lo habría sido publicarlo antes
+> sin advertir del ⊥.
+
+Y un segundo aviso, propio de la Parte III:
+
+> Gödel I está **a medias**: sólo `⊬G`. La indecidibilidad (`⊬¬G`) **no está cerrada** en la cadena
+> real — ver capítulo 9bis. El libro no puede enunciar «G es indecidible» sin esa salvedad.
 
 ---
 

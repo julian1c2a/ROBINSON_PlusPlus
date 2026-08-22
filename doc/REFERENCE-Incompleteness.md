@@ -6,23 +6,52 @@
 > todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
 > `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral`
 > → reglas `ind`/`listInd`).
-> **Ficheros `.lean`:** la cadena `Meta/` desde `Hilbert.lean` hasta `D3InDotPrf.lean` (ver la tabla de
-> módulos §1 del [índice raíz](../REFERENCE.md); barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)).
+> **Ficheros `.lean`:** la cadena `Meta/` (61 módulos activos, barrel
+> [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **21 módulos en `cuarentena/`**, que **NO están
+> en el build** (ver [cuarentena/README.md](../cuarentena/README.md)).
 
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
-`Prf` — Gödel I real (`goedel_first_real'`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
-(`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3 por el plan 12‑A
-(Σ₁‑completitud provable: capa Δ₀ del verificador + evaluación provable + reflexión punteada, ruta B).
-**Last updated:** 2026-07-12 · Lean v4.31.0.
+`Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
+(`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
+**Last updated:** 2026-08-22 23:55 · Lean v4.31.0.
+
+> ## ⚠️ ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
+>
+> **Build 97 jobs · 83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 en `cuarentena/`
+> + 10 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
+>
+> ### Dos cambios estructurales que este nodo documenta a partir de §3.24
+>
+> 1. **La REPARACIÓN (2026‑08‑18/19, [ADR‑012](../DECISIONS.md)).** `ax_tc_cons` **retirado** de
+>    `axioms`: hacía la teoría objeto **inconsistente**. Los códigos de Gödel pasan a escribirse como
+>    **NUMERALES** (`numeral (codeNat φ)`), no como árboles `cons`. En consecuencia:
+>    * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO
+>      EXISTEN.** Gödel I es hoy **`goedel_first_numeral`** (§3.24.2), sobre la sentencia `godelCN`.
+>    * 21 módulos a **cuarentena** ([ADR‑013](../DECISIONS.md)) — sus teoremas eran formalmente
+>      correctos pero **vacuos**, probados sobre una teoría que probaba ⊥.
+>    * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+> 2. **La ESCALERA (a.2, 2026‑08‑19/22).** La Σ₁‑completitud **internalizada** que devuelve la
+>    cuarentena: `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (§3.25). **Completa.**
+>
+> **Secciones §3.15–§3.23 son ANTERIORES a la reparación.** Lo que describen sobre la capa rastreada
+> (los 21 tags, `hI_dot`, el chasis, el KIT) sigue siendo una descripción fiel del **código en
+> `cuarentena/`**, pero **ese código no está en el build** y sus enunciados cambiarán al repatriarse
+> (los códigos estáticos pasan de `termCode (formCode φ)` a `termCode (numeral (codeNat φ))`).
 
 ---
 
 ## Descripción de módulos
 
-### 3.15 `Meta/Incompleteness.lean` — Incompletitud Nivel D (Fase 19)
+### 3.15 `Meta/Incompleteness.lean` — Incompletitud Nivel D (Fase 19) — 🗑️ **MÓDULO ELIMINADO**
 
-**Namespace**: `ROBINSON_PlusPlus.Meta.Incompleteness`
-**Status**: ✅ Gödel I (mitad esencial) + Gödel II (postulando D2/D3)
+> ⚠️ **Registro histórico, no código vigente.** El fichero se **borró en F7a** (2026‑07‑09, commit
+> `f03eacf`) junto con sus 7 postulados legacy. Ninguna de las declaraciones que siguen existe hoy.
+> Se conserva la sección porque el libro (`PLAN-LIBRO.md` Parte IV) la cita como registro del
+> episodio: `provFormula_repr` era **falso en general**, y de ahí venía la mitad `⊬¬G` de Gödel I
+> que hubo que retirar. **No revertir F7a** — fue un arreglo de solidez.
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.Incompleteness` *(inexistente)*
+**Status**: 🗑️ Eliminado en F7a — Gödel I (mitad esencial) + Gödel II, postulando D2/D3
 **@importance**: `high`
 **Last updated**: 2026-06-12
 **Dependencias**: `Axioms`, `Meta/Godel`, `Meta/Provability`, `FOL.*`.
@@ -1112,4 +1141,264 @@ de vuelta** por el bicondicional codificado (el corazón denso, «subproyecto de
 
 ---
 
-← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md)
+### 3.24 La REPARACIÓN — códigos como NUMERALES (ADR‑012)
+
+**Last updated**: 2026-08-22 23:55 · **@importance**: `foundational`
+**Módulos**: `Meta/NatOrderPrf.lean`, `Meta/NatMulPrf.lean`, `Meta/CantorMonoPrf.lean`,
+`Meta/Div2ParityPrf.lean`, `Meta/CodeNumeralPrf.lean`, `Meta/DiagonalNumeral.lean`,
+`Meta/StrongInductionPrf.lean` (+ refundación de `Meta/Sigma1CorePrf.lean`).
+
+#### 3.24.1 La enfermedad, y por qué el numeral la cura
+
+`tcFn` («código del código») tenía dos ecuaciones que recurren sobre estructuras **incompatibles**:
+`ax_tc_zero`/`ax_tc_succ` sobre la estructura **NUMERAL**, y `ax_tc_cons` sobre la estructura de
+**CÓDIGO**. Como `ax_L0_cons_def` identifica `cons h t = pair h (σt)`, en ℕ el mismo valor es ambas
+cosas (`cons 0 nil = 2 = σσ0`), luego `tcFn` de ese valor debía ser dos códigos distintos a la vez ⇒
+`axioms ⊢ ⊥`, verificado en el compilador.
+
+**El diagnóstico de fondo:** `tcFn` pide a la teoría objeto ver información **intensional** que los
+números no llevan — *qué término escribimos* para denotar N. Con `⌈φ⌉` como **numeral** esa
+información no se pierde, porque el numeral **es** canónico.
+
+#### 3.24.2 `Meta/CodeNumeralPrf.lean` — la aritmética del código, SIN división
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.CodeNumeralPrf` · **@importance**: `foundational`
+**Dependencias**: `Div2ParityPrf`, `CantorMonoPrf`, `NatMulPrf`.
+
+La pieza clave del diseño: `consN` se define con **números triangulares**, de modo que
+`2·consN a b = cpOf ā b̄` es una identidad `Nat` **directa** — no hay que razonar sobre divisibilidad.
+
+| Notación matemática | Firma Lean 4 |
+|---|---|
+| `triN n = 0+1+…+n` | `def triN : Nat → Nat` |
+| `2·triN n = n(n+1)` | `theorem two_mul_triN : ∀ n : Nat, 2 * triN n = n * (n + 1)` |
+| `consN a b = triN(a+b+1) + (b+1)` | `def consN (a b : Nat) : Nat := triN (a + (b + 1)) + (b + 1)` |
+| `2·consN a b = (a+b+1)(a+b+2) + 2(b+1)` | `theorem two_mul_consN (a b : Nat) : …` |
+| `⊢ ā + b̄ = (a+b)‾` | `theorem prf_gnum_add (a b : Nat) : Prf (add (numeral a) (numeral b) =eq numeral (a+b))` |
+| `⊢ cons(ā, b̄) = consN a b‾` | `theorem prf_cons_eval (a b : Nat) : Prf (cons (numeral a) (numeral b) =eq numeral (consN a b))` |
+| ídem, con premisas | `theorem prf_cons_eval_of {A B : Term} {a b : Nat} (ha …) (hb …) : Prf (cons A B =eq numeral (consN a b))` |
+| `codeNat φ ∈ ℕ` (espejo meta de `formCode`) | `def codeNat : Formula → Nat` |
+| **`⊢ formCode φ = codeNat φ‾`** | **`theorem prf_formCode_numeral : ∀ φ : Formula, Prf (formCode φ =eq numeral (codeNat φ))`** |
+
+`codeNat` va acompañado de `codeNatChars`/`codeNatStr`/`codeNatTerm`/`codeNatTerms`, y cada uno de su
+lema de evaluación (`prf_charsCode_numeral`, `prf_strCode_numeral`, `prf_termCode_numeral`,
+`prf_termsCode_numeral`). `prf_formCode_numeral` es **meta‑recursión** sobre la estructura de `φ`.
+
+**Hecho de magnitud medido** (`sondeos/S3S5.lean`): Lean **nunca reduce** `codeNat φ` — se mantiene
+simbólico incluso con `φ` concreta. La vía es viable del lado de Lean.
+
+#### 3.24.3 `Meta/Div2ParityPrf.lean` — `div2` sobre numerales, y la paridad de Cantor
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.Div2ParityPrf` · **@importance**: `high`
+**Dependencias**: `CantorMonoPrf`, `NatMulPrf`, `NatOrderPrf`.
+
+Todo en forma **OBJETO** (argumentos abstractos ⇒ vale para todo numeral) y **net‑0**
+(`[propext, choice, Quot.sound]`).
+
+| Notación matemática | Firma Lean 4 |
+|---|---|
+| `x < y ⇒ x·2 < y·2` | `theorem prf_mul_two_lt_mono (x y : Term) : Prf (lt x y ⇒ lt (mul x two) (mul y two))` |
+| `x·2 = y·2 ⇒ x = y` | `theorem prf_mul_two_cancel (x y : Term) : Prf ((mul x two =eq mul y two) ⇒ (x =eq y))` |
+| `mod2(x·2) = 0` | `theorem prf_mod2_double (x : Term) : Prf (mod2 (mul x two) =eq zero)` |
+| `div2(x·2) = x` | `theorem prf_div2_double (x : Term) : Prf (div2 (mul x two) =eq x)` |
+| **`div2(2m‾) = m̄`** | **`theorem prf_div2_numeral (m : Nat) : Prf (div2 (numeral (2 * m)) =eq numeral m)`** |
+| `mod2(S·σS) = 0` (consecutivos) | `theorem prf_mod2_consec (S : Term) : Prf (mod2 (mul S (succ S)) =eq zero)` |
+| `mod2(cpOf h t) = 0` | `theorem prf_mod2_cpOf (h t : Term) : Prf (mod2 (cpOf h t) =eq zero)` |
+| **`(cons h t)·2 = cpOf h t`** | **`theorem prf_cons_double (h t : Term) : Prf (mul (cons h t) two =eq cpOf h t)`** |
+
+Álgebra auxiliar portada aquí porque **eran axiomas objeto, no teoremas**: `prf_mul_distrib` (ax12),
+`prf_mul_assoc` (ax11), `prf_mul_distrib_right`, `prf_swap_mul2`, más los homomorfismos
+`prf_numeral_mul`/`prf_gnum_mul` (el de `·` sólo existía en la capa ω) y las congruencias
+`prf_eq_congr_div2`/`prf_eq_congr_mod2`.
+
+⚠️ `prf_cons_double` es **el puente** de la fase C de `pcc_dot_cons` (§3.25.3): es un teorema OBJETO,
+luego se «dota» con `prf_congr_tcFn` **sin coste**.
+
+#### 3.24.4 `Meta/NatOrderPrf.lean` · `Meta/NatMulPrf.lean` · `Meta/CantorMonoPrf.lean`
+
+**@importance**: `high` · net‑0 (`[propext, choice, Quot.sound]`).
+
+⚠️ **La asociatividad/conmutatividad de `+` y las leyes de `·` son AXIOMAS de la teoría objeto**
+(`ax6`/`ax7`, `ax8`–`ax12`) — **no** hay que probarlas por inducción; estos módulos las **portan** al
+cálculo finitario `Prf` y construyen encima.
+
+* **`NatOrderPrf`** — orden `≤`: `prf_le_of_lt`, `prf_le_of_eq`, `prf_le_refl`, la cadena de
+  transitividades (`prf_lt_trans`, `prf_lt_le_trans`, `prf_le_lt_trans`, `prf_le_trans`),
+  sustitución bajo `≤`/`<` (`prf_le_subst1/2`, `PrfH_lt_subst1/2`) y `prf_add_assoc`/`prf_add_comm`.
+* **`NatMulPrf`** — producto: `prf_mul_zero`, `prf_mul_succ`, `prf_mul_comm`, `prf_zero_mul`,
+  `prf_mul_one`; monotonía aditiva y multiplicativa (`prf_add_le_mono_*`, `prf_mul_le_mono_right`);
+  **cancelación** `prf_lt_of_mul_lt_mul_right`; tricotomía `prf_lt_trichotomy` e irreflexividad
+  `prf_lt_irrefl`; `div2`/`mod2` (`prf_div_mod_eq` = ax17, `prf_mod2_range` = ax21).
+* **`CantorMonoPrf`** — **`prf_cantor_mono_left (h t) : Prf (lt h (cons h t))`** y
+  `prf_cantor_mono_right`: *el sub‑código es estrictamente menor que el código*. 13 pasos troceados.
+  Aquí vive `abbrev cpOf (h t : Term) : Term` ( `= cantor_poly h (σt)` ) y `prf_cons_div2`,
+  `prf_cons_div_mod`.
+
+#### 3.24.5 `Meta/DiagonalNumeral.lean` — el lema diagonal rehecho, y **Gödel I**
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.DiagonalNumeral` · **@importance**: `foundational`
+**Dependencias**: `CodeNumeralPrf`, `Diagonal`, `DiagonalTwo`, `OmegaReflect`.
+
+| Notación matemática | Firma Lean 4 |
+|---|---|
+| `⊢ codeNat φ‾ = formCode φ` | `theorem hFN (φ : Formula) : axioms ⊢ (numeral (codeNat φ) =eq formCode φ)` |
+| `ψ[⌈ψ⌉]` con el código NUMERAL | `noncomputable def selfAppN (ψ : Formula) : Formula` |
+| `Prov` sobre el código numeral | `noncomputable def provCodeN (φ : Formula) : Formula` |
+| la sentencia de Gödel numeral | `noncomputable def godelCN : Formula` |
+| diagonalización | `theorem diag_arith_num (ψ : Formula) : …` |
+| **punto fijo** | **`theorem godelCN_fixedpoint : axioms ⊢ (godelCN ⇔ neg (provCodeC' godelCN))`** |
+| puente entre representaciones | `theorem provCode_transfer (φ : Formula) : axioms ⊢ (provCodeN φ ⇔ provCodeC' φ)` |
+| **Gödel I — `⊬G`** | **`theorem goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN`** |
+| Gödel I — indecidibilidad | `theorem goedel_first_undecidable_numeral (hcon : ConsistentOmega) (hrefl : Reflects godelCN) : (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN))` |
+
+**Por qué la refundación fue barata (~30 líneas):** `substFormula_arith (v) (s) (f)` toma **`s`
+arbitrario**, luego traga un numeral sin más; y `godelPred`, `godelBeta`, `diagTerm` y `godel_comp`
+**no cambian** — ninguno menciona la representación. Y **`provCode_transfer` es literalmente
+`subst_eq_iff provFormulaC' (hFN φ)`** ⇒ D1 y la cadena existente se transfieren **componiendo con
+ese bicondicional, sin re‑demostrarse**.
+
+**Footprint de `goedel_first_numeral`** (verificado con `#print axioms`):
+`[propext, Classical.choice, Quot.sound, dne, gen, imp_intro, ax_induction, ax_list_induction,
+ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
+
+⚠️ `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**. La reducción
+a ω‑consistencia (`reflects_of_omega`, §3.21) sigue vigente, pero **`NegVerifier` sigue abierto**:
+`⊬¬G` **no** está cerrado en la cadena real. Ver `PLAN-NEGVERIFIER.md`.
+
+#### 3.24.6 `Meta/StrongInductionPrf.lean` — inducción fuerte en `Prf`
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.StrongInductionPrf` · **@importance**: `medium`
+
+`theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
+(step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) : ∀ t : Term, Prf (substFormula 0 t Φ)`
+
+con `PSI Φ` = el `∀m<n. Φ[m]` acotado, `prf_le_of_lt_succ (m n) : Prf (lt m (succ n) ⇒ le m n)`
+(sin análisis de casos) y el andamiaje De Bruijn (`liftTerm_swap`, `psi_lift_eq_subst`, …).
+⚠️ Distinto de `Full/StrongInduction.lean`, que está sobre `Derives` (capa ω) y **no es importable**
+desde aquí — es un guion, no un módulo reutilizable.
+
+#### 3.24.7 Refundación de `Meta/Sigma1CorePrf.lean` (el keystone de (a.1))
+
+Tres declaraciones cambiaron de **enunciado**, no sólo de prueba:
+
+| antes | ahora |
+|---|---|
+| `prf_provCodeC'_In_formCode_of_tracked` vía `prf_tc_form` | vía `prf_tc_numeral`; ⚠️ concluye sobre `In (numeral (codeNat φ)) L` |
+| `prf_tc_objList` vía `prf_tc_of_cons` | `prf_objList_numeral` vía `prf_cons_eval_of` |
+| `prf_tc_objList_formCode` | `prf_objList_formCode_numeral`, con `termCode (numeral N)` a la derecha |
+
+Refundar el keystone **devolvió 10 módulos** de la cuarentena de golpe (31 → 21), entre ellos
+`MpCodePrf` (`pcc_axiom_inst`) y `Sigma1AtomPrf` (`eqCodeFn`) — el prerrequisito para poder siquiera
+**enunciar** la escalera (§3.25).
+
+---
+
+### 3.25 La ESCALERA (a.2) — Σ₁‑completitud INTERNALIZADA
+
+**Last updated**: 2026-08-22 23:55 · **@importance**: `foundational`
+**Módulos**: `Meta/EvalArithPrf.lean` (`+`), `Meta/EvalMulPrf.lean` (`·`), `Meta/DotConsPrf.lean`
+(`cons`). Todos con footprint `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` — la
+base sancionada, **sin `tc_cons`**.
+
+**Qué es.** Los cuatro peldaños que llevan la evaluación aritmética **dentro de `Prov`**, para
+argumentos **ABSTRACTOS** (no `numeral a` concretos). Es lo que devuelve la cuarentena: el viejo
+`pcc_eval_carc` cerraba con `prf_tc_cons'`, el puente que la reparación mató, y `pcc_dot_cons` es su
+sustituto — verificado en `sondeos/CarcPayoff.lean`.
+
+| peldaño | teorema | dónde |
+|---|---|---|
+| `⊢ Prov(⌜ ȧ + ḃ = (a+b)˙ ⌝)` | `pcc_eval_add (a b : Term) : Prf (provFromCode (evalAddCode a b))` | §3.25.1 |
+| `⊢ Prov(⌜ ȧ · ḃ = (a·b)˙ ⌝)` | `pcc_eval_mul (a b : Term) : Prf (provFromCode (evalMulCode a b))` | §3.25.2 |
+| `div2` | `pcc_thm_inst` sobre `Prf.gen (prf_div2_double (.var 0))` — **sin inducción** | §3.25.3 |
+| `⊢ Prov(⌜ cons(ḣ,ṫ) = (cons h t)˙ ⌝)` | `pcc_dot_cons (h t : Term) : …` | §3.25.3 |
+
+#### 3.25.1 `Meta/EvalArithPrf.lean` — la suma, y la lógica ecuacional INTERNA
+
+**@importance**: `foundational`. Además del peldaño `+`, este módulo aporta el **toolkit reutilizable**
+de razonamiento ecuacional dentro de `Prov`:
+
+| Notación | Firma Lean 4 |
+|---|---|
+| Leibniz codificado, aplicado | `theorem pcc_leibniz_apply (Ac t₁ t₂ : Term) (heq : Prf (provFromCode (eqc t₁ t₂))) (h1 : Prf (provFromCode (substfc zero t₁ Ac))) : Prf (provFromCode (substfc zero t₂ Ac))` |
+| transitividad interna de `=` | `theorem pcc_eq_trans_code (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X)) …` |
+| congruencia interna de `σ` | `theorem pcc_congr_succ_code (X Y : Term) …` |
+| invariancias `substtc` | `substtc_inv_tcFn`, `substtc_inv_succcT`, `substtc_inv_addcT` |
+| formas IMPLICACIÓN (para `prf_nat_induction`) | `pcc_leibniz_apply_imp`, `pcc_eq_trans_code_imp`, `pcc_congr_succ_code_imp` |
+
+La restricción real del toolkit: al sustituir en el código‑contexto `Ac`, el `substtc` alcanza también
+los subtérminos ya presentes ⇒ los lemas piden que el código fijo sea **`substtc`‑invariante**
+(`∀ W, substtc zero W X =eq X`), hipótesis que (A) `prf_substtc_tcFn` y las ecuaciones de `funcc`
+descargan para todos los códigos que se construyen.
+
+#### 3.25.2 `Meta/EvalMulPrf.lean` — el producto
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.EvalMulPrf` · **Dependencias**: `EvalArithPrf`, `NatMulPrf`.
+
+Espejo de `+` con `prf_nat_induction` como cierre. **La diferencia estructural:** `ax9_mul_succ` da
+`x·σy = (x·y) + x`, cuyo lado derecho es un `add`, **no un `succ`** — por eso el paso inductivo
+necesita dos piezas que `+` no tenía: `pcc_congr_addcT1_code_imp` (congruencia de `addcT` en el
+**primer** argumento, para meter la HI) y `pcc_eq_subst2_code_imp` (sustitución en el **segundo**
+argumento de `=` con la igualdad cerrada, que permite encadenar con `pcc_eval_add`).
+
+`def mulcT (x y : Term) : Term` (código de `mul x y`), `def evalMulCode (a b : Term) : Term :=
+eqCodeFn (mulcT (tcFn a) (tcFn b)) (tcFn (mul a b))`, más congruencia/`substtc`/invariancia
+(`prf_congr_mulcT`, `prf_substtc_mulcT`, `substtc_inv_mulcT`).
+
+#### 3.25.3 `Meta/DotConsPrf.lean` — **`pcc_dot_cons`**, el último peldaño
+
+**Namespace**: `ROBINSON_PlusPlus.Meta.DotConsPrf` · **@importance**: `foundational`
+**Dependencias**: `EvalMulPrf`, `Div2ParityPrf`, `CantorMonoPrf`, `MpCodePrf`, `SubstCodeOpenPrf`,
+`NumCodeClosedPrf`.
+
+```lean
+theorem pcc_dot_cons (h t : Term) :
+    Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t))))
+```
+
+**Sin inducción nueva.** `cons` no tiene ecuaciones recursivas propias: `ax_L0_cons_def` lo define
+como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, los tres ya internalizados. Es
+**ensamblaje**, en tres fases:
+
+| fase | qué | pieza |
+|---|---|---|
+| **A** | la instancia codificada de `ax_L0_cons_def` **computa por `rfl`** (igual que `ax5`/`ax9`) | `prf_axL0_body_computes`, `pcc_axL0_computed` |
+| **B** | el polinomio de Cantor se evalúa dentro de `Prov` en **cinco** pasos | `pcc_rw`, `pcc_rw_div2` |
+| **C** | el `div2` se cancela contra `prf_div2_double`; puente `prf_cons_double` | `pcc_div2_cons` |
+
+**API pública:**
+
+| Notación | Firma Lean 4 |
+|---|---|
+| código de `cons x y` | `def consT (x y : Term) : Term` |
+| código de `div2 x` | `def div2cT (x : Term) : Term` |
+| código del polinomio de Cantor | `def cpOfT (X Y : Term) : Term` · variante plegada `def cpOfT' (X Y1 : Term) : Term` |
+| **reescritura interna en un hueco** | `theorem pcc_rw (G : Term → Term) (hG : ∀ s, Prf (substfc zero s (G (varc (numeral 0))) =eq G s)) (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) (hbase : Prf (provFromCode (G X))) : Prf (provFromCode (G Y))` |
+| su molde para `L = div2(D ·)` | `theorem pcc_rw_div2 (L : Term) (hL …) (D : Term → Term) (hD …) …` |
+| fase A | `theorem pcc_axL0_computed (h t : Term) : Prf (provFromCode (eqCodeFn (consT (tcFn h) (tcFn t)) (div2cT (cpOfT (tcFn h) (tcFn t)))))` |
+| fase C | `theorem pcc_div2_cons (h t : Term) : Prf (provFromCode (eqc (div2cT (tcFn (cpOf h t))) (tcFn (cons h t))))` |
+| `⌜2⌝ = 2˙` | `theorem prf_tc_two : Prf (tcFn two =eq termCode two)` |
+| congruencias / `substtc` | `prf_congr_consT`, `prf_congr_div2cT`, `prf_congr_cpOfT`, `prf_congr_cpOfT2`, `prf_substtc_consT`, `prf_substtc_div2cT`, `prf_substtc_cpOfT`, `prf_substtc_two`, `substtc_inv_consT`, `substtc_inv_div2cT` |
+
+##### 🔑 Las dos técnicas — reutilizables para cualquier evaluación dentro de `Prov`
+
+1. **Todo teorema OBJETO se «dota» GRATIS.** `tcFn` es un símbolo de función, luego `prf_congr_tcFn`
+   transporta cualquier `Prf (a =eq b)` a `Prf (ȧ =eq ḃ)` **a nivel de código, sin entrar en `Prov`**.
+   Por eso `prf_cons_double` sirve de puente sin coste y los pasos `σ(ẋ) ⟶ (σx)˙` son libres
+   (`prf_tc_succ'`). **Antes de razonar dentro de `Prov`, comprobar si el paso es objeto.**
+2. **`substfc` sustituye TODAS las ocurrencias del hueco.** El polinomio `(x+y)·σ(x+y)+2y` menciona
+   `x+y` **dos veces**; reescribir por posiciones exigiría congruencias a cada profundidad. Con el
+   contexto `Ac := C[v₀]` un **único** `pcc_leibniz_apply` cierra las dos. De ahí que la fase B sean
+   5 pasos y no 15. `pcc_rw` empaqueta el patrón.
+
+##### El rédito, verificado
+
+`sondeos/CarcPayoff.lean` reconstruye **`pcc_eval_carc`** con el mismo enunciado y el mismo footprint.
+El viejo (`cuarentena/EvalListPrf.lean:123`) cerraba con `prf_tc_cons'`; la sustitución es **un único
+`pcc_rw` con `pcc_dot_cons`**, y los pasos 1‑3 (instancia de `ax_carc` + los dos `substfc` computados)
+quedan **intactos**. ⇒ el keystone `EvalListPrf` es repatriable, y el patrón de arreglo es mecánico.
+⚠️ El transporte pasa de ser **de código** (fuera de `Prov`) a ser **interno** (dentro), así que hay
+que dar el contexto `G` y su ecuación de `substfc`.
+
+---
+
+← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)

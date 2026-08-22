@@ -18,6 +18,68 @@
 
 ---
 
+## 2026-08-23 00:30 — AUDITORÍA de documentación: proyección del árbol REFERENCE
+
+Pasada completa (`repasa_y_proyecta` + `actualiza_documentacion`) sobre los 24 `.md` del repo y los
+5 nodos de `doc/`. **No toca código**: `lake build` sigue en 97 jobs, 0 errores/warnings/sorrys.
+
+### Dos errores REALES encontrados (no cosméticos)
+
+1. **La cuarentena tiene 8 raíces, no 6.** La cifra venía propagándose por `NEXT-STEPS.md`,
+   `PLAN-FRENTE-A.md`, `cuarentena/README.md` y la memoria. El recuento anterior buscaba sólo
+   `prf_tc_cons` y se dejó fuera **`CodeTreeReflect`** y **`LineWFEfqPrf`**, que usan la otra
+   sub‑familia: `prf_tc_nul`/`prf_tc_un`/`prf_tc_bin`, los constructores del KIT.
+   ⇒ **Consecuencia de planificación:** la repatriación necesita **dos** sustitutos, no uno.
+   `pcc_dot_cons` cubre `prf_tc_cons'`; el KIT necesita su propio `pcc_dot_nul`/`_un`/`_bin`
+   (esperable por composición, **sin medir** — sondeo registrado como paso 3 del plan).
+2. **`EvalListPrf` no es sólo el keystone: es la BASE.** Grafo recalculado por máquina: no tiene
+   ninguna dependencia dentro de la cuarentena, **los otros 20 dependen de él**, y es donde se
+   **define** `prf_tc_cons'` (`:48`). Nada vuelve antes que él. (Antes se decía «bloquea 9 de 15».)
+
+### Desincronización corregida
+
+* **`REFERENCE.md`** decía «113 jobs, 99 módulos (Meta 77)» — real: **97 jobs, 83 módulos (Meta 61)**;
+  su §1.5 listaba como activos 10 módulos que están **en cuarentena** y omitía los 10 nuevos.
+  Reescritos §1 (catálogo real, con §1.6 nuevo para la cuarentena), §3 y §5.
+* **La línea `Last updated` de `REFERENCE.md` era un volcado histórico acumulativo de ~20 KB en una
+  sola línea.** Sustituida por una marca de tiempo limpia; el fichero pasa de 36 KB a 20 KB. El
+  historial es competencia de este `CHANGELOG.md`.
+* **`CURRENT-STATUS-PROJECT.md`**: banner correcto, **cuerpo desfasado** — la tabla resumen seguía
+  citando `goedel_first_real'`, «113 jobs» y «99 módulos». Corregidas 6 filas.
+* **`DECISIONS.md` ADR‑007** llevaba **más de un mes** marcado «Propuesto (no implementado) — no
+  existe todavía directorio `doc/`»: existe desde 2026‑07‑12 con 5 nodos. Marcado ✅ implementado.
+* **Fantasma en `doc/REFERENCE-Incompleteness.md` §3.15**: documentaba `Meta/Incompleteness.lean`
+  como vigente; el fichero se **borró en F7a**. Marcado 🗑️ y conservado como registro para el libro.
+* Banners sincronizados en los 7 documentos de estado (jobs 95→97, módulos 82→83, Meta 59→61,
+  sondeos 9→10, HEAD).
+
+### Proyección nueva (AI-GUIDE §12/§14 — todo `export` debe estar proyectado)
+
+**`doc/REFERENCE-Incompleteness.md` §3.24 y §3.25** (nuevas, ~200 líneas): los **10 módulos** de la
+reparación y la escalera, que no estaban proyectados en ningún sitio — `NatOrderPrf`, `NatMulPrf`,
+`CantorMonoPrf`, `Div2ParityPrf`, `CodeNumeralPrf`, `DiagonalNumeral`, `StrongInductionPrf`,
+`EvalArithPrf`, `EvalMulPrf`, `DotConsPrf`, más la refundación de `Sigma1CorePrf`. Con firmas Lean 4
+exactas, notación matemática y dependencias.
+
+### Otras aportaciones
+
+* **`DEPENDENCIES.md` §0 (nueva)**: la **vista de subsistema de `Meta/`** que el propio fichero
+  llevaba pidiendo desde julio («candidato prioritario»), generada **por máquina** de los `import`
+  reales. **25 niveles, sin ciclos.** Hechos medidos: `DotConsPrf` (L24) es el módulo **más profundo**
+  del proyecto; `ReprPrf` (L7) el de mayor *fan‑in* (7 dependientes).
+* **`DECISIONS.md` ADR‑014 (nuevo)**: por qué la cuarentena se recupera *internalizando* la evaluación
+  en vez de reescribiendo los 21 módulos uno a uno.
+* **`PLAN-LIBRO.md`**: capítulo **16** nuevo (la reconstrucción — el capítulo de moraleja positiva que
+  cierra el arco de la Parte IV) y **9bis** (`⊬¬G`, la mitad que falta y que los manuales despachan en
+  un párrafo). El **aviso editorial** de §6 se reformula: la reparación **está hecha**, así que el
+  aviso ya no es «la teoría es inconsistente» sino «se retiró la inconsistencia **conocida**, y eso
+  **no** es una prueba de consistencia».
+* **`NEXT-STEPS.md`**: plan de repatriación en **6 pasos**, con el paso 1 (`EvalListPrf`) marcado como
+  el sondeo decisivo del frente.
+* **`cuarentena/README.md`** reescrito con el grafo recalculado y el patrón de arreglo en código.
+
+---
+
 ## 2026-08-22 23:42 — ✅ La ESCALERA (a.2) COMPLETA: `pcc_dot_cons`
 
 **`Meta/DotConsPrf.lean`** (nuevo). Cierra el cuarto y último peldaño de la escalera de
@@ -48,7 +110,9 @@ código‑contexto) y **`pcc_rw_div2`** (su molde para `L = div2(D ·)`).
 `Prov`; (2) `substfc` sustituye **todas** las ocurrencias del hueco, así que un único
 `pcc_leibniz_apply` cubre las repeticiones del polinomio — de ahí 5 pasos y no 15.
 
-**Siguiente:** repatriar las 6 raíces de `cuarentena/`, empezando por el keystone `EvalListPrf`.
+**Siguiente:** repatriar las **8** raíces de `cuarentena/`, empezando por `EvalListPrf` — que es
+la **base** de toda la cuarentena (los otros 20 dependen de él) y donde se **define** el contaminado
+`prf_tc_cons'`.
 `pcc_eval_carc` = `pcc_axiom_inst ax_carc` + `pcc_dot_cons`.
 > **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
 > **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.

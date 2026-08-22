@@ -1,10 +1,17 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+> ## ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
 >
-> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
-> → [cuarentena/README.md](cuarentena/README.md).
+> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
+> Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
+>
+> **Build 97 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 `cuarentena/` + 10 `sondeos/`.**
+> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+>
+> ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
@@ -14,9 +21,14 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
-> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
-> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+> ### La ESCALERA (a.2) COMPLETA — 4 de 4
+>
+> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
+> Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
+> `sondeos/CarcPayoff.lean` — `pcc_eval_carc` vuelve. **Lo siguiente: repatriar la cuarentena**,
+> empezando por el keystone `EvalListPrf`.
+>
+> ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
 **Last updated:** 2026-07-22 — **nueva §1.1: por qué la inducción de `Full/` es el mínimo teórico de Gödel II** (Q no satisface D2/D3; reparto verificado con `#print axioms`: D1 y D2 limpios, Gödel I/II usan `Full.ax_induction`+`ax_list_induction`). Sin cambios en el inventario: siguen **7**. — (previo 2026-07-20) **`prf_inAxC` → `prf_axiomsCodeT_eq`** (espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.)
 **Author:** Julián Calderón Almendros

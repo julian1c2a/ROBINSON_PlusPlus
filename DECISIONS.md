@@ -1,10 +1,17 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+> ## ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
 >
-> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
-> → [cuarentena/README.md](cuarentena/README.md).
+> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
+> Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
+>
+> **Build 97 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 `cuarentena/` + 10 `sondeos/`.**
+> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+>
+> ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
@@ -14,11 +21,16 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
-> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
-> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+> ### La ESCALERA (a.2) COMPLETA — 4 de 4
+>
+> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
+> Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
+> `sondeos/CarcPayoff.lean` — `pcc_eval_carc` vuelve. **Lo siguiente: repatriar la cuarentena**,
+> empezando por el keystone `EvalListPrf`.
+>
+> ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-08-21 12:00
+**Última actualización:** 2026-08-22 23:55 (HEAD `68fa43c`)
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta
@@ -142,19 +154,26 @@ completa (`Full/`).
 
 ## ADR-007: Árbol de documentación `doc/REFERENCE-{tema}.md`
 
-**Fecha**: 2026-04-20
-**Estado**: Propuesto (no implementado)
+**Fecha**: 2026-04-20 · **Estado**: ✅ **Aceptado e IMPLEMENTADO** (2026-07-12; revisado 2026-08-22)
 
-**Decisión**: `REFERENCE.md` debería ser solo el índice raíz, con el detalle de cada
-bloque temático en nodos bajo `doc/REFERENCE-{tema}.md`.
+**Decisión**: `REFERENCE.md` es solo el índice raíz, con el detalle de cada bloque temático en nodos
+bajo `doc/REFERENCE-{tema}.md`.
 
-**Justificación**: `REFERENCE.md` actual (103 KB, 1531+ líneas) ya es demasiado
-grande para navegarse como fichero único — exactamente el síntoma que `AI-GUIDE.md`
-§0.5 describe como señal de que hace falta partirlo.
+**Justificación**: `REFERENCE.md` había llegado a 103 KB / 1531+ líneas — exactamente el síntoma que
+`AI-GUIDE.md` §0.5 describe como señal de que hace falta partirlo.
 
-**Consecuencias**: **pendiente de implementar** — no existe todavía directorio `doc/`
-en este proyecto. Candidato más urgente de los 4 proyectos de la cola de propagación
-para beneficiarse de este ADR, dado el tamaño ya alcanzado.
+**Consecuencias**: implementado. Existen **cinco nodos**: `doc/REFERENCE-Kernel.md`,
+`-Arithmetic.md`, `-Godelization.md`, `-Full.md`, `-Incompleteness.md`. El índice raíz quedó en
+~20 KB.
+
+⚠️ **Corrección 2026-08-22**: este ADR llevaba desde julio marcado como «Propuesto (no implementado)
+— no existe todavía directorio `doc/`», y llevaba **más de un mes siendo falso**. Es un ejemplo del
+modo de fallo que esta auditoría corrige: *los documentos de estado se actualizan por su banner y no
+por su cuerpo*.
+
+**Lección aplicada en la misma auditoría:** la línea `Last updated` de `REFERENCE.md` había degenerado
+en un volcado histórico acumulativo de **~20 KB en una sola línea**. Se sustituyó por una marca de
+tiempo limpia; el historial es competencia de `CHANGELOG.md`.
 
 ---
 
@@ -412,6 +431,65 @@ mostró que la recuperación es **estructurada**, no un rescate ciego:
 `termCode (formCode φ)` a `termCode (numeral (codeNat φ))`.
 
 Ver `cuarentena/README.md` y `PLAN-FRENTE-A.md`.
+
+---
+
+## ADR-014: La cuarentena se recupera INTERNALIZANDO la evaluación, no reescribiendo los tags
+
+**Fecha:** 2026-08-22 · **Estado:** aceptada e implementada (`master`, HEAD `68fa43c`)
+
+### Contexto
+
+ADR-013 dejó 21 módulos en `cuarentena/` y una pregunta abierta: **cómo se recuperan**. El punto
+exacto de rotura está localizado: `pcc_eval_carc (h t)` cerraba con **`prf_tc_cons'`** — el puente
+`tcFn (cons h t) = consT (tcFn h) (tcFn t)` a nivel de **código** —, que era consecuencia de
+`ax_tc_cons` y **es falso** bajo la lectura numeral para argumentos abstractos.
+
+Dos vías posibles:
+
+| vía | qué exigiría |
+|---|---|
+| **(i)** reescribir cada consumidor a mano | los 14 tags + `hI_dot` + el chasis, caso por caso, sin garantía de que el patrón se repita |
+| **(ii)** reconstruir el puente **dentro de `Prov`** | un solo teorema nuevo, si es que se puede probar |
+
+### Decisión
+
+**Vía (ii).** Construir la **escalera de Σ₁‑completitud internalizada** — `pcc_eval_add`,
+`pcc_eval_mul`, el atajo de `div2`, y **`pcc_dot_cons`** — y usar ese último como sustituto de
+`prf_tc_cons'` en cada sitio afectado.
+
+```lean
+pcc_dot_cons (h t : Term) :
+    Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t))))
+```
+
+### Justificación
+
+1. **Se puede, y sale barato.** `cons` **no tiene ecuaciones recursivas propias**: `ax_L0_cons_def`
+   lo define como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, los tres ya internalizados.
+   El peldaño resultó ser **ensamblaje, no inducción** — tres fases, verdes a la primera.
+2. **El rédito está verificado, no supuesto.** `sondeos/CarcPayoff.lean` reconstruye `pcc_eval_carc`
+   con el **mismo enunciado y el mismo footprint**; los pasos 1‑3 del original quedan **intactos** y
+   sólo cambia el cierre. ⇒ el keystone `EvalListPrf` es repatriable y **el patrón de arreglo es
+   mecánico**: buscar cada `prf_tc_cons'` y sustituirlo por `pcc_rw` + `pcc_dot_cons`.
+3. **Un solo teorema frente a 21 reescrituras.** La vía (i) habría exigido entender de nuevo cada
+   tag; la (ii) concentra el trabajo en un punto y deja una herramienta (`pcc_rw`) reutilizable para
+   toda evaluación futura dentro de `Prov`.
+
+### Consecuencias
+
+* ⚠️ **El transporte cambia de nivel.** Antes era **de código** (fuera de `Prov`, un
+  `prf_provCode_congr`); ahora es **interno** (dentro de `Prov`, un `pcc_leibniz_apply`). Cada sitio
+  debe aportar el contexto `G` y su ecuación de `substfc` — trivial con los `prf_substtc_*`, pero no
+  es un reemplazo textual ciego.
+* Se consolidan **dos técnicas** que abaratan todo trabajo futuro en esta capa:
+  1. **Todo teorema OBJETO se «dota» gratis** con `prf_congr_tcFn`, **sin entrar en `Prov`** — `tcFn`
+     es un símbolo de función, luego es congruente. *Antes de razonar dentro de `Prov`, comprobar si
+     el paso es objeto.*
+  2. **`substfc` sustituye TODAS las ocurrencias del hueco**, así que un único `pcc_leibniz_apply`
+     con contexto `Ac := C[v₀]` cubre las repeticiones. Por eso la fase B fueron 5 pasos y no 15.
+* `Meta/DotConsPrf.lean` queda como el módulo **más profundo** del proyecto (L24 de 25, ver
+  `DEPENDENCIES.md` §0): depende en cadena de todo lo anterior.
 
 ---
 

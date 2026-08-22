@@ -181,8 +181,8 @@ peldaño es **ensamblaje**, en tres fases:
 
 #### ▶ Lo siguiente: repatriar la cuarentena
 
-Quedan **6 raíces**: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`, `InAxiomsCodePrf`,
-`LineWFTrackedPrf`. **`EvalListPrf` es el keystone**: bloquea a 9 de los 15 no‑raíz restantes.
+Quedan **8 raíces**: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`, `InAxiomsCodePrf`,
+`LineWFTrackedPrf`. **`EvalListPrf` es el keystone**: es la BASE: los otros 20 dependen de él restantes.
 
 `pcc_eval_carc` se reconstruye como `pcc_axiom_inst ax_carc` + `pcc_dot_cons`.
 

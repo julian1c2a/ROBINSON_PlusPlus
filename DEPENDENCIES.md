@@ -1,10 +1,17 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+> ## ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
 >
-> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
-> → [cuarentena/README.md](cuarentena/README.md).
+> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
+> Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
+>
+> **Build 97 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 `cuarentena/` + 10 `sondeos/`.**
+> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+>
+> ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
@@ -14,25 +21,66 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
-> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
-> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+> ### La ESCALERA (a.2) COMPLETA — 4 de 4
+>
+> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
+> Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
+> `sondeos/CarcPayoff.lean` — `pcc_eval_carc` vuelve. **Lo siguiente: repatriar la cuarentena**,
+> empezando por el keystone `EvalListPrf`.
+>
+> ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-08-21 12:00 (banner) — grafo `Minimal/` de 2026-06-05 (grafo `Minimal/`) — nota de alcance añadida 2026-07-12
+**Last updated:** 2026-08-22 23:55 (HEAD `68fa43c`)
 **Author**: Julián Calderón Almendros
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
 
-> ⚠️ **Alcance real (nota 2026-07-12)**: lo que sigue documenta con detalle **solo
-> `Minimal/`** (Axioms + Block1–8, 11 módulos). **`Meta/` (53 módulos a 2026-07-12,
-> el andamiaje meta-teórico de Gödel II) y `Full/` (11 módulos) no están cubiertos
-> aquí** — nunca se documentaron a este nivel de detalle. Dado el tamaño ya alcanzado
-> (77 ficheros `.lean` en total), añadir aquí un grafo módulo-a-módulo de `Meta/`
-> tendría el mismo problema que `AI-GUIDE.md` §0.5 advierte: quedaría desactualizado
-> de inmediato. Candidato prioritario para adoptar el ADR-007 de `DECISIONS.md` (árbol
-> `doc/REFERENCE-{tema}.md`) y una vista de nivel de subsistema en vez de intentar
-> mantener el grafo de `Meta/` módulo a módulo aquí. Mientras tanto, usar
-> los nodos temáticos `doc/REFERENCE-*.md` (§3.1–§3.20) o `lake graph` para el estado completo y al día.
+> ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
+> solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
+> [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (61 módulos) se adopta la **vista
+> de subsistema** que esta nota pedía — ver §0 justo debajo. Mantener un grafo módulo‑a‑módulo de
+> `Meta/` aquí quedaría desactualizado de inmediato (`AI-GUIDE.md` §0.5); el detalle por módulo vive
+> en [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md) §3.15–§3.25 y el catálogo
+> completo en [`REFERENCE.md`](REFERENCE.md) §1.5.
+
+---
+
+## 0 · `Meta/` — vista de subsistema (verificada 2026-08-22 23:55)
+
+Extraída **por máquina** de los `import` reales de los 61 módulos activos de `Meta/`; el nivel es la
+**longitud del camino más largo** hasta una raíz. **25 niveles, sin ciclos.**
+
+| nivel | subsistema | módulos |
+|---|---|---|
+| L0–L2 | **cálculo finitario + Nivel B/C** | `Hilbert`, `Godel`, `CodeDecode` · `HilbertDeduction`, `Provability`, `CodeArith` · `HilbertSeq`, `SubstArith`, `CodeDistinct` |
+| L3–L5 | **aritmetización del verificador** | `StepArith` · `CheckArith`, `Induction` · `ProofChain`, `ListInductionArith` |
+| L6–L8 | **representabilidad + capa ω** | `Representability` · `Necessitation`, **`ReprPrf`** · `ArithPrf`, `ChainPrf`, `Diagonal`, `NumListPrf`, `LineWFDerives`, `AxiomListCode` |
+| L9–L12 | **D1/D2 sobre `Prf` + aritmética en `Prf`** | `Representability2`, `DerivCond`, `TcArithPrf`, `SubstCodeOpenPrf`, `NatArithPrf` · `Representability2Prf`, `NumCodeClosedPrf`, `Reflection`, `BoundedInPrf`, `ChainDecode`, `DiagonalTwo`, `NatOrderPrf` · `DerivCondPrf`, `GodelTwo`, `NatMulPrf`, `RunFnBoundedPrf` · `ReflectionPrf`, `ChainOkBoundedPrf`, `CantorMonoPrf` |
+| L13–L16 | **LA REPARACIÓN** (ADR‑012) | `Sigma1Prf`, `LineWFConsPrf`, `StrongInductionPrf` · `Div2ParityPrf`, `Sigma1BoundedPrf` · **`CodeNumeralPrf`** · **`DiagonalNumeral`**, **`Sigma1CorePrf`** |
+| L17–L21 | **sistema de prueba interno a nivel de código** | `ExIntroCodePrf`, `LineWFCases`, `OmegaReflect` · `Sigma1TrackedPrf` · `TrackedCorePrf` · `ForallElimCodePrf`, `Sigma1AtomPrf` · **`MpCodePrf`** |
+| L22–L24 | **LA ESCALERA (a.2)** | **`EvalArithPrf`** → **`EvalMulPrf`** → **`DotConsPrf`** |
+
+**Hechos estructurales medidos:**
+
+* **`DotConsPrf` (L24) es el módulo más profundo del proyecto.** La escalera se apoya, en cadena,
+  sobre absolutamente todo lo anterior — por eso no se pudo ni *enunciar* hasta refundar
+  `Sigma1CorePrf` (L16), que es lo que devolvió `MpCodePrf` (L21) de la cuarentena.
+* **`ReprPrf` (L7) es el módulo de mayor *fan‑in* directo** (7 dependientes), seguido de
+  `Representability`, `Hilbert` (5) y `Representability2`, `ArithPrf` (4). Son los puntos donde un
+  cambio de enunciado se propaga más.
+* **Hojas** (nadie las importa, son los frentes): `DotConsPrf`, `GodelTwo`, `ChainDecode`,
+  `OmegaReflect`, `LineWFCases`, `LineWFConsPrf`, `Sigma1BoundedPrf`.
+
+### `cuarentena/` — 21 módulos FUERA del build
+
+No participan del grafo anterior. **8 raíces**: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`,
+`EvalNthcPrf`, `InAxiomsCodePrf`, `LineWFTrackedPrf` — con **`EvalListPrf` como keystone** (bloquea 9
+de los 13 no‑raíz). Grafo interno en [`cuarentena/README.md`](cuarentena/README.md).
+
+### `sondeos/` — 10 experimentos compilados a mano
+
+Fuera del `lake build` (se compilan con `lake env lean sondeos/X.lean`). Catálogo en
+[`sondeos/README.md`](sondeos/README.md).
 
 ---
 
@@ -47,7 +95,7 @@ ROBINSON_PlusPlus/                  # raíz del proyecto Lean
 ├── Intermediate_template.lean
 ├── Full_template.lean
 └── ROBINSON_PlusPlus/Minimal/
-    ├── Axioms.lean                 # Lenguaje + 34 axiomas + 5 meta-axiomas FOL (ADR-008)
+    ├── Axioms.lean                 # Lenguaje + 141 axiomas objeto + esquemas del verificador
     └── Theorems/
         ├── Block1.lean             # Aritmética básica + teo_2_11 (cancelación *2)
         ├── Block2.lean             # Raíz cuadrada, sqrt_*, succ_le_of_lt, le/lt-trans
@@ -168,7 +216,8 @@ Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
 ### Level 0 — Foundation
 
 * `FOL.*` (proyecto sibling, dependencia local vía `lakefile.lean`).
-* `Minimal/Axioms.lean` — lenguaje + 34 axiomas + 5 meta-axiomas FOL. Solo importa `FOL.FOL` y `FOL.Theorems.Eq`.
+* `Minimal/Axioms.lean` — lenguaje + **141 axiomas objeto** (`def axioms`, línea 1199) + los esquemas del verificador + la capa Δ₀ (`lenc`/`nthc`). Solo importa `FOL.FOL` y `FOL.Theorems.Eq`.
+  ⚠️ Las **6 meta-reglas ω** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) **ya no viven aquí**: se movieron a `FOL/MetaRules.lean` y se re-exportan (ADR-010).
 
 ### Level 1 — Aritmética básica
 
@@ -246,13 +295,22 @@ por módulo. Resumen:
 3. **Selective exports**: cada módulo termina con un bloque `export` que enumera su API pública.
 4. **Sin Mathlib** (ADR-001): solo `FOL` como dependencia externa.
 5. **One namespace per module** (ADR-005): mirrors file path.
-6. **5 meta-axiomas en Axioms** (ADR-008): `imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim` — meta-teoremas válidos en aritmética, no derivables como reglas FOL puras.
+6. **6 meta-reglas ω** (ADR-010): `imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne` — meta-teoremas válidos en aritmética, no derivables como reglas FOL puras. Viven en `FOL/MetaRules.lean`, re-exportadas desde `Minimal.Axioms`.
 
 ---
 
 ## Verification Commands
 
 ```bash
-lake build           # full project build (23 jobs)
-lake clean           # reset cache (use when `Replayed` hides errors)
+lake build                              # build completo (97 jobs a 2026-08-22)
+lake clean                              # reinicia la caché (cuando `Replayed` esconde errores)
+lake env lean sondeos/X.lean            # compila un sondeo (fuera del build)
+lake env lean Probe/X.lean              # scratch de sesión (Probe/ está en .gitignore)
 ```
+
+⚠️ **`lake build` puede dar VERDE sin construir lo que crees.** La `lean_lib` sólo construye lo
+**alcanzable desde el módulo raíz**: mover un fichero a `Meta/` sin añadir su `import` en
+`Meta.lean` lo deja **fuera del build**, y el build sale verde. **Señal de alarma: el número de jobs
+no cambia al añadir módulos.** Comprobar siempre que el conteo se mueve.
+
+⚠️ **NUNCA `cd FOL && lake build`** — desajuste de toolchain. Compilar siempre desde la raíz de RPP.

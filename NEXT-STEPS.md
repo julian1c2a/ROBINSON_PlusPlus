@@ -75,23 +75,55 @@ comentarios).
 > ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena** — el rédito ya está VERIFICADO
 >
 > **`sondeos/CarcPayoff.lean`: `pcc_eval_carc` YA VUELVE**, con el mismo enunciado y el mismo
-> footprint. El viejo (`cuarentena/EvalListPrf.lean:123`) cerraba con `prf_tc_cons'` — el puente que
+> footprint. El viejo (`cuarentena/EvalListPrf.lean:130`) cerraba con `prf_tc_cons'` — el puente que
 > murió con la reparación — y la sustitución es **un único `pcc_rw` con `pcc_dot_cons`**; los pasos
 > 1‑3 (instancia de `ax_carc` + los dos `substfc` computados) quedan **intactos**.
 >
-> ⇒ **Empezar por `EvalListPrf`**, el keystone (bloquea 9 de los 15 no‑raíz). El patrón de arreglo
-> es mecánico: **buscar cada `prf_tc_cons'` y sustituirlo por `pcc_rw` + `pcc_dot_cons`**. Ojo: el
-> transporte pasa de ser **de código** (fuera de `Prov`) a ser **interno** (dentro de `Prov`), así
-> que hay que dar el contexto `G` y su ecuación de `substfc` — trivial con los `prf_substtc_*`.
+> #### ⚠️ Corrección de la auditoría 2026‑08‑22: son **8 raíces**, no 6
 >
-> ### Estado de la cuarentena: **21 módulos**, 6 raíces
+> El recuento anterior buscaba sólo `prf_tc_cons` y se dejó fuera **`CodeTreeReflect`** y
+> **`LineWFEfqPrf`**, que usan la **otra** sub‑familia: `prf_tc_nul`/`prf_tc_un`/`prf_tc_bin`, los
+> constructores del KIT. Grafo recalculado por máquina en `cuarentena/README.md`.
 >
-> Raíces: `CodeCtorKit`, `D3InDotPrf`, `EvalListPrf`, `EvalNthcPrf`, `InAxiomsCodePrf`,
-> `LineWFTrackedPrf`. **`EvalListPrf` es el keystone actual**: bloquea a 9 de los 15 no‑raíz.
-> Ver `cuarentena/README.md` y `PLAN-FRENTE-A.md`.
+> Y **`EvalListPrf` no es sólo el keystone: es la BASE.** No tiene ninguna dependencia dentro de la
+> cuarentena, los **otros 20 dependen de él**, y es donde se **define** `prf_tc_cons'` (`:48`) — el
+> origen literal de la contaminación. **Nada vuelve antes que él.**
+>
+> #### 📋 PLAN EJECUTABLE — orden de repatriación
+>
+> | # | paso | qué hay que hacer | estado |
+> |--:|---|---|---|
+> | **1** | **`EvalListPrf`** | sustituir los **6** usos de `prf_tc_cons'` por `pcc_rw` + `pcc_dot_cons`. El de `pcc_eval_carc` **ya está hecho y compilado** (`sondeos/CarcPayoff.lean`); falta `pcc_eval_cdrc` (`:164`, mismo patrón con `cdrcT`) y los demás | ▶ **el siguiente** |
+> | **2** | `EvalNthcPrf` → `EvalCarcNthcPrf` | mismo patrón; caen `EvalLtPrf`, `EvalBoundedPrf`, `EvalRunFnPrf`, `Delta0ReflectPrf` | ⏳ |
+> | **3** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** `nulT`/`unT`/`binT` son todos `cons`‑árboles (ése fue el hallazgo del KIT), así que lo *esperable* es que salgan por **composición de `pcc_dot_cons`**, sin inducción nueva — pero **está SIN MEDIR**. Desbloquea `CodeCtorKit`, `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
+> | **4** | `LineWFTrackedPrf` + los 14 tags | caen con 1–3 (`LineWFSchemaPrf`, `LineWFPropPrf`, `LineWFMpPrf`, `LineWFThyPrf`, `LineWFAssemblePrf`) | ⏳ |
+> | **5** | `D3InDotPrf`, `InAxiomsCodePrf` | las dos raíces que quedan | ⏳ |
+> | **6** | `D3DottedPrf` → **D3** → **Gödel II** → **F7b** (7→6 `axiom`) | el objetivo | ⏳ |
+>
+> **El paso 1 es el sondeo decisivo del frente**: si los usos restantes de `EvalListPrf` salen con el
+> mismo patrón que el ya verificado, la repatriación es mecánica y el resto es volumen. Si alguno se
+> resiste, ahí está el siguiente muro y hay que mirarlo antes de seguir.
+>
+> ⚠️ **Al arreglar cada sitio**: el transporte pasa de ser **de código** (fuera de `Prov`, un
+> `prf_provCode_congr`) a ser **interno** (dentro de `Prov`, un `pcc_leibniz_apply`), así que hay que
+> dar el contexto `G` y su ecuación `substfc zero s (G (varc 0)) =eq G s`. Es mecánico con los
+> `prf_substtc_*`, pero **no es un reemplazo textual ciego**.
+>
+> ### Estado de la cuarentena: **21 módulos**, 8 raíces
+>
+> Raíces (**8**, ordenadas por cascada de desbloqueo): **`EvalListPrf`** (20) · `EvalNthcPrf` (13) ·
+> `D3InDotPrf` (11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) · **`CodeTreeReflect`** (2) ·
+> `InAxiomsCodePrf` (2) · **`LineWFEfqPrf`** (1). Las dos en negrita son las que el recuento anterior
+> no vio. Los 13 no‑raíz caen solos. Grafo completo en `cuarentena/README.md`.
 
 > ### ⚠️ TRAMPAS METODOLÓGICAS — caras, no repetir
 >
+> 0. **Los documentos de estado se actualizan por su BANNER y no por su CUERPO.** (auditoría
+>    2026‑08‑22) `CURRENT-STATUS-PROJECT.md` tenía un banner correcto y una tabla que decía «113 jobs,
+>    99 módulos»; `DECISIONS.md` ADR‑007 llevaba **un mes** diciendo «no implementado — no existe
+>    todavía `doc/`» sobre un directorio que existe con 5 nodos. **Al auditar, leer el cuerpo.**
+> 0bis. **Al contar por familia de símbolos, contar la familia ENTERA.** El recuento de raíces de la
+>    cuarentena buscó `prf_tc_cons` y se dejó dos raíces que usan `prf_tc_nul`/`un`/`bin`. 6 → 8.
 > 1. **La alcanzabilidad por `import` da FALSOS NEGATIVOS.** Me hizo afirmar en falso que Gödel I
 >    estaba limpio. Un **crawler de dependencias tampoco vale**: Lean 4.31 da `value? = NONE` para
 >    teoremas importados, o sea sólo recorre tipos. **La técnica buena**: convertir el puente

@@ -1,10 +1,17 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+> ## ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
 >
-> **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
-> → [cuarentena/README.md](cuarentena/README.md).
+> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
+> Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
+>
+> **Build 97 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 `cuarentena/` + 10 `sondeos/`.**
+> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+>
+> ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
@@ -14,11 +21,16 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** 95 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑19 00:44).
-> **82 módulos activos** (Minimal 11 + Meta 59 + Full 11) + 21 cuarentena + 9 `sondeos/`.
-> **7 `axiom` de Lean.** **141 axiomas objeto** en `axioms`.
+> ### La ESCALERA (a.2) COMPLETA — 4 de 4
+>
+> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
+> Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
+> `sondeos/CarcPayoff.lean` — `pcc_eval_carc` vuelve. **Lo siguiente: repatriar la cuarentena**,
+> empezando por el keystone `EvalListPrf`.
+>
+> ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-08-21 12:00 (HEAD `cf774f9`+)   ← auditoría; datos de build de 2026-08-19 00:44
+**Last updated:** 2026-08-22 23:55 (HEAD `68fa43c`)
 **Author**: Julián Calderón Almendros
 
 ---
@@ -27,22 +39,24 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **82 activos** (Minimal/ 11 + Meta/ 59 + Full/ 11) + barrel `Meta.lean` · **+21 en `cuarentena/`** |
-| Modules sin sorry | 82 / 82 ✅ |
+| Total modules | **83 activos** (Minimal/ 11 + Meta/ 61 + Full/ 11) + barrel `Meta.lean` · **+21 en `cuarentena/`** (fuera del build) · **+10 en `sondeos/`** |
+| Modules sin sorry | 83 / 83 ✅ |
 | Sorry reales (total) | **0** 🎉 |
-| Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-008) |
+| Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
-| Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); `ax_inAxC` (⊢) / `prf_inAxC` (Prf) — pertenencia de coding a `axiomsCodeT`; `d3` (GodelTwo, único gödeliano vivo). Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
+| Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); **`ax_axiomsCodeT_eq`** (⊢, `Minimal/Axioms:1376`) / **`prf_axiomsCodeT_eq`** (Prf, `Representability2Prf:104`) — anclas de codificación; `d3` (GodelTwo, único gödeliano vivo). ⚠️ `ax_inAxC`/`prf_inAxC` **ya no son axiomas**: son teoremas derivados de las anclas. Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
-| Gödel | ⚠️ **Auditado 2026-07-13.** **Gödel I: sólo `⊬G`** — `goedel_first_real'` (`Meta/DiagonalTwo.lean`), real y **sin postulado gödeliano alguno**, vía punto fijo real `godelC'_fixedpoint`. **La mitad `⊬¬G` (indecidibilidad) NO está en la cadena real**: se probó en la capa LEGACY (`Meta/Incompleteness.lean`) con el postulado **falso en general** `provFormula_repr`, y se **retiró en F7a** — *no revertir, fue un arreglo de solidez*. Para recuperarla falta **`repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ`**. — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ **reales** sobre el cálculo finitario `Prf` (verificador estructural `runFn`/`chainOk`, `provCodeC'` rastrea IΣ₁). **Gödel II**: `goedel_second'` ✅ montado, **módulo `axiom d3`** (único postulado gödeliano vivo). **D3 reducida a UN SOLO lema** `d3_prf_of_chainOkDot` (ruta B dotada): `hI_dot` ✅ cerrado, lógica interna completa ✅ (§39, incl. inducción), intro del `∀` acotado ✅ (§40). **B.3c**: **B.3c: 14 de los 21 tags de `lineWF` CERRADOS** (`eqrefl` `thy` `mp` `efq` `gen` + los 9 proposicionales) gracias a tres piezas genéricas nuevas: **chasis** (`Meta/LineWFSchemaPrf.lean`), **kit de constructores de código** (`Meta/CodeCtorKit.lean`: `nulT`/`unT`/`binT`, genéricos en tag y aridad) y **reflexión por ÁRBOL** (`Meta/CodeTreeReflect.lean`: `CTree` + `PrfH_dotVN` por inducción). Coste por tag: de ~545 líneas (`eqrefl`, a mano) a **tres declaraciones**. Los 21 esquemas quedan en forma ESTRICTA uniforme (lote de 18, net‑0 axiomas). **Faltan 7** (`q1` `q2` `q3` `leibniz` `ind` `qconf` `listInd`), que **NO son más de lo mismo**: llevan `substfc`/`liftfc` dentro del árbol, y ésas son funciones OBJETO, no constructores de código — requieren `substfcT`/`liftfcT` rastreados, que **no existen** (verificado). → `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`). Ver `NEXT-STEPS.md` §🎯 LO QUE QUEDA |
-| Build status | ✅ Passing (**113 jobs**, **99 módulos** = Minimal 11 + Meta 77 + Full 11, 0 errores, **0 warnings**, 0 sorrys) |
-| `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `Meta/CodeDecode.lean` (biyección de fórmulas: round‑trips + inyectividad `decodeForm_inj`) + `Meta/ChainDecode.lean` (cadenas: `decodeChain` + secciones `thy`/`mp`/`gen` + ensamblado `decodeChain_checkProof`/`decodeChain_prf`). Hallazgo: `lineJustif` es *lossy* ⟹ vale la **sección**, no el retract. Módulo B (21 tags, `Meta/LineWFCases.lean`): tabla + dirección negativa ✅; nivel `⊢` des‑duplicado (`Meta/LineWFDerives.lean`, `ProofChain` 870→540) ✅; **19 `ax_lineWF` estructurales reformulados a ACCESORES** ✅ (net‑0 axiomas; `prf_lineWF_<tag>` conservan enunciado; D1/D2 intactos) — `lineWF` ya reflejable sobre líneas abstractas. **B.3c en curso**: `pcc_lineWF_tracked` (átomo `lineWF` punteado) — columna vertebral del paso 6 construida y compilando (`hbwd`+`paso6_backbone`); falta reflejar antecedentes por evaluación provable (`pcc_eval_nthc`) + inversión ×21 → `hC_dot`/D3 |
-| D3 / plan 12‑A | Fases **1a ✅ 1b ✅ 2 ✅** (verificador Δ₀ sin acumulador). **Fase 3 en curso**: ✅ puente `d3_prf_of_reflect_bounded` (D3 ⇐ reflejar `boundedIn`/`chainOkB`) + ✅ átomo `=eq` rastreado (`Sigma1AtomPrf`); ⏳ reflexividad libre de muro, átomos `<`/`lineWF`, cuantificadores acotados, inducción estructural → `d3_prf` → `goedel_second_prf` |
+| Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, **módulo `axiom d3`**. **D3 está FUERA de la cadena activa** (la capa rastreada está en `cuarentena/`): se recupera repatriando las 8 raíces, y el habilitador (`pcc_dot_cons`, escalera a.2) ya está ✅. Ver `NEXT-STEPS.md` |
+| Build status | ✅ Passing (**97 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-22 23:42) |
+| `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `Meta/CodeDecode.lean` (biyección de fórmulas: round‑trips + inyectividad `decodeForm_inj`) + `Meta/ChainDecode.lean` (`decodeChain_prf`: cadena aceptada ⟹ `Prf`). Hallazgo: `lineJustif` es *lossy* ⟹ vale la **sección**, no el retract. **Módulo B**: `Meta/LineWFCases.lean` (tabla de los 21 tags + dirección negativa) sigue **activo**; pero los 14 tags cerrados de `pcc_lineWF_tracked` están **en `cuarentena/`** (`LineWFTrackedPrf`, `LineWFSchemaPrf`, `CodeCtorKit`, `CodeTreeReflect`, …) ⇒ **el frente está congelado** hasta repatriarlos |
+| D3 / plan 12‑A | Fases **1a ✅ 1b ✅ 2 ✅** (verificador Δ₀ sin acumulador, módulos activos) + **fase 3 puente ✅** (`d3_prf_of_reflect_bounded`, `Sigma1BoundedPrf`). ⚠️ **El resto de la fase 3 (evaluación provable rastreada, reflexión Δ₀, ruta B dotada) está en `cuarentena/`.** La vía de recuperación es la **escalera (a.2)**, ✅ completa: `pcc_dot_cons` sustituye a `prf_tc_cons'` en el punto exacto donde la capa rastreada se rompió (verificado, `sondeos/CarcPayoff.lean`) |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |
 
-> **Nota**: Todos los módulos compilan sin errores. Las 5 meta-reglas ω y los meta-axiomas matemáticos son `axiom` (intencionales, no provables), NO `sorry`s (ADR-008).
+> **Nota**: Todos los módulos compilan sin errores. Las **6** meta-reglas ω (que viven en
+> `FOL/MetaRules.lean`, no aquí) y los meta-axiomas matemáticos son `axiom` intencionales, no
+> provables — **no** son `sorry`s (ADR-010).
 
 ---
 
@@ -50,7 +64,7 @@
 
 | Module | Sorry | Status |
 |--------|------:|--------|
-| `Minimal/Axioms.lean` | 0 | ✅ Complete (5 `axiom` declarations son meta-reglas, no sorrys) |
+| `Minimal/Axioms.lean` | 0 | ✅ Complete — lenguaje + **141 axiomas objeto** + esquemas del verificador + capa Δ₀. Contiene **1** `axiom` de Lean (`ax_axiomsCodeT_eq`); las 6 meta-reglas ω se movieron a `FOL/MetaRules.lean`. ⚠️ `ax_tc_cons` sigue como `def` en `:827` pero **fuera de las listas** — definición muerta |
 | `Minimal/Theorems/Block1.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block2.lean` | 0 | ✅ Complete |
 | `Minimal/Theorems/Block3.lean` | 0 | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
@@ -72,6 +86,15 @@
 | `Meta/LineWFCases.lean` | 0 | ✅ `NegVerifier` B (§44): `tagArity`/`tagConcl`/`tagPrems` + `prf_lineWF_tag`/`prf_premsOf_tag` + dirección negativa (`derives_lineWF_neg_*`). `tagConcl` cubre **19, no 21** (`thy` va por `In`; `mp` es incondicional) |
 | `Meta/LineWFDerives.lean` | 0 | ✅ Des‑duplicación: los 42 `lineWF_*`/`premsOf_*` de `⊢` son `prf_to_derives` de sus gemelos `prf_*` (antes: probados dos veces) |
 | `Meta/ChainDecode.lean` | 0 | ✅ `NegVerifier` A.2 (§43): `decodeRule`/`decodeLine`/`decodeChain`, `DecidableEq Term`/`Formula` + `findIdx`, secciones `thy`/`mp`/`gen`, ensamblado **`decodeChain_prf`** (cadena aceptada ⟹ `Prf`) |
+| `Meta/NatOrderPrf.lean` | 0 | ✅ Orden `≤` en `Prf`: transitividades, sustitución, `prf_add_assoc`/`prf_add_comm`. ⚠️ Asoc./conm. de `+` son **axiomas objeto** (ax6/ax7), no se prueban por inducción |
+| `Meta/NatMulPrf.lean` | 0 | ✅ Producto en `Prf` (leyes = ax8–ax12), monotonía, **cancelación** `prf_lt_of_mul_lt_mul_right`, tricotomía, `div2`/`mod2` (ax17/ax21) |
+| `Meta/CantorMonoPrf.lean` | 0 | ✅ **`prf_cantor_mono_left/right`** — sub‑código < código, en 13 pasos troceados. Aquí vive `abbrev cpOf` |
+| `Meta/Div2ParityPrf.lean` | 0 | ✅ **`prf_div2_numeral`** (cadena L1–L5, forma OBJETO, net‑0) + **paridad de Cantor**: `prf_mod2_consec`, `prf_mod2_cpOf`, **`prf_cons_double`** (el puente de la fase C de `pcc_dot_cons`) |
+| `Meta/CodeNumeralPrf.lean` | 0 | ✅ **LA REPARACIÓN**: `triN`/`consN` (números triangulares ⇒ **sin división**), `codeNat`, **`prf_formCode_numeral`** por meta‑recursión |
+| `Meta/DiagonalNumeral.lean` | 0 | ✅ Lema diagonal por la **vía NUMERAL**: `hFN`, `godelCN`, `godelCN_fixedpoint`, `provCode_transfer`, **`goedel_first_numeral`** (Gödel I), `goedel_first_undecidable_numeral` |
+| `Meta/StrongInductionPrf.lean` | 0 | ✅ `prf_strong_induction` (inducción fuerte en `Prf`) + `prf_le_of_lt_succ` |
+| `Meta/EvalMulPrf.lean` | 0 | ✅ Escalera (a.2) peldaño 2: **`pcc_eval_mul`** + `pcc_congr_addcT1_code_imp`, `pcc_eq_subst2_code_imp` |
+| `Meta/DotConsPrf.lean` | 0 | ✅ Escalera (a.2) peldaño 4: **`pcc_dot_cons`** — `⊢ Prov(⌜cons(ḣ,ṫ) = (cons h t)˙⌝)`, argumentos abstractos. Herramientas nuevas `pcc_rw`/`pcc_rw_div2` |
 | `Full/Induction.lean` | 0 | 🔄 Inducción general object-level: `ax_induction`, composición generalizada, **ax6/7/10/11/12/18/19** derivados + lemas de orden |
 | `Full/Mod2.lean` | 0 | ✅ Opción C.2 (2026-06-11): `ax_mod2_alternation` + **ax21 (mod2_range) y ax24 (mod2_of_even) derivados como teoremas** |
 | `Full/Lists.lean` | 0 | ✅ Listas (2026-06-11): meta-axioma `ax_list_induction` + **ax_C3 (concat_assoc) y ax_L3 (in_concat) derivados como teoremas** |
@@ -82,6 +105,27 @@
 ---
 
 ## Recent Achievements
+
+- **2026-08-22 — ✅ La ESCALERA (a.2) COMPLETA: `pcc_dot_cons`** (`Meta/DotConsPrf.lean`, nuevo).
+  `⊢ Prov(⌜ cons(ḣ,ṫ) = (cons h t)˙ ⌝)` para `h`, `t` **abstractos**; footprint
+  `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]`. **Sin inducción nueva**: `cons` no tiene
+  ecuaciones recursivas propias (`ax_L0_cons_def` lo define por `div2 (cantor_poly h (σt))`), así que
+  fue **ensamblaje** en tres fases — (A) la instancia codificada **computa por `rfl`**, (B) el
+  polinomio se evalúa dentro de `Prov` en 5 pasos, (C) el `div2` se cancela vía `pcc_thm_inst` con
+  `prf_cons_double` de puente. Dos herramientas reutilizables: `pcc_rw` y `pcc_rw_div2`.
+  **Rédito verificado** (`sondeos/CarcPayoff.lean`): `pcc_eval_carc` vuelve con el mismo enunciado y
+  footprint, sustituyendo `prf_tc_cons'` por un único `pcc_rw`. Build **97 jobs**.
+  *Las dos lecciones:* (1) todo teorema **OBJETO** se «dota» gratis con `prf_congr_tcFn`, sin entrar
+  en `Prov`; (2) `substfc` sustituye **todas** las ocurrencias del hueco ⇒ un solo
+  `pcc_leibniz_apply` cubre las repeticiones del polinomio (5 pasos, no 15).
+
+- **2026-08-18/19 — LA REPARACIÓN: `ax_tc_cons` retirado, códigos como NUMERALES** (ADR‑012/013).
+  La teoría objeto probaba ⊥ (verificado en compilador). Cuatro reparaciones descartadas con
+  evidencia; la que funciona es escribir `⌈φ⌉` como `numeral (codeNat φ)`. **Coste: −1 axioma,
+  ninguno nuevo.** Módulos nuevos: `Div2ParityPrf`, `CodeNumeralPrf`, `DiagonalNumeral`,
+  `NatOrderPrf`, `NatMulPrf`, `CantorMonoPrf`, `StrongInductionPrf`. 31 módulos a cuarentena (hoy 21,
+  tras refundar el keystone `Sigma1CorePrf`, que devolvió 10 de golpe).
+  ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 
 - **2026-07-09c — 12‑A fase 3: puente D3→forma acotada + átomo `=eq` rastreado**:
   **`Meta/Sigma1BoundedPrf.lean`** (NUEVO): **`d3_prf_of_reflect_bounded`** — como la fase 1/2 dio los
