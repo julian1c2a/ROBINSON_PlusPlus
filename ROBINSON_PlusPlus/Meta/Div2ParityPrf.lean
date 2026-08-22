@@ -262,6 +262,142 @@ theorem prf_div2_numeral (m : Nat) : Prf (div2 (numeral (2 * m)) =eq numeral m) 
     exact h
   exact prf_eq_trans (prf_eq_congr_div2 (prf_eq_symm hmul)) (prf_div2_double (numeral m))
 
+/-! ## PARIDAD DE CANTOR — lo que el ensamblaje de `pcc_dot_cons` necesitaba
+
+Para bajar de `pair` a `div2` hace falta `(cons h t)·2 = cpOf h t`, y eso exige que `cpOf h t` sea
+**PAR**. Como `cpOf h t = S·σS + 2·σt` con `S = h + σt`, el nudo es que **el producto de dos
+consecutivos es par** — que a nivel objeto NO es gratis.
+
+**La salida sin inducción nueva:** case‑split de la paridad de `S` con `ax21`, y en cada rama `ax17`
+da la mitad **EXPLÍCITA** (`div2 S`), así que no hace falta ningún existencial.
+-/
+
+/-! ### Piezas que faltaban del producto (asociatividad y distributiva por la derecha) -/
+
+/-- `(a·b)·c = a·(b·c)` — instancia de `ax11_mul_assoc`. -/
+theorem prf_mul_assoc (a b c : Term) :
+    Prf (mul (mul a b) c =eq mul a (mul b c)) := by
+  have hh := prf_spec (prf_spec (prf_spec
+    (prf_ax (show ax11_mul_assoc ∈ axioms by simp [axioms])) a) b) c
+  simp [substFormula, substTerm, substTerms, mul,
+    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
+  exact hh
+
+/-- Distributividad por la DERECHA: `(a+b)·c = a·c + b·c`. -/
+theorem prf_mul_distrib_right (a b c : Term) :
+    Prf (mul (add a b) c =eq add (mul a c) (mul b c)) :=
+  prf_eq_trans (prf_mul_comm (add a b) c)
+    (prf_eq_trans (prf_mul_distrib c a b)
+      (prf_eq_trans (prf_eq_congr_add1 _ (prf_mul_comm c a))
+        (prf_eq_congr_add2 _ (prf_mul_comm c b))))
+
+/-- **Mover el `·2` hacia fuera**: `(a·2)·b = (a·b)·2`. -/
+theorem prf_swap_mul2 (a b : Term) : Prf (mul (mul a two) b =eq mul (mul a b) two) :=
+  prf_eq_trans (prf_mul_assoc a two b)
+    (prf_eq_trans (prf_eq_congr_mul2 a (prf_mul_comm two b))
+      (prf_eq_symm (prf_mul_assoc a b two)))
+
+/-- Congruencia de `mod2`. -/
+theorem prf_eq_congr_mod2 {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :
+    Prf (mod2 t₁ =eq mod2 t₂) := by
+  let f : Formula := Formula.eq (mod2 (liftTerm 0 t₁)) (mod2 (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mod2 t₁) (mod2 s) := by
+    intro s
+    simp only [f, substFormula, mod2, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ prf_leibniz_subst (A := f) h ((hS t₁) ▸ prf_refl (mod2 t₁))
+
+/-- Congruencia de `mod2`, en contexto. -/
+theorem PrfH_eq_congr_mod2 {Γ : List Formula} {t₁ t₂ : Term} (h : PrfH Γ (t₁ =eq t₂)) :
+    PrfH Γ (mod2 t₁ =eq mod2 t₂) := by
+  let f : Formula := Formula.eq (mod2 (liftTerm 0 t₁)) (mod2 (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mod2 t₁) (mod2 s) := by
+    intro s
+    simp only [f, substFormula, mod2, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS t₂) ▸ PrfH_leibniz_subst (A := f) h ((hS t₁) ▸ prf_to_prfH (prf_refl (mod2 t₁)) Γ)
+
+/-! ### De la paridad de `n` a su mitad EXPLÍCITA (en contexto) -/
+
+/-- `mod2 n = 0 ⟹ (div2 n)·2 = n`. Es `ax17` con el resto anulado. -/
+theorem PrfH_double_div2_of_even {Γ : List Formula} {n : Term}
+    (h : PrfH Γ (mod2 n =eq zero)) : PrfH Γ (mul (div2 n) two =eq n) :=
+  PrfH_eq_trans
+    (PrfH_eq_symm (PrfH_eq_trans (PrfH_eq_congr_add2 (mul (div2 n) two) h)
+      (prf_to_prfH (prf_add_zero_t (mul (div2 n) two)) _)))
+    (prf_to_prfH (prf_div_mod_eq n) _)
+
+/-- `mod2 n = 1 ⟹ σn = (σ(div2 n))·2`: el impar tiene sucesor par. -/
+theorem PrfH_succ_double_of_odd {Γ : List Formula} {n : Term}
+    (h : PrfH Γ (mod2 n =eq one)) : PrfH Γ (succ n =eq mul (succ (div2 n)) two) := by
+  have h1 : PrfH Γ (add (mul (div2 n) two) one =eq n) :=
+    PrfH_eq_trans (PrfH_eq_symm (PrfH_eq_congr_add2 (mul (div2 n) two) h))
+      (prf_to_prfH (prf_div_mod_eq n) _)
+  have h2 : PrfH Γ (succ (add (mul (div2 n) two) one) =eq succ n) := PrfH_eq_congr_succ h1
+  have h3 : Prf (mul (succ (div2 n)) two =eq succ (add (mul (div2 n) two) one)) :=
+    prf_eq_trans (prf_mul_comm (succ (div2 n)) two)
+      (prf_eq_trans (prf_mul_succ two (div2 n))
+        (prf_eq_trans (prf_eq_congr_add1 two (prf_mul_comm two (div2 n)))
+          (prf_add_succ_t (mul (div2 n) two) one)))
+  exact PrfH_eq_symm (PrfH_eq_trans (prf_to_prfH h3 _) h2)
+
+/-! ### El producto de dos CONSECUTIVOS es par -/
+
+/-- **`mod2 (S · σS) = 0`.** Case‑split de la paridad de `S` con `ax21`:
+    * `S` par   ⟹ `S = d·2`   ⟹ `S·σS = (d·σS)·2`;
+    * `S` impar ⟹ `σS = (σd)·2` ⟹ `S·σS = (S·σd)·2`.
+    En ambas ramas la mitad es EXPLÍCITA (`d = div2 S`), sin existenciales. -/
+theorem prf_mod2_consec (S : Term) : Prf (mod2 (mul S (succ S)) =eq zero) := by
+  refine prf_or_elim (prf_mod2_range S) (prf_deduction ?par) (prf_deduction ?impar)
+  · -- `S` PAR: `S = (div2 S)·2`
+    have hd : PrfH [mod2 S =eq zero] (mul (div2 S) two =eq S) :=
+      PrfH_double_div2_of_even (prfH_hyp_self _)
+    -- `S·σS = ((div2 S)·2)·σS = ((div2 S)·σS)·2`
+    have hchain : PrfH [mod2 S =eq zero]
+        (mul S (succ S) =eq mul (mul (div2 S) (succ S)) two) :=
+      PrfH_eq_trans (PrfH_eq_congr_mul1 (succ S) (PrfH_eq_symm hd))
+        (prf_to_prfH (prf_swap_mul2 (div2 S) (succ S)) _)
+    exact PrfH_eq_trans (PrfH_eq_congr_mod2 hchain)
+      (prf_to_prfH (prf_mod2_double (mul (div2 S) (succ S))) _)
+  · -- `S` IMPAR: `σS = (σ(div2 S))·2`
+    have hd : PrfH [mod2 S =eq one] (succ S =eq mul (succ (div2 S)) two) :=
+      PrfH_succ_double_of_odd (prfH_hyp_self _)
+    -- `S·σS = S·((σd)·2) = (S·σd)·2`
+    have hchain : PrfH [mod2 S =eq one]
+        (mul S (succ S) =eq mul (mul S (succ (div2 S))) two) :=
+      PrfH_eq_trans (PrfH_eq_congr_mul2 S hd)
+        (prf_to_prfH (prf_eq_symm (prf_mul_assoc S (succ (div2 S)) two)) _)
+    exact PrfH_eq_trans (PrfH_eq_congr_mod2 hchain)
+      (prf_to_prfH (prf_mod2_double (mul S (succ (div2 S)))) _)
+
+/-! ### `cpOf` es par, y por tanto `(cons h t)·2 = cpOf h t` -/
+
+/-- **`cpOf h t` es PAR.** `cpOf = S·σS + 2·σt`: el primer sumando es par por
+    `prf_mod2_consec`, el segundo lo es por construcción, y la suma de dos pares es par
+    porque se factoriza el `·2` con distributividad. -/
+theorem prf_mod2_cpOf (h t : Term) : Prf (mod2 (cpOf h t) =eq zero) := by
+  let S : Term := add h (succ t)
+  let P : Term := div2 (mul S (succ S))
+  -- (1) `S·σS = P·2`
+  have h1 : Prf (mul S (succ S) =eq mul P two) :=
+    prf_eq_symm (prf_mp (prf_deduction (PrfH_double_div2_of_even (prfH_hyp_self _)))
+      (prf_mod2_consec S))
+  -- (2) `2·σt = (σt)·2`
+  have h2 : Prf (mul two (succ t) =eq mul (succ t) two) := prf_mul_comm two (succ t)
+  -- (3) `cpOf = P·2 + (σt)·2 = (P + σt)·2`
+  have h3 : Prf (cpOf h t =eq mul (add P (succ t)) two) :=
+    prf_eq_trans (prf_eq_trans (prf_eq_congr_add1 _ h1) (prf_eq_congr_add2 _ h2))
+      (prf_eq_symm (prf_mul_distrib_right P (succ t) two))
+  exact prf_eq_trans (prf_eq_congr_mod2 h3)
+    (prf_mod2_double (add P (succ t)))
+
+/-- **LA PIEZA DEL ENSAMBLAJE**: `(cons h t)·2 = cpOf h t`.
+    De `prf_cons_div_mod` (que es `ax17` en `cpOf`) anulando el resto con `prf_mod2_cpOf`. -/
+theorem prf_cons_double (h t : Term) : Prf (mul (cons h t) two =eq cpOf h t) :=
+  prf_eq_trans
+    (prf_eq_symm (prf_eq_trans (prf_eq_congr_add2 (mul (cons h t) two) (prf_mod2_cpOf h t))
+      (prf_add_zero_t (mul (cons h t) two))))
+    (prf_cons_div_mod h t)
+
+
 end ROBINSON_PlusPlus.Meta.Div2ParityPrf
 
 export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
@@ -270,4 +406,8 @@ export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
   prf_mul_two_lt_mono
   prf_mul_two_cancel prf_mod2_double
   prf_eq_congr_div2 prf_div2_double prf_div2_numeral
+  prf_mul_assoc prf_mul_distrib_right prf_swap_mul2
+  prf_eq_congr_mod2 PrfH_eq_congr_mod2
+  PrfH_double_div2_of_even PrfH_succ_double_of_odd
+  prf_mod2_consec prf_mod2_cpOf prf_cons_double
 )
