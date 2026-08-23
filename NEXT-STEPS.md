@@ -96,10 +96,41 @@ comentarios).
 > | **1** | **`EvalListPrf`** | los 3 usos de `prf_tc_cons'` → `pcc_rw_dot_cons_un` | ✅ **HECHO 2026‑08‑23** |
 > | **2** | **`EvalNthcPrf`** → `EvalCarcNthcPrf` | necesitó **`pcc_rw_imp`** (la forma implicación de `pcc_rw`) | ✅ **HECHO 2026‑08‑23** |
 > | **3** | **`D3InDotPrf`** | familia `prf_tc_form`, por **conversión en la frontera** | ✅ **HECHO 2026‑08‑23** — arrastró `BdAllIntroPrf`. **D3 vuelve a estar reducida a UN SOLO lema** |
-> | **4** | **`LineWFTrackedPrf`** (8) · **KIT** (`CodeCtorKit` 4 + `CodeTreeReflect` 2 + `LineWFEfqPrf` 1) · `InAxiomsCodePrf` (2) | lo que queda | ▶ **elegir** |
+> | **4** | **KIT**: `CodeCtorKit` (4) → `CodeTreeReflect` (2) → `LineWFEfqPrf` (1) | ✅ **MEDIDO** (`sondeos/KitPayoff.lean`): los 3 sustitutos ya están escritos y compilados. El coste está en mudar `prf_tc_objAt` dentro de `Prov` | ▶ **el siguiente** |
+> | **5** | `LineWFTrackedPrf` (8) | `prf_tc_cons'` + `prf_tc_eqc`. `prf_tc_eqc` es un `binT 4` ⇒ debería caer con el KIT | ⏳ |
+> | **6** | `InAxiomsCodePrf` (2) | medido: el más fiddly de los tres (hipótesis muerta + hueco en cabeza de `cons`) | ⏳ |
 > | **3bis** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** Desbloquea `CodeCtorKit` (12 usos), `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
 > | **4** | `LineWFTrackedPrf` + los 14 tags | 6 usos (`prf_tc_cons'` + `prf_tc_eqc`); caen `LineWFSchemaPrf`, `LineWFPropPrf`, `LineWFMpPrf`, `LineWFThyPrf`, `LineWFAssemblePrf`, `BdAllIntroPrf` | ⏳ |
 > | **6** | **D3** → **Gödel II** → **F7b** (7→6 `axiom`) | `D3DottedPrf` **ya ha vuelto** (paso 1) y `d3_prf_of_dotted_atoms` es **net‑0** | ⏳ |
+>
+> ### 📏 MEDICIÓN del KIT (2026‑08‑23) — **la última familia, y tampoco es un muro**
+>
+> `sondeos/KitPayoff.lean`, cuatro declaraciones compiladas. **La hipótesis era correcta**: los tres
+> sustitutos salen **por composición de `pcc_dot_cons`, sin inducción nueva**.
+>
+> | | cómo sale |
+> |---|---|
+> | `pcc_dot_nul` | **sólo reescrituras de CÓDIGO** — las hojas (`prf_tc_numeral`, `prf_tc_zero`) **nunca murieron** |
+> | `pcc_dot_un` | código → **1 paso interno** (`pcc_rw`) → código |
+> | `pcc_dot_bin` | código → **2 pasos internos anidados** → código |
+>
+> Los tres con footprint sancionado.
+>
+> 🔑 **Hizo falta `pcc_dot_cons_symm`**, que sale de `pcc_eq_symm_code_internal` — y **ésa volvió con
+> `BdAllIntroPrf` en el paso 3**. Los pasos componen: hacerlos en orden de cascada dejó la
+> herramienta a mano justo cuando hacía falta.
+>
+> #### ⚠️ Dónde está el coste real: NO en el KIT, sino en `CodeTreeReflect`
+>
+> ```lean
+> prf_tc_objAt (t) : ∀ T : CTree, Prf (tcFn (T.objAt t) =eq T.dotV t)
+> ```
+>
+> Es **recursión estructural sobre `CTree`** que produce una igualdad **de código**. Con sustitutos
+> internos, la recursión entera se muda **dentro de `Prov`**. **Todas las piezas existen y están
+> activas**: `pcc_eq_trans_code` (`EvalArithPrf`) y las congruencias internas del KIT
+> (`pcc_congr_unT_code`, `pcc_congr_binT_1/2_code`), que **sobreviven intactas** y ya están en forma
+> implicación. ⇒ conversión **mecánica pero voluminosa**.
 >
 > ### ✅ PASO 3 EJECUTADO (2026‑08‑23) — `D3InDotPrf`, y **D3 vuelve a estar reducida a un solo lema**
 >
@@ -239,8 +270,9 @@ comentarios).
 > No‑raíz (5, caen solos): `LineWFAssemblePrf`, `LineWFMpPrf`, `LineWFPropPrf`, `LineWFSchemaPrf`,
 > `LineWFThyPrf`. Grafo en `cuarentena/README.md`.
 >
-> ⚠️ **Son TRES sub‑familias, no dos.** `prf_tc_cons'` (pasos 1‑2, ✅ resuelta con `pcc_dot_cons`),
-> el **KIT** `prf_tc_nul`/`_un`/`_bin` (paso 3, sin medir) y **`prf_tc_form`** (paso 5, sin mirar).
+> ✅ **Las TRES sub‑familias están MEDIDAS, y ninguna es un muro:** `prf_tc_cons'` (resuelta,
+> `pcc_dot_cons`), `prf_tc_form` (resuelta, conversión en la frontera) y el **KIT** (medido,
+> `sondeos/KitPayoff.lean` — los sustitutos ya están escritos).
 
 > ### ⚠️ TRAMPAS METODOLÓGICAS — caras, no repetir
 >

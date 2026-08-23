@@ -55,7 +55,7 @@ KIT) son **formalmente correctos**, pero se demostraron sobre una teoría que pr
 | familia | sustituto | estado |
 |---|---|---|
 | `prf_tc_cons'` | **`pcc_dot_cons`** + moldes `pcc_rw_dot_cons_un` (unario, `Prf`) y `pcc_rw_dot_cons_nthc` (binario, `PrfH`, vía **`pcc_rw_imp`**) | ✅ **resuelta y validada ×2** |
-| KIT: `prf_tc_nul`/`_un`/`_bin` | `pcc_dot_nul`/`_un`/`_bin` — esperables por composición | ⏳ **sin medir** |
+| KIT: `prf_tc_nul`/`_un`/`_bin` | **`pcc_dot_nul`/`_un`/`_bin`** — salen por composición de `pcc_dot_cons`, sin inducción | ✅ **MEDIDA y ESCRITA** (`sondeos/KitPayoff.lean`). El coste está en `CodeTreeReflect`: mudar `prf_tc_objAt` dentro de `Prov` |
 | `prf_tc_form` | `prf_tc_form_numeral` (1 línea, net‑0) **+ `pcc_to_formCode`** (D1 sobre `prf_formCode_numeral`) | ✅ **MEDIDA** (`sondeos/TcFormPayoff.lean`) — no es muro. ⚠️ El lado derecho **no es negociable**: convertir en la FRONTERA, no cambiar definiciones |
 
 ### ✅ `EvalListPrf` — REPATRIADO (2026‑08‑23)
