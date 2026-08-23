@@ -94,7 +94,7 @@ pendiente de este proyecto: es un **enunciado falso**.
 |---|---|
 | **D1** `repr_pos'_prf` | **NO** — limpio (sólo el ancla de codificación) |
 | **D2** `d2_prf` | **NO** — limpio (`[propext, choice, Quot.sound]`) |
-| `goedel_first_real'` | **SÍ** |
+| `goedel_first_numeral` (Gödel I) | **SÍ** |
 | `goedel_second'` | **SÍ** (+ el `d3` pendiente) |
 
 El reparto encaja con la teoría: **D1 es la Σ₁‑completitud *externa*** (aplicar el
@@ -158,16 +158,17 @@ Son **reglas del cálculo**, no postulados matemáticos falsables (ADR-008).
 
 ## 3 · Capa Gödel LEGACY — RETIRADA en F7a (2026-07-09)
 
-Auditado con `#print axioms`, la cadena **real** (`goedel_first_real'`, `d2_prf`,
-`goedel_second'`) **no citaba** ninguno de estos símbolos; solo los usaba la capa
+Auditado con `#print axioms`, la cadena **real** (entonces `goedel_first_real'`, hoy
+**`goedel_first_numeral`** tras la reparación de ADR‑012; `d2_prf`; `goedel_second'`) **no citaba**
+ninguno de estos símbolos; solo los usaba la capa
 Gödel vieja (Gödel I/II vía D2/D3 postulados). Retirados:
 
 | Símbolo | Estaba en | Reemplazado por (real) |
 |---------|-----------|------------------------|
 | `Dem`, `dem_iff_provable` | `Meta/Provability.lean` | `HilbertSeq.Dem`/`ProvableH` (concreto) |
 | `provFormula`, `provFormula_repr` | `Meta/Provability.lean` | `provCodeC'` + D1 `repr_pos'_prf` |
-| `diagonal_lemma` | `Meta/Provability.lean` | `godelC'_fixedpoint` (`DiagonalTwo`) |
-| `goedelSentence`, `goedelSentence_fixedpoint` | `Meta/Provability.lean` | `godelC'` + su punto fijo |
+| `diagonal_lemma` | `Meta/Provability.lean` | hoy **`godelCN_fixedpoint`** (`DiagonalNumeral`) — el `godelC'_fixedpoint` de entonces también murió con ADR‑012 |
+| `goedelSentence`, `goedelSentence_fixedpoint` | `Meta/Provability.lean` | hoy **`godelCN`** + `godelCN_fixedpoint` |
 | `D2` | `Meta/Incompleteness.lean` (**módulo borrado**) | `d2_prf` (`DerivCondPrf`) real |
 | `D3` | `Meta/Incompleteness.lean` (**módulo borrado**) | `d3_prf_of_sigma1` (reducido) + plan 12‑A |
 

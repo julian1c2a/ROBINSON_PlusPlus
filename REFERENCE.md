@@ -15,8 +15,8 @@
 >
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre `godelCN`.
-> * **21 módulos en `cuarentena/`** ([ADR‑013](DECISIONS.md)): sus teoremas eran formalmente
->   correctos pero **vacuos**. NO borrados.
+> * **21 módulos a `cuarentena/`** ([ADR‑013](DECISIONS.md)) — cifra histórica del momento de la
+>   reparación; hoy quedan **14** (§1.6). Sus teoremas eran formalmente correctos pero **vacuos**.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### ✅ La ESCALERA (a.2) está COMPLETA — 4 de 4
@@ -122,7 +122,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
-Los **68 módulos activos** de `Meta/`, en el orden del barrel
+Los **68** módulos de `Meta/` que están en el build, en el orden del barrel
 [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean). Detalle en el nodo §3.15–§3.25.
 
 | # | Module | Rol · Estado |

@@ -122,13 +122,14 @@ Meta/
 `Meta/Incompleteness.lean` deriva la **mitad esencial del Primer Teorema** a
 partir de las condiciones de demostrabilidad postuladas en el Nivel C:
 
-- ✅ **`goedel_first_unprovable`** : `Consistent → ¬(axioms ⊢ goedelSentence)`.
+- 🗑️ **`goedel_first_unprovable`** : *(capa LEGACY, **eliminada** en F7a)*
+  `Consistent → ¬(axioms ⊢ goedelSentence)`.
   Si el sistema es consistente, la sentencia de Gödel `G` no es demostrable.
   Prueba: `⊢ G` → (D1, `provFormula_repr`) `⊢ Prov(⌜G⌝)`; punto fijo
   (`goedelSentence_fixedpoint`) da `⊢ ¬Prov(⌜G⌝)`; `mp` → `⊢ ⊥`.
-- ✅ **`goedel_first_true`** : `G` es verdadera-pero-indemostrable (su código
-  no es `Provable`, que es exactamente lo que `G` afirma).
-- ✅ **`incompleteness`** : `Consistent → ∃ φ, ¬(axioms ⊢ φ)`.
+- 🗑️ **`goedel_first_true`** : *(capa LEGACY, **eliminada** en F7a — el símbolo ya no existe)*
+  `G` es verdadera-pero-indemostrable. Se apoyaba en el postulado **falso** `provFormula_repr`.
+- 🗑️ **`incompleteness`** : *(capa LEGACY, **eliminada** en F7a)* `Consistent → ∃ φ, ¬(axioms ⊢ φ)`.
 
 - ✅ **Gödel II** (`goedel_second`, 2026-06-12): `Consistent → ¬(axioms ⊢ Con)`
   con `Con := ¬Prov(⌜⊥⌝)`. **Postulando D2 y D3** (condiciones de
@@ -159,7 +160,8 @@ partir de las condiciones de demostrabilidad postuladas en el Nivel C:
   hipótesis honesta** falta la **representabilidad NEGATIVA**, que **no existe** en la cadena real:
   `repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ`. Con ella el argumento se porta tal cual
   (~8 líneas): `⊢¬G` →(punto fijo) `⊢¬¬Prov⌜G⌝` →(`dne`) `⊢Prov⌜G⌝` →(**`repr_neg`**) `⊢G` →(con `⊢¬G`)
-  `⊥`. Ya están el **punto fijo real** (`godelC'_fixedpoint`), **D1** (`repr_pos'_prf`) y `dne`.
+  `⊥`. Ya están el **punto fijo real** —hoy **`godelCN_fixedpoint`**, el `godelC'_fixedpoint` de
+  entonces murió con ADR‑012—, **D1** (`repr_pos'_prf`) y `dne`.
   `repr_neg` debería salir de la **fidelidad del verificador** + `ConsistentOmega`; hay groundwork en
   `Meta/CodeDistinct.lean` («aritmética negativa de códigos»).
 - 📜 **(histórico, capa legacy retirada)** Lo que se probó el 2026-06-13 fue:

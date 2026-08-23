@@ -440,7 +440,7 @@ Ver `cuarentena/README.md` y `PLAN-FRENTE-A.md`.
 
 ### Contexto
 
-ADR-013 dejó 21 módulos en `cuarentena/` y una pregunta abierta: **cómo se recuperan**. El punto
+ADR-013 dejó 21 módulos en cuarentena y una pregunta abierta: **cómo se recuperan**. El punto
 exacto de rotura está localizado: `pcc_eval_carc (h t)` cerraba con **`prf_tc_cons'`** — el puente
 `tcFn (cons h t) = consT (tcFn h) (tcFn t)` a nivel de **código** —, que era consecuencia de
 `ax_tc_cons` y **es falso** bajo la lectura numeral para argumentos abstractos.

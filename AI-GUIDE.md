@@ -1,6 +1,6 @@
 # Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-**Última actualización:** 2026-07-12
+**Última actualización:** 2026-08-23 (§27, control de sincronía doc↔código)
 **Autor:** Julián Calderón Almendros
 
 > Este documento define lo **universal**: aplica a cualquier proyecto Lean 4 que nazca
@@ -317,12 +317,51 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 | `bash new-module.bash NombreModulo` | Crea un módulo nuevo desde la plantilla |
 | `bash gen-root.bash` | Regenera el fichero de importación raíz |
 | `bash check-sorry.bash` | Localiza todos los `sorry` (excluyendo comentarios) |
+| `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |
 | `bash update-toolchain.bash vX.Y.Z` | Actualiza el toolchain de Lean con verificación de build |
 | `make help` | Lista los targets del Makefile |
 
 ---
 
 ## Trazabilidad y Documentación Anexa
+
+### (27.) Control de sincronía documentación ↔ código — `check-doc-sync.bash`
+
+**Este control es OBLIGATORIO antes de cerrar cualquier pasada de documentación.** No es opcional
+ni un extra: nace de dos fallos reales, ambos caros, que la auditoría de 2026-08-22 destapó.
+
+**El fallo que previene, y por qué es traicionero:** *los documentos de estado se actualizan por su
+BANNER y no por su CUERPO.* `CURRENT-STATUS-PROJECT.md` llegó a tener un banner correcto y, tres
+líneas más abajo, una tabla que decía «113 jobs, 99 módulos» citando un teorema borrado. Un ADR
+llevó **más de un mes** marcado «no implementado» sobre algo hecho. Poner un banner de aviso arriba
+es barato y **da sensación de haber actualizado**; recorrer el cuerpo es caro. El resultado es un
+documento que se contradice a sí mismo, y quien lo lee después se cree la mitad equivocada.
+
+```bash
+bash check-doc-sync.bash            # completo (incluye lake build)
+bash check-doc-sync.bash --quick    # sin build, para iterar
+bash check-doc-sync.bash --fix-hint # sugiere el sed de cada corrección
+make docsync                        # equivalente
+```
+
+**Qué comprueba:**
+
+| | control | ¿rompe? |
+|---|---|---|
+| **[A]** | **cifras**: jobs, módulos activos, conteo por capa, cuarentena — contra el estado REAL | ✅ sí |
+| **[B]** | **símbolos muertos** citados como vigentes en los docs autoritativos | ⚠️ aviso |
+| **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
+| **[D]** | **marcas de tiempo** (§22) presentes en los docs técnicos | ✅ sí |
+
+**[B] es un AVISO y no un error, deliberadamente.** Hay menciones legítimas de símbolos que no
+existen: históricas, planificadas, descartadas. Marcarlas como error convertiría el control en ruido,
+y un control que grita lobo se acaba ignorando — que es exactamente el fallo que viene a evitar.
+**[B] pide juicio**: por cada símbolo, decidir si el texto afirma que *ya está* (→ corregir) o lo
+menciona como historia/objetivo (→ añadir un marcador: «retirado», «falta», «propuesto», una fecha).
+
+⚠️ **Y la regla de oro que ningún script sustituye: NO basta con arreglar el banner.** Al corregir,
+recorrer también las tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría
+antiguas.
 
 ### (22.) Marcas de tiempo
 
@@ -419,6 +458,8 @@ vivos con el estado real del código tras una sesión de desarrollo.
 9. **Verificar consistencia**: el recuento de `sorry` debe coincidir entre
    `NEXT-STEPS.md`, `CHANGELOG.md` y `check-sorry.bash`; toda declaración pública
    nueva aparece en su bloque `export`.
+9bis. **Ejecutar `bash check-doc-sync.bash` (§27) y dejarlo en verde.** Obligatorio.
+   Comprobar el CUERPO de cada documento, no sólo su banner.
 10. Reportar en el chat un resumen breve: `sorry` cerrados, declaraciones nuevas,
     ficheros tocados, `sorry` restantes y su ubicación.
 
@@ -434,7 +475,10 @@ decisiones, flujo), no el detalle técnico módulo a módulo.
 `CURRENT-STATUS-PROJECT.md` → actualizar métricas de `README.md` → añadir un ADR nuevo
 a `DECISIONS.md` si hubo una decisión arquitectónica → revisar `DEPENDENCIES.md` si se
 crearon/movieron módulos → revisar `WORKFLOW.md` si la sesión reveló una regla
-operativa nueva.
+operativa nueva → **cerrar con `bash check-doc-sync.bash` (§27) en verde**.
+
+⚠️ Actualizar el **cuerpo**, no sólo el banner: las tablas resumen y las secciones de
+«Próximos pasos» son justo donde se acumula la mentira.
 
 ### `pon_al_dia_el_plan`
 
@@ -516,7 +560,9 @@ concreta.
 `export` → traducir cada símbolo a notación matemática + firma Lean 4 + dependencias
 (§1–§14) → insertarlos en el nodo temático correspondiente de `doc/REFERENCE-*.md` →
 actualizar el índice raíz `REFERENCE.md` si es un nodo nuevo → verificar que todo lo
-del `export` block quedó proyectado y que nada privado se filtró.
+del `export` block quedó proyectado y que nada privado se filtró →
+**`bash check-doc-sync.bash` (§27) en verde** (su control [C] comprueba precisamente
+que ningún módulo se quede fuera del catálogo).
 
 ### `repasa_y_proyecta`
 
@@ -527,7 +573,8 @@ del `export` block quedó proyectado y que nada privado se filtró.
 detectar y eliminar "elementos fantasma" (declaraciones borradas, renombradas o vueltas
 `private` en el código que siguen documentadas como vigentes) → asegurar coherencia de
 fechas, jerarquía de dependencias y enlaces de navegación fuerte → actualizar el
-índice raíz.
+índice raíz → **`bash check-doc-sync.bash` (§27)**, cuyo control [B] es exactamente el
+detector de fantasmas mecanizado; adjudicar uno a uno sus avisos.
 
 ### `guarda_y_sube`
 
@@ -536,7 +583,9 @@ preservando los bloqueos locales.
 
 **Pasos exactos:**
 
-1. Ejecutar `lake build` para garantizar que no hay errores de compilación.
+1. Ejecutar `lake build` para garantizar que no hay errores de compilación,
+   **y `bash check-doc-sync.bash` (§27) para garantizar que la documentación no miente.**
+   Si el segundo falla, corregir ANTES de commitear — no después.
 2. Desbloquear los ficheros `.lean` en los que se ha trabajado:
    `bash git-lock.bash unlock modulo_1.lean ... modulo_n.lean`
 3. Añadir los cambios al staging area (ficheros concretos, evitar `git add -A`/`*`
@@ -553,7 +602,8 @@ preservando los bloqueos locales.
 Antes de dar por completa y al día la documentación de una sesión, verificar que
 `REFERENCE.md` (+ nodos), los ficheros `.lean` y el resto de documentación cumplen:
 
-- [ ] Puntos (0)–(26) de esta guía.
+- [ ] Puntos (0)–(27) de esta guía.
+- [ ] `bash check-doc-sync.bash` en verde (§27), y los avisos de [B] adjudicados.
 - [ ] Reglas de exportación (§17 «Bloques de exportación», §18 «Barrels»).
 - [ ] `NAMING-CONVENTIONS.md` (diccionario de símbolos, REGLA 1–12 de formación de
       nombres, y §5–§8 de estructura de archivos/namespaces/variables/typeclasses).

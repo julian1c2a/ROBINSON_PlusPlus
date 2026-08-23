@@ -6,18 +6,18 @@
 > todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
 > `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral`
 > → reglas `ind`/`listInd`).
-> **Ficheros `.lean`:** la cadena `Meta/` (61 módulos activos, barrel
-> [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **21 módulos en `cuarentena/`**, que **NO están
+> **Ficheros `.lean`:** la cadena `Meta/` (68 módulos en el build, barrel
+> [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **14 módulos en `cuarentena/`**, que **NO están
 > en el build** (ver [cuarentena/README.md](../cuarentena/README.md)).
 
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
 (`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
-**Last updated:** 2026-08-22 23:55 · Lean v4.31.0.
+**Last updated:** 2026-08-23 · Lean v4.31.0.
 
-> ## ⚠️ ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
+> ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 97 jobs · 83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 en `cuarentena/`
+> **Build 104 jobs · 90 módulos activos** (Minimal 11 + Meta 68 + Full 11) **+ 14 en `cuarentena/`
 > + 10 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24

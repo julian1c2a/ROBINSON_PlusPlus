@@ -7,7 +7,7 @@
 
 ## La pregunta
 
-Retirar `ax_tc_cons` dejó 31 módulos en `cuarentena/`. **¿Se pueden recuperar sin reintroducir la
+Retirar `ax_tc_cons` dejó 31 módulos en cuarentena (histórico; hoy quedan 14). **¿Se pueden recuperar sin reintroducir la
 inconsistencia?** La vía candidata es probar la **Σ₁‑completitud internalizada** con **inducción
 interna** en vez de con la ecuación `tc` sintáctica.
 

@@ -19,6 +19,14 @@ rebuild: clean build
 sorry:
 	@bash check-sorry.bash
 
+## Comprueba que la documentacion cuadra con el codigo (AI-GUIDE §27)
+docsync:
+	@bash check-doc-sync.bash
+
+## Idem, sin lake build (para iterar rapido)
+docsync-quick:
+	@bash check-doc-sync.bash --quick
+
 ## Show project status: locked files + sorry count
 status:
 	@echo "=== Lock Status ==="
