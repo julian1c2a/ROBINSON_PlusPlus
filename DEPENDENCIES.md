@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
 >
-> **Build 104 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **90 módulos activos** (Minimal 11 + Meta 68 + Full 11) **+ 14 `cuarentena/` + 10 `sondeos/`.**
+> **Build 106 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **92 módulos activos** (Minimal 11 + Meta 70 + Full 11) **+ 12  + 10 .**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -18,7 +18,7 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **14 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **12 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -26,7 +26,7 @@
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
 > `sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
-> **6 módulos más en cascada** — cuarentena **21 → 14**. Siguiente raíz: `EvalNthcPrf`.
+> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). Siguiente raíz: `D3InDotPrf`.
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
@@ -37,7 +37,7 @@ Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos
 
 > ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
 > solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
-> [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (68 módulos) se adopta la **vista
+> [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (70 módulos) se adopta la **vista
 > de subsistema** que esta nota pedía — ver §0 justo debajo. Mantener un grafo módulo‑a‑módulo de
 > `Meta/` aquí quedaría desactualizado de inmediato (`AI-GUIDE.md` §0.5); el detalle por módulo vive
 > en [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md) §3.15–§3.25 y el catálogo
@@ -72,11 +72,11 @@ Extraída **por máquina** de los `import` reales de los módulos activos de `Me
 * **Hojas** (nadie las importa, son los frentes): `DotConsPrf`, `GodelTwo`, `ChainDecode`,
   `OmegaReflect`, `LineWFCases`, `LineWFConsPrf`, `Sigma1BoundedPrf`.
 
-### `cuarentena/` — 14 módulos FUERA del build
+### `cuarentena/` — 12 módulos FUERA del build
 
-No participan del grafo anterior. **7 raíces** (tras repatriar `EvalListPrf` el 2026-08-23):
-`EvalNthcPrf` (desbloquea 13) · `D3InDotPrf` (11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) ·
-`CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1). Grafo interno en [`cuarentena/README.md`](cuarentena/README.md).
+No participan del grafo anterior. **6 raíces** (tras los pasos 1 y 2 del 2026-08-23):
+`D3InDotPrf` (desbloquea 11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) · `CodeTreeReflect` (2) ·
+`InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1). Grafo interno en [`cuarentena/README.md`](cuarentena/README.md).
 
 ### `sondeos/` — 10 experimentos compilados a mano
 
@@ -303,7 +303,7 @@ por módulo. Resumen:
 ## Verification Commands
 
 ```bash
-lake build                              # build completo (104 jobs a 2026-08-23)
+lake build                              # build completo (106 jobs a 2026-08-23)
 lake clean                              # reinicia la caché (cuando `Replayed` esconde errores)
 lake env lean sondeos/X.lean            # compila un sondeo (fuera del build)
 lake env lean Probe/X.lean              # scratch de sesión (Probe/ está en .gitignore)

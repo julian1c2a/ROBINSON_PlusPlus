@@ -1,6 +1,6 @@
 # `cuarentena/` — la capa RASTREADA, apartada (no borrada)
 
-**Last updated:** 2026-08-23 — tras repatriar `EvalListPrf` (paso 1); grafo recalculado por máquina
+**Last updated:** 2026-08-23 — tras los pasos 1 y 2 (`EvalListPrf`, `EvalNthcPrf`); grafo por máquina
 **Autor:** Julián Calderón Almendros
 
 **Estos 14 módulos NO están en el build.** Se apartaron al ejecutar la reparación de la
@@ -34,30 +34,29 @@ KIT) son **formalmente correctos**, pero se demostraron sobre una teoría que pr
 > `CodeTreeReflect` y `LineWFEfqPrf`, que usan la sub‑familia del KIT. *Lección: contar por la
 > familia entera, y filtrando comentarios.*
 
-### Las 7 RAÍCES que quedan — usan la familia `tc` retirada **en código**
+### Las 6 RAÍCES que quedan — usan la familia `tc` retirada **en código**
 
 | raíz | sub‑familia | usos | desbloquea |
 |---|---|---:|---:|
-| **`EvalNthcPrf`** | `prf_tc_cons'` ⚠️ **bajo binder** | 2 | **13** |
-| `D3InDotPrf` | `prf_tc_form` | 3 | 11 |
+| **`D3InDotPrf`** | **`prf_tc_form`** ⚠️ tercera familia, sin mirar | 3 | **11** |
 | `LineWFTrackedPrf` | `prf_tc_cons'` + `prf_tc_eqc` | 6 | 8 |
 | `CodeCtorKit` | KIT (`nul`/`un`/`bin`) + `prf_tc_cons'` | 12 | 4 |
 | `CodeTreeReflect` | KIT | 3 | 2 |
 | `InAxiomsCodePrf` | `prf_tc_form` | 2 | 2 |
 | `LineWFEfqPrf` | KIT | 2 | 1 |
 
-### Los 7 NO‑RAÍZ — caen solos
+### Los 6 NO‑RAÍZ — caen solos
 
-`BdAllIntroPrf` · `EvalCarcNthcPrf` · `LineWFAssemblePrf` · `LineWFMpPrf` · `LineWFPropPrf` ·
-`LineWFSchemaPrf` · `LineWFThyPrf`
+`BdAllIntroPrf` · `LineWFAssemblePrf` · `LineWFMpPrf` · `LineWFPropPrf` · `LineWFSchemaPrf` ·
+`LineWFThyPrf`
 
 ### ⚠️ Son TRES sub‑familias, no dos
 
 | familia | sustituto | estado |
 |---|---|---|
-| `prf_tc_cons'` | **`pcc_dot_cons`** (+ el molde `pcc_rw_dot_cons_un`) | ✅ **resuelta y validada** |
+| `prf_tc_cons'` | **`pcc_dot_cons`** + moldes `pcc_rw_dot_cons_un` (unario, `Prf`) y `pcc_rw_dot_cons_nthc` (binario, `PrfH`, vía **`pcc_rw_imp`**) | ✅ **resuelta y validada ×2** |
 | KIT: `prf_tc_nul`/`_un`/`_bin` | `pcc_dot_nul`/`_un`/`_bin` — esperables por composición | ⏳ **sin medir** |
-| `prf_tc_form` | *sin diseñar* | ⏳ **sin mirar** |
+| `prf_tc_form` | *sin diseñar* | ⏳ **sin mirar** — es la raíz más rentable que queda (`D3InDotPrf`, 11) |
 
 ### ✅ `EvalListPrf` — REPATRIADO (2026‑08‑23)
 
@@ -128,10 +127,10 @@ Instanciado en `carcT`, `cdrcT` y `lencT`. **Reutilizable** en cualquier sitio c
 | # | módulo | qué hay que hacer |
 |--:|---|---|
 | 1 | ✅ **`EvalListPrf`** | **HECHO** — 3 sitios (no 6), cerrados con un único molde `pcc_rw_dot_cons_un`. Arrastró 6 módulos en cascada |
-| 2 | ▶ `EvalNthcPrf` → `EvalCarcNthcPrf` | ⚠️ **NO es el mismo patrón**: los 2 usos van sobre `.var 2`/`.var 1` **bajo binder**, dentro de `PrfH`. Hay que mirarlo antes de asumir |
-| 3 | **KIT**: `pcc_dot_nul`/`_un`/`_bin` | *medir primero* si salen por composición de `pcc_dot_cons` → desbloquea `CodeCtorKit`, `CodeTreeReflect`, `LineWFEfqPrf` |
+| 2 | ✅ **`EvalNthcPrf`** → `EvalCarcNthcPrf` | **HECHO** — no era el mismo patrón: hizo falta **`pcc_rw_imp`** (forma implicación, para entrar en `PrfH`) y un molde binario propio |
+| 3 | ▶ **`D3InDotPrf`** + `InAxiomsCodePrf` | familia **`prf_tc_form`**, sin mirar. La más rentable: desbloquea 11 |
+| 3bis | **KIT**: `pcc_dot_nul`/`_un`/`_bin` | *medir primero* si salen por composición de `pcc_dot_cons` → desbloquea `CodeCtorKit`, `CodeTreeReflect`, `LineWFEfqPrf` |
 | 4 | `LineWFTrackedPrf` + los 14 tags | caen con 1–3 |
-| 5 | `D3InDotPrf`, `InAxiomsCodePrf` | los dos que quedan |
 | 6 | `D3DottedPrf` → **D3** → **Gödel II** → **F7b** | el objetivo |
 
 Ver [`PLAN-FRENTE-A.md`](../PLAN-FRENTE-A.md), [`NEXT-STEPS.md`](../NEXT-STEPS.md) y

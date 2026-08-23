@@ -210,6 +210,35 @@ theorem pcc_rw (G : Term → Term)
     prf_mp (prf_provCode_congr (prf_eq_symm (hG X))) hbase
   exact prf_mp (prf_provCode_congr (hG Y)) (pcc_leibniz_apply _ X Y heq h1)
 
+/-- **`pcc_rw` en forma IMPLICACIÓN.** Mismo contrato, pero devolviendo la implicación en vez de
+    consumir la base.
+
+    Hace falta cuando el sitio a reescribir vive dentro de **`PrfH`** (el cálculo con contexto de
+    hipótesis): allí la base no es un `Prf` pelado, así que un `Prf → Prf` no encaja y hay que
+    entrar con `PrfH.mp` + `prf_to_prfH`. Es la misma maniobra que `EvalArithPrf` ya hizo para la
+    inducción (`pcc_leibniz_apply_imp`, `pcc_eq_trans_code_imp`, `pcc_congr_succ_code_imp`).
+
+    **Net‑0** (`[propext, choice, Quot.sound]`): la base sancionada entra por `heq`, no por aquí. -/
+theorem pcc_rw_imp (G : Term → Term)
+    (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s))
+    (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (G X) ⇒ provFromCode (G Y)) := by
+  let Ac : Term := G (varc (numeral 0))
+  -- (1) Leibniz codificado, ya aplicado a la igualdad: `Prov(⌜Ac[X] ⇒ Ac[Y]⌝)`
+  have himp : Prf (provFromCode (implc (substfc zero X Ac) (substfc zero Y Ac))) :=
+    pcc_mp_code_apply (pcc_leibniz_code Ac X Y) heq
+  -- (2) abrir el `implc` a implicación REAL
+  have hopen : Prf (provFromCode (substfc zero X Ac) ⇒ provFromCode (substfc zero Y Ac)) :=
+    prf_mp (pcc_mp_code_open _ _) himp
+  -- (3) normalizar los dos `substfc` a `G X` / `G Y`
+  refine prf_deduction ?_
+  have h1 : PrfH [provFromCode (G X)] (provFromCode (substfc zero X Ac)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hG X))) _)
+      (prfH_hyp_self (provFromCode (G X)))
+  have h2 : PrfH [provFromCode (G X)] (provFromCode (substfc zero Y Ac)) :=
+    PrfH.mp _ _ _ (prf_to_prfH hopen _) h1
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hG Y)) _) h2
+
 /-- Reescritura dentro de `L = div2(D ·)`: el molde de los cuatro pasos internos de la fase B. -/
 theorem pcc_rw_div2 (L : Term) (hL : ∀ W, Prf (substtc zero W L =eq L)) (D : Term → Term)
     (hD : ∀ s : Term, Prf (substtc zero s (D (varc (numeral 0))) =eq D s))
@@ -337,6 +366,6 @@ export ROBINSON_PlusPlus.Meta.DotConsPrf (
   consT div2cT prf_congr_consT prf_congr_div2cT prf_substtc_consT prf_substtc_div2cT
   substtc_inv_consT substtc_inv_div2cT prf_substtc_two prf_tc_two
   cpOfT prf_congr_cpOfT prf_substtc_cpOfT pcc_axL0_inst prf_axL0_body_computes
-  pcc_axL0_computed pcc_rw pcc_rw_div2 cpOfT' prf_congr_cpOfT2
+  pcc_axL0_computed pcc_rw pcc_rw_imp pcc_rw_div2 cpOfT' prf_congr_cpOfT2
   pcc_div2_cons pcc_dot_cons
 )

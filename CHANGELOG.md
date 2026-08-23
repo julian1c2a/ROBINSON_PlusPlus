@@ -18,6 +18,52 @@
 
 ---
 
+## 2026-08-23 — ▶ REPATRIACIÓN paso 2: `pcc_rw_imp` → `EvalNthcPrf` (cuarentena 14 → 12)
+
+Build **104 → 106 jobs**, **92 módulos activos**, 0 errores / 0 warnings / 0 sorrys.
+
+### `pcc_rw_imp` — la forma IMPLICACIÓN de `pcc_rw` (`Meta/DotConsPrf.lean`)
+
+```lean
+pcc_rw_imp (G : Term → Term) (hG …) (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) :
+    Prf (provFromCode (G X) ⇒ provFromCode (G Y))
+```
+
+**Net‑0** (`[propext, choice, Quot.sound]`): la base sancionada entra por `heq`, no por aquí.
+Se monta con `pcc_leibniz_code` + `pcc_mp_code_apply` + `pcc_mp_code_open`, las tres ya existentes;
+es la misma maniobra que `EvalArithPrf` hizo para la inducción (`pcc_leibniz_apply_imp` y cía).
+
+### Por qué el molde del paso 1 NO servía
+
+Tres razones, que conviene recordar para las raíces que quedan:
+
+1. Los sitios viven dentro de **`PrfH`** (cálculo con contexto de hipótesis) ⇒ un `Prf → Prf` no
+   encaja; hay que entrar con `PrfH.mp` + `prf_to_prfH`, y para eso hace falta la implicación.
+2. `nthcT` es **binario** y el hueco va en su primer argumento ⇒ molde propio,
+   `pcc_rw_dot_cons_nthc`.
+3. El `cons` era **una de tres ranuras** que la prueba reescribía a la vez. Las otras dos van por
+   `prf_tc_zero`/`prf_tc_succ'`, que **siguen vivos** ⇒ hubo que **separarlas**: primero las sanas a
+   nivel de código, y sólo el `cons` por dentro de `Prov`.
+
+`pcc_eval_nthc` y `pcc_eval_carc_nthc` conservan **enunciado idéntico** y el footprint sancionado.
+`EvalCarcNthcPrf` cayó detrás sin tocar una línea.
+
+### ⚠️ Efecto colateral nuevo: ambigüedades de nombre
+
+Importar `DotConsPrf` arrastra `NatOrderPrf`, y `PrfH_lt_subst1`/`_subst2` existen **en dos sitios**
+(`NatOrderPrf` y `BoundedInPrf`), ambos exportados a la raíz. Se resuelve cualificando
+(`BoundedInPrf.PrfH_lt_subst2`). **Esperar más de esto** conforme se repatríen módulos.
+
+### Estado
+
+Quedan **12 módulos** y **6 raíces**: `D3InDotPrf` (desbloquea 11) · `LineWFTrackedPrf` (8) ·
+`CodeCtorKit` (4) · `CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1).
+
+▶ **La siguiente es `D3InDotPrf`**, y es la más rentable — pero ataca la **tercera** sub‑familia,
+**`prf_tc_form`**, que sigue **sin mirar**.
+
+---
+
 ## 2026-08-23 — ▶ REPATRIACIÓN paso 1: `EvalListPrf` + 6 en cascada (cuarentena 21 → 14)
 
 Build **97 → 104 jobs**, **90 módulos activos** (Minimal 11 + Meta 68 + Full 11), 0 errores /

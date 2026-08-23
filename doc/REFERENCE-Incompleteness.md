@@ -6,8 +6,8 @@
 > todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
 > `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral`
 > → reglas `ind`/`listInd`).
-> **Ficheros `.lean`:** la cadena `Meta/` (68 módulos en el build, barrel
-> [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **14 módulos en `cuarentena/`**, que **NO están
+> **Ficheros `.lean`:** la cadena `Meta/` (70 módulos en el build, barrel
+> [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **12 módulos en `cuarentena/`**, que **NO están
 > en el build** (ver [cuarentena/README.md](../cuarentena/README.md)).
 
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 104 jobs · 90 módulos activos** (Minimal 11 + Meta 68 + Full 11) **+ 14 en `cuarentena/`
+> **Build 106 jobs · 92 módulos activos** (Minimal 11 + Meta 70 + Full 11) **+ 12 en `cuarentena/`
 > + 10 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24

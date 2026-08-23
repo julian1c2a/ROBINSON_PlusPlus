@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑23 · `master` limpio y verde · Lean v4.31.0**
-**104 jobs · 90 módulos activos (Minimal 11 + Meta 68 + Full 11) + 14 en `cuarentena/` · 10 `sondeos/`**
+**106 jobs · 92 módulos activos (Minimal 11 + Meta 70 + Full 11) + 12 en `cuarentena/` · 10 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -94,13 +94,33 @@ comentarios).
 > | # | paso | qué hay que hacer | estado |
 > |--:|---|---|---|
 > | **1** | **`EvalListPrf`** | los 3 usos de `prf_tc_cons'` → `pcc_rw_dot_cons_un` | ✅ **HECHO 2026‑08‑23** |
-> | **2** | **`EvalNthcPrf`** → `EvalCarcNthcPrf` | 2 usos de `prf_tc_cons'`, ⚠️ **bajo binder** (`.var 2`/`.var 1`, dentro de `PrfH`) — **no** es el patrón del paso 1 | ▶ **el siguiente** |
-> | **3** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** Desbloquea `CodeCtorKit` (12 usos), `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
+> | **2** | **`EvalNthcPrf`** → `EvalCarcNthcPrf` | necesitó **`pcc_rw_imp`** (la forma implicación de `pcc_rw`) | ✅ **HECHO 2026‑08‑23** |
+> | **3** | **`D3InDotPrf`** (+ `InAxiomsCodePrf`) | ⚠️ familia **`prf_tc_form`**, la tercera y **sin mirar**. Desbloquea **11** | ▶ **el siguiente** |
+> | **3bis** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** Desbloquea `CodeCtorKit` (12 usos), `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
 > | **4** | `LineWFTrackedPrf` + los 14 tags | 6 usos (`prf_tc_cons'` + `prf_tc_eqc`); caen `LineWFSchemaPrf`, `LineWFPropPrf`, `LineWFMpPrf`, `LineWFThyPrf`, `LineWFAssemblePrf`, `BdAllIntroPrf` | ⏳ |
-> | **5** | `D3InDotPrf`, `InAxiomsCodePrf` | 3 y 2 usos, ambos de **`prf_tc_form`** (otra sub‑familia más) | ⏳ |
 > | **6** | **D3** → **Gödel II** → **F7b** (7→6 `axiom`) | `D3DottedPrf` **ya ha vuelto** (paso 1) y `d3_prf_of_dotted_atoms` es **net‑0** | ⏳ |
 >
-> ### ✅ PASO 1 EJECUTADO (2026‑08‑23) — 7 módulos recuperados, cuarentena 21 → 14
+> ### ✅ PASO 2 EJECUTADO (2026‑08‑23) — `pcc_rw_imp`, y la tercera familia a la vista
+>
+> `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta. **No valía el molde del paso 1**, y por tres razones
+> que conviene recordar para los que quedan:
+>
+> 1. Los sitios viven dentro de **`PrfH`** (con contexto de hipótesis) ⇒ un `Prf → Prf` no encaja.
+>    Hizo falta **`pcc_rw_imp`**, la forma implicación de `pcc_rw` (`Meta/DotConsPrf.lean`, **net‑0**):
+>    `Prov(⌜G X⌝) ⇒ Prov(⌜G Y⌝)`, que entra en `PrfH` con `PrfH.mp` + `prf_to_prfH`. Se monta con
+>    `pcc_leibniz_code` + `pcc_mp_code_apply` + `pcc_mp_code_open`, las tres ya existentes.
+> 2. `nthcT` es **binario** y el hueco va en el primer argumento ⇒ molde propio,
+>    `pcc_rw_dot_cons_nthc`.
+> 3. El `cons` era **una de tres ranuras** que la prueba reescribía a la vez. Las otras dos van por
+>    `prf_tc_zero`/`prf_tc_succ'`, que **siguen vivos** ⇒ hay que **separarlas**: primero las sanas a
+>    nivel de código, y sólo el `cons` por dentro de `Prov`.
+>
+> ⚠️ **Efecto colateral a vigilar:** importar `DotConsPrf` arrastra `NatOrderPrf`, y aparecieron
+> **ambigüedades de nombre** (`PrfH_lt_subst1`/`_subst2` existen en `NatOrderPrf` y en
+> `BoundedInPrf`). Se resuelven cualificando (`BoundedInPrf.PrfH_lt_subst2`). Esperar más de esto
+> según se repatríen módulos.
+>
+> ### ✅ PASO 1 EJECUTADO (2026‑08‑23) — 7 módulos recuperados, cuarentena 21 → 12
 >
 > `EvalListPrf` repatriado. El trabajo real fueron **3 sitios**, no 6: el recuento anterior incluía la
 > definición, el `export` y los docstrings. Y los tres tenían **la misma forma**, así que se cerraron
@@ -129,13 +149,13 @@ comentarios).
 > y vuelve **net‑0** (`[propext, choice, Quot.sound]`). También vuelve `PropCodePrf` (§39, la lógica
 > interna completa incl. `pcc_ind_code`, net‑0).
 >
-> ### Estado de la cuarentena: **14 módulos**, 7 raíces
+> ### Estado de la cuarentena: **12 módulos**, 6 raíces
 >
-> Raíces (**7**, tras repatriar `EvalListPrf`; entre paréntesis lo que desbloquea cada una):
-> **`EvalNthcPrf`** (13) · `D3InDotPrf` (11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) ·
-> `CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1).
-> No‑raíz (7, caen solos): `BdAllIntroPrf`, `EvalCarcNthcPrf`, `LineWFAssemblePrf`, `LineWFMpPrf`,
-> `LineWFPropPrf`, `LineWFSchemaPrf`, `LineWFThyPrf`. Grafo en `cuarentena/README.md`.
+> Raíces (**6**, tras los pasos 1 y 2; entre paréntesis lo que desbloquea cada una):
+> **`D3InDotPrf`** (11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) · `CodeTreeReflect` (2) ·
+> `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1).
+> No‑raíz (6, caen solos): `BdAllIntroPrf`, `LineWFAssemblePrf`, `LineWFMpPrf`, `LineWFPropPrf`,
+> `LineWFSchemaPrf`, `LineWFThyPrf`. Grafo en `cuarentena/README.md`.
 >
 > ⚠️ **Son TRES sub‑familias, no dos.** `prf_tc_cons'` (pasos 1‑2, ✅ resuelta con `pcc_dot_cons`),
 > el **KIT** `prf_tc_nul`/`_un`/`_bin` (paso 3, sin medir) y **`prf_tc_form`** (paso 5, sin mirar).

@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 import ROBINSON_PlusPlus.Meta.EvalLtPrf
+import ROBINSON_PlusPlus.Meta.DotConsPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -29,6 +30,7 @@ open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.TrackedCorePrf
 open ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
+open ROBINSON_PlusPlus.Meta.DotConsPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -214,7 +216,7 @@ theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
-      (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
+      (BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 
 /-- Transporte de `provFromCode` por igualdad de código bajo contexto (Leibniz sobre
     `provFormulaC'`). -/
@@ -229,6 +231,37 @@ theorem PrfH_congr_nthcT {Γ : List Formula} {x x' y y' : Term}
   unfold nthcT funcc
   exact PrfH_congr_cons_tail (PrfH_congr_cons_tail (PrfH_congr_cons_head
     (PrfH_eq_trans (PrfH_congr_cons_head hx) (PrfH_congr_cons_tail (PrfH_congr_cons_head hy)))))
+
+/-! ### El sustituto de `pcc_dot_cons` (antes `prf_tc_cons'`, retirado)` en esta capa
+
+Aquí el transporte del `cons` dotado NO tiene la forma del molde de `EvalListPrf`
+(`pcc_rw_dot_cons_un`), por tres razones:
+
+* los sitios viven dentro de **`PrfH`** (con contexto de hipótesis), no en `Prf` pelado ⇒ hace falta
+  la forma IMPLICACIÓN, `pcc_rw_imp`;
+* `nthcT` es **binario**, y el hueco va en su primer argumento;
+* el `cons` es **una de tres ranuras** que la prueba original reescribía a la vez. Las otras dos van
+  por `prf_tc_zero` / `prf_tc_succ'`, que **siguen vivos** ⇒ se separan: primero las sanas a nivel de
+  código, y sólo el `cons` por dentro de `Prov`.
+-/
+
+/-- **Molde de repatriación para la capa `nthc`.** Cambia `cons(ḣ,ṫ)` por `(cons h t)˙` **dentro de
+    `Prov`**, bajo el contexto `⌜nthc(·, IDX) = RHS⌝`, y **dentro de `PrfH`**.
+
+    Sustituye al viejo transporte por `pcc_dot_cons` (antes `prf_tc_cons'`, retirado)`, que era de CÓDIGO; éste es INTERNO. -/
+theorem pcc_rw_dot_cons_nthc {Γ : List Formula} (h t IDX RHS : Term)
+    (hI : ∀ W : Term, Prf (substtc zero W IDX =eq IDX))
+    (hR : ∀ W : Term, Prf (substtc zero W RHS =eq RHS))
+    (hbase : PrfH Γ (provFromCode (eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) IDX) RHS))) :
+    PrfH Γ (provFromCode (eqCodeFn (nthcT (tcFn (cons h t)) IDX) RHS)) := by
+  refine PrfH.mp _ _ _ (prf_to_prfH
+    (pcc_rw_imp (fun s => eqCodeFn (nthcT s IDX) RHS) ?_ _ _ (pcc_dot_cons h t)) _) hbase
+  intro s
+  refine prf_eq_trans (prf_substfc_eq zero s (nthcT (varc (numeral 0)) IDX) RHS) ?_
+  exact prf_congr_eqCodeFn
+    (prf_eq_trans (prf_substtc_nthcT zero s (varc (numeral 0)) IDX)
+      (prf_congr_nthcT (prf_substtc_varc0 s) (hI s)))
+    (hR s)
 
 /-- `nthcT X Y` es `substtc`‑invariante si `X`, `Y` lo son. -/
 theorem substtc_inv_nthcT {X Y : Term}
@@ -261,9 +294,12 @@ theorem nthcEvalPred_step :
     have hbase : PrfH [Formula.eq (.var 0) zero, A0, P0]
         (provFromCode (eqCodeFn (nthcT (consT (tcFn (.var 2)) (tcFn (.var 1))) (termCode zero))
           (tcFn (.var 2)))) := prf_to_prfH (pcc_nthc_zero_code (.var 2) (.var 1)) _
+    -- el `cons` va por DENTRO de `Prov` (`pcc_dot_cons`); las otras dos ranuras siguen
+    -- siendo reescrituras de CÓDIGO, que `prf_tc_zero` y `prf_tc_succ'` cubren y siguen vivas
+    refine pcc_rw_dot_cons_nthc (.var 2) (.var 1) _ _
+      (substtc_inv_tcFn _) (substtc_inv_tcFn _) ?_
     refine PrfH_provCode_congr ?_ hbase
-    refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT ?_ ?_) ?_
-    · exact prf_to_prfH (prf_eq_symm (prf_tc_cons' (.var 2) (.var 1))) _
+    refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT (prf_to_prfH (prf_refl _) _) ?_) ?_
     · exact PrfH_eq_trans (prf_to_prfH (prf_eq_symm prf_tc_zero) _)
         (PrfH_congr_tcFn (PrfH_eq_symm hz))
     · exact PrfH_eq_symm (PrfH_eq_trans (PrfH_congr_tcFn (PrfH_eq_congr_nthc2 hz))
@@ -284,8 +320,8 @@ theorem nthcEvalPred_step :
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
-        (PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
-          (PrfH_lt_subst1 hs hlt))
+        (BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+          (BoundedInPrf.PrfH_lt_subst1 hs hlt))
     have ihEval := PrfH.mp _ _ _ ihj hltJ
     let X : Term := nthcT (consT (tcFn (.var 2)) (tcFn (.var 1))) (succcT (tcFn (pred (.var 0))))
     let Y : Term := nthcT (tcFn (.var 1)) (tcFn (pred (.var 0)))
@@ -297,9 +333,10 @@ theorem nthcEvalPred_step :
         (provFromCode (eqc X Z)) :=
       PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_trans_code_imp X Y Z hX
         (pcc_nthc_succ_code (.var 2) (.var 1) (pred (.var 0)))) _) ihEval
+    refine pcc_rw_dot_cons_nthc (.var 2) (.var 1) _ _
+      (substtc_inv_tcFn _) (substtc_inv_tcFn _) ?_
     refine PrfH_provCode_congr ?_ hXZ
-    refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT ?_ ?_) ?_
-    · exact prf_to_prfH (prf_eq_symm (prf_tc_cons' (.var 2) (.var 1))) _
+    refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT (prf_to_prfH (prf_refl _) _) ?_) ?_
     · exact PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_tc_succ' (pred (.var 0)))) _)
         (PrfH_congr_tcFn (PrfH_eq_symm hs))
     · exact PrfH_eq_symm (PrfH_eq_trans (PrfH_congr_tcFn (PrfH_eq_congr_nthc2 hs))

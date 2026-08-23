@@ -2,8 +2,8 @@
 
 > ## ESTADO REAL — 2026-08-23 · repatriación en curso
 >
-> **Build 104 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **90 módulos activos** (Minimal 11 + Meta 68 + Full 11) **+ 14 en `cuarentena/`** (fuera del build)
+> **Build 106 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **92 módulos activos** (Minimal 11 + Meta 70 + Full 11) **+ 12 en `cuarentena/`** (fuera del build)
 > **+ 10 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -72,8 +72,8 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**90 módulos activos** (Minimal 11 + Meta 68 + Full 11) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **14 en `cuarentena/`** (§1.6) y **10 en `sondeos/`**
+**92 módulos activos** (Minimal 11 + Meta 70 + Full 11) + barrel `Meta.lean` + raíz
+`ROBINSON_PlusPlus.lean`. Fuera del build: **12 en `cuarentena/`** (§1.6) y **10 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)
@@ -122,7 +122,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
-Los **68** módulos de `Meta/` que están en el build, en el orden del barrel
+Los **70** módulos de `Meta/` que están en el build, en el orden del barrel
 [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean). Detalle en el nodo §3.15–§3.25.
 
 | # | Module | Rol · Estado |
@@ -151,7 +151,7 @@ Los **68** módulos de `Meta/` que están en el build, en el orden del barrel
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
 
-### 1.6 `cuarentena/` — 14 módulos FUERA del build
+### 1.6 `cuarentena/` — 12 módulos FUERA del build
 
 > ⚠️ **No son código vigente.** Sus teoremas son **formalmente correctos** pero se demostraron sobre
 > una teoría que probaba ⊥ — o sea, **vacuos** ([ADR‑013](DECISIONS.md)). No se borran: la
@@ -270,7 +270,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-23.** Build **104 jobs**, **90 módulos activos**, 0 sorrys, 7 `axiom` de Lean.
+**Estado 2026-08-23.** Build **106 jobs**, **92 módulos activos**, 0 sorrys, 7 `axiom` de Lean.
 
 ### Lo que está cerrado
 
