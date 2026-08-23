@@ -58,7 +58,12 @@ printf "  axiom de Lean   : %s\n" "$AXIOMS"
 [ -n "$JOBS" ] && printf "  build jobs      : %s\n" "$JOBS"
 echo
 
-DOCS=$(ls *.md doc/*.md cuarentena/*.md sondeos/*.md 2>/dev/null | grep -v '^CHANGELOG.md$' || true)
+# Documentos AUTORITATIVOS: los que describen el ESTADO ACTUAL y por tanto deben cuadrar.
+# Quedan fuera, y con razón, los de diario, diseño e historia (CHANGELOG, GODEL-*-DESIGN,
+# PLAN-*, THOUGHTS, MINIMAL-AXIOMS…): sus cifras y símbolos son históricos POR DISEÑO.
+AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
+AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
+DOCS="$AUTHORITATIVE"
 FAIL=0
 
 # ─── 2. CIFRAS OBSOLETAS ─────────────────────────────────────────────────────
@@ -66,10 +71,21 @@ FAIL=0
 # Las líneas marcadas como históricas también (fecha ISO al principio, o marcador).
 echo "════ [A] CIFRAS ════"
 A_FAIL=0
-check_num () {   # $1 = regex con un grupo numérico   $2 = valor correcto   $3 = etiqueta
+# ALCANCE: sólo la REGIÓN DE CABECERA (primeras 100 líneas) de cada doc autoritativo.
+# Ahí viven el banner y las tablas resumen — lo que AFIRMA el estado actual. Más abajo
+# están los registros de logros, donde «93 jobs» es historia correcta, no un error.
+# Esta acotación es la que hace utilizable el control: sin ella, los diarios de
+# `NEXT-STEPS.md` disparan una docena de falsos positivos y nadie vuelve a mirarlo.
+HEADREGION=$(mktemp)
+: > "$HEADREGION"
+for d in $DOCS; do
+  [ -e "$d" ] || continue
+  head -100 "$d" | sed "s|^|$d:|" >> "$HEADREGION"
+done
+
+check_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = etiqueta
   local pat="$1" good="$2" label="$3" hits
-  hits=$(grep -rnE "$pat" $DOCS 2>/dev/null \
-         | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|20[0-9]{2}-[0-9]{2}-[0-9]{2} —" || true)
+  hits=$(grep -nE "$pat" "$HEADREGION" 2>/dev/null          | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|en su momento|entonces|ya no|20[0-9]{2}-[0-9]{2}-[0-9]{2}" || true)
   while IFS= read -r line; do
     [ -z "$line" ] && continue
     local n; n=$(echo "$line" | grep -oE "$pat" | grep -oE "[0-9]+" | head -1)
@@ -84,6 +100,7 @@ check_num () {   # $1 = regex con un grupo numérico   $2 = valor correcto   $3 
 check_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
 check_num "Meta ([0-9]+ \+|[0-9]+\))" "$META" "conteo de Meta"
 check_num "[0-9]+ (módulos )?en \`cuarentena/\`" "$QUAR" "cuarentena"
+rm -f "$HEADREGION"
 [ "$A_FAIL" = "0" ] && echo "  ✓ sin cifras obsoletas" || FAIL=1
 
 # ─── 3. SÍMBOLOS MUERTOS ─────────────────────────────────────────────────────
