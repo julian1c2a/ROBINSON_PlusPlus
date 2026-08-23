@@ -287,7 +287,7 @@ Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-L
 |--:|---|---|---|
 | **1** | **Repatriar `cuarentena/`** | ▶ **el siguiente**. Rédito verificado (`sondeos/CarcPayoff.lean`): `pcc_eval_carc` vuelve con un solo `pcc_rw` + `pcc_dot_cons`. Empezar por el keystone `EvalListPrf` | D3 → Gödel II → **F7b** (7→6 `axiom`) |
 | **2** | **`repr_neg` / `NegVerifier`** para `⊬¬G` | abierto, **independiente de D3**. Reducción hecha (`reflects_of_omega`); falta el verificador negativo. Módulo A ✅, módulo B al 14/21 — pero los 21 tags están **en cuarentena** | la mitad *indecidibilidad* de Gödel I |
-| **3** | **Recodificar símbolos por índice de tabla** | independiente y **sin riesgo**; medido: recorta **424×** el tamaño de los códigos (19 068 → 45), porque hoy los símbolos son numerales unarios de puntos Unicode (`σ` = U+03C3 = 963) | nada; es higiene de escala |
+| **3** | **Recodificar símbolos por índice de tabla** | 📏 **MEDIDO** (`sondeos/RecodCoste.lean`). Beneficio **mayor** de lo que decía S5 —el 98‑99 % del `formCode` de los axiomas del verificador son los nombres de símbolos; `ax_tc_zero` pasaría de 49 015 a ~708 nodos (**69×**)— pero **hoy no es cuello de botella**. Coste: ~10 teoremas en 4 módulos, uno `CodeDecode` (completo). ⚠️ Una tabla pura **no es total**: hace falta codificación **etiquetada**. ⇒ hacerlo **antes** de escribir C‑F de `NegVerifier`, no ahora | nada; es higiene de escala |
 
 ⚠️ **`⊬¬G` no está cerrado.** `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis
 META explícita**. El obstáculo de fondo es el **intuicionismo** del FOL, no la ω‑consistencia
