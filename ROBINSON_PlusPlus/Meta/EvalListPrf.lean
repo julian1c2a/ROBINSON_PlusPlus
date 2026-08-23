@@ -5,6 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.EvalArithPrf
 import ROBINSON_PlusPlus.Meta.NumListPrf
+import ROBINSON_PlusPlus.Meta.DotConsPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -23,6 +24,7 @@ open ROBINSON_PlusPlus.Meta.EvalArithPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
 open ROBINSON_PlusPlus.Meta.NumListPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.DotConsPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
@@ -37,7 +39,7 @@ usa sobre listas. La diferencia estructural:
 
 * `carc` / `cdrc` **no necesitan inducción**: sus axiomas (`ax_carc`, `ax_cdrc`) determinan el valor
   en un `cons` de una vez. Basta instanciar el axioma **codificado** con testigos `tcFn h`, `tcFn t`
-  y transportar por `prf_tc_cons` (el puente `tcFn (cons a b) =eq consT (tcFn a) (tcFn b)`).
+  y transportar `consT ḣ ṫ ↦ (cons h t)˙` con **`pcc_dot_cons`** (antes: `prf_tc_cons`, retirado).
 * `lenc` **sí** recurre sobre la estructura de lista ⇒ **inducción object de listas**
   (`prf_list_induction`), con base `ax_lenc_nil` y paso `ax_lenc_cons` + la lógica ecuacional
   interna de §26 (`pcc_congr_succ_code_imp`, `pcc_eq_trans_code_imp`).
@@ -54,8 +56,8 @@ def carcT (x : Term) : Term := funcc (strCode "carc") (cons x nil)
 def cdrcT (x : Term) : Term := funcc (strCode "cdrc") (cons x nil)
 /-- Código object del término `lenc x`. -/
 def lencT (x : Term) : Term := funcc (strCode "lenc") (cons x nil)
-/-- Código object del término `cons x y`. -/
-def consT (x y : Term) : Term := funcc (strCode cons_sym) (cons x (cons y nil))
+-- `consT` (y su congruencia, `substtc` e invariancia) viven ahora en `Meta/DotConsPrf.lean`:
+-- eran duplicados textuales. Aquí se usan vía `open`.
 
 /-- Puentes definicionales con `termCode` (por definición de `termCode` sobre `.func`). -/
 theorem carcT_termCode (a : Term) : carcT (termCode a) = termCode (carc a) := rfl
@@ -63,10 +65,17 @@ theorem cdrcT_termCode (a : Term) : cdrcT (termCode a) = termCode (cdrc a) := rf
 theorem lencT_termCode (a : Term) : lencT (termCode a) = termCode (lenc a) := rfl
 theorem consT_termCode (a b : Term) : consT (termCode a) (termCode b) = termCode (cons a b) := rfl
 
-/-- El puente `tcFn (cons a b) =eq consT (tcFn a) (tcFn b)` es exactamente `prf_tc_cons`
-    (`funcc`/`numeral 1` son definicionalmente lo que aparece en el axioma). -/
-theorem prf_tc_cons' (a b : Term) : Prf (tcFn (cons a b) =eq consT (tcFn a) (tcFn b)) :=
-  prf_tc_cons a b
+/-! ### ⚠️ `prf_tc_cons'` RETIRADO (2026-08-23)
+
+Aquí vivía `prf_tc_cons' (a b) : Prf (tcFn (cons a b) =eq consT (tcFn a) (tcFn b))`, que era
+`prf_tc_cons` — la consecuencia directa de **`ax_tc_cons`**, la ecuación que hacía **inconsistente**
+la teoría objeto (ADR-012). Retirado el axioma, ni el puente ni `prf_tc_cons` existen ya: bajo la
+lectura numeral el enunciado es **falso** para `a`, `b` abstractos, no sólo indemostrable.
+
+**Su sustituto es `pcc_dot_cons`** (`Meta/DotConsPrf.lean`), que prueba la misma ecuación **dentro de
+`Prov`** en vez de a nivel de código. El cambio de nivel es real: el transporte pasa de
+`prf_provCode_congr` (fuera) a `pcc_leibniz_apply` (dentro), y por eso hace falta dar el
+código-contexto. `pcc_rw_dot_cons_un` (abajo) encapsula ese trámite. -/
 
 /-! ### Congruencias e interacción con `substtc` -/
 
@@ -77,11 +86,6 @@ theorem prf_congr_cdrcT {x y : Term} (h : Prf (x =eq y)) : Prf (cdrcT x =eq cdrc
 theorem prf_congr_lencT {x y : Term} (h : Prf (x =eq y)) : Prf (lencT x =eq lencT y) :=
   prf_congr_funcc2 (prf_congr_cons_head h)
 
-theorem prf_congr_consT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
-    Prf (consT x y =eq consT x' y') :=
-  prf_congr_funcc2
-    (prf_eq_trans (prf_congr_cons_head hx) (prf_congr_cons_tail (prf_congr_cons_head hy)))
-
 theorem prf_substtc_carcT (v W x : Term) :
     Prf (substtc v W (carcT x) =eq carcT (substtc v W x)) :=
   prf_substtc_funcc1 v W (strCode "carc") x
@@ -91,9 +95,6 @@ theorem prf_substtc_cdrcT (v W x : Term) :
 theorem prf_substtc_lencT (v W x : Term) :
     Prf (substtc v W (lencT x) =eq lencT (substtc v W x)) :=
   prf_substtc_funcc1 v W (strCode "lenc") x
-theorem prf_substtc_consT (v W x y : Term) :
-    Prf (substtc v W (consT x y) =eq consT (substtc v W x) (substtc v W y)) :=
-  prf_substtc_funcc2 v W (strCode cons_sym) x y
 
 /-! #### Invariancias `substtc` (descargan la hipótesis `hX` de §26) -/
 
@@ -106,10 +107,33 @@ theorem substtc_inv_cdrcT {X : Term} (hX : ∀ W, Prf (substtc zero W X =eq X)) 
 theorem substtc_inv_lencT {X : Term} (hX : ∀ W, Prf (substtc zero W X =eq X)) :
     ∀ W, Prf (substtc zero W (lencT X) =eq lencT X) :=
   fun W => prf_eq_trans (prf_substtc_lencT zero W X) (prf_congr_lencT (hX W))
-theorem substtc_inv_consT {X Y : Term}
-    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
-    ∀ W, Prf (substtc zero W (consT X Y) =eq consT X Y) :=
-  fun W => prf_eq_trans (prf_substtc_consT zero W X Y) (prf_congr_consT (hX W) (hY W))
+
+/-! ### El sustituto de `prf_tc_cons'`: reescritura del `cons` dotado, INTERNA
+
+Los tres sitios que usaban `prf_tc_cons'` (`carc`, `cdrc`, `lenc`) tienen la **misma forma**: un
+constructor de código **unario** `F` aplicado al `cons`, con un lado derecho `R` fijo. Así que basta
+un molde, y los tres se cierran con él.
+
+Es `pcc_rw` (`Meta/DotConsPrf.lean`) con el contexto `G s := ⌜F s = R⌝` y `pcc_dot_cons h t` como
+igualdad interna. Las hipótesis sobre `F` (distribuye sobre `substtc`, es congruente) y sobre `R`
+(es `substtc`-invariante) son justo lo que hace falta para computar el `substfc` del contexto. -/
+
+/-- **Molde de repatriación.** De `⊢ Prov(⌜F (cons(ḣ,ṫ)) = R⌝)` sale `⊢ Prov(⌜F ((cons h t)˙) = R⌝)`.
+
+    Sustituye al viejo transporte por `prf_tc_cons'`, que era **de código**; éste es **interno**. -/
+theorem pcc_rw_dot_cons_un (F : Term → Term)
+    (hFs : ∀ v W x : Term, Prf (substtc v W (F x) =eq F (substtc v W x)))
+    (hFc : ∀ x y : Term, Prf (x =eq y) → Prf (F x =eq F y))
+    (R : Term) (hR : ∀ W : Term, Prf (substtc zero W R =eq R))
+    (h t : Term)
+    (hbase : Prf (provFromCode (eqCodeFn (F (consT (tcFn h) (tcFn t))) R))) :
+    Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R)) := by
+  refine pcc_rw (fun s => eqCodeFn (F s) R) ?_ _ _ (pcc_dot_cons h t) hbase
+  intro s
+  refine prf_eq_trans (prf_substfc_eq zero s (F (varc (numeral 0))) R) ?_
+  exact prf_congr_eqCodeFn
+    (prf_eq_trans (hFs zero s (varc (numeral 0))) (hFc _ _ (prf_substtc_varc0 s)))
+    (hR s)
 
 /-! ### `carc` y `cdrc`: evaluación provable SIN inducción
 
@@ -117,7 +141,7 @@ theorem substtc_inv_consT {X Y : Term}
 Instanciamos el axioma **codificado** (`pcc_axiom_inst2`) con testigos `tcFn h`, `tcFn t`, computamos
 los dos `substfc` (interno con `prf_substfc_arith_open`, externo a mano sobre el código explícito,
 usando (A) `prf_substtc_tcFn` para que los `tcFn` incrustados sobrevivan), y transportamos
-`consT ḣ ṫ ↦ (cons h t)˙` con `prf_tc_cons'`. -/
+`consT ḣ ṫ ↦ (cons h t)˙` con **`pcc_rw_dot_cons_un`** (que es `pcc_dot_cons` por dentro). -/
 
 /-- Instancia codificada de `ax_carc`, ya computada: `⊢ Prov(⌜carc (cons h t)˙ = ḣ⌝)`. -/
 theorem pcc_eval_carc (h t : Term) :
@@ -151,10 +175,8 @@ theorem pcc_eval_carc (h t : Term) :
   have hbase : Prf (provFromCode (eqCodeFn (carcT (consT (tcFn h) (tcFn t))) (tcFn h))) :=
     prf_mp (prf_provCode_congr hchain)
       (pcc_axiom_inst2 φ (show ax_carc ∈ axioms by simp [axioms]) (tcFn h) (tcFn t))
-  exact prf_mp
-    (prf_provCode_congr
-      (prf_congr_eqCodeFn (prf_congr_carcT (prf_eq_symm (prf_tc_cons' h t))) (prf_refl _)))
-    hbase
+  exact pcc_rw_dot_cons_un carcT prf_substtc_carcT (fun _ _ => prf_congr_carcT)
+    (tcFn h) (substtc_inv_tcFn h) h t hbase
 
 /-- Instancia codificada de `ax_cdrc`, ya computada: `⊢ Prov(⌜cdrc (cons h t)˙ = ṫ⌝)`. -/
 theorem pcc_eval_cdrc (h t : Term) :
@@ -185,10 +207,8 @@ theorem pcc_eval_cdrc (h t : Term) :
   have hbase : Prf (provFromCode (eqCodeFn (cdrcT (consT (tcFn h) (tcFn t))) (tcFn t))) :=
     prf_mp (prf_provCode_congr hchain)
       (pcc_axiom_inst2 φ (show ax_cdrc ∈ axioms by simp [axioms]) (tcFn h) (tcFn t))
-  exact prf_mp
-    (prf_provCode_congr
-      (prf_congr_eqCodeFn (prf_congr_cdrcT (prf_eq_symm (prf_tc_cons' h t))) (prf_refl _)))
-    hbase
+  exact pcc_rw_dot_cons_un cdrcT prf_substtc_cdrcT (fun _ _ => prf_congr_cdrcT)
+    (tcFn t) (substtc_inv_tcFn t) h t hbase
 
 /-! ### `lenc`: evaluación provable POR INDUCCIÓN DE LISTAS -/
 
@@ -249,10 +269,9 @@ theorem pcc_ax_lenc_cons_computed (h t : Term) :
       (eqCodeFn (lencT (consT (tcFn h) (tcFn t))) (succcT (lencT (tcFn t))))) :=
     prf_mp (prf_provCode_congr hchain)
       (pcc_axiom_inst2 φ (show ax_lenc_cons ∈ axioms by simp [axioms]) (tcFn h) (tcFn t))
-  exact prf_mp
-    (prf_provCode_congr
-      (prf_congr_eqCodeFn (prf_congr_lencT (prf_eq_symm (prf_tc_cons' h t))) (prf_refl _)))
-    hbase
+  exact pcc_rw_dot_cons_un lencT prf_substtc_lencT (fun _ _ => prf_congr_lencT)
+    (succcT (lencT (tcFn t)))
+    (substtc_inv_succcT (substtc_inv_lencT (substtc_inv_tcFn t))) h t hbase
 
 /-- **PASO INDUCTIVO** de `lenc`, en forma implicación (lo que pide `prf_list_induction`):
     `⊢ Prov(⌜lenc ṫ = (lenc t)˙⌝) ⇒ Prov(⌜lenc (cons h t)˙ = (lenc (cons h t))˙⌝)`. -/
@@ -330,10 +349,12 @@ theorem pcc_eval_lenc (L : Term) : Prf (provFromCode (evalLencCode L)) := by
 end ROBINSON_PlusPlus.Meta.EvalListPrf
 
 export ROBINSON_PlusPlus.Meta.EvalListPrf (
-  carcT cdrcT lencT consT prf_tc_cons'
-  prf_congr_carcT prf_congr_cdrcT prf_congr_lencT prf_congr_consT
-  prf_substtc_carcT prf_substtc_cdrcT prf_substtc_lencT prf_substtc_consT
-  substtc_inv_carcT substtc_inv_cdrcT substtc_inv_lencT substtc_inv_consT
+  carcT cdrcT lencT
+  carcT_termCode cdrcT_termCode lencT_termCode consT_termCode
+  prf_congr_carcT prf_congr_cdrcT prf_congr_lencT
+  prf_substtc_carcT prf_substtc_cdrcT prf_substtc_lencT
+  substtc_inv_carcT substtc_inv_cdrcT substtc_inv_lencT
+  pcc_rw_dot_cons_un
   pcc_eval_carc pcc_eval_cdrc
   evalLencCode pcc_eval_lenc_nil pcc_ax_lenc_cons_computed pcc_eval_lenc_cons_imp
   substTerm_evalLencCode liftTerm_evalLencCode evalLencPred substFormula_evalLencPred

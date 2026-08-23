@@ -72,6 +72,13 @@ import ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf
 import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 import ROBINSON_PlusPlus.Meta.DotConsPrf
+import ROBINSON_PlusPlus.Meta.EvalListPrf
+import ROBINSON_PlusPlus.Meta.EvalLtPrf
+import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
+import ROBINSON_PlusPlus.Meta.EvalBoundedPrf
+import ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
+import ROBINSON_PlusPlus.Meta.D3DottedPrf
+import ROBINSON_PlusPlus.Meta.PropCodePrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
 import ROBINSON_PlusPlus.Meta.AxiomListCode
 import ROBINSON_PlusPlus.Meta.CodeDecode

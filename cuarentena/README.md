@@ -1,11 +1,16 @@
 # `cuarentena/` — la capa RASTREADA, apartada (no borrada)
 
-**Last updated:** 2026-08-22 23:55 (HEAD `68fa43c`) — grafo recalculado por máquina
+**Last updated:** 2026-08-23 — tras repatriar `EvalListPrf` (paso 1); grafo recalculado por máquina
 **Autor:** Julián Calderón Almendros
 
-**Estos 21 módulos NO están en el build.** Se apartaron al ejecutar la reparación de la
+**Estos 14 módulos NO están en el build.** Se apartaron al ejecutar la reparación de la
 inconsistencia ([ADR‑012/013](../DECISIONS.md)). **No se han borrado**: vuelven cuando se repare su
-raíz. Fueron 31; refundar el keystone `Sigma1CorePrf` devolvió 10 de golpe.
+raíz.
+
+**Historial:** fueron **31**. Refundar el keystone `Sigma1CorePrf` devolvió **10** (→ 21).
+Repatriar `EvalListPrf` con `pcc_dot_cons` devolvió **7** más (→ 14, 2026‑08‑23): él mismo, más
+`EvalLtPrf`, `EvalRunFnPrf`, `EvalBoundedPrf`, `Delta0ReflectPrf`, `PropCodePrf` y **`D3DottedPrf`**
+— estos seis **sin tocar una línea**, sólo por quedar libres.
 
 ## Por qué se apartaron
 
@@ -22,40 +27,44 @@ KIT) son **formalmente correctos**, pero se demostraron sobre una teoría que pr
 
 ---
 
-## El grafo de recuperación (verificado por máquina, 2026-08-22)
+## El grafo de recuperación (verificado por máquina, 2026-08-23)
 
-> ⚠️ **Corrección de la auditoría 2026‑08‑22:** la cifra «**6 raíces**» que venía propagándose por
-> `NEXT-STEPS.md`, `PLAN-FRENTE-A.md` y este mismo fichero **era incorrecta**. Son **8**. Se habían
-> perdido `CodeTreeReflect` y `LineWFEfqPrf` porque el recuento buscaba sólo `prf_tc_cons`, y esos
-> dos usan la **otra** sub‑familia — `prf_tc_nul`/`prf_tc_un`/`prf_tc_bin`, los constructores del
-> KIT. *Lección: contar por la familia entera, y filtrando comentarios.*
+> ⚠️ **Corrección de la auditoría 2026‑08‑22:** la cifra «6 raíces» que circulaba **era incorrecta**
+> (eran 8, hoy 7 tras repatriar `EvalListPrf`). El recuento buscaba sólo `prf_tc_cons` y perdía
+> `CodeTreeReflect` y `LineWFEfqPrf`, que usan la sub‑familia del KIT. *Lección: contar por la
+> familia entera, y filtrando comentarios.*
 
-### Las 8 RAÍCES — usan la familia `tc` retirada **en código**
+### Las 7 RAÍCES que quedan — usan la familia `tc` retirada **en código**
 
-| raíz | qué sub‑familia usa | usos | desbloquea (cierre transitivo) |
+| raíz | sub‑familia | usos | desbloquea |
 |---|---|---:|---:|
-| **`EvalListPrf`** | `prf_tc_cons'` — **y lo DEFINE** (`:48`) | 6 | **20** — *todos los demás* |
-| `EvalNthcPrf` | `prf_tc_cons'` | — | 13 |
-| `D3InDotPrf` | `prf_tc_form`/`prf_tc_cons'` | — | 11 |
-| `LineWFTrackedPrf` | familia `tc` | — | 8 |
-| `CodeCtorKit` | `prf_tc_nul`/`un`/`bin` | — | 4 |
-| **`CodeTreeReflect`** ⚠️ | `prf_tc_nul`/`un`/`bin` | 3 | 2 |
-| `InAxiomsCodePrf` | familia `tc` | — | 2 |
-| **`LineWFEfqPrf`** ⚠️ | `prf_tc_bin`/`prf_tc_nul` | 2 | 1 |
+| **`EvalNthcPrf`** | `prf_tc_cons'` ⚠️ **bajo binder** | 2 | **13** |
+| `D3InDotPrf` | `prf_tc_form` | 3 | 11 |
+| `LineWFTrackedPrf` | `prf_tc_cons'` + `prf_tc_eqc` | 6 | 8 |
+| `CodeCtorKit` | KIT (`nul`/`un`/`bin`) + `prf_tc_cons'` | 12 | 4 |
+| `CodeTreeReflect` | KIT | 3 | 2 |
+| `InAxiomsCodePrf` | `prf_tc_form` | 2 | 2 |
+| `LineWFEfqPrf` | KIT | 2 | 1 |
 
-⚠️ = raíz que el recuento anterior no vio.
+### Los 7 NO‑RAÍZ — caen solos
 
-### Los 13 NO‑RAÍZ — caen solos al repararse sus raíces
+`BdAllIntroPrf` · `EvalCarcNthcPrf` · `LineWFAssemblePrf` · `LineWFMpPrf` · `LineWFPropPrf` ·
+`LineWFSchemaPrf` · `LineWFThyPrf`
 
-`BdAllIntroPrf` · `D3DottedPrf` · `Delta0ReflectPrf` · `EvalBoundedPrf` · `EvalCarcNthcPrf` ·
-`EvalLtPrf` · `EvalRunFnPrf` · `LineWFAssemblePrf` · `LineWFMpPrf` · `LineWFPropPrf` ·
-`LineWFSchemaPrf` · `LineWFThyPrf` · `PropCodePrf`
+### ⚠️ Son TRES sub‑familias, no dos
 
-### 🔑 `EvalListPrf` es la BASE, no sólo el keystone
+| familia | sustituto | estado |
+|---|---|---|
+| `prf_tc_cons'` | **`pcc_dot_cons`** (+ el molde `pcc_rw_dot_cons_un`) | ✅ **resuelta y validada** |
+| KIT: `prf_tc_nul`/`_un`/`_bin` | `pcc_dot_nul`/`_un`/`_bin` — esperables por composición | ⏳ **sin medir** |
+| `prf_tc_form` | *sin diseñar* | ⏳ **sin mirar** |
 
-No tiene **ninguna** dependencia dentro de la cuarentena, y **los otros 20 dependen de él**
-transitivamente. Es además donde se **define** `prf_tc_cons'` (`:48`) — el origen literal de la
-contaminación. **Nada vuelve antes que él.**
+### ✅ `EvalListPrf` — REPATRIADO (2026‑08‑23)
+
+Era la **base**: sin dependencias dentro de la cuarentena, con los otros 20 colgando de él, y donde
+se **definía** `prf_tc_cons'` — el origen literal de la contaminación. Hoy vive en
+`Meta/EvalListPrf.lean`, con `prf_tc_cons'` **borrado** (su cuerpo era `prf_tc_cons`, que ya no
+existe) y los tres transportes rehechos con el molde **`pcc_rw_dot_cons_un`**.
 
 ---
 
@@ -94,20 +103,32 @@ intro s
 contexto `G` y la ecuación `substfc zero s (G (varc 0)) =eq G s` — trivial con los `prf_substtc_*`,
 pero hay que escribirla.
 
-### ⚠️ Falta un segundo sustituto: el KIT
+### ✅ El molde, ya validado en los tres sitios de `EvalListPrf`
 
-`pcc_dot_cons` cubre **`prf_tc_cons'`**. Pero dos raíces (`CodeCtorKit`, `CodeTreeReflect`) y
-`LineWFEfqPrf` usan la **otra** sub‑familia: `prf_tc_nul m`, `prf_tc_un m a`, `prf_tc_bin m a b` —
-los constructores de código de aridad 0/1/2. Necesitan **su propia versión internalizada**, análoga
-a `pcc_dot_cons`. Como los tres son `cons`‑árboles (ése era el hallazgo del KIT), lo esperable es que
-salgan **por composición de `pcc_dot_cons`**, sin inducción nueva — pero **está sin medir**.
+Los tres usos tenían la **misma forma** —un constructor de código **unario** `F` aplicado al `cons`,
+con un lado derecho `R` fijo—, así que se cerraron con un solo lema:
+
+```lean
+pcc_rw_dot_cons_un (F : Term → Term) (hFs …) (hFc …) (R : Term) (hR …) (h t : Term)
+    (hbase : Prf (provFromCode (eqCodeFn (F (consT (tcFn h) (tcFn t))) R))) :
+    Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R))
+```
+
+Instanciado en `carcT`, `cdrcT` y `lencT`. **Reutilizable** en cualquier sitio con esa forma.
+
+### ⚠️ Faltan DOS sustitutos más
+
+* **KIT** (`prf_tc_nul m`, `prf_tc_un m a`, `prf_tc_bin m a b`, aridad 0/1/2): lo usan `CodeCtorKit`,
+  `CodeTreeReflect` y `LineWFEfqPrf`. Como los tres son `cons`‑árboles (ése era el hallazgo del KIT),
+  lo esperable es que salgan **por composición de `pcc_dot_cons`**, sin inducción nueva — **sin medir**.
+* **`prf_tc_form`**: lo usan `D3InDotPrf` (3) e `InAxiomsCodePrf` (2). **Sin mirar todavía.**
 
 ## Orden de repatriación propuesto
 
 | # | módulo | qué hay que hacer |
 |--:|---|---|
-| 1 | **`EvalListPrf`** | sustituir los 6 usos de `prf_tc_cons'` por `pcc_rw` + `pcc_dot_cons`. El de `pcc_eval_carc` ya está **hecho y compilado** en `sondeos/CarcPayoff.lean`; falta `pcc_eval_cdrc` y los demás |
-| 2 | `EvalNthcPrf` → `EvalCarcNthcPrf` | mismo patrón |
+| 1 | ✅ **`EvalListPrf`** | **HECHO** — 3 sitios (no 6), cerrados con un único molde `pcc_rw_dot_cons_un`. Arrastró 6 módulos en cascada |
+| 2 | ▶ `EvalNthcPrf` → `EvalCarcNthcPrf` | ⚠️ **NO es el mismo patrón**: los 2 usos van sobre `.var 2`/`.var 1` **bajo binder**, dentro de `PrfH`. Hay que mirarlo antes de asumir |
 | 3 | **KIT**: `pcc_dot_nul`/`_un`/`_bin` | *medir primero* si salen por composición de `pcc_dot_cons` → desbloquea `CodeCtorKit`, `CodeTreeReflect`, `LineWFEfqPrf` |
 | 4 | `LineWFTrackedPrf` + los 14 tags | caen con 1–3 |
 | 5 | `D3InDotPrf`, `InAxiomsCodePrf` | los dos que quedan |

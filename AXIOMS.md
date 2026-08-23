@@ -1,14 +1,14 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-22 23:55 · HEAD `68fa43c`
+> ## ESTADO REAL — 2026-08-23 · repatriación en curso
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
 >
-> **Build 97 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **83 módulos activos** (Minimal 11 + Meta 61 + Full 11) **+ 21 `cuarentena/` + 10 `sondeos/`.**
+> **Build 104 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **90 módulos activos** (Minimal 11 + Meta 68 + Full 11) **+ 14 `cuarentena/` + 10 `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -18,15 +18,15 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
+> * **14 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
 >
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
-> `sondeos/CarcPayoff.lean` — `pcc_eval_carc` vuelve. **Lo siguiente: repatriar la cuarentena**,
-> empezando por el keystone `EvalListPrf`.
+> `sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
+> **6 módulos más en cascada** — cuarentena **21 → 14**. Siguiente raíz: `EvalNthcPrf`.
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 

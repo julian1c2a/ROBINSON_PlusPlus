@@ -18,6 +18,63 @@
 
 ---
 
+## 2026-08-23 — ▶ REPATRIACIÓN paso 1: `EvalListPrf` + 6 en cascada (cuarentena 21 → 14)
+
+Build **97 → 104 jobs**, **90 módulos activos** (Minimal 11 + Meta 68 + Full 11), 0 errores /
+0 warnings / 0 sorrys. Primer paso del plan de repatriación, y el sondeo decisivo del frente.
+
+### `Meta/EvalListPrf.lean` — la BASE de la cuarentena, de vuelta
+
+El trabajo real fueron **3 sitios**, no 6: el recuento anterior incluía la definición, el `export` y
+menciones en docstrings. Y los tres tenían **la misma forma** —un constructor de código **unario**
+`F` aplicado al `cons`, con un lado derecho `R` fijo—, así que se cerraron con **un solo molde**:
+
+```lean
+pcc_rw_dot_cons_un (F : Term → Term) (hFs …) (hFc …) (R : Term) (hR …) (h t : Term)
+    (hbase : Prf (provFromCode (eqCodeFn (F (consT (tcFn h) (tcFn t))) R))) :
+    Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R))
+```
+
+Es `pcc_rw` con contexto `G s := ⌜F s = R⌝` y `pcc_dot_cons h t`. Instanciado en `carcT` / `cdrcT` /
+`lencT`. **Compiló a la primera.** `pcc_eval_carc`, `pcc_eval_cdrc`, `pcc_ax_lenc_cons_computed` y
+`pcc_eval_lenc` conservan **enunciado idéntico** y footprint
+`[propext, choice, Quot.sound, prf_axiomsCodeT_eq]` — la base sancionada, **sin `tc_cons`**.
+
+Dos limpiezas que el plan no había previsto:
+
+* **`prf_tc_cons'` se BORRA, no se reescribe.** Su cuerpo era `prf_tc_cons`, consecuencia directa de
+  `ax_tc_cons`, y **ya no existe** en el árbol. Bajo la lectura numeral su enunciado es **falso** para
+  argumentos abstractos, no sólo indemostrable. En su hueco queda una nota explicando la sustitución.
+* **4 declaraciones duplicadas con `DotConsPrf`** (`consT` —textualmente idéntica—, `prf_congr_consT`,
+  `prf_substtc_consT`, `substtc_inv_consT`): borradas de aquí, importadas de allí.
+
+### La cascada — 6 módulos más, sin tocar una línea
+
+Al volver `EvalListPrf` quedaron libres y compilan tal cual: `EvalLtPrf`, `EvalRunFnPrf`,
+`EvalBoundedPrf`, `Delta0ReflectPrf`, `PropCodePrf` y **`D3DottedPrf`**.
+
+🎯 **`D3DottedPrf` es el que importa**: contiene **`d3_prf_of_dotted_atoms`** —la reducción de D3 a
+las reflexiones punteadas— y vuelve **net‑0** (`[propext, choice, Quot.sound]`). También vuelve
+`PropCodePrf` (§39: la lógica interna completa, incl. `pcc_ind_code`), igualmente net‑0.
+
+### Lo que esto confirma (era el objetivo del paso 1)
+
+**El patrón se repite y es factorizable.** No hubo que reescribir tres pruebas: bastó reconocer la
+forma común y escribir el molde una vez. Es la misma lección que abarató `pcc_dot_cons`.
+
+### Lo que NO confirma — tres avisos para el paso 2
+
+1. **Son TRES sub‑familias, no dos.** `prf_tc_cons'` (✅ resuelta), el **KIT**
+   `prf_tc_nul`/`_un`/`_bin` (⏳ sin medir) y **`prf_tc_form`** (⏳ sin mirar, lo usan `D3InDotPrf` e
+   `InAxiomsCodePrf`).
+2. **`EvalNthcPrf` NO es el mismo patrón.** Sus 2 usos van sobre `.var 2`/`.var 1` **bajo binder**,
+   dentro de `PrfH` — no sobre términos abstractos sueltos. Hay que mirarlo antes de asumir.
+3. Quedan **14 módulos** y **7 raíces**: `EvalNthcPrf` (desbloquea 13) · `D3InDotPrf` (11) ·
+   `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) · `CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) ·
+   `LineWFEfqPrf` (1).
+
+---
+
 ## 2026-08-23 00:30 — AUDITORÍA de documentación: proyección del árbol REFERENCE
 
 Pasada completa (`repasa_y_proyecta` + `actualiza_documentacion`) sobre los 24 `.md` del repo y los

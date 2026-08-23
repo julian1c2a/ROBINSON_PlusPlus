@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑22 23:42 · `master` limpio y verde · Lean v4.31.0**
-**97 jobs · 83 módulos activos (Minimal 11 + Meta 61 + Full 11) + 21 en `cuarentena/` · 9 `sondeos/`**
+**Estado 2026‑08‑23 · `master` limpio y verde · Lean v4.31.0**
+**104 jobs · 90 módulos activos (Minimal 11 + Meta 68 + Full 11) + 14 en `cuarentena/` · 10 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -93,28 +93,52 @@ comentarios).
 >
 > | # | paso | qué hay que hacer | estado |
 > |--:|---|---|---|
-> | **1** | **`EvalListPrf`** | sustituir los **6** usos de `prf_tc_cons'` por `pcc_rw` + `pcc_dot_cons`. El de `pcc_eval_carc` **ya está hecho y compilado** (`sondeos/CarcPayoff.lean`); falta `pcc_eval_cdrc` (`:164`, mismo patrón con `cdrcT`) y los demás | ▶ **el siguiente** |
-> | **2** | `EvalNthcPrf` → `EvalCarcNthcPrf` | mismo patrón; caen `EvalLtPrf`, `EvalBoundedPrf`, `EvalRunFnPrf`, `Delta0ReflectPrf` | ⏳ |
-> | **3** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** `nulT`/`unT`/`binT` son todos `cons`‑árboles (ése fue el hallazgo del KIT), así que lo *esperable* es que salgan por **composición de `pcc_dot_cons`**, sin inducción nueva — pero **está SIN MEDIR**. Desbloquea `CodeCtorKit`, `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
-> | **4** | `LineWFTrackedPrf` + los 14 tags | caen con 1–3 (`LineWFSchemaPrf`, `LineWFPropPrf`, `LineWFMpPrf`, `LineWFThyPrf`, `LineWFAssemblePrf`) | ⏳ |
-> | **5** | `D3InDotPrf`, `InAxiomsCodePrf` | las dos raíces que quedan | ⏳ |
-> | **6** | `D3DottedPrf` → **D3** → **Gödel II** → **F7b** (7→6 `axiom`) | el objetivo | ⏳ |
+> | **1** | **`EvalListPrf`** | los 3 usos de `prf_tc_cons'` → `pcc_rw_dot_cons_un` | ✅ **HECHO 2026‑08‑23** |
+> | **2** | **`EvalNthcPrf`** → `EvalCarcNthcPrf` | 2 usos de `prf_tc_cons'`, ⚠️ **bajo binder** (`.var 2`/`.var 1`, dentro de `PrfH`) — **no** es el patrón del paso 1 | ▶ **el siguiente** |
+> | **3** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** Desbloquea `CodeCtorKit` (12 usos), `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
+> | **4** | `LineWFTrackedPrf` + los 14 tags | 6 usos (`prf_tc_cons'` + `prf_tc_eqc`); caen `LineWFSchemaPrf`, `LineWFPropPrf`, `LineWFMpPrf`, `LineWFThyPrf`, `LineWFAssemblePrf`, `BdAllIntroPrf` | ⏳ |
+> | **5** | `D3InDotPrf`, `InAxiomsCodePrf` | 3 y 2 usos, ambos de **`prf_tc_form`** (otra sub‑familia más) | ⏳ |
+> | **6** | **D3** → **Gödel II** → **F7b** (7→6 `axiom`) | `D3DottedPrf` **ya ha vuelto** (paso 1) y `d3_prf_of_dotted_atoms` es **net‑0** | ⏳ |
 >
-> **El paso 1 es el sondeo decisivo del frente**: si los usos restantes de `EvalListPrf` salen con el
-> mismo patrón que el ya verificado, la repatriación es mecánica y el resto es volumen. Si alguno se
-> resiste, ahí está el siguiente muro y hay que mirarlo antes de seguir.
+> ### ✅ PASO 1 EJECUTADO (2026‑08‑23) — 7 módulos recuperados, cuarentena 21 → 14
 >
-> ⚠️ **Al arreglar cada sitio**: el transporte pasa de ser **de código** (fuera de `Prov`, un
-> `prf_provCode_congr`) a ser **interno** (dentro de `Prov`, un `pcc_leibniz_apply`), así que hay que
-> dar el contexto `G` y su ecuación `substfc zero s (G (varc 0)) =eq G s`. Es mecánico con los
-> `prf_substtc_*`, pero **no es un reemplazo textual ciego**.
+> `EvalListPrf` repatriado. El trabajo real fueron **3 sitios**, no 6: el recuento anterior incluía la
+> definición, el `export` y los docstrings. Y los tres tenían **la misma forma**, así que se cerraron
+> con **un solo molde**:
 >
-> ### Estado de la cuarentena: **21 módulos**, 8 raíces
+> ```lean
+> pcc_rw_dot_cons_un (F : Term → Term) (hFs …) (hFc …) (R : Term) (hR …) (h t : Term)
+>     (hbase : Prf (provFromCode (eqCodeFn (F (consT (tcFn h) (tcFn t))) R))) :
+>     Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R))
+> ```
 >
-> Raíces (**8**, ordenadas por cascada de desbloqueo): **`EvalListPrf`** (20) · `EvalNthcPrf` (13) ·
-> `D3InDotPrf` (11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) · **`CodeTreeReflect`** (2) ·
-> `InAxiomsCodePrf` (2) · **`LineWFEfqPrf`** (1). Las dos en negrita son las que el recuento anterior
-> no vio. Los 13 no‑raíz caen solos. Grafo completo en `cuarentena/README.md`.
+> Es `pcc_rw` con contexto `G s := ⌜F s = R⌝` y `pcc_dot_cons h t`. Instanciado en `carcT`/`cdrcT`/
+> `lencT`. **Compiló a la primera.** Todo net‑0 salvo `prf_axiomsCodeT_eq`, y los enunciados de
+> `pcc_eval_carc`/`_cdrc`/`_lenc` son **idénticos** a los de la versión en cuarentena.
+>
+> Dos limpiezas que hicieron falta y no estaban en el plan:
+> * **`prf_tc_cons'` se BORRA**, no se reescribe: su cuerpo era `prf_tc_cons`, que **ya no existe**.
+> * **4 declaraciones duplicadas** con `DotConsPrf` (`consT`, `prf_congr_consT`, `prf_substtc_consT`,
+>   `substtc_inv_consT`) — se borran y se importan.
+>
+> **La cascada fue el rédito grande.** Al volver `EvalListPrf` quedaron libres, sin tocar una línea:
+> `EvalLtPrf`, `EvalRunFnPrf`, `EvalBoundedPrf`, `Delta0ReflectPrf`, `PropCodePrf` y **`D3DottedPrf`**.
+> Los seis compilan tal cual.
+>
+> 🎯 **`D3DottedPrf` es el que importa**: contiene `d3_prf_of_dotted_atoms` — la **reducción de D3** —
+> y vuelve **net‑0** (`[propext, choice, Quot.sound]`). También vuelve `PropCodePrf` (§39, la lógica
+> interna completa incl. `pcc_ind_code`, net‑0).
+>
+> ### Estado de la cuarentena: **14 módulos**, 7 raíces
+>
+> Raíces (**7**, tras repatriar `EvalListPrf`; entre paréntesis lo que desbloquea cada una):
+> **`EvalNthcPrf`** (13) · `D3InDotPrf` (11) · `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) ·
+> `CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1).
+> No‑raíz (7, caen solos): `BdAllIntroPrf`, `EvalCarcNthcPrf`, `LineWFAssemblePrf`, `LineWFMpPrf`,
+> `LineWFPropPrf`, `LineWFSchemaPrf`, `LineWFThyPrf`. Grafo en `cuarentena/README.md`.
+>
+> ⚠️ **Son TRES sub‑familias, no dos.** `prf_tc_cons'` (pasos 1‑2, ✅ resuelta con `pcc_dot_cons`),
+> el **KIT** `prf_tc_nul`/`_un`/`_bin` (paso 3, sin medir) y **`prf_tc_form`** (paso 5, sin mirar).
 
 > ### ⚠️ TRAMPAS METODOLÓGICAS — caras, no repetir
 >
