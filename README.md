@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
 >
-> **Build 106 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **92 módulos activos** (Minimal 11 + Meta 70 + Full 11) **+ 12  + 10 .**
+> **Build 108 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **94 módulos activos** (Minimal 11 + Meta 72 + Full 11) **+ 12  + 10 .**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -18,7 +18,7 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **12 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **10 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -26,7 +26,7 @@
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
 > `sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
-> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). Siguiente raíz: `D3InDotPrf`.
+> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). ▶ **PASO 3 EJECUTADO**: `D3InDotPrf` de vuelta ⇒ **D3 reducida otra vez a UN SOLO lema**. Siguiente: `LineWFTrackedPrf` o el KIT.
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 

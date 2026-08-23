@@ -24,6 +24,8 @@ open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 open ROBINSON_PlusPlus.Meta.EvalNthcPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 open ROBINSON_PlusPlus.Meta.D3DottedPrf
 open ROBINSON_PlusPlus.Meta.EvalArithPrf
 open ROBINSON_PlusPlus.Meta.EvalLtPrf
@@ -141,12 +143,52 @@ theorem substtc_inv_liftc_tcFn (a : Term) :
   prf_eq_trans (prf_congr_substtc3 (prf_liftc_tcFn a))
     (prf_eq_trans (prf_substtc_tcFn W a) (prf_eq_symm (prf_liftc_tcFn a)))
 
-/-- `termCode (formCode φ)` es `substtc`-invariante (el código de un código es cerrado; se descarga
-    con `prf_tc_form` + la invariancia de `tcFn`). -/
+/-! ### El sustituto de `prf_tc_form` (2026-08-23)
+
+`prf_tc_form (φ) : Prf (tcFn (formCode φ) =eq termCode (formCode φ))` murió con `ax_tc_cons`: bajo
+la lectura numeral su enunciado es **falso**, porque `tcFn (formCode φ)` es el código del NUMERAL y
+`termCode (formCode φ)` el del árbol `cons`. Dos códigos distintos de dos términos que **denotan el
+mismo número**.
+
+⚠️ **El lado derecho NO se puede cambiar.** `inDot φ` está fijado por `Meta/D3DottedPrf.lean` —que
+sale de la definición de `provCodeC'`— y lleva `termCode (formCode φ)`. Ese código **es el objetivo
+de D3**: cambiarlo sería cambiar el teorema, no refundar un enunciado.
+
+**La salida:** probar por dentro en forma NUMERAL, y convertir en la **frontera**, dentro de `Prov`,
+usando que D1 dota `prf_formCode_numeral`. Los enunciados públicos de este módulo quedan intactos.
+Medición completa en `sondeos/TcFormPayoff.lean`. -/
+
+/-- El sustituto directo, **net‑0**: la vía numeral sobre la estructura CONCRETA de `φ`.
+    ⚠️ Nótese el código estático cambiado a la derecha. -/
+theorem prf_tc_form_numeral (φ : Formula) :
+    Prf (tcFn (formCode φ) =eq termCode (numeral (codeNat φ))) :=
+  prf_eq_trans (prf_congr_tcFn (prf_formCode_numeral φ)) (prf_tc_numeral (codeNat φ))
+
+/-- **EL CONVERTIDOR DE FRONTERA**, en forma implicación (para entrar en `PrfH`).
+    De la forma numeral a la forma `formCode`, **dentro de `Prov`**, en cualquier hueco.
+
+    Es `pcc_rw_imp` con el puente de **D1**: `formCode φ` y `numeral (codeNat φ)` son términos objeto
+    provablemente iguales (`prf_formCode_numeral`), y `repr_pos'_prf` dota esa igualdad. -/
+theorem pcc_to_formCode_imp (φ : Formula) (G : Term → Term)
+    (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s)) :
+    Prf (provFromCode (G (termCode (numeral (codeNat φ))))
+       ⇒ provFromCode (G (termCode (formCode φ)))) :=
+  pcc_rw_imp G hG _ _ (repr_pos'_prf (prf_eq_symm (prf_formCode_numeral φ)))
+
+/-- Ídem, en forma directa. -/
+theorem pcc_to_formCode (φ : Formula) (G : Term → Term)
+    (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s))
+    (h : Prf (provFromCode (G (termCode (numeral (codeNat φ)))))) :
+    Prf (provFromCode (G (termCode (formCode φ)))) :=
+  prf_mp (pcc_to_formCode_imp φ G hG) h
+
+/-- `termCode (formCode φ)` es `substtc`-invariante. **Mismo enunciado que antes**; la prueba ya no
+    pasa por `tcFn`, sino directamente por que `formCode φ` es un término **CERRADO**. -/
 theorem substtc_inv_termCode_formCode (φ : Formula) :
-    ∀ W, Prf (substtc zero W (termCode (formCode φ)) =eq termCode (formCode φ)) := fun W =>
-  prf_eq_trans (prf_congr_substtc3 (prf_eq_symm (prf_tc_form φ)))
-    (prf_eq_trans (prf_substtc_tcFn W (formCode φ)) (prf_tc_form φ))
+    ∀ W, Prf (substtc zero W (termCode (formCode φ)) =eq termCode (formCode φ)) := fun W => by
+  have h := prf_substtc_arith_open 0 W (formCode φ)
+  rw [substCodeT_closed 0 W (formCode φ) (fun c => liftTerm_formCode c φ)] at h
+  exact h
 
 /-- Espejo de `prf_substfc_ltCodeFn_varc0`: el hueco `⌜v₀⌝` en la **segunda** posición
     (`substfc 0 K (A < ⌜v₀⌝) =eq (A < K)`). Lo necesita el Leibniz de la cota. -/
@@ -337,9 +379,11 @@ theorem pcc_bddCarcDot_reflect (φ : Formula) (p : Term) :
       (tcFn (carc (nthc (liftTerm 0 p) (.var 0)))))) :=
     PrfH.mp _ _ _
       (PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_carc_nthc (liftTerm 0 p) (.var 0)) _) hchain) hlt
-  have hTC : Prf (tcFn (liftTerm 0 (formCode φ)) =eq termCode (formCode φ)) := by
-    rw [liftTerm_formCode]; exact prf_tc_form φ
-  have htc : PrfH Γ' (tcFn (carc (nthc (liftTerm 0 p) (.var 0))) =eq termCode (formCode φ)) :=
+  -- ⚠️ Aquí estaba `prf_tc_form`. Ahora el transporte de código sólo llega a la forma NUMERAL...
+  have hTC : Prf (tcFn (liftTerm 0 (formCode φ)) =eq termCode (numeral (codeNat φ))) := by
+    rw [liftTerm_formCode]; exact prf_tc_form_numeral φ
+  have htc : PrfH Γ' (tcFn (carc (nthc (liftTerm 0 p) (.var 0)))
+      =eq termCode (numeral (codeNat φ))) :=
     PrfH_eq_trans (PrfH_congr_tcFn hbody) (prf_to_prfH hTC _)
   have hlc : Prf (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0)))
       =eq carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0)))) :=
@@ -347,12 +391,26 @@ theorem pcc_bddCarcDot_reflect (φ : Formula) (p : Term) :
   have hcodeq : PrfH Γ' (eqCodeFn (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
         (tcFn (carc (nthc (liftTerm 0 p) (.var 0))))
       =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
-        (termCode (formCode φ))) :=
+        (termCode (numeral (codeNat φ)))) :=
     PrfH_congr_eqCodeFn (prf_to_prfH (prf_eq_symm hlc) _) htc
+  have hphi0n : PrfH Γ' (provFromCode (eqCodeFn
+      (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+      (termCode (numeral (codeNat φ))))) :=
+    PrfH_provCode_congr hcodeq hev
+  -- ...y la FRONTERA se cruza aquí, DENTRO de `Prov`, con el puente de D1.
+  -- El hueco va en el lado derecho; el izquierdo es `substtc`-invariante y no se toca.
   have hphi0 : PrfH Γ' (provFromCode (eqCodeFn
       (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
-      (termCode (formCode φ)))) :=
-    PrfH_provCode_congr hcodeq hev
+      (termCode (formCode φ)))) := by
+    refine PrfH.mp _ _ _ (prf_to_prfH (pcc_to_formCode_imp φ
+      (fun s => eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0)))) s)
+      ?_) _) hphi0n
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ (varc (numeral 0))) ?_
+    exact prf_congr_eqCodeFn
+      (substtc_inv_carcT (substtc_inv_nthcT (substtc_inv_liftc_tcFn (liftTerm 0 p))
+        (substtc_inv_tcFn (.var 0))) s)
+      (prf_substtc_varc0 s)
   have hcompPhi : Prf (substfc zero (tcFn (.var 0)) (bdCarcPhicAt φ (liftTerm 0 p))
       =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
         (termCode (formCode φ))) := by
@@ -414,6 +472,7 @@ end ROBINSON_PlusPlus.Meta.D3InDotPrf
 export ROBINSON_PlusPlus.Meta.D3InDotPrf (
   pcc_bdEx_intro_open PrfH_eq_symm_code PrfH_and_intro_code PrfH_bdEx_intro_open
   liftTerm_tcFn substtc_inv_liftc_tcFn substtc_inv_termCode_formCode prf_substfc_ltCodeFn_snd
+  prf_tc_form_numeral pcc_to_formCode pcc_to_formCode_imp
   inBwdBody inDotAt bddCarcDotAt bddCarcDot inDot_eq_inDotAt
   liftTerm_inDotAt liftTerm_bddCarcDotAt
   pcc_bddDot_imp_inDot_at pcc_bddDot_imp_inDot

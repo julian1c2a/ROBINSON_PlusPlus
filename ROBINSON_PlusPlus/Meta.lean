@@ -81,6 +81,8 @@ import ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 import ROBINSON_PlusPlus.Meta.D3DottedPrf
 import ROBINSON_PlusPlus.Meta.PropCodePrf
 import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+import ROBINSON_PlusPlus.Meta.D3InDotPrf
+import ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
 import ROBINSON_PlusPlus.Meta.AxiomListCode
 import ROBINSON_PlusPlus.Meta.CodeDecode

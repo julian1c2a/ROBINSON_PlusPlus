@@ -18,6 +18,56 @@
 
 ---
 
+## 2026-08-23 — ▶ REPATRIACIÓN paso 3: `D3InDotPrf` — **D3 vuelve a reducirse a UN SOLO lema**
+
+Build **106 → 108 jobs**, **94 módulos activos**, cuarentena **12 → 10**, 0 sorrys.
+
+```lean
+d3_prf_of_chainOkDot (φ) : Prf (chainOk nil #0 ⇒ provFromCode chainOkDot)
+                         → Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
+```
+
+Ese consecuente **es D3**. Footprint sancionado (`prf_axiomsCodeT_eq`), y ahora **sobre la teoría
+reparada**. Arrastró `BdAllIntroPrf` (§40, `pcc_bdAll_intro`) sin tocar una línea.
+
+### La estrategia de frontera funcionó tal cual se midió
+
+Los tres usos de `prf_tc_form` no eran iguales:
+
+* **Dos** estaban en `substtc_inv_termCode_formCode`, y su enunciado **no cambia**. Bastó una prueba
+  nueva por `substCodeT_closed`: `formCode φ` es **cerrado**, así que su invariancia `substtc` nunca
+  necesitó pasar por `tcFn` — el puente muerto sólo se estaba usando de atajo.
+  *Lección general: antes de sustituir un puente, comprobar si el lema lo necesitaba de verdad.*
+* **Uno** era el genuino (`pcc_bddCarcDot_reflect`). Ahí el transporte de código sólo alcanza
+  `termCode (numeral (codeNat φ))`, y la frontera se cruza **dentro de `Prov`** con
+  `pcc_to_formCode_imp` (= `pcc_rw_imp` + D1 sobre `prf_formCode_numeral`).
+
+**Ningún enunciado público cambió** — que era el objetivo — y `D3DottedPrf` encajó sin tocarse.
+
+### Piezas nuevas (en `Meta/D3InDotPrf.lean`)
+
+| | |
+|---|---|
+| `prf_tc_form_numeral` | el sustituto directo, **net‑0**, una línea |
+| `pcc_to_formCode` / `_imp` | el convertidor de frontera, vía D1 |
+
+### 📏 Medición de `InAxiomsCodePrf` (no ejecutado)
+
+Sus 2 usos **no** son como el de `D3InDotPrf`: `prf_tc_listFormCodeM` usa **también**
+`prf_tc_of_cons` (meta‑recursión sobre lista), y `pcc_in_head_swap` toma la ecuación muerta **como
+hipótesis**, con la conversión metida **dentro de un código `cons`** (hueco en la cabeza). Más caro.
+Lo bueno: su consumidor principal, `substtc_inv_termCode_listFormCodeM`, es **invariancia de un
+código cerrado** ⇒ caso barato, `substCodeT_closed`. Y `prf_objList_numeral` (`Sigma1CorePrf:218`)
+ya es genérico y sirve para la recursión de lista.
+
+### Estado
+
+Quedan **10 módulos**, **5 raíces**: `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) ·
+`CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1).
+La única familia **sin medir** sigue siendo el **KIT** (`prf_tc_nul`/`_un`/`_bin`).
+
+---
+
 ## 2026-08-23 — ▶ REPATRIACIÓN paso 2: `pcc_rw_imp` → `EvalNthcPrf` (cuarentena 14 → 12)
 
 Build **104 → 106 jobs**, **92 módulos activos**, 0 errores / 0 warnings / 0 sorrys.
