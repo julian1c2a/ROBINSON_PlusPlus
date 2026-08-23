@@ -26,6 +26,8 @@ open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 open ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 open ROBINSON_PlusPlus.Meta.CodeCtorKit
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -111,14 +113,42 @@ theorem pcc_condDEfq (t : Term) :
   -- (1) puente `carc`
   have hcarc : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (tcFn (carc t)))) :=
     PrfH.mp _ _ _ (prf_to_prfH (pcc_carcD_bridge t) _) hlw
-  -- (2) la hipótesis reescribe el VALOR: `(carc t)˙ = binT 5 (nulT 2) V`
-  have hval : PrfH Γ (tcFn (carc t) =eq binT 5 (nulT 2) V) :=
-    PrfH_eq_trans (PrfH_congr_tcFn hEQ)
-      (PrfH_eq_trans (prf_to_prfH (prf_tc_bin 5 botc (nthc t (numeralM 2))) _)
-        (prf_to_prfH (prf_congr_binT (prf_tc_nul 2) (prf_refl _)) _))
-  have hcarc2 : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (binT 5 (nulT 2) V))) :=
+  -- (2) la hipótesis reescribe el VALOR. Tres tramos: el `tcFn`-congruente sigue siendo de CÓDIGO,
+  --     y los dos pasos del KIT (`bin` y `nul`) se cruzan DENTRO de `Prov`.
+  have hCinv : ∀ W, Prf (substtc zero W (carcT (tcFn t)) =eq carcT (tcFn t)) := fun W =>
+    prf_eq_trans (prf_substtc_carcT zero W (tcFn t))
+      (prf_congr_carcT (substtc_inv_tcFn t W))
+  have hG : ∀ s : Term, Prf (substfc zero s (eqCodeFn (carcT (tcFn t)) (varc (numeral 0)))
+      =eq eqCodeFn (carcT (tcFn t)) s) := fun s =>
+    prf_eq_trans (prf_substfc_eq zero s (carcT (tcFn t)) (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hCinv s) (prf_substtc_varc0 s))
+  -- (2a) CÓDIGO: `(carc t)˙ = (implc botc (nthc t 2))˙`
+  have hcarc1 : PrfH Γ (provFromCode (eqc (carcT (tcFn t))
+      (tcFn (implc botc (nthc t (numeralM 2)))))) :=
     PrfH_provCode_congr
-      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) hval) hcarc
+      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) (PrfH_congr_tcFn hEQ)) hcarc
+  -- (2b) INTERNO: `(implc botc X)˙ ⟶ binT 5 (botc)˙ Ẋ`
+  have hstep1 : Prf (provFromCode (eqc (carcT (tcFn t))
+        (tcFn (implc botc (nthc t (numeralM 2)))))
+      ⇒ provFromCode (eqc (carcT (tcFn t)) (binT 5 (tcFn botc) V))) :=
+    pcc_rw_imp (fun s => eqCodeFn (carcT (tcFn t)) s) hG _ _
+      (pcc_dot_bin_symm 5 botc (nthc t (numeralM 2)))
+  have hcarc1b : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (binT 5 (tcFn botc) V))) :=
+    PrfH.mp _ _ _ (prf_to_prfH hstep1 _) hcarc1
+  -- (2c) INTERNO: `(botc)˙ ⟶ nulT 2`, con el hueco en el 1.er argumento de `binT`
+  have hGb : ∀ s : Term, Prf (substfc zero s
+      (eqCodeFn (carcT (tcFn t)) (binT 5 (varc (numeral 0)) V))
+      =eq eqCodeFn (carcT (tcFn t)) (binT 5 s V)) := fun s =>
+    prf_eq_trans (prf_substfc_eq zero s (carcT (tcFn t)) (binT 5 (varc (numeral 0)) V))
+      (prf_congr_eqCodeFn (hCinv s)
+        (prf_eq_trans (prf_substtc_binT 5 s (varc (numeral 0)) V)
+          (prf_congr_binT (prf_substtc_varc0 s) (substtc_inv_tcFn _ s))))
+  have hstep2 : Prf (provFromCode (eqc (carcT (tcFn t)) (binT 5 (tcFn botc) V))
+      ⇒ provFromCode (eqc (carcT (tcFn t)) (binT 5 (nulT 2) V))) :=
+    pcc_rw_imp (fun s => eqCodeFn (carcT (tcFn t)) (binT 5 s V)) hGb _ _
+      (pcc_dot_nul_symm 2)
+  have hcarc2 : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (binT 5 (nulT 2) V))) :=
+    PrfH.mp _ _ _ (prf_to_prfH hstep2 _) hcarc1b
   -- (3) puente `nthc` bajo la cota derivada de la longitud canónica
   have hb2 : PrfH Γ (lt (numeralM 2) (lenc t)) :=
     PrfH_lt_of_lenc_eq (i := 2) (n := 3) (by omega) hlenc

@@ -27,6 +27,9 @@ open ROBINSON_PlusPlus.Meta.EvalNthcPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 open ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.Representability2Prf
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.D3InDotPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -126,26 +129,48 @@ theorem prf_substfc_inFormCode_hole2 (yc t : Term)
 
 /-! ### `listFormCodeM L` es un CÓDIGO: `tcFn` lo computa (recursión sobre `L`) -/
 
-/-- `tcFn (listFormCodeM L) =eq termCode (listFormCodeM L)` — el código de la lista de axiomas es
-    un código genuino (`prf_tc_of_cons` + `prf_tc_form` en cada cabeza). -/
-theorem prf_tc_listFormCodeM : ∀ L : List Formula,
-    Prf (tcFn (listFormCodeM L) =eq termCode (listFormCodeM L))
-  | [] => prf_tc_zero
-  | f :: fs => by
-      refine prf_tc_of_cons ?_ (prf_tc_listFormCodeM fs)
-      rw [formCodeM_eq]; exact prf_tc_form f
+/-! ### Los sustitutos de `prf_tc_form` en esta capa (2026-08-23)
 
-/-- `termCode a` es `substtc`‑invariante cuando `a` está rastreado (copia local del de
-    `LineWFTrackedPrf`, no importado aquí). -/
+Aquí vivía `prf_tc_listFormCodeM (L) : Prf (tcFn (listFormCodeM L) =eq termCode (listFormCodeM L))`,
+por recursión sobre `L` con `prf_tc_of_cons` + `prf_tc_form` en cada cabeza. **Ambos murieron.**
+
+Pero al mirar quién lo consumía resultó que **no hacía falta el puente**: su único consumidor es la
+**invariancia `substtc`** del código, y `listFormCodeM L` es un término **CERRADO**, así que sale
+directamente de `substCodeT_closed` — sin pasar por `tcFn` en absoluto. Mismo hallazgo que en
+`D3InDotPrf` (`substtc_inv_termCode_formCode`). -/
+
+/-- `termCode (listFormCodeM L)` es `substtc`‑invariante. **Mismo enunciado que antes**; la prueba ya
+    no pasa por `tcFn`, sino por que `listFormCodeM L` es CERRADO. -/
+theorem substtc_inv_termCode_listFormCodeM (L : List Formula) :
+    ∀ W, Prf (substtc zero W (termCode (listFormCodeM L))
+              =eq termCode (listFormCodeM L)) := fun W => by
+  have h := prf_substtc_arith_open 0 W (listFormCodeM L)
+  rw [substCodeT_closed 0 W (listFormCodeM L) (fun c => liftTerm_listFormCodeM c L)] at h
+  exact h
+
+/-- `termCode a` es `substtc`‑invariante cuando `a` está rastreado. -/
 theorem substtc_inv_termCode_of_tc {a : Term} (htc : Prf (tcFn a =eq termCode a)) :
     ∀ W, Prf (substtc zero W (termCode a) =eq termCode a) := fun W =>
   prf_eq_trans (prf_congr_substtc3 (prf_eq_symm htc))
     (prf_eq_trans (prf_substtc_tcFn W a) htc)
 
-/-- Corolario: `termCode (listFormCodeM L)` es `substtc`‑invariante. -/
-theorem substtc_inv_termCode_listFormCodeM (L : List Formula) :
-    ∀ W, Prf (substtc zero W (termCode (listFormCodeM L)) =eq termCode (listFormCodeM L)) :=
-  substtc_inv_termCode_of_tc (prf_tc_listFormCodeM L)
+/-- **El sustituto de `prf_tc_form` para `pcc_in_head_swap`.**
+
+    `Prov(⌜ f = f ⌝)` con los DOS códigos de `formCode f`: el dinámico (`tcFn`) y el estático
+    (`termCode`). El transporte entre ambos ya no existe a nivel de código, así que se hace en dos
+    tramos: (2) a la forma NUMERAL, que sí sobrevive (`prf_tc_form_numeral`), y (3) de ahí a la forma
+    `formCode` **dentro de `Prov`**, con el convertidor de frontera `pcc_to_formCode`. -/
+theorem pcc_tc_formCode_internal (f : Formula) :
+    Prf (provFromCode (eqCodeFn (tcFn (formCode f)) (termCode (formCode f)))) := by
+  have h0 : Prf (provFromCode (eqCodeFn (tcFn (formCode f)) (tcFn (formCode f)))) :=
+    prf_provFromCode_eqCodeFn_refl _
+  have h1 : Prf (provFromCode
+      (eqCodeFn (tcFn (formCode f)) (termCode (numeral (codeNat f))))) :=
+    prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _) (prf_tc_form_numeral f))) h0
+  refine pcc_to_formCode f (fun s => eqCodeFn (tcFn (formCode f)) s) ?_ h1
+  intro s
+  refine prf_eq_trans (prf_substfc_eq zero s (tcFn (formCode f)) (varc (numeral 0))) ?_
+  exact prf_congr_eqCodeFn (substtc_inv_tcFn _ s) (prf_substtc_varc0 s)
 
 /-! ### Combinador rastreado de COLA: extiende la lista‑código con `yc` fijo
 
@@ -182,7 +207,7 @@ códigos RASTREADOS (`tcFn`), no aparece `termCode y` para `y` abstracto — no 
     `Prov(yc = tcFn y)`, la pertenencia `Prov(⌜In yc (cons a t)~⌝)` es demostrable. -/
 theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
-    (haform : Prf (tcFn a =eq termCode a))
+    (haform : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))))
     (hatinv : ∀ W, Prf (substtc zero W (termCode (cons a t)) =eq termCode (cons a t)))
     (hbr : PrfH Γ (provFromCode (eqCodeFn yc (tcFn y))))
     (hya : PrfH Γ (y =eq a)) :
@@ -193,9 +218,9 @@ theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
   -- cadena de códigos:  yc = tcFn y = tcFn a = termCode a
   have heq2 : PrfH Γ (provFromCode (eqCodeFn (tcFn y) (tcFn a))) :=
     PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_tracked y a) _) hya
-  have heq3 : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))) :=
-    prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl (tcFn a)) haform))
-      (prf_provFromCode_eqCodeFn_refl (tcFn a))
+  -- ⚠️ antes esto se construía desde la ecuación de CÓDIGO `tcFn a =eq termCode a`
+  --    (`prf_tc_form`), que murió. Ahora la hipótesis ya viene en forma INTERNA.
+  have heq3 : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))) := haform
   have hyc_ta : PrfH Γ (provFromCode (eqc yc (tcFn a))) :=
     PrfH_eq_trans_code yc (tcFn y) (tcFn a) hycinv hbr heq2
   have hyc_tca : PrfH Γ (provFromCode (eqc yc (termCode a))) :=
@@ -239,7 +264,7 @@ theorem pcc_In_lfc_tracked (yc y : Term)
       refine PrfH_or_elim hor ?_ ?_
       · -- cabeza: `y = formCodeM f`
         exact pcc_in_head_swap yc y (formCodeM f) (listFormCodeM fs) hycinv
-          (by rw [formCodeM_eq]; exact prf_tc_form f)
+          (by rw [formCodeM_eq]; exact pcc_tc_formCode_internal f)
           (substtc_inv_termCode_listFormCodeM (f :: fs))
           (prf_to_prfH hbr _) (PrfH.hyp _ _ (List.Mem.head _))
       · -- cola: `In y (listFormCodeM fs)`, recursión
@@ -290,6 +315,6 @@ end ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 
 export ROBINSON_PlusPlus.Meta.InAxiomsCodePrf (
   pcc_inAxiomsCodeT_concrete prf_substfc_inFormCode_hole1 prf_substfc_inFormCode_hole2
-  prf_tc_listFormCodeM substtc_inv_termCode_of_tc substtc_inv_termCode_listFormCodeM
+  pcc_tc_formCode_internal substtc_inv_termCode_of_tc substtc_inv_termCode_listFormCodeM
   pcc_in_tail_tracked pcc_in_head_swap pcc_In_lfc_tracked pcc_In_axiomsCodeT_tracked
 )

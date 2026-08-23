@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
 >
-> **Build 112 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **98 módulos activos** (Minimal 11 + Meta 76 + Full 11) **+ 12  + 10 .**
+> **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 12  + 10 .**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -18,7 +18,7 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **6 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **0 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -26,7 +26,7 @@
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
 > `sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
-> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). ▶ **PASO 3 EJECUTADO**: `D3InDotPrf` de vuelta ⇒ **D3 reducida otra vez a UN SOLO lema**. ▶ **PASOS 4‑5 EJECUTADOS**: `LineWFTrackedPrf` y el **KIT** (`CodeCtorKit`) en producción. Quedan 6.
+> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). ▶ **PASO 3 EJECUTADO**: `D3InDotPrf` de vuelta ⇒ **D3 reducida otra vez a UN SOLO lema**. ▶ **PASOS 4‑5 EJECUTADOS**: `LineWFTrackedPrf` y el **KIT** (`CodeCtorKit`) en producción. **LA CUARENTENA ESTÁ VACÍA.**
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
@@ -39,15 +39,15 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **98 activos** (Minimal/ 11 + Meta/ 76 + Full/ 11) + barrel `Meta.lean` · **+6 en `cuarentena/`** (fuera del build) · **+10 en `sondeos/`** |
-| Modules sin sorry | 98 / 98 ✅ |
+| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+10 en `sondeos/`** |
+| Modules sin sorry | 104 / 104 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
 | Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); **`ax_axiomsCodeT_eq`** (⊢, `Minimal/Axioms:1376`) / **`prf_axiomsCodeT_eq`** (Prf, `Representability2Prf:104`) — anclas de codificación; `d3` (GodelTwo, único gödeliano vivo). ⚠️ `ax_inAxC`/`prf_inAxC` **ya no son axiomas**: son teoremas derivados de las anclas. Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
 | Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, **módulo `axiom d3`**. **D3 está FUERA de la cadena activa** (la capa rastreada está en `cuarentena/`): se recupera repatriando las raíces que quedan (7 a 2026-08-23), y el habilitador (`pcc_dot_cons`, escalera a.2) ya está ✅. Ver `NEXT-STEPS.md` |
-| Build status | ✅ Passing (**112 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-23) |
+| Build status | ✅ Passing (**118 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-23) |
 | `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `Meta/CodeDecode.lean` (biyección de fórmulas: round‑trips + inyectividad `decodeForm_inj`) + `Meta/ChainDecode.lean` (`decodeChain_prf`: cadena aceptada ⟹ `Prf`). Hallazgo: `lineJustif` es *lossy* ⟹ vale la **sección**, no el retract. **Módulo B**: `Meta/LineWFCases.lean` (tabla de los 21 tags + dirección negativa) sigue **activo**; pero los 14 tags cerrados de `pcc_lineWF_tracked` están **en `cuarentena/`** (`LineWFTrackedPrf`, `LineWFSchemaPrf`, `CodeCtorKit`, `CodeTreeReflect`, …) ⇒ **el frente está congelado** hasta repatriarlos |
 | D3 / plan 12‑A | Fases **1a ✅ 1b ✅ 2 ✅** (verificador Δ₀ sin acumulador, módulos activos) + **fase 3 puente ✅** (`d3_prf_of_reflect_bounded`, `Sigma1BoundedPrf`). ⚠️ **El resto de la fase 3 (evaluación provable rastreada, reflexión Δ₀, ruta B dotada) está en `cuarentena/`.** La vía de recuperación es la **escalera (a.2)**, ✅ completa: `pcc_dot_cons` sustituye a `prf_tc_cons'` en el punto exacto donde la capa rastreada se rompió (verificado, `sondeos/CarcPayoff.lean`) |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |

@@ -87,6 +87,12 @@ import ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 import ROBINSON_PlusPlus.Meta.LineWFMpPrf
 import ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 import ROBINSON_PlusPlus.Meta.CodeCtorKit
+import ROBINSON_PlusPlus.Meta.LineWFEfqPrf
+import ROBINSON_PlusPlus.Meta.CodeTreeReflect
+import ROBINSON_PlusPlus.Meta.LineWFPropPrf
+import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
+import ROBINSON_PlusPlus.Meta.LineWFThyPrf
+import ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
 import ROBINSON_PlusPlus.Meta.AxiomListCode
 import ROBINSON_PlusPlus.Meta.CodeDecode

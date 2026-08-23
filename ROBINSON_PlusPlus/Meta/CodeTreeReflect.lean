@@ -26,6 +26,8 @@ open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 open ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
 open ROBINSON_PlusPlus.Meta.CodeCtorKit
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -177,16 +179,44 @@ theorem substtc_inv_dotV (t : Term) :
       prf_eq_trans (prf_substtc_binT m W (a.dotV t) (b.dotV t))
         (prf_congr_binT (substtc_inv_dotV t a W) (substtc_inv_dotV t b W))
 
-/-- **El código del código del árbol**: `(E(nthc t i…))˙ = dotV`. Las ecuaciones `tc` del kit,
-    aplicadas por inducción. -/
-theorem prf_tc_objAt (t : Term) :
-    ∀ T : CTree, Prf (tcFn (T.objAt t) =eq T.dotV t)
-  | .leaf _ => prf_refl _
-  | .nul m => prf_tc_nul m
-  | .un m a => prf_eq_trans (prf_tc_un m (a.objAt t)) (prf_congr_unT (prf_tc_objAt t a))
+/-- **El código del código del árbol**: `(E(nthc t i…))˙ = dotV`, ahora **DENTRO de `Prov`**.
+
+    ⚠️ **Éste era el coste real de repatriar el KIT** (medido en `sondeos/KitPayoff.lean`): la
+    versión vieja era esta misma recursión produciendo una igualdad **de CÓDIGO**, y las ecuaciones
+    `tc` del kit murieron con `ax_tc_cons`. Como sus sustitutos (`pcc_dot_*`) son **internos**, la
+    recursión entera se muda dentro de `Prov`.
+
+    La conversión es literal, pieza por pieza — y todas existían ya:
+    * `prf_eq_trans` ⟶ **`pcc_eq_trans_code`** (`EvalArithPrf`);
+    * `prf_congr_unT`/`prf_congr_binT` ⟶ **`pcc_congr_unT_code`** / `pcc_congr_binT_1_code` /
+      `pcc_congr_binT_2_code` (`CodeCtorKit`), que **sobrevivieron intactas** y ya venían en forma
+      implicación, que es justo lo que la recursión interna pide;
+    * `prf_refl` ⟶ `prf_provFromCode_eqCodeFn_refl`;
+    * las ecuaciones `tc` del kit ⟶ `pcc_dot_nul_symm` / `_un_symm` / `_bin_symm`.
+
+    En el caso binario hacen falta **dos** congruencias encadenadas (una por argumento), donde antes
+    bastaba una `prf_congr_binT` simultánea: dentro de `Prov` los argumentos se reescriben de uno en
+    uno. -/
+theorem pcc_tc_objAt (t : Term) :
+    ∀ T : CTree, Prf (provFromCode (eqc (tcFn (T.objAt t)) (T.dotV t)))
+  | .leaf _ => prf_provFromCode_eqCodeFn_refl _
+  | .nul m => pcc_dot_nul_symm m
+  | .un m a =>
+      pcc_eq_trans_code _ _ _ (substtc_inv_tcFn _)
+        (pcc_dot_un_symm m (a.objAt t))
+        (prf_mp (pcc_congr_unT_code m (tcFn (a.objAt t)) (a.dotV t) (substtc_inv_tcFn _))
+          (pcc_tc_objAt t a))
   | .bin m a b =>
-      prf_eq_trans (prf_tc_bin m (a.objAt t) (b.objAt t))
-        (prf_congr_binT (prf_tc_objAt t a) (prf_tc_objAt t b))
+      pcc_eq_trans_code _ _ _ (substtc_inv_tcFn _)
+        (pcc_dot_bin_symm m (a.objAt t) (b.objAt t))
+        (pcc_eq_trans_code _ _ _
+          (substtc_inv_binT (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+          (prf_mp (pcc_congr_binT_1_code m (tcFn (b.objAt t)) (tcFn (a.objAt t)) (a.dotV t)
+              (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+            (pcc_tc_objAt t a))
+          (prf_mp (pcc_congr_binT_2_code m (a.dotV t) (tcFn (b.objAt t)) (b.dotV t)
+              (substtc_inv_dotV t a) (substtc_inv_tcFn _))
+            (pcc_tc_objAt t b)))
 
 /-! ### La pieza cara: `Prov(⌜E(valores) = E(accesores)⌝)`, por inducción
 
@@ -278,10 +308,14 @@ theorem pcc_condD_of_tree (T : CTree) (t : Term) {n : Nat} (hmax : Nat.le (CTree
   -- (1) puente `carc` + (2) la hipótesis reescribe el valor a `dotV`
   have hcarc : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (tcFn (carc t)))) :=
     PrfH.mp _ _ _ (prf_to_prfH (pcc_carcD_bridge t) _) hlw
-  have hval : PrfH Γ (tcFn (carc t) =eq T.dotV t) :=
-    PrfH_eq_trans (PrfH_congr_tcFn hEQ) (prf_to_prfH (prf_tc_objAt t T) _)
+  -- CÓDIGO: la congruencia de `tcFn` sigue viva y lleva `(carc t)˙` a `(T.objAt t)˙`
+  have hcarc1 : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (tcFn (T.objAt t)))) :=
+    PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) (PrfH_congr_tcFn hEQ)) hcarc
+  -- INTERNO: y de ahí a `dotV`, por transitividad dentro de `Prov`
   have hcarc2 : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (T.dotV t))) :=
-    PrfH_provCode_congr (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) hval) hcarc
+    PrfH_eq_trans_code _ _ _ (substtc_inv_carcT_tcFn t) hcarc1
+      (prf_to_prfH (pcc_tc_objAt t T) _)
   -- (3) `dotV → dotN` por inducción sobre el árbol
   have hVN : PrfH Γ (provFromCode (eqc (T.dotV t) (T.dotN t))) :=
     PrfH_dotVN t hlenc T hmax
@@ -305,6 +339,6 @@ end ROBINSON_PlusPlus.Meta.CodeTreeReflect
 
 export ROBINSON_PlusPlus.Meta.CodeTreeReflect (
   CTree substTerm_objAt substTerm_objAt_var0 code_eq_termCode prf_substtc_code substtc_inv_dotN substtc_inv_dotV
-  prf_tc_objAt PrfH_dotVN condOf substFormula_condOf substFormula_condOf_at
+  pcc_tc_objAt PrfH_dotVN condOf substFormula_condOf substFormula_condOf_at
   prf_condD_of_tree_eq pcc_condD_of_tree pcc_lineWF_tracked_of_tree
 )

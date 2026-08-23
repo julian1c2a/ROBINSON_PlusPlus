@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑23 · `master` limpio y verde · Lean v4.31.0**
-**112 jobs · 98 módulos activos (Minimal 11 + Meta 76 + Full 11) + 6 en `cuarentena/` · 10 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 10 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -234,7 +234,7 @@ comentarios).
 > `BoundedInPrf`). Se resuelven cualificando (`BoundedInPrf.PrfH_lt_subst2`). Esperar más de esto
 > según se repatríen módulos.
 >
-> ### ✅ PASO 1 EJECUTADO (2026‑08‑23) — 7 módulos recuperados, cuarentena 21 → 6
+> ### ✅ PASO 1 EJECUTADO (2026‑08‑23) — 7 módulos recuperados, cuarentena 21 → **0**
 >
 > `EvalListPrf` repatriado. El trabajo real fueron **3 sitios**, no 6: el recuento anterior incluía la
 > definición, el `export` y los docstrings. Y los tres tenían **la misma forma**, así que se cerraron
@@ -263,7 +263,7 @@ comentarios).
 > y vuelve **net‑0** (`[propext, choice, Quot.sound]`). También vuelve `PropCodePrf` (§39, la lógica
 > interna completa incl. `pcc_ind_code`, net‑0).
 >
-> ### Estado de la cuarentena: **6 módulos**, 3 raíces
+> ### Estado de la cuarentena: **VACÍA** ✅
 >
 > Raíces (**5**, tras los pasos 1‑3): `LineWFTrackedPrf` (8) · `CodeCtorKit` (4) ·
 > `CodeTreeReflect` (2) · `InAxiomsCodePrf` (2) · `LineWFEfqPrf` (1).

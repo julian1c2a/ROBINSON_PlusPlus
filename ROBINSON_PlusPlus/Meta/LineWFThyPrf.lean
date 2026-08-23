@@ -306,7 +306,7 @@ theorem pcc_lineWF_tracked_thy_imp (t : Term) :
     PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
   -- cota DERIVADA de la longitud canónica (`thy` sólo necesita `1 < lenc t`)
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
-    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+    BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlencH)
       (prf_to_prfH (prf_lt_numeralM (a := 1) (b := 2) (by omega)) _)
   -- los tres punteados producidos en el contexto
   have hTag : PrfH Γ (provFromCode (tagDotT t)) :=

@@ -214,6 +214,29 @@ theorem pcc_dot_bin (m : Nat) (a b : Term) :
     (prf_congr_consT (prf_refl _) (prf_congr_consT (prf_refl _)
       (prf_congr_consT (prf_refl _) prf_tc_zero))) (prf_refl _))) h3
 
+/-- Las direcciones simétricas, que es lo que consumen los sitios reales. -/
+theorem pcc_dot_nul_symm (m : Nat) :
+    Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) nil)) (nulT m))) :=
+  pcc_mp_code_apply
+    (pcc_eq_symm_code_internal (nulT m) (tcFn (cons (numeralM m) nil)) (substtc_inv_nulT m))
+    (pcc_dot_nul m)
+
+theorem pcc_dot_un_symm (m : Nat) (a : Term) :
+    Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) (cons a nil))) (unT m (tcFn a)))) :=
+  pcc_mp_code_apply
+    (pcc_eq_symm_code_internal (unT m (tcFn a)) (tcFn (cons (numeralM m) (cons a nil)))
+      (substtc_inv_unT (substtc_inv_tcFn a)))
+    (pcc_dot_un m a)
+
+theorem pcc_dot_bin_symm (m : Nat) (a b : Term) :
+    Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) (cons a (cons b nil))))
+      (binT m (tcFn a) (tcFn b)))) :=
+  pcc_mp_code_apply
+    (pcc_eq_symm_code_internal (binT m (tcFn a) (tcFn b))
+      (tcFn (cons (numeralM m) (cons a (cons b nil))))
+      (substtc_inv_binT (substtc_inv_tcFn a) (substtc_inv_tcFn b)))
+    (pcc_dot_bin m a b)
+
 /-! ### Congruencia DENTRO de `Prov` (la pieza que cada reflector consume)
 
 Cambiar un argumento del árbol de código **bajo `Prov`**, con la igualdad interna en la mano. Va
@@ -285,6 +308,6 @@ export ROBINSON_PlusPlus.Meta.CodeCtorKit (
   prf_congr_unT prf_congr_binT
   prf_substtc_nulT prf_substtc_unT prf_substtc_binT
   substtc_inv_nulT substtc_inv_unT substtc_inv_binT
-  pcc_dot_nul pcc_dot_un pcc_dot_bin
+  pcc_dot_nul pcc_dot_un pcc_dot_bin pcc_dot_nul_symm pcc_dot_un_symm pcc_dot_bin_symm
   pcc_congr_binT_1_code pcc_congr_binT_2_code pcc_congr_unT_code
 )
