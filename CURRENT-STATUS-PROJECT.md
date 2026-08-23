@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-08-23 (repatriación paso 1)
+**Last updated:** 2026-08-23 (repatriación COMPLETA + los 3 frentes medidos)
 **Author**: Julián Calderón Almendros
 
 ---
@@ -48,8 +48,8 @@
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
 | Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, **módulo `axiom d3`**. **D3 está FUERA de la cadena activa** (la capa rastreada está en `cuarentena/`): se recupera repatriando las raíces que quedan (7 a 2026-08-23), y el habilitador (`pcc_dot_cons`, escalera a.2) ya está ✅. Ver `NEXT-STEPS.md` |
 | Build status | ✅ Passing (**118 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-23) |
-| `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `Meta/CodeDecode.lean` (biyección de fórmulas: round‑trips + inyectividad `decodeForm_inj`) + `Meta/ChainDecode.lean` (`decodeChain_prf`: cadena aceptada ⟹ `Prf`). Hallazgo: `lineJustif` es *lossy* ⟹ vale la **sección**, no el retract. **Módulo B**: `Meta/LineWFCases.lean` (tabla de los 21 tags + dirección negativa) sigue **activo**; pero los 14 tags cerrados de `pcc_lineWF_tracked` están **en `cuarentena/`** (`LineWFTrackedPrf`, `LineWFSchemaPrf`, `CodeCtorKit`, `CodeTreeReflect`, …) ⇒ **el frente está congelado** hasta repatriarlos |
-| D3 / plan 12‑A | Fases **1a ✅ 1b ✅ 2 ✅** (verificador Δ₀ sin acumulador, módulos activos) + **fase 3 puente ✅** (`d3_prf_of_reflect_bounded`, `Sigma1BoundedPrf`). ⚠️ **El resto de la fase 3 (evaluación provable rastreada, reflexión Δ₀, ruta B dotada) está en `cuarentena/`.** La vía de recuperación es la **escalera (a.2)**, ✅ completa: `pcc_dot_cons` sustituye a `prf_tc_cons'` en el punto exacto donde la capa rastreada se rompió (verificado, `sondeos/CarcPayoff.lean`) |
+| `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `CodeDecode` (biyección `decodeForm` + inyectividad) + `ChainDecode` (`decodeChain_prf`). **Módulo B** (`LineWFCases`, 21 tags) ✅. ⛔ **Módulos C‑F BLOQUEADOS por un paso FALSO del plan**: `canon_ne` reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ Salida por **numerales** verificada y net‑0 (`sondeos/CodeNatInj.lean`) |
+| D3 / plan 12‑A | ✅ **Fases 1a/1b/2/3 completas y la cuarentena VACÍA.** D3 reducida a **UN SOLO lema**: `d3_prf_of_chainOkDot (φ) (hC)` — sólo pide `hC_dot`. Y `pcc_lineWF_tracked_modulo_7` verifica que eso es **exactamente** cerrar los **7 reflectores** que faltan. ⚠️ Esos 7 son el **muro de `substfc`**: necesitan `pcc_eval_substfc`, que exige sancionar `isFormCode` — **decisión pendiente** |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |

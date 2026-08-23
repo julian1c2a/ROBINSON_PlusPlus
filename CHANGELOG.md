@@ -18,6 +18,43 @@
 
 ---
 
+## 2026-08-23 — 📖 PROYECCIÓN + ACTUALIZA_DOC: los 82 módulos catalogados, §3.26 nueva
+
+Pasada de `proyecta` + `actualiza doc` tras la repatriación. **No toca código**: build **118 jobs**,
+**104 módulos activos** (Minimal 11 + Meta 82 + Full 11), `cuarentena/` **vacía**, 0 sorrys.
+
+### Proyección (AI-GUIDE §12/§14)
+
+* **`REFERENCE.md` §1.5 reescrita**: catálogo de los **82** módulos de `Meta/` (describía 61), con
+  los 21 repatriados marcados 🔁 y reubicados de §1.6 a §1.5. **§1.6 pasa a ser nota histórica** —
+  la cuarentena ya no contiene código.
+* **`doc/REFERENCE-Incompleteness.md` §3.26 (nueva)**: la repatriación proyectada con firmas Lean 4
+  exactas — las tres sub‑familias muertas y su sustituto; las herramientas nuevas (`pcc_rw_imp`,
+  `pcc_rw_dot_cons_un`, `pcc_rw_dot_cons_nthc`, `prf_tc_form_numeral`, `pcc_to_formCode_imp`,
+  `pcc_dot_nul`/`_un`/`_bin`, `pcc_dot_eqc`, `pcc_tc_objAt`, `pcc_tc_formCode_internal`); el punto
+  delicado de la **conversión en la frontera**; y el trabajo voluminoso de `pcc_tc_objAt`.
+
+### Estado (§5 de `REFERENCE.md`, reescrita)
+
+**Los tres frentes abiertos están ahora MEDIDOS**, y ninguna medición quedó pendiente:
+
+| # | frente | resultado |
+|--:|---|---|
+| 1 | muro de `substfc` → D3 → Gödel II | ✅ `prf_strong_induction` **ya existe** (net‑0, forma OBJETO) ⇒ sólo falta `pcc_eval_substfc`. Bloqueado por una **decisión**: sancionar `isFormCode` |
+| 2 | `NegVerifier` → `⊬¬G` | ⛔ paso 1.1 del plan **FALSO**; ✅ salida por **numerales** verificada y **net‑0** |
+| 3 | recodificar símbolos | 📏 **98‑99 %** del `formCode` son nombres de símbolos (69× de mejora), pero **hoy no es cuello de botella** |
+
+**Secuencia que sale de las mediciones:** (3) sólo tiene sentido **antes** de (2); (1) es la única
+vía a D3 pero **cuesta axiomas**, así que es decisión del autor, no un paso técnico.
+
+### Correcciones de documentación
+
+* `CURRENT-STATUS-PROJECT.md`: las filas `NegVerifier` y `D3 / plan 12‑A` estaban descritas como
+  «en curso» con el estado de julio. Reescritas con el estado real y los bloqueos verdaderos.
+* Nota obsoleta corregida en la memoria: `prf_strong_induction` no está «al 90 %», está **completo**.
+
+---
+
 ## 2026-08-23 — 🎯 **LA CUARENTENA ESTÁ VACÍA** — los 31 módulos han vuelto
 
 Build **112 → 118 jobs**, **104 módulos activos** (Minimal 11 + Meta 82 + Full 11),

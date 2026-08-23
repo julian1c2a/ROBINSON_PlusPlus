@@ -13,7 +13,7 @@
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
 (`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
-**Last updated:** 2026-08-23 · Lean v4.31.0.
+**Last updated:** 2026-08-23 (repatriación completa) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
@@ -1404,5 +1404,84 @@ quedan **intactos**. ⇒ el keystone `EvalListPrf` es repatriable, y el patrón 
 que dar el contexto `G` y su ecuación de `substfc`.
 
 ---
+
+---
+
+### 3.26 LA REPATRIACIÓN — los 31 módulos de vuelta (2026-08-23)
+
+**Last updated**: 2026-08-23 · **@importance**: `foundational`
+**Módulos**: los 21 que quedaban en `cuarentena/` + las piezas nuevas que los hicieron posibles.
+
+La reparación (§3.24) apartó 31 módulos porque dependían de la **lectura sintáctica de `tcFn`**.
+Todos han vuelto, **con el footprint sancionado** y **sin cambiar ningún enunciado público**.
+
+#### 3.26.1 Las tres sub‑familias muertas, y su sustituto
+
+| familia | por qué murió | sustituto |
+|---|---|---|
+| `prf_tc_cons'` | consecuencia directa de `ax_tc_cons`; **falsa** para argumentos abstractos bajo la lectura numeral | **`pcc_dot_cons`** (§3.25.3) — la misma ecuación, **dentro de `Prov`** |
+| `prf_tc_form` | meta‑recursión con paso `prf_tc_of_cons` (muerto) | `prf_tc_form_numeral` + **conversión en la FRONTERA** |
+| KIT `prf_tc_nul`/`_un`/`_bin` | composición pura de `prf_tc_cons'` | `pcc_dot_nul`/`_un`/`_bin`, **por composición de `pcc_dot_cons`** |
+
+#### 3.26.2 Las herramientas nuevas
+
+| notación | firma Lean 4 | dónde |
+|---|---|---|
+| reescritura interna, forma **implicación** | `theorem pcc_rw_imp (G : Term → Term) (hG : ∀ s, Prf (substfc zero s (G (varc (numeral 0))) =eq G s)) (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) : Prf (provFromCode (G X) ⇒ provFromCode (G Y))` | `DotConsPrf` |
+| molde unario (`Prf`) | `theorem pcc_rw_dot_cons_un (F : Term → Term) (hFs …) (hFc …) (R : Term) (hR …) (h t : Term) (hbase …) : Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R))` | `EvalListPrf` |
+| molde binario (`PrfH`) | `theorem pcc_rw_dot_cons_nthc {Γ} (h t IDX RHS : Term) (hI …) (hR …) (hbase …) : PrfH Γ (provFromCode (eqCodeFn (nthcT (tcFn (cons h t)) IDX) RHS))` | `EvalNthcPrf` |
+| sustituto de `prf_tc_form` | `theorem prf_tc_form_numeral (φ : Formula) : Prf (tcFn (formCode φ) =eq termCode (numeral (codeNat φ)))` | `D3InDotPrf` |
+| **convertidor de frontera** | `theorem pcc_to_formCode_imp (φ : Formula) (G : Term → Term) (hG …) : Prf (provFromCode (G (termCode (numeral (codeNat φ)))) ⇒ provFromCode (G (termCode (formCode φ))))` | `D3InDotPrf` |
+| KIT internalizado | `pcc_dot_nul (m)` · `pcc_dot_un (m a)` · `pcc_dot_bin (m a b)` (+ `_symm`) | `CodeCtorKit` |
+| ecuación `tc` del árbol `eqc` | `theorem pcc_dot_eqc (a b : Term) : Prf (provFromCode (eqCodeFn (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b))))` | `LineWFTrackedPrf` |
+| código del código del árbol | `theorem pcc_tc_objAt (t : Term) : ∀ T : CTree, Prf (provFromCode (eqc (tcFn (T.objAt t)) (T.dotV t)))` | `CodeTreeReflect` |
+| los dos códigos de `formCode f` | `theorem pcc_tc_formCode_internal (f : Formula) : Prf (provFromCode (eqCodeFn (tcFn (formCode f)) (termCode (formCode f))))` | `InAxiomsCodePrf` |
+
+#### 3.26.3 El punto delicado: `pcc_to_formCode` y por qué el lado derecho NO era negociable
+
+`inDot φ` está fijado por `D3DottedPrf` —activo y net‑0— como
+`substfc 0 (tcFn #0) (formCode (In (formCode φ) (runFn nil #0)))`. Ese código lleva
+`termCode (formCode φ)`, **no** la forma numeral, y **es el objetivo de D3**: sale de la definición
+de `provCodeC'`. Cambiarlo no sería refundar un enunciado, sería **cambiar el teorema**.
+
+La salida: los dos códigos son los de dos términos objeto **provablemente iguales**
+(`prf_formCode_numeral`), y **D1 dota cualquier teorema `Prf`**. El puente sale gratis dentro de
+`Prov`: `repr_pos'_prf (prf_eq_symm (prf_formCode_numeral φ))` es exactamente el `heq` que `pcc_rw`
+pide. ⇒ **probar por dentro en forma numeral y convertir en la frontera**, dejando los enunciados
+públicos intactos.
+
+#### 3.26.4 El trabajo voluminoso: `pcc_tc_objAt`
+
+`prf_tc_objAt` era **recursión estructural sobre `CTree`** produciendo una igualdad **de código**.
+Con sustitutos internos, la recursión entera se muda **dentro de `Prov`**. La conversión resultó
+**literal, pieza por pieza**, y todas las piezas existían:
+
+| antes | ahora |
+|---|---|
+| `prf_eq_trans` | `pcc_eq_trans_code` (`EvalArithPrf`) |
+| `prf_congr_unT` / `prf_congr_binT` | `pcc_congr_unT_code` / `pcc_congr_binT_1_code` / `_2_code` (`CodeCtorKit`) — **sobrevivieron intactas** y ya venían en forma implicación |
+| `prf_refl` | `prf_provFromCode_eqCodeFn_refl` |
+| ecuaciones `tc` del kit | `pcc_dot_nul_symm` / `_un_symm` / `_bin_symm` |
+
+⚠️ Único cambio de forma: en el caso binario hacen falta **dos** congruencias encadenadas donde
+antes bastaba una simultánea — **dentro de `Prov` los argumentos se reescriben de uno en uno**.
+
+#### 3.26.5 Estado tras la repatriación
+
+**D3 está reducida a UN SOLO lema**, ahora sobre la teoría **reparada**:
+
+```lean
+d3_prf_of_chainOkDot (φ) : Prf (chainOk nil #0 ⇒ provFromCode chainOkDot)
+                         → Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
+```
+
+Y `pcc_lineWF_tracked_modulo_7` verifica que cerrar `pcc_lineWF_tracked` es **exactamente** cerrar
+los **7 reflectores** que faltan (`q1 q2 q3 leibniz ind qconf listInd`).
+
+⚠️ Esos 7 son **el muro de `substfc`**: llevan `substfc`/`liftfc` sobre argumento **abstracto** y
+necesitan `pcc_eval_substfc`, que **no existe**. Requiere sancionar un predicado de buena‑formación
+(`isFormCode`, <12 axiomas) — **decisión pendiente**, con objeciones de conservatividad sin resolver.
+**La repatriación devuelve el proyecto a donde estaba antes de la inconsistencia; no lo lleva más lejos.**
+
 
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)
