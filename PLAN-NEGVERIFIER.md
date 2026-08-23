@@ -1,4 +1,44 @@
-# PLAN — `NegVerifier`: solidez estructural, decodificador e inversión de los 21 tags
+# PLAN — `NegVerifier` (cerrar `⊬¬G`)
+
+> ## ⛔ ALTO — LEER ANTES QUE NADA (2026-08-23)
+>
+> **El paso 1.1 de este plan (`canon_ne`) es FALSO, y con él caen los casos 3 y 4 del módulo C.**
+>
+> Este documento es del **2026‑07‑14**, anterior al descubrimiento de la inconsistencia
+> (2026‑08‑18), y arrastra **el mismo error de categoría**: confunde distinción **sintáctica** (en
+> Lean) con distinción **provable** (en la teoría), en una teoría donde los árboles `cons` **SON**
+> números.
+>
+> ```
+> cons nil nil = pair 0 (σ0) = div2 (cantor_poly 0 1) = div2 4 = 2 = numeralM 2
+> ```
+>
+> Distintos como términos de Lean, **provablemente iguales** en la teoría. Con `canon_ne` sale `⊥`
+> — **verificado en el compilador**: `sondeos/CanonNeRefuta.lean`, net‑0.
+>
+> ### Qué sigue en pie y qué no
+>
+> | | |
+> |---|---|
+> | módulos **A** (decodificador) y **B** (21 tags) | ✅ **HECHOS y válidos** |
+> | módulo **C**, casos **1 y 2** (refutar por `ax_lineWF_cons` / `ax_lineWF_inv`) | ✅ **no dependen de `canon_ne`** |
+> | módulo **C**, casos **3 y 4**; módulo **D** | ⛔ **hay que rediseñarlos** |
+>
+> ### La salida, y es la misma que la de ADR‑012: **NUMERALES**
+>
+> La distinción entre `numeralM m` y `numeralM n` con `m ≠ n` **sí** es provable
+> (`prf_succ_inj`/`prf_succ_ne_zero`), y `prf_formCode_numeral` puentea las representaciones. El
+> sustituto sería del tipo
+>
+> ```lean
+> codeNat_ne : codeNat φ ≠ codeNat ψ → axioms ⊢ neg (numeral (codeNat φ) =eq numeral (codeNat ψ))
+> ```
+>
+> que además exige la **inyectividad de `codeNat`** — plausible (se construye con `consN`, el
+> emparejamiento de Cantor), pero **SIN MEDIR**. Ése es el siguiente sondeo de este frente.
+>
+> ⚠️ **Las estimaciones de §10 (~1 900‑2 700 líneas, 8‑11 sesiones) NO incluyen este rediseño.**
+
 
 > **Objetivo:** descargar `NegVerifier` y, con ello, la hipótesis `Reflects` de
 > `goedel_first_undecidable_omega` — cerrando la **indecidibilidad de `G`** desde la ω‑consistencia

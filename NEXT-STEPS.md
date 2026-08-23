@@ -296,7 +296,12 @@ comentarios).
 
 > ### ⏸️ Otros frentes, sin cambios
 >
-> **`repr_neg` / `NegVerifier` para `⊬¬G`** — independiente, `PLAN-NEGVERIFIER.md`.
+> **`repr_neg` / `NegVerifier` para `⊬¬G`** — independiente. ⛔ **OJO: `PLAN-NEGVERIFIER.md` tiene un
+> paso FALSO.** Su paso 1.1 (`canon_ne`, base de los módulos C y D) **reintroduciría la
+> inconsistencia** — verificado en `sondeos/CanonNeRefuta.lean`. El plan es de julio, anterior al
+> descubrimiento, y arrastra el mismo error de categoría. Módulos A y B siguen válidos; C (casos 3‑4)
+> y D hay que rediseñarlos, previsiblemente **pasando a numerales** como ADR‑012. Siguiente sondeo de
+> ese frente: **¿es `codeNat` inyectiva?**
 > ⚠️ NO recuperar F7a (ver [[project-godel-first-complete]]).
 > **`prf_strong_induction`** al 90 % (rama B); `Meta/StrongInductionPrf.lean:156‑178`.
 > **El LIBRO**: ver `PLAN-LIBRO.md`, Parte IV reescrita con el episodio de hoy.
