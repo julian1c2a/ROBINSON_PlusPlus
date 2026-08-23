@@ -300,8 +300,11 @@ comentarios).
 > paso FALSO.** Su paso 1.1 (`canon_ne`, base de los módulos C y D) **reintroduciría la
 > inconsistencia** — verificado en `sondeos/CanonNeRefuta.lean`. El plan es de julio, anterior al
 > descubrimiento, y arrastra el mismo error de categoría. Módulos A y B siguen válidos; C (casos 3‑4)
-> y D hay que rediseñarlos, previsiblemente **pasando a numerales** como ADR‑012. Siguiente sondeo de
-> ese frente: **¿es `codeNat` inyectiva?**
+> y D hay que rediseñarlos, previsiblemente **pasando a numerales** como ADR‑012. ✅ **MEDIDO 2026‑08‑23**
+> (`sondeos/CodeNatInj.lean`): **`codeNat` ES inyectiva** y el sustituto (`codeNat_ne`) sale con la
+> base sancionada, **sin axiomas nuevos** — la mitad objeto (`numeral_ne`) ya existía. ⇒ el rediseño
+> por numerales es **viable y net‑0**. ▶ Falta **elegir la representación numeral de las LÍNEAS**
+> (`consN_inj` es el motor general) y aplicarlo a los módulos C y D.
 > ⚠️ NO recuperar F7a (ver [[project-godel-first-complete]]).
 > **`prf_strong_induction`** al 90 % (rama B); `Meta/StrongInductionPrf.lean:156‑178`.
 > **El LIBRO**: ver `PLAN-LIBRO.md`, Parte IV reescrita con el episodio de hoy.

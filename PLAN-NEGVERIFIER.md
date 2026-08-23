@@ -34,8 +34,31 @@
 > codeNat_ne : codeNat φ ≠ codeNat ψ → axioms ⊢ neg (numeral (codeNat φ) =eq numeral (codeNat ψ))
 > ```
 >
-> que además exige la **inyectividad de `codeNat`** — plausible (se construye con `consN`, el
-> emparejamiento de Cantor), pero **SIN MEDIR**. Ése es el siguiente sondeo de este frente.
+> ### ✅ MEDIDO (2026‑08‑23): la vía por numerales EXISTE y no cuesta axiomas
+>
+> `sondeos/CodeNatInj.lean`. Las dos mitades:
+>
+> | pieza | estado |
+> |---|---|
+> | `numeral_ne : a ≠ b → axioms ⊢ neg (numeral a =eq numeral b)` | ✅ **ya existía** (`Full/Numerals.lean:189`) |
+> | inyectividad de `codeNat` | ✅ **construida**, net‑0 |
+>
+> ```
+> consN_inj  (el emparejamiento de Cantor; [propext, Quot.sound])
+>   → codeNatChars_inj → codeNatStr_inj → codeNatTerm_inj/codeNatTerms_inj → codeNat_inj
+>   → codeNat_ne / codeNatTerm_ne          ← EL SUSTITUTO DE `canon_ne`
+> ```
+>
+> ⇒ **el rediseño de C y D por numerales es viable y net‑0 en axiomas.**
+>
+> ▶ **Lo que falta decidir**: `canon_ne` se usaba también sobre **líneas** (`cons`‑árboles), no sólo
+> sobre fórmulas. **`consN_inj` es el motor general** —toda estructura construida con `consN` desde
+> hojas inyectivas queda inyectiva—, así que falta **elegir la representación numeral de las
+> líneas** y aplicarlo. Ése es el siguiente paso del frente.
+>
+> ⚠️ Hallazgo lateral: hay **DOS `numeral` duplicados** (`Full.numeral` y `Meta.Godel.numeral`),
+> definiciones idénticas en namespaces distintos que Lean no identifica. El puente (`num_bridge`)
+> hay que probarlo. Deuda técnica menor pero real.
 >
 > ⚠️ **Las estimaciones de §10 (~1 900‑2 700 líneas, 8‑11 sesiones) NO incluyen este rediseño.**
 

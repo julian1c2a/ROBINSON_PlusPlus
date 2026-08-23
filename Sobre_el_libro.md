@@ -21,4 +21,5 @@ El siguiente punto debería ser totalmente en lenguaje natural: tiene que descri
 - Pasamos a exponer de forma matemática y formal todo lo dicho, y posteriormente, pasamos a ver su reflejo en el lenguaje que usamos: Lean 4.
 - Damos una breve pasada sobre el teorema de incompletitud de Gödel II, y explicamos cómo se construye la fórmula que se refiere a sí misma, y cómo se demuestra que no puede ser probada ni refutada dentro del marco de la teoría aritmética.
 - Damos una idea de las distintas fases de la demostración del teorema en el actual proyecto. Este libro siempre se referirá al material de este proyecto y al material del proyectoi FOL, y no a otros materiales. Por lo tanto, es importante que se haga una referencia clara a los distintos materiales que se han desarrollado en este proyecto y en el proyecto FOL, y cómo se relacionan entre sí.
- 
+
+El libro se desarrollará de forma activa en paralelo con el propio proyecto, de forma que será una forma en yo pueda seguir el desarrollo del mismo, y pueda ayudar a colaborar en el mismo. 
