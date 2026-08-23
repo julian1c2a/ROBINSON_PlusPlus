@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
+import ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -25,6 +26,9 @@ open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 open ROBINSON_PlusPlus.Meta.LineWFSchemaPrf
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
+open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -132,28 +136,83 @@ theorem substtc_inv_binT {m : Nat} {a b : Term}
 
 /-! ### Ecuaciones `tc` (el código del código, por aridad) -/
 
-/-- `tcFn ⟨m⟩ = nulT m`. -/
-theorem prf_tc_nul (m : Nat) : Prf (tcFn (cons (numeralM m) nil) =eq nulT m) := by
+/-! ### Los sustitutos del KIT (2026-08-23)
+
+Aquí vivían `prf_tc_nul`/`prf_tc_un`/`prf_tc_bin`, que eran **`prf_tc_cons'` compuesto** sobre el
+árbol `⟨m,a,b⟩`. Con argumentos ABSTRACTOS esos enunciados son **falsos** bajo la lectura numeral,
+así que no se recuperan a nivel de código.
+
+**Salen por composición de `pcc_dot_cons`, dentro de `Prov` y sin inducción nueva** — que es lo que
+predijo la medición (`sondeos/KitPayoff.lean`), porque `nulT`/`unT`/`binT` son todos `cons`-árboles.
+Las hojas (`prf_tc_numeral`, `prf_tc_zero`) **nunca murieron**; sólo el paso recursivo. -/
+
+/-- `tcFn ⟨m⟩ = nulT m`, **dentro de `Prov`**. Sólo reescrituras de CÓDIGO sobre `pcc_dot_cons`. -/
+theorem pcc_dot_nul (m : Nat) :
+    Prf (provFromCode (eqCodeFn (nulT m) (tcFn (cons (numeralM m) nil)))) := by
   unfold nulT
-  exact prf_eq_trans (prf_tc_cons' _ _) (prf_congr_consT (prf_tc_numeralM m) prf_tc_zero)
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+      (prf_congr_consT (prf_tc_numeralM' m) prf_tc_zero) (prf_refl _)))
+    (pcc_dot_cons (numeralM m) nil)
 
-/-- `tcFn ⟨m,a⟩ = unT m ȧ`. -/
-theorem prf_tc_un (m : Nat) (a : Term) :
-    Prf (tcFn (cons (numeralM m) (cons a nil)) =eq unT m (tcFn a)) := by
+/-- `tcFn ⟨m,a⟩ = unT m ȧ`, **dentro de `Prov`**: código → 1 paso interno → código. -/
+theorem pcc_dot_un (m : Nat) (a : Term) :
+    Prf (provFromCode (eqCodeFn (unT m (tcFn a)) (tcFn (cons (numeralM m) (cons a nil))))) := by
   unfold unT
-  refine prf_eq_trans (prf_tc_cons' _ _) ?_
-  refine prf_congr_consT (prf_tc_numeralM m) ?_
-  exact prf_eq_trans (prf_tc_cons' _ _) (prf_congr_consT (prf_refl _) prf_tc_zero)
+  have h1 : Prf (provFromCode (eqCodeFn (consT (termCode (numeralM m)) (tcFn (cons a nil)))
+      (tcFn (cons (numeralM m) (cons a nil))))) :=
+    prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+        (prf_congr_consT (prf_tc_numeralM' m) (prf_refl _)) (prf_refl _)))
+      (pcc_dot_cons (numeralM m) (cons a nil))
+  have h2 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM m)) (consT (tcFn a) (tcFn nil)))
+      (tcFn (cons (numeralM m) (cons a nil))))) := by
+    refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM m)) s)
+      (tcFn (cons (numeralM m) (cons a nil)))) ?_ _ _ (pcc_dot_cons_symm a nil) h1
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    exact prf_congr_eqCodeFn
+      (prf_eq_trans (prf_substtc_consT zero s _ _)
+        (prf_congr_consT (substtc_inv_termCode_numeralM' m s) (prf_substtc_varc0 s)))
+      (substtc_inv_tcFn _ s)
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+      (prf_congr_consT (prf_refl _) (prf_congr_consT (prf_refl _) prf_tc_zero)) (prf_refl _))) h2
 
-/-- `tcFn ⟨m,a,b⟩ = binT m ȧ ḃ`. -/
-theorem prf_tc_bin (m : Nat) (a b : Term) :
-    Prf (tcFn (cons (numeralM m) (cons a (cons b nil))) =eq binT m (tcFn a) (tcFn b)) := by
+/-- `tcFn ⟨m,a,b⟩ = binT m ȧ ḃ`, **dentro de `Prov`**: código → 2 pasos internos anidados → código. -/
+theorem pcc_dot_bin (m : Nat) (a b : Term) :
+    Prf (provFromCode (eqCodeFn (binT m (tcFn a) (tcFn b))
+      (tcFn (cons (numeralM m) (cons a (cons b nil)))))) := by
   unfold binT
-  refine prf_eq_trans (prf_tc_cons' _ _) ?_
-  refine prf_congr_consT (prf_tc_numeralM m) ?_
-  refine prf_eq_trans (prf_tc_cons' _ _) ?_
-  refine prf_congr_consT (prf_refl _) ?_
-  exact prf_eq_trans (prf_tc_cons' _ _) (prf_congr_consT (prf_refl _) prf_tc_zero)
+  let RHS : Term := tcFn (cons (numeralM m) (cons a (cons b nil)))
+  have hR : ∀ W, Prf (substtc zero W RHS =eq RHS) := substtc_inv_tcFn _
+  have h1 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM m)) (tcFn (cons a (cons b nil)))) RHS)) :=
+    prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+        (prf_congr_consT (prf_tc_numeralM' m) (prf_refl _)) (prf_refl _)))
+      (pcc_dot_cons (numeralM m) (cons a (cons b nil)))
+  have h2 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM m)) (consT (tcFn a) (tcFn (cons b nil)))) RHS)) := by
+    refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM m)) s) RHS) ?_ _ _
+      (pcc_dot_cons_symm a (cons b nil)) h1
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    exact prf_congr_eqCodeFn
+      (prf_eq_trans (prf_substtc_consT zero s _ _)
+        (prf_congr_consT (substtc_inv_termCode_numeralM' m s) (prf_substtc_varc0 s)))
+      (hR s)
+  have h3 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM m)) (consT (tcFn a) (consT (tcFn b) (tcFn nil)))) RHS)) := by
+    refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM m)) (consT (tcFn a) s)) RHS) ?_ _ _
+      (pcc_dot_cons_symm b nil) h2
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    refine prf_congr_eqCodeFn ?_ (hR s)
+    refine prf_eq_trans (prf_substtc_consT zero s _ _) ?_
+    refine prf_congr_consT (substtc_inv_termCode_numeralM' m s) ?_
+    exact prf_eq_trans (prf_substtc_consT zero s _ _)
+      (prf_congr_consT (substtc_inv_tcFn a s) (prf_substtc_varc0 s))
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+    (prf_congr_consT (prf_refl _) (prf_congr_consT (prf_refl _)
+      (prf_congr_consT (prf_refl _) prf_tc_zero))) (prf_refl _))) h3
 
 /-! ### Congruencia DENTRO de `Prov` (la pieza que cada reflector consume)
 
@@ -226,6 +285,6 @@ export ROBINSON_PlusPlus.Meta.CodeCtorKit (
   prf_congr_unT prf_congr_binT
   prf_substtc_nulT prf_substtc_unT prf_substtc_binT
   substtc_inv_nulT substtc_inv_unT substtc_inv_binT
-  prf_tc_nul prf_tc_un prf_tc_bin
+  pcc_dot_nul pcc_dot_un pcc_dot_bin
   pcc_congr_binT_1_code pcc_congr_binT_2_code pcc_congr_unT_code
 )

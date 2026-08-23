@@ -10,6 +10,7 @@ import ROBINSON_PlusPlus.Meta.EvalListPrf
 import ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.D3InDotPrf
+import ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -27,6 +28,9 @@ open ROBINSON_PlusPlus.Meta.EvalListPrf
 open ROBINSON_PlusPlus.Meta.EvalBoundedPrf
 open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.BdAllIntroPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -246,17 +250,85 @@ de un `Prov` que la evaluación ya produjo.
 Las cotas (`1 < lenc t`, `2 < lenc t`) van como **hipótesis explícitas**, igual que `chainOk`/cota
 en `pcc_eval_carc_nthc`: se descargan aguas arriba, desde `lineWF t`. -/
 
-/-- **Ecuación `tc` del árbol `eqc`**: `tcFn (eqc a b) = eqcT (tcFn a) (tcFn b)`. Es `prf_tc_cons'`
-    tres veces (el árbol `⟨4,a,b⟩`), con `4̇` y `nil` descargados por `prf_tc_numeral`/`prf_tc_zero`. -/
-theorem prf_tc_eqc (a b : Term) :
-    Prf (tcFn (eqc a b) =eq eqcT (tcFn a) (tcFn b)) := by
-  unfold eqc eqcT
-  refine prf_eq_trans (prf_tc_cons' _ _) ?_
-  refine prf_congr_consT (prf_tc_numeral 4) ?_
-  refine prf_eq_trans (prf_tc_cons' _ _) ?_
-  refine prf_congr_consT (prf_refl _) ?_
-  refine prf_eq_trans (prf_tc_cons' _ _) ?_
-  exact prf_congr_consT (prf_refl _) prf_tc_zero
+/-! ### El sustituto de `prf_tc_eqc` (2026-08-23)
+
+Aquí vivía `prf_tc_eqc (a b) : Prf (tcFn (eqc a b) =eq eqcT (tcFn a) (tcFn b))`, que era
+**`prf_tc_cons'` tres veces** sobre el árbol `⟨4,a,b⟩`. Con argumentos abstractos ese enunciado es
+**falso** bajo la lectura numeral, así que no se recupera a nivel de código.
+
+⚠️ **`eqcT` ES la forma binaria del KIT con `m = 4`** (`consT ⌜4̄⌝ (consT a (consT b ⌜nil⌝))`), así
+que su sustituto es exactamente el `pcc_dot_bin` medido en `sondeos/KitPayoff.lean`: sale **por
+composición de `pcc_dot_cons`, sin inducción nueva**. Las hojas (`prf_tc_numeral`, `prf_tc_zero`)
+nunca murieron; sólo el paso recursivo. -/
+
+/-- Hoja viva: `⌜m̄⌝` desde `prf_tc_numeral`. -/
+theorem prf_tc_numeralM' (m : Nat) : Prf (tcFn (numeralM m) =eq termCode (numeralM m)) := by
+  rw [numeralM_eq]; exact prf_tc_numeral m
+
+/-- `⌜m̄⌝` es `substtc`-invariante (`numeralM m` es CERRADO). -/
+theorem substtc_inv_termCode_numeralM' (m : Nat) :
+    ∀ W, Prf (substtc zero W (termCode (numeralM m)) =eq termCode (numeralM m)) := fun W => by
+  have h := prf_substtc_arith_open 0 W (numeralM m)
+  rw [substCodeT_closed 0 W (numeralM m)
+    (fun c => by rw [numeralM_eq]; exact liftTerm_numeral c m)] at h
+  exact h
+
+/-- `pcc_dot_cons` en la dirección simétrica (simetría INTERNA, de `BdAllIntroPrf`). -/
+theorem pcc_dot_cons_symm (h t : Term) :
+    Prf (provFromCode (eqCodeFn (tcFn (cons h t)) (consT (tcFn h) (tcFn t)))) :=
+  pcc_mp_code_apply
+    (pcc_eq_symm_code_internal (consT (tcFn h) (tcFn t)) (tcFn (cons h t))
+      (substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t)))
+    (pcc_dot_cons h t)
+
+/-- **El sustituto**: la ecuación `tc` del árbol `eqc`, ahora **DENTRO de `Prov`**.
+    Caso binario del KIT con `m = 4`: código → 2 pasos internos anidados → código. -/
+theorem pcc_dot_eqc (a b : Term) :
+    Prf (provFromCode (eqCodeFn (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b)))) := by
+  show Prf (provFromCode (eqCodeFn
+    (consT (termCode (numeralM 4)) (consT (tcFn a) (consT (tcFn b) (termCode nil))))
+    (tcFn (cons (numeralM 4) (cons a (cons b nil))))))
+  let RHS : Term := tcFn (cons (numeralM 4) (cons a (cons b nil)))
+  have hR : ∀ W, Prf (substtc zero W RHS =eq RHS) := substtc_inv_tcFn _
+  have h1 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM 4)) (tcFn (cons a (cons b nil)))) RHS)) :=
+    prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+        (prf_congr_consT (prf_tc_numeralM' 4) (prf_refl _)) (prf_refl _)))
+      (pcc_dot_cons (numeralM 4) (cons a (cons b nil)))
+  have h2 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM 4)) (consT (tcFn a) (tcFn (cons b nil)))) RHS)) := by
+    refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM 4)) s) RHS) ?_ _ _
+      (pcc_dot_cons_symm a (cons b nil)) h1
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    exact prf_congr_eqCodeFn
+      (prf_eq_trans (prf_substtc_consT zero s _ _)
+        (prf_congr_consT (substtc_inv_termCode_numeralM' 4 s) (prf_substtc_varc0 s)))
+      (hR s)
+  have h3 : Prf (provFromCode (eqCodeFn
+      (consT (termCode (numeralM 4)) (consT (tcFn a) (consT (tcFn b) (tcFn nil)))) RHS)) := by
+    refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM 4)) (consT (tcFn a) s)) RHS) ?_ _ _
+      (pcc_dot_cons_symm b nil) h2
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    refine prf_congr_eqCodeFn ?_ (hR s)
+    refine prf_eq_trans (prf_substtc_consT zero s _ _) ?_
+    refine prf_congr_consT (substtc_inv_termCode_numeralM' 4 s) ?_
+    exact prf_eq_trans (prf_substtc_consT zero s _ _)
+      (prf_congr_consT (substtc_inv_tcFn a s) (prf_substtc_varc0 s))
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+    (prf_congr_consT (prf_refl _) (prf_congr_consT (prf_refl _)
+      (prf_congr_consT (prf_refl _) prf_tc_zero))) (prf_refl _))) h3
+
+/-- La dirección que el consumidor necesita. -/
+theorem pcc_dot_eqc_symm (a b : Term) :
+    Prf (provFromCode (eqCodeFn (tcFn (eqc a b)) (eqcT (tcFn a) (tcFn b)))) :=
+  pcc_mp_code_apply
+    (pcc_eq_symm_code_internal (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b))
+      (substtc_inv_consT (substtc_inv_termCode_numeralM' 4)
+        (substtc_inv_consT (substtc_inv_tcFn a)
+          (substtc_inv_consT (substtc_inv_tcFn b) (substtc_inv_termCode_of_tc prf_tc_zero)))))
+    (pcc_dot_eqc a b)
 
 /-- **Congruencia DIAGONAL de `eqcT` DENTRO de `Prov`**: de `Prov(⌜X = Y⌝)` sale
     `Prov(⌜eqc(X,X) = eqc(Y,Y)⌝)`. Mismo patrón que `pcc_congr_carcT_code_imp`, con el contexto
@@ -350,12 +422,29 @@ theorem pcc_eqDot (t : Term) :
     PrfH_provCode_congr
       (PrfH_congr_eqCodeFn (PrfH_congr_carcT (PrfH_congr_tcFn (PrfH_eq_symm hcons)))
         (prf_to_prfH (prf_refl _) _)) hcarc0
-  -- (3) la hipótesis `=eq` reescribe el VALOR: `(carc t)˙ = eqcT(V,V)`
-  have hEQtc : PrfH _ (tcFn (carc t) =eq eqcT V V) :=
-    PrfH_eq_trans (PrfH_congr_tcFn hEQ) (prf_to_prfH (prf_tc_eqc _ _) _)
-  have hcarc2 : PrfH _ (provFromCode (eqc (carcT (tcFn t)) (eqcT V V))) :=
+  -- (3) la hipótesis `=eq` reescribe el VALOR. Ahora en DOS tramos: el `tcFn`-congruente sigue
+  --     siendo de CÓDIGO, y la ecuación del árbol `eqc` se cruza DENTRO de `Prov`.
+  have hEQtc : PrfH _ (tcFn (carc t)
+      =eq tcFn (eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :=
+    PrfH_congr_tcFn hEQ
+  have hcarc1 : PrfH _ (provFromCode (eqc (carcT (tcFn t))
+      (tcFn (eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))))) :=
     PrfH_provCode_congr
       (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) hEQtc) hcarc
+  have hCinv0 : ∀ W, Prf (substtc zero W (carcT (tcFn t)) =eq carcT (tcFn t)) := fun W =>
+    prf_eq_trans (prf_substtc_carcT zero W (tcFn t))
+      (prf_congr_carcT (substtc_inv_tcFn t W))
+  have hG2 : ∀ s : Term, Prf (substfc zero s (eqCodeFn (carcT (tcFn t)) (varc (numeral 0)))
+      =eq eqCodeFn (carcT (tcFn t)) s) := fun s =>
+    prf_eq_trans (prf_substfc_eq zero s (carcT (tcFn t)) (varc (numeral 0)))
+      (prf_congr_eqCodeFn (hCinv0 s) (prf_substtc_varc0 s))
+  have hconv : Prf (provFromCode (eqc (carcT (tcFn t))
+        (tcFn (eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))))
+      ⇒ provFromCode (eqc (carcT (tcFn t)) (eqcT V V))) :=
+    pcc_rw_imp (fun s => eqCodeFn (carcT (tcFn t)) s) hG2 _ _
+      (pcc_dot_eqc_symm (nthc t (numeralM 2)) (nthc t (numeralM 2)))
+  have hcarc2 : PrfH _ (provFromCode (eqc (carcT (tcFn t)) (eqcT V V))) :=
+    PrfH.mp _ _ _ (prf_to_prfH hconv _) hcarc1
   -- (4) evaluación provable de `nthc` bajo la cota, normalizada a `N`
   have hevN0 := PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc t (numeralM 2)) _) hbound
   have hevN : PrfH _ (provFromCode (eqc N V)) :=
@@ -512,10 +601,10 @@ theorem pcc_lineWF_tracked_eqrefl_imp (t : Term) :
     PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
   -- cotas DERIVADAS de la longitud canónica (en `PrfH`)
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
-    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+    BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlencH)
       (prf_to_prfH (prf_lt_numeralM (a := 1) (b := 3) (by omega)) _)
   have hb2 : PrfH Γ (lt (numeralM 2) (lenc t)) :=
-    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+    BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlencH)
       (prf_to_prfH (prf_lt_numeralM (a := 2) (b := 3) (by omega)) _)
   -- los tres punteados producidos en el contexto
   have hTag : PrfH Γ (provFromCode (tagDot t)) :=
@@ -538,7 +627,8 @@ export ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (
   tagEqrefl lencEqrefl eqEqrefl lwfVar ax_lineWF_eqrefl_eq prf_lineWF_eqrefl_bwd
   tagDot lencDot eqDot lwfDot paso6_backbone
   substtc_inv_termCode_of_tc eqcT eqcT_termCode prf_congr_eqcT prf_substtc_eqcT
-  prf_tagDot_eq prf_eqDot_eq prf_tc_eqc pcc_congr_eqcT_diag_code_imp
+  prf_tagDot_eq prf_eqDot_eq pcc_congr_eqcT_diag_code_imp
+  prf_tc_numeralM' substtc_inv_termCode_numeralM' pcc_dot_cons_symm pcc_dot_eqc pcc_dot_eqc_symm
   prf_lencDot_eq pcc_lencDot prf_lt_numeralM
   pcc_tagDot pcc_eqDot prf_lwfDot_eq pcc_lineWF_tracked_eqrefl
   pcc_lineWF_tracked_eqrefl_imp

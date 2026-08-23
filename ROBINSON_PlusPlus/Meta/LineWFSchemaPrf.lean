@@ -231,7 +231,7 @@ theorem prf_lt_of_lenc_eq {t : Term} {i n : Nat} (hlt : i < n)
 /-- Cota de sub‑índice desde la longitud canónica, en contexto. -/
 theorem PrfH_lt_of_lenc_eq {Γ : List Formula} {t : Term} {i n : Nat} (hlt : i < n)
     (h : PrfH Γ (lenc t =eq numeralM n)) : PrfH Γ (lt (numeralM i) (lenc t)) :=
-  PrfH_lt_subst2 (PrfH_eq_symm h) (prf_to_prfH (prf_lt_numeralM hlt) _)
+  BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm h) (prf_to_prfH (prf_lt_numeralM hlt) _)
 
 /-! ### Dirección `⇐` del bicondicional y columna vertebral, genéricas -/
 

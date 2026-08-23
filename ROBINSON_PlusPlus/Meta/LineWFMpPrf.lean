@@ -177,7 +177,7 @@ theorem pcc_lineWF_tracked_mp_imp (t : Term) :
     PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
   -- cota DERIVADA de la longitud canónica
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
-    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+    BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlencH)
       (prf_to_prfH (prf_lt_numeralM (a := 1) (b := 3) (by omega)) _)
   -- los dos punteados + MP interno ×2
   have hTag : PrfH Γ (provFromCode (tagDotM t)) :=
