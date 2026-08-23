@@ -95,10 +95,55 @@ comentarios).
 > |--:|---|---|---|
 > | **1** | **`EvalListPrf`** | los 3 usos de `prf_tc_cons'` → `pcc_rw_dot_cons_un` | ✅ **HECHO 2026‑08‑23** |
 > | **2** | **`EvalNthcPrf`** → `EvalCarcNthcPrf` | necesitó **`pcc_rw_imp`** (la forma implicación de `pcc_rw`) | ✅ **HECHO 2026‑08‑23** |
-> | **3** | **`D3InDotPrf`** (+ `InAxiomsCodePrf`) | ⚠️ familia **`prf_tc_form`**, la tercera y **sin mirar**. Desbloquea **11** | ▶ **el siguiente** |
+> | **3** | **`D3InDotPrf`** (+ `InAxiomsCodePrf`) | familia `prf_tc_form` ✅ **MEDIDA** (`sondeos/TcFormPayoff.lean`): no es muro, y hay estrategia. Desbloquea **11** | ▶ **el siguiente**, ya con plan |
 > | **3bis** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** Desbloquea `CodeCtorKit` (12 usos), `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
 > | **4** | `LineWFTrackedPrf` + los 14 tags | 6 usos (`prf_tc_cons'` + `prf_tc_eqc`); caen `LineWFSchemaPrf`, `LineWFPropPrf`, `LineWFMpPrf`, `LineWFThyPrf`, `LineWFAssemblePrf`, `BdAllIntroPrf` | ⏳ |
 > | **6** | **D3** → **Gödel II** → **F7b** (7→6 `axiom`) | `D3DottedPrf` **ya ha vuelto** (paso 1) y `d3_prf_of_dotted_atoms` es **net‑0** | ⏳ |
+>
+> ### 📏 MEDICIÓN de `prf_tc_form` (2026‑08‑23) — la tercera familia **no es un muro**
+>
+> `sondeos/TcFormPayoff.lean`, cuatro declaraciones compiladas. Dos hallazgos:
+>
+> **1. El sustituto directo es UNA LÍNEA y net‑0.**
+>
+> ```lean
+> prf_tc_form_numeral (φ) : Prf (tcFn (formCode φ) =eq termCode (numeral (codeNat φ)))
+>   := prf_eq_trans (prf_congr_tcFn (prf_formCode_numeral φ)) (prf_tc_numeral (codeNat φ))
+> ```
+>
+> Es la vía numeral aplicada a la estructura CONCRETA de `φ` — justo el «nivel 1» que
+> `PLAN-FRENTE-A.md` predijo que la reparación cubría. Las hojas de la vieja meta‑recursión
+> (`prf_tc_numeral`, `prf_tc_zero`) **nunca murieron**; sólo el paso `prf_tc_of_cons`.
+>
+> **2. ⚠️ Pero el lado derecho NO es negociable, y esto es lo importante.**
+>
+> `inDot φ` está fijado por **`D3DottedPrf`** —que ya está **activo y es net‑0**— como
+> `substfc 0 (tcFn #0) (formCode (In (formCode φ) (runFn nil #0)))`. Ese código lleva
+> `termCode (formCode φ)`, **no** `termCode (numeral (codeNat φ))`, y **es el objetivo de D3**:
+> sale de la definición de `provCodeC'`. Cambiarlo no sería «refundar un enunciado» — sería
+> **cambiar el teorema**.
+>
+> **La salida, y es elegante:** los dos códigos son los de dos términos objeto **provablemente
+> iguales** (`prf_formCode_numeral`), y **D1 dota cualquier teorema `Prf`**. Así que el puente entre
+> las dos formas sale **dentro de `Prov`**, gratis:
+>
+> ```lean
+> repr_pos'_prf (prf_eq_symm (prf_formCode_numeral φ))
+>   : Prf (provFromCode (eqc ⌜numeral (codeNat φ)⌝ ⌜formCode φ⌝))
+> ```
+>
+> …que es **exactamente** el `heq` que `pcc_rw`/`pcc_rw_imp` piden (verificado: `provCodeC' (a =eq b)`
+> unifica con `provFromCode (eqc ⌜a⌝ ⌜b⌝)`). De ahí salen `pcc_to_formCode` y `pcc_to_formCode_imp`.
+>
+> **⇒ ESTRATEGIA: no tocar las definiciones, convertir en la FRONTERA.** Probar por dentro en forma
+> NUMERAL (donde `prf_tc_form_numeral` funciona) y aplicar `pcc_to_formCode_imp` al final. Así los
+> enunciados públicos de `D3InDotPrf` —`inDot`, `bddCarcDotAt`, `hI_dot`, `d3_prf_of_chainOkDot`—
+> quedan **intactos**, y `D3DottedPrf` sigue encajando sin tocarse.
+>
+> **Radio de impacto medido:** `D3InDotPrf` = 3 usos de `prf_tc_form` + 8 menciones de
+> `termCode (formCode φ)` (de las cuales **1 definición** y **2 enunciados**, el resto cuerpos de
+> prueba). `InAxiomsCodePrf` = 2 usos y **0** menciones ⇒ mucho más barato, pero depende de
+> `D3InDotPrf`, así que va detrás.
 >
 > ### ✅ PASO 2 EJECUTADO (2026‑08‑23) — `pcc_rw_imp`, y la tercera familia a la vista
 >

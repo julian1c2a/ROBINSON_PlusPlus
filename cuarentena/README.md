@@ -38,7 +38,7 @@ KIT) son **formalmente correctos**, pero se demostraron sobre una teoría que pr
 
 | raíz | sub‑familia | usos | desbloquea |
 |---|---|---:|---:|
-| **`D3InDotPrf`** | **`prf_tc_form`** ⚠️ tercera familia, sin mirar | 3 | **11** |
+| **`D3InDotPrf`** | `prf_tc_form` ✅ medida | 3 | **11** |
 | `LineWFTrackedPrf` | `prf_tc_cons'` + `prf_tc_eqc` | 6 | 8 |
 | `CodeCtorKit` | KIT (`nul`/`un`/`bin`) + `prf_tc_cons'` | 12 | 4 |
 | `CodeTreeReflect` | KIT | 3 | 2 |
@@ -56,7 +56,7 @@ KIT) son **formalmente correctos**, pero se demostraron sobre una teoría que pr
 |---|---|---|
 | `prf_tc_cons'` | **`pcc_dot_cons`** + moldes `pcc_rw_dot_cons_un` (unario, `Prf`) y `pcc_rw_dot_cons_nthc` (binario, `PrfH`, vía **`pcc_rw_imp`**) | ✅ **resuelta y validada ×2** |
 | KIT: `prf_tc_nul`/`_un`/`_bin` | `pcc_dot_nul`/`_un`/`_bin` — esperables por composición | ⏳ **sin medir** |
-| `prf_tc_form` | *sin diseñar* | ⏳ **sin mirar** — es la raíz más rentable que queda (`D3InDotPrf`, 11) |
+| `prf_tc_form` | `prf_tc_form_numeral` (1 línea, net‑0) **+ `pcc_to_formCode`** (D1 sobre `prf_formCode_numeral`) | ✅ **MEDIDA** (`sondeos/TcFormPayoff.lean`) — no es muro. ⚠️ El lado derecho **no es negociable**: convertir en la FRONTERA, no cambiar definiciones |
 
 ### ✅ `EvalListPrf` — REPATRIADO (2026‑08‑23)
 
@@ -128,7 +128,7 @@ Instanciado en `carcT`, `cdrcT` y `lencT`. **Reutilizable** en cualquier sitio c
 |--:|---|---|
 | 1 | ✅ **`EvalListPrf`** | **HECHO** — 3 sitios (no 6), cerrados con un único molde `pcc_rw_dot_cons_un`. Arrastró 6 módulos en cascada |
 | 2 | ✅ **`EvalNthcPrf`** → `EvalCarcNthcPrf` | **HECHO** — no era el mismo patrón: hizo falta **`pcc_rw_imp`** (forma implicación, para entrar en `PrfH`) y un molde binario propio |
-| 3 | ▶ **`D3InDotPrf`** + `InAxiomsCodePrf` | familia **`prf_tc_form`**, sin mirar. La más rentable: desbloquea 11 |
+| 3 | ▶ **`D3InDotPrf`** + `InAxiomsCodePrf` | familia `prf_tc_form`, **ya medida**: probar por dentro en forma numeral y convertir con `pcc_to_formCode_imp` en la frontera, dejando los enunciados públicos intactos |
 | 3bis | **KIT**: `pcc_dot_nul`/`_un`/`_bin` | *medir primero* si salen por composición de `pcc_dot_cons` → desbloquea `CodeCtorKit`, `CodeTreeReflect`, `LineWFEfqPrf` |
 | 4 | `LineWFTrackedPrf` + los 14 tags | caen con 1–3 |
 | 6 | `D3DottedPrf` → **D3** → **Gödel II** → **F7b** | el objetivo |
