@@ -1,4 +1,4 @@
-# `sondeos/` — experimentos verificados de la sesión 2026‑08‑19
+# `sondeos/` — experimentos verificados (desde la sesión 2026‑08‑19)
 
 **NO son módulos de producción y NO entran en el build de `lake`** (la `lean_lib` está enraizada en
 `ROBINSON_PlusPlus/`; estos ficheros quedan fuera). Se versionan porque **contienen resultados
@@ -14,6 +14,7 @@ lake env lean sondeos/<fichero>.lean      # desde la raíz de RPP, NUNCA desde F
 
 | fichero | sondeo | resultado |
 |---|---|---|
+| **`SegundoMuro.lean`** | **muro de `substfc` · ¿existe de verdad el «segundo muro»?** | ✅ **NO ES UN MURO.** Mitad 1 (**compilada, net‑0**): `hcond_absorbe_extra` — el chasis `pcc_lineWF_tracked_of_schema` **absorbe el conjunto extra**; enmendar los 7 esquemas **no obliga a rehacerlo**. Sale por `Prf₀.c2`/`c3` fuera + `prf_substfc_and` (`substfc` distribuye sobre `andc`) + `PrfH_and_intro_code` dentro. Mitad 2: los 4 ingredientes del reflector **están en producción** — `prf_strong_induction` (⚠️ **existe**: la nota de MEMORY.md era obsoleta), `prf_cantor_mono_left/right`, `pcc_lt_tracked`, y el precedente **`pcc_eval_lenc`** (argumento objeto ABSTRACTO → `Prov`). ⚠️ `pcc_In_lfc_tracked` **no** es precedente: recurre sobre lista **META**. **R‑6 CONFIRMADA** y con especificación exacta: la enmienda pide **DOS** predicados mutuamente recursivos (`isFormCode` 7/7, `isTermCode` **sólo 3/7**), no uno ⇒ el reflector **cuesta el doble** de lo que suponía julio. `isFormCode`/`isTermCode` **no existen** en el árbol. |
 | **`DescargaHFN.lean`** | **la comprobación final** | ✅ **EL MÁS IMPORTANTE.** Rehace el piloto con `hFN` **DEMOSTRADA** (vía `Meta/CodeNumeralPrf.lean`). `godelCN_fixedpoint` compila **sin `codeN`, sin `hFN` y sin `tc_cons`**. La vía numeral deja de ser condicional. |
 | `PilotoDiagonal.lean` | piloto del lema diagonal (histórico: con `hFN` asumida) | El punto fijo de Gödel **sobrevive** con códigos NUMERALES. `godelCN_fixedpoint` tiene el footprint del original **menos `tc_cons`**. Asume sólo `hFN` (= la salida de S4). Además `provCode_transfer` da la equivalencia con la representación en árbol en **un** paso de Leibniz. |
 | **`PilotoRastreada.lean`** | **piloto de la capa RASTREADA** | ⛔ **NEGATIVO, y decide la estrategia.** `prf_cons_eval` permite enfrentar las dos lecturas: `cons 0 nil =eq numeral 2` es demostrable, luego la lectura numeral da `tcFn (cons 0 nil)` con cabeza `⌈σ⌉` y `prf_tc_cons` con cabeza `⌈::⌉`. Son **incompatibles**. La capa rastreada usa `prf_tc_cons` sobre argumentos **ABSTRACTOS** (`pcc_eval_carc (h t)`, `prf_tc_un/bin`), luego **no sobrevive a la reparación**. |

@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑23 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 10 `sondeos/`**
+**Estado 2026‑08‑24 · `master` limpio y verde · Lean v4.31.0**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 16 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,68 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## 📏 MEDICIÓN (2026‑08‑24) — **el «SEGUNDO MURO» NO es un muro** (`sondeos/SegundoMuro.lean`)
+>
+> La ruta `isFormCode` para tumbar el muro de `substfc` arrastraba una objeción que **8 de 8
+> revisores afirmaron y ninguno compiló**: al meter un conjunto extra en el `⇔` de los 7 esquemas,
+> `pcc_lineWF_tracked` tendría que reflejarlo también. Medido, en dos mitades:
+>
+> **MITAD 1 — el chasis lo absorbe. ✅ COMPILADO, net‑0.**
+> ```lean
+> hcond_absorbe_extra (P C : Formula) (t : Term) (n : Nat)
+>     (hP : Prf (lineWF t ⇒ (lenc t =eq numeralM n) ⇒ substFormula 0 t P ⇒ provFromCode (condD P t)))
+>     (hC : … C …) : … (Formula.and P C) …
+> ```
+> Es **exactamente** la `hcond` que pide `pcc_lineWF_tracked_of_schema` (`LineWFSchemaPrf.lean:291`).
+> ⇒ **enmendar los 7 esquemas NO obliga a rehacer el chasis.** Sale por `Prf₀.c2`/`c3` (proyectar la
+> conjunción **fuera** de `Prov`) + **`prf_substfc_and`** (`substfc` **distribuye** sobre `andc`, luego
+> `condD (P∧C) t` **es** `andc (condD P t) (condD C t)`) + `PrfH_and_intro_code` (∧‑intro **dentro**).
+> Lección 1 de la repatriación otra vez: *el transporte cambia de NIVEL, no de nombre*.
+>
+> **MITAD 2 — el reflector es trabajo real PERO PRECEDENTADO.** Los 4 ingredientes ya están en
+> producción: `prf_strong_induction` (`StrongInductionPrf.lean:185`),
+> `prf_cantor_mono_left/right` (todo sub‑código es **estrictamente** menor), `pcc_lt_tracked`, y el
+> **precedente de la forma completa**: `pcc_eval_lenc (L : Term)` — argumento objeto **ABSTRACTO**,
+> conclusión dentro de `Prov`, vía `prf_spec` de un `∀` probado por inducción a nivel objeto.
+> ⚠️ **`pcc_In_lfc_tracked` NO es precedente**: su recursión es sobre una lista **META** de Lean.
+>
+> ### ⚠️ DOS CORRECCIONES A LA DOCUMENTACIÓN, salidas de esta medición
+>
+> **(a) El ÍNDICE de `MEMORY.md` sigue diciendo que falta la inducción fuerte.** Dice que el paso
+> **(ii)** de la ruta 1a está pendiente porque `Full/StrongInduction.lean` es un GUION sobre
+> `Derives`. **Ya no**: `Meta/StrongInductionPrf.lean:185` la tiene sobre `Prf`, **exportada**, hecha
+> con `prf_nat_induction` + `prf_le_of_lt_succ` + `prf_not_lt_zero`. **(ii) está HECHO.**
+> (El nodo `project_substfc_wall.md` ya lo corrigió el 2026‑08‑23; el que mentía era el índice.)
+>
+> **(b) R‑6 CONFIRMADA, y ahora con la especificación EXACTA.** Leído `Minimal/Axioms.lean`, la
+> enmienda correcta se deduce mecánicamente de qué **posición** ocupa cada casilla:
+>
+> | tag | lenc | casillas | `isFormCode` | `isTermCode` | por qué |
+> |---|---|---|---|---|---|
+> | `q1` (9) | 4 | 1,2,3 | s2 | s3 | `substfc 0 (nthc X 3) (nthc X 2)`: s3 es el **sustituyendo** |
+> | `q2` (10) | 4 | 1,2,3 | s2 | s3 | ídem |
+> | `q3` (11) | 4 | 1,2,3 | s2, **s3** | — | `liftfc 0 (nthc X 3)`: s3 es **fórmula** |
+> | `leibniz` (13) | 5 | 1,2,3,4 | s2 | s3, s4 | `eqc (nthc X 3) (nthc X 4)` ⇒ términos |
+> | `ind` (18) | **3** | 1,2 | s2 | — | **no hay casilla 3**; sustituyendos CONCRETOS |
+> | `qconf` (19) | 4 | 1,2,3 | s2, **s3** | — | ambas son **fórmula** |
+> | `listInd` (20) | **3** | 1,2 | s2 | — | **no hay casilla 3**; sustituyendos CONCRETOS |
+>
+> Las dos formas de romperlo, confirmadas: `ind`/`listInd` **no tienen casilla 3**; y en `q3`/`qconf`
+> la casilla 3 lleva código de **fórmula** ⇒ `isTermCode` ahí sería **refutable** y cerraría B.3c
+> 21/21 **ex falso**.
+> ⇒ **la enmienda pide DOS predicados mutuamente recursivos**, `isFormCode` (7/7, 9 instancias) e
+> `isTermCode` (**sólo 3/7**, 4 instancias) — el reflector **cuesta el doble** de lo que suponía
+> julio. Y **ninguno de los dos existe** en el árbol.
+>
+> ### ▶ QUÉ DECIDE ESTA MEDICIÓN
+>
+> La objeción «segundo muro» **queda retirada como obstrucción**; se convierte en **coste**, y el
+> coste está acotado: 2 predicados + 2 reflectores por la receta de `pcc_eval_lenc`. Lo que sigue
+> abierto es lo de siempre y es **una decisión, no un problema**: `isFormCode`/`isTermCode` son
+> **axiomas objeto nuevos** y por tanto **requieren SANCIÓN explícita**, con el agravante ya
+> registrado de que `ax_axiomsCodeT_eq` ancla a los **141** axiomas (no a `coreAxioms`), luego el
+> argumento de julio «`isFormCode` queda fuera del sujeto gödeliano» es **FALSO**.
 >
 > ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena** — el rédito ya está VERIFICADO
 >
