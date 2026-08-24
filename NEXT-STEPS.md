@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑24 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 17 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 18 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,44 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## ✅ (A) EJECUTADO (2026‑08‑24): **el REFLECTOR de la vía (2) EXISTE** (`sondeos/InTracked.lean`)
+>
+> Footprint **sancionado** `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]` en las tres piezas.
+>
+> | pieza | qué asegura |
+> |---|---|
+> | **`pcc_boundedIn_tracked (x w)`** | **A1**: `boundedIn x w ⇒ Prov(⌜∃i<lencT ẇ. nthcT ẇ i = ẋ⌝)`, `x` y `w` **ABSTRACTOS** |
+> | **`pcc_In_tracked (x w)`** | A1 desde el átomo `In`, vía `prf_In_iff_boundedIn` (vale para `L` abstracta) |
+> | **`pcc_binOk_tracked (w X k)`** | **A2, caso MÁXIMO** de `nodeOk`: dos `=eq` + dos `In` |
+>
+> **A1 tapa el único hueco de la cadena**: no existía reflector `tracked` de `In` sobre lista
+> **abstracta** (`pcc_In_lfc_tracked` recurre sobre lista META, `pcc_in_objList_of_mem` también).
+> Sale por el molde de **`pcc_bddCarcDot_reflect`** (`D3InDotPrf.lean:334`, núcleo de `hI_dot`), y
+> **más barato que él** por dos razones:
+> * ⚠️ **`pcc_eval_nthc` es INCONDICIONAL** salvo `i < lenc p` — y eso lo da el propio `∃` acotado.
+>   `pcc_eval_carc_nthc` (el del precedente) consume además **`chainOk nil p`**; ese `chainOk` viene
+>   del `carc`, no del `nthc`. Como nuestro testigo de parseo **no es una cadena de prueba**, ese
+>   requisito habría sido un problema real. **No lo es.**
+> * **No hay cruce de FRONTERA numeral**: el precedente necesitaba `pcc_to_formCode_imp` porque su
+>   `φ` era concreto; con argumento abstracto no hay frontera.
+>
+> **A2 subsume los 12 casos**: los `=eq` los da `pcc_eq_tracked` (**general**, argumentos
+> abstractos), los `In` los da A1, y `PrfH_and_intro_code` ensambla dentro. `unOk`/`strBinOk` son
+> sub‑casos, `nulOk`/`varOk` sólo los `=eq`, `nil` un `=eq`, `cons` dos `In`. **Ningún mecanismo
+> queda sin medir.** ⚠️ Los `=eq` salen como `eqCodeFn (tcFn (carc X)) …`, no `carcT (tcFn X)`;
+> convertirlos es evaluación provable y las tres piezas existen (`pcc_eval_carc/lenc/nthc`).
+>
+> ### ▶ A3 — lo que queda, y NO tiene hueco de herramienta
+> `isFCB w c = wfAll w ∧ In c w`: el segundo es A1; el primero es un `∀` acotado cuya introducción
+> **está completa en producción** — **`pcc_bdAll_intro`** (§40, `BdAllIntroPrf.lean:316`), hecha
+> justo para esta forma, y su `hbody` es literalmente `prf_spec` + MP + **A2**.
+> Comprobado el punto que sí podía morder: `substfc` debe atravesar el `orc` de los 12 disyuntos
+> **y el `exc`** de `bdInDot` (un binder) — **las 8 ecuaciones son teoremas `Prf`**
+> (`ArithPrf.lean:298‑347`), `prf_substfc_or` y `prf_substfc_ex` incluidas. Al cruzar el `exc` los
+> índices se desplazan (`succ`/`liftc`) ⇒ **dos niveles De Bruijn** que gestionar; trabajo real con
+> precedente directo (`prf_substfc_exBodyc` `EvalLtPrf.lean:236`, `prf_substfc_ltCodeFn_varc0`
+> `EvalBoundedPrf.lean:170`). ⇒ **descargar parámetros, no resolver un problema abierto.**
 >
 > ## ✅ DECISIÓN TOMADA (2026‑08‑24): **opción (2), vía por TESTIGO DE PARSEO** — FASE A COMPILADA
 >
