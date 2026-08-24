@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑24 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 16 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 17 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,47 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## ✅ DECISIÓN TOMADA (2026‑08‑24): **opción (2), vía por TESTIGO DE PARSEO** — FASE A COMPILADA
+>
+> Presentada la decisión sobre `isFormCode`, el usuario eligió **(2)**: definir la buena‑formación
+> en **vocabulario objeto EXISTENTE**, sin sancionar axiomas. `sondeos/ParseWitness.lean`,
+> **todo net‑0** (`[propext, choice, Quot.sound]`):
+>
+> | pieza | qué asegura |
+> |---|---|
+> | `nodeOk` / `wfAll` / `isFCB` | la definición completa, **12 casos**, vocabulario existente |
+> | **`prf_bdAll_numeral`** | **la clave**: `∀i < numeralM n. Φ(i)` desde las `n` instancias concretas (no es la ω‑regla: la cota es concreta) |
+> | `prf_lenc_objList` · `prf_nthc_objList` · `prf_In_objList` | el puente `objList` ⇄ meta |
+> | `PrfH_congr_nodeOk` | Leibniz sobre el nodo — **UNA** aplicación, no 12 |
+> | **`prf_wfAll_objList`** | **el ensamblaje**: de «cada elemento es nodo válido» a `wfAll` |
+> | `prf_isFCB_bottom` | el caso base `⊥`, extremo a extremo |
+>
+> **El precedente que lo justifica ya estaba en producción y no se había visto**: el proyecto
+> **ya sustituyó un átomo recursivo por una forma posicional acotada** —
+> `prf_chainOk_iff_chainOkB` (`ChainOkBoundedPrf.lean:832`), y `prf_allIn_iff_boundedAllIn`.
+>
+> ### 🔑 Las tres decisiones que lo abarataron (material del libro)
+> 1. **Pertenencia SIN orden** (`In x w`, no «aparece antes de la posición `i`»). Con orden, cada
+>    composición de testigos exigiría concatenación + desplazamiento de índices. La buena
+>    fundamentación **no se pierde**: la da `prf_cantor_mono_left/right`, que alimentará
+>    `prf_strong_induction` en la fase B.
+> 2. **Las CADENAS no llevan predicado** — `substfc` no recurre en `strCodeM` ⇒ es carga OPACA.
+>    Borra un predicado entero **y** el problema de totalidad de `Char.ofNat` que
+>    `sondeos/RecodCoste.lean` había señalado.
+> 3. **Cero monotonía**: probar cada nodo contra la lista COMPLETA (`prf_In_objList`) evita
+>    transportar `nodeOk w X` ⇝ `nodeOk (cons y w) X`, que costaría un or‑elim de 12 casos por
+>    composición.
+>
+> ### ▶ SIGUIENTE PASO CONCRETO
+> **(i‑resto, VOLUMEN):** `subCodes : Formula → List Term` + la inducción meta sobre `φ` que prueba
+> que cada elemento es nodo válido. Cada caso = leer tag (`prf_carc_cons`), longitud
+> (`prf_lenc_cons`) y pertenencias (`prf_In_objList`). El ensamblaje ya está hecho.
+> **(ii, EL TRABAJO GRANDE, común a las dos opciones):** `pcc_eval_substfc` por
+> `prf_strong_induction` sobre el código, con el testigo dando el análisis de casos.
+>
+> ⚠️ `isFCB` **sobre‑aproxima**. No es problema de solidez: añadir el conjunto **restringe**
+> `lineWF` ⇒ `Prov` nunca crece (dirección opuesta al incidente `ax_lineWF_gen`).
 >
 > ## 📏 MEDICIÓN (2026‑08‑24) — **el «SEGUNDO MURO» NO es un muro** (`sondeos/SegundoMuro.lean`)
 >
