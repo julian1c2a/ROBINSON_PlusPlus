@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑25 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 20 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 22 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,49 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## ⛔ HITO (i) CERRADO — pero **el predicado FUSIONADO no desbloquea el muro** (2026‑08‑25)
+>
+> **Lo que SÍ está hecho** (`sondeos/SubCodesWitness.lean`, **net‑0**, 3 estrategias independientes,
+> **3 de 3** confirmadas incluida satisfacibilidad):
+> ```lean
+> prf_isFCB_subCodes (φ) : Prf (isFCB (objList (subCodes φ)) (formCodeM φ))
+> prf_isFC (φ)           : Prf (∃w. isFCB w ⌜φ⌝)
+> ```
+> Sin hipótesis. `subCodes` salió tal como se propuso, con **`subCodesTs [] = [nil]`**
+> imprescindible. La inducción **generaliza sobre un superconjunto** en vez de usar monotonía.
+> `real_mem_subCodes`: el testigo **no tiene basura** (todo miembro es `formCodeM`/`termCodeM`/
+> `termsCodeM`). Añadidos net‑0 por el crítico: **gemelo de términos** (`prf_isTC`/`prf_isTsC`) y
+> **transporte** `prf_congr_isFC` (Leibniz bajo el `∃`).
+>
+> ### 🚩 EL DEFECTO, y es de DISEÑO: `nodeOk` FUSIONA fórmulas y términos
+> Es **un solo** predicado de 12 disyuntos que mezcla los tags de FÓRMULA (2‑9) con los de TÉRMINO
+> (0‑1), `nil` y el `cons` genérico ⇒ **`isFC X` NO dice que `X` sea código de fórmula.**
+> Compilado net‑0 en `sondeos/SubCodesCritica.lean`:
+> `prf_isFC_nil` · `prf_isFC_varc` (un código de VARIABLE pasa) · **`prf_isFC_junk`**: la
+> «implicación» `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`, cuyas dos subfórmulas son códigos de TÉRMINO, **pasa**.
+>
+> Y `substfc` tiene **8 ecuaciones, una por constructor de FÓRMULA** (`Axioms.lean:497‑520`) y
+> **ninguna** para `varc`/`funcc`/`nil`/`cons` ⇒ la inducción interna de `pcc_eval_substfc` se
+> **atasca** en los 4 disyuntos no‑fórmula, y en el paso recursivo la HI puede ser la lectura de
+> TÉRMINO. ⇒ **R‑6 sigue viva palabra por palabra**: hacen falta `isFormCode`/`isTermCode`/
+> `isTermsCode` **separados y mutuamente recursivos**.
+>
+> ⚠️ **Error mío, y trazable**: la nota de R‑6 del 2026‑08‑24 decía literalmente «la enmienda pide
+> **DOS predicados mutuamente recursivos**», y `ParseWitness` diseñó **uno fusionado** sin
+> reconciliarlo. El hito (i) no supera R‑6 **ni la abarata**.
+>
+> ### ▶ LA REPARACIÓN, y su coste NO registrado
+> Partir `nodeOk` en tres variantes tipadas por tag y llevar **tres** listas testigo. La mitad meta
+> **ya está**: `subCodes`/`subCodesT`/`subCodesTs` **son** los tres testigos separados.
+> ⚠️ **Pero eso cambia el enunciado OBJETO de A3 ⇒ `pcc_isFCB_tracked` hay que REHACERLO.**
+>
+> ### ✅ Objeción (D) del crítico: **FALSA, comprobada**
+> Afirmaba que el puente `In x w → ∃i<lenc w. nthc w i = x` no existe («0 ocurrencias»). **Sí
+> existe**: `prf_boundedIn_of_In` (`BoundedInPrf.lean:321`), para lista **ABSTRACTA**, y A1 ya lo
+> usa. Queda descartada.
+> Sigue abierta y sin registrar su objeción (E): `pcc_isFC_tracked` — ∃‑intro **interno** con
+> testigo punteado abstracto, y `hcond_absorbe_extra` nunca se ejercitó con un `P` con cuantificador.
 >
 > ## ✅✅ A3 CERRADA (2026‑08‑25) — **la vía (2) llega al reflector COMPLETO** (`sondeos/A3IsFCBTracked.lean`)
 >
