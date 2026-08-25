@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑24 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 18 `sondeos/`**
+**Estado 2026‑08‑25 · `master` limpio y verde · Lean v4.31.0**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 20 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,45 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## ✅✅ A3 CERRADA (2026‑08‑25) — **la vía (2) llega al reflector COMPLETO** (`sondeos/A3IsFCBTracked.lean`)
+>
+> ```lean
+> pcc_isFCB_tracked (w c : Term) : Prf (isFCB w c ⇒ provFromCode (isFCBDot w c))
+> ```
+> `w` y `c` **ABSTRACTOS**. Footprint sancionado `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]`,
+> 0 errores, 0 warnings, 0 `sorry`, 0 axiomas nuevos. **Recompilado a mano**, no sólo reportado.
+>
+> ### 🔑 La jugada: dotar `In` como ÁTOMO, no como su despliegue
+> `inFormCodeFn` (que **ya estaba en producción**) en vez del `∃` acotado `bdInDot`. Consecuencia:
+> el cuerpo `PsiF` **no tiene ni un binder**, todo el descenso de `substfc` vive en **nivel 0**, y
+> `hPsiId` sale **por instanciación pura** del descenso genérico.
+> ⇒ **el problema de los dos niveles De Bruijn no se resolvió: se DISOLVIÓ.**
+> `pcc_wfAll_tracked` acaba siendo **una línea**:
+> `pcc_bdAll_intro wfAll lenc PsiF w` con las 8 obligaciones descargadas.
+> A1 no se tiró: es el motor. `boundedIn ⇒ In` es un teorema **objeto** que se **dota gratis**
+> (la lección de la escalera), y eso da el puente interno `bdInDot ⇒ ⌜In⌝` (`pcc_InBwd_computed`).
+>
+> ### ⛔ LA REFUTACIÓN — mató 2 de los 4 intentos (`sondeos/A3ConsOkRefuta.lean`)
+> Los cuatro necesitan saber que el nodo es un `cons` (porque `pcc_eval_carc` sólo evalúa sobre
+> `cons` EXPLÍCITO). Dos lo conjuntaron **globalmente**, y eso **mata el disyunto `X = nil`**:
+> la teoría objeto REFUTA `consOk nil` (`nil_ne_cons`, `CodeDistinct.lean:67`). Y `nil` es
+> **obligatorio** — `termCodeM zero = cons 1 (cons ⌜"0"⌝ (cons nil nil))` lo lleva en la casilla 2,
+> y la cola de toda lista de argumentos termina en `termsCodeM [] = nil`. ⇒ `∃w. isFCB w c` se
+> quedaría **sin testigos** para toda fórmula que mencione un símbolo con argumentos: teorema
+> **verdadero y vacío**. Dos verificadores lo hallaron **independientemente y COMPILADO**.
+> 🔑 **Para el libro**: reforzar el antecedente objeto es la dirección que ABARATA el teorema, y por
+> eso es donde hay que mirar. Se detectó porque alguien lo **compiló**, no porque alguien lo leyera.
+>
+> ### ⚠️ DOS DESVIACIONES respecto a `sondeos/ParseWitness.lean`, ambas declaradas
+> 1. **`consOk X` en 11 de los 12 disyuntos** (NO en `X = nil`). **Solidez**: restringe `nodeOk` ⇒
+>    `Prov` nunca crece. **Completitud**: para un testigo real cada nodo de esos 11 **es** un `cons`,
+>    luego se descarga solo — ⚠️ **pero añade una obligación al hito (i)**: `subCodes` tendrá que
+>    probar `consOk` por nodo. Trivial, pero no estaba en el plan.
+>    ⇒ **el `nodeOk` bueno pasa a ser el de `A3IsFCBTracked`**, no el de `ParseWitness`.
+> 2. **La cota** sale como reflexión pura `tcFn (lenc w)`, no evaluada `lencT (tcFn w)`. Iguales
+>    dentro de `Prov` (`pcc_eval_lenc`), pero convertirlas cuesta **un lema entero** (segunda
+>    travesía estructural de `PsiF` a nivel 1). Diferido.
 >
 > ## ✅ (A) EJECUTADO (2026‑08‑24): **el REFLECTOR de la vía (2) EXISTE** (`sondeos/InTracked.lean`)
 >
