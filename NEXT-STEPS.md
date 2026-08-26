@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑25 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 22 `sondeos/`**
+**Estado 2026‑08‑26 · `master` limpio y verde · Lean v4.31.0**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 24 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,55 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## ✅✅ COMPARACIÓN (1) vs (2) RESUELTA (2026‑08‑26) — **la partición FUNCIONA y DISCRIMINA**
+>
+> Recompilado por mí: `sondeos/ParticionTresPredicados.lean` (2282 l.) y
+> `sondeos/ParticionDiscrimina.lean` (2704 l.), ambos `EXIT=0`.
+>
+> ### 🔑 El cuadre que lo explica todo — **el premio de R‑6**
+> | predicado | disyuntos | ecuaciones de su sustitución |
+> |---|---|---|
+> | `isFormCode` | **8** | `substfc`: **8** (`Axioms.lean:497‑520`) |
+> | `isTermCode` | **2** | `substtc`: **2** |
+> | `isTermsCode` | **2** | `substtsc`: **2** |
+>
+> Hoy `pcc_eval_substfc` se atasca **porque 12 ≠ 8**. Partida, cada mitad encaja. El total **no
+> crece** (12 = 8+2+2): es **partición**, no recubrimiento. La partición no es sólo reparar el
+> defecto — es **la condición para que la inducción exista**.
+>
+> ### ✅ DISCRIMINA — y no sólo: **REFUTA** la basura
+> `crit_isFC_junk_REFUTED` y `crit_isFCB3_no_termcode`, **net‑0**: el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ` que el
+> predicado **fusionado aceptaba**, el partido lo **refuta**. Era el riesgo real de la partición
+> (tres predicados que siguieran aceptando basura no arreglarían nada) y queda cerrado con prueba.
+>
+> ### 📊 Coste medido de rehacer
+> **A1 y A2 sobreviven al 100 %** (ni una línea). **~527 líneas de A3 byte‑idénticas** (md5),
+> incluido `pcc_InBwd_computed` (~60 l. de De Bruijn, la pieza nueva más cara, genérica y usada
+> 3× sin tocar). Muere `nodeOkDot`; `pcc_nodeOk_pure` se re‑enuncia ×3 pero la cadena de or‑elim
+> **encoge** (11 → 9). Lo único que se triplica es el envoltorio `bdAll`: 8×3 = 24 obligaciones,
+> **18 reales** (`hbl_ok`/`hbs_ok` se comparten: la cota es `lenc` en las tres). **≈1,4‑1,6×**,
+> no 3×. Regalo: el caso base `n=0` de `prf_bdAll_numeral` da los testigos **vacíos** gratis.
+>
+> ### ⚖️ VEREDICTO: **(2), sin matices** — y la razón de peso NO es el ahorro
+> **(1) no es más caro: es OTRO TEOREMA.** Sus axiomas tienen que entrar en `axioms` para
+> funcionar; `ax_axiomsCodeT_eq` los mete en `axiomsCodeT`; el verificador interno los cita;
+> **`provCodeC'` cambia ⇒ G cambia**. 141 → ~159. Ningún ahorro de líneas compra eso.
+> Y la única ventaja genuina de (1) —«inducir dentro de `Prov` es más fácil»— se apoyaba en que a
+> (2) le faltaba el puente `In`⇄`nthc`: **ese puente ya está en producción**
+> (`prf_boundedIn_of_In`, `BoundedInPrf.lean:321`, `w` **abstracto**, net‑0). Objeción (D) de
+> `SubCodesCritica` **refutada por segunda vez, por identidad de términos**.
+> ⚠️ Corolario: aunque se sancionara (1), **los sondeos de (2) son su certificado de
+> conservatividad** — la prueba NO vacua que `ax_lineWF_inv` sólo afirma de palabra.
+>
+> ### 🚩 EL GATE QUE FALTA — **clausura del testigo bajo sustitución**
+> Río abajo, los 7 tags podrían exigir que el **RESULTADO** de `substfc` vuelva a reconocerse como
+> código de fórmula. En (1) sale gratis de los `⇔`; en (2) habría que construir el testigo de
+> `substfc c W` desde el testigo **abstracto** de `c`.
+> ⚠️ **Matiz que el informe no daba**: **`substtsc` YA ES un map** (`ax_substtsc_cons`:
+> `substtsc v t (cons a b) = cons (substtc v t a) (substtsc v t b)`). Lo que no existe es un map
+> sobre lista **heterogénea**. **Sondeo en curso** para decidir si hace falta siquiera, y si se
+> puede sin símbolo nuevo.
 >
 > ## ⛔ HITO (i) CERRADO — pero **el predicado FUSIONADO no desbloquea el muro** (2026‑08‑25)
 >
