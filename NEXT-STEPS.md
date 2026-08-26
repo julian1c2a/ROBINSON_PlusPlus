@@ -9,6 +9,49 @@
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
+> # 🎯 SIGUIENTE SESIÓN — dos tareas, EN ESTE ORDEN (acordado 2026‑08‑26)
+>
+> El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**), ya
+> decidida y con el gate de clausura superado. Quedan dos cosas **antes** de escribir
+> `pcc_eval_liftc`, que es el eslabón grande.
+>
+> ## ① REVALIDAR LA DISCRIMINACIÓN contra la forma ECUACIONAL *(barato, cierra un riesgo real)*
+>
+> **Qué**: la reformulación ecuacional de los 12 disyuntos (`X ≐ cons k̄ …` en lugar de
+> `carc X ≐ k̄ ∧ lenc X ≐ n̄`) **cambia el predicado**, y **nadie ha comprobado** que la
+> discriminación sobreviva. El sondeo sostiene que sí por ser un **fortalecimiento**
+> (`prf_shapeImpl_strengthens`), pero eso **no está compilado contra los teoremas de
+> discriminación**. La discriminación es justo lo que hace que la partición valga la pena.
+>
+> **Cómo**: coger `crit_isFC_junk_REFUTED` y `crit_isFCB3_no_termcode` de
+> `sondeos/ParticionDiscrimina.lean` y re‑probarlos con la cláusula ecuacional de
+> `sondeos/ClausuraFormaEcuacional.lean` (`shapeImpl`). Criterio de aceptación: los dos siguen
+> **net‑0** y siguen **REFUTANDO** el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`.
+> **Si NO sobreviven**: la forma ecuacional está descartada y (B) del gate vuelve a estar abierta.
+>
+> ## ② DECIDIR DÓNDE VIVE EL TESTIGO *(decisión del usuario; gatea todo lo demás)*
+>
+> **El problema**: el descenso sólo está probado para testigo **CERRADO**, y un testigo salido de
+> un `∃` **objeto** es `#0`, que no lo es. El sondeo recomienda meterlo en una **CASILLA** de la
+> línea. **Pero `ind` y `listInd` tienen `lenc = 3` y no tienen casilla libre** (re‑verificado
+> 2026‑08‑26) ⇒ les cambiaría la **ARIDAD**, no sólo añadiría un conjunto, y ramifica a `premsOf`
+> y a la construcción concreta de pruebas de D1 (`Meta/Representability2Prf.lean`).
+>
+> **Las opciones a poner sobre la mesa** (medir antes de elegir, como siempre):
+> * **(a)** subir `ind`/`listInd` a `lenc = 4` y meter el testigo en la casilla 3. Coste: tocar
+>   `premsOf` + la construcción de D1. ⚠️ Cambia el formato de línea ⇒ **requiere sanción**.
+> * **(b)** dejar el testigo en el `∃` objeto y **probar el descenso para testigo abierto**
+>   (levantar la hipótesis `∀n, liftTerm n p = p`). Coste: desconocido, **no medido**.
+> * **(c)** una tercera forma de anclar el testigo (¿derivable de la propia línea?). Sin explorar.
+>
+> ## Sólo DESPUÉS: ③ `pcc_eval_liftc`
+> Casos `varc`/`funcc` con testigo abstracto, **ya en forma ecuacional**. Es el único eslabón no
+> medido del gate y decide todo lo que viene detrás. **No empezarlo antes de cerrar ① y ②.**
+>
+> ### 📌 Contexto imprescindible para retomar
+> Leer, por este orden, los bloques de abajo: **GATE DE CLAUSURA** → **COMPARACIÓN (1) vs (2)** →
+> **HITO (i)**. Y en memoria: `project_substfc_wall.md` (el nodo que MANDA en este frente).
+
 > ## ✅ LA INCONSISTENCIA CONOCIDA ESTÁ REPARADA
 >
 > `ax_tc_cons` **RETIRADO** de `axioms`. Era la ecuación que obligaba a `tcFn` a recurrir a la vez
