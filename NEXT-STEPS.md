@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑26 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 24 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 26 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -71,6 +71,54 @@ comentarios).
 > **todas** las ocurrencias del hueco a la vez, así que **un solo** `pcc_leibniz_apply` con el
 > contexto `Ac := C[v₀]` cierra ambas. De ahí que (B) sean 5 pasos y no 15. `pcc_rw` empaqueta el
 > patrón y es reutilizable para cualquier evaluación futura dentro de `Prov`.
+>
+> ## ✅ GATE DE CLAUSURA SUPERADO (2026‑08‑26) — **la vía (2) sigue siendo CERO axiomas**
+>
+> Recompilado por mí: `sondeos/ClausuraNoHaceFalta.lean` y `sondeos/ClausuraFormaEcuacional.lean`,
+> más `Probe/SinMap.lean` y `Probe/VerifClausuraAdv.lean`, los cuatro `EXIT=0`.
+>
+> ### ✅ La clausura que se TEMÍA — mapear el testigo HETEROGÉNEO — **NO hace falta EN NINGÚN SITIO**
+> Censo por `rfl` de los **21** `ax_lineWF_*`: **ninguno** somete `carc X` a un predicado de forma.
+> Sólo hay tres moldes: ecuación `carc X =eq E(nthc X i…)` (18 tags), `In (carc X) axiomsCodeT`
+> (`thy` — **membresía**, no buena‑formación) y nada (`mp`). `lineOk`/`chainOk`/`allIn` y sus
+> versiones acotadas miran las conclusiones anteriores **sólo con `In`**. Las **dos** únicas reglas
+> que consumen conclusiones previas (`mp`, `gen`) **ya están cerradas en producción**, y sus
+> reflectores **tipan** sobre líneas cuya casilla es literalmente un `substfc` con argumentos
+> abstractos (`gen_no_pide_bf`, `mp_no_pide_bf`, `thy_no_pide_bf`). Si la cadena pidiera clausura,
+> no tiparían.
+>
+> ### 🚩 Donde SÍ hace falta — dos sitios, **ninguno el temido**
+> * **(A) `ax_lineWF_ind` (`Axioms.lean:1145`) y `ax_lineWF_listInd` (`:1157`)**: ahí el argumento
+>   de `substfc` **no es una casilla** sino un `liftfc` (doble en `listInd`). ⚠️ **Refuta la
+>   afirmación de que la enmienda R‑6 sobre casillas basta.** No es muro: se traslada al enunciado.
+>   Coste **0**: la descarga ya está en producción — **`prf_liftFormula_arith`**
+>   (`ArithPrf.lean:443`, verificado).
+> * **(B) Dentro de `pcc_eval_substfc`, casos `∀`/`∃`**: `ax_substfc_forall/ex` (`Axioms.lean:509`,
+>   `:518`) es la **única** familia cuyo paso recursivo cambia un parámetro por una **aplicación de
+>   función** — el sustituyendo pasa de `s` a **`liftc zero s`**. Eso obliga a `pcc_eval_liftc` ⇒
+>   clausura de `isTermCode` bajo `liftc` a profundidad de binder arbitraria ⇒ **no trasladable a
+>   una casilla**. Pero es el lado **TÉRMINO**, la mitad **homogénea**, y el map **ya es axioma**:
+>   **`ax_liftsc_cons`** (`Axioms.lean:476`) y `ax_substtsc_nil/cons` (`:454`).
+>
+> ### 💡 La reformulación que lo habilita: los disyuntos en forma **ECUACIONAL**
+> `X ≐ cons k̄ …` en vez de `carc X ≐ k̄ ∧ lenc X ≐ n̄`. Compilada **por partida doble e
+> independiente**, y es un **FORTALECIMIENTO** (`prf_shapeImpl_strengthens`) ⇒ la discriminación
+> debería sobrevivir. **0 axiomas.**
+>
+> ### ⚠️ TENSIÓN NUEVA, detectada por mí y NO registrada por el sondeo
+> El descenso está probado sólo para testigo **CERRADO**, y un testigo salido de un `∃` **objeto**
+> es `#0`, que no lo es ⇒ la recomendación es **poner el testigo en una CASILLA de la línea**.
+> **Pero `ind` y `listInd` tienen `lenc = 3` y NO tienen casilla libre** (verificado hoy otra vez).
+> Meter el testigo en casilla les cambiaría la **ARIDAD**, no sólo añadiría un conjunto — y eso
+> ramifica a `premsOf` y a la construcción concreta de pruebas de D1
+> (`Meta/Representability2Prf.lean`). **Es una decisión de diseño abierta, y gatea el paso siguiente.**
+>
+> ### ⚠️ Lo que el propio sondeo declara SIN DETERMINAR (no rellenado con conjetura)
+> `pcc_eval_liftc` **no está compilado** · la composición del reflector ecuacional
+> (`pcc_dot_cons` + `pcc_eval_nthc`) **nadie la ha hecho** · **`crit_isFC_junk_REFUTED` NO se ha
+> revalidado** contra la cláusula ecuacional nueva · la ruta de maps estaba **sobrevendida** (de
+> «4 ecuaciones medidas», **1** medida‑necesaria, 1 innecesaria y **2 nunca escritas**) ·
+> `identity_witness_absurd` concluye una **ecuación**, no `⊥`.
 >
 > ## ✅✅ COMPARACIÓN (1) vs (2) RESUELTA (2026‑08‑26) — **la partición FUNCIONA y DISCRIMINA**
 >
