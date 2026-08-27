@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑28 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 29 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 30 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -86,9 +86,34 @@ comentarios).
 > construido (`nthc X 2̄`, `implc a b`), nunca una variable. La clausura que estorbaba era la del
 > **testigo**, y ésa ya no está.
 >
-> ## Sólo DESPUÉS: ③ `pcc_eval_liftc`
-> Casos `varc`/`funcc` con testigo abstracto, **ya en forma ecuacional**. Es el único eslabón no
-> medido del gate y decide todo lo que viene detrás. **No empezarlo antes de cerrar ① y ②.**
+> ## ③ REORIENTADO (2026‑08‑28) — **`pcc_eval_liftc` NO hace falta**; falta `substfcT`
+>
+> ### ⛔ La obligación que el gate imputaba a ③ es FALSA (`sondeos/SustituyendoOpaco.lean`, net‑0)
+> El gate decía que los casos `∀`/`∃` de `pcc_eval_substfc` obligan a **clausura de `isTermCode`
+> bajo `liftc`**, porque el sustituyendo pasa de `s` a `liftc zero s`. **No es así**: el sustituyendo
+> es **CARGA OPACA**, nunca se inspecciona.
+> * `substCodeF v w (∀a) = cons 6̄ (cons (substCodeF (v+1) (liftc 0 w) a) nil)` **por `rfl`**.
+> * **`prf_substfc_arith_open`** (`SubstCodeOpenPrf.lean:138`) está **en producción** con
+>   `w : Term` **pelado**, cubre los 8 constructores, y aquí se instancia con `w := #0` y con
+>   **dos binders anidados** — cero hipótesis.
+>
+> ⚠️ **Es el MISMO fallo que ya cometió ese informe** con el puente `In` (que sí existía): inferir
+> una obligación de la **presencia sintáctica** de un símbolo sin comprobar si algo lo inspecciona.
+> **Lección: verificar las OBJECIONES, no sólo las afirmaciones** ([[feedback-auditoria-footprint]]).
+>
+> ### ▶ LO QUE ③ ES DE VERDAD
+> **`substfcT` ni siquiera está definido** (comprobado: **0 ocurrencias** en el árbol). ③ empieza
+> más atrás:
+> 1. **Definir `substfcT`** (y `liftcT`) como **constructores de código**, al estilo de
+>    `nthcT`/`lencT` — `funcc (strCode "substfc") …`, **sin axiomas**.
+> 2. **La ecuación interna** `pcc_eval_substfc`, por inducción sobre el código de fórmula
+>    bien‑formado. Modelo: **`pcc_dot_cons`** — la ecuación que como axioma OBJETO es
+>    **inconsistente** (`ax_tc_substfc`) es **inocua dentro de `Prov`**.
+> 3. Piezas: **`pcc_axiom_inst3`** (`MpCodePrf.lean:243`) para instanciar las ocho `ax_substfc_*`
+>    **dentro de `Prov`**; el **KIT** (`pcc_dot_un`/`pcc_dot_bin`) para el ensamblaje;
+>    `pcc_eq_trans_code` y `pcc_congr_unT_code` para encadenar.
+> ⚠️ El precedente `prf_substfc_arith_open` es la versión **META** (`f : Formula` de Lean): sirve de
+> guion, **no** de teorema. El trabajo grande sigue en pie.
 >
 > ### 📌 Contexto imprescindible para retomar
 > Leer, por este orden, los bloques de abajo: **GATE DE CLAUSURA** → **COMPARACIÓN (1) vs (2)** →
