@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑27 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 28 `sondeos/`**
+**Estado 2026‑08‑28 · `master` limpio y verde · Lean v4.31.0**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 29 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -15,19 +15,31 @@ comentarios).
 > decidida y con el gate de clausura superado. Quedan dos cosas **antes** de escribir
 > `pcc_eval_liftc`, que es el eslabón grande.
 >
-> ## ① REVALIDAR LA DISCRIMINACIÓN contra la forma ECUACIONAL *(barato, cierra un riesgo real)*
+> ## ① ✅✅ CERRADO (2026‑08‑28) — **la discriminación SOBREVIVE a la forma ecuacional**
 >
-> **Qué**: la reformulación ecuacional de los 12 disyuntos (`X ≐ cons k̄ …` en lugar de
-> `carc X ≐ k̄ ∧ lenc X ≐ n̄`) **cambia el predicado**, y **nadie ha comprobado** que la
-> discriminación sobreviva. El sondeo sostiene que sí por ser un **fortalecimiento**
-> (`prf_shapeImpl_strengthens`), pero eso **no está compilado contra los teoremas de
-> discriminación**. La discriminación es justo lo que hace que la partición valga la pena.
+> `sondeos/DiscriminaEcuacional.lean`, **todo net‑0**. Extiende `DiscriminaTestigoAbierto.lean`,
+> así que **① y ② componen** en un solo fichero.
 >
-> **Cómo**: coger `crit_isFC_junk_REFUTED` y `crit_isFCB3_no_termcode` de
-> `sondeos/ParticionDiscrimina.lean` y re‑probarlos con la cláusula ecuacional de
-> `sondeos/ClausuraFormaEcuacional.lean` (`shapeImpl`). Criterio de aceptación: los dos siguen
-> **net‑0** y siguen **REFUTANDO** el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`.
-> **Si NO sobreviven**: la forma ecuacional está descartada y (B) del gate vuelve a estar abierta.
+> ### 🔑 No hacen falta 12 lemas de fortalecimiento, ni 3: basta **UNO**
+> ```lean
+> prf_shape_strengthens (X C : Term) (k n : Nat)
+>     (hcarc : Prf (carc C =eq numeralM k)) (hlenc : Prf (lenc C =eq numeralM n))
+>     (hcons : Prf (consOk C)) :
+>     Prf (X ≐ C ⇒ consOk X ∧ (carc X ≐ k̄ ∧ lenc X ≐ n̄))
+> ```
+> La Leibniz transporta de la forma concreta `C` a la `X` abstracta **sin mirar qué constructor
+> es**. Los 12 disyuntos son instancias con distinto `C`/`k`/`n`; las tres aridades quedan como
+> `prf_shapeNul_str` / `prf_shapeUn_str` / `prf_shapeBin_str`.
+>
+> ### La revalidación
+> `prf_isTermCodeE_str` y `prf_isFormCodeE_str` (los 8 tags) prueban que la forma ecuacional
+> **fortalece** la vieja ⇒ la discriminación se hereda por `impT`:
+> **`crit_isTermCodeE_rejects_implc`** (el junk exacto de `SubCodesCritica`) y
+> **`crit_isFormCodeE_rejects_varc`** (un código de VARIABLE no pasa por `isFormCodeE`).
+> ⚠️ **No es fortalecimiento vacuo**: `prf_shapeNul_real`/`_shapeUn_real`/`_shapeBin_real`
+> exhiben códigos reales que lo satisfacen.
+> ⚠️ **`isTermsCodeB` ya estaba en forma ecuacional** — sus disyuntos son `X ≐ nil` y `cOk X …`,
+> y `consOk X` **es** una ecuación. No había nada que reformular ahí.
 >
 > ## ② DÓNDE VIVE EL TESTIGO — ✅✅ CERRADA (2026‑08‑27): no hace falta anclarlo
 >
