@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑26 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 26 `sondeos/`**
+**Estado 2026‑08‑27 · `master` limpio y verde · Lean v4.31.0**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 27 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -29,20 +29,34 @@ comentarios).
 > **net‑0** y siguen **REFUTANDO** el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`.
 > **Si NO sobreviven**: la forma ecuacional está descartada y (B) del gate vuelve a estar abierta.
 >
-> ## ② DECIDIR DÓNDE VIVE EL TESTIGO *(decisión del usuario; gatea todo lo demás)*
+> ## ② DÓNDE VIVE EL TESTIGO — ✅ **(c) MEDIDA Y POSITIVA (2026‑08‑27)**
 >
-> **El problema**: el descenso sólo está probado para testigo **CERRADO**, y un testigo salido de
-> un `∃` **objeto** es `#0`, que no lo es. El sondeo recomienda meterlo en una **CASILLA** de la
-> línea. **Pero `ind` y `listInd` tienen `lenc = 3` y no tienen casilla libre** (re‑verificado
-> 2026‑08‑26) ⇒ les cambiaría la **ARIDAD**, no sólo añadiría un conjunto, y ramifica a `premsOf`
-> y a la construcción concreta de pruebas de D1 (`Meta/Representability2Prf.lean`).
+> **El problema era**: el descenso y la discriminación sólo estaban probados para testigo
+> **CERRADO**, y un testigo salido de un `∃` **objeto** es `#0`, que no lo es
+> (`liftTerm 0 #0 = #1`). La recomendación era meterlo en una **CASILLA**, pero `ind`/`listInd`
+> tienen `lenc = 3` y no la tienen ⇒ cambiaría su **ARIDAD** y ramificaría a `premsOf` y a D1.
 >
-> **Las opciones a poner sobre la mesa** (medir antes de elegir, como siempre):
-> * **(a)** subir `ind`/`listInd` a `lenc = 4` y meter el testigo en la casilla 3. Coste: tocar
->   `premsOf` + la construcción de D1. ⚠️ Cambia el formato de línea ⇒ **requiere sanción**.
-> * **(b)** dejar el testigo en el `∃` objeto y **probar el descenso para testigo abierto**
->   (levantar la hipótesis `∀n, liftTerm n p = p`). Coste: desconocido, **no medido**.
-> * **(c)** una tercera forma de anclar el testigo (¿derivable de la propia línea?). Sin explorar.
+> ### ✅ RESULTADO: la clausura es un **ARTEFACTO DE LA RUTA DE PRUEBA**, no del enunciado
+> `sondeos/TestigoAbierto.lean`, **net‑0**: `inst_wfAllT_open (p k)`, `inst_wfAllTs_open`,
+> **`inst_wfAllT_var0`** (¡con `p := #0`, el testigo real!) y **`PrfH_inst_wfAllT_open`** (donde
+> vive tras el `∃`‑elim) compilan con `p` y `k` **ABSTRACTOS** y **CERO hipótesis**.
+>
+> 🔑 **La clave**: `wfAllT` **ya lleva el lift explícito** en su definición —
+> `∀. (#0 < ↑(bndT p)) ⇒ isTermCodeB ↑(carc p) ↑(cdrc p) (nthc ↑(carc p) #0)`. `wfAllT_closed`
+> existe sólo para **quitar** los lifts y que disparen los `simp`. Si en vez de quitarlos se
+> **LLEVAN**, `FOL.substTerm_liftTerm` hace el trabajo **para cualquier `p`**.
+>
+> ⇒ **NO hay que anclar el testigo en ninguna casilla. `ind`/`listInd` NO cambian de aridad.
+> NO hace falta sanción.** La opción **(a)** queda descartada y la **(b)** resulta ser gratis por
+> la vía (c).
+>
+> ### ⚠️ ALCANCE — lo que falta para cerrar ② del todo
+> Se ha medido el **primer** paso del consumo (la instanciación), que es donde se creía que estaba
+> la obstrucción. `crit_In_rejects_of_pairOk` (`ParticionDiscrimina.lean:2847`) usa la clausura en
+> **otros dos sitios**, ambos **del mismo tipo** (normalizar el lift interno de `boundedIn`, y
+> `hAs`/`hBs` para `crit_spec_body`): es la misma maniobra repetida, **pero no está compilada**.
+> **Siguiente paso de ②**: repetirla en esos dos sitios y re‑enunciar
+> `crit_isFCB3_no_termcode` / `crit_isFC_junk_REFUTED` **sin** hipótesis de clausura.
 >
 > ## Sólo DESPUÉS: ③ `pcc_eval_liftc`
 > Casos `varc`/`funcc` con testigo abstracto, **ya en forma ecuacional**. Es el único eslabón no
