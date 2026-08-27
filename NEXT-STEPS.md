@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑27 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 27 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 28 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -29,7 +29,7 @@ comentarios).
 > **net‑0** y siguen **REFUTANDO** el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`.
 > **Si NO sobreviven**: la forma ecuacional está descartada y (B) del gate vuelve a estar abierta.
 >
-> ## ② DÓNDE VIVE EL TESTIGO — ✅ **(c) MEDIDA Y POSITIVA (2026‑08‑27)**
+> ## ② DÓNDE VIVE EL TESTIGO — ✅✅ CERRADA (2026‑08‑27): no hace falta anclarlo
 >
 > **El problema era**: el descenso y la discriminación sólo estaban probados para testigo
 > **CERRADO**, y un testigo salido de un `∃` **objeto** es `#0`, que no lo es
@@ -50,13 +50,29 @@ comentarios).
 > NO hace falta sanción.** La opción **(a)** queda descartada y la **(b)** resulta ser gratis por
 > la vía (c).
 >
-> ### ⚠️ ALCANCE — lo que falta para cerrar ② del todo
-> Se ha medido el **primer** paso del consumo (la instanciación), que es donde se creía que estaba
-> la obstrucción. `crit_In_rejects_of_pairOk` (`ParticionDiscrimina.lean:2847`) usa la clausura en
-> **otros dos sitios**, ambos **del mismo tipo** (normalizar el lift interno de `boundedIn`, y
-> `hAs`/`hBs` para `crit_spec_body`): es la misma maniobra repetida, **pero no está compilada**.
-> **Siguiente paso de ②**: repetirla en esos dos sitios y re‑enunciar
-> `crit_isFCB3_no_termcode` / `crit_isFC_junk_REFUTED` **sin** hipótesis de clausura.
+> ### ✅✅ ② CERRADA DEL TODO (2026‑08‑27) — `sondeos/DiscriminaTestigoAbierto.lean`
+> Los dos titulares re‑enunciados **sin `hpl`/`hps` sobre el testigo**, todo **net‑0**:
+>
+> | cara | teorema |
+> |---|---|
+> | TÉRMINO | `crit_isTCB_junk_refuted_open` · `crit_junk_SubCodesCritica_open` (el junk EXACTO) · **`crit_junk_var0_witness`** |
+> | FÓRMULA | `prf_crit_In_F_rejects_open` · `crit_isFCB3_no_termcode_open` · **`crit_isFCB3_no_termcode_var0`** |
+>
+> Los dos `_var0` instancian con el testigo **literalmente `#0`** — el que entrega el `∃`‑elim y el
+> que `liftTerm 0 #0 = #1` hacía imposible.
+>
+> 🔑 **La maniobra**: **no existe** lema de lifting de DERIVACIONES
+> (`PrfH Γ A → PrfH (Γ.map (liftFormula 0)) (liftFormula 0 A)`) — comprobado. Así que el testigo
+> **no va como hipótesis externa sino DENTRO DEL OBJETIVO** del `∃`‑elim: ahí el `liftFormula 0` lo
+> aplica uno mismo (`liftF_pairOk`/`liftF_tripleOk`) y en el cuerpo aparece ya como `pairOk ↑p`.
+> **El lift cae en el sitio que se controla, no en uno que no se puede tocar.**
+>
+> **Piezas nuevas reutilizables**: `liftF_isTermCodeB`/`_isTermsCodeB`/`_isFormCodeB`,
+> `liftF_wfAllT`/`_wfAllTs`/`_pairOk`/`_wfAllF`/`_wfAllTgen`/`_wfAllTsgen`/`_tripleOk`,
+> `liftT_acF`/`_acT`/`_acTs`, `PrfH_inst_wfAllT_open`, `PrfH_inst_wfAllF_open`.
+> ⚠️ `c` conserva su lift‑invariancia, y es **legítimo**: el `c` del caso de uso es un código
+> construido (`nthc X 2̄`, `implc a b`), nunca una variable. La clausura que estorbaba era la del
+> **testigo**, y ésa ya no está.
 >
 > ## Sólo DESPUÉS: ③ `pcc_eval_liftc`
 > Casos `varc`/`funcc` con testigo abstracto, **ya en forma ecuacional**. Es el único eslabón no
