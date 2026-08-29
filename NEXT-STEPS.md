@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑29 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 32 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 34 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -124,13 +124,52 @@ comentarios).
 >   **el paso inductivo no cierra**.
 > * ⚠️ `hΦ` de `prf_strong_induction` obliga a meter **también el testigo `p`** dentro del `∀`.
 >
-> ### 🚩 EL PROBLEMA DE FONDO, a decidir ANTES de escribir
-> **Ninguna lista FINITA es cerrada bajo `liftc 0`**, porque `liftc 0 (varc n) = varc (σn)` no
-> cicla — y los sustituyendos reales llevan variables (`ind` sustituye `termCodeM (succ #0)`).
-> Salidas: **(b)** acotar — el número de lifts está acotado por la profundidad de binders, que lo
-> está por `lenc` del testigo ⇒ extender `SubCodesWitness` con `liftc 0^j s` para `j ≤ cota`;
-> finito, expresable, **cero axiomas**. **(a)** restringir a sustituyendos cerrados: **descartada**
-> (falsa para `ind`/`q1`/`leibniz`). **(c)** sin guarda: imposible.
+> ### ✅✅ EL PROBLEMA DE FONDO, RESUELTO (2026‑08‑29) — **sin axiomas y sin acotar**
+>
+> `sondeos/ClausuraLiftSinWTs.lean`, recompilado a mano, **net‑0, cero símbolos nuevos**:
+> ```lean
+> prf_isTC1_lift (w c : Term) : Prf (isTC1 w c ⇒ isTC1 (liftsc 0 w) (liftc 0 c))
+> CRIT_hasWit_lift (c : Term) : Prf (hasWit c ⇒ hasWit (liftc 0 c))   -- la forma real (∃-elim)
+> CRIT_hasWit_real (t : Term) : Prf (hasWit (termCodeM t))            -- NO vacuidad
+> ```
+> `w` y `c` **libres**; hay `example` con testigo literalmente `#0`.
+>
+> 🔑 **La jugada: QUITAR `wTs`.** El map que faltaba era el de `liftsc` un nivel arriba — y no hace
+> falta construirlo **porque `wTs` desaparece**. Con una sola lista, `liftsc 0` **es**
+> demostrablemente el map posicional sobre lista **arbitraria** (`prf_lenc_liftsc`,
+> `prf_nthc_liftsc`, `prf_In_liftsc`), y la llave es **`prf_list_induction`**
+> (`ChainPrf.lean:29`), eliminador de la **regla** `Prf.listInd` — constructor del inductivo,
+> **no** axioma de Lean: no toca `axiomsCodeT`, ni `provCodeC'`, ni G.
+>
+> ### ⛔ CORRECCIÓN a la recomendación de `05df9b6`: **NO acotar**
+> `sondeos/AcotarEsLaMismaObligacion.lean`: el obstáculo de expresividad **no existe** (iterar
+> `liftc 0` se expresa con símbolos existentes, cero nuevos), pero **acotar y la clausura de un
+> paso son INTER‑CONSTRUIBLES** — probado en las dos direcciones, compilado
+> (`clausura_de_via3 : Via3UnPiso → PasoClausura`). Pedir la cadena para **un solo piso** ya **es**
+> pedir la clausura. Acotar reordena la contabilidad y encima cuesta dos conjuntos dentro de `Prov`.
+> ⚠️ Y su diagnóstico estaba **mal atribuido** (culpaba a la falta de un map de `liftsc`): seguir
+> esa pista habría llevado a **fabricar un símbolo y romper el cero‑axiomas**.
+>
+> ### 🚩 DOS AVISOS de la vía ganadora — el segundo es serio
+> 1. **El reconocedor se DEBILITA**: sin `wTs`, la lista de argumentos ya no está obligada a ser
+>    cadena `cons` terminada en `nil` — basta `lenc Y ≐ 0̄` (compilado: `crit_argsIn_lenc_zero`).
+>    Con `wTs`, el disyunto `Y ≐ nil` era una **ecuación**.
+> 2. ⚠️ **EL COSTE DEL REFLECTOR NO ESTÁ MEDIDO, y es el riesgo real.** `argsIn` mete un
+>    `Formula.forall` **DENTRO** del cuerpo del `∀` de `wfAll1` ⇒ en la cara punteada es
+>    `bdAllCode` dentro de `bdAllCode`, y el descenso de `substfc` **baja de nivel 0 a nivel 1**.
+>    Eso es **exactamente** lo que compraba la idea de **dotar el átomo sin desplegarlo**
+>    (`inFormCodeFn`) en A3 — y esta vía **lo pierde ahí**. Podría ser el muro nuevo.
+>    **▶ Siguiente paso: medirlo** — escribir `isTC1Dot`/`argsInDot` y `pcc_isTC1_tracked` sobre el
+>    molde §5‑§9 de `sondeos/DiscriminaEcuacional.lean`, y ver si el `∀` anidado es barato.
+>
+> ### ⚠️ Tensión abierta, sin resolver
+> El sondeo afirma que `Inv1`/`Inv2` **son derivables** con `prf_list_induction`
+> (`CritLift_map.lean`: `crit_Inv1`, `crit_Inv2`, y `isTermCodeB ⟺ isTermCodeS`), y concluye que
+> la forma **ecuacional** de `ClausuraFormaEcuacional.lean` fue un *workaround* para una obstrucción
+> **inexistente**. ⚠️ **Pero ① y el crítico del paso 2 dicen lo contrario**: la guarda **tiene** que
+> ser `isFormCodeE` porque de `carc`/`lenc`/`In` no sale la ecuación que dispara el axioma.
+> Pueden ser cosas distintas (`shapeImpl` vs `isFormCodeE`) — **no dar por retirada la forma
+> ecuacional sin resolver esto**.
 >
 > ### Piezas de producción que FALTAN (grep: 0 ocurrencias)
 > `pcc_axiom_inst4`/`pcc_thm_inst4` (**5 de las 8** `ax_substfc_*` son `forall_4`; ~30 l.) ·
