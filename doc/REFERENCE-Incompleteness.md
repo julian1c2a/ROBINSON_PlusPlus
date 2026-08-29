@@ -1484,4 +1484,120 @@ necesitan `pcc_eval_substfc`, que **no existe**. Requiere sancionar un predicado
 **La repatriación devuelve el proyecto a donde estaba antes de la inconsistencia; no lo lleva más lejos.**
 
 
+---
+
+## §3.27 · EL FRENTE `substfc` POR LA VÍA DE **CERO AXIOMAS** (2026‑08‑24 → 08‑29)
+
+> ⚠️ **Supersede el cierre de §3.26.** Aquélla terminaba diciendo que los 7 tags «requieren
+> sancionar un predicado de buena‑formación (`isFormCode`, <12 axiomas) — decisión pendiente».
+> **La decisión se tomó, y fue la contraria**: la buena‑formación se define en vocabulario objeto
+> **EXISTENTE**, con **cero axiomas nuevos**. Todo lo de abajo está compilado y vive en `sondeos/`.
+
+### 3.27.1 · Por qué (1) no era «más cara» sino **otro teorema**
+
+La comparación se cerró con un dato de fuente, no de estimación: `ax_axiomsCodeT_eq`
+(`Minimal/Axioms.lean:1376`) ancla a **`axioms`** (los 141, `:1199`) y **no** a `coreAxioms`
+(`:922`). Luego los axiomas de la opción (1) **tienen** que entrar en `axioms` para funcionar,
+`axiomsCodeT` los absorbe, el verificador interno los cita y **`provCodeC'` cambia ⇒ G cambia**
+(141 → ~159). Ningún ahorro de líneas compra eso.
+Corolario registrado: **aunque se sancionara (1), los sondeos de (2) serían su certificado de
+conservatividad** — la prueba NO vacua que `ax_lineWF_inv` sólo afirma de palabra.
+
+### 3.27.2 · La PARTICIÓN en tres — y el cuadre que la hace necesaria
+
+| predicado | disyuntos | ecuaciones de su sustitución |
+|---|--:|---|
+| `isFormCode` | **8** | `substfc`: **8** (`Axioms.lean:497‑520`) |
+| `isTermCode` | **2** | `substtc`: **2** |
+| `isTermsCode` | **2** | `substtsc`: **2** |
+
+🔑 `pcc_eval_substfc` se atasca **porque 12 ≠ 8**. Partido, cada mitad encaja. El total **no crece**
+(12 = 8+2+2): es **partición**, no recubrimiento. ⇒ **partir no repara un defecto: es la CONDICIÓN
+para que la inducción exista.**
+Y **discrimina**: `crit_isFC_junk_REFUTED` es net‑0 — el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ` que el predicado
+**fusionado** aceptaba, el partido lo **refuta**. (`sondeos/ParticionTresPredicados.lean`,
+`sondeos/ParticionDiscrimina.lean`.)
+
+### 3.27.3 · Los teoremas, con firma
+
+```lean
+-- A1/A2 (sondeos/InTracked.lean) · el reflector de `In` sobre lista ABSTRACTA, que no existía
+pcc_boundedIn_tracked (x w : Term) : Prf (boundedIn x w ⇒ provFromCode (bdInDot x w))
+pcc_In_tracked        (x w : Term) : Prf (In x w ⇒ provFromCode (bdInDot x w))
+pcc_binOk_tracked (w X : Term) (k : Nat) : Prf (binOk w X k ⇒ provFromCode (binOkDot w X k))
+
+-- A3 (sondeos/A3IsFCBTracked.lean) · el reflector COMPLETO
+pcc_isFCB_tracked (w c : Term) : Prf (isFCB w c ⇒ provFromCode (isFCBDot w c))
+
+-- hito (i) (sondeos/SubCodesWitness.lean) · todo φ tiene testigo explícito
+prf_isFCB_subCodes (φ : Formula) : Prf (isFCB (objList (subCodes φ)) (formCodeM φ))
+prf_isFC (φ : Formula)           : Prf (∃w. isFCB w ⌜φ⌝)
+
+-- ① (sondeos/DiscriminaEcuacional.lean) · UN solo lema cubre los 12 disyuntos
+prf_shape_strengthens (X C : Term) (k n : Nat)
+    (hcarc : Prf (carc C =eq numeralM k)) (hlenc : Prf (lenc C =eq numeralM n))
+    (hcons : Prf (consOk C)) :
+    Prf (X ≐ C ⇒ consOk X ∧ (carc X ≐ k̄ ∧ lenc X ≐ n̄))
+
+-- ② (sondeos/DiscriminaTestigoAbierto.lean) · discriminación con testigo ABIERTO
+crit_junk_var0_witness         : el junk refutado con testigo LITERALMENTE `#0`
+crit_isFCB3_no_termcode_var0   : ídem en la cara de FÓRMULA
+
+-- ③ paso 1 (sondeos/CtorDotados.lean) · los constructores de código dotados
+substfcT / substtcT / substtscT / liftcT / liftfcT / liftscT   -- DEFINICIONES, cero axiomas
+pcc_congr_substfcT_arg1/2/3_code    -- las congruencias INTERNAS
+
+-- ③ paso 2, caso ∀ (sondeos/Paso2CasoForall.lean)
+paso2_caso_forall (v s f : Term) (hIH …) (hLift …) : …   -- cierra salvo `hLift`
+
+-- la clausura, SIN axiomas (sondeos/ClausuraLiftSinWTs.lean)
+prf_isTC1_lift (w c : Term) : Prf (isTC1 w c ⇒ isTC1 (liftsc 0 w) (liftc 0 c))
+CRIT_hasWit_lift (c : Term) : Prf (hasWit c ⇒ hasWit (liftc 0 c))
+```
+
+### 3.27.4 · Las cuatro ideas reutilizables
+
+1. **Dotar un átomo COMO ÁTOMO** en vez de desplegarlo (`inFormCodeFn`, y luego `allInFn`): el
+   cuerpo queda **sin binder** y el problema De Bruijn **se disuelve**. Pagó dos veces —en A3 y en
+   el reflector del predicado sin‑`wTs`.
+2. **Probar contra la lista COMPLETA** (generalizar sobre un superconjunto) en vez de usar
+   monotonía: ahorra un or‑elim de 12 casos por composición.
+3. **Llevar el lift en vez de quitarlo**: `wfAllT` ya lo lleva en su definición;
+   `FOL.substTerm_liftTerm` hace el trabajo **para cualquier `p`**, cerrado o no.
+4. **Poner el lift en el OBJETIVO, no en la hipótesis**: no existe lema de lifting de
+   **derivaciones**, así que el testigo va **dentro del objetivo** del `∃`‑elim, donde el
+   `liftFormula 0` lo aplica uno mismo.
+
+### 3.27.5 · Lo ABIERTO, y lo que NO se sabe
+
+**Abierto, y es PLANO** (ni `provFromCode` en la hipótesis ni `bdAllCode` en la estructura):
+```lean
+DESCENSO : ∀ w s, Prf (isTC1 w s) → Prf (targetLift s)
+```
+con `targetLift s := provFromCode (eqc (liftcT ⌜0⌝ ṡ) (tcFn (liftc 0 s)))`, que **es**
+`pcc_eval_liftc`. Base y paso ya cerrados (`refl_lista_nil`, `refl_lista_cons`, los casos
+`varc`/`funcc`). ⚠️ `prf_strong_induction` exige `liftFormula 1 Φ = Φ` ⇒ **`w` cuantificado DENTRO
+de `Φ`**.
+
+**SIN DETERMINAR**, dicho explícitamente:
+* **El puente a forma ECUACIONAL de la imagen punteada.** El reflector entrega `shapeDot` en forma
+  `carc`/`lenc`, **sin `consOk`** ⇒ `wfAll1Dot w ≠ formCode (wfAll1 w)`: el consecuente es
+  estrictamente **más débil** que la imagen del predicado objeto. Convención heredada de A3.
+* **Los DOS reconocedores están DESCONECTADOS**: el reflejado (con `wTs`) y el plano (sin `wTs`,
+  con **cero** imagen punteada). Nada los relaciona.
+* La composición con el reconocedor de **FÓRMULA** llevando esta carga: **no hecha**.
+* De `pcc_eval_substfc` sólo está medido el caso `∀`. Los otros 7 constructores: **sin medir**.
+
+### 3.27.6 · Tres correcciones al propio registro (material de método)
+
+* **`d783b9f` estaba mal cerrado.** Decía «`pcc_eval_liftc` NO hace falta». **Sí hace falta**:
+  `paso2_caso_forall` la deja como única hipótesis colgando. Se refutó la **razón** del gate, no su
+  **conclusión**. Modo de fallo: **generalizar de META a OBJETO**, que es donde vive la HI.
+* **La recomendación «acotar» era circular**: acotar y la clausura de un paso son
+  **inter‑construibles**, probado en las dos direcciones (`sondeos/AcotarEsLaMismaObligacion.lean`).
+* **«Ningún descenso de `substfc` cruza un binder de código» es FALSO** (hay 12 descensos a nivel 1).
+  El enunciado correcto: **ninguno corre sobre código de fórmula OPACO**.
+
+---
+
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)

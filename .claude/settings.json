@@ -5,7 +5,17 @@
       "PowerShell(Set-Location *)",
       "PowerShell(lake build *)",
       "PowerShell(lake build)",
-      "PowerShell(lake env lean *)"
+      "PowerShell(lake env lean *)",
+      "Bash(lake env lean *)",
+      "Bash(lake build *)",
+      "Bash(lake build)",
+      "PowerShell(Select-String *)",
+      "PowerShell(Get-Content *)",
+      "PowerShell(Get-ChildItem *)",
+      "PowerShell(Measure-Object *)",
+      "PowerShell(Test-Path *)",
+      "PowerShell(Get-Item *)",
+      "PowerShell(Get-FileHash *)"
     ],
     "additionalDirectories": [
       "e:\\Dropbox\\GitHub\\lean4\\FOL\\FOL\\Theorems"

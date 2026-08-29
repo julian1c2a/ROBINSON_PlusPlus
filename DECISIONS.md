@@ -1,14 +1,14 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-23 · repatriación en curso
+> ## ESTADO REAL — 2026-08-29 · frente `substfc` en curso (vía CERO axiomas)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.25.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.27.
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 12  + 10 .**
+> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 37 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -490,6 +490,87 @@ pcc_dot_cons (h t : Term) :
      con contexto `Ac := C[v₀]` cubre las repeticiones. Por eso la fase B fueron 5 pasos y no 15.
 * `Meta/DotConsPrf.lean` queda como el módulo **más profundo** del proyecto (L24 de 25, ver
   `DEPENDENCIES.md` §0): depende en cadena de todo lo anterior.
+
+---
+
+## ADR-015: La buena‑formación de códigos se DEFINE en vocabulario existente, no se AXIOMATIZA
+
+**Fecha**: 2026‑08‑24 (decidida) → 2026‑08‑26 (comparación cerrada con medición)
+**Estado**: ✅ ACEPTADA · **Supersede** la «decisión pendiente» de ADR‑014 (`isFormCode`, <12 axiomas)
+
+**Contexto**. Los 7 tags de `lineWF` necesitan `pcc_eval_substfc`, que exige un predicado de
+buena‑formación sobre códigos. Dos opciones: **(1)** sancionarlo como axiomas objeto
+(`isFormCode`/`isTermCode`/`isTermsCode` + inversión, ~15‑18 cláusulas); **(2)** definirlo por
+**testigo de parseo** en vocabulario objeto **EXISTENTE**.
+
+**Decisión**: **(2)**.
+
+**Justificación — y la razón de peso NO es el ahorro de líneas.** `ax_axiomsCodeT_eq`
+(`Minimal/Axioms.lean:1376`) ancla a **`axioms`** (los 141, `:1199`), **no** a `coreAxioms` (`:922`).
+Luego los axiomas de (1) **tienen** que entrar en `axioms` para funcionar; `axiomsCodeT` los
+absorbe; el verificador interno los cita; **`provCodeC'` cambia ⇒ G cambia** (141 → ~159).
+**(1) no es más cara: es OTRO TEOREMA.** Además, el precedente que se citaba a favor de (1)
+—`ax_allIn_nil/cons` y `ax_chainOk_nil/cons` ya sancionados en `codingAxioms`— resultó ser un
+argumento a favor de (2): esos átomos **ya existen**, y usarlos cuesta **cero**.
+
+**Consecuencias**.
+* **Cero axiomas nuevos y cero símbolos nuevos** en todo el frente (verificado por censo de
+  `Term.func` contra `Minimal/Axioms.lean`).
+* Corolario registrado: **aunque algún día se sancionara (1), los sondeos de (2) son su certificado
+  de conservatividad** — la prueba NO vacua que `ax_lineWF_inv` sólo afirma de palabra.
+* El coste se paga en **trabajo de reflector**, no en sanción. Medido: ≈1,4‑1,6× de lo ya
+  construido, no 3×.
+* Proyección completa en `doc/REFERENCE-Incompleteness.md` §3.27.
+
+---
+
+## ADR-016: El predicado se PARTE en tres, y la partición es la CONDICIÓN de la inducción
+
+**Fecha**: 2026‑08‑26 · **Estado**: ✅ ACEPTADA
+
+**Contexto**. El primer diseño (`sondeos/ParseWitness.lean`) usó **un solo** predicado de 12
+disyuntos que fusionaba las formas de código de FÓRMULA (tags 2‑9) con las de TÉRMINO (0‑1), `nil`
+y el `cons` genérico. ⚠️ **Error trazable**: la restricción R‑6 ya decía «dos predicados mutuamente
+recursivos», y se diseñó uno fusionado sin reconciliarlo.
+
+**Decisión**: partir en `isFormCode` (8 disyuntos) / `isTermCode` (2) / `isTermsCode` (2).
+
+**Justificación**. No es reparar un defecto: **es la condición para que la inducción exista**. El
+cuadre es **8↔8 / 2↔2 / 2↔2** con las ecuaciones de `substfc`/`substtc`/`substtsc`;
+`pcc_eval_substfc` se atasca **porque 12 ≠ 8**. Y el fusionado **no discriminaba**: `prf_isFC_junk`
+compila — `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`, cuyas dos «subfórmulas» son códigos de TÉRMINO, **pasaba** el
+reconocedor. El partido lo **REFUTA** (`crit_isFC_junk_REFUTED`, net‑0).
+
+**Consecuencias**. El total de disyuntos **no crece** (12 = 8+2+2): es partición, no recubrimiento.
+A1/A2 sobreviven al 100 % y ~527 líneas de A3 son byte‑idénticas. **Lección de método**: releer la
+restricción de diseño ANTES de diseñar, no tras compilar.
+
+---
+
+## ADR-017: El testigo va ABIERTO — no se ancla en casilla, y no se acota
+
+**Fecha**: 2026‑08‑27 (abierto) → 2026‑08‑29 (clausura) · **Estado**: ✅ ACEPTADA
+
+**Contexto**. El descenso y la discriminación estaban probados sólo para testigo **CERRADO**, y el
+que entrega un `∃` objeto es `#0`, que no lo es (`liftTerm 0 #0 = #1`). La salida propuesta era
+meterlo en una **casilla** de la línea — pero `ind`/`listInd` tienen `lenc = 3` y no la tienen, así
+que habría cambiado su **ARIDAD**, tocado `premsOf` y la construcción de D1, y **requerido sanción**.
+
+**Decisión**: **no anclar el testigo en ninguna parte**, y **no acotar** el número de lifts.
+
+**Justificación**. (a) La clausura era un **artefacto de la ruta de prueba**: `wfAllT` ya lleva el
+lift explícito y `wfAllT_closed` sólo existía para quitarlo; llevándolo,
+`FOL.substTerm_liftTerm` vale **para cualquier `p`** (`sondeos/TestigoAbierto.lean`,
+`DiscriminaTestigoAbierto.lean`, con instancias en `#0`). (b) **Acotar es circular**: acotar y la
+clausura de un paso son **inter‑construibles**, probado en las dos direcciones
+(`AcotarEsLaMismaObligacion.lean`). (c) La clausura real sale **quitando `wTs`**: con una sola
+lista, `liftsc 0` **es** el map posicional sobre lista arbitraria, vía `prf_list_induction`
+(`ClausuraLiftSinWTs.lean`).
+
+**Consecuencias**. **`ind`/`listInd` no cambian de aridad; no hace falta sanción.** ⚠️ Contrapartida
+medida: sin `wTs` el reconocedor se **debilita** (la lista de argumentos ya no está obligada a ser
+cadena `cons` terminada en `nil`). ⚠️ Y los **dos reconocedores** —el reflejado con `wTs` y el
+plano sin él— están hoy **desconectados**: nada los relaciona.
 
 ---
 

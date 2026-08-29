@@ -18,6 +18,76 @@
 
 ---
 
+## 2026-08-29 — 🎯 EL FRENTE `substfc` POR LA VÍA DE **CERO AXIOMAS** (semana 08‑24 → 08‑29)
+
+**Decisión tomada y ejecutada**: la buena‑formación de códigos se define en vocabulario objeto
+**EXISTENTE**. **Cero axiomas nuevos, cero símbolos nuevos.** Build **118 jobs**, **37 `sondeos/`**,
+0 sorrys. Proyectado en **`doc/REFERENCE-Incompleteness.md` §3.27** (nueva).
+
+### Lo que se cerró, en orden
+
+| # | resultado | fichero en `sondeos/` |
+|---|---|---|
+| — | el «segundo muro» **no es un muro**: el chasis absorbe el conjunto extra | `SegundoMuro.lean` |
+| A1/A2 | el reflector de `In` sobre lista **ABSTRACTA**, que no existía | `InTracked.lean` |
+| A3 | el reflector **completo**, `w`/`c` abstractos | `A3IsFCBTracked.lean` |
+| (i) | **todo `φ` tiene testigo** explícito y computable | `SubCodesWitness.lean` |
+| — | la **PARTICIÓN en tres** funciona **y DISCRIMINA** (refuta el junk) | `ParticionTresPredicados.lean` · `ParticionDiscrimina.lean` |
+| ① | la discriminación **sobrevive** a la forma ecuacional — **basta UN lema** | `DiscriminaEcuacional.lean` |
+| ② | la discriminación vale con **testigo ABIERTO** (`#0`) | `DiscriminaTestigoAbierto.lean` |
+| ③.1 | los **constructores dotados** y su kit | `CtorDotados.lean` |
+| ③.2 | el caso `∀`, y **dónde se atasca** | `Paso2CasoForall.lean` |
+| — | la **clausura bajo `liftc`** sin axiomas: quitando `wTs` se **disuelve** | `ClausuraLiftSinWTs.lean` |
+| — | **NO hay muro nuevo** en el reflector: tres vías, las tres cierran | `ReflectorAtomoAllIn.lean` · `ReflectorForallAnidado.lean` · `ReflectorDesdeConsumidor.lean` |
+
+### Por qué (1) quedó descartada — y no por el ahorro de líneas
+
+`ax_axiomsCodeT_eq` (`Minimal/Axioms.lean:1376`) ancla a **`axioms`** (los 141, `:1199`) y **no** a
+`coreAxioms` (`:922`) ⇒ los axiomas de la opción (1) **tienen** que entrar en `axioms` para
+funcionar, `axiomsCodeT` los absorbe, el verificador interno los cita y **`provCodeC'` cambia ⇒ G
+cambia** (141 → ~159). **(1) no es más cara: es OTRO TEOREMA.**
+Corolario: **aunque se sancionara (1), los sondeos de (2) serían su certificado de conservatividad.**
+
+### Las cuatro ideas reutilizables (material del libro)
+
+1. **Dotar un átomo COMO ÁTOMO** en vez de desplegarlo — pagó **dos veces** (`inFormCodeFn` en A3,
+   `allInFn` en el reflector sin `wTs`): el cuerpo queda **sin binder** y el problema De Bruijn
+   **se disuelve** en vez de resolverse.
+2. **Probar contra la lista COMPLETA** (generalizar sobre un superconjunto) en vez de usar
+   monotonía: ahorra un or‑elim de 12 casos por composición.
+3. **Llevar el lift en vez de quitarlo**: la clausura del testigo era un **artefacto de la ruta de
+   prueba**, no del enunciado — `FOL.substTerm_liftTerm` vale para cualquier `p`.
+4. **Poner el lift en el OBJETIVO, no en la hipótesis**: **no existe** lema de lifting de
+   **derivaciones**, así que el testigo va dentro del objetivo del `∃`‑elim.
+
+Y el cuadre que lo explica todo: **8↔8 / 2↔2 / 2↔2**. `pcc_eval_substfc` se atasca **porque 12 ≠ 8**;
+partido, cada mitad encaja con su juego de ecuaciones. **Partir no repara un defecto: es la
+CONDICIÓN para que la inducción exista.**
+
+### ⚠️ Tres correcciones al propio registro
+
+* **`d783b9f` estaba mal cerrado** («③ REORIENTADO: `pcc_eval_liftc` NO hace falta»). **Sí hace
+  falta**: `paso2_caso_forall` la deja como única hipótesis colgando. Se refutó la **RAZÓN** del
+  gate, no su **CONCLUSIÓN**. Modo de fallo: **generalizar de META a OBJETO**, que es donde vive la
+  hipótesis de inducción. Corregido en `05df9b6`.
+* **La recomendación «acotar» era circular**: acotar y la clausura de un paso son
+  **inter‑construibles**, probado en las dos direcciones (`AcotarEsLaMismaObligacion.lean`).
+  Y su diagnóstico estaba **mal atribuido** — seguirlo habría llevado a **fabricar un símbolo**.
+* **«Ningún descenso de `substfc` cruza un binder de código» es FALSO** (hay 12 a nivel 1, y el
+  teorema principal depende de tres). Lo correcto: **ninguno corre sobre código de fórmula OPACO.**
+
+### ▶ Abierto: UN lema, y es PLANO
+
+```lean
+DESCENSO : ∀ w s, Prf (isTC1 w s) → Prf (targetLift s)     -- ES pcc_eval_liftc
+```
+Base y paso ya cerrados (`refl_lista_nil`, `refl_lista_cons`, casos `varc`/`funcc`). Piezas todas en
+producción. ⚠️ `prf_strong_induction` exige `liftFormula 1 Φ = Φ` ⇒ **`w` cuantificado DENTRO de Φ**.
+
+**Sin determinar**: el puente a forma **ecuacional** de la imagen punteada (el reflector entrega
+`carc`/`lenc`, estrictamente más débil); la conexión entre los **dos reconocedores** (con y sin
+`wTs`), que hoy están **desconectados**; y los otros **7 constructores** de `pcc_eval_substfc`.
+
 ## 2026-08-23 — 📖 PROYECCIÓN + ACTUALIZA_DOC: los 82 módulos catalogados, §3.26 nueva
 
 Pasada de `proyecta` + `actualiza doc` tras la repatriación. **No toca código**: build **118 jobs**,

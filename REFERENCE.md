@@ -1,10 +1,10 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-23 · repatriación en curso
+> ## ESTADO REAL — 2026-08-29 · frente `substfc` en curso (vía CERO axiomas)
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 10 en `sondeos/`** (experimentos compilados, fuera del build).
+> **+ 37 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
@@ -24,7 +24,7 @@
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos abstractos, que es lo que repatría la cuarentena.
 > Rédito verificado en `sondeos/CarcPayoff.lean` (`pcc_eval_carc` vuelve). Detalle en
-> [Incompletitud §3.24–§3.25](doc/REFERENCE-Incompleteness.md).
+> [Incompletitud §3.24–§3.27](doc/REFERENCE-Incompleteness.md).
 >
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -123,7 +123,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
 Los **82 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
-Detalle en el nodo §3.15–§3.26.
+Detalle en el nodo §3.15–§3.27.
 
 | # | Module | Rol · Estado |
 |--:|--------|--------------|
@@ -234,12 +234,14 @@ REFERENCE (`AI-GUIDE.md` §0.5): el índice raíz cataloga y navega; los nodos d
 | [**Aritmética**](doc/REFERENCE-Arithmetic.md) | `Block1–8` — aritmética desarrollada, Cantor, pares, listas, primos/TFA objeto | §3.2–§3.11 |
 | [**Gödelización**](doc/REFERENCE-Godelization.md) | `Meta/Godel`, `Meta/Provability` — Nivel B/C (`⌜·⌝`, `formCode`, `Provable`) | §3.12–§3.13 |
 | [**Full**](doc/REFERENCE-Full.md) | `Full/` — inducción general, representabilidad, `numeral`, TFA | §3.14 |
-| [**Incompletitud**](doc/REFERENCE-Incompleteness.md) | Nivel D: Gödel I/II, D1–D3, Σ₁‑completitud provable (12‑A), módulos A/B de `NegVerifier`, **la REPARACIÓN (§3.24), la ESCALERA (§3.25) y la REPATRIACIÓN (§3.26)** | §3.15–§3.26 |
+| [**Incompletitud**](doc/REFERENCE-Incompleteness.md) | Nivel D: Gödel I/II, D1–D3, Σ₁‑completitud provable (12‑A), módulos A/B de `NegVerifier`, **la REPARACIÓN (§3.24), la ESCALERA (§3.25), la REPATRIACIÓN (§3.26) y el FRENTE `substfc` por la vía CERO AXIOMAS (§3.27)** | §3.15–§3.27 |
 
 **Navegación fuerte:** cada nodo enlaza de vuelta a este índice, a sus nodos hermanos relacionados y a
 los ficheros `.lean` que documenta. El subsistema **activo** es
-[Incompletitud](doc/REFERENCE-Incompleteness.md) — su **estado vivo** es **§3.26** (la
-repatriación, ✅ completa: `cuarentena/` está vacía). Lo siguiente ya no es mecánico — ver §5.
+[Incompletitud](doc/REFERENCE-Incompleteness.md) — su **estado vivo** es **§3.27**: el frente
+`substfc` por la vía de **CERO AXIOMAS**, con la partición en tres predicados (que **discrimina**),
+el reflector completo, el testigo para toda fórmula y la clausura bajo `liftc`. **Abierto queda un
+solo lema, y es PLANO**: `DESCENSO` (= `pcc_eval_liftc`). Ver §5.
 
 ⚠️ **§3.15–§3.23 son ANTERIORES a la reparación** (ADR‑012/013). Lo que dicen de la capa rastreada
 describe fielmente el código de `cuarentena/`, pero **ese código no está en el build** y sus
