@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑29 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 34 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 37 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -150,7 +150,45 @@ comentarios).
 > ⚠️ Y su diagnóstico estaba **mal atribuido** (culpaba a la falta de un map de `liftsc`): seguir
 > esa pista habría llevado a **fabricar un símbolo y romper el cero‑axiomas**.
 >
-> ### 🚩 DOS AVISOS de la vía ganadora — el segundo es serio
+> ### ✅✅ EL AVISO 2 MEDIDO (2026‑08‑29): **NO HAY MURO NUEVO** — tres vías, las tres cierran
+>
+> * **`sondeos/ReflectorAtomoAllIn.lean`** — 🔑 `argsIn wT Y` **ES** `boundedAllIn wT Y` **por
+>   `rfl`**, y producción ya tiene `prf_allIn_iff_boundedAllIn` con `allIn` **átomo** ⇒ se dota
+>   **como átomo** (`allInFn := atom2CodeFn "allIn"`, y `allInFn (termCode c) (termCode L) =
+>   formCode (allIn c L) := rfl`). **`PsiF` no contiene ningún `forallc`** ⇒ el `bdAllCode` dentro
+>   de `bdAllCode` **nunca llega a existir** y `pcc_wfAll_tracked_lit` es **UNA aplicación** de
+>   `pcc_bdAll_intro`, igual que `inFormCodeFn` en A3. **Es la idea #2 del proyecto, otra vez.**
+>   ⚠️ **Coste CERO, verificado en el fuente**: `ax_allIn_nil`/`ax_allIn_cons` **ya estaban** en
+>   `axioms` (`Axioms.lean:1305‑1306`) y en `codingAxioms` (`:1341`) ⇒ **G no cambia**.
+> * **`sondeos/ReflectorForallAnidado.lean`** — el `∀` anidado **también cierra de frente** ⇒ la vía
+>   del átomo es **optimización, no rescate**. Clave: **`liftc 0 ⌜v₀⌝ ≐ ⌜v₁⌝`**.
+> * **`sondeos/ReflectorDesdeConsumidor.lean`** — el `∀` anidado **nunca llega a la cara punteada**:
+>   `hLift` sólo pide **cuatro ecuaciones libres de cuantificador** a nivel plano.
+>
+> ### ▶ LO ÚNICO QUE QUEDA ABIERTO — y es PLANO
+> ```lean
+> DESCENSO : ∀ w X, Prf (isTC1 w X) → Prf (targetLiftsc (nthc X 2̄))
+> ```
+> Ni `provFromCode` en la hipótesis ni en la estructura. Piezas **todas en producción**:
+> `prf_strong_induction` + `prf_cantor_mono_left/right` + `prf_list_induction`, con base y paso ya
+> cerrados (`refl_lista_nil`, `refl_lista_cons_imp`). ⚠️ `prf_strong_induction` exige
+> `liftFormula 1 Φ = Φ` ⇒ **`w` cuantificado DENTRO de `Φ`**, no libre. **Coste: estimado, NO medido.**
+>
+> ### ⚠️ SIN DETERMINAR, dicho explícitamente
+> **(i) El puente a forma ECUACIONAL de la imagen punteada.** En las dos vías del reflector,
+> `shapeDot X k n = andc (eqCodeFn (carcT X) k̇) (eqCodeFn (lencT X) ṅ)` — forma `carc`/`lenc`,
+> **sin `consOk`, NO ecuacional** ⇒ **`wfAll1Dot w ≠ formCode (wfAll1 w)`**: el consecuente del
+> reflector es estrictamente **más débil** que la imagen del predicado objeto. Es la convención
+> heredada de A3, no una desviación nueva — pero **en cuanto `subCodes` o la discriminación
+> PUNTEADA pidan la ecuacional, ese puente no existe y no está medido**.
+> **(ii)** La composición con el reconocedor de códigos de **FÓRMULA** (los 12 disyuntos de A3)
+> llevando esta carga: **no hecha**.
+> **(iii)** ⚠️ **Los DOS reconocedores están DESCONECTADOS**: el reflejado (con `wTs`,
+> `ParticionTresPredicados`) y el plano (sin `wTs`, `ClausuraLiftSinWTs`, con **cero** imagen
+> punteada). **Nada los relaciona.** Si el `DESCENSO` corre contra el reflejado, el `∀` anidado
+> desaparece *a fortiori*; si el reflejado tuviera que absorber `argsIn`, el riesgo vuelve.
+>
+> ### 🚩 (histórico) DOS AVISOS de la vía ganadora — el segundo, MEDIDO arriba
 > 1. **El reconocedor se DEBILITA**: sin `wTs`, la lista de argumentos ya no está obligada a ser
 >    cadena `cons` terminada en `nil` — basta `lenc Y ≐ 0̄` (compilado: `crit_argsIn_lenc_zero`).
 >    Con `wTs`, el disyunto `Y ≐ nil` era una **ecuación**.
