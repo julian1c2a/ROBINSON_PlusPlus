@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑28 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 30 `sondeos/`**
+**Estado 2026‑08‑29 · `master` limpio y verde · Lean v4.31.0**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 32 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -86,7 +86,60 @@ comentarios).
 > construido (`nthc X 2̄`, `implc a b`), nunca una variable. La clausura que estorbaba era la del
 > **testigo**, y ésa ya no está.
 >
-> ## ③ REORIENTADO (2026‑08‑28) — **`pcc_eval_liftc` NO hace falta**; falta `substfcT`
+> ## ✅ ③ PASO 1 CERRADO + ⛔ CORRECCIÓN DE `d783b9f` (2026‑08‑29)
+>
+> ### ✅ PASO 1 hecho — `sondeos/CtorDotados.lean` (443 l., recompilado a mano)
+> Los seis constructores dotados (`substfcT`/`substtcT`/`substtscT`/`liftcT`/`liftfcT`/`liftscT`)
+> como **definiciones puras**, con kit completo, más `prf_substtc_funcc3`/`prf_liftc_funcc1‑3`
+> (que no existían) y las **congruencias INTERNAS** `pcc_congr_substfcT_arg1/2/3_code`.
+> ⚠️ **Cero ecuaciones postuladas**: `ax_tc_substfc` no entra por la puerta de atrás. Los puentes
+> `*_termCode` son `rfl` **y discriminantes** (con el nombre cambiado en `strCode`, el `rfl` falla
+> ⇒ el kernel verifica los seis nombres). Verificación adversarial: **3 de 3 confirmados**.
+>
+> ### ⛔⛔ CORRECCIÓN: el commit `d783b9f` («③ REORIENTADO») estaba MAL CERRADO
+> `sondeos/SustituyendoOpaco.lean` refutó la **RAZÓN** del gate, no su **CONCLUSIÓN**.
+> **`pcc_eval_liftc` SÍ hace falta**, y está **medido**: en `sondeos/Paso2CasoForall.lean`,
+> `paso2_caso_forall` cierra el caso `∀` **entero** y su ÚNICA hipótesis sin descargar es
+> ```lean
+> hLift : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))
+> ```
+> **Dónde falló**: aquel sondeo es la capa **META**, donde `liftc 0 w` queda **simbólico** y ninguna
+> HI lo toca. En la inducción **OBJETO** sí hay HI, se instancia en `s := liftc 0 s`, y pide el
+> sustituyendo como **punto de valor** `(liftc 0 s)˙` mientras el axioma dotado entrega el **código
+> de la expresión** `liftcT ⌜0⌝ ṡ`. **Son códigos distintos.**
+> ⚠️ **Lección**: refutar el ARGUMENTO de una objeción no la refuta; hay que atacar la CONCLUSIÓN.
+> Modo de fallo concreto: **generalizar de META a OBJETO**, que es donde vive la HI.
+>
+> ### ▶ EL PASO 2, YA ESPECIFICADO (`sondeos/Paso2CasoForall.lean`)
+> * **Enunciado**: `pcc_eval_substfc (p v s f) : Prf (isFCB3 p f ⇒ provFromCode (evalSubstfcCode v s f))`
+>   con `evalSubstfcCode v s f := eqCodeFn (substfcT v̇ ṡ ḟ) (tcFn (substfc v s f))`. Análogo exacto
+>   de `pcc_dot_cons`. **Mutuo** con `pcc_eval_substtc`/`pcc_eval_substtsc` (`ax_substfc_eq` recurre
+>   a `substtc`, `ax_substfc_atom` a `substtsc`).
+> * **Inducción: FUERTE sobre el VALOR del código** + descenso de Cantor (compilado:
+>   `descenso_un`/`descenso_bin1`/`descenso_bin2`). Absorbe la recursión **mutua**. ⚠️ La inducción
+>   sobre el testigo **NO vale**: `In (nthc X 1̄) wF` dice que el hijo está en la lista, **no que
+>   esté antes** — la lista no está ordenada.
+> * ⚠️ **La guarda debe ser `isFormCodeE`** (ecuacional, de ①), **no `isFormCodeB`**: de
+>   `carc`/`lenc`/`In` no sale la ecuación `X ≐ forallc a` que dispara el axioma. Con `isFormCodeB`
+>   **el paso inductivo no cierra**.
+> * ⚠️ `hΦ` de `prf_strong_induction` obliga a meter **también el testigo `p`** dentro del `∀`.
+>
+> ### 🚩 EL PROBLEMA DE FONDO, a decidir ANTES de escribir
+> **Ninguna lista FINITA es cerrada bajo `liftc 0`**, porque `liftc 0 (varc n) = varc (σn)` no
+> cicla — y los sustituyendos reales llevan variables (`ind` sustituye `termCodeM (succ #0)`).
+> Salidas: **(b)** acotar — el número de lifts está acotado por la profundidad de binders, que lo
+> está por `lenc` del testigo ⇒ extender `SubCodesWitness` con `liftc 0^j s` para `j ≤ cota`;
+> finito, expresable, **cero axiomas**. **(a)** restringir a sustituyendos cerrados: **descartada**
+> (falsa para `ind`/`q1`/`leibniz`). **(c)** sin guarda: imposible.
+>
+> ### Piezas de producción que FALTAN (grep: 0 ocurrencias)
+> `pcc_axiom_inst4`/`pcc_thm_inst4` (**5 de las 8** `ax_substfc_*` son `forall_4`; ~30 l.) ·
+> `prf_liftc_arith_open` (**la familia `liftc` no tiene aritmetización ni a nivel META**; ~60 l.) ·
+> las congruencias internas de `substtcT`/`substtscT`/`liftfcT`/`liftscT` · `CTree` extendido con
+> nodos `subst`/`lift` (el **consumidor**: `pcc_tc_objAt` ES `pcc_eval_substfc`) · descargar
+> internamente las guardas de los axiomas **condicionales** (`ax_substtc_var_*`, `ax_liftc_var_*`).
+>
+> ## ③ (histórico) REORIENTADO (2026‑08‑28) — ⛔ **conclusión corregida arriba**
 >
 > ### ⛔ La obligación que el gate imputaba a ③ es FALSA (`sondeos/SustituyendoOpaco.lean`, net‑0)
 > El gate decía que los casos `∀`/`∃` de `pcc_eval_substfc` obligan a **clausura de `isTermCode`

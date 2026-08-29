@@ -11,9 +11,34 @@
    `In x w → ∃i<lenc w. nthc w i = x` cuando **estaba en producción**. Infirió una obligación de
    la PRESENCIA SINTÁCTICA de un símbolo sin comprobar si algo lo inspecciona.
 
-   ## RESULTADO: la afirmación es FALSA. El sustituyendo es CARGA OPACA.
+   ## ⛔⛔ CORRECCIÓN (2026-08-29): ESTE FICHERO ESTABA MAL CERRADO
 
-   Las tres comprobaciones de abajo, todas compiladas. -/
+   Lo que se prueba abajo es CIERTO, pero la conclusión que se sacó **NO**. Este sondeo refuta
+   la **RAZÓN** que dio el gate, no su **CONCLUSIÓN**: `pcc_eval_liftc` **SÍ hace falta**.
+
+   **Medido, no argumentado** (`sondeos/Paso2CasoForall.lean`, `paso2_caso_forall`): el caso `∀`
+   del PASO 2 cierra **entero**, y su ÚNICA hipótesis sin descargar es
+
+       hLift : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))
+
+   que **es** `pcc_eval_liftc`.
+
+   **Dónde falló el razonamiento**: lo de abajo es la versión **META**, donde
+   `substCodeF (v+1) (liftc 0 w) a` deja `liftc 0 w` **simbólico** y ninguna HI lo toca. En la
+   inducción **OBJETO** sí hay HI, se instancia en `s := liftc 0 s`, y pide el sustituyendo como
+   **punto de valor** `(liftc 0 s)˙` — mientras que el axioma dotado entrega el **código de la
+   expresión** `liftcT ⌜0⌝ ṡ`. **Son códigos distintos**, y el puente entre ellos es justo lo que
+   falta. El gate lo tenía escrito con esas palabras en `ClausuraNoHaceFalta.lean:250‑256`.
+
+   ⚠️ **Lección** (va a [[feedback-auditoria-footprint]]): refutar el ARGUMENTO de una objeción
+   no la refuta. Hay que atacar la CONCLUSIÓN — y aquí el modo de fallo fue **generalizar de la
+   capa META a la capa OBJETO**, que es donde vive la hipótesis de inducción.
+
+   ## Lo que este fichero SÍ establece (sigue siendo válido)
+
+   Que en las ocho ecuaciones de `substfc` el sustituyendo **no se inspecciona**: sólo se traslada.
+   Eso acota `pcc_eval_liftc` — no hay que probar buena‑formación del sustituyendo *para aplicar
+   las ecuaciones*. Lo que hay que probar es el **puente entre las dos formas dotadas**. -/
 import ROBINSON_PlusPlus.Meta
 
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
