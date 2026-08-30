@@ -82,7 +82,10 @@
       "Bash(grep -n \"Falta \\\\`pcc_eval_substfc\\\\`: 1 de 8 constructores hecho\" CURRENT-STATUS-PROJECT.md)",
       "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 80; \"EXIT=$LASTEXITCODE\")",
       "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_medida.lean; \"EXIT=$LASTEXITCODE\")",
-      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 60; \"EXIT=$LASTEXITCODE\")"
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 60; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 100; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(cd \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_dosfases.lean > \"$env:TEMP\\\\ens.txt\" 2>&1; \"EXIT=$LASTEXITCODE\"; \\(Get-Content \"$env:TEMP\\\\ens.txt\"\\) -match \": error\" | Select-Object -First 30)",
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; $out = lake env lean Probe\\\\ENS_medida.lean 2>&1; \"EXIT=$LASTEXITCODE\"; $out | Select-String -Pattern \"depend|axioms|^[A-Z]\" | Select-Object -First 200)"
     ],
     "defaultMode": "dontAsk"
   }

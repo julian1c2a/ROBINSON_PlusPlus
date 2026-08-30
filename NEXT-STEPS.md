@@ -42,8 +42,33 @@ comentarios).
 >   E2 ⬜ F7b: retirar el `axiom d3` (Meta/GodelTwo.lean) — 7 axiomas de Lean pasan a 6
 > ```
 >
-> **FRENTE INDEPENDIENTE, no bloquea la fase**: `⊬¬G` (la mitad ausente de Gödel I).
-> ⬜ rediseño por NUMERALES de `NegVerifier` C‑F (⚠️ `canon_ne` es **FALSO**) ⟶ ⬜ `repr_neg`.
+> **FRENTE INDEPENDIENTE, no bloquea la fase — rama F**: `⊬¬G`.
+> ⚠️ **CORREGIDO 2026‑08‑30 contra el código.** Este frente estaba mal descrito en dos puntos:
+> * **`repr_neg` NO existe ni hace falta** (grep: 0 ocurrencias fuera de doc). Su papel lo juega
+>   `Reflects`, y la reducción **ya está hecha** (`reflects_of_omega`, `Meta/OmegaReflect.lean:157`).
+> * **El «obstáculo del intuicionismo» está RESUELTO desde hace tiempo.** `Prf` es intuicionista
+>   (`Prf₀`, `Meta/Hilbert.lean:83`, sólo `efq`, **ningún axioma de negación**), pero el paso DNE
+>   **no ocurre en `Prf`**: ocurre en `⊢`, que es clásico (`FOL/MetaRules.lean:59`), y **ya está en
+>   la prueba compilada** (`Meta/DiagonalTwo.lean:129`).
+>
+> ✅ `goedel_first_unrefutable_real'` (`DiagonalTwo.lean:119`) **está probado**, módulo `Reflects`.
+> ✅ `goedel_first_undecidable_omega` (`OmegaReflect.lean:168`) **está ensamblado**.
+> ⇒ **la ÚNICA obligación abierta es `NegVerifier`**:
+> ```lean
+> NegVerifier : ∀ φ, ¬ Prf φ → ∀ l, StdChain l → axioms ⊢ neg (Verifies φ (objList l))
+> ```
+> ```
+> F1 ✅ módulo A (decodificador) y módulo B (21 tags)                  hechos y válidos
+> F2 ✅ módulo C, casos 1 y 2 (por ax_lineWF_cons / ax_lineWF_inv)     NO dependen de canon_ne
+> F3 ⬜ módulo C casos 3 y 4, y módulo D — REDISEÑO por numerales
+>       ⚠️ canon_ne es FALSO: en esta teoría un `cons` ES un número
+>          (cons nil nil = 2 = numeralM 2), verificado en sondeos/CanonNeRefuta.lean
+>       ✅ el sustituto EXISTE y es net-0: consN_inj → codeNat_inj → codeNat_ne
+>          (sondeos/CodeNatInj.lean)
+> F4 ⬜ DECISIÓN DEL AUTOR: la representación NUMERAL de las LÍNEAS (ver abajo)
+> ```
+> ⚠️ **Quedarse intuicionista NO cuesta nada aquí**: no hace falta ningún tag 22, luego `lineWF` no
+> cambia, `Prov` no cambia y **G NO CAMBIA**.
 >
 > **SIN DETERMINAR, y no rellenar con conjetura**: el puente a forma **ECUACIONAL** de la imagen
 > punteada · los **dos reconocedores** (con y sin `wTs`) siguen **DESCONECTADOS**.
