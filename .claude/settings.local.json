@@ -62,8 +62,9 @@
       "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; $env:LEAN_PATH=\"$PWD\"; lake env lean Probe\\\\CritRefl_atomo.lean 2>&1; \"EXITCODE=$LASTEXITCODE\")",
       "PowerShell($out = & lake env lean Probe\\\\CritRefl_anidado.lean 2>&1 | Out-String; $code = $LASTEXITCODE; Write-Output \"EXITCODE=$code\"; Write-Output \"----OUT----\"; Write-Output $out)",
       "Bash(sed -n '109,145p' Probe/CritLift_sinwts.lean)",
-      "Bash(sed -n '879,886p' Probe/Refl_consumidor.lean)"
+      "Bash(sed -n '879,886p' Probe/Refl_consumidor.lean)",
+      "PowerShell(git -C \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\" log --oneline -25)"
     ],
-    "defaultMode": "bypassPermissions"
+    "defaultMode": "dontAsk"
   }
 }

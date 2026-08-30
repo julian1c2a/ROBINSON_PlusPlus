@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑29 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 37 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 39 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -165,7 +165,61 @@ comentarios).
 > * **`sondeos/ReflectorDesdeConsumidor.lean`** — el `∀` anidado **nunca llega a la cara punteada**:
 >   `hLift` sólo pide **cuatro ecuaciones libres de cuantificador** a nivel plano.
 >
-> ### ▶ LO ÚNICO QUE QUEDA ABIERTO — y es PLANO
+> ### ✅✅ EL DESCENSO, CERRADO (2026‑08‑30) — `sondeos/DescensoLiftc.lean`
+> **3 estrategias, 3 de 3 confirmadas** (compila / abstracto / hipótesis limpias / inducción
+> correcta). Recompilado a mano.
+> ```lean
+> DESCENSO (w s : Term) : Prf (isTC1 w s) → Prf (targetLift s)      -- w, s ABSTRACTOS
+> pcc_eval_liftc (w s)  : … := DESCENSO w s                          -- ES literalmente el mismo
+> DESCENSO_hasWit (s)   : Prf (hasWit s ⇒ targetLift s)              -- la forma que se consume
+> ```
+> 🔑 Las tres vías convergieron **por separado** en el mismo motivo: **no** dos inducciones mutuas
+> sino **UNA** inducción fuerte con conclusión **CONJUNTIVA**,
+> `PHI := ∀w. (isTC1 w #0 ⇒ targetLift #0) ∧ (isTsC1 w #0 ⇒ targetLiftsc #0)`, con `w` **DENTRO**.
+> ⚠️ **No hay atajo por el consumidor**, y está probado: el `s` que ve `paso2_caso_forall` **es
+> `#0`**, luego pedir `hLift` sólo para ése **es pedirlo para todo `s`** (`sin_ahorro`).
+>
+> ### ✅ Y el RESIDUO DE ACOPLE, resuelto — `sondeos/GateGuardaEnriquecida.lean`
+> `pcc_eval_liftc` tiene **guarda** y el `PHI` del consumidor no la tenía. Se enriquece:
+> `PHI_guarded := ∀.∀. (hasWit #0 ⇒ provFromCode (evalSubstfcCode #1 #0 #2))`, y
+> **`PHI_guarded_lift` compila**: el gate de `prf_strong_induction` **pasa**. 🔑 **Sin binder
+> nuevo** — la guarda es un `∃` **interno**, así que los binders exteriores no cambian. Y la
+> propagación al subcódigo **ya existía**: `CRIT_hasWit_lift`.
+>
+> ### ▶ SIGUIENTE PASO CONCRETO
+> Enriquecer `Paso2Ind.PHI` a `PHI_guarded` y rehacer `paso2_caso_forall` en forma `PrfH Γ` con
+> `hasWit s` en Γ, consumiendo `DESCENSO_hasWit` para el `hLift` y `CRIT_hasWit_lift` para pasarle
+> la guarda a la HI. **Las tres piezas ya compilan; no falta ninguna.**
+>
+> ### 🚩 LO QUE FALTA PARA `pcc_eval_substfc` COMPLETO — y dónde está el candidato a muro nuevo
+> De los **8** constructores (`Axioms.lean:498‑520`), **sólo existe `pcc_substfc_forall_dot`**.
+>
+> | caso | ¿problema distinto del `∀`? |
+> |---|---|
+> | `exc`(9) · `botc`(2) · `implc`(5)/`andc`(7)/`orc`(8) | **NO** — espejo, trivial, o más baratos (no hay `liftc`) |
+> | **`eqc`(4)** ⇒ pide **`pcc_eval_substtc`** | **SÍ** |
+> | **`atomc`(3)** ⇒ pide **`pcc_eval_substtsc`** | **SÍ** |
+>
+> ⚠️ **`pcc_eval_substtc` es estrictamente MÁS DURO que el DESCENSO**, por dos razones verificadas
+> en el código: (1) la guarda de `liftc` era **CERRADA** (`liftc zero` ⇒ `zero < succ n`,
+> descargada de una vez), pero `substtc v s (varc n)` tiene **TRES** cláusulas guardadas por
+> `v ≐ n` / `v < n` / `n < v` con **`v` ABSTRACTO** ⇒ hay que reflejar la **tricotomía dentro de
+> `Prov`** (la ruta existe: `prf_lt_trichotomy` + `pcc_lt_tracked`, pero son tres ramas × el dotado
+> entero); (2) `ax_substtc_var_gt` devuelve **`varc (pred n)`** ⇒ hace falta la evaluación **dotada
+> de `pred`**, que **no existe** (a nivel objeto sí: `prf_pred_succ`).
+> Y un requisito estructural que no estaba registrado: la inducción de `pcc_eval_substfc` debe
+> alcanzar **los tres sorts** con un `Φ` conjuntivo **triple** — es el cuadre **8↔8 / 2↔2 / 2↔2**
+> de `isFCB3`, cuyo diseño ya está pero **aún no se ha atado a este consumidor**.
+>
+> ### ⚠️ COSTE DE PROMOCIÓN, que no estaba en ningún informe
+> `targetLift`/`isTC1`/`wfAll1`/`argsIn` viven **sólo en `sondeos/`**. Promover el DESCENSO a
+> `Meta/EvalLiftcPrf.lean` obliga a **promover antes** `ReflectorDesdeConsumidor` y
+> `ClausuraLiftSinWTs`, o el módulo nuevo no tiene de dónde importar sus propias definiciones.
+> Piezas genéricas que van a otro sitio: **`PrfH_mono`/`PrfH_w1`** (monotonía del contexto en
+> `PrfH`, **no existe en producción**) → `Meta/HilbertDeduction.lean`; **`prf_nil_or_cons`** (sale
+> de `Prf.listInd`, net‑0) → `Meta/ChainPrf.lean`.
+>
+> ### ▶ (histórico) LO ÚNICO QUE QUEDABA ABIERTO — y era PLANO
 > ```lean
 > DESCENSO : ∀ w X, Prf (isTC1 w X) → Prf (targetLiftsc (nthc X 2̄))
 > ```
