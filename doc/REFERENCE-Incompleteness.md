@@ -1570,6 +1570,11 @@ CRIT_hasWit_lift (c : Term) : Prf (hasWit c ⇒ hasWit (liftc 0 c))
 
 ### 3.27.5 · Lo ABIERTO, y lo que NO se sabe
 
+> ⚠️ **APARTADO SUPERADO — leer §3.28.** El `DESCENSO` que aquí se declara abierto quedó
+> **PROBADO** el 2026‑08‑30 (`2f27a29`), y con él `pcc_eval_liftc`. Se conserva este texto como
+> registro de la medición del 08‑29, no como estado vigente. De los cuatro puntos «sin determinar»
+> de abajo, **el cuarto quedó medido** (§3.28.3); los otros tres siguen abiertos.
+
 **Abierto, y es PLANO** (ni `provFromCode` en la hipótesis ni `bdAllCode` en la estructura):
 ```lean
 DESCENSO : ∀ w s, Prf (isTC1 w s) → Prf (targetLift s)
@@ -1597,6 +1602,120 @@ de `Φ`**.
   **inter‑construibles**, probado en las dos direcciones (`sondeos/AcotarEsLaMismaObligacion.lean`).
 * **«Ningún descenso de `substfc` cruza un binder de código» es FALSO** (hay 12 descensos a nivel 1).
   El enunciado correcto: **ninguno corre sobre código de fórmula OPACO**.
+
+---
+
+## §3.28 · EL **DESCENSO**, CERRADO — `pcc_eval_liftc` existe (2026‑08‑30)
+
+Cierra el único lema que §3.27 dejaba abierto. Todo en `sondeos/`, **cero axiomas de Lean nuevos,
+cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29` y `c8f100f`.
+
+### 3.28.1 · Los teoremas, con firma
+
+`sondeos/DescensoLiftc.lean` (2011 l.):
+
+```lean
+-- :79    el objetivo, como definición
+def targetLift (s : Term) : Formula :=
+  provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s)))
+
+-- :1362  la forma implicativa
+theorem DESCENSO_imp (w s : Term) : Prf (Formula.impl (isTC1 w s) (targetLift s))
+-- :1371  el DESCENSO, con w y s ABSTRACTOS
+theorem DESCENSO (w s : Term) (h : Prf (isTC1 w s)) : Prf (targetLift s)
+-- :1379  y su identidad: ES pcc_eval_liftc, no una aproximación
+theorem pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
+    Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s)))) :=
+  DESCENSO w s h
+-- :1388  LA FORMA QUE CONSUME EL PASO 2: el testigo, cuantificado
+theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s))
+```
+
+Con su gemela sobre listas de argumentos (`DESCENSO_lista`, `:1374`) y los controles positivos que
+impiden que sea vacuo: `CRIT_targetLift_real` (`:1904`), `CRIT_real_A`/`_B` sobre términos
+concretos, y `CRIT_hasWit_real` (`:1964`) — **todo `t` tiene testigo**.
+
+### 3.28.2 · El motivo: **una** inducción, con conclusión **conjuntiva**
+
+Tres estrategias independientes, verificadas adversarialmente, **3 de 3 confirmadas**. Lo
+interesante es que **las tres convergieron por separado en el mismo motivo, y no era el previsto**:
+
+```lean
+PHI := ∀. ∀w. (isTC1 w #0 ⇒ targetLift #0) ∧ (isTsC1 w #0 ⇒ targetLiftsc #0)
+```
+
+No dos inducciones mutuas, sino **UNA** inducción fuerte cuya conclusión es una **conjunción**, con
+`w` cuantificado **dentro** de `Φ` (lo que exige el gate `liftFormula 1 Φ = Φ`, `hPHI` en `:1199`).
+**La mutua explícita resultó innecesaria** — el término y la lista de argumentos viajan juntos.
+
+🔑 **Y la tercera vía se respondió a sí misma en NEGATIVO, con prueba.** Se planteó si bastaba
+probar `hLift` sólo para el `s` concreto que aparece en el caso `∀`. La respuesta es que **ese `s`
+es `#0`**: pedirlo para él **es pedirlo para todo `s`**. No había atajo, y quedó **demostrado en
+vez de supuesto** — que es la diferencia entre cerrar una vía y abandonarla.
+
+### 3.28.3 · El residuo de acople, también resuelto
+
+Los tres intentos señalaron, sin que se les preguntara, el mismo defecto de encaje: `pcc_eval_liftc`
+llega con **guarda** (`hasWit s`) y el `Φ` del consumidor (`Paso2Ind.PHI`,
+`sondeos/Paso2CasoForall.lean:689`) no la tenía. Medido en `sondeos/GateGuardaEnriquecida.lean`:
+
+```lean
+-- :119
+def PHI_guarded : Formula :=
+  Formula.forall (Formula.forall (Formula.impl (hasWit (.var 0))
+    (provFromCode (evalSubstfcCode (.var 1) (.var 0) (.var 2)))))
+
+-- :126  EL GATE, SUPERADO
+theorem PHI_guarded_lift : liftFormula 1 PHI_guarded = PHI_guarded
+```
+
+🔑 **Y pasa sin binder nuevo**, porque `hasWit c := ∃. isTC1 #0 ↑c` es un `∃` **interno**: el número
+de binders **exteriores** no cambia, que es lo único que mira el gate. La propagación de la guarda
+al subcódigo ya existía: `CRIT_hasWit_lift` (`sondeos/ClausuraLiftSinWTs.lean:1392`),
+`Prf (hasWit c ⇒ hasWit (liftc zero c))`.
+
+El fichero incluye además el control negativo de que la guarda **no es decorativa**
+(`fail_if_success` contra `PHI_guarded = PHI_actual`, `:177`) y la fontanería De Bruijn nueva
+(`liftF_hasWit` `:88`, `substF_hasWit` `:159`, `PHI_guarded_at` `:167`).
+
+### 3.28.4 · ⚠️ Dónde está el siguiente muro — y **no es donde se miraba**
+
+De los **8** constructores de `substfc` sólo está hecho `pcc_substfc_forall_dot`
+(`Paso2CasoForall.lean:282`). Seis de los siete restantes son **mecánicos**. Los distintos son
+`eqc` y `atomc`, que recurren a `substtc`/`substtsc` (ya lo anticipaba `ec_objeto_eq`, `:662`:
+*«el `substfc` recurre a `substtc` ⇒ el teorema es MUTUO»*).
+
+**`pcc_eval_substtc` es ESTRICTAMENTE MÁS DURO que el DESCENSO**, por dos razones verificadas en el
+código y no conjeturadas:
+
+| | `pcc_eval_liftc` (hecho) | `pcc_eval_substtc` (pendiente) |
+|---|---|---|
+| **la guarda** | **CERRADA**: `liftc zero` ⇒ la condición es `zero < σn`, se descarga **de una vez** | **ABIERTA**: `substtc v s (varc n)` tiene **tres** cláusulas guardadas (`<`, `=`, `>`) con **`v` abstracto** ⇒ hay que reflejar la **tricotomía DENTRO de `Prov`** |
+| **la salida** | se mantiene en el mismo vocabulario | `ax_substtc_var_gt` devuelve **`varc (pred n)`** ⇒ pide la evaluación **dotada de `pred`**, que **no existe** |
+
+⇒ el trabajo pendiente del frente **no** es «siete casos más como el `∀`»: son **seis mecánicos y
+uno con obstrucción propia**, y conviene atacarlo sabiéndolo.
+
+### 3.28.5 · 💰 Coste de promoción (medido, no estimado)
+
+`targetLift`, `isTC1`, `wfAll1` y `argsIn` viven **sólo en `sondeos/`**. Promover el DESCENSO a
+`Meta/EvalLiftcPrf.lean` obliga a promover **antes** `ReflectorDesdeConsumidor` y
+`ClausuraLiftSinWTs`. Piezas sueltas que van con ello: `PrfH_mono`/`PrfH_w1` →
+`Meta/HilbertDeduction.lean`; `prf_nil_or_cons` → `Meta/ChainPrf.lean`. Nada de esto es difícil,
+pero **no es gratis** y no figuraba en ninguna estimación previa.
+
+### 3.28.6 · ▶ El paso siguiente, y el obstáculo ya localizado
+
+Enriquecer `Paso2Ind.PHI` a `PHI_guarded` y rehacer `paso2_caso_forall`
+(`sondeos/Paso2CasoForall.lean:505`) en forma **`PrfH Γ`** con `hasWit s` en Γ: `DESCENSO_hasWit`
+descarga `hLift` y `CRIT_hasWit_lift` pasa la guarda a la HI. **Las tres piezas ya compilan.**
+
+⚠️ **El único obstáculo real, localizado antes de empezar**: la cadena de `paso2_caso_forall` se
+monta con `pcc_eq_trans_code` (`Meta/EvalArithPrf.lean:238`), que toma sus **dos** eslabones como
+`Prf`. Bajo `PrfH Γ`, los eslabones h3 (vía `hLift`) y h4 (vía `hIH`) **ya no son `Prf`**. Existe
+`pcc_eq_trans_code_imp` (`:309`), pero internaliza el eslabón **SEGUNDO** dejando **libre el
+primero**, y los dos Γ‑dependientes están **en medio** de la cadena. Precedente de uso bajo `PrfH`:
+`Meta/EvalNthcPrf.lean:334`.
 
 ---
 

@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-29 · frente `substfc` en curso (vía CERO axiomas)
+> ## ESTADO REAL — 2026-08-30 · frente `substfc`: DESCENSO CERRADO (vía CERO axiomas)
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
@@ -24,7 +24,7 @@
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos abstractos, que es lo que repatría la cuarentena.
 > Rédito verificado en `sondeos/CarcPayoff.lean` (`pcc_eval_carc` vuelve). Detalle en
-> [Incompletitud §3.24–§3.27](doc/REFERENCE-Incompleteness.md).
+> [Incompletitud §3.24–§3.28](doc/REFERENCE-Incompleteness.md).
 >
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -123,7 +123,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
 Los **82 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
-Detalle en el nodo §3.15–§3.27.
+Detalle en el nodo §3.15–§3.28.
 
 | # | Module | Rol · Estado |
 |--:|--------|--------------|
@@ -234,14 +234,17 @@ REFERENCE (`AI-GUIDE.md` §0.5): el índice raíz cataloga y navega; los nodos d
 | [**Aritmética**](doc/REFERENCE-Arithmetic.md) | `Block1–8` — aritmética desarrollada, Cantor, pares, listas, primos/TFA objeto | §3.2–§3.11 |
 | [**Gödelización**](doc/REFERENCE-Godelization.md) | `Meta/Godel`, `Meta/Provability` — Nivel B/C (`⌜·⌝`, `formCode`, `Provable`) | §3.12–§3.13 |
 | [**Full**](doc/REFERENCE-Full.md) | `Full/` — inducción general, representabilidad, `numeral`, TFA | §3.14 |
-| [**Incompletitud**](doc/REFERENCE-Incompleteness.md) | Nivel D: Gödel I/II, D1–D3, Σ₁‑completitud provable (12‑A), módulos A/B de `NegVerifier`, **la REPARACIÓN (§3.24), la ESCALERA (§3.25), la REPATRIACIÓN (§3.26) y el FRENTE `substfc` por la vía CERO AXIOMAS (§3.27)** | §3.15–§3.27 |
+| [**Incompletitud**](doc/REFERENCE-Incompleteness.md) | Nivel D: Gödel I/II, D1–D3, Σ₁‑completitud provable (12‑A), módulos A/B de `NegVerifier`, **la REPARACIÓN (§3.24), la ESCALERA (§3.25), la REPATRIACIÓN (§3.26), el FRENTE `substfc` por la vía CERO AXIOMAS (§3.27) y el DESCENSO cerrado (§3.28)** | §3.15–§3.28 |
 
 **Navegación fuerte:** cada nodo enlaza de vuelta a este índice, a sus nodos hermanos relacionados y a
 los ficheros `.lean` que documenta. El subsistema **activo** es
-[Incompletitud](doc/REFERENCE-Incompleteness.md) — su **estado vivo** es **§3.27**: el frente
+[Incompletitud](doc/REFERENCE-Incompleteness.md) — su **estado vivo** es **§3.28**: el frente
 `substfc` por la vía de **CERO AXIOMAS**, con la partición en tres predicados (que **discrimina**),
-el reflector completo, el testigo para toda fórmula y la clausura bajo `liftc`. **Abierto queda un
-solo lema, y es PLANO**: `DESCENSO` (= `pcc_eval_liftc`). Ver §5.
+el reflector completo, el testigo para toda fórmula, la clausura bajo `liftc` y —desde el
+2026‑08‑30— el **`DESCENSO` PROBADO**, que **es** `pcc_eval_liftc` (§3.28.1). El `PHI_guarded` del
+consumidor **pasa el gate** de `prf_strong_induction` sin binder nuevo.
+⚠️ El siguiente muro **no** son «siete casos más como el `∀`»: son seis mecánicos y
+**`pcc_eval_substtc`**, que es **estrictamente más duro** (§3.28.4). Ver §5.
 
 ⚠️ **§3.15–§3.23 son ANTERIORES a la reparación** (ADR‑012/013). Lo que dicen de la capa rastreada
 describe fielmente el código de `cuarentena/`, pero **ese código no está en el build** y sus
@@ -264,7 +267,8 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-23.** Build **118 jobs**, **104 módulos activos**, 0 sorrys, 7 `axiom` de Lean.
+**Estado 2026-08-30.** Build **118 jobs**, **104 módulos activos**, **39 `sondeos/`**, 0 sorrys,
+7 `axiom` de Lean.
 
 ### Lo que está cerrado
 
@@ -275,17 +279,20 @@ Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-L
 3. **La ESCALERA (a.2)** ✅ **4 de 4** (§3.25): `pcc_eval_add`, `pcc_eval_mul`, el atajo de `div2`, y
    **`pcc_dot_cons`**. Es la Σ₁‑completitud internalizada para argumentos abstractos.
 
-### Los tres frentes abiertos — **todos MEDIDOS** (2026-08-23)
+### Los tres frentes abiertos — **todos MEDIDOS** (frente 1 actualizado 2026‑08‑30)
 
 | # | frente | estado | qué lo bloquea |
 |--:|---|---|---|
-| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` **ya existe**, net‑0 y en forma OBJETO ⇒ sólo falta `pcc_eval_substfc` | **una DECISIÓN**: sancionar `isFormCode` (<12 axiomas). ⚠️ objeciones sin resolver: la justificación de conservatividad **prueba consistencia, no conservatividad** (haría falta Knaster‑Tarski), y choca con `AXIOMS.md` §1.1 |
+| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` existe, net‑0 y en forma OBJETO. ✅ **La decisión ya está tomada: vía (2), CERO axiomas** ([ADR‑015](DECISIONS.md)) ⇒ la objeción de conservatividad **dejó de aplicar**. ✅ Partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** (§3.28) | falta **`pcc_eval_substfc`**: de sus 8 constructores, uno hecho, **seis mecánicos** y **`pcc_eval_substtc`**, que es **estrictamente más duro** (tricotomía con `v` abstracto dentro de `Prov`; `pred` dotado inexistente) — §3.28.4 |
 | **2** | **`NegVerifier`** → `⊬¬G` | ⛔ el paso 1.1 del plan (`canon_ne`) es **FALSO** y reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ La salida por **numerales** está verificada y es **net‑0** (`sondeos/CodeNatInj.lean`: `consN_inj` → `codeNat_inj` → `codeNat_ne`) | elegir la **representación numeral de las LÍNEAS** y rediseñar los módulos C y D |
 | **3** | **recodificar símbolos por índice** | 📏 medido (`sondeos/RecodCoste.lean`): el **98‑99 %** del `formCode` de los axiomas del verificador son los nombres de símbolos (`ax_tc_zero`: 49 015 → ~708 nodos, **69×**). Pero **hoy no es cuello de botella** | nada. ⚠️ Una tabla pura **no es total** (`Term.func` toma String arbitrario) ⇒ codificación **etiquetada**. Coste: ~10 teoremas en 4 módulos, uno `CodeDecode` (completo) |
 
 **Secuencia que sale de las mediciones:** (3) sólo tiene sentido **antes** de (2) —el rediseño de C‑F
-toca la codificación de todos modos—, y (1) es la única vía a D3 pero **cuesta axiomas**, así que es
-decisión del autor, no un paso técnico.
+toca la codificación de todos modos—. ⚠️ **La frase «(1) cuesta axiomas, es decisión del autor» ya
+NO vale** (era de 2026‑08‑23): desde ADR‑015 el frente 1 va por la **vía de CERO axiomas** y es un
+**paso técnico**, no una decisión pendiente. La razón de fondo está en §3.27.1: la opción de
+axiomatizar **no era más cara, era OTRO TEOREMA** — sus axiomas entrarían en `axioms`,
+`ax_axiomsCodeT_eq` los metería en `axiomsCodeT` y **G cambiaría**.
 
 ### Alternativa siempre disponible
 

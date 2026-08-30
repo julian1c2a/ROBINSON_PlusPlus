@@ -4,16 +4,28 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑29 · `master` limpio y verde · Lean v4.31.0**
+**Estado 2026‑08‑30 · `master` limpio y verde · Lean v4.31.0**
 **118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 39 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
-> # 🎯 SIGUIENTE SESIÓN — dos tareas, EN ESTE ORDEN (acordado 2026‑08‑26)
+> # 🎯 SIGUIENTE SESIÓN — **rehacer `paso2_caso_forall` en forma `PrfH Γ`**
 >
-> El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**), ya
-> decidida y con el gate de clausura superado. Quedan dos cosas **antes** de escribir
-> `pcc_eval_liftc`, que es el eslabón grande.
+> El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**).
+> ✅ **`pcc_eval_liftc` YA ESTÁ PROBADO** (2026‑08‑30, `2f27a29`) — el eslabón grande está puesto.
+> El paso siguiente está en **«▶ SIGUIENTE PASO CONCRETO»**, más abajo en este mismo documento, y
+> las tres piezas que consume ya compilan.
+>
+> ⚠️ **El obstáculo, localizado antes de empezar**: la cadena de `paso2_caso_forall` se monta con
+> `pcc_eq_trans_code` (`Meta/EvalArithPrf.lean:238`), que toma sus **dos** eslabones como `Prf`;
+> bajo `PrfH Γ` los eslabones h3 (vía `hLift`) y h4 (vía `hIH`) **ya no lo son**. Existe
+> `pcc_eq_trans_code_imp` (`:309`), pero internaliza el eslabón **SEGUNDO** dejando libre el
+> primero, y los dos Γ‑dependientes están **en medio**. Precedente de uso bajo `PrfH`:
+> `Meta/EvalNthcPrf.lean:334`.
+>
+> ---
+>
+> ## 📓 (histórico) Las dos tareas acordadas el 2026‑08‑26 — **las dos CERRADAS**
 >
 > ## ① ✅✅ CERRADO (2026‑08‑28) — **la discriminación SOBREVIVE a la forma ecuacional**
 >

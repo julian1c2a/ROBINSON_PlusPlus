@@ -1,11 +1,11 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-29 · frente `substfc` en curso (vía CERO axiomas)
+> ## ESTADO REAL — 2026-08-30 · frente `substfc`: DESCENSO CERRADO (vía CERO axiomas)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.27.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.28.
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 39 en `sondeos/`.**

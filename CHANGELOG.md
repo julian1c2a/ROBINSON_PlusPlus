@@ -14,7 +14,65 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** 97 jobs, 0 errores, 0 warnings, 0 sorrys (2026‑08‑22 23:42).
+> **Último build verificado:** **118 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑08‑30 13:40).
+
+---
+
+## 2026-08-30 — ✅✅ EL **DESCENSO**, CERRADO: `pcc_eval_liftc` existe
+
+Cierra el único lema que la semana 08‑24→08‑29 dejaba abierto. **Cero axiomas de Lean nuevos, cero
+`sorry`**, recompilado a mano. Build **118 jobs**, **39 `sondeos/`**. Proyectado en
+**`doc/REFERENCE-Incompleteness.md` §3.28** (nueva). ADR **018**.
+
+```lean
+DESCENSO        (w s : Term) : Prf (isTC1 w s) → Prf (targetLift s)   -- w, s ABSTRACTOS
+pcc_eval_liftc  (w s : Term) : … := DESCENSO w s                      -- ES el mismo teorema
+DESCENSO_hasWit (s : Term)   : Prf (hasWit s ⇒ targetLift s)          -- la forma CONSUMIBLE
+```
+
+**3 estrategias independientes, 3 de 3 confirmadas** por verificación adversarial.
+
+### Lo que enseñó, y que vale fuera de aquí
+
+* 🔑 **Las tres vías convergieron por separado en el mismo motivo, y no era el previsto**: no dos
+  inducciones mutuas, sino **UNA** inducción fuerte con conclusión **CONJUNTIVA**
+  (`PHI := ∀w. (isTC1 w #0 ⇒ targetLift #0) ∧ (isTsC1 w #0 ⇒ targetLiftsc #0)`), con `w` **dentro**
+  de `Φ` porque el gate `liftFormula 1 Φ = Φ` lo exige. **La mutua explícita era innecesaria.**
+* 🔑 **La tercera vía se respondió a sí misma en NEGATIVO, con prueba**: el `s` que ve
+  `paso2_caso_forall` **es `#0`**, luego pedir `hLift` sólo para él **es pedirlo para todo `s`**.
+  Se cerró la vía **demostrando** que no había atajo, en vez de abandonarla por intuición.
+* 🔑 **El residuo de acople, resuelto** (`sondeos/GateGuardaEnriquecida.lean`): los tres intentos
+  señalaron sin que se les preguntara que `pcc_eval_liftc` llega con **guarda** y el `PHI` del
+  consumidor no la tenía. `PHI_guarded` la mete dentro y **`PHI_guarded_lift` compila** — y **sin
+  binder nuevo**, porque la guarda es un `∃` **interno**: el gate sólo mira los binders exteriores.
+
+### ⚠️ Dónde está el siguiente muro — y no es donde se miraba
+
+De los **8** constructores de `substfc` sólo existe `pcc_substfc_forall_dot`. Seis de los siete
+restantes son **mecánicos**; los distintos son `eqc` y `atomc`. Y **`pcc_eval_substtc` es
+estrictamente MÁS DURO que el DESCENSO**, por dos razones verificadas en el código: la guarda de
+`liftc` era **cerrada** (`liftc zero` ⇒ `zero < σn`, se descarga de una vez) mientras
+`substtc v s (varc n)` tiene **tres** cláusulas guardadas con **`v` abstracto** ⇒ pide reflejar la
+**tricotomía dentro de `Prov`**; y `ax_substtc_var_gt` devuelve `varc (pred n)` ⇒ pide la
+evaluación **dotada de `pred`**, que no existe.
+
+### 💰 Coste de promoción, que no figuraba en ninguna estimación
+
+`targetLift`/`isTC1`/`wfAll1`/`argsIn` viven **sólo en `sondeos/`** ⇒ promover el DESCENSO a
+`Meta/EvalLiftcPrf.lean` obliga a promover **antes** `ReflectorDesdeConsumidor` y
+`ClausuraLiftSinWTs`. Sueltas: `PrfH_mono`/`PrfH_w1` → `Meta/HilbertDeduction.lean`;
+`prf_nil_or_cons` → `Meta/ChainPrf.lean`.
+
+### 🧹 Mantenimiento
+
+* Limpiados **8 procesos `lake`/`lean` huérfanos** (~14 h, 889 MB). Build reverificado después:
+  118 jobs, `EXIT=0`.
+* ⚠️ **Aprendizaje de método**: `started > result` en el journal de un workflow **no** significa
+  «agentes vivos» — tres daban esa señal y eran cadáveres de julio y del 28‑08. El criterio bueno
+  es el **timestamp**, no el conteo.
+* ⚠️ **Trampa de doc, cometida y corregida** (`c8f100f`): se actualizaron los banners de ocho
+  documentos y se dejó el **cuerpo** con cifras viejas (`10 en sondeos/`, cuarentena «quedan 14»
+  cuando está vacía desde el 23). Es exactamente la trampa que el proyecto tiene registrada.
 
 ---
 

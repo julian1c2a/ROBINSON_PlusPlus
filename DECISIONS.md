@@ -1,11 +1,11 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-29 · frente `substfc` en curso (vía CERO axiomas)
+> ## ESTADO REAL — 2026-08-30 · frente `substfc`: DESCENSO CERRADO (vía CERO axiomas)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.27.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.28.
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 39 en `sondeos/`.**
@@ -571,6 +571,39 @@ lista, `liftsc 0` **es** el map posicional sobre lista arbitraria, vía `prf_lis
 medida: sin `wTs` el reconocedor se **debilita** (la lista de argumentos ya no está obligada a ser
 cadena `cons` terminada en `nil`). ⚠️ Y los **dos reconocedores** —el reflejado con `wTs` y el
 plano sin él— están hoy **desconectados**: nada los relaciona.
+
+---
+
+## ADR-018: El descenso es UNA inducción con conclusión CONJUNTIVA, y la guarda va DENTRO de `Φ`
+
+**Fecha**: 2026‑08‑30 · **Estado**: ✅ ACEPTADA
+
+**Contexto**. `pcc_eval_liftc` (el `DESCENSO`) recorre a la vez **términos** y **listas de
+argumentos**. La lectura natural —y la que estaba escrita— era que hacían falta **dos inducciones
+mutuamente recursivas**, como en R‑6. Además, `prf_strong_induction` impone el gate
+`liftFormula 1 Φ = Φ`, que prohíbe dejar libre nada por encima del índice de inducción, y el
+`Φ` del consumidor (`Paso2Ind.PHI`) **no llevaba** la guarda `hasWit s` que el descenso necesita.
+
+**Decisión**. (a) **Una sola** inducción fuerte, con la conclusión **conjuntiva**
+`PHI := ∀w. (isTC1 w #0 ⇒ targetLift #0) ∧ (isTsC1 w #0 ⇒ targetLiftsc #0)`, y `w` cuantificado
+**dentro** de `Φ`. (b) La guarda se mete **dentro** de `Φ` (`PHI_guarded`), no se pasa por fuera.
+
+**Justificación**. (a) Tres estrategias independientes convergieron **por separado** en este mismo
+motivo, y las tres cerraron: el término y su lista de argumentos viajan juntos, de modo que la
+conjunción hace de par mutuo sin necesidad de recursión mutua. (b) La guarda `hasWit c` es un `∃`
+**interno**, así que meterla en `Φ` **no añade binder exterior** y el gate sigue pasando —
+verificado compilando `PHI_guarded_lift`. La alternativa (pasarla como hipótesis externa) habría
+exigido un lema de lifting de **derivaciones**, que **no existe** en el proyecto (ya medido en
+ADR‑017). Y no había atajo por el consumidor: se **probó** que el `s` que ve `paso2_caso_forall`
+es `#0`, luego pedir `hLift` sólo para él es pedirlo para todo `s`.
+
+**Consecuencias**. `pcc_eval_liftc` existe con `w`/`s` **abstractos** y footprint net‑0.
+⚠️ Contrapartida: `Φ` es ahora **guardado**, luego **todo consumidor aguas abajo tiene que
+suministrar `hasWit`** — barato, porque `CRIT_hasWit_real` da testigo para todo término y
+`CRIT_hasWit_lift` lo propaga al subcódigo, pero **no es gratis** y hay que declararlo en cada
+composición. ⚠️ Y el patrón **no se extiende sin más** a `pcc_eval_substtc`: allí la guarda es
+**abierta** (tricotomía con `v` abstracto, a reflejar dentro de `Prov`) y aparece `varc (pred n)`,
+que pide un `pred` dotado inexistente. Ver `doc/REFERENCE-Incompleteness.md` §3.28.
 
 ---
 
