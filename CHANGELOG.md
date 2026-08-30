@@ -21,7 +21,7 @@
 ## 2026-08-29 — 🎯 EL FRENTE `substfc` POR LA VÍA DE **CERO AXIOMAS** (semana 08‑24 → 08‑29)
 
 **Decisión tomada y ejecutada**: la buena‑formación de códigos se define en vocabulario objeto
-**EXISTENTE**. **Cero axiomas nuevos, cero símbolos nuevos.** Build **118 jobs**, **37 `sondeos/`**,
+**EXISTENTE**. **Cero axiomas nuevos, cero símbolos nuevos.** Build **118 jobs**, **37 `sondeos/`** (39 tras cerrar el DESCENSO el 08‑30),
 0 sorrys. Proyectado en **`doc/REFERENCE-Incompleteness.md` §3.27** (nueva).
 
 ### Lo que se cerró, en orden

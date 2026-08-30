@@ -39,7 +39,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+10 en `sondeos/`** |
+| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+39 en `sondeos/`** |
 | Modules sin sorry | 104 / 104 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |

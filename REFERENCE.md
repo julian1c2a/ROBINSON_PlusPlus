@@ -16,7 +16,7 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre `godelCN`.
 > * **21 módulos a `cuarentena/`** ([ADR‑013](DECISIONS.md)) — cifra histórica del momento de la
->   reparación; hoy quedan **14** (§1.6). Sus teoremas eran formalmente correctos pero **vacuos**.
+>   reparación; hoy la cuarentena está **VACÍA** (§1.6). Sus teoremas eran formalmente correctos pero **vacuos**.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### ✅ La ESCALERA (a.2) está COMPLETA — 4 de 4
@@ -73,7 +73,7 @@ temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo 
 REFERENCE, `AI-GUIDE.md` §0.5).
 
 **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **10 en `sondeos/`**
+`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **39 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)

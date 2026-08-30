@@ -63,7 +63,13 @@
       "PowerShell($out = & lake env lean Probe\\\\CritRefl_anidado.lean 2>&1 | Out-String; $code = $LASTEXITCODE; Write-Output \"EXITCODE=$code\"; Write-Output \"----OUT----\"; Write-Output $out)",
       "Bash(sed -n '109,145p' Probe/CritLift_sinwts.lean)",
       "Bash(sed -n '879,886p' Probe/Refl_consumidor.lean)",
-      "PowerShell(git -C \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\" log --oneline -25)"
+      "PowerShell(git -C \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\" log --oneline -25)",
+      "Bash(grep -n 'en `sondeos/`\\\\|quedan \\\\*\\\\*14\\\\*\\\\*\\\\|21 módulos a `cuarentena/`' REFERENCE.md)",
+      "Bash(sed -i 's|y \\\\*\\\\*10 en `sondeos/`\\\\*\\\\*|y **39 en `sondeos/`**|' REFERENCE.md)",
+      "Bash(sed -i 's|cifra histórica del momento de la|cifra histórica del momento de la|; s|reparación; hoy quedan \\\\*\\\\*14\\\\*\\\\* \\(§1.6\\)|reparación; hoy la cuarentena está **VACÍA** \\(§1.6\\)|' REFERENCE.md)",
+      "Bash(grep -n 'en `sondeos/`\\\\|cuarentena está\\\\|quedan \\\\*\\\\*14\\\\*\\\\*' REFERENCE.md)",
+      "Bash(sed -i 's|\\\\*\\\\*+10 en `sondeos/`\\\\*\\\\*|**+39 en `sondeos/`**|' CURRENT-STATUS-PROJECT.md)",
+      "Bash(sed -i 's|Build \\\\*\\\\*118 jobs\\\\*\\\\*, \\\\*\\\\*37 `sondeos/`\\\\*\\\\*,|Build **118 jobs**, **37 `sondeos/`** \\(39 tras cerrar el DESCENSO el 08‑30\\),|' CHANGELOG.md)"
     ],
     "defaultMode": "dontAsk"
   }
