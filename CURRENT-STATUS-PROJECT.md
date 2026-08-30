@@ -8,7 +8,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.28.
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 39 en `sondeos/`.**
+> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 41 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -39,7 +39,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+39 en `sondeos/`** |
+| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+41 en `sondeos/`** |
 | Modules sin sorry | 104 / 104 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |

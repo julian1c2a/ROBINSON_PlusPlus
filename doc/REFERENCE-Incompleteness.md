@@ -1704,18 +1704,58 @@ uno con obstrucción propia**, y conviene atacarlo sabiéndolo.
 `Meta/HilbertDeduction.lean`; `prf_nil_or_cons` → `Meta/ChainPrf.lean`. Nada de esto es difícil,
 pero **no es gratis** y no figuraba en ninguna estimación previa.
 
-### 3.28.6 · ▶ El paso siguiente, y el obstáculo ya localizado
+### 3.28.6 · ✅ `paso2_caso_forall` REHECHO en forma `PrfH Γ` — la hipótesis colgante desaparece
 
-Enriquecer `Paso2Ind.PHI` a `PHI_guarded` y rehacer `paso2_caso_forall`
-(`sondeos/Paso2CasoForall.lean:505`) en forma **`PrfH Γ`** con `hasWit s` en Γ: `DESCENSO_hasWit`
-descarga `hLift` y `CRIT_hasWit_lift` pasa la guarda a la HI. **Las tres piezas ya compilan.**
+`sondeos/Paso2Guardado.lean`, recompilado a mano (`EXIT=0`):
 
-⚠️ **El único obstáculo real, localizado antes de empezar**: la cadena de `paso2_caso_forall` se
-monta con `pcc_eq_trans_code` (`Meta/EvalArithPrf.lean:238`), que toma sus **dos** eslabones como
-`Prf`. Bajo `PrfH Γ`, los eslabones h3 (vía `hLift`) y h4 (vía `hIH`) **ya no son `Prf`**. Existe
-`pcc_eq_trans_code_imp` (`:309`), pero internaliza el eslabón **SEGUNDO** dejando **libre el
-primero**, y los dos Γ‑dependientes están **en medio** de la cadena. Precedente de uso bajo `PrfH`:
-`Meta/EvalNthcPrf.lean:334`.
+```lean
+theorem paso2_caso_forall_guarded (v s f : Term)
+    (hIH : Prf (Formula.impl (hasWit (liftc zero s))
+                 (provFromCode (evalSubstfcCode (succ v) (liftc zero s) f)))) :
+    Prf (Formula.impl (hasWit s) (provFromCode (evalSubstfcCode v s (forallc f))))
+```
+
+**Una sola hipótesis**: la HI legítima sobre el subcódigo `f`. `hLift` ha desaparecido —
+`DESCENSO_hasWit` la descarga desde la guarda, y `CRIT_hasWit_lift` pasa la guarda a la HI.
+Footprint **idéntico** al de `Paso2.paso2_caso_forall`, reprobado en el mismo fichero
+(`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`) ⇒ **la reescritura no añade nada**.
+Controles de no‑vacuidad: `CRIT_guarda_no_vacua` y `paso2_caso_forall_guarded_real` (sobre código
+real la guarda se descarga y queda la ecuación **pelada**).
+
+#### ⚠️ Dos correcciones a lo que decía la versión anterior de este apartado
+
+1. **El obstáculo anunciado no era tal.** Se dijo que la cadena se monta con `pcc_eq_trans_code`,
+   que toma sus dos eslabones como `Prf`, y que bajo `PrfH Γ` haría falta un helper nuevo.
+   **`PrfH_eq_trans_code` ya existía en producción** (`Meta/EvalCarcNthcPrf.lean:66`, exportado en
+   `:142`) con la firma exacta ⇒ la cadena se reescribe **1:1**. El mismo bloque trae
+   `PrfH_mp_code_apply` (`:53`) y `PrfH_leibniz_apply` (`:59`).
+2. **Trampa real y nueva: `hasWit` son DOS CONSTANTES DISTINTAS.** `DESCENSO_hasWit` habla de
+   `DescMutua.hasWit` (`DescensoLiftc.lean:1386`) y `CRIT_hasWit_lift` de `SinWTs.hasWit`
+   (`ClausuraLiftSinWTs.lean:1389`): definiciones **literalmente iguales**, constantes diferentes,
+   que Lean **no identifica en el enunciado**. Sin puente, los dos sondeos **no componen**. Cerrado
+   con `hasWit_bridge := rfl`, **net‑0** (`does not depend on any axioms`), lo que certifica que la
+   coincidencia es **definicional** y no un apaño. ⇒ para `hasWit`, los dos reconocedores ya **no**
+   están desconectados (§3.27.5 sigue valiendo para el resto).
+
+#### ⚠️ Límite de alcance
+
+El descargue de la guarda está verificado para códigos **REALES** (`CRIT_hasWit_real` da testigo
+para todo `termCodeM t`). Los **7 reflectores de `lineWF` llevan argumento ABSTRACTO** ⇒
+necesitarán `hasWit` de ese argumento abstracto para quitarse la guarda. No es un defecto de este
+teorema, pero **no está resuelto**.
+
+#### Pieza genérica de propina
+
+`sondeos/EqTransCodeImp2.lean`: `pcc_eq_trans_code_imp2 (X Y Z) (hX) : Prf (⌜X=Y⌝ ⇒ ⌜Y=Z⌝ ⇒ ⌜X=Z⌝)`
+—la transitividad interna con **ambos** eslabones como antecedentes, que no existía— y
+**`prfH_deduction`**, deducción dentro de `PrfH`, que tampoco. Resultaron **innecesarias** para el
+objetivo, pero son genéricas y reutilizables.
+
+### 3.28.7 · ▶ El paso siguiente
+
+Los **6 constructores mecánicos** restantes de `pcc_eval_substfc` (`exc` `botc` `implc` `andc`
+`orc`, más el espejo del `∀`), y después **`pcc_eval_substtc`** con la obstrucción propia de
+§3.28.4.
 
 ---
 

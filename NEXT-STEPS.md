@@ -5,23 +5,38 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑30 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 39 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 41 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
-> # 🎯 SIGUIENTE SESIÓN — **rehacer `paso2_caso_forall` en forma `PrfH Γ`**
+> # 🎯 SIGUIENTE SESIÓN — **los 6 constructores mecánicos, y luego `pcc_eval_substtc`**
 >
 > El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**).
-> ✅ **`pcc_eval_liftc` YA ESTÁ PROBADO** (2026‑08‑30, `2f27a29`) — el eslabón grande está puesto.
-> El paso siguiente está en **«▶ SIGUIENTE PASO CONCRETO»**, más abajo en este mismo documento, y
-> las tres piezas que consume ya compilan.
+> ✅ **`pcc_eval_liftc` PROBADO** (`2f27a29`) y ✅ **`paso2_caso_forall` REHECHO en forma `PrfH Γ`**
+> (2026‑08‑30) — `sondeos/Paso2Guardado.lean`:
+> ```lean
+> paso2_caso_forall_guarded (v s f) (hIH) :
+>     Prf (hasWit s ⇒ provFromCode (evalSubstfcCode v s (forallc f)))
+> ```
+> **La hipótesis colgante `hLift` DESAPARECE**: queda **una sola** hipótesis, la HI legítima sobre
+> el subcódigo `f`. Footprint **idéntico** al de `Paso2.paso2_caso_forall`, reprobado en el mismo
+> fichero ⇒ **la reescritura no añade nada**. 3 estrategias, 2 confirmadas + 1 parcial (la parcial
+> se auto‑declaró así por literalidad; sus hipótesis residuales **son** las dos piezas ya probadas).
 >
-> ⚠️ **El obstáculo, localizado antes de empezar**: la cadena de `paso2_caso_forall` se monta con
-> `pcc_eq_trans_code` (`Meta/EvalArithPrf.lean:238`), que toma sus **dos** eslabones como `Prf`;
-> bajo `PrfH Γ` los eslabones h3 (vía `hLift`) y h4 (vía `hIH`) **ya no lo son**. Existe
-> `pcc_eq_trans_code_imp` (`:309`), pero internaliza el eslabón **SEGUNDO** dejando libre el
-> primero, y los dos Γ‑dependientes están **en medio**. Precedente de uso bajo `PrfH`:
-> `Meta/EvalNthcPrf.lean:334`.
+> ⚠️ **DOS CORRECCIONES a lo que este documento decía ayer:**
+> 1. **`PrfH_eq_trans_code` YA EXISTÍA en producción** (`Meta/EvalCarcNthcPrf.lean:66`, exportado)
+>    con la firma exacta ⇒ el obstáculo que se anunciaba (`pcc_eq_trans_code` toma sus eslabones
+>    como `Prf`) **no era tal**: la cadena se reescribe **1:1**. No hacía falta helper nuevo.
+> 2. **`hasWit` son DOS CONSTANTES DISTINTAS** — `DescMutua.hasWit` (`DescensoLiftc.lean:1386`) y
+>    `SinWTs.hasWit` (`ClausuraLiftSinWTs.lean:1389`), definiciones **literalmente iguales** pero
+>    constantes diferentes que Lean **no identifica en el enunciado**. Sin puente los dos sondeos
+>    **no componen**. Cerrado con `hasWit_bridge := rfl`, **net‑0** ⇒ la coincidencia es
+>    **definicional**. Para `hasWit`, los dos reconocedores ya **no** están desconectados.
+>
+> ⚠️ **LÍMITE DE ALCANCE, que sale de la verificación y hay que tener presente aguas abajo**: el
+> descargue de la guarda está verificado para códigos **REALES** (`CRIT_hasWit_real`). Los **7
+> reflectores de `lineWF` llevan argumento ABSTRACTO** ⇒ necesitarán `hasWit` de ese argumento
+> abstracto para quitarse la guarda. No es un defecto de este teorema, pero **no está resuelto**.
 >
 > ---
 >

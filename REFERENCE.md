@@ -4,7 +4,7 @@
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 39 en `sondeos/`** (experimentos compilados, fuera del build).
+> **+ 41 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
@@ -73,7 +73,7 @@ temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo 
 REFERENCE, `AI-GUIDE.md` §0.5).
 
 **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **39 en `sondeos/`**
+`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **41 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)
@@ -267,7 +267,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-30.** Build **118 jobs**, **104 módulos activos**, **39 `sondeos/`**, 0 sorrys,
+**Estado 2026-08-30.** Build **118 jobs**, **104 módulos activos**, **41 `sondeos/`**, 0 sorrys,
 7 `axiom` de Lean.
 
 ### Lo que está cerrado

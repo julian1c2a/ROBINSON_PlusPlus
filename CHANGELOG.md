@@ -18,6 +18,46 @@
 
 ---
 
+## 2026-08-30 (b) — ✅ `paso2_caso_forall` REHECHO en `PrfH Γ`: la hipótesis colgante desaparece
+
+`sondeos/Paso2Guardado.lean` + `sondeos/EqTransCodeImp2.lean`. Build **118 jobs**, **41 `sondeos/`**.
+Proyectado en **§3.28.6**.
+
+```lean
+paso2_caso_forall_guarded (v s f) (hIH) :
+    Prf (hasWit s ⇒ provFromCode (evalSubstfcCode v s (forallc f)))
+```
+
+**Una sola hipótesis** —la HI legítima sobre el subcódigo `f`—: `hLift` ha desaparecido.
+Footprint **idéntico** al de `Paso2.paso2_caso_forall`, reprobado en el mismo fichero ⇒ **la
+reescritura no añade nada**. 3 estrategias, **2 confirmadas + 1 parcial** (la parcial se declaró
+así ella misma por literalidad del criterio: sus dos hipótesis residuales **son** `DESCENSO_hasWit`
+y `CRIT_hasWit_lift` instanciadas).
+
+### ⚠️ Dos correcciones al registro del día anterior
+
+* **El obstáculo que se anunció no era tal.** Se dijo que la cadena se monta con
+  `pcc_eq_trans_code` —que toma sus dos eslabones como `Prf`— y que bajo `PrfH Γ` haría falta un
+  helper nuevo. **`PrfH_eq_trans_code` ya existía en producción** (`Meta/EvalCarcNthcPrf.lean:66`,
+  exportado) con la firma exacta: la cadena se reescribe **1:1**. Fue trabajo dirigido a un hueco
+  inexistente, y lo detectó quien lo ejecutó, no quien lo encargó.
+* **Trampa real y nueva: `hasWit` son DOS CONSTANTES DISTINTAS** — `DescMutua.hasWit` y
+  `SinWTs.hasWit`, definiciones literalmente iguales pero constantes diferentes que Lean **no
+  identifica en el enunciado**. Sin puente, los dos sondeos **no componen**. Cerrado con
+  `hasWit_bridge := rfl`, **net‑0**, lo que certifica que la coincidencia es **definicional**.
+
+### ⚠️ Límite de alcance, declarado
+
+El descargue de la guarda está verificado para códigos **REALES**. Los **7 reflectores de `lineWF`
+llevan argumento ABSTRACTO** ⇒ necesitarán `hasWit` de ese argumento abstracto. **No resuelto.**
+
+### Piezas genéricas nuevas, aunque resultaron innecesarias
+
+`pcc_eq_trans_code_imp2` (transitividad interna con **ambos** eslabones como antecedentes) y
+`prfH_deduction` (deducción dentro de `PrfH`). Ninguna existía; se conservan por reutilizables.
+
+---
+
 ## 2026-08-30 — ✅✅ EL **DESCENSO**, CERRADO: `pcc_eval_liftc` existe
 
 Cierra el único lema que la semana 08‑24→08‑29 dejaba abierto. **Cero axiomas de Lean nuevos, cero
