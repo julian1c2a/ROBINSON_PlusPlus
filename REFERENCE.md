@@ -29,7 +29,7 @@
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
-**Last updated:** 2026-08-22 23:55 · HEAD `68fa43c` · Lean v4.31.0
+**Last updated:** 2026-08-30 · HEAD `0e577a2` · Lean v4.31.0 — los 8 constructores de `substfc` cubiertos (§3.29)
 
 > **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el

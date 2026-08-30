@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-08-23 (repatriación paso 1)
+**Last updated:** 2026-08-30 (sin cambios en el grafo: los 4 sondeos nuevos están fuera del build)
 **Author**: Julián Calderón Almendros
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.

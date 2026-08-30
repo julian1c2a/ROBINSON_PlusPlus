@@ -79,7 +79,10 @@
       "PowerShell(\\(Get-Command lake -ErrorAction SilentlyContinue\\).Source; $env:PATH -split ';' | Select-String -Pattern 'elan|lean|lake')",
       "Bash(pcc_eval_substfc)",
       "Bash(grep -n \"falta \\\\*\\\\*`pcc_eval_substfc`\\\\*\\\\*: de sus 8 constructores\" REFERENCE.md)",
-      "Bash(grep -n \"Falta \\\\`pcc_eval_substfc\\\\`: 1 de 8 constructores hecho\" CURRENT-STATUS-PROJECT.md)"
+      "Bash(grep -n \"Falta \\\\`pcc_eval_substfc\\\\`: 1 de 8 constructores hecho\" CURRENT-STATUS-PROJECT.md)",
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 80; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_medida.lean; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 60; \"EXIT=$LASTEXITCODE\")"
     ],
     "defaultMode": "dontAsk"
   }

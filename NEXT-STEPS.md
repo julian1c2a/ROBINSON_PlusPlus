@@ -9,6 +9,47 @@
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
+> # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)
+>
+> **La fase es**: cerrar el muro de `substfc` ⟶ los 7 reflectores ⟶ `hC_dot` ⟶ **D3 real** ⟶
+> **Gödel II sin `axiom d3`**. Cada eslabón está verificado en el código; los ⬜ no.
+>
+> ```
+> A · pcc_eval_substfc                                    [EN CURSO]
+>   A1 ✅ los 8 constructores, cubiertos uno a uno            §3.29
+>   A2 ⏳ EL ENSAMBLAJE — inducción fuerte, Φ conjuntivo TRIPLE + guarda
+>   A3 ⬜ la guarda sobre argumento ABSTRACTO                 ⚠️ la piden los 7 reflectores;
+>                                                             hoy sólo se descarga en códigos reales
+> B · PROMOCIÓN a Meta/  — deuda acumulada que BLOQUEA C, D y E
+>   B1 ⬜ ReflectorDesdeConsumidor + ClausuraLiftSinWTs        (prerequisito de B2)
+>   B2 ⬜ DescensoLiftc  → Meta/EvalLiftcPrf.lean
+>   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot
+>   B4 ⬜ pcc_axiom_inst4 → Meta/MpCodePrf.lean                ⚠️ el frente la pide 2 veces más
+>   B5 ⬜ pcc_eval_pred  → Meta/                               (la incondicional, no la guardada)
+>   B6 ⬜ PrfH_mono/PrfH_w1 → Meta/HilbertDeduction.lean
+>         prf_nil_or_cons  → Meta/ChainPrf.lean
+>   B7 ⬜ LIMPIEZA: borrar la pcc_eq_tracked local de EvalSubsttc
+>         (sombrea Meta/Sigma1AtomPrf.lean:246)
+> C · LOS 7 REFLECTORES de lineWF
+>   C1 ⬜ q1 q2 q3 leibniz ind qconf listInd
+>         ✅ pcc_lineWF_tracked_modulo_7 (Meta/LineWFAssemblePrf.lean) GARANTIZA que cerrar
+>            esos 7 cierra pcc_lineWF_tracked, y que no hay nada más aguas abajo
+> D · D3 REAL
+>   D1 ⬜ hC_dot — la reflexión punteada de chainOk. NO EXISTE (verificado por grep)
+>   D2 ⬜ d3_prf := d3_prf_of_chainOkDot φ hC_dot   ✅ el consumidor YA existe (Meta/D3InDotPrf)
+> E · GÖDEL II
+>   E1 ⬜ goedel_second_prf     ✅ goedel_second' YA está montado (Meta/GodelTwo.lean)
+>   E2 ⬜ F7b: retirar el `axiom d3` (Meta/GodelTwo.lean) — 7 axiomas de Lean pasan a 6
+> ```
+>
+> **FRENTE INDEPENDIENTE, no bloquea la fase**: `⊬¬G` (la mitad ausente de Gödel I).
+> ⬜ rediseño por NUMERALES de `NegVerifier` C‑F (⚠️ `canon_ne` es **FALSO**) ⟶ ⬜ `repr_neg`.
+>
+> **SIN DETERMINAR, y no rellenar con conjetura**: el puente a forma **ECUACIONAL** de la imagen
+> punteada · los **dos reconocedores** (con y sin `wTs`) siguen **DESCONECTADOS**.
+>
+> ---
+>
 > # 🎯 SIGUIENTE SESIÓN — **el ENSAMBLAJE de `pcc_eval_substfc`**
 >
 > ✅✅ **Los OCHO constructores están CUBIERTOS** (2026‑08‑30, §3.29): `botc` `implc` `andc` `orc`

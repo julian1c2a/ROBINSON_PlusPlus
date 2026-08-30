@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-08-22 23:55 (HEAD `68fa43c`)
+**Última actualización:** 2026-08-30 (HEAD `0e577a2`) — ADR-015…018; frente `substfc` por la vía de CERO axiomas
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta
