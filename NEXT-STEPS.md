@@ -5,16 +5,36 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑30 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 41 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 45 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
-> # 🎯 SIGUIENTE SESIÓN — **los 5 constructores mecánicos, y luego `pcc_eval_substtc`**
+> # 🎯 SIGUIENTE SESIÓN — **el ENSAMBLAJE de `pcc_eval_substfc`**
 >
-> ⚠️ **Corrección aritmética (2026‑08‑30)**: se escribió «6 mecánicos» a la vez que se nombraban
-> **dos** casos duros. Son **8** ecuaciones (`Minimal/Axioms.lean:498‑520`: `bottom` `atom` `eq`
-> `impl` `forall` `and` `or` `ex`), **una hecha** (`forall`) ⇒ quedan 7, de los cuales `eqc` y
-> `atomc` son los duros ⇒ **5 mecánicos**, no 6.
+> ✅✅ **Los OCHO constructores están CUBIERTOS** (2026‑08‑30, §3.29): `botc` `implc` `andc` `orc`
+> (`sondeos/SubstfcPlanos.lean`) · `exc` (`SubstfcEx.lean`) · `forallc` (`Paso2Guardado.lean`) ·
+> `eqc` y `atomc` vía `pcc_eval_substtc'`/`pcc_eval_substtsc'` (`EvalSubsttc.lean`). Todos net‑0,
+> recompilados a mano.
+>
+> ### ▶ LO QUE FALTA, en orden
+> 1. **EL ENSAMBLAJE.** Tener los ocho casos **no** es tener `pcc_eval_substfc`: falta la inducción
+>    fuerte que los junta, y **no está medida**. Es el trabajo real que queda.
+>    ⚠️ Nótese que el `Φ` tendrá que ser **conjuntivo sobre los tres sorts** (fórmula, término,
+>    lista) y llevar la **guarda** — ver el `PHI` de `EvalSubsttc.lean` (`CONJ`), que ya lo hace
+>    para dos sorts.
+> 2. **La guarda sobre argumento ABSTRACTO.** Los 7 reflectores de `lineWF` la necesitarán, y hoy
+>    sólo se sabe descargar para códigos **reales** (`CRIT_hasWit_real`).
+> 3. **La promoción a `Meta/`** (§3.28.5), con dos candidatas claras: **`pcc_axiom_inst4`** (no
+>    existe en producción y el frente la pedirá dos veces más) y **`pcc_eval_pred`** (incondicional).
+>    Y una limpieza: **borrar la `pcc_eq_tracked` local** de `EvalSubsttc.lean`, que sombrea la de
+>    producción (`Meta/Sigma1AtomPrf.lean:246`).
+>
+> ⚠️ **Dos correcciones al registro de esta misma jornada:**
+> * *Aritmética*: se escribió «6 mecánicos» nombrando a la vez **dos** casos duros. Son **8**
+>   ecuaciones, **una** hecha ⇒ 7 restantes − 2 duros = **5 mecánicos**.
+> * *De enunciado*: el encargo pedía `pcc_eval_substtc` **sin guarda**. **No es probable por esta
+>   vía** —ni ella ni `pcc_eval_liftc`—: la inducción va sobre el **VALOR** del código, luego hace
+>   falta que `t` sea código de término (`isTC1 w t`). **El encargo estaba mal pedido.**
 >
 > El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**).
 > ✅ **`pcc_eval_liftc` PROBADO** (`2f27a29`) y ✅ **`paso2_caso_forall` REHECHO en forma `PrfH Γ`**

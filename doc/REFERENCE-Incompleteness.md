@@ -1765,4 +1765,116 @@ Los **5 constructores mecánicos** restantes de `pcc_eval_substfc` (`botc` `impl
 
 ---
 
+## §3.29 · LOS OCHO CONSTRUCTORES DE `substfc`, CUBIERTOS (2026‑08‑30)
+
+Cuatro sondeos nuevos, **todos net‑0**, recompilados a mano desde su ubicación final (`EXIT=0`),
+build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
+matemática — es por un **hallazgo falso** que el verificador cazó (§3.29.5).
+
+⚠️ **Cubiertos ≠ ensamblado.** Tener los ocho casos **no** es tener `pcc_eval_substfc`: falta la
+inducción que los junta. Y todo vive en `sondeos/`, con el coste de promoción de §3.28.5 sin pagar.
+
+### 3.29.1 · El cuadro completo
+
+| # | constructor | estado | dónde |
+|--:|---|---|---|
+| 2 | `botc` | ✅ nulario, 4 eslabones | `sondeos/SubstfcPlanos.lean` |
+| 5,7,8 | `implc` `andc` `orc` | ✅ **una prueba, no tres** | `sondeos/SubstfcPlanos.lean` |
+| 6 | `forallc` | ✅ (2026‑08‑29/30) | `sondeos/Paso2CasoForall.lean` · `Paso2Guardado.lean` |
+| 9 | `exc` | ✅ espejo **perfecto**, factorizado | `sondeos/SubstfcEx.lean` |
+| 4 | `eqc` | ✅ vía `pcc_eval_substtc'` | `sondeos/EvalSubsttc.lean` |
+| 3 | `atomc` | ✅ vía `pcc_eval_substtsc'` | `sondeos/EvalSubsttc.lean` |
+
+### 3.29.2 · 🔑 Los tres binarios son **la misma fórmula salvo el tag** — y se certifica por `rfl`
+
+```lean
+def AXBIN_BODY (T : Term) : Formula :=
+  substfc #3 #2 (binct T #1 #0) =eq binct T (substfc #3 #2 #1) (substfc #3 #2 #0)
+theorem AXBIN_impl : ax_substfc_impl = forall_4 (AXBIN_BODY (numeralM 5)) := rfl
+theorem AXBIN_and  : ax_substfc_and  = forall_4 (AXBIN_BODY (numeralM 7)) := rfl
+theorem AXBIN_or   : ax_substfc_or   = forall_4 (AXBIN_BODY (numeralM 8)) := rfl
+```
+
+⇒ se factorizan en `pcc_substfc_bin_dot` (genérico en la etiqueta como `Term` abstracto) y
+`paso2_caso_bin` (genérico en `k : Nat`); los tres casos finales son **cuatro líneas cada uno**. El
+ensamblaje sale genérico **gratis** porque `binT`, `pcc_dot_bin`, `pcc_dot_bin_symm` y
+`pcc_congr_binT_1/2_code` **ya son paramétricos en `k`** en producción.
+
+### 3.29.3 · 🔑 La técnica que lo hizo posible, y vale fuera de aquí
+
+Con la etiqueta abstracta, `substCodeF 3 W₃ (AXBIN_BODY T)` reduce definicionalmente **entero salvo
+una hoja**: `substCodeT 3 W₃ T`. En vez de pelearse con `simp only` sobre `substCodeF`, se enuncia
+el `have` **dejando esa hoja sin evaluar** —puro defeq, cero tácticas— y después **una sola línea**,
+`rw [substCodeT_closed 3 W₃ T hT]`, la convierte en `termCode T`.
+
+> **Receta**: cuando un parámetro bloquea la reducción **en una sola hoja**, enuncia el `have` con
+> la hoja bloqueada y reescríbela luego. **No intentes normalizar el término entero.**
+
+Es hermana de las ideas #2 y #3 de §3.27.4: en las tres, el ahorro viene de **no desplegar** lo que
+no hace falta desplegar.
+
+### 3.29.4 · `pcc_eval_substtc` — cerrado, **con guarda**, y el encargo estaba mal pedido
+
+```lean
+pcc_eval_substtc'  (w v s t) (h : Prf (isTC1 w t)) :
+    Prf (provFromCode (eqc (substtcT v̇ ṡ ṫ) (tcFn (substtc v s t))))
+pcc_eval_substtsc' (w v s t) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w t)) : …
+pcc_eval_substtc_hasWit' (v s t) : Prf (hasWit t ⇒ targetSubsttc v s t)
+```
+
+⚠️ La forma **sin guarda** que pedía el encargo **no está probada, y no es probable por esta vía** —
+ni ella ni su gemela `pcc_eval_liftc`. **El encargo estaba mal pedido, no el teorema mal probado**:
+la inducción es sobre el **VALOR** del código (`prf_strong_induction`), así que para descender hace
+falta que `t` sea de verdad un código de término, y eso es exactamente lo que dice `isTC1 w t`.
+
+**Las dos obstrucciones de §3.28.4, resueltas:**
+* **La tricotomía** sale por **or‑elim EXTERNO** (`Prf₀.j3`), no interno. Producción **sí** tiene
+  or‑elim interno (`pcc_or_elim_code`, `Meta/PropCodePrf.lean:112`) pero **no hizo falta**.
+* **El `pred` dotado**: `PredHyp` **declarada y descargada** (`predHyp`), vía
+  `prf_lt_iff` → `prf_add_succ_t` → `ax26_pred_succ` dentro de `Prov`, **sin inducción**.
+
+**Empalme**: `isTC1`, `wfAll1`, `argsIn`, `isTermCodeE1`, `shapeUn/Bin`, `consOk` son **idénticas**
+a las de `DescensoLiftc.lean` (verificado def a def) ⇒ **el mismo testigo sirve para las dos
+evaluaciones**, y los controles adversariales de aquel fichero valen tal cual.
+
+### 3.29.5 · Lo que el paso adversarial cazó — y por qué el `PARCIAL`
+
+El verificador de `substtc` no se fió del «los controles valen tal cual»: montó su **propio**
+fichero de auditoría y compiló los testigos. Resultado: la matemática, **confirmada entera**
+(no vacua sobre `termCodeM t` con `v`/`s` abstractos; guarda **refutable** con código de fórmula y
+testigo abierto ⇒ no es un `⊥ ⇒ …`; siete controles negativos `fail_if_success`).
+
+⛔ **Pero uno de los nueve hallazgos era FALSO**: `pcc_eq_tracked` **ya existe** en producción
+(`Meta/Sigma1AtomPrf.lean:246`), con enunciado idéntico y ya consumido en
+`Meta/InAxiomsCodePrf.lean:220`. La copia local lo **sombrea** — la trampa registrada de «misma
+definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al lado de
+`pcc_lt_tracked`») habría creado una **tercera** copia. **Lo correcto es borrar la local.**
+⇒ el `PARCIAL` es exacto: no degrada la prueba, y evita mandar trabajo a la basura.
+
+### 3.29.6 · Piezas nuevas, y el arbitraje entre dos agentes
+
+* ⚠️ **`pcc_axiom_inst4` NO existía**: producción llega sólo a `pcc_axiom_inst3`
+  (`Meta/MpCodePrf.lean:243`) y los tres binarios son `forall_4`. **Dos agentes la escribieron por
+  separado.** Es **candidata clara a promoción**: `ax_substfc_atom` y `ax_substfc_eq` también son
+  `forall_4`, o sea que el frente la volverá a necesitar dos veces más.
+* **`pred` dotado — dos versiones, y la comparación importa**: `EvalPredDot.lean` prueba
+  `pcc_eval_pred (n)` **incondicional** para `n` abstracto (por inducción);
+  `EvalSubsttc.lean` prueba `predHyp`, **guardada** por `lt v n`, sin inducción. El segundo agente
+  declaró que el primero era «innecesario»: **es media verdad** — para *su* uso sí, pero la
+  incondicional es **estrictamente más fuerte** y es la que vale la pena promover.
+* **Piezas que resultaron innecesarias** (útil para no arrastrarlas): de las congruencias internas
+  de `Paso2CasoForall` §4 sólo hace falta **`arg3`**; en los casos planos no interviene nada de
+  §7‑§9, ni `succcT`, ni `unT`, ni `liftcT`, ni el kit de `liftfcT`/`liftscT`.
+
+### 3.29.7 · ▶ Lo que queda
+
+1. **El ENSAMBLAJE**: la inducción fuerte que junta los ocho casos en `pcc_eval_substfc`. Es lo que
+   falta de verdad, y no está medido.
+2. **La guarda sobre argumento ABSTRACTO** (§3.28.6): los 7 reflectores de `lineWF` la necesitarán,
+   y hoy sólo se sabe descargar para códigos reales.
+3. **Promoción a `Meta/`**: sigue sin pagarse (§3.28.5), y ahora con dos candidatas claras
+   (`pcc_axiom_inst4`, `pcc_eval_pred`) y una limpieza pendiente (borrar la `pcc_eq_tracked` local).
+
+---
+
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)

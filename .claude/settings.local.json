@@ -69,7 +69,17 @@
       "Bash(sed -i 's|cifra histórica del momento de la|cifra histórica del momento de la|; s|reparación; hoy quedan \\\\*\\\\*14\\\\*\\\\* \\(§1.6\\)|reparación; hoy la cuarentena está **VACÍA** \\(§1.6\\)|' REFERENCE.md)",
       "Bash(grep -n 'en `sondeos/`\\\\|cuarentena está\\\\|quedan \\\\*\\\\*14\\\\*\\\\*' REFERENCE.md)",
       "Bash(sed -i 's|\\\\*\\\\*+10 en `sondeos/`\\\\*\\\\*|**+39 en `sondeos/`**|' CURRENT-STATUS-PROJECT.md)",
-      "Bash(sed -i 's|Build \\\\*\\\\*118 jobs\\\\*\\\\*, \\\\*\\\\*37 `sondeos/`\\\\*\\\\*,|Build **118 jobs**, **37 `sondeos/`** \\(39 tras cerrar el DESCENSO el 08‑30\\),|' CHANGELOG.md)"
+      "Bash(sed -i 's|Build \\\\*\\\\*118 jobs\\\\*\\\\*, \\\\*\\\\*37 `sondeos/`\\\\*\\\\*,|Build **118 jobs**, **37 `sondeos/`** \\(39 tras cerrar el DESCENSO el 08‑30\\),|' CHANGELOG.md)",
+      "PowerShell($sw=[Diagnostics.Stopwatch]::StartNew\\(\\); lake env lean Probe\\\\SF_ex.lean > \"$env:TEMP\\\\sfex.txt\" 2>&1; $code=$LASTEXITCODE; $sw.Stop\\(\\); \"EXIT: $code  ELAPSED: $\\($sw.Elapsed\\)\"; Select-String -Path \"$env:TEMP\\\\sfex.txt\" -Pattern \"error\" -Context 0,10 | Select-Object -First 30)",
+      "PowerShell($t = Get-Content \"$env:TEMP\\\\sfex.txt\" -Raw; $i = $t.IndexOf\\(\"'Paso2.unc6'\"\\); $j = $t.IndexOf\\(\"ROBINSON_PlusPlus.Minimal.Axioms.forall_3 \\(Paso2.AXBODY m\\)\"\\); $t.Substring\\($i, $j-$i\\))",
+      "PowerShell($sw=[Diagnostics.Stopwatch]::StartNew\\(\\); lake env lean Probe\\\\SF_ex.lean > \"$env:TEMP\\\\sfex.txt\" 2>&1; $code=$LASTEXITCODE; $sw.Stop\\(\\); \"EXIT: $code  ELAPSED: $\\($sw.Elapsed\\)\"; Select-String -Path \"$env:TEMP\\\\sfex.txt\" -Pattern \"error\" -Context 0,10 | Select-Object -First 20; \"--- MedBin ---\"; Select-String -Path \"$env:TEMP\\\\sfex.txt\" -Pattern \"MedBin\")",
+      "PowerShell(lake env lean Probe\\\\SF_substtc.lean 2>&1 | Out-String -Width 200 | Set-Content -Path \"C:\\\\msys64\\\\tmp\\\\claude\\\\e--dropbox-github-lean4-ROBINSON-PlusPlus\\\\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\\\\scratchpad\\\\ax2.txt\"; Write-Output \"EXIT=$LASTEXITCODE\"; Get-Content \"C:\\\\msys64\\\\tmp\\\\claude\\\\e--dropbox-github-lean4-ROBINSON-PlusPlus\\\\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\\\\scratchpad\\\\ax2.txt\" | Select-String -Pattern \"predHyp|pcc_eval_substtc'|pcc_eval_substtsc'|pcc_eval_substtc_hasWit'|pcc_pred_succ_code\" -Context 0,4)",
+      "PowerShell(lake env lean Probe\\\\SF_substtc.lean 2>&1 | Out-String -Width 160 | Set-Content -Path \"C:\\\\msys64\\\\tmp\\\\claude\\\\e--dropbox-github-lean4-ROBINSON-PlusPlus\\\\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\\\\scratchpad\\\\final.txt\"; Write-Output \"EXIT=$LASTEXITCODE\"; Get-Content \"C:\\\\msys64\\\\tmp\\\\claude\\\\e--dropbox-github-lean4-ROBINSON-PlusPlus\\\\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\\\\scratchpad\\\\final.txt\" | Select-Object -Last 40)",
+      "PowerShell($sw=[System.Diagnostics.Stopwatch]::StartNew\\(\\); & lake env lean \"Probe\\\\SF_ex_AUDIT.lean\" 2>&1 | Select-String -Pattern 'AUDIT|error|sorry' | ForEach-Object { $_.Line }; $c=$LASTEXITCODE; $sw.Stop\\(\\); \"EXIT: $c\"; \"ELAPSED $\\($sw.Elapsed\\)\")",
+      "PowerShell(\\(Get-Command lake -ErrorAction SilentlyContinue\\).Source; $env:PATH -split ';' | Select-String -Pattern 'elan|lean|lake')",
+      "Bash(pcc_eval_substfc)",
+      "Bash(grep -n \"falta \\\\*\\\\*`pcc_eval_substfc`\\\\*\\\\*: de sus 8 constructores\" REFERENCE.md)",
+      "Bash(grep -n \"Falta \\\\`pcc_eval_substfc\\\\`: 1 de 8 constructores hecho\" CURRENT-STATUS-PROJECT.md)"
     ],
     "defaultMode": "dontAsk"
   }

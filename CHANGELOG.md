@@ -18,6 +18,64 @@
 
 ---
 
+## 2026-08-30 (c) — ✅✅ LOS **OCHO** CONSTRUCTORES DE `substfc`, CUBIERTOS
+
+Cuatro sondeos nuevos, **todos net‑0**, recompilados a mano desde su ubicación final (`EXIT=0`),
+build de producción intacto (**118 jobs**, **45 `sondeos/`**). **3 CONFIRMADOS + 1 PARCIAL** — y el
+`PARCIAL` no es por la matemática, sino por un **hallazgo falso** que el verificador cazó.
+Proyectado en **§3.29**.
+
+| constructor | dónde |
+|---|---|
+| `botc` `implc` `andc` `orc` | `sondeos/SubstfcPlanos.lean` |
+| `exc` (espejo del `∀`) | `sondeos/SubstfcEx.lean` |
+| `eqc` · `atomc` | `sondeos/EvalSubsttc.lean` (`pcc_eval_substtc'` / `pcc_eval_substtsc'`) |
+| `pred` dotado | `sondeos/EvalPredDot.lean` |
+
+⚠️ **CUBIERTOS ≠ ENSAMBLADO.** Tener los ocho casos **no** es tener `pcc_eval_substfc`: falta la
+inducción que los junta, y no está medida. Todo vive en `sondeos/`.
+
+### 🔑 Los tres binarios son la misma fórmula salvo el tag — y se certifica por `rfl`
+
+`ax_substfc_impl/_and/_or = forall_4 (AXBIN_BODY (numeralM 5/7/8))`, los tres por `rfl`. ⇒ **una
+prueba en vez de tres**, factorizada en `pcc_substfc_bin_dot` (genérico en la etiqueta) y
+`paso2_caso_bin` (genérico en `k : Nat`); los tres casos finales son cuatro líneas cada uno. El
+ensamblaje sale genérico **gratis** porque `binT`/`pcc_dot_bin`/`pcc_congr_binT_*_code` ya son
+paramétricos en `k` en producción.
+
+### 🔑 La técnica, reutilizable fuera de aquí
+
+Cuando un parámetro bloquea la reducción **en una sola hoja**, enuncia el `have` **con la hoja sin
+evaluar** —puro defeq, cero tácticas— y reescríbela después con una línea. **No intentes normalizar
+el término entero.** Es hermana de las ideas #2 y #3 de §3.27.4: el ahorro viene de **no desplegar**.
+
+### ⚠️ `pcc_eval_substtc` va CON GUARDA, y el encargo estaba mal pedido
+
+La forma **sin guarda** que pedía el encargo **no está probada y no es probable por esta vía** — ni
+ella ni su gemela `pcc_eval_liftc`. La inducción es sobre el **VALOR** del código, luego para
+descender hace falta que `t` sea de verdad código de término: eso es `isTC1 w t`. **El enunciado
+del encargo era el defectuoso, no la prueba.** Las dos obstrucciones de §3.28.4 quedan resueltas: la
+**tricotomía** por or‑elim **EXTERNO** (`Prf₀.j3`; el interno existe pero no hizo falta) y el `pred`
+dotado (`predHyp` **declarada y descargada**, sin inducción).
+
+### ⛔ Lo que cazó el paso adversarial
+
+De nueve hallazgos, **uno era FALSO**: `pcc_eq_tracked` **ya existe** en producción
+(`Meta/Sigma1AtomPrf.lean:246`, enunciado idéntico, ya consumido en `InAxiomsCodePrf.lean:220`); la
+copia local lo **sombrea**. Actuar sobre el hallazgo habría creado una **tercera** copia. Es la
+trampa registrada de «misma definición en dos namespaces». Verificado por mí contra producción.
+
+### Piezas nuevas y un arbitraje
+
+* **`pcc_axiom_inst4` no existía** (producción llega a `pcc_axiom_inst3`, `Meta/MpCodePrf.lean:243`)
+  y **dos agentes la escribieron por separado**. Candidata clara a promoción: `ax_substfc_atom` y
+  `ax_substfc_eq` también son `forall_4`.
+* **`pred` dotado, dos versiones**: `EvalPredDot` la prueba **incondicional** para `n` abstracto;
+  `EvalSubsttc` prueba una **guardada** por `lt v n` y declaró la otra «innecesaria». **Es media
+  verdad**: para su uso sí, pero la incondicional es **estrictamente más fuerte**.
+
+---
+
 ## 2026-08-30 (b) — ✅ `paso2_caso_forall` REHECHO en `PrfH Γ`: la hipótesis colgante desaparece
 
 `sondeos/Paso2Guardado.lean` + `sondeos/EqTransCodeImp2.lean`. Build **118 jobs**, **41 `sondeos/`**.
