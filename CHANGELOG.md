@@ -88,7 +88,7 @@ DESCENSO_hasWit (s : Term)   : Prf (hasWit s ⇒ targetLift s)          -- la fo
 
 ### ⚠️ Dónde está el siguiente muro — y no es donde se miraba
 
-De los **8** constructores de `substfc` sólo existe `pcc_substfc_forall_dot`. Seis de los siete
+De los **8** constructores de `substfc` sólo existe `pcc_substfc_forall_dot`. **CINCO** de los siete
 restantes son **mecánicos**; los distintos son `eqc` y `atomc`. Y **`pcc_eval_substtc` es
 estrictamente MÁS DURO que el DESCENSO**, por dos razones verificadas en el código: la guarda de
 `liftc` era **cerrada** (`liftc zero` ⇒ `zero < σn`, se descarga de una vez) mientras

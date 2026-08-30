@@ -243,8 +243,10 @@ los ficheros `.lean` que documenta. El subsistema **activo** es
 el reflector completo, el testigo para toda fórmula, la clausura bajo `liftc` y —desde el
 2026‑08‑30— el **`DESCENSO` PROBADO**, que **es** `pcc_eval_liftc` (§3.28.1). El `PHI_guarded` del
 consumidor **pasa el gate** de `prf_strong_induction` sin binder nuevo.
-⚠️ El siguiente muro **no** son «siete casos más como el `∀`»: son seis mecánicos y
-**`pcc_eval_substtc`**, que es **estrictamente más duro** (§3.28.4). Ver §5.
+⚠️ El siguiente muro **no** son «siete casos más como el `∀`»: son **cinco mecánicos**
+(`botc` `implc` `andc` `orc` `exc`) y **dos con obstrucción propia** — `eqc`, que pide
+**`pcc_eval_substtc`**, y `atomc`, que pide `pcc_eval_substtsc`; el primero es **estrictamente más
+duro** que el DESCENSO (§3.28.4). Ver §5.
 
 ⚠️ **§3.15–§3.23 son ANTERIORES a la reparación** (ADR‑012/013). Lo que dicen de la capa rastreada
 describe fielmente el código de `cuarentena/`, pero **ese código no está en el build** y sus
@@ -283,7 +285,7 @@ Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-L
 
 | # | frente | estado | qué lo bloquea |
 |--:|---|---|---|
-| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` existe, net‑0 y en forma OBJETO. ✅ **La decisión ya está tomada: vía (2), CERO axiomas** ([ADR‑015](DECISIONS.md)) ⇒ la objeción de conservatividad **dejó de aplicar**. ✅ Partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** (§3.28) | falta **`pcc_eval_substfc`**: de sus 8 constructores, uno hecho, **seis mecánicos** y **`pcc_eval_substtc`**, que es **estrictamente más duro** (tricotomía con `v` abstracto dentro de `Prov`; `pred` dotado inexistente) — §3.28.4 |
+| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` existe, net‑0 y en forma OBJETO. ✅ **La decisión ya está tomada: vía (2), CERO axiomas** ([ADR‑015](DECISIONS.md)) ⇒ la objeción de conservatividad **dejó de aplicar**. ✅ Partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** (§3.28) | falta **`pcc_eval_substfc`**: de sus 8 constructores, uno hecho, **cinco mecánicos** y **DOS duros** (`pcc_eval_substtc` para `eqc`, `pcc_eval_substtsc` para `atomc`), que es **estrictamente más duro** (tricotomía con `v` abstracto dentro de `Prov`; `pred` dotado inexistente) — §3.28.4 |
 | **2** | **`NegVerifier`** → `⊬¬G` | ⛔ el paso 1.1 del plan (`canon_ne`) es **FALSO** y reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ La salida por **numerales** está verificada y es **net‑0** (`sondeos/CodeNatInj.lean`: `consN_inj` → `codeNat_inj` → `codeNat_ne`) | elegir la **representación numeral de las LÍNEAS** y rediseñar los módulos C y D |
 | **3** | **recodificar símbolos por índice** | 📏 medido (`sondeos/RecodCoste.lean`): el **98‑99 %** del `formCode` de los axiomas del verificador son los nombres de símbolos (`ax_tc_zero`: 49 015 → ~708 nodos, **69×**). Pero **hoy no es cuello de botella** | nada. ⚠️ Una tabla pura **no es total** (`Term.func` toma String arbitrario) ⇒ codificación **etiquetada**. Coste: ~10 teoremas en 4 módulos, uno `CodeDecode` (completo) |
 

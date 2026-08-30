@@ -9,7 +9,12 @@
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
-> # 🎯 SIGUIENTE SESIÓN — **los 6 constructores mecánicos, y luego `pcc_eval_substtc`**
+> # 🎯 SIGUIENTE SESIÓN — **los 5 constructores mecánicos, y luego `pcc_eval_substtc`**
+>
+> ⚠️ **Corrección aritmética (2026‑08‑30)**: se escribió «6 mecánicos» a la vez que se nombraban
+> **dos** casos duros. Son **8** ecuaciones (`Minimal/Axioms.lean:498‑520`: `bottom` `atom` `eq`
+> `impl` `forall` `and` `or` `ex`), **una hecha** (`forall`) ⇒ quedan 7, de los cuales `eqc` y
+> `atomc` son los duros ⇒ **5 mecánicos**, no 6.
 >
 > El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**).
 > ✅ **`pcc_eval_liftc` PROBADO** (`2f27a29`) y ✅ **`paso2_caso_forall` REHECHO en forma `PrfH Γ`**

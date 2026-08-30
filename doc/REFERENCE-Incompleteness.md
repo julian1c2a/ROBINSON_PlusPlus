@@ -1681,7 +1681,7 @@ El fichero incluye además el control negativo de que la guarda **no es decorati
 ### 3.28.4 · ⚠️ Dónde está el siguiente muro — y **no es donde se miraba**
 
 De los **8** constructores de `substfc` sólo está hecho `pcc_substfc_forall_dot`
-(`Paso2CasoForall.lean:282`). Seis de los siete restantes son **mecánicos**. Los distintos son
+(`Paso2CasoForall.lean:282`). **CINCO** de los siete restantes son **mecánicos** (`botc` `implc` `andc` `orc` `exc`). Los DOS distintos son
 `eqc` y `atomc`, que recurren a `substtc`/`substtsc` (ya lo anticipaba `ec_objeto_eq`, `:662`:
 *«el `substfc` recurre a `substtc` ⇒ el teorema es MUTUO»*).
 
@@ -1693,8 +1693,14 @@ código y no conjeturadas:
 | **la guarda** | **CERRADA**: `liftc zero` ⇒ la condición es `zero < σn`, se descarga **de una vez** | **ABIERTA**: `substtc v s (varc n)` tiene **tres** cláusulas guardadas (`<`, `=`, `>`) con **`v` abstracto** ⇒ hay que reflejar la **tricotomía DENTRO de `Prov`** |
 | **la salida** | se mantiene en el mismo vocabulario | `ax_substtc_var_gt` devuelve **`varc (pred n)`** ⇒ pide la evaluación **dotada de `pred`**, que **no existe** |
 
-⇒ el trabajo pendiente del frente **no** es «siete casos más como el `∀`»: son **seis mecánicos y
-uno con obstrucción propia**, y conviene atacarlo sabiéndolo.
+⇒ el trabajo pendiente del frente **no** es «siete casos más como el `∀`»: son **CINCO mecánicos**
+(`botc` nulario, `implc`/`andc`/`orc` binarios sin `liftc`, y `exc` que es el **espejo** del `∀` ya
+hecho) **y DOS con obstrucción propia** (`eqc` y `atomc`). Conviene atacarlo sabiéndolo.
+
+⚠️ **Corrección aritmética (2026‑08‑30)**: la primera redacción de este apartado decía «seis de los
+siete restantes son mecánicos» a la vez que nombraba **dos** como distintos — 7 − 2 = **5**, no 6.
+Contado contra la fuente (`Minimal/Axioms.lean:498‑520`, las ocho `ax_substfc_*`): `bottom` `atom`
+`eq` `impl` `forall` `and` `or` `ex`.
 
 ### 3.28.5 · 💰 Coste de promoción (medido, no estimado)
 
@@ -1753,7 +1759,7 @@ objetivo, pero son genéricas y reutilizables.
 
 ### 3.28.7 · ▶ El paso siguiente
 
-Los **6 constructores mecánicos** restantes de `pcc_eval_substfc` (`exc` `botc` `implc` `andc`
+Los **5 constructores mecánicos** restantes de `pcc_eval_substfc` (`botc` `implc` `andc`
 `orc`, más el espejo del `∀`), y después **`pcc_eval_substtc`** con la obstrucción propia de
 §3.28.4.
 
