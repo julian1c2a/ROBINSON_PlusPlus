@@ -1,6 +1,6 @@
 # ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-30 · frente `substfc`: los 8 constructores CUBIERTOS (vía CERO axiomas)
+> ## ESTADO REAL — 2026-08-31 · frente `substfc`: 6 de 8 constructores montados (vía CERO axiomas)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).

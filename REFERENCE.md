@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-30 · frente `substfc`: los 8 constructores CUBIERTOS (vía CERO axiomas)
+> ## ESTADO REAL — 2026-08-31 · frente `substfc`: 6 de 8 constructores montados (vía CERO axiomas)
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
@@ -287,7 +287,7 @@ Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-L
 
 | # | frente | estado | qué lo bloquea |
 |--:|---|---|---|
-| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` existe, net‑0 y en forma OBJETO. ✅ **La decisión ya está tomada: vía (2), CERO axiomas** ([ADR‑015](DECISIONS.md)) ⇒ la objeción de conservatividad **dejó de aplicar**. ✅ Partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** (§3.28) | ✅ **los 8 constructores CUBIERTOS** (§3.29). ⚠️ Falta el **ENSAMBLAJE** (la inducción que los junta, sin medir), la guarda sobre argumento **ABSTRACTO** que pedirán los 7 reflectores, y la **promoción a `Meta/`** (§3.28.5) |
+| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` existe, net‑0 y en forma OBJETO. ✅ **La decisión ya está tomada: vía (2), CERO axiomas** ([ADR‑015](DECISIONS.md)) ⇒ la objeción de conservatividad **dejó de aplicar**. ✅ Partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** (§3.28) | ⚠️ **SEIS de los 8 montados** (§3.29; `eqc`/`atomc` sólo tienen sus ingredientes). ⚠️ Falta el **ENSAMBLAJE** (la inducción que los junta, sin medir), la guarda sobre argumento **ABSTRACTO** que pedirán los 7 reflectores, y la **promoción a `Meta/`** (§3.28.5) |
 | **2** | **`NegVerifier`** → `⊬¬G` | ⛔ el paso 1.1 del plan (`canon_ne`) es **FALSO** y reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ La salida por **numerales** está verificada y es **net‑0** (`sondeos/CodeNatInj.lean`: `consN_inj` → `codeNat_inj` → `codeNat_ne`) | elegir la **representación numeral de las LÍNEAS** y rediseñar los módulos C y D |
 | **3** | **recodificar símbolos por índice** | 📏 medido (`sondeos/RecodCoste.lean`): el **98‑99 %** del `formCode` de los axiomas del verificador son los nombres de símbolos (`ax_tc_zero`: 49 015 → ~708 nodos, **69×**). Pero **hoy no es cuello de botella** | nada. ⚠️ Una tabla pura **no es total** (`Term.func` toma String arbitrario) ⇒ codificación **etiquetada**. Coste: ~10 teoremas en 4 módulos, uno `CodeDecode` (completo) |
 

@@ -1765,7 +1765,24 @@ Los **5 constructores mecánicos** restantes de `pcc_eval_substfc` (`botc` `impl
 
 ---
 
-## §3.29 · LOS OCHO CONSTRUCTORES DE `substfc`, CUBIERTOS (2026‑08‑30)
+## §3.29 · LOS CONSTRUCTORES DE `substfc` (2026‑08‑30)
+
+> ## ⛔ CORRECCIÓN 2026‑08‑31 — **son SEIS, no ocho**
+>
+> Este apartado se tituló «los OCHO constructores, cubiertos». **Es falso, y el error es mío.**
+> Verificado por grep sobre todo el árbol: los casos montados sobre `evalSubstfcCode` son
+> `paso2_caso_bottom`, `paso2_caso_bin` (que cubre `implc`/`andc`/`orc`), `paso2_caso_forall` y
+> `paso2_caso_ex_guarded` ⇒ **`botc` `implc` `andc` `orc` `forallc` `exc` = SEIS**.
+> **`eqc`(4) y `atomc`(3) NO están montados en ningún sitio** (`paso2_caso_eq`/`paso2_caso_atom`:
+> **0 hits**).
+>
+> **El error de razonamiento**: conté como «caso cubierto» lo que sólo era su **INGREDIENTE**.
+> `pcc_eval_substtc'` y `pcc_eval_substtsc'` existen, son net‑0 y son correctos — pero están
+> enunciados sobre `substtc`/`substtsc`, **no sobre `evalSubstfcCode`**. Montarlos es un paso
+> aparte, y es trabajo real.
+>
+> Lo detectaron **dos agentes del ensamblaje por separado**, y lo confirmé yo por grep.
+> Los apartados de abajo son correctos salvo por esa cuenta.
 
 Cuatro sondeos nuevos, **todos net‑0**, recompilados a mano desde su ubicación final (`EXIT=0`),
 build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
