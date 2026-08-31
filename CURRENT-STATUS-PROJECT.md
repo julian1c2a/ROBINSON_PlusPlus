@@ -1,14 +1,14 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-31 · frente `substfc`: 6 de 8 constructores montados (vía CERO axiomas)
+> ## ESTADO REAL — 2026-08-31 · 🏁 el MURO DE `substfc` está ROTO (vía CERO axiomas)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.29.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.30.
 >
 > **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 45 en `sondeos/`.**
+> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/` + 48 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-08-30 — los 8 constructores de `substfc` cubiertos; falta el ENSAMBLAJE
+**Last updated:** 2026-08-31 — 🏁 `pcc_eval_substfc` probado; falta sólo su control de no-vacuidad
 **Author**: Julián Calderón Almendros
 
 ---
@@ -39,7 +39,7 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+45 en `sondeos/`** |
+| Total modules | **104 activos** (Minimal/ 11 + Meta/ 82 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+48 en `sondeos/`** |
 | Modules sin sorry | 104 / 104 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |
@@ -49,7 +49,7 @@
 | Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, **módulo `axiom d3`**. **D3 está FUERA de la cadena activa** (la capa rastreada está en `cuarentena/`): se recupera repatriando las raíces que quedan (7 a 2026-08-23), y el habilitador (`pcc_dot_cons`, escalera a.2) ya está ✅. Ver `NEXT-STEPS.md` |
 | Build status | ✅ Passing (**118 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-30) |
 | `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `CodeDecode` (biyección `decodeForm` + inyectividad) + `ChainDecode` (`decodeChain_prf`). **Módulo B** (`LineWFCases`, 21 tags) ✅. ⛔ **Módulos C‑F BLOQUEADOS por un paso FALSO del plan**: `canon_ne` reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ Salida por **numerales** verificada y net‑0 (`sondeos/CodeNatInj.lean`) |
-| D3 / plan 12‑A | ✅ **Fases 1a/1b/2/3 completas y la cuarentena VACÍA.** D3 reducida a **UN SOLO lema**: `d3_prf_of_chainOkDot (φ) (hC)` — sólo pide `hC_dot`. Y `pcc_lineWF_tracked_modulo_7` verifica que eso es **exactamente** cerrar los **7 reflectores** que faltan. ⚠️ Esos 7 son el **muro de `substfc`**: necesitan `pcc_eval_substfc`. ✅ **La decisión NO está pendiente**: desde [ADR‑015](DECISIONS.md) va por la **vía de CERO axiomas** (no se sanciona `isFormCode`). Hecho ya: partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** ([ADR‑018](DECISIONS.md), §3.28). ⚠️ **SEIS de los ocho montados** (§3.29, corregido el 08‑31): `botc` `implc` `andc` `orc` `forallc` `exc`. **`eqc` y `atomc` NO están montados** sobre `evalSubstfcCode`; existen sus INGREDIENTES (`pcc_eval_substtc'`/`pcc_eval_substtsc'`, net‑0) pero montarlos es paso aparte. ⚠️ **Cubiertos ≠ ensamblado**: falta la inducción que los junta (sin medir), la guarda sobre argumento **ABSTRACTO** que pedirán los 7 reflectores, y todo vive en `sondeos/` con la promoción a `Meta/` sin pagar |
+| D3 / plan 12‑A | ✅ **Fases 1a/1b/2/3 completas y la cuarentena VACÍA.** D3 reducida a **UN SOLO lema**: `d3_prf_of_chainOkDot (φ) (hC)` — sólo pide `hC_dot`. Y `pcc_lineWF_tracked_modulo_7` verifica que eso es **exactamente** cerrar los **7 reflectores** que faltan. ⚠️ Esos 7 son el **muro de `substfc`**: necesitan `pcc_eval_substfc`. ✅ **La decisión NO está pendiente**: desde [ADR‑015](DECISIONS.md) va por la **vía de CERO axiomas** (no se sanciona `isFormCode`). Hecho ya: partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** ([ADR‑018](DECISIONS.md), §3.28). 🏁 **`pcc_eval_substfc` PROBADO** (2026‑08‑31, §3.30): CONFIRMADO por verificación adversarial, footprint = la base sancionada. ⚠️ Falta **sólo** su control de no‑vacuidad (`prf_hasWitF_real`); la mitad difícil (que la guarda DISCRIMINA) ya está probada. ⚠️ **Cubiertos ≠ ensamblado**: falta la inducción que los junta (sin medir), la guarda sobre argumento **ABSTRACTO** que pedirán los 7 reflectores, y todo vive en `sondeos/` con la promoción a `Meta/` sin pagar |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |

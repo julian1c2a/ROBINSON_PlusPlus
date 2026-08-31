@@ -212,7 +212,7 @@ cerrado y compilando. Era la única razón por la que la fase 2 podía quedarse 
 
 **Materia prima ya disponible, verificada y citable** (nada de esto hay que reconstruirlo):
 `sondeos/` (10 experimentos compilados, con su `README.md`), `cuarentena/README.md` (grafo de
-recuperación), `DECISIONS.md` ADR‑012/013/014, `doc/REFERENCE-Incompleteness.md` §3.24–§3.29, y las
+recuperación), `DECISIONS.md` ADR‑012/013/014, `doc/REFERENCE-Incompleteness.md` §3.24–§3.30, y las
 memorias `project-inconsistencia-tcfn-cons`, `project-reparacion-via-numeral`,
 `project-escalera-sigma1`, `feedback-auditoria-footprint`.
 

@@ -85,7 +85,10 @@
       "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 60; \"EXIT=$LASTEXITCODE\")",
       "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_triple.lean 2>&1 | Select-Object -First 100; \"EXIT=$LASTEXITCODE\")",
       "PowerShell(cd \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; lake env lean Probe\\\\ENS_dosfases.lean > \"$env:TEMP\\\\ens.txt\" 2>&1; \"EXIT=$LASTEXITCODE\"; \\(Get-Content \"$env:TEMP\\\\ens.txt\"\\) -match \": error\" | Select-Object -First 30)",
-      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; $out = lake env lean Probe\\\\ENS_medida.lean 2>&1; \"EXIT=$LASTEXITCODE\"; $out | Select-String -Pattern \"depend|axioms|^[A-Z]\" | Select-Object -First 200)"
+      "PowerShell(Set-Location \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; $out = lake env lean Probe\\\\ENS_medida.lean 2>&1; \"EXIT=$LASTEXITCODE\"; $out | Select-String -Pattern \"depend|axioms|^[A-Z]\" | Select-Object -First 200)",
+      "PowerShell(cd \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; $out = \"C:\\\\msys64\\\\tmp\\\\claude\\\\e--dropbox-github-lean4-ROBINSON-PlusPlus\\\\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\\\\scratchpad\\\\adv_out.txt\"; lake env lean Probe\\\\ADV_novacuo.lean 1> $out 2>&1; \"EXIT=$LASTEXITCODE\")",
+      "PowerShell(cd \"E:\\\\Dropbox\\\\GitHub\\\\lean4\\\\ROBINSON_PlusPlus\"; $out = \"C:\\\\msys64\\\\tmp\\\\claude\\\\e--dropbox-github-lean4-ROBINSON-PlusPlus\\\\85b0df6c-1e14-407d-a9ae-04b9e8841ed5\\\\scratchpad\\\\adv_out2.txt\"; lake env lean Probe\\\\ADV_novacuo.lean 1> $out 2>&1; \"EXIT=$LASTEXITCODE\")",
+      "Bash(grep -n 'SEIS constructores montados' __TRACKED_VAR__/MEMORY.md)"
     ],
     "defaultMode": "dontAsk"
   }

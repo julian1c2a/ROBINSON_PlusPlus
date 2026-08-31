@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑30 · `master` limpio y verde · Lean v4.31.0**
-**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 45 `sondeos/`**
+**118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 48 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -15,15 +15,22 @@ comentarios).
 > **Gödel II sin `axiom d3`**. Cada eslabón está verificado en el código; los ⬜ no.
 >
 > ```
-> A · pcc_eval_substfc                                    [EN CURSO]
->   A1 ✅ los 8 constructores, cubiertos uno a uno            §3.29
->   A2 ⏳ EL ENSAMBLAJE — inducción fuerte, Φ conjuntivo TRIPLE + guarda
->   A3 ⬜ la guarda sobre argumento ABSTRACTO                 ⚠️ la piden los 7 reflectores;
->                                                             hoy sólo se descarga en códigos reales
+> A · pcc_eval_substfc                          🏁 PROBADO (2026-08-31, §3.30)
+>   A1 ✅ los constructores, caso a caso                      §3.29
+>   A2 ✅ EL ENSAMBLAJE — cerrado y CONFIRMADO. NO hacia falta Phi triple:
+>         la induccion de FORMULA es de UN SOLO SORT y consume termino/lista
+>         como caja negra. Footprint = la base sancionada.
+>   A3 ⬜ prf_hasWitF_real — el control de NO-VACUIDAD. Lo UNICO que falta de A.
+>         (la mitad dificil ya esta: la guarda DISCRIMINA, probado;
+>          dos precedentes exactos para transportar)
+>   A4 ⬜ la guarda sobre argumento ABSTRACTO                 ⚠️ la piden los 7 reflectores;
+>                                                             hoy solo se descarga en codigos reales
 > B · PROMOCIÓN a Meta/  — deuda acumulada que BLOQUEA C, D y E
 >   B1 ⬜ ReflectorDesdeConsumidor + ClausuraLiftSinWTs        (prerequisito de B2)
 >   B2 ⬜ DescensoLiftc  → Meta/EvalLiftcPrf.lean
->   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot
+>   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot · EvalSubstfcPrf
+>         ⚠️ EvalSubstfcPrf son 7522 l. de las que ~6100 son COPIA de los otros cuatro.
+>            Promoverlo BIEN = promover primero los cuatro y dejar solo sus §1-§15.
 >   B4 ⬜ pcc_axiom_inst4 → Meta/MpCodePrf.lean                ⚠️ el frente la pide 2 veces más
 >   B5 ⬜ pcc_eval_pred  → Meta/                               (la incondicional, no la guardada)
 >   B6 ⬜ PrfH_mono/PrfH_w1 → Meta/HilbertDeduction.lean
@@ -75,7 +82,25 @@ comentarios).
 >
 > ---
 >
-> # 🎯 SIGUIENTE SESIÓN — **el ENSAMBLAJE de `pcc_eval_substfc`**
+> # 🎯 SIGUIENTE SESIÓN — **`prf_hasWitF_real`, y luego la PROMOCIÓN (rama B)**
+>
+> 🏁 **`pcc_eval_substfc` está PROBADO** (2026‑08‑31, §3.30) — el muro de `substfc` está roto.
+> Queda **una sola pieza** de la rama A y es de las baratas:
+> ```lean
+> prf_hasWitF_real (φ : Formula) : Prf (ENS.hasWitF (formCodeM φ))
+> ```
+> el **control de no‑vacuidad**. Sin él el teorema es correcto pero podría ser vacío.
+> ✅ La **mitad difícil ya está probada** —la guarda **DISCRIMINA**, no es un colador— y hay **dos
+> precedentes exactos** para transportar: `SinWTs.prf_isTC1_tcodes` (sort término, misma forma) y
+> `ParticionTresPredicados.prf_isFCB3_fcodes` (sort fórmula, predicado posicional de tres testigos;
+> ~650 l., y en forma ecuacional **cada nodo cuesta menos**).
+>
+> ⚠️ **Y después, la rama B deja de ser deuda y pasa a ser el cuello de botella**: C, D y E no
+> pueden consumir nada mientras todo viva en `sondeos/`.
+>
+> ---
+>
+> ## 📓 (histórico) El ensamblaje, que era la incógnita
 >
 > ✅✅ **Los OCHO constructores están CUBIERTOS** (2026‑08‑30, §3.29): `botc` `implc` `andc` `orc`
 > (`sondeos/SubstfcPlanos.lean`) · `exc` (`SubstfcEx.lean`) · `forallc` (`Paso2Guardado.lean`) ·

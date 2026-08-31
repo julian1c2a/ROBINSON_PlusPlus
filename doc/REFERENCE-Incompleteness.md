@@ -1894,4 +1894,106 @@ definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al l
 
 ---
 
+## §3.30 · 🏁 EL MURO DE `substfc` ESTÁ ROTO — `pcc_eval_substfc` PROBADO (2026‑08‑31)
+
+Cierra la rama A del árbol de la fase, y con ella el frente que llevaba abierto desde julio.
+**Tres framings independientes, 1 CONFIRMADO + 2 PARCIAL** (los dos parciales con `medicionFiable`,
+que era el veredicto correcto: midieron bien y no cerraron). Los tres compilan; recompilados por mí
+desde su ubicación final. Build de producción intacto, **118 jobs**, **48 `sondeos/`**.
+
+### 3.30.1 · El teorema
+
+`sondeos/EvalSubstfcPrf.lean` (7 522 l.):
+
+```lean
+def hasWitF (c : Term) : Formula := ∃.∃. isFC1 #1 #0 ↑↑c
+
+theorem pcc_eval_substfc (wF wT v s f : Term)
+    (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
+    Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f))))
+
+theorem pcc_eval_substfc_wit (v s f : Term) :
+    Prf (Formula.impl (land (hasWit s) (hasWitF f)) (targetSubstfc v s f))
+```
+
+Las hipótesis son las **guardas** —testigo para el sustituyendo y para el código de fórmula—, no
+obligaciones colgando: la misma forma que `pcc_eval_liftc` (§3.28) y `pcc_eval_substtc'` (§3.29).
+
+**Footprint, reejecutado por el verificador y por mí**:
+`pcc_eval_substfc`, `pcc_eval_substfc_wit` y `DESCENSO_substfc` →
+`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` (la base sancionada, sin nada nuevo);
+`hPHI`, `PHI_step`, las cuatro ramas y los cuatro controles de discriminación → **net‑0 puro**.
+
+### 3.30.2 · 🔑 Las cuatro ideas — y ninguna era la prevista
+
+1. **NO hacían falta tres sorts.** §3.29.7 anunciaba un `Φ` conjuntivo sobre fórmula + término +
+   lista. **Falso**: la inducción de término/lista ya estaba cerrada aparte, así que la de
+   **fórmula es de UN SOLO SORT** y consume las otras dos **como caja negra**. Los tags 4 (`eqc`) y
+   3 (`atomc`) **no descienden por `substfc`**: descienden por `substtc`/`substtsc`.
+2. **El puente de testigos NO se prueba: SE DISUELVE.** El encargo pedía medir «del testigo de
+   FÓRMULA sale el de TÉRMINO para sus subcódigos». No hay que demostrarlo — hay que **DEFINIR** el
+   reconocedor de modo que sus casillas de término apunten a `wT` con la forma **exacta** que
+   consume `EvalSubsttc`:
+   ```lean
+   clEq   wT X := shapeBin X 4 ∧ In (nthc X 1̄) wT ∧ In (nthc X 2̄) wT
+   clAtom wT X := shapeBin X 3 ∧ argsIn wT (nthc X 2̄)
+   ```
+   Con `wfAll1 wT` dentro de la guarda, la premisa de `DESCENSO_imp` sale por **`rfl`**
+   (`bridge_isTC1`, net‑0). **Definir bien salió más barato que probar.**
+3. **El gate fue gratis por una decisión tomada por otra razón.** El paquete de testigos ya venía
+   **empaquetado en UN término** (`p`, con `acF/acT/acTs = carc, carc∘cdrc, cdrc∘cdrc`), cosa que
+   `ParticionTresPredicados` decidió por naturalidad de `pcc_bdAll_intro`. ⇒ tres binders, y
+   `FOL.substTerm_liftTerm`/`_liftLift`/`SubstArith.substTerm_liftLiftLift` bastan tal cual.
+   *El empaquetado que impuso la mutualidad es lo que hace que el gate sea gratis.*
+4. ⚠️ **«LA MONEDA DE LA INDUCCIÓN OBJETO» — lo caro de verdad, y se pagó tres veces.**
+
+> Un lema de caso con la HI como hipótesis **META** (`Prf A → Prf C`) **no sirve**. La inducción
+> objeto sólo puede consumir implicaciones **OBJETO** (`Prf (A ⇒ C)`) o versiones
+> **Γ‑paramétricas** (`∀ Γ, PrfH Γ A → PrfH Γ C`), porque **la HI sólo existe dentro del `Γ` del
+> paso**. Por eso los cuatro lemas de término/lista de `EvalSubsttc` valían tal cual y los cinco de
+> fórmula no. **Regla: un lema de caso destinado a una inducción OBJETO se enuncia en forma
+> Γ‑paramétrica desde el principio.** Conversión mecánica: `imp_of_ctx1`/`imp_of_ctx2`.
+
+### 3.30.3 · Piezas que ya estaban y nadie había usado
+
+* **`SinWTs.isFormCodeB2`** (`ClausuraLiftSinWTs.lean:1170`) — el reconocedor de código de fórmula
+  con **DOS** listas testigo, con su discriminación ya probada (`crit_isFormCodeB2_rejects*`) y
+  **sin un solo consumidor**. Sólo le faltaba la versión ecuacional (`isFormCodeE2`).
+* **`SubstfcEx.lean` §MED** ya había medido que los tags 4 y 3 no descienden por `substfc`, y no se
+  había recogido en ningún documento.
+
+Es la tercera vez en esta semana que aparece trabajo hecho y no usado. La regla del grep sobre el
+árbol **entero** (§3.28.6) sigue sin ser un lujo.
+
+### 3.30.4 · ▶ Lo único que falta: el control de NO‑VACUIDAD
+
+```lean
+prf_hasWitF_real (φ : Formula) : Prf (hasWitF (formCodeM φ))
+```
+
+Sin él, el teorema es correcto pero **podría ser vacío**. ✅ **La mitad difícil ya está probada**:
+la guarda **DISCRIMINA** y no es un colador — `CRIT_E2_rejects_varc`, `CRIT_E2_rejects_funcc`,
+`CRIT_isFC1_rejects_varc`, vía `prf_isFormCodeE2_str` (la forma ecuacional **fortalece** la
+posicional y hereda su discriminación de los 8 tags).
+**Dos precedentes exactos** para transportar: `SinWTs.prf_isTC1_tcodes` (misma forma, sort término)
+y `ParticionTresPredicados.prf_isFCB3_fcodes` (sort fórmula, predicado posicional de tres
+testigos). **Los tres sondeos coinciden en señalar esta misma pieza como residuo**, lo que la
+confirma.
+
+### 3.30.5 · Los dos sondeos que no cerraron, y lo que aportan
+
+No son fracasos: son **medición fiable**, y quedan archivados por eso.
+
+| sondeo | qué aporta |
+|---|---|
+| `sondeos/EnsamblajeTriple.lean` (1 127 l.) | La ruta del `Φ` triple, que **también pasa el gate**. Su `structure CasesCtx` es el **censo Γ‑paramétrico** de los 10 casos, y `imp_of_ctx1`/`imp_of_ctx2` son la conversión mecánica de moneda. Reutilizables. |
+| `sondeos/EnsamblajeMedida.lean` (1 503 l.) | El **inventario de acoples**: los tres puentes entre familias de predicados, el censo de guardas y el inventario de lifts. Es quien primero dijo «no hacen falta tres sorts». |
+
+⚠️ **Trampa de notación nueva, cara y no registrada**: `FOL/FOL/FOL.lean:38` declara
+`infixr:65 " ∨ " => Formula.or`, que **sombrea el `∨` de Lean** (precedencia 30). ⇒
+`(k = 5 ∨ k = 7 ∨ k = 8)` es un **error de PARSEO** —agrupa `k = (5 ∨ k) = 7`— y **el mensaje no
+menciona `∨`**. Escribir `Or (k = 5) (Or …)`.
+
+---
+
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)

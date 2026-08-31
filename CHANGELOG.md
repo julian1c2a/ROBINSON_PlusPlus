@@ -18,6 +18,61 @@
 
 ---
 
+## 2026-08-31 — 🏁 **EL MURO DE `substfc` ESTÁ ROTO**: `pcc_eval_substfc` PROBADO
+
+Cierra el frente que llevaba abierto desde julio. `sondeos/EvalSubstfcPrf.lean` (7 522 l.),
+**CONFIRMADO** por verificación adversarial que recompiló de cero (107 s en frío) y reejecutó los
+`#print axioms`; recompilado también por mí. Build **118 jobs**, **48 `sondeos/`**. Proyectado en
+**§3.30**.
+
+```lean
+pcc_eval_substfc (wF wT v s f) (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
+    Prf (provFromCode (eqc (substfcT v̇ ṡ ḟ) (tcFn (substfc v s f))))
+pcc_eval_substfc_wit (v s f) : Prf ((hasWit s ∧ hasWitF f) ⇒ targetSubstfc v s f)
+```
+
+Footprint = **la base sancionada**, sin nada nuevo; el gate y el paso inductivo son **net‑0 puro**.
+Tres framings independientes: **1 CONFIRMADO + 2 PARCIAL** (los dos parciales con medición fiable —
+midieron bien y no cerraron, que era el veredicto correcto).
+
+### 🔑 Las cuatro ideas, y ninguna era la prevista
+
+1. **No hacían falta tres sorts.** La inducción de término/lista ya estaba cerrada aparte ⇒ la de
+   **fórmula es de UN SOLO SORT** y consume las otras dos como **caja negra**. Los tags `eqc` y
+   `atomc` no descienden por `substfc`: descienden por `substtc`/`substtsc`.
+2. **El puente de testigos no se prueba: SE DISUELVE.** No hay que demostrar «del testigo de
+   fórmula sale el de término»: hay que **definir** el reconocedor de modo que sus casillas de
+   término apunten a `wT` con la forma exacta que consume `EvalSubsttc`. Entonces la premisa sale
+   por **`rfl`**, net‑0. **Definir bien salió más barato que probar.**
+3. **El gate fue gratis por una decisión tomada por otra razón**: el paquete de testigos ya venía
+   empaquetado en **un** término, cosa que `ParticionTresPredicados` decidió por naturalidad de
+   `pcc_bdAll_intro`. ⇒ tres binders y los lifts existentes bastan.
+4. ⚠️ **«La moneda de la inducción OBJETO» — lo caro de verdad, pagado tres veces.** Un lema de caso
+   con la HI como hipótesis **META** (`Prf A → Prf C`) **no sirve**: la inducción objeto sólo
+   consume implicaciones **objeto** o versiones **Γ‑paramétricas**, porque la HI **sólo existe
+   dentro del `Γ` del paso**. **Regla: enunciar los lemas de caso en forma Γ‑paramétrica desde el
+   principio.**
+
+### ⚠️ Piezas que ya estaban y nadie había usado (tercera vez esta semana)
+
+`SinWTs.isFormCodeB2` (`ClausuraLiftSinWTs.lean:1170`) era **exactamente** el reconocedor con dos
+listas testigo que hacía falta, con su discriminación probada y **sin un solo consumidor**. Y
+`SubstfcEx.lean` §MED ya había medido que los tags 4 y 3 no descienden por `substfc`.
+
+### ⚠️ Trampa de notación nueva
+
+`FOL/FOL/FOL.lean:38` declara `infixr:65 " ∨ " => Formula.or`, que **sombrea el `∨` de Lean**
+(precedencia 30) ⇒ `(k = 5 ∨ k = 7 ∨ k = 8)` es un **error de PARSEO**, y el mensaje **no menciona
+`∨`**. Escribir `Or (k = 5) (Or …)`.
+
+### ▶ Lo único que falta
+
+`prf_hasWitF_real (φ) : Prf (hasWitF (formCodeM φ))` — el control de **no‑vacuidad**. La mitad
+difícil ya está: la guarda **discrimina** (rechaza `varc` y `funcc`, probado). Dos precedentes
+exactos para transportar. **Los tres sondeos coinciden en señalar esta misma pieza.**
+
+---
+
 ## 2026-08-30 (c) — ✅✅ LOS **OCHO** CONSTRUCTORES DE `substfc`, CUBIERTOS
 
 Cuatro sondeos nuevos, **todos net‑0**, recompilados a mano desde su ubicación final (`EXIT=0`),
