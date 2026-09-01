@@ -1899,7 +1899,7 @@ definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al l
 Cierra la rama A del árbol de la fase, y con ella el frente que llevaba abierto desde julio.
 **Tres framings independientes, 1 CONFIRMADO + 2 PARCIAL** (los dos parciales con `medicionFiable`,
 que era el veredicto correcto: midieron bien y no cerraron). Los tres compilan; recompilados por mí
-desde su ubicación final. Build de producción intacto, **118 jobs**, **48 `sondeos/`**.
+desde su ubicación final. Build de producción intacto, **118 jobs**, **51 `sondeos/`**.
 
 ### 3.30.1 · El teorema
 
@@ -1993,6 +1993,104 @@ No son fracasos: son **medición fiable**, y quedan archivados por eso.
 `infixr:65 " ∨ " => Formula.or`, que **sombrea el `∨` de Lean** (precedencia 30). ⇒
 `(k = 5 ∨ k = 7 ∨ k = 8)` es un **error de PARSEO** —agrupa `k = (5 ∨ k) = 7`— y **el mensaje no
 menciona `∨`**. Escribir `Or (k = 5) (Or …)`.
+
+---
+
+## §3.31 · LA NO‑VACUIDAD, CERRADA — y **A4 resultó IMPOSIBLE** (2026‑08‑31)
+
+Cierra el residuo que §3.30.4 declaraba como «lo único que falta». **Tres rutas independientes,
+3 CONFIRMADAS**, todas con `noVacuo=true`. Recompiladas por mí desde su ubicación final.
+
+### 3.31.1 · El teorema
+
+`sondeos/HasWitFReal.lean`:
+
+```lean
+def fcodesF : Formula → List Term   -- subcódigos de FÓRMULA de φ
+def tcodesF : Formula → List Term   -- subcódigos de TÉRMINO de φ (vía SinWTs.tcodes1/tcodes1s)
+
+theorem prf_isFC1_real   (φ : Formula) :
+    Prf (ENS.isFC1 (objList (fcodesF φ)) (objList (tcodesF φ)) (formCodeM φ))
+theorem prf_hasWitF_real (φ : Formula) : Prf (ENS.hasWitF (formCodeM φ))
+```
+
+🔑 **Footprint `[propext, Classical.choice, Quot.sound]` — net‑0 PURO**, ni siquiera arrastra
+`prf_axiomsCodeT_eq`. Los enunciados hablan de las constantes **reales** `ENS.isFC1`/`ENS.hasWitF`
+—no de copias homónimas—, verificado con puentes `rfl` net‑0.
+
+⇒ **`pcc_eval_substfc` deja de ser condicional para códigos reales**: `pcc_eval_substfc_wit_REAL`
+da la ecuación **pelada**, sin guardas, para toda `φ` y todo término `t`.
+
+### 3.31.2 · ⛔ A4 no es trabajo pendiente: **es imposible tal como estaba enunciado**
+
+§3.30 y el árbol de tareas listaban como A4 «la guarda sobre argumento **ABSTRACTO**». Hay que
+retirarlo:
+
+> **`hasWitF` sobre argumento abstracto es FALSO en general**, y ya estaba refutado en el propio
+> fichero del ensamblaje: **`ENS.CRIT_isFC1_rejects_varc`** refuta `isFC1 wF wT (varc n)` **para
+> CUALQUIER testigo**. No es que falte probarlo: **no se puede**.
+
+⇒ **La vía real para los 7 reflectores es CARGAR la guarda como hipótesis OBJETO a lo largo de la
+cadena y descargarla al final**, donde el argumento sí es un código real. Eso replantea cómo se
+ataca la rama C, y conviene saberlo **antes** de empezarla.
+
+Es, en pequeño, la misma lección que §3.28.6: **una obligación que parece pendiente puede ser una
+obligación mal enunciada.** Aquí la refutación ya estaba compilada en el árbol desde el día
+anterior, escrita como control de discriminación, y nadie la leyó como lo que también era: la
+prueba de que A4 no existe.
+
+### 3.31.3 · ▶ La obligación NUEVA, ésta sí real
+
+```lean
+Prf (ENS.hasWitF c ⇒ ENS.hasWitF (liftc zero c))     -- NO existe
+```
+La propagación de la guarda bajo el `liftc` **OBJETO**. El análogo del sort TÉRMINO sí existe
+(`SinWTs.CRIT_hasWit_lift`) y el molde debería transportarse — `ENS.liftF_isFC1` ya está y la
+estructura es la misma con **dos** binders en vez de uno.
+⚠️ **`ENS.liftF_hasWitF` NO sirve**: es sólo el lift **De Bruijn**, no el objeto. Son cosas
+distintas con nombres parecidos.
+
+### 3.31.4 · 🧱 El footprint mínimo, medido — lo más accionable para la rama B
+
+La no‑vacuidad **no necesita nada** del descenso, ni `Paso2`, ni `SFsubsttc`, ni `DescMutua`, ni el
+ensamblaje. Le bastan tres bloques:
+
+| bloque | qué es |
+|---|---|
+| `S_Clausura` (namespace `SinWTs`) | `EvalSubstfcPrf.lean:11‑1241` |
+| el bloque **definicional** `ENS` §1‑§2 | `:5953‑6228` |
+| `def hasWitF` (+ `liftF_hasWitF`) | `:8243‑8244`, `:8320‑8324` |
+
+Verificado **ejecutándolo**: `sondeos/HasWitFRealMin.lean`, **1 819 líneas, EXIT=0, mismo net‑0**.
+⇒ **promover la no‑vacuidad a `Meta/` es un módulo pequeño e independiente**, no las ~20 000 líneas
+del frente entero. Es el primer trozo de la rama B que se puede pagar barato.
+
+### 3.31.5 · Medidas de coste que corrigen la estimación previa
+
+* **La ruta que se encargó NO hizo falta.** El encargo decía «copia §19 de
+  `ParticionTresPredicados` (~650 l.) y reescríbelo». **No se abrió §19 ni una vez**: fue
+  re‑derivación desde el precedente del sort TÉRMINO más un molde ya existente. Coste real
+  **~590 líneas**.
+* **El precedente del sort TÉRMINO se reutiliza ENTERO y sin tocar.** `SinWTs.okE1_T`/`okE1_Ts`
+  valen byte a byte porque `tcodesF` se definió a base de `tcodes1`/`tcodes1s`. El eje TÉRMINO
+  costó **cero líneas de invención**: `okT_F` son 20 líneas de fontanería de `List.mem_append`.
+* **«La tercera lista se absorbe en `argsIn`»: confirmado, y cuesta 8 líneas.** `flcodes`/`WTs` no
+  aparecen en ningún sitio.
+* **El eje ECUACIONAL, medido**: **TRES** lemas de forma cubren **los OCHO tags**
+  (`prf_shapeNul_real` 1 l., `_shapeUn_real` 3 l., `_shapeBin_real` 5 l.), y `cl_bin_real`/
+  `cl_un_real` salen **genéricos en el tag `k`** ⇒ los tags 5/7/8 comparten un lema y 6/9 otro, y
+  los 8 nodos suman **~55 líneas**. La predicción «en forma ecuacional cada nodo cuesta menos»
+  **se quedó corta**: cuesta menos **y se factoriza**.
+
+### 3.31.6 · ⚠️ Cuarta vez: trabajo hecho y no recogido — ahora en `Probe/`
+
+`Probe/ADV_novacuo.lean` (**7 668 l.**, de una tanda anterior de esa misma noche) ya contenía
+`PROBE_wfAllF_of_list`, el molde general del `∀` acotado que hacía falta, ya medido. Se copió
+literal.
+
+La regla registrada decía «grepea el árbol de **producción** entero». **Es insuficiente**: hay que
+extenderla a **`sondeos/` y `Probe/`**. El censo de las cuatro veces está en el nodo de memoria
+[[feedback-auditoria-footprint]] §6.
 
 ---
 

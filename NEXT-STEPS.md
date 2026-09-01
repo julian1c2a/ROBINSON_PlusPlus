@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑31 · `master` limpio y verde · Lean v4.31.0**
-**119 jobs · 105 módulos activos (Minimal 11 + Meta 83 + Full 11) + 0 en `cuarentena/` · 48 `sondeos/`**
+**119 jobs · 105 módulos activos (Minimal 11 + Meta 83 + Full 11) + 0 en `cuarentena/` · 51 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -20,12 +20,26 @@ comentarios).
 >   A2 ✅ EL ENSAMBLAJE — cerrado y CONFIRMADO. NO hacia falta Phi triple:
 >         la induccion de FORMULA es de UN SOLO SORT y consume termino/lista
 >         como caja negra. Footprint = la base sancionada.
->   A3 ⬜ prf_hasWitF_real — el control de NO-VACUIDAD. Lo UNICO que falta de A.
->         (la mitad dificil ya esta: la guarda DISCRIMINA, probado;
->          dos precedentes exactos para transportar)
->   A4 ⬜ la guarda sobre argumento ABSTRACTO                 ⚠️ la piden los 7 reflectores;
->                                                             hoy solo se descarga en codigos reales
-> B · PROMOCIÓN a Meta/  — deuda acumulada que BLOQUEA C, D y E
+>   A3 ✅ prf_hasWitF_real — el control de NO-VACUIDAD. CERRADO 2026-08-31,
+>         3 rutas de 3, y con footprint NET-0 PURO (ni prf_axiomsCodeT_eq).
+>         => pcc_eval_substfc deja de ser condicional para codigos REALES.
+>   A4 ⛔ RETIRADA: NO es trabajo pendiente, es IMPOSIBLE. "hasWitF sobre argumento
+>         ABSTRACTO" es FALSO en general, y ya estaba refutado en el arbol:
+>         ENS.CRIT_isFC1_rejects_varc lo refuta para CUALQUIER testigo.
+>         => la via real es CARGAR la guarda como hipotesis OBJETO a lo largo de la
+>            cadena y descargarla al final, donde el argumento SI es un codigo real.
+>            Esto replantea como se ataca la rama C. Ver §3.31.2.
+>   A5 ⬜ OBLIGACION NUEVA Y REAL: Prf (hasWitF c => hasWitF (liftc zero c)),
+>         la propagacion bajo el liftc OBJETO. NO existe. El analogo del sort
+>         TERMINO si (SinWTs.CRIT_hasWit_lift) y el molde deberia transportarse.
+>         ⚠️ ENS.liftF_hasWitF NO sirve: es el lift De Bruijn, no el objeto.
+> B · PROMOCIÓN a Meta/  — ahora es el CUELLO DE BOTELLA: bloquea C, D y E
+>   B0 ✅ pcc_axiom_inst4 -> Meta/MpCodePrf.lean   |  Meta/EvalPredPrf.lean (NUEVO)
+>         |  borrada la pcc_eq_tracked local que sombreaba produccion
+>         (2026-08-31; build 118 -> 119 jobs, que es la comprobacion de que se construye)
+>   B0b⬜ ⭐ EL SIGUIENTE, Y ES BARATO: promover la NO-VACUIDAD. Footprint MEDIDO
+>         ejecutando sondeos/HasWitFRealMin.lean: 1819 l., independiente del descenso,
+>         de Paso2, de SFsubsttc, de DescMutua y del ensamblaje. Modulo PEQUENO.
 >   B1 ⬜ ReflectorDesdeConsumidor + ClausuraLiftSinWTs        (prerequisito de B2)
 >   B2 ⬜ DescensoLiftc  → Meta/EvalLiftcPrf.lean
 >   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot · EvalSubstfcPrf
@@ -85,7 +99,24 @@ comentarios).
 >
 > ---
 >
-> # 🎯 SIGUIENTE SESIÓN — **`prf_hasWitF_real`, y luego la PROMOCIÓN (rama B)**
+> # 🎯 SIGUIENTE SESIÓN — **B0b: promover la NO‑VACUIDAD** (barato y medido)
+>
+> ✅✅ **La rama A está CERRADA** (2026‑08‑31): `pcc_eval_substfc` probado (§3.30) y su control de
+> **no‑vacuidad** también (§3.31), este último **net‑0 PURO**. Para códigos reales la ecuación sale
+> **pelada**, sin guardas.
+>
+> ▶ **El siguiente paso es B0b, y es el trozo barato de la rama B**: el footprint mínimo de la
+> no‑vacuidad está **medido ejecutándolo** (`sondeos/HasWitFRealMin.lean`, 1 819 l.) y resulta
+> **independiente** del descenso, de `Paso2`, de `SFsubsttc`, de `DescMutua` y del ensamblaje.
+> Es un módulo pequeño, no las ~20 000 líneas del frente.
+>
+> ⛔ **Y A4 se retira del árbol**: «la guarda sobre argumento abstracto» **no es trabajo pendiente,
+> es imposible** — está refutado (§3.31.2). Los 7 reflectores hay que atacarlos **cargando la
+> guarda como hipótesis objeto** por la cadena, no probándola para argumento abstracto.
+>
+> ---
+>
+> ## 📓 (histórico) `prf_hasWitF_real`, que era el residuo
 >
 > 🏁 **`pcc_eval_substfc` está PROBADO** (2026‑08‑31, §3.30) — el muro de `substfc` está roto.
 > Queda **una sola pieza** de la rama A y es de las baratas:

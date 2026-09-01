@@ -18,11 +18,63 @@
 
 ---
 
+## 2026-08-31 (b) — ✅ LA **NO‑VACUIDAD**, CERRADA · ⛔ y **A4 resultó IMPOSIBLE**
+
+Cierra la **rama A** entera. `sondeos/HasWitFReal.lean` (+ `HasWitFRealMin.lean` y
+`HasWitFCritica.lean`). **3 rutas de 3 CONFIRMADAS**, todas con `noVacuo=true`. Recompiladas por
+mí. Build **119 jobs**, **51 `sondeos/`**. Proyectado en **§3.31**.
+
+```lean
+prf_isFC1_real   (φ) : Prf (ENS.isFC1 (objList (fcodesF φ)) (objList (tcodesF φ)) (formCodeM φ))
+prf_hasWitF_real (φ) : Prf (ENS.hasWitF (formCodeM φ))
+```
+
+🔑 **Footprint `[propext, Classical.choice, Quot.sound]` — net‑0 PURO**, ni siquiera arrastra
+`prf_axiomsCodeT_eq`. ⇒ para códigos **reales**, `pcc_eval_substfc` da la ecuación **pelada**.
+
+### ⛔ A4 se retira del árbol: no es trabajo pendiente, **es imposible**
+
+«La guarda sobre argumento **abstracto**» figuraba como tarea. **`hasWitF` sobre argumento
+abstracto es FALSO en general**, y estaba **ya refutado en el árbol desde el día anterior**:
+`ENS.CRIT_isFC1_rejects_varc` lo refuta **para cualquier testigo**. Se había escrito como control
+de discriminación y nadie lo leyó como lo que también era.
+⇒ **la vía real es cargar la guarda como hipótesis OBJETO por la cadena y descargarla al final**,
+donde el argumento sí es un código real. Replantea cómo se ataca la rama C.
+
+### ▶ La obligación NUEVA, ésta sí real
+
+`Prf (hasWitF c ⇒ hasWitF (liftc zero c))` — la propagación bajo el `liftc` **objeto**. No existe.
+El análogo del sort término sí (`SinWTs.CRIT_hasWit_lift`) y el molde debería transportarse.
+⚠️ `ENS.liftF_hasWitF` **no sirve**: es el lift **De Bruijn**, no el objeto.
+
+### 🧱 El footprint mínimo, medido — lo más accionable
+
+La no‑vacuidad **no necesita nada** del descenso, ni `Paso2`, ni `SFsubsttc`, ni `DescMutua`, ni el
+ensamblaje. Verificado **ejecutándolo**: `HasWitFRealMin.lean`, **1 819 l., EXIT=0, mismo net‑0**.
+⇒ **promoverla a `Meta/` es un módulo pequeño e independiente**, y es el trozo de la rama B que se
+puede pagar barato.
+
+### Medidas que corrigen la estimación previa
+
+* **La ruta encargada no hizo falta**: se pidió «copia §19 de `ParticionTresPredicados` (~650 l.)»
+  y **no se abrió §19 ni una vez**. Coste real ~590 líneas, re‑derivadas desde el sort término.
+* **El eje TÉRMINO costó cero líneas de invención**: `okE1_T`/`okE1_Ts` valen **byte a byte**.
+* **TRES lemas de forma cubren los OCHO tags**, y dos de ellos salen **genéricos en el tag** ⇒ los
+  8 nodos suman ~55 líneas. «En forma ecuacional cada nodo cuesta menos» **se quedó corto**.
+
+### ⚠️ Cuarta vez: trabajo hecho y no recogido, ahora en `Probe/`
+
+`Probe/ADV_novacuo.lean` (7 668 l., de una tanda anterior de esa misma noche) ya traía el molde
+`PROBE_wfAllF_of_list`. La regla registrada decía «grepea **producción**»; **hay que extenderla a
+`sondeos/` y `Probe/`**.
+
+---
+
 ## 2026-08-31 — 🏁 **EL MURO DE `substfc` ESTÁ ROTO**: `pcc_eval_substfc` PROBADO
 
 Cierra el frente que llevaba abierto desde julio. `sondeos/EvalSubstfcPrf.lean` (7 522 l.),
 **CONFIRMADO** por verificación adversarial que recompiló de cero (107 s en frío) y reejecutó los
-`#print axioms`; recompilado también por mí. Build **119 jobs** (tras promover `EvalPredPrf`), **48 `sondeos/`**. Proyectado en
+`#print axioms`; recompilado también por mí. Build **119 jobs** (tras promover `EvalPredPrf`), **51 `sondeos/`**. Proyectado en
 **§3.30**.
 
 ```lean
