@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.31.
 >
-> **Build 119 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **105 módulos activos** (Minimal 11 + Meta 83 + Full 11) **+ 0 en `cuarentena/` + 51 en `sondeos/`.**
+> **Build 120 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) **+ 0 en `cuarentena/` + 51 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-08-31 (HEAD `bf8c0fe`) — ADR-015…018; el muro de `substfc` roto por la vía de CERO axiomas
+**Última actualización:** 2026-08-31 (HEAD `c2044aa`) — ADR-015…018; el muro de `substfc` roto por la vía de CERO axiomas
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta

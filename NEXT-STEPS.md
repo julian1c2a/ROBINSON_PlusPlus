@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑31 · `master` limpio y verde · Lean v4.31.0**
-**119 jobs · 105 módulos activos (Minimal 11 + Meta 83 + Full 11) + 0 en `cuarentena/` · 51 `sondeos/`**
+**120 jobs · 106 módulos activos (Minimal 11 + Meta 84 + Full 11) + 0 en `cuarentena/` · 51 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -36,11 +36,19 @@ comentarios).
 > B · PROMOCIÓN a Meta/  — ahora es el CUELLO DE BOTELLA: bloquea C, D y E
 >   B0 ✅ pcc_axiom_inst4 -> Meta/MpCodePrf.lean   |  Meta/EvalPredPrf.lean (NUEVO)
 >         |  borrada la pcc_eq_tracked local que sombreaba produccion
->         (2026-08-31; build 118 -> 119 jobs, que es la comprobacion de que se construye)
->   B0b⬜ ⭐ EL SIGUIENTE, Y ES BARATO: promover la NO-VACUIDAD. Footprint MEDIDO
->         ejecutando sondeos/HasWitFRealMin.lean: 1819 l., independiente del descenso,
->         de Paso2, de SFsubsttc, de DescMutua y del ensamblaje. Modulo PEQUENO.
+>         (2026-08-31; build 118 -> 120 jobs, que es la comprobacion de que se construye)
+>   B0b✅ HECHA (2026-08-31): Meta/CodeWitnessPrf.lean (2145 l.). El VOCABULARIO del
+>         frente llega POR FIN a produccion -- antes habia CERO en Meta/: isTC1,
+>         wfAll1, argsIn, isTermCodeE1, isFormCodeE2, isFC1, hasWitF, shapeNul/Un/Bin.
+>         Mas HW.prf_hasWitF_real, net-0 PURO.
+>         ⚠️ Se DEDUPLICARON NUEVE definiciones al promover: ENS redefinia byte a byte
+>            lo que SinWTs ya tenia, y el sondeo lo certificaba con puentes rfl SIN
+>            resolverlo. Promoverlo asi habria metido DOS constantes por cada una en
+>            produccion -- la trampa registrada. Los puentes desaparecieron al sobrar.
+>         Build 119 -> 120 jobs (la comprobacion de que se construye de verdad).
 >   B1 ⬜ ReflectorDesdeConsumidor + ClausuraLiftSinWTs        (prerequisito de B2)
+>         ⚠️ OJO: CodeWitnessPrf.SinWTs YA ES el nucleo de ClausuraLiftSinWTs. B1 se
+>            ha reducido a lo que NO entro en B0b -- medirlo antes de empezar.
 >   B2 ⬜ DescensoLiftc  → Meta/EvalLiftcPrf.lean
 >   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot · EvalSubstfcPrf
 >         ⚠️ EvalSubstfcPrf son 7522 l. de las que ~6100 son COPIA de los otros cuatro.
@@ -99,7 +107,28 @@ comentarios).
 >
 > ---
 >
-> # 🎯 SIGUIENTE SESIÓN — **B0b: promover la NO‑VACUIDAD** (barato y medido)
+> # 🎯 SIGUIENTE SESIÓN — **MEDIR la rama C antes de construirla**
+>
+> ✅ **B0b hecha**: `Meta/CodeWitnessPrf.lean` está en producción y con ella **el vocabulario
+> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **120 jobs**.
+>
+> ▶ **Lo siguiente es MEDIR C, no construirla.** La caída de A4 dejó a los 7 reflectores sin
+> planteamiento: la guarda no se puede probar para argumento abstracto, hay que **cargarla como
+> hipótesis objeto** por la cadena. Antes de escribir siete pruebas conviene contestar, sobre
+> **uno solo** (`q1`, el más simple):
+> * ¿admite `pcc_lineWF_tracked_of_schema` (`LineWFSchemaPrf.lean:291`) esa hipótesis extra **sin
+>   tocar su firma**? Su `hcond` es el hueco donde entraría.
+> * ¿dónde se descarga al final, y con qué? El argumento de `lineWF` es abstracto, pero en el
+>   punto de uso puede haber información de forma que lo convierta en código real.
+> * ¿hace falta A5 (`hasWitF c ⇒ hasWitF (liftc zero c)`) para propagarla, o no aparece?
+>
+> ⚠️ En esta fase, medir antes de construir ha descubierto **dos veces** que la tarea escrita no
+> era la tarea real (el ensamblaje, que no era el obstáculo; y A4, que no existía). Sería raro no
+> aplicarlo justo donde acaba de pasar.
+>
+> ---
+>
+> ## 📓 (histórico) B0b, que era el trozo barato de la rama B
 >
 > ✅✅ **La rama A está CERRADA** (2026‑08‑31): `pcc_eval_substfc` probado (§3.30) y su control de
 > **no‑vacuidad** también (§3.31), este último **net‑0 PURO**. Para códigos reales la ecuación sale

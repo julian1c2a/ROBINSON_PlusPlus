@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.31.
 >
-> **Build 119 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **105 módulos activos** (Minimal 11 + Meta 83 + Full 11) **+ 0 en `cuarentena/` + 51 en `sondeos/`.**
+> **Build 120 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) **+ 0 en `cuarentena/` + 51 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-08-31 — 🏁 rama A CERRADA: `pcc_eval_substfc` y su control de no-vacuidad, ambos probados
+**Last updated:** 2026-08-31 — 🏁 rama A cerrada · B0b: `Meta/CodeWitnessPrf.lean`, con nueve definiciones deduplicadas
 **Author**: Julián Calderón Almendros
 
 ---
@@ -39,15 +39,15 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **105 activos** (Minimal/ 11 + Meta/ 83 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+51 en `sondeos/`** |
-| Modules sin sorry | 105 / 105 ✅ |
+| Total modules | **106 activos** (Minimal/ 11 + Meta/ 84 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+51 en `sondeos/`** |
+| Modules sin sorry | 106 / 106 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
 | Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); **`ax_axiomsCodeT_eq`** (⊢, `Minimal/Axioms:1376`) / **`prf_axiomsCodeT_eq`** (Prf, `Representability2Prf:104`) — anclas de codificación; `d3` (GodelTwo, único gödeliano vivo). ⚠️ `ax_inAxC`/`prf_inAxC` **ya no son axiomas**: son teoremas derivados de las anclas. Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
 | Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, **módulo `axiom d3`**. **D3 está FUERA de la cadena activa** (la capa rastreada está en `cuarentena/`): se recupera repatriando las raíces que quedan (7 a 2026-08-23), y el habilitador (`pcc_dot_cons`, escalera a.2) ya está ✅. Ver `NEXT-STEPS.md` |
-| Build status | ✅ Passing (**119 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-31) |
+| Build status | ✅ Passing (**120 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-31) |
 | `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `CodeDecode` (biyección `decodeForm` + inyectividad) + `ChainDecode` (`decodeChain_prf`). **Módulo B** (`LineWFCases`, 21 tags) ✅. ⛔ **Módulos C‑F BLOQUEADOS por un paso FALSO del plan**: `canon_ne` reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ Salida por **numerales** verificada y net‑0 (`sondeos/CodeNatInj.lean`) |
 | D3 / plan 12‑A | ✅ **Fases 1a/1b/2/3 completas y la cuarentena VACÍA.** D3 reducida a **UN SOLO lema**: `d3_prf_of_chainOkDot (φ) (hC)` — sólo pide `hC_dot`. Y `pcc_lineWF_tracked_modulo_7` verifica que eso es **exactamente** cerrar los **7 reflectores** que faltan. ⚠️ Esos 7 son el **muro de `substfc`**: necesitan `pcc_eval_substfc`. ✅ **La decisión NO está pendiente**: desde [ADR‑015](DECISIONS.md) va por la **vía de CERO axiomas** (no se sanciona `isFormCode`). Hecho ya: partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** ([ADR‑018](DECISIONS.md), §3.28). 🏁 **`pcc_eval_substfc` PROBADO** (2026‑08‑31, §3.30): CONFIRMADO por verificación adversarial, footprint = la base sancionada. ✅ **Y su control de NO‑VACUIDAD también** (`prf_hasWitF_real`, §3.31, **net‑0 PURO**) ⇒ para códigos REALES la ecuación sale **pelada**. ⛔ Y A4 («guarda sobre argumento ABSTRACTO») se **retira**: es IMPOSIBLE, está refutado. ⚠️ **Cubiertos ≠ ensamblado**: falta la inducción que los junta (sin medir), la guarda sobre argumento **ABSTRACTO** que pedirán los 7 reflectores, y todo vive en `sondeos/` con la promoción a `Meta/` sin pagar |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |
