@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑30 · `master` limpio y verde · Lean v4.31.0**
+**Estado 2026‑08‑31 · `master` limpio y verde · Lean v4.31.0**
 **118 jobs · 104 módulos activos (Minimal 11 + Meta 82 + Full 11) + 0 en `cuarentena/` · 48 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
@@ -33,8 +33,11 @@ comentarios).
 >            Promoverlo BIEN = promover primero los cuatro y dejar solo sus §1-§15.
 >   B4 ⬜ pcc_axiom_inst4 → Meta/MpCodePrf.lean                ⚠️ el frente la pide 2 veces más
 >   B5 ⬜ pcc_eval_pred  → Meta/                               (la incondicional, no la guardada)
->   B6 ⬜ PrfH_mono/PrfH_w1 → Meta/HilbertDeduction.lean
->         prf_nil_or_cons  → Meta/ChainPrf.lean
+>   B6 ⬜ prf_nil_or_cons -> Meta/ChainPrf.lean          (esto SI es promocion)
+>   B6b⬜ ⚠️ NO es promocion, es TRABAJO NUEVO: PrfH_mono / PrfH_w1 (monotonia
+>         del contexto en PrfH) NO existen en NINGUN sitio -- ni en produccion
+>         ni en sondeos (verificado por grep 2026-08-31). Van a
+>         Meta/HilbertDeduction.lean, pero hay que PROBARLOS primero.
 >   B7 ⬜ LIMPIEZA: borrar la pcc_eq_tracked local de EvalSubsttc
 >         (sombrea Meta/Sigma1AtomPrf.lean:246)
 > C · LOS 7 REFLECTORES de lineWF
