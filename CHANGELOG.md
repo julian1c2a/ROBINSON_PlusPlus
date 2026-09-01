@@ -14,7 +14,7 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** **118 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑08‑30 13:40).
+> **Último build verificado:** **119 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑08‑31).
 
 ---
 
@@ -22,7 +22,7 @@
 
 Cierra el frente que llevaba abierto desde julio. `sondeos/EvalSubstfcPrf.lean` (7 522 l.),
 **CONFIRMADO** por verificación adversarial que recompiló de cero (107 s en frío) y reejecutó los
-`#print axioms`; recompilado también por mí. Build **118 jobs**, **48 `sondeos/`**. Proyectado en
+`#print axioms`; recompilado también por mí. Build **119 jobs** (tras promover `EvalPredPrf`), **48 `sondeos/`**. Proyectado en
 **§3.30**.
 
 ```lean

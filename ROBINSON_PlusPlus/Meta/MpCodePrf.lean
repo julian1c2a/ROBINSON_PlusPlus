@@ -245,10 +245,72 @@ theorem pcc_axiom_inst3 (φ : Formula) (hmem : forall_3 φ ∈ axioms) (w₁ w�
       (substfc (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ))))) :=
   pcc_thm_inst3 φ (prf_ax hmem) w₁ w₂ w₃
 
+/-! ### §N+1 · Cuatro testigos (promovido de `sondeos/SubstfcPlanos.lean`, 2026‑08‑31)
+
+La familia se paraba en **tres**, pero los axiomas binarios de `substfc` son `forall_4`:
+`ax_substfc_impl`/`_and`/`_or` (`Minimal/Axioms.lean:506,512,515`), y también `ax_substfc_atom`
+(`:500`) y `ax_substfc_eq` (`:503`). **Cinco consumidores** en el frente `substfc`, y dos agentes
+independientes escribieron esta misma pieza por separado antes de que se promoviera.
+
+Extensión **mecánica** de `pcc_thm_inst3` con un binder más: el mismo baile de
+`pcc_forallElim_code_open` + `prf_substfc_forall` + `prf_congr_substfc_arg3`, una vuelta más. -/
+
+/-- **Instanciación de un TEOREMA `∀∀∀∀φ` codificado** (cuatro testigos, todos pueden ser abiertos). -/
+theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w₄ : Term) :
+    Prf (provFromCode (substfc zero w₄ (substfc (numeral 1) (liftc zero w₃)
+      (substfc (numeral 2) (liftc zero (liftc zero w₂))
+        (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))) := by
+  have h0 : Prf (provFromCode (formCode (forall_4 φ))) := repr_pos'_prf h
+  have h1 : Prf (provFromCode (substfc zero w₁ (formCode (forall_3 φ)))) :=
+    prf_mp (pcc_forallElim_code_open (formCode (forall_3 φ)) w₁) h0
+  have h2 : Prf (provFromCode (forallc (substfc (numeral 1) (liftc zero w₁)
+      (formCode (forall_2 φ))))) :=
+    prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (formCode (forall_2 φ)))) h1
+  have h3 : Prf (provFromCode (substfc zero w₂ (substfc (numeral 1) (liftc zero w₁)
+      (formCode (forall_2 φ))))) :=
+    prf_mp (pcc_forallElim_code_open _ w₂) h2
+  have h4 : Prf (provFromCode (substfc zero w₂ (forallc (substfc (numeral 2)
+      (liftc zero (liftc zero w₁)) (forallc (formCode φ)))))) :=
+    prf_mp (prf_provCode_congr (prf_congr_substfc_arg3
+      (prf_substfc_forall (numeral 1) (liftc zero w₁) (forallc (formCode φ))))) h3
+  have h5 : Prf (provFromCode (forallc (substfc (numeral 1) (liftc zero w₂)
+      (substfc (numeral 2) (liftc zero (liftc zero w₁)) (forallc (formCode φ)))))) :=
+    prf_mp (prf_provCode_congr (prf_substfc_forall zero w₂
+      (substfc (numeral 2) (liftc zero (liftc zero w₁)) (forallc (formCode φ))))) h4
+  have h6 : Prf (provFromCode (substfc zero w₃ (substfc (numeral 1) (liftc zero w₂)
+      (substfc (numeral 2) (liftc zero (liftc zero w₁)) (forallc (formCode φ)))))) :=
+    prf_mp (pcc_forallElim_code_open _ w₃) h5
+  have h7 : Prf (provFromCode (substfc zero w₃ (substfc (numeral 1) (liftc zero w₂)
+      (forallc (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁)))
+        (formCode φ)))))) :=
+    prf_mp (prf_provCode_congr (prf_congr_substfc_arg3 (prf_congr_substfc_arg3
+      (prf_substfc_forall (numeral 2) (liftc zero (liftc zero w₁)) (formCode φ))))) h6
+  have h8 : Prf (provFromCode (substfc zero w₃ (forallc (substfc (numeral 2)
+      (liftc zero (liftc zero w₂))
+      (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))) :=
+    prf_mp (prf_provCode_congr (prf_congr_substfc_arg3
+      (prf_substfc_forall (numeral 1) (liftc zero w₂)
+        (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ))))) h7
+  have h9 : Prf (provFromCode (forallc (substfc (numeral 1) (liftc zero w₃)
+      (substfc (numeral 2) (liftc zero (liftc zero w₂))
+        (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))) :=
+    prf_mp (prf_provCode_congr (prf_substfc_forall zero w₃
+      (substfc (numeral 2) (liftc zero (liftc zero w₂))
+        (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ))))) h8
+  exact prf_mp (pcc_forallElim_code_open _ w₄) h9
+
+/-- **Instanciación de un axioma `∀∀∀∀φ` codificado** (cuatro testigos). -/
+theorem pcc_axiom_inst4 (φ : Formula) (hmem : forall_4 φ ∈ axioms) (w₁ w₂ w₃ w₄ : Term) :
+    Prf (provFromCode (substfc zero w₄ (substfc (numeral 1) (liftc zero w₃)
+      (substfc (numeral 2) (liftc zero (liftc zero w₂))
+        (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))) :=
+  pcc_thm_inst4 φ (prf_ax hmem) w₁ w₂ w₃ w₄
+
 end ROBINSON_PlusPlus.Meta.MpCodePrf
 
 export ROBINSON_PlusPlus.Meta.MpCodePrf (
   liftTerm_implc liftTerm_implc_open pcc_mp_code_open pcc_mp_code pcc_mp_code_apply
-  pcc_thm_inst pcc_thm_inst2 pcc_thm_inst3 pcc_axiom_inst pcc_axiom_inst2 pcc_axiom_inst3
+  pcc_thm_inst pcc_thm_inst2 pcc_thm_inst3 pcc_thm_inst4
+  pcc_axiom_inst pcc_axiom_inst2 pcc_axiom_inst3 pcc_axiom_inst4
   pcc_ax4_inst pcc_ax5_inst
 )

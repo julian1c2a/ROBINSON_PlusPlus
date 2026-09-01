@@ -2,8 +2,8 @@
 
 > ## ESTADO REAL — 2026-08-31 · 🏁 el MURO DE `substfc` está ROTO (vía CERO axiomas)
 >
-> **Build 118 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **Build 119 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **105 módulos activos** (Minimal 11 + Meta 83 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 48 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -29,7 +29,7 @@
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
-**Last updated:** 2026-08-31 · HEAD `5f6ce62` · Lean v4.31.0 — 🏁 `pcc_eval_substfc` PROBADO (§3.30)
+**Last updated:** 2026-08-31 · HEAD `aae9aa9` · Lean v4.31.0 — 🏁 `pcc_eval_substfc` PROBADO (§3.30)
 
 > **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**104 módulos activos** (Minimal 11 + Meta 82 + Full 11) + barrel `Meta.lean` + raíz
+**105 módulos activos** (Minimal 11 + Meta 83 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **48 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -122,7 +122,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
-Los **82 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
+Los **83 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
 Detalle en el nodo §3.15–§3.30.
 
 | # | Module | Rol · Estado |
@@ -271,7 +271,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-30.** Build **118 jobs**, **104 módulos activos**, **48 `sondeos/`**, 0 sorrys,
+**Estado 2026-08-31.** Build **119 jobs**, **105 módulos activos**, **48 `sondeos/`**, 0 sorrys,
 7 `axiom` de Lean.
 
 ### Lo que está cerrado

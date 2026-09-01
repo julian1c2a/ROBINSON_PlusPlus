@@ -6,7 +6,7 @@
 > todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
 > `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral`
 > → reglas `ind`/`listInd`).
-> **Ficheros `.lean`:** la cadena `Meta/` (82 módulos en el build, barrel
+> **Ficheros `.lean`:** la cadena `Meta/` (83 módulos en el build, barrel
 > [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **0 módulos en `cuarentena/`**, que **NO están
 > en el build** (ver [cuarentena/README.md](../cuarentena/README.md)).
 
@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 118 jobs · 104 módulos activos** (Minimal 11 + Meta 82 + Full 11) **+ 0 en `cuarentena/`
+> **Build 119 jobs · 105 módulos activos** (Minimal 11 + Meta 83 + Full 11) **+ 0 en `cuarentena/`
 > + 10 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24

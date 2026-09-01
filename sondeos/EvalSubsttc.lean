@@ -978,16 +978,17 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
-/-- **REFLECTOR DEL ATOMO `=`** (el gemelo de `pcc_lt_tracked`, que no estaba):
-    `⊢ (a ≐ b) ⇒ Prov(⌜ ȧ = ḃ ⌝)`, con `a`, `b` **ABSTRACTOS**. Sale de la reflexividad
-    codificada (`prf_provFromCode_eqCodeFn_refl`) mas Leibniz OBJETO. -/
-theorem pcc_eq_tracked (a b : Term) :
-    Prf ((a =eq b) ⇒ provFromCode (eqCodeFn (tcFn a) (tcFn b))) := by
-  refine prf_deduction ?_
-  exact PrfH_provCode_congr
-    (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl (tcFn a)) _)
-      (PrfH_congr_tcFn (prfH_hyp_self _)))
-    (prf_to_prfH (prf_provFromCode_eqCodeFn_refl (tcFn a)) _)
+/- ⛔ **RETIRADA 2026‑08‑31 — `pcc_eq_tracked` YA EXISTE EN PRODUCCIÓN.**
+
+   Aquí había una copia local del reflector del átomo `=`. El agente que la escribió la
+   declaró como pieza nueva; el verificador adversarial lo refutó y yo lo confirmé:
+   está en `ROBINSON_PlusPlus/Meta/Sigma1AtomPrf.lean:246`, con enunciado **idéntico**
+   (`Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))`) y ya consumida en
+   `Meta/InAxiomsCodePrf.lean:220`.
+
+   La copia local la **SOMBREABA** — la trampa registrada de «misma definición en dos
+   namespaces». Este fichero abre `Sigma1AtomPrf` en la línea 17, así que el uso de
+   más abajo resuelve solo a la de producción. -/
 
 /-- Rama `v < n` (clausula `ax_substtc_var_gt`). **La UNICA que necesita `pred` dotado.** -/
 theorem br_lt (v s n : Term)
@@ -1890,7 +1891,6 @@ end SFsubsttc
 #print axioms SFsubsttc.refl_caso_funcc
 #print axioms SFsubsttc.refl_lista_nil
 #print axioms SFsubsttc.refl_lista_cons
-#print axioms SFsubsttc.pcc_eq_tracked
 #print axioms SFsubsttc.br_lt
 #print axioms SFsubsttc.br_eq
 #print axioms SFsubsttc.br_gt
