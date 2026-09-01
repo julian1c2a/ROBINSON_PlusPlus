@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑31 · `master` limpio y verde · Lean v4.31.0**
-**120 jobs · 106 módulos activos (Minimal 11 + Meta 84 + Full 11) + 0 en `cuarentena/` · 51 `sondeos/`**
+**120 jobs · 106 módulos activos (Minimal 11 + Meta 84 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -60,12 +60,37 @@ comentarios).
 >         del contexto en PrfH) NO existen en NINGUN sitio -- ni en produccion
 >         ni en sondeos (verificado por grep 2026-08-31). Van a
 >         Meta/HilbertDeduction.lean, pero hay que PROBARLOS primero.
+>   B8 ⬜ ⚠️ NUEVO (2026-08-31, destapado por las mediciones): faltan en produccion
+>         prf_isFormCodeE2_str, CRIT_E2_rejects_varc, CRIT_isFC1_rejects_varc
+>         (el kit de DISCRIMINACION) y prf_congr_carc (solo existe prf_congr_carcT).
+>   B9 ⬜ ⚠️ Y BLOQUEA A LA RAMA F: codeNat_ne / codeNatTerm_ne viven solo en
+>         sondeos/CodeNatInj.lean (210 l.), y los casos 3-4 del modulo C de
+>         NegVerifier los necesitan. La promocion desatasca TRES frentes, no dos.
 >   B7 ⬜ LIMPIEZA: borrar la pcc_eq_tracked local de EvalSubsttc
 >         (sombrea Meta/Sigma1AtomPrf.lean:246)
-> C · LOS 7 REFLECTORES de lineWF
->   C1 ⬜ q1 q2 q3 leibniz ind qconf listInd
->         ✅ pcc_lineWF_tracked_modulo_7 (Meta/LineWFAssemblePrf.lean) GARANTIZA que cerrar
->            esos 7 cierra pcc_lineWF_tracked, y que no hay nada más aguas abajo
+> C · LOS 7 REFLECTORES de lineWF     ⚠️ REPLANTEADA 2026-08-31 (§3.32.2)
+>   C0 ✅ MEDIDA: las tres vias, y DOS estan REFUTADAS con prueba compilada.
+>         (A) la guarda NO sale de `lineWF t`: hay una LINEA BASURA que satisface
+>             lineWF, tag 9, lenc 4 y la condicion estructural ENTERA, con la casilla 2
+>             = codigo de VARIABLE. Causa: la condicion del tag 9 es UNA ecuacion de
+>             carc, y ax_lineWF_inv solo habla de la ETIQUETA.
+>         (B) cargarla por la cadena: sube hasta D3, y la hipotesis colgante es
+>             REFUTABLE => la D3 que saldria seria VACUA, no solo condicionada.
+>         ✅ Lo que SI sobrevive: chasis y ensamblador NO hay que rehacerlos.
+>   C1 ⬜ (C) LA ENMIENDA DEL ESQUEMA — la unica via que puede funcionar.
+>         ⚠️ Es CIRCULAR tal cual: rompe el chasis que la consume.
+>         ▶ PREREQUISITO: el lema previo `∀t. hasWit (tcFn t)`. Hay que pagarlo ANTES.
+>         ✅ hcond_absorbe_extra (sondeos/SegundoMuro.lean) la abarata: lo que absorbe
+>            es un conjunto EXTRA en C, o sea EXACTAMENTE una enmienda de esquema.
+>            Aquella pieza se probo para esto y no se sabia.
+>   C2 ⬜ DECISION DEL AUTOR, ahora con el coste real medido:
+>         ⛔ El argumento "enmendar cambia G" que se venia usando ES FALSO (§3.32.1):
+>            godelCN tiene 483 dependencias y NINGUNA es `axioms`. G, como FORMULA, no
+>            cambia. Lo que cambia es la TEORIA de la que G habla -- puede seguir siendo
+>            motivo para no hacerlo, pero es OTRO argumento y mucho mas debil.
+>   C3 ⬜ los 7 tags, una vez decidida la via: q1 q2 q3 leibniz ind qconf listInd
+>         ✅ pcc_lineWF_tracked_modulo_7 GARANTIZA que cerrar esos 7 cierra
+>            pcc_lineWF_tracked, y que no hay nada más aguas abajo
 > D · D3 REAL
 >   D1 ⬜ hC_dot — la reflexión punteada de chainOk. NO EXISTE (verificado por grep)
 >   D2 ⬜ d3_prf := d3_prf_of_chainOkDot φ hC_dot   ✅ el consumidor YA existe (Meta/D3InDotPrf)
@@ -74,8 +99,24 @@ comentarios).
 >   E2 ⬜ F7b: retirar el `axiom d3` (Meta/GodelTwo.lean) — 7 axiomas de Lean pasan a 6
 > ```
 >
-> **FRENTE INDEPENDIENTE, no bloquea la fase — rama F**: `⊬¬G`.
-> ⚠️ **CORREGIDO 2026‑08‑30 contra el código.** Este frente estaba mal descrito en dos puntos:
+> **FRENTE INDEPENDIENTE — rama F**: `⊬¬G`.
+>
+> ## 🧨 RE‑MEDIDO 2026‑08‑31 (§3.32.3): **el bloqueo de su plan es FALSO desde julio**
+> `PLAN-NEGVERIFIER.md` §B declara que **`NegVerifier` NO es demostrable** por la opacidad de
+> `axiomsCodeT`. La pieza que declara imposible lleva **compilada y enchufada** desde el **14‑jul**
+> (`Meta/AxiomListCode.lean:70` + `Meta/LineWFCases.lean:223`), y **el plan está fechado el 13‑jul**.
+> Su propia tabla marca ✅ el paso que invalidaba §B sin reescribir la conclusión.
+> ⇒ estimación: **de 1 900‑2 700 líneas / 8‑11 sesiones a ~800‑1 300 / 3,5‑5**. La opacidad es hoy
+> el **0 %** del coste restante.
+> El **censo**: caso 4 (aridad) **gratis 21/21**, caso 3 por `carc` en **19/21**, hueco real
+> **~45 líneas net‑0**.
+> ⛔ **NO ejecutar la recomendación §0.5 del plan** (añadir `ax_notInAxC`): la dirección negativa es
+> hoy un TEOREMA, y añadiría un axioma innecesario al inventario, que sigue en **7**.
+> ⚠️⚠️ **EL CUELLO DE BOTELLA DE F NO ES `axiomsCodeT`: ES LA RAMA B.** Los casos 3 y 4 necesitan
+> `codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `sondeos/CodeNatInj.lean`**, fuera del build.
+> ⇒ **la promoción bloquea también a F**, no sólo a C/D/E.
+>
+> ⚠️ (2026‑08‑30) Y este frente ya estaba mal descrito en otros dos puntos:
 > * **`repr_neg` NO existe ni hace falta** (grep: 0 ocurrencias fuera de doc). Su papel lo juega
 >   `Reflects`, y la reducción **ya está hecha** (`reflects_of_omega`, `Meta/OmegaReflect.lean:157`).
 > * **El «obstáculo del intuicionismo» está RESUELTO desde hace tiempo.** `Prf` es intuicionista
@@ -107,7 +148,28 @@ comentarios).
 >
 > ---
 >
-> # 🎯 SIGUIENTE SESIÓN — **MEDIR la rama C antes de construirla**
+> # 🎯 SIGUIENTE SESIÓN — **la rama B, que ahora bloquea TRES frentes**
+>
+> ✅ Las dos mediciones están hechas (3/3 cada una) y las dos **cambian el plan**:
+> * **Rama C** (§3.32.2): de las tres vías, **dos están REFUTADAS con prueba compilada**. Queda la
+>   **enmienda del esquema**, que es circular tal cual y pide antes `∀t. hasWit (tcFn t)`.
+>   ⛔ Y el argumento «enmendar cambia G» que la desaconsejaba **es FALSO** (§3.32.1).
+> * **Rama F** (§3.32.3): su bloqueo documentado **no existe desde julio**; la estimación baja a la
+>   mitad.
+>
+> ▶ **Y las dos apuntan al mismo sitio: la RAMA B.** Ya no bloquea sólo a C, D y E — la medición de
+> F descubrió que **también la bloquea a ella** (`codeNat_ne` vive sólo en `sondeos/`). Es el único
+> trabajo que desatasca **tres frentes a la vez**, y su primer trozo ya está hecho (B0, B0b).
+>
+> ⚠️ **Antes de empezar B1, medir qué queda**: `CodeWitnessPrf.SinWTs` ya es el núcleo de
+> `ClausuraLiftSinWTs`, así que B1 se ha reducido y no son sus 1 428 líneas.
+> Y añadir a la lista lo que las mediciones destaparon como ausente en producción:
+> `prf_isFormCodeE2_str`, `CRIT_E2_rejects_varc`, `CRIT_isFC1_rejects_varc`, `prf_congr_carc`
+> y **`codeNat_ne`/`codeNatTerm_ne`** (`sondeos/CodeNatInj.lean`, 210 l.).
+>
+> ---
+>
+> ## 📓 (histórico) La medición de la rama C, que era lo que había que hacer
 >
 > ✅ **B0b hecha**: `Meta/CodeWitnessPrf.lean` está en producción y con ella **el vocabulario
 > entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **120 jobs**.

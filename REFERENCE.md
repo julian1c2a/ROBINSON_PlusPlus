@@ -4,7 +4,7 @@
 >
 > **Build 120 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 51 en `sondeos/`** (experimentos compilados, fuera del build).
+> **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
@@ -24,12 +24,12 @@
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos abstractos, que es lo que repatría la cuarentena.
 > Rédito verificado en `sondeos/CarcPayoff.lean` (`pcc_eval_carc` vuelve). Detalle en
-> [Incompletitud §3.24–§3.31](doc/REFERENCE-Incompleteness.md).
+> [Incompletitud §3.24–§3.32](doc/REFERENCE-Incompleteness.md).
 >
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
-**Last updated:** 2026-08-31 · HEAD `c2044aa` · Lean v4.31.0 — 🏁 rama A cerrada · B0b hecha: el vocabulario del frente ya está en producción
+**Last updated:** 2026-08-31 · HEAD `7be9ee8` · Lean v4.31.0 — 🏁 rama A cerrada · B0b hecha: el vocabulario del frente ya está en producción
 
 > **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el
@@ -73,7 +73,7 @@ temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo 
 REFERENCE, `AI-GUIDE.md` §0.5).
 
 **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **51 en `sondeos/`**
+`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)
@@ -123,7 +123,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
 Los **84 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
-Detalle en el nodo §3.15–§3.31.
+Detalle en el nodo §3.15–§3.32.
 
 | # | Module | Rol · Estado |
 |--:|--------|--------------|
@@ -236,7 +236,7 @@ REFERENCE (`AI-GUIDE.md` §0.5): el índice raíz cataloga y navega; los nodos d
 | [**Aritmética**](doc/REFERENCE-Arithmetic.md) | `Block1–8` — aritmética desarrollada, Cantor, pares, listas, primos/TFA objeto | §3.2–§3.11 |
 | [**Gödelización**](doc/REFERENCE-Godelization.md) | `Meta/Godel`, `Meta/Provability` — Nivel B/C (`⌜·⌝`, `formCode`, `Provable`) | §3.12–§3.13 |
 | [**Full**](doc/REFERENCE-Full.md) | `Full/` — inducción general, representabilidad, `numeral`, TFA | §3.14 |
-| [**Incompletitud**](doc/REFERENCE-Incompleteness.md) | Nivel D: Gödel I/II, D1–D3, Σ₁‑completitud provable (12‑A), módulos A/B de `NegVerifier`, **la REPARACIÓN (§3.24), la ESCALERA (§3.25), la REPATRIACIÓN (§3.26), el FRENTE `substfc` por la vía CERO AXIOMAS (§3.27) y el DESCENSO cerrado (§3.28)** | §3.15–§3.31 |
+| [**Incompletitud**](doc/REFERENCE-Incompleteness.md) | Nivel D: Gödel I/II, D1–D3, Σ₁‑completitud provable (12‑A), módulos A/B de `NegVerifier`, **la REPARACIÓN (§3.24), la ESCALERA (§3.25), la REPATRIACIÓN (§3.26), el FRENTE `substfc` por la vía CERO AXIOMAS (§3.27) y el DESCENSO cerrado (§3.28)** | §3.15–§3.32 |
 
 **Navegación fuerte:** cada nodo enlaza de vuelta a este índice, a sus nodos hermanos relacionados y a
 los ficheros `.lean` que documenta. El subsistema **activo** es
@@ -273,7 +273,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-31.** Build **120 jobs**, **106 módulos activos**, **51 `sondeos/`**, 0 sorrys,
+**Estado 2026-08-31.** Build **120 jobs**, **106 módulos activos**, **57 `sondeos/`**, 0 sorrys,
 7 `axiom` de Lean.
 
 ### Lo que está cerrado

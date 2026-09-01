@@ -1495,6 +1495,18 @@ necesitan `pcc_eval_substfc`, que **no existe**. Requiere sancionar un predicado
 
 ### 3.27.1 · Por qué (1) no era «más cara» sino **otro teorema**
 
+> ## ⛔ APARTADO **REFUTADO** — leer §3.32.1 antes de citarlo
+>
+> El razonamiento de abajo concluye que un axioma nuevo **cambiaría la sentencia G**. **Es falso**,
+> medido el 2026‑08‑31 sobre el `Environment` de Lean: `godelCN` tiene **483 dependencias
+> transitivas y NINGUNA es `axioms`**, porque `axiomsCodeT`/`lineWF`/`chainOk`/`runFn` son **átomos
+> opacos** que `provFormulaC'` menciona sólo por su nombre.
+>
+> Lo que sí es cierto y se conserva: cambiar `axioms` **cambia la teoría de la que G habla** — la
+> fórmula es la misma, lo que cambia es **qué demuestra `Prov`**. Eso puede seguir siendo motivo
+> para no hacerlo, pero **es un argumento distinto** del que se escribió aquí, y mucho más débil
+> como razón de coste. Se conserva el texto como registro del razonamiento del 08‑26.
+
 La comparación se cerró con un dato de fuente, no de estimación: `ax_axiomsCodeT_eq`
 (`Minimal/Axioms.lean:1376`) ancla a **`axioms`** (los 141, `:1199`) y **no** a `coreAxioms`
 (`:922`). Luego los axiomas de la opción (1) **tienen** que entrar en `axioms` para funcionar,
@@ -1899,7 +1911,7 @@ definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al l
 Cierra la rama A del árbol de la fase, y con ella el frente que llevaba abierto desde julio.
 **Tres framings independientes, 1 CONFIRMADO + 2 PARCIAL** (los dos parciales con `medicionFiable`,
 que era el veredicto correcto: midieron bien y no cerraron). Los tres compilan; recompilados por mí
-desde su ubicación final. Build de producción intacto, **118 jobs**, **51 `sondeos/`**.
+desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
 
 ### 3.30.1 · El teorema
 
@@ -2091,6 +2103,117 @@ literal.
 La regla registrada decía «grepea el árbol de **producción** entero». **Es insuficiente**: hay que
 extenderla a **`sondeos/` y `Probe/`**. El censo de las cuatro veces está en el nodo de memoria
 [[feedback-auditoria-footprint]] §6.
+
+---
+
+## §3.32 · DOS MEDICIONES, Y DOS DOCUMENTOS DE ESTE ÁRBOL QUE ERAN FALSOS (2026‑08‑31)
+
+Dos frentes medidos en paralelo, **3 de 3 CONFIRMADOS cada uno**, seis ficheros en `sondeos/`,
+recompilados por mí. Ninguno tocó el árbol (`git status` limpio en todo momento). Y los dos
+terminan corrigiendo un documento del proyecto.
+
+### 3.32.1 · ⛔ **§3.27.1 ERA FALSO: enmendar un `ax_lineWF_*` NO cambia la sentencia G**
+
+Este documento viene repitiendo —§3.27.1, y con él parte del razonamiento de ADR‑015— que
+axiomatizar «no es más caro: es **otro teorema**», porque un axioma nuevo entraría en `axioms`,
+`ax_axiomsCodeT_eq` lo metería en `axiomsCodeT`, cambiaría `provCodeC'` y **cambiaría G**.
+
+Medido sobre el `Environment` de Lean, no por grep ni por lectura:
+
+```
+godelCN: 483 dependencias transitivas
+¿depende de  axioms / ax_lineWF_q1 / coreAxioms / codingAxioms ?  ->  NINGUNA
+```
+
+**Razón estructural, y comprobable**: `axiomsCodeT := Term.func "axiomsCodeT" []`,
+`lineWF l := Formula.atom "lineWF" [l]`, `chainOk c p := Formula.atom "chainOk" [c,p]` y `runFn`
+son **átomos OPACOS**. `provFormulaC' = ∃p. chainOk nil p ∧ In #1 (runFn nil p)` los menciona
+**sólo por su nombre**, y `godelBeta'`/`godelPred'`/`diagTerm`/`selfAppN` se construyen encima.
+⇒ **la sentencia G, como fórmula, no depende de `axioms`.**
+
+⚠️ **El matiz, y es el que importa**: G es **literalmente la misma fórmula**, pero pasa a hablar de
+una **teoría distinta**. Lo que cambia no es el enunciado sino **qué demuestra `Prov`**. Si eso
+afecta a la afirmación matemática es decisión del autor — pero **el argumento de coste que se venía
+usando para descartar la enmienda es incorrecto y hay que dejar de repetirlo.**
+
+### 3.32.2 · La rama C: las tres vías medidas, y dos REFUTADAS
+
+`sondeos/MedirC_Deriva.lean` · `MedirC_Carga.lean` · `MedirC_Enmienda.lean`.
+
+**(A) ¿sale la guarda del antecedente `lineWF t`? ⛔ REFUTADA** — y no «no conseguida». Se
+construyó una **línea basura** que satisface `lineWF` (usando el `prf_lineWF_q1` de **producción**),
+con tag 9, `lenc = 4̄`, que cumple **la condición estructural entera** del esquema, y cuya casilla 2
+es un **código de VARIABLE**:
+
+```lean
+MEDIDA_A_REFUTADA_con_TODO_el_antecedente_de_hcond
+  (hA : ∀ t, Prf (lineWF t ⇒ (lenc t ≐ 4̄) ⇒ substFormula 0 t condQ1 ⇒ hasWitF (nthc t 2̄)))
+  : Prf ⊥
+```
+
+🔑 **La causa es de una limpieza brutal, y está compilada**: `condQ1_es_UNA_ecuacion_atomica` —
+**la condición entera del tag 9 es UNA sola ecuación de `carc`**. No menciona bien‑formación en
+ningún sitio, y `ax_lineWF_inv` sólo habla de la **etiqueta**. La otra mitad tampoco baja: segunda
+línea basura con un código de **fórmula** en la ranura de **término**.
+
+**(B) ¿cargar la guarda por la cadena? ⛔ REFUTADA, y por una razón peor de la temida.** Sube hasta
+`pcc_lineWF_tracked` y hasta **D3** (compilado con el `d3_prf_of_chainOkDot` **real** de
+producción). Pero el problema no es ése:
+
+```lean
+M5_LA_GUARDA_COLGANTE_IMPLICA_BOT : Prf GUARDA_COLGANTE → Prf ⊥
+```
+
+⇒ la D3 que saldría sería **VACUA**, no sólo condicionada.
+✅ Lo que **sí** sobrevive, y es la buena noticia: **ni el chasis ni el ensamblador hay que
+rehacerlos** — el ensamblador con guarda ya está escrito (25 líneas).
+
+**(C) enmendar el esquema — la ÚNICA que puede funcionar.** ⚠️ Pero **es circular** tal cual: rompe
+el chasis que la consume, porque éste pide reflejar todo el lado derecho del `⇔`. Hay que pagar
+antes un lema previo, **`∀t. hasWit (tcFn t)`**. Y es la vía que `hcond_absorbe_extra`
+(`sondeos/SegundoMuro.lean`) sabe abaratar, porque lo que absorbe es un **conjunto extra en `C`** —
+o sea, exactamente una enmienda de esquema. Aquella pieza se probó para esto y no se sabía.
+
+### 3.32.3 · El frente F: su plan declara imposible algo que existe desde julio
+
+`sondeos/MedirF_Opaco.lean` · `MedirF_Censo.lean` · `MedirF_Replan.lean`.
+
+`PLAN-NEGVERIFIER.md` §B dice que **`NegVerifier` NO es demostrable** por la opacidad de
+`axiomsCodeT`. **Es falso**, y las piezas llevan compiladas **y enchufadas** desde julio:
+
+```lean
+-- Meta/AxiomListCode.lean:70
+neg_In_axiomsCodeT (φ) (hnp : ¬ Prf φ) : axioms ⊢ neg (In (formCode φ) axiomsCodeT)
+-- Meta/LineWFCases.lean:223  — el consumidor, ya alimentado
+derives_lineWF_neg_thy_of_not_prf (φ) (hnp) : axioms ⊢ neg (lineWF ⟨formCode φ, 15̄⟩)
+```
+
+🔑 **Las fechas lo explican** (comprobadas en git): el plan es del **2026‑07‑13**,
+`Meta/AxiomListCode.lean` del **2026‑07‑14**. **El módulo se escribió al día siguiente del plan que
+lo declara imposible**, y el propio plan marca ✅ su paso 0.5 («concretar `axiomsCodeT`») **sin
+reescribir la conclusión de §B que ese paso invalidaba**. El documento se contradice a sí mismo.
+
+**Estimación revisada, medida contra el árbol**: de **1 900‑2 700 líneas / 8‑11 sesiones** a
+**~800‑1 300 líneas / 3,5‑5 sesiones**. Ya están entregadas ~1 160 líneas del presupuesto, que el
+plan estimaba en 650‑900. **La opacidad es hoy el 0 % del coste restante.**
+
+**El censo de los 21 tags**: el caso 4 (aridad) es **gratis para 21/21**, el caso 3 cae por la
+cabeza de `carc` en **19/21**, y el único hueco real lo tapa un sustituto de `canon_ne` de
+**~45 líneas net‑0**.
+
+⚠️ **Y el cuello de botella real de F NO es `axiomsCodeT`: es la rama B.** Los casos 3 y 4 necesitan
+`codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `sondeos/CodeNatInj.lean`**, fuera del build.
+⇒ la promoción a `Meta/` bloquea **también** a F.
+
+⛔ **Y una recomendación del plan que NO hay que ejecutar**: su §0.5 propone añadir un `axiom`
+(`ax_notInAxC`). Se tomó la opción net‑0 y **la dirección negativa es hoy un teorema**; ejecutarla
+añadiría un axioma innecesario a un inventario que sigue en **7**.
+
+### 3.32.4 · Piezas del frente que faltan en producción (para la rama B)
+
+Detectadas al reconstruirlas a mano durante las mediciones: `prf_isFormCodeE2_str`,
+`CRIT_E2_rejects_varc`, `CRIT_isFC1_rejects_varc` — el kit de **discriminación** — y
+**`prf_congr_carc`**, que no existe (sólo `prf_congr_carcT`, la de código).
 
 ---
 

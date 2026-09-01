@@ -1,5 +1,50 @@
 # PLAN — `NegVerifier` (cerrar `⊬¬G`)
 
+> # 🧨 ESTE PLAN CONTIENE AFIRMACIONES FALSAS — corregido 2026‑08‑31
+>
+> Re‑medido contra el árbol actual (3 ángulos, 3/3 confirmados; `sondeos/MedirF_*.lean`).
+> Proyección completa en **`doc/REFERENCE-Incompleteness.md` §3.32.3**.
+>
+> ## ⛔ Lo más grave: **§B es FALSO**, y llevaba mes y medio siéndolo
+>
+> §B concluye que **«`NegVerifier` NO es demostrable mientras `axiomsCodeT` sea opaco»**.
+> El átomo **dejó de ser opaco el 2026‑07‑13** (`ax_axiomsCodeT_eq`), y la dirección negativa lleva
+> **compilada y enchufada a su consumidor** desde el **2026‑07‑14**:
+> ```lean
+> Meta/AxiomListCode.lean:70   neg_In_axiomsCodeT (φ) (hnp : ¬ Prf φ) :
+>                                axioms ⊢ neg (In (formCode φ) axiomsCodeT)
+> Meta/LineWFCases.lean:223    derives_lineWF_neg_thy_of_not_prf   -- el consumidor, ya alimentado
+> ```
+> 🔑 **Este documento está fechado el 2026‑07‑13 y el módulo se escribió al día siguiente.** Su
+> propia tabla marca ✅ el paso 0.5 («concretar `axiomsCodeT`») **sin reescribir la conclusión de
+> §B que ese paso invalidaba**. El plan se contradice a sí mismo.
+>
+> ## Las otras correcciones verificadas
+>
+> | dónde | dice | realidad |
+> |---|---|---|
+> | §B | «no existe forma de refutar `In v axiomsCodeT`» | `neg_In_axiomsCodeT_gen` la refuta para **cualquier** término invariante por sustitución |
+> | §B | «si `φ` es indemostrable pero no‑axioma, no se puede» | **sí se puede**, con la hipótesis META `¬ List.Mem φ axioms` |
+> | **§0.5** | recomienda **añadir un `axiom`** (`ax_notInAxC`) | ⛔ **NO HACERLO**: se tomó la opción net‑0 y la dirección negativa **es hoy un teorema**. Añadiría un axioma innecesario a un inventario que sigue en **7** |
+> | §10 | criterio de aceptación cita `ax_inAxC` | **ya no es axioma**: es teorema derivado ⇒ el criterio daría **falso rojo** |
+> | §3 | `ax_lineWF_mp` es incondicional | el esquema **ESTRICTO** ya liga la forma ⇒ `NegVerifier` **gana** una vía de refutación que el plan no contabiliza |
+>
+> ## Lo que SÍ sigue en pie
+> **`canon_ne` es FALSO** (§ALTO, abajo) y con él los casos 3 y 4 del módulo C. ✅ El sustituto
+> existe y es net‑0 (`sondeos/CodeNatInj.lean`). Y el **caso `thy`** —que §B usaba como argumento de
+> imposibilidad— **está CERRADO** y es independiente de `canon_ne`.
+>
+> ## Estimación revisada
+> **De 1 900‑2 700 líneas / 8‑11 sesiones → ~800‑1 300 líneas / 3,5‑5 sesiones.** Ya entregadas
+> ~1 160 líneas del presupuesto (el plan las estimaba en 650‑900). **La opacidad es hoy el 0 % del
+> coste restante.** El censo: caso 4 **gratis 21/21**, caso 3 por `carc` en **19/21**, y el único
+> hueco real son **~45 líneas net‑0**.
+>
+> ⚠️ **EL CUELLO DE BOTELLA REAL NO ES `axiomsCodeT`: ES LA RAMA B.** Los casos 3 y 4 necesitan
+> `codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `sondeos/`**, fuera del build.
+>
+> ---
+
 > ## ⛔ ALTO — LEER ANTES QUE NADA (2026-08-23)
 >
 > **El paso 1.1 de este plan (`canon_ne`) es FALSO, y con él caen los casos 3 y 4 del módulo C.**

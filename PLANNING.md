@@ -5,10 +5,10 @@
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.31.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 120 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) **+ 0 en `cuarentena/` + 51 en `sondeos/`.**
+> **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-08-31 (HEAD `aae9aa9`) — Estado global: **105 módulos** (Minimal 11 + Meta 83 + Full 11), **120 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`), **51 `sondeos/`**, `cuarentena/` VACÍA. Frente vivo: el muro de `substfc` por la vía de CERO axiomas — SEIS de los 8 constructores montados (`eqc`/`atomc` sólo tienen sus ingredientes); el ENSAMBLAJE en sí ya compila (ver `NEXT-STEPS.md` y `doc/REFERENCE-Incompleteness.md` §3.29). ⚠️ **Lo que sigue en esta línea es el registro de 2026-07-24 y se conserva como HISTÓRICO**: **MÓDULO A de `NegVerifier` COMPLETO (§43)** (decodificador: biyección de fórmulas + cadenas + `decodeChain_prf`). **MÓDULO B en curso (§44)**: tabla de los 21 tags + dirección negativa ✅; nivel `⊢` des‑duplicado ✅; **19 `ax_lineWF` estructurales a accesores ✅** (net‑0); **B.3c EN CURSO**: `pcc_lineWF_tracked` — **`eqrefl` (tag 12) CERRADO** vía esquema ESTRICTO (`Meta/LineWFTrackedPrf.lean`) y el **`In`‑reflect de `axiomsCodeT` CERRADO** (`Meta/InAxiomsCodePrf.lean`, el nudo de `NegVerifier`); faltan `thy` (mecánico), `mp`, los 17 tags `=eq` y el `or_elim` ×21 → `hC_dot`. **Refactor de anclas**: `prf_axiomsCodeT_eq` nuevo, `prf_inAxC` pasa a teorema (net‑0, siguen 7). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
+**Última actualización:** 2026-08-31 (HEAD `aae9aa9`) — Estado global: **105 módulos** (Minimal 11 + Meta 83 + Full 11), **120 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`), **57 `sondeos/`**, `cuarentena/` VACÍA. Frente vivo: el muro de `substfc` por la vía de CERO axiomas — SEIS de los 8 constructores montados (`eqc`/`atomc` sólo tienen sus ingredientes); el ENSAMBLAJE en sí ya compila (ver `NEXT-STEPS.md` y `doc/REFERENCE-Incompleteness.md` §3.29). ⚠️ **Lo que sigue en esta línea es el registro de 2026-07-24 y se conserva como HISTÓRICO**: **MÓDULO A de `NegVerifier` COMPLETO (§43)** (decodificador: biyección de fórmulas + cadenas + `decodeChain_prf`). **MÓDULO B en curso (§44)**: tabla de los 21 tags + dirección negativa ✅; nivel `⊢` des‑duplicado ✅; **19 `ax_lineWF` estructurales a accesores ✅** (net‑0); **B.3c EN CURSO**: `pcc_lineWF_tracked` — **`eqrefl` (tag 12) CERRADO** vía esquema ESTRICTO (`Meta/LineWFTrackedPrf.lean`) y el **`In`‑reflect de `axiomsCodeT` CERRADO** (`Meta/InAxiomsCodePrf.lean`, el nudo de `NegVerifier`); faltan `thy` (mecánico), `mp`, los 17 tags `=eq` y el `or_elim` ×21 → `hC_dot`. **Refactor de anclas**: `prf_axiomsCodeT_eq` nuevo, `prf_inAxC` pasa a teorema (net‑0, siguen 7). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
 
 **Gödel I — COMPLETO** (`goedel_first_undecidable_real'`): `⊬G ∧ ⊬¬G`, **sin ningún postulado gödeliano**, con la **reflexión como hipótesis META explícita** (`Reflects`), reducida a **ω‑consistencia clásica + `NegVerifier`** (`Meta/OmegaReflect.lean`). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales. **Gödel II** (`goedel_second'`) montado, **módulo `axiom d3`**.
 
