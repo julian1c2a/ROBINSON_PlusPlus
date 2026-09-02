@@ -1,9 +1,9 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-08-31 · 🏁 rama A CERRADA: `pcc_eval_substfc` + no-vacuidad (vía CERO axiomas)
+> ## ESTADO REAL — 2026-09-01 · rama A cerrada · PROMOCIÓN en curso (B0, B0b, B9, B1)
 >
-> **Build 120 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **106 módulos activos** (Minimal 11 + Meta 84 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **Build 121 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **107 módulos activos** (Minimal 11 + Meta 85 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -29,7 +29,7 @@
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
-**Last updated:** 2026-08-31 · HEAD `7be9ee8` · Lean v4.31.0 — 🏁 rama A cerrada · B0b hecha: el vocabulario del frente ya está en producción
+**Last updated:** 2026-09-01 · HEAD `d876e26` · Lean v4.31.0 — B9 y B1: el sustituto de `canon_ne` y la clausura de `hasWit`, en producción
 
 > **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**106 módulos activos** (Minimal 11 + Meta 84 + Full 11) + barrel `Meta.lean` + raíz
+**107 módulos activos** (Minimal 11 + Meta 85 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -122,7 +122,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
-Los **84 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
+Los **85 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
 Detalle en el nodo §3.15–§3.32.
 
 | # | Module | Rol · Estado |
@@ -152,10 +152,11 @@ Detalle en el nodo §3.15–§3.32.
 | 70–73 | **`CodeCtorKit`** · `LineWFEfqPrf` · **`CodeTreeReflect`** · `LineWFPropPrf` | 🔁 **el KIT**: `pcc_dot_nul`/`_un`/`_bin` (+ simétricas) y sus congruencias internas; **`pcc_tc_objAt`** (recursión sobre `CTree` dentro de `Prov`) (§3.26.3) |
 | 74 | **`EvalPredPrf`** | 🆕 **la evaluación DOTADA de `pred`** (2026‑08‑31, promovido de `sondeos/EvalPredDot.lean`): `pcc_eval_pred (n)` con `n` **ABSTRACTO**, más `pcc_eval_varc_pred`. Lo pide `ax_substtc_var_gt`, cuya cláusula devuelve `varc (pred n)`. ⚠️ `predcT` es **DEFINICIÓN**: no se postula ninguna ecuación de recursión suya (§3.30) |
 | 75 | **`CodeWitnessPrf`** | 🆕 **el vocabulario de TESTIGOS del frente `substfc`** (2026‑08‑31, promovido de `sondeos/HasWitFRealMin.lean`). Tres bloques: `SinWTs` (reconocedor de TÉRMINO con una lista, `isTC1`/`wfAll1`/`argsIn`, más `isFormCodeB2`), `ENS` (reconocedor de FÓRMULA **ecuacional** con dos listas, `isFC1`/`hasWitF`) y `HW` (**la NO‑VACUIDAD**: `prf_hasWitF_real`, net‑0 **puro**). ⚠️ Se **dedupliparon nueve** definiciones al promover (§3.31) |
-| 76–78 | **`InAxiomsCodePrf`** · `LineWFThyPrf` · `LineWFAssemblePrf` | 🔁 `pcc_In_axiomsCodeT_tracked`, **`pcc_tc_formCode_internal`**; **`pcc_lineWF_tracked_modulo_7`** (§3.26.4) |
-| 79–80 | `LineWFConsPrf` · `AxiomListCode` | `prf_line_is_cons`; `axiomsCodeT` concretado (`neg_In_axiomsCodeT`) |
-| 81–82 | `CodeDecode` · `ChainDecode` | **módulo A de `NegVerifier`**: `decodeForm` biyección + `decodeChain_prf` |
-| 83–84 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo; **Gödel II `goedel_second'`**, módulo `axiom d3` |
+| 76 | **`CodeNatInjPrf`** | 🆕 **inyectividad de la codificación numeral** (2026‑09‑01, promovido de `sondeos/CodeNatInj.lean`): `consN_inj` (Cantor) → `codeNat_inj` → **`codeNat_ne`/`codeNatTerm_ne`**, el **sustituto de `canon_ne`** que desbloquea los casos 3‑4 del módulo C de `NegVerifier`. ⚠️ Trae también `num_bridge`, el puente entre los **dos `numeral`** duplicados del proyecto |
+| 77–79 | **`InAxiomsCodePrf`** · `LineWFThyPrf` · `LineWFAssemblePrf` | 🔁 `pcc_In_axiomsCodeT_tracked`, **`pcc_tc_formCode_internal`**; **`pcc_lineWF_tracked_modulo_7`** (§3.26.4) |
+| 80–81 | `LineWFConsPrf` · `AxiomListCode` | `prf_line_is_cons`; `axiomsCodeT` concretado (`neg_In_axiomsCodeT`) |
+| 82–83 | `CodeDecode` · `ChainDecode` | **módulo A de `NegVerifier`**: `decodeForm` biyección + `decodeChain_prf` |
+| 84–85 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo; **Gödel II `goedel_second'`**, módulo `axiom d3` |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -273,7 +274,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-31.** Build **120 jobs**, **106 módulos activos**, **57 `sondeos/`**, 0 sorrys,
+**Estado 2026-08-31.** Build **121 jobs**, **106 módulos activos**, **57 `sondeos/`**, 0 sorrys,
 7 `axiom` de Lean.
 
 ### Lo que está cerrado

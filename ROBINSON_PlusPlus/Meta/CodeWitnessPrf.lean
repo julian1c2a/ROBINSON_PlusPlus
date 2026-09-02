@@ -1411,6 +1411,45 @@ theorem substF_isTC1 (v : Nat) (s w c : Term) :
     substFormula v s (isTC1 w c) = isTC1 (substTerm v s w) (substTerm v s c) := by
   simp only [isTC1, land, In, substFormula, substF_wfAll1, substTerm, substTerms]
 
+
+/-! ### Clausura y no‑vacuidad de `hasWit` (promovido de `sondeos/ClausuraLiftSinWTs.lean`, B1)
+
+`CRIT_hasWit_lift` es además **el molde de la obligación A5**
+(`hasWitF c ⇒ hasWitF (liftc zero c)`, el análogo del sort FÓRMULA, que no existe): misma
+estructura, con **dos** binders en vez de uno. -/
+
+/-- **La clausura en la forma que el descenso necesita.** -/
+theorem CRIT_hasWit_lift (c : Term) :
+    Prf (Formula.impl (hasWit c) (hasWit (liftc zero c))) := by
+  refine prf_ex_elim_imp ?_
+  have hgoal : liftFormula 0 (hasWit (liftc zero c))
+      = Formula.ex (isTC1 (.var 0) (liftTerm 1 (liftTerm 0 (liftc zero c)))) := by
+    simp only [hasWit, liftFormula, liftF_isTC1, liftTerm, Nat.reduceAdd,
+      Nat.zero_lt_succ, reduceIte]
+  rw [hgoal]
+  refine PrfH_ex_intro (liftsc zero (.var 0)) ?_
+  have hsub : substFormula 0 (liftsc zero (.var 0))
+      (isTC1 (.var 0) (liftTerm 1 (liftTerm 0 (liftc zero c))))
+      = isTC1 (liftsc zero (.var 0)) (liftc zero (liftTerm 0 c)) := by
+    have hv : substTerm 0 (liftsc zero (Term.var 0)) (Term.var 0) = liftsc zero (.var 0) := by
+      simp only [substTerm, if_true]
+    rw [← FOL.liftTerm_comm_zero, substF_isTC1, FOL.substTerm_liftTerm, hv, liftT_liftc]
+  rw [hsub]
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_isTC1_lift (.var 0) (liftTerm 0 c)) _)
+    (prfH_hyp_self _)
+
+/-- Y **no vacua**: todo término real TIENE testigo en esa forma. -/
+theorem CRIT_hasWit_real (t : Term) : Prf (hasWit (termCodeM t)) := by
+  refine prf_ex_intro (objList (tcodes1 t)) ?_
+  have h : substFormula 0 (objList (tcodes1 t)) (isTC1 (.var 0) (liftTerm 0 (termCodeM t)))
+      = isTC1 (objList (tcodes1 t)) (termCodeM t) := by
+    simp only [substF_isTC1, substTerm, if_true, FOL.substTerm_liftTerm]
+  rw [h]
+  exact prf_isTC1_tcodes t
+
+theorem CRIT_hasWit_real_lifted (t : Term) : Prf (hasWit (liftc zero (termCodeM t))) :=
+  prf_mp (CRIT_hasWit_lift (termCodeM t)) (CRIT_hasWit_real t)
+
 theorem liftF_hasWit (k : Nat) (c : Term) :
     liftFormula k (hasWit c) = hasWit (liftTerm k c) := by
   simp only [hasWit, liftFormula, liftF_isTC1, liftTerm, Nat.zero_lt_succ, reduceIte,
