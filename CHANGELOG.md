@@ -14,7 +14,7 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** **121 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑08‑31).
+> **Último build verificado:** **122 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑08‑31).
 
 ---
 
@@ -22,7 +22,7 @@
 
 Cierra la **rama A** entera. `sondeos/HasWitFReal.lean` (+ `HasWitFRealMin.lean` y
 `HasWitFCritica.lean`). **3 rutas de 3 CONFIRMADAS**, todas con `noVacuo=true`. Recompiladas por
-mí. Build **121 jobs**, **57 `sondeos/`**. Proyectado en **§3.31**.
+mí. Build **122 jobs**, **57 `sondeos/`**. Proyectado en **§3.31**.
 
 ```lean
 prf_isFC1_real   (φ) : Prf (ENS.isFC1 (objList (fcodesF φ)) (objList (tcodesF φ)) (formCodeM φ))
@@ -74,7 +74,7 @@ puede pagar barato.
 
 Cierra el frente que llevaba abierto desde julio. `sondeos/EvalSubstfcPrf.lean` (7 522 l.),
 **CONFIRMADO** por verificación adversarial que recompiló de cero (107 s en frío) y reejecutó los
-`#print axioms`; recompilado también por mí. Build **121 jobs** (tras promover `EvalPredPrf`), **57 `sondeos/`**. Proyectado en
+`#print axioms`; recompilado también por mí. Build **122 jobs** (tras promover `EvalPredPrf`), **57 `sondeos/`**. Proyectado en
 **§3.30**.
 
 ```lean

@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑08‑31 · `master` limpio y verde · Lean v4.31.0**
-**121 jobs · 107 módulos activos (Minimal 11 + Meta 85 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
+**122 jobs · 108 módulos activos (Minimal 11 + Meta 86 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -36,7 +36,7 @@ comentarios).
 > B · PROMOCIÓN a Meta/  — ahora es el CUELLO DE BOTELLA: bloquea C, D y E
 >   B0 ✅ pcc_axiom_inst4 -> Meta/MpCodePrf.lean   |  Meta/EvalPredPrf.lean (NUEVO)
 >         |  borrada la pcc_eq_tracked local que sombreaba produccion
->         (2026-08-31; build 118 -> 121 jobs, que es la comprobacion de que se construye)
+>         (2026-08-31; build 118 -> 122 jobs, que es la comprobacion de que se construye)
 >   B0b✅ HECHA (2026-08-31): Meta/CodeWitnessPrf.lean (2145 l.). El VOCABULARIO del
 >         frente llega POR FIN a produccion -- antes habia CERO en Meta/: isTC1,
 >         wfAll1, argsIn, isTermCodeE1, isFormCodeE2, isFC1, hasWitF, shapeNul/Un/Bin.
@@ -45,7 +45,7 @@ comentarios).
 >            lo que SinWTs ya tenia, y el sondeo lo certificaba con puentes rfl SIN
 >            resolverlo. Promoverlo asi habria metido DOS constantes por cada una en
 >            produccion -- la trampa registrada. Los puentes desaparecieron al sobrar.
->         Build 119 -> 121 jobs (la comprobacion de que se construye de verdad).
+>         Build 119 -> 122 jobs (la comprobacion de que se construye de verdad).
 >   B1 ✅/⬜ PARCIAL (2026-09-01). MEDIDA antes de empezar, y salio MUCHO menor:
 >         de las 155 declaraciones de ClausuraLiftSinWTs, 134 YA estaban en
 >         produccion via CodeWitnessPrf => quedaban 21, casi todas controles.
@@ -183,7 +183,7 @@ comentarios).
 > ## 📓 (histórico) La medición de la rama C, que era lo que había que hacer
 >
 > ✅ **B0b hecha**: `Meta/CodeWitnessPrf.lean` está en producción y con ella **el vocabulario
-> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **121 jobs**.
+> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **122 jobs**.
 >
 > ▶ **Lo siguiente es MEDIR C, no construirla.** La caída de A4 dejó a los 7 reflectores sin
 > planteamiento: la guarda no se puede probar para argumento abstracto, hay que **cargarla como

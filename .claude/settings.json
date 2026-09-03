@@ -1,5 +1,6 @@
 {
   "permissions": {
+    "defaultMode": "dontAsk",
     "allow": [
       "PowerShell($out = lake build 2>&1; $code = $LASTEXITCODE; \\($out | Select-String -Pattern 'error:' -SimpleMatch | Select-Object -First 25\\); \"ERR=\" + \\($out | Select-String -Pattern 'error:' -SimpleMatch\\).Count; \"EXIT=$code\")",
       "PowerShell(Set-Location *)",

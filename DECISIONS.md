@@ -1,14 +1,14 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-01 · rama A cerrada · PROMOCIÓN en curso (B0, B0b, B9, B1)
+> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 121 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **107 módulos activos** (Minimal 11 + Meta 85 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
+> **Build 122 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **108 módulos activos** (Minimal 11 + Meta 86 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-09-01 (HEAD `d876e26`) — ADR-015…018; rama A cerrada, promoción a `Meta/` en curso
+**Última actualización:** 2026-09-03 (HEAD `e46e482`) — ADR-015…018; promoción a `Meta/` avanzando (B0, B0b, B9, B1, B8)
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta

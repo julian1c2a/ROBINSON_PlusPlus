@@ -1618,6 +1618,77 @@ theorem liftF_hasWitF (k : Nat) (c : Term) :
     Nat.zero_lt_succ, reduceIte, ← FOL.liftTerm_comm_zero]
 
 
+
+/-! ### El kit de DISCRIMINACIÓN (promovido de `sondeos/EvalSubstfcPrf.lean`, B8)
+
+Estas piezas se reconstruyeron **a mano** durante las mediciones de la rama C porque no estaban
+en producción — señal de que se volverán a necesitar. Son las que prueban que la guarda
+**DISCRIMINA** y no es un colador: sin ellas, `pcc_eval_substfc` podría ser vacuo. -/
+
+/-- `shapeUn`/`shapeBin` en la forma con `consOk` (variantes que consume el fortalecimiento). -/
+theorem prf_shapeUn_str' (X : Term) (k : Nat) :
+    Prf (Formula.impl (shapeUn X k)
+      (land (SinWTs.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                                    (Formula.eq (lenc X) (numeralM 2))))) :=
+  SinWTs.prf_shape_strengthens X _ k 2 (prf_carc_cons _ _)
+    (SinWTs.prf_lenc_c2 _ _) (SinWTs.prf_consOk_cons _ _)
+
+theorem prf_shapeBin_str' (X : Term) (k : Nat) :
+    Prf (Formula.impl (shapeBin X k)
+      (land (SinWTs.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                                    (Formula.eq (lenc X) (numeralM 3))))) :=
+  SinWTs.prf_shape_strengthens X _ k 3 (prf_carc_cons _ _)
+    (SinWTs.prf_lenc_c3 _ _ _) (SinWTs.prf_consOk_cons _ _)
+
+theorem prf_shapeNul_str (X : Term) (k : Nat) :
+    Prf (Formula.impl (shapeNul X k)
+      (land (SinWTs.consOk X) (land (Formula.eq (carc X) (numeralM k))
+                                    (Formula.eq (lenc X) (numeralM 1))))) :=
+  SinWTs.prf_shape_strengthens X _ k 1 (prf_carc_cons _ _)
+    (SinWTs.prf_lenc_c1 _) (SinWTs.prf_consOk_cons _ _)
+
+/-- Functorialidad de `lor` en las DOS ramas. -/
+theorem lor_map {A A' B B' : Formula} (hA : Prf (A ⇒ A')) (hB : Prf (B ⇒ B')) :
+    Prf (lor A B ⇒ lor A' B') :=
+  prf_or_elim_imp (impT hA (prf_lorL _ _)) (impT hB (prf_lorR _ _))
+
+/-- **La forma ECUACIONAL fortalece la POSICIONAL** — 8 disyuntos a 8 disyuntos. -/
+theorem prf_isFormCodeE2_str (wF wT X : Term) :
+    Prf (Formula.impl (isFormCodeE2 wF wT X) (SinWTs.isFormCodeB2 wF wT X)) := by
+  simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn,
+    SinWTs.isFormCodeB2, SinWTs.lorAll]
+  exact lor_map (prf_shapeNul_str X 2)
+   (lor_map (SinWTs.prf_str_and X 3 3 _ _ (prf_shapeBin_str' X 3))
+    (lor_map (SinWTs.prf_str_and X 4 3 _ _ (prf_shapeBin_str' X 4))
+     (lor_map (SinWTs.prf_str_and X 5 3 _ _ (prf_shapeBin_str' X 5))
+      (lor_map (SinWTs.prf_str_and X 6 2 _ _ (prf_shapeUn_str' X 6))
+       (lor_map (SinWTs.prf_str_and X 7 3 _ _ (prf_shapeBin_str' X 7))
+        (lor_map (SinWTs.prf_str_and X 8 3 _ _ (prf_shapeBin_str' X 8))
+                 (SinWTs.prf_str_and X 9 2 _ _ (prf_shapeUn_str' X 9))))))))
+
+/-- **CONTROL**: un código de VARIABLE (tag 0) NO pasa por el reconocedor de FÓRMULA. -/
+theorem CRIT_E2_rejects_varc (wF wT n : Term) :
+    Prf (Formula.impl (isFormCodeE2 wF wT (varc n)) Formula.bottom) :=
+  impT (prf_isFormCodeE2_str wF wT (varc n))
+    (SinWTs.crit_isFormCodeB2_rejects_varc wF wT n)
+
+/-- **CONTROL**: un código de FUNCIÓN (tag 1) tampoco. -/
+theorem CRIT_E2_rejects_funcc (wF wT p ts : Term) :
+    Prf (Formula.impl (isFormCodeE2 wF wT (funcc p ts)) Formula.bottom) :=
+  impT (prf_isFormCodeE2_str wF wT (funcc p ts))
+    (SinWTs.crit_isFormCodeB2_rejects_funcc wF wT p ts)
+
+/-- **CONTROL**: la GUARDA COMPLETA hereda la discriminación. ⚠️ Es la pieza que REFUTÓ la
+    tarea A4 del árbol: la guarda sobre argumento ABSTRACTO no es sólo difícil, es FALSA. -/
+theorem CRIT_isFC1_rejects_varc (wF wT n : Term) :
+    Prf (Formula.impl (isFC1 wF wT (varc n)) Formula.bottom) := by
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (isFC1 wF wT (varc n))
+  have hwF := PrfH_and_elim_right (PrfH_and_elim_left hh)
+  have hin := PrfH_and_elim_right hh
+  have hcode := PrfH.mp _ _ _ (PrfH.mp _ _ _
+    (prf_to_prfH (prf_isFormCodeE2_of_In wF wT (varc n)) _) hin) hwF
+  exact PrfH.mp _ _ _ (prf_to_prfH (CRIT_E2_rejects_varc wF wT n) _) hcode
 end ENS
 end S_Ens
 

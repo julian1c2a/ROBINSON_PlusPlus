@@ -1,14 +1,14 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-01 · rama A cerrada · PROMOCIÓN en curso (B0, B0b, B9, B1)
+> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 121 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **107 módulos activos** (Minimal 11 + Meta 85 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
+> **Build 122 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **108 módulos activos** (Minimal 11 + Meta 86 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -30,14 +30,14 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-01 (grafo: +1 módulo, `Meta/CodeNatInjPrf.lean`, que importa `Full.Numerals`)
+**Last updated:** 2026-09-03 (grafo: +1 módulo, `Meta/LiftcCodePrf.lean`, con 25 imports concretos)
 **Author**: Julián Calderón Almendros
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
 
 > ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
 > solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
-> [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (85 módulos) se adopta la **vista
+> [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (86 módulos) se adopta la **vista
 > de subsistema** que esta nota pedía — ver §0 justo debajo. Mantener un grafo módulo‑a‑módulo de
 > `Meta/` aquí quedaría desactualizado de inmediato (`AI-GUIDE.md` §0.5); el detalle por módulo vive
 > en [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md) §3.15–§3.25 y el catálogo
@@ -303,7 +303,7 @@ por módulo. Resumen:
 ## Verification Commands
 
 ```bash
-lake build                              # build completo (121 jobs a 2026-08-31)
+lake build                              # build completo (122 jobs a 2026-08-31)
 lake clean                              # reinicia la caché (cuando `Replayed` esconde errores)
 lake env lean sondeos/X.lean            # compila un sondeo (fuera del build)
 lake env lean Probe/X.lean              # scratch de sesión (Probe/ está en .gitignore)
