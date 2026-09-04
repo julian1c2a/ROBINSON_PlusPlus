@@ -89,9 +89,60 @@ comentarios).
 >         no esta duplicada, asi que esto es solo higiene).
 >   B2e⬜ Docstrings FALSOS en CodeWitnessPrf: :78-82 promete un `DescMutua` y unas
 >         secciones que NO EXISTEN, y :68 se contradice con :78. Ver rama G.
->   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot · EvalSubstfcPrf
->         ⚠️ EvalSubstfcPrf son 7522 l. de las que ~6100 son COPIA de los otros cuatro.
->            Promoverlo BIEN = promover primero los cuatro y dejar solo sus §1-§15.
+>   B3 ⏳ EN CURSO. MEDIDO: los 5 sondeos son 576 nombres unicos, 294 ya estaban,
+>         282 faltaban. El ORDEN NO ES PREFERENCIA: EvalSubstfcPrf va el ULTIMO
+>         porque 407 de sus 522 nombres (78%) estan en los otros cuatro -- primero
+>         serian 249 declaraciones, ultimo son 84.
+>     B3.0 ✅ EvalPredDot: NADA QUE HACER, el 100% ya estaba en produccion.
+>     B3.1 ✅ SubstfcPlanos CERRADO (2026-09-04). De 39: dos DESCENSOS + modulo + 4 muertas.
+>           · descenso 1 -> Meta/CodeCtorKit.lean: binK, binK_binT, prf_congr_binK,
+>             prf_substtc_binK_at, y los 3 prf_substtc_termCode_* que ARRASTRA.
+>             ⛔ ADR-019 EN VIVO: el plan lo ponia en LiftcCodePrf, que IMPORTA
+>                CodeCtorKit => el tercero de sus «tres corolarios» era INALCANZABLE.
+>                Contabilidad real: UN lema de ahorro, no tres. Con el general en
+>                CodeCtorKit, los tres. TARIFA: quitar los termCode_* del export de
+>                LiftcCodePrf (error duro si no) y reapuntar una ref CUALIFICADA en
+>                EvalLiftcPrf que se rompia sin avisar.
+>           · descenso 2 -> Meta/EvalArithPrf.lean: el KIT TERNARIO (funcc3 + la
+>             imagen dotada substfcT). ⭐ RETIRA 74 COPIAS A MANO de sondeos/:
+>             substfcT estaba en ONCE sondeos y los dos funcc3 en NUEVE cada uno.
+>             ⛔ substfcT entra como DEFINICION. Postular su ecuacion de recursion
+>                como axioma OBJETO hace la teoria INCONSISTENTE.
+>           · Meta/SubstfcCodePrf.lean (NUEVO, 17): caso BINARIO y BOTTOM.
+>           · ⚠️ 4 RETIRADAS POR MUERTAS: paso2_caso_bin/_impl/_and/_or, CERO
+>             consumidores de codigo (solo prosa). El ensamblaje real usa
+>             paso2_caso_bin_imp, en MONEDA OBJETO -- la HI llega como hipotesis.
+>     B3.2 ⏳ EvalSubsttc -> Meta/EvalSubsttcPrf.lean. MEDIDO: de 156 a 70.
+>           ✅ condicion 5 HECHA: la escalera psi de nivel 2 y 3 (psi_lift_form2,
+>              psi_lift_form3, PSI_inst3, genericos en Phi) SUBIDA a StrongInductionPrf.
+>              🔑 Con ella se cazo el DUPLICADO nº69, invisible a TODO censo:
+>                 psi_substtc_l1 ES psi_lift_form instanciado a Phi := PHIsubsttc.
+>                 No es una copia, es una INSTANCIA -- se le escapa al indice por
+>                 nombre Y al comparador de enunciados. Sirve a TRES frentes
+>                 (EnsamblajeTriple y EnsamblajeMedida llevan el bloque igual).
+>           ⬜ QUEDAN LAS CUATRO CONDICIONES, en este orden:
+>              1. RENOMBRAR ANTES DE MOVER: 13 colisiones vivas (3 mas son muertas y
+>                 se caen solas). NUEVE estan exportadas a la raiz => el modulo NO
+>                 COMPILA sin esto.
+>                 ⚠️ SEMANTICA MEDIDA, no supuesta: dentro del modulo el local gana;
+>                    fuera sin homonimo local resuelve a produccion; EL PELIGRO es un
+>                    CONSUMIDOR AGUAS ABAJO que abre el modulo nuevo con el export de
+>                    LiftcCodePrf visible -- dos candidatos, y Lean elige POR
+>                    ELABORACION. Compilados los dos casos con el MISMO texto pelado:
+>                    ambos verdes. Fallo SILENCIOSO.
+>              2. Los TRES sin exportar: prf_cdrc_cons, wfAll1Body,
+>                 PrfH_congr_isTermCodeE1 viven en CodeWitnessPrf.SinWTs SIN export y
+>                 el sondeo no abre ese namespace. Hace falta el `open` o cualificar.
+>              3. BORRAR el §13 (9 decls) y las 3 muertas. ⚠️ Aparecen tambien en el
+>                 bloque de footprint del sondeo: un borrado MECANICO rompe ahi.
+>              4. `export` POR CONSUMO (criterio B2b), no por existencia.
+>           ⭐ El §13 entero SOBRA: produccion prueba pcc_eval_pred SIN GUARDA, o sea
+>              algo mas fuerte que PredHyp -- que ni existe en produccion.
+>     B3.3 ⬜ SubstfcEx. MEDIDO: de 104 que faltan, 49 NO se promueven (47%), 47 BAJAN
+>           a modulos existentes y solo 8 plantean modulo nuevo. Recomendacion del
+>           analisis: MEZCLA, y practicamente SIN MODULO NUEVO.
+>     B3.4 ⬜ EvalSubstfcPrf, el ultimo. Le faltan 222, pero 138 estan en los otros dos
+>           => quedaran ~84 exclusivas cuando lleguen B3.2 y B3.3.
 >   B4 ⬜ pcc_axiom_inst4 → Meta/MpCodePrf.lean                ⚠️ el frente la pide 2 veces más
 >   B5 ⬜ pcc_eval_pred  → Meta/                               (la incondicional, no la guardada)
 >   B6 ⬜ prf_nil_or_cons -> Meta/ChainPrf.lean          (esto SI es promocion)

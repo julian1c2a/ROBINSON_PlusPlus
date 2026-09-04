@@ -1,6 +1,6 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8, B2 hechas · **B3 EN CURSO**
+> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).

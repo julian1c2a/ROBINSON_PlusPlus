@@ -1,6 +1,6 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8, B2 hechas · **B3 EN CURSO**
+> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
@@ -29,7 +29,7 @@
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
-**Last updated:** 2026-09-04 · Lean v4.31.0 — **B2 CERRADA**: `Meta/EvalLiftcPrf.lean` (el DESCENSO, `pcc_eval_liftc`). Seis piezas genéricas subidas aguas arriba y dos bajadas a `LiftcCodePrf` por el CICLO DE IMPORTS (§3.34)
+**Last updated:** 2026-09-05 · Lean v4.31.0 — **B3 EN CURSO**: `SubstfcPlanos` cerrado con DOS descensos (`binK`→`CodeCtorKit`, KIT TERNARIO→`EvalArithPrf`, que retira **74 copias**) + `Meta/SubstfcCodePrf.lean`; y la escalera `psi` subida a `StrongInductionPrf` (§3.35)
 
 > **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el

@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8, B2 hechas · **B3 EN CURSO**
+> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-09-04 — **ADR-019 NUEVO** (baja el general, no subas el corolario: el CICLO DE IMPORTS que destapó B2); ADR-018 pasa a EN PRODUCCIÓN (`Meta/EvalLiftcPrf.lean`)
+**Última actualización:** 2026-09-05 — **ADR-019 confirmado en vivo por B3**: el general mal colocado dejaba un corolario inalcanzable, y la duplicación por INSTANCIA que ningún censo ve. ADR-018 en producción.
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta
@@ -661,6 +661,19 @@ abajo — nunca al revés.
 * La cualificación se simplifica sola: `prf_isTermCodeE1_of_In` necesitaba `SinWTs.impT`
   cualificado a mano en el módulo del descenso (que abre los dos namespaces); dentro de
   `SinWTs` el nombre a secas ya es el correcto.
+* ⚠️ **B3 lo confirmó en vivo, y el error casi se cuela.** El plan de `SubstfcPlanos` ponía el
+  general `prf_substtc_binK_at` en `LiftcCodePrf` prometiendo **tres** corolarios — pero
+  `LiftcCodePrf` **importa** `CodeCtorKit`, así que el tercero era **inalcanzable por
+  construcción**. Contabilidad medida: **un** lema de ahorro, no tres. Con el general en
+  `CodeCtorKit`, los tres. **Tarifa pagada**: subir los tres `prf_substtc_termCode_*`, quitarlos
+  del bloque `export` de `LiftcCodePrf` y **reapuntar una referencia cualificada** que se rompía
+  sin avisar hasta el build.
+* 🔑 **Y B3 destapó la forma más escurridiza del problema**: `psi_substtc_l1` **no era una
+  copia de `psi_lift_form`: era una INSTANCIA** (`Φ := PHIsubsttc`). Invisible al índice **por
+  nombre** (el nombre difiere) y al comparador de **enunciados normalizados** (el enunciado
+  también). Sólo se ve preguntando *«¿existe ya un genérico del que esto sea instancia?»* — que
+  **no es una pregunta que un censo conteste**. Contramedida: cuando aparezca una escalera
+  (`_l1`/`_l2`/`_l3`), mirar si el escalón 1 ya está arriba **antes** de promover los otros.
 * El mismo criterio decidió las **seis piezas genéricas** que subieron aguas arriba en B2:
   si un lema no menciona el vocabulario del frente, no es del frente, y escondido en el módulo
   del descenso queda **invisible** para los sondeos que lo tienen copiado a mano — `PSI_inst`

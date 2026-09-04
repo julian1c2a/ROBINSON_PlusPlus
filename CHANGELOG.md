@@ -14,7 +14,45 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** **123 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑09‑04).
+> **Último build verificado:** **124 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑09‑05).
+
+---
+
+## 2026-09-05 — B3 en marcha: **tres descensos, un módulo**, y un duplicado invisible al censo
+
+`sondeos/SubstfcPlanos.lean` cerrado entero; `EvalSubsttc` medido y su escalera subida.
+Build **124 jobs**, **110 módulos**. Proyectado en **§3.35**.
+
+**Lo que entró**, por orden:
+
+| | destino | qué |
+|---|---|---|
+| descenso 1 | `Meta/CodeCtorKit.lean` | `binK` + kit, y los 3 `prf_substtc_termCode_*` que arrastra |
+| descenso 2 | `Meta/EvalArithPrf.lean` | KIT TERNARIO (`funcc3` + `substfcT` dotado) — **retira 74 copias a mano** |
+| módulo | `Meta/SubstfcCodePrf.lean` | caso BINARIO y BOTTOM de `substfc`, **17 de 39** |
+| condición 5 | `Meta/StrongInductionPrf.lean` | la escalera `psi` de nivel 2 y 3, genérica en Φ |
+
+🔑 **El hallazgo de la jornada — una duplicación que ningún censo por nombre puede ver.**
+`psi_substtc_l1` **es `psi_lift_form` instanciado a `Φ := PHIsubsttc`**. Se le escapó al índice
+por nombre (el nombre difiere) **y** al comparador de enunciados normalizados (el enunciado
+también). No es una copia: es una **instancia**. Sólo se ve preguntando *«¿existe un genérico del
+que esto sea instancia?»*, que no es una pregunta que un censo conteste.
+
+⛔ **ADR‑019 aplicado, y un error atrapado a tiempo**: el plan colocaba el general en
+`LiftcCodePrf`, que **importa** `CodeCtorKit` — el tercero de sus «tres corolarios» era
+**inalcanzable por construcción**. Contabilidad real: **un** lema de ahorro, no tres. Con el
+general en `CodeCtorKit`, los tres — pagando la tarifa de subir los `prf_substtc_termCode_*`,
+quitarlos del `export` de `LiftcCodePrf` y reapuntar una referencia cualificada que se rompía.
+
+⚠️ **No se promueve lo muerto**: cuatro `paso2_caso_*` sin un solo consumidor de código (sólo
+prosa), porque el ensamblaje real usa la versión `_imp`, en **moneda OBJETO**. Y **el §13 entero
+de `EvalSubsttc` sobra**: producción prueba `pcc_eval_pred` **sin guarda**, más fuerte que
+`PredHyp`.
+
+⚠️ **17 colisiones en `EvalSubsttc`**, nueve exportadas a la raíz. Medida la semántica real: el
+peligro no está dentro del módulo sino en un **consumidor aguas abajo** que abre el módulo nuevo
+con el `export` de `LiftcCodePrf` visible — dos candidatos, y Lean elige **por elaboración**.
+Compilados los dos casos con el mismo texto pelado: ambos verdes. Fallo silencioso.
 
 ---
 

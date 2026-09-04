@@ -2311,6 +2311,103 @@ renombrados a «el descenso DISPARA», y se retiraron seis declaraciones. De pro
   cinco warnings** `unusedSimpArgs` sin introducir ninguno.
 * **Docstrings falsos**: `:78‑82` promete un `DescMutua` y unas secciones que **no existen**, y
   `:68` se contradice con `:78` sobre la procedencia del módulo.
+
+---
+
+## §3.35 · B3 · TRES DESCENSOS, UN MÓDULO, Y LA DUPLICACIÓN QUE NINGÚN CENSO VE (2026‑09‑04/05)
+
+B3 es la promoción grande: cinco sondeos, 15 777 líneas. Pero **medida**, son 576 nombres únicos
+de los que **294 ya estaban**. Y medida **otra vez después de cada paso**, encoge sola.
+
+### 3.35.1 · El orden no es preferencia: cambia el tamaño
+
+`EvalSubstfcPrf` va el **último** porque **407 de sus 522 nombres (78 %) están también en los
+otros cuatro**. Promovido primero serían 249 declaraciones; promovido último, **84**.
+
+Medido de nuevo tras los pasos de hoy: de las 222 que le faltaban, **138 están en `EvalSubsttc`
+o `SubstfcEx`**. La cuenta se sostiene.
+
+### 3.35.2 · `SubstfcPlanos` — el sondeo que casi no dio módulo
+
+Sus 39 declaraciones se repartieron así:
+
+| destino | qué | por qué |
+|---|---|---|
+| `Meta/CodeCtorKit.lean` | `binK`, `binK_binT`, `prf_congr_binK`, `prf_substtc_binK_at` + los 3 `prf_substtc_termCode_*` | **descenso 1** |
+| `Meta/EvalArithPrf.lean` | el KIT TERNARIO: `funcc3` + la imagen dotada `substfcT` | **descenso 2** |
+| `Meta/SubstfcCodePrf.lean` | 17 | el módulo nuevo |
+| — | 4 | **retiradas por MUERTAS** |
+
+**El descenso 2 retira 74 copias a mano** de `sondeos/`: `substfcT` estaba en **once** sondeos y
+los dos `funcc3` en **nueve** cada uno. Es lo que más ha pagado de toda la rama.
+
+### 3.35.3 · ⛔ El ciclo de imports, aplicado — y el error que casi se cuela
+
+El plan ponía el general `prf_substtc_binK_at` en `LiftcCodePrf` y prometía **tres** corolarios.
+Pero `LiftcCodePrf` **importa** `CodeCtorKit`: un lema allí no puede reescribir `prf_congr_binT`
+ni `prf_substtc_binT`. El tercero era **inalcanzable por construcción**.
+
+Contabilidad real, medida por la verificación adversarial:
+
+| lema | ahorro |
+|---|---|
+| `prf_substtc_binT_at` | 12 líneas de `refine` → **1**. Real |
+| `prf_substtc_funccT_at` | **ya era** una línea. **Cero** |
+| `CodeCtorKit.prf_substtc_binT` | **inalcanzable** con la colocación propuesta |
+
+Con el general en `CodeCtorKit`, los tres. ⚠️ **Y la tarifa**: arrastra los tres
+`prf_substtc_termCode_*`, que había que **quitar del `export` de `LiftcCodePrf`** —error duro si
+no— y **reapuntar una referencia cualificada** en `EvalLiftcPrf` que se rompía sin avisar.
+
+### 3.35.4 · ⚠️ No se promueve lo MUERTO — «la moneda de la inducción OBJETO», otra vez
+
+`paso2_caso_bin`, `_impl`, `_and`, `_or` **no tienen ni un consumidor de código**. Sus únicas
+apariciones fuera del sondeo son **prosa en comentarios**.
+
+La razón es la lección registrada: el ensamblaje real usa `paso2_caso_bin_imp`, el mismo caso
+reprobado en `PrfH Γ` como **implicación**, porque dentro de la inducción la HI llega como
+**hipótesis**, no como `Prf` cerrada — y esa reprueba es **independiente**, no los usa.
+
+`paso2_caso_bottom` **sí** entra: el caso `botc` no induce.
+
+### 3.35.5 · 🔑 La duplicación que ningún censo por nombre puede ver
+
+`sondeos/EvalSubsttc.lean` declara `psi_substtc_l1`, y **es `psi_lift_form` instanciado a
+`Φ := PHIsubsttc`** — el genérico que subió en B2. Es el duplicado **nº 69**, y se le escapó a
+**dos** censos independientes:
+
+* al índice **por nombre**, porque el nombre es distinto;
+* al comparador de **enunciados normalizados**, porque el enunciado *también* es distinto.
+
+No es una copia: es una **instancia**. Un genérico reescrito a mano en su caso particular.
+Es la forma más escurridiza de lo que ADR‑019 persigue, y sólo se ve preguntando *«¿existe ya un
+genérico del que esto sea instancia?»* — que no es una pregunta que un censo conteste.
+
+Subida la escalera entera (`psi_lift_form2`, `psi_lift_form3`, `PSI_inst3`, genéricos en Φ) a
+`Meta/StrongInductionPrf.lean`: sirve a **tres** frentes, porque `EnsamblajeTriple` y
+`EnsamblajeMedida` llevan el mismo bloque **carácter por carácter**.
+
+### 3.35.6 · ⚠️ Las 17 COLISIONES de `EvalSubsttc`, y cómo fallan de verdad
+
+17 nombres del sondeo existen en producción **hablando de otra cosa**: el homónimo es de `liftc`,
+no de `substtc`. **Nueve están exportados a la raíz.**
+
+La semántica medida —no supuesta— es más sutil de lo que parecía:
+
+* **dentro** del módulo que declara el homónimo, el local gana y no hay cambiazo;
+* **fuera**, sin homónimo local, el nombre pelado resuelve a producción;
+* ⚠️ **el caso peligroso**: un consumidor aguas abajo que hace `open` del módulo nuevo **teniendo
+  visible el `export` de `LiftcCodePrf`**. Hay **dos candidatos** y Lean elige **por elaboración**.
+  Compilados los dos casos con el **mismo texto pelado** y tipos distintos: ambos verdes.
+
+Eso es un fallo silencioso, y es lo que obliga a **renombrar antes de mover**.
+
+### 3.35.7 · Trabajo que ya no hace falta
+
+**El §13 entero de `EvalSubsttc` está muerto**: producción prueba
+`pcc_eval_pred (n : Term) : Prf (provFromCode (evalPredCode n))` **sin guarda ninguna**, o sea
+algo estrictamente más fuerte que `PredHyp` — que ni existe en producción. Nueve declaraciones
+que descargaban esa hipótesis dejan de ser trabajo.
 ---
 
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)

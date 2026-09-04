@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8, B2 hechas · **B3 EN CURSO**
+> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-04 — **B2 cerrada**: `Meta/EvalLiftcPrf.lean` (el DESCENSO). ADR-019 nuevo: el CICLO DE IMPORTS obliga a bajar el general. Rama G abierta: verdad de los docstrings
+**Last updated:** 2026-09-05 — **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
 **Author**: Julián Calderón Almendros
 
 ---
