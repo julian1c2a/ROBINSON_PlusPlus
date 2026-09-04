@@ -792,8 +792,13 @@ end
     ⚠️ Bajado desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
     (2026‑09‑04). **Tuvo que bajar AQUI, no quedarse arriba**: `EvalLiftcPrf` importa a este
     modulo, asi que reescribir `substF_targetLift_hole` como corolario de un lema de alli
-    seria un CICLO. Y el `_hole` tiene tres consumidores dentro de este mismo fichero
-    (`:799`, `:802` y el simp‑set del `export`), asi que no podia simplemente irse. -/
+    seria un CICLO. Y el `_hole` se consume dentro de este mismo fichero —dos veces en
+    `PrfH_congr_targetLift`, mas el bloque `export`—, asi que no podia simplemente irse.
+
+    ⚠️ Se cita por NOMBRE y no por numero de linea a proposito: la version anterior de este
+    docstring daba tres numeros y los TRES eran falsos — se copiaron de un parche escrito
+    antes de que el fichero creciera, y dos de ellos caian en lineas que no son consumidores
+    (un `simp only` de otra prueba y una linea de docstring). Los nombres no derivan. -/
 theorem substF_targetLift (v : Nat) (u s : Term) :
     substFormula v u (targetLift s) = targetLift (substTerm v u s) := by
   simp only [targetLift, substFormula_provFromCode_open, eqc, liftcT, funcc, tcFn, liftc,

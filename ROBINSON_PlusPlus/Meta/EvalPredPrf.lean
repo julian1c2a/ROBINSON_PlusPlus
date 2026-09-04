@@ -24,7 +24,14 @@ inducción** (`ax26_pred_succ` da el valor directamente), así que el «paso» e
 Hacerlo sería la familia `ax_tc_*`, que hace la teoría **INCONSISTENTE** (ver `DECISIONS.md`
 ADR‑012 y el nodo de la inconsistencia).
 
-Promovido de `sondeos/EvalPredDot.lean` (2026‑08‑31). Cero axiomas de Lean, cero `sorry`.
+Promovido de `sondeos/EvalPredDot.lean` (2026‑08‑31). Cero `sorry`.
+
+⚠️ **NO «cero axiomas de Lean»**, como decia antes esta linea: **11 de las 31** constantes del
+namespace —`pcc_eval_pred` y `pcc_eval_pred'` incluidos— arrastran
+`Representability2Prf.prf_axiomsCodeT_eq`, que es uno de los **7 `axiom` SANCIONADOS** del
+proyecto (`AXIOMS.md`), no un axioma estandar de Lean. No hay axioma **NUEVO** —que es lo que la
+frase queria decir— pero «cero axiomas de Lean» era **falso**, y es justo la clase de frase que
+un libro cita como garantia.
 -/
 
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel

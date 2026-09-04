@@ -59,7 +59,7 @@ De las 198 declaraciones del sondeo se promueven **31**. El reparto exacto, medi
 | §C `isTC1` y su fontaneria| 883–1041    | `Meta/CodeWitnessPrf.lean` (`SinWTs`/`ENS`)   |
 | §E controles `crit_*`     | 1401–1568   | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
 | `hasWit`, `CRIT_hasWit_real`| 1386,1964 | `Meta/CodeWitnessPrf.lean` (`ENS`)            |
-| §F testigo `tcodes1`      | 1571–1897   | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
+| cola del §E + testigo `tcodes1` | 1571–1897 | `Meta/CodeWitnessPrf.lean` (`SinWTs`) ⚠️ el §F del sondeo empieza en la 1899, no aqui |
 
 ## ⚠️ LOS DOS DUPLICADOS CONOCIDOS — se BORRAN y se redirigen sus usos
 
@@ -89,19 +89,24 @@ demuestran, y por tanto el descenso CONECTA con el vocabulario ya promovido.
 ⚠️ **SEIS piezas mas se subieron a modulos de aguas ARRIBA, no aqui** — eran genericas y
 desde el modulo del descenso quedaban invisibles para los sondeos que las tienen copiadas:
 
-| pieza                              | ahora vive en                         | copiada a mano en |
-|------------------------------------|---------------------------------------|-------------------|
-| `psi_lift_form` (generico en `Φ`)  | `Meta/StrongInductionPrf.lean`        | 4 sondeos         |
-| `PSI_inst` (generico en `Φ`)       | `Meta/StrongInductionPrf.lean`        | 7 sondeos         |
-| `prf_argsIn_head`                  | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos         |
-| `prf_argsIn_tail`                  | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos         |
-| `prf_isTermCodeE1_of_boundedIn`    | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos         |
-| `prf_isTermCodeE1_of_In`           | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos         |
+⚠️ **Convencion de la ultima columna**, que la version anterior de esta tabla mezclaba y por
+eso tenia TRES de seis cifras mal: se cuentan **ficheros de `sondeos/` que DECLARAN el nombre**
+(regex `^(theorem|def|lemma) <nombre>`), **incluido `DescensoLiftc`**, que es el que se promueve.
+Entre parentesis, las **declaraciones**, que no coinciden porque algun sondeo lo declara dos veces.
+
+| pieza                              | ahora vive en                         | declarada en |
+|------------------------------------|---------------------------------------|--------------|
+| `psi_lift_form` (generico en `Φ`)  | `Meta/StrongInductionPrf.lean`        | 5 sondeos (5) |
+| `PSI_inst` (generico en `Φ`)       | `Meta/StrongInductionPrf.lean`        | **8 sondeos (10)** |
+| `prf_argsIn_head`                  | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 5 sondeos (5) |
+| `prf_argsIn_tail`                  | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos (8) |
+| `prf_isTermCodeE1_of_boundedIn`    | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos (8) |
+| `prf_isTermCodeE1_of_In`           | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos (8) |
 
 ⚠️ **Y DOS BAJARON a `Meta/LiftcCodePrf.lean`**: `substF_targetLift` y `substF_targetLiftsc`.
 No podian quedarse aqui como generales con el particular arriba —seria un CICLO, porque este
-modulo lo importa—, asi que bajaron ellos y `substF_targetLift_hole` (:790 de alli) quedo
-reescrito como su corolario. Es la restriccion que manda en esta rama.
+modulo lo importa—, asi que bajaron ellos y alli `substF_targetLift_hole` quedo reescrito
+como su corolario. Es la restriccion que manda en esta rama.
 
 ## ⚠️ LA LISTA DE `import` CONCRETA DEL MODULO REAL (20; ninguno es el barrel)
 
@@ -247,7 +252,9 @@ theorem liftF_targetLiftsc (k : Nat) (s : Term) :
 --    `v := 0`, `s := #0` y que alli quedo reescrito como corolario suyo.
 --    Razon: este modulo IMPORTA a `LiftcCodePrf`, asi que el corolario no podia ir al reves
 --    sin ciclo — y el `_hole` tiene tres consumidores dentro de aquel fichero.
---    Los usos de abajo (`:254`, `:368`, `:378`) resuelven por el `open ...LiftcCodePrf`.
+--    Los usos de abajo —en `PrfH_congr_targetLiftsc`, `PHI_at` y `PHI_use`— resuelven por
+--    el `open ...LiftcCodePrf` de la cabecera. (Por NOMBRE, no por linea: los numeros que
+--    habia aqui eran falsos, copiados de un parche previo al fichero actual.)
 
 /-- Leibniz sobre el argumento de `targetLiftsc`. (La companera `PrfH_congr_targetLift` ya
     esta en produccion, `Meta/LiftcCodePrf.lean:797`.) -/
@@ -358,10 +365,10 @@ theorem PHI_use {Γ : List Formula} (t w : Term) (h : PrfH Γ (substFormula 0 t 
     `prf_psi_elim`. Al promover se subieron **genericos en `Φ`** a
     `Meta/StrongInductionPrf.lean:195,203`, junto a sus padres.
 
-    No es cosmetica: `PSI_inst` esta copiado a mano en **siete** sondeos
-    (`EvalSubstfcPrf` ×2, `EvalSubsttc`, `EnsamblajeMedida`, `EnsamblajeTriple`,
-    `HasWitFReal`, `DescensoLiftc`) y `psi_lift_form` en cuatro. Dejandolos aqui,
-    instanciados a `PHI`, seguirian invisibles para todos ellos.
+    No es cosmetica: `PSI_inst` esta copiado a mano en **OCHO** sondeos, con **DIEZ**
+    declaraciones (`EvalSubstfcPrf` ×2, `HasWitFReal` ×2, `EvalSubsttc`, `EnsamblajeMedida`,
+    `EnsamblajeTriple`, `Paso2Guardado`, `SubstfcEx`, `DescensoLiftc`), y `psi_lift_form` en
+    **cinco**. Dejandolos aqui, instanciados a `PHI`, seguirian invisibles para todos ellos.
 
     Uso local: `PSI_inst PHI hPHI hpsi z`. -/
 
