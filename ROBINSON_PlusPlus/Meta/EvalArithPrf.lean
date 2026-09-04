@@ -145,6 +145,71 @@ theorem prf_substtc_funcc2 (v W sc x y : Term) :
           (prf_eq_trans (prf_substtsc_cons v W y nil)
             (prf_congr_cons_tail (prf_substtsc_nil v W))))))
 
+/-! ### El KIT TERNARIO — `funcc3` y la imagen DOTADA de `substfc`
+
+    ⚠️ **Bajado de `sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y AQUI porque este es su
+    sitio mas alto posible**: `prf_substtc_funcc3`/`prf_congr_funcc3` son el escalon ternario
+    del binario que ya vivia justo arriba, y no mencionan nada del frente `substfc`.
+
+    🔑 **Es lo que mas paga de todo el sondeo**: `prf_substtc_funcc3` y `prf_congr_funcc3`
+    estan copiados a mano en **NUEVE** sondeos cada uno. Promoverlos una vez los quita de
+    todos ellos.
+
+    ⛔ **`substfcT` es una DEFINICION y se queda en definicion.** Postular su ecuacion de
+    recursion como axioma OBJETO (`ax_tc_substfc`) hace la teoria **INCONSISTENTE** —
+    derivacion guardada en el proyecto. `substfcT_termCode` es un puente `:= rfl`, no un
+    axioma; esa es toda la diferencia. -/
+
+theorem prf_substtc_funcc3 (v W sc x y z : Term) :
+    Prf (substtc v W (funcc sc (cons x (cons y (cons z nil))))
+      =eq funcc sc (cons (substtc v W x) (cons (substtc v W y) (cons (substtc v W z) nil)))) :=
+  prf_eq_trans (prf_substtc_func v W sc (cons x (cons y (cons z nil))))
+    (prf_congr_funcc2
+      (prf_eq_trans (prf_substtsc_cons v W x (cons y (cons z nil)))
+        (prf_congr_cons_tail
+          (prf_eq_trans (prf_substtsc_cons v W y (cons z nil))
+            (prf_congr_cons_tail
+              (prf_eq_trans (prf_substtsc_cons v W z nil)
+                (prf_congr_cons_tail (prf_substtsc_nil v W))))))))
+
+theorem prf_congr_funcc3 {sc x x' y y' z z' : Term}
+    (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) (hz : Prf (z =eq z')) :
+    Prf (funcc sc (cons x (cons y (cons z nil)))
+      =eq funcc sc (cons x' (cons y' (cons z' nil)))) :=
+  prf_congr_funcc2 (prf_eq_trans (prf_congr_cons_head hx)
+    (prf_congr_cons_tail (prf_eq_trans (prf_congr_cons_head hy)
+      (prf_congr_cons_tail (prf_congr_cons_head hz)))))
+
+/-- El constructor de código `substfc` (DEFINICIÓN; ninguna ecuación suya se postula). -/
+def substfcT (v s f : Term) : Term :=
+  funcc (strCode "substfc") (cons v (cons s (cons f nil)))
+
+theorem substfcT_termCode (v s f : Term) :
+    substfcT (termCode v) (termCode s) (termCode f) = termCode (substfc v s f) := rfl
+
+theorem prf_congr_substfcT {v v' s s' f f' : Term}
+    (hv : Prf (v =eq v')) (hs : Prf (s =eq s')) (hf : Prf (f =eq f')) :
+    Prf (substfcT v s f =eq substfcT v' s' f') := prf_congr_funcc3 hv hs hf
+
+theorem prf_substtc_substfcT (v W x y z : Term) :
+    Prf (substtc v W (substfcT x y z)
+      =eq substfcT (substtc v W x) (substtc v W y) (substtc v W z)) :=
+  prf_substtc_funcc3 v W (strCode "substfc") x y z
+
+theorem substtc_inv_substfcT {X Y Z : Term}
+    (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
+    (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
+    ∀ W, Prf (substtc zero W (substfcT X Y Z) =eq substfcT X Y Z) := fun W =>
+  prf_eq_trans (prf_substtc_substfcT zero W X Y Z) (prf_congr_substfcT (hX W) (hY W) (hZ W))
+
+theorem liftTerm_substfcT (k : Nat) (v s f : Term) :
+    liftTerm k (substfcT v s f) = substfcT (liftTerm k v) (liftTerm k s) (liftTerm k f) := by
+  simp only [substfcT, funcc, cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+theorem substTerm_substfcT (k : Nat) (u v s f : Term) :
+    substTerm k u (substfcT v s f)
+      = substfcT (substTerm k u v) (substTerm k u s) (substTerm k u f) := by
+  simp only [substfcT, funcc, cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+
 /-- `substtc` sobre `succcT`. -/
 theorem prf_substtc_succcT (v W x : Term) :
     Prf (substtc v W (succcT x) =eq succcT (substtc v W x)) :=
@@ -444,6 +509,11 @@ export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   evalAddCode pcc_ax4_computed pcc_eval_add_zero
   succcT prf_tc_succ' prf_congr_succcT
   prf_substtc_funcc1 prf_substtc_funcc2 prf_substtc_succcT prf_substtc_addcT prf_substtc_varc0
+  -- KIT TERNARIO, bajado en B3 (2026-09-04). Retira 74 copias a mano repartidas por
+  -- `sondeos/`: `substfcT` estaba en ONCE sondeos y los dos `funcc3` en NUEVE cada uno.
+  prf_substtc_funcc3 prf_congr_funcc3
+  substfcT substfcT_termCode prf_congr_substfcT prf_substtc_substfcT substtc_inv_substfcT
+  liftTerm_substfcT substTerm_substfcT
   pcc_ax5_computed
   pcc_leibniz_apply pcc_eq_trans_code pcc_congr_succ_code
   substtc_inv_tcFn substtc_inv_succcT substtc_inv_addcT
