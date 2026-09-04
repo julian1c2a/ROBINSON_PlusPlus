@@ -20,7 +20,7 @@ import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
 /-!
-# `Meta/EvalLiftcPrf.lean` — CONTENIDO PROPUESTO (rama B2, validado desde `Probe/`)
+# `Meta/EvalLiftcPrf.lean` — promovido de `sondeos/DescensoLiftc.lean` (rama B2)
 
 Promocion de `sondeos/DescensoLiftc.lean` (2011 lineas, 198 declaraciones) quedandose
 **SOLO con lo que falta**. Todo lo demas se CONSUME de produccion.
@@ -44,7 +44,8 @@ De las 198 declaraciones del sondeo se promueven **31**. El reparto exacto, medi
   (`tEjA`, `tEjB`, `CRIT_real_A`, `CRIT_real_B`, `CRIT_real_lista` eran instancias de un
   enunciado ya universal en `t`; `CRIT_antecedente_discrimina` era
   `SinWTs.crit_junk_var0_witness1` renombrado);
-* **31** se promueven aqui, mas **6** puentes de consumo (§0) y **5** controles negativos
+* **27** se promueven AQUI y **4** aguas arriba (tabla de mas abajo) = **31** en total, mas
+  **6** puentes de consumo (§0) y **5** controles negativos
   (`example`) que no anaden constantes al frente.
 
 | bloque del sondeo         | lineas      | ya vive en                                    |
@@ -104,8 +105,8 @@ reescrito como su corolario. Es la restriccion que manda en esta rama.
 
 ## ⚠️ LA LISTA DE `import` CONCRETA DEL MODULO REAL (20; ninguno es el barrel)
 
-Este fichero de `Probe/` lleva `import ROBINSON_PlusPlus.Meta` porque ahi SI vale. El modulo
-real lleva estos 20, **cada uno justificado por el simbolo que lo pide**:
+El borrador de `Probe/` llevaba `import ROBINSON_PlusPlus.Meta` porque ahi SI vale. **Este**
+modulo lleva estos 20, **cada uno justificado por el simbolo que lo pide**:
 
 | import (`ROBINSON_PlusPlus.Meta.…`) | simbolo que lo exige                                    |
 |-------------------------------------|---------------------------------------------------------|
@@ -543,7 +544,7 @@ theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)
     recursion META sobre la estructura del termino y **no ejercita la induccion objeto**;
     estos van por `DESCENSO (objList (tcodes1 t)) …`, que es justamente lo que hay que medir.
 
-    Por eso se conservan TRES y se retiraron cinco (`CRIT_real_A`, `CRIT_real_B`,
+    Por eso se conservan TRES y se retiraron SEIS (`CRIT_real_A`, `CRIT_real_B`,
     `CRIT_real_lista` eran instancias de un enunciado ya universal en `t`; sus datos `tEjA`
     y `tEjB`, con ellas; y `CRIT_antecedente_discrimina` era `SinWTs.crit_junk_var0_witness1`
     renombrado — usese el de produccion directamente).
@@ -551,7 +552,8 @@ theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)
 
 /-- **EL DESCENSO DISPARA (1)** — sort TERMINO. Para **todo** termino REAL `t`, abierto
     incluido, el antecedente `isTC1 W ⌜t⌝` es demostrable con testigo explicito, luego el
-    DESCENSO entrega el `hLift` de `paso2_caso_forall`.
+    DESCENSO entrega el `hLift` de `paso2_caso_forall` (`sondeos/Paso2CasoForall.lean:505`;
+    el consumidor en produccion es `pcc_eval_liftc`).
 
     ⚠️ El ENUNCIADO no es informacion nueva (ver la cabecera de §9): lo nuevo es la RUTA. -/
 theorem CRIT_targetLift_real (t : Term) : Prf (targetLift (termCodeM t)) :=

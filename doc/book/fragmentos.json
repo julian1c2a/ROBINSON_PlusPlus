@@ -23,12 +23,12 @@
     "FOL.MetaRules.dne",
     "FOL.MetaRules.or_elim",
     "FOL.MetaRules.ex_elim",
-    "ROBINSON_PlusPlus.Full.Induction.ax_induction",
-    "ROBINSON_PlusPlus.Full.Lists.ax_list_induction",
-    "ROBINSON_PlusPlus.Full.Mod2.ax_mod2_alternation",
+    "ROBINSON_PlusPlus.Full.ax_induction",
+    "ROBINSON_PlusPlus.Full.ax_list_induction",
+    "ROBINSON_PlusPlus.Full.ax_mod2_alternation",
     "ROBINSON_PlusPlus.Minimal.Theorems.Block8.ax_p_tfa",
     "ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq",
-    "ROBINSON_PlusPlus.Minimal.Axioms.prf_axiomsCodeT_eq",
+    "ROBINSON_PlusPlus.Meta.Representability2Prf.prf_axiomsCodeT_eq",
     "ROBINSON_PlusPlus.Meta.GodelTwo.d3"
   ],
   "fragmentos": [
