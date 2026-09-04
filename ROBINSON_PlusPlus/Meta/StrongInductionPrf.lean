@@ -211,6 +211,45 @@ theorem PSI_inst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula
       Nat.reduceSub, reduceIte, if_true]
   rwa [e] at h
 
+/-! ### Los escalones 2 y 3 de la misma escalera
+
+    ⚠️ **Subidos en B3 (2026‑09‑04) por la MISMA razon que `psi_lift_form`/`PSI_inst` en B2**, y
+    citando el precedente que quedo escrito alli: son maquinaria GENERICA de la induccion fuerte,
+    **no** del frente que las consume. `sondeos/EvalSubsttc.lean` las tenia instanciadas a
+    `Φ := PHIsubsttc`, y `sondeos/EnsamblajeTriple.lean` y `sondeos/EnsamblajeMedida.lean` llevan
+    el MISMO bloque caracter por caracter. Subirlas una vez sirve a **tres frentes**.
+
+    🔑 Y una de ellas, `psi_substtc_l1` del sondeo, **era `psi_lift_form` instanciado** — un
+    duplicado que **ningun censo por nombre podia ver**, porque no es una copia: es `Φ := PHI…`.
+    Es el modo de duplicacion que el ADR‑019 existe para impedir. -/
+
+theorem psi_lift_form2 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    liftFormula 0 (liftFormula 0 (PSI Φ))
+      = Formula.forall (Formula.impl (lt (.var 0) (.var 3)) Φ) := by
+  rw [psi_lift_form Φ hΦ]
+  simp only [lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte, hΦ]
+
+theorem psi_lift_form3 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI Φ)))
+      = Formula.forall (Formula.impl (lt (.var 0) (.var 4)) Φ) := by
+  rw [psi_lift_form2 Φ hΦ]
+  simp only [lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte, hΦ]
+
+/-- La extraccion al TERCER nivel de lift — la que consume una induccion con TRES binders
+    por encima de `Φ` (el caso `substtc`, que lleva testigo, `v` y `s`). -/
+theorem PSI_inst3 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula}
+    (hpsi : PrfH Γ (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI Φ))))) (z : Term) :
+    PrfH Γ (Formula.impl (lt z (.var 3)) (substFormula 0 z Φ)) := by
+  rw [psi_lift_form3 Φ hΦ] at hpsi
+  have h := PrfH_spec hpsi z
+  have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 4)) Φ)
+      = Formula.impl (lt z (.var 3)) (substFormula 0 z Φ) := by
+    simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
+      Nat.reduceSub, reduceIte, if_true]
+  rwa [e] at h
+
 theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
     (step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) :
     ∀ t : Term, Prf (substFormula 0 t Φ) := by
@@ -271,4 +310,5 @@ export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
   liftTerm_swap liftTerms_swap liftFormula_swap psi_step_motive
   subst1_id subst0_var0_id psi_lift_eq_subst prf_strong_induction
   psi_lift_form PSI_inst
+  psi_lift_form2 psi_lift_form3 PSI_inst3
 )
