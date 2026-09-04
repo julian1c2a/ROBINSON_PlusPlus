@@ -34,9 +34,23 @@ el descenso bien fundado que cierra `pcc_eval_liftc`. El prefijo `Eval…Prf` es
 `pcc_eval_*`. `EvalLiftcPrf` lo dice, y ademas ordena el grafo: `EvalLiftcPrf` importa a
 `LiftcCodePrf`, nunca al reves.
 
+## ⚠️ POLITICA DE CITAS DE ESTE DOCSTRING (2026‑09‑04)
+
+**A produccion se cita por NOMBRE, nunca por numero de linea.** No es estilo: es lo medido.
+Dos auditorias mecanicas seguidas encontraron que **practicamente todas** las citas
+`fichero.lean:NNN` de esta cabecera eran falsas a las pocas horas de escribirlas — y las peores
+aterrizaban sobre OTRO teorema real del vecindario, que es el modo mas peligroso de fallar:
+quien la sigue encuentra codigo plausible y no sospecha. `PrfH_congr_targetLift` se cito como
+`:797`, se midio en `:816` y hoy esta en `:821`: tres valores en un dia.
+
+Los numeros que quedan apuntan a **`sondeos/`**, que esta fuera del build y no se toca; aun asi,
+van como referencia a la version del sondeo, no como direccion estable.
+
 ## Lo que NO se promueve (ya vive en produccion)
 
-De las 198 declaraciones del sondeo se promueven **31**. El reparto exacto, medido:
+De las 198 declaraciones del sondeo se promueven **31**, de las que **23 aterrizan en ESTE
+modulo** y 8 se reparten (6 suben aguas arriba, 2 bajan a `LiftcCodePrf`). El reparto, medido
+sobre `env.constants` — no sobre el fuente:
 
 * **159** ya estaban en produccion **por nombre** (la tabla de abajo dice donde);
 * **8** no se promueven: los **2** duplicados conocidos (`iz_inv`, `eqc_eq_eqCodeFn`, tabla
@@ -44,17 +58,17 @@ De las 198 declaraciones del sondeo se promueven **31**. El reparto exacto, medi
   (`tEjA`, `tEjB`, `CRIT_real_A`, `CRIT_real_B`, `CRIT_real_lista` eran instancias de un
   enunciado ya universal en `t`; `CRIT_antecedente_discrimina` era
   `SinWTs.crit_junk_var0_witness1` renombrado);
-* **27** se promueven AQUI y **4** aguas arriba (tabla de mas abajo) = **31** en total, mas
-  **6** puentes de consumo (§0) y **5** controles negativos
-  (`example`) que no anaden constantes al frente.
+* **23** se declaran AQUI y **8** en otros modulos (las dos tablas de mas abajo) = **31**;
+  mas **6** puentes de consumo (§0) y **5** controles negativos (`example`), que no anaden
+  constantes al frente. Este modulo declara **29** nombres: 23 + los 6 puentes.
 
 | bloque del sondeo         | lineas      | ya vive en                                    |
 |---------------------------|-------------|-----------------------------------------------|
-| §1–§4 vocabulario `liftcT`| 56–168      | `Meta/LiftcCodePrf.lean:105‑213`              |
-| `targetLift`/`targetLiftsc`| 79, 535    | `Meta/LiftcCodePrf.lean:225,229`  ⚠ CRITICO   |
-| §4–§6 axiomas dotados     | 180–520     | `Meta/LiftcCodePrf.lean:247‑605`              |
-| §7 `refl_caso_*`          | 542–672     | `Meta/LiftcCodePrf.lean:613‑743`              |
-| §9–§10 `refl_*_imp`       | 676–856     | `Meta/LiftcCodePrf.lean:768‑876`              |
+| §1–§4 vocabulario `liftcT`| 56–168      | `Meta/LiftcCodePrf.lean`                      |
+| `targetLift`/`targetLiftsc`| 79, 535    | `Meta/LiftcCodePrf.lean`  ⚠ CRITICO           |
+| §4–§6 axiomas dotados     | 180–520     | `Meta/LiftcCodePrf.lean`                      |
+| §7 `refl_caso_*`          | 542–672     | `Meta/LiftcCodePrf.lean`                      |
+| §9–§10 `refl_*_imp`       | 676–856     | `Meta/LiftcCodePrf.lean` (los CUATRO)         |
 | §10 `argsIn`/`isTermCodeE1`| 862–879    | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
 | §C `isTC1` y su fontaneria| 883–1041    | `Meta/CodeWitnessPrf.lean` (`SinWTs`/`ENS`)   |
 | §E controles `crit_*`     | 1401–1568   | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
@@ -70,12 +84,12 @@ De las 198 declaraciones del sondeo se promueven **31**. El reparto exacto, medi
 
 Ninguno de los dos se usa ya en el residuo promovido: los unicos consumidores de `iz_inv` eran
 `refl_caso_*` / `refl_*_imp`, que YA estan en produccion (y alli usan
-`prf_substtc_termCode_nil`, ver `Meta/LiftcCodePrf.lean:826`).
+`prf_substtc_termCode_nil`, ver `Meta/LiftcCodePrf.lean`).
 
 ## ⚠️ EL PUNTO CRITICO: `targetLift` ya esta en produccion
 
 `sondeos/DescensoLiftc.lean:79,535` REDEFINE `targetLift`/`targetLiftsc`. Este modulo NO los
-redefine: consume los de `Meta/LiftcCodePrf.lean:225,229`. Los puentes `:= rfl` de §0 lo
+redefine: consume los de `Meta/LiftcCodePrf.lean`. Los puentes `:= rfl` de §0 lo
 demuestran, y por tanto el descenso CONECTA con el vocabulario ya promovido.
 
 ## Lo que este modulo entrega rio abajo
@@ -148,7 +162,8 @@ Si el orquestador decide BORRAR los dos puentes anti‑duplicado de §0 (son con
 resultados), caen con ellos `EvalRunFnPrf` y `Sigma1AtomPrf`: quedan 18.
 -/
 
-/-! ⚠️ `open` YA PODADO: el sondeo abria 32 namespaces; el modulo real necesita estos 21.
+/-! ⚠️ `open` YA PODADO: el sondeo abria **35** namespaces; este modulo necesita **22** — los 20
+    de abajo, mas `CodeWitnessPrf.SinWTs` entero y `CodeWitnessPrf.ENS` selectivo.
     Cada linea esta cubierta por su `import` homonimo de la cabecera.
 
     ⚠️ `open ROBINSON_PlusPlus.Minimal.Axioms` en CABECERA: aqui **no muerde**. La trampa
@@ -186,7 +201,7 @@ set_option maxRecDepth 8000
 
 namespace ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 
-/-! ## §0 · PUENTES DE CONSUMO — `net-0`, todos `rfl`
+/-! ## §0 · PUENTES DE CONSUMO — `net-0`; **cinco por `rfl` y uno por `.symm`**
 
     Estos cuatro `rfl` son la MEDIDA de que este modulo consume el vocabulario de produccion
     y no fabrica constantes nuevas. Si alguno dejara de ser `rfl`, el descenso estaria
@@ -257,7 +272,7 @@ theorem liftF_targetLiftsc (k : Nat) (s : Term) :
 --    habia aqui eran falsos, copiados de un parche previo al fichero actual.)
 
 /-- Leibniz sobre el argumento de `targetLiftsc`. (La companera `PrfH_congr_targetLift` ya
-    esta en produccion, `Meta/LiftcCodePrf.lean:797`.) -/
+    esta en produccion, en `Meta/LiftcCodePrf.lean`.) -/
 theorem PrfH_congr_targetLiftsc {Γ : List Formula} {s s' : Term} (h : PrfH Γ (s =eq s'))
     (ha : PrfH Γ (targetLiftsc s)) : PrfH Γ (targetLiftsc s') := by
   have hS : ∀ u : Term, substFormula 0 u (targetLiftsc (.var 0)) = targetLiftsc u := by
@@ -303,7 +318,8 @@ theorem prf_nil_or_cons (Y : Term) : Prf (lor (Formula.eq Y nil) (consOk Y)) := 
     `targetLift`— y al promover se bajaron a `Meta/CodeWitnessPrf.lean` (`SinWTs`, :680 y
     :692), junto a `PrfH_inst_argsIn`, que es de quien salen.
 
-    Razon: estan copiados a mano en SEIS sondeos del frente (`DescensoLiftc`,
+    Razon: `prf_argsIn_tail` esta copiado a mano en SEIS sondeos del frente y
+    `prf_argsIn_head` en CINCO — `EvalSubsttc` copia solo la cola — (`DescensoLiftc`,
     `EvalSubstfcPrf`, `SubstfcEx`, …). Dejandolos en el modulo del DESCENSO quedaban
     invisibles para todos ellos, que es justo el problema que esta promocion venia a
     resolver. Se consumen desde aqui via `open …CodeWitnessPrf.SinWTs`. -/
@@ -590,7 +606,7 @@ theorem CRIT_targetLiftsc_real (ts : List Term) :
   exact List.Mem.tail _ (mem_tcodes1s_of_mem ts u (mem_of_getElem? ts k u hu))
 
 -- ⚠️ RETIRADO `CRIT_antecedente_discrimina`: era `SinWTs.crit_junk_var0_witness1`
---    (`Meta/CodeWitnessPrf.lean:1160`) renombrado — el sondeo lo definia literalmente como
+--    (en `Meta/CodeWitnessPrf.lean`) renombrado — el sondeo lo definia literalmente como
 --    `crit_junk_var0_witness1 hjunk`. El lado contrario de la no-vacuidad (que `isTC1` es
 --    REFUTABLE con el codigo de una FORMULA y testigo ARBITRARIO, luego el DESCENSO no es
 --    un `⊥ ⇒ …` disfrazado) lo da ESE lema de produccion, directamente.

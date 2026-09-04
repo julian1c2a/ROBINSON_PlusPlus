@@ -32,7 +32,18 @@ acotado por la diagonal. De él salen en cascada `codeNatChars_inj` → `codeNat
 namespaces distintos que Lean **no** identifica. `numeral_ne` usa la de `Full` y los códigos la de
 `Godel`, así que hace falta el puente **`num_bridge`**, que se prueba aquí por inducción.
 
-Promovido de `sondeos/CodeNatInj.lean` (2026‑09‑01). Cero axiomas de Lean, cero `sorry`.
+Promovido de `sondeos/CodeNatInj.lean` (2026‑09‑01). Cero `sorry`.
+
+⚠️ **NO «cero axiomas de Lean»**, como decía antes esta línea. Medido con `#print axioms`,
+los dos resultados de cabecera —`codeNat_ne` y `codeNatTerm_ne`— salen con **OCHO**:
+
+    [propext, Classical.choice, Quot.sound,
+     FOL.MetaRules.ex_elim, FOL.MetaRules.gen, FOL.MetaRules.imp_intro, FOL.MetaRules.raa,
+     ROBINSON_PlusPlus.Full.ax_induction]
+
+Las cinco meta-reglas ω y `ax_induction` entran enteras por `Full.numeral_ne`, que tiene ese
+mismo footprint. **No hay axioma NUEVO** —que es lo que la frase quería decir— pero «cero
+axiomas» era falso, y es justo la clase de frase que un libro cita como garantía.
 Desbloquea los casos 3 y 4 del módulo C de `NegVerifier` (ver `PLAN-NEGVERIFIER.md`).
 -/
 

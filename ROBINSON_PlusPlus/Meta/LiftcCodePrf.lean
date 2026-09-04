@@ -28,10 +28,10 @@ import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 
 Promocion de `sondeos/ReflectorDesdeConsumidor.lean` (rama B1).
 
-**ESTE FICHERO ES EL MODULO REAL, BYTE A BYTE.** La lista de `import` de arriba es ya la
-concreta (24 modulos de `Meta/`, ninguno es el barrel), asi que integrar = mover el fichero a
-`ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean`, anadirlo al barrel `ROBINSON_PlusPlus/Meta.lean` y
-borrar el bloque final de `#print axioms` / `example` de control si el orquestador lo prefiere.
+**ESTE FICHERO ES EL MODULO, BYTE A BYTE** — promovido a `ROBINSON_PlusPlus/Meta/` y anadido al
+barrel el 2026‑09‑02. La lista de `import` de arriba es la concreta: **25** modulos de `Meta/`,
+ninguno es el barrel. El bloque final de `#print axioms` / `example` se conserva a proposito: es
+el control de footprint del modulo, no andamio.
 
 ## Nombre propuesto: `LiftcCodePrf`, NO `CodeCtorDotPrf`
 
@@ -59,7 +59,8 @@ Los siete primeros se CONSUMEN con un `open` SELECTIVO (abrir `SinWTs` entero co
 `NumCodeClosedPrf.prf_congr_liftc`, que tiene otra aridad). El octavo llega solo, por el `export`
 de `EvalCarcNthcPrf`. El noveno es la orientacion contraria del mismo `rfl`: se usa `.symm`.
 
-## Lo que SI se promueve: 68 declaraciones (66 de las 75 del sondeo, + 2 puentes nuevos)
+## Lo que SI se promueve: **69** declaraciones (65 de las 75 del sondeo, + 2 puentes nuevos,
++ **2 bajadas desde `sondeos/DescensoLiftc.lean`** en B2: `substF_targetLift`/`substF_targetLiftsc`)
 
 Vocabulario de codigo dotado de `liftc`/`liftsc` (§1–§2), los cuatro axiomas de `liftc`/`liftsc`
 en su imagen DOTADA (§4–§5), las congruencias internas que faltaban (§6) y las cuatro clausulas
@@ -98,8 +99,13 @@ namespace ROBINSON_PlusPlus.Meta.LiftcCodePrf
 
 /-! ## §1 · Los constructores de codigo DOTADOS
 
-    Ninguna ecuacion de recursion de `liftc`/`liftsc` se postula: son DEFINICIONES, y sus
-    puentes con `termCode` salen por `rfl`. -/
+    Ninguna ecuacion de recursion se postula para `liftcT`/`liftscT`: **la imagen DOTADA es una
+    DEFINICION**, y sus puentes con `termCode` salen por `rfl`.
+
+    ⚠️ **Distincion que la version anterior de esta frase borraba, y que aqui es critica**: las
+    ecuaciones de `liftc`/`liftsc` (el nivel OBJETO) **si estan postuladas**, como axiomas objeto
+    de `Minimal/Axioms.lean`. Lo que NO se postula —y no se puede, porque hace la teoria
+    INCONSISTENTE— es la ecuacion de recursion de su imagen dotada. -/
 
 /-- `⌜liftc c t⌝` como constructor de codigo. -/
 def liftcT (c t : Term) : Term := funcc (strCode "liftc") (cons c (cons t nil))
@@ -958,7 +964,12 @@ theorem refl_lista_cons_imp (h t : Term) :
 
     `isTermCodeE1`/`argsIn` son los de PRODUCCION (`CodeWitnessPrf.SinWTs`). -/
 
-/-- **EL RESULTADO CENTRAL DE ESTE MODULO.**
+/-- **LA MEDIDA DEL MODULO, no su resultado consumible.**
+
+    ⚠️ Censo 2026‑09‑04: **cero usos**, aqui y aguas abajo. Toma como PREMISA justo lo que el
+    descenso FABRICA, asi que nadie rio abajo puede aportarsela: es inconsumible por
+    construccion. Se conserva porque mide que el predicado entero cuadra contra el objetivo,
+    pero **no es lo que el frente consume** — eso es `pcc_eval_liftc`, en `Meta/EvalLiftcPrf.lean`.
 
     El predicado `isTermCodeE1 w X` de la via sin‑`wTs`, contra el objetivo `targetLift X`:
 
@@ -988,7 +999,9 @@ theorem refl_isTermCodeE1_imp (w X : Term) :
     exact PrfH.mp _ _ _ (prf_to_prfH (refl_shapeBin_imp X) _)
       (PrfH_and_intro (PrfH_and_elim_left hB) hT)
 
-/-! ## §11 · EL RESIDUO, con nombre y enunciado exactos (NO se cierra aqui).
+/-! ## §11 · EL RESIDUO — no se cierra aqui, y desde el 2026‑09‑04 esta CERRADO aguas abajo
+    en `Meta/EvalLiftcPrf.lean` (`DESCENSO` / `pcc_eval_liftc`, rama B2).
+
 
     Lo unico que NO se descarga aqui es el **DESCENSO**: pasar de «cada hijo es de nuevo un
     codigo con testigo» a la premisa `targetLiftsc (nthc X 2̄)`. En enunciado:
