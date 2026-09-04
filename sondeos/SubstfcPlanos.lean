@@ -4,7 +4,10 @@
    ni el DESCENSO. Base: `sondeos/Paso2CasoForall.lean` §0-§6 (kit copiado literalmente).
 
    Piezas NUEVAS respecto de aquel fichero:
-     * `pcc_thm_inst4` / `pcc_axiom_inst4` — no existían en producción (sólo hasta `inst3`).
+     * `pcc_thm_inst4` / `pcc_axiom_inst4` — ⚠️ **YA ESTÁN EN PRODUCCIÓN** desde el 2026‑08‑31,
+       promovidos DESDE ESTE MISMO SONDEO a `Meta/MpCodePrf.lean` (y exportados). NO volver a
+       promoverlos: esta línea decía «no existían (sólo hasta `inst3`)» y llevaba obsoleta desde
+       entonces — detectado por la auditoría de B3 (2026‑09‑04).
        `ax_substfc_impl/_and/_or` son `forall_4`.
      * `binK` + `prf_substtc_binK_at` — el constructor binario de código con la ETIQUETA
        ABSTRACTA (`termCode T`), que es lo que permite FACTORIZAR impl/and/or en UN lema.
