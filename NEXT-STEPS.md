@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑04 · `master` verde · Lean v4.31.0 — B2 CERRADA (el DESCENSO en producción)**
-**123 jobs · 109 módulos activos (Minimal 11 + Meta 87 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
+**124 jobs · 110 módulos activos (Minimal 11 + Meta 88 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -241,7 +241,7 @@ comentarios).
 > ## 📓 (histórico) La medición de la rama C, que era lo que había que hacer
 >
 > ✅ **B0b hecha**: `Meta/CodeWitnessPrf.lean` está en producción y con ella **el vocabulario
-> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **123 jobs**.
+> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **124 jobs**.
 >
 > ▶ **Lo siguiente es MEDIR C, no construirla.** La caída de A4 dejó a los 7 reflectores sin
 > planteamiento: la guarda no se puede probar para argumento abstracto, hay que **cargarla como

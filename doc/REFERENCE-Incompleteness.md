@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 123 jobs · 109 módulos activos** (Minimal 11 + Meta 87 + Full 11) **+ 0 en `cuarentena/`
+> **Build 124 jobs · 110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2222,7 +2222,7 @@ Detectadas al reconstruirlas a mano durante las mediciones: `prf_isFormCodeE2_st
 
 `sondeos/DescensoLiftc.lean` (2011 l., 198 declaraciones) → **`Meta/EvalLiftcPrf.lean`**.
 Cierra **`pcc_eval_liftc`**, el `hLift` que `sondeos/Paso2CasoForall.lean` dejaba sin descargar.
-Build **123 jobs**, 0 errores, 0 sorrys.
+Build **124 jobs**, 0 errores, 0 sorrys.
 
 ### 3.34.1 · El reparto, medido antes de construir
 

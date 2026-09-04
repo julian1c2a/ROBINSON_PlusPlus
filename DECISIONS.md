@@ -1,14 +1,14 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 y **B2** hechas
+> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8, B2 hechas · **B3 EN CURSO**
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 123 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **109 módulos activos** (Minimal 11 + Meta 87 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
+> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)

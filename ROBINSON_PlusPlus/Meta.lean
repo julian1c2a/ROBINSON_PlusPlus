@@ -91,6 +91,7 @@ import ROBINSON_PlusPlus.Meta.EvalPredPrf
 import ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 import ROBINSON_PlusPlus.Meta.CodeNatInjPrf
 import ROBINSON_PlusPlus.Meta.LiftcCodePrf
+import ROBINSON_PlusPlus.Meta.SubstfcCodePrf
 import ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 import ROBINSON_PlusPlus.Meta.LineWFEfqPrf
 import ROBINSON_PlusPlus.Meta.CodeTreeReflect
