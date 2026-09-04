@@ -17,8 +17,8 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 122 jobs · 108 módulos activos** (Minimal 11 + Meta 86 + Full 11) **+ 0 en `cuarentena/`
-> + 10 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
+> **Build 123 jobs · 109 módulos activos** (Minimal 11 + Meta 87 + Full 11) **+ 0 en `cuarentena/`
+> + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -2215,6 +2215,102 @@ Detectadas al reconstruirlas a mano durante las mediciones: `prf_isFormCodeE2_st
 `CRIT_E2_rejects_varc`, `CRIT_isFC1_rejects_varc` — el kit de **discriminación** — y
 **`prf_congr_carc`**, que no existe (sólo `prf_congr_carcT`, la de código).
 
+
+---
+
+## §3.34 · B2 · EL DESCENSO EN PRODUCCIÓN, y la restricción que manda: el CICLO DE IMPORTS (2026‑09‑04)
+
+`sondeos/DescensoLiftc.lean` (2011 l., 198 declaraciones) → **`Meta/EvalLiftcPrf.lean`**.
+Cierra **`pcc_eval_liftc`**, el `hLift` que `sondeos/Paso2CasoForall.lean` dejaba sin descargar.
+Build **123 jobs**, 0 errores, 0 sorrys.
+
+### 3.34.1 · El reparto, medido antes de construir
+
+| | |
+|---|---|
+| ya en producción **por nombre** | **159** |
+| no se promueven | **8** — 2 duplicados conocidos + **6 controles `CRIT_*` retirados** |
+| promovidas | **31** (+ 6 puentes `rfl` y 5 controles negativos) |
+
+Medir antes de construir volvió a pagar: el sondeo se encogió al **20 %**, y la auditoría de
+duplicación —la que cazó nueve en B0b y diez en B1— encontró aquí **cinco duplicados exactos y
+doce casi‑duplicados**.
+
+**El descenso CONECTA** con lo promovido en B1: `targetLift`/`targetLiftsc` se **consumen** de
+`LiftcCodePrf`, no se redefinen. La prueba fuerte no es el `rfl` suelto sino que **`PHI_step`
+consume las cuatro cláusulas ya promovidas** y no tiparía si fueran constantes distintas.
+Y consume las versiones **`_imp`** — la **moneda OBJETO**, ver §3.31.
+
+### 3.34.2 · 🔑 EL CICLO DE IMPORTS — la restricción estructural de esta rama
+
+Dos lemas del sondeo **subsumen** a lemas que ya estaban en producción:
+
+* `substF_targetLift` ⊃ `LiftcCodePrf.substF_targetLift_hole` (su caso `v:=0, s:=#0`)
+* `prf_isTermCodeE1_of_boundedIn` ⊃ `SinWTs.prf_crit_In_rejects_open1`
+
+⛔ **NO se puede reescribir el de producción como corolario del general**: `EvalLiftcPrf`
+**importa** a `LiftcCodePrf` y a `CodeWitnessPrf` ⇒ **ciclo**. Y los de producción tienen
+consumidores **dentro de su propio módulo**, así que tampoco podían simplemente irse.
+
+**La única salida es la contraria: BAJAR el general** al módulo donde vive el particular. Medido
+—no supuesto— que los dos podían bajar sin que faltara ninguna constante, uno de ellos con
+`#deps` sobre el término de prueba. Hecho: los dos bajaron y el particular quedó como corolario.
+
+⚠️ **Al bajar hay que quitarlos también del `export` y del bloque `#print axioms`**: exportar o
+imprimir una constante que el módulo ya no declara es **error duro**, no lo salva ningún `open`.
+Lo destapó un verificador con dos controles sintéticos compilados.
+
+### 3.34.3 · Seis piezas genéricas subieron AGUAS ARRIBA
+
+No son del descenso: son maquinaria genérica que, escondida en el módulo del descenso, quedaba
+invisible para los sondeos que la tienen copiada a mano.
+
+| pieza | ahora vive en | copiada a mano en |
+|---|---|---|
+| `psi_lift_form`, `PSI_inst` (genéricos en `Φ`) | `Meta/StrongInductionPrf.lean` | 4 y **7** sondeos |
+| `prf_argsIn_head`, `prf_argsIn_tail` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+| `prf_isTermCodeE1_of_boundedIn`, `_of_In` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+
+`psi_lift_form` salía en **dos líneas** de `psi_lift_eq_subst` + `psi_at`, ambos ya en producción.
+Los dos últimos son el **análogo por sort** de `ENS.prf_isFormCodeE2_of_boundedIn`/`_of_In`, con
+el esqueleto de prueba idéntico línea a línea — el hueco de simetría que el docstring de
+`CodeWitnessPrf` prometía cubierto citando un sondeo que **no existe en producción**.
+
+### 3.34.4 · El `export` es PARCIAL a propósito
+
+`sondeos/EvalSubstfcPrf.lean` monta **otros dos descensos** con los mismos nombres y tipos
+distintos (`PHI` con 1 vs 3 vs 5 binders). Sacar `PHI*`/`DESCENSO*` a la raíz envenenaría la
+promoción siguiente. Se quedan cualificados; salen sólo `pcc_eval_liftc`, los transportes De
+Bruijn y los genéricos.
+
+### 3.34.5 · ⚠️ «Net‑0» aquí son CUATRO axiomas, no tres
+
+Los resultados sustantivos salen con
+`[propext, Classical.choice, Quot.sound, Representability2Prf.prf_axiomsCodeT_eq]`.
+El cuarto es uno de los **7 `axiom` sancionados** y **ya estaba en la línea base** (`refl_termCode`
+y `refl_shapeUn_imp` lo arrastran). **No hay axioma nuevo y net‑0 se sostiene**, pero
+«net‑0 puro» describe sólo los puentes definicionales. La frase estaba mal puesta y se corrigió.
+
+### 3.34.6 · Los controles §9 no medían lo que decían
+
+Los seis `CRIT_*_real` se vendían como «NO ES VACUO». **Producción ya probaba sus enunciados
+sola**, sin descenso, componiendo `LiftcCodePrf.refl_termCode` con `Representability.termCodeM_eq`.
+No son inútiles —la **ruta** importa, porque `refl_termCode` va por recursión META y **no ejercita
+la inducción objeto**— pero el enunciado no era información nueva. Se conservan **tres**,
+renombrados a «el descenso DISPARA», y se retiraron seis declaraciones. De propina: el parámetro
+`f : String` de uno de ellos era **inerte**.
+
+### 3.34.7 · Deuda abierta en `CodeWitnessPrf.lean` (decisión pendiente)
+
+* **No tiene bloque `export`** (§17): 4 de 87 módulos de `Meta/` están así. El bloque medido
+  exportaría **202 de 212** declaraciones. ⚠️ **Riesgo sin resolver**: deja 202 nombres a secas en
+  la RAÍZ para los ~50 sondeos que importan el barrel, y **los 202 están re‑declarados en
+  `sondeos/`** (coincidencia 202/202). **Decisión del autor antes de pegarlo.**
+* **Duplica SIETE lemas entre `SinWTs` y `ENS`** (no cinco: se contaron mal y faltaban `impT` y
+  `prf_or_elim_imp`). El borrado **no obliga a reordenar** y está compilado: EXIT=0, y **quita
+  cinco warnings** `unusedSimpArgs` sin introducir ninguno.
+* **Docstrings falsos**: `:78‑82` promete un `DescMutua` y unas secciones que **no existen**, y
+  `:68` se contradice con `:78` sobre la procedencia del módulo.
 ---
 
 ← Índice raíz: [REFERENCE.md](../REFERENCE.md) · Ramas: [Gödelización](REFERENCE-Godelization.md) · [Núcleo](REFERENCE-Kernel.md) · [Full](REFERENCE-Full.md) · [Aritmética](REFERENCE-Arithmetic.md)

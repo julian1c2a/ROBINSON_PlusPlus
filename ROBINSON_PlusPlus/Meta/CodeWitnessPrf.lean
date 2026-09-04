@@ -670,6 +670,103 @@ theorem PrfH_inst_wfAll1 {Γ : List Formula} (w i : Term) (h : PrfH Γ (wfAll1 w
     Nat.reduceAdd, Nat.reduceLT, Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff, reduceIte,
     FOL.substTerm_liftTerm, FOL.substTerm_lift_comm_zero, substTerm_numeralM, if_true] using hi
 
+/-! ### `argsIn` se parte en CABEZA y COLA (posicion 0 / posiciones desplazadas)
+
+    Subidos desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
+    (2026-09-03). Van AQUI, junto a `PrfH_inst_argsIn`, y no en el modulo del descenso:
+    son genericos —no mencionan `targetLift`— y estan copiados a mano en SEIS sondeos del
+    frente (`DescensoLiftc`, `EvalSubstfcPrf`, `SubstfcEx`, ...). Desde el modulo del
+    descenso quedaban invisibles para todos ellos. -/
+theorem prf_argsIn_head (w hd tl : Term) :
+    Prf (Formula.impl (argsIn w (cons hd tl)) (In hd w)) := by
+  refine prf_deduction ?_
+  have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
+  have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
+    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
+      (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
+  have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
+    PrfH.mp _ _ _ (PrfH_inst_argsIn w (cons hd tl) zero hargs) hlt
+  exact PrfH_congr_In_left (prf_to_prfH (prf_nthc_zero hd tl) _) hin
+
+theorem prf_argsIn_tail (w hd tl : Term) :
+    Prf (Formula.impl (argsIn w (cons hd tl)) (argsIn w tl)) := by
+  refine prf_mp (Prf.qconf (argsIn w (cons hd tl)) (argsInBody w tl)) (Prf.gen _ ?_)
+  rw [liftF_argsIn]
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc tl)))
+    [argsIn (liftTerm 0 w) (liftTerm 0 (cons hd tl))] rfl)
+  show PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+      argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+    (In (nthc (liftTerm 0 tl) (.var 0)) (liftTerm 0 w))
+  have hlt : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+      argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+      (lt (.var 0) (lenc (liftTerm 0 tl))) := PrfH.hyp _ _ (List.Mem.head _)
+  have hargs : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+      argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+      (argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+      argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+      (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
+    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
+      (PrfH.mp _ _ _ (prf_to_prfH
+        (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
+  have hin : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
+      argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
+      (In (nthc (cons (liftTerm 0 hd) (liftTerm 0 tl)) (succ (.var 0))) (liftTerm 0 w)) :=
+    PrfH.mp _ _ _ (PrfH_inst_argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))
+      (succ (.var 0)) hargs) hlt'
+  exact PrfH_congr_In_left
+    (prf_to_prfH (prf_nthc_succ (liftTerm 0 hd) (liftTerm 0 tl) (.var 0)) _) hin
+
+/-! ### Del testigo al NODO: `In c w ⇒ wfAll1 w ⇒ isTermCodeE1 w c`, con `c` y `w`
+       **ABSTRACTOS** (ni uno ni otro tienen que ser cerrados).
+
+    Analogo, para el sort TERMINO, de `ENS.prf_isFormCodeE2_of_boundedIn` / `_of_In`:
+    esqueleto de prueba identico linea a linea, con `wfAllF`/`isFormCodeE2` cambiados por
+    `wfAll1`/`isTermCodeE1`.
+
+    Bajados desde `Meta/EvalLiftcPrf.lean` (2026-09-04) por la misma razon que
+    `prf_argsIn_head`/`prf_argsIn_tail` de aqui arriba: son GENERICOS —no mencionan
+    `targetLift`— y desde el modulo del DESCENSO quedaban invisibles para los sondeos del
+    frente que los tienen copiados a mano. La constante mas tardia que usan es
+    `PrfH_inst_wfAll1` (:665), o sea que este es su sitio mas alto posible. -/
+
+theorem prf_isTermCodeE1_of_boundedIn (w c : Term) :
+    Prf (Formula.impl (boundedIn c w) (Formula.impl (wfAll1 w) (isTermCodeE1 w c))) := by
+  refine prf_ex_elim_imp ?_
+  rw [liftFormula, liftF_wfAll1, liftF_isTermCodeE1]
+  refine deduction_aux ?_ (wfAll1 (liftTerm 0 w)) _ rfl
+  have hwf : PrfH [wfAll1 (liftTerm 0 w),
+      land (lt (.var 0) (liftTerm 0 (lenc w)))
+        (Formula.eq (nthc (liftTerm 0 w) (.var 0)) (liftTerm 0 c))]
+      (wfAll1 (liftTerm 0 w)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hbody : PrfH [wfAll1 (liftTerm 0 w),
+      land (lt (.var 0) (liftTerm 0 (lenc w)))
+        (Formula.eq (nthc (liftTerm 0 w) (.var 0)) (liftTerm 0 c))]
+      (land (lt (.var 0) (liftTerm 0 (lenc w)))
+        (Formula.eq (nthc (liftTerm 0 w) (.var 0)) (liftTerm 0 c))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt : PrfH [wfAll1 (liftTerm 0 w),
+      land (lt (.var 0) (liftTerm 0 (lenc w)))
+        (Formula.eq (nthc (liftTerm 0 w) (.var 0)) (liftTerm 0 c))]
+      (lt (.var 0) (lenc (liftTerm 0 w))) := by
+    have h := PrfH_and_elim_left hbody
+    simpa only [lenc, liftTerm, liftTerms] using h
+  have heq := PrfH_and_elim_right hbody
+  have hitc := PrfH.mp _ _ _ (PrfH_inst_wfAll1 (liftTerm 0 w) (.var 0) hwf) hlt
+  exact PrfH_congr_isTermCodeE1 heq hitc
+
+/-- ⚠️ `impT` SIN cualificar, y aqui es lo CORRECTO: estamos dentro de `namespace SinWTs`,
+    asi que resuelve a `SinWTs.impT` y no a la copia `ENS.impT`. Es justamente la
+    cualificacion que `Meta/EvalLiftcPrf.lean` tenia que poner a mano —porque aquel modulo
+    abre los DOS namespaces— y que al bajar aqui DESAPARECE. -/
+theorem prf_isTermCodeE1_of_In (w c : Term) :
+    Prf (Formula.impl (In c w) (Formula.impl (wfAll1 w) (isTermCodeE1 w c))) :=
+  impT (prf_boundedIn_of_In c w) (prf_isTermCodeE1_of_boundedIn w c)
+
+
 /-- Cuerpo de la clausura de `argsIn`, con el indice `i` LIBRE. -/
 theorem prf_argsIn_lift_body (W V i : Term) :
     Prf (Formula.impl (argsIn W V) (Formula.impl (lt i (lenc (liftsc zero V)))

@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑08‑31 · `master` limpio y verde · Lean v4.31.0**
-**122 jobs · 108 módulos activos (Minimal 11 + Meta 86 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
+**Estado 2026‑09‑04 · `master` verde · Lean v4.31.0 — B2 CERRADA (el DESCENSO en producción)**
+**123 jobs · 109 módulos activos (Minimal 11 + Meta 87 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
 **7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
 comentarios).
 
@@ -56,7 +56,39 @@ comentarios).
 >            como se hizo aqui: puede haber encogido igual.
 >         ⚠️ OJO: CodeWitnessPrf.SinWTs YA ES el nucleo de ClausuraLiftSinWTs. B1 se
 >            ha reducido a lo que NO entro en B0b -- medirlo antes de empezar.
->   B2 ⬜ DescensoLiftc  → Meta/EvalLiftcPrf.lean
+>   B2 ✅ HECHA (2026-09-04): Meta/EvalLiftcPrf.lean -- EL DESCENSO. pcc_eval_liftc
+>         EN PRODUCCION => el hLift de Paso2CasoForall queda descargado.
+>         MEDIDA antes: de 198 declaraciones, 159 ya estaban => se promovieron 31.
+>         🔑 EL HALLAZGO ESTRUCTURAL, y manda en toda la rama: EL CICLO DE IMPORTS.
+>            Dos lemas del sondeo SUBSUMEN a otros que ya estaban en produccion
+>            (substF_targetLift => substF_targetLift_hole; prf_isTermCodeE1_of_boundedIn
+>            => prf_crit_In_rejects_open1). NO se puede hacer corolario al de arriba:
+>            EvalLiftcPrf los IMPORTA. La unica salida es BAJAR el general. Hecho.
+>            ⚠️ Al bajar hay que quitarlos del `export` y del `#print axioms`:
+>               exportar/imprimir una constante que el modulo ya no declara es
+>               ERROR DURO, no lo salva ningun `open`.
+>         SEIS piezas genericas subieron AGUAS ARRIBA (psi_lift_form y PSI_inst,
+>         genericos en Phi, a StrongInductionPrf; prf_argsIn_head/_tail y
+>         prf_isTermCodeE1_of_boundedIn/_of_In a SinWTs). PSI_inst estaba copiado
+>         a mano en SIETE sondeos.
+>         Retirados SEIS controles CRIT_*: produccion ya probaba sus enunciados sola.
+>         ⚠️ «net-0» aqui son CUATRO axiomas (prf_axiomsCodeT_eq incluido, sancionado
+>            y ya en la linea base). «net-0 puro» describe solo los puentes.
+>   B2b⬜ DECISION DEL AUTOR, no tecnica: el bloque `export` de CodeWitnessPrf.
+>         Le falta (§17; 4 de 87 modulos de Meta/ estan asi) y su ausencia YA cuesta
+>         (consumidores fallan con unknownIdentifier). El bloque medido exporta
+>         202 de 212 nombres y COMPILA (EXIT=0).
+>         ⚠️ RIESGO SIN RESOLVER: deja 202 nombres a secas en la RAIZ para los ~50
+>            sondeos que importan el barrel, y los 202 estan RE-DECLARADOS en
+>            sondeos/ (coincidencia 202/202). Decidir antes de pegarlo.
+>   B2c⬜ Borrar las SIETE copias duplicadas entre SinWTs y ENS en CodeWitnessPrf
+>         (no cinco: faltaban impT y prf_or_elim_imp). Borrado puro + UNA linea a
+>         reescribir; compilado EXIT=0 y quita 5 warnings sin introducir ninguno.
+>   B2d⬜ OPCIONAL: reescribir prf_crit_In_rejects_open1 como corolario del general
+>         que acaba de bajar (quita 22 lineas de prueba duplicada; la CONSTANTE ya
+>         no esta duplicada, asi que esto es solo higiene).
+>   B2e⬜ Docstrings FALSOS en CodeWitnessPrf: :78-82 promete un `DescMutua` y unas
+>         secciones que NO EXISTEN, y :68 se contradice con :78. Ver rama G.
 >   B3 ⬜ SubstfcPlanos · SubstfcEx · EvalSubsttc · EvalPredDot · EvalSubstfcPrf
 >         ⚠️ EvalSubstfcPrf son 7522 l. de las que ~6100 son COPIA de los otros cuatro.
 >            Promoverlo BIEN = promover primero los cuatro y dejar solo sus §1-§15.
@@ -79,6 +111,32 @@ comentarios).
 >            error OPACO. El `open` va CONFINADO a una section.
 >   B7 ⬜ LIMPIEZA: borrar la pcc_eq_tracked local de EvalSubsttc
 >         (sombrea Meta/Sigma1AtomPrf.lean:246)
+> G · VERDAD DE LOS DOCSTRINGS   🆕 2026-09-04 -- el libro se escribe LEYENDO del arbol
+>   ⚠️ EL COMPILADOR NO VERIFICA LA PROSA. Un lake build verde garantiza los TEOREMAS,
+>      no los docstrings. Y el autor escribe el libro leyendo de aqui, asi que una
+>      afirmacion falsa en un docstring SALTA AL LIBRO.
+>   G0 ✅/⬜ PARCIAL: auditoria de 5 categorias lanzada; 6 de 10 agentes entregaron
+>         antes de que tres interrupciones mataran el workflow. 37 hallazgos en bruto
+>         (21 FALSAS, 6 ENGANOSAS, 10 IMPRECISAS), 2 verificadores en PARCIAL.
+>         ⬜ FALTAN las categorias EXISTENCIA y SIGNIFICADO + sus verificadores.
+>            Reanudable: Workflow({scriptPath: scratchpad/docverdad.js,
+>            resumeFromRunId: 'wf_a0ba1c5f-343'}) -- replayea los 6 de caché.
+>         ⚠️ HACERLO SOBRE EL ARBOL YA ESTABLE: editar un fichero que un agente audita
+>            invalida sus numeros de linea (mordio en B2).
+>   G1 ⬜ Las CINCO clases y su metodo (cada una se comprueba distinto):
+>         existencia -> censo de env.constants, NO grep
+>         citas de linea -> mecanico (72 numeros en 60 sitios, medidos)
+>         footprint -> #print axioms real contra el texto
+>         significado -> censo de CONSUMIDORES + direccion de las hipotesis
+>         cifras -> contar la familia ENTERA, con el comando a la vista
+>   G2 ⬜ Casos ya CONFIRMADOS que hay que corregir:
+>         * CodeWitnessPrf:78-82 (DescMutua y dos secciones inexistentes) y :68 vs :78
+>         * CodeWitnessPrf:1555 cita EvalSubsttc.prf_isTermCodeE1_of_In -- era un sondeo
+>           (⚠️ hoy YA existe en produccion: lo cerro B2, en SinWTs)
+>         * LiftcCodePrf.refl_isTermCodeE1_imp: «EL RESULTADO CENTRAL» con CERO usos;
+>           toma como PREMISA lo que el descenso FABRICA => inconsumible por construccion
+>   G3 ⬜ PREGUNTA DE FONDO, con datos: ¿merece la pena mantener numeros de linea en
+>         los docstrings? Derivan en cuanto alguien inserta arriba y nadie se entera.
 > C · LOS 7 REFLECTORES de lineWF     ⚠️ REPLANTEADA 2026-08-31 (§3.32.2)
 >   C0 ✅ MEDIDA: las tres vias, y DOS estan REFUTADAS con prueba compilada.
 >         (A) la guarda NO sale de `lineWF t`: hay una LINEA BASURA que satisface
@@ -183,7 +241,7 @@ comentarios).
 > ## 📓 (histórico) La medición de la rama C, que era lo que había que hacer
 >
 > ✅ **B0b hecha**: `Meta/CodeWitnessPrf.lean` está en producción y con ella **el vocabulario
-> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **122 jobs**.
+> entero del frente**, que hasta hoy no tenía **ni una** definición en `Meta/`. Build **123 jobs**.
 >
 > ▶ **Lo siguiente es MEDIR C, no construirla.** La caída de A4 dejó a los 7 reflectores sin
 > planteamiento: la guarda no se puede probar para argumento abstracto, hay que **cargarla como

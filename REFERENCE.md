@@ -1,9 +1,9 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
+> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 y **B2** hechas
 >
-> **Build 122 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **108 módulos activos** (Minimal 11 + Meta 86 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **Build 123 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **109 módulos activos** (Minimal 11 + Meta 87 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -29,7 +29,7 @@
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
-**Last updated:** 2026-09-03 · HEAD `e46e482` · Lean v4.31.0 — B1 CERRADA (`Meta/LiftcCodePrf.lean`) y B8 aplicada
+**Last updated:** 2026-09-04 · Lean v4.31.0 — **B2 CERRADA**: `Meta/EvalLiftcPrf.lean` (el DESCENSO, `pcc_eval_liftc`). Seis piezas genéricas subidas aguas arriba y dos bajadas a `LiftcCodePrf` por el CICLO DE IMPORTS (§3.34)
 
 > **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**108 módulos activos** (Minimal 11 + Meta 86 + Full 11) + barrel `Meta.lean` + raíz
+**109 módulos activos** (Minimal 11 + Meta 87 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -122,7 +122,7 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 ### 1.5 Incompletitud Nivel D → [`doc/REFERENCE-Incompleteness.md`](doc/REFERENCE-Incompleteness.md)
 
-Los **86 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
+Los **87 módulos** de `Meta/`, en el orden del barrel [`Meta.lean`](ROBINSON_PlusPlus/Meta.lean).
 Detalle en el nodo §3.15–§3.32.
 
 | # | Module | Rol · Estado |
@@ -154,6 +154,7 @@ Detalle en el nodo §3.15–§3.32.
 | 75 | **`CodeWitnessPrf`** | 🆕 **el vocabulario de TESTIGOS del frente `substfc`** (2026‑08‑31, promovido de `sondeos/HasWitFRealMin.lean`). Tres bloques: `SinWTs` (reconocedor de TÉRMINO con una lista, `isTC1`/`wfAll1`/`argsIn`, más `isFormCodeB2`), `ENS` (reconocedor de FÓRMULA **ecuacional** con dos listas, `isFC1`/`hasWitF`) y `HW` (**la NO‑VACUIDAD**: `prf_hasWitF_real`, net‑0 **puro**). ⚠️ Se **dedupliparon nueve** definiciones al promover (§3.31) |
 | 76 | **`CodeNatInjPrf`** | 🆕 **inyectividad de la codificación numeral** (2026‑09‑01, promovido de `sondeos/CodeNatInj.lean`): `consN_inj` (Cantor) → `codeNat_inj` → **`codeNat_ne`/`codeNatTerm_ne`**, el **sustituto de `canon_ne`** que desbloquea los casos 3‑4 del módulo C de `NegVerifier`. ⚠️ Trae también `num_bridge`, el puente entre los **dos `numeral`** duplicados del proyecto |
 | 77 | **`LiftcCodePrf`** | 🆕 **los constructores de código DOTADOS y las cláusulas del reflector** (2026‑09‑03, promovido de `sondeos/ReflectorDesdeConsumidor.lean`): `liftcT`/`liftscT`/`varcT`/`funccT` con sus puentes `rfl`, las congruencias META e INTERNAS, `targetLift`/`targetLiftsc`, las cuatro ecuaciones dotadas de `liftc`/`liftsc` y las cuatro cláusulas del reflector en **moneda de inducción OBJETO**. ⚠️ Se **descartaron DIEZ duplicados** al promover (§3.33) |
+| 77b | **`EvalLiftcPrf`** | 🆕 **EL DESCENSO** (2026‑09‑04, promovido de `sondeos/DescensoLiftc.lean`, rama **B2**): la inducción fuerte que cierra **`pcc_eval_liftc`** — el `hLift` que `Paso2CasoForall` dejaba sin descargar — más `DESCENSO_hasWit`, la forma consumible contra `ENS.hasWit`. 🔑 **UNA** inducción fuerte con conclusión **CONJUNTIVA** sobre los dos sorts y `w` cuantificado **DENTRO** de `Φ`; `PHI_step` consume las cláusulas `_imp`, o sea la **moneda OBJETO**. De 198 declaraciones del sondeo se promovieron **31**; ⚠️ **seis piezas genéricas se subieron aguas ARRIBA** (a `StrongInductionPrf` y a `SinWTs`) y **dos BAJARON** a `LiftcCodePrf` — ver §3.34. `export` **PARCIAL a propósito**: `PHI*`/`DESCENSO*` quedan cualificados porque `EvalSubstfcPrf` monta otros dos descensos con los mismos nombres |
 | 78–80 | **`InAxiomsCodePrf`** · `LineWFThyPrf` · `LineWFAssemblePrf` | 🔁 `pcc_In_axiomsCodeT_tracked`, **`pcc_tc_formCode_internal`**; **`pcc_lineWF_tracked_modulo_7`** (§3.26.4) |
 | 81–82 | `LineWFConsPrf` · `AxiomListCode` | `prf_line_is_cons`; `axiomsCodeT` concretado (`neg_In_axiomsCodeT`) |
 | 83–84 | `CodeDecode` · `ChainDecode` | **módulo A de `NegVerifier`**: `decodeForm` biyección + `decodeChain_prf` |
@@ -275,7 +276,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-31.** Build **122 jobs**, **106 módulos activos**, **57 `sondeos/`**, 0 sorrys,
+**Estado 2026-08-31.** Build **123 jobs**, **106 módulos activos**, **57 `sondeos/`**, 0 sorrys,
 7 `axiom` de Lean.
 
 ### Lo que está cerrado

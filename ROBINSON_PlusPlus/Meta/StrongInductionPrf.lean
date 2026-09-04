@@ -182,6 +182,35 @@ theorem psi_lift_eq_subst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
   simp only [PSI, liftFormula, substFormula, lt, liftTerms, liftTerm, substTerms, substTerm,
     Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, hΦ, subst1_id Φ hΦ]
 
+/-! ### La HI de curso de valores DENTRO del paso — genérica en `Φ`
+
+    Estas dos son maquinaria de la inducción fuerte, no de ningún descenso concreto: viven
+    aquí, junto a sus dos padres (`psi_lift_eq_subst` y `psi_at`), y no en el módulo que las
+    consume. Se subieron desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
+    (2026‑09‑03), donde estaban instanciadas a `Φ := PHI` y por tanto invisibles para los otros
+    dos descensos que las necesitan palabra por palabra (`sondeos/EvalSubstfcPrf.lean`). -/
+
+/-- Tras el `gen` de `w`, la HI de curso de valores toma esta forma. Es `psi_lift_eq_subst`
+    compuesto con `psi_at`, en dos líneas. -/
+theorem psi_lift_form (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    liftFormula 0 (PSI Φ) = Formula.forall (Formula.impl (lt (.var 0) (.var 2)) Φ) := by
+  rw [psi_lift_eq_subst Φ hΦ, psi_at]
+  simp only [liftTerm, Nat.reduceLT, reduceIte, Nat.reduceAdd]
+
+/-- **Extracción bajo hipótesis**: la versión `PrfH` de `prf_psi_elim`, que es la `Prf`.
+    De la HI de curso de valores ya levantada, y para cualquier testigo `z`, sale
+    `z < #1 ⇒ Φ(z)`. -/
+theorem PSI_inst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula}
+    (hpsi : PrfH Γ (liftFormula 0 (PSI Φ))) (z : Term) :
+    PrfH Γ (Formula.impl (lt z (.var 1)) (substFormula 0 z Φ)) := by
+  rw [psi_lift_form Φ hΦ] at hpsi
+  have h := PrfH_spec hpsi z
+  have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 2)) Φ)
+      = Formula.impl (lt z (.var 1)) (substFormula 0 z Φ) := by
+    simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
+      Nat.reduceSub, reduceIte, if_true]
+  rwa [e] at h
+
 theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
     (step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) :
     ∀ t : Term, Prf (substFormula 0 t Φ) := by
@@ -241,4 +270,5 @@ export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
   substFormula_liftFormula PSI psi_at prf_psi_elim
   liftTerm_swap liftTerms_swap liftFormula_swap psi_step_motive
   subst1_id subst0_var0_id psi_lift_eq_subst prf_strong_induction
+  psi_lift_form PSI_inst
 )

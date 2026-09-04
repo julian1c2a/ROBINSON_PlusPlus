@@ -787,12 +787,31 @@ theorem substTerm_termsCode (v : Nat) (u : Term) :
         substTerm_termsCode v u ts]
 end
 
+/-- **`substFormula` atraviesa `targetLift`**, en su forma GENERAL: cae sobre el argumento.
+
+    ⚠️ Bajado desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
+    (2026‑09‑04). **Tuvo que bajar AQUI, no quedarse arriba**: `EvalLiftcPrf` importa a este
+    modulo, asi que reescribir `substF_targetLift_hole` como corolario de un lema de alli
+    seria un CICLO. Y el `_hole` tiene tres consumidores dentro de este mismo fichero
+    (`:799`, `:802` y el simp‑set del `export`), asi que no podia simplemente irse. -/
+theorem substF_targetLift (v : Nat) (u s : Term) :
+    substFormula v u (targetLift s) = targetLift (substTerm v u s) := by
+  simp only [targetLift, substFormula_provFromCode_open, eqc, liftcT, funcc, tcFn, liftc,
+    cons, nil, zero, succ, substTerm, substTerms, substTerm_termCode, substTerm_strCode]
+
+/-- La companera sobre LISTAS, mismo footprint. -/
+theorem substF_targetLiftsc (v : Nat) (u s : Term) :
+    substFormula v u (targetLiftsc s) = targetLiftsc (substTerm v u s) := by
+  simp only [targetLiftsc, substFormula_provFromCode_open, eqc, liftscT, funcc, tcFn, liftsc,
+    cons, nil, zero, succ, substTerm, substTerms, substTerm_termCode, substTerm_strCode]
+
+/-- El HUECO: el caso `v := 0`, `s := #0` del general. Instancia DEFEQ, sin conversion.
+    Se conserva el nombre porque lo consumen `:799`, `:802` y el `export`. -/
 theorem substF_targetLift_hole (t : Term) :
     substFormula 0 t (provFromCode (eqc (liftcT (termCode zero) (tcFn (.var 0)))
         (tcFn (liftc zero (.var 0)))))
-      = targetLift t := by
-  simp only [targetLift, substFormula_provFromCode_open, eqc, liftcT, funcc, tcFn, liftc,
-    cons, nil, zero, succ, substTerm, substTerms, substTerm_termCode, substTerm_strCode, if_true]
+      = targetLift t :=
+  substF_targetLift 0 t (.var 0)
 
 theorem PrfH_congr_targetLift {Γ : List Formula} {s s' : Term} (h : PrfH Γ (s =eq s'))
     (ha : PrfH Γ (targetLift s)) : PrfH Γ (targetLift s') :=
@@ -1007,7 +1026,8 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
   refl_caso_varc refl_caso_funcc refl_lista_nil refl_lista_cons
   refl_termCode refl_termsCode
   shapeUn0_es_varc shapeBin1_es_funcc
-  substTerm_termCode substTerm_termsCode substF_targetLift_hole PrfH_congr_targetLift
+  substTerm_termCode substTerm_termsCode
+  substF_targetLift substF_targetLiftsc substF_targetLift_hole PrfH_congr_targetLift
   refl_shapeUn_imp refl_caso_funcc_imp refl_shapeBin_imp refl_lista_cons_imp
   refl_isTermCodeE1_imp
 )
