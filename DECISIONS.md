@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
+> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 y **B2** hechas
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-09-03 (HEAD `e46e482`) — ADR-015…018; promoción a `Meta/` avanzando (B0, B0b, B9, B1, B8)
+**Última actualización:** 2026-09-04 — **ADR-019 NUEVO** (baja el general, no subas el corolario: el CICLO DE IMPORTS que destapó B2); ADR-018 pasa a EN PRODUCCIÓN (`Meta/EvalLiftcPrf.lean`)
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta
@@ -597,7 +597,8 @@ exigido un lema de lifting de **derivaciones**, que **no existe** en el proyecto
 ADR‑017). Y no había atajo por el consumidor: se **probó** que el `s` que ve `paso2_caso_forall`
 es `#0`, luego pedir `hLift` sólo para él es pedirlo para todo `s`.
 
-**Consecuencias**. `pcc_eval_liftc` existe con `w`/`s` **abstractos** y footprint net‑0.
+**Consecuencias**. `pcc_eval_liftc` existe con `w`/`s` **abstractos** y footprint net‑0, y
+desde **2026‑09‑04 está EN PRODUCCIÓN**: `Meta/EvalLiftcPrf.lean` (rama B2, §3.34).
 ⚠️ Contrapartida: `Φ` es ahora **guardado**, luego **todo consumidor aguas abajo tiene que
 suministrar `hasWit`** — barato, porque `CRIT_hasWit_real` da testigo para todo término y
 `CRIT_hasWit_lift` lo propaga al subcódigo, pero **no es gratis** y hay que declararlo en cada
@@ -619,3 +620,48 @@ que pide un `pred` dotado inexistente. Ver `doc/REFERENCE-Incompleteness.md` §3
 **Justificación**: [¿Por qué esta opción frente a las alternativas?]
 
 **Consecuencias**: [¿Cuáles son las contrapartidas?]
+
+---
+
+## ADR-019: Cuando el sondeo SUBSUME a producción, baja el GENERAL — no subas el corolario
+
+**Fecha**: 2026‑09‑04 · **Estado**: ✅ ACEPTADA · **Descubierta al promover B2** (§3.34.2)
+
+**Contexto**. Al promover un sondeo aparece un patrón recurrente: un lema del sondeo resulta ser
+**más general** que uno que producción ya tenía. En B2 pasó dos veces:
+
+| general (del sondeo) | particular (ya en producción) |
+|---|---|
+| `substF_targetLift` | `LiftcCodePrf.substF_targetLift_hole` (su caso `v:=0`, `s:=#0`) |
+| `prf_isTermCodeE1_of_boundedIn` | `SinWTs.prf_crit_In_rejects_open1` |
+
+La reacción natural —y la que estaba escrita en el plan— es **dejar el general en el módulo
+nuevo y reescribir el de producción como corolario suyo**.
+
+**⛔ Eso es IMPOSIBLE, y no por estilo: por el grafo.** El módulo nuevo **importa** a aquel en
+que vive el particular. Un corolario allí que dependa del general de aquí es un **ciclo de
+imports**. Y el particular no puede simplemente irse: tiene consumidores **dentro de su propio
+módulo** (`substF_targetLift_hole` en tres sitios de `LiftcCodePrf`, incluido un simp‑set).
+
+**Decisión**. **Baja el GENERAL** al módulo donde vive el particular, y deja el particular como
+corolario **allí mismo**. La dirección del grafo manda: lo genérico vive arriba, lo específico
+abajo — nunca al revés.
+
+**Cómo se comprueba antes de mover** (no se supone):
+1. Inventario de las constantes que usan enunciado y prueba del general — mejor con `#deps`
+   sobre el término de prueba, no leyendo los `import`.
+2. Cada una, ¿está disponible **antes** del punto de destino? La más tardía fija el sitio.
+3. Prueba compilada en un `Probe/` que importe **sólo lo que importa el módulo de destino** —
+   ⚠️ **ni el módulo nuevo ni el barrel**, o la prueba no demuestra nada.
+
+**Consecuencias**.
+* ⚠️ **Al bajar hay que quitar el nombre del `export` y del bloque `#print axioms` del módulo
+  de origen.** Exportar o imprimir una constante que el módulo ya no declara es **error duro de
+  elaboración**, y **no lo salva ningún `open`**. Es el fallo que más veces se coló en B2.
+* La cualificación se simplifica sola: `prf_isTermCodeE1_of_In` necesitaba `SinWTs.impT`
+  cualificado a mano en el módulo del descenso (que abre los dos namespaces); dentro de
+  `SinWTs` el nombre a secas ya es el correcto.
+* El mismo criterio decidió las **seis piezas genéricas** que subieron aguas arriba en B2:
+  si un lema no menciona el vocabulario del frente, no es del frente, y escondido en el módulo
+  del descenso queda **invisible** para los sondeos que lo tienen copiado a mano — `PSI_inst`
+  estaba duplicado en **siete**.

@@ -14,7 +14,48 @@
 > * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** **122 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑08‑31).
+> **Último build verificado:** **123 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑09‑04).
+
+---
+
+## 2026-09-04 — ✅ **B2 CERRADA**: el DESCENSO en producción · 🔑 el **CICLO DE IMPORTS** (ADR‑019)
+
+`sondeos/DescensoLiftc.lean` (2011 l., 198 decls) → **`Meta/EvalLiftcPrf.lean`**.
+**`pcc_eval_liftc` EN PRODUCCIÓN**: el `hLift` que `Paso2CasoForall` dejaba sin descargar queda
+cerrado. Build **123 jobs**, 0 errores, 0 sorrys. Proyectado en **§3.34**.
+
+**Medido antes de construir** (lo que ahorró el 80 %): de 198 declaraciones, **159 ya estaban**
+en producción por nombre, 8 no se promueven y **31** se promovieron.
+
+🔑 **El hallazgo estructural, y manda en toda la rama: EL CICLO DE IMPORTS** ([ADR‑019](DECISIONS.md)).
+Dos lemas del sondeo **subsumen** a otros que ya estaban en producción. **No se puede** reescribir
+el de arriba como corolario del general: el módulo nuevo **lo importa**. La única salida es
+**bajar el general**. ⚠️ Y al bajar hay que quitarlo del `export` y del `#print axioms`:
+exportar o imprimir una constante que el módulo ya no declara es **error duro**, y no lo salva
+ningún `open`.
+
+**Seis piezas genéricas subieron aguas arriba**, donde se ven: `psi_lift_form`/`PSI_inst`
+(genéricos en `Φ`) a `StrongInductionPrf` — `PSI_inst` estaba copiado **a mano en siete
+sondeos** —, y `prf_argsIn_head`/`_tail` más los dos `prf_isTermCodeE1_of_*` a `SinWTs`.
+
+**Retirados seis controles `CRIT_*`**: producción ya probaba sus enunciados sola, sin descenso.
+No eran inútiles —la **ruta** importa, porque `refl_termCode` va por recursión META y **no
+ejercita la inducción objeto**— pero el enunciado no era información nueva.
+
+**Correcciones medidas**: «net‑0» aquí son **CUATRO** axiomas (`prf_axiomsCodeT_eq`, sancionado
+y ya en la línea base); y `CodeWitnessPrf` duplica **SIETE** lemas entre `SinWTs` y `ENS`, no
+cinco — faltaban `impT` y `prf_or_elim_imp`.
+
+🆕 **Rama G abierta: verdad de los docstrings.** El libro se escribe **leyendo del árbol**, y el
+compilador **no verifica la prosa**. Casos confirmados: `CodeWitnessPrf:78‑82` promete un
+`DescMutua` **inexistente**; `refl_isTermCodeE1_imp` se anuncia «EL RESULTADO CENTRAL» y tiene
+**cero usos**.
+
+```lean
+pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
+    Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))
+DESCENSO_hasWit (s : Term) : Prf (hasWit s ⇒ targetLift s)   -- la forma consumible
+```
 
 ---
 

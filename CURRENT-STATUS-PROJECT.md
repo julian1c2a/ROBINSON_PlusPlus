@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
+> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 y **B2** hechas
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-03 — B1 cerrada y B8 aplicada; DIEZ duplicados descartados al promover
+**Last updated:** 2026-09-04 — **B2 cerrada**: `Meta/EvalLiftcPrf.lean` (el DESCENSO). ADR-019 nuevo: el CICLO DE IMPORTS obliga a bajar el general. Rama G abierta: verdad de los docstrings
 **Author**: Julián Calderón Almendros
 
 ---
@@ -39,15 +39,17 @@
 
 | Metric | Value |
 |--------|-------|
-| Total modules | **108 activos** (Minimal/ 11 + Meta/ 86 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+57 en `sondeos/`** |
-| Modules sin sorry | 108 / 108 ✅ |
+| Total modules | **109 activos** (Minimal/ 11 + Meta/ 87 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+57 en `sondeos/`** |
+| Modules sin sorry | 109 / 109 ✅ |
 | Sorry reales (total) | **0** 🎉 |
 | Declaraciones `axiom` de Lean | **7** (tras F7a): 3 esquemas de inducción `Full/`, TFA `Block8`, 2 anclas de codificación, `d3`. Inventario en **`AXIOMS.md`**. Ninguna es un `sorry` (ADR-010) |
 | Meta-reglas FOL (ω) | 6 en **`FOL/MetaRules.lean`** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) — re-export desde `Minimal.Axioms` |
 | Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); **`ax_axiomsCodeT_eq`** (⊢, `Minimal/Axioms:1376`) / **`prf_axiomsCodeT_eq`** (Prf, `Representability2Prf:104`) — anclas de codificación; `d3` (GodelTwo, único gödeliano vivo). ⚠️ `ax_inAxC`/`prf_inAxC` **ya no son axiomas**: son teoremas derivados de las anclas. Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
 | Axiomas matemáticos | **34** en `Minimal/`; en `Full/` **ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3** son **teoremas** + **TFA completo** (`tfa_numeral`) |
 | Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, **módulo `axiom d3`**. **D3 está FUERA de la cadena activa** (la capa rastreada está en `cuarentena/`): se recupera repatriando las raíces que quedan (7 a 2026-08-23), y el habilitador (`pcc_dot_cons`, escalera a.2) ya está ✅. Ver `NEXT-STEPS.md` |
-| Build status | ✅ Passing (**123 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-08-31) |
+| Build status | ✅ Passing (**123 jobs**, 0 errores, **0 warnings**, 0 sorrys, Lean v4.31.0, 2026-09-04) |
+| Promoción a `Meta/` (rama B) | ⏳ **B0, B0b, B9, B1, B8 y B2 hechas; queda B3.** 🆕 **B2 (2026‑09‑04)**: `Meta/EvalLiftcPrf.lean` — **el DESCENSO**, que pone **`pcc_eval_liftc`** en producción y descarga el `hLift` de `Paso2CasoForall`. De 198 declaraciones del sondeo se promovieron **31**. 🔑 Destapó el **CICLO DE IMPORTS** (**ADR‑019**): cuando el sondeo subsume a producción hay que **bajar el general**, no subir el corolario. Seis piezas genéricas subieron aguas arriba (`PSI_inst` estaba copiado a mano en **siete** sondeos). Detalle en [§3.34](doc/REFERENCE-Incompleteness.md) |
+| Verdad de los docstrings (rama G) | 🆕 ⚠️ **El libro se escribe leyendo del árbol, y el compilador NO verifica la prosa.** Auditoría en curso, 5 categorías con método propio cada una. Casos ya confirmados: `CodeWitnessPrf:78‑82` promete un `DescMutua` **inexistente**; `refl_isTermCodeE1_imp` se anuncia «EL RESULTADO CENTRAL» con **cero usos**. Ver `NEXT-STEPS.md` rama G |
 | `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `CodeDecode` (biyección `decodeForm` + inyectividad) + `ChainDecode` (`decodeChain_prf`). **Módulo B** (`LineWFCases`, 21 tags) ✅. ⚠️ `canon_ne` es FALSO (reintroduciría la inconsistencia, `sondeos/CanonNeRefuta.lean`), pero ✅ **su sustituto YA ESTÁ EN PRODUCCIÓN** (2026‑09‑01): `Meta/CodeNatInjPrf.lean` (`codeNat_ne`/`codeNatTerm_ne`). ⛔ Y el otro bloqueo que el plan documentaba (`axiomsCodeT` opaco) **es FALSO desde julio** (§3.32.3). Estimación revisada: **~800‑1 300 líneas / 3,5‑5 sesiones** |
 | D3 / plan 12‑A | ✅ **Fases 1a/1b/2/3 completas y la cuarentena VACÍA.** D3 reducida a **UN SOLO lema**: `d3_prf_of_chainOkDot (φ) (hC)` — sólo pide `hC_dot`. Y `pcc_lineWF_tracked_modulo_7` verifica que eso es **exactamente** cerrar los **7 reflectores** que faltan. ⚠️ Esos 7 son el **muro de `substfc`**: necesitan `pcc_eval_substfc`. ✅ **La decisión NO está pendiente**: desde [ADR‑015](DECISIONS.md) va por la **vía de CERO axiomas** (no se sanciona `isFormCode`). Hecho ya: partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** ([ADR‑018](DECISIONS.md), §3.28). 🏁 **`pcc_eval_substfc` PROBADO** (2026‑08‑31, §3.30): CONFIRMADO por verificación adversarial, footprint = la base sancionada. ✅ **Y su control de NO‑VACUIDAD también** (`prf_hasWitF_real`, §3.31, **net‑0 PURO**) ⇒ para códigos REALES la ecuación sale **pelada**. ⛔ Y A4 («guarda sobre argumento ABSTRACTO») se **retira**: es IMPOSIBLE, está refutado. ⚠️ La **rama C** está **replanteada** (§3.32.2): de sus tres vías **dos están REFUTADAS** y queda la **enmienda del esquema**, que pide antes `∀t. hasWit (tcFn t)` |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |

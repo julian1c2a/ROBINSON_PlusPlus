@@ -1,6 +1,6 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
+> ## ESTADO REAL — 2026-09-04 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 y **B2** hechas
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
@@ -30,7 +30,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-03 (grafo: +1 módulo, `Meta/LiftcCodePrf.lean`, con 25 imports concretos)
+**Last updated:** 2026-09-04 (grafo: +1 módulo, `Meta/EvalLiftcPrf.lean` — el DESCENSO, 20 imports concretos; importa a `LiftcCodePrf` y a `CodeWitnessPrf`, **nunca al revés**: ver ADR-019)
 **Author**: Julián Calderón Almendros
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
@@ -303,7 +303,7 @@ por módulo. Resumen:
 ## Verification Commands
 
 ```bash
-lake build                              # build completo (122 jobs a 2026-08-31)
+lake build                              # build completo (123 jobs a 2026-09-04)
 lake clean                              # reinicia la caché (cuando `Replayed` esconde errores)
 lake env lean sondeos/X.lean            # compila un sondeo (fuera del build)
 lake env lean Probe/X.lean              # scratch de sesión (Probe/ está en .gitignore)
