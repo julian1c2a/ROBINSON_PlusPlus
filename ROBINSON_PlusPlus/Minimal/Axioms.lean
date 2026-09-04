@@ -905,17 +905,39 @@ def ax_vpf_gen : Formula :=
   forall_3 ((In (.var 1) (.var 2)) ⇒
     (validProofFn (.var 2) (cons (cons (numeralM 17) (cons (.var 1) nil)) (.var 0)) =eq
       validProofFn (concat (.var 2) (cons (forallc (.var 1)) nil)) (.var 0)))
-/-! ### Teoría-objeto `coreAxioms` y su código `axiomsCodeT`
+/-! ### El código de la teoría, `axiomsCodeT`
 
-`thy` recorre los **34 axiomas matemáticos** (`coreAxioms`), NO las ecuaciones de
-coding (`codingAxioms`, maquinaria de verificación). `axiomsCodeT` es el código
-object de esa lista; se declara **opaco** (símbolo `Term.func "axiomsCodeT" []`)
-y se ancla por el axioma `ax_axiomsCodeT` a `listFormCodeM coreAxioms`, para que
-la sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida).
+`axiomsCodeT` se declara **opaco** (símbolo `Term.func "axiomsCodeT" []`) para que la
+sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida), y se ancla por
+el axioma **`ax_axiomsCodeT_eq`** (`axioms ⊢ axiomsCodeT =eq listFormCodeM axioms`) a la lista
+**`axioms`**.
 
-Evita el **ciclo**: `axiomsCodeT`/`ax_axiomsCodeT` referencian `coreAxioms`, que
-**no** contiene `ax_vpf_thy` ni `ax_axiomsCodeT`; por eso `axiomsCodeT` no se
-contiene a sí mismo. -/
+⚠️ **Corrección 2026‑09‑05 — este párrafo describía un diseño ANTERIOR y decía lo contrario
+de lo que hace el verificador.** Afirmaba dos cosas falsas:
+
+1. que el ancla es **`ax_axiomsCodeT`** — ese axioma **no existe**: no hay ninguna declaración
+   con ese nombre en el árbol, sus únicas apariciones son comentarios, y `Meta/Hilbert.lean`
+   lo da por **eliminado** explícitamente;
+2. que ancla a **`listFormCodeM coreAxioms`** — el axioma vivo ancla a **`axioms`**.
+
+Y la consecuencia **no es cosmética**, que es lo que obliga a corregirlo aquí: la regla `thy`
+del verificador (`ax_lineWF_thy`, tag 15) acepta una línea como axioma de teoría si
+`In (carc ·) axiomsCodeT`. Por el anclaje, eso son **las 141 de `axioms`**, no las 34 de
+`coreAxioms`. Quién lea el párrafo viejo concluye justo lo contrario sobre dónde está la
+frontera de la teoría — y esa frontera es la que decide qué significa `provCodeC'`, y por tanto
+cuál es la sentencia G ([ADR‑015](../../DECISIONS.md)).
+
+Medido con `#eval ·.length`, no contado a ojo:
+
+    coreAxioms = 34      codingAxioms = 107      axioms = 141      (34 + 107 = 141)
+
+**Sigue evitando el ciclo**, que era el punto bueno del párrafo original y se conserva:
+`axiomsCodeT` es un símbolo **opaco**, así que no aparece dentro de la lista que codifica y
+**no se contiene a sí mismo**.
+
+Detectado por la auditoría de verdad de docstrings (rama G, caso #5 de
+`doc/book/DOCSTRINGS-NO-FIABLES.md`). ⚠️ Se corrige **sólo la prosa**: ni un axioma, ni una
+definición, ni una lista han cambiado. -/
 
 /-- Los 34 axiomas **matemáticos** de la teoría (sin las ecuaciones de coding). Es
     `axioms` truncada antes del bloque Nivel D (ver `axioms_eq`). -/
