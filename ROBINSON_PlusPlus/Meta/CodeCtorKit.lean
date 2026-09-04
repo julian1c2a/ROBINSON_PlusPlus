@@ -82,11 +82,67 @@ theorem prf_congr_unT {m : Nat} {a a' : Term} (ha : Prf (a =eq a')) :
     Prf (unT m a =eq unT m a') := by
   unfold unT; exact prf_congr_consT (prf_refl _) (prf_congr_consT ha (prf_refl _))
 
-/-- Congruencia de `binT` en ambos argumentos. -/
+/-! ### El constructor binario con ETIQUETA ABSTRACTA — y los tres `substtc` que lo alimentan
+
+    ⚠️ **Bajados de `sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y bajados AQUI y no a
+    `LiftcCodePrf` por el CICLO DE IMPORTS ([ADR‑019](../../DECISIONS.md))**: `LiftcCodePrf`
+    IMPORTA este modulo, asi que un general que viviera alli no podria reescribir
+    `prf_congr_binT` ni `prf_substtc_binT`, que son de aqui. Puestos aqui, los reescribe **los
+    dos**, y ademas `LiftcCodePrf` puede colgar de el sus `_at`.
+
+    ⚠️ **TARIFA del movimiento, pagada**: `prf_substtc_binK_at` consume
+    `prf_substtc_termCode_closed`/`_zero`, que vivian en `LiftcCodePrf` y estaban en SU bloque
+    `export`. Han subido con el — y se han retirado de aquel `export`, porque exportar una
+    constante que el modulo ya no declara es ERROR DURO. -/
+
+theorem prf_substtc_termCode_closed (v : Nat) (W t : Term) (ht : ∀ c : Nat, liftTerm c t = t) :
+    Prf (substtc (numeral v) W (termCode t) =eq termCode t) := by
+  have h := prf_substtc_arith_open v W t
+  rwa [substCodeT_closed v W t ht] at h
+
+theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
+    Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
+
+theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
+    Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
+  prf_substtc_termCode_closed v W zero (fun _ => rfl)
+
+/-- El binario con la etiqueta **abstracta** (`termCode T` con `T` cerrado), que es lo que
+    permite factorizar `impl`/`and`/`or` en UN lema en vez de tres. -/
+def binK (H a b : Term) : Term := consT H (consT a (consT b (termCode nil)))
+
+/-- Puente por `rfl` con el `binT` de este mismo modulo. -/
+theorem binK_binT (m : Nat) (a b : Term) : binK (termCode (numeralM m)) a b = binT m a b := rfl
+
+theorem prf_congr_binK {H a a' b b' : Term} (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
+    Prf (binK H a b =eq binK H a' b') :=
+  prf_congr_consT (prf_refl _) (prf_congr_consT ha (prf_congr_consT hb (prf_refl _)))
+
+/-- `substtc` atraviesa `binK` a nivel ARBITRARIO (`prf_substtc_binT` solo vale a nivel
+    `zero`). Requiere que la etiqueta `T` sea CERRADA. -/
+theorem prf_substtc_binK_at (T : Term) (hT : ∀ c : Nat, liftTerm c T = T)
+    (n : Nat) (W a b : Term) :
+    Prf (substtc (numeral n) W (binK (termCode T) a b)
+      =eq binK (termCode T) (substtc (numeral n) W a) (substtc (numeral n) W b)) := by
+  unfold binK consT
+  refine prf_eq_trans (prf_substtc_funcc2 _ _ _ _ _) ?_
+  refine prf_congr_funcc2 ?_
+  refine prf_eq_trans (prf_congr_cons_head (prf_substtc_termCode_closed n W T hT)) ?_
+  refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+  refine prf_eq_trans (prf_substtc_funcc2 _ _ _ _ _) ?_
+  refine prf_congr_funcc2 ?_
+  refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+  refine prf_eq_trans (prf_substtc_funcc2 _ _ _ _ _) ?_
+  exact prf_congr_funcc2
+    (prf_congr_cons_tail (prf_congr_cons_head (prf_substtc_termCode_zero n W)))
+
+/-- Congruencia de `binT` en ambos argumentos. **Corolario de `prf_congr_binK`** desde B3:
+    `binT m a b` es `binK (termCode (numeralM m)) a b` por `rfl`. Tiene 11 call-sites reales
+    en cuatro modulos (`CodeCtorKit`, `CodeTreeReflect`, `LiftcCodePrf`, `LineWFEfqPrf`). -/
 theorem prf_congr_binT {m : Nat} {a a' b b' : Term}
-    (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) : Prf (binT m a b =eq binT m a' b') := by
-  unfold binT
-  exact prf_congr_consT (prf_refl _) (prf_congr_consT ha (prf_congr_consT hb (prf_refl _)))
+    (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) : Prf (binT m a b =eq binT m a' b') :=
+  prf_congr_binK (H := termCode (numeralM m)) ha hb
 
 /-- `substtc` es la identidad sobre un código nulario (es cerrado). -/
 theorem prf_substtc_nulT (m : Nat) (W : Term) :
@@ -106,17 +162,15 @@ theorem prf_substtc_unT (m : Nat) (W a : Term) :
   exact prf_congr_consT (prf_refl _)
     (LineWFTrackedPrf.substtc_inv_termCode_of_tc prf_tc_zero W)
 
-/-- `substtc` distribuye sobre `binT`. -/
+/-- `substtc` distribuye sobre `binT`. **Corolario de `prf_substtc_binK_at` al nivel `zero`**
+    desde B3 (`numeral 0` es `zero` por `rfl`).
+
+    ⚠️ Este es el corolario que la colocacion inicialmente propuesta —el general en
+    `LiftcCodePrf`— dejaba **INALCANZABLE**, porque aquel modulo importa este. Es el caso
+    concreto que motivo la correccion de ADR‑019. -/
 theorem prf_substtc_binT (m : Nat) (W a b : Term) :
-    Prf (substtc zero W (binT m a b) =eq binT m (substtc zero W a) (substtc zero W b)) := by
-  unfold binT
-  refine prf_eq_trans (prf_substtc_consT zero W _ _) ?_
-  refine prf_congr_consT (substtc_inv_termCode_numeralM m W) ?_
-  refine prf_eq_trans (prf_substtc_consT zero W _ _) ?_
-  refine prf_congr_consT (prf_refl _) ?_
-  refine prf_eq_trans (prf_substtc_consT zero W _ _) ?_
-  exact prf_congr_consT (prf_refl _)
-    (LineWFTrackedPrf.substtc_inv_termCode_of_tc prf_tc_zero W)
+    Prf (substtc zero W (binT m a b) =eq binT m (substtc zero W a) (substtc zero W b)) :=
+  prf_substtc_binK_at (numeralM m) (fun c => liftTerm_numeralM c m) 0 W a b
 
 /-- Invariancia `substtc` de `nulT` (forma `∀ W`, la que consumen los Leibniz internos). -/
 theorem substtc_inv_nulT (m : Nat) : ∀ W, Prf (substtc zero W (nulT m) =eq nulT m) :=
@@ -306,6 +360,8 @@ end ROBINSON_PlusPlus.Meta.CodeCtorKit
 export ROBINSON_PlusPlus.Meta.CodeCtorKit (
   nulT unT binT nulT_termCode unT_termCode binT_termCode
   prf_congr_unT prf_congr_binT
+  binK binK_binT prf_congr_binK prf_substtc_binK_at
+  prf_substtc_termCode_closed prf_substtc_termCode_numeralM prf_substtc_termCode_zero
   prf_substtc_nulT prf_substtc_unT prf_substtc_binT
   substtc_inv_nulT substtc_inv_unT substtc_inv_binT
   pcc_dot_nul pcc_dot_un pcc_dot_bin pcc_dot_nul_symm pcc_dot_un_symm pcc_dot_bin_symm

@@ -239,7 +239,7 @@ theorem iz_inv_es_prf_substtc_termCode_nil (W : Term) :
 
 /-- Y los dos habitantes existen ya en produccion, uno por cada cara del mismo enunciado. -/
 example (W : Term) : Prf (substtc zero W (termCode nil) =eq termCode nil) :=
-  ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_substtc_termCode_zero 0 W
+  ROBINSON_PlusPlus.Meta.CodeCtorKit.prf_substtc_termCode_zero 0 W
 example (W : Term) : Prf (substtc zero W (termCode zero) =eq termCode zero) :=
   ROBINSON_PlusPlus.Meta.EvalRunFnPrf.prf_substtc_termCode_nil W
 

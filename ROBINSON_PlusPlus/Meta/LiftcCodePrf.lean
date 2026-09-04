@@ -171,18 +171,12 @@ theorem substtc_inv_liftscT {X Y : Term}
     `LineWFSchemaPrf.substtc_inv_termCode_numeralM`). Estos son la GENERALIZACION a
     `numeral v` arbitrario, que es la que consume `pcc_liftc_func_code` (nivel 1 y 2). -/
 
-theorem prf_substtc_termCode_closed (v : Nat) (W t : Term) (ht : ∀ c : Nat, liftTerm c t = t) :
-    Prf (substtc (numeral v) W (termCode t) =eq termCode t) := by
-  have h := prf_substtc_arith_open v W t
-  rwa [substCodeT_closed v W t ht] at h
-
-theorem prf_substtc_termCode_numeralM (v m : Nat) (W : Term) :
-    Prf (substtc (numeral v) W (termCode (numeralM m)) =eq termCode (numeralM m)) :=
-  prf_substtc_termCode_closed v W (numeralM m) (fun c => liftTerm_numeralM c m)
-
-theorem prf_substtc_termCode_zero (v : Nat) (W : Term) :
-    Prf (substtc (numeral v) W (termCode zero) =eq termCode zero) :=
-  prf_substtc_termCode_closed v W zero (fun _ => rfl)
+-- ⚠️ `prf_substtc_termCode_closed` / `_numeralM` / `_zero` **SUBIERON a
+--    `Meta/CodeCtorKit.lean`** en B3 (2026‑09‑04). Fue la TARIFA de colocar alli el general
+--    `prf_substtc_binK_at`, que los consume: si el general se quedaba aqui, no podia
+--    reescribir `prf_congr_binT` ni `prf_substtc_binT`, que son de `CodeCtorKit` y este
+--    modulo lo IMPORTA (el ciclo de ADR‑019). Se siguen usando aqui sin cambiar nada:
+--    llegan por el `import` y por el `export` de aquel modulo.
 
 theorem prf_substtc_unT_at (m v : Nat) (W a : Term) :
     Prf (substtc (numeral v) W (unT m a) =eq unT m (substtc (numeral v) W a)) := by
@@ -195,20 +189,13 @@ theorem prf_substtc_unT_at (m v : Nat) (W a : Term) :
   exact prf_congr_funcc2
     (prf_congr_cons_tail (prf_congr_cons_head (prf_substtc_termCode_zero v W)))
 
+/-- **Corolario de `CodeCtorKit.prf_substtc_binK_at`** desde B3: eran DOCE lineas de
+    `refine`, y son una. El general esta aguas arriba, en `CodeCtorKit`, por el ciclo de
+    imports (ADR‑019). -/
 theorem prf_substtc_binT_at (m v : Nat) (W a b : Term) :
     Prf (substtc (numeral v) W (binT m a b)
-      =eq binT m (substtc (numeral v) W a) (substtc (numeral v) W b)) := by
-  unfold binT consT
-  refine prf_eq_trans (prf_substtc_funcc2 _ _ _ _ _) ?_
-  refine prf_congr_funcc2 ?_
-  refine prf_eq_trans (prf_congr_cons_head (prf_substtc_termCode_numeralM v m W)) ?_
-  refine prf_congr_cons_tail (prf_congr_cons_head ?_)
-  refine prf_eq_trans (prf_substtc_funcc2 _ _ _ _ _) ?_
-  refine prf_congr_funcc2 ?_
-  refine prf_congr_cons_tail (prf_congr_cons_head ?_)
-  refine prf_eq_trans (prf_substtc_funcc2 _ _ _ _ _) ?_
-  exact prf_congr_funcc2
-    (prf_congr_cons_tail (prf_congr_cons_head (prf_substtc_termCode_zero v W)))
+      =eq binT m (substtc (numeral v) W a) (substtc (numeral v) W b)) :=
+  prf_substtc_binK_at (numeralM m) (fun c => liftTerm_numeralM c m) v W a b
 
 theorem prf_substtc_varcT_at (v : Nat) (W a : Term) :
     Prf (substtc (numeral v) W (varcT a) =eq varcT (substtc (numeral v) W a)) :=
@@ -1029,7 +1016,8 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
   liftcT_termCode liftscT_termCode varcT_termCode funccT_termCode
   prf_congr_liftcT prf_congr_liftscT prf_congr_varcT prf_congr_funccT
   prf_substtc_liftcT prf_substtc_liftscT substtc_inv_liftcT substtc_inv_liftscT
-  prf_substtc_termCode_closed prf_substtc_termCode_numeralM prf_substtc_termCode_zero
+  -- ⚠️ `prf_substtc_termCode_closed`/`_numeralM`/`_zero` ya NO se exportan desde aqui:
+  --    subieron a `Meta/CodeCtorKit.lean` (B3) y salen a la raiz desde su `export`.
   prf_substtc_unT_at prf_substtc_binT_at prf_substtc_varcT_at prf_substtc_funccT_at
   targetLift targetLiftsc
   LIFTC_FUNC_BODY LIFTC_FUNC_BODY_ok pcc_liftc_func_code
