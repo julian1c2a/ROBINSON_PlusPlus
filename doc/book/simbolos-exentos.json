@@ -36,6 +36,11 @@
     "not": "entrada del diccionario símbolo→palabra (¬), no una declaración",
     "exists": "entrada del diccionario símbolo→palabra (∃), no una declaración",
     "Prov": "notación matemática del libro; en el código es provCodeC'/provFromCode",
-    "isNat_succ_of_isNat": "ejemplo de NAMING-CONVENTIONS.md tomado de otro proyecto; ilustra la REGLA 1"
+    "isNat_succ_of_isNat": "ejemplo de NAMING-CONVENTIONS.md tomado de otro proyecto; ilustra la REGLA 1",
+    "ax22_cantor_proj_exists": "RETIRADO el 2026-06-02 (537fd68): proj1/proj2 pasaron a definiciones. Se cita como historia",
+    "ax23_cantor_proj_uniq": "RETIRADO el 2026-06-02 (537fd68): nunca se usó. Se cita como historia",
+    "ax27_add_left_cancel": "RETIRADO el 2026-06-03: derivable en PA⁻. Se cita como historia",
+    "ax28_mul_two_cancel": "RETIRADO el 2026-06-02: hoy es el teorema teo_2_11. Se cita como historia",
+    "inductive": "palabra clave de Lean"
   }
 }

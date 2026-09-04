@@ -12,44 +12,184 @@
     "               meta→objeto   función meta que PRODUCE sintaxis objeto",
     "               ambos         nombra la distinción misma",
     "               proyecto      noción sobre el proyecto, no sobre las teorías",
-    "  glosa    — la definición, una o dos frases"
+    "  glosa    — la definición, una o dos frases",
+    "",
+    "NOTACIONES (§2.8): igual que los términos, pero para los signos. Se controlan por",
+    "su MACRO, que es lo que se puede buscar sin ambigüedad en el .tex. Cada una debe",
+    "introducirse con \\defnot{...} y no aparecer antes."
   ],
   "terminos": [
-    {"t": "teoría objeto", "variantes": ["lenguaje objeto", "teoría-objeto"], "nivel": "ambos",
-     "glosa": "El sistema aritmético del que habla el libro: un lenguaje, unos axiomas y una noción de derivación. Sus fórmulas son \\emph{datos} para nosotros."},
-    {"t": "metateoría", "variantes": ["lenguaje meta", "metateórico", "metateórica"], "nivel": "ambos",
-     "glosa": "Donde razonamos \\emph{sobre} la teoría objeto. Aquí es Lean 4."},
-    {"t": "aritmetización", "variantes": ["aritmetizar", "aritmetiza"], "nivel": "meta→objeto",
-     "glosa": "Codificar sintaxis como números para que la teoría objeto pueda hablar de sus propias fórmulas y demostraciones. También \\defterm{gödelización}. La codificación la define la metateoría; lo codificado son objetos del lenguaje."},
-    {"t": "gödelización", "variantes": [], "nivel": "meta→objeto",
-     "glosa": "Sinónimo de \\emph{aritmetización} en el contexto de la incompletitud."},
-    {"t": "numeral", "variantes": ["numerales"], "nivel": "meta→objeto",
-     "glosa": "\\ident{numeral : Nat → Term} es una función \\textbf{de la metateoría}: toma un \\ident{Nat} de Lean y \\emph{construye} un término. Su \\textbf{valor} $\\sigma^n 0$ sí es del lenguaje objeto. Es canónico —sólo hay una forma de escribirlo—, y de ahí que sirva para representar códigos. \\nota{El proyecto tiene tres copias de esta función: \\ident{Meta.Godel.numeral}, \\ident{Full.numeral} y \\ident{Minimal.Axioms.numeralM}.}"},
-    {"t": "código de Gödel", "variantes": ["códigos de Gödel"], "nivel": "objeto",
-     "glosa": "Un \\emph{término del lenguaje objeto} que denota una fórmula o un término. Se escribe $\\codigo{\\varphi}$. Ojo: la \\emph{función} que lo calcula (\\ident{formCode}, \\ident{codeNat}) es meta; el código es objeto."},
-    {"t": "punto fijo", "variantes": [], "nivel": "objeto",
-     "glosa": "Una sentencia $G$ del lenguaje objeto que la teoría prueba equivalente a un enunciado sobre su propio código. Es el corazón del argumento de Gödel."},
-    {"t": "condiciones de derivabilidad", "variantes": [], "nivel": "meta",
-     "glosa": "Las tres propiedades D1, D2 y D3 que $\\Prov$ debe cumplir para que el segundo teorema salga. Son enunciados \\emph{sobre} la teoría. D1 y D2 están probadas aquí; D3 es el frente abierto."},
-    {"t": "$\\Sigma_1$-completitud", "variantes": ["Σ₁-completitud", "Σ₁‑completitud"], "nivel": "ambos",
-     "glosa": "Que todo enunciado $\\Sigma_1$ verdadero sea demostrable. \\textbf{Externa} si lo comprobamos nosotros —es meta—; \\defterm{provable} si la teoría lo demuestra \\emph{de sí misma} —y entonces es objeto, y es D3, y es la cara."},
-    {"t": "provable", "variantes": [], "nivel": "objeto",
-     "glosa": "Dicho de una propiedad: que la propia teoría objeto la demuestra, no que la comprobemos nosotros desde fuera."},
-    {"t": "$\\omega$-regla", "variantes": ["ω-regla"], "nivel": "meta",
-     "glosa": "La regla que de «$A[n]$ para todo $n$» concluye $\\forall A$. Su premisa es infinita, así que no es una regla del lenguaje objeto: vive en la metateoría, y el cálculo que la admite no es \\defterm{r.e.}"},
-    {"t": "r.e.", "variantes": ["recursivamente enumerable"], "nivel": "meta",
-     "glosa": "Recursivamente enumerable: hay un programa que lista sus elementos. Es una propiedad \\emph{del cálculo}, afirmada desde fuera."},
-    {"t": "footprint", "variantes": ["footprints"], "nivel": "proyecto",
-     "glosa": "La lista de axiomas de los que depende un teorema \\emph{de Lean}, tal y como la reporta \\printaxioms. Es la auditoría del proyecto, y en este libro se imprime junto a cada enunciado."},
-    {"t": "net-0", "variantes": ["net‑0"], "nivel": "proyecto",
-     "glosa": "Que un resultado no añade ningún axioma al footprint: sale con la base ya sancionada."},
-    {"t": "sondeo", "variantes": ["sondeos"], "nivel": "proyecto",
-     "glosa": "Un experimento compilado que contesta una pregunta —muchas veces respondiendo \\emph{que no}— y que vive fuera del build, en \\modulo{sondeos/}."},
-    {"t": "cuarentena", "variantes": [], "nivel": "proyecto",
-     "glosa": "El directorio donde se apartaron los módulos que dependían de una inconsistencia. Hoy está vacío; el episodio es la Parte~IV."},
-    {"t": "índice de De Bruijn", "variantes": ["índices de De Bruijn"], "nivel": "objeto",
-     "glosa": "Una variable escrita como la distancia al cuantificador que la liga (\\texttt{\\#0} es el más cercano). Evita la captura al sustituir, al precio de una aritmética de índices."},
-    {"t": "axioma objeto", "variantes": ["axiomas objeto"], "nivel": "objeto",
-     "glosa": "Una fórmula del lenguaje que se postula. Distinto de un \\ident{axiom} de Lean, que es un postulado de la \\emph{metateoría}: el proyecto tiene 141 de los primeros y 7 de los segundos."}
+    {
+      "t": "signatura",
+      "variantes": [
+        "signaturas"
+      ],
+      "nivel": "objeto",
+      "glosa": "La lista de símbolos concretos con los que se escribe: una constante \\ident{0}; las funciones $\\obj{\\sigma}$ (sucesor), $\\obj{+}$, $\\obj{\\cdot}$, $\\obj{-}$ (monus), $\\obj{\\sqrt{\\ }}$, $\\obj{/_2}$, $\\obj{\\%_2}$, $\\obj{\\tau}$ (predecesor), $\\obj{[\\,]}$, $\\obj{::}$, $\\obj{\\#\\#}$ (concatenación), $\\obj{\\hat{\\ }}$ y $\\obj{\\Pi_p}$; y los predicados $\\obj{<}$, $\\obj{\\le}$, $\\obj{\\in}$. La igualdad $\\doteq$ no está aquí: la trae el kernel. Se declara en \\modulo{ROBINSON_PlusPlus/Minimal/Axioms.lean}."
+    },
+    {
+      "t": "lenguaje objeto",
+      "variantes": [
+        "lenguaje-objeto"
+      ],
+      "nivel": "objeto",
+      "glosa": "\\textbf{La gramática, y nada más.} Son dos piezas de origen distinto: el kernel \\modulo{FOL}, que aporta cómo se forman términos y fórmulas —variables por índice, aplicación, $\\bot$, $\\Rightarrow$, $\\forall$, $\\wedge$, $\\vee$, $\\exists$, $\\doteq$— y es \\emph{independiente de la aritmética}; y la \\defterm{signatura}, que dice qué símbolos concretos hay. El lenguaje por sí solo no afirma nada: con él se escriben tanto las verdades como las falsedades."
+    },
+    {
+      "t": "teoría objeto",
+      "variantes": [
+        "teoría-objeto"
+      ],
+      "nivel": "objeto",
+      "glosa": "El sistema del que habla el libro, y son \\textbf{tres} cosas, no una: (1) el \\defterm{lenguaje objeto}; (2) un conjunto de \\defterm{axiomas objeto} —la lista \\ident{axioms}—; y (3) una relación de derivación que diga qué se sigue de ellos. Cambiar cualquiera de las tres cambia la teoría, y por tanto cambia el teorema de incompletitud que se demuestra sobre ella. \\nota{Medido sobre \\modulo{Minimal/Axioms.lean}: \\ident{axioms} tiene \\textbf{141} fórmulas y es exactamente \\ident{coreAxioms ++ codingAxioms}, con \\textbf{34} axiomas matemáticos y \\textbf{107} de la maquinaria de codificación. Tres veces más maquinaria que aritmética: es lo que cuesta que una teoría pueda hablar de su propia sintaxis. Y de la relación de derivación hay dos —$\\vdash$ y \\ident{Prf}—, por la razón que da la sección 2.}"
+    },
+    {
+      "t": "metateoría",
+      "variantes": [
+        "lenguaje meta",
+        "metateórico",
+        "metateórica"
+      ],
+      "nivel": "meta",
+      "glosa": "Donde razonamos \\emph{sobre} la teoría objeto: aquí es Lean 4. Para ella, las fórmulas de la teoría objeto son \\emph{datos} —valores de los tipos \\ident{Term} y \\ident{Formula}—, no enunciados que afirmemos."
+    },
+    {
+      "t": "aritmetización",
+      "variantes": [
+        "aritmetizar",
+        "aritmetiza"
+      ],
+      "nivel": "meta→objeto",
+      "glosa": "Codificar sintaxis como números para que la teoría objeto pueda hablar de sus propias fórmulas y demostraciones. También \\defterm{gödelización}. La codificación la define la metateoría; lo codificado son objetos del lenguaje."
+    },
+    {
+      "t": "gödelización",
+      "variantes": [],
+      "nivel": "meta→objeto",
+      "glosa": "Sinónimo de \\emph{aritmetización} en el contexto de la incompletitud."
+    },
+    {
+      "t": "numeral",
+      "variantes": [
+        "numerales"
+      ],
+      "nivel": "meta→objeto",
+      "glosa": "\\ident{numeral : Nat → Term} es una función \\textbf{de la metateoría}: toma un \\ident{Nat} de Lean y \\emph{construye} un término. Su \\textbf{valor} $\\sigma^n 0$ sí es del lenguaje objeto. Es canónico —sólo hay una forma de escribirlo—, y de ahí que sirva para representar códigos. \\nota{El proyecto tiene tres copias de esta función: \\ident{Meta.Godel.numeral}, \\ident{Full.numeral} y \\ident{Minimal.Axioms.numeralM}.}"
+    },
+    {
+      "t": "código de Gödel",
+      "variantes": [
+        "códigos de Gödel"
+      ],
+      "nivel": "objeto",
+      "glosa": "Un \\emph{término del lenguaje objeto} que denota una fórmula o un término. Se escribe $\\defnot{\\codigo{\\varphi}}$ \\selee{«el código de $\\varphi$»}. Ojo: la \\emph{función} que lo calcula (\\ident{formCode}, \\ident{codeNat}) es meta; el código es objeto."
+    },
+    {
+      "t": "punto fijo",
+      "variantes": [],
+      "nivel": "objeto",
+      "glosa": "Una sentencia $G$ del lenguaje objeto que la teoría prueba equivalente a un enunciado sobre su propio código. Es el corazón del argumento de Gödel."
+    },
+    {
+      "t": "condiciones de derivabilidad",
+      "variantes": [],
+      "nivel": "meta",
+      "glosa": "Las tres propiedades D1, D2 y D3 que $\\defnot{\\Prov}$ —«es demostrable», dicho \\emph{dentro} de la teoría— debe cumplir para que el segundo teorema salga. Son enunciados \\emph{sobre} la teoría. D1 y D2 están probadas aquí; D3 es el frente abierto."
+    },
+    {
+      "t": "$\\Sigma_1$-completitud",
+      "variantes": [
+        "Σ₁-completitud",
+        "Σ₁‑completitud"
+      ],
+      "nivel": "ambos",
+      "glosa": "Que todo enunciado $\\Sigma_1$ verdadero sea demostrable. \\textbf{Externa} si lo comprobamos nosotros —es meta—; \\defterm{provable} si la teoría lo demuestra \\emph{de sí misma} —y entonces es objeto, y es D3, y es la cara."
+    },
+    {
+      "t": "provable",
+      "variantes": [],
+      "nivel": "objeto",
+      "glosa": "Dicho de una propiedad: que la propia teoría objeto la demuestra, no que la comprobemos nosotros desde fuera."
+    },
+    {
+      "t": "$\\omega$-regla",
+      "variantes": [
+        "ω-regla"
+      ],
+      "nivel": "meta",
+      "glosa": "La regla que de «$A[n]$ para todo $n$» concluye $\\forall A$. Su premisa es infinita, así que no es una regla del lenguaje objeto: vive en la metateoría, y el cálculo que la admite no es \\defterm{r.e.}"
+    },
+    {
+      "t": "r.e.",
+      "variantes": [
+        "recursivamente enumerable"
+      ],
+      "nivel": "meta",
+      "glosa": "Recursivamente enumerable: hay un programa que lista sus elementos. Es una propiedad \\emph{del cálculo}, afirmada desde fuera."
+    },
+    {
+      "t": "footprint",
+      "variantes": [
+        "footprints"
+      ],
+      "nivel": "proyecto",
+      "glosa": "La lista de axiomas de los que depende un teorema \\emph{de Lean}, tal y como la reporta \\printaxioms. Es la auditoría del proyecto, y en este libro se imprime junto a cada enunciado."
+    },
+    {
+      "t": "net-0",
+      "variantes": [
+        "net‑0"
+      ],
+      "nivel": "proyecto",
+      "glosa": "Que un resultado no añade ningún axioma al footprint: sale con la base ya sancionada."
+    },
+    {
+      "t": "sondeo",
+      "variantes": [
+        "sondeos"
+      ],
+      "nivel": "proyecto",
+      "glosa": "Un experimento compilado que contesta una pregunta —muchas veces respondiendo \\emph{que no}— y que vive fuera del build, en \\modulo{sondeos/}."
+    },
+    {
+      "t": "cuarentena",
+      "variantes": [],
+      "nivel": "proyecto",
+      "glosa": "El directorio donde se apartaron los módulos que dependían de una inconsistencia. Hoy está vacío; el episodio es la Parte~IV."
+    },
+    {
+      "t": "índice de De Bruijn",
+      "variantes": [
+        "índices de De Bruijn"
+      ],
+      "nivel": "objeto",
+      "glosa": "Una variable escrita como la distancia al cuantificador que la liga (\\texttt{\\#0} es el más cercano). Evita la captura al sustituir, al precio de una aritmética de índices."
+    },
+    {
+      "t": "axioma objeto",
+      "variantes": [
+        "axiomas objeto"
+      ],
+      "nivel": "objeto",
+      "glosa": "Una fórmula del lenguaje que se postula. Distinto de un \\ident{axiom} de Lean, que es un postulado de la \\emph{metateoría}: el proyecto tiene 141 de los primeros y 7 de los segundos."
+    }
+  ],
+  "notaciones": [
+    {
+      "macro": "\\Prf",
+      "lectura": "«tiene una demostración de Hilbert finitaria»"
+    },
+    {
+      "macro": "\\Prov",
+      "lectura": "«es demostrable», dicho DENTRO de la teoría"
+    },
+    {
+      "macro": "\\codigo",
+      "lectura": "«el código de …»"
+    },
+    {
+      "macro": "\\dotado",
+      "lectura": "«… dotado»: su código construido dentro del lenguaje"
+    }
   ]
 }

@@ -1,0 +1,71 @@
+\chapter{Representabilidad y D1}
+\label{cap:d1}
+
+Ya hay un $\Prov$ escrito en el lenguaje objeto. Falta comprobar que dice lo que pretende: que
+cuando algo es demostrable de verdad, la teoría \emph{demuestra} que lo es.
+
+\section{El enunciado}
+
+\begin{teorema}[D1 — representabilidad positiva]
+Si $\varphi$ tiene una demostración en el cálculo finitario, entonces la teoría demuestra
+$\Prov(\codigo{\varphi})$.
+\end{teorema}
+
+\noindent En los dos cálculos, que es como el proyecto lo necesita:
+
+\leanfrag{repr_pos}
+\leanfrag{repr_pos_prf}
+
+\selee{de que $\varphi$ tenga demostración finitaria se sigue que la teoría demuestra que
+$\varphi$ tiene demostración.}
+
+\section{Por qué D1 sale sin inducción}
+
+Éste es el punto conceptual del capítulo, y conviene decirlo despacio porque es lo que separa D1 de
+D3.
+
+\begin{leccion}[Un testigo concreto es un cálculo]
+La hipótesis de D1 no es «$\varphi$ es demostrable» en abstracto: es \textbf{una derivación
+concreta}, un objeto finito que se tiene en la mano. La prueba consiste en \emph{traducirla} —
+recorrer sus líneas, emitir el código de cada una, y comprobar que el verificador las acepta. Eso es
+un cómputo finito sobre un objeto dado, y por eso \textbf{no necesita inducción de la teoría
+objeto}: no hay que razonar sobre \emph{todas} las derivaciones, sólo sobre ésta.
+\end{leccion}
+
+Y está medido, no supuesto: el \emph{footprint} de D1 no cita ningún esquema de inducción — sólo el
+ancla de codificación. Lo mismo vale para D2. En cambio Gödel~I y Gödel~II sí citan
+\ident{ax_induction} y \ident{ax_list_induction}.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+resultado & ¿usa inducción de la teoría objeto? \\
+\midrule
+\textbf{D1} \ident{repr_pos'_prf} & \textbf{no} — sólo el ancla de codificación \\
+\textbf{D2} \ident{d2_prf} & \textbf{no} \\
+Gödel I \ident{goedel_first_numeral} & sí \\
+Gödel II \ident{goedel_second'} & sí (más el \ident{d3} pendiente) \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{muro}[Y la contrapartida, que es todo el resto del libro]
+D1 es la $\Sigma_1$-completitud \textbf{externa}: la comprobamos nosotros, caso a caso. \textbf{D3}
+es la misma propiedad \textbf{provable}: que la teoría demuestre, \emph{para toda} derivación, que
+el verificador la acepta. Ahí sí hay que razonar sobre todas, y ahí sí hace falta inducción — y ése
+es el muro que la Parte~IV cuenta.
+\end{muro}
+
+\section{El ancla de codificación}
+
+Queda una pieza que el \emph{footprint} de D1 sí cita, y que conviene no esconder:
+\ident{ax_axiomsCodeT_eq}. La regla del verificador que acepta un axioma de teoría necesita
+comprobar que el código de la fórmula está en la lista de códigos de los axiomas — y esa lista,
+escrita literalmente, es un término gigantesco. El axioma dice que el símbolo opaco
+\ident{axiomsCodeT} \emph{es} esa lista, sin materializarla.
+
+\begin{leccion}[Un ancla no es un postulado gödeliano]
+Es una extensión \textbf{conservadora}: nombra un objeto que ya existe. No añade fuerza aritmética —
+añade un nombre corto para un término largo, y evita que las pruebas tengan que manipularlo. Está
+en el inventario de \doc{AXIOMS.md} como los axiomas 5 y 6, uno por cálculo.
+\end{leccion}

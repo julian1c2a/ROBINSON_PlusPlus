@@ -22,6 +22,7 @@ LIBRO = os.path.dirname(AQUI)
 
 RE_INCLUIDO = re.compile(r"^\s*\\(?:input|include)\{((?:capitulos|extraido)/[^}]+)\}", re.M)
 RE_DEFTERM = re.compile(r"\\defterm\{([^}]*)\}")
+RE_DEFNOT = re.compile(r"\\defnot\{")
 
 
 def expandir(fichero, vistos=None, marcas=None, base=0):
@@ -131,14 +132,34 @@ def main():
                   % (t, forma_usada, donde(marcas, primer_uso), donde(marcas, idef)))
             fallos += 1
 
+    # --- notaciones: mismo criterio, pero por su macro -----------------------
+    # Una fórmula que se muestra se lee la primera vez (§2.8). Se controlan por
+    # el MACRO y no por el glifo: el macro se busca sin ambigüedad en el .tex.
+    for e in voc.get("notaciones", []):
+        mac = e["macro"]
+        idef = None
+        for m in RE_DEFNOT.finditer(texto):
+            resto = texto[m.end():m.end() + 400]
+            if mac in resto:
+                idef = m.start()
+                break
+        usos = [m.start() for m in re.finditer(re.escape(mac) + r"(?![A-Za-z])", texto)]
+        if idef is None:
+            print("  ✗ la notación «%s» no se introduce con \\defnot en ninguna parte" % mac)
+            fallos += 1
+        elif usos and min(usos) < idef:
+            print("  ✗ la notación «%s» se usa (en %s) ANTES de introducirse (en %s)"
+                  % (mac, donde(marcas, min(usos)), donde(marcas, idef)))
+            fallos += 1
+
     if fallos:
-        print("\n✗ %d término(s) del vocabulario sin introducir a tiempo.\n"
+        print("\n✗ %d término(s) o notación(es) sin introducir a tiempo.\n"
               "  §2.7 no admite exenciones: mueve el \\defterm{} antes del primer uso,\n"
               "  o introduce el término en el capítulo de Nomenclatura." % fallos,
               file=sys.stderr)
         return 1
-    print("✓ %d término(s) del vocabulario, todos definidos antes de su primer uso"
-          % len(voc["terminos"]))
+    print("✓ %d término(s) y %d notación(es), todos introducidos antes de su primer uso"
+          % (len(voc["terminos"]), len(voc.get("notaciones", []))))
     return 0
 
 

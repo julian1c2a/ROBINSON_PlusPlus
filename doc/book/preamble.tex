@@ -217,6 +217,14 @@
 \makeatother
 \newcommand{\nota}[1]{{\footnotesize\color{rppCom} #1}}
 
+% \defnot marca LA introducción de una notación; \selee da su lectura en voz
+% alta. PLAN-LIBRO.md §2.8: una fórmula que se muestra se lee la primera vez.
+\newcommand{\defnot}[1]{#1}
+\newcommand{\selee}[1]{%
+  \par\vspace{-0.3\baselineskip}
+  {\small\itshape\color{rppMate}\hspace*{1.2em}se lee: #1\par}
+  \vspace{0.2\baselineskip}}
+
 % =============================================================================
 %  LOS CINCO ENTORNOS
 %  Ver PLAN-LIBRO.md §4. Cada uno tiene un papel distinto y no intercambiable.
@@ -255,9 +263,19 @@
   {\ttfamily\scriptsize\color{rppCom} #1\ \textbf{·}\ #2\par}}
 
 % Footprint de `#print axioms` — OBLIGATORIO en todo teorema (§2.2(c)).
+% Un nombre cualificado (`FOL.MetaRules.imp_intro`) no se puede partir en \texttt
+% y desborda; \fpi lo pasa por \nolinkurl, que parte por los puntos.
+\newcommand{\fpi}[1]{\begingroup\urlstyle{tt}\nolinkurl{#1}\endgroup}
 \newcommand{\footprint}[1]{%
   \par\vspace{-0.2\baselineskip}%
-  {\ttfamily\scriptsize\color{rppCom}\#print axioms $\rightarrow$ #1\par}}
+  {\raggedright\ttfamily\scriptsize\color{rppCom}\#print axioms $\rightarrow$ #1\par}}
+
+% Footprint DECLARADO pero aún no medido con `make axiomas`. Distinguirlo del
+% medido no es escrúpulo: §2.6 dice que una afirmación sin medir es testimonio.
+\newcommand{\footprintpend}[1]{%
+  \par\vspace{-0.2\baselineskip}%
+  {\raggedright\ttfamily\scriptsize\color{rppCom}\#print axioms $\rightarrow$ #1
+   \normalfont\sffamily\itshape (declarado, \textbf{sin medir})\par}}
 
 % Marca «fuera del build» para fragmentos de sondeos/ (§2.3).
 \newcommand{\fueradelbuild}[1]{%

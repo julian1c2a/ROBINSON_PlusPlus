@@ -4,7 +4,7 @@
 \addcontentsline{toc}{chapter}{Nomenclatura, niveles y notación}
 
 Este capítulo no supone nada. Da los cuatro alfabetos que hacen falta para leer el resto: las
-\textbf{palabras}, los \textbf{niveles}, los \textbf{nombres} y los \textbf{signos}. Se puede
+\textbf{palabras}, los \textbf{signos}, los \textbf{niveles} y los \textbf{nombres}. Se puede
 saltar y volver — pero nada de lo que viene después usa un término que no esté aquí, y eso está
 comprobado por una máquina, no por buena voluntad.
 
@@ -25,9 +25,32 @@ Parte~IV.
 
 \input{extraido/_glosario.tex}
 
+\section*{2 · Los signos}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+signo & qué es \\
+\midrule
+$\defnot{\Gamma \vdash A}$ & $A$ se deriva de las hipótesis $\Gamma$ en el cálculo $\omega$ \\
+$\defnot{\Prf\,A}$ & $A$ se deriva en el cálculo de Hilbert finitario, sin hipótesis \\
+$\sigma n$ & el sucesor de $n$ \\
+$t \doteq u$ & igualdad \textbf{del lenguaje objeto} (no la de Lean, que es \ident{=}) \\
+\texttt{\#0} & la variable ligada más cercana: un \defterm{índice de De Bruijn} \\
+$\defnot{\codigo{\varphi}}$ & el \defterm{código de Gödel} de $\varphi$: un término objeto que la denota \\
+$\defnot{\dotado{a}}$ & «$a$ dotado»: el código de $a$ construido \emph{dentro} del lenguaje (\ident{tcFn}) \\
+$\defnot{\Prov(\codigo{\varphi})}$ & la fórmula objeto que dice «$\varphi$ es demostrable» \\
+$\Delta_0$, $\Sigma_1$ & clases de fórmulas por su cuantificación: acotada, y $\exists$ sobre acotada \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\nota{Ningún término técnico aparece en este libro antes de estar definido aquí. Lo comprueba
+\modulo{doc/book/scripts/terminos.py} en cada compilación, y no admite excepciones.}
+
 \input{capitulos/00-niveles.tex}
 
-\section*{3 · Cómo se lee un nombre}
+\section*{4 · Cómo se lee un nombre}
 
 Los identificadores van en inglés y siguen las convenciones de Mathlib. Tres reglas bastan para
 leer casi cualquiera:
@@ -43,7 +66,7 @@ leer casi cualquiera:
   \ident{prf_add_zero_left} se lee sin traducir.
 \end{enumerate}
 
-Y hay algo más útil todavía, porque conecta con la chapa de la sección anterior:
+Y hay algo más útil todavía, porque conecta con la chapa de la sección 3:
 \textbf{el prefijo dice en qué nivel se afirma.} No es una impresión — es la práctica medida del
 proyecto:
 
@@ -63,25 +86,3 @@ prefijo & símbolos & qué anuncia \\
 \nota{Los recuentos son de \modulo{ROBINSON\_PlusPlus/} a 2026-09-03. La excepción conocida son las
 seis meta-reglas $\omega$ de \modulo{FOL}, anteriores a la convención, que no llevan \ident{ax_}.}
 
-\section*{4 · Los signos}
-
-\begin{center}\small
-\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
-\toprule
-signo & qué es \\
-\midrule
-$\Gamma \vdash A$ & $A$ se deriva de las hipótesis $\Gamma$ en el cálculo $\omega$ \\
-$\Prf\,A$ & $A$ se deriva en el cálculo de Hilbert finitario, sin hipótesis \\
-$\sigma n$ & el sucesor de $n$ \\
-$t \doteq u$ & igualdad \textbf{del lenguaje objeto} (no la de Lean, que es \ident{=}) \\
-\texttt{\#0} & la variable ligada más cercana: un \defterm{índice de De Bruijn} \\
-$\codigo{\varphi}$ & el \defterm{código de Gödel} de $\varphi$: un término objeto que la denota \\
-$\dotado{a}$ & «$a$ dotado»: el código de $a$ construido \emph{dentro} del lenguaje (\ident{tcFn}) \\
-$\Prov(\codigo{\varphi})$ & la fórmula objeto que dice «$\varphi$ es demostrable» \\
-$\Delta_0$, $\Sigma_1$ & clases de fórmulas por su cuantificación: acotada, y $\exists$ sobre acotada \\
-\bottomrule
-\end{tabularx}
-\end{center}
-
-\nota{Ningún término técnico aparece en este libro antes de estar definido aquí. Lo comprueba
-\modulo{doc/book/scripts/terminos.py} en cada compilación, y no admite excepciones.}

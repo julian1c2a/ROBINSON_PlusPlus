@@ -1,5 +1,5 @@
 %% La leyenda de niveles. Va ANTES del índice: PLAN-LIBRO.md §2.5.
-\section*{2 · Los dos ejes: quién afirma, y sobre qué}
+\section*{3 · Los dos ejes: quién afirma, y sobre qué}
 
 Con esas palabras ya se puede plantear la pregunta que vuelve en cada línea:
 \emph{¿esto es lenguaje objeto o lenguaje meta?} En un libro de metamatemática se
@@ -51,17 +51,30 @@ chapa & tipo en Lean & ctx. & r.e. & papel \\
 \end{tabularx}
 \end{center}
 
-\noindent \textbf{Los puentes, y el que no existe.} Las cuatro no son intercambiables, y la
-dirección importa:
+\noindent \textbf{Los puentes, y el que no existe.} Antes de la fórmula, qué es cada cosa, en una
+línea: $\Prf_0\varphi$ dice que $\varphi$ tiene una demostración de Hilbert \emph{intuicionista} y
+\emph{sin hipótesis}; $\Prf\varphi$, lo mismo pero admitiendo la lógica clásica; $\mathsf{PrfH}\
+\Gamma\ \varphi$, lo mismo a partir de las hipótesis $\Gamma$; y
+$\text{\ident{axioms}} \vdash \varphi$, que $\varphi$ se deriva de los axiomas en el cálculo
+$\omega$. Las cuatro dicen «$\varphi$ es demostrable», y las cuatro dicen cosas distintas.
+
+Las flechas van en un solo sentido:
 \[
   \Prf_0\,\varphi \;\longrightarrow\; \Prf\,\varphi \;\longrightarrow\;
   \bigl(\forall \Gamma,\ \mathsf{PrfH}\ \Gamma\ \varphi\bigr),
   \qquad
   \Prf\,\varphi \;\longrightarrow\; \text{\ident{axioms}} \vdash \varphi .
 \]
-El recíproco $\text{\ident{axioms}} \vdash \varphi \to \Prf\,\varphi$ \textbf{es falso, y tiene que
-serlo}: si valiera, $\vdash$ sería r.e.\ y Tarski cerraría el paso. Ésa es la asimetría que obliga a
-tener dos cálculos en vez de uno, y por eso la chapa distingue en cuál se afirma.
+\selee{si $\varphi$ se demuestra sin lógica clásica, se demuestra también con ella; si se demuestra
+sin hipótesis, se demuestra bajo cualquier contexto $\Gamma$; y todo lo que se demuestra en el
+cálculo finitario se deriva también en el cálculo $\omega$.}
+
+\noindent Y el recíproco $\text{\ident{axioms}} \vdash \varphi \to \Prf\,\varphi$ \textbf{es falso, y
+tiene que serlo}.
+\selee{que algo se derive en el cálculo $\omega$ \emph{no} garantiza que tenga una demostración
+finita.}
+\noindent Si valiera, $\vdash$ sería r.e. y Tarski cerraría el paso. Ésa es la asimetría
+que obliga a tener dos cálculos en vez de uno, y por eso la chapa distingue en cuál se afirma.
 Además \ident{prf0_to_derives} no usa \emph{ninguna} meta-regla $\omega$ y \ident{prf_to_derives}
 usa \ident{dne} exactamente una vez: la diferencia entre los dos puentes es, medida,
 $\{\ident{FOL.MetaRules.dne}\}$.

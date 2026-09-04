@@ -1,0 +1,81 @@
+\chapter{Codificar estructuras como números}
+\label{cap:estructuras}
+
+En una teoría de primer orden no hay tipos inductivos. No hay listas, no hay árboles, no hay
+fórmulas: hay números, funciones y predicados. Y sin embargo Gödel necesita que la teoría hable de
+listas y de árboles sintácticos. Este capítulo es el puente.
+
+\section{Un par es un número}
+
+La pieza de partida es el emparejamiento de Cantor, que el capítulo~\ref{cap:qpp} ya demostró
+biyectivo dentro de la teoría. Con él, un par ordenado deja de ser una estructura y pasa a ser un
+número.
+
+\begin{matematica}[De pares a listas]
+\[
+  \langle x,y\rangle \;=\; \frac{(x{+}y)(x{+}y{+}1)}{2} + y,
+  \qquad
+  \obj{\mathrm{nil}} \;=\; \obj{0},
+  \qquad
+  \obj{\mathrm{cons}}(h,t) \;=\; \langle h,\ \obj{\sigma}t\rangle .
+\]
+El \(\obj{\sigma}\) de la cola no es adorno: hace que ningún \(\obj{\mathrm{cons}}\) valga
+\(\obj{0}\), y por tanto que \(\obj{\mathrm{nil}}\) no sea confundible con una lista no vacía.
+\end{matematica}
+
+La pertenencia se caracteriza con un solo axioma, y es el que hace que una lista se pueda recorrer:
+
+\leanfrag{ax_in_cons}
+
+\begin{leccion}[Lo que se gana y lo que se paga]
+Se gana que \emph{toda} la teoría de listas viva dentro de la aritmética, sin ampliar la lógica. Se
+paga que \textbf{un número es varias cosas a la vez}: el mismo valor es un par, un sucesor y una
+lista, y nada en el número dice cuál se pretendía. Esa ambigüedad es exactamente el material del
+capítulo~\ref{cap:numerales}.
+\end{leccion}
+
+\section{Los accesos: símbolos opacos con axiomas}
+
+Para recorrer listas hacen falta cabeza, cola, longitud e índice. Y aquí aparece una decisión de
+diseño que conviene ver, porque explica buena parte del recuento de axiomas: estos símbolos
+\textbf{no se definen}, se declaran opacos y se fijan con axiomas.
+
+\leanfrag{carc}
+\leanfrag{lenc}
+\leanfrag{nthc}
+
+\noindent Un \ident{Term.func "carc" [l]} es literalmente eso: un símbolo de función del lenguaje
+objeto, sin contenido. Lo que le da significado son sus ecuaciones —\(\obj{\mathrm{carc}}(h::t) =
+h\), \(\obj{\mathrm{lenc}}(\mathrm{nil}) = \obj{0}\), y las demás—, que viven en la lista de
+axiomas.
+
+\begin{leccion}[Símbolo opaco frente a definición]
+Un símbolo \emph{definido} —como \(\obj{\mathrm{cons}}\), que es
+\(\obj{\mathrm{div2}}\) del polinomio de Cantor— no cuesta axiomas: su comportamiento se deduce.
+Un símbolo \emph{opaco} cuesta tantos axiomas como ecuaciones haga falta fijar. Es el mismo criterio
+que retiró \ident{ax22_cantor_proj_exists} y \ident{ax23_cantor_proj_uniq} en 2026: convertir dos
+símbolos opacos en definiciones eliminó sus axiomas de golpe.
+\end{leccion}
+
+\section{La inducción estructural, recuperada}
+
+Queda una objeción de fondo. En Lean, \ident{List} viene con su principio de inducción; en la teoría
+objeto no hay tal cosa. ¿Cómo se demuestra algo «para toda lista»?
+
+\begin{matematica}[De la inducción numérica a la estructural]
+Se define la longitud \(\obj{\mathrm{lenc}}\) como función aritmética y se induce \emph{sobre ella}:
+si la propiedad vale para la lista vacía, y se conserva al añadir un elemento, entonces vale para
+toda lista — porque toda lista tiene una longitud, y sobre los números sí hay inducción.
+\end{matematica}
+
+Esto exige inducción, luego \textbf{no está disponible en \modulo{Minimal/}}: ahí los dos hechos
+inductivos sobre listas que se necesitan (\ident{ax_C3_concat_assoc} y \ident{ax_L3_in_concat}) se
+postulan, y pasan a teoremas en \modulo{Full/}. Es la misma frontera del capítulo anterior, vista
+desde las estructuras de datos.
+
+\begin{leccion}[El engarce con los tipos inductivos de Lean]
+Lo que este capítulo hace a mano —inyectividad y disyunción de los constructores, inducción
+estructural desde la numérica, funciones recursivas por recorrido— es exactamente lo que el
+compilador de Lean regala al declarar un \ident{inductive}. Verlo hecho a mano en primer orden
+enseña qué hay realmente dentro de esa comodidad.
+\end{leccion}

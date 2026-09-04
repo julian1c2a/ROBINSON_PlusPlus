@@ -28,7 +28,20 @@ registran para que el libro no los cite, y para que la tarea de desarrollo los a
 | 1 | `Meta/CodeWitnessPrf.lean:78-82` | que el módulo aporta `DescMutua.DESCENSO_hasWit` y las secciones `S_Descenso`/`S_Paso2` | **no existe ningún `DescMutua`**; las secciones son `S_Clausura`/`S_Ens`/`S_HW` (censo de `env.constants`) | detectado |
 | 2 | `Meta/CodeWitnessPrf.lean:1555` | cita `EvalSubsttc.prf_isTermCodeE1_of_In` como si estuviera en producción | el 09‑03: **no existía**, era un sondeo. ⚠️ **El 09‑04 dejó de ser falso sin que nadie tocara el docstring**: la promoción **B2** puso `prf_isTermCodeE1_of_In` en producción, en `CodeWitnessPrf.SinWTs`. El módulo que la cita **sigue sin existir** (`EvalSubsttc`), pero el hecho afirmado ya es cierto por otra vía | ⚠️ **mutado** — reescribir la cita, no borrarla |
 | 3 | `Meta/LiftcCodePrf.lean` · `refl_isTermCodeE1_imp` | «EL RESULTADO CENTRAL DE ESTE MÓDULO» | **sobrevende**: toma como premisa justo lo que el descenso fabrica, luego nada aguas abajo puede usarlo; **cero usos** en B2 | detectado |
+| 5 | `Minimal/Axioms.lean:908-917` | que `axiomsCodeT` es el código de **`coreAxioms`** (34) y que «se ancla por el axioma **`ax_axiomsCodeT`**» a `listFormCodeM coreAxioms` | **dos cosas falsas**: (a) `ax_axiomsCodeT` **no existe** —sólo aparece en comentarios, y `Meta/Hilbert.lean:69` dice «`ax_axiomsCodeT` eliminado»—; (b) el axioma vivo es `ax_axiomsCodeT_eq` (`:1376`) y ancla a **`axioms`** (141), no a `coreAxioms`. [ADR-015](../../DECISIONS.md) lo dice bien | ✅ **CORREGIDO en desarrollo 2026‑09‑05** — confirmadas las DOS mitades con `lake`, y medidas las listas con `#eval ·.length`: `coreAxioms` **34**, `codingAxioms` **107**, `axioms` **141** (34+107=141). El comentario reescrito dice ya el ancla real (`ax_axiomsCodeT_eq` → `axioms`) y **deja escrita la consecuencia**: la regla `thy` (`ax_lineWF_thy`, tag 15) admite las 141, no las 34. ⚠️ Sólo prosa: 0 declaraciones en el diff, 269 antes y 269 después |
 | 4 | §9, marca «NO ES VACUO» | que el resultado no es vacuo | producción **ya probaba** esos enunciados por otra vía, sin descenso ninguno; lo que los controles miden es que **el descenso dispara**, que es otra cosa | corregido en desarrollo (2026-09-03) |
+
+### Nota sobre el caso 5 — no es cosmético
+
+Si `axiomsCodeT` codifica `axioms` (141) y no `coreAxioms` (34), entonces la regla `thy` del
+verificador acepta como axioma de teoría los 141, no los 34. Eso cambia **qué significa
+`provCodeC'`**, y por tanto **cuál es la sentencia G**. Es el mismo mecanismo que ADR-015 describe
+para el caso contrario —añadir axiomas cambia el teorema—, y aquí lo que está desincronizado es
+justo la descripción de dónde está esa frontera.
+
+⚠️ No he podido comprobarlo en el entorno compilado (aquí no hay `lake`): lo seguro es la
+**contradicción textual** entre el comentario y la declaración. Cuál de los dos refleja la intención
+lo decide la tarea de desarrollo.
 
 ## Lección, y por qué es material del libro
 
@@ -78,3 +91,33 @@ mal apuntada es indistinguible de una ausencia** hasta que se mira dos veces, y 
 exactamente el mismo error que no medir: una afirmación falsa dicha con confianza. La regla de
 §2.6 —«respaldar con una medición»— es necesaria pero **no suficiente**: la medición tiene que
 apuntar al sitio correcto, y eso también hay que comprobarlo.
+
+---
+
+## Cierre del caso #5 (2026‑09‑05)
+
+Lo que el registro no podía comprobar —«aquí no hay `lake`»— lo cerró la tarea de desarrollo:
+
+* **`ax_axiomsCodeT` no existe.** Cero declaraciones en el árbol; sus cinco menciones son
+  comentarios, y `Meta/Hilbert.lean` lo da por **eliminado** explícitamente.
+* **El axioma vivo ancla a `axioms`**, no a `coreAxioms`:
+  `axiom ax_axiomsCodeT_eq : axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`.
+* **Y tu inferencia era correcta**: la regla `thy` del verificador (`ax_lineWF_thy`, tag 15) dice
+  `lineWF ⇔ (lenc = 2) ∧ In (carc ·) axiomsCodeT`, o sea que admite **las 141**.
+
+**Pero el diagnóstico final es más tranquilo que el temido**: no es un desajuste vivo del
+sistema, sino **prosa fósil de un diseño anterior**. La nota de `Hilbert.lean` —«ya no hay ancla
+gigante, `ax_axiomsCodeT` eliminado»— dice que el cambio fue **deliberado**: se pasó de anclar a
+`coreAxioms` a anclar a `axioms`, y el párrafo se quedó describiendo el diseño viejo. El sistema
+es coherente consigo mismo; lo que mentía era el párrafo que lo describe.
+
+### Y por eso el caso #5 es el mejor del registro para el capítulo
+
+Los otros cuatro son símbolos que no existen o énfasis mal puesto. **El #5 es un comentario que
+fue verdad**, y dejó de serlo cuando el diseño cambió debajo — igual que el #2, pero al revés:
+aquel se volvió verdadero solo, y éste se volvió falso solo. **Los dos sin que nadie los tocara.**
+
+Es la prueba más limpia de la regla de §2.6: un docstring no describe un módulo, **da fe de lo
+que su autor creía en una fecha**. Y aquí lo que estaba en juego no era una cita: era **dónde
+está la frontera de la teoría**, que es lo que decide qué significa `provCodeC'` y por tanto
+**cuál es la sentencia G**.

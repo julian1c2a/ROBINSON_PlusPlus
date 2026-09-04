@@ -1,0 +1,82 @@
+\chapter{Códigos de términos y fórmulas}
+\label{cap:codigos}
+
+Con listas dentro de la aritmética, ya se puede codificar sintaxis. Este capítulo construye
+\(\codigo{\varphi}\): el término del lenguaje objeto que denota la fórmula \(\varphi\).
+
+\section{Dos codificaciones, y por qué hay dos}
+
+El proyecto tiene una codificación \emph{de juguete} y una \emph{real}, y conviene no confundirlas.
+
+La primera —el nivel B— codifica cadenas de símbolos de un alfabeto finito de doce elementos:
+
+\leanfrag{Sym}
+\leanfrag{gNat}
+\leanfrag{encode}
+
+\noindent Es la construcción clásica de Gödel, útil para explicar la idea y para el teorema de
+inyectividad, pero no sirve para el argumento real: codifica \emph{cadenas}, no el árbol sintáctico
+de las fórmulas del kernel.
+
+\section{La codificación real: por constructor}
+
+La segunda codificación —el nivel C— recorre la estructura de \ident{Term} y \ident{Formula} y
+asigna una etiqueta a cada constructor.
+
+\leanfrag{termCode}
+\leanfrag{formCode}
+
+\begin{matematica}[Las etiquetas]
+\[
+\begin{array}{llll}
+\bot \mapsto 2 & \text{átomo} \mapsto 3 & {\doteq} \mapsto 4 & {\Rightarrow} \mapsto 5\\
+\forall \mapsto 6 & \wedge \mapsto 7 & \vee \mapsto 8 & \exists \mapsto 9
+\end{array}
+\]
+y, en los términos, \(0\) para variables y \(1\) para aplicaciones. Un código es una lista cuya
+cabeza es la etiqueta y cuya cola son los códigos de las partes.
+\end{matematica}
+
+\begin{leccion}[Dónde vive cada cosa]
+\ident{formCode} es una función \textbf{de Lean}: toma un valor del tipo \ident{Formula} y devuelve
+un valor del tipo \ident{Term}. Su \emph{resultado} es un término del lenguaje objeto. Por eso la
+chapa dice \emph{Lean} sobre \emph{código}, y por eso el capítulo de nomenclatura insiste: la
+función que calcula el código es meta; el código es objeto.
+\end{leccion}
+
+\section{Inyectividad, sin suponer consistencia}
+
+Que la codificación sea inyectiva es lo que la hace utilizable: dos fórmulas distintas tienen
+códigos distintos, luego un código determina su fórmula.
+
+\begin{teorema}[La codificación es inyectiva]
+Si \(\codigo{\varphi} = \codigo{\psi}\) entonces \(\varphi = \psi\).
+\end{teorema}
+
+\leanfrag{formCode_injective}
+
+\begin{leccion}[Un detalle que importa más de lo que parece]
+Este teorema se demuestra \textbf{en la metateoría}, por inducción estructural, y \textbf{no supone
+la consistencia} de la teoría objeto. Es un hecho sobre los constructores de un tipo inductivo de
+Lean, no sobre lo que la aritmética demuestre. Si dependiera de la consistencia, todo el edificio
+sería circular.
+\end{leccion}
+
+\section{De códigos a demostrabilidad}
+
+Con la codificación se pueden definir, ya en la metateoría, los dos predicados que dan sentido a
+todo lo demás:
+
+\leanfrag{IsFormula}
+\leanfrag{Provable}
+
+\noindent Y el primer resultado que los conecta:
+
+\leanfrag{provable_formCode_iff}
+
+\begin{muro}[Esto todavía no es Gödel]
+\ident{Provable} es un predicado \emph{de Lean} sobre términos: dice que existe una fórmula con ese
+código y que la teoría la demuestra. Es correcto y es inútil para la incompletitud, porque la
+teoría objeto no puede hablar de él — vive en la metateoría. Lo que hace falta es una \emph{fórmula
+del lenguaje objeto} que exprese «existe una demostración». Ése es el capítulo siguiente.
+\end{muro}

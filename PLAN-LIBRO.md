@@ -13,7 +13,9 @@
 > 2026-08-22) y el pedagógico (`Sobre_el_libro.md`) — y **corrige** las afirmaciones que el
 > proyecto ha refutado desde entonces. El registro de correcciones está en §8.
 
-**Última actualización:** 2026-09-03 23:40 — **nuevo principio §2.7** (nada se usa antes de estar
+**Última actualización:** 2026-09-04 11:30 — **nuevo principio §2.8** (una fórmula se lee en voz
+alta la primera vez) y **M-4** en la cantera; previo, **`MATERIALES.md`**, la cantera de material
+pendiente de capítulo; previo, **§2.7** (nada se usa antes de estar
 definido, sin exenciones) + capítulo de apertura; previo, **§2.6** (un docstring es testimonio,
 nunca evidencia) + registro `DOCSTRINGS-NO-FIABLES.md`; previo, **licencia doble** (prosa CC BY-SA 4.0, código MIT);
 previo, **§0: MANDATORY de ámbito de escritura**
@@ -103,7 +105,7 @@ diverge de este fichero, manda este fichero.
 
 ## 2 · Principios editoriales
 
-Son **siete**, y los siete nacen de un fallo real de este proyecto. Ninguno es estético.
+Son **ocho**, y los ocho nacen de un fallo real de este proyecto. Ninguno es estético.
 
 ### 2.1 · Sólo se publica lo que compila
 
@@ -354,6 +356,26 @@ antes**. Se comprueba con `doc/book/scripts/terminos.py`, que reconstruye el **o
 lectura** —expandiendo los `\input` en su sitio, no concatenándolos al final— y falla si un término
 se adelanta. No hay fichero de excepciones para este control, a diferencia de §2.6: aquí una
 excepción es exactamente el fallo que se quiere evitar.
+
+### 2.8 · Una fórmula que se muestra se lee en voz alta la primera vez
+
+§2.7 protege las **palabras**; ésta protege los **signos**. Cuando una notación aparece por primera
+vez —`Prf₀ φ → Prf φ → (∀Γ, PrfH Γ φ)`, `Prf φ → axioms ⊢ φ`, `⌜φ⌝`, `Prov(⌜φ⌝)`— el libro hace dos
+cosas antes de seguir: **una introducción mínima** de qué es cada pieza, en una línea por pieza; y
+**la lectura en voz alta** de la fórmula entera, con el macro `\selee{}`.
+
+No es cortesía. Una cadena de flechas entre cuatro relaciones de demostrabilidad es ilegible para
+quien no sepa ya cuál es cuál, y el lector que se la salta pierde justo la asimetría que justifica
+que haya dos cálculos.
+
+**Mecanizado con la misma máquina que §2.7**: las notaciones controladas se declaran en
+`doc/book/terminos.json` bajo `notaciones`, **por su macro** —que es lo que se puede buscar en el
+`.tex` sin ambigüedad, a diferencia del glifo—, se introducen con `\defnot{}`, y `terminos.py` falla
+si una se usa antes. Tampoco hay fichero de excepciones.
+
+⚠️ Efecto de orden que este control destapó: la sección de **signos** tuvo que pasar por delante de
+la de **niveles** en el capítulo de apertura, porque la explicación de los dos ejes usa `⊢`, `Prf` y
+`Prov`. El orden final es **palabras → signos → niveles → nombres**.
 
 ---
 
@@ -608,7 +630,20 @@ doc/book/
   la excepción de `doc/book/`. Está fuera del ámbito del libro (§0), así que se reporta, no se toca.
 - `doc/book/` queda **fuera** del build de `lake`: la `lean_lib` sólo alcanza `.lean` importables
   desde `ROBINSON_PlusPlus.lean`, así que no interfiere.
-- ⚠️ **Comprobar** que `bash check-doc-sync.bash --quick` sigue verde tras crear el directorio —
+- **`doc/book/MATERIALES.md` — la cantera.** Lo que se descubre hablando se pierde si no se escribe:
+ahí van los hallazgos, mediciones y razonamientos que deben acabar en el libro pero cuyo capítulo aún
+no está escrito. **Cada entrada lleva su destino** (qué capítulo) y **cada afirmación su estatuto**
+—`[medido]` con la orden que lo comprueba, `[citado]` con su referencia, `[razonado]`, `[conjetura]`—,
+que es §2.6 aplicado también a lo que escribimos nosotros. Nada sale de la cantera a un capítulo sin
+volver a pasar los controles de `make`: toda cifra se remide en el momento de escribirla.
+
+Contenido a 2026-09-04: **M-1** la fuerza de la metateoría (cuántos universos se usan de verdad —dos—,
+la impredicatividad que no se usa, los dos únicos `Classical` y por qué uno de ellos es exactamente el
+principio de Markov, y qué transferiría y qué no una metateoría-Peano); **M-2** el reparto 34/107 de
+los 141 axiomas objeto; **M-3** las tres funciones `numeral`; **M-4** por qué «Q tiene 7 y nosotros 34» engaña, el historial
+de cinco reducciones, y por qué reducir hoy **cambia el teorema** en vez de simplificarlo.
+
+⚠️ **Comprobar** que `bash check-doc-sync.bash --quick` sigue verde tras crear el directorio —
   sus controles [C]/[D] recorren `.md` y no deben confundirse con los del libro.
 
 ---
@@ -620,6 +655,7 @@ doc/book/
 | **−1** | **este plan, puesto al día** | ✅ **HECHO 2026-09-03** | sin él, la fase 2 escribiría afirmaciones que el proyecto ya refutó (§2.4) |
 | **0** | esqueleto `doc/book/` + `Makefile` + capítulo piloto (19) | ✅ **HECHO 2026-09-03** | validar la cadena LaTeX **y** el extractor antes de escribir |
 | **1** | `scripts/extraer.py` + capítulo 2 (kernel) + capítulo de apertura | ✅ **HECHO 2026-09-03** | el kernel es estable y no está afectado por la inconsistencia |
+| **3a** | Parte II completa (capítulos 5-8) + capítulo 4 | ✅ **HECHO 2026-09-04** | el terreno y la aritmetización están estables y no dependen del frente vivo |
 | **2** | Parte IV: capítulos 16-19, 21 y **22-25** | ⏳ **siguiente** | **escribir ahora, mientras el episodio está fresco** — es el material más valioso y el más fácil de perder |
 | **3** | Partes I–III (con el cap. 11 corregido) | ⏳ | exposición sistemática; se apoya en `doc/REFERENCE-*.md` ya escritos |
 | **4** | Apéndices y bibliografía | ⏳ | mecánico |
@@ -641,9 +677,15 @@ del glosario), `simbolos-exentos.json`, `DOCSTRINGS-NO-FIABLES.md`, `LICENSE`, y
 numerales) y **apéndice E** (licencia). 34 páginas. `make` encadena extraer → compilar → verificar →
 símbolos → términos, y **los cinco controles tienen su control positivo hecho**. Nada commiteado.
 
+**Estado al 2026-09-04.** Escritos: **apertura** (nomenclatura, niveles y notación), **capítulo 2**
+(kernel FOL⁼), **capítulo 4** (Robinson Q++), **Parte II completa** —5 codificar estructuras,
+6 códigos de sintaxis, 7 el verificador, 8 representabilidad y D1— **capítulo 19** y **apéndice E**.
+67 fragmentos, 50 páginas, cinco controles en verde. Nada commiteado.
+
 **Siguiente sesión**, por este orden: (1) `make subir` desde el shell del autor, para que el libro
-entre en git; (2) `make axiomas` con Lean en el PATH, para medir los footprints reales y adjudicar
-las discrepancias; (3) capítulo 16 (la inconsistencia latente).
+entre en git; (2) `make axiomas` con Lean en el PATH — **los 64 fragmentos de producción están hoy
+marcados «declarado, sin medir»**, que es la verdad, y esto los pasa a medidos; (3) capítulo 16
+(la inconsistencia latente), o los capítulos 1 y 3 para cerrar la Parte I.
 
 **Materia prima ya disponible, verificada y citable** (nada de esto hay que reconstruirlo):
 `sondeos/` (**57** experimentos compilados, con su `README.md` de 41 KB), `cuarentena/README.md`
@@ -690,7 +732,8 @@ El libro **no bloquea ni es bloqueado** por el desarrollo:
   están adjudicados uno a uno.
 - `make simbolos` en verde (§2.6): cada `\ident{}` del libro nombra algo que existe, o está exento
   con su razón. **Ninguna afirmación sobre el contenido de un módulo descansa en su docstring.**
-- `make terminos` en verde (§2.7): ningún término del vocabulario aparece antes de su `\defterm{}`.
+- `make terminos` en verde (§2.7 y §2.8): ningún término aparece antes de su `\defterm{}`, ninguna
+  notación antes de su `\defnot{}`.
 - `make verificar` en verde. Comprueba dos cosas: que el **código impreso en el PDF** coincide línea
   a línea con el del repo, y que **nada se sale de la caja de texto** (`Overfull \hbox`). Lo segundo
   se añadió tras detectar a ojo una tabla 88 pt más ancha que la página: depender de que alguien mire

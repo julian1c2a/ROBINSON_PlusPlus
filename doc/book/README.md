@@ -32,6 +32,8 @@ ser citado). Detalle en [`LICENSE`](LICENSE) y en el apéndice E del libro.
 | `extraido/*.tex` | **GENERADO** por `scripts/extraer.py`. No editar. No commitear |
 | `scripts/extraer.py` | extrae del repo y aplica los controles de `PLAN-LIBRO.md` §2.1–§2.3 |
 | `bib/libro.bib` | bibliografía |
+| `MATERIALES.md` | **la cantera**: hallazgos y razonamientos que deben acabar en el libro, cada uno con su capítulo de destino y su estatuto ([medido]/[citado]/[razonado]/[conjetura]) |
+| `DOCSTRINGS-NO-FIABLES.md` | afirmaciones falsas encontradas en docstrings de producción (§2.6) |
 
 ## Uso
 

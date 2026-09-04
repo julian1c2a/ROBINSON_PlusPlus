@@ -1,0 +1,70 @@
+\chapter{El verificador de pruebas}
+\label{cap:verificador}
+
+Hace falta una fórmula del lenguaje objeto que diga «\(x\) es demostrable». La estrategia de Gödel
+es indirecta y es la única que funciona: no se define la demostrabilidad, se define **verificar una
+demostración** —que es una comprobación finita— y luego se dice «existe algo que pasa la
+verificación».
+
+\section{Una demostración es una lista de líneas}
+
+\begin{matematica}[La forma de una prueba]
+Una demostración es una lista \(p\) de líneas. Cada línea lleva su conclusión y la etiqueta de la
+regla que la justifica, más las referencias a sus premisas. La cadena es válida si \emph{cada} línea
+está bien formada y \emph{cada} premisa que invoca ya estaba probada antes.
+\end{matematica}
+
+Eso se escribe con cuatro símbolos del lenguaje objeto, y los cuatro son \textbf{opacos}:
+
+\leanfrag{lineWF}
+\leanfrag{premsOf}
+\leanfrag{runFn}
+\leanfrag{chainOk}
+
+\noindent \(\obj{\mathrm{lineWF}}(\ell)\) dice que la línea \(\ell\) es una instancia legítima de
+alguna regla; \(\obj{\mathrm{premsOf}}(\ell)\) da la lista de premisas que invoca;
+\(\obj{\mathrm{runFn}}(c,p)\) acumula las conclusiones de la cadena \(p\) sobre lo ya verificado
+\(c\); y \(\obj{\mathrm{chainOk}}(c,p)\) es la comprobación completa.
+
+\begin{leccion}[De dónde salen los 107]
+El capítulo~\ref{cap:qpp} contaba 34 axiomas de aritmética y \textbf{107 de maquinaria de
+codificación}. Aquí es donde están: cada uno de estos símbolos opacos necesita sus ecuaciones, y las
+reglas del cálculo son \textbf{21 etiquetas} que \(\obj{\mathrm{lineWF}}\) tiene que reconocer una
+por una. Que la maquinaria triplique a la aritmética no es descuido: es lo que cuesta escribir un
+verificador \emph{dentro} de la teoría que verifica.
+\end{leccion}
+
+\section{El predicado de demostrabilidad}
+
+Con el verificador, la demostrabilidad es una sola fórmula, y es \(\Sigma_1\):
+
+\leanfrag{provFormulaC}
+
+\begin{matematica}[$\Prov$, por fin en el lenguaje objeto]
+\[
+  \Prov(x) \;:=\; \exists p.\ \obj{\mathrm{chainOk}}(\mathrm{nil}, p)
+  \;\wedge\; x \obj{\in} \obj{\mathrm{runFn}}(\mathrm{nil}, p)
+\]
+\selee{existe una cadena de prueba $p$ que pasa la verificación desde cero, y entre las conclusiones
+que acumula está $x$.}
+\end{matematica}
+
+Y aplicándolo al código de una fórmula concreta:
+
+\leanfrag{provCodeC}
+
+\begin{leccion}[Por qué $\Sigma_1$ y por qué importa]
+La forma es «\(\exists p\) tal que \emph{algo decidible} sobre \(p\)»: eso es
+\(\Sigma_1\). Y es la forma que hace funcionar la incompletitud, porque una teoría aritmética
+razonable demuestra todos los \(\Sigma_1\) verdaderos — comprobar un testigo concreto es cálculo,
+no razonamiento. Esa propiedad es la condición \textbf{D1}, y es el capítulo siguiente. Su versión
+\emph{provable} —que la teoría demuestre esa capacidad \emph{de sí misma}— es \textbf{D3}, y es el
+frente abierto del proyecto.
+\end{leccion}
+
+\begin{muro}[La asimetría del verificador]
+El verificador es \emph{sólido} por construcción: si una cadena pasa, hay demostración. Lo que no es
+gratis es el recíproco negativo — que si algo \emph{no} es demostrable, la teoría pueda refutar
+todas las cadenas. Eso es lo que falta para la mitad $\noderives\lnot G$ del primer teorema, y tiene
+capítulo propio.
+\end{muro}

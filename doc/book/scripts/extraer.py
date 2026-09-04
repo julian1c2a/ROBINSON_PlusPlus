@@ -150,7 +150,9 @@ def extraer_declaracion(ruta, nombre):
     """Devuelve (texto, nº de línea 1-based) o (None, None)."""
     with open(ruta, encoding="utf-8") as fh:
         lineas = fh.read().split("\n")
-    re_ini = re.compile(r"^" + INICIO_DECL + re.escape(nombre) + r"\b")
+    # `\b` falla tras un apóstrofo (`repr_pos'`), porque `'` no es carácter de
+    # palabra: se exige explícitamente que no siga otro carácter de nombre.
+    re_ini = re.compile(r"^" + INICIO_DECL + re.escape(nombre) + r"(?![A-Za-z0-9_'\u2080-\u2089])")
     ini = None
     for i, ln in enumerate(lineas):
         if re_ini.match(ln):
@@ -276,8 +278,12 @@ def escribir_fragmento(fr, codigo, linea):
     if fr.get("capa") == "sondeo":
         partes.append("\\fueradelbuild{%s}" % tex_escapar_titulo(modulo))
     fp = fr.get("footprint")
-    if fp:
-        partes.append("\\footprint{%s}" % tex_escapar_titulo(", ".join(fp)))
+    if fp is not None and fr.get("capa") != "sondeo":
+        # `make axiomas` es lo que convierte un footprint declarado en medido.
+        macro = "footprint" if fr.get("footprint_medido") else "footprintpend"
+        # cada nombre va por \fpi para que pueda partirse por los puntos
+        texto_fp = (", ".join("\\fpi{%s}" % a for a in fp)) if fp else "(net-0)"
+        partes.append("\\%s{%s}" % (macro, texto_fp))
     with open(os.path.join(EXTRAIDO, clave + ".tex"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(partes) + "\n")
 
@@ -489,6 +495,7 @@ def main():
                       % (fr["clave"], ", ".join(fuera)))
             if fijar:
                 fr["footprint"] = real
+                fr["footprint_medido"] = True
             elif sorted(real) != sorted(fr.get("footprint", [])):
                 error("[%s] el footprint declarado no coincide con el real.\n"
                       "        declarado: %s\n        real:      %s"

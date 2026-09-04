@@ -1,0 +1,217 @@
+\chapter{La teoría objeto: Robinson Q\texttt{++}}
+\label{cap:qpp}
+
+Ya hay lenguaje y hay cálculo. Falta decir \emph{qué} se afirma. Este capítulo presenta la
+aritmética sobre la que se demuestra todo lo demás, y contesta la pregunta que salta a la vista en
+cuanto se mira la lista: \emph{¿por qué 34 axiomas, si la aritmética de Robinson tiene 7?}
+
+\section{El núcleo de Q}
+
+Seis de los 34 son, literalmente, seis de los siete de Q.
+
+\begin{matematica}[El núcleo]
+\[
+\begin{array}{ll}
+\text{Q1}\quad \forall x.\ \obj{\sigma} x \neq \obj{0}
+  & \text{el cero no es sucesor de nadie}\\
+\text{Q2}\quad \forall x,y.\ \obj{\sigma} x \doteq \obj{\sigma} y \Rightarrow x \doteq y
+  & \text{el sucesor es inyectivo}\\
+\text{Q4}\quad \forall x.\ x \obj{+} \obj{0} \doteq x
+  & \text{la suma, caso base}\\
+\text{Q5}\quad \forall x,y.\ x \obj{+} \obj{\sigma} y \doteq \obj{\sigma}(x \obj{+} y)
+  & \text{la suma, paso recursivo}\\
+\text{Q6}\quad \forall x.\ x \obj{\cdot} \obj{0} \doteq \obj{0}
+  & \text{el producto, caso base}\\
+\text{Q7}\quad \forall x,y.\ x \obj{\cdot} \obj{\sigma} y \doteq (x \obj{\cdot} y) \obj{+} x
+  & \text{el producto, paso recursivo}
+\end{array}
+\]
+\end{matematica}
+
+Así se escriben en Lean. Nótese que un axioma es un \textbf{dato}: un valor de tipo
+\ident{Formula}, no un enunciado que Lean afirme. Por eso la chapa dice \emph{Lean} sobre
+\emph{objeto}.
+
+\leanfrag{ax_q1}
+\leanfrag{ax_q4}
+\leanfrag{ax_q5}
+\leanfrag{ax_q7}
+
+El séptimo de Q, \(\forall y.\ y \doteq \obj{0} \vee \exists x.\ \obj{\sigma}x \doteq y\), no está:
+aquí el predecesor es una función total \(\obj{\tau}\) con dos axiomas propios. Se gana comodidad en
+todas las pruebas y se paga un axioma.
+
+\section{Lo que Q no demuestra, y por eso hay que postularlo}
+
+\begin{leccion}[La limitación de Q, en un ejemplo]
+Q demuestra \(5\obj{+}7 \doteq 7\obj{+}5\): basta desplegar los numerales con Q4 y Q5 hasta que las
+dos partes se reduzcan al mismo término. Q \textbf{no} demuestra
+\(\forall x,y.\ x\obj{+}y \doteq y\obj{+}x\). Para eso hace falta inducción — y \modulo{Minimal/} no
+la tiene. Luego, o se renuncia al álgebra cuantificada, o se postula.
+\end{leccion}
+
+Se postula. Ocho axiomas más, todos ellos teoremas de PA: conmutatividad y asociatividad de
+\(\obj{+}\) y \(\obj{\cdot}\), distributividad, la definición del orden
+(\(x \obj{<} y \Leftrightarrow \exists k.\ x \obj{+} \obj{\sigma}k \doteq y\)), irreflexividad y
+tricotomía.
+
+\leanfrag{ax_add_comm}
+
+\begin{matematica}[La comparación justa]
+Sobre el vocabulario de Q —\(\obj{0}\), \(\obj{\sigma}\), \(\obj{+}\), \(\obj{\cdot}\)— esta teoría
+usa \textbf{14} axiomas donde Q usa 7. Los 7 de más son exactamente el precio de querer álgebra
+\emph{cuantificada} sin inducción.
+\end{matematica}
+
+\section{Cada símbolo nuevo cuesta axiomas}
+
+Los 20 restantes no son más aritmética: son \textbf{más vocabulario}. La \emph{signatura} añade
+\(\obj{\sqrt{\ }}\), \(\obj{/_2}\), \(\obj{\%_2}\), \(\obj{\tau}\), \(\obj{-}\) (monus), listas,
+\(\obj{\hat{\ }}\) y \(\obj{\Pi_p}\); y un símbolo de función sin axiomas que lo fijen \textbf{no
+está definido}: cualquier función lo satisface.
+
+Dos ejemplos del método, que no es siempre el mismo. La raíz se caracteriza \emph{por cotas}, sin
+decir cómo se calcula:
+
+\leanfrag{ax_sqrt}
+
+Y la resta truncada, \emph{por testigo}: no se dice qué es \(a \obj{-} b\), se dice qué ecuación
+cumple cuando tiene sentido.
+
+\leanfrag{ax_sub}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X r >{\raggedright\arraybackslash}p{0.30\linewidth}@{}}
+\toprule
+qué paga & nº & ¿reducible? \\
+\midrule
+núcleo de Q & 6 & no \\
+álgebra y orden que Q no prueba & 8 & no \emph{sin inducción} \\
+caracterización de $\obj{\sqrt{\ }}$ & 2 & no \\
+caracterización de $\obj{/_2}$, $\obj{\%_2}$ & 2 & no \\
+caracterización de $\obj{\tau}$ & 2 & no \\
+caracterización de $\obj{-}$ & 1 & no \\
+testigos inductivos & 2 & no sin inducción \\
+listas & 7 & no sin inducción \\
+$\obj{\hat{\ }}$ & 2 & no \\
+$\obj{\Pi_p}$ & 2 & no \\
+\midrule
+\textbf{total} & \textbf{34} & \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{El axioma que traía la inconsistencia}
+
+Uno de los siete de listas merece mirarse ahora, porque será el protagonista de la Parte~IV:
+
+\leanfrag{ax_cons_def}
+
+\begin{matematica}[Las listas \emph{son} números]
+\[ \obj{\mathrm{cons}}(h,t) \;\doteq\; \langle h, \obj{\sigma}t\rangle \]
+donde \(\langle\cdot,\cdot\rangle\) es el emparejamiento de Cantor. No hay un tipo «lista» aparte:
+una lista \textbf{es} un número, y el mismo valor es a la vez un par, un sucesor y una lista.
+\end{matematica}
+
+\begin{leccion}[Guárdese esta frase]
+Que el mismo número sea las tres cosas es lo que hace posible la aritmetización — y es lo que hizo
+inconsistente la teoría durante meses. El capítulo~\ref{cap:numerales} cuenta cómo.
+\end{leccion}
+
+\section{Qué se consigue sin inducción}
+
+La apuesta de \modulo{Minimal/} es que con eso basta para llegar muy lejos. Lo que se demuestra:
+
+\textbf{El emparejamiento de Cantor es una biyección.} La pieza difícil es el lema de las cotas
+—que todo \(c\) cae en una única «diagonal»—, y de él salen la sobreyectividad y la unicidad:
+
+\leanfrag{lemma_C5}
+\leanfrag{cantor_surjectivity}
+
+\textbf{Los pares son inyectivos}, que es lo que convierte el emparejamiento en una codificación
+utilizable:
+
+\leanfrag{pair_inj}
+
+\textbf{Las funciones discretas se caracterizan}: ser una función y ser funcional coinciden.
+
+\leanfrag{teo_F3}
+
+\textbf{Y la factorización prima.} Aquí sí hay una concesión, y va declarada: el teorema fundamental
+de la aritmética \textbf{se postula} en \modulo{Minimal/}, porque su prueba necesita inducción fuerte.
+
+\leanfrag{ax_p_tfa}
+
+\begin{muro}[La única concesión de este capítulo]
+\ident{ax_p_tfa} es un \ident{axiom} de \emph{Lean}, no una fórmula de la lista: cuantifica sobre
+términos desde fuera. Es teorema en \modulo{Full/}, y en \modulo{Minimal/} se postula. Está en el
+inventario de \doc{AXIOMS.md} como el axioma número 4 de los siete.
+\end{muro}
+
+\section{La frontera: qué cambia al añadir inducción}
+
+\modulo{Full/} añade una sola cosa —el esquema de inducción como axioma \emph{de la teoría objeto}— y
+con ella una parte de \modulo{Minimal/} deja de ser postulado:
+
+\leanfrag{ax_induction}
+\leanfrag{add_comm_thm}
+
+Pasan a teoremas los ocho de álgebra y orden (\ident{ax6_add_comm}, \ident{ax7_add_assoc}, \ident{ax10_mul_comm}--\ident{ax12_mul_distrib},
+\ident{ax18_lt_irrefl}, \ident{ax19_lt_trichotomy}), los dos testigos de paridad (\ident{ax21_mod2_range}, \ident{ax24_mod2_of_even}), los dos de
+listas (\ident{ax_C3_concat_assoc}, \ident{ax_L3_in_concat}) — y el teorema fundamental de la aritmética:
+
+\leanfrag{tfa_numeral}
+
+\begin{leccion}[Por qué existen las dos capas]
+No es que \modulo{Full/} sea «la buena» y \modulo{Minimal/} un ensayo. \modulo{Minimal/} responde a una
+pregunta —\emph{¿hasta dónde se llega sin inducción?}— y la respuesta resulta ser: hasta Cantor,
+listas, funciones y, postulando el TFA, la factorización. \modulo{Full/} responde a otra. Y hay una
+tercera razón, que el capítulo~13 desarrolla: para Gödel~II la inducción \textbf{no es opcional} —
+Q no satisface las condiciones de derivabilidad.
+\end{leccion}
+
+\section{Los otros 107}
+
+La lista \ident{axioms} que el verificador consulta no tiene 34 fórmulas, sino \textbf{141}. Medido:
+\ident{axioms} es exactamente \ident{coreAxioms ++ codingAxioms}, con 34 axiomas matemáticos y
+\textbf{107 de maquinaria de codificación}.
+
+\begin{center}\small
+\begin{tabular}{lr}
+\toprule
+\ident{coreAxioms} — la aritmética & 34 \\
+\ident{codingAxioms} — la maquinaria de codificación & 107 \\
+\midrule
+\ident{axioms} & \textbf{141} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Tres veces más maquinaria que aritmética. Ése es, medido, **el precio de que una teoría
+pueda hablar de su propia sintaxis**, y el capítulo~7 lo desglosa.
+
+\begin{muro}[Y una consecuencia que no es obvia]
+Desde que existe esa maquinaria, \textbf{el conjunto de axiomas es portante}: el verificador interno
+consulta la lista, luego $\Prov$ depende de ella, luego la sentencia de Gödel depende de ella.
+Quitar un axioma hoy no simplifica el mismo teorema: \textbf{cambia el teorema}. Es el argumento de
+\adr{015} (capítulo~22) leído al revés, y significa que la elección de axiomas dejó de ser
+reversible en el momento en que la teoría empezó a hablar de sí misma.
+\end{muro}
+
+\section{¿Se puede bajar de 34?}
+
+Ya ha pasado cinco veces. \ident{ax20_eq_decidable} cayó por derivarse de la tricotomía y la
+irreflexividad; \ident{ax22_cantor_proj_exists} y \ident{ax23_cantor_proj_uniq}, al convertir
+\ident{proj1} y \ident{proj2} de símbolos opacos en definiciones;
+\ident{ax27_add_left_cancel} y \ident{ax28_mul_two_cancel}, por ser demostrables en PA\(^-\) sin
+inducción.
+
+\begin{leccion}[El método, que es siempre el mismo]
+Los cinco cayeron por la misma pregunta: \emph{¿este axioma ya era un teorema?} Y dos de los cinco
+cayeron por una variante más fina: \emph{¿este símbolo tiene que ser opaco, o puede ser una
+definición?} Un símbolo opaco necesita axiomas que lo fijen; una definición no necesita ninguno.
+\end{leccion}
+
+Lo que queda es un mínimo local defendible. Bajar más exige elegir: añadir inducción —y entonces
+esto ya no es \modulo{Minimal/}—, empobrecer el vocabulario —y perder la aritmetización—, o cambiar de
+codificación a cambio de complicar las pruebas. El detalle está en \doc{MINIMAL-AXIOMS.md}.

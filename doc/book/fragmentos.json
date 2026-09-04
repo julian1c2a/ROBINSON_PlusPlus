@@ -275,6 +275,529 @@
       "nivel_excepcion": "parte de PrfH y concluye en Prf; la chapa marca la conclusión"
     },
     {
+      "clave": "ax_q1",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax2_peano_succ_neq_zero",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_q4",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax4_add_zero",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_q5",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax5_add_succ",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_q7",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax9_mul_succ",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_add_comm",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax6_add_comm",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_sqrt",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax14_sqrt_le",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_sub",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax29_sub_witness",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_cons_def",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax_L0_cons_def",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "nivel_excepcion": "`ax_` anuncia un axioma objeto, pero la DECLARACIÓN es de Lean: un `def : Formula` o un `axiom`. La chapa marca dónde vive la declaración; lo que enuncia es objeto"
+    },
+    {
+      "clave": "lemma_C5",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Theorems/Block4_C5.lean",
+      "decl": "lemma_C5",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim"
+      ],
+      "nivel": [
+        "derives",
+        "objeto"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "cantor_surjectivity",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Theorems/Block4_C6_C7.lean",
+      "decl": "cantor_surjectivity",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim"
+      ],
+      "nivel": [
+        "derives",
+        "objeto"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "pair_inj",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Theorems/Block5.lean",
+      "decl": "pair_inj",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim"
+      ],
+      "nivel": [
+        "derives",
+        "objeto"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "teo_F3",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Theorems/Block7.lean",
+      "decl": "teo_F3",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim"
+      ],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "ax_p_tfa",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Theorems/Block8.lean",
+      "decl": "ax_p_tfa",
+      "capa": "produccion",
+      "footprint": [
+        "ROBINSON_PlusPlus.Minimal.Theorems.Block8.ax_p_tfa"
+      ],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "solo_firma": true,
+      "nivel_excepcion": "`ax_` anuncia un axioma objeto, pero la DECLARACIÓN es de Lean: un `def : Formula` o un `axiom`. La chapa marca dónde vive la declaración; lo que enuncia es objeto"
+    },
+    {
+      "clave": "ax_induction",
+      "modulo": "ROBINSON_PlusPlus/Full/Induction.lean",
+      "decl": "ax_induction",
+      "capa": "produccion",
+      "footprint": [
+        "ROBINSON_PlusPlus.Full.ax_induction"
+      ],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "solo_firma": true,
+      "nivel_excepcion": "`ax_` anuncia un axioma objeto, pero la DECLARACIÓN es de Lean: un `def : Formula` o un `axiom`. La chapa marca dónde vive la declaración; lo que enuncia es objeto"
+    },
+    {
+      "clave": "add_comm_thm",
+      "modulo": "ROBINSON_PlusPlus/Full/Induction.lean",
+      "decl": "add_comm_thm",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim",
+        "ROBINSON_PlusPlus.Full.ax_induction"
+      ],
+      "nivel": [
+        "derives",
+        "objeto"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "tfa_numeral",
+      "modulo": "ROBINSON_PlusPlus/Full/Factorization.lean",
+      "decl": "tfa_numeral",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim",
+        "ROBINSON_PlusPlus.Full.ax_induction",
+        "ROBINSON_PlusPlus.Full.ax_list_induction"
+      ],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "ax_in_cons",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax_L2_in_cons",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "nivel_excepcion": "`ax_` anuncia axioma objeto; la DECLARACIÓN es un `def : Formula` de Lean"
+    },
+    {
+      "clave": "carc",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "carc",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "lenc",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "lenc",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "nthc",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "nthc",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "Sym",
+      "modulo": "ROBINSON_PlusPlus/Meta/Godel.lean",
+      "decl": "Sym",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "gNat",
+      "modulo": "ROBINSON_PlusPlus/Meta/Godel.lean",
+      "decl": "gNat",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "encode",
+      "modulo": "ROBINSON_PlusPlus/Meta/Godel.lean",
+      "decl": "encode",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "termCode",
+      "modulo": "ROBINSON_PlusPlus/Meta/Provability.lean",
+      "decl": "termCode",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "formCode",
+      "modulo": "ROBINSON_PlusPlus/Meta/Provability.lean",
+      "decl": "formCode",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "formCode_injective",
+      "modulo": "ROBINSON_PlusPlus/Meta/Provability.lean",
+      "decl": "formCode_injective",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim"
+      ],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "IsFormula",
+      "modulo": "ROBINSON_PlusPlus/Meta/Provability.lean",
+      "decl": "IsFormula",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "Provable",
+      "modulo": "ROBINSON_PlusPlus/Meta/Provability.lean",
+      "decl": "Provable",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "provable_formCode_iff",
+      "modulo": "ROBINSON_PlusPlus/Meta/Provability.lean",
+      "decl": "provable_formCode_iff",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim"
+      ],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "lineWF",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "lineWF",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "premsOf",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "premsOf",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "runFn",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "runFn",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "chainOk",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "chainOk",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "provFormulaC",
+      "modulo": "ROBINSON_PlusPlus/Meta/ProofChain.lean",
+      "decl": "provFormulaC'",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "provCodeC",
+      "modulo": "ROBINSON_PlusPlus/Meta/ProofChain.lean",
+      "decl": "provCodeC'",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "repr_pos",
+      "modulo": "ROBINSON_PlusPlus/Meta/Representability2.lean",
+      "decl": "repr_pos'",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim",
+        "ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq"
+      ],
+      "nivel": [
+        "derives",
+        "Prov"
+      ],
+      "solo_firma": true
+    },
+    {
+      "clave": "repr_pos_prf",
+      "modulo": "ROBINSON_PlusPlus/Meta/Representability2Prf.lean",
+      "decl": "repr_pos'_prf",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound",
+        "FOL.MetaRules.imp_intro",
+        "FOL.MetaRules.gen",
+        "FOL.MetaRules.raa",
+        "FOL.MetaRules.or_elim",
+        "FOL.MetaRules.ex_elim",
+        "ROBINSON_PlusPlus.Meta.Representability2Prf.prf_axiomsCodeT_eq"
+      ],
+      "nivel": [
+        "Prf",
+        "Prov"
+      ],
+      "solo_firma": true
+    },
+    {
       "clave": "triN",
       "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
       "decl": "triN",
