@@ -1426,16 +1426,6 @@ namespace ENS
     ## §0 · Combinadores (copias literales de `sondeos/EvalSubsttc.lean` §D)
     ############################################################################ -/
 
-theorem impT {A B C : Formula} (h1 : Prf (A ⇒ B)) (h2 : Prf (B ⇒ C)) : Prf (A ⇒ C) := by
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (prf_to_prfH h2 _) (PrfH.mp _ _ _ (prf_to_prfH h1 _) (prfH_hyp_self _))
-
-theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ C)) :
-    Prf (lor A B ⇒ C) := by
-  refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
-    (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 /-! ############################################################################
     ## §1 · COPIAS LITERALES del reconocedor de codigo de TERMINO sin `wTs`
@@ -1463,34 +1453,6 @@ def hasWit (c : Term) : Formula := Formula.ex (isTC1 (.var 0) (liftTerm 0 c))
 
 /-! ### Fontaneria De Bruijn del bloque de TERMINO (copias literales) -/
 
-theorem liftF_argsIn (k : Nat) (wT Y : Term) :
-    liftFormula k (argsIn wT Y) = argsIn (liftTerm k wT) (liftTerm k Y) := by
-  simp only [argsIn, argsInBody, liftFormula, lt, lenc, nthc, In, liftTerm, liftTerms,
-    Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
-
-theorem substF_argsIn (v : Nat) (s wT Y : Term) :
-    substFormula v s (argsIn wT Y) = argsIn (substTerm v s wT) (substTerm v s Y) := by
-  have hz : (0 = v + 1) = False := eq_false (by omega)
-  have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [argsIn, argsInBody, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
-    liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
-    FOL.substTerm_lift_comm_zero]
-
-theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
-    liftFormula k (isTermCodeE1 wT X) = isTermCodeE1 (liftTerm k wT) (liftTerm k X) := by
-  simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, liftFormula, liftF_argsIn,
-    nthc, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
-
-theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
-    substFormula v s (isTermCodeE1 wT X)
-      = isTermCodeE1 (substTerm v s wT) (substTerm v s X) := by
-  simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, substFormula, substF_argsIn,
-    nthc, cons, nil, zero, substTerm, substTerms, substTerm_numeralM]
-
-theorem liftF_wfAll1 (k : Nat) (w : Term) :
-    liftFormula k (wfAll1 w) = wfAll1 (liftTerm k w) := by
-  simp only [wfAll1, wfAll1Body, liftFormula, liftF_isTermCodeE1, lt, lenc, nthc,
-    liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
 
 theorem substF_wfAll1 (v : Nat) (s w : Term) :
     substFormula v s (wfAll1 w) = wfAll1 (substTerm v s w) := by
@@ -1713,7 +1675,6 @@ theorem liftF_hasWitF (k : Nat) (c : Term) :
   have h1 : (1 < k + 1 + 1) = True := eq_true (by omega)
   simp only [hasWitF, liftFormula, liftF_isFC1, liftTerm, Nat.reduceAdd, h1, if_true,
     Nat.zero_lt_succ, reduceIte, ← FOL.liftTerm_comm_zero]
-
 
 
 /-! ### El kit de DISCRIMINACIÓN (promovido de `sondeos/EvalSubstfcPrf.lean`, B8)
@@ -2236,7 +2197,7 @@ theorem prf_wfAll1_of_list (L : List Term)
   have hAI : SinWTs.wfAll1 (objList L)
       = Formula.forall (Formula.impl (lt (.var 0) (lenc (objList L)))
           (SinWTs.isTermCodeE1 (objList L) (nthc (objList L) (.var 0)))) := by
-    simp only [SinWTs.wfAll1, SinWTs.wfAll1Body, lt, lenc, nthc, ENS.liftF_isTermCodeE1,
+    simp only [SinWTs.wfAll1, SinWTs.wfAll1Body, lt, lenc, nthc, SinWTs.liftF_isTermCodeE1,
       liftTerm, liftTerms, hWl]
   rw [hAI]
   refine SinWTs.prf_bdAll_of_bound _ (lenc (objList L)) L.length ?_
@@ -2350,3 +2311,27 @@ end S_HW
 
 
 end ROBINSON_PlusPlus.Meta.CodeWitnessPrf
+/-! ## AI-GUIDE §17 · bloque `export` del modulo
+
+    ⚠️ **CRITERIO: sale a la raiz lo que OTRO modulo consume, no lo que existe.**
+    Medido: de las 214 declaraciones, **50** se usan desde fuera de este fichero y 157 no.
+    La propuesta inicial de la auditoria era exportar 202 — o sea ~152 nombres que no usa
+    nadie, y cada uno choca con una re-declaracion en `sondeos/` (los 207 nombres del
+    modulo estan re-declarados alli, y 50 de los 57 sondeos importan el barrel).
+
+    Los 7 nombres que viven en `SinWTs` **y** en `ENS` salen por `SinWTs`, que es el
+    canonico; las copias de `ENS` se han retirado en la misma pasada. -/
+
+export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs (
+  argsIn argsInBody closed_mem_tcodes1 consOk crit_junk_var0_witness1 impT isTC1 isTermCodeE1
+  liftF_argsIn liftF_isTermCodeE1 liftF_wfAll1 liftTerm_objList mem_tcodes1s_of_mem
+  prf_argsIn_head prf_argsIn_of_closed prf_argsIn_tail prf_congr_In_left prf_congr_liftc
+  prf_consOk_cons prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn
+  prf_isTermCodeE1_of_In prf_lenc_termsCodeM prf_nthc_termsCodeM prf_or_elim_imp prf_orL
+  prf_orR PrfH_congr_argsIn PrfH_congr_In_left PrfH_congr_lenc PrfH_congr_liftc
+  PrfH_congr_nthc_lst PrfH_inst_argsIn PrfH_inst_wfAll1 shapeBin shapeUn substF_argsIn
+  substF_isTermCodeE1 substTerm_objList tcodes1 wfAll1)
+
+export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS (
+  CRIT_hasWit_real hasWit liftF_hasWit liftF_isTC1 prf_isFormCodeE2_of_boundedIn
+  substF_hasWit substF_isTC1 substF_wfAll1)
