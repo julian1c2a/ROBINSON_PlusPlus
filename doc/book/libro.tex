@@ -1,0 +1,95 @@
+% =============================================================================
+%  Incompletitud, formalizada
+%  Julián Calderón Almendros · Licencia MIT
+%
+%  Documento maestro. El índice sigue PLAN-LIBRO.md §3; los capítulos aún no
+%  escritos están comentados, para que el esqueleto refleje el plan completo.
+%
+%  Compilar:  make          (extrae del repo y compila)
+%             make pdf      (sólo compila; falla si falta algún fragmento)
+% =============================================================================
+\documentclass[11pt,openright]{book}
+\input{preamble.tex}
+
+\title{\bfseries Incompletitud, formalizada\\[0.4em]
+       \large Un recorrido por la formalización real de los teoremas de Gödel
+       en Lean 4}
+\author{Julián Calderón Almendros}
+\date{\normalsize\vspace{2em}
+  Prosa bajo \textbf{CC BY-SA 4.0} \quad·\quad código Lean 4 bajo \textbf{MIT}\\[0.3em]
+  {\small Ver el apéndice \emph{Licencia}}}
+
+\begin{document}
+
+\frontmatter
+\maketitle
+
+% -- Estado del código sobre el que se escribe este ejemplar ------------------
+% GENERADO por scripts/extraer.py. Es el control §2.2(b): el libro declara
+% contra qué commit y con qué build se ha verificado cada teorema que cita.
+\IfFileExists{extraido/_estado.tex}{\input{extraido/_estado.tex}}{%
+  \chapter*{Estado del código}
+  \textbf{(sin generar)} — ejecuta \texttt{make extraer} antes de compilar.}
+
+\input{capitulos/00-nomenclatura.tex}
+
+\tableofcontents
+
+\mainmatter
+
+% =============================================================================
+\part{El terreno}
+% =============================================================================
+% \include{capitulos/cap01-que-dice-godel}
+\include{capitulos/cap02-kernel-fol}       % ← fase 1
+% \include{capitulos/cap03-objeto-y-meta}
+% \include{capitulos/cap04-robinson-qpp}
+
+% =============================================================================
+\part{Aritmetización}
+% =============================================================================
+% \include{capitulos/cap05-codificar-estructuras}
+% \include{capitulos/cap06-codigos-de-sintaxis}
+% \include{capitulos/cap07-el-verificador}
+% \include{capitulos/cap08-representabilidad-d1}
+
+% =============================================================================
+\part{Los teoremas}
+% =============================================================================
+% \include{capitulos/cap09-autorreferencia}
+% \include{capitulos/cap10-godel-i}
+% \include{capitulos/cap11-la-mitad-que-falta}
+% \include{capitulos/cap12-condiciones-de-derivabilidad}
+% \include{capitulos/cap13-la-induccion-como-precio}
+% \include{capitulos/cap14-godel-ii-modulo-d3}
+
+% =============================================================================
+\part{Lo que no sale en los libros}
+% =============================================================================
+% \include{capitulos/cap15-muro-substfc}
+% \include{capitulos/cap16-inconsistencia-latente}
+% \include{capitulos/cap17-localizar-el-dano}
+% \include{capitulos/cap18-cuatro-reparaciones}
+\include{capitulos/cap19-codigos-como-numerales}   % ← PILOTO de la fase 0
+% \include{capitulos/cap20-la-cuarentena}
+% \include{capitulos/cap21-la-reconstruccion}
+% \include{capitulos/cap22-definir-en-vez-de-axiomatizar}
+% \include{capitulos/cap23-la-particion}
+% \include{capitulos/cap24-romper-el-muro}
+% \include{capitulos/cap25-tarea-imposible}
+% \include{capitulos/cap26-metodo}
+
+% =============================================================================
+\appendix
+% =============================================================================
+% \include{capitulos/apA-inventario-de-axiomas}
+% \include{capitulos/apB-mapa-de-modulos}
+% \include{capitulos/apC-trampas-de-lean}
+% \include{capitulos/apD-glosario}
+\include{capitulos/apE-licencia}
+
+\backmatter
+% \bibliographystyle{plain}
+% \bibliography{bib/libro}
+
+\end{document}

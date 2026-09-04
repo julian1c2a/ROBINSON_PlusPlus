@@ -1,0 +1,401 @@
+{
+  "_comentario": [
+    "EL MANIFIESTO. Es la lista cerrada de todo lo que el libro cita del repo.",
+    "Ver PLAN-LIBRO.md §2.1-§2.3. Campos:",
+    "  clave     — nombre del fichero generado en extraido/<clave>.tex",
+    "  modulo    — ruta relativa a la raíz del repo",
+    "  decl      — nombre exacto de la declaración Lean",
+    "  capa      — 'produccion' (alcanzable desde ROBINSON_PlusPlus.lean) o 'sondeo'",
+    "  footprint — #print axioms. OBLIGATORIO en produccion. [] significa net-0.",
+    "              `make axiomas` lo mide; `make axiomas-fix` lo escribe aquí.",
+    "  nivel     — [quién afirma, sobre qué]. OBLIGATORIO (§2.5).",
+    "              afirma: Lean | derives | Prf   ·   sobre: Lean | sintaxis | objeto | codigo | Prov",
+    "  nivel_excepcion — razón por la que el prefijo del nombre y el nivel no cuadran.",
+    "                    Adjudica el aviso; sin ella el aviso reaparece en cada extracción."
+  ],
+  "base_sancionada": [
+    "propext",
+    "Classical.choice",
+    "Quot.sound",
+    "FOL.MetaRules.imp_intro",
+    "FOL.MetaRules.gen",
+    "FOL.MetaRules.raa",
+    "FOL.MetaRules.dne",
+    "FOL.MetaRules.or_elim",
+    "FOL.MetaRules.ex_elim",
+    "ROBINSON_PlusPlus.Full.Induction.ax_induction",
+    "ROBINSON_PlusPlus.Full.Lists.ax_list_induction",
+    "ROBINSON_PlusPlus.Full.Mod2.ax_mod2_alternation",
+    "ROBINSON_PlusPlus.Minimal.Theorems.Block8.ax_p_tfa",
+    "ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq",
+    "ROBINSON_PlusPlus.Minimal.Axioms.prf_axiomsCodeT_eq",
+    "ROBINSON_PlusPlus.Meta.GodelTwo.d3"
+  ],
+  "fragmentos": [
+    {
+      "clave": "fol_Term",
+      "modulo": "../FOL/FOL/FOL.lean",
+      "decl": "Term",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_Formula",
+      "modulo": "../FOL/FOL/FOL.lean",
+      "decl": "Formula",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_liftTerm",
+      "modulo": "../FOL/FOL/FOL.lean",
+      "decl": "liftTerm",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_substTerm",
+      "modulo": "../FOL/FOL/FOL.lean",
+      "decl": "substTerm",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_substFormula",
+      "modulo": "../FOL/FOL/FOL.lean",
+      "decl": "substFormula",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_Derives",
+      "modulo": "../FOL/FOL/FOL.lean",
+      "decl": "Derives",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_deduction_theorem",
+      "modulo": "../FOL/FOL/Deduction.lean",
+      "decl": "deduction_theorem",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_gen",
+      "modulo": "../FOL/FOL/MetaRules.lean",
+      "decl": "gen",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "derives",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_imp_intro",
+      "modulo": "../FOL/FOL/MetaRules.lean",
+      "decl": "imp_intro",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "derives",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_substTerm_liftTerm",
+      "modulo": "../FOL/FOL/Theorems/Eq.lean",
+      "decl": "substTerm_liftTerm",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_substTerm_liftLift",
+      "modulo": "../FOL/FOL/Theorems/Eq.lean",
+      "decl": "substTerm_liftLift",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_liftTerm_comm_zero",
+      "modulo": "../FOL/FOL/Theorems/Eq.lean",
+      "decl": "liftTerm_comm_zero",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "fol_derive_eq_trans",
+      "modulo": "../FOL/FOL/Theorems/Eq.lean",
+      "decl": "derive_eq_trans",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "fol_derive_eq_symm",
+      "modulo": "../FOL/FOL/Theorems/Eq.lean",
+      "decl": "derive_eq_symm",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "fol_subst_lift_cancel",
+      "modulo": "../FOL/FOL/Theorems/Quantifiers.lean",
+      "decl": "subst_lift_cancel_formula",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "Prf_tipo",
+      "modulo": "ROBINSON_PlusPlus/Meta/Hilbert.lean",
+      "decl": "Prf",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "PrfH_tipo",
+      "modulo": "ROBINSON_PlusPlus/Meta/HilbertDeduction.lean",
+      "decl": "PrfH",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "prf_to_derives",
+      "modulo": "ROBINSON_PlusPlus/Meta/Hilbert.lean",
+      "decl": "prf_to_derives",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Quot.sound",
+        "FOL.MetaRules.dne"
+      ],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "objeto"
+      ],
+      "nivel_excepcion": "el prefijo `prf_` anuncia el cálculo de partida, pero la CONCLUSIÓN de un puente vive en el de llegada: aquí se afirma en ⊢"
+    },
+    {
+      "clave": "prf0_to_derives",
+      "modulo": "ROBINSON_PlusPlus/Meta/Hilbert.lean",
+      "decl": "prf0_to_derives",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Quot.sound"
+      ],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "objeto"
+      ],
+      "nivel_excepcion": "ídem: es el puente Prf₀ → ⊢, la conclusión afirma en ⊢"
+    },
+    {
+      "clave": "prf_deduction",
+      "modulo": "ROBINSON_PlusPlus/Meta/HilbertDeduction.lean",
+      "decl": "prf_deduction",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "objeto"
+      ],
+      "nivel_excepcion": "parte de PrfH y concluye en Prf; la chapa marca la conclusión"
+    },
+    {
+      "clave": "triN",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
+      "decl": "triN",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Lean"
+      ]
+    },
+    {
+      "clave": "consN",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
+      "decl": "consN",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Lean"
+      ]
+    },
+    {
+      "clave": "two_mul_consN",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
+      "decl": "two_mul_consN",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Lean"
+      ]
+    },
+    {
+      "clave": "codeNat",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
+      "decl": "codeNat",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "prf_cons_eval",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
+      "decl": "prf_cons_eval",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "nivel": [
+        "Prf",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "prf_formCode_numeral",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeNumeralPrf.lean",
+      "decl": "prf_formCode_numeral",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "nivel": [
+        "Prf",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "hFN",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "hFN",
+      "capa": "produccion",
+      "footprint": [
+        "propext",
+        "Classical.choice",
+        "Quot.sound"
+      ],
+      "nivel": [
+        "derives",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "piloto_codeN_axioma",
+      "modulo": "sondeos/PilotoDiagonal.lean",
+      "decl": "codeN",
+      "capa": "sondeo",
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "piloto_hFN_axioma",
+      "modulo": "sondeos/PilotoDiagonal.lean",
+      "decl": "hFN",
+      "capa": "sondeo",
+      "nivel": [
+        "derives",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "descarga_hFN",
+      "modulo": "sondeos/DescargaHFN.lean",
+      "decl": "hFN",
+      "capa": "sondeo",
+      "nivel": [
+        "derives",
+        "codigo"
+      ]
+    }
+  ],
+  "paquetes": {
+    "ROBINSON_PlusPlus": ".",
+    "FOL": "../FOL"
+  }
+}

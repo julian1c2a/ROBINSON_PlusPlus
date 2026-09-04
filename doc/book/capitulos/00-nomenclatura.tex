@@ -1,0 +1,87 @@
+%% Nomenclatura y notación. Va ANTES del índice y después de la leyenda de
+%% niveles: PLAN-LIBRO.md §2.7 — nada se usa antes de estar definido.
+\chapter*{Nomenclatura, niveles y notación}
+\addcontentsline{toc}{chapter}{Nomenclatura, niveles y notación}
+
+Este capítulo no supone nada. Da los cuatro alfabetos que hacen falta para leer el resto: las
+\textbf{palabras}, los \textbf{niveles}, los \textbf{nombres} y los \textbf{signos}. Se puede
+saltar y volver — pero nada de lo que viene después usa un término que no esté aquí, y eso está
+comprobado por una máquina, no por buena voluntad.
+
+\section*{1 · Las palabras}
+
+Cada entrada lleva, además de su definición, una etiqueta que dice \textbf{de qué lado está lo que
+nombra}. No es un adorno: es la primera pregunta que hay que saber contestar de cualquier palabra de
+este libro, y dejarla implícita es la puerta por la que entró la inconsistencia que cuenta la
+Parte~IV.
+
+\begin{center}\footnotesize
+\nivelterm{meta} del lado de Lean, donde razonamos\quad
+\nivelterm{objeto} del lado del sistema aritmético del que se habla\\[0.35em]
+\nivelterm{meta→objeto} una función de Lean que \emph{produce} sintaxis de ese sistema\quad
+\nivelterm{ambos} nombra la distinción misma\\[0.35em]
+\nivelterm{proyecto} una noción sobre el proyecto, no sobre las teorías
+\end{center}
+
+\input{extraido/_glosario.tex}
+
+\input{capitulos/00-niveles.tex}
+
+\section*{3 · Cómo se lee un nombre}
+
+Los identificadores van en inglés y siguen las convenciones de Mathlib. Tres reglas bastan para
+leer casi cualquiera:
+
+\begin{enumerate}[leftmargin=1.4em]
+\item \textbf{La conclusión primero, las hipótesis con \ident{_of_}.} El nombre dice \emph{qué se
+  demuestra}, no cómo. \ident{isNat_succ_of_isNat} es «$\sigma n$ es natural, \emph{a partir de}
+  que $n$ lo es».
+\item \textbf{Los bicondicionales acaban en \ident{_iff}.} \ident{prf_In_iff_boundedIn} es un «si y
+  sólo si».
+\item \textbf{Los símbolos se deletrean}: \ident{add}, \ident{mul}, \ident{succ}, \ident{eq},
+  \ident{lt}, \ident{le}, \ident{dvd}, \ident{not}, \ident{forall}, \ident{exists}. Así
+  \ident{prf_add_zero_left} se lee sin traducir.
+\end{enumerate}
+
+Y hay algo más útil todavía, porque conecta con la chapa de la sección anterior:
+\textbf{el prefijo dice en qué nivel se afirma.} No es una impresión — es la práctica medida del
+proyecto:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l r >{\raggedright\arraybackslash}X@{}}
+\toprule
+prefijo & símbolos & qué anuncia \\
+\midrule
+\ident{ax_}   & 154 & un \defterm{axioma objeto}: se postula, no se demuestra \\
+\ident{prf_}  & 585 & un teorema del cálculo finitario \ident{Prf} \\
+\ident{pcc_}  & 214 & un teorema de \ident{Prf} \textbf{dentro de} \ident{Prov} — la teoría hablando de sí misma \\
+\ident{CRIT_} & 13  & un \defterm{sondeo} crítico: una pregunta contestada, a menudo en negativo \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\nota{Los recuentos son de \modulo{ROBINSON\_PlusPlus/} a 2026-09-03. La excepción conocida son las
+seis meta-reglas $\omega$ de \modulo{FOL}, anteriores a la convención, que no llevan \ident{ax_}.}
+
+\section*{4 · Los signos}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+signo & qué es \\
+\midrule
+$\Gamma \vdash A$ & $A$ se deriva de las hipótesis $\Gamma$ en el cálculo $\omega$ \\
+$\Prf\,A$ & $A$ se deriva en el cálculo de Hilbert finitario, sin hipótesis \\
+$\sigma n$ & el sucesor de $n$ \\
+$t \doteq u$ & igualdad \textbf{del lenguaje objeto} (no la de Lean, que es \ident{=}) \\
+\texttt{\#0} & la variable ligada más cercana: un \defterm{índice de De Bruijn} \\
+$\codigo{\varphi}$ & el \defterm{código de Gödel} de $\varphi$: un término objeto que la denota \\
+$\dotado{a}$ & «$a$ dotado»: el código de $a$ construido \emph{dentro} del lenguaje (\ident{tcFn}) \\
+$\Prov(\codigo{\varphi})$ & la fórmula objeto que dice «$\varphi$ es demostrable» \\
+$\Delta_0$, $\Sigma_1$ & clases de fórmulas por su cuantificación: acotada, y $\exists$ sobre acotada \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\nota{Ningún término técnico aparece en este libro antes de estar definido aquí. Lo comprueba
+\modulo{doc/book/scripts/terminos.py} en cada compilación, y no admite excepciones.}

@@ -1,0 +1,41 @@
+{
+  "_comentario": [
+    "Identificadores que el libro nombra y que NO son declaraciones del repo.",
+    "Cada uno lleva su razón: la doctrina es adjudicar, no silenciar en bloque.",
+    "Ver PLAN-LIBRO.md §2.6 y DOCSTRINGS-NO-FIABLES.md.",
+    "Las entradas de tipo «prefijo» y «diccionario» no son símbolos: el libro",
+    "las cita como PIEZAS de la gramática de nombres, en el cap. de nomenclatura."
+  ],
+  "exentos": {
+    "Nat": "tipo del núcleo de Lean",
+    "List": "tipo del núcleo de Lean",
+    "Prop": "universo de Lean",
+    "String": "tipo del núcleo de Lean",
+    "Char": "tipo del núcleo de Lean",
+    "axiom": "palabra clave de Lean",
+    "theorem": "palabra clave de Lean",
+    "import": "palabra clave de Lean",
+    "rfl": "término del núcleo de Lean",
+    "simp": "táctica de Lean",
+    "by": "palabra clave de Lean",
+    "Semantics": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Soundness": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Completeness": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Compacity": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Impl": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Neg": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Derived": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "Quantifiers": "módulo de FOL nombrado sin ruta, en la tabla de alcance",
+    "ax_": "prefijo, no identificador: se cita en la tabla de nomenclatura",
+    "prf_": "prefijo, no identificador: se cita en la tabla de nomenclatura",
+    "pcc_": "prefijo, no identificador: se cita en la tabla de nomenclatura",
+    "CRIT_": "prefijo, no identificador: se cita en la tabla de nomenclatura",
+    "_of_": "infijo de la REGLA 1 de NAMING-CONVENTIONS.md, no un símbolo",
+    "_iff": "sufijo de la REGLA 2 de NAMING-CONVENTIONS.md, no un símbolo",
+    "dvd": "entrada del diccionario símbolo→palabra (∣), no una declaración",
+    "not": "entrada del diccionario símbolo→palabra (¬), no una declaración",
+    "exists": "entrada del diccionario símbolo→palabra (∃), no una declaración",
+    "Prov": "notación matemática del libro; en el código es provCodeC'/provFromCode",
+    "isNat_succ_of_isNat": "ejemplo de NAMING-CONVENTIONS.md tomado de otro proyecto; ilustra la REGLA 1"
+  }
+}

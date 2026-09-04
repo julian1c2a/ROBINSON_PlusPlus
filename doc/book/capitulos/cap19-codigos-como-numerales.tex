@@ -1,0 +1,147 @@
+\chapter{La reparación: códigos como numerales}
+\label{cap:numerales}
+
+El capítulo anterior terminó en un sitio incómodo: cuatro reparaciones razonables, y ninguna
+funciona. Éste cuenta la que sí, y por qué —vista desde el final— era la única que podía funcionar.
+
+\section{El diagnóstico, en una línea}
+
+La inconsistencia no venía de un axioma equivocado sino de un \textbf{error de categoría}. El
+símbolo objeto \ident{tcFn} —«el código del código»— es una operación sobre \emph{sintaxis},
+declarada como función \emph{objeto}. Y una función objeto sólo puede depender de \textbf{valores}.
+
+\begin{leccion}[La distinción que lo explica todo]
+Un predicado \emph{es} un subconjunto: separa números, no maneras de escribirlos.
+\ident{substfc} necesita un reconocedor \textbf{extensional} —¿pertenece este número al conjunto de
+los códigos de fórmula?—, y eso un predicado lo puede dar. \ident{tcFn} necesita una distinción
+\textbf{intensional} —¿qué sintaxis escribimos para denotar el número 9?—, y eso ningún predicado
+lo puede dar, porque no está separado en los valores.
+\end{leccion}
+
+Con $\codigo{\varphi}$ escrito como \textbf{árbol} \ident{cons}, la sintaxis no se recupera del
+valor: \ident{ax_L0_cons_def} identifica \ident{cons h t} con \ident{pair h (σt)}, así que en
+$\mathbb{N}$ el mismo número es a la vez un par y un sucesor, y \ident{tcFn} debía devolver dos
+códigos distintos para él. Con $\codigo{\varphi}$ escrito como \textbf{numeral}, la ambigüedad
+desaparece por una razón que conviene decir despacio: \textbf{el numeral es canónico}. Sólo hay una
+manera de escribir $\sigma^n 0$.
+
+\begin{refutado}[Y no era «indemostrable»: era falso]
+La lectura sintáctica de \ident{tcFn} sobre \ident{cons} con argumentos abstractos no es una ecuación
+que faltase probar. Bajo la lectura numeral obliga a que un código de cabeza $\codigo{\sigma}$ sea
+igual a uno de cabeza $\codigo{::}$. Medido en \modulo{sondeos/PilotoRastreada.lean}.
+\end{refutado}
+
+\section{La aritmética sale sin división}
+
+El obstáculo práctico de la vía numeral es el polinomio de Cantor: \ident{cons} se define como
+$\mathrm{div2}$ de él, y razonar sobre divisibilidad dentro de la teoría objeto es caro. La salida
+es no razonar sobre ella en absoluto. Se define el valor del código con \textbf{números
+triangulares}, de modo que la mitad ya está tomada.
+
+\begin{matematica}[Números triangulares y valor de un \ident{cons}]
+\[
+T(0)=0,\qquad T(n{+}1)=T(n)+(n{+}1),
+\qquad\text{luego}\qquad 2\,T(n)=n(n{+}1).
+\]
+\[
+\mathrm{consN}(a,b) \;=\; T\bigl(a+(b{+}1)\bigr) + (b{+}1),
+\qquad
+2\cdot\mathrm{consN}(a,b) \;=\; \underbrace{(a{+}b{+}1)(a{+}b{+}2) + 2(b{+}1)}_{\text{polinomio de Cantor de }\langle a,b\rangle}.
+\]
+La segunda identidad es una igualdad de \ident{Nat}, demostrable por reescritura. No hay división
+en ninguna parte.
+\end{matematica}
+
+\leanfrag{triN}
+\leanfrag{consN}
+\leanfrag{two_mul_consN}
+
+\begin{leccion}[Dónde está el truco]
+No se ha evitado la división eligiendo mejor las tácticas: se ha evitado \emph{eligiendo la
+definición}. \ident{consN} se define ya multiplicado por dos, y por eso engancha directamente en la
+forma $2m$ exacta que pide \ident{prf_div2_numeral}. Cuando una prueba obliga a razonar sobre una
+operación cara, la primera pregunta no es cómo probarlo, sino si la definición se puede escribir
+del otro lado.
+\end{leccion}
+
+\section{De la identidad en \ident{Nat} a la evaluación provable}
+
+La identidad anterior vive en la metateoría. Para que sirva hay que subirla al cálculo: la teoría
+objeto tiene que \emph{probar} que el árbol de código y el numeral de su valor son el mismo número.
+
+\leanfrag{prf_cons_eval}
+
+Con ese peldaño, el espejo meta de \ident{formCode} —la función \ident{codeNat}, que calcula en
+\ident{Nat} lo que \ident{formCode} construye como término— cierra el puente por meta-recursión sobre
+la estructura de la fórmula.
+
+\leanfrag{codeNat}
+
+\begin{teorema}[El código de una fórmula \emph{es} un numeral]
+\label{teo:formcode-numeral}
+Para toda fórmula $\varphi$, la teoría prueba
+$\codigo{\varphi} \;=\; \mathrm{numeral}\bigl(\mathrm{codeNat}(\varphi)\bigr)$.
+\end{teorema}
+
+\leanfrag{prf_formCode_numeral}
+
+Obsérvese que la prueba es una \textbf{meta-recursión}: un caso por constructor de \ident{Formula},
+cada uno ensamblado con \ident{prf_cons_eval_of}. No hay inducción de la teoría objeto por ninguna
+parte, y por eso el footprint se queda en la base del kernel.
+
+\section{El puente, y qué cambia en los enunciados}
+
+Del lado del cálculo $\derives$, el mismo hecho es la hipótesis que el piloto del lema diagonal
+daba por supuesta, y que aquí queda \textbf{descargada}:
+
+\leanfrag{hFN}
+
+\begin{muro}[Lo que sí cambia]
+Refundar por la vía numeral \textbf{cambia enunciados, no sólo pruebas}: el código estático que
+aparece dentro de los teoremas pasa de \ident{termCode (formCode φ)} a
+\ident{termCode (numeral (codeNat φ))}. Cada consumidor hay que revisarlo, o componerlo con
+\ident{provCode_transfer}, que puentea las dos representaciones en un solo paso de Leibniz.
+\end{muro}
+
+\section{Cómo se decidió: pilotar antes de ejecutar}
+
+Aquí está, para mi gusto, la lección de ingeniería del capítulo. La reparación exigía construir
+unos veinte lemas nuevos. Antes de escribir ninguno se hizo lo contrario de lo intuitivo:
+\textbf{se asumió el resultado costoso como axioma de Lean} y se comprobó que, con él, la cadena
+cerraba de verdad.
+
+\leanfrag{piloto_codeN_axioma}
+\leanfrag{piloto_hFN_axioma}
+
+Con esos dos axiomas puestos, el piloto reconstruyó el lema diagonal entero y comprobó que el punto
+fijo salía. Sólo entonces se invirtió el trabajo en probarlos — y el sondeo gemelo descargó \ident{hFN}
+sin axioma ninguno:
+
+\leanfrag{descarga_hFN}
+
+\begin{leccion}[Un axioma temporal es un instrumento de medida]
+Poner un \ident{axiom} de Lean no es hacer trampa si se hace \emph{para preguntar}. Contesta la única
+pregunta que importa antes de invertir: \emph{si tuviera esto, ¿cerraría?} Si la respuesta es no, se
+han ahorrado veinte lemas; si es sí, se sabe exactamente dónde van a enchufarse. Lo que sería hacer
+trampa es olvidarse de quitarlo — y contra eso está el inventario de \doc{AXIOMS.md} y la auditoría
+por \printaxioms.
+\end{leccion}
+
+\section{El coste}
+
+\begin{center}\small
+\begin{tabular}{ll}
+\toprule
+Axiomas retirados & \ident{ax_tc_cons} \\
+Axiomas nuevos & ninguno \\
+Balance & $-1$ \\
+Módulos afectados & 31, a cuarentena (capítulo siguiente) \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Es un resultado poco frecuente: la reparación de una inconsistencia que \textbf{reduce} la
+superficie axiomática en vez de ampliarla. La razón es que no se añadió nada para tapar el agujero;
+se cambió la \emph{representación} para que el agujero no existiera.
+
+\avisoreparacion

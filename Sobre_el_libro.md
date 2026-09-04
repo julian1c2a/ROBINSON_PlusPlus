@@ -4,6 +4,17 @@ marp: true
 
 # Sobre el libro
 
+> ## ⚠️ NOTA HISTÓRICA — 2026-09-03
+>
+> Este documento **ya no es normativo**. Su contenido (la progresión pedagógica: arrancar por FOL,
+> lenguaje natural, teoría objeto vs metateoría, gramática y reglas de inferencia explícitas antes
+> de la autorreferencia) se ha **fusionado** en **[PLAN-LIBRO.md](PLAN-LIBRO.md)**, que es el plan
+> único del libro. Si este fichero diverge de aquél, **manda `PLAN-LIBRO.md`**.
+>
+> Se conserva porque es el enunciado original de la intención del libro, en primera persona, y como
+> tal es material citable para el propio libro.
+
+
 Para comenzar, quiero que este libro sea más una guía personal que un manual técnico.
 
 La primera parte será sobre de dónde partimos. Sobre lo dado en el proyecto FOL. Quiero que introduzca de forma fluida los distintos conceptos que se han desarrollado en el proyecto FOL, y será la base sobre la que trabajar. Necesitamos tener en forma matemática y formal esos conceptos introducidos y al menos las firmas de los teoremas y axiomas desarrollados en el proyecto FOL.

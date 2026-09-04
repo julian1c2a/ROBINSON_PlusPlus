@@ -1,0 +1,362 @@
+% =============================================================================
+%  preamble.tex — Incompletitud, formalizada
+%  Estilo, paquetes y los cinco entornos del libro.
+%  Ver PLAN-LIBRO.md §4. NO contiene texto del libro.
+% =============================================================================
+
+% --- Motor -------------------------------------------------------------------
+% El libro se compila con LuaLaTeX. Motivo: el proyecto usa Unicode
+% intensivamente (σ ⟹ ⊢ ≐ ⌜·⌝ ⟨·⟩ Σ₁ Δ₀ ˙) y fontspec + luaotfload permiten
+% una cadena de fuentes de respaldo por glifo. Con pdflatex esto no es viable.
+\usepackage{iftex}
+\ifLuaTeX\else\ifXeTeX\else
+  \PackageError{preamble}{Compila con LuaLaTeX o XeLaTeX, no con pdfLaTeX}{%
+    El libro necesita fontspec para el Unicode del proyecto.}%
+\fi\fi
+
+\usepackage[a4paper,margin=2.6cm,bottom=3cm]{geometry}
+\usepackage{fontspec}
+% babel español si la instalación de TeX lo trae; si no, se compila igual y
+% sólo se pierden la partición de palabras y los rótulos automáticos.
+\IfFileExists{spanish.ldf}{%
+  \usepackage[spanish,es-noshorthands]{babel}%
+}{%
+  \PackageWarningNoLine{preamble}{spanish.ldf no disponible:
+    instala texlive-lang-spanish para partición de palabras correcta}%
+  \AtBeginDocument{%
+    \renewcommand{\contentsname}{Índice}%
+    \renewcommand{\partname}{Parte}%
+    \renewcommand{\chaptername}{Capítulo}%
+    \renewcommand{\appendixname}{Apéndice}%
+    \renewcommand{\bibname}{Bibliografía}%
+    \renewcommand{\tablename}{Tabla}%
+    \renewcommand{\figurename}{Figura}%
+  }%
+}
+\usepackage{csquotes}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{amsmath,amssymb,amsthm,mathtools}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{array}
+\usepackage{enumitem}
+\usepackage{etoolbox}
+\usepackage[most]{tcolorbox}
+\usepackage{fancyvrb}
+\usepackage{fvextra}  % breaklines para fancyvrb
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage[nameinlink]{cleveref}
+
+% Margen de estiramiento para párrafos con mucho \texttt: sin él, una racha de
+% identificadores sin puntos de corte desborda por unos pocos puntos.
+\setlength{\emergencystretch}{2.5em}
+
+% --- Fuentes -----------------------------------------------------------------
+% Texto: se prefiere Libertinus (buena cobertura griega y matemática);
+% si no está instalada, Latin Modern.
+\IfFontExistsTF{Libertinus Serif}{%
+  \setmainfont{Libertinus Serif}\setsansfont{Libertinus Sans}%
+}{\IfFontExistsTF{Latin Modern Roman}{%
+  \setmainfont{Latin Modern Roman}\setsansfont{Latin Modern Sans}%
+}{%
+  \setmainfont{DejaVu Serif}\setsansfont{DejaVu Sans}%
+}}
+
+% Código: DejaVu Sans Mono cubre casi todo el Unicode del proyecto.
+% Se declara una CADENA DE RESPALDO por glifo: si DejaVu no tiene el signo,
+% luaotfload lo busca en las siguientes. Sin esto aparecen cuadraditos en
+% ⌜·⌝, ≐ o los puntos de «dotar» (ȧ).
+% Sólo LuaLaTeX admite cadena de respaldo por glifo (luaotfload). Bajo XeLaTeX
+% se depende de la cobertura de la fuente elegida.
+\makeatletter
+\newif\ifrpp@fb  % ¿hay cadena de respaldo por glifo?
+\ifLuaTeX
+\IfFileExists{luaotfload-main.lua}{%
+  \directlua{
+    if luaotfload and luaotfload.add_fallback then
+      luaotfload.add_fallback("leanfallback", {
+        "DejaVuSansMono:mode=harf;",
+        "Symbola:mode=harf;",
+        "NotoSansMath-Regular:mode=harf;",
+        "FreeMono:mode=harf;",
+      })
+    end
+  }%
+  \rpp@fbtrue
+}{}
+\fi
+\IfFontExistsTF{DejaVu Sans Mono}{%
+  \ifrpp@fb
+    \setmonofont{DejaVu Sans Mono}[Scale=MatchLowercase,
+                                   RawFeature={fallback=leanfallback}]%
+  \else
+    \setmonofont{DejaVu Sans Mono}[Scale=MatchLowercase]%
+  \fi
+}{%
+  \setmonofont{Latin Modern Mono}[Scale=MatchLowercase]%
+}
+\makeatother
+
+% --- Paleta ------------------------------------------------------------------
+\definecolor{rppTinta}   {HTML}{1B1B1F}  % texto
+\definecolor{rppCodigo}  {HTML}{F6F7F9}  % fondo de código
+\definecolor{rppBorde}   {HTML}{C9CED6}
+\definecolor{rppMate}    {HTML}{2F5D8C}  % matematica  — azul sobrio
+\definecolor{rppLeccion} {HTML}{1F7A63}  % leccion     — verde azulado
+\definecolor{rppMuro}    {HTML}{B0641E}  % muro        — ámbar: obstrucción
+\definecolor{rppRefut}   {HTML}{9B2226}  % refutado    — rojo: resultado negativo
+\definecolor{rppSondeo}  {HTML}{6E6E78}  % marca «fuera del build»
+\definecolor{rppKw}      {HTML}{7A3E9D}
+\definecolor{rppCom}     {HTML}{6E7781}
+\definecolor{rppStr}     {HTML}{1F7A63}
+
+\hypersetup{colorlinks=true, linkcolor=rppMate, citecolor=rppMate,
+            urlcolor=rppMate, linktoc=all}
+
+% --- Resaltado de Lean 4 -----------------------------------------------------
+% NO se usa `listings`. Medido el 2026-09-03: con Unicode, listings REORDENA los
+% caracteres —`(φ : Formula)` sale impreso como `φ( : Formula)`—, es decir,
+% ALTERA EN SILENCIO el código publicado. En un libro cuyo principio editorial
+% §2.1 es justo que eso no ocurra, es descalificante. Tampoco `minted`: exige
+% --shell-escape y un lexer de Lean 4 en Pygments que no se puede dar por dado.
+%
+% Se usa `fancyvrb`, que es fiel byte a byte, y el RESALTADO LO HACE EL
+% EXTRACTOR: scripts/extraer.py emite \kw{}/\cm{}/\st{} ya marcados. Es además
+% lo correcto arquitectónicamente: quien conoce el código es el extractor.
+\newcommand{\kw}[1]{\textcolor{rppKw}{\textbf{#1}}}   % palabra clave
+\newcommand{\cm}[1]{\textcolor{rppCom}{\textit{#1}}}  % comentario
+\newcommand{\st}[1]{\textcolor{rppStr}{#1}}           % cadena
+
+% =============================================================================
+%  MARCAS DE NIVEL — objeto vs meta, siempre a la vista
+% =============================================================================
+% Por qué esto no es decoración. La inconsistencia de ADR-012 fue un ERROR DE
+% CATEGORÍA: `tcFn` es una operación sobre SINTAXIS declarada como función
+% OBJETO. Si el nivel no se ve, el error no se ve. De ahí que cada fragmento de
+% código y cada enunciado del libro lleve su nivel impreso.
+%
+% Y no es una distinción binaria: hay DOS EJES independientes.
+%   · ¿QUIÉN afirma?  Lean (metateoría) · ⊢ (cálculo ω) · Prf (cálculo finitario)
+%   · ¿SOBRE QUÉ?     Lean · sintaxis · objeto · código · Prov
+% `prf_formCode_numeral` afirma en Prf SOBRE códigos; `hFN` afirma en ⊢ sobre lo
+% mismo; `two_mul_consN` afirma en Lean sobre Nat. Son tres casillas distintas.
+
+\definecolor{nvLean}  {HTML}{5B6470}   % metateoría: Lean
+\definecolor{nvDer}   {HTML}{2F5D8C}   % el cálculo ⊢ (ω)
+\definecolor{nvPrf}   {HTML}{1F7A63}   % el cálculo Prf (finitario, clásico)
+\definecolor{nvPrf0}  {HTML}{3E9C84}   % Prf₀ (finitario, intuicionista)
+\definecolor{nvPrfH}  {HTML}{15594A}   % PrfH (finitario CON contexto)
+\definecolor{nvObj}   {HTML}{B0641E}   % lenguaje objeto
+\definecolor{nvCod}   {HTML}{7A3E9D}   % códigos (términos objeto que denotan sintaxis)
+\definecolor{nvProv}  {HTML}{9B2226}   % dentro de Prov
+
+\makeatletter
+\newcommand{\rpp@nvcolor}[1]{%
+  \ifcsname nvcol@#1\endcsname \csname nvcol@#1\endcsname \else nvLean\fi}
+\expandafter\def\csname nvcol@Lean\endcsname{nvLean}
+\expandafter\def\csname nvcol@derives\endcsname{nvDer}
+\expandafter\def\csname nvcol@Prf\endcsname{nvPrf}
+\expandafter\def\csname nvcol@Prf0\endcsname{nvPrf0}
+\expandafter\def\csname nvcol@PrfH\endcsname{nvPrfH}
+\expandafter\def\csname nvcol@sintaxis\endcsname{nvLean}
+\expandafter\def\csname nvcol@objeto\endcsname{nvObj}
+\expandafter\def\csname nvcol@codigo\endcsname{nvCod}
+\expandafter\def\csname nvcol@Prov\endcsname{nvProv}
+
+\newcommand{\rpp@nvlabel}[1]{%
+  \ifcsname nvlab@#1\endcsname \csname nvlab@#1\endcsname \else #1\fi}
+\expandafter\def\csname nvlab@Lean\endcsname{Lean}
+% La etiqueta lleva el TIPO a la vista: si el juicio arrastra contexto (Γ) o no.
+% Confundir un juicio con contexto y uno sin él es un error de tipo, no de estilo.
+\expandafter\def\csname nvlab@derives\endcsname{$\Gamma\vdash$}
+\expandafter\def\csname nvlab@Prf\endcsname{Prf}
+\expandafter\def\csname nvlab@Prf0\endcsname{Prf$_0$}
+\expandafter\def\csname nvlab@PrfH\endcsname{$\Gamma\,$PrfH}
+\expandafter\def\csname nvlab@sintaxis\endcsname{sintaxis}
+\expandafter\def\csname nvlab@objeto\endcsname{objeto}
+\expandafter\def\csname nvlab@codigo\endcsname{código}
+\expandafter\def\csname nvlab@Prov\endcsname{Prov}
+
+% \nivel{quién afirma}{sobre qué} — la chapa de dos casillas.
+\newcommand{\nivel}[2]{%
+  \begingroup\sffamily\scriptsize\bfseries
+  \colorbox{\rpp@nvcolor{#1}}{\textcolor{white}{\strut\,\rpp@nvlabel{#1}\,}}%
+  \colorbox{\rpp@nvcolor{#2}!18}{\textcolor{\rpp@nvcolor{#2}}{\strut\,\rpp@nvlabel{#2}\,}}%
+  \endgroup}
+\makeatother
+
+% Marcas de nivel en prosa y en fórmulas.
+\newcommand{\obj}[1]{\textcolor{nvObj}{#1}}        % símbolo del lenguaje objeto
+\newcommand{\cod}[1]{\textcolor{nvCod}{#1}}        % código
+\newcommand{\prov}[1]{\textcolor{nvProv}{#1}}      % dentro de Prov
+
+% --- Nomenclatura (PLAN-LIBRO.md §2.7) --------------------------------------
+% \defterm marca LA introducción de un término. El control `make terminos`
+% exige que ningún término del vocabulario aparezca en el texto ANTES de su
+% \defterm — sin exenciones: un lector con bases tiene que poder avanzar.
+\newcommand{\defterm}[1]{\textbf{\textcolor{rppMate}{#1}}}
+
+% Etiqueta de nivel de un TÉRMINO del glosario. Contesta, para cada palabra, la
+% pregunta que el libro no puede dejar implícita: ¿esto es objeto o es meta?
+\makeatletter
+\newcommand{\nivelterm}[1]{%
+  \begingroup\sffamily\scriptsize\bfseries
+  \ifcsname ntcol@#1\endcsname
+    \colorbox{\csname ntcol@#1\endcsname!16}{\textcolor{\csname ntcol@#1\endcsname}{\strut\,#1\,}}%
+  \else
+    \colorbox{nvLean!16}{\textcolor{nvLean}{\strut\,#1\,}}%
+  \fi
+  \endgroup}
+\expandafter\def\csname ntcol@meta\endcsname{nvLean}
+\expandafter\def\csname ntcol@objeto\endcsname{nvObj}
+\expandafter\def\csname ntcol@meta→objeto\endcsname{nvCod}
+\expandafter\def\csname ntcol@ambos\endcsname{nvDer}
+\expandafter\def\csname ntcol@proyecto\endcsname{nvPrf}
+\makeatother
+\newcommand{\nota}[1]{{\footnotesize\color{rppCom} #1}}
+
+% =============================================================================
+%  LOS CINCO ENTORNOS
+%  Ver PLAN-LIBRO.md §4. Cada uno tiene un papel distinto y no intercambiable.
+% =============================================================================
+
+% --- (1) lean — código Lean 4 real ------------------------------------------
+% Uso normal: NO se escribe a mano. El extractor genera extraido/<clave>.tex y
+% el capítulo lo trae con \leanfrag{clave} (§2.1: nada de copiar-pegar).
+% El argumento opcional es la referencia de origen (módulo:declaración).
+\newtcolorbox{leanbox}[1][]{%
+  enhanced, breakable, sharp corners,
+  colback=rppCodigo, colframe=rppBorde, boxrule=0.4pt,
+  left=2mm, right=2mm, top=1.4mm, bottom=1.4mm,
+  fonttitle=\ttfamily\scriptsize, coltitle=rppTinta,
+  attach boxed title to top left={xshift=2mm, yshift=-2mm},
+  boxed title style={colback=rppBorde, sharp corners, boxrule=0pt},
+  #1}
+
+\DefineVerbatimEnvironment{lean}{Verbatim}{%
+  fontsize=\small, commandchars=\\\{\},
+  breaklines=true, breakanywhere=false, breakautoindent=true,
+  % El símbolo de continuación NO puede ser una flecha: pdftotext la extrae como
+  % `→`, que es un token legítimo de Lean — un lector podría leer una flecha de
+  % más en una línea partida, y el verificador del PDF no podría distinguirlas.
+  % Se usa «›», que no aparece ni una vez en el código del proyecto ni en FOL.
+  breaksymbolleft=\textcolor{rppBorde}{\guilsinglright},
+  breaksymbolright={},
+  xleftmargin=0pt, samepage=false}
+
+% Trae un fragmento ya extraído del repo.
+\newcommand{\leanfrag}[1]{\input{extraido/#1.tex}}
+
+% Referencia de origen impresa bajo un fragmento.
+\newcommand{\leanorigen}[2]{%
+  \par\vspace{-0.4\baselineskip}%
+  {\ttfamily\scriptsize\color{rppCom} #1\ \textbf{·}\ #2\par}}
+
+% Footprint de `#print axioms` — OBLIGATORIO en todo teorema (§2.2(c)).
+\newcommand{\footprint}[1]{%
+  \par\vspace{-0.2\baselineskip}%
+  {\ttfamily\scriptsize\color{rppCom}\#print axioms $\rightarrow$ #1\par}}
+
+% Marca «fuera del build» para fragmentos de sondeos/ (§2.3).
+\newcommand{\fueradelbuild}[1]{%
+  \par\vspace{-0.2\baselineskip}%
+  {\sffamily\scriptsize\color{rppSondeo}%
+   \fcolorbox{rppSondeo}{white}{\strut\,fuera del build\,}\quad
+   recompilar con \texttt{lake env lean #1}\par}}
+
+% --- (2) matematica — el enunciado formal, legible sin Lean ------------------
+% Sin barra de título: el rótulo va como línea de texto, para que el enunciado
+% se lea como un enunciado y no como un aviso.
+\NewDocumentEnvironment{matematica}{O{}}{%
+  \begin{tcolorbox}[enhanced, breakable, sharp corners,
+    colback=white, colframe=white, boxrule=0pt,
+    borderline west={1.6pt}{0pt}{rppMate},
+    left=4mm, right=2mm, top=1.6mm, bottom=1.6mm]%
+  \ifblank{#1}{}{{\sffamily\bfseries\small\color{rppMate} #1\par}\vspace{0.4em}}%
+}{%
+  \end{tcolorbox}%
+}
+
+% --- (3) leccion — la nota pedagógica ---------------------------------------
+\newtcolorbox{leccion}[1][Lección]{%
+  enhanced, breakable, sharp corners,
+  colback=rppLeccion!4, colframe=rppLeccion, boxrule=0.5pt,
+  left=3mm, right=3mm, top=1.8mm, bottom=1.8mm,
+  fonttitle=\bfseries\sffamily\small, coltitle=white,
+  colbacktitle=rppLeccion,
+  attach boxed title to top left={xshift=3mm, yshift=-2.4mm},
+  boxed title style={sharp corners, boxrule=0pt},
+  title={#1}}
+
+% --- (4) muro — una obstrucción encontrada ----------------------------------
+\newtcolorbox{muro}[1][Muro]{%
+  enhanced, breakable, sharp corners,
+  colback=rppMuro!5, colframe=rppMuro, boxrule=0.5pt,
+  left=3mm, right=3mm, top=1.8mm, bottom=1.8mm,
+  fonttitle=\bfseries\sffamily\small, coltitle=white,
+  colbacktitle=rppMuro,
+  attach boxed title to top left={xshift=3mm, yshift=-2.4mm},
+  boxed title style={sharp corners, boxrule=0pt},
+  title={#1}}
+
+% --- (5) refutado — un resultado NEGATIVO, compilado ------------------------
+% No es un muro: un muro es «no sé pasar»; esto es «se ha probado que no se
+% pasa». Es el entorno que sostiene el capítulo 25 y media Parte IV.
+\newtcolorbox{refutado}[1][Refutado]{%
+  enhanced, breakable, sharp corners,
+  colback=rppRefut!5, colframe=rppRefut, boxrule=0.5pt,
+  left=3mm, right=3mm, top=1.8mm, bottom=1.8mm,
+  fonttitle=\bfseries\sffamily\small, coltitle=white,
+  colbacktitle=rppRefut,
+  attach boxed title to top left={xshift=3mm, yshift=-2.4mm},
+  boxed title style={sharp corners, boxrule=0pt},
+  title={#1}}
+
+% =============================================================================
+%  Entornos de teorema (notación matemática estándar)
+% =============================================================================
+\theoremstyle{plain}
+\newtheorem{teorema}{Teorema}[chapter]
+\newtheorem{lema}[teorema]{Lema}
+\newtheorem{proposicion}[teorema]{Proposición}
+\newtheorem{corolario}[teorema]{Corolario}
+\theoremstyle{definition}
+\newtheorem{definicion}[teorema]{Definición}
+\newtheorem{convenio}[teorema]{Convenio}
+\theoremstyle{remark}
+\newtheorem*{observacion}{Observación}
+
+% =============================================================================
+%  Macros de prosa
+% =============================================================================
+% \detokenize: permite escribir \ident{ax_tc_cons} sin escapar el subrayado.
+% (El nombre \lean está tomado por el ENTORNO `lean`; en prosa se usa \ident.)
+\newcommand{\ident}[1]{\texttt{\detokenize{#1}}}         % identificador Lean
+% Las rutas de módulo son largas y aparecen constantemente. Con \texttt son
+% inquebrables y desbordan la caja de texto; \nolinkurl parte por «/» y «.»,
+% que es donde una ruta se puede partir sin confundir al lector.
+\newcommand{\modulo}[1]{\begingroup\urlstyle{tt}\nolinkurl{#1}\endgroup}
+\newcommand{\adr}[1]{\textsc{adr}-#1}                    % referencia a un ADR
+\newcommand{\printaxioms}{\texttt{\#print axioms}}       % \detokenize duplica #
+\newcommand{\doc}[1]{\textsf{\detokenize{#1}}}           % fichero .md del repo
+\newcommand{\codigo}[1]{\ensuremath{\ulcorner #1 \urcorner}}  % ⌜φ⌝
+\newcommand{\dotado}[1]{\ensuremath{\dot{#1}}}           % ȧ  («dotar»)
+\newcommand{\Prov}{\operatorname{Prov}}
+\newcommand{\Prf}{\mathsf{Prf}}
+\newcommand{\derives}{\vdash}
+\newcommand{\noderives}{\nvdash}
+
+% Aviso editorial recurrente (§6): se usa donde toque, no se improvisa.
+\newcommand{\avisoreparacion}{%
+  \begin{muro}[Aviso]
+  Lo que se retiró fue la inconsistencia \textbf{conocida y localizada}
+  (\ident{ax_tc_cons}). \textbf{Eso no es una prueba de consistencia} de
+  Q\texttt{++} extendido.
+  \end{muro}}
+\newcommand{\avisomediagodel}{%
+  \begin{muro}[Aviso]
+  Gödel I está \textbf{a medias}: sólo $\noderives G$. La indecidibilidad
+  ($\noderives \lnot G$) \textbf{no está cerrada} en la cadena real.
+  \end{muro}}

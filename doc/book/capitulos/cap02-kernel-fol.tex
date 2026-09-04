@@ -1,0 +1,247 @@
+\chapter{El kernel \texorpdfstring{FOL$^=$}{FOL=}}
+\label{cap:kernel}
+
+Antes de poder decir «esta teoría no demuestra su propia consistencia» hay que tener una teoría, y
+antes de tener una teoría hay que tener un lenguaje y una noción de demostración. Ese es el papel del
+proyecto \modulo{FOL}, hermano de éste: lo que aquí se usa, y sólo eso, es lo que este capítulo
+resume.
+
+\begin{leccion}[Criterio de selección de este capítulo]
+\modulo{FOL} es más grande que lo que este libro necesita: tiene semántica, solidez, completitud y
+compacidad. La cadena de la incompletitud \textbf{no importa ninguno de esos módulos} — es
+íntegramente sintáctica. Lo que sigue es el corte medido, no una visita guiada.
+\end{leccion}
+
+\section{El lenguaje}
+
+\begin{matematica}[Términos y fórmulas]
+Los términos son variables (índices de De Bruijn) o aplicaciones de un símbolo de función a una
+lista de términos:
+\[ t \;::=\; v_n \;\mid\; f(t_1,\dots,t_k). \]
+Las fórmulas son
+\[ A \;::=\; \bot \;\mid\; P(\bar t) \;\mid\; t \doteq u \;\mid\; A \Rightarrow B
+   \;\mid\; \forall A \;\mid\; A \wedge B \;\mid\; A \vee B \;\mid\; \exists A. \]
+La negación, la verdad y el bicondicional no son primitivas:
+\[ \lnot A := A \Rightarrow \bot, \qquad \top := \lnot\bot, \qquad
+   A \Leftrightarrow B := (A \Rightarrow B) \wedge (B \Rightarrow A). \]
+\end{matematica}
+
+\leanfrag{fol_Term}
+\leanfrag{fol_Formula}
+
+Nótese que los cuantificadores \textbf{no llevan variable}: \(\forall A\) liga la variable
+\(\texttt{\#0}\) del cuerpo. Es la consecuencia visible de la decisión siguiente.
+
+\section{De Bruijn, y el precio que se paga}
+
+Con nombres de variable, la sustitución exige renombrar para evitar capturas, y toda prueba formal
+arrastra hipótesis de frescura. Con índices no hay nombres que capturar: una variable es la distancia
+al cuantificador que la liga. La captura desaparece — y aparece la aritmética de índices.
+
+\begin{matematica}[Desplazamiento y sustitución]
+El desplazamiento \(\uparrow^{c}\) incrementa las variables \emph{libres} por encima del corte
+\(c\); la sustitución \(A[s/v]\) reemplaza \(v\) por \(s\) y decrementa lo que quedaba por encima:
+\[
+\uparrow^{c}(v_n) =
+  \begin{cases} v_n & n < c\\ v_{n+1} & n \ge c\end{cases}
+\qquad
+v_n[s/v] =
+  \begin{cases} s & n = v\\ v_{n-1} & n > v\\ v_n & n < v.\end{cases}
+\]
+Al cruzar un cuantificador ambas suben un nivel, y la sustitución debe desplazar lo que introduce:
+\(\forall A [s/v] = \forall\bigl(A[\uparrow^{0}\!s\,/\,v{+}1]\bigr)\).
+\end{matematica}
+
+\leanfrag{fol_liftTerm}
+\leanfrag{fol_substTerm}
+\leanfrag{fol_substFormula}
+
+\begin{leccion}[El precio, medido]
+La última línea de \ident{substFormula} —el \ident{liftTerm 0 s} al entrar en un cuantificador— es
+la fuente de casi toda la fricción técnica del proyecto. No es una impresión: contando las citas de
+\modulo{FOL} en los 108 módulos de ROBINSON\texttt{++}, \textbf{tres lemas de conmutación
+lift/subst acumulan 1\,316 usos}, y el más citado de todos, \ident{substTerm_liftTerm}, aparece
+\textbf{978 veces}. Formalizar con De Bruijn no es más difícil que con nombres: es difícil en otro
+sitio, y el sitio es éste.
+\end{leccion}
+
+\section{El cálculo \texorpdfstring{$\vdash$}{|-}}
+
+\begin{matematica}[Deducción natural sobre listas de hipótesis]
+\(\Gamma \vdash A\) se define inductivamente con las reglas usuales de deducción natural
+—hipótesis, introducción y eliminación de \(\Rightarrow\), \(\wedge\), \(\vee\), \(\forall\),
+\(\exists\)—, más \emph{ex falso}, debilitamiento, y las dos reglas de igualdad
+\[
+\frac{}{\Gamma \vdash t \doteq t}\quad(\text{refl})
+\qquad
+\frac{\Gamma \vdash t_1 \doteq t_2 \qquad \Gamma \vdash A[t_1]}{\Gamma \vdash A[t_2]}\quad(\text{subst}).
+\]
+La regla de \(\forall\)-introducción desplaza todo el contexto
+(\(\Gamma\!\uparrow^{0} \vdash A\) da \(\Gamma \vdash \forall A\)): es la forma De Bruijn de exigir
+que la variable no aparezca libre en las hipótesis.
+\end{matematica}
+
+Hay además una regla que no es estándar y conviene señalar: \ident{rewrite_at} permite aplicar una
+regla local \emph{en una posición exacta} del árbol sintáctico, navegando con \ident{Pos} y
+\ident{getAt?}. Es maquinaria de reescritura, no fuerza lógica añadida.
+
+El teorema de deducción es aquí un teorema de una línea, porque el cálculo ya tiene
+\ident{intro_impl} como constructor:
+
+\leanfrag{fol_deduction_theorem}
+
+\section{Las meta-reglas \texorpdfstring{$\omega$}{omega}: seis axiomas, y lo que cuestan}
+
+Sobre \(\vdash\) hay una segunda capa, en \modulo{FOL/MetaRules.lean}, cuyas hipótesis son
+\textbf{funciones de Lean} en vez de hipótesis en contexto. Seis de ellas son \ident{axiom}:
+\ident{imp_intro}, \ident{gen}, \ident{raa}, \ident{dne}, \ident{or_elim} y \ident{ex_elim}.
+
+\leanfrag{fol_imp_intro}
+\leanfrag{fol_gen}
+
+Que sean axiomas no es una comodidad: es que \textbf{no son derivables}, y el contraejemplo es
+concreto. Tómese \(\Gamma = [\,]\), \(A = P\), \(B = Q\) átomos distintos. En Lean clásico
+\(\lnot(\;[\,] \vdash P\;)\) es cierto, luego la hipótesis \(([\,]\vdash P) \to ([\,]\vdash Q)\) se
+cumple \emph{vacuamente}; pero \([\,] \vdash P \Rightarrow Q\) no es derivable. Aceptar
+\ident{imp_intro} como teorema de FOL sería, por tanto, aceptar algo falso. Lo mismo vale para
+\ident{raa}, \ident{or_elim} y \ident{ex_elim}. La forma correcta a nivel objeto existe y se
+prefiere en código nuevo: \ident{Derives.intro_impl}.
+
+\ident{gen} es de otra naturaleza: es la \textbf{\(\omega\)-regla}. De «\(\Gamma \vdash A[n]\) para
+todo término \(n\)» concluye \(\Gamma \vdash \forall A\). Es válida en el modelo estándar
+\(\mathbb{N}\) y no es derivable en ningún sistema finitario.
+
+\begin{muro}[La consecuencia que gobierna todo el libro]
+Con la \(\omega\)-regla, \(\vdash\) tiene reglas de \textbf{premisas infinitas}: no es recursivamente
+enumerable. Y por Tarski, ninguna fórmula \(\Prov\) puede satisfacer
+\(\vdash \Prov(\codigo{\varphi}) \Leftrightarrow \;\vdash \varphi\) para ese \(\vdash\).
+Por eso el proyecto construye, \emph{en paralelo}, un cálculo de Hilbert \textbf{finitario}
+\(\Prf\), y toda la aritmetización se hace sobre él. Los dos cálculos y su puente son el capítulo siguiente;
+aquí basta con saber que hay dos, y por qué tiene que haberlos.
+\end{muro}
+
+\section{Cuatro relaciones de derivabilidad, no dos}
+
+De la observación anterior no sale «un cálculo más»: salen \textbf{cuatro} relaciones distintas, y
+lo que las separa —si arrastran contexto y si son recursivamente enumerables— es exactamente lo que
+no se puede confundir. Sus tipos en Lean lo dicen:
+
+\leanfrag{fol_Derives}
+\leanfrag{Prf_tipo}
+\leanfrag{PrfH_tipo}
+
+\begin{matematica}[Las cuatro, y sus puentes]
+\[
+\begin{array}{lccl}
+\Gamma \vdash A & \text{con contexto} & \text{\textbf{no} r.e.} & \text{cálculo }\omega\\
+\Prf_0\, A      & \text{sin contexto} & \text{r.e.} & \text{Hilbert intuicionista}\\
+\Prf\, A        & \text{sin contexto} & \text{r.e.} & \text{Hilbert clásico: \textbf{el que se aritmetiza}}\\
+\mathsf{PrfH}\ \Gamma\ A & \text{con contexto} & \text{r.e.} & \text{variante contextual}
+\end{array}
+\]
+\[
+  \Prf_0\varphi \to \Prf\varphi \to \bigl(\forall\Gamma,\ \mathsf{PrfH}\,\Gamma\,\varphi\bigr),
+  \qquad \Prf\varphi \to \text{\ident{axioms}} \vdash \varphi .
+\]
+\end{matematica}
+
+\leanfrag{prf0_to_derives}
+\leanfrag{prf_to_derives}
+\leanfrag{prf_deduction}
+
+Los dos puentes hacia $\vdash$ se diferencian en \textbf{un solo símbolo}, y está medido: el primero
+no invoca \emph{ninguna} meta-regla $\omega$; el segundo usa \ident{dne} exactamente una vez. Es la
+frontera intuicionista/clásica, aislada en un punto.
+
+\begin{muro}[El recíproco no existe, y tiene que no existir]
+$\text{\ident{axioms}} \vdash \varphi \to \Prf\,\varphi$ es \textbf{falso}. Si valiera, $\vdash$
+sería recursivamente enumerable y Tarski cerraría el paso: ningún $\Prov$ podría representar su
+demostrabilidad. La asimetría no es un defecto de la formalización — \emph{es} la razón de que haya
+dos cálculos.
+\end{muro}
+
+\section{El toolkit De Bruijn que de verdad se usa}
+
+De los diecinueve lemas de \modulo{FOL/Theorems/Eq.lean}, el proyecto vive esencialmente de cinco.
+Ordenados por número de citas medidas en ROBINSON\texttt{++}:
+
+\leanfrag{fol_substTerm_liftTerm}
+\leanfrag{fol_derive_eq_trans}
+\leanfrag{fol_substTerm_liftLift}
+\leanfrag{fol_derive_eq_symm}
+\leanfrag{fol_liftTerm_comm_zero}
+
+\begin{center}\small
+\begin{tabular}{lr}
+\toprule
+lema & citas en \modulo{ROBINSON\_PlusPlus/} \\
+\midrule
+\ident{substTerm_liftTerm} & 978 \\
+\ident{derive_eq_trans}    & 429 \\
+\ident{substTerm_liftLift} & 312 \\
+\ident{derive_eq_symm}     & 57 \\
+\ident{liftTerm_comm_zero} & 26 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Los dos primeros dicen, respectivamente, que \emph{sustituir deshace desplazar} y que la
+igualdad derivada es transitiva. Que un proyecto de metamatemática se apoye casi por completo en
+esas dos cosas es, en sí, el resumen honesto de en qué consiste formalizar.
+
+\section{Un axioma que era falso}
+
+\modulo{FOL/Theorems/Quantifiers.lean} declaraba en su día:
+\[ \texttt{substFormula } v\ t\ (\texttt{liftFormula } (v{+}1)\ f) \;=\; f
+   \qquad\text{para \emph{cualquier} } t. \]
+
+\begin{refutado}[El contraejemplo, en tres líneas]
+Sea \(f = P(\texttt{\#0})\), \(v = 0\), \(t = \texttt{zero}\). Entonces
+\(\uparrow^{1}\! f = P(\texttt{\#0})\) —la variable \(0 < 1\) no se desplaza— y
+\(P(\texttt{\#0})[\texttt{zero}/0] = P(\texttt{zero}) \neq f\).
+\end{refutado}
+
+El enunciado correcto exige que el término sustituido sea \emph{exactamente} la variable, y entonces
+es un teorema, demostrable por inducción estructural:
+
+\leanfrag{fol_subst_lift_cancel}
+
+\begin{leccion}[Por qué esto abre el libro y no lo cierra]
+Es el mismo modo de fallo que la Parte~IV cuenta en grande: un enunciado plausible, aceptado como
+axioma, que resulta ser falso —y que mientras estuvo ahí hacía \emph{unsound} todo lo que lo citaba.
+Aquí costó un cambio de enunciado; en el capítulo~\ref{cap:numerales} costó 31 módulos. La
+diferencia no es de naturaleza, sino de cuánto se tardó en mirar.
+\end{leccion}
+
+\section{Lo que hay en FOL y este libro no usa}
+
+Para que el alcance quede declarado y no haya que deducirlo:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.30\linewidth}
+                              >{\raggedright\arraybackslash}X
+                              >{\raggedright\arraybackslash}p{0.14\linewidth}@{}}
+\toprule
+módulo de \modulo{FOL} & contenido & ¿se usa? \\
+\midrule
+\modulo{FOL/FOL.lean} & sintaxis, De Bruijn, \ident{Derives} & sí, todo \\
+\modulo{FOL/MetaRules.lean} & las 6 meta-reglas \(\omega\) & sí \\
+\modulo{FOL/Theorems/Eq.lean} & toolkit De Bruijn e igualdad & sí, cinco lemas \\
+\modulo{FOL/Deduction.lean} & teorema de deducción & sí \\
+\modulo{FOL/Theorems/}: \ident{Impl}, \ident{Neg}, \ident{Derived}, \ident{Quantifiers}
+  & lógica proposicional y de cuantificadores & parcialmente \\
+\modulo{FOL/}: \ident{Semantics}, \ident{Soundness}, \ident{Completeness}, \ident{Compacity}
+  & modelos, solidez, completitud, compacidad & \textbf{no} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{observacion}
+La mitad semántica de \modulo{FOL} no la importa \textbf{ningún} módulo de
+ROBINSON\texttt{++} (verificado: cero \ident{import}). Esto importa porque
+\modulo{FOL/Completeness.lean} declara cinco \ident{axiom} propios —entre ellos una enumeración de
+fórmulas y el lema de extensión de Henkin— que, por tanto, no pueden entrar en la base de ningún
+teorema de este libro. Y por la misma razón conviene decirlo explícitamente: \modulo{FOL} declara
+\textbf{trece} \ident{axiom} en total, de los que la base sancionada de este libro admite
+\textbf{seis}. Los otros siete están fuera de la cadena, y \printaxioms\ es lo que lo comprueba.
+\end{observacion}

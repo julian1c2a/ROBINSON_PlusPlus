@@ -1,0 +1,81 @@
+%% La leyenda de niveles. Va ANTES del índice: PLAN-LIBRO.md §2.5.
+\section*{2 · Los dos ejes: quién afirma, y sobre qué}
+
+Con esas palabras ya se puede plantear la pregunta que vuelve en cada línea:
+\emph{¿esto es lenguaje objeto o lenguaje meta?} En un libro de metamatemática se
+plantea en cada línea, y responderla mal es caro: la inconsistencia que cuenta la
+Parte~IV fue exactamente un error de categoría. Por eso aquí el nivel \textbf{se imprime}.
+
+No es una distinción binaria. Hay dos ejes independientes, y cada fragmento de código y cada
+enunciado llevan una chapa con los dos:
+
+\noindent\textbf{Eje 1 — ¿quién afirma?} Son cuatro relaciones de derivabilidad distintas, y
+\emph{de tipos distintos}: lo que las separa es si arrastran contexto y si son recursivamente
+enumerables.
+
+\begin{center}\footnotesize\setlength{\tabcolsep}{4pt}
+\begin{tabularx}{\linewidth}{@{}l >{\ttfamily\scriptsize}l cc >{\raggedright\arraybackslash}X@{}}
+\toprule
+chapa & tipo en Lean & ctx. & r.e. & papel \\
+\midrule
+\colorbox{nvLean}{\textcolor{white}{\sffamily\scriptsize\bfseries\strut\,Lean\,}} &
+  \normalfont--- & --- & --- & la metateoría: un teorema \emph{sobre} el sistema \\
+\colorbox{nvDer}{\textcolor{white}{\sffamily\scriptsize\bfseries\strut\,$\Gamma\vdash$\,}} &
+  List Formula → Formula → Prop & sí & \textbf{no} & el cálculo $\omega$; sólido en $\mathbb{N}$ \\
+\colorbox{nvPrf0}{\textcolor{white}{\sffamily\scriptsize\bfseries\strut\,Prf$_0$\,}} &
+  Formula → Prop & no & sí & Hilbert \textbf{intuicionista} \\
+\colorbox{nvPrf}{\textcolor{white}{\sffamily\scriptsize\bfseries\strut\,Prf\,}} &
+  Formula → Prop & no & sí & Hilbert clásico: \textbf{el que se aritmetiza} \\
+\colorbox{nvPrfH}{\textcolor{white}{\sffamily\scriptsize\bfseries\strut\,$\Gamma\,$PrfH\,}} &
+  List Formula → Formula → Prop & sí & sí & variante con contexto; ahí vive la deducción \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent\textbf{Eje 2 — ¿sobre qué?} Cinco valores.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\colorbox{nvLean!18}{\textcolor{nvLean}{\sffamily\scriptsize\bfseries\strut\,Lean\,}} &
+  objetos nativos: \ident{Nat}, listas, recursión estructural \\
+\colorbox{nvLean!18}{\textcolor{nvLean}{\sffamily\scriptsize\bfseries\strut\,sintaxis\,}} &
+  la representación en Lean de la sintaxis: \ident{Term}, \ident{Formula} \\
+\colorbox{nvObj!18}{\textcolor{nvObj}{\sffamily\scriptsize\bfseries\strut\,objeto\,}} &
+  enunciados de la teoría aritmética: $\obj{+}$, $\obj{\cdot}$, $\obj{\sigma}$, sus axiomas \\
+\colorbox{nvCod!18}{\textcolor{nvCod}{\sffamily\scriptsize\bfseries\strut\,código\,}} &
+  términos objeto que \emph{denotan} sintaxis: $\cod{\codigo{\varphi}}$, \ident{numeral} \\
+\colorbox{nvProv!18}{\textcolor{nvProv}{\sffamily\scriptsize\bfseries\strut\,Prov\,}} &
+  dentro del predicado de demostrabilidad: la teoría hablando de sí misma \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent \textbf{Los puentes, y el que no existe.} Las cuatro no son intercambiables, y la
+dirección importa:
+\[
+  \Prf_0\,\varphi \;\longrightarrow\; \Prf\,\varphi \;\longrightarrow\;
+  \bigl(\forall \Gamma,\ \mathsf{PrfH}\ \Gamma\ \varphi\bigr),
+  \qquad
+  \Prf\,\varphi \;\longrightarrow\; \text{\ident{axioms}} \vdash \varphi .
+\]
+El recíproco $\text{\ident{axioms}} \vdash \varphi \to \Prf\,\varphi$ \textbf{es falso, y tiene que
+serlo}: si valiera, $\vdash$ sería r.e.\ y Tarski cerraría el paso. Ésa es la asimetría que obliga a
+tener dos cálculos en vez de uno, y por eso la chapa distingue en cuál se afirma.
+Además \ident{prf0_to_derives} no usa \emph{ninguna} meta-regla $\omega$ y \ident{prf_to_derives}
+usa \ident{dne} exactamente una vez: la diferencia entre los dos puentes es, medida,
+$\{\ident{FOL.MetaRules.dne}\}$.
+
+\medskip\noindent Tres ejemplos que ocupan tres casillas distintas y que conviene comparar:
+\ident{two_mul_consN} afirma \emph{en Lean} sobre \ident{Nat};
+\ident{prf_formCode_numeral} afirma \emph{en Prf} sobre \textbf{códigos};
+\ident{hFN} afirma lo mismo, pero \emph{en} $\vdash$.
+Y \ident{pcc_dot_cons} afirma en \ident{Prf} \textbf{dentro de} \ident{Prov} — cuatro niveles de
+distancia entre el primero y el último.
+
+\begin{leccion}[Por qué la chapa es un control, no un adorno]
+La cuarta fila del segundo eje es la que se cobró 31 módulos. \ident{tcFn} —«el código del
+código»— es una operación sobre \textbf{sintaxis} que se declaró como función \textbf{objeto}, y
+una función objeto sólo puede depender de \textbf{valores}. Con la chapa puesta, la mezcla se ve
+antes de escribirla.
+\end{leccion}

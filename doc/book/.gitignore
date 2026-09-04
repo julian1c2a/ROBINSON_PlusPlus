@@ -1,0 +1,34 @@
+# Salida de LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.bbl
+*.blg
+*.run.xml
+*.bcf
+libro.pdf
+
+# GENERADO por scripts/extraer.py — nunca se edita ni se commitea a mano
+extraido/*.tex
+extraido/*.lean
+!extraido/.gitkeep
+
+# Vistas previas locales (no se commitean)
+preview/
+
+# --- añadido 2026-09-04 al meter doc/book/ en el repo ---
+# Intermedio de XeTeX: se regenera al compilar, igual que libro.pdf (670 KB)
+*.xdv
+
+# Bytecode de Python
+__pycache__/
+*.pyc
+
+# Fichero de prueba de 1 byte del arranque
+.probe-borrado

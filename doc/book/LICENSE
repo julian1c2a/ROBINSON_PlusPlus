@@ -1,0 +1,38 @@
+# Licencia del libro *Incompletitud, formalizada*
+
+Este directorio (`doc/book/`) se licencia **de forma distinta al resto del repositorio**.
+
+## 1 · La prosa, las figuras y la maquetación
+
+© 2026 Julián Calderón Almendros
+
+Bajo **Creative Commons Reconocimiento-CompartirIgual 4.0 Internacional
+(CC BY-SA 4.0)**.
+
+    https://creativecommons.org/licenses/by-sa/4.0/deed.es
+    Articulado completo: https://creativecommons.org/licenses/by-sa/4.0/legalcode.es
+
+En resumen, y sin valor legal —manda el articulado—: cualquiera puede **copiar, redistribuir,
+traducir y adaptar** esta obra, **incluso con fines comerciales**, siempre que (a) **reconozca la
+autoría** y enlace a la licencia, indicando si hizo cambios, y (b) distribuya sus obras derivadas
+**bajo esta misma licencia**.
+
+> ⓘ El articulado completo **no se incluye aquí a propósito**: transcribir un texto legal de memoria
+> es introducir erratas en una licencia. Si quieres empaquetarlo con el repositorio, descárgalo del
+> enlace de arriba y guárdalo como `doc/book/CC-BY-SA-4.0.txt`.
+
+## 2 · Los fragmentos de código Lean 4
+
+Los bloques de código que el libro extrae de `ROBINSON_PlusPlus/`, de `sondeos/` y del proyecto
+`FOL` **no cambian de licencia** al ser citados: siguen bajo la **licencia MIT** del repositorio,
+cuyo aviso se reproduce íntegro en el apéndice del libro, como esa licencia exige al distribuir
+porciones sustanciales.
+
+## 3 · Qué queda fuera
+
+El resto del repositorio —todo `*.lean`, los documentos de estado y los scripts— está bajo **MIT**;
+ver el fichero `LICENSE` de la raíz.
+
+⚠️ Nota de coherencia documental: `README.md` de la raíz declara «Licencia MIT» sin mencionar esta
+excepción. Corregirlo corresponde a la tarea de desarrollo, no a la del libro
+(`PLAN-LIBRO.md` §0).
