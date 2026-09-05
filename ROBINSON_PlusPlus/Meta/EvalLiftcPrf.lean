@@ -69,10 +69,10 @@ sobre `env.constants` — no sobre el fuente:
 | §4–§6 axiomas dotados     | 180–520     | `Meta/LiftcCodePrf.lean`                      |
 | §7 `refl_caso_*`          | 542–672     | `Meta/LiftcCodePrf.lean`                      |
 | §9–§10 `refl_*_imp`       | 676–856     | `Meta/LiftcCodePrf.lean` (los CUATRO)         |
-| §10 `argsIn`/`isTermCodeE1`| 862–879    | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
-| §C `isTC1` y su fontaneria| 883–1041    | `Meta/CodeWitnessPrf.lean` (`SinWTs`/`ENS`)   |
+| §10 `argsIn`/`isTermCodeE1`| 862–879    | `Minimal/Axioms.lean`, alias `SinWTs` (ADR-020)|
+| §C `isTC1` y su fontaneria| 883–1041    | `isTC1` en `Minimal/Axioms.lean`; el resto en `CodeWitnessPrf` |
 | §E controles `crit_*`     | 1401–1568   | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
-| `hasWit`, `CRIT_hasWit_real`| 1386,1964 | `Meta/CodeWitnessPrf.lean` (`ENS`)            |
+| `hasWit`, `CRIT_hasWit_real`| 1386,1964 | `hasWit` en `Minimal/Axioms.lean` (ADR-020); `CRIT_hasWit_real` en `CodeWitnessPrf` (`ENS`) |
 | cola del §E + testigo `tcodes1` | 1571–1897 | `Meta/CodeWitnessPrf.lean` (`SinWTs`) ⚠️ el §F del sondeo empieza en la 1899, no aqui |
 
 ## ⚠️ LOS DOS DUPLICADOS CONOCIDOS — se BORRAN y se redirigen sus usos
@@ -133,7 +133,7 @@ modulo lleva estos 20, **cada uno justificado por el simbolo que lo pide**:
 | `BoundedInPrf`    | `PrfH_lt_subst2` (§6). ⚠️ `boundedIn` y `prf_boundedIn_of_In` se los llevaron los lemas de §4 al bajar, pero el import SE QUEDA |
 | `CantorMonoPrf`   | `prf_cantor_mono_left` / `_right` — el descenso de Cantor (§6)        |
 | `ChainPrf`        | `prf_list_induction` (§2), `PrfH_leibniz_subst`, `PrfH_and_*`, `PrfH_or_elim`, `PrfH_spec` |
-| `CodeWitnessPrf`  | `SinWTs` (`isTC1`, `wfAll1`, `argsIn`, `isTermCodeE1`, `tcodes1`, `crit_*`) y `ENS` (`hasWit`, `liftF_isTC1`, `substF_isTC1`, `substF_wfAll1`, `CRIT_hasWit_real`) |
+| `CodeWitnessPrf`  | `SinWTs` (`tcodes1`, `crit_*`, y por alias `isTC1`/`wfAll1`/`argsIn`/`isTermCodeE1`) y `ENS` (`liftF_isTC1`, `substF_isTC1`, `substF_wfAll1`, `CRIT_hasWit_real`, y por alias `hasWit`). ⚠️ Los predicados de guarda se DECLARAN en `Minimal/Axioms.lean` desde ADR-020 |
 | `DerivCondPrf`    | `liftTerm_termCode`, `liftTerm_strCode`, `substTerm_strCode` (§1)     |
 | `EvalRunFnPrf`    | `prf_substtc_termCode_nil` — SOLO para el puente anti‑`iz_inv` de §0  |
 | `Hilbert`         | `Prf`, `PrfH`, `Prf₀.p1`/`j1`/`j2`, `Prf.gen`, `Prf.qconf`            |
@@ -540,7 +540,8 @@ theorem pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
 
 /-! ## §8 · La forma que de verdad llega rio abajo: el testigo viene de un `∃`.
 
-    `hasWit` es el de produccion (`Meta/CodeWitnessPrf.lean`, `ENS`): aqui NO se redefine. -/
+    `hasWit` es el de produccion: se declara en `Minimal/Axioms.lean` (ADR-020) y
+    `CodeWitnessPrf.ENS` lo re-exporta. Aqui NO se redefine. -/
 
 theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)) := by
   refine prf_ex_elim_imp ?_

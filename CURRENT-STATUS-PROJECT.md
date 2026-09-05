@@ -1,15 +1,24 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
+> ## ESTADO REAL — 2026-09-05 · rama `via-c-adr020` · **VÍA C EJECUTADA** (ADR-020) · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`
+>
+> ⚠️ **La parada es CONOCIDA y localizada, no una regresión**: la enmienda de los 7 esquemas está
+> aplicada y todo lo demás compila. `master` sigue **VERDE** en `97f2a37`; el trabajo vive en la
+> rama **`via-c-adr020`**. Qué falta exactamente para verde: **§3.36.5** y el PUNTO DE REANUDACIÓN
+> de `NEXT-STEPS.md` — **una sola pieza nueva**, `prf_hasWitF_substfc`.
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.36.
 >
-> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 125 jobs · 0 sorrys · Lean v4.31.0** (⚠️ con la parada conocida arriba).
+> **111 módulos activos** (Minimal 11 + Meta 89 + Full 11) **+ 0 en `cuarentena/` + 58 en `sondeos/`.**
+> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
+> no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
+>
+> 🏁 **`∀t. hasWit (tcFn t)` PROBADO** y en producción (`Meta/HasWitTcFnPrf.lean`), footprint
+> `[propext, Classical.choice, Quot.sound]` — **net-0 puro**.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >

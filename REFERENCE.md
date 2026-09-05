@@ -3,7 +3,7 @@
 > ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **111 módulos activos** (Minimal 11 + Meta 89 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**110 módulos activos** (Minimal 11 + Meta 88 + Full 11) + barrel `Meta.lean` + raíz
+**111 módulos activos** (Minimal 11 + Meta 89 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -156,6 +156,7 @@ Detalle en el nodo §3.15–§3.32.
 | 77 | **`LiftcCodePrf`** | 🆕 **los constructores de código DOTADOS y las cláusulas del reflector** (2026‑09‑03, promovido de `sondeos/ReflectorDesdeConsumidor.lean`): `liftcT`/`liftscT`/`varcT`/`funccT` con sus puentes `rfl`, las congruencias META e INTERNAS, `targetLift`/`targetLiftsc`, las cuatro ecuaciones dotadas de `liftc`/`liftsc` y las cuatro cláusulas del reflector en **moneda de inducción OBJETO**. ⚠️ Se **descartaron DIEZ duplicados** al promover (§3.33) |
 | 77b | **`EvalLiftcPrf`** | 🆕 **EL DESCENSO** (2026‑09‑04, promovido de `sondeos/DescensoLiftc.lean`, rama **B2**): la inducción fuerte que cierra **`pcc_eval_liftc`** — el `hLift` que `Paso2CasoForall` dejaba sin descargar — más `DESCENSO_hasWit`, la forma consumible contra `ENS.hasWit`. 🔑 **UNA** inducción fuerte con conclusión **CONJUNTIVA** sobre los dos sorts y `w` cuantificado **DENTRO** de `Φ`; `PHI_step` consume las cláusulas `_imp`, o sea la **moneda OBJETO**. De 198 declaraciones del sondeo se promovieron **31**; ⚠️ **seis piezas genéricas se subieron aguas ARRIBA** (a `StrongInductionPrf` y a `SinWTs`) y **dos BAJARON** a `LiftcCodePrf` — ver §3.34. `export` **PARCIAL a propósito**: `PHI*`/`DESCENSO*` quedan cualificados porque `EvalSubstfcPrf` monta otros dos descensos con los mismos nombres |
 | 77c | **`SubstfcCodePrf`** | 🆕 **el caso BINARIO y el caso BOTTOM de `substfc`** (2026‑09‑04, promovido de `sondeos/SubstfcPlanos.lean`, rama **B3**): `binct` con la ETIQUETA abstracta —que hace `implc`/`andc`/`orc` en UN lema en vez de tres—, los cuerpos `AXBIN_BODY`/`AXBOT_BODY`, `evalSubstfcCode` y las instancias dotadas `pcc_substfc_bin_dot`/`_bottom_dot`. De las 39 del sondeo aquí viven **17**: 18 ya estaban (13 por los dos DESCENSOS de esta rama, a `CodeCtorKit` y `EvalArithPrf`) y ⚠️ **4 se retiran por MUERTAS** — `paso2_caso_bin`/`_impl`/`_and`/`_or` no tienen ni un consumidor de código: el ensamblaje real usa `paso2_caso_bin_imp`, el mismo caso en **moneda OBJETO**, porque en la inducción la HI llega como hipótesis |
+| 77d | **`HasWitTcFnPrf`** | 🆕 **`∀t. hasWit (tcFn t)`** (2026‑09‑05, promovido de `sondeos/HasWitTcFn.lean`, rama **C** / [ADR‑020](DECISIONS.md)): la buena formación de los códigos **PUNTEADOS**, por **inducción OBJETO** — la única ruta posible, porque `tcFn` es un átomo opaco con sólo `ax_tc_zero`/`ax_tc_succ` vivos. Footprint `[propext, Classical.choice, Quot.sound]`, **net‑0 puro** (la inducción entra por `Prf.ind`, no por `ax_induction`). 🔑 Aporta además **tres piezas GENÉRICAS** que no existían — `prf_argsIn_mono`, `prf_isTermCodeE1_mono`, `prf_wfAll1_cons` (monotonía y extensión de testigo) —, válidas también para el lado `hasWitF` |
 | 78–80 | **`InAxiomsCodePrf`** · `LineWFThyPrf` · `LineWFAssemblePrf` | 🔁 `pcc_In_axiomsCodeT_tracked`, **`pcc_tc_formCode_internal`**; **`pcc_lineWF_tracked_modulo_7`** (§3.26.4) |
 | 81–82 | `LineWFConsPrf` · `AxiomListCode` | `prf_line_is_cons`; `axiomsCodeT` concretado (`neg_In_axiomsCodeT`) |
 | 83–84 | `CodeDecode` · `ChainDecode` | **módulo A de `NegVerifier`**: `decodeForm` biyección + `decodeChain_prf` |

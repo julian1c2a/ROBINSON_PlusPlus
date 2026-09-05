@@ -45,11 +45,11 @@ sufijo `…Prf` es la convencion del arbol.
 
 | simbolo del sondeo   | ya vive en                                          |
 |----------------------|-----------------------------------------------------|
-| `shapeUn`            | `Meta/CodeWitnessPrf.lean:197` (`…CodeWitnessPrf.SinWTs`) |
-| `shapeBin`           | `Meta/CodeWitnessPrf.lean:200` (idem)               |
-| `argsInBody`         | `Meta/CodeWitnessPrf.lean:179` (idem)               |
-| `argsIn`             | `Meta/CodeWitnessPrf.lean:184` (idem)               |
-| `isTermCodeE1`       | `Meta/CodeWitnessPrf.lean:205` (idem)               |
+| `shapeUn`            | `Minimal/Axioms.lean` — alias `CodeWitnessPrf.SinWTs` (ADR-020) |
+| `shapeBin`           | `Minimal/Axioms.lean` (idem)                        |
+| `argsInBody`         | `Minimal/Axioms.lean` (idem)                        |
+| `argsIn`             | `Minimal/Axioms.lean` (idem)                        |
+| `isTermCodeE1`       | `Minimal/Axioms.lean` (idem)                        |
 | `impT`               | `Meta/CodeWitnessPrf.lean:105` (idem)               |
 | `prf_or_elim_imp`    | `Meta/CodeWitnessPrf.lean:109` (idem)               |
 | `PrfH_eq_trans_code` | `Meta/EvalCarcNthcPrf.lean:66` (exportado a raiz)   |
@@ -754,8 +754,9 @@ end
 
 /-! ## §9 · LA FORMA ECUACIONAL DE LA GUARDA ES *EXACTAMENTE* LO QUE PIDEN LAS CLAUSULAS
 
-    `shapeUn`/`shapeBin` son los de PRODUCCION (`Meta/CodeWitnessPrf.lean`, namespace
-    `SinWTs`): aqui NO se redefinen, se abren selectivamente. `shapeUn X 0` y `shapeBin X 1`
+    `shapeUn`/`shapeBin` son los de PRODUCCION: se DECLARAN en `Minimal/Axioms.lean`
+    (ADR-020, bajaron con las guardas) y `CodeWitnessPrf.SinWTs` los re-exporta, asi que el
+    nombre cualificado de siempre sigue valiendo. Aqui NO se redefinen, se abren selectivamente. `shapeUn X 0` y `shapeBin X 1`
     son, **por `rfl`**, las dos ecuaciones que consumen `refl_caso_varc`/`refl_caso_funcc`. -/
 
 theorem shapeUn0_es_varc (X : Term) :
@@ -949,7 +950,8 @@ theorem refl_lista_cons_imp (h t : Term) :
 
 /-! ## §10 · EL PREDICADO SIN‑`wTs` ENTERO, CONTRA EL OBJETIVO — la MEDIDA
 
-    `isTermCodeE1`/`argsIn` son los de PRODUCCION (`CodeWitnessPrf.SinWTs`). -/
+    `isTermCodeE1`/`argsIn` son los de PRODUCCION: declarados en `Minimal/Axioms.lean`
+    (ADR-020), re-exportados por `CodeWitnessPrf.SinWTs`. -/
 
 /-- **LA MEDIDA DEL MODULO, no su resultado consumible.**
 

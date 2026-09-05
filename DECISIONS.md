@@ -8,7 +8,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
+> **111 módulos activos** (Minimal 11 + Meta 89 + Full 11) **+ 0 en `cuarentena/` + 58 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -678,3 +678,183 @@ abajo — nunca al revés.
   si un lema no menciona el vocabulario del frente, no es del frente, y escondido en el módulo
   del descenso queda **invisible** para los sondeos que lo tienen copiado a mano — `PSI_inst`
   estaba duplicado en **siete**.
+
+---
+
+## ADR-020: Los 7 esquemas de sustitución llevan la guarda DENTRO — y para eso las guardas BAJAN a `Minimal`
+
+**Fecha:** 2026-09-05 · **Estado:** aceptado · **Sanción del autor:** explícita (vía C)
+**Corrige el argumento de coste de:** §3.27.1 y la parte correspondiente de ADR-015
+
+### Contexto
+
+Los 7 tags de `lineWF` que faltan para cerrar `pcc_lineWF_tracked` —`q1` (9), `q2` (10), `q3` (11),
+`leibniz` (13), `ind` (18), `qconf` (19), `listInd` (20)— son los que reconstruyen su conclusión
+con `substfc`/`liftfc`. Reflejarlos exige evaluar esos operadores, y la evaluación
+(`pcc_eval_substfc`, `pcc_eval_liftc`) **pide una guarda de buena formación** del código:
+`hasWitF` en la ranura de fórmula, `hasWit` en la de término.
+
+De dónde sale esa guarda se midió en tres vías (§3.32.2), y **dos están REFUTADAS con prueba
+compilada**, no «no conseguidas»:
+
+* **(A) derivarla del antecedente `lineWF t`** — REFUTADA. Se construyó una línea basura que
+  satisface `lineWF` (con el `prf_lineWF_q1` de **producción**), tag 9, `lenc = 4̄`, que cumple
+  **la condición estructural entera**, y cuya casilla 2 es un **código de variable**. De ahí sale
+  `⊥`. La causa: la condición entera del tag 9 es **una sola ecuación de `carc`**, no menciona
+  buena formación, y `ax_lineWF_inv` sólo habla de la **etiqueta**.
+* **(B) cargarla colgante por la cadena** — REFUTADA, y peor:
+  `M5_LA_GUARDA_COLGANTE_IMPLICA_BOT` demuestra que la hipótesis es refutable, luego la D3
+  resultante sería **vacua**, no condicionada.
+
+### Decisión
+
+**Se enmiendan los 7 esquemas metiendo la guarda dentro del bicondicional**, en su versión
+**MÍNIMA**: se guarda **sólo las ranuras que aparecen bajo `substfc` o `liftfc`** — las únicas
+cuya evaluación la necesita. Las que sólo aparecen bajo constructores (`implc`, `forallc`, `exc`,
+`eqc`) no llevan nada, para dejar el verificador lo más completo posible.
+
+| tag | guarda añadida | conjuntos |
+|---|---|---|
+| `q1` (9) | `hasWitF (nthc · 2̄)` y `hasWit (nthc · 3̄)` | 2 |
+| `q2` (10) | `hasWitF (nthc · 2̄)` y `hasWit (nthc · 3̄)` | 2 |
+| `q3` (11) | `hasWitF (nthc · 3̄)` — sólo la que va bajo `liftfc` | 1 |
+| `leibniz` (13) | `hasWitF (nthc · 2̄)`, `hasWit (nthc · 3̄)`, `hasWit (nthc · 4̄)` | 3 |
+| `ind` (18) | `hasWitF (nthc · 2̄)` — los args de término son **cerrados** | 1 |
+| `qconf` (19) | `hasWitF (nthc · 2̄)` | 1 |
+| `listInd` (20) | `hasWitF (nthc · 2̄)` | 1 |
+
+**11 conjuntos nuevos**, 7 de sorte fórmula y 4 de sorte término, anidados a la derecha
+(`G₁ ∧ (G₂ ∧ ecuación)`) para que `hcond_absorbe_extra` se aplique en cascada.
+
+### El precio estructural: el CICLO DE IMPORTS (ADR-019) en DOS capas
+
+**Capa 1.** `hasWitF` y su cono se escribieron en `Meta/CodeWitnessPrf.lean`. Los esquemas viven en
+`Minimal/Axioms.lean`, que **sólo importa `FOL.*`**. Mencionarlos desde allí es un ciclo.
+
+Luego **las 21 definiciones del cono bajan a `Minimal/Axioms.lean`**: `shapeNul` `shapeUn`
+`shapeBin` `argsInBody` `argsIn` `isTermCodeE1` `wfAll1Body` `wfAll1` `isTC1` `hasWit` `lorAll`
+`clBot` `clAtom` `clEq` `clBin` `clUn` `isFormCodeE2` `wfAllFBody` `wfAllF` `isFC1` `hasWitF`.
+Todas sus hojas (`In` `lt` `land` `lor` `numeralM` `cons` `nil` `lenc` `nthc` `carc` `liftTerm`)
+ya estaban allí o en `FOL`, así que el descenso es mecánico y **no cambia ni un enunciado**.
+
+🔑 **Y NO se duplican**: `CodeWitnessPrf` las recupera con `export ROBINSON_PlusPlus.Minimal.Axioms
+(…)` dentro de `SinWTs` y de `ENS`. Son **la misma constante**, no una copia con puente `rfl`
+—verificado: `#print axioms CodeWitnessPrf.ENS.hasWitF` imprime `Minimal.Axioms.hasWitF`, y los
+`example … := rfl` pasan el kernel—, así que las **5 310 referencias** medidas (4 749 en
+`sondeos/`, 428 en el propio módulo, 133 en otros módulos de `Meta/`) siguen resolviendo **sin
+tocar ninguna**. Duplicarlas habría sido la enfermedad que ADR-019 describe.
+
+**Capa 2 — la que la medición previa no vio.** Los siete `prf_lineWF_*` —el codificador de D1, la
+dirección de vuelta del bicondicional— viven en `Meta/ReprPrf.lean`, que está **estrictamente
+aguas arriba** de `CodeWitnessPrf`. No pueden **pagar** la guarda (`prf_hasWitF_real` está abajo);
+sólo pueden **arrastrarla como hipótesis**. Eso obliga a bajar también **nueve lemas de
+fontanería** `substF_*` (`argsIn`, `isTermCodeE1`, `wfAll1`, `isTC1`, `hasWit`, `isFormCodeE2`,
+`wfAllF`, `isFC1`, `hasWitF`): son los que hacen a `substFormula` atravesar las guardas, y sin
+ellos la congruencia Leibniz no se puede enunciar arriba. Los `liftF_*` **no** bajan: su cadena es
+independiente. ⚠️ `substF_hasWitF` **no existía en producción** — estaba duplicada en
+`sondeos/MedirC_Carga.lean` y `sondeos/MedirC_Enmienda.lean`. Ahora es una sola constante.
+
+**La capa cierra**, y es lo que hace viable la vía: sólo `ReprPrf` y `ForallElimCodePrf` están
+aguas arriba de `CodeWitnessPrf`. Los otros cuatro consumidores —`PropCodePrf`, `LineWFCases`,
+`LineWFDerives`, `Representability2Prf`— son **incomparables** con él (ni lo importan ni son
+importados), así que pueden importarlo y **descargar** la guarda. La obligación viaja hacia abajo
+hasta donde hay códigos reales.
+
+Firma resultante, por ejemplo `q1`:
+
+```lean
+theorem prf_lineWF_q1 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (hasWit t)) :
+    Prf (lineWF (cons concl (cons (numeralM 9) (cons A (cons t nil)))) ⇔
+      (concl =eq implc (forallc A) (substfc zero t A)))
+```
+
+🔑 **El enunciado viejo era FALSO tras la enmienda, no sólo incompleto**: afirmaba el bicondicional
+para `A` y `t` **arbitrarios**, que es exactamente lo que la línea basura de la vía (A) explotaba.
+Que rompa es la señal de que la enmienda hace lo que promete.
+
+### Qué cambia, y qué NO
+
+**NO cambia el enunciado de nada.** Ni D1, ni D2, ni D3, ni Gödel I, ni Gödel II: los cinco están
+escritos sobre `Prf`, `provCodeC'` y `lineWF`, que son los mismos símbolos. **Ni la sentencia G**:
+`godelCN` tiene 483 dependencias transitivas y **ninguna es `axioms`** (§3.32.1), porque
+`axiomsCodeT`, `lineWF`, `chainOk` y `runFn` son átomos **opacos**. Y las listas **no cambian de
+longitud**: se sustituyen 7 de las 141, no se añade ninguna (`coreAxioms` 34, `codingAxioms` 107,
+`axioms` 141). El inventario de `axiom` de Lean sigue en **7**.
+
+**Cambia qué demuestra `Prov`**, en una sola dirección: `lineWF` se vuelve **estrictamente más
+exigente** en esos 7 tags, luego el verificador acepta **menos** líneas.
+
+* **Solidez**: mejora o queda igual. Nada sólido se vuelve insólido.
+* **Completitud (D1)**: aquí va la factura. El **enunciado** de D1 no cambia, pero su **prueba**
+  debe descargar los 11 conjuntos para cada línea que el codificador emite con esos tags. Son
+  líneas **concretas**, así que la obligación es sobre códigos concretos — y **las dos piezas ya
+  estaban en producción**: `prf_hasWitF_real (φ) : Prf (hasWitF (formCodeM φ))` y
+  `CRIT_hasWit_real (t) : Prf (hasWit (termCodeM t))`. Es la **rama A**, cerrada en agosto,
+  pagando una factura que entonces no existía. `sondeos/MedirC_Enmienda.lean` ya lo había
+  demostrado para la línea q1 real (`guardQ1_se_paga`) y no se sabía.
+* **El chasis NO se rehace**, contra lo que decía §3.32.2: `pcc_lineWF_tracked_of_schema` ya es
+  **genérico en `C`**, y `hcond_absorbe_extra` (`sondeos/SegundoMuro.lean`) es **genérico en `P`**,
+  compilado y net-0. Encajan tal cual. `pcc_lineWF_tracked_modulo_7` tampoco se toca: sus 7
+  hipótesis conservan la firma exacta.
+* **Trabajo genuinamente nuevo**: el reflector del conjunto extra —la reflexión Σ₁ de `hasWitF`
+  sobre un código **abstracto**—, que necesita el lema previo **`∀t. hasWit (tcFn t)`**, medido e
+  **inexistente** en producción y en los 57 sondeos. Receta precedentada (`pcc_eval_lenc` más
+  `prf_strong_induction`), no técnica nueva.
+* **De propina, la rama F se abarata**: `derives_lineWF_neg_thy_of_not_prf` y compañía demuestran
+  hechos **negativos** sobre `lineWF`, y un `lineWF` más fuerte es más fácil de refutar.
+
+### Por qué esto no debilita el teorema
+
+Lo único que la enmienda le quita a `Prov` son **líneas basura** — del tipo que la vía (A)
+construyó y compiló, con la ranura 2 ocupada por un código de variable. Un verificador de verdad
+comprueba que su carga sean códigos; el nuestro no lo comprobaba. **La enmienda no recorta la
+aritmetización: le quita una generosidad que no debería tener.** Y que D1 sobreviva es
+precisamente la garantía de que no recorta: `Prov` sigue reconociendo **todas** las demostraciones
+reales.
+
+⚠️ **Con precisión**: la refutación de (A) prueba que el verificador acepta líneas cuya carga no
+codifica nada. **No** prueba que la teoría actual sea insólida — de eso no hay medición. Son cosas
+distintas y no conviene confundirlas.
+
+### Consecuencia documental
+
+**El argumento de coste que se venía repitiendo para descartar esta vía era FALSO** y hay que
+dejar de repetirlo: «enmendar un esquema cambia G» es incorrecto, medido sobre el `Environment` de
+Lean y no por lectura. Queda corregido en §3.32.1, y esta ADR lo hereda.
+
+### Addendum (2026-09-05, al ejecutar): lo que la ejecución CORRIGIÓ de esta ADR
+
+Esta ADR se redactó antes de aplicar la enmienda. Tres cosas cambiaron al hacerlo:
+
+**1. El ciclo de imports tenía TRES capas, no una.** Además de bajar las 21 guardas (capa 1), hubo
+que bajar **9 lemas de fontanería `substF_*`** porque los 7 `prf_lineWF_*` viven en `ReprPrf`,
+**aguas arriba** de `CodeWitnessPrf`: no pueden PAGAR la guarda, sólo arrastrarla (capa 2).
+⚠️ `substF_hasWitF` **no existía en producción**, sólo duplicada en dos sondeos.
+
+**2. 🔑 La tercera capa se resolvió BORRANDO, no moviendo.** `CodeWitnessPrf` estaba en el FONDO
+del DAG (veía 62 módulos, sólo 3 lo veían), lo que hacía inalcanzables `prf_hasWitF_real` y
+`CRIT_hasWit_real` desde D1 y parecía obligar a mover **148 de sus 178 declaraciones**. Medido de
+verdad: el módulo **entero** necesita **10 de sus 36 imports**; **26 eran lastre**. Y el único que
+lo hundía por debajo de `Representability2` era `Sigma1CorePrf`, **por un solo nombre**: `objList`,
+tres líneas. Bajada `objList` a `Minimal` y podados 27 imports, el módulo pasa a ver 20, sube por
+encima de `Representability2`, y **no se movió ni una declaración**.
+⇒ **Regla**: cuando un módulo parezca estar en el sitio equivocado del DAG, medir **qué imports
+usa de verdad** antes de mover código. La posición suele ser HISTÓRICA, no necesaria.
+
+**3. El criterio que decide la viabilidad: PAGAR vs ARRASTRAR.** Cada sitio tocado por la enmienda
+o **descarga** la guarda (tiene códigos reales) o la **arrastra** como hipótesis. Arrastrar hasta
+arriba es exactamente la «guarda colgante» de la vía (B), refutada porque la D3 resultante sería
+**vacua**. ⇒ una guarda sólo se arrastra si algún consumidor concreto puede pagarla.
+
+**Y una pieza nueva que la ADR daba por lejana ya está**: `∀t. hasWit (tcFn t)`
+(`Meta/HasWitTcFnPrf.lean`, net-0 puro), probada por **inducción OBJETO** — la única ruta posible,
+porque `tcFn` es un átomo opaco con sólo `ax_tc_zero`/`ax_tc_succ` vivos. Paga las guardas de
+término en todos los sitios donde el testigo es un código punteado.
+
+**Estado al cierre: parada CONOCIDA en `Meta/MpCodePrf.lean`.** De sus 10 sitios, **4 son gratis**
+(piden `hasWitF` de códigos que ya son `formCode` de algo, incluido `forallc (formCode φ)`, que
+**es** `formCode (∀φ)`), y **6 piden una sola pieza que no existe**:
+`prf_hasWitF_substfc : Prf (hasWitF c) → Prf (hasWit s) → Prf (hasWitF (substfc v s c))`.
+Las guardas de TÉRMINO ya están resueltas: los 11 módulos consumidores pasan `tcFn …`.
+⚠️ El build se detiene ahí, así que los módulos de aguas abajo aún no se han evaluado: aparecerán
+más sitios, pero **ésos pagan** en vez de arrastrar.

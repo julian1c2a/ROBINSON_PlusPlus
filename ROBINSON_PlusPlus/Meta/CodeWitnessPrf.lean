@@ -1,39 +1,12 @@
 import ROBINSON_PlusPlus.Meta.ArithPrf
-import ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
-import ROBINSON_PlusPlus.Meta.CantorMonoPrf
 import ROBINSON_PlusPlus.Meta.ChainPrf
-import ROBINSON_PlusPlus.Meta.CheckArith
-import ROBINSON_PlusPlus.Meta.CodeCtorKit
-import ROBINSON_PlusPlus.Meta.D3InDotPrf
-import ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
-import ROBINSON_PlusPlus.Meta.DerivCondPrf
-import ROBINSON_PlusPlus.Meta.DotConsPrf
-import ROBINSON_PlusPlus.Meta.EvalArithPrf
-import ROBINSON_PlusPlus.Meta.EvalBoundedPrf
-import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
-import ROBINSON_PlusPlus.Meta.EvalListPrf
-import ROBINSON_PlusPlus.Meta.EvalLtPrf
-import ROBINSON_PlusPlus.Meta.EvalNthcPrf
-import ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 import ROBINSON_PlusPlus.Meta.Godel
 import ROBINSON_PlusPlus.Meta.Hilbert
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
-import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
-import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.NatArithPrf
 import ROBINSON_PlusPlus.Meta.NatOrderPrf
-import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
-import ROBINSON_PlusPlus.Meta.Provability
 import ROBINSON_PlusPlus.Meta.ReprPrf
-import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
-import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
-import ROBINSON_PlusPlus.Meta.Sigma1Prf
-import ROBINSON_PlusPlus.Meta.StrongInductionPrf
-import ROBINSON_PlusPlus.Meta.SubstArith
-import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
-import ROBINSON_PlusPlus.Meta.TcArithPrf
-import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 /-!
 # `Meta/CodeWitnessPrf.lean` — TESTIGOS de buena‑formación de códigos, y su NO‑VACUIDAD
 
@@ -84,21 +57,23 @@ section S_Clausura
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
-open ROBINSON_PlusPlus.Meta.BoundedInPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
-open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.TrackedCorePrf
-open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.Sigma1CorePrf
-open ROBINSON_PlusPlus.Meta.EvalListPrf ROBINSON_PlusPlus.Meta.EvalNthcPrf
-open ROBINSON_PlusPlus.Meta.EvalLtPrf ROBINSON_PlusPlus.Meta.EvalBoundedPrf
-open ROBINSON_PlusPlus.Meta.EvalArithPrf ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
-open ROBINSON_PlusPlus.Meta.InAxiomsCodePrf ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
-open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.D3InDotPrf
-open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.MpCodePrf
+open ROBINSON_PlusPlus.Meta.BoundedInPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000
 
 namespace SinWTs
+
+/-! Las nueve guardas de TERMINO **bajaron a `Minimal/Axioms.lean`** (ADR-020): los esquemas
+    `ax_lineWF_*` de sustitucion las mencionan, y `Minimal/` no puede importar `Meta/`. El
+    `export` las recupera como `SinWTs.*`, asi que **son la misma constante** y ninguna
+    referencia del arbol ni de `sondeos/` cambia. Es el CICLO DE IMPORTS de ADR-019 otra vez. -/
+export ROBINSON_PlusPlus.Minimal.Axioms (
+  argsInBody argsIn shapeUn shapeBin isTermCodeE1 wfAll1Body wfAll1 isTC1 lorAll
+  substF_argsIn substF_isTermCodeE1)
+
 
 /-! ## 0 · Combinadores y copias LITERALES del piloto -/
 
@@ -175,13 +150,6 @@ def varOkT (X : Term) : Formula :=
     Comparese con `CritPiloto.funcOkT`, que pedia `In (nthc X 2̄) wTs` — una segunda lista
     testigo de codigos de LISTA DE TERMINOS. Aqui NO hay segunda lista. -/
 
-/-- Cuerpo del `∀` acotado (el indice es `#0`). -/
-def argsInBody (wT Y : Term) : Formula :=
-  Formula.impl (lt (.var 0) (liftTerm 0 (lenc Y)))
-    (In (nthc (liftTerm 0 Y) (.var 0)) (liftTerm 0 wT))
-
-/-- «todas las posiciones de `Y` estan en `wT`». `Y` es la lista de argumentos. -/
-def argsIn (wT Y : Term) : Formula := Formula.forall (argsInBody wT Y)
 
 /-- tag 1 (`funcc`), SIN `wTs`. -/
 def funcOkT1 (wT X : Term) : Formula :=
@@ -192,27 +160,6 @@ def funcOkT1 (wT X : Term) : Formula :=
 def isTermCodeB1 (wT X : Term) : Formula :=
   lor (cOk X (varOkT X)) (cOk X (funcOkT1 wT X))
 
-/-! ### Forma ECUACIONAL (la que hace falta para CALCULAR el lift) -/
-
-def shapeUn (X : Term) (k : Nat) : Formula :=
-  Formula.eq X (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))
-
-def shapeBin (X : Term) (k : Nat) : Formula :=
-  Formula.eq X (cons (numeralM k)
-    (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))
-
-/-- `X` es codigo de TERMINO, forma ECUACIONAL, **un solo testigo**. -/
-def isTermCodeE1 (wT X : Term) : Formula :=
-  lor (shapeUn X 0) (land (shapeBin X 1) (argsIn wT (nthc X (numeralM 2))))
-
-def wfAll1Body (w : Term) : Formula :=
-  Formula.impl (lt (.var 0) (liftTerm 0 (lenc w)))
-    (isTermCodeE1 (liftTerm 0 w) (nthc (liftTerm 0 w) (.var 0)))
-
-/-- El testigo es AHORA UNA SOLA LISTA: no hay `p = cons wT wTs`, no hay `carc`/`cdrc`. -/
-def wfAll1 (w : Term) : Formula := Formula.forall (wfAll1Body w)
-
-def isTC1 (w c : Term) : Formula := land (wfAll1 w) (In c w)
 
 /-! ## 2 · LA DISCRIMINACION SOBREVIVE
 
@@ -612,19 +559,7 @@ theorem liftF_argsIn (k : Nat) (wT Y : Term) :
   simp only [argsIn, argsInBody, liftFormula, lt, lenc, nthc, In, liftTerm, liftTerms,
     Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
 
-theorem substF_argsIn (v : Nat) (s wT Y : Term) :
-    substFormula v s (argsIn wT Y) = argsIn (substTerm v s wT) (substTerm v s Y) := by
-  have hz : (0 = v + 1) = False := eq_false (by omega)
-  have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [argsIn, argsInBody, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
-    liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ, reduceIte, if_true,
-    FOL.substTerm_lift_comm_zero]
 
-theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
-    substFormula v s (isTermCodeE1 wT X)
-      = isTermCodeE1 (substTerm v s wT) (substTerm v s X) := by
-  simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, substFormula, substF_argsIn,
-    nthc, cons, nil, zero, substTerm, substTerms, substTerm_numeralM]
 
 theorem liftF_isTermCodeE1 (k : Nat) (wT X : Term) :
     liftFormula k (isTermCodeE1 wT X)
@@ -1329,9 +1264,6 @@ def strBinOkF1 (wT X : Term) (k : Nat) : Formula :=
   land (land (Formula.eq (carc X) (numeralM k)) (Formula.eq (lenc X) (numeralM 3)))
        (argsIn wT (nthc X (numeralM 2)))
 
-def lorAll : Formula → List Formula → Formula
-  | a, []      => a
-  | a, b :: bs => lor a (lorAll b bs)
 
 /-- Predicado de codigo de FORMULA con **DOS** listas testigo (`wF`, `wT`) en vez de tres. -/
 def isFormCodeB2 (wF wT X : Term) : Formula :=
@@ -1405,22 +1337,20 @@ section S_Ens
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
-open ROBINSON_PlusPlus.Meta.BoundedInPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
-open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.TrackedCorePrf
-open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.Sigma1CorePrf
-open ROBINSON_PlusPlus.Meta.EvalListPrf ROBINSON_PlusPlus.Meta.EvalNthcPrf
-open ROBINSON_PlusPlus.Meta.EvalLtPrf ROBINSON_PlusPlus.Meta.EvalBoundedPrf
-open ROBINSON_PlusPlus.Meta.EvalArithPrf ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
-open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.ChainPrf
-open ROBINSON_PlusPlus.Meta.MpCodePrf ROBINSON_PlusPlus.Meta.CodeCtorKit
-open ROBINSON_PlusPlus.Meta.StrongInductionPrf ROBINSON_PlusPlus.Meta.CantorMonoPrf
-open ROBINSON_PlusPlus.Meta.NatOrderPrf ROBINSON_PlusPlus.Meta.SubstArith
-open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
-open ROBINSON_PlusPlus.Meta.ForallElimCodePrf ROBINSON_PlusPlus.Meta.TcArithPrf
-open ROBINSON_PlusPlus.Meta.CheckArith ROBINSON_PlusPlus.Meta.Sigma1Prf
-open ROBINSON_PlusPlus.Meta.NatArithPrf ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.BoundedInPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.NatOrderPrf
+open ROBINSON_PlusPlus.Meta.NatArithPrf
 
 namespace ENS
+
+/-! Las doce guardas de FORMULA (y `hasWit`) **bajaron a `Minimal/Axioms.lean`** — ver la nota
+    de `SinWTs` y ADR-020. Misma constante, via `export`. -/
+export ROBINSON_PlusPlus.Minimal.Axioms (
+  shapeNul hasWit clBot clAtom clEq clBin clUn isFormCodeE2 wfAllFBody wfAllF isFC1 hasWitF
+  substF_wfAll1 substF_isTC1 substF_hasWit substF_isFormCodeE2 substF_wfAllF substF_isFC1
+  substF_hasWitF)
+
 
 /-! ############################################################################
     ## §0 · Combinadores (copias literales de `sondeos/EvalSubsttc.lean` §D)
@@ -1447,28 +1377,15 @@ namespace ENS
    Sólo se conservan las DOS que son genuinamente de este bloque. -/
 open SinWTs
 
-def shapeNul (X : Term) (k : Nat) : Formula := Formula.eq X (cons (numeralM k) nil)
-
-def hasWit (c : Term) : Formula := Formula.ex (isTC1 (.var 0) (liftTerm 0 c))
 
 /-! ### Fontaneria De Bruijn del bloque de TERMINO (copias literales) -/
 
 
-theorem substF_wfAll1 (v : Nat) (s w : Term) :
-    substFormula v s (wfAll1 w) = wfAll1 (substTerm v s w) := by
-  have hz : (0 = v + 1) = False := eq_false (by omega)
-  have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [wfAll1, wfAll1Body, substFormula, substF_isTermCodeE1, lt, lenc, nthc,
-    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ,
-    reduceIte, if_true, FOL.substTerm_lift_comm_zero]
 
 theorem liftF_isTC1 (k : Nat) (w c : Term) :
     liftFormula k (isTC1 w c) = isTC1 (liftTerm k w) (liftTerm k c) := by
   simp only [isTC1, land, In, liftFormula, liftF_wfAll1, liftTerm, liftTerms]
 
-theorem substF_isTC1 (v : Nat) (s w c : Term) :
-    substFormula v s (isTC1 w c) = isTC1 (substTerm v s w) (substTerm v s c) := by
-  simp only [isTC1, land, In, substFormula, substF_wfAll1, substTerm, substTerms]
 
 
 /-! ### Clausura y no‑vacuidad de `hasWit` (promovido de `sondeos/ClausuraLiftSinWTs.lean`, B1)
@@ -1514,12 +1431,6 @@ theorem liftF_hasWit (k : Nat) (c : Term) :
   simp only [hasWit, liftFormula, liftF_isTC1, liftTerm, Nat.zero_lt_succ, reduceIte,
     ← FOL.liftTerm_comm_zero]
 
-theorem substF_hasWit (v : Nat) (s c : Term) :
-    substFormula v s (hasWit c) = hasWit (substTerm v s c) := by
-  have hz : (0 = v + 1) = False := eq_false (by omega)
-  have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [hasWit, substFormula, substF_isTC1, substTerm, hz, hz2, if_false,
-    FOL.substTerm_lift_comm_zero]
 
 /-! ############################################################################
     ## §2 · EL RECONOCEDOR DE CODIGO DE **FORMULA**, forma ECUACIONAL, con
@@ -1534,43 +1445,7 @@ theorem substF_hasWit (v : Nat) (s c : Term) :
     ############################################################################ -/
 
 
-/-- tag 2 · `botc` -/
-def clBot (X : Term) : Formula := shapeNul X 2
-/-- tag 3 · `atomc p ts` : casilla 1 OPACA (simbolo), casilla 2 LISTA de terminos. -/
-def clAtom (wT X : Term) : Formula :=
-  land (shapeBin X 3) (argsIn wT (nthc X (numeralM 2)))
-/-- tag 4 · `eqc a b` : las DOS casillas son codigos de TERMINO. -/
-def clEq (wT X : Term) : Formula :=
-  land (shapeBin X 4)
-    (land (In (nthc X (numeralM 1)) wT) (In (nthc X (numeralM 2)) wT))
-/-- tags 5/7/8 · `implc`/`andc`/`orc` : las DOS casillas son codigos de FORMULA. -/
-def clBin (wF X : Term) (k : Nat) : Formula :=
-  land (shapeBin X k)
-    (land (In (nthc X (numeralM 1)) wF) (In (nthc X (numeralM 2)) wF))
-/-- tags 6/9 · `forallc`/`exc` : UNA casilla de FORMULA. -/
-def clUn (wF X : Term) (k : Nat) : Formula :=
-  land (shapeUn X k) (In (nthc X (numeralM 1)) wF)
 
-def isFormCodeE2 (wF wT X : Term) : Formula :=
-  lorAll (clBot X)
-    [ clAtom wT X
-    , clEq wT X
-    , clBin wF X 5
-    , clUn wF X 6
-    , clBin wF X 7
-    , clBin wF X 8
-    , clUn wF X 9 ]
-
-def wfAllFBody (wF wT : Term) : Formula :=
-  Formula.impl (lt (.var 0) (liftTerm 0 (lenc wF)))
-    (isFormCodeE2 (liftTerm 0 wF) (liftTerm 0 wT) (nthc (liftTerm 0 wF) (.var 0)))
-
-def wfAllF (wF wT : Term) : Formula := Formula.forall (wfAllFBody wF wT)
-
-/-- **La guarda de FORMULA**: `wT` es un testigo de terminos bien formado, `wF` un testigo
-    de formulas bien formado CONTRA `wT`, y `c` esta en `wF`. -/
-def isFC1 (wF wT c : Term) : Formula :=
-  land (land (wfAll1 wT) (wfAllF wF wT)) (In c wF)
 
 /-! ### Fontaneria De Bruijn del bloque de FORMULA -/
 
@@ -1581,35 +1456,18 @@ theorem liftF_isFormCodeE2 (k : Nat) (wF wT X : Term) :
     shapeBin, lor, land, In, liftFormula, liftF_argsIn, nthc, cons, nil, zero,
     liftTerm, liftTerms, liftTerm_numeralM]
 
-theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
-    substFormula v s (isFormCodeE2 wF wT X)
-      = isFormCodeE2 (substTerm v s wF) (substTerm v s wT) (substTerm v s X) := by
-  simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn, shapeNul, shapeUn,
-    shapeBin, lor, land, In, substFormula, substF_argsIn, nthc, cons, nil, zero,
-    substTerm, substTerms, substTerm_numeralM]
 
 theorem liftF_wfAllF (k : Nat) (wF wT : Term) :
     liftFormula k (wfAllF wF wT) = wfAllF (liftTerm k wF) (liftTerm k wT) := by
   simp only [wfAllF, wfAllFBody, liftFormula, liftF_isFormCodeE2, lt, lenc, nthc,
     liftTerm, liftTerms, Nat.zero_lt_succ, reduceIte, if_true, ← FOL.liftTerm_comm_zero]
 
-theorem substF_wfAllF (v : Nat) (s wF wT : Term) :
-    substFormula v s (wfAllF wF wT) = wfAllF (substTerm v s wF) (substTerm v s wT) := by
-  have hz : (0 = v + 1) = False := eq_false (by omega)
-  have hz2 : (0 > v + 1) = False := eq_false (by omega)
-  simp only [wfAllF, wfAllFBody, substFormula, substF_isFormCodeE2, lt, lenc, nthc,
-    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, if_false, Nat.zero_lt_succ,
-    reduceIte, if_true, FOL.substTerm_lift_comm_zero]
 
 theorem liftF_isFC1 (k : Nat) (wF wT c : Term) :
     liftFormula k (isFC1 wF wT c)
       = isFC1 (liftTerm k wF) (liftTerm k wT) (liftTerm k c) := by
   simp only [isFC1, land, In, liftFormula, liftF_wfAll1, liftF_wfAllF, liftTerm, liftTerms]
 
-theorem substF_isFC1 (v : Nat) (s wF wT c : Term) :
-    substFormula v s (isFC1 wF wT c)
-      = isFC1 (substTerm v s wF) (substTerm v s wT) (substTerm v s c) := by
-  simp only [isFC1, land, In, substFormula, substF_wfAll1, substF_wfAllF, substTerm, substTerms]
 
 /-! ### Del testigo al NODO — espejo de `EvalSubsttc.prf_isTermCodeE1_of_In` -/
 
@@ -1667,8 +1525,6 @@ theorem prf_isFormCodeE2_of_In (wF wT c : Term) :
 
 /-! COPIA LITERAL de EvalSubstfcPrf.lean:8243-8244 y 8320-8324 -/
 
-def hasWitF (c : Term) : Formula :=
-  Formula.ex (Formula.ex (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 c))))
 
 theorem liftF_hasWitF (k : Nat) (c : Term) :
     liftFormula k (hasWitF c) = hasWitF (liftTerm k c) := by
@@ -1768,12 +1624,7 @@ section S_HW
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
-open ROBINSON_PlusPlus.Meta.BoundedInPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
-open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.TrackedCorePrf
-open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.Sigma1CorePrf
-open ROBINSON_PlusPlus.Meta.EvalListPrf ROBINSON_PlusPlus.Meta.EvalNthcPrf
-open ROBINSON_PlusPlus.Meta.EvalLtPrf ROBINSON_PlusPlus.Meta.EvalBoundedPrf
-open ROBINSON_PlusPlus.Meta.EvalArithPrf ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
+open ROBINSON_PlusPlus.Meta.BoundedInPrf
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -2335,3 +2186,6 @@ export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs (
 export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS (
   CRIT_hasWit_real hasWit liftF_hasWit liftF_isTC1 prf_isFormCodeE2_of_boundedIn
   substF_hasWit substF_isTC1 substF_wfAll1)
+
+-- ADR-020: `Representability2` lo consume para PAGAR la guarda de los 7 esquemas enmendados.
+export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.HW (prf_hasWitF_real)

@@ -4,10 +4,51 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑04 · `master` verde · Lean v4.31.0 — B2 CERRADA (el DESCENSO en producción)**
-**124 jobs · 110 módulos activos (Minimal 11 + Meta 88 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
-**7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
-comentarios).
+**Estado 2026‑09‑05 · rama `via-c-adr020` · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`**
+**`master` sigue VERDE en `97f2a37`.** La parada es **CONOCIDA y localizada**, en mitad de la
+ejecución de la **vía C** ([ADR‑020](DECISIONS.md)) — **no es una regresión**. Todo lo demás verde.
+**125 jobs · 111 módulos activos (Minimal 11 + Meta 89 + Full 11) + 0 en `cuarentena/` · 58 `sondeos/`**
+**7 `axiom` de Lean · 0 sorrys.**
+
+> # 🎯 SIGUIENTE SESIÓN — **cerrar `MpCodePrf` y devolver el árbol a verde**
+>
+> Todo lo medido está en **§3.36** de `doc/REFERENCE-Incompleteness.md` y en el **Addendum** de
+> ADR‑020. Resumen operativo:
+>
+> **Los 10 sitios de `MpCodePrf` NO son iguales:**
+> * **4 son gratis** — piden `hasWitF` de códigos que **ya son `formCode` de algo**, incluido
+>   `forallc (formCode φ)`, que **es** `formCode (∀φ)`. Los paga `prf_hasWitF_fc`.
+> * **6 piden UNA sola pieza que no existe**:
+>   `prf_hasWitF_substfc : Prf (hasWitF c) → Prf (hasWit s) → Prf (hasWitF (substfc v s c))`.
+>   Vienen del patrón de `pcc_thm_inst2/3/4`: la primera ∀‑elim va sobre un `formCode`, las
+>   siguientes sobre el código ya **sustituido**. Estimación **300‑600 líneas**, terreno de
+>   `pcc_eval_substfc`.
+> * **Las guardas de TÉRMINO ya están resueltas**: los 11 consumidores pasan `tcFn …` ⇒
+>   `prf_hasWit_tcFn` (`Meta/HasWitTcFnPrf.lean`, probado hoy). Falta sólo `hasWit (varc n)`,
+>   lema pequeño (cae por `shapeUn X 0`).
+>
+> ▶ **PRIMER PASO, antes de escribir nada: MEDIR `sondeos/HasWitFReal.lean` y
+> `sondeos/HasWitFCritica.lean`.** Ya tienen `prf_hasWitF_real`, `PrfH_congr_hasWitF`,
+> `substF_hole_hasWitF` y varios controles negativos. Medir antes de construir ha ganado
+> **cuatro de cuatro** veces en la sesión del 09‑05.
+>
+> ⚠️ **El build se detiene en `MpCodePrf`**, así que los módulos de aguas abajo (`EvalNthcPrf`,
+> `EvalListPrf`, `EvalMulPrf`, `LiftcCodePrf`, `SubstfcCodePrf`…) **aún no se han evaluado**:
+> aparecerán más sitios. La diferencia es que **ésos pagan** en vez de arrastrar.
+>
+> 🔑 **EL CRITERIO QUE MANDA EN ESTA RAMA — pagar vs arrastrar.** Cada sitio o **descarga** la
+> guarda (tiene códigos reales) o la **arrastra** como hipótesis. Arrastrar hasta arriba es
+> exactamente la **«guarda colgante» de la vía (B)**, refutada porque la D3 resultante sería
+> **vacua**. Una guarda sólo se arrastra si algún consumidor concreto puede pagarla.
+>
+> ⚠️ **Y dos errores de medición cometidos el 09‑05, para no repetirlos** (§3.36.6):
+> 1. el **cierre por nombres** sobre cuerpos estimó 165 teoremas infectados (incluido D3); la
+>    realidad fueron **~6 sitios**. Para el radio de una propagación de firma, **el compilador es
+>    la única medida**.
+> 2. medir lo que un módulo **importa** no es medir lo que **necesita**: `CodeWitnessPrf` usaba
+>    10 de sus 36 imports, y podar los 26 muertos lo subió en el DAG **sin mover una declaración**.
+
+---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)
 >
@@ -271,9 +312,10 @@ comentarios).
 > # 🎯 SIGUIENTE SESIÓN — **la rama B, que ahora bloquea TRES frentes**
 >
 > ✅ Las dos mediciones están hechas (3/3 cada una) y las dos **cambian el plan**:
-> * **Rama C** (§3.32.2): de las tres vías, **dos están REFUTADAS con prueba compilada**. Queda la
->   **enmienda del esquema**, que es circular tal cual y pide antes `∀t. hasWit (tcFn t)`.
->   ⛔ Y el argumento «enmendar cambia G» que la desaconsejaba **es FALSO** (§3.32.1).
+> * **Rama C** — ✅ **EJECUTADA el 2026‑09‑05** (ADR‑020, §3.36). La enmienda está aplicada, y
+>   `∀t. hasWit (tcFn t)` **probado** y en producción (`Meta/HasWitTcFnPrf.lean`, net‑0 puro).
+>   ⚠️ Parada conocida en `MpCodePrf`: ver el PUNTO DE REANUDACIÓN arriba.
+>   ⛔ El argumento «enmendar cambia G» que la desaconsejaba **es FALSO** (§3.32.1).
 > * **Rama F** (§3.32.3): su bloqueo documentado **no existe desde julio**; la estimación baja a la
 >   mitad.
 >

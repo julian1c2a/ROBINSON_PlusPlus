@@ -134,10 +134,10 @@ explícita se resuelve por **meta-inducción** en la lista, usando los combinado
 en el caso cabeza el elemento **es** `x` (igualdad Lean, no `x =eq e` object), así que
 `pcc_in_head` aplica **incondicionalmente**. -/
 
-/-- Lista object (`cons`/`nil`) a partir de una lista meta de términos. -/
-def objList : List Term → Term
-  | []      => nil
-  | e :: es => cons e (objList es)
+/-! `objList` **bajó a `Minimal/Axioms.lean`** (ADR-020): era el único nombre por el que
+    `CodeWitnessPrf` dependía de este módulo, y esa dependencia lo hundía por debajo de
+    `Representability2`. El `export` la recupera: **es la misma constante**. -/
+export ROBINSON_PlusPlus.Minimal.Axioms (objList)
 
 /-- Valor `Nat` de `objList` (espejo exacto, con `consN` de `CodeNumeralPrf`). -/
 def objListN : List Nat → Nat
@@ -257,21 +257,30 @@ theorem prf_provCodeC'_of_tracked_witness (A : Formula) (p : Term)
 
 /-! ### A‑F3 — hacia `pcc_exIntro_code` (∃‑intro a nivel de código)
 
-**Verificación (2026‑07‑05):** el verificador SÍ acepta líneas‑axioma **Q2** con testigo‑código
-arbitrario: `ax_lineWF_q2` da `lineWF ⌜concl,10,A,t⌝ ⇔ (concl =eq implc (substfc 0 t A) (exc A))`
-y `ax_premsOf_q2` da `premsOf = nil` (axioma, sin premisas de contexto). Por tanto una línea Q2
-con `t := tcFn p` (código arbitrario) es **incondicionalmente válida** y concluye
-`implc (substfc 0 (tcFn p) ⌜A⌝) (exc ⌜A⌝)` = `⌜A[tcFn p] ⇒ ∃A⌝`. Primer ladrillo: la validez de
-la línea Q2 en cualquier contexto (`lineOk`), precursor del ensamblaje tipo `d2_prf`. -/
+**Verificación (2026‑07‑05):** el verificador acepta líneas‑axioma **Q2**:
+`ax_lineWF_q2` da `lineWF ⌜concl,10,A,t⌝ ⇔ (…condición…)` y `ax_premsOf_q2` da `premsOf = nil`
+(axioma, sin premisas de contexto). Concluye `implc (substfc 0 t ⌜A⌝) (exc ⌜A⌝)` = `⌜A[t] ⇒ ∃A⌝`.
+Primer ladrillo: la validez de la línea Q2 en cualquier contexto (`lineOk`), precursor del
+ensamblaje tipo `d2_prf`.
+
+⚠️ **Corregido 2026‑09‑05 ([ADR‑020](../../DECISIONS.md)).** Este párrafo decía que la línea es
+**«incondicionalmente válida» con testigo‑código arbitrario**. Ya NO lo es, y era justamente el
+agujero: la enmienda de los 7 esquemas de sustitución mete en el `⇔` la guarda `hasWitF A` y
+`hasWit t`, precisamente para que una línea con la casilla ocupada por un código de VARIABLE
+—que satisfacía `lineWF`, y está compilado— deje de pasar. `prf_lineOk_q2` arrastra ahora esas
+dos guardas como hipótesis; en un uso REAL las descargan `prf_hasWitF_real`/`CRIT_hasWit_real`. -/
 
 /-- **Validez de una línea Q2** en cualquier contexto `c`: `lineOk c (q2line)` donde
     `q2line = ⟨implc (substfc 0 w Ac) (exc Ac), 10, Ac, w⟩`. `lineWF` por `prf_lineWF_q2`
-    (reflexividad de la conclusión), sin premisas (`prf_premsOf_q2` → `allIn c nil`). -/
-theorem prf_lineOk_q2 (c Ac w : Term) :
+    (reflexividad de la conclusión), sin premisas (`prf_premsOf_q2` → `allIn c nil`).
+
+    ⚠️ Pide las dos guardas de ADR‑020: `Ac` ha de ser código de FÓRMULA y `w` de TÉRMINO. No es
+    burocracia — sin ellas la línea admite basura (ver la nota de §A‑F3). -/
+theorem prf_lineOk_q2 (c Ac w : Term) (hwA : Prf (hasWitF Ac)) (hww : Prf (hasWit w)) :
     Prf (lineOk c (cons (implc (substfc zero w Ac) (exc Ac))
       (cons (numeralM 10) (cons Ac (cons w nil))))) :=
   prf_and_intro
-    (prf_iff_mpr (prf_lineWF_q2 _ Ac w) (prf_refl _))
+    (prf_iff_mpr (prf_lineWF_q2 _ Ac w hwA hww) (prf_refl _))
     (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q2 _ Ac w)) (prf_allIn_nil c))
 
 end ROBINSON_PlusPlus.Meta.Sigma1CorePrf

@@ -1001,6 +1001,183 @@ def ax_vpf_listInd : Formula :=
                            (liftfc (succ (succ zero)) (liftfc (succ zero) (.var 1)))))))
                       (forallc (.var 1)))) nil)) (.var 0))
 
+/-! ### Las guardas de BUENA FORMACIÓN de códigos (`hasWit` / `hasWitF`)
+
+Predicados de «código bien formado, **con testigo**», en la forma ECUACIONAL de un solo testigo
+por sorte (`wT` para términos, `wF` contra `wT` para fórmulas).
+
+⚠️ **Por qué viven AQUÍ y no en `Meta/CodeWitnessPrf.lean`, donde se escribieron** (ADR‑020): los
+esquemas `ax_lineWF_*` de sustitución los **mencionan**, y `Minimal/Axioms.lean` no puede importar
+nada de `Meta/` sin ciclo. Es el CICLO DE IMPORTS de ADR‑019 un nivel más adentro, y la salida es
+la misma: **bajar el general**. `CodeWitnessPrf` los recupera por `export`‑alias en sus namespaces
+`SinWTs` y `ENS`, así que **son la misma constante** —no una copia— y las ~5 300 referencias del
+árbol y de `sondeos/` siguen resolviendo sin tocar ni una.
+
+⚠️ Son **DEFINICIONES**, no axiomas: no tocan el inventario de `axiom`, que sigue en 7. -/
+
+/-- Forma NULARIA: `X = ⟨k⟩`. -/
+def shapeNul (X : Term) (k : Nat) : Formula := Formula.eq X (cons (numeralM k) nil)
+
+/-- Forma UNARIA: `X = ⟨k, X₁⟩`. -/
+def shapeUn (X : Term) (k : Nat) : Formula :=
+  Formula.eq X (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))
+
+/-- Forma BINARIA: `X = ⟨k, X₁, X₂⟩`. -/
+def shapeBin (X : Term) (k : Nat) : Formula :=
+  Formula.eq X (cons (numeralM k)
+    (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))
+
+/-- Cuerpo del `∀` acotado (el índice es `#0`). -/
+def argsInBody (wT Y : Term) : Formula :=
+  Formula.impl (lt (.var 0) (liftTerm 0 (lenc Y)))
+    (In (nthc (liftTerm 0 Y) (.var 0)) (liftTerm 0 wT))
+
+/-- «todas las posiciones de `Y` están en `wT`». `Y` es la lista de argumentos. -/
+def argsIn (wT Y : Term) : Formula := Formula.forall (argsInBody wT Y)
+
+/-- `X` es código de TÉRMINO, forma ECUACIONAL, **un solo testigo**. -/
+def isTermCodeE1 (wT X : Term) : Formula :=
+  lor (shapeUn X 0) (land (shapeBin X 1) (argsIn wT (nthc X (numeralM 2))))
+
+def wfAll1Body (w : Term) : Formula :=
+  Formula.impl (lt (.var 0) (liftTerm 0 (lenc w)))
+    (isTermCodeE1 (liftTerm 0 w) (nthc (liftTerm 0 w) (.var 0)))
+
+/-- El testigo es UNA SOLA LISTA: no hay `p = cons wT wTs`, no hay `carc`/`cdrc`. -/
+def wfAll1 (w : Term) : Formula := Formula.forall (wfAll1Body w)
+
+def isTC1 (w c : Term) : Formula := land (wfAll1 w) (In c w)
+
+/-- **La guarda de TÉRMINO**: `c` tiene un testigo de código de término. -/
+def hasWit (c : Term) : Formula := Formula.ex (isTC1 (.var 0) (liftTerm 0 c))
+
+/-- Disyunción de una lista no vacía de cláusulas. -/
+def lorAll : Formula → List Formula → Formula
+  | a, []      => a
+  | a, b :: bs => lor a (lorAll b bs)
+
+/-- tag 2 · `botc` -/
+def clBot (X : Term) : Formula := shapeNul X 2
+/-- tag 3 · `atomc p ts`: casilla 1 OPACA (símbolo), casilla 2 LISTA de términos. -/
+def clAtom (wT X : Term) : Formula :=
+  land (shapeBin X 3) (argsIn wT (nthc X (numeralM 2)))
+/-- tag 4 · `eqc a b`: las DOS casillas son códigos de TÉRMINO. -/
+def clEq (wT X : Term) : Formula :=
+  land (shapeBin X 4)
+    (land (In (nthc X (numeralM 1)) wT) (In (nthc X (numeralM 2)) wT))
+/-- tags 5/7/8 · `implc`/`andc`/`orc`: las DOS casillas son códigos de FÓRMULA. -/
+def clBin (wF X : Term) (k : Nat) : Formula :=
+  land (shapeBin X k)
+    (land (In (nthc X (numeralM 1)) wF) (In (nthc X (numeralM 2)) wF))
+/-- tags 6/9 · `forallc`/`exc`: UNA casilla de FÓRMULA. -/
+def clUn (wF X : Term) (k : Nat) : Formula :=
+  land (shapeUn X k) (In (nthc X (numeralM 1)) wF)
+
+def isFormCodeE2 (wF wT X : Term) : Formula :=
+  lorAll (clBot X)
+    [ clAtom wT X
+    , clEq wT X
+    , clBin wF X 5
+    , clUn wF X 6
+    , clBin wF X 7
+    , clBin wF X 8
+    , clUn wF X 9 ]
+
+def wfAllFBody (wF wT : Term) : Formula :=
+  Formula.impl (lt (.var 0) (liftTerm 0 (lenc wF)))
+    (isFormCodeE2 (liftTerm 0 wF) (liftTerm 0 wT) (nthc (liftTerm 0 wF) (.var 0)))
+
+def wfAllF (wF wT : Term) : Formula := Formula.forall (wfAllFBody wF wT)
+
+/-- **La guarda de FÓRMULA**: `wT` es un testigo de términos bien formado, `wF` un testigo
+    de fórmulas bien formado CONTRA `wT`, y `c` está en `wF`. -/
+def isFC1 (wF wT c : Term) : Formula :=
+  land (land (wfAll1 wT) (wfAllF wF wT)) (In c wF)
+
+/-- **La guarda de FÓRMULA, existencial** — la que enmienda los 7 esquemas de sustitución. -/
+def hasWitF (c : Term) : Formula :=
+  Formula.ex (Formula.ex (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 c))))
+
+/-! #### Fontanería De Bruijn de las guardas (`substFormula`)
+
+Las nueve que necesita la **congruencia Leibniz** de `hasWit`/`hasWitF` aguas arriba —en
+`Meta/ReprPrf.lean`, que es donde viven los `prf_lineWF_*` enmendados y que está **antes** de
+`CodeWitnessPrf`—. Bajan con las definiciones por la misma razón (ADR‑020) y `CodeWitnessPrf` las
+re‑exporta. Los `liftF_*` **no** bajan: su cadena es independiente y nadie los necesita aquí.
+
+⚠️ `substF_hasWitF` es **nueva en producción**: no existía, sólo estaba duplicada en
+`sondeos/MedirC_Carga.lean` y `sondeos/MedirC_Enmienda.lean`. -/
+
+theorem substF_argsIn (v : Nat) (s wT Y : Term) :
+    substFormula v s (argsIn wT Y) = argsIn (substTerm v s wT) (substTerm v s Y) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [argsIn, argsInBody, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
+    liftTerm, liftTerms, hz, hz2, if_false, FOL.substTerm_lift_comm_zero]
+
+theorem substF_isTermCodeE1 (v : Nat) (s wT X : Term) :
+    substFormula v s (isTermCodeE1 wT X)
+      = isTermCodeE1 (substTerm v s wT) (substTerm v s X) := by
+  simp only [isTermCodeE1, shapeUn, shapeBin, lor, land, substFormula, substF_argsIn,
+    nthc, cons, nil, zero, substTerm, substTerms, substTerm_numeralM]
+
+theorem substF_wfAll1 (v : Nat) (s w : Term) :
+    substFormula v s (wfAll1 w) = wfAll1 (substTerm v s w) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [wfAll1, wfAll1Body, substFormula, substF_isTermCodeE1, lt, lenc, nthc,
+    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, if_false,
+    FOL.substTerm_lift_comm_zero]
+
+theorem substF_isTC1 (v : Nat) (s w c : Term) :
+    substFormula v s (isTC1 w c) = isTC1 (substTerm v s w) (substTerm v s c) := by
+  simp only [isTC1, land, In, substFormula, substF_wfAll1, substTerms]
+
+theorem substF_hasWit (v : Nat) (s c : Term) :
+    substFormula v s (hasWit c) = hasWit (substTerm v s c) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [hasWit, substFormula, substF_isTC1, substTerm, hz, hz2, if_false,
+    FOL.substTerm_lift_comm_zero]
+
+theorem substF_isFormCodeE2 (v : Nat) (s wF wT X : Term) :
+    substFormula v s (isFormCodeE2 wF wT X)
+      = isFormCodeE2 (substTerm v s wF) (substTerm v s wT) (substTerm v s X) := by
+  simp only [isFormCodeE2, lorAll, clBot, clAtom, clEq, clBin, clUn, shapeNul, shapeUn,
+    shapeBin, lor, land, In, substFormula, substF_argsIn, nthc, cons, nil, zero,
+    substTerm, substTerms, substTerm_numeralM]
+
+theorem substF_wfAllF (v : Nat) (s wF wT : Term) :
+    substFormula v s (wfAllF wF wT) = wfAllF (substTerm v s wF) (substTerm v s wT) := by
+  have hz : (0 = v + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1) = False := eq_false (by omega)
+  simp only [wfAllF, wfAllFBody, substFormula, substF_isFormCodeE2, lt, lenc, nthc,
+    substTerm, substTerms, liftTerm, liftTerms, hz, hz2, if_false,
+    FOL.substTerm_lift_comm_zero]
+
+theorem substF_isFC1 (v : Nat) (s wF wT c : Term) :
+    substFormula v s (isFC1 wF wT c)
+      = isFC1 (substTerm v s wF) (substTerm v s wT) (substTerm v s c) := by
+  simp only [isFC1, land, In, substFormula, substF_wfAll1, substF_wfAllF, substTerms]
+
+/-- Lista object (`cons`/`nil`) a partir de una lista meta de terminos.
+
+    Baja aqui con las guardas (ADR-020): era el UNICO nombre por el que `CodeWitnessPrf`
+    dependia de `Sigma1CorePrf`, y esa dependencia era la que lo hundia hasta debajo de
+    `Representability2`. Tres lineas que costaban 26 imports. `Sigma1CorePrf` la re-exporta. -/
+def objList : List Term -> Term
+  | []      => nil
+  | e :: es => cons e (objList es)
+
+theorem substF_hasWitF (v : Nat) (s c : Term) :
+    substFormula v s (hasWitF c) = hasWitF (substTerm v s c) := by
+  have h1 : (1 = v + 1 + 1) = False := eq_false (by omega)
+  have h2 : (1 > v + 1 + 1) = False := eq_false (by omega)
+  have hz : (0 = v + 1 + 1) = False := eq_false (by omega)
+  have hz2 : (0 > v + 1 + 1) = False := eq_false (by omega)
+  simp only [hasWitF, substFormula, substF_isFC1, substTerm, h1, h2, hz, hz2, if_false,
+    FOL.substTerm_lift_comm_zero]
+
 /-! ### `lineWF` / `premsOf` por regla (validez de líneas del verificador `runFn`)
 
 Para el verificador estructural `runFn` (Nivel D real, hacia D2/D3): cada línea es
@@ -1132,51 +1309,70 @@ def ax_lineWF_p3 : Formula :=
 def ax_premsOf_p3 : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 14) (cons (.var 0) nil))) =eq nil)
 
-/-! ### `lineWF`/`premsOf` de los esquemas de SUSTITUCIÓN (q1/q2/q3/leibniz/ind)
+/-! ### `lineWF`/`premsOf` de los esquemas de SUSTITUCIÓN (q1 q2 q3 leibniz ind qconf listInd)
 
 Reconstrucciones con `substfc`/`liftfc` (espejo de los `ax_vpf_*`); la fidelidad
-se cierra con los `*_concl_code` (StepArith) y `ind_concl_code` (Induction). -/
+se cierra con los `*_concl_code` (StepArith) y `ind_concl_code` (Induction).
 
--- Q1 (tag 9, [A,t]): concl ⇔ (∀A) ⇒ A[t]
+⚠️ **Son SIETE, no cinco** — el encabezado listaba `q1/q2/q3/leibniz/ind` y se dejaba fuera
+`qconf` (19) y `listInd` (20), que están en este mismo bloque. Corregido 2026‑09‑05.
+
+🔑 **LA GUARDA VA DENTRO DEL `⇔` ([ADR‑020](../../DECISIONS.md))**. Estos siete son exactamente
+los tags cuya conclusión se reconstruye con `substfc`/`liftfc`, y evaluar esos operadores exige
+**buena formación** del código: `hasWitF` en la ranura de fórmula, `hasWit` en la de término.
+Esa guarda **no se puede derivar** del antecedente `lineWF t` —refutado con una línea basura que
+satisface `lineWF` con la casilla 2 ocupada por un código de VARIABLE— ni cargarse colgante por la
+cadena —refutado: la D3 resultante sería vacua—. Se guarda **sólo** la ranura que va bajo
+`substfc`/`liftfc`; las que sólo aparecen bajo constructores (`implc`, `forallc`, `exc`, `eqc`)
+no llevan nada, para dejar el verificador lo más completo posible.
+
+⚠️ Dirección del cambio: `lineWF` se vuelve **estrictamente más exigente** ⟹ el verificador
+acepta MENOS líneas. La solidez sólo puede mejorar; la factura la paga la **completitud**, es
+decir D1, cuya prueba debe descargar las guardas sobre las líneas CONCRETAS que emite el
+codificador. Las dos piezas que lo hacen ya estaban: `prf_hasWitF_real` y `CRIT_hasWit_real`
+(`Meta/CodeWitnessPrf.lean`). Los enunciados de D1/D2/D3 y de Gödel I/II **no cambian**, ni la
+sentencia G: `godelCN` no depende de `axioms` (§3.32.1). -/
+
+-- Q1 (tag 9, [A,t]): concl ⇔ (∀A) ⇒ A[t] · GUARDA `hasWitF A` ∧ `hasWit t` (ADR-020)
 def ax_lineWF_q1 : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 9)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) ((carc (.var 0)) =eq implc (forallc (nthc (.var 0) (numeralM 2))) (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) (Formula.and (hasWitF (nthc (.var 0) (numeralM 2))) (Formula.and (hasWit (nthc (.var 0) (numeralM 3))) ((carc (.var 0)) =eq implc (forallc (nthc (.var 0) (numeralM 2))) (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))))))))
 def ax_premsOf_q1 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 9) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
--- Q2 (tag 10, [A,t]): concl ⇔ A[t] ⇒ ∃A
+-- Q2 (tag 10, [A,t]): concl ⇔ A[t] ⇒ ∃A · GUARDA `hasWitF A` ∧ `hasWit t` (ADR-020)
 def ax_lineWF_q2 : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 10)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) ((carc (.var 0)) =eq implc (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))) (exc (nthc (.var 0) (numeralM 2))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) (Formula.and (hasWitF (nthc (.var 0) (numeralM 2))) (Formula.and (hasWit (nthc (.var 0) (numeralM 3))) ((carc (.var 0)) =eq implc (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))) (exc (nthc (.var 0) (numeralM 2))))))))
 def ax_premsOf_q2 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 10) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
--- Q3 (tag 11, [A,B]): concl ⇔ (∀(A ⇒ ↑B)) ⇒ ((∃A) ⇒ B)
+-- Q3 (tag 11, [A,B]): concl ⇔ (∀(A ⇒ ↑B)) ⇒ ((∃A) ⇒ B) · GUARDA `hasWitF B`, la que va bajo `liftfc` (ADR-020)
 def ax_lineWF_q3 : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 11)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) ((carc (.var 0)) =eq implc (forallc (implc (nthc (.var 0) (numeralM 2)) (liftfc (zero) (nthc (.var 0) (numeralM 3))))) (implc (exc (nthc (.var 0) (numeralM 2))) (nthc (.var 0) (numeralM 3))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) (Formula.and (hasWitF (nthc (.var 0) (numeralM 3))) ((carc (.var 0)) =eq implc (forallc (implc (nthc (.var 0) (numeralM 2)) (liftfc (zero) (nthc (.var 0) (numeralM 3))))) (implc (exc (nthc (.var 0) (numeralM 2))) (nthc (.var 0) (numeralM 3)))))))
 def ax_premsOf_q3 : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 11) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
--- LEIBNIZ (tag 13, [A,t₁,t₂]): concl ⇔ (t₁≐t₂) ⇒ (A[t₁] ⇒ A[t₂])
+-- LEIBNIZ (tag 13, [A,t₁,t₂]): concl ⇔ (t₁≐t₂) ⇒ (A[t₁] ⇒ A[t₂]) · GUARDA `hasWitF A` ∧ `hasWit t₁` ∧ `hasWit t₂` (ADR-020)
 def ax_lineWF_leibniz : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 13)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 5) ((carc (.var 0)) =eq implc (eqc (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 4))) (implc (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))) (substfc (zero) (nthc (.var 0) (numeralM 4)) (nthc (.var 0) (numeralM 2)))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 5) (Formula.and (hasWitF (nthc (.var 0) (numeralM 2))) (Formula.and (hasWit (nthc (.var 0) (numeralM 3))) (Formula.and (hasWit (nthc (.var 0) (numeralM 4))) ((carc (.var 0)) =eq implc (eqc (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 4))) (implc (substfc (zero) (nthc (.var 0) (numeralM 3)) (nthc (.var 0) (numeralM 2))) (substfc (zero) (nthc (.var 0) (numeralM 4)) (nthc (.var 0) (numeralM 2))))))))))
 def ax_premsOf_leibniz : Formula :=
   forall_4 (premsOf (cons (.var 3) (cons (numeralM 13) (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil)
--- IND (tag 18, [a]): concl ⇔ reconstrucción de inducción (códigos cerrados de O y σ#0)
+-- IND (tag 18, [a]): concl ⇔ reconstrucción de inducción (códigos cerrados de O y σ#0) · GUARDA `hasWitF a`; los args de término son CERRADOS (ADR-020)
 def ax_lineWF_ind : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 18)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 3) ((carc (.var 0)) =eq implc (substfc (zero) (termCodeM zero) (nthc (.var 0) (numeralM 2))) (implc (forallc (implc (nthc (.var 0) (numeralM 2)) (substfc (zero) (termCodeM (succ (.var 0))) (liftfc (succ zero) (nthc (.var 0) (numeralM 2)))))) (forallc (nthc (.var 0) (numeralM 2)))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 3) (Formula.and (hasWitF (nthc (.var 0) (numeralM 2))) ((carc (.var 0)) =eq implc (substfc (zero) (termCodeM zero) (nthc (.var 0) (numeralM 2))) (implc (forallc (implc (nthc (.var 0) (numeralM 2)) (substfc (zero) (termCodeM (succ (.var 0))) (liftfc (succ zero) (nthc (.var 0) (numeralM 2)))))) (forallc (nthc (.var 0) (numeralM 2))))))))
 def ax_premsOf_ind : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 18) (cons (.var 0) nil))) =eq nil)
--- QCONF (tag 19, [P,C]): concl ⇔ (∀(↑P ⇒ C)) ⇒ (P ⇒ ∀C)  (confinamiento ∀)
+-- QCONF (tag 19, [P,C]): concl ⇔ (∀(↑P ⇒ C)) ⇒ (P ⇒ ∀C) (confinamiento ∀) · GUARDA `hasWitF P` (ADR-020)
 def ax_lineWF_qconf : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 19)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) ((carc (.var 0)) =eq implc (forallc (implc (liftfc (zero) (nthc (.var 0) (numeralM 2))) (nthc (.var 0) (numeralM 3)))) (implc (nthc (.var 0) (numeralM 2)) (forallc (nthc (.var 0) (numeralM 3)))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 4) (Formula.and (hasWitF (nthc (.var 0) (numeralM 2))) ((carc (.var 0)) =eq implc (forallc (implc (liftfc (zero) (nthc (.var 0) (numeralM 2))) (nthc (.var 0) (numeralM 3)))) (implc (nthc (.var 0) (numeralM 2)) (forallc (nthc (.var 0) (numeralM 3))))))))
 def ax_premsOf_qconf : Formula :=
   forall_3 (premsOf (cons (.var 2) (cons (numeralM 19) (cons (.var 1) (cons (.var 0) nil)))) =eq nil)
--- LISTIND (tag 20, [A]): concl ⇔ inducción de listas (códigos cerrados de nil y cons#1#0)
+-- LISTIND (tag 20, [A]): concl ⇔ inducción de listas (códigos cerrados de nil y cons#1#0) · GUARDA `hasWitF A` (ADR-020)
 def ax_lineWF_listInd : Formula :=
   forall_ (Formula.impl (nthc (.var 0) (succ zero) =eq numeralM 20)
-    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 3) ((carc (.var 0)) =eq implc (substfc (zero) (termCodeM nil) (nthc (.var 0) (numeralM 2))) (implc (forallc (forallc (implc (liftfc (succ zero) (nthc (.var 0) (numeralM 2))) (substfc (zero) (termCodeM (cons (.var 1) (.var 0))) (liftfc (succ (succ zero)) (liftfc (succ zero) (nthc (.var 0) (numeralM 2)))))))) (forallc (nthc (.var 0) (numeralM 2)))))))
+    (lineWF (.var 0) ⇔ Formula.and (lenc (.var 0) =eq numeralM 3) (Formula.and (hasWitF (nthc (.var 0) (numeralM 2))) ((carc (.var 0)) =eq implc (substfc (zero) (termCodeM nil) (nthc (.var 0) (numeralM 2))) (implc (forallc (forallc (implc (liftfc (succ zero) (nthc (.var 0) (numeralM 2))) (substfc (zero) (termCodeM (cons (.var 1) (.var 0))) (liftfc (succ (succ zero)) (liftfc (succ zero) (nthc (.var 0) (numeralM 2)))))))) (forallc (nthc (.var 0) (numeralM 2))))))))
 def ax_premsOf_listInd : Formula :=
   forall_2 (premsOf (cons (.var 1) (cons (numeralM 20) (cons (.var 0) nil))) =eq nil)
 

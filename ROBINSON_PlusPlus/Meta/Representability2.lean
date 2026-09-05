@@ -6,6 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.ProofChain
 import ROBINSON_PlusPlus.Meta.LineWFDerives
 import ROBINSON_PlusPlus.Meta.Representability
+import ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 
 import FOL.FOL
 import FOL.Theorems.Eq
@@ -139,6 +140,21 @@ private theorem inAxiomsCodeT {f : Formula} (hmem : f ∈ axioms) :
   have h0 : axioms ⊢ In (formCodeM f) axiomsCodeT := ax_inAxC f hmem
   rwa [formCodeM_eq] at h0
 
+/-! ### Pago de la guarda de los 7 esquemas enmendados (ADR-020)
+
+Los esquemas `ax_lineWF_{q1,q2,q3,leibniz,ind,qconf,listInd}` piden `hasWitF`/`hasWit` de sus
+ranuras. En una línea REAL esas ranuras son `formCode φ` / `termCode t`, y la **rama A** ya tenía
+las dos piezas — sólo estaban inalcanzables: `CodeWitnessPrf` colgaba por debajo de este módulo
+por **26 imports que no usaba**. Podados, sube, y la guarda se paga con dos líneas. -/
+
+/-- `hasWitF` de un código de fórmula REAL. -/
+theorem prf_hasWitF_fc (phi : Formula) : Prf (hasWitF (formCode phi)) :=
+  formCodeM_eq phi ▸ prf_hasWitF_real phi
+
+/-- `hasWit` de un código de término REAL. -/
+theorem prf_hasWit_tc (t : Term) : Prf (hasWit (termCode t)) :=
+  termCodeM_eq t ▸ CRIT_hasWit_real t
+
 /-- **chainOk-tracking**: `proofCode' rs acc` es una cadena válida desde `⌜acc⌝`.
     Inducción sobre `rs`; cada línea cumple `lineOk` (esquemas: `lineWF` reconstrucción
     vía `*_concl_code`/`refl`, `premsOf=nil`; mp/gen: premisas en contexto vía
@@ -232,20 +248,20 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
                 exact Minimal.Axioms.and_intro
-                  (iff_mpr (lineWF_q1 _ _ _) (FOL.derive_eq_symm (q1_concl_code A t)))
+                  (iff_mpr (lineWF_q1 _ _ _ (prf_hasWitF_fc A) (prf_hasWit_tc t)) (FOL.derive_eq_symm (q1_concl_code A t)))
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_q1 _ _ _)) (allIn_nil (listFormCode acc)))
             | q2 A t =>
                 have hf : f = (substFormula 0 t A ⇒ Formula.ex A) := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
                 exact Minimal.Axioms.and_intro
-                  (iff_mpr (lineWF_q2 _ _ _) (FOL.derive_eq_symm (q2_concl_code A t)))
+                  (iff_mpr (lineWF_q2 _ _ _ (prf_hasWitF_fc A) (prf_hasWit_tc t)) (FOL.derive_eq_symm (q2_concl_code A t)))
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_q2 _ _ _)) (allIn_nil (listFormCode acc)))
             | q3 A B =>
                 have hf : f = ((Formula.forall (A ⇒ liftFormula 0 B)) ⇒ ((Formula.ex A) ⇒ B)) := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_q3 _ _ _) ?_)
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_q3 _ _ _ (prf_hasWitF_fc B)) ?_)
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_q3 _ _ _)) (allIn_nil (listFormCode acc)))
                 -- formCode q3-concl =eq implc (forallc (implc A (liftfc zero B))) (implc (exc A) B)
                 exact FOL.derive_eq_symm
@@ -261,7 +277,7 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
                 exact Minimal.Axioms.and_intro
-                  (iff_mpr (lineWF_leibniz _ _ _ _) (FOL.derive_eq_symm (leibniz_concl_code A t₁ t₂)))
+                  (iff_mpr (lineWF_leibniz _ _ _ _ (prf_hasWitF_fc A) (prf_hasWit_tc t₁) (prf_hasWit_tc t₂)) (FOL.derive_eq_symm (leibniz_concl_code A t₁ t₂)))
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_leibniz _ _ _ _)) (allIn_nil (listFormCode acc)))
             | p3 A =>
                 have hf : f = (((A ⇒ ⊥) ⇒ ⊥) ⇒ A) := by
@@ -273,7 +289,7 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                 have hf : f = Full.inductionFormula A := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_ind _ _) ?_)
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_ind _ _ (prf_hasWitF_fc A)) ?_)
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_ind _ _)) (allIn_nil (listFormCode acc)))
                 rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
                 exact FOL.derive_eq_symm (ind_concl_code A)
@@ -281,7 +297,7 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                 have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula P C := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_qconf _ _ _) ?_)
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_qconf _ _ _ (prf_hasWitF_fc P)) ?_)
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_qconf _ _ _)) (allIn_nil (listFormCode acc)))
                 exact FOL.derive_eq_symm
                   (congr_bin1 (congr_un (congr_bin1 (liftFormula_arith 0 P))))
@@ -289,7 +305,7 @@ theorem chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs
                 have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula A := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_listInd _ _) ?_)
+                refine Minimal.Axioms.and_intro (iff_mpr (lineWF_listInd _ _ (prf_hasWitF_fc A)) ?_)
                   (allIn_subst2 (FOL.derive_eq_symm (premsOf_listInd _ _)) (allIn_nil (listFormCode acc)))
                 rw [termCodeM_eq nil, termCodeM_eq (cons (Term.var 1) (Term.var 0))]
                 exact FOL.derive_eq_symm (ROBINSON_PlusPlus.Meta.ListInductionArith.listInd_concl_code A)

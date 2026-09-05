@@ -19,6 +19,7 @@ Public API:
 -/
 import ROBINSON_PlusPlus.Meta.Godel
 import ROBINSON_PlusPlus.Meta.Provability
+import ROBINSON_PlusPlus.Meta.HasWitTcFnPrf
 import ROBINSON_PlusPlus.Meta.Hilbert
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.HilbertSeq
