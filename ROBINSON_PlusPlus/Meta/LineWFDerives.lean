@@ -152,70 +152,71 @@ theorem premsOf_p3 (concl a : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 14) (cons a nil))) =eq nil) :=
   prf_to_derives (prf_premsOf_p3 concl a)
 
-theorem lineWF_q1 (concl A t : Term) :
+theorem lineWF_q1 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (hasWit t)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 9) (cons A (cons t nil)))) ⇔
       (concl =eq implc (forallc A) (substfc zero t A))) :=
-  prf_to_derives (prf_lineWF_q1 concl A t)
+  prf_to_derives (prf_lineWF_q1 concl A t hwA hwt)
 
 theorem premsOf_q1 (concl A t : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 9) (cons A (cons t nil)))) =eq nil) :=
   prf_to_derives (prf_premsOf_q1 concl A t)
 
-theorem lineWF_q2 (concl A t : Term) :
+theorem lineWF_q2 (concl A t : Term) (hwA : Prf (hasWitF A)) (hwt : Prf (hasWit t)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 10) (cons A (cons t nil)))) ⇔
       (concl =eq implc (substfc zero t A) (exc A))) :=
-  prf_to_derives (prf_lineWF_q2 concl A t)
+  prf_to_derives (prf_lineWF_q2 concl A t hwA hwt)
 
 theorem premsOf_q2 (concl A t : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 10) (cons A (cons t nil)))) =eq nil) :=
   prf_to_derives (prf_premsOf_q2 concl A t)
 
-theorem lineWF_q3 (concl A B : Term) :
+theorem lineWF_q3 (concl A B : Term) (hwB : Prf (hasWitF B)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 11) (cons A (cons B nil)))) ⇔
       (concl =eq implc (forallc (implc A (liftfc zero B))) (implc (exc A) B))) :=
-  prf_to_derives (prf_lineWF_q3 concl A B)
+  prf_to_derives (prf_lineWF_q3 concl A B hwB)
 
 theorem premsOf_q3 (concl A B : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 11) (cons A (cons B nil)))) =eq nil) :=
   prf_to_derives (prf_premsOf_q3 concl A B)
 
-theorem lineWF_leibniz (concl A t₁ t₂ : Term) :
+theorem lineWF_leibniz (concl A t₁ t₂ : Term) (hwA : Prf (hasWitF A))
+    (hwt1 : Prf (hasWit t₁)) (hwt2 : Prf (hasWit t₂)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 13) (cons A (cons t₁ (cons t₂ nil))))) ⇔
       (concl =eq implc (eqc t₁ t₂) (implc (substfc zero t₁ A) (substfc zero t₂ A)))) :=
-  prf_to_derives (prf_lineWF_leibniz concl A t₁ t₂)
+  prf_to_derives (prf_lineWF_leibniz concl A t₁ t₂ hwA hwt1 hwt2)
 
 theorem premsOf_leibniz (concl A t₁ t₂ : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 13) (cons A (cons t₁ (cons t₂ nil))))) =eq nil) :=
   prf_to_derives (prf_premsOf_leibniz concl A t₁ t₂)
 
-theorem lineWF_ind (concl a : Term) :
+theorem lineWF_ind (concl a : Term) (hwa : Prf (hasWitF a)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 18) (cons a nil))) ⇔
       (concl =eq implc (substfc zero (termCodeM zero) a)
         (implc (forallc (implc a (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) a))))
                (forallc a)))) :=
-  prf_to_derives (prf_lineWF_ind concl a)
+  prf_to_derives (prf_lineWF_ind concl a hwa)
 
 theorem premsOf_ind (concl a : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 18) (cons a nil))) =eq nil) :=
   prf_to_derives (prf_premsOf_ind concl a)
 
-theorem lineWF_listInd (concl a : Term) :
+theorem lineWF_listInd (concl a : Term) (hwa : Prf (hasWitF a)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 20) (cons a nil))) ⇔
       (concl =eq implc (substfc zero (termCodeM nil) a)
         (implc (forallc (forallc (implc (liftfc (succ zero) a)
                   (substfc zero (termCodeM (cons (.var 1) (.var 0)))
                     (liftfc (succ (succ zero)) (liftfc (succ zero) a))))))
                (forallc a)))) :=
-  prf_to_derives (prf_lineWF_listInd concl a)
+  prf_to_derives (prf_lineWF_listInd concl a hwa)
 
 theorem premsOf_listInd (concl a : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 20) (cons a nil))) =eq nil) :=
   prf_to_derives (prf_premsOf_listInd concl a)
 
-theorem lineWF_qconf (concl P C : Term) :
+theorem lineWF_qconf (concl P C : Term) (hwP : Prf (hasWitF P)) :
     axioms ⊢ (lineWF (cons concl (cons (numeralM 19) (cons P (cons C nil)))) ⇔
       (concl =eq implc (forallc (implc (liftfc zero P) C)) (implc P (forallc C)))) :=
-  prf_to_derives (prf_lineWF_qconf concl P C)
+  prf_to_derives (prf_lineWF_qconf concl P C hwP)
 
 theorem premsOf_qconf (concl P C : Term) :
     axioms ⊢ (premsOf (cons concl (cons (numeralM 19) (cons P (cons C nil)))) =eq nil) :=

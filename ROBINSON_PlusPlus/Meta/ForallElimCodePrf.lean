@@ -64,12 +64,17 @@ theorem liftTerm_substfc_open2 (Ac w : Term) :
 
 /-- **Validez de una línea Q1** en cualquier contexto `c`:
     `q1line = ⟨implc (forallc Ac) (substfc zero w Ac), 9, Ac, w⟩`. `lineWF` por reflexividad de la
-    conclusión (`prf_lineWF_q1`), sin premisas (`prf_premsOf_q1` → `allIn c nil`). -/
-theorem prf_lineOk_q1 (c Ac w : Term) :
+    conclusión (`prf_lineWF_q1`), sin premisas (`prf_premsOf_q1` → `allIn c nil`).
+
+    ⚠️ Pide las guardas de ADR-020: la enmienda de los 7 esquemas de sustitución las mete en el
+    `⇔`, para que una línea con la casilla ocupada por basura deje de pasar. En un uso REAL las
+    descargan `prf_hasWitF_real` (sorte fórmula) y `prf_hasWit_tcFn` (códigos punteados). -/
+theorem prf_lineOk_q1 (c Ac w : Term)
+    (hwF : Prf (hasWitF Ac)) (hwT : Prf (hasWit w)) :
     Prf (lineOk c (cons (implc (forallc Ac) (substfc zero w Ac))
       (cons (numeralM 9) (cons Ac (cons w nil))))) :=
   prf_and_intro
-    (prf_iff_mpr (prf_lineWF_q1 _ Ac w) (prf_refl _))
+    (prf_iff_mpr (prf_lineWF_q1 _ Ac w hwF hwT) (prf_refl _))
     (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q1 _ Ac w)) (prf_allIn_nil c))
 
 /-- **`∀`‑elim a nivel de código** (reflexión de la regla Q1), con testigo‑código **abierto**:
@@ -77,7 +82,8 @@ theorem prf_lineOk_q1 (c Ac w : Term) :
     `substfc zero w Ac`. Sólo pide `Ac` cerrado (`hAc`).
 
     Ensamblaje `r = p ++ [q1line, mpline]`, espejo de `pcc_exIntro_code'`. -/
-theorem pcc_forallElim_code_open (Ac w : Term) :
+theorem pcc_forallElim_code_open (Ac w : Term)
+    (hwF : Prf (hasWitF (liftTerm 0 Ac))) (hwT : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (forallc Ac) ⇒ provFromCode (substfc zero w Ac)) := by
   -- elimina el ∃ externo de `provFromCode (forallc Ac)`; testigo `p = #0`
   refine prf_ex_elim_imp ?_
@@ -133,7 +139,7 @@ theorem pcc_forallElim_code_open (Ac w : Term) :
     refine PrfH_iff_mpr (prf_chainOk_concat nil p_ tl) (PrfH_and_intro hpChain ?_)
     refine PrfH_iff_mpr (prf_chainOk_cons Cp q1line (cons mpline nil)) (PrfH_and_intro ?_ ?_)
     · -- lineOk Cp q1line (línea‑axioma Q1)
-      exact prf_to_prfH (prf_lineOk_q1 Cp Ac' w') Γ
+      exact prf_to_prfH (prf_lineOk_q1 Cp Ac' w' hwF hwT) Γ
     · -- chainOk Cp1 [mpline]
       refine PrfH_iff_mpr (prf_chainOk_cons Cp1 mpline nil)
         (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
@@ -156,15 +162,19 @@ theorem pcc_forallElim_code_open (Ac w : Term) :
           (prf_to_prfH (prf_In_mono_right_imp Aall (cons (carc q1line) nil) Cp) Γ) hpIn
   exact PrfH_and_intro hChainR hInB
 
-/-- **Corolario (compatibilidad)**: la versión con cuerpo `Ac` cerrado. La hipótesis `hAc` ya **no se
-    usa** — era, como `hw` en `pcc_exIntro_code` (§17), un artefacto de colapsar los lifts en vez de
-    arrastrarlos. Su eliminación es **imprescindible** para `pcc_axiom_inst2`: en la segunda
-    eliminación el cuerpo es `substfc (σ0) (liftc 0 w₁) ⌜φ⌝`, que contiene el testigo `w₁` y por tanto
-    **no es cerrado** cuando `w₁` es abierto (p. ej. `tcFn #0`). -/
+/-- **Corolario (compatibilidad)**: la versión con cuerpo `Ac` cerrado.
+
+    ⚠️ **Corregido 2026‑09‑05 ([ADR‑020](../../DECISIONS.md)).** Decía que `hAc` «ya **no se usa**,
+    era un artefacto de colapsar los lifts». **Vuelve a usarse**, exactamente igual que `hw` en
+    `pcc_exIntro_code`: la guarda de fórmula que la enmienda exige llega LIFTEADA
+    (`hasWitF (liftTerm 0 Ac)`), y es `hAc` quien la colapsa. Lo que sigue siendo cierto —y era el
+    punto de la nota— es que la versión ABIERTA (`pcc_forallElim_code_open`) es imprescindible
+    para `pcc_axiom_inst2`, donde el cuerpo contiene el testigo y **no** es cerrado. -/
 theorem pcc_forallElim_code' (Ac w : Term)
-    (_hAc : ∀ c, liftTerm c Ac = Ac) :
+    (hAc : ∀ c, liftTerm c Ac = Ac)
+    (hwF : Prf (hasWitF Ac)) (hwT : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (forallc Ac) ⇒ provFromCode (substfc zero w Ac)) :=
-  pcc_forallElim_code_open Ac w
+  pcc_forallElim_code_open Ac w (by rw [hAc 0]; exact hwF) hwT
 
 end ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 

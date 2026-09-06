@@ -97,7 +97,7 @@ def lencDotM (t : Term) : Term := substfc zero (tcFn t) (formCode lencMp)
     conjunción en el RHS, sólo hay que distribuir el `substfc` sobre **un** `implc`. -/
 theorem paso6_backbone_mp (t : Term) :
     Prf (provFromCode (implc (tagDotM t) (implc (lencDotM t) (lwfDot t)))) := by
-  have h := pcc_thm_inst _ prf_lineWF_mp_bwd (tcFn t)
+  have h := pcc_thm_inst _ prf_lineWF_mp_bwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
   refine prf_mp (prf_provCode_congr ?_) h
   refine prf_eq_trans
     (prf_substfc_impl zero (tcFn t) (formCode tagMp)

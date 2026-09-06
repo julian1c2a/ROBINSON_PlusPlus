@@ -45,11 +45,11 @@ sufijo `…Prf` es la convencion del arbol.
 
 | simbolo del sondeo   | ya vive en                                          |
 |----------------------|-----------------------------------------------------|
-| `shapeUn`            | `Meta/CodeWitnessPrf.lean:197` (`…CodeWitnessPrf.SinWTs`) |
-| `shapeBin`           | `Meta/CodeWitnessPrf.lean:200` (idem)               |
-| `argsInBody`         | `Meta/CodeWitnessPrf.lean:179` (idem)               |
-| `argsIn`             | `Meta/CodeWitnessPrf.lean:184` (idem)               |
-| `isTermCodeE1`       | `Meta/CodeWitnessPrf.lean:205` (idem)               |
+| `shapeUn`            | `Minimal/Axioms.lean` — alias `CodeWitnessPrf.SinWTs` (ADR-020) |
+| `shapeBin`           | `Minimal/Axioms.lean` (idem)                        |
+| `argsInBody`         | `Minimal/Axioms.lean` (idem)                        |
+| `argsIn`             | `Minimal/Axioms.lean` (idem)                        |
+| `isTermCodeE1`       | `Minimal/Axioms.lean` (idem)                        |
 | `impT`               | `Meta/CodeWitnessPrf.lean:105` (idem)               |
 | `prf_or_elim_imp`    | `Meta/CodeWitnessPrf.lean:109` (idem)               |
 | `PrfH_eq_trans_code` | `Meta/EvalCarcNthcPrf.lean:66` (exportado a raiz)   |
@@ -112,12 +112,23 @@ def liftcT (c t : Term) : Term := funcc (strCode "liftc") (cons c (cons t nil))
 /-- `⌜liftsc c ts⌝` como constructor de codigo. -/
 def liftscT (c ts : Term) : Term := funcc (strCode "liftsc") (cons c (cons ts nil))
 
+/-! ### La GUARDA de los dos constructores (ADR-020): `funcc` binarios ⇒ escalera §28 -/
+theorem prf_hasWit_liftcT {c t : Term} (hc : Prf (hasWit c)) (ht : Prf (hasWit t)) :
+    Prf (hasWit (liftcT c t)) := prf_hasWit_funcc2 (strCode "liftc") c t hc ht
+theorem prf_hasWit_liftscT {c t : Term} (hc : Prf (hasWit c)) (ht : Prf (hasWit t)) :
+    Prf (hasWit (liftscT c t)) := prf_hasWit_funcc2 (strCode "liftsc") c t hc ht
+
 /-- `varc x = cons 0 (cons x nil)` ⇒ su imagen punteada es el `unT 0` del KIT
     (`Meta/CodeCtorKit.lean:60`). CERO simbolos nuevos: es un alias defeq. -/
 def varcT (X : Term) : Term := unT 0 X
 /-- `funcc a b = cons 1 (cons a (cons b nil))` ⇒ su imagen punteada es el `binT 1` del KIT
     (`Meta/CodeCtorKit.lean:64`). Alias defeq. -/
 def funccT (X Y : Term) : Term := binT 1 X Y
+
+theorem prf_hasWit_varcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (varcT X)) :=
+  prf_hasWit_unT 0 hX
+theorem prf_hasWit_funccT {X Y : Term} (hX : Prf (hasWit X)) (hY : Prf (hasWit Y)) :
+    Prf (hasWit (funccT X Y)) := prf_hasWit_binT 1 hX hY
 
 /-- Control explicito de que `varcT` NO es un constructor nuevo. -/
 theorem varcT_eq_unT (X : Term) : varcT X = unT 0 X := rfl
@@ -305,7 +316,9 @@ theorem pcc_liftc_func_code (c a b : Term) :
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hmid)) hout
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst3 LIFTC_FUNC_BODY (show ax_liftc_func ∈ axioms by simp [axioms])
-      (tcFn c) (tcFn a) (tcFn b))
+      (tcFn c) (tcFn a) (tcFn b)
+      (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 a))
+      (prf_hasWit_tcFn (liftTerm 0 b)))
 
 /-- `substfc` atraviesa un atomo binario de codigo. Generaliza los dos casos particulares de
     produccion (`D3InDotPrf.prf_substfc_ltCodeFn_snd`, `EvalBoundedPrf.prf_substfc_ltCodeFn_varc0`),
@@ -377,7 +390,8 @@ theorem pcc_liftc_var_ge_code (c n : Term) :
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst2 LIFTC_VARGE_BODY (show ax_liftc_var_ge ∈ axioms by simp [axioms])
-      (tcFn c) (tcFn n))
+      (tcFn c) (tcFn n)
+      (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 n)))
 
 def LIFTSC_NIL_BODY : Formula := liftsc (.var 0) nil =eq nil
 
@@ -390,7 +404,8 @@ theorem pcc_liftsc_nil_code (c : Term) :
       =eq eqCodeFn (liftscT (tcFn c) (termCode nil)) (termCode nil)) :=
     prf_substfc_arith_open 0 (tcFn c) LIFTSC_NIL_BODY
   exact prf_mp (prf_provCode_congr hin)
-    (pcc_axiom_inst LIFTSC_NIL_BODY (show ax_liftsc_nil ∈ axioms by simp [axioms]) (tcFn c))
+    (pcc_axiom_inst LIFTSC_NIL_BODY (show ax_liftsc_nil ∈ axioms by simp [axioms]) (tcFn c)
+      (prf_hasWit_tcFn (liftTerm 0 c)))
 
 def LIFTSC_CONS_BODY : Formula :=
   liftsc (.var 2) (cons (.var 1) (.var 0))
@@ -465,7 +480,9 @@ theorem pcc_liftsc_cons_code (c h t : Term) :
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hmid)) hout
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst3 LIFTSC_CONS_BODY (show ax_liftsc_cons ∈ axioms by simp [axioms])
-      (tcFn c) (tcFn h) (tcFn t))
+      (tcFn c) (tcFn h) (tcFn t)
+      (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 h))
+      (prf_hasWit_tcFn (liftTerm 0 t)))
 
 /-! ## §5 · LA GUARDA INTERNA SE DESCARGA — y las cuatro ecuaciones quedan a NIVEL `zero`
 
@@ -516,7 +533,9 @@ theorem pcc_liftsc0_cons_code (h t : Term) :
      con tag `cons_sym`, que NO es un `binT`. -/
 
 theorem pcc_congr_liftcT_arg2_code (A X Y : Term)
-    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftcT A X) (liftcT A Y))) := by
   let Ac : Term := eqc (liftcT A X) (liftcT A (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (liftcT A X) (liftcT A w)) := by
@@ -531,10 +550,14 @@ theorem pcc_congr_liftcT_arg2_code (A X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (liftcT A X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (liftcT A X) (liftcT A (varc (numeral 0)))
+        (prf_hasWit_liftcT hwA hwX) (prf_hasWit_liftcT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 theorem pcc_congr_liftscT_arg2_code (A X Y : Term)
-    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftscT A X) (liftscT A Y))) := by
   let Ac : Term := eqc (liftscT A X) (liftscT A (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (liftscT A X) (liftscT A w)) := by
@@ -549,11 +572,15 @@ theorem pcc_congr_liftscT_arg2_code (A X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (liftscT A X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (liftscT A X) (liftscT A (varc (numeral 0)))
+        (prf_hasWit_liftscT hwA hwX) (prf_hasWit_liftscT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 /-- Congruencia interna en la COLA de `consT` (para el paso `cons` de la lista). -/
 theorem pcc_congr_consT_arg2_code (A X Y : Term)
-    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT A X) (consT A Y))) := by
   let Ac : Term := eqc (consT A X) (consT A (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (consT A X) (consT A w)) := by
@@ -568,11 +595,15 @@ theorem pcc_congr_consT_arg2_code (A X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (consT A X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (consT A X) (consT A (varc (numeral 0)))
+        (prf_hasWit_consT hwA hwX) (prf_hasWit_consT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 /-- Congruencia interna en la CABEZA de `consT`. -/
 theorem pcc_congr_consT_arg1_code (B X Y : Term)
-    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT X B) (consT Y B))) := by
   let Ac : Term := eqc (consT X B) (consT (varc (numeral 0)) B)
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (consT X B) (consT w B)) := by
@@ -587,7 +618,10 @@ theorem pcc_congr_consT_arg1_code (B X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (consT X B))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (consT X B) (consT (varc (numeral 0)) B)
+        (prf_hasWit_consT hwX hwB)
+        (prf_hasWit_consT (prf_hasWit_varc (numeral 0)) hwB)) hwX hwY)
 
 /-! ## §7 · LAS CUATRO CLAUSULAS DE LA RECURSION — el esqueleto entero de `hLift`
 
@@ -616,7 +650,9 @@ theorem refl_caso_varc (s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLift 
   have s1 : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn (varc a)))
       (liftcT (termCode zero) (varcT (tcFn a))))) :=
     prf_mp (pcc_congr_liftcT_arg2_code (termCode zero) (tcFn (varc a)) (varcT (tcFn a))
-      prf_substtc_termCode_nil (substtc_inv_tcFn (varc a))) (pcc_dot_un_symm 0 a)
+      prf_substtc_termCode_nil (substtc_inv_tcFn (varc a))
+      (prf_hasWit_tc zero) (prf_hasWit_tcFn (varc a))
+      (prf_hasWit_varcT (prf_hasWit_tcFn a))) (pcc_dot_un_symm 0 a)
   have s2 : Prf (provFromCode (eqc (liftcT (termCode zero) (varcT (tcFn a)))
       (varcT (succcT (tcFn a))))) := pcc_liftc0_var_code a
   have s3 : Prf (provFromCode (eqc (varcT (succcT (tcFn a))) (tcFn (varc (succ a))))) :=
@@ -625,7 +661,14 @@ theorem refl_caso_varc (s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLift 
       (pcc_dot_un 0 (succ a))
   have hchain : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn (varc a)))
       (tcFn (varc (succ a))))) :=
-    pcc_eq_trans_code _ _ _ hX s1 (pcc_eq_trans_code _ _ _ hY s2 s3)
+    pcc_eq_trans_code _ _ _ hX
+      (prf_hasWit_liftcT (prf_hasWit_tc zero) (prf_hasWit_tcFn (varc a)))
+      (prf_hasWit_liftcT (prf_hasWit_tc zero) (prf_hasWit_varcT (prf_hasWit_tcFn a)))
+      (prf_hasWit_tcFn (varc (succ a))) s1
+      (pcc_eq_trans_code _ _ _ hY
+        (prf_hasWit_liftcT (prf_hasWit_tc zero) (prf_hasWit_varcT (prf_hasWit_tcFn a)))
+        (prf_hasWit_varcT (prf_hasWit_succcT (prf_hasWit_tcFn a)))
+        (prf_hasWit_tcFn (varc (succ a))) s2 s3)
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
     (prf_congr_liftcT (prf_refl _) (prf_congr_tcFn (prf_eq_symm hs)))
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
@@ -652,7 +695,9 @@ theorem refl_caso_funcc (s p b : Term) (hs : Prf (s =eq funcc p b))
   have s1 : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn (funcc p b)))
       (liftcT (termCode zero) (funccT (tcFn p) (tcFn b))))) :=
     prf_mp (pcc_congr_liftcT_arg2_code (termCode zero) (tcFn (funcc p b))
-      (funccT (tcFn p) (tcFn b)) prf_substtc_termCode_nil (substtc_inv_tcFn (funcc p b)))
+      (funccT (tcFn p) (tcFn b)) prf_substtc_termCode_nil (substtc_inv_tcFn (funcc p b))
+      (prf_hasWit_tc zero) (prf_hasWit_tcFn (funcc p b))
+      (prf_hasWit_funccT (prf_hasWit_tcFn p) (prf_hasWit_tcFn b)))
       (pcc_dot_bin_symm 1 p b)
   have s2 : Prf (provFromCode (eqc (liftcT (termCode zero) (funccT (tcFn p) (tcFn b)))
       (funccT (tcFn p) (liftscT (termCode zero) (tcFn b))))) := pcc_liftc0_func_code p b
@@ -660,13 +705,30 @@ theorem refl_caso_funcc (s p b : Term) (hs : Prf (s =eq funcc p b))
       (funccT (tcFn p) (tcFn (liftsc zero b))))) :=
     prf_mp (pcc_congr_binT_2_code 1 (tcFn p) (liftscT (termCode zero) (tcFn b))
       (tcFn (liftsc zero b)) (substtc_inv_tcFn p)
-      (substtc_inv_liftscT prf_substtc_termCode_nil (substtc_inv_tcFn b))) hb
+      (substtc_inv_liftscT prf_substtc_termCode_nil (substtc_inv_tcFn b))
+      (prf_hasWit_tcFn p)
+      (prf_hasWit_liftscT (prf_hasWit_tc zero) (prf_hasWit_tcFn b))
+      (prf_hasWit_tcFn (liftsc zero b))) hb
   have s4 : Prf (provFromCode (eqc (funccT (tcFn p) (tcFn (liftsc zero b)))
       (tcFn (funcc p (liftsc zero b))))) := pcc_dot_bin 1 p (liftsc zero b)
   have hchain : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn (funcc p b)))
       (tcFn (funcc p (liftsc zero b))))) :=
-    pcc_eq_trans_code _ _ _ hX s1
-      (pcc_eq_trans_code _ _ _ hY s2 (pcc_eq_trans_code _ _ _ hZ s3 s4))
+    pcc_eq_trans_code _ _ _ hX
+      (prf_hasWit_liftcT (prf_hasWit_tc zero) (prf_hasWit_tcFn (funcc p b)))
+      (prf_hasWit_liftcT (prf_hasWit_tc zero)
+        (prf_hasWit_funccT (prf_hasWit_tcFn p) (prf_hasWit_tcFn b)))
+      (prf_hasWit_tcFn (funcc p (liftsc zero b))) s1
+      (pcc_eq_trans_code _ _ _ hY
+        (prf_hasWit_liftcT (prf_hasWit_tc zero)
+          (prf_hasWit_funccT (prf_hasWit_tcFn p) (prf_hasWit_tcFn b)))
+        (prf_hasWit_funccT (prf_hasWit_tcFn p)
+          (prf_hasWit_liftscT (prf_hasWit_tc zero) (prf_hasWit_tcFn b)))
+        (prf_hasWit_tcFn (funcc p (liftsc zero b))) s2
+        (pcc_eq_trans_code _ _ _ hZ
+          (prf_hasWit_funccT (prf_hasWit_tcFn p)
+            (prf_hasWit_liftscT (prf_hasWit_tc zero) (prf_hasWit_tcFn b)))
+          (prf_hasWit_funccT (prf_hasWit_tcFn p) (prf_hasWit_tcFn (liftsc zero b)))
+          (prf_hasWit_tcFn (funcc p (liftsc zero b))) s3 s4))
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
     (prf_congr_liftcT (prf_refl _) (prf_congr_tcFn (prf_eq_symm hs)))
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
@@ -728,10 +790,10 @@ theorem refl_lista_cons (h t : Term) (hh : Prf (targetLift h)) (ht : Prf (target
     pcc_dot_cons (liftc zero h) (liftsc zero t)
   have hchain : Prf (provFromCode (eqc (liftscT (termCode zero) (tcFn (cons h t)))
       (tcFn (cons (liftc zero h) (liftsc zero t))))) :=
-    pcc_eq_trans_code _ _ _ hX s1
-      (pcc_eq_trans_code _ _ _ hY s2
-        (pcc_eq_trans_code _ _ _ hZ s3
-          (pcc_eq_trans_code _ _ _ hU s4 s5)))
+    pcc_eq_trans_code _ _ _ hX (by hw_auto) (by hw_auto) (by hw_auto) s1
+      (pcc_eq_trans_code _ _ _ hY (by hw_auto) (by hw_auto) (by hw_auto) s2
+        (pcc_eq_trans_code _ _ _ hZ (by hw_auto) (by hw_auto) (by hw_auto) s3
+          (pcc_eq_trans_code _ _ _ hU (by hw_auto) (by hw_auto) (by hw_auto) s4 s5)))
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
 
@@ -754,8 +816,9 @@ end
 
 /-! ## §9 · LA FORMA ECUACIONAL DE LA GUARDA ES *EXACTAMENTE* LO QUE PIDEN LAS CLAUSULAS
 
-    `shapeUn`/`shapeBin` son los de PRODUCCION (`Meta/CodeWitnessPrf.lean`, namespace
-    `SinWTs`): aqui NO se redefinen, se abren selectivamente. `shapeUn X 0` y `shapeBin X 1`
+    `shapeUn`/`shapeBin` son los de PRODUCCION: se DECLARAN en `Minimal/Axioms.lean`
+    (ADR-020, bajaron con las guardas) y `CodeWitnessPrf.SinWTs` los re-exporta, asi que el
+    nombre cualificado de siempre sigue valiendo. Aqui NO se redefinen, se abren selectivamente. `shapeUn X 0` y `shapeBin X 1`
     son, **por `rfl`**, las dos ecuaciones que consumen `refl_caso_varc`/`refl_caso_funcc`. -/
 
 theorem shapeUn0_es_varc (X : Term) :
@@ -869,7 +932,11 @@ theorem refl_caso_funcc_imp (p b : Term) :
   have hchain : PrfH [targetLiftsc b] (provFromCode (eqc
       (liftcT (termCode zero) (tcFn (funcc p b))) (tcFn (funcc p (liftsc zero b))))) :=
     PrfH_eq_trans_code _ _ _ hX s1
-      (PrfH_eq_trans_code _ _ _ hY s2 (PrfH_eq_trans_code _ _ _ hZ s3 s4))
+      (PrfH_eq_trans_code _ _ _ hY s2
+        (PrfH_eq_trans_code _ _ _ hZ s3 s4
+          (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto))
+      (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftc_func zero p b))))) _) hchain
 
@@ -943,13 +1010,19 @@ theorem refl_lista_cons_imp (h t : Term) :
       (tcFn (cons (liftc zero h) (liftsc zero t))))) :=
     PrfH_eq_trans_code _ _ _ hX s1
       (PrfH_eq_trans_code _ _ _ hY s2
-        (PrfH_eq_trans_code _ _ _ hZ s3 (PrfH_eq_trans_code _ _ _ hU s4 s5)))
+        (PrfH_eq_trans_code _ _ _ hZ s3
+          (PrfH_eq_trans_code _ _ _ hU s4 s5
+            (by hw_auto) (by hw_auto) (by hw_auto))
+          (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto))
+      (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftsc_cons zero h t))))) _) hchain
 
 /-! ## §10 · EL PREDICADO SIN‑`wTs` ENTERO, CONTRA EL OBJETIVO — la MEDIDA
 
-    `isTermCodeE1`/`argsIn` son los de PRODUCCION (`CodeWitnessPrf.SinWTs`). -/
+    `isTermCodeE1`/`argsIn` son los de PRODUCCION: declarados en `Minimal/Axioms.lean`
+    (ADR-020), re-exportados por `CodeWitnessPrf.SinWTs`. -/
 
 /-- **LA MEDIDA DEL MODULO, no su resultado consumible.**
 
@@ -1077,8 +1150,9 @@ example (wT X : Term) :
     ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.isTermCodeE1 wT X = isTermCodeE1 wT X := rfl
 example {Γ : List Formula} (X Y Z : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (h1 : PrfH Γ (provFromCode (eqc X Y))) (h2 : PrfH Γ (provFromCode (eqc Y Z))) :
+    (h1 : PrfH Γ (provFromCode (eqc X Y))) (h2 : PrfH Γ (provFromCode (eqc Y Z)))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) (hwZ : Prf (hasWit Z)) :
     PrfH Γ (provFromCode (eqc X Z)) :=
-  ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf.PrfH_eq_trans_code X Y Z hX h1 h2
+  ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf.PrfH_eq_trans_code X Y Z hX h1 h2 hwX hwY hwZ
 example (a b : Term) : eqc a b = eqCodeFn a b :=
   (ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.eqCodeFn_eq_eqc a b).symm

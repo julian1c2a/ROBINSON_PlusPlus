@@ -204,7 +204,9 @@ theorem pcc_bdEx_intro (B Phic K : Term)
     (hBcl : ∀ c, liftTerm c B = B) (hBinv : ∀ W, Prf (substtc zero W B =eq B))
     (hPcl : ∀ c, liftTerm c Phic = Phic)
     (hlt : Prf (provFromCode (ltCodeFn K B)))
-    (hphi : Prf (provFromCode (substfc zero K Phic))) :
+    (hphi : Prf (provFromCode (substfc zero K Phic)))
+    (hwB : Prf (hasWit B)) (hwP : Prf (hasWitF Phic))
+    (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (bdExCode B Phic)) := by
   -- (1) `∧`‑intro de las dos reflexiones
   have hand : Prf (provFromCode (andc (ltCodeFn K B) (substfc zero K Phic))) :=
@@ -221,7 +223,11 @@ theorem pcc_bdEx_intro (B Phic K : Term)
       = andc (ltCodeFn (varc (numeral 0)) B) Phic := fun c => by
     simp only [andc, ltCodeFn, atom2CodeFn, varc, cons, nil, zero, succ, liftTerm, liftTerms,
       liftTerm_numeral, liftTerm_strCode, hBcl c, hPcl c]
-  exact prf_mp (pcc_exIntro_code' (andc (ltCodeFn (varc (numeral 0)) B) Phic) K hbody) hant
+  exact prf_mp (pcc_exIntro_code' (andc (ltCodeFn (varc (numeral 0)) B) Phic) K hbody
+    (prf_hasWitF_andc (ltCodeFn (varc (numeral 0)) B) Phic
+      (prf_hasWitF_atom2 (strCode lt_sym) (varc (numeral 0)) B
+        (prf_hasWit_varc (numeral 0)) hwB) hwP)
+    hwK) hant
 
 /-! ### `∀i<B`‑ELIM a nivel de código -/
 
@@ -230,11 +236,17 @@ theorem pcc_bdEx_intro (B Phic K : Term)
 theorem pcc_bdAll_elim (B Phic K : Term)
     (hBinv : ∀ W, Prf (substtc zero W B =eq B))
     (hall : Prf (provFromCode (bdAllCode B Phic)))
-    (hlt : Prf (provFromCode (ltCodeFn K B))) :
+    (hlt : Prf (provFromCode (ltCodeFn K B)))
+    (hwB : Prf (hasWit (liftTerm 0 B))) (hwP : Prf (hasWitF (liftTerm 0 Phic)))
+    (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (substfc zero K Phic)) := by
   -- (1) `∀`‑elim con testigo `K`
   have helim : Prf (provFromCode (substfc zero K (implc (ltCodeFn (varc (numeral 0)) B) Phic))) :=
-    prf_mp (pcc_forallElim_code_open (implc (ltCodeFn (varc (numeral 0)) B) Phic) K) hall
+    prf_mp (pcc_forallElim_code_open (implc (ltCodeFn (varc (numeral 0)) B) Phic) K
+      (prf_hasWitF_implc (ltCodeFn (varc (numeral 0)) (liftTerm 0 B)) (liftTerm 0 Phic)
+        (prf_hasWitF_atom2 (strCode lt_sym) (varc (numeral 0)) (liftTerm 0 B)
+          (prf_hasWit_varc (numeral 0)) hwB) hwP)
+      hwK) hall
   -- (2) `substfc zero K` distribuye sobre el `implc`
   have hsub : Prf (substfc zero K (implc (ltCodeFn (varc (numeral 0)) B) Phic)
       =eq implc (ltCodeFn K B) (substfc zero K Phic)) :=

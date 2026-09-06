@@ -84,7 +84,9 @@ namespace ROBINSON_PlusPlus.Meta.SubstfcCodePrf
 
 theorem pcc_congr_substfcT_arg3_code (A B X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hB : ∀ W, Prf (substtc zero W B =eq B))
-    (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwB : Prf (hasWit B) := by hw_auto)
+    (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substfcT A B X) (substfcT A B Y))) := by
   let Ac : Term := eqc (substfcT A B X) (substfcT A B (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (substfcT A B X) (substfcT A B w)) := by
@@ -101,7 +103,11 @@ theorem pcc_congr_substfcT_arg3_code (A B X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (substfcT A B X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (substfcT A B X) (substfcT A B (varc (numeral 0)))
+        (prf_hasWit_funcc3 (strCode "substfc") A B X hwA hwB hwX)
+        (prf_hasWit_funcc3 (strCode "substfc") A B (varc (numeral 0)) hwA hwB
+          (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 /-! ## §4 · El código de la ecuación interna (idéntico a `Paso2CasoForall` §6) -/
 
@@ -151,7 +157,7 @@ theorem pcc_substfc_bottom_dot (v s : Term) :
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst2 AXBOT_BODY (show ax_substfc_bottom ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s))
+      (tcFn v) (tcFn s) (prf_hasWit_tcFn (liftTerm 0 v)) (prf_hasWit_tcFn (liftTerm 0 s)))
 
 /-- **CASO `bottom` DE `pcc_eval_substfc`, CERRADO.** Sin hipótesis: constructor nulario. -/
 theorem paso2_caso_bottom (v s : Term) :
@@ -178,9 +184,10 @@ theorem paso2_caso_bottom (v s : Term) :
     prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
       (prf_congr_tcFn (prf_eq_symm (prf_substfc_bottom v s)))))
       (prf_provFromCode_eqCodeFn_refl (tcFn botc))
-  exact pcc_eq_trans_code _ _ _ iA h1
-    (pcc_eq_trans_code _ _ _ iB h2
-      (pcc_eq_trans_code _ _ _ (substtc_inv_nulT 2) h3 h4))
+  exact pcc_eq_trans_code _ _ _ iA (by hw_auto) (by hw_auto) (by hw_auto) h1
+    (pcc_eq_trans_code _ _ _ iB (by hw_auto) (by hw_auto) (by hw_auto) h2
+      (pcc_eq_trans_code _ _ _ (substtc_inv_nulT 2) (by hw_auto) (by hw_auto) (by hw_auto)
+        h3 h4))
 
 /-! ## §6 · CASO BINARIO — `impl`, `and`, `or` en UN SOLO lema.
 
@@ -339,7 +346,9 @@ theorem pcc_substfc_bin_dot (T : Term) (hT : ∀ c : Nat, liftTerm c T = T)
       (prf_eq_trans (prf_congr_substfc_arg3
         (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin0 hnorm3)) hmid2)) hmid1)) hout
   exact prf_mp (prf_provCode_congr hchain)
-    (pcc_axiom_inst4 (AXBIN_BODY T) hmem (tcFn v) (tcFn s) (tcFn a) (tcFn b))
+    (pcc_axiom_inst4 (AXBIN_BODY T) hmem (tcFn v) (tcFn s) (tcFn a) (tcFn b)
+      (prf_hasWit_tcFn (liftTerm 0 v)) (prf_hasWit_tcFn (liftTerm 0 s))
+      (prf_hasWit_tcFn (liftTerm 0 a)) (prf_hasWit_tcFn (liftTerm 0 b)))
 
 end ROBINSON_PlusPlus.Meta.SubstfcCodePrf
 

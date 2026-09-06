@@ -168,6 +168,8 @@ theorem pcc_tc_formCode_internal (f : Formula) :
       (eqCodeFn (tcFn (formCode f)) (termCode (numeral (codeNat f))))) :=
     prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _) (prf_tc_form_numeral f))) h0
   refine pcc_to_formCode f (fun s => eqCodeFn (tcFn (formCode f)) s) ?_ h1
+    (prf_hasWitF_eq2 (tcFn (formCode f)) (varc (numeral 0))
+      (prf_hasWit_tcFn (formCode f)) (prf_hasWit_varc (numeral 0)))
   intro s
   refine prf_eq_trans (prf_substfc_eq zero s (tcFn (formCode f)) (varc (numeral 0))) ?_
   exact prf_congr_eqCodeFn (substtc_inv_tcFn _ s) (prf_substtc_varc0 s)
@@ -179,13 +181,14 @@ código‑testigo `yc`), con el hueco `⌜v₀⌝` recibiendo `yc`. -/
 
 /-- **Cola rastreada**: `Prov(⌜In yc t̃⌝) ⇒ Prov(⌜In yc (cons a t)~⌝)`, con `yc` código arbitrario. -/
 theorem pcc_in_tail_tracked (yc a t : Term)
+    (hwyc : Prf (hasWit (liftTerm 0 yc)))
     (ht : ∀ W, Prf (substtc zero W (termCode t) =eq termCode t))
     (hat : ∀ W, Prf (substtc zero W (termCode (cons a t)) =eq termCode (cons a t))) :
     Prf (provFromCode (inFormCodeFn yc (termCode t)) ⇒
       provFromCode (inFormCodeFn yc (termCode (cons a t)))) := by
   have hgen : Prf (Formula.forall (Formula.impl (In (.var 0) t) (In (.var 0) (cons a t)))) :=
     Prf.gen _ (prf_in_cons_tail_imp a (.var 0) t)
-  have hinst := pcc_thm_inst _ hgen yc
+  have hinst := pcc_thm_inst _ hgen yc hwyc
   have hcode : Prf (substfc zero yc (formCode (Formula.impl (In (.var 0) t) (In (.var 0) (cons a t))))
       =eq implc (inFormCodeFn yc (termCode t)) (inFormCodeFn yc (termCode (cons a t)))) := by
     refine prf_eq_trans (prf_substfc_impl zero yc (formCode (In (.var 0) t))
@@ -206,6 +209,7 @@ códigos RASTREADOS (`tcFn`), no aparece `termCode y` para `y` abstracto — no 
 /-- **Cabeza rastreada**: bajo `y =eq a` (con `a` código, `tcFn a = termCode a`) y el puente
     `Prov(yc = tcFn y)`, la pertenencia `Prov(⌜In yc (cons a t)~⌝)` es demostrable. -/
 theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
+    (hwyc : Prf (hasWit yc))
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
     (haform : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))))
     (hatinv : ∀ W, Prf (substtc zero W (termCode (cons a t)) =eq termCode (cons a t)))
@@ -223,10 +227,12 @@ theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
   have heq3 : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))) := haform
   have hyc_ta : PrfH Γ (provFromCode (eqc yc (tcFn a))) :=
     PrfH_eq_trans_code yc (tcFn y) (tcFn a) hycinv hbr heq2
+      hwyc (prf_hasWit_tcFn y) (prf_hasWit_tcFn a)
   have hyc_tca : PrfH Γ (provFromCode (eqc yc (termCode a))) :=
     PrfH_eq_trans_code yc (tcFn a) (termCode a) hycinv hyc_ta (prf_to_prfH heq3 _)
+      hwyc (prf_hasWit_tcFn a) (prf_hasWit_tc a)
   have hsym : PrfH Γ (provFromCode (eqc (termCode a) yc)) :=
-    PrfH_eq_symm_code yc (termCode a) hycinv hyc_tca
+    PrfH_eq_symm_code yc (termCode a) hycinv hyc_tca hwyc (prf_hasWit_tc a)
   -- Leibniz interno: swap  termCode a → yc  en la 1ª posición del átomo `In`
   let Ac : Term := inFormCodeFn (varc (numeral 0)) (termCode (cons a t))
   have h1 : PrfH Γ (provFromCode (substfc zero (termCode a) Ac)) :=
@@ -234,6 +240,9 @@ theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
       (prf_substfc_inFormCode_hole1 (termCode a) (termCode (cons a t)) hatinv))) _) hhead
   have h2 : PrfH Γ (provFromCode (substfc zero yc Ac)) :=
     PrfH_leibniz_apply Ac (termCode a) yc hsym h1
+      (prf_hasWitF_atom2 (strCode in_sym) (varc (numeral 0)) (termCode (cons a t))
+        (prf_hasWit_varc (numeral 0)) (prf_hasWit_tc (cons a t)))
+      (prf_hasWit_tc a) hwyc
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
     (prf_substfc_inFormCode_hole1 yc (termCode (cons a t)) hatinv)) _) h2
 
@@ -247,6 +256,7 @@ recursión + `pcc_in_tail_tracked`. -/
     código `substtc`‑invariante y el puente `Prov(yc = tcFn y)`, de `In y (listFormCodeM L)` sale
     `Prov(⌜In yc (listFormCodeM L)~⌝)`. Núcleo de la Σ₁‑completitud de pertenencia a axiomas. -/
 theorem pcc_In_lfc_tracked (yc y : Term)
+    (hwyc : Prf (hasWit yc)) (hwycL : Prf (hasWit (liftTerm 0 yc)))
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
     (hbr : Prf (provFromCode (eqCodeFn yc (tcFn y)))) :
     ∀ L : List Formula,
@@ -263,14 +273,14 @@ theorem pcc_In_lfc_tracked (yc y : Term)
         PrfH_iff_mp (prf_in_cons_iff y (formCodeM f) (listFormCodeM fs)) (prfH_hyp_self _)
       refine PrfH_or_elim hor ?_ ?_
       · -- cabeza: `y = formCodeM f`
-        exact pcc_in_head_swap yc y (formCodeM f) (listFormCodeM fs) hycinv
+        exact pcc_in_head_swap yc y (formCodeM f) (listFormCodeM fs) hwyc hycinv
           (by rw [formCodeM_eq]; exact pcc_tc_formCode_internal f)
           (substtc_inv_termCode_listFormCodeM (f :: fs))
           (prf_to_prfH hbr _) (PrfH.hyp _ _ (List.Mem.head _))
       · -- cola: `In y (listFormCodeM fs)`, recursión
-        have hrec := pcc_In_lfc_tracked yc y hycinv hbr fs
+        have hrec := pcc_In_lfc_tracked yc y hwyc hwycL hycinv hbr fs
         exact PrfH.mp _ _ _
-          (prf_to_prfH (pcc_in_tail_tracked yc (formCodeM f) (listFormCodeM fs)
+          (prf_to_prfH (pcc_in_tail_tracked yc (formCodeM f) (listFormCodeM fs) hwycL
             (substtc_inv_termCode_listFormCodeM fs)
             (substtc_inv_termCode_listFormCodeM (f :: fs))) _)
           (PrfH.mp _ _ _ (prf_to_prfH hrec _) (PrfH.hyp _ _ (List.Mem.head _)))
@@ -286,6 +296,7 @@ reflejada del anclaje). -/
     puente `Prov(yc = tcFn y)`, de `In y axiomsCodeT` sale `Prov(⌜In yc axiomsCodeT~⌝)`. Compone la
     recursión `pcc_In_lfc_tracked` con el anclaje `prf_axiomsCodeT_eq` en ambos lados. -/
 theorem pcc_In_axiomsCodeT_tracked (yc y : Term)
+    (hwyc : Prf (hasWit yc)) (hwycL : Prf (hasWit (liftTerm 0 yc)))
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
     (hbr : Prf (provFromCode (eqCodeFn yc (tcFn y)))) :
     Prf (In y axiomsCodeT ⇒ provFromCode (inFormCodeFn yc (termCode axiomsCodeT))) := by
@@ -296,7 +307,7 @@ theorem pcc_In_axiomsCodeT_tracked (yc y : Term)
   -- recursión
   have hrec : PrfH [In y axiomsCodeT]
       (provFromCode (inFormCodeFn yc (termCode (listFormCodeM axioms)))) :=
-    PrfH.mp _ _ _ (prf_to_prfH (pcc_In_lfc_tracked yc y hycinv hbr axioms) _) hlist
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_In_lfc_tracked yc y hwyc hwycL hycinv hbr axioms) _) hlist
   -- lado CÓDIGO (dentro de Prov): swap termCode(listFormCodeM axioms) → termCode axiomsCodeT
   let Ac : Term := inFormCodeFn yc (varc (numeral 0))
   have heq : PrfH [In y axiomsCodeT]
@@ -308,6 +319,9 @@ theorem pcc_In_axiomsCodeT_tracked (yc y : Term)
       (prf_substfc_inFormCode_hole2 yc (termCode (listFormCodeM axioms)) hycinv))) _) hrec
   have h2 : PrfH [In y axiomsCodeT] (provFromCode (substfc zero (termCode axiomsCodeT) Ac)) :=
     PrfH_leibniz_apply Ac (termCode (listFormCodeM axioms)) (termCode axiomsCodeT) heq h1
+      (prf_hasWitF_atom2 (strCode in_sym) yc (varc (numeral 0)) hwyc
+        (prf_hasWit_varc (numeral 0)))
+      (prf_hasWit_tc (listFormCodeM axioms)) (prf_hasWit_tc axiomsCodeT)
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_provCode_congr (prf_substfc_inFormCode_hole2 yc (termCode axiomsCodeT) hycinv)) _) h2
 

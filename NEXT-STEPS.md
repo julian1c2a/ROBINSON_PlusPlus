@@ -4,10 +4,64 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑04 · `master` verde · Lean v4.31.0 — B2 CERRADA (el DESCENSO en producción)**
-**124 jobs · 110 módulos activos (Minimal 11 + Meta 88 + Full 11) + 0 en `cuarentena/` · 57 `sondeos/`**
-**7 `axiom` de Lean · 0 errores · 0 warnings · 0 sorrys** (las 4 coincidencias de `sorry` son
-comentarios).
+**Estado 2026‑09‑07 · rama `via-c-adr020` · 🏁 VÍA C CERRADA · ✅ ÁRBOL VERDE**
+`Build completed successfully (126 jobs)` — **112 módulos** (Minimal 11 + Meta 90 + Full 11) + 0 en
+`cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**. `master` sigue verde en `97f2a37`;
+esta rama vuelve a estarlo **con la enmienda de los 7 esquemas aplicada**, y está lista para integrar.
+
+> # 🎯 SIGUIENTE SESIÓN — **la rama C está cerrada; el cuello de botella se mueve**
+>
+> Todo lo medido: **§3.38** (las dos clausuras), **§3.39** (① y ②), **§3.40** (③ y el cierre) de
+> `doc/REFERENCE-Incompleteness.md`.
+>
+> ## 🏁 Lo que se cerró
+>
+> * **①** `Meta/SubstfcWitnessPrf.lean` — `prf_hasWit_substtc` y `prf_hasWitF_substfc`, net‑0 puro.
+> * **②** `MpCodePrf`: los 10 sitios; la mitad CÓDIGO se paga entera ahí (tres lemas).
+> * **③** los **29 módulos** bloqueados. La escalera de aridad (§28), `hw_auto` + `autoParam`, y
+>   dos lemas por inducción para `CTree`.
+> * ✅✅ **La línea roja de ADR‑020, comprobada y con razón ESTRUCTURAL** (§3.40.3):
+>   `d3_prf_of_chainOkDot` y `pcc_lineWF_tracked_modulo_7` conservan su firma exacta, porque la
+>   guarda va DENTRO del `⇔` objeto y le llega al reflector como conjunto objeto, no como hipótesis.
+> * ✅ Las **dos** deudas de ADR‑019 (`BdAllIntroPrf`, `EvalLiftcPrf`), saldadas.
+>
+> ## ▶ LO QUE TOCA AHORA — hay que DECIDIR entre tres frentes
+>
+> **(a) INTEGRAR `via-c-adr020` en `master`.** La rama está verde y el inventario no se mueve
+> (7 `axiom`, 141 axiomas objeto, se sustituyen 7 de los 141). Decisión del autor.
+>
+> **(b) B3.4 — el cuello de botella de fondo, ahora DESBLOQUEADO.** Era lo que ③ liberaba: el
+> cierre de `pcc_eval_substfc_wit` son **554** declaraciones, **131** a promover, y tocaba
+> **13 módulos de los que 8 no compilaban**. Ya compilan los 13. ⚠️ **RE‑MEDIR antes de empezar**:
+> parte de esas 131 pueden haber entrado con las promociones de ①–③.
+>
+> **(c) C3 — los 7 reflectores de `lineWF`.** `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar
+> esos 7 cierra `pcc_lineWF_tracked` y que no hay nada más aguas abajo, y §3.40.3 acaba de
+> confirmar que esa afirmación **sigue siendo verdadera bajo la enmienda**. Ahora la guarda llega
+> a cada reflector como **conjunto objeto dentro del `⇔`**, que es justo lo que
+> `hcond_absorbe_extra` sabe absorber.
+>
+> Y detrás siguen **D** (`hC_dot` → D3 real), **E** (Gödel II sin `axiom d3`) y el frente
+> independiente **F** (`⊬¬G`, sólo `NegVerifier` abierto).
+>
+> ## 🔑 Las reglas de método que deja esta fase
+>
+> 1. **MEDIR LA FORMA, NO EL TAMAÑO.** «¿Cuántos sitios hay?» da un plan lineal *y la respuesta
+>    está mal* (el censo por API mide la onda inicial: medí 44 y un módulo que daba *uno* tenía
+>    *diez*). «¿Qué forma tienen?» dio **6 lemas en vez de 35** y **una táctica en vez de 200
+>    anotaciones**. La leí en el módulo veinte.
+> 2. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
+>    de la táctica importa: las estructurales ANTES que `prf_hasWit_tc`, o el unificador despliega
+>    `termCode` y agota los heartbeats.
+> 3. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
+>    `CTree` se paga por inducción; arrastrar habría contaminado el chasis).
+> 4. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
+> 5. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
+>    nombre del `export` **y** del `#print axioms` del donante — si no, es error duro.
+> 6. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
+>    prohibido editar), uno que propone y uno que refuta con sesgo hacia PAGAR. 26 sitios,
+>    0 refutados, 26 `patch_old` casando de forma única (§3.40.8).
+---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)
 >
@@ -197,20 +251,47 @@ comentarios).
 >         (B) cargarla por la cadena: sube hasta D3, y la hipotesis colgante es
 >             REFUTABLE => la D3 que saldria seria VACUA, no solo condicionada.
 >         ✅ Lo que SI sobrevive: chasis y ensamblador NO hay que rehacerlos.
->   C1 ⬜ (C) LA ENMIENDA DEL ESQUEMA — la unica via que puede funcionar.
+>   C1 ✅ HECHA (2026-09-05, ADR-020): (C) LA ENMIENDA DEL ESQUEMA, en version MINIMA.
+>         11 conjuntos nuevos (7 hasWitF + 4 hasWit) en los 7 esquemas. El chasis NO
+>         hubo que rehacerlo. Ver §3.36.
+>   C1b✅ LAS DOS CLAUSURAS, PROBADAS (2026-09-06, sondeos/ClausuraSubsttc.lean,
+>         1911 l., 0 sorrys, net-0 puro):
+>         · prf_hasWit_substtc   — mitad TERMINO
+>         · prf_hasWitF_substfc  — 🏁 LA PIEZA QUE FALTABA PARA EL VERDE (§3.38)
+>         ⇒ YA NO QUEDA MATEMATICA por hacer para cerrar la via C. Lo que resta es
+>            PROPAGACION: promover + 9 firmas + ~40 sitios. Medido en §3.38.3.
+>   C1c ☑ HISTORICO (se conserva el argumento, ya consumido):
 >         ⚠️ Es CIRCULAR tal cual: rompe el chasis que la consume.
 >         ▶ PREREQUISITO: el lema previo `∀t. hasWit (tcFn t)`. Hay que pagarlo ANTES.
 >         ✅ hcond_absorbe_extra (sondeos/SegundoMuro.lean) la abarata: lo que absorbe
 >            es un conjunto EXTRA en C, o sea EXACTAMENTE una enmienda de esquema.
 >            Aquella pieza se probo para esto y no se sabia.
->   C2 ⬜ DECISION DEL AUTOR, ahora con el coste real medido:
+>   C2 ✅ DECIDIDA POR EL AUTOR el 2026-09-05: se ejecuta la via C (ADR-020).
+>         El coste real medido que la sostuvo:
 >         ⛔ El argumento "enmendar cambia G" que se venia usando ES FALSO (§3.32.1):
 >            godelCN tiene 483 dependencias y NINGUNA es `axioms`. G, como FORMULA, no
 >            cambia. Lo que cambia es la TEORIA de la que G habla -- puede seguir siendo
 >            motivo para no hacerlo, pero es OTRO argumento y mucho mas debil.
->   C3 ⬜ los 7 tags, una vez decidida la via: q1 q2 q3 leibniz ind qconf listInd
+>   C3 ⬜ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7. El arbol
+>         YA esta verde, asi que sus reflectores son lo unico que queda de la rama C.
 >         ✅ pcc_lineWF_tracked_modulo_7 GARANTIZA que cerrar esos 7 cierra
->            pcc_lineWF_tracked, y que no hay nada más aguas abajo
+>            pcc_lineWF_tracked, y que no hay nada mas aguas abajo
+>         ⭐ Y §3.40.3 confirma que esa garantia SIGUE VALIENDO bajo la enmienda: la
+>            guarda va DENTRO del ⇔ OBJETO, luego le llega a cada reflector como
+>            CONJUNTO OBJETO extraido de `lineWF t` -- que es justo lo que
+>            `hcond_absorbe_extra` sabe absorber.
+>   C4 ✅ PROPAGACION HASTA EL VERDE -- HECHA (2026-09-07). Build 126 jobs, VERDE.
+>         ① ✅ HECHA: Meta/SubstfcWitnessPrf.lean (1912 l., net-0 puro). Sin ciclo,
+>              como estaba medido. ADR-019 TRES veces al promover.
+>              ✅ la deuda que dejo (borrados en BdAllIntroPrf y EvalLiftcPrf, sin
+>              compilar) quedo VERIFICADA en ③: cero `unknown identifier`.
+>         ② ✅ HECHA: MpCodePrf VERDE, 10 lemas enmendados. La mitad CODIGO se paga
+>              entera ahi (prf_hasWitF_fc_lift / _liftc_lift / _substfc_lift).
+>         ③ ✅ HECHA: los 29 modulos cerrados. La escalera de aridad (§28), `hw_auto` +
+>              `autoParam`, y dos lemas por induccion para `CTree` (§3.40.7).
+>              ✅✅ LINEA ROJA COMPROBADA: d3_prf_of_chainOkDot y
+>              pcc_lineWF_tracked_modulo_7 conservan su firma EXACTA (§3.40.3).
+>              ✅ Las DOS deudas de ADR-019 (BdAllIntroPrf, EvalLiftcPrf), saldadas.
 > D · D3 REAL
 >   D1 ⬜ hC_dot — la reflexión punteada de chainOk. NO EXISTE (verificado por grep)
 >   D2 ⬜ d3_prf := d3_prf_of_chainOkDot φ hC_dot   ✅ el consumidor YA existe (Meta/D3InDotPrf)
@@ -271,9 +352,10 @@ comentarios).
 > # 🎯 SIGUIENTE SESIÓN — **la rama B, que ahora bloquea TRES frentes**
 >
 > ✅ Las dos mediciones están hechas (3/3 cada una) y las dos **cambian el plan**:
-> * **Rama C** (§3.32.2): de las tres vías, **dos están REFUTADAS con prueba compilada**. Queda la
->   **enmienda del esquema**, que es circular tal cual y pide antes `∀t. hasWit (tcFn t)`.
->   ⛔ Y el argumento «enmendar cambia G» que la desaconsejaba **es FALSO** (§3.32.1).
+> * **Rama C** — ✅ **EJECUTADA el 2026‑09‑05** (ADR‑020, §3.36). La enmienda está aplicada, y
+>   `∀t. hasWit (tcFn t)` **probado** y en producción (`Meta/HasWitTcFnPrf.lean`, net‑0 puro).
+>   ⚠️ Parada conocida en `MpCodePrf`: ver el PUNTO DE REANUDACIÓN arriba.
+>   ⛔ El argumento «enmendar cambia G» que la desaconsejaba **es FALSO** (§3.32.1).
 > * **Rama F** (§3.32.3): su bloqueo documentado **no existe desde julio**; la estimación baja a la
 >   mitad.
 >

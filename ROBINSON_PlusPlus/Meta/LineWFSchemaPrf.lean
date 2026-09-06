@@ -263,7 +263,7 @@ theorem schema_backbone (k n : Nat) (C : Formula)
       (Formula.impl (Formula.and (lencF n) C) lwfVar)))) (t : Term) :
     Prf (provFromCode
       (implc (tagD k t) (implc (andc (lencD n t) (condD C t)) (lwfDot t)))) := by
-  have h := pcc_thm_inst _ hbwd (tcFn t)
+  have h := pcc_thm_inst _ hbwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
   refine prf_mp (prf_provCode_congr ?_) h
   refine prf_eq_trans
     (prf_substfc_impl zero (tcFn t) (formCode (tagF k))

@@ -87,31 +87,42 @@ def tagConcl : Nat → List Term → Option Term
              (forallc a)))
   | _, _ => none
 
-/-- **Envoltorio UNIFORME de los 21 esquemas**: despacha a los `prf_lineWF_<tag>` existentes. -/
-theorem prf_lineWF_tag (k : Nat) (concl : Term) (args : List Term) (e : Term)
+/-- **Envoltorio UNIFORME de los 21 esquemas**, en la mitad `→`.
+
+    ⚠️ **Cambió de bicondicional a IMPLICACION** ([ADR-020](../../DECISIONS.md)). Los siete
+    esquemas de sustitución llevan ahora la guarda de buena formación DENTRO del `⇔`, así que el
+    bicondicional **ya no es cierto** para argumentos arbitrarios — que es exactamente el punto de
+    la enmienda. La mitad `→`, en cambio, **sigue siendo cierta y sale GRATIS**: un `lineWF` más
+    exigente sigue implicando la ecuación, y basta proyectar la conjunción.
+
+    Y es la única mitad que se usaba: sus dos consumidores (`prf_lineWF_neg_of_tag` y
+    `derives_lineWF_neg_of_tag`, la dirección NEGATIVA que consume la rama F) aplicaban
+    `and_elim_left` acto seguido. ⇒ la enmienda **abarata** la rama F en vez de romperla: un
+    `lineWF` más fuerte es más fácil de refutar. -/
+theorem prf_lineWF_tag_imp (k : Nat) (concl : Term) (args : List Term) (e : Term)
     (h : tagConcl k args = some e) :
-    Prf (lineWF (cons concl (cons (numeralM k) (objList args))) ⇔ (concl =eq e)) := by
+    Prf (Formula.impl (lineWF (cons concl (cons (numeralM k) (objList args)))) (concl =eq e)) := by
   unfold tagConcl at h
   split at h
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_p1 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_p2 concl _ _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_c1 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_c2 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_c3 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_j1 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_j2 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_j3 concl _ _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_efq concl _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_q1 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_q2 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_q3 concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_eqrefl concl _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_leibniz concl _ _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_p3 concl _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_gen concl _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_ind concl _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_qconf concl _ _
-  · injection h with h; subst h; simpa only [objList] using prf_lineWF_listInd concl _
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_p1 concl _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_p2 concl _ _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_c1 concl _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_c2 concl _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_c3 concl _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_j1 concl _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_j2 concl _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_j3 concl _ _ _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_efq concl _)
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_q1_imp concl _ _
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_q2_imp concl _ _
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_q3_imp concl _ _
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_eqrefl concl _)
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_leibniz_imp concl _ _ _
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_p3 concl _)
+  · injection h with h; subst h; simpa only [objList] using prf_and_elim_left (prf_lineWF_gen concl _)
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_ind_imp concl _
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_qconf_imp concl _ _
+  · injection h with h; subst h; simpa only [objList] using prf_lineWF_listInd_imp concl _
   · simp at h
 
 
@@ -202,7 +213,7 @@ theorem derives_imp_trans {a b c : Formula}
 theorem prf_lineWF_neg_of_tag (k : Nat) (concl : Term) (args : List Term) (e : Term)
     (h : tagConcl k args = some e) (hne : Prf (neg (concl =eq e))) :
     Prf (neg (lineWF (cons concl (cons (numeralM k) (objList args))))) :=
-  prf_imp_trans (prf_and_elim_left (prf_lineWF_tag k concl args e h)) hne
+  prf_imp_trans (prf_lineWF_tag_imp k concl args e h) hne
 
 /-- **NEGATIVA uniforme (19 tags estructurales), en `⊢`** — la que consume el módulo C
     (sus inputs, `formCode_ne` y compañía, son de nivel `⊢`). -/
@@ -210,7 +221,7 @@ theorem derives_lineWF_neg_of_tag (k : Nat) (concl : Term) (args : List Term) (e
     (h : tagConcl k args = some e) (hne : axioms ⊢ neg (concl =eq e)) :
     axioms ⊢ neg (lineWF (cons concl (cons (numeralM k) (objList args)))) :=
   derives_imp_trans
-    (FOL.MetaRules.and_elim_left (prf_to_derives (prf_lineWF_tag k concl args e h))) hne
+    (prf_to_derives (prf_lineWF_tag_imp k concl args e h)) hne
 
 /-- **NEGATIVA de `thy` (15)**: fuera de `tagConcl`; va por `In … axiomsCodeT`. -/
 theorem derives_lineWF_neg_thy (concl : Term) (hne : axioms ⊢ neg (In concl axiomsCodeT)) :
@@ -227,7 +238,7 @@ theorem derives_lineWF_neg_thy_of_not_prf (φ : Formula) (hnp : ¬ Prf φ) :
 end ROBINSON_PlusPlus.Meta.LineWFCases
 
 export ROBINSON_PlusPlus.Meta.LineWFCases (
-  tagArity tagConcl tagPrems prf_lineWF_tag prf_premsOf_tag
+  tagArity tagConcl tagPrems prf_lineWF_tag_imp prf_premsOf_tag
   prf_imp_trans derives_imp_trans
   prf_lineWF_neg_of_tag derives_lineWF_neg_of_tag
   derives_lineWF_neg_thy derives_lineWF_neg_thy_of_not_prf

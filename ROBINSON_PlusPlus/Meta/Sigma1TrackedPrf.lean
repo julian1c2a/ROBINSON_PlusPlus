@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ExIntroCodePrf
+import ROBINSON_PlusPlus.Meta.HasWitTcFnPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -60,7 +61,13 @@ theorem pcc_exIntro_code_bridge (A : Formula) (p : Term)
     Prf (provCodeC' (Formula.ex A)) := by
   have hw : ∀ c, liftTerm c (tcFn p) = tcFn p := fun c => by
     simp only [tcFn, liftTerm, liftTerms, hpc c]
+  -- ADR-020: las dos guardas de la línea Q2. La de FORMULA la paga la rama A
+  -- (`prf_hasWitF_real`, vía `Representability2.prf_hasWitF_fc`); la de TERMINO la paga
+  -- `prf_hasWit_tcFn`, probado por inducción OBJETO en `Meta/HasWitTcFnPrf.lean` — y el
+  -- testigo es exactamente un código PUNTEADO, que es el caso para el que se probó.
   have himp := pcc_exIntro_code (formCode A) (tcFn p) (fun c => liftTerm_formCode c A) hw
+    (ROBINSON_PlusPlus.Meta.Representability2.prf_hasWitF_fc A)
+    (ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn p)
   -- himp : provFromCode (substfc zero (tcFn p) ⌜A⌝) ⇒ provFromCode (exc ⌜A⌝)
   -- exc ⌜A⌝ = ⌜∃A⌝, y provCodeC'(∃A) = provFromCode ⌜∃A⌝ (defeq: numeral 9 = succ⁹ zero)
   exact prf_mp himp h

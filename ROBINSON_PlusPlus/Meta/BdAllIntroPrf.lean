@@ -66,20 +66,10 @@ theorem prf_congr_orc {a a' b b' : Term} (ha : Prf (a =eq a')) (hb : Prf (b =eq 
   exact prf_congr_cons_tail
     (prf_eq_trans (prf_congr_cons_head ha) (prf_congr_cons_tail (prf_congr_cons_head hb)))
 
-/-- Congruencia de `substfc` en el código (3er arg), en `PrfH` (espejo de `PrfH_congr_substtc3`). -/
-theorem PrfH_congr_substfc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a =eq b)) :
-    PrfH Γ (substfc v s a =eq substfc v s b) := by
-  let f : Formula := Formula.eq (substfc (liftTerm 0 v) (liftTerm 0 s) (liftTerm 0 a))
-                                (substfc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
-  have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substfc v s a) (substfc v s u) := by
-    intro u
-    simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (substfc v s a)) Γ)
-
-/-- Congruencia de `substfc` en el código (3er arg). -/
-theorem prf_congr_substfc3 {v s a b : Term} (h : Prf (a =eq b)) :
-    Prf (substfc v s a =eq substfc v s b) :=
-  prfH_nil_to_prf (PrfH_congr_substfc3 (Γ := []) (prf_to_prfH h [])) rfl
+/-! ⚠️ **`PrfH_congr_substfc3` y `prf_congr_substfc3` BAJARON a `Meta/NumCodeClosedPrf.lean`**
+    (2026-09-06, ADR-019), junto a sus hermanas de `liftc`/`substtc`. La clausura de `hasWitF`
+    bajo `substfc` las necesita y vive **aguas arriba** de este módulo; no se puede hacer
+    corolario al de abajo. Llegan aquí por el `export` de `NumCodeClosedPrf`. -/
 
 /-! ### Piezas objeto de `<` que faltaban -/
 
@@ -116,7 +106,8 @@ theorem prf_lt_succ_split' (i b : Term) :
 /-- **Simetría interna de `=` a nivel de código, forma INTERNA**: `⊢ Prov(⌜(X=Y) ⇒ (Y=X)⌝)`.
     Leibniz con `Ac := (v₀ = X)` da `Prov(⌜(X=Y) ⇒ ((X=X) ⇒ (Y=X))⌝)`; la reflexividad codificada y
     P2 descargan el `(X=X)`. **Exige `X` `substtc`‑invariante** (por eso NO sirve con `X = ⌜v₀⌝`). -/
-theorem pcc_eq_symm_code_internal (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+theorem pcc_eq_symm_code_internal (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (implc (eqc X Y) (eqc Y X))) := by
   have hcomp : ∀ t : Term,
       Prf (substfc zero t (eqc (varc (numeral 0)) X) =eq eqc t X) := fun t =>
@@ -126,6 +117,7 @@ theorem pcc_eq_symm_code_internal (X Y : Term) (hX : ∀ W, Prf (substtc zero W 
       (implc (substfc zero X (eqc (varc (numeral 0)) X))
              (substfc zero Y (eqc (varc (numeral 0)) X))))) :=
     pcc_leibniz_code (eqc (varc (numeral 0)) X) X Y
+      (prf_hasWitF_eq2 (varc (numeral 0)) X (prf_hasWit_varc (numeral 0)) hwX) hwX hwY
   have hleib2 : Prf (provFromCode (implc (eqc X Y) (implc (eqc X X) (eqc Y X)))) :=
     prf_mp (prf_provCode_congr
       (prf_congr_implc (prf_refl _) (prf_congr_implc (hcomp X) (hcomp Y)))) hleib
@@ -144,7 +136,7 @@ theorem pcc_bdAll_base (Psi : Term) :
     Prf.gen _ (prf_not_lt_zero (.var 0))
   have hinst : Prf (provFromCode (substfc zero (varc (numeral 0))
       (formCode (Formula.impl (lt (.var 0) zero) Formula.bottom)))) :=
-    pcc_thm_inst _ hthm (varc (numeral 0))
+    pcc_thm_inst _ hthm (varc (numeral 0)) (prf_hasWit_varc (numeral 0))
   have hbridge : Prf (substfc zero (varc (numeral 0))
       (formCode (Formula.impl (lt (.var 0) zero) Formula.bottom))
       =eq implc (ltCodeFn (varc (numeral 0)) (termCode zero)) botc) :=
@@ -181,6 +173,7 @@ theorem pcc_lt_succ_split_code (b : Term) :
   have hinst : Prf (provFromCode (substfc zero (varc (numeral 0))
       (substfc (succ zero) (liftc zero (tcFn b)) (formCode splitSchema)))) :=
     pcc_thm_inst2 splitSchema hthm (tcFn b) (varc (numeral 0))
+      (prf_hasWit_tcFn (liftTerm 0 b)) (prf_hasWit_varc (numeral 0))
   have hin : Prf (substfc (succ zero) (liftc zero (tcFn b)) (formCode splitSchema)
       =eq implc (ltCodeFn (varc (numeral 0)) (succcT (liftc zero (tcFn b))))
         (orc (ltCodeFn (varc (numeral 0)) (liftc zero (tcFn b)))
@@ -217,13 +210,15 @@ theorem pcc_lt_succ_split_code (b : Term) :
     identidad cuando la única code‑var de `Psi` es `⌜v₀⌝` — que es el caso de uso. Se descarga
     estructuralmente en la aplicación (patrón `prf_substfc_ltCodeFn_varc0`). -/
 theorem pcc_bdAll_step (Psi b : Term)
+    (hwPsi : Prf (hasWitF Psi))
     (hPsiId : Prf (substfc zero (varc (numeral 0)) Psi =eq Psi))
     (hIH : Prf (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn b)) Psi)))
     (hb : Prf (provFromCode (substfc zero (tcFn b) Psi))) :
     Prf (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (succ b))) Psi)) := by
   have hleib : Prf (provFromCode (implc (eqc (tcFn b) (varc (numeral 0)))
       (implc (substfc zero (tcFn b) Psi) (substfc zero (varc (numeral 0)) Psi)))) :=
-    pcc_leibniz_code Psi (tcFn b) (varc (numeral 0))
+    pcc_leibniz_code Psi (tcFn b) (varc (numeral 0)) hwPsi
+      (prf_hasWit_tcFn b) (prf_hasWit_varc (numeral 0))
   have hleib2 : Prf (provFromCode (implc (eqc (tcFn b) (varc (numeral 0)))
       (implc (substfc zero (tcFn b) Psi) Psi))) :=
     prf_mp (prf_provCode_congr
@@ -270,6 +265,7 @@ theorem PrfH_or_elim_imp_code {Γ : List Formula} (Ac Bc Cc : Term)
 
 /-- **PASO, versión `PrfH`** (la que consume la inducción objeto). -/
 theorem PrfH_bdAll_step {Γ : List Formula} (Psi b : Term)
+    (hwPsi : Prf (hasWitF Psi))
     (hPsiId : Prf (substfc zero (varc (numeral 0)) Psi =eq Psi))
     (hIH : PrfH Γ (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn b)) Psi)))
     (hb : PrfH Γ (provFromCode (substfc zero (tcFn b) Psi))) :
@@ -278,7 +274,8 @@ theorem PrfH_bdAll_step {Γ : List Formula} (Psi b : Term)
       (implc (substfc zero (tcFn b) Psi) Psi))) :=
     prf_mp (prf_provCode_congr
       (prf_congr_implc (prf_refl _) (prf_congr_implc (prf_refl _) hPsiId)))
-      (pcc_leibniz_code Psi (tcFn b) (varc (numeral 0)))
+      (pcc_leibniz_code Psi (tcFn b) (varc (numeral 0)) hwPsi
+        (prf_hasWit_tcFn b) (prf_hasWit_varc (numeral 0)))
   have hcaseB : PrfH Γ (provFromCode (implc (eqc (tcFn b) (varc (numeral 0))) Psi)) :=
     PrfH_mp_code_apply
       (PrfH_mp_code_apply (prf_to_prfH (pcc_p2_code (eqc (tcFn b) (varc (numeral 0)))
@@ -322,6 +319,7 @@ theorem pcc_bdAll_intro
     (hPl : ∀ k q, liftTerm k (PsiF q) = PsiF (liftTerm k q))
     (hPs : ∀ v t q, substTerm v t (PsiF q) = PsiF (substTerm v t q))
     (hPsiId : ∀ q, Prf (substfc zero (varc (numeral 0)) (PsiF q) =eq PsiF q))
+    (hwPsi : ∀ q, Prf (hasWitF (PsiF q)))
     (hbody : ∀ q i, Prf (CF q ⇒ (lt i (bndF q)
       ⇒ provFromCode (substfc zero (tcFn i) (PsiF q))))) :
     Prf (CF p ⇒ provFromCode (bdAllCode (tcFn (bndF p)) (PsiF p))) := by
@@ -387,7 +385,8 @@ theorem pcc_bdAll_intro
       have hb : PrfH Γ' (provFromCode (substfc zero (tcFn (.var 0)) (PsiF (liftTerm 0 p)))) :=
         PrfH.mp _ _ _ (PrfH.mp _ _ _
           (prf_to_prfH (hbody (liftTerm 0 p) (.var 0)) _) hC) hlt
-      exact PrfH_bdAll_step (PsiF (liftTerm 0 p)) (.var 0) (hPsiId (liftTerm 0 p)) hIHapp hb
+      exact PrfH_bdAll_step (PsiF (liftTerm 0 p)) (.var 0) (hwPsi (liftTerm 0 p))
+        (hPsiId (liftTerm 0 p)) hIHapp hb
   -- instanciar en `b := bndF p`, descargar la guarda (`bndF p < σ(bndF p)`) y generalizar dentro
   have hspec := prf_spec hind (bndF p)
   have heq2 : substFormula 0 (bndF p) (bdAllPred CF bndF PsiF p)
@@ -408,7 +407,7 @@ theorem pcc_bdAll_intro
 end ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
-  prf_congr_orc PrfH_congr_substfc3 prf_congr_substfc3
+  prf_congr_orc
   prf_lt_succ_of_lt prf_lt_succ_split' pcc_eq_symm_code_internal
   pcc_bdAll_base splitSchema pcc_lt_succ_split_code pcc_bdAll_step
   PrfH_weaken_code PrfH_imp_trans_code PrfH_or_elim_imp_code PrfH_bdAll_step

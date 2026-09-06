@@ -56,6 +56,17 @@ def carcT (x : Term) : Term := funcc (strCode "carc") (cons x nil)
 def cdrcT (x : Term) : Term := funcc (strCode "cdrc") (cons x nil)
 /-- Código object del término `lenc x`. -/
 def lencT (x : Term) : Term := funcc (strCode "lenc") (cons x nil)
+
+/-! ### La GUARDA de los tres accesores (ADR-020): escalera de aridad, §28 -/
+
+theorem prf_hasWit_carcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (carcT X)) :=
+  prf_hasWit_funcc1 (strCode "carc") X hX
+
+theorem prf_hasWit_cdrcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (cdrcT X)) :=
+  prf_hasWit_funcc1 (strCode "cdrc") X hX
+
+theorem prf_hasWit_lencT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (lencT X)) :=
+  prf_hasWit_funcc1 (strCode "lenc") X hX
 -- `consT` (y su congruencia, `substtc` e invariancia) viven ahora en `Meta/DotConsPrf.lean`:
 -- eran duplicados textuales. Aquí se usan vía `open`.
 
@@ -126,9 +137,13 @@ theorem pcc_rw_dot_cons_un (F : Term → Term)
     (hFc : ∀ x y : Term, Prf (x =eq y) → Prf (F x =eq F y))
     (R : Term) (hR : ∀ W : Term, Prf (substtc zero W R =eq R))
     (h t : Term)
-    (hbase : Prf (provFromCode (eqCodeFn (F (consT (tcFn h) (tcFn t))) R))) :
+    (hbase : Prf (provFromCode (eqCodeFn (F (consT (tcFn h) (tcFn t))) R)))
+    (hwF : Prf (hasWit (F (varc (numeral 0))))) (hwR : Prf (hasWit R)) :
     Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R)) := by
   refine pcc_rw (fun s => eqCodeFn (F s) R) ?_ _ _ (pcc_dot_cons h t) hbase
+    (prf_hasWitF_eq2 (F (varc (numeral 0))) R hwF hwR)
+    (prf_hasWit_consT (prf_hasWit_tcFn h) (prf_hasWit_tcFn t))
+    (prf_hasWit_tcFn (cons h t))
   intro s
   refine prf_eq_trans (prf_substfc_eq zero s (F (varc (numeral 0))) R) ?_
   exact prf_congr_eqCodeFn
@@ -174,9 +189,11 @@ theorem pcc_eval_carc (h t : Term) :
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   have hbase : Prf (provFromCode (eqCodeFn (carcT (consT (tcFn h) (tcFn t))) (tcFn h))) :=
     prf_mp (prf_provCode_congr hchain)
-      (pcc_axiom_inst2 φ (show ax_carc ∈ axioms by simp [axioms]) (tcFn h) (tcFn t))
+      (pcc_axiom_inst2 φ (show ax_carc ∈ axioms by simp [axioms]) (tcFn h) (tcFn t)
+        (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t)))
   exact pcc_rw_dot_cons_un carcT prf_substtc_carcT (fun _ _ => prf_congr_carcT)
     (tcFn h) (substtc_inv_tcFn h) h t hbase
+    (prf_hasWit_carcT (prf_hasWit_varc (numeral 0))) (prf_hasWit_tcFn h)
 
 /-- Instancia codificada de `ax_cdrc`, ya computada: `⊢ Prov(⌜cdrc (cons h t)˙ = ṫ⌝)`. -/
 theorem pcc_eval_cdrc (h t : Term) :
@@ -206,9 +223,11 @@ theorem pcc_eval_cdrc (h t : Term) :
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   have hbase : Prf (provFromCode (eqCodeFn (cdrcT (consT (tcFn h) (tcFn t))) (tcFn t))) :=
     prf_mp (prf_provCode_congr hchain)
-      (pcc_axiom_inst2 φ (show ax_cdrc ∈ axioms by simp [axioms]) (tcFn h) (tcFn t))
+      (pcc_axiom_inst2 φ (show ax_cdrc ∈ axioms by simp [axioms]) (tcFn h) (tcFn t)
+        (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t)))
   exact pcc_rw_dot_cons_un cdrcT prf_substtc_cdrcT (fun _ _ => prf_congr_cdrcT)
     (tcFn t) (substtc_inv_tcFn t) h t hbase
+    (prf_hasWit_cdrcT (prf_hasWit_varc (numeral 0))) (prf_hasWit_tcFn t)
 
 /-! ### `lenc`: evaluación provable POR INDUCCIÓN DE LISTAS -/
 
@@ -268,10 +287,13 @@ theorem pcc_ax_lenc_cons_computed (h t : Term) :
   have hbase : Prf (provFromCode
       (eqCodeFn (lencT (consT (tcFn h) (tcFn t))) (succcT (lencT (tcFn t))))) :=
     prf_mp (prf_provCode_congr hchain)
-      (pcc_axiom_inst2 φ (show ax_lenc_cons ∈ axioms by simp [axioms]) (tcFn h) (tcFn t))
+      (pcc_axiom_inst2 φ (show ax_lenc_cons ∈ axioms by simp [axioms]) (tcFn h) (tcFn t)
+        (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t)))
   exact pcc_rw_dot_cons_un lencT prf_substtc_lencT (fun _ _ => prf_congr_lencT)
     (succcT (lencT (tcFn t)))
     (substtc_inv_succcT (substtc_inv_lencT (substtc_inv_tcFn t))) h t hbase
+    (prf_hasWit_lencT (prf_hasWit_varc (numeral 0)))
+    (prf_hasWit_succcT (prf_hasWit_lencT (prf_hasWit_tcFn t)))
 
 /-- **PASO INDUCTIVO** de `lenc`, en forma implicación (lo que pide `prf_list_induction`):
     `⊢ Prov(⌜lenc ṫ = (lenc t)˙⌝) ⇒ Prov(⌜lenc (cons h t)˙ = (lenc (cons h t))˙⌝)`. -/
@@ -285,10 +307,15 @@ theorem pcc_eval_lenc_cons_imp (h t : Term) :
   have hcs : Prf (provFromCode (eqc (lencT (tcFn t)) (tcFn (lenc t)))
       ⇒ provFromCode (eqc (succcT (lencT (tcFn t))) (succcT (tcFn (lenc t))))) :=
     pcc_congr_succ_code_imp _ _ hinvT
+      (prf_hasWit_lencT (prf_hasWit_tcFn t)) (prf_hasWit_tcFn (lenc t))
   -- transitividad con la instancia del axioma
   have htr : Prf (provFromCode (eqc (succcT (lencT (tcFn t))) (succcT (tcFn (lenc t))))
       ⇒ provFromCode (eqc (lencT (tcFn (cons h t))) (succcT (tcFn (lenc t))))) :=
-    pcc_eq_trans_code_imp _ _ _ hinvHT (pcc_ax_lenc_cons_computed h t)
+    pcc_eq_trans_code_imp _ _ _ hinvHT
+      (prf_hasWit_lencT (prf_hasWit_tcFn (cons h t)))
+      (prf_hasWit_succcT (prf_hasWit_lencT (prf_hasWit_tcFn t)))
+      (prf_hasWit_succcT (prf_hasWit_tcFn (lenc t)))
+      (pcc_ax_lenc_cons_computed h t)
   -- transporte final del código: `σ ((lenc t)˙) =eq (lenc (cons h t))˙`
   have hcode : Prf (eqc (lencT (tcFn (cons h t))) (succcT (tcFn (lenc t)))
       =eq evalLencCode (cons h t)) :=
@@ -359,4 +386,6 @@ export ROBINSON_PlusPlus.Meta.EvalListPrf (
   evalLencCode pcc_eval_lenc_nil pcc_ax_lenc_cons_computed pcc_eval_lenc_cons_imp
   substTerm_evalLencCode liftTerm_evalLencCode evalLencPred substFormula_evalLencPred
   prf_eval_lenc_all pcc_eval_lenc
+  -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)
+  prf_hasWit_carcT prf_hasWit_cdrcT prf_hasWit_lencT
 )

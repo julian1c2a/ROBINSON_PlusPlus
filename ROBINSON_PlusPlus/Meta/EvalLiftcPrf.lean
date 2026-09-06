@@ -69,10 +69,10 @@ sobre `env.constants` — no sobre el fuente:
 | §4–§6 axiomas dotados     | 180–520     | `Meta/LiftcCodePrf.lean`                      |
 | §7 `refl_caso_*`          | 542–672     | `Meta/LiftcCodePrf.lean`                      |
 | §9–§10 `refl_*_imp`       | 676–856     | `Meta/LiftcCodePrf.lean` (los CUATRO)         |
-| §10 `argsIn`/`isTermCodeE1`| 862–879    | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
-| §C `isTC1` y su fontaneria| 883–1041    | `Meta/CodeWitnessPrf.lean` (`SinWTs`/`ENS`)   |
+| §10 `argsIn`/`isTermCodeE1`| 862–879    | `Minimal/Axioms.lean`, alias `SinWTs` (ADR-020)|
+| §C `isTC1` y su fontaneria| 883–1041    | `isTC1` en `Minimal/Axioms.lean`; el resto en `CodeWitnessPrf` |
 | §E controles `crit_*`     | 1401–1568   | `Meta/CodeWitnessPrf.lean` (`SinWTs`)         |
-| `hasWit`, `CRIT_hasWit_real`| 1386,1964 | `Meta/CodeWitnessPrf.lean` (`ENS`)            |
+| `hasWit`, `CRIT_hasWit_real`| 1386,1964 | `hasWit` en `Minimal/Axioms.lean` (ADR-020); `CRIT_hasWit_real` en `CodeWitnessPrf` (`ENS`) |
 | cola del §E + testigo `tcodes1` | 1571–1897 | `Meta/CodeWitnessPrf.lean` (`SinWTs`) ⚠️ el §F del sondeo empieza en la 1899, no aqui |
 
 ## ⚠️ LOS DOS DUPLICADOS CONOCIDOS — se BORRAN y se redirigen sus usos
@@ -133,7 +133,7 @@ modulo lleva estos 20, **cada uno justificado por el simbolo que lo pide**:
 | `BoundedInPrf`    | `PrfH_lt_subst2` (§6). ⚠️ `boundedIn` y `prf_boundedIn_of_In` se los llevaron los lemas de §4 al bajar, pero el import SE QUEDA |
 | `CantorMonoPrf`   | `prf_cantor_mono_left` / `_right` — el descenso de Cantor (§6)        |
 | `ChainPrf`        | `prf_list_induction` (§2), `PrfH_leibniz_subst`, `PrfH_and_*`, `PrfH_or_elim`, `PrfH_spec` |
-| `CodeWitnessPrf`  | `SinWTs` (`isTC1`, `wfAll1`, `argsIn`, `isTermCodeE1`, `tcodes1`, `crit_*`) y `ENS` (`hasWit`, `liftF_isTC1`, `substF_isTC1`, `substF_wfAll1`, `CRIT_hasWit_real`) |
+| `CodeWitnessPrf`  | `SinWTs` (`tcodes1`, `crit_*`, y por alias `isTC1`/`wfAll1`/`argsIn`/`isTermCodeE1`) y `ENS` (`liftF_isTC1`, `substF_isTC1`, `substF_wfAll1`, `CRIT_hasWit_real`, y por alias `hasWit`). ⚠️ Los predicados de guarda se DECLARAN en `Minimal/Axioms.lean` desde ADR-020 |
 | `DerivCondPrf`    | `liftTerm_termCode`, `liftTerm_strCode`, `substTerm_strCode` (§1)     |
 | `EvalRunFnPrf`    | `prf_substtc_termCode_nil` — SOLO para el puente anti‑`iz_inv` de §0  |
 | `Hilbert`         | `Prf`, `PrfH`, `Prf₀.p1`/`j1`/`j2`, `Prf.gen`, `Prf.qconf`            |
@@ -287,30 +287,10 @@ theorem PrfH_congr_targetLiftsc {Γ : List Formula} {s s' : Term} (h : PrfH Γ (
     fabricar (ordena valores, no descompone). Sale de `prf_list_induction` con un paso que
     **no usa la hipotesis de induccion**: `prf_consOk_cons` a secas. -/
 
-def nilOrCons : Formula := lor (Formula.eq (.var 0) nil) (consOk (.var 0))
-
-theorem nilOrCons_at (Y : Term) :
-    substFormula 0 Y nilOrCons = lor (Formula.eq Y nil) (consOk Y) := by
-  simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, substFormula, substTerm,
-    substTerms, if_true]
-
-theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
-  refine prf_list_induction nilOrCons ?base ?step
-  · rw [nilOrCons_at]
-    exact prf_orL (prf_refl nil)
-  · refine Prf.gen _ (Prf.gen _ ?_)
-    have hR : substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nilOrCons))
-        = lor (Formula.eq (cons (.var 1) (.var 0)) nil) (consOk (cons (.var 1) (.var 0))) := by
-      simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, liftFormula, substFormula,
-        liftTerm, liftTerms, substTerm, substTerms, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
-        reduceIte, if_true]
-    rw [hR]
-    exact prf_mp (Prf.incl (Prf₀.p1 _ _)) (prf_orR (prf_consOk_cons _ _))
-
-/-- **`⊢ Y ≐ nil ∨ consOk Y`** con `Y` **abstracto** (puede ser `#0`). -/
-theorem prf_nil_or_cons (Y : Term) : Prf (lor (Formula.eq Y nil) (consOk Y)) := by
-  have h := prf_spec prf_nil_or_cons_all Y
-  rwa [nilOrCons_at] at h
+/-! ⚠️ **`nilOrCons`, `nilOrCons_at`, `prf_nil_or_cons_all` y `prf_nil_or_cons` BAJARON a
+    `Meta/SubstfcWitnessPrf.lean`** (2026-09-06, ADR-019). La clausura de `hasWitF` bajo `substfc`
+    los necesita y vive **aguas arriba** de este modulo, asi que hubo que reproducirlos alli; en
+    vez de dejar el duplicado, baja el general. Llegan aqui por su `export` a la raiz. -/
 
 /-! ## §3 · `argsIn` se parte en CABEZA y COLA
 
@@ -540,7 +520,8 @@ theorem pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
 
 /-! ## §8 · La forma que de verdad llega rio abajo: el testigo viene de un `∃`.
 
-    `hasWit` es el de produccion (`Meta/CodeWitnessPrf.lean`, `ENS`): aqui NO se redefine. -/
+    `hasWit` es el de produccion: se declara en `Minimal/Axioms.lean` (ADR-020) y
+    `CodeWitnessPrf.ENS` lo re-exporta. Aqui NO se redefine. -/
 
 theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)) := by
   refine prf_ex_elim_imp ?_
@@ -669,7 +650,9 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
   --    MISMA raiz: bajaron alli. Exportar aqui un nombre que el modulo ya no declara es
   --    error de elaboracion, no un aviso.
   PrfH_congr_targetLiftsc
-  nilOrCons nilOrCons_at prf_nil_or_cons_all prf_nil_or_cons
+  -- ⚠️ `nilOrCons` / `nilOrCons_at` / `prf_nil_or_cons_all` / `prf_nil_or_cons` ya NO se
+  --    exportan desde aqui: BAJARON a `Meta/SubstfcWitnessPrf.lean`, que los exporta a la
+  --    MISMA raiz. Exportar un nombre que el modulo ya no declara es ERROR DURO.
   -- ⚠️ `prf_argsIn_head` / `prf_argsIn_tail` ya NO se exportan desde aqui: viven en
   --    `Meta/CodeWitnessPrf.lean` (`SinWTs`), que es donde esta `PrfH_inst_argsIn`.
   -- ⚠️ `prf_isTermCodeE1_of_boundedIn` / `_of_In` ya no se exportan desde aqui: viven en
@@ -701,7 +684,7 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftc
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_step
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_all
-#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.prf_nil_or_cons
+#print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons
 #print axioms ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLift_real
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLiftsc_real

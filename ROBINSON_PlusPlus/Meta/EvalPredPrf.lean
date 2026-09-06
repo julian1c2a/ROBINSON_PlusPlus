@@ -58,6 +58,10 @@ namespace ROBINSON_PlusPlus.Meta.EvalPredPrf
     ecuacion de recursion para ella. -/
 def predcT (x : Term) : Term := funcc (strCode pred_sym) (cons x nil)
 
+/-- La GUARDA de `predcT` (ADR-020): `funcc` unario ⇒ escalera de aridad, §28. -/
+theorem prf_hasWit_predcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (predcT X)) :=
+  prf_hasWit_funcc1 (strCode pred_sym) X hX
+
 /-- **Puente definicional** con `termCode`, por `rfl` (como `addcT_termCode`/`succcT`). -/
 theorem predcT_termCode (a : Term) : predcT (termCode a) = termCode (pred a) := rfl
 
@@ -119,13 +123,13 @@ theorem substCodeF_AX26 (w : Term) :
 
 /-- La instancia codificada de `ax26_pred_succ` con testigo-codigo **arbitrario** `w`,
     ya computada: `Prov(⌜τ(σw) = w⌝)`. -/
-theorem pcc_ax26_computed (w : Term) :
+theorem pcc_ax26_computed (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (eqCodeFn (predcT (succcT w)) w)) := by
   have hmem : Formula.forall AX26_BODY ∈ axioms := by
     show ax26_pred_succ ∈ axioms
     simp [axioms]
   exact prf_mp (prf_provCode_congr (prf_substfc_arith_open 0 w AX26_BODY))
-    (pcc_axiom_inst AX26_BODY hmem w)
+    (pcc_axiom_inst AX26_BODY hmem w hw)
 
 /-- **PASO de la evaluacion provable de `pred`**, en forma INCONDICIONAL:
     `⊢ Prov(⌜τ((σx)˙) = (pred (σx))˙⌝)` — **sin hipotesis de induccion**.
@@ -137,7 +141,7 @@ theorem pcc_eval_pred_succ (x : Term) : Prf (provFromCode (evalPredCode (succ x)
     prf_congr_predcT (prf_eq_symm (prf_tc_succ' x))
   have hR : Prf (tcFn x =eq tcFn (pred (succ x))) :=
     prf_congr_tcFn (prf_eq_symm (prf_pred_succ x))
-  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn hL hR)) (pcc_ax26_computed (tcFn x))
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn hL hR)) (pcc_ax26_computed (tcFn x) (prf_hasWit_tcFn (liftTerm 0 x)))
 
 /-- La forma IMPLICACION que exige `prf_nat_induction` (la HI se descarta). -/
 theorem pcc_eval_pred_succ_imp (x : Term) :
@@ -200,6 +204,7 @@ theorem pcc_eval_pred' (n : Term) :
 consumidor aguas abajo, molde `pcc_congr_succ_code` (`Meta/EvalArithPrf.lean:253`). -/
 
 theorem pcc_congr_predcT_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y))
     (heq : Prf (provFromCode (eqc X Y))) :
     Prf (provFromCode (eqc (predcT X) (predcT Y))) := by
   let Ac : Term := eqc (predcT X) (predcT (varc (numeral 0)))
@@ -213,7 +218,11 @@ theorem pcc_congr_predcT_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =e
   have hAX : Prf (provFromCode (substfc zero X Ac)) :=
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
       (prf_provFromCode_eqCodeFn_refl (predcT X))
-  have hAY : Prf (provFromCode (substfc zero Y Ac)) := pcc_leibniz_apply Ac X Y heq hAX
+  have hAY : Prf (provFromCode (substfc zero Y Ac)) :=
+    pcc_leibniz_apply Ac X Y
+      (prf_hasWitF_eq2 (predcT X) (predcT (varc (numeral 0)))
+        (prf_hasWit_predcT hwX) (prf_hasWit_predcT (prf_hasWit_varc (numeral 0)))) hwX hwY
+      heq hAX
   exact prf_mp (prf_provCode_congr (hcomp Y)) hAY
 
 /-! ## §5b · PAYOFF: el LADO DERECHO de `ax_substtc_var_gt` dotado, YA PLEGADO.
@@ -245,8 +254,12 @@ theorem pcc_eval_varc_pred (n : Term) :
     Prf (provFromCode (eqc (unT 0 (predcT (tcFn n))) (tcFn (varc (pred n))))) :=
   pcc_eq_trans_code _ _ _
     (substtc_inv_unT (substtc_inv_predcT (substtc_inv_tcFn n)))
+    (prf_hasWit_unT 0 (prf_hasWit_predcT (prf_hasWit_tcFn n)))
+    (prf_hasWit_unT 0 (prf_hasWit_tcFn (pred n)))
+    (prf_hasWit_tcFn (varc (pred n)))
     (prf_mp (pcc_congr_unT_code 0 (predcT (tcFn n)) (tcFn (pred n))
-      (substtc_inv_predcT (substtc_inv_tcFn n))) (pcc_eval_pred n))
+      (substtc_inv_predcT (substtc_inv_tcFn n))
+      (prf_hasWit_predcT (prf_hasWit_tcFn n)) (prf_hasWit_tcFn (pred n))) (pcc_eval_pred n))
     (pcc_dot_varc (pred n))
 
 /-! ## §6 · CONTROL NEGATIVO: el enunciado NO es una reflexividad disfrazada.

@@ -148,7 +148,7 @@ def lwfDot (t : Term) : Term := substfc zero (tcFn t) (formCode lwfVar)
 theorem paso6_backbone (t : Term) :
     Prf (provFromCode
       (implc (tagDot t) (implc (andc (lencDot t) (eqDot t)) (lwfDot t)))) := by
-  have h := pcc_thm_inst _ prf_lineWF_eqrefl_bwd (tcFn t)
+  have h := pcc_thm_inst _ prf_lineWF_eqrefl_bwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
   refine prf_mp (prf_provCode_congr ?_) h
   -- distribuye el `substfc` sobre `implc`, el `andc` interno y el `implc` interno
   refine prf_eq_trans
@@ -197,6 +197,12 @@ object propio, `eqcT`, con su congruencia y su distribución de `substtc`. -/
 /-- Constructor object del código de `eqc a b` desde los códigos `a`, `b` de sus argumentos. -/
 def eqcT (a b : Term) : Term :=
   consT (termCode (numeralM 4)) (consT a (consT b (termCode nil)))
+
+/-- La GUARDA de `eqcT` (ADR-020): es `consT` anidado sobre `termCode`s cerrados. -/
+theorem prf_hasWit_eqcT {a b : Term} (ha : Prf (hasWit a)) (hb : Prf (hasWit b)) :
+    Prf (hasWit (eqcT a b)) :=
+  prf_hasWit_consT (prf_hasWit_tc (numeralM 4))
+    (prf_hasWit_consT ha (prf_hasWit_consT hb (prf_hasWit_tc nil)))
 
 /-- Puente definicional con `termCode`. -/
 theorem eqcT_termCode (a b : Term) : eqcT (termCode a) (termCode b) = termCode (eqc a b) := rfl
@@ -278,7 +284,9 @@ theorem pcc_dot_cons_symm (h t : Term) :
     Prf (provFromCode (eqCodeFn (tcFn (cons h t)) (consT (tcFn h) (tcFn t)))) :=
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (consT (tcFn h) (tcFn t)) (tcFn (cons h t))
-      (substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t)))
+      (substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t))
+      (prf_hasWit_consT (prf_hasWit_tcFn h) (prf_hasWit_tcFn t))
+      (prf_hasWit_tcFn (cons h t)))
     (pcc_dot_cons h t)
 
 /-- **El sustituto**: la ecuación `tc` del árbol `eqc`, ahora **DENTRO de `Prov`**.
@@ -299,6 +307,11 @@ theorem pcc_dot_eqc (a b : Term) :
       (consT (termCode (numeralM 4)) (consT (tcFn a) (tcFn (cons b nil)))) RHS)) := by
     refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM 4)) s) RHS) ?_ _ _
       (pcc_dot_cons_symm a (cons b nil)) h1
+      (prf_hasWitF_eq2 _ _
+        (prf_hasWit_consT (prf_hasWit_tc (numeralM 4)) (prf_hasWit_varc (numeral 0)))
+        (prf_hasWit_tcFn _))
+      (prf_hasWit_tcFn (cons a (cons b nil)))
+      (prf_hasWit_consT (prf_hasWit_tcFn a) (prf_hasWit_tcFn (cons b nil)))
     intro s
     refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
     exact prf_congr_eqCodeFn
@@ -309,6 +322,12 @@ theorem pcc_dot_eqc (a b : Term) :
       (consT (termCode (numeralM 4)) (consT (tcFn a) (consT (tcFn b) (tcFn nil)))) RHS)) := by
     refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM 4)) (consT (tcFn a) s)) RHS) ?_ _ _
       (pcc_dot_cons_symm b nil) h2
+      (prf_hasWitF_eq2 _ _
+        (prf_hasWit_consT (prf_hasWit_tc (numeralM 4))
+          (prf_hasWit_consT (prf_hasWit_tcFn a) (prf_hasWit_varc (numeral 0))))
+        (prf_hasWit_tcFn _))
+      (prf_hasWit_tcFn (cons b nil))
+      (prf_hasWit_consT (prf_hasWit_tcFn b) (prf_hasWit_tcFn nil))
     intro s
     refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
     refine prf_congr_eqCodeFn ?_ (hR s)
@@ -327,7 +346,9 @@ theorem pcc_dot_eqc_symm (a b : Term) :
     (pcc_eq_symm_code_internal (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b))
       (substtc_inv_consT (substtc_inv_termCode_numeralM' 4)
         (substtc_inv_consT (substtc_inv_tcFn a)
-          (substtc_inv_consT (substtc_inv_tcFn b) (substtc_inv_termCode_of_tc prf_tc_zero)))))
+          (substtc_inv_consT (substtc_inv_tcFn b) (substtc_inv_termCode_of_tc prf_tc_zero))))
+      (prf_hasWit_eqcT (prf_hasWit_tcFn a) (prf_hasWit_tcFn b))
+      (prf_hasWit_tcFn (eqc a b)))
     (pcc_dot_eqc a b)
 
 /-- **Congruencia DIAGONAL de `eqcT` DENTRO de `Prov`**: de `Prov(⌜X = Y⌝)` sale
@@ -335,7 +356,8 @@ theorem pcc_dot_eqc_symm (a b : Term) :
     de código llevando **dos huecos** `⌜v₀⌝` — ambos reciben el mismo testigo al sustituir, que es
     justo lo que pide `eqrefl` (`t ≐ t`, el mismo término a los dos lados). -/
 theorem pcc_congr_eqcT_diag_code_imp (X Y : Term)
-    (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (eqcT X X) (eqcT Y Y))) := by
   let Ac : Term := eqc (eqcT X X) (eqcT (varc (numeral 0)) (varc (numeral 0)))
   have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (eqcT X X) (eqcT t t)) := by
@@ -351,7 +373,11 @@ theorem pcc_congr_eqcT_diag_code_imp (X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (eqcT X X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (eqcT X X) (eqcT (varc (numeral 0)) (varc (numeral 0)))
+        (prf_hasWit_eqcT hwX hwX)
+        (prf_hasWit_eqcT (prf_hasWit_varc (numeral 0)) (prf_hasWit_varc (numeral 0))))
+      hwX hwY)
 
 /-- **`Prov(TAG_dot t)`**: bajo la cota `1 < lenc t`, la igualdad de etiqueta `nthc t 1 = 12̇`
     produce el código punteado del antecedente de tag, DENTRO de `Prov`. -/
@@ -443,6 +469,11 @@ theorem pcc_eqDot (t : Term) :
       ⇒ provFromCode (eqc (carcT (tcFn t)) (eqcT V V))) :=
     pcc_rw_imp (fun s => eqCodeFn (carcT (tcFn t)) s) hG2 _ _
       (pcc_dot_eqc_symm (nthc t (numeralM 2)) (nthc t (numeralM 2)))
+      (prf_hasWitF_eq2 _ _ (prf_hasWit_carcT (prf_hasWit_tcFn t))
+        (prf_hasWit_varc (numeral 0)))
+      (prf_hasWit_tcFn (eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))))
+      (prf_hasWit_eqcT (prf_hasWit_tcFn (nthc t (numeralM 2)))
+        (prf_hasWit_tcFn (nthc t (numeralM 2))))
   have hcarc2 : PrfH _ (provFromCode (eqc (carcT (tcFn t)) (eqcT V V))) :=
     PrfH.mp _ _ _ (prf_to_prfH hconv _) hcarc1
   -- (4) evaluación provable de `nthc` bajo la cota, normalizada a `N`
@@ -456,8 +487,12 @@ theorem pcc_eqDot (t : Term) :
   -- (5) simetría interna + congruencia diagonal: `Prov(eqcT(V,V) = eqcT(N,N))`
   have hdiag : PrfH _ (provFromCode (eqc (eqcT V V) (eqcT N N))) :=
     PrfH.mp _ _ _
-      (prf_to_prfH (pcc_congr_eqcT_diag_code_imp V N (substtc_inv_tcFn _)) _)
-      (PrfH_eq_symm_code N V hNinv hevN)
+      (prf_to_prfH (pcc_congr_eqcT_diag_code_imp V N (substtc_inv_tcFn _)
+        (prf_hasWit_tcFn (nthc t (numeralM 2)))
+        (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM 2)))) _)
+      (PrfH_eq_symm_code N V hNinv hevN
+        (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM 2)))
+        (prf_hasWit_tcFn (nthc t (numeralM 2))))
   -- (6) transitividad interna (Leibniz con el hueco en la 2ª posición)
   have hCinv : ∀ W, Prf (substtc zero W (carcT (tcFn t)) =eq carcT (tcFn t)) := fun W =>
     prf_eq_trans (prf_substtc_carcT zero W (tcFn t))
@@ -472,7 +507,13 @@ theorem pcc_eqDot (t : Term) :
       (PrfH_leibniz_apply (eqc (carcT (tcFn t)) (varc (numeral 0))) (eqcT V V) (eqcT N N)
         hdiag
         (PrfH.mp _ _ _
-          (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcompA (eqcT V V)))) _) hcarc2))
+          (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcompA (eqcT V V)))) _) hcarc2)
+        (prf_hasWitF_eq2 (carcT (tcFn t)) (varc (numeral 0))
+          (prf_hasWit_carcT (prf_hasWit_tcFn t)) (prf_hasWit_varc (numeral 0)))
+        (prf_hasWit_eqcT (prf_hasWit_tcFn (nthc t (numeralM 2)))
+          (prf_hasWit_tcFn (nthc t (numeralM 2))))
+        (prf_hasWit_eqcT (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM 2)))
+          (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM 2)))))
   -- (7) de vuelta a la forma `substfc` del código punteado
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_eqDot_eq t))) _) hfin

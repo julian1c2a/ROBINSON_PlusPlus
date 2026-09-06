@@ -250,6 +250,29 @@ theorem PSI_inst3 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formul
       Nat.reduceSub, reduceIte, if_true]
   rwa [e] at h
 
+/-- El CUARTO escalon, subido en la via C (2026-09-06) por la misma razon que los tres
+    anteriores: es maquinaria GENERICA de la induccion fuerte, no del frente que la consume.
+    Lo pide una induccion con CUATRO binders por encima de `Φ` -- la clausura de `hasWitF`
+    bajo `substfc`, cuyo `Φ` cuantifica `wF`, `wT`, `v` y `s`. -/
+theorem psi_lift_form4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI Φ))))
+      = Formula.forall (Formula.impl (lt (.var 0) (.var 5)) Φ) := by
+  rw [psi_lift_form3 Φ hΦ]
+  simp only [lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte, hΦ]
+
+/-- La extraccion al CUARTO nivel de lift. -/
+theorem PSI_inst4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula}
+    (hpsi : PrfH Γ (liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI Φ))))))
+    (z : Term) : PrfH Γ (Formula.impl (lt z (.var 4)) (substFormula 0 z Φ)) := by
+  rw [psi_lift_form4 Φ hΦ] at hpsi
+  have h := PrfH_spec hpsi z
+  have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 5)) Φ)
+      = Formula.impl (lt z (.var 4)) (substFormula 0 z Φ) := by
+    simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
+      Nat.reduceSub, reduceIte, if_true]
+  rwa [e] at h
+
 theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
     (step : Prf (Formula.forall (Formula.impl (PSI Φ) Φ))) :
     ∀ t : Term, Prf (substFormula 0 t Φ) := by
@@ -311,4 +334,5 @@ export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
   subst1_id subst0_var0_id psi_lift_eq_subst prf_strong_induction
   psi_lift_form PSI_inst
   psi_lift_form2 psi_lift_form3 PSI_inst3
+  psi_lift_form4 PSI_inst4
 )

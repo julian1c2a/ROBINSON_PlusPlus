@@ -63,6 +63,11 @@ partialidad de `carc` (esa se resuelve con `chainOk` → la línea es `cons`).
 /-- Constructor de código del término `nthc x y`: `⟨1, ⌜nthc⌝, [x, y]⟩`. -/
 def nthcT (x y : Term) : Term := funcc (strCode "nthc") (cons x (cons y nil))
 
+/-- La GUARDA de `nthcT` (ADR-020): es un `funcc` binario ⇒ escalera de aridad, §28. -/
+theorem prf_hasWit_nthcT {X Y : Term} (hX : Prf (hasWit X)) (hY : Prf (hasWit Y)) :
+    Prf (hasWit (nthcT X Y)) :=
+  prf_hasWit_funcc2 (strCode "nthc") X Y hX hY
+
 /-- Congruencia de `nthcT` en ambos argumentos. -/
 theorem prf_congr_nthcT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
     Prf (nthcT x y =eq nthcT x' y') :=
@@ -104,7 +109,8 @@ theorem pcc_nthc_zero_code (h t : Term) :
       =eq eqCodeFn (nthcT (consT (tcFn h) T) (termCode zero)) (tcFn h)) :=
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   exact prf_mp (prf_provCode_congr hchain)
-    (pcc_axiom_inst2 BODY (show ax_nthc_zero ∈ axioms by simp [axioms]) (tcFn h) T)
+    (pcc_axiom_inst2 BODY (show ax_nthc_zero ∈ axioms by simp [axioms]) (tcFn h) T
+      (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t)))
 
 /-- **Ecuación `succ` de `nthc` CODIFICADA**:
     `⊢ Prov(⌜nthc(cons ḣ ṫ, σ ı̇) = nthc(ṫ, ı̇)⌝)`.
@@ -177,7 +183,9 @@ theorem pcc_nthc_succ_code (h t i : Term) :
     prf_eq_trans (prf_congr_substfc_arg3
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hmid)) hout
   exact prf_mp (prf_provCode_congr hchain)
-    (pcc_axiom_inst3 BODY (show ax_nthc_succ ∈ axioms by simp [axioms]) (tcFn h) (tcFn t) (tcFn i))
+    (pcc_axiom_inst3 BODY (show ax_nthc_succ ∈ axioms by simp [axioms]) (tcFn h) (tcFn t) (tcFn i)
+      (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t))
+      (prf_hasWit_tcFn (liftTerm 0 i)))
 
 /-! ### La inducción ACOTADA de `nthc` (`∀p∀i. i<lenc p ⇒ Prov(⌜nthc(ṗ,ı̇) = (nthc p i)˙⌝)`)
 
@@ -252,10 +260,15 @@ Aquí el transporte del `cons` dotado NO tiene la forma del molde de `EvalListPr
 theorem pcc_rw_dot_cons_nthc {Γ : List Formula} (h t IDX RHS : Term)
     (hI : ∀ W : Term, Prf (substtc zero W IDX =eq IDX))
     (hR : ∀ W : Term, Prf (substtc zero W RHS =eq RHS))
-    (hbase : PrfH Γ (provFromCode (eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) IDX) RHS))) :
+    (hbase : PrfH Γ (provFromCode (eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) IDX) RHS)))
+    (hwI : Prf (hasWit IDX)) (hwR : Prf (hasWit RHS)) :
     PrfH Γ (provFromCode (eqCodeFn (nthcT (tcFn (cons h t)) IDX) RHS)) := by
   refine PrfH.mp _ _ _ (prf_to_prfH
-    (pcc_rw_imp (fun s => eqCodeFn (nthcT s IDX) RHS) ?_ _ _ (pcc_dot_cons h t)) _) hbase
+    (pcc_rw_imp (fun s => eqCodeFn (nthcT s IDX) RHS) ?_ _ _ (pcc_dot_cons h t)
+      (prf_hasWitF_eq2 (nthcT (varc (numeral 0)) IDX) RHS
+        (prf_hasWit_nthcT (prf_hasWit_varc (numeral 0)) hwI) hwR)
+      (prf_hasWit_consT (prf_hasWit_tcFn h) (prf_hasWit_tcFn t))
+      (prf_hasWit_tcFn (cons h t))) _) hbase
   intro s
   refine prf_eq_trans (prf_substfc_eq zero s (nthcT (varc (numeral 0)) IDX) RHS) ?_
   exact prf_congr_eqCodeFn
@@ -298,6 +311,7 @@ theorem nthcEvalPred_step :
     -- siendo reescrituras de CÓDIGO, que `prf_tc_zero` y `prf_tc_succ'` cubren y siguen vivas
     refine pcc_rw_dot_cons_nthc (.var 2) (.var 1) _ _
       (substtc_inv_tcFn _) (substtc_inv_tcFn _) ?_
+      (prf_hasWit_tcFn _) (prf_hasWit_tcFn _)
     refine PrfH_provCode_congr ?_ hbase
     refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT (prf_to_prfH (prf_refl _) _) ?_) ?_
     · exact PrfH_eq_trans (prf_to_prfH (prf_eq_symm prf_tc_zero) _)
@@ -332,9 +346,15 @@ theorem nthcEvalPred_step :
     have hXZ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (provFromCode (eqc X Z)) :=
       PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_trans_code_imp X Y Z hX
+        (prf_hasWit_nthcT
+          (prf_hasWit_consT (prf_hasWit_tcFn (.var 2)) (prf_hasWit_tcFn (.var 1)))
+          (prf_hasWit_succcT (prf_hasWit_tcFn (pred (.var 0)))))
+        (prf_hasWit_nthcT (prf_hasWit_tcFn (.var 1)) (prf_hasWit_tcFn (pred (.var 0))))
+        (prf_hasWit_tcFn (nthc (.var 1) (pred (.var 0))))
         (pcc_nthc_succ_code (.var 2) (.var 1) (pred (.var 0)))) _) ihEval
     refine pcc_rw_dot_cons_nthc (.var 2) (.var 1) _ _
       (substtc_inv_tcFn _) (substtc_inv_tcFn _) ?_
+      (prf_hasWit_tcFn _) (prf_hasWit_tcFn _)
     refine PrfH_provCode_congr ?_ hXZ
     refine PrfH_congr_eqCodeFn (PrfH_congr_nthcT (prf_to_prfH (prf_refl _) _) ?_) ?_
     · exact PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_tc_succ' (pred (.var 0)))) _)
@@ -360,4 +380,6 @@ export ROBINSON_PlusPlus.Meta.EvalNthcPrf (
   nthcT prf_congr_nthcT prf_substtc_nthcT pcc_nthc_zero_code pcc_nthc_succ_code
   evalNthcCode substTerm_evalNthcCode liftTerm_evalNthcCode nthcEvalPred nthcEvalPred_base
   PrfH_provCode_congr PrfH_congr_nthcT
+  -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)
+  prf_hasWit_nthcT
 )

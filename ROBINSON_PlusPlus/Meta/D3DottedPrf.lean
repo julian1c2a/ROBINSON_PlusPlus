@@ -74,7 +74,8 @@ theorem d3_prf_of_dotted (φ : Formula)
   have hb : PrfH [bodyF φ] (provFromCode (substfc zero (tcFn (.var 0)) (formCode (bodyF φ)))) :=
     PrfH.mp _ _ _ (prf_to_prfH hbody _) (prfH_hyp_self _)
   exact PrfH.mp _ _ _
-    (prf_to_prfH (pcc_exIntro_code_open (formCode (bodyF φ)) (tcFn (.var 0))) _) hb
+    (prf_to_prfH (pcc_exIntro_code_open (formCode (bodyF φ)) (tcFn (.var 0))
+      (prf_hasWitF_fc_lift (bodyF φ)) (prf_hasWit_tcFn (liftTerm 0 (.var 0)))) _) hb
 
 /-! ### Descomposición de `hbody` en los dos átomos punteados
 

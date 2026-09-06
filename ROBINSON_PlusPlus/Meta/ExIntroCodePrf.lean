@@ -77,7 +77,8 @@ de `d2_prf`. -/
     demostrabilidad del código del existencial `exc Ac`. Es el ladrillo que la Opción A necesita
     para el ∃‑intro rastreado del testigo en `d3`. -/
 theorem pcc_exIntro_code' (Ac w : Term)
-    (hAc : ∀ c, liftTerm c Ac = Ac) :
+    (hAc : ∀ c, liftTerm c Ac = Ac)
+    (hwF : Prf (hasWitF Ac)) (hwT : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac)) := by
   -- elimina el ∃ externo de `provFromCode (substfc zero w Ac)`; testigo `p = #0`
   refine prf_ex_elim_imp ?_
@@ -133,7 +134,7 @@ theorem pcc_exIntro_code' (Ac w : Term)
     refine PrfH_iff_mpr (prf_chainOk_concat nil p_ tl) (PrfH_and_intro hpChain ?_)
     refine PrfH_iff_mpr (prf_chainOk_cons Cp q2line (cons mpline nil)) (PrfH_and_intro ?_ ?_)
     · -- lineOk Cp q2line (línea‑axioma Q2)
-      exact prf_to_prfH (prf_lineOk_q2 Cp Ac w') Γ
+      exact prf_to_prfH (prf_lineOk_q2 Cp Ac w' hwF hwT) Γ
     · -- chainOk Cp1 [mpline]
       refine PrfH_iff_mpr (prf_chainOk_cons Cp1 mpline nil)
         (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
@@ -157,12 +158,18 @@ theorem pcc_exIntro_code' (Ac w : Term)
   exact PrfH_and_intro hChainR hInB
 
 /-- **Corolario (compatibilidad)**: la versión con testigo **cerrado** es un caso particular de
-    `pcc_exIntro_code'`. La hipótesis `hw` ya **no se usa**: era un artefacto de colapsar el lift
-    del testigo en vez de arrastrarlo (§17.1). -/
+    `pcc_exIntro_code'`.
+
+    ⚠️ **Corregido 2026‑09‑05 ([ADR‑020](../../DECISIONS.md)).** Este docstring decía que la
+    hipótesis `hw` «ya **no se usa**, era un artefacto de colapsar el lift del testigo». **Vuelve a
+    usarse**: la guarda de término que la enmienda exige llega en la forma lifteada
+    `hasWit (liftTerm 0 w)`, y es precisamente `hw` quien la colapsa a `hasWit w`. La cerrazón del
+    testigo dejó de ser decorativa. -/
 theorem pcc_exIntro_code (Ac w : Term)
-    (hAc : ∀ c, liftTerm c Ac = Ac) (_hw : ∀ c, liftTerm c w = w) :
+    (hAc : ∀ c, liftTerm c Ac = Ac) (hw : ∀ c, liftTerm c w = w)
+    (hwF : Prf (hasWitF Ac)) (hwT : Prf (hasWit w)) :
     Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac)) :=
-  pcc_exIntro_code' Ac w hAc
+  pcc_exIntro_code' Ac w hAc hwF (by rw [hw 0]; exact hwT)
 
 end ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 

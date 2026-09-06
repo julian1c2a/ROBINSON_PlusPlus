@@ -217,20 +217,20 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
                 exact prf_and_intro
-                  (prf_iff_mpr (prf_lineWF_q1 _ _ _) (prf_eq_symm (prf_q1_concl_code A t)))
+                  (prf_iff_mpr (prf_lineWF_q1 _ _ _ (prf_hasWitF_fc A) (prf_hasWit_tc t)) (prf_eq_symm (prf_q1_concl_code A t)))
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q1 _ _ _)) (prf_allIn_nil (listFormCode acc)))
             | q2 A t =>
                 have hf : f = (substFormula 0 t A ⇒ Formula.ex A) := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
                 exact prf_and_intro
-                  (prf_iff_mpr (prf_lineWF_q2 _ _ _) (prf_eq_symm (prf_q2_concl_code A t)))
+                  (prf_iff_mpr (prf_lineWF_q2 _ _ _ (prf_hasWitF_fc A) (prf_hasWit_tc t)) (prf_eq_symm (prf_q2_concl_code A t)))
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q2 _ _ _)) (prf_allIn_nil (listFormCode acc)))
             | q3 A B =>
                 have hf : f = ((Formula.forall (A ⇒ liftFormula 0 B)) ⇒ ((Formula.ex A) ⇒ B)) := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine prf_and_intro (prf_iff_mpr (prf_lineWF_q3 _ _ _) ?_)
+                refine prf_and_intro (prf_iff_mpr (prf_lineWF_q3 _ _ _ (prf_hasWitF_fc B)) ?_)
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_q3 _ _ _)) (prf_allIn_nil (listFormCode acc)))
                 exact prf_eq_symm
                   (prf_congr_bin1 (prf_congr_un (prf_congr_bin2 (prf_liftFormula_arith 0 B))))
@@ -245,7 +245,7 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
                 exact prf_and_intro
-                  (prf_iff_mpr (prf_lineWF_leibniz _ _ _ _) (prf_eq_symm (prf_leibniz_concl_code A t₁ t₂)))
+                  (prf_iff_mpr (prf_lineWF_leibniz _ _ _ _ (prf_hasWitF_fc A) (prf_hasWit_tc t₁) (prf_hasWit_tc t₂)) (prf_eq_symm (prf_leibniz_concl_code A t₁ t₂)))
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_leibniz _ _ _ _)) (prf_allIn_nil (listFormCode acc)))
             | p3 A =>
                 have hf : f = (((A ⇒ ⊥) ⇒ ⊥) ⇒ A) := by
@@ -257,7 +257,7 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                 have hf : f = Full.inductionFormula A := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine prf_and_intro (prf_iff_mpr (prf_lineWF_ind _ _) ?_)
+                refine prf_and_intro (prf_iff_mpr (prf_lineWF_ind _ _ (prf_hasWitF_fc A)) ?_)
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_ind _ _)) (prf_allIn_nil (listFormCode acc)))
                 rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
                 exact prf_eq_symm (prf_ind_concl_code A)
@@ -265,7 +265,7 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                 have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula P C := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine prf_and_intro (prf_iff_mpr (prf_lineWF_qconf _ _ _) ?_)
+                refine prf_and_intro (prf_iff_mpr (prf_lineWF_qconf _ _ _ (prf_hasWitF_fc P)) ?_)
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_qconf _ _ _)) (prf_allIn_nil (listFormCode acc)))
                 exact prf_eq_symm
                   (prf_congr_bin1 (prf_congr_un (prf_congr_bin1 (prf_liftFormula_arith 0 P))))
@@ -273,7 +273,7 @@ theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAu
                 have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula A := by
                   simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
                 subst hf; simp only [lineCode', lineJustif]
-                refine prf_and_intro (prf_iff_mpr (prf_lineWF_listInd _ _) ?_)
+                refine prf_and_intro (prf_iff_mpr (prf_lineWF_listInd _ _ (prf_hasWitF_fc A)) ?_)
                   (prf_allIn_subst2 (prf_eq_symm (prf_premsOf_listInd _ _)) (prf_allIn_nil (listFormCode acc)))
                 rw [termCodeM_eq nil, termCodeM_eq (cons (Term.var 1) (Term.var 0))]
                 exact prf_eq_symm (prf_listInd_concl_code A)

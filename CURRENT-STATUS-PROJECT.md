@@ -1,15 +1,36 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
+> ## ESTADO REAL — 2026-09-07 · rama `via-c-adr020` · 🏁 **VÍA C CERRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+>
+> 🏁 **`Build completed successfully (126 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> **el árbol entero compila con ella**. `master` sigue verde en `97f2a37`; el trabajo vive en la
+> rama **`via-c-adr020`**, lista para integrar.
+>
+> 🏁 **LA VÍA C, COMPLETA** (§3.38–§3.40):
+> * **`prf_hasWit_substtc` y `prf_hasWitF_substfc`** —las dos clausuras, con código y sustituyendo
+>   ABSTRACTOS— en `Meta/SubstfcWitnessPrf.lean`, **net-0 puro**.
+> * ✅ **① promoción** (sin ciclo de imports; ⛔ ADR-019 **tres veces** al promover).
+> * ✅ **② `MpCodePrf`**: los 10 sitios cerrados; la mitad CÓDIGO se paga entera ahí.
+> * ✅ **③ propagación**: los **29 módulos** bloqueados, cerrados.
+>
+> ✅✅ **LA LÍNEA ROJA DE ADR-020, COMPROBADA Y CON RAZÓN ESTRUCTURAL**: `d3_prf_of_chainOkDot` y
+> `pcc_lineWF_tracked_modulo_7` **conservan su firma exacta**. La guarda va DENTRO del `⇔` OBJETO,
+> así que al reflector le llega como conjunto objeto extraído de `lineWF t`, **no** como hipótesis
+> Lean — y por tanto no puede aparecer en su firma. Era el argumento que sostenía la vía; ahora es
+> una comprobación.
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.40.
 >
-> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **110 módulos activos** (Minimal 11 + Meta 88 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 126 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
+> no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
+>
+> 🏁 **`∀t. hasWit (tcFn t)` PROBADO** y en producción (`Meta/HasWitTcFnPrf.lean`), footprint
+> `[propext, Classical.choice, Quot.sound]` — **net-0 puro**.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >

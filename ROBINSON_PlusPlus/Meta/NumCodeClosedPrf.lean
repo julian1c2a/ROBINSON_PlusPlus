@@ -82,6 +82,27 @@ theorem prf_congr_substtc3 {v s a b : Term} (h : Prf (a =eq b)) :
     Prf (substtc v s a =eq substtc v s b) :=
   prfH_nil_to_prf (PrfH_congr_substtc3 (Γ := []) (prf_to_prfH h [])) rfl
 
+/-- Congruencia de `substfc` en el código (3er argumento), en `PrfH` (espejo exacto de
+    `PrfH_congr_substtc3`).
+
+    ⚠️ **BAJADA aquí desde `Meta/BdAllIntroPrf.lean` (2026-09-06, ADR-019)**: la clausura de
+    `hasWitF` bajo `substfc` la necesita, y vive **aguas arriba** de `BdAllIntroPrf`. No se puede
+    hacer corolario al de abajo: hay que BAJAR el general. Su sitio natural es éste, al lado de
+    las congruencias hermanas de `liftc` y `substtc`. -/
+theorem PrfH_congr_substfc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a =eq b)) :
+    PrfH Γ (substfc v s a =eq substfc v s b) := by
+  let f : Formula := Formula.eq (substfc (liftTerm 0 v) (liftTerm 0 s) (liftTerm 0 a))
+                                (substfc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
+  have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substfc v s a) (substfc v s u) := by
+    intro u
+    simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (substfc v s a)) Γ)
+
+/-- Congruencia de `substfc` en el código (3er argumento). -/
+theorem prf_congr_substfc3 {v s a b : Term} (h : Prf (a =eq b)) :
+    Prf (substfc v s a =eq substfc v s b) :=
+  prfH_nil_to_prf (PrfH_congr_substfc3 (Γ := []) (prf_to_prfH h [])) rfl
+
 /-- Congruencia de `funcc` en la lista de argumentos. -/
 theorem prf_congr_funcc2 {sc a b : Term} (h : Prf (a =eq b)) :
     Prf (funcc sc a =eq funcc sc b) := by
@@ -185,6 +206,7 @@ end ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 
 export ROBINSON_PlusPlus.Meta.NumCodeClosedPrf (
   prf_congr_liftc PrfH_congr_liftc PrfH_congr_substtc3 prf_congr_substtc3
+  PrfH_congr_substfc3 prf_congr_substfc3
   prf_congr_funcc2 PrfH_congr_funcc2
   prf_liftc_tcFn_zero prf_liftc_tcFn_succ_imp liftcTcPred prf_liftc_tcFn_all prf_liftc_tcFn
   prf_substtc_tcFn_zero prf_substtc_tcFn_succ_imp substtcTcPred prf_substtc_tcFn_all

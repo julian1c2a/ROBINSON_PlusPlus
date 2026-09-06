@@ -30,6 +30,9 @@ open ROBINSON_PlusPlus.Meta.EvalLtPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1600000
+-- ADR-020: la guarda de `pcc_exIntro_code_open` va sobre el codigo LIFTEADO, y comprobar
+-- que `liftTerm 0 (exBodyc ...)` es el nodo `eqc` esperado agota la pila por defecto.
+set_option maxRecDepth 8000
 
 namespace ROBINSON_PlusPlus.Meta.Delta0ReflectPrf
 
@@ -68,7 +71,8 @@ theorem liftTerm_exc_open (Ac : Term) : ∀ c, liftTerm c (exc Ac) = exc (liftTe
     (`liftFormula_provFromCode_open`) y cae sobre `exc (liftTerm 0 Ac)` (`liftTerm_exc_open`); el
     antecedente `substfc zero w Ac` bajo el lift se abre con `liftTerm_substfc_open2`. El ensamblaje
     `p ++ [q2line, mpline]` pasa verbatim con `Ac ↦ liftTerm 0 Ac`. -/
-theorem pcc_exIntro_code_open (Ac w : Term) :
+theorem pcc_exIntro_code_open (Ac w : Term)
+    (hwA : Prf (hasWitF (liftTerm 0 Ac))) (hwW : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w Ac) ⇒ provFromCode (exc Ac)) := by
   refine prf_ex_elim_imp ?_
   rw [liftFormula_provFromCode_open 0 (exc Ac), liftTerm_exc_open Ac 0]
@@ -115,7 +119,7 @@ theorem pcc_exIntro_code_open (Ac w : Term) :
   have hChainR : PrfH Γ (chainOk nil (concat p_ tl)) := by
     refine PrfH_iff_mpr (prf_chainOk_concat nil p_ tl) (PrfH_and_intro hpChain ?_)
     refine PrfH_iff_mpr (prf_chainOk_cons Cp q2line (cons mpline nil)) (PrfH_and_intro ?_ ?_)
-    · exact prf_to_prfH (prf_lineOk_q2 Cp A' w') Γ
+    · exact prf_to_prfH (prf_lineOk_q2 Cp A' w' hwA hwW) Γ
     · refine PrfH_iff_mpr (prf_chainOk_cons Cp1 mpline nil)
         (PrfH_and_intro ?_ (prf_to_prfH (prf_chainOk_nil _) Γ))
       refine PrfH_and_intro (prf_to_prfH (prf_lineWF_mp Bex Ain) Γ) ?_
@@ -191,7 +195,7 @@ theorem pcc_gen_code (body : Term) :
 
 /-- **Reflexión de `<` con `a`, `b` ABIERTOS, en forma implicación**: de `Prov(⌜ ȧ + σK = ḃ ⌝)` sale
     `Prov(⌜ ȧ < ḃ ⌝)`, sin exigir `a`, `b` cerrados. Es `pcc_lt_intro` con el `∃`‑intro ABIERTO. -/
-theorem pcc_lt_intro_open_imp (a b K : Term) :
+theorem pcc_lt_intro_open_imp (a b K : Term) (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))
       ⇒ provFromCode (ltCodeFn (tcFn a) (tcFn b))) := by
   refine prf_deduction ?_
@@ -203,16 +207,23 @@ theorem pcc_lt_intro_open_imp (a b K : Term) :
       (prfH_hyp_self _)
   have hex : PrfH [provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))]
       (provFromCode (exc (exBodyc (tcFn a) (tcFn b)))) :=
-    PrfH.mp _ _ _ (prf_to_prfH (pcc_exIntro_code_open (exBodyc (tcFn a) (tcFn b)) K) _) hsub
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_exIntro_code_open (exBodyc (tcFn a) (tcFn b)) K
+      (prf_hasWitF_eq2 (addcT (tcFn (liftTerm 0 a)) (succcT (varc (numeral 0))))
+        (tcFn (liftTerm 0 b))
+        (prf_hasWit_addcT (prf_hasWit_tcFn (liftTerm 0 a))
+          (prf_hasWit_succcT (prf_hasWit_varc (numeral 0))))
+        (prf_hasWit_tcFn (liftTerm 0 b)))
+      hwK) _) hsub
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_mp (pcc_mp_code_open (exc (exBodyc (tcFn a) (tcFn b)))
       (ltCodeFn (tcFn a) (tcFn b))) (pcc_ltBwd_computed a b)) _) hex
 
 /-- **Reflexión de `<` con `a`, `b` ABIERTOS** (aplicación directa). -/
 theorem pcc_lt_intro_open (a b K : Term)
-    (h : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b)))) :
+    (h : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))))
+    (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (ltCodeFn (tcFn a) (tcFn b))) :=
-  prf_mp (pcc_lt_intro_open_imp a b K) h
+  prf_mp (pcc_lt_intro_open_imp a b K hwK) h
 
 /-- `liftTerm` atraviesa `ltCodeFn` con argumentos `tcFn`. -/
 theorem liftTerm_ltCodeFn_tcFn (s t : Term) (c : Nat) :
@@ -262,7 +273,8 @@ theorem pcc_lt_tracked (s t : Term) :
       (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcodeq)
       (prf_to_prfH heval _)
   exact PrfH.mp _ _ _
-    (prf_to_prfH (pcc_lt_intro_open_imp s' t' (tcFn (.var 0))) _) h2
+    (prf_to_prfH (pcc_lt_intro_open_imp s' t' (tcFn (.var 0))
+      (prf_hasWit_tcFn (liftTerm 0 (.var 0)))) _) h2
 
 /-! ### Casos COMPOSICIONALES `∧` / `∨`
 
