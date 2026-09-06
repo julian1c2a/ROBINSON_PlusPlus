@@ -2618,3 +2618,115 @@ la mitad término. Los `un` (`forallc`/`exc`) suben el nivel y liftean el sustit
 **Y B3.4 sigue bloqueada por C**, medido hoy: el cierre de `pcc_eval_substfc_wit` son **554**
 declaraciones (**131** a promover, 212 ya en producción), y toca **13 módulos de los que 8 no
 compilan** — `LiftcCodePrf`, `SubstfcCodePrf` y `EvalArithPrf` importan `MpCodePrf` directamente.
+
+---
+
+## §3.38 · 🏁 `hasWitF` es CERRADO bajo `substfc` — y el camino al verde, MEDIDO (2026‑09‑06b)
+
+```
+prf_hasWitF_substfc (v s X) : Prf (hasWitF X ⇒ (hasWit s ⇒ hasWitF (substfc v s X)))
+```
+
+`sondeos/ClausuraSubsttc.lean`, ahora **1 911 líneas, 0 sorrys**, footprint
+`[propext, Classical.choice, Quot.sound]` — **net‑0 puro**. Es literalmente la pieza que §3.36.5
+identificó como *lo único que separa el árbol del verde* bajo ADR‑020.
+
+### 3.38.1 · 🔑 Las dos decisiones que la hicieron barata
+
+**(a) Sacar el existencial fuera, otra vez — pero ahora de la FUSIÓN, no del paso.**
+El plan era fusionar los dos testigos *dentro* de las cuatro eliminaciones del nodo binario, donde
+los testigos son `#3`/`#2` y `#1`/`#0` y los códigos llevan **cuatro** lifts. En vez de eso, toda
+la fusión se prueba con los testigos **abstractos** y en forma de **implicación objeto**
+(`prf_isFC1_binN`, `prf_isFC1_unN`, y `prf_hasWitF_imp` — dos `q2` encadenados): ni un índice De
+Bruijn que mover. Los cuatro `∃` se eliminan después y allí cada constructor es **un solo `mp`**.
+Es la regla de §3.37.4.1 aplicada un nivel más arriba: no al paso de inducción, sino a la
+maquinaria que el paso consume.
+
+**(b) Cada caso GENÉRICO en el contexto, recibiendo sus hipótesis por argumento.**
+Los ocho casos salen de **siete `or`-elim anidados** sobre `isFormCodeE2`, así que un caso a
+profundidad `d` vive en un contexto con `d` disyunciones residuales delante — y escribir esos ocho
+contextos era el grueso del trabajo. Con `casoF_bot/_atom/_eq/_bin/_un` genéricos en `Γ` y con la
+cláusula, la guarda y la HI como **parámetros**, toda la contabilidad se reduce a los índices del
+`List.Mem` en el ensamblaje. Los tres `bin` (5/7/8) son **una** función instanciada tres veces, y
+los dos `un` (6/9) otra.
+
+### 3.38.2 · La mitad FÓRMULA no es conjuntiva: sólo CINCO de los ocho casos inducen
+
+| caso | cómo se cierra |
+|---|---|
+| `botc` | inmediato: `prf_substfc_bottom` y el testigo `⟨[botc], []⟩` |
+| `atomc` | **consume la mitad LISTA** (§3.37, `prf_hasWitArgs_substtsc_of`). **No induce** |
+| `eqc` | **consume la mitad TÉRMINO** (`prf_hasWit_substtc`) dos veces, y fusiona los dos testigos. **No induce** |
+| `implc`/`andc`/`orc` (5/7/8) | HI en los dos operandos por **Cantor**, y `prf_hasWitF_bin` |
+| `forallc`/`exc` (6/9) | HI con `v+1` y el sustituyendo **levantado** ⇒ `CRIT_hasWit_lift`; y `prf_hasWitF_un` |
+
+Piezas nuevas que no existían: `prf_hasWitF_imp`, `prf_isFC1_unN`, `prf_isFC1_binN`,
+`prf_hasWitF_un`, `prf_hasWitF_bin`, `prf_wfAllF_nil`, `PrfH_congr_hasWitF`,
+`prf_hasWitF_bot`/`_atomc`/`_eqc`, los ocho casos y el ensamblaje. Y **`psi_lift_form4` +
+`PSI_inst4`**: `PHIF` lleva **cuatro** binders (`wF`, `wT`, `v`, `s`) y la escalera psi de
+`Meta/StrongInductionPrf.lean` llegaba a tres.
+
+⚠️ **Tercera pieza reproducida por el árbol rojo**: `PrfH_congr_substfc3` vive en
+`Meta/BdAllIntroPrf.lean`, que importa `MpCodePrf`. Van **tres en dos días** (`prf_nil_or_cons`,
+la fusión, y ésta). El peaje de la parada es real y creciente.
+
+### 3.38.3 · 📏 QUÉ FALTA PARA EL VERDE, medido con el compilador
+
+**Dónde para hoy**: exactamente **10 errores**, todos en `Meta/MpCodePrf.lean`
+(**173, 180, 183, 225, 231, 240, 265, 271, 282, 300**), todos la misma aplicación. La familia
+`pcc_thm_inst`/`inst2`/`inst3`/`inst4` + `pcc_axiom_inst`/`inst2`/`inst3`/`inst4` + los envoltorios
+`pcc_ax4_inst`/`pcc_ax5_inst` **no está enmendada**: toma `w₁…w₄ : Term` sin hipótesis, y
+`pcc_forallElim_code_open` ya pide `hasWitF (↑Ac)` y `hasWit (↑w)`.
+
+🔑 **La mitad CÓDIGO de las diez es gratis**, y es exactamente lo que la pieza de hoy desbloquea:
+
+| lo que pide el sitio | quién lo paga |
+|---|---|
+| `hasWitF ⌜φ⌝`, `hasWitF (forallc ⌜φ⌝)` | `prf_hasWitF_fc` (producción) |
+| `hasWitF (substfc (σ0) (liftc 0 w₁) ⌜φ⌝)` y sus anidados | **`prf_hasWitF_substfc`** + `CRIT_hasWit_lift` |
+
+**La mitad TESTIGO no se puede pagar ahí** —`wᵢ` es un `Term` arbitrario— así que se **ARRASTRA**.
+Bajo el criterio de §3.36.2 eso sólo vale si algún consumidor concreto puede pagarla; medido:
+**puede**.
+
+**① Promover el sondeo.** Medido: **no hay ciclo**. El cierre de sus 6 imports son 46 módulos y
+**ninguno depende de `MpCodePrf`**; 5 de los 6 ya están dentro de los 51 que `MpCodePrf` importa, y
+el sexto (`NumCodeClosedPrf`) es independiente ⇒ cabe un módulo nuevo justo debajo. Con dos deudas
+a saldar en la misma pasada: `psi_lift_form4`+`PSI_inst4` van a `StrongInductionPrf` con sus
+hermanos, y `PrfH_congr_substfc3` **duplica** al de `BdAllIntroPrf` (que está aguas abajo, así que
+la copia buena es la promovida).
+
+**② Enmendar los 9 lemas de la familia**, en `MpCodePrf`.
+
+**③ 40 sitios de llamada** en la zona bloqueada (**29 módulos** detrás de `MpCodePrf`, de los que
+**18** tienen sitios): **29** de la familia `pcc_*_inst*` y **11** de API ya enmendada que aún no
+se ha evaluado (7 de `pcc_leibniz_code`, y uno en cada uno de `Delta0ReflectPrf`,
+`EvalCarcNthcPrf`, `PropCodePrf`, `EvalBoundedPrf`).
+
+🔑 **De esos 40, la inmensa mayoría PAGA**: el testigo que pasan es
+`tcFn a`/`tcFn b`/`tcFn h`/`tcFn t`/`tcFn i`/`tcFn c`/`tcFn v`/`tcFn s`, que cubre
+`prf_hasWit_tcFn` (§3.36.4, en producción). El único distinto es `varc (numeral 0)`
+(`BdAllIntroPrf:147`), y lo paga `prf_hasWit_varc`, **ya escrito** en el sondeo.
+Los que **arrastran** son media docena, y todos son *envoltorios* de la misma forma que
+`pcc_ax4_inst`: `pcc_ax8_inst`/`pcc_ax9_inst` (`EvalMulPrf`), `EvalPredPrf:128`,
+`DotConsPrf:156`, `InAxiomsCodePrf:188`. Sus consumidores hoja sí pagan con `tcFn`.
+
+⭐ **El único sitio realmente nuevo** es `EvalBoundedPrf:237`:
+`pcc_forallElim_code_open (implc (ltCodeFn (varc 0̄) B) Phic) K`. Ahí el código **no es un
+`formCode`**, es un nodo `implc` construido — necesita `prf_hasWitF_bin 5`, que también salió hoy.
+
+**El frente `lineWF` está PAGADO DEL TODO**: de los 14 `lineWF_*`/`prf_lineWF_*` enmendados,
+**0 sitios** quedan en la zona bloqueada.
+
+### 3.38.4 · ⚠️ El residuo honesto
+
+29 módulos no se han type‑checkeado nunca bajo la enmienda. El análisis por **consumo de API**
+cubre todo lo que cambió de *firma* —es sólido— pero **no ve la rotura de segundo orden**:
+`CodeWitnessPrf` perdió 202 líneas (las 21 definiciones bajaron a `Minimal/Axioms` y ahora son
+re‑exports), y eso ya dio trabajo en los módulos verdes. Los **11** sin ningún sitio medido son la
+incógnita: `CodeCtorKit`, `CodeTreeReflect`, `D3DottedPrf`, `Delta0ReflectPrf`, `EvalCarcNthcPrf`,
+`EvalLiftcPrf`, `LineWFAssemblePrf`, `LineWFEfqPrf`, `LineWFPropPrf`, `PropCodePrf`, `Meta`.
+
+**Resumen**: ① promoción + ② 9 firmas + ③ ~40 anotaciones de una línea. **Ninguna pieza matemática
+nueva** — todo lo que hacía falta demostrar está demostrado. Lo que queda es propagación, y por
+primera vez cada eslabón tiene con qué pagar.

@@ -4,50 +4,84 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑05 · rama `via-c-adr020` · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`**
+**Estado 2026‑09‑06 · rama `via-c-adr020` · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`**
 **`master` sigue VERDE en `97f2a37`.** La parada es **CONOCIDA y localizada**, en mitad de la
 ejecución de la **vía C** ([ADR‑020](DECISIONS.md)) — **no es una regresión**. Todo lo demás verde.
 **125 jobs · 111 módulos activos (Minimal 11 + Meta 89 + Full 11) + 0 en `cuarentena/` · 60 `sondeos/`**
 **7 `axiom` de Lean · 0 sorrys.**
 
-> # 🎯 SIGUIENTE SESIÓN — **terminar la mitad FÓRMULA de la clausura**
+> # 🎯 SIGUIENTE SESIÓN — **propagar hasta el verde. No queda matemática por hacer**
 >
-> Todo lo medido está en **§3.36** y **§3.37** de `doc/REFERENCE-Incompleteness.md`.
+> Todo lo medido está en **§3.38** de `doc/REFERENCE-Incompleteness.md` (§3.36 y §3.37, el
+> contexto).
 >
-> ## Lo que YA está probado (2026‑09‑06, los dos net‑0 puros)
+> ## 🏁 Lo que YA está probado (2026‑09‑06, los tres net‑0 puros)
 >
-> * `sondeos/MergeTestigos.lean` — **la fusión de testigos NO estaba obstruida** (TAREA A).
-> * `sondeos/ClausuraSubsttc.lean` — 🏁 **`prf_hasWit_substtc`**: `hasWit` es cerrado bajo
->   `substtc`, con código y sustituyendo ABSTRACTOS. Es la mitad TÉRMINO de C.
->   Contiene además el **armazón de la mitad FÓRMULA** ya compilando: `BODYF`, `PHIF` de cuatro
->   binders, el gate, `PHIF_at`, los cuatro colapsos y `PHIF_use`.
+> * `sondeos/MergeTestigos.lean` — la fusión de testigos **NO estaba obstruida** (TAREA A).
+> * `sondeos/ClausuraSubsttc.lean` (**1 911 l., 0 sorrys**) — las **DOS** clausuras:
+>   * `prf_hasWit_substtc` — mitad TÉRMINO;
+>   * 🏁 **`prf_hasWitF_substfc (v s X) : Prf (hasWitF X ⇒ (hasWit s ⇒ hasWitF (substfc v s X)))`**
+>     — **la pieza que §3.36.5 identificó como lo único que separa el árbol del verde**.
+>     Con `prf_hasWitF_substfc_mp`, en la forma de aplicación que piden los sitios.
 >
-> ## Lo que falta, por orden
+> ## Lo que falta, por orden — **es PROPAGACIÓN, no matemática**
 >
-> 1. **El espejo formula‑sort de la maquinaria de testigos**: `wfAllF` extendido (`cons`) y
->    **fusionado** (`concat`). ⚠️ Aquí el testigo tiene **DOS** componentes (`wF` y `wT`), así que
->    fusionar es fusionar los dos. El molde es §10‑§11 de `ClausuraSubsttc.lean`.
-> 2. **Los ocho casos** de `PHIF_step`: `bot` (trivial), `atom` y `eq` (**consumen la mitad
->    término**, ya hecha), tres `bin` (`implc`/`andc`/`orc`: IH dos veces + fusión) y dos `un`
->    (`forallc`/`exc`: el nivel sube y el sustituyendo se liftea ⇒ `CRIT_hasWit_lift`).
-> 3. Ensamblar `PHIF_step`, cerrar `prf_hasWitF_substfc`, y **enchufarlo a los 6 sitios duros de
->    `MpCodePrf`** (los otros 4 son gratis: piden `hasWitF` de códigos que ya son `formCode`).
-> 4. Con `MpCodePrf` verde, **B3.4 se desbloquea**: medido hoy, **131 declaraciones** a promover
->    de un cierre de 554.
+> **① Promover el sondeo** a `Meta/` (módulo nuevo, p. ej. `Meta/SubstfcWitnessPrf.lean`).
+> ✅ **Medido: NO hay ciclo de imports.** El cierre de sus 6 imports son 46 módulos y ninguno
+> depende de `MpCodePrf`; 5 de los 6 ya están dentro de los 51 que `MpCodePrf` importa, y el
+> sexto (`NumCodeClosedPrf`) es independiente ⇒ cabe justo debajo de `MpCodePrf`.
+> ⚠️ Dos deudas a saldar **en la misma pasada**:
+> * `psi_lift_form4` + `PSI_inst4` van a `Meta/StrongInductionPrf.lean`, con sus hermanos
+>   (`psi_lift_form`/`2`/`3`, `PSI_inst`, `PSI_inst3`) — son genéricos en `Φ`, no del frente.
+> * `PrfH_congr_substfc3` **duplica** al de `Meta/BdAllIntroPrf.lean`. Como ése está aguas abajo,
+>   la copia buena es la promovida y la suya se borra (⛔ ADR‑019: bajar el general).
+> * Sigue pendiente deduplicar **`prf_syll`** (declarado en `HasWitTcFnPrf` **y** en `ReprPrf`).
 >
-> ## 🔑 Las tres reglas de método que hicieron viable la mitad término
+> **② Enmendar los 9 lemas de la familia en `MpCodePrf`**: `pcc_thm_inst`/`inst2`/`inst3`/`inst4`,
+> `pcc_axiom_inst`/`inst2`/`inst3`/`inst4`, y los envoltorios `pcc_ax4_inst`/`pcc_ax5_inst`.
+> **10 errores exactos**, líneas **173, 180, 183, 225, 231, 240, 265, 271, 282, 300**.
+> 🔑 **La mitad CÓDIGO es gratis** (`prf_hasWitF_fc` para `⌜φ⌝`/`forallc ⌜φ⌝`; la clausura nueva +
+> `CRIT_hasWit_lift` para los `substfc` anidados). **La mitad TESTIGO se ARRASTRA** —`wᵢ` es un
+> `Term` arbitrario— y eso vale porque los consumidores hoja **pagan** (medido).
 >
-> 1. **SACAR EL `∃` FUERA DEL PASO** — eliminarlo a nivel `Prf`, como lema suelto, y que el paso
->    sólo haga un `mp`. Dentro del `PHI_step` cuesta el doble lift cada vez.
-> 2. **Colapsar los binders UNO A UNO** (`PHI_specK` por binder, justo tras su `PrfH_spec`): con
->    3‑4 sustituciones anidadas el `simp` grande no reduce. Por eso hace falta un `BODY` explícito.
->    Y usar la escalera completa de lifts anidados de `Meta/SubstArith.lean`.
-> 3. **Escribir el tipo entero en cada `have`**: los implícitos de las congruencias no se infieren
->    cuando el contexto crece por un `or_elim`.
+> **③ ~40 sitios de llamada** en la zona bloqueada (29 módulos detrás de `MpCodePrf`, 18 con
+> sitios): 29 de la familia + 11 de API ya enmendada sin evaluar (7 de `pcc_leibniz_code`, y uno
+> en `Delta0ReflectPrf`, `EvalCarcNthcPrf`, `PropCodePrf`, `EvalBoundedPrf`).
+> 🔑 **La inmensa mayoría PAGA** con `prf_hasWit_tcFn`: los testigos son `tcFn …` casi siempre.
+> `varc (numeral 0)` (`BdAllIntroPrf:147`) lo paga `prf_hasWit_varc`, ya escrito en el sondeo.
+> **Arrastran** media docena, todos *envoltorios* tipo `pcc_ax4_inst`: `pcc_ax8_inst`/`pcc_ax9_inst`
+> (`EvalMulPrf`), `EvalPredPrf:128`, `DotConsPrf:156`, `InAxiomsCodePrf:188`.
+> ⭐ **El único sitio realmente nuevo**: `EvalBoundedPrf:237`, donde el código **no es un
+> `formCode`** sino un `implc` construido ⇒ `prf_hasWitF_bin 5`, que también salió hoy.
 >
-> ⚠️ **El árbol rojo cobra peaje**: `prf_nil_or_cons` (en `EvalLiftcPrf`, bloqueado) y la fusión
-> (en un sondeo) **no son importables**; hubo que reproducirlas. Van dos veces en un día.
-
+> ✅ **El frente `lineWF` está PAGADO DEL TODO**: 0 sitios de los 14 `lineWF_*` enmendados quedan
+> en la zona bloqueada.
+>
+> ⚠️ **El residuo honesto**: el análisis por consumo de API cubre todo lo que cambió de *firma*,
+> pero no ve la rotura de **segundo orden** (`CodeWitnessPrf` perdió 202 líneas al bajar las 21
+> definiciones a `Minimal/Axioms`). Los **11** módulos bloqueados sin ningún sitio medido son la
+> incógnita: `CodeCtorKit`, `CodeTreeReflect`, `D3DottedPrf`, `Delta0ReflectPrf`,
+> `EvalCarcNthcPrf`, `EvalLiftcPrf`, `LineWFAssemblePrf`, `LineWFEfqPrf`, `LineWFPropPrf`,
+> `PropCodePrf`, `Meta`.
+>
+> **④ Con `MpCodePrf` verde, B3.4 se desbloquea**: **131 declaraciones** a promover de un cierre
+> de 554.
+>
+> ## 🔑 Las reglas de método que hicieron viables las dos clausuras
+>
+> 1. **SACAR EL `∃` FUERA** — y no sólo del paso de inducción: también de **la maquinaria que el
+>    paso consume**. La fusión de testigos se prueba con testigos **abstractos** y en forma de
+>    **implicación objeto**; los existenciales se eliminan después, y allí cada caso es un `mp`.
+> 2. **Cada caso GENÉRICO en el contexto**, recibiendo sus hipótesis por argumento. Con siete
+>    `or`-elim anidados, escribir los ocho contextos era el grueso del trabajo.
+> 3. **Colapsar los binders UNO A UNO** (`PHI_specK` por binder): con 3‑4 sustituciones anidadas
+>    el `simp` grande no reduce. Y la escalera completa de lifts de `Meta/SubstArith.lean`.
+> 4. **Escribir el tipo entero en cada `have`**: los implícitos no se infieren cuando el contexto
+>    crece por un `or_elim`.
+>
+> ⚠️ **El árbol rojo cobra peaje, y va creciendo**: `prf_nil_or_cons` (`EvalLiftcPrf`), la fusión
+> (un sondeo) y `PrfH_congr_substfc3` (`BdAllIntroPrf`) **no son importables**; hubo que
+> reproducir las tres. **Tres en dos días.**
 ---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)
@@ -238,20 +272,36 @@ ejecución de la **vía C** ([ADR‑020](DECISIONS.md)) — **no es una regresi�
 >         (B) cargarla por la cadena: sube hasta D3, y la hipotesis colgante es
 >             REFUTABLE => la D3 que saldria seria VACUA, no solo condicionada.
 >         ✅ Lo que SI sobrevive: chasis y ensamblador NO hay que rehacerlos.
->   C1 ⬜ (C) LA ENMIENDA DEL ESQUEMA — la unica via que puede funcionar.
+>   C1 ✅ HECHA (2026-09-05, ADR-020): (C) LA ENMIENDA DEL ESQUEMA, en version MINIMA.
+>         11 conjuntos nuevos (7 hasWitF + 4 hasWit) en los 7 esquemas. El chasis NO
+>         hubo que rehacerlo. Ver §3.36.
+>   C1b✅ LAS DOS CLAUSURAS, PROBADAS (2026-09-06, sondeos/ClausuraSubsttc.lean,
+>         1911 l., 0 sorrys, net-0 puro):
+>         · prf_hasWit_substtc   — mitad TERMINO
+>         · prf_hasWitF_substfc  — 🏁 LA PIEZA QUE FALTABA PARA EL VERDE (§3.38)
+>         ⇒ YA NO QUEDA MATEMATICA por hacer para cerrar la via C. Lo que resta es
+>            PROPAGACION: promover + 9 firmas + ~40 sitios. Medido en §3.38.3.
+>   C1c ☑ HISTORICO (se conserva el argumento, ya consumido):
 >         ⚠️ Es CIRCULAR tal cual: rompe el chasis que la consume.
 >         ▶ PREREQUISITO: el lema previo `∀t. hasWit (tcFn t)`. Hay que pagarlo ANTES.
 >         ✅ hcond_absorbe_extra (sondeos/SegundoMuro.lean) la abarata: lo que absorbe
 >            es un conjunto EXTRA en C, o sea EXACTAMENTE una enmienda de esquema.
 >            Aquella pieza se probo para esto y no se sabia.
->   C2 ⬜ DECISION DEL AUTOR, ahora con el coste real medido:
+>   C2 ✅ DECIDIDA POR EL AUTOR el 2026-09-05: se ejecuta la via C (ADR-020).
+>         El coste real medido que la sostuvo:
 >         ⛔ El argumento "enmendar cambia G" que se venia usando ES FALSO (§3.32.1):
 >            godelCN tiene 483 dependencias y NINGUNA es `axioms`. G, como FORMULA, no
 >            cambia. Lo que cambia es la TEORIA de la que G habla -- puede seguir siendo
 >            motivo para no hacerlo, pero es OTRO argumento y mucho mas debil.
->   C3 ⬜ los 7 tags, una vez decidida la via: q1 q2 q3 leibniz ind qconf listInd
+>   C3 ⏳ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7, y sus
+>         reflectores esperan solo a que el arbol vuelva a verde.
 >         ✅ pcc_lineWF_tracked_modulo_7 GARANTIZA que cerrar esos 7 cierra
->            pcc_lineWF_tracked, y que no hay nada más aguas abajo
+>            pcc_lineWF_tracked, y que no hay nada mas aguas abajo
+>   C4 ⏳ PROPAGACION HASTA EL VERDE -- lo unico que queda de la rama (§3.38.3):
+>         ① ⬜ promover sondeos/ClausuraSubsttc.lean a Meta/  (medido: SIN ciclo)
+>         ② ⬜ enmendar los 9 lemas de pcc_*_inst* en MpCodePrf (10 errores exactos)
+>         ③ ⬜ ~40 sitios en 18 de los 29 modulos bloqueados; la mayoria PAGA con
+>              prf_hasWit_tcFn. Unico sitio nuevo de verdad: EvalBoundedPrf:237
 > D · D3 REAL
 >   D1 ⬜ hC_dot — la reflexión punteada de chainOk. NO EXISTE (verificado por grep)
 >   D2 ⬜ d3_prf := d3_prf_of_chainOkDot φ hC_dot   ✅ el consumidor YA existe (Meta/D3InDotPrf)

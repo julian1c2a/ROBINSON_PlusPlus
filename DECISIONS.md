@@ -858,3 +858,23 @@ término en todos los sitios donde el testigo es un código punteado.
 Las guardas de TÉRMINO ya están resueltas: los 11 módulos consumidores pasan `tcFn …`.
 ⚠️ El build se detiene ahí, así que los módulos de aguas abajo aún no se han evaluado: aparecerán
 más sitios, pero **ésos pagan** en vez de arrastrar.
+
+### Addendum 2026‑09‑06b · 🏁 la pieza existe, y el camino al verde está MEDIDO
+
+`prf_hasWitF_substfc` **está probada** (`sondeos/ClausuraSubsttc.lean`, 1 911 l., 0 sorrys, net‑0
+puro), junto con la mitad TÉRMINO `prf_hasWit_substtc` que sus casos `atom`/`eq` consumen.
+**Ya no queda ninguna pieza matemática por demostrar para cerrar la vía C.** Detalle en §3.38 de
+`doc/REFERENCE-Incompleteness.md`.
+
+**La ADR se cumple, y esto lo confirma el compilador**: la parada son **10 errores**, todos en
+`Meta/MpCodePrf.lean`, todos la misma aplicación. La familia `pcc_thm_inst*`/`pcc_axiom_inst*`
+**arrastra** la guarda de testigo (`wᵢ` es un `Term` arbitrario: ahí no se puede pagar), y los
+**~40 sitios** de la zona bloqueada **pagan** casi todos con `prf_hasWit_tcFn`, porque el testigo
+que pasan es `tcFn …`. Es exactamente el criterio *pagar vs arrastrar* funcionando: se arrastra
+sólo donde hay un consumidor concreto que descarga.
+
+⚠️ **Y una deuda que la ADR genera y hay que saldar al promover**: el árbol rojo ha obligado a
+**reproducir tres piezas** que existen en producción pero son inalcanzables
+(`prf_nil_or_cons` en `EvalLiftcPrf`, la fusión de testigos en un sondeo, y `PrfH_congr_substfc3`
+en `BdAllIntroPrf`). Al promover, la copia buena es la que baja, y las de aguas abajo se borran
+(⛔ ADR‑019).

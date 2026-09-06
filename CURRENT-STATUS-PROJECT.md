@@ -1,16 +1,24 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-05 · rama `via-c-adr020` · **VÍA C EJECUTADA** (ADR-020) · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`
+> ## ESTADO REAL — 2026-09-06 · rama `via-c-adr020` · **VÍA C EJECUTADA** (ADR-020) · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`
 >
 > ⚠️ **La parada es CONOCIDA y localizada, no una regresión**: la enmienda de los 7 esquemas está
 > aplicada y todo lo demás compila. `master` sigue **VERDE** en `97f2a37`; el trabajo vive en la
-> rama **`via-c-adr020`**. Qué falta exactamente para verde: **§3.36.5** y el PUNTO DE REANUDACIÓN
-> de `NEXT-STEPS.md` — **una sola pieza nueva**, `prf_hasWitF_substfc`.
+> rama **`via-c-adr020`**.
+>
+> 🏁 **2026-09-06: LA PIEZA QUE FALTABA ESTÁ PROBADA.** `prf_hasWitF_substfc` — `hasWitF` es
+> cerrado bajo `substfc`, con código y sustituyendo ABSTRACTOS (`sondeos/ClausuraSubsttc.lean`,
+> 1 911 l., 0 sorrys, **net-0 puro**), junto con la mitad TÉRMINO `prf_hasWit_substtc`.
+> **Ya no queda ninguna pieza matemática por demostrar para el verde**: lo que resta es
+> PROPAGACIÓN, medida en **§3.38.3** — ① promover el sondeo (medido: **sin ciclo de imports**),
+> ② enmendar **9 lemas** de la familia `pcc_*_inst*` en `MpCodePrf` (**10 errores**, todos ahí),
+> ③ **~40 sitios** de llamada en 18 de los 29 módulos bloqueados, de los que la inmensa mayoría
+> **PAGA** con `prf_hasWit_tcFn`.
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.36.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.38.
 >
 > **Build 125 jobs · 0 sorrys · Lean v4.31.0** (⚠️ con la parada conocida arriba).
 > **111 módulos activos** (Minimal 11 + Meta 89 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
