@@ -64,6 +64,19 @@ def unT (m : Nat) (a : Term) : Term := consT (termCode (numeralM m)) (consT a (t
 def binT (m : Nat) (a b : Term) : Term :=
   consT (termCode (numeralM m)) (consT a (consT b (termCode nil)))
 
+/-! ### La GUARDA del KIT (ADR-020): los tres son `consT` anidado sobre `termCode`s CERRADOS -/
+
+theorem prf_hasWit_nulT (m : Nat) : Prf (hasWit (nulT m)) :=
+  prf_hasWit_consT (prf_hasWit_tc (numeralM m)) (prf_hasWit_tc nil)
+
+theorem prf_hasWit_unT (m : Nat) {a : Term} (ha : Prf (hasWit a)) : Prf (hasWit (unT m a)) :=
+  prf_hasWit_consT (prf_hasWit_tc (numeralM m)) (prf_hasWit_consT ha (prf_hasWit_tc nil))
+
+theorem prf_hasWit_binT (m : Nat) {a b : Term}
+    (ha : Prf (hasWit a)) (hb : Prf (hasWit b)) : Prf (hasWit (binT m a b)) :=
+  prf_hasWit_consT (prf_hasWit_tc (numeralM m))
+    (prf_hasWit_consT ha (prf_hasWit_consT hb (prf_hasWit_tc nil)))
+
 /-- Puente definicional con `termCode`, caso nulario. -/
 theorem nulT_termCode (m : Nat) : nulT m = termCode (cons (numeralM m) nil) := rfl
 
@@ -222,6 +235,11 @@ theorem pcc_dot_un (m : Nat) (a : Term) :
       (tcFn (cons (numeralM m) (cons a nil))))) := by
     refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM m)) s)
       (tcFn (cons (numeralM m) (cons a nil)))) ?_ _ _ (pcc_dot_cons_symm a nil) h1
+      (prf_hasWitF_eq2 _ _
+        (prf_hasWit_consT (prf_hasWit_tc (numeralM m)) (prf_hasWit_varc (numeral 0)))
+        (prf_hasWit_tcFn _))
+      (prf_hasWit_tcFn (cons a nil))
+      (prf_hasWit_consT (prf_hasWit_tcFn a) (prf_hasWit_tcFn nil))
     intro s
     refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
     exact prf_congr_eqCodeFn
@@ -247,6 +265,11 @@ theorem pcc_dot_bin (m : Nat) (a b : Term) :
       (consT (termCode (numeralM m)) (consT (tcFn a) (tcFn (cons b nil)))) RHS)) := by
     refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM m)) s) RHS) ?_ _ _
       (pcc_dot_cons_symm a (cons b nil)) h1
+      (prf_hasWitF_eq2 _ _
+        (prf_hasWit_consT (prf_hasWit_tc (numeralM m)) (prf_hasWit_varc (numeral 0)))
+        (prf_hasWit_tcFn _))
+      (prf_hasWit_tcFn (cons a (cons b nil)))
+      (prf_hasWit_consT (prf_hasWit_tcFn a) (prf_hasWit_tcFn (cons b nil)))
     intro s
     refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
     exact prf_congr_eqCodeFn
@@ -257,6 +280,12 @@ theorem pcc_dot_bin (m : Nat) (a b : Term) :
       (consT (termCode (numeralM m)) (consT (tcFn a) (consT (tcFn b) (tcFn nil)))) RHS)) := by
     refine pcc_rw (fun s => eqCodeFn (consT (termCode (numeralM m)) (consT (tcFn a) s)) RHS) ?_ _ _
       (pcc_dot_cons_symm b nil) h2
+      (prf_hasWitF_eq2 _ _
+        (prf_hasWit_consT (prf_hasWit_tc (numeralM m))
+          (prf_hasWit_consT (prf_hasWit_tcFn a) (prf_hasWit_varc (numeral 0))))
+        (prf_hasWit_tcFn _))
+      (prf_hasWit_tcFn (cons b nil))
+      (prf_hasWit_consT (prf_hasWit_tcFn b) (prf_hasWit_tcFn nil))
     intro s
     refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
     refine prf_congr_eqCodeFn ?_ (hR s)
@@ -272,14 +301,17 @@ theorem pcc_dot_bin (m : Nat) (a b : Term) :
 theorem pcc_dot_nul_symm (m : Nat) :
     Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) nil)) (nulT m))) :=
   pcc_mp_code_apply
-    (pcc_eq_symm_code_internal (nulT m) (tcFn (cons (numeralM m) nil)) (substtc_inv_nulT m))
+    (pcc_eq_symm_code_internal (nulT m) (tcFn (cons (numeralM m) nil)) (substtc_inv_nulT m)
+      (prf_hasWit_nulT m) (prf_hasWit_tcFn (cons (numeralM m) nil)))
     (pcc_dot_nul m)
 
 theorem pcc_dot_un_symm (m : Nat) (a : Term) :
     Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) (cons a nil))) (unT m (tcFn a)))) :=
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (unT m (tcFn a)) (tcFn (cons (numeralM m) (cons a nil)))
-      (substtc_inv_unT (substtc_inv_tcFn a)))
+      (substtc_inv_unT (substtc_inv_tcFn a))
+      (prf_hasWit_unT m (prf_hasWit_tcFn a))
+      (prf_hasWit_tcFn (cons (numeralM m) (cons a nil))))
     (pcc_dot_un m a)
 
 theorem pcc_dot_bin_symm (m : Nat) (a b : Term) :
@@ -288,7 +320,9 @@ theorem pcc_dot_bin_symm (m : Nat) (a b : Term) :
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (binT m (tcFn a) (tcFn b))
       (tcFn (cons (numeralM m) (cons a (cons b nil))))
-      (substtc_inv_binT (substtc_inv_tcFn a) (substtc_inv_tcFn b)))
+      (substtc_inv_binT (substtc_inv_tcFn a) (substtc_inv_tcFn b))
+      (prf_hasWit_binT m (prf_hasWit_tcFn a) (prf_hasWit_tcFn b))
+      (prf_hasWit_tcFn (cons (numeralM m) (cons a (cons b nil)))))
     (pcc_dot_bin m a b)
 
 /-! ### Congruencia DENTRO de `Prov` (la pieza que cada reflector consume)
@@ -300,7 +334,8 @@ por Leibniz interno sobre un contexto de código de un solo hueco. Generaliza el
 /-- **Congruencia interna de `binT` en el 2º argumento**: de `Prov(⌜X = Y⌝)` sale
     `Prov(⌜binT m A X = binT m A Y⌝)`. -/
 theorem pcc_congr_binT_2_code (m : Nat) (A X Y : Term)
-    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A)) (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m A X) (binT m A Y))) := by
   let Ac : Term := eqc (binT m A X) (binT m A (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (binT m A X) (binT m A w)) := by
@@ -315,11 +350,15 @@ theorem pcc_congr_binT_2_code (m : Nat) (A X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (binT m A X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (binT m A X) (binT m A (varc (numeral 0)))
+        (prf_hasWit_binT m hwA hwX)
+        (prf_hasWit_binT m hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 /-- **Congruencia interna de `binT` en el 1er argumento**. -/
 theorem pcc_congr_binT_1_code (m : Nat) (B X Y : Term)
-    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwB : Prf (hasWit B)) (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m X B) (binT m Y B))) := by
   let Ac : Term := eqc (binT m X B) (binT m (varc (numeral 0)) B)
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (binT m X B) (binT m w B)) := by
@@ -334,11 +373,15 @@ theorem pcc_congr_binT_1_code (m : Nat) (B X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (binT m X B))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (binT m X B) (binT m (varc (numeral 0)) B)
+        (prf_hasWit_binT m hwX hwB)
+        (prf_hasWit_binT m (prf_hasWit_varc (numeral 0)) hwB)) hwX hwY)
 
 /-- **Congruencia interna de `unT`**. -/
 theorem pcc_congr_unT_code (m : Nat) (X Y : Term)
-    (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (unT m X) (unT m Y))) := by
   let Ac : Term := eqc (unT m X) (unT m (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (unT m X) (unT m w)) := by
@@ -353,7 +396,10 @@ theorem pcc_congr_unT_code (m : Nat) (X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (unT m X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (unT m X) (unT m (varc (numeral 0)))
+        (prf_hasWit_unT m hwX)
+        (prf_hasWit_unT m (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 end ROBINSON_PlusPlus.Meta.CodeCtorKit
 
