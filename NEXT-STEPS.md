@@ -4,10 +4,11 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑07 · rama `via-c-adr020` · 🏁 VÍA C CERRADA · ✅ ÁRBOL VERDE**
+**Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
 `Build completed successfully (126 jobs)` — **112 módulos** (Minimal 11 + Meta 90 + Full 11) + 0 en
-`cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**. `master` sigue verde en `97f2a37`;
-esta rama vuelve a estarlo **con la enmienda de los 7 esquemas aplicada**, y está lista para integrar.
+`cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
+La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
+verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
 
 > # 🎯 SIGUIENTE SESIÓN — **la rama C está cerrada; el cuello de botella se mueve**
 >
@@ -25,10 +26,11 @@ esta rama vuelve a estarlo **con la enmienda de los 7 esquemas aplicada**, y est
 >   guarda va DENTRO del `⇔` objeto y le llega al reflector como conjunto objeto, no como hipótesis.
 > * ✅ Las **dos** deudas de ADR‑019 (`BdAllIntroPrf`, `EvalLiftcPrf`), saldadas.
 >
-> ## ▶ LO QUE TOCA AHORA — hay que DECIDIR entre tres frentes
+> ## ▶ LO QUE TOCA AHORA — quedan DOS frentes por decidir
 >
-> **(a) INTEGRAR `via-c-adr020` en `master`.** La rama está verde y el inventario no se mueve
-> (7 `axiom`, 141 axiomas objeto, se sustituyen 7 de los 141). Decisión del autor.
+> ~~**(a) INTEGRAR `via-c-adr020` en `master`.**~~ ✅ **HECHO** (2026‑09‑07, merge `7bc2c8a`),
+> con el build verificado verde **después** del merge. El inventario no se movió: 7 `axiom` de
+> Lean, 141 axiomas objeto, de los que se **sustituyen** 7 sin añadir ninguno.
 >
 > **(b) B3.4 — el cuello de botella de fondo, ahora DESBLOQUEADO.** Era lo que ③ liberaba: el
 > cierre de `pcc_eval_substfc_wit` son **554** declaraciones, **131** a promover, y tocaba

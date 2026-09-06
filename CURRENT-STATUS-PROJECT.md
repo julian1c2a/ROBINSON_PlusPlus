@@ -1,10 +1,11 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-07 · rama `via-c-adr020` · 🏁 **VÍA C CERRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-07 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (126 jobs)`.** La enmienda de los 7 esquemas está aplicada y
-> **el árbol entero compila con ella**. `master` sigue verde en `97f2a37`; el trabajo vive en la
-> rama **`via-c-adr020`**, lista para integrar.
+> **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
+> `master`** el 2026-09-07 con merge commit `7bc2c8a`, y el build se verificó verde **después** del
+> merge, no sólo en la rama.
 >
 > 🏁 **LA VÍA C, COMPLETA** (§3.38–§3.40):
 > * **`prf_hasWit_substtc` y `prf_hasWitF_substfc`** —las dos clausuras, con código y sustituyendo
