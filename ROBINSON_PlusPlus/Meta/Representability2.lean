@@ -378,4 +378,6 @@ export ROBINSON_PlusPlus.Meta.Representability2 (
   In_runFn_of_mem
   chainOk_track
   repr_pos'
+  -- ADR-020: los consumidores de aguas abajo PAGAN la guarda con estos dos.
+  prf_hasWitF_fc prf_hasWit_tc
 )

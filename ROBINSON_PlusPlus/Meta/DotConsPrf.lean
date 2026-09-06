@@ -76,6 +76,15 @@ def consT (x y : Term) : Term := funcc (strCode cons_sym) (cons x (cons y nil))
 /-- Código del término `div2 x`. -/
 def div2cT (x : Term) : Term := funcc (strCode div2_sym) (cons x nil)
 
+/-- `consT X Y` tiene testigo si lo tienen sus dos argumentos (escalera de aridad, §28). -/
+theorem prf_hasWit_consT {X Y : Term} (hX : Prf (hasWit X)) (hY : Prf (hasWit Y)) :
+    Prf (hasWit (consT X Y)) :=
+  prf_hasWit_funcc2 (strCode cons_sym) X Y hX hY
+
+/-- `div2cT X` tiene testigo si `X` lo tiene. -/
+theorem prf_hasWit_div2cT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (div2cT X)) :=
+  prf_hasWit_funcc1 (strCode div2_sym) X hX
+
 theorem prf_congr_consT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
     Prf (consT x y =eq consT x' y') := by
   unfold consT funcc
@@ -150,10 +159,11 @@ theorem prf_substtc_cpOfT (W X Y : Term) :
     exact prf_congr_mulcT (prf_substtc_two W)
       (prf_eq_trans (prf_substtc_succcT zero W Y) (prf_refl _))
 
-theorem pcc_axL0_inst (w₁ w₂ : Term) :
+theorem pcc_axL0_inst (w₁ w₂ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
       (formCode (cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0))))))) :=
-  pcc_axiom_inst2 _ (show ax_L0_cons_def ∈ axioms by simp [axioms]) w₁ w₂
+  pcc_axiom_inst2 _ (show ax_L0_cons_def ∈ axioms by simp [axioms]) w₁ w₂ hw₁ hw₂
 
 /-- **`substCodeF` computa sobre el cuerpo de `ax_L0`**, igual que sobre `ax5`/`ax9`. Era la
     pregunta arriesgada de la fase A: si no computase, la instancia no sería barata. -/
@@ -191,7 +201,7 @@ theorem pcc_axL0_computed (h t : Term) :
         (prf_congr_cpOfT (prf_substtc_tcFn B h) (prf_substtc_varc0 B))
   exact prf_mp (prf_provCode_congr
     (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout))
-    (pcc_axL0_inst (tcFn h) B)
+    (pcc_axL0_inst (tcFn h) B (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t)))
 
 /-! ### FASE B — evaluar el polinomio de Cantor DENTRO de `Prov`
 
@@ -204,11 +214,14 @@ sustituye **todas** las ocurrencias del hueco, un solo paso cubre las repeticion
 theorem pcc_rw (G : Term → Term)
     (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s))
     (X Y : Term) (heq : Prf (provFromCode (eqc X Y)))
-    (hbase : Prf (provFromCode (G X))) :
+    (hbase : Prf (provFromCode (G X)))
+    (hwG : Prf (hasWitF (G (varc (numeral 0)))))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (G Y)) := by
   have h1 : Prf (provFromCode (substfc zero X (G (varc (numeral 0))))) :=
     prf_mp (prf_provCode_congr (prf_eq_symm (hG X))) hbase
-  exact prf_mp (prf_provCode_congr (hG Y)) (pcc_leibniz_apply _ X Y heq h1)
+  exact prf_mp (prf_provCode_congr (hG Y))
+    (pcc_leibniz_apply _ X Y hwG hwX hwY heq h1)
 
 /-- **`pcc_rw` en forma IMPLICACIÓN.** Mismo contrato, pero devolviendo la implicación en vez de
     consumir la base.
@@ -221,12 +234,14 @@ theorem pcc_rw (G : Term → Term)
     **Net‑0** (`[propext, choice, Quot.sound]`): la base sancionada entra por `heq`, no por aquí. -/
 theorem pcc_rw_imp (G : Term → Term)
     (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s))
-    (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) :
+    (X Y : Term) (heq : Prf (provFromCode (eqc X Y)))
+    (hwG : Prf (hasWitF (G (varc (numeral 0)))))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (G X) ⇒ provFromCode (G Y)) := by
   let Ac : Term := G (varc (numeral 0))
   -- (1) Leibniz codificado, ya aplicado a la igualdad: `Prov(⌜Ac[X] ⇒ Ac[Y]⌝)`
   have himp : Prf (provFromCode (implc (substfc zero X Ac) (substfc zero Y Ac))) :=
-    pcc_mp_code_apply (pcc_leibniz_code Ac X Y) heq
+    pcc_mp_code_apply (pcc_leibniz_code Ac X Y hwG hwX hwY) heq
   -- (2) abrir el `implc` a implicación REAL
   have hopen : Prf (provFromCode (substfc zero X Ac) ⇒ provFromCode (substfc zero Y Ac)) :=
     prf_mp (pcc_mp_code_open _ _) himp
@@ -243,9 +258,12 @@ theorem pcc_rw_imp (G : Term → Term)
 theorem pcc_rw_div2 (L : Term) (hL : ∀ W, Prf (substtc zero W L =eq L)) (D : Term → Term)
     (hD : ∀ s : Term, Prf (substtc zero s (D (varc (numeral 0))) =eq D s))
     (X Y : Term) (heq : Prf (provFromCode (eqc X Y)))
-    (hbase : Prf (provFromCode (eqc L (div2cT (D X))))) :
+    (hbase : Prf (provFromCode (eqc L (div2cT (D X)))))
+    (hwL : Prf (hasWit L)) (hwD : Prf (hasWit (D (varc (numeral 0)))))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc L (div2cT (D Y)))) := by
   refine pcc_rw (fun s => eqc L (div2cT (D s))) ?_ X Y heq hbase
+    (prf_hasWitF_eq2 L (div2cT (D (varc (numeral 0)))) hwL (prf_hasWit_div2cT hwD)) hwX hwY
   intro s
   refine prf_eq_trans (prf_substfc_eq zero s L (div2cT (D (varc (numeral 0))))) ?_
   exact prf_congr_eqCodeFn (hL s)
@@ -275,6 +293,7 @@ theorem pcc_div2_cons (h t : Term) :
   have hdiv : Prf (provFromCode (substfc zero (tcFn (cons h t))
       (formCode (div2 (mul (.var 0) two) =eq (.var 0))))) :=
     pcc_thm_inst _ (Prf.gen _ (prf_div2_double (.var 0))) (tcFn (cons h t))
+      (prf_hasWit_tcFn (liftTerm 0 (cons h t)))
   have hdivc := prf_substfc_arith_open 0 (tcFn (cons h t))
     (div2 (mul (.var 0) two) =eq (.var 0))
   have hdiv' : Prf (provFromCode
@@ -287,6 +306,10 @@ theorem pcc_div2_cons (h t : Term) :
         (prf_congr_tcFn (prf_cons_double h t))))
       (pcc_eval_mul (cons h t) two)
   refine pcc_rw (fun s => eqc (div2cT s) (tcFn (cons h t))) ?_ _ _ hcd hdiv'
+    (prf_hasWitF_eq2 (div2cT (varc (numeral 0))) (tcFn (cons h t))
+      (prf_hasWit_div2cT (prf_hasWit_varc (numeral 0))) (prf_hasWit_tcFn (cons h t)))
+    (prf_hasWit_mulcT (prf_hasWit_tcFn (cons h t)) (prf_hasWit_tc two))
+    (prf_hasWit_tcFn (cpOf h t))
   intro s
   refine prf_eq_trans (prf_substfc_eq zero s (div2cT (varc (numeral 0))) (tcFn (cons h t))) ?_
   exact prf_congr_eqCodeFn
@@ -302,6 +325,13 @@ theorem pcc_dot_cons (h t : Term) :
     Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t)))) := by
   have hL : ∀ W, Prf (substtc zero W (consT (tcFn h) (tcFn t)) =eq consT (tcFn h) (tcFn t)) :=
     substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t)
+  -- testigos (ADR-020): el mismo reparto que las invariancias `substtc` de arriba
+  have hv0 : Prf (hasWit (varc (numeral 0))) := prf_hasWit_varc (numeral 0)
+  have hw2 : Prf (hasWit (termCode two)) := prf_hasWit_tc two
+  have hwL : Prf (hasWit (consT (tcFn h) (tcFn t))) :=
+    prf_hasWit_consT (prf_hasWit_tcFn h) (prf_hasWit_tcFn t)
+  have hwQ2 : Prf (hasWit (mulcT (termCode two) (tcFn (succ t)))) :=
+    prf_hasWit_mulcT hw2 (prf_hasWit_tcFn (succ t))
   have hQ2 : ∀ W, Prf (substtc zero W (mulcT (termCode two) (tcFn (succ t)))
       =eq mulcT (termCode two) (tcFn (succ t))) :=
     substtc_inv_mulcT prf_substtc_two (substtc_inv_tcFn (succ t))
@@ -318,6 +348,10 @@ theorem pcc_dot_cons (h t : Term) :
     refine pcc_rw_div2 _ hL
       (fun s => addcT (mulcT s (succcT s)) (mulcT (termCode two) (tcFn (succ t)))) ?_
       _ _ (pcc_eval_add h (succ t)) h0
+      hwL
+      (prf_hasWit_addcT (prf_hasWit_mulcT hv0 (prf_hasWit_succcT hv0)) hwQ2)
+      (prf_hasWit_addcT (prf_hasWit_tcFn h) (prf_hasWit_tcFn (succ t)))
+      (prf_hasWit_tcFn (add h (succ t)))
     intro s
     refine prf_eq_trans (prf_substtc_addcT zero s _ _) (prf_congr_addcT ?_ (hQ2 s))
     refine prf_eq_trans (prf_substtc_mulcT zero s _ _) (prf_congr_mulcT (prf_substtc_varc0 s) ?_)
@@ -337,6 +371,10 @@ theorem pcc_dot_cons (h t : Term) :
     refine pcc_rw_div2 _ hL
       (fun s => addcT s (mulcT (termCode two) (tcFn (succ t)))) ?_
       _ _ (pcc_eval_mul (add h (succ t)) (succ (add h (succ t)))) h2
+      hwL (prf_hasWit_addcT hv0 hwQ2)
+      (prf_hasWit_mulcT (prf_hasWit_tcFn (add h (succ t)))
+        (prf_hasWit_tcFn (succ (add h (succ t)))))
+      (prf_hasWit_tcFn (mul (add h (succ t)) (succ (add h (succ t)))))
     intro s
     exact prf_eq_trans (prf_substtc_addcT zero s _ _)
       (prf_congr_addcT (prf_substtc_varc0 s) (hQ2 s))
@@ -350,6 +388,9 @@ theorem pcc_dot_cons (h t : Term) :
                      (tcFn (mul two (succ t))))))) := by
     refine pcc_rw_div2 _ hL
       (fun s => addcT (tcFn (mul (add h (succ t)) (succ (add h (succ t))))) s) ?_ _ _ hQ h3
+      hwL
+      (prf_hasWit_addcT (prf_hasWit_tcFn (mul (add h (succ t)) (succ (add h (succ t))))) hv0)
+      hwQ2 (prf_hasWit_tcFn (mul two (succ t)))
     intro s
     exact prf_eq_trans (prf_substtc_addcT zero s _ _)
       (prf_congr_addcT (substtc_inv_tcFn _ s) (prf_substtc_varc0 s))
@@ -357,8 +398,14 @@ theorem pcc_dot_cons (h t : Term) :
   have h5 : Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (div2cT (tcFn (cpOf h t))))) := by
     refine pcc_rw_div2 _ hL (fun s => s) (fun s => prf_substtc_varc0 s) _ _
       (pcc_eval_add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))) h4
+      hwL hv0
+      (prf_hasWit_addcT (prf_hasWit_tcFn (mul (add h (succ t)) (succ (add h (succ t)))))
+        (prf_hasWit_tcFn (mul two (succ t))))
+      (prf_hasWit_tcFn (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))))
   -- FASE C: el `div2` se cancela contra el polinomio
-  exact pcc_eq_trans_code _ _ _ hL h5 (pcc_div2_cons h t)
+  exact pcc_eq_trans_code _ _ _ hL hwL
+    (prf_hasWit_div2cT (prf_hasWit_tcFn (cpOf h t))) (prf_hasWit_tcFn (cons h t))
+    h5 (pcc_div2_cons h t)
 
 end ROBINSON_PlusPlus.Meta.DotConsPrf
 
