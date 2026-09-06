@@ -61,7 +61,8 @@ theorem pcc_ax_runFn_nil_computed :
     (prf_provCode_congr
       (prf_substfc_arith_open 0 (tcFn nil) (runFn (.var 0) nil =eq (.var 0))))
     (pcc_axiom_inst (runFn (.var 0) nil =eq (.var 0))
-      (show ax_runFn_nil ∈ axioms by simp [axioms]) (tcFn nil))
+      (show ax_runFn_nil ∈ axioms by simp [axioms]) (tcFn nil)
+      (prf_hasWit_tcFn (liftTerm 0 nil)))
 
 /-- **BASE de la evaluación provable de `runFn`**: `⊢ Prov(⌜runFn(ṅil, ṅil) = (runFn nil nil)˙⌝)`.
     De `pcc_ax_runFn_nil_computed` transportando `⌜nil⌝ ↦ tcFn nil` (`prf_tc_zero`) y
@@ -150,7 +151,8 @@ theorem pcc_runFn_cons_code (h t : Term) :
                    (consT (carcT (tcFn h)) (runFnT (termCode nil) T))) :=
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   exact prf_mp (prf_provCode_congr hchain)
-    (pcc_thm_inst2 BODY prf_runFn_nil_cons_forall (tcFn h) T)
+    (pcc_thm_inst2 BODY prf_runFn_nil_cons_forall (tcFn h) T
+      (prf_hasWit_tcFn (liftTerm 0 h)) (prf_hasWit_tcFn (liftTerm 0 t)))
 
 end ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 

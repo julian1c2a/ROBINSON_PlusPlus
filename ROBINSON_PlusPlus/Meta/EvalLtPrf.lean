@@ -159,6 +159,7 @@ theorem pcc_ltBwd_computed (a b : Term) :
   have h0 : Prf (provFromCode
       (substfc zero B (substfc (succ zero) W (formCode phiLtBwd)))) :=
     pcc_thm_inst2 phiLtBwd ltBwd A B
+      (prf_hasWit_tcFn (liftTerm 0 a)) (prf_hasWit_tcFn (liftTerm 0 b))
   -- (1) `substfc` INTERNO (nivel 1) sobre `formCode phiLtBwd` (computa por `rfl` a substCodeF)
   have hin : Prf (substfc (succ zero) W (formCode phiLtBwd)
       =eq implc (exc (eqCodeFn (addcT (liftc zero W) (succcT (varc (numeral 0))))
@@ -252,7 +253,8 @@ theorem prf_substfc_exBodyc (A B K : Term)
     implicación `⇐` de `ax13` codificada (`pcc_ltBwd_computed`). -/
 theorem pcc_lt_intro (a b K : Term)
     (ha : ∀ c, liftTerm c a = a) (hb : ∀ c, liftTerm c b = b)
-    (h : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b)))) :
+    (h : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))))
+    (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (ltCodeFn (tcFn a) (tcFn b))) := by
   have hAcl : ∀ c, liftTerm c (tcFn a) = tcFn a := fun c => by
     simp only [tcFn, liftTerm, liftTerms, ha c]
@@ -264,7 +266,12 @@ theorem pcc_lt_intro (a b K : Term)
     prf_mp (prf_provCode_congr (prf_eq_symm
       (prf_substfc_exBodyc (tcFn a) (tcFn b) K (substtc_inv_tcFn a) (substtc_inv_tcFn b)))) h
   have hex : Prf (provFromCode (exc (exBodyc (tcFn a) (tcFn b)))) :=
-    prf_mp (pcc_exIntro_code' (exBodyc (tcFn a) (tcFn b)) K hbodycl) hsub
+    prf_mp (pcc_exIntro_code' (exBodyc (tcFn a) (tcFn b)) K hbodycl
+      (prf_hasWitF_eq2 (addcT (tcFn a) (succcT (varc (numeral 0)))) (tcFn b)
+        (prf_hasWit_addcT (prf_hasWit_tcFn a)
+          (prf_hasWit_succcT (prf_hasWit_varc (numeral 0))))
+        (prf_hasWit_tcFn b))
+      hwK) hsub
   exact pcc_mp_code_apply (pcc_ltBwd_computed a b) hex
 
 end ROBINSON_PlusPlus.Meta.EvalLtPrf
