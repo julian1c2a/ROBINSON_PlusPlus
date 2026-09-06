@@ -179,6 +179,31 @@ theorem substtc_inv_dotV (t : Term) :
       prf_eq_trans (prf_substtc_binT m W (a.dotV t) (b.dotV t))
         (prf_congr_binT (substtc_inv_dotV t a W) (substtc_inv_dotV t b W))
 
+/-! ### La GUARDA de las dos formas del árbol (ADR-020)
+
+⚠️ **`hw_auto` NO puede con `T.dotV t` ni con `T.dotN t`**: con `T` abstracto son aplicaciones de
+recursor **ATASCADAS**, y ninguna alternativa de la escalera unifica. Y no se le puede enseñar
+`CTree` a la táctica, porque `hw_auto` vive en `SubstfcWitnessPrf`, aguas **ARRIBA** de este módulo.
+
+🔑 Pero **no hace falta ARRASTRAR nada**: el árbol es un dato **FINITO**, y la guarda se paga por
+la misma inducción pura que ya prueban `substtc_inv_dotN`/`substtc_inv_dotV` justo arriba. Con
+estos dos lemas TODOS los sitios de este módulo pagan y **ninguna firma pública cambia**. -/
+
+/-- **Guarda de la forma V** (valores punteados): `hasWit (T.dotV t)`, por inducción sobre el árbol. -/
+theorem prf_hasWit_dotV (t : Term) : ∀ T : CTree, Prf (hasWit (T.dotV t))
+  | .leaf i    => prf_hasWit_tcFn (nthc t (numeralM i))
+  | .nul m     => prf_hasWit_nulT m
+  | .un m a    => prf_hasWit_unT m (prf_hasWit_dotV t a)
+  | .bin m a b => prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b)
+
+/-- **Guarda de la forma N** (accesores rastreados): `hasWit (T.dotN t)`, por inducción sobre el
+    árbol. La hoja es `nthcT ṫ ı̇`, un `funcc` binario sobre dos códigos cerrados. -/
+theorem prf_hasWit_dotN (t : Term) : ∀ T : CTree, Prf (hasWit (T.dotN t))
+  | .leaf i    => prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM i))
+  | .nul m     => prf_hasWit_nulT m
+  | .un m a    => prf_hasWit_unT m (prf_hasWit_dotN t a)
+  | .bin m a b => prf_hasWit_binT m (prf_hasWit_dotN t a) (prf_hasWit_dotN t b)
+
 /-- **El código del código del árbol**: `(E(nthc t i…))˙ = dotV`, ahora **DENTRO de `Prov`**.
 
     ⚠️ **Éste era el coste real de repatriar el KIT** (medido en `sondeos/KitPayoff.lean`): la
@@ -203,19 +228,33 @@ theorem pcc_tc_objAt (t : Term) :
   | .nul m => pcc_dot_nul_symm m
   | .un m a =>
       pcc_eq_trans_code _ _ _ (substtc_inv_tcFn _)
+        (prf_hasWit_tcFn _)
+        (prf_hasWit_unT m (prf_hasWit_tcFn (a.objAt t)))
+        (prf_hasWit_unT m (prf_hasWit_dotV t a))
         (pcc_dot_un_symm m (a.objAt t))
-        (prf_mp (pcc_congr_unT_code m (tcFn (a.objAt t)) (a.dotV t) (substtc_inv_tcFn _))
+        (prf_mp (pcc_congr_unT_code m (tcFn (a.objAt t)) (a.dotV t) (substtc_inv_tcFn _)
+            (prf_hasWit_tcFn (a.objAt t)) (prf_hasWit_dotV t a))
           (pcc_tc_objAt t a))
   | .bin m a b =>
       pcc_eq_trans_code _ _ _ (substtc_inv_tcFn _)
+        (prf_hasWit_tcFn _)
+        (prf_hasWit_binT m (prf_hasWit_tcFn (a.objAt t)) (prf_hasWit_tcFn (b.objAt t)))
+        (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b))
         (pcc_dot_bin_symm m (a.objAt t) (b.objAt t))
         (pcc_eq_trans_code _ _ _
           (substtc_inv_binT (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+          (prf_hasWit_binT m (prf_hasWit_tcFn (a.objAt t)) (prf_hasWit_tcFn (b.objAt t)))
+          (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_tcFn (b.objAt t)))
+          (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b))
           (prf_mp (pcc_congr_binT_1_code m (tcFn (b.objAt t)) (tcFn (a.objAt t)) (a.dotV t)
-              (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+              (substtc_inv_tcFn _) (substtc_inv_tcFn _)
+              (prf_hasWit_tcFn (b.objAt t)) (prf_hasWit_tcFn (a.objAt t))
+              (prf_hasWit_dotV t a))
             (pcc_tc_objAt t a))
           (prf_mp (pcc_congr_binT_2_code m (a.dotV t) (tcFn (b.objAt t)) (b.dotV t)
-              (substtc_inv_dotV t a) (substtc_inv_tcFn _))
+              (substtc_inv_dotV t a) (substtc_inv_tcFn _)
+              (prf_hasWit_dotV t a) (prf_hasWit_tcFn (b.objAt t))
+              (prf_hasWit_dotV t b))
             (pcc_tc_objAt t b)))
 
 /-! ### La pieza cara: `Prov(⌜E(valores) = E(accesores)⌝)`, por inducción
@@ -240,12 +279,14 @@ theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
           (tcFn (nthc t (numeralM i))))) :=
         PrfH.mp _ _ _ (prf_to_prfH (pcc_nthcD_bridge t i) _) hbound
       exact PrfH_eq_symm_code _ _ (substtc_inv_nthcT_tcFn t i) hev
+        (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM i)))
+        (prf_hasWit_tcFn (nthc t (numeralM i)))
   | nul m => intro _; exact prf_to_prfH (prf_provFromCode_eqCodeFn_refl (nulT m)) _
   | un m a ih =>
       intro hb
       exact PrfH.mp _ _ _
         (prf_to_prfH (pcc_congr_unT_code m (CTree.dotV t a) (CTree.dotN t a)
-          (substtc_inv_dotV t a)) _) (ih hb)
+          (substtc_inv_dotV t a) (prf_hasWit_dotV t a) (prf_hasWit_dotN t a)) _) (ih hb)
   | bin m a b iha ihb =>
       intro hb
       have hba : Nat.le (CTree.maxLeaf a) n := Nat.le_trans (Nat.le_max_left _ _) hb
@@ -255,16 +296,21 @@ theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
           (binT m (CTree.dotN t a) (CTree.dotV t b)))) :=
         PrfH.mp _ _ _
           (prf_to_prfH (pcc_congr_binT_1_code m (CTree.dotV t b) (CTree.dotV t a)
-            (CTree.dotN t a) (substtc_inv_dotV t b) (substtc_inv_dotV t a)) _)
+            (CTree.dotN t a) (substtc_inv_dotV t b) (substtc_inv_dotV t a)
+            (prf_hasWit_dotV t b) (prf_hasWit_dotV t a) (prf_hasWit_dotN t a)) _)
           (iha hba)
       have h2 : PrfH Γ (provFromCode (eqc (binT m (CTree.dotN t a) (CTree.dotV t b))
           (binT m (CTree.dotN t a) (CTree.dotN t b)))) :=
         PrfH.mp _ _ _
           (prf_to_prfH (pcc_congr_binT_2_code m (CTree.dotN t a) (CTree.dotV t b)
-            (CTree.dotN t b) (substtc_inv_dotN t a) (substtc_inv_dotV t b)) _)
+            (CTree.dotN t b) (substtc_inv_dotN t a) (substtc_inv_dotV t b)
+            (prf_hasWit_dotN t a) (prf_hasWit_dotV t b) (prf_hasWit_dotN t b)) _)
           (ihb hbb)
       exact PrfH_eq_trans_code _ _ _
         (substtc_inv_binT (substtc_inv_dotV t a) (substtc_inv_dotV t b)) h1 h2
+        (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b))
+        (prf_hasWit_binT m (prf_hasWit_dotN t a) (prf_hasWit_dotV t b))
+        (prf_hasWit_binT m (prf_hasWit_dotN t a) (prf_hasWit_dotN t b))
 
 /-! ### El reflector `hcond` del chasis, ya genérico -/
 
@@ -316,12 +362,16 @@ theorem pcc_condD_of_tree (T : CTree) (t : Term) {n : Nat} (hmax : Nat.le (CTree
   have hcarc2 : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (T.dotV t))) :=
     PrfH_eq_trans_code _ _ _ (substtc_inv_carcT_tcFn t) hcarc1
       (prf_to_prfH (pcc_tc_objAt t T) _)
+      (prf_hasWit_carcT (prf_hasWit_tcFn t)) (prf_hasWit_tcFn (T.objAt t))
+      (prf_hasWit_dotV t T)
   -- (3) `dotV → dotN` por inducción sobre el árbol
   have hVN : PrfH Γ (provFromCode (eqc (T.dotV t) (T.dotN t))) :=
     PrfH_dotVN t hlenc T hmax
   -- (4) transitividad interna + vuelta a la forma `substfc`
   have hfin : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (T.dotN t))) :=
     PrfH_eq_trans_code _ _ _ (substtc_inv_carcT_tcFn t) hcarc2 hVN
+      (prf_hasWit_carcT (prf_hasWit_tcFn t)) (prf_hasWit_dotV t T)
+      (prf_hasWit_dotN t T)
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_condD_of_tree_eq T t))) _) hfin
 

@@ -133,6 +133,10 @@ theorem pcc_condDEfq (t : Term) :
       ⇒ provFromCode (eqc (carcT (tcFn t)) (binT 5 (tcFn botc) V))) :=
     pcc_rw_imp (fun s => eqCodeFn (carcT (tcFn t)) s) hG _ _
       (pcc_dot_bin_symm 5 botc (nthc t (numeralM 2)))
+      (prf_hasWitF_eq2 _ _ (prf_hasWit_carcT (prf_hasWit_tcFn t))
+        (prf_hasWit_varc (numeral 0)))
+      (prf_hasWit_tcFn _)
+      (prf_hasWit_binT 5 (prf_hasWit_tcFn botc) (prf_hasWit_tcFn _))
   have hcarc1b : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (binT 5 (tcFn botc) V))) :=
     PrfH.mp _ _ _ (prf_to_prfH hstep1 _) hcarc1
   -- (2c) INTERNO: `(botc)˙ ⟶ nulT 2`, con el hueco en el 1.er argumento de `binT`
@@ -147,6 +151,10 @@ theorem pcc_condDEfq (t : Term) :
       ⇒ provFromCode (eqc (carcT (tcFn t)) (binT 5 (nulT 2) V))) :=
     pcc_rw_imp (fun s => eqCodeFn (carcT (tcFn t)) (binT 5 s V)) hGb _ _
       (pcc_dot_nul_symm 2)
+      (prf_hasWitF_eq2 _ _ (prf_hasWit_carcT (prf_hasWit_tcFn t))
+        (prf_hasWit_binT 5 (prf_hasWit_varc (numeral 0)) (prf_hasWit_tcFn _)))
+      (prf_hasWit_tcFn _)
+      (prf_hasWit_nulT 2)
   have hcarc2 : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (binT 5 (nulT 2) V))) :=
     PrfH.mp _ _ _ (prf_to_prfH hstep2 _) hcarc1b
   -- (3) puente `nthc` bajo la cota derivada de la longitud canónica
@@ -160,11 +168,17 @@ theorem pcc_condDEfq (t : Term) :
     PrfH.mp _ _ _
       (prf_to_prfH (pcc_congr_binT_2_code 5 (nulT 2) V N
         (substtc_inv_nulT 2) (substtc_inv_tcFn _)) _)
-      (PrfH_eq_symm_code N V hNinv hevN)
+      (PrfH_eq_symm_code N V hNinv hevN
+        (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM 2)))
+        (prf_hasWit_tcFn _))
   -- (5) transitividad interna + vuelta a la forma `substfc`
   have hfin : PrfH Γ (provFromCode (eqc (carcT (tcFn t)) (binT 5 (nulT 2) N))) :=
     PrfH_eq_trans_code (carcT (tcFn t)) (binT 5 (nulT 2) V) (binT 5 (nulT 2) N)
       (substtc_inv_carcT_tcFn t) hcarc2 hcongr
+      (prf_hasWit_carcT (prf_hasWit_tcFn t))
+      (prf_hasWit_binT 5 (prf_hasWit_nulT 2) (prf_hasWit_tcFn _))
+      (prf_hasWit_binT 5 (prf_hasWit_nulT 2)
+        (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM 2))))
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_condDEfq_eq t))) _) hfin
 

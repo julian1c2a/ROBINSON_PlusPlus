@@ -932,7 +932,11 @@ theorem refl_caso_funcc_imp (p b : Term) :
   have hchain : PrfH [targetLiftsc b] (provFromCode (eqc
       (liftcT (termCode zero) (tcFn (funcc p b))) (tcFn (funcc p (liftsc zero b))))) :=
     PrfH_eq_trans_code _ _ _ hX s1
-      (PrfH_eq_trans_code _ _ _ hY s2 (PrfH_eq_trans_code _ _ _ hZ s3 s4))
+      (PrfH_eq_trans_code _ _ _ hY s2
+        (PrfH_eq_trans_code _ _ _ hZ s3 s4
+          (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto))
+      (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftc_func zero p b))))) _) hchain
 
@@ -1006,7 +1010,12 @@ theorem refl_lista_cons_imp (h t : Term) :
       (tcFn (cons (liftc zero h) (liftsc zero t))))) :=
     PrfH_eq_trans_code _ _ _ hX s1
       (PrfH_eq_trans_code _ _ _ hY s2
-        (PrfH_eq_trans_code _ _ _ hZ s3 (PrfH_eq_trans_code _ _ _ hU s4 s5)))
+        (PrfH_eq_trans_code _ _ _ hZ s3
+          (PrfH_eq_trans_code _ _ _ hU s4 s5
+            (by hw_auto) (by hw_auto) (by hw_auto))
+          (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto))
+      (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftsc_cons zero h t))))) _) hchain
 
@@ -1141,8 +1150,9 @@ example (wT X : Term) :
     ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.isTermCodeE1 wT X = isTermCodeE1 wT X := rfl
 example {Γ : List Formula} (X Y Z : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (h1 : PrfH Γ (provFromCode (eqc X Y))) (h2 : PrfH Γ (provFromCode (eqc Y Z))) :
+    (h1 : PrfH Γ (provFromCode (eqc X Y))) (h2 : PrfH Γ (provFromCode (eqc Y Z)))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) (hwZ : Prf (hasWit Z)) :
     PrfH Γ (provFromCode (eqc X Z)) :=
-  ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf.PrfH_eq_trans_code X Y Z hX h1 h2
+  ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf.PrfH_eq_trans_code X Y Z hX h1 h2 hwX hwY hwZ
 example (a b : Term) : eqc a b = eqCodeFn a b :=
   (ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.eqCodeFn_eq_eqc a b).symm
