@@ -335,7 +335,8 @@ por Leibniz interno sobre un contexto de código de un solo hueco. Generaliza el
     `Prov(⌜binT m A X = binT m A Y⌝)`. -/
 theorem pcc_congr_binT_2_code (m : Nat) (A X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (hwA : Prf (hasWit A)) (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
+    (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m A X) (binT m A Y))) := by
   let Ac : Term := eqc (binT m A X) (binT m A (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (binT m A X) (binT m A w)) := by
@@ -358,7 +359,8 @@ theorem pcc_congr_binT_2_code (m : Nat) (A X Y : Term)
 /-- **Congruencia interna de `binT` en el 1er argumento**. -/
 theorem pcc_congr_binT_1_code (m : Nat) (B X Y : Term)
     (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (hwB : Prf (hasWit B)) (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
+    (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (binT m X B) (binT m Y B))) := by
   let Ac : Term := eqc (binT m X B) (binT m (varc (numeral 0)) B)
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (binT m X B) (binT m w B)) := by
@@ -381,7 +383,7 @@ theorem pcc_congr_binT_1_code (m : Nat) (B X Y : Term)
 /-- **Congruencia interna de `unT`**. -/
 theorem pcc_congr_unT_code (m : Nat) (X Y : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
+    (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (unT m X) (unT m Y))) := by
   let Ac : Term := eqc (unT m X) (unT m (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (unT m X) (unT m w)) := by

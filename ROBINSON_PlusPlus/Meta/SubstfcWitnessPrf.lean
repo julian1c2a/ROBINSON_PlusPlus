@@ -1973,6 +1973,37 @@ theorem prf_hasWitF_exc (a : Term) (ha : Prf (hasWitF a)) :
     Prf (hasWitF (exc a)) :=
   prf_mp (prf_hasWitF_un 9 a inj_un9) ha
 
+/-! ### `hw_auto` — la escalera, automatizada
+
+⭐ **Una táctica cubre TODOS los constructores dotados del árbol**, y la razón es la misma que hacía
+que bastasen seis lemas: `addcT`, `consT`, `liftcT`, `nthcT`, `predcT`, `nulT`/`unT`/`binT`,
+`varcT`, `funccT`, `eqcT`… son **todos** `funcc (strCode σ) ⟨…⟩` con aridad ≤ 3, así que
+`prf_hasWit_funcc1/2/3` unifica con cualquiera de ellos sin que la táctica tenga que conocerlos.
+Las hojas son `tcFn` (`prf_hasWit_tcFn`), `termCode` (`prf_hasWit_tc`), `varc ⌜n⌝`
+(`prf_hasWit_varc`) y lo que ya esté en el contexto.
+
+Con esto, la propagación de ADR-020 aguas abajo deja de ser trabajo y pasa a ser `by hw_auto`.
+
+
+⚠️ **El ORDEN de las alternativas importa, y no es el obvio.** Las reglas ESTRUCTURALES
+(`funcc1/2/3`) van ANTES que `prf_hasWit_tc`: si `termCode ?t` se prueba primero contra un nodo
+grande, el unificador despliega la recursión de `termCode` entera y la táctica se va en
+heartbeats. Con las estructurales delante, el nodo se descompone y `termCode` sólo se intenta
+sobre las hojas, donde unifica al instante. -/
+
+syntax "hw_auto" : tactic
+macro_rules
+  | `(tactic| hw_auto) => `(tactic|
+      first
+        | assumption
+        | exact prf_hasWit_tcFn _
+        | exact prf_hasWit_varc _
+        | (refine prf_hasWit_funcc1 _ _ ?_ <;> hw_auto)
+        | (refine prf_hasWit_funcc2 _ _ _ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWit_funcc3 _ _ _ _ ?_ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWit_liftc ?_ <;> hw_auto)
+        | exact prf_hasWit_tc _)
+
 /-! ### CONTROLES: el molde, sobre objetivos REALES del árbol
 
 No son ejemplos de juguete: `tcFn (succ x)` es literalmente la forma que `NumCodeClosedPrf` usa
@@ -1987,6 +2018,12 @@ example (x : Term) : Prf (hasWit (funcc (strCode "succ") (cons (tcFn x) nil))) :
 example (x y : Term) :
     Prf (hasWit (funcc (strCode "add") (cons (tcFn x) (cons (tcFn y) nil)))) :=
   prf_hasWit_funcc2 _ _ _ (prf_hasWit_tcFn x) (prf_hasWit_tcFn y)
+
+/-- `hw_auto` sobre una torre real de constructores dotados anidados. -/
+example (p h t : Term) :
+    Prf (hasWit (funcc (strCode "liftsc") (cons (termCode nil)
+      (cons (funcc (strCode "cons") (cons (tcFn h) (cons (tcFn t) nil))) nil)))) := by
+  hw_auto
 
 /-- La forma de `EvalBoundedPrf:237`: un nodo `implc` CONSTRUIDO, no un `formCode`. -/
 example (x y : Term) (Phic : Term) (hP : Prf (hasWitF Phic)) :
