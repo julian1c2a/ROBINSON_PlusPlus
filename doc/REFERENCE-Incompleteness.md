@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 126 jobs · 112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/`
+> **Build 128 jobs · 114 módulos activos** (Minimal 11 + Meta 92 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2819,7 +2819,7 @@ sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente 
 ## §3.40 · 🏁 ③ TERMINADO — EL ÁRBOL VUELVE A VERDE y la vía C queda CERRADA (2026‑09‑06d)
 
 ```
-Build completed successfully (126 jobs)
+Build completed successfully (128 jobs)
 112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
 ```
 
@@ -2985,3 +2985,149 @@ argumento correcto: `hw_auto` **no está en scope** en `EvalCarcNthcPrf`, que s�
 ⚠️ Regla operativa que confirma [[feedback-workflows-operativa]]: los agentes fueron de **SOLO
 LECTURA** (prohibido `lake build` y prohibido editar). Compilar en paralelo se pelea por `.lake`, y
 editar un fichero que otro agente audita le invalida los números de línea.
+
+---
+
+## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
+
+> `Build completed successfully (128 jobs)` · **114 módulos** (Minimal 11 + Meta 92 + Full 11).
+> Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
+
+Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
+`pcc_eval_substfc`), y B3.4 tenía **B3.2 por prerrequisito**. Esta sección cierra B3.2 y pone el
+chasis de la única deuda que ADR‑020 dejó abierta.
+
+### §3.41.1 · B3.2 — `pcc_eval_substtc` en producción, y la promoción como ejercicio de BORRADO
+
+`Meta/EvalSubsttcPrf.lean` (1 307 l.), promovido de `sondeos/EvalSubsttc.lean`:
+
+```
+pcc_eval_substtc        (w v s t) (h : Prf (isTC1 w t)) :
+    Prf (provFromCode (eqc (substtcT (tcFn v) (tcFn s) (tcFn t)) (tcFn (substtc v s t))))
+pcc_eval_substtsc       (w v s t) (hwf) (hargs)          -- la gemela sobre LISTAS
+pcc_eval_substtc_hasWit (v s t) : Prf (hasWit t ⇒ targetSubsttc v s t)
+```
+
+Footprint `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` = **la base sancionada**;
+ni un axioma nuevo. El molde es el de `EvalLiftcPrf`: **UNA** inducción fuerte con conclusión
+**conjuntiva** sobre los dos sorts, con el testigo, `v` y `s` cuantificados **dentro** del
+predicado (lo exige `liftFormula 1 Φ = Φ`).
+
+⭐ **De 154 declaraciones entraron 71: promover es sobre todo BORRAR.** El desglose de las 83 que
+se caen es la parte instructiva:
+
+| qué | cuántas | por qué |
+|---|---|---|
+| duplicados exactos | 66 | el §8 entero (38) era copia literal de `DescensoLiftc` |
+| **instancias** de genéricos ya subidos | 4 | `psi_l1/l2/l3`, `PSI_inst` **son** `psi_lift_form3`/`PSI_inst3` con `Φ := PHIsubsttc` |
+| muertas | 3 | `refl_caso_funcc`/`_lista_cons`/`_caso_varc`: cero consumidores; el ensamblaje usa las `_imp` |
+| **el §13 entero** | 8 | ⬇ |
+
+⭐ **El §13 sobraba por completo.** Ocho declaraciones —`ax26_pred_succ` instanciada dentro de
+`Prov`, dos congruencias `PrfH`, una eliminación de ∃ objeto— dedicadas a descargar una hipótesis
+`PredHyp` (`⊢ v < n ⇒ Prov(⌜τ(ṅ) = (τn)˙⌝)`). Producción prueba `pcc_eval_pred'`
+(`Meta/EvalPredPrf.lean:200`) **sin guarda ninguna**, que es estrictamente más fuerte. Queda en:
+
+```lean
+theorem prf_pred_dot_guarded (v n : Term) :
+    Prf (Formula.impl (lt v n) (provFromCode (eqc (predcT (tcFn n)) (tcFn (pred n))))) :=
+  prf_deduction (prf_to_prfH (pcc_eval_pred' n) [lt v n])
+```
+
+y `PredHyp` desaparece de las **ocho** firmas que la arrastraban — con ella se caen las tres
+versiones primadas del §14, que sólo existían para descargarla.
+
+### §3.41.2 · ⛔ La trampa que ningún comparador de enunciados ve
+
+Las 83 colisiones con producción (el plan había medido **13**: la cifra era de antes de que
+entraran 29 módulos y `SubstfcWitnessPrf`) se separan en duplicados y **homónimos** comparando
+enunciados… y ahí está la trampa:
+
+> **Dos `def` con la MISMA FIRMA y CUERPO DISTINTO se leen como duplicados.**
+
+`PHI` y `PHIbody` colisionaban con `EvalLiftcPrf` con firma idéntica (`def _ : Formula`) y cuerpo
+distinto —allí sobre `targetLift`, aquí sobre `targetSubsttc`—. Borrarlos como «duplicados»
+habría **cambiado el predicado de la inducción en silencio**. La cura: para `def`/`abbrev`
+comparar **cuerpo**; para `theorem`/`lemma` basta la firma, porque la prueba da igual.
+
+De ahí los **13 renombres antes de mover**. Y el peligro real no era este módulo —dentro gana el
+local, y compila— sino un consumidor aguas abajo con los dos `export` visibles: dos candidatos y
+Lean elige **por elaboración, sin avisar**.
+
+⚠️ Dos correcciones más a lo que el plan daba por medido: los duplicados **no alcanzables** eran
+**14**, no 3 (los otros 11 son de `LiftcCodePrf`/`EvalPredPrf`, que el sondeo no abría) — se
+arreglan con tres `open`, y los `open` sólo son seguros **porque** se renombraron los homónimos.
+
+El `export` sí se pudo hacer **por consumo** y no por existencia, aunque el módulo no tenga aún
+consumidores en el build: los tiene en `sondeos/`. Grep de las 71 supervivientes contra
+`EvalSubstfcPrf.lean` y `HasWitFReal.lean` → **46 referenciadas de hecho**. Ésas se exportan.
+
+### §3.41.3 · `hGuard` — el chasis, y la deuda reducida a DOS lemas
+
+`Meta/LineWFGuardPrf.lean` (227 l.), footprint `[propext, Classical.choice, Quot.sound]` —
+**net‑0 puro**, ni siquiera el axioma sancionado de la línea base.
+
+* **`hcond_absorbe_extra`** es el lema sobre el que se **aceptó** ADR‑020 (§3.36) y hasta hoy
+  vivía en **cinco copias fuera del build**: `sondeos/SegundoMuro.lean`,
+  `sondeos/MedirC_Carga.lean`, `sondeos/MedirC_Enmienda.lean` y dos de `Probe/`. Entra una vez.
+  Lo único con contenido es el transporte: `substfc` **distribuye sobre `andc`**, luego
+  `condD P t ∧̇ condD C t` **es** `condD (P ∧ C) t`.
+* ⭐ **`hcond_absorbe_cascade`** absorbe la cascada **entera** por inducción sobre la lista de
+  casillas. Es lo que convierte la deuda de los 7 tags en **DOS** lemas genéricos —uno por
+  constructor de `GuardSlot`—, porque el índice de casilla es un parámetro.
+* `DEUDA_hGuardT` / `DEUDA_hGuardF` quedan **enunciadas, no postuladas** (`abbrev` de `Prop`,
+  idioma de `Meta/Sigma1BoundedPrf.lean`). **Cero `axiom` nuevos.**
+
+### §3.41.4 · ⚠️ La medición que corrigió el diseño: es una CASCADA, no un par
+
+La primera versión escribía el conjunto extra como un par `hasWit ∧ hasWitF`. **Falso.** Leídos
+los axiomas reales, la enmienda mete entre **una y tres** guardas por tag, **anidadas a la
+derecha** delante de la condición estructural:
+
+| tag | `lenc` | guardas, en orden |
+|---|---|---|
+| `q1` (9), `q2` (10) | 4 | `hasWitF`@2, `hasWit`@3 |
+| `q3` (11) | 4 | `hasWitF`@3 |
+| `leibniz` (13) | 5 | `hasWitF`@2, `hasWit`@3, `hasWit`@4 |
+| `ind` (18), `qconf` (19), `listInd` (20) | 3 / 4 / 3 | `hasWitF`@2 |
+
+7 `hasWitF` + 4 `hasWit` = los **11 conjuntos nuevos** que declara ADR‑020. ✔
+
+Escrito como par habría sido **un lema correcto sobre la fórmula equivocada** — y habría
+compilado. Por eso §2.1 del módulo no *describe* la forma: la **comprueba**, con siete `rfl`:
+
+```lean
+example : ∃ C, ax_lineWF_q1 =
+    forall_ (Formula.impl (tagF 9) (lwfVar ⇔ Formula.and (lencF 4)
+      (guardedCond [.witF 2, .wit 3] C))) := ⟨_, rfl⟩
+```
+
+El `∃ C` evita copiar la condición estructural entera y el `rfl` sigue casando **orden de las
+guardas, índice de cada casilla y anidamiento**. Cobró en el acto: tres de los siete tags que yo
+había supuesto (12/13/14) eran **13/18/19**. Y tres `rfl` más comprueban el recuento 11 = 7 + 4.
+
+> 🔑 **Regla de método, corolario de «medir la forma»**: toda abstracción de una forma medida se
+> acompaña de un `rfl` por instancia real. Si el original cambia, dejan de compilar — que es
+> exactamente lo que se quiere.
+
+### §3.41.5 · Lo que falta de `hGuard`, medido — y no es una inducción nueva
+
+`DEUDA_hGuardT`/`DEUDA_hGuardF` no están probadas. Lo que **ya existe** para atacarlas:
+
+* **los átomos, con términos ABSTRACTOS**: `pcc_lt_tracked` y `pcc_eq_tracked`. 🔑 La reflexión
+  de una ecuación **no necesita numerales**: sale por congruencia dotada (`a = b` ⟹ `ȧ = ḃ` por
+  `PrfH_congr_tcFn`, y luego Leibniz sobre `Prov(⌜ȧ = ȧ⌝)`) — es el patrón que usaba el §13 que
+  §3.41.1 acaba de borrar.
+* **el cuantificador acotado**: `pcc_bdAll_intro` (`Meta/BdAllIntroPrf.lean:313`), keystone de
+  `hC_dot`, que además ya lleva la guarda `hasWitF` de ADR‑020 entre sus hipótesis.
+* **el `∃` sin cota**: `pcc_exIntro_code_open` (`Meta/Delta0ReflectPrf.lean:74`).
+* `prf_In_iff_boundedIn` (`Meta/BoundedInPrf.lean:391`) reduce el átomo `In` —primitivo,
+  `.atom in_sym [x,l]`— a un `∃` **acotado**.
+
+Falta el **recorrido** de `isTC1`/`isFC1` bajo el `∃`: la disyunción de formas (`isTermCodeE1`,
+y las **ocho** cláusulas de `isFormCodeE2`) y el `argsIn` interno, que es un segundo `∀` acotado
+anidado. Es un **ensamblaje**, del tamaño de una sesión, no una inducción nueva.
+
+⛔ Sigue vivo el coste que midió `Probe/MC_enmienda.lean` §8: la guarda **DISCRIMINA**
+(`CRIT_hasWitF_rejects_varc`), luego **no** se puede descargar para código abstracto. Es lo que
+la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`/`_q2`.

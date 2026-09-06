@@ -8,7 +8,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **114 módulos activos** (Minimal 11 + Meta 92 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -904,7 +904,7 @@ Pide `hasWitF Ac` con `Ac` abstracto, así que arrastra salvo donde el `Ac` sea 
 ### Addendum 2026‑09‑07 · 🏁 ADR‑020 CERRADA — el árbol compila con la enmienda
 
 ```
-Build completed successfully (126 jobs) · 112 módulos · 0 sorrys · 7 `axiom` de Lean
+Build completed successfully (128 jobs) · 112 módulos · 0 sorrys · 7 `axiom` de Lean
 ```
 
 Los **29 módulos** que bloqueaba `MpCodePrf` están cerrados. Detalle en §3.38–§3.40 de
@@ -936,3 +936,43 @@ compilan sin un solo `unknown identifier`.
 **Lo que NO cambió, y conviene repetirlo**: 7 `axiom` de Lean, 141 axiomas objeto (se **sustituyen**
 7 de los 141, no se añade ninguno), y ni D1, ni D2, ni D3, ni Gödel I/II, ni la sentencia `G`
 cambian de enunciado.
+
+### Addendum 2026‑09‑07b · el CHASIS de la deuda, en producción — y la forma real de la enmienda
+
+`Meta/LineWFGuardPrf.lean` (nuevo, net‑0 **puro**: `[propext, Classical.choice, Quot.sound]`).
+Detalle completo en `doc/REFERENCE-Incompleteness.md` §3.41.3–§3.41.5.
+
+**`hcond_absorbe_extra` entra en el build.** Es el lema sobre el que se **aceptó esta ADR** —el
+que garantiza que el chasis absorbe el conjunto extra— y hasta hoy vivía en **cinco copias fuera
+del build**: `sondeos/SegundoMuro.lean`, `sondeos/MedirC_Carga.lean`,
+`sondeos/MedirC_Enmienda.lean` y dos de `Probe/`. Una decisión no debería descansar sobre una
+pieza que el árbol no compila; ya no lo hace.
+
+⭐ **La deuda queda reducida a DOS lemas genéricos, no siete.** `hcond_absorbe_cascade` absorbe
+la cascada entera por inducción sobre la lista de casillas, así que el índice de casilla es un
+parámetro y los 7 tags se cierran a la vez. Las dos obligaciones —`DEUDA_hGuardT` y
+`DEUDA_hGuardF`— quedan **enunciadas y no postuladas** (`abbrev` de `Prop`, idioma de
+`Meta/Sigma1BoundedPrf.lean`): **cero `axiom` nuevos**, el inventario sigue en 7.
+
+⚠️ **Corrección a cómo se venía describiendo la enmienda en este ADR.** No añade «la guarda» ni
+«un par de guardas»: añade entre **una y tres**, **anidadas a la derecha** delante de la
+condición estructural, y el orden es `hasWitF` antes que `hasWit`:
+
+| tag | `lenc` | guardas, en orden |
+|---|---|---|
+| `q1` (9), `q2` (10) | 4 | `hasWitF`@2, `hasWit`@3 |
+| `q3` (11) | 4 | `hasWitF`@3 |
+| `leibniz` (13) | 5 | `hasWitF`@2, `hasWit`@3, `hasWit`@4 |
+| `ind` (18), `qconf` (19), `listInd` (20) | 3 / 4 / 3 | `hasWitF`@2 |
+
+7 `hasWitF` + 4 `hasWit` = los **11 conjuntos nuevos** que declara esta ADR. ✔ El recuento era
+correcto; la **forma** estaba mal descrita, y modelarla como un par habría producido un lema
+correcto sobre la fórmula equivocada — que además habría compilado. §2.1 del módulo lo
+**comprueba** con siete `rfl` contra `Minimal/Axioms.lean`: si la ADR cambiara el orden de las
+guardas, un índice de casilla o el anidamiento, esos siete dejan de compilar.
+
+**Lo que sigue abierto** (y no lo cierra este addendum): el recorrido de `isTC1`/`isFC1` bajo el
+`∃`. Los átomos ya están (`pcc_lt_tracked`, `pcc_eq_tracked`, con términos **abstractos**), el
+`∀` acotado también (`pcc_bdAll_intro`) y el `∃` sin cota también
+(`pcc_exIntro_code_open`); falta la disyunción de formas y el `argsIn` interno. Es un
+ensamblaje, no una inducción nueva.

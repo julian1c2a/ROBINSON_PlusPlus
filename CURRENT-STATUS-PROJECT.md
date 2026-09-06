@@ -2,7 +2,7 @@
 
 > ## ESTADO REAL — 2026-09-07 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
-> 🏁 **`Build completed successfully (126 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> 🏁 **`Build completed successfully (128 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
 > `master`** el 2026-09-07 con merge commit `7bc2c8a`, y el build se verificó verde **después** del
 > merge, no sólo en la rama.
@@ -14,6 +14,18 @@
 > * ✅ **② `MpCodePrf`**: los 10 sitios cerrados; la mitad CÓDIGO se paga entera ahí.
 > * ✅ **③ propagación**: los **29 módulos** bloqueados, cerrados.
 >
+> 🏁 **Y después del merge, dos cierres más el mismo día — los dos net-0** (§3.41):
+> * **B3.2 · `Meta/EvalSubsttcPrf.lean`** — `pcc_eval_substtc` / `pcc_eval_substtsc` /
+>   `pcc_eval_substtc_hasWit`, con `v`, `s`, `t` **ABSTRACTOS**. Era el **prerrequisito de B3.4**.
+>   De 154 declaraciones del sondeo entraron **71**: promover fue sobre todo **borrar**.
+> * **El chasis de `hGuard` · `Meta/LineWFGuardPrf.lean`**, **net-0 puro**. Mete en el build
+>   `hcond_absorbe_extra` —el lema sobre el que se aceptó ADR-020, que vivía en **cinco copias
+>   fuera del build**— y ⭐ `hcond_absorbe_cascade`, que **reduce la deuda de los 7 tags a DOS
+>   lemas genéricos**, `DEUDA_hGuardT`/`DEUDA_hGuardF`, **enunciados y no postulados**.
+>   ⚠️ Corrigió además la descripción de la enmienda: el conjunto extra es una **cascada** de 1–3
+>   guardas anidadas a la derecha, no un par — comprobado con **siete `rfl`** contra
+>   `Minimal/Axioms.lean` (§3.41.4).
+>
 > ✅✅ **LA LÍNEA ROJA DE ADR-020, COMPROBADA Y CON RAZÓN ESTRUCTURAL**: `d3_prf_of_chainOkDot` y
 > `pcc_lineWF_tracked_modulo_7` **conservan su firma exacta**. La guarda va DENTRO del `⇔` OBJETO,
 > así que al reflector le llega como conjunto objeto extraído de `lineWF t`, **no** como hipótesis
@@ -23,10 +35,10 @@
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.40.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
 >
-> **Build 126 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
-> **112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 128 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **114 módulos activos** (Minimal 11 + Meta 92 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >

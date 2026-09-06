@@ -5,43 +5,55 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (126 jobs)` — **112 módulos** (Minimal 11 + Meta 90 + Full 11) + 0 en
+`Build completed successfully (128 jobs)` — **114 módulos** (Minimal 11 + Meta 92 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
+🏁 Después del merge se cerraron **dos frentes más**, los dos net‑0 y los dos documentados en
+**§3.41** de `doc/REFERENCE-Incompleteness.md`: **B3.2** (`Meta/EvalSubsttcPrf.lean`) y **el
+chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`).
 
-> # 🎯 SIGUIENTE SESIÓN — **la rama C está cerrada; el cuello de botella se mueve**
+> # 🎯 SIGUIENTE SESIÓN — **B3.4, que ya no tiene prerrequisitos**
 >
-> Todo lo medido: **§3.38** (las dos clausuras), **§3.39** (① y ②), **§3.40** (③ y el cierre) de
-> `doc/REFERENCE-Incompleteness.md`.
+> ## 🏁 Lo que se cerró el 2026‑09‑07 (después del merge)
 >
-> ## 🏁 Lo que se cerró
+> * **B3.2 · `Meta/EvalSubsttcPrf.lean`** (§3.41.1) — `pcc_eval_substtc` / `pcc_eval_substtsc` /
+>   `pcc_eval_substtc_hasWit` en producción, con `v`,`s`,`t` **abstractos**. Footprint = la base
+>   sancionada. De 154 declaraciones entraron **71**. **Era el prerrequisito de B3.4.**
+> * **El chasis de `hGuard`** (§3.41.3) — `Meta/LineWFGuardPrf.lean`, net‑0 **puro**.
+>   `hcond_absorbe_extra` (que vivía en **cinco copias fuera del build**) y
+>   ⭐ `hcond_absorbe_cascade`, que **reduce la deuda de los 7 tags a DOS lemas genéricos**.
 >
-> * **①** `Meta/SubstfcWitnessPrf.lean` — `prf_hasWit_substtc` y `prf_hasWitF_substfc`, net‑0 puro.
-> * **②** `MpCodePrf`: los 10 sitios; la mitad CÓDIGO se paga entera ahí (tres lemas).
-> * **③** los **29 módulos** bloqueados. La escalera de aridad (§28), `hw_auto` + `autoParam`, y
->   dos lemas por inducción para `CTree`.
-> * ✅✅ **La línea roja de ADR‑020, comprobada y con razón ESTRUCTURAL** (§3.40.3):
->   `d3_prf_of_chainOkDot` y `pcc_lineWF_tracked_modulo_7` conservan su firma exacta, porque la
->   guarda va DENTRO del `⇔` objeto y le llega al reflector como conjunto objeto, no como hipótesis.
-> * ✅ Las **dos** deudas de ADR‑019 (`BdAllIntroPrf`, `EvalLiftcPrf`), saldadas.
+> ## ▶ LO QUE TOCA AHORA
 >
-> ## ▶ LO QUE TOCA AHORA — quedan DOS frentes por decidir
+> **(1) B3.4 — el cuello de botella de fondo, y ya sin prerrequisitos.** El cierre de
+> `pcc_eval_substfc_wit` son **554** declaraciones, **131** a promover, y tocaba **13 módulos de
+> los que 8 no compilaban**: ya compilan los 13, y ya está B3.2. ⚠️ **RE‑MEDIR antes de
+> empezar** — y ahora se sabe cómo: [[feedback-promover-un-sondeo]] y §3.41.2. La medición de
+> B3.2 desmintió al plan **tres veces** (13 colisiones medidas → 83 reales; 3 duplicados no
+> alcanzables → 14; y dos `def` homónimos que ningún comparador de enunciados separa).
+> ⚠️ El asset `sondeos/EvalSubstfcPrf.lean` tenía **66 errores** en su último intento de
+> reparación, y las fallas estaban en bloques que el plan medido manda **borrar**: repararlos
+> antes de decidir el payload es trabajo tirado.
 >
-> ~~**(a) INTEGRAR `via-c-adr020` en `master`.**~~ ✅ **HECHO** (2026‑09‑07, merge `7bc2c8a`),
-> con el build verificado verde **después** del merge. El inventario no se movió: 7 `axiom` de
-> Lean, 141 axiomas objeto, de los que se **sustituyen** 7 sin añadir ninguno.
+> **(2) C3 — los 7 reflectores de `lineWF`, cuyo chasis ya está puesto.**
+> `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar esos 7 cierra `pcc_lineWF_tracked` y que no
+> hay nada más aguas abajo (§3.40.3 confirmó que **sigue valiendo bajo la enmienda**). Lo que
+> queda de C3, con el chasis en producción:
 >
-> **(b) B3.4 — el cuello de botella de fondo, ahora DESBLOQUEADO.** Era lo que ③ liberaba: el
-> cierre de `pcc_eval_substfc_wit` son **554** declaraciones, **131** a promover, y tocaba
-> **13 módulos de los que 8 no compilaban**. Ya compilan los 13. ⚠️ **RE‑MEDIR antes de empezar**:
-> parte de esas 131 pueden haber entrado con las promociones de ①–③.
+> | pieza | estado |
+> |---|---|
+> | la absorción del conjunto extra | ✅ `hcond_absorbe_cascade` (§3.41.3) |
+> | `DEUDA_hGuardT` (reflector Σ₁ de `hasWit`) | ⬜ **enunciada, no probada** |
+> | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada** |
+> | `hCarc` | ⬜ lo compra B3.4 (`pcc_eval_substfc_wit` pasa a ser una MP) |
+> | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
+> | A5 más allá del nivel `zero` | ⬜ generalización |
 >
-> **(c) C3 — los 7 reflectores de `lineWF`.** `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar
-> esos 7 cierra `pcc_lineWF_tracked` y que no hay nada más aguas abajo, y §3.40.3 acaba de
-> confirmar que esa afirmación **sigue siendo verdadera bajo la enmienda**. Ahora la guarda llega
-> a cada reflector como **conjunto objeto dentro del `⇔`**, que es justo lo que
-> `hcond_absorbe_extra` sabe absorber.
+> Para las dos deudas, lo que ya hay está medido en **§3.41.5**: los átomos con términos
+> **abstractos** (`pcc_lt_tracked`, `pcc_eq_tracked`), el `∀` acotado (`pcc_bdAll_intro`) y el
+> `∃` sin cota (`pcc_exIntro_code_open`). Falta el **recorrido** de `isTC1`/`isFC1` bajo el `∃`.
+> Es un ensamblaje, no una inducción nueva.
 >
 > Y detrás siguen **D** (`hC_dot` → D3 real), **E** (Gödel II sin `axiom d3`) y el frente
 > independiente **F** (`⊬¬G`, sólo `NegVerifier` abierto).
@@ -52,15 +64,21 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >    está mal* (el censo por API mide la onda inicial: medí 44 y un módulo que daba *uno* tenía
 >    *diez*). «¿Qué forma tienen?» dio **6 lemas en vez de 35** y **una táctica en vez de 200
 >    anotaciones**. La leí en el módulo veinte.
-> 2. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
+> 2. ⭐ **Y COMPROBAR la forma medida contra el original, con `rfl`.** Una abstracción puede ser
+>    correcta *sobre la fórmula equivocada* y compilar igual: el conjunto extra de ADR‑020 no es
+>    un par de guardas sino una **cascada** de 1–3, y sólo lo dijeron los siete `rfl` de §3.41.4
+>    —que además cazaron tres tags mal supuestos—.
+> 3. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
 >    de la táctica importa: las estructurales ANTES que `prf_hasWit_tc`, o el unificador despliega
 >    `termCode` y agota los heartbeats.
-> 3. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
+> 4. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
 >    `CTree` se paga por inducción; arrastrar habría contaminado el chasis).
-> 4. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
-> 5. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
+> 5. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
+> 6. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
 >    nombre del `export` **y** del `#print axioms` del donante — si no, es error duro.
-> 6. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
+>    ⚠️ Y **un duplicado sólo se borra si el original es ALCANZABLE**: 14 de los 66 de B3.2
+>    vivían en módulos que el sondeo no abría (§3.41.2).
+> 7. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
 >    prohibido editar), uno que propone y uno que refuta con sesgo hacia PAGAR. 26 sitios,
 >    0 refutados, 26 `patch_old` casando de forma única (§3.40.8).
 ---
@@ -168,32 +186,31 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >           · ⚠️ 4 RETIRADAS POR MUERTAS: paso2_caso_bin/_impl/_and/_or, CERO
 >             consumidores de codigo (solo prosa). El ensamblaje real usa
 >             paso2_caso_bin_imp, en MONEDA OBJETO -- la HI llega como hipotesis.
->     B3.2 ⏳ EvalSubsttc -> Meta/EvalSubsttcPrf.lean. MEDIDO: de 156 a 70.
->           ✅ condicion 5 HECHA: la escalera psi de nivel 2 y 3 (psi_lift_form2,
->              psi_lift_form3, PSI_inst3, genericos en Phi) SUBIDA a StrongInductionPrf.
->              🔑 Con ella se cazo el DUPLICADO nº69, invisible a TODO censo:
->                 psi_substtc_l1 ES psi_lift_form instanciado a Phi := PHIsubsttc.
->                 No es una copia, es una INSTANCIA -- se le escapa al indice por
->                 nombre Y al comparador de enunciados. Sirve a TRES frentes
->                 (EnsamblajeTriple y EnsamblajeMedida llevan el bloque igual).
->           ⬜ QUEDAN LAS CUATRO CONDICIONES, en este orden:
->              1. RENOMBRAR ANTES DE MOVER: 13 colisiones vivas (3 mas son muertas y
->                 se caen solas). NUEVE estan exportadas a la raiz => el modulo NO
->                 COMPILA sin esto.
->                 ⚠️ SEMANTICA MEDIDA, no supuesta: dentro del modulo el local gana;
->                    fuera sin homonimo local resuelve a produccion; EL PELIGRO es un
->                    CONSUMIDOR AGUAS ABAJO que abre el modulo nuevo con el export de
->                    LiftcCodePrf visible -- dos candidatos, y Lean elige POR
->                    ELABORACION. Compilados los dos casos con el MISMO texto pelado:
->                    ambos verdes. Fallo SILENCIOSO.
->              2. Los TRES sin exportar: prf_cdrc_cons, wfAll1Body,
->                 PrfH_congr_isTermCodeE1 viven en CodeWitnessPrf.SinWTs SIN export y
->                 el sondeo no abre ese namespace. Hace falta el `open` o cualificar.
->              3. BORRAR el §13 (9 decls) y las 3 muertas. ⚠️ Aparecen tambien en el
->                 bloque de footprint del sondeo: un borrado MECANICO rompe ahi.
->              4. `export` POR CONSUMO (criterio B2b), no por existencia.
->           ⭐ El §13 entero SOBRA: produccion prueba pcc_eval_pred SIN GUARDA, o sea
->              algo mas fuerte que PredHyp -- que ni existe en produccion.
+>     B3.2 ✅ CERRADO 2026-09-07. Meta/EvalSubsttcPrf.lean, net-0 (base sancionada).
+>           El plan decia «de 156 a 70»: de 154 entraron 71. Y la promocion fue sobre
+>           todo BORRADO -- 83 declaraciones se caen. Detalle en §3.41.1-§3.41.2.
+>           ⚠️ LA MEDICION DEL PLAN ESTABA MAL EN TRES SITIOS, y todas caducaron por lo
+>              mismo: se midieron antes de que entraran 29 modulos y SubstfcWitnessPrf.
+>              · «13 colisiones» -> **83** (67 duplicados + 16 homonimos).
+>              · «los TRES sin exportar» -> **14** duplicados NO ALCANZABLES. Los otros
+>                11 son de LiftcCodePrf/EvalPredPrf, que el sondeo no abria. Se arreglan
+>                con tres `open` -- y los `open` solo son seguros PORQUE se renombraron
+>                los homonimos primero.
+>              · «el §13 (9 decls)» -> 8. Y si, SOBRABA ENTERO: produccion prueba
+>                pcc_eval_pred' SIN GUARDA. PredHyp se descarga en TRES lineas
+>                (prf_pred_dot_guarded) y desaparece de las OCHO firmas que la
+>                arrastraban; con ella caen las tres primadas del §14.
+>           ⛔ LA TRAMPA NUEVA, y no la veia ningun censo: PHI y PHIbody chocaban con
+>              EvalLiftcPrf con la MISMA FIRMA (`def _ : Formula`) y CUERPO DISTINTO.
+>              Un comparador de ENUNCIADOS los da por duplicados y borrarlos habria
+>              cambiado el predicado de la induccion EN SILENCIO. Para def/abbrev hay
+>              que comparar CUERPO; para theorem basta la firma.
+>           ✅ condicion 5 (la escalera psi) ya estaba hecha; el mismo patron volvio a
+>              cobrar: psi_l1/l2/l3 y PSI_inst eran INSTANCIAS de psi_lift_form3 /
+>              PSI_inst3 con Phi := PHIsubsttc. Cuatro mas que no eran copias.
+>           ✅ export POR CONSUMO, medido: 46 de las 71 estan referenciadas de hecho por
+>              sondeos/EvalSubstfcPrf.lean y sondeos/HasWitFReal.lean.
+>           📖 El metodo, para B3.3 y B3.4: memoria [[feedback-promover-un-sondeo]].
 >     B3.3 ⬜ SubstfcEx. MEDIDO: de 104 que faltan, 49 NO se promueven (47%), 47 BAJAN
 >           a modulos existentes y solo 8 plantean modulo nuevo. Recomendacion del
 >           analisis: MEZCLA, y practicamente SIN MODULO NUEVO.
@@ -274,7 +291,7 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >            godelCN tiene 483 dependencias y NINGUNA es `axioms`. G, como FORMULA, no
 >            cambia. Lo que cambia es la TEORIA de la que G habla -- puede seguir siendo
 >            motivo para no hacerlo, pero es OTRO argumento y mucho mas debil.
->   C3 ⬜ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7. El arbol
+>   C3 ⏳ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7. El arbol
 >         YA esta verde, asi que sus reflectores son lo unico que queda de la rama C.
 >         ✅ pcc_lineWF_tracked_modulo_7 GARANTIZA que cerrar esos 7 cierra
 >            pcc_lineWF_tracked, y que no hay nada mas aguas abajo
@@ -282,6 +299,39 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >            guarda va DENTRO del ⇔ OBJETO, luego le llega a cada reflector como
 >            CONJUNTO OBJETO extraido de `lineWF t` -- que es justo lo que
 >            `hcond_absorbe_extra` sabe absorber.
+>         ✅ C3a HECHA 2026-09-07: EL CHASIS, en Meta/LineWFGuardPrf.lean, net-0 PURO.
+>              · hcond_absorbe_extra ENTRA EN EL BUILD. Vivia en CINCO copias fuera
+>                (SegundoMuro, MedirC_Carga, MedirC_Enmienda, y dos de Probe/). Una
+>                decision no deberia descansar en una pieza que el arbol no compila.
+>              · ⭐ hcond_absorbe_cascade: absorbe la cascada ENTERA por induccion sobre
+>                la lista de casillas => LA DEUDA DE LOS 7 TAGS SON **DOS** LEMAS
+>                GENERICOS, no siete ni once. El indice de casilla es un parametro.
+>              · DEUDA_hGuardT / DEUDA_hGuardF ENUNCIADAS, no postuladas (abbrev de
+>                Prop). CERO axiom nuevos.
+>              ⚠️ Y CORRIGIO EL DISENO: el conjunto extra NO es un par, es una CASCADA
+>                 anidada a la derecha de 1-3 guardas, con hasWitF ANTES que hasWit:
+>                    q1(9) q2(10) len4 [witF@2, wit@3]     ind(18)     len3 [witF@2]
+>                    q3(11)       len4 [witF@3]            qconf(19)   len4 [witF@2]
+>                    leibniz(13)  len5 [witF@2,wit@3,wit@4] listInd(20) len3 [witF@2]
+>                 7 witF + 4 wit = los 11 conjuntos de la ADR. ✔ Escrito como par habria
+>                 sido un lema CORRECTO SOBRE LA FORMULA EQUIVOCADA -- y habria
+>                 compilado. §2.1 del modulo lo COMPRUEBA con siete `rfl` contra
+>                 Minimal/Axioms.lean, y el rfl cazo tres tags mal supuestos.
+>         ⬜ C3b LO QUE QUEDA: DEUDA_hGuardT y DEUDA_hGuardF. MEDIDO lo que ya hay:
+>              · atomos con terminos ABSTRACTOS: pcc_lt_tracked, pcc_eq_tracked. La
+>                reflexion de una ecuacion NO necesita numerales: sale por congruencia
+>                dotada (PrfH_congr_tcFn + Leibniz sobre Prov(a. = a.)).
+>              · ∀ acotado: pcc_bdAll_intro (BdAllIntroPrf:313), keystone de hC_dot, que
+>                ademas ya lleva la guarda hasWitF de ADR-020 en sus hipotesis.
+>              · ∃ sin cota: pcc_exIntro_code_open (Delta0ReflectPrf:74).
+>              · prf_In_iff_boundedIn (BoundedInPrf:391) reduce el atomo In a un ∃ acotado.
+>              FALTA el RECORRIDO de isTC1/isFC1 bajo el ∃: la disyuncion de formas
+>              (isTermCodeE1, y las OCHO clausulas de isFormCodeE2) y el argsIn interno,
+>              que es un segundo ∀ acotado anidado. Es ENSAMBLAJE, no induccion nueva.
+>              ⛔ Sigue vivo: la guarda DISCRIMINA (CRIT_hasWitF_rejects_varc), luego NO
+>                 se puede descargar para codigo abstracto (Probe/MC_enmienda.lean §8).
+>         ⬜ C3c pcc_eval_liftfc: NO EXISTE EN NINGUN SITIO. Trabajo nuevo, no promocion.
+>         ⬜ C3d A5 generalizada mas alla del nivel `zero`.
 >   C4 ✅ PROPAGACION HASTA EL VERDE -- HECHA (2026-09-07). Build 126 jobs, VERDE.
 >         ① ✅ HECHA: Meta/SubstfcWitnessPrf.lean (1912 l., net-0 puro). Sin ciclo,
 >              como estaba medido. ADR-019 TRES veces al promover.
