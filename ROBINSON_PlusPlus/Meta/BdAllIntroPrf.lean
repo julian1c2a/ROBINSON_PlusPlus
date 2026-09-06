@@ -66,20 +66,10 @@ theorem prf_congr_orc {a a' b b' : Term} (ha : Prf (a =eq a')) (hb : Prf (b =eq 
   exact prf_congr_cons_tail
     (prf_eq_trans (prf_congr_cons_head ha) (prf_congr_cons_tail (prf_congr_cons_head hb)))
 
-/-- Congruencia de `substfc` en el código (3er arg), en `PrfH` (espejo de `PrfH_congr_substtc3`). -/
-theorem PrfH_congr_substfc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a =eq b)) :
-    PrfH Γ (substfc v s a =eq substfc v s b) := by
-  let f : Formula := Formula.eq (substfc (liftTerm 0 v) (liftTerm 0 s) (liftTerm 0 a))
-                                (substfc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
-  have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substfc v s a) (substfc v s u) := by
-    intro u
-    simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (substfc v s a)) Γ)
-
-/-- Congruencia de `substfc` en el código (3er arg). -/
-theorem prf_congr_substfc3 {v s a b : Term} (h : Prf (a =eq b)) :
-    Prf (substfc v s a =eq substfc v s b) :=
-  prfH_nil_to_prf (PrfH_congr_substfc3 (Γ := []) (prf_to_prfH h [])) rfl
+/-! ⚠️ **`PrfH_congr_substfc3` y `prf_congr_substfc3` BAJARON a `Meta/NumCodeClosedPrf.lean`**
+    (2026-09-06, ADR-019), junto a sus hermanas de `liftc`/`substtc`. La clausura de `hasWitF`
+    bajo `substfc` las necesita y vive **aguas arriba** de este módulo; no se puede hacer
+    corolario al de abajo. Llegan aquí por el `export` de `NumCodeClosedPrf`. -/
 
 /-! ### Piezas objeto de `<` que faltaban -/
 
@@ -408,7 +398,7 @@ theorem pcc_bdAll_intro
 end ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
-  prf_congr_orc PrfH_congr_substfc3 prf_congr_substfc3
+  prf_congr_orc
   prf_lt_succ_of_lt prf_lt_succ_split' pcc_eq_symm_code_internal
   pcc_bdAll_base splitSchema pcc_lt_succ_split_code pcc_bdAll_step
   PrfH_weaken_code PrfH_imp_trans_code PrfH_or_elim_imp_code PrfH_bdAll_step

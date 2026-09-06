@@ -7,7 +7,7 @@
 **Estado 2026‑09‑06 · rama `via-c-adr020` · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`**
 **`master` sigue VERDE en `97f2a37`.** La parada es **CONOCIDA y localizada**, en mitad de la
 ejecución de la **vía C** ([ADR‑020](DECISIONS.md)) — **no es una regresión**. Todo lo demás verde.
-**125 jobs · 111 módulos activos (Minimal 11 + Meta 89 + Full 11) + 0 en `cuarentena/` · 60 `sondeos/`**
+**126 jobs · 112 módulos activos (Minimal 11 + Meta 90 + Full 11) + 0 en `cuarentena/` · 60 `sondeos/`**
 **7 `axiom` de Lean · 0 sorrys.**
 
 > # 🎯 SIGUIENTE SESIÓN — **propagar hasta el verde. No queda matemática por hacer**

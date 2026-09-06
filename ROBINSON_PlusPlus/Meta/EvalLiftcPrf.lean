@@ -287,30 +287,10 @@ theorem PrfH_congr_targetLiftsc {Γ : List Formula} {s s' : Term} (h : PrfH Γ (
     fabricar (ordena valores, no descompone). Sale de `prf_list_induction` con un paso que
     **no usa la hipotesis de induccion**: `prf_consOk_cons` a secas. -/
 
-def nilOrCons : Formula := lor (Formula.eq (.var 0) nil) (consOk (.var 0))
-
-theorem nilOrCons_at (Y : Term) :
-    substFormula 0 Y nilOrCons = lor (Formula.eq Y nil) (consOk Y) := by
-  simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, substFormula, substTerm,
-    substTerms, if_true]
-
-theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
-  refine prf_list_induction nilOrCons ?base ?step
-  · rw [nilOrCons_at]
-    exact prf_orL (prf_refl nil)
-  · refine Prf.gen _ (Prf.gen _ ?_)
-    have hR : substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nilOrCons))
-        = lor (Formula.eq (cons (.var 1) (.var 0)) nil) (consOk (cons (.var 1) (.var 0))) := by
-      simp only [nilOrCons, consOk, lor, carc, cdrc, cons, nil, zero, liftFormula, substFormula,
-        liftTerm, liftTerms, substTerm, substTerms, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
-        reduceIte, if_true]
-    rw [hR]
-    exact prf_mp (Prf.incl (Prf₀.p1 _ _)) (prf_orR (prf_consOk_cons _ _))
-
-/-- **`⊢ Y ≐ nil ∨ consOk Y`** con `Y` **abstracto** (puede ser `#0`). -/
-theorem prf_nil_or_cons (Y : Term) : Prf (lor (Formula.eq Y nil) (consOk Y)) := by
-  have h := prf_spec prf_nil_or_cons_all Y
-  rwa [nilOrCons_at] at h
+/-! ⚠️ **`nilOrCons`, `nilOrCons_at`, `prf_nil_or_cons_all` y `prf_nil_or_cons` BAJARON a
+    `Meta/SubstfcWitnessPrf.lean`** (2026-09-06, ADR-019). La clausura de `hasWitF` bajo `substfc`
+    los necesita y vive **aguas arriba** de este modulo, asi que hubo que reproducirlos alli; en
+    vez de dejar el duplicado, baja el general. Llegan aqui por su `export` a la raiz. -/
 
 /-! ## §3 · `argsIn` se parte en CABEZA y COLA
 
@@ -670,7 +650,9 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
   --    MISMA raiz: bajaron alli. Exportar aqui un nombre que el modulo ya no declara es
   --    error de elaboracion, no un aviso.
   PrfH_congr_targetLiftsc
-  nilOrCons nilOrCons_at prf_nil_or_cons_all prf_nil_or_cons
+  -- ⚠️ `nilOrCons` / `nilOrCons_at` / `prf_nil_or_cons_all` / `prf_nil_or_cons` ya NO se
+  --    exportan desde aqui: BAJARON a `Meta/SubstfcWitnessPrf.lean`, que los exporta a la
+  --    MISMA raiz. Exportar un nombre que el modulo ya no declara es ERROR DURO.
   -- ⚠️ `prf_argsIn_head` / `prf_argsIn_tail` ya NO se exportan desde aqui: viven en
   --    `Meta/CodeWitnessPrf.lean` (`SinWTs`), que es donde esta `PrfH_inst_argsIn`.
   -- ⚠️ `prf_isTermCodeE1_of_boundedIn` / `_of_In` ya no se exportan desde aqui: viven en
@@ -702,7 +684,7 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftc
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_step
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_all
-#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.prf_nil_or_cons
+#print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons
 #print axioms ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLift_real
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLiftsc_real
