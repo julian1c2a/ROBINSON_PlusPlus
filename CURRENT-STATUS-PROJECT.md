@@ -1,24 +1,29 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-06 · rama `via-c-adr020` · **VÍA C EJECUTADA** (ADR-020) · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`
+> ## ESTADO REAL — 2026-09-06 · rama `via-c-adr020` · **VÍA C EJECUTADA** (ADR-020) · ⚠️ ÁRBOL ROJO en `Meta/EvalArithPrf.lean`
 >
 > ⚠️ **La parada es CONOCIDA y localizada, no una regresión**: la enmienda de los 7 esquemas está
 > aplicada y todo lo demás compila. `master` sigue **VERDE** en `97f2a37`; el trabajo vive en la
 > rama **`via-c-adr020`**.
 >
-> 🏁 **2026-09-06: LA PIEZA QUE FALTABA ESTÁ PROBADA.** `prf_hasWitF_substfc` — `hasWitF` es
-> cerrado bajo `substfc`, con código y sustituyendo ABSTRACTOS (`sondeos/ClausuraSubsttc.lean`,
-> 1 911 l., 0 sorrys, **net-0 puro**), junto con la mitad TÉRMINO `prf_hasWit_substtc`.
-> **Ya no queda ninguna pieza matemática por demostrar para el verde**: lo que resta es
-> PROPAGACIÓN, medida en **§3.38.3** — ① promover el sondeo (medido: **sin ciclo de imports**),
-> ② enmendar **9 lemas** de la familia `pcc_*_inst*` en `MpCodePrf` (**10 errores**, todos ahí),
-> ③ **~40 sitios** de llamada en 18 de los 29 módulos bloqueados, de los que la inmensa mayoría
-> **PAGA** con `prf_hasWit_tcFn`.
+> 🏁 **2026-09-06: LA PIEZA QUE FALTABA ESTÁ PROBADA, Y EN PRODUCCIÓN.**
+> `prf_hasWitF_substfc` — `hasWitF` cerrado bajo `substfc`, con código y sustituyendo ABSTRACTOS —
+> junto con la mitad TÉRMINO `prf_hasWit_substtc`, en **`Meta/SubstfcWitnessPrf.lean`** (1 912 l.,
+> 0 sorrys, **net-0 puro**). **Ya no queda ninguna pieza matemática por demostrar para el verde.**
+>
+> ✅ **① promoción HECHA** (medido: sin ciclo de imports; y ⛔ ADR-019 **tres veces**: `PSI_inst4`
+> sube a `StrongInductionPrf`, `PrfH_congr_substfc3` baja de `BdAllIntroPrf` a `NumCodeClosedPrf`,
+> `prf_nil_or_cons` baja de `EvalLiftcPrf`).
+> ✅ **② `MpCodePrf` VERDE**: los 10 errores cerrados, la familia `pcc_*_inst*` enmendada.
+> ⏳ **③ EN CURSO**: el árbol para ahora en **`Meta/EvalArithPrf.lean`** con **4 errores**.
+> Censo re-medido (**§3.39.3**): **40 sitios** en 21 de los **29** módulos bloqueados; **22 pagan**
+> con `prf_hasWit_tcFn`, y aparece un **segundo frente** que §3.38.3 no había contado —
+> `pcc_leibniz_code`, 6 sitios.
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.38.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.39.
 >
 > **Build 126 jobs · 0 sorrys · Lean v4.31.0** (⚠️ con la parada conocida arriba).
 > **112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**

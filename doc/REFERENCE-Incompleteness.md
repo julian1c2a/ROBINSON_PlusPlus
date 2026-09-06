@@ -2730,3 +2730,86 @@ incógnita: `CodeCtorKit`, `CodeTreeReflect`, `D3DottedPrf`, `Delta0ReflectPrf`,
 **Resumen**: ① promoción + ② 9 firmas + ③ ~40 anotaciones de una línea. **Ninguna pieza matemática
 nueva** — todo lo que hacía falta demostrar está demostrado. Lo que queda es propagación, y por
 primera vez cada eslabón tiene con qué pagar.
+
+---
+
+## §3.39 · ① y ② EJECUTADOS — la clausura en producción, `MpCodePrf` VERDE, y ③ RE‑MEDIDO (2026‑09‑06c)
+
+### 3.39.1 · ① `Meta/SubstfcWitnessPrf.lean` — y **ADR‑019 tres veces en la misma pasada**
+
+Las dos clausuras dejan el sondeo y entran en producción: **1 912 líneas, 0 sorrys**, footprint
+`[propext, Classical.choice, Quot.sound]`. El árbol pasa a **112 módulos** (Meta 90).
+
+Medido antes de mover, como manda §3.36.1: **no había ciclo**. El cierre de los 6 imports del
+sondeo son 46 módulos y **ninguno depende de `MpCodePrf`**; 5 de los 6 ya estaban dentro de los 51
+que `MpCodePrf` importa. Cabe justo debajo, sin mover nada más.
+
+🔑 **Pero el árbol rojo había dejado tres piezas reproducidas, y al promover NO se dejan
+duplicados: se BAJA el general** (⛔ ADR‑019, tres veces seguidas):
+
+| pieza | de | a | por qué |
+|---|---|---|---|
+| `psi_lift_form4`, `PSI_inst4` | (nuevas) | `Meta/StrongInductionPrf.lean` ⬆ | son maquinaria **genérica** de la inducción fuerte, no del frente: el cuarto escalón de la escalera psi, que `PHIF` necesita por tener **cuatro** binders |
+| `PrfH_congr_substfc3`, `prf_congr_substfc3` | `Meta/BdAllIntroPrf.lean` | `Meta/NumCodeClosedPrf.lean` ⬇ | su sitio natural, al lado de las hermanas de `liftc`/`substtc` |
+| `nilOrCons`, `nilOrCons_at`, `prf_nil_or_cons_all`, `prf_nil_or_cons` | `Meta/EvalLiftcPrf.lean` | `Meta/SubstfcWitnessPrf.lean` ⬇ | la clausura las necesita y vive **aguas arriba** |
+
+⚠️ En los dos borrados hay que quitar el nombre del bloque `export` **y** del `#print axioms`:
+exportar o imprimir una constante que el módulo ya no declara es **error duro**. Los dos módulos
+donantes están aguas abajo y hoy no compilan, así que esos borrados **se verificarán al llegar
+a ellos** — es deuda anotada, no verificada.
+
+⚠️ **Y la trampa de las COLISIONES, evitada por construcción.** La familia `PHI`/`PHI_at`/
+`PHI_step`/… del sondeo colisiona con las de `EvalLiftcPrf` y `HasWitTcFnPrf` — mismo nombre, OTRO
+predicado. Renombrada a `PHIT…`, porque el fallo que evita es **silencioso**: un consumidor aguas
+abajo con dos candidatos elige **por elaboración** (§3.35.6). Y 29 nombres cortos de andamiaje
+(`CTX*`, `AF`, `BF`, `NN`, `HD`, `TL`, `caso*`) van **`private`**, para que ni siquiera sean
+visibles desde fuera.
+
+### 3.39.2 · ② `MpCodePrf` VERDE — la mitad código se paga ENTERA aquí
+
+Los **10** errores cerrados; el módulo compila. Diez lemas enmendados: `pcc_thm_inst`/`_inst2`/
+`_inst3`/`_inst4`, `pcc_axiom_inst`/`_inst2`/`_inst3`/`_inst4` y los envoltorios `pcc_ax4_inst`/
+`pcc_ax5_inst`.
+
+🔑 **Tres lemas de pago, uno por forma en que aparece el `Ac` de cada eliminación:**
+
+| lema | el código es | quién lo paga |
+|---|---|---|
+| `prf_hasWitF_fc_lift` | `⌜φ⌝`, y `forallc ⌜φ⌝` que **es** `⌜∀φ⌝` | `prf_hasWitF_fc` + `liftTerm_formCode` |
+| `prf_hasWit_liftc_lift` | el **sustituyendo levantado** | `CRIT_hasWit_lift` (existía desde B1: era «el molde de A5») |
+| `prf_hasWitF_substfc_lift` | el código **ya sustituido** | ⭐ `prf_hasWitF_substfc`, la clausura de ① |
+
+En `pcc_thm_inst4` la torre llega a **tres** `substfc` anidados y **tres** `liftc` encadenados
+sobre el mismo testigo; sale por composición de esos tres lemas, sin nada nuevo.
+
+⚠️ **Los `Ac` van escritos ENTEROS en cada eliminación, no `_`**: con la guarda como argumento, el
+metavariable del código ya no se resuelve solo por unificación con el `prf_mp`. Es la regla de
+«escribir el tipo entero» (§3.37.4.3) apareciendo en un sitio nuevo.
+
+### 3.39.3 · 📏 ③ RE‑MEDIDO — el árbol para ahora en `Meta/EvalArithPrf.lean`
+
+**Cuatro** errores, y confirman el criterio de ADR‑020 **en vivo**:
+
+* `EvalArithPrf:88` `pcc_ax4_inst (tcFn a)` y `:279` `pcc_ax5_inst (tcFn a) B` — testigo `tcFn`
+  ⇒ **PAGAN** con `prf_hasWit_tcFn`.
+* `EvalArithPrf:298` y `:365` `pcc_leibniz_code Ac t₁ t₂` con los tres abstractos ⇒ **ARRASTRAN**.
+
+⚠️ **La topología no ayuda**: `EvalArithPrf` domina casi el mismo cono que `MpCodePrf` (28 módulos
+detrás, contra 29). Aquí el DAG es una **cadena**, así que cada módulo que se cierra libera pocos
+y hay que recorrerlos casi de uno en uno.
+
+**Censo actualizado sobre los 29 módulos bloqueados** (incluido `EvalArithPrf`):
+
+| | |
+|---|---|
+| sitios de API enmendada | **40**, repartidos en **21** módulos |
+| de ésos, con testigo `tcFn` en la línea | **18** ⇒ pagan con `prf_hasWit_tcFn` |
+| con `tcFn` en la línea siguiente | 4 más (`LiftcCodePrf` ×3, `SubstfcCodePrf`, `EvalRunFnPrf`) |
+| envoltorios que **arrastran** | `pcc_ax8_inst`/`pcc_ax9_inst` (`EvalMulPrf`), `EvalPredPrf:128`, `DotConsPrf:156`, `InAxiomsCodePrf:188`, `EvalLtPrf:161` |
+| `varc (numeral 0)` | `BdAllIntroPrf:137` ⇒ `prf_hasWit_varc`, que vino con ① |
+| **`pcc_leibniz_code`** | **6 sitios** (`BdAllIntroPrf`, `DotConsPrf`, `EvalArithPrf` ×2, `EvalCarcNthcPrf`, `EvalMulPrf`) — es el **segundo frente**, y no estaba en la cuenta de §3.38.3 |
+| ⭐ sitio realmente nuevo | `EvalBoundedPrf:237`: el código es un `implc` **construido**, no un `formCode` ⇒ `prf_hasWitF_bin 5` |
+
+⚠️ **Corrección a §3.38.3**: allí conté 7 sitios de `pcc_leibniz_code` mirando sólo módulos con
+sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente propio: piden
+`hasWitF Ac` con `Ac` abstracto, así que **arrastran** salvo donde el `Ac` sea un código real.
