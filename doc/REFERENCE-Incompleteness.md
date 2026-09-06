@@ -2813,3 +2813,175 @@ y hay que recorrerlos casi de uno en uno.
 ⚠️ **Corrección a §3.38.3**: allí conté 7 sitios de `pcc_leibniz_code` mirando sólo módulos con
 sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente propio: piden
 `hasWitF Ac` con `Ac` abstracto, así que **arrastran** salvo donde el `Ac` sea un código real.
+
+---
+
+## §3.40 · 🏁 ③ TERMINADO — EL ÁRBOL VUELVE A VERDE y la vía C queda CERRADA (2026‑09‑06d)
+
+```
+Build completed successfully (126 jobs)
+112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
+```
+
+Los **29 módulos** que bloqueaba `MpCodePrf` están cerrados, con la enmienda de los 7 esquemas
+aplicada. Detalle por tramos en los commits `③.1`–`③.12`.
+
+**Censo final, por módulo**: `EvalArithPrf` 4 · `EvalMulPrf` 7 · `DotConsPrf` 5 ·
+`EvalListPrf` 6 · `EvalRunFnPrf` 2 · `EvalLtPrf` 2 · `EvalBoundedPrf` 2 · `EvalNthcPrf` 5 ·
+`Delta0ReflectPrf` 3 · `PropCodePrf` 1 · `EvalCarcNthcPrf` 3 · `D3DottedPrf` 1 · `D3InDotPrf` 9 ·
+`BdAllIntroPrf` 6 · `InAxiomsCodePrf` 7 · `LineWFTrackedPrf` 10 · `LineWFMpPrf` 1 ·
+`LineWFSchemaPrf` 1 · `LineWFThyPrf` 4 · `CodeCtorKit` 9 · `EvalPredPrf` 4 · `LiftcCodePrf` 10 ·
+`LineWFEfqPrf` 5 · `CodeTreeReflect` 13 · `SubstfcCodePrf` 5 · y **CERO** en `LineWFPropPrf`,
+`LineWFAssemblePrf` y `EvalLiftcPrf`.
+
+### 3.40.1 · ⭐ La escalera de aridad, y por qué había que escribirla ANTES
+
+El árbol tiene **~35 constructores de la imagen punteada** (`addcT`, `succcT`, `carcT`, `cdrcT`,
+`nthcT`, `lencT`, `predcT`, `mulcT`, `consT`, `div2cT`, `liftcT`, `liftscT`, `nulT`/`unT`/`binT`,
+`varcT`, `funccT`, `eqcT`, `cpOfT`…), y bajo ADR‑020 cada sitio que los pasa como testigo o como
+código tiene que pagar su guarda.
+
+🔑 **Medido antes de escribir nada: no hacen falta ~35 lemas, hacen falta SEIS.** Todos los de
+sorte TÉRMINO son `funcc (strCode σ) ⟨x₁,…,xₙ⟩` con n ≤ 3, y todos los de sorte FÓRMULA
+(`eqCodeFn`, `atom1CodeFn`, `atom2CodeFn`, `ltCodeFn`, `inFormCodeFn`) son nodos `eqc`/`atomc`.
+Una escalera por **aridad** los cubre a todos, y cada constructor concreto se paga después en una
+línea, aguas abajo, donde esté definido.
+
+⚠️ **Una trampa registrada que aquí NO muerde, comprobada con `rfl` antes de diseñar**:
+`eqCodeFn` usa `Godel.numeral 4` y `eqc` usa `numeralM 4`, que son **dos constantes distintas**
+(trampa nº5 del registro de notación). Pero con el índice **literal** las dos reducen a
+`succ⁴ zero`, así que `eqCodeFn a b` **es** `eqc a b` definicionalmente. Cero puentes.
+
+### 3.40.2 · 🔑 El reparto PAGAR vs ARRASTRAR, confirmado módulo a módulo
+
+| quién | qué hace |
+|---|---|
+| los **envoltorios genéricos** (`pcc_ax8_inst`, `pcc_rw`, `pcc_leibniz_apply`, `pcc_eq_trans_code`, `pcc_congr_*`, `pcc_bdAll_step`, `pcc_in_tail_tracked`…) | **ARRASTRAN**: su código/testigo es un parámetro abstracto |
+| las **hojas** (`pcc_eval_add_succ_imp`, `pcc_eval_mul_succ_imp`, `pcc_dot_cons`, los cuatro `paso6_backbone*`, `pcc_eqDot`…) | **PAGAN**, casi siempre con `prf_hasWit_tcFn` |
+
+⭐ Y un caso que enseña la forma correcta de pensarlo: `pcc_rw_dot_cons_un` **arrastra y paga a la
+vez** — arrastra la guarda del contexto (`hasWit (F (varc 0̄))`, con `F` una función abstracta) y
+**paga por dentro** los dos testigos de la igualdad `pcc_dot_cons`, que son concretos. No es que un
+lema arrastre *o* pague: arrastra lo que no puede ver y paga lo que sí.
+
+### 3.40.3 · ✅✅ LA LÍNEA ROJA DE ADR‑020, COMPROBADA
+
+```
+theorem d3_prf_of_chainOkDot (φ : Formula)
+    (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot)) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
+```
+
+**Conserva su firma exacta.** Ni una guarda sube hasta D3: las de `hI_dot` se descargan enteras
+dentro de `D3InDotPrf` (`bdCarcBAt` por la escalera + `prf_hasWit_liftc`; `bdCarcPhicAt` por
+`prf_hasWitF_eq2` + `prf_hasWit_tc`; el convertidor de frontera con `prf_hasWit_tc` puro). Era la
+condición de la vía C — si llegase colgando, la D3 resultante sería **vacua**, que es exactamente
+por lo que la vía (B) está refutada.
+
+⭐ **Y el ENSAMBLAJE también, con razón ESTRUCTURAL y no por suerte.** `pcc_lineWF_tracked_modulo_7`
+y `pcc_lineWF_tracked_of_branches` conservan su enunciado exacto, y sus 7 hipótesis pendientes
+siguen siendo las 7 formas **sin guarda**. El motivo:
+
+> ADR‑020 mete la guarda **DENTRO del `⇔` OBJETO** (`Minimal/Axioms.lean:1339,1345,1351,1357,1363,
+> 1369,1375`). Al reflector le llega como **conjunto objeto** extraído de `lineWF t`, no como
+> hipótesis Lean — y por tanto **no puede** aparecer en su firma.
+
+🔑 Esa es exactamente la propiedad que hace viable la vía C, y hasta ahora era un argumento; desde
+hoy es una comprobación. Corolario que conviene dejar escrito: la afirmación de
+`LineWFAssemblePrf` («cerrar `pcc_lineWF_tracked` es *exactamente* cerrar esos 7 reflectores; no hay
+ninguna otra pieza aguas abajo») **sigue siendo verdadera bajo la enmienda**, y el ensamblaje lo
+demuestra sin cambiar ni una línea. El chasis tampoco arrastra: `pcc_lineWF_tracked_of_schema` y
+`pcc_lineWF_tracked_of_tree` no mencionan `hasWit` (cero ocurrencias en `CodeTreeReflect.lean`).
+
+✅ **Y las DOS deudas de ADR‑019, saldadas.** Los borrados que no se habían podido compilar:
+`PrfH_congr_substfc3` + su `export` en `BdAllIntroPrf`, y `nilOrCons`/`prf_nil_or_cons` + su
+`export` + su `#print axioms` en `EvalLiftcPrf`. Ni un solo `unknown identifier`; el único uso real
+(`EvalLiftcPrf:442`) resuelve por el `export` a la raíz, y `prf_nil_or_cons` se declara y exporta
+**una sola vez** en todo el árbol.
+
+### 3.40.4 · 📖 Un docstring falso de la SEXTA clase, cazado en vivo
+
+`PropCodePrf.pcc_ind_code` prometía «INDUCCIÓN interna a nivel de código, LIBRE DE MURO: para `Ac`
+**arbitrario**». Bajo ADR‑020 el esquema del tag 18 lleva la guarda dentro ⟹ `Ac` **ya no es
+arbitrario**. Es exactamente la clase que §3.36.7 registró —prosa que *era* cierta y que un cambio
+deliberado falsifica— y **la palabra «arbitrario» estaba en la lista de marcadores léxicos**.
+Corregido en el mismo commit que la firma, que es la única forma de que no salte al libro.
+
+### 3.40.5 · ⚠️ Dos correcciones a lo que §3.39.3 daba por medido
+
+1. **El censo por API mide la ONDA INICIAL, no la propagación.** §3.39.3 contó 44 sitios buscando
+   los nombres de la API enmendada. `LineWFTrackedPrf` daba **uno**; salieron **diez**, porque
+   nueve pasan por lemas del propio módulo que se enmendaron *después* del censo. Cada módulo que
+   arrastra crea sitios nuevos aguas abajo: **44 era una cota inferior, no un total.**
+2. **`pcc_leibniz_code` era un segundo frente de 8 sitios**, no de 6 — el censo original sólo miró
+   módulos que ya tenían sitios de la familia `pcc_*_inst*`.
+
+### 3.40.6 · ⭐⭐ LA LECCIÓN DE MÉTODO, y llegó tarde
+
+Después de veinte módulos anotando guardas a mano, la misma observación que hizo barata la
+escalera —**todos los constructores dotados son `funcc` de aridad ≤ 3**— resulta que también
+permite **automatizar la descarga entera**:
+
+```lean
+syntax "hw_auto" : tactic
+macro_rules | `(tactic| hw_auto) => `(tactic|
+  first | assumption | exact prf_hasWit_tcFn _ | exact prf_hasWit_varc _
+        | (refine prf_hasWit_funcc1 _ _ ?_ <;> hw_auto)
+        | (refine prf_hasWit_funcc2 _ _ _ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWit_funcc3 _ _ _ _ ?_ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWit_liftc ?_ <;> hw_auto)
+        | exact prf_hasWit_tc _)
+```
+
+⚠️ **El orden de las alternativas importa, y no es el obvio**: con `prf_hasWit_tc` delante, el
+unificador prueba `termCode ?t` contra el nodo entero, despliega la recursión de `termCode` y la
+táctica agota los heartbeats (medido: timeout a 200 000). Con las estructurales delante, el nodo se
+descompone y `termCode` sólo se intenta en las hojas.
+
+⭐ Y combinada con **`autoParam`** —`(hwX : Prf (hasWit X) := by hw_auto)`— la propagación se
+vuelve **invisible**: los sitios de llamada no cambian. En `LiftcCodePrf` pasó de 12 errores a 4
+sin tocar una sola llamada.
+
+🔑 **La lección**: cuando una propagación es mecánica y uniforme, la forma correcta de medirla no
+es «cuántos sitios hay» sino «**qué forma tienen**». La misma medición que dio «seis lemas en vez
+de treinta y cinco» daba «una táctica en vez de doscientas anotaciones», y no la leí hasta el
+módulo veinte.
+
+### 3.40.7 · ⭐ Donde la táctica NO llega: `CodeTreeReflect`, y por qué NO había que arrastrar
+
+`hw_auto` **no puede** con este módulo. `T.dotV t` / `T.dotN t` con `T : CTree` abstracto son
+**aplicaciones de recursor ATASCADAS**: ninguna alternativa de la escalera unifica. Y no se le puede
+enseñar `CTree` a la táctica, porque `hw_auto` vive en `SubstfcWitnessPrf`, **aguas arriba**.
+
+🔑 **Pero no había que arrastrar.** El árbol es un dato **FINITO**, así que la guarda se paga por la
+misma inducción pura que ya usaban `substtc_inv_dotV`/`substtc_inv_dotN` **justo al lado**:
+
+```lean
+theorem prf_hasWit_dotV (t : Term) : ∀ T : CTree, Prf (hasWit (T.dotV t))
+  | .leaf i    => prf_hasWit_tcFn (nthc t (numeralM i))
+  | .nul m     => prf_hasWit_nulT m
+  | .un m a    => prf_hasWit_unT m (prf_hasWit_dotV t a)
+  | .bin m a b => prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b)
+```
+
+Dos lemas de cuatro casos, y los **13** sitios del módulo pagan **sin que cambie ni una firma
+pública**. ⇒ **La regla**: cuando la táctica no llega, mirar si el objeto es **finito** antes de
+arrastrar. Arrastrar habría contaminado `pcc_lineWF_tracked_of_tree`, que es chasis.
+
+### 3.40.8 · 🔬 La cola final se cerró con AUDITORÍA ADVERSARIAL, y salió gratis
+
+Los últimos 26 sitios (4 módulos) se analizaron con un workflow de **8 agentes**: uno por módulo
+produciendo el parche exacto, y por cada uno un **refutador** con instrucción de tumbarlo —
+comprobar que el `patch_old` casa **literalmente**, que el veredicto PAGA/ARRASTRA es correcto con
+**sesgo hacia PAGAR** (un arrastre innecesario contamina aguas abajo), y buscar con `grep` si alguna
+guarda escapa hacia el ensamblaje o D3.
+
+Resultado: **0 sitios refutados**, `red_line_ok: true` en los cuatro, y los **26 `patch_old`
+casando de forma única** al aplicarlos. Los refutadores no confirmaron sin más: corrigieron cuatro
+citas de línea y **tumbaron una mejora propuesta** —poner autoParam en `PrfH_eq_trans_code`— con el
+argumento correcto: `hw_auto` **no está en scope** en `EvalCarcNthcPrf`, que sólo importa
+`EvalNthcPrf` y `LineWFConsPrf`, ambos aguas arriba de `SubstfcWitnessPrf`.
+
+⚠️ Regla operativa que confirma [[feedback-workflows-operativa]]: los agentes fueron de **SOLO
+LECTURA** (prohibido `lake build` y prohibido editar). Compilar en paralelo se pelea por `.lake`, y
+editar un fichero que otro agente audita le invalida los números de línea.

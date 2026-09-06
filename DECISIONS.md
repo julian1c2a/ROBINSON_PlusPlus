@@ -900,3 +900,39 @@ anotada, no verificada**.
 
 ⚠️ **Y un frente que la medición anterior no había contado**: `pcc_leibniz_code`, **6 sitios**.
 Pide `hasWitF Ac` con `Ac` abstracto, así que arrastra salvo donde el `Ac` sea un código real.
+
+### Addendum 2026‑09‑07 · 🏁 ADR‑020 CERRADA — el árbol compila con la enmienda
+
+```
+Build completed successfully (126 jobs) · 112 módulos · 0 sorrys · 7 `axiom` de Lean
+```
+
+Los **29 módulos** que bloqueaba `MpCodePrf` están cerrados. Detalle en §3.38–§3.40 de
+`doc/REFERENCE-Incompleteness.md`.
+
+**✅✅ LA CONDICIÓN QUE SOSTENÍA LA DECISIÓN, COMPROBADA — y la razón es ESTRUCTURAL.**
+La ADR se aceptó sobre el criterio *«una guarda sólo se arrastra si algún consumidor concreto puede
+pagarla»*, y con el riesgo explícito de que si llegaba colgando hasta D3 la D3 resultante sería
+**vacua** (que es por lo que la vía (B) está refutada). Medido con el compilador:
+
+* `d3_prf_of_chainOkDot` conserva su firma **exacta**.
+* `pcc_lineWF_tracked_modulo_7` y `pcc_lineWF_tracked_of_branches` también, y sus 7 hipótesis
+  pendientes siguen siendo las 7 formas **sin guarda**.
+
+🔑 El motivo no es suerte: la enmienda mete la guarda **DENTRO del `⇔` OBJETO**, así que al
+reflector le llega como **conjunto objeto** extraído de `lineWF t`, no como hipótesis Lean — y por
+tanto **no puede** aparecer en su firma. Esa es exactamente la propiedad que hacía viable la vía C
+frente a la (B), y hasta hoy era un argumento; desde hoy es una comprobación.
+
+⇒ **Corolario**: la garantía de `pcc_lineWF_tracked_modulo_7` («cerrar esos 7 reflectores cierra
+`pcc_lineWF_tracked`, y no hay nada más aguas abajo») **sigue valiendo bajo la enmienda**, sin
+cambiar una línea del ensamblaje.
+
+✅ **Y las dos deudas que la ADR generó vía ADR‑019 quedan saldadas**: los borrados en
+`BdAllIntroPrf` (`PrfH_congr_substfc3` + su `export`) y en `EvalLiftcPrf` (`nilOrCons`/
+`prf_nil_or_cons` + su `export` + su `#print axioms`), que se habían hecho sin poder compilar,
+compilan sin un solo `unknown identifier`.
+
+**Lo que NO cambió, y conviene repetirlo**: 7 `axiom` de Lean, 141 axiomas objeto (se **sustituyen**
+7 de los 141, no se añade ninguno), y ni D1, ni D2, ni D3, ni Gödel I/II, ni la sentencia `G`
+cambian de enunciado.

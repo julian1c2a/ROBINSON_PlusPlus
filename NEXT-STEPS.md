@@ -4,62 +4,63 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑06 · rama `via-c-adr020` · ⚠️ ÁRBOL ROJO en `Meta/EvalArithPrf.lean`**
-**`master` sigue VERDE en `97f2a37`.** La parada es **CONOCIDA y localizada**, y ha **AVANZADO**:
-`MpCodePrf` ya compila. **126 jobs · 112 módulos activos (Minimal 11 + Meta 90 + Full 11) + 0 en
-`cuarentena/` · 60 `sondeos/` · 7 `axiom` de Lean · 0 sorrys.**
+**Estado 2026‑09‑07 · rama `via-c-adr020` · 🏁 VÍA C CERRADA · ✅ ÁRBOL VERDE**
+`Build completed successfully (126 jobs)` — **112 módulos** (Minimal 11 + Meta 90 + Full 11) + 0 en
+`cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**. `master` sigue verde en `97f2a37`;
+esta rama vuelve a estarlo **con la enmienda de los 7 esquemas aplicada**, y está lista para integrar.
 
-> # 🎯 SIGUIENTE SESIÓN — **③: los 40 sitios. No queda matemática por hacer**
+> # 🎯 SIGUIENTE SESIÓN — **la rama C está cerrada; el cuello de botella se mueve**
 >
-> Todo lo medido: **§3.38** (la clausura) y **§3.39** (① y ② ejecutados, ③ re‑medido) de
+> Todo lo medido: **§3.38** (las dos clausuras), **§3.39** (① y ②), **§3.40** (③ y el cierre) de
 > `doc/REFERENCE-Incompleteness.md`.
 >
-> ## ✅ Hecho — ① y ②
+> ## 🏁 Lo que se cerró
 >
-> * **① `Meta/SubstfcWitnessPrf.lean`** (1 912 l., 0 sorrys, net‑0 puro): `prf_hasWit_substtc` y
->   ⭐ **`prf_hasWitF_substfc`** EN PRODUCCIÓN. Sin ciclo de imports, como estaba medido.
->   ⛔ **ADR‑019 tres veces**: `psi_lift_form4`/`PSI_inst4` **suben** a `StrongInductionPrf`;
->   `PrfH_congr_substfc3`/`prf_congr_substfc3` **bajan** de `BdAllIntroPrf` a `NumCodeClosedPrf`;
->   `nilOrCons`/`prf_nil_or_cons` **bajan** de `EvalLiftcPrf`.
->   ⚠️ **DEUDA ANOTADA, NO VERIFICADA**: los dos módulos donantes (`BdAllIntroPrf`, `EvalLiftcPrf`)
->   están aguas abajo y no compilan; sus borrados —incluido quitar el nombre del `export` y del
->   `#print axioms`, que si no es **error duro**— se verifican al llegar a ellos.
-> * **② `MpCodePrf` VERDE**: 10 lemas enmendados. La **mitad código se paga entera ahí**, con tres
->   lemas nuevos (`prf_hasWitF_fc_lift`, `prf_hasWit_liftc_lift`, `prf_hasWitF_substfc_lift`).
+> * **①** `Meta/SubstfcWitnessPrf.lean` — `prf_hasWit_substtc` y `prf_hasWitF_substfc`, net‑0 puro.
+> * **②** `MpCodePrf`: los 10 sitios; la mitad CÓDIGO se paga entera ahí (tres lemas).
+> * **③** los **29 módulos** bloqueados. La escalera de aridad (§28), `hw_auto` + `autoParam`, y
+>   dos lemas por inducción para `CTree`.
+> * ✅✅ **La línea roja de ADR‑020, comprobada y con razón ESTRUCTURAL** (§3.40.3):
+>   `d3_prf_of_chainOkDot` y `pcc_lineWF_tracked_modulo_7` conservan su firma exacta, porque la
+>   guarda va DENTRO del `⇔` objeto y le llega al reflector como conjunto objeto, no como hipótesis.
+> * ✅ Las **dos** deudas de ADR‑019 (`BdAllIntroPrf`, `EvalLiftcPrf`), saldadas.
 >
-> ## ⏳ ③ — el árbol para en `Meta/EvalArithPrf.lean`, con CUATRO errores
+> ## ▶ LO QUE TOCA AHORA — hay que DECIDIR entre tres frentes
 >
-> Y los cuatro confirman el criterio de ADR‑020 en vivo: dos son `pcc_ax4_inst (tcFn a)` /
-> `pcc_ax5_inst (tcFn a) B` ⇒ **PAGAN**; dos son `pcc_leibniz_code Ac t₁ t₂` con los tres
-> abstractos ⇒ **ARRASTRAN**.
+> **(a) INTEGRAR `via-c-adr020` en `master`.** La rama está verde y el inventario no se mueve
+> (7 `axiom`, 141 axiomas objeto, se sustituyen 7 de los 141). Decisión del autor.
 >
-> **Censo re‑medido sobre los 29 módulos bloqueados**: **40 sitios** en **21** módulos.
-> * **18** llevan `tcFn` en la propia línea y **4 más** en la siguiente (`LiftcCodePrf` ×3,
->   `SubstfcCodePrf`, `EvalRunFnPrf`) ⇒ **22 pagan** con `prf_hasWit_tcFn`.
-> * **Arrastran** los *envoltorios*: `pcc_ax8_inst`/`pcc_ax9_inst` (`EvalMulPrf`),
->   `EvalPredPrf:128`, `DotConsPrf:156`, `InAxiomsCodePrf:188`, `EvalLtPrf:161`.
-> * `BdAllIntroPrf:137` pasa `varc (numeral 0)` ⇒ `prf_hasWit_varc`, que vino con ①.
-> * ⚠️ **SEGUNDO FRENTE que §3.38.3 no había contado: `pcc_leibniz_code`, 6 sitios**
->   (`BdAllIntroPrf`, `DotConsPrf`, `EvalArithPrf` ×2, `EvalCarcNthcPrf`, `EvalMulPrf`). Pide
->   `hasWitF Ac` con `Ac` abstracto ⇒ arrastra salvo donde el `Ac` sea un código real.
-> * ⭐ **El único sitio realmente nuevo**: `EvalBoundedPrf:237`, donde el código es un `implc`
->   **construido** y no un `formCode` ⇒ `prf_hasWitF_bin 5`, que vino con ①.
+> **(b) B3.4 — el cuello de botella de fondo, ahora DESBLOQUEADO.** Era lo que ③ liberaba: el
+> cierre de `pcc_eval_substfc_wit` son **554** declaraciones, **131** a promover, y tocaba
+> **13 módulos de los que 8 no compilaban**. Ya compilan los 13. ⚠️ **RE‑MEDIR antes de empezar**:
+> parte de esas 131 pueden haber entrado con las promociones de ①–③.
 >
-> ⚠️ **La topología no ayuda**: `EvalArithPrf` domina 28 módulos, casi el mismo cono que
-> `MpCodePrf` (29). Aquí el DAG es una **cadena**: cada módulo que se cierra libera pocos, así que
-> hay que recorrerlos casi de uno en uno. No esperar saltos grandes.
+> **(c) C3 — los 7 reflectores de `lineWF`.** `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar
+> esos 7 cierra `pcc_lineWF_tracked` y que no hay nada más aguas abajo, y §3.40.3 acaba de
+> confirmar que esa afirmación **sigue siendo verdadera bajo la enmienda**. Ahora la guarda llega
+> a cada reflector como **conjunto objeto dentro del `⇔`**, que es justo lo que
+> `hcond_absorbe_extra` sabe absorber.
 >
-> **④ Con el árbol verde, B3.4 se desbloquea**: 131 declaraciones a promover de un cierre de 554.
+> Y detrás siguen **D** (`hC_dot` → D3 real), **E** (Gödel II sin `axiom d3`) y el frente
+> independiente **F** (`⊬¬G`, sólo `NegVerifier` abierto).
 >
-> ## 🔑 Las reglas de método que han ido ganando
+> ## 🔑 Las reglas de método que deja esta fase
 >
-> 1. **MEDIR ANTES DE MOVER** — la promoción no tenía ciclo, y estaba medido antes de empezar.
-> 2. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
-> 3. **Cada caso GENÉRICO en el contexto**, con las hipótesis por argumento.
-> 4. **Escribir el tipo entero** — y ahora también los `Ac` de cada eliminación: con la guarda como
->    argumento, el metavariable del código ya no se resuelve solo.
+> 1. **MEDIR LA FORMA, NO EL TAMAÑO.** «¿Cuántos sitios hay?» da un plan lineal *y la respuesta
+>    está mal* (el censo por API mide la onda inicial: medí 44 y un módulo que daba *uno* tenía
+>    *diez*). «¿Qué forma tienen?» dio **6 lemas en vez de 35** y **una táctica en vez de 200
+>    anotaciones**. La leí en el módulo veinte.
+> 2. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
+>    de la táctica importa: las estructurales ANTES que `prf_hasWit_tc`, o el unificador despliega
+>    `termCode` y agota los heartbeats.
+> 3. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
+>    `CTree` se paga por inducción; arrastrar habría contaminado el chasis).
+> 4. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
 > 5. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
->    nombre del `export` y del `#print axioms` del donante.
+>    nombre del `export` **y** del `#print axioms` del donante — si no, es error duro.
+> 6. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
+>    prohibido editar), uno que propone y uno que refuta con sesgo hacia PAGAR. 26 sitios,
+>    0 refutados, 26 `patch_old` casando de forma única (§3.40.8).
 ---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)
@@ -271,21 +272,26 @@
 >            godelCN tiene 483 dependencias y NINGUNA es `axioms`. G, como FORMULA, no
 >            cambia. Lo que cambia es la TEORIA de la que G habla -- puede seguir siendo
 >            motivo para no hacerlo, pero es OTRO argumento y mucho mas debil.
->   C3 ⏳ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7, y sus
->         reflectores esperan solo a que el arbol vuelva a verde.
+>   C3 ⬜ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7. El arbol
+>         YA esta verde, asi que sus reflectores son lo unico que queda de la rama C.
 >         ✅ pcc_lineWF_tracked_modulo_7 GARANTIZA que cerrar esos 7 cierra
 >            pcc_lineWF_tracked, y que no hay nada mas aguas abajo
->   C4 ⏳ PROPAGACION HASTA EL VERDE -- lo unico que queda de la rama (§3.38.3, §3.39):
+>         ⭐ Y §3.40.3 confirma que esa garantia SIGUE VALIENDO bajo la enmienda: la
+>            guarda va DENTRO del ⇔ OBJETO, luego le llega a cada reflector como
+>            CONJUNTO OBJETO extraido de `lineWF t` -- que es justo lo que
+>            `hcond_absorbe_extra` sabe absorber.
+>   C4 ✅ PROPAGACION HASTA EL VERDE -- HECHA (2026-09-07). Build 126 jobs, VERDE.
 >         ① ✅ HECHA: Meta/SubstfcWitnessPrf.lean (1912 l., net-0 puro). Sin ciclo,
 >              como estaba medido. ADR-019 TRES veces al promover.
->              ⚠️ deuda no verificada: los borrados en BdAllIntroPrf y EvalLiftcPrf
->              (modulos aguas abajo que aun no compilan).
+>              ✅ la deuda que dejo (borrados en BdAllIntroPrf y EvalLiftcPrf, sin
+>              compilar) quedo VERIFICADA en ③: cero `unknown identifier`.
 >         ② ✅ HECHA: MpCodePrf VERDE, 10 lemas enmendados. La mitad CODIGO se paga
 >              entera ahi (prf_hasWitF_fc_lift / _liftc_lift / _substfc_lift).
->         ③ ⏳ EN CURSO. Para en Meta/EvalArithPrf.lean, 4 errores. Censo re-medido:
->              40 sitios en 21 de los 29 modulos; 22 PAGAN con prf_hasWit_tcFn.
->              ⚠️ SEGUNDO FRENTE no contado antes: pcc_leibniz_code, 6 sitios.
->              ⭐ unico sitio nuevo: EvalBoundedPrf:237 (codigo `implc` construido).
+>         ③ ✅ HECHA: los 29 modulos cerrados. La escalera de aridad (§28), `hw_auto` +
+>              `autoParam`, y dos lemas por induccion para `CTree` (§3.40.7).
+>              ✅✅ LINEA ROJA COMPROBADA: d3_prf_of_chainOkDot y
+>              pcc_lineWF_tracked_modulo_7 conservan su firma EXACTA (§3.40.3).
+>              ✅ Las DOS deudas de ADR-019 (BdAllIntroPrf, EvalLiftcPrf), saldadas.
 > D · D3 REAL
 >   D1 ⬜ hC_dot — la reflexión punteada de chainOk. NO EXISTE (verificado por grep)
 >   D2 ⬜ d3_prf := d3_prf_of_chainOkDot φ hC_dot   ✅ el consumidor YA existe (Meta/D3InDotPrf)

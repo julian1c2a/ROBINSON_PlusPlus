@@ -1,31 +1,30 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-06 · rama `via-c-adr020` · **VÍA C EJECUTADA** (ADR-020) · ⚠️ ÁRBOL ROJO en `Meta/EvalArithPrf.lean`
+> ## ESTADO REAL — 2026-09-07 · rama `via-c-adr020` · 🏁 **VÍA C CERRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
-> ⚠️ **La parada es CONOCIDA y localizada, no una regresión**: la enmienda de los 7 esquemas está
-> aplicada y todo lo demás compila. `master` sigue **VERDE** en `97f2a37`; el trabajo vive en la
-> rama **`via-c-adr020`**.
+> 🏁 **`Build completed successfully (126 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> **el árbol entero compila con ella**. `master` sigue verde en `97f2a37`; el trabajo vive en la
+> rama **`via-c-adr020`**, lista para integrar.
 >
-> 🏁 **2026-09-06: LA PIEZA QUE FALTABA ESTÁ PROBADA, Y EN PRODUCCIÓN.**
-> `prf_hasWitF_substfc` — `hasWitF` cerrado bajo `substfc`, con código y sustituyendo ABSTRACTOS —
-> junto con la mitad TÉRMINO `prf_hasWit_substtc`, en **`Meta/SubstfcWitnessPrf.lean`** (1 912 l.,
-> 0 sorrys, **net-0 puro**). **Ya no queda ninguna pieza matemática por demostrar para el verde.**
+> 🏁 **LA VÍA C, COMPLETA** (§3.38–§3.40):
+> * **`prf_hasWit_substtc` y `prf_hasWitF_substfc`** —las dos clausuras, con código y sustituyendo
+>   ABSTRACTOS— en `Meta/SubstfcWitnessPrf.lean`, **net-0 puro**.
+> * ✅ **① promoción** (sin ciclo de imports; ⛔ ADR-019 **tres veces** al promover).
+> * ✅ **② `MpCodePrf`**: los 10 sitios cerrados; la mitad CÓDIGO se paga entera ahí.
+> * ✅ **③ propagación**: los **29 módulos** bloqueados, cerrados.
 >
-> ✅ **① promoción HECHA** (medido: sin ciclo de imports; y ⛔ ADR-019 **tres veces**: `PSI_inst4`
-> sube a `StrongInductionPrf`, `PrfH_congr_substfc3` baja de `BdAllIntroPrf` a `NumCodeClosedPrf`,
-> `prf_nil_or_cons` baja de `EvalLiftcPrf`).
-> ✅ **② `MpCodePrf` VERDE**: los 10 errores cerrados, la familia `pcc_*_inst*` enmendada.
-> ⏳ **③ EN CURSO**: el árbol para ahora en **`Meta/EvalArithPrf.lean`** con **4 errores**.
-> Censo re-medido (**§3.39.3**): **40 sitios** en 21 de los **29** módulos bloqueados; **22 pagan**
-> con `prf_hasWit_tcFn`, y aparece un **segundo frente** que §3.38.3 no había contado —
-> `pcc_leibniz_code`, 6 sitios.
+> ✅✅ **LA LÍNEA ROJA DE ADR-020, COMPROBADA Y CON RAZÓN ESTRUCTURAL**: `d3_prf_of_chainOkDot` y
+> `pcc_lineWF_tracked_modulo_7` **conservan su firma exacta**. La guarda va DENTRO del `⇔` OBJETO,
+> así que al reflector le llega como conjunto objeto extraído de `lineWF t`, **no** como hipótesis
+> Lean — y por tanto no puede aparecer en su firma. Era el argumento que sostenía la vía; ahora es
+> una comprobación.
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.39.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.40.
 >
-> **Build 126 jobs · 0 sorrys · Lean v4.31.0** (⚠️ con la parada conocida arriba).
+> **Build 126 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
 > **112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
