@@ -85,7 +85,7 @@ theorem pcc_ax4_computed (a : Term) :
   prf_mp
     (prf_provCode_congr
       (prf_substfc_arith_open 0 (tcFn a) (add (.var 0) zero =eq (.var 0))))
-    (pcc_ax4_inst (tcFn a))
+    (pcc_ax4_inst (tcFn a) (prf_hasWit_tcFn (liftTerm 0 a)))
 
 /-- **BASE de la evaluación provable de `+`**: `⊢ Prov(⌜ȧ + 0̇ = (a+0)˙⌝)`.
 
@@ -276,7 +276,8 @@ theorem pcc_ax5_computed (a b : Term) :
       (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0)))))
       =eq eqCodeFn (addcT (tcFn a) (succcT B)) (succcT (addcT (tcFn a) B))) :=
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
-  exact prf_mp (prf_provCode_congr hchain) (pcc_ax5_inst (tcFn a) B)
+  exact prf_mp (prf_provCode_congr hchain)
+    (pcc_ax5_inst (tcFn a) B (prf_hasWit_tcFn (liftTerm 0 a)) (prf_hasWit_tcFn (liftTerm 0 b)))
 
 /-! ### Lógica ecuacional INTERNA sobre códigos (§25.4)
 
@@ -288,19 +289,36 @@ subtérminos ya presentes. Por eso los lemas piden que el código fijo sea **`su
 (`∀ W, substtc zero W X =eq X`), hipótesis que (A) (`prf_substtc_tcFn`) y las ecuaciones de `funcc`
 descargan para todos los códigos que construimos (`tcFn`, `addcT`, `succcT`). -/
 
+/-! #### La GUARDA de los códigos que construimos (ADR-020)
+
+Espejo exacto de las invariancias `substtc_inv_*`: los lemas de abajo piden que el código lleve
+testigo, y como `addcT`/`succcT` son `funcc` de aridad 2 y 1, los paga **la escalera de aridad**
+(`Meta/SubstfcWitnessPrf.lean` §28) en una línea cada uno. -/
+
+/-- `succcT X` tiene testigo si `X` lo tiene. -/
+theorem prf_hasWit_succcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (succcT X)) :=
+  prf_hasWit_funcc1 (strCode succ_sym) X hX
+
+/-- `addcT X Y` tiene testigo si lo tienen sus dos argumentos. -/
+theorem prf_hasWit_addcT {X Y : Term} (hX : Prf (hasWit X)) (hY : Prf (hasWit Y)) :
+    Prf (hasWit (addcT X Y)) :=
+  prf_hasWit_funcc2 (strCode add_sym) X Y hX hY
+
 /-- **Leibniz codificado, aplicado**: de `Prov(⌜t₁ = t₂⌝)` y `Prov(⌜Ac[t₁]⌝)` sale `Prov(⌜Ac[t₂]⌝)`.
     Dos usos de `pcc_mp_code_open` sobre `pcc_leibniz_code`. -/
 theorem pcc_leibniz_apply (Ac t₁ t₂ : Term)
+    (hwA : Prf (hasWitF Ac)) (hw1 : Prf (hasWit t₁)) (hw2 : Prf (hasWit t₂))
     (heq : Prf (provFromCode (eqc t₁ t₂)))
     (h1 : Prf (provFromCode (substfc zero t₁ Ac))) :
     Prf (provFromCode (substfc zero t₂ Ac)) :=
   pcc_mp_code_apply
-    (pcc_mp_code_apply (pcc_leibniz_code Ac t₁ t₂) heq)
+    (pcc_mp_code_apply (pcc_leibniz_code Ac t₁ t₂ hwA hw1 hw2) heq)
     h1
 
 /-- **Transitividad interna de `=`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜Y=Z⌝) → Prov(⌜X=Z⌝)`.
     Leibniz con el contexto `Ac := (X = v₀)`, sustituyendo `v₀ ↦ Y` y luego `v₀ ↦ Z`. -/
 theorem pcc_eq_trans_code (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) (hwZ : Prf (hasWit Z))
     (h1 : Prf (provFromCode (eqc X Y))) (h2 : Prf (provFromCode (eqc Y Z))) :
     Prf (provFromCode (eqc X Z)) := by
   let Ac : Term := eqc X (varc (numeral 0))
@@ -309,13 +327,16 @@ theorem pcc_eq_trans_code (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq 
       (prf_congr_eqCodeFn (hX t) (prf_substtc_varc0 t))
   have hY : Prf (provFromCode (substfc zero Y Ac)) :=
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp Y))) h1
-  have hZ : Prf (provFromCode (substfc zero Z Ac)) := pcc_leibniz_apply Ac Y Z h2 hY
+  have hZ : Prf (provFromCode (substfc zero Z Ac)) :=
+    pcc_leibniz_apply Ac Y Z
+      (prf_hasWitF_eq2 X (varc (numeral 0)) hwX (prf_hasWit_varc (numeral 0))) hwY hwZ h2 hY
   exact prf_mp (prf_provCode_congr (hcomp Z)) hZ
 
 /-- **Congruencia interna de `σ`** sobre códigos: `Prov(⌜X=Y⌝) → Prov(⌜σX = σY⌝)`.
     Leibniz con el contexto `Ac := (σX = σv₀)`; la base `Ac[X]` es la **reflexividad codificada**
     (`prf_provFromCode_eqCodeFn_refl`, libre de muro). -/
 theorem pcc_congr_succ_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y))
     (heq : Prf (provFromCode (eqc X Y))) :
     Prf (provFromCode (eqc (succcT X) (succcT Y))) := by
   let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
@@ -330,7 +351,10 @@ theorem pcc_congr_succ_code (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq 
     prf_provFromCode_eqCodeFn_refl (succcT X)
   have hAX : Prf (provFromCode (substfc zero X Ac)) :=
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) hrefl
-  have hAY : Prf (provFromCode (substfc zero Y Ac)) := pcc_leibniz_apply Ac X Y heq hAX
+  have hAY : Prf (provFromCode (substfc zero Y Ac)) :=
+    pcc_leibniz_apply Ac X Y
+      (prf_hasWitF_eq2 (succcT X) (succcT (varc (numeral 0))) (prf_hasWit_succcT hwX)
+        (prf_hasWit_succcT (prf_hasWit_varc (numeral 0)))) hwX hwY heq hAX
   exact prf_mp (prf_provCode_congr (hcomp Y)) hAY
 
 /-! #### Invariancias `substtc` de los códigos que usamos (descargan `hX`) -/
@@ -357,12 +381,13 @@ combinadores internos ya son implicaciones por dentro (`pcc_mp_code_open`), así
 
 /-- Leibniz aplicado, en forma implicación sobre la **igualdad** (la premisa `Ac[t₁]` va cerrada). -/
 theorem pcc_leibniz_apply_imp (Ac t₁ t₂ : Term)
+    (hwA : Prf (hasWitF Ac)) (hw1 : Prf (hasWit t₁)) (hw2 : Prf (hasWit t₂))
     (h1 : Prf (provFromCode (substfc zero t₁ Ac))) :
     Prf (provFromCode (eqc t₁ t₂) ⇒ provFromCode (substfc zero t₂ Ac)) := by
   have hI : Prf (provFromCode (eqc t₁ t₂)
       ⇒ provFromCode (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) :=
     prf_mp (pcc_mp_code_open (eqc t₁ t₂)
-      (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) (pcc_leibniz_code Ac t₁ t₂)
+      (implc (substfc zero t₁ Ac) (substfc zero t₂ Ac))) (pcc_leibniz_code Ac t₁ t₂ hwA hw1 hw2)
   refine prf_deduction ?_
   have himp := PrfH.mp _ _ _ (prf_to_prfH hI _) (prfH_hyp_self (provFromCode (eqc t₁ t₂)))
   exact PrfH.mp _ _ _
@@ -372,6 +397,7 @@ theorem pcc_leibniz_apply_imp (Ac t₁ t₂ : Term)
 
 /-- **Transitividad interna**, en forma implicación sobre la segunda igualdad. -/
 theorem pcc_eq_trans_code_imp (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) (hwZ : Prf (hasWit Z))
     (h1 : Prf (provFromCode (eqc X Y))) :
     Prf (provFromCode (eqc Y Z) ⇒ provFromCode (eqc X Z)) := by
   let Ac : Term := eqc X (varc (numeral 0))
@@ -381,13 +407,15 @@ theorem pcc_eq_trans_code_imp (X Y Z : Term) (hX : ∀ W, Prf (substtc zero W X 
   have hY : Prf (provFromCode (substfc zero Y Ac)) :=
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp Y))) h1
   have himp : Prf (provFromCode (eqc Y Z) ⇒ provFromCode (substfc zero Z Ac)) :=
-    pcc_leibniz_apply_imp Ac Y Z hY
+    pcc_leibniz_apply_imp Ac Y Z
+      (prf_hasWitF_eq2 X (varc (numeral 0)) hwX (prf_hasWit_varc (numeral 0))) hwY hwZ hY
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Z)) _)
     (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
 
 /-- **Congruencia interna de `σ`**, en forma implicación. -/
-theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (succcT X) (succcT Y))) := by
   let Ac : Term := eqc (succcT X) (succcT (varc (numeral 0)))
   have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (succcT X) (succcT t)) := by
@@ -401,7 +429,9 @@ theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X 
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
       (prf_provFromCode_eqCodeFn_refl (succcT X))
   have himp : Prf (provFromCode (eqc X Y) ⇒ provFromCode (substfc zero Y Ac)) :=
-    pcc_leibniz_apply_imp Ac X Y hAX
+    pcc_leibniz_apply_imp Ac X Y
+      (prf_hasWitF_eq2 (succcT X) (succcT (varc (numeral 0))) (prf_hasWit_succcT hwX)
+        (prf_hasWit_succcT (prf_hasWit_varc (numeral 0)))) hwX hwY hAX
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
     (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _))
@@ -426,10 +456,15 @@ theorem pcc_eval_add_succ_imp (a b : Term) :
   have hcs : Prf (provFromCode (eqc (addcT (tcFn a) (tcFn b)) (tcFn (add a b)))
       ⇒ provFromCode (eqc (succcT (addcT (tcFn a) (tcFn b))) (succcT (tcFn (add a b))))) :=
     pcc_congr_succ_code_imp _ _ hinvAB
+      (prf_hasWit_addcT (prf_hasWit_tcFn a) (prf_hasWit_tcFn b)) (prf_hasWit_tcFn (add a b))
   -- (B) + transitividad
   have htr : Prf (provFromCode (eqc (succcT (addcT (tcFn a) (tcFn b))) (succcT (tcFn (add a b))))
       ⇒ provFromCode (eqc (addcT (tcFn a) (succcT (tcFn b))) (succcT (tcFn (add a b))))) :=
-    pcc_eq_trans_code_imp _ _ _ hinvX (pcc_ax5_computed a b)
+    pcc_eq_trans_code_imp _ _ _ hinvX
+      (prf_hasWit_addcT (prf_hasWit_tcFn a) (prf_hasWit_succcT (prf_hasWit_tcFn b)))
+      (prf_hasWit_succcT (prf_hasWit_addcT (prf_hasWit_tcFn a) (prf_hasWit_tcFn b)))
+      (prf_hasWit_succcT (prf_hasWit_tcFn (add a b)))
+      (pcc_ax5_computed a b)
   -- transporte final de códigos: `succcT ḃ =eq (σb)˙` y `σ((a+b)˙) =eq (a+σb)˙`
   have hcode : Prf (eqc (addcT (tcFn a) (succcT (tcFn b))) (succcT (tcFn (add a b)))
       =eq evalAddCode a (succ b)) :=
