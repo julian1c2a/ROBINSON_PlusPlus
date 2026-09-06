@@ -1932,6 +1932,10 @@ theorem prf_hasWit_funcc3 (S x y z : Term)
     Prf (hasWit (funcc S (cons x (cons y (cons z nil))))) :=
   prf_mp (prf_hasWit_funcc S (cons x (cons y (cons z nil)))) (prf_hasWitArgs_3 x y z hx hy hz)
 
+/-- `liftc zero X` conserva testigo: es `CRIT_hasWit_lift`, en forma de aplicación. -/
+theorem prf_hasWit_liftc {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (liftc zero X)) :=
+  prf_mp (CRIT_hasWit_lift X) hX
+
 /-! ### Sorte FÓRMULA: los ocho constructores, en forma de APLICACIÓN
 
 Los de §22-§24 están en forma de implicación objeto —que es como los consume el paso de
@@ -2009,7 +2013,7 @@ export ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf (
   prf_hasWitF_imp prf_isFC1_unN prf_isFC1_binN prf_hasWitF_un prf_hasWitF_bin
   prf_hasWitF_bot prf_hasWitF_atomc prf_hasWitF_eqc
   prf_hasWitArgs_1 prf_hasWitArgs_2 prf_hasWitArgs_3
-  prf_hasWit_funcc1 prf_hasWit_funcc2 prf_hasWit_funcc3
+  prf_hasWit_funcc1 prf_hasWit_funcc2 prf_hasWit_funcc3 prf_hasWit_liftc
   prf_hasWitF_atom1 prf_hasWitF_atom2 prf_hasWitF_eq2
   prf_hasWitF_implc prf_hasWitF_andc prf_hasWitF_orc prf_hasWitF_forallc prf_hasWitF_exc
   nilOrCons nilOrCons_at prf_nil_or_cons_all prf_nil_or_cons

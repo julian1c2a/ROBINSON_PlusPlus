@@ -390,4 +390,6 @@ export ROBINSON_PlusPlus.Meta.MpCodePrf (
   pcc_thm_inst pcc_thm_inst2 pcc_thm_inst3 pcc_thm_inst4
   pcc_axiom_inst pcc_axiom_inst2 pcc_axiom_inst3 pcc_axiom_inst4
   pcc_ax4_inst pcc_ax5_inst
+  -- ADR-020: los tres lemas de PAGO de la guarda de CODIGO (§3.39.2)
+  prf_hasWitF_fc_lift prf_hasWit_liftc_lift prf_hasWitF_substfc_lift
 )
