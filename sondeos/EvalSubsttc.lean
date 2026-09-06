@@ -175,51 +175,12 @@ theorem prf_substtc_funccT_at (v : Nat) (W a b : Term) :
       =eq funccT (substtc (numeral v) W a) (substtc (numeral v) W b)) :=
   prf_substtc_binT_at 1 v W a b
 
-/-! ## §3 · `pcc_axiom_inst4` — la pieza que faltaba (los dos axiomas clave son `forall_4`) -/
+/-! ## §3 · `pcc_axiom_inst4` — ⛔ **BORRADA: hoy vive en PRODUCCIÓN**
 
-theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w₄ : Term) :
-    Prf (provFromCode (substfc zero w₄ (substfc (succ zero) (liftc zero w₃)
-      (substfc (succ (succ zero)) (liftc zero (liftc zero w₂))
-        (substfc (succ (succ (succ zero))) (liftc zero (liftc zero (liftc zero w₁)))
-          (formCode φ)))))) := by
-  have h3 : Prf (provFromCode (substfc zero w₃ (substfc (succ zero) (liftc zero w₂)
-      (substfc (succ (succ zero)) (liftc zero (liftc zero w₁))
-        (formCode (Formula.forall φ)))))) :=
-    pcc_thm_inst3 (Formula.forall φ) h w₁ w₂ w₃
-  -- empuja los tres `substfc` bajo el binder, uno a uno
-  have e2 : Prf (substfc (succ (succ zero)) (liftc zero (liftc zero w₁))
-        (forallc (formCode φ))
-      =eq forallc (substfc (succ (succ (succ zero)))
-        (liftc zero (liftc zero (liftc zero w₁))) (formCode φ))) :=
-    prf_substfc_forall (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ)
-  have h3' := prf_mp (prf_provCode_congr (prf_congr_substfc_arg3
-    (prf_congr_substfc_arg3 e2))) h3
-  have e1 : Prf (substfc (succ zero) (liftc zero w₂)
-        (forallc (substfc (succ (succ (succ zero)))
-          (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))
-      =eq forallc (substfc (succ (succ zero)) (liftc zero (liftc zero w₂))
-        (substfc (succ (succ (succ zero)))
-          (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))) :=
-    prf_substfc_forall (succ zero) (liftc zero w₂) _
-  have h3'' := prf_mp (prf_provCode_congr (prf_congr_substfc_arg3 e1)) h3'
-  have e0 : Prf (substfc zero w₃
-        (forallc (substfc (succ (succ zero)) (liftc zero (liftc zero w₂))
-          (substfc (succ (succ (succ zero)))
-            (liftc zero (liftc zero (liftc zero w₁))) (formCode φ))))
-      =eq forallc (substfc (succ zero) (liftc zero w₃)
-        (substfc (succ (succ zero)) (liftc zero (liftc zero w₂))
-          (substfc (succ (succ (succ zero)))
-            (liftc zero (liftc zero (liftc zero w₁))) (formCode φ))))) :=
-    prf_substfc_forall zero w₃ _
-  have h3''' := prf_mp (prf_provCode_congr e0) h3''
-  exact prf_mp (pcc_forallElim_code_open _ w₄) h3'''
-
-theorem pcc_axiom_inst4 (φ : Formula) (hmem : forall_4 φ ∈ axioms) (w₁ w₂ w₃ w₄ : Term) :
-    Prf (provFromCode (substfc zero w₄ (substfc (succ zero) (liftc zero w₃)
-      (substfc (succ (succ zero)) (liftc zero (liftc zero w₂))
-        (substfc (succ (succ (succ zero))) (liftc zero (liftc zero (liftc zero w₁)))
-          (formCode φ)))))) :=
-  pcc_thm_inst4 φ (prf_ax hmem) w₁ w₂ w₃ w₄
+    Cuando se escribió este sondeo, `pcc_thm_inst4`/`pcc_axiom_inst4` no existían y había que
+    reproducirlas aquí. Hoy están en `Meta/MpCodePrf.lean` (:302, :378) y **enmendadas por
+    ADR-020**, con sus cuatro guardas `hasWit`. ⛔ ADR-019: no se deja duplicado, se consume el
+    de producción — que además es el único que compila bajo la enmienda. -/
 
 /-! ############################################################################
     ## §4 · LAS SEIS ECUACIONES DE `substtc`/`substtsc`, DOTADAS
@@ -256,7 +217,7 @@ theorem pcc_substtsc_nil_code (v s : Term) :
     prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst2 SUBSTTSC_NIL_BODY (show ax_substtsc_nil ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s))
+      (tcFn v) (tcFn s) (by hw_auto) (by hw_auto))
 
 /-! ### (b) `ax_substtc_func` (`forall_4`) -/
 
@@ -368,7 +329,7 @@ theorem pcc_substtc_func_code (v s p b : Term) :
         (prf_eq_trans (prf_congr_substfc_arg3 hL1) hL0))
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst4 SUBSTTC_FUNC_BODY (show ax_substtc_func ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s) (tcFn p) (tcFn b))
+      (tcFn v) (tcFn s) (tcFn p) (tcFn b) (by hw_auto) (by hw_auto) (by hw_auto) (by hw_auto))
 
 /-! ### (c) `ax_substtsc_cons` (`forall_4`) -/
 
@@ -496,7 +457,7 @@ theorem pcc_substtsc_cons_code (v s h t : Term) :
         (prf_eq_trans (prf_congr_substfc_arg3 hL1) hL0))
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst4 SUBSTTSC_CONS_BODY (show ax_substtsc_cons ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s) (tcFn h) (tcFn t))
+      (tcFn v) (tcFn s) (tcFn h) (tcFn t) (by hw_auto) (by hw_auto) (by hw_auto) (by hw_auto))
 
 /-! ### (d) las TRES clausulas guardadas de `varc` (`forall_3`) -/
 
@@ -593,7 +554,7 @@ theorem pcc_substtc_var_eq_code (v s n : Term) :
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hL1)) hL0
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst3 SUBSTTC_VAR_EQ_BODY (show ax_substtc_var_eq ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s) (tcFn n))
+      (tcFn v) (tcFn s) (tcFn n) (by hw_auto) (by hw_auto) (by hw_auto))
 
 theorem pcc_substtc_var_gt_code (v s n : Term) :
     Prf (provFromCode (implc (ltCodeFn (tcFn v) (tcFn n))
@@ -671,7 +632,7 @@ theorem pcc_substtc_var_gt_code (v s n : Term) :
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hL1)) hL0
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst3 SUBSTTC_VAR_GT_BODY (show ax_substtc_var_gt ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s) (tcFn n))
+      (tcFn v) (tcFn s) (tcFn n) (by hw_auto) (by hw_auto) (by hw_auto))
 
 theorem pcc_substtc_var_lt_code (v s n : Term) :
     Prf (provFromCode (implc (ltCodeFn (tcFn n) (tcFn v))
@@ -742,7 +703,7 @@ theorem pcc_substtc_var_lt_code (v s n : Term) :
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hL1)) hL0
   exact prf_mp (prf_provCode_congr hchain)
     (pcc_axiom_inst3 SUBSTTC_VAR_LT_BODY (show ax_substtc_var_lt ∈ axioms by simp [axioms])
-      (tcFn v) (tcFn s) (tcFn n))
+      (tcFn v) (tcFn s) (tcFn n) (by hw_auto) (by hw_auto) (by hw_auto))
 
 /-! ############################################################################
     ## §5 · EL OBJETIVO y las CONGRUENCIAS INTERNAS
@@ -763,7 +724,9 @@ example (v s X : Term) : True := by
 
 theorem pcc_congr_substtcT_arg3_code (A B X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hB : ∀ W, Prf (substtc zero W B =eq B))
-    (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwB : Prf (hasWit B) := by hw_auto)
+    (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substtcT A B X) (substtcT A B Y))) := by
   let Ac : Term := eqc (substtcT A B X) (substtcT A B (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (substtcT A B X) (substtcT A B w)) := by
@@ -780,11 +743,14 @@ theorem pcc_congr_substtcT_arg3_code (A B X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (substtcT A B X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (by hw_auto) hwX hwY)
 
 theorem pcc_congr_substtscT_arg3_code (A B X Y : Term)
     (hA : ∀ W, Prf (substtc zero W A =eq A)) (hB : ∀ W, Prf (substtc zero W B =eq B))
-    (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwB : Prf (hasWit B) := by hw_auto)
+    (hwX : Prf (hasWit X) := by hw_auto) (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (substtscT A B X) (substtscT A B Y))) := by
   let Ac : Term := eqc (substtscT A B X) (substtscT A B (varc (numeral 0)))
   have hcomp : ∀ w : Term,
@@ -802,11 +768,14 @@ theorem pcc_congr_substtscT_arg3_code (A B X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (substtscT A B X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (by hw_auto) hwX hwY)
 
 /-- Congruencia interna en la CABEZA de `consT` (copia de `DescensoLiftc:508`). -/
 theorem pcc_congr_consT_arg1_code (B X Y : Term)
-    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT X B) (consT Y B))) := by
   let Ac : Term := eqc (consT X B) (consT (varc (numeral 0)) B)
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (consT X B) (consT w B)) := by
@@ -821,11 +790,14 @@ theorem pcc_congr_consT_arg1_code (B X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (consT X B))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (by hw_auto) hwX hwY)
 
 /-- Congruencia interna en la COLA de `consT`. -/
 theorem pcc_congr_consT_arg2_code (A X Y : Term)
-    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (consT A X) (consT A Y))) := by
   let Ac : Term := eqc (consT A X) (consT A (varc (numeral 0)))
   have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (consT A X) (consT A w)) := by
@@ -840,7 +812,8 @@ theorem pcc_congr_consT_arg2_code (A X Y : Term)
       (prf_provFromCode_eqCodeFn_refl (consT A X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (by hw_auto) hwX hwY)
 
 /-! ############################################################################
     ## §6 · LAS CLAUSULAS ESTRUCTURALES (`funcc`, `nil`, `cons`) — CERRADAS
@@ -889,8 +862,8 @@ theorem refl_caso_funcc (v s X p b : Term) (hX : Prf (X =eq funcc p b))
   have hchain : Prf (provFromCode (eqc
       (substtcT (tcFn v) (tcFn s) (tcFn (funcc p b)))
       (tcFn (funcc p (substtsc v s b))))) :=
-    pcc_eq_trans_code _ _ _ (invA v s (funcc p b)) s1
-      (pcc_eq_trans_code _ _ _ hY s2 (pcc_eq_trans_code _ _ _ hZ s3 s4))
+    pcc_eq_trans_code _ _ _ (invA v s (funcc p b)) (by hw_auto) (by hw_auto) (by hw_auto) s1
+      (pcc_eq_trans_code _ _ _ hY (by hw_auto) (by hw_auto) (by hw_auto) s2 (pcc_eq_trans_code _ _ _ hZ (by hw_auto) (by hw_auto) (by hw_auto) s3 s4))
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
     (prf_congr_substtcT (prf_refl _) (prf_refl _) (prf_congr_tcFn (prf_eq_symm hX)))
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
@@ -952,9 +925,9 @@ theorem refl_lista_cons (v s h t : Term) (hh : Prf (targetSubsttc v s h))
   have hchain : Prf (provFromCode (eqc
       (substtscT (tcFn v) (tcFn s) (tcFn (cons h t)))
       (tcFn (cons (substtc v s h) (substtsc v s t))))) :=
-    pcc_eq_trans_code _ _ _ (invAs v s (cons h t)) s1
-      (pcc_eq_trans_code _ _ _ hY s2
-        (pcc_eq_trans_code _ _ _ hZ s3 (pcc_eq_trans_code _ _ _ hU s4 s5)))
+    pcc_eq_trans_code _ _ _ (invAs v s (cons h t)) (by hw_auto) (by hw_auto) (by hw_auto) s1
+      (pcc_eq_trans_code _ _ _ hY (by hw_auto) (by hw_auto) (by hw_auto) s2
+        (pcc_eq_trans_code _ _ _ hZ (by hw_auto) (by hw_auto) (by hw_auto) s3 (pcc_eq_trans_code _ _ _ hU (by hw_auto) (by hw_auto) (by hw_auto) s4 s5)))
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
 
@@ -1018,7 +991,7 @@ theorem br_lt (v s n : Term)
       (substtc_inv_substtcT (substtc_inv_tcFn v) (substtc_inv_tcFn s)
         (substtc_inv_unT (substtc_inv_tcFn n))) e1
       (PrfH_eq_trans_code _ _ _
-        (substtc_inv_unT (substtc_inv_predcT (substtc_inv_tcFn n))) e2 e3)
+        (substtc_inv_unT (substtc_inv_predcT (substtc_inv_tcFn n))) e2 e3 (by hw_auto) (by hw_auto) (by hw_auto)) (by hw_auto) (by hw_auto) (by hw_auto)
   have hobj : PrfH [lt v n] (substtc v s (varc n) =eq varc (pred n)) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_substtc_var_gt v s n) _) hg
   exact PrfH_provCode_congr
@@ -1061,7 +1034,7 @@ theorem br_gt (v s n : Term) :
       (substtcT (tcFn v) (tcFn s) (varcT (tcFn n))) (tcFn (varc n)))) :=
     PrfH_eq_trans_code _ _ _
       (substtc_inv_substtcT (substtc_inv_tcFn v) (substtc_inv_tcFn s)
-        (substtc_inv_unT (substtc_inv_tcFn n))) e1 e2
+        (substtc_inv_unT (substtc_inv_tcFn n))) e1 e2 (by hw_auto) (by hw_auto) (by hw_auto)
   have hobj : PrfH [lt n v] (substtc v s (varc n) =eq varc n) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_substtc_var_lt v s n) _) hg
   exact PrfH_provCode_congr
@@ -1084,7 +1057,7 @@ theorem refl_caso_varc_at (v s n : Term)
       (tcFn (substtc v s (varc n))))) :=
     prf_or_elim (prf_lt_trichotomy v n) (br_lt v s n hPred)
       (prf_or_elim_imp (br_eq v s n) (br_gt v s n))
-  exact pcc_eq_trans_code _ _ _ (invA v s (varc n)) s0 hmain
+  exact pcc_eq_trans_code _ _ _ (invA v s (varc n)) (by hw_auto) (by hw_auto) (by hw_auto) s0 hmain
 
 /-- La forma que consume la induccion: la guarda llega como ecuacion PLANA `X ≐ varc n`. -/
 theorem refl_caso_varc (v s X n : Term) (hX : Prf (X =eq varc n))
@@ -1437,7 +1410,8 @@ theorem refl_caso_funcc_imp (v s p b : Term) :
       (substtcT (tcFn v) (tcFn s) (tcFn (funcc p b)))
       (tcFn (funcc p (substtsc v s b))))) :=
     PrfH_eq_trans_code _ _ _ (invA v s (funcc p b)) s1
-      (PrfH_eq_trans_code _ _ _ hY s2 (PrfH_eq_trans_code _ _ _ hZ s3 s4))
+      (PrfH_eq_trans_code _ _ _ hY s2
+        (PrfH_eq_trans_code _ _ _ hZ s3 s4 (by hw_auto) (by hw_auto) (by hw_auto)) (by hw_auto) (by hw_auto) (by hw_auto)) (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_substtc_func v s p b))))) _) hchain
 
@@ -1508,7 +1482,8 @@ theorem refl_lista_cons_imp (v s h t : Term) :
       (tcFn (cons (substtc v s h) (substtsc v s t))))) :=
     PrfH_eq_trans_code _ _ _ (invAs v s (cons h t)) s1
       (PrfH_eq_trans_code _ _ _ hY s2
-        (PrfH_eq_trans_code _ _ _ hZ s3 (PrfH_eq_trans_code _ _ _ hU s4 s5)))
+        (PrfH_eq_trans_code _ _ _ hZ s3
+          (PrfH_eq_trans_code _ _ _ hU s4 s5 (by hw_auto) (by hw_auto) (by hw_auto)) (by hw_auto) (by hw_auto) (by hw_auto)) (by hw_auto) (by hw_auto) (by hw_auto)) (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_substtsc_cons v s h t))))) _) hchain
 
@@ -1791,7 +1766,7 @@ theorem pcc_pred_succ_code (m : Term) :
       =eq eqCodeFn (predcT (succcT (tcFn m))) (tcFn m)) :=
     prf_substfc_arith_open 0 (tcFn m) AX26_BODY
   exact prf_mp (prf_provCode_congr hin)
-    (pcc_axiom_inst AX26_BODY (show ax26_pred_succ ∈ axioms by simp [axioms]) (tcFn m))
+    (pcc_axiom_inst AX26_BODY (show ax26_pred_succ ∈ axioms by simp [axioms]) (tcFn m) (by hw_auto))
 
 theorem PrfH_congr_pred {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b)) :
     PrfH Γ (pred a =eq pred b) := by
@@ -1868,7 +1843,6 @@ theorem pcc_eval_substtc_hasWit' (v s t : Term) :
 
 end SFsubsttc
 
-#print axioms SFsubsttc.pcc_axiom_inst4
 #print axioms SFsubsttc.prf_isTermCodeE1_of_In
 #print axioms SFsubsttc.pcc_pred_succ_code
 #print axioms SFsubsttc.predHyp
