@@ -1882,6 +1882,113 @@ theorem prf_hasWitF_substfc_mp (v s X : Term)
     (hX : Prf (hasWitF X)) (hs : Prf (hasWit s)) : Prf (hasWitF (substfc v s X)) :=
   prf_mp (prf_mp (prf_hasWitF_substfc v s X) hX) hs
 
+/-! ## §28 · LA ESCALERA DE ARIDAD — el kit que paga los constructores DOTADOS
+
+⭐ **Es la pieza que hace mecánica la propagación** (③ de §3.39.3). El árbol tiene ~35
+constructores de la **imagen punteada** —`addcT`, `succcT`, `carcT`, `cdrcT`, `nthcT`, `mulcT`,
+`consT`, `div2cT`, `lencT`, `predcT`, `liftcT`, `substfcT`, `nulT`/`unT`/`binT`, `cpOfT`,
+`eqCodeFn`, `atom1CodeFn`/`atom2CodeFn`, `ltCodeFn`…— y bajo ADR-020 cada sitio que los pasa como
+testigo o como código tiene que pagar su guarda.
+
+🔑 **Pero NO hacen falta ~35 lemas, hacen falta SEIS.** Medido: todos los de sorte TÉRMINO son
+`funcc (strCode σ) ⟨x₁,…,xₙ⟩` con n ≤ 3, y todos los de sorte FÓRMULA son nodos `eqc`/`atomc`.
+Así que basta una escalera por aridad, y cada constructor concreto se paga después **en una
+línea**, aguas abajo, donde esté definido.
+
+⚠️ **Y una trampa registrada que aquí NO muerde, comprobado con `rfl`**: `eqCodeFn` usa
+`numeral 4` y `eqc` usa `numeralM 4`, que son **dos constantes distintas**; pero con el índice
+LITERAL las dos reducen a `succ⁴ zero`, así que `eqCodeFn a b` **es** `eqc a b` definicionalmente,
+y `atom1CodeFn`/`atom2CodeFn` son `atomc` igual. No hace falta ningún puente.
+
+Todo esto es composición pura de §6, §11 y §22-§24: **no hay nada nuevo que demostrar**. -/
+
+/-! ### Listas de argumentos, por aridad -/
+
+theorem prf_hasWitArgs_1 (x : Term) (hx : Prf (hasWit x)) :
+    Prf (hasWitArgs (cons x nil)) :=
+  prf_mp (prf_mp (prf_hasWitArgs_cons x nil) hx) prf_hasWitArgs_nil
+
+theorem prf_hasWitArgs_2 (x y : Term) (hx : Prf (hasWit x)) (hy : Prf (hasWit y)) :
+    Prf (hasWitArgs (cons x (cons y nil))) :=
+  prf_mp (prf_mp (prf_hasWitArgs_cons x (cons y nil)) hx) (prf_hasWitArgs_1 y hy)
+
+theorem prf_hasWitArgs_3 (x y z : Term)
+    (hx : Prf (hasWit x)) (hy : Prf (hasWit y)) (hz : Prf (hasWit z)) :
+    Prf (hasWitArgs (cons x (cons y (cons z nil)))) :=
+  prf_mp (prf_mp (prf_hasWitArgs_cons x (cons y (cons z nil))) hx) (prf_hasWitArgs_2 y z hy hz)
+
+/-! ### Sorte TÉRMINO: **todo** constructor dotado es un `funcc` -/
+
+theorem prf_hasWit_funcc1 (S x : Term) (hx : Prf (hasWit x)) :
+    Prf (hasWit (funcc S (cons x nil))) :=
+  prf_mp (prf_hasWit_funcc S (cons x nil)) (prf_hasWitArgs_1 x hx)
+
+theorem prf_hasWit_funcc2 (S x y : Term) (hx : Prf (hasWit x)) (hy : Prf (hasWit y)) :
+    Prf (hasWit (funcc S (cons x (cons y nil)))) :=
+  prf_mp (prf_hasWit_funcc S (cons x (cons y nil))) (prf_hasWitArgs_2 x y hx hy)
+
+theorem prf_hasWit_funcc3 (S x y z : Term)
+    (hx : Prf (hasWit x)) (hy : Prf (hasWit y)) (hz : Prf (hasWit z)) :
+    Prf (hasWit (funcc S (cons x (cons y (cons z nil))))) :=
+  prf_mp (prf_hasWit_funcc S (cons x (cons y (cons z nil)))) (prf_hasWitArgs_3 x y z hx hy hz)
+
+/-! ### Sorte FÓRMULA: los ocho constructores, en forma de APLICACIÓN
+
+Los de §22-§24 están en forma de implicación objeto —que es como los consume el paso de
+inducción—; aguas abajo se usan aplicados, y con el tag ya fijado. -/
+
+theorem prf_hasWitF_atom1 (P x : Term) (hx : Prf (hasWit x)) :
+    Prf (hasWitF (atomc P (cons x nil))) :=
+  prf_mp (prf_hasWitF_atomc P (cons x nil)) (prf_hasWitArgs_1 x hx)
+
+theorem prf_hasWitF_atom2 (P x y : Term) (hx : Prf (hasWit x)) (hy : Prf (hasWit y)) :
+    Prf (hasWitF (atomc P (cons x (cons y nil)))) :=
+  prf_mp (prf_hasWitF_atomc P (cons x (cons y nil))) (prf_hasWitArgs_2 x y hx hy)
+
+theorem prf_hasWitF_eq2 (a b : Term) (ha : Prf (hasWit a)) (hb : Prf (hasWit b)) :
+    Prf (hasWitF (eqc a b)) :=
+  prf_mp (prf_mp (prf_hasWitF_eqc a b) ha) hb
+
+theorem prf_hasWitF_implc (a b : Term) (ha : Prf (hasWitF a)) (hb : Prf (hasWitF b)) :
+    Prf (hasWitF (implc a b)) :=
+  prf_mp (prf_mp (prf_hasWitF_bin 5 a b inj_bin5) ha) hb
+
+theorem prf_hasWitF_andc (a b : Term) (ha : Prf (hasWitF a)) (hb : Prf (hasWitF b)) :
+    Prf (hasWitF (andc a b)) :=
+  prf_mp (prf_mp (prf_hasWitF_bin 7 a b inj_bin7) ha) hb
+
+theorem prf_hasWitF_orc (a b : Term) (ha : Prf (hasWitF a)) (hb : Prf (hasWitF b)) :
+    Prf (hasWitF (orc a b)) :=
+  prf_mp (prf_mp (prf_hasWitF_bin 8 a b inj_bin8) ha) hb
+
+theorem prf_hasWitF_forallc (a : Term) (ha : Prf (hasWitF a)) :
+    Prf (hasWitF (forallc a)) :=
+  prf_mp (prf_hasWitF_un 6 a inj_un6) ha
+
+theorem prf_hasWitF_exc (a : Term) (ha : Prf (hasWitF a)) :
+    Prf (hasWitF (exc a)) :=
+  prf_mp (prf_hasWitF_un 9 a inj_un9) ha
+
+/-! ### CONTROLES: el molde, sobre objetivos REALES del árbol
+
+No son ejemplos de juguete: `tcFn (succ x)` es literalmente la forma que `NumCodeClosedPrf` usa
+para el sucesor punteado, y `implc`/`eqc` sobre códigos punteados es lo que pide
+`EvalBoundedPrf:237` — el único sitio de ③ cuyo código **no** es un `formCode`. -/
+
+/-- El sucesor punteado, `funcc ⌜succ⌝ [x]`, con testigo. -/
+example (x : Term) : Prf (hasWit (funcc (strCode "succ") (cons (tcFn x) nil))) :=
+  prf_hasWit_funcc1 _ _ (prf_hasWit_tcFn x)
+
+/-- Un constructor punteado BINARIO (`addcT`/`mulcT`/`nthcT`/`consT` son todos así). -/
+example (x y : Term) :
+    Prf (hasWit (funcc (strCode "add") (cons (tcFn x) (cons (tcFn y) nil)))) :=
+  prf_hasWit_funcc2 _ _ _ (prf_hasWit_tcFn x) (prf_hasWit_tcFn y)
+
+/-- La forma de `EvalBoundedPrf:237`: un nodo `implc` CONSTRUIDO, no un `formCode`. -/
+example (x y : Term) (Phic : Term) (hP : Prf (hasWitF Phic)) :
+    Prf (hasWitF (implc (eqc (tcFn x) (tcFn y)) Phic)) :=
+  prf_hasWitF_implc _ _ (prf_hasWitF_eq2 _ _ (prf_hasWit_tcFn x) (prf_hasWit_tcFn y)) hP
+
 end ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 
 export ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf (
@@ -1901,6 +2008,10 @@ export ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf (
   inj_bot inj_atom inj_eq inj_bin5 inj_un6 inj_bin7 inj_bin8 inj_un9
   prf_hasWitF_imp prf_isFC1_unN prf_isFC1_binN prf_hasWitF_un prf_hasWitF_bin
   prf_hasWitF_bot prf_hasWitF_atomc prf_hasWitF_eqc
+  prf_hasWitArgs_1 prf_hasWitArgs_2 prf_hasWitArgs_3
+  prf_hasWit_funcc1 prf_hasWit_funcc2 prf_hasWit_funcc3
+  prf_hasWitF_atom1 prf_hasWitF_atom2 prf_hasWitF_eq2
+  prf_hasWitF_implc prf_hasWitF_andc prf_hasWitF_orc prf_hasWitF_forallc prf_hasWitF_exc
   nilOrCons nilOrCons_at prf_nil_or_cons_all prf_nil_or_cons
 )
 
@@ -1910,3 +2021,5 @@ export ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf (
 #print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWitF_substfc
 #print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWitF_bin
 #print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons
+#print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWit_funcc2
+#print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWitF_implc
