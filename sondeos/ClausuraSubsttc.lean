@@ -950,4 +950,962 @@ theorem PHIF_use {Γ : List Formula} (t wF wT v s : Term)
   have h4 := PrfH_spec h3 s
   rwa [PHIF_spec4] at h4
 
+/-! ## §17 · MONOTONÍA de `isFormCodeE2` — la pieza de la que cuelga la mitad FÓRMULA
+
+`isFormCodeE2` es una disyunción de OCHO cláusulas, y el testigo entra en cada una sólo por `In`
+o por `argsIn`. Así que cada cláusula es monótona por separado y se combinan con `or`-elim
+encadenado. ⚠️ El testigo tiene **DOS** componentes: `wT` gobierna `clAtom`/`clEq` y `wF` gobierna
+`clBin`/`clUn`; `clBot` no lleva testigo y es invariante. -/
+
+/-- De `X ⇒ a` sale `X ⇒ a ∨ b`. -/
+theorem prf_imp_orL {X a b : Formula} (h : Prf (Formula.impl X a)) :
+    Prf (Formula.impl X (lor a b)) :=
+  ROBINSON_PlusPlus.Meta.ReprPrf.prf_syll h (Prf.incl (Prf₀.j1 a b))
+
+/-- De `X ⇒ b` sale `X ⇒ a ∨ b`. -/
+theorem prf_imp_orR {X a b : Formula} (h : Prf (Formula.impl X b)) :
+    Prf (Formula.impl X (lor a b)) :=
+  ROBINSON_PlusPlus.Meta.ReprPrf.prf_syll h (Prf.incl (Prf₀.j2 a b))
+
+/-- La identidad, como implicación. -/
+theorem prf_imp_self (A : Formula) : Prf (Formula.impl A A) :=
+  prf_deduction (prfH_hyp_self _)
+
+/-- Conjunción monótona en la segunda componente. -/
+theorem prf_and_mono_right {A B B' : Formula} (h : Prf (Formula.impl B B')) :
+    Prf (Formula.impl (land A B) (land A B')) := by
+  refine prf_deduction ?_
+  have hh : PrfH [land A B] (land A B) := prfH_hyp_self _
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hh))
+    (PrfH.mp _ _ _ (prf_to_prfH h _) (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hh))
+
+/-- `In x w ∧ In y w` es monótono. -/
+theorem prf_inPair_mono_of (w w' x y : Term)
+    (hsub : ∀ z : Term, Prf (Formula.impl (In z w) (In z w'))) :
+    Prf (Formula.impl (land (In x w) (In y w)) (land (In x w') (In y w'))) := by
+  refine prf_deduction ?_
+  have hh : PrfH [land (In x w) (In y w)] (land (In x w) (In y w)) := prfH_hyp_self _
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _))
+    (PrfH.mp _ _ _ (prf_to_prfH (hsub x) _)
+      (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hh)))
+    (PrfH.mp _ _ _ (prf_to_prfH (hsub y) _)
+      (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hh))
+
+/-- **MONOTONÍA de `isFormCodeE2`** en los DOS testigos. -/
+theorem prf_isFormCodeE2_mono_of (wF wF' wT wT' X : Term)
+    (hF : ∀ z : Term, Prf (Formula.impl (In z wF) (In z wF')))
+    (hTl : ∀ z : Term, Prf (Formula.impl (In z (liftTerm 0 wT)) (In z (liftTerm 0 wT'))))
+    (hT : ∀ z : Term, Prf (Formula.impl (In z wT) (In z wT'))) :
+    Prf (Formula.impl (isFormCodeE2 wF wT X) (isFormCodeE2 wF' wT' X)) := by
+  unfold isFormCodeE2 lorAll
+  refine prf_or_elim_imp (prf_imp_orL (prf_imp_self (clBot X))) ?_
+  refine prf_or_elim_imp (prf_imp_orR (prf_imp_orL ?_)) ?_
+  · -- clAtom: monotono en `wT` via `argsIn`
+    exact prf_and_mono_right (prf_argsIn_mono_of wT wT' (nthc X (numeralM 2)) hTl)
+  refine prf_or_elim_imp (prf_imp_orR (prf_imp_orR (prf_imp_orL ?_))) ?_
+  · -- clEq: dos `In` contra `wT`
+    exact prf_and_mono_right (prf_inPair_mono_of wT wT'
+      (nthc X (numeralM 1)) (nthc X (numeralM 2)) hT)
+  refine prf_or_elim_imp (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orL ?_)))) ?_
+  · exact prf_and_mono_right (prf_inPair_mono_of wF wF'
+      (nthc X (numeralM 1)) (nthc X (numeralM 2)) hF)
+  refine prf_or_elim_imp (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR
+    (prf_imp_orL ?_))))) ?_
+  · exact prf_and_mono_right (hF (nthc X (numeralM 1)))
+  refine prf_or_elim_imp (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR
+    (prf_imp_orR (prf_imp_orL ?_)))))) ?_
+  · exact prf_and_mono_right (prf_inPair_mono_of wF wF'
+      (nthc X (numeralM 1)) (nthc X (numeralM 2)) hF)
+  refine prf_or_elim_imp (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR
+    (prf_imp_orR (prf_imp_orR (prf_imp_orL ?_))))))) ?_
+  · exact prf_and_mono_right (prf_inPair_mono_of wF wF'
+      (nthc X (numeralM 1)) (nthc X (numeralM 2)) hF)
+  · exact prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR
+      (prf_imp_orR (prf_imp_orR (prf_and_mono_right (hF (nthc X (numeralM 1)))))))))) 
+
+/-! ## §18 · El testigo de FÓRMULAS: monotonía en `wT`, extensión y FUSIÓN
+
+Mismo molde que §4 y §10 del sorte término. ⚠️ La asimetría: `wfAllF wF wT` **no** es monótono en
+`wF` (que aparece también en la COTA `lenc wF`), pero sí en `wT`. Extender o fusionar `wF` va por
+el corte de índice / la forma de pertenencia, igual que antes. -/
+
+def CTXf (A wF wT : Term) : List Formula :=
+  [lt (.var 0) (lenc (cons (liftTerm 0 A) (liftTerm 0 wF))),
+   land (isFormCodeE2 (cons (liftTerm 0 A) (liftTerm 0 wF)) (liftTerm 0 wT) (liftTerm 0 A))
+     (wfAllF (liftTerm 0 wF) (liftTerm 0 wT))]
+
+/-- **`wfAllF` es monótono en el testigo de TÉRMINOS.** -/
+theorem prf_wfAllF_mono_wT (wF wT wT' : Term)
+    (hT : ∀ z : Term, Prf (Formula.impl (In z (liftTerm 0 wT)) (In z (liftTerm 0 wT'))))
+    (hTl : ∀ z : Term, Prf (Formula.impl (In z (liftTerm 0 (liftTerm 0 wT)))
+      (In z (liftTerm 0 (liftTerm 0 wT'))))) :
+    Prf (Formula.impl (wfAllF wF wT) (wfAllF wF wT')) := by
+  refine prf_mp (Prf.qconf (wfAllF wF wT) (wfAllFBody wF wT')) (Prf.gen _ ?_)
+  simp only [liftF_wfAllF]
+  refine prf_deduction (deduction_aux ?_ (lt (.var 0) (liftTerm 0 (lenc wF)))
+    [wfAllF (liftTerm 0 wF) (liftTerm 0 wT)] rfl)
+  have hlt : PrfH [lt (.var 0) (lenc (liftTerm 0 wF)),
+      wfAllF (liftTerm 0 wF) (liftTerm 0 wT)] (lt (.var 0) (lenc (liftTerm 0 wF))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hw : PrfH [lt (.var 0) (lenc (liftTerm 0 wF)),
+      wfAllF (liftTerm 0 wF) (liftTerm 0 wT)] (wfAllF (liftTerm 0 wF) (liftTerm 0 wT)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hnode := PrfH.mp _ _ _
+    (PrfH_inst_wfAllF (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) hw) hlt
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_isFormCodeE2_mono_of
+    (liftTerm 0 wF) (liftTerm 0 wF) (liftTerm 0 wT) (liftTerm 0 wT')
+    (nthc (liftTerm 0 wF) (.var 0))
+    (fun z => prf_imp_self (In z (liftTerm 0 wF))) hTl hT) _) hnode
+
+/-- **EXTENSIÓN del testigo de FÓRMULAS con un nodo.** -/
+theorem prf_wfAllF_cons (A wF wT : Term) :
+    Prf (Formula.impl
+      (land (isFormCodeE2 (cons A wF) wT A) (wfAllF wF wT)) (wfAllF (cons A wF) wT)) := by
+  refine prf_mp (Prf.qconf (land (isFormCodeE2 (cons A wF) wT A) (wfAllF wF wT))
+    (wfAllFBody (cons A wF) wT)) (Prf.gen _ ?_)
+  simp only [liftFormula, liftF_isFormCodeE2, liftF_wfAllF, land]
+  refine prf_deduction (deduction_aux ?_
+    (lt (.var 0) (liftTerm 0 (lenc (cons A wF))))
+    [land (isFormCodeE2 (cons (liftTerm 0 A) (liftTerm 0 wF)) (liftTerm 0 wT) (liftTerm 0 A))
+      (wfAllF (liftTerm 0 wF) (liftTerm 0 wT))] rfl)
+  refine PrfH_or_elim (prf_to_prfH (prf_zero_or_eq_succ_pred (.var 0)) _) ?zc ?sc
+  case zc =>
+    have hz : PrfH (Formula.eq (.var 0) zero :: CTXf A wF wT) (Formula.eq (.var 0) zero) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hA : PrfH (Formula.eq (.var 0) zero :: CTXf A wF wT)
+        (isFormCodeE2 (cons (liftTerm 0 A) (liftTerm 0 wF)) (liftTerm 0 wT) (liftTerm 0 A)) :=
+      PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    have hnth : PrfH (Formula.eq (.var 0) zero :: CTXf A wF wT)
+        (nthc (cons (liftTerm 0 A) (liftTerm 0 wF)) (.var 0) =eq liftTerm 0 A) :=
+      PrfH_eq_trans (PrfH_congr_nthc_idx _ hz)
+        (prf_to_prfH (prf_nthc_zero (liftTerm 0 A) (liftTerm 0 wF)) _)
+    exact PrfH_congr_isFormCodeE2 (PrfH_eq_symm hnth) hA
+  case sc =>
+    have hs : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+        (Formula.eq (.var 0) (succ (pred (.var 0)))) := PrfH.hyp _ _ (List.Mem.head _)
+    have hlt2 : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+        (lt (.var 0) (lenc (cons (liftTerm 0 A) (liftTerm 0 wF)))) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+        (wfAllF (liftTerm 0 wF) (liftTerm 0 wT)) :=
+      PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+        (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 wF)))) :=
+      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+        (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 wF)) _)
+        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+    have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+        (lt (pred (.var 0)) (lenc (liftTerm 0 wF))) :=
+      PrfH.mp _ _ _ (prf_to_prfH
+        (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (liftTerm 0 wF))) _) hltS
+    have hnode := PrfH.mp _ _ _
+      (PrfH_inst_wfAllF (liftTerm 0 wF) (liftTerm 0 wT) (pred (.var 0)) hw) hltw
+    have hmono := PrfH.mp _ _ _ (prf_to_prfH (prf_isFormCodeE2_mono_of
+      (liftTerm 0 wF) (cons (liftTerm 0 A) (liftTerm 0 wF))
+      (liftTerm 0 wT) (liftTerm 0 wT) (nthc (liftTerm 0 wF) (pred (.var 0)))
+      (fun z => prf_in_cons_tail_imp (liftTerm 0 A) z (liftTerm 0 wF))
+      (fun z => prf_imp_self (In z (liftTerm 0 (liftTerm 0 wT))))
+      (fun z => prf_imp_self (In z (liftTerm 0 wT)))) _) hnode
+    have hnth : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
+        (nthc (cons (liftTerm 0 A) (liftTerm 0 wF)) (.var 0)
+          =eq nthc (liftTerm 0 wF) (pred (.var 0))) :=
+      PrfH_eq_trans (PrfH_congr_nthc_idx _ hs)
+        (prf_to_prfH (prf_nthc_succ (liftTerm 0 A) (liftTerm 0 wF) (pred (.var 0))) _)
+    exact PrfH_congr_isFormCodeE2 (PrfH_eq_symm hnth) hmono
+
+/-! ## §19 · LA FUSIÓN del testigo de FÓRMULAS
+
+Misma ruta que §10 (TAREA A): forma de PERTENENCIA —donde `concat` es axioma—, `or`-elim sobre
+las dos mitades, y vuelta por monotonía. `prf_isFormCodeE2_of_In` ya existía. -/
+
+def CTXfc (WF1 WF2 wT : Term) : List Formula :=
+  [lt (.var 0) (lenc (concat (liftTerm 0 WF1) (liftTerm 0 WF2))),
+   land (wfAllF (liftTerm 0 WF1) (liftTerm 0 wT)) (wfAllF (liftTerm 0 WF2) (liftTerm 0 wT))]
+
+theorem prf_wfAllF_concat (WF1 WF2 wT : Term) :
+    Prf (Formula.impl (land (wfAllF WF1 wT) (wfAllF WF2 wT))
+      (wfAllF (concat WF1 WF2) wT)) := by
+  refine prf_mp (Prf.qconf (land (wfAllF WF1 wT) (wfAllF WF2 wT))
+    (wfAllFBody (concat WF1 WF2) wT)) (Prf.gen _ ?_)
+  simp only [liftFormula, liftF_wfAllF, land]
+  refine prf_deduction (deduction_aux ?_
+    (lt (.var 0) (liftTerm 0 (lenc (concat WF1 WF2))))
+    [land (wfAllF (liftTerm 0 WF1) (liftTerm 0 wT))
+      (wfAllF (liftTerm 0 WF2) (liftTerm 0 wT))] rfl)
+  have hlt : PrfH (CTXfc WF1 WF2 wT)
+      (lt (.var 0) (lenc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hinC : PrfH (CTXfc WF1 WF2 wT)
+      (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+        (concat (liftTerm 0 WF1) (liftTerm 0 WF2))) :=
+    PrfH.mp _ _ _ (prf_to_prfH
+      (prf_in_nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0)) _) hlt
+  have hor : PrfH (CTXfc WF1 WF2 wT)
+      (lor (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0)) (liftTerm 0 WF1))
+           (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0)) (liftTerm 0 WF2))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _))
+      (prf_to_prfH (prf_in_concat
+        (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+        (liftTerm 0 WF1) (liftTerm 0 WF2)) _)) hinC
+  refine PrfH_or_elim hor ?iz ?dr
+  case iz =>
+    have hin : PrfH (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+          (liftTerm 0 WF1) :: CTXfc WF1 WF2 wT)
+        (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0)) (liftTerm 0 WF1)) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hw : PrfH (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+          (liftTerm 0 WF1) :: CTXfc WF1 WF2 wT)
+        (wfAllF (liftTerm 0 WF1) (liftTerm 0 wT)) :=
+      PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    have hnode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH
+      (prf_isFormCodeE2_of_In (liftTerm 0 WF1) (liftTerm 0 wT)
+        (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))) _) hin) hw
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_isFormCodeE2_mono_of
+      (liftTerm 0 WF1) (concat (liftTerm 0 WF1) (liftTerm 0 WF2))
+      (liftTerm 0 wT) (liftTerm 0 wT)
+      (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+      (fun z => prf_In_mono_right_imp z (liftTerm 0 WF2) (liftTerm 0 WF1))
+      (fun z => prf_imp_self (In z (liftTerm 0 (liftTerm 0 wT))))
+      (fun z => prf_imp_self (In z (liftTerm 0 wT)))) _) hnode
+  case dr =>
+    have hin : PrfH (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+          (liftTerm 0 WF2) :: CTXfc WF1 WF2 wT)
+        (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0)) (liftTerm 0 WF2)) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hw : PrfH (In (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+          (liftTerm 0 WF2) :: CTXfc WF1 WF2 wT)
+        (wfAllF (liftTerm 0 WF2) (liftTerm 0 wT)) :=
+      PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    have hnode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH
+      (prf_isFormCodeE2_of_In (liftTerm 0 WF2) (liftTerm 0 wT)
+        (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))) _) hin) hw
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_isFormCodeE2_mono_of
+      (liftTerm 0 WF2) (concat (liftTerm 0 WF1) (liftTerm 0 WF2))
+      (liftTerm 0 wT) (liftTerm 0 wT)
+      (nthc (concat (liftTerm 0 WF1) (liftTerm 0 WF2)) (.var 0))
+      (fun z => prf_In_mono_imp z (liftTerm 0 WF2) (liftTerm 0 WF1))
+      (fun z => prf_imp_self (In z (liftTerm 0 (liftTerm 0 wT))))
+      (fun z => prf_imp_self (In z (liftTerm 0 wT)))) _) hnode
+
+/-! ## §20 · Los NODOS de fórmula, genéricos en el tag
+
+`implc`/`andc`/`orc` son el mismo nodo binario con tag 5/7/8, y `forallc`/`exc` el mismo unario
+con 6/9 — definicionalmente. Se prueba UNA vez cada forma y se instancia. -/
+
+/-- Nodo BINARIO de tag `k`: `⟨k̄, a, b⟩`. -/
+def binN (k : Nat) (a b : Term) : Term := cons (numeralM k) (cons a (cons b nil))
+/-- Nodo UNARIO de tag `k`: `⟨k̄, a⟩`. -/
+def unN (k : Nat) (a : Term) : Term := cons (numeralM k) (cons a nil)
+
+theorem prf_nthc_binN1 (k : Nat) (a b : Term) :
+    Prf (nthc (binN k a b) (numeralM 1) =eq a) := prf_nthc_c1 (numeralM k) a (cons b nil)
+theorem prf_nthc_binN2 (k : Nat) (a b : Term) :
+    Prf (nthc (binN k a b) (numeralM 2) =eq b) := prf_nthc_c2 (numeralM k) a b nil
+theorem prf_nthc_unN1 (k : Nat) (a : Term) :
+    Prf (nthc (unN k a) (numeralM 1) =eq a) := prf_nthc_c1 (numeralM k) a nil
+
+theorem prf_shapeBin_binN (k : Nat) (a b : Term) : Prf (shapeBin (binN k a b) k) :=
+  prf_eq_symm (prf_congr_cons_tail (prf_eq_trans
+    (prf_congr_cons_head (prf_nthc_binN1 k a b))
+    (prf_congr_cons_tail (prf_congr_cons_head (prf_nthc_binN2 k a b)))))
+
+theorem prf_shapeUn_unN (k : Nat) (a : Term) : Prf (shapeUn (unN k a) k) :=
+  prf_eq_symm (prf_congr_cons_tail (prf_congr_cons_head (prf_nthc_unN1 k a)))
+
+/-- La cláusula BINARIA del nodo, con sus dos casillas en el testigo. -/
+theorem prf_clBin_node (wF a b : Term) (k : Nat)
+    (ha : Prf (In a wF)) (hb : Prf (In b wF)) : Prf (clBin wF (binN k a b) k) :=
+  prf_and_intro (prf_shapeBin_binN k a b)
+    (prf_and_intro
+      (prf_congr_In_left (prf_eq_symm (prf_nthc_binN1 k a b)) ha)
+      (prf_congr_In_left (prf_eq_symm (prf_nthc_binN2 k a b)) hb))
+
+/-- La cláusula UNARIA del nodo. -/
+theorem prf_clUn_node (wF a : Term) (k : Nat) (ha : Prf (In a wF)) :
+    Prf (clUn wF (unN k a) k) :=
+  prf_and_intro (prf_shapeUn_unN k a)
+    (prf_congr_In_left (prf_eq_symm (prf_nthc_unN1 k a)) ha)
+
+/-- Las mismas, en forma de IMPLICACIÓN: es como llegan cuando la pertenencia viene del
+    contexto `PrfH` y no como `Prf` (la moneda OBJETO otra vez). -/
+theorem prf_clUn_node_imp (wF a : Term) (k : Nat) :
+    Prf (Formula.impl (In a wF) (clUn wF (unN k a) k)) := by
+  refine prf_deduction ?_
+  have h : PrfH [In a wF] (In a wF) := prfH_hyp_self _
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _))
+    (prf_to_prfH (prf_shapeUn_unN k a) _))
+    (PrfH_congr_In_left (prf_to_prfH (prf_eq_symm (prf_nthc_unN1 k a)) _) h)
+
+theorem prf_clBin_node_imp (wF a b : Term) (k : Nat) :
+    Prf (Formula.impl (land (In a wF) (In b wF)) (clBin wF (binN k a b) k)) := by
+  refine prf_deduction ?_
+  have h : PrfH [land (In a wF) (In b wF)] (land (In a wF) (In b wF)) := prfH_hyp_self _
+  have ha := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) h
+  have hb := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) h
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _))
+    (prf_to_prfH (prf_shapeBin_binN k a b) _))
+    (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _))
+      (PrfH_congr_In_left (prf_to_prfH (prf_eq_symm (prf_nthc_binN1 k a b)) _) ha))
+      (PrfH_congr_In_left (prf_to_prfH (prf_eq_symm (prf_nthc_binN2 k a b)) _) hb))
+
+/-! ## §21 · Las OCHO inyecciones en `isFormCodeE2`
+
+`isFormCodeE2` es `clBot ∨ (clAtom ∨ (clEq ∨ (clBin 5 ∨ (clUn 6 ∨ (clBin 7 ∨ (clBin 8 ∨ clUn 9))))))`.
+Cada caso entra por su posición. -/
+
+theorem inj_bot (wF wT X : Term) : Prf (Formula.impl (clBot X) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orL (prf_imp_self _)
+theorem inj_atom (wF wT X : Term) : Prf (Formula.impl (clAtom wT X) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orL (prf_imp_self _))
+theorem inj_eq (wF wT X : Term) : Prf (Formula.impl (clEq wT X) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orR (prf_imp_orL (prf_imp_self _)))
+theorem inj_bin5 (wF wT X : Term) : Prf (Formula.impl (clBin wF X 5) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orL (prf_imp_self _))))
+theorem inj_un6 (wF wT X : Term) : Prf (Formula.impl (clUn wF X 6) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orL (prf_imp_self _)))))
+theorem inj_bin7 (wF wT X : Term) : Prf (Formula.impl (clBin wF X 7) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orL
+    (prf_imp_self _))))))
+theorem inj_bin8 (wF wT X : Term) : Prf (Formula.impl (clBin wF X 8) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR
+    (prf_imp_orL (prf_imp_self _)))))))
+theorem inj_un9 (wF wT X : Term) : Prf (Formula.impl (clUn wF X 9) (isFormCodeE2 wF wT X)) :=
+  prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR (prf_imp_orR
+    (prf_imp_orR (prf_imp_self _)))))))
+
+/-! ## §22 · INTRODUCIR el testigo, y los DOS constructores con testigos ABSTRACTOS
+
+🔑 **La regla de método otra vez** (§3.37.4): *sacar el `∃` fuera del paso*. Toda la fusión se hace
+aquí con los testigos **abstractos** —ni un índice De Bruijn que mover— y en forma de
+**IMPLICACIÓN objeto**, que es como llegan las cosas desde un contexto `PrfH`. Los existenciales se
+eliminan en §23, y allí cada caso es un solo `mp`. -/
+
+/-- **Introducción de la guarda existencial**: dos `q2` encadenados. Es `prf_hasWitF_real` en
+    abstracto, y en forma de implicación OBJETO. -/
+theorem prf_hasWitF_imp (wF wT X : Term) :
+    Prf (Formula.impl (isFC1 wF wT X) (hasWitF X)) := by
+  have h2 : Prf (Formula.impl
+      (substFormula 0 wT (isFC1 (liftTerm 0 wF) (.var 0) (liftTerm 0 X)))
+      (Formula.ex (isFC1 (liftTerm 0 wF) (.var 0) (liftTerm 0 X)))) :=
+    Prf.incl (Prf₀.q2 _ wT)
+  have h2' : Prf (Formula.impl (isFC1 wF wT X)
+      (Formula.ex (isFC1 (liftTerm 0 wF) (.var 0) (liftTerm 0 X)))) := by
+    simpa only [substF_isFC1, substTerm, if_true, FOL.substTerm_liftTerm] using h2
+  have h1 : Prf (Formula.impl (substFormula 0 wF (Formula.ex (isFC1 (.var 1) (.var 0)
+      (liftTerm 0 (liftTerm 0 X))))) (hasWitF X)) := Prf.incl (Prf₀.q2 _ wF)
+  have hz1 : (0 = 1) = False := eq_false (by omega)
+  have h1' : Prf (Formula.impl (Formula.ex (isFC1 (liftTerm 0 wF) (.var 0) (liftTerm 0 X)))
+      (hasWitF X)) := by
+    simpa only [substFormula, substF_isFC1, substTerm, Nat.reduceAdd, Nat.reduceLT,
+      Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, hz1, if_false,
+      FOL.substTerm_liftLift] using h1
+  exact ROBINSON_PlusPlus.Meta.ReprPrf.prf_syll h2' h1'
+
+/-- **El nodo UNARIO con testigo abstracto**: basta EXTENDER el testigo de fórmulas con el nodo;
+    el de términos no se toca. -/
+theorem prf_isFC1_unN (k : Nat) (A wF wT : Term)
+    (inj : ∀ wF wT X : Term, Prf (Formula.impl (clUn wF X k) (isFormCodeE2 wF wT X))) :
+    Prf (Formula.impl (isFC1 wF wT A)
+      (isFC1 (cons (unN k A) wF) wT (unN k A))) := by
+  refine prf_deduction ?_
+  have h : PrfH [isFC1 wF wT A] (isFC1 wF wT A) := prfH_hyp_self _
+  have hwT := PrfH_and_elim_left (PrfH_and_elim_left h)
+  have hwF := PrfH_and_elim_right (PrfH_and_elim_left h)
+  have hin := PrfH_and_elim_right h
+  have hinC := PrfH.mp _ _ _ (prf_to_prfH (prf_in_cons_tail_imp (unN k A) A wF) _) hin
+  have hcl := PrfH.mp _ _ _ (prf_to_prfH (prf_clUn_node_imp (cons (unN k A) wF) A k) _) hinC
+  have hnode := PrfH.mp _ _ _ (prf_to_prfH (inj (cons (unN k A) wF) wT (unN k A)) _) hcl
+  have hwF' := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAllF_cons (unN k A) wF wT) _)
+    (PrfH_and_intro hnode hwF)
+  exact PrfH_and_intro (PrfH_and_intro hwT hwF')
+    (prf_to_prfH (prf_in_cons_head (unN k A) wF) _)
+
+/-- **El nodo BINARIO con testigos abstractos** — LA FUSIÓN de los dos componentes: `concat` en el
+    testigo de términos (TAREA A) y en el de fórmulas (§19), monotonía para que cada mitad siga
+    cubriendo lo suyo, y extensión con el nodo. -/
+theorem prf_isFC1_binN (k : Nat) (A B wFa wTa wFb wTb : Term)
+    (inj : ∀ wF wT X : Term, Prf (Formula.impl (clBin wF X k) (isFormCodeE2 wF wT X))) :
+    Prf (Formula.impl (land (isFC1 wFa wTa A) (isFC1 wFb wTb B))
+      (isFC1 (cons (binN k A B) (concat wFa wFb)) (concat wTa wTb) (binN k A B))) := by
+  refine prf_deduction ?_
+  have h : PrfH [land (isFC1 wFa wTa A) (isFC1 wFb wTb B)]
+      (land (isFC1 wFa wTa A) (isFC1 wFb wTb B)) := prfH_hyp_self _
+  have ha := PrfH_and_elim_left h
+  have hb := PrfH_and_elim_right h
+  have hwTa := PrfH_and_elim_left (PrfH_and_elim_left ha)
+  have hwFa := PrfH_and_elim_right (PrfH_and_elim_left ha)
+  have hina := PrfH_and_elim_right ha
+  have hwTb := PrfH_and_elim_left (PrfH_and_elim_left hb)
+  have hwFb := PrfH_and_elim_right (PrfH_and_elim_left hb)
+  have hinb := PrfH_and_elim_right hb
+  -- (1) el testigo de TERMINOS se fusiona (TAREA A)
+  have hwT := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAll1_concat wTa wTb) _)
+    (PrfH_and_intro hwTa hwTb)
+  -- (2) los dos `wfAllF` suben al `wT` fusionado, y luego se fusionan entre si (§18-§19)
+  have hwFa2 := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAllF_mono_wT wFa wTa (concat wTa wTb)
+    (fun z => prf_In_mono_right_imp z (liftTerm 0 wTb) (liftTerm 0 wTa))
+    (fun z => prf_In_mono_right_imp z (liftTerm 0 (liftTerm 0 wTb))
+      (liftTerm 0 (liftTerm 0 wTa)))) _) hwFa
+  have hwFb2 := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAllF_mono_wT wFb wTb (concat wTa wTb)
+    (fun z => prf_In_mono_imp z (liftTerm 0 wTb) (liftTerm 0 wTa))
+    (fun z => prf_In_mono_imp z (liftTerm 0 (liftTerm 0 wTb))
+      (liftTerm 0 (liftTerm 0 wTa)))) _) hwFb
+  have hwFc := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAllF_concat wFa wFb (concat wTa wTb)) _)
+    (PrfH_and_intro hwFa2 hwFb2)
+  -- (3) las dos casillas siguen en el testigo EXTENDIDO
+  have hinaC := PrfH.mp _ _ _
+    (prf_to_prfH (prf_in_cons_tail_imp (binN k A B) A (concat wFa wFb)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_In_mono_right_imp A wFb wFa) _) hina)
+  have hinbC := PrfH.mp _ _ _
+    (prf_to_prfH (prf_in_cons_tail_imp (binN k A B) B (concat wFa wFb)) _)
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_In_mono_imp B wFb wFa) _) hinb)
+  -- (4) el nodo, y la extension del testigo de formulas
+  have hcl := PrfH.mp _ _ _
+    (prf_to_prfH (prf_clBin_node_imp (cons (binN k A B) (concat wFa wFb)) A B k) _)
+    (PrfH_and_intro hinaC hinbC)
+  have hnode := PrfH.mp _ _ _
+    (prf_to_prfH (inj (cons (binN k A B) (concat wFa wFb)) (concat wTa wTb) (binN k A B)) _) hcl
+  have hwF' := PrfH.mp _ _ _
+    (prf_to_prfH (prf_wfAllF_cons (binN k A B) (concat wFa wFb) (concat wTa wTb)) _)
+    (PrfH_and_intro hnode hwFc)
+  exact PrfH_and_intro (PrfH_and_intro hwT hwF')
+    (prf_to_prfH (prf_in_cons_head (binN k A B) (concat wFa wFb)) _)
+
+/-! ## §23 · Los dos constructores, ya SIN testigos
+
+Se eliminan los existenciales (dos por operando) y se aplica §22. Es donde se ve el ahorro: el
+cuerpo de cada uno son cuatro líneas, porque toda la fusión ya está pagada en abstracto. -/
+
+/-- El contexto que dejan las DOS eliminaciones del caso unario. -/
+def CTXu (a : Term) : List Formula :=
+  [isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a)),
+   liftFormula 0 (Formula.ex (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a))))]
+
+theorem prf_hasWitF_un (k : Nat) (a : Term)
+    (inj : ∀ wF wT X : Term, Prf (Formula.impl (clUn wF X k) (isFormCodeE2 wF wT X))) :
+    Prf (Formula.impl (hasWitF a) (hasWitF (unN k a))) := by
+  refine prf_ex_elim_imp ?_
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil]
+  have hF : PrfH (CTXu a) (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hg : liftFormula 0 (liftFormula 0 (hasWitF (unN k a)))
+      = hasWitF (unN k (liftTerm 0 (liftTerm 0 a))) := by
+    simp only [liftF_hasWitF, unN, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
+  rw [hg]
+  have hstep := PrfH.mp _ _ _ (prf_to_prfH
+    (prf_isFC1_unN k (liftTerm 0 (liftTerm 0 a)) (.var 1) (.var 0) inj) _) hF
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_imp
+    (cons (unN k (liftTerm 0 (liftTerm 0 a))) (.var 1)) (.var 0)
+    (unN k (liftTerm 0 (liftTerm 0 a)))) _) hstep
+
+/-- El contexto que dejan las CUATRO eliminaciones del caso binario: los testigos de `a` quedan en
+    `#3`/`#2` y los de `b` en `#1`/`#0`, y los códigos con CUATRO lifts. -/
+def CTXb (a b : Term) : List Formula :=
+  [isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b)))),
+   liftFormula 0 (Formula.ex (isFC1 (.var 1) (.var 0)
+     (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b)))))),
+   liftFormula 0 (liftFormula 0 (hasWitF (liftTerm 0 (liftTerm 0 b)))),
+   liftFormula 0 (liftFormula 0 (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a)))),
+   liftFormula 0 (liftFormula 0 (liftFormula 0 (Formula.ex (isFC1 (.var 1) (.var 0)
+     (liftTerm 0 (liftTerm 0 a))))))]
+
+theorem prf_hasWitF_bin (k : Nat) (a b : Term)
+    (inj : ∀ wF wT X : Term, Prf (Formula.impl (clBin wF X k) (isFormCodeE2 wF wT X))) :
+    Prf (Formula.impl (hasWitF a) (Formula.impl (hasWitF b) (hasWitF (binN k a b)))) := by
+  refine prf_ex_elim_imp ?_
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil]
+  have hgb : liftFormula 0 (liftFormula 0 (Formula.impl (hasWitF b) (hasWitF (binN k a b))))
+      = Formula.impl (hasWitF (liftTerm 0 (liftTerm 0 b)))
+          (hasWitF (binN k (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b)))) := by
+    simp only [liftFormula, liftF_hasWitF, binN, cons, nil, zero, liftTerm, liftTerms,
+      liftTerm_numeralM]
+  rw [hgb]
+  refine deduction_aux ?_ (hasWitF (liftTerm 0 (liftTerm 0 b)))
+    [isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a)),
+     liftFormula 0 (Formula.ex (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a))))] rfl
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil]
+  -- testigos de `b`: `#1`/`#0`, directos;  de `a`: `#3`/`#2`, tras los dos lifts de contexto
+  have hFb : PrfH (CTXb a b) (isFC1 (.var 1) (.var 0)
+      (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b))))) := PrfH.hyp _ _ (List.Mem.head _)
+  have hFa : PrfH (CTXb a b) (liftFormula 0 (liftFormula 0
+      (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 a))))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+  have hFa' : PrfH (CTXb a b) (isFC1 (.var 3) (.var 2)
+      (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 a))))) := by
+    simpa only [liftF_isFC1, liftTerm, Nat.reduceAdd, Nat.reduceLT, reduceIte] using hFa
+  have hgoal : liftFormula 0 (liftFormula 0 (hasWitF (binN k (liftTerm 0 (liftTerm 0 a))
+      (liftTerm 0 (liftTerm 0 b)))))
+      = hasWitF (binN k (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 a))))
+          (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b))))) := by
+    simp only [liftF_hasWitF, binN, cons, nil, zero, liftTerm, liftTerms, liftTerm_numeralM]
+  rw [hgoal]
+  have hstep := PrfH.mp _ _ _ (prf_to_prfH (prf_isFC1_binN k
+    (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 a))))
+    (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b))))
+    (.var 3) (.var 2) (.var 1) (.var 0) inj) _) (PrfH_and_intro hFa' hFb)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_imp
+    (cons (binN k (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 a))))
+      (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b))))) (concat (.var 3) (.var 1)))
+    (concat (.var 2) (.var 0))
+    (binN k (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 a))))
+      (liftTerm 0 (liftTerm 0 (liftTerm 0 (liftTerm 0 b)))))) _) hstep
+
+/-! ## §24 · Las piezas que el PASO de fórmula consume y no existían
+
+Cuatro grupos: (a) el testigo de fórmulas VACÍO y las congruencias que faltaban; (b) el cuarto
+escalón de la escalera `psi` —`PHIF` tiene CUATRO binders y `PSI_inst3` sólo llega a tres—;
+(c) los tres constructores SIN inducción (`botc`, `atomc`, `eqc`), que se cierran con la mitad
+TÉRMINO y no necesitan la HI.
+
+⚠️ `PrfH_congr_substfc3` vive en `Meta/BdAllIntroPrf.lean`, que importa `MpCodePrf` y está en
+ROJO: **tercera** pieza que el árbol parado obliga a reproducir. -/
+
+/-- El testigo de FÓRMULAS vacío es bien formado (vacuamente). -/
+theorem prf_wfAllF_nil (wT : Term) : Prf (wfAllF nil wT) := by
+  refine Prf.gen _ (prf_deduction ?_)
+  have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
+    prfH_hyp_self _
+  have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
+    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
+
+/-- Congruencia de `hasWitF` en `PrfH` (espejo de `PrfH_congr_hasWit`). -/
+theorem PrfH_congr_hasWitF {Γ : List Formula} {a b : Term}
+    (h : PrfH Γ (a =eq b)) (hw : PrfH Γ (hasWitF a)) : PrfH Γ (hasWitF b) := by
+  have e : ∀ x : Term, substFormula 0 x (hasWitF (.var 0)) = hasWitF x := by
+    intro x; simp only [substF_hasWitF, substTerm, if_true]
+  exact (e b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst
+    (A := hasWitF (.var 0)) h ((e a) ▸ hw)
+
+/-- Congruencia de `substfc` en el CÓDIGO, en `PrfH`. Reproducida de `Meta/BdAllIntroPrf.lean`
+    (bloqueado tras `MpCodePrf`). -/
+theorem PrfH_congr_substfc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a =eq b)) :
+    PrfH Γ (substfc v s a =eq substfc v s b) := by
+  let f : Formula := Formula.eq (substfc (liftTerm 0 v) (liftTerm 0 s) (liftTerm 0 a))
+                                (substfc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
+  have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substfc v s a) (substfc v s u) := by
+    intro u
+    simp only [f, substfc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_leibniz_subst (A := f) h
+    ((hS a) ▸ prf_to_prfH (prf_refl (substfc v s a)) Γ)
+
+/-! ### El CUARTO escalón de la escalera `psi`
+
+`PHIF` lleva cuatro binders (`wF`, `wT`, `v`, `s`), así que la HI de curso de valores llega con
+**cuatro** lifts. `psi_lift_form`/`2`/`3` y `PSI_inst`/`PSI_inst3` están en
+`Meta/StrongInductionPrf.lean`; éste es el escalón que falta, escrito con el mismo molde. -/
+
+theorem psi_lift_form4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
+    liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI Φ))))
+      = Formula.forall (Formula.impl (lt (.var 0) (.var 5)) Φ) := by
+  rw [psi_lift_form3 Φ hΦ]
+  simp only [lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte, hΦ]
+
+theorem PSI_inst4 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula}
+    (hpsi : PrfH Γ (liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI Φ))))))
+    (z : Term) : PrfH Γ (Formula.impl (lt z (.var 4)) (substFormula 0 z Φ)) := by
+  rw [psi_lift_form4 Φ hΦ] at hpsi
+  have h := PrfH_spec hpsi z
+  have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 5)) Φ)
+      = Formula.impl (lt z (.var 4)) (substFormula 0 z Φ) := by
+    simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
+      Nat.reduceSub, reduceIte, if_true]
+  rwa [e] at h
+
+/-! ### Los TRES constructores que no necesitan la hipótesis de inducción
+
+`botc` no tiene subfórmulas; `atomc` y `eqc` tienen argumentos de sorte **TÉRMINO**, y para ésos
+la clausura ya está probada arriba (§13, §15). Por eso la mitad FÓRMULA no es conjuntiva. -/
+
+/-- `⊥` codificado tiene testigo: `⟨[botc], []⟩`. -/
+theorem prf_hasWitF_bot : Prf (hasWitF botc) := by
+  have hnode : Prf (isFormCodeE2 (cons botc nil) nil botc) :=
+    prf_mp (inj_bot (cons botc nil) nil botc) (prf_refl botc)
+  have hwF : Prf (wfAllF (cons botc nil) nil) :=
+    prf_mp (prf_wfAllF_cons botc nil nil) (prf_and_intro hnode (prf_wfAllF_nil nil))
+  exact prf_mp (prf_hasWitF_imp (cons botc nil) nil botc)
+    (prf_and_intro (prf_and_intro prf_wfAll1_nil hwF) (prf_in_cons_head botc nil))
+
+/-- **Un átomo cuyos argumentos comparten testigo, tiene testigo de fórmula.**
+    El testigo de términos es el de la lista; el de fórmulas es el nodo solo. -/
+theorem prf_hasWitF_atomc (P Y : Term) :
+    Prf (Formula.impl (hasWitArgs Y) (hasWitF (atomc P Y))) := by
+  refine prf_ex_elim_imp ?_
+  have hgoal : liftFormula 0 (hasWitF (atomc P Y))
+      = hasWitF (atomc (liftTerm 0 P) (liftTerm 0 Y)) := by
+    simp only [liftF_hasWitF, atomc, cons, nil, zero, succ, liftTerm, liftTerms]
+  rw [hgoal]
+  have hctx : PrfH [land (wfAll1 (.var 0)) (argsIn (.var 0) (liftTerm 0 Y))]
+      (land (wfAll1 (.var 0)) (argsIn (.var 0) (liftTerm 0 Y))) := prfH_hyp_self _
+  have hwf := PrfH_and_elim_left hctx
+  have hargs := PrfH_and_elim_right hctx
+  have hcl : PrfH [land (wfAll1 (.var 0)) (argsIn (.var 0) (liftTerm 0 Y))]
+      (clAtom (.var 0) (atomc (liftTerm 0 P) (liftTerm 0 Y))) :=
+    PrfH_and_intro (prf_to_prfH (prf_shapeBin_binN 3 (liftTerm 0 P) (liftTerm 0 Y)) _)
+      (PrfH_congr_argsIn (prf_to_prfH (prf_eq_symm
+        (prf_nthc_binN2 3 (liftTerm 0 P) (liftTerm 0 Y))) _) hargs)
+  have hnode := PrfH.mp _ _ _ (prf_to_prfH (inj_atom
+    (cons (atomc (liftTerm 0 P) (liftTerm 0 Y)) nil) (.var 0)
+    (atomc (liftTerm 0 P) (liftTerm 0 Y))) _) hcl
+  have hwF := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAllF_cons
+    (atomc (liftTerm 0 P) (liftTerm 0 Y)) nil (.var 0)) _)
+    (PrfH_and_intro hnode (prf_to_prfH (prf_wfAllF_nil (.var 0)) _))
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_imp
+    (cons (atomc (liftTerm 0 P) (liftTerm 0 Y)) nil) (.var 0)
+    (atomc (liftTerm 0 P) (liftTerm 0 Y))) _)
+    (PrfH_and_intro (PrfH_and_intro hwf hwF)
+      (prf_to_prfH (prf_in_cons_head (atomc (liftTerm 0 P) (liftTerm 0 Y)) nil) _))
+
+/-- El contexto que dejan las DOS eliminaciones del caso `eqc`. -/
+def CTXe (a b : Term) : List Formula :=
+  [isTC1 (.var 0) (liftTerm 0 (liftTerm 0 b)),
+   liftFormula 0 (hasWit (liftTerm 0 b)),
+   liftFormula 0 (isTC1 (.var 0) (liftTerm 0 a))]
+
+/-- **Una ecuación con los dos lados con testigo, tiene testigo de fórmula.**
+    Aquí se fusionan DOS testigos de TÉRMINO (`prf_wfAll1_concat`, TAREA A). -/
+theorem prf_hasWitF_eqc (a b : Term) :
+    Prf (Formula.impl (hasWit a) (Formula.impl (hasWit b) (hasWitF (eqc a b)))) := by
+  refine prf_ex_elim_imp ?_
+  have hg1 : liftFormula 0 (Formula.impl (hasWit b) (hasWitF (eqc a b)))
+      = Formula.impl (hasWit (liftTerm 0 b))
+          (hasWitF (eqc (liftTerm 0 a) (liftTerm 0 b))) := by
+    simp only [liftFormula, liftF_hasWit, liftF_hasWitF, eqc, cons, nil, zero, succ,
+      liftTerm, liftTerms]
+  rw [hg1]
+  refine deduction_aux ?_ (hasWit (liftTerm 0 b)) [isTC1 (.var 0) (liftTerm 0 a)] rfl
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil]
+  have hgoal : liftFormula 0 (hasWitF (eqc (liftTerm 0 a) (liftTerm 0 b)))
+      = hasWitF (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b))) := by
+    simp only [liftF_hasWitF, eqc, cons, nil, zero, succ, liftTerm, liftTerms]
+  rw [hgoal]
+  have hb : PrfH (CTXe a b) (isTC1 (.var 0) (liftTerm 0 (liftTerm 0 b))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have ha0 : PrfH (CTXe a b) (liftFormula 0 (isTC1 (.var 0) (liftTerm 0 a))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have ha : PrfH (CTXe a b) (isTC1 (.var 1) (liftTerm 0 (liftTerm 0 a))) := by
+    simpa only [liftF_isTC1, liftTerm, Nat.reduceAdd, Nat.reduceLT, reduceIte] using ha0
+  have hwT := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAll1_concat (.var 1) (.var 0)) _)
+    (PrfH_and_intro (PrfH_and_elim_left ha) (PrfH_and_elim_left hb))
+  have hinA := PrfH.mp _ _ _ (prf_to_prfH (prf_In_mono_right_imp
+    (liftTerm 0 (liftTerm 0 a)) (.var 0) (.var 1)) _) (PrfH_and_elim_right ha)
+  have hinB := PrfH.mp _ _ _ (prf_to_prfH (prf_In_mono_imp
+    (liftTerm 0 (liftTerm 0 b)) (.var 0) (.var 1)) _) (PrfH_and_elim_right hb)
+  have hcl : PrfH (CTXe a b) (clEq (concat (.var 1) (.var 0))
+      (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b)))) :=
+    PrfH_and_intro (prf_to_prfH (prf_shapeBin_binN 4
+        (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b))) _)
+      (PrfH_and_intro
+        (PrfH_congr_In_left (prf_to_prfH (prf_eq_symm (prf_nthc_binN1 4
+          (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b)))) _) hinA)
+        (PrfH_congr_In_left (prf_to_prfH (prf_eq_symm (prf_nthc_binN2 4
+          (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b)))) _) hinB))
+  have hnode := PrfH.mp _ _ _ (prf_to_prfH (inj_eq
+    (cons (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b))) nil)
+    (concat (.var 1) (.var 0))
+    (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b)))) _) hcl
+  have hwF := PrfH.mp _ _ _ (prf_to_prfH (prf_wfAllF_cons
+    (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b))) nil
+    (concat (.var 1) (.var 0))) _)
+    (PrfH_and_intro hnode (prf_to_prfH (prf_wfAllF_nil (concat (.var 1) (.var 0))) _))
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_imp
+    (cons (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b))) nil)
+    (concat (.var 1) (.var 0))
+    (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b)))) _)
+    (PrfH_and_intro (PrfH_and_intro hwT hwF)
+      (prf_to_prfH (prf_in_cons_head
+        (eqc (liftTerm 0 (liftTerm 0 a)) (liftTerm 0 (liftTerm 0 b))) nil) _))
+
+/-! ## §25 · EL PASO de la mitad FÓRMULA — los OCHO casos
+
+🔑 **Cada caso es GENÉRICO en el contexto y recibe por argumento exactamente las hipótesis que
+usa** (la cláusula, la guarda, y —los cinco que inducen— la HI de curso de valores). Es lo que
+evita la contabilidad de los siete `or`-elim anidados: un caso a profundidad `d` vive en un
+contexto con `d` disyunciones residuales delante, y escribir ese contexto ocho veces era el
+grueso del trabajo. Así sólo cambian los índices del `List.Mem` en el ensamblaje.
+
+Reparto: `bot` es inmediato; `atom` y `eq` **consumen la mitad TÉRMINO** (§13/§15) y no inducen;
+los tres `bin` (5/7/8) y los dos `un` (6/9) usan la HI, con la escalera de Cantor para bajar. -/
+
+/-- Los dos operandos del nodo, cuando el código resulta ser binario (o el único, si es unario). -/
+def AF : Term := nthc (.var 4) (numeralM 1)
+def BF : Term := nthc (.var 4) (numeralM 2)
+
+/-- **Caso `botc`**: `⊥` no tiene subfórmulas y `substfc` lo deja igual. -/
+theorem casoF_bot {Γ : List Formula} (hcl : PrfH Γ (clBot (.var 4))) :
+    PrfH Γ (hasWitF (substfc (.var 1) (.var 0) (.var 4))) := by
+  have heq : PrfH Γ (substfc (.var 1) (.var 0) (.var 4) =eq botc) :=
+    PrfH_eq_trans (PrfH_congr_substfc3 hcl)
+      (prf_to_prfH (prf_substfc_bottom (.var 1) (.var 0)) _)
+  exact PrfH_congr_hasWitF (PrfH_eq_symm heq) (prf_to_prfH prf_hasWitF_bot _)
+
+/-- **Caso `atomc`**: la casilla 2 es una LISTA de códigos de término; la cierra §15. -/
+theorem casoF_atom {Γ : List Formula} (hcl : PrfH Γ (clAtom (.var 2) (.var 4)))
+    (hg : PrfH Γ (land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0)))) :
+    PrfH Γ (hasWitF (substfc (.var 1) (.var 0) (.var 4))) := by
+  have hshape := PrfH_and_elim_left hcl
+  have hargs := PrfH_and_elim_right hcl
+  have hwT := PrfH_and_elim_left (PrfH_and_elim_left (PrfH_and_elim_left hg))
+  have hws := PrfH_and_elim_right hg
+  have hargsW := PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitArgs_substtsc_of
+    (.var 2) (.var 1) (.var 0) BF) _)
+    (PrfH_and_intro (PrfH_and_intro hwT hargs) hws)
+  have hnode := PrfH.mp _ _ _ (prf_to_prfH
+    (prf_hasWitF_atomc AF (substtsc (.var 1) (.var 0) BF)) _) hargsW
+  have h1 : PrfH Γ (substfc (.var 1) (.var 0) (.var 4)
+      =eq substfc (.var 1) (.var 0) (atomc AF BF)) := PrfH_congr_substfc3 hshape
+  have h2 : PrfH Γ (substfc (.var 1) (.var 0) (atomc AF BF)
+      =eq atomc AF (substtsc (.var 1) (.var 0) BF)) :=
+    prf_to_prfH (prf_substfc_atom (.var 1) (.var 0) AF BF) _
+  exact PrfH_congr_hasWitF (PrfH_eq_symm (PrfH_eq_trans h1 h2)) hnode
+
+/-- **Caso `eqc`**: las DOS casillas son códigos de término; las cierra §13, y los dos testigos
+    se fusionan en `prf_hasWitF_eqc`. -/
+theorem casoF_eq {Γ : List Formula} (hcl : PrfH Γ (clEq (.var 2) (.var 4)))
+    (hg : PrfH Γ (land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0)))) :
+    PrfH Γ (hasWitF (substfc (.var 1) (.var 0) (.var 4))) := by
+  have hshape := PrfH_and_elim_left hcl
+  have hins := PrfH_and_elim_right hcl
+  have hinA := PrfH_and_elim_left hins
+  have hinB := PrfH_and_elim_right hins
+  have hwT := PrfH_and_elim_left (PrfH_and_elim_left (PrfH_and_elim_left hg))
+  have hws := PrfH_and_elim_right hg
+  have hA := PrfH.mp _ _ _ (prf_to_prfH (prf_hasWit_substtc_of_isTC1
+    (.var 2) (.var 1) (.var 0) AF) _) (PrfH_and_intro (PrfH_and_intro hwT hinA) hws)
+  have hB := PrfH.mp _ _ _ (prf_to_prfH (prf_hasWit_substtc_of_isTC1
+    (.var 2) (.var 1) (.var 0) BF) _) (PrfH_and_intro (PrfH_and_intro hwT hinB) hws)
+  have hnode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_eqc
+    (substtc (.var 1) (.var 0) AF) (substtc (.var 1) (.var 0) BF)) _) hA) hB
+  have h1 : PrfH Γ (substfc (.var 1) (.var 0) (.var 4)
+      =eq substfc (.var 1) (.var 0) (eqc AF BF)) := PrfH_congr_substfc3 hshape
+  have h2 : PrfH Γ (substfc (.var 1) (.var 0) (eqc AF BF)
+      =eq eqc (substtc (.var 1) (.var 0) AF) (substtc (.var 1) (.var 0) BF)) :=
+    prf_to_prfH (prf_substfc_eq (.var 1) (.var 0) AF BF) _
+  exact PrfH_congr_hasWitF (PrfH_eq_symm (PrfH_eq_trans h1 h2)) hnode
+
+/-- **Los tres casos BINARIOS** (`implc`/`andc`/`orc`, tags 5/7/8), de una vez: sólo cambian el
+    tag, la inyección y la ecuación de `substfc`. Dos descensos de Cantor y la fusión de §23. -/
+theorem casoF_bin {Γ : List Formula} (k : Nat)
+    (inj : ∀ wF wT X : Term, Prf (Formula.impl (clBin wF X k) (isFormCodeE2 wF wT X)))
+    (heqn : ∀ v s a b : Term, Prf (substfc v s (binN k a b)
+      =eq binN k (substfc v s a) (substfc v s b)))
+    (hcl : PrfH Γ (clBin (.var 3) (.var 4) k))
+    (hg : PrfH Γ (land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0))))
+    (hpsi : PrfH Γ (liftFormula 0 (liftFormula 0 (liftFormula 0
+      (liftFormula 0 (PSI PHIF)))))) :
+    PrfH Γ (hasWitF (substfc (.var 1) (.var 0) (.var 4))) := by
+  have hshape := PrfH_and_elim_left hcl
+  have hins := PrfH_and_elim_right hcl
+  have hinA := PrfH_and_elim_left hins
+  have hinB := PrfH_and_elim_right hins
+  have hwT := PrfH_and_elim_left (PrfH_and_elim_left (PrfH_and_elim_left hg))
+  have hwF := PrfH_and_elim_right (PrfH_and_elim_left (PrfH_and_elim_left hg))
+  have hws := PrfH_and_elim_right hg
+  -- LA CADENA DE CANTOR: los dos operandos son estrictamente menores que el nodo
+  have cA1 : Prf (lt AF (cons AF (cons BF nil))) := prf_cantor_mono_left _ _
+  have cA2 : Prf (lt (cons AF (cons BF nil)) (binN k AF BF)) := prf_cantor_mono_right _ _
+  have cA : Prf (lt AF (binN k AF BF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cA1) cA2
+  have cB1 : Prf (lt BF (cons BF nil)) := prf_cantor_mono_left _ _
+  have cB2 : Prf (lt (cons BF nil) (cons AF (cons BF nil))) := prf_cantor_mono_right _ _
+  have cB12 : Prf (lt BF (cons AF (cons BF nil))) :=
+    prf_mp (prf_mp (prf_lt_trans _ _ _) cB1) cB2
+  have cB : Prf (lt BF (binN k AF BF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cB12) cA2
+  have hltA := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    (PrfH_eq_symm hshape) (prf_to_prfH cA _)
+  have hltB := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    (PrfH_eq_symm hshape) (prf_to_prfH cB _)
+  -- LA HIPOTESIS DE INDUCCION, una por operando (cuarto escalon de la escalera psi)
+  have hihA := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi AF) hltA
+  have hA := PrfH.mp _ _ _ (PHIF_use AF (.var 3) (.var 2) (.var 1) (.var 0) hihA)
+    (PrfH_and_intro (PrfH_and_intro (PrfH_and_intro hwT hwF) hinA) hws)
+  have hihB := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi BF) hltB
+  have hB := PrfH.mp _ _ _ (PHIF_use BF (.var 3) (.var 2) (.var 1) (.var 0) hihB)
+    (PrfH_and_intro (PrfH_and_intro (PrfH_and_intro hwT hwF) hinB) hws)
+  have hnode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_bin k
+    (substfc (.var 1) (.var 0) AF) (substfc (.var 1) (.var 0) BF) inj) _) hA) hB
+  have h1 : PrfH Γ (substfc (.var 1) (.var 0) (.var 4)
+      =eq substfc (.var 1) (.var 0) (binN k AF BF)) := PrfH_congr_substfc3 hshape
+  have h2 : PrfH Γ (substfc (.var 1) (.var 0) (binN k AF BF)
+      =eq binN k (substfc (.var 1) (.var 0) AF) (substfc (.var 1) (.var 0) BF)) :=
+    prf_to_prfH (heqn (.var 1) (.var 0) AF BF) _
+  exact PrfH_congr_hasWitF (PrfH_eq_symm (PrfH_eq_trans h1 h2)) hnode
+
+/-- **Los dos casos UNARIOS** (`forallc`/`exc`, tags 6/9). El binder SUBE el nivel: la HI se aplica
+    con `v+1` y con el sustituyendo LEVANTADO, y por eso hace falta `CRIT_hasWit_lift`. -/
+theorem casoF_un {Γ : List Formula} (k : Nat)
+    (inj : ∀ wF wT X : Term, Prf (Formula.impl (clUn wF X k) (isFormCodeE2 wF wT X)))
+    (heqn : ∀ v s a : Term, Prf (substfc v s (unN k a)
+      =eq unN k (substfc (succ v) (liftc zero s) a)))
+    (hcl : PrfH Γ (clUn (.var 3) (.var 4) k))
+    (hg : PrfH Γ (land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0))))
+    (hpsi : PrfH Γ (liftFormula 0 (liftFormula 0 (liftFormula 0
+      (liftFormula 0 (PSI PHIF)))))) :
+    PrfH Γ (hasWitF (substfc (.var 1) (.var 0) (.var 4))) := by
+  have hshape := PrfH_and_elim_left hcl
+  have hinA := PrfH_and_elim_right hcl
+  have hwT := PrfH_and_elim_left (PrfH_and_elim_left (PrfH_and_elim_left hg))
+  have hwF := PrfH_and_elim_right (PrfH_and_elim_left (PrfH_and_elim_left hg))
+  have hws := PrfH_and_elim_right hg
+  have cA1 : Prf (lt AF (cons AF nil)) := prf_cantor_mono_left _ _
+  have cA2 : Prf (lt (cons AF nil) (unN k AF)) := prf_cantor_mono_right _ _
+  have cA : Prf (lt AF (unN k AF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cA1) cA2
+  have hltA := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    (PrfH_eq_symm hshape) (prf_to_prfH cA _)
+  have hihA := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi AF) hltA
+  -- el sustituyendo sube de nivel: su testigo lo da `CRIT_hasWit_lift`
+  have hwsL := PrfH.mp _ _ _ (prf_to_prfH (CRIT_hasWit_lift (.var 0)) _) hws
+  have hA := PrfH.mp _ _ _
+    (PHIF_use AF (.var 3) (.var 2) (succ (.var 1)) (liftc zero (.var 0)) hihA)
+    (PrfH_and_intro (PrfH_and_intro (PrfH_and_intro hwT hwF) hinA) hwsL)
+  have hnode := PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_un k
+    (substfc (succ (.var 1)) (liftc zero (.var 0)) AF) inj) _) hA
+  have h1 : PrfH Γ (substfc (.var 1) (.var 0) (.var 4)
+      =eq substfc (.var 1) (.var 0) (unN k AF)) := PrfH_congr_substfc3 hshape
+  have h2 : PrfH Γ (substfc (.var 1) (.var 0) (unN k AF)
+      =eq unN k (substfc (succ (.var 1)) (liftc zero (.var 0)) AF)) :=
+    prf_to_prfH (heqn (.var 1) (.var 0) AF) _
+  exact PrfH_congr_hasWitF (PrfH_eq_symm (PrfH_eq_trans h1 h2)) hnode
+
+/-! ## §26 · EL PASO ENSAMBLADO, y 🏁 LA CLAUSURA DE FÓRMULA
+
+Siete `or`-elim anidados sobre las ocho cláusulas de `isFormCodeE2`. En cada rama la guarda está
+a profundidad `d+1` y la HI a `d+2`: es toda la contabilidad que queda. -/
+
+/-- Contexto de la mitad FÓRMULA tras introducir su antecedente. -/
+def CTXF : List Formula :=
+  [land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0)),
+   liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PHIF))))]
+
+theorem PHIF_step : Prf (Formula.forall (Formula.impl (PSI PHIF) PHIF)) := by
+  refine Prf.gen _ (prf_deduction ?_)
+  refine PrfH.gen [PSI PHIF] _ ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH.gen _ _ ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH.gen _ _ ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH.gen _ _ ?_
+  simp only [List.map_cons, List.map_nil]
+  refine deduction_aux ?_ (land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0)))
+    [liftFormula 0 (liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PHIF))))] rfl
+  have hg : PrfH CTXF (land (isFC1 (.var 3) (.var 2) (.var 4)) (hasWit (.var 0))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hcode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH
+      (prf_isFormCodeE2_of_In (.var 3) (.var 2) (.var 4)) _)
+      (PrfH_and_elim_right (PrfH_and_elim_left hg)))
+    (PrfH_and_elim_right (PrfH_and_elim_left (PrfH_and_elim_left hg)))
+  -- 1 · botc
+  refine PrfH_or_elim hcode (casoF_bot (PrfH.hyp _ _ (List.Mem.head _))) ?_
+  -- 2 · atomc
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _))
+    (casoF_atom (PrfH.hyp _ _ (List.Mem.head _))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))) ?_
+  -- 3 · eqc
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _))
+    (casoF_eq (PrfH.hyp _ _ (List.Mem.head _))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.head _)))))) ?_
+  -- 4 · implc (tag 5)
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _))
+    (casoF_bin 5 inj_bin5 (fun v s a b => prf_substfc_impl v s a b)
+      (PrfH.hyp _ _ (List.Mem.head _))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.head _))))))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))))) ?_
+  -- 5 · forallc (tag 6)
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _))
+    (casoF_un 6 inj_un6 (fun v s a => prf_substfc_forall v s a)
+      (PrfH.hyp _ _ (List.Mem.head _))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))))))) ?_
+  -- 6 · andc (tag 7)
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _))
+    (casoF_bin 7 inj_bin7 (fun v s a b => prf_substfc_and v s a b)
+      (PrfH.hyp _ _ (List.Mem.head _))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))))))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+          (List.Mem.tail _ (List.Mem.head _)))))))))) ?_
+  -- 7 · orc (tag 8) y 8 · exc (tag 9)
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _))
+    (casoF_bin 8 inj_bin8 (fun v s a b => prf_substfc_or v s a b)
+      (PrfH.hyp _ _ (List.Mem.head _))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+          (List.Mem.tail _ (List.Mem.head _)))))))))
+      (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+          (List.Mem.tail _ (List.Mem.head _))))))))))) ?_
+  exact casoF_un 9 inj_un9 (fun v s a => prf_substfc_ex v s a)
+    (PrfH.hyp _ _ (List.Mem.head _))
+    (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+      (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.head _)))))))))
+    (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+      (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _
+        (List.Mem.tail _ (List.Mem.head _))))))))))
+
+theorem PHIF_all (t : Term) : Prf (substFormula 0 t PHIF) :=
+  prf_strong_induction PHIF hPHIF PHIF_step t
+
+/-- **LA CLAUSURA DE FÓRMULA, con testigo EXPLÍCITO.** -/
+theorem prf_hasWitF_substfc_of_isFC1 (wF wT v s X : Term) :
+    Prf (Formula.impl (land (isFC1 wF wT X) (hasWit s)) (hasWitF (substfc v s X))) :=
+  prfH_nil_to_prf (PHIF_use X wF wT v s (prf_to_prfH (PHIF_all X) [])) rfl
+
+/-- El contexto que dejan las dos eliminaciones de `hasWitF X`. -/
+def CTXs (s X : Term) : List Formula :=
+  [hasWit (liftTerm 0 (liftTerm 0 s)),
+   isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 X)),
+   liftFormula 0 (Formula.ex (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 X))))]
+
+/-- 🏁 **LA PIEZA QUE FALTABA PARA EL VERDE** (§3.36.5): `hasWitF` es cerrado bajo `substfc`,
+    con el código y el sustituyendo ABSTRACTOS. Es lo que piden los 6 sitios duros de
+    `Meta/MpCodePrf.lean` bajo la enmienda ADR-020. -/
+theorem prf_hasWitF_substfc (v s X : Term) :
+    Prf (Formula.impl (hasWitF X) (Formula.impl (hasWit s) (hasWitF (substfc v s X)))) := by
+  refine prf_ex_elim_imp ?_
+  refine PrfH_ex_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_
+  simp only [List.map_cons, List.map_nil]
+  have hg : liftFormula 0 (liftFormula 0
+      (Formula.impl (hasWit s) (hasWitF (substfc v s X))))
+      = Formula.impl (hasWit (liftTerm 0 (liftTerm 0 s)))
+          (hasWitF (substfc (liftTerm 0 (liftTerm 0 v)) (liftTerm 0 (liftTerm 0 s))
+            (liftTerm 0 (liftTerm 0 X)))) := by
+    simp only [liftFormula, liftF_hasWit, liftF_hasWitF, substfc, liftTerm, liftTerms]
+  rw [hg]
+  refine deduction_aux ?_ (hasWit (liftTerm 0 (liftTerm 0 s)))
+    [isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 X)),
+     liftFormula 0 (Formula.ex (isFC1 (.var 1) (.var 0)
+       (liftTerm 0 (liftTerm 0 X))))] rfl
+  have hF : PrfH (CTXs s X) (isFC1 (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 X))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hws : PrfH (CTXs s X) (hasWit (liftTerm 0 (liftTerm 0 s))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_hasWitF_substfc_of_isFC1 (.var 1) (.var 0)
+    (liftTerm 0 (liftTerm 0 v)) (liftTerm 0 (liftTerm 0 s))
+    (liftTerm 0 (liftTerm 0 X))) _) (PrfH_and_intro hF hws)
+
+/-- La forma de APLICACIÓN, que es como la piden los 6 sitios duros de `MpCodePrf`. -/
+theorem prf_hasWitF_substfc_mp (v s X : Term)
+    (hX : Prf (hasWitF X)) (hs : Prf (hasWit s)) : Prf (hasWitF (substfc v s X)) :=
+  prf_mp (prf_mp (prf_hasWitF_substfc v s X) hX) hs
+
+/-! ## §27 · FOOTPRINT de la mitad FÓRMULA -/
+#print axioms ClausuraSubsttc.prf_hasWitF_substfc_of_isFC1
+#print axioms ClausuraSubsttc.prf_hasWitF_substfc
+
 end ClausuraSubsttc
