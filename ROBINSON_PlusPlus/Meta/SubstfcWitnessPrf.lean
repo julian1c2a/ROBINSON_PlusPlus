@@ -1984,6 +1984,11 @@ Las hojas son `tcFn` (`prf_hasWit_tcFn`), `termCode` (`prf_hasWit_tc`), `varc �
 
 Con esto, la propagación de ADR-020 aguas abajo deja de ser trabajo y pasa a ser `by hw_auto`.
 
+⭐ **Cubre los DOS sortes** (ampliada 2026-09-07): además de `hasWit`, resuelve `hasWitF` sobre
+los ocho constructores de código de fórmula (`implc`/`andc`/`orc`/`forallc`/`exc`/`eqc`/`atomc`/
+`botc`) y sobre `formCode φ`. El mismo criterio de orden manda: las reglas ESTRUCTURALES van
+antes que las hojas, porque `formCode ?φ` contra un nodo grande despliega su recursión.
+
 
 ⚠️ **El ORDEN de las alternativas importa, y no es el obvio.** Las reglas ESTRUCTURALES
 (`funcc1/2/3`) van ANTES que `prf_hasWit_tc`: si `termCode ?t` se prueba primero contra un nodo
@@ -2002,7 +2007,19 @@ macro_rules
         | (refine prf_hasWit_funcc2 _ _ _ ?_ ?_ <;> hw_auto)
         | (refine prf_hasWit_funcc3 _ _ _ _ ?_ ?_ ?_ <;> hw_auto)
         | (refine prf_hasWit_liftc ?_ <;> hw_auto)
-        | exact prf_hasWit_tc _)
+        | exact prf_hasWit_tc _
+        -- sorte FORMULA: los ocho constructores, mismo criterio de orden (estructurales
+        -- antes que las hojas `formCode`, que despliegan su recursion al unificar)
+        | (refine prf_hasWitF_implc _ _ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_andc _ _ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_orc _ _ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_forallc _ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_exc _ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_eq2 _ _ ?_ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_atom1 _ _ ?_ <;> hw_auto)
+        | (refine prf_hasWitF_atom2 _ _ _ ?_ ?_ <;> hw_auto)
+        | exact prf_hasWitF_bot
+        | exact prf_hasWitF_fc _)
 
 /-! ### CONTROLES: el molde, sobre objetivos REALES del árbol
 
@@ -2023,6 +2040,11 @@ example (x y : Term) :
 example (p h t : Term) :
     Prf (hasWit (funcc (strCode "liftsc") (cons (termCode nil)
       (cons (funcc (strCode "cons") (cons (tcFn h) (cons (tcFn t) nil))) nil)))) := by
+  hw_auto
+
+/-- `hw_auto` tambien en el sorte FORMULA: un nodo compuesto sobre codigos punteados. -/
+example (x y : Term) (Phic : Term) (hP : Prf (hasWitF Phic)) :
+    Prf (hasWitF (implc (andc (eqc (tcFn x) (tcFn y)) Phic) (forallc botc))) := by
   hw_auto
 
 /-- La forma de `EvalBoundedPrf:237`: un nodo `implc` CONSTRUIDO, no un `formCode`. -/
