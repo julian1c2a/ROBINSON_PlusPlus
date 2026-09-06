@@ -7,46 +7,46 @@
 **Estado 2026‑09‑05 · rama `via-c-adr020` · ⚠️ ÁRBOL ROJO en `Meta/MpCodePrf.lean`**
 **`master` sigue VERDE en `97f2a37`.** La parada es **CONOCIDA y localizada**, en mitad de la
 ejecución de la **vía C** ([ADR‑020](DECISIONS.md)) — **no es una regresión**. Todo lo demás verde.
-**125 jobs · 111 módulos activos (Minimal 11 + Meta 89 + Full 11) + 0 en `cuarentena/` · 58 `sondeos/`**
+**125 jobs · 111 módulos activos (Minimal 11 + Meta 89 + Full 11) + 0 en `cuarentena/` · 60 `sondeos/`**
 **7 `axiom` de Lean · 0 sorrys.**
 
-> # 🎯 SIGUIENTE SESIÓN — **cerrar `MpCodePrf` y devolver el árbol a verde**
+> # 🎯 SIGUIENTE SESIÓN — **terminar la mitad FÓRMULA de la clausura**
 >
-> Todo lo medido está en **§3.36** de `doc/REFERENCE-Incompleteness.md` y en el **Addendum** de
-> ADR‑020. Resumen operativo:
+> Todo lo medido está en **§3.36** y **§3.37** de `doc/REFERENCE-Incompleteness.md`.
 >
-> **Los 10 sitios de `MpCodePrf` NO son iguales:**
-> * **4 son gratis** — piden `hasWitF` de códigos que **ya son `formCode` de algo**, incluido
->   `forallc (formCode φ)`, que **es** `formCode (∀φ)`. Los paga `prf_hasWitF_fc`.
-> * **6 piden UNA sola pieza que no existe**:
->   `prf_hasWitF_substfc : Prf (hasWitF c) → Prf (hasWit s) → Prf (hasWitF (substfc v s c))`.
->   Vienen del patrón de `pcc_thm_inst2/3/4`: la primera ∀‑elim va sobre un `formCode`, las
->   siguientes sobre el código ya **sustituido**. Estimación **300‑600 líneas**, terreno de
->   `pcc_eval_substfc`.
-> * **Las guardas de TÉRMINO ya están resueltas**: los 11 consumidores pasan `tcFn …` ⇒
->   `prf_hasWit_tcFn` (`Meta/HasWitTcFnPrf.lean`, probado hoy). Falta sólo `hasWit (varc n)`,
->   lema pequeño (cae por `shapeUn X 0`).
+> ## Lo que YA está probado (2026‑09‑06, los dos net‑0 puros)
 >
-> ▶ **PRIMER PASO, antes de escribir nada: MEDIR `sondeos/HasWitFReal.lean` y
-> `sondeos/HasWitFCritica.lean`.** Ya tienen `prf_hasWitF_real`, `PrfH_congr_hasWitF`,
-> `substF_hole_hasWitF` y varios controles negativos. Medir antes de construir ha ganado
-> **cuatro de cuatro** veces en la sesión del 09‑05.
+> * `sondeos/MergeTestigos.lean` — **la fusión de testigos NO estaba obstruida** (TAREA A).
+> * `sondeos/ClausuraSubsttc.lean` — 🏁 **`prf_hasWit_substtc`**: `hasWit` es cerrado bajo
+>   `substtc`, con código y sustituyendo ABSTRACTOS. Es la mitad TÉRMINO de C.
+>   Contiene además el **armazón de la mitad FÓRMULA** ya compilando: `BODYF`, `PHIF` de cuatro
+>   binders, el gate, `PHIF_at`, los cuatro colapsos y `PHIF_use`.
 >
-> ⚠️ **El build se detiene en `MpCodePrf`**, así que los módulos de aguas abajo (`EvalNthcPrf`,
-> `EvalListPrf`, `EvalMulPrf`, `LiftcCodePrf`, `SubstfcCodePrf`…) **aún no se han evaluado**:
-> aparecerán más sitios. La diferencia es que **ésos pagan** en vez de arrastrar.
+> ## Lo que falta, por orden
 >
-> 🔑 **EL CRITERIO QUE MANDA EN ESTA RAMA — pagar vs arrastrar.** Cada sitio o **descarga** la
-> guarda (tiene códigos reales) o la **arrastra** como hipótesis. Arrastrar hasta arriba es
-> exactamente la **«guarda colgante» de la vía (B)**, refutada porque la D3 resultante sería
-> **vacua**. Una guarda sólo se arrastra si algún consumidor concreto puede pagarla.
+> 1. **El espejo formula‑sort de la maquinaria de testigos**: `wfAllF` extendido (`cons`) y
+>    **fusionado** (`concat`). ⚠️ Aquí el testigo tiene **DOS** componentes (`wF` y `wT`), así que
+>    fusionar es fusionar los dos. El molde es §10‑§11 de `ClausuraSubsttc.lean`.
+> 2. **Los ocho casos** de `PHIF_step`: `bot` (trivial), `atom` y `eq` (**consumen la mitad
+>    término**, ya hecha), tres `bin` (`implc`/`andc`/`orc`: IH dos veces + fusión) y dos `un`
+>    (`forallc`/`exc`: el nivel sube y el sustituyendo se liftea ⇒ `CRIT_hasWit_lift`).
+> 3. Ensamblar `PHIF_step`, cerrar `prf_hasWitF_substfc`, y **enchufarlo a los 6 sitios duros de
+>    `MpCodePrf`** (los otros 4 son gratis: piden `hasWitF` de códigos que ya son `formCode`).
+> 4. Con `MpCodePrf` verde, **B3.4 se desbloquea**: medido hoy, **131 declaraciones** a promover
+>    de un cierre de 554.
 >
-> ⚠️ **Y dos errores de medición cometidos el 09‑05, para no repetirlos** (§3.36.6):
-> 1. el **cierre por nombres** sobre cuerpos estimó 165 teoremas infectados (incluido D3); la
->    realidad fueron **~6 sitios**. Para el radio de una propagación de firma, **el compilador es
->    la única medida**.
-> 2. medir lo que un módulo **importa** no es medir lo que **necesita**: `CodeWitnessPrf` usaba
->    10 de sus 36 imports, y podar los 26 muertos lo subió en el DAG **sin mover una declaración**.
+> ## 🔑 Las tres reglas de método que hicieron viable la mitad término
+>
+> 1. **SACAR EL `∃` FUERA DEL PASO** — eliminarlo a nivel `Prf`, como lema suelto, y que el paso
+>    sólo haga un `mp`. Dentro del `PHI_step` cuesta el doble lift cada vez.
+> 2. **Colapsar los binders UNO A UNO** (`PHI_specK` por binder, justo tras su `PrfH_spec`): con
+>    3‑4 sustituciones anidadas el `simp` grande no reduce. Por eso hace falta un `BODY` explícito.
+>    Y usar la escalera completa de lifts anidados de `Meta/SubstArith.lean`.
+> 3. **Escribir el tipo entero en cada `have`**: los implícitos de las congruencias no se infieren
+>    cuando el contexto crece por un `or_elim`.
+>
+> ⚠️ **El árbol rojo cobra peaje**: `prf_nil_or_cons` (en `EvalLiftcPrf`, bloqueado) y la fusión
+> (en un sondeo) **no son importables**; hubo que reproducirlas. Van dos veces en un día.
 
 ---
 

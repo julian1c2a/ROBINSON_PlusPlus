@@ -13,7 +13,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.36.
 >
 > **Build 125 jobs · 0 sorrys · Lean v4.31.0** (⚠️ con la parada conocida arriba).
-> **111 módulos activos** (Minimal 11 + Meta 89 + Full 11) **+ 0 en `cuarentena/` + 58 en `sondeos/`.**
+> **111 módulos activos** (Minimal 11 + Meta 89 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >

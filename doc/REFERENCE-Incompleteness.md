@@ -2524,3 +2524,97 @@ usarse** — el mismo caso en los **dos espejos**), y `prf_lineWF_tag` (bicondic
 🔑 **Marcador léxico**: al cambiar un esquema o una firma, buscar **«arbitrario», «incondicional»,
 «libre de», «ya no se usa», «cualquier»**. Y **corregir no es borrar**: en tres de los cinco, parte
 de la frase seguía siendo cierta y valiosa.
+
+---
+
+## §3.37 · TAREA C · LA FUSIÓN NO ERA OBSTRUCCIÓN, y la mitad TÉRMINO de la clausura está PROBADA (2026‑09‑06)
+
+Dos sondeos, los dos **net‑0 puros**: `sondeos/MergeTestigos.lean` (206 l.) y
+`sondeos/ClausuraSubsttc.lean` (953 l.). Cero sorrys.
+
+### 3.37.1 · ⚠️ Correcciones al plan de §3.36.5, medidas hoy
+
+Tres cosas que §3.36 daba por buenas y **no lo eran**:
+
+1. **`HasWitFReal`/`HasWitFCritica` NO sirven para la clausura.** El punto de reanudación decía
+   «ya tienen `substF_hole_hasWitF`…». Medido: esas piezas son **fontanería De Bruijn**
+   (`substFormula`/`liftFormula`, nivel META), **no** clausura bajo el `substfc` OBJETO. Es la
+   misma trampa que el árbol ya registra para `liftF_hasWitF`, y se repitió al redactar el plan.
+2. **`hasWitF (substfc …)` no se enuncia en NINGÚN sitio** — ni producción ni los 58 sondeos.
+3. **C son DOS clausuras, no una.** Los casos `atom`/`eq` de la mitad de FÓRMULA tienen argumentos
+   de sorte TÉRMINO y piden `hasWit (substtc v s t)`, que **tampoco existía**.
+
+### 3.37.2 · 🔑 TAREA A — la fusión de testigos NO está obstruida
+
+`wfAll1 W := ∀i < lenc W. isTermCodeE1 W (nthc W i)` está en forma **INDEXADA**, y `concat` es
+horrible con índices (habría que partir `i < lenc W₁ + lenc W₂`, y no hay aritmética de `lenc`
+sobre `concat`). Pero **`In` sí se lleva bien con `concat`** (`ax_L3_in_concat` es un axioma), y el
+proyecto ya tenía las DOS direcciones del puente índice↔pertenencia (`prf_boundedIn_of_In` /
+`prf_In_of_boundedIn`).
+
+⇒ **la ruta es pasar a forma de PERTENENCIA, fusionar allí, y volver.** Ni un índice partido.
+Y media ruta ya estaba hecha: **`prf_isTermCodeE1_of_In`** (`In c w ⇒ wfAll1 w ⇒ isTermCodeE1 w c`,
+con `c` y `w` ABSTRACTOS) existe desde B0b. Lo único que faltaba de verdad era **`prf_in_nthc`**
+—«lo que está en una posición válida, pertenece»—, quince líneas.
+
+**Subproducto**: la monotonía de ayer estaba clavada a `cons a w`. Queda **generalizada** a
+cualquier inclusión de testigos dada como implicación objeto (`prf_argsIn_mono_of`,
+`prf_isTermCodeE1_mono_of`); `cons` y `concat` son corolarios de la misma. Al promover, la de ayer
+debería reescribirse como instancia.
+
+### 3.37.3 · 🏁 La mitad TÉRMINO: `hasWit` es CERRADO bajo `substtc`
+
+```
+prf_hasWit_substtc (v s t) : Prf (hasWit t ⇒ (hasWit s ⇒ hasWit (substtc v s t)))
+```
+Footprint `[propext, Classical.choice, Quot.sound]` — **net‑0 puro**.
+
+Inducción fuerte **conjuntiva** sobre los dos sorts (molde de B2, `Meta/EvalLiftcPrf.lean:396`),
+con `w`, `v`, `s` cuantificados dentro: **tres** binders frente al único de B2. Los cuatro casos:
+
+| caso | cómo |
+|---|---|
+| `varc` | **tricotomía** (`ax19`): dos ramas dan un nodo variable —que se basta a sí mismo, porque `prf_isTermCodeE1_var` es **incondicional en el testigo**— y la tercera devuelve `s`, cuyo testigo es la hipótesis |
+| `funcc` | cadena de **Cantor** para bajar al argumento, `PSI_inst3`, y `prf_isTermCodeE1_func` para el nodo |
+| `nil` | trivial (`lenc nil = 0`, todo vacuo) |
+| `cons` | **aquí paga la fusión**: la HI da testigo para la cabeza y otro para la cola, y el de la lista es el `concat` de los dos |
+
+### 3.37.4 · 🔑 Tres lecciones de método
+
+1. **SACAR EL `∃` FUERA DEL PASO.** En `prf_hasWit_funcc` y `prf_hasWitArgs_cons` la eliminación
+   del existencial se hace **a nivel `Prf`, como lema suelto**, y el paso sólo hace un `mp`.
+   Dentro del `PHI_step` habría costado el doble lift cada vez. Es «la moneda de la inducción
+   OBJETO» (§3.31) aplicada a los existenciales.
+2. **Los colapsos van paso a paso, no con un `simp` final.** Con tres o cuatro sustituciones
+   anidadas el `simp` grande no reduce: hace falta un `PHI_specK` por binder, aplicado justo tras
+   su `PrfH_spec` (patrón de `sondeos/EvalSubstfcPrf.lean:6357`), y por eso conviene un `BODY`
+   explícito. Y necesitan la escalera **completa** de lifts anidados —`substTerm_liftTerm`,
+   `FOL.substTerm_liftLift`, `substTerm_liftLiftLift`, `substTerm_liftLiftLiftLift`—: los cuatro
+   existen en `Meta/SubstArith.lean`, uno por profundidad.
+3. **`PSI_inst3` ya existía.** Con tres binders el `PSI_inst` normal no vale. La escalera psi
+   completa se promovió en **B3 condición 5**, para un descenso distinto, y encaja exacta. Es la
+   segunda vez esta semana que una pieza promovida «para otra cosa» paga la factura del día.
+
+### 3.37.5 · ⚠️ El árbol rojo cobra peaje operativo
+
+`prf_nil_or_cons` vive en `Meta/EvalLiftcPrf.lean` y la fusión en un sondeo: **ninguna de las dos
+es importable** hoy (la primera está bloqueada tras `MpCodePrf`, la segunda está fuera del build).
+Hubo que **reproducirlas**. Barato —`prf_list_induction` está en `ChainPrf`, que sí compila, y el
+paso de esa inducción no usa la HI—, pero es coste real de la parada, y van dos veces en un día.
+
+### 3.37.6 · Estado y qué queda
+
+**Mitad FÓRMULA — armazón HECHO**: `BODYF`, `PHIF` con **cuatro** binders (`wF`, `wT`, `v`, `s`),
+el gate `liftFormula 1 PHIF = PHIF`, `PHIF_at`, los cuatro colapsos y `PHIF_use`.
+🔑 Y su cuerpo **no es conjuntivo**, a diferencia de la mitad término: la parte de lista ya está
+resuelta (`prf_hasWitArgs_substtsc_of`) y entra como lema externo.
+
+**Falta**: el espejo formula‑sort de la maquinaria de testigos (`wfAllF` extendido y **fusionado**
+— con la complicación de que el testigo tiene DOS componentes), los **ocho** casos (`bot`, `atom`,
+`eq`, tres `bin`, dos `un`) y el ensamblaje. Los `atom`/`eq` ya tienen con qué cerrarse: consumen
+la mitad término. Los `un` (`forallc`/`exc`) suben el nivel y liftean el sustituyendo, lo que pide
+`CRIT_hasWit_lift`, que existe.
+
+**Y B3.4 sigue bloqueada por C**, medido hoy: el cierre de `pcc_eval_substfc_wit` son **554**
+declaraciones (**131** a promover, 212 ya en producción), y toca **13 módulos de los que 8 no
+compilan** — `LiftcCodePrf`, `SubstfcCodePrf` y `EvalArithPrf` importan `MpCodePrf` directamente.
