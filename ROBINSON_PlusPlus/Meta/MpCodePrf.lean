@@ -4,6 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ForallElimCodePrf
+import ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -162,36 +163,73 @@ Primer uso real del toolkit: un axioma `∀x. φ(x)` de `axioms` tiene su códig
 (`repr_pos'_prf` sobre `prf_ax`), y el ∀‑elim de código lo **instancia en cualquier código‑testigo
 `w`, incluso abierto**. Es el paso que la **evaluación provable** repite sobre `ax4`/`ax5`. -/
 
+/-! ### §N · CÓMO SE PAGA LA GUARDA en esta familia (ADR-020)
+
+`pcc_forallElim_code_open` pide, bajo la enmienda, `hasWitF (↑Ac)` y `hasWit (↑w)`.
+
+🔑 **La mitad CÓDIGO se PAGA aquí, entera**: el `Ac` de cada eliminación es o bien `⌜φ⌝` —o
+`forallc ⌜φ⌝`, que **es** `⌜∀φ⌝—`, o bien una imagen `substfc` de uno de ésos, y la clausura
+`prf_hasWitF_substfc` (`Meta/SubstfcWitnessPrf.lean`) la cierra. Los tres lemas de abajo son las
+tres formas en que aparece.
+
+⚠️ **La mitad TESTIGO se ARRASTRA**, y no hay alternativa: `wᵢ` es un `Term` **arbitrario**, así
+que aquí no hay nada que descargar. Es legítimo bajo el criterio de ADR-020 —«una guarda sólo se
+arrastra si algún consumidor concreto puede pagarla»— y está MEDIDO que lo es: los ~40 sitios de
+llamada pasan casi siempre `tcFn …`, que paga `prf_hasWit_tcFn`. -/
+
+/-- El código de una fórmula REAL paga su guarda, y el lift De Bruijn no lo toca. -/
+theorem prf_hasWitF_fc_lift (φ : Formula) : Prf (hasWitF (liftTerm 0 (formCode φ))) := by
+  rw [liftTerm_formCode]
+  exact ROBINSON_PlusPlus.Meta.Representability2.prf_hasWitF_fc φ
+
+/-- El sustituyendo LEVANTADO conserva testigo: es `CRIT_hasWit_lift`, que existía desde B1. -/
+theorem prf_hasWit_liftc_lift {w : Term} (h : Prf (hasWit (liftTerm 0 w))) :
+    Prf (hasWit (liftTerm 0 (liftc zero w))) :=
+  prf_mp (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_lift (liftTerm 0 w)) h
+
+/-- El código YA SUSTITUIDO paga su guarda: es exactamente la clausura nueva. -/
+theorem prf_hasWitF_substfc_lift {v s C : Term}
+    (hC : Prf (hasWitF (liftTerm 0 C))) (hs : Prf (hasWit (liftTerm 0 s))) :
+    Prf (hasWitF (liftTerm 0 (substfc v s C))) :=
+  prf_hasWitF_substfc_mp (liftTerm 0 v) (liftTerm 0 s) (liftTerm 0 C) hC hs
+
 /-- **Instanciación de un TEOREMA universal codificado**: de `Prf (∀φ)` sale que, para todo
     código‑testigo `w` (abierto o cerrado), el código sustituido `substfc zero w ⌜φ⌝` es demostrable.
 
     `formCode (Formula.forall φ) = forallc (formCode φ)` (definicional). Es la forma general:
     `pcc_axiom_inst` es el caso `h = prf_ax hmem`. Sirve para internalizar **cualquier** teorema
     universal de la teoría objeto (p. ej. la transitividad de `=`), no sólo los axiomas. -/
-theorem pcc_thm_inst (φ : Formula) (h : Prf (Formula.forall φ)) (w : Term) :
+theorem pcc_thm_inst (φ : Formula) (h : Prf (Formula.forall φ)) (w : Term)
+    (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode φ))) :=
-  prf_mp (pcc_forallElim_code_open (formCode φ) w) (repr_pos'_prf h)
+  prf_mp (pcc_forallElim_code_open (formCode φ) w (prf_hasWitF_fc_lift φ) hw)
+    (repr_pos'_prf h)
 
 /-- **Instanciación de un TEOREMA `∀∀φ` codificado** (dos testigos, ambos pueden ser abiertos). -/
-theorem pcc_thm_inst2 (φ : Formula) (h : Prf (forall_2 φ)) (w₁ w₂ : Term) :
+theorem pcc_thm_inst2 (φ : Formula) (h : Prf (forall_2 φ)) (w₁ w₂ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) := by
   have h0 : Prf (provFromCode (formCode (forall_2 φ))) := repr_pos'_prf h
   have h1 : Prf (provFromCode (substfc zero w₁ (forallc (formCode φ)))) :=
-    prf_mp (pcc_forallElim_code_open (forallc (formCode φ)) w₁) h0
+    prf_mp (pcc_forallElim_code_open (forallc (formCode φ)) w₁
+      (prf_hasWitF_fc_lift (Formula.forall φ)) hw₁) h0
   have h2 : Prf (provFromCode (forallc (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
     prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (formCode φ))) h1
-  exact prf_mp (pcc_forallElim_code_open _ w₂) h2
+  exact prf_mp (pcc_forallElim_code_open
+    (substfc (succ zero) (liftc zero w₁) (formCode φ)) w₂
+    (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift φ) (prf_hasWit_liftc_lift hw₁)) hw₂) h2
 
 /-- **Instanciación de un axioma universal codificado** (caso `h = prf_ax hmem` de `pcc_thm_inst`). -/
-theorem pcc_axiom_inst (φ : Formula) (hmem : Formula.forall φ ∈ axioms) (w : Term) :
+theorem pcc_axiom_inst (φ : Formula) (hmem : Formula.forall φ ∈ axioms) (w : Term)
+    (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode φ))) :=
-  pcc_thm_inst φ (prf_ax hmem) w
+  pcc_thm_inst φ (prf_ax hmem) w hw
 
 /-- Instancia codificada de **`ax4_add_zero`** (`∀n. n + 0 = n`): el caso base de la evaluación
     provable de `+`. Testigo‑código `w` arbitrario (puede ser `tcFn` de una variable ligada). -/
-theorem pcc_ax4_inst (w : Term) :
+theorem pcc_ax4_inst (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode (add (.var 0) zero =eq (.var 0))))) :=
-  pcc_axiom_inst _ (show ax4_add_zero ∈ axioms by simp [axioms]) w
+  pcc_axiom_inst _ (show ax4_add_zero ∈ axioms by simp [axioms]) w hw
 
 /-- **Instanciación de un axioma `∀∀φ` codificado** (dos testigos).
 
@@ -202,33 +240,41 @@ theorem pcc_ax4_inst (w : Term) :
     **Nota:** el cuerpo de la segunda eliminación, `substfc (σ0) (liftc 0 w₁) ⌜φ⌝`, contiene `w₁` y
     por tanto **no es cerrado** cuando `w₁` es abierto. Por eso hace falta `pcc_forallElim_code_open`
     (sin `hAc`), no `pcc_forallElim_code'`. -/
-theorem pcc_axiom_inst2 (φ : Formula) (hmem : forall_2 φ ∈ axioms) (w₁ w₂ : Term) :
+theorem pcc_axiom_inst2 (φ : Formula) (hmem : forall_2 φ ∈ axioms) (w₁ w₂ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
-  pcc_thm_inst2 φ (prf_ax hmem) w₁ w₂
+  pcc_thm_inst2 φ (prf_ax hmem) w₁ w₂ hw₁ hw₂
 
 /-- Instancia codificada de **`ax5_add_succ`** (`∀n∀m. n + σm = σ(n+m)`): el paso inductivo de la
     evaluación provable de `+`. Ambos testigos‑código arbitrarios (pueden ser abiertos). -/
-theorem pcc_ax5_inst (w₁ w₂ : Term) :
+theorem pcc_ax5_inst (w₁ w₂ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
       (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0))))))) :=
-  pcc_axiom_inst2 _ (show ax5_add_succ ∈ axioms by simp [axioms]) w₁ w₂
+  pcc_axiom_inst2 _ (show ax5_add_succ ∈ axioms by simp [axioms]) w₁ w₂ hw₁ hw₂
 
 /-- **Instanciación de un TEOREMA `∀∀∀φ` codificado** (tres testigos, todos pueden ser abiertos).
     Extiende `pcc_thm_inst2` con un binder más: elimina el `∀` externo con `w₁`, empuja el `substfc`
     bajo cada binder (`prf_substfc_forall`, que levanta el testigo con `liftc zero`), y elimina los
     dos `∀` internos con `w₂`, `w₃`. -/
-theorem pcc_thm_inst3 (φ : Formula) (h : Prf (forall_3 φ)) (w₁ w₂ w₃ : Term) :
+theorem pcc_thm_inst3 (φ : Formula) (h : Prf (forall_3 φ)) (w₁ w₂ w₃ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
+    (hw₃ : Prf (hasWit (liftTerm 0 w₃))) :
     Prf (provFromCode (substfc zero w₃ (substfc (succ zero) (liftc zero w₂)
       (substfc (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ))))) := by
   have h0 : Prf (provFromCode (formCode (forall_3 φ))) := repr_pos'_prf h
   have h1 : Prf (provFromCode (substfc zero w₁ (formCode (forall_2 φ)))) :=
-    prf_mp (pcc_forallElim_code_open (formCode (forall_2 φ)) w₁) h0
+    prf_mp (pcc_forallElim_code_open (formCode (forall_2 φ)) w₁
+      (prf_hasWitF_fc_lift (forall_2 φ)) hw₁) h0
   have h2 : Prf (provFromCode (forallc (substfc (succ zero) (liftc zero w₁)
       (forallc (formCode φ))))) :=
     prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (forallc (formCode φ)))) h1
   have h3 : Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
       (forallc (formCode φ))))) :=
-    prf_mp (pcc_forallElim_code_open _ w₂) h2
+    prf_mp (pcc_forallElim_code_open
+      (substfc (succ zero) (liftc zero w₁) (forallc (formCode φ))) w₂
+      (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift (Formula.forall φ))
+        (prf_hasWit_liftc_lift hw₁)) hw₂) h2
   have h4 : Prf (provFromCode (substfc zero w₂ (forallc (substfc (succ (succ zero))
       (liftc zero (liftc zero w₁)) (formCode φ))))) :=
     prf_mp (prf_provCode_congr (prf_congr_substfc_arg3
@@ -237,13 +283,21 @@ theorem pcc_thm_inst3 (φ : Formula) (h : Prf (forall_3 φ)) (w₁ w₂ w₃ : T
       (substfc (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ))))) :=
     prf_mp (prf_provCode_congr (prf_substfc_forall zero w₂
       (substfc (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ)))) h4
-  exact prf_mp (pcc_forallElim_code_open _ w₃) h5
+  exact prf_mp (pcc_forallElim_code_open
+    (substfc (succ zero) (liftc zero w₂)
+      (substfc (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ))) w₃
+    (prf_hasWitF_substfc_lift
+      (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift φ)
+        (prf_hasWit_liftc_lift (prf_hasWit_liftc_lift hw₁)))
+      (prf_hasWit_liftc_lift hw₂)) hw₃) h5
 
 /-- **Instanciación de un axioma `∀∀∀φ` codificado** (tres testigos). -/
-theorem pcc_axiom_inst3 (φ : Formula) (hmem : forall_3 φ ∈ axioms) (w₁ w₂ w₃ : Term) :
+theorem pcc_axiom_inst3 (φ : Formula) (hmem : forall_3 φ ∈ axioms) (w₁ w₂ w₃ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
+    (hw₃ : Prf (hasWit (liftTerm 0 w₃))) :
     Prf (provFromCode (substfc zero w₃ (substfc (succ zero) (liftc zero w₂)
       (substfc (succ (succ zero)) (liftc zero (liftc zero w₁)) (formCode φ))))) :=
-  pcc_thm_inst3 φ (prf_ax hmem) w₁ w₂ w₃
+  pcc_thm_inst3 φ (prf_ax hmem) w₁ w₂ w₃ hw₁ hw₂ hw₃
 
 /-! ### §N+1 · Cuatro testigos (promovido de `sondeos/SubstfcPlanos.lean`, 2026‑08‑31)
 
@@ -256,19 +310,25 @@ Extensión **mecánica** de `pcc_thm_inst3` con un binder más: el mismo baile d
 `pcc_forallElim_code_open` + `prf_substfc_forall` + `prf_congr_substfc_arg3`, una vuelta más. -/
 
 /-- **Instanciación de un TEOREMA `∀∀∀∀φ` codificado** (cuatro testigos, todos pueden ser abiertos). -/
-theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w₄ : Term) :
+theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w₄ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
+    (hw₃ : Prf (hasWit (liftTerm 0 w₃))) (hw₄ : Prf (hasWit (liftTerm 0 w₄))) :
     Prf (provFromCode (substfc zero w₄ (substfc (numeral 1) (liftc zero w₃)
       (substfc (numeral 2) (liftc zero (liftc zero w₂))
         (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))) := by
   have h0 : Prf (provFromCode (formCode (forall_4 φ))) := repr_pos'_prf h
   have h1 : Prf (provFromCode (substfc zero w₁ (formCode (forall_3 φ)))) :=
-    prf_mp (pcc_forallElim_code_open (formCode (forall_3 φ)) w₁) h0
+    prf_mp (pcc_forallElim_code_open (formCode (forall_3 φ)) w₁
+      (prf_hasWitF_fc_lift (forall_3 φ)) hw₁) h0
   have h2 : Prf (provFromCode (forallc (substfc (numeral 1) (liftc zero w₁)
       (formCode (forall_2 φ))))) :=
     prf_mp (prf_provCode_congr (prf_substfc_forall zero w₁ (formCode (forall_2 φ)))) h1
   have h3 : Prf (provFromCode (substfc zero w₂ (substfc (numeral 1) (liftc zero w₁)
       (formCode (forall_2 φ))))) :=
-    prf_mp (pcc_forallElim_code_open _ w₂) h2
+    prf_mp (pcc_forallElim_code_open
+      (substfc (numeral 1) (liftc zero w₁) (formCode (forall_2 φ))) w₂
+      (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift (forall_2 φ))
+        (prf_hasWit_liftc_lift hw₁)) hw₂) h2
   have h4 : Prf (provFromCode (substfc zero w₂ (forallc (substfc (numeral 2)
       (liftc zero (liftc zero w₁)) (forallc (formCode φ)))))) :=
     prf_mp (prf_provCode_congr (prf_congr_substfc_arg3
@@ -279,7 +339,13 @@ theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w�
       (substfc (numeral 2) (liftc zero (liftc zero w₁)) (forallc (formCode φ))))) h4
   have h6 : Prf (provFromCode (substfc zero w₃ (substfc (numeral 1) (liftc zero w₂)
       (substfc (numeral 2) (liftc zero (liftc zero w₁)) (forallc (formCode φ)))))) :=
-    prf_mp (pcc_forallElim_code_open _ w₃) h5
+    prf_mp (pcc_forallElim_code_open
+      (substfc (numeral 1) (liftc zero w₂)
+        (substfc (numeral 2) (liftc zero (liftc zero w₁)) (forallc (formCode φ)))) w₃
+      (prf_hasWitF_substfc_lift
+        (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift (Formula.forall φ))
+          (prf_hasWit_liftc_lift (prf_hasWit_liftc_lift hw₁)))
+        (prf_hasWit_liftc_lift hw₂)) hw₃) h5
   have h7 : Prf (provFromCode (substfc zero w₃ (substfc (numeral 1) (liftc zero w₂)
       (forallc (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁)))
         (formCode φ)))))) :=
@@ -297,14 +363,25 @@ theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w�
     prf_mp (prf_provCode_congr (prf_substfc_forall zero w₃
       (substfc (numeral 2) (liftc zero (liftc zero w₂))
         (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ))))) h8
-  exact prf_mp (pcc_forallElim_code_open _ w₄) h9
+  exact prf_mp (pcc_forallElim_code_open
+    (substfc (numeral 1) (liftc zero w₃)
+      (substfc (numeral 2) (liftc zero (liftc zero w₂))
+        (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))) w₄
+    (prf_hasWitF_substfc_lift
+      (prf_hasWitF_substfc_lift
+        (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift φ)
+          (prf_hasWit_liftc_lift (prf_hasWit_liftc_lift (prf_hasWit_liftc_lift hw₁))))
+        (prf_hasWit_liftc_lift (prf_hasWit_liftc_lift hw₂)))
+      (prf_hasWit_liftc_lift hw₃)) hw₄) h9
 
 /-- **Instanciación de un axioma `∀∀∀∀φ` codificado** (cuatro testigos). -/
-theorem pcc_axiom_inst4 (φ : Formula) (hmem : forall_4 φ ∈ axioms) (w₁ w₂ w₃ w₄ : Term) :
+theorem pcc_axiom_inst4 (φ : Formula) (hmem : forall_4 φ ∈ axioms) (w₁ w₂ w₃ w₄ : Term)
+    (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
+    (hw₃ : Prf (hasWit (liftTerm 0 w₃))) (hw₄ : Prf (hasWit (liftTerm 0 w₄))) :
     Prf (provFromCode (substfc zero w₄ (substfc (numeral 1) (liftc zero w₃)
       (substfc (numeral 2) (liftc zero (liftc zero w₂))
         (substfc (numeral 3) (liftc zero (liftc zero (liftc zero w₁))) (formCode φ)))))) :=
-  pcc_thm_inst4 φ (prf_ax hmem) w₁ w₂ w₃ w₄
+  pcc_thm_inst4 φ (prf_ax hmem) w₁ w₂ w₃ w₄ hw₁ hw₂ hw₃ hw₄
 
 end ROBINSON_PlusPlus.Meta.MpCodePrf
 
