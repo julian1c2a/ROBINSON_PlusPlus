@@ -386,4 +386,6 @@ export ROBINSON_PlusPlus.Meta.EvalListPrf (
   evalLencCode pcc_eval_lenc_nil pcc_ax_lenc_cons_computed pcc_eval_lenc_cons_imp
   substTerm_evalLencCode liftTerm_evalLencCode evalLencPred substFormula_evalLencPred
   prf_eval_lenc_all pcc_eval_lenc
+  -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)
+  prf_hasWit_carcT prf_hasWit_cdrcT prf_hasWit_lencT
 )

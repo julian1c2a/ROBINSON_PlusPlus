@@ -415,4 +415,6 @@ export ROBINSON_PlusPlus.Meta.DotConsPrf (
   cpOfT prf_congr_cpOfT prf_substtc_cpOfT pcc_axL0_inst prf_axL0_body_computes
   pcc_axL0_computed pcc_rw pcc_rw_imp pcc_rw_div2 cpOfT' prf_congr_cpOfT2
   pcc_div2_cons pcc_dot_cons
+  -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)
+  prf_hasWit_consT prf_hasWit_div2cT
 )

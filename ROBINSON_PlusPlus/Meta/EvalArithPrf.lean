@@ -555,4 +555,6 @@ export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   pcc_leibniz_apply_imp pcc_eq_trans_code_imp pcc_congr_succ_code_imp
   substTerm_evalAddCode liftTerm_evalAddCode evalAddPred substFormula_evalAddPred
   step_evalAddPred pcc_eval_add_succ_imp prf_eval_add_all pcc_eval_add
+  -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)
+  prf_hasWit_succcT prf_hasWit_addcT
 )

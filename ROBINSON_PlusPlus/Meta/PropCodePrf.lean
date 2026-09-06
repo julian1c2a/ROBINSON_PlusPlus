@@ -130,11 +130,18 @@ noncomputable def indConcl (Ac : Term) : Term :=
     (implc (forallc (implc Ac (substfc zero (termCodeM (succ (.var 0))) (liftfc (succ zero) Ac))))
            (forallc Ac))
 
-/-- **INDUCCIÓN interna a nivel de código, LIBRE DE MURO**: para `Ac` **arbitrario**,
-    `⊢ Prov(⌜ Ac[0] ⇒ (∀x. Ac[x] ⇒ Ac[σx]) ⇒ ∀x. Ac[x] ⌝)`. -/
-theorem pcc_ind_code (Ac : Term) : Prf (provFromCode (indConcl Ac)) :=
+/-- **INDUCCIÓN interna a nivel de código, LIBRE DE MURO**:
+    `⊢ Prov(⌜ Ac[0] ⇒ (∀x. Ac[x] ⇒ Ac[σx]) ⇒ ∀x. Ac[x] ⌝)`.
+
+    ⚠️ **Ya NO es «para `Ac` arbitrario»** ([ADR-020](../../DECISIONS.md)): el esquema `lineWF`
+    del tag 18 lleva la guarda `hasWitF` dentro, así que `Ac` tiene que ser un código con
+    testigo. Sigue siendo libre de MURO —que es otra cosa: no pide `pcc_eval_substfc`—, y la
+    guarda la pagan `prf_hasWitF_fc` para códigos reales y los constructores de
+    `Meta/SubstfcWitnessPrf.lean` para los construidos. -/
+theorem pcc_ind_code (Ac : Term) (hwA : Prf (hasWitF Ac)) :
+    Prf (provFromCode (indConcl Ac)) :=
   pcc_axline _ (cons (indConcl Ac) (cons (numeralM 18) (cons Ac nil)))
-    (prf_iff_mpr (prf_lineWF_ind _ Ac) (prf_refl _))
+    (prf_iff_mpr (prf_lineWF_ind _ Ac hwA) (prf_refl _))
     (prf_carc_cons _ _) (prf_premsOf_ind _ Ac)
 
 end ROBINSON_PlusPlus.Meta.PropCodePrf

@@ -58,14 +58,17 @@ theorem PrfH_mp_code_apply {Γ : List Formula} {Ac Bc : Term}
 /-- Leibniz interno a nivel de código, en `PrfH`. -/
 theorem PrfH_leibniz_apply {Γ : List Formula} (Ac t₁ t₂ : Term)
     (heq : PrfH Γ (provFromCode (eqc t₁ t₂)))
-    (h1 : PrfH Γ (provFromCode (substfc zero t₁ Ac))) :
+    (h1 : PrfH Γ (provFromCode (substfc zero t₁ Ac)))
+    (hwA : Prf (hasWitF Ac)) (hw1 : Prf (hasWit t₁)) (hw2 : Prf (hasWit t₂)) :
     PrfH Γ (provFromCode (substfc zero t₂ Ac)) :=
-  PrfH_mp_code_apply (PrfH_mp_code_apply (prf_to_prfH (pcc_leibniz_code Ac t₁ t₂) _) heq) h1
+  PrfH_mp_code_apply
+    (PrfH_mp_code_apply (prf_to_prfH (pcc_leibniz_code Ac t₁ t₂ hwA hw1 hw2) _) heq) h1
 
 /-- Transitividad interna de `=` a nivel de código, en `PrfH`. -/
 theorem PrfH_eq_trans_code {Γ : List Formula} (X Y Z : Term)
     (hX : ∀ W, Prf (substtc zero W X =eq X))
-    (h1 : PrfH Γ (provFromCode (eqc X Y))) (h2 : PrfH Γ (provFromCode (eqc Y Z))) :
+    (h1 : PrfH Γ (provFromCode (eqc X Y))) (h2 : PrfH Γ (provFromCode (eqc Y Z)))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) (hwZ : Prf (hasWit Z)) :
     PrfH Γ (provFromCode (eqc X Z)) := by
   let Ac : Term := eqc X (varc (numeral 0))
   have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc X t) := fun t =>
@@ -73,12 +76,15 @@ theorem PrfH_eq_trans_code {Γ : List Formula} (X Y Z : Term)
       (prf_congr_eqCodeFn (hX t) (prf_substtc_varc0 t))
   have hY : PrfH Γ (provFromCode (substfc zero Y Ac)) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcomp Y))) _) h1
-  have hZ : PrfH Γ (provFromCode (substfc zero Z Ac)) := PrfH_leibniz_apply Ac Y Z h2 hY
+  have hZ : PrfH Γ (provFromCode (substfc zero Z Ac)) :=
+    PrfH_leibniz_apply Ac Y Z h2 hY
+      (prf_hasWitF_eq2 X (varc (numeral 0)) hwX (prf_hasWit_varc (numeral 0))) hwY hwZ
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Z)) _) hZ
 
 /-- **Congruencia interna de `carcT`** (forma implicación): `Prov(⌜X=Y⌝) ⇒ Prov(⌜carcT X = carcT Y⌝)`.
     Leibniz con contexto `Ac := (carcT X = carcT v₀)`; base = reflexividad codificada. -/
-theorem pcc_congr_carcT_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X)) :
+theorem pcc_congr_carcT_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwX : Prf (hasWit X)) (hwY : Prf (hasWit Y)) :
     Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (carcT X) (carcT Y))) := by
   let Ac : Term := eqc (carcT X) (carcT (varc (numeral 0)))
   have hcomp : ∀ t : Term, Prf (substfc zero t Ac =eq eqc (carcT X) (carcT t)) := by
@@ -92,7 +98,9 @@ theorem pcc_congr_carcT_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X
     prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X))) (prf_provFromCode_eqCodeFn_refl (carcT X))
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
-    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _))
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (carcT X) (carcT (varc (numeral 0))) (prf_hasWit_carcT hwX)
+        (prf_hasWit_carcT (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 /-- Congruencia de `carcT` en `PrfH`. -/
 theorem PrfH_congr_carcT {Γ : List Formula} {x y : Term} (h : PrfH Γ (x =eq y)) :
@@ -122,7 +130,9 @@ theorem pcc_eval_carc_nthc (p i : Term) :
   have hA : PrfH [lt i (lenc p), chainOk nil p]
       (provFromCode (eqc (carcT (nthcT (tcFn p) (tcFn i))) (carcT (tcFn (nthc p i))))) :=
     PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_carcT_code_imp (nthcT (tcFn p) (tcFn i)) (tcFn (nthc p i))
-      (substtc_inv_nthcT (substtc_inv_tcFn p) (substtc_inv_tcFn i))) _) hevalN
+      (substtc_inv_nthcT (substtc_inv_tcFn p) (substtc_inv_tcFn i))
+      (prf_hasWit_nthcT (prf_hasWit_tcFn p) (prf_hasWit_tcFn i))
+      (prf_hasWit_tcFn (nthc p i))) _) hevalN
   have hcodeqB : PrfH [lt i (lenc p), chainOk nil p]
       (eqCodeFn (carcT (tcFn (cons (carc (nthc p i)) (cdrc (nthc p i))))) (tcFn (carc (nthc p i)))
         =eq eqCodeFn (carcT (tcFn (nthc p i))) (tcFn (carc (nthc p i)))) :=
@@ -135,6 +145,9 @@ theorem pcc_eval_carc_nthc (p i : Term) :
   exact PrfH_eq_trans_code (carcT (nthcT (tcFn p) (tcFn i))) (carcT (tcFn (nthc p i)))
     (tcFn (carc (nthc p i)))
     (substtc_inv_carcT (substtc_inv_nthcT (substtc_inv_tcFn p) (substtc_inv_tcFn i))) hA hB
+    (prf_hasWit_carcT (prf_hasWit_nthcT (prf_hasWit_tcFn p) (prf_hasWit_tcFn i)))
+    (prf_hasWit_carcT (prf_hasWit_tcFn (nthc p i)))
+    (prf_hasWit_tcFn (carc (nthc p i)))
 
 end ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 

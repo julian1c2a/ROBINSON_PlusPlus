@@ -310,4 +310,6 @@ export ROBINSON_PlusPlus.Meta.EvalMulPrf (
   pcc_eval_mul_succ_imp
   substTerm_evalMulCode liftTerm_evalMulCode evalMulPred
   substFormula_evalMulPred step_evalMulPred prf_eval_mul_all pcc_eval_mul
+  -- ADR-020: la guarda de los constructores dotados (escalera de aridad, §28)
+  prf_hasWit_mulcT
 )
