@@ -138,7 +138,7 @@ def inDotT (t : Term) : Term := substfc zero (tcFn t) (formCode inThy)
 theorem paso6_backbone_thy (t : Term) :
     Prf (provFromCode
       (implc (tagDotT t) (implc (andc (lencDotT t) (inDotT t)) (lwfDot t)))) := by
-  have h := pcc_thm_inst _ prf_lineWF_thy_bwd (tcFn t)
+  have h := pcc_thm_inst _ prf_lineWF_thy_bwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
   refine prf_mp (prf_provCode_congr ?_) h
   refine prf_eq_trans
     (prf_substfc_impl zero (tcFn t) (formCode tagThy)
@@ -249,6 +249,7 @@ theorem pcc_inDotT (t : Term) :
   have hrefl : PrfH Γ (provFromCode (inFormCodeFn (tcFn (carc t)) (termCode axiomsCodeT))) :=
     PrfH.mp _ _ _
       (prf_to_prfH (pcc_In_axiomsCodeT_tracked (tcFn (carc t)) (carc t)
+        (prf_hasWit_tcFn (carc t)) (prf_hasWit_tcFn (liftTerm 0 (carc t)))
         (substtc_inv_tcFn _) (prf_provFromCode_eqCodeFn_refl (tcFn (carc t)))) _) hin
   -- (2) puente de evaluación `Prov(carcT ṫ = (carc t)˙)` (necesita la estructura `cons`)
   have hcons := PrfH.mp _ _ _ (prf_to_prfH (prf_lineWF_cons t) _) hlw
@@ -262,6 +263,7 @@ theorem pcc_inDotT (t : Term) :
       (prf_congr_carcT (substtc_inv_tcFn t W))
   have hsym : PrfH Γ (provFromCode (eqc (tcFn (carc t)) (carcT (tcFn t)))) :=
     PrfH_eq_symm_code (carcT (tcFn t)) (tcFn (carc t)) hCinv hcarc
+      (prf_hasWit_carcT (prf_hasWit_tcFn t)) (prf_hasWit_tcFn (carc t))
   -- (3) Leibniz interno en el hueco 1 del átomo `In`: `(carc t)˙ → carcT ṫ`
   let Ac : Term := inFormCodeFn (varc (numeral 0)) (termCode axiomsCodeT)
   have h1 : PrfH Γ (provFromCode (substfc zero (tcFn (carc t)) Ac)) :=
@@ -270,6 +272,9 @@ theorem pcc_inDotT (t : Term) :
         substtc_inv_termCode_axiomsCodeT))) _) hrefl
   have h2 : PrfH Γ (provFromCode (substfc zero (carcT (tcFn t)) Ac)) :=
     PrfH_leibniz_apply Ac (tcFn (carc t)) (carcT (tcFn t)) hsym h1
+      (prf_hasWitF_atom2 (strCode in_sym) (varc (numeral 0)) (termCode axiomsCodeT)
+        (prf_hasWit_varc (numeral 0)) (prf_hasWit_tc axiomsCodeT))
+      (prf_hasWit_tcFn (carc t)) (prf_hasWit_carcT (prf_hasWit_tcFn t))
   have h3 : PrfH Γ (provFromCode (inFormCodeFn (carcT (tcFn t)) (termCode axiomsCodeT))) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
       (prf_substfc_inFormCode_hole1 (carcT (tcFn t)) (termCode axiomsCodeT)
