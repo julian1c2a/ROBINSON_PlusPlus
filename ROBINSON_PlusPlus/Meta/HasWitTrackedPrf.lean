@@ -50,6 +50,7 @@ open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
+open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
 
 set_option linter.unusedSimpArgs false
 
@@ -196,6 +197,78 @@ theorem pcc_argsIn_tracked (wT Y : Term) :
       provFromCode (bdAllCode (tcFn (lenc (cdrc (cons wT Y)))) (argsInPsi (cons wT Y)))) :=
   pcc_argsIn_pair_tracked (cons wT Y)
 
+
+/-! ## §5 · EL RECORRIDO DE LOS DOS DISYUNTOS DE `isTermCodeE1`
+
+    isTermCodeE1 wT X = shapeUn X 0 ∨ (shapeBin X 1 ∧ argsIn wT (nthc X 2))
+
+Cada mitad se refleja con piezas que ya están: la **forma** con `pcc_shape_tracked` (previa
+conversión posicional→ecuacional por `prf_shapeUn_str`/`prf_shapeBin_str`) y la **pertenencia**
+con `pcc_argsIn_pair_tracked` de §4. El `∨` y el `∧` los ensamblan `pcc_reflect_or` y
+`pcc_reflect_and`. -/
+
+/-- Congruencia de `argsIn` en su **primer** argumento (el testigo). Producción tenía sólo la
+    del segundo (`PrfH_congr_argsIn`); ésta hace falta para el puente al par de §4. -/
+theorem PrfH_congr_argsIn_wit {Γ : List Formula} {wT₁ wT₂ Y : Term}
+    (h : PrfH Γ (wT₁ =eq wT₂)) (ha : PrfH Γ (argsIn wT₁ Y)) : PrfH Γ (argsIn wT₂ Y) := by
+  have hS : ∀ s : Term, substFormula 0 s (argsIn (.var 0) (liftTerm 0 Y)) = argsIn s Y := by
+    intro s
+    simp only [substF_argsIn, substTerm, FOL.substTerm_liftTerm, if_true]
+  exact (hS wT₂) ▸ PrfH_leibniz_subst (A := argsIn (.var 0) (liftTerm 0 Y)) h ((hS wT₁) ▸ ha)
+
+/-- **El puente al par de §4**: `argsIn wT Y` es `argsInPair (cons wT Y)` módulo las dos
+    ecuaciones objeto `carc (cons a b) = a` y `cdrc (cons a b) = b`. -/
+theorem prf_argsIn_to_pair (wT Y : Term) :
+    Prf (argsIn wT Y ⇒ argsInPair (cons wT Y)) := by
+  refine prf_deduction ?_
+  have h : PrfH [argsIn wT Y] (argsIn wT Y) := prfH_hyp_self _
+  have h1 : PrfH [argsIn wT Y] (argsIn (carc (cons wT Y)) Y) :=
+    PrfH_congr_argsIn_wit (prf_to_prfH (prf_eq_symm (prf_carc_cons wT Y)) _) h
+  exact PrfH_congr_argsIn (prf_to_prfH (prf_eq_symm (prf_cdrc_cons wT Y)) _) h1
+
+/-- La imagen punteada de `argsIn`, tal como sale de §4. -/
+def argsInDot (wT Y : Term) : Term :=
+  bdAllCode (tcFn (lenc (cdrc (cons wT Y)))) (argsInPsi (cons wT Y))
+
+/-- `argsIn` reflejado con sus dos argumentos **separados**. -/
+theorem pcc_argsIn_tracked' (wT Y : Term) :
+    Prf (argsIn wT Y ⇒ provFromCode (argsInDot wT Y)) :=
+  impT (prf_argsIn_to_pair wT Y) (pcc_argsIn_pair_tracked (cons wT Y))
+
+/-- La forma, de la versión posicional directamente al código: junta
+    `prf_shape*_str` con `pcc_shape_tracked` descurrificando la conjunción. -/
+theorem pcc_shape_of_str (X : Term) (k n : Nat) (S : Formula)
+    (hstr : Prf (Formula.impl S (land (consOk X)
+      (land (Formula.eq (carc X) (numeralM k)) (Formula.eq (lenc X) (numeralM n)))))) :
+    Prf (S ⇒ provFromCode (shapeDot (tcFn X) k n)) := by
+  refine prf_deduction ?_
+  have hs : PrfH [S] (land (consOk X) (land (Formula.eq (carc X) (numeralM k))
+      (Formula.eq (lenc X) (numeralM n)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH hstr _) (prfH_hyp_self _)
+  exact PrfH.mp _ _ _
+    (PrfH.mp _ _ _ (prf_to_prfH (pcc_shape_tracked X k n) _) (PrfH_and_elim_left hs))
+    (PrfH_and_elim_right hs)
+
+/-- **La imagen punteada de `isTermCodeE1`**, disyunto a disyunto. -/
+noncomputable def isTermCodeE1Dot (wT X : Term) : Term :=
+  orc (shapeDot (tcFn X) 0 2)
+      (andc (shapeDot (tcFn X) 1 3) (argsInDot wT (nthc X (numeralM 2))))
+
+/-- ⭐ **EL RECORRIDO DE LOS DOS DISYUNTOS, REFLEJADO**, con `wT` y `X` **abstractos**.
+
+    ⚠️ **Ojo a la forma de la imagen**: aquí `X` es el término OBJETO y el código sale como
+    `tcFn X`. Para alimentar el `pcc_bdAll_intro` EXTERIOR hace falta la variante sobre
+    CÓDIGOS —con el hueco del índice en `varc 0`, o sea `nthcT (tcFn w) (varc 0)` en vez de
+    `tcFn (nthc w i)`—, que es como `sondeos/A3IsFCBTracked.lean:205` define su `PsiF`.
+    El salto entre las dos formas es **un solo** `PrfH_leibniz_apply` sobre el hueco del nodo
+    (aquel sondeo lo hace así en su `hbody_ok`), no una cadena de congruencias. -/
+theorem pcc_isTermCodeE1_tracked (wT X : Term) :
+    Prf (isTermCodeE1 wT X ⇒ provFromCode (isTermCodeE1Dot wT X)) := by
+  refine pcc_reflect_or _ _ _ _ (pcc_shape_of_str X 0 2 _ (prf_shapeUn_str X 0)) ?_
+  exact pcc_reflect_and _ _ _ _
+    (pcc_shape_of_str X 1 3 _ (prf_shapeBin_str X 1))
+    (pcc_argsIn_tracked' wT (nthc X (numeralM 2)))
+
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -206,6 +279,8 @@ El consumidor previsto es **C3**: quien pruebe `DEUDA_wfAll1_tracked` obtiene el
 fingir una medición de consumo. -/
 export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
   DEUDA_wfAll1_tracked pcc_isTC1_tracked_of
+  PrfH_congr_argsIn_wit prf_argsIn_to_pair argsInDot pcc_argsIn_tracked'
+  pcc_shape_of_str isTermCodeE1Dot pcc_isTermCodeE1_tracked
   argsInPsi argsInPair liftF_argsInPair substF_argsInPair
   liftT_argsInBnd substT_argsInBnd liftT_argsInPsi substT_argsInPsi
   prf_substfc_argsInPsi prf_argsInPsi_id prf_argsIn_body
@@ -214,3 +289,4 @@ export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
 
 #print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTC1_tracked_of
 #print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_argsIn_pair_tracked
+#print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTermCodeE1_tracked
