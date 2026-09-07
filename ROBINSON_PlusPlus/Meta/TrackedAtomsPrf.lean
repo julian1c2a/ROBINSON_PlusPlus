@@ -314,6 +314,34 @@ theorem pcc_shape_tracked (X : Term) (k n : Nat) :
       (by hw_auto) (by hw_auto) (by hw_auto)
   exact PrfH_and_intro_code _ _ hA hB
 
+/-- ⭐ **La pertenencia de un hijo con el índice ABSTRACTO** — el cuerpo que pide la
+    aplicación de `pcc_bdAll_intro` a un `∀` acotado **anidado** (p. ej. el `argsIn` que lleva
+    dentro `isTermCodeE1`).
+
+    Es `pcc_child_tracked` sin la parte que fuerza el índice literal, y sale **más corto**:
+    allí la cota `j < lenc X` había que derivarla de `lenc X = ṅ` y `j < n`; aquí llega
+    directamente como hipótesis, que es justo la forma en que `pcc_bdAll_intro` la entrega.
+
+    🔑 Y es la pieza que muestra que **el anidamiento del `∀` acotado NO es un muro**: las dos
+    aplicaciones de `pcc_bdAll_intro` son a nivel **META** (`∀ Y i` en Lean), así que el `∀`
+    anidado lo está en la fórmula OBJETO, no bajo un binder de Lean. -/
+theorem pcc_child_tracked_at (q Y i : Term) :
+    Prf (lt i (lenc Y) ⇒ (In (nthc Y i) q ⇒
+      provFromCode (inFormCodeFn (nthcT (tcFn Y) (tcFn i)) (tcFn q)))) := by
+  refine prf_deduction (deduction_aux ?_ (In (nthc Y i) q) [lt i (lenc Y)] rfl)
+  have hin : PrfH [In (nthc Y i) q, lt i (lenc Y)] (In (nthc Y i) q) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH [In (nthc Y i) q, lt i (lenc Y)] (lt i (lenc Y)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn Y) (tcFn i)) (tcFn (nthc Y i)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc Y i) _) hlt
+  have hevS : PrfH _ (provFromCode (eqCodeFn (tcFn (nthc Y i)) (nthcT (tcFn Y) (tcFn i)))) :=
+    PrfH_eq_symm_code _ _
+      (substtc_inv_nthcT (substtc_inv_tcFn Y) (substtc_inv_tcFn i)) hev (by hw_auto) (by hw_auto)
+  have hat : PrfH _ (provFromCode (inFormCodeFn (tcFn (nthc Y i)) (tcFn q))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (nthc Y i) q) _) hin
+  exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hevS hat
+
 /-- La pertenencia de un HIJO en la casilla `j`, en forma COMPUTADA (`nthcT Ẋ ȷ̇`). -/
 theorem pcc_child_tracked (q X : Term) (j n : Nat) (hjn : j < n) :
     Prf (Formula.eq (lenc X) (numeralM n) ⇒ (In (nthc X (numeralM j)) q ⇒
@@ -378,7 +406,8 @@ export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
   bdInB bdInPhic bdInDot substtc_inv_bdInB liftTerm_bdInDot pcc_boundedIn_tracked
   phiInBwd InBwd prf_substtc_varc0_at1 pcc_InBwd_computed pcc_In_atom_tracked
   PrfH_congr_cdrcT pcc_carcD_bridge_cons pcc_cdrcD_bridge_cons PrfH_in_transport
-  pcc_shape_tracked pcc_child_tracked pcc_carcIn_tracked pcc_cdrcIn_tracked
+  pcc_shape_tracked pcc_child_tracked pcc_child_tracked_at
+  pcc_carcIn_tracked pcc_cdrcIn_tracked
 )
 
 /-! ## FOOTPRINT -/
