@@ -1191,10 +1191,16 @@ end ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
 
-El consumidor previsto es el chasis de ADR‑020: probada `DEUDA_hGuardF`, `hGuard_of_deudas`
-queda **enteramente descargado** y `pcc_lineWF_tracked` deja de estar condicionado a los 7
-reflectores. Nada lo consume todavía, y se dice en vez de fingir una medición de consumo
-(mismo criterio que `Meta/D3ChainDotPrf.lean`). -/
+El consumidor previsto es el chasis de ADR‑020: probada `DEUDA_hGuardF`, `hGuard_of_slots`
+absorbe la cascada **sin ninguna obligación abierta**.
+
+⚠️ **Y eso NO deja `pcc_lineWF_tracked` incondicional**: `pcc_lineWF_tracked_modulo_7` sigue
+pidiendo un reflector por tag, y en el árbol hay **14** —ninguno de los 7 de sustitución—. Lo
+que a esos siete les falta es ya **sólo su condición ESTRUCTURAL**, que es lo que B3.2/B3.4
+compraron; el conjunto extra que esta ADR añadió ya no estorba (§3.46.4, §3.47).
+
+Nada lo consume todavía, y se dice en vez de fingir una medición de consumo (mismo criterio
+que `Meta/D3ChainDotPrf.lean`). -/
 export ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf (
   shapeFCnul treeNul1 pcc_shapeNul_fc shapeNulCtx prf_substfc_shapeNulCtx
   PrfH_shapeFCnul_transport prf_substfc_shapeFCnul_at

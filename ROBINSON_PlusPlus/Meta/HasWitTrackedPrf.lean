@@ -2,11 +2,18 @@ import ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 import ROBINSON_PlusPlus.Meta.LineWFGuardPrf
 import ROBINSON_PlusPlus.Meta.LiftcCodePrf
 /-!
-# `Meta/HasWitTrackedPrf.lean` — el descenso de `DEUDA_hGuardT` hasta UNA obligación
+# `Meta/HasWitTrackedPrf.lean` — `DEUDA_hGuardT`, PROBADA
 
 `Meta/LineWFGuardPrf.lean` dejó la deuda de ADR‑020 en **dos** lemas genéricos,
-`DEUDA_hGuardT` y `DEUDA_hGuardF`. Este módulo baja el primero un escalón más y, sobre todo,
-**mide dónde está el contenido**.
+`DEUDA_hGuardT` y `DEUDA_hGuardF`. Este módulo **cierra el primero**:
+
+    pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) : DEUDA_hGuardT i n t   (§12)
+
+Footprint = la base sancionada; net‑0 puro. La mitad `hasWitF` la cierra
+`Meta/HasWitFTrackedPrf.lean` (§3.46). ⚠️ La cota `i < n` **no es un artefacto**: el puente
+`(nthc t ı̇)˙ → nthcT ṫ ı̄` es `pcc_eval_nthc`, que la exige.
+
+Las secciones §1‑§11 son el descenso, y siguen siendo el mapa de dónde está el contenido.
 
 ## El descenso
 

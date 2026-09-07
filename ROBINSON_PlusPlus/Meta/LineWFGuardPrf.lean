@@ -32,7 +32,14 @@ Este módulo es el chasis de esa deuda. Todo lo de aquí está compilado y es **
 
 ## ⚠️ Lo que este módulo NO hace, y lo que está medido de lo que falta
 
-No prueba `DEUDA_hGuardT`/`DEUDA_hGuardF`. Medido, lo que ya existe para atacarlas:
+⚠️ **Este módulo** no prueba `DEUDA_hGuardT`/`DEUDA_hGuardF` — pero **ambas están probadas**
+aguas abajo desde 2026‑09‑08: `pcc_hGuardT` (`Meta/HasWitTrackedPrf.lean`, §3.44) y
+`pcc_hGuardF` (`Meta/HasWitFTrackedPrf.lean`, §3.46), las dos net‑0 puras, y con
+`hGuard_of_slots` **la cascada de ADR‑020 no tiene ninguna obligación abierta**.
+⚠️ Y eso **no cierra C3**: `pcc_lineWF_tracked_modulo_7` sigue pidiendo los 7 reflectores
+de sustitución, a los que ahora sólo les falta su condición **estructural** (§3.47).
+
+Lo que sigue valiendo de la medición original, por si hace falta rehacerla:
 
 * los **átomos**, con términos **abstractos**: `pcc_lt_tracked` y `pcc_eq_tracked`
   (`s = t ⊢ Prov(⌜ṡ = ṫ⌝)` sale por congruencia dotada, no hace falta numeral);
@@ -40,7 +47,7 @@ No prueba `DEUDA_hGuardT`/`DEUDA_hGuardF`. Medido, lo que ya existe para atacarl
   keystone de `hC_dot` y ya lleva la guarda `hasWitF` de ADR-020 en sus hipótesis;
 * el **`∃` sin cota**: `pcc_exIntro_code_open` (`Meta/Delta0ReflectPrf.lean:74`).
 
-Lo que falta es el **recorrido** de `isTC1` / `isFC1` bajo el `∃`: la disyunción de formas
+Lo que faltaba era el **recorrido** de `isTC1` / `isFC1` bajo el `∃`: la disyunción de formas
 (`isTermCodeE1`, y las **ocho** cláusulas de `isFormCodeE2`) y el `argsIn` interno, que es un
 segundo `∀` acotado anidado.
 -/
