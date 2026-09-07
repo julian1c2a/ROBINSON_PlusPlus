@@ -1814,6 +1814,12 @@ inducción que los junta. Y todo vive en `sondeos/`, con el coste de promoción 
 | 4 | `eqc` | ✅ vía `pcc_eval_substtc'` | `sondeos/EvalSubsttc.lean` |
 | 3 | `atomc` | ✅ vía `pcc_eval_substtsc'` | `sondeos/EvalSubsttc.lean` |
 
+> 📍 **Dónde viven hoy** (nota de 2026‑09‑08; la columna de arriba es el registro **histórico**
+> de dónde se probó cada caso, y se deja como tal): los ocho casos están **en producción**, en
+> `Meta/EvalSubstfcPrf.lean` (B3.4, §3.42); `pcc_eval_substtc'`/`pcc_eval_substtsc'` son hoy
+> `pcc_eval_substtc`/`pcc_eval_substtsc` de `Meta/EvalSubsttcPrf.lean` (B3.2, §3.41.1) — sin
+> la prima, porque la hipótesis `PredHyp` que la justificaba se descargó al promover.
+
 ### 3.29.2 · 🔑 Los tres binarios son **la misma fórmula salvo el tag** — y se certifica por `rfl`
 
 ```lean

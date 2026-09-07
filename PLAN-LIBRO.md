@@ -164,12 +164,13 @@ se impriman con su condición a la vista, no en una nota al pie*:
 - **`goedel_first_undecidable_numeral`** — toma **`Reflects` como hipótesis META explícita**, sin
   descargar (para descargarla falta `NegVerifier`).
 
-⚠️ **Corolario que afecta al calendario.** El capítulo 24 (la rotura del muro de `substfc`) narra un
-resultado que hoy vive en `sondeos/`, **fuera del build**: `pcc_eval_substfc` y `prf_hasWitF_real`
-están probados y medidos, pero no son alcanzables desde el módulo raíz. Bajo este principio pueden
-**contarse** como episodio y su código citarse con las marcas de §2.3, pero **no pueden presentarse
-como teoremas del libro** hasta que la **rama B** los promueva a `Meta/`. Ésa es la única dependencia
-real del libro respecto al desarrollo, y conviene tenerla escrita.
+✅ **Corolario que afectaba al calendario, SALDADO (2026‑09‑08).** El capítulo 24 (la rotura del
+muro de `substfc`) narraba un resultado que vivía en `sondeos/`, **fuera del build**. Ya no:
+`prf_hasWitF_real` está en `Meta/CodeWitnessPrf.lean:2140`, y `pcc_eval_substfc` /
+`pcc_eval_substfc_wit` en `Meta/EvalSubstfcPrf.lean` desde la promoción **B3.4** (§3.42), con
+footprint = la base sancionada. ⇒ **el capítulo 24 ya puede presentar sus resultados como teoremas
+del libro**, sin la marca «fuera del build». Era la única dependencia real del libro respecto al
+desarrollo, y queda cerrada.
 
 ### 2.3 · Los `sondeos/` son citables, pero se etiquetan — y no sostienen teoremas
 
@@ -660,10 +661,10 @@ de cinco reducciones, y por qué reducir hoy **cambia el teorema** en vez de sim
 | **3** | Partes I–III (con el cap. 11 corregido) | ⏳ | exposición sistemática; se apoya en `doc/REFERENCE-*.md` ya escritos |
 | **4** | Apéndices y bibliografía | ⏳ | mecánico |
 
-⚠️ **Dependencia real del desarrollo (§2.2).** El capítulo 24 puede **escribirse** en la fase 2,
-pero sus resultados sólo pueden **enunciarse como teoremas** cuando la **rama B** promueva
-`pcc_eval_substfc` y `prf_hasWitF_real` de `sondeos/` a `Meta/`. Hasta entonces el capítulo va como
-episodio con código marcado «fuera del build». Es el único punto del libro que espera al proyecto.
+✅ **Dependencia real del desarrollo (§2.2), SALDADA (2026‑09‑08).** El capítulo 24 ya puede
+**enunciar sus resultados como teoremas**: la rama B promovió `pcc_eval_substfc` (B3.4,
+`Meta/EvalSubstfcPrf.lean`) y `prf_hasWitF_real` (`Meta/CodeWitnessPrf.lean`) a `Meta/`. Ya no hace
+falta la marca «fuera del build». Era el único punto del libro que esperaba al proyecto.
 
 ⚠️ **La fase 2 va deliberadamente antes que la I–III.** El capítulo de la inconsistencia se escribe
 mejor ahora que dentro de seis meses — y ahora hay **cuatro capítulos más** en esa situación
