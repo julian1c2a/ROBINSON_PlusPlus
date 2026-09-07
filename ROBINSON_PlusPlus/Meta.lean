@@ -109,3 +109,4 @@ import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
 import ROBINSON_PlusPlus.Meta.EvalSubsttcPrf
 import ROBINSON_PlusPlus.Meta.LineWFGuardPrf
+import ROBINSON_PlusPlus.Meta.EvalSubstfcPrf
