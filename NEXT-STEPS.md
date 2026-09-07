@@ -251,6 +251,17 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >         del contexto en PrfH) NO existen en NINGUN sitio -- ni en produccion
 >         ni en sondeos (verificado por grep 2026-08-31). Van a
 >         Meta/HilbertDeduction.lean, pero hay que PROBARLOS primero.
+>   B8b⬜ ⚠️ NUEVO (2026-09-08, destapado por B3.4): **`prf_congr_liftc` esta DUPLICADO en
+>         PRODUCCION** -- `Meta/CodeWitnessPrf.lean:109` (nivel `v` EXPLICITO) y
+>         `Meta/NumCodeClosedPrf.lean:53` (nivel `c` IMPLICITO). MISMO teorema, y los dos
+>         llegan a la raiz. Es una violacion de ADR-019 que ya estaba en el arbol.
+>         ⚠️ Es tambien un riesgo de ELABORACION: en `Meta/EvalSubstfcPrf.lean` habia siete
+>            usos sin cualificar con los dos candidatos a la vista. Aqui NO fallo en silencio
+>            -- solo la implicita tipa con un unico argumento --, y quedo cualificado a
+>            proposito para que no dependa de eso. Pero con firmas mas parecidas si fallaria.
+>         Arreglo: dejar UNA (la de nivel implicito es la que consumen los 7 sitios) y bajar/
+>         subir segun el orden de imports. Toca dos modulos aguas arriba => reconstruye el
+>         arbol entero, por eso NO se hace de paso.
 >   B8 ⬜ ⚠️ NUEVO (2026-08-31, destapado por las mediciones): faltan en produccion
 >         prf_isFormCodeE2_str, CRIT_E2_rejects_varc, CRIT_isFC1_rejects_varc
 >         (el kit de DISCRIMINACION) y prf_congr_carc (solo existe prf_congr_carcT).

@@ -177,7 +177,7 @@ theorem pcc_substfc_un_dot (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms) (a 
     have h := prf_substfc_arith_open 2 W2 (AXBODY m)
     rwa [substCodeF_AXBODY m W2] at h
   have hA2 : Prf (W2 =eq tcFn a) :=
-    prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn a)) (prf_liftc_tcFn a)
+    prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc (prf_liftc_tcFn a)) (prf_liftc_tcFn a)
   have hnorm : Prf (eqCodeFn
         (substfcT W2 (varc (numeral 1)) (unT m (varc (numeral 0))))
         (unT m (substfcT (succcT W2) (liftcT (termCode zero) (varc (numeral 1)))
@@ -982,11 +982,11 @@ theorem pcc_substfc_ter_dot (T : Term) (nm : String) (hT : ∀ c : Nat, liftTerm
   let W1 : Term := liftc zero (tcFn a)
   let W0 : Term := tcFn b
   have hv3 : Prf (W3 =eq tcFn v) :=
-    prf_eq_trans (prf_congr_liftc
-      (prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn v)) (prf_liftc_tcFn v)))
+    prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc
+      (prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc (prf_liftc_tcFn v)) (prf_liftc_tcFn v)))
       (prf_liftc_tcFn v)
   have hs2 : Prf (W2 =eq tcFn s) :=
-    prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn s)) (prf_liftc_tcFn s)
+    prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc (prf_liftc_tcFn s)) (prf_liftc_tcFn s)
   have ha1 : Prf (W1 =eq tcFn a) := prf_liftc_tcFn a
   have hkc : substCodeT 3 W3 T = termCode T := substCodeT_closed 3 W3 T hT
   have hin0 : Prf (substfc (numeral 3) W3 (formCode (AXTER_BODY T nm))
@@ -1122,11 +1122,11 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
   let W1 : Term := liftc zero (tcFn a)
   let W0 : Term := tcFn b
   have hv3 : Prf (W3 =eq tcFn v) :=
-    prf_eq_trans (prf_congr_liftc
-      (prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn v)) (prf_liftc_tcFn v)))
+    prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc
+      (prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc (prf_liftc_tcFn v)) (prf_liftc_tcFn v)))
       (prf_liftc_tcFn v)
   have hs2 : Prf (W2 =eq tcFn s) :=
-    prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn s)) (prf_liftc_tcFn s)
+    prf_eq_trans (ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_congr_liftc (prf_liftc_tcFn s)) (prf_liftc_tcFn s)
   have ha1 : Prf (W1 =eq tcFn a) := prf_liftc_tcFn a
   have hkc : substCodeT 3 W3 T = termCode T := substCodeT_closed 3 W3 T hT
   have hin0 : Prf (substfc (numeral 3) W3 (formCode AXATOM_BODY)
