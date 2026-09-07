@@ -260,8 +260,13 @@ noncomputable def isTermCodeE1Dot (wT X : Term) : Term :=
     `tcFn X`. Para alimentar el `pcc_bdAll_intro` EXTERIOR hace falta la variante sobre
     CÓDIGOS —con el hueco del índice en `varc 0`, o sea `nthcT (tcFn w) (varc 0)` en vez de
     `tcFn (nthc w i)`—, que es como `sondeos/A3IsFCBTracked.lean:205` define su `PsiF`.
-    El salto entre las dos formas es **un solo** `PrfH_leibniz_apply` sobre el hueco del nodo
-    (aquel sondeo lo hace así en su `hbody_ok`), no una cadena de congruencias. -/
+    ⚠️ Y hay **dos** restricciones sobre esa imagen, las dos forzadas (§3.43.5):
+    (1) el índice sólo puede aparecer como `varc 0` en una ranura de código, porque `hbody`
+        lo mete con `substfc zero (tcFn i) ·` ⇒ aguas abajo, accesores **dotados**;
+    (2) `bdAllCode` mete la cota **dentro** del `forallc`, así que un `∀` acotado anidado
+        —el que trae `argsIn`— obliga a desplazar el índice exterior (`prf_substfc_forall`
+        baja a `succ v` y `liftc`‑a el sustituyendo). A3 nunca tocó (2): su `PsiF` **no tiene
+        binders**, por el diseño de su §2. -/
 theorem pcc_isTermCodeE1_tracked (wT X : Term) :
     Prf (isTermCodeE1 wT X ⇒ provFromCode (isTermCodeE1Dot wT X)) := by
   refine pcc_reflect_or _ _ _ _ (pcc_shape_of_str X 0 2 _ (prf_shapeUn_str X 0)) ?_

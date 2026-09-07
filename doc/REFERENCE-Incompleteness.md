@@ -3356,12 +3356,36 @@ noncomputable def PsiF (w : Term) : Term :=
   nodeOkDot (tcFn w) (nthcT (tcFn w) (varc (numeral 0)))   -- nodeOkDot toma CÓDIGOS
 ```
 
-⭐ **Y el salto entre las dos formas no es una cadena de congruencias: es UN solo
-`PrfH_leibniz_apply`** con el hueco en la ranura del nodo — que es como aquel sondeo lo hace en
-su `hbody_ok`. Queda anotado en el docstring del propio lema.
+⚠️ **CORRECCIÓN a lo que decía la primera versión de esta sección** («el salto es UN solo
+`PrfH_leibniz_apply`»). Eso es cierto **para A3**, y falso para nosotros. Medido:
+
+1. **La imagen debe mencionar el índice SÓLO como `varc 0` en una ranura de código.** Es
+   forzado, no estilístico: `hbody` pide `Prov(⌜substfc zero (tcFn i) (PsiF q)⌝)`, y
+   `substfc zero s C` sustituye la variable‑código `varc 0` de `C` por `s`. Luego toda
+   aparición del índice en el resultado es **exactamente `tcFn i`** — no puede ser
+   `tcFn (lenc (nthc … i …))`. ⇒ todo lo que vaya *aguas abajo del índice* tiene que usar
+   accesores **dotados** (`nthcT`, `lencT`, …) sobre códigos. **Eso explica por qué el
+   `nodeOkDot` de A3 toma códigos**: no era una preferencia.
+2. ⛔ **Y hay una segunda restricción que A3 nunca tocó**: `bdAllCode B Phic =
+   forallc (implc (ltCodeFn (varc 0) B) Phic)` mete la **cota `B` DENTRO del binder**, así que
+   `B` tiene que ser cerrada o venir pre‑`liftc`‑ada, o se captura. En A3 eso nunca mordió
+   porque su `PsiF` **no tiene ningún binder** (`nodeOkDot` es `orc`/`andc`/`inFormCodeFn`, y
+   el `In` va como átomo **a propósito**, su §2). El nuestro **sí** lo tiene: `isTermCodeE1`
+   lleva `argsIn`, cuya imagen es otro `bdAllCode`. ⇒ el índice exterior aparece **dentro** de
+   un `forallc`, y ahí hay que escribirlo desplazado (`prf_substfc_forall` baja a `succ v` y
+   `liftc`‑a el sustituyendo).
+
+⇒ El ensamblaje exterior **no es un transporte de una línea**: es un montaje De Bruijn con
+niveles, encima del Leibniz. Es la pieza más cara que queda de C3‑T.
 
 > 🔑 **Regla que deja el episodio**: al diseñar la imagen punteada de un predicado que va a
-> alimentar un `∀` acotado, parametrizarla por **códigos**, no por términos objeto. La versión
-> «objeto» es cómoda para probar el recorrido y luego cuesta un transporte; la versión «código»
-> encaja directamente en `PsiF`. A3 lo había resuelto así y no lo leí a tiempo — es la misma
-> clase de lección que [[feedback-medir-la-forma]].
+> alimentar un `∀` acotado, parametrizarla por **códigos** y —si se puede— **sin binders
+> dentro**. A3 hizo las dos cosas, y ahora se ve que la segunda no era higiene: era lo que
+> hacía barato su `hbody`.
+>
+> ⭐ **Y eso reabre la pregunta de la reformulación, pero mejor entendida.** §3.43.1 concluyó
+> que reformular `isTermCodeE1` con `In` atómico **no hacía falta** — cierto para reflejar el
+> `argsIn` (§3.43.2). Para el **ensamblaje exterior** compraría otra cosa: un `PsiF` **sin
+> binders**, o sea exactamente el caso barato de A3. Sigue siendo ADR (toca
+> `Minimal/Axioms.lean` dentro de los 7 axiomas enmendados) y sigue sin ser obligatoria, pero
+> ahora se sabe **qué** compra y **cuánto** cuesta no hacerla.

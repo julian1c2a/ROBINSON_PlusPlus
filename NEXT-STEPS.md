@@ -53,12 +53,19 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | `DEUDA_hGuardT` · mitad `In c w` | ✅ `pcc_In_atom_tracked`, con los dos argumentos **abstractos** |
 > | `DEUDA_hGuardT` · el `∀` acotado **ANIDADO** (`argsIn`) | ✅ `pcc_argsIn_pair_tracked` (§3.43) — **y sin tocar `Minimal/Axioms.lean`** |
 > | `DEUDA_hGuardT` · el recorrido de los DOS disyuntos de `isTermCodeE1` | ✅ `pcc_isTermCodeE1_tracked` (§3.43.5) |
-> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ⬜ falta **rehacer la imagen punteada sobre CÓDIGOS** (`PsiF w := …(nthcT (tcFn w) (varc 0))`, molde `A3IsFCBTracked:205`) + **UN** `PrfH_leibniz_apply` de transporte |
+> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ⬜ **la pieza más cara que queda de C3‑T**. NO es un transporte de una línea (§3.43.5 corrige eso): la imagen debe usar accesores **dotados** —forzado: `hbody` mete el índice con `substfc zero (tcFn i) ·`, luego sólo puede aparecer como `varc 0`— **y además** `bdAllCode` mete la cota DENTRO del `forallc`, así que el `∀` anidado de `argsIn` obliga a desplazar el índice exterior. Montaje De Bruijn con niveles |
 > | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
 > | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |
+>
+> ⭐ **Y la pregunta de la REFORMULACIÓN vuelve, mejor entendida** (§3.43.5): reformular
+> `isTermCodeE1` con `In` atómico —estilo A3— **no hacía falta** para reflejar el `argsIn`, y
+> eso sigue siendo cierto. Para el **ensamblaje exterior** compraría otra cosa: un `PsiF` **sin
+> binders**, que es exactamente lo que hace barato el `hbody` de A3. Sigue siendo ADR (toca
+> `Minimal/Axioms.lean` dentro de los 7 enmendados) y sigue sin ser obligatoria — pero ahora se
+> sabe qué compra y cuánto cuesta no hacerla.
 >
 > ✅ **RESUELTO 2026‑09‑08 (§3.43): el `∀` acotado ANIDADO no era un muro, y NO hubo que
 > reformular `isTermCodeE1`** —o sea, no hubo que tocar `Minimal/Axioms.lean` ni los 7 axiomas
