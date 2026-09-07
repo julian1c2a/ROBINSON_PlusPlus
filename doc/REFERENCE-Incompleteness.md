@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 128 jobs · 114 módulos activos** (Minimal 11 + Meta 92 + Full 11) **+ 0 en `cuarentena/`
+> **Build 129 jobs · 115 módulos activos** (Minimal 11 + Meta 93 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2819,7 +2819,7 @@ sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente 
 ## §3.40 · 🏁 ③ TERMINADO — EL ÁRBOL VUELVE A VERDE y la vía C queda CERRADA (2026‑09‑06d)
 
 ```
-Build completed successfully (128 jobs)
+Build completed successfully (129 jobs)
 112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
 ```
 
@@ -2990,7 +2990,7 @@ editar un fichero que otro agente audita le invalida los números de línea.
 
 ## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
 
-> `Build completed successfully (128 jobs)` · **114 módulos** (Minimal 11 + Meta 92 + Full 11).
+> `Build completed successfully (129 jobs)` · **115 módulos** (Minimal 11 + Meta 93 + Full 11).
 > Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
 
 Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
@@ -3131,3 +3131,116 @@ anidado. Es un **ensamblaje**, del tamaño de una sesión, no una inducción nue
 ⛔ Sigue vivo el coste que midió `Probe/MC_enmienda.lean` §8: la guarda **DISCRIMINA**
 (`CRIT_hasWitF_rejects_varc`), luego **no** se puede descargar para código abstracto. Es lo que
 la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`/`_q2`.
+
+---
+
+## §3.42 · B3.4 CERRADO — `pcc_eval_substfc` en producción (2026‑09‑08)
+
+> `Build completed successfully (129 jobs)` · **115 módulos** (Minimal 11 + Meta 93 + Full 11).
+> `Meta/EvalSubstfcPrf.lean` (1 620 l.). Footprint = la base sancionada; **ni un axioma nuevo**.
+
+⭐ **El muro de `substfc` estaba roto desde 2026‑08‑31 (§3.30), pero vivía fuera del build.**
+Desde hoy no:
+
+```
+pcc_eval_substfc     (wF wT v s f) (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
+    Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f))))
+pcc_eval_substfc_wit (v s f) : Prf (hasWit s ∧ hasWitF f ⇒ targetSubstfc v s f)
+pcc_eval_substfc_modulo_8    -- el CHASIS, parametrizado sobre los ocho casos
+```
+
+⭐ El antecedente de `pcc_eval_substfc_wit` es **literalmente** el conjunto extra que ADR‑020
+metió dentro del `⇔` de los 7 esquemas (§3.41.4), así que con este módulo el reflector `hCarc`
+de C3 pasa a ser **una MP**.
+
+### §3.42.1 · El sondeo era la ACRECIÓN DE CINCO SONDEOS
+
+El plan medía «554 declaraciones, 131 a promover». Re‑medido: **806 declaraciones, 576
+duplicados exactos (71 %)**, repartidas en cinco namespaces que son cinco sondeos apilados:
+
+| namespace | líneas | decls | qué es |
+|---|---|---|---|
+| `SinWTs` | 40–1406 | 155 (137 DUP) | `Meta/CodeWitnessPrf` |
+| `DescMutua` | 1434–3359 | 198 (183 DUP) | `LiftcCodePrf` + `EvalLiftcPrf` |
+| `Paso2` | 3379–4086 | 82 (34 DUP) | casi todo `SubstfcCodePrf` |
+| `SFsubsttc` | 4120–5950 | 157 (108 DUP) | **B3.2**, cerrado el día anterior |
+| **`ENS`** | 5973–8372 | 214 (114 DUP + **86 NEW**) | **el trabajo real** |
+
+⭐ **Lo que hizo limpio el borrado no fue el porcentaje de duplicados: fue el AISLAMIENTO.**
+Medido, `ENS` sólo depende de **41 nombres** de los otros cuatro namespaces, y **31 ya estaban
+en producción**. De los diez restantes, seis son piezas de `Paso2` que suben con el frente
+(cierre transitivo: 9 declaraciones) y cuatro se repuntan a producción. Total: entran **90**,
+se borran **697 de 806**.
+
+> 🔑 **La pregunta que decide una promoción no es «¿cuántos duplicados hay?» sino «¿de cuánto
+> de lo que voy a borrar depende lo que voy a quedarme?».** La primera da un porcentaje; la
+> segunda da el plan.
+
+### §3.42.2 · Tres fallos de medición, corregidos sobre la marcha
+
+Los tres los destapó algo externo, no la medición:
+
+1. ⚠️ **El regex de referencias perdía TODAS las cualificadas.** El patrón `(?<![A-Za-z0-9_.])`
+   excluye un punto delante, así que `Paso2.unc` y `SFsubsttc.targetSubsttc` eran invisibles.
+   Lo destapó **un mensaje de error del compilador** que citaba `Paso2.unc`. Corregido, las
+   dependencias de `ENS` pasaron de 10 a 41.
+   ⚠️ **El mismo fallo está en la cifra «46 exportados por consumo» de §3.41.2**: es una cota
+   inferior, no la medida. (Y en efecto: `DESCENSO_substtc_imp` y `DESCENSO_substtc_lista_imp`
+   se consumen desde aquí de forma cualificada y no estaban exportados.)
+2. ⚠️ **Había que quitar los COMENTARIOS antes de contar.** `paso2_caso_un_guarded` figuraba
+   como dependencia y sólo aparecía en una docstring.
+3. ⚠️ **La propiedad de un nombre no es «quien lo declara primero».** Varios nombres están
+   declarados en **dos** namespaces del mismo fichero (`PHI`, `PHI_at`, `pcc_thm_inst4`…), y
+   atribuirlos al primero inflaba el consumo cruzado. Un uso sólo es cruzado si el consumidor
+   **no** declara ese nombre él mismo.
+
+### §3.42.3 · ⛔ Una clase NUEVA de duplicado falso
+
+§3.41.2 dejó la regla: *para un `def` hay que comparar el CUERPO; para un `theorem` basta la
+firma, porque la prueba da igual*. **La segunda mitad es falsa cuando la firma menciona un
+homónimo.**
+
+```lean
+theorem hPHI : liftFormula 1 PHI = PHI          -- en el sondeo
+theorem hPHI : liftFormula 1 PHI = PHI          -- en Meta/EvalLiftcPrf.lean
+```
+
+Firmas idénticas carácter a carácter, y **dos teoremas distintos**: el `PHI` de cada uno es una
+constante diferente. La cura es barata: cruzar la lista de homónimos contra las firmas de todos
+los duplicados candidatos. Aquí sólo mordió en `hPHI`, pero habría bastado con ese.
+
+### §3.42.4 · Los 16 puentes se DISUELVEN
+
+El sondeo llevaba dieciséis lemas `bridge_wfAll1`, `bridge_hasWit_SinWTs`, `gT_substtcT`… todos
+`:= rfl`. Existían para certificar que dos namespaces definían **lo mismo** — la trampa
+registrada de «misma definición en dos namespaces son DOS constantes que no componen».
+
+Medido: **cero usos, los dieciséis**. No eran maquinaria, eran **certificados**. Y son el precio
+exacto de que el trabajo viviera fuera de producción en copias: al quedar una sola definición ya
+no dicen nada, y se van enteros.
+
+> 🔑 Un `bridge_* := rfl` sin consumidores no es código muerto: es **la factura de vivir en
+> `sondeos/`**. Promover la paga.
+
+### §3.42.5 · Y el resto, que ya era rutina
+
+* **13 renombres** (la familia `PHI*`/`BODY`/`CTXF` → `*substfc`), por la misma razón que en
+  §3.41.2, y confirmados de forma independiente por una auditoría adversarial de sólo lectura
+  (11 RENOMBRAR + 3 BORRAR, coincidencia exacta).
+* ⛔ **ADR‑019 dos veces más**: `pcc_thm_inst4`/`pcc_axiom_inst4`/`pcc_congr_substfcT_arg3_code`
+  se borran (producción los tiene enmendados por ADR‑020), y `psi_l1`/`psi_l2`/`psi_l3` eran
+  `psi_lift_form1/2/3` instanciados en `PHIsubstfc` — igual que en B3.2, y por tercera vez.
+* **De 15 errores a 0 en tres pasadas.** Nueve sitios de guarda pagados con `(by hw_auto)`.
+* ⭐ **El décimo no se puede pagar: se ARRASTRA.** `pcc_congr_substfcT_arg2_code` tiene sus
+  argumentos **abstractos**, y para un término abstracto `hasWit` no es demostrable —es
+  justamente lo que hace útil a la guarda—. La solución no hubo que inventarla: producción ya
+  la tenía en el hermano `_arg3_code` de `SubstfcCodePrf`, con las cuatro guardas como
+  `autoParam := by hw_auto` y el testigo de `Ac` construido a mano con `prf_hasWitF_eq2` +
+  `prf_hasWit_funcc3`. Espejarlo fue una línea. Es el criterio **PAGAR vs ARRASTRAR** de
+  ADR‑020 aplicado dentro de un solo lema.
+* **`export` por PROPÓSITO DECLARADO, y dicho como tal.** Medido con el filtro correcto
+  —descontando los nombres que el propio fichero declara— **ningún** sondeo consume nada de
+  este módulo: `HasWitFReal.lean`, `EnsamblajeTriple.lean`, `EnsamblajeMedida.lean` y
+  `SubstfcEx.lean` son **variantes del mismo trabajo** y declaran ellos mismos los nombres que
+  usan. **Consumo de una copia no es consumo**, y fingir la medición habría sido peor que
+  decirlo.

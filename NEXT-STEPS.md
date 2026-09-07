@@ -5,17 +5,17 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (128 jobs)` — **114 módulos** (Minimal 11 + Meta 92 + Full 11) + 0 en
+`Build completed successfully (129 jobs)` — **115 módulos** (Minimal 11 + Meta 93 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
-🏁 Después del merge se cerraron **dos frentes más**, los dos net‑0 y los dos documentados en
-**§3.41** de `doc/REFERENCE-Incompleteness.md`: **B3.2** (`Meta/EvalSubsttcPrf.lean`) y **el
-chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`).
+🏁 Después del merge se cerraron **tres frentes**: **B3.2** (`Meta/EvalSubsttcPrf.lean`) y el
+**chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
+(`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **B3.4, que ya no tiene prerrequisitos**
+> # 🎯 SIGUIENTE SESIÓN — **C3, y ya sin `hCarc`**
 >
-> ## 🏁 Lo que se cerró el 2026‑09‑07 (después del merge)
+> ## 🏁 Lo que se cerró después del merge (2026‑09‑07 y ‑08)
 >
 > * **B3.2 · `Meta/EvalSubsttcPrf.lean`** (§3.41.1) — `pcc_eval_substtc` / `pcc_eval_substtsc` /
 >   `pcc_eval_substtc_hasWit` en producción, con `v`,`s`,`t` **abstractos**. Footprint = la base
@@ -23,18 +23,16 @@ chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`).
 > * **El chasis de `hGuard`** (§3.41.3) — `Meta/LineWFGuardPrf.lean`, net‑0 **puro**.
 >   `hcond_absorbe_extra` (que vivía en **cinco copias fuera del build**) y
 >   ⭐ `hcond_absorbe_cascade`, que **reduce la deuda de los 7 tags a DOS lemas genéricos**.
+> * ⭐ **B3.4 · `Meta/EvalSubstfcPrf.lean`** (§3.42) — **el muro de `substfc`, dentro del
+>   build**: `pcc_eval_substfc`, `pcc_eval_substfc_wit` y el chasis genérico
+>   `pcc_eval_substfc_modulo_8`. De **806** declaraciones entraron **90**.
 >
 > ## ▶ LO QUE TOCA AHORA
 >
-> **(1) B3.4 — el cuello de botella de fondo, y ya sin prerrequisitos.** El cierre de
-> `pcc_eval_substfc_wit` son **554** declaraciones, **131** a promover, y tocaba **13 módulos de
-> los que 8 no compilaban**: ya compilan los 13, y ya está B3.2. ⚠️ **RE‑MEDIR antes de
-> empezar** — y ahora se sabe cómo: [[feedback-promover-un-sondeo]] y §3.41.2. La medición de
-> B3.2 desmintió al plan **tres veces** (13 colisiones medidas → 83 reales; 3 duplicados no
-> alcanzables → 14; y dos `def` homónimos que ningún comparador de enunciados separa).
-> ⚠️ El asset `sondeos/EvalSubstfcPrf.lean` tenía **66 errores** en su último intento de
-> reparación, y las fallas estaban en bloques que el plan medido manda **borrar**: repararlos
-> antes de decidir el payload es trabajo tirado.
+> ~~**(1) B3.4**~~ ✅ **CERRADO** (2026‑09‑08, §3.42). `pcc_eval_substfc` y
+> `pcc_eval_substfc_wit` en producción, footprint = la base sancionada. De 806 declaraciones
+> entraron 90. ⭐ Con esto **`hCarc` ya está comprado**: el antecedente de
+> `pcc_eval_substfc_wit` es literalmente el conjunto extra de ADR‑020.
 >
 > **(2) C3 — los 7 reflectores de `lineWF`, cuyo chasis ya está puesto.**
 > `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar esos 7 cierra `pcc_lineWF_tracked` y que no
@@ -46,7 +44,7 @@ chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`).
 > | la absorción del conjunto extra | ✅ `hcond_absorbe_cascade` (§3.41.3) |
 > | `DEUDA_hGuardT` (reflector Σ₁ de `hasWit`) | ⬜ **enunciada, no probada** |
 > | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada** |
-> | `hCarc` | ⬜ lo compra B3.4 (`pcc_eval_substfc_wit` pasa a ser una MP) |
+> | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |
 >
@@ -64,21 +62,26 @@ chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`).
 >    está mal* (el censo por API mide la onda inicial: medí 44 y un módulo que daba *uno* tenía
 >    *diez*). «¿Qué forma tienen?» dio **6 lemas en vez de 35** y **una táctica en vez de 200
 >    anotaciones**. La leí en el módulo veinte.
-> 2. ⭐ **Y COMPROBAR la forma medida contra el original, con `rfl`.** Una abstracción puede ser
+> 2. ⭐ **La pregunta que decide una PROMOCIÓN no es «¿cuántos duplicados hay?» sino «¿de
+>    cuánto de lo que voy a borrar depende lo que me voy a quedar?».** La primera da un
+>    porcentaje; la segunda da el plan. En B3.4, 71 % de duplicados no decía nada — lo que
+>    hizo limpio el borrado fue que `ENS` sólo dependía de **41** nombres de los 5 000 líneas
+>    que se iban, y **31 ya estaban en producción** (§3.42.1).
+> 3. ⭐ **Y COMPROBAR la forma medida contra el original, con `rfl`.** Una abstracción puede ser
 >    correcta *sobre la fórmula equivocada* y compilar igual: el conjunto extra de ADR‑020 no es
 >    un par de guardas sino una **cascada** de 1–3, y sólo lo dijeron los siete `rfl` de §3.41.4
 >    —que además cazaron tres tags mal supuestos—.
-> 3. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
+> 4. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
 >    de la táctica importa: las estructurales ANTES que `prf_hasWit_tc`, o el unificador despliega
 >    `termCode` y agota los heartbeats.
-> 4. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
+> 5. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
 >    `CTree` se paga por inducción; arrastrar habría contaminado el chasis).
-> 5. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
-> 6. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
+> 6. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
+> 7. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
 >    nombre del `export` **y** del `#print axioms` del donante — si no, es error duro.
 >    ⚠️ Y **un duplicado sólo se borra si el original es ALCANZABLE**: 14 de los 66 de B3.2
 >    vivían en módulos que el sondeo no abría (§3.41.2).
-> 7. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
+> 8. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
 >    prohibido editar), uno que propone y uno que refuta con sesgo hacia PAGAR. 26 sitios,
 >    0 refutados, 26 `patch_old` casando de forma única (§3.40.8).
 ---
@@ -214,8 +217,33 @@ chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`).
 >     B3.3 ⬜ SubstfcEx. MEDIDO: de 104 que faltan, 49 NO se promueven (47%), 47 BAJAN
 >           a modulos existentes y solo 8 plantean modulo nuevo. Recomendacion del
 >           analisis: MEZCLA, y practicamente SIN MODULO NUEVO.
->     B3.4 ⬜ EvalSubstfcPrf, el ultimo. Le faltan 222, pero 138 estan en los otros dos
->           => quedaran ~84 exclusivas cuando lleguen B3.2 y B3.3.
+>     B3.4 ✅ CERRADO 2026-09-08. Meta/EvalSubstfcPrf.lean (1620 l.), footprint = la base
+>           sancionada. pcc_eval_substfc + pcc_eval_substfc_wit + el chasis generico
+>           pcc_eval_substfc_modulo_8. Detalle en §3.42.
+>           El plan decia «554 decls, 131 a promover». Real: **806 decls, 576 duplicados
+>           (71%)**, y el sondeo era la ACRECION DE CINCO SONDEOS en cinco namespaces
+>           (SinWTs=CodeWitnessPrf, DescMutua=LiftcCodePrf+EvalLiftcPrf, Paso2~SubstfcCodePrf,
+>           SFsubsttc=B3.2, y ENS = el trabajo real). ENTRAN 90, SE BORRAN 697.
+>           ⭐ Lo que hizo limpio el borrado no fue el % de duplicados sino el AISLAMIENTO:
+>              ENS solo dependia de 41 nombres de los otros cuatro, y 31 ya estaban en
+>              produccion. La pregunta que decide una promocion no es «¿cuantos duplicados
+>              hay?» sino «¿de cuanto de lo que voy a borrar depende lo que me quedo?».
+>           ⚠️ TRES fallos de medicion, y los tres los destapo algo EXTERNO:
+>              1. el regex perdia TODAS las referencias CUALIFICADAS (lo dijo un error del
+>                 compilador citando `Paso2.unc`): 10 dependencias -> 41.
+>                 ⚠️ El mismo fallo esta en el «46 por consumo» de B3.2: es COTA INFERIOR.
+>              2. habia que quitar los COMENTARIOS antes de contar.
+>              3. la propiedad de un nombre no es «quien lo declara primero».
+>           ⛔ CLASE NUEVA DE DUPLICADO FALSO: `hPHI` tiene la firma IDENTICA a la de
+>              EvalLiftcPrf.hPHI, pero la firma menciona `PHI`, que es un HOMONIMO. La regla
+>              de B3.2 «para un teorema basta la firma» falla si la firma menciona un homonimo.
+>           ⭐ Los 16 lemas `bridge_* := rfl` se DISUELVEN: cero usos, eran CERTIFICADOS de que
+>              dos namespaces definian lo mismo. Son la factura de vivir en sondeos/.
+>           ⭐ El unico sitio de guarda que NO se puede pagar (`pcc_congr_substfcT_arg2_code`,
+>              argumentos abstractos) se ARRASTRA con autoParam -- espejando lo que produccion
+>              ya hacia en su hermano `_arg3_code`. PAGAR vs ARRASTRAR dentro de UN lema.
+>           ⚠️ `export` por PROPOSITO DECLARADO: medido bien, NINGUN sondeo lo consume; los
+>              que lo parecian son VARIANTES que declaran ellos mismos esos nombres.
 >   B4 ⬜ pcc_axiom_inst4 → Meta/MpCodePrf.lean                ⚠️ el frente la pide 2 veces más
 >   B5 ⬜ pcc_eval_pred  → Meta/                               (la incondicional, no la guardada)
 >   B6 ⬜ prf_nil_or_cons -> Meta/ChainPrf.lean          (esto SI es promocion)

@@ -1593,17 +1593,22 @@ consumirlo (`HasWitFReal.lean`, `EnsamblajeTriple.lean`, `EnsamblajeMedida.lean`
 `SubstfcEx.lean`) son **variantes del mismo trabajo**: declaran ellos mismos los nombres que
 usan. Consumo de una copia no es consumo.
 
-Se exporta, entonces, la **API frontal**: los dos teoremas del encargo, el objetivo
+Se exporta, entonces, la **API frontal**: los dos teoremas del encargo, ⭐ el **chasis
+genérico** `pcc_eval_substfc_modulo_8` —el teorema parametrizado sobre los ocho casos, que es
+lo que querría quien tenga que enmendar uno—, el objetivo
 `targetSubstfc` con su fontanería De Bruijn (que es lo que un reflector necesita para moverlo
 bajo `substFormula`/`liftFormula`), el descenso, y el constructor unario genérico en el tag con
 sus dos pertenencias. Todo lo demás —los ocho casos, sus ramas, el predicado de la inducción y
-su escalera `psi`— se queda dentro del namespace hasta que alguien lo pida.
+su escalera `psi`— se queda dentro del namespace hasta que alguien lo pida. Los tres
+`pcc_eval_substfc_modulo_5`/`_4`/`_2` se quedan también: son los **hitos** del camino
+incremental (el teorema con 5, 4 y 2 hipótesis abiertas), y documentan la ruta que siguió la
+prueba, pero ya no tienen consumidor porque el teorema completo existe.
 
 ⭐ El consumidor previsto es **C3**: el antecedente de `pcc_eval_substfc_wit` es literalmente el
 conjunto extra que ADR‑020 metió dentro del `⇔` de los 7 esquemas (ver `Meta/LineWFGuardPrf.lean`
 §2), así que con este módulo el reflector `hCarc` pasa a ser una MP. -/
 export ROBINSON_PlusPlus.Meta.EvalSubstfcPrf (
-  pcc_eval_substfc pcc_eval_substfc_wit DESCENSO_substfc
+  pcc_eval_substfc pcc_eval_substfc_wit DESCENSO_substfc pcc_eval_substfc_modulo_8
   targetSubstfc liftF_targetSubstfc substF_targetSubstfc
   PrfH_congr_targetSubstfc substF_hole_fc
   unc AXBODY mem6 mem9 pcc_substfc_un_dot fuego_ab_un

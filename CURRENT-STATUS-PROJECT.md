@@ -2,7 +2,7 @@
 
 > ## ESTADO REAL — 2026-09-07 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
-> 🏁 **`Build completed successfully (128 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> 🏁 **`Build completed successfully (129 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
 > `master`** el 2026-09-07 con merge commit `7bc2c8a`, y el build se verificó verde **después** del
 > merge, no sólo en la rama.
@@ -26,6 +26,15 @@
 >   guardas anidadas a la derecha, no un par — comprobado con **siete `rfl`** contra
 >   `Minimal/Axioms.lean` (§3.41.4).
 >
+> 🏁 ⭐ **2026-09-08 · B3.4 CERRADO: el muro de `substfc` está DENTRO DEL BUILD** (§3.42).
+> `Meta/EvalSubstfcPrf.lean` — `pcc_eval_substfc` con `v`,`s`,`f` **abstractos**,
+> `pcc_eval_substfc_wit` y el chasis genérico `pcc_eval_substfc_modulo_8`. Footprint = la base
+> sancionada. De **806** declaraciones del sondeo entraron **90**: era la **acreción de cinco
+> sondeos**, y `ENS` —el trabajo real— sólo dependía de **41** nombres de los otros cuatro
+> namespaces, **31 ya en producción**.
+> ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
+> literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
+>
 > ✅✅ **LA LÍNEA ROJA DE ADR-020, COMPROBADA Y CON RAZÓN ESTRUCTURAL**: `d3_prf_of_chainOkDot` y
 > `pcc_lineWF_tracked_modulo_7` **conservan su firma exacta**. La guarda va DENTRO del `⇔` OBJETO,
 > así que al reflector le llega como conjunto objeto extraído de `lineWF t`, **no** como hipótesis
@@ -37,8 +46,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
 >
-> **Build 128 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
-> **114 módulos activos** (Minimal 11 + Meta 92 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 129 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **115 módulos activos** (Minimal 11 + Meta 93 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >
