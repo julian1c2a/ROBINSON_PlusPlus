@@ -214,11 +214,122 @@ theorem hGuard_of_deudas (t : Term) (n : Nat) (C : Formula) (hC : Hcond n t C)
   hcond_absorbe_cascade t n C hC gs
     (fun g _ => by cases g with | wit i => exact hT i | witF i => exact hF i)
 
+
+/-! ## §5 · ⚠️ LA ABSORCIÓN **DEPENDIENTE**: el núcleo TIENE que ver las guardas
+
+`hcond_absorbe_cascade` refleja cada conjunto de la cascada **por separado**, y para las guardas
+eso es justo lo que se quiere. Pero para la **condición estructural** de los 7 esquemas de
+sustitución no vale, y la razón es exactamente la que hizo viable esta ADR:
+
+> `pcc_eval_substfc_wit (v s f) : Prf (hasWit s ∧ hasWitF f ⇒ targetSubstfc v s f)`
+
+es una implicación **OBJETO** cuyo antecedente **son** las guardas. Con `t` abstracto,
+`hasWit (nthc t 3)` no es demostrable —eso es lo que hace útil a la guarda—, así que el núcleo
+sólo puede pagarla si la tiene **en su contexto**, y ahí es donde ADR‑020 la puso: dentro del
+`⇔`, como conjunto objeto.
+
+⇒ Estos tres absorbedores dan al núcleo la fórmula guardada **entera** como antecedente. Cubren
+las tres longitudes de lista que la enmienda usa (1, 2 y 3), o sea **los siete tags**. -/
+
+/-- El núcleo de la cascada, con la fórmula guardada ENTERA disponible. -/
+abbrev HcondCore (n : Nat) (t : Term) (G C : Formula) : Prop :=
+  Prf (lineWF t ⇒ ((lenc t =eq numeralM n) ⇒
+    (substFormula 0 t G ⇒ provFromCode (condD C t))))
+
+/-- Lista de **una** guarda (tags 11, 18, 19, 20). -/
+theorem hcond_absorbe_1 (t : Term) (n : Nat) (g : GuardSlot) (C : Formula)
+    (hg : Hcond n t g.toF)
+    (hC : HcondCore n t (guardedCond [g] C) C) :
+    Hcond n t (guardedCond [g] C) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (substFormula 0 t (guardedCond [g] C)) [lenc t =eq numeralM n, lineWF t] rfl)
+    (lenc t =eq numeralM n) [lineWF t] rfl)
+  have hlw : PrfH [substFormula 0 t (guardedCond [g] C), lenc t =eq numeralM n, lineWF t]
+      (lineWF t) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hln : PrfH [substFormula 0 t (guardedCond [g] C), lenc t =eq numeralM n, lineWF t]
+      (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hall : PrfH [substFormula 0 t (guardedCond [g] C), lenc t =eq numeralM n, lineWF t]
+      (substFormula 0 t (guardedCond [g] C)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hg1 : PrfH [substFormula 0 t (guardedCond [g] C), lenc t =eq numeralM n, lineWF t]
+      (substFormula 0 t g.toF) := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hall
+  have hgd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg _) hlw) hln) hg1
+  have hcd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hC _) hlw) hln) hall
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (prf_substfc_and zero (tcFn t) (formCode g.toF) (formCode C)))) _)
+    (PrfH_and_intro_code _ _ hgd hcd)
+
+/-- Lista de **dos** guardas (tags 9 y 10). -/
+theorem hcond_absorbe_2 (t : Term) (n : Nat) (g₁ g₂ : GuardSlot) (C : Formula)
+    (hg₁ : Hcond n t g₁.toF) (hg₂ : Hcond n t g₂.toF)
+    (hC : HcondCore n t (guardedCond [g₁, g₂] C) C) :
+    Hcond n t (guardedCond [g₁, g₂] C) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (substFormula 0 t (guardedCond [g₁, g₂] C)) [lenc t =eq numeralM n, lineWF t] rfl)
+    (lenc t =eq numeralM n) [lineWF t] rfl)
+  have hlw : PrfH [substFormula 0 t (guardedCond [g₁, g₂] C), lenc t =eq numeralM n, lineWF t]
+      (lineWF t) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hln : PrfH [substFormula 0 t (guardedCond [g₁, g₂] C), lenc t =eq numeralM n, lineWF t]
+      (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hall : PrfH [substFormula 0 t (guardedCond [g₁, g₂] C), lenc t =eq numeralM n, lineWF t]
+      (substFormula 0 t (guardedCond [g₁, g₂] C)) := PrfH.hyp _ _ (List.Mem.head _)
+  have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hall
+  have hrest := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hall
+  have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hrest
+  have hd1 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₁ _) hlw) hln) h1
+  have hd2 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₂ _) hlw) hln) h2
+  have hcd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hC _) hlw) hln) hall
+  have hinner := PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (prf_substfc_and zero (tcFn t) (formCode g₂.toF) (formCode C)))) _)
+    (PrfH_and_intro_code _ _ hd2 hcd)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (prf_substfc_and zero (tcFn t) (formCode g₁.toF)
+      (formCode (guardedCond [g₂] C))))) _)
+    (PrfH_and_intro_code _ _ hd1 hinner)
+
+/-- Lista de **tres** guardas (tag 13, `leibniz`). -/
+theorem hcond_absorbe_3 (t : Term) (n : Nat) (g₁ g₂ g₃ : GuardSlot) (C : Formula)
+    (hg₁ : Hcond n t g₁.toF) (hg₂ : Hcond n t g₂.toF) (hg₃ : Hcond n t g₃.toF)
+    (hC : HcondCore n t (guardedCond [g₁, g₂, g₃] C) C) :
+    Hcond n t (guardedCond [g₁, g₂, g₃] C) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (substFormula 0 t (guardedCond [g₁, g₂, g₃] C)) [lenc t =eq numeralM n, lineWF t] rfl)
+    (lenc t =eq numeralM n) [lineWF t] rfl)
+  have hlw : PrfH [substFormula 0 t (guardedCond [g₁, g₂, g₃] C),
+      lenc t =eq numeralM n, lineWF t] (lineWF t) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hln : PrfH [substFormula 0 t (guardedCond [g₁, g₂, g₃] C),
+      lenc t =eq numeralM n, lineWF t] (lenc t =eq numeralM n) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hall : PrfH [substFormula 0 t (guardedCond [g₁, g₂, g₃] C),
+      lenc t =eq numeralM n, lineWF t]
+      (substFormula 0 t (guardedCond [g₁, g₂, g₃] C)) := PrfH.hyp _ _ (List.Mem.head _)
+  have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hall
+  have hr1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hall
+  have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hr1
+  have hr2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hr1
+  have h3 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hr2
+  have hd1 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₁ _) hlw) hln) h1
+  have hd2 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₂ _) hlw) hln) h2
+  have hd3 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₃ _) hlw) hln) h3
+  have hcd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hC _) hlw) hln) hall
+  have hi2 := PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (prf_substfc_and zero (tcFn t) (formCode g₃.toF) (formCode C)))) _)
+    (PrfH_and_intro_code _ _ hd3 hcd)
+  have hi1 := PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (prf_substfc_and zero (tcFn t) (formCode g₂.toF)
+      (formCode (guardedCond [g₃] C))))) _)
+    (PrfH_and_intro_code _ _ hd2 hi2)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (prf_substfc_and zero (tcFn t) (formCode g₁.toF)
+      (formCode (guardedCond [g₂, g₃] C))))) _)
+    (PrfH_and_intro_code _ _ hd1 hi1)
+
 end ROBINSON_PlusPlus.Meta.LineWFGuardPrf
 
 export ROBINSON_PlusPlus.Meta.LineWFGuardPrf (
   hcond_absorbe_extra GuardSlot guardedCond Hcond
   hcond_absorbe_cascade DEUDA_hGuardT DEUDA_hGuardF hGuard_of_deudas
+  HcondCore hcond_absorbe_1 hcond_absorbe_2 hcond_absorbe_3
 )
 
 #print axioms ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_extra
