@@ -1,5 +1,6 @@
 import ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 import ROBINSON_PlusPlus.Meta.LineWFGuardPrf
+import ROBINSON_PlusPlus.Meta.LiftcCodePrf
 /-!
 # `Meta/HasWitTrackedPrf.lean` — el descenso de `DEUDA_hGuardT` hasta UNA obligación
 
@@ -50,7 +51,7 @@ open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.Sigma1Prf ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
-open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
+open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs ROBINSON_PlusPlus.Meta.LiftcCodePrf
 
 set_option linter.unusedSimpArgs false
 
@@ -303,21 +304,174 @@ theorem prf_liftc_wfAll1Args (w : Term) :
   exact prf_eq_trans (prf_liftc_nthcT zero _ _)
     (prf_congr_nthcT (prf_liftc_tcFn w) prf_liftc_varc0)
 
-/-- ⭐ **LA CONMUTACIÓN, HECHA.** Bajar el `substfc` por dentro del binder ya no está
-    bloqueado: el `substtc` de nivel 1 sobre el `Z` lifteado devuelve el `Z` con el hueco
-    relleno, que es exactamente lo que pide `hbody`. -/
-theorem prf_substtc_liftc_wfAll1Args (w s : Term) :
-    Prf (substtc (succ zero) (liftc zero (tcFn s)) (liftc zero (wfAll1Args w))
-      =eq nthcT (nthcT (tcFn w) (tcFn s)) (tcFn (numeralM 2))) := by
+/-- ⭐ **LA CONMUTACIÓN, HECHA Y GENÉRICA.** Bajar el `substfc` por dentro del binder ya no
+    está bloqueado: el `substtc` de nivel 1 sobre el `Z` lifteado devuelve el `Z` con el hueco
+    relleno. Se enuncia con el sustituyendo `s` y su lift `s'` **separados** porque los dos
+    consumidores lo usan de forma distinta: `hbody` con `s := ⌜i⌝` (y `s' = s`, cerrado) y
+    `hPsiId` con `s := ⌜v₀⌝` (y `s' = ⌜v₁⌝`). -/
+theorem prf_substtc_liftc_wfAll1Args_gen (w s s' : Term) (hs : Prf (liftc zero s =eq s')) :
+    Prf (substtc (succ zero) (liftc zero s) (liftc zero (wfAll1Args w))
+      =eq nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))) := by
   refine prf_eq_trans (prf_congr_substtc3 (prf_liftc_wfAll1Args w)) ?_
   refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
   refine prf_congr_nthcT ?_ (prf_substtc_tcFn_at 1 _ (numeralM 2))
   refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
   refine prf_congr_nthcT (prf_substtc_tcFn_at 1 _ w) ?_
   exact prf_eq_trans
-    (prf_mp (prf_substtc_var_eq (succ zero) (liftc zero (tcFn s)) (succ (numeral 0)))
-      (prf_refl _))
-    (prf_liftc_tcFn s)
+    (prf_mp (prf_substtc_var_eq (succ zero) (liftc zero s) (succ (numeral 0))) (prf_refl _)) hs
+
+/-- La instancia que consume `hbody`: el sustituyendo es `⌜i⌝`, que es CERRADO. -/
+theorem prf_substtc_liftc_wfAll1Args (w s : Term) :
+    Prf (substtc (succ zero) (liftc zero (tcFn s)) (liftc zero (wfAll1Args w))
+      =eq nthcT (nthcT (tcFn w) (tcFn s)) (tcFn (numeralM 2))) :=
+  prf_substtc_liftc_wfAll1Args_gen w (tcFn s) (tcFn s) (prf_liftc_tcFn s)
+
+
+/-! ## §7 · EL `pcc_bdAll_intro` EXTERIOR: `PsiF` y sus obligaciones
+
+`CF := wfAll1` es natural en **un** parámetro (`liftF_wfAll1`, `substF_wfAll1`), así que aquí
+no hay que empaquetar nada — a diferencia del `argsIn` de §4. El cuerpo `PsiF` se escribe con
+accesores **dotados** y el hueco del índice en `⌜v₀⌝` (§3.43.5), y con los trozos que van
+dentro del `bdAllCode` interno pre‑`liftc`‑ados (§3.43.8). `tcFn w` **no** necesita `liftc`:
+es cerrado. -/
+
+/-- El cuerpo del `∀` acotado EXTERIOR. Lleva **dos** huecos porque el índice aparece a **dos
+    niveles**: `s` fuera del `bdAllCode` interno y `s'` dentro (donde De Bruijn lo desplaza).
+    Escribir `⌜v₁⌝` explícitamente —en vez de `liftc 0 ⌜v₀⌝`— es lo que hace que `hPsiId`
+    salga por definición y que una sola keystone sirva a los dos consumidores. -/
+noncomputable def wfAll1PsiAt (w s s' : Term) : Term :=
+  orc (shapeDot (nthcT (tcFn w) s) 0 2)
+      (andc (shapeDot (nthcT (tcFn w) s) 1 3)
+        (bdAllCode (lencT (nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))))
+          (inFormCodeFn
+            (nthcT (nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))) (varc (numeral 0)))
+            (tcFn w))))
+
+/-- El `PsiF` que consume `pcc_bdAll_intro`: el hueco es `⌜v₀⌝` fuera y `⌜v₁⌝` dentro. -/
+noncomputable def wfAll1Psi (w : Term) : Term :=
+  wfAll1PsiAt w (varc (numeral 0)) (varc (succ (numeral 0)))
+
+/-- La imagen punteada de `wfAll1` (lo que `pcc_bdAll_intro` entrega, literalmente). -/
+noncomputable def wfAll1Dot (w : Term) : Term := bdAllCode (tcFn (lenc w)) (wfAll1Psi w)
+
+/-! ### Las obligaciones ADMINISTRATIVAS -/
+
+theorem hCl_wfAll1 : ∀ (k : Nat) (q : Term), liftFormula k (wfAll1 q) = wfAll1 (liftTerm k q) :=
+  fun k q => liftF_wfAll1 k q
+
+theorem hCs_wfAll1 :
+    ∀ (v : Nat) (s q : Term), substFormula v s (wfAll1 q) = wfAll1 (substTerm v s q) :=
+  fun v s q => substF_wfAll1 v s q
+
+theorem hbl_lenc : ∀ (k : Nat) (q : Term), liftTerm k (lenc q) = lenc (liftTerm k q) := by
+  intro k q; simp only [lenc, liftTerm, liftTerms]
+
+theorem hbs_lenc : ∀ (v : Nat) (s q : Term), substTerm v s (lenc q) = lenc (substTerm v s q) := by
+  intro v s q; simp only [lenc, substTerm, substTerms]
+
+theorem hPl_wfAll1Psi :
+    ∀ (k : Nat) (q : Term), liftTerm k (wfAll1Psi q) = wfAll1Psi (liftTerm k q) := by
+  intro k q
+  simp only [wfAll1Psi, wfAll1PsiAt, shapeDot, bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
+    eqCodeFn, andc, orc, implc, forallc, carcT, lencT, nthcT, varc, liftc, funcc, tcFn,
+    cons, nil, zero, succ, numeralM, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
+
+theorem hPs_wfAll1Psi :
+    ∀ (v : Nat) (s q : Term), substTerm v s (wfAll1Psi q) = wfAll1Psi (substTerm v s q) := by
+  intro v s q
+  simp only [wfAll1Psi, wfAll1PsiAt, shapeDot, bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
+    eqCodeFn, andc, orc, implc, forallc, carcT, lencT, nthcT, varc, liftc, funcc, tcFn,
+    cons, nil, zero, succ, numeralM, substTerm, substTerms, substTerm_numeral, substTerm_strCode]
+
+
+/-! ### ⭐ LA KEYSTONE: cómo baja `substfc` por el cuerpo -/
+
+/-- `substtc` sobre la casilla del nodo, en el nivel 0 (fuera del binder). -/
+theorem prf_substtc_node0 (w s : Term) :
+    Prf (substtc zero s (nthcT (tcFn w) (varc (numeral 0))) =eq nthcT (tcFn w) s) :=
+  prf_eq_trans (prf_substtc_nthcT zero s _ _)
+    (prf_congr_nthcT (substtc_inv_tcFn w s) (prf_substtc_varc0 s))
+
+/-- `substtc` sobre la lista de argumentos, en el nivel 1 (dentro del binder). -/
+theorem prf_substtc_args1 (w s s' : Term) (hs : Prf (liftc zero s =eq s')) :
+    Prf (substtc (succ zero) (liftc zero s)
+          (nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (tcFn (numeralM 2)))
+      =eq nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))) := by
+  refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
+  refine prf_congr_nthcT ?_ (prf_substtc_tcFn_at 1 _ (numeralM 2))
+  refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
+  refine prf_congr_nthcT (prf_substtc_tcFn_at 1 _ w) ?_
+  exact prf_eq_trans
+    (prf_mp (prf_substtc_var_eq (succ zero) (liftc zero s) (succ (numeral 0))) (prf_refl _)) hs
+
+/-- ⭐ **LA KEYSTONE.** `substfc` baja por los dos niveles del cuerpo: el hueco exterior recibe
+    `s`, y el interior —desplazado por De Bruijn— recibe `s'`, el lift de `s`. -/
+theorem prf_substfc_wfAll1Psi (w s s' : Term) (hs : Prf (liftc zero s =eq s')) :
+    Prf (substfc zero s (wfAll1Psi w) =eq wfAll1PsiAt w s s') := by
+  have hnode := prf_substtc_node0 w s
+  have hargs := prf_substtc_args1 w s s' hs
+  refine prf_eq_trans (prf_substfc_or zero s _ _) (prf_congr_orc ?_ ?_)
+  · exact prf_substfc_shapeDot s _ _ 0 2 hnode
+  refine prf_eq_trans (prf_substfc_and zero s _ _) (prf_congr_andc ?_ ?_)
+  · exact prf_substfc_shapeDot s _ _ 1 3 hnode
+  -- el `bdAllCode` interno: se entra en el binder y el nivel sube a `σ0`
+  refine prf_eq_trans (prf_substfc_forall zero s _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl (succ zero) (liftc zero s) _ _)
+    (prf_congr_implc ?_ ?_)
+  · -- la cota: `⌜v₀⌝ < lencT …`
+    refine prf_eq_trans (prf_substfc_atom2CodeFn (succ zero) (liftc zero s) lt_sym _ _) ?_
+    refine prf_congr_atom2CodeFn ?_ ?_
+    · exact prf_mp (prf_substtc_var_lt (succ zero) (liftc zero s) (numeral 0))
+        (prf_zero_lt_succ zero)
+    · exact prf_eq_trans (prf_substtc_lencT (succ zero) _ _) (prf_congr_lencT hargs)
+  · -- el cuerpo: `nthcT … ⌜v₀⌝ ∈ ẇ`
+    refine prf_eq_trans (prf_substfc_atom2CodeFn (succ zero) (liftc zero s) in_sym _ _) ?_
+    refine prf_congr_atom2CodeFn ?_ (prf_substtc_tcFn_at 1 _ w)
+    refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
+    exact prf_congr_nthcT hargs
+      (prf_mp (prf_substtc_var_lt (succ zero) (liftc zero s) (numeral 0))
+        (prf_zero_lt_succ zero))
+
+/-- La obligación `hPsiId`: sale de la keystone con `s := ⌜v₀⌝`, cuyo lift es `⌜v₁⌝`. -/
+theorem hPsiId_wfAll1Psi (w : Term) :
+    Prf (substfc zero (varc (numeral 0)) (wfAll1Psi w) =eq wfAll1Psi w) :=
+  prf_substfc_wfAll1Psi w (varc (numeral 0)) (varc (succ (numeral 0))) prf_liftc_varc0
+
+
+/-! ### El ENSAMBLAJE: `pcc_bdAll_intro` instanciado, módulo `hbody` -/
+
+/-- La obligación `hwPsi` de ADR-020: el cuerpo tiene testigo. La paga `hw_auto`. -/
+theorem hwPsi_wfAll1Psi (w : Term) : Prf (hasWitF (wfAll1Psi w)) := by hw_auto
+
+/-- ⭐ **EL `pcc_bdAll_intro` EXTERIOR, INSTANCIADO.** Ocho de las nueve obligaciones están
+    descargadas aquí; la novena, `hbody`, es lo único que queda de esta mitad de C3‑T.
+
+    `CF := wfAll1` es natural en **un** parámetro, así que —a diferencia del `argsIn` de §4— no
+    hubo que empaquetar nada con `cons`. -/
+theorem pcc_wfAll1_tracked_of_hbody
+    (hbody : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (wfAll1Psi q)))))
+    (w : Term) : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w)) :=
+  pcc_bdAll_intro wfAll1 lenc wfAll1Psi w
+    hCl_wfAll1 hCs_wfAll1 hbl_lenc hbs_lenc hPl_wfAll1Psi hPs_wfAll1Psi
+    hPsiId_wfAll1Psi hwPsi_wfAll1Psi hbody
+
+/-- **Y con ella, `DEUDA_wfAll1_tracked`**: la obligación genérica de §2 queda reducida a
+    `hbody`, con la imagen punteada ya elegida (`wfAll1Dot`). -/
+theorem DEUDA_wfAll1_of_hbody
+    (hbody : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (wfAll1Psi q))))) :
+    DEUDA_wfAll1_tracked wfAll1Dot :=
+  fun w => pcc_wfAll1_tracked_of_hbody hbody w
+
+/-- ⭐⭐ **Y con ella, el reflector de `isTC1` — el objetivo de §3, ya sin la hipótesis
+    genérica**: de `hbody` sale directamente, con la imagen concreta. -/
+theorem pcc_isTC1_tracked_of_hbody
+    (hbody : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (wfAll1Psi q)))))
+    (w c : Term) :
+    Prf (isTC1 w c ⇒ provFromCode (andc (wfAll1Dot w) (inFormCodeFn (tcFn c) (tcFn w)))) :=
+  pcc_isTC1_tracked_of (DEUDA_wfAll1_of_hbody hbody) w c
 
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
@@ -331,7 +485,12 @@ export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
   DEUDA_wfAll1_tracked pcc_isTC1_tracked_of
   PrfH_congr_argsIn_wit prf_argsIn_to_pair argsInDot pcc_argsIn_tracked'
   pcc_shape_of_str isTermCodeE1Dot pcc_isTermCodeE1_tracked
-  wfAll1Args prf_liftc_wfAll1Args prf_substtc_liftc_wfAll1Args
+  wfAll1Args prf_liftc_wfAll1Args prf_substtc_liftc_wfAll1Args_gen
+  prf_substtc_liftc_wfAll1Args
+  wfAll1PsiAt wfAll1Psi wfAll1Dot
+  hCl_wfAll1 hCs_wfAll1 hbl_lenc hbs_lenc hPl_wfAll1Psi hPs_wfAll1Psi
+  prf_substtc_node0 prf_substtc_args1 prf_substfc_wfAll1Psi hPsiId_wfAll1Psi hwPsi_wfAll1Psi
+  pcc_wfAll1_tracked_of_hbody DEUDA_wfAll1_of_hbody pcc_isTC1_tracked_of_hbody
   argsInPsi argsInPair liftF_argsInPair substF_argsInPair
   liftT_argsInBnd substT_argsInBnd liftT_argsInPsi substT_argsInPsi
   prf_substfc_argsInPsi prf_argsInPsi_id prf_argsIn_body

@@ -82,6 +82,13 @@ theorem prf_substfc_inDot (s A A' W : Term)
   exact prf_eq_trans (prf_substtsc_cons zero s W nil)
     (prf_eq_trans (prf_congr_cons_head (hW s)) (prf_congr_cons_tail (prf_substtsc_nil zero s)))
 
+/-- Congruencia de `forallc` a nivel META. Producción tenía la de `exc` (`prf_congr_exc`,
+    `Meta/EvalLtPrf.lean:60`) pero no ésta, y la pide cualquier descenso por un `∀` acotado. -/
+theorem prf_congr_forallc {a a' : Term} (h : Prf (a =eq a')) :
+    Prf (forallc a =eq forallc a') := by
+  unfold forallc
+  exact prf_congr_cons_tail (prf_congr_cons_head h)
+
 /-! ### KIT de distribución de `liftc` sobre los constructores DOTADOS
 
 ⭐ **Esto es lo que de verdad hacía falta para el `pcc_bdAll_intro` exterior**, y no el lema
@@ -478,6 +485,7 @@ Los consumidores previstos son **C3** (`DEUDA_hGuardT`/`DEUDA_hGuardF`) y **D3**
 todo él es genérico: no hay aquí fontanería privada de ningún frente. -/
 export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
   shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substtc_child
+  prf_congr_forallc
   prf_liftc_varc0 prf_liftc_funcc1 prf_liftc_funcc2
   prf_liftc_nthcT prf_liftc_lencT prf_liftc_carcT prf_liftc_cdrcT
   bdInB bdInPhic bdInDot substtc_inv_bdInB liftTerm_bdInDot pcc_boundedIn_tracked
