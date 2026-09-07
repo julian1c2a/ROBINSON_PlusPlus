@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 129 jobs · 115 módulos activos** (Minimal 11 + Meta 93 + Full 11) **+ 0 en `cuarentena/`
+> **Build 130 jobs · 116 módulos activos** (Minimal 11 + Meta 94 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2825,7 +2825,7 @@ sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente 
 ## §3.40 · 🏁 ③ TERMINADO — EL ÁRBOL VUELVE A VERDE y la vía C queda CERRADA (2026‑09‑06d)
 
 ```
-Build completed successfully (129 jobs)
+Build completed successfully (130 jobs)
 112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
 ```
 
@@ -2996,7 +2996,7 @@ editar un fichero que otro agente audita le invalida los números de línea.
 
 ## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
 
-> `Build completed successfully (129 jobs)` · **115 módulos** (Minimal 11 + Meta 93 + Full 11).
+> `Build completed successfully (130 jobs)` · **116 módulos** (Minimal 11 + Meta 94 + Full 11).
 > Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
 
 Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
@@ -3142,7 +3142,7 @@ la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`
 
 ## §3.42 · B3.4 CERRADO — `pcc_eval_substfc` en producción (2026‑09‑08)
 
-> `Build completed successfully (129 jobs)` · **115 módulos** (Minimal 11 + Meta 93 + Full 11).
+> `Build completed successfully (130 jobs)` · **116 módulos** (Minimal 11 + Meta 94 + Full 11).
 > `Meta/EvalSubstfcPrf.lean` (1 620 l.). Footprint = la base sancionada; **ni un axioma nuevo**.
 
 ⭐ **El muro de `substfc` estaba roto desde 2026‑08‑31 (§3.30), pero vivía fuera del build.**

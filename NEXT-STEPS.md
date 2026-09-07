@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (129 jobs)` — **115 módulos** (Minimal 11 + Meta 93 + Full 11) + 0 en
+`Build completed successfully (130 jobs)` — **116 módulos** (Minimal 11 + Meta 94 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
@@ -13,7 +13,7 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **C3, y ya sin `hCarc`**
+> # 🎯 SIGUIENTE SESIÓN — **C3: `DEUDA_hGuardT`/`DEUDA_hGuardF`, que ahora bloquean TAMBIÉN a D3**
 >
 > ## 🏁 Lo que se cerró después del merge (2026‑09‑07 y ‑08)
 >
@@ -33,6 +33,13 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > `pcc_eval_substfc_wit` en producción, footprint = la base sancionada. De 806 declaraciones
 > entraron 90. ⭐ Con esto **`hCarc` ya está comprado**: el antecedente de
 > `pcc_eval_substfc_wit` es literalmente el conjunto extra de ADR‑020.
+>
+> ⭐ **Y una medición de 2026‑09‑08 que cambia el ORDEN del plan**: al montar el chasis de D3
+> (§`Meta/D3ChainDotPrf.lean`) resultó que **D3 está aguas abajo de C3**. El `hbody` que pide
+> `pcc_bdAll_intro` para `chainOkB` necesita reflejar el átomo `lineWF`, o sea
+> `pcc_lineWF_tracked` — que no existe sin condicionar: sólo `pcc_lineWF_tracked_modulo_7`.
+> ⇒ **las dos `DEUDA_hGuard*` son ahora el cuello de botella de C3 Y de D3 a la vez**, y son
+> el camino corto a Gödel II sin `axiom d3`.
 >
 > **(2) C3 — los 7 reflectores de `lineWF`, cuyo chasis ya está puesto.**
 > `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar esos 7 cierra `pcc_lineWF_tracked` y que no
@@ -384,8 +391,29 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >              pcc_lineWF_tracked_modulo_7 conservan su firma EXACTA (§3.40.3).
 >              ✅ Las DOS deudas de ADR-019 (BdAllIntroPrf, EvalLiftcPrf), saldadas.
 > D · D3 REAL
->   D1 ⬜ hC_dot — la reflexión punteada de chainOk. NO EXISTE (verificado por grep)
->   D2 ⬜ d3_prf := d3_prf_of_chainOkDot φ hC_dot   ✅ el consumidor YA existe (Meta/D3InDotPrf)
+>   D0 ✅ HECHO 2026-09-08: Meta/D3ChainDotPrf.lean -- EL PUENTE ATOMO<->FORMA ACOTADA dentro
+>         de Prov, y D3 reducida a UNA SOLA obligacion. Footprint = la base sancionada.
+>         ⚠️ EL HUECO QUE A3 NO TENIA: `sondeos/A3IsFCBTracked.lean:819` ya aplica
+>            `pcc_bdAll_intro` entero (`pcc_wfAll_tracked`, 8 obligaciones descargadas) -- pero
+>            alli `wfAll` **ES** un ∀ acotado, luego lo que la keystone entrega ES lo pedido.
+>            Aqui `chainOk` es un **ATOMO** (Minimal/Axioms.lean:790) y `chainOkB` es otra
+>            formula. Y cruzarlo NO lo hace `prf_chainOk_iff_chainOkB`: eso es META-nivel. Hay
+>            que meter la implicacion en la TEORIA OBJETO sobre codigo punteado y ABIERTO
+>            (`pcc_thm_inst` + `prf_substfc_impl` + MP interna). Eso es `hC_dot_of_chainOkBDot`.
+>   D1 ⬜ DEUDA_chainOkBDot -- el reflector punteado de la forma ACOTADA. ENUNCIADA, no
+>         postulada (cero axiom). Se ataca con `pcc_bdAll_intro`: CF := chainOk nil,
+>         bndF := lenc, PsiF := el codigo de `lineOkB nil p #0`. Molde completo y ejercitado
+>         en `sondeos/A3IsFCBTracked.lean` §8-§9.
+>         ⛔ SU `hbody` SE PARTE EN DOS, Y LA PRIMERA MITAD ES C3:
+>            (1) reflejar el atomo `lineWF` = `pcc_lineWF_tracked` -- que NO EXISTE sin
+>                condicionar: solo `pcc_lineWF_tracked_modulo_7` (LineWFAssemblePrf:104), que
+>                pide los 7 reflectores de C3, que piden DEUDA_hGuardT/DEUDA_hGuardF.
+>            (2) reflejar `boundedPremsIn` = un SEGUNDO ∀ acotado anidado. Trabajo nuevo, misma
+>                forma => otra aplicacion de `pcc_bdAll_intro`. Esta mitad SI es independiente.
+>   D2 ⬜ d3_prf := d3_prf_of_chainOkBDot φ (…)   ✅ el consumidor YA existe y esta compilado
+>   ⭐ CONSECUENCIA PARA EL ORDEN DEL PLAN: **D3 esta AGUAS ABAJO de C3**. Ir a por D3 sin
+>      cerrar antes los 7 reflectores solo puede producir chasis, no el teorema. El camino
+>      corto a Godel II sin `axiom d3` pasa por DEUDA_hGuardT/DEUDA_hGuardF.
 > E · GÖDEL II
 >   E1 ⬜ goedel_second_prf     ✅ goedel_second' YA está montado (Meta/GodelTwo.lean)
 >   E2 ⬜ F7b: retirar el `axiom d3` (Meta/GodelTwo.lean) — 7 axiomas de Lean pasan a 6

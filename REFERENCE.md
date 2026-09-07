@@ -3,7 +3,7 @@
 > ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **115 módulos activos** (Minimal 11 + Meta 93 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **116 módulos activos** (Minimal 11 + Meta 94 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**115 módulos activos** (Minimal 11 + Meta 93 + Full 11) + barrel `Meta.lean` + raíz
+**116 módulos activos** (Minimal 11 + Meta 94 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -164,6 +164,7 @@ Detalle en el nodo §3.15–§3.32.
 | 78–80 | **`InAxiomsCodePrf`** · `LineWFThyPrf` · `LineWFAssemblePrf` | 🔁 `pcc_In_axiomsCodeT_tracked`, **`pcc_tc_formCode_internal`**; **`pcc_lineWF_tracked_modulo_7`** (§3.26.4) |
 | 81–82 | `LineWFConsPrf` · `AxiomListCode` | `prf_line_is_cons`; `axiomsCodeT` concretado (`neg_In_axiomsCodeT`) |
 | 83–84 | `CodeDecode` · `ChainDecode` | **módulo A de `NegVerifier`**: `decodeForm` biyección + `decodeChain_prf` |
+| 84b | **`D3ChainDotPrf`** | 🆕 ⭐ **EL PUENTE ÁTOMO ↔ FORMA ACOTADA dentro de `Prov`, y D3 reducida a UNA obligación** (2026‑09‑08, rama **D**): `hC_dot_of_chainOkBDot` y `d3_prf_of_chainOkBDot`. Footprint = la base sancionada; **cero `axiom`**, la deuda se **enuncia** (`DEUDA_chainOkBDot`). ⚠️ **El hueco que `sondeos/A3IsFCBTracked.lean` no tenía**: allí `wfAll` **es** un `∀` acotado, así que `pcc_bdAll_intro` entrega justo lo pedido; aquí `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:790`) y su forma acotada es otra fórmula. Cruzarlo **no** lo hace `prf_chainOk_iff_chainOkB` —ése es meta‑nivel—: hay que meter la implicación en la **teoría objeto** sobre código punteado y abierto, vía `pcc_thm_inst` + `prf_substfc_impl` + MP interna. ⛔ **Y mide lo que queda: D3 está AGUAS ABAJO de C3** — el `hbody` de `pcc_bdAll_intro` pide reflejar `lineWF`, o sea `pcc_lineWF_tracked`, que sólo existe como `_modulo_7` |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo; **Gödel II `goedel_second'`**, módulo `axiom d3` |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).

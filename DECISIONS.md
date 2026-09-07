@@ -8,7 +8,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **115 módulos activos** (Minimal 11 + Meta 93 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **116 módulos activos** (Minimal 11 + Meta 94 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -904,7 +904,7 @@ Pide `hasWitF Ac` con `Ac` abstracto, así que arrastra salvo donde el `Ac` sea 
 ### Addendum 2026‑09‑07 · 🏁 ADR‑020 CERRADA — el árbol compila con la enmienda
 
 ```
-Build completed successfully (129 jobs) · 112 módulos · 0 sorrys · 7 `axiom` de Lean
+Build completed successfully (130 jobs) · 112 módulos · 0 sorrys · 7 `axiom` de Lean
 ```
 
 Los **29 módulos** que bloqueaba `MpCodePrf` están cerrados. Detalle en §3.38–§3.40 de
