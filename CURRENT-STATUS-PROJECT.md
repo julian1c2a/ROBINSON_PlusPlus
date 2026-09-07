@@ -2,7 +2,7 @@
 
 > ## ESTADO REAL — 2026-09-07 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
-> 🏁 **`Build completed successfully (130 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
 > `master`** el 2026-09-07 con merge commit `7bc2c8a`, y el build se verificó verde **después** del
 > merge, no sólo en la rama.
@@ -46,8 +46,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
 >
-> **Build 130 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
-> **116 módulos activos** (Minimal 11 + Meta 94 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 132 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **118 módulos activos** (Minimal 11 + Meta 96 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >

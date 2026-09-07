@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (130 jobs)` — **116 módulos** (Minimal 11 + Meta 94 + Full 11) + 0 en
+`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 96 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
@@ -49,11 +49,23 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | pieza | estado |
 > |---|---|
 > | la absorción del conjunto extra | ✅ `hcond_absorbe_cascade` (§3.41.3) |
-> | `DEUDA_hGuardT` (reflector Σ₁ de `hasWit`) | ⬜ **enunciada, no probada** |
-> | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada** |
+> | el **kit genérico** de reflexión Σ₁ (átomo `In`, `boundedIn`, formas, casillas) | ✅ `Meta/TrackedAtomsPrf.lean` (2026‑09‑08) |
+> | `DEUDA_hGuardT` · mitad `In c w` | ✅ `pcc_In_atom_tracked`, con los dos argumentos **abstractos** |
+> | `DEUDA_hGuardT` · mitad `wfAll1` | ⬜ **`DEUDA_wfAll1_tracked`** — la única obligación de contenido que queda de esta mitad |
+> | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
+> | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |
+>
+> ⛔ **Y lo que la sesión del 2026‑09‑08 midió sobre `DEUDA_wfAll1_tracked`, que es lo caro**:
+> se ataca con `pcc_bdAll_intro`, cuya aplicación completa está ejercitada en
+> `sondeos/A3IsFCBTracked.lean` (`pcc_wfAll_tracked`, ocho obligaciones descargadas) — **pero
+> aquel `nodeOk` estaba DISEÑADO para no tener binders dentro del `∀` acotado**: el sondeo metió
+> el `In` como **átomo** a propósito, «así el cuerpo no tiene ningún binder y todo el descenso de
+> `substfc` vive en nivel 0». `isTermCodeE1 wT X = shapeUn X 0 ∨ (shapeBin X 1 ∧ argsIn wT (nthc
+> X 2))` **no** tiene esa propiedad: `argsIn` es un `∀` acotado **anidado**. Ese anidamiento es
+> el contenido que falta, y el kit no lo cubre. ⇒ no es «una instancia más del molde».
 >
 > Para las dos deudas, lo que ya hay está medido en **§3.41.5**: los átomos con términos
 > **abstractos** (`pcc_lt_tracked`, `pcc_eq_tracked`), el `∀` acotado (`pcc_bdAll_intro`) y el

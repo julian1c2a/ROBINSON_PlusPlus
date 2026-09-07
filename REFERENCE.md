@@ -3,7 +3,7 @@
 > ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **116 módulos activos** (Minimal 11 + Meta 94 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **118 módulos activos** (Minimal 11 + Meta 96 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**116 módulos activos** (Minimal 11 + Meta 94 + Full 11) + barrel `Meta.lean` + raíz
+**118 módulos activos** (Minimal 11 + Meta 96 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -164,6 +164,8 @@ Detalle en el nodo §3.15–§3.32.
 | 78–80 | **`InAxiomsCodePrf`** · `LineWFThyPrf` · `LineWFAssemblePrf` | 🔁 `pcc_In_axiomsCodeT_tracked`, **`pcc_tc_formCode_internal`**; **`pcc_lineWF_tracked_modulo_7`** (§3.26.4) |
 | 81–82 | `LineWFConsPrf` · `AxiomListCode` | `prf_line_is_cons`; `axiomsCodeT` concretado (`neg_In_axiomsCodeT`) |
 | 83–84 | `CodeDecode` · `ChainDecode` | **módulo A de `NegVerifier`**: `decodeForm` biyección + `decodeChain_prf` |
+| 84c | **`TrackedAtomsPrf`** | 🆕 ⭐ **EL KIT GENÉRICO de reflexión Σ₁ con argumentos ABSTRACTOS** (2026‑09‑08, promovido de `sondeos/A3IsFCBTracked.lean`, 21 de 81 declaraciones, **cero homónimos**): **`pcc_In_atom_tracked (x w)`** —el átomo `In` reflejado con los dos argumentos abstractos, que es lo que permite partir la guarda de ADR‑020—, `pcc_boundedIn_tracked`, `pcc_shape_tracked`, `pcc_child_tracked`, `pcc_carcIn_tracked`/`_cdrcIn_tracked`. Sirve a **C3‑T**, **C3‑F** y **D3** a la vez, porque es la mitad del trabajo que **no depende del predicado de nodo**. De 14 errores a 0: diez guardas de ADR‑020 se **pagan** con `hw_auto`; la undécima (`PrfH_in_transport`, tres argumentos abstractos) **no se puede pagar** y se **arrastra** con `autoParam`. ⚠️ Aquel sondeo metió el `In` como **átomo a propósito**, para que el cuerpo del `∀` acotado no tuviera binders — `isTermCodeE1` **no** tiene esa propiedad |
+| 84d | **`HasWitTrackedPrf`** | 🆕 **`DEUDA_hGuardT` baja a UNA obligación de contenido** (2026‑09‑08): `pcc_isTC1_tracked_of`, la plantilla `isFCB` de A3 portada a `isTC1 w c = wfAll1 w ∧ In c w` — cuatro líneas sobre el kit, con la mitad derecha pagada por `pcc_In_atom_tracked`. Genérico en la imagen punteada `WD`, para no prejuzgar la que salga del `pcc_bdAll_intro`. §1 comprueba la forma contra `Minimal/Axioms.lean` con dos `rfl`. ⛔ Lo que queda medido: `DEUDA_wfAll1_tracked`, y **por qué no es una instancia más del molde de A3** — `isTermCodeE1` lleva `argsIn`, un `∀` acotado **anidado**, y aquel molde estaba diseñado para no tener binders dentro |
 | 84b | **`D3ChainDotPrf`** | 🆕 ⭐ **EL PUENTE ÁTOMO ↔ FORMA ACOTADA dentro de `Prov`, y D3 reducida a UNA obligación** (2026‑09‑08, rama **D**): `hC_dot_of_chainOkBDot` y `d3_prf_of_chainOkBDot`. Footprint = la base sancionada; **cero `axiom`**, la deuda se **enuncia** (`DEUDA_chainOkBDot`). ⚠️ **El hueco que `sondeos/A3IsFCBTracked.lean` no tenía**: allí `wfAll` **es** un `∀` acotado, así que `pcc_bdAll_intro` entrega justo lo pedido; aquí `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:790`) y su forma acotada es otra fórmula. Cruzarlo **no** lo hace `prf_chainOk_iff_chainOkB` —ése es meta‑nivel—: hay que meter la implicación en la **teoría objeto** sobre código punteado y abierto, vía `pcc_thm_inst` + `prf_substfc_impl` + MP interna. ⛔ **Y mide lo que queda: D3 está AGUAS ABAJO de C3** — el `hbody` de `pcc_bdAll_intro` pide reflejar `lineWF`, o sea `pcc_lineWF_tracked`, que sólo existe como `_modulo_7` |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo; **Gödel II `goedel_second'`**, módulo `axiom d3` |
 
