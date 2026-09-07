@@ -2,6 +2,7 @@ import ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 import ROBINSON_PlusPlus.Meta.D3InDotPrf
 import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 import ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
+import ROBINSON_PlusPlus.Meta.CodeTreeReflect
 import ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 import ROBINSON_PlusPlus.Meta.LiftcCodePrf
 /-!
@@ -60,6 +61,7 @@ open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 open ROBINSON_PlusPlus.Meta.LiftcCodePrf
+open ROBINSON_PlusPlus.Meta.CodeCtorKit ROBINSON_PlusPlus.Meta.CodeTreeReflect
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -249,6 +251,54 @@ theorem prf_substfc_shapeDot (s X X' : Term) (k n : Nat)
   · refine prf_eq_trans (prf_substfc_eq zero s _ _) (prf_congr_eqCodeFn ?_ ?_)
     · exact prf_eq_trans (prf_substtc_lencT zero s X) (prf_congr_lencT hX)
     · exact substtc_inv_tcFn (numeralM n) s
+
+/-- La misma, a **nivel arbitrario**: la pide cualquier invariancia bajo un binder. -/
+theorem prf_substfc_shapeDot_at (v s X X' : Term) (k n : Nat)
+    (hX : Prf (substtc v s X =eq X'))
+    (hk : Prf (substtc v s (tcFn (numeralM k)) =eq tcFn (numeralM k)))
+    (hn : Prf (substtc v s (tcFn (numeralM n)) =eq tcFn (numeralM n))) :
+    Prf (substfc v s (shapeDot X k n) =eq shapeDot X' k n) := by
+  unfold shapeDot
+  refine prf_eq_trans (prf_substfc_and v s _ _) (prf_congr_andc ?_ ?_)
+  · refine prf_eq_trans (prf_substfc_eq v s _ _) (prf_congr_eqCodeFn ?_ hk)
+    exact prf_eq_trans (prf_substtc_carcT v s X) (prf_congr_carcT hX)
+  · refine prf_eq_trans (prf_substfc_eq v s _ _) (prf_congr_eqCodeFn ?_ hn)
+    exact prf_eq_trans (prf_substtc_lencT v s X) (prf_congr_lencT hX)
+
+/-! ### ⭐ La forma posicional, reflejada a su código `formCode` LITERAL (vía `CTree`)
+
+`shapeDot` es la forma `carc X = k̇ ∧ lenc X = ṅ` — la que `pcc_shape_tracked` sabe producir.
+Pero el `condD` de ADR‑020 **no admite elegir imagen**: pide la de `formCode`, y
+`formCode (shapeUn X k)` es la **ECUACIÓN** `Ẋ = ⟨k̄, nthcT Ẋ 1̄⟩`, no la conjunción de
+accesores. Las dos son equivalentes en la teoría objeto, pero son **códigos distintos**.
+
+⭐ No hace falta ningún teorema objeto nuevo para cruzar ese hueco: `Meta/CodeTreeReflect.lean`
+ya tiene, genérico y probado **por inducción sobre el árbol**, todo lo que se necesita —
+`pcc_tc_objAt` (el «código del código» del árbol) y `PrfH_dotVN` (el paso de valores punteados
+a accesores rastreados). Aquí sólo se componen, y el resultado sirve para cualquier forma
+posicional de cualquier frente. -/
+
+/-- ⭐ **UNA FORMA POSICIONAL, REFLEJADA DIRECTAMENTE A SU CÓDIGO `formCode`.**
+
+    `S` es la hipótesis de la que se saca la forma (típicamente `shapeUn X k` o `shapeBin X k`);
+    `hsh` dice que `S` da la ecuación posicional y `hlen` su longitud, que es lo que
+    `PrfH_dotVN` necesita para acotar los índices de las hojas. -/
+theorem pcc_shape_tree (X : Term) (T : CTree) {n : Nat} (hmax : Nat.le (CTree.maxLeaf T) n)
+    (S : Formula) (hsh : Prf (S ⇒ (X =eq T.objAt X)))
+    (hlen : Prf (S ⇒ (lenc X =eq numeralM n))) :
+    Prf (S ⇒ provFromCode (eqCodeFn (tcFn X) (T.dotN X))) := by
+  refine prf_deduction ?_
+  have hS : PrfH [S] S := prfH_hyp_self S
+  have h1 : PrfH [S] (provFromCode (eqCodeFn (tcFn X) (tcFn (T.objAt X)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eq_tracked X (T.objAt X)) _)
+      (PrfH.mp _ _ _ (prf_to_prfH hsh _) hS)
+  have h12 : PrfH [S] (provFromCode (eqc (tcFn X) (T.dotV X))) :=
+    PrfH_eq_trans_code _ _ _ (substtc_inv_tcFn X) h1
+      (prf_to_prfH (pcc_tc_objAt X T) _)
+      (prf_hasWit_tcFn X) (prf_hasWit_tcFn (T.objAt X)) (prf_hasWit_dotV X T)
+  exact PrfH_eq_trans_code _ _ _ (substtc_inv_tcFn X) h12
+    (PrfH_dotVN X (PrfH.mp _ _ _ (prf_to_prfH hlen _) hS) T hmax)
+    (prf_hasWit_tcFn X) (prf_hasWit_dotV X T) (prf_hasWit_dotN X T)
 
 /-- **`substtc` sobre la casilla `k`‑ésima dotada**: idem, sólo la ranura del nodo. -/
 theorem prf_substtc_child (s X X' : Term) (k : Nat)
@@ -592,7 +642,8 @@ Los consumidores previstos son **C3** (`DEUDA_hGuardT`/`DEUDA_hGuardF`) y **D3**
 (`DEUDA_chainOkBDot`), ninguno de los cuales existe todavía. Se exporta el kit entero porque
 todo él es genérico: no hay aquí fontanería privada de ningún frente. -/
 export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
-  shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substtc_child
+  shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substfc_shapeDot_at pcc_shape_tree
+  prf_substtc_child
   prf_congr_forallc prf_congr_bdAllCode
   pcc_congr_nthcT_arg1_code PrfH_shapeDot_transport PrfH_orL_code PrfH_orR_code
   bdAllBndCtx prf_substfc_bdAllBndCtx PrfH_bdAllCode_congr_bnd

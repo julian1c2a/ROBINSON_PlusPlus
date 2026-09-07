@@ -251,10 +251,149 @@ theorem pcc_shape_of_str (X : Term) (k n : Nat) (S : Formula)
     (PrfH.mp _ _ _ (prf_to_prfH (pcc_shape_tracked X k n) _) (PrfH_and_elim_left hs))
     (PrfH_and_elim_right hs)
 
+/-! ### ⭐ LA IMAGEN DE LA FORMA QUE EXIGE `condD`, y por qué `shapeDot` no vale
+
+⚠️ Aquí se corrige una elección que §5 hizo **antes de medir el destino**. `pcc_shape_of_str`
+entrega `shapeDot` —`carc X = k̇ ∧ lenc X = ṅ`—, que es una imagen legítima de la forma… pero
+`condD C t = substfc 0 ṫ (formCode C)` **no admite elegir imagen**: la impone `formCode`, y
+`formCode (shapeUn X k)` es la **ECUACIÓN POSICIONAL** `Ẋ = ⟨k̄, nthcT Ẋ 1̄⟩`. Las dos fórmulas
+son equivalentes en la teoría objeto, pero son **códigos distintos**, y `pcc_lineWF_tracked_of_schema`
+recompone el `⇔` con el código, no con la equivalencia.
+
+La ecuación la produce `pcc_shape_tree` (`Meta/TrackedAtomsPrf.lean`), componiendo dos piezas
+que `Meta/CodeTreeReflect.lean` ya tenía probadas **por inducción sobre el árbol**. -/
+
+/-- Los dos árboles de `isTermCodeE1`… -/
+def treeUn1 (k : Nat) : CTree := .un k (.leaf 1)
+def treeBin1 (k : Nat) : CTree := .bin k (.leaf 1) (.leaf 2)
+
+/-- …y la comprobación de que **son** sus formas (regla de método: la abstracción se casa con
+    el original por `rfl`). -/
+example (X : Term) (k : Nat) : shapeUn X k = (X =eq (treeUn1 k).objAt X) := rfl
+example (X : Term) (k : Nat) : shapeBin X k = (X =eq (treeBin1 k).objAt X) := rfl
+
+/-- La imagen `formCode` de `shapeUn`, con el nodo como CÓDIGO. -/
+noncomputable def shapeFCun (ND : Term) (k : Nat) : Term :=
+  eqCodeFn ND (unT k (nthcT ND (termCode (numeralM 1))))
+
+/-- La imagen `formCode` de `shapeBin`, con el nodo como CÓDIGO. -/
+noncomputable def shapeFCbin (ND : Term) (k : Nat) : Term :=
+  eqCodeFn ND (binT k (nthcT ND (termCode (numeralM 1))) (nthcT ND (termCode (numeralM 2))))
+
+/-- ⭐ **La comprobación que decide todo esto**: son literalmente lo que `formCode` produce. -/
+example (X : Term) (k : Nat) : formCode (shapeUn X k) = shapeFCun (termCode X) k := rfl
+example (X : Term) (k : Nat) : formCode (shapeBin X k) = shapeFCbin (termCode X) k := rfl
+
+/-- Y son lo que `pcc_shape_tree` entrega sobre el término objeto. -/
+example (X : Term) (k : Nat) : (treeUn1 k).dotN X = unT k (nthcT (tcFn X) (termCode (numeralM 1))) := rfl
+example (X : Term) (k : Nat) :
+    (treeBin1 k).dotN X
+      = binT k (nthcT (tcFn X) (termCode (numeralM 1))) (nthcT (tcFn X) (termCode (numeralM 2))) := rfl
+
+/-- La forma UNARIA, reflejada a su código `formCode` sobre el término objeto. -/
+theorem pcc_shapeUn_fc (X : Term) (k : Nat) :
+    Prf (shapeUn X k ⇒ provFromCode (shapeFCun (tcFn X) k)) :=
+  pcc_shape_tree X (treeUn1 k) Nat.le.refl _
+    (prf_deduction (prfH_hyp_self _))
+    (prf_deduction (PrfH_and_elim_right (PrfH_and_elim_right
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_shapeUn_str X k) _) (prfH_hyp_self _)))))
+
+/-- La forma BINARIA, ídem. -/
+theorem pcc_shapeBin_fc (X : Term) (k : Nat) :
+    Prf (shapeBin X k ⇒ provFromCode (shapeFCbin (tcFn X) k)) :=
+  pcc_shape_tree X (treeBin1 k) Nat.le.refl _
+    (prf_deduction (prfH_hyp_self _))
+    (prf_deduction (PrfH_and_elim_right (PrfH_and_elim_right
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_shapeBin_str X k) _) (prfH_hyp_self _)))))
+
+/-! #### El transporte del NODO en la forma, con el hueco a nivel `⌜v₀⌝` -/
+
+noncomputable def shapeUnCtx (k : Nat) : Term :=
+  eqCodeFn (varc (numeral 0)) (unT k (nthcT (varc (numeral 0)) (termCode (numeralM 1))))
+
+noncomputable def shapeBinCtx (k : Nat) : Term :=
+  eqCodeFn (varc (numeral 0)) (binT k (nthcT (varc (numeral 0)) (termCode (numeralM 1)))
+    (nthcT (varc (numeral 0)) (termCode (numeralM 2))))
+
+theorem prf_substfc_shapeUnCtx (k : Nat) (U : Term) :
+    Prf (substfc zero U (shapeUnCtx k) =eq shapeFCun U k) := by
+  unfold shapeUnCtx shapeFCun
+  refine prf_eq_trans (prf_substfc_eq zero U _ _) ?_
+  refine prf_congr_eqCodeFn (prf_substtc_varc0 U) ?_
+  refine prf_eq_trans (prf_substtc_unT k U _) (prf_congr_unT ?_)
+  exact prf_eq_trans (prf_substtc_nthcT zero U _ _)
+    (prf_congr_nthcT (prf_substtc_varc0 U) (substtc_inv_termCode_numeralM 1 U))
+
+theorem prf_substfc_shapeBinCtx (k : Nat) (U : Term) :
+    Prf (substfc zero U (shapeBinCtx k) =eq shapeFCbin U k) := by
+  unfold shapeBinCtx shapeFCbin
+  refine prf_eq_trans (prf_substfc_eq zero U _ _) ?_
+  refine prf_congr_eqCodeFn (prf_substtc_varc0 U) ?_
+  refine prf_eq_trans (prf_substtc_binT k U _ _) (prf_congr_binT ?_ ?_)
+  · exact prf_eq_trans (prf_substtc_nthcT zero U _ _)
+      (prf_congr_nthcT (prf_substtc_varc0 U) (substtc_inv_termCode_numeralM 1 U))
+  · exact prf_eq_trans (prf_substtc_nthcT zero U _ _)
+      (prf_congr_nthcT (prf_substtc_varc0 U) (substtc_inv_termCode_numeralM 2 U))
+
+theorem PrfH_shapeFCun_transport {Γ : List Formula} (k : Nat) (U U' : Term)
+    (hU : PrfH Γ (provFromCode (eqCodeFn U U')))
+    (h : PrfH Γ (provFromCode (shapeFCun U k)))
+    (hwC : Prf (hasWitF (shapeUnCtx k)) := by hw_auto)
+    (hwU : Prf (hasWit U) := by hw_auto) (hwU' : Prf (hasWit U') := by hw_auto) :
+    PrfH Γ (provFromCode (shapeFCun U' k)) := by
+  have h0 : PrfH Γ (provFromCode (substfc zero U (shapeUnCtx k))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+      (prf_eq_symm (prf_substfc_shapeUnCtx k U))) _) h
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_substfc_shapeUnCtx k U')) _)
+    (PrfH_leibniz_apply _ U U' hU h0 hwC hwU hwU')
+
+theorem PrfH_shapeFCbin_transport {Γ : List Formula} (k : Nat) (U U' : Term)
+    (hU : PrfH Γ (provFromCode (eqCodeFn U U')))
+    (h : PrfH Γ (provFromCode (shapeFCbin U k)))
+    (hwC : Prf (hasWitF (shapeBinCtx k)) := by hw_auto)
+    (hwU : Prf (hasWit U) := by hw_auto) (hwU' : Prf (hasWit U') := by hw_auto) :
+    PrfH Γ (provFromCode (shapeFCbin U' k)) := by
+  have h0 : PrfH Γ (provFromCode (substfc zero U (shapeBinCtx k))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+      (prf_eq_symm (prf_substfc_shapeBinCtx k U))) _) h
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_substfc_shapeBinCtx k U')) _)
+    (PrfH_leibniz_apply _ U U' hU h0 hwC hwU hwU')
+
+/-- `liftc` sobre `termCode ⌜m⌝`: es un código CERRADO, y el puente `prf_tc_numeralM` lo
+    reduce al caso `tcFn` que producción ya tiene. -/
+theorem prf_liftc_termCode_numeralM (m : Nat) :
+    Prf (liftc zero (termCode (numeralM m)) =eq termCode (numeralM m)) :=
+  prf_eq_trans (NumCodeClosedPrf.prf_congr_liftc (prf_eq_symm (prf_tc_numeralM m)))
+    (prf_eq_trans (prf_liftc_tcFn (numeralM m)) (prf_tc_numeralM m))
+
+/-- `substfc` sobre la forma UNARIA, a nivel ARBITRARIO. -/
+theorem prf_substfc_shapeFCun_at (v : Nat) (s X X' : Term) (k : Nat)
+    (hX : Prf (substtc (numeral v) s X =eq X')) :
+    Prf (substfc (numeral v) s (shapeFCun X k) =eq shapeFCun X' k) := by
+  unfold shapeFCun
+  refine prf_eq_trans (prf_substfc_eq _ s _ _) (prf_congr_eqCodeFn hX ?_)
+  refine prf_eq_trans (prf_substtc_unT_at k v s _) (prf_congr_unT ?_)
+  exact prf_eq_trans (prf_substtc_nthcT _ s _ _)
+    (prf_congr_nthcT hX (prf_substtc_termCode_numeralM v 1 s))
+
+/-- `substfc` sobre la forma BINARIA, a nivel ARBITRARIO. -/
+theorem prf_substfc_shapeFCbin_at (v : Nat) (s X X' : Term) (k : Nat)
+    (hX : Prf (substtc (numeral v) s X =eq X')) :
+    Prf (substfc (numeral v) s (shapeFCbin X k) =eq shapeFCbin X' k) := by
+  unfold shapeFCbin
+  refine prf_eq_trans (prf_substfc_eq _ s _ _) (prf_congr_eqCodeFn hX ?_)
+  refine prf_eq_trans
+    (prf_substtc_binK_at (numeralM k) (fun c => liftTerm_numeralM c k) v s _ _)
+    (prf_congr_binT ?_ ?_)
+  · exact prf_eq_trans (prf_substtc_nthcT _ s _ _)
+      (prf_congr_nthcT hX (prf_substtc_termCode_numeralM v 1 s))
+  · exact prf_eq_trans (prf_substtc_nthcT _ s _ _)
+      (prf_congr_nthcT hX (prf_substtc_termCode_numeralM v 2 s))
+
 /-- **La imagen punteada de `isTermCodeE1`**, disyunto a disyunto. -/
 noncomputable def isTermCodeE1Dot (wT X : Term) : Term :=
-  orc (shapeDot (tcFn X) 0 2)
-      (andc (shapeDot (tcFn X) 1 3) (argsInDot wT (nthc X (numeralM 2))))
+  orc (shapeFCun (tcFn X) 0)
+      (andc (shapeFCbin (tcFn X) 1) (argsInDot wT (nthc X (numeralM 2))))
 
 /-- ⭐ **EL RECORRIDO DE LOS DOS DISYUNTOS, REFLEJADO**, con `wT` y `X` **abstractos**.
 
@@ -271,9 +410,8 @@ noncomputable def isTermCodeE1Dot (wT X : Term) : Term :=
         binders**, por el diseño de su §2. -/
 theorem pcc_isTermCodeE1_tracked (wT X : Term) :
     Prf (isTermCodeE1 wT X ⇒ provFromCode (isTermCodeE1Dot wT X)) := by
-  refine pcc_reflect_or _ _ _ _ (pcc_shape_of_str X 0 2 _ (prf_shapeUn_str X 0)) ?_
-  exact pcc_reflect_and _ _ _ _
-    (pcc_shape_of_str X 1 3 _ (prf_shapeBin_str X 1))
+  refine pcc_reflect_or _ _ _ _ (pcc_shapeUn_fc X 0) ?_
+  exact pcc_reflect_and _ _ _ _ (pcc_shapeBin_fc X 1)
     (pcc_argsIn_tracked' wT (nthc X (numeralM 2)))
 
 
@@ -294,14 +432,14 @@ Aquí se hace la cuenta entera para el `Z` del cuerpo de `wfAll1`, que es el cas
 /-- El `Z` del cuerpo de `wfAll1`: la casilla 2 del nodo `i`‑ésimo del testigo, con el hueco
     del índice en `⌜v₀⌝`. -/
 noncomputable def wfAll1Args (w : Term) : Term :=
-  nthcT (nthcT (tcFn w) (varc (numeral 0))) (tcFn (numeralM 2))
+  nthcT (nthcT (tcFn w) (varc (numeral 0))) (termCode (numeralM 2))
 
 /-- `liftc` sobre él: el hueco pasa de `⌜v₀⌝` a `⌜v₁⌝` y todo lo demás es cerrado. -/
 theorem prf_liftc_wfAll1Args (w : Term) :
     Prf (liftc zero (wfAll1Args w)
-      =eq nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (tcFn (numeralM 2))) := by
+      =eq nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (termCode (numeralM 2))) := by
   refine prf_eq_trans (prf_liftc_nthcT zero _ _) ?_
-  refine prf_congr_nthcT ?_ (prf_liftc_tcFn (numeralM 2))
+  refine prf_congr_nthcT ?_ (prf_liftc_termCode_numeralM 2)
   exact prf_eq_trans (prf_liftc_nthcT zero _ _)
     (prf_congr_nthcT (prf_liftc_tcFn w) prf_liftc_varc0)
 
@@ -312,10 +450,10 @@ theorem prf_liftc_wfAll1Args (w : Term) :
     `hPsiId` con `s := ⌜v₀⌝` (y `s' = ⌜v₁⌝`). -/
 theorem prf_substtc_liftc_wfAll1Args_gen (w s s' : Term) (hs : Prf (liftc zero s =eq s')) :
     Prf (substtc (succ zero) (liftc zero s) (liftc zero (wfAll1Args w))
-      =eq nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))) := by
+      =eq nthcT (nthcT (tcFn w) s') (termCode (numeralM 2))) := by
   refine prf_eq_trans (prf_congr_substtc3 (prf_liftc_wfAll1Args w)) ?_
   refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
-  refine prf_congr_nthcT ?_ (prf_substtc_tcFn_at 1 _ (numeralM 2))
+  refine prf_congr_nthcT ?_ (prf_substtc_termCode_numeralM 1 2 _)
   refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
   refine prf_congr_nthcT (prf_substtc_tcFn_at 1 _ w) ?_
   exact prf_eq_trans
@@ -324,7 +462,7 @@ theorem prf_substtc_liftc_wfAll1Args_gen (w s s' : Term) (hs : Prf (liftc zero s
 /-- La instancia que consume `hbody`: el sustituyendo es `⌜i⌝`, que es CERRADO. -/
 theorem prf_substtc_liftc_wfAll1Args (w s : Term) :
     Prf (substtc (succ zero) (liftc zero (tcFn s)) (liftc zero (wfAll1Args w))
-      =eq nthcT (nthcT (tcFn w) (tcFn s)) (tcFn (numeralM 2))) :=
+      =eq nthcT (nthcT (tcFn w) (tcFn s)) (termCode (numeralM 2))) :=
   prf_substtc_liftc_wfAll1Args_gen w (tcFn s) (tcFn s) (prf_liftc_tcFn s)
 
 
@@ -340,17 +478,27 @@ es cerrado. -/
     niveles**: `s` fuera del `bdAllCode` interno y `s'` dentro (donde De Bruijn lo desplaza).
     Escribir `⌜v₁⌝` explícitamente —en vez de `liftc 0 ⌜v₀⌝`— es lo que hace que `hPsiId`
     salga por definición y que una sola keystone sirva a los dos consumidores. -/
-noncomputable def wfAll1PsiAt (w s s' : Term) : Term :=
-  orc (shapeDot (nthcT (tcFn w) s) 0 2)
-      (andc (shapeDot (nthcT (tcFn w) s) 1 3)
-        (bdAllCode (lencT (nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))))
+noncomputable def wfAll1PsiAtC (WD WD' s s' : Term) : Term :=
+  orc (shapeFCun (nthcT WD s) 0)
+      (andc (shapeFCbin (nthcT WD s) 1)
+        (bdAllCode (lencT (nthcT (nthcT WD' s') (termCode (numeralM 2))))
           (inFormCodeFn
-            (nthcT (nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))) (varc (numeral 0)))
-            (tcFn w))))
+            (nthcT (nthcT (nthcT WD' s') (termCode (numeralM 2))) (varc (numeral 0)))
+            WD')))
+
+/-- La misma, con el testigo como TÉRMINO objeto (es `wfAll1PsiAtC (tcFn w)` por definición). -/
+noncomputable def wfAll1PsiAt (w s s' : Term) : Term := wfAll1PsiAtC (tcFn w) (tcFn w) s s'
+
+/-- El cuerpo, paramétrico en el CÓDIGO del testigo. -/
+noncomputable def wfAll1PsiC (WD : Term) : Term :=
+  wfAll1PsiAtC WD WD (varc (numeral 0)) (varc (succ (numeral 0)))
 
 /-- El `PsiF` que consume `pcc_bdAll_intro`: el hueco es `⌜v₀⌝` fuera y `⌜v₁⌝` dentro. -/
-noncomputable def wfAll1Psi (w : Term) : Term :=
-  wfAll1PsiAt w (varc (numeral 0)) (varc (succ (numeral 0)))
+noncomputable def wfAll1Psi (w : Term) : Term := wfAll1PsiC (tcFn w)
+
+/-- La imagen de `wfAll1` **paramétrica en el código del testigo**, con la cota ya en forma de
+    accesor dotado (`lencT WD`, no `tcFn (lenc w)`). Es la que admite el hueco del `∃`. -/
+noncomputable def wfAll1DotC (WD : Term) : Term := bdAllCode (lencT WD) (wfAll1PsiC WD)
 
 /-- La imagen punteada de `wfAll1` (lo que `pcc_bdAll_intro` entrega, literalmente). -/
 noncomputable def wfAll1Dot (w : Term) : Term := bdAllCode (tcFn (lenc w)) (wfAll1Psi w)
@@ -373,16 +521,20 @@ theorem hbs_lenc : ∀ (v : Nat) (s q : Term), substTerm v s (lenc q) = lenc (su
 theorem hPl_wfAll1Psi :
     ∀ (k : Nat) (q : Term), liftTerm k (wfAll1Psi q) = wfAll1Psi (liftTerm k q) := by
   intro k q
-  simp only [wfAll1Psi, wfAll1PsiAt, shapeDot, bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
+  simp only [wfAll1Psi, wfAll1PsiC, wfAll1PsiAtC, shapeFCun, shapeFCbin, unT, binT, consT,
+    bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
     eqCodeFn, andc, orc, implc, forallc, carcT, lencT, nthcT, varc, liftc, funcc, tcFn,
-    cons, nil, zero, succ, numeralM, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
+    cons, nil, zero, succ, numeralM, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode,
+    liftTerm_termCode]
 
 theorem hPs_wfAll1Psi :
     ∀ (v : Nat) (s q : Term), substTerm v s (wfAll1Psi q) = wfAll1Psi (substTerm v s q) := by
   intro v s q
-  simp only [wfAll1Psi, wfAll1PsiAt, shapeDot, bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
+  simp only [wfAll1Psi, wfAll1PsiC, wfAll1PsiAtC, shapeFCun, shapeFCbin, unT, binT, consT,
+    bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn,
     eqCodeFn, andc, orc, implc, forallc, carcT, lencT, nthcT, varc, liftc, funcc, tcFn,
-    cons, nil, zero, succ, numeralM, substTerm, substTerms, substTerm_numeral, substTerm_strCode]
+    cons, nil, zero, succ, numeralM, substTerm, substTerms, substTerm_numeral, substTerm_strCode,
+    substTerm_termCode]
 
 
 /-! ### ⭐ LA KEYSTONE: cómo baja `substfc` por el cuerpo -/
@@ -396,10 +548,10 @@ theorem prf_substtc_node0 (w s : Term) :
 /-- `substtc` sobre la lista de argumentos, en el nivel 1 (dentro del binder). -/
 theorem prf_substtc_args1 (w s s' : Term) (hs : Prf (liftc zero s =eq s')) :
     Prf (substtc (succ zero) (liftc zero s)
-          (nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (tcFn (numeralM 2)))
-      =eq nthcT (nthcT (tcFn w) s') (tcFn (numeralM 2))) := by
+          (nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (termCode (numeralM 2)))
+      =eq nthcT (nthcT (tcFn w) s') (termCode (numeralM 2))) := by
   refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
-  refine prf_congr_nthcT ?_ (prf_substtc_tcFn_at 1 _ (numeralM 2))
+  refine prf_congr_nthcT ?_ (prf_substtc_termCode_numeralM 1 2 _)
   refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
   refine prf_congr_nthcT (prf_substtc_tcFn_at 1 _ w) ?_
   exact prf_eq_trans
@@ -412,9 +564,9 @@ theorem prf_substfc_wfAll1Psi (w s s' : Term) (hs : Prf (liftc zero s =eq s')) :
   have hnode := prf_substtc_node0 w s
   have hargs := prf_substtc_args1 w s s' hs
   refine prf_eq_trans (prf_substfc_or zero s _ _) (prf_congr_orc ?_ ?_)
-  · exact prf_substfc_shapeDot s _ _ 0 2 hnode
+  · exact prf_substfc_shapeFCun_at 0 s _ _ 0 hnode
   refine prf_eq_trans (prf_substfc_and zero s _ _) (prf_congr_andc ?_ ?_)
-  · exact prf_substfc_shapeDot s _ _ 1 3 hnode
+  · exact prf_substfc_shapeFCbin_at 0 s _ _ 1 hnode
   -- el `bdAllCode` interno: se entra en el binder y el nivel sube a `σ0`
   refine prf_eq_trans (prf_substfc_forall zero s _) (prf_congr_forallc ?_)
   refine prf_eq_trans (prf_substfc_impl (succ zero) (liftc zero s) _ _)
@@ -588,8 +740,8 @@ theorem pcc_argsIn_trackedC (q Y : Term) :
 /-- El recorrido de `isTermCodeE1`, con la imagen ya en forma de **CÓDIGOS**: el nodo entra
     como `ND` (un código) en vez de como `tcFn X`. Es lo que pide `hbody`. -/
 noncomputable def isTermCodeE1DotC (q ND : Term) : Term :=
-  orc (shapeDot ND 0 2)
-      (andc (shapeDot ND 1 3) (argsInDotC (nthcT ND (tcFn (numeralM 2))) (tcFn q)))
+  orc (shapeFCun ND 0)
+      (andc (shapeFCbin ND 1) (argsInDotC (nthcT ND (termCode (numeralM 2))) (tcFn q)))
 
 /-- ⭐ **EL RECORRIDO EN FORMA DE CÓDIGOS.**
 
@@ -621,10 +773,9 @@ theorem pcc_isTermCodeE1_trackedC (q X ND : Term)
     have hsh : PrfH [shapeUn X 0, isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
         (shapeUn X 0) := PrfH.hyp _ _ (List.Mem.head _)
     have h0 : PrfH [shapeUn X 0, isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (shapeDot (tcFn X) 0 2)) :=
-      PrfH.mp _ _ _ (prf_to_prfH (pcc_shape_of_str X 0 2 _ (prf_shapeUn_str X 0)) _) hsh
-    exact PrfH_orL_code _ _
-      (PrfH_shapeDot_transport (tcFn X) ND 0 2 (substtc_inv_tcFn X) hNDinv hsym h0)
+        (provFromCode (shapeFCun (tcFn X) 0)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_shapeUn_fc X 0) _) hsh
+    exact PrfH_orL_code _ _ (PrfH_shapeFCun_transport 0 (tcFn X) ND hsym h0)
   · -- rama BINARIA
     have hND : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))),
         isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
@@ -657,46 +808,49 @@ theorem pcc_isTermCodeE1_trackedC (q X ND : Term)
         (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
     have hsh0 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (shapeDot (tcFn X) 1 3)) :=
-      PrfH.mp _ _ _ (prf_to_prfH (pcc_shape_of_str X 1 3 _ (prf_shapeBin_str X 1)) _) hsb
+        (provFromCode (shapeFCbin (tcFn X) 1)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_shapeBin_fc X 1) _) hsb
     have hshD : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (shapeDot ND 1 3)) :=
-      PrfH_shapeDot_transport (tcFn X) ND 1 3 (substtc_inv_tcFn X) hNDinv hsym hsh0
+        (provFromCode (shapeFCbin ND 1)) :=
+      PrfH_shapeFCbin_transport 1 (tcFn X) ND hsym hsh0
     have hA0 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
         (provFromCode (argsInDotC (tcFn (nthc X (numeralM 2))) (tcFn q))) :=
       PrfH.mp _ _ _ (prf_to_prfH (pcc_argsIn_trackedC q (nthc X (numeralM 2))) _) hargs
     have hev : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM 2)))
+        (provFromCode (eqCodeFn (nthcT (tcFn X) (termCode (numeralM 2)))
         (tcFn (nthc X (numeralM 2))))) :=
-      PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc X (numeralM 2)) _) hlt2
+      PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn
+          (prf_congr_nthcT (prf_refl _) (prf_tc_numeralM 2)) (prf_refl _))) _)
+        (PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc X (numeralM 2)) _) hlt2)
     have hcg : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (eqCodeFn (nthcT ND (tcFn (numeralM 2)))
-        (nthcT (tcFn X) (tcFn (numeralM 2))))) :=
-      PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_nthcT_arg1_code (tcFn (numeralM 2)) ND (tcFn X)
-        (substtc_inv_tcFn (numeralM 2)) hNDinv) _) hND
+        (provFromCode (eqCodeFn (nthcT ND (termCode (numeralM 2)))
+        (nthcT (tcFn X) (termCode (numeralM 2))))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_nthcT_arg1_code (termCode (numeralM 2)) ND (tcFn X)
+        (prf_substtc_termCode_numeralM 0 2) hNDinv) _) hND
     have hfwd : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (eqCodeFn (nthcT ND (tcFn (numeralM 2)))
+        (provFromCode (eqCodeFn (nthcT ND (termCode (numeralM 2)))
         (tcFn (nthc X (numeralM 2))))) :=
-      PrfH_eq_trans_code _ _ _ (substtc_inv_nthcT hNDinv (substtc_inv_tcFn (numeralM 2)))
+      PrfH_eq_trans_code _ _ _
+        (substtc_inv_nthcT hNDinv (prf_substtc_termCode_numeralM 0 2))
         hcg hev (by hw_auto) (by hw_auto) (by hw_auto)
     have hchain : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
         (provFromCode (eqCodeFn (tcFn (nthc X (numeralM 2)))
-        (nthcT ND (tcFn (numeralM 2))))) :=
-      PrfH_eq_symm_code _ _ (substtc_inv_nthcT hNDinv (substtc_inv_tcFn (numeralM 2)))
+        (nthcT ND (termCode (numeralM 2))))) :=
+      PrfH_eq_symm_code _ _ (substtc_inv_nthcT hNDinv (prf_substtc_termCode_numeralM 0 2))
         hfwd (by hw_auto) (by hw_auto)
     have hAD : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
-        (provFromCode (argsInDotC (nthcT ND (tcFn (numeralM 2))) (tcFn q))) :=
+        (provFromCode (argsInDotC (nthcT ND (termCode (numeralM 2))) (tcFn q))) :=
       PrfH_argsInDotC_transport q _ _ hchain hA0
         (prf_liftc_tcFn (nthc X (numeralM 2)))
-        (prf_eq_trans (prf_liftc_nthcT zero ND (tcFn (numeralM 2)))
-          (prf_congr_nthcT hNDlift (prf_liftc_tcFn (numeralM 2))))
+        (prf_eq_trans (prf_liftc_nthcT zero ND (termCode (numeralM 2)))
+          (prf_congr_nthcT hNDlift (prf_liftc_termCode_numeralM 2)))
     exact PrfH_orR_code _ _ (PrfH_and_intro_code _ _ hshD hAD)
 
 
@@ -748,6 +902,251 @@ theorem pcc_isTC1_tracked (w c : Term) :
     Prf (isTC1 w c ⇒ provFromCode (andc (wfAll1Dot w) (inFormCodeFn (tcFn c) (tcFn w)))) :=
   pcc_isTC1_tracked_of DEUDA_wfAll1_tracked_proved w c
 
+
+/-! ## §10 · LA COTA EN FORMA DE ACCESOR DOTADO: `wfAll1DotC`
+
+`pcc_bdAll_intro` entrega la cota como `(lenc w)˙`; el `condD` de ADR‑020 la pide como
+`lencT ẇ` — porque `formCode (wfAll1 #0)` codifica `lenc #1` como `lencT ⌜v₁⌝` y `substfc`
+rellena el hueco con `ẇ`, **sin** volver a meter el `lenc` dentro del punto.
+
+El salto de `(lenc w)˙` a `lencT ẇ` es `pcc_eval_lenc`, y **sólo vale dentro de `Prov`**: va
+por `PrfH_bdAllCode_congr_bnd`, exactamente como `pcc_argsIn_trackedC` (§8) hace con su lista.
+La obligación que ese lema pide —que el cuerpo sea invariante bajo `substfc` de NIVEL 1— es
+`hPinv_wfAll1Psi`: el cuerpo sólo tiene `⌜v₀⌝` fuera del `bdAllCode` interno y `⌜v₀⌝`/`⌜v₁⌝`
+dentro (niveles 0 y, bajo el binder, 0 y 1), así que el nivel 1 exterior no toca nada. -/
+
+/-- **El cuerpo de `wfAll1` es invariante bajo `substfc` de nivel 1.**
+
+    Es la obligación `hPinv` de `PrfH_bdAllCode_congr_bnd`. Fuera del `bdAllCode` interno sólo
+    aparece `⌜v₀⌝` (nivel 0 < 1); dentro, el binder sube el nivel a 2 y allí viven `⌜v₀⌝` (el
+    índice interno) y `⌜v₁⌝` (el externo desplazado), los dos por debajo de 2. -/
+theorem hPinv_wfAll1Psi (w : Term) : ∀ u : Term,
+    Prf (substfc (succ zero) u (wfAll1Psi w) =eq wfAll1Psi w) := by
+  intro u
+  have hnode : Prf (substtc (succ zero) u (nthcT (tcFn w) (varc (numeral 0)))
+      =eq nthcT (tcFn w) (varc (numeral 0))) :=
+    prf_eq_trans (prf_substtc_nthcT (succ zero) u _ _)
+      (prf_congr_nthcT (prf_substtc_tcFn_at 1 u w)
+        (prf_mp (prf_substtc_var_lt (succ zero) u (numeral 0)) (prf_zero_lt_succ zero)))
+  have hargs : Prf (substtc (succ (succ zero)) (liftc zero u)
+      (nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (termCode (numeralM 2)))
+      =eq nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (termCode (numeralM 2))) := by
+    refine prf_eq_trans (prf_substtc_nthcT (succ (succ zero)) _ _ _) ?_
+    refine prf_congr_nthcT ?_ (prf_substtc_termCode_numeralM 2 2 _)
+    refine prf_eq_trans (prf_substtc_nthcT (succ (succ zero)) _ _ _) ?_
+    exact prf_congr_nthcT (prf_substtc_tcFn_at 2 _ w)
+      (prf_mp (prf_substtc_var_lt (succ (succ zero)) _ (succ (numeral 0)))
+        (prf_lt_succ_self (succ zero)))
+  unfold wfAll1Psi wfAll1PsiC wfAll1PsiAtC
+  refine prf_eq_trans (prf_substfc_or (succ zero) u _ _) (prf_congr_orc ?_ ?_)
+  · exact prf_substfc_shapeFCun_at 1 u _ _ 0 hnode
+  refine prf_eq_trans (prf_substfc_and (succ zero) u _ _) (prf_congr_andc ?_ ?_)
+  · exact prf_substfc_shapeFCbin_at 1 u _ _ 1 hnode
+  refine prf_eq_trans (prf_substfc_forall (succ zero) u _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl (succ (succ zero)) (liftc zero u) _ _)
+    (prf_congr_implc ?_ ?_)
+  · refine prf_eq_trans
+      (prf_substfc_atom2CodeFn (succ (succ zero)) (liftc zero u) lt_sym _ _) ?_
+    refine prf_congr_atom2CodeFn
+      (prf_mp (prf_substtc_var_lt (succ (succ zero)) _ (numeral 0))
+        (prf_zero_lt_succ (succ zero))) ?_
+    exact prf_eq_trans (prf_substtc_lencT (succ (succ zero)) _ _) (prf_congr_lencT hargs)
+  · refine prf_eq_trans
+      (prf_substfc_atom2CodeFn (succ (succ zero)) (liftc zero u) in_sym _ _) ?_
+    refine prf_congr_atom2CodeFn ?_ (prf_substtc_tcFn_at 2 _ w)
+    refine prf_eq_trans (prf_substtc_nthcT (succ (succ zero)) _ _ _) ?_
+    exact prf_congr_nthcT hargs
+      (prf_mp (prf_substtc_var_lt (succ (succ zero)) _ (numeral 0))
+        (prf_zero_lt_succ (succ zero)))
+
+/-- ⭐ **`wfAll1` reflejado con la cota ya DOTADA.** Misma prueba que `pcc_argsIn_trackedC`:
+    `pcc_eval_lenc` dentro de `Prov` y `PrfH_bdAllCode_congr_bnd` para meterlo bajo el binder. -/
+theorem pcc_wfAll1_trackedC (w : Term) :
+    Prf (wfAll1 w ⇒ provFromCode (wfAll1DotC (tcFn w))) := by
+  refine prf_deduction ?_
+  have h0 : PrfH [wfAll1 w] (provFromCode (wfAll1Dot w)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_wfAll1_tracked w) _) (prfH_hyp_self _)
+  have hbnd : PrfH [wfAll1 w] (provFromCode (eqCodeFn (tcFn (lenc w)) (lencT (tcFn w)))) :=
+    PrfH_eq_symm_code _ _ (substtc_inv_lencT (substtc_inv_tcFn w))
+      (prf_to_prfH (pcc_eval_lenc w) _) (by hw_auto) (by hw_auto)
+  exact PrfH_bdAllCode_congr_bnd _ _ _ (hPinv_wfAll1Psi w)
+    (prf_liftc_tcFn (lenc w))
+    (prf_eq_trans (prf_liftc_lencT zero (tcFn w)) (prf_congr_lencT (prf_liftc_tcFn w)))
+    hbnd h0
+
+
+/-! ## §11 · ⭐ EL PASO `∃`: DE `isTC1` A `hasWit`, CON EL HUECO DEL TESTIGO
+
+`hasWit c = ∃x. isTC1 x c` (`Minimal/Axioms.lean:1052`), así que subir §9 por el `∃` es
+`pcc_exIntro_code_open` (`Meta/Delta0ReflectPrf.lean:74`) — la variante **abierta**, que no
+exige clausurar `Ac`.
+
+⭐ **Lo que hay que modelar bien es el hueco.** Bajo el `∃`, el testigo es una **VARIABLE DE
+CÓDIGO QUE SE DESPLAZA**: `⌜v₀⌝` en el cuerpo, `⌜v₁⌝` dentro del `∀` de `wfAll1`, y `⌜v₂⌝`
+dentro del `∀` anidado de `argsIn`. Por eso `wfAll1PsiAtC` lleva **dos** ranuras de testigo
+(`WD` y `WD'`) y no una: con testigo cerrado (`tcFn w`) coinciden, con el hueco del `∃` no. -/
+
+/-- La imagen de `wfAll1` con las **dos** ranuras del testigo separadas. Con testigo cerrado es
+    `wfAll1DotC` (por `rfl`); con el hueco del `∃` es `wfAll1DotAtC ⌜v₁⌝ ⌜v₂⌝`. -/
+noncomputable def wfAll1DotAtC (WD WD' : Term) : Term :=
+  bdAllCode (lencT WD) (wfAll1PsiAtC WD WD' (varc (numeral 0)) (varc (numeral 1)))
+
+example (WD : Term) : wfAll1DotC WD = wfAll1DotAtC WD WD := rfl
+
+/-- ⭐ **EL CUERPO DEL `∃`**, con el testigo como hueco `⌜v₀⌝` y la casilla `I` del testigo de
+    línea `T` ya en forma de accesor dotado. Es el `Ac` de `pcc_exIntro_code_open`. -/
+noncomputable def hasWitAc (T I : Term) : Term :=
+  andc (wfAll1DotAtC (varc (numeral 1)) (varc (numeral 2)))
+       (inFormCodeFn (nthcT T I) (varc (numeral 0)))
+
+/-- ⭐ **LA KEYSTONE DEL `∃`**: rellenar el hueco baja por los TRES niveles a la vez. El
+    testigo entra como `U` fuera, `liftc 0 U` bajo el `∀` de `wfAll1` y `liftc 0 (liftc 0 U)`
+    bajo el de `argsIn`; con `U` cerrado los dos `liftc` se colapsan y queda `wfAll1DotC U`. -/
+theorem prf_substfc_wfAll1DotAtC (U : Term) (hU : Prf (liftc zero U =eq U)) :
+    Prf (substfc zero U (wfAll1DotAtC (varc (numeral 1)) (varc (numeral 2)))
+      =eq wfAll1DotC U) := by
+  have hU2 : Prf (liftc zero (liftc zero U) =eq U) :=
+    prf_eq_trans (NumCodeClosedPrf.prf_congr_liftc hU) hU
+  have hW1 : Prf (substtc (numeral 1) (liftc zero U) (varc (numeral 1)) =eq U) :=
+    prf_eq_trans
+      (prf_mp (prf_substtc_var_eq (numeral 1) (liftc zero U) (numeral 1)) (prf_refl _)) hU
+  have hi1 : Prf (substtc (numeral 1) (liftc zero U) (varc (numeral 0)) =eq varc (numeral 0)) :=
+    prf_mp (prf_substtc_var_lt (numeral 1) (liftc zero U) (numeral 0)) (prf_zero_lt_succ zero)
+  have hW2 : Prf (substtc (numeral 2) (liftc zero (liftc zero U)) (varc (numeral 2)) =eq U) :=
+    prf_eq_trans (prf_mp
+      (prf_substtc_var_eq (numeral 2) (liftc zero (liftc zero U)) (numeral 2)) (prf_refl _)) hU2
+  have hj2 : Prf (substtc (numeral 2) (liftc zero (liftc zero U)) (varc (numeral 1))
+      =eq varc (numeral 1)) :=
+    prf_mp (prf_substtc_var_lt (numeral 2) (liftc zero (liftc zero U)) (numeral 1))
+      (prf_lt_succ_self (numeral 1))
+  have hi2 : Prf (substtc (numeral 2) (liftc zero (liftc zero U)) (varc (numeral 0))
+      =eq varc (numeral 0)) :=
+    prf_mp (prf_substtc_var_lt (numeral 2) (liftc zero (liftc zero U)) (numeral 0))
+      (prf_zero_lt_succ (numeral 1))
+  have hnode : Prf (substtc (numeral 1) (liftc zero U)
+      (nthcT (varc (numeral 1)) (varc (numeral 0))) =eq nthcT U (varc (numeral 0))) :=
+    prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hW1 hi1)
+  have hargs : Prf (substtc (numeral 2) (liftc zero (liftc zero U))
+      (nthcT (nthcT (varc (numeral 2)) (varc (numeral 1))) (termCode (numeralM 2)))
+      =eq nthcT (nthcT U (varc (numeral 1))) (termCode (numeralM 2))) := by
+    refine prf_eq_trans (prf_substtc_nthcT _ _ _ _) ?_
+    exact prf_congr_nthcT
+      (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hW2 hj2))
+      (prf_substtc_termCode_numeralM 2 2 _)
+  unfold wfAll1DotAtC wfAll1DotC wfAll1PsiC wfAll1PsiAtC
+  refine prf_eq_trans (prf_substfc_forall zero U _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl (numeral 1) (liftc zero U) _ _) (prf_congr_implc ?_ ?_)
+  · refine prf_eq_trans (prf_substfc_atom2CodeFn (numeral 1) (liftc zero U) lt_sym _ _) ?_
+    exact prf_congr_atom2CodeFn hi1
+      (prf_eq_trans (prf_substtc_lencT _ _ _) (prf_congr_lencT hW1))
+  refine prf_eq_trans (prf_substfc_or (numeral 1) (liftc zero U) _ _) (prf_congr_orc ?_ ?_)
+  · exact prf_substfc_shapeFCun_at 1 (liftc zero U) _ _ 0 hnode
+  refine prf_eq_trans (prf_substfc_and (numeral 1) (liftc zero U) _ _) (prf_congr_andc ?_ ?_)
+  · exact prf_substfc_shapeFCbin_at 1 (liftc zero U) _ _ 1 hnode
+  refine prf_eq_trans (prf_substfc_forall (numeral 1) (liftc zero U) _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl (numeral 2) (liftc zero (liftc zero U)) _ _)
+    (prf_congr_implc ?_ ?_)
+  · refine prf_eq_trans
+      (prf_substfc_atom2CodeFn (numeral 2) (liftc zero (liftc zero U)) lt_sym _ _) ?_
+    exact prf_congr_atom2CodeFn hi2
+      (prf_eq_trans (prf_substtc_lencT _ _ _) (prf_congr_lencT hargs))
+  · refine prf_eq_trans
+      (prf_substfc_atom2CodeFn (numeral 2) (liftc zero (liftc zero U)) in_sym _ _) ?_
+    exact prf_congr_atom2CodeFn
+      (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hargs hi2)) hW2
+
+/-- Y con el `In` al lado: el cuerpo entero, con el hueco relleno. -/
+theorem prf_substfc_hasWitAc (T I U : Term) (hU : Prf (liftc zero U =eq U))
+    (hT : ∀ W, Prf (substtc zero W T =eq T)) (hI : ∀ W, Prf (substtc zero W I =eq I)) :
+    Prf (substfc zero U (hasWitAc T I)
+      =eq andc (wfAll1DotC U) (inFormCodeFn (nthcT T I) U)) := by
+  unfold hasWitAc
+  refine prf_eq_trans (prf_substfc_and zero U _ _)
+    (prf_congr_andc (prf_substfc_wfAll1DotAtC U hU) ?_)
+  refine prf_eq_trans (prf_substfc_atom2CodeFn zero U in_sym _ _) ?_
+  exact prf_congr_atom2CodeFn
+    (prf_eq_trans (prf_substtc_nthcT zero U _ _) (prf_congr_nthcT (hT U) (hI U)))
+    (prf_substtc_varc0 U)
+
+/-- `liftTerm` atraviesa el cuerpo del ∃: todo lo demas es codigo CERRADO. Es lo que necesita
+    la guarda `hwA` de `pcc_exIntro_code_open`, que la pide bajo el lift. -/
+theorem liftTerm_hasWitAc (c : Nat) (T I : Term) :
+    liftTerm c (hasWitAc T I) = hasWitAc (liftTerm c T) (liftTerm c I) := by
+  simp only [hasWitAc, wfAll1DotAtC, wfAll1PsiAtC, shapeFCun, shapeFCbin, unT, binT, consT,
+    bdAllCode, inFormCodeFn, ltCodeFn, atom2CodeFn, eqCodeFn, andc, orc, implc, forallc,
+    lencT, nthcT, varc, funcc, cons, nil, zero, succ, numeralM,
+    liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode, liftTerm_termCode]
+
+/-- ⭐⭐ **EL CUERPO DEL `∃`, REFLEJADO Y CERRADO POR `∃`-intro.**
+
+    Las dos mitades son §10 (`pcc_wfAll1_trackedC`, con la cota ya dotada) y
+    `pcc_In_atom_tracked`; el único transporte es de `(nthc t ı̇)˙` a `nthcT ṫ ı̄`, que es
+    `pcc_eval_nthc` y **por eso pide la cota** `ı̇ < lenc t` — la que `Hcond` trae de
+    `lenc t = ṅ`. -/
+theorem pcc_isTC1_exc_body (t : Term) (i : Nat) :
+    Prf (isTC1 (.var 0) (nthc t (numeralM i)) ⇒
+      (lt (numeralM i) (lenc t) ⇒
+        provFromCode (exc (hasWitAc (tcFn t) (termCode (numeralM i)))))) := by
+  refine prf_deduction (deduction_aux ?_ (lt (numeralM i) (lenc t))
+    [isTC1 (.var 0) (nthc t (numeralM i))] rfl)
+  have hlt : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (lt (numeralM i) (lenc t)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hTC : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (isTC1 (.var 0) (nthc t (numeralM i))) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hL : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (provFromCode (wfAll1DotC (tcFn (.var 0)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_wfAll1_trackedC (.var 0)) _) (PrfH_and_elim_left hTC)
+  have hR0 : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (provFromCode (inFormCodeFn (tcFn (nthc t (numeralM i))) (tcFn (.var 0)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (nthc t (numeralM i)) (.var 0)) _)
+      (PrfH_and_elim_right hTC)
+  have hev : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (provFromCode (eqCodeFn (nthcT (tcFn t) (termCode (numeralM i)))
+        (tcFn (nthc t (numeralM i))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn
+        (prf_congr_nthcT (prf_refl _) (prf_tc_numeralM i)) (prf_refl _))) _)
+      (PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc t (numeralM i)) _) hlt)
+  have hsym : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (provFromCode (eqCodeFn (tcFn (nthc t (numeralM i)))
+        (nthcT (tcFn t) (termCode (numeralM i))))) :=
+    PrfH_eq_symm_code _ _
+      (substtc_inv_nthcT (substtc_inv_tcFn t) (prf_substtc_termCode_numeralM 0 i))
+      hev (by hw_auto) (by hw_auto)
+  have hR : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (provFromCode (inFormCodeFn (nthcT (tcFn t) (termCode (numeralM i))) (tcFn (.var 0)))) :=
+    PrfH_in_transport _ _ _ (substtc_inv_tcFn (.var 0)) hsym hR0
+  have hAnd := PrfH_and_intro_code _ _ hL hR
+  have hsub : PrfH [lt (numeralM i) (lenc t), isTC1 (.var 0) (nthc t (numeralM i))]
+      (provFromCode (substfc zero (tcFn (.var 0))
+        (hasWitAc (tcFn t) (termCode (numeralM i))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
+      (prf_substfc_hasWitAc (tcFn t) (termCode (numeralM i)) (tcFn (.var 0))
+        (prf_liftc_tcFn (.var 0)) (substtc_inv_tcFn t)
+        (prf_substtc_termCode_numeralM 0 i)))) _) hAnd
+  exact PrfH.mp _ _ _ (prf_to_prfH (pcc_exIntro_code_open
+    (hasWitAc (tcFn t) (termCode (numeralM i))) (tcFn (.var 0))
+    (by simp only [liftTerm_hasWitAc, liftTerm_tcFn, liftTerm_termCode]; hw_auto)
+    (by simp only [liftTerm_tcFn]; hw_auto)) _) hsub
+
+
+/-- ⭐⭐⭐ **`hasWit` REFLEJADO**, con `t` abstracto: la mitad de `DEUDA_hGuardT` que no es
+    fontanería de `condD`. El `∃` objeto se elimina con `prf_ex_elim_imp`, y lo único que hay
+    que cuidar es que el lift atraviese la imagen — que lo hace, porque salvo `ṫ` todo el
+    cuerpo es código cerrado (`liftTerm_hasWitAc`). -/
+theorem pcc_hasWit_exc (t : Term) (i : Nat) :
+    Prf (hasWit (nthc t (numeralM i)) ⇒
+      (lt (numeralM i) (lenc t) ⇒
+        provFromCode (exc (hasWitAc (tcFn t) (termCode (numeralM i)))))) := by
+  unfold hasWit
+  refine prf_ex_elim_imp ?_
+  refine PrfH.mp _ _ _ ?_ (prfH_hyp_self _)
+  simpa only [liftFormula, liftFormula_provFromCode_open, liftTerm_exc_open,
+    liftTerm_hasWitAc, liftTerm_tcFn, liftTerm_termCode, isTC1, land, wfAll1, wfAll1Body,
+    lt, lenc, nthc, liftTerm, liftTerms, liftTerm_numeralM, cons, nil, zero, succ,
+    Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true]
+    using prf_to_prfH (pcc_isTC1_exc_body (liftTerm 0 t) i)
+      [isTC1 (.var 0) (liftTerm 0 (nthc t (numeralM i)))]
+
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -760,12 +1159,18 @@ export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
   DEUDA_wfAll1_tracked pcc_isTC1_tracked_of
   PrfH_congr_argsIn_wit prf_argsIn_to_pair argsInDot pcc_argsIn_tracked'
   pcc_shape_of_str isTermCodeE1Dot pcc_isTermCodeE1_tracked
+  treeUn1 treeBin1 shapeFCun shapeFCbin pcc_shapeUn_fc pcc_shapeBin_fc
+  shapeUnCtx shapeBinCtx prf_substfc_shapeUnCtx prf_substfc_shapeBinCtx
+  PrfH_shapeFCun_transport PrfH_shapeFCbin_transport
+  prf_liftc_termCode_numeralM prf_substfc_shapeFCun_at prf_substfc_shapeFCbin_at
   wfAll1Args prf_liftc_wfAll1Args prf_substtc_liftc_wfAll1Args_gen
   prf_substtc_liftc_wfAll1Args
   wfAll1PsiAt wfAll1Psi wfAll1Dot
   hCl_wfAll1 hCs_wfAll1 hbl_lenc hbs_lenc hPl_wfAll1Psi hPs_wfAll1Psi
   prf_substtc_node0 prf_substtc_args1 prf_substfc_wfAll1Psi hPsiId_wfAll1Psi hwPsi_wfAll1Psi
   pcc_wfAll1_tracked_of_hbody DEUDA_wfAll1_of_hbody pcc_isTC1_tracked_of_hbody
+  wfAll1PsiAtC wfAll1PsiC wfAll1DotC hPinv_wfAll1Psi pcc_wfAll1_trackedC
+  wfAll1DotAtC hasWitAc prf_substfc_wfAll1DotAtC prf_substfc_hasWitAc liftTerm_hasWitAc pcc_isTC1_exc_body pcc_hasWit_exc
   argsInPsi argsInPair liftF_argsInPair substF_argsInPair
   liftT_argsInBnd substT_argsInBnd liftT_argsInPsi substT_argsInPsi
   prf_substfc_argsInPsi prf_argsInPsi_id prf_argsIn_body
