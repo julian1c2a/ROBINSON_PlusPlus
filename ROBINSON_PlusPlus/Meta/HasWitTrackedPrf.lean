@@ -274,6 +274,51 @@ theorem pcc_isTermCodeE1_tracked (wT X : Term) :
     (pcc_shape_of_str X 1 3 _ (prf_shapeBin_str X 1))
     (pcc_argsIn_tracked' wT (nthc X (numeralM 2)))
 
+
+/-! ## §6 · ⭐ LA CONMUTACIÓN `substtc`/`liftc` PARA EL `Z` QUE APARECE — sin el lema general
+
+§3.43.6 midió que el `pcc_bdAll_intro` **exterior** necesitaba
+
+    substtc (σv) (liftc 0 t) (liftc 0 Z)  =eq  liftc 0 (substtc v t Z)
+
+con `Z` **arbitrario** —el lema de sustitución/lift a nivel de código, que no existe y sería una
+inducción objeto nueva—. **No hace falta.** Los `Z` que aparecen de verdad son códigos de
+**forma conocida** (`nthcT` sobre `tcFn` y el hueco), y para ésos basta con que `liftc` sepa
+atravesar sus constructores: eso es el kit de `Meta/TrackedAtomsPrf.lean`, cinco líneas por
+constructor sobre axiomas que ya estaban.
+
+Aquí se hace la cuenta entera para el `Z` del cuerpo de `wfAll1`, que es el caso que bloqueaba. -/
+
+/-- El `Z` del cuerpo de `wfAll1`: la casilla 2 del nodo `i`‑ésimo del testigo, con el hueco
+    del índice en `⌜v₀⌝`. -/
+noncomputable def wfAll1Args (w : Term) : Term :=
+  nthcT (nthcT (tcFn w) (varc (numeral 0))) (tcFn (numeralM 2))
+
+/-- `liftc` sobre él: el hueco pasa de `⌜v₀⌝` a `⌜v₁⌝` y todo lo demás es cerrado. -/
+theorem prf_liftc_wfAll1Args (w : Term) :
+    Prf (liftc zero (wfAll1Args w)
+      =eq nthcT (nthcT (tcFn w) (varc (succ (numeral 0)))) (tcFn (numeralM 2))) := by
+  refine prf_eq_trans (prf_liftc_nthcT zero _ _) ?_
+  refine prf_congr_nthcT ?_ (prf_liftc_tcFn (numeralM 2))
+  exact prf_eq_trans (prf_liftc_nthcT zero _ _)
+    (prf_congr_nthcT (prf_liftc_tcFn w) prf_liftc_varc0)
+
+/-- ⭐ **LA CONMUTACIÓN, HECHA.** Bajar el `substfc` por dentro del binder ya no está
+    bloqueado: el `substtc` de nivel 1 sobre el `Z` lifteado devuelve el `Z` con el hueco
+    relleno, que es exactamente lo que pide `hbody`. -/
+theorem prf_substtc_liftc_wfAll1Args (w s : Term) :
+    Prf (substtc (succ zero) (liftc zero (tcFn s)) (liftc zero (wfAll1Args w))
+      =eq nthcT (nthcT (tcFn w) (tcFn s)) (tcFn (numeralM 2))) := by
+  refine prf_eq_trans (prf_congr_substtc3 (prf_liftc_wfAll1Args w)) ?_
+  refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
+  refine prf_congr_nthcT ?_ (prf_substtc_tcFn_at 1 _ (numeralM 2))
+  refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
+  refine prf_congr_nthcT (prf_substtc_tcFn_at 1 _ w) ?_
+  exact prf_eq_trans
+    (prf_mp (prf_substtc_var_eq (succ zero) (liftc zero (tcFn s)) (succ (numeral 0)))
+      (prf_refl _))
+    (prf_liftc_tcFn s)
+
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -286,6 +331,7 @@ export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
   DEUDA_wfAll1_tracked pcc_isTC1_tracked_of
   PrfH_congr_argsIn_wit prf_argsIn_to_pair argsInDot pcc_argsIn_tracked'
   pcc_shape_of_str isTermCodeE1Dot pcc_isTermCodeE1_tracked
+  wfAll1Args prf_liftc_wfAll1Args prf_substtc_liftc_wfAll1Args
   argsInPsi argsInPair liftF_argsInPair substF_argsInPair
   liftT_argsInBnd substT_argsInBnd liftT_argsInPsi substT_argsInPsi
   prf_substfc_argsInPsi prf_argsInPsi_id prf_argsIn_body

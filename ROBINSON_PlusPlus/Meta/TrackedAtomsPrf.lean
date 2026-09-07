@@ -82,6 +82,60 @@ theorem prf_substfc_inDot (s A A' W : Term)
   exact prf_eq_trans (prf_substtsc_cons zero s W nil)
     (prf_eq_trans (prf_congr_cons_head (hW s)) (prf_congr_cons_tail (prf_substtsc_nil zero s)))
 
+/-! ### KIT de distribución de `liftc` sobre los constructores DOTADOS
+
+⭐ **Esto es lo que de verdad hacía falta para el `pcc_bdAll_intro` exterior**, y no el lema
+general de sustitución/lift. Cuando un `∀` acotado va **anidado**, lo que va dentro del binder
+hay que pre‑`liftc`‑arlo (idiom de `bdInB` en `sondeos/A3IsFCBTracked.lean:318`), y allí el
+argumento era **cerrado** (`tcFn w`), así que `prf_liftc_tcFn` lo colapsaba. Con un argumento
+que **contiene el hueco del índice** eso ya no vale… pero tampoco hace falta el lema general
+`substtc (σv) (liftc 0 t) (liftc 0 Z) =eq liftc 0 (substtc v t Z)` con `Z` **arbitrario**: los
+`Z` que aparecen son códigos de **forma conocida**, y basta con que `liftc` sepa atravesar sus
+constructores. Eso es este kit, y son cinco líneas por constructor.
+
+Los axiomas objeto ya estaban (`ax_liftc_var_ge`, `ax_liftc_func`, `ax_liftsc_nil/cons`); lo
+único que faltaba era componerlos. -/
+
+/-- `liftc 0 ⌜v₀⌝ = ⌜v₁⌝`: el desplazamiento del hueco al entrar en un binder. -/
+theorem prf_liftc_varc0 : Prf (liftc zero (varc (numeral 0)) =eq varc (succ (numeral 0))) :=
+  prf_mp (prf_liftc_var_ge zero (numeral 0)) (prf_zero_lt_succ (numeral 0))
+
+/-- `liftc` atraviesa un constructor dotado UNARIO. -/
+theorem prf_liftc_funcc1 (c s a : Term) :
+    Prf (liftc c (funcc s (cons a nil)) =eq funcc s (cons (liftc c a) nil)) :=
+  prf_eq_trans (prf_liftc_func c s _)
+    (prf_congr_funcc2 (prf_eq_trans (prf_liftsc_cons c a nil)
+      (prf_congr_cons_tail (prf_liftsc_nil c))))
+
+/-- `liftc` atraviesa un constructor dotado BINARIO. -/
+theorem prf_liftc_funcc2 (c s a b : Term) :
+    Prf (liftc c (funcc s (cons a (cons b nil)))
+      =eq funcc s (cons (liftc c a) (cons (liftc c b) nil))) :=
+  prf_eq_trans (prf_liftc_func c s _)
+    (prf_congr_funcc2 (prf_eq_trans (prf_liftsc_cons c a (cons b nil))
+      (prf_congr_cons_tail (prf_eq_trans (prf_liftsc_cons c b nil)
+        (prf_congr_cons_tail (prf_liftsc_nil c))))))
+
+/-- `liftc` atraviesa `nthcT`. -/
+theorem prf_liftc_nthcT (c x y : Term) :
+    Prf (liftc c (nthcT x y) =eq nthcT (liftc c x) (liftc c y)) :=
+  prf_liftc_funcc2 c (strCode "nthc") x y
+
+/-- `liftc` atraviesa `lencT`. -/
+theorem prf_liftc_lencT (c x : Term) :
+    Prf (liftc c (lencT x) =eq lencT (liftc c x)) :=
+  prf_liftc_funcc1 c (strCode "lenc") x
+
+/-- `liftc` atraviesa `carcT`. -/
+theorem prf_liftc_carcT (c x : Term) :
+    Prf (liftc c (carcT x) =eq carcT (liftc c x)) :=
+  prf_liftc_funcc1 c (strCode "carc") x
+
+/-- `liftc` atraviesa `cdrcT`. -/
+theorem prf_liftc_cdrcT (c x : Term) :
+    Prf (liftc c (cdrcT x) =eq cdrcT (liftc c x)) :=
+  prf_liftc_funcc1 c (strCode "cdrc") x
+
 /-- **`substfc` sobre una forma `shapeDot`**: sólo toca la ranura del nodo. Es la pieza que
     consume cualquier recorrido de disyuntos por forma (C3‑T, C3‑F). -/
 theorem prf_substfc_shapeDot (s X X' : Term) (k n : Nat)
@@ -424,6 +478,8 @@ Los consumidores previstos son **C3** (`DEUDA_hGuardT`/`DEUDA_hGuardF`) y **D3**
 todo él es genérico: no hay aquí fontanería privada de ningún frente. -/
 export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
   shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substtc_child
+  prf_liftc_varc0 prf_liftc_funcc1 prf_liftc_funcc2
+  prf_liftc_nthcT prf_liftc_lencT prf_liftc_carcT prf_liftc_cdrcT
   bdInB bdInPhic bdInDot substtc_inv_bdInB liftTerm_bdInDot pcc_boundedIn_tracked
   phiInBwd InBwd prf_substtc_varc0_at1 pcc_InBwd_computed pcc_In_atom_tracked
   PrfH_congr_cdrcT pcc_carcD_bridge_cons pcc_cdrcD_bridge_cons PrfH_in_transport
