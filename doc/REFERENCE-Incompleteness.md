@@ -3843,3 +3843,77 @@ Tres pasos, todos con la máquina ya escrita:
    [substCodeT_closed …]`.
 
 ⇒ **la mitad cara está hecha**; lo que queda es ensamblaje con piezas existentes.
+
+---
+
+## §3.46 · 🏁🏁 C3‑F CERRADO — `DEUDA_hGuardF` PROBADA, y la cascada de ADR‑020 sin deudas (2026‑09‑08e)
+
+> `Build completed successfully (133 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> `Meta/HasWitFTrackedPrf.lean` (1 230 l.).
+
+```
+pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n) : DEUDA_hGuardF i n t
+hGuard_of_slots  -- `hGuard` SIN NINGUNA obligación abierta
+```
+
+⭐⭐ **ADR‑020 queda enteramente descargado.** `hGuard_of_deudas` pedía las **dos**
+obligaciones que la enmienda dejó abiertas (§3.41.3); `hGuard_of_slots` no pide ninguna.
+
+### §3.46.1 · Los cuatro pasos, y dónde estaba el trabajo
+
+| paso | qué | coste real |
+|---|---|---|
+| **[0.]** §8 | el cuerpo del `∃∃` (`wfAllFDotAtC`, `hasWitFAc`) y ⭐⭐ **el `rfl` que decide el frente** | el `rfl` compiló a la primera |
+| **[1.]** §9 | `pcc_isFC1_trackedC` — las tres mitades ya estaban (§7, C3‑T, kit genérico) | trivial, como estaba medido |
+| **[2.]** §10 | **el `∃∃`** | **aquí estaba todo el trabajo** |
+| **[3.]** §11‑§12 | la fontanería `condD` (otra vez `rfl`) y el cierre | pequeño |
+
+### §3.46.2 · ⭐ Por qué el `∃∃` es distinto del `∃` de C3‑T
+
+En `hasWitF c = ∃∃. isFC1 #1 #0 ↑↑c`, el `∃` **EXTERIOR** liga `wF` (que en el cuerpo es
+`⌜v₁⌝`) y el **interior** liga `wT` (`⌜v₀⌝`) — se lee de la definición, no de la intuición.
+Consecuencia:
+
+> los dos huecos se rellenan **en dos pasadas Y A NIVELES DISTINTOS**: primero
+> `substfc (σ0) (liftc 0 ẇF)` y después `substfc 0 ẇT`.
+
+Y eso es lo que obligó a **abrir el nivel** de la keystone. `prf_substfc_wfAll1DotAtC` (C3‑T)
+sólo sabía bajar desde el nivel `zero`; se generalizó a `prf_substfc_wfAll1DotAtC_gen` —con el
+nivel y las dos ranuras abiertas— y **el lema de C3‑T pasa a ser su instancia `v = 0`**
+(ADR‑019: una sola fuente, no dos descensos parecidos). Su gemelo
+`prf_substfc_wfAllFDotAtC_gen` hace lo propio con las ocho cláusulas.
+
+Los dos `pcc_exIntro_code_open` se encadenan por `prf_substfc_ex`, que es exactamente lo que
+convierte el `substfc` de nivel 0 sobre un `exc` en un `exc` del `substfc` de nivel 1.
+
+🔑 **La lección**: cuando un `∃` se anida, lo que hay que generalizar **no es el testigo: es el
+NIVEL**. Escribir la keystone con el nivel fijo funciona hasta el primer anidamiento, y el
+segundo obliga a reescribirla entera. Abrirla desde el principio es gratis.
+
+### §3.46.3 · Dos trampas de homónimo, las dos destapadas por el compilador
+
+* ⚠️ **`prf_numeral_lt` es de `Full.numeral`.** El de `Godel.numeral` —el que usan `varc` y los
+  niveles de `substtc`— es **`prf_gnum_lt`** (`Meta/ArithPrf.lean:124`). Es la familia de
+  trampas ya registrada (`numeralM` vs `numeral` vs `Full.numeral`): tres numerales distintos,
+  nombres casi iguales, y el error que producen habla de un tipo, no del homónimo.
+* ⚠️ **No existe `and`‑elim a nivel de CÓDIGO** (sólo `PrfH_and_intro_code`). Se intentó
+  «reflejar `isFC1` entero y luego partirlo para transportar la casilla»; la cura fue no
+  partirlo: **ensamblar las tres mitades ya transportadas**, que además sale más corto.
+
+### §3.46.4 · ⚠️ Qué desbloquea esto EXACTAMENTE — y qué no
+
+**Lo que sí**: la deuda que ADR‑020 generó está saldada. Los 7 esquemas enmendados recuperan su
+`hcond` **a partir del de su condición estructural**, sin ninguna hipótesis extra salvo que los
+índices de casilla caigan bajo la longitud canónica — y las **once** casillas reales lo cumplen
+(cuatro `wit`: (3,4)(3,4)(3,5)(4,5); siete `witF`: (2,4)(2,4)(3,4)(2,5)(2,3)(2,4)(2,3),
+comprobado con un `decide`).
+
+**Lo que NO**: ⚠️ **C3 no queda cerrado.** `pcc_lineWF_tracked_modulo_7` pide un reflector por
+tag, y medido en el árbol hay **14** (`p1`, `p2`, `c1`, `c2`, `c3`, `j1`, `j2`, `j3`, `p3`,
+`gen`, `efq`, `mp`, `thy`, `eqrefl`) y **ninguno de los 7 de sustitución**. Lo que falta de esos
+siete es ahora **sólo la condición ESTRUCTURAL** `C₀` de cada uno —el RHS del esquema, con
+`substfcT`/`substtcT`/`predcT`/`liftcT`—, que es justo donde entran `pcc_eval_substtc` (B3.2) y
+`pcc_eval_substfc` (B3.4). **El conjunto extra ya no estorba**: `hGuard_of_slots` lo absorbe.
+
+⇒ El orden correcto del enunciado: *«ADR‑020 ya no debe nada; C3 sigue abierto, pero por la
+mitad que B3.2/B3.4 compraron, no por la que la enmienda añadió.»*

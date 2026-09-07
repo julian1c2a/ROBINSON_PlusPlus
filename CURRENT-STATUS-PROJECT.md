@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-08d · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-08e · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -34,6 +34,17 @@
 > namespaces, **31 ya en producción**.
 > ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
 > literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
+>
+> 🏁🏁 **2026-09-08e · C3-F CERRADO: `DEUDA_hGuardF` PROBADA** (§3.46).
+> `pcc_hGuardF` + `hGuard_of_slots`: **la cascada de ADR-020 no tiene ninguna obligación
+> abierta**. Footprint = la base sancionada, net-0 puro.
+> ⭐ Todo el trabajo estaba en el **`∃∃`**: el `∃` EXTERIOR liga `wF` y el INTERIOR `wT`, luego
+> los huecos se rellenan **en dos pasadas y a NIVELES DISTINTOS** ⇒ hubo que **abrir el nivel**
+> de la keystone. 🔑 Cuando un `∃` se anida, lo que hay que generalizar no es el testigo: es el
+> NIVEL.
+> ⚠️ **Y lo que esto NO cierra**: C3 sigue abierto. `pcc_lineWF_tracked_modulo_7` pide un
+> reflector por tag y hay **14** en el árbol, ninguno de los 7 de sustitución. Pero lo que les
+> falta es ya **sólo la condición ESTRUCTURAL**, que es lo que B3.2/B3.4 compraron.
 >
 > 🏁 **2026-09-08d · C3-F, la mitad cara: `Meta/HasWitFTrackedPrf.lean`** (§3.45, 828 l.,
 > net-0 puro). `pcc_wfAllF_trackedC` — `wfAllF` reflejado con los DOS testigos abstractos y la

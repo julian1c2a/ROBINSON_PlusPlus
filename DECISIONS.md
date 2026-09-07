@@ -1050,3 +1050,34 @@ eso pide generalizar el descenso `prf_substfc_wfAll1DotAtC` a nivel arbitrario�
 `condD`, que es el `rfl` ya comprobado. **Ninguna de las tres es contenido nuevo.**
 
 **Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
+
+
+### Addendum 2026‑09‑08e · 🏁🏁 ADR‑020 NO DEBE NADA — `DEUDA_hGuardF` probada
+
+`pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n)` y `hGuard_of_slots`
+(`Meta/HasWitFTrackedPrf.lean`). Footprint = la base sancionada; **net‑0 puro**. Árbol verde a
+133 jobs. Detalle en `doc/REFERENCE-Incompleteness.md` §3.46.
+
+**Las DOS obligaciones que este ADR generó están saldadas.** `hGuard_of_deudas` (addendum
+2026‑09‑07b) pedía `DEUDA_hGuardT` y `DEUDA_hGuardF`; `hGuard_of_slots` no pide ninguna. Lo
+único que se añade sobre el chasis original es la cota de casilla `i < n`, que **no es un
+artefacto** (addendum 2026‑09‑08c) y que cumplen las **once** casillas que la enmienda declara:
+
+| casillas | pares `(i, n)` |
+|---|---|
+| las **cuatro** `hasWit` | (3,4) (3,4) (3,5) (4,5) |
+| las **siete** `hasWitF` | (2,4) (2,4) (3,4) (2,5) (2,3) (2,4) (2,3) |
+
+Comprobado con un `decide` sobre la lista. 11 = el recuento que este ADR declara.
+
+**⚠️ Y lo que esto NO cierra, dicho antes de que alguien lo lea al revés.** C3 sigue abierto:
+`pcc_lineWF_tracked_modulo_7` pide un reflector por tag y en el árbol hay **14**, ninguno de los
+7 de sustitución. Pero lo que les falta es ahora **sólo su condición ESTRUCTURAL** —el RHS del
+esquema, con `substfcT`/`substtcT`—, que es exactamente lo que `pcc_eval_substtc` (B3.2) y
+`pcc_eval_substfc` (B3.4) compraron. **El conjunto extra que este ADR añadió ya no estorba.**
+
+⇒ El enunciado correcto es: *«ADR‑020 ya no debe nada; C3 sigue abierto, pero por la mitad que
+B3.2/B3.4 compraron, no por la que la enmienda añadió.»* Que es justo lo que la línea roja de
+la decisión prometía.
+
+**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
