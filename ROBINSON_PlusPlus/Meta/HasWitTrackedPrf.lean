@@ -20,20 +20,24 @@ en cuatro líneas apoyado en el kit genérico que ya está en producción
 
 ⇒ Queda **una** obligación de contenido para esta mitad: reflejar el `∀` acotado `wfAll1`.
 
-## ⚠️ Dónde está la dificultad real, medida
+## Dónde estaba la dificultad — y por qué resultó no serlo
 
 `wfAll1 w = ∀i < lenc w. isTermCodeE1 w (nthc w i)`, y se ataca con `pcc_bdAll_intro`
 (`Meta/BdAllIntroPrf.lean:313`), cuya aplicación completa está ejercitada en aquel sondeo
 (`pcc_wfAll_tracked`, ocho obligaciones administrativas descargadas). Pero:
 
-> ⛔ **aquel `nodeOk` estaba diseñado para NO tener binders dentro del `∀` acotado** — el
+> ⚠️ **aquel `nodeOk` estaba diseñado para NO tener binders dentro del `∀` acotado** — el
 > sondeo eligió a propósito meter el `In` como **átomo** y no como su despliegue `∃`‑acotado,
 > «así el cuerpo del `∀` acotado no tiene ningún binder y todo el descenso de `substfc` vive en
 > nivel 0» (`sondeos/A3IsFCBTracked.lean` §2).
 >
 > `isTermCodeE1 wT X = shapeUn X 0 ∨ (shapeBin X 1 ∧ argsIn wT (nthc X 2))` **no tiene esa
-> propiedad**: `argsIn` es un `∀` acotado **anidado**. Ése es el contenido que falta, y no lo
-> cubre el kit.
+> propiedad**: `argsIn` es un `∀` acotado **anidado**.
+>
+> ✅ **Y esto ya NO es un obstáculo: §4 lo resuelve** (`pcc_argsIn_pair_tracked`), sin
+> reformular `isTermCodeE1` y por tanto **sin tocar `Minimal/Axioms.lean`**. La lectura de que
+> era un muro venía de leer «`∀` anidado» como «hay que meterse bajo un binder», y no lo es:
+> `pcc_bdAll_intro` es un lema del META‑nivel.
 
 La mitad `hasWitF` (`DEUDA_hGuardF`) es estrictamente peor: `isFormCodeE2` tiene **ocho**
 cláusulas y **dos** listas testigo, y `hasWitF` lleva un `∃∃`.

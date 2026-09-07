@@ -51,14 +51,23 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | la absorción del conjunto extra | ✅ `hcond_absorbe_cascade` (§3.41.3) |
 > | el **kit genérico** de reflexión Σ₁ (átomo `In`, `boundedIn`, formas, casillas) | ✅ `Meta/TrackedAtomsPrf.lean` (2026‑09‑08) |
 > | `DEUDA_hGuardT` · mitad `In c w` | ✅ `pcc_In_atom_tracked`, con los dos argumentos **abstractos** |
-> | `DEUDA_hGuardT` · mitad `wfAll1` | ⬜ **`DEUDA_wfAll1_tracked`** — la única obligación de contenido que queda de esta mitad |
+> | `DEUDA_hGuardT` · el `∀` acotado **ANIDADO** (`argsIn`) | ✅ `pcc_argsIn_pair_tracked` (§3.43) — **y sin tocar `Minimal/Axioms.lean`** |
+> | `DEUDA_hGuardT` · mitad `wfAll1` | ⬜ **`DEUDA_wfAll1_tracked`**: queda el recorrido de los DOS disyuntos de `isTermCodeE1` y el `pcc_bdAll_intro` EXTERIOR |
 > | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
 > | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |
 >
-> ⛔ **Y lo que la sesión del 2026‑09‑08 midió sobre `DEUDA_wfAll1_tracked`, que es lo caro**:
+> ✅ **RESUELTO 2026‑09‑08 (§3.43): el `∀` acotado ANIDADO no era un muro, y NO hubo que
+> reformular `isTermCodeE1`** —o sea, no hubo que tocar `Minimal/Axioms.lean` ni los 7 axiomas
+> enmendados—. 🔑 `pcc_bdAll_intro` es un lema del **META‑nivel**: sus hipótesis se cuantifican
+> sobre `q` e `i` **en Lean**, no bajo un binder objeto, así que anidar dos `∀` acotados en la
+> FÓRMULA son **dos aplicaciones independientes**. La única fricción era administrativa: `CF`
+> debe ser natural en UN parámetro y `argsIn wT Y` tiene dos libres ⇒ se empaquetan con `cons`
+> y se leen con `carc`/`cdrc`, naturales por construcción.
+>
+> Lo que sigue abierto de `DEUDA_wfAll1_tracked`, ya sin misterio:
 > se ataca con `pcc_bdAll_intro`, cuya aplicación completa está ejercitada en
 > `sondeos/A3IsFCBTracked.lean` (`pcc_wfAll_tracked`, ocho obligaciones descargadas) — **pero
 > aquel `nodeOk` estaba DISEÑADO para no tener binders dentro del `∀` acotado**: el sondeo metió

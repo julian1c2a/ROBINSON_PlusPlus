@@ -3250,3 +3250,78 @@ no dicen nada, y se van enteros.
   `SubstfcEx.lean` son **variantes del mismo trabajo** y declaran ellos mismos los nombres que
   usan. **Consumo de una copia no es consumo**, y fingir la medición habría sido peor que
   decirlo.
+
+---
+
+## §3.43 · C3 · El `∀` acotado ANIDADO, reflejado — y el axioma que no hubo que tocar (2026‑09‑08)
+
+> `Build completed successfully (132 jobs)` · **118 módulos**. `Meta/TrackedAtomsPrf.lean` (21
+> declaraciones promovidas) y `Meta/HasWitTrackedPrf.lean`. Footprint = la base sancionada.
+
+§3.42 dejó C3 en dos deudas genéricas; §3.41.5 midió qué hacía falta. Al bajar `DEUDA_hGuardT`
+apareció lo que parecía el muro, y resultó no serlo.
+
+### §3.43.1 · La pregunta: ¿había que reformular `isTermCodeE1`?
+
+`hasWit c = ∃w. isTC1 w ↑c` e `isTC1 w c = wfAll1 w ∧ In c w`. Esa segunda línea **es**
+exactamente la forma `isFCB w c = wfAll w ∧ In c w` que `sondeos/A3IsFCBTracked.lean` reflejó
+entera, así que el escalón `pcc_isTC1_tracked_of` sale en cuatro líneas — con la mitad derecha
+pagada por `pcc_In_atom_tracked`, el átomo `In` reflejado **con los dos argumentos abstractos**.
+
+Quedaba `wfAll1 w = ∀i < lenc w. isTermCodeE1 w (nthc w i)`, y ahí
+
+    isTermCodeE1 wT X = shapeUn X 0 ∨ (shapeBin X 1 ∧ argsIn wT (nthc X 2))
+
+lleva `argsIn`, que es un **`∀` acotado anidado**. Aquel sondeo había evitado justo eso: metió
+el `In` como **átomo a propósito**, «así el cuerpo del `∀` acotado no tiene ningún binder y todo
+el descenso de `substfc` vive en nivel 0» (su §2). De ahí la pregunta natural: **¿reformular
+`isTermCodeE1` con `In` atómico?**
+
+⛔ Eso sería tocar `Minimal/Axioms.lean` **dentro de los 7 axiomas enmendados por ADR‑020**:
+cambia qué demuestra `Prov`, y es decisión del autor. **No hizo falta.**
+
+### §3.43.2 · 🔑 Por qué el anidamiento no era un muro
+
+> **`pcc_bdAll_intro` es un lema del META‑nivel.** Sus hipótesis están cuantificadas sobre `q` e
+> `i` **en Lean** (`hbody : ∀ q i, Prf (…)`), no bajo un binder objeto. Anidar dos `∀` acotados
+> en la **fórmula** no obliga a anidar nada en Lean: son **dos aplicaciones independientes**.
+
+Lo que hacía parecer un muro era leer «`∀` anidado» como «hay que meterse bajo un binder». El
+cuerpo de la aplicación interior es `pcc_child_tracked_at` — `pcc_child_tracked` con el índice
+**abstracto** —, y sale **más corto** que la versión literal: allí la cota `j < lenc X` había
+que derivarla de `lenc X = ṅ` y `j < n`; aquí llega directamente como hipótesis, que es
+exactamente la forma en que `pcc_bdAll_intro` la entrega.
+
+### §3.43.3 · ⚠️ La única fricción real era administrativa: `CF` natural en UN parámetro
+
+`pcc_bdAll_intro` pide `liftFormula k (CF q) = CF (liftTerm k q)`. Pero
+`liftFormula k (argsIn wT Y) = argsIn (liftTerm k wT) (liftTerm k Y)`: **`argsIn wT` no es
+natural**, porque `wT` también se levanta. Con dos términos libres y un solo parámetro, la
+condición no se puede escribir… hasta que se empaquetan:
+
+```lean
+def argsInPair (p : Term) : Formula := argsIn (carc p) (cdrc p)
+```
+
+`carc p = Term.func "carc" [p]`, así que `liftTerm k (carc p) = carc (liftTerm k p)` **por
+computación**, y la naturalidad sale sola. Es la misma necesidad con la que se topó aquel
+sondeo, y por eso el kit trae `pcc_carcD_bridge_cons`/`pcc_cdrcD_bridge_cons`.
+
+> 🔑 **Regla que deja este episodio**: cuando un lema genérico pide naturalidad en **un**
+> parámetro y el predicado tiene **dos** argumentos libres, no es un límite del lema: se
+> empaquetan con `cons` y se leen con accesores, que son naturales por construcción.
+
+### §3.43.4 · Lo que entra, y dónde queda C3
+
+* `Meta/TrackedAtomsPrf.lean` — el **kit genérico** (21 de 81 declaraciones de aquel sondeo,
+  cero homónimos): `pcc_In_atom_tracked`, `pcc_boundedIn_tracked`, `pcc_shape_tracked`,
+  `pcc_child_tracked`, **`pcc_child_tracked_at`**, `pcc_carcIn_tracked`/`_cdrcIn_tracked`.
+  Sirve a **C3‑T, C3‑F y D3** a la vez: es la mitad que **no depende del predicado de nodo**.
+  ⚠️ De 14 errores a 0 — el sondeo es anterior a ADR‑020. Diez guardas se **pagan** con
+  `hw_auto`; la undécima (`PrfH_in_transport`, tres argumentos abstractos) **no se puede pagar**
+  y se **arrastra** con `autoParam`.
+* `Meta/HasWitTrackedPrf.lean` — `pcc_isTC1_tracked_of` y ⭐ **`pcc_argsIn_pair_tracked`**.
+
+De `DEUDA_wfAll1_tracked` queda el recorrido de los **dos disyuntos** de `isTermCodeE1` y su
+ensamblaje por el `pcc_bdAll_intro` **exterior**. Las dos piezas que ese recorrido consume —la
+de forma (`pcc_shape_tracked`) y la de pertenencia (`pcc_argsIn_pair_tracked`)— ya están.
