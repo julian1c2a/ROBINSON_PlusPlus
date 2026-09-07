@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 97 + Full 11) + 0 en
+`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 98 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
@@ -13,7 +13,10 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **`pcc_eval_liftfc`** (decisión del autor, 2026‑09‑08d)
+> # 🎯 SIGUIENTE SESIÓN — **`PrfH_dotVN` para `STree`**, que cierra q1, q2 y leibniz
+>
+> Y después **`pcc_eval_liftfc`**, que ahora está **cuantificado**: bloquea **4 de los 7**
+> reflectores de sustitución (q3, qconf, ind, listInd), o sea el 57 % de lo que queda de C3.
 >
 > ⛔ `pcc_eval_liftfc` **no existe en ningún sitio**: es **trabajo nuevo**, no promoción. Es la
 > evaluación provable de `liftfc` —el hermano de `pcc_eval_substfc` (B3.4) para la familia
@@ -85,7 +88,11 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | `DEUDA_hGuardF` · `isFC1` | ✅ `pcc_isFC1_trackedC` |
 > | `DEUDA_hGuardF` · el `∃∃` | ✅ `pcc_hasWitF_exc` (§3.46.2). ⭐ **Aquí estaba todo el trabajo**: hubo que **abrir el NIVEL** de la keystone (`prf_substfc_wfAll1DotAtC_gen`, del que el lema de C3‑T pasa a ser la instancia `v = 0`) y escribir su gemelo `prf_substfc_wfAllFDotAtC_gen` |
 > | ⭐ **`DEUDA_hGuardF`** | 🏁 **PROBADA** — `pcc_hGuardF`, y con `hGuard_of_slots` **la cascada de ADR‑020 sin deudas** |
-> | **C3 · los 7 reflectores de sustitución** | ⬜ ⚠️ **LO QUE QUEDA DE C3**: hay 14 reflectores por tag y **ninguno de los 7**. Lo que les falta es ya sólo la condición **ESTRUCTURAL** (`substfcT`/`substtcT`), que es lo que B3.2/B3.4 compraron; el conjunto extra ya no estorba |
+> | C3 · el chasis del árbol con `substfc` | ✅ `Meta/SubstTreeReflect.lean` (§3.47): `STree` con nodo `sub`, sus cinco inducciones y `prf_condD_of_stree_eq`. ⛔ Tipo nuevo, no extensión de `CTree`: **ciclo de imports** |
+> | C3 · el núcleo tiene que VER las guardas | ✅ `hcond_absorbe_1/2/3` (§3.47.2) — es la propiedad que ADR‑020 compró, cobrada por primera vez |
+> | C3 · los árboles de q1, q2, leibniz | ✅ declarados y **casados por `rfl` con los axiomas ENTEROS**, cascada incluida ⇒ el `∃ C` de §2.1 resuelto para tres |
+> | C3 · **`PrfH_dotVN` para `STree`** | ⬜ **LA PIEZA QUE CIERRA q1, q2 y leibniz.** Único caso nuevo: el nodo `sub`, que paga `pcc_eval_substfc_wit` con las guardas del contexto + `pcc_congr_substfcT_arg2_code`/`_arg3_code` |
+> | C3 · q3 (11), qconf (19), ind (18), listInd (20) | ⛔ **bloqueados por `pcc_eval_liftfc`** — medido: 4 de los 7 |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |

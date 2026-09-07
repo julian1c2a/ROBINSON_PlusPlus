@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 133 jobs · 119 módulos activos** (Minimal 11 + Meta 97 + Full 11) **+ 0 en `cuarentena/`
+> **Build 134 jobs · 120 módulos activos** (Minimal 11 + Meta 98 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2996,7 +2996,7 @@ editar un fichero que otro agente audita le invalida los números de línea.
 
 ## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 97 + Full 11).
+> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 98 + Full 11).
 > Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
 
 Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
@@ -3142,7 +3142,7 @@ la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`
 
 ## §3.42 · B3.4 CERRADO — `pcc_eval_substfc` en producción (2026‑09‑08)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 97 + Full 11).
+> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 98 + Full 11).
 > `Meta/EvalSubstfcPrf.lean` (1 620 l.). Footprint = la base sancionada; **ni un axioma nuevo**.
 
 ⭐ **El muro de `substfc` estaba roto desde 2026‑08‑31 (§3.30), pero vivía fuera del build.**
@@ -3762,7 +3762,7 @@ específicamente nuevo de C3‑F son las dos listas testigo y el `∃∃` de `ha
 
 ## §3.45 · C3‑F · `Meta/HasWitFTrackedPrf.lean` — la mitad cara de `DEUDA_hGuardF`, probada (2026‑09‑08d)
 
-> `Build completed successfully (133 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> `Build completed successfully (134 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
 > `Meta/HasWitFTrackedPrf.lean` (828 l.).
 
 ```
@@ -3848,7 +3848,7 @@ Tres pasos, todos con la máquina ya escrita:
 
 ## §3.46 · 🏁🏁 C3‑F CERRADO — `DEUDA_hGuardF` PROBADA, y la cascada de ADR‑020 sin deudas (2026‑09‑08e)
 
-> `Build completed successfully (133 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> `Build completed successfully (134 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
 > `Meta/HasWitFTrackedPrf.lean` (1 230 l.).
 
 ```
@@ -3917,3 +3917,84 @@ siete es ahora **sólo la condición ESTRUCTURAL** `C₀` de cada uno —el RHS 
 
 ⇒ El orden correcto del enunciado: *«ADR‑020 ya no debe nada; C3 sigue abierto, pero por la
 mitad que B3.2/B3.4 compraron, no por la que la enmienda añadió.»*
+
+---
+
+## §3.47 · C3 · Arranque de los 7 reflectores de sustitución — el chasis del árbol con `substfc` (2026‑09‑08f)
+
+> `Build completed successfully (134 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+> Footprint = **sólo los tres axiomas de Lean**: es trabajo estructural puro.
+
+### §3.47.1 · ⭐ El `liftfc` parte los siete en dos grupos
+
+Contado sobre los axiomas reales, no sobre la intuición:
+
+| tags | `liftfc` | `substfc` | `termCodeM` | alcanzable |
+|---|---|---|---|---|
+| **q1** (9), **q2** (10), **leibniz** (13) | **0** | 1 / 1 / 2 | 0 | ✅ con lo que B3.4 compró |
+| q3 (11), qconf (19) | 1 | 0 | 0 | ⛔ `pcc_eval_liftfc` |
+| ind (18) | 1 | 2 | 2 | ⛔ |
+| listInd (20) | **3** | 2 | 2 | ⛔ |
+
+⇒ **`pcc_eval_liftfc` bloquea 4 de los 7, y tres son alcanzables hoy.** Es la primera vez que
+ese frente aparece cuantificado: no es «lo siguiente» en abstracto, es **el 57 % de C3**.
+
+### §3.47.2 · ⚠️ Un hueco en el chasis: el núcleo no veía las guardas
+
+`hcond_absorbe_cascade` (§3.41.3) refleja cada conjunto de la cascada **por separado** — y para
+las guardas eso es exactamente lo que se quiere. Para la **condición estructural** no:
+
+> `pcc_eval_substfc_wit (v s f) : Prf (hasWit s ∧ hasWitF f ⇒ targetSubstfc v s f)`
+
+es una implicación **OBJETO** cuyo antecedente **son** las guardas. Con `t` abstracto,
+`hasWit (nthc t 3)` **no es demostrable** —eso es justamente lo que hace útil a la guarda—, así
+que el núcleo sólo puede pagarla teniéndola **en su contexto**.
+
+⇒ `hcond_absorbe_1/2/3` (`Meta/LineWFGuardPrf.lean` §5) dan al núcleo la fórmula guardada
+**entera** como antecedente. Cubren las tres longitudes de lista que la enmienda usa, o sea los
+**siete** tags.
+
+🔑 Y esto **es** la propiedad que ADR‑020 compró, cobrada por primera vez: *la guarda va dentro
+del `⇔` para que le llegue al reflector como conjunto objeto*. Hasta hoy era el argumento de la
+decisión; desde hoy es la hipótesis de un lema que compila.
+
+### §3.47.3 · ⛔ Por qué un tipo de árbol NUEVO y no extender `CTree`
+
+El paso caro de un nodo `substfc` es `pcc_eval_substfc` (`Meta/EvalSubstfcPrf.lean`, B3.4), y
+`Meta/CodeTreeReflect.lean` está **aguas ARRIBA** de ese módulo: añadirle un constructor `sub`
+haría imposible probar su caso. Es el mismo **ciclo de imports** que en B2 obligó a bajar el
+lema general en vez de hacerle un corolario.
+
+⇒ `STree` vive aguas abajo, y `CTree` se queda como está. No es duplicación por descuido: es
+una consecuencia medida del orden de imports, y así queda escrito.
+
+⚠️ `STree` trae **sólo** el nodo `sub`, no `lift`. Añadir un constructor cuya evaluación
+provable no existe sería declarar un caso que ninguna inducción puede cerrar.
+
+### §3.47.4 · Los tres árboles, casados con los axiomas ENTEROS
+
+Regla de método de §3.44 otra vez, y esta vez llega hasta el final: no sólo se casa la
+condición estructural con su árbol, sino **el esquema completo con su cascada de guardas**:
+
+```lean
+example : ax_lineWF_q1 =
+    forall_ (Formula.impl (tagF 9) (lwfVar ⇔ Formula.and (lencF 4)
+      (guardedCond [.witF 2, .wit 3] (condOfS treeQ1)))) := rfl
+```
+
+Los seis `rfl` (tres de `condOfS`, tres de esquema entero) compilaron a la primera. ⭐ Con eso,
+**el `∃ C` que §2.1 de `Meta/LineWFGuardPrf.lean` dejaba existencial queda RESUELTO** para q1,
+q2 y leibniz: ya no es «existe una condición estructural», es *ésta*.
+
+### §3.47.5 · Lo que queda para cerrar los tres
+
+**Una sola pieza**: `PrfH_dotVN` para `STree`. Los cuatro casos heredados son los de
+`CodeTreeReflect`; el único nuevo es el nodo `sub`, y lo paga
+
+* `pcc_eval_substfc_wit` con las guardas que `hcond_absorbe_1/2/3` ponen en el contexto
+  (⚠️ el `tcFn zero` de `evalSubstfcCode` se cruza con el `termCode zero` del árbol por
+  `prf_tc_zero`, congruencia META);
+* `pcc_congr_substfcT_arg2_code` / `_arg3_code` para bajar a los hijos dentro de `Prov`.
+
+Como esas guardas dependen del nodo, `PrfH_dotVN` para `STree` se enuncia con un predicado
+`SGuards Γ t T` que las exige **sólo en los nodos `sub`** — el resto del árbol no pide nada.

@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-08e · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-08f · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -34,6 +34,17 @@
 > namespaces, **31 ya en producción**.
 > ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
 > literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
+>
+> ▶ **2026-09-08f · C3 ARRANCADO: el chasis del árbol con `substfc`** (§3.47).
+> `Meta/SubstTreeReflect.lean` — `STree` con nodo `sub`; footprint = sólo los tres axiomas de
+> Lean. ⭐ Los árboles de **q1, q2 y leibniz** declarados y **casados por `rfl` con los axiomas
+> ENTEROS**, cascada de guardas incluida ⇒ el `∃ C` de §2.1 de `LineWFGuardPrf` queda resuelto
+> para tres tags.
+> ⚠️ Y un hueco del chasis, tapado: `hcond_absorbe_cascade` reflejaba cada conjunto por
+> separado, y el núcleo estructural **no veía las guardas** — que es justo lo que
+> `pcc_eval_substfc_wit` pide como antecedente OBJETO. `hcond_absorbe_1/2/3` se las dan.
+> ⭐ **Medición que cuantifica el siguiente frente**: `pcc_eval_liftfc` bloquea **4 de los 7**
+> reflectores (q3, qconf, ind, listInd); **tres son alcanzables hoy**.
 >
 > 🏁🏁 **2026-09-08e · C3-F CERRADO: `DEUDA_hGuardF` PROBADA** (§3.46).
 > `pcc_hGuardF` + `hGuard_of_slots`: **la cascada de ADR-020 no tiene ninguna obligación
@@ -81,8 +92,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
 >
-> **Build 133 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
-> **119 módulos activos** (Minimal 11 + Meta 97 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 134 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **120 módulos activos** (Minimal 11 + Meta 98 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >

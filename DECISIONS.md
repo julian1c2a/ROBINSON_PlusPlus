@@ -8,7 +8,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **119 módulos activos** (Minimal 11 + Meta 97 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **120 módulos activos** (Minimal 11 + Meta 98 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -1056,7 +1056,7 @@ eso pide generalizar el descenso `prf_substfc_wfAll1DotAtC` a nivel arbitrario�
 
 `pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n)` y `hGuard_of_slots`
 (`Meta/HasWitFTrackedPrf.lean`). Footprint = la base sancionada; **net‑0 puro**. Árbol verde a
-133 jobs. Detalle en `doc/REFERENCE-Incompleteness.md` §3.46.
+134 jobs. Detalle en `doc/REFERENCE-Incompleteness.md` §3.46.
 
 **Las DOS obligaciones que este ADR generó están saldadas.** `hGuard_of_deudas` (addendum
 2026‑09‑07b) pedía `DEUDA_hGuardT` y `DEUDA_hGuardF`; `hGuard_of_slots` no pide ninguna. Lo
