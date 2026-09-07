@@ -44,6 +44,8 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > * **El chasis de `hGuard`** (§3.41.3) — `Meta/LineWFGuardPrf.lean`, net‑0 **puro**.
 >   `hcond_absorbe_extra` (que vivía en **cinco copias fuera del build**) y
 >   ⭐ `hcond_absorbe_cascade`, que **reduce la deuda de los 7 tags a DOS lemas genéricos**.
+>   🏁🏁 *(y desde 2026‑09‑08e las **dos** están probadas: `pcc_hGuardT` / `pcc_hGuardF`;
+>   ADR‑020 no debe nada. Ver C3b del árbol de tareas y §3.44/§3.46.)*
 > * ⭐ **B3.4 · `Meta/EvalSubstfcPrf.lean`** (§3.42) — **el muro de `substfc`, dentro del
 >   build**: `pcc_eval_substfc`, `pcc_eval_substfc_wit` y el chasis genérico
 >   `pcc_eval_substfc_modulo_8`. De **806** declaraciones entraron **90**.
@@ -405,6 +407,9 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >            motivo para no hacerlo, pero es OTRO argumento y mucho mas debil.
 >   C3 ⏳ los 7 tags: q1 q2 q3 leibniz ind qconf listInd -- ENMENDADOS los 7. El arbol
 >         YA esta verde, asi que sus reflectores son lo unico que queda de la rama C.
+>         🏁🏁 2026-09-08e: LA DEUDA QUE LA ENMIENDA GENERO ESTA SALDADA (C3b). Lo que
+>         queda de C3 es la condicion ESTRUCTURAL de cada tag, que es lo que B3.2/B3.4
+>         compraron -- no lo que ADR-020 anadio.
 >         ✅ pcc_lineWF_tracked_modulo_7 GARANTIZA que cerrar esos 7 cierra
 >            pcc_lineWF_tracked, y que no hay nada mas aguas abajo
 >         ⭐ Y §3.40.3 confirma que esa garantia SIGUE VALIENDO bajo la enmienda: la
@@ -429,21 +434,63 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >                 sido un lema CORRECTO SOBRE LA FORMULA EQUIVOCADA -- y habria
 >                 compilado. §2.1 del modulo lo COMPRUEBA con siete `rfl` contra
 >                 Minimal/Axioms.lean, y el rfl cazo tres tags mal supuestos.
->         ⬜ C3b LO QUE QUEDA: DEUDA_hGuardT y DEUDA_hGuardF. MEDIDO lo que ya hay:
->              · atomos con terminos ABSTRACTOS: pcc_lt_tracked, pcc_eq_tracked. La
->                reflexion de una ecuacion NO necesita numerales: sale por congruencia
->                dotada (PrfH_congr_tcFn + Leibniz sobre Prov(a. = a.)).
->              · ∀ acotado: pcc_bdAll_intro (BdAllIntroPrf:313), keystone de hC_dot, que
->                ademas ya lleva la guarda hasWitF de ADR-020 en sus hipotesis.
->              · ∃ sin cota: pcc_exIntro_code_open (Delta0ReflectPrf:74).
->              · prf_In_iff_boundedIn (BoundedInPrf:391) reduce el atomo In a un ∃ acotado.
->              FALTA el RECORRIDO de isTC1/isFC1 bajo el ∃: la disyuncion de formas
->              (isTermCodeE1, y las OCHO clausulas de isFormCodeE2) y el argsIn interno,
->              que es un segundo ∀ acotado anidado. Es ENSAMBLAJE, no induccion nueva.
->              ⛔ Sigue vivo: la guarda DISCRIMINA (CRIT_hasWitF_rejects_varc), luego NO
->                 se puede descargar para codigo abstracto (Probe/MC_enmienda.lean §8).
->         ⬜ C3c pcc_eval_liftfc: NO EXISTE EN NINGUN SITIO. Trabajo nuevo, no promocion.
->         ⬜ C3d A5 generalizada mas alla del nivel `zero`.
+>         ✅ C3b LAS DOS DEUDAS, PROBADAS -- ADR-020 NO DEBE NADA.
+>              · DEUDA_hGuardT 🏁 2026-09-08c (§3.44): pcc_hGuardT (i n t) (hin : i<n),
+>                en Meta/HasWitTrackedPrf.lean. Net-0 puro.
+>              · DEUDA_hGuardF 🏁 2026-09-08e (§3.46): pcc_hGuardF, en
+>                Meta/HasWitFTrackedPrf.lean (1230 l.). Net-0 puro.
+>              · hGuard_of_slots: la cascada de los 7 tags SIN NINGUNA obligacion abierta.
+>              ⚠️ La UNICA condicion anadida es la cota de casilla i<n, y NO es un
+>                 artefacto: el puente (nthc t i.)˙ -> nthcT t. i- es pcc_eval_nthc, que la
+>                 exige. Las ONCE casillas reales la cumplen (decide sobre los pares).
+>              🔑 LAS TRES LECCIONES, por si vuelven a hacer falta:
+>                 (a) condD NO ADMITE ELEGIR IMAGEN: la impone formCode. Medir la forma no
+>                     basta cuando hay un DESTINO FIJO -- hay que medir la del destino y
+>                     casarla con rfl. Costo una sesion en C3-T; en C3-F costo cero.
+>                 (b) el testigo de un ∃ es una VARIABLE DE CODIGO QUE SE DESPLAZA, luego
+>                     el cuerpo necesita UNA RANURA POR NIVEL, no una.
+>                 (c) cuando un ∃ se ANIDA, lo que hay que generalizar no es el testigo:
+>                     es el NIVEL de la keystone de descenso.
+>         ⏳ C3c LOS 7 REFLECTORES DE SUSTITUCION -- ARRANCADO 2026-09-08f (§3.47).
+>              ⚠️ Medido: hay 14 reflectores por tag en el arbol y NINGUNO de los 7.
+>              ⭐ Y el liftfc los PARTE EN DOS GRUPOS (contado sobre los axiomas):
+>                    q1(9) q2(10) leibniz(13)  liftfc=0  => ALCANZABLES HOY con B3.4
+>                    q3(11) qconf(19)          liftfc=1  ⛔ pcc_eval_liftfc
+>                    ind(18)                   liftfc=1  ⛔
+>                    listInd(20)               liftfc=3  ⛔
+>                 => pcc_eval_liftfc bloquea 4 de los 7 (el 57% de lo que queda de C3).
+>              ✅ El chasis: Meta/SubstTreeReflect.lean -- STree, el arbol de codigo CON
+>                 nodo `sub` (= substfc 0 s f), sus cinco inducciones puras y
+>                 prf_condD_of_stree_eq. Footprint = SOLO los tres axiomas de Lean.
+>                 ⛔ Tipo NUEVO y no un constructor mas de CTree: el paso caro del nodo
+>                    `sub` es pcc_eval_substfc, y CodeTreeReflect esta aguas ARRIBA de
+>                    EvalSubstfcPrf. Mismo CICLO DE IMPORTS que en B2.
+>                 ⚠️ STree trae SOLO `sub`, no `lift`: declarar un constructor cuya
+>                    evaluacion provable no existe seria declarar un caso que ninguna
+>                    induccion puede cerrar.
+>              ✅ El hueco del chasis, tapado: hcond_absorbe_cascade reflejaba cada
+>                 conjunto POR SEPARADO, asi que el nucleo estructural NO VEIA LAS GUARDAS
+>                 -- y pcc_eval_substfc_wit es `hasWit s ∧ hasWitF f => ...`, una
+>                 implicacion OBJETO cuyo antecedente SON las guardas. hcond_absorbe_1/2/3
+>                 (LineWFGuardPrf §5) le dan la formula guardada ENTERA.
+>                 🔑 Es la propiedad que ADR-020 compro, COBRADA POR PRIMERA VEZ.
+>              ✅ treeQ1 / treeQ2 / treeLeibniz declarados y casados POR rfl con
+>                 ax_lineWF_q1/_q2/_leibniz ENTEROS, cascada de guardas incluida => el
+>                 `∃ C` de §2.1 de LineWFGuardPrf queda RESUELTO para tres tags.
+>              ⬜ FALTA PrfH_dotVN para STree -- LA PIEZA QUE CIERRA q1, q2 y leibniz.
+>                 Unico caso nuevo: el nodo `sub`, que pagan pcc_eval_substfc_wit (con las
+>                 guardas del contexto; ⚠️ el tcFn zero de evalSubstfcCode se cruza con el
+>                 termCode zero del arbol por prf_tc_zero) y
+>                 pcc_congr_substfcT_arg2_code/_arg3_code. Como las guardas dependen del
+>                 nodo, se enuncia con un predicado SGuards Γ t T que las exige SOLO en los
+>                 nodos `sub`.
+>         ⬜ C3d pcc_eval_liftfc: NO EXISTE EN NINGUN SITIO. Trabajo nuevo, no promocion.
+>              ⚠️ La familia liftc NO TIENE ARITMETIZACION NI A NIVEL META: no hay
+>                 prf_liftc_arith_open del que colgar el primer paso, que es lo que hizo
+>                 barato B3.4. Empezar MIDIENDO Meta/LiftcCodePrf.lean y
+>                 Meta/EvalLiftcPrf.lean, con pcc_eval_substfc_modulo_8 como molde de chasis.
+>              ⭐ Ya esta CUANTIFICADO: bloquea 4 de los 7 reflectores.
+>         ⬜ C3e A5 generalizada mas alla del nivel `zero`.
 >   C4 ✅ PROPAGACION HASTA EL VERDE -- HECHA (2026-09-07). Build 126 jobs, VERDE.
 >         ① ✅ HECHA: Meta/SubstfcWitnessPrf.lean (1912 l., net-0 puro). Sin ciclo,
 >              como estaba medido. ADR-019 TRES veces al promover.
@@ -473,13 +520,17 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >         ⛔ SU `hbody` SE PARTE EN DOS, Y LA PRIMERA MITAD ES C3:
 >            (1) reflejar el atomo `lineWF` = `pcc_lineWF_tracked` -- que NO EXISTE sin
 >                condicionar: solo `pcc_lineWF_tracked_modulo_7` (LineWFAssemblePrf:104), que
->                pide los 7 reflectores de C3, que piden DEUDA_hGuardT/DEUDA_hGuardF.
+>                pide los 7 reflectores de C3.
+>                ⭐ ACTUALIZADO 2026-09-08e: esos 7 YA NO piden DEUDA_hGuardT/hGuardF
+>                   (ambas probadas); piden su condicion ESTRUCTURAL, y de esas 3 son
+>                   alcanzables hoy y 4 esperan a pcc_eval_liftfc. Ver C3c.
 >            (2) reflejar `boundedPremsIn` = un SEGUNDO ∀ acotado anidado. Trabajo nuevo, misma
 >                forma => otra aplicacion de `pcc_bdAll_intro`. Esta mitad SI es independiente.
 >   D2 ⬜ d3_prf := d3_prf_of_chainOkBDot φ (…)   ✅ el consumidor YA existe y esta compilado
 >   ⭐ CONSECUENCIA PARA EL ORDEN DEL PLAN: **D3 esta AGUAS ABAJO de C3**. Ir a por D3 sin
 >      cerrar antes los 7 reflectores solo puede producir chasis, no el teorema. El camino
->      corto a Godel II sin `axiom d3` pasa por DEUDA_hGuardT/DEUDA_hGuardF.
+>      corto a Godel II sin `axiom d3` pasa hoy por C3c (PrfH_dotVN para STree, y despues
+>      pcc_eval_liftfc para los otros cuatro tags).
 > E · GÖDEL II
 >   E1 ⬜ goedel_second_prf     ✅ goedel_second' YA está montado (Meta/GodelTwo.lean)
 >   E2 ⬜ F7b: retirar el `axiom d3` (Meta/GodelTwo.lean) — 7 axiomas de Lean pasan a 6
