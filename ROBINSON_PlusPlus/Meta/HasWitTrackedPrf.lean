@@ -1147,6 +1147,100 @@ theorem pcc_hasWit_exc (t : Term) (i : Nat) :
     using prf_to_prfH (pcc_isTC1_exc_body (liftTerm 0 t) i)
       [isTC1 (.var 0) (liftTerm 0 (nthc t (numeralM i)))]
 
+
+/-! ## §12 · LA FONTANERÍA `condD`, Y `DEUDA_hGuardT` CERRADA
+
+`condD C t = substfc 0 ṫ (formCode C)` — un `substfc` **objeto** sobre un código literal.
+`prf_substfc_arith_open` (`Meta/SubstCodeOpenPrf.lean:138`) lo convierte en la función META
+`substCodeF`, y a partir de ahí ya no hay teoría: es una igualdad de términos que sale por
+`rfl`, porque cada cláusula de `substCodeF` cae sobre su constructor de código.
+
+⚠️ El único punto donde `rfl` no llega es el **índice de casilla**: `numeralM i` con `i`
+variable no reduce, y hace falta `substCodeT_closed` (que es un teorema, no una defeq). Por eso
+el `rfl` se enuncia con el índice ABSTRACTO y la instancia se cierra con un `rw`. -/
+
+/-- ⭐ **`condD` de la guarda, COMPUTADO** — con el índice abstracto, por `rfl`. -/
+theorem substCodeF_hasWit_nthc (t I : Term) :
+    substCodeF 0 (tcFn t) (hasWit (nthc (.var 0) I))
+      = exc (hasWitAc (liftc zero (tcFn t))
+              (substCodeT 1 (liftc zero (tcFn t)) (liftTerm 0 I))) := rfl
+
+/-- Congruencia de `hasWitAc` en la ranura de la LÍNEA. -/
+theorem prf_congr_hasWitAc_T {T T' I : Term} (h : Prf (T =eq T')) :
+    Prf (hasWitAc T I =eq hasWitAc T' I) := by
+  unfold hasWitAc
+  exact prf_congr_andc (prf_refl _)
+    (prf_congr_atom2CodeFn (prf_congr_nthcT h (prf_refl _)) (prf_refl _))
+
+/-- ⭐ **La alineación**: el código que `condD` impone **es** la imagen que §11 produce.
+    El `liftc` que `substCodeF` deja al entrar en el `∃` se colapsa con `prf_liftc_tcFn`. -/
+theorem prf_condD_hasWit_eq (t : Term) (i : Nat) :
+    Prf (condD (hasWit (nthc (.var 0) (numeralM i))) t
+      =eq exc (hasWitAc (tcFn t) (termCode (numeralM i)))) := by
+  have h : substCodeF 0 (tcFn t) (hasWit (nthc (.var 0) (numeralM i)))
+      = exc (hasWitAc (liftc zero (tcFn t)) (termCode (numeralM i))) := by
+    rw [substCodeF_hasWit_nthc, liftTerm_numeralM,
+      substCodeT_closed 1 (liftc zero (tcFn t)) (numeralM i) (fun c => liftTerm_numeralM c i)]
+  refine prf_eq_trans ?_ (prf_congr_exc (prf_congr_hasWitAc_T (prf_liftc_tcFn t)))
+  show Prf (substfc zero (tcFn t) (formCode (hasWit (nthc (.var 0) (numeralM i)))) =eq _)
+  rw [← h]
+  exact prf_substfc_arith_open 0 (tcFn t) _
+
+/-- ⭐⭐⭐ **`DEUDA_hGuardT` PROBADA**, para toda casilla `i` bajo la longitud canónica `n`.
+
+    La cota `i < n` **no es un artefacto**: el transporte `(nthc t ı̇)˙ → nthcT ṫ ı̄` es
+    `pcc_eval_nthc`, y sin la cota ese paso no existe. `Hcond` ya trae `lenc t = ṅ`, así que la
+    única condición que se añade es aritmética y la cumplen las cuatro casillas reales. -/
+theorem pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) :
+    ROBINSON_PlusPlus.Meta.LineWFGuardPrf.DEUDA_hGuardT i n t := by
+  show Prf (lineWF t ⇒ ((lenc t =eq numeralM n) ⇒
+    (substFormula 0 t (hasWit (nthc (.var 0) (numeralM i))) ⇒
+      provFromCode (condD (hasWit (nthc (.var 0) (numeralM i))) t))))
+  have hsub : substFormula 0 t (hasWit (nthc (.var 0) (numeralM i)))
+      = hasWit (nthc t (numeralM i)) := by
+    simp only [substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
+      FOL.substTerm_liftTerm, if_true]
+  rw [hsub]
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (hasWit (nthc t (numeralM i))) [lenc t =eq numeralM n, lineWF t] rfl)
+    (lenc t =eq numeralM n) [lineWF t] rfl)
+  have hhw : PrfH [hasWit (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
+      (hasWit (nthc t (numeralM i))) := PrfH.hyp _ _ (List.Mem.head _)
+  have hlenc : PrfH [hasWit (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
+      (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt : PrfH [hasWit (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
+      (lt (numeralM i) (lenc t)) :=
+    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlenc)
+      (prf_to_prfH (prf_lt_numeralM hin) _)
+  have hexc : PrfH [hasWit (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
+      (provFromCode (exc (hasWitAc (tcFn t) (termCode (numeralM i))))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_hasWit_exc t i) _) hhw) hlt
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_condD_hasWit_eq t i))) _) hexc
+
+/-- **Las CUATRO casillas `hasWit` de los 7 esquemas, con su longitud canónica**: todas cumplen
+    `i < n`, así que `pcc_hGuardT` las cubre todas. (Tags 9, 10 y 13; los otros cuatro tags no
+    llevan ninguna casilla `wit`.) -/
+example : [(3,4), (3,4), (3,5), (4,5)].all (fun p => decide (p.1 < p.2)) = true := by decide
+
+
+/-- ⭐⭐ **MEDIA CASCADA, DESCARGADA.** `hGuard_of_deudas` (`Meta/LineWFGuardPrf.lean`) pedía las
+    DOS deudas; la mitad `wit` ya no es hipótesis. Lo único que se añade es que los índices de
+    las casillas `wit` de la lista caigan bajo la longitud canónica — cosa que cumplen las
+    cuatro reales, y que la cota de `pcc_eval_nthc` hace inevitable. -/
+theorem hGuard_of_deudaF (t : Term) (n : Nat) (C : Formula)
+    (hC : ROBINSON_PlusPlus.Meta.LineWFGuardPrf.Hcond n t C)
+    (hF : ∀ i, ROBINSON_PlusPlus.Meta.LineWFGuardPrf.DEUDA_hGuardF i n t)
+    (gs : List ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot)
+    (hgs : ∀ i, List.Mem (ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot.wit i) gs → i < n) :
+    ROBINSON_PlusPlus.Meta.LineWFGuardPrf.Hcond n t
+      (ROBINSON_PlusPlus.Meta.LineWFGuardPrf.guardedCond gs C) :=
+  ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_cascade t n C hC gs
+    (fun g hg => by
+      cases g with
+      | wit i => exact pcc_hGuardT i n t (hgs i hg)
+      | witF i => exact hF i)
+
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -1171,12 +1265,17 @@ export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
   pcc_wfAll1_tracked_of_hbody DEUDA_wfAll1_of_hbody pcc_isTC1_tracked_of_hbody
   wfAll1PsiAtC wfAll1PsiC wfAll1DotC hPinv_wfAll1Psi pcc_wfAll1_trackedC
   wfAll1DotAtC hasWitAc prf_substfc_wfAll1DotAtC prf_substfc_hasWitAc liftTerm_hasWitAc pcc_isTC1_exc_body pcc_hasWit_exc
+  substCodeF_hasWit_nthc prf_congr_hasWitAc_T prf_condD_hasWit_eq pcc_hGuardT hGuard_of_deudaF
   argsInPsi argsInPair liftF_argsInPair substF_argsInPair
   liftT_argsInBnd substT_argsInBnd liftT_argsInPsi substT_argsInPsi
   prf_substfc_argsInPsi prf_argsInPsi_id prf_argsIn_body
   pcc_argsIn_pair_tracked pcc_argsIn_tracked
 )
 
+#print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_wfAll1_trackedC
+#print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_hasWit_exc
+#print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_hGuardT
+#print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.hGuard_of_deudaF
 #print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTC1_tracked_of
 #print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_argsIn_pair_tracked
 #print axioms ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTermCodeE1_tracked
