@@ -54,7 +54,8 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | `DEUDA_hGuardT` · el `∀` acotado **ANIDADO** (`argsIn`) | ✅ `pcc_argsIn_pair_tracked` (§3.43) — **y sin tocar `Minimal/Axioms.lean`** |
 > | `DEUDA_hGuardT` · el recorrido de los DOS disyuntos de `isTermCodeE1` | ✅ `pcc_isTermCodeE1_tracked` (§3.43.5) |
 > | `DEUDA_hGuardT` · la conmutación `substtc`/`liftc` bajo el binder | ✅ **DESBLOQUEADA** (§3.43.8): `prf_substtc_liftc_wfAll1Args` + el **kit de distribución de `liftc`**. ⚠️ §3.43.6/§3.43.7 estaban sobregeneralizados: **no** hacía falta el lema general con `Z` arbitrario **ni** el ADR — los `Z` reales tienen forma conocida |
-> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ⬜ ya sólo **ensamblaje**: definir `PsiF` con el kit, descargar las 9 obligaciones (8 son simp) y componer `hbody` con `pcc_isTermCodeE1_tracked` |
+> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ✅ **INSTANCIADO** (§3.43.9): 8 de las 9 obligaciones descargadas (`hwPsi` la paga `hw_auto`). ⭐ La clave fue parametrizar el cuerpo por los **dos** huecos (`⌜v₀⌝` fuera, `⌜v₁⌝` dentro) en vez de escribir `liftc`: una sola keystone sirve a `hPsiId` y a `hbody` |
+> | `DEUDA_hGuardT` · **`hbody`** | ⬜ **lo único que queda de esta mitad**. `pcc_isTermCodeE1_tracked` ya lo prueba salvo la FORMA de la imagen (objeto vs códigos). ⚠️ El transporte NO se puede dejar al final: la pieza `nthc (nthc q i) 2̇` necesita la cota `2̇ < lenc (nthc q i)`, que sólo existe **dentro** del disyunto `shapeBin` ⇒ hay que rehacer §3.43.5 entregando la forma de códigos desde dentro de cada disyunto |
 > | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
 > | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |

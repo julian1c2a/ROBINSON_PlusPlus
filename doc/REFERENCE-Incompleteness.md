@@ -3476,3 +3476,57 @@ es exactamente lo que pide `hbody`. El ensamblaje exterior deja de estar bloquea
 
 ⇒ **La decisión de §3.43.7 queda retirada**: no hay que elegir entre (a) y (b). La vía era una
 tercera que no había visto.
+
+### §3.43.9 · El `pcc_bdAll_intro` EXTERIOR, instanciado — 8 de 9 obligaciones
+
+`Meta/HasWitTrackedPrf.lean` §7. El ensamblaje exterior sobre `wfAll1` queda montado, y de las
+nueve obligaciones de `pcc_bdAll_intro` sólo queda `hbody`:
+
+```lean
+pcc_wfAll1_tracked_of_hbody (hbody) (w) : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w))
+DEUDA_wfAll1_of_hbody       (hbody)     : DEUDA_wfAll1_tracked wfAll1Dot
+pcc_isTC1_tracked_of_hbody  (hbody) (w c) : el reflector de `isTC1`, ya con imagen CONCRETA
+```
+
+`CF := wfAll1` es natural en **un** parámetro (`liftF_wfAll1`/`substF_wfAll1`), así que aquí
+**no** hubo que empaquetar con `cons` — a diferencia del `argsIn` de §3.43.3.
+
+#### ⭐ La decisión de diseño que lo hizo barato
+
+El cuerpo lleva el índice a **dos niveles**: fuera del `bdAllCode` interno y dentro, donde De
+Bruijn lo desplaza. En vez de escribirlo como `liftc 0 (…)` —que obligaría a transportar— se
+escribe `⌜v₁⌝` **explícitamente**, y el cuerpo se parametriza por los **dos** huecos:
+
+```lean
+wfAll1PsiAt w s s'          -- `s` fuera del binder, `s'` dentro
+wfAll1Psi w := wfAll1PsiAt w ⌜v₀⌝ ⌜v₁⌝
+```
+
+Con eso **una sola keystone** (`prf_substfc_wfAll1Psi`, con hipótesis `liftc 0 s =eq s'`) sirve
+a los dos consumidores: `hPsiId` la usa con `s := ⌜v₀⌝`, `s' := ⌜v₁⌝` —y entonces sale **por
+definición**— y `hbody` con `s := s' := ⌜i⌝`, que es cerrado. Cada uno paga el puente con
+`prf_liftc_varc0` o `prf_liftc_tcFn`.
+
+> 🔑 **Regla**: cuando un cuerpo bajo binder necesita el mismo parámetro a dos niveles, no lo
+> escribas con `liftc` — **parametrízalo por los dos** y deja que quien lo use aporte la
+> igualdad entre ellos. Convierte un transporte en una hipótesis de una línea.
+
+#### Las ocho descargadas
+
+`hCl`/`hCs` ya existían (`liftF_wfAll1`, `substF_wfAll1`); `hbl`/`hbs` y `hPl`/`hPs` son `simp`
+sobre los constructores (molde de A3 §8); `hPsiId` es la keystone; y ⭐ **`hwPsi` la paga
+`hw_auto`** — la táctica de ADR‑020 atraviesa el cuerpo entero sin ayuda.
+
+Piezas nuevas de kit: `prf_congr_forallc` (producción tenía la de `exc` y no ésta),
+`prf_substtc_node0` y `prf_substtc_args1` (el descenso del `substtc` por los dos niveles).
+
+#### ⚠️ Lo que queda, y por qué no es un transporte al final
+
+`hbody`: de `wfAll1 q` y `lt i (lenc q)`, dar `Prov(⌜wfAll1PsiAt q ⌜i⌝ ⌜i⌝⌝)`.
+`pcc_isTermCodeE1_tracked` (§3.43.5) ya lo prueba **salvo por la forma de la imagen**: entrega
+sobre el término objeto (`tcFn X`) y aquí se pide sobre **códigos**.
+
+⛔ **Y el transporte no se puede dejar para el final**: una de las piezas —`nthc (nthc q i) 2̇`—
+necesita la cota `2̇ < lenc (nthc q i)`, que **sólo existe dentro del disyunto `shapeBin`** (es
+donde `lenc X = 3̇`). Hay que rehacer §3.43.5 entregando la forma de códigos **desde dentro de
+cada disyunto**, donde las hipótesis están disponibles, en vez de transportarla después.
