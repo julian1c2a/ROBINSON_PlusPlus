@@ -999,61 +999,69 @@ noncomputable def hasWitAc (T I : Term) : Term :=
   andc (wfAll1DotAtC (varc (numeral 1)) (varc (numeral 2)))
        (inFormCodeFn (nthcT T I) (varc (numeral 0)))
 
-/-- ⭐ **LA KEYSTONE DEL `∃`**: rellenar el hueco baja por los TRES niveles a la vez. El
-    testigo entra como `U` fuera, `liftc 0 U` bajo el `∀` de `wfAll1` y `liftc 0 (liftc 0 U)`
-    bajo el de `argsIn`; con `U` cerrado los dos `liftc` se colapsan y queda `wfAll1DotC U`. -/
-theorem prf_substfc_wfAll1DotAtC (U : Term) (hU : Prf (liftc zero U =eq U)) :
-    Prf (substfc zero U (wfAll1DotAtC (varc (numeral 1)) (varc (numeral 2)))
-      =eq wfAll1DotC U) := by
-  have hU2 : Prf (liftc zero (liftc zero U) =eq U) :=
-    prf_eq_trans (NumCodeClosedPrf.prf_congr_liftc hU) hU
-  have hW1 : Prf (substtc (numeral 1) (liftc zero U) (varc (numeral 1)) =eq U) :=
-    prf_eq_trans
-      (prf_mp (prf_substtc_var_eq (numeral 1) (liftc zero U) (numeral 1)) (prf_refl _)) hU
-  have hi1 : Prf (substtc (numeral 1) (liftc zero U) (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 1) (liftc zero U) (numeral 0)) (prf_zero_lt_succ zero)
-  have hW2 : Prf (substtc (numeral 2) (liftc zero (liftc zero U)) (varc (numeral 2)) =eq U) :=
-    prf_eq_trans (prf_mp
-      (prf_substtc_var_eq (numeral 2) (liftc zero (liftc zero U)) (numeral 2)) (prf_refl _)) hU2
-  have hj2 : Prf (substtc (numeral 2) (liftc zero (liftc zero U)) (varc (numeral 1))
-      =eq varc (numeral 1)) :=
-    prf_mp (prf_substtc_var_lt (numeral 2) (liftc zero (liftc zero U)) (numeral 1))
-      (prf_lt_succ_self (numeral 1))
-  have hi2 : Prf (substtc (numeral 2) (liftc zero (liftc zero U)) (varc (numeral 0))
+/-- ⭐ **LA KEYSTONE DEL `∃`, GENERALIZADA** — a nivel arbitrario y con las dos ranuras de
+    testigo abiertas. La necesita C3‑F, donde el `∃∃` obliga a rellenar los huecos **en dos
+    pasadas** (primero `wF` a nivel 1, luego `wT` a nivel 0) y por tanto a niveles distintos de
+    `zero`. `prf_substfc_wfAll1DotAtC` es su instancia `v = 0` con testigo cerrado. -/
+theorem prf_substfc_wfAll1DotAtC_gen (v : Nat) (s WD WD' RD RD' : Term)
+    (hD : Prf (substtc (numeral (v + 1)) (liftc zero s) WD =eq RD))
+    (hD' : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s)) WD' =eq RD')) :
+    Prf (substfc (numeral v) s (wfAll1DotAtC WD WD') =eq wfAll1DotAtC RD RD') := by
+  have hi1 : Prf (substtc (numeral (v + 1)) (liftc zero s) (varc (numeral 0))
       =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 2) (liftc zero (liftc zero U)) (numeral 0))
-      (prf_zero_lt_succ (numeral 1))
-  have hnode : Prf (substtc (numeral 1) (liftc zero U)
-      (nthcT (varc (numeral 1)) (varc (numeral 0))) =eq nthcT U (varc (numeral 0))) :=
-    prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hW1 hi1)
-  have hargs : Prf (substtc (numeral 2) (liftc zero (liftc zero U))
-      (nthcT (nthcT (varc (numeral 2)) (varc (numeral 1))) (termCode (numeralM 2)))
-      =eq nthcT (nthcT U (varc (numeral 1))) (termCode (numeralM 2))) := by
+    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_gnum_lt (by omega : 0 < v + 1))
+  have hi2 : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s)) (varc (numeral 0))
+      =eq varc (numeral 0)) :=
+    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_gnum_lt (by omega : 0 < v + 2))
+  have hj2 : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s)) (varc (numeral 1))
+      =eq varc (numeral 1)) :=
+    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_gnum_lt (by omega : 1 < v + 2))
+  have hnode : Prf (substtc (numeral (v + 1)) (liftc zero s) (nthcT WD (varc (numeral 0)))
+      =eq nthcT RD (varc (numeral 0))) :=
+    prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hD hi1)
+  have hargs : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s))
+      (nthcT (nthcT WD' (varc (numeral 1))) (termCode (numeralM 2)))
+      =eq nthcT (nthcT RD' (varc (numeral 1))) (termCode (numeralM 2))) := by
     refine prf_eq_trans (prf_substtc_nthcT _ _ _ _) ?_
     exact prf_congr_nthcT
-      (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hW2 hj2))
-      (prf_substtc_termCode_numeralM 2 2 _)
-  unfold wfAll1DotAtC wfAll1DotC wfAll1PsiC wfAll1PsiAtC
-  refine prf_eq_trans (prf_substfc_forall zero U _) (prf_congr_forallc ?_)
-  refine prf_eq_trans (prf_substfc_impl (numeral 1) (liftc zero U) _ _) (prf_congr_implc ?_ ?_)
-  · refine prf_eq_trans (prf_substfc_atom2CodeFn (numeral 1) (liftc zero U) lt_sym _ _) ?_
-    exact prf_congr_atom2CodeFn hi1
-      (prf_eq_trans (prf_substtc_lencT _ _ _) (prf_congr_lencT hW1))
-  refine prf_eq_trans (prf_substfc_or (numeral 1) (liftc zero U) _ _) (prf_congr_orc ?_ ?_)
-  · exact prf_substfc_shapeFCun_at 1 (liftc zero U) _ _ 0 hnode
-  refine prf_eq_trans (prf_substfc_and (numeral 1) (liftc zero U) _ _) (prf_congr_andc ?_ ?_)
-  · exact prf_substfc_shapeFCbin_at 1 (liftc zero U) _ _ 1 hnode
-  refine prf_eq_trans (prf_substfc_forall (numeral 1) (liftc zero U) _) (prf_congr_forallc ?_)
-  refine prf_eq_trans (prf_substfc_impl (numeral 2) (liftc zero (liftc zero U)) _ _)
+      (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hD' hj2))
+      (prf_substtc_termCode_numeralM (v + 2) 2 _)
+  unfold wfAll1DotAtC wfAll1PsiAtC
+  refine prf_eq_trans (prf_substfc_forall _ s _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl _ (liftc zero s) _ _) (prf_congr_implc ?_ ?_)
+  · exact prf_eq_trans (prf_substfc_atom2CodeFn _ (liftc zero s) lt_sym _ _)
+      (prf_congr_atom2CodeFn hi1
+        (prf_eq_trans (prf_substtc_lencT _ _ _) (prf_congr_lencT hD)))
+  refine prf_eq_trans (prf_substfc_or _ (liftc zero s) _ _) (prf_congr_orc ?_ ?_)
+  · exact prf_substfc_shapeFCun_at (v + 1) (liftc zero s) _ _ 0 hnode
+  refine prf_eq_trans (prf_substfc_and _ (liftc zero s) _ _) (prf_congr_andc ?_ ?_)
+  · exact prf_substfc_shapeFCbin_at (v + 1) (liftc zero s) _ _ 1 hnode
+  refine prf_eq_trans (prf_substfc_forall _ (liftc zero s) _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl _ (liftc zero (liftc zero s)) _ _)
     (prf_congr_implc ?_ ?_)
-  · refine prf_eq_trans
-      (prf_substfc_atom2CodeFn (numeral 2) (liftc zero (liftc zero U)) lt_sym _ _) ?_
-    exact prf_congr_atom2CodeFn hi2
-      (prf_eq_trans (prf_substtc_lencT _ _ _) (prf_congr_lencT hargs))
-  · refine prf_eq_trans
-      (prf_substfc_atom2CodeFn (numeral 2) (liftc zero (liftc zero U)) in_sym _ _) ?_
-    exact prf_congr_atom2CodeFn
-      (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hargs hi2)) hW2
+  · exact prf_eq_trans
+      (prf_substfc_atom2CodeFn _ (liftc zero (liftc zero s)) lt_sym _ _)
+      (prf_congr_atom2CodeFn hi2
+        (prf_eq_trans (prf_substtc_lencT _ _ _) (prf_congr_lencT hargs)))
+  · exact prf_eq_trans
+      (prf_substfc_atom2CodeFn _ (liftc zero (liftc zero s)) in_sym _ _)
+      (prf_congr_atom2CodeFn
+        (prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hargs hi2)) hD')
+
+/-- ⭐ **LA KEYSTONE DEL `∃`**: rellenar el hueco baja por los TRES niveles a la vez. El
+    testigo entra como `U` fuera, `liftc 0 U` bajo el `∀` de `wfAll1` y `liftc 0 (liftc 0 U)`
+    bajo el de `argsIn`; con `U` cerrado los dos `liftc` se colapsan y queda `wfAll1DotC U`.
+    Es la instancia `v = 0` de `prf_substfc_wfAll1DotAtC_gen`. -/
+theorem prf_substfc_wfAll1DotAtC (U : Term) (hU : Prf (liftc zero U =eq U)) :
+    Prf (substfc zero U (wfAll1DotAtC (varc (numeral 1)) (varc (numeral 2)))
+      =eq wfAll1DotC U) :=
+  prf_substfc_wfAll1DotAtC_gen 0 U (varc (numeral 1)) (varc (numeral 2)) U U
+    (prf_eq_trans
+      (prf_mp (prf_substtc_var_eq (numeral 1) (liftc zero U) (numeral 1)) (prf_refl _)) hU)
+    (prf_eq_trans
+      (prf_mp (prf_substtc_var_eq (numeral 2) (liftc zero (liftc zero U)) (numeral 2))
+        (prf_refl _))
+      (prf_eq_trans (NumCodeClosedPrf.prf_congr_liftc hU) hU))
 
 /-- Y con el `In` al lado: el cuerpo entero, con el hueco relleno. -/
 theorem prf_substfc_hasWitAc (T I U : Term) (hU : Prf (liftc zero U =eq U))
@@ -1264,7 +1272,7 @@ export ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (
   prf_substtc_node0 prf_substtc_args1 prf_substfc_wfAll1Psi hPsiId_wfAll1Psi hwPsi_wfAll1Psi
   pcc_wfAll1_tracked_of_hbody DEUDA_wfAll1_of_hbody pcc_isTC1_tracked_of_hbody
   wfAll1PsiAtC wfAll1PsiC wfAll1DotC hPinv_wfAll1Psi pcc_wfAll1_trackedC
-  wfAll1DotAtC hasWitAc prf_substfc_wfAll1DotAtC prf_substfc_hasWitAc liftTerm_hasWitAc pcc_isTC1_exc_body pcc_hasWit_exc
+  wfAll1DotAtC hasWitAc prf_substfc_wfAll1DotAtC_gen prf_substfc_wfAll1DotAtC prf_substfc_hasWitAc liftTerm_hasWitAc pcc_isTC1_exc_body pcc_hasWit_exc
   substCodeF_hasWit_nthc prf_congr_hasWitAc_T prf_condD_hasWit_eq pcc_hGuardT hGuard_of_deudaF
   argsInPsi argsInPair liftF_argsInPair substF_argsInPair
   liftT_argsInBnd substT_argsInBnd liftT_argsInPsi substT_argsInPsi
