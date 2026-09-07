@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-08c · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-08d · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -35,6 +35,15 @@
 > ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
 > literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
 >
+> 🏁 **2026-09-08d · C3-F, la mitad cara: `Meta/HasWitFTrackedPrf.lean`** (§3.45, 828 l.,
+> net-0 puro). `pcc_wfAllF_trackedC` — `wfAllF` reflejado con los DOS testigos abstractos y la
+> cota ya dotada — sobre `pcc_isFormCodeE2_trackedC`, el recorrido de las OCHO cláusulas.
+> ⭐ **La regla de §3.44 aplicada ANTES de construir**: siete `example … := rfl` casando la
+> imagen con la que `substCodeF` produce. Acertaron todos a la primera.
+> ⭐ Y confirmó que lo genérico de C3-T lo era de verdad: `pcc_shape_tree` en el árbol,
+> `shapeFCun`/`shapeFCbin` en el tag, `wfAll1DotAtC` **literalmente el mismo término**.
+> ⬜ Queda `isFC1` (trivial), el `∃∃` y la fontanería `condD` — todos con la máquina escrita.
+>
 > 🏁🏁 **2026-09-08c · C3-T CERRADO: `DEUDA_hGuardT` PROBADA** (§3.44).
 > `pcc_hGuardT (i n t) (hin : i < n) : DEUDA_hGuardT i n t` en `Meta/HasWitTrackedPrf.lean`,
 > footprint = la base sancionada, **net-0 puro**. Con `hGuard_of_deudaF`, la cascada de ADR-020
@@ -61,8 +70,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
 >
-> **Build 132 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
-> **118 módulos activos** (Minimal 11 + Meta 96 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 133 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **119 módulos activos** (Minimal 11 + Meta 97 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >

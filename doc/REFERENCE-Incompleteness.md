@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 132 jobs · 118 módulos activos** (Minimal 11 + Meta 96 + Full 11) **+ 0 en `cuarentena/`
+> **Build 133 jobs · 119 módulos activos** (Minimal 11 + Meta 97 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2996,7 +2996,7 @@ editar un fichero que otro agente audita le invalida los números de línea.
 
 ## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 96 + Full 11).
+> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 97 + Full 11).
 > Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
 
 Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
@@ -3142,7 +3142,7 @@ la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`
 
 ## §3.42 · B3.4 CERRADO — `pcc_eval_substfc` en producción (2026‑09‑08)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 96 + Full 11).
+> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 97 + Full 11).
 > `Meta/EvalSubstfcPrf.lean` (1 620 l.). Footprint = la base sancionada; **ni un axioma nuevo**.
 
 ⭐ **El muro de `substfc` estaba roto desde 2026‑08‑31 (§3.30), pero vivía fuera del build.**
@@ -3757,3 +3757,89 @@ sí computa, y por eso el resto pasa entero.
 cláusulas de `isFormCodeE2` son **condiciones‑árbol igual que las dos de `isTermCodeE1`**. El
 paso `∃`, la fontanería `condD` y el reparto de huecos por niveles son los mismos; lo
 específicamente nuevo de C3‑F son las dos listas testigo y el `∃∃` de `hasWitF`.
+
+---
+
+## §3.45 · C3‑F · `Meta/HasWitFTrackedPrf.lean` — la mitad cara de `DEUDA_hGuardF`, probada (2026‑09‑08d)
+
+> `Build completed successfully (133 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> `Meta/HasWitFTrackedPrf.lean` (828 l.).
+
+```
+pcc_wfAllF_trackedC (wF wT : Term) : Prf (wfAllF wF wT ⇒ provFromCode (wfAllFDotC ẇF ẇT))
+pcc_isFormCodeE2_trackedC          -- el recorrido de las OCHO cláusulas
+pcc_shapeNul_fc                    -- la TERCERA forma posicional
+```
+
+### §3.45.1 · ⭐ La regla de §3.44, aplicada **antes** de construir — y acertó
+
+C3‑T costó una sesión por elegir la imagen antes de mirar el destino. Aquí lo primero que se
+escribió, antes de una sola prueba, fue la comprobación:
+
+```lean
+example (t I : Term) :
+    substCodeF 0 (tcFn t) (hasWitF (nthc (.var 0) I))
+      = exc (exc (hasWitFAc (liftc zero (liftc zero (tcFn t)))
+                    (substCodeT 2 (liftc zero (liftc zero (tcFn t)))
+                      (liftTerm 0 (liftTerm 0 I))))) := rfl
+```
+
+más seis `rfl` por cláusula. **Compilaron todos a la primera**: la derivación a mano de la
+imagen —incluida la estructura del `∃∃` y las **cuatro** ranuras de testigo— era exacta.
+
+⭐ El reparto de huecos, medido y confirmado por el compilador: bajo el `∃∃`, `wF` es `⌜v₁⌝` en
+el cuerpo, `⌜v₂⌝` bajo el `∀` de `wfAllF` y `⌜v₃⌝` bajo el `∀` anidado de `argsIn`; `wT` es
+`⌜v₀⌝`, `⌜v₁⌝` y `⌜v₂⌝` respectivamente. Es la **cuarta** aparición del patrón «parametrizar
+por TODOS los huecos», y ya no fue un descubrimiento: fue el punto de partida.
+
+### §3.45.2 · Lo que C3‑T dejó pagado, comprobado en uso
+
+| pieza de C3‑T | ¿sirve en C3‑F? |
+|---|---|
+| `pcc_shape_tree` | ✅ **genérica en el `CTree`** — la nularia sale con `CTree.nul k` y `maxLeaf = 0` |
+| `shapeFCun` / `shapeFCbin` + transportes | ✅ tal cual, y **genéricos en el tag `k`** (aquí se usan con 3, 4, 5, 6, 7, 8, 9) |
+| `pcc_argsIn_trackedC`, `argsInDotC`, su transporte | ✅ tal cual: el `argsIn` de `clAtom` es idéntico al de `isTermCodeE1` |
+| `pcc_wfAll1_trackedC` | ✅ tal cual (la mitad `wfAll1` de `isFC1`) |
+| `wfAll1DotAtC` + `prf_substfc_wfAll1DotAtC` | ✅ el término coincide **literalmente** (mismos `⌜v₁⌝`/`⌜v₂⌝`) |
+| `pcc_In_atom_tracked`, `PrfH_in_transport` | ✅ tal cual, diez veces |
+| el empaquetado con `cons` de §4 | ✅ el mismo gesto para `wfAllF`, que también es natural en dos |
+
+⇒ **lo que hubo que escribir nuevo es sólo lo que depende de `isFormCodeE2`**.
+
+### §3.45.3 · Tres factorizaciones que evitaron que fuera ocho veces el trabajo
+
+1. ⭐ **`clEq wT X = clBin wT X 4` por `rfl`.** Son la misma forma con otra lista testigo. Con
+   `clBin`/`clUn` genéricos en el tag, las **ocho** cláusulas se cubren con **cuatro** lemas.
+2. ⭐ **`PrfH_clIn`** — el átomo `In (nthc X ȷ̇) w` reflejado **y transportado** a `nthcT ND ȷ̄`,
+   con su `pcc_eval_nthc` y su cota. Aparece **diez** veces (dos por `clEq`/`clBin`, una por
+   `clUn`); escrito una.
+3. ⭐ **`prf_or_imp_of`** — `pcc_reflect_or` **arrastrando** el antecedente objeto de la
+   ecuación del nodo. Sin él, `lorAll` de ocho ramas obligaba a ocho `PrfH_or_elim` a mano con
+   contextos crecientes (la deuda **B6b**, no hay debilitamiento de contexto, muerde igual que
+   en C3‑T). Con él, el recorrido entero es **siete aplicaciones en cascada**.
+
+### §3.45.4 · Y la cota de cada `In`, de dónde sale
+
+Igual que en C3‑T, `pcc_eval_nthc` exige `ȷ̇ < lenc X`, y aquí la da **la forma de la propia
+cláusula**: `prf_shapeBin_str` da `lenc X = 3̇` (domina los índices 1 y 2 de `clEq`/`clBin`, y
+el 2 de `clAtom`), `prf_shapeUn_str` da `lenc X = 2̇` (domina el 1 de `clUn`), y `clBot` no
+tiene ningún `In`. **No hay ninguna cota que no esté disponible dentro de su rama.**
+
+### §3.45.5 · Lo que queda de `DEUDA_hGuardF`, medido
+
+Tres pasos, todos con la máquina ya escrita:
+
+1. **`isFC1` reflejado** — `isFC1 wF wT c = (wfAll1 wT ∧ wfAllF wF wT) ∧ In c wF`: dos
+   `PrfH_and_intro_code` sobre `pcc_wfAll1_trackedC`, `pcc_wfAllF_trackedC` y
+   `pcc_In_atom_tracked`. Trivial.
+2. **El `∃∃`** — dos `pcc_exIntro_code_open` encadenados. ⚠️ El orden importa y está medido:
+   el `∃` **exterior** liga `wF` (es `⌜v₁⌝`) y el **interior** liga `wT` (`⌜v₀⌝`), así que los
+   huecos se rellenan **en dos pasadas y a niveles distintos** — primero `wF` con
+   `substfc (σ0) (liftc 0 ẇF)`, luego `wT` con `substfc 0 ẇT`. Eso pide **generalizar
+   `prf_substfc_wfAll1DotAtC` a nivel arbitrario** (y escribir su gemelo para `wfAllFDotAtC`):
+   ambos son el mismo descenso que ya está escrito, con el nivel abierto.
+3. **La alineación con `condD`** — el mismo `rfl` de §3.44.5, ya comprobado en §1 de este
+   módulo. La instancia con el índice `numeralM i` se cierra con el mismo `rw
+   [substCodeT_closed …]`.
+
+⇒ **la mitad cara está hecha**; lo que queda es ensamblaje con piezas existentes.

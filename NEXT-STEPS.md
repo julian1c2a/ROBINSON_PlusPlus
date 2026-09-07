@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 96 + Full 11) + 0 en
+`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 97 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
@@ -13,7 +13,16 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **C3‑F: `DEUDA_hGuardF`, LO ÚNICO que queda de la cascada de ADR‑020**
+> # 🎯 SIGUIENTE SESIÓN — **`pcc_eval_liftfc`** (decisión del autor, 2026‑09‑08d)
+>
+> ⛔ `pcc_eval_liftfc` **no existe en ningún sitio**: es **trabajo nuevo**, no promoción. Es la
+> evaluación provable de `liftfc` —el hermano de `pcc_eval_substfc` (B3.4) para la familia
+> `liftc`/`liftfc`—, y ⚠️ la familia `liftc` **no tiene aritmetización ni a nivel META**, así
+> que no hay `prf_liftc_arith_open` del que colgar el primer paso. Lo primero de esa sesión es
+> **medir** qué hay: `Meta/LiftcCodePrf.lean` (los `pcc_liftc_*_code`), `Meta/EvalLiftcPrf.lean`
+> (el DESCENSO promovido en B2) y el patrón de `pcc_eval_substfc_modulo_8` como chasis.
+>
+> ▶ **C3‑F queda PARADO A MEDIAS, y limpio** — ver más abajo y §3.45.
 >
 > 🏁 **2026‑09‑08c · C3‑T CERRADO** (§3.44): `pcc_hGuardT (i n t) (hin : i < n) : DEUDA_hGuardT i n t`,
 > footprint = la base sancionada, **net‑0 puro**. Con `hGuard_of_deudaF`, la cascada de los 7 tags
@@ -66,7 +75,12 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | `DEUDA_hGuardT` · paso `∃` | ✅ `pcc_hasWit_exc` (§3.44.3). ⭐ El testigo es una **variable de código que se desplaza** (`⌜v₀⌝`/`⌜v₁⌝`/`⌜v₂⌝`) ⇒ **dos** ranuras en `wfAll1PsiAtC` |
 > | `DEUDA_hGuardT` · fontanería `condD` | ✅ **por `rfl`** (§3.44.5): `prf_substfc_arith_open` pasa a la función META `substCodeF` y la alineación es una igualdad de términos. ⚠️ Sólo el índice `numeralM i` con `i` variable pide un `rw` (`substCodeT_closed`) |
 > | ⭐ **`DEUDA_hGuardT`** | 🏁 **PROBADA** — `pcc_hGuardT`, para toda casilla con `i < n`. ⚠️ La cota **no es artefacto**: `pcc_eval_nthc` la exige, y las CUATRO casillas reales la cumplen (`decide`) |
-> | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **LO ÚNICO QUE QUEDA**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃`. ⭐ Pero hereda hecho todo lo genérico: `pcc_shape_tree` (las 8 cláusulas son condiciones‑árbol igual que las 2 de `isTermCodeE1`), el paso `∃` y la fontanería `condD` |
+> | `DEUDA_hGuardF` · las 8 cláusulas de `isFormCodeE2` | ✅ `pcc_isFormCodeE2_trackedC` (§3.45). Cuatro lemas, no ocho (`clEq = clBin · 4` por `rfl`), y `prf_or_imp_of` arrastra la ecuación del nodo por las siete disyunciones |
+> | `DEUDA_hGuardF` · la tercera forma (`shapeNul`) | ✅ `pcc_shapeNul_fc` — `pcc_shape_tree` ERA genérica en el árbol |
+> | `DEUDA_hGuardF` · el `∀` acotado de `wfAllF` (dos testigos) | ✅ `pcc_wfAllF_trackedC` (§3.45): empaquetado con `cons` + cota dotada. **La mitad cara** |
+> | `DEUDA_hGuardF` · `isFC1` | ⬜ **trivial**: dos `PrfH_and_intro_code` sobre `pcc_wfAll1_trackedC`, `pcc_wfAllF_trackedC` y `pcc_In_atom_tracked` |
+> | `DEUDA_hGuardF` · el `∃∃` | ⬜ dos `pcc_exIntro_code_open`. ⚠️ Medido: el `∃` EXTERIOR liga `wF` (`⌜v₁⌝`) y el INTERIOR `wT` (`⌜v₀⌝`) ⇒ los huecos se rellenan **en dos pasadas a niveles distintos**, y eso pide **generalizar `prf_substfc_wfAll1DotAtC` a nivel arbitrario** más su gemelo para `wfAllFDotAtC`. Es el mismo descenso ya escrito, con el nivel abierto |
+> | `DEUDA_hGuardF` · fontanería `condD` | ⬜ el mismo `rfl` de §3.44.5, **ya comprobado** en §1 de `Meta/HasWitFTrackedPrf.lean` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |

@@ -8,7 +8,7 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **118 módulos activos** (Minimal 11 + Meta 96 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **119 módulos activos** (Minimal 11 + Meta 97 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -1027,3 +1027,26 @@ es genérica en el `CTree` — luego C3‑F la hereda tal cual.
 
 **Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, y ninguna firma de D1/D2/D3 ni de
 Gödel I/II.
+
+
+### Addendum 2026‑09‑08d · C3‑F a medias, y limpio
+
+`Meta/HasWitFTrackedPrf.lean` (nuevo, 828 l., **net‑0 puro**). Detalle en §3.45 de
+`doc/REFERENCE-Incompleteness.md`. Cierra **la mitad cara** de `DEUDA_hGuardF`:
+
+```
+pcc_wfAllF_trackedC (wF wT) : wfAllF wF wT ⇒ Prov(⌜wfAllFDotC ẇF ẇT⌝)
+pcc_isFormCodeE2_trackedC   -- el recorrido de las OCHO cláusulas
+```
+
+⭐ **La corrección del addendum anterior se aplicó como método, y funcionó.** Lo primero del
+módulo —antes de una sola prueba— son **siete `example … := rfl`** casando la imagen propuesta
+con la que `substCodeF` produce de verdad. Acertaron todos a la primera; C3‑T había costado una
+sesión por hacerlo al revés.
+
+Queda: `isFC1` (dos `PrfH_and_intro_code`, trivial), el `∃∃` —⚠️ el `∃` **exterior** liga `wF`
+y el **interior** `wT`, luego los huecos se rellenan en **dos pasadas a niveles distintos**, y
+eso pide generalizar el descenso `prf_substfc_wfAll1DotAtC` a nivel arbitrario— y la fontanería
+`condD`, que es el `rfl` ya comprobado. **Ninguna de las tres es contenido nuevo.**
+
+**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
