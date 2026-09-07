@@ -3325,3 +3325,43 @@ sondeo, y por eso el kit trae `pcc_carcD_bridge_cons`/`pcc_cdrcD_bridge_cons`.
 De `DEUDA_wfAll1_tracked` queda el recorrido de los **dos disyuntos** de `isTermCodeE1` y su
 ensamblaje por el `pcc_bdAll_intro` **exterior**. Las dos piezas que ese recorrido consume —la
 de forma (`pcc_shape_tracked`) y la de pertenencia (`pcc_argsIn_pair_tracked`)— ya están.
+
+### §3.43.5 · El recorrido de los dos disyuntos, y el `PsiF` sobre CÓDIGOS (2026‑09‑08b)
+
+`Meta/HasWitTrackedPrf.lean` §5 cierra el recorrido de `isTermCodeE1`, con `wT` y `X`
+**abstractos**, apoyado íntegramente en piezas que ya estaban:
+
+| mitad | cómo se refleja |
+|---|---|
+| `shapeUn X 0` | `prf_shapeUn_str` (posicional → ecuacional) + `pcc_shape_tracked` |
+| `shapeBin X 1` | `prf_shapeBin_str` + `pcc_shape_tracked` |
+| `argsIn wT (nthc X 2)` | `pcc_argsIn_pair_tracked` (§3.43.2) vía el puente al par |
+| `∨` y `∧` | `pcc_reflect_or` / `pcc_reflect_and` |
+
+Lo único nuevo son cuatro lemas pequeños: `PrfH_congr_argsIn_wit` (producción sólo tenía la
+congruencia de `argsIn` en el **segundo** argumento), `prf_argsIn_to_pair`, `pcc_shape_of_str` y
+el ensamblaje `pcc_isTermCodeE1_tracked`.
+
+#### ⚠️ Y lo que falta del `pcc_bdAll_intro` EXTERIOR, medido
+
+No se puede alimentar con esto tal cual, y la razón es precisa: el `PsiF w` del `bdAll` exterior
+necesita el cuerpo **con el hueco del índice en `varc 0`**, es decir sobre **CÓDIGOS**
+—`nthcT (tcFn w) (varc 0)`—, mientras que `pcc_isTermCodeE1_tracked` entrega la imagen sobre el
+**término objeto**, `tcFn X`.
+
+Es exactamente la distinción que `sondeos/A3IsFCBTracked.lean:205` ya tenía resuelta:
+
+```lean
+noncomputable def PsiF (w : Term) : Term :=
+  nodeOkDot (tcFn w) (nthcT (tcFn w) (varc (numeral 0)))   -- nodeOkDot toma CÓDIGOS
+```
+
+⭐ **Y el salto entre las dos formas no es una cadena de congruencias: es UN solo
+`PrfH_leibniz_apply`** con el hueco en la ranura del nodo — que es como aquel sondeo lo hace en
+su `hbody_ok`. Queda anotado en el docstring del propio lema.
+
+> 🔑 **Regla que deja el episodio**: al diseñar la imagen punteada de un predicado que va a
+> alimentar un `∀` acotado, parametrizarla por **códigos**, no por términos objeto. La versión
+> «objeto» es cómoda para probar el recorrido y luego cuesta un transporte; la versión «código»
+> encaja directamente en `PsiF`. A3 lo había resuelto así y no lo leí a tiempo — es la misma
+> clase de lección que [[feedback-medir-la-forma]].

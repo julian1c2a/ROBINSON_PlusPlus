@@ -52,7 +52,8 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | el **kit genérico** de reflexión Σ₁ (átomo `In`, `boundedIn`, formas, casillas) | ✅ `Meta/TrackedAtomsPrf.lean` (2026‑09‑08) |
 > | `DEUDA_hGuardT` · mitad `In c w` | ✅ `pcc_In_atom_tracked`, con los dos argumentos **abstractos** |
 > | `DEUDA_hGuardT` · el `∀` acotado **ANIDADO** (`argsIn`) | ✅ `pcc_argsIn_pair_tracked` (§3.43) — **y sin tocar `Minimal/Axioms.lean`** |
-> | `DEUDA_hGuardT` · mitad `wfAll1` | ⬜ **`DEUDA_wfAll1_tracked`**: queda el recorrido de los DOS disyuntos de `isTermCodeE1` y el `pcc_bdAll_intro` EXTERIOR |
+> | `DEUDA_hGuardT` · el recorrido de los DOS disyuntos de `isTermCodeE1` | ✅ `pcc_isTermCodeE1_tracked` (§3.43.5) |
+> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ⬜ falta **rehacer la imagen punteada sobre CÓDIGOS** (`PsiF w := …(nthcT (tcFn w) (varc 0))`, molde `A3IsFCBTracked:205`) + **UN** `PrfH_leibniz_apply` de transporte |
 > | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
 > | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
