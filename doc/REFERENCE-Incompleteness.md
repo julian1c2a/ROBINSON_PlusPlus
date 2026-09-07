@@ -3585,3 +3585,175 @@ en el antecedente, el `or`‑elim la conserva en su rama.
   `condD (hasWit (nthc #0 ī)) t` se reduce a `substCodeF 0 (tcFn t) (hasWit (nthc #0 ī))` y lo
   que queda es casarlo con la imagen construida — el mismo gesto que
   `prf_condD_of_tree_eq` (`Meta/CodeTreeReflect.lean:332`) hace para su condición‑árbol.
+
+---
+
+## §3.44 · 🏁 C3‑T CERRADO — `DEUDA_hGuardT` PROBADA, y media cascada de ADR‑020 descargada (2026‑09‑08c)
+
+> `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
+> (`prf_axiomsCodeT_eq` + los tres de Lean). **Net‑0 puro**, ni un axioma nuevo.
+
+```
+pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) : DEUDA_hGuardT i n t
+hGuard_of_deudaF  -- la cascada de ADR‑020 con la mitad `wit` YA descargada
+```
+
+La deuda que ADR‑020 dejó abierta eran **dos** lemas genéricos (§3.41.3). **Queda uno.**
+
+### §3.44.1 · ⚠️ La corrección que mandó el frente: `condD` NO ADMITE ELEGIR IMAGEN
+
+§3.43.11 midió que faltaba «el paso `∃` + la fontanería `condD`» y lo dio por rutina. La
+medición se quedó corta en un punto que resultó ser **el trabajo entero**:
+
+> **`condD C t = substfc 0 ṫ (formCode C)`.** La imagen no es una elección del que refleja:
+> la impone `formCode`. Y `formCode (shapeUn X k)` es la **ECUACIÓN POSICIONAL**
+> `Ẋ = ⟨k̄, nthcT Ẋ 1̄⟩` — no la conjunción de accesores `carc X = k̇ ∧ lenc X = ṅ` que
+> `pcc_shape_tracked` sabe producir y que §5 había elegido (`shapeDot`).
+
+Las dos fórmulas son equivalentes en la teoría objeto. **Son códigos distintos**, y
+`pcc_lineWF_tracked_of_schema` recompone el `⇔` con el código, no con la equivalencia.
+
+🔑 **La regla, generalizada.** *Medir la forma* (§3.41.4) no basta cuando hay un **destino
+fijo**: hay que medir **la forma del destino**, no sólo la del origen. Aquí el destino estaba
+escrito desde ADR‑020 y nadie lo había desplegado.
+
+### §3.44.2 · ⭐ Y no hizo falta ningún teorema objeto nuevo: `CodeTreeReflect` ya lo tenía
+
+La reacción natural —probar en la teoría objeto la implicación
+`carc X = k̇ ∧ lenc X = ṅ → X = ⟨k̄, …⟩` y meterla en `Prov` con `pcc_thm_inst`, al estilo del
+puente de D3 (`hC_dot_of_chainOkBDot`)— **no hacía falta**. La ecuación posicional se refleja
+**directamente**, y las dos piezas caras ya estaban probadas **por inducción sobre el árbol**
+desde el frente de los 14 tags estructurales:
+
+| pieza | dónde | qué da |
+|---|---|---|
+| `pcc_tc_objAt` | `Meta/CodeTreeReflect.lean:225` | `Prov(⌜(E(t))˙ = dotV⌝)` — el «código del código» del árbol |
+| `PrfH_dotVN` | `Meta/CodeTreeReflect.lean:269` | `Prov(⌜dotV = dotN⌝)` — de valores punteados a accesores rastreados |
+
+y `shapeUn X k` / `shapeBin X k` **son** condiciones‑árbol: sus `CTree` son `un k (leaf 1)` y
+`bin k (leaf 1) (leaf 2)`, comprobado con dos `rfl`. Componiéndolas con `pcc_eq_tracked` sale
+
+```
+pcc_shape_tree (X T) (hmax : maxLeaf T ≤ n) (S) (hsh) (hlen) :
+    Prf (S ⇒ provFromCode (eqCodeFn (tcFn X) (T.dotN X)))
+```
+
+en `Meta/TrackedAtomsPrf.lean`, **genérica en el árbol** — o sea, reutilizable tal cual por C3‑F
+y por D3.
+
+> 🔑 **La lección, que ya había salido dos veces en este frente**: antes de concluir «hace falta
+> el teorema general», mirar si el trabajo ya está hecho **para otra cosa con la misma forma**.
+> §3.43.8 lo aprendió con el lema de sustitución/lift; aquí con la reflexión de la forma.
+
+⭐ Y la comprobación que decide: los dos `example … := rfl` que casan `shapeFCun`/`shapeFCbin`
+con `formCode (shapeUn …)` / `formCode (shapeBin …)`. **Compilan**. Es la regla de método de
+§3.41.4 (*la abstracción se casa con el original por `rfl`*) aplicada al destino.
+
+### §3.44.3 · ⭐ El hueco del `∃` es una VARIABLE DE CÓDIGO QUE SE DESPLAZA
+
+El segundo hallazgo salió de desplegar `substCodeF 0 ṫ (hasWit (nthc #0 ı̄))` entero. Bajo el
+`∃` de `hasWit`, el testigo **no** es un código fijo: es `⌜v₀⌝` en el cuerpo, `⌜v₁⌝` dentro del
+`∀` de `wfAll1`, y `⌜v₂⌝` dentro del `∀` anidado de `argsIn`.
+
+`wfAll1PsiAtC` repetía un `WD` único en las tres ranuras — **válido sólo con testigo cerrado**
+(`tcFn w`), que es el caso que §3.43.9 tenía delante. Ahora lleva **dos** ranuras (`WD`, `WD'`),
+y `wfAll1PsiC WD = wfAll1PsiAtC WD WD …` recupera el caso cerrado por `rfl`.
+
+> 🔑 Tercera aparición del mismo patrón: **si un cuerpo bajo binders necesita el mismo dato a
+> varios niveles, parametrizar por TODOS los huecos**. Con `⌜v₀⌝`/`⌜v₁⌝` fue el índice
+> (§3.43.9); aquí es el testigo. Escribir `liftc` en su lugar convierte una hipótesis de una
+> línea en un transporte.
+
+Con eso, la keystone del `∃` baja por los **tres** niveles a la vez:
+
+```
+prf_substfc_wfAll1DotAtC (U) (hU : liftc 0 U =eq U) :
+    substfc 0 U (wfAll1DotAtC ⌜v₁⌝ ⌜v₂⌝) =eq wfAll1DotC U
+```
+
+y `pcc_exIntro_code_open` cierra el `∃` sin clausurar nada.
+
+### §3.44.4 · La cota de casilla `i < n` **no es un artefacto**
+
+`condD` escribe la casilla como **accesor dotado** `nthcT ṫ ı̄`; el reflector del átomo `In`
+entrega `(nthc t ı̇)˙`. El puente entre los dos es `pcc_eval_nthc`, **y pide la cota**
+`ı̇ < lenc t`. Sin ella ese paso no existe: `nthc` fuera de rango no está determinado.
+
+`Hcond` ya trae `lenc t = ṅ` (es una de sus tres hipótesis), así que lo único que se añade es
+**aritmético**: `i < n`. Y las **cuatro** casillas `wit` reales lo cumplen —tags 9 y 10 con
+`(3,4)`, tag 13 con `(3,5)` y `(4,5)`—, comprobado con un `decide`. Los otros cuatro tags no
+llevan ninguna casilla `wit`.
+
+⇒ `hGuard_of_deudas` (`∀ i` sin restricción) sigue en pie para quien tenga las deudas sin
+cota; el consumidor real usa `hGuard_of_deudaF`, que pide la cota sólo de las casillas que la
+lista **usa**.
+
+### §3.44.5 · La alineación con `condD` sale por `rfl`
+
+§3.43.11 midió bien esta parte: `prf_substfc_arith_open` es **genérico en la fórmula**, así que
+convierte el `substfc` **objeto** en la función **meta** `substCodeF`. Y a partir de ahí no hay
+teoría — cada cláusula de `substCodeF` cae sobre su constructor de código:
+
+```lean
+theorem substCodeF_hasWit_nthc (t I : Term) :
+    substCodeF 0 (tcFn t) (hasWit (nthc (.var 0) I))
+      = exc (hasWitAc (liftc zero (tcFn t))
+              (substCodeT 1 (liftc zero (tcFn t)) (liftTerm 0 I))) := rfl
+```
+
+⚠️ **El único punto que `rfl` no alcanza es el índice**: `numeralM i` con `i` **variable** no
+reduce, y `substCodeT v W (numeralM i) = termCode (numeralM i)` es un **teorema**
+(`substCodeT_closed`), no una defeq. Por eso el `rfl` se enuncia con el índice **abstracto** y
+la instancia se cierra con un `rw`. Con índices literales (los `numeralM 0/1/2/3` de las formas)
+sí computa, y por eso el resto pasa entero.
+
+### §3.44.6 · Lo que entra
+
+**`Meta/TrackedAtomsPrf.lean`** (+ `import CodeTreeReflect`):
+
+* `prf_substfc_shapeDot_at` — `shapeDot` a nivel arbitrario (la de producción era sólo nivel 0);
+* ⭐ **`pcc_shape_tree`** — una forma posicional reflejada **directamente a su `formCode`**,
+  genérica en el árbol.
+
+**`Meta/HasWitTrackedPrf.lean`**:
+
+* §5′ `treeUn1`/`treeBin1`, `shapeFCun`/`shapeFCbin` (**casados con `formCode` por `rfl`**),
+  `pcc_shapeUn_fc`/`pcc_shapeBin_fc`, `shapeUnCtx`/`shapeBinCtx` y sus dos transportes;
+  `prf_substfc_shapeFCun_at`/`_bin_at`; `prf_liftc_termCode_numeralM`.
+* §5‑§9 rehechos sobre esa imagen, y `tcFn ⌜2⌝ → termCode ⌜2⌝` en todas las ranuras de índice
+  (que es lo que `formCode` produce de verdad).
+* §10 `hPinv_wfAll1Psi` + ⭐ **`pcc_wfAll1_trackedC`** — la cota pasa de `(lenc w)˙` a
+  `lencT ẇ`, vía `pcc_eval_lenc` **dentro de `Prov`** (`PrfH_bdAllCode_congr_bnd`), calcado de
+  `pcc_argsIn_trackedC`.
+* §11 `wfAll1DotAtC`, `hasWitAc`, `prf_substfc_wfAll1DotAtC`, `prf_substfc_hasWitAc`,
+  `liftTerm_hasWitAc`, `pcc_isTC1_exc_body` y ⭐ **`pcc_hasWit_exc`**.
+* §12 `substCodeF_hasWit_nthc`, `prf_congr_hasWitAc_T`, `prf_condD_hasWit_eq`,
+  ⭐⭐⭐ **`pcc_hGuardT`** y ⭐⭐ **`hGuard_of_deudaF`**.
+
+### §3.44.7 · Dos trampas, y una evitada por el compilador
+
+* ⛔ **ADR‑019, evitada**: `prf_substtc_unT_at` (`substtc` sobre `unT` a nivel arbitrario) lo
+  escribí de cero… y ya existía en `Meta/LiftcCodePrf.lean`. Lo destapó un error de
+  **ambigüedad**, no la búsqueda previa. ⇒ el `open` de dos módulos que declaran el mismo
+  nombre es, en este árbol, el mejor detector de duplicados que hay.
+* ⚠️ **`∈` resuelve al `In` OBJETO** con `Minimal.Axioms` abierto, exactamente igual que `≤`
+  resuelve al orden objeto. En una hipótesis Lean sobre listas hay que escribir `List.Mem`.
+* ⚠️ `by decide` **no vale con una variable libre en el objetivo** («Expected type must not
+  contain free variables»); para `maxLeaf (treeUn1 k) ≤ 2`, que no depende de `k`, la prueba es
+  `Nat.le.refl`.
+
+### §3.44.8 · Dónde queda C3, y qué desbloquea
+
+| pieza | estado |
+|---|---|
+| absorción del conjunto extra | ✅ `hcond_absorbe_cascade` |
+| kit genérico de reflexión Σ₁ | ✅ `Meta/TrackedAtomsPrf.lean`, ahora con `pcc_shape_tree` |
+| `DEUDA_hGuardT` | 🏁 **PROBADA** (`pcc_hGuardT`), para toda casilla con `i < n` |
+| `DEUDA_hGuardF` | ⬜ **lo único que queda de la cascada**; estrictamente peor: `isFormCodeE2` tiene 8 cláusulas, 2 listas testigo y `hasWitF` lleva `∃∃` |
+| `hCarc` | ✅ comprado por B3.4 |
+| `pcc_eval_liftfc` | ⛔ no existe en ningún sitio |
+
+⭐ **Y lo que C3‑F hereda ya hecho**: `pcc_shape_tree` es genérica en el árbol, y las ocho
+cláusulas de `isFormCodeE2` son **condiciones‑árbol igual que las dos de `isTermCodeE1`**. El
+paso `∃`, la fontanería `condD` y el reparto de huecos por niveles son los mismos; lo
+específicamente nuevo de C3‑F son las dos listas testigo y el `∃∃` de `hasWitF`.

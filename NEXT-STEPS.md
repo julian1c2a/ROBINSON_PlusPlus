@@ -13,7 +13,12 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **C3: `DEUDA_hGuardT`/`DEUDA_hGuardF`, que ahora bloquean TAMBIÉN a D3**
+> # 🎯 SIGUIENTE SESIÓN — **C3‑F: `DEUDA_hGuardF`, LO ÚNICO que queda de la cascada de ADR‑020**
+>
+> 🏁 **2026‑09‑08c · C3‑T CERRADO** (§3.44): `pcc_hGuardT (i n t) (hin : i < n) : DEUDA_hGuardT i n t`,
+> footprint = la base sancionada, **net‑0 puro**. Con `hGuard_of_deudaF`, la cascada de los 7 tags
+> queda a la espera de **una sola** deuda. ⚠️ Y una corrección de método que costó el frente entero:
+> **`condD` NO ADMITE ELEGIR IMAGEN** — la impone `formCode`, y §5 había elegido `shapeDot`.
 >
 > ## 🏁 Lo que se cerró después del merge (2026‑09‑07 y ‑08)
 >
@@ -56,9 +61,12 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | `DEUDA_hGuardT` · la conmutación `substtc`/`liftc` bajo el binder | ✅ **DESBLOQUEADA** (§3.43.8): `prf_substtc_liftc_wfAll1Args` + el **kit de distribución de `liftc`**. ⚠️ §3.43.6/§3.43.7 estaban sobregeneralizados: **no** hacía falta el lema general con `Z` arbitrario **ni** el ADR — los `Z` reales tienen forma conocida |
 > | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ✅ **INSTANCIADO** (§3.43.9): 8 de las 9 obligaciones descargadas (`hwPsi` la paga `hw_auto`). ⭐ La clave fue parametrizar el cuerpo por los **dos** huecos (`⌜v₀⌝` fuera, `⌜v₁⌝` dentro) en vez de escribir `liftc`: una sola keystone sirve a `hPsiId` y a `hbody` |
 > | `DEUDA_hGuardT` · **`hbody`** | ✅ **PROBADA** (§3.43.10). Con ella, ⭐ **`DEUDA_wfAll1_tracked` cerrada** y `pcc_isTC1_tracked (w c)` sin hipótesis, con `w` y `c` abstractos |
-> | `DEUDA_hGuardT` · paso `∃` + `condD` | ⬜ **lo único que queda de esta mitad**. Medido (§3.43.11): refactor **definicional** para hacer la imagen paramétrica en el CÓDIGO del testigo + el transporte de la cota (máquina ya hecha) + ⭐ la alineación con `condD`, que es un **cómputo** — `prf_substfc_arith_open` es genérico en la fórmula |
-> | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
-> | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
+> | `DEUDA_hGuardT` · la imagen que `condD` EXIGE | ✅ **corregida** (§3.44.1‑2): no es `shapeDot` sino la ECUACIÓN POSICIONAL de `formCode`. La refleja `pcc_shape_tree`, compuesta de dos piezas que `CodeTreeReflect` ya probaba por inducción — **cero teoremas objeto nuevos** |
+> | `DEUDA_hGuardT` · la cota, de `(lenc w)˙` a `lencT ẇ` | ✅ `pcc_wfAll1_trackedC` (§3.44.6), vía `pcc_eval_lenc` DENTRO de `Prov` |
+> | `DEUDA_hGuardT` · paso `∃` | ✅ `pcc_hasWit_exc` (§3.44.3). ⭐ El testigo es una **variable de código que se desplaza** (`⌜v₀⌝`/`⌜v₁⌝`/`⌜v₂⌝`) ⇒ **dos** ranuras en `wfAll1PsiAtC` |
+> | `DEUDA_hGuardT` · fontanería `condD` | ✅ **por `rfl`** (§3.44.5): `prf_substfc_arith_open` pasa a la función META `substCodeF` y la alineación es una igualdad de términos. ⚠️ Sólo el índice `numeralM i` con `i` variable pide un `rw` (`substCodeT_closed`) |
+> | ⭐ **`DEUDA_hGuardT`** | 🏁 **PROBADA** — `pcc_hGuardT`, para toda casilla con `i < n`. ⚠️ La cota **no es artefacto**: `pcc_eval_nthc` la exige, y las CUATRO casillas reales la cumplen (`decide`) |
+> | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **LO ÚNICO QUE QUEDA**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃`. ⭐ Pero hereda hecho todo lo genérico: `pcc_shape_tree` (las 8 cláusulas son condiciones‑árbol igual que las 2 de `isTermCodeE1`), el paso `∃` y la fontanería `condD` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |

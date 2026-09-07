@@ -976,3 +976,54 @@ guardas, un índice de casilla o el anidamiento, esos siete dejan de compilar.
 `∀` acotado también (`pcc_bdAll_intro`) y el `∃` sin cota también
 (`pcc_exIntro_code_open`); falta la disyunción de formas y el `argsIn` interno. Es un
 ensamblaje, no una inducción nueva.
+
+### Addendum 2026‑09‑08c · 🏁 media cascada DESCARGADA — `DEUDA_hGuardT` probada
+
+`pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) : DEUDA_hGuardT i n t`
+(`Meta/HasWitTrackedPrf.lean`). Footprint = la base sancionada; **net‑0 puro**. Árbol verde a
+132 jobs. Detalle en `doc/REFERENCE-Incompleteness.md` §3.44.
+
+De las **dos** obligaciones que este ADR dejó abiertas (addendum 2026‑09‑07b) **queda una**:
+`DEUDA_hGuardF`. `hGuard_of_deudaF` es `hGuard_of_deudas` con la mitad `wit` ya descargada.
+
+**⚠️ Una condición NUEVA, y hay que dejarla escrita: la cota de casilla `i < n`.**
+
+`condD` escribe la casilla como accesor dotado `nthcT ṫ ı̄`; el reflector del átomo `In`
+entrega `(nthc t ı̇)˙`. El puente entre los dos es `pcc_eval_nthc`, **que exige**
+`ı̇ < lenc t`. No es un artefacto de esta prueba: `nthc` fuera de rango no está determinado,
+así que ningún reflector de la casilla `i` puede existir sin la cota.
+
+`Hcond` ya trae `lenc t = ṅ` entre sus tres hipótesis, luego lo único que se añade es
+**aritmético**. Y las **cuatro** casillas `wit` que la enmienda declara lo cumplen todas:
+
+| tag | `lenc` (`n`) | casillas `wit` | `i < n` |
+|---|---|---|---|
+| `q1` (9), `q2` (10) | 4 | 3 | ✔ |
+| `leibniz` (13) | 5 | 3, 4 | ✔ |
+| `q3` (11), `ind` (18), `qconf` (19), `listInd` (20) | — | ninguna | — |
+
+Comprobado con un `decide` sobre los pares `(i,n)`. `hGuard_of_deudas` (con su `∀ i` sin
+restricción) se conserva para quien tenga las deudas sin cota; el consumidor real usa
+`hGuard_of_deudaF`, que pide la cota **sólo de las casillas que su lista usa**.
+
+**⚠️ Y una corrección a cómo este ADR describía su propia obligación.** El addendum
+2026‑09‑07b decía que lo que faltaba era «el recorrido de `isTC1`/`isFC1` bajo el `∃`», dando
+por hecho que la imagen punteada era una elección del que refleja. **No lo es.**
+
+> `condD C t = substfc 0 ṫ (formCode C)`: la imagen la impone `formCode`. Y
+> `formCode (shapeUn X k)` es la **ecuación posicional** `Ẋ = ⟨k̄, nthcT Ẋ 1̄⟩`, no la
+> conjunción de accesores `carc X = k̇ ∧ lenc X = ṅ` que el kit genérico sabía producir.
+
+Las dos son equivalentes en la teoría objeto y **son códigos distintos**; el chasis recompone
+el `⇔` con el código. Reflejar la equivocada habría dado un teorema correcto sobre la fórmula
+equivocada —y habría compilado—, exactamente el mismo modo de fallo que el addendum
+2026‑09‑07b registró para la **forma** de la cascada. La cura fue la misma: **`rfl` contra el
+original**, aquí dos, casando `shapeFCun`/`shapeFCbin` con `formCode`.
+
+⭐ El coste de la corrección resultó ser **cero teoremas objeto nuevos**: la ecuación posicional
+la reflejan `pcc_tc_objAt` + `PrfH_dotVN` de `Meta/CodeTreeReflect.lean`, ya probadas por
+inducción sobre el árbol para los 14 tags estructurales. `pcc_shape_tree` sólo las compone, y
+es genérica en el `CTree` — luego C3‑F la hereda tal cual.
+
+**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, y ninguna firma de D1/D2/D3 ni de
+Gödel I/II.

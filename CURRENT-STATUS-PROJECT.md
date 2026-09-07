@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-07 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-08c · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -34,6 +34,21 @@
 > namespaces, **31 ya en producción**.
 > ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
 > literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
+>
+> 🏁🏁 **2026-09-08c · C3-T CERRADO: `DEUDA_hGuardT` PROBADA** (§3.44).
+> `pcc_hGuardT (i n t) (hin : i < n) : DEUDA_hGuardT i n t` en `Meta/HasWitTrackedPrf.lean`,
+> footprint = la base sancionada, **net-0 puro**. Con `hGuard_of_deudaF`, la cascada de ADR-020
+> queda a la espera de **UNA sola** deuda: `DEUDA_hGuardF`.
+> ⚠️ **La corrección que costó el frente entero, y que conviene no repetir**:
+> `condD C t = substfc 0 ṫ (formCode C)` **NO admite elegir imagen** — la impone `formCode`, y
+> `formCode (shapeUn X k)` es la **ecuación posicional**, no la conjunción de accesores
+> (`shapeDot`) que §5 había elegido. Equivalentes en la teoría objeto, **códigos distintos**.
+> ⭐ Y la corrección salió **gratis en teoría objeto**: `pcc_tc_objAt` + `PrfH_dotVN` de
+> `Meta/CodeTreeReflect.lean` ya reflejaban esa ecuación por inducción sobre el árbol, desde el
+> frente de los 14 tags estructurales. `pcc_shape_tree` sólo las compone — y es genérica, luego
+> C3-F la hereda.
+> ⚠️ **La cota de casilla `i < n` no es un artefacto**: el puente `(nthc t ı̇)˙ → nthcT ṫ ı̄` es
+> `pcc_eval_nthc` y la exige. Las cuatro casillas `wit` reales la cumplen (`decide`).
 >
 > ✅✅ **LA LÍNEA ROJA DE ADR-020, COMPROBADA Y CON RAZÓN ESTRUCTURAL**: `d3_prf_of_chainOkDot` y
 > `pcc_lineWF_tracked_modulo_7` **conservan su firma exacta**. La guarda va DENTRO del `⇔` OBJETO,
