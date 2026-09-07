@@ -3389,3 +3389,50 @@ niveles, encima del Leibniz. Es la pieza más cara que queda de C3‑T.
 > binders**, o sea exactamente el caso barato de A3. Sigue siendo ADR (toca
 > `Minimal/Axioms.lean` dentro de los 7 axiomas enmendados) y sigue sin ser obligatoria, pero
 > ahora se sabe **qué** compra y **cuánto** cuesta no hacerla.
+
+### §3.43.6 · El ensamblaje exterior toca fondo: falta el LEMA DE SUSTITUCIÓN a nivel de código
+
+Atacado el `pcc_bdAll_intro` exterior, el diseño se cierra hasta un punto único y bien
+identificado. La cadena, con todo lo que ya está:
+
+1. `CF := wfAll1` es natural en un parámetro (`liftF_wfAll1`, `substF_wfAll1`) ✔ — aquí no hay
+   que empaquetar nada, a diferencia del `argsIn` de §3.43.3.
+2. La imagen debe usar accesores **dotados** y el índice sólo como `varc 0` (§3.43.5) ✔.
+3. Los trozos que van **dentro** del `forallc` interno hay que pre‑`liftc`‑arlos. ⭐ **Y esto
+   A3 sí lo tenía resuelto**, en contra de lo que decía §3.43.5: su `bdInB w :=
+   lencT (liftc zero (tcFn w))` está pre‑`liftc`‑ado precisamente porque va dentro de un
+   `bdExCode`. El idiom existe.
+4. ⛔ **Pero ahí muerde la diferencia**: el `liftc zero` de A3 envuelve `tcFn w`, que es
+   **CERRADO**, y entonces `prf_liftc_tcFn` lo colapsa. El nuestro envuelve
+   `nthcT (nthcT (tcFn w) (varc 0)) (tcFn 2̇)`, que **contiene el índice exterior** y no es
+   cerrado. Para bajar el `substfc` por ahí hace falta
+
+       substtc (succ v) (liftc 0 t) (liftc 0 Z)  =eq  liftc 0 (substtc v t Z)
+
+   — el **lema de sustitución/lift a nivel de código**, con `Z` **arbitrario**.
+
+**Medido: ese lema no existe en ninguna parte** (ni producción, ni `sondeos/`, ni `Probe/`), y
+**no es un axioma**: los axiomas objeto de `liftc`/`substtc` son sólo sus ecuaciones de
+recursión (`ax_liftc_var_lt`/`_var_ge`/`_func`, `ax_substtc_var_eq`/`_gt`/`_lt`/`_func`, y las
+dos de listas). Los tres usos que hay en el árbol (`BdAllIntroPrf:167`, `D3InDotPrf:158`,
+`TrackedAtomsPrf:206`) son todos el caso **fácil**, con el argumento cerrado.
+
+⇒ Probarlo es una **inducción OBJETO nueva** sobre el código, del tamaño de las de §3.38.
+
+### §3.43.7 · La decisión que esto pone sobre la mesa
+
+El ensamblaje exterior necesita **una de dos**, y son alternativas reales:
+
+| vía | qué cuesta | qué toca |
+|---|---|---|
+| **(a)** probar el lema de sustitución/lift a nivel de código | una inducción objeto nueva sobre el código, genérica en `Z` | nada del axioma; es trabajo nuevo puro y **reutilizable** (lo pedirá cualquier `∀` acotado anidado, también en C3‑F y en D3) |
+| **(b)** reformular `isTermCodeE1` con `In` atómico (estilo A3) | ⛔ **ADR**: toca `Minimal/Axioms.lean` dentro de los 7 axiomas enmendados por ADR‑020 ⇒ cambia qué demuestra `Prov` | elimina el binder interno ⇒ **no hace falta el lema**, y el `hbody` pasa a ser el caso barato de A3 |
+
+⭐ Nótese que esto **precisa** la conclusión de §3.43.1: allí se dijo que la reformulación «no
+hacía falta», y era cierto **para reflejar el `argsIn`** (§3.43.2 lo probó). Para el
+**ensamblaje exterior** la disyuntiva es la de arriba: no es que la reformulación sea
+necesaria, es que la alternativa tiene precio y ahora se sabe cuál.
+
+> 🔑 **Y una observación de arquitectura**: la vía (a) es la que **no compromete la teoría** y
+> además paga tres veces (C3‑T, C3‑F, D3, que anidan `∀` acotados los tres). La (b) es más
+> barata aquí y sólo aquí. Es decisión del autor.

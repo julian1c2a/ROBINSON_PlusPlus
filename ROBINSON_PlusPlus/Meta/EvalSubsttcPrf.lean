@@ -119,8 +119,6 @@ theorem substtc_inv_substtscT {X Y Z : Term}
     (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
     ∀ W, Prf (substtc zero W (substtscT X Y Z) =eq substtscT X Y Z) := fun W =>
   prf_eq_trans (prf_substtc_substtscT zero W X Y Z) (prf_congr_substtscT (hX W) (hY W) (hZ W))
-/-! ### `substtc` a NIVEL ARBITRARIO sobre los codigos cerrados (copia de Paso2 §2) -/
-
 /-! ## §3 · `pcc_axiom_inst4` — ⛔ **BORRADA: hoy vive en PRODUCCIÓN**
 
     Cuando se escribió este sondeo, `pcc_thm_inst4`/`pcc_axiom_inst4` no existían y había que

@@ -82,6 +82,27 @@ theorem prf_substfc_inDot (s A A' W : Term)
   exact prf_eq_trans (prf_substtsc_cons zero s W nil)
     (prf_eq_trans (prf_congr_cons_head (hW s)) (prf_congr_cons_tail (prf_substtsc_nil zero s)))
 
+/-- **`substfc` sobre una forma `shapeDot`**: sólo toca la ranura del nodo. Es la pieza que
+    consume cualquier recorrido de disyuntos por forma (C3‑T, C3‑F). -/
+theorem prf_substfc_shapeDot (s X X' : Term) (k n : Nat)
+    (hX : Prf (substtc zero s X =eq X')) :
+    Prf (substfc zero s (shapeDot X k n) =eq shapeDot X' k n) := by
+  unfold shapeDot
+  refine prf_eq_trans (prf_substfc_and zero s _ _) (prf_congr_andc ?_ ?_)
+  · refine prf_eq_trans (prf_substfc_eq zero s _ _) (prf_congr_eqCodeFn ?_ ?_)
+    · exact prf_eq_trans (prf_substtc_carcT zero s X) (prf_congr_carcT hX)
+    · exact substtc_inv_tcFn (numeralM k) s
+  · refine prf_eq_trans (prf_substfc_eq zero s _ _) (prf_congr_eqCodeFn ?_ ?_)
+    · exact prf_eq_trans (prf_substtc_lencT zero s X) (prf_congr_lencT hX)
+    · exact substtc_inv_tcFn (numeralM n) s
+
+/-- **`substtc` sobre la casilla `k`‑ésima dotada**: idem, sólo la ranura del nodo. -/
+theorem prf_substtc_child (s X X' : Term) (k : Nat)
+    (hX : Prf (substtc zero s X =eq X')) :
+    Prf (substtc zero s (nthcT X (tcFn (numeralM k))) =eq nthcT X' (tcFn (numeralM k))) :=
+  prf_eq_trans (prf_substtc_nthcT zero s X (tcFn (numeralM k)))
+    (prf_congr_nthcT hX (substtc_inv_tcFn (numeralM k) s))
+
 noncomputable def bdInB (w : Term) : Term := lencT (liftc zero (tcFn w))
 
 noncomputable def bdInPhic (x w : Term) : Term :=
@@ -402,7 +423,7 @@ Los consumidores previstos son **C3** (`DEUDA_hGuardT`/`DEUDA_hGuardF`) y **D3**
 (`DEUDA_chainOkBDot`), ninguno de los cuales existe todavía. Se exporta el kit entero porque
 todo él es genérico: no hay aquí fontanería privada de ningún frente. -/
 export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
-  shapeDot prf_substfc_inDot
+  shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substtc_child
   bdInB bdInPhic bdInDot substtc_inv_bdInB liftTerm_bdInDot pcc_boundedIn_tracked
   phiInBwd InBwd prf_substtc_varc0_at1 pcc_InBwd_computed pcc_In_atom_tracked
   PrfH_congr_cdrcT pcc_carcD_bridge_cons pcc_cdrcD_bridge_cons PrfH_in_transport
