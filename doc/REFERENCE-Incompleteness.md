@@ -3436,3 +3436,43 @@ necesaria, es que la alternativa tiene precio y ahora se sabe cuál.
 > 🔑 **Y una observación de arquitectura**: la vía (a) es la que **no compromete la teoría** y
 > además paga tres veces (C3‑T, C3‑F, D3, que anidan `∀` acotados los tres). La (b) es más
 > barata aquí y sólo aquí. Es decisión del autor.
+
+### §3.43.8 · ⚠️ CORRECCIÓN a §3.43.6/§3.43.7 — no hacía falta ni el lema general ni el ADR
+
+§3.43.6 concluyó que el `pcc_bdAll_intro` **exterior** estaba bloqueado por el **lema de
+sustitución/lift a nivel de código**, `substtc (σv) (liftc 0 t) (liftc 0 Z) =eq
+liftc 0 (substtc v t Z)` con `Z` **arbitrario**, y §3.43.7 puso encima de la mesa una
+disyuntiva: **(a)** probarlo (inducción objeto nueva) o **(b)** el ADR de reformular
+`isTermCodeE1`. **Ninguna de las dos hacía falta.**
+
+🔑 **El error fue sobregeneralizar el requisito.** Los `Z` que aparecen de verdad **no son
+arbitrarios**: son códigos de **forma conocida** — `nthcT` sobre `tcFn` y el hueco del índice.
+Para ésos basta con que `liftc` sepa atravesar sus constructores, y los axiomas objeto que eso
+pide (`ax_liftc_var_ge`, `ax_liftc_func`, `ax_liftsc_nil`/`_cons`) **ya estaban en la teoría**.
+Sólo faltaba componerlos.
+
+#### Lo que entra
+
+`Meta/TrackedAtomsPrf.lean` — el **kit de distribución de `liftc`**, cinco líneas por
+constructor: `prf_liftc_varc0` (el desplazamiento del hueco, `⌜v₀⌝ ↦ ⌜v₁⌝`),
+`prf_liftc_funcc1`/`_funcc2`, y sus instancias `prf_liftc_nthcT`/`_lencT`/`_carcT`/`_cdrcT`.
+
+`Meta/HasWitTrackedPrf.lean` §6 — la cuenta entera para el `Z` que bloqueaba:
+
+```lean
+theorem prf_substtc_liftc_wfAll1Args (w s : Term) :
+    Prf (substtc (succ zero) (liftc zero (tcFn s)) (liftc zero (wfAll1Args w))
+      =eq nthcT (nthcT (tcFn w) (tcFn s)) (tcFn (numeralM 2)))
+```
+
+es decir: **bajar el `substfc` por dentro del binder devuelve el `Z` con el hueco relleno**, que
+es exactamente lo que pide `hbody`. El ensamblaje exterior deja de estar bloqueado.
+
+> 🔑 **Regla de método, hermana de «medir la forma, no el tamaño»**: antes de concluir «hace
+> falta el lema GENERAL», mirar si las **instancias que de verdad ocurren** tienen forma
+> conocida. Allí la pregunta era *qué forma tienen los sitios*; aquí, *qué forma tienen los
+> argumentos*. En ambos casos la respuesta convierte un teorema general caro en una composición
+> barata — y aquí además evitó plantear un ADR que no era necesario.
+
+⇒ **La decisión de §3.43.7 queda retirada**: no hay que elegir entre (a) y (b). La vía era una
+tercera que no había visto.

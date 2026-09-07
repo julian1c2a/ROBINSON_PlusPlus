@@ -53,8 +53,8 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | `DEUDA_hGuardT` · mitad `In c w` | ✅ `pcc_In_atom_tracked`, con los dos argumentos **abstractos** |
 > | `DEUDA_hGuardT` · el `∀` acotado **ANIDADO** (`argsIn`) | ✅ `pcc_argsIn_pair_tracked` (§3.43) — **y sin tocar `Minimal/Axioms.lean`** |
 > | `DEUDA_hGuardT` · el recorrido de los DOS disyuntos de `isTermCodeE1` | ✅ `pcc_isTermCodeE1_tracked` (§3.43.5) |
-> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ⛔ **BLOQUEADO en una pieza identificada** (§3.43.6): falta el **lema de sustitución/lift a nivel de CÓDIGO**, `substtc (succ v) (liftc 0 t) (liftc 0 Z) =eq liftc 0 (substtc v t Z)` con `Z` **arbitrario**. NO existe en ningún sitio y NO es axioma (los axiomas de `liftc`/`substtc` son sólo sus ecuaciones de recursión). Los tres usos del árbol son el caso fácil, con el argumento cerrado. Probarlo es una **inducción objeto nueva** |
-> | ↳ **la decisión** | **(a)** probar ese lema — no toca la teoría y **paga tres veces** (C3‑T, C3‑F y D3 anidan `∀` acotados los tres) · **(b)** reformular `isTermCodeE1` con `In` atómico — ⛔ **ADR**, elimina el binder interno y el lema deja de hacer falta. §3.43.7 |
+> | `DEUDA_hGuardT` · la conmutación `substtc`/`liftc` bajo el binder | ✅ **DESBLOQUEADA** (§3.43.8): `prf_substtc_liftc_wfAll1Args` + el **kit de distribución de `liftc`**. ⚠️ §3.43.6/§3.43.7 estaban sobregeneralizados: **no** hacía falta el lema general con `Z` arbitrario **ni** el ADR — los `Z` reales tienen forma conocida |
+> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ⬜ ya sólo **ensamblaje**: definir `PsiF` con el kit, descargar las 9 obligaciones (8 son simp) y componer `hbody` con `pcc_isTermCodeE1_tracked` |
 > | `DEUDA_hGuardT` · el paso `∃` + fontanería `condD` | ⬜ ensamblaje (`pcc_exIntro_code_open`) |
 > | `DEUDA_hGuardF` (reflector Σ₁ de `hasWitF`) | ⬜ **enunciada, no probada**; estrictamente peor: 8 cláusulas, 2 listas testigo, `∃∃` |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
