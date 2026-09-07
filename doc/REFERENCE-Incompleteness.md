@@ -3530,3 +3530,58 @@ sobre el término objeto (`tcFn X`) y aquí se pide sobre **códigos**.
 necesita la cota `2̇ < lenc (nthc q i)`, que **sólo existe dentro del disyunto `shapeBin`** (es
 donde `lenc X = 3̇`). Hay que rehacer §3.43.5 entregando la forma de códigos **desde dentro de
 cada disyunto**, donde las hipótesis están disponibles, en vez de transportarla después.
+
+### §3.43.10 · 🏁 `DEUDA_wfAll1_tracked` PROBADA — y el reflector de `isTC1` sin hipótesis
+
+```lean
+pcc_wfAll1_tracked (w)  : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w))
+pcc_isTC1_tracked (w c) : Prf (isTC1 w c ⇒ provFromCode ⌜isTC1 ẇ ċ⌝)   -- w, c ABSTRACTOS
+```
+
+`hbody`, la novena obligación de §3.43.9, queda probada. Con ella se cierra **la mitad `wfAll1`
+de `DEUDA_hGuardT`**. Footprint = la base sancionada.
+
+#### Las cuatro piezas que hubo que construir
+
+1. **`PrfH_bdAllCode_congr_bnd`** — la congruencia de la **cota** de un `∀` acotado *dentro de
+   `Prov`*. Hacía falta porque `bdAllCode` mete la cota dentro del `forallc`, y el paso de
+   `(lenc Y)˙` a `lencT Ẏ` (que es `pcc_eval_lenc`) **sólo vale dentro de `Prov`**: los dos
+   términos no son iguales a nivel objeto. 🔑 El hueco del Leibniz se escribe `⌜v₁⌝`, de modo
+   que `substfc zero ·` lo alcanza al bajar por el binder — el mismo truco de §3.43.9.
+2. **`PrfH_argsInDotC_transport`** — el transporte de la lista, con las **dos** ocurrencias
+   (cota y cuerpo) rellenadas por **una sola** sustitución.
+3. **`pcc_argsIn_trackedC`** — `argsIn` en forma de códigos. Los `carc`/`cdrc` del `cons` son
+   igualdad **objeto** y se mueven con `prf_provCode_congr`, sin entrar en `Prov`; la cota
+   necesita (1).
+4. **`pcc_isTermCodeE1_trackedC`** — el recorrido en forma de códigos.
+
+#### Dos decisiones que lo hicieron posible
+
+⭐ **La ecuación del nodo entra como ANTECEDENTE OBJETO, no como hipótesis Lean.** En el punto
+de uso sólo se tiene bajo contexto (viene de `pcc_eval_nthc` con la cota), y el proyecto **no
+tiene debilitamiento de contexto** para `PrfH` — es la deuda **B6b**, y aquí mordió. Metiéndola
+en el antecedente, el `or`‑elim la conserva en su rama.
+
+⭐ **Cada disyunto se transporta dentro de su rama**, como §3.43.9 había medido.
+
+⚠️ Dos trampas registradas que volvieron a morder: `set` es de Mathlib y no existe; y un
+`have : PrfH _ (…)` **no** puede inferir el contexto desde la prueba de pertenencia — con
+`or`‑elim hay que escribir el de cada rama entero.
+
+### §3.43.11 · Lo que queda: el paso `∃` + `condD`, medido
+
+`hasWit c = ∃w. isTC1 w ↑c`, así que falta subir `pcc_isTC1_tracked` por el `∃`
+(`pcc_exIntro_code_open`) y envolverlo en la fontanería `condD`. Medido:
+
+* ⚠️ **El `∃`‑intro pide la imagen paramétrica en el CÓDIGO del testigo** (`WD`), no en el
+  término (`tcFn w`) — por la misma razón de §3.43.5: el hueco es una ranura de código. Es un
+  refactor **definicional** de `wfAll1PsiAt` (sustituir `tcFn w` por `WD`), más el transporte
+  de la cota `tcFn (lenc w) → lencT WD`, que ya tiene máquina: `PrfH_bdAllCode_congr_bnd`.
+* Su hipótesis `hPinv` (invariancia bajo `substfc` de **nivel 1**) se cumple: las ocurrencias
+  de `⌜v₁⌝` viven dentro del `forallc` **interno**, donde ya están a nivel 2.
+* ⭐ **Y la alineación con `condD` es un CÓMPUTO, no un teorema nuevo**:
+  `prf_substfc_arith_open : ∀ v w f, substfc ⌜v⌝ w (formCode f) =eq substCodeF v w f` es
+  **genérico en la fórmula `f`** (recursión estructural), así que
+  `condD (hasWit (nthc #0 ī)) t` se reduce a `substCodeF 0 (tcFn t) (hasWit (nthc #0 ī))` y lo
+  que queda es casarlo con la imagen construida — el mismo gesto que
+  `prf_condD_of_tree_eq` (`Meta/CodeTreeReflect.lean:332`) hace para su condición‑árbol.
