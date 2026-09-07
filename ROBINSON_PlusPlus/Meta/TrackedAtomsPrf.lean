@@ -3,6 +3,7 @@ import ROBINSON_PlusPlus.Meta.D3InDotPrf
 import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 import ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 import ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
+import ROBINSON_PlusPlus.Meta.LiftcCodePrf
 /-!
 # `Meta/TrackedAtomsPrf.lean` — el KIT GENÉRICO de reflexión Σ₁, con argumentos ABSTRACTOS
 
@@ -58,6 +59,7 @@ open ROBINSON_PlusPlus.Meta.InAxiomsCodePrf ROBINSON_PlusPlus.Meta.Delta0Reflect
 open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.MpCodePrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
+open ROBINSON_PlusPlus.Meta.LiftcCodePrf
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -88,6 +90,97 @@ theorem prf_congr_forallc {a a' : Term} (h : Prf (a =eq a')) :
     Prf (forallc a =eq forallc a') := by
   unfold forallc
   exact prf_congr_cons_tail (prf_congr_cons_head h)
+
+/-- Congruencia de `bdAllCode` a nivel META, en sus dos argumentos. -/
+theorem prf_congr_bdAllCode {B B' P P' : Term} (hB : Prf (B =eq B')) (hP : Prf (P =eq P')) :
+    Prf (bdAllCode B P =eq bdAllCode B' P') := by
+  unfold bdAllCode
+  exact prf_congr_forallc (prf_congr_implc (prf_congr_atom2CodeFn (prf_refl _) hB) hP)
+
+/-- Congruencia INTERNA de `nthcT` en su PRIMER argumento (molde `pcc_congr_consT_arg1_code`). -/
+theorem pcc_congr_nthcT_arg1_code (B X Y : Term)
+    (hB : ∀ W, Prf (substtc zero W B =eq B)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwB : Prf (hasWit B) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (nthcT X B) (nthcT Y B))) := by
+  let Ac : Term := eqc (nthcT X B) (nthcT (varc (numeral 0)) B)
+  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (nthcT X B) (nthcT w B)) := by
+    intro w
+    refine prf_eq_trans (prf_substfc_eq zero w (nthcT X B) (nthcT (varc (numeral 0)) B)) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_nthcT zero w X B) (prf_congr_nthcT (hX w) (hB w))
+    · exact prf_eq_trans (prf_substtc_nthcT zero w (varc (numeral 0)) B)
+        (prf_congr_nthcT (prf_substtc_varc0 w) (hB w))
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
+      (prf_provFromCode_eqCodeFn_refl (nthcT X B))
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (nthcT X B) (nthcT (varc (numeral 0)) B)
+        (prf_hasWit_funcc2 _ X B hwX hwB)
+        (prf_hasWit_funcc2 _ (varc (numeral 0)) B (prf_hasWit_varc (numeral 0)) hwB)) hwX hwY)
+
+/-- Introducción del `∨` a nivel de código, bajo contexto (versión `PrfH` de la mitad
+    izquierda de `pcc_reflect_or`). -/
+theorem PrfH_orL_code {Γ : List Formula} (Ac Bc : Term) (h : PrfH Γ (provFromCode Ac)) :
+    PrfH Γ (provFromCode (orc Ac Bc)) :=
+  PrfH.mp _ _ _ (prf_to_prfH (prf_mp (pcc_mp_code_open Ac (orc Ac Bc)) (pcc_j1_code Ac Bc)) _) h
+
+/-- Idem, mitad derecha. -/
+theorem PrfH_orR_code {Γ : List Formula} (Ac Bc : Term) (h : PrfH Γ (provFromCode Bc)) :
+    PrfH Γ (provFromCode (orc Ac Bc)) :=
+  PrfH.mp _ _ _ (prf_to_prfH (prf_mp (pcc_mp_code_open Bc (orc Ac Bc)) (pcc_j2_code Ac Bc)) _) h
+
+/-! ### La congruencia de `bdAllCode` en su COTA, DENTRO de `Prov`
+
+⚠️ Hace falta porque la cota de un `∀` acotado **va dentro del `forallc`**
+(`bdAllCode B Phic = forallc (implc (ltCodeFn ⌜v₀⌝ B) Phic)`), y el paso de `tcFn (lenc Y)` a
+`lencT Ẏ` —que es `pcc_eval_lenc`— **sólo vale dentro de `Prov`**: los dos términos no son
+iguales a nivel objeto. Así que el transporte de la cota tiene que hacerse ahí dentro.
+
+🔑 **El truco es el mismo de `wfAll1Psi`**: el hueco del Leibniz se escribe `⌜v₁⌝`, de modo que
+`substfc zero ·` lo alcanza al bajar por el `forallc` (donde el nivel sube a `σ0`). -/
+
+/-- El contexto de Leibniz para transportar la cota: el hueco es `⌜v₁⌝`, que queda a nivel `σ0`
+    justo dentro del `forallc`. -/
+noncomputable def bdAllBndCtx (Phic : Term) : Term :=
+  bdAllCode (varc (succ (numeral 0))) Phic
+
+/-- Y así se computa: rellenar el hueco da el `bdAllCode` con la cota lifteada. -/
+theorem prf_substfc_bdAllBndCtx (Phic s : Term)
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic)) :
+    Prf (substfc zero s (bdAllBndCtx Phic) =eq bdAllCode (liftc zero s) Phic) := by
+  unfold bdAllBndCtx bdAllCode
+  refine prf_eq_trans (prf_substfc_forall zero s _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl (succ zero) (liftc zero s) _ _)
+    (prf_congr_implc ?_ (hPinv (liftc zero s)))
+  refine prf_eq_trans (prf_substfc_atom2CodeFn (succ zero) (liftc zero s) lt_sym _ _) ?_
+  refine prf_congr_atom2CodeFn
+    (prf_mp (prf_substtc_var_lt (succ zero) (liftc zero s) (numeral 0)) (prf_zero_lt_succ zero))
+    ?_
+  exact prf_mp (prf_substtc_var_eq (succ zero) (liftc zero s) (succ (numeral 0))) (prf_refl _)
+
+/-- ⭐ **LA CONGRUENCIA DE LA COTA, DENTRO DE `Prov`.** Con `B` y `B'` **cerrados** a nivel de
+    código (que es el caso: son `tcFn …` o `lencT (tcFn …)`), el `liftc` se colapsa y queda la
+    congruencia limpia. -/
+theorem PrfH_bdAllCode_congr_bnd {Γ : List Formula} (B B' Phic : Term)
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
+    (hBc : Prf (liftc zero B =eq B)) (hBc' : Prf (liftc zero B' =eq B'))
+    (hB : PrfH Γ (provFromCode (eqCodeFn B B')))
+    (h : PrfH Γ (provFromCode (bdAllCode B Phic)))
+    (hwB : Prf (hasWit B) := by hw_auto) (hwB' : Prf (hasWit B') := by hw_auto)
+    (hwP : Prf (hasWitF (bdAllBndCtx Phic)) := by hw_auto) :
+    PrfH Γ (provFromCode (bdAllCode B' Phic)) := by
+  have hcomp : ∀ u : Term, Prf (substfc zero u (bdAllBndCtx Phic)
+      =eq bdAllCode (liftc zero u) Phic) := fun u => prf_substfc_bdAllBndCtx Phic u hPinv
+  have hB0 : PrfH Γ (provFromCode (substfc zero B (bdAllBndCtx Phic))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
+      (prf_eq_trans (hcomp B) (prf_congr_bdAllCode hBc (prf_refl Phic))))) _) h
+  have hB1 : PrfH Γ (provFromCode (substfc zero B' (bdAllBndCtx Phic))) :=
+    PrfH_leibniz_apply _ B B' hB hB0 hwP hwB hwB'
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_trans (hcomp B') (prf_congr_bdAllCode hBc' (prf_refl Phic)))) _) hB1
 
 /-! ### KIT de distribución de `liftc` sobre los constructores DOTADOS
 
@@ -163,6 +256,21 @@ theorem prf_substtc_child (s X X' : Term) (k : Nat)
     Prf (substtc zero s (nthcT X (tcFn (numeralM k))) =eq nthcT X' (tcFn (numeralM k))) :=
   prf_eq_trans (prf_substtc_nthcT zero s X (tcFn (numeralM k)))
     (prf_congr_nthcT hX (substtc_inv_tcFn (numeralM k) s))
+
+/-- Transporte de la ranura del nodo dentro de una `shapeDot`, DENTRO de `Prov`. -/
+theorem PrfH_shapeDot_transport {Γ : List Formula} (u v : Term) (k n : Nat)
+    (hu : ∀ W, Prf (substtc zero W u =eq u)) (hv : ∀ W, Prf (substtc zero W v =eq v))
+    (heq : PrfH Γ (provFromCode (eqCodeFn u v)))
+    (h : PrfH Γ (provFromCode (shapeDot u k n)))
+    (hwu : Prf (hasWit u) := by hw_auto) (hwv : Prf (hasWit v) := by hw_auto) :
+    PrfH Γ (provFromCode (shapeDot v k n)) := by
+  have hcomp : ∀ w : Term, Prf (substfc zero w (shapeDot (varc (numeral 0)) k n)
+      =eq shapeDot w k n) := fun w =>
+    prf_substfc_shapeDot w (varc (numeral 0)) w k n (prf_substtc_varc0 w)
+  have h0 : PrfH Γ (provFromCode (substfc zero u (shapeDot (varc (numeral 0)) k n))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm (hcomp u))) _) h
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp v)) _)
+    (PrfH_leibniz_apply _ u v heq h0 (by hw_auto) hwu hwv)
 
 noncomputable def bdInB (w : Term) : Term := lencT (liftc zero (tcFn w))
 
@@ -485,7 +593,9 @@ Los consumidores previstos son **C3** (`DEUDA_hGuardT`/`DEUDA_hGuardF`) y **D3**
 todo él es genérico: no hay aquí fontanería privada de ningún frente. -/
 export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
   shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substtc_child
-  prf_congr_forallc
+  prf_congr_forallc prf_congr_bdAllCode
+  pcc_congr_nthcT_arg1_code PrfH_shapeDot_transport PrfH_orL_code PrfH_orR_code
+  bdAllBndCtx prf_substfc_bdAllBndCtx PrfH_bdAllCode_congr_bnd
   prf_liftc_varc0 prf_liftc_funcc1 prf_liftc_funcc2
   prf_liftc_nthcT prf_liftc_lencT prf_liftc_carcT prf_liftc_cdrcT
   bdInB bdInPhic bdInDot substtc_inv_bdInB liftTerm_bdInDot pcc_boundedIn_tracked

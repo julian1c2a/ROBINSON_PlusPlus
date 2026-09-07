@@ -52,6 +52,7 @@ open ROBINSON_PlusPlus.Meta.Sigma1Prf ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs ROBINSON_PlusPlus.Meta.LiftcCodePrf
+open ROBINSON_PlusPlus.Meta.EvalNthcPrf ROBINSON_PlusPlus.Meta.EvalListPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -472,6 +473,280 @@ theorem pcc_isTC1_tracked_of_hbody
     (w c : Term) :
     Prf (isTC1 w c ⇒ provFromCode (andc (wfAll1Dot w) (inFormCodeFn (tcFn c) (tcFn w)))) :=
   pcc_isTC1_tracked_of (DEUDA_wfAll1_of_hbody hbody) w c
+
+
+/-! ## §8 · `hbody`: llevar el recorrido de §5 a la forma de CÓDIGOS
+
+§5 refleja `isTermCodeE1` entregando la imagen sobre el **término objeto** (`tcFn X`); `hbody`
+la pide sobre **códigos** (`nthcT ẇ ⌜i⌝`). El transporte tiene dos mitades:
+
+* lo que es **igualdad OBJETO** de códigos (los `carc`/`cdrc` de un `cons`) se mueve con
+  `prf_provCode_congr`, sin entrar en `Prov`;
+* lo que **sólo vale dentro de `Prov`** (`pcc_eval_lenc`, `pcc_eval_nthc`) necesita Leibniz — y
+  como las ocurrencias están **bajo el binder** del `bdAllCode`, con el hueco a nivel `⌜v₁⌝`
+  (`Meta/TrackedAtomsPrf.lean`). -/
+
+/-- La imagen de `argsIn` en forma de CÓDIGOS: la lista y el testigo entran como códigos. -/
+noncomputable def argsInDotC (YD W : Term) : Term :=
+  bdAllCode (lencT YD) (inFormCodeFn (nthcT YD (varc (numeral 0))) W)
+
+/-- El contexto de Leibniz con el hueco de la LISTA a nivel `⌜v₁⌝`: aparece **dos veces**
+    (en la cota y en el cuerpo) y una sola sustitución rellena las dos. -/
+noncomputable def argsInCtx (W : Term) : Term :=
+  bdAllCode (lencT (varc (succ (numeral 0))))
+    (inFormCodeFn (nthcT (varc (succ (numeral 0))) (varc (numeral 0))) W)
+
+theorem prf_substfc_argsInCtx (q s : Term) :
+    Prf (substfc zero s (argsInCtx (tcFn q)) =eq argsInDotC (liftc zero s) (tcFn q)) := by
+  unfold argsInCtx argsInDotC bdAllCode
+  refine prf_eq_trans (prf_substfc_forall zero s _) (prf_congr_forallc ?_)
+  refine prf_eq_trans (prf_substfc_impl (succ zero) (liftc zero s) _ _)
+    (prf_congr_implc ?_ ?_)
+  · refine prf_eq_trans (prf_substfc_atom2CodeFn (succ zero) (liftc zero s) lt_sym _ _) ?_
+    refine prf_congr_atom2CodeFn
+      (prf_mp (prf_substtc_var_lt (succ zero) (liftc zero s) (numeral 0)) (prf_zero_lt_succ zero))
+      ?_
+    exact prf_eq_trans (prf_substtc_lencT (succ zero) _ _)
+      (prf_congr_lencT
+        (prf_mp (prf_substtc_var_eq (succ zero) (liftc zero s) (succ (numeral 0)))
+          (prf_refl _)))
+  · refine prf_eq_trans (prf_substfc_atom2CodeFn (succ zero) (liftc zero s) in_sym _ _) ?_
+    refine prf_congr_atom2CodeFn ?_ (prf_substtc_tcFn_at 1 _ q)
+    refine prf_eq_trans (prf_substtc_nthcT (succ zero) _ _ _) ?_
+    exact prf_congr_nthcT
+      (prf_mp (prf_substtc_var_eq (succ zero) (liftc zero s) (succ (numeral 0))) (prf_refl _))
+      (prf_mp (prf_substtc_var_lt (succ zero) (liftc zero s) (numeral 0)) (prf_zero_lt_succ zero))
+
+/-- ⭐ **El transporte de la LISTA dentro de `Prov`**, con las dos ocurrencias a la vez. -/
+theorem PrfH_argsInDotC_transport {Γ : List Formula} (q YD YD' : Term)
+    (hY : PrfH Γ (provFromCode (eqCodeFn YD YD')))
+    (h : PrfH Γ (provFromCode (argsInDotC YD (tcFn q))))
+    (hcY : Prf (liftc zero YD =eq YD)) (hcY' : Prf (liftc zero YD' =eq YD'))
+    (hwY : Prf (hasWit YD) := by hw_auto) (hwY' : Prf (hasWit YD') := by hw_auto)
+    (hwC : Prf (hasWitF (argsInCtx (tcFn q))) := by hw_auto) :
+    PrfH Γ (provFromCode (argsInDotC YD' (tcFn q))) := by
+  have hcong : ∀ u u' : Term, Prf (u =eq u') →
+      Prf (argsInDotC u (tcFn q) =eq argsInDotC u' (tcFn q)) := by
+    intro u u' hu
+    exact prf_congr_bdAllCode (prf_congr_lencT hu)
+      (prf_congr_atom2CodeFn (prf_congr_nthcT hu (prf_refl _)) (prf_refl _))
+  have h0 : PrfH Γ (provFromCode (substfc zero YD (argsInCtx (tcFn q)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
+      (prf_eq_trans (prf_substfc_argsInCtx q YD) (hcong _ _ hcY)))) _) h
+  have h1 : PrfH Γ (provFromCode (substfc zero YD' (argsInCtx (tcFn q)))) :=
+    PrfH_leibniz_apply _ YD YD' hY h0 hwC hwY hwY'
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_trans (prf_substfc_argsInCtx q YD') (hcong _ _ hcY'))) _) h1
+
+
+/-- El cuerpo del `argsIn` dotado es invariante bajo `substfc` de NIVEL 1: su única variable
+    de código es `⌜v₀⌝`, que vive en el nivel 0. -/
+theorem prf_substfc_argsInBody_inv (q Y : Term) : ∀ u : Term,
+    Prf (substfc (succ zero) u (inFormCodeFn (nthcT (tcFn Y) (varc (numeral 0))) (tcFn q))
+      =eq inFormCodeFn (nthcT (tcFn Y) (varc (numeral 0))) (tcFn q)) := by
+  intro u
+  refine prf_eq_trans (prf_substfc_atom2CodeFn (succ zero) u in_sym _ _) ?_
+  refine prf_congr_atom2CodeFn ?_ (prf_substtc_tcFn_at 1 u q)
+  refine prf_eq_trans (prf_substtc_nthcT (succ zero) u _ _) ?_
+  exact prf_congr_nthcT (prf_substtc_tcFn_at 1 u Y)
+    (prf_mp (prf_substtc_var_lt (succ zero) u (numeral 0)) (prf_zero_lt_succ zero))
+
+/-- ⭐ **`argsIn` reflejado EN FORMA DE CÓDIGOS.** Es `pcc_argsIn_tracked'` (§4) con dos
+    transportes: los `carc`/`cdrc` del `cons` son igualdad **objeto** y se mueven con
+    `prf_provCode_congr`; el paso de `(lenc Y)˙` a `lencT Ẏ` **sólo vale dentro de `Prov`**
+    (`pcc_eval_lenc`) y va por `PrfH_bdAllCode_congr_bnd`, con el hueco bajo el binder. -/
+theorem pcc_argsIn_trackedC (q Y : Term) :
+    Prf (argsIn q Y ⇒ provFromCode (argsInDotC (tcFn Y) (tcFn q))) := by
+  refine prf_deduction ?_
+  have h0 : PrfH [argsIn q Y] (provFromCode (argsInDot q Y)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_argsIn_tracked' q Y) _) (prfH_hyp_self _)
+  -- (i) los `carc`/`cdrc` del `cons`: igualdad OBJETO
+  have hc : Prf (tcFn (carc (cons q Y)) =eq tcFn q) := prf_congr_tcFn (prf_carc_cons q Y)
+  have hd : Prf (tcFn (cdrc (cons q Y)) =eq tcFn Y) := prf_congr_tcFn (prf_cdrc_cons q Y)
+  have hl : Prf (tcFn (lenc (cdrc (cons q Y))) =eq tcFn (lenc Y)) :=
+    prf_congr_tcFn (prf_congr_lenc (prf_cdrc_cons q Y))
+  have hmeta : Prf (argsInDot q Y
+      =eq bdAllCode (tcFn (lenc Y))
+            (inFormCodeFn (nthcT (tcFn Y) (varc (numeral 0))) (tcFn q))) := by
+    unfold argsInDot argsInPsi
+    exact prf_congr_bdAllCode hl
+      (prf_congr_atom2CodeFn (prf_congr_nthcT hd (prf_refl _)) hc)
+  have h1 : PrfH [argsIn q Y] (provFromCode (bdAllCode (tcFn (lenc Y))
+      (inFormCodeFn (nthcT (tcFn Y) (varc (numeral 0))) (tcFn q)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr hmeta) _) h0
+  -- (ii) la cota, DENTRO de `Prov`
+  have hbnd : PrfH [argsIn q Y]
+      (provFromCode (eqCodeFn (tcFn (lenc Y)) (lencT (tcFn Y)))) :=
+    PrfH_eq_symm_code _ _ (substtc_inv_lencT (substtc_inv_tcFn Y))
+      (prf_to_prfH (pcc_eval_lenc Y) _) (by hw_auto) (by hw_auto)
+  exact PrfH_bdAllCode_congr_bnd _ _ _ (prf_substfc_argsInBody_inv q Y)
+    (prf_liftc_tcFn (lenc Y))
+    (prf_eq_trans (prf_liftc_lencT zero (tcFn Y)) (prf_congr_lencT (prf_liftc_tcFn Y)))
+    hbnd h1
+
+
+/-- El recorrido de `isTermCodeE1`, con la imagen ya en forma de **CÓDIGOS**: el nodo entra
+    como `ND` (un código) en vez de como `tcFn X`. Es lo que pide `hbody`. -/
+noncomputable def isTermCodeE1DotC (q ND : Term) : Term :=
+  orc (shapeDot ND 0 2)
+      (andc (shapeDot ND 1 3) (argsInDotC (nthcT ND (tcFn (numeralM 2))) (tcFn q)))
+
+/-- ⭐ **EL RECORRIDO EN FORMA DE CÓDIGOS.**
+
+    ⚠️ La ecuación `ND = Ẋ` entra como **antecedente OBJETO**, no como hipótesis Lean: en el
+    punto de uso sólo se tiene bajo el contexto (viene de `pcc_eval_nthc` con la cota), y el
+    proyecto **no tiene debilitamiento de contexto** para `PrfH` (deuda B6b). Metiéndola en el
+    antecedente, el `or`-elim la conserva en su rama.
+
+    Y cada disyunto se transporta **dentro de su rama**, que es donde están las hipótesis: la
+    cota `2̇ < lenc X` que necesita `pcc_eval_nthc` sólo existe en la rama `shapeBin`. -/
+theorem pcc_isTermCodeE1_trackedC (q X ND : Term)
+    (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
+    (hNDlift : Prf (liftc zero ND =eq ND))
+    (hwND : Prf (hasWit ND) := by hw_auto) :
+    Prf (provFromCode (eqCodeFn ND (tcFn X)) ⇒
+      (isTermCodeE1 q X ⇒ provFromCode (isTermCodeE1DotC q ND))) := by
+  refine prf_deduction (deduction_aux ?_ (isTermCodeE1 q X)
+    [provFromCode (eqCodeFn ND (tcFn X))] rfl)
+  have hE1 : PrfH [isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
+      (isTermCodeE1 q X) := PrfH.hyp _ _ (List.Mem.head _)
+  refine PrfH_or_elim hE1 ?_ ?_
+  · -- rama UNARIA
+    have hND : PrfH [shapeUn X 0, isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn ND (tcFn X))) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+    have hsym : PrfH [shapeUn X 0, isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn (tcFn X) ND)) :=
+      PrfH_eq_symm_code _ _ hNDinv hND (by hw_auto) (by hw_auto)
+    have hsh : PrfH [shapeUn X 0, isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
+        (shapeUn X 0) := PrfH.hyp _ _ (List.Mem.head _)
+    have h0 : PrfH [shapeUn X 0, isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (shapeDot (tcFn X) 0 2)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_shape_of_str X 0 2 _ (prf_shapeUn_str X 0)) _) hsh
+    exact PrfH_orL_code _ _
+      (PrfH_shapeDot_transport (tcFn X) ND 0 2 (substtc_inv_tcFn X) hNDinv hsym h0)
+  · -- rama BINARIA
+    have hND : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))),
+        isTermCodeE1 q X, provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn ND (tcFn X))) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+    have hsym : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn (tcFn X) ND)) :=
+      PrfH_eq_symm_code _ _ hNDinv hND (by hw_auto) (by hw_auto)
+    have hand : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (land (shapeBin X 1) (argsIn q (nthc X (numeralM 2)))) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hsb : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (shapeBin X 1) := PrfH_and_elim_left hand
+    have hargs : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (argsIn q (nthc X (numeralM 2))) := PrfH_and_elim_right hand
+    have hstr : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (land (consOk X) (land (Formula.eq (carc X) (numeralM 1))
+        (Formula.eq (lenc X) (numeralM 3)))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_shapeBin_str X 1) _) hsb
+    have hlt2 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (lt (numeralM 2) (lenc X)) :=
+      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+        (PrfH_eq_symm (PrfH_and_elim_right (PrfH_and_elim_right hstr)))
+        (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
+    have hsh0 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (shapeDot (tcFn X) 1 3)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_shape_of_str X 1 3 _ (prf_shapeBin_str X 1)) _) hsb
+    have hshD : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (shapeDot ND 1 3)) :=
+      PrfH_shapeDot_transport (tcFn X) ND 1 3 (substtc_inv_tcFn X) hNDinv hsym hsh0
+    have hA0 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (argsInDotC (tcFn (nthc X (numeralM 2))) (tcFn q))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_argsIn_trackedC q (nthc X (numeralM 2))) _) hargs
+    have hev : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM 2)))
+        (tcFn (nthc X (numeralM 2))))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc X (numeralM 2)) _) hlt2
+    have hcg : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn (nthcT ND (tcFn (numeralM 2)))
+        (nthcT (tcFn X) (tcFn (numeralM 2))))) :=
+      PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_nthcT_arg1_code (tcFn (numeralM 2)) ND (tcFn X)
+        (substtc_inv_tcFn (numeralM 2)) hNDinv) _) hND
+    have hfwd : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn (nthcT ND (tcFn (numeralM 2)))
+        (tcFn (nthc X (numeralM 2))))) :=
+      PrfH_eq_trans_code _ _ _ (substtc_inv_nthcT hNDinv (substtc_inv_tcFn (numeralM 2)))
+        hcg hev (by hw_auto) (by hw_auto) (by hw_auto)
+    have hchain : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (eqCodeFn (tcFn (nthc X (numeralM 2)))
+        (nthcT ND (tcFn (numeralM 2))))) :=
+      PrfH_eq_symm_code _ _ (substtc_inv_nthcT hNDinv (substtc_inv_tcFn (numeralM 2)))
+        hfwd (by hw_auto) (by hw_auto)
+    have hAD : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
+        provFromCode (eqCodeFn ND (tcFn X))]
+        (provFromCode (argsInDotC (nthcT ND (tcFn (numeralM 2))) (tcFn q))) :=
+      PrfH_argsInDotC_transport q _ _ hchain hA0
+        (prf_liftc_tcFn (nthc X (numeralM 2)))
+        (prf_eq_trans (prf_liftc_nthcT zero ND (tcFn (numeralM 2)))
+          (prf_congr_nthcT hNDlift (prf_liftc_tcFn (numeralM 2))))
+    exact PrfH_orR_code _ _ (PrfH_and_intro_code _ _ hshD hAD)
+
+
+/-- ⭐⭐ **`hbody`, LA NOVENA OBLIGACIÓN.** De `wfAll1 q` y la cota sale el cuerpo dotado con el
+    hueco relleno. Junta todo: instancia el `∀` objeto, saca la ecuación del nodo de
+    `pcc_eval_nthc`, aplica el recorrido en forma de códigos y transporta con la keystone. -/
+theorem hbody_wfAll1 : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
+    provFromCode (substfc zero (tcFn i) (wfAll1Psi q)))) := by
+  intro q i
+  refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [wfAll1 q] rfl)
+  have hlt : PrfH [lt i (lenc q), wfAll1 q] (lt i (lenc q)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hwf : PrfH [lt i (lenc q), wfAll1 q] (wfAll1 q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hND : PrfH [lt i (lenc q), wfAll1 q]
+      (provFromCode (eqCodeFn (nthcT (tcFn q) (tcFn i)) (tcFn (nthc q i)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc q i) _) hlt
+  have hspec := PrfH_spec hwf i
+  have heq : substFormula 0 i (wfAll1Body q)
+      = Formula.impl (lt i (lenc q)) (isTermCodeE1 q (nthc q i)) := by
+    simp only [wfAll1Body, substFormula, substTerm, substTerms, lt, lenc, nthc,
+      substF_isTermCodeE1, FOL.substTerm_liftTerm, if_true]
+  rw [wfAll1, heq] at hspec
+  have hE1 : PrfH [lt i (lenc q), wfAll1 q] (isTermCodeE1 q (nthc q i)) :=
+    PrfH.mp _ _ _ hspec hlt
+  have hNDinv : ∀ W, Prf (substtc zero W (nthcT (tcFn q) (tcFn i)) =eq nthcT (tcFn q) (tcFn i)) :=
+    substtc_inv_nthcT (substtc_inv_tcFn q) (substtc_inv_tcFn i)
+  have hNDlift : Prf (liftc zero (nthcT (tcFn q) (tcFn i)) =eq nthcT (tcFn q) (tcFn i)) :=
+    prf_eq_trans (prf_liftc_nthcT zero (tcFn q) (tcFn i))
+      (prf_congr_nthcT (prf_liftc_tcFn q) (prf_liftc_tcFn i))
+  have hC : PrfH [lt i (lenc q), wfAll1 q]
+      (provFromCode (isTermCodeE1DotC q (nthcT (tcFn q) (tcFn i)))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH
+      (pcc_isTermCodeE1_trackedC q (nthc q i) (nthcT (tcFn q) (tcFn i)) hNDinv hNDlift) _)
+      hND) hE1
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
+    (prf_substfc_wfAll1Psi q (tcFn i) (tcFn i) (prf_liftc_tcFn i)))) _) hC
+
+/-! ## §9 · ⭐⭐⭐ `DEUDA_wfAll1_tracked`, PROBADA — y con ella el reflector de `isTC1` -/
+
+theorem pcc_wfAll1_tracked (w : Term) : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w)) :=
+  pcc_wfAll1_tracked_of_hbody hbody_wfAll1 w
+
+theorem DEUDA_wfAll1_tracked_proved : DEUDA_wfAll1_tracked wfAll1Dot :=
+  DEUDA_wfAll1_of_hbody hbody_wfAll1
+
+/-- ⭐⭐⭐ **EL REFLECTOR DE `isTC1`, SIN HIPÓTESIS**: `isTC1 w c ⇒ Prov(⌜isTC1 ẇ ċ⌝)`, con
+    **`w` y `c` abstractos**. Es la mitad `wfAll1` de `DEUDA_hGuardT`, cerrada. -/
+theorem pcc_isTC1_tracked (w c : Term) :
+    Prf (isTC1 w c ⇒ provFromCode (andc (wfAll1Dot w) (inFormCodeFn (tcFn c) (tcFn w)))) :=
+  pcc_isTC1_tracked_of DEUDA_wfAll1_tracked_proved w c
 
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
