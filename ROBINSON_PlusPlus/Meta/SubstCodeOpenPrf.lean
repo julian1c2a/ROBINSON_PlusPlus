@@ -239,9 +239,15 @@ end
 
 /-! ## §4 · INVARIANCIA DE `substCodeT` BAJO `substtc` DE NIVEL SUPERIOR (2026‑09‑09g)
 
-⭐ **La obligación `hPinv` de TODA aplicación de `pcc_bdAll_intro`**, en su forma genérica y a
-nivel de TÉRMINO. Hasta ahora se pagaba a mano en cada frente (`hPinv_wfAll1Psi`,
-`Meta/HasWitTrackedPrf.lean` §10, ~40 líneas de recorrido); esto la hace de una vez.
+El **ladrillo de nivel TÉRMINO** sobre el que se construye `hPinv`. ⚠️ **NO es `hPinv`**: la
+obligación que `pcc_bdAll_intro` consume es de nivel **FÓRMULA**, y vive en
+`Meta/BdAllIntroPrf.lean` (`substfc_inv_substCodeF_at`) — aquí no cabe, porque este módulo está
+aguas arriba de `atomc`/`eqCodeFn`/`implc`.
+
+⚠️ Y ojo al **ÍNDICE**, que es donde la versión anterior de este docstring engañaba: el lema de
+abajo da invariancia a nivel `v+1` de un código construido con `substCodeT v`. Un `hPinv` real
+suele pedir el **mismo** índice (`chainOkBPsi = substCodeF 1 …` y la obligación actúa al nivel
+1), y para eso está la variante `_at` de más abajo. Hacen falta las dos.
 
 **El enunciado.** Si el testigo `W` es `substtc`‑invariante al nivel `v+1`, y la fórmula/término
 no tiene variables libres por encima de `v+1`, entonces el código `substCodeT v W t` es
