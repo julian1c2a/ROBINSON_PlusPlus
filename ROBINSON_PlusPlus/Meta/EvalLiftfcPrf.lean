@@ -680,6 +680,252 @@ theorem pcc_eval_liftfc_modulo_8
   fun wF wT c X => DESCENSO_liftfc_imp hbot hatom heq h5 h7 h8 h6 h9 wF wT c X
 
 
+
+/-! ## §8 · DESCARGA de `CasoBotL`, `CasoBinL 5/7/8` y `CasoUnL 6/9`
+
+Los seis que **no** piden A5. Cada uno es la misma jugada: la ecuación dotada de §3, la
+ecuación META correspondiente (`prf_liftfc_*`, `Meta/ArithPrf.lean`), y el transporte de
+Leibniz desde la forma ecuacional de la guarda. -/
+
+/-- La congruencia interna de `liftfcT` en su argumento CÓDIGO — espejo de
+    `pcc_congr_liftcT_arg2_code`. Es lo único de fontanería que faltaba. -/
+theorem pcc_congr_liftfcT_arg2_code (A X Y : Term)
+    (hA : ∀ W, Prf (substtc zero W A =eq A)) (hX : ∀ W, Prf (substtc zero W X =eq X))
+    (hwA : Prf (hasWit A) := by hw_auto) (hwX : Prf (hasWit X) := by hw_auto)
+    (hwY : Prf (hasWit Y) := by hw_auto) :
+    Prf (provFromCode (eqc X Y) ⇒ provFromCode (eqc (liftfcT A X) (liftfcT A Y))) := by
+  let Ac : Term := eqc (liftfcT A X) (liftfcT A (varc (numeral 0)))
+  have hcomp : ∀ w : Term, Prf (substfc zero w Ac =eq eqc (liftfcT A X) (liftfcT A w)) := by
+    intro w
+    refine prf_eq_trans (prf_substfc_eq zero w (liftfcT A X) (liftfcT A (varc (numeral 0)))) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · exact prf_eq_trans (prf_substtc_liftfcT zero w A X) (prf_congr_liftfcT (hA w) (hX w))
+    · exact prf_eq_trans (prf_substtc_liftfcT zero w A (varc (numeral 0)))
+        (prf_congr_liftfcT (hA w) (prf_substtc_varc0 w))
+  have hAX : Prf (provFromCode (substfc zero X Ac)) :=
+    prf_mp (prf_provCode_congr (prf_eq_symm (hcomp X)))
+      (prf_provFromCode_eqCodeFn_refl (liftfcT A X))
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
+    (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
+      (prf_hasWitF_eq2 (liftfcT A X) (liftfcT A (varc (numeral 0)))
+        (prf_hasWit_liftfcT hwA hwX) (prf_hasWit_liftfcT hwA (prf_hasWit_varc (numeral 0)))) hwX hwY)
+
+/-- El transporte de Leibniz del objetivo (espeja `PrfH_congr_targetSubstfc`). -/
+theorem substF_targetLiftfc_hole (c t : Term) :
+    substFormula 0 t (targetLiftfc (liftTerm 0 c) (.var 0)) = targetLiftfc c t := by
+  simp only [substF_targetLiftfc, FOL.substTerm_liftTerm, substTerm, if_true]
+
+theorem PrfH_congr_targetLiftfc {Γ : List Formula} (c : Term) {X X' : Term}
+    (h : PrfH Γ (X =eq X')) (ha : PrfH Γ (targetLiftfc c X)) : PrfH Γ (targetLiftfc c X') :=
+  (substF_targetLiftfc_hole c X') ▸
+    PrfH_leibniz_subst (A := targetLiftfc (liftTerm 0 c) (.var 0)) h
+      ((substF_targetLiftfc_hole c X) ▸ ha)
+
+/-! ### §8.1 · `CasoBotL` (tag 2) -/
+
+/-- **`CasoBotL` DESCARGADO.** -/
+theorem casoBotL : CasoBotL := by
+  intro c X
+  refine prf_deduction ?_
+  have hbase : Prf (targetLiftfc c botc) := by
+    unfold targetLiftfc evalLiftfcCode
+    refine prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+      (prf_congr_tcFn (prf_eq_symm (prf_liftfc_bottom c))))) ?_
+    exact pcc_eq_trans_code _ _ _
+      (substtc_inv_liftfcT (substtc_inv_tcFn c) (substtc_inv_tcFn botc))
+      (by hw_auto) (by hw_auto) (by hw_auto)
+      (prf_mp (pcc_congr_liftfcT_arg2_code (tcFn c) (tcFn botc) (nulT 2)
+        (substtc_inv_tcFn c) (substtc_inv_tcFn botc)) (pcc_dot_nul_symm 2))
+      (pcc_eq_trans_code _ _ _ (substtc_inv_liftfcT (substtc_inv_tcFn c) (substtc_inv_nulT 2))
+        (by hw_auto) (by hw_auto) (by hw_auto)
+        (pcc_liftfc_bottom_code c) (pcc_dot_nul 2))
+  exact PrfH_congr_targetLiftfc c (PrfH_eq_symm (prfH_hyp_self (clBot X)))
+    (prf_to_prfH hbase _)
+
+/-! ### §8.2 · `CasoBinL 5/7/8` — genérico en el tag, tres instancias -/
+
+/-- El núcleo del caso BINARIO en forma IMPLICACION: las dos HI llegan como hipótesis OBJETO.
+    ⚠️ Igual que en `substfc`, hay que escribirlo en `PrfH` (deuda B6b). -/
+theorem paso_caso_bin_imp_L (k : Nat) (c a b : Term)
+    (hax : Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (binT k (tcFn a) (tcFn b)))
+      (binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))))
+    (hobj : Prf (liftfc c (cons (numeralM k) (cons a (cons b nil)))
+      =eq cons (numeralM k) (cons (liftfc c a) (cons (liftfc c b) nil)))) :
+    Prf (Formula.impl (land (targetLiftfc c a) (targetLiftfc c b))
+      (targetLiftfc c (cons (numeralM k) (cons a (cons b nil))))) := by
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (land (targetLiftfc c a) (targetLiftfc c b))
+  have hA : PrfH [land (targetLiftfc c a) (targetLiftfc c b)]
+      (provFromCode (eqc (liftfcT (tcFn c) (tcFn a)) (tcFn (liftfc c a)))) :=
+    PrfH_and_elim_left hh
+  have hB : PrfH [land (targetLiftfc c a) (targetLiftfc c b)]
+      (provFromCode (eqc (liftfcT (tcFn c) (tcFn b)) (tcFn (liftfc c b)))) :=
+    PrfH_and_elim_right hh
+  have iLA : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (tcFn a))
+      =eq liftfcT (tcFn c) (tcFn a)) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c) (substtc_inv_tcFn a)
+  have iLB : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (tcFn b))
+      =eq liftfcT (tcFn c) (tcFn b)) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c) (substtc_inv_tcFn b)
+  have iX0 : ∀ W, Prf (substtc zero W
+      (liftfcT (tcFn c) (tcFn (cons (numeralM k) (cons a (cons b nil)))))
+      =eq liftfcT (tcFn c) (tcFn (cons (numeralM k) (cons a (cons b nil))))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_tcFn (cons (numeralM k) (cons a (cons b nil))))
+  have iX1 : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (binT k (tcFn a) (tcFn b)))
+      =eq liftfcT (tcFn c) (binT k (tcFn a) (tcFn b))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_binT (substtc_inv_tcFn a) (substtc_inv_tcFn b))
+  have iX2 : ∀ W, Prf (substtc zero W
+      (binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b)))
+      =eq binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))) :=
+    substtc_inv_binT iLA iLB
+  have iX3 : ∀ W, Prf (substtc zero W (binT k (tcFn (liftfc c a)) (liftfcT (tcFn c) (tcFn b)))
+      =eq binT k (tcFn (liftfc c a)) (liftfcT (tcFn c) (tcFn b))) :=
+    substtc_inv_binT (substtc_inv_tcFn (liftfc c a)) iLB
+  have iX4 : ∀ W, Prf (substtc zero W (binT k (tcFn (liftfc c a)) (tcFn (liftfc c b)))
+      =eq binT k (tcFn (liftfc c a)) (tcFn (liftfc c b))) :=
+    substtc_inv_binT (substtc_inv_tcFn (liftfc c a)) (substtc_inv_tcFn (liftfc c b))
+  have h1 := prf_to_prfH (prf_mp (pcc_congr_liftfcT_arg2_code (tcFn c)
+      (tcFn (cons (numeralM k) (cons a (cons b nil)))) (binT k (tcFn a) (tcFn b))
+      (substtc_inv_tcFn c) (substtc_inv_tcFn (cons (numeralM k) (cons a (cons b nil)))))
+    (pcc_dot_bin_symm k a b)) [land (targetLiftfc c a) (targetLiftfc c b)]
+  have h2 := prf_to_prfH hax [land (targetLiftfc c a) (targetLiftfc c b)]
+  have h3 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_1_code k
+      (liftfcT (tcFn c) (tcFn b)) (liftfcT (tcFn c) (tcFn a)) (tcFn (liftfc c a)) iLB iLA) _) hA
+  have h4 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_2_code k (tcFn (liftfc c a))
+      (liftfcT (tcFn c) (tcFn b)) (tcFn (liftfc c b))
+      (substtc_inv_tcFn (liftfc c a)) iLB) _) hB
+  have h5 := prf_to_prfH (pcc_dot_bin k (liftfc c a) (liftfc c b))
+    [land (targetLiftfc c a) (targetLiftfc c b)]
+  have h6 := prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+      (prf_congr_tcFn (prf_eq_symm hobj))))
+    (prf_provFromCode_eqCodeFn_refl
+      (tcFn (cons (numeralM k) (cons (liftfc c a) (cons (liftfc c b) nil))))))
+    [land (targetLiftfc c a) (targetLiftfc c b)]
+  refine PrfH_eq_trans_code _ _ _ iX0 h1
+    (PrfH_eq_trans_code _ _ _ iX1 h2
+      (PrfH_eq_trans_code _ _ _ iX2 h3
+        (PrfH_eq_trans_code _ _ _ iX3 h4
+          (PrfH_eq_trans_code _ _ _ iX4 h5 h6 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
+    <;> hw_auto
+
+theorem casoBinL_gen (k : Nat)
+    (hax : ∀ c a b : Term, Prf (provFromCode (eqCodeFn
+      (liftfcT (tcFn c) (binT k (tcFn a) (tcFn b)))
+      (binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))))
+    (hobj : ∀ c a b : Term, Prf (liftfc c (cons (numeralM k) (cons a (cons b nil)))
+      =eq cons (numeralM k) (cons (liftfc c a) (cons (liftfc c b) nil)))) :
+    CasoBinL k := by
+  intro c X
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (land (shapeBin X k)
+    (land (targetLiftfc c (nthc X (numeralM 1))) (targetLiftfc c (nthc X (numeralM 2)))))
+  have hshape := PrfH_and_elim_left hh
+  have hab := PrfH_and_elim_right hh
+  have hC := PrfH.mp _ _ _
+    (prf_to_prfH (paso_caso_bin_imp_L k c (nthc X (numeralM 1)) (nthc X (numeralM 2))
+      (hax c (nthc X (numeralM 1)) (nthc X (numeralM 2)))
+      (hobj c (nthc X (numeralM 1)) (nthc X (numeralM 2)))) _) hab
+  exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
+
+theorem casoBinL5 : CasoBinL 5 :=
+  casoBinL_gen 5 (fun c a b => pcc_liftfc_impl_code c a b) (fun c a b => prf_liftfc_impl c a b)
+theorem casoBinL7 : CasoBinL 7 :=
+  casoBinL_gen 7 (fun c a b => pcc_liftfc_and_code c a b) (fun c a b => prf_liftfc_and c a b)
+theorem casoBinL8 : CasoBinL 8 :=
+  casoBinL_gen 8 (fun c a b => pcc_liftfc_or_code c a b) (fun c a b => prf_liftfc_or c a b)
+
+/-! ### §8.3 · `CasoUnL 6/9` — ⚠️ LAS QUE SUBEN EL NIVEL
+
+La HI llega a nivel `σc` y la conclusión es a nivel `c`. Dentro de `Prov` eso se ve como
+`liftfcT (succcT ċ) ȧ` en el lado derecho de la ecuación dotada — de ahí que el eslabón que
+consume la HI sea el de nivel `succ c`, no el de `c`. -/
+
+theorem paso_caso_un_imp_L (k : Nat) (c a : Term)
+    (hax : Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (unT k (tcFn a)))
+      (unT k (liftfcT (succcT (tcFn c)) (tcFn a))))))
+    (hobj : Prf (liftfc c (cons (numeralM k) (cons a nil))
+      =eq cons (numeralM k) (cons (liftfc (succ c) a) nil))) :
+    Prf (Formula.impl (targetLiftfc (succ c) a)
+      (targetLiftfc c (cons (numeralM k) (cons a nil)))) := by
+  refine prf_deduction ?_
+  have hA : PrfH [targetLiftfc (succ c) a]
+      (provFromCode (eqc (liftfcT (tcFn (succ c)) (tcFn a)) (tcFn (liftfc (succ c) a)))) :=
+    prfH_hyp_self _
+  -- el nivel dotado `⌜σc⌝` se normaliza a `succcT ċ`
+  have hsc : Prf (tcFn (succ c) =eq succcT (tcFn c)) := prf_tc_succ' c
+  have hA' : PrfH [targetLiftfc (succ c) a]
+      (provFromCode (eqc (liftfcT (succcT (tcFn c)) (tcFn a)) (tcFn (liftfc (succ c) a)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn
+      (prf_congr_liftfcT hsc (prf_refl _)) (prf_refl _))) _) hA
+  have iLA : ∀ W, Prf (substtc zero W (liftfcT (succcT (tcFn c)) (tcFn a))
+      =eq liftfcT (succcT (tcFn c)) (tcFn a)) :=
+    substtc_inv_liftfcT (substtc_inv_succcT (substtc_inv_tcFn c)) (substtc_inv_tcFn a)
+  have iX0 : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (tcFn (cons (numeralM k) (cons a nil))))
+      =eq liftfcT (tcFn c) (tcFn (cons (numeralM k) (cons a nil)))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_tcFn (cons (numeralM k) (cons a nil)))
+  have iX1 : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (unT k (tcFn a)))
+      =eq liftfcT (tcFn c) (unT k (tcFn a))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c) (substtc_inv_unT (substtc_inv_tcFn a))
+  have iX2 : ∀ W, Prf (substtc zero W (unT k (liftfcT (succcT (tcFn c)) (tcFn a)))
+      =eq unT k (liftfcT (succcT (tcFn c)) (tcFn a))) := substtc_inv_unT iLA
+  have iX3 : ∀ W, Prf (substtc zero W (unT k (tcFn (liftfc (succ c) a)))
+      =eq unT k (tcFn (liftfc (succ c) a))) :=
+    substtc_inv_unT (substtc_inv_tcFn (liftfc (succ c) a))
+  have h1 := prf_to_prfH (prf_mp (pcc_congr_liftfcT_arg2_code (tcFn c)
+      (tcFn (cons (numeralM k) (cons a nil))) (unT k (tcFn a))
+      (substtc_inv_tcFn c) (substtc_inv_tcFn (cons (numeralM k) (cons a nil))))
+    (pcc_dot_un_symm k a)) [targetLiftfc (succ c) a]
+  have h2 := prf_to_prfH hax [targetLiftfc (succ c) a]
+  have h3 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_unT_code k
+      (liftfcT (succcT (tcFn c)) (tcFn a)) (tcFn (liftfc (succ c) a)) iLA) _) hA'
+  have h4 := prf_to_prfH (pcc_dot_un k (liftfc (succ c) a)) [targetLiftfc (succ c) a]
+  have h5 := prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+      (prf_congr_tcFn (prf_eq_symm hobj))))
+    (prf_provFromCode_eqCodeFn_refl
+      (tcFn (cons (numeralM k) (cons (liftfc (succ c) a) nil)))))
+    [targetLiftfc (succ c) a]
+  refine PrfH_eq_trans_code _ _ _ iX0 h1
+    (PrfH_eq_trans_code _ _ _ iX1 h2
+      (PrfH_eq_trans_code _ _ _ iX2 h3
+        (PrfH_eq_trans_code _ _ _ iX3 h4 h5 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
+    <;> hw_auto
+
+theorem casoUnL_gen (k : Nat)
+    (hax : ∀ c a : Term, Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (unT k (tcFn a)))
+      (unT k (liftfcT (succcT (tcFn c)) (tcFn a))))))
+    (hobj : ∀ c a : Term, Prf (liftfc c (cons (numeralM k) (cons a nil))
+      =eq cons (numeralM k) (cons (liftfc (succ c) a) nil))) :
+    CasoUnL k := by
+  intro c X
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (land (shapeUn X k) (targetLiftfc (succ c) (nthc X (numeralM 1))))
+  have hshape := PrfH_and_elim_left hh
+  have ha := PrfH_and_elim_right hh
+  have hC := PrfH.mp _ _ _
+    (prf_to_prfH (paso_caso_un_imp_L k c (nthc X (numeralM 1))
+      (hax c (nthc X (numeralM 1))) (hobj c (nthc X (numeralM 1)))) _) ha
+  exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
+
+theorem casoUnL6 : CasoUnL 6 :=
+  casoUnL_gen 6 (fun c a => pcc_liftfc_forall_code c a) (fun c a => prf_liftfc_forall c a)
+theorem casoUnL9 : CasoUnL 9 :=
+  casoUnL_gen 9 (fun c a => pcc_liftfc_ex_code c a) (fun c a => prf_liftfc_ex c a)
+
+/-- ⭐⭐ **SEIS DE LOS OCHO, DESCARGADOS.** Lo que queda de `pcc_eval_liftfc` son
+    `CasoAtomL` y `CasoEqL`, que consumen `pcc_eval_liftsc_at` / `pcc_eval_liftc_at` (A5). -/
+theorem pcc_eval_liftfc_modulo_2 (hatom : CasoAtomL) (heq : CasoEqL) :
+    DEUDA_evalLiftfc_isFC1 :=
+  pcc_eval_liftfc_modulo_8 casoBotL hatom heq casoBinL5 casoBinL7 casoBinL8 casoUnL6 casoUnL9
+
+/-- Y su forma con el testigo cuantificado, vía el `∃∃` de C3‑F. -/
+theorem deuda_modulo_2 (hatom : CasoAtomL) (heq : CasoEqL) : DEUDA_evalLiftfc :=
+  deuda_of_isFC1 (pcc_eval_liftfc_modulo_2 hatom heq)
+
+
 end ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -706,6 +952,10 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
   --    son el tercer descenso del árbol con esos mismos nombres.
   CasoBotL CasoAtomL CasoEqL CasoBinL CasoUnL
   DESCENSO_liftfc_imp pcc_eval_liftfc_modulo_8
+  -- §8 · SEIS de los ocho, DESCARGADOS
+  pcc_congr_liftfcT_arg2_code substF_targetLiftfc_hole PrfH_congr_targetLiftfc
+  casoBotL casoBinL_gen casoBinL5 casoBinL7 casoBinL8 casoUnL_gen casoUnL6 casoUnL9
+  pcc_eval_liftfc_modulo_2 deuda_modulo_2
 )
 
 /-! ## FOOTPRINT -/
@@ -718,3 +968,8 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_ex_code
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.PHIliftfc_step
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_modulo_8
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoBotL
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoBinL5
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoUnL6
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoUnL9
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_modulo_2
