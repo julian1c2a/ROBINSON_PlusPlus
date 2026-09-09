@@ -115,3 +115,4 @@ import ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 import ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 import ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf
 import ROBINSON_PlusPlus.Meta.SubstTreeReflect
+import ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
