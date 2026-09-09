@@ -13,7 +13,7 @@
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
 (`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
-**Last updated:** 2026-08-23 (repatriación completa) · Lean v4.31.0.
+**Last updated:** 2026-09-10 (§3.56 · el `PsiF` del chasis) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
@@ -4612,3 +4612,110 @@ Se lanzó un panel de cinco mediciones + síntesis (agentes **read‑only**, sin
 es una narración de plausibilidad — y en Lean la plausibilidad y la realidad se separan justo en
 los sitios interesantes. ⇒ **fan‑out para medir y para auditar, sí; para decidir la ruta de una
 prueba, tratar el veredicto como hipótesis.**
+
+
+---
+
+## §3.56 · ⛔ D3 · el `PsiF` de §8 **no era natural** — y con el dotado caen SIETE de las nueve (2026‑09‑09i)
+
+> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §10 (888 l.),
+> `Meta/LiftcCodePrf.lean` (+`substTerm_formCode`). Footprint: la base sancionada; las piezas
+> nuevas salen con **sólo los tres axiomas de Lean**.
+
+§3.55 dejó D3 en dos obligaciones y dio `hbdAll` por «aplicar `pcc_bdAll_intro` y ya». Al ir a
+aplicarlo aparece una obstrucción que **no es de esfuerzo: es de enunciado**.
+
+### §3.56.1 · ⛔ `hPl` es FALSA para el `PsiF` de §8
+
+`pcc_bdAll_intro` pide que el cuerpo sea **natural**:
+
+    hPl : ∀ k q, liftTerm k (PsiF q) = PsiF (liftTerm k q)
+
+y con `PsiF q := chainOkBPsi (tcFn q) q` **es falsa**. ⚠️ No es conjetura — el núcleo está
+certificado por el compilador, en dos `rfl`:
+
+    liftTerm 0 (substCodeT 1 w #1)                = liftTerm 0 w        -- el HUECO entrega el testigo
+    substCodeT 1 (liftTerm 0 w) (liftTerm 0 #1)   = varc (numeral 1)    -- …y tras el lift, un varc CERRADO
+
+`chainOkBPsi W p = substCodeF 1 (liftc 0 W) (lineOkB nil (liftTerm 0 p) #0)`, y `substCodeF`
+manda cada variable del argumento **al hueco `W` o a un `varc` cerrado, según su nivel**. Un
+`liftTerm` en `q` la mueve **fuera del hueco**: donde antes salía el testigo, ahora sale el
+`varc`. Los dos lados dejan de ser el mismo término.
+
+### §3.56.2 · 🔑 La regla, que el molde de `argsInPsi` ya cumplía sin decirlo
+
+> **El `PsiF` de `pcc_bdAll_intro` se escribe con símbolos de función OBJETO** —`substfc`,
+> `liftc`, `tcFn`, `nthcT`— **y nunca con un `substCodeF` aplicado a una fórmula que contenga el
+> parámetro.** Los símbolos objeto son `Term.func`: `liftTerm`/`substTerm` los atraviesan y la
+> naturalidad es `simp`. `substCodeF` es una función de **Lean** que recursa sobre la fórmula, y
+> ahí la naturalidad es falsa.
+
+⭐ Releído `HasWitTrackedPrf` §4 con esto en la mano: `argsInPsi p = inFormCodeFn (nthcT (tcFn
+(cdrc p)) (varc 0̄)) (tcFn (carc p))` — **todo objeto**, y por eso sus `liftT_`/`substT_` eran dos
+`simp only`. La condición estaba cumplida, pero **no estaba escrita**; por eso no se vio venir.
+
+### §3.56.3 · ⭐⭐ La salida: el `PsiF` DOTADO, y el puente al revés
+
+    chainOkBPsiDot q := substfc 1̄ (liftc 0 (tcFn q)) ⌜lineOkB nil #1 #0⌝
+
+Todo objeto, y —la clave— **el código de la fórmula es CERRADO y no contiene `q`**: el parámetro
+entra sólo por `tcFn q`. `hPl` y `hPs` salen en un `simp only` cada una.
+
+Y el paso a `chainOkBPsi` es **`prf_substfc_arith_open` al nivel 1**, dentro de `Prov`. ⭐ Es el
+puente de §3.55.1 **usado al revés**: allí se abría el destino opaco hacia el gemelo computable;
+aquí se cierra el gemelo computable hacia el opaco, que es el que sabe ser natural. Los dos hacen
+falta, y ninguno sustituye al otro:
+
+| | quién lo pide | forma |
+|---|---|---|
+| `chainOkBPsi` | el **destino** (`hmatch`, por `rfl`) | `substCodeF` — computa, **no** es natural |
+| `chainOkBPsiDot` | el **chasis** (`pcc_bdAll_intro`) | símbolos objeto — natural, **no** computa |
+
+### §3.56.4 · Siete de las nueve obligaciones, descargadas
+
+| obligación | cómo |
+|---|---|
+| `hCl`, `hCs` | `chainOk nil q` es un **átomo** (`Formula.atom "chainOk" [nil, q]`): `simp` |
+| `hbl`, `hbs` | `lenc` es símbolo objeto: `simp` |
+| `hPl`, `hPs` | §3.56.3 — y eran **falsas** con el `PsiF` de §8 |
+| **`hwPsi`** | ⭐ **cae entera con la rama C de ADR‑020**, sin trabajo nuevo |
+
+⭐ El detalle de `hwPsi` es el dividendo de haber dotado el cuerpo: `prf_hasWitF_substfc` pide
+`hasWitF` del código y `hasWit` del sustituyente, y las dos ya estaban —el código es un `formCode`
+(`prf_hasWitF_fc`) y el sustituyente un `liftc` de un punteado (`prf_hasWit_tcFn` +
+`CRIT_hasWit_lift`)—. **Sobre el `substCodeF` de §8 no había absolutamente nada que aplicar.**
+
+⇒ **`d3_prf_of_body`: D3 desde TRES obligaciones**, y las tres sobre el `PsiF` dotado: `hwP`,
+`hPsiId` y `hbody`.
+
+### §3.56.5 · El ladrillo que faltaba, y dónde tuvo que vivir
+
+`substTerm_formCode` —`formCode φ` es cerrado también bajo `substTerm`— **no existía**, aunque su
+gemelo `liftTerm_formCode` lleva en `DerivCondPrf` desde siempre. ⚠️ Vive en
+`Meta/LiftcCodePrf.lean` **por dependencia, no por tema**: necesita
+`substTerm_termCode`/`substTerm_termsCode`, que están ahí, y `DerivCondPrf` está **aguas arriba**.
+ADR‑019 dice bajar el general, pero bajar la pareja obligaría a mover tres lemas dentro de un
+módulo de 1 600 líneas de la ruta crítica. **Se deja medido en su docstring en vez de duplicarlo.**
+
+### §3.56.6 · ⚠️ `hPsiId` NO es `hPinv` con otro nombre
+
+Las dos variantes de `substfc_inv_substCodeF` (§3.55.6) actúan al nivel del propio `substCodeF`
+(`v`) o **uno por encima** (`v+1`). `hPsiId` actúa al nivel **0** sobre un `substCodeF 1 …`, o sea
+**por debajo** — y por debajo el enunciado cambia de carácter: `substfc` al nivel 0 **decrementa**
+las variables de código de nivel > 0 (la rama `n > v` de `substCodeT`), así que no basta con que
+el testigo sea invariante.
+
+⭐ **El enunciado es cierto, y está medido por qué**: en `substCodeF 1 W (lineOkB nil #1 #0)` los
+únicos huecos de nivel 0 vienen de `#0`, que `substCodeF` ya mandó a `varc 0̄` —y sustituir `#0`
+por `varc 0̄` los deja igual—; y todo lo demás vive dentro de `W = liftc 0 ṫq`, invariante **a todo
+nivel** por `hW_chainOkBPsi`, que §3.55.6 probó justo con esa fuerza (`∀ k u`). ⇒ falta la
+**tercera variante** de la familia: nivel actuante **por debajo** del `substCodeF`, con testigo
+`varc w̄`. Misma inducción, aritmética de índices corrida.
+
+### §3.56.7 · 🔑 La lección
+
+**El destino fija la IMAGEN; el chasis fija la FORMA en que hay que escribirla.** Son dos
+restricciones distintas sobre el mismo objeto, y §3.44 sólo había registrado la primera («`condD`
+no admite elegir imagen»). Aquí la segunda muerde igual de fuerte, y **el `rfl` que casa con el
+destino no dice nada sobre si el chasis podrá consumirlo**. Medir la forma del destino era
+necesario; no era suficiente.

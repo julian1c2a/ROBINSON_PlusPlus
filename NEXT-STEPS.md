@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑09h · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
+**Estado 2026‑09‑09i · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
 `Build completed successfully (135 jobs)` — **121 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
@@ -13,209 +13,70 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **`prf_hasWitF_liftfc`** (⬜ **aún NO existe**), que desbloquea DOS ramas
+> # 🎯 SIGUIENTE SESIÓN — **dos puertas ABIERTAS en D3, y ninguna depende de C3**
 >
-> ⭐⭐ **Es el único punto donde C3 y D3 se tocan.** La clausura de `hasWitF` bajo `liftfc` a
-> nivel arbitrario cierra `ind` (18) y `listInd` (20) —los dos reflectores que faltan de C3— y
-> con ellos **`hbody`(a) de D3**.
+> D3 pasó de dos obligaciones a **tres**, y eso es un avance, no un retroceso: hasta §3.56 el
+> `pcc_bdAll_intro` de `hbdAll` **no era aplicable en absoluto**. Ahora lo es, con **siete de sus
+> nueve obligaciones descargadas**. Las tres que quedan:
 >
-> ⛔ **Por qué falta, medido (§3.54.1)**: no es que los árboles sean mayores, es que **se rompe
-> una cadena de guardas**. En `ind` y `listInd` los `liftfc` van **anidados y bajo un `substfc`**:
+> | obligación | depende de C3 | tamaño estimado |
+> |---|---|---|
+> | **`hPsiId`** — 3ª variante de `substfc_inv_substCodeF`, nivel actuante **por debajo** | ❌ no | la inducción de §3.55.6 con los índices corridos |
+> | **`hwP`** — `hasWitF (bdAllBndCtx (chainOkBPsi …))` | ❌ no | sin medir |
+> | **`hbody`** — (a) `pcc_lineWF_tracked` + (b) `boundedPremsIn` | ✅ (a) sí | el contenido real |
+>
+> ⭐ **`hPsiId` es la que mejor relación tiene**: el enunciado está **medido y es cierto** (§3.56.6),
+> la maquinaria es la misma de §3.55.6, y con ella D3 baja a DOS. **Empezar por ahí.**
+>
+> ⭐⭐ **Y el punto donde C3 y D3 se tocan sigue siendo `prf_hasWitF_liftfc`** (⬜ **aún NO
+> existe**): cierra `ind` (18) y `listInd` (20) —los dos reflectores que faltan de C3— y con ellos
+> `hbody`(a) de D3.
+> ⛔ **Por qué falta, medido (§3.54.1)**: no es que los árboles sean mayores, es que **se rompe una
+> cadena de guardas**. En `ind` y `listInd` los `liftfc` van **anidados y bajo un `substfc`**:
 > `substfc 0 ⌜σ#0⌝ (liftfc 1 A)` y `substfc 0 ⌜cons #1 #0⌝ (liftfc 2 (liftfc 1 A))`. El evaluador
-> pide `hasWitF (liftfc 1 A)` —el testigo del RESULTADO de un lift— y la cascada de ADR‑020 sólo
-> da `hasWitF A`. En `listInd`, dos veces.
-> ✅ **El molde existe**: `prf_hasWitF_substfc` (`Meta/SubstfcWitnessPrf.lean`, rama C de
-> ADR‑020), y el análogo sale **un binder más barato** —no hay sustituyendo—, exactamente como
+> pide `hasWitF (liftfc 1 A)` —el testigo del RESULTADO de un lift— y la cascada de ADR‑020 sólo da
+> `hasWitF A`. En `listInd`, dos veces.
+> ✅ **El molde existe**: `prf_hasWitF_substfc` (`Meta/SubstfcWitnessPrf.lean`, rama C de ADR‑020),
+> y el análogo sale **un binder más barato** —no hay sustituyendo—, exactamente como
 > `pcc_eval_liftfc` salió más barato que `pcc_eval_substfc`.
 > ➕ Y un nodo `tcm : Term → STree` para los `termCodeM` cerrados: trivial
 > (`substTerm_termCodeM` ya existe).
 >
-> ⚠️ **La otra puerta, y NO está bloqueada**: las dos obligaciones que le quedan a D3
-> (§3.55.7) son **`hwP`** (el testigo del cuerpo, `hasWitF (bdAllBndCtx (chainOkBPsi …))`) y
-> **`hbdAll`** (el `pcc_bdAll_intro` con su `hbody`). `hwP` no depende de C3 en absoluto.
+> 🔑🔑 **LA REGLA NUEVA, y la más cara de la sesión** (§3.56): **el destino fija la IMAGEN; el
+> CHASIS fija la FORMA en que hay que escribirla.** El `PsiF` de `pcc_bdAll_intro` tiene que estar
+> escrito con **símbolos de función OBJETO** —`substfc`, `liftc`, `tcFn`, `nthcT`—, **nunca con un
+> `substCodeF` aplicado a una fórmula que contenga el parámetro**: los primeros son `Term.func` y
+> `liftTerm`/`substTerm` los atraviesan; el segundo recursa sobre la fórmula, y ahí la naturalidad
+> (`hPl`) **es FALSA**. Está certificado por dos `rfl`. ⇒ hacen falta **los dos** cuerpos, el
+> computable (para casar el destino por `rfl`) y el dotado (para el chasis), y el puente entre
+> ellos vive **dentro de `Prov`**.
 >
-> 🏁🏁 **2026‑09‑09e · `pcc_eval_liftfc` PROBADO** (§3.53), sin hipótesis, con `v` y `X`
-> abstractos y sólo `hasWitF X` de guarda. El frente entero —fontanería, 8 ecuaciones dotadas,
-> chasis y 8 casos— en una sesión, net‑0. ⭐ Un binder más barato que el molde de B3.4.
-> 🏁 **q3 (11) y qconf (19) CERRADOS ⇒ CINCO de los SIETE** (§3.54), con el nodo `lift` de
-> `STree`, y `pcc_lineWF_tracked_modulo_2`.
-> 🏁 **D3 a DOS obligaciones** (§3.55): destino fijado, puente de la cota, `∃` acotado, cuerpo del
-> `∀`, empaquetado, `PsiF` exterior, `hmatch` descargado y **`hPinv_chainOkBPsi`**.
+> 🏁🏁 **2026‑09‑09e · `pcc_eval_liftfc` PROBADO** (§3.53), sin hipótesis, con `v` y `X` abstractos
+> y sólo `hasWitF X` de guarda. El frente entero en una sesión, net‑0.
+> 🏁 **q3 (11) y qconf (19) CERRADOS ⇒ CINCO de los SIETE** (§3.54), con el nodo `lift` de `STree`,
+> y `pcc_lineWF_tracked_modulo_2`.
+> 🏁 **D3** (§3.55, §3.56): destino fijado, puente de la cota, `∃` acotado, cuerpo del `∀`,
+> empaquetado, `PsiF` exterior, `hmatch` descargado, `hPinv_chainOkBPsi`, y el chasis **por fin
+> aplicable** con siete de nueve obligaciones.
 > 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52), y una ambigüedad que había creado yo en A5.
 >
-> ⛔ **LA TRAMPA DEL DÍA, que mordió TRES veces**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`…
-> son **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Todo `rfl` que parezca
-> obvio sobre ellos es falso. El patrón que sí funciona: **abrir el destino opaco hacia su gemelo
-> computable** (`substCodeF`, `formCode`, `liftTerm`…) con `prf_*_arith_open`, y **entonces**
-> casar la forma por `rfl`. ⚠️ Y medir sobre la **instancia real**: el gemelo computable se
-> atasca con argumentos abstractos.
+> ⛔ **LA TRAMPA QUE MORDIÓ TRES VECES**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`… son
+> **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Todo `rfl` que parezca obvio
+> sobre ellos es falso. El patrón que sí funciona: **abrir el destino opaco hacia su gemelo
+> computable** con `prf_*_arith_open`, y **entonces** casar la forma por `rfl`. ⚠️ Y medir sobre la
+> **instancia real**: el gemelo computable se atasca con argumentos abstractos.
 >
-> ⚠️ **Y la lección más cara: MEDIR UNA OBSTRUCCIÓN NO ES PROBARLA.** Declaré imposible el
-> `hPinv` genérico a nivel fórmula —y lo dejé escrito en producción— cuando estaba a **una
+> ⚠️ **MEDIR UNA OBSTRUCCIÓN NO ES PROBARLA** — declaré imposible un lema que estaba a **una
 > hipótesis** de distancia. Cuando una inducción no cierra un caso, la pregunta no es «¿qué
 > maquinaria falta?» sino **«¿qué le falta a mi hipótesis para ser invariante bajo el paso que me
-> rompe?»**.
+> rompe?»**. ⚠️ Y su recíproca, de esta sesión: **una obstrucción SÍ probada ahorra un frente** —
+> `hPl` es falsa, y descubrirlo con dos `rfl` antes de escribir la prueba evitó atacar `hbody`
+> contra un chasis que no podía consumirlo.
 >
-> 🏁 **B8b saldada también el 2026‑09‑09c (§3.51)**: el `prf_congr_liftc` de
-> `CodeWitnessPrf.SinWTs` tenía **cero consumidores** en todo el árbol — estaba exportado por
-> EXISTENCIA, no por consumo. Borrado, con la nota de ADR‑019 en su hueco.
-> ⚠️ **Hallazgo colateral SIN tocar**: `SinWTs.prf_congr_liftsc` está en el mismo caso (cero
-> consumidores, ni siquiera exportado). Es código muerto, pero no era B8b: queda a decisión.
->
-> 🏁 **2026‑09‑09: TRES de los SIETE reflectores de sustitución, PROBADOS** (§3.48):
-> `pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10) y `_leibniz_imp` (13), net‑0 puros.
-> ⬜ Los otros **cuatro** —q3 (11), qconf (19), ind (18), listInd (20)— son **exactamente los que
-> llevan `liftfc`**, y ya no les falta chasis: son el **mismo gesto** (declarar su árbol y
-> desempaquetar su cascada) en cuanto `STree` pueda llevar un nodo `lift`.
-> ⚠️ Y hasta que estén los siete, `pcc_lineWF_tracked` **sigue siendo condicional**.
->
-> ⛔ `pcc_eval_liftfc` **no existe en ningún sitio**: es **trabajo nuevo**, no promoción. Es la
-> evaluación provable de `liftfc` —el hermano de `pcc_eval_substfc` (B3.4) para la familia
-> `liftc`/`liftfc`—, y ⚠️ la familia `liftc` **no tiene aritmetización ni a nivel META**, así
-> que no hay `prf_liftc_arith_open` del que colgar el primer paso. Lo primero de esa sesión es
-> **medir** qué hay: `Meta/LiftcCodePrf.lean` (los `pcc_liftc_*_code`), `Meta/EvalLiftcPrf.lean`
-> (el DESCENSO promovido en B2) y el patrón de `pcc_eval_substfc_modulo_8` como chasis.
->
-> 🏁🏁 **2026‑09‑08e · C3‑F CERRADO: `DEUDA_hGuardF` PROBADA** (§3.46). Con `hGuard_of_slots`,
-> **la cascada de ADR‑020 no tiene ninguna obligación abierta**.
-> ⚠️ **Pero eso NO cierra C3**: `pcc_lineWF_tracked_modulo_7` pide un reflector por tag y en el
-> árbol hay **14**, ninguno de los 7 de sustitución. Lo que les falta es ya **sólo su condición
-> ESTRUCTURAL** (el RHS con `substfcT`/`substtcT`), que es lo que B3.2/B3.4 compraron.
->
-> 🏁 **2026‑09‑08c · C3‑T CERRADO** (§3.44): `pcc_hGuardT (i n t) (hin : i < n) : DEUDA_hGuardT i n t`,
-> footprint = la base sancionada, **net‑0 puro**. Con `hGuard_of_deudaF`, la cascada de los 7 tags
-> queda a la espera de **una sola** deuda. ⚠️ Y una corrección de método que costó el frente entero:
-> **`condD` NO ADMITE ELEGIR IMAGEN** — la impone `formCode`, y §5 había elegido `shapeDot`.
->
-> ## 🏁 Lo que se cerró después del merge (2026‑09‑07 y ‑08)
->
-> * **B3.2 · `Meta/EvalSubsttcPrf.lean`** (§3.41.1) — `pcc_eval_substtc` / `pcc_eval_substtsc` /
->   `pcc_eval_substtc_hasWit` en producción, con `v`,`s`,`t` **abstractos**. Footprint = la base
->   sancionada. De 154 declaraciones entraron **71**. **Era el prerrequisito de B3.4.**
-> * **El chasis de `hGuard`** (§3.41.3) — `Meta/LineWFGuardPrf.lean`, net‑0 **puro**.
->   `hcond_absorbe_extra` (que vivía en **cinco copias fuera del build**) y
->   ⭐ `hcond_absorbe_cascade`, que **reduce la deuda de los 7 tags a DOS lemas genéricos**.
->   🏁🏁 *(y desde 2026‑09‑08e las **dos** están probadas: `pcc_hGuardT` / `pcc_hGuardF`;
->   ADR‑020 no debe nada. Ver C3b del árbol de tareas y §3.44/§3.46.)*
-> * ⭐ **B3.4 · `Meta/EvalSubstfcPrf.lean`** (§3.42) — **el muro de `substfc`, dentro del
->   build**: `pcc_eval_substfc`, `pcc_eval_substfc_wit` y el chasis genérico
->   `pcc_eval_substfc_modulo_8`. De **806** declaraciones entraron **90**.
->
-> ## ▶ LO QUE TOCA AHORA
->
-> ~~**(1) B3.4**~~ ✅ **CERRADO** (2026‑09‑08, §3.42). `pcc_eval_substfc` y
-> `pcc_eval_substfc_wit` en producción, footprint = la base sancionada. De 806 declaraciones
-> entraron 90. ⭐ Con esto **`hCarc` ya está comprado**: el antecedente de
-> `pcc_eval_substfc_wit` es literalmente el conjunto extra de ADR‑020.
->
-> ⭐ **Y una medición de 2026‑09‑08 que cambia el ORDEN del plan**: al montar el chasis de D3
-> (§`Meta/D3ChainDotPrf.lean`) resultó que **D3 está aguas abajo de C3**. El `hbody` que pide
-> `pcc_bdAll_intro` para `chainOkB` necesita reflejar el átomo `lineWF`, o sea
-> `pcc_lineWF_tracked` — que no existe sin condicionar: sólo `pcc_lineWF_tracked_modulo_7`.
-> ⇒ **las dos `DEUDA_hGuard*` son ahora el cuello de botella de C3 Y de D3 a la vez**, y son
-> el camino corto a Gödel II sin `axiom d3`.
->
-> **(2) C3 — los 7 reflectores de `lineWF`, cuyo chasis ya está puesto.**
-> `pcc_lineWF_tracked_modulo_7` GARANTIZA que cerrar esos 7 cierra `pcc_lineWF_tracked` y que no
-> hay nada más aguas abajo (§3.40.3 confirmó que **sigue valiendo bajo la enmienda**). Lo que
-> queda de C3, con el chasis en producción:
->
-> | pieza | estado |
-> |---|---|
-> | la absorción del conjunto extra | ✅ `hcond_absorbe_cascade` (§3.41.3) |
-> | el **kit genérico** de reflexión Σ₁ (átomo `In`, `boundedIn`, formas, casillas) | ✅ `Meta/TrackedAtomsPrf.lean` (2026‑09‑08) |
-> | `DEUDA_hGuardT` · mitad `In c w` | ✅ `pcc_In_atom_tracked`, con los dos argumentos **abstractos** |
-> | `DEUDA_hGuardT` · el `∀` acotado **ANIDADO** (`argsIn`) | ✅ `pcc_argsIn_pair_tracked` (§3.43) — **y sin tocar `Minimal/Axioms.lean`** |
-> | `DEUDA_hGuardT` · el recorrido de los DOS disyuntos de `isTermCodeE1` | ✅ `pcc_isTermCodeE1_tracked` (§3.43.5) |
-> | `DEUDA_hGuardT` · la conmutación `substtc`/`liftc` bajo el binder | ✅ **DESBLOQUEADA** (§3.43.8): `prf_substtc_liftc_wfAll1Args` + el **kit de distribución de `liftc`**. ⚠️ §3.43.6/§3.43.7 estaban sobregeneralizados: **no** hacía falta el lema general con `Z` arbitrario **ni** el ADR — los `Z` reales tienen forma conocida |
-> | `DEUDA_hGuardT` · el `pcc_bdAll_intro` EXTERIOR (`wfAll1`) | ✅ **INSTANCIADO** (§3.43.9): 8 de las 9 obligaciones descargadas (`hwPsi` la paga `hw_auto`). ⭐ La clave fue parametrizar el cuerpo por los **dos** huecos (`⌜v₀⌝` fuera, `⌜v₁⌝` dentro) en vez de escribir `liftc`: una sola keystone sirve a `hPsiId` y a `hbody` |
-> | `DEUDA_hGuardT` · **`hbody`** | ✅ **PROBADA** (§3.43.10). Con ella, ⭐ **`DEUDA_wfAll1_tracked` cerrada** y `pcc_isTC1_tracked (w c)` sin hipótesis, con `w` y `c` abstractos |
-> | `DEUDA_hGuardT` · la imagen que `condD` EXIGE | ✅ **corregida** (§3.44.1‑2): no es `shapeDot` sino la ECUACIÓN POSICIONAL de `formCode`. La refleja `pcc_shape_tree`, compuesta de dos piezas que `CodeTreeReflect` ya probaba por inducción — **cero teoremas objeto nuevos** |
-> | `DEUDA_hGuardT` · la cota, de `(lenc w)˙` a `lencT ẇ` | ✅ `pcc_wfAll1_trackedC` (§3.44.6), vía `pcc_eval_lenc` DENTRO de `Prov` |
-> | `DEUDA_hGuardT` · paso `∃` | ✅ `pcc_hasWit_exc` (§3.44.3). ⭐ El testigo es una **variable de código que se desplaza** (`⌜v₀⌝`/`⌜v₁⌝`/`⌜v₂⌝`) ⇒ **dos** ranuras en `wfAll1PsiAtC` |
-> | `DEUDA_hGuardT` · fontanería `condD` | ✅ **por `rfl`** (§3.44.5): `prf_substfc_arith_open` pasa a la función META `substCodeF` y la alineación es una igualdad de términos. ⚠️ Sólo el índice `numeralM i` con `i` variable pide un `rw` (`substCodeT_closed`) |
-> | ⭐ **`DEUDA_hGuardT`** | 🏁 **PROBADA** — `pcc_hGuardT`, para toda casilla con `i < n`. ⚠️ La cota **no es artefacto**: `pcc_eval_nthc` la exige, y las CUATRO casillas reales la cumplen (`decide`) |
-> | `DEUDA_hGuardF` · las 8 cláusulas de `isFormCodeE2` | ✅ `pcc_isFormCodeE2_trackedC` (§3.45). Cuatro lemas, no ocho (`clEq = clBin · 4` por `rfl`), y `prf_or_imp_of` arrastra la ecuación del nodo por las siete disyunciones |
-> | `DEUDA_hGuardF` · la tercera forma (`shapeNul`) | ✅ `pcc_shapeNul_fc` — `pcc_shape_tree` ERA genérica en el árbol |
-> | `DEUDA_hGuardF` · el `∀` acotado de `wfAllF` (dos testigos) | ✅ `pcc_wfAllF_trackedC` (§3.45): empaquetado con `cons` + cota dotada. **La mitad cara** |
-> | `DEUDA_hGuardF` · `isFC1` | ✅ `pcc_isFC1_trackedC` |
-> | `DEUDA_hGuardF` · el `∃∃` | ✅ `pcc_hasWitF_exc` (§3.46.2). ⭐ **Aquí estaba todo el trabajo**: hubo que **abrir el NIVEL** de la keystone (`prf_substfc_wfAll1DotAtC_gen`, del que el lema de C3‑T pasa a ser la instancia `v = 0`) y escribir su gemelo `prf_substfc_wfAllFDotAtC_gen` |
-> | ⭐ **`DEUDA_hGuardF`** | 🏁 **PROBADA** — `pcc_hGuardF`, y con `hGuard_of_slots` **la cascada de ADR‑020 sin deudas** |
-> | C3 · el chasis del árbol con `substfc` | ✅ `Meta/SubstTreeReflect.lean` (§3.47): `STree` con nodo `sub`, sus cinco inducciones y `prf_condD_of_stree_eq`. ⛔ Tipo nuevo, no extensión de `CTree`: **ciclo de imports** |
-> | C3 · el núcleo tiene que VER las guardas | ✅ `hcond_absorbe_1/2/3` (§3.47.2) — es la propiedad que ADR‑020 compró, cobrada por primera vez |
-> | C3 · los árboles de q1, q2, leibniz | ✅ declarados y **casados por `rfl` con los axiomas ENTEROS**, cascada incluida ⇒ el `∃ C` de §2.1 resuelto para tres |
-> | C3 · `PrfH_tc_objAt` + `PrfH_dotVN` para `STree` | ✅ (§3.48). ⚠️ **Corrige §3.47.5**: `dotVN` es pura congruencia; quien paga la guarda es `tc_objAt`, vía `pcc_eval_substfc_wit` |
-> | ⭐ **C3 · q1 (9), q2 (10), leibniz (13)** | 🏁 **PROBADOS** — `pcc_lineWF_tracked_*_imp`, net‑0 puros |
-> | C3 · `pcc_eval_liftfc` · la BASE | ✅ `Meta/EvalLiftfcPrf.lean` (§3.49): `liftfcT` (⛔ **definición**, nunca axioma), `targetLiftfc` + naturalidad, control **negativo** (`fail_if_success rfl`) y la deuda **enunciada** con su puente `∃∃` |
-> | ⭐ **C3 · A5 · `pcc_eval_liftc_at`/`_liftsc_at`** | 🏁 **CERRADA** (2026‑09‑09c, §3.50), net‑0 y sin módulos nuevos. El nivel va **cuantificado dentro de `Φ`** (lo exige el gate `liftFormula 1 Φ = Φ`). ⭐ Barata porque **en el sorte TÉRMINO el nivel es INERTE**; lo único nuevo fue la **tricotomía** del `varc` |
-> | ⭐ **C3 · `pcc_eval_liftfc`** | 🏁🏁 **PROBADO** (2026‑09‑09e, §3.53), sin hipótesis. Chasis + 8 casos + 8 ecuaciones dotadas, net‑0. Antes decía: Molde = `pcc_eval_substfc_modulo_8` (paso de 41 l.). ✅ `CasoAtom`/`CasoEq` **desbloqueados por A5**; ⬜ `CasoBot` y `CasoBin 5/7/8` son congruencia pura; ⬜ `CasoUn 6/9` es el que **sube** el nivel. ⚠️ El chasis **no es reutilizable tal cual**: sus `Caso*` van sobre `targetSubstfc`; hacerlo genérico en el operador es refactorizar en vivo 1625 l. de la ruta crítica |
-> | C3 · q3 (11) y qconf (19) | 🏁 **PROBADOS** (§3.54) ⇒ **CINCO de los SIETE**, con el nodo `lift` de `STree`. Antes: — los 4 que llevan `liftfc`. ⚠️ Hasta que estén, `pcc_lineWF_tracked` sigue condicional |
-> | ⛔ **C3 · ind (18) y listInd (20)** | ⬜ **LO SIGUIENTE.** Falta **`prf_hasWitF_liftfc`**: sus `liftfc` van anidados y bajo un `substfc`, el evaluador pide `hasWitF (liftfc 1 A)` y la cascada sólo da `hasWitF A` (§3.54.1). Molde: `prf_hasWitF_substfc`, y sale **un binder más barato** |
-> | ⭐ **D3 · `DEUDA_chainOkBDot`** | ⬜ a **DOS** obligaciones (§3.55.7): **`hwP`** (no bloqueada por C3) y **`hbdAll`**. Todo lo demás —destino, cota, `∃` acotado, cuerpo, empaquetado, `PsiF` exterior, `hmatch`, `hPinv`— **probado** |
-> | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
-> | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
-> | A5 más allá del nivel `zero` | 🏁 **HECHA en el sorte TÉRMINO** (§3.50). ⚠️ Lo que **NO** cubre: `hasWitF` a nivel arbitrario — eso es el sorte FÓRMULA y no hacía falta aquí |
->
-> ⭐ **Y la pregunta de la REFORMULACIÓN vuelve, mejor entendida** (§3.43.5): reformular
-> `isTermCodeE1` con `In` atómico —estilo A3— **no hacía falta** para reflejar el `argsIn`, y
-> eso sigue siendo cierto. Para el **ensamblaje exterior** compraría otra cosa: un `PsiF` **sin
-> binders**, que es exactamente lo que hace barato el `hbody` de A3. Sigue siendo ADR (toca
-> `Minimal/Axioms.lean` dentro de los 7 enmendados) y sigue sin ser obligatoria — pero ahora se
-> sabe qué compra y cuánto cuesta no hacerla.
->
-> ✅ **RESUELTO 2026‑09‑08 (§3.43): el `∀` acotado ANIDADO no era un muro, y NO hubo que
-> reformular `isTermCodeE1`** —o sea, no hubo que tocar `Minimal/Axioms.lean` ni los 7 axiomas
-> enmendados—. 🔑 `pcc_bdAll_intro` es un lema del **META‑nivel**: sus hipótesis se cuantifican
-> sobre `q` e `i` **en Lean**, no bajo un binder objeto, así que anidar dos `∀` acotados en la
-> FÓRMULA son **dos aplicaciones independientes**. La única fricción era administrativa: `CF`
-> debe ser natural en UN parámetro y `argsIn wT Y` tiene dos libres ⇒ se empaquetan con `cons`
-> y se leen con `carc`/`cdrc`, naturales por construcción.
->
-> Lo que sigue abierto de `DEUDA_wfAll1_tracked`, ya sin misterio:
-> se ataca con `pcc_bdAll_intro`, cuya aplicación completa está ejercitada en
-> `sondeos/A3IsFCBTracked.lean` (`pcc_wfAll_tracked`, ocho obligaciones descargadas) — **pero
-> aquel `nodeOk` estaba DISEÑADO para no tener binders dentro del `∀` acotado**: el sondeo metió
-> el `In` como **átomo** a propósito, «así el cuerpo no tiene ningún binder y todo el descenso de
-> `substfc` vive en nivel 0». `isTermCodeE1 wT X = shapeUn X 0 ∨ (shapeBin X 1 ∧ argsIn wT (nthc
-> X 2))` **no** tiene esa propiedad: `argsIn` es un `∀` acotado **anidado**. Ese anidamiento es
-> el contenido que falta, y el kit no lo cubre. ⇒ no es «una instancia más del molde».
->
-> Para las dos deudas, lo que ya hay está medido en **§3.41.5**: los átomos con términos
-> **abstractos** (`pcc_lt_tracked`, `pcc_eq_tracked`), el `∀` acotado (`pcc_bdAll_intro`) y el
-> `∃` sin cota (`pcc_exIntro_code_open`). Falta el **recorrido** de `isTC1`/`isFC1` bajo el `∃`.
-> Es un ensamblaje, no una inducción nueva.
->
-> Y detrás siguen **D** (`hC_dot` → D3 real), **E** (Gödel II sin `axiom d3`) y el frente
-> independiente **F** (`⊬¬G`, sólo `NegVerifier` abierto).
->
-> ## 🔑 Las reglas de método que deja esta fase
->
-> 1. **MEDIR LA FORMA, NO EL TAMAÑO.** «¿Cuántos sitios hay?» da un plan lineal *y la respuesta
->    está mal* (el censo por API mide la onda inicial: medí 44 y un módulo que daba *uno* tenía
->    *diez*). «¿Qué forma tienen?» dio **6 lemas en vez de 35** y **una táctica en vez de 200
->    anotaciones**. La leí en el módulo veinte.
-> 2. ⭐ **La pregunta que decide una PROMOCIÓN no es «¿cuántos duplicados hay?» sino «¿de
->    cuánto de lo que voy a borrar depende lo que me voy a quedar?».** La primera da un
->    porcentaje; la segunda da el plan. En B3.4, 71 % de duplicados no decía nada — lo que
->    hizo limpio el borrado fue que `ENS` sólo dependía de **41** nombres de los 5 000 líneas
->    que se iban, y **31 ya estaban en producción** (§3.42.1).
-> 3. ⭐ **Y COMPROBAR la forma medida contra el original, con `rfl`.** Una abstracción puede ser
->    correcta *sobre la fórmula equivocada* y compilar igual: el conjunto extra de ADR‑020 no es
->    un par de guardas sino una **cascada** de 1–3, y sólo lo dijeron los siete `rfl` de §3.41.4
->    —que además cazaron tres tags mal supuestos—.
-> 4. **`hw_auto` + `autoParam`** hacen la propagación invisible. ⚠️ El orden de las alternativas
->    de la táctica importa: las estructurales ANTES que `prf_hasWit_tc`, o el unificador despliega
->    `termCode` y agota los heartbeats.
-> 5. **Cuando la táctica no llega, mirar si el objeto es FINITO antes de arrastrar** (§3.40.7:
->    `CTree` se paga por inducción; arrastrar habría contaminado el chasis).
-> 6. **SACAR EL `∃` FUERA**, también de la maquinaria que el paso consume.
-> 7. **Al promover no se dejan duplicados: se BAJA el general** (⛔ ADR‑019), y hay que quitar el
->    nombre del `export` **y** del `#print axioms` del donante — si no, es error duro.
->    ⚠️ Y **un duplicado sólo se borra si el original es ALCANZABLE**: 14 de los 66 de B3.2
->    vivían en módulos que el sondeo no abría (§3.41.2).
-> 8. **Auditoría adversarial para la cola**: agentes de SOLO LECTURA (prohibido compilar y
->    prohibido editar), uno que propone y uno que refuta con sesgo hacia PAGAR. 26 sitios,
->    0 refutados, 26 `patch_old` casando de forma única (§3.40.8).
+> ⛔ **Y un VERDE no es haber comprobado**: `check-doc-sync.bash` y `check-sorry.bash` daban verde
+> **sin comprobar casi nada** (AI‑GUIDE §27.1), y la CI **no había arrancado nunca**. Arreglado el
+> 2026‑09‑09; leer **la cifra medida**, no el `✅`.
+
 ---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)

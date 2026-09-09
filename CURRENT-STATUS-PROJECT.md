@@ -1,6 +1,19 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-09b · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-09i · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+>
+> ⛔🏁 **D3 · §3.56 — el `PsiF` del chasis.** `hPl` (naturalidad del cuerpo) era **FALSA** para el
+> `chainOkBPsi` de §8, certificado por dos `rfl`: `pcc_bdAll_intro` **no era aplicable**. Con el
+> `PsiF` **dotado** (`chainOkBPsiDot`, símbolos objeto y código de fórmula CERRADO) caen **siete de
+> sus nueve** obligaciones —incluida `hwPsi`, entera, con la rama C de ADR‑020— y el puente al
+> cuerpo del destino vive **dentro de `Prov`**. ⇒ **`d3_prf_of_body`: D3 desde `hwP`, `hPsiId` y
+> `hbody`.** 🔑 La regla: **el destino fija la IMAGEN; el chasis fija la FORMA de escribirla.**
+>
+> 🔧 **Y el instrumental mentía** (AI‑GUIDE §27.1): `check-sorry.bash` daba **101 falsos positivos**
+> —menciones en prosa— donde hay **0** de verdad; `check-doc-sync.bash` daba verde con los cuatro
+> controles `[A]` **vacíos**; y la **CI no
+> había arrancado nunca** (YAML inválido). Arreglado el 2026‑09‑09, y lo primero que encontró
+> fueron **siete documentos autoritativos** con la cifra de jobs obsoleta.
 >
 > 🏁 **`Build completed successfully (135 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -148,7 +161,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-05 — **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
+**Last updated:** 2026-09-10 — **D3 · §3.56** (el `PsiF` del chasis: siete de nueve obligaciones) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
 **Author**: Julián Calderón Almendros
 
 ---
