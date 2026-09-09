@@ -404,6 +404,183 @@ theorem pcc_bdAll_intro
       (prf_to_prfH (prf_lt_succ_self (bndF p)) _)
   exact PrfH.mp _ _ _ (prf_to_prfH (pcc_gen_code _) _) hopen
 
+
+/-! ## §N · `hPinv` GENÉRICO — la obligación que `pcc_bdAll_intro` pide del CUERPO (2026‑09‑09h)
+
+`pcc_bdAll_intro` (arriba) pide `hPsiId` y, en sus consumidores, la invariancia del cuerpo bajo
+`substfc` de nivel superior (`hPinv` de `PrfH_bdAllCode_congr_bnd`). Hasta hoy se pagaba **a
+mano en cada frente** (`hPinv_wfAll1Psi`, `Meta/HasWitTrackedPrf.lean` §10). Aquí queda genérica.
+
+⭐ La clave, y lo que una medición anterior dio por imposible: **las dos hipótesis son cerradas
+bajo `liftc zero`**, y eso es lo único que hace falta para que la inducción atraviese los
+binders (`∀`/`∃`), donde `substCodeF` recursa con el testigo lifteado.
+
+⚠️ El nivel de TÉRMINO vive en `Meta/SubstCodeOpenPrf.lean` (`substtc_inv_substCodeT`); aquí
+está el de FÓRMULA, que necesita vocabulario de código (`atomc`, `eqCodeFn`, `implc`…) que
+aquel módulo, aguas arriba, no tiene. -/
+/-- Las dos hipótesis del lema de abajo son **cerradas bajo `liftc zero`**. Es lo único que hace
+    falta para que la inducción atraviese los binders. -/
+theorem substCode_hyps_lift {W : Term}
+    (hW : ∀ (k : Nat) (u : Term), Prf (substtc (numeral k) u W =eq W))
+    (hL : Prf (liftc zero W =eq W)) :
+    (∀ (k : Nat) (u : Term),
+        Prf (substtc (numeral k) u (liftc zero W) =eq liftc zero W))
+    ∧ Prf (liftc zero (liftc zero W) =eq liftc zero W) :=
+  ⟨fun k u => prf_eq_trans (prf_congr_substtc3 hL)
+      (prf_eq_trans (hW k u) (prf_eq_symm hL)),
+   prf_congr_liftc hL⟩
+
+/-! ### La invariancia a nivel FÓRMULA, en sus DOS índices
+
+⚠️ Hacen falta las dos: la obligación `hPinv` de `pcc_bdAll_intro` actúa **al mismo nivel
+`v`** con el que se construyó el código (`chainOkBPsi = substCodeF 1 …` y `hPinv` actúa al
+nivel 1), mientras que otros consumidores la piden al nivel `v+1`. El índice **no es un detalle
+cosmético**: cambia la condición sobre las variables libres (`v+2` frente a `v+1`). -/
+
+/-- **Nivel actuante `v+1`.** -/
+theorem substfc_inv_substCodeF : ∀ (v : Nat) (W : Term),
+    (∀ (k : Nat) (u : Term), Prf (substtc (numeral k) u W =eq W)) →
+    Prf (liftc zero W =eq W) →
+    ∀ (φ : Formula), liftFormula (v+2) φ = φ →
+      ∀ u, Prf (substfc (numeral (v+1)) u (substCodeF v W φ) =eq substCodeF v W φ)
+  | v, W, hW, hL, .bottom, _, u => by
+      show Prf (substfc (numeral (v+1)) u botc =eq botc)
+      exact prf_substfc_bottom (numeral (v+1)) u
+  | v, W, hW, hL, .atom P ts, hfv, u => by
+      have hts : liftTerms (v+2) ts = ts := by
+        simpa only [liftFormula, Formula.atom.injEq, true_and] using hfv
+      show Prf (substfc (numeral (v+1)) u (atomc (strCode P) (substCodeTs v W ts))
+        =eq atomc (strCode P) (substCodeTs v W ts))
+      refine prf_eq_trans (prf_substfc_atom (numeral (v+1)) u _ _) ?_
+      unfold atomc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_inv_substCodeTs v W (hW (v+1)) ts hts u
+  | v, W, hW, hL, .eq a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.eq.injEq] at h1
+      show Prf (substfc (numeral (v+1)) u (eqCodeFn (substCodeT v W a) (substCodeT v W b))
+        =eq eqCodeFn (substCodeT v W a) (substCodeT v W b))
+      refine prf_eq_trans (prf_substfc_eq (numeral (v+1)) u _ _) ?_
+      exact prf_congr_eqCodeFn (substtc_inv_substCodeT v W (hW (v+1)) a h1.1 u)
+        (substtc_inv_substCodeT v W (hW (v+1)) b h1.2 u)
+  | v, W, hW, hL, .impl a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.impl.injEq] at h1
+      show Prf (substfc (numeral (v+1)) u (implc (substCodeF v W a) (substCodeF v W b))
+        =eq implc (substCodeF v W a) (substCodeF v W b))
+      refine prf_eq_trans (prf_substfc_impl (numeral (v+1)) u _ _) ?_
+      exact prf_congr_implc (substfc_inv_substCodeF v W hW hL a h1.1 u)
+        (substfc_inv_substCodeF v W hW hL b h1.2 u)
+  | v, W, hW, hL, .and a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.and.injEq] at h1
+      show Prf (substfc (numeral (v+1)) u (andc (substCodeF v W a) (substCodeF v W b))
+        =eq andc (substCodeF v W a) (substCodeF v W b))
+      refine prf_eq_trans (prf_substfc_and (numeral (v+1)) u _ _) ?_
+      exact prf_congr_andc (substfc_inv_substCodeF v W hW hL a h1.1 u)
+        (substfc_inv_substCodeF v W hW hL b h1.2 u)
+  | v, W, hW, hL, .or a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.or.injEq] at h1
+      show Prf (substfc (numeral (v+1)) u (orc (substCodeF v W a) (substCodeF v W b))
+        =eq orc (substCodeF v W a) (substCodeF v W b))
+      refine prf_eq_trans (prf_substfc_or (numeral (v+1)) u _ _) ?_
+      exact prf_congr_orc (substfc_inv_substCodeF v W hW hL a h1.1 u)
+        (substfc_inv_substCodeF v W hW hL b h1.2 u)
+  | v, W, hW, hL, Formula.forall a, hfv, u => by
+      have h1 : liftFormula (v+3) a = a := by
+        simpa only [liftFormula, Formula.forall.injEq] using hfv
+      show Prf (substfc (numeral (v+1)) u (forallc (substCodeF (v+1) (liftc zero W) a))
+        =eq forallc (substCodeF (v+1) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_forall (numeral (v+1)) u _) ?_
+      unfold forallc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_inv_substCodeF (v+1) (liftc zero W) hW' hL' a h1 (liftc zero u)
+  | v, W, hW, hL, .ex a, hfv, u => by
+      have h1 : liftFormula (v+3) a = a := by
+        simpa only [liftFormula, Formula.ex.injEq] using hfv
+      show Prf (substfc (numeral (v+1)) u (exc (substCodeF (v+1) (liftc zero W) a))
+        =eq exc (substCodeF (v+1) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_ex (numeral (v+1)) u _) ?_
+      unfold exc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_inv_substCodeF (v+1) (liftc zero W) hW' hL' a h1 (liftc zero u)
+
+
+/-- ⭐⭐ **La que consume `hPinv`**: nivel actuante = `v`. -/
+theorem substfc_inv_substCodeF_at : ∀ (v : Nat) (W : Term),
+    (∀ (k : Nat) (u : Term), Prf (substtc (numeral k) u W =eq W)) →
+    Prf (liftc zero W =eq W) →
+    ∀ (φ : Formula), liftFormula (v+1) φ = φ →
+      ∀ u, Prf (substfc (numeral v) u (substCodeF v W φ) =eq substCodeF v W φ)
+  | v, W, hW, hL, .bottom, _, u => by
+      show Prf (substfc (numeral v) u botc =eq botc)
+      exact prf_substfc_bottom (numeral v) u
+  | v, W, hW, hL, .atom P ts, hfv, u => by
+      have hts : liftTerms (v+1) ts = ts := by
+        simpa only [liftFormula, Formula.atom.injEq, true_and] using hfv
+      show Prf (substfc (numeral v) u (atomc (strCode P) (substCodeTs v W ts))
+        =eq atomc (strCode P) (substCodeTs v W ts))
+      refine prf_eq_trans (prf_substfc_atom (numeral v) u _ _) ?_
+      unfold atomc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_inv_substCodeTs_at v W (hW v) ts hts u
+  | v, W, hW, hL, .eq a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.eq.injEq] at h1
+      show Prf (substfc (numeral v) u (eqCodeFn (substCodeT v W a) (substCodeT v W b))
+        =eq eqCodeFn (substCodeT v W a) (substCodeT v W b))
+      refine prf_eq_trans (prf_substfc_eq (numeral v) u _ _) ?_
+      exact prf_congr_eqCodeFn (substtc_inv_substCodeT_at v W (hW v) a h1.1 u)
+        (substtc_inv_substCodeT_at v W (hW v) b h1.2 u)
+  | v, W, hW, hL, .impl a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.impl.injEq] at h1
+      show Prf (substfc (numeral v) u (implc (substCodeF v W a) (substCodeF v W b))
+        =eq implc (substCodeF v W a) (substCodeF v W b))
+      refine prf_eq_trans (prf_substfc_impl (numeral v) u _ _) ?_
+      exact prf_congr_implc (substfc_inv_substCodeF_at v W hW hL a h1.1 u)
+        (substfc_inv_substCodeF_at v W hW hL b h1.2 u)
+  | v, W, hW, hL, .and a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.and.injEq] at h1
+      show Prf (substfc (numeral v) u (andc (substCodeF v W a) (substCodeF v W b))
+        =eq andc (substCodeF v W a) (substCodeF v W b))
+      refine prf_eq_trans (prf_substfc_and (numeral v) u _ _) ?_
+      exact prf_congr_andc (substfc_inv_substCodeF_at v W hW hL a h1.1 u)
+        (substfc_inv_substCodeF_at v W hW hL b h1.2 u)
+  | v, W, hW, hL, .or a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.or.injEq] at h1
+      show Prf (substfc (numeral v) u (orc (substCodeF v W a) (substCodeF v W b))
+        =eq orc (substCodeF v W a) (substCodeF v W b))
+      refine prf_eq_trans (prf_substfc_or (numeral v) u _ _) ?_
+      exact prf_congr_orc (substfc_inv_substCodeF_at v W hW hL a h1.1 u)
+        (substfc_inv_substCodeF_at v W hW hL b h1.2 u)
+  | v, W, hW, hL, Formula.forall a, hfv, u => by
+      have h1 : liftFormula (v+2) a = a := by
+        simpa only [liftFormula, Formula.forall.injEq] using hfv
+      show Prf (substfc (numeral v) u (forallc (substCodeF (v+1) (liftc zero W) a))
+        =eq forallc (substCodeF (v+1) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_forall (numeral v) u _) ?_
+      unfold forallc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_inv_substCodeF_at (v+1) (liftc zero W) hW' hL' a h1 (liftc zero u)
+  | v, W, hW, hL, .ex a, hfv, u => by
+      have h1 : liftFormula (v+2) a = a := by
+        simpa only [liftFormula, Formula.ex.injEq] using hfv
+      show Prf (substfc (numeral v) u (exc (substCodeF (v+1) (liftc zero W) a))
+        =eq exc (substCodeF (v+1) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_ex (numeral v) u _) ?_
+      unfold exc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_inv_substCodeF_at (v+1) (liftc zero W) hW' hL' a h1 (liftc zero u)
+
+
 end ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
@@ -412,4 +589,5 @@ export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
   pcc_bdAll_base splitSchema pcc_lt_succ_split_code pcc_bdAll_step
   PrfH_weaken_code PrfH_imp_trans_code PrfH_or_elim_imp_code PrfH_bdAll_step
   prf_lt_succ_self bdAllPred pcc_bdAll_intro
+  substCode_hyps_lift substfc_inv_substCodeF substfc_inv_substCodeF_at
 )

@@ -311,22 +311,76 @@ theorem substtc_inv_substCodeTs (v : Nat) (W : Term)
 
 end
 
-/-! ### ⚠️ POR QUÉ ESTO NO SUBE AL NIVEL FÓRMULA SIN MÁS, y qué haría falta
+/-! ### ⚠️ CORRECCIÓN (2026‑09‑09h): **SÍ sube al nivel FÓRMULA**, y el arreglo es pequeño
 
-El nivel fórmula funcionaría igual **salvo en los binders**. El caso
+La versión anterior de esta nota decía que la inducción no cerraba el caso del binder, porque
 
     substCodeF v w (∀a) = cons 6̄ (cons (substCodeF (v+1) (liftc 0 w) a) nil)
 
-recursa con el testigo **`liftc 0 w`**, y la hipótesis de invariancia sobre `w` **no se
-transfiere** a `liftc 0 w`: haría falta darla ya cerrada bajo `liftc 0`, o sea para todos los
-lifts iterados `liftcⁿ w`. Con la hipótesis tal como está, la inducción no cierra ese caso.
+recursa con el testigo **`liftc 0 w`** y la invariancia sobre `w` no se transfiere. El
+diagnóstico era correcto; la conclusión, **no**.
 
-⭐ Y para los testigos REALES sí vale, porque son códigos punteados y **todos los `liftc`
-iterados COLAPSAN**: `prf_liftc_tcFn` da `liftc 0 ṫ ≐ ṫ`, y de ahí `substtc_inv_liftc_tcFn`
-(`Meta/D3InDotPrf.lean`). ⇒ la versión fórmula es alcanzable, pero pide la hipótesis en forma
-**iterada** (`∀ j, invariante (liftcⁿ W)`), no en la forma simple de arriba.
+⭐ **Lo que faltaba era la hipótesis correcta, no una construcción nueva.** Con DOS hipótesis
 
-Se deja medido en vez de descubrirlo dentro de una inducción de ocho casos. -/
+    hW : ∀ k u, substtc (numeral k) u W ≐ W        (invariante a TODO nivel)
+    hL : liftc 0 W ≐ W                             (el lift COLAPSA)
+
+el par **es cerrado bajo `liftc 0`** — eso es `substCode_hyps_lift`, tres líneas — y la
+inducción cierra el binder sin más. No hace falta ninguna formulación «iterada».
+
+⚠️ Se deja escrito el error para que no se repita: **medir una obstrucción no es probarla**.
+Aquella nota generalizó de «mi hipótesis no basta» a «hace falta otra maquinaria», y la
+distancia entre las dos era una hipótesis más. -/
+
+/-! ### Y las mismas, con el nivel actuante = `v` (las que consume `hPinv`) -/
+
+mutual
+theorem substtc_inv_substCodeT_at (v : Nat) (W : Term)
+    (hW : ∀ u, Prf (substtc (numeral v) u W =eq W)) :
+    ∀ (t : Term), liftTerm (v+1) t = t →
+      ∀ u, Prf (substtc (numeral v) u (substCodeT v W t) =eq substCodeT v W t)
+  | .var n, hfv, u => by
+      have hn : Nat.le n v := by
+        rcases Nat.lt_or_ge n (v + 1) with h | h
+        · exact Nat.le_of_lt_succ h
+        · have hne : ¬ (n < v + 1) := Nat.not_lt.mpr h
+          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          exact absurd hfv (Nat.succ_ne_self n)
+      rcases Nat.lt_or_ge n v with hlt | hge
+      · have hsub : substCodeT v W (.var n) = varc (numeral n) := by
+          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+        rw [hsub]
+        exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+      · have hnv : n = v := Nat.le_antisymm hn hge
+        subst hnv
+        have hsub : substCodeT n W (.var n) = W := by simp [substCodeT]
+        rw [hsub]; exact hW u
+  | .func sym ts, hfv, u => by
+      have hall := hfv
+      simp only [liftTerm, Term.func.injEq, true_and] at hall
+      show Prf (substtc (numeral v) u (funcc (strCode sym) (substCodeTs v W ts))
+        =eq funcc (strCode sym) (substCodeTs v W ts))
+      refine prf_eq_trans (prf_substtc_func (numeral v) u _ _) ?_
+      unfold funcc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_inv_substCodeTs_at v W hW ts hall u
+
+theorem substtc_inv_substCodeTs_at (v : Nat) (W : Term)
+    (hW : ∀ u, Prf (substtc (numeral v) u W =eq W)) :
+    ∀ (ts : List Term), liftTerms (v+1) ts = ts →
+      ∀ u, Prf (substtsc (numeral v) u (substCodeTs v W ts) =eq substCodeTs v W ts)
+  | [], _, u => by
+      show Prf (substtsc (numeral v) u nil =eq nil)
+      exact prf_substtsc_nil (numeral v) u
+  | t :: ts, hfv, u => by
+      have hall := hfv
+      simp only [liftTerms, List.cons.injEq] at hall
+      show Prf (substtsc (numeral v) u (cons (substCodeT v W t) (substCodeTs v W ts))
+        =eq cons (substCodeT v W t) (substCodeTs v W ts))
+      refine prf_eq_trans (prf_substtsc_cons (numeral v) u _ _) ?_
+      exact prf_eq_trans (prf_congr_cons_head (substtc_inv_substCodeT_at v W hW t hall.1 u))
+        (prf_congr_cons_tail (substtc_inv_substCodeTs_at v W hW ts hall.2 u))
+end
 
 end ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 
@@ -336,4 +390,5 @@ export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
   substCodeT_termCode substCodeTs_termsCode
   substCodeT_closed substCodeTs_closed
   substtc_inv_substCodeT substtc_inv_substCodeTs
+  substtc_inv_substCodeT_at substtc_inv_substCodeTs_at
 )

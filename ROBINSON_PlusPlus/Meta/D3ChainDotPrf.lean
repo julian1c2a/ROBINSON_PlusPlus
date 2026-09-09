@@ -626,6 +626,62 @@ theorem d3_prf_of_hbdAll (φ : Formula)
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of_hbdAll hPinv hwP hbdAll)
 
+
+/-! ## §9 · 🏁 `hPinv` PARA `chainOkBPsi`, PROBADO (2026‑09‑09h)
+
+Con `substfc_inv_substCodeF_at` (`Meta/BdAllIntroPrf.lean`) la obligación sale en tres
+hipótesis, todas baratas, porque el testigo es un **código punteado**:
+
+* invariante a TODO nivel — `prf_substtc_tcFn_at` con el `liftc` colapsado;
+* su `liftc zero` COLAPSA — `prf_liftc_tcFn`;
+* el cuerpo no tiene variables libres ≥ 2 — `simp` sobre `liftFormula_lineOkB`.
+
+⚠️ **Y el ÍNDICE importa**: `chainOkBPsi = substCodeF 1 …` y `hPinv` actúa al nivel **1**, no
+al 2. Por eso hace falta la variante `_at` (nivel actuante = `v`) y no la de `v+1`. Con la otra
+el enunciado también es cierto, pero **no es el que `pcc_bdAll_intro` consume**. -/
+
+theorem hW_chainOkBPsi : ∀ (k : Nat) (u : Term),
+    Prf (substtc (numeral k) u (liftc zero (tcFn (.var 0)))
+      =eq liftc zero (tcFn (.var 0))) :=
+  fun k u => prf_eq_trans (prf_congr_substtc3 (prf_liftc_tcFn (.var 0)))
+    (prf_eq_trans (prf_substtc_tcFn_at k u (.var 0))
+      (prf_eq_symm (prf_liftc_tcFn (.var 0))))
+
+theorem hL_chainOkBPsi : Prf (liftc zero (liftc zero (tcFn (.var 0)))
+    =eq liftc zero (tcFn (.var 0))) := prf_congr_liftc (prf_liftc_tcFn (.var 0))
+
+/-- El cuerpo `lineOkB nil #1 #0` no tiene variables libres ≥ 2. -/
+theorem hfv_chainOkBPsi : liftFormula 2 (lineOkB nil (.var 1) (.var 0))
+    = lineOkB nil (.var 1) (.var 0) := by
+  have h1 : (1 : Nat) < 2 := by omega
+  have h0 : (0 : Nat) < 2 := by omega
+  simp only [liftFormula_lineOkB, liftTerm, nil, zero, liftTerms, if_pos h1, if_pos h0]
+
+/-- ⭐⭐⭐ **`hPinv` PARA `chainOkBPsi`.** Una de las tres obligaciones que §8 dejó abiertas,
+    cerrada. -/
+theorem hPinv_chainOkBPsi : ∀ u : Term,
+    Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
+      =eq chainOkBPsi (tcFn (.var 0)) (.var 0)) :=
+  fun u => substfc_inv_substCodeF_at 1 (liftc zero (tcFn (.var 0)))
+    hW_chainOkBPsi hL_chainOkBPsi (lineOkB nil (.var 1) (.var 0)) hfv_chainOkBPsi u
+
+/-- Y D3 baja a **DOS** obligaciones. -/
+theorem DEUDA_chainOkBDot_of_two
+    (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
+    (hbdAll : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0)))
+        (chainOkBPsi (tcFn (.var 0)) (.var 0))))) :
+    DEUDA_chainOkBDot :=
+  DEUDA_chainOkBDot_of_hbdAll hPinv_chainOkBPsi hwP hbdAll
+
+theorem d3_prf_of_two (φ : Formula)
+    (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
+    (hbdAll : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0)))
+        (chainOkBPsi (tcFn (.var 0)) (.var 0))))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of_two hwP hbdAll)
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -644,6 +700,10 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   pkP pkI pkL premsPair premsBnd
   hCl_premsPair hCs_premsPair hbl_premsBnd hbs_premsBnd
   premsBody substCodeF_boundedPremsIn substCodeF_premsBody
+  chainOkBPsi substCodeF_chainOkB chainOkBPsi_split substCodeF_chainOkB_at
+  hmatch_chainOkB DEUDA_chainOkBDot_of_hbdAll d3_prf_of_hbdAll
+  hW_chainOkBPsi hL_chainOkBPsi hfv_chainOkBPsi hPinv_chainOkBPsi
+  DEUDA_chainOkBDot_of_two d3_prf_of_two
 )
 
 /-! ## FOOTPRINT -/
@@ -656,3 +716,5 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_bdCarcLt_reflect
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_premsBody_reflect
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hPinv_chainOkBPsi
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_two
