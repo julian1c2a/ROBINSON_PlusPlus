@@ -926,6 +926,327 @@ theorem deuda_modulo_2 (hatom : CasoAtomL) (heq : CasoEqL) : DEUDA_evalLiftfc :=
   deuda_of_isFC1 (pcc_eval_liftfc_modulo_2 hatom heq)
 
 
+
+/-! ## §9 · `CasoAtomL` y `CasoEqL` — los DOS que consumen A5
+
+⭐ Aquí es donde A5 cobra. Los dos casos bajan al sorte TÉRMINO **al nivel corriente `c`**, no a
+nivel `zero`, y por eso `pcc_eval_liftc` no valía: lo que consumen es `DESCENSO_at_imp` y
+`DESCENSO_at_lista_imp` (`Meta/EvalLiftcPrf.lean` §7bis, A5), que llevan el nivel abierto.
+
+Las dos ecuaciones dotadas que faltaban tienen **otra forma** que las de §3: su lado derecho no
+es `liftfc` otra vez, sino `liftsc` (atom) y `liftc` (eq) — el cambio de sorte. -/
+
+def LIFTFC_ATOM_BODY : Formula :=
+  liftfc (.var 2) (atomc (.var 1) (.var 0)) =eq atomc (.var 1) (liftsc (.var 2) (.var 0))
+theorem LIFTFC_ATOM_BODY_ok : ax_liftfc_atom = forall_3 LIFTFC_ATOM_BODY := rfl
+
+def LIFTFC_EQ_BODY : Formula :=
+  liftfc (.var 2) (eqc (.var 1) (.var 0)) =eq eqc (liftc (.var 2) (.var 1)) (liftc (.var 2) (.var 0))
+theorem LIFTFC_EQ_BODY_ok : ax_liftfc_eq = forall_3 LIFTFC_EQ_BODY := rfl
+
+/-- **`ax_liftfc_atom` DOTADA** — la casilla 1 (el símbolo) va INTACTA; sólo baja la lista. -/
+theorem pcc_liftfc_atom_code (c p ts : Term) :
+    Prf (provFromCode (eqCodeFn
+      (liftfcT (tcFn c) (binT 3 (tcFn p) (tcFn ts)))
+      (binT 3 (tcFn p) (liftscT (tcFn c) (tcFn ts))))) := by
+  let W2 : Term := liftc zero (liftc zero (tcFn c))
+  let W1 : Term := liftc zero (tcFn p)
+  let W0 : Term := tcFn ts
+  have hin : Prf (substfc (succ (succ zero)) W2 (formCode LIFTFC_ATOM_BODY)
+      =eq eqCodeFn (liftfcT W2 (binT 3 (varc (numeral 1)) (varc (numeral 0))))
+                   (binT 3 (varc (numeral 1)) (liftscT W2 (varc (numeral 0))))) :=
+    prf_substfc_arith_open 2 W2 LIFTFC_ATOM_BODY
+  have hA2 : Prf (W2 =eq tcFn c) :=
+    prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn c)) (prf_liftc_tcFn c)
+  have hnorm : Prf (eqCodeFn (liftfcT W2 (binT 3 (varc (numeral 1)) (varc (numeral 0))))
+                   (binT 3 (varc (numeral 1)) (liftscT W2 (varc (numeral 0))))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 3 (varc (numeral 1)) (varc (numeral 0))))
+                   (binT 3 (varc (numeral 1)) (liftscT (tcFn c) (varc (numeral 0))))) :=
+    prf_congr_eqCodeFn (prf_congr_liftfcT hA2 (prf_refl _))
+      (prf_congr_binT (prf_refl _) (prf_congr_liftscT hA2 (prf_refl _)))
+  have hv1 : Prf (substtc (succ zero) W1 (varc (numeral 1)) =eq tcFn p) :=
+    prf_eq_trans (prf_mp (prf_substtc_var_eq (succ zero) W1 (numeral 1)) (prf_refl _))
+      (prf_liftc_tcFn p)
+  have hv0 : Prf (substtc (succ zero) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
+    prf_mp (prf_substtc_var_lt (succ zero) W1 (numeral 0)) (prf_zero_lt_succ zero)
+  have hc1 : Prf (substtc (succ zero) W1 (tcFn c) =eq tcFn c) := prf_substtc_tcFn_at 1 W1 c
+  have hmid : Prf (substfc (succ zero) W1 (eqCodeFn
+        (liftfcT (tcFn c) (binT 3 (varc (numeral 1)) (varc (numeral 0))))
+        (binT 3 (varc (numeral 1)) (liftscT (tcFn c) (varc (numeral 0)))))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 3 (tcFn p) (varc (numeral 0))))
+                   (binT 3 (tcFn p) (liftscT (tcFn c) (varc (numeral 0))))) := by
+    refine prf_eq_trans (prf_substfc_eq (succ zero) W1 _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_liftfcT (succ zero) W1 _ _) ?_
+      refine prf_congr_liftfcT hc1 ?_
+      exact prf_eq_trans (prf_substtc_binT_at 3 1 W1 _ _) (prf_congr_binT hv1 hv0)
+    · refine prf_eq_trans (prf_substtc_binT_at 3 1 W1 _ _) ?_
+      refine prf_congr_binT hv1 ?_
+      exact prf_eq_trans (prf_substtc_liftscT (succ zero) W1 _ _) (prf_congr_liftscT hc1 hv0)
+  have hout : Prf (substfc zero W0 (eqCodeFn
+        (liftfcT (tcFn c) (binT 3 (tcFn p) (varc (numeral 0))))
+        (binT 3 (tcFn p) (liftscT (tcFn c) (varc (numeral 0)))))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 3 (tcFn p) (tcFn ts)))
+                   (binT 3 (tcFn p) (liftscT (tcFn c) (tcFn ts)))) := by
+    have hb : Prf (substtc zero W0 (varc (numeral 0)) =eq tcFn ts) := prf_substtc_varc0 W0
+    have hcz : Prf (substtc zero W0 (tcFn c) =eq tcFn c) := prf_substtc_tcFn W0 c
+    have hpz : Prf (substtc zero W0 (tcFn p) =eq tcFn p) := prf_substtc_tcFn W0 p
+    refine prf_eq_trans (prf_substfc_eq zero W0 _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_liftfcT zero W0 _ _) ?_
+      refine prf_congr_liftfcT hcz ?_
+      exact prf_eq_trans (prf_substtc_binT_at 3 0 W0 _ _) (prf_congr_binT hpz hb)
+    · refine prf_eq_trans (prf_substtc_binT_at 3 0 W0 _ _) ?_
+      refine prf_congr_binT hpz ?_
+      exact prf_eq_trans (prf_substtc_liftscT zero W0 _ _) (prf_congr_liftscT hcz hb)
+  have hchain : Prf (substfc zero W0 (substfc (succ zero) W1
+        (substfc (succ (succ zero)) W2 (formCode LIFTFC_ATOM_BODY)))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 3 (tcFn p) (tcFn ts)))
+                   (binT 3 (tcFn p) (liftscT (tcFn c) (tcFn ts)))) :=
+    prf_eq_trans (prf_congr_substfc_arg3
+      (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hmid)) hout
+  exact prf_mp (prf_provCode_congr hchain)
+    (pcc_axiom_inst3 LIFTFC_ATOM_BODY (show ax_liftfc_atom ∈ axioms by simp [axioms])
+      (tcFn c) (tcFn p) (tcFn ts)
+      (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 p))
+      (prf_hasWit_tcFn (liftTerm 0 ts)))
+
+/-- **`ax_liftfc_eq` DOTADA** — las DOS casillas bajan al sorte TÉRMINO (`liftc`). -/
+theorem pcc_liftfc_eq_code (c a b : Term) :
+    Prf (provFromCode (eqCodeFn
+      (liftfcT (tcFn c) (binT 4 (tcFn a) (tcFn b)))
+      (binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (tcFn b))))) := by
+  let W2 : Term := liftc zero (liftc zero (tcFn c))
+  let W1 : Term := liftc zero (tcFn a)
+  let W0 : Term := tcFn b
+  have hin : Prf (substfc (succ (succ zero)) W2 (formCode LIFTFC_EQ_BODY)
+      =eq eqCodeFn (liftfcT W2 (binT 4 (varc (numeral 1)) (varc (numeral 0))))
+                   (binT 4 (liftcT W2 (varc (numeral 1))) (liftcT W2 (varc (numeral 0))))) :=
+    prf_substfc_arith_open 2 W2 LIFTFC_EQ_BODY
+  have hA2 : Prf (W2 =eq tcFn c) :=
+    prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn c)) (prf_liftc_tcFn c)
+  have hnorm : Prf (eqCodeFn (liftfcT W2 (binT 4 (varc (numeral 1)) (varc (numeral 0))))
+                   (binT 4 (liftcT W2 (varc (numeral 1))) (liftcT W2 (varc (numeral 0))))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 4 (varc (numeral 1)) (varc (numeral 0))))
+                   (binT 4 (liftcT (tcFn c) (varc (numeral 1)))
+                           (liftcT (tcFn c) (varc (numeral 0))))) :=
+    prf_congr_eqCodeFn (prf_congr_liftfcT hA2 (prf_refl _))
+      (prf_congr_binT (prf_congr_liftcT hA2 (prf_refl _))
+                      (prf_congr_liftcT hA2 (prf_refl _)))
+  have hv1 : Prf (substtc (succ zero) W1 (varc (numeral 1)) =eq tcFn a) :=
+    prf_eq_trans (prf_mp (prf_substtc_var_eq (succ zero) W1 (numeral 1)) (prf_refl _))
+      (prf_liftc_tcFn a)
+  have hv0 : Prf (substtc (succ zero) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
+    prf_mp (prf_substtc_var_lt (succ zero) W1 (numeral 0)) (prf_zero_lt_succ zero)
+  have hc1 : Prf (substtc (succ zero) W1 (tcFn c) =eq tcFn c) := prf_substtc_tcFn_at 1 W1 c
+  have hmid : Prf (substfc (succ zero) W1 (eqCodeFn
+        (liftfcT (tcFn c) (binT 4 (varc (numeral 1)) (varc (numeral 0))))
+        (binT 4 (liftcT (tcFn c) (varc (numeral 1))) (liftcT (tcFn c) (varc (numeral 0)))))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 4 (tcFn a) (varc (numeral 0))))
+                   (binT 4 (liftcT (tcFn c) (tcFn a))
+                           (liftcT (tcFn c) (varc (numeral 0))))) := by
+    refine prf_eq_trans (prf_substfc_eq (succ zero) W1 _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_liftfcT (succ zero) W1 _ _) ?_
+      refine prf_congr_liftfcT hc1 ?_
+      exact prf_eq_trans (prf_substtc_binT_at 4 1 W1 _ _) (prf_congr_binT hv1 hv0)
+    · refine prf_eq_trans (prf_substtc_binT_at 4 1 W1 _ _) ?_
+      refine prf_congr_binT ?_ ?_
+      · exact prf_eq_trans (prf_substtc_liftcT (succ zero) W1 _ _) (prf_congr_liftcT hc1 hv1)
+      · exact prf_eq_trans (prf_substtc_liftcT (succ zero) W1 _ _) (prf_congr_liftcT hc1 hv0)
+  have hout : Prf (substfc zero W0 (eqCodeFn
+        (liftfcT (tcFn c) (binT 4 (tcFn a) (varc (numeral 0))))
+        (binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (varc (numeral 0)))))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 4 (tcFn a) (tcFn b)))
+                   (binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (tcFn b)))) := by
+    have hb : Prf (substtc zero W0 (varc (numeral 0)) =eq tcFn b) := prf_substtc_varc0 W0
+    have hcz : Prf (substtc zero W0 (tcFn c) =eq tcFn c) := prf_substtc_tcFn W0 c
+    have haz : Prf (substtc zero W0 (tcFn a) =eq tcFn a) := prf_substtc_tcFn W0 a
+    refine prf_eq_trans (prf_substfc_eq zero W0 _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_liftfcT zero W0 _ _) ?_
+      refine prf_congr_liftfcT hcz ?_
+      exact prf_eq_trans (prf_substtc_binT_at 4 0 W0 _ _) (prf_congr_binT haz hb)
+    · refine prf_eq_trans (prf_substtc_binT_at 4 0 W0 _ _) ?_
+      refine prf_congr_binT ?_ ?_
+      · exact prf_eq_trans (prf_substtc_liftcT zero W0 _ _) (prf_congr_liftcT hcz haz)
+      · exact prf_eq_trans (prf_substtc_liftcT zero W0 _ _) (prf_congr_liftcT hcz hb)
+  have hchain : Prf (substfc zero W0 (substfc (succ zero) W1
+        (substfc (succ (succ zero)) W2 (formCode LIFTFC_EQ_BODY)))
+      =eq eqCodeFn (liftfcT (tcFn c) (binT 4 (tcFn a) (tcFn b)))
+                   (binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (tcFn b)))) :=
+    prf_eq_trans (prf_congr_substfc_arg3
+      (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hmid)) hout
+  exact prf_mp (prf_provCode_congr hchain)
+    (pcc_axiom_inst3 LIFTFC_EQ_BODY (show ax_liftfc_eq ∈ axioms by simp [axioms])
+      (tcFn c) (tcFn a) (tcFn b)
+      (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 a))
+      (prf_hasWit_tcFn (liftTerm 0 b)))
+
+/-! ### §9.1 · Los dos NÚCLEOS, con la evaluación de término como hipótesis OBJETO -/
+
+/-- El núcleo de `atomc`: pide **sólo** la evaluación de la LISTA de argumentos, al nivel `c`. -/
+theorem caso_atom_core_L (c p ts : Term) :
+    Prf (Formula.impl (targetLiftscAt c ts)
+      (targetLiftfc c (cons (numeralM 3) (cons p (cons ts nil))))) := by
+  refine prf_deduction ?_
+  have hB : PrfH [targetLiftscAt c ts]
+      (provFromCode (eqc (liftscT (tcFn c) (tcFn ts)) (tcFn (liftsc c ts)))) := prfH_hyp_self _
+  have iLS : ∀ W, Prf (substtc zero W (liftscT (tcFn c) (tcFn ts))
+      =eq liftscT (tcFn c) (tcFn ts)) :=
+    substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn ts)
+  have iX0 : ∀ W, Prf (substtc zero W
+      (liftfcT (tcFn c) (tcFn (cons (numeralM 3) (cons p (cons ts nil)))))
+      =eq liftfcT (tcFn c) (tcFn (cons (numeralM 3) (cons p (cons ts nil))))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_tcFn (cons (numeralM 3) (cons p (cons ts nil))))
+  have iX1 : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (binT 3 (tcFn p) (tcFn ts)))
+      =eq liftfcT (tcFn c) (binT 3 (tcFn p) (tcFn ts))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_binT (substtc_inv_tcFn p) (substtc_inv_tcFn ts))
+  have iX2 : ∀ W, Prf (substtc zero W (binT 3 (tcFn p) (liftscT (tcFn c) (tcFn ts)))
+      =eq binT 3 (tcFn p) (liftscT (tcFn c) (tcFn ts))) :=
+    substtc_inv_binT (substtc_inv_tcFn p) iLS
+  have iX3 : ∀ W, Prf (substtc zero W (binT 3 (tcFn p) (tcFn (liftsc c ts)))
+      =eq binT 3 (tcFn p) (tcFn (liftsc c ts))) :=
+    substtc_inv_binT (substtc_inv_tcFn p) (substtc_inv_tcFn (liftsc c ts))
+  have h1 := prf_to_prfH (prf_mp (pcc_congr_liftfcT_arg2_code (tcFn c)
+      (tcFn (cons (numeralM 3) (cons p (cons ts nil)))) (binT 3 (tcFn p) (tcFn ts))
+      (substtc_inv_tcFn c) (substtc_inv_tcFn (cons (numeralM 3) (cons p (cons ts nil)))))
+    (pcc_dot_bin_symm 3 p ts)) [targetLiftscAt c ts]
+  have h2 := prf_to_prfH (pcc_liftfc_atom_code c p ts) [targetLiftscAt c ts]
+  have h3 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_2_code 3 (tcFn p)
+      (liftscT (tcFn c) (tcFn ts)) (tcFn (liftsc c ts)) (substtc_inv_tcFn p) iLS) _) hB
+  have h4 := prf_to_prfH (pcc_dot_bin 3 p (liftsc c ts)) [targetLiftscAt c ts]
+  have h5 := prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+      (prf_congr_tcFn (prf_eq_symm (prf_liftfc_atom c p ts)))))
+    (prf_provFromCode_eqCodeFn_refl (tcFn (cons (numeralM 3) (cons p (cons (liftsc c ts) nil))))))
+    [targetLiftscAt c ts]
+  refine PrfH_eq_trans_code _ _ _ iX0 h1
+    (PrfH_eq_trans_code _ _ _ iX1 h2
+      (PrfH_eq_trans_code _ _ _ iX2 h3
+        (PrfH_eq_trans_code _ _ _ iX3 h4 h5 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
+    <;> hw_auto
+
+/-- El núcleo de `eqc`: pide la evaluación de TÉRMINO en las DOS casillas, al nivel `c`. -/
+theorem caso_eq_core_L (c a b : Term) :
+    Prf (Formula.impl (land (targetLiftAt c a) (targetLiftAt c b))
+      (targetLiftfc c (cons (numeralM 4) (cons a (cons b nil))))) := by
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (land (targetLiftAt c a) (targetLiftAt c b))
+  have hA : PrfH [land (targetLiftAt c a) (targetLiftAt c b)]
+      (provFromCode (eqc (liftcT (tcFn c) (tcFn a)) (tcFn (liftc c a)))) :=
+    PrfH_and_elim_left hh
+  have hB : PrfH [land (targetLiftAt c a) (targetLiftAt c b)]
+      (provFromCode (eqc (liftcT (tcFn c) (tcFn b)) (tcFn (liftc c b)))) :=
+    PrfH_and_elim_right hh
+  have iLA : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (tcFn a)) =eq liftcT (tcFn c) (tcFn a)) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn a)
+  have iLB : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (tcFn b)) =eq liftcT (tcFn c) (tcFn b)) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn b)
+  have iX0 : ∀ W, Prf (substtc zero W
+      (liftfcT (tcFn c) (tcFn (cons (numeralM 4) (cons a (cons b nil)))))
+      =eq liftfcT (tcFn c) (tcFn (cons (numeralM 4) (cons a (cons b nil))))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_tcFn (cons (numeralM 4) (cons a (cons b nil))))
+  have iX1 : ∀ W, Prf (substtc zero W (liftfcT (tcFn c) (binT 4 (tcFn a) (tcFn b)))
+      =eq liftfcT (tcFn c) (binT 4 (tcFn a) (tcFn b))) :=
+    substtc_inv_liftfcT (substtc_inv_tcFn c)
+      (substtc_inv_binT (substtc_inv_tcFn a) (substtc_inv_tcFn b))
+  have iX2 : ∀ W, Prf (substtc zero W
+      (binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (tcFn b)))
+      =eq binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (tcFn b))) :=
+    substtc_inv_binT iLA iLB
+  have iX3 : ∀ W, Prf (substtc zero W (binT 4 (tcFn (liftc c a)) (liftcT (tcFn c) (tcFn b)))
+      =eq binT 4 (tcFn (liftc c a)) (liftcT (tcFn c) (tcFn b))) :=
+    substtc_inv_binT (substtc_inv_tcFn (liftc c a)) iLB
+  have iX4 : ∀ W, Prf (substtc zero W (binT 4 (tcFn (liftc c a)) (tcFn (liftc c b)))
+      =eq binT 4 (tcFn (liftc c a)) (tcFn (liftc c b))) :=
+    substtc_inv_binT (substtc_inv_tcFn (liftc c a)) (substtc_inv_tcFn (liftc c b))
+  have h1 := prf_to_prfH (prf_mp (pcc_congr_liftfcT_arg2_code (tcFn c)
+      (tcFn (cons (numeralM 4) (cons a (cons b nil)))) (binT 4 (tcFn a) (tcFn b))
+      (substtc_inv_tcFn c) (substtc_inv_tcFn (cons (numeralM 4) (cons a (cons b nil)))))
+    (pcc_dot_bin_symm 4 a b)) [land (targetLiftAt c a) (targetLiftAt c b)]
+  have h2 := prf_to_prfH (pcc_liftfc_eq_code c a b) [land (targetLiftAt c a) (targetLiftAt c b)]
+  have h3 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_1_code 4
+      (liftcT (tcFn c) (tcFn b)) (liftcT (tcFn c) (tcFn a)) (tcFn (liftc c a)) iLB iLA) _) hA
+  have h4 := PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_2_code 4 (tcFn (liftc c a))
+      (liftcT (tcFn c) (tcFn b)) (tcFn (liftc c b))
+      (substtc_inv_tcFn (liftc c a)) iLB) _) hB
+  have h5 := prf_to_prfH (pcc_dot_bin 4 (liftc c a) (liftc c b))
+    [land (targetLiftAt c a) (targetLiftAt c b)]
+  have h6 := prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+      (prf_congr_tcFn (prf_eq_symm (prf_liftfc_eq c a b)))))
+    (prf_provFromCode_eqCodeFn_refl
+      (tcFn (cons (numeralM 4) (cons (liftc c a) (cons (liftc c b) nil))))))
+    [land (targetLiftAt c a) (targetLiftAt c b)]
+  refine PrfH_eq_trans_code _ _ _ iX0 h1
+    (PrfH_eq_trans_code _ _ _ iX1 h2
+      (PrfH_eq_trans_code _ _ _ iX2 h3
+        (PrfH_eq_trans_code _ _ _ iX3 h4
+          (PrfH_eq_trans_code _ _ _ iX4 h5 h6 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
+    <;> hw_auto
+
+/-! ### §9.2 · Los dos casos, DESCARGADOS — aquí entra A5 -/
+
+/-- **`CasoAtomL` DESCARGADO.** Consume `DESCENSO_at_lista_imp` (A5): la evaluación provable de
+    `liftsc` **al nivel `c`**, que es exactamente lo que `pcc_eval_liftc` clavado a `zero` no
+    podía dar. -/
+theorem casoAtomL_thm : CasoAtomL := by
+  intro wT c X
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (land (wfAll1 wT)
+    (land (shapeBin X 3) (argsIn wT (nthc X (numeralM 2)))))
+  have hwT := PrfH_and_elim_left hh
+  have hR := PrfH_and_elim_right hh
+  have hshape := PrfH_and_elim_left hR
+  have hargs := PrfH_and_elim_right hR
+  have hTB := PrfH.mp _ _ _
+    (prf_to_prfH (DESCENSO_at_lista_imp c wT (nthc X (numeralM 2))) _)
+    (PrfH_and_intro hwT hargs)
+  have hC := PrfH.mp _ _ _
+    (prf_to_prfH (caso_atom_core_L c (nthc X (numeralM 1)) (nthc X (numeralM 2))) _) hTB
+  exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
+
+/-- **`CasoEqL` DESCARGADO.** Consume `DESCENSO_at_imp` (A5) DOS veces. -/
+theorem casoEqL_thm : CasoEqL := by
+  intro wT c X
+  refine prf_deduction ?_
+  have hh := prfH_hyp_self (land (wfAll1 wT) (land (shapeBin X 4)
+    (land (In (nthc X (numeralM 1)) wT) (In (nthc X (numeralM 2)) wT))))
+  have hwT := PrfH_and_elim_left hh
+  have hR := PrfH_and_elim_right hh
+  have hshape := PrfH_and_elim_left hR
+  have hin1 := PrfH_and_elim_left (PrfH_and_elim_right hR)
+  have hin2 := PrfH_and_elim_right (PrfH_and_elim_right hR)
+  have hTA := PrfH.mp _ _ _
+    (prf_to_prfH (DESCENSO_at_imp c wT (nthc X (numeralM 1))) _)
+    (PrfH_and_intro hwT hin1)
+  have hTB := PrfH.mp _ _ _
+    (prf_to_prfH (DESCENSO_at_imp c wT (nthc X (numeralM 2))) _)
+    (PrfH_and_intro hwT hin2)
+  have hC := PrfH.mp _ _ _
+    (prf_to_prfH (caso_eq_core_L c (nthc X (numeralM 1)) (nthc X (numeralM 2))) _)
+    (PrfH_and_intro hTA hTB)
+  exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
+
+/-! ## §10 · 🏁🏁 `pcc_eval_liftfc`, SIN HIPÓTESIS -/
+
+/-- ⭐⭐⭐ **`DEUDA_evalLiftfc_isFC1` PROBADA** — los ocho casos descargados. -/
+theorem pcc_eval_liftfc_isFC1 : DEUDA_evalLiftfc_isFC1 :=
+  pcc_eval_liftfc_modulo_2 casoAtomL_thm casoEqL_thm
+
+/-- ⭐⭐⭐ **`DEUDA_evalLiftfc` PROBADA**: la evaluación provable de `liftfc` con el nivel `v` y
+    el código `X` **abstractos**, bajo la sola guarda `hasWitF X`. -/
+theorem pcc_eval_liftfc : DEUDA_evalLiftfc := deuda_of_isFC1 pcc_eval_liftfc_isFC1
+
+/-- La forma desplegada, que es la que consumirá `Meta/SubstTreeReflect.lean`. -/
+theorem pcc_eval_liftfc_wit (v X : Term) :
+    Prf (Formula.impl (hasWitF X)
+      (provFromCode (eqc (liftfcT (tcFn v) (tcFn X)) (tcFn (liftfc v X))))) :=
+  pcc_eval_liftfc v X
+
+
 end ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -956,6 +1277,11 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
   pcc_congr_liftfcT_arg2_code substF_targetLiftfc_hole PrfH_congr_targetLiftfc
   casoBotL casoBinL_gen casoBinL5 casoBinL7 casoBinL8 casoUnL_gen casoUnL6 casoUnL9
   pcc_eval_liftfc_modulo_2 deuda_modulo_2
+  -- §9‑§10 · los DOS que consumen A5, y el TEOREMA
+  LIFTFC_ATOM_BODY LIFTFC_ATOM_BODY_ok pcc_liftfc_atom_code
+  LIFTFC_EQ_BODY LIFTFC_EQ_BODY_ok pcc_liftfc_eq_code
+  caso_atom_core_L caso_eq_core_L casoAtomL_thm casoEqL_thm
+  pcc_eval_liftfc_isFC1 pcc_eval_liftfc pcc_eval_liftfc_wit
 )
 
 /-! ## FOOTPRINT -/
@@ -973,3 +1299,9 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoUnL6
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoUnL9
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_modulo_2
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_atom_code
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_eq_code
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoAtomL_thm
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoEqL_thm
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_wit
