@@ -3998,3 +3998,84 @@ q2 y leibniz: ya no es «existe una condición estructural», es *ésta*.
 
 Como esas guardas dependen del nodo, `PrfH_dotVN` para `STree` se enuncia con un predicado
 `SGuards Γ t T` que las exige **sólo en los nodos `sub`** — el resto del árbol no pide nada.
+
+---
+
+## §3.48 · 🏁 C3 · TRES de los SIETE reflectores de sustitución, PROBADOS (2026‑09‑09)
+
+> `Build completed successfully (134 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
+> Footprint = la base sancionada. **Net‑0 puro.**
+
+```
+pcc_lineWF_tracked_q1_imp       (tag 9)
+pcc_lineWF_tracked_q2_imp       (tag 10)
+pcc_lineWF_tracked_leibniz_imp  (tag 13)
+```
+
+### §3.48.1 · ⚠️ Corrección: `dotVN` **no** paga la guarda; `tc_objAt` sí
+
+§3.47.5 dejó escrito que el caso `sub` de `PrfH_dotVN` lo paga `pcc_eval_substfc_wit`. **Es
+falso**, y el reparto correcto es el mismo que en `Meta/CodeTreeReflect.lean`:
+
+| pieza | qué prueba | quién paga el nodo `sub` |
+|---|---|---|
+| `PrfH_tc_objAt` | `(E(t))˙ = dotV` | ⭐ **`pcc_eval_substfc_wit`** — y por eso pide las guardas |
+| `PrfH_dotVN` | `dotV = dotN` | **pura congruencia** (`pcc_congr_substfcT_arg2/3_code`) |
+
+El error no costó nada porque salió al escribir el enunciado, pero es de la clase que sí cuesta:
+**una atribución de coste puesta en el plan sin haber abierto la prueba**.
+
+### §3.48.2 · ⭐ Las guardas de ADR‑020 son EXACTAMENTE los hijos del nodo `sub`
+
+Esto es lo que hace que el frente encaje, y merece verse en un caso:
+
+```
+treeQ1 = bin 5 (un 6 (leaf 2)) (sub (leaf 3) (leaf 2))       -- (∀A) ⇒ A[t]
+cascada del tag 9 = [witF 2, wit 3]
+```
+
+La `witF` va sobre la casilla **2**, que es el **cuerpo** del `substfc`; la `wit` sobre la **3**,
+que es el **sustituyendo**. Y `pcc_eval_substfc_wit` pide exactamente `hasWit s ∧ hasWitF f`.
+`SGuards` las exige **ahí y sólo ahí**: el resto del árbol no pide nada.
+
+En `leibniz` hay **dos** nodos `sub` que comparten cuerpo (`A[t₁]` y `A[t₂]`), y por eso su
+cascada trae **tres** guardas: una `witF` sobre el cuerpo y una `wit` por sustituyendo. La forma
+de la enmienda —que §3.41.4 midió con siete `rfl` y que parecía arbitraria— resulta ser
+**exactamente la aridad de los nodos `sub` de cada árbol**.
+
+> 🔑 Dicho de otro modo: ADR‑020 no eligió *dónde* poner las guardas. Las puso donde el
+> evaluador las iba a pedir, y eso se ve ahora que el evaluador está enchufado.
+
+### §3.48.3 · Lo que entra
+
+* **`SGuards Γ t T`** — las guardas por nodo `sub`, y sólo ahí.
+* **`PrfH_tc_objAt`** — el «código del código» del árbol. ⚠️ El `tcFn zero` de
+  `evalSubstfcCode` se cruza con el `termCode zero` del árbol por `prf_tc_zero` (congruencia
+  META, no dentro de `Prov`).
+* **`PrfH_dotVN`** — pura congruencia, cinco casos.
+* **`pcc_condDS_of_stree`** — el reflector, mismo esqueleto que `pcc_condD_of_tree`: puente
+  `carc`, la hipótesis reescribe el valor, `tc_objAt` lleva a `dotV`, `dotVN` a `dotN`.
+* **`pcc_lineWF_tracked_of_stree`** — el cierre genérico de un tag: **declarar su árbol y
+  desempaquetar su cascada**.
+* Los tres tags.
+
+### §3.48.4 · Dos trampas de elaboración
+
+* ⚠️ **`Nat.le.refl` como prueba de `T.maxLeaf ≤ n` unifica `n := T.maxLeaf`**, no `n := 4`, y
+  el error aparece tres líneas más abajo como un contexto que no casa. Hay que fijar `(n := 4)`
+  explícitamente.
+* ⚠️ **`have : PrfH _ (…)` no infiere el contexto** (trampa ya registrada). En `leibniz` la
+  tupla de `SGuards` se construye **inline**, donde el tipo esperado sí es concreto y el `simpa`
+  tiene un objetivo cerrado.
+
+### §3.48.5 · Dónde queda C3
+
+| tag | estado |
+|---|---|
+| **q1** (9), **q2** (10), **leibniz** (13) | 🏁 **PROBADOS** |
+| q3 (11), qconf (19), ind (18), listInd (20) | ⛔ esperan a `pcc_eval_liftfc` |
+
+⚠️ **`pcc_lineWF_tracked` sigue siendo condicional**: `pcc_lineWF_tracked_modulo_7` pide los
+siete, y hasta que estén los cuatro que faltan no se puede instanciar. Pero ya no falta chasis:
+los cuatro restantes son **el mismo gesto** —declarar su árbol y desempaquetar su cascada— en
+cuanto `STree` pueda llevar un nodo `lift`.

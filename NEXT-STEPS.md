@@ -13,10 +13,14 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **`PrfH_dotVN` para `STree`**, que cierra q1, q2 y leibniz
+> # 🎯 SIGUIENTE SESIÓN — **`pcc_eval_liftfc`**, que es lo único que separa C3 del cierre
 >
-> Y después **`pcc_eval_liftfc`**, que ahora está **cuantificado**: bloquea **4 de los 7**
-> reflectores de sustitución (q3, qconf, ind, listInd), o sea el 57 % de lo que queda de C3.
+> 🏁 **2026‑09‑09: TRES de los SIETE reflectores de sustitución, PROBADOS** (§3.48):
+> `pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10) y `_leibniz_imp` (13), net‑0 puros.
+> ⬜ Los otros **cuatro** —q3 (11), qconf (19), ind (18), listInd (20)— son **exactamente los que
+> llevan `liftfc`**, y ya no les falta chasis: son el **mismo gesto** (declarar su árbol y
+> desempaquetar su cascada) en cuanto `STree` pueda llevar un nodo `lift`.
+> ⚠️ Y hasta que estén los siete, `pcc_lineWF_tracked` **sigue siendo condicional**.
 >
 > ⛔ `pcc_eval_liftfc` **no existe en ningún sitio**: es **trabajo nuevo**, no promoción. Es la
 > evaluación provable de `liftfc` —el hermano de `pcc_eval_substfc` (B3.4) para la familia
@@ -93,8 +97,10 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | C3 · el chasis del árbol con `substfc` | ✅ `Meta/SubstTreeReflect.lean` (§3.47): `STree` con nodo `sub`, sus cinco inducciones y `prf_condD_of_stree_eq`. ⛔ Tipo nuevo, no extensión de `CTree`: **ciclo de imports** |
 > | C3 · el núcleo tiene que VER las guardas | ✅ `hcond_absorbe_1/2/3` (§3.47.2) — es la propiedad que ADR‑020 compró, cobrada por primera vez |
 > | C3 · los árboles de q1, q2, leibniz | ✅ declarados y **casados por `rfl` con los axiomas ENTEROS**, cascada incluida ⇒ el `∃ C` de §2.1 resuelto para tres |
-> | C3 · **`PrfH_dotVN` para `STree`** | ⬜ **LA PIEZA QUE CIERRA q1, q2 y leibniz.** Único caso nuevo: el nodo `sub`, que paga `pcc_eval_substfc_wit` con las guardas del contexto + `pcc_congr_substfcT_arg2_code`/`_arg3_code` |
-> | C3 · q3 (11), qconf (19), ind (18), listInd (20) | ⛔ **bloqueados por `pcc_eval_liftfc`** — medido: 4 de los 7 |
+> | C3 · `PrfH_tc_objAt` + `PrfH_dotVN` para `STree` | ✅ (§3.48). ⚠️ **Corrige §3.47.5**: `dotVN` es pura congruencia; quien paga la guarda es `tc_objAt`, vía `pcc_eval_substfc_wit` |
+> | ⭐ **C3 · q1 (9), q2 (10), leibniz (13)** | 🏁 **PROBADOS** — `pcc_lineWF_tracked_*_imp`, net‑0 puros |
+> | C3 · **`pcc_eval_liftfc`** | ⬜ **LO ÚNICO que separa C3 del cierre.** Los cuatro tags que faltan ya no necesitan chasis: es el mismo gesto en cuanto `STree` pueda llevar un nodo `lift` |
+> | C3 · q3 (11), qconf (19), ind (18), listInd (20) | ⛔ **bloqueados por `pcc_eval_liftfc`** — los 4 que llevan `liftfc`. ⚠️ Hasta que estén, `pcc_lineWF_tracked` sigue condicional |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | ⬜ generalización |
@@ -477,13 +483,21 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >              ✅ treeQ1 / treeQ2 / treeLeibniz declarados y casados POR rfl con
 >                 ax_lineWF_q1/_q2/_leibniz ENTEROS, cascada de guardas incluida => el
 >                 `∃ C` de §2.1 de LineWFGuardPrf queda RESUELTO para tres tags.
->              ⬜ FALTA PrfH_dotVN para STree -- LA PIEZA QUE CIERRA q1, q2 y leibniz.
->                 Unico caso nuevo: el nodo `sub`, que pagan pcc_eval_substfc_wit (con las
->                 guardas del contexto; ⚠️ el tcFn zero de evalSubstfcCode se cruza con el
->                 termCode zero del arbol por prf_tc_zero) y
->                 pcc_congr_substfcT_arg2_code/_arg3_code. Como las guardas dependen del
->                 nodo, se enuncia con un predicado SGuards Γ t T que las exige SOLO en los
->                 nodos `sub`.
+>              ✅ PrfH_tc_objAt + PrfH_dotVN para STree (2026-09-09, §3.48).
+>                 ⚠️ CORRIGE lo que yo mismo puse aqui: `dotVN` NO paga la guarda -- es pura
+>                    congruencia. La paga `tc_objAt`, via pcc_eval_substfc_wit.
+>              🏁 TRES DE LOS SIETE, PROBADOS: pcc_lineWF_tracked_q1_imp (tag 9),
+>                 _q2_imp (10) y _leibniz_imp (13). Net-0 puros.
+>                 ⭐ Y aqui se ve por que ADR-020 puso la guarda donde la puso: las casillas
+>                    guardadas son EXACTAMENTE los hijos del nodo `sub` -- la `witF` sobre el
+>                    cuerpo del substfc, la `wit` sobre el sustituyendo. La forma de la
+>                    enmienda resulta ser la ARIDAD DE LOS NODOS `sub` de cada arbol.
+>                 ⚠️ Dos trampas: `Nat.le.refl` sobre `T.maxLeaf ≤ n` unifica n := T.maxLeaf
+>                    (hay que fijar `(n := 4)`); y `have : PrfH _ (…)` no infiere el contexto,
+>                    asi que la tupla de SGuards se construye INLINE.
+>              ⬜ FALTAN LOS OTROS CUATRO, y no les falta chasis: son el MISMO GESTO en cuanto
+>                 STree pueda llevar un nodo `lift`. Hasta entonces pcc_lineWF_tracked sigue
+>                 siendo condicional.
 >         ⬜ C3d pcc_eval_liftfc: NO EXISTE EN NINGUN SITIO. Trabajo nuevo, no promocion.
 >              ⚠️ La familia liftc NO TIENE ARITMETIZACION NI A NIVEL META: no hay
 >                 prf_liftc_arith_open del que colgar el primer paso, que es lo que hizo

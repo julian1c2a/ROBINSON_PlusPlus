@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-08f · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-09 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -34,6 +34,17 @@
 > namespaces, **31 ya en producción**.
 > ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
 > literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
+>
+> 🏁 **2026-09-09 · C3: TRES de los SIETE reflectores de sustitución, PROBADOS** (§3.48).
+> `pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10), `_leibniz_imp` (13); net-0 puros.
+> ⭐ **Y se ve por qué ADR-020 puso la guarda donde la puso**: las casillas guardadas son
+> **exactamente los hijos del nodo `sub`** — la `witF` sobre el cuerpo del `substfc`, la `wit`
+> sobre el sustituyendo. La forma de la enmienda, que parecía arbitraria, resulta ser la
+> **aridad de los nodos `sub`** de cada árbol.
+> ⚠️ Corrige §3.47.5: `PrfH_dotVN` **no** paga la guarda (es pura congruencia); la paga
+> `PrfH_tc_objAt`, vía `pcc_eval_substfc_wit`.
+> ⬜ Los otros **cuatro** esperan a `pcc_eval_liftfc`, y hasta que estén los siete
+> `pcc_lineWF_tracked` **sigue siendo condicional**.
 >
 > ▶ **2026-09-08f · C3 ARRANCADO: el chasis del árbol con `substfc`** (§3.47).
 > `Meta/SubstTreeReflect.lean` — `STree` con nodo `sub`; footprint = sólo los tres axiomas de
