@@ -530,6 +530,213 @@ theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)
   rw [liftF_targetLift]
   exact PrfH.mp _ _ _ (prf_to_prfH (DESCENSO_imp (.var 0) (liftTerm 0 s)) _) (prfH_hyp_self _)
 
+/-! ## §7bis · A5 · EL DESCENSO CON EL **NIVEL CUANTIFICADO**
+
+🔑 **La razón por la que el nivel entra en `Φ` y no se queda libre** es la MISMA que la de `w`
+(§5): el gate `hΦ : liftFormula 1 Φ = Φ` de `prf_strong_induction`. Con `c` libre haría falta
+`liftTerm 1 c = c`, que no se descarga para `c` abstracto. Así que:
+
+    Φat(X) := ∀c. ∀w. ( isTC1 w X                ⇒ targetLiftAt   c X )
+                    ∧ ( (wfAll1 w ∧ argsIn w X) ⇒ targetLiftscAt c X )
+
+⭐ **Y esto es TODO lo que cuesta abrir el nivel en el sorte término**: la recursión es la misma
+—Cantor sobre `carc`/`cdrc`, exactamente los mismos cortes— porque **el nivel NUNCA cambia en la
+recursión de término**. `c` viaja intacto de la conclusión a las dos hipótesis. Lo que sí cambia
+el nivel es el sorte FÓRMULA (`liftfc c (forallc a) = forallc (liftfc (σc) a)`), y ése es el
+frente de `pcc_eval_liftfc`, no éste.
+
+⚠️ Con DOS binders sobre `Φ` la HI de curso de valores llega con DOS `liftFormula 0`: la
+extracción es `PSI_inst2`, el escalón que faltaba en `Meta/StrongInductionPrf.lean` (estaban el
+1, el 3 y el 4). -/
+
+def PHIatBody : Formula :=
+  land (Formula.impl (isTC1 (.var 0) (.var 2)) (targetLiftAt (.var 1) (.var 2)))
+       (Formula.impl (land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)))
+         (targetLiftscAt (.var 1) (.var 2)))
+
+/-- `#0` es el código sobre el que se induce; el binder EXTERNO es el nivel `c`, el INTERNO
+    el testigo `w`. -/
+def PHIat : Formula := Formula.forall (Formula.forall PHIatBody)
+
+theorem hPHIat : liftFormula 1 PHIat = PHIat := by
+  simp only [PHIat, PHIatBody, land, liftFormula, liftF_isTC1, liftF_wfAll1, liftF_argsIn,
+    liftF_targetLiftAt, liftF_targetLiftscAt, liftTerm, Nat.reduceAdd, Nat.reduceLT, reduceIte]
+
+/-- Instanciación de las DOS mitades a un nivel `c` y un testigo `w` concretos. -/
+theorem PHIat_use {Γ : List Formula} (t c w : Term) (h : PrfH Γ (substFormula 0 t PHIat)) :
+    PrfH Γ (land (Formula.impl (isTC1 w t) (targetLiftAt c t))
+                 (Formula.impl (land (wfAll1 w) (argsIn w t)) (targetLiftscAt c t))) := by
+  have h1 := PrfH_spec h c
+  have h2 := PrfH_spec h1 w
+  -- ⚠️ Con DOS binders el codigo llega con DOS `liftTerm 0`; el segundo `substTerm` cae en
+  -- el indice 1, y hay que pasar por `liftTerm_swap` para que `substTerm_liftTerm` enganche.
+  have e : substTerm 0 w (substTerm 1 (liftTerm 0 c) (liftTerm 0 (liftTerm 0 t))) = t := by
+    simp only [← liftTerm_swap, FOL.substTerm_liftTerm]
+  simpa only [e, PHIat, PHIatBody, land, substFormula, substF_isTC1, substF_wfAll1, substF_argsIn,
+    substF_targetLiftAt, substF_targetLiftscAt, substTerm, substTerms,
+    FOL.substTerm_liftTerm, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+    reduceIte, if_true] using h2
+
+theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
+  refine Prf.gen _ (prf_deduction ?_)
+  refine PrfH.gen [PSI PHIat] (Formula.forall PHIatBody) ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH.gen _ PHIatBody ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH_and_intro ?half1 ?half2
+  case half1 =>
+    -- `X = #2`, `c = #1`, `w = #0`; hipotesis: `isTC1 w X`
+    refine deduction_aux ?_ (isTC1 (.var 0) (.var 2))
+      [liftFormula 0 (liftFormula 0 (PSI PHIat))] rfl
+    have hh : PrfH [isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+        (isTC1 (.var 0) (.var 2)) := PrfH.hyp _ _ (List.Mem.head _)
+    have hpsi : PrfH [isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+        (liftFormula 0 (liftFormula 0 (PSI PHIat))) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+    have hwf : PrfH [isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+        (wfAll1 (.var 0)) := PrfH_and_elim_left hh
+    have hin : PrfH [isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+        (In (.var 2) (.var 0)) := PrfH_and_elim_right hh
+    have hitc : PrfH [isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+        (isTermCodeE1 (.var 0) (.var 2)) :=
+      PrfH.mp _ _ _ (PrfH.mp _ _ _
+        (prf_to_prfH (prf_isTermCodeE1_of_In (.var 0) (.var 2)) _) hin) hwf
+    refine PrfH_or_elim hitc ?varc ?func
+    case varc =>
+      exact PrfH.mp _ _ _ (prf_to_prfH (refl_shapeUn_imp_at (.var 1) (.var 2)) _)
+        (PrfH.hyp _ _ (List.Mem.head _))
+    case func =>
+      have hb : PrfH [land (shapeBin (.var 2) 1) (argsIn (.var 0) (nthc (.var 2) (numeralM 2))),
+          isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (land (shapeBin (.var 2) 1) (argsIn (.var 0) (nthc (.var 2) (numeralM 2)))) :=
+        PrfH.hyp _ _ (List.Mem.head _)
+      have hwf' : PrfH [land (shapeBin (.var 2) 1) (argsIn (.var 0) (nthc (.var 2) (numeralM 2))),
+          isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (wfAll1 (.var 0)) :=
+        PrfH_and_elim_left (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+      have hpsi' : PrfH [land (shapeBin (.var 2) 1) (argsIn (.var 0) (nthc (.var 2) (numeralM 2))),
+          isTC1 (.var 0) (.var 2), liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (liftFormula 0 (liftFormula 0 (PSI PHIat))) :=
+        PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+      have hshape := PrfH_and_elim_left hb
+      have hargs := PrfH_and_elim_right hb
+      have h1 : Prf (lt (nthc (.var 2) (numeralM 2)) (cons (nthc (.var 2) (numeralM 2)) nil)) :=
+        prf_cantor_mono_left _ _
+      have h2 : Prf (lt (cons (nthc (.var 2) (numeralM 2)) nil)
+          (cons (nthc (.var 2) (numeralM 1)) (cons (nthc (.var 2) (numeralM 2)) nil))) :=
+        prf_cantor_mono_right _ _
+      have h3 : Prf (lt (cons (nthc (.var 2) (numeralM 1)) (cons (nthc (.var 2) (numeralM 2)) nil))
+          (cons (numeralM 1)
+            (cons (nthc (.var 2) (numeralM 1)) (cons (nthc (.var 2) (numeralM 2)) nil)))) :=
+        prf_cantor_mono_right _ _
+      have h12 : Prf (lt (nthc (.var 2) (numeralM 2))
+          (cons (nthc (.var 2) (numeralM 1)) (cons (nthc (.var 2) (numeralM 2)) nil))) :=
+        prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
+      have h123 : Prf (lt (nthc (.var 2) (numeralM 2))
+          (cons (numeralM 1)
+            (cons (nthc (.var 2) (numeralM 1)) (cons (nthc (.var 2) (numeralM 2)) nil)))) :=
+        prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
+      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+        (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
+      have hphi := PrfH.mp _ _ _
+        (PSI_inst2 PHIat hPHIat hpsi' (nthc (.var 2) (numeralM 2))) hltb
+      have huse := PHIat_use (nthc (.var 2) (numeralM 2)) (.var 1) (.var 0) hphi
+      have htls := PrfH.mp _ _ _ (PrfH_and_elim_right huse) (PrfH_and_intro hwf' hargs)
+      exact PrfH.mp _ _ _ (prf_to_prfH (refl_shapeBin_imp_at (.var 1) (.var 2)) _)
+        (PrfH_and_intro hshape htls)
+  case half2 =>
+    refine deduction_aux ?_ (land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)))
+      [liftFormula 0 (liftFormula 0 (PSI PHIat))] rfl
+    have hh : PrfH [land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)),
+        liftFormula 0 (liftFormula 0 (PSI PHIat))]
+        (land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2))) := PrfH.hyp _ _ (List.Mem.head _)
+    refine PrfH_or_elim (prf_to_prfH (prf_nil_or_cons (.var 2)) _) ?nilc ?consc
+    case nilc =>
+      have heq : PrfH [Formula.eq (.var 2) nil,
+          land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)),
+          liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (Formula.eq (.var 2) nil) := PrfH.hyp _ _ (List.Mem.head _)
+      exact PrfH_congr_targetLiftscAt (.var 1) (PrfH_eq_symm heq)
+        (prf_to_prfH (refl_lista_nil_at (.var 1)) _)
+    case consc =>
+      have hcons : PrfH [consOk (.var 2),
+          land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)),
+          liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (Formula.eq (.var 2) (cons (carc (.var 2)) (cdrc (.var 2)))) :=
+        PrfH.hyp _ _ (List.Mem.head _)
+      have hh' : PrfH [consOk (.var 2),
+          land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)),
+          liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2))) :=
+        PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+      have hpsi : PrfH [consOk (.var 2),
+          land (wfAll1 (.var 0)) (argsIn (.var 0) (.var 2)),
+          liftFormula 0 (liftFormula 0 (PSI PHIat))]
+          (liftFormula 0 (liftFormula 0 (PSI PHIat))) :=
+        PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+      have hwf := PrfH_and_elim_left hh'
+      have hargs := PrfH_and_elim_right hh'
+      have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
+        (prf_to_prfH (prf_lenc_cons (carc (.var 2)) (cdrc (.var 2))) _)
+      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+        (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 2)))) _)
+      have hin0 := PrfH.mp _ _ _
+        (PrfH_inst_argsIn (.var 0) (.var 2) zero hargs) hzlt
+      have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
+        (prf_to_prfH (prf_nthc_zero (carc (.var 2)) (cdrc (.var 2))) _)
+      have hinhd := PrfH_congr_In_left hnth0 hin0
+      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+        (prf_to_prfH (prf_cantor_mono_left (carc (.var 2)) (cdrc (.var 2))) _)
+      have huse_hd := PHIat_use (carc (.var 2)) (.var 1) (.var 0)
+        (PrfH.mp _ _ _ (PSI_inst2 PHIat hPHIat hpsi (carc (.var 2))) hlthd)
+      have hTL_hd := PrfH.mp _ _ _ (PrfH_and_elim_left huse_hd) (PrfH_and_intro hwf hinhd)
+      have hargs_cons := PrfH_congr_argsIn hcons hargs
+      have hargs_tl := PrfH.mp _ _ _
+        (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 2)) (cdrc (.var 2))) _) hargs_cons
+      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+        (prf_to_prfH (prf_cantor_mono_right (carc (.var 2)) (cdrc (.var 2))) _)
+      have huse_tl := PHIat_use (cdrc (.var 2)) (.var 1) (.var 0)
+        (PrfH.mp _ _ _ (PSI_inst2 PHIat hPHIat hpsi (cdrc (.var 2))) hlttl)
+      have hTLs_tl := PrfH.mp _ _ _ (PrfH_and_elim_right huse_tl) (PrfH_and_intro hwf hargs_tl)
+      have hres := PrfH.mp _ _ _
+        (prf_to_prfH (refl_lista_cons_imp_at (.var 1) (carc (.var 2)) (cdrc (.var 2))) _)
+        (PrfH_and_intro hTL_hd hTLs_tl)
+      exact PrfH_congr_targetLiftscAt (.var 1) (PrfH_eq_symm hcons) hres
+
+theorem PHIat_all (t : Term) : Prf (substFormula 0 t PHIat) :=
+  prf_strong_induction PHIat hPHIat PHIat_step t
+
+/-- **EL DESCENSO A NIVEL ABIERTO, en forma de IMPLICACION OBJETO.** -/
+theorem DESCENSO_at_imp (c w s : Term) :
+    Prf (Formula.impl (isTC1 w s) (targetLiftAt c s)) :=
+  prfH_nil_to_prf (PrfH_and_elim_left (PHIat_use s c w (prf_to_prfH (PHIat_all s) []))) rfl
+
+/-- Su gemela sobre LISTAS de argumentos. -/
+theorem DESCENSO_at_lista_imp (c w s : Term) :
+    Prf (Formula.impl (land (wfAll1 w) (argsIn w s)) (targetLiftscAt c s)) :=
+  prfH_nil_to_prf (PrfH_and_elim_right (PHIat_use s c w (prf_to_prfH (PHIat_all s) []))) rfl
+
+/-- ⭐⭐⭐ **`pcc_eval_liftc` A NIVEL ARBITRARIO** — A5 CERRADA en el sorte término.
+    Es el prerrequisito que `Meta/EvalLiftfcPrf.lean` midió: los casos `atom`/`eq` de la
+    inducción sobre códigos de FORMULA bajan a `liftsc`/`liftc` **al nivel corriente**, no a
+    nivel `zero`. -/
+theorem pcc_eval_liftc_at (c w s : Term) (h : Prf (isTC1 w s)) :
+    Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn s)) (tcFn (liftc c s)))) :=
+  prf_mp (DESCENSO_at_imp c w s) h
+
+/-- La compañera sobre LISTAS. -/
+theorem pcc_eval_liftsc_at (c w s : Term) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w s)) :
+    Prf (provFromCode (eqc (liftscT (tcFn c) (tcFn s)) (tcFn (liftsc c s)))) :=
+  prf_mp (DESCENSO_at_lista_imp c w s) (prf_and_intro hwf hargs)
+
+/-- Y la forma que de verdad llega río abajo: el testigo viene de un `∃` (`hasWit`). -/
+theorem DESCENSO_at_hasWit (c s : Term) :
+    Prf (Formula.impl (hasWit s) (targetLiftAt c s)) := by
+  refine prf_ex_elim_imp ?_
+  rw [liftF_targetLiftAt]
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (DESCENSO_at_imp (liftTerm 0 c) (.var 0) (liftTerm 0 s)) _) (prfH_hyp_self _)
+
 /-! ############################################################################
     ## §9 · CONTROLES ADVERSARIALES SOBRE EL DESCENSO
 
@@ -661,6 +868,15 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
   --    `Meta/CodeWitnessPrf.lean` (`SinWTs`), junto a `PrfH_inst_wfAll1`, que es de quien
   --    salen. Exportar un nombre que el modulo ya no declara es ERROR DURO de elaboracion.
   pcc_eval_liftc
+  -- A5 (§7bis): el descenso con el NIVEL cuantificado. ⚠️ Consumidor previsto:
+  -- `Meta/EvalLiftfcPrf.lean` — sus casos `atom`/`eq` bajan a `liftsc`/`liftc` AL NIVEL
+  -- CORRIENTE, y por eso `pcc_eval_liftc` (clavado a `zero`) no le vale. **Nada lo consume
+  -- todavia**, y se dice en vez de fingir una medicion de consumo (§17).
+  -- `PHIat`, `PHIat_step`, `PHIat_all`, `PHIat_use`, `hPHIat`, `PHIatBody` se quedan
+  -- CUALIFICADOS por la misma razon que sus gemelos sin `at`: colisionarian con los otros
+  -- dos descensos.
+  pcc_eval_liftc_at pcc_eval_liftsc_at
+  DESCENSO_at_imp DESCENSO_at_lista_imp DESCENSO_at_hasWit
 )
 
 /-! ## CONTROL DE FOOTPRINT
@@ -686,6 +902,13 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftc
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_step
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_all
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHIat_step
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHIat_all
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_at_imp
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_at_lista_imp
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_at_hasWit
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftc_at
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftsc_at
 #print axioms ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons
 #print axioms ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLift_real

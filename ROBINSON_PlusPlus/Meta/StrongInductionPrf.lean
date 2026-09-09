@@ -237,6 +237,21 @@ theorem psi_lift_form3 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
   simp only [lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
     reduceIte, hΦ]
 
+/-- El escalon que FALTABA: la extraccion al SEGUNDO nivel de lift. La escalera tenia el 1
+    (`PSI_inst`), el 3 y el 4, pero no el 2 — porque hasta A5 ningun frente induca con
+    exactamente DOS binders por encima de `Φ`. `pcc_eval_liftc` a nivel abierto sí: cuantifica
+    el NIVEL y el testigo (A5, §3.49). Su `psi_lift_form2` ya estaba. -/
+theorem PSI_inst2 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula}
+    (hpsi : PrfH Γ (liftFormula 0 (liftFormula 0 (PSI Φ)))) (z : Term) :
+    PrfH Γ (Formula.impl (lt z (.var 2)) (substFormula 0 z Φ)) := by
+  rw [psi_lift_form2 Φ hΦ] at hpsi
+  have h := PrfH_spec hpsi z
+  have e : substFormula 0 z (Formula.impl (lt (.var 0) (.var 3)) Φ)
+      = Formula.impl (lt z (.var 2)) (substFormula 0 z Φ) := by
+    simp only [substFormula, lt, substTerm, substTerms, Nat.reduceEqDiff, Nat.reduceGT,
+      Nat.reduceSub, reduceIte, if_true]
+  rwa [e] at h
+
 /-- La extraccion al TERCER nivel de lift — la que consume una induccion con TRES binders
     por encima de `Φ` (el caso `substtc`, que lleva testigo, `v` y `s`). -/
 theorem PSI_inst3 (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula}
@@ -333,6 +348,6 @@ export ROBINSON_PlusPlus.Meta.StrongInductionPrf (
   liftTerm_swap liftTerms_swap liftFormula_swap psi_step_motive
   subst1_id subst0_var0_id psi_lift_eq_subst prf_strong_induction
   psi_lift_form PSI_inst
-  psi_lift_form2 psi_lift_form3 PSI_inst3
+  psi_lift_form2 PSI_inst2 psi_lift_form3 PSI_inst3
   psi_lift_form4 PSI_inst4
 )

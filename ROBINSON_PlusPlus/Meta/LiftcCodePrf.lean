@@ -921,6 +921,241 @@ theorem refl_lista_cons (h t : Term) (hh : Prf (targetLift h)) (ht : Prf (target
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
 
+/-! ## §7bis · A5 · LAS CUATRO CLAUSULAS A **NIVEL ARBITRARIO**
+
+⭐ Espejo casi literal de §7, con `termCode zero` ↦ `tcFn c` y `prf_substtc_termCode_nil` ↦
+`substtc_inv_tcFn c`. Sale tan barato porque **en el sorte TÉRMINO el nivel es un parámetro
+INERTE**: `liftc c (funcc s ts) = funcc s (liftsc c ts)` y `liftsc c (cons h t) =
+cons (liftc c h) (liftsc c t)` no lo tocan, y sus reflexiones internas
+(`pcc_liftc_func_code`, `pcc_liftsc_nil_code`, `pcc_liftsc_cons_code`) ya eran genéricas en
+`c` desde §4 — las `pcc_liftc0_*` de §5 son sus instancias `c := zero`.
+
+⚠️ **Lo único que cambia de verdad es el `varc`.** A nivel `zero` la guarda `0 < σa` se
+descargaba de una vez (`pcc_zero_lt_succ_code`) y quedaba UNA sola ecuación; al abrir el nivel
+la guarda **no se puede descargar**, y hay que abrir la **tricotomía**: dos ramas, cada una con
+su ecuación meta distinta (`liftc c (varc a) ≐ varc a` frente a `≐ varc (σa)`) y con su guarda
+reflejada dentro de `Prov` por `pcc_lt_tracked`.
+
+⚠️ Y por eso las dos ramas se escriben en **`PrfH`**, no en `Prf`: la disyunción se elimina con
+`prf_or_elim`, así que la guarda entra en el CONTEXTO y toda la cadena interna la tiene que
+llevar el kit `PrfH_*` (`PrfH_eq_trans_code`, `PrfH_mp_code_apply`, `PrfH_provCode_congr`),
+que ya está en producción. -/
+
+/-- El HUECO a nivel abierto — el `v := 0`, `s := #0` de `substF_targetLiftAt`.
+    ⚠️ El nivel viaja `liftTerm`‑eado: es un parámetro del hueco, no el agujero. -/
+theorem substF_targetLiftAt_hole (c t : Term) :
+    substFormula 0 t (targetLiftAt (liftTerm 0 c) (.var 0)) = targetLiftAt c t := by
+  simp only [substF_targetLiftAt, FOL.substTerm_liftTerm, substTerm, if_true]
+
+/-- El HUECO de la LISTA, misma forma. -/
+theorem substF_targetLiftscAt_hole (c t : Term) :
+    substFormula 0 t (targetLiftscAt (liftTerm 0 c) (.var 0)) = targetLiftscAt c t := by
+  simp only [substF_targetLiftscAt, FOL.substTerm_liftTerm, substTerm, if_true]
+
+/-- Transporte de Leibniz del objetivo a nivel abierto (espeja `PrfH_congr_targetLift`). -/
+theorem PrfH_congr_targetLiftAt {Γ : List Formula} (c : Term) {s s' : Term}
+    (h : PrfH Γ (s =eq s')) (ha : PrfH Γ (targetLiftAt c s)) : PrfH Γ (targetLiftAt c s') :=
+  (substF_targetLiftAt_hole c s') ▸
+    PrfH_leibniz_subst (A := targetLiftAt (liftTerm 0 c) (.var 0)) h
+      ((substF_targetLiftAt_hole c s) ▸ ha)
+
+/-! ### Las dos guardas de la tricotomía, reflejadas DENTRO de `Prov`
+
+`pcc_lt_tracked` (completitud‑Δ₀ provable del átomo `<`, con argumentos ABIERTOS) es lo que
+convierte la hipótesis META en la premisa que el axioma dotado pide. -/
+
+theorem PrfH_guard_lt_code {Γ : List Formula} (a c : Term) (h : PrfH Γ (lt a c)) :
+    PrfH Γ (provFromCode (ltCodeFn (tcFn a) (tcFn c))) :=
+  PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked a c) Γ) h
+
+theorem PrfH_guard_ge_code {Γ : List Formula} (c a : Term) (h : PrfH Γ (lt c (succ a))) :
+    PrfH Γ (provFromCode (ltCodeFn (tcFn c) (succcT (tcFn a)))) :=
+  PrfH_provCode_congr
+    (prf_to_prfH (prf_congr_atom2CodeFn (prf_refl _) (prf_tc_succ' a)) Γ)
+    (PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked c (succ a)) Γ) h)
+
+/-- **(1‑at) BASE `varc` A NIVEL ABIERTO** — la única clausula con contenido nuevo. -/
+theorem refl_caso_varc_at (c s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLiftAt c s) := by
+  have hs1 : Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn (varc a)))
+      (liftcT (tcFn c) (varcT (tcFn a))))) :=
+    prf_mp (pcc_congr_liftcT_arg2_code (tcFn c) (tcFn (varc a)) (varcT (tcFn a))
+      (substtc_inv_tcFn c) (substtc_inv_tcFn (varc a))) (pcc_dot_un_symm 0 a)
+  have hinvX : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (tcFn (varc a)))
+      =eq liftcT (tcFn c) (tcFn (varc a))) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn (varc a))
+  have hinvY : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (varcT (tcFn a)))
+      =eq liftcT (tcFn c) (varcT (tcFn a))) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_unT (substtc_inv_tcFn a))
+  refine ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_or_elim (prf_liftc_varc_cases c a) ?_ ?_
+  · -- ▸ RAMA `a < c`: `liftc c (varc a) ≐ varc a`, el nivel NO sube
+    refine prf_deduction ?_
+    have hplain : PrfH [lt a c] (liftc c (varc a) =eq varc a) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_liftc_var_lt c a) _) (prfH_hyp_self _)
+    have s2 : PrfH [lt a c] (provFromCode (eqc (liftcT (tcFn c) (varcT (tcFn a)))
+        (varcT (tcFn a)))) :=
+      PrfH_mp_code_apply (prf_to_prfH (pcc_liftc_var_lt_code c a) _)
+        (PrfH_guard_lt_code a c (prfH_hyp_self _))
+    have s3 : PrfH [lt a c] (provFromCode (eqc (varcT (tcFn a)) (tcFn (varc a)))) :=
+      prf_to_prfH (pcc_dot_un 0 a) _
+    have hchain : PrfH [lt a c] (provFromCode (eqc (liftcT (tcFn c) (tcFn (varc a)))
+        (tcFn (varc a)))) :=
+      PrfH_eq_trans_code _ _ _ hinvX (prf_to_prfH hs1 _)
+        (PrfH_eq_trans_code _ _ _ hinvY s2 s3 (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto)
+    refine PrfH_congr_targetLiftAt c (prf_to_prfH (prf_eq_symm hs) _) ?_
+    exact PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _)
+        (PrfH_congr_tcFn (PrfH_eq_symm hplain))) hchain
+  · -- ▸ RAMA `c < σa`: `liftc c (varc a) ≐ varc (σa)`, el nivel SÍ sube
+    refine prf_deduction ?_
+    have hplain : PrfH [lt c (succ a)] (liftc c (varc a) =eq varc (succ a)) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_liftc_var_ge c a) _) (prfH_hyp_self _)
+    have s2 : PrfH [lt c (succ a)] (provFromCode (eqc (liftcT (tcFn c) (varcT (tcFn a)))
+        (varcT (succcT (tcFn a))))) :=
+      PrfH_mp_code_apply (prf_to_prfH (pcc_liftc_var_ge_code c a) _)
+        (PrfH_guard_ge_code c a (prfH_hyp_self _))
+    have s3 : PrfH [lt c (succ a)] (provFromCode (eqc (varcT (succcT (tcFn a)))
+        (tcFn (varc (succ a))))) :=
+      prf_to_prfH (prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+        (prf_congr_varcT (prf_tc_succ' a)) (prf_refl _))) (pcc_dot_un 0 (succ a))) _
+    have hchain : PrfH [lt c (succ a)] (provFromCode (eqc (liftcT (tcFn c) (tcFn (varc a)))
+        (tcFn (varc (succ a))))) :=
+      PrfH_eq_trans_code _ _ _ hinvX (prf_to_prfH hs1 _)
+        (PrfH_eq_trans_code _ _ _ hinvY s2 s3 (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto)
+    refine PrfH_congr_targetLiftAt c (prf_to_prfH (prf_eq_symm hs) _) ?_
+    exact PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _)
+        (PrfH_congr_tcFn (PrfH_eq_symm hplain))) hchain
+
+/-- **(2‑at) PASO `funcc`** — espejo puro: el nivel viaja intacto al `liftsc`. -/
+theorem refl_caso_funcc_at (c s p b : Term) (hs : Prf (s =eq funcc p b))
+    (hb : Prf (targetLiftscAt c b)) : Prf (targetLiftAt c s) := by
+  unfold targetLiftAt
+  unfold targetLiftscAt at hb
+  have hplain : Prf (liftc c s =eq funcc p (liftsc c b)) :=
+    prf_eq_trans (prf_congr_liftc hs) (prf_liftc_func c p b)
+  have hX : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (tcFn (funcc p b)))
+      =eq liftcT (tcFn c) (tcFn (funcc p b))) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn (funcc p b))
+  have hY : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (funccT (tcFn p) (tcFn b)))
+      =eq liftcT (tcFn c) (funccT (tcFn p) (tcFn b))) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c)
+      (substtc_inv_binT (substtc_inv_tcFn p) (substtc_inv_tcFn b))
+  have hZ : ∀ W, Prf (substtc zero W (funccT (tcFn p) (liftscT (tcFn c) (tcFn b)))
+      =eq funccT (tcFn p) (liftscT (tcFn c) (tcFn b))) :=
+    substtc_inv_binT (substtc_inv_tcFn p)
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn b))
+  have s1 : Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn (funcc p b)))
+      (liftcT (tcFn c) (funccT (tcFn p) (tcFn b))))) :=
+    prf_mp (pcc_congr_liftcT_arg2_code (tcFn c) (tcFn (funcc p b))
+      (funccT (tcFn p) (tcFn b)) (substtc_inv_tcFn c) (substtc_inv_tcFn (funcc p b)))
+      (pcc_dot_bin_symm 1 p b)
+  have s2 : Prf (provFromCode (eqc (liftcT (tcFn c) (funccT (tcFn p) (tcFn b)))
+      (funccT (tcFn p) (liftscT (tcFn c) (tcFn b))))) := pcc_liftc_func_code c p b
+  have s3 : Prf (provFromCode (eqc (funccT (tcFn p) (liftscT (tcFn c) (tcFn b)))
+      (funccT (tcFn p) (tcFn (liftsc c b))))) :=
+    prf_mp (pcc_congr_binT_2_code 1 (tcFn p) (liftscT (tcFn c) (tcFn b))
+      (tcFn (liftsc c b)) (substtc_inv_tcFn p)
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn b))) hb
+  have s4 : Prf (provFromCode (eqc (funccT (tcFn p) (tcFn (liftsc c b)))
+      (tcFn (funcc p (liftsc c b))))) := pcc_dot_bin 1 p (liftsc c b)
+  have hchain : Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn (funcc p b)))
+      (tcFn (funcc p (liftsc c b))))) :=
+    pcc_eq_trans_code _ _ _ hX (by hw_auto) (by hw_auto) (by hw_auto) s1
+      (pcc_eq_trans_code _ _ _ hY (by hw_auto) (by hw_auto) (by hw_auto) s2
+        (pcc_eq_trans_code _ _ _ hZ (by hw_auto) (by hw_auto) (by hw_auto) s3 s4))
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+    (prf_congr_liftcT (prf_refl _) (prf_congr_tcFn (prf_eq_symm hs)))
+    (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
+
+/-- El puente `termCode nil` ↦ `tcFn nil` de `pcc_liftsc_nil_code`, a nivel abierto. -/
+theorem pcc_liftsc_nil_code_at (c : Term) :
+    Prf (provFromCode (eqCodeFn (liftscT (tcFn c) (tcFn nil)) (tcFn nil))) :=
+  prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
+      (prf_congr_liftscT (prf_refl _) (prf_eq_symm prf_tc_zero)) (prf_eq_symm prf_tc_zero)))
+    (pcc_liftsc_nil_code c)
+
+/-- **(3‑at) BASE de la LISTA (`nil`)** — sin hipótesis, a cualquier nivel. -/
+theorem refl_lista_nil_at (c : Term) : Prf (targetLiftscAt c nil) := by
+  unfold targetLiftscAt
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+    (prf_congr_tcFn (prf_eq_symm (prf_liftsc_nil c))))) (pcc_liftsc_nil_code_at c)
+
+/-- **(4‑at) PASO de la LISTA (`cons`)** — espejo puro. -/
+theorem refl_lista_cons_at (c h t : Term) (hh : Prf (targetLiftAt c h))
+    (ht : Prf (targetLiftscAt c t)) : Prf (targetLiftscAt c (cons h t)) := by
+  unfold targetLiftAt at hh
+  unfold targetLiftscAt at ht ⊢
+  have hplain : Prf (liftsc c (cons h t) =eq cons (liftc c h) (liftsc c t)) :=
+    prf_liftsc_cons c h t
+  have hX : ∀ W, Prf (substtc zero W (liftscT (tcFn c) (tcFn (cons h t)))
+      =eq liftscT (tcFn c) (tcFn (cons h t))) :=
+    substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn (cons h t))
+  have hY : ∀ W, Prf (substtc zero W (liftscT (tcFn c) (consT (tcFn h) (tcFn t)))
+      =eq liftscT (tcFn c) (consT (tcFn h) (tcFn t))) :=
+    substtc_inv_liftscT (substtc_inv_tcFn c)
+      (substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t))
+  have hZ : ∀ W, Prf (substtc zero W
+      (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t)))
+      =eq consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t))) :=
+    substtc_inv_consT (substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))
+  have hU : ∀ W, Prf (substtc zero W
+      (consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t)))
+      =eq consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t))) :=
+    substtc_inv_consT (substtc_inv_tcFn (liftc c h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))
+  have s1 : Prf (provFromCode (eqc (liftscT (tcFn c) (tcFn (cons h t)))
+      (liftscT (tcFn c) (consT (tcFn h) (tcFn t))))) :=
+    prf_mp (pcc_congr_liftscT_arg2_code (tcFn c) (tcFn (cons h t))
+      (consT (tcFn h) (tcFn t)) (substtc_inv_tcFn c) (substtc_inv_tcFn (cons h t)))
+      (pcc_dot_cons_symm h t)
+  have s2 : Prf (provFromCode (eqc (liftscT (tcFn c) (consT (tcFn h) (tcFn t)))
+      (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t))))) :=
+    pcc_liftsc_cons_code c h t
+  have s3 : Prf (provFromCode (eqc
+      (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t)))
+      (consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t))))) :=
+    prf_mp (pcc_congr_consT_arg1_code (liftscT (tcFn c) (tcFn t))
+      (liftcT (tcFn c) (tcFn h)) (tcFn (liftc c h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))
+      (substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn h))) hh
+  have s4 : Prf (provFromCode (eqc
+      (consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t)))
+      (consT (tcFn (liftc c h)) (tcFn (liftsc c t))))) :=
+    prf_mp (pcc_congr_consT_arg2_code (tcFn (liftc c h))
+      (liftscT (tcFn c) (tcFn t)) (tcFn (liftsc c t))
+      (substtc_inv_tcFn (liftc c h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))) ht
+  have s5 : Prf (provFromCode (eqc
+      (consT (tcFn (liftc c h)) (tcFn (liftsc c t)))
+      (tcFn (cons (liftc c h) (liftsc c t))))) :=
+    pcc_dot_cons (liftc c h) (liftsc c t)
+  have hchain : Prf (provFromCode (eqc (liftscT (tcFn c) (tcFn (cons h t)))
+      (tcFn (cons (liftc c h) (liftsc c t))))) :=
+    pcc_eq_trans_code _ _ _ hX (by hw_auto) (by hw_auto) (by hw_auto) s1
+      (pcc_eq_trans_code _ _ _ hY (by hw_auto) (by hw_auto) (by hw_auto) s2
+        (pcc_eq_trans_code _ _ _ hZ (by hw_auto) (by hw_auto) (by hw_auto) s3
+          (pcc_eq_trans_code _ _ _ hU (by hw_auto) (by hw_auto) (by hw_auto) s4 s5)))
+  exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+    (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
+
+/-! ### NO VACUIDAD a nivel abierto: las cuatro clausulas `_at` cubren todo código GENUINO -/
+
+mutual
+theorem refl_termCode_at (c : Term) : ∀ t : Term, Prf (targetLiftAt c (termCode t))
+  | .var n     => refl_caso_varc_at c (termCode (.var n)) (numeral n) (prf_refl _)
+  | .func f ts =>
+      refl_caso_funcc_at c (termCode (.func f ts)) (strCode f) (termsCode ts)
+        (prf_refl _) (refl_termsCode_at c ts)
+theorem refl_termsCode_at (c : Term) : ∀ ts : List Term, Prf (targetLiftscAt c (termsCode ts))
+  | []      => refl_lista_nil_at c
+  | t :: ts =>
+      refl_lista_cons_at c (termCode t) (termsCode ts)
+        (refl_termCode_at c t) (refl_termsCode_at c ts)
+end
+
 /-! ## §8 · NO VACUIDAD / COMPLETITUD DEL ESQUEMA — las cuatro clausulas CIERRAN el objetivo
        para todo codigo de termino GENUINO (`termCode t`), por recursion META.
 
@@ -1143,6 +1378,158 @@ theorem refl_lista_cons_imp (h t : Term) :
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftsc_cons zero h t))))) _) hchain
 
+/-! ## §9bis · A5 · LAS CUATRO CLAUSULAS EN LA **MONEDA DE LA INDUCCION OBJETO**
+
+Espejo de §9 con el nivel abierto. ⚠️ Hay que reescribir las cadenas (no basta invocar §7bis):
+la HI llega como hipótesis **OBJETO**, y sin `PrfH_mono` (deuda B6b) una premisa `Prf` no vale.
+Por eso `refl_caso_funcc_imp_at` y `refl_lista_cons_imp_at` repiten la cadena en `PrfH`, igual
+que hacen sus originales a nivel `zero`.
+
+⭐ En cambio `refl_shapeUn_imp_at` y `refl_shapeBin_imp_at` sí son de una línea: la guarda
+`shapeUn X 0` / `shapeBin X 1` es una ECUACION, y el transporte es Leibniz. -/
+
+/-- La compañera sobre LISTAS del transporte de §7bis. -/
+theorem PrfH_congr_targetLiftscAt {Γ : List Formula} (c : Term) {s s' : Term}
+    (h : PrfH Γ (s =eq s')) (ha : PrfH Γ (targetLiftscAt c s)) : PrfH Γ (targetLiftscAt c s') :=
+  (substF_targetLiftscAt_hole c s') ▸
+    PrfH_leibniz_subst (A := targetLiftscAt (liftTerm 0 c) (.var 0)) h
+      ((substF_targetLiftscAt_hole c s) ▸ ha)
+
+/-- **EL DISYUNTO `varc` A NIVEL ABIERTO**: `⊢ shapeUn X 0 ⇒ targetLiftAt c X`. -/
+theorem refl_shapeUn_imp_at (c X : Term) :
+    Prf (Formula.impl (shapeUn X 0) (targetLiftAt c X)) := by
+  refine prf_deduction ?_
+  let a : Term := nthc X (numeralM 1)
+  have hh : PrfH [shapeUn X 0] (Formula.eq X (varc a)) := prfH_hyp_self _
+  exact PrfH_congr_targetLiftAt c (PrfH_eq_symm hh)
+    (prf_to_prfH (refl_caso_varc_at c (varc a) a (prf_refl _)) _)
+
+/-- **(2'‑at) PASO `funcc`, en forma IMPLICACION**, con el nivel abierto. -/
+theorem refl_caso_funcc_imp_at (c p b : Term) :
+    Prf (Formula.impl (targetLiftscAt c b) (targetLiftAt c (funcc p b))) := by
+  refine prf_deduction ?_
+  have hb : PrfH [targetLiftscAt c b] (targetLiftscAt c b) := prfH_hyp_self _
+  have hX : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (tcFn (funcc p b)))
+      =eq liftcT (tcFn c) (tcFn (funcc p b))) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn (funcc p b))
+  have hY : ∀ W, Prf (substtc zero W (liftcT (tcFn c) (funccT (tcFn p) (tcFn b)))
+      =eq liftcT (tcFn c) (funccT (tcFn p) (tcFn b))) :=
+    substtc_inv_liftcT (substtc_inv_tcFn c)
+      (substtc_inv_binT (substtc_inv_tcFn p) (substtc_inv_tcFn b))
+  have hZ : ∀ W, Prf (substtc zero W (funccT (tcFn p) (liftscT (tcFn c) (tcFn b)))
+      =eq funccT (tcFn p) (liftscT (tcFn c) (tcFn b))) :=
+    substtc_inv_binT (substtc_inv_tcFn p)
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn b))
+  have s1 : PrfH [targetLiftscAt c b] (provFromCode (eqc
+      (liftcT (tcFn c) (tcFn (funcc p b)))
+      (liftcT (tcFn c) (funccT (tcFn p) (tcFn b))))) :=
+    prf_to_prfH (prf_mp (pcc_congr_liftcT_arg2_code (tcFn c) (tcFn (funcc p b))
+      (funccT (tcFn p) (tcFn b)) (substtc_inv_tcFn c) (substtc_inv_tcFn (funcc p b)))
+      (pcc_dot_bin_symm 1 p b)) _
+  have s2 : PrfH [targetLiftscAt c b] (provFromCode (eqc
+      (liftcT (tcFn c) (funccT (tcFn p) (tcFn b)))
+      (funccT (tcFn p) (liftscT (tcFn c) (tcFn b))))) :=
+    prf_to_prfH (pcc_liftc_func_code c p b) _
+  have s3 : PrfH [targetLiftscAt c b] (provFromCode (eqc
+      (funccT (tcFn p) (liftscT (tcFn c) (tcFn b)))
+      (funccT (tcFn p) (tcFn (liftsc c b))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_binT_2_code 1 (tcFn p)
+      (liftscT (tcFn c) (tcFn b)) (tcFn (liftsc c b)) (substtc_inv_tcFn p)
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn b))) _) hb
+  have s4 : PrfH [targetLiftscAt c b] (provFromCode (eqc
+      (funccT (tcFn p) (tcFn (liftsc c b))) (tcFn (funcc p (liftsc c b))))) :=
+    prf_to_prfH (pcc_dot_bin 1 p (liftsc c b)) _
+  have hchain : PrfH [targetLiftscAt c b] (provFromCode (eqc
+      (liftcT (tcFn c) (tcFn (funcc p b))) (tcFn (funcc p (liftsc c b))))) :=
+    PrfH_eq_trans_code _ _ _ hX s1
+      (PrfH_eq_trans_code _ _ _ hY s2
+        (PrfH_eq_trans_code _ _ _ hZ s3 s4
+          (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto))
+      (by hw_auto) (by hw_auto) (by hw_auto)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+    (prf_congr_tcFn (prf_eq_symm (prf_liftc_func c p b))))) _) hchain
+
+/-- **EL DISYUNTO `funcc` A NIVEL ABIERTO**, en la moneda de la inducción objeto. -/
+theorem refl_shapeBin_imp_at (c X : Term) :
+    Prf (Formula.impl (land (shapeBin X 1) (targetLiftscAt c (nthc X (numeralM 2))))
+      (targetLiftAt c X)) := by
+  refine prf_deduction ?_
+  let p : Term := nthc X (numeralM 1)
+  let b : Term := nthc X (numeralM 2)
+  let H : Formula := land (shapeBin X 1) (targetLiftscAt c b)
+  have hh : PrfH [H] H := prfH_hyp_self _
+  have hs : PrfH [H] (Formula.eq X (funcc p b)) := PrfH_and_elim_left hh
+  have hb : PrfH [H] (targetLiftscAt c b) := PrfH_and_elim_right hh
+  have hfb : PrfH [H] (targetLiftAt c (funcc p b)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (refl_caso_funcc_imp_at c p b) _) hb
+  exact PrfH_congr_targetLiftAt c (PrfH_eq_symm hs) hfb
+
+/-- **(4'‑at) PASO de la LISTA, en forma IMPLICACION**, con el nivel abierto. -/
+theorem refl_lista_cons_imp_at (c h t : Term) :
+    Prf (Formula.impl (land (targetLiftAt c h) (targetLiftscAt c t))
+      (targetLiftscAt c (cons h t))) := by
+  refine prf_deduction ?_
+  let H : Formula := land (targetLiftAt c h) (targetLiftscAt c t)
+  have hh0 : PrfH [H] H := prfH_hyp_self _
+  have hh : PrfH [H] (targetLiftAt c h) := PrfH_and_elim_left hh0
+  have ht : PrfH [H] (targetLiftscAt c t) := PrfH_and_elim_right hh0
+  have hX : ∀ W, Prf (substtc zero W (liftscT (tcFn c) (tcFn (cons h t)))
+      =eq liftscT (tcFn c) (tcFn (cons h t))) :=
+    substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn (cons h t))
+  have hY : ∀ W, Prf (substtc zero W (liftscT (tcFn c) (consT (tcFn h) (tcFn t)))
+      =eq liftscT (tcFn c) (consT (tcFn h) (tcFn t))) :=
+    substtc_inv_liftscT (substtc_inv_tcFn c)
+      (substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t))
+  have hZ : ∀ W, Prf (substtc zero W
+      (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t)))
+      =eq consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t))) :=
+    substtc_inv_consT (substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))
+  have hU : ∀ W, Prf (substtc zero W
+      (consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t)))
+      =eq consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t))) :=
+    substtc_inv_consT (substtc_inv_tcFn (liftc c h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))
+  have s1 : PrfH [H] (provFromCode (eqc (liftscT (tcFn c) (tcFn (cons h t)))
+      (liftscT (tcFn c) (consT (tcFn h) (tcFn t))))) :=
+    prf_to_prfH (prf_mp (pcc_congr_liftscT_arg2_code (tcFn c) (tcFn (cons h t))
+      (consT (tcFn h) (tcFn t)) (substtc_inv_tcFn c) (substtc_inv_tcFn (cons h t)))
+      (pcc_dot_cons_symm h t)) _
+  have s2 : PrfH [H] (provFromCode (eqc (liftscT (tcFn c) (consT (tcFn h) (tcFn t)))
+      (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t))))) :=
+    prf_to_prfH (pcc_liftsc_cons_code c h t) _
+  have s3 : PrfH [H] (provFromCode (eqc
+      (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t)))
+      (consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_consT_arg1_code (liftscT (tcFn c) (tcFn t))
+      (liftcT (tcFn c) (tcFn h)) (tcFn (liftc c h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))
+      (substtc_inv_liftcT (substtc_inv_tcFn c) (substtc_inv_tcFn h))) _) hh
+  have s4 : PrfH [H] (provFromCode (eqc
+      (consT (tcFn (liftc c h)) (liftscT (tcFn c) (tcFn t)))
+      (consT (tcFn (liftc c h)) (tcFn (liftsc c t))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_consT_arg2_code (tcFn (liftc c h))
+      (liftscT (tcFn c) (tcFn t)) (tcFn (liftsc c t))
+      (substtc_inv_tcFn (liftc c h))
+      (substtc_inv_liftscT (substtc_inv_tcFn c) (substtc_inv_tcFn t))) _) ht
+  have s5 : PrfH [H] (provFromCode (eqc
+      (consT (tcFn (liftc c h)) (tcFn (liftsc c t)))
+      (tcFn (cons (liftc c h) (liftsc c t))))) :=
+    prf_to_prfH (pcc_dot_cons (liftc c h) (liftsc c t)) _
+  have hchain : PrfH [H] (provFromCode (eqc (liftscT (tcFn c) (tcFn (cons h t)))
+      (tcFn (cons (liftc c h) (liftsc c t))))) :=
+    PrfH_eq_trans_code _ _ _ hX s1
+      (PrfH_eq_trans_code _ _ _ hY s2
+        (PrfH_eq_trans_code _ _ _ hZ s3
+          (PrfH_eq_trans_code _ _ _ hU s4 s5
+            (by hw_auto) (by hw_auto) (by hw_auto))
+          (by hw_auto) (by hw_auto) (by hw_auto))
+        (by hw_auto) (by hw_auto) (by hw_auto))
+      (by hw_auto) (by hw_auto) (by hw_auto)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
+    (prf_congr_tcFn (prf_eq_symm (prf_liftsc_cons c h t))))) _) hchain
+
 /-! ## §10 · EL PREDICADO SIN‑`wTs` ENTERO, CONTRA EL OBJETIVO — la MEDIDA
 
     `isTermCodeE1`/`argsIn` son los de PRODUCCION: declarados en `Minimal/Axioms.lean`
@@ -1236,6 +1623,13 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
   substF_targetLift substF_targetLiftsc substF_targetLift_hole PrfH_congr_targetLift
   refl_shapeUn_imp refl_caso_funcc_imp refl_shapeBin_imp refl_lista_cons_imp
   refl_isTermCodeE1_imp
+  -- A5 (§7bis/§9bis) — las CINCO que consume `Meta/EvalLiftcPrf.lean` en su descenso a nivel
+  -- abierto (`PHIat_step`). El resto de la familia `_at` (`refl_caso_varc_at`,
+  -- `refl_caso_funcc_at`, `refl_lista_cons_at`, `refl_caso_funcc_imp_at`, `refl_termCode_at`,
+  -- `refl_termsCode_at`, `PrfH_congr_targetLiftAt`, los dos `_hole`, las dos guardas y
+  -- `pcc_liftsc_nil_code_at`) se consume SOLO dentro de este modulo: no se exporta.
+  refl_shapeUn_imp_at refl_shapeBin_imp_at refl_lista_nil_at refl_lista_cons_imp_at
+  PrfH_congr_targetLiftscAt
 )
 
 /-! ## CONTROL DE FOOTPRINT — todo debe salir NET-0 (solo los `axiom` de Lean sancionados). -/
@@ -1263,6 +1657,16 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_substfc_atom2CodeFn
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.substF_targetLift_hole
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.PrfH_congr_targetLift
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_liftc_varc_cases
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc_var_lt_code
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_varc_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_nil_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_termCode_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeUn_imp_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeBin_imp_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_imp_at
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.substTerm_termCode
 
 -- CONTROL: la base sancionada es EXACTAMENTE la que ya carga produccion.
