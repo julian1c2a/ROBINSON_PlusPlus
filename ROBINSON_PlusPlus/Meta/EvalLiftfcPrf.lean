@@ -1247,7 +1247,58 @@ theorem pcc_eval_liftfc_wit (v X : Term) :
   pcc_eval_liftfc v X
 
 
+/-! ## §12 · LA OTRA DEUDA DE `liftfc`: la CLAUSURA DEL TESTIGO (2026‑09‑10)
+
+`pcc_eval_liftfc` (§11) cierra la **evaluación**. Lo que sigue faltando es la **clausura del
+TESTIGO** bajo `liftfc`, y es lo único que separa a C3 de sus dos últimos reflectores —`ind` (18)
+y `listInd` (20)— y, con ellos, a `hbody`(a) de D3.
+
+⛔ **Por qué hace falta, medido** (`Meta/SubstTreeReflect.lean` §10, §3.54.1): en `ind` y
+`listInd` los `liftfc` van **anidados y bajo un `substfc`**:
+
+    ind     : substfc 0 ⌜σ#0⌝        (liftfc 1 A)
+    listInd : substfc 0 ⌜cons #1 #0⌝ (liftfc 2 (liftfc 1 A))        con A = nthc t 2̄
+
+El evaluador pide `hasWitF (liftfc 1 A)` —el testigo del **RESULTADO** de un lift— y la cascada de
+guardas de ADR‑020 sólo entrega `hasWitF A`. En `listInd`, dos veces.
+
+⚠️ **Y NO hay atajo, medido el 2026‑09‑10.** Lo que existe en todo el árbol sobre testigos y lifts
+es: `prf_hasWit_liftc` (`Meta/SubstfcWitnessPrf.lean:1936`) —sorte **TÉRMINO** y **sólo a nivel
+`zero`**— y `prf_hasWit_liftcT`/`liftscT` (`LiftcCodePrf`), que son sobre el **constructor dotado**
+`liftcT`, no sobre `liftfc`. **Ni la mitad TÉRMINO a nivel arbitrario existe.**
+
+📐 **El molde y su tamaño**: `prf_hasWitF_substfc` (`Meta/SubstfcWitnessPrf.lean`, rama C de
+ADR‑020) es la culminación de la inducción `PHIF` —§16 a §22 de un módulo de **2 088 líneas**—,
+conjuntiva sobre los dos sortes, con la **fusión de testigos** (§10, §19) y las **ocho
+inyecciones** (§21). El análogo de `liftfc` sale **un binder más barato** —no hay sustituyendo,
+igual que `pcc_eval_liftfc` frente a `pcc_eval_substfc`— pero **es un frente, no un tramo**.
+
+⇒ Se **enuncia** la deuda, como manda el idioma del módulo (§2 de `Meta/D3ChainDotPrf.lean`: la
+deuda se enuncia, no se postula). No hay ningún `axiom` aquí. -/
+
+/-- **LA DEUDA**: la clausura del testigo de FÓRMULA bajo `liftfc`, a nivel arbitrario.
+
+    ⚠️ **Es un OBJETIVO enunciado, no un teorema**: aquí no se prueba ni se postula (no hay
+    ningún `axiom` en este módulo). Quien la pruebe cierra `ind` (18) y `listInd` (20) de C3 y,
+    con ellos, `hbody`(a) de D3.
+
+    📐 **Guarda: sólo `hasWitF X`, y el NIVEL va libre.** Se copia exactamente la forma de
+    `pcc_eval_liftfc` (§11), que evalúa `liftfc` con `v` **abstracto y sin guarda**. ⚠️ La
+    tentación es copiar el molde `prf_hasWitF_substfc`, que pide además `hasWit s` del
+    sustituyendo — pero **aquí sería un error**: `hasWit` es el predicado de testigo de un
+    **CÓDIGO**, y el nivel de un `liftfc` es un **numeral**, no un código. La guarda no sólo
+    sobraría: haría la deuda **inconsumible**, porque el consumidor no tendría con qué
+    descargarla. Medido el 2026‑09‑10 al intentarlo. -/
+abbrev DEUDA_hasWitF_liftfc : Prop :=
+  ∀ v X : Term, Prf (Formula.impl (hasWitF X) (hasWitF (liftfc v X)))
+
+/-- La forma en que los consumidores la aplican. -/
+theorem hasWitF_liftfc_of_deuda (h : DEUDA_hasWitF_liftfc) (v : Term) {X : Term}
+    (hX : Prf (hasWitF X)) : Prf (hasWitF (liftfc v X)) := prf_mp (h v X) hX
+
+
 end ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
+
 
 /-! ## `export` — por PROPÓSITO DECLARADO
 
@@ -1282,6 +1333,7 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
   LIFTFC_EQ_BODY LIFTFC_EQ_BODY_ok pcc_liftfc_eq_code
   caso_atom_core_L caso_eq_core_L casoAtomL_thm casoEqL_thm
   pcc_eval_liftfc_isFC1 pcc_eval_liftfc pcc_eval_liftfc_wit
+  DEUDA_hasWitF_liftfc hasWitF_liftfc_of_deuda
 )
 
 /-! ## FOOTPRINT -/
@@ -1305,3 +1357,4 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoEqL_thm
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_wit
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.hasWitF_liftfc_of_deuda
