@@ -929,6 +929,68 @@ theorem d3_prf_of_hbody (φ : Formula)
 
 ⇒ Sólo `hbody`(a) sigue aguas abajo de C3, y su desbloqueo es `prf_hasWitF_liftfc`. -/
 
+/-! ## §12 · 🏁🏁 `hwP` PROBADO — **D3 queda en UNA sola obligación** (2026‑09‑10)
+
+⭐⭐ **Y sale en cuatro líneas, como dividendo directo de §10.** `hwP` pide el testigo del cuerpo
+**bajo el contexto del `bdAll`**:
+
+    hasWitF (bdAllBndCtx (chainOkBPsi ṗ #0))
+      = hasWitF (forallc (implc (ltCodeFn ⌜v₀⌝ ⌜v₁⌝) (chainOkBPsi ṗ #0)))
+
+y se parte en dos por el KIT de ADR‑020 (`prf_hasWitF_forallc` + `prf_hasWitF_implc`):
+
+* la **cota** —un átomo de `lt` entre dos variables de código— la cierra `hw_auto` sola;
+* el **cuerpo** es donde §10 cobra: el testigo está probado para el `PsiF` **dotado**
+  (`hwPsi_chainOkBPsiDot`, que salió gratis de la rama C), y **se transporta** al computable por
+  el mismo puente `chainOkBPsiDot_eq`, esta vez con **Leibniz OBJETO** (`prf_congr_hasWitF`).
+
+🔑 Es la **tercera vez** que el par «cuerpo dotado + cuerpo computable, puenteados dentro de la
+teoría» paga: `hmatch` (§8) casó el destino, `hbdAll_of_dotted` (§10.5) transportó la prueba, y
+aquí transporta el **testigo**. La regla de §10 —*el destino fija la imagen, el chasis fija la
+forma*— no era una molestia administrativa: es lo que hace que las tres cosas viajen. -/
+
+/-- ⭐⭐⭐ **`hwP`, PROBADO.** La última obligación no‑`hbody` de D3. -/
+theorem hwP_chainOkBPsi :
+    Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))) := by
+  have hPsi : Prf (hasWitF (chainOkBPsi (tcFn (.var 0)) (.var 0))) :=
+    prf_congr_hasWitF chainOkBPsiDot_eq (hwPsi_chainOkBPsiDot (.var 0))
+  unfold bdAllBndCtx bdAllCode
+  exact prf_hasWitF_forallc _ (prf_hasWitF_implc _ _ (by hw_auto) hPsi)
+
+/-- ⭐⭐⭐ **`DEUDA_chainOkBDot` DESDE `hbody` Y NADA MÁS.** -/
+theorem DEUDA_chainOkBDot_of_body_only
+    (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
+    DEUDA_chainOkBDot :=
+  DEUDA_chainOkBDot_of_hbody hwP_chainOkBPsi hbody
+
+/-- ⭐⭐⭐ **D3 DESDE `hbody` Y NADA MÁS.**
+
+    Todo lo demás —el puente átomo↔forma acotada, la cota, el `∃` acotado, el cuerpo del `∀`, el
+    empaquetado, los dos `PsiF`, `hmatch`, `hPinv`, `hPsiId` y `hwP`— está **probado**, y con
+    footprint igual a la base sancionada. -/
+theorem d3_prf_of_body_only (φ : Formula)
+    (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of_body_only hbody)
+
+/-! ### §12.1 · Lo que queda de D3: **`hbody`, y sólo `hbody`**
+
+    hbody : ∀ q i, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+              provFromCode (substfc 0 (tcFn i) (chainOkBPsiDot q))))
+
+Y se parte —por `chainOkBPsi_split` (§8), que conecta los dos `PsiF` **por construcción**— en:
+
+| mitad | estado |
+|---|---|
+| **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`); faltan `ind` (18) y `listInd` (20) |
+| **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado sobre argumentos ABSTRACTOS (§5, §6); falta ensamblar |
+
+⇒ **(a) es lo único de D3 que sigue aguas abajo de C3**, y su desbloqueo es `prf_hasWitF_liftfc`.
+**(b) no depende de C3 en absoluto**: sus piezas se dejaron abstractas en §5–§6 exactamente para
+que se instancien con las capas de `liftc`/`substCodeT` que el exterior imponga. -/
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -957,6 +1019,7 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   hwS_chainOkBPsiDot hwPsi_chainOkBPsiDot
   hbdAll_of_dotted hbdAllDot_of_body d3_prf_of_body
   hPsiId_chainOkBPsiDot hbdAllDot_of_hbody DEUDA_chainOkBDot_of_hbody d3_prf_of_hbody
+  hwP_chainOkBPsi DEUDA_chainOkBDot_of_body_only d3_prf_of_body_only
 )
 
 /-! ## FOOTPRINT -/
@@ -976,3 +1039,5 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hPsiId_chainOkBPsiDot
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_hbody
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hwP_chainOkBPsi
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body_only
