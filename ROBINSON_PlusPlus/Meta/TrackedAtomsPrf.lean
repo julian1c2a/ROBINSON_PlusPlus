@@ -593,7 +593,7 @@ theorem pcc_child_tracked (q X : Term) (j n : Nat) (hjn : j < n) :
   have hlen : PrfH [In (nthc X (numeralM j)) q, Formula.eq (lenc X) (numeralM n)]
       (Formula.eq (lenc X) (numeralM n)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have hlt : PrfH _ (lt (numeralM j) (lenc X)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlen)
+    PrfH_lt_subst2 (PrfH_eq_symm hlen)
       (prf_to_prfH (prf_lt_numeralM hjn) _)
   have hev : PrfH _ (provFromCode (eqCodeFn (nthcT (tcFn X) (tcFn (numeralM j)))
       (tcFn (nthc X (numeralM j))))) :=

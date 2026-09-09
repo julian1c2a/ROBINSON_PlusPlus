@@ -58,14 +58,10 @@ theorem prf_congr_liftc {c a b : Term} (h : Prf (a =eq b)) :
     simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftc c a))
 
-/-- Congruencia de `liftc` en el código, en `PrfH`. -/
-theorem PrfH_congr_liftc {Γ : List Formula} {c a b : Term} (h : PrfH Γ (a =eq b)) :
-    PrfH Γ (liftc c a =eq liftc c b) := by
-  let f : Formula := Formula.eq (liftc (liftTerm 0 c) (liftTerm 0 a)) (liftc (liftTerm 0 c) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftc c a) (liftc c s) := by
-    intro s
-    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (liftc c a)) Γ)
+/-! ⛔ **`PrfH_congr_liftc` bajó a `Meta/ChainPrf.lean`** (2026‑09‑09d): estaba también en
+`Meta/CodeWitnessPrf.lean` (`SinWTs`), con el nivel explícito, y los dos llegaban a la raíz.
+Ver la nota allí. El enunciado que sobrevive es **éste** (nivel implícito); sólo cambió de
+módulo, y llega aquí por el `export` de `ChainPrf`. -/
 
 /-- Congruencia de `substtc` en el código (3er argumento), en `PrfH`. -/
 theorem PrfH_congr_substtc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a =eq b)) :
@@ -205,7 +201,8 @@ theorem prf_substtc_tcFn (W a : Term) : Prf (substtc zero W (tcFn a) =eq tcFn a)
 end ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 
 export ROBINSON_PlusPlus.Meta.NumCodeClosedPrf (
-  prf_congr_liftc PrfH_congr_liftc PrfH_congr_substtc3 prf_congr_substtc3
+  prf_congr_liftc PrfH_congr_substtc3 prf_congr_substtc3
+  -- ⚠️ `PrfH_congr_liftc` ya NO se exporta desde aquí: bajó a `Meta/ChainPrf.lean`.
   PrfH_congr_substfc3 prf_congr_substfc3
   prf_congr_funcc2 PrfH_congr_funcc2
   prf_liftc_tcFn_zero prf_liftc_tcFn_succ_imp liftcTcPred prf_liftc_tcFn_all prf_liftc_tcFn

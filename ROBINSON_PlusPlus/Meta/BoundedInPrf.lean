@@ -70,13 +70,9 @@ theorem prf_lt_subst2 {a b₁ b₂ : Term} (h : Prf (b₁ =eq b₂)) (hlt : Prf 
     intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS b₂) ▸ prf_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
 
-/-- Congruencia de `lt` en el 2º argumento, en `PrfH`. -/
-theorem PrfH_lt_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
-    (hlt : PrfH Γ (lt a b₁)) : PrfH Γ (lt a b₂) := by
-  let f : Formula := lt (liftTerm 0 a) (.var 0)
-  have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
+/-! ⛔ **`PrfH_lt_subst2` bajó a `Meta/ChainPrf.lean`** (2026‑09‑09d, ADR‑019): estaba también
+en `Meta/NatOrderPrf.lean`, y las dos llegaban a la raíz. Llega aquí por el `export` de
+`ChainPrf`, con el mismo enunciado. Lo mismo con `PrfH_lt_subst1`, más abajo. -/
 
 /-! ### Dirección ⇒ : los dos casos del paso `cons` -/
 
@@ -246,14 +242,6 @@ theorem prf_boundedIn_nil (x : Term) : Prf (boundedIn x nil ⇒ Formula.bottom) 
     PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (PrfH_and_elim_left (prfH_hyp_self _))
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt0
 
-/-- Congruencia de `lt` en el 1er argumento, en `PrfH`. -/
-theorem PrfH_lt_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a₁ =eq a₂))
-    (hlt : PrfH Γ (lt a₁ b)) : PrfH Γ (lt a₂ b) := by
-  let f : Formula := lt (.var 0) (liftTerm 0 b)
-  have hS : ∀ s : Term, substFormula 0 s f = lt s b := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hlt)
-
 /-- Congruencia de `nthc` en el índice (2º argumento), en `PrfH`. -/
 theorem PrfH_eq_congr_nthc2 {Γ : List Formula} {L i j : Term} (h : PrfH Γ (i =eq j)) :
     PrfH Γ (nthc L i =eq nthc L j) := by
@@ -395,7 +383,8 @@ end ROBINSON_PlusPlus.Meta.BoundedInPrf
 
 export ROBINSON_PlusPlus.Meta.BoundedInPrf (
   boundedIn liftFormula_boundedIn liftFormula_boundedIn_gen substFormula_boundedIn
-  prf_lt_subst2 PrfH_lt_subst2 PrfH_lt_subst1 PrfH_eq_congr_nthc2
+  prf_lt_subst2 PrfH_eq_congr_nthc2
+  -- ⚠️ `PrfH_lt_subst1`/`_subst2` ya NO se exportan desde aquí: bajaron a `Meta/ChainPrf.lean`.
   prf_boundedIn_head prf_boundedIn_tail
   prf_pred_succ prf_eq_congr_pred PrfH_eq_congr_pred prf_zero_or_eq_succ_pred
   prf_lt_succ_helper prf_lt_succ_split

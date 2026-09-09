@@ -190,8 +190,8 @@ theorem prf_wfAll1_cons (A w : Term) :
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
     have hw2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand2
     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTX0 A w) (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 w)))) :=
-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 w)) _)
-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+      PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 w)) _)
+        (PrfH_lt_subst1 hs hlt2)
     have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTX0 A w) (lt (pred (.var 0)) (lenc (liftTerm 0 w))) :=
       PrfH.mp _ _ _ (prf_to_prfH
         (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (liftTerm 0 w))) _) hltS
@@ -261,13 +261,13 @@ theorem prf_argsIn_singleton (W hd : Term) :
     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) ::
         [lt (.var 0) (lenc (cons (liftTerm 0 hd) nil)), In (liftTerm 0 hd) (liftTerm 0 W)])
         (lt (succ (pred (.var 0))) (succ (lenc nil))) :=
-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      PrfH_lt_subst2
         (prf_to_prfH (prf_lenc_cons (liftTerm 0 hd) nil) _)
-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+        (PrfH_lt_subst1 hs hlt2)
     have hzero : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) ::
         [lt (.var 0) (lenc (cons (liftTerm 0 hd) nil)), In (liftTerm 0 hd) (liftTerm 0 W)])
         (lt (pred (.var 0)) zero) :=
-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _)
+      PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _)
         (PrfH.mp _ _ _ (prf_to_prfH
           (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc nil)) _) hltS)
     exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
@@ -375,10 +375,10 @@ theorem step_at (x : Term) :
 
 /-! ## §10 · EL CIERRE — inducción objeto -/
 
-/-- Silogismo hipotético en `Prf` (local: `prf_imp_trans` vive en `LineWFCases`, aguas abajo). -/
-theorem prf_syll {a b c : Formula} (h1 : Prf (a ⇒ b)) (h2 : Prf (b ⇒ c)) : Prf (a ⇒ c) :=
-  prf_mp (prf_mp (Prf.incl (Prf₀.p2 a b c))
-    (prf_mp (Prf.incl (Prf₀.p1 (Formula.impl b c) a)) h2)) h1
+/-! ⛔ **El `prf_syll` local se borró (2026‑09‑09d).** Era **idéntico** al de
+`Meta/ReprPrf.lean`, que está **aguas arriba** de este módulo — duplicado de ADR‑019 puro. Su
+docstring citaba `prf_imp_trans` (aguas abajo, en `LineWFCases`) para justificar la copia local,
+pero **no miraba aguas arriba**, que es donde estaba. Ahora `ReprPrf` lo exporta a la raíz. -/
 
 /-- Congruencia de `hasWit` en forma de IMPLICACION. -/
 theorem prf_congr_hasWit_imp {a b : Term} (h : Prf (a =eq b)) :

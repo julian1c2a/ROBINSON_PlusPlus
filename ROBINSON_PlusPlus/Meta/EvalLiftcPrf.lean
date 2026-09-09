@@ -429,7 +429,7 @@ theorem PHI_step : Prf (Formula.forall (Formula.impl (PSI PHI) PHI)) := by
           (cons (numeralM 1)
             (cons (nthc (.var 1) (numeralM 1)) (cons (nthc (.var 1) (numeralM 2)) nil)))) :=
         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      have hltb := PrfH_lt_subst2
         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
       have hphi := PrfH.mp _ _ _ (PSI_inst PHI hPHI hpsi' (nthc (.var 1) (numeralM 2))) hltb
       have huse := PHI_use (nthc (.var 1) (numeralM 2)) (.var 0) hphi
@@ -465,14 +465,14 @@ theorem PHI_step : Prf (Formula.forall (Formula.impl (PSI PHI) PHI)) := by
       -- (a) la CABEZA esta en el testigo y es MENOR ⟹ `targetLift (carc X)` por la HI
       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
         (prf_to_prfH (prf_lenc_cons (carc (.var 1)) (cdrc (.var 1))) _)
-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      have hzlt := PrfH_lt_subst2
         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 1)))) _)
       have hin0 := PrfH.mp _ _ _
         (PrfH_inst_argsIn (.var 0) (.var 1) zero hargs) hzlt
       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
         (prf_to_prfH (prf_nthc_zero (carc (.var 1)) (cdrc (.var 1))) _)
       have hinhd := PrfH_congr_In_left hnth0 hin0
-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+      have hlthd := PrfH_lt_subst2 (PrfH_eq_symm hcons)
         (prf_to_prfH (prf_cantor_mono_left (carc (.var 1)) (cdrc (.var 1))) _)
       have huse_hd := PHI_use (carc (.var 1)) (.var 0)
         (PrfH.mp _ _ _ (PSI_inst PHI hPHI hpsi (carc (.var 1))) hlthd)
@@ -481,7 +481,7 @@ theorem PHI_step : Prf (Formula.forall (Formula.impl (PSI PHI) PHI)) := by
       have hargs_cons := PrfH_congr_argsIn hcons hargs
       have hargs_tl := PrfH.mp _ _ _
         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 1)) (cdrc (.var 1))) _) hargs_cons
-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+      have hlttl := PrfH_lt_subst2 (PrfH_eq_symm hcons)
         (prf_to_prfH (prf_cantor_mono_right (carc (.var 1)) (cdrc (.var 1))) _)
       have huse_tl := PHI_use (cdrc (.var 1)) (.var 0)
         (PrfH.mp _ _ _ (PSI_inst PHI hPHI hpsi (cdrc (.var 1))) hlttl)
@@ -636,7 +636,7 @@ theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
           (cons (numeralM 1)
             (cons (nthc (.var 2) (numeralM 1)) (cons (nthc (.var 2) (numeralM 2)) nil)))) :=
         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      have hltb := PrfH_lt_subst2
         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
       have hphi := PrfH.mp _ _ _
         (PSI_inst2 PHIat hPHIat hpsi' (nthc (.var 2) (numeralM 2))) hltb
@@ -678,14 +678,14 @@ theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
       have hargs := PrfH_and_elim_right hh'
       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
         (prf_to_prfH (prf_lenc_cons (carc (.var 2)) (cdrc (.var 2))) _)
-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      have hzlt := PrfH_lt_subst2
         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 2)))) _)
       have hin0 := PrfH.mp _ _ _
         (PrfH_inst_argsIn (.var 0) (.var 2) zero hargs) hzlt
       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
         (prf_to_prfH (prf_nthc_zero (carc (.var 2)) (cdrc (.var 2))) _)
       have hinhd := PrfH_congr_In_left hnth0 hin0
-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+      have hlthd := PrfH_lt_subst2 (PrfH_eq_symm hcons)
         (prf_to_prfH (prf_cantor_mono_left (carc (.var 2)) (cdrc (.var 2))) _)
       have huse_hd := PHIat_use (carc (.var 2)) (.var 1) (.var 0)
         (PrfH.mp _ _ _ (PSI_inst2 PHIat hPHIat hpsi (carc (.var 2))) hlthd)
@@ -693,7 +693,7 @@ theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
       have hargs_cons := PrfH_congr_argsIn hcons hargs
       have hargs_tl := PrfH.mp _ _ _
         (prf_to_prfH (prf_argsIn_tail (.var 0) (carc (.var 2)) (cdrc (.var 2))) _) hargs_cons
-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+      have hlttl := PrfH_lt_subst2 (PrfH_eq_symm hcons)
         (prf_to_prfH (prf_cantor_mono_right (carc (.var 2)) (cdrc (.var 2))) _)
       have huse_tl := PHIat_use (cdrc (.var 2)) (.var 1) (.var 0)
         (PrfH.mp _ _ _ (PSI_inst2 PHIat hPHIat hpsi (cdrc (.var 2))) hlttl)

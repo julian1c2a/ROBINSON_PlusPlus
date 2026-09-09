@@ -642,10 +642,10 @@ theorem pcc_lineWF_tracked_eqrefl_imp (t : Term) :
     PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
   -- cotas DERIVADAS de la longitud canónica (en `PrfH`)
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
-    BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
       (prf_to_prfH (prf_lt_numeralM (a := 1) (b := 3) (by omega)) _)
   have hb2 : PrfH Γ (lt (numeralM 2) (lenc t)) :=
-    BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlencH)
+    PrfH_lt_subst2 (PrfH_eq_symm hlencH)
       (prf_to_prfH (prf_lt_numeralM (a := 2) (b := 3) (by omega)) _)
   -- los tres punteados producidos en el contexto
   have hTag : PrfH Γ (provFromCode (tagDot t)) :=

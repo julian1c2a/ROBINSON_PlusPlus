@@ -1170,7 +1170,7 @@ theorem PHIsubsttc_step : Prf (Formula.forall (Formula.impl (PSI PHIsubsttc) PHI
           (cons (numeralM 1) (cons (nthc (.var 3) (numeralM 1))
             (cons (nthc (.var 3) (numeralM 2)) nil)))) :=
         prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
-      have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      have hltb := PrfH_lt_subst2
         (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
       have hphi := PrfH.mp _ _ _ (PSI_inst3 PHIsubsttc hPHIsubsttc1 hpsi' (nthc (.var 3) (numeralM 2))) hltb
       have huse := PHIsubsttc_use (nthc (.var 3) (numeralM 2)) (.var 2) (.var 1) (.var 0) hphi
@@ -1203,13 +1203,13 @@ theorem PHIsubsttc_step : Prf (Formula.forall (Formula.impl (PSI PHIsubsttc) PHI
       -- (a) la CABEZA esta en el testigo y es MENOR
       have hlenX := PrfH_eq_trans (PrfH_congr_lenc hcons)
         (prf_to_prfH (prf_lenc_cons (carc (.var 3)) (cdrc (.var 3))) _)
-      have hzlt := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      have hzlt := PrfH_lt_subst2
         (PrfH_eq_symm hlenX) (prf_to_prfH (prf_zero_lt_succ (lenc (cdrc (.var 3)))) _)
       have hin0 := PrfH.mp _ _ _ (PrfH_inst_argsIn (.var 2) (.var 3) zero hargs) hzlt
       have hnth0 := PrfH_eq_trans (PrfH_congr_nthc_lst zero hcons)
         (prf_to_prfH (prf_nthc_zero (carc (.var 3)) (cdrc (.var 3))) _)
       have hinhd := PrfH_congr_In_left hnth0 hin0
-      have hlthd := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+      have hlthd := PrfH_lt_subst2 (PrfH_eq_symm hcons)
         (prf_to_prfH (prf_cantor_mono_left (carc (.var 3)) (cdrc (.var 3))) _)
       have huse_hd := PHIsubsttc_use (carc (.var 3)) (.var 2) (.var 1) (.var 0)
         (PrfH.mp _ _ _ (PSI_inst3 PHIsubsttc hPHIsubsttc1 hpsi (carc (.var 3))) hlthd)
@@ -1218,7 +1218,7 @@ theorem PHIsubsttc_step : Prf (Formula.forall (Formula.impl (PSI PHIsubsttc) PHI
       have hargs_cons := PrfH_congr_argsIn hcons hargs
       have hargs_tl := PrfH.mp _ _ _
         (prf_to_prfH (prf_argsIn_tail (.var 2) (carc (.var 3)) (cdrc (.var 3))) _) hargs_cons
-      have hlttl := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hcons)
+      have hlttl := PrfH_lt_subst2 (PrfH_eq_symm hcons)
         (prf_to_prfH (prf_cantor_mono_right (carc (.var 3)) (cdrc (.var 3))) _)
       have huse_tl := PHIsubsttc_use (cdrc (.var 3)) (.var 2) (.var 1) (.var 0)
         (PrfH.mp _ _ _ (PSI_inst3 PHIsubsttc hPHIsubsttc1 hpsi (cdrc (.var 3))) hlttl)

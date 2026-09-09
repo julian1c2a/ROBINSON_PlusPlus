@@ -810,7 +810,7 @@ theorem pcc_isTermCodeE1_trackedC (q X ND : Term)
     have hlt2 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
         provFromCode (eqCodeFn ND (tcFn X))]
         (lt (numeralM 2) (lenc X)) :=
-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      PrfH_lt_subst2
         (PrfH_eq_symm (PrfH_and_elim_right (PrfH_and_elim_right hstr)))
         (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
     have hsh0 : PrfH [land (shapeBin X 1) (argsIn q (nthc X (numeralM 2))), isTermCodeE1 q X,
@@ -1225,7 +1225,7 @@ theorem pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) :
       (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have hlt : PrfH [hasWit (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
       (lt (numeralM i) (lenc t)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlenc)
+    PrfH_lt_subst2 (PrfH_eq_symm hlenc)
       (prf_to_prfH (prf_lt_numeralM hin) _)
   have hexc : PrfH [hasWit (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
       (provFromCode (exc (hasWitAc (tcFn t) (termCode (numeralM i))))) :=

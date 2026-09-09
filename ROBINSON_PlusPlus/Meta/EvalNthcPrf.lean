@@ -224,7 +224,7 @@ theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
-      (BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
+      (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 
 /-- Transporte de `provFromCode` por igualdad de código bajo contexto (Leibniz sobre
     `provFormulaC'`). -/
@@ -334,8 +334,8 @@ theorem nthcEvalPred_step :
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
-        (BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
-          (BoundedInPrf.PrfH_lt_subst1 hs hlt))
+        (PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
+          (PrfH_lt_subst1 hs hlt))
     have ihEval := PrfH.mp _ _ _ ihj hltJ
     let X : Term := nthcT (consT (tcFn (.var 2)) (tcFn (.var 1))) (succcT (tcFn (pred (.var 0))))
     let Y : Term := nthcT (tcFn (.var 1)) (tcFn (pred (.var 0)))

@@ -119,16 +119,17 @@ La medición que lo desempata: **el de aquí no tenía NI UN consumidor** — lo
 ⚠️ No re‑añadirlo: si un consumidor de este módulo lo necesita, `NumCodeClosedPrf` está
 aguas abajo y hay que **bajar el general**, no duplicar (ADR‑019). -/
 
-theorem prf_congr_liftsc {t₁ t₂ : Term} (v : Term) (h : Prf (t₁ =eq t₂)) :
-    Prf (liftsc v t₁ =eq liftsc v t₂) := by
-  let f : Formula := Formula.eq (liftsc (liftTerm 0 v) (liftTerm 0 t₁))
-                                (liftsc (liftTerm 0 v) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftsc v t₁) (liftsc v s) := by
-    intro s
-    simp only [f, liftsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact prfH_nil_to_prf
-    ((hS t₂) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h [])
-      ((hS t₁) ▸ prf_to_prfH (prf_refl (liftsc v t₁)) [])) rfl
+/-! ⛔ **Y su gemela de LISTAS se fue con ella (2026‑09‑09d).** Aquí hubo también un
+`prf_congr_liftsc (v) (h)`. Ese **no era un duplicado**: no hay congruencia de `liftsc` en
+ningún otro sitio de producción. Era **código muerto liso** — cero usos en el árbol, ni
+siquiera dentro de este módulo, y **nunca exportado**; `git log -S` dice que el único commit
+que la tocó es el que la creó. Llegó **por simetría de familia** al promover
+`sondeos/HasWitFRealMin.lean`: `prf_congr_lenc` sí se usa, `prf_congr_liftc` lo usaban los
+sondeos, y «la de listas» vino de paquete.
+
+⚠️ Si alguna vez hace falta, el sitio es `Meta/NumCodeClosedPrf.lean`, **junto a
+`prf_congr_liftc` y con el nivel IMPLÍCITO**: es la firma que usan los tres consumidores reales
+que quedan en `sondeos/AcotarEsLaMismaObligacion.lean`. -/
 
 theorem prf_congr_nthc_lst {w₁ w₂ : Term} (i : Term) (h : Prf (w₁ =eq w₂)) :
     Prf (nthc w₁ i =eq nthc w₂ i) := by
@@ -347,13 +348,12 @@ theorem PrfH_congr_lenc {Γ : List Formula} {a b : Term} (h : PrfH Γ (a =eq b))
     simp only [f, lenc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (lenc a)) Γ)
 
-theorem PrfH_congr_liftc {Γ : List Formula} {a b : Term} (v : Term) (h : PrfH Γ (a =eq b)) :
-    PrfH Γ (liftc v a =eq liftc v b) := by
-  let f : Formula := Formula.eq (liftc (liftTerm 0 v) (liftTerm 0 a)) (liftc (liftTerm 0 v) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftc v a) (liftc v s) := by
-    intro s
-    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (liftc v a)) Γ)
+/-! ⛔ **`PrfH_congr_liftc` BAJÓ a `Meta/ChainPrf.lean` (2026‑09‑09d).** Estaba declarado aquí
+(nivel `v` EXPLÍCITO) **y** en `Meta/NumCodeClosedPrf.lean` (nivel `c` implícito), los dos
+exportados a la raíz — el mismo par que B8b, un piso más arriba. Los dos módulos son
+INDEPENDIENTES, así que no bastaba borrar uno: hubo que **bajar el general** al ancestro común
+(ADR‑019). `ChainPrf` es su sitio, porque es donde vive `PrfH_leibniz_subst`, que es de lo
+único que depende. Sobrevive la firma de **nivel implícito**, que es la de `prf_congr_liftc`. -/
 
 theorem PrfH_congr_nthc_lst {Γ : List Formula} {a b : Term} (i : Term) (h : PrfH Γ (a =eq b)) :
     PrfH Γ (nthc a i =eq nthc b i) := by
@@ -433,7 +433,7 @@ theorem nthLiftPred_base : Prf (substFormula 0 nil nthLiftPred) := by
   rw [hnil]
   refine Prf.gen _ (prf_deduction ?_)
   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
@@ -465,7 +465,7 @@ theorem nthLiftPred_step :
     refine PrfH_eq_trans (PrfH_congr_nthc_idx _ hz) ?_
     refine PrfH_eq_trans (prf_to_prfH
       (prf_nthc_zero (liftc zero (.var 2)) (liftsc zero (.var 1))) _) ?_
-    refine PrfH_congr_liftc _ ?_
+    refine PrfH_congr_liftc ?_
     refine PrfH_eq_symm (PrfH_eq_trans (PrfH_congr_nthc_idx _ hz) ?_)
     exact prf_to_prfH (prf_nthc_zero (.var 2) (.var 1)) _
   · -- i = σ (pred i)
@@ -482,16 +482,16 @@ theorem nthLiftPred_step :
     have hltJ : PrfH [Formula.eq (.var 0) (succ (pred (.var 0))), A0, P0]
         (lt (pred (.var 0)) (lenc (.var 1))) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc (.var 1))) _)
-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+        (PrfH_lt_subst2
           (prf_to_prfH (prf_lenc_cons (.var 2) (.var 1)) _)
-          (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt))
+          (PrfH_lt_subst1 hs hlt))
     have ih := PrfH.mp _ _ _ ihj hltJ
     refine PrfH_eq_trans (hcons _) ?_
     refine PrfH_eq_trans (PrfH_congr_nthc_idx _ hs) ?_
     refine PrfH_eq_trans (prf_to_prfH
       (prf_nthc_succ (liftc zero (.var 2)) (liftsc zero (.var 1)) (pred (.var 0))) _) ?_
     refine PrfH_eq_trans ih ?_
-    refine PrfH_congr_liftc _ ?_
+    refine PrfH_congr_liftc ?_
     refine PrfH_eq_symm (PrfH_eq_trans (PrfH_congr_nthc_idx _ hs) ?_)
     exact prf_to_prfH (prf_nthc_succ (.var 2) (.var 1) (pred (.var 0))) _
 
@@ -543,10 +543,10 @@ theorem prf_boundedIn_liftsc (x w : Term) :
   simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, liftc, liftsc,
     zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
   refine PrfH_and_intro ?_ ?_
-  · exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  · exact PrfH_lt_subst2
       (prf_to_prfH (prf_eq_symm (prf_lenc_liftsc W)) _) hlt
   · refine PrfH_eq_trans (PrfH.mp _ _ _ (prf_to_prfH (prf_nthc_liftsc W (.var 0)) _) hlt) ?_
-    exact PrfH_congr_liftc _ heq
+    exact PrfH_congr_liftc heq
 
 /-- **G3** — la IMAGEN del testigo bajo `liftsc 0` contiene la imagen de cada elemento. -/
 theorem prf_In_liftsc (x w : Term) :
@@ -619,7 +619,7 @@ theorem prf_argsIn_head (w hd tl : Term) :
   refine prf_deduction ?_
   have hargs : PrfH [argsIn w (cons hd tl)] (argsIn w (cons hd tl)) := prfH_hyp_self _
   have hlt : PrfH [argsIn w (cons hd tl)] (lt zero (lenc (cons hd tl))) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (prf_to_prfH (prf_eq_symm (prf_lenc_cons hd tl)) _)
       (prf_to_prfH (prf_zero_lt_succ (lenc tl)) _)
   have hin : PrfH [argsIn w (cons hd tl)] (In (nthc (cons hd tl) zero) w) :=
@@ -645,7 +645,7 @@ theorem prf_argsIn_tail (w hd tl : Term) :
   have hlt' : PrfH [lt (.var 0) (lenc (liftTerm 0 tl)),
       argsIn (liftTerm 0 w) (cons (liftTerm 0 hd) (liftTerm 0 tl))]
       (lt (succ (.var 0)) (lenc (cons (liftTerm 0 hd) (liftTerm 0 tl)))) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (prf_to_prfH (prf_eq_symm (prf_lenc_cons (liftTerm 0 hd) (liftTerm 0 tl))) _)
       (PrfH.mp _ _ _ (prf_to_prfH
         (prf_succ_lt_succ_of_lt (.var 0) (lenc (liftTerm 0 tl))) _) hlt)
@@ -713,7 +713,7 @@ theorem prf_argsIn_lift_body (W V i : Term) :
   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero V))) := PrfH.hyp _ _ (List.Mem.head _)
   have hargs : PrfH Γ (argsIn W V) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have hlt : PrfH Γ (lt i (lenc V)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (prf_to_prfH (prf_lenc_liftsc V) _) hlt0
   have hin : PrfH Γ (In (nthc V i) W) := PrfH.mp _ _ _ (PrfH_inst_argsIn W V i hargs) hlt
   have hin2 : PrfH Γ (In (liftc zero (nthc V i)) (liftsc zero W)) :=
@@ -760,7 +760,7 @@ theorem prf_isTermCodeE1_lift (w X : Term) :
     let a : Term := nthc X (numeralM 1)
     have h : PrfH [shapeUn X 0] (Formula.eq X (varc a)) := prfH_hyp_self _
     have hL : PrfH [shapeUn X 0] (liftc zero X =eq varc (succ a)) :=
-      PrfH_eq_trans (PrfH_congr_liftc zero h)
+      PrfH_eq_trans (PrfH_congr_liftc (c := zero) h)
         (prf_to_prfH (prf_mp (prf_liftc_var_ge zero a) (prf_zero_lt_succ a)) _)
     have hn : PrfH [shapeUn X 0] (nthc (liftc zero X) (numeralM 1) =eq succ a) :=
       PrfH_eq_trans (PrfH_congr_nthc_lst (numeralM 1) hL)
@@ -779,7 +779,7 @@ theorem prf_isTermCodeE1_lift (w X : Term) :
     have h : PrfH [H] (Formula.eq X (funcc a b)) := PrfH_and_elim_left hh
     have hargs : PrfH [H] (argsIn w b) := PrfH_and_elim_right hh
     have hL : PrfH [H] (liftc zero X =eq funcc a (liftsc zero b)) :=
-      PrfH_eq_trans (PrfH_congr_liftc zero h) (prf_to_prfH (prf_liftc_func zero a b) _)
+      PrfH_eq_trans (PrfH_congr_liftc (c := zero) h) (prf_to_prfH (prf_liftc_func zero a b) _)
     have hn1 : PrfH [H] (nthc (liftc zero X) (numeralM 1) =eq a) :=
       PrfH_eq_trans (PrfH_congr_nthc_lst (numeralM 1) hL)
         (prf_to_prfH (prf_nthc_c1 (numeralM 1) a (cons (liftsc zero b) nil)) _)
@@ -806,7 +806,7 @@ theorem prf_wfAll1_lift_body (W i : Term) :
   have hlt0 : PrfH Γ (lt i (lenc (liftsc zero W))) := PrfH.hyp _ _ (List.Mem.head _)
   have hwf : PrfH Γ (wfAll1 W) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have hlt : PrfH Γ (lt i (lenc W)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (prf_to_prfH (prf_lenc_liftsc W) _) hlt0
   have hitc : PrfH Γ (isTermCodeE1 W (nthc W i)) :=
     PrfH.mp _ _ _ (PrfH_inst_wfAll1 W i hwf) hlt
@@ -905,7 +905,7 @@ theorem prf_bdAll_of_bound (Φ : Formula) (b : Term) (n : Nat)
     simp only [substFormula, lt, substTerm, substTerms, substTerm_numeralM, hΦ, if_true]
   refine Prf.gen _ (prf_deduction ?_)
   exact PrfH.mp _ _ _ (prf_to_prfH (hself ▸ prf_spec key (.var 0)) _)
-    (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    (PrfH_lt_subst2
       (prf_to_prfH hb _) (PrfH.hyp _ _ (List.Mem.head _)))
 
 /-! ### Los dos moldes de nodo, ya en forma ECUACIONAL -/
@@ -2181,7 +2181,9 @@ export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs (
   prf_argsIn_head prf_argsIn_of_closed prf_argsIn_tail prf_congr_In_left
   prf_consOk_cons prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn
   prf_isTermCodeE1_of_In prf_lenc_termsCodeM prf_nthc_termsCodeM prf_or_elim_imp prf_orL
-  prf_orR PrfH_congr_argsIn PrfH_congr_In_left PrfH_congr_lenc PrfH_congr_liftc
+  prf_orR PrfH_congr_argsIn PrfH_congr_In_left PrfH_congr_lenc
+  -- ⚠️ `PrfH_congr_liftc` ya NO se exporta desde aquí: bajó a `Meta/ChainPrf.lean`, que lo
+  --    exporta a la MISMA raíz (2026‑09‑09d, dedup ADR‑019).
   PrfH_congr_nthc_lst PrfH_inst_argsIn PrfH_inst_wfAll1 shapeBin shapeUn substF_argsIn
   substF_isTermCodeE1 substTerm_objList tcodes1 wfAll1)
 

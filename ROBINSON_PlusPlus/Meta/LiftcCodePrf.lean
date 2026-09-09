@@ -450,7 +450,7 @@ theorem prf_liftc_varc_cases (c a : Term) : Prf (lor (lt a c) (lt c (succ a))) :
     refine PrfH_or_elim (prfH_hyp_self _) ?_ ?_
     · -- `a = c` ⟹ `c < σa`  (por `c < σc` y Leibniz)
       refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
-      exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      exact PrfH_lt_subst2
         (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_succ
           (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _))))
         (prf_to_prfH (prf_lt_succ_self c) _)
@@ -974,8 +974,15 @@ theorem PrfH_guard_ge_code {Γ : List Formula} (c a : Term) (h : PrfH Γ (lt c (
     (prf_to_prfH (prf_congr_atom2CodeFn (prf_refl _) (prf_tc_succ' a)) Γ)
     (PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked c (succ a)) Γ) h)
 
-/-- **(1‑at) BASE `varc` A NIVEL ABIERTO** — la única clausula con contenido nuevo. -/
-theorem refl_caso_varc_at (c s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLiftAt c s) := by
+/-- **(1‑at) BASE `varc` A NIVEL ABIERTO** — la única clausula con contenido nuevo.
+
+    ⚠️ **Rompe el patrón `_at` de la familia a propósito**: `refl_caso_varc_at` a secas ya
+    existe en `Meta/EvalSubsttcPrf.lean` —otro enunciado, sobre `substtc`— **y está
+    exportado a la raíz**, mientras que éste es interno. `Meta/EvalSubstfcPrf.lean` abre
+    los dos módulos, así que el nombre corto sería AMBIGUO allí. No revienta hoy porque la
+    ambigüedad de `open` en Lean es perezosa — y eso es justo lo que convierte a estos
+    homónimos en trampas (B8b). Se desambigua en el origen. -/
+theorem refl_caso_varc_lift_at (c s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLiftAt c s) := by
   have hs1 : Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn (varc a)))
       (liftcT (tcFn c) (varcT (tcFn a))))) :=
     prf_mp (pcc_congr_liftcT_arg2_code (tcFn c) (tcFn (varc a)) (varcT (tcFn a))
@@ -1145,7 +1152,7 @@ theorem refl_lista_cons_at (c h t : Term) (hh : Prf (targetLiftAt c h))
 
 mutual
 theorem refl_termCode_at (c : Term) : ∀ t : Term, Prf (targetLiftAt c (termCode t))
-  | .var n     => refl_caso_varc_at c (termCode (.var n)) (numeral n) (prf_refl _)
+  | .var n     => refl_caso_varc_lift_at c (termCode (.var n)) (numeral n) (prf_refl _)
   | .func f ts =>
       refl_caso_funcc_at c (termCode (.func f ts)) (strCode f) (termsCode ts)
         (prf_refl _) (refl_termsCode_at c ts)
@@ -1402,7 +1409,7 @@ theorem refl_shapeUn_imp_at (c X : Term) :
   let a : Term := nthc X (numeralM 1)
   have hh : PrfH [shapeUn X 0] (Formula.eq X (varc a)) := prfH_hyp_self _
   exact PrfH_congr_targetLiftAt c (PrfH_eq_symm hh)
-    (prf_to_prfH (refl_caso_varc_at c (varc a) a (prf_refl _)) _)
+    (prf_to_prfH (refl_caso_varc_lift_at c (varc a) a (prf_refl _)) _)
 
 /-- **(2'‑at) PASO `funcc`, en forma IMPLICACION**, con el nivel abierto. -/
 theorem refl_caso_funcc_imp_at (c p b : Term) :
@@ -1624,7 +1631,7 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
   refl_shapeUn_imp refl_caso_funcc_imp refl_shapeBin_imp refl_lista_cons_imp
   refl_isTermCodeE1_imp
   -- A5 (§7bis/§9bis) — las CINCO que consume `Meta/EvalLiftcPrf.lean` en su descenso a nivel
-  -- abierto (`PHIat_step`). El resto de la familia `_at` (`refl_caso_varc_at`,
+  -- abierto (`PHIat_step`). El resto de la familia `_at` (`refl_caso_varc_lift_at`,
   -- `refl_caso_funcc_at`, `refl_lista_cons_at`, `refl_caso_funcc_imp_at`, `refl_termCode_at`,
   -- `refl_termsCode_at`, `PrfH_congr_targetLiftAt`, los dos `_hole`, las dos guardas y
   -- `pcc_liftsc_nil_code_at`) se consume SOLO dentro de este modulo: no se exporta.
@@ -1659,7 +1666,7 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.PrfH_congr_targetLift
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_liftc_varc_cases
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc_var_lt_code
-#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_varc_at
+#print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_varc_lift_at
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc_at
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_nil_at
 #print axioms ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_at

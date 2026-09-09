@@ -148,11 +148,13 @@ theorem substtc_inv_termCode_listFormCodeM (L : List Formula) :
   rw [substCodeT_closed 0 W (listFormCodeM L) (fun c => liftTerm_listFormCodeM c L)] at h
   exact h
 
-/-- `termCode a` es `substtc`‑invariante cuando `a` está rastreado. -/
-theorem substtc_inv_termCode_of_tc {a : Term} (htc : Prf (tcFn a =eq termCode a)) :
-    ∀ W, Prf (substtc zero W (termCode a) =eq termCode a) := fun W =>
-  prf_eq_trans (prf_congr_substtc3 (prf_eq_symm htc))
-    (prf_eq_trans (prf_substtc_tcFn W a) htc)
+/-! ⛔ **Aquí había una copia LITERAL de `substtc_inv_termCode_of_tc`** (2026‑09‑09d, dedup
+ADR‑019). El original vive en `Meta/LineWFTrackedPrf.lean`, con el mismo cuerpo carácter por
+carácter, y es el que consumen los nueve sitios del árbol — todos cualificados
+`LineWFTrackedPrf.substtc_inv_termCode_of_tc`.
+
+⚠️ La copia de aquí tenía **cero usos**, aquí y fuera: su única mención aparte de la
+declaración era el `export`. Otra vez exportada por EXISTENCIA, no por consumo (§17). -/
 
 /-- **El sustituto de `prf_tc_form` para `pcc_in_head_swap`.**
 
@@ -329,6 +331,8 @@ end ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 
 export ROBINSON_PlusPlus.Meta.InAxiomsCodePrf (
   pcc_inAxiomsCodeT_concrete prf_substfc_inFormCode_hole1 prf_substfc_inFormCode_hole2
-  pcc_tc_formCode_internal substtc_inv_termCode_of_tc substtc_inv_termCode_listFormCodeM
+  pcc_tc_formCode_internal substtc_inv_termCode_listFormCodeM
+  -- ⚠️ `substtc_inv_termCode_of_tc` ya NO se exporta desde aquí: era copia literal del de
+  --    `Meta/LineWFTrackedPrf.lean`, y sin un solo consumidor (dedup 2026‑09‑09d).
   pcc_in_tail_tracked pcc_in_head_swap pcc_In_lfc_tracked pcc_In_axiomsCodeT_tracked
 )

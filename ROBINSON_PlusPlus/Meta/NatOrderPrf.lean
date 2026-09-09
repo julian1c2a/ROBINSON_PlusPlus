@@ -164,22 +164,12 @@ theorem PrfH_le_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b�
     simp only [f, le, lt, lor, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hle)
 
-/-- Sustitución en el 1er argumento de `<`, en contexto. ⚠️ Copia local: el original vive en
-    `Meta/BoundedInPrf.lean`, que es **posterior** a este módulo en la cadena de imports. -/
-theorem PrfH_lt_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a₁ =eq a₂))
-    (hlt : PrfH Γ (lt a₁ b)) : PrfH Γ (lt a₂ b) := by
-  let f : Formula := lt (.var 0) (liftTerm 0 b)
-  have hS : ∀ s : Term, substFormula 0 s f = lt s b := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hlt)
-
-/-- Sustitución en el 2º argumento de `<`, en contexto (misma nota que arriba). -/
-theorem PrfH_lt_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
-    (hlt : PrfH Γ (lt a b₁)) : PrfH Γ (lt a b₂) := by
-  let f : Formula := lt (liftTerm 0 a) (.var 0)
-  have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
+/-! ⛔ **Las dos `PrfH_lt_subst*` bajaron a `Meta/ChainPrf.lean`** (2026‑09‑09d, ADR‑019).
+El docstring que había aquí lo decía todo y sacaba la conclusión contraria: «copia local:
+el original vive en `Meta/BoundedInPrf.lean`, que es **posterior** a este módulo en la
+cadena de imports». Que el original esté aguas ABAJO no autoriza la copia: obliga a
+**bajar el general** a un ancestro común, que es donde está ahora (junto a
+`PrfH_leibniz_subst`, lo único de lo que dependen). -/
 
 /-! ### Transitividad
 
@@ -299,7 +289,8 @@ end ROBINSON_PlusPlus.Meta.NatOrderPrf
 export ROBINSON_PlusPlus.Meta.NatOrderPrf (
   prf_eq_congr_add1 prf_eq_congr_add2 PrfH_eq_congr_add2
   prf_add_assoc prf_add_comm
-  PrfH_eq_congr_add1 PrfH_le_subst1 PrfH_le_subst2 prf_le_subst1 prf_le_subst2 PrfH_lt_subst1 PrfH_lt_subst2
+  PrfH_eq_congr_add1 PrfH_le_subst1 PrfH_le_subst2 prf_le_subst1 prf_le_subst2
+  -- ⚠️ `PrfH_lt_subst1`/`_subst2` ya NO se exportan desde aquí: bajaron a `Meta/ChainPrf.lean`.
   prf_le_of_lt prf_le_of_eq prf_le_refl
   prf_lt_add_succ prf_succ_add_succ prf_lt_add_succ_of_lt
   prf_lt_trans_swap prf_lt_trans prf_lt_le_trans prf_le_lt_trans prf_le_trans

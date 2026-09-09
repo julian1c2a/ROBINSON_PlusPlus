@@ -48,6 +48,45 @@ theorem PrfH_eq_trans {Γ : List Formula} {a b c : Term}
     intro s; simp only [f, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS c) ▸ PrfH_leibniz_subst (A := f) h2 ((hS b) ▸ h1)
 
+/-- ⭐ Congruencia de `liftc` en el argumento código, en `PrfH`, con el nivel **implícito**.
+
+    ⚠️ **Bajó aquí en el dedup del 2026‑09‑09d** (ADR‑019). Estaba declarado dos veces:
+    `Meta/CodeWitnessPrf.lean` (`SinWTs`, nivel explícito) y `Meta/NumCodeClosedPrf.lean`
+    (implícito), **los dos exportados a la raíz**, en módulos INDEPENDIENTES — el mismo par que
+    B8b un piso más arriba, y ambigüo ya hoy en los tres módulos que abren los dos `namespace`.
+    Como ninguno de los dos era código muerto, no bastaba borrar: hubo que bajar el general al
+    ancestro común. Es aquí porque lo único de lo que depende es `PrfH_leibniz_subst`. -/
+theorem PrfH_congr_liftc {Γ : List Formula} {c a b : Term} (h : PrfH Γ (a =eq b)) :
+    PrfH Γ (liftc c a =eq liftc c b) := by
+  let f : Formula := Formula.eq (liftc (liftTerm 0 c) (liftTerm 0 a)) (liftc (liftTerm 0 c) (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftc c a) (liftc c s) := by
+    intro s
+    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ PrfH_leibniz_subst (A := f) h ((hS a) ▸ prf_to_prfH (prf_refl (liftc c a)) Γ)
+
+/-- ⭐ Congruencia de `<` en el 1er argumento, en `PrfH`.
+
+    ⚠️ **Bajó aquí en el dedup del 2026‑09‑09d** (ADR‑019). Estaba declarada dos veces, en
+    `Meta/BoundedInPrf.lean` y en `Meta/NatOrderPrf.lean`, **las dos exportadas a la raíz**. Y
+    el duplicado era CONSCIENTE: el docstring de `NatOrderPrf` decía «copia local: el original
+    vive en `BoundedInPrf`, que es posterior a este módulo en la cadena de imports». Esa es
+    exactamente la situación que ADR‑019 resuelve **bajando el general**, no copiándolo. -/
+theorem PrfH_lt_subst1 {Γ : List Formula} {a₁ a₂ b : Term} (h : PrfH Γ (a₁ =eq a₂))
+    (hlt : PrfH Γ (lt a₁ b)) : PrfH Γ (lt a₂ b) := by
+  let f : Formula := lt (.var 0) (liftTerm 0 b)
+  have hS : ∀ s : Term, substFormula 0 s f = lt s b := by
+    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS a₂) ▸ PrfH_leibniz_subst (A := f) h ((hS a₁) ▸ hlt)
+
+/-- ⭐ Congruencia de `<` en el 2º argumento, en `PrfH`. Misma historia que la anterior; ésta es
+    la que tenía **53 referencias cualificadas** `PrfH_lt_subst2` por el árbol. -/
+theorem PrfH_lt_subst2 {Γ : List Formula} {a b₁ b₂ : Term} (h : PrfH Γ (b₁ =eq b₂))
+    (hlt : PrfH Γ (lt a b₁)) : PrfH Γ (lt a b₂) := by
+  let f : Formula := lt (liftTerm 0 a) (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
+    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b₂) ▸ PrfH_leibniz_subst (A := f) h ((hS b₁) ▸ hlt)
+
 /-- Congruencia de `cons` en la cola, en `PrfH`. -/
 theorem PrfH_congr_cons_tail {Γ : List Formula} {hd t₁ t₂ : Term}
     (h : PrfH Γ (t₁ =eq t₂)) : PrfH Γ (cons hd t₁ =eq cons hd t₂) := by
@@ -729,4 +768,8 @@ export ROBINSON_PlusPlus.Meta.ChainPrf
    prf_In_mono_right_imp prf_concat_assoc prf_allIn_mono_imp prf_lineOk_mono_imp prf_chainOk_subst2
    prf_runFn_concat prf_chainOk_mono_imp prf_runFn_weaken prf_chainOk_concat
    PrfH_and_intro PrfH_and_elim_left PrfH_and_elim_right PrfH_iff_mp PrfH_iff_mpr
-   PrfH_chainOk_subst1 PrfH_chainOk_subst2 PrfH_allIn_subst2 PrfH_eq_subst_in PrfH_in_cons_head)
+   PrfH_chainOk_subst1 PrfH_chainOk_subst2 PrfH_allIn_subst2 PrfH_eq_subst_in PrfH_in_cons_head
+   -- dedup 2026‑09‑09d (ADR‑019): bajaron aquí desde dos módulos independientes que las
+   -- declaraban las dos veces. Consumidas por `CodeWitnessPrf`, `NumCodeClosedPrf`,
+   -- `BoundedInPrf`, `NatOrderPrf` y toda la cola de `PrfH_lt_subst2` (59 sitios).
+   PrfH_congr_liftc PrfH_lt_subst1 PrfH_lt_subst2)

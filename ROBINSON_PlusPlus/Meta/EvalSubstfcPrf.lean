@@ -453,7 +453,7 @@ theorem descenso_un (X : Term) (k : Nat) : Prf (shapeUn X k ⇒ lt (nthc X (nume
       (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) := prf_cantor_mono_right _ _
   have h3 : Prf (lt (nthc X (numeralM 1)) (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))) :=
     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  exact PrfH_lt_subst2
     (PrfH_eq_symm (prfH_hyp_self (shapeUn X k))) (prf_to_prfH h3 _)
 
 theorem descenso_bin1 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (numeralM 1)) X) := by
@@ -466,7 +466,7 @@ theorem descenso_bin1 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (n
   have h3 : Prf (lt (nthc X (numeralM 1))
       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  exact PrfH_lt_subst2
     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h3 _)
 
 theorem descenso_bin2 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (numeralM 2)) X) := by
@@ -484,7 +484,7 @@ theorem descenso_bin2 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (n
   have h5 : Prf (lt (nthc X (numeralM 2))
       (cons (numeralM k) (cons (nthc X (numeralM 1)) (cons (nthc X (numeralM 2)) nil)))) :=
     prf_mp (prf_mp (prf_lt_trans _ _ _) h4) h3
-  exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  exact PrfH_lt_subst2
     (PrfH_eq_symm (prfH_hyp_self (shapeBin X k))) (prf_to_prfH h5 _)
 
 /-! ############################################################################

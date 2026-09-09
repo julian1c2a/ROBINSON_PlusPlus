@@ -1027,6 +1027,9 @@ theorem prf_lineWF_listInd_imp (concl a : Term) :
 end ROBINSON_PlusPlus.Meta.ReprPrf
 
 export ROBINSON_PlusPlus.Meta.ReprPrf (
+  -- ⚠️ `prf_syll` se exporta desde el dedup del 2026‑09‑09d: `HasWitTcFnPrf` tenía una copia
+  --    LITERAL (ADR‑019) y `SubstfcWitnessPrf` lo consumía ya cualificado, tres veces.
+  prf_syll
   prf_congr_bin1 prf_congr_bin2 prf_congr_un prf_congr_bin
   prf_lineWF_iff_transport
   prf_lineWF_iff_transport_in

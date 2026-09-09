@@ -4,6 +4,12 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.CheckArith
+-- ⚠️ Añadido en el dedup del 2026‑09‑09d: este módulo tenía copias LITERALES de
+--    `concat_nil_eq`, `concat_cons_eq`, `in_cons_head` e `in_cons_tail`, que ya declara y
+--    **exporta** `Meta/ProofChain.lean`. Los dos módulos eran independientes, así que la
+--    salida barata era este `import` (no hay ciclo: `ProofChain` no depende de este módulo,
+--    y sólo dos módulos del árbol pasan a verlo que no lo vieran ya).
+import ROBINSON_PlusPlus.Meta.ProofChain
 import ROBINSON_PlusPlus.Meta.HilbertSeq
 import ROBINSON_PlusPlus.Meta.Induction
 import ROBINSON_PlusPlus.Meta.ListInductionArith
@@ -87,18 +93,9 @@ theorem congr_concat2 {T a b : Term} (h : axioms ⊢ (a =eq b)) :
 
 /-! ### Cómputo de `concat` sobre códigos de listas -/
 
-/-- `concat nil X = X` (ax_C1). -/
-theorem concat_nil_eq (X : Term) : axioms ⊢ (concat nil X =eq X) := by
-  have hh := spec (ax (show ax_C1_concat_nil ∈ axioms by simp [axioms])) X
-  simp [ax_C1_concat_nil, substFormula, substTerm, substTerms, concat, nil, zero] at hh
-  exact hh
-
-/-- `concat (cons h t) X = cons h (concat t X)` (ax_C2). -/
-theorem concat_cons_eq (h t X : Term) : axioms ⊢ (concat (cons h t) X =eq cons h (concat t X)) := by
-  have hh := spec (spec (spec (ax (show ax_C2_concat_cons ∈ axioms by simp [axioms])) h) t) X
-  simp [ax_C2_concat_cons, substFormula, substTerm, substTerms, concat, cons, nil, zero,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
-  exact hh
+/-! ⛔ **`concat_nil_eq` y `concat_cons_eq` se borraron aquí** (2026‑09‑09d, dedup ADR‑019):
+eran copias literales de las de `Meta/ProofChain.lean`, que sí las exporta. Llegan ahora por el
+`import` de arriba. -/
 
 /-- `concat ⌜a⌝ ⌜b⌝ = ⌜a ++ b⌝` (sobre códigos de listas de fórmulas). -/
 theorem concat_listFormCode : ∀ (a b : List Formula),
@@ -111,26 +108,8 @@ theorem concat_listFormCode : ∀ (a b : List Formula),
 
 /-! ### Pertenencia object en una lista codificada -/
 
-/-- `In x (cons x t)` (ax_L2 + or-intro-left). -/
-theorem in_cons_head (x t : Term) : axioms ⊢ In x (cons x t) := by
-  have h_axL2 := ax (show ax_L2_in_cons ∈ axioms by simp [axioms])
-  have hiff := by
-    have hh := spec (spec (spec h_axL2 x) x) t
-    simp [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
-      FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
-    exact hh
-  exact iff_mpr hiff (FOL.MetaRules.or_intro_left (eq_refl x))
-
-/-- `In x t → In x (cons h t)` (ax_L2 + or-intro-right). -/
-theorem in_cons_tail (hd : Term) {x t : Term} (hx : axioms ⊢ In x t) :
-    axioms ⊢ In x (cons hd t) := by
-  have h_axL2 := ax (show ax_L2_in_cons ∈ axioms by simp [axioms])
-  have hiff := by
-    have hh := spec (spec (spec h_axL2 x) hd) t
-    simp [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
-      FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
-    exact hh
-  exact iff_mpr hiff (FOL.MetaRules.or_intro_right hx)
+/-! ⛔ **`in_cons_head` e `in_cons_tail` se borraron aquí** por la misma razón: copias literales
+de las de `Meta/ProofChain.lean`. -/
 
 /-- Reflexión de pertenencia: `g ∈ l ⟹ axioms ⊢ In ⌜g⌝ ⌜l⌝`. -/
 theorem In_listFormCode {g : Formula} : ∀ {l : List Formula},

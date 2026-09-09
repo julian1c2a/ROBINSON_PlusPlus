@@ -248,7 +248,7 @@ theorem pcc_clUn_fc (w X ND : Term) (k : Nat)
     PrfH.mp _ _ _ (prf_to_prfH (prf_shapeUn_str X k) _) hsh
   have hlt1 : PrfH [clUn w X k, provFromCode (eqCodeFn ND (tcFn X))]
       (lt (numeralM 1) (lenc X)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (PrfH_eq_symm (PrfH_and_elim_right (PrfH_and_elim_right hstr)))
       (prf_to_prfH (prf_lt_numeralM (by omega : 1 < 2)) _)
   have hsym : PrfH [clUn w X k, provFromCode (eqCodeFn ND (tcFn X))]
@@ -285,12 +285,12 @@ theorem pcc_clBin_fc (w X ND : Term) (k : Nat)
     PrfH.mp _ _ _ (prf_to_prfH (prf_shapeBin_str X k) _) hsh
   have hlt1 : PrfH [clBin w X k, provFromCode (eqCodeFn ND (tcFn X))]
       (lt (numeralM 1) (lenc X)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (PrfH_eq_symm (PrfH_and_elim_right (PrfH_and_elim_right hstr)))
       (prf_to_prfH (prf_lt_numeralM (by omega : 1 < 3)) _)
   have hlt2 : PrfH [clBin w X k, provFromCode (eqCodeFn ND (tcFn X))]
       (lt (numeralM 2) (lenc X)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (PrfH_eq_symm (PrfH_and_elim_right (PrfH_and_elim_right hstr)))
       (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
   have hsym : PrfH [clBin w X k, provFromCode (eqCodeFn ND (tcFn X))]
@@ -330,7 +330,7 @@ theorem pcc_clAtom_fc (wT X ND : Term)
     PrfH.mp _ _ _ (prf_to_prfH (prf_shapeBin_str X 3) _) hsh
   have hlt2 : PrfH [clAtom wT X, provFromCode (eqCodeFn ND (tcFn X))]
       (lt (numeralM 2) (lenc X)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+    PrfH_lt_subst2
       (PrfH_eq_symm (PrfH_and_elim_right (PrfH_and_elim_right hstr)))
       (prf_to_prfH (prf_lt_numeralM (by omega : 2 < 3)) _)
   have hsym : PrfH [clAtom wT X, provFromCode (eqCodeFn ND (tcFn X))]
@@ -1152,7 +1152,7 @@ theorem pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n) :
       (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have hlt : PrfH [hasWitF (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
       (lt (numeralM i) (lenc t)) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (PrfH_eq_symm hlenc)
+    PrfH_lt_subst2 (PrfH_eq_symm hlenc)
       (prf_to_prfH (prf_lt_numeralM hin) _)
   have hexc : PrfH [hasWitF (nthc t (numeralM i)), lenc t =eq numeralM n, lineWF t]
       (provFromCode (exc (exc (hasWitFAc (tcFn t) (termCode (numeralM i)))))) :=

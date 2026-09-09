@@ -192,7 +192,7 @@ theorem prf_wfAll1_nil : Prf (wfAll1 nil) := by
   have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
     prfH_hyp_self _
   have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+    PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
 
@@ -372,7 +372,7 @@ private theorem caso_funcc :
     prf_mp (prf_mp (prf_lt_trans _ _ _) h1) h2
   have h123 : Prf (lt AA (cons (numeralM 1) (cons SS (cons AA nil)))) :=
     prf_mp (prf_mp (prf_lt_trans _ _ _) h12) h3
-  have hltb := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  have hltb := PrfH_lt_subst2
     (PrfH_eq_symm hshape) (prf_to_prfH h123 _)
   -- (2) la HIPOTESIS DE INDUCCION en el argumento
   have hih := PrfH.mp _ _ _ (PSI_inst3 PHIT hPHIT hpsi AA) hltb
@@ -428,7 +428,7 @@ theorem prf_argsIn_nil (W : Term) : Prf (argsIn W nil) := by
   have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
     prfH_hyp_self _
   have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+    PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
 
@@ -470,9 +470,9 @@ theorem prf_argsIn_cons_intro (W a as : Term) :
       PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXa W a as)
         (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 as)))) :=
-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      PrfH_lt_subst2
         (prf_to_prfH (prf_lenc_cons (liftTerm 0 a) (liftTerm 0 as)) _)
-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+        (PrfH_lt_subst1 hs hlt2)
     have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXa W a as)
         (lt (pred (.var 0)) (lenc (liftTerm 0 as))) :=
       PrfH.mp _ _ _ (prf_to_prfH
@@ -777,9 +777,9 @@ private theorem caso_cons :
   -- (2) Cantor: cabeza y cola son estrictamente menores que la lista
   have hcHD : Prf (lt HD (cons HD TL)) := prf_cantor_mono_left _ _
   have hcTL : Prf (lt TL (cons HD TL)) := prf_cantor_mono_right _ _
-  have hltHD := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  have hltHD := PrfH_lt_subst2
     (PrfH_eq_symm hcons) (prf_to_prfH hcHD _)
-  have hltTL := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  have hltTL := PrfH_lt_subst2
     (PrfH_eq_symm hcons) (prf_to_prfH hcTL _)
   -- (3) la HIPOTESIS DE INDUCCION en cada mitad
   have hihHD := PrfH.mp _ _ _ (PSI_inst3 PHIT hPHIT hpsi HD) hltHD
@@ -1106,9 +1106,9 @@ theorem prf_wfAllF_cons (A wF wT : Term) :
       PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
         (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 wF)))) :=
-      ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+      PrfH_lt_subst2
         (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 wF)) _)
-        (ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst1 hs hlt2)
+        (PrfH_lt_subst1 hs hlt2)
     have hltw : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTXf A wF wT)
         (lt (pred (.var 0)) (lenc (liftTerm 0 wF))) :=
       PrfH.mp _ _ _ (prf_to_prfH
@@ -1486,7 +1486,7 @@ theorem prf_wfAllF_nil (wT : Term) : Prf (wfAllF nil wT) := by
   have hlt : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) (lenc nil)) :=
     prfH_hyp_self _
   have hz : PrfH [lt (.var 0) (liftTerm 0 (lenc nil))] (lt (.var 0) zero) :=
-    ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
+    PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) hlt
   exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hz)
 
@@ -1697,9 +1697,9 @@ private theorem casoF_bin {Γ : List Formula} (k : Nat)
   have cB12 : Prf (lt BF (cons AF (cons BF nil))) :=
     prf_mp (prf_mp (prf_lt_trans _ _ _) cB1) cB2
   have cB : Prf (lt BF (binN k AF BF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cB12) cA2
-  have hltA := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  have hltA := PrfH_lt_subst2
     (PrfH_eq_symm hshape) (prf_to_prfH cA _)
-  have hltB := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  have hltB := PrfH_lt_subst2
     (PrfH_eq_symm hshape) (prf_to_prfH cB _)
   -- LA HIPOTESIS DE INDUCCION, una por operando (cuarto escalon de la escalera psi)
   have hihA := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi AF) hltA
@@ -1736,7 +1736,7 @@ private theorem casoF_un {Γ : List Formula} (k : Nat)
   have cA1 : Prf (lt AF (cons AF nil)) := prf_cantor_mono_left _ _
   have cA2 : Prf (lt (cons AF nil) (unN k AF)) := prf_cantor_mono_right _ _
   have cA : Prf (lt AF (unN k AF)) := prf_mp (prf_mp (prf_lt_trans _ _ _) cA1) cA2
-  have hltA := ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+  have hltA := PrfH_lt_subst2
     (PrfH_eq_symm hshape) (prf_to_prfH cA _)
   have hihA := PrfH.mp _ _ _ (PSI_inst4 PHIF hPHIF hpsi AF) hltA
   -- el sustituyendo sube de nivel: su testigo lo da `CRIT_hasWit_lift`
