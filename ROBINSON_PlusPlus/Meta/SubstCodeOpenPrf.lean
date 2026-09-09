@@ -236,6 +236,98 @@ theorem substCodeTs_closed (v : Nat) (w : Term) :
 
 end
 
+
+/-! ## §4 · INVARIANCIA DE `substCodeT` BAJO `substtc` DE NIVEL SUPERIOR (2026‑09‑09g)
+
+⭐ **La obligación `hPinv` de TODA aplicación de `pcc_bdAll_intro`**, en su forma genérica y a
+nivel de TÉRMINO. Hasta ahora se pagaba a mano en cada frente (`hPinv_wfAll1Psi`,
+`Meta/HasWitTrackedPrf.lean` §10, ~40 líneas de recorrido); esto la hace de una vez.
+
+**El enunciado.** Si el testigo `W` es `substtc`‑invariante al nivel `v+1`, y la fórmula/término
+no tiene variables libres por encima de `v+1`, entonces el código `substCodeT v W t` es
+`substtc (v+1)`‑invariante.
+
+🔑 **Por qué la condición es la que es.** `substCodeT v W (.var n)` vale `W` si `n = v`,
+`⌜v_n⌝` si `n < v` y `⌜v_(n-1)⌝` si `n > v`. Para que `substtc (v+1)` no toque nada hace falta
+que ningún `⌜v_(v+1)⌝` aparezca, o sea que ninguna variable libre valga `v+2`. La cota
+`liftTerm (v+2) t = t` —que dice «sin variables libres ≥ v+2»— es más fuerte y **se comprueba
+por `simp`** para todo término concreto, que es lo que la hace usable. -/
+
+mutual
+
+/-- **La invariancia, nivel TÉRMINO.** -/
+theorem substtc_inv_substCodeT (v : Nat) (W : Term)
+    (hW : ∀ u, Prf (substtc (numeral (v+1)) u W =eq W)) :
+    ∀ (t : Term), liftTerm (v+2) t = t →
+      ∀ u, Prf (substtc (numeral (v+1)) u (substCodeT v W t) =eq substCodeT v W t)
+  | .var n, hfv, u => by
+      have hn : Nat.le n (v + 1) := by
+        rcases Nat.lt_or_ge n (v + 2) with h | h
+        · exact Nat.le_of_lt_succ h
+        · have hne : ¬ (n < v + 2) := Nat.not_lt.mpr h
+          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          exact absurd hfv (Nat.succ_ne_self n)
+      rcases Nat.lt_trichotomy n v with hlt | heq | hgt
+      · have hsub : substCodeT v W (.var n) = varc (numeral n) := by
+          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+        rw [hsub]
+        exact prf_mp (prf_substtc_var_lt (numeral (v+1)) u (numeral n)) (prf_gnum_lt (by omega))
+      · subst heq
+        have hsub : substCodeT n W (.var n) = W := by simp [substCodeT]
+        rw [hsub]; exact hW u
+      · have hsub : substCodeT v W (.var n) = varc (numeral (n - 1)) := by
+          simp only [substCodeT]; rw [if_neg (by omega), if_pos (by omega)]
+        rw [hsub]
+        have hnv : n = v + 1 := Nat.le_antisymm hn hgt
+        subst hnv
+        exact prf_mp (prf_substtc_var_lt (numeral (v+1)) u (numeral (v+1-1)))
+          (prf_gnum_lt (by omega))
+  | .func sym ts, hfv, u => by
+      have hall := hfv
+      simp only [liftTerm, Term.func.injEq, true_and] at hall
+      show Prf (substtc (numeral (v+1)) u (funcc (strCode sym) (substCodeTs v W ts))
+        =eq funcc (strCode sym) (substCodeTs v W ts))
+      refine prf_eq_trans (prf_substtc_func (numeral (v+1)) u _ _) ?_
+      unfold funcc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_inv_substCodeTs v W hW ts hall u
+
+/-- **La invariancia, nivel LISTA.** -/
+theorem substtc_inv_substCodeTs (v : Nat) (W : Term)
+    (hW : ∀ u, Prf (substtc (numeral (v+1)) u W =eq W)) :
+    ∀ (ts : List Term), liftTerms (v+2) ts = ts →
+      ∀ u, Prf (substtsc (numeral (v+1)) u (substCodeTs v W ts) =eq substCodeTs v W ts)
+  | [], _, u => by
+      show Prf (substtsc (numeral (v+1)) u nil =eq nil)
+      exact prf_substtsc_nil (numeral (v+1)) u
+  | t :: ts, hfv, u => by
+      have hall := hfv
+      simp only [liftTerms, List.cons.injEq] at hall
+      show Prf (substtsc (numeral (v+1)) u (cons (substCodeT v W t) (substCodeTs v W ts))
+        =eq cons (substCodeT v W t) (substCodeTs v W ts))
+      refine prf_eq_trans (prf_substtsc_cons (numeral (v+1)) u _ _) ?_
+      exact prf_eq_trans (prf_congr_cons_head (substtc_inv_substCodeT v W hW t hall.1 u))
+        (prf_congr_cons_tail (substtc_inv_substCodeTs v W hW ts hall.2 u))
+
+end
+
+/-! ### ⚠️ POR QUÉ ESTO NO SUBE AL NIVEL FÓRMULA SIN MÁS, y qué haría falta
+
+El nivel fórmula funcionaría igual **salvo en los binders**. El caso
+
+    substCodeF v w (∀a) = cons 6̄ (cons (substCodeF (v+1) (liftc 0 w) a) nil)
+
+recursa con el testigo **`liftc 0 w`**, y la hipótesis de invariancia sobre `w` **no se
+transfiere** a `liftc 0 w`: haría falta darla ya cerrada bajo `liftc 0`, o sea para todos los
+lifts iterados `liftcⁿ w`. Con la hipótesis tal como está, la inducción no cierra ese caso.
+
+⭐ Y para los testigos REALES sí vale, porque son códigos punteados y **todos los `liftc`
+iterados COLAPSAN**: `prf_liftc_tcFn` da `liftc 0 ṫ ≐ ṫ`, y de ahí `substtc_inv_liftc_tcFn`
+(`Meta/D3InDotPrf.lean`). ⇒ la versión fórmula es alcanzable, pero pide la hipótesis en forma
+**iterada** (`∀ j, invariante (liftcⁿ W)`), no en la forma simple de arriba.
+
+Se deja medido en vez de descubrirlo dentro de una inducción de ocho casos. -/
+
 end ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 
 export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
@@ -243,4 +335,5 @@ export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
   prf_substtc_arith_open prf_substtsc_arith_open prf_substfc_arith_open
   substCodeT_termCode substCodeTs_termsCode
   substCodeT_closed substCodeTs_closed
+  substtc_inv_substCodeT substtc_inv_substCodeTs
 )
