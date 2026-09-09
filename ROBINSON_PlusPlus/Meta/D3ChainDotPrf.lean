@@ -2,6 +2,10 @@ import ROBINSON_PlusPlus.Meta.D3DottedPrf
 import ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 import ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 import ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
+-- ⚠️ Añadido con el puente de la cota (§4, 2026‑09‑09f): de aquí sale
+--    `PrfH_bdAllCode_congr_bnd`, que es el ÚNICO sitio donde el salto
+--    `(lenc p)˙ ↦ lencT ṗ` es legal — dentro de `Prov`. Sin ciclo.
+import ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 /-!
 # `Meta/D3ChainDotPrf.lean` — el CHASIS de `hC_dot`, y el puente ÁTOMO ↔ FORMA ACOTADA
 
@@ -63,6 +67,7 @@ open ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf ROBINSON_PlusPlus.Meta.BdAllIntroP
 open ROBINSON_PlusPlus.Meta.D3DottedPrf ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 open ROBINSON_PlusPlus.Meta.EvalBoundedPrf ROBINSON_PlusPlus.Meta.EvalListPrf
+open ROBINSON_PlusPlus.Meta.TrackedAtomsPrf ROBINSON_PlusPlus.Meta.EvalArithPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -194,6 +199,84 @@ theorem chainOkBDot_computed :
 reflectores sigue sin poder producir el teorema — lo que sí se puede hacer, y es lo que hace
 esta sección, es **fijar el destino** para que cuando (a) llegue no haya que redescubrirlo. -/
 
+
+/-! ## §4 · EL PUENTE DE LA COTA (2026‑09‑09f)
+
+§3 midió el hueco: `pcc_bdAll_intro` entrega la cota como **reflexión pura** `(lenc p)˙`, y el
+destino la pide como **accesor dotado pre‑`liftc`‑ado** `lencT (liftc 0 ṗ)`.
+
+⚠️ **Y ese salto NO se puede dar fuera de `Prov`.** `(lenc p)˙` es el código del término
+`lenc p`; `lencT ṗ` es el constructor de código aplicado a `ṗ`. Que sean iguales es
+exactamente la ecuación de RASTREO, y postularla a nivel objeto es lo que hizo la teoría
+inconsistente (ADR‑012/013, `ax_tc_cons`). Lo que sí vale es la **evaluación provable**:
+`pcc_eval_lenc` da `Prov(⌜lencT L̇ = (lenc L)˙⌝)`, y el cambio de cota se hace **dentro** de
+`Prov` con `PrfH_bdAllCode_congr_bnd` (`Meta/TrackedAtomsPrf.lean`), que existe y es genérico.
+
+⭐ Es el mismo gesto que `pcc_argsIn_trackedC` y `pcc_wfAll1_trackedC` hacen con sus listas
+(`HasWitTrackedPrf` §8 y §10). Aquí sólo se instancia. -/
+
+/-- El `liftc zero` de la cota del destino **se colapsa**: `ṗ` es un código dotado. -/
+theorem chainOkB_bnd_liftc (p : Term) :
+    Prf (lencT (liftc zero (tcFn p)) =eq lencT (tcFn p)) :=
+  prf_congr_lencT (prf_liftc_tcFn p)
+
+/-- ⭐⭐ **EL PUENTE DE LA COTA.** De la forma que `pcc_bdAll_intro` produce —cota en reflexión
+    pura— a la que el destino impone —accesor dotado—, **dentro de `Prov`**.
+
+    La única obligación que traslada es `hPinv`: que el cuerpo sea invariante bajo `substfc` de
+    NIVEL 1. Es la misma que pide `hPinv_wfAll1Psi`, y se paga recorriendo el cuerpo: el nivel
+    exterior 1 no toca nada porque los códigos dotados (`ṗ`, `tcFn …`) son `substtc`‑invariantes
+    y los huecos vivos están en `⌜v₀⌝` (nivel 0) y, bajo el binder interno, en `⌜v₀⌝`/`⌜v₁⌝`. -/
+theorem PrfH_chainOkB_bnd_bridge {Γ : List Formula} (p Phic : Term)
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
+    (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
+    (h : PrfH Γ (provFromCode (bdAllCode (tcFn (lenc p)) Phic))) :
+    PrfH Γ (provFromCode (bdAllCode (lencT (liftc zero (tcFn p))) Phic)) := by
+  -- (1) primero al accesor SIN `liftc`, que es donde `pcc_eval_lenc` aterriza
+  have hstep : PrfH Γ (provFromCode (bdAllCode (lencT (tcFn p)) Phic)) := by
+    refine PrfH_bdAllCode_congr_bnd (tcFn (lenc p)) (lencT (tcFn p)) Phic hPinv
+      (prf_liftc_tcFn (lenc p)) ?_ ?_ h (by hw_auto) (by hw_auto) hwP
+    · exact prf_eq_trans (prf_liftc_lencT zero (tcFn p)) (prf_congr_lencT (prf_liftc_tcFn p))
+    · -- `Prov(⌜(lenc p)˙ = lencT ṗ⌝)` — es `pcc_eval_lenc` al revés
+      refine prf_to_prfH ?_ _
+      -- `pcc_eval_lenc` da `Prov(⌈lencT L̇ = (lenc L)˙⌉); la cota la pide al revés.
+      exact pcc_mp_code_apply
+        (pcc_eq_symm_code_internal (lencT (tcFn p)) (tcFn (lenc p))
+          (substtc_inv_lencT (substtc_inv_tcFn p)) (by hw_auto) (by hw_auto))
+        (pcc_eval_lenc p)
+  -- (2) y de ahí a la forma pre‑`liftc`‑ada del destino, que es congruencia META
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_congr_bdAllCode (prf_eq_symm (chainOkB_bnd_liftc p)) (prf_refl Phic))) _) hstep
+
+/-- ⭐⭐⭐ **`DEUDA_chainOkBDot` REDUCIDA A `hbody`** (y a la invariancia del cuerpo).
+
+    Con esto, D3 queda a **una sola** obligación con enunciado explícito: producir la reflexión
+    del cuerpo `lineOkB nil p i`. Todo lo demás —el puente átomo↔acotada de §1, la apertura del
+    destino de §3, y el puente de la cota de §4— está probado. -/
+theorem DEUDA_chainOkBDot_of (Phic : Term)
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
+    (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
+    (hmatch : Prf (bdAllCode (lencT (liftc zero (tcFn (.var 0)))) Phic =eq chainOkBDot))
+    (hbdAll : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0))) Phic))) :
+    DEUDA_chainOkBDot := by
+  refine prf_deduction ?_
+  have h : PrfH [chainOk nil (.var 0)]
+      (provFromCode (bdAllCode (tcFn (lenc (.var 0))) Phic)) :=
+    PrfH.mp _ _ _ (prf_to_prfH hbdAll _) (prfH_hyp_self _)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr hmatch) _)
+    (PrfH_chainOkB_bnd_bridge (.var 0) Phic hPinv hwP h)
+
+/-- Y **D3 entera**, a partir de lo mismo. -/
+theorem d3_prf_of (φ : Formula) (Phic : Term)
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
+    (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
+    (hmatch : Prf (bdAllCode (lencT (liftc zero (tcFn (.var 0)))) Phic =eq chainOkBDot))
+    (hbdAll : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0))) Phic))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of Phic hPinv hwP hmatch hbdAll)
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -205,6 +288,7 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   chainOkBDot prf_forall_chainOkB_imp_chainOk pcc_chainOkBDot_imp_chainOkDot
   hC_dot_of_chainOkBDot DEUDA_chainOkBDot d3_prf_of_chainOkBDot
   chainOkBDot_eq_substCodeF chainOkBDot_computed
+  chainOkB_bnd_liftc PrfH_chainOkB_bnd_bridge DEUDA_chainOkBDot_of d3_prf_of
 )
 
 /-! ## FOOTPRINT -/
@@ -212,3 +296,6 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_chainOkBDot_imp_chainOkDot
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hC_dot_of_chainOkBDot
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_chainOkBDot
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.PrfH_chainOkB_bnd_bridge
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of
