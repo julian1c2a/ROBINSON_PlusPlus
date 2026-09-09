@@ -85,8 +85,10 @@ open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf ROBINSON_PlusPlus.Meta.TrackedCorePr
 open ROBINSON_PlusPlus.Meta.LineWFTrackedPrf ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 
 /-! ⚠️ `open` **SELECTIVO**: se toma de `CodeWitnessPrf.SinWTs` **solo** lo que este modulo
-    consume. Abrirlo entero traeria `SinWTs.prf_congr_liftc (v : Term) …`, que es AMBIGUO con
-    `NumCodeClosedPrf.prf_congr_liftc {c : Term} …`, usado aqui en `refl_caso_varc`. -/
+    consume. (Hasta B8b el motivo era otro: abrirlo entero traia `SinWTs.prf_congr_liftc
+    (v : Term) …`, AMBIGUO con `NumCodeClosedPrf.prf_congr_liftc {c : Term} …`. Ese duplicado
+    ya no existe — se borro por no tener consumidores —, pero el `open` sigue siendo selectivo
+    porque un `open` entero de un modulo de 2 200 lineas no es una dependencia declarada.) -/
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
   (shapeUn shapeBin argsIn argsInBody isTermCodeE1 impT prf_or_elim_imp)
 

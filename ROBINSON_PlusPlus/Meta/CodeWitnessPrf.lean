@@ -106,16 +106,18 @@ theorem prf_congr_lenc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (lenc 
     ((hS t₂) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h [])
       ((hS t₁) ▸ prf_to_prfH (prf_refl (lenc t₁)) [])) rfl
 
-theorem prf_congr_liftc {t₁ t₂ : Term} (v : Term) (h : Prf (t₁ =eq t₂)) :
-    Prf (liftc v t₁ =eq liftc v t₂) := by
-  let f : Formula := Formula.eq (liftc (liftTerm 0 v) (liftTerm 0 t₁))
-                                (liftc (liftTerm 0 v) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftc v t₁) (liftc v s) := by
-    intro s
-    simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact prfH_nil_to_prf
-    ((hS t₂) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h [])
-      ((hS t₁) ▸ prf_to_prfH (prf_refl (liftc v t₁)) [])) rfl
+/-! ⛔ **B8b, SALDADA**: aquí hubo un `prf_congr_liftc (v : Term) (h : …)` — la MISMA
+congruencia que `Meta/NumCodeClosedPrf.lean:53`, con el nivel EXPLÍCITO en vez de implícito.
+Los dos módulos son INDEPENDIENTES (ninguno importa al otro), así que el duplicado no rompió
+nada: sólo hacía AMBIGUO el nombre en todo módulo que abriera los dos, y obligó a
+`Meta/LiftcCodePrf.lean` a un `open` selectivo.
+
+La medición que lo desempata: **el de aquí no tenía NI UN consumidor** — los ~25 usos del
+árbol pasan **un** argumento explícito y son todos el de `NumCodeClosedPrf`. Estaba en el
+`export` por EXISTENCIA, no por consumo (AI‑GUIDE §17). Se borra el de aquí.
+
+⚠️ No re‑añadirlo: si un consumidor de este módulo lo necesita, `NumCodeClosedPrf` está
+aguas abajo y hay que **bajar el general**, no duplicar (ADR‑019). -/
 
 theorem prf_congr_liftsc {t₁ t₂ : Term} (v : Term) (h : Prf (t₁ =eq t₂)) :
     Prf (liftsc v t₁ =eq liftsc v t₂) := by
@@ -2176,7 +2178,7 @@ end ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 export ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs (
   argsIn argsInBody closed_mem_tcodes1 consOk crit_junk_var0_witness1 impT isTC1 isTermCodeE1
   liftF_argsIn liftF_isTermCodeE1 liftF_wfAll1 liftTerm_objList mem_tcodes1s_of_mem
-  prf_argsIn_head prf_argsIn_of_closed prf_argsIn_tail prf_congr_In_left prf_congr_liftc
+  prf_argsIn_head prf_argsIn_of_closed prf_argsIn_tail prf_congr_In_left
   prf_consOk_cons prf_In_objList prf_isTC1_tcodes prf_isTermCodeE1_of_boundedIn
   prf_isTermCodeE1_of_In prf_lenc_termsCodeM prf_nthc_termsCodeM prf_or_elim_imp prf_orL
   prf_orR PrfH_congr_argsIn PrfH_congr_In_left PrfH_congr_lenc PrfH_congr_liftc

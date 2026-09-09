@@ -183,9 +183,11 @@ open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.LiftcCodePrf
 open ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 
 /-! ⚠️ `SinWTs` entero: es de donde sale TODO el vocabulario del testigo (`isTC1`, `wfAll1`,
-    `argsIn`, `isTermCodeE1`, `consOk`, `tcodes1`, los `crit_*`). Su `prf_congr_liftc` es
-    AMBIGUO con `NumCodeClosedPrf.prf_congr_liftc`, pero este modulo NO usa ese nombre
-    (la ambiguedad de `open` en Lean 4 es perezosa: solo rompe en el punto de uso).
+    `argsIn`, `isTermCodeE1`, `consOk`, `tcodes1`, los `crit_*`).
+    (Hasta B8b `SinWTs` traia ademas un `prf_congr_liftc` AMBIGUO con el de
+    `NumCodeClosedPrf`; era inocuo aqui porque este modulo no usa ese nombre — la ambiguedad
+    de `open` en Lean 4 es perezosa, solo rompe en el punto de uso. Ese duplicado ya no
+    existe.)
 
     ⚠️ De `ENS`, en cambio, `open` **SELECTIVO**: `ENS` reprueba `liftF_argsIn`,
     `substF_argsIn`, `liftF_isTermCodeE1`, `substF_isTermCodeE1` y `liftF_wfAll1`, que ya
