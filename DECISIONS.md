@@ -1,13 +1,13 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
+> ## ESTADO REAL — 2026-09-09 · rama A cerrada · **A5 y B8b cerradas** · C3: **5 de 7** reflectores · D3 a **DOS** obligaciones
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **Build 135 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
@@ -44,14 +44,25 @@ Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada doc
 
 ---
 
-## ⚠️ MANDATORIES (reglas vinculantes de este proyecto)
+## ⚠️ MANDATORIES (reglas vinculantes de este proyecto — lectura obligatoria)
 
-**Sin MANDATORIES explícitas más allá de la disciplina documentada en ADR-010/011**:
-este proyecto no prohíbe `Classical.*` (2 usos verificados en 2026-07-12), pero sí
-mantiene una disciplina activa de **cero axiomas espurios**: cualquier `axiom`
-declarado debe justificarse con un ADR propio (ver ADR-010/011 como ejemplo) o
-eliminarse. El episodio histórico "F7a" (retirada de 7 postulados legacy, documentado
-en `CHANGELOG.md`) es la aplicación práctica de esta disciplina.
+**Cada MANDATORY lleva su columna «Verificación»** — una MANDATORY sin verificación
+mecánica es una intención, no una regla. Esta tabla recoge reglas **ya vigentes** en el
+proyecto; no introduce ninguna nueva.
+
+| # | MANDATORY | ADR | Verificación |
+|---|---|---|---|
+| **M-1** | ⛔ **Ningún `axiom` nuevo —de Lean o de la teoría objeto— sin sanción explícita del autor y su ADR.** Un axioma sin ADR ya hizo **inconsistente** la teoría objeto | ADR-010/011/012/013 | `AXIOMS.md` (inventario) · `check-doc-sync.bash` [A] contrasta la cifra «N `axiom` de Lean» con `grep '^axiom '` · `#print axioms` en cada frente |
+| **M-2** | ⛔ **Las imágenes punteadas (`substfcT`, `substtcT`, `liftcT`, `liftfcT`, `predcT`) son DEFINICIONES, jamás axiomas.** Postular la ecuación de rastreo (`ax_tc_substfc`, `ax_tc_cons`) da `axioms ⊢ ⊥`; los puentes se escriben `:= rfl` y el salto sólo vale **dentro de `Prov`** | ADR-012/013/015 | `grep -rn '^axiom ax_tc_' ROBINSON_PlusPlus/` debe dar **0** |
+| **M-3** | ⛔ **NUNCA `cd FOL && lake build`.** `FOL` es dependencia LOCAL (`require FOL from "../FOL"`) y compilarla desde su propio directorio usa **otro toolchain**. Todo se compila desde la raíz de `ROBINSON_PlusPlus` | — | `update-toolchain.bash` compila desde la raíz; el `lakefile.lean` es la única fuente del target |
+| **M-4** | **Cero `sorry` en el árbol activo.** No se «aparca» una prueba con `sorry`: o entra probada, o se queda en `sondeos/` | — | `bash check-sorry.bash` → `✅ No sorry found.` (cuenta el TOKEN, fuera de comentarios y cadenas; AI-GUIDE §27.1) |
+| **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
+| **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
+
+> **Sobre `Classical.*`**: este proyecto **no** lo prohíbe (2 usos verificados el
+> 2026-07-12). Lo que sí mantiene es la disciplina de **cero axiomas espurios** de M-1.
+> El episodio «F7a» (retirada de 7 postulados legacy, en `CHANGELOG.md`) es su
+> aplicación práctica. ⚠️ **No revertir F7a**: fue un arreglo de solidez.
 
 ---
 
@@ -132,6 +143,39 @@ namespaces.
 
 **Consecuencias**: `new-module.bash` debe soportar creación en subdirectorios;
 `gen-root.bash` debe escanear recursivamente.
+
+### Addendum 2026-09-09 — medido, y por qué aquí NO se cambia la regla
+
+Los proyectos hermanos **corrigieron ADR-005 a «namespace plano por fichero»** el
+2026-07-12 (`lean4-project-template` 76eb5b8), tras auditar Peano y descubrir que
+**ningún** fichero de producción seguía el mirroring que la regla mandaba: la práctica
+real era `Project.<Concepto>`, un nivel. ⚠️ **Esa corrección NO se propaga a
+ROBINSON_PlusPlus**, y la razón es una medición, no una preferencia:
+
+    122 ficheros de `ROBINSON_PlusPlus/` · 109 con `namespace` = ruta exacta
+
+Aquí el mirroring **sí se sigue**, así que la regla se queda como está. Las 13
+excepciones, todas identificadas:
+
+| excepción | veredicto |
+|---|---|
+| `ROBINSON_PlusPlus/Meta.lean` — sin `namespace` | ✅ legítima: es fichero **barril**, sólo `import`s |
+| `Meta/LineWFDerives.lean` → `…Meta.ProofChain` | ✅ deliberada: reapertura de namespace para que las referencias cualificadas sigan resolviendo tras el dedup de ADR-019 |
+| **los 11 módulos de `Full/`** — todos comparten `ROBINSON_PlusPlus.Full` | ⚠️ **deuda registrada** |
+
+⚠️ **La deuda de `Full/` es exactamente la violación que la auditoría de Peano
+encontró** (allí, 16 ficheros de `GroupTheory/` compartiendo namespace entre sí), y la
+regla derivada que los hermanos adoptaron aplica igual aquí:
+
+> **Un namespace, un fichero — nunca compartido.** Que dos ficheros «traten del mismo
+> tema» no autoriza a fusionar sus declaraciones en un namespace común: oculta qué
+> fichero define qué símbolo y arrastra colisiones de nombre.
+
+No se toca ahora: renombrar el namespace de los 11 módulos de `Full/` es un refactor de
+radio amplio sobre una capa estable y **fuera de la ruta crítica** (Gödel vive en
+`Meta/`). Queda **anotada** para cuando se toque esa capa. El grano más fino dentro de
+un fichero (sub-namespaces para sub-conceptos, como `CTree`, `ENS`, `HW` en `Meta/`)
+sigue siendo legítimo si se documenta localmente.
 
 ---
 

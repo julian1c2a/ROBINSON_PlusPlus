@@ -1,13 +1,13 @@
 # Frente Gödel — Estado y Roadmap
 
-> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
+> ## ESTADO REAL — 2026-09-09 · rama A cerrada · **A5 y B8b cerradas** · C3: **5 de 7** reflectores · D3 a **DOS** obligaciones
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **Build 135 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >

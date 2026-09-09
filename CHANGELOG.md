@@ -1,6 +1,6 @@
 # Changelog
 
-> ## ⚠️ ESTADO REAL — auditoría 2026-08-21 12:00
+> ## ⚠️ ESTADO REAL — auditoría 2026-09-09 23:30
 >
 > **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
@@ -11,10 +11,73 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **21 módulos en `cuarentena/`** (D3 y Gödel II fuera de la cadena activa). NO borrados.
+> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** **124 jobs**, 0 errores, 0 warnings, 0 sorrys (2026‑09‑05).
+> **Último build verificado:** **135 jobs**, **121 módulos**, 0 errores, 0 warnings, **0 `sorry`** (2026‑09‑09).
+
+---
+
+## 2026-09-09 — 🔧 **Unificación con `lean4-project-template`: la CI no arrancaba y tres controles no comprobaban nada**
+
+Sin tocar ni un `.lean`. Se trae de la plantilla lo que arreglaba su workflow, y al probarlo
+aquí aparecen tres fallos propios más. Proyectado en **AI-GUIDE §27.1**.
+
+### ⛔ La CI no ha arrancado NUNCA
+
+`.github/workflows/build.yml` tenía
+
+```yaml
+run: elan toolchain install $(cat lean-toolchain | cut -d: -f2)
+```
+
+y `-d: ` son dos puntos seguidos de espacio dentro de un escalar sin comillas: YAML lo lee como
+un **mapa** y falla con «mapping values are not allowed here» **antes de ejecutar nada** — 0 s y
+«workflow file issue». Verificado con un parser: el escalar viejo no parsea, el de bloque sí.
+Se pasa a `run: |`.
+
+➕ `.gitattributes` nuevo, forzando `*.bash`, `*.yml` y `*.py` a **LF**: con `core.autocrlf`
+activo en Windows un re-clone los convierte a CRLF y fallan en el runner con
+«`$'': command not found`». Cinco ficheros estaban ya en CRLF y se renormalizan.
+
+### 🔧 Tres controles que daban verde sin comprobar
+
+| control | mentía porque | ahora |
+|---|---|---|
+| `check-sorry.bash` | `grep -c 'sorry'` contaba las menciones **en prosa**: **«101 sorry en 87 ficheros»** donde hay **0** | elimina comentarios de Lean (`--`, `/- … -/` **anidados**, docstrings) y literales de cadena **antes** de buscar, con un despojador `awk`; los números de línea siguen siendo los del original |
+| `check-doc-sync.bash` [A] con `lake` fuera del PATH de Bash | `JOBS` vacío ⇒ el control de jobs **se saltaba en silencio** | distingue «no lo pedí» (`--quick`) de «no pude medirlo», y lo segundo **avisa** |
+| `check-doc-sync.bash` lanzado desde **PowerShell** | `bash` hereda el PATH de Windows y `head`/`grep` resuelven a binarios **ajenos** (el HEAD de **Quantum ESPRESSO** en `ucrt64`): los **cuatro** controles `[A]` salían **VACÍOS** | **PATH higiénico** (`/usr/bin` primero) en todos los `.bash` |
+
+➕ `bc` tampoco existe (ni en Git Bash ni en el runner): el conteo de `axiom` salía **vacío**.
+Ahora se cuenta con `wc -l`.
+➕ ⭐ **`check_num` avisa `control VACÍO`** cuando su patrón no aparece en ningún doc: un patrón
+que no encuentra su frase **no está comprobando nada**, y dar verde por eso es el peor resultado
+posible. Es la aportación de la plantilla que más ha rendido.
+➕ El conteo de `sorry` de `check-doc-sync.bash` **delega en `check-sorry.bash`** en vez de
+reimplementarlo: la definición de «qué es un `sorry`» vive en **un** sitio.
+➕ [A] gana dos cifras: **`axiom` de Lean** y **`sorry`**.
+
+### 📄 Lo que el control reparado encontró en el primer intento
+
+**Siete documentos autoritativos** con la cifra de jobs obsoleta —`REFERENCE.md`,
+`DEPENDENCIES.md`, `DECISIONS.md`, `README.md`, `AXIOMS.md`, `GODEL-STATUS.md` decían
+**124 jobs**; `CURRENT-STATUS-PROJECT.md`, **132**— frente a **135** reales. Corregidos, junto
+con `57 sondeos/` → 60 y la fila «Build status» del **cuerpo** de `CURRENT-STATUS-PROJECT.md`.
+
+### 📐 Lo demás que se unificó
+
+* **`DECISIONS.md` §MANDATORIES**: pasa de «sin MANDATORIES explícitas» a **tabla de seis** con
+  columna **«Verificación»** — *una MANDATORY sin verificación mecánica es una intención, no una
+  regla*. Recoge reglas **ya vigentes**, no introduce ninguna.
+* **`AI-GUIDE.md`**: banner de lectura obligatoria de `DECISIONS.md` §MANDATORIES antes de tocar
+  cualquier `.lean`, y **§27.1** con las tres reglas de arriba.
+* **`update-toolchain.bash`**: `--check`, consulta de la última estable y reversión automática si
+  el build falla. Informa: hoy hay **v4.33.1** frente a la v4.31.0 en uso.
+* **`Makefile`**: `VERSION` deja de ser obligatorio en `make update-toolchain`.
+* **ADR-005 · addendum**: los hermanos corrigieron la regla a «namespace plano» tras auditar que
+  nadie seguía el mirroring. ⚠️ **Aquí no se propaga**, y es una medición: **109 de 122** módulos
+  espejan la ruta. Sí se registra la deuda que sale de esa misma auditoría — **los 11 módulos de
+  `Full/` comparten `ROBINSON_PlusPlus.Full`**, que es «un namespace, un fichero» violado.
 
 ---
 

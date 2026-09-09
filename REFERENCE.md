@@ -1,10 +1,10 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-05 · rama A cerrada · PROMOCIÓN: B0–B2 hechas · **B3 EN CURSO** (SubstfcPlanos cerrado; EvalSubsttc medido)
+> ## ESTADO REAL — 2026-09-09 · rama A cerrada · **A5 y B8b cerradas** · C3: **5 de 7** reflectores · D3 a **DOS** obligaciones
 >
-> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **Build 135 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 57 en `sondeos/`** (experimentos compilados, fuera del build).
+> **+ 60 en `sondeos/`** (experimentos compilados, fuera del build).
 > **7 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
@@ -288,7 +288,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-08-31.** Build **124 jobs**, **106 módulos activos**, **57 `sondeos/`**, 0 sorrys,
+**Estado 2026-09-09.** Build **135 jobs**, **121 módulos activos**, **60 `sondeos/`**, 0 sorrys,
 7 `axiom` de Lean.
 
 ### Lo que está cerrado

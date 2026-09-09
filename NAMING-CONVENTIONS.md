@@ -9,7 +9,7 @@
 > La prosa de este documento (explicaciones, motivación) va en español para que quede
 > clara sin ambigüedad.
 
-**Última actualización:** 2026-07-12
+**Última actualización:** 2026-09-09
 **Autor**: Julián Calderón Almendros
 
 ---
@@ -272,6 +272,19 @@ predecible.
 - Cerrar siempre el namespace explícitamente (`end MiNamespace`) para evitar
   confusiones de alcance.
 - Los bloques `variable` se declaran justo después de abrir el namespace.
+- **Namespace = ruta del fichero** (`DECISIONS.md` ADR-005):
+  `Meta/ArithPrf.lean` → `namespace ROBINSON_PlusPlus.Meta.ArithPrf`. Aquí el mirroring
+  **sí se sigue** —109 de 122 módulos, medido el 2026-09-09—, y por eso ROBINSON_PlusPlus
+  **no** adopta la regla «namespace plano» que los proyectos hermanos corrigieron en su
+  ADR-005: allí nadie seguía el mirroring, aquí sí. Ver el addendum de ADR-005.
+- ⚠️ **Un namespace, un fichero — nunca compartido.** Que dos ficheros «traten del mismo
+  tema» no autoriza a fusionar sus declaraciones en un namespace común: oculta qué fichero
+  define qué símbolo y arrastra colisiones de nombre —justo el tipo de trampa de §3.52,
+  donde dos homónimos legítimos convivían porque *la ambigüedad de `open` en Lean es
+  perezosa*—. Deuda registrada: los **11 módulos de `Full/`** comparten
+  `ROBINSON_PlusPlus.Full`.
+- **Sub-namespaces dentro de un fichero, permitidos** para sub-conceptos (`CTree`, `ENS`,
+  `HW` en `Meta/`), siempre que se documenten localmente.
 
 ---
 

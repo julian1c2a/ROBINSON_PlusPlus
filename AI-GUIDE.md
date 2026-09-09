@@ -1,6 +1,6 @@
 # Guía Maestra de la IA — Estándares de Documentación y Desarrollo
 
-**Última actualización:** 2026-08-23 (§27, control de sincronía doc↔código)
+**Última actualización:** 2026-09-09 (§27.1, «un control que no comprueba nada»; banner de MANDATORIES)
 **Autor:** Julián Calderón Almendros
 
 > Este documento define lo **universal**: aplica a cualquier proyecto Lean 4 que nazca
@@ -14,6 +14,16 @@ protocolo de documentación del proyecto, las convenciones de nomenclatura (por
 referencia a `NAMING-CONVENTIONS.md`), la política de bloqueo de archivos, el formato
 de código y los comandos interactivos disponibles. **Léelo completamente antes de
 modificar cualquier archivo `.lean` o de documentación.**
+
+> ## 🚨 LECTURA OBLIGATORIA — `DECISIONS.md` (MANDATORIES del proyecto)
+>
+> **ANTES de escribir o modificar CUALQUIER `.lean`, es OBLIGATORIO leer
+> [`DECISIONS.md` §MANDATORIES](DECISIONS.md).** Son las reglas vinculantes de ESTE
+> proyecto, y varias de ellas no se deducen leyendo el código: violarlas ha llegado a
+> hacer **inconsistente la teoría objeto** (ADR-012/013).
+>
+> Cada MANDATORY lleva su columna **«Verificación»**: una MANDATORY sin verificación
+> mecánica es una intención, no una regla.
 
 ---
 
@@ -348,7 +358,7 @@ make docsync                        # equivalente
 
 | | control | ¿rompe? |
 |---|---|---|
-| **[A]** | **cifras**: jobs, módulos activos, conteo por capa, cuarentena — contra el estado REAL | ✅ sí |
+| **[A]** | **cifras**: jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean y `sorry` — contra el estado REAL. Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
 | **[B]** | **símbolos muertos** citados como vigentes en los docs autoritativos | ⚠️ aviso |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
 | **[D]** | **marcas de tiempo** (§22) presentes en los docs técnicos | ✅ sí |
@@ -362,6 +372,41 @@ menciona como historia/objetivo (→ añadir un marcador: «retirado», «falta�
 ⚠️ **Y la regla de oro que ningún script sustituye: NO basta con arreglar el banner.** Al corregir,
 recorrer también las tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría
 antiguas.
+
+#### (27.1) ⛔ El fallo peor no es el control que falla: es **el que no comprueba nada y da verde**
+
+El 2026-09-09, al unificar con `lean4-project-template`, se descubrió que este mismo script
+llevaba tiempo dando `✅ DOCUMENTACIÓN SINCRONIZADA` **sin haber comprobado casi nada**. Tres
+causas independientes, las tres silenciosas:
+
+| # | causa | efecto | arreglo |
+|---|---|---|---|
+| 1 | `lake` **no está en el PATH de Git Bash** | `JOBS` vacío ⇒ el control de jobs se **saltaba** | se distingue «no lo pedí» (`--quick`) de «no pude medirlo», y lo segundo **avisa** |
+| 2 | `bc` **no está instalado** (ni en Git Bash ni en el runner) | `AXIOMS` salía **vacío** | se cuenta con `wc -l`, sin dependencias |
+| 3 | lanzado desde **PowerShell**, `bash` hereda el PATH de Windows y `head`/`grep` resuelven a binarios **ajenos** (aquí, el HEAD de Quantum ESPRESSO en `ucrt64`) | los **cuatro** controles `[A]` salían **VACÍOS** | **PATH higiénico**: los `.bash` anteponen `/usr/bin` |
+
+⇒ Tres reglas que salen de ahí, y que valen para cualquier control futuro:
+
+1. ⭐ **Un patrón que no encuentra su frase en ninguna parte NO está comprobando nada.** `check_num`
+   avisa ahora explícitamente: `control VACÍO`. Un control silencioso es peor que ninguno, porque
+   se cobra la confianza sin dar nada a cambio.
+2. ⭐ **Todo script `.bash` del proyecto antepone `/usr/bin` al PATH.** No es paranoia: está medido.
+3. ⭐ **Una herramienta que miente se arregla; la cifra, nunca.** `check-sorry.bash` daba
+   «101 sorry en 87 ficheros» donde hay **0**: contaba las menciones en prosa (`cero \`sorry\``)
+   de los docstrings. Ahora **elimina comentarios y literales de cadena antes de buscar**, y el
+   conteo de `sorry` de `check-doc-sync.bash` **delega en él** en vez de reimplementarlo — tener la
+   definición de «qué es un `sorry`» en dos sitios garantiza que se separen.
+
+La primera vez que el control [A] funcionó de verdad encontró, en el mismo segundo, **siete
+documentos autoritativos** con la cifra de jobs obsoleta (124 y 132 frente a 135 reales).
+
+⚠️ **Y la CI llevaba desde siempre sin arrancar**: `.github/workflows/build.yml` tenía
+`run: elan toolchain install $(cat lean-toolchain | cut -d: -f2)` en una sola línea, y `-d: ` son
+dos puntos seguidos de espacio dentro de un escalar sin comillas: YAML lo lee como un mapa y falla
+con «mapping values are not allowed here» **antes de ejecutar nada** (0 s, «workflow file issue»).
+Se pasa a escalar de bloque. `.gitattributes` fuerza además `*.bash`, `*.yml` y `*.py` a **LF**:
+con `core.autocrlf` activo en Windows, un re-clone los convierte a CRLF y fallan en el runner con
+«$'': command not found».
 
 ### (22.) Marcas de tiempo
 
