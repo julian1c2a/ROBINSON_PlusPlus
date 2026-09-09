@@ -388,6 +388,108 @@ theorem substtc_inv_substCodeTs_at (v : Nat) (W : Term)
         (prf_congr_cons_tail (substtc_inv_substCodeTs_at v W hW ts hall.2 u))
 end
 
+/-! ### §5 · LA TERCERA VARIANTE: nivel actuante **POR DEBAJO** del código (2026‑09‑10)
+
+Las dos de §4 actúan al nivel del propio `substCodeT` (`v`) o **uno por encima** (`v+1`).
+`pcc_bdAll_intro` pide además la obligación **`hPsiId`**, que actúa **POR DEBAJO**: nivel `v`
+sobre un código construido a `v+1`. Y por debajo el enunciado **cambia de carácter**.
+
+⛔ **Por qué no vale la misma prueba.** El caso `.var n` de `substCodeT` reparte según el nivel:
+
+    n = v+1  ↦ W                       (el hueco del testigo de código)
+    n < v+1  ↦ varc (numeral n)        (variable de código CERRADA)
+    n > v+1  ↦ varc (numeral (n-1))    (⚠️ DECREMENTADA)
+
+Actuando **al** nivel `v` (§4) las variables `< v` no se tocan y la `= v` es el hueco, así que la
+identidad sale con testigo **libre**. Actuando **por debajo** aparecen dos diferencias:
+
+1. ⚠️ **El testigo YA NO puede ser libre.** La casilla `n = v` es ahora una `varc (numeral v)`
+   corriente, y `substtc` la sustituye **por el testigo**. La identidad sólo vale si el testigo
+   **es esa misma variable** ⇒ la hipótesis `u ≐ varc v̄`. Se pide como igualdad OBJETO, no como
+   igualdad de Lean, porque bajo los binders lo que aparece es `liftc 0 u`, no la variable.
+2. ⚠️ **El hueco queda una unidad más arriba** (`v+1`), así que la condición de variables libres
+   sube a `liftTerm (v+2) t = t` — la misma que pide `substtc_inv_substCodeT`, no la de `_at`.
+
+⭐ Y hay una **tercera** cosa, que es la que hace que el índice `v+1` sea el único que funciona:
+si el código se construyera a `v+2` o más, entre el nivel actuante y el hueco quedarían variables
+`w` con `v < w < v+2`, que `substtc` **decrementaría** — y ahí el enunciado sería **falso**. La
+familia no admite un salto arbitrario: es exactamente «uno por debajo». -/
+
+/-- `liftc zero` sobre una variable de código **sube su índice**.
+    ⭐ Generaliza `prf_liftc_varc0` (`Meta/TrackedAtomsPrf.lean`), que pasa a ser su instancia
+    `v := 0` (ADR‑019: se baja el general, no se sube el corolario). -/
+theorem prf_liftc_varc_numeral (v : Nat) :
+    Prf (liftc zero (varc (numeral v)) =eq varc (numeral (v + 1))) :=
+  prf_mp (prf_liftc_var_ge zero (numeral v)) (prf_gnum_lt (Nat.zero_lt_succ v))
+
+mutual
+
+/-- **Nivel actuante `v`, código construido a `v+1`.** Ver §5 para las tres diferencias con `_at`.
+    ⚠️ El testigo **no es libre**: `hu : u ≐ varc v̄`. -/
+theorem substtc_id_substCodeT (v : Nat) (W : Term)
+    (hW : ∀ u, Prf (substtc (numeral v) u W =eq W)) :
+    ∀ (t : Term), liftTerm (v + 2) t = t →
+      ∀ u, Prf (u =eq varc (numeral v)) →
+        Prf (substtc (numeral v) u (substCodeT (v + 1) W t)
+          =eq substCodeT (v + 1) W t)
+  | .var n, hfv, u, hu => by
+      -- de `liftTerm (v+2) t = t` sale `n ≤ v+1`
+      have hn : Nat.le n (v + 1) := by
+        rcases Nat.lt_or_ge n (v + 2) with h | h
+        · exact Nat.le_of_lt_succ h
+        · have hne : ¬ (n < v + 2) := Nat.not_lt.mpr h
+          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          exact absurd hfv (Nat.succ_ne_self n)
+      rcases Nat.lt_or_ge n (v + 1) with hlt | hge
+      · -- n ≤ v : la casilla es una variable de código CERRADA
+        have hsub : substCodeT (v + 1) W (.var n) = varc (numeral n) := by
+          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+        rw [hsub]
+        rcases Nat.lt_or_ge n v with hlt2 | hge2
+        · -- n < v : `substtc` no la toca
+          exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+        · -- ⚠️ n = v : `substtc` la sustituye POR EL TESTIGO — aquí es donde `hu` paga
+          have hnv : n = v := by omega
+          subst hnv
+          exact prf_eq_trans
+            (prf_mp (prf_substtc_var_eq (numeral n) u (numeral n)) (prf_refl (numeral n))) hu
+      · -- n = v+1 : la casilla es el testigo de código `W`
+        have hnv : n = v + 1 := Nat.le_antisymm hn hge
+        subst hnv
+        have hsub : substCodeT (v + 1) W (.var (v + 1)) = W := by simp [substCodeT]
+        rw [hsub]; exact hW u
+  | .func sym ts, hfv, u, hu => by
+      have hall := hfv
+      simp only [liftTerm, Term.func.injEq, true_and] at hall
+      show Prf (substtc (numeral v) u (funcc (strCode sym) (substCodeTs (v + 1) W ts))
+        =eq funcc (strCode sym) (substCodeTs (v + 1) W ts))
+      refine prf_eq_trans (prf_substtc_func (numeral v) u _ _) ?_
+      unfold funcc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_id_substCodeTs v W hW ts hall u hu
+
+/-- La gemela sobre listas. -/
+theorem substtc_id_substCodeTs (v : Nat) (W : Term)
+    (hW : ∀ u, Prf (substtc (numeral v) u W =eq W)) :
+    ∀ (ts : List Term), liftTerms (v + 2) ts = ts →
+      ∀ u, Prf (u =eq varc (numeral v)) →
+        Prf (substtsc (numeral v) u (substCodeTs (v + 1) W ts)
+          =eq substCodeTs (v + 1) W ts)
+  | [], _, u, _ => by
+      show Prf (substtsc (numeral v) u nil =eq nil)
+      exact prf_substtsc_nil (numeral v) u
+  | t :: ts, hfv, u, hu => by
+      have hall := hfv
+      simp only [liftTerms, List.cons.injEq] at hall
+      show Prf (substtsc (numeral v) u (cons (substCodeT (v + 1) W t) (substCodeTs (v + 1) W ts))
+        =eq cons (substCodeT (v + 1) W t) (substCodeTs (v + 1) W ts))
+      refine prf_eq_trans (prf_substtsc_cons (numeral v) u _ _) ?_
+      exact prf_eq_trans
+        (prf_congr_cons_head (substtc_id_substCodeT v W hW t hall.1 u hu))
+        (prf_congr_cons_tail (substtc_id_substCodeTs v W hW ts hall.2 u hu))
+
+end
+
 end ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 
 export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
@@ -397,4 +499,5 @@ export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
   substCodeT_closed substCodeTs_closed
   substtc_inv_substCodeT substtc_inv_substCodeTs
   substtc_inv_substCodeT_at substtc_inv_substCodeTs_at
+  prf_liftc_varc_numeral substtc_id_substCodeT substtc_id_substCodeTs
 )

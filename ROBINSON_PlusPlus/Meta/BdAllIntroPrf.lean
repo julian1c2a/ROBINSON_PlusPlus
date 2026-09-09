@@ -581,6 +581,118 @@ theorem substfc_inv_substCodeF_at : ∀ (v : Nat) (W : Term),
       exact substfc_inv_substCodeF_at (v+1) (liftc zero W) hW' hL' a h1 (liftc zero u)
 
 
+/-! ### La TERCERA variante: nivel actuante **POR DEBAJO** — la obligación `hPsiId` (2026‑09‑10)
+
+`pcc_bdAll_intro` pide dos invariancias distintas del cuerpo y **no son la misma**:
+
+| obligación | nivel actuante | testigo | condición sobre `φ` |
+|---|---|---|---|
+| `hPinv` (de `PrfH_bdAllCode_congr_bnd`) | el del código, `v` | **libre** | `liftFormula (v+1) φ = φ` |
+| **`hPsiId`** | **`v`, sobre un código a `v+1`** | ⚠️ **fijo**: `≐ varc v̄` | `liftFormula (v+2) φ = φ` |
+
+⚠️ El testigo **deja de ser libre** por la razón que explica §5 de `Meta/SubstCodeOpenPrf.lean`:
+por debajo del hueco, la casilla `n = v` es una `varc v̄` corriente y `substtc` la sustituye **por
+el testigo**, así que la identidad sólo vale si el testigo **es esa misma variable**. Se pide como
+igualdad OBJETO (`Prf (u =eq varc v̄)`) y no como igualdad de Lean, precisamente para que la
+inducción atraviese los binders: allí lo que aparece es `liftc 0 u`, no la variable — y el puente
+es `prf_liftc_varc_numeral`.
+
+⭐ El resto es literalmente la inducción de arriba con los índices corridos: las dos hipótesis
+sobre `W` siguen siendo **cerradas bajo `liftc zero`** (`substCode_hyps_lift`), que es lo único
+que hacía falta.
+
+📖 **Y el testigo va como PARÁMETRO con su ecuación, no clavado.** Existe
+`prf_congr_substfc_arg2` (`Meta/ArithPrf.lean:59`) y se podría clavar el testigo a
+`varc v̄` transportando; **no se hace**, y la razón está escrita desde A5 en
+`doc/REFERENCE-Incompleteness.md` §3.50: *cuando un cuerpo bajo binder necesita el mismo
+parámetro a dos niveles, no lo escribas con `liftc` — parametrízalo por los dos*. Es la misma
+forma que ya tiene `prf_substfc_wfAll1Psi` (`Meta/HasWitTrackedPrf.lean`), y por la misma causa:
+bajo el binder aparece `liftc 0 u`, que **no es sintácticamente** la variable del nivel de
+arriba, y el puente hay que darlo igualmente. -/
+
+/-- ⭐⭐ **La que consume `hPsiId`**: nivel actuante `v` sobre un código construido a `v+1`. -/
+theorem substfc_id_substCodeF : ∀ (v : Nat) (W : Term),
+    (∀ (k : Nat) (u : Term), Prf (substtc (numeral k) u W =eq W)) →
+    Prf (liftc zero W =eq W) →
+    ∀ (φ : Formula), liftFormula (v + 2) φ = φ →
+      ∀ u, Prf (u =eq varc (numeral v)) →
+        Prf (substfc (numeral v) u (substCodeF (v + 1) W φ)
+          =eq substCodeF (v + 1) W φ)
+  | v, W, _, _, .bottom, _, u, _ => by
+      show Prf (substfc (numeral v) u botc =eq botc)
+      exact prf_substfc_bottom (numeral v) u
+  | v, W, hW, _, .atom P ts, hfv, u, hu => by
+      have hts : liftTerms (v + 2) ts = ts := by
+        simpa only [liftFormula, Formula.atom.injEq, true_and] using hfv
+      show Prf (substfc (numeral v) u (atomc (strCode P) (substCodeTs (v + 1) W ts))
+        =eq atomc (strCode P) (substCodeTs (v + 1) W ts))
+      refine prf_eq_trans (prf_substfc_atom (numeral v) u _ _) ?_
+      unfold atomc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_id_substCodeTs v W (hW v) ts hts u hu
+  | v, W, hW, _, .eq a b, hfv, u, hu => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.eq.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (eqCodeFn (substCodeT (v + 1) W a) (substCodeT (v + 1) W b))
+        =eq eqCodeFn (substCodeT (v + 1) W a) (substCodeT (v + 1) W b))
+      refine prf_eq_trans (prf_substfc_eq (numeral v) u _ _) ?_
+      exact prf_congr_eqCodeFn (substtc_id_substCodeT v W (hW v) a h1.1 u hu)
+        (substtc_id_substCodeT v W (hW v) b h1.2 u hu)
+  | v, W, hW, hL, .impl a b, hfv, u, hu => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.impl.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (implc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+        =eq implc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+      refine prf_eq_trans (prf_substfc_impl (numeral v) u _ _) ?_
+      exact prf_congr_implc (substfc_id_substCodeF v W hW hL a h1.1 u hu)
+        (substfc_id_substCodeF v W hW hL b h1.2 u hu)
+  | v, W, hW, hL, .and a b, hfv, u, hu => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.and.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (andc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+        =eq andc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+      refine prf_eq_trans (prf_substfc_and (numeral v) u _ _) ?_
+      exact prf_congr_andc (substfc_id_substCodeF v W hW hL a h1.1 u hu)
+        (substfc_id_substCodeF v W hW hL b h1.2 u hu)
+  | v, W, hW, hL, .or a b, hfv, u, hu => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.or.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (orc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+        =eq orc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+      refine prf_eq_trans (prf_substfc_or (numeral v) u _ _) ?_
+      exact prf_congr_orc (substfc_id_substCodeF v W hW hL a h1.1 u hu)
+        (substfc_id_substCodeF v W hW hL b h1.2 u hu)
+  | v, W, hW, hL, Formula.forall a, hfv, u, hu => by
+      have h1 : liftFormula (v + 3) a = a := by
+        simpa only [liftFormula, Formula.forall.injEq] using hfv
+      show Prf (substfc (numeral v) u (forallc (substCodeF (v + 2) (liftc zero W) a))
+        =eq forallc (substCodeF (v + 2) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_forall (numeral v) u _) ?_
+      unfold forallc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      -- ⭐ El testigo sube con el binder, y sigue siendo LA VARIABLE del nivel de arriba.
+      have hu' : Prf (liftc zero u =eq varc (numeral (v + 1))) :=
+        prf_eq_trans (prf_congr_liftc hu) (prf_liftc_varc_numeral v)
+      exact substfc_id_substCodeF (v + 1) (liftc zero W) hW' hL' a h1 (liftc zero u) hu'
+  | v, W, hW, hL, .ex a, hfv, u, hu => by
+      have h1 : liftFormula (v + 3) a = a := by
+        simpa only [liftFormula, Formula.ex.injEq] using hfv
+      show Prf (substfc (numeral v) u (exc (substCodeF (v + 2) (liftc zero W) a))
+        =eq exc (substCodeF (v + 2) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_ex (numeral v) u _) ?_
+      unfold exc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      have hu' : Prf (liftc zero u =eq varc (numeral (v + 1))) :=
+        prf_eq_trans (prf_congr_liftc hu) (prf_liftc_varc_numeral v)
+      exact substfc_id_substCodeF (v + 1) (liftc zero W) hW' hL' a h1 (liftc zero u) hu'
+
+
 end ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
@@ -590,4 +702,5 @@ export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
   PrfH_weaken_code PrfH_imp_trans_code PrfH_or_elim_imp_code PrfH_bdAll_step
   prf_lt_succ_self bdAllPred pcc_bdAll_intro
   substCode_hyps_lift substfc_inv_substCodeF substfc_inv_substCodeF_at
+  substfc_id_substCodeF
 )

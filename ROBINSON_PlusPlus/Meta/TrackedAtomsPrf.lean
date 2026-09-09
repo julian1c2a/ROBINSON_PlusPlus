@@ -198,9 +198,13 @@ constructores. Eso es este kit, y son cinco líneas por constructor.
 Los axiomas objeto ya estaban (`ax_liftc_var_ge`, `ax_liftc_func`, `ax_liftsc_nil/cons`); lo
 único que faltaba era componerlos. -/
 
-/-- `liftc 0 ⌜v₀⌝ = ⌜v₁⌝`: el desplazamiento del hueco al entrar en un binder. -/
+/-- `liftc 0 ⌜v₀⌝ = ⌜v₁⌝`: el desplazamiento del hueco al entrar en un binder.
+
+    ⚠️ **Instancia `v := 0`** de `prf_liftc_varc_numeral` (`Meta/SubstCodeOpenPrf.lean` §5),
+    la versión genérica bajada por ADR‑019 el 2026‑09‑10. Se conserva el nombre porque tiene
+    **tres consumidores**; lo que se retira es la derivación duplicada. -/
 theorem prf_liftc_varc0 : Prf (liftc zero (varc (numeral 0)) =eq varc (succ (numeral 0))) :=
-  prf_mp (prf_liftc_var_ge zero (numeral 0)) (prf_zero_lt_succ (numeral 0))
+  ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf.prf_liftc_varc_numeral 0
 
 /-- `liftc` atraviesa un constructor dotado UNARIO. -/
 theorem prf_liftc_funcc1 (c s a : Term) :
