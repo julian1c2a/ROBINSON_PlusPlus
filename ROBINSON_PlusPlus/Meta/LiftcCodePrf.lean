@@ -393,6 +393,128 @@ theorem pcc_liftc_var_ge_code (c n : Term) :
       (tcFn c) (tcFn n)
       (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 n)))
 
+/-! ### A5 · EL OBJETIVO A NIVEL ABIERTO, Y LA TRICOTOMÍA DEL `varc`
+
+⚠️ `targetLift`/`targetLiftsc` (arriba) tienen el nivel **clavado a `zero`**, y eso basta
+mientras el consumidor sea el sorte término: `liftc c (funcc s ts) = funcc s (liftsc c ts)` y
+`liftsc c (cons h t) = cons (liftc c h) (liftsc c t)` **no cambian el nivel**. Lo cambia el
+sorte FÓRMULA (`liftfc c (forallc a) = forallc (liftfc (σc) a)`), y por eso `pcc_eval_liftfc`
+obliga a abrirlo — es **A5** (§3.49.1).
+
+⭐ **Y por eso A5 es más barata de lo que parece**: en toda la recursión de término el nivel es
+un **parámetro inerte**. El único sitio donde de verdad interviene es el `varc`, y ahí lo que
+aparece es la **tricotomía**: a nivel `zero` sólo valía la rama `≥` (porque `n < 0` es falso),
+y al abrirlo hacen falta las dos. -/
+
+/-- El objetivo del sorte TÉRMINO, con el nivel `c` **abierto**. -/
+def targetLiftAt (c s : Term) : Formula :=
+  provFromCode (eqc (liftcT (tcFn c) (tcFn s)) (tcFn (liftc c s)))
+
+/-- El objetivo del sorte LISTA, con el nivel `c` **abierto**. -/
+def targetLiftscAt (c b : Term) : Formula :=
+  provFromCode (eqc (liftscT (tcFn c) (tcFn b)) (tcFn (liftsc c b)))
+
+theorem liftF_targetLiftAt (k : Nat) (c s : Term) :
+    liftFormula k (targetLiftAt c s) = targetLiftAt (liftTerm k c) (liftTerm k s) := by
+  simp only [targetLiftAt, liftFormula_provFromCode_open, eqc, liftcT, funcc, tcFn, liftc,
+    cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+
+theorem substF_targetLiftAt (k : Nat) (u c s : Term) :
+    substFormula k u (targetLiftAt c s)
+      = targetLiftAt (substTerm k u c) (substTerm k u s) := by
+  simp only [targetLiftAt, substFormula_provFromCode_open, eqc, liftcT, funcc, tcFn, liftc,
+    cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+
+theorem liftF_targetLiftscAt (k : Nat) (c b : Term) :
+    liftFormula k (targetLiftscAt c b) = targetLiftscAt (liftTerm k c) (liftTerm k b) := by
+  simp only [targetLiftscAt, liftFormula_provFromCode_open, eqc, liftscT, funcc, tcFn, liftsc,
+    cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_strCode]
+
+theorem substF_targetLiftscAt (k : Nat) (u c b : Term) :
+    substFormula k u (targetLiftscAt c b)
+      = targetLiftscAt (substTerm k u c) (substTerm k u b) := by
+  simp only [targetLiftscAt, substFormula_provFromCode_open, eqc, liftscT, funcc, tcFn, liftsc,
+    cons, nil, zero, succ, substTerm, substTerms, substTerm_strCode]
+
+/-- ⭐ **LA TRICOTOMÍA DEL `varc`, EMPAQUETADA**: los dos axiomas `ax_liftc_var_lt` /
+    `ax_liftc_var_ge` cubren todos los casos, porque `a < c` o `c < σa` siempre.
+
+    A nivel `zero` esto es trivial (`prf_zero_lt_succ`); al abrir el nivel es lo único
+    genuinamente nuevo del sorte término. -/
+theorem prf_liftc_varc_cases (c a : Term) : Prf (lor (lt a c) (lt c (succ a))) := by
+  refine ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_or_elim (prf_lt_trichotomy a c) ?_ ?_
+  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (prfH_hyp_self _))
+  · refine prf_deduction ?_
+    refine PrfH_or_elim (prfH_hyp_self _) ?_ ?_
+    · -- `a = c` ⟹ `c < σa`  (por `c < σc` y Leibniz)
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      exact ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
+        (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_succ
+          (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _))))
+        (prf_to_prfH (prf_lt_succ_self c) _)
+    · -- `c < a` ⟹ `c < σa`
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      exact PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_of_lt c a) _)
+        (PrfH.hyp _ _ (List.Mem.head _))
+
+/-! ### La rama `<` del `varc`, que faltaba
+
+⚠️ **A nivel `zero` esta rama no existe**: `lt n zero` es falso, así que `refl_caso_varc` sólo
+necesitaba `pcc_liftc_var_ge_code`. Al abrir el nivel aparece la **tricotomía**, y con ella la
+otra mitad del axioma — que hasta hoy no estaba dotada. Es literalmente el molde de
+`pcc_liftc_var_ge_code`, con la guarda al revés y sin el `succcT` del lado derecho. -/
+
+def LIFTC_VARLT_BODY : Formula :=
+  Formula.impl (lt (.var 0) (.var 1))
+    (liftc (.var 1) (varc (.var 0)) =eq varc (.var 0))
+
+theorem LIFTC_VARLT_BODY_ok : ax_liftc_var_lt = forall_2 LIFTC_VARLT_BODY := rfl
+
+/-- **`ax_liftc_var_lt` DOTADA** (con la guarda interna `ṅ < ċ` SIN descargar). -/
+theorem pcc_liftc_var_lt_code (c n : Term) :
+    Prf (provFromCode (implc (ltCodeFn (tcFn n) (tcFn c))
+      (eqCodeFn (liftcT (tcFn c) (varcT (tcFn n))) (varcT (tcFn n))))) := by
+  let W1 : Term := liftc zero (tcFn c)
+  let W0 : Term := tcFn n
+  have hin : Prf (substfc (succ zero) W1 (formCode LIFTC_VARLT_BODY)
+      =eq implc (ltCodeFn (varc (numeral 0)) W1)
+            (eqCodeFn (liftcT W1 (varcT (varc (numeral 0))))
+              (varcT (varc (numeral 0))))) :=
+    prf_substfc_arith_open 1 W1 LIFTC_VARLT_BODY
+  have hA1 : Prf (W1 =eq tcFn c) := prf_liftc_tcFn c
+  have hnorm : Prf (implc (ltCodeFn (varc (numeral 0)) W1)
+        (eqCodeFn (liftcT W1 (varcT (varc (numeral 0))))
+          (varcT (varc (numeral 0))))
+      =eq implc (ltCodeFn (varc (numeral 0)) (tcFn c))
+            (eqCodeFn (liftcT (tcFn c) (varcT (varc (numeral 0))))
+              (varcT (varc (numeral 0))))) :=
+    prf_congr_implc (prf_congr_atom2CodeFn (prf_refl _) hA1)
+      (prf_congr_eqCodeFn (prf_congr_liftcT hA1 (prf_refl _)) (prf_refl _))
+  have hout : Prf (substfc zero W0 (implc (ltCodeFn (varc (numeral 0)) (tcFn c))
+        (eqCodeFn (liftcT (tcFn c) (varcT (varc (numeral 0))))
+          (varcT (varc (numeral 0)))))
+      =eq implc (ltCodeFn (tcFn n) (tcFn c))
+            (eqCodeFn (liftcT (tcFn c) (varcT (tcFn n))) (varcT (tcFn n)))) := by
+    refine prf_eq_trans (prf_substfc_impl zero W0 _ _) ?_
+    refine prf_congr_implc ?_ ?_
+    · refine prf_eq_trans (prf_substfc_ltCodeFn' zero W0 _ _) ?_
+      exact prf_congr_atom2CodeFn (prf_substtc_varc0 W0) (prf_substtc_tcFn W0 c)
+    · refine prf_eq_trans (prf_substfc_eq zero W0 _ _) ?_
+      refine prf_congr_eqCodeFn ?_ ?_
+      · refine prf_eq_trans (prf_substtc_liftcT zero W0 _ _) ?_
+        exact prf_congr_liftcT (prf_substtc_tcFn W0 c)
+          (prf_eq_trans (prf_substtc_varcT_at 0 W0 _) (prf_congr_varcT (prf_substtc_varc0 W0)))
+      · exact prf_eq_trans (prf_substtc_varcT_at 0 W0 _)
+          (prf_congr_varcT (prf_substtc_varc0 W0))
+  have hchain : Prf (substfc zero W0 (substfc (succ zero) W1 (formCode LIFTC_VARLT_BODY))
+      =eq implc (ltCodeFn (tcFn n) (tcFn c))
+            (eqCodeFn (liftcT (tcFn c) (varcT (tcFn n))) (varcT (tcFn n)))) :=
+    prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout
+  exact prf_mp (prf_provCode_congr hchain)
+    (pcc_axiom_inst2 LIFTC_VARLT_BODY (show ax_liftc_var_lt ∈ axioms by simp [axioms])
+      (tcFn c) (tcFn n)
+      (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 n)))
+
 def LIFTSC_NIL_BODY : Formula := liftsc (.var 0) nil =eq nil
 
 theorem LIFTSC_NIL_BODY_ok : ax_liftsc_nil = Formula.forall LIFTSC_NIL_BODY := rfl
@@ -1096,6 +1218,9 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
   LIFTC_FUNC_BODY LIFTC_FUNC_BODY_ok pcc_liftc_func_code
   prf_substfc_atom2CodeFn prf_substfc_ltCodeFn'
   LIFTC_VARGE_BODY LIFTC_VARGE_BODY_ok pcc_liftc_var_ge_code
+  LIFTC_VARLT_BODY LIFTC_VARLT_BODY_ok pcc_liftc_var_lt_code
+  targetLiftAt targetLiftscAt liftF_targetLiftAt substF_targetLiftAt
+  liftF_targetLiftscAt substF_targetLiftscAt prf_liftc_varc_cases
   LIFTSC_NIL_BODY LIFTSC_NIL_BODY_ok pcc_liftsc_nil_code
   LIFTSC_CONS_BODY LIFTSC_CONS_BODY_ok pcc_liftsc_cons_code
   pcc_zero_lt_succ_code pcc_liftc0_var_code pcc_liftc0_func_code
