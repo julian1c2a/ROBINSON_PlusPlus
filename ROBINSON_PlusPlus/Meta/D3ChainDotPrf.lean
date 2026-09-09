@@ -682,6 +682,174 @@ theorem d3_prf_of_two (φ : Formula)
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of_two hwP hbdAll)
 
+/-! ## §10 · ⛔ EL `PsiF` DEL CHASIS **NO PUEDE SER** `chainOkBPsi` — y el que sí (2026‑09‑09i)
+
+§8 fijó `chainOkBPsi` como el cuerpo del `bdAllCode` **del destino**, y lo hizo bien: es lo que
+`hmatch` necesita, y sale por `rfl`. Pero al ir a aplicarle `pcc_bdAll_intro` aparece una
+obstrucción que **no es de esfuerzo, es de enunciado**:
+
+    hPl : ∀ k q, liftTerm k (PsiF q) = PsiF (liftTerm k q)
+
+es **FALSA** para `PsiF q := chainOkBPsi (tcFn q) q`.
+
+⚠️ Y no es una conjetura: el núcleo está medido en §10.1 y lo certifica el **compilador**.
+`chainOkBPsi W p = substCodeF 1 (liftc 0 W) (lineOkB nil (liftTerm 0 p) #0)`, y `substCodeF`
+manda las variables del argumento a **códigos cerrados** (`varc (numeral n)`) o al **hueco** `W`,
+según su nivel. Un `liftTerm` en `q` mueve la variable **fuera del hueco**: donde antes salía el
+testigo, ahora sale un `varc` cerrado. Los dos lados dejan de ser el mismo término.
+
+🔑 **La regla que sale de aquí, y que el molde de `argsInPsi` ya cumplía sin decirlo:**
+
+> El `PsiF` de `pcc_bdAll_intro` tiene que estar escrito con **símbolos de función OBJETO**
+> (`substfc`, `liftc`, `tcFn`, `nthcT`…), **nunca con un `substCodeF` aplicado a una fórmula que
+> contenga el parámetro**. Los símbolos objeto son `Term.func`: `liftTerm`/`substTerm` los
+> atraviesan y la naturalidad es `simp`. `substCodeF` es una función de LEAN que **recursa sobre
+> la fórmula**, y ahí la naturalidad es falsa.
+
+⇒ Se construye el `PsiF` **dotado** —todo objeto, con el código de la fórmula **cerrado y sin
+`q`**— y el paso a `chainOkBPsi` se hace **dentro de `Prov`** con `prf_substfc_arith_open`, que es
+exactamente el puente de §3 usado al revés: allí se abría el destino opaco hacia el gemelo
+computable; aquí se cierra el gemelo computable hacia el opaco, que es el que sabe ser natural. -/
+
+/-! ### §10.1 · La medición, certificada por `rfl` -/
+
+/-- El hueco (`n = v`) entrega el testigo… -/
+theorem substCodeT_hole_lhs (w : Term) :
+    liftTerm 0 (substCodeT 1 w (.var 1)) = liftTerm 0 w := rfl
+
+/-- …pero tras el `liftTerm` la variable ya **no** cae en el hueco, y sale un `varc` CERRADO.
+    ⇒ `liftTerm 0 w` frente a `varc (numeral 1)`: la naturalidad es falsa. -/
+theorem substCodeT_hole_rhs (w : Term) :
+    substCodeT 1 (liftTerm 0 w) (liftTerm 0 (.var 1)) = varc (numeral 1) := rfl
+
+/-! ### §10.2 · El `PsiF` DOTADO, y su naturalidad -/
+
+/-- ⭐⭐ **EL `PsiF` QUE EL CHASIS SÍ CONSUME.** Mismo contenido que `chainOkBPsi`, escrito con
+    símbolos OBJETO: el parámetro `q` aparece sólo dentro de `tcFn`, y el código de la fórmula es
+    **cerrado**. Por eso `liftTerm`/`substTerm` lo atraviesan. -/
+noncomputable def chainOkBPsiDot (q : Term) : Term :=
+  substfc (numeral 1) (liftc zero (tcFn q)) (formCode (lineOkB nil (.var 1) (.var 0)))
+
+/-- La obligación `hPl`, ahora **verdadera** y `simp`. -/
+theorem liftT_chainOkBPsiDot (k : Nat) (q : Term) :
+    liftTerm k (chainOkBPsiDot q) = chainOkBPsiDot (liftTerm k q) := by
+  simp only [chainOkBPsiDot, substfc, liftc, tcFn, zero, liftTerm, liftTerms,
+    liftTerm_numeral, liftTerm_formCode]
+
+/-- La obligación `hPs`. Consume `substTerm_formCode` (`Meta/LiftcCodePrf.lean`), el gemelo del
+    `liftTerm_formCode` de `DerivCondPrf` que hasta hoy no existía. -/
+theorem substT_chainOkBPsiDot (v : Nat) (s q : Term) :
+    substTerm v s (chainOkBPsiDot q) = chainOkBPsiDot (substTerm v s q) := by
+  simp only [chainOkBPsiDot, substfc, liftc, tcFn, zero, substTerm, substTerms,
+    substTerm_numeral, substTerm_formCode]
+
+/-- ⭐⭐ **EL PUENTE**, en la instancia del destino: `prf_substfc_arith_open` al nivel 1.
+    ⚠️ El argumento fórmula es `lineOkB nil #1 #0` —cerrado— y a `q := #0` coincide con el
+    `lineOkB nil (liftTerm 0 #0) #0` de `chainOkBPsi`, porque `liftTerm 0 #0 = #1`. -/
+theorem chainOkBPsiDot_eq :
+    Prf (chainOkBPsiDot (.var 0) =eq chainOkBPsi (tcFn (.var 0)) (.var 0)) :=
+  prf_substfc_arith_open 1 (liftc zero (tcFn (.var 0))) (lineOkB nil (.var 1) (.var 0))
+
+/-! ### §10.3 · Las cuatro obligaciones administrativas
+
+`CF q := chainOk nil q` es un **átomo** (`Formula.atom "chainOk" [nil, q]`) y `bndF q := lenc q`
+un símbolo de función objeto: las cuatro son `simp`. -/
+
+theorem hCl_chainOk (k : Nat) (q : Term) :
+    liftFormula k (chainOk nil q) = chainOk nil (liftTerm k q) := by
+  simp only [chainOk, nil, zero, liftFormula, liftTerm, liftTerms]
+
+theorem hCs_chainOk (v : Nat) (s q : Term) :
+    substFormula v s (chainOk nil q) = chainOk nil (substTerm v s q) := by
+  simp only [chainOk, nil, zero, substFormula, substTerm, substTerms]
+
+theorem hbl_lenc (k : Nat) (q : Term) : liftTerm k (lenc q) = lenc (liftTerm k q) := by
+  simp only [lenc, liftTerm, liftTerms]
+
+theorem hbs_lenc (v : Nat) (s q : Term) :
+    substTerm v s (lenc q) = lenc (substTerm v s q) := by
+  simp only [lenc, substTerm, substTerms]
+
+/-! ### §10.4 · `hwPsi`, DESCARGADA
+
+⭐ El testigo del cuerpo sale de la rama C de ADR‑020 sin trabajo nuevo: `prf_hasWitF_substfc`
+pide `hasWitF` del código y `hasWit` del sustituyente, y las dos están —el código es un `formCode`
+(`prf_hasWitF_fc`) y el sustituyente un `liftc` de un punteado (`prf_hasWit_tcFn` +
+`CRIT_hasWit_lift`)—. Es exactamente el dividendo de que el `PsiF` sea DOTADO: sobre el
+`substCodeF` de §8 no había nada que aplicar. -/
+
+theorem hwS_chainOkBPsiDot (q : Term) : Prf (hasWit (liftc zero (tcFn q))) :=
+  prf_mp (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_lift (tcFn q))
+    (ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn q)
+
+theorem hwPsi_chainOkBPsiDot (q : Term) : Prf (hasWitF (chainOkBPsiDot q)) :=
+  prf_mp (prf_mp (prf_hasWitF_substfc (numeral 1) (liftc zero (tcFn q))
+      (formCode (lineOkB nil (.var 1) (.var 0))))
+    (ROBINSON_PlusPlus.Meta.Representability2.prf_hasWitF_fc _)) (hwS_chainOkBPsiDot q)
+
+/-! ### §10.5 · EL ENSAMBLAJE -/
+
+/-- El transporte del cuerpo dotado al que el destino pide, **dentro de `Prov`**. -/
+theorem hbdAll_of_dotted
+    (h : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0))) (chainOkBPsiDot (.var 0))))) :
+    Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0)))
+        (chainOkBPsi (tcFn (.var 0)) (.var 0)))) :=
+  prf_syll h (prf_provCode_congr (prf_congr_bdAllCode (prf_refl _) chainOkBPsiDot_eq))
+
+/-- ⭐⭐⭐ **`pcc_bdAll_intro`, YA APLICABLE**: siete de sus nueve obligaciones descargadas.
+    Antes de §10 no lo era en absoluto — `hPl` era falsa. -/
+theorem hbdAllDot_of_body
+    (hPsiId : ∀ q : Term,
+      Prf (substfc zero (varc (numeral 0)) (chainOkBPsiDot q) =eq chainOkBPsiDot q))
+    (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
+    Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0))) (chainOkBPsiDot (.var 0)))) :=
+  pcc_bdAll_intro (fun q => chainOk nil q) (fun q => lenc q) chainOkBPsiDot (.var 0)
+    hCl_chainOk hCs_chainOk hbl_lenc hbs_lenc
+    liftT_chainOkBPsiDot substT_chainOkBPsiDot hPsiId hwPsi_chainOkBPsiDot hbody
+
+/-- ⭐⭐⭐ **D3 DESDE TRES OBLIGACIONES**, y las tres sobre el `PsiF` DOTADO. -/
+theorem d3_prf_of_body (φ : Formula)
+    (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
+    (hPsiId : ∀ q : Term,
+      Prf (substfc zero (varc (numeral 0)) (chainOkBPsiDot q) =eq chainOkBPsiDot q))
+    (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_two φ hwP (hbdAll_of_dotted (hbdAllDot_of_body hPsiId hbody))
+
+/-! ### §10.6 · Lo que queda, y por qué `hPsiId` **no** sale de §9
+
+| obligación de `pcc_bdAll_intro` | estado |
+|---|---|
+| `hCl`, `hCs`, `hbl`, `hbs` | ✅ §10.3 |
+| `hPl`, `hPs` | ✅ §10.2 — y eran **falsas** con el `PsiF` de §8 |
+| `hwPsi` | ✅ §10.4 |
+| **`hPsiId`** | ⬜ ver abajo |
+| **`hbody`** | ⬜ el contenido real: (a) `pcc_lineWF_tracked` (5 de 7) + (b) `boundedPremsIn` |
+
+⚠️ **`hPsiId` NO es `hPinv` con otro nombre, y la familia de §9 no la cubre.** Las dos variantes
+de `substfc_inv_substCodeF` actúan al nivel del propio `substCodeF` (`v`) o uno por encima
+(`v+1`); `hPsiId` actúa al nivel **0** sobre un `substCodeF 1 …`, o sea **por debajo**. Y por
+debajo el enunciado cambia de carácter: `substfc` al nivel 0 **decrementa** las variables de
+código de nivel > 0 (es la rama `n > v` de `substCodeT`), así que no basta con que el testigo sea
+invariante.
+
+⭐ **Pero el enunciado es cierto, y está medido por qué**: en `substCodeF 1 W (lineOkB nil #1 #0)`
+los únicos huecos de nivel 0 son los que vienen de `#0`, que `substCodeF` ya mandó a
+`varc (numeral 0)` —y sustituir `#0` por `varc 0̄` los deja igual—; y todo lo demás vive dentro de
+`W = liftc 0 ṫq`, que es invariante **a todo nivel** (`hW_chainOkBPsi` de §9, probado justo con
+esa fuerza: `∀ k u`). ⇒ falta la **tercera variante** de la familia, la de nivel actuante **por
+debajo** del `substCodeF`, con testigo `varc (numeral w)`. Es la misma inducción de §9 con la
+aritmética de índices corrida, no maquinaria nueva.
+
+🔑 Y la lección de método: **el destino fija la IMAGEN, pero el chasis fija la FORMA en que hay
+que escribirla**. `chainOkBPsi` es la imagen correcta y `chainOkBPsiDot` la escritura correcta;
+hacen falta las dos, y el puente entre ellas vive dentro de `Prov`. -/
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -704,6 +872,11 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   hmatch_chainOkB DEUDA_chainOkBDot_of_hbdAll d3_prf_of_hbdAll
   hW_chainOkBPsi hL_chainOkBPsi hfv_chainOkBPsi hPinv_chainOkBPsi
   DEUDA_chainOkBDot_of_two d3_prf_of_two
+  substCodeT_hole_lhs substCodeT_hole_rhs
+  chainOkBPsiDot liftT_chainOkBPsiDot substT_chainOkBPsiDot chainOkBPsiDot_eq
+  hCl_chainOk hCs_chainOk hbl_lenc hbs_lenc
+  hwS_chainOkBPsiDot hwPsi_chainOkBPsiDot
+  hbdAll_of_dotted hbdAllDot_of_body d3_prf_of_body
 )
 
 /-! ## FOOTPRINT -/
@@ -718,3 +891,6 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_premsBody_reflect
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hPinv_chainOkBPsi
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_two
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.chainOkBPsiDot_eq
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hwPsi_chainOkBPsiDot
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body

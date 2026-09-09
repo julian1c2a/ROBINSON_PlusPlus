@@ -1209,6 +1209,41 @@ theorem substTerm_termsCode (v : Nat) (u : Term) :
         substTerm_termsCode v u ts]
 end
 
+/-- **`formCode φ` es CERRADO también bajo `substTerm`** — el gemelo del `liftTerm_formCode` de
+    `DerivCondPrf`, que sí existía.
+
+    ⚠️ Vive **aquí y no allí** por dependencia, no por tema: necesita `substTerm_termCode` /
+    `substTerm_termsCode`, que están en este módulo, y `DerivCondPrf` está **aguas arriba**
+    (ADR‑019: no se sube el corolario, y bajar la pareja obligaría a mover tres lemas y
+    reescribir sus referencias en un módulo de la ruta crítica). Se deja medido en vez de
+    duplicarlo.
+
+    Lo pide `D3ChainDotPrf` §10 para la naturalidad del `PsiF` dotado. -/
+theorem substTerm_formCode (v : Nat) (u : Term) :
+    ∀ φ : Formula, substTerm v u (formCode φ) = formCode φ
+  | .bottom => by simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral]
+  | .atom _ _ => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_strCode, substTerm_termsCode]
+  | .eq _ _ => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_termCode]
+  | .impl a b => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_formCode v u a, substTerm_formCode v u b]
+  | Formula.forall a => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_formCode v u a]
+  | .and a b => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_formCode v u a, substTerm_formCode v u b]
+  | .or a b => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_formCode v u a, substTerm_formCode v u b]
+  | .ex a => by
+      simp only [formCode, cons, nil, zero, substTerm, substTerms, substTerm_numeral,
+        substTerm_formCode v u a]
+
 /-- **`substFormula` atraviesa `targetLift`**, en su forma GENERAL: cae sobre el argumento.
 
     ⚠️ Bajado desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
@@ -1626,7 +1661,7 @@ export ROBINSON_PlusPlus.Meta.LiftcCodePrf (
   refl_caso_varc refl_caso_funcc refl_lista_nil refl_lista_cons
   refl_termCode refl_termsCode
   shapeUn0_es_varc shapeBin1_es_funcc
-  substTerm_termCode substTerm_termsCode
+  substTerm_termCode substTerm_termsCode substTerm_formCode
   substF_targetLift substF_targetLiftsc substF_targetLift_hole PrfH_congr_targetLift
   refl_shapeUn_imp refl_caso_funcc_imp refl_shapeBin_imp refl_lista_cons_imp
   refl_isTermCodeE1_imp
