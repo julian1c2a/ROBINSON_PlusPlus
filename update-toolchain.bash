@@ -1,37 +1,100 @@
 #!/bin/bash
-# update-toolchain.bash — Update lean-toolchain to a new version and verify build
+# update-toolchain.bash — Probar y actualizar Lean a una versión (por defecto, la
+#                         última estable publicada) verificando la librería completa.
 #
-# Usage:
-#   bash update-toolchain.bash v4.29.0
-#   bash update-toolchain.bash v4.29.0-rc1
+# Uso:
+#   bash update-toolchain.bash            # consulta la última estable y la prueba
+#   bash update-toolchain.bash v4.31.0    # prueba una versión concreta
+#   bash update-toolchain.bash --check    # solo informa si hay una versión más nueva
 #
-# On success: commits the updated lean-toolchain file.
-# On failure: restores the previous version.
+# En éxito: commitea el lean-toolchain actualizado.
+# En fallo: restaura la versión previa y sale con código 1.
+#
+# ⛔ REGLA DE ESTE PROYECTO: NUNCA `cd FOL && lake build`. `FOL` es una dependencia
+#    LOCAL (`require FOL from "../FOL"`) y compilarla desde su propio directorio usa
+#    OTRO toolchain. Todo se compila desde la raíz de ROBINSON_PlusPlus, como hace
+#    este script. Si el bump rompe `FOL`, se arregla en `../FOL` y se vuelve aquí.
+#
+# NOTA: verifica `lake build <lib>` (toda la librería), no solo el target por defecto.
+#       Las dependencias locales/git se recompilan con el nuevo toolchain; si alguna
+#       no es compatible, el build fallará y se revertirá (cada dependencia se
+#       actualiza por separado en su propio repo).
+#
+# ⚠️ Un bump de toolchain que rompe el build casi nunca es un problema matemático:
+#    suele ser una divergencia de `simp`/`omega` entre versiones (forma normal
+#    distinta). Se arregla en la prueba concreta, no revirtiendo la matemática.
 
-set -e
+set -euo pipefail
+cd "$(dirname "$0")"
 
-if [ $# -eq 0 ]; then
-    echo "Usage: bash update-toolchain.bash v4.28.0"
-    echo "Current toolchain: $(cat lean-toolchain)"
-    exit 1
+# ═══ PATH HIGIÉNICO ═════════════════════════════════════════════════════════
+# ⚠️ Lanzado desde una consola de Windows, `bash` hereda un PATH en el que `head`, `grep`
+# o `sed` pueden resolver a binarios AJENOS (en esta máquina, el HEAD de Quantum
+# ESPRESSO en ucrt64). Se antepone el /usr/bin de MSYS2. Medido el 2026-09-09.
+[ -d /usr/bin ] && export PATH="/usr/bin:/bin:$PATH"
+
+CURRENT=$(cat lean-toolchain)
+
+# ── Detectar la librería (misma lógica que gen-root.bash) ───────────────────
+LIB=$(grep -E 'lean_lib\s+«([^»]+)»' lakefile.lean 2>/dev/null | sed 's/.*«\(.*\)».*/\1/' | head -1)
+[ -z "$LIB" ] && LIB=$(grep -E '^lean_lib\s+"([^"]+)"' lakefile.lean 2>/dev/null | sed 's/.*"\(.*\)".*/\1/' | head -1)
+[ -z "$LIB" ] && LIB=$(grep -E 'package\s+«([^»]+)»' lakefile.lean 2>/dev/null | sed 's/.*«\(.*\)».*/\1/' | head -1)
+[ -z "$LIB" ] && LIB=$(grep -E '^package\s+"([^"]+)"' lakefile.lean 2>/dev/null | sed 's/.*"\(.*\)".*/\1/' | head -1)
+
+# ── Resolver la versión objetivo ────────────────────────────────────────────
+CHECK_ONLY=0
+if [ "${1:-}" = "--check" ]; then
+    CHECK_ONLY=1
+    set --   # descartar el flag para caer en la rama de "consulta automática"
 fi
 
-NEW_VERSION="leanprover/lean4:$1"
-OLD_VERSION=$(cat lean-toolchain)
+if [ $# -ge 1 ]; then
+    TARGET="$1"
+else
+    echo "Consultando la última versión estable de Lean 4 (GitHub releases)..."
+    # /releases/latest devuelve la última release NO marcada como prerelease.
+    TARGET=$(curl -fsSL https://api.github.com/repos/leanprover/lean4/releases/latest \
+        | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1)
+    if [ -z "$TARGET" ]; then
+        echo "❌ No se pudo obtener la última versión (¿sin red o rate-limit de la API?)." >&2
+        exit 1
+    fi
+fi
 
-echo "Updating toolchain: $OLD_VERSION → $NEW_VERSION"
-echo "$NEW_VERSION" > lean-toolchain
+NEW="leanprover/lean4:$TARGET"
 
-echo "Running lake build..."
-if lake build; then
+# ── Comparar con la versión actual ──────────────────────────────────────────
+if [ "$NEW" = "$CURRENT" ]; then
+    echo "✅ Ya estás en la última versión estable ($CURRENT). Nada que hacer."
+    exit 0
+fi
+
+echo "Actual:   $CURRENT"
+echo "Objetivo: $NEW"
+
+if [ "$CHECK_ONLY" -eq 1 ]; then
+    echo "ℹ️  Hay una versión más nueva disponible: $TARGET (ejecuta sin --check para probarla)."
+    exit 0
+fi
+
+# ── Instalar, probar y commitear/revertir ───────────────────────────────────
+echo "Instalando toolchain $TARGET..."
+elan toolchain install "leanprover/lean4:$TARGET"
+
+echo "$NEW" > lean-toolchain
+
+echo "Compilando la librería completa (lake build ${LIB:-})..."
+if lake build ${LIB:-}; then
     echo ""
-    echo "✅ Build passed with $NEW_VERSION"
+    echo "✅ Build OK con $NEW"
     git add lean-toolchain
-    git commit -m "chore: update lean toolchain to $1"
-    echo "✅ Committed lean-toolchain update."
+    git commit -m "chore: actualizar lean toolchain a $TARGET"
+    echo "✅ Commit hecho."
+    echo "ℹ️  Recuerda: las dependencias locales/git pueden necesitar el mismo bump —"
+    echo "    actualízalas en su repo y ejecuta 'lake update'."
 else
     echo ""
-    echo "❌ Build failed. Restoring previous toolchain: $OLD_VERSION"
-    echo "$OLD_VERSION" > lean-toolchain
+    echo "❌ Build falló con $NEW. Restaurando $CURRENT."
+    echo "$CURRENT" > lean-toolchain
     exit 1
 fi

@@ -24,6 +24,18 @@
 set -uo pipefail
 cd "$(dirname "$0")"
 
+# ═══ PATH HIGIÉNICO ═════════════════════════════════════════════════════════
+# ⚠️ No es paranoia: es un fallo MEDIDO el 2026-09-09. Lanzado desde PowerShell (o desde
+# cualquier consola de Windows), `bash` hereda el PATH de Windows, y en esta máquina eso
+# hace que `head` resuelva a C:/msys64/ucrt64/bin/head.exe — que no es el `head` de
+# coreutils, sino el HEAD de Quantum ESPRESSO — y que `grep` sea otro build que rechaza
+# las expresiones de este script («warning: ? at start of expression»).
+#
+# El resultado era el peor posible: los CUATRO controles [A] salían VACÍOS y el script
+# imprimía «✅ DOCUMENTACIÓN SINCRONIZADA» sin haber comprobado absolutamente nada.
+# Se antepone el /usr/bin de MSYS2, que es contra el que están escritos estos scripts.
+[ -d /usr/bin ] && export PATH="/usr/bin:/bin:$PATH"
+
 QUICK=0
 HINT=0
 for a in "$@"; do
@@ -42,12 +54,29 @@ FULL=$(ls ROBINSON_PlusPlus/Full/*.lean 2>/dev/null | wc -l)
 ACTIVE=$((MIN + META + FULL))
 QUAR=$(ls cuarentena/*.lean 2>/dev/null | wc -l)
 SOND=$(ls sondeos/*.lean 2>/dev/null | wc -l)
-AXIOMS=$(grep -rhc "^axiom " ROBINSON_PlusPlus/ --include=*.lean 2>/dev/null | paste -sd+ | bc)
+# ⚠️ Sin `bc`: no está instalado en Git Bash ni, por defecto, en el runner de CI, y
+# `paste -sd+ | bc` fallaba en silencio dejando la cifra VACÍA. `wc -l` sobre las
+# líneas que casan cuenta lo mismo y no depende de nada.
+AXIOMS=$(grep -rhE "^axiom " ROBINSON_PlusPlus/ --include=*.lean 2>/dev/null | wc -l)
+# ⚠️ El conteo de `sorry` se DELEGA en check-sorry.bash y no se reimplementa aquí: qué
+# cuenta como `sorry` (token de código, fuera de comentarios y de literales) es una
+# definición delicada, y tenerla en dos sitios garantiza que se separen.
+SORRY=$(bash check-sorry.bash 2>/dev/null | sed -n 's/^.*Total: \([0-9][0-9]*\) sorry.*//p' | head -1)
+[ -z "$SORRY" ] && SORRY=0
 
-if [ "$QUICK" = "1" ]; then
-  JOBS=""
-else
-  JOBS=$(lake build 2>&1 | grep -oE "Build completed successfully \([0-9]+ jobs\)" | grep -oE "[0-9]+" || true)
+# ⚠️ `lake` NO está en el PATH de Git Bash en la máquina de desarrollo (sí en el runner
+# de CI). Cuando no lo está, `JOBS` quedaba vacío y el control [A] de jobs — el más
+# importante — se SALTABA EN SILENCIO dando verde. Ahora se distingue «no lo pedí»
+# (`--quick`) de «no pude medirlo», y lo segundo avisa.
+JOBS=""
+LAKE_MISSING=0
+if [ "$QUICK" != "1" ]; then
+  if command -v lake >/dev/null 2>&1; then
+    JOBS=$(lake build 2>&1 | grep -oE "Build completed successfully \([0-9]+ jobs\)" | grep -oE "[0-9]+" || true)
+    [ -z "$JOBS" ] && LAKE_MISSING=2
+  else
+    LAKE_MISSING=1
+  fi
 fi
 
 echo "════ VERDAD DEL CÓDIGO ════"
@@ -55,7 +84,12 @@ printf "  módulos activos : %s  (Minimal %s + Meta %s + Full %s)\n" "$ACTIVE" "
 printf "  cuarentena      : %s\n" "$QUAR"
 printf "  sondeos         : %s\n" "$SOND"
 printf "  axiom de Lean   : %s\n" "$AXIOMS"
+printf "  sorry           : %s
+" "$SORRY"
 [ -n "$JOBS" ] && printf "  build jobs      : %s\n" "$JOBS"
+[ "$LAKE_MISSING" = "1" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake' no está en el PATH de este shell."
+[ "$LAKE_MISSING" = "1" ] && echo "                     Lánzalo desde PowerShell, o usa --quick para decirlo a propósito."
+[ "$LAKE_MISSING" = "2" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake build' no dijo 'Build completed successfully'."
 echo
 
 # Documentos AUTORITATIVOS: los que describen el ESTADO ACTUAL y por tanto deben cuadrar.
@@ -83,9 +117,12 @@ for d in $DOCS; do
   head -100 "$d" | sed "s|^|$d:|" >> "$HEADREGION"
 done
 
+# ⚠️ Los patrones se pasan SIEMPRE entre comillas SIMPLES: un backtick dentro de
+#    comillas dobles lo ejecuta bash como sustitución de comando y el patrón queda roto.
 check_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = etiqueta
   local pat="$1" good="$2" label="$3" hits
-  hits=$(grep -nE "$pat" "$HEADREGION" 2>/dev/null          | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|en su momento|entonces|ya no|20[0-9]{2}-[0-9]{2}-[0-9]{2}" || true)
+  # Se descartan: menciones históricas, aproximaciones (~40), rangos (40-50) y ejemplos.
+  hits=$(grep -nE "$pat" "$HEADREGION" 2>/dev/null          | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|en su momento|entonces|ya no|20[0-9]{2}-[0-9]{2}-[0-9]{2}|~|p\. ej|ejemplo|umbral|[0-9]+-[0-9]+" || true)
   while IFS= read -r line; do
     [ -z "$line" ] && continue
     local n; n=$(echo "$line" | grep -oE "$pat" | grep -oE "[0-9]+" | head -1)
@@ -95,11 +132,19 @@ check_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = e
       A_FAIL=1
     fi
   done <<< "$hits"
+  # ⚠️ Un patrón sin ninguna aparición NO está comprobando nada, y da verde. Es el peor
+  # resultado posible para un control cuyo cometido es que no te fibres de los docs: por eso
+  # se avisa en vez de callar. Si sale este aviso, o el fraseo del doc cambió, o el patrón
+  # está mal — en los dos casos hay que tocar algo.
+  [ -z "$hits" ] && echo "  ⚠️  $label: la frase no aparece en ningún doc autoritativo — control VACÍO"
+  return 0
 }
 [ -n "$JOBS" ] && check_num "[0-9]+ jobs" "$JOBS" "jobs"
 check_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
 check_num "Meta ([0-9]+ \+|[0-9]+\))" "$META" "conteo de Meta"
 check_num "[0-9]+ (módulos )?en \`cuarentena/\`" "$QUAR" "cuarentena"
+check_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
+check_num '[0-9]+ sorrys?' "$SORRY" "sorry"
 rm -f "$HEADREGION"
 [ "$A_FAIL" = "0" ] && echo "  ✓ sin cifras obsoletas" || FAIL=1
 
