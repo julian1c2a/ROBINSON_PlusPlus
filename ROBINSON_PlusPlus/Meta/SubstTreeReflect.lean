@@ -295,23 +295,434 @@ example : treeQ1.maxLeaf = 4 := rfl
 example : treeQ2.maxLeaf = 4 := rfl
 example : treeLeibniz.maxLeaf = 5 := rfl
 
+
+/-! ## §5 · LAS DOS MITADES DENTRO DE `Prov`
+
+⚠️ **Corrección a lo que dejé escrito en `NEXT-STEPS.md`**: allí puse que el caso `sub` de
+`PrfH_dotVN` lo paga `pcc_eval_substfc_wit`. **No es así.** Las dos mitades se reparten:
+
+| pieza | qué prueba | quién paga el nodo `sub` |
+|---|---|---|
+| `PrfH_tc_objAt` | `(E(t))˙ = dotV` | ⭐ **`pcc_eval_substfc_wit`** — y por eso pide las guardas |
+| `PrfH_dotVN` | `dotV = dotN` | pura **congruencia** (`pcc_congr_substfcT_arg2/3_code`) + las hojas |
+
+Es el mismo reparto que en `Meta/CodeTreeReflect.lean`: el salto de valor a accesor vive en
+`dotVN`, y el «código del código» en `tc_objAt`. Lo que cambia es **dónde** entra la guarda de
+ADR‑020: sólo en `tc_objAt`, y sólo en los nodos `sub`. -/
+
+/-- Las guardas que los nodos `sub` necesitan, y **sólo** ellos: el resto del árbol no pide
+    nada. Con `t` abstracto `hasWit (nthc t 3)` no es demostrable —es lo que hace útil a la
+    guarda—, así que llegan como hipótesis del contexto, que es donde ADR‑020 las puso. -/
+def SGuards (Γ : List Formula) (t : Term) : STree → Prop
+  | .leaf _    => True
+  | .nul _     => True
+  | .un _ a    => SGuards Γ t a
+  | .bin _ a b => SGuards Γ t a ∧ SGuards Γ t b
+  | .sub s f   => (PrfH Γ (hasWit (s.objAt t)) ∧ PrfH Γ (hasWitF (f.objAt t)))
+                    ∧ SGuards Γ t s ∧ SGuards Γ t f
+
+/-- ⭐ **EL «CÓDIGO DEL CÓDIGO» DEL ÁRBOL, con nodos de sustitución.** El caso `sub` es el
+    único con contenido: lo paga `pcc_eval_substfc_wit`, cuyo antecedente OBJETO **son** las
+    guardas de ADR‑020 — que `SGuards` exige exactamente ahí. -/
+theorem PrfH_tc_objAt {Γ : List Formula} (t : Term) :
+    ∀ T : STree, SGuards Γ t T →
+      PrfH Γ (provFromCode (eqc (tcFn (T.objAt t)) (T.dotV t)))
+  | .leaf _, _ => prf_to_prfH (prf_provFromCode_eqCodeFn_refl _) _
+  | .nul m, _ => prf_to_prfH (pcc_dot_nul_symm m) _
+  | .un m a, hg =>
+      PrfH_eq_trans_code _ _ _ (substtc_inv_tcFn _)
+        (prf_to_prfH (pcc_dot_un_symm m (a.objAt t)) _)
+        (PrfH.mp _ _ _
+          (prf_to_prfH (pcc_congr_unT_code m (tcFn (a.objAt t)) (a.dotV t)
+            (substtc_inv_tcFn _) (prf_hasWit_tcFn (a.objAt t)) (prf_hasWit_dotV t a)) _)
+          (PrfH_tc_objAt t a hg))
+        (prf_hasWit_tcFn _)
+        (prf_hasWit_unT m (prf_hasWit_tcFn (a.objAt t)))
+        (prf_hasWit_unT m (prf_hasWit_dotV t a))
+  | .bin m a b, hg =>
+      PrfH_eq_trans_code _ _ _ (substtc_inv_tcFn _)
+        (prf_to_prfH (pcc_dot_bin_symm m (a.objAt t) (b.objAt t)) _)
+        (PrfH_eq_trans_code _ _ _
+          (substtc_inv_binT (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+          (PrfH.mp _ _ _
+            (prf_to_prfH (pcc_congr_binT_1_code m (tcFn (b.objAt t)) (tcFn (a.objAt t))
+              (a.dotV t) (substtc_inv_tcFn _) (substtc_inv_tcFn _)
+              (prf_hasWit_tcFn (b.objAt t)) (prf_hasWit_tcFn (a.objAt t))
+              (prf_hasWit_dotV t a)) _)
+            (PrfH_tc_objAt t a hg.1))
+          (PrfH.mp _ _ _
+            (prf_to_prfH (pcc_congr_binT_2_code m (a.dotV t) (tcFn (b.objAt t)) (b.dotV t)
+              (substtc_inv_dotV t a) (substtc_inv_tcFn _)
+              (prf_hasWit_dotV t a) (prf_hasWit_tcFn (b.objAt t))
+              (prf_hasWit_dotV t b)) _)
+            (PrfH_tc_objAt t b hg.2))
+          (prf_hasWit_binT m (prf_hasWit_tcFn (a.objAt t)) (prf_hasWit_tcFn (b.objAt t)))
+          (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_tcFn (b.objAt t)))
+          (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b)))
+        (prf_hasWit_tcFn _)
+        (prf_hasWit_binT m (prf_hasWit_tcFn (a.objAt t)) (prf_hasWit_tcFn (b.objAt t)))
+        (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b))
+  | .sub s f, hg => by
+      -- ⭐ EL CASO CON CONTENIDO. `pcc_eval_substfc_wit` con las guardas del contexto.
+      have hev : PrfH Γ (provFromCode (eqc
+          (substfcT (tcFn zero) (tcFn (s.objAt t)) (tcFn (f.objAt t)))
+          (tcFn (substfc zero (s.objAt t) (f.objAt t))))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_substfc_wit zero (s.objAt t) (f.objAt t)) _)
+          (PrfH_and_intro hg.1.1 hg.1.2)
+      -- el nivel: `tcFn zero` es el `termCode zero` del árbol (congruencia META)
+      have hev0 : PrfH Γ (provFromCode (eqc
+          (substfcT (termCode zero) (tcFn (s.objAt t)) (tcFn (f.objAt t)))
+          (tcFn (substfc zero (s.objAt t) (f.objAt t))))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+          (prf_congr_eqCodeFn
+            (prf_congr_substfcT prf_tc_zero (prf_refl _) (prf_refl _)) (prf_refl _))) _) hev
+      have hsym : PrfH Γ (provFromCode (eqc
+          (tcFn (substfc zero (s.objAt t) (f.objAt t)))
+          (substfcT (termCode zero) (tcFn (s.objAt t)) (tcFn (f.objAt t))))) :=
+        PrfH_eq_symm_code _ _
+          (substtc_inv_substfcT (prf_substtc_termCode_zero 0)
+            (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+          hev0
+          (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+            (prf_hasWit_tcFn _) (prf_hasWit_tcFn _))
+          (prf_hasWit_tcFn _)
+      -- y ahora los dos hijos, por congruencia dentro de `Prov`
+      have h2 : PrfH Γ (provFromCode (eqc
+          (substfcT (termCode zero) (tcFn (s.objAt t)) (tcFn (f.objAt t)))
+          (substfcT (termCode zero) (s.dotV t) (tcFn (f.objAt t))))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg2_code (termCode zero)
+          (tcFn (f.objAt t)) (tcFn (s.objAt t)) (s.dotV t)
+          (prf_substtc_termCode_zero 0) (substtc_inv_tcFn _) (substtc_inv_tcFn _)
+          (prf_hasWit_tc zero) (prf_hasWit_tcFn _) (prf_hasWit_tcFn _)
+          (prf_hasWit_dotV t s)) _) (PrfH_tc_objAt t s hg.2.1)
+      have h3 : PrfH Γ (provFromCode (eqc
+          (substfcT (termCode zero) (s.dotV t) (tcFn (f.objAt t)))
+          (substfcT (termCode zero) (s.dotV t) (f.dotV t)))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg3_code (termCode zero)
+          (s.dotV t) (tcFn (f.objAt t)) (f.dotV t)
+          (prf_substtc_termCode_zero 0) (substtc_inv_dotV t s) (substtc_inv_tcFn _)
+          (prf_hasWit_tc zero) (prf_hasWit_dotV t s) (prf_hasWit_tcFn _)
+          (prf_hasWit_dotV t f)) _) (PrfH_tc_objAt t f hg.2.2)
+      have h23 : PrfH Γ (provFromCode (eqc
+          (substfcT (termCode zero) (tcFn (s.objAt t)) (tcFn (f.objAt t)))
+          (substfcT (termCode zero) (s.dotV t) (f.dotV t)))) :=
+        PrfH_eq_trans_code _ _ _
+          (substtc_inv_substfcT (prf_substtc_termCode_zero 0)
+            (substtc_inv_tcFn _) (substtc_inv_tcFn _))
+          h2 h3
+          (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+            (prf_hasWit_tcFn _) (prf_hasWit_tcFn _))
+          (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+            (prf_hasWit_dotV t s) (prf_hasWit_tcFn _))
+          (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+            (prf_hasWit_dotV t s) (prf_hasWit_dotV t f))
+      exact PrfH_eq_trans_code _ _ _ (substtc_inv_tcFn _) hsym h23
+        (prf_hasWit_tcFn _)
+        (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+          (prf_hasWit_tcFn _) (prf_hasWit_tcFn _))
+        (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+          (prf_hasWit_dotV t s) (prf_hasWit_dotV t f))
+
+/-- ⭐ **`Prov(⌜dotV = dotN⌝)`** para todo árbol cuyas hojas caigan bajo la longitud canónica.
+    El nodo `sub` es **pura congruencia**: no pide guardas ni evaluación. -/
+theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
+    (hlenc : PrfH Γ (lenc t =eq numeralM n)) (T : STree) :
+    Nat.le T.maxLeaf n →
+      PrfH Γ (provFromCode (eqc (T.dotV t) (T.dotN t))) := by
+  induction T with
+  | leaf i =>
+      intro hb
+      have hbound : PrfH Γ (lt (numeralM i) (lenc t)) :=
+        PrfH_lt_of_lenc_eq (i := i) (n := n) hb hlenc
+      have hev : PrfH Γ (provFromCode (eqc (nthcT (tcFn t) (termCode (numeralM i)))
+          (tcFn (nthc t (numeralM i))))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (pcc_nthcD_bridge t i) _) hbound
+      exact PrfH_eq_symm_code _ _ (substtc_inv_nthcT_tcFn t i) hev
+        (prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM i)))
+        (prf_hasWit_tcFn (nthc t (numeralM i)))
+  | nul m => intro _; exact prf_to_prfH (prf_provFromCode_eqCodeFn_refl (nulT m)) _
+  | un m a ih =>
+      intro hb
+      exact PrfH.mp _ _ _
+        (prf_to_prfH (pcc_congr_unT_code m (a.dotV t) (a.dotN t)
+          (substtc_inv_dotV t a) (prf_hasWit_dotV t a) (prf_hasWit_dotN t a)) _) (ih hb)
+  | bin m a b iha ihb =>
+      intro hb
+      have hba : Nat.le a.maxLeaf n := Nat.le_trans (Nat.le_max_left _ _) hb
+      have hbb : Nat.le b.maxLeaf n := Nat.le_trans (Nat.le_max_right _ _) hb
+      have h1 : PrfH Γ (provFromCode (eqc (binT m (a.dotV t) (b.dotV t))
+          (binT m (a.dotN t) (b.dotV t)))) :=
+        PrfH.mp _ _ _
+          (prf_to_prfH (pcc_congr_binT_1_code m (b.dotV t) (a.dotV t) (a.dotN t)
+            (substtc_inv_dotV t b) (substtc_inv_dotV t a)
+            (prf_hasWit_dotV t b) (prf_hasWit_dotV t a) (prf_hasWit_dotN t a)) _) (iha hba)
+      have h2 : PrfH Γ (provFromCode (eqc (binT m (a.dotN t) (b.dotV t))
+          (binT m (a.dotN t) (b.dotN t)))) :=
+        PrfH.mp _ _ _
+          (prf_to_prfH (pcc_congr_binT_2_code m (a.dotN t) (b.dotV t) (b.dotN t)
+            (substtc_inv_dotN t a) (substtc_inv_dotV t b)
+            (prf_hasWit_dotN t a) (prf_hasWit_dotV t b) (prf_hasWit_dotN t b)) _) (ihb hbb)
+      exact PrfH_eq_trans_code _ _ _
+        (substtc_inv_binT (substtc_inv_dotV t a) (substtc_inv_dotV t b)) h1 h2
+        (prf_hasWit_binT m (prf_hasWit_dotV t a) (prf_hasWit_dotV t b))
+        (prf_hasWit_binT m (prf_hasWit_dotN t a) (prf_hasWit_dotV t b))
+        (prf_hasWit_binT m (prf_hasWit_dotN t a) (prf_hasWit_dotN t b))
+  | sub s f ihs ihf =>
+      intro hb
+      have hbs : Nat.le s.maxLeaf n := Nat.le_trans (Nat.le_max_left _ _) hb
+      have hbf : Nat.le f.maxLeaf n := Nat.le_trans (Nat.le_max_right _ _) hb
+      have h1 : PrfH Γ (provFromCode (eqc
+          (substfcT (termCode zero) (s.dotV t) (f.dotV t))
+          (substfcT (termCode zero) (s.dotN t) (f.dotV t)))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg2_code (termCode zero)
+          (f.dotV t) (s.dotV t) (s.dotN t)
+          (prf_substtc_termCode_zero 0) (substtc_inv_dotV t f) (substtc_inv_dotV t s)
+          (prf_hasWit_tc zero) (prf_hasWit_dotV t f) (prf_hasWit_dotV t s)
+          (prf_hasWit_dotN t s)) _) (ihs hbs)
+      have h2 : PrfH Γ (provFromCode (eqc
+          (substfcT (termCode zero) (s.dotN t) (f.dotV t))
+          (substfcT (termCode zero) (s.dotN t) (f.dotN t)))) :=
+        PrfH.mp _ _ _ (prf_to_prfH (pcc_congr_substfcT_arg3_code (termCode zero)
+          (s.dotN t) (f.dotV t) (f.dotN t)
+          (prf_substtc_termCode_zero 0) (substtc_inv_dotN t s) (substtc_inv_dotV t f)
+          (prf_hasWit_tc zero) (prf_hasWit_dotN t s) (prf_hasWit_dotV t f)
+          (prf_hasWit_dotN t f)) _) (ihf hbf)
+      exact PrfH_eq_trans_code _ _ _
+        (substtc_inv_substfcT (prf_substtc_termCode_zero 0)
+          (substtc_inv_dotV t s) (substtc_inv_dotV t f))
+        h1 h2
+        (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+          (prf_hasWit_dotV t s) (prf_hasWit_dotV t f))
+        (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+          (prf_hasWit_dotN t s) (prf_hasWit_dotV t f))
+        (prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
+          (prf_hasWit_dotN t s) (prf_hasWit_dotN t f))
+
+
+/-! ## §6 · EL REFLECTOR DE UNA CONDICIÓN‑ÁRBOL CON SUSTITUCIONES
+
+Mismo esqueleto que `pcc_condD_of_tree` (`Meta/CodeTreeReflect.lean`): puente `carc`, la
+hipótesis reescribe el valor, `tc_objAt` lleva a `dotV` y `dotVN` a `dotN`. La única
+diferencia es que ahora el núcleo recibe la fórmula guardada **entera** (`G`), porque de ella
+salen **las dos** cosas que necesita: la ecuación estructural y las guardas de los nodos `sub`. -/
+
+theorem pcc_condDS_of_stree (T : STree) (t : Term) {n : Nat} (hmax : Nat.le T.maxLeaf n)
+    (G : Formula)
+    (hstruct : Prf (substFormula 0 t G ⇒ (carc t =eq T.objAt t)))
+    (hguards : SGuards [substFormula 0 t G, lenc t =eq numeralM n, lineWF t] t T) :
+    HcondCore n t G (condOfS T) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (substFormula 0 t G) [lenc t =eq numeralM n, lineWF t] rfl)
+    (lenc t =eq numeralM n) [lineWF t] rfl)
+  have hlw : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t] (lineWF t) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hlenc : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hG : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (substFormula 0 t G) := PrfH.hyp _ _ (List.Mem.head _)
+  have hEQ : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (carc t =eq T.objAt t) := PrfH.mp _ _ _ (prf_to_prfH hstruct _) hG
+  -- (1) el puente `carc`, que es lo que `lineWF t` compra
+  have hcarc : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (provFromCode (eqc (carcT (tcFn t)) (tcFn (carc t)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_carcD_bridge t) _) hlw
+  -- (2) la hipótesis estructural reescribe el valor, DENTRO de `Prov`
+  have hcarc1 : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (provFromCode (eqc (carcT (tcFn t)) (tcFn (T.objAt t)))) :=
+    PrfH_provCode_congr
+      (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _) (PrfH_congr_tcFn hEQ)) hcarc
+  -- (3) `tc_objAt`: aquí se pagan las guardas de los nodos `sub`
+  have hcarc2 : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (provFromCode (eqc (carcT (tcFn t)) (T.dotV t))) :=
+    PrfH_eq_trans_code _ _ _ (substtc_inv_carcT_tcFn t) hcarc1
+      (PrfH_tc_objAt t T hguards)
+      (prf_hasWit_carcT (prf_hasWit_tcFn t)) (prf_hasWit_tcFn (T.objAt t))
+      (prf_hasWit_dotV t T)
+  -- (4) `dotV → dotN`, por inducción sobre el árbol
+  have hfin : PrfH [substFormula 0 t G, lenc t =eq numeralM n, lineWF t]
+      (provFromCode (eqc (carcT (tcFn t)) (T.dotN t))) :=
+    PrfH_eq_trans_code _ _ _ (substtc_inv_carcT_tcFn t) hcarc2
+      (PrfH_dotVN t hlenc T hmax)
+      (prf_hasWit_carcT (prf_hasWit_tcFn t)) (prf_hasWit_dotV t T) (prf_hasWit_dotN t T)
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_condD_of_stree_eq T t))) _) hfin
+
+/-! ## §7 · LOS TRES TAGS ALCANZABLES, CERRADOS
+
+La obligación administrativa `hC` del chasis, para una condición guardada. -/
+
+theorem substFormula_guardedCond_var0 :
+    ∀ (gs : List GuardSlot) (C : Formula), substFormula 0 (.var 0) C = C →
+      substFormula 0 (.var 0) (guardedCond gs C) = guardedCond gs C
+  | [], C, h => h
+  | g :: gs, C, h => by
+      have hg : substFormula 0 (.var 0) g.toF = g.toF := by
+        cases g with
+        | wit i =>
+            simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms,
+              substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
+        | witF i =>
+            simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms,
+              substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
+      simp only [guardedCond, substFormula, hg, substFormula_guardedCond_var0 gs C h]
+
+/-- ⭐ **EL CIERRE DE UN TAG DE SUSTITUCIÓN**, genérico: basta declarar su árbol, su lista de
+    guardas y descargar las dos obligaciones locales. -/
+theorem pcc_lineWF_tracked_of_stree {k n : Nat} (T : STree) (t : Term)
+    (gs : List GuardSlot) (hmax : Nat.le T.maxLeaf n) (h1n : 1 < n)
+    (hax : Prf (Formula.forall (Formula.impl (tagF k)
+      (lwfVar ⇔ Formula.and (lencF n) (guardedCond gs (condOfS T))))))
+    (hcond : Hcond n t (guardedCond gs (condOfS T))) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM k)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_schema t
+    (substFormula_guardedCond_var0 gs (condOfS T) (substFormula_condOfS T)) hax hcond h1n
+
+
+/-! ## §8 · q1 (tag 9), CERRADO — el piloto
+
+⭐ Y aquí se ve por qué ADR‑020 puso la guarda donde la puso: **las casillas guardadas son
+exactamente los hijos del nodo `sub`**. `treeQ1 = bin 5 (un 6 (leaf 2)) (sub (leaf 3) (leaf 2))`,
+y la cascada del tag 9 es `[witF 2, wit 3]` — la `witF` sobre la casilla 2 (el cuerpo del
+`substfc`) y la `wit` sobre la 3 (el sustituyendo). `SGuards` las pide **ahí y sólo ahí**. -/
+
+theorem substF_wit_slot (t : Term) (i : Nat) :
+    substFormula 0 t (GuardSlot.wit i).toF = hasWit (nthc t (numeralM i)) := by
+  simp only [GuardSlot.toF, substF_hasWit, nthc, substTerm, substTerms, substTerm_numeralM,
+    FOL.substTerm_liftTerm, if_true]
+
+theorem substF_witF_slot (t : Term) (i : Nat) :
+    substFormula 0 t (GuardSlot.witF i).toF = hasWitF (nthc t (numeralM i)) := by
+  simp only [GuardSlot.toF, substF_hasWitF, nthc, substTerm, substTerms, substTerm_numeralM,
+    FOL.substTerm_liftTerm, if_true]
+
+/-- El núcleo estructural de **q1**, con la fórmula guardada entera a la vista. -/
+theorem pcc_core_q1 (t : Term) :
+    HcondCore 4 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ1)) (condOfS treeQ1) := by
+  refine pcc_condDS_of_stree treeQ1 t (n := 4) Nat.le.refl _ ?_ ?_
+  · refine prf_deduction ?_
+    have h := PrfH_and_elim_right (PrfH_and_elim_right
+      (prfH_hyp_self (substFormula 0 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ1)))))
+    simpa only [guardedCond, substFormula_condOfS_at] using h
+  · have hh : PrfH [substFormula 0 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ1)),
+        lenc t =eq numeralM 4, lineWF t]
+        (substFormula 0 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ1))) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    refine ⟨trivial, ⟨?_, ?_⟩, trivial, trivial⟩
+    · have h := PrfH_and_elim_left (PrfH_and_elim_right hh)
+      simpa only [guardedCond, substF_wit_slot, STree.objAt] using h
+    · have h := PrfH_and_elim_left hh
+      simpa only [guardedCond, substF_witF_slot, STree.objAt] using h
+
+/-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 9 (`q1`), PROBADO.** El primero de los siete. -/
+theorem pcc_lineWF_tracked_q1_imp (t : Term) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 9)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_stree (k := 9) (n := 4) treeQ1 t [.witF 2, .wit 3] Nat.le.refl (by omega)
+    (prf_ax (show ax_lineWF_q1 ∈ axioms by simp [axioms]))
+    (hcond_absorbe_2 t 4 (.witF 2) (.wit 3) (condOfS treeQ1)
+      (pcc_hGuardF 2 4 t (by omega)) (pcc_hGuardT 3 4 t (by omega)) (pcc_core_q1 t))
+
+
+/-! ## §9 · q2 (tag 10) y leibniz (tag 13), CERRADOS
+
+Con el piloto hecho, cada tag es **declarar su árbol y desempaquetar su cascada**. `leibniz`
+tiene **dos** nodos `sub` (`A[t₁]` y `A[t₂]`) y por eso su cascada trae **tres** guardas: la
+`witF` sobre el cuerpo, compartida por los dos, y una `wit` por cada sustituyendo. -/
+
+theorem pcc_core_q2 (t : Term) :
+    HcondCore 4 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ2)) (condOfS treeQ2) := by
+  refine pcc_condDS_of_stree treeQ2 t (n := 4) Nat.le.refl _ ?_ ?_
+  · refine prf_deduction ?_
+    have h := PrfH_and_elim_right (PrfH_and_elim_right
+      (prfH_hyp_self (substFormula 0 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ2)))))
+    simpa only [guardedCond, substFormula_condOfS_at] using h
+  · have hh : PrfH [substFormula 0 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ2)),
+        lenc t =eq numeralM 4, lineWF t]
+        (substFormula 0 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ2))) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    refine ⟨⟨⟨?_, ?_⟩, trivial, trivial⟩, trivial⟩
+    · have h := PrfH_and_elim_left (PrfH_and_elim_right hh)
+      simpa only [guardedCond, substF_wit_slot, STree.objAt] using h
+    · have h := PrfH_and_elim_left hh
+      simpa only [guardedCond, substF_witF_slot, STree.objAt] using h
+
+/-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 10 (`q2`), PROBADO.** -/
+theorem pcc_lineWF_tracked_q2_imp (t : Term) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 10)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_stree (k := 10) (n := 4) treeQ2 t [.witF 2, .wit 3]
+    Nat.le.refl (by omega)
+    (prf_ax (show ax_lineWF_q2 ∈ axioms by simp [axioms]))
+    (hcond_absorbe_2 t 4 (.witF 2) (.wit 3) (condOfS treeQ2)
+      (pcc_hGuardF 2 4 t (by omega)) (pcc_hGuardT 3 4 t (by omega)) (pcc_core_q2 t))
+
+theorem pcc_core_leibniz (t : Term) :
+    HcondCore 5 t (guardedCond [.witF 2, .wit 3, .wit 4] (condOfS treeLeibniz))
+      (condOfS treeLeibniz) := by
+  refine pcc_condDS_of_stree treeLeibniz t (n := 5) Nat.le.refl _ ?_ ?_
+  · refine prf_deduction ?_
+    have h := PrfH_and_elim_right (PrfH_and_elim_right (PrfH_and_elim_right
+      (prfH_hyp_self (substFormula 0 t
+        (guardedCond [.witF 2, .wit 3, .wit 4] (condOfS treeLeibniz))))))
+    simpa only [guardedCond, substFormula_condOfS_at] using h
+  · have hh : PrfH [substFormula 0 t
+        (guardedCond [.witF 2, .wit 3, .wit 4] (condOfS treeLeibniz)),
+        lenc t =eq numeralM 5, lineWF t]
+        (substFormula 0 t (guardedCond [.witF 2, .wit 3, .wit 4] (condOfS treeLeibniz))) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    -- ⚠️ los tipos van INLINE: un `have : PrfH _ (…)` no puede inferir el contexto
+    exact ⟨⟨trivial, trivial⟩,
+      ⟨⟨by simpa only [guardedCond, substF_wit_slot, STree.objAt] using
+            PrfH_and_elim_left (PrfH_and_elim_right hh),
+        by simpa only [guardedCond, substF_witF_slot, STree.objAt] using
+            PrfH_and_elim_left hh⟩, trivial, trivial⟩,
+      ⟨⟨by simpa only [guardedCond, substF_wit_slot, STree.objAt] using
+            PrfH_and_elim_left (PrfH_and_elim_right (PrfH_and_elim_right hh)),
+        by simpa only [guardedCond, substF_witF_slot, STree.objAt] using
+            PrfH_and_elim_left hh⟩, trivial, trivial⟩⟩
+
+/-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 13 (`leibniz`), PROBADO.** Con él, **tres de los siete**. -/
+theorem pcc_lineWF_tracked_leibniz_imp (t : Term) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 13)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_stree (k := 13) (n := 5) treeLeibniz t [.witF 2, .wit 3, .wit 4]
+    Nat.le.refl (by omega)
+    (prf_ax (show ax_lineWF_leibniz ∈ axioms by simp [axioms]))
+    (hcond_absorbe_3 t 5 (.witF 2) (.wit 3) (.wit 4) (condOfS treeLeibniz)
+      (pcc_hGuardF 2 5 t (by omega)) (pcc_hGuardT 3 5 t (by omega))
+      (pcc_hGuardT 4 5 t (by omega)) (pcc_core_leibniz t))
+
 end ROBINSON_PlusPlus.Meta.SubstTreeReflect
 
 /-! ## `export` — por PROPÓSITO DECLARADO
 
-El consumidor previsto es el cierre de los tres reflectores alcanzables (q1, q2, leibniz):
-quien pruebe `PrfH_dotVN` para `STree` —cuyo único caso nuevo es el nodo `sub`, y lo paga
-`pcc_eval_substfc_wit` con las guardas que `hcond_absorbe_1/2/3` ponen en el contexto— cierra
-los tres declarando su árbol. Nada lo consume todavía, y se dice en vez de fingir una medición
-de consumo. -/
+El consumidor previsto es `pcc_lineWF_tracked_modulo_7` (`Meta/LineWFAssemblePrf.lean`), que
+pide un reflector por tag. Este módulo le entrega **tres de los siete**:
+`pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10) y `_leibniz_imp` (13).
+
+⚠️ **Los otros cuatro** —q3 (11), qconf (19), ind (18), listInd (20)— **esperan a
+`pcc_eval_liftfc`**, que no existe en ningún sitio; son exactamente los que llevan `liftfc`
+(§3.47.1). Hasta que estén los siete, `pcc_lineWF_tracked` sigue siendo condicional.
+
+Nada lo consume todavía, y se dice en vez de fingir una medición de consumo. -/
 export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
   STree substTerm_objAt substTerm_objAt_var0 code_eq_termCode prf_substtc_code
   substtc_inv_dotN substtc_inv_dotV prf_hasWit_dotN prf_hasWit_dotV
   condOfS substFormula_condOfS substFormula_condOfS_at prf_condD_of_stree_eq
   treeQ1 treeQ2 treeLeibniz
+  SGuards PrfH_tc_objAt PrfH_dotVN pcc_condDS_of_stree
+  substFormula_guardedCond_var0 pcc_lineWF_tracked_of_stree
+  substF_wit_slot substF_witF_slot
+  pcc_core_q1 pcc_core_q2 pcc_core_leibniz
+  pcc_lineWF_tracked_q1_imp pcc_lineWF_tracked_q2_imp pcc_lineWF_tracked_leibniz_imp
 )
 
 /-! ## FOOTPRINT -/
 
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.prf_substtc_code
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.prf_condD_of_stree_eq
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.PrfH_tc_objAt
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q1_imp
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q2_imp
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_leibniz_imp
