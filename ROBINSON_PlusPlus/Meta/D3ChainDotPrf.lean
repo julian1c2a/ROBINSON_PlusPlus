@@ -62,6 +62,7 @@ open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 open ROBINSON_PlusPlus.Meta.D3DottedPrf ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
+open ROBINSON_PlusPlus.Meta.EvalBoundedPrf ROBINSON_PlusPlus.Meta.EvalListPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -132,6 +133,67 @@ theorem d3_prf_of_chainOkBDot (φ : Formula) (hB : DEUDA_chainOkBDot) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_chainOkDot φ (hC_dot_of_chainOkBDot hB)
 
+
+/-! ## §3 · LA MEDICIÓN DEL DESTINO (2026‑09‑09f)
+
+Regla de método de §3.44 y del 2º corolario de *medir la forma*: **antes de escribir la prueba,
+desplegar el destino y casarlo con `rfl`**. `condD` costó un frente por saltársela. Aquí se
+aplica primero, y el resultado reordena el trabajo.
+
+### ⚠️ Lo primero que hay que saber: `chainOkBDot` **NO reduce**
+
+`chainOkBDot = substfc zero ṗ (formCode (chainOkB nil #0))`, y `substfc` es un **símbolo de
+función OBJETO**, no una función de Lean. Así que el destino es **sintácticamente opaco**: no
+hay `rfl` que lo vea como un `bdAllCode`. Medido: `∃ B Psi, chainOkBDot = bdAllCode B Psi`
+**no compila**.
+
+Quien lo abre es `prf_substfc_arith_open`, que lo iguala —**dentro de la teoría objeto**— a
+`substCodeF`, que sí es una función de Lean y sí computa. Ése es el puente, y es el mismo
+mecanismo con el que se dotaron los `ax_liftfc_*` (§3.52). -/
+
+/-- **[1] EL DESTINO, ABIERTO.** `substCodeF` computa; `chainOkBDot` no. Esto los iguala. -/
+theorem chainOkBDot_eq_substCodeF :
+    Prf (chainOkBDot =eq substCodeF 0 (tcFn (.var 0)) (chainOkB nil (.var 0))) :=
+  prf_substfc_arith_open 0 (tcFn (.var 0)) (chainOkB nil (.var 0))
+
+/-- **[2] Y LA FORMA COMPUTADA ES UN `bdAllCode`** — con la cota EXPLÍCITA, casada por `rfl`.
+
+    ⭐⭐ **Aquí está el hueco real de `DEUDA_chainOkBDot`, y no es el que se esperaba.** La cota
+    del destino es
+
+        lencT (liftc zero ṗ)
+
+    es decir, el **ACCESOR DOTADO** `lencT`, y además **pre‑`liftc`‑ado** porque vive dentro del
+    binder del `∀`. Y lo que `pcc_bdAll_intro` entrega es
+
+        tcFn (lenc p)
+
+    o sea la **REFLEXIÓN PURA**, y sin `liftc`. Son códigos distintos.
+
+    ⇒ **`DEUDA_chainOkBDot` no es «aplicar `pcc_bdAll_intro` y ya»**: son DOS puentes más,
+    los dos ya conocidos en el árbol:
+    * `tcFn (lenc p)` ↦ `lencT ṗ` — es exactamente `pcc_eval_lenc` (`Meta/EvalListPrf.lean`),
+      que **ya está probado**; es la «desviación 2» que `HasWitTrackedPrf` §9 y
+      `sondeos/ReflectorAtomoAllIn.lean` documentan.
+    * el `liftc zero` de la cota, que sale del binder. -/
+theorem chainOkBDot_computed :
+    ∃ Psi, substCodeF 0 (tcFn (.var 0)) (chainOkB nil (.var 0))
+      = bdAllCode (lencT (liftc zero (tcFn (.var 0)))) Psi := ⟨_, rfl⟩
+
+/-! ### §3.1 · Lo que queda, con los tamaños medidos
+
+| pieza | estado |
+|---|---|
+| `d3_prf_of_chainOkBDot` (§2) y todo lo de aguas abajo | ✅ **probado** |
+| el destino, abierto y con su forma fijada por `rfl` | ✅ **[1] y [2], aquí** |
+| puente de la COTA (`tcFn (lenc p)` ↦ `lencT ṗ`, y el `liftc`) | ⬜ `pcc_eval_lenc` ya existe |
+| `hbody` (a) · reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores |
+| `hbody` (b) · reflexión de `boundedPremsIn` | ⬜ 2º `∀` acotado ⇒ 2º `pcc_bdAll_intro` |
+
+⚠️ **Y el orden importa**: (a) está aguas abajo de C3, así que «ir a por D3» sin cerrar los 7
+reflectores sigue sin poder producir el teorema — lo que sí se puede hacer, y es lo que hace
+esta sección, es **fijar el destino** para que cuando (a) llegue no haya que redescubrirlo. -/
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -142,6 +204,7 @@ de fingir una medición de consumo (mismo criterio que `Meta/EvalSubstfcPrf.lean
 export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   chainOkBDot prf_forall_chainOkB_imp_chainOk pcc_chainOkBDot_imp_chainOkDot
   hC_dot_of_chainOkBDot DEUDA_chainOkBDot d3_prf_of_chainOkBDot
+  chainOkBDot_eq_substCodeF chainOkBDot_computed
 )
 
 /-! ## FOOTPRINT -/
