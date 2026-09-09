@@ -506,6 +506,59 @@ kit trae `pcc_carcD_bridge_cons` / `pcc_cdrcD_bridge_cons`, que `HasWitTrackedPr
 
 Se deja medido aquí en vez de descubrirlo dentro de la prueba del `hbody`. -/
 
+
+/-! ### §7.1 · LA DESCOMPOSICIÓN DEL DESTINO, FIJADA POR `rfl`
+
+Regla de §3: el destino se despliega y se casa con `rfl` **antes** de escribir la prueba. Aquí
+no se adivina la forma: se **lee de la definición de `substCodeF`** (`SubstCodeOpenPrf:68`), y
+las dos igualdades de abajo la certifican. Si `boundedPremsIn` o `substCodeF` cambiaran, dejan
+de compilar. -/
+
+/-- El cuerpo del `∀` de `boundedPremsIn`, como FÓRMULA (ya bajo el binder). -/
+noncomputable def premsBody (p i L : Term) : Formula :=
+  lor (In (nthc (liftTerm 0 L) (.var 0)) nil)
+      (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p) (liftTerm 0 i))
+
+/-- ⭐ **EL DESTINO, DESCOMPUESTO**: el código de `boundedPremsIn` ES un `bdAllCode`, con la cota
+    y el cuerpo identificados. Correcto por construcción, no por conjetura. -/
+theorem substCodeF_boundedPremsIn (W p i L : Term) :
+    substCodeF 0 W (boundedPremsIn nil p i L)
+      = bdAllCode (substCodeT 1 (liftc zero W) (liftTerm 0 (lenc L)))
+          (substCodeF 1 (liftc zero W) (premsBody p i L)) := rfl
+
+/-- Y el cuerpo se parte en el `orc` de sus dos disyuntos — que es lo que §6 refleja. -/
+theorem substCodeF_premsBody (W p i L : Term) :
+    substCodeF 1 (liftc zero W) (premsBody p i L)
+      = orc (substCodeF 1 (liftc zero W) (In (nthc (liftTerm 0 L) (.var 0)) nil))
+            (substCodeF 1 (liftc zero W)
+              (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p) (liftTerm 0 i))) := rfl
+
+/-! ### §7.2 · ⚠️ EL HALLAZGO QUE REORDENA EL RESTO DE `hbody`(b)
+
+Intenté fijar el `PsiF` del `pcc_bdAll_intro` interior por separado, y **no se puede**. La razón
+es estructural, no de esfuerzo:
+
+* `pcc_bdAll_intro` entrega `bdAllCode (tcFn (bndF q)) (PsiF q)` con `PsiF` **a elección**;
+* pero el código de `boundedPremsIn` que D3 necesita no es cualquiera: es el **sub‑término** del
+  `PsiF` del `pcc_bdAll_intro` EXTERIOR (el de `chainOkB`, §3), porque `boundedPremsIn` vive
+  dentro de `lineOkB`, que es el cuerpo de aquél;
+* y ese sub‑término lleva las capas de `liftc`/`substCodeT` que le impone **su posición bajo los
+  binders del exterior**, no las que salen de instanciar el interior por su cuenta.
+
+Medido: `substCodeF 1 (liftc 0 ṗ) (lineOkB nil #1 #0)` **sí** computa a
+`andc … (bdAllCode (lencT …) (orc … …))` —comprobado— pero sus capas de `liftc` no coinciden con
+las que produce un `bdCarcLtDot` construido de cero (comprobado también, y falla).
+
+⇒ **Los dos `PsiF` hay que diseñarlos JUNTOS**: primero el exterior, explícito y casado con el
+destino por `rfl`, y el interior sale de él como sub‑término. Atacar `hbody`(b) aislado lleva a
+un `PsiF` que compila pero que el ensamblaje exterior no puede consumir — el mismo modo de fallo
+que `condD` (§3.44), y por la misma causa: **elegir la imagen cuando hay un destino fijo**.
+
+⚠️ Y eso NO invalida nada de §5–§7: `pcc_bdCarcLt_reflect` y `pcc_premsBody_reflect` están
+enunciados sobre argumentos **abstractos** (`y p b`, y el `Ac` libre del disyunto vacuo), así
+que se instanciarán con las capas que el exterior imponga, sean las que sean. Es exactamente
+para lo que se dejaron abstractos. -/
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -523,6 +576,7 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   pcc_premsBody_reflect pcc_premsBody_reflect_at
   pkP pkI pkL premsPair premsBnd
   hCl_premsPair hCs_premsPair hbl_premsBnd hbs_premsBnd
+  premsBody substCodeF_boundedPremsIn substCodeF_premsBody
 )
 
 /-! ## FOOTPRINT -/
