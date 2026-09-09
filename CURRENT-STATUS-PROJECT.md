@@ -2,28 +2,40 @@
 
 > ## ESTADO REAL — 2026-09-10 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE** · ✅ **CI VERDE**
 >
-> ⛔🏁 **D3 · §3.56 — el `PsiF` del chasis.** `hPl` (naturalidad del cuerpo) era **FALSA** para el
-> `chainOkBPsi` de §8, certificado por dos `rfl`: `pcc_bdAll_intro` **no era aplicable**. Con el
-> `PsiF` **dotado** (`chainOkBPsiDot`, símbolos objeto y código de fórmula CERRADO) caen **siete de
-> sus nueve** obligaciones —incluida `hwPsi`, entera, con la rama C de ADR‑020— y el puente al
-> cuerpo del destino vive **dentro de `Prov`**. ⇒ **`d3_prf_of_body`: D3 desde `hwP`, `hPsiId` y
-> `hbody`.** 🔑 La regla: **el destino fija la IMAGEN; el chasis fija la FORMA de escribirla.**
+> 🏁🏁🏁 **D3 ESTÁ EN UNA SOLA OBLIGACIÓN: `hbody`** (§3.58). `d3_prf_of_body_only` la cierra desde
+> ahí, y **todo lo demás está probado** —el puente átomo↔forma acotada, la cota, el `∃` acotado, el
+> cuerpo del `∀`, el empaquetado, los **dos** `PsiF`, `hmatch`, `hPinv`, `hPsiId` y `hwP`—, con
+> footprint igual a la base sancionada.
 >
-> 🏁 **Y `hPsiId` PROBADO** (§3.57), con la **TERCERA variante** de la familia
-> `substfc_inv_substCodeF` — nivel actuante **por debajo** del `substCodeF`. ⚠️ Por debajo **el
-> testigo deja de ser libre** (la casilla `n = v` es una `varc v̄` corriente y `substtc` la
-> sustituye por él) y ⭐⭐ **el índice no admite salto**: a `v+2` o más quedarían variables que
-> `substtc` **decrementaría** y el enunciado sería **FALSO**. ⇒ **`d3_prf_of_hbody`: D3 desde DOS
-> obligaciones**, `hwP` y `hbody`.
+> `hbody` se parte —por `chainOkBPsi_split`, que conecta los dos `PsiF` **por construcción**— en:
 >
-> 🏁🏁 **Y `hwP` PROBADO en CUATRO líneas** (§3.58) ⇒ **D3 queda en UNA SOLA OBLIGACIÓN:
-> `hbody`.** El testigo del cuerpo se **transporta** del `PsiF` dotado al computable con Leibniz
-> objeto, por el **mismo puente** que ya había llevado la forma (`hmatch`) y la prueba
-> (`hbdAll_of_dotted`). ⇒ De `hbody` sólo la mitad **(a)** —`pcc_lineWF_tracked`, 5 de 7— sigue
-> aguas abajo de C3; la mitad **(b)** es ensamblaje y **no depende de C3**.
+> | mitad | estado | ¿depende de C3? |
+> |---|---|---|
+> | **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`) | ✅ **sí** — `ind` (18), `listInd` (20) |
+> | **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado, falta **ensamblar** | ❌ **no** |
 >
-> ⚠️ **El contador de obligaciones NO mide el progreso**: §3.56 lo subió de 2 a 3 y fue el paso
-> más importante de los cuatro — lo que medía era una cadena que no cerraba.
+> ⭐ **Dos rutas, y la elección está medida**: **(b) primero** para avanzar sin tocar C3 —es
+> ensamblaje, no maquinaria nueva—, o **`prf_hasWitF_liftfc`** para cerrar C3 y (a) de una vez.
+>
+> ### Cómo se llegó, en cuatro tramos (§3.55–§3.58)
+>
+> | tramo | de → a | la pieza que lo movió |
+> |---|---|---|
+> | §3.55 | sin medir → **2** | destino abierto y forma fijada por `rfl`; la cota **dentro de `Prov`**; `hPinv` genérico |
+> | §3.56 | 2 → **3** ⚠️ | ⛔ el chasis **no era aplicable**: `hPl` era **FALSA** ⇒ el `PsiF` **dotado** |
+> | §3.57 | 3 → **2** | `hPsiId`, con la **tercera variante** de la familia |
+> | §3.58 | 2 → **1** | `hwP`, transportando el **testigo** por el puente de §3.56 |
+>
+> 🔑🔑🔑 **Las tres reglas del frente, y las tres son sobre la FORMA:**
+> 1. **El destino fija la IMAGEN; el chasis fija la FORMA en que hay que escribirla.** Hacen falta
+>    **los dos** cuerpos —el computable, que casa el destino por `rfl`, y el **dotado**, que es el
+>    único natural— y por el puente entre ellos, **dentro de `Prov`**, han viajado ya **tres cosas**:
+>    la forma (`hmatch`), la prueba (`hbdAll_of_dotted`) y el testigo (`hwP`).
+> 2. **El ÍNDICE no es cosmético, y van tres veces.** La familia `substfc_inv_substCodeF` tiene
+>    **tres** variantes y **no son intercambiables**: por debajo del hueco el testigo **deja de ser
+>    libre**, y un salto de dos o más haría el enunciado **FALSO**.
+> 3. ⚠️ **El contador de obligaciones NO mide el progreso**: §3.56 lo **subió** de 2 a 3 y fue el
+>    paso más importante de los cuatro — lo que el «2» medía era una cadena que **no cerraba**.
 >
 > 🔧 **Y el instrumental mentía** (AI‑GUIDE §27.1): `check-sorry.bash` daba **101 falsos positivos**
 > —menciones en prosa— donde hay **0** de verdad; `check-doc-sync.bash` daba verde con los cuatro
@@ -165,7 +177,8 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **0 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
+>   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -198,7 +211,7 @@
 | Promoción a `Meta/` (rama B) | ⏳ **B0–B2 hechas; B3 EN CURSO.** 🆕 **B3 (2026‑09‑04)**: de `SubstfcPlanos` salieron DOS DESCENSOS —`binK` a `CodeCtorKit` y el KIT TERNARIO a `EvalArithPrf`, que retira **74 copias a mano** de `sondeos/`— y el módulo **`SubstfcCodePrf`** (17 de 39; 4 retiradas por MUERTAS). Quedan `EvalSubsttc`, `SubstfcEx` y `EvalSubstfcPrf`. 🆕 **B2 (2026‑09‑04)**: `Meta/EvalLiftcPrf.lean` — **el DESCENSO**, que pone **`pcc_eval_liftc`** en producción y descarga el `hLift` de `Paso2CasoForall`. De 198 declaraciones del sondeo se promovieron **31**. 🔑 Destapó el **CICLO DE IMPORTS** (**ADR‑019**): cuando el sondeo subsume a producción hay que **bajar el general**, no subir el corolario. Seis piezas genéricas subieron aguas arriba (`PSI_inst` estaba copiado a mano en **siete** sondeos). Detalle en [§3.34](doc/REFERENCE-Incompleteness.md) |
 | Verdad de los docstrings (rama G) | 🆕 ⚠️ **El libro se escribe leyendo del árbol, y el compilador NO verifica la prosa.** Auditoría en curso, 5 categorías con método propio cada una. Casos ya confirmados: `CodeWitnessPrf:78‑82` promete un `DescMutua` **inexistente**; `refl_isTermCodeE1_imp` se anuncia «EL RESULTADO CENTRAL» con **cero usos**. Ver `NEXT-STEPS.md` rama G |
 | `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `CodeDecode` (biyección `decodeForm` + inyectividad) + `ChainDecode` (`decodeChain_prf`). **Módulo B** (`LineWFCases`, 21 tags) ✅. ⚠️ `canon_ne` es FALSO (reintroduciría la inconsistencia, `sondeos/CanonNeRefuta.lean`), pero ✅ **su sustituto YA ESTÁ EN PRODUCCIÓN** (2026‑09‑01): `Meta/CodeNatInjPrf.lean` (`codeNat_ne`/`codeNatTerm_ne`). ⛔ Y el otro bloqueo que el plan documentaba (`axiomsCodeT` opaco) **es FALSO desde julio** (§3.32.3). Estimación revisada: **~800‑1 300 líneas / 3,5‑5 sesiones** |
-| D3 / plan 12‑A | ✅ **Fases 1a/1b/2/3 completas y la cuarentena VACÍA.** D3 reducida a **UN SOLO lema**: `d3_prf_of_chainOkDot (φ) (hC)` — sólo pide **`hC_dot`**, la reflexión punteada de `chainOk`, que **NO EXISTE** (rama D). Su keystone sí: `pcc_bdAll_intro` (`Meta/BdAllIntroPrf.lean:313`). Y `pcc_lineWF_tracked_modulo_7` verifica que cerrar los **7 reflectores** es exactamente lo que falta aguas abajo. 🏁 **El muro de `substfc` YA NO bloquea**: `pcc_eval_substfc` y `pcc_eval_substfc_wit` están **en producción** desde 2026‑09‑08 (`Meta/EvalSubstfcPrf.lean`, §3.42), igual que `pcc_eval_substtc` (§3.41.1) y `prf_hasWitF_real` (`Meta/CodeWitnessPrf.lean:2140`). ✅ **La decisión NO estuvo nunca pendiente**: desde [ADR‑015](DECISIONS.md) va por la **vía de CERO axiomas**, y [ADR‑020](DECISIONS.md) la cerró metiendo la guarda dentro del `⇔`. ⛔ A4 («guarda sobre argumento ABSTRACTO») sigue **RETIRADA**: es imposible, está refutado — por eso la guarda se **arrastra**. 🏁🏁 **Y desde 2026‑09‑08e `DEUDA_hGuardT`/`DEUDA_hGuardF` están PROBADAS**: ADR‑020 no debe nada (`hGuard_of_slots`). ▶ De la rama C queda la **condición ESTRUCTURAL** de los 7 tags de sustitución — **3 alcanzables hoy** (q1, q2, leibniz; chasis en `Meta/SubstTreeReflect.lean`, falta `PrfH_dotVN` para `STree`) y **4 bloqueados por `pcc_eval_liftfc`** (q3, qconf, ind, listInd) —, más A5 generalizada |
+| D3 / plan 12‑A | 🏁🏁 **D3 EN UNA SOLA OBLIGACIÓN: `hbody`** (2026‑09‑10, §3.55–§3.58). `d3_prf_of_body_only (φ) (hbody)` cierra D3; todo lo demás está **probado** en `Meta/D3ChainDotPrf.lean` (978 l.), con footprint igual a la base sancionada. ⚠️ **Lo que costó el frente no fue el tamaño, fue la FORMA**: `pcc_bdAll_intro` **no era aplicable** —su obligación de naturalidad `hPl` es **FALSA** para el cuerpo que casa el destino, certificado por dos `rfl`—, así que hacen falta **DOS** cuerpos: `chainOkBPsi` (`substCodeF`, computa y casa el destino por `rfl`) y **`chainOkBPsiDot`** (símbolos objeto, único natural), puenteados **dentro de `Prov`** por `prf_substfc_arith_open`. ⭐⭐ Por ese puente han viajado **tres cosas**: la FORMA (`hmatch`), la PRUEBA (`hbdAll_of_dotted`) y el TESTIGO (`hwP`). ➕ `hPsiId` pidió la **tercera variante** de `substfc_inv_substCodeF` —nivel actuante **por debajo** del código, donde el testigo **deja de ser libre**— y `hwP` salió en **cuatro líneas**. ▶ De `hbody`, la mitad **(a)** (`pcc_lineWF_tracked`, ⬜ **5 de 7**) es **lo único de D3 aguas abajo de C3** —desbloqueo: `prf_hasWitF_liftfc`—; la mitad **(b)** (reflexión de `boundedPremsIn`) tiene el núcleo probado sobre argumentos **abstractos** y **no depende de C3**: es ensamblaje. Detalle en [§3.55–§3.58](doc/REFERENCE-Incompleteness.md) |
 | Limpieza F7 | **F7a ✅ HECHA (2026-07-09)**: retirados los 7 postulados legacy (14→7 `axiom`); `Meta/Incompleteness.lean` eliminado + 5 postulados de `Meta/Provability.lean`. Cadena real verificada intacta (`#print axioms`). **F7b bloqueada** (`GodelTwo.d3` es portante; espera a D3 real) |
 | Lean version | v4.31.0 |
 | Naming convention | Mathlib-style (see `NAMING-CONVENTIONS.md`) |

@@ -4644,6 +4644,9 @@ manda cada variable del argumento **al hueco `W` o a un `varc` cerrado, según s
 
 ### §3.56.2 · 🔑 La regla, que el molde de `argsInPsi` ya cumplía sin decirlo
 
+> 📐 **Registrada como [ADR‑021](../DECISIONS.md)** el 2026‑09‑10, y como **MANDATORY M‑7**: no es
+> preferencia de estilo, es que la alternativa está **refutada por el compilador**.
+
 > **El `PsiF` de `pcc_bdAll_intro` se escribe con símbolos de función OBJETO** —`substfc`,
 > `liftc`, `tcFn`, `nthcT`— **y nunca con un `substCodeF` aplicado a una fórmula que contenga el
 > parámetro.** Los símbolos objeto son `Term.func`: `liftTerm`/`substTerm` los atraviesan y la
@@ -4854,7 +4857,7 @@ teoría» paga**, y conviene verlo junto:
 | §3.58 · `hwP_chainOkBPsi` | el **testigo**: `prf_congr_hasWitF` |
 
 ⇒ La regla de §3.56.2 —*el destino fija la imagen, el chasis fija la forma en que hay que
-escribirla*— **no era una molestia administrativa**. Tener los dos cuerpos y un puente entre ellos
+escribirla*, hoy **[ADR‑021](../DECISIONS.md)**— **no era una molestia administrativa**. Tener los dos cuerpos y un puente entre ellos
 **dentro de la teoría** es lo que hace que las tres cosas viajen; con un solo cuerpo, ninguna de
 las tres tenía por dónde pasar.
 

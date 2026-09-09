@@ -18,7 +18,8 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **0 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
+>   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -187,4 +188,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-07-05 — Build ✅ **0 sorrys** (67 jobs), Lean **v4.31.0** (política: última estable). **~54 módulos** (Minimal/ 11 + Meta/ 30 + Full/ 11 + barrels). **Minimal/** (34 axiomas, sin inducción) cierra Bloques I–VIII + TFA. **Full/** (inducción general) deriva ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 y cierra el **Teorema Fundamental de la Aritmética** (`tfa_numeral`). **Meta/** formaliza la Gödelización completa: codificación, demostrabilidad, los **dos Teoremas de Incompletitud**, y el **Nivel D REAL** sobre un cálculo de Hilbert finitario `Prf`. **Primer Teorema de Gödel REAL sin postulados**: verificador `validProofFn`/`runFn` sólido → `repr_pos`/D1 → **lema diagonal real** (`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`) → **`goedel_first_real : ConsistentOmega → ¬ Prf G`**. **Hacia Gödel II REAL**: **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) finitarias reales sin postulados; **D3** reducida (`d3_prf_of_sigma1`) a la Σ₁-completitud del verificador (`hC`/`hI`). En curso (**Opción A**, ver `GODEL-D3-TRACKED-DESIGN.md`): predicado de demostrabilidad con **testigo rastreado** (`tcFn`/`substfc`) para cerrar `hI`/`hC` → `d3_prf` → `goedel_second_prf : ConsistentH → ¬ Prf Con'`. Las meta-reglas ω viven en `FOL/MetaRules.lean`.*
+*Last updated: 2026-09-10 — Build ✅ **135 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI‑GUIDE §27.1), **7 `axiom` de Lean**, Lean **v4.31.0** (política: última estable). **121 módulos activos** (Minimal/ 11 + Meta/ 99 + Full/ 11) + 0 en `cuarentena/` + 60 en `sondeos/`. ✅ **CI en verde** (`.github/workflows/build.yml`, con los dos checkouts hermanos que `FOL` necesita).*

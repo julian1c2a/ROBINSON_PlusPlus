@@ -18,7 +18,8 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **0 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
+>   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -58,6 +59,7 @@ proyecto; no introduce ninguna nueva.
 | **M-4** | **Cero `sorry` en el árbol activo.** No se «aparca» una prueba con `sorry`: o entra probada, o se queda en `sondeos/` | — | `bash check-sorry.bash` → `✅ No sorry found.` (cuenta el TOKEN, fuera de comentarios y cadenas; AI-GUIDE §27.1) |
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
 | **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
+| **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) se escribe con símbolos de función OBJETO**, nunca con un `substCodeF` sobre una fórmula que lleve el parámetro. No es preferencia: la obligación de naturalidad `hPl` es **FALSA** en el segundo caso | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
 
 > **Sobre `Classical.*`**: este proyecto **no** lo prohíbe (2 usos verificados el
 > 2026-07-12). Lo que sí mantiene es la disciplina de **cero axiomas espurios** de M-1.
@@ -1125,3 +1127,106 @@ B3.2/B3.4 compraron, no por la que la enmienda añadió.»* Que es justo lo que 
 la decisión prometía.
 
 **Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
+
+
+---
+
+## ADR-021: El `PsiF` de un chasis inductivo se escribe con símbolos OBJETO — y por eso hacen falta DOS cuerpos
+
+**Fecha**: 2026-09-10
+**Estado**: Aceptado — ⚠️ **forzado por una medición, no elegido**. La alternativa está
+**refutada por el compilador**, no descartada por conveniencia.
+
+### Contexto
+
+`pcc_bdAll_intro` (`Meta/BdAllIntroPrf.lean`) es el chasis que produce
+`Prf (CF p ⇒ Prov(⌜∀i<bndF p. Ψ⌝))` por inducción sobre el parámetro `p`. Entre sus nueve
+obligaciones hay dos de **naturalidad del cuerpo**:
+
+    hPl : ∀ k q, liftTerm k (PsiF q) = PsiF (liftTerm k q)
+    hPs : ∀ v t q, substTerm v t (PsiF q) = PsiF (substTerm v t q)
+
+Al aplicarlo a D3 (§3.56) se descubrió que el `PsiF` natural —el que **casa el destino por
+`rfl`**, `chainOkBPsi W p = substCodeF 1 (liftc 0 W) (lineOkB nil (liftTerm 0 p) #0)`— **no
+cumple `hPl`**.
+
+### La medición (certificada por el compilador, dos `rfl`)
+
+    substCodeT 1 w #1                            = w                    -- el HUECO entrega el testigo
+    substCodeT 1 (liftTerm 0 w) (liftTerm 0 #1)  = varc (numeral 1)     -- …y tras el lift, un varc CERRADO
+
+`substCodeF`/`substCodeT` mandan cada variable del argumento **al hueco del testigo o a un `varc`
+cerrado, según su nivel**. Un `liftTerm` en el parámetro la mueve **fuera del hueco**: donde antes
+salía el testigo, ahora sale un `varc`. Los dos lados dejan de ser el mismo término. ⇒ `hPl` es
+**FALSA**, no «difícil».
+
+### Decisión
+
+> **El `PsiF` de `pcc_bdAll_intro` —y de cualquier chasis que induzca sobre el parámetro— se
+> escribe con SÍMBOLOS DE FUNCIÓN OBJETO** (`substfc`, `liftc`, `tcFn`, `nthcT`, `funcc`…),
+> **NUNCA con un `substCodeF`/`substCodeT` aplicado a una fórmula o término que contenga el
+> parámetro.**
+>
+> El parámetro entra **sólo** por dentro de un símbolo objeto (`tcFn q`), y el código de la
+> fórmula queda **CERRADO**.
+
+**Razón**: los símbolos objeto son `Term.func`, y `liftTerm`/`substTerm` los **atraviesan** — la
+naturalidad es un `simp only`. `substCodeF` es una función de **Lean** que **recursa sobre la
+fórmula**, y ahí la naturalidad es falsa.
+
+⭐ La regla ya se cumplía sin estar escrita: `argsInPsi` (`Meta/HasWitTrackedPrf.lean` §4) está
+construido enteramente con `inFormCodeFn`/`nthcT`/`tcFn`, y por eso sus `liftT_`/`substT_` eran
+dos `simp only`. **No estaba documentada, y por eso no se vio venir.**
+
+### Consecuencia: hacen falta DOS cuerpos, y un puente DENTRO de `Prov`
+
+| cuerpo | quién lo pide | forma | ¿natural? |
+|---|---|---|---|
+| `chainOkBPsi` | el **destino** (`hmatch`, casa por `rfl`) | `substCodeF` — computa | ⛔ **no** |
+| `chainOkBPsiDot` | el **chasis** (`pcc_bdAll_intro`) | símbolos objeto | ✅ sí |
+
+El puente es **`prf_substfc_arith_open`**, dentro de la teoría objeto. ⚠️ Y no es un peaje: es
+**la infraestructura por la que cruza todo**. A 2026‑09‑10 han cruzado **tres cosas distintas**:
+
+| qué cruza | con qué | dónde |
+|---|---|---|
+| la **FORMA** | `rfl` + `prf_eq_symm` | `hmatch_chainOkB` (§3.55.5) |
+| la **PRUEBA** | `prf_provCode_congr` + `prf_congr_bdAllCode` | `hbdAll_of_dotted` (§3.56.5) |
+| el **TESTIGO** | `prf_congr_hasWitF` (Leibniz objeto) | `hwP_chainOkBPsi` (§3.58.2) |
+
+Con **un solo** cuerpo, ninguna de las tres tenía por dónde pasar.
+
+### Regla derivada: el ÍNDICE del nivel no es cosmético
+
+De la misma familia salen **tres** variantes de la invariancia del cuerpo, y **no son
+intercambiables** (`Meta/BdAllIntroPrf.lean`, `Meta/SubstCodeOpenPrf.lean` §5):
+
+| variante | nivel actuante | código a | testigo | condición sobre `φ` |
+|---|---|---|---|---|
+| `substfc_inv_substCodeF` | `v+1` | `v` | libre | `liftFormula (v+2) φ = φ` |
+| `substfc_inv_substCodeF_at` | `v` | `v` | libre | `liftFormula (v+1) φ = φ` |
+| **`substfc_id_substCodeF`** | `v` | **`v+1`** | ⚠️ **atado**: `u ≐ varc v̄` | `liftFormula (v+2) φ = φ` |
+
+⚠️ **Por debajo del hueco el testigo deja de ser libre**: la casilla `n = v` es una `varc v̄`
+corriente y `substtc` la sustituye **por el testigo**. ⭐⭐ Y el salto es **exactamente de uno**:
+con el código a `v+2` o más quedarían variables que `substtc` **decrementaría**, y el enunciado
+sería **FALSO**.
+
+📖 **El testigo va como PARÁMETRO con su ecuación, no clavado.** Existe `prf_congr_substfc_arg2`
+(`Meta/ArithPrf.lean:59`) y se podría clavar transportando; **no se hace**, por la regla que §3.50
+ya había registrado: *cuando un cuerpo bajo binder necesita el mismo parámetro a dos niveles, no
+lo escribas con `liftc` — parametrízalo por los dos*. Bajo el binder aparece `liftc 0 u`, que no
+es sintácticamente la variable de arriba, y el puente hay que darlo igualmente.
+
+### Consecuencias operativas
+
+* Al abrir un frente con `pcc_bdAll_intro`, **medir `hPl` ANTES de escribir `hbody`**. Cuesta dos
+  `rfl` y evita atacar el cuerpo contra un chasis que no puede consumirlo.
+* Si el destino impone un `substCodeF`, **no intentar hacerlo natural**: construir el gemelo
+  dotado y puentear dentro de `Prov`.
+* ⚠️ **El número de obligaciones abiertas no mide el progreso.** Aplicar este ADR **subió** el
+  contador de D3 de 2 a 3 (§3.56) y fue el paso más importante del frente: lo que el «2» medía era
+  una cadena que **no cerraba**.
+
+**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
+Footprint de todas las piezas nuevas: los tres axiomas de Lean, o la base sancionada.

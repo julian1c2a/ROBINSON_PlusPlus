@@ -18,7 +18,8 @@
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
 >   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
 >   **numeral** `godelCN`.
-> * **0 módulos en `cuarentena/`** (D3 y Gödel II aún fuera de la cadena activa). NO borrados.
+> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
+>   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
 > ### La ESCALERA (a.2) COMPLETA — 4 de 4
@@ -30,7 +31,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-04 (grafo: +1 módulo, `Meta/EvalLiftcPrf.lean` — el DESCENSO, 20 imports concretos; importa a `LiftcCodePrf` y a `CodeWitnessPrf`, **nunca al revés**: ver ADR-019)
+**Last updated:** 2026-09-10 — ⚠️ **el grafo NO ha cambiado desde el 2026-09-04**, y se ha **verificado**: los frentes de §3.52–§3.58 no añadieron ni un módulo (121 activos) ni una arista nueva. Las piezas de `hPsiId` entraron en módulos que ya existían (`SubstCodeOpenPrf` §5, `BdAllIntroPrf`), y la referencia de `TrackedAtomsPrf` a `prf_liftc_varc_numeral` (ADR-019) es **cualificada**, no un `import` nuevo: `SubstCodeOpenPrf` ya estaba en su cierre vía `BdAllIntroPrf`. Último cambio real del grafo: 2026-09-04 (+1 módulo, `Meta/EvalLiftcPrf.lean` — el DESCENSO, 20 imports concretos; importa a `LiftcCodePrf` y a `CodeWitnessPrf`, **nunca al revés**: ver ADR-019)
 **Author**: Julián Calderón Almendros
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
