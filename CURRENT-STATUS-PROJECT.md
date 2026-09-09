@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-09i · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-10 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE** · ✅ **CI VERDE**
 >
 > ⛔🏁 **D3 · §3.56 — el `PsiF` del chasis.** `hPl` (naturalidad del cuerpo) era **FALSA** para el
 > `chainOkBPsi` de §8, certificado por dos `rfl`: `pcc_bdAll_intro` **no era aplicable**. Con el
@@ -8,6 +8,13 @@
 > sus nueve** obligaciones —incluida `hwPsi`, entera, con la rama C de ADR‑020— y el puente al
 > cuerpo del destino vive **dentro de `Prov`**. ⇒ **`d3_prf_of_body`: D3 desde `hwP`, `hPsiId` y
 > `hbody`.** 🔑 La regla: **el destino fija la IMAGEN; el chasis fija la FORMA de escribirla.**
+>
+> 🏁 **Y `hPsiId` PROBADO** (§3.57), con la **TERCERA variante** de la familia
+> `substfc_inv_substCodeF` — nivel actuante **por debajo** del `substCodeF`. ⚠️ Por debajo **el
+> testigo deja de ser libre** (la casilla `n = v` es una `varc v̄` corriente y `substtc` la
+> sustituye por él) y ⭐⭐ **el índice no admite salto**: a `v+2` o más quedarían variables que
+> `substtc` **decrementaría** y el enunciado sería **FALSO**. ⇒ **`d3_prf_of_hbody`: D3 desde DOS
+> obligaciones**, `hwP` y `hbody` — y `hwP` **no depende de C3**.
 >
 > 🔧 **Y el instrumental mentía** (AI‑GUIDE §27.1): `check-sorry.bash` daba **101 falsos positivos**
 > —menciones en prosa— donde hay **0** de verdad; `check-doc-sync.bash` daba verde con los cuatro
@@ -130,7 +137,7 @@
 > una sesión, net‑0.
 > 🏁 **C3: CINCO de los SIETE** reflectores de sustitución (§3.54) — q3 (11) y qconf (19) con el
 > nodo `lift` de `STree`. ⛔ Faltan `ind` (18) y `listInd` (20), bloqueados por
-> **`prf_hasWitF_liftfc`** (⬜ aún NO existe) — que es también lo que bloquea `hbody`(a) de D3.
+> **`prf_hasWitF_liftfc`** (⬜ falta: no existe en el árbol) — que es también lo que bloquea `hbody`(a) de D3.
 > 🏁 **D3 a DOS obligaciones** (§3.55): `hwP` y `hbdAll`. Destino fijado, puente de la cota,
 > `∃` acotado, cuerpo del `∀`, empaquetado, `PsiF` exterior, `hmatch` y `hPinv`: **probados**.
 > 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52).
@@ -161,7 +168,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-10 — **D3 · §3.56** (el `PsiF` del chasis: siete de nueve obligaciones) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
+**Last updated:** 2026-09-10b — **D3 · §3.57** (`hPsiId` probado: ocho de nueve obligaciones, D3 desde DOS) y **§3.56** (el `PsiF` del chasis) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
 **Author**: Julián Calderón Almendros
 
 ---

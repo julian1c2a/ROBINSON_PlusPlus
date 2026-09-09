@@ -13,7 +13,7 @@
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
 (`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
-**Last updated:** 2026-09-10 (§3.56 · el `PsiF` del chasis) · Lean v4.31.0.
+**Last updated:** 2026-09-10 (§3.57 · `hPsiId` probado) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
@@ -4719,3 +4719,99 @@ restricciones distintas sobre el mismo objeto, y §3.44 sólo había registrado 
 no admite elegir imagen»). Aquí la segunda muerde igual de fuerte, y **el `rfl` que casa con el
 destino no dice nada sobre si el chasis podrá consumirlo**. Medir la forma del destino era
 necesario; no era suficiente.
+
+
+---
+
+## §3.57 · 🏁 D3 · `hPsiId` PROBADO — la TERCERA variante de la familia, y D3 a DOS obligaciones (2026‑09‑10)
+
+> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §5,
+> `Meta/BdAllIntroPrf.lean`, `Meta/D3ChainDotPrf.lean` §11 (978 l.).
+> Footprint: `hPsiId_chainOkBPsiDot` con **sólo los tres axiomas de Lean**;
+> `d3_prf_of_hbody`, con la base sancionada.
+
+§3.56.6 dejó `hPsiId` **medida** y con el diagnóstico escrito: no es `hPinv` con otro nombre,
+hace falta la **tercera variante** de `substfc_inv_substCodeF` —nivel actuante **por debajo** del
+`substCodeF`— y el enunciado es cierto por dos razones concretas. ⭐ **El diagnóstico era correcto
+entero**: las dos razones se convirtieron, literalmente, en las dos hipótesis del lema genérico.
+
+### §3.57.1 · ⛔ Por qué no valía la misma inducción
+
+El caso `.var n` de `substCodeT` reparte **según el nivel**:
+
+    n = v+1  ↦ W                       el hueco del testigo de código
+    n < v+1  ↦ varc (numeral n)        variable de código CERRADA
+    n > v+1  ↦ varc (numeral (n-1))    ⚠️ DECREMENTADA
+
+Actuando **al** nivel del código (§3.55.6), las variables `< v` no se tocan y la `= v` **es** el
+hueco: la identidad sale con testigo **libre**. Actuando **por debajo** cambian dos cosas:
+
+1. ⚠️ **El testigo deja de ser libre.** La casilla `n = v` es ahora una `varc v̄` corriente, y
+   `substtc` la sustituye **por el testigo** ⇒ la identidad sólo vale si el testigo **es esa
+   misma variable**. Entra la hipótesis `u ≐ varc v̄`.
+2. **El hueco queda una unidad más arriba**, así que la condición de variables libres sube a
+   `liftFormula (v+2) φ = φ` — la de `substfc_inv_substCodeF`, no la de `_at`.
+
+⭐⭐ **Y hay una tercera, que es la que FIJA el índice.** Si el código se construyera a `v+2` o
+más, entre el nivel actuante y el hueco quedarían variables `w` con `v < w < v+2`, que `substtc`
+**decrementaría** — y ahí el enunciado sería **FALSO**. La familia **no admite salto arbitrario**:
+es exactamente «uno por debajo». Es la **tercera** vez en este frente que el índice resulta no ser
+cosmético (§3.55.6 y §3.56.6 fueron las otras dos).
+
+### §3.57.2 · Las piezas, cada una en su capa
+
+| pieza | módulo | qué |
+|---|---|---|
+| `prf_liftc_varc_numeral` | `SubstCodeOpenPrf` §5 | `liftc 0 ⌜v_k⌝ ≐ ⌜v_{k+1}⌝`, **genérico en el nivel** |
+| `substtc_id_substCodeT` / `_Ts` | `SubstCodeOpenPrf` §5 | sorte TÉRMINO |
+| `substfc_id_substCodeF` | `BdAllIntroPrf` | sorte FÓRMULA |
+| `hPsiId_chainOkBPsiDot` | `D3ChainDotPrf` §11 | la instancia de D3 |
+
+⭐ El resto **es** la inducción de §3.55.6 con los índices corridos: las dos hipótesis sobre `W`
+siguen siendo **cerradas bajo `liftc zero`** (`substCode_hyps_lift`), que era lo único que hacía
+falta — el mismo hecho que desbloqueó `hPinv`.
+
+Y la instancia sale por la ruta de siempre: **abrir el dotado hacia su gemelo computable** con
+`prf_substfc_arith_open`, aplicar el genérico allí, y volver. ⭐ Las tres hipótesis **ya estaban**:
+`hW_chainOkBPsi`/`hL_chainOkBPsi` de §3.55.6 —generalizadas en `q`, que era gratis— y
+`hfv_chainOkBPsi`, que ya tenía **el índice correcto** (`liftFormula 2`, que es justo el `v+2` con
+`v := 0`). No hizo falta reprobar nada.
+
+### §3.57.3 · 📖 El testigo va como PARÁMETRO con su ecuación, no clavado
+
+Existe `prf_congr_substfc_arg2` (`Meta/ArithPrf.lean:59`) y se podría **clavar** el testigo a
+`varc v̄` transportando con ella. **No se hace**, y la razón lleva escrita desde A5 en §3.50:
+
+> cuando un cuerpo bajo binder necesita **el mismo parámetro a dos niveles**, no lo escribas con
+> `liftc` — **parametrízalo por los dos**.
+
+Es la misma forma que ya tiene `prf_substfc_wfAll1Psi` (`Meta/HasWitTrackedPrf.lean`), y por la
+misma causa: bajo el binder lo que aparece es `liftc 0 u`, que **no es sintácticamente** la
+variable del nivel de arriba, así que el puente hay que darlo igualmente. ⭐ El diseño salió
+independientemente y **coincidió con una regla ya registrada** — señal de que la regla es buena.
+
+### §3.57.4 · 🧹 Dedup ADR‑019, medido antes de tocar
+
+* `prf_liftc_varc0` (`TrackedAtomsPrf`, **3 consumidores**) pasa a ser la **instancia `v := 0`**
+  del genérico. Se conserva el nombre —lo consumen tres frentes— y se retira la derivación
+  duplicada. Es ADR‑019 en su forma canónica: **bajar el general, no subir el corolario**.
+* `hW_chainOkBPsi`/`hL_chainOkBPsi` se **generalizan en `q`** en vez de copiarse; el enunciado no
+  dependía de `#0` para nada.
+
+⚠️ Verificado con un panel **read‑only** de cinco mediciones que **no existe versión genérica
+previa** de esta identidad: los tres `hPsiId` ya pagados a mano —`prf_argsInPsi_id`,
+`hPsiId_wfAll1Psi`, `prf_wfAllFPsi_id`— son cuerpos **dotados**, no `substCodeF`, y por tanto no
+son instancias de este lema. El panel también confirmó que `prf_liftc_varc0` **es** exactamente el
+caso `v = 0`, que es lo que autorizó el dedup.
+
+### §3.57.5 · Lo que queda de D3
+
+| pieza | estado |
+|---|---|
+| §3–§10 y **ocho de las nueve** obligaciones del chasis | ✅ |
+| **`hwP`** — `hasWitF (bdAllBndCtx (chainOkBPsi …))` | ⬜ **no depende de C3** |
+| **`hbody`**(a) — reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** (`modulo_2`) |
+| **`hbody`**(b) — reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta ensamblar |
+
+⇒ **`d3_prf_of_hbody`: D3 desde `hwP` y `hbody`.** Sólo `hbody`(a) sigue aguas abajo de C3, y su
+desbloqueo es `prf_hasWitF_liftfc`.

@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑09i · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
+**Estado 2026‑09‑10 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE · ✅ CI VERDE**
 `Build completed successfully (135 jobs)` — **121 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
@@ -13,23 +13,25 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **dos puertas ABIERTAS en D3, y ninguna depende de C3**
+> # 🎯 SIGUIENTE SESIÓN — **D3 está a `hwP` + `hbody`, y `hwP` NO depende de C3**
 >
-> D3 pasó de dos obligaciones a **tres**, y eso es un avance, no un retroceso: hasta §3.56 el
-> `pcc_bdAll_intro` de `hbdAll` **no era aplicable en absoluto**. Ahora lo es, con **siete de sus
-> nueve obligaciones descargadas**. Las tres que quedan:
+> 🏁 **`hPsiId` PROBADO** (§3.57), con la **tercera variante** de la familia
+> `substfc_inv_substCodeF` —nivel actuante **por debajo** del `substCodeF`—. Con ella,
+> **ocho de las nueve** obligaciones de `pcc_bdAll_intro` están descargadas y
+> **`d3_prf_of_hbody` cierra D3 desde DOS**:
 >
-> | obligación | depende de C3 | tamaño estimado |
+> | obligación | depende de C3 | qué es |
 > |---|---|---|
-> | **`hPsiId`** — 3ª variante de `substfc_inv_substCodeF`, nivel actuante **por debajo** | ❌ no | la inducción de §3.55.6 con los índices corridos |
-> | **`hwP`** — `hasWitF (bdAllBndCtx (chainOkBPsi …))` | ❌ no | sin medir |
-> | **`hbody`** — (a) `pcc_lineWF_tracked` + (b) `boundedPremsIn` | ✅ (a) sí | el contenido real |
+> | **`hwP`** | ❌ **no** | `hasWitF (bdAllBndCtx (chainOkBPsi …))` — el testigo del cuerpo, **sin medir** |
+> | **`hbody`**(a) | ✅ sí | `pcc_lineWF_tracked`, hoy `_modulo_2`: faltan `ind` (18) y `listInd` (20) |
+> | **`hbody`**(b) | ❌ no | reflexión de `boundedPremsIn`; núcleo probado (§3.55.3), falta ensamblar |
 >
-> ⭐ **`hPsiId` es la que mejor relación tiene**: el enunciado está **medido y es cierto** (§3.56.6),
-> la maquinaria es la misma de §3.55.6, y con ella D3 baja a DOS. **Empezar por ahí.**
+> ⭐ **Dos puertas abiertas que no pasan por C3**: `hwP` y `hbody`(b). Empezar por **medir
+> `hwP`** —es la única pieza de D3 que sigue sin medición— y, con eso en la mano, decidir
+> entre ensamblar `hbody`(b) o ir a `prf_hasWitF_liftfc`, que sigue siendo lo que falta de C3.
 >
-> ⭐⭐ **Y el punto donde C3 y D3 se tocan sigue siendo `prf_hasWitF_liftfc`** (⬜ **aún NO
-> existe**): cierra `ind` (18) y `listInd` (20) —los dos reflectores que faltan de C3— y con ellos
+> ⭐⭐ **El único punto donde C3 y D3 se tocan** sigue siendo `prf_hasWitF_liftfc`, que ⬜ **falta** (no existe en el árbol):
+> cierra `ind` (18) y `listInd` (20) —los dos reflectores que faltan de C3— y con ellos
 > `hbody`(a) de D3.
 > ⛔ **Por qué falta, medido (§3.54.1)**: no es que los árboles sean mayores, es que **se rompe una
 > cadena de guardas**. En `ind` y `listInd` los `liftfc` van **anidados y bajo un `substfc`**:
@@ -37,28 +39,26 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > pide `hasWitF (liftfc 1 A)` —el testigo del RESULTADO de un lift— y la cascada de ADR‑020 sólo da
 > `hasWitF A`. En `listInd`, dos veces.
 > ✅ **El molde existe**: `prf_hasWitF_substfc` (`Meta/SubstfcWitnessPrf.lean`, rama C de ADR‑020),
-> y el análogo sale **un binder más barato** —no hay sustituyendo—, exactamente como
-> `pcc_eval_liftfc` salió más barato que `pcc_eval_substfc`.
-> ➕ Y un nodo `tcm : Term → STree` para los `termCodeM` cerrados: trivial
-> (`substTerm_termCodeM` ya existe).
+> y el análogo sale **un binder más barato** —no hay sustituyendo—.
+> ➕ Y un nodo `tcm : Term → STree` para los `termCodeM` cerrados: trivial.
 >
-> 🔑🔑 **LA REGLA NUEVA, y la más cara de la sesión** (§3.56): **el destino fija la IMAGEN; el
-> CHASIS fija la FORMA en que hay que escribirla.** El `PsiF` de `pcc_bdAll_intro` tiene que estar
-> escrito con **símbolos de función OBJETO** —`substfc`, `liftc`, `tcFn`, `nthcT`—, **nunca con un
-> `substCodeF` aplicado a una fórmula que contenga el parámetro**: los primeros son `Term.func` y
-> `liftTerm`/`substTerm` los atraviesan; el segundo recursa sobre la fórmula, y ahí la naturalidad
-> (`hPl`) **es FALSA**. Está certificado por dos `rfl`. ⇒ hacen falta **los dos** cuerpos, el
-> computable (para casar el destino por `rfl`) y el dotado (para el chasis), y el puente entre
-> ellos vive **dentro de `Prov`**.
+> 🔑🔑 **LAS DOS REGLAS DEL FRENTE, y las dos son sobre la FORMA, no sobre el tamaño:**
 >
-> 🏁🏁 **2026‑09‑09e · `pcc_eval_liftfc` PROBADO** (§3.53), sin hipótesis, con `v` y `X` abstractos
-> y sólo `hasWitF X` de guarda. El frente entero en una sesión, net‑0.
-> 🏁 **q3 (11) y qconf (19) CERRADOS ⇒ CINCO de los SIETE** (§3.54), con el nodo `lift` de `STree`,
-> y `pcc_lineWF_tracked_modulo_2`.
-> 🏁 **D3** (§3.55, §3.56): destino fijado, puente de la cota, `∃` acotado, cuerpo del `∀`,
-> empaquetado, `PsiF` exterior, `hmatch` descargado, `hPinv_chainOkBPsi`, y el chasis **por fin
-> aplicable** con siete de nueve obligaciones.
-> 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52), y una ambigüedad que había creado yo en A5.
+> 1. **El destino fija la IMAGEN; el CHASIS fija la FORMA en que hay que escribirla** (§3.56). El
+>    `PsiF` de `pcc_bdAll_intro` va con **símbolos de función OBJETO**, nunca con un `substCodeF`
+>    sobre una fórmula que lleve el parámetro: allí la naturalidad (`hPl`) **es FALSA**. Hacen falta
+>    **los dos** cuerpos, y el puente entre ellos vive **dentro de `Prov`**.
+> 2. **El ÍNDICE no es cosmético, y ya van tres veces** (§3.55.6, §3.56.6, §3.57.1). La familia
+>    `substfc_inv_substCodeF` tiene **tres** variantes —actuante `v+1`, `v`, y `v` sobre un código
+>    a `v+1`— y **no son intercambiables**: por debajo del hueco el testigo **deja de ser libre**, y
+>    un salto de dos o más haría el enunciado **FALSO**.
+>
+> 🏁🏁 **2026‑09‑09e · `pcc_eval_liftfc` PROBADO** (§3.53), con `v` y `X` abstractos y sólo
+> `hasWitF X` de guarda; el frente entero en una sesión, net‑0.
+> 🏁 **q3 (11) y qconf (19) CERRADOS ⇒ CINCO de los SIETE** (§3.54), con el nodo `lift` de `STree`.
+> 🏁 **D3** (§3.55–§3.57): destino fijado, puente de la cota, `∃` acotado, cuerpo del `∀`,
+> empaquetado, `PsiF` exterior, `hmatch`, `hPinv`, el `PsiF` **dotado**, `hwPsi` y **`hPsiId`**.
+> 🧹 **Dedup ADR‑019** de seis familias (§3.52) + `prf_liftc_varc0` (§3.57.4).
 >
 > ⛔ **LA TRAMPA QUE MORDIÓ TRES VECES**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`… son
 > **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Todo `rfl` que parezca obvio
@@ -67,15 +67,15 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > **instancia real**: el gemelo computable se atasca con argumentos abstractos.
 >
 > ⚠️ **MEDIR UNA OBSTRUCCIÓN NO ES PROBARLA** — declaré imposible un lema que estaba a **una
-> hipótesis** de distancia. Cuando una inducción no cierra un caso, la pregunta no es «¿qué
-> maquinaria falta?» sino **«¿qué le falta a mi hipótesis para ser invariante bajo el paso que me
-> rompe?»**. ⚠️ Y su recíproca, de esta sesión: **una obstrucción SÍ probada ahorra un frente** —
-> `hPl` es falsa, y descubrirlo con dos `rfl` antes de escribir la prueba evitó atacar `hbody`
-> contra un chasis que no podía consumirlo.
+> hipótesis** de distancia. ⚠️ Y sus **dos recíprocas**, las dos de esta sesión: **una obstrucción
+> SÍ probada ahorra un frente** (dos `rfl` evitaron atacar `hbody` contra un chasis que no podía
+> consumirlo), y **una obstrucción bien MEDIDA se convierte en el enunciado del lema que falta** —
+> las dos razones de §3.56.6 son, literalmente, las dos hipótesis de `substfc_id_substCodeF`.
 >
 > ⛔ **Y un VERDE no es haber comprobado**: `check-doc-sync.bash` y `check-sorry.bash` daban verde
 > **sin comprobar casi nada** (AI‑GUIDE §27.1), y la CI **no había arrancado nunca**. Arreglado el
-> 2026‑09‑09; leer **la cifra medida**, no el `✅`.
+> 2026‑09‑09; **la CI pasa a verde por primera vez** el 2026‑09‑10 (4 m 7 s), con los dos checkouts
+> hermanos que `FOL` necesita. Leer **la cifra medida**, no el `✅`.
 
 ---
 
