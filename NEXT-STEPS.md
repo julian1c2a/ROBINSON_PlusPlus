@@ -5,7 +5,7 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 98 + Full 11) + 0 en
+`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
@@ -13,7 +13,15 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **`pcc_eval_liftfc`**, que es lo único que separa C3 del cierre
+> # 🎯 SIGUIENTE SESIÓN — **A5 primero**: `pcc_eval_liftc`/`_liftsc` a NIVEL ARBITRARIO
+>
+> ⚠️⚠️ **Medición 2026‑09‑09b (§3.49.1) que reordena el plan**: `pcc_eval_liftc` sólo vale a
+> nivel `zero`, y `ax_liftfc_forall`/`_ex` **suben el nivel**. ⇒ **A5 no es una generalización
+> opcional: es PRERREQUISITO de `pcc_eval_liftfc`** (sus casos `atom`/`eq` bajan a
+> `liftsc`/`liftc` al nivel que toque), y por tanto de los cuatro tags que faltan.
+> ▶ La base de `pcc_eval_liftfc` ya está puesta y verificada (`Meta/EvalLiftfcPrf.lean`):
+> `liftfcT` (DEFINICIÓN, nunca axioma), `targetLiftfc`, los controles y la deuda **enunciada**.
+> ⚠️ Y es un frente de **escala B3.4**, no de una sesión.
 >
 > 🏁 **2026‑09‑09: TRES de los SIETE reflectores de sustitución, PROBADOS** (§3.48):
 > `pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10) y `_leibniz_imp` (13), net‑0 puros.
@@ -99,7 +107,9 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | C3 · los árboles de q1, q2, leibniz | ✅ declarados y **casados por `rfl` con los axiomas ENTEROS**, cascada incluida ⇒ el `∃ C` de §2.1 resuelto para tres |
 > | C3 · `PrfH_tc_objAt` + `PrfH_dotVN` para `STree` | ✅ (§3.48). ⚠️ **Corrige §3.47.5**: `dotVN` es pura congruencia; quien paga la guarda es `tc_objAt`, vía `pcc_eval_substfc_wit` |
 > | ⭐ **C3 · q1 (9), q2 (10), leibniz (13)** | 🏁 **PROBADOS** — `pcc_lineWF_tracked_*_imp`, net‑0 puros |
-> | C3 · **`pcc_eval_liftfc`** | ⬜ **LO ÚNICO que separa C3 del cierre.** Los cuatro tags que faltan ya no necesitan chasis: es el mismo gesto en cuanto `STree` pueda llevar un nodo `lift` |
+> | C3 · `pcc_eval_liftfc` · la BASE | ✅ `Meta/EvalLiftfcPrf.lean` (§3.49): `liftfcT` (⛔ **definición**, nunca axioma), `targetLiftfc` + naturalidad, control **negativo** (`fail_if_success rfl`) y la deuda **enunciada** con su puente `∃∃` |
+> | C3 · **A5 · `pcc_eval_liftc`/`_liftsc` a nivel ARBITRARIO** | ⬜ ⚠️⚠️ **PRERREQUISITO, no generalización opcional** (§3.49.1): `pcc_eval_liftc` sólo vale a nivel `zero` y los axiomas `liftfc` suben el nivel |
+> | C3 · el chasis de `pcc_eval_liftfc` (8 `Caso*`) | ⬜ mecánico; molde = `pcc_eval_substfc_modulo_8` (paso de 41 l.). ⚠️ **No reutilizable tal cual**: sus `Caso*` van sobre `targetSubstfc`; hacerlo genérico en el operador es refactorizar en vivo 1625 l. de la ruta crítica |
 > | C3 · q3 (11), qconf (19), ind (18), listInd (20) | ⛔ **bloqueados por `pcc_eval_liftfc`** — los 4 que llevan `liftfc`. ⚠️ Hasta que estén, `pcc_lineWF_tracked` sigue condicional |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
@@ -504,7 +514,11 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >                 barato B3.4. Empezar MIDIENDO Meta/LiftcCodePrf.lean y
 >                 Meta/EvalLiftcPrf.lean, con pcc_eval_substfc_modulo_8 como molde de chasis.
 >              ⭐ Ya esta CUANTIFICADO: bloquea 4 de los 7 reflectores.
->         ⬜ C3e A5 generalizada mas alla del nivel `zero`.
+>         ⚠️⚠️ C3e A5 NO ES OPCIONAL: es PRERREQUISITO de C3d (§3.49.1). `pcc_eval_liftc`
+>              solo vale a nivel `zero`, y ax_liftfc_forall/_ex SUBEN el nivel, asi que los
+>              casos atom/eq de la induccion de formula bajan a liftsc/liftc al nivel que
+>              toque. Estaba catalogada como generalizacion suelta; esta en la ruta critica.
+>              ⇒ EL ORDEN CORRECTO ES: A5 -> chasis de liftfc -> los 4 tags.
 >   C4 ✅ PROPAGACION HASTA EL VERDE -- HECHA (2026-09-07). Build 126 jobs, VERDE.
 >         ① ✅ HECHA: Meta/SubstfcWitnessPrf.lean (1912 l., net-0 puro). Sin ciclo,
 >              como estaba medido. ADR-019 TRES veces al promover.

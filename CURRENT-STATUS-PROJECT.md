@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-09 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
+> ## ESTADO REAL — 2026-09-09b · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE**
 >
 > 🏁 **`Build completed successfully (132 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
@@ -34,6 +34,14 @@
 > namespaces, **31 ya en producción**.
 > ⭐ Con esto **`hCarc` queda comprado** para C3: el antecedente de `pcc_eval_substfc_wit` es
 > literalmente el conjunto extra que ADR-020 metió dentro del `⇔`.
+>
+> ▶ **2026-09-09b · `pcc_eval_liftfc`: la base, y una medición que REORDENA el plan** (§3.49).
+> `Meta/EvalLiftfcPrf.lean` — `liftfcT` (⛔ **definición**, nunca axioma), `targetLiftfc`, los
+> controles y la deuda **enunciada, no postulada**. Footprint = sólo los tres axiomas de Lean.
+> ⚠️⚠️ **`pcc_eval_liftc` sólo vale a nivel `zero`**, y `ax_liftfc_forall`/`_ex` **suben el
+> nivel** ⇒ **A5 no es una generalización opcional: es PRERREQUISITO** de `pcc_eval_liftfc`, y
+> por tanto de los cuatro tags que faltan. Orden correcto: **A5 → chasis → los 4 tags**.
+> ⚠️ Y es un frente de **escala B3.4**, no de una sesión.
 >
 > 🏁 **2026-09-09 · C3: TRES de los SIETE reflectores de sustitución, PROBADOS** (§3.48).
 > `pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10), `_leibniz_imp` (13); net-0 puros.
@@ -103,8 +111,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
 >
-> **Build 134 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
-> **120 módulos activos** (Minimal 11 + Meta 98 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 135 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >

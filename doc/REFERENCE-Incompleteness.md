@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 134 jobs · 120 módulos activos** (Minimal 11 + Meta 98 + Full 11) **+ 0 en `cuarentena/`
+> **Build 135 jobs · 121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -2996,7 +2996,7 @@ editar un fichero que otro agente audita le invalida los números de línea.
 
 ## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 98 + Full 11).
+> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
 > Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
 
 Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
@@ -3142,7 +3142,7 @@ la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`
 
 ## §3.42 · B3.4 CERRADO — `pcc_eval_substfc` en producción (2026‑09‑08)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 98 + Full 11).
+> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
 > `Meta/EvalSubstfcPrf.lean` (1 620 l.). Footprint = la base sancionada; **ni un axioma nuevo**.
 
 ⭐ **El muro de `substfc` estaba roto desde 2026‑08‑31 (§3.30), pero vivía fuera del build.**
@@ -3762,7 +3762,7 @@ específicamente nuevo de C3‑F son las dos listas testigo y el `∃∃` de `ha
 
 ## §3.45 · C3‑F · `Meta/HasWitFTrackedPrf.lean` — la mitad cara de `DEUDA_hGuardF`, probada (2026‑09‑08d)
 
-> `Build completed successfully (134 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
 > `Meta/HasWitFTrackedPrf.lean` (828 l.).
 
 ```
@@ -3848,7 +3848,7 @@ Tres pasos, todos con la máquina ya escrita:
 
 ## §3.46 · 🏁🏁 C3‑F CERRADO — `DEUDA_hGuardF` PROBADA, y la cascada de ADR‑020 sin deudas (2026‑09‑08e)
 
-> `Build completed successfully (134 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
 > `Meta/HasWitFTrackedPrf.lean` (1 230 l.).
 
 ```
@@ -3922,7 +3922,7 @@ mitad que B3.2/B3.4 compraron, no por la que la enmienda añadió.»*
 
 ## §3.47 · C3 · Arranque de los 7 reflectores de sustitución — el chasis del árbol con `substfc` (2026‑09‑08f)
 
-> `Build completed successfully (134 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
 > Footprint = **sólo los tres axiomas de Lean**: es trabajo estructural puro.
 
 ### §3.47.1 · ⭐ El `liftfc` parte los siete en dos grupos
@@ -4003,7 +4003,7 @@ Como esas guardas dependen del nodo, `PrfH_dotVN` para `STree` se enuncia con un
 
 ## §3.48 · 🏁 C3 · TRES de los SIETE reflectores de sustitución, PROBADOS (2026‑09‑09)
 
-> `Build completed successfully (134 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
+> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
 > Footprint = la base sancionada. **Net‑0 puro.**
 
 ```
@@ -4079,3 +4079,73 @@ de la enmienda —que §3.41.4 midió con siete `rfl` y que parecía arbitraria�
 siete, y hasta que estén los cuatro que faltan no se puede instanciar. Pero ya no falta chasis:
 los cuatro restantes son **el mismo gesto** —declarar su árbol y desempaquetar su cascada— en
 cuanto `STree` pueda llevar un nodo `lift`.
+
+---
+
+## §3.49 · `pcc_eval_liftfc` · la base, y la medición que reclasifica A5 (2026‑09‑09b)
+
+> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (nuevo).
+> Footprint = **sólo los tres axiomas de Lean**.
+
+### §3.49.1 · ⚠️⚠️ `pcc_eval_liftc` sólo vale a nivel `zero` — y eso pone A5 en la ruta crítica
+
+```
+pcc_eval_liftc (w s) (h : isTC1 w s) :
+  Prf (provFromCode (eqc (liftcT (termCode zero) ṡ) ((liftc zero s)˙)))
+```
+
+El nivel está **fijado a `zero`** (`Meta/EvalLiftcPrf.lean`, B2 · el DESCENSO). Y los axiomas
+del sorte fórmula **suben el nivel**:
+
+```
+liftfc c (forallc a) = forallc (liftfc (σc) a)
+liftfc c (exc a)     = exc     (liftfc (σc) a)
+```
+
+⇒ una inducción sobre el código de fórmula **no puede quedarse en el nivel 0**: el predicado
+tiene que cuantificar el nivel, y los casos `atom`/`eq` bajan a `liftsc`/`liftc` **a ese nivel**.
+
+> 🔑 **A5 —«generalizar `hasWitF` / la familia `liftc` más allá del nivel `zero`»— no es una
+> mejora opcional: es PRERREQUISITO de `pcc_eval_liftfc`, y por tanto de los cuatro tags que
+> faltan.** Llevaba catalogada como generalización suelta en el árbol de tareas (`C3e`, antes
+> `C3d`); está en la ruta crítica.
+
+⚠️ Es la misma clase de error de plan que §3.48.1: **una tarea colocada en el árbol por su
+enunciado, sin haber abierto lo que la consume**. Aquí no costó nada porque salió al medir.
+
+### §3.49.2 · Lo que entra, verificado
+
+* **`liftfcT`** — la imagen dotada de `liftfc`, que **no existía**: sólo estaban `liftcT` y
+  `liftscT`, del sorte término. ⛔ Entra como **DEFINICIÓN**; postular su ecuación de recursión
+  como axioma **objeto** hace la teoría INCONSISTENTE (la regla que ADR‑015/020 fijaron para
+  `substfcT`, y la razón por la que el frente entero va por la vía de cero axiomas).
+* `liftfcT_termCode := rfl` — el puente con `formCode`, que es lo que hace que la imagen sea
+  **la que el destino impone** y no una elegida (la lección de §3.44.1, aplicada de entrada).
+* `evalLiftfcCode`, `targetLiftfc`, y su naturalidad bajo `liftFormula`/`substFormula`.
+* **Los dos controles.** Uno **negativo** —`fail_if_success (rfl : liftfcT ṫv ṫX = (liftfc v X)˙)`—
+  que es el mismo que `Meta/EvalLiftcPrf.lean` pone sobre `liftcT`/`liftscT`: sin él, un
+  enunciado así podría ser cierto **por reflexividad** y no decir nada. Y uno positivo sobre
+  `termCode`.
+* `DEUDA_evalLiftfc` y `DEUDA_evalLiftfc_isFC1`, **enunciadas y no postuladas** (cero `axiom`),
+  y `deuda_of_isFC1`, el puente entre las dos — que **reusa la eliminación del `∃∃`** de C3‑F.
+  ⚠️ La guarda es **sólo** `hasWitF X`: `liftfc` no tiene sustituyendo, así que no hay
+  `hasWit s` que arrastrar. Es más barata que la de `substfc` en ese punto.
+
+### §3.49.3 · Lo que queda, y por qué es un frente de escala B3.4
+
+| pieza | estado |
+|---|---|
+| las 8 ecuaciones objeto `prf_liftfc_*` | ✅ ya existen **y ya son genéricas en el nivel** (`Meta/ArithPrf.lean`) |
+| la inducción fuerte (`prf_strong_induction`, `psi_lift_form*`) | ✅ **genérica en `Φ`** |
+| el chasis (predicado + gate + instanciación + paso de 8 ramas) | ⬜ mecánico; el molde es `pcc_eval_substfc_modulo_8`, cuyo paso son **41 líneas** que delegan en ocho `Caso*` |
+| `CasoBot`, `CasoBin 5/7/8` | ⬜ **congruencia pura** sobre las ecuaciones que ya están |
+| `CasoAtom`, `CasoEq` | ⛔ piden `pcc_eval_liftc`/`_liftsc` **a nivel arbitrario** = A5 |
+| `CasoUn 6/9` | ⬜ el caso que sube el nivel |
+
+⚠️ **Y el chasis de B3.4 no es reutilizable tal cual**: sus `Caso*` están escritos sobre
+`targetSubstfc v s X`. Hacerlo genérico en el operador —que es la jugada correcta a medio
+plazo— obliga a refactorizar **en vivo** un módulo de 1 625 líneas que está en la ruta crítica
+de todo lo demás. Se mide antes de tocarlo; no se toca de paso.
+
+⇒ **`pcc_eval_liftfc` es un frente de escala B3.4**, y los cuatro tags de C3 (q3, qconf, ind,
+listInd) están **aguas abajo** de él.
