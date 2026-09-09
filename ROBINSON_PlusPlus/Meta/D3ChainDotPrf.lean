@@ -400,6 +400,112 @@ theorem pcc_bdCarcLt_reflect (y p b : Term) :
     (substtc_inv_bdCarcLtB (liftTerm 0 b)) hltB hphi'
     (by hw_auto) (by hw_auto) (by hw_auto)
 
+
+/-! ## §6 · EL CUERPO DEL `∀` DE `boundedPremsIn`: la disyunción, reflejada (2026‑09‑09f)
+
+El cuerpo es `In (nthc L j) c ∨ boundedCarcLt (nthc L j) p i`, y en D3 **`c := nil`** (la cadena
+es `chainOk nil p`: sin hipótesis).
+
+⭐⭐ **Y eso hace la mitad izquierda VACUA.** `In y nil` es refutable (`prf_not_in_nil`), así que
+esa rama sale por EFQ — y, lo que importa para el ensamblaje, **el código del disyunto izquierdo
+puede quedar ARBITRARIO**: no hay que calcularlo ni casarlo con nada. Es el único sitio de todo
+D3 donde el destino **no** impone la imagen, y conviene decirlo porque contradice la regla
+general (§3.44: «`condD` no admite elegir imagen»). Aquí sí, y por una razón concreta: la rama
+no se recorre.
+
+⇒ El parámetro `Ac` de abajo es exactamente eso: el código del disyunto izquierdo, sin
+restricción. Cuando el `pcc_bdAll_intro` de §7 fije el `PsiF`, se instanciará con lo que
+`substCodeF` produzca, y esta prueba no cambia. -/
+
+/-- ⭐⭐ **EL CUERPO DEL `∀`, REFLEJADO.** La disyunción se elimina a nivel OBJETO y cada rama se
+    refleja por separado: la izquierda por explosión, la derecha por `pcc_bdCarcLt_reflect`. -/
+theorem pcc_premsBody_reflect (Ac y p i : Term) :
+    Prf (chainOk nil p ⇒ (lt i (lenc p) ⇒
+      (lor (In y nil) (boundedCarcLt y p i) ⇒
+        provFromCode (orc Ac (bdCarcLtDot y p i))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (lor (In y nil) (boundedCarcLt y p i)) [lt i (lenc p), chainOk nil p] rfl)
+    (lt i (lenc p)) [chainOk nil p] rfl)
+  refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_ ?_
+  · -- ⭐ RAMA IZQUIERDA: `In y nil` es refutable ⇒ explosión. El código `Ac` no se toca.
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (PrfH.hyp _ _ (List.Mem.head _)))
+  · -- RAMA DERECHA: el `∃` acotado de §5, con el contexto ya en su sitio
+    refine PrfH_orR_code Ac _ ?_
+    have hchain : PrfH [boundedCarcLt y p i, lor (In y nil) (boundedCarcLt y p i),
+        lt i (lenc p), chainOk nil p] (chainOk nil p) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+    have hlt : PrfH [boundedCarcLt y p i, lor (In y nil) (boundedCarcLt y p i),
+        lt i (lenc p), chainOk nil p] (lt i (lenc p)) :=
+      PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+    exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH (pcc_bdCarcLt_reflect y p i) _) hchain) hlt)
+      (PrfH.hyp _ _ (List.Mem.head _))
+
+/-- La forma que el `hbody` del `pcc_bdAll_intro` de `boundedPremsIn` consumirá: el cuerpo ya
+    instanciado en el índice `j` de la lista `L`. -/
+theorem pcc_premsBody_reflect_at (Ac L j p i : Term) :
+    Prf (chainOk nil p ⇒ (lt i (lenc p) ⇒
+      (lor (In (nthc L j) nil) (boundedCarcLt (nthc L j) p i) ⇒
+        provFromCode (orc Ac (bdCarcLtDot (nthc L j) p i))))) :=
+  pcc_premsBody_reflect Ac (nthc L j) p i
+
+
+/-! ## §7 · EL `pcc_bdAll_intro` DE `boundedPremsIn`: el EMPAQUETADO y sus obligaciones
+
+⚠️ **La fricción administrativa conocida**, y aquí es peor que en `argsIn`: `pcc_bdAll_intro`
+pide que la condición `CF` sea natural en **UN** parámetro, y `boundedPremsIn c p i L` tiene
+**cuatro** términos libres. Con `c := nil` (D3 no tiene hipótesis) quedan **tres**, que se
+empaquetan en uno con `cons` y se leen con `carc`/`cdrc` — naturales por construcción. Es
+exactamente lo que `HasWitTrackedPrf` §4 hace con `argsInPair`, un nivel más de anidamiento.
+
+    q = ⟨p, i, L⟩ = cons p (cons i L)
+      p = carc q      i = carc (cdrc q)      L = cdrc (cdrc q) -/
+
+/-- Los tres accesores del paquete. Se nombran para que las pruebas se lean. -/
+abbrev pkP (q : Term) : Term := carc q
+abbrev pkI (q : Term) : Term := carc (cdrc q)
+abbrev pkL (q : Term) : Term := cdrc (cdrc q)
+
+/-- `boundedPremsIn nil p i L` con sus tres argumentos EMPAQUETADOS en uno. -/
+def premsPair (q : Term) : Formula := boundedPremsIn nil (pkP q) (pkI q) (pkL q)
+
+/-- La cota del `∀`: la longitud de la lista de premisas. -/
+abbrev premsBnd (q : Term) : Term := lenc (pkL q)
+
+/-! ### Las obligaciones ADMINISTRATIVAS que no dependen de `PsiF` (4 de 8) -/
+
+theorem hCl_premsPair (k : Nat) (q : Term) :
+    liftFormula k (premsPair q) = premsPair (liftTerm k q) := by
+  simp only [premsPair, pkP, pkI, pkL, liftFormula_boundedPremsIn, carc, cdrc, nil, zero,
+    liftTerm, liftTerms]
+
+theorem hCs_premsPair (v : Nat) (s q : Term) :
+    substFormula v s (premsPair q) = premsPair (substTerm v s q) := by
+  simp only [premsPair, pkP, pkI, pkL, substFormula_boundedPremsIn, carc, cdrc, nil, zero,
+    substTerm, substTerms]
+
+theorem hbl_premsBnd (k : Nat) (q : Term) :
+    liftTerm k (premsBnd q) = premsBnd (liftTerm k q) := by
+  simp only [premsBnd, pkL, lenc, carc, cdrc, liftTerm, liftTerms]
+
+theorem hbs_premsBnd (v : Nat) (s q : Term) :
+    substTerm v s (premsBnd q) = premsBnd (substTerm v s q) := by
+  simp only [premsBnd, pkL, lenc, carc, cdrc, substTerm, substTerms]
+
+/-! ### ⚠️ LA INSTANCIACIÓN DEL PAQUETE **NO ES `rfl`** — y conviene tenerlo escrito
+
+El instinto dice que `premsPair (cons p (cons i L)) = boundedPremsIn nil p i L` por `rfl`.
+**Es falso**, y por la misma razón que `chainOkBDot` no reduce (§3): `carc` y `cdrc` son
+**símbolos de función OBJETO** (`Term.func "carc" […]`), no funciones de Lean. `carc (cons p X)`
+se queda tal cual; que valga `p` es un **teorema de la teoría** (`prf_carc_cons`), no un cómputo.
+
+⇒ El empaquetado de `pcc_bdAll_intro` **no es gratis** aquí, al revés de lo que sugiere leer
+`argsInPair`: hay que arrastrar los puentes objeto al instanciar. Es exactamente para lo que el
+kit trae `pcc_carcD_bridge_cons` / `pcc_cdrcD_bridge_cons`, que `HasWitTrackedPrf` §4 cita.
+
+Se deja medido aquí en vez de descubrirlo dentro de la prueba del `hbody`. -/
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -414,6 +520,9 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   chainOkB_bnd_liftc PrfH_chainOkB_bnd_bridge DEUDA_chainOkBDot_of d3_prf_of
   bdCarcLtPhic bdCarcLtDot liftTerm_bdCarcLtPhic liftTerm_bdCarcLtDot
   substtc_inv_bdCarcLtB pcc_bdCarcLt_reflect
+  pcc_premsBody_reflect pcc_premsBody_reflect_at
+  pkP pkI pkL premsPair premsBnd
+  hCl_premsPair hCs_premsPair hbl_premsBnd hbs_premsBnd
 )
 
 /-! ## FOOTPRINT -/
@@ -425,3 +534,4 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_bdCarcLt_reflect
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_premsBody_reflect
