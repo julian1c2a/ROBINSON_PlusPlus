@@ -172,6 +172,26 @@
       ],
       "nivel": "objeto",
       "glosa": "Una fórmula del lenguaje que se postula. Distinto de un \\ident{axiom} de Lean, que es un postulado de la \\emph{metateoría}: el proyecto tiene 141 de los primeros y 7 de los segundos."
+    },
+    {
+      "t": "esquema de axiomas",
+      "nivel": "objeto",
+      "glosa": "Una familia infinita de axiomas dada por una plantilla: un axioma por cada fórmula del lenguaje. La inducción de PA es un esquema; la de Lean es \\textbf{un solo} enunciado que cuantifica sobre un motivo, y por eso no son lo mismo."
+    },
+    {
+      "t": "recursión de curso de valores",
+      "nivel": "meta",
+      "glosa": "Definir $f(n)$ pudiendo mirar \\emph{todos} los valores anteriores, no sólo $f(n-1)$. Dentro de la aritmética se consigue codificando la sucesión de valores en un número (la función $\\beta$ de Gödel); es la contrapartida aritmética de definir por recursión sobre un tipo inductivo."
+    },
+    {
+      "t": "principio de Markov",
+      "nivel": "meta",
+      "glosa": "De $\\neg\\neg\\exists n.\\,P(n)$ concluir $\\exists n.\\,P(n)$ cuando $P$ es decidible. Es el principio \\textbf{más débil} que separa el constructivismo intuicionista del recursivo ruso, y es el único uso esencial de lógica clásica medido en este proyecto."
+    },
+    {
+      "t": "reflector",
+      "nivel": "proyecto",
+      "glosa": "El teorema que traslada al interior de $\\Prov$ lo que la metateoría ya sabe de un caso del verificador: por cada uno de los 21 \\emph{tags} de línea, el reflector que demuestra —dentro de la teoría— que una línea con ese tag está bien formada. Cerrar D3 es cerrar los 21."
     }
   ],
   "notaciones": [

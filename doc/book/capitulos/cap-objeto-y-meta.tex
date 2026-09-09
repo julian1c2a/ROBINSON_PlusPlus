@@ -1,0 +1,230 @@
+\chapter{¿Cuánta metateoría hace falta?}
+\label{cap:objeto-y-meta}
+
+El capítulo~\ref{cap:kernel} dejó los dos cálculos y el puente entre ellos; el
+capítulo~\ref{cap:qpp} dirá qué se afirma con ellos. Entre los dos queda una pregunta que casi
+ningún libro de incompletitud hace explícita, y que aquí no se puede eludir porque la metateoría
+es una máquina concreta: \emph{¿cuánta fuerza lógica estamos gastando para hablar de la teoría
+objeto, y cuánta hace falta de verdad?}
+
+La pregunta no es ociosa. Gödel escribió su metateoría en prosa, pero deliberadamente
+\textbf{finitaria}, para que Hilbert la aceptara: no valía razonar sobre las pruebas con más
+recursos que los que se estaban poniendo en duda. Aquí la metateoría es Lean~4, que es
+enormemente más fuerte que eso. Si nadie mide cuánto se usa, el libro estaría demostrando la
+incompletitud de una aritmética débil desde una torre de la que no sabe nada. Este capítulo mide.
+
+\begin{leccion}[La asimetría que hay que decir en voz alta]
+La metateoría \textbf{no tiene que ser más fuerte} que la teoría de la que habla. Sólo tiene que
+poder hablar de \emph{sintaxis finita}: fórmulas, listas de fórmulas, y la comprobación mecánica de
+que una lista es una derivación. Es una exigencia de \emph{expresividad}, no de fuerza. Esto es lo
+que hace posible el proyecto entero — y lo que hace que la pregunta «¿cuánta metateoría?» tenga
+una respuesta pequeña.
+\end{leccion}
+
+\section{Lean no es la aritmética de Peano, y por tres razones}
+
+Conviene descartar primero la respuesta cómoda. Sería elegante que la metateoría de este proyecto
+fuera exactamente PA —la aritmética de primer orden con inducción—: el libro se cerraría sobre sí
+mismo. No lo es, y por bastante margen.
+
+\textbf{Primero, la inducción de Lean no es un esquema.} La de PA sí: un axioma \emph{por cada}
+fórmula del lenguaje aritmético, infinitas numerables, todas cuantificando sólo sobre números. Eso
+es un \defterm{esquema de axiomas}\nivelterm{objeto}. El principio de inducción que Lean genera
+para un tipo inductivo es \textbf{un solo enunciado} que cuantifica sobre un motivo
+\ident{C : Formula → Sort u} — es decir, sobre \emph{todos} los predicados de fórmulas. Eso es
+inducción de segundo orden, y no hay manera de escribirla como esquema numerable.
+
+Y no es una diferencia de manual: el proyecto la usa así de verdad. La demostración de que el
+código de una fórmula es igual a su numeral va por recursión meta sobre \ident{Formula} con el
+motivo $\varphi \mapsto \Prf(\text{\ident{formCode}}\ \varphi \doteq \text{\ident{numeral}}
+(\text{\ident{codeNat}}\ \varphi))$, y $\Prf$ es a su vez un \ident{Prop} inductivo — un motivo que
+en PA no se puede ni enunciar sin haber aritmetizado antes $\Prf$.
+
+\leanfrag{prf_formCode_numeral}
+
+\textbf{Segundo, los universos.} Lean tiene una jerarquía infinita de universos con \ident{Prop}
+impredicativo. Su teoría de tipos se interpreta en \textsc{zfc} más una cantidad numerable de
+cardinales inaccesibles, y dentro de Lean puede construirse un modelo de \textsc{zfc}; luego Lean
+demuestra $\mathrm{Con}(\textsc{zfc})$, y con ella $\mathrm{Con}(\mathrm{PA})$, que PA no
+demuestra.\footnote{M.~Carneiro, \emph{The Type Theory of Lean}, tesis de máster, Carnegie Mellon
+University, 2019. Es la referencia estándar para el modelo; el enunciado exacto conviene
+consultarlo allí.}
+
+\textbf{Tercero, los axiomas.} \ident{propext}, \ident{Classical.choice} y \ident{Quot.sound} están
+en el \defterm{footprint}\nivelterm{proyecto} de prácticamente todo lo que este libro cita: son la
+base sancionada del proyecto. Ninguno de los tres tiene contrapartida aritmética.
+
+\section{Cuánto de esa fuerza se usa: dos niveles, y ninguno más}
+
+Que Lean sea fuerte no dice nada sobre cuánto se gasta. Eso se mide, y el resultado es
+sorprendentemente pequeño.
+
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+qué & tipo & nivel \\
+\midrule
+\ident{Term}, \ident{Formula}, \ident{Pos} & \ident{Type} & \ident{Sort 1} \\
+\ident{Derives}, \ident{Prf}, \ident{PrfH} & \ident{Prop} & \ident{Sort 0} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+En todo el árbol de \modulo{ROBINSON_PlusPlus/} y en los módulos de \modulo{FOL} que la cadena de
+\ident{import} alcanza no hay \textbf{ni un} \ident{Sort u}, \textbf{ni un} \ident{Type 1},
+\textbf{ni una} declaración \ident{universe}. El único \ident{Type u} del árbol vive en
+\modulo{FOL/Completeness.lean}, que —como dijo el capítulo~\ref{cap:kernel}— ningún módulo importa.
+
+Aunque el recursor de \ident{Formula} sea polimórfico en universos, el proyecto lo instancia en
+exactamente dos sitios: motivo en \ident{Prop} cuando \emph{demuestra} por inducción, y motivo en
+\ident{Type} cuando \emph{define} por recursión (\ident{codeNat}, \ident{formCode},
+\ident{liftTerm}, \ident{substFormula}). Ninguna inducción concreta necesita el polimorfismo: cada
+una vive en un nivel fijo.
+
+\begin{observacion}
+Y algo más fuerte: \textbf{no se cuantifica sobre \ident{Prop} en ninguna parte} —ni
+\ident{(P : Prop)} ni \ident{{P : Prop}}—, luego la impredicatividad de \ident{Prop}, que es de
+donde sale buena parte de la fuerza de Lean, \textbf{no se usa}. Dato relacionado: hay un solo
+\ident{termination_by} en todo el árbol (\modulo{ROBINSON_PlusPlus/Meta/CodeDecode.lean}); todo lo
+demás es recursión estructural.
+\end{observacion}
+
+\begin{muro}[Qué mide exactamente esto]
+Todas las cifras de esta sección están medidas sobre el \textbf{texto} del árbol, con búsquedas
+literales. Un \printaxioms\ sobre el entorno compilado puede destapar usos implícitos que una
+búsqueda no ve —una táctica que instancia algo en un universo alto, por ejemplo—. El resultado hay
+que leerlo como «no hay ningún uso \emph{escrito}», que es menos de lo que uno querría y bastante
+más de lo que suele decirse.
+\end{muro}
+
+\section{La traducción a una metateoría aritmética}
+
+Dos niveles, y cada uno tiene contrapartida conocida en aritmética:
+
+\begin{itemize}
+\item motivo en \ident{Type} —definir una función recursiva sobre sintaxis— se traduce por
+  \defterm{recursión de curso de valores}\nivelterm{meta}: la función $\beta$ de Gödel, que permite
+  codificar una sucesión finita en un número y así definir por recursión dentro de la aritmética.
+  En este proyecto la capa \ident{lenc}/\ident{nthc} ya se construye \emph{para otra cosa}, y es
+  exactamente ese instrumental;
+\item motivo en \ident{Prop} —probar por inducción— se traduce por el esquema de inducción de la
+  metateoría.
+\end{itemize}
+
+La fuerza necesaria es del orden de $\mathrm{I}\Sigma_1$: inducción restringida a fórmulas
+$\Sigma_1$. Y aquí se cierra un círculo que merece decirse: \doc{AXIOMS.md}~§1.1 argumenta que la
+\emph{teoría objeto} necesita inducción de ese mismo perfil para D2 y D3. Teoría y metateoría
+piden lo mismo. No es casualidad: las dos tienen que hacer el mismo trabajo, hablar de objetos
+sintácticos finitos.
+
+\section{\texorpdfstring{\texttt{Classical}}{Classical}: dos usos, y no son de la misma clase}
+
+En todo \modulo{ROBINSON_PlusPlus/} hay \textbf{dos} usos explícitos de lógica clásica. Dos. Y la
+diferencia entre ellos es el resultado más interesante de este capítulo.
+
+\textbf{(a) Eliminable.} En \modulo{ROBINSON_PlusPlus/Full/PrimeFactor.lean} se saca
+$\exists a,\ a \mid n \wedge a \neq 1 \wedge a \neq n$ por reducción al absurdo desde
+«$n$ no es primo».
+
+\leanfrag{exists_prime_factor}
+
+Pero todos los divisores están acotados por $n$, y la divisibilidad, la igualdad y «ser primo» son
+decidibles sobre \ident{Nat}. Es una \textbf{búsqueda acotada}: constructiva de manual.
+\ident{Decidable.byContradiction} la sustituye sin perder nada.
+
+\textbf{(b) No eliminable — y está identificado.} El otro está en la reducción que descarga la
+hipótesis de reflexión:
+
+\leanfrag{Reflects}
+\leanfrag{reflects_of_omega}
+
+Tras el \ident{intro}, el objetivo es $\Prf\varphi$ con la hipótesis $\neg\,\Prf\varphi$: o sea,
+$\neg\neg\,\Prf\varphi \to \Prf\varphi$. Y $\Prf\varphi$ es $\Sigma_1$ —existe una derivación
+finita, y comprobar que una lista dada es una derivación es decidible: ése es justo el trabajo del
+verificador del capítulo~\ref{cap:verificador}—.
+
+\begin{leccion}[Eso tiene nombre, y es el más débil que sirve]
+Eliminar la doble negación sobre un enunciado $\Sigma_1$ de matriz decidible es el
+\defterm{principio de Markov}\nivelterm{meta}. No es «lógica clásica» a secas: es el principio
+\textbf{más débil} que separa la matemática constructiva intuicionista de la recursiva rusa. Poder
+decir «un solo uso esencial, y es Markov» no es una nota de limpieza — es un resultado sobre el
+proyecto.
+\end{leccion}
+
+El \ident{Classical.choice} que aparece en los footprints es otra cosa: entra casi todo por
+instancias \ident{Decidable} y por tácticas. En
+\modulo{ROBINSON_PlusPlus/Meta/ChainDecode.lean} se construyen a mano \ident{DecidableEq} para
+\ident{Term} y \ident{Formula} —el \ident{deriving} automático no cubre el anidamiento
+\ident{func : String → List Term}—, así que hay decidibilidad real disponible y ese uso es en
+principio prescindible.
+
+\begin{muro}[Lo que un \printaxioms\ no distingue]
+Los footprints son la moneda del proyecto, pero \ident{Classical.choice} en un \printaxioms\ sale
+igual venga del Markov esencial o de una táctica perezosa. Y esa distinción es justo la que hace
+falta. La sección siguiente cuenta que la herramienta que la hace ya existe.
+\end{muro}
+
+\section{El experimento ya está hecho, y en el mismo ecosistema}
+
+Sustituir la maquinaria meta de Lean por una metateoría aritmética es un objetivo declarado del
+autor: usar su proyecto \modulo{Peano} —con alguna extensión— en lugar de Lean. La pregunta
+natural es si eso es una aspiración o un plan. Resulta que es un plan, porque la parte difícil ya
+se hizo allí.
+
+\modulo{Peano} lleva desde 2026 una \textbf{guarda de compilación}: un comando que, en cada
+\ident{lake} \ident{build}, comprueba que los teoremas vigilados no dependen de
+\ident{Classical.choice}. Si alguien introduce lógica clásica por accidente, la compilación falla.
+
+\leanfrag{peano_assert_constructive}
+
+Hoy hay \textbf{1425} invocaciones activas de ese comando. Y —el detalle que lo hace confiable— el
+fichero conserva, comentada, una invocación sobre un teorema que \emph{sí} usa elección, para poder
+verificar que la guarda detecta lo que dice detectar. Es un control positivo, exactamente la
+disciplina que este libro se impone a sí mismo en \doc{PLAN-LIBRO.md}~§2.
+
+\begin{leccion}[Lo que eso demuestra para el plan de sustitución]
+La técnica es \textbf{portable tal cual}: es un fichero, no una metodología por inventar.
+Aplicarla aquí daría la separación que la sección anterior pide —Markov esencial frente a
+\ident{Decidable} incidental— como \emph{control de compilación} y no como auditoría manual. Es la
+doctrina de este libro aplicada a sí mismo: convertir un principio en una máquina.
+\end{leccion}
+
+Y hay un dato que vale más que el método. La función $\beta$ de Gödel —la pieza que la sección
+anterior identifica como necesaria para que una metateoría aritmética hospede la recursión de curso
+de valores— figuraba en la lista inicial de deuda clásica de \modulo{Peano}. Ya no: sus doce
+declaraciones principales están hoy bajo la guarda, y la reparación consistió en reemplazar la
+elección por \textbf{búsqueda acotada} — la misma técnica que arriba se propone para el uso
+eliminable de este proyecto. La única excepción que \modulo{Peano} mantiene, documentada y
+aceptada, es un módulo cuyo cometido es cuantificar sobre sistemas de Peano \emph{abstractos}
+cualesquiera: metateoría genuinamente no constructiva, sin nada que enumerar ni acotar.
+
+\begin{observacion}
+Nótese qué acaba de pasar aquí, porque es un caso de \doc{DOCSTRINGS-NO-FIABLES.md} en vivo. La
+lista de deuda clásica que la documentación de \modulo{Peano} exhibe sigue nombrando el módulo de
+la función $\beta$; el árbol dice que se resolvió. La documentación es el inventario de partida, no
+el estado. Lo que decide es la medición.
+\end{observacion}
+
+\section{Qué transferiría y qué no}
+
+Suponiendo hecha la sustitución, conviene decir por adelantado cuál sería su alcance, porque no es
+total y la mitad que falta no es un defecto.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}p{0.22\linewidth}
+                              >{\raggedright\arraybackslash}X@{}}
+\toprule
+qué & transfiere a una metateoría de fuerza $\mathrm{I}\Sigma_1$ \\
+\midrule
+todo $\Prf$ & \textbf{sí, entero}: es finitario, r.e.\ y por recursión estructural sobre objetos
+finitos. D1, D2, el punto fijo y Gödel~II sobre Q\texttt{++} caben ahí \\
+$\derives$ con \ident{gen} & \textbf{no}: la \defnot{$\omega$-regla} tiene premisas infinitas, y
+ninguna aritmética de primer orden puede hospedarla \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+O sea: una metateoría-Peano reproduciría la mitad $\Prf$ del proyecto y no la mitad $\derives$. No
+es una limitación nueva — es exactamente la misma razón por la que el capítulo~\ref{cap:kernel}
+tenía que presentar \emph{dos} cálculos y no uno. Pero la sustitución habría que enunciarla como
+parcial, y decir cuál mitad, que es lo que casi nunca se dice.

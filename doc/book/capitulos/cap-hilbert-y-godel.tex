@@ -1,0 +1,135 @@
+\chapter{1931: qué preguntó Hilbert y qué contestó Gödel}
+\label{cap:hilbert}
+
+Este libro cuenta una formalización, pero la formalización no se entiende sin la pregunta que la
+originó. Y la pregunta no la hizo Gödel: la hizo Hilbert, treinta años antes, y era una pregunta
+optimista.
+
+\section{El programa de Hilbert}
+
+A principios del siglo~XX las matemáticas habían pasado un susto. Las paradojas de la teoría de
+conjuntos mostraron que razonar con confianza sobre objetos infinitos podía llevar a
+contradicciones, y que la intuición no bastaba para detectarlas. La respuesta de Hilbert fue un
+programa: si no podemos fiarnos de la intuición, escribamos las matemáticas como un sistema formal
+—símbolos, axiomas, reglas— y demostremos \emph{sobre ese sistema}, con métodos que nadie discuta,
+que es consistente.
+
+\begin{leccion}[La palabra clave es «finitario»]
+Hilbert no pedía cualquier demostración de consistencia. Pedía una \textbf{finitaria}: que no usara
+ella misma el infinito que estaba tratando de justificar. Razonar sobre secuencias finitas de
+símbolos, comprobar cosas caso a caso, contar. Nada más. Ésa era la condición, y es la que da
+sentido a todo lo que viene después — incluida buena parte de las decisiones de este proyecto.
+\end{leccion}
+
+Para plantear siquiera la pregunta hay que separar dos cosas que en matemáticas ordinarias van
+juntas. Por un lado, el sistema del que se habla: sus fórmulas, sus axiomas, su noción de
+demostración. Lo llamaremos la \defterm{teoría objeto}, y sus fórmulas son, para nosotros,
+\emph{datos}: cadenas de símbolos que se pueden manipular sin creerlas. Por otro, el lugar desde el
+que hablamos de ella y demostramos cosas \emph{sobre} ella: la \defterm{metateoría}.
+
+Esa separación no es un tecnicismo. Es la condición de posibilidad del programa entero: sin ella,
+«demostrar que la aritmética es consistente» sería demostrarlo \emph{dentro} de la aritmética, y no
+convencería a nadie.
+
+\section{El finitismo era una estrategia, no una creencia}
+\label{sec:finitismo-estrategia}
+
+Conviene deshacer ahora un malentendido que se arrastra, porque cambia cómo se lee todo lo demás.
+Hilbert \textbf{no era} un matemático constructivista que desconfiara del infinito. Era justo lo
+contrario: había hecho carrera usando métodos fuertemente no constructivos y los defendía como un
+territorio ganado, un derecho que las matemáticas no debían devolver.
+
+El caso famoso es el teorema de la base, en teoría de invariantes: Hilbert demostró que existe una
+base finita \emph{sin exhibir ninguna}, en un campo cuyo rey indiscutible, Paul Gordan, había
+construido las suyas a mano. La reacción que se cita siempre es la de Gordan —«esto no es
+matemática, esto es teología»—, y este libro, que se dedica a comprobar afirmaciones, tiene que
+añadir en el mismo aliento que \textbf{esa cita está mal atestiguada}: aparece impresa por primera
+vez en la necrológica que Max Noether escribió \emph{veinticinco años después} del episodio. Lo que
+sí está documentado es lo contrario del mito: Gordan publicó en 1893 su propia versión del
+argumento diciendo que la demostración de Hilbert era, en sustancia, correcta.
+
+\begin{observacion}
+Se cita esa frase para ilustrar la resistencia al método no constructivo, y funciona tan bien como
+ilustración que casi nadie va a mirar de dónde sale. Es exactamente el modo de fallo que
+\doc{PLAN-LIBRO.md}~§2.6 describe para los docstrings de este proyecto: una afirmación cómoda,
+repetida hasta ser evidente, cuya fuente nadie ha vuelto a abrir. Se cita aquí porque es
+instructiva, y con la salvedad delante.
+\end{observacion}
+
+Con eso en su sitio, la exigencia finitaria se lee bien. Hilbert no pedía que las
+\emph{matemáticas} fueran finitarias — pedía que lo fuera la \textbf{demostración de
+consistencia}, que es otra cosa. Se puede usar todo el infinito que se quiera \emph{dentro} del
+sistema formal, con tal de que el argumento que certifica ese sistema desde fuera no lo use. Es una
+autolimitación de la metateoría, y es estratégica: sólo un argumento que no presuponga lo que está
+en duda puede convencer a quien lo duda.
+
+\begin{leccion}[Y Gödel hizo lo mismo, por la misma razón]
+La restricción de Gödel también era estratégica. Su argumento no usa el infinito ni necesita lógica
+clásica más allá de lo imprescindible — no porque él dudara de ellos, sino porque un teorema que
+demoliera el programa de Hilbert usando los métodos que el programa quería justificar no habría
+demolido nada. Los dos se autolimitaron para poder hablarle al otro.
+
+Esa es, tres capas más abajo, la misma razón por la que este proyecto anota debajo de cada teorema
+de qué axiomas depende, y por la que el capítulo~\ref{cap:objeto-y-meta} se molesta en contar
+cuánta lógica clásica gasta:
+\textbf{importa con qué se demuestra, no sólo qué se demuestra.}
+\end{leccion}
+
+\section{La idea de Gödel}
+
+Gödel publicó en 1930 un resultado que encajaba con el optimismo: la lógica de primer orden es
+completa —todo lo que es verdad en todos los modelos es demostrable—. Un año después publicó el
+que no encajaba.
+
+La idea central es una jugada de una audacia difícil de exagerar. Si las fórmulas de la teoría
+objeto son cadenas de símbolos, y las cadenas de símbolos se pueden numerar, entonces \textbf{la
+teoría puede hablar de sus propias fórmulas} — no de fórmulas, sino de los números que las
+codifican. A ese procedimiento se le llama \defterm{aritmetización} o \defterm{gödelización}, y el
+número —o el término que lo denota— es el \defterm{código de Gödel} de la fórmula.
+
+\begin{leccion}[Por qué eso lo cambia todo]
+Una teoría aritmética habla de números. Si las fórmulas \emph{son} números, la teoría habla de
+fórmulas sin saberlo. Y si además puede expresar «existe una demostración de la fórmula número
+$x$», entonces habla de su propia demostrabilidad. La autorreferencia deja de ser un juego de
+palabras y pasa a ser aritmética.
+\end{leccion}
+
+Con esa maquinaria, Gödel construye una sentencia $G$ que la teoría demuestra equivalente a «yo no
+soy demostrable» — un \defterm{punto fijo} de la negación de la demostrabilidad — y prueba que si la
+teoría es consistente, no puede demostrar $G$. El primer teorema. Y a continuación observa que el
+argumento entero, siendo finitario, se puede formalizar dentro de la propia teoría: de donde
+resulta que la teoría tampoco puede demostrar su propia consistencia. El segundo teorema.
+
+\section{El «I» del título}
+
+Y aquí está el detalle que da sentido a este libro.
+
+El artículo de 1931 se titula \emph{Sobre proposiciones formalmente indecidibles de los Principia
+Mathematica y sistemas afines}, \textbf{I}. Ese «I» no es decorativo: Gödel anunció una segunda
+parte con la demostración detallada del segundo teorema, que en el artículo publicado sólo queda
+esbozada. \textbf{La segunda parte nunca se escribió.}
+
+Lo que faltaba no era la idea, que estaba clara, sino la comprobación penosa de que el predicado de
+demostrabilidad se comporta como debe: que si algo es demostrable, la teoría demuestra que lo es;
+que la demostrabilidad respeta el modus ponens; y que la teoría demuestra ella misma esa primera
+propiedad. Esas tres son las \defterm{condiciones de derivabilidad}, y las suministraron
+Hilbert y Bernays en 1939.
+
+\begin{leccion}[La tesis de este libro, en una frase]
+Las condiciones de derivabilidad son el artículo que Gödel no llegó a publicar. Y de las tres, la
+tercera —la que dice que la teoría demuestra \emph{de sí misma} que reconoce lo que es cierto de
+forma finita, la \defterm{$\Sigma_1$-completitud} en su versión \defterm{provable}— es la que este
+proyecto lleva meses sin poder cerrar. Buena parte de la Parte~\ref{parte:noescrito} cuenta ese intento.
+\end{leccion}
+
+\section{Qué quedó del programa}
+
+El programa de Hilbert, tal y como estaba formulado, no se puede completar. Pero decir sólo eso es
+quedarse corto de una manera que este libro quiere evitar: lo que Gödel demostró no es que las
+matemáticas sean poco fiables, sino que \textbf{la fiabilidad no se puede certificar desde dentro}.
+Es un resultado sobre los límites de la autocertificación, no sobre la verdad matemática.
+
+Y tiene una consecuencia práctica que hoy se ve mejor que en 1931: si un sistema no puede
+certificarse a sí mismo, la alternativa es certificarlo desde otro sistema — explícito, más débil o
+más fuerte, pero declarado. Que es exactamente lo que hace una formalización asistida por ordenador,
+y lo que hace este proyecto.

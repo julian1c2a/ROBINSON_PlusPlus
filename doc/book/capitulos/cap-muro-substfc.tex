@@ -1,0 +1,231 @@
+\chapter{El muro de \texorpdfstring{\ident{substfc}}{substfc}}
+\label{cap:muro-substfc}
+
+Los libros de incompletitud cuentan la demostración. Esta parte cuenta lo otro: qué pasa cuando
+la pieza que falta no es difícil, sino que \textbf{la ruta obvia hacia ella hace inconsistente la
+teoría}, y hay que descubrirlo antes de escribirla.
+
+El episodio de este capítulo duró cuarenta días. No fue un atasco de implementación: fue un muro
+con tres paredes independientes, y la primera de ellas —la que parecía la salida— habría destruido
+el proyecto entero de haberse aceptado. Se atrapó porque alguien se sentó a derivar la
+contradicción a mano en vez de comprobar que compilaba.
+
+\section{Qué es \texorpdfstring{\ident{substfc}}{substfc}, y por qué está en todas partes}
+
+El capítulo~\ref{cap:codigos} construyó los códigos de la sintaxis. Sustituir es lo que
+la sintaxis hace: si $\varphi$ tiene una variable libre, $\varphi[t/v]$ es la fórmula que resulta de
+poner $t$ donde estaba $v$. En la metateoría eso es la función \ident{substFormula}. Dentro de la
+teoría objeto tiene que existir su contraparte, y se llama \ident{substfc}:
+
+\leanfrag{substfc_def}
+
+\selee{«\ident{substfc} $v$ $t$ $f$ es el término objeto \emph{«sustituir la variable de código $v$
+por el término de código $t$ en la fórmula de código $f$»}»}
+
+Nótese qué es y qué no es. No computa nada: construye un \emph{símbolo de función objeto} de aridad
+tres. Lean no sabe qué significa. Quien lo sabe es la teoría, mediante ocho axiomas objeto, uno por
+constructor de fórmula. Éste es el del condicional:
+
+\leanfrag{ax_substfc_impl}
+
+\selee{«para cualesquiera $v,t,a,b$: sustituir en el condicional $a \Rightarrow b$ es el condicional
+de las dos sustituciones»}
+
+Y aquí está la razón de que todo esto importe. El término diagonal —el corazón mismo de la sentencia
+de Gödel, la que dice de sí misma que no es demostrable— \emph{es} una aplicación de
+\ident{substfc}:
+
+\leanfrag{diagTerm}
+
+Si \ident{substfc} no funciona, no hay autorreferencia. Si tiene una grieta, la grieta está en el
+centro del edificio.
+
+\section{Lo que bloqueaba: siete de veintiuno}
+
+D3 —la tercera condición de derivabilidad, la que Gödel anunció y nunca publicó, y sin la cual no
+hay segundo teorema— se reduce en este proyecto a un solo lema, y ése a que el verificador de
+pruebas se refleje dentro de $\Prov$: que la teoría demuestre, de cada línea de una derivación, que
+la línea está bien formada.
+
+Las líneas se clasifican por un \emph{tag}, y hay veintiún tags. Cada uno necesita su
+\defterm{reflector}\nivelterm{proyecto}: el teorema que traslada al interior de $\Prov$ lo que la
+metateoría ya sabe de ese tag. Catorce estaban hechos. Siete no.
+
+Y aquí el proyecto hizo algo que conviene subrayar, porque es lo contrario de lo que se suele
+hacer con una tarea pendiente: en vez de estimar cuánto faltaba, lo \textbf{demostró}.
+
+\leanfrag{lineWF_modulo_7}
+
+\begin{leccion}[Un teorema cuya función es medir lo que falta]
+Ese enunciado no prueba nada nuevo sobre aritmética. Prueba que \emph{el ensamblaje encaja}: que
+tomando los siete reflectores que faltan \textbf{como hipótesis}, todo lo demás cierra. Y por tanto
+que cerrar el verificador es \textbf{exactamente} cerrar esos siete, ni una pieza más aguas abajo.
+
+Es una manera de convertir «creo que falta poco» en un objeto que compila o no compila. Cuesta una
+tarde y evita meses de trabajo en la dirección equivocada — que es justo lo que este capítulo
+narra que estuvo a punto de pasar.
+\end{leccion}
+
+Los siete —\ident{q1}, \ident{q2}, \ident{q3}, \ident{leibniz}, \ident{ind}, \ident{qconf},
+\ident{listInd}— tienen algo en común y sólo eso: su conclusión se reconstruye con \ident{substfc}
+o con \ident{liftfc}, y por tanto exige \emph{evaluar} esos operadores dentro de $\Prov$. Eso es el
+muro.
+
+\section{El axioma que lo resolvía, y que hace inconsistente la teoría}
+
+Hay una salida evidente, y es la primera que se le ocurre a cualquiera. El operador dotado
+\ident{substfcT} es la versión «código del código» de \ident{substfc}. Bastaría postular que
+conmutan:
+\[
+  \text{\ident{ax_tc_substfc}}:\quad
+  \dotado{(\text{\ident{substfc}}\ v\ s\ f)} \;\doteq\;
+  \text{\ident{substfcT}}\ \dotado{v}\ \dotado{s}\ \dotado{f}.
+\]
+
+\selee{«el código del resultado de sustituir es el resultado de sustituir sobre los códigos»}
+
+Parece inocente. Ya existe un axioma exactamente de esa forma y nadie protesta — el de \ident{cons}:
+
+\leanfrag{ax_tc_cons}
+
+La diferencia es la que decide el episodio, y no se ve mirando los dos enunciados: \ident{cons} es
+un \textbf{constructor}, y \ident{substfc} es una \textbf{función definida} — definida, además, por
+ocho ecuaciones que la teoría \emph{ya tiene} y que la interpretan como productora de árboles de
+\ident{cons}. Postular la ley de conmutación sobre algo ya interpretado no añade información:
+la contradice.
+
+\begin{refutado}[La derivación, en cinco pasos]
+Supóngase \ident{ax_tc_substfc} en la teoría. Tómese la fórmula $\text{\ident{implc}}\ a\ b$.
+\begin{enumerate}
+\item Por \ident{ax_substfc_impl} —axioma ya presente—, la teoría demuestra que
+  $\text{\ident{substfc}}\ v\ s\ (\text{\ident{implc}}\ a\ b)$ \emph{es} un
+  $\text{\ident{implc}}$ de dos sustituciones. La teoría \textbf{interpreta} \ident{substfc}: no
+  es opaco.
+\item El operador $\dotado{\cdot}$ respeta la igualdad derivada —es un símbolo de función, y la
+  congruencia de Leibniz vale para él—:
+  \leanfrag{prf_congr_tcFn}
+  Luego los códigos de los dos lados de (1) son iguales.
+\item El lado izquierdo, por el axioma supuesto, tiene cabeza
+  $\langle 1, \codigo{\text{\ident{substfc}}}, \ldots\rangle$.
+\item El lado derecho es el código de un \ident{cons} —porque \ident{implc} \emph{es} un
+  \ident{cons}—, y por \ident{ax_tc_cons} tiene cabeza
+  $\langle 1, \codigo{\ident{::}}, \ldots\rangle$.
+\item Luego la teoría demuestra que esas dos cabezas son iguales. Pero la aritmética negativa de
+  códigos, que ya está construida, demuestra que \textbf{no} lo son:
+  \leanfrag{cons_ne_head}
+  Contradicción. La teoría prueba $\bot$.
+\end{enumerate}
+\end{refutado}
+
+\begin{muro}[Por qué esto no habría fallado en compilación]
+Una teoría objeto inconsistente \textbf{compila}. Lean no comprueba que los axiomas objeto sean
+satisfacibles: son datos, valores de tipo \ident{Formula}, y añadir uno más a la lista es tan legal
+como añadir el primero. El proyecto habría seguido en verde durante meses, demostrando teoremas
+—todos ellos vacíos, porque de una teoría inconsistente se demuestra cualquier cosa—. Y en
+particular habría «demostrado» $\Prov(\codigo{\bot})$, que aniquila la construcción de Gödel entera:
+la sentencia $G$ dejaría de decir nada.
+
+Este es el modo de fallo característico del proyecto, y por eso la Parte~\ref{parte:noescrito}
+existe. Ya apareció en pequeño en el capítulo~\ref{cap:kernel} —un axioma del kernel que era falso—
+y volverá a aparecer en grande en el capítulo~\ref{cap:numerales}, donde no se atrapó a tiempo.
+\end{muro}
+
+\begin{observacion}
+\ident{ax_tc_substfc} \textbf{no existe} en el código. Y sin embargo su nombre aparece
+\textbf{nueve veces} en el árbol —una en \modulo{ROBINSON_PlusPlus/Meta/EvalArithPrf.lean}, otra en
+\modulo{ROBINSON_PlusPlus/Meta/SubstfcCodePrf.lean}, el resto en sondeos y experimentos—: siempre
+en un comentario, siempre para advertir de que sería inconsistente. El proyecto convirtió la
+refutación en un cartel y lo clavó en las nueve puertas por las que alguien podría volver a entrar.
+Es, en pequeño, la misma doctrina que este libro: un resultado negativo también es un resultado, y
+se guarda donde vaya a leerse.
+\end{observacion}
+
+\section{El obstáculo real: evaluar sobre un argumento abstracto}
+
+Cerrada la puerta del axioma, queda el trabajo honesto: demostrar la evaluación en vez de
+postularla. Y ahí está la segunda pared.
+
+Hay evaluaciones provables que salen. La de \ident{carc} —la cabeza de una lista— sale porque
+\ident{carc} tiene \textbf{una} ecuación definitoria y se instancia sobre un patrón explícito:
+delante hay un \ident{cons} escrito, y se aplica la ecuación. \ident{substfc} no está en esa
+situación por dos razones a la vez: se define por recursión sobre los \textbf{ocho} constructores
+de fórmula, con ligadores —los casos $\forall$ y $\exists$ incrementan el nivel y desplazan el
+sustituyendo—, y en los siete tags se aplica a un código \textbf{abstracto}, una casilla de la
+línea que se está verificando, no a una fórmula escrita.
+
+\begin{muro}[Lo que eso obliga a hacer]
+Evaluar \ident{substfc} sobre un argumento abstracto exige \textbf{inducción sobre códigos de
+fórmula dentro de $\Prov$}. No inducción en la metateoría —eso se tiene— sino inducción de la
+teoría objeto sobre sus propios códigos, disponible en un punto en que la teoría objeto no tiene
+inducción: la aritmética de \modulo{ROBINSON_PlusPlus/Minimal/} es Q\texttt{++}, sin esquema de
+inducción, por la razón que dio el capítulo~\ref{cap:qpp}.
+
+Ésa es la distancia real entre «un lema más» y «un problema abierto», y explica por qué el registro
+del proyecto insiste en que el muro no era mecánico.
+\end{muro}
+
+\section{La tercera pared: quitar \texorpdfstring{\ident{substfc}}{substfc} tampoco se puede}
+
+Queda una salida más, y es la que parece más razonable de todas: si el problema es que los siete
+esquemas mencionan \ident{substfc}, reescríbanse sin él. El 25 de julio de 2026 se sondeó
+sistemáticamente, y el resultado no fue «no lo hemos conseguido» sino una dicotomía cerrada.
+
+El argumento tiene dos bisagras, las dos comprobables en el código: la regla de instanciación toma
+un término \textbf{arbitrario}, y \ident{substFormula} es recursión sobre los ocho constructores.
+De ahí: para que el reflector sea \emph{sólido} tiene que atar la instancia correcta, y la instancia
+correcta contiene $\varphi[t/v]$. Si esa mención queda \textbf{ligada} —como función, como ecuación,
+como átomo relacional—, reaparece el mismo muro un piso más abajo. Si queda \textbf{libre}, el
+esquema deja de ser sólido. Las tres propuestas concretas que se estudiaron colapsan las tres al
+mismo núcleo.
+
+\begin{leccion}[La diferencia entre «no sale» y «no existe»]
+Un resultado como éste es incómodo de publicar y valiosísimo de tener: no dice que el equipo no
+supiera hacerlo, dice que no hay nada que hacer por ahí. Sin él, la ruta se habría reintentado cada
+pocas semanas con una variante — que es exactamente lo que pasa cuando un callejón sin salida no se
+documenta como tal. Los otros casos de esta misma clase que el proyecto encontró después los
+recoge \capfuturo{las tareas que resultan ser imposibles}.
+\end{leccion}
+
+\section{Cuarenta días}
+
+\begin{center}\small
+\begin{tabular}{lll}
+\toprule
+fecha & commit & hito \\
+\midrule
+2026-07-10 & \texttt{8a96e8e} & el frente arranca en positivo \\
+\textbf{2026-07-22} & \texttt{15dccda} & \textbf{el muro se identifica}: «el plan era erróneo en su forma» \\
+2026-07-24 & --- & veredicto: \ident{ax_tc_substfc} es inconsistente; no hay ruta \defterm{net-0}\nivelterm{proyecto} \\
+2026-07-25 & \texttt{6c4d7ac} & la puerta de reescribir los esquemas, cerrada \\
+2026-07-26 & \texttt{ee31d07} & inducción fuerte objeto, net-0 — la herramienta que luego serviría \\
+2026-08-25 & \texttt{bdfff12} & el reconocedor fusionado no desbloquea el muro \\
+2026-08-30 & \texttt{2f27a29} & el descenso, cerrado \\
+\textbf{2026-08-31} & \texttt{c1fd804} & \textbf{el muro está roto} \\
+2026-09-07 & \texttt{61edd46} & dentro del build: deja de ser un sondeo y pasa a ser un teorema \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Cuarenta días entre la identificación y la rotura; siete más hasta que el resultado dejó de vivir
+en \modulo{sondeos/} y entró en el build, que es la condición que este libro exige para llamarlo
+teorema (§2.2). Hoy se enuncia así:
+
+\leanfrag{pcc_eval_substfc}
+
+\selee{«bajo dos guardas —que $s$ tenga testigo y que $f$ sea un código de fórmula bien formado
+contra su testigo—, la teoría demuestra que el operador dotado aplicado a los códigos es igual al
+código del resultado»}
+
+Las dos hipótesis no son deudas colgando: son las \emph{guardas} que dicen sobre qué códigos vale
+la evaluación, y \capfuturo{la no-vacuidad de las guardas} muestra que se satisfacen
+para códigos reales. Cómo se llegó hasta aquí —definir en vez de axiomatizar, partir el
+reconocedor en tres, y una inducción con la guarda dentro— es la materia del resto de esta
+parte.
+
+\begin{observacion}
+Un detalle que este libro no puede pasar por alto, porque es su propia doctrina aplicada a sí mismo.
+El docstring de \ident{pcc_eval_substfc} dice, literalmente, «cero \ident{sorry}, cero hipótesis».
+El teorema tiene dos. Es una imprecisión menor —«hipótesis» quiere decir ahí «obligación
+pendiente»—, pero es exactamente el tipo de afirmación que un lector tomaría por buena y que el
+compilador no verifica. Queda anotada en \doc{DOCSTRINGS-NO-FIABLES.md}.
+\end{observacion}

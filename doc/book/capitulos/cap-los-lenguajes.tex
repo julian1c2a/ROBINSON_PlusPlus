@@ -1,0 +1,241 @@
+\chapter{Los lenguajes de este libro}
+\label{cap:lenguajes}
+
+Hay una pregunta que en este libro se plantea en cada línea: \emph{esto que estoy leyendo,
+¿se afirma dentro del sistema del que hablamos, o desde fuera?} Contestarla mal es caro — la Parte~\ref{parte:noescrito} cuenta una inconsistencia que fue exactamente
+eso, un error de categoría. Este capítulo la contesta de una vez, y con más detalle del que suele
+darse: porque ni hay una metateoría, ni hay un solo lenguaje del que se hable. Hay tres y hay
+cuatro.
+
+\section{Tres metateorías, no una}
+
+Cuando se dice «la metateoría» se está diciendo, en tres momentos distintos de esta historia, tres
+cosas incompatibles.
+
+\textbf{La de Gödel era deliberadamente débil.} Razonamiento finitario sobre secuencias de símbolos,
+y nada más — porque el objetivo era convencer a Hilbert, y una demostración de consistencia que
+usara el infinito no habría valido de nada. Esa autolimitación no era humildad ni convicción
+—§\ref{sec:finitismo-estrategia} cuenta que ninguno de los dos era constructivista—: era el
+requisito para que el argumento le sirviera a quien iba dirigido.
+
+\textbf{La del kernel de este proyecto es más fuerte de lo que parece.} El cálculo $\vdash$ de
+\modulo{FOL} incluye la \defterm{$\omega$-regla}: de «$A[n]$ para todo término $n$» concluye
+$\forall A$. Es válida en el modelo estándar y tiene \emph{infinitas premisas}, luego el cálculo que
+la admite no es \defterm{r.e.} — no hay programa que liste sus teoremas.
+
+\begin{muro}[La consecuencia que gobierna el libro entero]
+Con la $\omega$-regla, $\vdash$ no es recursivamente enumerable. Y por el teorema de Tarski, ninguna
+fórmula puede representar fielmente la demostrabilidad de un cálculo así. \textbf{Por eso el
+proyecto construye un segundo cálculo}, finitario, y aritmetiza ése. Todo lo que en este libro se
+codifica, se verifica o se diagonaliza ocurre en el segundo, no en el primero.
+\end{muro}
+
+\textbf{Y la de Lean es enormemente más fuerte que ambas.} Su teoría de tipos interpreta a ZFC y
+más. Ahora bien —y esto sí está medido sobre el árbol—, \textbf{el proyecto usa dos niveles de ella
+y ninguno más}: proposiciones y datos. No hay universos por encima, no hay polimorfismo de
+universos, y no se cuantifica sobre proposiciones arbitrarias en ninguna parte. La fuerza está
+disponible; no se gasta.
+
+\subsection*{Dónde cae cada una: la escala, con nombres}
+
+«Más fuerte» y «más débil» dicho así no informa. Hay una escala estándar, y las tres piezas de este
+libro tienen sitio en ella. De arriba abajo por lo que \emph{demuestran} de aritmética:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X l@{}}
+\toprule
+sistema & qué permite & papel aquí \\
+\midrule
+PRA & recursión primitiva, inducción sin cuantificadores no acotados & el finitismo que pedía Hilbert \\
+$\mathrm{I}\Sigma_1$ & inducción restringida a fórmulas $\Sigma_1$ & lo que \emph{basta} como metateoría (cap.~\ref{cap:objeto-y-meta}) \\
+HA & PA con lógica intuicionista & equiconsistente con PA \\
+PA & inducción sobre todas las fórmulas de primer orden & la referencia habitual \\
+Q\texttt{++} $+\ \omega$-regla & el cálculo $\vdash$ de este proyecto & \textbf{toda la aritmética verdadera} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+La última fila no es una exageración retórica, y merece decirse con precisión porque es la razón
+de ser del segundo cálculo.
+
+\begin{matematica}[La $\omega$-regla no sube un escalón: se sale de la escala]
+Es un resultado clásico que $\mathrm{PA}^{\omega}$ —PA cerrada bajo la $\omega$-regla— demuestra
+\emph{exactamente} las sentencias verdaderas en $\mathbb{N}$:
+\[ \mathrm{PA}^{\omega} \;=\; \mathrm{Th}(\mathbb{N}). \]
+Y la demostración no usa casi nada de PA: le basta con que los axiomas sean verdaderos en
+$\mathbb{N}$ y que las sentencias atómicas cerradas estén decididas. \textbf{Vale igual partiendo
+de la aritmética de Robinson}, que es de donde parte este proyecto.
+\end{matematica}
+
+\selee{«añadir la $\omega$-regla a una teoría aritmética verdadera la convierte en la teoría de
+\emph{todo} lo que es cierto de los números»}
+
+O sea: $\vdash$ no está «un poco por encima de PA». Está en el tope, y por eso no es
+\defterm{r.e.}: no hay nada que enumerar cuando ya se demuestra todo lo verdadero. El precio de esa
+potencia es que sus demostraciones no son objetos finitos, y por tanto \textbf{no se pueden
+codificar} — que es justo lo que la incompletitud necesita hacer.
+
+\begin{muro}[La salvedad que hay que declarar]
+El enunciado de arriba es sobre el modelo estándar. El vocabulario de este proyecto no es sólo el
+de la aritmética: incluye los 107 axiomas de la capa de codificación, con símbolos opacos cuyo
+significado fija la propia teoría. La igualdad $\mathrm{Th}(\mathbb{N})$ se lee, entonces, sobre
+$\mathbb{N}$ con esos símbolos interpretados como se pretende. No cambia la moraleja —$\vdash$ no
+es r.e., y por eso hace falta el segundo cálculo— pero sí la letra pequeña.
+\end{muro}
+
+\section{Cuatro lenguajes objeto, no uno}
+
+Del otro lado pasa algo parecido, y es más fácil de pasar por alto porque los cuatro se llaman
+igual. Un \defterm{lenguaje objeto} es sólo una gramática: dice cómo se escriben términos y
+fórmulas, y no afirma nada. La teoría aparece cuando se le añaden axiomas.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X r@{}}
+\toprule
+estrato & qué añade & para qué sirve & axiomas \\
+\midrule
+FOL$^=$ desnudo & la gramática y la lógica & escribir fórmulas; no afirma nada & --- \\
+Q\texttt{++} & la \defterm{signatura} aritmética y sus \defterm{axiomas objeto} & \textbf{ser incompleta}: es la teoría de la que habla el teorema & 34 \\
+Q\texttt{++} codificante & los símbolos opacos del verificador y sus ecuaciones & \textbf{hablar de sintaxis}: sin esto no hay predicado de demostrabilidad & +107 \\
+con inducción (\modulo{Full/}) & el esquema de inducción & demostrar D2 y D3 & +1 esquema \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\subsection*{Los dos del medio no se parecen en nada, y la diferencia decide el teorema}
+
+Los estratos primero y último se distinguen solos. Los dos de en medio se confunden —los dos se
+llaman «Q\texttt{++}», los dos son listas de fórmulas postuladas— y son de naturaleza distinta.
+
+Los \textbf{34} son aritmética: hablan de sumar, multiplicar, comparar. Se entienden mirándolos, se
+discuten como se discute un axioma, y son los que hacen del sistema \emph{una teoría de números},
+que es lo que el teorema de Gödel exige para tener algo que decir. El
+capítulo~\ref{cap:qpp} los desmenuza uno a uno.
+
+Los \textbf{107} no hablan de números: hablan de \emph{sintaxis codificada como} números. Son las
+ecuaciones que fijan el comportamiento de símbolos que no se pueden definir —\ident{substfc},
+\ident{lenc}, \ident{nthc}, \ident{carc}, el verificador entero— y su papel no es ser verdad sobre
+$\mathbb{N}$, sino \textbf{dar a la teoría un vocabulario para hablar de sus propias fórmulas}. Sin
+ellos, el predicado «$x$ es demostrable» no se puede ni escribir dentro del lenguaje. El
+capítulo~\ref{cap:verificador} los construye.
+
+\begin{observacion}
+La proporción es el dato: \textbf{tres veces más maquinaria que aritmética}. Eso es, medido, lo que
+cuesta que una teoría pueda hablar de su propia sintaxis — y es la cifra que más sorprende a quien
+llega desde la exposición clásica, donde la codificación se despacha con un «y esto se aritmetiza
+de manera rutinaria».
+\end{observacion}
+
+\begin{muro}[Y por qué la frontera entre los dos no es cosmética]
+El verificador consulta la lista de axiomas de la teoría: la regla que acepta «esto es un axioma»
+comprueba que el código de la fórmula está en esa lista. Luego \textbf{la lista entra en la
+definición del predicado de demostrabilidad}, y ese predicado entra en la sentencia de Gödel. Mover
+un axioma de fuera a dentro no hace la teoría «un poco más fuerte»: cambia el predicado, y con él
+cambia $G$. Es literalmente otro teorema.
+
+Por eso este libro dice siempre de qué estrato habla, y por eso \adr{015} decidió \emph{definir}
+la buena formación de los códigos en vocabulario ya existente en vez de postularla. La historia
+completa está en \capfuturo{definir en vez de axiomatizar}.
+\end{muro}
+
+\begin{leccion}[Cuatro teorías, cuatro teoremas de incompletitud]
+No son cuatro presentaciones de lo mismo: son cuatro teorías distintas, y el teorema de
+incompletitud que se demuestra sobre cada una es un teorema distinto. En cuanto la teoría contiene
+un verificador que consulta su propia lista de axiomas, \textbf{cambiar la lista cambia la sentencia
+de Gödel}. El libro vuelve sobre esto dos veces, y las dos con consecuencias prácticas.
+\end{leccion}
+
+\section{Los signos que hacen falta desde ya}
+
+Cuatro notaciones aparecen a partir de aquí constantemente, y conviene fijarlas antes.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+$\Gamma \vdash A$ & $A$ se deriva de $\Gamma$ en el cálculo $\omega$ \\
+$\defnot{\Prf}\,A$ & $A$ se deriva en el cálculo de Hilbert finitario, sin hipótesis
+  \selee{«$A$ tiene una demostración finitaria»} \\
+$\defnot{\codigo{\varphi}}$ & el \defterm{código de Gödel} de $\varphi$, \textbf{calculado desde
+  fuera}: se lo damos ya hecho a la teoría \selee{«el código de $\varphi$»} \\
+$\defnot{\dotado{a}}$ & «$a$ dotado»: el código de $a$, \textbf{calculado dentro} por una función
+  del propio lenguaje \selee{«$a$ dotado», o «el código de lo que valga $a$»} \\
+$\defnot{\Prov}(\codigo{\varphi})$ & la fórmula \emph{objeto} que dice «$\varphi$ es demostrable»
+  \selee{«es demostrable», dicho dentro de la teoría} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent Y dos convenios del lenguaje que sorprenden la primera vez. Las variables se escriben
+como \defterm{índice de De Bruijn} —\texttt{\#0} es la ligada más cercana, y los cuantificadores no
+llevan nombre de variable—. Y el término que denota el número $n$ es el \defterm{numeral}
+$\sigma^n 0$: es \emph{canónico}, sólo hay una forma de escribirlo, y de ahí que sirva para
+representar códigos.
+
+\subsection*{Dos maneras de decir «el código de», y no son intercambiables}
+
+Las dos filas segunda y tercera parecen decir lo mismo y no lo dicen. La diferencia es \emph{quién
+hace el cálculo}, y de ella depende medio libro.
+
+$\codigo{\varphi}$ es una \textbf{función de Lean}: nosotros, desde fuera, tomamos una fórmula
+concreta y calculamos su código. El resultado es un término cerrado y concreto que se puede escribir
+en un papel. Para usarlo hay que tener la fórmula \textbf{en la mano}.
+
+$\dotado{a}$ es un \textbf{símbolo de función del lenguaje objeto} —se llama \ident{tcFn}— que la
+teoría aplica a lo que sea. No calcula nada por adelantado: es una expresión del lenguaje, como
+$\obj{\sigma}$ o $\obj{+}$.
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X >{\raggedright\arraybackslash}X@{}}
+\toprule
+ & $\codigo{\cdot}$ (\ident{formCode}, \ident{termCode}) & $\dotado{\cdot}$ (\ident{tcFn}) \\
+\midrule
+quién lo calcula & nosotros, en la metateoría & la teoría, dentro del lenguaje \\
+qué admite como argumento & una fórmula o término \textbf{concretos} & cualquier término, incluida \textbf{una variable} \\
+qué es el resultado & un término cerrado, escrito & una expresión con variables libres \\
+¿se puede poner bajo un $\forall$? & \textbf{no} útilmente & \textbf{sí} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent La cuarta fila es la que importa, y se ve en un ejemplo. Ésta es una de las ecuaciones que
+caracterizan a \ident{tcFn}, y dice, para \emph{todo} $x$, cómo se relaciona el código de
+$\obj{\sigma}x$ con el de $x$:
+\[ \forall x.\quad \dotado{(\obj{\sigma}x)} \;\doteq\; \langle 1,\ \codigo{\obj{\sigma}},\ [\,\dotado{x}\,]\rangle \]
+\selee{para todo $x$, el código del sucesor de $x$ es la lista formada por la etiqueta de
+aplicación, el código del símbolo $\sigma$, y el código de $x$.}
+
+\begin{muro}[Por qué ahí no se puede escribir $\codigo{x}$]
+Se podría \emph{teclear}, y ahí está la trampa: $\codigo{x}$ es legal, pero significa «el código del
+término \emph{la variable~$x$}» — un código concreto, cerrado, de un objeto sintáctico. \textbf{No}
+significa «el código de lo que valga $x$», que es lo que la fórmula necesita. El punto es la única
+notación que puede ir bajo un cuantificador diciendo lo segundo.
+\end{muro}
+
+\begin{leccion}[Y una asimetría que se cobra cara]
+Como $\dotado{\cdot}$ es un símbolo de función, la teoría demuestra que \textbf{respeta la
+igualdad}: de $a \doteq b$ se sigue $\dotado{a} \doteq \dotado{b}$. $\codigo{\cdot}$ no tiene nada
+parecido, porque no es un símbolo del lenguaje: es una operación sobre \emph{sintaxis}.
+
+Y ahí está el precio. Un símbolo de función sólo puede depender del \textbf{valor} de su argumento,
+nunca de cómo se escribió ese valor. Pero un mismo número es a la vez un numeral y una lista —
+$\obj{\mathrm{cons}}(\mathrm{nil},\mathrm{nil})$ y $\obj{\sigma\sigma}\obj{0}$ son el mismo número—,
+así que exigirle a $\dotado{\cdot}$ que devuelva un código distinto según «cómo se escribió» es
+pedirle lo imposible. Eso hizo la teoría inconsistente durante meses, y es el episodio central de la
+Parte~\ref{parte:noescrito}.
+\end{leccion}
+
+\section{Cómo se lee la chapa}
+
+De todo lo anterior sale el instrumento que este libro usa en cada fragmento de código y en cada
+enunciado: una \textbf{chapa de dos casillas} que dice quién afirma y sobre qué. No es un adorno —
+es la distinción cuya violación costó 31 módulos, y \textbf{no es binaria}: son dos ejes
+independientes.
+
+\input{capitulos/00-niveles.tex}
+
+\begin{leccion}[La distinción que hay que llevarse de aquí]
+$\Prov$ es una fórmula del lenguaje objeto; \defterm{provable} quiere decir que la propia teoría
+demuestra algo, no que lo comprobemos nosotros desde fuera. La diferencia entre comprobar una cosa y
+que la teoría la demuestre \emph{de sí misma} es toda la distancia que hay entre la primera condición
+de derivabilidad y la tercera — es decir, entre lo que está hecho y lo que falta.
+\end{leccion}

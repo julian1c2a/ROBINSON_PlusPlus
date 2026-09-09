@@ -121,3 +121,35 @@ Es la prueba más limpia de la regla de §2.6: un docstring no describe un módu
 que su autor creía en una fecha**. Y aquí lo que estaba en juego no era una cita: era **dónde
 está la frontera de la teoría**, que es lo que decide qué significa `provCodeC'` y por tanto
 **cuál es la sentencia G**.
+
+---
+
+## Caso #6 — «cero hipótesis» en un teorema con dos (2026‑09‑09)
+
+Encontrado al escribir el capítulo del muro de `substfc`. El docstring de
+`ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1521‑1523` dice, literalmente:
+
+> **★ `pcc_eval_substfc` ★** — la evaluacion PROVABLE de `substfc` con `v`, `s`, `f`
+> **ABSTRACTOS**, guardada por los DOS testigos (formula `wF` y termino `wT`).
+> CERO axiomas de Lean, cero `sorry`, cero hipotesis.
+
+Y la firma, tres líneas más abajo (`:1524‑1526`), tiene **dos**:
+
+```lean
+theorem pcc_eval_substfc (wF wT v s f : Term)
+    (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
+```
+
+**Es el caso más leve del registro, y por eso el más instructivo.** El autor quiere decir «cero
+obligaciones pendientes»: `hws` y `hfc` son las *guardas* que delimitan sobre qué códigos vale la
+evaluación, no deudas colgando — y el propio docstring las anuncia dos líneas antes («guardada por
+los DOS testigos»). O sea: el párrafo **se contradice a sí mismo en tres líneas**, y aun así se lee
+sin tropezar, porque cada frase es verdadera en su propio sentido.
+
+Ninguno de los cinco casos anteriores es de esta clase. Los otros son afirmaciones falsas; ésta es
+una afirmación **verdadera en un sentido y falsa en el literal**, y es la que un libro tiene más
+papeletas de copiar mal: «este teorema no tiene hipótesis» es exactamente el tipo de frase que se
+transcribe sin comprobar la firma. El capítulo lo imprime como observación, con la firma delante.
+
+**Regla que añade al §2.6:** cuando un docstring cuantifique algo —«cero X», «los tres Y», «sólo
+falta Z»—, la cifra se cuenta en la declaración, no se cita del párrafo.

@@ -85,6 +85,12 @@ RE_IMPORT = re.compile(r"^\s*import\s+([A-Za-z0-9_.]+)\s*(?:--.*)?$")
 # donde empieza el capítulo 2.
 PAQUETES = {"ROBINSON_PlusPlus": ".", "FOL": os.path.join("..", "FOL")}
 
+# Proyectos HERMANOS que el libro CITA como evidencia pero que no forman parte
+# de su base: nada de lo suyo sostiene un teorema de este libro. Se citan con
+# `"capa": "externo"`, se imprimen con una chapa que lo dice, y no llevan
+# footprint —medir la base de un teorema ajeno sería mentir sobre el nuestro—.
+PROYECTOS_CITADOS = {"Peano": os.path.join("..", "Peano")}
+
 
 def rel(p):
     return os.path.relpath(p, RAIZ).replace("\\", "/")
@@ -132,8 +138,11 @@ def cierre_de_imports():
 INICIO_DECL = (
     r"(?:@\[[^\]]*\]\s*)?"
     r"(?:private\s+|protected\s+|noncomputable\s+|partial\s+|scoped\s+)*"
-    r"(?:theorem|lemma|def|abbrev|axiom|instance|structure|inductive)\s+"
+    r"(?:theorem|lemma|def|abbrev|axiom|instance|structure|inductive|elab)\s+"
 )
+# `elab` está para poder citar un COMANDO de Lean —una guarda de compilación es
+# un comando, no un teorema— y entonces el `decl` del manifiesto es la cadena
+# que el comando declara, comillas incluidas.
 RE_CORTE = re.compile(
     r"^(?:@\[|/--|/-!|/-|"
     r"(?:private|protected|noncomputable|partial|scoped)\s|"
@@ -233,9 +242,12 @@ RE_PALABRA = re.compile(r"[A-Za-z_][A-Za-z0-9_']*")
 
 def escapar_verbatim(t):
     """Escapa lo único que `commandchars=\\\\\\{\\}` vuelve especial."""
-    return (t.replace("\\", "\\textbackslash{}")
-             .replace("{", "\\{")
-             .replace("}", "\\}"))
+    # En UNA pasada: encadenar `.replace()` haría que las llaves que introduce
+    # `\textbackslash{}` volvieran a escaparse, y saldría impreso `\{}` donde el
+    # fuente dice `\` — o sea, código alterado (§2.1). Apareció de verdad al
+    # citar una continuación de línea de Lean.
+    return "".join({"\\": "\\textbackslash{}", "{": "\\{", "}": "\\}"}.get(c, c)
+                   for c in t)
 
 
 def resaltar(linea):
@@ -277,8 +289,10 @@ def escribir_fragmento(fr, codigo, linea):
     ]
     if fr.get("capa") == "sondeo":
         partes.append("\\fueradelbuild{%s}" % tex_escapar_titulo(modulo))
+    if fr.get("capa") == "externo":
+        partes.append("\\otroproyecto{%s}" % tex_escapar_titulo(fr.get("proyecto", "?")))
     fp = fr.get("footprint")
-    if fp is not None and fr.get("capa") != "sondeo":
+    if fp is not None and fr.get("capa") not in ("sondeo", "externo"):
         # `make axiomas` es lo que convierte un footprint declarado en medido.
         macro = "footprint" if fr.get("footprint_medido") else "footprintpend"
         # cada nombre va por \fpi para que pueda partirse por los puntos
@@ -305,7 +319,7 @@ def git(*args):
         return "?"
 
 
-def escribir_estado(n_frag, n_prod, n_sond):
+def escribir_estado(n_frag, n_prod, n_sond, n_ext):
     commit = git("rev-parse", "--short", "HEAD")
     fecha = git("log", "-1", "--format=%cd", "--date=format:%Y-%m-%d %H:%M")
     sucio = git("status", "--porcelain")
@@ -334,18 +348,21 @@ citado ha pasado los cuatro controles de \doc{PLAN-LIBRO.md}~§2.2.
 Commit & \texttt{COMMIT} \\
 Fecha del commit & FECHA \\
 Build declarado & \texttt{JOBS} jobs, 0 errores, 0 warnings, 0 \texttt{sorry} \\
-Fragmentos citados & TOTAL (PROD en producción, SOND en \texttt{sondeos/}) \\
+Fragmentos citados & TOTAL (PROD en producción, SOND en \texttt{sondeos/}, EXT de otros proyectos) \\
 \bottomrule
 \end{tabular}
 \end{center}
 
 \noindent\small Los fragmentos marcados \textbf{«fuera del build»} provienen de
 \modulo{sondeos/}: compilan, y por eso son citables, pero \textbf{no sostienen ningún
-teorema} de las Partes I--III (\doc{PLAN-LIBRO.md}~§2.3).AVISO
+teorema} de las Partes I--III (\doc{PLAN-LIBRO.md}~§2.3). Los marcados con el nombre de
+\textbf{otro proyecto} son código ajeno citado como evidencia: no están en este build ni
+sostienen nada de este libro.AVISO
 """
     txt = (txt.replace("COMMIT", commit).replace("FECHA", fecha)
               .replace("JOBS", jobs).replace("TOTAL", str(n_frag))
               .replace("PROD", str(n_prod)).replace("SOND", str(n_sond))
+              .replace("EXT", str(n_ext))
               .replace("AVISO", aviso_sucio))
     with open(os.path.join(EXTRAIDO, "_estado.tex"), "w", encoding="utf-8") as fh:
         fh.write(txt)
@@ -405,7 +422,7 @@ def main():
     os.makedirs(EXTRAIDO, exist_ok=True)
 
     cierre = cierre_de_imports()
-    n_prod = n_sond = 0
+    n_prod = n_sond = n_ext = 0
 
     for fr in frags:
         clave = fr.get("clave", "?")
@@ -424,7 +441,16 @@ def main():
             error("[%s] %s NO es alcanzable desde ROBINSON_PlusPlus.lean: "
                   "no está en el build. §2.2(a) lo prohíbe como teorema del libro. "
                   "Si es un sondeo, decláralo con \"capa\": \"sondeo\"." % (clave, modulo))
-        if capa == "sondeo":
+        if capa == "externo":
+            if en_build:
+                error("[%s] %s SÍ está en el build de este libro: no es externo."
+                      % (clave, modulo))
+            if not fr.get("proyecto"):
+                error("[%s] un fragmento externo tiene que declarar de qué "
+                      "\"proyecto\" viene: el lector debe saber que no es de aquí."
+                      % clave)
+            n_ext += 1
+        elif capa == "sondeo":
             if en_build:
                 error("[%s] %s SÍ está en el build: no lo marques como sondeo." % (clave, modulo))
             n_sond += 1
@@ -506,7 +532,7 @@ def main():
                 fh.write("\n")
             print("· fragmentos.json actualizado con los footprints medidos")
 
-    escribir_estado(len(frags), n_prod, n_sond)
+    escribir_estado(len(frags), n_prod, n_sond, n_ext)
 
     for a in AVISOS:
         print("⚠ " + a)
@@ -517,8 +543,8 @@ def main():
         print("\nPLAN-LIBRO.md §2.1-§2.3: el libro no puede desincronizarse "
               "en silencio del código.", file=sys.stderr)
         return 1
-    print("✓ %d fragmento(s) extraído(s): %d de producción, %d de sondeos"
-          % (len(frags), n_prod, n_sond))
+    print("✓ %d fragmento(s) extraído(s): %d de producción, %d de sondeos, "
+          "%d de otros proyectos" % (len(frags), n_prod, n_sond, n_ext))
     return 0
 
 

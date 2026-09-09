@@ -34,6 +34,8 @@ ser citado). Detalle en [`LICENSE`](LICENSE) y en el apéndice E del libro.
 | `bib/libro.bib` | bibliografía |
 | `MATERIALES.md` | **la cantera**: hallazgos y razonamientos que deben acabar en el libro, cada uno con su capítulo de destino y su estatuto ([medido]/[citado]/[razonado]/[conjetura]) |
 | `DOCSTRINGS-NO-FIABLES.md` | afirmaciones falsas encontradas en docstrings de producción (§2.6) |
+| `scripts/revisar.py` | el **bucle de revisión** (§2.10): LaTeX → Markdown/ODT → retoques → LaTeX |
+| `revision/bitacora.json` | **el estado de la revisión**, y lo único de `revision/` que se commitea junto a su lectura `BITACORA.md`. `LIBRO.md`, `LIBRO.odt` y `.base.md` son generados |
 
 ## Uso
 
@@ -42,6 +44,9 @@ make            # extraer + compilar
 make extraer    # sólo extraer los fragmentos del repo
 make pdf        # sólo compilar (falla si falta algún fragmento)
 make axiomas    # regenera los #print axioms reales (necesita lake/lean)
+make revision   # regenera revision/LIBRO.md y LIBRO.odt para revisar el texto
+make recoger    # pasa las notas y retoques de la revisión a la bitácora
+make bitacora   # qué hay abierto en la revisión
 make ambito     # ¿hay algo preparado para subir fuera del libro?
 make subir MSG='...'   # compila, verifica, prepara sólo el libro y commitea
 make clean
@@ -59,6 +64,33 @@ declarado en `fragmentos.json` y contra la base sancionada.
 - **`muro`** — una obstrucción encontrada: *«aquí no sé pasar»*.
 - **`refutado`** — un resultado **negativo compilado**: *«se ha probado que no se pasa»*.
   No es lo mismo que un muro, y confundirlos vacía de contenido la Parte IV.
+
+## Subir el libro desde la tarea principal
+
+Esta tarea **no commitea**: el montaje que usa no puede borrar ficheros, y `git` dejaría un
+`.git/index.lock` huérfano. Deja el árbol listo y el commit lo hace quien tenga un shell normal.
+
+Lo que hay que subir son **`doc/book/**` y `PLAN-LIBRO.md`**, y nada más. Desde la raíz del repo:
+
+```bash
+cd doc/book && make            # los cuatro controles en verde antes de subir
+cd ../..
+git add -A -- doc/book PLAN-LIBRO.md
+git status --short -- doc/book PLAN-LIBRO.md   # revisar: debe haber renombrados, no borrados
+git commit -m "libro: ..."
+git push
+```
+
+`git add -A` sobre esas dos rutas es **necesario** —hay renombrados de fichero pendientes de
+registrar, y sin `-A` git los vería como un borrado más un fichero nuevo—, y es **seguro**, porque
+la ruta lo acota al libro. Nunca `git add -A` a secas: el resto del repositorio es la otra tarea.
+
+Comprobación previa opcional: `cd doc/book && make ambito` verifica que el área de preparación no
+contiene nada de fuera del libro.
+
+**Lo que NO se sube, y es correcto que no se suba**: `extraido/*.tex`, `libro.pdf`, `*.tmp`,
+`revision/LIBRO.md`, `revision/LIBRO.odt`, `revision/.base.md`. Todo eso lo regenera `make`. Si
+alguno aparece en `git status`, es que se ha roto un `.gitignore`.
 
 ## Regla que no se negocia
 

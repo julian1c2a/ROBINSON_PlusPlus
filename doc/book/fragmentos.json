@@ -915,10 +915,148 @@
         "derives",
         "codigo"
       ]
+    },
+    {
+      "clave": "reflects_of_omega",
+      "modulo": "ROBINSON_PlusPlus/Meta/OmegaReflect.lean",
+      "decl": "reflects_of_omega",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "Reflects",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalTwo.lean",
+      "decl": "Reflects",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "exists_prime_factor",
+      "modulo": "ROBINSON_PlusPlus/Full/PrimeFactor.lean",
+      "decl": "exists_prime_factor",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "Lean"
+      ]
+    },
+    {
+      "clave": "peano_assert_constructive",
+      "modulo": "../Peano/Peano/ConstructiveCheck.lean",
+      "decl": "\"#assert_constructive",
+      "capa": "externo",
+      "proyecto": "Peano",
+      "nivel": [
+        "Lean",
+        "Lean"
+      ]
+    },
+    {
+      "clave": "substfc_def",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "substfc",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "ax_substfc_impl",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax_substfc_impl",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "nivel_excepcion": "`ax_` anuncia un axioma objeto, pero la DECLARACIÓN es de Lean: un `def : Formula` o un `axiom`. La chapa marca dónde vive la declaración; lo que enuncia es objeto"
+    },
+    {
+      "clave": "ax_tc_cons",
+      "modulo": "ROBINSON_PlusPlus/Minimal/Axioms.lean",
+      "decl": "ax_tc_cons",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ],
+      "nivel_excepcion": "`ax_` anuncia un axioma objeto, pero la DECLARACIÓN es de Lean: un `def : Formula` o un `axiom`. La chapa marca dónde vive la declaración; lo que enuncia es objeto"
+    },
+    {
+      "clave": "diagTerm",
+      "modulo": "ROBINSON_PlusPlus/Meta/Diagonal.lean",
+      "decl": "diagTerm",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "prf_congr_tcFn",
+      "modulo": "ROBINSON_PlusPlus/Meta/TcArithPrf.lean",
+      "decl": "prf_congr_tcFn",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "cons_ne_head",
+      "modulo": "ROBINSON_PlusPlus/Meta/CodeDistinct.lean",
+      "decl": "cons_ne_head",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "derives",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "lineWF_modulo_7",
+      "modulo": "ROBINSON_PlusPlus/Meta/LineWFAssemblePrf.lean",
+      "decl": "pcc_lineWF_tracked_modulo_7",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "pcc_eval_substfc",
+      "modulo": "ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean",
+      "decl": "pcc_eval_substfc",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Prf",
+        "Prov"
+      ]
     }
   ],
   "paquetes": {
     "ROBINSON_PlusPlus": ".",
-    "FOL": "../FOL"
+    "FOL": "../FOL",
+    "Peano": "../Peano  (citado como evidencia, NO es base de este libro)"
   }
 }

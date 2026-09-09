@@ -1,5 +1,6 @@
 # Salida de LaTeX
 *.aux
+capitulos/*.aux
 *.log
 *.out
 *.toc
@@ -32,3 +33,15 @@ __pycache__/
 
 # Fichero de prueba de 1 byte del arranque
 .probe-borrado
+
+# --- añadido 2026-09-09 con el bucle de revisión (§2.10) ---
+# Lo que se commitea de `revision/` es la BITÁCORA —bitacora.json (el estado) y
+# BITACORA.md (su lectura)—, porque es la conversación sobre el texto y no se
+# puede reconstruir de nada. Lo demás es derivado y se regenera con
+# `make revision`:
+#   .base.md   el espejo contra el que se saca el diff, no un documento
+#   LIBRO.md   el libro entero, generado del LaTeX: mismo caso que extraido/
+#   LIBRO.odt  además, binario (lo ignora también el .gitignore de la raíz)
+revision/.base.md
+revision/LIBRO.md
+revision/LIBRO.odt

@@ -103,7 +103,7 @@ $\obj{\Pi_p}$ & 2 & no \\
 
 \subsection*{El axioma que traía la inconsistencia}
 
-Uno de los siete de listas merece mirarse ahora, porque será el protagonista de la Parte~IV:
+Uno de los siete de listas merece mirarse ahora, porque será el protagonista de la Parte~\ref{parte:noescrito}:
 
 \leanfrag{ax_cons_def}
 
@@ -166,7 +166,7 @@ listas (\ident{ax_C3_concat_assoc}, \ident{ax_L3_in_concat}) — y el teorema fu
 No es que \modulo{Full/} sea «la buena» y \modulo{Minimal/} un ensayo. \modulo{Minimal/} responde a una
 pregunta —\emph{¿hasta dónde se llega sin inducción?}— y la respuesta resulta ser: hasta Cantor,
 listas, funciones y, postulando el TFA, la factorización. \modulo{Full/} responde a otra. Y hay una
-tercera razón, que el capítulo~13 desarrolla: para Gödel~II la inducción \textbf{no es opcional} —
+tercera razón, que desarrollará \capfuturo{por qué la inducción no es opcional para Gödel~II}: para Gödel~II la inducción \textbf{no es opcional} —
 Q no satisface las condiciones de derivabilidad.
 \end{leccion}
 
@@ -187,14 +187,14 @@ La lista \ident{axioms} que el verificador consulta no tiene 34 fórmulas, sino 
 \end{tabular}
 \end{center}
 
-\noindent Tres veces más maquinaria que aritmética. Ése es, medido, **el precio de que una teoría
-pueda hablar de su propia sintaxis**, y el capítulo~7 lo desglosa.
+\noindent Tres veces más maquinaria que aritmética. Ése es, medido, \textbf{el precio de que una teoría
+pueda hablar de su propia sintaxis}, y lo desglosa \capfuturo{cómo funciona el verificador}.
 
 \begin{muro}[Y una consecuencia que no es obvia]
 Desde que existe esa maquinaria, \textbf{el conjunto de axiomas es portante}: el verificador interno
 consulta la lista, luego $\Prov$ depende de ella, luego la sentencia de Gödel depende de ella.
 Quitar un axioma hoy no simplifica el mismo teorema: \textbf{cambia el teorema}. Es el argumento de
-\adr{015} (capítulo~22) leído al revés, y significa que la elección de axiomas dejó de ser
+\adr{015} —ver \capfuturo{definir en vez de axiomatizar}— leído al revés, y significa que la elección de axiomas dejó de ser
 reversible en el momento en que la teoría empezó a hablar de sí misma.
 \end{muro}
 

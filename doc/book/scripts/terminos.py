@@ -116,7 +116,14 @@ def main():
     for entrada in voc["terminos"]:
         t = entrada["t"]
         formas = [t] + entrada.get("variantes", [])
-        idef = definido.get(t)
+        # Un \defterm{} de CUALQUIERA de las formas declaradas introduce el
+        # término: las `variantes` existen justamente para decir que singular y
+        # plural son la misma palabra. Sin esto, `\defterm{axiomas objeto}` no
+        # contaba como introducción de «axioma objeto» y el primer uso en prosa
+        # llana lo delataba — pasó el 2026-09-09, con el término ya introducido
+        # desde el capítulo 3.
+        posiciones = [definido[f] for f in formas if f in definido]
+        idef = min(posiciones) if posiciones else None
         if idef is None:
             print("  ✗ «%s» está en el vocabulario y no se introduce con \\defterm en ninguna parte" % t)
             fallos += 1

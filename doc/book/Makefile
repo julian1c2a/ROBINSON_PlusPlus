@@ -9,7 +9,8 @@ PY       ?= python3
 ENGINE   ?= $(shell kpsewhich luaotfload-main.lua >/dev/null 2>&1 && echo -lualatex || echo -xelatex)
 FLAGS     = -interaction=nonstopmode -halt-on-error -file-line-error
 
-.PHONY: all extraer pdf verificar simbolos terminos ambito subir axiomas axiomas-fix clean distclean help
+.PHONY: all extraer pdf verificar simbolos terminos ambito subir axiomas axiomas-fix \
+        revision recoger bitacora clean distclean help
 
 ## all: extrae, compila y verifica que lo impreso coincide con el repo
 all: extraer pdf verificar simbolos terminos
@@ -33,6 +34,18 @@ simbolos:
 ## terminos: ningún término del vocabulario se usa antes de definirse (§2.7)
 terminos:
 	@$(PY) scripts/terminos.py
+
+## revision: regenera revision/LIBRO.md desde el LaTeX, con tus notas abiertas
+revision: all
+	@$(PY) scripts/revisar.py generar
+
+## recoger: pasa tus notas y retoques de revision/LIBRO.md a la bitácora
+recoger:
+	@$(PY) scripts/revisar.py recoger
+
+## bitacora: qué hay abierto ahora mismo
+bitacora:
+	@$(PY) scripts/revisar.py estado
 
 ## ambito: comprueba que sólo el libro está preparado para subir
 ambito:

@@ -30,7 +30,9 @@ establecida.
 
 ## M-1 · La fuerza de la metateoría: cuánto de Lean se usa realmente
 
-**Destino:** capítulo 3, «Teoría objeto y metateoría», como apartado propio.
+**Destino:** ✅ **CONSUMIDO el 2026-09-09** por el capítulo 6, «¿Cuánta metateoría hace falta?»
+(`capitulos/cap-objeto-y-meta.tex`). Lo que sigue se conserva como cantera: tiene más detalle del
+que cabe en el capítulo, y las correcciones de abajo documentan qué se midió al escribirlo.
 **Origen:** conversación del 2026-09-04. **Pregunta que lo abre:** *el lenguaje de Lean 4 usado como
 metateoría, ¿es equivalente a Peano con inducción sobre un conjunto infinito numerable de fórmulas?*
 
@@ -165,13 +167,28 @@ técnica probada en el propio ecosistema del autor. **[medido]**
    metodología por inventar. Aplicarlo a RPP daría la separación que §1.5 pide —Markov esencial
    frente a `Decidable` incidental— **como control de compilación**, no como auditoría manual. Es
    exactamente la doctrina de este libro: convertir un principio en una máquina.
-2. Que `Foundation/GodelBeta.lean` esté en la lista de deuda clásica de Peano es **notable**: la
-   función β de Gödel es justo la pieza que §1.4 identifica como necesaria para que una metateoría
-   aritmética hospede la recursión de curso de valores. Si esa pieza aún no es constructiva en
-   Peano, el plan de sustitución tiene ahí su primer trabajo concreto. **[razonado]**
+2. ~~Que `Foundation/GodelBeta.lean` esté en la lista de deuda clásica de Peano es **notable**~~
+   — **CORREGIDO el 2026-09-09.** Era falso, y el error tiene interés propio. La lista que
+   `DECISIONS.md` de Peano exhibe (líneas 24-25, 418-421) es el **inventario de partida** de
+   ADR-017, no el estado: ADR-017 se cerró el 2026-07-14. Medido sobre el árbol: `GodelBeta` tiene
+   **12 declaraciones bajo `#assert_constructive`** (`beta`, `beta_lt`, `beta_of_lt`,
+   `godel_beta_seq`, `encodeList`/`decodeList`, `encode_decode`, `godelB`, `godelC`, `godelC_spec`…)
+   y **cero usos** de `Classical.*` — sólo dos comentarios que dicen «por búsqueda acotada, sin
+   `Classical.choose`». **[medido]**
+   Lo que queda de verdad: `Prelim/Classical.lean` y `Prelim/ExistsUnique.lean` son los **únicos**
+   ficheros de producción de Peano con un uso literal; la excepción está documentada y aceptada
+   (`DECISIONS.md` líneas 493 ss.), y sus dos consumidores —`Foundation/Initiality.lean` y
+   `Foundation/PureAxioms.lean`— cuantifican sobre `PeanoSystem` **abstractos**: metateoría
+   genuinamente no constructiva, sin nada que acotar. **[medido]**
+   **Y el hallazgo que sí sirve al plan de sustitución:** la reparación de `GodelBeta` fue
+   **búsqueda acotada** — exactamente la técnica que §1.5(a) propone para el uso eliminable de RPP.
+   El primer trabajo concreto no es inventar nada: es repetir allí lo que Peano ya hizo.
 
-⚠️ No he leído `ConstructiveCheck.lean` entero ni ADR-017 completo: sólo la cabecera y la
-MANDATORY. Antes de escribirlo en un capítulo, leer los dos.
+✅ Leídos el 2026-09-09: `Peano/ConstructiveCheck.lean` (2030 líneas, **1425**
+`#assert_constructive` activos, 1 comentado) y las entradas ADR-017/ADR-018 de `DECISIONS.md`.
+Dato que el capítulo usa y que no estaba aquí: el único assert comentado lo está **a propósito**,
+sobre `Peano.choose_spec`, con la nota «TEST: descomentar para verificar que la guarda detecta
+Classical». Es un control positivo de la guarda — la misma doctrina que §2 de `PLAN-LIBRO.md`.
 
 ### 1.7 · Experimento propuesto (barato, y con resultado publicable)
 

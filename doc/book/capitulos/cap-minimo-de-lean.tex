@@ -1,0 +1,96 @@
+\chapter{Lo mínimo de Lean: cuatro palabras}
+\label{cap:lean}
+
+Este libro está lleno de código Lean 4 y no es un libro sobre Lean. Para leerlo hacen falta cuatro
+palabras. Con ellas se entiende cada fragmento que aparece; sin ellas, ninguno. Todo lo demás
+—tácticas, elaboración, instancias— es maquinaria que el lector puede ignorar sin perder el hilo.
+
+\section{\ident{inductive}: cómo se dice «esto es todo lo que hay»}
+
+Un tipo inductivo se declara enumerando sus \emph{constructores}, y esa enumeración es exhaustiva:
+no hay más términos que los que se obtienen aplicándolos.
+
+\leanfrag{fol_Term}
+
+\noindent Un término es una variable o la aplicación de un símbolo de función a una lista de
+términos. Nada más. De esa declaración salen gratis tres cosas que en la teoría objeto cuestan
+axiomas:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+constructores disjuntos & una variable nunca es una aplicación \\
+constructores inyectivos & si dos aplicaciones son iguales, coinciden símbolo y argumentos \\
+inducción estructural & para demostrar algo de todo término basta hacerlo caso por constructor \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\begin{leccion}[Lo que regala el compilador, en primer orden se paga]
+Esas tres cosas son exactamente lo que la parte~\ref{parte:aritmetizacion} tiene que \emph{demostrar} cuando reconstruye
+listas y árboles sintácticos dentro de la aritmética, donde no hay tipos inductivos: hay números.
+Ver hecho a mano lo que aquí es una línea enseña qué había realmente dentro de esa comodidad.
+\end{leccion}
+
+\section{Las tres palabras que son tres categorías morales}
+
+Las otras tres —\ident{def}, \ident{theorem}, \ident{axiom}— parecen tres formas de escribir lo
+mismo. No lo son. Son tres compromisos distintos, y la diferencia entre ellos organiza el proyecto
+entero.
+
+\subsection*{\ident{def} — nombrar no cuesta nada}
+
+Una definición introduce una abreviatura. No afirma nada y no puede ser falsa: como mucho, puede ser
+inútil.
+
+\leanfrag{consN}
+
+\subsection*{\ident{theorem} — se gana}
+
+Un teorema afirma algo, y sólo entra en el sistema si el núcleo de Lean acepta su demostración.
+
+\leanfrag{two_mul_consN}
+
+\subsection*{\ident{axiom} — es una deuda}
+
+Un axioma afirma algo \textbf{sin demostración}. Lean lo acepta y lo apunta. Es legítimo cuando lo
+que se postula es una regla del juego o un principio que la teoría de destino tiene por definición
+— y es peligroso siempre, porque un axioma falso hace demostrable cualquier cosa.
+
+\leanfrag{fol_gen}
+
+\begin{muro}[Un axioma falso ya ha pasado aquí, dos veces]
+En \modulo{FOL} hubo un \ident{axiom} cuyo enunciado era literalmente falso, con contraejemplo de
+tres líneas; hoy es un teorema con el enunciado corregido. Y en la teoría objeto hubo otro que hacía
+la teoría inconsistente durante meses. Los dos episodios están contados en este libro, y los dos
+empiezan igual: alguien escribió \ident{axiom} donde debía haber escrito una pregunta.
+\end{muro}
+
+\section{Por eso hay una línea gris debajo de cada teorema}
+
+Si un axioma es una deuda, lo mínimo es llevar la cuenta. Lean lo permite: dado cualquier teorema,
+se puede preguntar de qué axiomas depende — no los que están declarados en el fichero, sino los que
+su demostración usa realmente, siguiendo toda la cadena. Esa lista es el \defterm{footprint}, y en
+este libro se imprime debajo de cada enunciado citado:
+
+\footprint{\fpi{propext}, \fpi{Classical.choice}, \fpi{Quot.sound}}
+
+\begin{leccion}[Cómo se lee]
+Los tres de arriba son la base del propio Lean y salen prácticamente en todo. Lo interesante es lo
+que aparece \emph{además}: si un teorema cita un esquema de inducción, es que lo necesita; si no lo
+cita, es que no. Cuando el footprint no añade nada a la base ya aceptada se dice que el resultado es
+\defterm{net-0}. Y cuando aparece algo que no debería, hay un problema — así se descubrió la
+inconsistencia de la parte~\ref{parte:noescrito}.
+\end{leccion}
+
+\section{Dos palabras más, que no son de Lean sino de este proyecto}
+
+Aparecen a menudo y conviene fijarlas aquí. Un \defterm{sondeo} es un experimento compilado que
+contesta una pregunta —muchas veces respondiendo \emph{que no}— y que vive fuera de la compilación
+principal. La \defterm{cuarentena} es el directorio donde se apartaron los módulos que dependían de
+la inconsistencia; hoy está vacío, y el episodio es la Parte~\ref{parte:noescrito}.
+
+\begin{leccion}[Todo lo anterior en una línea]
+\ident{def} nombra, \ident{theorem} se gana, \ident{axiom} se debe. El resto de este libro consiste,
+básicamente, en pagar deudas y en anotar las que no se han podido pagar todavía.
+\end{leccion}

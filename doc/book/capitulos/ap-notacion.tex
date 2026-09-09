@@ -1,31 +1,9 @@
-%% Nomenclatura y notación. Va ANTES del índice y después de la leyenda de
-%% niveles: PLAN-LIBRO.md §2.7 — nada se usa antes de estar definido.
-\chapter*{Nomenclatura, niveles y notación}
-\addcontentsline{toc}{chapter}{Nomenclatura, niveles y notación}
+%% Apéndice: notación. Recapitulación; los signos se introducen en la Parte I.
+\chapter{Notación}
+\label{ap:notacion}
 
-Este capítulo no supone nada. Da los cuatro alfabetos que hacen falta para leer el resto: las
-\textbf{palabras}, los \textbf{signos}, los \textbf{niveles} y los \textbf{nombres}. Se puede
-saltar y volver — pero nada de lo que viene después usa un término que no esté aquí, y eso está
-comprobado por una máquina, no por buena voluntad.
+\section{Los signos}
 
-\section*{1 · Las palabras}
-
-Cada entrada lleva, además de su definición, una etiqueta que dice \textbf{de qué lado está lo que
-nombra}. No es un adorno: es la primera pregunta que hay que saber contestar de cualquier palabra de
-este libro, y dejarla implícita es la puerta por la que entró la inconsistencia que cuenta la
-Parte~IV.
-
-\begin{center}\footnotesize
-\nivelterm{meta} del lado de Lean, donde razonamos\quad
-\nivelterm{objeto} del lado del sistema aritmético del que se habla\\[0.35em]
-\nivelterm{meta→objeto} una función de Lean que \emph{produce} sintaxis de ese sistema\quad
-\nivelterm{ambos} nombra la distinción misma\\[0.35em]
-\nivelterm{proyecto} una noción sobre el proyecto, no sobre las teorías
-\end{center}
-
-\input{extraido/_glosario.tex}
-
-\section*{2 · Los signos}
 
 \begin{center}\small
 \begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
@@ -48,9 +26,7 @@ $\Delta_0$, $\Sigma_1$ & clases de fórmulas por su cuantificación: acotada, y 
 \nota{Ningún término técnico aparece en este libro antes de estar definido aquí. Lo comprueba
 \modulo{doc/book/scripts/terminos.py} en cada compilación, y no admite excepciones.}
 
-\input{capitulos/00-niveles.tex}
-
-\section*{4 · Cómo se lee un nombre}
+\section{Cómo se lee un nombre}
 
 Los identificadores van en inglés y siguen las convenciones de Mathlib. Tres reglas bastan para
 leer casi cualquiera:
@@ -66,7 +42,7 @@ leer casi cualquiera:
   \ident{prf_add_zero_left} se lee sin traducir.
 \end{enumerate}
 
-Y hay algo más útil todavía, porque conecta con la chapa de la sección 3:
+Y hay algo más útil todavía, porque conecta con la chapa de niveles:
 \textbf{el prefijo dice en qué nivel se afirma.} No es una impresión — es la práctica medida del
 proyecto:
 
@@ -86,3 +62,5 @@ prefijo & símbolos & qué anuncia \\
 \nota{Los recuentos son de \modulo{ROBINSON\_PlusPlus/} a 2026-09-03. La excepción conocida son las
 seis meta-reglas $\omega$ de \modulo{FOL}, anteriores a la convención, que no llevan \ident{ax_}.}
 
+\nota{Ningún término ni notación aparece en este libro antes de haberse introducido. Lo comprueba
+\modulo{doc/book/scripts/terminos.py} en cada compilación, y no admite excepciones.}

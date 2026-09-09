@@ -1,0 +1,72 @@
+\chapter{Qué hay que construir para decirlo hoy}
+\label{cap:construir}
+
+El argumento del capítulo anterior cabe en diez páginas de prosa. Formalizarlo —hacer que una
+máquina lo verifique paso a paso— exige construir cinco cosas, ninguna de las cuales se puede
+saltar. Este capítulo dice cuáles son y en qué orden vienen. Es, de paso, el mapa del libro.
+
+\section{Las cinco piezas}
+
+\begin{enumerate}[leftmargin=1.6em]
+\item \textbf{Un lenguaje.} Qué es un término, qué es una fórmula, cómo se sustituye una variable.
+  Suena trivial y no lo es: la sustitución con nombres exige evitar capturas, y ahí se pierden más
+  demostraciones de las que uno espera.
+\item \textbf{Una teoría.} Un lenguaje no afirma nada. Hacen falta axiomas — y decidir cuáles, que
+  es una decisión con consecuencias que este libro persigue hasta el final.
+\item \textbf{Un cálculo.} Qué cuenta como demostración. Y aquí aparece la primera sorpresa del
+  proyecto: hacen falta \emph{dos}, por una razón que el capítulo siguiente explica.
+\item \textbf{Una codificación.} Convertir fórmulas en números, de modo que la teoría pueda hablar
+  de ellas.
+\item \textbf{Un verificador.} Una fórmula del propio lenguaje que diga «esto de aquí es una
+  demostración correcta». Sin ella no hay predicado de demostrabilidad, y sin predicado de
+  demostrabilidad no hay teorema de Gödel.
+\end{enumerate}
+
+\begin{leccion}[El orden no es negociable]
+Cada pieza usa las anteriores. No se puede codificar sin lenguaje, ni verificar sin codificación.
+Por eso el libro va en ese orden, y por eso los capítulos técnicos empiezan diciendo qué se sabe ya
+— si el lector llegó hasta aquí, tiene derecho a que se le diga dónde está.
+\end{leccion}
+
+\section{Lo que este libro añade a esa lista}
+
+Si el libro fuera sólo la construcción, sería un manual más. Hay dos cosas que lo separan de un
+manual, y conviene anunciarlas ahora porque condicionan cómo está escrito.
+
+\textbf{La primera: aquí todo está compilado.} Ningún bloque de código de este libro se ha escrito a
+mano. Se extraen del repositorio, y hay controles que fallan si el texto impreso deja de coincidir
+con el código, si un teorema deja de estar demostrado desde la base declarada, o si el libro nombra
+un símbolo que no existe. Debajo de cada enunciado hay una línea gris con los axiomas de los que
+depende — el capítulo~\ref{cap:lean} explica qué es eso y por qué está ahí.
+
+\textbf{La segunda: aquí también se cuentan los fracasos.} Una formalización real produce, además de
+teoremas, una cantidad notable de callejones sin salida — y algunos de ellos enseñan más que los
+teoremas. La Parte~\ref{parte:noescrito} está dedicada a eso: una inconsistencia que sobrevivió meses, cuatro
+reparaciones que no funcionan, y la que sí. En los manuales eso no aparece, porque los manuales
+presentan el resultado ya limpio.
+
+\begin{leccion}[Por qué los fracasos son contenido y no anécdota]
+Un resultado negativo demostrado —\emph{esto no se puede hacer, y aquí está la prueba}— ahorra al
+siguiente el tiempo de intentarlo. En este proyecto hay varios, compilados. El libro los trata con
+el mismo rango que los positivos, y tiene un entorno tipográfico propio para ellos.
+\end{leccion}
+
+\section{Cómo leer este libro}
+
+Las partes de este libro siguen las cinco piezas, más los teoremas y más lo que no sale en los
+libros:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+\textbf{I} · El problema & dónde estás ahora: el contexto y las cuatro palabras de Lean que hacen falta \\
+\textbf{II} · El terreno & el lenguaje, los cálculos y la teoría aritmética \\
+\textbf{III} · Aritmetización & la codificación y el verificador \\
+\textbf{IV} · Los teoremas & el punto fijo, Gödel~I, las condiciones de derivabilidad, Gödel~II \\
+\textbf{V} · Lo que no sale en los libros & la inconsistencia, las reparaciones, el método \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+\noindent Los apéndices recogen el inventario de axiomas, el mapa de módulos, las trampas de Lean
+encontradas, y un glosario y una tabla de notación a los que se puede volver en cualquier momento.

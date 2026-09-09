@@ -13,7 +13,11 @@
 > 2026-08-22) y el pedagógico (`Sobre_el_libro.md`) — y **corrige** las afirmaciones que el
 > proyecto ha refutado desde entonces. El registro de correcciones está en §8.
 
-**Última actualización:** 2026-09-04 11:30 — **nuevo principio §2.8** (una fórmula se lee en voz
+**Última actualización:** 2026-09-09 (2ª) — **Parte I escrita** y migración 3b completada;
+previo, **§3 reestructurado**: nueva **Parte I pedagógica**
+(los artículos de Gödel, los lenguajes, lo mínimo de Lean) y cinco partes en total; **nuevo §2.9**
+(ninguna parte empieza sin decir qué pregunta contesta) con los números de capítulo mecanizados;
+previo, **§2.8** (una fórmula se lee en voz
 alta la primera vez) y **M-4** en la cantera; previo, **`MATERIALES.md`**, la cantera de material
 pendiente de capítulo; previo, **§2.7** (nada se usa antes de estar
 definido, sin exenciones) + capítulo de apertura; previo, **§2.6** (un docstring es testimonio,
@@ -105,7 +109,7 @@ diverge de este fichero, manda este fichero.
 
 ## 2 · Principios editoriales
 
-Son **ocho**, y los ocho nacen de un fallo real de este proyecto. Ninguno es estético.
+Son **nueve**, y los nueve nacen de un fallo real de este proyecto. Ninguno es estético.
 
 ### 2.1 · Sólo se publica lo que compila
 
@@ -166,7 +170,7 @@ se impriman con su condición a la vista, no en una nota al pie*:
 
 ✅ **Corolario que afectaba al calendario, SALDADO (2026‑09‑08).** El capítulo 24 (la rotura del
 muro de `substfc`) narraba un resultado que vivía en `sondeos/`, **fuera del build**. Ya no:
-`prf_hasWitF_real` está en `Meta/CodeWitnessPrf.lean:2140`, y `pcc_eval_substfc` /
+`prf_hasWitF_real` está en `Meta/CodeWitnessPrf.lean:2142` (medido el 2026-09-09; la nota decía 2140), y `pcc_eval_substfc` /
 `pcc_eval_substfc_wit` en `Meta/EvalSubstfcPrf.lean` desde la promoción **B3.4** (§3.42), con
 footprint = la base sancionada. ⇒ **el capítulo 24 ya puede presentar sus resultados como teoremas
 del libro**, sin la marca «fuera del build». Era la única dependencia real del libro respecto al
@@ -188,6 +192,25 @@ No citarlos empobrecería gravemente la Parte IV; citarlos como si fueran produc
 **«fuera del build»**, la orden exacta con la que se recompila
 (`lake env lean sondeos/<fichero>.lean`, `EXIT=0`) y su footprint. Lo mismo para `cuarentena/` si
 algún día vuelve a tener contenido.
+
+#### 2.3bis · Código de OTRO proyecto: se cita como evidencia, nunca como base
+
+*(Añadido el 2026-09-09, al escribir el capítulo 6.)* El libro cita código de proyectos hermanos del
+autor —hoy `Peano`— cuando ese código es **la evidencia de una afirmación sobre el ecosistema**:
+que una técnica es portable, que un experimento ya se hizo, que una deuda se saldó. Es un tercer
+estatuto, distinto de producción y de sondeo, con reglas propias:
+
+| | producción | sondeo | **externo** |
+|---|---|---|---|
+| alcanzable desde la raíz | ✅ obligatorio | ⛔ prohibido | ⛔ prohibido |
+| footprint impreso | ✅ obligatorio | opcional | **⛔ no se imprime** |
+| puede sostener un teorema del libro | ✅ | ⛔ | **⛔** |
+| marca visible | — | «fuera del build» | **«otro proyecto: NOMBRE»** |
+
+La prohibición del footprint no es un descuido: medir la base de un teorema **ajeno** e imprimirla
+con la misma tipografía que las nuestras invitaría a leerlo como parte de nuestra cadena. Se declara
+con `"capa": "externo"` y un campo `"proyecto"` obligatorio; `scripts/extraer.py` falla si falta, y
+`scripts/simbolos.py` informa aparte de los identificadores que sólo existen en esos proyectos.
 
 ### 2.4 · El libro no puede afirmar lo que el proyecto ha refutado
 
@@ -378,215 +401,198 @@ si una se usa antes. Tampoco hay fichero de excepciones.
 la de **niveles** en el capítulo de apertura, porque la explicación de los dos ejes usa `⊢`, `Prf` y
 `Prov`. El orden final es **palabras → signos → niveles → nombres**.
 
+### 2.9 · Ninguna parte técnica empieza sin decir qué pregunta contesta
+
+Los ocho principios anteriores protegen la verdad y la legibilidad de lo que el libro dice. Éste
+protege que **se entienda para qué**.
+
+**Regla.** Cada parte abre con un puente narrativo de media página que remite a la Parte I y dice
+qué pregunta contesta la parte que empieza. Y ningún capítulo técnico entra en materia sin haber
+dicho, en su primer párrafo, qué se sabe ya y qué falta.
+
+**Por qué es una regla y no una buena intención:** la prosa pedagógica es lo primero que se
+sacrifica cuando hay prisa, y su ausencia no rompe ningún build. Escrita como principio, al menos
+se nota cuando falta.
+
+**Corolario mecanizado — prohibido escribir «capítulo 13» a mano.** Un número de capítulo escrito
+en el texto deja de ser cierto en cuanto se reordena el libro, y nada lo avisa: es exactamente la
+mentira silenciosa que persigue todo el aparato de controles. Se usa `\ref{}`/`\cref{}` cuando el
+capítulo existe y **`\capfuturo{...}`** —que imprime «el capítulo dedicado a …», sin número— cuando
+todavía no. `scripts/simbolos.py` falla si encuentra uno escrito a mano.
+
+**Corolario de nomenclatura — los ficheros de capítulo no llevan número.** `cap-kernel-fol.tex`, no
+`cap02-kernel-fol.tex`. El orden lo fija **sólo** `libro.tex`. Un fichero llamado `cap04-` que
+acabara siendo el capítulo 8 es el mismo fallo con otro disfraz.
+
+---
+
+### 2.10 · El texto se revisa en Markdown, pero la fuente sigue siendo el LaTeX
+
+*(Añadido el 2026-09-09.)* Revisar prosa en `.tex` es incómodo: las macros se comen la frase y el
+autor acaba corrigiendo marcado en vez de leyendo. Y revisar en Markdown tiene el peligro contrario:
+dos fuentes que divergen en silencio, que es exactamente el modo de fallo contra el que va todo
+este documento.
+
+La regla que resuelve las dos cosas: **el Markdown es una VISTA, generada, de un solo sentido.**
+
+| | fuente | vista |
+|---|---|---|
+| dónde vive | `capitulos/*.tex` | `revision/LIBRO.md` |
+| quién la escribe | Claude, aplicando lo acordado | `scripts/revisar.py`, de la fuente |
+| qué se imprime | esto | nada |
+| qué pasa si divergen | manda la fuente | se regenera y punto |
+
+**El ciclo**, y las tres cosas que lo hacen fiable:
+
+1. `make revision` — regenera `revision/LIBRO.md` del LaTeX, con las notas abiertas recolocadas.
+2. El autor **anota** (líneas que empiezan por `>>`) y/o **reescribe la prosa** directamente.
+3. `make recoger` — las notas y el diff de prosa pasan a `revision/bitacora.json`.
+4. Claude lo aplica **al LaTeX**, responde con `revisar.py responder <ID> "..." --estado ...`, y
+   vuelve al paso 1.
+
+**(0) Se puede revisar en el procesador de textos, y es lo que pasa.** `make revision` deja
+`revision/LIBRO.odt` al día junto al `.md`, y `recoger` lee el que sea **más reciente**. Dos
+consecuencias que hubo que programar: la marca de nota es `>>` **y también `»`**, porque el
+autocorrector convierte lo primero en lo segundo en cuanto escribes detrás; y desde un `.odt` **no
+vale un diff de líneas** —el conversor pierde el marcado, reescribe las tablas y vuelve a partir
+los párrafos, así que saldría todo cambiado—, sino una comparación de párrafos normalizados que
+sólo recoge lo que cambia de palabras. Las anclas, que en el `.odt` desaparecen por ser comentarios
+HTML, se recuperan buscando en `.base.md` el bloque que más se parece al contexto de la nota.
+
+**(a) El código no se revisa aquí.** Los bloques ```lean``` de la vista se leen **del repositorio**,
+no del `.tex` generado — la misma lectura canónica que usa `verificar_pdf.py` (§2.1). Editarlos en
+el Markdown no tiene efecto, y `recoger` avisa si el diff los toca. Si un fragmento está mal, lo que
+se cambia es el código.
+
+**(b) Nada se pierde por desfase.** `recoger` compara con `.base.md` —copia exacta de lo último
+generado—, no con el LaTeX de hoy. Se puede anotar sobre una versión vieja: las notas se recogen
+igual, y las que ya no encuentran su párrafo se re-emiten al principio marcadas como **huérfanas**,
+con el extracto que las ancló. Una nota nunca desaparece en silencio.
+
+**(c) La conversación es acumulativa y es un documento del proyecto.** `revision/BITACORA.md`
+guarda cada nota, cada respuesta y cada estado (`abierta` · `aplicada` · `discutida` ·
+`descartada`), con su fecha, **incluidas las descartadas y su razón**. Es el registro de por qué el
+libro dice lo que dice, y se commitea con él. `.base.md` no: es un espejo, no un documento.
+
 ---
 
 ## 3 · Estructura
 
-### Apertura (antes del índice)
+> **Reestructurado el 2026-09-09.** El libro abría con el capítulo de nomenclatura —bueno como
+> referencia, malo como primera página: obligaba a definir «teoría objeto» antes de que el lector
+> supiera por qué le importa—. Ahora abre con una **Parte I puramente pedagógica**, y la
+> nomenclatura pasa a ser recapitulación en los apéndices.
 
-0. **Nomenclatura, niveles y notación** — las palabras, los dos ejes, la gramática de nombres y los
-   signos. Es la capa sintáctica de §2.7, y va delante de todo.
+### Parte I — El problema
 
-### Parte I — El terreno
+Sin una sola línea de Lean hasta el capítulo 4. Es la prosa que guía el resto del libro: las partes
+siguientes se leen a través de ella (§2.9).
 
-1. **¿Qué dice Gödel, y qué hay que construir para decirlo?** — el enunciado informal, y por qué
-   formalizarlo obliga a construir tres cosas: un lenguaje, una teoría y una aritmetización.
-2. **El kernel FOL⁼** — `Term`, `Formula`, índices de De Bruijn, `substFormula`/`liftFormula`, la
-   relación `Derives` (`⊢`) y las **6 meta-reglas ω** (`imp_intro`, `gen`, `raa`, `dne`, `or_elim`,
-   `ex_elim`). *Material:* `doc/REFERENCE-Kernel.md`, `FOL/REFERENCE.md`.
-   *Lección:* por qué De Bruijn, y el precio que se paga por ello.
-3. **Teoría objeto y metateoría: dos gramáticas y DOS cálculos.** ← capítulo que venía de
-   `Sobre_el_libro.md` y que el plan técnico no tenía. Es la clave arquitectónica de todo el
-   proyecto: `⊢` incluye la ω-regla `gen`, luego **no es r.e.**, y por Tarski ningún `Prov` puede
-   satisfacer el bicondicional; de ahí el cálculo de Hilbert **finitario** `Prf` en paralelo, con
-   los puentes `prf_to_derives` / `prf0_to_derives`. *Material:* `GODEL-D-ARITHMETIZATION.md`,
-   ADR-010 (por qué las meta-reglas son `axiom` y no teoremas).
-4. **La teoría objeto: Robinson Q++** — los 34 axiomas matemáticos de `Minimal/`, los 141 axiomas
-   objeto de la lista `axioms`, y la frontera `Minimal` / `Full`. Qué se puede **sin inducción**:
-   Cantor, pares, listas, funciones discretas, TFA vía Ax-P.
-   *Material:* `MINIMAL-AXIOMS.md`, `AXIOMS.md`, `TuplasFuncionesYListas.md`, `DISCUSIONES.md`.
+1. **1931: qué preguntó Hilbert y qué contestó Gödel.** Los dos artículos —la completitud de 1930 y
+   la incompletitud de 1931—, el programa de Hilbert y por qué la respuesta tuvo que pasar por
+   aritmetizar la sintaxis.
+   ⭐ **El gancho que abre el libro:** el artículo de 1931 lleva un **«I»** en el título. Gödel
+   anunció una segunda parte con la demostración detallada del segundo teorema y **nunca la
+   escribió**; las condiciones de derivabilidad las suministraron Hilbert–Bernays en 1939. Es decir:
+   **D1, D2 y D3 son el artículo que Gödel no llegó a publicar**, y este proyecto lleva meses
+   peleando con D3. Eso da tesis a la Parte V y sentido al libro entero en un párrafo.
+   ⚠️ `[citado]` — verificar títulos, fechas y la atribución a Hilbert–Bernays antes de imprimirlo.
+2. **Qué hay que construir para decirlo hoy.** De la prosa de Gödel al código: hace falta un
+   lenguaje, una teoría, un cálculo, una codificación y un verificador. Es el mapa del libro y
+   justifica el orden de las partes.
+3. **Los lenguajes de este libro.** El capítulo que hoy no existe y hace más falta.
+   * **Tres metateorías, no una.** La de Gödel era informal pero **deliberadamente finitaria**, para
+     que Hilbert la aceptara. La de FOL⁼ admite la **ω-regla**, luego `⊢` **no es r.e.** y es *más
+     fuerte* que el cálculo del que Gödel hablaba. La de Lean es más fuerte todavía —aunque el
+     proyecto sólo use dos niveles de ella y ninguna impredicatividad—. *Material:*
+     `doc/book/MATERIALES.md` M-1.
+   * **Cuatro lenguajes objeto, no uno.** FOL⁼ desnudo (gramática sin signatura) → **Q++** (signatura
+     aritmética + 34 axiomas) → Q++ **con la capa de codificación** (+107, los símbolos opacos del
+     verificador) → la **extensión con inducción** de `Full/`. Cada uno es una teoría distinta y
+     demuestra un teorema de incompletitud distinto. Es [ADR-015](DECISIONS.md) dicho al principio
+     en vez de al final, y es lo que resuelve la ambigüedad de `axiomsCodeT` (¿34 o 141?) registrada
+     en `doc/book/DOCSTRINGS-NO-FIABLES.md` caso 5.
+   * Aquí se introducen **narrativamente** las chapas de nivel de §2.5.
+4. **Lo mínimo de Lean: cuatro palabras.** `inductive`, `def`, `theorem`, `axiom`. Nada más.
+   ⭐ Con el enganche que lo hace memorable: **las tres últimas son las tres categorías morales del
+   proyecto.** Un `def` no cuesta nada —nombra—. Un `theorem` se gana. Un `axiom` es una **deuda**, y
+   por eso el proyecto los inventaría uno a uno en `AXIOMS.md` y este libro imprime el *footprint*
+   debajo de cada enunciado. El lector entiende de golpe qué es esa línea gris.
 
-### Parte II — Aritmetización
+### Parte II — El terreno
 
-5. **Codificar estructuras como números** — emparejamiento de Cantor, `cons`/`nil`, listas,
-   proyecciones, y el engarce con los tipos inductivos de Lean.
-   *Material:* `TuplasFuncionesYListas.md`, `FOL/ENGARCE-ROBINSON-FOL.md`.
-6. **Códigos de términos y fórmulas** — `strCode`, `termCode`, `formCode` y sus 9 tags; el espejo
-   meta `codeNat`; `numeral`; la inyectividad (Teo G1). *Material:* `doc/REFERENCE-Godelization.md`.
-7. **El verificador de pruebas** — `lineWF`, `premsOf`, `runFn`, `chainOk`, `validProofFn`, los
-   **21 tags**, y `provCodeC'`. *Material:* `doc/REFERENCE-Incompleteness.md`,
-   `GODEL-D-ARITHMETIZATION.md`.
-8. **Representabilidad y D1** — de `Prf φ` a `Prov(⌜φ⌝)`: `repr_pos` y `repr_pos'_prf`. Por qué D1
-   es la Σ₁-completitud **externa** y por eso sale sin inducción.
+5. **El kernel FOL⁼** ✅ — `Term`, `Formula`, De Bruijn, `Derives`, las 6 meta-reglas ω, las cuatro
+   relaciones de derivabilidad, el toolkit medido, y el axioma que era falso (ADR-011).
+6. **¿Cuánta metateoría hace falta?** ✅ — *(reorientado el 2026-09-09; ver §8 entrada 13.)* El
+   solapamiento se revisó y era total: «los dos cálculos, su puente y el recíproco que no existe»
+   ya está escrito, y bien, en el capítulo 5. Lo que faltaba —y no está en ningún otro sitio— es la
+   pregunta de la **fuerza**: por qué Lean no es PA (la inducción como esquema frente al motivo de
+   segundo orden, los universos, los tres axiomas del núcleo), cuánto de esa fuerza se usa de verdad
+   (**dos niveles**, cero `Sort u`, cero cuantificación sobre `Prop`), cómo se traduciría a una
+   metateoría aritmética (curso de valores + esquema de inducción ≈ IΣ₁), los **dos** usos de
+   `Classical` y por qué uno es el principio de Markov, el experimento ya hecho en `Peano`
+   (`#assert_constructive`, 1425 invocaciones, con su propio control positivo) y qué transferiría y
+   qué no una metateoría-Peano. Cierra la asimetría que el libro necesita decir en voz alta: **la
+   metateoría no tiene que ser más fuerte que la teoría de la que habla.**
+   *Material:* `doc/book/MATERIALES.md` M-1 — consumido entero por este capítulo.
+7. **La teoría objeto: Robinson Q++** ✅ — el núcleo de Q, lo que Q no prueba, el precio de cada
+   símbolo nuevo, qué se consigue sin inducción, la frontera con `Full/`, los otros 107, y por qué
+   reducir hoy cambia el teorema.
 
-### Parte III — Los teoremas
+### Parte III — Aritmetización
 
-9. **Autorreferencia** — el mentiroso, la sustitución diagonal, y el punto fijo real
-   **`godelCN_fixedpoint`**. ⚠️ El código va escrito como **numeral**; el porqué es el cap. 19,
-   y aquí basta con anunciarlo.
-10. **Gödel I** — **`goedel_first_numeral : ConsistentOmega → ¬ Prf godelCN`**, con su footprint
-    auditado. Con el aviso editorial de §6.
-11. **La mitad que falta: `⊬¬G`.** Casi todos los libros enuncian Gödel I como *«G es indecidible»*
-    y despachan la segunda mitad en un párrafo. En la formalización **no es un párrafo**: `⊬G` sale
-    de la consistencia, pero `⊬¬G` necesita **reflexión** —de `Prov(⌜φ⌝)` volver a `φ`—, y eso
-    exige un **verificador negativo**. El capítulo cuenta:
-    * **(a)** que el proyecto llegó a «tenerlo» y era **falso**: `provFormula_repr` se postuló como
-      bicondicional y su dirección `.mp` es representabilidad **negativa**, que no se sigue de la
-      consistencia simple. Retirado en F7a — **arreglo de solidez, no regresión**;
-    * **(b)** ⚠️ **CORREGIDO respecto al plan anterior**: el obstáculo **no** es el intuicionismo del
-      kernel (ver §2.4), y `repr_neg` **no hace falta**. La obligación real y única es
-      **`NegVerifier`**, reducida en `reflects_of_omega`;
-    * **(c)** por qué `canon_ne` era el plan y **es falso** — un `cons` es un número —, y cómo la
-      salida es la misma que la del cap. 19: **numerales** (`consN_inj → codeNat_inj → codeNat_ne`);
-    * **(d)** por qué Rosser sería **peor**, no mejor, en este marco.
-    *Material:* `PLAN-NEGVERIFIER.md` (⚠️ **leer con la lista de §2.4 delante**), `GODEL-STATUS.md`,
-    `sondeos/CanonNeRefuta.lean`, `sondeos/CodeNatInj.lean`.
-12. **Las condiciones de derivabilidad** — D1 ✅, **D2 `d2_prf`** ✅, y el **muro de D3**: por qué
-    D3 es la Σ₁-completitud **provable** y por eso no sale sin inducción. Estado: D3 reducida a
-    **un solo lema**, `d3_prf_of_chainOkDot`, que sólo pide `hC_dot`.
-13. **La inducción como precio** — por qué Q sola no basta y `Full` es imprescindible; el reparto
-    verificado con `#print axioms` (D1 y D2 limpios; Gödel I y II citan `ax_induction` /
-    `ax_list_induction`). *Material:* `AXIOMS.md` §1.1 (ya escrito, se puede trasladar casi tal cual).
-14. **Gödel II, módulo `d3`** — `goedel_second'` montado, y qué significa exactamente publicar un
-    teorema «módulo un axioma»: el estado es **honesto y publicable**, y el inventario de los 7
-    `axiom` es la garantía. *Material:* `AXIOMS.md`, `Meta/GodelTwo.lean`.
+8. **Codificar estructuras como números** ✅ · 9. **Códigos de términos y fórmulas** ✅ ·
+10. **El verificador de pruebas** ✅ · 11. **Representabilidad y D1** ✅
 
-### Parte IV — Lo que no sale en los libros ← **el núcleo original**
+### Parte IV — Los teoremas
 
-> El arco está **cerrado y compilando**: inconsistencia → diagnóstico → cuatro reparaciones fallidas
-> → la que funciona → la cuarentena → **la reconstrucción** → **la vía de cero axiomas** → **el muro
-> roto**. Esta parte se puede escribir entera hoy.
+12. **Autorreferencia** — el mentiroso, la sustitución diagonal, `godelCN_fixedpoint`.
+13. **Gödel I** — `goedel_first_numeral`, con el aviso editorial de §6.
+14. **La mitad que falta: `⊬¬G`** — con la lista de §2.4 delante.
+15. **Las condiciones de derivabilidad** — D1 ✅, D2 ✅, el muro de D3.
+16. **La inducción como precio** — por qué Q sola no basta. *Material:* `AXIOMS.md` §1.1.
+17. **Gödel II, módulo `d3`** — qué significa publicar un teorema «módulo un axioma».
 
-15. **El muro de `substfc`** — cuando una función objeto no se puede evaluar sobre un código
-    abstracto. Planteamiento del problema; su resolución es el cap. 24.
-    *Material:* memoria `project-substfc-wall`.
-16. **Una inconsistencia latente.** La derivación en cinco pasos; `cons 0 nil = 2 = σσ0`; el error
-    de categoría (`tcFn` es una operación sobre **sintaxis** declarada como función **objeto**, que
-    sólo puede depender de **valores**). **La lección central:** la inconsistencia era **latente
-    desde el principio**, y la hizo visible un teorema *net-0* — `prf_cantor_mono`, que no añadía
-    nada. El peligro no estaba en lo que se añadía, sino en lo que ya estaba.
-    *Material:* memoria `project-inconsistencia-tcfn-cons`, ADR-012.
-17. **Cómo se localiza el daño** — capítulo **metodológico**, y quizá el más útil para el lector.
-    Por qué fallan las dos técnicas obvias: la alcanzabilidad por `import` da **falsos negativos**,
-    y un crawler de dependencias **no funciona en Lean 4** (`value?` devuelve `NONE` para teoremas
-    importados y sólo recorre tipos). La técnica que sí vale: **convertir el puente sospechoso en
-    `axiom` de Lean y leer `#print axioms`**, con un **control positivo** que debe salir contaminado.
-    Resultado: el daño entra a Gödel I **por un solo sitio**, el lema diagonal.
-    *Material:* memoria `feedback-auditoria-footprint`, `sondeos/README.md`, `sondeos/S1Audit.lean`.
-18. **Cuatro reparaciones que no funcionan** — el capítulo de **valor negativo**, el que ahorra meses:
-    * **Partir el símbolo en dos** (`tcNum`/`tcCode`): insuficiente — las **hojas** de un árbol de
-      código son numerales, luego `tcCode` necesitaría las dos recursiones y reproduce el mismo ⊥.
-    * **Quitar el axioma sin más**: **decapita la diagonalización**. El «código del código» no es un
-      accidente de implementación: es lo que Gödel **exige** para construir `G = β(⌈β⌉)`.
-    * **Relativizar por axiomas** en un lenguaje mono-sortido: imposible; tricotomía y orden prueban
-      `∀x. x=0 ∨ ∃k. x=σk` **sin inducción**, así que no hay sitio para un `cons` que no sea ni cero
-      ni sucesor.
-    * **Un paquete de buena-formación** (`isFormCode`): no repara `tc`. **La razón es bonita y
-      general**: `substfc` pide un reconocedor **extensional** (un subconjunto de ℕ); `tc` pide una
-      distinción **intensional** (qué sintaxis escribimos para el número 9). Un predicado *es* un
-      subconjunto: no separa lo que no está separado en los valores.
-    ⚠️ Nota de continuidad: la cuarta reparación vuelve en el cap. 22, pero **por otro motivo y con
-    otro veredicto** — no confundir «no repara `tc`» con «no sirve para la buena-formación».
-19. **La reparación: códigos como numerales.** Por qué el numeral **es** canónico y el árbol no.
-    La aritmética **sin división** (números triangulares) que hace exacta la mitad del polinomio de
-    Cantor. Y una lección de **método de ingeniería**: se **pilotó antes de ejecutar**, asumiendo el
-    resultado costoso como axioma de Lean para comprobar que la cadena cerraba.
-    **Coste: −1 axioma, ninguno nuevo.** *Material:* `sondeos/PilotoDiagonal.lean`,
-    `sondeos/DescargaHFN.lean`, memoria `project-reparacion-via-numeral`, ADR-012.
-20. **Lo que se pierde, y por qué «perder» es la palabra equivocada.** 31 módulos a cuarentena: los
-    14 tags, `hI_dot`, el chasis. Eran teoremas **correctos** sobre una teoría que probaba ⊥, o sea
-    **vacuos**. El capítulo trata la pregunta incómoda: *¿qué significa haber demostrado algo sobre
-    una teoría inconsistente?* ✅ **Y tiene final**: la cuarentena está **vacía**, 31 → 0, por
-    **keystone** y **niveles** (argumentos concretos vs abstractos). *Material:*
-    `cuarentena/README.md`, `PLAN-FRENTE-A.md`, ADR-013.
-21. **La reconstrucción: internalizar en vez de reescribir.** Roto el puente `prf_tc_cons'`, había
-    dos vías: reescribir los 21 módulos caídos uno a uno, o **reconstruir el puente dentro de
-    `Prov`** con un solo teorema. Se eligió la segunda (ADR-014).
-    * **Por qué se pudo:** `cons` **no tiene ecuaciones recursivas propias** — `ax_L0_cons_def` lo
-      define por `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, ya internalizados. Lo que
-      parecía un quinto peldaño de inducción resultó ser **ensamblaje**. *Lección general: antes de
-      inducir, mirar si el símbolo está definido o es primitivo.*
-    * **Las dos técnicas que lo abarataron**, exportables a cualquier formalización con capa de
-      códigos: (1) **dotar un teorema OBJETO es gratis** — `tcFn` es símbolo de función, luego es
-      congruente, luego cualquier `⊢ a = b` sube a `⊢ ȧ = ḃ` sin entrar en `Prov`; (2) **la
-      sustitución cubre todas las ocurrencias del hueco** — un único paso de Leibniz cierra las dos
-      apariciones de `x+y` en el polinomio. Cinco pasos en vez de quince.
-    * **Y el método:** el rédito se **verificó antes de celebrarlo** (`sondeos/CarcPayoff.lean`).
-      «Debería desbloquear» no es un resultado; «desbloquea, aquí está compilado» sí.
-    *Material:* `Meta/DotConsPrf.lean`, `doc/REFERENCE-Incompleteness.md` §3.25, memoria
-    `project-escalera-sigma1`.
-22. **Definir en vez de axiomatizar** ← **NUEVO (ADR-015)**. Los 7 tags de `lineWF` necesitaban un
-    predicado de buena-formación sobre códigos. Dos opciones: sancionarlo como ~15-18 axiomas
-    objeto, o definirlo por **testigo de parseo** en vocabulario **ya existente**. Se eligió la
-    segunda, **y la razón de peso no es el ahorro de líneas**: `ax_axiomsCodeT_eq` ancla a `axioms`,
-    luego los axiomas nuevos entrarían en `axioms`, `axiomsCodeT` los absorbería, el verificador
-    interno los citaría y **`provCodeC'` cambiaría ⇒ G cambiaría** (141 → ~159 axiomas).
-    **La opción cara no es más cara: es OTRO TEOREMA.** Lección general para cualquier
-    formalización con verificador interno: **añadir axiomas a la teoría objeto cambia el sujeto del
-    teorema de incompletitud.** Corolario elegante: aunque algún día se sancionaran, los sondeos de
-    la vía definitoria son su **certificado de conservatividad**.
-    *Material:* ADR-015, `doc/REFERENCE-Incompleteness.md` §3.27.
-23. **La partición que hace posible la inducción** ← **NUEVO (ADR-016)**. El primer diseño usó **un
-    solo** predicado de 12 disyuntos que fusionaba códigos de FÓRMULA y de TÉRMINO. No era un
-    defecto estético: **era la razón de que la inducción no existiera**. El cuadre correcto es
-    **8 ↔ 8 / 2 ↔ 2 / 2 ↔ 2** contra las ecuaciones de `substfc`/`substtc`/`substtsc`, y
-    `pcc_eval_substfc` se atascaba **porque 12 ≠ 8**. Y el fusionado **no discriminaba**:
-    `prf_isFC_junk` compilaba —`implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`, cuyas dos «subfórmulas» son códigos de TÉRMINO,
-    **pasaba** el reconocedor—; el partido lo **refuta**. El total de disyuntos **no crece**
-    (12 = 8+2+2): es partición, no recubrimiento. **Lección de método, en palabras del propio ADR:
-    releer la restricción de diseño ANTES de diseñar, no tras compilar.**
-    *Material:* ADR-016, `sondeos/SubCodesCritica.lean`, `sondeos/ParticionTresPredicados.lean`,
-    `sondeos/ParticionDiscrimina.lean`.
-24. **Cómo se rompió el muro de `substfc`** ← **NUEVO (ADR-017/018, §3.28–§3.31)**. El cierre del
-    cap. 15, y el capítulo con más contenido técnico transferible del libro. Cuatro ideas, ninguna
-    prevista:
-    * **el testigo va ABIERTO** — la clausura era un artefacto de la ruta de prueba, y **acotar es
-      circular** (acotar y la clausura de un paso son inter-construibles, probado en las dos
-      direcciones). Consecuencia: `ind`/`listInd` **no cambian de aridad y no hace falta sanción**;
-    * **UNA sola inducción, con conclusión CONJUNTIVA** — la lectura natural pedía dos inducciones
-      mutuamente recursivas; el término y su lista de argumentos viajan juntos, así que la
-      conjunción hace de par mutuo. Tres estrategias independientes convergieron por separado en
-      este mismo motivo;
-    * **la guarda va DENTRO de `Φ`** — `hasWit` es un `∃` **interno**, así que no añade binder
-      exterior y el gate `liftFormula 1 Φ = Φ` sigue pasando. La alternativa exigía un lema de
-      lifting de **derivaciones** que no existe;
-    * **un solo sort**, y **la moneda de la inducción OBJETO**: un lema de caso con la HI como
-      hipótesis META (`Prf A → Prf C`) **no sirve** — hay que enunciarlo Γ-paramétrico
-      (`∀ Γ, PrfH Γ A → PrfH Γ C`) desde el principio.
-    Resultado: `pcc_eval_substfc` **probado**, y su **no-vacuidad** `prf_hasWitF_real` también, con
-    footprint **net-0 puro**. *Material:* ADR-017, ADR-018,
-    `doc/REFERENCE-Incompleteness.md` §3.28–§3.31, `sondeos/EvalSubstfcPrf.lean`,
-    `sondeos/HasWitFReal.lean`, `sondeos/DescensoLiftc.lean`.
-25. **Cuando la tarea pendiente es imposible** ← **NUEVO**. El capítulo sobre el valor de **refutar
-    tu propio plan**, con cinco casos reales del proyecto:
-    `canon_ne` (falso: un `cons` es un número) · `consOk` global (haría el teorema verdadero y
-    **vacío**) · **A4** (`hasWitF` sobre argumento abstracto: refutado para *cualquier* testigo) ·
-    las **dos primeras vías de la rama C** (la guarda no sale del antecedente — hay una **línea
-    basura** que satisface `lineWF`; y cargarla por la cadena daría una D3 **vacua**) ·
-    y el propio `PLAN-NEGVERIFIER.md`, que declaraba imposible algo que ya estaba compilado **al día
-    siguiente** de escribirse. Moraleja doble: un plan no auditado envejece hacia la falsedad, y
-    **una refutación compilada vale más que una tarea abierta**.
-    *Material:* `sondeos/README.md` (veredictos negativos), `NEXT-STEPS.md` §3.32.
-26. **Método** — qué funcionó al formalizar: trocear y compilar entre pasos; **probar primero lo más
-    arriesgado**; **medir antes de construir** (dos veces reveló que la tarea escrita no era la
-    tarea real: 155 declaraciones → 21; 1 900-2 700 líneas → 800-1 300); verificación adversarial;
-    `#print axioms` como auditoría; y las **trampas caras**, todas reales: no lanzar sondeos contra
-    un árbol que cambia; `lake build` puede dar **verde sin construir lo que crees** —señal de
-    alarma: el número de jobs no cambia—; filtrar **comentarios de bloque** al buscar usos; y el
-    fallo que descubrió la auditoría del 2026-08-22: **los documentos de estado se actualizan por su
-    banner y no por su cuerpo** (un ADR llevaba un mes diciendo «no implementado» sobre algo hecho).
-    *Material:* memorias `feedback-*`, `AI-GUIDE.md` §27.
+### Parte V — Lo que no sale en los libros
+
+**18. El muro de `substfc`** ✅ — qué es `substfc` y por qué está en el centro (`diagTerm`);
+los 7 reflectores de 21 que bloqueaban D3, y `pcc_lineWF_tracked_modulo_7` como *teorema que mide
+lo que falta*; **el axioma `ax_tc_substfc` que lo resolvía y hace INCONSISTENTE la teoría**, con la
+derivación en cinco pasos; por qué una teoría objeto inconsistente **compila**; el obstáculo real
+(evaluación sobre argumento abstracto ⇒ inducción sobre códigos dentro de `Prov`); la puerta (a)
+cerrada por imposibilidad estructural; y los 40 días, con `pcc_eval_substfc` como está hoy.
+· 19. Una inconsistencia latente · 20. Cómo se localiza el daño ·
+21. Cuatro reparaciones que no funcionan · **22. La reparación: códigos como numerales ✅** ·
+23. La cuarentena · 24. La reconstrucción · 25. Definir en vez de axiomatizar (ADR-015) ·
+26. La partición que hace posible la inducción (ADR-016) · 27. Cómo se rompió el muro (ADR-017/018) ·
+28. Cuando la tarea pendiente es imposible · 29. Método.
+
+*(El contenido detallado de cada uno se conserva sin cambios respecto a la versión anterior de este
+plan; sólo cambian los números.)*
 
 ### Apéndices
 
-- **A.** Inventario de los 7 `axiom` de Lean con su justificación (`AXIOMS.md`).
-- **B.** Mapa de módulos y grafo de dependencias por niveles (`REFERENCE.md`, `DEPENDENCIES.md` §0).
-- **C.** Trampas de Lean 4 encontradas (memorias `feedback-lean-*`; incluye `Char.ofNat` clampa,
-  `∨` sombreado por `FOL/FOL/FOL.lean:38`, `<=` que resuelve al orden OBJETO con `Minimal.Axioms`
-  abierto).
-- **E.** Licencia: CC BY-SA 4.0 para la prosa, MIT para el código citado (aviso íntegro).
-- **D.** Glosario de símbolos: `⊢` vs `Prf` vs `Prov`, `⌜·⌝` vs `⌈·⌉`, el punto de «dotar» (`ȧ`),
-  y la convención de prefijos (`prf_`, `pcc_`, `ax_`, `CRIT_`).
+Sin letra: LaTeX las asigna por orden, y una letra escrita a mano deriva igual que un número de
+capítulo (§2.9).
+
+- Inventario de los 7 `axiom` de Lean (`AXIOMS.md`).
+- Mapa de módulos y grafo de dependencias (`REFERENCE.md`, `DEPENDENCIES.md` §0).
+- Trampas de Lean 4 encontradas (memorias `feedback-lean-*`).
+- **Glosario** ✅ — recapitulación de los términos, generado de `terminos.json`.
+- **Notación** ✅ — recapitulación de los signos y de cómo se lee un nombre.
+- **Licencia** ✅ — CC BY-SA 4.0 para la prosa, MIT para el código citado.
+
+### ✅ Migración completada (2026-09-09)
+
+El capítulo *Nomenclatura, niveles y notación* que abría el libro **ya no existe**. Sus cuatro
+secciones se repartieron así: las **palabras** y los **signos** se introducen ahora narrativamente
+en la Parte I y recapitulan en los apéndices; los **dos ejes** son la última sección del
+capítulo~3; y **cómo se lee un nombre** va al apéndice de notación.
+
+Un detalle del método que conviene registrar: **no hizo falta el modo «recapitulación»** que este
+plan preveía. `terminos.py` toma el **primer** `\defterm{}` en orden de lectura, así que basta con
+que la introducción narrativa vaya antes; el glosario del apéndice puede seguir marcándolos sin
+romper nada. Un paso menos del previsto.
 
 ---
 
@@ -656,9 +662,10 @@ de cinco reducciones, y por qué reducir hoy **cambia el teorema** en vez de sim
 | **−1** | **este plan, puesto al día** | ✅ **HECHO 2026-09-03** | sin él, la fase 2 escribiría afirmaciones que el proyecto ya refutó (§2.4) |
 | **0** | esqueleto `doc/book/` + `Makefile` + capítulo piloto (19) | ✅ **HECHO 2026-09-03** | validar la cadena LaTeX **y** el extractor antes de escribir |
 | **1** | `scripts/extraer.py` + capítulo 2 (kernel) + capítulo de apertura | ✅ **HECHO 2026-09-03** | el kernel es estable y no está afectado por la inconsistencia |
-| **3a** | Parte II completa (capítulos 5-8) + capítulo 4 | ✅ **HECHO 2026-09-04** | el terreno y la aritmetización están estables y no dependen del frente vivo |
+| **3a** | Aritmetización completa (hoy Parte III) + Robinson Q++ | ✅ **HECHO 2026-09-04** | el terreno y la aritmetización están estables y no dependen del frente vivo |
 | **2** | Parte IV: capítulos 16-19, 21 y **22-25** | ⏳ **siguiente** | **escribir ahora, mientras el episodio está fresco** — es el material más valioso y el más fácil de perder |
 | **3** | Partes I–III (con el cap. 11 corregido) | ⏳ | exposición sistemática; se apoya en `doc/REFERENCE-*.md` ya escritos |
+| **3b** | Parte I (los 4 capítulos pedagógicos) + migración del glosario a apéndices | ✅ **HECHO 2026-09-09** | guía el resto del libro (§2.9) |
 | **4** | Apéndices y bibliografía | ⏳ | mecánico |
 
 ✅ **Dependencia real del desarrollo (§2.2), SALDADA (2026‑09‑08).** El capítulo 24 ya puede
@@ -678,15 +685,32 @@ del glosario), `simbolos-exentos.json`, `DOCSTRINGS-NO-FIABLES.md`, `LICENSE`, y
 numerales) y **apéndice E** (licencia). 34 páginas. `make` encadena extraer → compilar → verificar →
 símbolos → términos, y **los cinco controles tienen su control positivo hecho**. Nada commiteado.
 
-**Estado al 2026-09-04.** Escritos: **apertura** (nomenclatura, niveles y notación), **capítulo 2**
-(kernel FOL⁼), **capítulo 4** (Robinson Q++), **Parte II completa** —5 codificar estructuras,
-6 códigos de sintaxis, 7 el verificador, 8 representabilidad y D1— **capítulo 19** y **apéndice E**.
-67 fragmentos, 50 páginas, cinco controles en verde. Nada commiteado.
+**Estado al cierre del 2026-09-09.** Escritas **las Partes I, II y III enteras** (1 Hilbert y
+Gödel · 2 qué hay que construir · 3 los lenguajes · 4 lo mínimo de Lean · 5 el kernel FOL⁼ ·
+**6 ¿cuánta metateoría hace falta?** · 7 Robinson Q++ · 8-11 la aritmetización), el capítulo 22 de
+la Parte V y **tres apéndices** (glosario, notación, licencia). Los cinco puentes narrativos de
+§2.9, puestos. Y de la Parte V, los capítulos **18** (el muro de `substfc`) y 22.
+**94 páginas, 79 fragmentos (1 de ellos externo), cinco controles en verde**, cada uno con su
+control positivo pasado.
 
-**Siguiente sesión**, por este orden: (1) `make subir` desde el shell del autor, para que el libro
-entre en git; (2) `make axiomas` con Lean en el PATH — **los 64 fragmentos de producción están hoy
-marcados «declarado, sin medir»**, que es la verdad, y esto los pasa a medidos; (3) capítulo 16
-(la inconsistencia latente), o los capítulos 1 y 3 para cerrar la Parte I.
+**Primera vuelta de revisión cerrada (2026-09-09)**, por el bucle de §2.10 y con el autor
+revisando en `.odt`: tres notas, las tres aplicadas — el finitismo como estrategia y no como
+creencia (§3 del cap. 1, con la cita de Gordan puesta en su sitio: mal atestiguada, impresa por
+primera vez veinticinco años después en una necrológica); la escala PRA / IΣ₁ / HA / PA con
+$\mathrm{PA}^\omega=\mathrm{Th}(\mathbb{N})$, que sitúa el $\omega$-cálculo **fuera** de la
+escala y no un escalón por encima; y la distinción Q++ / Q++ codificante en el cuadro de estratos.
+Queda en `doc/book/revision/BITACORA.md`.
+
+**Falta escribir**: la Parte IV entera (12-17), diez capítulos de la Parte V (19-21, 23-29) y tres
+apéndices (inventario de axiomas, mapa de módulos, trampas de Lean).
+
+**Siguiente sesión**, por este orden: (1) `make subir` desde el shell del autor — hay además
+renombrados de fichero pendientes de registrar; (2) `make axiomas` con Lean en el PATH — **los 67
+fragmentos de producción siguen marcados «declarado, sin medir»**, que es la verdad, y es hoy el
+mayor incumplimiento de §2.2(c); (3) **verificar la bibliografía del capítulo 1** (títulos y fechas
+de los artículos de 1930 y 1931, y la atribución a Hilbert–Bernays 1939), que es hoy la única
+afirmación del libro sin respaldo mecanizado; (4) seguir la fase 2 —Parte V— por el
+capítulo 19 (la inconsistencia latente), que enlaza directamente con el 18 ya escrito.
 
 **Materia prima ya disponible, verificada y citable** (nada de esto hay que reconstruirlo):
 `sondeos/` (**57** experimentos compilados, con su `README.md` de 41 KB), `cuarentena/README.md`
@@ -767,6 +791,13 @@ actualizado, cuerpo sin recorrer**.
 | 8 | nada sobre citar `sondeos/` | **§2.3**: admisibles con recompilación, marca visible y footprint, pero **no sostienen teoremas** |
 | 9 | ningún control contra afirmaciones caducadas | **§2.4**: lista de afirmaciones prohibidas + procedimiento de cierre de capítulo |
 | 11 | nada obligaba a distinguir objeto de meta a la vista | **§2.5 (nuevo)**: chapa de dos ejes obligatoria en cada fragmento, leyenda al principio, y la convención de nombres del proyecto como control cruzado |
+| 12 | nada preveía citar código de otros proyectos del autor | **§2.3bis (nuevo)**: capa `externo`, sin footprint y con marca visible; el capítulo 6 la estrena con `Peano` |
+| 18 | el bucle §2.10 suponía que se revisa en un editor de texto | **falso a la primera vuelta**: la revisión real llegó en `.odt`. `revisar.py` lee ahora ODT, acepta `»` como marca y compara por párrafos normalizados |
+| 17 | no había forma cómoda de revisar la prosa: leerla en `.tex` es leer marcado | **§2.10 (nuevo)**: `scripts/revisar.py` genera `revision/LIBRO.md` del LaTeX, recoge notas y retoques, y los guarda en una bitácora acumulativa. El Markdown es vista; el LaTeX sigue siendo fuente |
+| 16 | §2.9 sólo vigilaba números; «los tres capítulos siguientes» derivaba igual y en silencio | el control cuenta ahora también los **recuentos escritos con palabras** («dos…diez capítulos»). Deliberadamente NO cubre «partes»: «las dos partes se reduzcan al mismo término» habla de una ecuación |
+| 14 | nada impedía que la sintaxis Markdown del material de partida se colara en el LaTeX | **control nuevo en `scripts/simbolos.py`**: `**negrita**`, `` `código` `` y `# encabezado` en un capítulo son error. Había **tres** casos vivos, en tres capítulos |
+| 15 | `scripts/terminos.py` no aceptaba un `\defterm{}` de una **variante** declarada | corregido: `\defterm{axiomas objeto}` ya introduce «axioma objeto». El fallo estaba latente desde §2.7 y sólo lo destapó el primer uso en prosa llana |
+| 13 | cap. 6 era «teoría objeto y metateoría — los dos cálculos y su puente» | **solapamiento total con el cap. 5**, comprobado al escribirlo. Reorientado a la pregunta de la **fuerza** de la metateoría, que no estaba en ninguna parte |
 | 10 | «sólo se publica lo que compila» era el único criterio de admisión | **§2.2 (nuevo)**: *sólo se expone lo que está demostrado **desde la base*** — alcanzabilidad desde el módulo raíz, footprint impreso y contenido en la base sancionada, y los «módulo algo» obligados a declararlo en el enunciado |
 
 ---

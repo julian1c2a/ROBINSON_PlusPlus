@@ -220,6 +220,13 @@
 % \defnot marca LA introducción de una notación; \selee da su lectura en voz
 % alta. PLAN-LIBRO.md §2.8: una fórmula que se muestra se lee la primera vez.
 \newcommand{\defnot}[1]{#1}
+% Referencia a un capítulo o parte que todavía no está escrito. NO lleva
+% número: un número escrito a mano deriva en cuanto se reordena el libro, y esa
+% es la mentira silenciosa que todo el aparato de controles persigue. Cuando el
+% capítulo exista, esto pasa a \cref sobre su \label.
+\newcommand{\capfuturo}[1]{el capítulo dedicado a #1}
+\newcommand{\partefutura}[1]{la parte dedicada a #1}
+
 \newcommand{\selee}[1]{%
   \par\vspace{-0.3\baselineskip}
   {\small\itshape\color{rppMate}\hspace*{1.2em}se lee: #1\par}
@@ -283,6 +290,15 @@
   {\sffamily\scriptsize\color{rppSondeo}%
    \fcolorbox{rppSondeo}{white}{\strut\,fuera del build\,}\quad
    recompilar con \texttt{lake env lean #1}\par}}
+
+% Código de OTRO proyecto, citado como evidencia. No está en el build de este
+% libro y no sostiene ninguno de sus teoremas; por eso no lleva footprint y por
+% eso la chapa dice de dónde viene.
+\newcommand{\otroproyecto}[1]{%
+  \par\vspace{-0.2\baselineskip}%
+  {\sffamily\scriptsize\color{rppSondeo}%
+   \fcolorbox{rppSondeo}{white}{\strut\,otro proyecto\,}\quad
+   de \texttt{#1}: citado como evidencia, no es base de este libro\par}}
 
 % --- (2) matematica — el enunciado formal, legible sin Lean ------------------
 % Sin barra de título: el rótulo va como línea de texto, para que el enunciado

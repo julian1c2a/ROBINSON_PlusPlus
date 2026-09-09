@@ -41,6 +41,23 @@
     "ax23_cantor_proj_uniq": "RETIRADO el 2026-06-02 (537fd68): nunca se usó. Se cita como historia",
     "ax27_add_left_cancel": "RETIRADO el 2026-06-03: derivable en PA⁻. Se cita como historia",
     "ax28_mul_two_cancel": "RETIRADO el 2026-06-02: hoy es el teorema teo_2_11. Se cita como historia",
-    "inductive": "palabra clave de Lean"
+    "inductive": "palabra clave de Lean",
+    "def": "palabra clave de Lean",
+    "Type": "universo de Lean",
+    "Sort": "universo de Lean",
+    "universe": "palabra clave de Lean",
+    "termination_by": "palabra clave de Lean",
+    "deriving": "palabra clave de Lean",
+    "Decidable": "clase del núcleo de Lean",
+    "DecidableEq": "clase del núcleo de Lean",
+    "Decidable.byContradiction": "teorema del núcleo de Lean",
+    "propext": "axioma del núcleo de Lean (base sancionada)",
+    "Quot.sound": "axioma del núcleo de Lean (base sancionada)",
+    "Classical.choice": "axioma del núcleo de Lean (base sancionada)",
+    "lake": "herramienta de build de Lean, no un identificador",
+    "build": "subcomando de lake, no un identificador",
+    "intro": "táctica de Lean (existe además un `intro` en Peano: no es ése)",
+    "ax_tc_substfc": "AXIOMA REFUTADO: nunca se declaró. Haría INCONSISTENTE la teoría (derivación en el cap. del muro de substfc). El árbol lo nombra nueve veces, siempre en un comentario de aviso, nunca como declaración",
+    "sorry": "palabra clave de Lean"
   }
 }
