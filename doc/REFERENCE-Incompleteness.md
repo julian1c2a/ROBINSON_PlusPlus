@@ -13,7 +13,7 @@
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
 (`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
-**Last updated:** 2026-09-10 (§3.57 · `hPsiId` probado) · Lean v4.31.0.
+**Last updated:** 2026-09-10 (§3.58 · `hwP` probado ⇒ D3 a UNA obligación) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
@@ -4815,3 +4815,78 @@ caso `v = 0`, que es lo que autorizó el dedup.
 
 ⇒ **`d3_prf_of_hbody`: D3 desde `hwP` y `hbody`.** Sólo `hbody`(a) sigue aguas abajo de C3, y su
 desbloqueo es `prf_hasWitF_liftfc`.
+
+
+---
+
+## §3.58 · 🏁🏁 D3 · `hwP` PROBADO **en cuatro líneas** — y D3 queda en **UNA sola obligación** (2026‑09‑10)
+
+> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §12.
+> `hwP_chainOkBPsi` con **sólo los tres axiomas de Lean**; `d3_prf_of_body_only`, con la base
+> sancionada. ✅ Y la **CI en verde** (2 m 53 s con caché).
+
+§3.57.5 dejó `hwP` como *«la única pieza de D3 sin medir»* y recomendó empezar midiéndola. Se
+midió, y **se cerró en el mismo gesto**: el trabajo ya estaba hecho en §3.56.
+
+### §3.58.1 · Lo que pedía, y en qué se parte
+
+    hasWitF (bdAllBndCtx (chainOkBPsi ṗ #0))
+      = hasWitF (forallc (implc (ltCodeFn ⌜v₀⌝ ⌜v₁⌝) (chainOkBPsi ṗ #0)))
+
+El KIT de ADR‑020 lo abre en dos (`prf_hasWitF_forallc` + `prf_hasWitF_implc`):
+
+* la **cota** —un átomo de `lt` entre dos **variables de código**— la cierra **`hw_auto` sola**;
+* el **cuerpo** es donde §3.56 cobra.
+
+### §3.58.2 · ⭐⭐ Y el cuerpo sale del `PsiF` DOTADO, transportado
+
+`hwPsi_chainOkBPsiDot` —el testigo del cuerpo **dotado**, que §3.56.4 obtuvo **gratis** de la rama
+C de ADR‑020— se transporta al cuerpo **computable** por el mismo puente `chainOkBPsiDot_eq`, esta
+vez con **Leibniz OBJETO** (`prf_congr_hasWitF`, `Meta/ReprPrf.lean:100`).
+
+🔑 **Es la tercera vez que el par «cuerpo dotado + cuerpo computable, puenteados dentro de la
+teoría» paga**, y conviene verlo junto:
+
+| dónde | qué viaja por el puente |
+|---|---|
+| §3.55.5 · `hmatch_chainOkB` | la **forma**: el `bdAllCode` casa con el destino |
+| §3.56.5 · `hbdAll_of_dotted` | la **prueba**: `prf_provCode_congr` + `prf_congr_bdAllCode` |
+| §3.58 · `hwP_chainOkBPsi` | el **testigo**: `prf_congr_hasWitF` |
+
+⇒ La regla de §3.56.2 —*el destino fija la imagen, el chasis fija la forma en que hay que
+escribirla*— **no era una molestia administrativa**. Tener los dos cuerpos y un puente entre ellos
+**dentro de la teoría** es lo que hace que las tres cosas viajen; con un solo cuerpo, ninguna de
+las tres tenía por dónde pasar.
+
+### §3.58.3 · Lo que queda de D3: `hbody`, y sólo `hbody`
+
+    hbody : ∀ q i, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+              provFromCode (substfc 0 (tcFn i) (chainOkBPsiDot q))))
+
+y se parte —por `chainOkBPsi_split` (§3.55.5), que conecta los dos `PsiF` **por construcción**— en:
+
+| mitad | estado | ¿depende de C3? |
+|---|---|---|
+| **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`) | ✅ **sí** — faltan `ind` (18) y `listInd` (20) |
+| **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta **ensamblar** | ❌ no |
+
+⇒ **(a) es lo único de D3 que sigue aguas abajo de C3**, y su desbloqueo es
+`prf_hasWitF_liftfc`. **(b) no depende de C3 en absoluto**: `pcc_bdCarcLt_reflect` y
+`pcc_premsBody_reflect` se dejaron sobre argumentos **abstractos** exactamente para que se
+instancien con las capas de `liftc`/`substCodeT` que el exterior imponga (§3.55.3), y ahora el
+exterior está **fijado** (`chainOkBPsiDot`).
+
+### §3.58.4 · 📐 El balance del frente, de §3.55 a §3.58
+
+D3 llevaba desde §3.19 reducida a `hC_dot` y desde §3.41 a `DEUDA_chainOkBDot`, **sin medir**. En
+cuatro tramos ha pasado a **una** obligación, y las paradas intermedias dicen por qué:
+
+| tramo | de → a | la pieza que lo movió |
+|---|---|---|
+| §3.55 | sin medir → **2** | el destino abierto y su forma fijada por `rfl`; la cota **dentro de `Prov`**; `hPinv` genérico |
+| §3.56 | 2 → **3** ⚠️ | ⛔ el chasis **no era aplicable**: `hPl` era FALSA ⇒ el `PsiF` **dotado** |
+| §3.57 | 3 → **2** | `hPsiId` con la **tercera variante** de la familia |
+| §3.58 | 2 → **1** | `hwP` transportando el testigo por el puente de §3.56 |
+
+⚠️ **El paso de §3.56 subió el contador y fue el más importante de los cuatro.** El número de
+obligaciones abiertas no mide el progreso: medía una cadena que no cerraba.

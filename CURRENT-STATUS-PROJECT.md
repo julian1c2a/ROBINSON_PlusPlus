@@ -14,7 +14,16 @@
 > testigo deja de ser libre** (la casilla `n = v` es una `varc v̄` corriente y `substtc` la
 > sustituye por él) y ⭐⭐ **el índice no admite salto**: a `v+2` o más quedarían variables que
 > `substtc` **decrementaría** y el enunciado sería **FALSO**. ⇒ **`d3_prf_of_hbody`: D3 desde DOS
-> obligaciones**, `hwP` y `hbody` — y `hwP` **no depende de C3**.
+> obligaciones**, `hwP` y `hbody`.
+>
+> 🏁🏁 **Y `hwP` PROBADO en CUATRO líneas** (§3.58) ⇒ **D3 queda en UNA SOLA OBLIGACIÓN:
+> `hbody`.** El testigo del cuerpo se **transporta** del `PsiF` dotado al computable con Leibniz
+> objeto, por el **mismo puente** que ya había llevado la forma (`hmatch`) y la prueba
+> (`hbdAll_of_dotted`). ⇒ De `hbody` sólo la mitad **(a)** —`pcc_lineWF_tracked`, 5 de 7— sigue
+> aguas abajo de C3; la mitad **(b)** es ensamblaje y **no depende de C3**.
+>
+> ⚠️ **El contador de obligaciones NO mide el progreso**: §3.56 lo subió de 2 a 3 y fue el paso
+> más importante de los cuatro — lo que medía era una cadena que no cerraba.
 >
 > 🔧 **Y el instrumental mentía** (AI‑GUIDE §27.1): `check-sorry.bash` daba **101 falsos positivos**
 > —menciones en prosa— donde hay **0** de verdad; `check-doc-sync.bash` daba verde con los cuatro
@@ -168,7 +177,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-10b — **D3 · §3.57** (`hPsiId` probado: ocho de nueve obligaciones, D3 desde DOS) y **§3.56** (el `PsiF` del chasis) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
+**Last updated:** 2026-09-10c — **D3 EN UNA SOLA OBLIGACIÓN** (§3.58, `hwP` probado); antes **§3.57** (`hPsiId`) y **§3.56** (el `PsiF` del chasis) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
 **Author**: Julián Calderón Almendros
 
 ---
