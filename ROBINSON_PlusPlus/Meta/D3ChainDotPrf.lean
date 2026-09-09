@@ -559,6 +559,73 @@ enunciados sobre argumentos **abstractos** (`y p b`, y el `Ac` libre del disyunt
 que se instanciarán con las capas que el exterior imponga, sean las que sean. Es exactamente
 para lo que se dejaron abstractos. -/
 
+
+/-! ## §8 · EL `PsiF` EXTERIOR DE `chainOkB` — y con él, `hmatch` DESCARGADO (2026‑09‑09g)
+
+§7.2 midió que los dos `PsiF` hay que diseñarlos juntos, y que el orden es **de fuera adentro**.
+Esto hace el de fuera, con el mismo método que §7.1: **leer la definición de `substCodeF`**, no
+adivinar la forma. Las tres igualdades de abajo son `rfl` y certifican la lectura. -/
+
+/-- ⭐ **EL `PsiF` EXTERIOR**: el cuerpo del `∀` acotado de `chainOkB`, ya bajo el binder.
+    Correcto por construcción — es literalmente lo que `substCodeF` produce en esa posición. -/
+noncomputable def chainOkBPsi (W p : Term) : Term :=
+  substCodeF 1 (liftc zero W) (lineOkB nil (liftTerm 0 p) (.var 0))
+
+/-- La descomposición exterior, genérica en `W` y `p`. -/
+theorem substCodeF_chainOkB (W p : Term) :
+    substCodeF 0 W (chainOkB nil p)
+      = bdAllCode (substCodeT 1 (liftc zero W) (liftTerm 0 (lenc p))) (chainOkBPsi W p) := rfl
+
+/-- ⭐⭐ **LA CONEXIÓN CON §7**: el `PsiF` exterior se parte en el `andc` de las dos mitades de
+    `lineOkB`, y la derecha **es** el código de `boundedPremsIn` que §7.1 descompuso — con las
+    capas de `liftc` que le impone su posición, que era justo lo que §7.2 advertía. Los dos
+    `PsiF` quedan así conectados por construcción, no por conjetura. -/
+theorem chainOkBPsi_split (W p : Term) :
+    chainOkBPsi W p
+      = andc (substCodeF 1 (liftc zero W) (lineWF (nthc (liftTerm 0 p) (.var 0))))
+             (substCodeF 1 (liftc zero W)
+               (boundedPremsIn nil (liftTerm 0 p) (.var 0)
+                 (premsOf (nthc (liftTerm 0 p) (.var 0))))) := rfl
+
+/-- La instancia que el destino usa: `p := #0`, `W := ṗ`. ⭐ La cota sale **exactamente** la que
+    §3 midió (`lencT (liftc 0 ṗ)`), sin ningún transporte. -/
+theorem substCodeF_chainOkB_at :
+    substCodeF 0 (tcFn (.var 0)) (chainOkB nil (.var 0))
+      = bdAllCode (lencT (liftc zero (tcFn (.var 0))))
+          (chainOkBPsi (tcFn (.var 0)) (.var 0)) := rfl
+
+/-- ⭐⭐⭐ **`hmatch` DESCARGADO.** La hipótesis que §4 dejaba abierta —que el `bdAllCode` con la
+    cota del destino sea el destino— es ahora un teorema: la igualdad de códigos la da §3
+    (`prf_substfc_arith_open`) y la forma la da el `rfl` de arriba. -/
+theorem hmatch_chainOkB :
+    Prf (bdAllCode (lencT (liftc zero (tcFn (.var 0))))
+        (chainOkBPsi (tcFn (.var 0)) (.var 0)) =eq chainOkBDot) :=
+  prf_eq_symm chainOkBDot_eq_substCodeF
+
+/-- ⭐⭐⭐ **D3 REDUCIDA A TRES OBLIGACIONES SOBRE UN `PsiF` YA FIJADO.** Comparado con
+    `DEUDA_chainOkBDot_of` (§4), el cuerpo deja de ser un parámetro libre y `hmatch` desaparece:
+    lo que queda es la invariancia del cuerpo, su testigo, y el `pcc_bdAll_intro`. -/
+theorem DEUDA_chainOkBDot_of_hbdAll
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
+      =eq chainOkBPsi (tcFn (.var 0)) (.var 0)))
+    (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
+    (hbdAll : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0)))
+        (chainOkBPsi (tcFn (.var 0)) (.var 0))))) :
+    DEUDA_chainOkBDot :=
+  DEUDA_chainOkBDot_of _ hPinv hwP hmatch_chainOkB hbdAll
+
+/-- Y **D3 entera** desde las mismas tres. -/
+theorem d3_prf_of_hbdAll (φ : Formula)
+    (hPinv : ∀ u : Term, Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
+      =eq chainOkBPsi (tcFn (.var 0)) (.var 0)))
+    (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
+    (hbdAll : Prf (chainOk nil (.var 0) ⇒
+      provFromCode (bdAllCode (tcFn (lenc (.var 0)))
+        (chainOkBPsi (tcFn (.var 0)) (.var 0))))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of_hbdAll hPinv hwP hbdAll)
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO

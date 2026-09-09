@@ -4,6 +4,10 @@ import ROBINSON_PlusPlus.Meta.CodeTreeReflect
 -- ⚠️ Añadido con el nodo `lift` (2026‑09‑09e): lo paga `pcc_eval_liftfc_wit`. Sin ciclo
 --    (`EvalLiftfcPrf` no depende de este módulo) y el cierre crece en UN módulo.
 import ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
+-- ⚠️ Añadido con §11 (2026‑09‑09g): de aquí sale `pcc_lineWF_tracked_modulo_7`, al que se
+--    le cablean los CINCO reflectores ya probados. Sin ciclo (`LineWFAssemblePrf` no depende
+--    de este módulo); el cierre pasa de 89 a 94.
+import ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 /-!
 # `Meta/SubstTreeReflect.lean` — C3: el árbol de código **con nodos `substfc`**
 
@@ -858,6 +862,35 @@ theorem pcc_lineWF_tracked_qconf_imp (t : Term) :
       (pcc_hGuardF 2 4 t (by omega)) (pcc_core_qconf t))
 
 
+
+/-! ## §11 · `pcc_lineWF_tracked` MÓDULO DOS — los cinco reflectores, cableados
+
+`pcc_lineWF_tracked_modulo_7` (`Meta/LineWFAssemblePrf.lean`) pide los siete tags de
+sustitución. Cinco están probados —q1 (9), q2 (10), leibniz (13) en §8‑§9, y q3 (11), qconf (19)
+en §10— así que se cablean aquí y la obligación baja a **dos**.
+
+⚠️ **Y `hbody`(a) de D3 es exactamente esto**: la reflexión del átomo `lineWF`, que el
+`pcc_bdAll_intro` de `chainOkB` consume en el cuerpo de `lineOkB`. Con `modulo_2`, esa mitad de
+D3 queda a la misma distancia que C3: `ind` (18) y `listInd` (20).
+
+⚠️ `hOther` NO se descarga aquí y no es un descuido: cubre los tags `k ≥ 21`, que **no existen**
+en el verificador. Es una obligación vacua que el ensamblaje pide por exhaustividad del `match`,
+y quien la tenga a mano la paga con `absurd`; enunciarla como hipótesis es más honesto que
+fabricar aquí una prueba que dependa del número exacto de tags. -/
+
+theorem pcc_lineWF_tracked_modulo_2 (t : Term)
+    (hind : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 18)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))))
+    (hlistInd : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 20)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))))
+    (hOther : ∀ k : Nat, Prf (lineWF t ⇒ ((lineTag t =eq numeralM k)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t))))) :
+    Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t))) :=
+  pcc_lineWF_tracked_modulo_7 t
+    (pcc_lineWF_tracked_q1_imp t) (pcc_lineWF_tracked_q2_imp t)
+    (pcc_lineWF_tracked_q3_imp t) (pcc_lineWF_tracked_leibniz_imp t)
+    hind (pcc_lineWF_tracked_qconf_imp t) hlistInd hOther
+
 end ROBINSON_PlusPlus.Meta.SubstTreeReflect
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -882,6 +915,7 @@ export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
   pcc_core_q1 pcc_core_q2 pcc_core_leibniz pcc_core_q3 pcc_core_qconf
   pcc_lineWF_tracked_q1_imp pcc_lineWF_tracked_q2_imp pcc_lineWF_tracked_leibniz_imp
   pcc_lineWF_tracked_q3_imp pcc_lineWF_tracked_qconf_imp
+  pcc_lineWF_tracked_modulo_2
 )
 
 /-! ## FOOTPRINT -/
@@ -894,3 +928,4 @@ export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_leibniz_imp
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q3_imp
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_qconf_imp
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_2
