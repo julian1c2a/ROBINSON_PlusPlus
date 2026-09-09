@@ -11,9 +11,36 @@ jobs:
     name: lake build
     runs-on: ubuntu-latest
 
+    # Todos los `run` se ejecutan desde la raíz de ROBINSON_PlusPlus, que aquí es un
+    # SUBDIRECTORIO del workspace (ver el comentario de los dos checkouts).
+    # ⚠️ No afecta a los pasos `uses:`: sus rutas siguen siendo relativas al workspace.
+    defaults:
+      run:
+        working-directory: ROBINSON_PlusPlus
+
     steps:
-      - name: Checkout
+      # ⚠️ DOS CHECKOUTS, COMO HERMANOS. `lakefile.lean` declara
+      #     require FOL from "../FOL"
+      # es decir, una dependencia LOCAL, no de git — y a propósito: es la que garantiza
+      # que RPP y FOL se compilan SIEMPRE con el mismo toolchain (⛔ nunca `cd FOL &&
+      # lake build`). El runner necesita entonces el árbol de FOL al lado.
+      #
+      # Y como `actions/checkout` no admite un `path:` fuera del workspace, ESTE repo
+      # también se clona en un subdirectorio: así `../FOL` cae dentro del workspace.
+      #
+      # Sin esto el build falla con «FOL: package directory not found». Detectado
+      # 2026-09-09, en la primera ejecución real de este workflow.
+      - name: Checkout ROBINSON_PlusPlus
         uses: actions/checkout@v4
+        with:
+          path: ROBINSON_PlusPlus
+
+      - name: Checkout FOL (dependencia local hermana)
+        uses: actions/checkout@v4
+        with:
+          repository: julian1c2a/FOL
+          ref: master
+          path: FOL
 
       - name: Install elan (Lean version manager)
         run: |
@@ -28,13 +55,16 @@ jobs:
         run: |
           elan toolchain install $(cut -d: -f2 lean-toolchain)
 
+      # ⚠️ Los `path:`/`hashFiles` de un `uses:` NO ven el `working-directory` de arriba:
+      # van con el prefijo del subdirectorio.
       - name: Cache Lake packages
         uses: actions/cache@v4
         with:
           path: |
             ~/.elan
-            .lake/packages
-          key: ${{ runner.os }}-lake-${{ hashFiles('lean-toolchain', 'lakefile.lean') }}
+            ROBINSON_PlusPlus/.lake/packages
+            FOL/.lake
+          key: ${{ runner.os }}-lake-${{ hashFiles('ROBINSON_PlusPlus/lean-toolchain', 'ROBINSON_PlusPlus/lakefile.lean', 'FOL/lakefile.lean') }}
           restore-keys: |
             ${{ runner.os }}-lake-
 
@@ -44,3 +74,10 @@ jobs:
       - name: Check for sorry
         run: bash check-sorry.bash
         continue-on-error: true   # Warning only — change to false to make it blocking
+
+      # El control de sincronía documentación ↔ código (AI-GUIDE §27). `--quick` omite el
+      # `lake build`, que ya se hizo arriba; a cambio el control [A] de jobs no se ejecuta
+      # y eso lo dice el propio script (§27.1: un control que no comprueba nada AVISA).
+      - name: Check doc sync
+        run: bash check-doc-sync.bash --quick
+        continue-on-error: true   # Warning only
