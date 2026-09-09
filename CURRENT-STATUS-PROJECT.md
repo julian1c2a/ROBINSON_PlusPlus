@@ -109,9 +109,14 @@
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.41.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.51.
 >
-> **Build 135 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE**.
+> **Build 135 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE** (2026‑09‑09c).
+> 🏁 **A5 CERRADA** (§3.50): `pcc_eval_liftc_at`/`pcc_eval_liftsc_at`, con el nivel **cuantificado
+> dentro de `Φ`** — net‑0 y **sin módulos nuevos**. Desbloquea `CasoAtom`/`CasoEq` de
+> `pcc_eval_liftfc`; el chasis de ocho ramas sigue pendiente.
+> 🏁 **B8b saldada** (§3.51): el `prf_congr_liftc` de `CodeWitnessPrf.SinWTs` tenía **cero
+> consumidores** — exportado por EXISTENCIA, no por consumo. Borrado.
 > **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.

@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑07 · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
-`Build completed successfully (132 jobs)` — **118 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
+**Estado 2026‑09‑09c · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
+`Build completed successfully (135 jobs)` — **121 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
 verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
@@ -13,15 +13,33 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **A5 primero**: `pcc_eval_liftc`/`_liftsc` a NIVEL ARBITRARIO
+> # 🎯 SIGUIENTE SESIÓN — **el CHASIS de `pcc_eval_liftfc`** (A5 ya está cerrada)
 >
-> ⚠️⚠️ **Medición 2026‑09‑09b (§3.49.1) que reordena el plan**: `pcc_eval_liftc` sólo vale a
-> nivel `zero`, y `ax_liftfc_forall`/`_ex` **suben el nivel**. ⇒ **A5 no es una generalización
-> opcional: es PRERREQUISITO de `pcc_eval_liftfc`** (sus casos `atom`/`eq` bajan a
-> `liftsc`/`liftc` al nivel que toque), y por tanto de los cuatro tags que faltan.
-> ▶ La base de `pcc_eval_liftfc` ya está puesta y verificada (`Meta/EvalLiftfcPrf.lean`):
-> `liftfcT` (DEFINICIÓN, nunca axioma), `targetLiftfc`, los controles y la deuda **enunciada**.
-> ⚠️ Y es un frente de **escala B3.4**, no de una sesión.
+> 🏁 **A5 CERRADA el 2026‑09‑09c (§3.50)**: `pcc_eval_liftc_at` y `pcc_eval_liftsc_at`, con el
+> nivel **cuantificado dentro de `Φ`**, net‑0 y sin módulos nuevos. Lo que la abarató: ⭐ **en el
+> sorte TÉRMINO el nivel es INERTE** — la recursión es la misma y las reflexiones internas de §4
+> de `LiftcCodePrf` ya eran genéricas en `c`; lo único con contenido nuevo fue el `varc`, donde
+> aparece la **tricotomía** (`pcc_liftc_var_lt_code` + `prf_liftc_varc_cases`).
+> ➕ Subó `PSI_inst2` a `Meta/StrongInductionPrf.lean`: el escalón que faltaba de la escalera
+> (estaban el 1, el 3 y el 4).
+>
+> ▶▶ **LO SIGUIENTE: el chasis de ocho ramas de `pcc_eval_liftfc`.** La base ya está puesta y
+> verificada (`Meta/EvalLiftfcPrf.lean`): `liftfcT` (DEFINICIÓN, nunca axioma), `targetLiftfc`,
+> los controles y la deuda **enunciada, no postulada**.
+> Estado de sus ocho casos (§3.49.3, actualizado por §3.50.5):
+> ✅ `CasoAtom` y `CasoEq` — **desbloqueados por A5** (bajan a `liftsc`/`liftc` al nivel corriente).
+> ⬜ `CasoBot`, `CasoBin 5/7/8` — congruencia pura sobre ecuaciones que ya existen.
+> ⬜ `CasoUn 6/9` — el caso que **sube** el nivel, y el único realmente nuevo.
+> ⬜ El chasis: molde `pcc_eval_substfc_modulo_8`. ⚠️ **No es reutilizable tal cual** (sus `Caso*`
+> están escritos sobre `targetSubstfc`); hacerlo genérico en el operador obliga a refactorizar en
+> vivo un módulo de 1 625 líneas que está en la ruta crítica — se mide antes de tocarlo.
+> ⚠️ Sigue siendo un frente de **escala B3.4**, no de una sesión.
+>
+> 🏁 **B8b saldada también el 2026‑09‑09c (§3.51)**: el `prf_congr_liftc` de
+> `CodeWitnessPrf.SinWTs` tenía **cero consumidores** en todo el árbol — estaba exportado por
+> EXISTENCIA, no por consumo. Borrado, con la nota de ADR‑019 en su hueco.
+> ⚠️ **Hallazgo colateral SIN tocar**: `SinWTs.prf_congr_liftsc` está en el mismo caso (cero
+> consumidores, ni siquiera exportado). Es código muerto, pero no era B8b: queda a decisión.
 >
 > 🏁 **2026‑09‑09: TRES de los SIETE reflectores de sustitución, PROBADOS** (§3.48):
 > `pcc_lineWF_tracked_q1_imp` (tag 9), `_q2_imp` (10) y `_leibniz_imp` (13), net‑0 puros.
@@ -108,12 +126,12 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | C3 · `PrfH_tc_objAt` + `PrfH_dotVN` para `STree` | ✅ (§3.48). ⚠️ **Corrige §3.47.5**: `dotVN` es pura congruencia; quien paga la guarda es `tc_objAt`, vía `pcc_eval_substfc_wit` |
 > | ⭐ **C3 · q1 (9), q2 (10), leibniz (13)** | 🏁 **PROBADOS** — `pcc_lineWF_tracked_*_imp`, net‑0 puros |
 > | C3 · `pcc_eval_liftfc` · la BASE | ✅ `Meta/EvalLiftfcPrf.lean` (§3.49): `liftfcT` (⛔ **definición**, nunca axioma), `targetLiftfc` + naturalidad, control **negativo** (`fail_if_success rfl`) y la deuda **enunciada** con su puente `∃∃` |
-> | C3 · **A5 · `pcc_eval_liftc`/`_liftsc` a nivel ARBITRARIO** | ⬜ ⚠️⚠️ **PRERREQUISITO, no generalización opcional** (§3.49.1): `pcc_eval_liftc` sólo vale a nivel `zero` y los axiomas `liftfc` suben el nivel |
-> | C3 · el chasis de `pcc_eval_liftfc` (8 `Caso*`) | ⬜ mecánico; molde = `pcc_eval_substfc_modulo_8` (paso de 41 l.). ⚠️ **No reutilizable tal cual**: sus `Caso*` van sobre `targetSubstfc`; hacerlo genérico en el operador es refactorizar en vivo 1625 l. de la ruta crítica |
+> | ⭐ **C3 · A5 · `pcc_eval_liftc_at`/`_liftsc_at`** | 🏁 **CERRADA** (2026‑09‑09c, §3.50), net‑0 y sin módulos nuevos. El nivel va **cuantificado dentro de `Φ`** (lo exige el gate `liftFormula 1 Φ = Φ`). ⭐ Barata porque **en el sorte TÉRMINO el nivel es INERTE**; lo único nuevo fue la **tricotomía** del `varc` |
+> | ▶▶ **C3 · el chasis de `pcc_eval_liftfc` (8 `Caso*`)** | ⬜ **LO SIGUIENTE**. Molde = `pcc_eval_substfc_modulo_8` (paso de 41 l.). ✅ `CasoAtom`/`CasoEq` **desbloqueados por A5**; ⬜ `CasoBot` y `CasoBin 5/7/8` son congruencia pura; ⬜ `CasoUn 6/9` es el que **sube** el nivel. ⚠️ El chasis **no es reutilizable tal cual**: sus `Caso*` van sobre `targetSubstfc`; hacerlo genérico en el operador es refactorizar en vivo 1625 l. de la ruta crítica |
 > | C3 · q3 (11), qconf (19), ind (18), listInd (20) | ⛔ **bloqueados por `pcc_eval_liftfc`** — los 4 que llevan `liftfc`. ⚠️ Hasta que estén, `pcc_lineWF_tracked` sigue condicional |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
-> | A5 más allá del nivel `zero` | ⬜ generalización |
+> | A5 más allá del nivel `zero` | 🏁 **HECHA en el sorte TÉRMINO** (§3.50). ⚠️ Lo que **NO** cubre: `hasWitF` a nivel arbitrario — eso es el sorte FÓRMULA y no hacía falta aquí |
 >
 > ⭐ **Y la pregunta de la REFORMULACIÓN vuelve, mejor entendida** (§3.43.5): reformular
 > `isTermCodeE1` con `In` atómico —estilo A3— **no hacía falta** para reflejar el `argsIn`, y
@@ -342,7 +360,7 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >         del contexto en PrfH) NO existen en NINGUN sitio -- ni en produccion
 >         ni en sondeos (verificado por grep 2026-08-31). Van a
 >         Meta/HilbertDeduction.lean, pero hay que PROBARLOS primero.
->   B8b⬜ ⚠️ NUEVO (2026-09-08, destapado por B3.4): **`prf_congr_liftc` esta DUPLICADO en
+>   B8b✅ SALDADA (2026-09-09c, §3.51). Era: **`prf_congr_liftc` estaba DUPLICADO en
 >         PRODUCCION** -- `Meta/CodeWitnessPrf.lean:109` (nivel `v` EXPLICITO) y
 >         `Meta/NumCodeClosedPrf.lean:53` (nivel `c` IMPLICITO). MISMO teorema, y los dos
 >         llegan a la raiz. Es una violacion de ADR-019 que ya estaba en el arbol.
@@ -350,7 +368,16 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >            usos sin cualificar con los dos candidatos a la vista. Aqui NO fallo en silencio
 >            -- solo la implicita tipa con un unico argumento --, y quedo cualificado a
 >            proposito para que no dependa de eso. Pero con firmas mas parecidas si fallaria.
->         Arreglo: dejar UNA (la de nivel implicito es la que consumen los 7 sitios) y bajar/
+>         ✅ RESUELTO MIDIENDO, y la medicion fue mas limpia de lo previsto: NO hubo que
+>            bajar ni subir nada. La de `SinWTs` tenia **CERO consumidores** en todo el arbol
+>            (los ~25 usos pasan UN argumento explicito = todos son la de `NumCodeClosedPrf`),
+>            ni una referencia cualificada, ni siquiera dentro de su propio modulo. Estaba en
+>            el `export` por EXISTENCIA, no por consumo (AI-GUIDE §17). Se borro, y en su hueco
+>            queda la nota de ADR-019. Los dos modulos son INDEPENDIENTES: el duplicado solo
+>            hacia ambiguo el nombre en quien abriera los dos.
+>         ⚠️ HALLAZGO COLATERAL SIN TOCAR: `SinWTs.prf_congr_liftsc` esta en el MISMO caso
+>            (cero consumidores, y ni siquiera exportado). Codigo muerto, pero no era B8b.
+>         (Plan anterior, superado: dejar UNA y bajar/
 >         subir segun el orden de imports. Toca dos modulos aguas arriba => reconstruye el
 >         arbol entero, por eso NO se hace de paso.
 >   B8 ⬜ ⚠️ NUEVO (2026-08-31, destapado por las mediciones): faltan en produccion
@@ -514,11 +541,14 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 >                 barato B3.4. Empezar MIDIENDO Meta/LiftcCodePrf.lean y
 >                 Meta/EvalLiftcPrf.lean, con pcc_eval_substfc_modulo_8 como molde de chasis.
 >              ⭐ Ya esta CUANTIFICADO: bloquea 4 de los 7 reflectores.
->         ⚠️⚠️ C3e A5 NO ES OPCIONAL: es PRERREQUISITO de C3d (§3.49.1). `pcc_eval_liftc`
->              solo vale a nivel `zero`, y ax_liftfc_forall/_ex SUBEN el nivel, asi que los
->              casos atom/eq de la induccion de formula bajan a liftsc/liftc al nivel que
->              toque. Estaba catalogada como generalizacion suelta; esta en la ruta critica.
->              ⇒ EL ORDEN CORRECTO ES: A5 -> chasis de liftfc -> los 4 tags.
+>         ✅ C3e A5 CERRADA (2026-09-09c, §3.50). Era PRERREQUISITO de C3d, no generalizacion
+>              opcional (§3.49.1). `pcc_eval_liftc_at`/`pcc_eval_liftsc_at` ya estan, net-0.
+>              ⭐ La medicion que la abarato: en el sorte TERMINO el nivel es INERTE, y las
+>              reflexiones internas de §4 de LiftcCodePrf YA eran genericas en c (las
+>              pcc_liftc0_* son sus instancias c:=zero). Lo unico nuevo: la TRICOTOMIA del
+>              varc (pcc_liftc_var_lt_code + prf_liftc_varc_cases), y las ramas en PrfH.
+>              + PSI_inst2 subio a StrongInductionPrf: el escalon que faltaba de la escalera.
+>              ⇒ ORDEN QUE QUEDA: chasis de liftfc -> los 4 tags.
 >   C4 ✅ PROPAGACION HASTA EL VERDE -- HECHA (2026-09-07). Build 126 jobs, VERDE.
 >         ① ✅ HECHA: Meta/SubstfcWitnessPrf.lean (1912 l., net-0 puro). Sin ciclo,
 >              como estaba medido. ADR-019 TRES veces al promover.

@@ -4149,3 +4149,170 @@ de todo lo demás. Se mide antes de tocarlo; no se toca de paso.
 
 ⇒ **`pcc_eval_liftfc` es un frente de escala B3.4**, y los cuatro tags de C3 (q3, qconf, ind,
 listInd) están **aguas abajo** de él.
+
+---
+
+## §3.50 · 🏁 A5 CERRADA — `pcc_eval_liftc_at` / `pcc_eval_liftsc_at`, con el nivel cuantificado (2026‑09‑09c)
+
+> `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
+> `Meta/EvalLiftcPrf.lean` (§7bis), `Meta/StrongInductionPrf.lean` (`PSI_inst2`).
+> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq`,
+> que ya estaba en la línea base. **Cero módulos nuevos.**
+
+§3.49.1 dejó A5 en la ruta crítica: `pcc_eval_liftc` está clavado a nivel `zero` y
+`pcc_eval_liftfc` no puede quedarse ahí. Este apartado la cierra.
+
+### §3.50.1 · ⭐ La medición que la abarató: **en el sorte TÉRMINO el nivel es INERTE**
+
+Antes de escribir nada, la pregunta de *medir la forma, no el tamaño*: ¿qué forma tiene la
+dependencia del nivel? La respuesta partió la tarea en dos mitades muy desiguales:
+
+```
+liftc  c (funcc s ts) = funcc s (liftsc c ts)          ← c viaja INTACTO
+liftsc c (cons h t)   = cons (liftc c h) (liftsc c t)  ← c viaja INTACTO
+liftc  c (varc n)     = varc n      si n < c   ⎫  el ÚNICO sitio
+liftc  c (varc n)     = varc (σn)   si c ≤ n   ⎭  donde c interviene
+```
+
+Y, correlato: **las reflexiones internas de §4 ya eran genéricas en el nivel** —
+`pcc_liftc_func_code (c a b)`, `pcc_liftc_var_ge_code (c n)`, `pcc_liftsc_nil_code (c)`,
+`pcc_liftsc_cons_code (c h t)`—; las `pcc_liftc0_*` de §5 **son sus instancias `c := zero`**.
+Es decir: buena parte de A5 estaba escrita desde 2026‑09‑03 y nadie la había mirado con esa
+pregunta delante.
+
+> 🔑 **La recursión no cambia**: mismo descenso de Cantor sobre `carc`/`cdrc`, mismos cortes,
+> mismas cláusulas. `c` viaja de la conclusión a las dos hipótesis sin tocarse. Lo que sí
+> cambia el nivel es el **sorte FÓRMULA** (`liftfc c (forallc a) = forallc (liftfc (σc) a)`),
+> y ése es el frente de `pcc_eval_liftfc` — no éste.
+
+### §3.50.2 · Lo único con contenido nuevo: la **tricotomía** del `varc`
+
+A nivel `zero` la rama `<` **no existe** (`n < 0` es falsa), así que `refl_caso_varc` sólo
+necesitaba `ax_liftc_var_ge`, y su guarda `0 < σa` se descargaba de una vez
+(`pcc_zero_lt_succ_code`). Al abrir el nivel:
+
+* la guarda **no se puede descargar** — `c` es abstracto;
+* hacen falta **las dos** ramas, y cada una tiene **su propia ecuación meta**
+  (`liftc c (varc a) ≐ varc a` frente a `≐ varc (σa)`).
+
+Entran, en `Meta/LiftcCodePrf.lean`:
+
+| pieza | qué es |
+|---|---|
+| `LIFTC_VARLT_BODY` + `_ok := rfl` + **`pcc_liftc_var_lt_code (c n)`** | la mitad de `ax_liftc_var_lt` que **no estaba dotada**, con la guarda interna `ṅ < ċ` sin descargar |
+| **`prf_liftc_varc_cases (c a)`** | la tricotomía empaquetada: `⊢ (a < c) ∨ (c < σa)`, vía `prf_lt_trichotomy` + Leibniz sobre el caso `=` |
+| `PrfH_guard_lt_code` / `PrfH_guard_ge_code` | las dos guardas **reflejadas dentro de `Prov`** por `pcc_lt_tracked` (completitud‑Δ₀ del átomo `<` con argumentos abiertos) |
+
+⚠️ **Y por eso las dos ramas se escriben en `PrfH`, no en `Prf`.** La disyunción se elimina con
+`prf_or_elim`, así que la guarda entra en el **contexto** y toda la cadena interna la tiene que
+llevar el kit `PrfH_*` — `PrfH_eq_trans_code`, `PrfH_mp_code_apply`, `PrfH_provCode_congr`,
+`PrfH_congr_eqCodeFn`, `PrfH_congr_tcFn`—, que ya estaba entero en producción. No hubo que
+escribir ni una pieza de fontanería `PrfH` nueva.
+
+### §3.50.3 · §7bis y §9bis: las cuatro cláusulas, en las dos monedas
+
+`Meta/LiftcCodePrf.lean` §7bis (moneda META, hipótesis `Prf`):
+
+* `targetLiftAt c s` / `targetLiftscAt c b` con su naturalidad `liftF_`/`substF_`;
+* `substF_targetLiftAt_hole` / `substF_targetLiftscAt_hole` y
+  `PrfH_congr_targetLiftAt` / `PrfH_congr_targetLiftscAt` — el transporte de Leibniz con el
+  nivel como **parámetro del hueco**, no como el agujero;
+* `refl_caso_varc_at`, `refl_caso_funcc_at`, `refl_lista_nil_at`, `refl_lista_cons_at`
+  (+ `pcc_liftsc_nil_code_at`, el puente `termCode nil` ↦ `tcFn nil`);
+* `refl_termCode_at` / `refl_termsCode_at`: la **no vacuidad**, igual que a nivel 0 — las
+  cuatro cláusulas cubren todo código genuino.
+
+§9bis (moneda de la **inducción OBJETO**, hipótesis como antecedente): `refl_shapeUn_imp_at`,
+`refl_caso_funcc_imp_at`, `refl_shapeBin_imp_at`, `refl_lista_cons_imp_at`.
+
+> ⚠️ **Las `_imp_at` hay que REESCRIBIRLAS, no basta invocar §7bis.** Sin `PrfH_mono`
+> (deuda **B6b**) una premisa `Prf` no sirve cuando la HI llega como hipótesis objeto: la
+> cadena entera se repite en `PrfH`. Es exactamente lo que hacen sus originales a nivel `zero`,
+> y es el precio recurrente de B6b.
+
+### §3.50.4 · El descenso con el nivel **dentro de `Φ`**
+
+```
+Φat(X) := ∀c. ∀w. ( isTC1 w X                ⇒ targetLiftAt   c X )
+                ∧ ( (wfAll1 w ∧ argsIn w X) ⇒ targetLiftscAt c X )
+```
+
+🔑 **El nivel entra en `Φ` por la MISMA razón que `w`** (§3.34): el gate
+`hΦ : liftFormula 1 Φ = Φ` de `prf_strong_induction`. Con `c` libre haría falta
+`liftTerm 1 c = c`, que no se descarga para `c` abstracto. Binder externo = `c`,
+interno = `w`, `#0` = el código sobre el que se induce.
+
+De ahí `PHIat`, `hPHIat`, `PHIat_use`, `PHIat_step`, `PHIat_all`,
+`DESCENSO_at_imp` / `_lista_imp` / `_hasWit`, y **el resultado**:
+
+```
+pcc_eval_liftc_at  (c w s) (h : isTC1 w s) :
+  Prf (provFromCode (eqc (liftcT ċ ṡ) ((liftc c s)˙)))
+pcc_eval_liftsc_at (c w s) (hwf : wfAll1 w) (hargs : argsIn w s) :
+  Prf (provFromCode (eqc (liftscT ċ ṡ) ((liftsc c s)˙)))
+```
+
+**`PSI_inst2`** — `Meta/StrongInductionPrf.lean`. La escalera tenía el escalón **1**
+(`PSI_inst`), el **3** y el **4**, y `psi_lift_form2` ya estaba… pero **no el `PSI_inst2`**,
+porque hasta hoy ningún frente inducía con exactamente **dos** binders sobre `Φ`. A5 sí. Sube
+como maquinaria genérica, no como pieza del frente (ADR‑019, una vez más).
+
+⚠️ **Trampa De Bruijn del camino**: con dos binders el código llega con **dos** `liftTerm 0`,
+el segundo `substTerm` cae en el índice **1**, y `substTerm_liftTerm` **no engancha** hasta
+pasar por `liftTerm_swap`. Un `simp only [← liftTerm_swap, FOL.substTerm_liftTerm]` lo resuelve,
+pero el mensaje de error no lo sugiere: dice sólo «después de simplificar, el término tiene
+tipo …».
+
+### §3.50.5 · Lo que A5 desbloquea, y lo que NO
+
+✅ Desbloquea los casos **`CasoAtom`** y **`CasoEq`** de `pcc_eval_liftfc` (§3.49.3): son los
+que bajan a `liftsc`/`liftc` **al nivel corriente**.
+
+⬜ **NO cierra `pcc_eval_liftfc`**: siguen pendientes el chasis de ocho ramas, `CasoBot`,
+`CasoBin 5/7/8` (congruencia pura) y `CasoUn 6/9` (el caso que **sube** el nivel). La tabla de
+§3.49.3 queda con una fila menos en rojo, no vacía.
+
+⛔ Y **no toca el sorte fórmula**: `hasWitF` a nivel arbitrario no entra aquí. A5 se enunció en
+el árbol como «la familia `liftc` más allá del nivel `zero`», y eso es lo que se ha cerrado —
+el sorte TÉRMINO y su lista.
+
+---
+
+## §3.51 · B8b saldada: el `prf_congr_liftc` duplicado no tenía consumidores (2026‑09‑09c)
+
+> `Meta/CodeWitnessPrf.lean` (−1 teorema, −1 nombre en el `export`),
+> `Meta/LiftcCodePrf.lean` y `Meta/EvalLiftcPrf.lean` (comentarios corregidos).
+> `Build completed successfully (135 jobs)` — reconstrucción completa aguas abajo.
+
+Había **dos** `prf_congr_liftc` en producción, la misma congruencia con el nivel en distinta
+posición:
+
+| dónde | firma | `export` |
+|---|---|---|
+| `CodeWitnessPrf.SinWTs` | `{t₁ t₂} (v : Term) (h : Prf (t₁ ≐ t₂))` — nivel **explícito** | sí |
+| `NumCodeClosedPrf` | `{c a b} (h : Prf (a ≐ b))` — nivel **implícito** | sí |
+
+Los dos módulos son **independientes** (ninguno importa al otro), así que el duplicado nunca
+rompió nada: sólo hacía **ambiguo** el nombre en todo módulo que abriera los dos, y obligaba a
+`LiftcCodePrf` a un `open` **selectivo** de `SinWTs`.
+
+⭐ **La medición desempata sin margen**: de los ~25 usos del árbol (`EvalLtPrf`, `EvalNthcPrf`,
+`EvalSubstfcPrf`, `EvalSubsttcPrf`, `SubstfcCodePrf`, `TrackedAtomsPrf`, `HasWitTrackedPrf`,
+`HasWitFTrackedPrf`, `LiftcCodePrf`, `NumCodeClosedPrf`) **ninguno pasa dos argumentos
+explícitos**: todos son el de `NumCodeClosedPrf`. Y **no hay ni una referencia cualificada** al
+de `SinWTs`, ni siquiera dentro de su propio módulo. Estaba en el `export` **por EXISTENCIA, no
+por consumo** — justo lo que AI‑GUIDE §17 prohíbe.
+
+Se borra el de `SinWTs`. En su hueco queda la nota de por qué no re‑añadirlo (ADR‑019: si un
+consumidor de `CodeWitnessPrf` lo necesitara, hay que **bajar el general**, no duplicar).
+
+⚠️ **Y se corrigen los DOS comentarios que a partir del borrado mentirían**: `LiftcCodePrf`
+decía que su `open` es selectivo *por* la ambigüedad, y `EvalLiftcPrf` que
+`SinWTs.prf_congr_liftc` es ambiguo «pero este módulo no usa ese nombre». Los dos pasan a
+hablar **en pasado**. Es la clase de mentira de docstring más barata de producir y más difícil
+de cazar: el comentario **sobrevive al hecho que describía**, y `check-doc-sync` no la ve
+porque `[B]` sólo detecta símbolos inexistentes.
+
+> ⚠️ **Hallazgo colateral, NO tocado**: `CodeWitnessPrf.SinWTs.prf_congr_liftsc` tiene
+> **también cero consumidores** en todo el árbol, y ni siquiera está exportado. Es código
+> muerto de la misma clase, pero **no es B8b**: se deja a decisión del autor.
