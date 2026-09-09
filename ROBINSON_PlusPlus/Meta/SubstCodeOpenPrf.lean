@@ -490,6 +490,114 @@ theorem substtc_id_substCodeTs (v : Nat) (W : Term)
 
 end
 
+
+/-! ### §6 · LA COMPOSICIÓN DE DOS `substfc` — el DOS HUECOS (2026‑09‑10)
+
+§5 cubre el caso en que el segundo `substfc` es la IDENTIDAD. Falta el general: qué sale de
+
+    substfc v̄ u (substCodeF (v+1) W φ)
+
+cuando `u` **no** es la variable del hueco. La respuesta no es otro `substCodeF`: el resultado
+tiene **DOS** huecos rellenos —la variable `v+1` por `W` y la `v` por `u`—, y eso pide una
+función meta propia.
+
+⭐ **Por qué hace falta.** `pcc_bdAll_intro` entrega su `hbody` sobre
+`substfc 0̄ (tcFn i) (PsiF q)`, y el `PsiF` dotado de ADR‑021 es él mismo un `substfc` (sobre un
+`formCode` cerrado). Componer los dos es el paso obligado antes de poder mirar el cuerpo, y lo
+necesitan **las dos** mitades de un `lineOkB`.
+
+⚠️ Los índices, otra vez, no son cosméticos: bajo un binder `substCodeF` sube a `v+2` con
+`liftc 0 W`, y `substfc` sube a `v+1` con `liftc 0 u`. La función meta replica **las dos**
+subidas a la vez, y por eso su recursión es `substCodeF2 (v+1) (liftc 0 u) (liftc 0 W)`. -/
+
+mutual
+
+/-- `substCodeT2 v u W t` = código de `t` con **DOS** huecos rellenos: la variable `v+1` por el
+    código `W` y la `v` por el código `u`. Es lo que produce `substfc v̄ u (substCodeT (v+1) W t)`.
+
+    ⚠️ La rama `n > v+1` decrementa **DOS** veces (cada `subst` baja uno). Bajo la hipótesis de
+    variables libres no se recorre, pero se escribe para que la función sea total y honesta. -/
+def substCodeT2 (v : Nat) (u W : Term) : Term → Term
+  | .var n =>
+      if n = v + 1 then W
+      else if n = v then u
+      else if n > v + 1 then varc (numeral (n - 2))
+      else varc (numeral n)
+  | .func sym ts => funcc (strCode sym) (substCodeTs2 v u W ts)
+
+/-- Versión para listas. -/
+def substCodeTs2 (v : Nat) (u W : Term) : List Term → Term
+  | [] => nil
+  | t :: ts => cons (substCodeT2 v u W t) (substCodeTs2 v u W ts)
+
+end
+
+mutual
+
+/-- ⭐ **LA COMPOSICIÓN, nivel TÉRMINO.** -/
+theorem substtc_comp_substCodeT (v : Nat) (u W : Term)
+    (hW : ∀ w, Prf (substtc (numeral v) w W =eq W)) :
+    ∀ (t : Term), liftTerm (v + 2) t = t →
+      Prf (substtc (numeral v) u (substCodeT (v + 1) W t) =eq substCodeT2 v u W t)
+  | .var n, hfv => by
+      have hn : Nat.le n (v + 1) := by
+        rcases Nat.lt_or_ge n (v + 2) with h | h
+        · exact Nat.le_of_lt_succ h
+        · have hne : ¬ (n < v + 2) := Nat.not_lt.mpr h
+          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          exact absurd hfv (Nat.succ_ne_self n)
+      rcases Nat.lt_or_ge n (v + 1) with hlt | hge
+      · have hsub : substCodeT (v + 1) W (.var n) = varc (numeral n) := by
+          simp only [substCodeT]; rw [if_neg (by omega), if_neg (by omega)]
+        rw [hsub]
+        rcases Nat.lt_or_ge n v with hlt2 | hge2
+        · have h2 : substCodeT2 v u W (.var n) = varc (numeral n) := by
+            simp only [substCodeT2]
+            rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+          rw [h2]
+          exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+        · have hnv : n = v := by omega
+          subst hnv
+          have h2 : substCodeT2 n u W (.var n) = u := by
+            simp only [substCodeT2]; rw [if_neg (by omega)]; simp
+          rw [h2]
+          exact prf_mp (prf_substtc_var_eq (numeral n) u (numeral n)) (prf_refl (numeral n))
+      · have hnv : n = v + 1 := Nat.le_antisymm hn hge
+        subst hnv
+        have hsub : substCodeT (v + 1) W (.var (v + 1)) = W := by simp [substCodeT]
+        have h2 : substCodeT2 v u W (.var (v + 1)) = W := by
+          simp only [substCodeT2]; simp
+        rw [hsub, h2]; exact hW u
+  | .func sym ts, hfv => by
+      have hall := hfv
+      simp only [liftTerm, Term.func.injEq, true_and] at hall
+      show Prf (substtc (numeral v) u (funcc (strCode sym) (substCodeTs (v + 1) W ts))
+        =eq funcc (strCode sym) (substCodeTs2 v u W ts))
+      refine prf_eq_trans (prf_substtc_func (numeral v) u _ _) ?_
+      unfold funcc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtsc_comp_substCodeTs v u W hW ts hall
+
+/-- La gemela sobre listas. -/
+theorem substtsc_comp_substCodeTs (v : Nat) (u W : Term)
+    (hW : ∀ w, Prf (substtc (numeral v) w W =eq W)) :
+    ∀ (ts : List Term), liftTerms (v + 2) ts = ts →
+      Prf (substtsc (numeral v) u (substCodeTs (v + 1) W ts) =eq substCodeTs2 v u W ts)
+  | [], _ => by
+      show Prf (substtsc (numeral v) u nil =eq nil)
+      exact prf_substtsc_nil (numeral v) u
+  | t :: ts, hfv => by
+      have hall := hfv
+      simp only [liftTerms, List.cons.injEq] at hall
+      show Prf (substtsc (numeral v) u (cons (substCodeT (v + 1) W t) (substCodeTs (v + 1) W ts))
+        =eq cons (substCodeT2 v u W t) (substCodeTs2 v u W ts))
+      refine prf_eq_trans (prf_substtsc_cons (numeral v) u _ _) ?_
+      exact prf_eq_trans
+        (prf_congr_cons_head (substtc_comp_substCodeT v u W hW t hall.1))
+        (prf_congr_cons_tail (substtsc_comp_substCodeTs v u W hW ts hall.2))
+
+end
+
 end ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 
 export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
@@ -500,4 +608,5 @@ export ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (
   substtc_inv_substCodeT substtc_inv_substCodeTs
   substtc_inv_substCodeT_at substtc_inv_substCodeTs_at
   prf_liftc_varc_numeral substtc_id_substCodeT substtc_id_substCodeTs
+  substCodeT2 substCodeTs2 substtc_comp_substCodeT substtsc_comp_substCodeTs
 )

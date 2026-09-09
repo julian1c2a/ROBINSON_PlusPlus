@@ -991,6 +991,131 @@ Y se parte —por `chainOkBPsi_split` (§8), que conecta los dos `PsiF` **por co
 **(b) no depende de C3 en absoluto**: sus piezas se dejaron abstractas en §5–§6 exactamente para
 que se instancien con las capas de `liftc`/`substCodeT` que el exterior imponga. -/
 
+/-! ## §13 · `hbody` PARTIDO EN SUS DOS MITADES — y una corrección de §12.1 (2026‑09‑10)
+
+§12 dejó D3 en `hbody`. Para partirlo hay que **componer los dos `substfc`**: el que el chasis
+aplica (`substfc 0̄ (tcFn i)`) y el que el propio `PsiF` dotado ES (ADR‑021). Esa composición es
+`substfc_comp_substCodeF` (`Meta/BdAllIntroPrf.lean`), y con ella el cuerpo se abre y **se parte
+por `rfl`** en las dos mitades de `lineOkB`.
+
+⚠️⚠️ **Y aquí hay que corregir §12.1 y §3.58.3.** Allí se dijo que la mitad **(b)** «no depende de
+C3» y que era «ensamblaje, no maquinaria nueva». **Es FALSO**, y la medición está abajo (§13.1).
+La causa: `lineOkB` mete `premsOf (nthc p i)` en el código, y `premsOf` **no es evaluable
+uniformemente**. -/
+
+/-- El código de la mitad **(a)** del cuerpo: la reflexión de `lineWF`. -/
+noncomputable def lineWFDotAt (q i : Term) : Term :=
+  substCodeF2 0 (tcFn i) (liftc zero (tcFn q)) (lineWF (nthc (.var 1) (.var 0)))
+
+/-- El código de la mitad **(b)**: la reflexión de `boundedPremsIn`. -/
+noncomputable def premsDotAt (q i : Term) : Term :=
+  substCodeF2 0 (tcFn i) (liftc zero (tcFn q))
+    (boundedPremsIn nil (.var 1) (.var 0) (premsOf (nthc (.var 1) (.var 0))))
+
+/-- ⭐⭐ **EL CUERPO DEL CHASIS, ABIERTO.** Los dos `substfc` compuestos en uno de dos huecos.
+    Las tres hipótesis ya estaban: `hW`/`hL` de §9 (genéricas en `q`) y `hfv_chainOkBPsi`, que
+    tiene justo el índice que pide la composición (`liftFormula 2` = el `v+2` con `v := 0`). -/
+theorem substfc_chainOkBPsiDot (q i : Term) :
+    Prf (substfc zero (tcFn i) (chainOkBPsiDot q)
+      =eq substCodeF2 0 (tcFn i) (liftc zero (tcFn q)) (lineOkB nil (.var 1) (.var 0))) :=
+  prf_eq_trans
+    (prf_congr_substfc3
+      (prf_substfc_arith_open 1 (liftc zero (tcFn q)) (lineOkB nil (.var 1) (.var 0))))
+    (substfc_comp_substCodeF 0 (tcFn i) (liftc zero (tcFn q))
+      (hW_chainOkBPsi q) (hL_chainOkBPsi q)
+      (lineOkB nil (.var 1) (.var 0)) hfv_chainOkBPsi)
+
+/-- Y el cuerpo abierto **se parte por `rfl`**: `lineOkB` es un `land`. -/
+theorem substCodeF2_lineOkB_split (u W : Term) :
+    substCodeF2 0 u W (lineOkB nil (.var 1) (.var 0))
+      = andc (substCodeF2 0 u W (lineWF (nthc (.var 1) (.var 0))))
+             (substCodeF2 0 u W (boundedPremsIn nil (.var 1) (.var 0)
+               (premsOf (nthc (.var 1) (.var 0))))) := rfl
+
+/-- La igualdad completa, con los dos códigos ya nombrados. -/
+theorem substfc_chainOkBPsiDot_split (q i : Term) :
+    Prf (substfc zero (tcFn i) (chainOkBPsiDot q)
+      =eq andc (lineWFDotAt q i) (premsDotAt q i)) :=
+  substfc_chainOkBPsiDot q i
+
+/-- ⭐⭐⭐ **`hbody` DESDE SUS DOS MITADES.** -/
+theorem hbody_of_halves
+    (hA : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (lineWFDotAt q i))))
+    (hB : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (premsDotAt q i)))) :
+    ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q)))) := by
+  intro q i
+  refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
+  have hch : PrfH [lt i (lenc q), chainOk nil q] (chainOk nil q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt : PrfH [lt i (lenc q), chainOk nil q] (lt i (lenc q)) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have ha : PrfH [lt i (lenc q), chainOk nil q] (provFromCode (lineWFDotAt q i)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (hA q i) _) hch) hlt
+  have hb : PrfH [lt i (lenc q), chainOk nil q] (provFromCode (premsDotAt q i)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (hB q i) _) hch) hlt
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (prf_provCode_congr (prf_eq_symm (substfc_chainOkBPsiDot_split q i))) _)
+    (PrfH_and_intro_code _ _ ha hb)
+
+/-- ⭐⭐⭐ **D3 DESDE LAS DOS MITADES DEL CUERPO, y nada más.** -/
+theorem d3_prf_of_halves (φ : Formula)
+    (hA : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (lineWFDotAt q i))))
+    (hB : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (premsDotAt q i)))) :
+    Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_hbody φ hwP_chainOkBPsi (hbody_of_halves hA hB)
+
+/-! ### §13.1 · ⛔ LA CORRECCIÓN: la mitad (b) **SÍ** depende del análisis por tags
+
+§12.1 y §3.58.3 afirmaron que `hbody`(b) «no depende de C3» y era «ensamblaje». **Medido, y es
+falso.** El destino de (b), desplegado capa a capa por `rfl`, es un `bdAllCode` cuya **cota** es
+
+    lencT (premsOfT (nthcT (liftc 0 W) (varc 1̄)))
+
+es decir, con el símbolo **`premsOf` DOTADO**. Y `pcc_bdAll_intro` entrega la cota como reflexión
+pura `tcFn (bndF p)`, así que hay que cruzar —dentro de `Prov`— la cadena
+
+    nthcT q̇ i̇     ↦ (nthc q i)˙          ✅ `pcc_eval_nthc`
+    premsOfT Ẋ     ↦ (premsOf X)˙          ⛔ **NO EXISTE, y no puede existir uniformemente**
+    lencT L̇        ↦ (lenc L)˙             ✅ `pcc_eval_lenc`
+
+⛔ **Por qué el eslabón de en medio no existe**: `premsOf` **no está definido por recursión**, como
+`lenc` o `nthc`, sino por **21 axiomas `ax_premsOf_*`, uno por TAG de regla**, y cada uno hace
+*pattern‑matching sobre la FORMA de la línea*:
+
+    ax_premsOf_mp  : premsOf (cons c (cons 16̄ (cons a nil))) ≐ cons (implc a c) (cons a nil)
+    ax_premsOf_gen : premsOf (cons c (cons 17̄ (cons b nil))) ≐ cons b nil
+    …
+
+⇒ Para un `X` **abstracto**, `premsOf X` está **sin restringir**: no hay nada que evaluar. Sólo se
+puede evaluar tras **saber el tag**, y saber el tag es exactamente el análisis de casos de
+`lineWF` — o sea, la mitad **(a)**.
+
+🔑 ⇒ **Las dos mitades no son independientes: (b) consume el análisis por tags de (a).** Son
+hermanas del mismo tamaño (21 tags frente a 23 esquemas `ax_lineWF_*`), no una barata y otra cara.
+
+⚠️ **Y la lección de método, que es sobre MÍ, no sobre el árbol**: en §12.1 estimé el coste de (b)
+**por su enunciado** —«el núcleo ya está probado sobre argumentos abstractos, sólo falta
+instanciar»— sin haber desplegado el destino. Es exactamente el error que
+[[feedback-medir-la-forma]] viene a evitar, y el mismo que ADR‑021 documenta un nivel más arriba:
+**que las piezas estén enunciadas sobre argumentos abstractos no garantiza que el destino se deje
+instanciar con ellas.** `pcc_bdCarcLt_reflect` y `pcc_premsBody_reflect` siguen siendo correctos y
+seguirán haciendo falta; lo que no vale es la estimación de que bastaban.
+
+### §13.2 · Lo que queda, con la dependencia REAL
+
+| pieza | estado | depende de |
+|---|---|---|
+| `hbody` partido en (a) y (b), con los dos `substfc` compuestos | ✅ §13 | — |
+| **(a)** `lineWFDotAt` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores | `prf_hasWitF_liftfc` |
+| **(b)** `premsDotAt` | ⬜ cota con `premsOfT`; núcleo de §5–§6 probado | **el análisis por tags de (a)** + `pcc_eval_premsOf` (21 casos) |
+
+⇒ **El orden correcto es (a) primero**, y (b) después reutilizando su análisis de casos. -/
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -1020,6 +1145,8 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   hbdAll_of_dotted hbdAllDot_of_body d3_prf_of_body
   hPsiId_chainOkBPsiDot hbdAllDot_of_hbody DEUDA_chainOkBDot_of_hbody d3_prf_of_hbody
   hwP_chainOkBPsi DEUDA_chainOkBDot_of_body_only d3_prf_of_body_only
+  lineWFDotAt premsDotAt substfc_chainOkBPsiDot substCodeF2_lineOkB_split
+  substfc_chainOkBPsiDot_split hbody_of_halves d3_prf_of_halves
 )
 
 /-! ## FOOTPRINT -/
@@ -1041,3 +1168,5 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_hbody
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hwP_chainOkBPsi
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body_only
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.substfc_chainOkBPsiDot
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_halves

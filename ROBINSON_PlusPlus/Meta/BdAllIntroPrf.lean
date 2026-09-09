@@ -693,6 +693,114 @@ theorem substfc_id_substCodeF : ∀ (v : Nat) (W : Term),
       exact substfc_id_substCodeF (v + 1) (liftc zero W) hW' hL' a h1 (liftc zero u) hu'
 
 
+/-! ### La COMPOSICIÓN de dos `substfc`, nivel FÓRMULA — el DOS HUECOS (2026‑09‑10)
+
+El caso general del que `substfc_id_substCodeF` es la degeneración: cuando el testigo `u` **no**
+es la variable del hueco, el resultado tiene **DOS** huecos rellenos y hay que nombrarlo.
+
+⭐ **Lo pide el `hbody` de `pcc_bdAll_intro`**: entrega `substfc 0̄ (tcFn i) (PsiF q)`, y el `PsiF`
+dotado de ADR‑021 es él mismo un `substfc` sobre un `formCode` cerrado. Componer los dos es el
+paso obligado antes de poder mirar el cuerpo — y lo necesitan **las dos** mitades de un `lineOkB`.
+
+El sorte TÉRMINO (`substCodeT2`, `substtc_comp_substCodeT`) vive en `Meta/SubstCodeOpenPrf.lean`
+§6, aguas arriba; aquí sólo el de FÓRMULA, que necesita el vocabulario de código. -/
+
+/-- `substCodeF2 v u W φ` = código de `φ` con la variable `v+1` rellena por `W` y la `v` por `u`.
+    ⚠️ Bajo un binder suben **las dos** cosas a la vez: nivel `v+1`, testigos `liftc 0 u` y
+    `liftc 0 W`. -/
+def substCodeF2 (v : Nat) (u W : Term) : Formula → Term
+  | .bottom          => cons (numeral 2) nil
+  | .atom p ts       => cons (numeral 3) (cons (strCode p) (cons (substCodeTs2 v u W ts) nil))
+  | .eq a b          => cons (numeral 4) (cons (substCodeT2 v u W a)
+                          (cons (substCodeT2 v u W b) nil))
+  | .impl a b        => cons (numeral 5) (cons (substCodeF2 v u W a)
+                          (cons (substCodeF2 v u W b) nil))
+  | Formula.forall a => cons (numeral 6) (cons (substCodeF2 (v + 1) (liftc zero u)
+                          (liftc zero W) a) nil)
+  | .and a b         => cons (numeral 7) (cons (substCodeF2 v u W a)
+                          (cons (substCodeF2 v u W b) nil))
+  | .or a b          => cons (numeral 8) (cons (substCodeF2 v u W a)
+                          (cons (substCodeF2 v u W b) nil))
+  | .ex a            => cons (numeral 9) (cons (substCodeF2 (v + 1) (liftc zero u)
+                          (liftc zero W) a) nil)
+
+/-- ⭐⭐ **LA COMPOSICIÓN, nivel FÓRMULA.** Misma inducción que las tres de arriba; lo único que
+    cambia es que el lado derecho ya no es `substCodeF` sino el de DOS huecos. -/
+theorem substfc_comp_substCodeF : ∀ (v : Nat) (u W : Term),
+    (∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w W =eq W)) →
+    Prf (liftc zero W =eq W) →
+    ∀ (φ : Formula), liftFormula (v + 2) φ = φ →
+      Prf (substfc (numeral v) u (substCodeF (v + 1) W φ) =eq substCodeF2 v u W φ)
+  | v, u, W, _, _, .bottom, _ => by
+      show Prf (substfc (numeral v) u botc =eq botc)
+      exact prf_substfc_bottom (numeral v) u
+  | v, u, W, hW, _, .atom P ts, hfv => by
+      have hts : liftTerms (v + 2) ts = ts := by
+        simpa only [liftFormula, Formula.atom.injEq, true_and] using hfv
+      show Prf (substfc (numeral v) u (atomc (strCode P) (substCodeTs (v + 1) W ts))
+        =eq atomc (strCode P) (substCodeTs2 v u W ts))
+      refine prf_eq_trans (prf_substfc_atom (numeral v) u _ _) ?_
+      unfold atomc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtsc_comp_substCodeTs v u W (hW v) ts hts
+  | v, u, W, hW, _, .eq a b, hfv => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.eq.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (eqCodeFn (substCodeT (v + 1) W a) (substCodeT (v + 1) W b))
+        =eq eqCodeFn (substCodeT2 v u W a) (substCodeT2 v u W b))
+      refine prf_eq_trans (prf_substfc_eq (numeral v) u _ _) ?_
+      exact prf_congr_eqCodeFn (substtc_comp_substCodeT v u W (hW v) a h1.1)
+        (substtc_comp_substCodeT v u W (hW v) b h1.2)
+  | v, u, W, hW, hL, .impl a b, hfv => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.impl.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (implc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+        =eq implc (substCodeF2 v u W a) (substCodeF2 v u W b))
+      refine prf_eq_trans (prf_substfc_impl (numeral v) u _ _) ?_
+      exact prf_congr_implc (substfc_comp_substCodeF v u W hW hL a h1.1)
+        (substfc_comp_substCodeF v u W hW hL b h1.2)
+  | v, u, W, hW, hL, .and a b, hfv => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.and.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (andc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+        =eq andc (substCodeF2 v u W a) (substCodeF2 v u W b))
+      refine prf_eq_trans (prf_substfc_and (numeral v) u _ _) ?_
+      exact prf_congr_andc (substfc_comp_substCodeF v u W hW hL a h1.1)
+        (substfc_comp_substCodeF v u W hW hL b h1.2)
+  | v, u, W, hW, hL, .or a b, hfv => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.or.injEq] at h1
+      show Prf (substfc (numeral v) u
+          (orc (substCodeF (v + 1) W a) (substCodeF (v + 1) W b))
+        =eq orc (substCodeF2 v u W a) (substCodeF2 v u W b))
+      refine prf_eq_trans (prf_substfc_or (numeral v) u _ _) ?_
+      exact prf_congr_orc (substfc_comp_substCodeF v u W hW hL a h1.1)
+        (substfc_comp_substCodeF v u W hW hL b h1.2)
+  | v, u, W, hW, hL, Formula.forall a, hfv => by
+      have h1 : liftFormula (v + 3) a = a := by
+        simpa only [liftFormula, Formula.forall.injEq] using hfv
+      show Prf (substfc (numeral v) u (forallc (substCodeF (v + 2) (liftc zero W) a))
+        =eq forallc (substCodeF2 (v + 1) (liftc zero u) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_forall (numeral v) u _) ?_
+      unfold forallc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_comp_substCodeF (v + 1) (liftc zero u) (liftc zero W) hW' hL' a h1
+  | v, u, W, hW, hL, .ex a, hfv => by
+      have h1 : liftFormula (v + 3) a = a := by
+        simpa only [liftFormula, Formula.ex.injEq] using hfv
+      show Prf (substfc (numeral v) u (exc (substCodeF (v + 2) (liftc zero W) a))
+        =eq exc (substCodeF2 (v + 1) (liftc zero u) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_ex (numeral v) u _) ?_
+      unfold exc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_comp_substCodeF (v + 1) (liftc zero u) (liftc zero W) hW' hL' a h1
+
+
 end ROBINSON_PlusPlus.Meta.BdAllIntroPrf
 
 export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
@@ -703,4 +811,5 @@ export ROBINSON_PlusPlus.Meta.BdAllIntroPrf (
   prf_lt_succ_self bdAllPred pcc_bdAll_intro
   substCode_hyps_lift substfc_inv_substCodeF substfc_inv_substCodeF_at
   substfc_id_substCodeF
+  substCodeF2 substfc_comp_substCodeF
 )
