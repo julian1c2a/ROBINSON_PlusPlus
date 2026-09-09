@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑09c · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
+**Estado 2026‑09‑09h · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE**
 `Build completed successfully (135 jobs)` — **121 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
@@ -13,27 +13,48 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 **chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
 (`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **el CHASIS de `pcc_eval_liftfc`** (A5 ya está cerrada)
+> # 🎯 SIGUIENTE SESIÓN — **`prf_hasWitF_liftfc`** (⬜ **aún NO existe**), que desbloquea DOS ramas
 >
-> 🏁 **A5 CERRADA el 2026‑09‑09c (§3.50)**: `pcc_eval_liftc_at` y `pcc_eval_liftsc_at`, con el
-> nivel **cuantificado dentro de `Φ`**, net‑0 y sin módulos nuevos. Lo que la abarató: ⭐ **en el
-> sorte TÉRMINO el nivel es INERTE** — la recursión es la misma y las reflexiones internas de §4
-> de `LiftcCodePrf` ya eran genéricas en `c`; lo único con contenido nuevo fue el `varc`, donde
-> aparece la **tricotomía** (`pcc_liftc_var_lt_code` + `prf_liftc_varc_cases`).
-> ➕ Subó `PSI_inst2` a `Meta/StrongInductionPrf.lean`: el escalón que faltaba de la escalera
-> (estaban el 1, el 3 y el 4).
+> ⭐⭐ **Es el único punto donde C3 y D3 se tocan.** La clausura de `hasWitF` bajo `liftfc` a
+> nivel arbitrario cierra `ind` (18) y `listInd` (20) —los dos reflectores que faltan de C3— y
+> con ellos **`hbody`(a) de D3**.
 >
-> ▶▶ **LO SIGUIENTE: el chasis de ocho ramas de `pcc_eval_liftfc`.** La base ya está puesta y
-> verificada (`Meta/EvalLiftfcPrf.lean`): `liftfcT` (DEFINICIÓN, nunca axioma), `targetLiftfc`,
-> los controles y la deuda **enunciada, no postulada**.
-> Estado de sus ocho casos (§3.49.3, actualizado por §3.50.5):
-> ✅ `CasoAtom` y `CasoEq` — **desbloqueados por A5** (bajan a `liftsc`/`liftc` al nivel corriente).
-> ⬜ `CasoBot`, `CasoBin 5/7/8` — congruencia pura sobre ecuaciones que ya existen.
-> ⬜ `CasoUn 6/9` — el caso que **sube** el nivel, y el único realmente nuevo.
-> ⬜ El chasis: molde `pcc_eval_substfc_modulo_8`. ⚠️ **No es reutilizable tal cual** (sus `Caso*`
-> están escritos sobre `targetSubstfc`); hacerlo genérico en el operador obliga a refactorizar en
-> vivo un módulo de 1 625 líneas que está en la ruta crítica — se mide antes de tocarlo.
-> ⚠️ Sigue siendo un frente de **escala B3.4**, no de una sesión.
+> ⛔ **Por qué falta, medido (§3.54.1)**: no es que los árboles sean mayores, es que **se rompe
+> una cadena de guardas**. En `ind` y `listInd` los `liftfc` van **anidados y bajo un `substfc`**:
+> `substfc 0 ⌜σ#0⌝ (liftfc 1 A)` y `substfc 0 ⌜cons #1 #0⌝ (liftfc 2 (liftfc 1 A))`. El evaluador
+> pide `hasWitF (liftfc 1 A)` —el testigo del RESULTADO de un lift— y la cascada de ADR‑020 sólo
+> da `hasWitF A`. En `listInd`, dos veces.
+> ✅ **El molde existe**: `prf_hasWitF_substfc` (`Meta/SubstfcWitnessPrf.lean`, rama C de
+> ADR‑020), y el análogo sale **un binder más barato** —no hay sustituyendo—, exactamente como
+> `pcc_eval_liftfc` salió más barato que `pcc_eval_substfc`.
+> ➕ Y un nodo `tcm : Term → STree` para los `termCodeM` cerrados: trivial
+> (`substTerm_termCodeM` ya existe).
+>
+> ⚠️ **La otra puerta, y NO está bloqueada**: las dos obligaciones que le quedan a D3
+> (§3.55.7) son **`hwP`** (el testigo del cuerpo, `hasWitF (bdAllBndCtx (chainOkBPsi …))`) y
+> **`hbdAll`** (el `pcc_bdAll_intro` con su `hbody`). `hwP` no depende de C3 en absoluto.
+>
+> 🏁🏁 **2026‑09‑09e · `pcc_eval_liftfc` PROBADO** (§3.53), sin hipótesis, con `v` y `X`
+> abstractos y sólo `hasWitF X` de guarda. El frente entero —fontanería, 8 ecuaciones dotadas,
+> chasis y 8 casos— en una sesión, net‑0. ⭐ Un binder más barato que el molde de B3.4.
+> 🏁 **q3 (11) y qconf (19) CERRADOS ⇒ CINCO de los SIETE** (§3.54), con el nodo `lift` de
+> `STree`, y `pcc_lineWF_tracked_modulo_2`.
+> 🏁 **D3 a DOS obligaciones** (§3.55): destino fijado, puente de la cota, `∃` acotado, cuerpo del
+> `∀`, empaquetado, `PsiF` exterior, `hmatch` descargado y **`hPinv_chainOkBPsi`**.
+> 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52), y una ambigüedad que había creado yo en A5.
+>
+> ⛔ **LA TRAMPA DEL DÍA, que mordió TRES veces**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`…
+> son **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Todo `rfl` que parezca
+> obvio sobre ellos es falso. El patrón que sí funciona: **abrir el destino opaco hacia su gemelo
+> computable** (`substCodeF`, `formCode`, `liftTerm`…) con `prf_*_arith_open`, y **entonces**
+> casar la forma por `rfl`. ⚠️ Y medir sobre la **instancia real**: el gemelo computable se
+> atasca con argumentos abstractos.
+>
+> ⚠️ **Y la lección más cara: MEDIR UNA OBSTRUCCIÓN NO ES PROBARLA.** Declaré imposible el
+> `hPinv` genérico a nivel fórmula —y lo dejé escrito en producción— cuando estaba a **una
+> hipótesis** de distancia. Cuando una inducción no cierra un caso, la pregunta no es «¿qué
+> maquinaria falta?» sino **«¿qué le falta a mi hipótesis para ser invariante bajo el paso que me
+> rompe?»**.
 >
 > 🏁 **B8b saldada también el 2026‑09‑09c (§3.51)**: el `prf_congr_liftc` de
 > `CodeWitnessPrf.SinWTs` tenía **cero consumidores** en todo el árbol — estaba exportado por
@@ -127,8 +148,10 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > | ⭐ **C3 · q1 (9), q2 (10), leibniz (13)** | 🏁 **PROBADOS** — `pcc_lineWF_tracked_*_imp`, net‑0 puros |
 > | C3 · `pcc_eval_liftfc` · la BASE | ✅ `Meta/EvalLiftfcPrf.lean` (§3.49): `liftfcT` (⛔ **definición**, nunca axioma), `targetLiftfc` + naturalidad, control **negativo** (`fail_if_success rfl`) y la deuda **enunciada** con su puente `∃∃` |
 > | ⭐ **C3 · A5 · `pcc_eval_liftc_at`/`_liftsc_at`** | 🏁 **CERRADA** (2026‑09‑09c, §3.50), net‑0 y sin módulos nuevos. El nivel va **cuantificado dentro de `Φ`** (lo exige el gate `liftFormula 1 Φ = Φ`). ⭐ Barata porque **en el sorte TÉRMINO el nivel es INERTE**; lo único nuevo fue la **tricotomía** del `varc` |
-> | ▶▶ **C3 · el chasis de `pcc_eval_liftfc` (8 `Caso*`)** | ⬜ **LO SIGUIENTE**. Molde = `pcc_eval_substfc_modulo_8` (paso de 41 l.). ✅ `CasoAtom`/`CasoEq` **desbloqueados por A5**; ⬜ `CasoBot` y `CasoBin 5/7/8` son congruencia pura; ⬜ `CasoUn 6/9` es el que **sube** el nivel. ⚠️ El chasis **no es reutilizable tal cual**: sus `Caso*` van sobre `targetSubstfc`; hacerlo genérico en el operador es refactorizar en vivo 1625 l. de la ruta crítica |
-> | C3 · q3 (11), qconf (19), ind (18), listInd (20) | ⛔ **bloqueados por `pcc_eval_liftfc`** — los 4 que llevan `liftfc`. ⚠️ Hasta que estén, `pcc_lineWF_tracked` sigue condicional |
+> | ⭐ **C3 · `pcc_eval_liftfc`** | 🏁🏁 **PROBADO** (2026‑09‑09e, §3.53), sin hipótesis. Chasis + 8 casos + 8 ecuaciones dotadas, net‑0. Antes decía: Molde = `pcc_eval_substfc_modulo_8` (paso de 41 l.). ✅ `CasoAtom`/`CasoEq` **desbloqueados por A5**; ⬜ `CasoBot` y `CasoBin 5/7/8` son congruencia pura; ⬜ `CasoUn 6/9` es el que **sube** el nivel. ⚠️ El chasis **no es reutilizable tal cual**: sus `Caso*` van sobre `targetSubstfc`; hacerlo genérico en el operador es refactorizar en vivo 1625 l. de la ruta crítica |
+> | C3 · q3 (11) y qconf (19) | 🏁 **PROBADOS** (§3.54) ⇒ **CINCO de los SIETE**, con el nodo `lift` de `STree`. Antes: — los 4 que llevan `liftfc`. ⚠️ Hasta que estén, `pcc_lineWF_tracked` sigue condicional |
+> | ⛔ **C3 · ind (18) y listInd (20)** | ⬜ **LO SIGUIENTE.** Falta **`prf_hasWitF_liftfc`**: sus `liftfc` van anidados y bajo un `substfc`, el evaluador pide `hasWitF (liftfc 1 A)` y la cascada sólo da `hasWitF A` (§3.54.1). Molde: `prf_hasWitF_substfc`, y sale **un binder más barato** |
+> | ⭐ **D3 · `DEUDA_chainOkBDot`** | ⬜ a **DOS** obligaciones (§3.55.7): **`hwP`** (no bloqueada por C3) y **`hbdAll`**. Todo lo demás —destino, cota, `∃` acotado, cuerpo, empaquetado, `PsiF` exterior, `hmatch`, `hPinv`— **probado** |
 > | `hCarc` | ✅ **COMPRADO** por B3.4: `pcc_eval_substfc_wit` es una MP (§3.42) |
 > | `pcc_eval_liftfc` | ⛔ **no existe en ningún sitio** — trabajo nuevo, no promoción |
 > | A5 más allá del nivel `zero` | 🏁 **HECHA en el sorte TÉRMINO** (§3.50). ⚠️ Lo que **NO** cubre: `hasWitF` a nivel arbitrario — eso es el sorte FÓRMULA y no hacía falta aquí |

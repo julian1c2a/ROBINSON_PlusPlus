@@ -111,12 +111,17 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.51.
 >
-> **Build 135 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE** (2026‑09‑09c).
-> 🏁 **A5 CERRADA** (§3.50): `pcc_eval_liftc_at`/`pcc_eval_liftsc_at`, con el nivel **cuantificado
-> dentro de `Φ`** — net‑0 y **sin módulos nuevos**. Desbloquea `CasoAtom`/`CasoEq` de
-> `pcc_eval_liftfc`; el chasis de ocho ramas sigue pendiente.
-> 🏁 **B8b saldada** (§3.51): el `prf_congr_liftc` de `CodeWitnessPrf.SinWTs` tenía **cero
-> consumidores** — exportado por EXISTENCIA, no por consumo. Borrado.
+> **Build 135 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE** (2026‑09‑09h).
+> 🏁🏁 **`pcc_eval_liftfc` PROBADO** (§3.53): sin hipótesis, con `v` y `X` abstractos y sólo
+> `hasWitF X` de guarda. El frente entero —fontanería, 8 ecuaciones dotadas, chasis y 8 casos— en
+> una sesión, net‑0.
+> 🏁 **C3: CINCO de los SIETE** reflectores de sustitución (§3.54) — q3 (11) y qconf (19) con el
+> nodo `lift` de `STree`. ⛔ Faltan `ind` (18) y `listInd` (20), bloqueados por
+> **`prf_hasWitF_liftfc`** (⬜ aún NO existe) — que es también lo que bloquea `hbody`(a) de D3.
+> 🏁 **D3 a DOS obligaciones** (§3.55): `hwP` y `hbdAll`. Destino fijado, puente de la cota,
+> `∃` acotado, cuerpo del `∀`, empaquetado, `PsiF` exterior, `hmatch` y `hPinv`: **probados**.
+> 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52).
+> ⛔ **Trampa del día, tres veces**: `substfc`/`carc`/`lenc`… son símbolos OBJETO y **no reducen**.
 > **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.

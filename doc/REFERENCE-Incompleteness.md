@@ -4316,3 +4316,299 @@ porque `[B]` sólo detecta símbolos inexistentes.
 > ⚠️ **Hallazgo colateral, NO tocado**: `CodeWitnessPrf.SinWTs.prf_congr_liftsc` tiene
 > **también cero consumidores** en todo el árbol, y ni siquiera está exportado. Es código
 > muerto de la misma clase, pero **no es B8b**: se deja a decisión del autor.
+
+---
+
+## §3.52 · 🧹 Dedup ADR‑019: SEIS familias duplicadas, y una ambigüedad que yo creé (2026‑09‑09d)
+
+> `Build completed successfully (135 jobs)`. 22 ficheros. Footprint sin cambios.
+
+B8b (§3.51) dejó apuntado un duplicado colateral. En vez de mirar sólo ése se hizo **barrido
+sistemático** de nombres declarados más de una vez en producción: **28 candidatos, SEIS
+duplicados reales**. El resto son homónimos legítimos —`CTree` vs `STree`, los tres descensos
+`PHI`, `Godel.numeral` vs `Full.numeral`— ya documentados como tales.
+
+### §3.52.1 · Los seis, y por qué cada uno se resolvió como se resolvió
+
+| familia | diagnóstico | resolución |
+|---|---|---|
+| `SinWTs.prf_congr_liftsc` | ⚠️ **NO era duplicado**: no hay congruencia de `liftsc` en ningún otro sitio. Código muerto liso, cero usos, nunca exportado | **borrado** |
+| `InAxiomsCodePrf.substtc_inv_termCode_of_tc` | copia literal de la de `LineWFTrackedPrf`, **cero usos**: su única mención era el `export` | **borrado** |
+| `PrfH_congr_liftc` | en `CodeWitnessPrf` (nivel explícito) **y** `NumCodeClosedPrf` (implícito), **las dos exportadas**. Ninguna muerta | **bajada** a `ChainPrf` |
+| `PrfH_lt_subst1`/`_subst2` | en `BoundedInPrf` y `NatOrderPrf`, las dos exportadas | **bajadas** a `ChainPrf` (59 refs cualificadas reescritas) |
+| `prf_syll` | `ReprPrf` está **aguas arriba** de `HasWitTcFnPrf` | sobrevive el de `ReprPrf` |
+| `concat_*`/`in_cons_*` | `Representability` tenía copias literales de `ProofChain` | `import ProofChain` |
+
+⭐ **Las dos primeras son la lección de `export`**: estaban ahí **por EXISTENCIA, no por
+consumo** — exactamente lo que AI‑GUIDE §17 prohíbe, y exactamente el patrón de B8b.
+
+⚠️ **Y el duplicado de `PrfH_lt_subst*` era CONSCIENTE**: el docstring de `NatOrderPrf` decía
+«copia local: el original vive en `BoundedInPrf`, que es **posterior** a este módulo en la cadena
+de imports». Que el original esté aguas abajo **no autoriza la copia**: obliga a bajar el
+general. Es ADR‑019 leído al revés.
+
+### §3.52.2 · Dos hallazgos de método
+
+⭐ **Resolver por `import` es a veces más barato que reubicar.** `Representability` y
+`ProofChain` eran independientes, así que bastó un `import` (sin ciclo, y sólo **dos** módulos
+del árbol pasan a ver `ProofChain` sin verlo ya) en vez de mover cuatro lemas a un módulo
+temáticamente ajeno. Se midió antes de decidir.
+
+⚠️ **Y una ambigüedad que había creado yo el día anterior**: `refl_caso_varc_at` (A5) chocaba con
+el de `EvalSubsttcPrf` —otro enunciado, sobre `substtc`, y **exportado a la raíz**—, y
+`EvalSubstfcPrf` abre los dos módulos. No reventaba porque **la ambigüedad de `open` en Lean es
+perezosa**, que es justo lo que convierte a estos homónimos en trampas. Renombrado
+`refl_caso_varc_lift_at`, y la razón escrita en su docstring.
+
+### §3.52.3 · Lo que NO se tocó, y por qué
+
+`substFormula_liftFormula` está en `Full/StrongInduction.lean` **y** en
+`Meta/StrongInductionPrf.lean`. Pero son **capas distintas**: `Full` no importa nada de `Meta`
+(cierre disjunto). Unificarlas crearía una dependencia entre capas que hoy no existe. **Es el
+precio de la independencia de capas, no un duplicado que retirar.**
+
+---
+
+## §3.53 · 🏁🏁 `pcc_eval_liftfc` PROBADO — el frente entero, de la fontanería al teorema (2026‑09‑09e)
+
+> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
+> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq`.
+
+    pcc_eval_liftfc (v X) : Prf (hasWitF X ⇒ Prov(⌜ liftfc(v̇, Ẋ) = (liftfc v X)˙ ⌝))
+
+con `v` y `X` **abstractos** y bajo la sola guarda `hasWitF X`. §3.49 lo daba como «frente de
+escala B3.4»; se cerró entero, y todos los tramos compilaron a la primera salvo uno.
+
+### §3.53.1 · La medición que abrió el frente
+
+⚠️ `NEXT-STEPS` avisaba: «la familia `liftc` **no tiene aritmetización ni a nivel META**». Cierto
+—no hay `prf_liftc_arith_open`— **pero el dotado no lo necesita**. Los ocho `ax_liftfc_*` están
+en `axioms` y tienen forma `forall_n BODY`, que es exactamente la de `ax_liftc_var_lt`: la receta
+con que A5 la dotó (`prf_substfc_arith_open` + `pcc_axiom_inst*`) vale **tal cual**.
+
+⭐ Y los tags: `liftfc` recorre los **mismos constructores del KIT** que `formCode` —`botc`=`nulT 2`,
+`implc`=`binT 5`, `forallc`=`unT 6`, `andc`=`binT 7`, `orc`=`binT 8`, `exc`=`unT 9`— y los seis
+puentes son `rfl`. **Ni un constructor nuevo.**
+
+### §3.53.2 · La trampa del genérico en el tag
+
+Escribí `pcc_liftfc_bin_code (k) …` genérico para servir a los tres tags binarios de una vez, y
+**no compiló**: con `k` **variable**, el `numeralM k` del cuerpo **bloquea el cómputo de
+`substCodeF`**, y `prf_substfc_arith_open` deja de casar por defeq con la forma explícita. Con el
+tag concreto sí computa.
+
+⇒ **El `hin` sale fuera como PARÁMETRO**: las 40 líneas de prueba quedan compartidas por los tres
+tags y sólo la línea que computa es por tag — que era el objetivo de generalizar. Es el mismo
+fenómeno que §3.55 vuelve a encontrar, y la raíz común está en §3.57.
+
+### §3.53.3 · El chasis, un binder más barato que el molde
+
+Molde: `pcc_eval_substfc_modulo_8` (B3.4). ⭐ Aquí sale **un binder más barato**: `liftfc` no
+tiene sustituyendo, así que **no hay `hasWit s` en la guarda y no hace falta `HasWitLift`** —que
+en `substfc` es una obligación aparte—. Binders internos: **tres** (`wF`, `wT`, `c`), y la
+escalera que toca es `PSI_inst3` (el que faltaba, `PSI_inst2`, lo puso A5 el día anterior).
+
+🔑 El **nivel va cuantificado dentro de `Φ`** por la razón de siempre (el gate
+`liftFormula 1 Φ = Φ`) **y por una propia de este frente**: los casos `forallc`/`exc` lo
+**cambian** (`σc`), así que la HI hay que tenerla disponible a un nivel distinto del que se
+concluye.
+
+⭐ Reutilizado sin copiar (ADR‑019): `descenso_un`/`descenso_bin1`/`descenso_bin2` de
+`EvalSubstfcPrf` son **independientes del operador** (sólo hablan de `shapeUn`/`shapeBin`/`lt`/
+`nthc`), así que se consumen cualificados en vez de reescribirse.
+
+### §3.53.4 · Los ocho casos
+
+`CasoBotL`, `CasoBinL 5/7/8` y `CasoUnL 6/9` salen de las ecuaciones dotadas de §3.53.1 más el
+transporte de Leibniz. ⚠️ Los núcleos van en `PrfH` porque **las HI llegan como hipótesis
+OBJETO** (deuda B6b), igual que en `substfc`. ⚠️ Y los dos `Un` son los que **suben el nivel**:
+obligan a normalizar el nivel dotado `⌜σc⌝` a `succcT ċ` (`prf_tc_succ'`) antes de encadenar — el
+único paso sin análogo en el caso binario.
+
+⭐⭐ **`CasoAtomL` y `CasoEqL` son donde A5 cobra, y es literalmente lo que §3.49.1 predijo**:
+bajan al sorte TÉRMINO **al nivel corriente**, y consumen `DESCENSO_at_lista_imp` y
+`DESCENSO_at_imp`. Con `pcc_eval_liftc` clavado a `zero` no se podían escribir.
+
+⚠️ Sus dos ecuaciones dotadas **no caben** en el genérico binario de §3.53.1: su lado derecho
+**cambia de sorte** (`liftsc` en atom, `liftc` en eq) en vez de repetir `liftfc`. Y en `atom` la
+casilla del símbolo viaja **intacta**.
+
+---
+
+## §3.54 · 🏁 C3 · q3 (11) y qconf (19) — CINCO de los SIETE, y el nodo `lift` (2026‑09‑09e)
+
+> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean`.
+
+`STree` gana un constructor **`lift : Nat → STree → STree`**
+(`objAt t (lift n a) = liftfc (numeralM n) (a.objAt t)`), con sus casos en las cinco funciones y
+en las siete inducciones puras. El módulo importa `Meta/EvalLiftfcPrf.lean`: sin ciclo, y el
+cierre crece en **un** módulo.
+
+⭐ El caso `lift` de `PrfH_tc_objAt` es el **análogo UNARIO del `sub`**: un hijo, UNA guarda
+(`hasWitF`), una evaluación —y la evaluación es `pcc_eval_liftfc_wit`—. En `PrfH_dotVN`, en
+cambio, es **pura congruencia**, igual que el `un`: el reparto de §5 se mantiene intacto.
+
+⭐⭐ **Y vuelve a salir el hecho estructural que §3.48 registró para el `sub`**: la guarda de la
+cascada de ADR‑020 cae **exactamente sobre el hijo del nodo `lift`**. q3 lleva
+`liftfc 0 (nthc t 3̄)` y su cascada es `[witF 3]`; qconf lleva `liftfc 0 (nthc t 2̄)` y es
+`[witF 2]`. **ADR‑020 no eligió dónde poner las guardas: las puso donde el evaluador las iba a
+pedir.** Dos frentes independientes, el mismo hallazgo.
+
+### §3.54.1 · ⛔ Por qué `ind` (18) y `listInd` (20) NO salen con esto
+
+No es que los árboles sean más grandes: es una **cadena de guardas que se rompe**. Sus `liftfc`
+van **anidados y bajo un `substfc`**:
+
+    ind     : substfc 0 ⌜σ#0⌝        (liftfc 1 A)
+    listInd : substfc 0 ⌜cons #1 #0⌝ (liftfc 2 (liftfc 1 A))          con A = nthc t 2̄
+
+El evaluador pide entonces `hasWitF (liftfc 1 A)` —el testigo del **resultado** de un lift, no
+del argumento— y la cascada sólo da `hasWitF A`. En `listInd`, dos veces.
+
+⇒ Falta la **clausura de `hasWitF` bajo `liftfc`** a nivel arbitrario, que **no existe**: sólo
+está la de TÉRMINO a nivel `zero` (`prf_hasWit_liftc`). El molde es `prf_hasWitF_substfc` (rama C
+de ADR‑020) y el análogo sale **un binder más barato** —sin sustituyendo—, igual que
+`pcc_eval_liftfc` frente a `pcc_eval_substfc`. ⚠️ Más un nodo `tcm : Term → STree` para los
+`termCodeM` cerrados, que es trivial (`substTerm_termCodeM` ya existe).
+
+⭐ Y con los cinco cerrados entra **`pcc_lineWF_tracked_modulo_2`** (`SubstTreeReflect` §11): los
+cinco reflectores cableados en `pcc_lineWF_tracked_modulo_7`. ⚠️ **`hbody`(a) de D3 es exactamente
+esto**, así que esa mitad de D3 queda **a la misma distancia que C3**.
+
+---
+
+## §3.55 · D3 · de «una obligación sin medir» a **DOS obligaciones sobre un `PsiF` fijo** (2026‑09‑09f‑h)
+
+> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` (720 l.),
+> `Meta/BdAllIntroPrf.lean`, `Meta/SubstCodeOpenPrf.lean`. Footprint: la base sancionada, y
+> `hPinv_chainOkBPsi` sale con **sólo los tres axiomas de Lean**.
+
+D3 estaba reducida desde §3.19 a `hC_dot`, y §3.41 la redujo a **`DEUDA_chainOkBDot`**. Esta
+sesión la ataca por partes. Estado al cerrar: **`DEUDA_chainOkBDot_of_two` / `d3_prf_of_two`**,
+o sea D3 desde **`hwP`** y **`hbdAll`**, y nada más.
+
+### §3.55.1 · ⛔ El destino NO reduce, y ésa es la primera lección
+
+`chainOkBDot = substfc zero ṗ (formCode (chainOkB nil #0))`, y `substfc` es un **símbolo de
+función OBJETO, no una función de Lean**. Medido: `∃ B Psi, chainOkBDot = bdAllCode B Psi`
+**no compila**.
+
+Quien lo abre es `prf_substfc_arith_open`, que lo iguala **dentro de la teoría objeto** a
+`substCodeF` — que sí computa. ⭐ **Ése es el patrón, y se usó tres veces más esta sesión**:
+abrir el destino opaco hacia su gemelo computable, y **entonces** casar la forma por `rfl`.
+
+⚠️ Esta trampa mordió **tres veces en un día**: `chainOkBDot`, `carc (cons p X)` (§3.55.4) y
+`substtc zero ṗ (termCode (lenc #0))`. Las tres con el mismo disfraz: un `rfl` que parece obvio.
+
+### §3.55.2 · ⭐⭐ El hueco real era la COTA, y no el que se esperaba
+
+Con el destino abierto, la comparación es:
+
+    destino     : bdAllCode (lencT (liftc 0 ṗ)) Psi    ← ACCESOR DOTADO, y pre‑`liftc`‑ado
+    bdAll_intro : bdAllCode (tcFn (lenc p))      Psi'   ← REFLEXIÓN PURA
+
+⛔ **Y ese salto no se puede dar fuera de `Prov`**: que `(lenc p)˙` y `lencT ṗ` sean iguales es
+**la ecuación de RASTREO**, y postularla a nivel objeto es lo que hizo la teoría INCONSISTENTE
+(ADR‑012/013, `ax_tc_cons`). Lo que sí vale es la **evaluación provable**: `pcc_eval_lenc`, y el
+cambio de cota **dentro** de `Prov` con `PrfH_bdAllCode_congr_bnd`.
+
+⭐ No hubo que inventar maquinaria: ese lema **ya existía** y es el mismo gesto que
+`pcc_argsIn_trackedC` y `pcc_wfAll1_trackedC` hacen con sus listas. Aquí sólo se instancia
+(`PrfH_chainOkB_bnd_bridge`, §4 del módulo).
+
+### §3.55.3 · Las piezas del `hbody`(b), todas sobre argumentos ABSTRACTOS
+
+* **`pcc_bdCarcLt_reflect`** — el `∃` acotado con **cota arbitraria**. ⭐⭐ Y aquí la
+  generalización sale **MÁS BARATA que el caso especial**: los dos pasos caros del molde
+  (`pcc_eval_lenc` + simetría interna en la cota; la frontera D1 en el cuerpo) **desaparecen**,
+  porque eran artefactos de que la cota fuera un accesor y el lado derecho un `⌜φ⌝` de fórmula
+  meta. ⚠️ Lo que sí aparece: `pcc_eval_carc_nthc` pide `k < lenc p` y el testigo sólo da
+  `k < b`; entra `b < lenc p` como antecedente — la cota real del acceso, que el consumidor tiene.
+* **`pcc_premsBody_reflect`** — el cuerpo del `∀`. ⭐⭐ En D3 `c := nil`, así que el disyunto
+  izquierdo `In y nil` es **refutable** y esa rama sale por EFQ ⇒ **su código puede quedar
+  ARBITRARIO** (parámetro `Ac` libre). Es el **único sitio de D3 donde el destino no impone la
+  imagen**, y contradice la regla general de §3.44 por una razón concreta: la rama no se recorre.
+
+### §3.55.4 · El empaquetado, y la segunda vez que un símbolo objeto engañó
+
+`pcc_bdAll_intro` pide `CF` natural en **un** parámetro y `boundedPremsIn c p i L` tiene cuatro;
+con `c := nil` quedan tres, empaquetados con `cons` y leídos con `carc`/`cdrc`. Entran
+`premsPair`, `premsBnd` y **4 de las 8** obligaciones.
+
+⚠️ Escribí el round‑trip `premsPair (cons p (cons i L)) = boundedPremsIn nil p i L` dándolo por
+`simp`. **Falso**: `carc` es símbolo objeto. ⇒ **el empaquetado no es gratis**, al revés de lo
+que sugiere leer `argsInPair`: hay que arrastrar `pcc_carcD_bridge_cons`/`pcc_cdrcD_bridge_cons`.
+
+### §3.55.5 · ⭐⭐ El hallazgo que reordenó el frente: los dos `PsiF` van JUNTOS
+
+Intenté fijar el `PsiF` del `bdAll` **interior** por separado y no se puede, por una razón
+estructural: el código de `boundedPremsIn` que D3 necesita es el **sub‑término** del `PsiF` del
+`bdAll` **exterior**, y lleva las capas de `liftc`/`substCodeT` que le impone **su posición bajo
+los binders del exterior**.
+
+⇒ **de fuera adentro**. §8 hace el exterior: `chainOkBPsi`, su descomposición por `rfl`, y
+⭐⭐ **`chainOkBPsi_split`**, que lo parte en el `andc` de las dos mitades de `lineOkB` y conecta
+la derecha con la descomposición de §7.1 **por construcción**. Con la instancia del destino —cuya
+cota sale **exactamente** la de §3.55.2, sin transporte— **`hmatch` deja de ser hipótesis y pasa a
+ser teorema**.
+
+### §3.55.6 · `hPinv`, y ⚠️ una obstrucción que declaré y era falsa
+
+`hPinv` es la obligación de invariancia del cuerpo bajo `substfc` de nivel superior, y hasta hoy
+se pagaba **a mano en cada frente** (`hPinv_wfAll1Psi`, ~40 líneas de recorrido).
+
+Primer intento: se probó el nivel **TÉRMINO** genérico (`substtc_inv_substCodeT`,
+`Meta/SubstCodeOpenPrf.lean`), y al intentar subirlo a FÓRMULA chocó con el binder —`substCodeF`
+recursa con el testigo `liftc 0 w` y la hipótesis no se transfiere—. **Se escribió en el módulo
+que hacía falta otra maquinaria** («formulación iterada», «escala de frente»).
+
+⚠️⚠️ **El diagnóstico era correcto; la conclusión, no.** Faltaba **una hipótesis más**:
+
+    hW : ∀ k u, substtc (numeral k) u W ≐ W      (invariante a TODO nivel)
+    hL : liftc 0 W ≐ W                            (el lift COLAPSA)
+
+Ese par **es cerrado bajo `liftc 0`** (`substCode_hyps_lift`, **tres líneas**) y la inducción
+atraviesa los binders. El lema salió entero: `substfc_inv_substCodeF` y
+`substfc_inv_substCodeF_at`, en `Meta/BdAllIntroPrf.lean` —el hogar temático, y el sitio donde el
+vocabulario de código (`atomc`, `eqCodeFn`, `implc`) está disponible; `SubstCodeOpenPrf` queda
+aguas arriba de él—.
+
+⚠️ **Y el ÍNDICE no es cosmético**: hacen falta **las dos** variantes, porque cambian la
+condición sobre variables libres (`v+2` frente a `v+1`) y `hPinv` de `chainOkBPsi = substCodeF 1 …`
+actúa al nivel **1**. Con la otra el enunciado también es cierto y **no es el que el chasis
+consume**.
+
+Con eso, `hPinv_chainOkBPsi` sale en tres hipótesis baratas —el testigo es un **código
+punteado**: invariante a todo nivel, su `liftc` colapsa, y el cuerpo no tiene libres ≥ 2—.
+
+### §3.55.7 · Lo que queda de D3, y por qué converge con C3
+
+| pieza | estado |
+|---|---|
+| toda la cadena aguas abajo, §3–§9 del módulo | ✅ |
+| **`hwP`** — testigo del cuerpo (`hasWitF (bdAllBndCtx …)`) | ⬜ |
+| **`hbdAll`** — `pcc_bdAll_intro` con su `hbody` | ⬜ |
+| ↳ `hbody`(a) = `pcc_lineWF_tracked` | ⬜ **5 de 7** (`modulo_2`) |
+| ↳ `hbody`(b) = reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta ensamblar |
+
+⇒ **`prf_hasWitF_liftfc` desbloquea las dos ramas**: cierra `ind`/`listInd` de C3 y con ellos
+`hbody`(a) de D3. Es el único punto donde los dos frentes se tocan.
+
+### §3.55.8 · 📖 Nota de método: un fan‑out read‑only, y qué aportó
+
+Se lanzó un panel de cinco mediciones + síntesis (agentes **read‑only**, sin compilar) sobre
+`hPinv`. Balance honesto:
+
+* ✅ **midieron bien**: estructura nodo a nodo con los niveles correctos, inventarios con
+  `file:line`, y ⭐ **cazaron un sobreclaim en un docstring propio** (§4 de `SubstCodeOpenPrf`
+  decía «la obligación `hPinv` de TODA aplicación» cuando está **desplazado un índice** y es de
+  nivel término). Tenían razón; está corregido. También detectaron una **contradicción entre tres
+  de sus propias mediciones** y dijeron cuál era la buena.
+* ❌ **estimaron mal**: recomendaron la ruta cara y declararon la barata «escala de frente,
+  ≥150 líneas». La barata ya estaba compilada cuando llegó el informe, y su argumento de descarte
+  era una conjetura sobre un obstáculo que **no se produce**.
+
+🔑 La causa es estructural: un agente read‑only **no puede intentar la prueba**, así que su coste
+es una narración de plausibilidad — y en Lean la plausibilidad y la realidad se separan justo en
+los sitios interesantes. ⇒ **fan‑out para medir y para auditar, sí; para decidir la ruta de una
+prueba, tratar el veredicto como hipótesis.**
