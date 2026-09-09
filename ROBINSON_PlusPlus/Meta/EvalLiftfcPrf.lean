@@ -53,6 +53,8 @@ open ROBINSON_PlusPlus.Meta.EvalArithPrf ROBINSON_PlusPlus.Meta.LiftcCodePrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 open ROBINSON_PlusPlus.Meta.TrackedCorePrf ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS
+open ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.StrongInductionPrf
+open ROBINSON_PlusPlus.Meta.CodeCtorKit ROBINSON_PlusPlus.Meta.MpCodePrf
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -380,6 +382,304 @@ theorem deuda_of_isFC1 (h : DEUDA_evalLiftfc_isFC1) : DEUDA_evalLiftfc := by
     using prf_to_prfH (h (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 v))
       (liftTerm 0 (liftTerm 0 X))) _
 
+
+/-! ## §4 · EL CHASIS — la inducción fuerte sobre códigos de FÓRMULA
+
+Molde: `pcc_eval_substfc_modulo_8` (`Meta/EvalSubstfcPrf.lean`, B3.4). ⭐ Aquí sale **un binder
+más barato**: `liftfc` no tiene sustituyendo, así que no hay `s`, no hay `hasWit s` en la guarda
+y **no hace falta `HasWitLift`** (la clausura del testigo bajo `liftc zero`, que en `substfc` es
+una obligación aparte). Los binders internos son TRES — `wF`, `wT`, `c` — y el código sobre el
+que se induce es `#3`.
+
+🔑 El **nivel `c` va cuantificado DENTRO de `Φ`**, por la razón de siempre (el gate
+`liftFormula 1 Φ = Φ`) y además por una razón propia de este frente: los casos `forallc`/`exc`
+lo **cambian** (`σc`), así que la HI tiene que estar disponible a *otro* nivel del que se
+concluye. Es la misma forma que el `v`/`s` de `substfc` en su `CasoUn`. -/
+
+/-- La guarda: aquí es **sólo** el testigo de fórmula. Sin `hasWit s`: no hay `s`. -/
+def BODYliftfc (wF wT c X : Term) : Formula :=
+  Formula.impl (isFC1 wF wT X) (targetLiftfc c X)
+
+theorem liftF_BODYliftfc (k : Nat) (wF wT c X : Term) :
+    liftFormula k (BODYliftfc wF wT c X)
+      = BODYliftfc (liftTerm k wF) (liftTerm k wT) (liftTerm k c) (liftTerm k X) := by
+  simp only [BODYliftfc, liftFormula, liftF_isFC1, liftF_targetLiftfc]
+
+theorem substF_BODYliftfc (k : Nat) (u wF wT c X : Term) :
+    substFormula k u (BODYliftfc wF wT c X)
+      = BODYliftfc (substTerm k u wF) (substTerm k u wT) (substTerm k u c) (substTerm k u X) := by
+  simp only [BODYliftfc, substFormula, substF_isFC1, substF_targetLiftfc]
+
+/-- `#3` es el CÓDIGO; `#2` = `wF`, `#1` = `wT`, `#0` = `c`. -/
+def PHIliftfcBody : Formula := BODYliftfc (.var 2) (.var 1) (.var 0) (.var 3)
+
+def PHIliftfc : Formula := Formula.forall (Formula.forall (Formula.forall PHIliftfcBody))
+
+/-- **EL GATE de `prf_strong_induction`.** -/
+theorem hPHIliftfc : liftFormula 1 PHIliftfc = PHIliftfc := by
+  simp only [PHIliftfc, PHIliftfcBody, liftFormula, liftF_BODYliftfc, liftTerm, Nat.reduceAdd,
+    Nat.reduceLT, reduceIte]
+
+/-! ### Instanciación de los tres binders -/
+
+theorem PHIliftfc_at (t : Term) :
+    substFormula 0 t PHIliftfc
+      = Formula.forall (Formula.forall (Formula.forall
+          (BODYliftfc (.var 2) (.var 1) (.var 0)
+            (liftTerm 0 (liftTerm 0 (liftTerm 0 t)))))) := by
+  simp only [PHIliftfc, PHIliftfcBody, substFormula, substF_BODYliftfc, substTerm, Nat.reduceAdd,
+    Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true]
+
+theorem PHIl_spec1 (t wF : Term) :
+    substFormula 0 wF (Formula.forall (Formula.forall
+        (BODYliftfc (.var 2) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 (liftTerm 0 t))))))
+      = Formula.forall (Formula.forall
+          (BODYliftfc (liftTerm 0 (liftTerm 0 wF)) (.var 1) (.var 0)
+            (liftTerm 0 (liftTerm 0 t)))) := by
+  simp only [substFormula, substF_BODYliftfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
+    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, ROBINSON_PlusPlus.Meta.SubstArith.substTerm_liftLiftLift]
+
+theorem PHIl_spec2 (t wF wT : Term) :
+    substFormula 0 wT (Formula.forall
+        (BODYliftfc (liftTerm 0 (liftTerm 0 wF)) (.var 1) (.var 0) (liftTerm 0 (liftTerm 0 t))))
+      = Formula.forall (BODYliftfc (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) (liftTerm 0 t)) := by
+  simp only [substFormula, substF_BODYliftfc, substTerm, Nat.reduceAdd, Nat.reduceEqDiff,
+    Nat.reduceGT, Nat.reduceSub, reduceIte, if_true, FOL.substTerm_liftLift]
+
+theorem PHIl_spec3 (t wF wT c : Term) :
+    substFormula 0 c (BODYliftfc (liftTerm 0 wF) (liftTerm 0 wT) (.var 0) (liftTerm 0 t))
+      = BODYliftfc wF wT c t := by
+  simp only [substF_BODYliftfc, substTerm, FOL.substTerm_liftTerm, if_true]
+
+theorem PHIliftfc_use {Γ : List Formula} (t wF wT c : Term)
+    (h : PrfH Γ (substFormula 0 t PHIliftfc)) : PrfH Γ (BODYliftfc wF wT c t) := by
+  rw [PHIliftfc_at] at h
+  have h1 := PrfH_spec h wF
+  rw [PHIl_spec1] at h1
+  have h2 := PrfH_spec h1 wT
+  rw [PHIl_spec2] at h2
+  have h3 := PrfH_spec h2 c
+  rwa [PHIl_spec3] at h3
+
+/-! ### El `PSI` de la inducción fuerte, en la forma que se usa DENTRO del paso -/
+
+def PSIatL (X : Term) : Formula :=
+  Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 X)) PHIliftfc)
+
+theorem PSIatL_inst {Γ : List Formula} {X : Term} (h : PrfH Γ (PSIatL X)) (z : Term) :
+    PrfH Γ (Formula.impl (lt z X) (substFormula 0 z PHIliftfc)) := by
+  have hi := PrfH_spec h z
+  have e : substFormula 0 z (Formula.impl (lt (.var 0) (liftTerm 0 X)) PHIliftfc)
+      = Formula.impl (lt z X) (substFormula 0 z PHIliftfc) := by
+    simp only [substFormula, lt, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  rwa [e] at hi
+
+/-- **LA HIPÓTESIS DE INDUCCIÓN, ya instanciada**: si `z < X` y `z` tiene testigo de fórmula,
+    vale el objetivo en `z` **al nivel `c'` que se quiera** — que es lo que consume el caso
+    `forallc`/`exc`, donde el nivel sube a `σc`. -/
+theorem IHl_at {Γ : List Formula} {X : Term} (hpsi : PrfH Γ (PSIatL X)) (z : Term)
+    (hlt : PrfH Γ (lt z X)) (wF wT c' : Term)
+    (hguard : PrfH Γ (isFC1 wF wT z)) : PrfH Γ (targetLiftfc c' z) :=
+  PrfH.mp _ _ _ (PHIliftfc_use z wF wT c' (PrfH.mp _ _ _ (PSIatL_inst hpsi z) hlt)) hguard
+
+/-! ## §5 · LOS OCHO CASOS, con el enunciado EXACTO que el paso consume
+
+⭐ Compárense con los de `substfc`: **ninguno lleva `hasWit s`**, y `CasoUnL` pide la HI a
+nivel `σc` en vez de a `(σv, liftc 0 s)`. No hay `HasWitLift`. -/
+
+/-- tag 2 · `botc`. -/
+def CasoBotL : Prop := ∀ c X : Term, Prf (Formula.impl (clBot X) (targetLiftfc c X))
+
+/-- tag 3 · `atomc`. ⛔ Consume `pcc_eval_liftsc_at` (A5). No se descarga en este tramo. -/
+def CasoAtomL : Prop := ∀ wT c X : Term,
+  Prf (Formula.impl (land (wfAll1 wT) (clAtom wT X)) (targetLiftfc c X))
+
+/-- tag 4 · `eqc`. ⛔ Consume `pcc_eval_liftc_at` (A5) DOS veces. -/
+def CasoEqL : Prop := ∀ wT c X : Term,
+  Prf (Formula.impl (land (wfAll1 wT) (clEq wT X)) (targetLiftfc c X))
+
+/-- tags 5/7/8 · `implc`/`andc`/`orc`: el nivel NO cambia. -/
+def CasoBinL (k : Nat) : Prop := ∀ c X : Term,
+  Prf (Formula.impl
+    (land (shapeBin X k)
+      (land (targetLiftfc c (nthc X (numeralM 1))) (targetLiftfc c (nthc X (numeralM 2)))))
+    (targetLiftfc c X))
+
+/-- tags 6/9 · `forallc`/`exc`: ⚠️ el nivel **SUBE** en la hipótesis. -/
+def CasoUnL (k : Nat) : Prop := ∀ c X : Term,
+  Prf (Formula.impl
+    (land (shapeUn X k) (targetLiftfc (succ c) (nthc X (numeralM 1))))
+    (targetLiftfc c X))
+
+/-! ## §6 · EL PASO INDUCTIVO — las ocho ramas -/
+
+/-- Todo lo que la rama necesita del contexto, en UNA fórmula. Una conjunción menos que la de
+    `substfc`, porque no hay `hasWit s`. -/
+def CTXFliftfc (wF wT X : Term) : Formula :=
+  land (land (PSIatL X) (wfAll1 wT)) (wfAllF wF wT)
+
+section RamasL
+variable (wF wT c X : Term)
+
+theorem ramaL_bot (hbot : CasoBotL) :
+    Prf (Formula.impl (clBot X) (Formula.impl (CTXFliftfc wF wT X) (targetLiftfc c X))) := by
+  refine prf_deduction (deduction_aux ?_ (CTXFliftfc wF wT X) [clBot X] rfl)
+  exact PrfH.mp _ _ _ (prf_to_prfH (hbot c X) _)
+    (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
+
+theorem ramaL_atom (hatom : CasoAtomL) :
+    Prf (Formula.impl (clAtom wT X) (Formula.impl (CTXFliftfc wF wT X) (targetLiftfc c X))) := by
+  refine prf_deduction (deduction_aux ?_ (CTXFliftfc wF wT X) [clAtom wT X] rfl)
+  have hcl : PrfH [CTXFliftfc wF wT X, clAtom wT X] (clAtom wT X) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hctx : PrfH [CTXFliftfc wF wT X, clAtom wT X] (CTXFliftfc wF wT X) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hwT := PrfH_and_elim_right (PrfH_and_elim_left hctx)
+  exact PrfH.mp _ _ _ (prf_to_prfH (hatom wT c X) _) (PrfH_and_intro hwT hcl)
+
+theorem ramaL_eq (heq : CasoEqL) :
+    Prf (Formula.impl (clEq wT X) (Formula.impl (CTXFliftfc wF wT X) (targetLiftfc c X))) := by
+  refine prf_deduction (deduction_aux ?_ (CTXFliftfc wF wT X) [clEq wT X] rfl)
+  have hcl : PrfH [CTXFliftfc wF wT X, clEq wT X] (clEq wT X) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hctx : PrfH [CTXFliftfc wF wT X, clEq wT X] (CTXFliftfc wF wT X) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hwT := PrfH_and_elim_right (PrfH_and_elim_left hctx)
+  exact PrfH.mp _ _ _ (prf_to_prfH (heq wT c X) _) (PrfH_and_intro hwT hcl)
+
+theorem ramaL_bin (k : Nat) (hbin : CasoBinL k) :
+    Prf (Formula.impl (clBin wF X k)
+      (Formula.impl (CTXFliftfc wF wT X) (targetLiftfc c X))) := by
+  refine prf_deduction (deduction_aux ?_ (CTXFliftfc wF wT X) [clBin wF X k] rfl)
+  have hcl : PrfH [CTXFliftfc wF wT X, clBin wF X k] (clBin wF X k) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hctx : PrfH [CTXFliftfc wF wT X, clBin wF X k] (CTXFliftfc wF wT X) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hpsi := PrfH_and_elim_left (PrfH_and_elim_left hctx)
+  have hwT := PrfH_and_elim_right (PrfH_and_elim_left hctx)
+  have hwF := PrfH_and_elim_right hctx
+  have hshape := PrfH_and_elim_left hcl
+  have hin1 := PrfH_and_elim_left (PrfH_and_elim_right hcl)
+  have hin2 := PrfH_and_elim_right (PrfH_and_elim_right hcl)
+  have hlt1 : PrfH [CTXFliftfc wF wT X, clBin wF X k] (lt (nthc X (numeralM 1)) X) :=
+    PrfH.mp _ _ _ (prf_to_prfH
+      (ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.descenso_bin1 X k) _) hshape
+  have hlt2 : PrfH [CTXFliftfc wF wT X, clBin wF X k] (lt (nthc X (numeralM 2)) X) :=
+    PrfH.mp _ _ _ (prf_to_prfH
+      (ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.descenso_bin2 X k) _) hshape
+  have hIH1 : PrfH [CTXFliftfc wF wT X, clBin wF X k] (targetLiftfc c (nthc X (numeralM 1))) :=
+    IHl_at hpsi _ hlt1 wF wT c (PrfH_and_intro (PrfH_and_intro hwT hwF) hin1)
+  have hIH2 : PrfH [CTXFliftfc wF wT X, clBin wF X k] (targetLiftfc c (nthc X (numeralM 2))) :=
+    IHl_at hpsi _ hlt2 wF wT c (PrfH_and_intro (PrfH_and_intro hwT hwF) hin2)
+  exact PrfH.mp _ _ _ (prf_to_prfH (hbin c X) _)
+    (PrfH_and_intro hshape (PrfH_and_intro hIH1 hIH2))
+
+/-- ⚠️ **La rama donde el nivel SUBE.** La HI se instancia a `σc`, y eso es legal porque el
+    nivel va **cuantificado dentro de `Φ`** — exactamente la razón de §4. -/
+theorem ramaL_un (k : Nat) (hun : CasoUnL k) :
+    Prf (Formula.impl (clUn wF X k)
+      (Formula.impl (CTXFliftfc wF wT X) (targetLiftfc c X))) := by
+  refine prf_deduction (deduction_aux ?_ (CTXFliftfc wF wT X) [clUn wF X k] rfl)
+  have hcl : PrfH [CTXFliftfc wF wT X, clUn wF X k] (clUn wF X k) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hctx : PrfH [CTXFliftfc wF wT X, clUn wF X k] (CTXFliftfc wF wT X) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hpsi := PrfH_and_elim_left (PrfH_and_elim_left hctx)
+  have hwT := PrfH_and_elim_right (PrfH_and_elim_left hctx)
+  have hwF := PrfH_and_elim_right hctx
+  have hshape := PrfH_and_elim_left hcl
+  have hin1 := PrfH_and_elim_right hcl
+  have hlt1 : PrfH [CTXFliftfc wF wT X, clUn wF X k] (lt (nthc X (numeralM 1)) X) :=
+    PrfH.mp _ _ _ (prf_to_prfH
+      (ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.descenso_un X k) _) hshape
+  have hIH1 : PrfH [CTXFliftfc wF wT X, clUn wF X k]
+      (targetLiftfc (succ c) (nthc X (numeralM 1))) :=
+    IHl_at hpsi _ hlt1 wF wT (succ c) (PrfH_and_intro (PrfH_and_intro hwT hwF) hin1)
+  exact PrfH.mp _ _ _ (prf_to_prfH (hun c X) _) (PrfH_and_intro hshape hIH1)
+
+end RamasL
+
+/-- **LAS OCHO RAMAS, ENSAMBLADAS** por or-elim al nivel `Prf`. -/
+theorem clausesL_imp (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
+    (h5 : CasoBinL 5) (h7 : CasoBinL 7) (h8 : CasoBinL 8)
+    (h6 : CasoUnL 6) (h9 : CasoUnL 9) (wF wT c X : Term) :
+    Prf (Formula.impl (isFormCodeE2 wF wT X)
+      (Formula.impl (CTXFliftfc wF wT X) (targetLiftfc c X))) := by
+  simp only [isFormCodeE2, lorAll]
+  exact prf_or_elim_imp (ramaL_bot wF wT c X hbot)
+   (prf_or_elim_imp (ramaL_atom wF wT c X hatom)
+    (prf_or_elim_imp (ramaL_eq wF wT c X heq)
+     (prf_or_elim_imp (ramaL_bin wF wT c X 5 h5)
+      (prf_or_elim_imp (ramaL_un wF wT c X 6 h6)
+       (prf_or_elim_imp (ramaL_bin wF wT c X 7 h7)
+        (prf_or_elim_imp (ramaL_bin wF wT c X 8 h8)
+                         (ramaL_un wF wT c X 9 h9)))))))
+
+/-- ⛔ ADR‑019: `psi_lift_form3` es GENÉRICO en `Φ` y vive en `Meta/StrongInductionPrf.lean`.
+    Aquí sólo se pliega el resultado en la abreviatura local `PSIatL`. -/
+theorem psi_l3L : liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PHIliftfc)))
+    = PSIatL (.var 3) := by
+  rw [psi_lift_form3 PHIliftfc hPHIliftfc]
+  simp only [PSIatL, lt, liftFormula, liftTerm, liftTerms, Nat.reduceAdd, Nat.reduceLT,
+    reduceIte, hPHIliftfc]
+
+/-- **EL PASO DE LA INDUCCIÓN FUERTE.** -/
+theorem PHIliftfc_step (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
+    (h5 : CasoBinL 5) (h7 : CasoBinL 7) (h8 : CasoBinL 8)
+    (h6 : CasoUnL 6) (h9 : CasoUnL 9) :
+    Prf (Formula.forall (Formula.impl (PSI PHIliftfc) PHIliftfc)) := by
+  refine Prf.gen _ (prf_deduction ?_)
+  refine PrfH.gen [PSI PHIliftfc] (Formula.forall (Formula.forall PHIliftfcBody)) ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH.gen _ (Formula.forall PHIliftfcBody) ?_
+  simp only [List.map_cons, List.map_nil]
+  refine PrfH.gen _ PHIliftfcBody ?_
+  simp only [List.map_cons, List.map_nil, psi_l3L]
+  show PrfH [PSIatL (.var 3)] PHIliftfcBody
+  refine deduction_aux ?_ (isFC1 (.var 2) (.var 1) (.var 3)) [PSIatL (.var 3)] rfl
+  have hg : PrfH [isFC1 (.var 2) (.var 1) (.var 3), PSIatL (.var 3)]
+      (isFC1 (.var 2) (.var 1) (.var 3)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hpsi : PrfH [isFC1 (.var 2) (.var 1) (.var 3), PSIatL (.var 3)]
+      (PSIatL (.var 3)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hwT := PrfH_and_elim_left (PrfH_and_elim_left hg)
+  have hwF := PrfH_and_elim_right (PrfH_and_elim_left hg)
+  have hin := PrfH_and_elim_right hg
+  have hcode : PrfH [isFC1 (.var 2) (.var 1) (.var 3), PSIatL (.var 3)]
+      (isFormCodeE2 (.var 2) (.var 1) (.var 3)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH (prf_isFormCodeE2_of_In (.var 2) (.var 1) (.var 3)) _) hin) hwF
+  have hctx : PrfH [isFC1 (.var 2) (.var 1) (.var 3), PSIatL (.var 3)]
+      (CTXFliftfc (.var 2) (.var 1) (.var 3)) :=
+    PrfH_and_intro (PrfH_and_intro hpsi hwT) hwF
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _
+    (prf_to_prfH (clausesL_imp hbot hatom heq h5 h7 h8 h6 h9
+      (.var 2) (.var 1) (.var 0) (.var 3)) _) hcode) hctx
+
+/-! ## §7 · EL TEOREMA, MÓDULO LOS OCHO CASOS -/
+
+theorem PHIliftfc_all (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
+    (h5 : CasoBinL 5) (h7 : CasoBinL 7) (h8 : CasoBinL 8)
+    (h6 : CasoUnL 6) (h9 : CasoUnL 9) (t : Term) : Prf (substFormula 0 t PHIliftfc) :=
+  prf_strong_induction PHIliftfc hPHIliftfc (PHIliftfc_step hbot hatom heq h5 h7 h8 h6 h9) t
+
+theorem DESCENSO_liftfc_imp (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
+    (h5 : CasoBinL 5) (h7 : CasoBinL 7) (h8 : CasoBinL 8)
+    (h6 : CasoUnL 6) (h9 : CasoUnL 9) (wF wT c t : Term) :
+    Prf (Formula.impl (isFC1 wF wT t) (targetLiftfc c t)) :=
+  prfH_nil_to_prf
+    (PHIliftfc_use t wF wT c
+      (prf_to_prfH (PHIliftfc_all hbot hatom heq h5 h7 h8 h6 h9 t) [])) rfl
+
+/-- ⭐⭐ **EL CHASIS: `pcc_eval_liftfc` MÓDULO LOS OCHO CASOS.** Con esto,
+    `DEUDA_evalLiftfc_isFC1` —y por `deuda_of_isFC1` también `DEUDA_evalLiftfc`— quedan a
+    distancia de descargar los ocho `Caso*L`. -/
+theorem pcc_eval_liftfc_modulo_8
+    (hbot : CasoBotL) (hatom : CasoAtomL) (heq : CasoEqL)
+    (h5 : CasoBinL 5) (h7 : CasoBinL 7) (h8 : CasoBinL 8)
+    (h6 : CasoUnL 6) (h9 : CasoUnL 9) : DEUDA_evalLiftfc_isFC1 :=
+  fun wF wT c X => DESCENSO_liftfc_imp hbot hatom heq h5 h7 h8 h6 h9 wF wT c X
+
+
 end ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -392,9 +692,29 @@ export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
   liftTerm_evalLiftfcCode substTerm_evalLiftfcCode
   liftF_targetLiftfc substF_targetLiftfc
   DEUDA_evalLiftfc DEUDA_evalLiftfc_isFC1 deuda_of_isFC1
+  -- §1bis · la fontanería de `liftfcT` y los seis puentes `rfl` con el KIT
+  prf_hasWit_liftfcT prf_congr_liftfcT prf_substtc_liftfcT substtc_inv_liftfcT
+  botcT_termCode implcT_termCode forallcT_termCode andcT_termCode orcT_termCode excT_termCode
+  -- §3 · las SEIS ecuaciones dotadas (faltan `atom` y `eq`, que consumen A5)
+  LIFTFC_BOT_BODY LIFTFC_BOT_BODY_ok pcc_liftfc_bottom_code
+  LIFTFC_BIN_BODY LIFTFC_IMPL_BODY_ok LIFTFC_AND_BODY_ok LIFTFC_OR_BODY_ok
+  pcc_liftfc_bin_code pcc_liftfc_impl_code pcc_liftfc_and_code pcc_liftfc_or_code
+  LIFTFC_UN_BODY LIFTFC_FORALL_BODY_ok LIFTFC_EX_BODY_ok
+  pcc_liftfc_un_code pcc_liftfc_forall_code pcc_liftfc_ex_code
+  -- §4‑§7 · EL CHASIS. ⚠️ `PHIliftfc*`, `PSIatL`, `CTXFliftfc` y las `ramaL_*` se quedan
+  --    CUALIFICADOS por la misma razón que sus gemelos de `EvalSubstfcPrf`/`EvalLiftcPrf`:
+  --    son el tercer descenso del árbol con esos mismos nombres.
+  CasoBotL CasoAtomL CasoEqL CasoBinL CasoUnL
+  DESCENSO_liftfc_imp pcc_eval_liftfc_modulo_8
 )
 
 /-! ## FOOTPRINT -/
 
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.liftfcT_termCode
 #print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.deuda_of_isFC1
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_bottom_code
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_impl_code
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_forall_code
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_ex_code
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.PHIliftfc_step
+#print axioms ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_modulo_8
