@@ -68,6 +68,10 @@ open ROBINSON_PlusPlus.Meta.D3DottedPrf ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 open ROBINSON_PlusPlus.Meta.EvalBoundedPrf ROBINSON_PlusPlus.Meta.EvalListPrf
 open ROBINSON_PlusPlus.Meta.TrackedAtomsPrf ROBINSON_PlusPlus.Meta.EvalArithPrf
+open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf ROBINSON_PlusPlus.Meta.EvalNthcPrf
+open ROBINSON_PlusPlus.Meta.Delta0ReflectPrf ROBINSON_PlusPlus.Meta.NatOrderPrf
+open ROBINSON_PlusPlus.Meta.Sigma1AtomPrf ROBINSON_PlusPlus.Meta.CantorMonoPrf
+open ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 set_option linter.unusedSimpArgs false
 
@@ -277,6 +281,125 @@ theorem d3_prf_of (φ : Formula) (Phic : Term)
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of Phic hPinv hwP hmatch hbdAll)
 
+
+/-! ## §5 · EL `∃` ACOTADO CON COTA ARBITRARIA — la pieza de `boundedPremsIn` (2026‑09‑09f)
+
+`boundedPremsIn c p i L = ∀j < lenc L. (In (nthc L j) c ∨ boundedCarcLt (nthc L j) p i)`, y el
+disyunto de la derecha es un `∃` **acotado por `i`**, no por `lenc p`. `D3InDotPrf` ya refleja el
+caso `boundedCarcIn` (cota `lenc p`); esto lo generaliza.
+
+⭐⭐ **Y la generalización sale MÁS BARATA que el caso especial** — la lección de A5 otra vez, pero
+al revés de lo intuitivo. Los dos pasos caros del molde desaparecen:
+
+| paso | en `pcc_bddCarcDot_reflect` (cota `lenc p`) | aquí (cota `b` abstracta) |
+|---|---|---|
+| COTA | `pcc_eval_lenc` + simetría interna + Leibniz (≈15 l.) | `pcc_lt_tracked` **directo** |
+| CUERPO | cruza la frontera D1 (`prf_tc_form_numeral` + `pcc_to_formCode_imp`, ≈30 l.) | congruencia objeto |
+
+La razón: la cota deja de ser un accesor que hay que **evaluar**, y el lado derecho deja de ser
+`⌜φ⌝` de una fórmula META para ser `ẏ` de un término **abstracto**. Medido antes de escribir.
+
+⚠️ **Lo que sí aparece, y es real**: `pcc_eval_carc_nthc` pide `k < lenc p`, y el testigo del `∃`
+sólo da `k < b`. Hace falta `b ≤ lenc p`, que entra como antecedente `lt b (lenc p)` — y es
+exactamente lo que el `hbody` exterior tiene a mano (`i < lenc p`). -/
+
+/-- El CUERPO dotado del `∃` acotado, con `y` y `p` abstractos (bajo el binder ⇒ `liftc 0`). -/
+noncomputable def bdCarcLtPhic (y p : Term) : Term :=
+  eqCodeFn (carcT (nthcT (liftc zero (tcFn p)) (varc (numeral 0)))) (liftc zero (tcFn y))
+
+/-- El código dotado de `boundedCarcLt y p b`, con TODO abstracto. -/
+noncomputable def bdCarcLtDot (y p b : Term) : Term :=
+  bdExCode (liftc zero (tcFn b)) (bdCarcLtPhic y p)
+
+theorem liftTerm_bdCarcLtPhic (c : Nat) (y p : Term) :
+    liftTerm c (bdCarcLtPhic y p) = bdCarcLtPhic (liftTerm c y) (liftTerm c p) := by
+  simp only [bdCarcLtPhic, eqCodeFn, carcT, nthcT, liftc, varc, numeral, funcc, cons, nil, zero,
+    succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral]
+
+theorem liftTerm_bdCarcLtDot (c : Nat) (y p b : Term) :
+    liftTerm c (bdCarcLtDot y p b) = bdCarcLtDot (liftTerm c y) (liftTerm c p) (liftTerm c b) := by
+  simp only [bdCarcLtDot, bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral,
+    funcc, cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral,
+    liftTerm_bdCarcLtPhic]
+
+theorem substtc_inv_bdCarcLtB (b : Term) :
+    ∀ W, Prf (substtc zero W (liftc zero (tcFn b)) =eq liftc zero (tcFn b)) :=
+  substtc_inv_liftc_tcFn b
+
+/-- ⭐⭐ **LA REFLEXIÓN DEL `∃` ACOTADO, CON COTA ARBITRARIA.** -/
+theorem pcc_bdCarcLt_reflect (y p b : Term) :
+    Prf (chainOk nil p ⇒ (lt b (lenc p) ⇒
+      (boundedCarcLt y p b ⇒ provFromCode (bdCarcLtDot y p b)))) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_ (boundedCarcLt y p b)
+    [lt b (lenc p), chainOk nil p] rfl) (lt b (lenc p)) [chainOk nil p] rfl)
+  have hex : PrfH [boundedCarcLt y p b, lt b (lenc p), chainOk nil p]
+      (boundedCarcLt y p b) := PrfH.hyp _ _ (List.Mem.head _)
+  refine PrfH_ex_elim hex ?_
+  rw [liftFormula_provFromCode_open, liftTerm_bdCarcLtDot]
+  let exBody : Formula := land (lt (.var 0) (liftTerm 0 b))
+    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
+  let Γ' : List Formula :=
+    [exBody, liftFormula 0 (boundedCarcLt y p b), liftFormula 0 (lt b (lenc p)),
+     liftFormula 0 (chainOk nil p)]
+  show PrfH Γ' (provFromCode (bdCarcLtDot (liftTerm 0 y) (liftTerm 0 p) (liftTerm 0 b)))
+  have hC : PrfH Γ' exBody := PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH Γ' (lt (.var 0) (liftTerm 0 b)) := PrfH_and_elim_left hC
+  have hbody : PrfH Γ'
+      (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)) :=
+    PrfH_and_elim_right hC
+  have hble : PrfH Γ' (lt (liftTerm 0 b) (lenc (liftTerm 0 p))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hchain : PrfH Γ' (chainOk nil (liftTerm 0 p)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+  -- el testigo cae bajo `lenc p` por transitividad: es lo que `pcc_eval_carc_nthc` pide
+  have hk : PrfH Γ' (lt (.var 0) (lenc (liftTerm 0 p))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_trans _ _ _) _) hlt) hble
+  -- COTA: directa, sin evaluación (aquí está el ahorro)
+  have hlt1 : PrfH Γ' (provFromCode (ltCodeFn (tcFn (.var 0)) (tcFn (liftTerm 0 b)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked (.var 0) (liftTerm 0 b)) _) hlt
+  have hltB : PrfH Γ' (provFromCode
+      (ltCodeFn (tcFn (.var 0)) (liftc zero (tcFn (liftTerm 0 b))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_atom2CodeFn (prf_refl _)
+      (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 b))))) _) hlt1
+  -- CUERPO: evaluación + congruencia OBJETO, sin cruzar la frontera D1
+  have hev : PrfH Γ' (provFromCode (eqCodeFn
+      (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
+      (tcFn (carc (nthc (liftTerm 0 p) (.var 0)))))) :=
+    PrfH.mp _ _ _
+      (PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_carc_nthc (liftTerm 0 p) (.var 0)) _) hchain) hk
+  have hcodeq : PrfH Γ' (eqCodeFn (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
+        (tcFn (carc (nthc (liftTerm 0 p) (.var 0))))
+      =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+        (liftc zero (tcFn (liftTerm 0 y)))) :=
+    PrfH_congr_eqCodeFn
+      (prf_to_prfH (prf_congr_carcT (prf_congr_nthcT
+        (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 p))) (prf_refl _))) _)
+      (PrfH_eq_trans (PrfH_congr_tcFn hbody)
+        (prf_to_prfH (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 y))) _))
+  have hphi : PrfH Γ' (provFromCode (eqCodeFn
+      (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+      (liftc zero (tcFn (liftTerm 0 y))))) :=
+    PrfH_provCode_congr hcodeq hev
+  -- el hueco `⌜v₀⌝` del cuerpo recibe el testigo `ı̇`
+  have hcompPhi : Prf (substfc zero (tcFn (.var 0))
+      (bdCarcLtPhic (liftTerm 0 y) (liftTerm 0 p))
+      =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
+        (liftc zero (tcFn (liftTerm 0 y)))) := by
+    unfold bdCarcLtPhic
+    refine prf_eq_trans (prf_substfc_eq zero (tcFn (.var 0)) _ _) ?_
+    refine prf_congr_eqCodeFn ?_ (substtc_inv_liftc_tcFn (liftTerm 0 y) (tcFn (.var 0)))
+    refine prf_eq_trans (prf_substtc_carcT zero (tcFn (.var 0)) _) ?_
+    refine prf_congr_carcT ?_
+    exact prf_eq_trans (prf_substtc_nthcT zero (tcFn (.var 0)) _ _)
+      (prf_congr_nthcT (substtc_inv_liftc_tcFn (liftTerm 0 p) (tcFn (.var 0)))
+        (prf_substtc_varc0 (tcFn (.var 0))))
+  have hphi' : PrfH Γ' (provFromCode (substfc zero (tcFn (.var 0))
+      (bdCarcLtPhic (liftTerm 0 y) (liftTerm 0 p)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hcompPhi)) _) hphi
+  exact PrfH_bdEx_intro_open _ _ (tcFn (.var 0))
+    (substtc_inv_bdCarcLtB (liftTerm 0 b)) hltB hphi'
+    (by hw_auto) (by hw_auto) (by hw_auto)
+
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -289,6 +412,8 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   hC_dot_of_chainOkBDot DEUDA_chainOkBDot d3_prf_of_chainOkBDot
   chainOkBDot_eq_substCodeF chainOkBDot_computed
   chainOkB_bnd_liftc PrfH_chainOkB_bnd_bridge DEUDA_chainOkBDot_of d3_prf_of
+  bdCarcLtPhic bdCarcLtDot liftTerm_bdCarcLtPhic liftTerm_bdCarcLtDot
+  substtc_inv_bdCarcLtB pcc_bdCarcLt_reflect
 )
 
 /-! ## FOOTPRINT -/
@@ -299,3 +424,4 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.PrfH_chainOkB_bnd_bridge
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of
 #print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of
+#print axioms ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_bdCarcLt_reflect
