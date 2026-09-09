@@ -13,7 +13,7 @@
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
 (`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
-**Last updated:** 2026-09-10 (§3.58 · `hwP` probado ⇒ D3 a UNA obligación) · Lean v4.31.0.
+**Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
@@ -4871,13 +4871,14 @@ y se parte —por `chainOkBPsi_split` (§3.55.5), que conecta los dos `PsiF` **p
 | mitad | estado | ¿depende de C3? |
 |---|---|---|
 | **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`) | ✅ **sí** — faltan `ind` (18) y `listInd` (20) |
-| **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta **ensamblar** | ❌ no |
+| **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado (§3.55.3), falta **ensamblar** | ⛔ **ver §3.59.2** |
 
-⇒ **(a) es lo único de D3 que sigue aguas abajo de C3**, y su desbloqueo es
-`prf_hasWitF_liftfc`. **(b) no depende de C3 en absoluto**: `pcc_bdCarcLt_reflect` y
-`pcc_premsBody_reflect` se dejaron sobre argumentos **abstractos** exactamente para que se
-instancien con las capas de `liftc`/`substCodeT` que el exterior imponga (§3.55.3), y ahora el
-exterior está **fijado** (`chainOkBPsiDot`).
+⚠️⚠️ **CORREGIDO EN §3.59.2 (2026‑09‑10).** Aquí se dijo que **(b) no depende de C3 en absoluto**.
+**Es falso**: el destino de (b) lleva el símbolo `premsOf` **dotado** en la cota, y `premsOf` está
+definido por **21 axiomas, uno por TAG** — no es evaluable sin saber el tag, que es justamente el
+análisis de casos de (a). Las dos mitades **no son independientes**, y el orden correcto es **(a)
+primero**. `pcc_bdCarcLt_reflect` y `pcc_premsBody_reflect` siguen siendo correctos y necesarios;
+lo que no valía era la estimación de que bastaban.
 
 ### §3.58.4 · 📐 El balance del frente, de §3.55 a §3.58
 
@@ -4893,3 +4894,114 @@ cuatro tramos ha pasado a **una** obligación, y las paradas intermedias dicen p
 
 ⚠️ **El paso de §3.56 subió el contador y fue el más importante de los cuatro.** El número de
 obligaciones abiertas no mide el progreso: medía una cadena que no cerraba.
+
+
+---
+
+## §3.59 · D3 · la COMPOSICIÓN de dos `substfc`, `hbody` partido — y ⛔ una CORRECCIÓN de §3.58.3 (2026‑09‑10)
+
+> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §6,
+> `Meta/BdAllIntroPrf.lean`, `Meta/D3ChainDotPrf.lean` §13.
+> `substfc_chainOkBPsiDot` con **sólo los tres axiomas de Lean**.
+
+### §3.59.1 · La pieza: el DOS HUECOS
+
+`pcc_bdAll_intro` entrega su `hbody` sobre `substfc 0̄ (tcFn i) (PsiF q)`, y el `PsiF` **dotado**
+de [ADR‑021](../DECISIONS.md) es él mismo un `substfc` sobre un `formCode` cerrado. Componerlos es
+el paso obligado antes de poder mirar el cuerpo — y el resultado **no es otro `substCodeF`**:
+tiene **DOS** huecos rellenos, la variable `v+1` por `W` y la `v` por `u`. Eso pide función meta
+propia.
+
+| pieza | módulo |
+|---|---|
+| `substCodeT2` / `substCodeTs2` + `substtc_comp_substCodeT` / `substtsc_comp_substCodeTs` | `SubstCodeOpenPrf` §6 |
+| `substCodeF2` + `substfc_comp_substCodeF` | `BdAllIntroPrf` |
+
+⚠️ Los índices, por cuarta vez: bajo un binder `substCodeF` sube a `v+2` con `liftc 0 W` y
+`substfc` sube a `v+1` con `liftc 0 u`; la función meta replica **las dos** subidas a la vez. Y la
+rama `n > v+1` **decrementa dos veces** (cada `subst` baja uno).
+
+⇒ Con ella, `hbody` se abre y **se parte por `rfl`** en las dos mitades de `lineOkB`:
+`hbody_of_halves` y `d3_prf_of_halves`. Las tres hipótesis ya estaban.
+
+### §3.59.2 · ⛔⛔ LA CORRECCIÓN: la mitad (b) **sí** depende del análisis por tags
+
+§3.58.3 y §12.1 del módulo afirmaron que `hbody`(b) «no depende de C3» y era «ensamblaje, no
+maquinaria nueva». **Medido: es FALSO.**
+
+Desplegado capa a capa por `rfl`, el destino de (b) es un `bdAllCode` cuya **cota** lleva el
+símbolo `premsOf` **DOTADO**:
+
+    lencT (premsOfT (nthcT (liftc 0 W) (varc 1̄)))
+
+y `pcc_bdAll_intro` entrega la cota como **reflexión pura**, así que hay que cruzar —dentro de
+`Prov`— la cadena
+
+| eslabón | estado |
+|---|---|
+| `nthcT q̇ i̇ ↦ (nthc q i)˙` | ✅ `pcc_eval_nthc` |
+| **`premsOfT Ẋ ↦ (premsOf X)˙`** | ⛔ **no existe, y no puede existir uniformemente** |
+| `lencT L̇ ↦ (lenc L)˙` | ✅ `pcc_eval_lenc` |
+
+⛔ **Por qué el eslabón de en medio no existe.** `premsOf` **no está definido por recursión**, como
+`lenc` o `nthc`, sino por **21 axiomas `ax_premsOf_*`, uno por TAG de regla**, y cada uno hace
+*pattern‑matching sobre la FORMA de la línea*:
+
+    ax_premsOf_mp  : premsOf (cons c (cons 16̄ (cons a nil))) ≐ cons (implc a c) (cons a nil)
+    ax_premsOf_gen : premsOf (cons c (cons 17̄ (cons b nil))) ≐ cons b nil
+
+⇒ Para un `X` **abstracto**, `premsOf X` está **sin restringir**: no hay nada que evaluar. Sólo se
+puede evaluar **tras saber el tag**, y saber el tag es exactamente el análisis de casos de
+`lineWF` — o sea, la mitad **(a)**.
+
+🔑 **Las dos mitades no son independientes: (b) consume el análisis por tags de (a).** Son hermanas
+del mismo tamaño (**21** tags frente a **23** esquemas `ax_lineWF_*`), no una barata y otra cara.
+⇒ **El orden correcto es (a) primero.**
+
+### §3.59.3 · ⚠️ La lección, y es sobre el método, no sobre el árbol
+
+En §3.58.3 estimé el coste de (b) **por su enunciado** —«el núcleo ya está probado sobre
+argumentos abstractos, sólo falta instanciar»— **sin haber desplegado el destino**. Es exactamente
+el error que §3.44 y el 2º corolario de *medir la forma* vienen a evitar, y el mismo que ADR‑021
+documenta un nivel más arriba:
+
+> **Que las piezas estén enunciadas sobre argumentos abstractos no garantiza que el destino se
+> deje instanciar con ellas.**
+
+`pcc_bdCarcLt_reflect` y `pcc_premsBody_reflect` (§3.55.3) siguen siendo correctos y seguirán
+haciendo falta. Lo que no valía era la **estimación** de que bastaban.
+
+---
+
+## §3.60 · `liftfc` · la OTRA deuda —la clausura del TESTIGO—, enunciada y **medida** (2026‑09‑10)
+
+> `Meta/EvalLiftfcPrf.lean` §12. Cero `axiom`: la deuda se **enuncia**, no se postula.
+
+`prf_hasWitF_liftfc` es lo único que separa a C3 de `ind` (18) y `listInd` (20) y, con ellos, a
+`hbody`(a) de D3 (§3.54.1). Medido el 2026‑09‑10: **no hay atajo.**
+
+| lo que existe | qué es |
+|---|---|
+| `prf_hasWit_liftc` (`SubstfcWitnessPrf:1936`) | sorte **TÉRMINO** y **sólo a nivel `zero`** |
+| `prf_hasWit_liftcT` / `liftscT` (`LiftcCodePrf`) | sobre el **constructor dotado** `liftcT`, no sobre `liftfc` |
+| `pcc_eval_liftfc` (§3.53) | la **evaluación** dentro de `Prov` — no da el testigo |
+
+⛔ **Ni la mitad TÉRMINO a nivel arbitrario existe.** Y el molde, `prf_hasWitF_substfc`, es la
+culminación de la inducción `PHIF` —§16 a §22 de un módulo de **2 088 líneas**—, conjuntiva sobre
+los dos sortes, con la **fusión de testigos** (§10, §19) y las **ocho inyecciones** (§21). El
+análogo de `liftfc` sale **un binder más barato** —no hay sustituyendo, igual que `pcc_eval_liftfc`
+frente a `pcc_eval_substfc`— pero **es un frente, no un tramo**.
+
+### §3.60.1 · 📐 La guarda, y una trampa medida al escribirla
+
+`DEUDA_hasWitF_liftfc` se enuncia con **sólo `hasWitF X`**, copiando la forma de
+`pcc_eval_liftfc`, que evalúa con `v` **abstracto y sin guarda**.
+
+⚠️ La tentación es copiar el molde `prf_hasWitF_substfc` y añadir `hasWit v`. **Sería un error**:
+`hasWit` es el predicado de testigo de un **CÓDIGO**, y el nivel de un `liftfc` es un **NUMERAL**,
+no un código. La guarda no sólo sobraría: **haría la deuda inconsumible**, porque el consumidor no
+tendría con qué descargarla. Se intentó, no compiló, y queda escrito en el docstring.
+
+🔑 **Regla**: al enunciar una deuda, la guarda se copia del **consumidor**, no del molde. Una deuda
+demasiado guardada es tan inútil como una demasiado fuerte — y falla más tarde, cuando ya se ha
+invertido en probarla.

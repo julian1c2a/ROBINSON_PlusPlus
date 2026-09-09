@@ -1,6 +1,6 @@
 # Current Project Status — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-10 · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE** · ✅ **CI VERDE**
+> ## ESTADO REAL — 2026-09-10c · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE** · ✅ **CI VERDE**
 >
 > 🏁🏁🏁 **D3 ESTÁ EN UNA SOLA OBLIGACIÓN: `hbody`** (§3.58). `d3_prf_of_body_only` la cierra desde
 > ahí, y **todo lo demás está probado** —el puente átomo↔forma acotada, la cota, el `∃` acotado, el
@@ -9,13 +9,22 @@
 >
 > `hbody` se parte —por `chainOkBPsi_split`, que conecta los dos `PsiF` **por construcción**— en:
 >
-> | mitad | estado | ¿depende de C3? |
-> |---|---|---|
-> | **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`) | ✅ **sí** — `ind` (18), `listInd` (20) |
-> | **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado, falta **ensamblar** | ❌ **no** |
+> `hbody` está **partido por `rfl`** en sus dos mitades (§3.59), con la **composición de los dos
+> `substfc`** — el `PsiF` dotado es él mismo un `substfc`, y el resultado tiene **DOS huecos**.
 >
-> ⭐ **Dos rutas, y la elección está medida**: **(b) primero** para avanzar sin tocar C3 —es
-> ensamblaje, no maquinaria nueva—, o **`prf_hasWitF_liftfc`** para cerrar C3 y (a) de una vez.
+> | mitad | estado | depende de |
+> |---|---|---|
+> | **(a)** reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores (`modulo_2`) | **`prf_hasWitF_liftfc`** (`ind` 18, `listInd` 20) |
+> | **(b)** reflexión de `boundedPremsIn` | ⬜ núcleo probado, falta ensamblar | ⛔ **el análisis por tags de (a)** |
+>
+> ⛔⛔ **CORREGIDO (§3.59.2)**: aquí se dijo que (b) «no depende de C3» y era «ensamblaje». **Es
+> falso.** Su cota lleva `premsOf` **dotado**, y `premsOf` no está definido por recursión sino por
+> **21 axiomas, uno por TAG**, con pattern-matching sobre la forma de la línea ⇒ para un argumento
+> abstracto **no hay nada que evaluar**. ⇒ **el orden correcto es (a) primero**.
+>
+> ⛔ Y **`prf_hasWitF_liftfc` es un FRENTE**, medido (§3.60): no existe ni la mitad TÉRMINO a nivel
+> arbitrario, y el molde es una inducción de **2 088 líneas**. La deuda está **enunciada**
+> (`DEUDA_hasWitF_liftfc`), con su guarda medida — sólo `hasWitF X`, el nivel **libre**.
 >
 > ### Cómo se llegó, en cuatro tramos (§3.55–§3.58)
 >
@@ -190,7 +199,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-09-10c — **D3 EN UNA SOLA OBLIGACIÓN** (§3.58, `hwP` probado); antes **§3.57** (`hPsiId`) y **§3.56** (el `PsiF` del chasis) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
+**Last updated:** 2026-09-10d — **`hbody` PARTIDO** (§3.59) y ⛔ corregida la dependencia de (b); la deuda del testigo de `liftfc`, enunciada y medida (§3.60). Antes: **D3 EN UNA SOLA OBLIGACIÓN** (§3.58, `hwP` probado); antes **§3.57** (`hPsiId`) y **§3.56** (el `PsiF` del chasis) y la reparación del instrumental (§27.1). Antes: **B3 en curso**: `SubstfcPlanos` cerrado (2 descensos + `SubstfcCodePrf`, 4 muertas retiradas) y la escalera `psi` subida, que cazó un duplicado invisible a todo censo (§3.35)
 **Author**: Julián Calderón Almendros
 
 ---
