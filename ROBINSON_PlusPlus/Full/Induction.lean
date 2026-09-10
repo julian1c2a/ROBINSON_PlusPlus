@@ -302,11 +302,28 @@ theorem add_assoc_ax (a b : Term) :
       exact FOL.derive_eq_trans (eq_congr_add_left hb5) ha5
     exact FOL.derive_eq_trans hL (eq_symm hR)
 
--- NOTA: el empaquetado `⊢ ax7_add_assoc` (∀³) vía `gen` triple topa con el
--- ajuste de niveles `liftTerm` de los parámetros (a/b acumulan lifts distintos
--- a `liftTerm 0`). Pendiente: helper de empaquetado n-ario. `add_assoc_ax` ya
--- es la derivación sustantiva de ax7. (Para ∀² —ax6, ax10— el empaquetado sí
--- sale directo, ver `add_comm_thm`.)
+/-! ⭐ **La NOTA que había aquí era FALSA, y se retira (2026‑09‑10h).**
+
+Decía que el empaquetado `∀³` «topa con el ajuste de niveles `liftTerm`» y que hacía falta un
+«helper de empaquetado n‑ario». **No hace falta ninguno.** Tras los dos `gen`, el hueco del
+parámetro exterior queda como `substTerm (0+1) ṡ (liftTerm 0 (liftTerm 0 a))`, y eso **ya tenía
+lema** desde siempre — `FOL.substTerm_liftLift` (`FOL/Theorems/Eq.lean`), que devuelve
+exactamente `liftTerm 0 a`, que es lo que `add_assoc_ax a b` produce. Todo el «ajuste de niveles»
+era **un lema ausente del `simp set`**, no un obstáculo estructural.
+
+⚠️ **Y el camino tuvo una trampa que merece quedar escrita**: el primer intento metió en el
+`simp set` un lema *propio* `substTerm (c+1) s (liftTerm 0 (liftTerm 0 t)) = liftTerm 0 (liftTerm 0 t)`
+dejado en `sorry` «para medir». Los tres empaquetados **compilaron** con él — y el lema es
+**FALSO** (la sustitución en `c+1` sí baja un nivel: el verdadero da `liftTerm 0 t`). Un `sorry`
+en el `simp set` no mide: **fabrica** el verde. Cf. AI‑GUIDE §27.1. -/
+
+/-- **`ax7` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b ∀c, (a+b)+c = a+(b+c)`. -/
+theorem add_assoc_thm : axioms ⊢ ax7_add_assoc := by
+  apply gen; intro a
+  apply gen; intro b
+  have h := add_assoc_ax a b
+  simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftLift] at h ⊢
+  exact h
 
 /-! ### `zero_mul` (sin parámetro) — base de la cadena de `mul` -/
 
@@ -448,6 +465,15 @@ private theorem mul_distrib3 (x y z : Term) :
   have hh := spec (mul_distrib_ax x y) z
   simp [substFormula, substTerm, substTerms, mul, add, FOL.substTerm_liftTerm] at hh; exact hh
 
+/-- **`ax12` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b ∀c, a·(b+c) = a·b + a·c`.
+    Mismo empaquetado que `add_assoc_thm` (2026‑09‑10h). -/
+theorem mul_distrib_thm : axioms ⊢ ax12_mul_distrib := by
+  apply gen; intro a
+  apply gen; intro b
+  have h := mul_distrib_ax a b
+  simp [substFormula, substTerm, substTerms, mul, add, FOL.substTerm_liftLift] at h ⊢
+  exact h
+
 /-! ### `mul_assoc` (= `ax11`) — `∀c, (a·b)·c = a·(b·c)` (2 parámetros) -/
 
 theorem mul_assoc_ax (a b : Term) :
@@ -469,6 +495,15 @@ theorem mul_assoc_ax (a b : Term) :
     have hR : axioms ⊢ (mul a (mul b (succ n)) =eq add (mul a (mul b n)) (mul a b)) :=
       FOL.derive_eq_trans (eq_congr_mul_left (u := a) (mul_succ2 b n)) (mul_distrib3 a (mul b n) b)
     exact FOL.derive_eq_trans hL (eq_symm hR)
+
+/-- **`ax11` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b ∀c, (a·b)·c = a·(b·c)`.
+    Mismo empaquetado que `add_assoc_thm` (2026‑09‑10h). -/
+theorem mul_assoc_thm : axioms ⊢ ax11_mul_assoc := by
+  apply gen; intro a
+  apply gen; intro b
+  have h := mul_assoc_ax a b
+  simp [substFormula, substTerm, substTerms, mul, FOL.substTerm_liftLift] at h ⊢
+  exact h
 
 /-! ### `lt_irrefl` (= `ax18`) — primer axioma NO ecuacional, vía `step_reduce` general -/
 
