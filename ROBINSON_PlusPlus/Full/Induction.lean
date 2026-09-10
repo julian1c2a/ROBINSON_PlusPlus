@@ -49,30 +49,36 @@ El censo de `coreAxioms` (`doc/REFERENCE-Full.md` §3.14.1) lo parte en **23 pri
 `FOL/FOL.lean`, no un lema por probar. ⇒ de `primAxioms ⊢ f` se recupera `axioms ⊢ f` en una línea
 (`prim_to_axioms`), y **ninguna firma aguas abajo cambia**. -/
 
-/-- Los **23** axiomas **PRIMITIVOS / DEFINITORIOS** de `coreAxioms`: los que **fijan el
+/-- Los **24** axiomas **PRIMITIVOS / DEFINITORIOS** de `coreAxioms`: los que **fijan el
     significado de un símbolo** (Peano, las ecuaciones de `+`, `·`, `<`, `√`, `mod2`/`div2`,
     `pred`, listas, `^`, `prod_pairs` y la resta truncada). Ningún esquema de inducción los deriva
     — sin ellos el símbolo no significa nada.
 
-    Los **11 restantes** de `coreAxioms` (ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax21, ax24,
-    ax_C3, ax_L3) **deben** ser teoremas en `Full`, y lo son. -/
+    Los **10 restantes** de `coreAxioms` (ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax24, ax_C3,
+    ax_L3) **deben** ser teoremas en `Full`, y lo son. -/
 def primAxioms : List Formula :=
   [ ax2_peano_succ_neq_zero, ax3_peano_succ_inj,
     ax4_add_zero, ax5_add_succ, ax8_mul_zero, ax9_mul_succ,
     ax13_lt_def, ax14_sqrt_le, ax15_lt_succ_sqrt,
-    ax16_mod2_succ, ax17_div_mod_eq, ax25_pred_zero, ax26_pred_succ,
+    ax16_mod2_succ, ax17_div_mod_eq, ax21_mod2_range, ax25_pred_zero, ax26_pred_succ,
     ax_L0_cons_def, ax_L1_in_nil, ax_L2_in_cons,
     ax_C1_concat_nil, ax_C2_concat_cons, ax29_sub_witness,
     ax_pow_zero, ax_pow_succ, ax_prodp_nil, ax_prodp_cons ]
 
-/-- El censo, comprobado por el kernel: **23 + 11 = 34 = `coreAxioms`**. -/
-theorem primAxioms_len : primAxioms.length = 23 := rfl
+/-- El censo, comprobado por el kernel: **24 + 10 = 34 = `coreAxioms`**.
+
+    ⚠️ **Eran 23 + 11 hasta el 2026‑09‑10h**, y la corrección la forzó una medición: `ax21` (el rango
+    de `mod2`) **no es derivable de los primitivos**. Su «derivación» en `Full/Mod2.lean` usaba
+    `ax_mod2_alternation`, y **ése** se deriva de `ax21` ⇒ era **circular en contenido**. `ax21`
+    **caracteriza `mod2`** junto a `ax16`/`ax17` (sin él, `ax16 + ax17` admiten `mod2 2̄ = 2̄`), luego
+    es **primitivo**; el teorema es la alternancia. Ver [ADR‑023](../../DECISIONS.md). -/
+theorem primAxioms_len : primAxioms.length = 24 := rfl
 
 /-- Y son **de verdad** axiomas de la teoría. -/
 theorem primAxioms_subset : ∀ f ∈ primAxioms, f ∈ axioms := by
   intro f hf
   simp only [primAxioms, List.mem_cons, List.not_mem_nil, or_false] at hf
-  rcases hf with h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h <;>
+  rcases hf with h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h <;>
     subst h <;> simp [axioms]
 
 /-- ⭐ **El puente, en una línea**: `Derives.weakening` es constructor. ⇒ certificar sobre

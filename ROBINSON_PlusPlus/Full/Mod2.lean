@@ -74,16 +74,70 @@ theorem mod2_zero_aux : axioms ⊢ (mod2 zero ≐ zero) := by
 
 /-! ### Axioma de Full: alternancia explícita de `mod2` -/
 
-/-- **Axioma de Full** (Opción C.2): `∀n, mod2(σn) + mod2(n) = 1`.
+/-! ### 🏁 La alternancia, **DEMOSTRADA** (2026‑09‑10h) — `6 → 5` axiomas de Lean
 
-    Caracteriza completamente la recursión de `mod2` (Minimal sólo daba
-    `ax16` que es media biconditional). De este sale `ax21` por inducción.
+Aquí había un **`axiom ax_mod2_alternation`**, y su propio docstring ya decía que *«en `Minimal` con
+`ax21` es derivable como teorema»*. Lo era: **se deriva**, y el postulado se retira.
 
-    En `Minimal` con `ax21`: derivable como teorema (case-split sobre mod2(n)
-    y aplicar `ax16` forward/usar teo_1_3). Por tanto añadirlo en Full es
-    **conservativo respecto a Minimal**. -/
-axiom ax_mod2_alternation : axioms ⊢ Formula.forall
-  (add (mod2 (succ (.var 0))) (mod2 (.var 0)) ≐ one)
+⚠️⚠️ **Pero eso obliga a corregir el censo, porque había una CIRCULARIDAD EN CONTENIDO.** El
+diseño de 2026‑06‑11 («Opción C.2») decía: *«de este axioma salen `ax21` y `ax24` por inducción»*.
+Y a la vez: *«el axioma es derivable de `ax21 + ax16`»*. Las dos frases juntas dan un círculo, y
+mientras la alternancia fue **axioma** el círculo no se veía.
+
+**Cuál de los dos es el primitivo, medido**: `ax16 + ax17` **no** fijan el rango de `mod2`. Un modelo
+con `mod2 2̄ = 2̄` los satisface — `ax17` sólo pide `div2(2̄)·2̄ + mod2(2̄) = 2̄`, y con `div2(2̄) = 0̄`
+encaja; y `ax16` en `2̄` sólo dice `mod2 2̄ = 0̄ ⇔ mod2 3̄ = 1̄`, que se cumple vacuamente. ⇒ **`ax21`
+carga información independiente y es PRIMITIVO**; la alternancia es el **teorema**. -/
+
+/-- 🏁 **La alternancia de `mod2`, DEMOSTRADA**: `∀n, mod2(σn) + mod2(n) = 1`.
+
+    De `ax21` (rango) + `ax16` (el bicondicional) + `ax4` + `zero_add` + `teo_1_11` (`0 ≠ 1`).
+    El case‑split es sobre `mod2 n`; en la rama `mod2 n = 1̄` hace falta **volver a partir** por
+    `ax21` en `σn`, y la rama imposible la cierra `ax16` hacia atrás contra `0 ≠ 1`. -/
+theorem ax_mod2_alternation : axioms ⊢ Formula.forall
+    (add (mod2 (succ (.var 0))) (mod2 (.var 0)) ≐ one) := by
+  apply gen; intro n
+  simp only [substFormula, substTerm, substTerms, add, mod2, one, zero, succ]
+  have h21 := ax (by simp [axioms] : ax21_mod2_range ∈ axioms)
+  have h16 := ax (by simp [axioms] : ax16_mod2_succ ∈ axioms)
+  have h4  := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
+  have h21n : axioms ⊢ lor (mod2 n ≐ zero) (mod2 n ≐ one) := by
+    have hh := spec h21 n
+    simp [substFormula, substTerm, substTerms, mod2, zero, one, succ] at hh
+    exact hh
+  have h21sn : axioms ⊢ lor (mod2 (succ n) ≐ zero) (mod2 (succ n) ≐ one) := by
+    have hh := spec h21 (succ n)
+    simp [substFormula, substTerm, substTerms, mod2, zero, one, succ] at hh
+    exact hh
+  have h16n : axioms ⊢ iff (mod2 n ≐ zero) (mod2 (succ n) ≐ one) := by
+    have hh := spec h16 n
+    simp [substFormula, substTerm, substTerms, iff, mod2, zero, one, succ] at hh
+    exact hh
+  have h4sn : axioms ⊢ (add (mod2 (succ n)) zero ≐ mod2 (succ n)) := by
+    have hh := spec h4 (mod2 (succ n))
+    simp [substFormula, substTerm, substTerms, add, zero] at hh
+    exact hh
+  have hz1 : axioms ⊢ (add zero one ≐ one) := by
+    have hh := spec zero_add one
+    simp [substFormula, substTerm, substTerms, add, zero, one, succ] at hh
+    exact hh
+  refine Minimal.Axioms.or_elim h21n ?_ ?_
+  · -- mod2 n = 0  ⇒  mod2 (σn) = 1, y `x + 0 = x`
+    intro hA
+    have hsn1 : axioms ⊢ (mod2 (succ n) ≐ one) :=
+      mp (Minimal.Axioms.and_elim_left h16n) hA
+    exact FOL.derive_eq_trans (FOL.derive_eq_trans (eq_congr_add_left hA) h4sn) hsn1
+  · -- mod2 n = 1: hay que volver a partir por `ax21` en σn
+    intro hB
+    refine Minimal.Axioms.or_elim h21sn ?_ ?_
+    · intro hB1   -- mod2 (σn) = 0  ⇒  `0 + 1 = 1`
+      exact FOL.derive_eq_trans
+        (FOL.derive_eq_trans (eq_congr_add_right (u := mod2 n) hB1) (eq_congr_add_left hB)) hz1
+    · intro hB2   -- mod2 (σn) = 1  ⇒  ax16 hacia atrás da mod2 n = 0, contra hB
+      have hn0 : axioms ⊢ (mod2 n ≐ zero) :=
+        mp (Minimal.Axioms.and_elim_right h16n) hB2
+      exact Minimal.Axioms.false_elim
+        (mp (eq_symm_neg teo_1_11) (FOL.derive_eq_trans (eq_symm hB) hn0))
 
 /-! ### Helper: `a + 1 = 1 → a = 0` -/
 
@@ -117,55 +171,32 @@ private theorem a_plus_one_eq_one (a : Term) (h : axioms ⊢ (add a one ≐ one)
     exact hh
   exact eq_trans h_ax4_inst h_az_zero  -- (a+0=a) ∧ (a+0=0) → a=0
 
-/-! ### `ax21` derivado: `mod2(n) ∈ {0,1}` -/
+/-! ### ⚠️ `ax21` NO es derivado: es **PRIMITIVO** (corregido el 2026‑09‑10h)
 
-/-- Forma "axioma de Full": `∀n, mod2(n) = 0 ∨ mod2(n) = 1`. -/
+Aquí había una demostración de `ax21` **por inducción a partir de `ax_mod2_alternation`**, y con la
+alternancia ya demostrada —desde `ax21`— eso es un **círculo en contenido**: Lean lo aceptaba
+porque el círculo pasaba por un `axiom`, y al retirarlo se hizo visible.
+
+⇒ Se corrige en la dirección que la medición señala: **`ax21` es primitivo** (entra en
+`primAxioms`, que pasa de 23 a **24**) y la alternancia es el **teorema**. Lo que sigue conserva el
+nombre para no romper consumidores, pero ya **no finge** ser una derivación. -/
+
+/-- `∀n, mod2(n) = 0 ∨ mod2(n) = 1` — **es `ax21`**, citado. ⚠️ **No es un teorema de `Full`**:
+    `ax16 + ax17` no fijan el rango de `mod2` (admiten `mod2 2̄ = 2̄`), así que `ax21` carga
+    información independiente y es **primitivo**. -/
 theorem mod2_range_ax : axioms ⊢ Formula.forall
-    (lor (mod2 (.var 0) ≐ zero) (mod2 (.var 0) ≐ one)) := by
-  apply induction_object
-  · -- base: mod2(0) = 0 ∨ mod2(0) = 1
-    simp only [substFormula, substTerm, substTerms, lor, mod2, zero, one, succ,
-               FOL.substTerm_liftTerm]
-    exact Minimal.Axioms.or_intro_left mod2_zero_aux
-  · -- step: ∀n, (mod2(n) ∈ {0,1}) → (mod2(σn) ∈ {0,1})
-    apply gen; intro n
-    rw [step_reduce]
-    apply Minimal.Axioms.imp_intro; intro ih
-    simp only [substFormula, substTerm, substTerms, lor, mod2, zero, one, succ,
-               FOL.substTerm_liftTerm] at ih ⊢
-    -- ax_mod2_alternation spec'd at n: mod2(σn) + mod2(n) = 1
-    have h_alt : axioms ⊢ (add (mod2 (succ n)) (mod2 n) ≐ one) := by
-      have hh := spec ax_mod2_alternation n
-      simp [substFormula, substTerm, substTerms, add, mod2, one, zero, succ,
-            FOL.substTerm_liftTerm] at hh
-      exact hh
-    -- ax4 spec'd at mod2(σn): mod2(σn) + 0 = mod2(σn)
-    have h_ax4_mod2sn : axioms ⊢ (add (mod2 (succ n)) zero ≐ mod2 (succ n)) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) (mod2 (succ n))
-      simp [substFormula, substTerm, substTerms, add, zero] at hh
-      exact hh
-    apply Minimal.Axioms.or_elim ih
-    · -- Caso mod2(n) = 0 → mod2(σn) = 1
-      intro h_mod2n_zero
-      have h_cong : axioms ⊢ (add (mod2 (succ n)) (mod2 n) ≐ add (mod2 (succ n)) zero) :=
-        eq_congr_add_left h_mod2n_zero
-      have h_sn_plus_zero : axioms ⊢ (add (mod2 (succ n)) zero ≐ one) :=
-        FOL.derive_eq_trans (eq_symm h_cong) h_alt
-      have h_sn_one : axioms ⊢ (mod2 (succ n) ≐ one) :=
-        FOL.derive_eq_trans (eq_symm h_ax4_mod2sn) h_sn_plus_zero
-      exact Minimal.Axioms.or_intro_right h_sn_one
-    · -- Caso mod2(n) = 1 → mod2(σn) = 0
-      intro h_mod2n_one
-      have h_cong : axioms ⊢ (add (mod2 (succ n)) (mod2 n) ≐ add (mod2 (succ n)) one) :=
-        eq_congr_add_left h_mod2n_one
-      have h_sn_plus_one : axioms ⊢ (add (mod2 (succ n)) one ≐ one) :=
-        FOL.derive_eq_trans (eq_symm h_cong) h_alt
-      have h_sn_zero : axioms ⊢ (mod2 (succ n) ≐ zero) :=
-        a_plus_one_eq_one (mod2 (succ n)) h_sn_plus_one
-      exact Minimal.Axioms.or_intro_left h_sn_zero
+    (lor (mod2 (.var 0) ≐ zero) (mod2 (.var 0) ≐ one)) :=
+  ax (by simp [axioms] : ax21_mod2_range ∈ axioms)
 
-/-- **`ax21` como teorema en Full**: `⊢ ax21_mod2_range`. -/
-theorem mod2_range_thm : axioms ⊢ ax21_mod2_range := mod2_range_ax
+/-- Ídem sobre los primitivos, que es donde `ax21` vive desde [ADR‑023](../../DECISIONS.md). -/
+theorem mod2_range_prim : primAxioms ⊢ Formula.forall
+    (lor (mod2 (.var 0) ≐ zero) (mod2 (.var 0) ≐ one)) :=
+  axp (by simp [primAxioms] : ax21_mod2_range ∈ primAxioms)
+
+/-- ⚠️ **`ax21` es PRIMITIVO**, no un teorema de `Full`. El nombre se conserva porque hay
+    consumidores; el enunciado es honesto: es la cita del axioma. -/
+theorem mod2_range_thm : axioms ⊢ ax21_mod2_range :=
+  ax (by simp [axioms] : ax21_mod2_range ∈ axioms)
 
 /-! ### `ax24` derivado: `n = 2k → mod2(n) = 0` -/
 
