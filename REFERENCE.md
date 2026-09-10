@@ -193,9 +193,12 @@ registro del episodio. Ver [`cuarentena/README.md`](cuarentena/README.md) y §3.
 > gödeliano vivo). Inventario en **[`AXIOMS.md`](AXIOMS.md)**. Ninguna es un `sorry` (ADR‑010).
 >
 > ⚠️ **La mitad `⊬¬G` de Gödel I sigue SIN cerrar.** `goedel_first_undecidable_numeral` toma
-> `Reflects` como hipótesis META; descargarla exige **`NegVerifier`**, cuyo plan tiene un **paso
-> falso** (`canon_ne`, refutado en `sondeos/CanonNeRefuta.lean`) y necesita rediseño por numerales
-> (vía verificada en `sondeos/CodeNatInj.lean`). **NO recuperar F7a.**
+> `Reflects` como hipótesis META; descargarla exige **`NegVerifier`**.
+> 🏁 **Estado 2026‑09‑10h**: el **módulo E** está hecho (`Meta/VerifierSound.lean`) y `NegVerifier`
+> queda reducido a **dos deudas enunciadas** (`DEUDA_chainNeg`, `DEUDA_inNeg`), que son los módulos
+> **C** y **D**. [ADR‑022](DECISIONS.md) estrechó la clase de testigos para que sean atacables.
+> ⚠️ El plan `PLAN-NEGVERIFIER.md` sigue conteniendo afirmaciones falsas —van **tres** medidas—:
+> **se re‑mide, no se lee**. **NO recuperar F7a.**
 
 ## 2 · Dependency Graph
 
@@ -295,8 +298,8 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026-09-09.** Build **135 jobs**, **121 módulos activos**, **60 `sondeos/`**, 0 sorrys,
-7 `axiom` de Lean.
+**Estado 2026‑09‑10h.** Build **142 jobs**, **128 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+**6** `axiom` de Lean (`d3` retirado el 2026‑09‑10g).
 
 ### Lo que está cerrado
 

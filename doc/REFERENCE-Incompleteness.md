@@ -12,7 +12,8 @@
 
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
-(`goedel_second'`, módulo `axiom d3`), y la construcción **en curso** de D3.
+(`goedel_second'`) — 🏁 **D3 DEMOSTRADA** el 2026‑09‑10g (`d3_prf_real`), con lo que la cadena
+D1/D2/D3 **no postula ninguna de las tres**.
 **Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha

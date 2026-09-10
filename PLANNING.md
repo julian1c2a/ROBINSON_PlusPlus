@@ -1,15 +1,25 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
-> ## ESTADO REAL — 2026-09-03 · rama A cerrada · PROMOCIÓN: B0, B0b, B9, B1, B8 hechas
+> ## ⛔⛔ ESTE DOCUMENTO ES **HISTÓRICO** DE LA LÍNEA `:33` PARA ABAJO — 2026-09-10h
 >
-> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
-> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
+> La auditoría `doc/book/AUDITORIA-2026-09-10.md` §5 lo midió y lo llamó, con razón, **«el
+> documento menos fiable de los tres de estado»**: cuatro días y ~20 commits de retraso, y una
+> contradicción **interna** —`:35` afirma «Gödel I — COMPLETO» citando
+> `goedel_first_undecidable_real'`, un teorema que **no existe**, y `:19‑23` del mismo fichero dice
+> lo contrario—. ⇒ Se marca entero como histórico en vez de remendarlo pieza a pieza.
+>
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
+> → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
+> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md).
 >
-> **Build 124 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **112 módulos activos** (Minimal 11 + Meta 90 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Cifras REALES de hoy: Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+>
+> 🏁 Y lo que este documento presenta como frentes abiertos ya no lo son: **D3 está DEMOSTRADA**
+> (2026‑09‑10g, `d3` pasó de `axiom` a teorema) y el **módulo E** de `NegVerifier` está hecho.
+> Lo que sigue abierto de `⊬¬G` son los módulos **C** y **D**.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -32,7 +42,7 @@
 
 **Última actualización:** 2026-09-04 — Estado global: **109 módulos** (Minimal 11 + Meta 87 + Full 11), **124 jobs**, 0 sorrys, **7 `axiom` de Lean** (`AXIOMS.md`), **57 `sondeos/`**, `cuarentena/` VACÍA. Frente vivo: el muro de `substfc` por la vía de CERO axiomas — SEIS de los 8 constructores montados (`eqc`/`atomc` sólo tienen sus ingredientes); el ENSAMBLAJE en sí ya compila (ver `NEXT-STEPS.md` y `doc/REFERENCE-Incompleteness.md` §3.29). ⚠️ **Lo que sigue en esta línea es el registro de 2026-07-24 y se conserva como HISTÓRICO**: **MÓDULO A de `NegVerifier` COMPLETO (§43)** (decodificador: biyección de fórmulas + cadenas + `decodeChain_prf`). **MÓDULO B en curso (§44)**: tabla de los 21 tags + dirección negativa ✅; nivel `⊢` des‑duplicado ✅; **19 `ax_lineWF` estructurales a accesores ✅** (net‑0); **B.3c EN CURSO**: `pcc_lineWF_tracked` — **`eqrefl` (tag 12) CERRADO** vía esquema ESTRICTO (`Meta/LineWFTrackedPrf.lean`) y el **`In`‑reflect de `axiomsCodeT` CERRADO** (`Meta/InAxiomsCodePrf.lean`, el nudo de `NegVerifier`); faltan `thy` (mecánico), `mp`, los 17 tags `=eq` y el `or_elim` ×21 → `hC_dot`. **Refactor de anclas**: `prf_axiomsCodeT_eq` nuevo, `prf_inAxC` pasa a teorema (net‑0, siguen 7). `Minimal/` cerrado; `Full/` deriva el fragmento inductivo + **TFA completo**; `Meta/` tiene la **cadena Gödel REAL** (la capa legacy con D2/D3 postulados fue **RETIRADA en F7a** — era insólida, ver `GODEL-STATUS.md`).
 
-**Gödel I — COMPLETO** (`goedel_first_undecidable_real'`): `⊬G ∧ ⊬¬G`, **sin ningún postulado gödeliano**, con la **reflexión como hipótesis META explícita** (`Reflects`), reducida a **ω‑consistencia clásica + `NegVerifier`** (`Meta/OmegaReflect.lean`). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales. **Gödel II** (`goedel_second'`) montado, **módulo `axiom d3`**.
+⛔ **[FALSO, 2026-09-04 — conservado como registro de la deriva]** «Gödel I — COMPLETO» (`goedel_first_undecidable_real'`, teorema que **no existe**): `⊬G ∧ ⊬¬G`, **sin ningún postulado gödeliano**, con la **reflexión como hipótesis META explícita** (`Reflects`), reducida a **ω‑consistencia clásica + `NegVerifier`** (`Meta/OmegaReflect.lean`). **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales. **Gödel II** (`goedel_second'`) montado, **módulo `axiom d3`**.
 
 **Dos frentes abiertos, ambos con plan escrito y sin incógnitas de diseño:**
 

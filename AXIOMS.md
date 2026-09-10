@@ -56,7 +56,10 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 
 ---
 
-## 1 · Axiomas de Lean en ROBINSON_PlusPlus (7)
+## 1 · Axiomas de Lean en ROBINSON_PlusPlus (6)
+
+> ⚠️ Esta cabecera decía **(7)** con la fila 7 tachada justo debajo. Lo cazó
+> `doc/book/AUDITORIA-2026-09-10.md` R3.
 
 | # | Axioma | Módulo | Familia | Naturaleza |
 |---|--------|--------|---------|------------|

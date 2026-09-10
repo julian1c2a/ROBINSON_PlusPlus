@@ -148,6 +148,56 @@ check_num '[0-9]+ sorrys?' "$SORRY" "sorry"
 rm -f "$HEADREGION"
 [ "$A_FAIL" = "0" ] && echo "  ✓ sin cifras obsoletas" || FAIL=1
 
+# ─── 2bis. CIFRAS EN EL **CUERPO** ───────────────────────────────────────────
+# ⭐ Añadido el 2026-09-10h, y lo pidió una auditoría externa (`doc/book/AUDITORIA-2026-09-10.md`
+# §5 y R3), que midió la causa raíz de la deriva documental del proyecto:
+#
+#     «check-doc-sync.bash:108 — ALCANCE: sólo la REGIÓN DE CABECERA (primeras 100 líneas).
+#      Eso explica el patrón entero. El commit 50e8864 pudo declarar la sincronía en verde con
+#      ocho contradicciones vivas a partir de la línea 218. No es que nadie mire: es que el
+#      control mira sólo el banner, y el banner es justamente la parte que sí se actualiza.
+#      Auditar el banner es auditar lo que ya está bien.»
+#
+# ⚠️ Y la acotación NO era un descuido: sin ella, los diarios de `NEXT-STEPS.md` disparan una
+# docena de falsos positivos y el control deja de usarse. Así que el cuerpo entra como **AVISO**,
+# igual que [B]: se ve, pide juicio, y no rompe. Lo que rompe sigue siendo la cabecera.
+echo ""
+echo "════ [A2] CIFRAS EN EL CUERPO — AVISO, requiere juicio ════"
+BODYREGION=$(mktemp)
+: > "$BODYREGION"
+for d in $DOCS; do
+  [ -e "$d" ] || continue
+  tail -n +101 "$d" | sed "s|^|$d:|" >> "$BODYREGION"
+done
+
+A2_HITS=0
+warn_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = etiqueta
+  local pat="$1" good="$2" label="$3" hits
+  hits=$(grep -nE "$pat" "$BODYREGION" 2>/dev/null          | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|en su momento|entonces|ya no|retirad|20[0-9]{2}-[0-9]{2}-[0-9]{2}|20[0-9]{2}‑[0-9]{2}‑[0-9]{2}|~|p\. ej|ejemplo|umbral|[0-9]+-[0-9]+" || true)
+  while IFS= read -r line; do
+    [ -z "$line" ] && continue
+    local n; n=$(echo "$line" | grep -oE "$pat" | grep -oE "[0-9]+" | head -1)
+    if [ -n "$n" ] && [ "$n" != "$good" ]; then
+      echo "  ⚠️  $label: dice $n, real $good"
+      echo "      ${line:0:150}"
+      A2_HITS=$((A2_HITS+1))
+    fi
+  done <<< "$hits"
+  return 0
+}
+[ -n "$JOBS" ] && warn_num "[0-9]+ jobs" "$JOBS" "jobs"
+warn_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
+warn_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
+warn_num '[0-9]+ sorrys?' "$SORRY" "sorry"
+rm -f "$BODYREGION"
+if [ "$A2_HITS" = "0" ]; then
+  echo "  ✓ el cuerpo tampoco tiene cifras obsoletas"
+else
+  echo "  ⚠️  $A2_HITS línea(s) en el CUERPO con cifras que no cuadran."
+  echo "      ¿es una afirmación de estado ACTUAL (⇒ corregir) o un registro histórico"
+  echo "      sin marcar (⇒ marcarlo: fecha ISO, «previo», «era», «histórico»)?"
+fi
+
 # ─── 3. SÍMBOLOS MUERTOS ─────────────────────────────────────────────────────
 # Un símbolo está MUERTO si se cita en un doc AUTORITATIVO pero ninguna declaración
 # del árbol activo empieza por él.

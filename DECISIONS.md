@@ -980,7 +980,7 @@ cambiar una línea del ensamblaje.
 `prf_nil_or_cons` + su `export` + su `#print axioms`), que se habían hecho sin poder compilar,
 compilan sin un solo `unknown identifier`.
 
-**Lo que NO cambió, y conviene repetirlo**: 7 `axiom` de Lean, 141 axiomas objeto (se **sustituyen**
+**Lo que NO cambió, y conviene repetirlo**: 7 `axiom` de Lean (la cifra **de entonces**; hoy **6**), 141 axiomas objeto (se **sustituyen**
 7 de los 141, no se añade ninguno), y ni D1, ni D2, ni D3, ni Gödel I/II, ni la sentencia `G`
 cambian de enunciado.
 
@@ -1072,7 +1072,7 @@ la reflejan `pcc_tc_objAt` + `PrfH_dotVN` de `Meta/CodeTreeReflect.lean`, ya pro
 inducción sobre el árbol para los 14 tags estructurales. `pcc_shape_tree` sólo las compone, y
 es genérica en el `CTree` — luego C3‑F la hereda tal cual.
 
-**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, y ninguna firma de D1/D2/D3 ni de
+**Lo que NO cambia**: 7 `axiom` de Lean (la cifra **de entonces**; hoy **6**, `d3` retirado), 141 axiomas objeto, y ninguna firma de D1/D2/D3 ni de
 Gödel I/II.
 
 
@@ -1096,7 +1096,7 @@ y el **interior** `wT`, luego los huecos se rellenan en **dos pasadas a niveles 
 eso pide generalizar el descenso `prf_substfc_wfAll1DotAtC` a nivel arbitrario— y la fontanería
 `condD`, que es el `rfl` ya comprobado. **Ninguna de las tres es contenido nuevo.**
 
-**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
+**Lo que NO cambia**: 7 `axiom` de Lean (la cifra **de entonces**; hoy **6**, `d3` retirado), 141 axiomas objeto, ninguna firma aguas abajo.
 
 
 ### Addendum 2026‑09‑08e · 🏁🏁 ADR‑020 NO DEBE NADA — `DEUDA_hGuardF` probada
@@ -1127,7 +1127,7 @@ esquema, con `substfcT`/`substtcT`—, que es exactamente lo que `pcc_eval_subst
 B3.2/B3.4 compraron, no por la que la enmienda añadió.»* Que es justo lo que la línea roja de
 la decisión prometía.
 
-**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
+**Lo que NO cambia**: 7 `axiom` de Lean (la cifra **de entonces**; hoy **6**, `d3` retirado), 141 axiomas objeto, ninguna firma aguas abajo.
 
 
 ---
@@ -1250,7 +1250,7 @@ es sintácticamente la variable de arriba, y el puente hay que darlo igualmente.
   contador de D3 de 2 a 3 (§3.56) y fue el paso más importante del frente: lo que el «2» medía era
   una cadena que **no cerraba**.
 
-**Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
+**Lo que NO cambia**: 7 `axiom` de Lean (la cifra **de entonces**; hoy **6**, `d3` retirado), 141 axiomas objeto, ninguna firma aguas abajo.
 Footprint de todas las piezas nuevas: los tres axiomas de Lean, o la base sancionada.
 
 ---
