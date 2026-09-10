@@ -1,0 +1,198 @@
+\chapter{Autorreferencia}
+\label{cap:autorreferencia}
+
+Al final de la parte anterior el edificio está montado: hay una teoría de números, hay una
+codificación de la sintaxis, hay un verificador de demostraciones y hay una fórmula $\Prov$ que
+dice, dentro del lenguaje, «existe una demostración de la fórmula cuyo código es $x$». Falta el
+disparo. Este capítulo contesta la pregunta que lo hace posible: \emph{¿cómo se consigue que una
+fórmula concreta hable de sí misma?}
+
+La respuesta no es un truco de lenguaje. Es una construcción, y aquí está entera y compilada.
+
+\section{El mentiroso, y el cambio que lo salva}
+
+La paradoja del mentiroso —«esta frase es falsa»— es vieja y es un callejón. Si la frase es
+verdadera, es falsa; si es falsa, es verdadera. Como argumento matemático no sirve de nada: lo
+único que demuestra es que «verdadero» no se deja definir así.
+
+Y esa es, literalmente, la mitad del descubrimiento. El teorema de Tarski dice que \textbf{la verdad
+aritmética no es definible en el lenguaje de la aritmética}: no hay ninguna fórmula
+$\mathrm{Verdad}(x)$ que valga exactamente para los códigos de las sentencias verdaderas. Si Gödel
+hubiera necesitado esa fórmula, no habría teorema.
+
+\begin{leccion}[El cambio de una palabra]
+Gödel no dice «esta frase es falsa». Dice \textbf{«esta frase no es demostrable»}. Y la diferencia
+lo es todo, porque la demostrabilidad \emph{sí} es expresable: una demostración es un objeto
+finito, verificarla es una comprobación mecánica, y el capítulo~\ref{cap:verificador} construyó esa
+comprobación dentro de la teoría. \emph{Ser demostrable} se puede escribir; \emph{ser verdadero},
+no.
+
+Cambiar «falsa» por «no demostrable» convierte una paradoja en un teorema. Todo lo que este libro
+lleva construido —los códigos, el verificador, $\Prov$— existe para pagar ese cambio.
+\end{leccion}
+
+Queda el otro problema, y es el de este capítulo: ¿cómo se escribe el «esta»?
+
+\section{Autoaplicación: sustituirse el propio código}
+
+En la metateoría la maniobra es sencilla de decir. Sea $\psi$ una fórmula con una variable libre.
+Su \emph{autoaplicación} es lo que resulta de sustituir en esa variable el código de la propia
+$\psi$:
+
+\leanfrag{selfApp}
+
+\selee{«\ident{selfApp} $\psi$ es $\psi$ con su propio código de Gödel puesto en su variable
+libre~0»}
+
+Es una función de la \textbf{metateoría}: toma una fórmula y devuelve otra. No hay nada
+autorreferente todavía — $\psi$ no se menciona a sí misma, somos nosotros los que le enchufamos su
+código desde fuera. Y así, sola, no sirve: para que la teoría razone sobre la sentencia resultante,
+la teoría tiene que poder \emph{hacer} esa sustitución, no verla hecha.
+
+\section{Diagonalizar dentro del lenguaje}
+
+Aquí es donde se cobra la distinción del capítulo~\ref{cap:lenguajes} entre las dos maneras de
+decir «el código de». Hay que escribir un término del lenguaje objeto que, aplicado al código de
+una fórmula, dé el código de su autoaplicación. Y ese término tiene que operar sobre una
+\textbf{variable}, no sobre una fórmula concreta:
+
+\leanfrag{diagTerm}
+
+\selee{«\ident{diagTerm} es: sustituir, en la variable~0 de la fórmula de código \texttt{\#0}, el
+código del código de \texttt{\#0}»}
+
+Léase con cuidado, porque en esa línea está todo el capítulo. El tercer argumento de
+\ident{substfc} es \texttt{\#0}: la fórmula en la que se sustituye es \emph{la que sea}, dada por su
+código. El segundo es $\dotado{\texttt{\#0}}$: lo que se mete dentro es el \textbf{código del
+código}, calculado por la teoría. Por eso hace falta $\dotado{\cdot}$ y no valdría $\codigo{\cdot}$
+— $\codigo{\texttt{\#0}}$ sería «el código del término \emph{la variable cero}», un número fijo, y
+no lo que aquí se necesita.
+
+\begin{leccion}[Por qué se llama diagonalización]
+La maniobra es la de Cantor. Se tiene una familia de fórmulas indexada por números —la fórmula de
+código $n$— y se construye algo que consulta la casilla $(n,n)$: la fórmula de código $n$
+\emph{aplicada a} $n$. La diagonal de la tabla. Cantor la usó para escapar de una enumeración;
+Gödel, para no salirse de ella.
+\end{leccion}
+
+\section{Que la teoría sepa hacerlo}
+
+Escribir el término no basta: hay que \textbf{demostrar} que hace lo que se dice, y demostrarlo
+\emph{dentro de la teoría}. Ese es el enunciado que convierte la idea en matemáticas:
+
+\leanfrag{diag_arith_num}
+
+\selee{«la teoría demuestra que sustituir el código de $\psi$ en \ident{diagTerm} da exactamente el
+código de la autoaplicación de $\psi$»}
+
+Nótese quién afirma: la chapa dice $\derives$ sobre \emph{código}. No somos nosotros comprobándolo
+caso a caso —eso sería una afirmación de la metateoría—; es la teoría objeto la que lo demuestra,
+para el $\psi$ que se le dé. Sin este teorema, $\Prov$ y \ident{diagTerm} serían dos piezas que no
+encajan.
+
+\begin{observacion}
+La demostración es una cadena de cuatro igualdades encadenadas por transitividad, y las cuatro
+están en el fichero. Merece la pena mirarla porque enseña de qué está hecho realmente este
+proyecto: dos congruencias (\emph{si los argumentos son iguales, los resultados lo son}), la
+ecuación que caracteriza la sustitución sobre códigos, y el puente entre las dos maneras de
+escribir un código que la Parte~\ref{parte:noescrito} explica. Nada más profundo que eso — y aun
+así costó reconstruirla entera.
+\end{observacion}
+
+\section{La sentencia}
+
+Con las piezas anteriores, $G$ se escribe en tres líneas. Primero el predicado: \emph{no ser
+demostrable}.
+
+\leanfrag{godelPred}
+
+Después se diagonaliza ese predicado — es decir, se le antepone \ident{diagTerm}, de modo que
+$\beta$ dice, de la fórmula de código \texttt{\#0}, que \emph{su autoaplicación} no es demostrable:
+
+\leanfrag{godelBeta}
+
+Y por fin la sentencia: $\beta$ aplicada a su propio código.
+
+\leanfrag{godelCN}
+
+\selee{«$G$ es $\beta$ con el código de $\beta$ sustituido en su variable libre»}
+
+\begin{matematica}[La sentencia de Gödel, en una línea]
+\[ G \;=\; \beta(\codigo{\beta}), \qquad\text{donde}\qquad
+   \beta(x) \;=\; \lnot\,\Prov\bigl(\mathrm{diag}(x)\bigr). \]
+$G$ no contiene ningún «esta»: es una fórmula cerrada, con un código de Gödel concreto, que se
+podría imprimir. Lo autorreferente no está en la sentencia — está en que su código aparece dentro
+de ella.
+\end{matematica}
+
+\section{El punto fijo}
+
+Y ahora el teorema del capítulo. Un \defterm{punto fijo}\nivelterm{objeto} es una sentencia que la
+teoría prueba equivalente a lo que se afirma \emph{de su propio código}. Aquí:
+
+\leanfrag{godelCN_fixedpoint}
+
+\selee{«la teoría demuestra que $G$ es equivalente a que $G$ no sea demostrable»}
+
+\begin{leccion}[Lo que hay que mirar de este enunciado]
+Dos cosas, y las dos importan más que la fórmula.
+
+\textbf{No tiene hipótesis.} Ni consistencia, ni $\omega$-consistencia, ni reflexión, ni ningún
+postulado gödeliano. Es un teorema de la teoría objeto, a secas. Todo lo que viene después
+—Gödel~I, Gödel~II— añadirá hipótesis; el punto fijo no necesita ninguna.
+
+\textbf{Y no dice nada sobre la verdad de $G$.} Sólo dice que la teoría demuestra una
+\emph{equivalencia}. De ahí todavía no se sigue que $G$ sea indemostrable: para eso hace falta el
+argumento del capítulo siguiente, y hace falta suponer que la teoría es consistente.
+\end{leccion}
+
+\section{Dos maneras de escribir el mismo código, y un paso de Leibniz}
+
+Queda un detalle que en otro libro sería una nota al pie y aquí es una cicatriz visible. El punto
+fijo se demuestra primero en una forma \emph{numeral} —con el código escrito como el numeral de un
+número— y sólo después se traslada a la forma que el argumento de Gödel espera:
+
+\leanfrag{godelCN_fixedpoint_N}
+
+El traslado es un único paso de congruencia, y es este:
+
+\leanfrag{provCode_transfer}
+
+\selee{«las dos maneras de escribir $\Prov$ del código de $\varphi$ son equivalentes en la teoría»}
+
+\begin{leccion}[Por qué hay dos, y por qué eso salvó meses de trabajo]
+Porque la primera versión de todo esto era \textbf{inconsistente}. El código se escribía como un
+árbol, y el axioma que relacionaba ese árbol con su propio código hacía que la teoría demostrara
+$\bot$. La reparación —el capítulo~\ref{cap:numerales}— consistió en escribir los códigos como
+numerales.
+
+Lo que hizo barata la reparación fue exactamente este lema. \ident{diagTerm}, $\beta$ y la
+composición de sustituciones \textbf{no mencionan cómo se escribe un código}, así que se
+reutilizaron sin tocarlos; y D1 y el argumento modular de Gödel siguieron valiendo porque
+\ident{provCode_transfer} los conecta con un paso de Leibniz. Un cambio en los cimientos que no
+obligó a rehacer la planta de arriba: eso no pasa por suerte, pasa porque las piezas estaban
+separadas.
+\end{leccion}
+
+\section{Lo que \texorpdfstring{$G$}{G} no dice}
+
+Conviene cerrar el capítulo desactivando tres lecturas que la divulgación repite y que este
+libro, que tiene la fórmula delante, puede desmentir con precisión.
+
+\begin{muro}[Tres cosas que $G$ no es]
+\textbf{$G$ no dice «yo soy indemostrable».} Dice, literalmente, que un cierto número no está en
+cierta relación aritmética con otros números. Que ese número sea el código de la propia $G$ es un
+teorema —el punto fijo—, no una lectura.
+
+\textbf{$G$ no es indemostrable «en general».} Es indemostrable \emph{en esta teoría}, y la teoría
+está fijada por la lista \ident{axioms}. Cambiar la lista cambia $\Prov$, y cambiar $\Prov$ cambia
+$G$: es otra sentencia y otro teorema. El capítulo~\ref{cap:lenguajes} lo dijo con los cuatro
+estratos; aquí se ve por qué.
+
+\textbf{$G$ no es una curiosidad autorreferente.} La construcción es uniforme: el mismo argumento
+produce un punto fijo para \emph{cualquier} predicado con una variable libre. Que se aplique a
+«no demostrable» es una elección; el mecanismo no sabe de qué habla.
+\end{muro}
+
+Con el punto fijo en la mano, el primer teorema de Gödel es corto. Es el capítulo siguiente — y la
+sorpresa es que sólo la mitad sale gratis.

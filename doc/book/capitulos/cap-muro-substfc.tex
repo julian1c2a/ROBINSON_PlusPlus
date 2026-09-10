@@ -202,6 +202,8 @@ fecha & commit & hito \\
 2026-08-30 & \texttt{2f27a29} & el descenso, cerrado \\
 \textbf{2026-08-31} & \texttt{c1fd804} & \textbf{el muro está roto} \\
 2026-09-07 & \texttt{61edd46} & dentro del build: deja de ser un sondeo y pasa a ser un teorema \\
+\textbf{2026-09-10} & \texttt{61ecbe8} & \textbf{los siete reflectores, cerrados} \\
+2026-09-10 & \texttt{9a608c9} & \ident{pcc_lineWF_tracked} incondicional \\
 \bottomrule
 \end{tabular}
 \end{center}
@@ -221,6 +223,40 @@ la evaluación, y \capfuturo{la no-vacuidad de las guardas} muestra que se satis
 para códigos reales. Cómo se llegó hasta aquí —definir en vez de axiomatizar, partir el
 reconocedor en tres, y una inducción con la guarda dentro— es la materia del resto de esta
 parte.
+
+\section{Y los siete cayeron}
+
+Este capítulo se escribió el 9 de septiembre de 2026, con los siete reflectores todavía abiertos.
+Al día siguiente se cerraron los siete, y el teorema que este capítulo presentaba como \emph{medida
+de lo que faltaba} dejó de necesitar hipótesis:
+
+\leanfrag{pcc_lineWF_tracked}
+
+\selee{«para toda línea $t$: si $t$ está bien formada, la teoría demuestra —dentro de $\Prov$— que
+lo está»}
+
+Compárese con el enunciado de más arriba: mismo teorema, siete hipótesis menos. El cierre necesitó
+una pieza más que la evaluación de \ident{substfc} —\ident{prf_hasWitF_liftfc}, la clausura del
+testigo bajo el desplazamiento— y una observación de las que no se ven venir: el caso restante,
+\emph{los tags que no existen}, se paga con un lema que dice que un tag mayor que veinte no
+describe ninguna línea.
+
+\begin{leccion}[Cuarenta días de muro, diez de consecuencias]
+Entre romper el muro y cobrar lo que había detrás pasaron diez días. Es la proporción normal en
+este proyecto y conviene tenerla presente al leer la Parte~\ref{parte:noescrito}: el trabajo
+visible —el teorema que se anuncia— es la punta de un episodio cuya mayor parte fue averiguar por
+dónde \emph{no} se pasaba. Tres paredes descartadas, cuarenta días; la travesía, diez.
+\end{leccion}
+
+\begin{observacion}
+Lo que \textbf{no} cerró esto, por sí solo, fue D3. Cerrar el reflejo del átomo \ident{lineWF} era
+una de las dos mitades del cuerpo de la condición; la otra —la que habla de las premisas de cada
+línea— tardó otras seis horas, y con ella cayó D3 entera y el \ident{axiom} que el segundo teorema
+arrastraba. El capítulo~\ref{cap:d123} lo cuenta.
+
+Conviene medir bien la distancia, porque es lo que este capítulo enseña: entre identificar el muro
+y romperlo, cuarenta días; entre romperlo y que cayera todo lo que había detrás, diez.
+\end{observacion}
 
 \begin{observacion}
 Un detalle que este libro no puede pasar por alto, porque es su propia doctrina aplicada a sí mismo.

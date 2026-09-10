@@ -344,3 +344,30 @@ inducción hay que postular lo que con inducción se demuestra**.
 ⚠️ `MINIMAL-AXIOMS.md` tiene una incoherencia interna: el encabezado de §2 dice «Comparación con
 `Minimal` (30 axiomas)» y §3.5.1 y §4 dicen 34. Es el fallo de §27 —cuerpo actualizado, encabezado
 no—. Fuera del ámbito del libro (§0): se reporta, no se toca. **[medido]**
+
+---
+
+## M-5 · Una trampa de nomenclatura: `ConsistentOmega` ≠ `OmegaConsistent`
+
+**Hallazgo del 2026-09-10**, al escribir el capítulo 13. **[medido]**
+
+El árbol tiene dos definiciones que se leen casi igual y son propiedades distintas, y **la que suena
+más fuerte es la más débil**:
+
+| declaración | fichero:línea | qué es de verdad |
+|---|---|---|
+| `ConsistentOmega` | `Meta/Hilbert.lean:285` | **consistencia simple** del cálculo ω: `¬ (axioms ⊢ ⊥)` |
+| `OmegaConsistent` | `Meta/OmegaReflect.lean:127` | la **ω-consistencia**: no probar `∃x. A(x)` refutando todos los testigos estándar |
+
+Los dos docstrings son **correctos**: no es un caso de `DOCSTRINGS-NO-FIABLES.md`. El riesgo está
+en los nombres, y es real porque las dos aparecen como hipótesis de teoremas vecinos:
+`goedel_first_numeral` pide la primera, `goedel_first_undecidable_omega` pide la segunda. Leer
+`ConsistentOmega` como «ω-consistencia» convierte un teorema honesto —Gödel I con la hipótesis más
+débil posible— en una exageración.
+
+**Para la otra tarea, si le sirve:** un renombrado del tipo `ConsistentOmega` → `ConsistentDerives`
+(o `OmegaCalcConsistent`) desharía la ambigüedad sin tocar ninguna prueba. Aquí queda anotado, no
+hecho: `Meta/Hilbert.lean` está fuera del ámbito de escritura del libro (§0).
+
+El libro lo imprime como un `muro` en el capítulo 13, con las dos definiciones extraídas del repo
+una debajo de otra, que es la única manera de que no se confundan.

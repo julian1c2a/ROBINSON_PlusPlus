@@ -1,0 +1,161 @@
+\chapter{La mitad que falta}
+\label{cap:mitad-que-falta}
+
+El capítulo anterior demostró que $G$ no tiene demostración. Para la indecidibilidad falta la otra
+mitad: que tampoco tiene refutación. Este capítulo la construye hasta donde llega —que es lejos— y
+después hace algo que un libro normal evitaría: explicar con precisión qué es lo que falta, por qué
+no se puede coger el atajo, y cuánto trabajo hay hecho.
+
+Porque el interés de esta mitad no es que esté incompleta. Es \emph{dónde} se atasca.
+
+\section{El argumento, hasta donde llega}
+
+Supóngase que $\lnot G$ sí fuera demostrable.
+
+\begin{matematica}[Los cuatro pasos, y el quinto]
+\begin{enumerate}
+\item De $\Prf(\lnot G)$ se pasa a $\text{\ident{axioms}} \derives \lnot G$ por el puente.
+\item El punto fijo, leído de derecha a izquierda, dice
+  $\lnot\Prov(\codigo{G}) \Rightarrow G$. Con (1), la teoría demuestra
+  $\lnot\lnot\Prov(\codigo{G})$.
+\item Por eliminación de la doble negación, la teoría demuestra $\Prov(\codigo{G})$.
+\item Y ahora hace falta el paso que no es lógica: de que \emph{la teoría demuestre que $G$ es
+  demostrable} concluir que $G$ \textbf{realmente} lo es. Con eso, contradicción con el capítulo
+  anterior.
+\end{enumerate}
+\end{matematica}
+
+El paso (4) es todo el problema. Los tres primeros son manipulación formal; el cuarto dice que la
+teoría no se equivoca al afirmar que algo es demostrable. Y eso no se sigue de que sea consistente.
+
+\section{La hipótesis, con nombre}
+
+El proyecto no la esconde: la declara.
+
+\leanfrag{Reflects}
+
+\selee{«\ident{Reflects} $G$ dice: si la teoría demuestra que $G$ es demostrable, entonces $G$ tiene
+demostración»}
+
+Es la \textbf{representabilidad negativa}, el espejo de D1. D1 dice que si algo es demostrable, la
+teoría lo sabe; la reflexión dice que si la teoría lo afirma, es verdad. La primera es un teorema
+del capítulo~\ref{cap:d1}. La segunda no lo es, y no puede serlo.
+
+Con ella delante, la mitad se cierra:
+
+\leanfrag{goedel_first_unrefutable}
+
+\leanfrag{goedel_first_undecidable}
+
+\selee{«bajo consistencia y reflexión, $G$ no es demostrable ni refutable»}
+
+\section{Por qué el atajo está cerrado — y quien lo cierra es Gödel}
+
+La tentación evidente es demostrar la reflexión dentro de la teoría. Haría falta que, para cada
+$\varphi$ indemostrable, la teoría probara $\lnot\Prov(\codigo{\varphi})$. Los dos casos que uno
+probaría primero son los dos que lo cierran:
+
+\begin{muro}[Los dos callejones, y son el mismo]
+Tómese $\varphi = \bot$. Si la teoría es consistente, $\bot$ es indemostrable, así que haría falta
+$\derives \lnot\Prov(\codigo{\bot})$. Pero esa fórmula \textbf{es} $\mathrm{Con}(T)$, la sentencia
+de consistencia — y por el segundo teorema de Gödel la teoría no la demuestra.
+
+Tómese $\varphi = G$. Por el punto fijo, $\derives \lnot\Prov(\codigo{G})$ equivale a
+$\derives G$ — y el capítulo anterior acaba de demostrar que eso no pasa.
+
+La vía «que la teoría refute la demostrabilidad» no está cerrada por falta de trabajo:
+\textbf{está cerrada por los teoremas de este libro}.
+\end{muro}
+
+\begin{leccion}[Un obstáculo que se demuestra es información, no un hueco]
+Merece la pena parar en la forma de ese argumento. No dice «no lo hemos conseguido»: dice
+\emph{dónde} está el obstáculo y \emph{qué} teorema lo pone. Un lector puede comprobarlo. Y como
+efecto lateral, explica por qué existe Rosser: para tener las dos mitades desde consistencia simple
+hay que cambiar de sentencia, porque con \emph{esta} sentencia el camino corto lo corta Gödel~II.
+\end{leccion}
+
+\section{El postulado que escondía todo esto}
+
+Esta mitad estuvo dada por cerrada durante tres meses, y no lo estaba.
+
+\begin{refutado}[Lo que decía la capa antigua]
+El 13 de junio de 2026 la mitad $\noderives\lnot G$ se cerró apoyándose en un postulado escrito
+como \textbf{bicondicional}:
+\[ \bigl(\text{\ident{axioms}} \derives \Prov(\codigo{\varphi})\bigr)
+   \;\Longleftrightarrow\;
+   \bigl(\text{\ident{axioms}} \derives \varphi\bigr). \]
+La dirección de derecha a izquierda es D1, y es un teorema. La de izquierda a derecha \textbf{es la
+reflexión}, y es falsa en general. Y el teorema que se apoyaba en ella estaba enunciado bajo
+\emph{consistencia simple}: es decir, afirmaba más de lo que Gödel permite. Se retiró.
+\end{refutado}
+
+\begin{leccion}[El mismo modo de fallo, por tercera vez]
+Un enunciado plausible, aceptado como postulado, que resulta ser más fuerte de lo que se puede
+sostener. Ya pasó con un axioma del kernel (capítulo~\ref{cap:kernel}) y con el axioma que hacía
+inconsistente la teoría (capítulo~\ref{cap:numerales}). Aquí no produjo una contradicción: produjo
+algo más difícil de detectar, \textbf{un teorema que decía de más}. El compilador no protesta
+cuando una hipótesis es demasiado fuerte — sólo cuando falta.
+
+La reparación no fue demostrar el postulado. Fue \textbf{partirlo}: quedarse con la mitad que es
+teorema y dejar la otra a la vista como hipótesis.
+\end{leccion}
+
+\section{Cómo se descarga: dos piezas}
+
+La reflexión no es indemostrable en absoluto — es indemostrable \emph{dentro} de la teoría. Desde
+la metateoría se descarga, y el proyecto tiene el camino escrito:
+
+\leanfrag{reflects_of_omega}
+
+Hacen falta dos cosas. La primera es la \textbf{$\omega$-consistencia} —la de verdad, la que el
+capítulo anterior distinguía del nombre parecido—. La segunda es un verificador que además de
+aceptar las derivaciones buenas \textbf{rechace} las malas:
+
+\leanfrag{NegVerifier}
+
+\selee{«para toda $\varphi$ no demostrable y toda cadena estándar, la teoría refuta que esa cadena
+verifique $\varphi$»}
+
+Es el espejo negativo de D1: D1 dice que el verificador acepta lo que debe; esto dice que rechaza
+lo que debe. Con las dos, la indecidibilidad sale sin hipótesis meta:
+
+\leanfrag{goedel_first_undecidable_omega}
+
+\begin{observacion}
+La demostración de \ident{reflects_of_omega} es donde vive el \textbf{único uso esencial de lógica
+clásica} de todo el proyecto, y el capítulo~\ref{cap:objeto-y-meta} lo identificó: es el principio
+de Markov. Tiene sentido que esté aquí. Lo que se hace es concluir «existe una demostración» de la
+imposibilidad de que no exista, y eso —sobre un enunciado $\Sigma_1$ con matriz decidible— es
+exactamente Markov.
+\end{observacion}
+
+\section{Y ahora la cifra incómoda}
+
+\ident{NegVerifier} está escrito. Está enunciado con precisión, tiene su papel claro en la cadena y
+dos teoremas lo consumen como hipótesis.
+
+\textbf{Y no hay ni un teorema en producción que lo concluya.} Medido el 10 de septiembre de 2026:
+cero. Lo que lo bloquea —la inyectividad de la codificación numérica— vive en un sondeo, fuera del
+build.
+
+\avisomediagodel
+
+\begin{leccion}[Qué es exactamente lo que falta, y por qué decirlo así vale más]
+Compárese con la manera habitual de dejar esto: «la otra mitad es análoga» o, peor, «Gödel~I,
+completo». Lo que este proyecto puede decir en su lugar es:
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X@{}}
+\toprule
+pieza & estado \\
+\midrule
+el argumento $\noderives\lnot G$ desde la reflexión & \textbf{demostrado} \\
+la reducción reflexión $\leftarrow$ $\omega$-consistencia $+$ verificador negativo & \textbf{demostrada} \\
+el verificador negativo & \textbf{enunciado, sin construir} \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Eso no es un hueco: es un plano con una pieza marcada en rojo. La diferencia entre las dos maneras
+de escribirlo es la diferencia entre un libro que se puede auditar y uno que hay que creer.
+\end{leccion}

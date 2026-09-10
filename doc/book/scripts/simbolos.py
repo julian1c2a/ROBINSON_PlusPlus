@@ -205,7 +205,10 @@ def main():
     # y nadie lo ve porque LaTeX no protesta. El 2026-09-09 había tres casos en
     # tres capítulos distintos. Los acentos graves también, aunque hoy no haya
     # ninguno: en los capítulos el código va por \ident/\leanfrag, nunca en crudo.
-    RE_MD = re.compile(r"\*\*[^*\n]+\*\*"          # **negrita**
+    # `[^*]` y no `[^*\n]`: una negrita de Markdown copiada de un `.md` acaba
+    # partida en dos líneas al reajustar el párrafo, y así NO se veía. Pasó
+    # el 2026-09-10, en el capítulo de autorreferencia.
+    RE_MD = re.compile(r"\*\*[^*]{1,200}\*\*"           # **negrita**, aunque parta línea
                        r"|`[^`\n]*`"                 # `código`
                        r"|^#{1,6} ", re.M)           # # encabezado
     md = []

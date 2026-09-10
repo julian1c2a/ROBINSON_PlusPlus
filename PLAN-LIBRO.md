@@ -1,10 +1,14 @@
 # PLAN — Libro en LaTeX: *Incompletitud, formalizada*
 
-> ## ESTADO REAL — 2026-09-04 · `master` HEAD `1ab7a96` · **fase 0 sin arrancar**
+> ## ESTADO REAL — 2026-09-10h · `master` · **Parte IV escrita hasta el cap. 15**
 >
-> **Build 123 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **109 módulos activos** (Minimal 11 + Meta 87 + Full 11) **+ 0 en `cuarentena/` + 57 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms` (= 34 `coreAxioms` + 107 `codingAxioms`).
+>
+> ⚠️ El banner anterior (2026-09-04, `1ab7a96`) decía **123 jobs · 109 módulos · 7 axiom**, con
+> `d3` todavía postulado. Es exactamente la deriva que la auditoría de `doc/book/AUDITORIA-2026-09-10.md`
+> §5/R3 documenta — y que, por una vez, se corrige aquí en vez de anotarse.
 >
 > **Ubicación acordada: `doc/book/`** (no `libro/`, como decía la versión anterior de este plan).
 > Formato **LaTeX**. Idioma **español**.
@@ -155,7 +159,7 @@ Tres razones, las tres aprendidas a golpes aquí:
 |---|---|
 | kernel de Lean | `propext`, `Classical.choice`, `Quot.sound` |
 | meta-reglas ω de FOL (6) | `imp_intro`, `gen`, `raa`, `dne`, `or_elim`, `ex_elim` (`FOL/MetaRules.lean`) |
-| `axiom` de RPP (7) | `ax_induction`, `ax_list_induction`, `ax_mod2_alternation`, `ax_p_tfa`, `ax_axiomsCodeT_eq`, `prf_axiomsCodeT_eq`, `d3` |
+| `axiom` de RPP (**6**) | `ax_induction`, `ax_list_induction`, `ax_mod2_alternation`, `ax_p_tfa`, `ax_axiomsCodeT_eq`, `prf_axiomsCodeT_eq` — **`d3` RETIRADO el 2026-09-10** (`9ca5e66`): pasó a teorema |
 
 Cualquier símbolo que aparezca en un `#print axioms` **fuera de esa tabla** es un error del libro,
 no una nota a pie de página.
@@ -164,7 +168,7 @@ no una nota a pie de página.
 Hay exactamente **dos** en el estado actual, y los dos son teoremas legítimos del libro *siempre que
 se impriman con su condición a la vista, no en una nota al pie*:
 
-- **`goedel_second'`** — módulo el `axiom d3`;
+- ~~**`goedel_second'`** — módulo el `axiom d3`~~ — **SALDADO el 2026-09-10**: `d3` es teorema. Le quedan sus tres hipótesis explícitas (`fp_bwd`, `nec1`, `hgi`), que no son ninguna de las condiciones de derivabilidad;
 - **`goedel_first_undecidable_numeral`** — toma **`Reflects` como hipótesis META explícita**, sin
   descargar (para descargarla falta `NegVerifier`).
 
@@ -546,12 +550,32 @@ siguientes se leen a través de ella (§2.9).
 
 ### Parte IV — Los teoremas
 
-12. **Autorreferencia** — el mentiroso, la sustitución diagonal, `godelCN_fixedpoint`.
-13. **Gödel I** — `goedel_first_numeral`, con el aviso editorial de §6.
-14. **La mitad que falta: `⊬¬G`** — con la lista de §2.4 delante.
-15. **Las condiciones de derivabilidad** — D1 ✅, D2 ✅, el muro de D3.
+12. **Autorreferencia** ✅ — el mentiroso y el cambio de «falsa» por «no demostrable» (Tarski);
+    `selfApp`, `diagTerm` y por qué ahí hace falta el código *dotado*; que la teoría **sepa hacer**
+    la diagonalización (`diag_arith_num`); la sentencia; `godelCN_fixedpoint` **sin hipótesis**; las
+    dos representaciones y el paso de Leibniz que abarató la reparación; y tres lecturas falsas de
+    `G` desmontadas con la fórmula delante.
+13. **Gödel I** ✅ — el argumento en cuatro pasos, la prueba de Lean **impresa entera** (son las
+    mismas cuatro líneas), la descarga, y las tres cosas que el capítulo tiene que decir y casi
+    ningún libro dice en el mismo sitio: que la hipótesis es la **consistencia simple** y no la
+    ω-consistencia (con la trampa `ConsistentOmega`/`OmegaConsistent`, ver `MATERIALES.md` M-5);
+    que la teoría es la **reparada** (`\avisoreparacion`); y que sólo está cerrada **una de las dos
+    mitades** (`\avisomediagodel`). Con Rosser 1936 como contrapunto: eliminó la ω-consistencia
+    cambiando la sentencia, y este proyecto no tomó esa ruta.
+14. **La mitad que falta: `⊬¬G`** ✅ — el argumento hasta donde llega y el paso (4) que no es
+    lógica; `Reflects` como hipótesis honesta; **por qué el atajo lo cierra Gödel II** (para `φ=⊥`
+    la reflexión ES `Con(T)`; para `φ=G`, equivale a `⊢G`); el postulado de junio que la escondía
+    —un bicondicional cuya mitad izquierda era falsa, bajo consistencia simple: *decía de más*—;
+    la descarga por ω-consistencia + `NegVerifier`, con el uso de Markov en su sitio; y la cifra
+    incómoda: `NegVerifier` **enunciado, con cero teoremas que lo concluyan**.
+15. **Las condiciones de derivabilidad** ✅ — las tres en una página; **externo contra provable**
+    como la distinción que lo gobierna todo; D1 y D2 **teoremas** (D2 es el que suele postularse);
+    `d3` como el único `axiom` que el proyecto considera deuda; por qué D3 es difícil (una función
+    frente a una inducción); y **cuánto falta con nombres**: `d3_prf_of_halves`, la mitad (a)
+    cerrada por el episodio del cap. 18 y la (b) en tres piezas. Incluye el **hueco de ensamblaje**
+    que la auditoría del 2026-09-10 encontró y que ningún documento del proyecto señala.
 16. **La inducción como precio** — por qué Q sola no basta. *Material:* `AXIOMS.md` §1.1.
-17. **Gödel II, módulo `d3`** — qué significa publicar un teorema «módulo un axioma».
+17. **Gödel II** — *(reorientado el 2026-09-10, al cerrarse D3.)* Ya no va de «publicar módulo un axioma»: va de qué hipótesis le quedan y por qué son de otra clase. El punto fijo y la necesitación son piezas construibles; `hgi` es la mitad demostrada de Gödel I. Y el contraste que ahora se puede hacer: el capítulo 15 cuenta cómo se pagó la deuda, y éste cuenta qué queda cuando ya no hay ninguna.
 
 ### Parte V — Lo que no sale en los libros
 
@@ -701,8 +725,8 @@ $\mathrm{PA}^\omega=\mathrm{Th}(\mathbb{N})$, que sitúa el $\omega$-cálculo **
 escala y no un escalón por encima; y la distinción Q++ / Q++ codificante en el cuadro de estratos.
 Queda en `doc/book/revision/BITACORA.md`.
 
-**Falta escribir**: la Parte IV entera (12-17), diez capítulos de la Parte V (19-21, 23-29) y tres
-apéndices (inventario de axiomas, mapa de módulos, trampas de Lean).
+**Falta escribir**: de la Parte IV, los capítulos 16 y 17; diez capítulos de la Parte V (19-21,
+23-29); y tres apéndices (inventario de axiomas, mapa de módulos, trampas de Lean).
 
 **Siguiente sesión**, por este orden: (1) `make subir` desde el shell del autor — hay además
 renombrados de fichero pendientes de registrar; (2) `make axiomas` con Lean en el PATH — **los 67
@@ -726,7 +750,7 @@ capítulo 19 (la inconsistencia latente), que enlaza directamente con el 18 ya e
 El libro **no bloquea ni es bloqueado** por el desarrollo:
 
 - Partes I–III describen lo que **ya está probado y compila**: kernel, Q++, verificador, D1, D2,
-  Gödel I vía `goedel_first_numeral`, Gödel II módulo `d3`.
+  Gödel I vía `goedel_first_numeral`, y Gödel II con las tres condiciones **demostradas**.
 - La Parte IV documenta el problema, su reparación y **la reconstrucción**, con el arco **cerrado**.
 - Lo que **está vivo** en el proyecto (rama B de promoción, `hC_dot`, D3 real, `NegVerifier`) entra
   en el libro como **frente abierto declarado**, no como hueco silencioso.

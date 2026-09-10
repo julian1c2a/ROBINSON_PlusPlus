@@ -1,0 +1,189 @@
+\chapter{Las tres condiciones de derivabilidad}
+\label{cap:d123}
+
+El primer teorema necesita que $\Prov$ exista y diga la verdad en una dirección. El segundo
+necesita mucho más: que la teoría sepa \emph{razonar} sobre su propia demostrabilidad. Esas
+exigencias son tres, se llaman D1, D2 y D3, y no las publicó Gödel — son el artículo que anunció y
+nunca escribió, y las suministraron Hilbert y Bernays en 1939.
+
+Este capítulo dice qué pide cada una, cuáles son teoremas aquí y por qué la tercera lleva meses
+resistiéndose. Y da una respuesta concreta a la pregunta que el lector debería estar haciéndose:
+\emph{¿cuánto falta, exactamente?}
+
+\section{Las tres, en una página}
+
+\begin{matematica}[Lo que pide cada una]
+\[
+\begin{array}{ll}
+\text{D1} & \vdash \varphi \;\Longrightarrow\; \derives \Prov(\codigo{\varphi}) \\[4pt]
+\text{D2} & \derives \Prov(\codigo{\varphi \Rightarrow \psi}) \Rightarrow
+             \bigl(\Prov(\codigo{\varphi}) \Rightarrow \Prov(\codigo{\psi})\bigr) \\[4pt]
+\text{D3} & \derives \Prov(\codigo{\varphi}) \Rightarrow \Prov(\codigo{\Prov(\codigo{\varphi})})
+\end{array}
+\]
+
+\noindent D1: \emph{si algo se demuestra, la teoría lo sabe.} \quad
+D2: \emph{la demostrabilidad respeta el modus ponens.} \quad
+D3: \emph{la teoría sabe que sabe.}
+\end{matematica}
+
+La diferencia de naturaleza entre la primera y las otras dos es la que gobierna todo el capítulo, y
+conviene fijarla antes de mirar ningún código.
+
+\begin{leccion}[Externo contra provable]
+\textbf{D1 es una afirmación de la metateoría}: para \emph{cada} $\varphi$ demostrable,
+\emph{nosotros} construimos la derivación de $\Prov(\codigo{\varphi})$. Se demuestra caso a caso, y
+cada caso es finito.
+
+\textbf{D2 y D3 son afirmaciones de la teoría objeto}: la que se demuestra es una fórmula con un
+$\Rightarrow$ dentro, cuantificada sobre \emph{todas} las derivaciones posibles. Y razonar sobre
+todas las derivaciones, dentro de la teoría, exige inducción — que es justo lo que
+Q\texttt{++} no tiene.
+
+Ésa es toda la historia. D1 es trabajo; D3 es un problema.
+\end{leccion}
+
+\section{D1: un teorema, sin hipótesis}
+
+Ya está demostrada, y el capítulo~\ref{cap:d1} contó cómo. Aquí sólo el recordatorio de que no
+arrastra nada:
+
+\leanfrag{repr_pos_prf}
+
+Es la $\Sigma_1$-completitud \textbf{externa}: dada una demostración concreta, se construye el
+testigo concreto. Ninguna inducción de la teoría objeto interviene.
+
+\section{D2: también un teorema, y es el que suele postularse}
+
+\leanfrag{d2_prf}
+
+\selee{«la teoría demuestra que, si es demostrable $A \Rightarrow B$ y es demostrable $A$, entonces
+es demostrable $B$»}
+
+\begin{observacion}
+Merece la pena subrayarlo porque es donde muchas presentaciones —y una versión anterior de este
+mismo proyecto— se ahorran el trabajo: \textbf{D2 aquí es un teorema, no un postulado}. La
+diferencia se ve en el inventario: el capítulo~\ref{cap:lean} decía que un \ident{axiom} es
+una deuda, y ésta está pagada.
+
+La prueba, por cierto, es instructiva: elimina el $\exists$ externo del predicado de
+demostrabilidad —el testigo es la propia derivación— y después concatena las dos cadenas. Es el
+\emph{modus ponens} de la teoría, escrito dentro de la teoría.
+\end{observacion}
+
+\section{D3: la que Gödel anunció, y estuvo postulada hasta anteayer}
+
+Durante casi toda la vida de este proyecto, D3 fue lo que la mayoría de las presentaciones hacen
+con ella: un postulado. Estaba escrita como \ident{axiom} de Lean —no como axioma objeto de la
+lista de 141, sino como un supuesto de la \textbf{metateoría}—, lo que significaba que todo
+teorema que la citara la llevaba impresa en su \emph{footprint}. El segundo teorema de Gödel se
+publicaba con esa marca.
+
+Ya no. Desde el 10 de septiembre de 2026 es un teorema, con la misma firma exacta que tenía el
+axioma:
+
+\leanfrag{d3_teorema}
+
+\selee{«la teoría demuestra que, si $\varphi$ es demostrable, entonces es demostrable que
+$\varphi$ es demostrable»}
+
+\begin{leccion}[Retirar un axioma sólo puede fortalecer lo que había]
+Nótese qué es lo que \emph{no} cambió: ni el enunciado de D3, ni el de \ident{goedel_second'}, ni
+una línea de su demostración. Lo único que cambió es de dónde viene D3 — antes se suponía, ahora se
+deriva.
+
+Ésa es la propiedad que hace que este tipo de deuda sea \textbf{segura de contraer}: mientras el
+postulado esté a la vista y con la firma que tendrá el teorema, pagarlo después no obliga a
+reconstruir nada aguas abajo. Se sustituye la palabra \ident{axiom} por \ident{theorem} y todos
+los \emph{footprints} de la cadena adelgazan solos.
+\end{leccion}
+
+El inventario de axiomas de Lean del proyecto pasó, ese día, de siete a \textbf{seis}. De los que
+quedan, ninguno es una deuda de este tipo: son anclas de codificación y esquemas de inducción
+declarados.
+
+\section{Por qué costó tanto}
+
+La demostración real de D3 es la $\Sigma_1$-completitud \textbf{provable}: que la teoría
+demuestre, de toda derivación, que su verificador la acepta. Y ahí hay que razonar sobre un objeto
+de longitud arbitraria \emph{desde dentro}.
+
+\begin{leccion}[Dónde estaba la dificultad, en una frase]
+D1 mira \emph{una} derivación y construye \emph{un} testigo. D3 tiene que decir algo sobre
+\textbf{todas} las derivaciones, y decirlo la teoría, no nosotros. La primera es una función; la
+segunda es una inducción — y la inducción de la teoría objeto es exactamente el recurso que
+Q\texttt{++} no tiene y que \capfuturo{la inducción como precio} tendrá que comprar.
+\end{leccion}
+
+\section{La forma de la demostración}
+
+Lo que hay debajo del teorema de una línea es una reducción de varios pisos, y su forma final es
+ésta: D3 se sigue de reflejar \textbf{las dos mitades del cuerpo} del verificador.
+
+\leanfrag{d3_prf_of_halves}
+
+\selee{«si se reflejan las dos mitades del cuerpo —la buena formación de cada línea y sus
+premisas—, D3 queda demostrada»}
+
+Las dos reciben lo mismo: una cadena $q$ y un índice $i$ dentro de ella. Y de la cadena sale lo que
+las dos necesitan:
+
+\leanfrag{prf_lineWF_of_chainOk}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X l@{}}
+\toprule
+mitad & qué refleja & se cerró \\
+\midrule
+(a) & que la línea $i$-ésima está bien formada & 2026-09-10 \\
+(b) & que sus premisas están donde deben & 2026-09-10 \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+La mitad (a) es la que costó el episodio del capítulo~\ref{cap:muro-substfc}: los veintiún
+reflectores del verificador, de los que siete estuvieron bloqueados cuarenta días. La mitad (b)
+necesitó tres piezas más, y la primera de ellas resume bien de qué va todo esto:
+
+\leanfrag{pcc_eval_premsOf}
+
+\selee{«si la línea $t$ está bien formada, la teoría demuestra que el operador \emph{premisas de}
+aplicado a su código da el código de sus premisas»}
+
+Veintiuna ramas, una por cada tipo de línea que el verificador admite, porque \textbf{las premisas
+sólo se pueden evaluar sabiendo de qué regla se trata}. Con ella, la cota; con la cota, el chasis
+inductivo interior; y con las tres, el ensamblaje:
+
+\leanfrag{d3_prf_real}
+
+\begin{observacion}
+Este libro llegó tarde por dos días. El capítulo que se escribió el 10 de septiembre por la mañana
+decía —midiendo, y correctamente— que la mitad (b) estaba abierta en tres piezas, y señalaba además
+un hueco de ensamblaje que ningún documento del proyecto había visto: la mitad (a) estaba probada y
+\textbf{no la consumía nadie}.
+
+Las tres piezas se cerraron esa misma tarde, en cuatro commits, y el hueco de ensamblaje lo cerró
+el último de ellos. \ident{d3_prf_real} es exactamente el teorema que faltaba: la mitad (a) y la
+mitad (b), enchufadas.
+
+Se deja escrito porque es la clase de dato que un libro sobre un proyecto vivo debe dar y casi
+ninguno da: \textbf{cuánto tiempo hubo entre saber qué faltaba y que dejara de faltar}. Aquí,
+unas horas.
+\end{observacion}
+
+\section{Lo que las tres condiciones significan juntas}
+
+\begin{leccion}[Por qué esto es el artículo que Gödel no escribió]
+El primer teorema necesita D1 y nada más. El segundo necesita las tres, y ésa es la razón de que
+Gödel anunciara una segunda parte y no la publicara: la demostración detallada exige justamente
+esto, y «esto» resultó ser considerablemente más trabajo de lo que cabía en una nota.
+
+Noventa y cinco años después, en una formalización mecánica, la proporción se repite con precisión
+incómoda: D1 y D2 salieron en semanas, y D3 —la que Gödel dejó anunciada— costó meses y fue la
+última en caer. Eso no dice nada malo del proyecto: es la medida honesta de lo que Hilbert y
+Bernays tuvieron que suministrar cuando la segunda parte no llegó.
+
+Con las tres demostradas, el segundo teorema deja de publicarse con una condición al margen. Qué
+significa eso exactamente —y qué hipótesis \emph{sí} le quedan, que no son ninguna de las
+tres— es el asunto de \capfuturo{Gödel II}.
+\end{leccion}

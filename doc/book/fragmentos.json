@@ -1052,6 +1052,278 @@
         "Prf",
         "Prov"
       ]
+    },
+    {
+      "clave": "pcc_lineWF_tracked",
+      "modulo": "ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean",
+      "decl": "pcc_lineWF_tracked",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "selfApp",
+      "modulo": "ROBINSON_PlusPlus/Meta/Diagonal.lean",
+      "decl": "selfApp",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "sintaxis"
+      ]
+    },
+    {
+      "clave": "godelPred",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalTwo.lean",
+      "decl": "godelPred'",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "godelBeta",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalTwo.lean",
+      "decl": "godelBeta'",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "godelCN",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "godelCN",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "diag_arith_num",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "diag_arith_num",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "godelCN_fixedpoint_N",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "godelCN_fixedpoint_N",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "derives",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "provCode_transfer",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "provCode_transfer",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "derives",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "godelCN_fixedpoint",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "godelCN_fixedpoint",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "derives",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "ConsistentOmega",
+      "modulo": "ROBINSON_PlusPlus/Meta/Hilbert.lean",
+      "decl": "ConsistentOmega",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "OmegaConsistent",
+      "modulo": "ROBINSON_PlusPlus/Meta/OmegaReflect.lean",
+      "decl": "OmegaConsistent",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "consistentH_of_omega",
+      "modulo": "ROBINSON_PlusPlus/Meta/Hilbert.lean",
+      "decl": "consistentH_of_omega",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "objeto"
+      ]
+    },
+    {
+      "clave": "goedel_first_unprovable",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalTwo.lean",
+      "decl": "goedel_first_unprovable_real'",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "goedel_first_numeral",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "goedel_first_numeral",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "goedel_first_unrefutable",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalTwo.lean",
+      "decl": "goedel_first_unrefutable_real'",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "goedel_first_undecidable",
+      "modulo": "ROBINSON_PlusPlus/Meta/DiagonalNumeral.lean",
+      "decl": "goedel_first_undecidable_numeral",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "NegVerifier",
+      "modulo": "ROBINSON_PlusPlus/Meta/OmegaReflect.lean",
+      "decl": "NegVerifier",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "goedel_first_undecidable_omega",
+      "modulo": "ROBINSON_PlusPlus/Meta/OmegaReflect.lean",
+      "decl": "goedel_first_undecidable_omega",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Lean",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "d2_prf",
+      "modulo": "ROBINSON_PlusPlus/Meta/DerivCondPrf.lean",
+      "decl": "d2_prf",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "d3_teorema",
+      "modulo": "ROBINSON_PlusPlus/Meta/GodelTwo.lean",
+      "decl": "d3",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "derives",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "d3_prf_of_halves",
+      "modulo": "ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean",
+      "decl": "d3_prf_of_halves",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "prf_lineWF_of_chainOk",
+      "modulo": "ROBINSON_PlusPlus/Meta/D3BodyPrf.lean",
+      "decl": "prf_lineWF_of_chainOk",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "codigo"
+      ]
+    },
+    {
+      "clave": "d3_prf_real",
+      "modulo": "ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean",
+      "decl": "d3_prf_real",
+      "capa": "produccion",
+      "footprint": [],
+      "nivel": [
+        "Prf",
+        "Prov"
+      ]
+    },
+    {
+      "clave": "pcc_eval_premsOf",
+      "modulo": "ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean",
+      "decl": "pcc_eval_premsOf",
+      "capa": "produccion",
+      "footprint": [],
+      "solo_firma": true,
+      "nivel": [
+        "Prf",
+        "codigo"
+      ]
     }
   ],
   "paquetes": {

@@ -1,0 +1,155 @@
+\chapter{El primer teorema, y la mitad que sale gratis}
+\label{cap:godel-i}
+
+Con el punto fijo demostrado, el primer teorema de Gödel ocupa seis líneas de Lean y no necesita
+ninguna idea nueva. Este capítulo las lee despacio, porque en ellas se ve exactamente
+\emph{qué} se usa — y, sobre todo, qué no.
+
+Y luego dice lo que casi ningún libro dice en el mismo sitio: que de las dos mitades del teorema,
+en esta formalización sólo una está cerrada.
+
+\section{El argumento}
+
+Supóngase que $G$ \emph{sí} fuera demostrable. Entonces:
+
+\begin{matematica}[Cuatro pasos y una contradicción]
+\begin{enumerate}
+\item Si $G$ tiene una demostración finitaria, la teoría lo \emph{sabe}: por D1,
+  $\text{\ident{axioms}} \derives \Prov(\codigo{G})$. Eso es exactamente lo que el
+  capítulo~\ref{cap:d1} demostró.
+\item De $\Prf G$ se pasa a $\text{\ident{axioms}} \derives G$ por el puente entre los dos cálculos
+  (capítulo~\ref{cap:kernel}).
+\item El punto fijo, leído de izquierda a derecha, dice
+  $G \Rightarrow \lnot\Prov(\codigo{G})$. Con (2), la teoría demuestra
+  $\lnot\Prov(\codigo{G})$.
+\item Junto a (1): la teoría demuestra una fórmula y su negación. Luego demuestra $\bot$.
+\end{enumerate}
+Si la teoría es consistente, (4) es imposible. Luego $G$ no es demostrable. $\square$
+\end{matematica}
+
+Obsérvese que no se ha hablado ni una vez de si $G$ es \emph{verdadera}. El argumento entero es
+sintáctico: entra una demostración hipotética y sale una contradicción.
+
+\section{El mismo argumento, en Lean}
+
+Aquí está, entero, sin recortes. Es uno de los pocos sitios de este libro donde merece la pena
+imprimir la prueba completa y no sólo el enunciado, porque las cinco líneas del cuerpo son las
+cuatro del argumento de arriba más la contradicción:
+
+\leanfrag{goedel_first_unprovable}
+
+\selee{«si la teoría es consistente y $G$ es un punto fijo de $\lnot\Prov$, entonces $G$ no tiene
+demostración finitaria»}
+
+Léase la correspondencia línea a línea: \ident{repr_pos'} es D1; \ident{prf_to_derives} es el
+puente entre los cálculos; \ident{and_elim_left} extrae la dirección del bicondicional que hace
+falta; y la hipótesis \texttt{hcon} —la consistencia— es lo único que se pone de fuera.
+
+\begin{leccion}[Por qué el teorema está partido en dos declaraciones]
+Nótese que este enunciado no habla de \emph{la} sentencia de Gödel: habla de \textbf{cualquier}
+punto fijo $G$. Es el argumento, aislado de la construcción que lo alimenta.
+
+Eso no es elegancia gratuita. Cuando la construcción del punto fijo resultó estar apoyada en un
+axioma inconsistente y hubo que rehacerla entera (capítulo~\ref{cap:numerales}), \textbf{este
+teorema no se tocó}: bastó con enchufarle el punto fijo nuevo. Separar el argumento de su insumo
+es lo que hizo que una reparación de los cimientos no obligara a rehacer el tejado.
+\end{leccion}
+
+Y la descarga, que es una línea:
+
+\leanfrag{goedel_first_numeral}
+
+\begin{observacion}
+\emph{Cero postulados gödelianos.} No hay ninguna hipótesis del tipo «supongamos que $\Prov$
+representa fielmente la demostrabilidad», que es donde las formalizaciones ingenuas esconden el
+trabajo. Lo único que entra es la consistencia. Todo lo demás son teoremas de las partes
+anteriores.
+\end{observacion}
+
+\section{Qué consistencia, exactamente}
+
+La hipótesis se llama \ident{ConsistentOmega}, y conviene mirarla porque su nombre engaña:
+
+\leanfrag{ConsistentOmega}
+
+\selee{«la teoría no demuestra $\bot$ en el cálculo con la $\omega$-regla»}
+
+Es \textbf{consistencia simple} —la más débil que se puede pedir—, enunciada sobre el cálculo
+fuerte $\derives$. Y de ahí se hereda para el cálculo finitario:
+
+\leanfrag{consistentH_of_omega}
+
+\begin{muro}[Dos nombres a una palabra de distancia, y no son lo mismo]
+En este proyecto conviven \ident{ConsistentOmega} y \ident{OmegaConsistent}. Se leen casi igual y
+son propiedades distintas — y la que \emph{suena} más fuerte es la más débil:
+
+\leanfrag{OmegaConsistent}
+
+\ident{ConsistentOmega} es «el cálculo $\omega$ es consistente»: no demuestra $\bot$.
+\ident{OmegaConsistent} es la \textbf{$\omega$-consistencia} de verdad: que la teoría no demuestre
+$\exists x.\,A(x)$ mientras refuta $A(\bar n)$ para todos los testigos estándar.
+
+La primera es la hipótesis de este capítulo. La segunda hace falta para la otra mitad. Confundirlas
+en una lectura rápida convierte un teorema honesto en una exageración, y el orden de las palabras
+es lo único que las separa.
+\end{muro}
+
+\section{Sobre qué teoría se ha demostrado esto}
+
+\avisoreparacion
+
+Conviene ser preciso sobre qué significa eso aquí. \ident{goedel_first_numeral} es un teorema
+\textbf{real} sobre la teoría \textbf{reparada}: se retiró el axioma que hacía derivable $\bot$, y
+lo que queda no tiene ninguna inconsistencia conocida. Pero «ninguna conocida» no es «ninguna», y
+este libro no va a decir lo segundo.
+
+\begin{leccion}[Y la hipótesis se lleva bien con esa cautela]
+Hay una elegancia real en que el teorema tome la consistencia como \emph{hipótesis} en vez de
+darla por buena. El enunciado no afirma que la teoría sea consistente: afirma que
+\textbf{si} lo es, $G$ no es demostrable. Esa forma condicional es la que sobrevive a un
+descubrimiento como el de julio de 2026 — y, de hecho, es la única forma en la que el segundo
+teorema de Gödel permite enunciar nada sobre la consistencia de un sistema desde dentro.
+\end{leccion}
+
+\section{La mitad que falta}
+
+\avisomediagodel
+
+El teorema clásico dice que $G$ es \textbf{indecidible}: ni demostrable ni refutable. Lo que este
+proyecto tiene demostrado es la primera mitad. La segunda existe como enunciado y arrastra una
+hipótesis que hoy no está descargada — es el asunto del capítulo siguiente.
+
+La razón de fondo no es un descuido, y ya estaba en el teorema original.
+
+\begin{leccion}[Las dos mitades nunca costaron lo mismo]
+Gödel demostró $\noderives G$ con la consistencia simple, y necesitó la
+\textbf{$\omega$-consistencia} para $\noderives \lnot G$. La asimetría es del argumento, no de la
+formalización: la primera mitad sólo tiene que impedir que la teoría demuestre algo y su negación;
+la segunda tiene que impedir que la teoría se equivoque \emph{sobre los testigos}, y eso es una
+exigencia más fuerte.
+
+Rosser la eliminó en 1936 —cambiando la sentencia, no el argumento: su $R$ dice «si hay una
+demostración mía, hay antes una demostración de mi negación»— y consiguió las dos mitades con
+consistencia simple.\footnote{J.~B. Rosser, «Extensions of some theorems of Gödel and Church»,
+\emph{The Journal of Symbolic Logic} 1(3), 1936, pp.~87--91.} Este proyecto \textbf{no} tomó esa
+ruta: construyó la sentencia de Gödel y dejó la segunda mitad como una hipótesis explícita. Es una
+decisión, y decirla es parte de decir qué se ha demostrado.
+\end{leccion}
+
+\section{Lo que queda dicho}
+
+\begin{center}\small
+\begin{tabularx}{\linewidth}{@{}l >{\raggedright\arraybackslash}X l@{}}
+\toprule
+mitad & qué hace falta & estado \\
+\midrule
+$\noderives G$ & consistencia simple, y nada más & \textbf{demostrado} \\
+$\noderives \lnot G$ & reflexión —o $\omega$-consistencia más un verificador negativo— & hipótesis sin descargar \\
+\bottomrule
+\end{tabularx}
+\end{center}
+
+Media indecidibilidad no es un resultado a medias: $\noderives G$ es, por sí solo, el enunciado que
+hunde el programa de Hilbert. Hay una sentencia aritmética que la teoría no puede demostrar, y su
+número de Gödel se puede calcular. Lo que falta es saber si la teoría tampoco puede refutarla — y
+en eso, como se verá, el proyecto tiene el enunciado escrito y ni una línea de la construcción.

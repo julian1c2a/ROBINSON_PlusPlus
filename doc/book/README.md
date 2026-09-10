@@ -34,6 +34,7 @@ ser citado). Detalle en [`LICENSE`](LICENSE) y en el apéndice E del libro.
 | `bib/libro.bib` | bibliografía |
 | `MATERIALES.md` | **la cantera**: hallazgos y razonamientos que deben acabar en el libro, cada uno con su capítulo de destino y su estatuto ([medido]/[citado]/[razonado]/[conjetura]) |
 | `DOCSTRINGS-NO-FIABLES.md` | afirmaciones falsas encontradas en docstrings de producción (§2.6) |
+| `AUDITORIA-<fecha>.md` | auditoría del estado real de código y libro, con el rastro del camino seguido. **Caduca**: las cifras se miden el día que se escribe |
 | `scripts/revisar.py` | el **bucle de revisión** (§2.10): LaTeX → Markdown/ODT → retoques → LaTeX |
 | `revision/bitacora.json` | **el estado de la revisión**, y lo único de `revision/` que se commitea junto a su lectura `BITACORA.md`. `LIBRO.md`, `LIBRO.odt` y `.base.md` son generados |
 
@@ -55,6 +56,22 @@ make clean
 ⚠️ `make axiomas` **necesita `lake` y `lean` en el PATH** y se ejecuta desde la raíz del repo. Es el
 control `PLAN-LIBRO.md` §2.2(c)-(d): compara el footprint real de cada declaración citada contra el
 declarado en `fragmentos.json` y contra la base sancionada.
+
+## ⏱️ Si `make` se corta a la mitad
+
+Con el libro por encima de las 100 páginas, `make` completo (extraer + tres pasadas de LaTeX + los
+tres controles) puede pasar del límite de tiempo de una sesión remota. **Una compilación
+interrumpida deja `libro.out` truncado**, y la siguiente falla con `Runaway argument? … File ended
+while scanning use of \@@BOOKMARK`. No es un error del libro:
+
+```bash
+: > libro.out ; : > libro.aux ; : > libro.toc   # los regenera latexmk
+touch libro.tex                                  # fuerza la recompilación
+make pdf                                         # y luego los controles por separado
+python3 scripts/verificar_pdf.py
+python3 scripts/simbolos.py --estricto
+python3 scripts/terminos.py
+```
 
 ## Los cinco entornos, y cuándo se usa cada uno
 
