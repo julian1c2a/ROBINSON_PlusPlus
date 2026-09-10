@@ -14,6 +14,19 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10h (c) — ADR‑023: el censo de `coreAxioms`, CERTIFICADO (2 de 11) — y una
+> autocorrección.** `Full/Induction.lean` §0bis: **`primAxioms`** (los 23 primitivos),
+> `primAxioms_subset`, **`prim_to_axioms`** y `axp`. `Full/Lists.lean`: **`concat_assoc_prim`** y
+> **`in_concat_prim`** — ax_C3 y ax_L3 **certificados sobre los primitivos**, con **cero cambios de
+> axioma** (⭐ `ax_list_induction` ya era genérico en `Γ`); las firmas `axioms ⊢` se conservan
+> porque **`Derives.weakening` es un CONSTRUCTOR**, no un lema. ⚠️⚠️ **Corrige lo escrito unas horas
+> antes en esta misma sesión**: certificar con `primAxioms` **NO mueve la frontera de la teoría**
+> —`axioms` queda intacta—; lo que la movería es **quitar** los 11 de la lista, y eso **no se
+> hace**. ⭐ Medido: **ninguna** de las 46 citaciones `∈ axioms` de `Full/{Induction,Mod2,Lists}`
+> cita uno de los 11 ⇒ no hay circularidad. ⬜ Los 9 restantes esperan sanción: pasan por
+> `ax_induction`, y ⛔ generalizarlo a `∀Γ` sería **FALSO** (con `Γ = []` la inducción quedaría
+> lógicamente válida) ⇒ hay que **moverlo** a `primAxioms ⊢ …` — M‑1.
+>
 > **2026‑09‑10h (b) — ADR‑022: la clase de testigos de la ω‑consistencia, ESTRECHADA.**
 > `Meta/OmegaReflect.lean` §1bis–§1quater: `StdChain` pasa de `IsCodeShaped` a **`StdLine`**
 > (`⟨⌜f⌝, k̄, args⟩`, args `formCode`/`termCode`) ⇒ las comparaciones de `NegVerifier` son

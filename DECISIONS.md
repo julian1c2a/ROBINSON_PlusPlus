@@ -1392,3 +1392,116 @@ theorem junk_line_not_stdLine :
 
 **Lo que NO cambia**: 6 `axiom` de Lean, 141 axiomas objeto, `reflects_of_omega` y
 `goedel_first_undecidable_omega` **sin tocar** (son paramétricos en `StdChain`).
+
+---
+
+## ADR-023: El censo de `coreAxioms` se CERTIFICA con `primAxioms` — y eso NO mueve la frontera de la teoría
+
+**Fecha**: 2026-09-10
+**Estado**: **Parcialmente aceptado y ejecutado.** 2 de los 11 certificados hoy, sin coste;
+los 9 restantes **esperan una sanción del propietario** (restatar `ax_induction`), y por eso
+esto es un ADR y no un commit.
+
+### Contexto
+
+El censo (`doc/REFERENCE-Full.md` §3.14.1) parte `coreAxioms` en **23 primitivos/definitorios** y
+**11 derivables con inducción**, y los 11 **están demostrados** en `Full`. Pero se enuncian:
+
+```lean
+theorem add_comm_thm : axioms ⊢ ax6_add_comm         -- y ax6_add_comm ∈ axioms
+```
+
+⇒ **trivialmente ciertos por `ax`**. El **tipo no certifica** la redundancia; sólo la prueba lo
+hace, y nada impide que una edición futura la cortocircuite.
+
+### ⚠️ CORRECCIÓN de lo que este mismo proyecto escribió esta misma sesión
+
+Al levantar el censo se anotó que certificarlo *«pide `primAxioms`, y eso **mueve la frontera de la
+teoría** (ADR‑015) ⇒ ADR, no limpieza»*. **Eso confunde dos cosas distintas**, y sólo una es cierta:
+
+| | qué se hace | ¿mueve la frontera? |
+|---|---|---|
+| **(A) CERTIFICAR** | añadir `primAxioms ⊆ axioms` y demostrar `primAxioms ⊢ axN` | ⛔ **NO.** `axioms` queda **intacta**; `axiomsCodeT`, `provCodeC'` y la sentencia `G` no se enteran |
+| **(B) ESTRECHAR** | **quitar** los 11 de `axioms` | ✅ SÍ, y por eso **no se hace** |
+
+Este ADR decide **(A)**. **(B)** queda descartada.
+
+### La medición que lo hace barato
+
+1. ⭐ **`Derives.weakening` es un CONSTRUCTOR de `Derives`** (`FOL/FOL.lean`), no un lema por
+   probar. ⇒ el puente `primAxioms ⊢ f → axioms ⊢ f` es **una línea** y **ninguna firma aguas
+   abajo cambia**.
+2. ⭐ **Ninguna de las 46 citaciones `∈ axioms`** de `Full/{Induction,Mod2,Lists}.lean` cita **uno
+   de los 11 derivables**. Las distintas que se citan son, todas, **primitivas**:
+
+       Full/Lists.lean      : ax_C1, ax_C2, ax_L1, ax_L2                    (4)
+       Full/Induction.lean  : ax2, ax3, ax4, ax5, ax8, ax9, ax13            (7)
+
+   ⇒ **no hay circularidad que romper**: la migración es **mecánica**.
+3. ⭐ **`ax_list_induction` YA es genérico en `Γ`** (`Full/Lists.lean`). ⇒ `ax_C3` y `ax_L3` se
+   certifican **sin tocar ningún axioma**.
+
+### Lo EJECUTADO hoy
+
+```lean
+def primAxioms : List Formula := [ … los 23 … ]        -- Full/Induction.lean §0bis
+theorem primAxioms_len    : primAxioms.length = 23 := rfl
+theorem primAxioms_subset : ∀ f ∈ primAxioms, f ∈ axioms
+theorem prim_to_axioms    : primAxioms ⊢ f → axioms ⊢ f     -- Derives.weakening
+theorem axp               : f ∈ primAxioms → primAxioms ⊢ f -- Derives.hyp
+
+theorem concat_assoc_prim : primAxioms ⊢ ax_C3_concat_assoc   -- 🏁 CERTIFICADO
+theorem in_concat_prim    : primAxioms ⊢ ax_L3_in_concat      -- 🏁 CERTIFICADO
+```
+
+`concat_assoc_thm`/`in_concat_thm` **conservan su firma** `axioms ⊢ …` (vía `prim_to_axioms`), y
+los *pointwise* también, porque `Meta/ProofChain.lean` los consume. ⚠️ Los cuatro helpers de
+congruencia de `Full/Lists.lean` pasan a ser **genéricos en `Γ`** —no citan ningún axioma— para
+servir a los dos contextos a la vez.
+
+### ⛔ LO QUE FALTA, Y POR QUÉ NO LO DECIDO YO
+
+Los otros **9** (ax6, ax7, ax10, ax11, ax12, ax18, ax19 en `Induction.lean`; ax21, ax24 en
+`Mod2.lean`) pasan por `induction_object`, y con él por
+
+```lean
+axiom ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ
+```
+
+que está **especializado a `axioms`**. Para certificar sobre `primAxioms` hace falta el mismo
+axioma sobre `primAxioms` — y eso es **restatar un axioma** ⇒ **M‑1: sanción explícita**.
+
+⚠️⚠️ **Y la salida fácil está CERRADA**: generalizarlo a `∀ {Γ}, Γ ⊢ inductionFormula φ` —la forma
+que `ax_list_induction` sí tiene— sería **FALSO**, porque con `Γ = []` diría que el esquema de
+inducción es **lógicamente válido**. `ax_list_induction` puede ser genérico porque es una **regla**
+(lleva `base` y `step` sobre el mismo `Γ`); `ax_induction` es un **axioma**, y un axioma tiene que
+**nombrar su contexto**.
+
+⇒ **La forma correcta a sancionar** sería:
+
+```lean
+axiom ax_induction_prim (φ : Formula) : primAxioms ⊢ inductionFormula φ
+theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
+  prim_to_axioms (ax_induction_prim φ)          -- ⇒ `ax_induction` deja de ser axioma
+```
+
+Nótese que **no añade un axioma: lo mueve**, y el recuento queda igual (`ax_induction` pasa a
+teorema). Dice exactamente lo que `Full` significa: *«los 23 primitivos **más** el esquema de
+inducción»*. ⚠️ Es **estrictamente más fuerte** que la forma de hoy, así que es una decisión del
+propietario.
+
+⚠️ **`Mod2.lean` tiene además un coste propio**: importa `Block1`, cuyos teoremas están enunciados
+sobre `axioms`. Certificar ax21/ax24 arrastra esa capa. **Medir antes de prometer.**
+
+### Consecuencias operativas
+
+* **Certificar es barato y no cambia nada**: cuando un frente de `Full` derive un axioma de
+  `Minimal`, enunciarlo sobre `primAxioms` y recuperar `axioms ⊢` con `prim_to_axioms`.
+* `primAxioms` vive en `Full/Induction.lean`, no en `Minimal/Axioms.lean`, para **no tocar el
+  fichero con verja**. ⭐ Su sitio natural es junto a `coreAxioms`; moverlo es del propietario.
+* ⚠️ **Regla que este ADR deja**: *«mueve la frontera de la teoría» no es un comodín*. Antes de
+  aplazar algo por eso, comprobar si de verdad **cambia `axioms`** o sólo **añade un enunciado
+  sobre un subconjunto**.
+
+**Lo que NO cambia**: 6 `axiom` de Lean, 141 axiomas objeto, `axioms`, `coreAxioms`,
+`axiomsCodeT`, `provCodeC'`, `G`, y todas las firmas aguas abajo.

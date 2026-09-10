@@ -186,11 +186,28 @@ def primAxioms : List Formula := [ … los 23 … ]          -- ⬜ no existe
 theorem add_comm_thm : primAxioms ⊢ ax6_add_comm := …    -- ⬜ el enunciado que certifica
 ```
 
-⚠️ **Pero eso NO es una limpieza gratis, y por eso no se hace sin ADR**: `axiomsCodeT` está
-anclado a **`axioms`** (`ax_axiomsCodeT_eq`), y la regla `thy` del verificador acepta como axioma
-de teoría todo lo que esté en `axiomsCodeT`. Estrechar la lista **mueve la frontera de la teoría**,
-y esa frontera es la que decide qué significa `provCodeC'` y **cuál es la sentencia G**
-([ADR‑015](../DECISIONS.md)). ⇒ decisión del propietario, no del formalizador.
+⚠️⚠️ **CORRECCIÓN (misma sesión, [ADR‑023](../DECISIONS.md)).** Aquí se escribió que certificarlo
+*«mueve la frontera de la teoría»*. **Confunde dos cosas, y sólo una es cierta:**
+
+| | qué se hace | ¿mueve la frontera? |
+|---|---|---|
+| **(A) CERTIFICAR** | añadir `primAxioms ⊆ axioms` y probar `primAxioms ⊢ axN` | ⛔ **NO.** `axioms` queda intacta ⇒ `axiomsCodeT`, `provCodeC'` y `G` no se enteran |
+| **(B) ESTRECHAR** | **quitar** los 11 de `axioms` | ✅ SÍ — y por eso **no se hace** |
+
+⇒ **(A) está decidida y parcialmente ejecutada.** ⭐ Y sale barata por dos hallazgos:
+**`Derives.weakening` es un CONSTRUCTOR** de `Derives` (el puente es una línea, ninguna firma aguas
+abajo cambia), y **ninguna de las 46 citaciones `∈ axioms`** de `Full/{Induction,Mod2,Lists}.lean`
+cita uno de los 11 derivables ⇒ **no hay circularidad**, la migración es mecánica.
+
+🏁 **Hecho hoy**: `primAxioms` (los 23) + `primAxioms_subset` + `prim_to_axioms` + `axp`
+(`Full/Induction.lean` §0bis), y **`concat_assoc_prim`/`in_concat_prim`** — ax_C3 y ax_L3
+**certificados**, con **cero cambios de axioma**, porque `ax_list_induction` ya era genérico en `Γ`.
+
+⬜ **Los otros 9** pasan por `ax_induction`, que está especializado a `axioms`. ⛔ Y la salida fácil
+está cerrada: `∀ {Γ}, Γ ⊢ inductionFormula φ` sería **FALSO** (con `Γ = []` haría la inducción
+lógicamente válida). Un axioma **tiene que nombrar su contexto** ⇒ hay que **mover** `ax_induction`
+a `primAxioms ⊢ …` y recuperar el de hoy por debilitamiento — **sanción del propietario** (M‑1).
+Detalle y forma exacta en ADR‑023.
 
 
 ---

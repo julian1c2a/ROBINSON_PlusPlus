@@ -108,9 +108,9 @@ REFERENCE, `AI-GUIDE.md` §0.5).
 
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
-| `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | ✅ `ax_induction`/`inductionFormula` · 🆕 **ax6/7/10/11/12/18/19 empaquetados de verdad** (2026‑09‑10h: `add_assoc_thm`, `mul_assoc_thm`, `mul_distrib_thm` — la NOTA que declaraba imposible el `∀³` era FALSA). Censo completo en [REFERENCE-Full §3.14.1](doc/REFERENCE-Full.md) |
+| `Full/Induction.lean` | `…Full` | `Axioms`, `FOL.*` | ✅ `ax_induction`/`inductionFormula` · 🆕 **ax6/7/10/11/12/18/19 empaquetados de verdad** (2026‑09‑10h: `add_assoc_thm`, `mul_assoc_thm`, `mul_distrib_thm` — la NOTA que declaraba imposible el `∀³` era FALSA). Censo completo en [REFERENCE-Full §3.14.1](doc/REFERENCE-Full.md). 🆕 **§0bis: `primAxioms`** (los 23 primitivos) + `primAxioms_subset` + `prim_to_axioms` + `axp` ([ADR‑023](DECISIONS.md)) — el andamio que **certifica** el censo, y ⭐ **no mueve la frontera de la teoría** (`axioms` intacta; `Derives.weakening` es constructor) |
 | `Full/Mod2.lean` | `…Full` | `Axioms`, `Block1`, `Full.Induction` | ✅ ax21/ax24 |
-| `Full/Lists.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ `ax_list_induction` (ax_C3/ax_L3) |
+| `Full/Lists.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ `ax_list_induction` · 🆕 **ax_C3/ax_L3 CERTIFICADOS sobre `primAxioms`** ([ADR‑023](DECISIONS.md), 2026‑09‑10h): `concat_assoc_prim`/`in_concat_prim`, con **cero cambios de axioma** porque `ax_list_induction` ya era genérico en `Γ`. Las firmas `axioms ⊢` se conservan por `prim_to_axioms` |
 | `Full/StrongInduction.lean` | `…Full` | `Axioms`, `Full.Induction` | ✅ inducción fuerte derivada |
 | `Full/Numerals.lean` | `…Full` | `Axioms`, `Block1`, `Full.Induction` | ✅ puente `numeral` + homomorfismo |
 | `Full/Bounded.lean` | `…Full` | `Axioms`, `Full.{Induction,StrongInduction,Numerals}` | ✅ `le_numeral_split` |

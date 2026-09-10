@@ -57,13 +57,33 @@
 > baja un nivel: el verdadero da `liftTerm 0 t`). 🔑 **Un `sorry` en el `simp set` no mide: FABRICA
 > el verde.** Es AI‑GUIDE §27.1 en una forma que no estaba catalogada.
 >
-> ⛔ **LO QUE EL CENSO NO CIERRA, y es lo sustantivo**: los once se enuncian `axioms ⊢ axN` con
-> `axN ∈ axioms` ⇒ **trivialmente ciertos por `ax`**. El tipo **no certifica** la redundancia (sí la
-> prueba: ninguna de las once cita su propio axioma, medido por grep — pero nada lo impide). La
-> forma que certificaría es `primAxioms ⊢ axN` con `primAxioms` = los 23. ⚠️ **Y eso NO es gratis**:
-> `axiomsCodeT` ancla a **`axioms`**, y estrechar la lista **mueve la frontera de la teoría**, que
-> es la que decide qué significa `provCodeC'` y **cuál es la sentencia G** (ADR‑015). ⇒ **ADR, no
-> limpieza.**
+> ⛔ **LO QUE EL CENSO NO CERRABA**: los once se enuncian `axioms ⊢ axN` con `axN ∈ axioms` ⇒
+> **trivialmente ciertos por `ax`**. El tipo **no certifica** la redundancia.
+>
+> 🏁 **Y eso se ha atacado el mismo día — ADR‑023.** ⚠️⚠️ **Corrigiendo de paso lo que yo mismo había
+> escrito unas horas antes**: dije que certificarlo *«mueve la frontera de la teoría»*. **Confunde
+> dos cosas:**
+>
+> | | qué se hace | ¿mueve la frontera? |
+> |---|---|---|
+> | **(A) CERTIFICAR** — `primAxioms ⊆ axioms`, probar `primAxioms ⊢ axN` | ⛔ **NO**: `axioms` queda **intacta** | |
+> | **(B) ESTRECHAR** — **quitar** los 11 de `axioms` | ✅ sí, y por eso **no se hace** | |
+>
+> ⭐ **Y (A) sale barata por dos hallazgos**: **`Derives.weakening` es un CONSTRUCTOR** de `Derives`
+> (el puente es una línea; **ninguna firma aguas abajo cambia**), y **ninguna de las 46 citaciones
+> `∈ axioms`** de `Full/{Induction,Mod2,Lists}.lean` cita uno de los 11 ⇒ **no hay circularidad**.
+>
+> 🏁 **Hecho**: `primAxioms` (los 23) + `primAxioms_subset` + `prim_to_axioms` + `axp`
+> (`Full/Induction.lean` §0bis) y **ax_C3/ax_L3 CERTIFICADOS** (`concat_assoc_prim`,
+> `in_concat_prim`) con **cero cambios de axioma**, porque `ax_list_induction` ya era genérico en `Γ`.
+>
+> ⬜ **Los otros 9 esperan UNA SANCIÓN**: pasan por `ax_induction`, especializado a `axioms`.
+> ⛔ Y la salida fácil está **cerrada**: `∀ {Γ}, Γ ⊢ inductionFormula φ` sería **FALSO** (con
+> `Γ = []` haría la inducción lógicamente válida). Un axioma **tiene que nombrar su contexto** ⇒ la
+> forma correcta es **mover** `ax_induction` a `primAxioms ⊢ …` y recuperar el de hoy por
+> debilitamiento —con lo que `ax_induction` **deja de ser axioma** y el recuento no sube—, pero es
+> **estrictamente más fuerte** ⇒ **M‑1, decisión del propietario**. ⚠️ `Mod2` arrastra además la
+> capa `Block1`, enunciada sobre `axioms`: **medir antes de prometer**.
 >
 > ## 4. 🏁 **ADR‑022 ESCRITO Y EJECUTADO** — la clase de testigos, estrechada
 >
@@ -184,8 +204,9 @@
 > 5. 🏁 ~~**El ADR de `StdChain`**~~ — **ADR‑022 escrito y ejecutado** (2026‑09‑10h) ⇒ lo que
 >    queda de `⊬¬G` son los módulos **C** y **D**, con las dos deudas de `Meta/VerifierSound.lean`
 >    ya enunciadas sobre la clase estrecha.
-> 6. ⬜ **`primAxioms`** — la forma que *certifica* el censo de `coreAxioms` (§3.14.1 de
->    `doc/REFERENCE-Full.md`). ⚠️ Mueve la frontera de la teoría ⇒ **ADR**.
+> 6. 🔶 **`primAxioms`** — **ADR‑023 escrito y 2 de 11 certificados**. ⬜ Los 9 restantes esperan
+>    la sanción de **mover `ax_induction` a `primAxioms ⊢ …`** (M‑1). ⚠️ **NO** mueve la frontera de
+>    la teoría — eso era un error mío, corregido en el ADR.
 >
 > 🔑🔑 **LAS SEIS REGLAS DEL FRENTE, todas sobre la FORMA:**
 > 1. **ADR‑021, AFINADA**: lo que rompe la naturalidad del `PsiF` **no es «ser un `substCodeF`»**,
