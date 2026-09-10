@@ -211,8 +211,41 @@ def inductionFormula (φ : Formula) : Formula :=
       (Formula.forall (Formula.impl φ (substFormula 0 (succ (.var 0)) (liftFormula 1 φ))))
       (Formula.forall φ))
 
-/-- **Esquema de inducción general** como axioma object-level. -/
-axiom ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ
+/-! #### El esquema, sobre los PRIMITIVOS — [ADR‑023](../../DECISIONS.md), **ratificado 2026‑09‑10h**
+
+⭐ **Esto es lo que `Full` significa, dicho con precisión**: *los 23 primitivos **más** el esquema de
+inducción*. Antes el axioma decía `axioms ⊢ inductionFormula φ`, que es **más débil** y además
+impedía certificar el censo de `coreAxioms` (los 11 derivables se enunciaban sobre `axioms`, que los
+contiene ⇒ **triviales por `ax`**).
+
+⚠️⚠️ **Y la salida fácil estaba CERRADA**: generalizarlo a `∀ {Γ}, Γ ⊢ inductionFormula φ` —la forma
+que `ax_list_induction` sí tiene— sería **FALSO**, porque con `Γ = []` diría que el esquema de
+inducción es **lógicamente válido**. `ax_list_induction` puede ser genérico porque es una **REGLA**
+(lleva `base` y `step` sobre el mismo `Γ`); esto es un **AXIOMA**, y un axioma tiene que **nombrar
+su contexto**.
+
+⭐ **No añade un axioma: lo MUEVE.** `ax_induction` deja de ser `axiom` y pasa a **teorema** por
+debilitamiento ⇒ **el recuento sigue en 6**, y **ninguna firma aguas abajo cambia**. -/
+
+/-- **Esquema de inducción general** como axioma object-level, **sobre los 23 primitivos**.
+    Sancionado por el propietario el 2026‑09‑10h (M‑1). -/
+axiom ax_induction_prim (φ : Formula) : primAxioms ⊢ inductionFormula φ
+
+/-- **Esquema de inducción general** sobre `axioms`. 🏁 **Ya NO es un `axiom`**: sale de
+    `ax_induction_prim` por debilitamiento (`Derives.weakening`, que es constructor). -/
+theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
+  prim_to_axioms (ax_induction_prim φ)
+
+/-- Empaquetado object-level **sobre los primitivos** (doble `mp` sobre `ax_induction_prim`).
+    Es el que hay que usar para **certificar** un axioma derivable. -/
+theorem induction_object_prim {φ : Formula}
+    (base : primAxioms ⊢ substFormula 0 zero φ)
+    (step : primAxioms ⊢ Formula.forall
+              (Formula.impl φ (substFormula 0 (succ (.var 0)) (liftFormula 1 φ)))) :
+    primAxioms ⊢ Formula.forall φ := by
+  have hind := ax_induction_prim φ
+  simp only [inductionFormula] at hind
+  exact mp (mp hind base) step
 
 /-- Empaquetado object-level (doble `mp` sobre `ax_induction`). No es regla meta. -/
 theorem induction_object {φ : Formula}
@@ -224,39 +257,39 @@ theorem induction_object {φ : Formula}
   simp only [inductionFormula] at hind
   exact mp (mp hind base) step
 
-/-! ### `zero_add` (sin parámetro) -/
+/-! ### `zero_add_prim` (sin parámetro) -/
 
-theorem zero_add : axioms ⊢ Formula.forall (add zero (.var 0) =eq (.var 0)) := by
-  apply induction_object
-  · show axioms ⊢ (add zero zero =eq zero)
-    have h := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) zero
+theorem zero_add_prim : primAxioms ⊢ Formula.forall (add zero (.var 0) =eq (.var 0)) := by
+  apply induction_object_prim
+  · show primAxioms ⊢ (add zero zero =eq zero)
+    have h := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) zero
     simp [substFormula, substTerm, substTerms, add, zero] at h
     exact h
   · apply gen; intro n
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro hn
-    have hn' : axioms ⊢ (add zero n =eq n) := hn
-    show axioms ⊢ (add zero (succ n) =eq succ n)
-    have h5 : axioms ⊢ (add zero (succ n) =eq succ (add zero n)) := by
-      have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) zero) n
+    have hn' : primAxioms ⊢ (add zero n =eq n) := hn
+    show primAxioms ⊢ (add zero (succ n) =eq succ n)
+    have h5 : primAxioms ⊢ (add zero (succ n) =eq succ (add zero n)) := by
+      have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) zero) n
       simp [substFormula, substTerm, substTerms, add, succ, zero, FOL.substTerm_liftTerm] at hh
       exact hh
     exact FOL.derive_eq_trans h5 (eq_congr_succ hn')
 
-/-! ### `succ_add` (con parámetro) -/
+/-! ### `succ_add_prim` (con parámetro) -/
 
-theorem succ_add (a : Term) :
-    axioms ⊢ Formula.forall
+theorem succ_add_prim (a : Term) :
+    primAxioms ⊢ Formula.forall
       (add (succ (liftTerm 0 a)) (.var 0) =eq succ (add (liftTerm 0 a) (.var 0))) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: add (σa) 0 = σ(add a 0)
     simp only [substFormula, substTerm, substTerms, add, succ, zero, FOL.substTerm_liftTerm]
-    have hA : axioms ⊢ (add (succ a) zero =eq succ a) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) (succ a)
+    have hA : primAxioms ⊢ (add (succ a) zero =eq succ a) := by
+      have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) (succ a)
       simp [substFormula, substTerm, substTerms, add, zero, succ] at hh
       exact hh
-    have hB : axioms ⊢ (add a zero =eq a) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) a
+    have hB : primAxioms ⊢ (add a zero =eq a) := by
+      have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) a
       simp [substFormula, substTerm, substTerms, add, zero] at hh
       exact hh
     exact FOL.derive_eq_trans hA (eq_symm (eq_congr_succ hB))
@@ -264,12 +297,12 @@ theorem succ_add (a : Term) :
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, add, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
-    have h5sa : axioms ⊢ (add (succ a) (succ n) =eq succ (add (succ a) n)) := by
-      have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) (succ a)) n
+    have h5sa : primAxioms ⊢ (add (succ a) (succ n) =eq succ (add (succ a) n)) := by
+      have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) (succ a)) n
       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
       exact hh
-    have h5a : axioms ⊢ (add a (succ n) =eq succ (add a n)) := by
-      have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) a) n
+    have h5a : primAxioms ⊢ (add a (succ n) =eq succ (add a n)) := by
+      have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) a) n
       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
       exact hh
     exact FOL.derive_eq_trans (FOL.derive_eq_trans h5sa (eq_congr_succ ih))
@@ -277,18 +310,18 @@ theorem succ_add (a : Term) :
 
 /-! ### `add_comm` (= `ax6`) por inducción object-level -/
 
-theorem add_comm_ax (a : Term) :
-    axioms ⊢ Formula.forall
+theorem add_comm_ax_prim (a : Term) :
+    primAxioms ⊢ Formula.forall
       (add (liftTerm 0 a) (.var 0) =eq add (.var 0) (liftTerm 0 a)) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: add a 0 = add 0 a
     simp only [substFormula, substTerm, substTerms, add, zero, FOL.substTerm_liftTerm]
-    have hA : axioms ⊢ (add a zero =eq a) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) a
+    have hA : primAxioms ⊢ (add a zero =eq a) := by
+      have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) a
       simp [substFormula, substTerm, substTerms, add, zero] at hh
       exact hh
-    have hB : axioms ⊢ (add zero a =eq a) := by
-      have hh := spec zero_add a
+    have hB : primAxioms ⊢ (add zero a =eq a) := by
+      have hh := spec zero_add_prim a
       simp [substFormula, substTerm, substTerms, add, zero] at hh
       exact hh
     exact FOL.derive_eq_trans hA (eq_symm hB)
@@ -296,36 +329,36 @@ theorem add_comm_ax (a : Term) :
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, add, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
-    have h5 : axioms ⊢ (add a (succ n) =eq succ (add a n)) := by
-      have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) a) n
+    have h5 : primAxioms ⊢ (add a (succ n) =eq succ (add a n)) := by
+      have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) a) n
       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
       exact hh
-    have hsucc : axioms ⊢ (add (succ n) a =eq succ (add n a)) := by
-      have hh := spec (succ_add n) a
+    have hsucc : primAxioms ⊢ (add (succ n) a =eq succ (add n a)) := by
+      have hh := spec (succ_add_prim n) a
       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
       exact hh
     exact FOL.derive_eq_trans (FOL.derive_eq_trans h5 (eq_congr_succ ih)) (eq_symm hsucc)
 
 /-- **`ax6` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b, a+b = b+a`. -/
-theorem add_comm_thm : axioms ⊢ ax6_add_comm := by
+theorem add_comm_thm_prim : primAxioms ⊢ ax6_add_comm := by
   apply gen; intro a
-  exact add_comm_ax a
+  exact add_comm_ax_prim a
 
 /-! ### `add_assoc` (= `ax7`) — inducción sobre el tercer argumento, 2 parámetros -/
 
-theorem add_assoc_ax (a b : Term) :
-    axioms ⊢ Formula.forall
+theorem add_assoc_ax_prim (a b : Term) :
+    primAxioms ⊢ Formula.forall
       (add (add (liftTerm 0 a) (liftTerm 0 b)) (.var 0)
         =eq add (liftTerm 0 a) (add (liftTerm 0 b) (.var 0))) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: (a+b)+0 = a+(b+0)
     simp only [substFormula, substTerm, substTerms, add, zero, FOL.substTerm_liftTerm]
-    have h1 : axioms ⊢ (add (add a b) zero =eq add a b) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) (add a b)
+    have h1 : primAxioms ⊢ (add (add a b) zero =eq add a b) := by
+      have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) (add a b)
       simp [substFormula, substTerm, substTerms, add, zero] at hh
       exact hh
-    have hb0 : axioms ⊢ (add b zero =eq b) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) b
+    have hb0 : primAxioms ⊢ (add b zero =eq b) := by
+      have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) b
       simp [substFormula, substTerm, substTerms, add, zero] at hh
       exact hh
     exact FOL.derive_eq_trans h1 (eq_symm (eq_congr_add_left hb0))
@@ -333,19 +366,19 @@ theorem add_assoc_ax (a b : Term) :
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, add, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
-    have hL : axioms ⊢ (add (add a b) (succ n) =eq succ (add a (add b n))) := by
-      have h5 : axioms ⊢ (add (add a b) (succ n) =eq succ (add (add a b) n)) := by
-        have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) (add a b)) n
+    have hL : primAxioms ⊢ (add (add a b) (succ n) =eq succ (add a (add b n))) := by
+      have h5 : primAxioms ⊢ (add (add a b) (succ n) =eq succ (add (add a b) n)) := by
+        have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) (add a b)) n
         simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
         exact hh
       exact FOL.derive_eq_trans h5 (eq_congr_succ ih)
-    have hR : axioms ⊢ (add a (add b (succ n)) =eq succ (add a (add b n))) := by
-      have hb5 : axioms ⊢ (add b (succ n) =eq succ (add b n)) := by
-        have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) b) n
+    have hR : primAxioms ⊢ (add a (add b (succ n)) =eq succ (add a (add b n))) := by
+      have hb5 : primAxioms ⊢ (add b (succ n) =eq succ (add b n)) := by
+        have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) b) n
         simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
         exact hh
-      have ha5 : axioms ⊢ (add a (succ (add b n)) =eq succ (add a (add b n))) := by
-        have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) a) (add b n)
+      have ha5 : primAxioms ⊢ (add a (succ (add b n)) =eq succ (add a (add b n))) := by
+        have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) a) (add b n)
         simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh
         exact hh
       exact FOL.derive_eq_trans (eq_congr_add_left hb5) ha5
@@ -357,7 +390,7 @@ Decía que el empaquetado `∀³` «topa con el ajuste de niveles `liftTerm`» y
 «helper de empaquetado n‑ario». **No hace falta ninguno.** Tras los dos `gen`, el hueco del
 parámetro exterior queda como `substTerm (0+1) ṡ (liftTerm 0 (liftTerm 0 a))`, y eso **ya tenía
 lema** desde siempre — `FOL.substTerm_liftLift` (`FOL/Theorems/Eq.lean`), que devuelve
-exactamente `liftTerm 0 a`, que es lo que `add_assoc_ax a b` produce. Todo el «ajuste de niveles»
+exactamente `liftTerm 0 a`, que es lo que `add_assoc_ax_prim a b` produce. Todo el «ajuste de niveles»
 era **un lema ausente del `simp set`**, no un obstáculo estructural.
 
 ⚠️ **Y el camino tuvo una trampa que merece quedar escrita**: el primer intento metió en el
@@ -367,220 +400,220 @@ dejado en `sorry` «para medir». Los tres empaquetados **compilaron** con él �
 en el `simp set` no mide: **fabrica** el verde. Cf. AI‑GUIDE §27.1. -/
 
 /-- **`ax7` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b ∀c, (a+b)+c = a+(b+c)`. -/
-theorem add_assoc_thm : axioms ⊢ ax7_add_assoc := by
+theorem add_assoc_thm_prim : primAxioms ⊢ ax7_add_assoc := by
   apply gen; intro a
   apply gen; intro b
-  have h := add_assoc_ax a b
+  have h := add_assoc_ax_prim a b
   simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftLift] at h ⊢
   exact h
 
-/-! ### `zero_mul` (sin parámetro) — base de la cadena de `mul` -/
+/-! ### `zero_mul_prim` (sin parámetro) — base de la cadena de `mul` -/
 
-theorem zero_mul : axioms ⊢ Formula.forall (mul zero (.var 0) =eq zero) := by
-  apply induction_object
-  · show axioms ⊢ (mul zero zero =eq zero)
-    have h := spec (ax (by simp [axioms] : ax8_mul_zero ∈ axioms)) zero
+theorem zero_mul_prim : primAxioms ⊢ Formula.forall (mul zero (.var 0) =eq zero) := by
+  apply induction_object_prim
+  · show primAxioms ⊢ (mul zero zero =eq zero)
+    have h := spec (axp (by simp [primAxioms] : ax8_mul_zero ∈ primAxioms)) zero
     simp [substFormula, substTerm, substTerms, mul, zero] at h
     exact h
   · apply gen; intro n
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
-    have ih' : axioms ⊢ (mul zero n =eq zero) := ih
-    show axioms ⊢ (mul zero (succ n) =eq zero)
-    have h9 : axioms ⊢ (mul zero (succ n) =eq add (mul zero n) zero) := by
-      have hh := spec (spec (ax (by simp [axioms] : ax9_mul_succ ∈ axioms)) zero) n
+    have ih' : primAxioms ⊢ (mul zero n =eq zero) := ih
+    show primAxioms ⊢ (mul zero (succ n) =eq zero)
+    have h9 : primAxioms ⊢ (mul zero (succ n) =eq add (mul zero n) zero) := by
+      have hh := spec (spec (axp (by simp [primAxioms] : ax9_mul_succ ∈ primAxioms)) zero) n
       simp [substFormula, substTerm, substTerms, mul, add, succ, zero, FOL.substTerm_liftTerm] at hh
       exact hh
-    have hz : axioms ⊢ (add zero zero =eq zero) := by
-      have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) zero
+    have hz : primAxioms ⊢ (add zero zero =eq zero) := by
+      have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) zero
       simp [substFormula, substTerm, substTerms, add, zero] at hh
       exact hh
     exact FOL.derive_eq_trans (FOL.derive_eq_trans h9 (eq_congr_add_right ih')) hz
 
 /-! ### Helpers de instanciación (axiomas y lemas derivados en términos concretos) -/
 
-private theorem add_zero1 (x : Term) : axioms ⊢ (add x zero =eq x) := by
-  have hh := spec (ax (by simp [axioms] : ax4_add_zero ∈ axioms)) x
+private theorem add_zero1_prim (x : Term) : primAxioms ⊢ (add x zero =eq x) := by
+  have hh := spec (axp (by simp [primAxioms] : ax4_add_zero ∈ primAxioms)) x
   simp [substFormula, substTerm, substTerms, add, zero] at hh; exact hh
 
-private theorem add_succ2 (x y : Term) : axioms ⊢ (add x (succ y) =eq succ (add x y)) := by
-  have hh := spec (spec (ax (by simp [axioms] : ax5_add_succ ∈ axioms)) x) y
+private theorem add_succ2_prim (x y : Term) : primAxioms ⊢ (add x (succ y) =eq succ (add x y)) := by
+  have hh := spec (spec (axp (by simp [primAxioms] : ax5_add_succ ∈ primAxioms)) x) y
   simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
 
-private theorem add_assoc3 (x y z : Term) :
-    axioms ⊢ (add (add x y) z =eq add x (add y z)) := by
-  have hh := spec (add_assoc_ax x y) z
+private theorem add_assoc3_prim (x y z : Term) :
+    primAxioms ⊢ (add (add x y) z =eq add x (add y z)) := by
+  have hh := spec (add_assoc_ax_prim x y) z
   simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftTerm] at hh; exact hh
 
-private theorem add_comm2 (x y : Term) : axioms ⊢ (add x y =eq add y x) := by
-  have hh := spec (add_comm_ax x) y
+private theorem add_comm2_prim (x y : Term) : primAxioms ⊢ (add x y =eq add y x) := by
+  have hh := spec (add_comm_ax_prim x) y
   simp [substFormula, substTerm, substTerms, add, FOL.substTerm_liftTerm] at hh; exact hh
 
-private theorem mul_zero1 (x : Term) : axioms ⊢ (mul x zero =eq zero) := by
-  have hh := spec (ax (by simp [axioms] : ax8_mul_zero ∈ axioms)) x
+private theorem mul_zero1_prim (x : Term) : primAxioms ⊢ (mul x zero =eq zero) := by
+  have hh := spec (axp (by simp [primAxioms] : ax8_mul_zero ∈ primAxioms)) x
   simp [substFormula, substTerm, substTerms, mul, zero] at hh; exact hh
 
-private theorem mul_succ2 (x y : Term) : axioms ⊢ (mul x (succ y) =eq add (mul x y) x) := by
-  have hh := spec (spec (ax (by simp [axioms] : ax9_mul_succ ∈ axioms)) x) y
+private theorem mul_succ2_prim (x y : Term) : primAxioms ⊢ (mul x (succ y) =eq add (mul x y) x) := by
+  have hh := spec (spec (axp (by simp [primAxioms] : ax9_mul_succ ∈ primAxioms)) x) y
   simp [substFormula, substTerm, substTerms, mul, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
 
-private theorem zero_mul1 (x : Term) : axioms ⊢ (mul zero x =eq zero) := by
-  have hh := spec zero_mul x
+private theorem zero_mul1_prim (x : Term) : primAxioms ⊢ (mul zero x =eq zero) := by
+  have hh := spec zero_mul_prim x
   simp [substFormula, substTerm, substTerms, mul, zero] at hh; exact hh
 
-/-! ### `succ_mul` (con parámetro) — `∀n, σa·n = a·n + n` -/
+/-! ### `succ_mul_prim` (con parámetro) — `∀n, σa·n = a·n + n` -/
 
-theorem succ_mul (a : Term) :
-    axioms ⊢ Formula.forall
+theorem succ_mul_prim (a : Term) :
+    primAxioms ⊢ Formula.forall
       (mul (succ (liftTerm 0 a)) (.var 0) =eq add (mul (liftTerm 0 a) (.var 0)) (.var 0)) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: σa·0 = a·0 + 0
     simp only [substFormula, substTerm, substTerms, mul, add, succ, zero, FOL.substTerm_liftTerm]
     -- goal: mul (succ a) zero =eq add (mul a zero) zero
-    have hR : axioms ⊢ (add (mul a zero) zero =eq zero) :=
-      FOL.derive_eq_trans (eq_congr_add_right (mul_zero1 a)) (add_zero1 zero)
-    exact FOL.derive_eq_trans (mul_zero1 (succ a)) (eq_symm hR)
+    have hR : primAxioms ⊢ (add (mul a zero) zero =eq zero) :=
+      FOL.derive_eq_trans (eq_congr_add_right (mul_zero1_prim a)) (add_zero1_prim zero)
+    exact FOL.derive_eq_trans (mul_zero1_prim (succ a)) (eq_symm hR)
   · apply gen; intro n
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, mul, add, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
     -- ih: σa·n = a·n + n ; goal: σa·σn = a·σn + σn
-    have hL : axioms ⊢ (mul (succ a) (succ n) =eq add (mul a n) (succ (add a n))) :=
-      FOL.derive_eq_trans (mul_succ2 (succ a) n)
+    have hL : primAxioms ⊢ (mul (succ a) (succ n) =eq add (mul a n) (succ (add a n))) :=
+      FOL.derive_eq_trans (mul_succ2_prim (succ a) n)
         (FOL.derive_eq_trans (eq_congr_add_right ih)
-          (FOL.derive_eq_trans (add_assoc3 (mul a n) n (succ a))
-            (FOL.derive_eq_trans (eq_congr_add_left (u := mul a n) (add_succ2 n a))
-              (eq_congr_add_left (u := mul a n) (eq_congr_succ (add_comm2 n a))))))
-    have hRr : axioms ⊢ (add (mul a (succ n)) (succ n) =eq add (mul a n) (succ (add a n))) :=
-      FOL.derive_eq_trans (eq_congr_add_right (mul_succ2 a n))
-        (FOL.derive_eq_trans (add_assoc3 (mul a n) a (succ n))
-          (eq_congr_add_left (u := mul a n) (add_succ2 a n)))
+          (FOL.derive_eq_trans (add_assoc3_prim (mul a n) n (succ a))
+            (FOL.derive_eq_trans (eq_congr_add_left (u := mul a n) (add_succ2_prim n a))
+              (eq_congr_add_left (u := mul a n) (eq_congr_succ (add_comm2_prim n a))))))
+    have hRr : primAxioms ⊢ (add (mul a (succ n)) (succ n) =eq add (mul a n) (succ (add a n))) :=
+      FOL.derive_eq_trans (eq_congr_add_right (mul_succ2_prim a n))
+        (FOL.derive_eq_trans (add_assoc3_prim (mul a n) a (succ n))
+          (eq_congr_add_left (u := mul a n) (add_succ2_prim a n)))
     exact FOL.derive_eq_trans hL (eq_symm hRr)
 
-private theorem succ_mul2 (x y : Term) : axioms ⊢ (mul (succ x) y =eq add (mul x y) y) := by
-  have hh := spec (succ_mul x) y
+private theorem succ_mul2_prim (x y : Term) : primAxioms ⊢ (mul (succ x) y =eq add (mul x y) y) := by
+  have hh := spec (succ_mul_prim x) y
   simp [substFormula, substTerm, substTerms, mul, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
 
 /-! ### `mul_comm` (= `ax10`) — `∀n, a·n = n·a` -/
 
-theorem mul_comm_ax (a : Term) :
-    axioms ⊢ Formula.forall (mul (liftTerm 0 a) (.var 0) =eq mul (.var 0) (liftTerm 0 a)) := by
-  apply induction_object
+theorem mul_comm_ax_prim (a : Term) :
+    primAxioms ⊢ Formula.forall (mul (liftTerm 0 a) (.var 0) =eq mul (.var 0) (liftTerm 0 a)) := by
+  apply induction_object_prim
   · -- base: a·0 = 0·a
     simp only [substFormula, substTerm, substTerms, mul, zero, FOL.substTerm_liftTerm]
-    exact FOL.derive_eq_trans (mul_zero1 a) (eq_symm (zero_mul1 a))
+    exact FOL.derive_eq_trans (mul_zero1_prim a) (eq_symm (zero_mul1_prim a))
   · apply gen; intro n
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, mul, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
     -- ih: a·n = n·a ; goal: a·σn = σn·a
     exact FOL.derive_eq_trans
-      (FOL.derive_eq_trans (mul_succ2 a n) (eq_congr_add_right ih))
-      (eq_symm (succ_mul2 n a))
+      (FOL.derive_eq_trans (mul_succ2_prim a n) (eq_congr_add_right ih))
+      (eq_symm (succ_mul2_prim n a))
 
 /-- **`ax10` (mul_comm)** es teorema en `Full`: `⊢ ∀a ∀b, a·b = b·a`. -/
-theorem mul_comm_thm : axioms ⊢ ax10_mul_comm := by
+theorem mul_comm_thm_prim : primAxioms ⊢ ax10_mul_comm := by
   apply gen; intro a
-  exact mul_comm_ax a
+  exact mul_comm_ax_prim a
 
 /-! ### `mul_distrib` (= `ax12`) — `∀c, a·(b+c) = a·b + a·c` (2 parámetros) -/
 
-theorem mul_distrib_ax (a b : Term) :
-    axioms ⊢ Formula.forall
+theorem mul_distrib_ax_prim (a b : Term) :
+    primAxioms ⊢ Formula.forall
       (mul (liftTerm 0 a) (add (liftTerm 0 b) (.var 0))
         =eq add (mul (liftTerm 0 a) (liftTerm 0 b)) (mul (liftTerm 0 a) (.var 0))) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: a·(b+0) = a·b + a·0
     simp only [substFormula, substTerm, substTerms, mul, add, zero, FOL.substTerm_liftTerm]
-    have hLb : axioms ⊢ (mul a (add b zero) =eq mul a b) := eq_congr_mul_left (u := a) (add_zero1 b)
-    have hRb : axioms ⊢ (add (mul a b) (mul a zero) =eq mul a b) :=
-      FOL.derive_eq_trans (eq_congr_add_left (u := mul a b) (mul_zero1 a)) (add_zero1 (mul a b))
+    have hLb : primAxioms ⊢ (mul a (add b zero) =eq mul a b) := eq_congr_mul_left (u := a) (add_zero1_prim b)
+    have hRb : primAxioms ⊢ (add (mul a b) (mul a zero) =eq mul a b) :=
+      FOL.derive_eq_trans (eq_congr_add_left (u := mul a b) (mul_zero1_prim a)) (add_zero1_prim (mul a b))
     exact FOL.derive_eq_trans hLb (eq_symm hRb)
   · apply gen; intro n
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, mul, add, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
-    have hL : axioms ⊢ (mul a (add b (succ n)) =eq add (mul a b) (add (mul a n) a)) :=
-      FOL.derive_eq_trans (eq_congr_mul_left (u := a) (add_succ2 b n))
-        (FOL.derive_eq_trans (mul_succ2 a (add b n))
+    have hL : primAxioms ⊢ (mul a (add b (succ n)) =eq add (mul a b) (add (mul a n) a)) :=
+      FOL.derive_eq_trans (eq_congr_mul_left (u := a) (add_succ2_prim b n))
+        (FOL.derive_eq_trans (mul_succ2_prim a (add b n))
           (FOL.derive_eq_trans (eq_congr_add_right ih)
-            (add_assoc3 (mul a b) (mul a n) a)))
-    have hR : axioms ⊢ (add (mul a b) (mul a (succ n)) =eq add (mul a b) (add (mul a n) a)) :=
-      eq_congr_add_left (u := mul a b) (mul_succ2 a n)
+            (add_assoc3_prim (mul a b) (mul a n) a)))
+    have hR : primAxioms ⊢ (add (mul a b) (mul a (succ n)) =eq add (mul a b) (add (mul a n) a)) :=
+      eq_congr_add_left (u := mul a b) (mul_succ2_prim a n)
     exact FOL.derive_eq_trans hL (eq_symm hR)
 
-private theorem mul_distrib3 (x y z : Term) :
-    axioms ⊢ (mul x (add y z) =eq add (mul x y) (mul x z)) := by
-  have hh := spec (mul_distrib_ax x y) z
+private theorem mul_distrib3_prim (x y z : Term) :
+    primAxioms ⊢ (mul x (add y z) =eq add (mul x y) (mul x z)) := by
+  have hh := spec (mul_distrib_ax_prim x y) z
   simp [substFormula, substTerm, substTerms, mul, add, FOL.substTerm_liftTerm] at hh; exact hh
 
 /-- **`ax12` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b ∀c, a·(b+c) = a·b + a·c`.
-    Mismo empaquetado que `add_assoc_thm` (2026‑09‑10h). -/
-theorem mul_distrib_thm : axioms ⊢ ax12_mul_distrib := by
+    Mismo empaquetado que `add_assoc_thm_prim` (2026‑09‑10h). -/
+theorem mul_distrib_thm_prim : primAxioms ⊢ ax12_mul_distrib := by
   apply gen; intro a
   apply gen; intro b
-  have h := mul_distrib_ax a b
+  have h := mul_distrib_ax_prim a b
   simp [substFormula, substTerm, substTerms, mul, add, FOL.substTerm_liftLift] at h ⊢
   exact h
 
 /-! ### `mul_assoc` (= `ax11`) — `∀c, (a·b)·c = a·(b·c)` (2 parámetros) -/
 
-theorem mul_assoc_ax (a b : Term) :
-    axioms ⊢ Formula.forall
+theorem mul_assoc_ax_prim (a b : Term) :
+    primAxioms ⊢ Formula.forall
       (mul (mul (liftTerm 0 a) (liftTerm 0 b)) (.var 0)
         =eq mul (liftTerm 0 a) (mul (liftTerm 0 b) (.var 0))) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: (a·b)·0 = a·(b·0)
     simp only [substFormula, substTerm, substTerms, mul, zero, FOL.substTerm_liftTerm]
-    have hR : axioms ⊢ (mul a (mul b zero) =eq zero) :=
-      FOL.derive_eq_trans (eq_congr_mul_left (u := a) (mul_zero1 b)) (mul_zero1 a)
-    exact FOL.derive_eq_trans (mul_zero1 (mul a b)) (eq_symm hR)
+    have hR : primAxioms ⊢ (mul a (mul b zero) =eq zero) :=
+      FOL.derive_eq_trans (eq_congr_mul_left (u := a) (mul_zero1_prim b)) (mul_zero1_prim a)
+    exact FOL.derive_eq_trans (mul_zero1_prim (mul a b)) (eq_symm hR)
   · apply gen; intro n
     rw [step_eq_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
     simp only [substFormula, substTerm, substTerms, mul, succ, zero, FOL.substTerm_liftTerm] at ih ⊢
-    have hL : axioms ⊢ (mul (mul a b) (succ n) =eq add (mul a (mul b n)) (mul a b)) :=
-      FOL.derive_eq_trans (mul_succ2 (mul a b) n) (eq_congr_add_right ih)
-    have hR : axioms ⊢ (mul a (mul b (succ n)) =eq add (mul a (mul b n)) (mul a b)) :=
-      FOL.derive_eq_trans (eq_congr_mul_left (u := a) (mul_succ2 b n)) (mul_distrib3 a (mul b n) b)
+    have hL : primAxioms ⊢ (mul (mul a b) (succ n) =eq add (mul a (mul b n)) (mul a b)) :=
+      FOL.derive_eq_trans (mul_succ2_prim (mul a b) n) (eq_congr_add_right ih)
+    have hR : primAxioms ⊢ (mul a (mul b (succ n)) =eq add (mul a (mul b n)) (mul a b)) :=
+      FOL.derive_eq_trans (eq_congr_mul_left (u := a) (mul_succ2_prim b n)) (mul_distrib3_prim a (mul b n) b)
     exact FOL.derive_eq_trans hL (eq_symm hR)
 
 /-- **`ax11` de `Minimal` es teorema en `Full`**: `⊢ ∀a ∀b ∀c, (a·b)·c = a·(b·c)`.
-    Mismo empaquetado que `add_assoc_thm` (2026‑09‑10h). -/
-theorem mul_assoc_thm : axioms ⊢ ax11_mul_assoc := by
+    Mismo empaquetado que `add_assoc_thm_prim` (2026‑09‑10h). -/
+theorem mul_assoc_thm_prim : primAxioms ⊢ ax11_mul_assoc := by
   apply gen; intro a
   apply gen; intro b
-  have h := mul_assoc_ax a b
+  have h := mul_assoc_ax_prim a b
   simp [substFormula, substTerm, substTerms, mul, FOL.substTerm_liftLift] at h ⊢
   exact h
 
 /-! ### `lt_irrefl` (= `ax18`) — primer axioma NO ecuacional, vía `step_reduce` general -/
 
-theorem lt_irrefl_ax : axioms ⊢ Formula.forall (neg (lt (.var 0) (.var 0))) := by
-  apply induction_object
+theorem lt_irrefl_ax_prim : primAxioms ⊢ Formula.forall (neg (lt (.var 0) (.var 0))) := by
+  apply induction_object_prim
   · -- base: ¬(0 < 0)
-    show axioms ⊢ neg (lt zero zero)
+    show primAxioms ⊢ neg (lt zero zero)
     apply raa; intro hlt
-    have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+    have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
     have hiff := spec (spec h13 zero) zero
     simp [substFormula, substTerm, substTerms, lt, zero, succ, iff, liftTerm, liftTerms] at hiff
     apply ex_elim (iff_mp hiff hlt); intro k hk
     simp [substFormula, substTerm, substTerms, add, zero, succ] at hk
     -- hk : add zero (succ k) =eq zero
-    have hz : axioms ⊢ (add zero (succ k) =eq succ k) := by
-      have hh := spec zero_add (succ k)
+    have hz : primAxioms ⊢ (add zero (succ k) =eq succ k) := by
+      have hh := spec zero_add_prim (succ k)
       simp [substFormula, substTerm, substTerms, add, zero, succ] at hh; exact hh
-    have hne : axioms ⊢ neg (succ k =eq zero) := by
-      have hh := spec (ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)) k
+    have hne : primAxioms ⊢ neg (succ k =eq zero) := by
+      have hh := spec (axp (by simp [primAxioms] : ax2_peano_succ_neq_zero ∈ primAxioms)) k
       simp [succ, zero] at hh; exact hh
     exact mp hne (eq_trans hz hk)
   · apply gen; intro n
     rw [step_reduce]
     apply Minimal.Axioms.imp_intro; intro ih
-    have ih' : axioms ⊢ neg (lt n n) := ih
-    show axioms ⊢ neg (lt (succ n) (succ n))
+    have ih' : primAxioms ⊢ neg (lt n n) := ih
+    show primAxioms ⊢ neg (lt (succ n) (succ n))
     apply raa; intro hlt
-    have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+    have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
     have hiff := spec (spec h13 (succ n)) (succ n)
     simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
@@ -588,18 +621,18 @@ theorem lt_irrefl_ax : axioms ⊢ Formula.forall (neg (lt (.var 0) (.var 0))) :=
     simp [substFormula, substTerm, substTerms, add, succ,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
     -- hk : add (succ n) (succ k) =eq succ n
-    have hsa : axioms ⊢ (add (succ n) (succ k) =eq succ (add n (succ k))) := by
-      have hh := spec (succ_add n) (succ k)
+    have hsa : primAxioms ⊢ (add (succ n) (succ k) =eq succ (add n (succ k))) := by
+      have hh := spec (succ_add_prim n) (succ k)
       simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
-    have heq1 : axioms ⊢ (succ (add n (succ k)) =eq succ n) := eq_trans hsa hk
-    have h3i : axioms ⊢ ((succ (add n (succ k)) =eq succ n) ⇒ (add n (succ k) =eq n)) := by
-      have hh := spec (spec (ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)) (add n (succ k))) n
+    have heq1 : primAxioms ⊢ (succ (add n (succ k)) =eq succ n) := eq_trans hsa hk
+    have h3i : primAxioms ⊢ ((succ (add n (succ k)) =eq succ n) ⇒ (add n (succ k) =eq n)) := by
+      have hh := spec (spec (axp (by simp [primAxioms] : ax3_peano_succ_inj ∈ primAxioms)) (add n (succ k))) n
       simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at hh; exact hh
-    have hnn : axioms ⊢ (add n (succ k) =eq n) := mp h3i heq1
+    have hnn : primAxioms ⊢ (add n (succ k) =eq n) := mp h3i heq1
     have hiffn := spec (spec h13 n) n
     simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffn
-    have hltnn : axioms ⊢ lt n n := by
+    have hltnn : primAxioms ⊢ lt n n := by
       apply iff_mpr hiffn
       apply ex_intro k
       simp [substFormula, substTerm, substTerms, add, succ,
@@ -608,13 +641,13 @@ theorem lt_irrefl_ax : axioms ⊢ Formula.forall (neg (lt (.var 0) (.var 0))) :=
     exact mp ih' hltnn
 
 /-- **`ax18` (lt_irrefl)** es teorema en `Full`: `⊢ ∀a, ¬(a < a)`. -/
-theorem lt_irrefl_thm : axioms ⊢ ax18_lt_irrefl := lt_irrefl_ax
+theorem lt_irrefl_thm_prim : primAxioms ⊢ ax18_lt_irrefl := lt_irrefl_ax_prim
 
 /-! ### Lemas de orden auxiliares (hacia la tricotomía `ax19`) -/
 
 /-- `a < σa` (testigo `k = 0` en ax13: `a + σ0 = σa`). -/
-theorem lt_succ_self (a : Term) : axioms ⊢ lt a (succ a) := by
-  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+theorem lt_succ_self_prim (a : Term) : primAxioms ⊢ lt a (succ a) := by
+  have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
   have hiff := spec (spec h13 a) (succ a)
   simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
@@ -622,12 +655,12 @@ theorem lt_succ_self (a : Term) : axioms ⊢ lt a (succ a) := by
   apply ex_intro zero
   simp [substFormula, substTerm, substTerms, add, succ, zero,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  exact FOL.derive_eq_trans (add_succ2 a zero) (eq_congr_succ (add_zero1 a))
+  exact FOL.derive_eq_trans (add_succ2_prim a zero) (eq_congr_succ (add_zero1_prim a))
 
 /-- `¬(a < 0)` (nada es menor que cero: `a + σk = 0` contradice `ax2`). -/
-theorem not_lt_zero (a : Term) : axioms ⊢ neg (lt a zero) := by
+theorem not_lt_zero_prim (a : Term) : primAxioms ⊢ neg (lt a zero) := by
   apply raa; intro hlt
-  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+  have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
   have hiff := spec (spec h13 a) zero
   simp [substFormula, substTerm, substTerms, lt, zero, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
@@ -635,15 +668,15 @@ theorem not_lt_zero (a : Term) : axioms ⊢ neg (lt a zero) := by
   simp [substFormula, substTerm, substTerms, add, succ, zero,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
   -- hk : add a (succ k) =eq zero
-  have h5 : axioms ⊢ (add a (succ k) =eq succ (add a k)) := add_succ2 a k
-  have hne : axioms ⊢ neg (succ (add a k) =eq zero) := by
-    have hh := spec (ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)) (add a k)
+  have h5 : primAxioms ⊢ (add a (succ k) =eq succ (add a k)) := add_succ2_prim a k
+  have hne : primAxioms ⊢ neg (succ (add a k) =eq zero) := by
+    have hh := spec (axp (by simp [primAxioms] : ax2_peano_succ_neq_zero ∈ primAxioms)) (add a k)
     simp [succ, zero] at hh; exact hh
   exact mp hne (eq_trans h5 hk)
 
 /-- `b < a → b < σa` (testigo `σk` desde el de `b<a`). -/
-theorem lt_succ_of_lt (a b : Term) (h : axioms ⊢ lt b a) : axioms ⊢ lt b (succ a) := by
-  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+theorem lt_succ_of_lt_prim (a b : Term) (h : primAxioms ⊢ lt b a) : primAxioms ⊢ lt b (succ a) := by
+  have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
   have hiffa := spec (spec h13 b) a
   simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffa
@@ -658,11 +691,11 @@ theorem lt_succ_of_lt (a b : Term) (h : axioms ⊢ lt b a) : axioms ⊢ lt b (su
   apply ex_intro (succ k)
   simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   -- goal: add b (succ (succ k)) =eq succ a
-  exact FOL.derive_eq_trans (add_succ2 b (succ k)) (eq_congr_succ hk)
+  exact FOL.derive_eq_trans (add_succ2_prim b (succ k)) (eq_congr_succ hk)
 
-/-- `0 < σk` (testigo `k`: `0 + σk = σk` por `zero_add`). -/
-theorem zero_lt_succ (k : Term) : axioms ⊢ lt zero (succ k) := by
-  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+/-- `0 < σk` (testigo `k`: `0 + σk = σk` por `zero_add_prim`). -/
+theorem zero_lt_succ_prim (k : Term) : primAxioms ⊢ lt zero (succ k) := by
+  have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
   have hiff := spec (spec h13 zero) (succ k)
   simp [substFormula, substTerm, substTerms, lt, zero, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
@@ -670,17 +703,17 @@ theorem zero_lt_succ (k : Term) : axioms ⊢ lt zero (succ k) := by
   apply ex_intro k
   simp [substFormula, substTerm, substTerms, add, zero, succ,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  have hh := spec zero_add (succ k)
+  have hh := spec zero_add_prim (succ k)
   simp [substFormula, substTerm, substTerms, add, zero, succ] at hh
   exact hh
 
 /-- `∀b, b = 0 ∨ ∃k, b = σk` (cero o sucesor) por inducción. -/
-theorem zero_or_succ_ax :
-    axioms ⊢ Formula.forall (lor (.var 0 =eq zero) (ex (.var 1 =eq succ (.var 0)))) := by
-  apply induction_object
+theorem zero_or_succ_ax_prim :
+    primAxioms ⊢ Formula.forall (lor (.var 0 =eq zero) (ex (.var 1 =eq succ (.var 0)))) := by
+  apply induction_object_prim
   · -- base: 0 = 0 ∨ ...
     apply Minimal.Axioms.or_intro_left
-    exact Derives.refl axioms zero
+    exact Derives.refl primAxioms zero
   · apply gen; intro n
     rw [step_reduce]
     apply Minimal.Axioms.imp_intro; intro _ih
@@ -688,16 +721,16 @@ theorem zero_or_succ_ax :
     apply ex_intro n
     simp [substFormula, substTerm, substTerms, succ,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-    exact Derives.refl axioms (succ n)
+    exact Derives.refl primAxioms (succ n)
 
-private theorem succ_add2 (x y : Term) : axioms ⊢ (add (succ x) y =eq succ (add x y)) := by
-  have hh := spec (succ_add x) y
+private theorem succ_add2_prim (x y : Term) : primAxioms ⊢ (add (succ x) y =eq succ (add x y)) := by
+  have hh := spec (succ_add_prim x) y
   simp [substFormula, substTerm, substTerms, add, succ, FOL.substTerm_liftTerm] at hh; exact hh
 
 /-- `a < b → σa < b ∨ σa = b` (casando el testigo `k` con `zero_or_succ`). -/
-theorem lt_succ_cases (a b : Term) (h : axioms ⊢ lt a b) :
-    axioms ⊢ lor (lt (succ a) b) (succ a =eq b) := by
-  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+theorem lt_succ_cases_prim (a b : Term) (h : primAxioms ⊢ lt a b) :
+    primAxioms ⊢ lor (lt (succ a) b) (succ a =eq b) := by
+  have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
   have hiffab := spec (spec h13 a) b
   simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiffab
@@ -705,16 +738,16 @@ theorem lt_succ_cases (a b : Term) (h : axioms ⊢ lt a b) :
   simp [substFormula, substTerm, substTerms, add, succ,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hk
   -- hk : add a (succ k) =eq b
-  have hzos := spec zero_or_succ_ax k
+  have hzos := spec zero_or_succ_ax_prim k
   simp [substFormula, substTerm, substTerms, zero, succ,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hzos
   apply Minimal.Axioms.or_elim hzos
   · -- k = 0  →  σa = b
     intro hk0
     apply Minimal.Axioms.or_intro_right
-    have h1 : axioms ⊢ (add a (succ k) =eq succ a) :=
+    have h1 : primAxioms ⊢ (add a (succ k) =eq succ a) :=
       FOL.derive_eq_trans (eq_congr_add_left (eq_congr_succ hk0))
-        (FOL.derive_eq_trans (add_succ2 a zero) (eq_congr_succ (add_zero1 a)))
+        (FOL.derive_eq_trans (add_succ2_prim a zero) (eq_congr_succ (add_zero1_prim a)))
     exact eq_trans h1 hk
   · -- k = σj  →  σa < b
     intro hex
@@ -731,19 +764,19 @@ theorem lt_succ_cases (a b : Term) (h : axioms ⊢ lt a b) :
     simp [substFormula, substTerm, substTerms, add, succ,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
     -- goal: add (succ a) (succ j) =eq b
-    have hN : axioms ⊢ (add a (succ k) =eq add a (succ (succ j))) :=
+    have hN : primAxioms ⊢ (add a (succ k) =eq add a (succ (succ j))) :=
       eq_congr_add_left (eq_congr_succ hj)
-    have hM : axioms ⊢ (add a (succ (succ j)) =eq succ (succ (add a j))) :=
-      FOL.derive_eq_trans (add_succ2 a (succ j)) (eq_congr_succ (add_succ2 a j))
-    have hL : axioms ⊢ (add (succ a) (succ j) =eq succ (succ (add a j))) :=
-      FOL.derive_eq_trans (add_succ2 (succ a) j) (eq_congr_succ (succ_add2 a j))
-    have hAk : axioms ⊢ (add a (succ k) =eq succ (succ (add a j))) := FOL.derive_eq_trans hN hM
+    have hM : primAxioms ⊢ (add a (succ (succ j)) =eq succ (succ (add a j))) :=
+      FOL.derive_eq_trans (add_succ2_prim a (succ j)) (eq_congr_succ (add_succ2_prim a j))
+    have hL : primAxioms ⊢ (add (succ a) (succ j) =eq succ (succ (add a j))) :=
+      FOL.derive_eq_trans (add_succ2_prim (succ a) j) (eq_congr_succ (succ_add2_prim a j))
+    have hAk : primAxioms ⊢ (add a (succ k) =eq succ (succ (add a j))) := FOL.derive_eq_trans hN hM
     exact FOL.derive_eq_trans hL (eq_trans hAk hk)
 
 /-- Construcción de `lt` desde un testigo: `a + σk = b → a < b`. -/
-private theorem lt_intro (a b k : Term) (h : axioms ⊢ (add a (succ k) =eq b)) :
-    axioms ⊢ lt a b := by
-  have h13 := ax (by simp [axioms] : ax13_lt_def ∈ axioms)
+private theorem lt_intro_prim (a b k : Term) (h : primAxioms ⊢ (add a (succ k) =eq b)) :
+    primAxioms ⊢ lt a b := by
+  have h13 := axp (by simp [primAxioms] : ax13_lt_def ∈ primAxioms)
   have hiff := spec (spec h13 a) b
   simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
@@ -755,15 +788,15 @@ private theorem lt_intro (a b k : Term) (h : axioms ⊢ (add a (succ k) =eq b)) 
 
 /-! ### `lt_trichotomy` (= `ax19`) — ensamblaje por inducción sobre `a` -/
 
-theorem lt_trichotomy_ax :
-    axioms ⊢ Formula.forall (Formula.forall
+theorem lt_trichotomy_ax_prim :
+    primAxioms ⊢ Formula.forall (Formula.forall
       (lor (lt (.var 1) (.var 0)) (lor (.var 1 =eq .var 0) (lt (.var 0) (.var 1))))) := by
-  apply induction_object
+  apply induction_object_prim
   · -- base: ∀b, 0<b ∨ 0=b ∨ b<0
     apply gen; intro b
     simp [substFormula, substTerm, substTerms, lt, lor, zero, succ,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-    have hzos := spec zero_or_succ_ax b
+    have hzos := spec zero_or_succ_ax_prim b
     simp [substFormula, substTerm, substTerms, zero, succ,
           FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hzos
     apply Minimal.Axioms.or_elim hzos
@@ -776,8 +809,8 @@ theorem lt_trichotomy_ax :
       simp [substFormula, substTerm, substTerms, succ,
             FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hbk
       apply Minimal.Axioms.or_intro_left
-      apply lt_intro zero b k
-      have hz := spec zero_add (succ k)
+      apply lt_intro_prim zero b k
+      have hz := spec zero_add_prim (succ k)
       simp [substFormula, substTerm, substTerms, add, zero, succ] at hz
       exact FOL.derive_eq_trans hz (eq_symm hbk)
   · -- paso: T(a,·) → T(σa,·)
@@ -793,7 +826,7 @@ theorem lt_trichotomy_ax :
     apply Minimal.Axioms.or_elim htab
     · -- a < b  →  σa < b ∨ σa = b
       intro hab
-      apply Minimal.Axioms.or_elim (lt_succ_cases a b hab)
+      apply Minimal.Axioms.or_elim (lt_succ_cases_prim a b hab)
       · intro h; exact Minimal.Axioms.or_intro_left h
       · intro h; exact Minimal.Axioms.or_intro_right (Minimal.Axioms.or_intro_left h)
     · intro hrest
@@ -801,16 +834,91 @@ theorem lt_trichotomy_ax :
       · -- a = b  →  b < σa (derecha)
         intro hab
         apply Minimal.Axioms.or_intro_right; apply Minimal.Axioms.or_intro_right
-        apply lt_intro b (succ a) zero
+        apply lt_intro_prim b (succ a) zero
         exact FOL.derive_eq_trans
-          (FOL.derive_eq_trans (add_succ2 b zero) (eq_congr_succ (add_zero1 b)))
+          (FOL.derive_eq_trans (add_succ2_prim b zero) (eq_congr_succ (add_zero1_prim b)))
           (eq_congr_succ (eq_symm hab))
       · -- b < a  →  b < σa (derecha)
         intro hba
         apply Minimal.Axioms.or_intro_right; apply Minimal.Axioms.or_intro_right
-        exact lt_succ_of_lt a b hba
+        exact lt_succ_of_lt_prim a b hba
 
 /-- **`ax19` (tricotomía)** es teorema en `Full`: `⊢ ∀a ∀b, a<b ∨ a=b ∨ b<a`. -/
-theorem lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy := lt_trichotomy_ax
+theorem lt_trichotomy_thm_prim : primAxioms ⊢ ax19_lt_trichotomy := lt_trichotomy_ax_prim
+
+
+/-! ### 🏁 De vuelta a `axioms` — las firmas de siempre, por DEBILITAMIENTO
+
+Todo lo de arriba se demuestra ahora **sobre los 23 primitivos** ([ADR‑023](../../DECISIONS.md)),
+que es lo que **certifica** que los 7 axiomas derivables de `Minimal` lo son de verdad: sus
+enunciados `primAxioms ⊢ axN` **no** son triviales, porque `axN ∉ primAxioms`.
+
+`Derives.weakening` es **constructor**, así que recuperar las versiones `axioms ⊢` no cuesta nada,
+y **ningún consumidor de aguas abajo cambia**. -/
+
+/-- **`ax6` de `Minimal` es teorema en `Full`** — 🏁 y desde 2026‑09‑10h **certificado**
+    (`add_comm_thm_prim`). -/
+theorem add_comm_thm : axioms ⊢ ax6_add_comm := prim_to_axioms add_comm_thm_prim
+
+/-- **`ax7`**, ídem. -/
+theorem add_assoc_thm : axioms ⊢ ax7_add_assoc := prim_to_axioms add_assoc_thm_prim
+
+/-- **`ax10`**, ídem. -/
+theorem mul_comm_thm : axioms ⊢ ax10_mul_comm := prim_to_axioms mul_comm_thm_prim
+
+/-- **`ax11`**, ídem. -/
+theorem mul_assoc_thm : axioms ⊢ ax11_mul_assoc := prim_to_axioms mul_assoc_thm_prim
+
+/-- **`ax12`**, ídem. -/
+theorem mul_distrib_thm : axioms ⊢ ax12_mul_distrib := prim_to_axioms mul_distrib_thm_prim
+
+/-- **`ax18`**, ídem. -/
+theorem lt_irrefl_thm : axioms ⊢ ax18_lt_irrefl := prim_to_axioms lt_irrefl_thm_prim
+
+/-- **`ax19`**, ídem. -/
+theorem lt_trichotomy_thm : axioms ⊢ ax19_lt_trichotomy := prim_to_axioms lt_trichotomy_thm_prim
+
+/-! Y los lemas que consumen otros módulos, con su firma `axioms ⊢` intacta. -/
+
+theorem zero_add : axioms ⊢ Formula.forall (add zero (.var 0) =eq (.var 0)) :=
+  prim_to_axioms zero_add_prim
+
+theorem succ_add (a : Term) : axioms ⊢ Formula.forall
+    (add (succ (liftTerm 0 a)) (.var 0) =eq succ (add (liftTerm 0 a) (.var 0))) :=
+  prim_to_axioms (succ_add_prim a)
+
+theorem add_comm_ax (a : Term) : axioms ⊢ Formula.forall
+    (add (liftTerm 0 a) (.var 0) =eq add (.var 0) (liftTerm 0 a)) :=
+  prim_to_axioms (add_comm_ax_prim a)
+
+theorem zero_mul : axioms ⊢ Formula.forall (mul zero (.var 0) =eq zero) :=
+  prim_to_axioms zero_mul_prim
+
+theorem succ_mul (a : Term) : axioms ⊢ Formula.forall
+    (mul (succ (liftTerm 0 a)) (.var 0) =eq add (mul (liftTerm 0 a) (.var 0)) (.var 0)) :=
+  prim_to_axioms (succ_mul_prim a)
+
+theorem mul_comm_ax (a : Term) : axioms ⊢ Formula.forall
+    (mul (liftTerm 0 a) (.var 0) =eq mul (.var 0) (liftTerm 0 a)) :=
+  prim_to_axioms (mul_comm_ax_prim a)
+
+theorem lt_succ_self (a : Term) : axioms ⊢ lt a (succ a) :=
+  prim_to_axioms (lt_succ_self_prim a)
+
+theorem not_lt_zero (a : Term) : axioms ⊢ neg (lt a zero) :=
+  prim_to_axioms (not_lt_zero_prim a)
+
+/-- ⚠️ Este toma la hipótesis **en el contexto**, así que el debilitamiento no basta (va en la
+    dirección contraria). Se cierra el ángulo: se interna la implicación sobre `primAxioms`, se
+    debilita **la implicación**, y se aplica `mp` con la hipótesis sobre `axioms`. -/
+theorem lt_succ_of_lt (a b : Term) (h : axioms ⊢ lt b a) : axioms ⊢ lt b (succ a) :=
+  mp (prim_to_axioms (Minimal.Axioms.imp_intro (lt_succ_of_lt_prim a b))) h
+
+theorem zero_lt_succ (k : Term) : axioms ⊢ lt zero (succ k) :=
+  prim_to_axioms (zero_lt_succ_prim k)
+
+theorem zero_or_succ_ax : axioms ⊢ Formula.forall
+    (((.var 0) =eq zero) ∨ (Formula.ex ((.var 1) =eq succ (.var 0)))) :=
+  prim_to_axioms zero_or_succ_ax_prim
 
 end ROBINSON_PlusPlus.Full
