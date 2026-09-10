@@ -14,6 +14,22 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10h — MÓDULO E de `NegVerifier`, la dedup ADR‑019, y el CENSO de `coreAxioms`.**
+> (1) `Meta/VerifierSound.lean`: la **solidez estructural del verificador** en diez líneas —
+> `verifier_sound` **es** `decodeChain_prf`, porque el decisor no tiene que ser el verificador
+> OBJETO sino el **decodificador META**, que es una **sección** (`decodeForm_inj`). Lo que falta se
+> **enuncia** (`DEUDA_chainNeg`, `DEUDA_inNeg`) y `negVerifier_of_deudas` lo convierte en
+> `NegVerifier`. ⛔ El sondeo previo movió el riesgo: **E era «ALTO» y es una línea; los que hay que
+> rediseñar son C y D**. (2) `Meta/D3ChainDotPrf.lean` §5bis/§5ter: `pcc_bdEx_carc_reflect_gen`
+> **baja** desde `PremsBdAllPrf` (ADR‑019) y `pcc_bdCarcLt_reflect` queda como **instancia**;
+> footprint de `d3_prf_real` intacto. (3) ⭐⭐ **`Full` cierra 11 de 11 axiomas derivables de
+> `Minimal`**: `add_assoc_thm`, `mul_assoc_thm`, `mul_distrib_thm` (ax7/ax11/ax12). La NOTA que
+> declaraba imposible el empaquetado `∀³` **era falsa** — bastaba `FOL.substTerm_liftLift` en el
+> `simp set`. Censo completo en `doc/REFERENCE-Full.md` §3.14.1, con lo que **no** cierra: el
+> enunciado `axioms ⊢ axN` es trivial por `ax`, y certificarlo pide `primAxioms` ⇒ **ADR**.
+> ⚠️ **Trampa nueva**: un `sorry` en el `simp set` **fabrica** el verde (los tres empaquetados
+> compilaron con un lema falso antes de encontrar el verdadero).
+>
 > **2026‑09‑10g — 🏁🏁🏁🏁 D3 PROBADA y `axiom d3` RETIRADO (7 → 6 axiomas).**
 > `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10): la **tercera condición de derivabilidad** es un
 > teorema, y `GodelTwo.d3` pasa de `axiom` a `theorem` ⇒ **la cadena D1/D2/D3 no postula ninguna de

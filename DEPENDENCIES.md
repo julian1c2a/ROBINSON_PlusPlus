@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 141 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
 > **6 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -65,7 +65,7 @@ Extraída **por máquina** de los `import` reales de los módulos activos de `Me
 ### ⚠️ NOVEDADES posteriores a la extracción (la tabla de arriba es del 2026‑08‑22)
 
 Módulos añadidos desde entonces cuyas **aristas** conviene tener a mano, medidas de los `import`
-reales el **2026‑09‑10f** (`127 módulos activos`, Meta 105):
+reales el **2026‑09‑10h** (`128 módulos activos`, Meta 106):
 
 | módulo | importa | quién lo importa | por qué la arista es la que es |
 |---|---|---|---|
@@ -75,6 +75,7 @@ reales el **2026‑09‑10f** (`127 módulos activos`, Meta 105):
 | **`D3BodyPrf`** | `D3ChainDotPrf`, `SubstTreeReflect`, **`PremsOfDotPrf`** | `PremsBdAllPrf` |
 | **`PremsOfDotPrf`** | `PremsOfTagPrf`, `SubstTreeReflect` | `D3BodyPrf` | **B1**: necesita las 21 ramas OBJETO y el `pcc_tag_vacuous` del ensamblador |
 | **`PremsBdAllPrf`** | `D3BodyPrf` | — (hoja) | **B3**: el chasis interior, que consume el destino medido en `D3BodyPrf` §3 |
+| **`VerifierSound`** | `ChainDecode`, `OmegaReflect` | — (hoja) | **módulo E**: la solidez la da el **decodificador META** (`ChainDecode`), y `NegVerifier`/`StdChain` viven en `OmegaReflect`. ⭐ **No importa nada de la rama D3**: el decisor **no es** el verificador OBJETO |
 
 ⭐ **`PremsBdAllPrf` es el nodo más profundo del proyecto** desde el 2026‑09‑10f; hasta esa fecha lo era `D3BodyPrf`, que sigue siendo: es la confluencia de las
 dos ramas largas (C3 por `SubstTreeReflect`, D3 por `D3ChainDotPrf`), que hasta hoy corrían en

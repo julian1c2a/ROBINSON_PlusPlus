@@ -4,9 +4,73 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑10g · `master` · 🏁🏁🏁🏁 D3 PROBADA · `axiom d3` RETIRADO · ✅ ÁRBOL VERDE · ✅ CI VERDE**
-`Build completed successfully (141 jobs)` — **127 módulos** (Minimal 11 + Meta 105 + Full 11) + 0 en
-`cuarentena/` · 60 `sondeos/` · **6 `axiom` de Lean · 0 sorrys**.
+**Estado 2026‑09‑10h · `master` · 🏁 MÓDULO E · 🏁 `coreAxioms` 11/11 · ✅ ÁRBOL VERDE · ✅ CI VERDE**
+`Build completed successfully (142 jobs)` — **128 módulos** (Minimal 11 + Meta 106 + Full 11) + 0 en
+`cuarentena/` · 61 `sondeos/` · **6 `axiom` de Lean · 0 sorrys**.
+
+> # 🎯 LO DE HOY (2026‑09‑10h) — tres cosas, y una de ellas **es un frente nuevo**
+>
+> ## 1. 🏁 **MÓDULO E de `NegVerifier`, cerrado en diez líneas** (`Meta/VerifierSound.lean`)
+>
+> `PLAN-NEGVERIFIER.md` §8 lo llamaba **«el corazón»**, le ponía riesgo **ALTO** y 300–500 líneas,
+> y exigía un **sondeo previo**. El sondeo (`sondeos/NegVerifierModE.lean`, 5 mediciones) midió que
+> **el corazón no había que construirlo**: el decisor que E necesita **no tiene que ser el
+> verificador OBJETO**, basta el **decodificador META**, y entonces la solidez **ya estaba probada**
+> — `verifier_sound` **es** `decodeChain_prf`. 🔑 La pieza que lo hace gratis es **`decodeForm_inj`**:
+> el decodificador es una **SECCIÓN**.
+>
+> ⭐ La forma de consumo es la **CONTRAPOSITIVA** (`not_decodes_of_not_prf`): con `¬Prf φ`, la rama
+> «cadena aceptada» del ensamblaje es **IMPOSIBLE** ⇒ todo el trabajo que queda cae en la otra.
+> ⬜ Y queda **enunciado, no postulado**: `DEUDA_chainNeg` + `DEUDA_inNeg` ⇒ `negVerifier_of_deudas`.
+>
+> ## 2. 🧹 **La dedup ADR‑019**, hecha (`Meta/D3ChainDotPrf.lean` §5bis/§5ter)
+>
+> `pcc_bdEx_carc_reflect_gen` **baja** desde `PremsBdAllPrf`, y `pcc_bdCarcLt_reflect` pasa a ser
+> **su instancia** (vía `prf_contract`). Footprint de `d3_prf_real` intacto.
+>
+> ## 3. ⭐⭐ **EL FRENTE NUEVO: `Full` debe demostrar los axiomas DERIVABLES de `Minimal`**
+>
+> El planteamiento correcto **no** es «todos»: una ecuación que **define** un símbolo no la deriva
+> ningún esquema de inducción. El censo de `coreAxioms` (34 = 23 + 11) está en
+> **`doc/REFERENCE-Full.md` §3.14.1**:
+>
+> | clase | cuántos | estado |
+> |---|---|---|
+> | **PRIMITIVOS / DEFINITORIOS** (Peano, `+`, `·`, `<`, `√`, `mod2`, `pred`, listas, `^`, `prod_pairs`, monus) | 23 | ⛔ irreducibles **por naturaleza** |
+> | **DERIVABLES CON INDUCCIÓN** (ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax21, ax24, ax_C3, ax_L3) | 11 | 🏁 **11 de 11** |
+> | `codingAxioms` (`substtc`/`liftc`/`substfc`/`liftfc`/`vpf`/`tc`/`carc`/`cdrc`) | 107 | ⛔ **extensión definicional**, fuera del censo |
+>
+> ⭐ **Los tres que faltaban cayeron hoy, y la «obstrucción» era FALSA.** `Full/Induction.lean`
+> llevaba **tres sesiones** una NOTA diciendo que el empaquetado `∀³` vía `gen` triple «topa con el
+> ajuste de niveles `liftTerm`» y que hacía falta un «**helper de empaquetado n‑ario**». No hacía
+> falta ninguno: tras los dos `gen` el hueco es `substTerm (0+1) ṡ (liftTerm 0 (liftTerm 0 a))`, y
+> **eso ya tenía lema desde siempre** — **`FOL.substTerm_liftLift`**, que devuelve exactamente
+> `liftTerm 0 a`. **Cuatro líneas por axioma** ⇒ `add_assoc_thm`, `mul_assoc_thm`,
+> `mul_distrib_thm`.
+>
+> ⚠️⚠️ **LA TRAMPA DEL CAMINO, y es nueva:** el primer intento metió en el `simp set` un lema
+> **propio** dejado en `sorry` «para medir»:
+>
+>     substTerm (c+1) s (liftTerm 0 (liftTerm 0 t)) = liftTerm 0 (liftTerm 0 t)     -- FALSO
+>
+> Los **tres** empaquetados **compilaron** con él. El lema es falso (la sustitución en `c+1` **sí**
+> baja un nivel: el verdadero da `liftTerm 0 t`). 🔑 **Un `sorry` en el `simp set` no mide: FABRICA
+> el verde.** Es AI‑GUIDE §27.1 en una forma que no estaba catalogada.
+>
+> ⛔ **LO QUE EL CENSO NO CIERRA, y es lo sustantivo**: los once se enuncian `axioms ⊢ axN` con
+> `axN ∈ axioms` ⇒ **trivialmente ciertos por `ax`**. El tipo **no certifica** la redundancia (sí la
+> prueba: ninguna de las once cita su propio axioma, medido por grep — pero nada lo impide). La
+> forma que certificaría es `primAxioms ⊢ axN` con `primAxioms` = los 23. ⚠️ **Y eso NO es gratis**:
+> `axiomsCodeT` ancla a **`axioms`**, y estrechar la lista **mueve la frontera de la teoría**, que
+> es la que decide qué significa `provCodeC'` y **cuál es la sentencia G** (ADR‑015). ⇒ **ADR, no
+> limpieza.**
+>
+> ## ⬜ Y una DECISIÓN sancionada que aún no se ha escrito
+>
+> Estrechar **`StdChain`** a líneas `⟨formCode φ, numeralM k, args⟩` con args `formCode`/`termCode`,
+> aceptando que `OmegaConsistent` quede **algo más fuerte** que la ω‑consistencia clásica
+> (atenuante medido: **ya no era la clásica pura** — cuantifica sobre `objList l`). Sancionado por
+> el propietario el 2026‑09‑10h; **falta redactar el ADR** y con él atacar **C y D**.
 
 > # 🏁🏁🏁 LO GRANDE DE HOY: **`pcc_lineWF_tracked` ES INCONDICIONAL**
 >
@@ -90,10 +154,11 @@
 > 2. ⬜ **`prf_axiomsCodeT_eq`** — el axioma que arrastra casi todo el árbol («net‑0 son CUATRO,
 >    no tres»). Es de naturaleza distinta a los gödelianos: dice que el código de la lista de
 >    axiomas **es** la lista de códigos.
-> 3. 🧹 **Dedup**: `pcc_bdEx_carc_reflect_gen` (`Meta/PremsBdAllPrf.lean` §9bis.3) **generaliza**
->    `pcc_bdCarcLt_reflect` (§5 de `D3ChainDotPrf`) y hoy conviven. Re‑derivar el especializado
->    desde el genérico — ADR‑019.
+> 3. 🏁 ~~**Dedup** ADR‑019~~ — **HECHO** el 2026‑09‑10h (`D3ChainDotPrf` §5bis/§5ter).
 > 4. 📖 El **libro**: hay cambios sin commitear en `doc/book/`.
+> 5. ⬜ **El ADR de `StdChain`** — sancionado, sin redactar; es lo que desbloquea **C** y **D**.
+> 6. ⬜ **`primAxioms`** — la forma que *certifica* el censo de `coreAxioms` (§3.14.1 de
+>    `doc/REFERENCE-Full.md`). ⚠️ Mueve la frontera de la teoría ⇒ **ADR**.
 >
 > 🔑🔑 **LAS SEIS REGLAS DEL FRENTE, todas sobre la FORMA:**
 > 1. **ADR‑021, AFINADA**: lo que rompe la naturalidad del `PsiF` **no es «ser un `substCodeF`»**,

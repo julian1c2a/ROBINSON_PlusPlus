@@ -9,7 +9,7 @@
 
 **Contenido:** inducción general a nivel objeto (`ax_induction`/`inductionFormula`), inducción fuerte
 derivada, puente `numeral` + homomorfismo, acotados, divisibilidad/división, primos y **TFA completo**
-(`tfa_numeral`). **Last updated:** 2026-07-12 · Lean v4.31.0.
+(`tfa_numeral`). **Last updated:** 2026-09-10h · Lean v4.31.0.
 
 ---
 
@@ -113,6 +113,85 @@ theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
 **TFA completo** (existencia object ∧ unicidad ℕ), autocontenido sin Mathlib/Peano. El `ax_p_tfa` de Block8 queda como forma *idealizada* (membership object + testigo object, no discharge constructivo por el "Muro 1"); `tfa_numeral` es la realización equivalente para todos los usos reales.
 
 **Axiomas extra de Full**: `ax_induction`, `ax_mod2_alternation`, `ax_list_induction`. **Estado del fragmento de Minimal en Full**: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅ + TFA ✅.
+
+---
+
+### 3.14.1 · ⭐ EL CENSO DE `coreAxioms` — qué es PRIMITIVO y qué es TEOREMA (2026‑09‑10h)
+
+> **El planteamiento correcto es éste**: *en `Full` deberían demostrarse como teoremas todos los
+> axiomas de `Minimal` **que no sean definitorios**.* No «todos»: una ecuación que **define** un
+> símbolo de función no la deriva ningún esquema de inducción — sin ella el símbolo no significa
+> nada. El censo separa las dos clases y **mide** cuántos quedan.
+
+`Minimal` tiene `axioms = coreAxioms ++ codingAxioms` (`axioms_eq`, por `rfl`), medido con
+`#eval ·.length`: **34 + 107 = 141**.
+
+#### (a) Los **107** `codingAxioms` — **extensión definicional, irreducibles por diseño**
+
+Las ecuaciones recursivas de `substtc`/`substtsc`/`liftc`/`liftsc`/`substfc`/`liftfc`, las 22
+cláusulas `ax_vpf_*` del verificador, `ax_tc_zero`/`ax_tc_succ`, `ax_carc`/`ax_cdrc`. **Definen**
+los símbolos aritmetizados; no son enunciados matemáticos que la inducción pueda alcanzar. ⇒ fuera
+del censo.
+
+#### (b) Los **34** `coreAxioms`, partidos en dos
+
+| clase | cuántos | cuáles | por qué |
+|---|---|---|---|
+| **PRIMITIVOS / DEFINITORIOS** | **23** | ax2, ax3 (Peano) · ax4, ax5 (definen `+`) · ax8, ax9 (definen `·`) · ax13 (define `<`) · ax14, ax15 (caracterizan `√`) · ax16, ax17 (caracterizan `mod2`/`div2`) · ax25, ax26 (definen `pred`) · ax_L0, ax_L1, ax_L2 (definen `cons`/`In`) · ax_C1, ax_C2 (definen `concat`) · ax29 (caracteriza la resta truncada) · ax_pow_zero, ax_pow_succ · ax_prodp_nil, ax_prodp_cons | **irreducibles**: fijan el significado de un símbolo. Nada que derivar |
+| **DERIVABLES CON INDUCCIÓN** | **11** | ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax21, ax24, ax_C3, ax_L3 | consecuencias de las ecuaciones definitorias **+ inducción** ⇒ **deben ser teoremas en `Full`** |
+
+#### (c) 🏁 **Estado: 11 de 11.** Y los tres últimos cayeron hoy
+
+| axioma | teorema en `Full` | fichero |
+|---|---|---|
+| ax6 `add_comm` | `add_comm_thm` | `Full/Induction.lean` |
+| **ax7 `add_assoc`** | 🆕 **`add_assoc_thm`** | `Full/Induction.lean` |
+| ax10 `mul_comm` | `mul_comm_thm` | `Full/Induction.lean` |
+| **ax11 `mul_assoc`** | 🆕 **`mul_assoc_thm`** | `Full/Induction.lean` |
+| **ax12 `mul_distrib`** | 🆕 **`mul_distrib_thm`** | `Full/Induction.lean` |
+| ax18 `lt_irrefl` | `lt_irrefl_thm` | `Full/Induction.lean` |
+| ax19 `lt_trichotomy` | `lt_trichotomy_thm` | `Full/Induction.lean` |
+| ax21 `mod2_range` | `mod2_range_thm` | `Full/Mod2.lean` |
+| ax24 `mod2_of_even` | `mod2_of_even_thm` | `Full/Mod2.lean` |
+| ax_C3 `concat_assoc` | `concat_assoc_thm` | `Full/Lists.lean` |
+| ax_L3 `in_concat` | `in_concat_thm` | `Full/Lists.lean` |
+
+⭐ **La «obstrucción» de ax7/ax11/ax12 era FALSA.** `Full/Induction.lean` llevaba una NOTA —tres
+sesiones— diciendo que el empaquetado `∀³` vía `gen` triple «topa con el ajuste de niveles
+`liftTerm`» y que hacía falta un «helper de empaquetado n‑ario». **No hacía falta ninguno**: tras
+los dos `gen`, el hueco del parámetro exterior es
+`substTerm (0+1) ṡ (liftTerm 0 (liftTerm 0 a))`, y eso **ya tenía lema desde siempre** —
+**`FOL.substTerm_liftLift`** (`FOL/Theorems/Eq.lean`)—, que devuelve exactamente `liftTerm 0 a`,
+que es lo que `add_assoc_ax a b` produce. Era **un lema ausente del `simp set`**: cuatro líneas
+por axioma. Es otra vez [[feedback-medir-la-forma]]: *una obstrucción medida pero no probada puede
+simplemente ser falsa*.
+
+⚠️ **Y la trampa del camino, que merece quedar escrita**: el primer intento metió en el `simp set`
+un lema propio dejado en `sorry` «para medir» —
+`substTerm (c+1) s (liftTerm 0 (liftTerm 0 t)) = liftTerm 0 (liftTerm 0 t)`. Los **tres**
+empaquetados compilaron con él, y el lema es **FALSO** (la sustitución en `c+1` sí baja un nivel).
+**Un `sorry` en el `simp set` no mide: fabrica el verde.** Cf. AI‑GUIDE §27.1.
+
+#### (d) ⛔ LO QUE EL CENSO **NO** CIERRA — y es lo sustantivo
+
+Los once teoremas se enuncian **`axioms ⊢ axN`**, y `axN ∈ axioms`. ⇒ el enunciado es
+**trivialmente cierto por `ax`**: el tipo **no certifica** la redundancia, sólo la prueba lo hace.
+Medido (grep sobre `Full/`): **ninguna de las once pruebas cita su propio axioma** — pero **nada lo
+impide**, y una edición futura podría cortocircuitar cualquiera sin que nada rompa.
+
+**La forma que sí certifica** sería partir la lista:
+
+```lean
+def primAxioms : List Formula := [ … los 23 … ]          -- ⬜ no existe
+theorem add_comm_thm : primAxioms ⊢ ax6_add_comm := …    -- ⬜ el enunciado que certifica
+```
+
+⚠️ **Pero eso NO es una limpieza gratis, y por eso no se hace sin ADR**: `axiomsCodeT` está
+anclado a **`axioms`** (`ax_axiomsCodeT_eq`), y la regla `thy` del verificador acepta como axioma
+de teoría todo lo que esté en `axiomsCodeT`. Estrechar la lista **mueve la frontera de la teoría**,
+y esa frontera es la que decide qué significa `provCodeC'` y **cuál es la sentencia G**
+([ADR‑015](../DECISIONS.md)). ⇒ decisión del propietario, no del formalizador.
+
 
 ---
 
