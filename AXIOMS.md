@@ -9,7 +9,7 @@
 >
 > **Build 141 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -66,7 +66,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 | 4 | `ax_p_tfa` | `Minimal/Theorems/Block8.lean` | Teoría objeto | Teorema Fundamental de la Aritmética (teorema en Full, postulado en Minimal) |
 | 5 | `ax_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) |
 | 6 | `prf_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`Prf (axiomsCodeT =eq listFormCodeM axioms)`** — espejo `Prf` de (5) para el cálculo finitario. **Reemplaza a `prf_inAxC`** (2026‑07‑20, `25d255b`), que pasa a ser **teorema** derivado (**net‑0 axiomas**). D1 `repr_pos'_prf` cita ahora éste |
-| 7 | `d3` | `Meta/GodelTwo.lean` | Postulado gödeliano | **Única pieza pendiente**: condición D3 de Hilbert-Bernays-Löb para `provCodeC'`. En construcción por el plan 12‑A |
+| ~~7~~ | ~~`d3`~~ | `Meta/GodelTwo.lean` | 🏁 **RETIRADO el 2026‑09‑10g** | Era la condición D3 de Hilbert‑Bernays‑Löb para `provCodeC'`. Hoy es **teorema**: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres** |
 
 ### Detalle por familia
 
@@ -96,7 +96,7 @@ pendiente de este proyecto: es un **enunciado falso**.
 | **D1** `repr_pos'_prf` | **NO** — limpio (sólo el ancla de codificación) |
 | **D2** `d2_prf` | **NO** — limpio (`[propext, choice, Quot.sound]`) |
 | `goedel_first_numeral` (Gödel I) | **SÍ** |
-| `goedel_second'` | **SÍ** (+ el `d3` pendiente) |
+| `goedel_second'` | **SÍ** — 🏁 y **sin `d3`** desde el 2026‑09‑10g |
 
 El reparto encaja con la teoría: **D1 es la Σ₁‑completitud *externa*** (aplicar el
 verificador a una derivación concreta = cómputo finito, sin inducción); **D3 es la
@@ -131,10 +131,10 @@ con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`)
   positivo y ahora es **teorema** derivado—, también **net‑0 axiomas**. Lo exige el
   `In`‑reflect de `axiomsCodeT` (`Meta/InAxiomsCodePrf.lean`), que necesita las **dos**
   direcciones dentro de `Prf`.
-- **Postulado gödeliano vivo (7).** `d3` es la única condición de derivabilidad
+- 🏁🏁🏁 **NINGÚN postulado gödeliano vivo desde el 2026‑09‑10g.** `d3` era la última condición de derivabilidad
   aún postulada. Su prueba real (Σ₁-completitud provable del verificador) es el
   objetivo del plan **12‑A** (`GODEL-D3-TRACKED-DESIGN.md` §12–§14); fases 1a/1b/2
-  ✅ completas. Cuando `d3` pase a teorema, **F7b** lo retirará (6 axiomas).
+  ✅ completas. `d3` **pasó a teorema** el 2026‑09‑10g y **F7b lo retiró**: quedan **6 axiomas**.
 
 ---
 
@@ -187,10 +187,10 @@ goedel_first_real'  : [propext, choice, Quot.sound,
                        Full.ax_induction, Full.ax_list_induction, ax_axiomsCodeT_eq]
 goedel_second'      : [propext, choice, Quot.sound,
                        FOL.MetaRules.{ex_elim, gen, imp_intro, or_elim},
-                       Full.ax_list_induction, d3]
+                       Full.ax_list_induction]   -- ⚠️ `d3` YA NO
 ```
 
-Ningún postulado gödeliano salvo `d3` en `goedel_second'` (F7b, pendiente de D3
+🏁 **Ningún postulado gödeliano** en `goedel_second'` — `d3` retirado el 2026‑09‑10g (F7b CERRADA; era «pendiente de D3»
 real).
 
 **Gödel I — precisión (auditoría 2026-07-13):** la mitad **`⊬G`** (`goedel_first_real'`) es **real y

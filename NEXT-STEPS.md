@@ -4,9 +4,9 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑10f · `master` · 🏁🏁🏁 C3 CERRADO · B1+B2 CERRADAS · ✅ ÁRBOL VERDE · ✅ CI VERDE**
+**Estado 2026‑09‑10g · `master` · 🏁🏁🏁🏁 D3 PROBADA · `axiom d3` RETIRADO · ✅ ÁRBOL VERDE · ✅ CI VERDE**
 `Build completed successfully (141 jobs)` — **127 módulos** (Minimal 11 + Meta 105 + Full 11) + 0 en
-`cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
+`cuarentena/` · 60 `sondeos/` · **6 `axiom` de Lean · 0 sorrys**.
 
 > # 🏁🏁🏁 LO GRANDE DE HOY: **`pcc_lineWF_tracked` ES INCONDICIONAL**
 >
@@ -64,65 +64,55 @@
 
 ---
 
-> # 🎯 SIGUIENTE SESIÓN — **la NOVENA obligación del chasis interior, y D3 se cierra**
+> # 🏁🏁🏁🏁 **D3 PROBADA — `axiom d3` RETIRADO** (2026‑09‑10g)
 
-> D3 sigue en **UNA** obligación, `hbody`, partida por `rfl` en dos mitades. **(a) está PROBADA**
-> desde el 2026‑09‑10e. De **(b)** se cerraron **B1** y **B2**, y de **B3** las **ocho**
-> obligaciones administrativas del chasis interior.
+>     d3_prf_real (φ) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
 >
-> | pieza | qué es | estado |
-> |---|---|---|
-> | **(a)** `lineWFDotAt` | reflexión de `lineWF` | 🏁 `Meta/D3BodyPrf.lean`, incondicional |
-> | **B1** | `Prov(premsOfT ṫ ≐ (premsOf t)˙)`, las 21 ramas | 🏁 `Meta/PremsOfDotPrf.lean` |
-> | **B2** | el puente de la **cota** dentro de `Prov` | 🏁 `Meta/D3BodyPrf.lean` §2–§3 |
-> | **B3** | el `pcc_bdAll_intro` interior, **8 de 9** | 🏁 `Meta/PremsBdAllPrf.lean` |
-> | **B3** | **`DEUDA_premsBody`** — la novena | ⬜ **lo ÚNICO que queda de D3** |
+> La **tercera condición de derivabilidad** es un **teorema**. `GodelTwo.d3` pasa de `axiom` a
+> `theorem` ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres**, y `goedel_second'` ya no
+> depende de `d3`. **6 `axiom` de Lean** (eran 7).
 >
-> ## La novena, con la ruta MEDIDA
+> | pieza | estado |
+> |---|---|
+> | **(a)** `lineWFDotAt` — reflexión de `lineWF` | 🏁 `Meta/D3BodyPrf.lean` |
+> | **B1** — `premsOf` dentro de `Prov`, 21 ramas | 🏁 `Meta/PremsOfDotPrf.lean` |
+> | **B2** — el puente de la cota | 🏁 `Meta/D3BodyPrf.lean` §2–§3 |
+> | **B3** — el chasis interior, **9 de 9** | 🏁 `Meta/PremsBdAllPrf.lean` |
+> | **4** — retirar `axiom d3` | 🏁 `Meta/GodelTwo.lean` |
 >
->     DEUDA_premsBody : ∀ r j, premsCF r ⇒ (j < premsBnd r ⇒
->                          Prov(substfc 0 j̇ (premsPsiPk r)))
+> ## 🎯 SIGUIENTE SESIÓN
 >
-> **No tiene sorpresas de forma:**
-> * el cuerpo se parte por el `lor` (`prf_substfc_or`);
-> * el disyunto **izquierdo** (`In y nil`) es **vacuo** —`prf_not_in_nil`— y §6 de `D3ChainDotPrf`
->   ya lo explota dejando su código **ARBITRARIO** (el parámetro `Ac`): **no hay que calcularlo**;
-> * el **derecho** es `boundedCarcLt`, y `pcc_bdCarcLt_reflect` (§5) lo refleja con `y`, `p`, `b`
->   **abstractos**.
+> D3 ya no bloquea nada. Los frentes que quedan abiertos, por orden de valor:
 >
-> ⚠️ **La única fricción, y está localizada**: §5 escribe el testigo del `∃` como `liftc 0 ẏ`, y lo
-> que `substCodeF2` produce en esa posición es el **accesor dotado**
-> `nthcT (premsOfT (nthcT q̇ i̇)) j̇`. Es **la MONEDA de §3.55.2 por CUARTA vez**, y las dos piezas
-> que la cruzan **ya existen**: **B2** lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y `pcc_eval_nthc L j`
-> lleva `nthcT L̇ j̇` a `(nthc L j)˙` **bajo `j < lenc L`** — que es exactamente la cota del `∀`
-> interior, o sea **una hipótesis que el `hbody` tiene a mano**.
+> 1. ⬜ **Gödel I · la mitad `⊬¬G`** — la única obligación es `NegVerifier`
+>    ([[project-godel-first-complete]], `PLAN-NEGVERIFIER.md`). ⚠️ `repr_neg` **no existe ni hace
+>    falta**.
+> 2. ⬜ **`prf_axiomsCodeT_eq`** — el axioma que arrastra casi todo el árbol («net‑0 son CUATRO,
+>    no tres»). Es de naturaleza distinta a los gödelianos: dice que el código de la lista de
+>    axiomas **es** la lista de códigos.
+> 3. 🧹 **Dedup**: `pcc_bdEx_carc_reflect_gen` (`Meta/PremsBdAllPrf.lean` §9bis.3) **generaliza**
+>    `pcc_bdCarcLt_reflect` (§5 de `D3ChainDotPrf`) y hoy conviven. Re‑derivar el especializado
+>    desde el genérico — ADR‑019.
+> 4. 📖 El **libro**: hay cambios sin commitear en `doc/book/`.
 >
-> ⇒ **El trabajo concreto**: generalizar `pcc_bdCarcLt_reflect` en su `Phic` (hoy fijo a
-> `bdCarcLtPhic`), porque el hueco a reescribir queda **bajo el binder del `exc`** y `pcc_rw` no
-> llega ahí. `PrfH_bdEx_intro_open` **ya es genérico** en `Phic`, así que la generalización es de la
-> **envoltura**, no del núcleo.
->
-> ⇒ Con ella: `hbdAllPrems_of_body` → `hbody_of_halves` → `d3_prf_of_halves` → **se retira
-> `axiom d3`** (7 → 6 `axiom` de Lean). **Nada más aguas abajo.**
->
-> 🔑🔑 **LAS SEIS REGLAS DEL FRENTE — todas sobre la FORMA, ninguna sobre el tamaño:**
-> 1. 🆕 **ADR‑021, AFINADA** (§3.66.1): lo que rompe la naturalidad del `PsiF` **no es «ser un
->    `substCodeF`»** — es que **el PARÁMETRO VIAJE DENTRO DE LA FÓRMULA**. Enunciada así predice los
->    dos casos: en el chasis exterior `hPl` era falsa (el parámetro iba dentro), en el interior es
->    cierta (el cuerpo es cerrado y los parámetros son sólo testigos).
-> 2. **El ÍNDICE no es cosmético, y van CINCO veces.** La cuarta variante
->    (`substfc_id_substCodeF2`) sube la guarda de `liftFormula (v+2)` a **`(v+3)`**, porque entre el
->    nivel actuante y el hueco alto hay **dos** casillas.
+> 🔑🔑 **LAS SEIS REGLAS DEL FRENTE, todas sobre la FORMA:**
+> 1. **ADR‑021, AFINADA**: lo que rompe la naturalidad del `PsiF` **no es «ser un `substCodeF`»**,
+>    es que **el PARÁMETRO VIAJE DENTRO DE LA FÓRMULA**.
+> 2. **El ÍNDICE no es cosmético, y van CINCO veces** — el inventario completo de la familia
+>    `substfc_inv_*` está en §3.67.3.
 > 3. ⚠️ **El número de obligaciones abiertas NO mide el progreso.**
 > 4. ⚠️ **Que una pieza esté enunciada sobre argumentos ABSTRACTOS no garantiza que el destino se
->    deje instanciar con ella** (§3.59.3).
+>    deje instanciar con ella.**
 > 5. ⚠️ **Una obligación declarada VACUA sin pagarla sigue contando como ABIERTA** (§3.62).
-> 6. ⚠️ **Medir un frente por el TAMAÑO del molde SOBREESTIMA** (§3.61.3): el molde incluye lo ya
->    comprado. La medida útil se lee de su bloque `export`, no de su `wc -l`.
+> 6. ⚠️ **Medir un frente por el TAMAÑO del molde SOBREESTIMA** (§3.61.3).
+>
+> 🆕 ⚠️ **Y tres trampas de FORMA nuevas** (§3.67.2): una hipótesis que **no viaja** por el
+> genérico; `rfl` desplegando `strCode` **carácter a carácter** hasta agotar los heartbeats; y el
+> Leibniz que **captura** la variable si no se protege el hueco con `liftTerm`.
 >
 > ⛔ **LA TRAMPA**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`, `premsOf`… son **símbolos de
-> función OBJETO, no funciones de Lean: NO reducen**. Abrir el destino hacia su gemelo computable
-> con `prf_*_arith_open` y **entonces** casar por `rfl`. ⚠️ Y medir sobre la **instancia real**.
+> función OBJETO: NO reducen**. Abrir el destino con `prf_*_arith_open` y **entonces** casar por
+> `rfl`; y medir sobre la **instancia real**.
 >
 > ⛔ **Y un VERDE no es haber comprobado** (AI‑GUIDE §27.1). Leer **la cifra medida**, no el `✅`.
 

@@ -9,7 +9,7 @@
 >
 > **Build 141 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -188,4 +188,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-09-10 — Build ✅ **135 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI‑GUIDE §27.1), **7 `axiom` de Lean**, Lean **v4.31.0** (política: última estable). **121 módulos activos** (Minimal/ 11 + Meta/ 99 + Full/ 11) + 0 en `cuarentena/` + 60 en `sondeos/`. ✅ **CI en verde** (`.github/workflows/build.yml`, con los dos checkouts hermanos que `FOL` necesita).*
+*Last updated: 2026-09-10 — Build ✅ **135 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI‑GUIDE §27.1), **6 `axiom` de Lean**, Lean **v4.31.0** (política: última estable). **121 módulos activos** (Minimal/ 11 + Meta/ 99 + Full/ 11) + 0 en `cuarentena/` + 60 en `sondeos/`. ✅ **CI en verde** (`.github/workflows/build.yml`, con los dos checkouts hermanos que `FOL` necesita).*

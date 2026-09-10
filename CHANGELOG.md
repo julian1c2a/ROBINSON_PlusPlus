@@ -14,6 +14,14 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10g — 🏁🏁🏁🏁 D3 PROBADA y `axiom d3` RETIRADO (7 → 6 axiomas).**
+> `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10): la **tercera condición de derivabilidad** es un
+> teorema, y `GodelTwo.d3` pasa de `axiom` a `theorem` ⇒ **la cadena D1/D2/D3 no postula ninguna de
+> las tres**; `goedel_second'` ya no depende de `d3`. Lo que faltaba: la novena obligación del
+> chasis interior (`premsBody_deuda`), la **quinta** variante de la familia `substfc_inv_*` —la más
+> barata, porque el testigo no aparece en el resultado— y el puente de la cota, que es §4 de
+> `D3ChainDotPrf` **un nivel más adentro**. Detalle en `doc/REFERENCE-Incompleteness.md` §3.67.
+>
 > **2026‑09‑10f — B1 y B2 CERRADAS, B3 en 8/9.** `Meta/PremsOfDotPrf.lean` (B1:
 > `pcc_eval_premsOf`, `premsOf` dentro de `Prov`, las 21 ramas), `Meta/D3BodyPrf.lean` §2–§3 (B2:
 > la cota cruzada, con `PrfH_pcc_rw` porque los eslabones son condicionales) y

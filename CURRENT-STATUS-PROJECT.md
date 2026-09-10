@@ -173,6 +173,19 @@
 > obstrucción de §3.59.2 («21 axiomas con *pattern‑matching*, nada que evaluar sobre un argumento
 > abstracto») le faltaba una frase — *mientras no se sepa la **LONGITUD***, que sale del propio
 > bicondicional del tag. Las **21 ramas**, a nivel objeto, en 417 líneas.
+> 🏁🏁🏁🏁 **2026‑09‑10g · D3 PROBADA — `axiom d3` RETIRADO** (§3.67).
+> `d3_prf_real (φ) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))`. La **tercera condición de
+> derivabilidad** de Hilbert‑Bernays‑Löb es un **teorema**, `GodelTwo.d3` pasa de `axiom` a
+> `theorem` ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres**, y `goedel_second'` ya no
+> depende de `d3`. **6 `axiom` de Lean** (eran 7).
+> ⭐ **La QUINTA variante de `substfc_inv_*`** —nivel actuante **igual** al hueco bajo— es la **más
+> barata de la familia**: el testigo **no aparece** en el resultado, luego no hace falta la
+> hipótesis `u ≐ varc v̄` que la cuarta sí pedía. ⚠️ Van **cinco veces** que el índice no es
+> cosmético; el inventario completo está en §3.67.3.
+> ⚠️ **Tres trampas de FORMA nuevas** (§3.67.2): una hipótesis que **no viajaba** por el genérico;
+> `rfl` desplegando `strCode` **carácter a carácter** hasta agotar los heartbeats; y el Leibniz que
+> **captura** la variable si no se protege el hueco con `liftTerm`.
+>
 > 🏁🏁 **2026‑09‑10f · B1 y B2 CERRADAS, y B3 en 8 de 9** (§3.64–§3.66).
 > **B1** (`Meta/PremsOfDotPrf.lean`): `pcc_eval_premsOf` — `premsOf` reflejado **dentro de `Prov`**
 > con `t` abstracto, las 21 ramas. **B2** (`Meta/D3BodyPrf.lean` §2–§3): la **cota** cruzada, con B1
@@ -201,7 +214,7 @@
 > 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52).
 > ⛔ **Trampa del día, tres veces**: `substfc`/`carc`/`lenc`… son símbolos OBJETO y **no reducen**.
 > **127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
-> **7 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
+> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >
 > 🏁 **`∀t. hasWit (tcFn t)` PROBADO** y en producción (`Meta/HasWitTcFnPrf.lean`), footprint

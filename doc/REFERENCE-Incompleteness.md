@@ -18,7 +18,7 @@
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
 > **Build 141 jobs · 127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/`
-> + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
+> + 57 `sondeos/` · 6 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -5343,3 +5343,81 @@ la cota del `∀` interior, o sea una hipótesis que el `hbody` **tiene a mano**
 `bdCarcLtPhic`), porque el hueco a reescribir queda **bajo el binder del `exc`** y `pcc_rw` no
 llega ahí. `PrfH_bdEx_intro_open` ya es genérico en `Phic`, así que la generalización es de la
 envoltura, no del núcleo.
+
+---
+
+## §3.67 · 🏁🏁🏁🏁 **D3 PROBADA — y `axiom d3` RETIRADO** (2026‑09‑10g)
+
+> `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +
+> `Meta/GodelTwo.lean`. Footprint de `d3_prf_real` = la base sancionada.
+> **6 `axiom` de Lean** (eran 7).
+
+    d3_prf_real (φ) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
+
+La **tercera condición de derivabilidad** de Hilbert‑Bernays‑Löb es un **teorema**. Con ella,
+`GodelTwo.d3` deja de ser `axiom` y pasa a `theorem`: ⇒ **la cadena D1/D2/D3 no postula ninguna de
+las tres**, y `goedel_second'` ya no depende de `d3`.
+
+### §3.67.1 · La novena obligación (`DEUDA_premsBody`)
+
+El cuerpo del `∀` interior de `boundedPremsIn`, reflejado. La ruta era la que §7.2 había previsto,
+y la previsión acertó punto por punto:
+
+* el cuerpo se parte por el `lor` (`prf_substfc_or`);
+* el disyunto **izquierdo** (`In y nil`) es **vacuo** —`prf_not_in_nil`— y su código queda
+  **arbitrario**: no hay que calcularlo;
+* el **derecho** lo refleja `pcc_bdCarcLt_reflect`, **generalizado en su `Phic`**;
+* la fricción es **la MONEDA de §3.55.2 por CUARTA vez**, y sus dos piezas ya existían: **B2**
+  lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y `pcc_eval_nthc L j` lleva `nthcT L̇ ȷ̇` a `(nthc L j)˙`
+  bajo `j < lenc L` — que es **exactamente** la cota del `∀` interior.
+
+⛔ **Por qué había que generalizar §5**: el hueco a reescribir vive **bajo el binder del `exc`** y
+`pcc_rw` (que reescribe con `substfc zero`) **no llega ahí**. El sitio donde el salto **sí** se
+puede dar es la obligación `hphi` — el cuerpo **ya instanciado en el testigo**, o sea con el binder
+**abierto**. ⭐ `PrfH_bdEx_intro_open` era genérico en `Phic` **desde siempre**; lo único
+especializado era la envoltura.
+
+### §3.67.2 · ⚠️ Tres cosas que la previsión NO vio, y las tres de FORMA
+
+1. **`hphi` necesita la cota `j < lenc L`, y no viajaba.** El genérico de §5 lleva tres hipótesis
+   (`chainOk`, `b < lenc p`, el cuerpo del `∃`) y ninguna es esa. Hubo que darle una **hipótesis
+   extra `A`** que atraviese el `∃`‑elim — con su `A'` liftada, porque `PrfH_ex_elim` lifta todo el
+   contexto.
+2. ⚠️ **Dejar que `rfl` case `liftTerm 0 (miPhiAt …)` agota los heartbeats.** Lean despliega
+   `strCode "premsOf"` **carácter a carácter**. Con `liftTerm_strCode`/`liftTerm_numeral` en un
+   `simp only` sale en un instante. 🔑 **Regla**: la naturalidad de un código con nombres de
+   símbolo dentro se da **por lemas, nunca por `rfl`**.
+3. ⚠️ **Al desempaquetar con Leibniz hay que PROTEGER el hueco.** `carc (cons q i) ≐ q` no es
+   `rfl` y se arrastra con Leibniz objeto sobre la fórmula entera; pero el argumento que **no** se
+   sustituye puede mencionar `#0`, así que va bajo un `liftTerm 0` y se recupera con
+   `FOL.substTerm_liftTerm`. **Sin eso el Leibniz captura la variable y el lema es FALSO.**
+
+### §3.67.3 · ⭐ La QUINTA variante de la familia — y es la más barata
+
+Para el puente de la cota hacía falta `hPinv`: el cuerpo invariante bajo `substfc` de **nivel 1**.
+Es la quinta variante de `substfc_inv_*`, con el nivel actuante **igual al hueco bajo**:
+
+    substfc_inv_substCodeF2 : substfc (v+1)̄ u (substCodeF2 (v+1) u₀ W φ) ≐ substCodeF2 (v+1) u₀ W φ
+
+⭐ **Y sale más barata que la cuarta**: el testigo `u` **no aparece** en el resultado, así que
+**no hace falta** la hipótesis `u ≐ varc v̄` que la cuarta sí necesitaba. La razón es exacta: a
+nivel `v+1` las variables que sobreviven son todas `≤ v`.
+
+⚠️ **Van CINCO veces que el índice no es cosmético en este frente.** El inventario de la familia:
+
+| variante | nivel actuante | hipótesis extra |
+|---|---|---|
+| `substfc_inv_substCodeF` | `v+1` (el del hueco) | — |
+| `substfc_inv_substCodeF_at` | `v` | — |
+| `substfc_id_substCodeF` | `v` (uno por debajo) | `u ≐ varc v̄` |
+| `substfc_id_substCodeF2` | `v` (uno por debajo del **bajo** de dos) | `u ≐ varc v̄`, guarda `v+3` |
+| `substfc_inv_substCodeF2` | `v+1` (**el** hueco bajo de dos) | — |
+
+### §3.67.4 · El cierre
+
+    hbody_of_halves hA_lineWFDotAt hB_premsDotAt   →   d3_prf_of_halves   →   d3_prf_real
+
+y en `Meta/GodelTwo.lean`, `axiom d3` pasa a `theorem d3 := prf_to_derives (d3_prf_real φ)`.
+⚠️ **`GodelTwo` no lo importa nadie** salvo el barril, así que meter la cadena entera de D3 no
+crea ningún ciclo. Y **retirar un axioma sólo puede fortalecer**: lo que antes se suponía ahora se
+deriva, y todo lo que dependía de `d3` conserva su enunciado con un footprint más pequeño.
