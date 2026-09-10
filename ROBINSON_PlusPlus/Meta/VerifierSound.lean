@@ -117,9 +117,16 @@ La otra mitad de `NegVerifier`: la **completitud negativa**. Se enuncia aquí pa
 tenga su obligación con nombre y firma, como manda el idioma del proyecto (§2 de
 `Meta/D3ChainDotPrf.lean`: *la deuda se enuncia, no se postula*).
 
-⚠️ **Y no se puede consumir todavía**: depende del ADR de `StdChain` (ver §0 y
-`sondeos/NegVerifierModE.lean` §4). Con `StdChain = IsCodeShaped` la clase **no separa**
-(`cons nil nil ≐ numeralM 2` es provable) y la refutación exigiría evaluar Cantor. -/
+🏁 **YA SON CONSUMIBLES (2026‑09‑10h, [ADR‑022](../../DECISIONS.md)).** La nota que había aquí
+decía que no se podían consumir *«hasta el ADR de `StdChain`»*: con `StdChain = IsCodeShaped` la
+clase **no separaba** (`cons nil nil ≐ numeralM 2` es provable) y refutar una línea basura exigía
+**evaluar Cantor**. Ese ADR está tomado: `StdChain` es hoy `∀ x ∈ l, StdLine x`, con la línea en su
+forma exacta `⟨⌜f⌝, k̄, args⟩` y args `formCode`/`termCode` ⇒ **todas** las comparaciones son
+paralelas por tipo y las decide `formCode_ne`/`termCode_ne`, sin Cantor.
+
+⚠️ **El precio va escrito en el ADR**: `OmegaConsistent` es estrictamente **más fuerte**. La
+garantía que lo hace admisible —y sin la cual esto sería una trampa— es `stdChain_proofCode'`
+(`Meta/OmegaReflect.lean` §1ter): **la clase contiene los códigos de prueba REALES**. -/
 
 /-- **La mitad (b) de `NegVerifier`**: si el decisor META rechaza, la teoría REFUTA la cadena. -/
 abbrev DEUDA_chainNeg : Prop :=
