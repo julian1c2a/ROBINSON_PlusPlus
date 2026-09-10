@@ -61,9 +61,12 @@ open ROBINSON_PlusPlus.Meta.DotConsPrf
 open ROBINSON_PlusPlus.Meta.PremsOfDotPrf
 open ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 open ROBINSON_PlusPlus.Meta.D3BodyPrf
+open ROBINSON_PlusPlus.Meta.D3InDotPrf
+open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxRecDepth 40000
+set_option maxHeartbeats 2000000
 
 namespace ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 
@@ -506,7 +509,9 @@ theorem hwPsi_premsPsiPk (r : Term) : Prf (hasWitF (premsPsiPk r)) :=
 
 /-! ## §7 · EL CHASIS INTERIOR, con OCHO de sus nueve obligaciones -/
 
-/-- La NOVENA obligación, **enunciada** (no postulada): el cuerpo del `∀` interior, reflejado. -/
+/-- La NOVENA obligación. ⚠️ **HISTÓRICO**: se enunció como deuda y quedó **PROBADA el mismo
+    día** (§9bis.8, `premsBody_deuda`). Se conserva el `abbrev` porque es la forma en que
+    `hbdAllPrems_of_body` la consume. -/
 abbrev DEUDA_premsBody : Prop :=
   ∀ r j : Term, Prf (premsCF r ⇒ (lt j (premsBnd r) ⇒
     provFromCode (substfc zero (tcFn j) (premsPsiPk r))))
@@ -527,33 +532,606 @@ theorem prf_pkQ (q i : Term) : Prf (carc (cons q i) =eq q) := prf_carc_cons q i
 theorem prf_pkI (q i : Term) : Prf (cdrc (cons q i) =eq i) := prf_cdrc_cons q i
 
 
-/-! ### §7.2 · Lo que queda de D3, con la ruta MEDIDA
+/-! ### §7.2 · ⚠️ ESTA SECCIÓN ERA UNA PREVISIÓN — y se cumplió **el mismo día**
 
-| pieza | estado |
-|---|---|
-| **B1** · `pcc_eval_premsOf` — `premsOf` dentro de `Prov` | 🏁 `Meta/PremsOfDotPrf.lean` |
-| **B2** · el puente de la COTA | 🏁 `Meta/D3BodyPrf.lean` §2 |
-| **B3** · el chasis interior, **ocho** obligaciones | 🏁 aquí |
-| **B3** · `DEUDA_premsBody` — la novena | ⬜ **lo único que queda de D3** |
+Decía que `DEUDA_premsBody` era «lo único que queda de D3» y trazaba su ruta. **La ruta era
+correcta** y está ejecutada en §9bis. Se conserva porque su valor es de método: una obstrucción
+**bien medida** se convierte en el guion de la prueba.
 
-⭐ **La ruta de la novena está medida y no tiene sorpresas de forma.** El cuerpo se parte por el
-`lor` (`prf_substfc_or`), y de sus dos disyuntos:
+**Lo que la previsión acertó, punto por punto:**
+* el disyunto **izquierdo** es vacuo y su código queda **arbitrario** (§9bis.8);
+* el **derecho** lo refleja `pcc_bdCarcLt_reflect`, **generalizado en su `Phic`** (§9bis.3);
+* la fricción es **la MONEDA de §3.55.2 por cuarta vez**, y sus dos piezas ya existían
+  (§9bis.4, §9bis.7);
+* el sitio donde el salto **sí** se puede dar es la obligación `hphi`, con el binder **ya
+  abierto** (§9bis.7).
 
-* el **izquierdo** (`In y nil`) es **vacuo** —`prf_not_in_nil`— y §6 de `D3ChainDotPrf` ya lo
-  explota dejando su código **ARBITRARIO** (el parámetro `Ac`): no hay que calcularlo;
-* el **derecho** es `boundedCarcLt`, y `pcc_bdCarcLt_reflect` (§5) lo refleja con `y`, `p`, `b`
-  **abstractos**.
+**Lo que la previsión NO vio, y salió al escribir** — tres cosas, todas de forma:
+* ⚠️ `hphi` necesita la cota `j < lenc L`, que **no viajaba** por el genérico ⇒ hubo que darle una
+  **hipótesis extra `A`** que atraviese el `∃`‑elim;
+* ⚠️ dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hace que Lean despliegue `strCode "premsOf"`
+  **carácter a carácter** y agota los heartbeats: hay que dárselo por **lemas**;
+* ⚠️ al desempaquetar con Leibniz, el argumento que **no** se sustituye puede mencionar `#0` ⇒ hay
+  que protegerlo con `liftTerm 0`, o el lema es **FALSO**. -/
 
-⚠️ **La única fricción que queda, y está localizada**: §5 escribe el testigo del `∃` como
-`liftc 0 ẏ`, y lo que `substCodeF2` produce en esa posición es el **accesor dotado**
-`nthcT (premsOfT (nthcT q̇ i̇)) j̇`. Es **la misma moneda de §3.55.2 por cuarta vez**, y las dos
-piezas que la cruzan ya existen: **B2** lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y `pcc_eval_nthc L j`
-lleva `nthcT L̇ j̇` a `(nthc L j)˙` **bajo `j < lenc L`** — que es exactamente la cota del `∀`
-interior, o sea una hipótesis que el `hbody` **tiene a mano**.
+/-! # §9bis · 🏁 LA NOVENA OBLIGACIÓN, PROBADA (2026‑09‑10g) -/
 
-⇒ Lo que hace falta es **generalizar `pcc_bdCarcLt_reflect` en su `Phic`** (hoy fijo a
-`bdCarcLtPhic`), porque el hueco a reescribir queda **bajo el binder del `exc`** y `pcc_rw` no
-llega ahí. -/
+
+/-! ## §1 · LA MEDICIÓN DEL CUERPO INTERIOR — `rfl` o nada -/
+
+/-- Abreviaturas de los dos testigos, con las capas de `liftc` que impone la posición. -/
+noncomputable def WQ (q : Term) : Term := liftc zero (liftc zero (tcFn q))
+noncomputable def UI (i : Term) : Term := liftc zero (tcFn i)
+
+/-- ⭐ El cuerpo del `∀` interior **se parte por el `lor`**, y el disyunto derecho es un
+    `bdExCode` cuya cota y cuyo `Phic` quedan a la vista. -/
+theorem premsPsi_split (q i : Term) :
+    premsPsi q i
+      = orc (substCodeF2 1 (UI i) (WQ q)
+              (In (nthc (premsOf (nthc (.var 2) (.var 1))) (.var 0)) nil))
+            (bdExCode (liftc zero (UI i))
+              (eqCodeFn (carcT (nthcT (liftc zero (WQ q)) (varc (numeral 0))))
+                (nthcT (premsOfT (nthcT (liftc zero (WQ q)) (liftc zero (UI i))))
+                  (varc (numeral 1))))) := rfl
+
+
+/-! ## §2 · EL `substfc` DEL ÍNDICE — el cuerpo, ya instanciado en `j` -/
+
+/-- La cota del `∃` interior. -/
+noncomputable def miB (i : Term) : Term := liftc zero (UI i)
+
+/-- El `Phic` del `∃` interior, **antes** de instanciar el índice del `∀`. -/
+noncomputable def miPhi (q i : Term) : Term :=
+  eqCodeFn (carcT (nthcT (liftc zero (WQ q)) (varc (numeral 0))))
+    (nthcT (premsOfT (nthcT (liftc zero (WQ q)) (liftc zero (UI i)))) (varc (numeral 1)))
+
+/-- Y **después**: el `varc 1̄` recibe el testigo `ȷ̇`, levantado por el binder del `∃`. -/
+noncomputable def miPhiAt (q i j : Term) : Term :=
+  eqCodeFn (carcT (nthcT (liftc zero (WQ q)) (varc (numeral 0))))
+    (nthcT (premsOfT (nthcT (liftc zero (WQ q)) (liftc zero (UI i)))) (liftc zero (tcFn j)))
+
+/-! ### Las invariancias `substtc` de los dos testigos, a nivel ARBITRARIO -/
+
+theorem hinv_UI (i : Term) : ∀ (k : Nat) (w : Term),
+    Prf (substtc (numeral k) w (liftc zero (UI i)) =eq liftc zero (UI i)) :=
+  (substCode_hyps_lift (hu0_premsPsi i) (hLu0_premsPsi i)).1
+
+theorem hinv_WQ (q : Term) : ∀ (k : Nat) (w : Term),
+    Prf (substtc (numeral k) w (liftc zero (WQ q)) =eq liftc zero (WQ q)) :=
+  (substCode_hyps_lift (hW_premsPsi q) (hLW_premsPsi q)).1
+
+/-- ⭐ El `substfc` del índice, distribuido hasta el fondo. El `varc 0̄` (el testigo del `∃`)
+    **sobrevive** —está por debajo del nivel actuante— y el `varc 1̄` (el índice del `∀`) **recibe
+    el testigo**, levantado por el binder. -/
+theorem substfc_bdEx_at (q i j : Term) :
+    Prf (substfc zero (tcFn j) (bdExCode (miB i) (miPhi q i))
+      =eq bdExCode (miB i) (miPhiAt q i j)) := by
+  unfold bdExCode
+  refine prf_eq_trans (prf_substfc_ex zero (tcFn j) _) (prf_congr_exc ?_)
+  refine prf_eq_trans (prf_substfc_and (succ zero) (liftc zero (tcFn j)) _ _) ?_
+  refine prf_congr_andc ?_ ?_
+  · -- la COTA: `varc 0̄` sobrevive, `miB i` es invariante
+    unfold ltCodeFn
+    refine prf_eq_trans (prf_substfc_atom (succ zero) (liftc zero (tcFn j)) _ _) ?_
+    unfold atom2CodeFn
+    refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+    refine prf_eq_trans (prf_substtsc_cons (succ zero) (liftc zero (tcFn j)) _ _) ?_
+    refine prf_eq_trans
+      (prf_congr_cons_head (prf_substtc_varc_lt (by omega : 0 < 1) (liftc zero (tcFn j))))
+      (prf_congr_cons_tail ?_)
+    refine prf_eq_trans (prf_substtsc_cons (succ zero) (liftc zero (tcFn j)) _ _) ?_
+    exact prf_eq_trans (prf_congr_cons_head (hinv_UI i 1 (liftc zero (tcFn j))))
+      (prf_congr_cons_tail (prf_substtsc_nil (succ zero) (liftc zero (tcFn j))))
+  · -- el `Phic`
+    unfold miPhi miPhiAt
+    refine prf_eq_trans (prf_substfc_eq (succ zero) (liftc zero (tcFn j)) _ _) ?_
+    refine prf_congr_eqCodeFn ?_ ?_
+    · refine prf_eq_trans (prf_substtc_carcT (succ zero) (liftc zero (tcFn j)) _) ?_
+      refine prf_congr_carcT ?_
+      refine prf_eq_trans (prf_substtc_nthcT (succ zero) (liftc zero (tcFn j)) _ _) ?_
+      exact prf_congr_nthcT (hinv_WQ q 1 (liftc zero (tcFn j)))
+        (prf_substtc_varc_lt (by omega : 0 < 1) (liftc zero (tcFn j)))
+    · refine prf_eq_trans (prf_substtc_nthcT (succ zero) (liftc zero (tcFn j)) _ _) ?_
+      refine prf_congr_nthcT ?_ (prf_substtc_varc_eq 1 (liftc zero (tcFn j)))
+      refine prf_eq_trans (prf_substtc_premsOfT (succ zero) (liftc zero (tcFn j)) _) ?_
+      refine prf_congr_premsOfT ?_
+      refine prf_eq_trans (prf_substtc_nthcT (succ zero) (liftc zero (tcFn j)) _ _) ?_
+      exact prf_congr_nthcT (hinv_WQ q 1 (liftc zero (tcFn j)))
+        (hinv_UI i 1 (liftc zero (tcFn j)))
+
+
+/-! ## §3 · §5 DE `D3ChainDotPrf`, GENERALIZADA EN SU `Phic`
+
+⛔ **Por qué hace falta.** El `Phic` que `substCodeF2` produce **no** es el `bdCarcLtPhic` de §5:
+su lado derecho es el **accesor dotado** `nthcT (premsOfT (nthcT q̇ i̇)) ȷ̇` y no `liftc 0 ẏ`. Es la
+MONEDA de §3.55.2 por cuarta vez. Y el salto **no se puede dar donde está**, porque ese hueco vive
+**bajo el binder del `exc`** y `pcc_rw` (que reescribe con `substfc zero`) no llega ahí.
+
+⭐ **Dónde sí se puede dar**: en la obligación `hphi` — el cuerpo **ya instanciado en el testigo**
+del `∃`, o sea con el binder **ya abierto**. `PrfH_bdEx_intro_open` es genérico en `Phic` desde
+siempre; lo único que estaba especializado era la envoltura. -/
+
+theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
+    (hPlift : liftTerm 0 Phic = Phic')
+    (hAlift : liftFormula 0 A = A')
+    (hwPhi : Prf (hasWitF (liftTerm 0 Phic')))
+    (hphi : Prf (A' ⇒ (chainOk nil (liftTerm 0 p) ⇒ (lt (liftTerm 0 b) (lenc (liftTerm 0 p)) ⇒
+        (land (lt (.var 0) (liftTerm 0 b))
+              (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
+         ⇒ provFromCode (substfc zero (tcFn (.var 0)) Phic')))))) :
+    Prf (A ⇒ (chainOk nil p ⇒ (lt b (lenc p) ⇒ (boundedCarcLt y p b ⇒
+      provFromCode (bdExCode (liftc zero (tcFn b)) Phic))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux (deduction_aux ?_
+    (boundedCarcLt y p b) [lt b (lenc p), chainOk nil p, A] rfl)
+    (lt b (lenc p)) [chainOk nil p, A] rfl)
+    (chainOk nil p) [A] rfl)
+  have hex : PrfH [boundedCarcLt y p b, lt b (lenc p), chainOk nil p, A]
+      (boundedCarcLt y p b) := PrfH.hyp _ _ (List.Mem.head _)
+  refine PrfH_ex_elim hex ?_
+  rw [liftFormula_provFromCode_open]
+  have hLb : liftTerm 0 (bdExCode (liftc zero (tcFn b)) Phic)
+      = bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic' := by
+    simp only [bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral, funcc,
+      cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral,
+      hPlift]
+  rw [hLb]
+  let exBody : Formula := land (lt (.var 0) (liftTerm 0 b))
+    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
+  let Gm : List Formula :=
+    [exBody, liftFormula 0 (boundedCarcLt y p b), liftFormula 0 (lt b (lenc p)),
+     liftFormula 0 (chainOk nil p), liftFormula 0 A]
+  show PrfH Gm (provFromCode (bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic'))
+  have hC : PrfH Gm exBody := PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH Gm (lt (.var 0) (liftTerm 0 b)) := PrfH_and_elim_left hC
+  have hble : PrfH Gm (lt (liftTerm 0 b) (lenc (liftTerm 0 p))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hchain : PrfH Gm (chainOk nil (liftTerm 0 p)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+  have hA : PrfH Gm A' := hAlift ▸ PrfH.hyp _ _
+    (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
+  -- COTA: directa, sin evaluación
+  have hlt1 : PrfH Gm (provFromCode (ltCodeFn (tcFn (.var 0)) (tcFn (liftTerm 0 b)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked (.var 0) (liftTerm 0 b)) _) hlt
+  have hltB : PrfH Gm (provFromCode
+      (ltCodeFn (tcFn (.var 0)) (liftc zero (tcFn (liftTerm 0 b))))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_atom2CodeFn (prf_refl _)
+      (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 b))))) _) hlt1
+  -- CUERPO: la obligación genérica, ya con el binder ABIERTO
+  have hphi' : PrfH Gm (provFromCode (substfc zero (tcFn (.var 0)) Phic')) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH hphi _) hA) hchain) hble) hC
+  exact PrfH_bdEx_intro_open _ _ (tcFn (.var 0))
+    (substtc_inv_bdCarcLtB (liftTerm 0 b)) hltB hphi'
+    (by hw_auto) hwPhi (by hw_auto)
+
+
+/-! ## §4 · EL PUENTE `premsOfT (nthcT q̇ i̇) ↦ L̇`, extraído de B2
+
+Es el paso intermedio de `pcc_bnd_bridge` (`Meta/D3BodyPrf.lean` §2). Se expone porque `hphi` lo
+necesita **sin** el `lencT` de encima. -/
+
+theorem pcc_premsOfT_bridge (q i : Term) :
+    Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      provFromCode (eqc (premsOfT (nthcT (tcFn q) (tcFn i)))
+        (tcFn (premsOf (nthc q i)))))) := by
+  refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
+  let Gm : List Formula := [lt i (lenc q), chainOk nil q]
+  let X : Term := nthc q i
+  let L : Term := premsOf X
+  have hch : PrfH Gm (chainOk nil q) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt : PrfH Gm (lt i (lenc q)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hline : PrfH Gm (lineWF X) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lineWF_of_chainOk q i) _) hch) hlt
+  have e1 : PrfH Gm (provFromCode (eqc (nthcT (tcFn q) (tcFn i)) (tcFn X))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc q i) _) hlt
+  have e1s : PrfH Gm (provFromCode (eqc (tcFn X) (nthcT (tcFn q) (tcFn i)))) :=
+    PrfH_mp_code_apply (prf_to_prfH (pcc_eq_symm_code_internal
+      (nthcT (tcFn q) (tcFn i)) (tcFn X)
+      (substtc_inv_nthcT (substtc_inv_tcFn q) (substtc_inv_tcFn i))
+      (prf_hasWit_nthcT (prf_hasWit_tcFn q) (prf_hasWit_tcFn i))
+      (prf_hasWit_tcFn X)) _) e1
+  have e2 : PrfH Gm (provFromCode (eqc (premsOfT (tcFn X)) (tcFn L))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_premsOf X) _) hline
+  exact PrfH_pcc_rw (fun c => eqCodeFn (premsOfT c) (tcFn L)) (hG_premsOfT L) _ _ e1s e2
+    (prf_hasWitF_eq2 _ _ (prf_hasWit_premsOfT (prf_hasWit_varc (numeral 0)))
+      (prf_hasWit_tcFn L))
+    (prf_hasWit_tcFn X)
+    (prf_hasWit_nthcT (prf_hasWit_tcFn q) (prf_hasWit_tcFn i))
+
+/-- ⭐ **LA MONEDA, cruzada del todo**: el accesor dotado triple `nthcT (premsOfT (nthcT q̇ i̇)) ȷ̇`
+    llevado a la reflexión pura `(nthc (premsOf (nthc q i)) j)˙`. Dos eslabones: el puente de
+    arriba (bajo `i < lenc q`) y `pcc_eval_nthc` (bajo `j < lenc L`). -/
+theorem pcc_nthc_premsOf_bridge (q i j : Term) :
+    Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ (lt j (lenc (premsOf (nthc q i))) ⇒
+      provFromCode (eqc (nthcT (premsOfT (nthcT (tcFn q) (tcFn i))) (tcFn j))
+        (tcFn (nthc (premsOf (nthc q i)) j)))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (lt j (lenc (premsOf (nthc q i)))) [lt i (lenc q), chainOk nil q] rfl)
+    (lt i (lenc q)) [chainOk nil q] rfl)
+  let Gm : List Formula :=
+    [lt j (lenc (premsOf (nthc q i))), lt i (lenc q), chainOk nil q]
+  let L : Term := premsOf (nthc q i)
+  have hch : PrfH Gm (chainOk nil q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hlt : PrfH Gm (lt i (lenc q)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hltj : PrfH Gm (lt j (lenc L)) := PrfH.hyp _ _ (List.Mem.head _)
+  -- (1) el argumento interior: `premsOfT (nthcT q̇ i̇) ↦ L̇`
+  have h1 : PrfH Gm (provFromCode (eqc (premsOfT (nthcT (tcFn q) (tcFn i))) (tcFn L))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_premsOfT_bridge q i) _) hch) hlt
+  -- (2) `nthcT L̇ ȷ̇ ↦ (nthc L j)˙`
+  have h2 : PrfH Gm (provFromCode (eqc (nthcT (tcFn L) (tcFn j)) (tcFn (nthc L j)))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_nthc L j) _) hltj
+  -- (3) reescribir el argumento y componer — todo **sin binder**
+  have hG : ∀ s : Term, Prf (substfc zero s
+      (eqCodeFn (nthcT (varc (numeral 0)) (tcFn j)) (tcFn (nthc L j)))
+      =eq eqCodeFn (nthcT s (tcFn j)) (tcFn (nthc L j))) := by
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    refine prf_congr_eqCodeFn ?_ (prf_substtc_tcFn s (nthc L j))
+    exact prf_eq_trans (prf_substtc_nthcT zero s _ _)
+      (prf_congr_nthcT (prf_substtc_varc0 s) (prf_substtc_tcFn s j))
+  have h1s : PrfH Gm (provFromCode (eqc (tcFn L) (premsOfT (nthcT (tcFn q) (tcFn i))))) :=
+    PrfH_mp_code_apply (prf_to_prfH (pcc_eq_symm_code_internal
+      (premsOfT (nthcT (tcFn q) (tcFn i))) (tcFn L)
+      (substtc_inv_premsOfT (substtc_inv_nthcT (substtc_inv_tcFn q) (substtc_inv_tcFn i)))
+      (prf_hasWit_premsOfT (prf_hasWit_nthcT (prf_hasWit_tcFn q) (prf_hasWit_tcFn i)))
+      (prf_hasWit_tcFn L)) _) h1
+  exact PrfH_pcc_rw (fun c => eqCodeFn (nthcT c (tcFn j)) (tcFn (nthc L j))) hG _ _ h1s h2
+    (prf_hasWitF_eq2 _ _
+      (prf_hasWit_nthcT (prf_hasWit_varc (numeral 0)) (prf_hasWit_tcFn j))
+      (prf_hasWit_tcFn (nthc L j)))
+    (prf_hasWit_tcFn L)
+    (prf_hasWit_premsOfT (prf_hasWit_nthcT (prf_hasWit_tcFn q) (prf_hasWit_tcFn i)))
+
+
+/-! ## §5 · LA DISYUNCIÓN DEL CUERPO, desde la cadena
+
+Es el `∀`-elim **interior**: de `chainOk nil q` sale `lineOkB nil q i`, su segundo conjunto es
+`boundedPremsIn nil q i L`, y con `j < lenc L` sale el disyunto. ⭐ La cota `j < lenc L` es
+**exactamente** la hipótesis que el `hbody` del chasis interior tiene a mano. -/
+
+theorem prf_premsDisj_of_chainOk (q i j : Term) :
+    Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ (lt j (lenc (premsOf (nthc q i))) ⇒
+      lor (In (nthc (premsOf (nthc q i)) j) nil)
+          (boundedCarcLt (nthc (premsOf (nthc q i)) j) q i)))) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (lt j (lenc (premsOf (nthc q i)))) [lt i (lenc q), chainOk nil q] rfl)
+    (lt i (lenc q)) [chainOk nil q] rfl)
+  let Gm : List Formula :=
+    [lt j (lenc (premsOf (nthc q i))), lt i (lenc q), chainOk nil q]
+  let L : Term := premsOf (nthc q i)
+  have hch : PrfH Gm (chainOk nil q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hlt : PrfH Gm (lt i (lenc q)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hltj : PrfH Gm (lt j (lenc L)) := PrfH.hyp _ _ (List.Mem.head _)
+  have hB : PrfH Gm (chainOkB nil q) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_chainOk_iff_chainOkB nil q)) _) hch
+  have hB' : PrfH Gm (Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
+      (lineOkB (liftTerm 0 nil) (liftTerm 0 q) (.var 0)))) := hB
+  have hspec := PrfH_spec hB' i
+  have heq : substFormula 0 i (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
+      (lineOkB (liftTerm 0 nil) (liftTerm 0 q) (.var 0)))
+      = Formula.impl (lt i (lenc q)) (lineOkB nil q i) := by
+    simp only [substFormula, substFormula_lineOkB, lt, lenc, nil, zero, substTerm, substTerms,
+      FOL.substTerm_liftTerm, if_true]
+  rw [heq] at hspec
+  have hline : PrfH Gm (lineOkB nil q i) := PrfH.mp _ _ _ hspec hlt
+  have hprems : PrfH Gm (boundedPremsIn nil q i L) := PrfH_and_elim_right hline
+  have hp' : PrfH Gm (Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+      (lor (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 nil))
+           (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 q) (liftTerm 0 i))))) :=
+    hprems
+  have hspec2 := PrfH_spec hp' j
+  have heq2 : substFormula 0 j (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+      (lor (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 nil))
+           (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 q) (liftTerm 0 i))))
+      = Formula.impl (lt j (lenc L))
+          (lor (In (nthc L j) nil) (boundedCarcLt (nthc L j) q i)) := by
+    simp only [substFormula, substFormula_boundedCarcLt, lor, In, lt, lenc, nthc, nil, zero,
+      substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  rw [heq2] at hspec2
+  exact PrfH.mp _ _ _ hspec2 hltj
+
+
+/-! ## §6 · LOS COLAPSOS DE `liftc` y el `substfc` del testigo -/
+
+theorem prf_liftc2_tcFn (x : Term) :
+    Prf (liftc zero (liftc zero (tcFn x)) =eq tcFn x) :=
+  prf_eq_trans (prf_congr_liftc (prf_liftc_tcFn x)) (prf_liftc_tcFn x)
+
+theorem prf_liftc3_tcFn (x : Term) :
+    Prf (liftc zero (liftc zero (liftc zero (tcFn x))) =eq tcFn x) :=
+  prf_eq_trans (prf_congr_liftc (prf_liftc2_tcFn x)) (prf_liftc_tcFn x)
+
+theorem prf_liftc_WQ (q : Term) : Prf (liftc zero (WQ q) =eq tcFn q) := prf_liftc3_tcFn q
+theorem prf_liftc_UI (i : Term) : Prf (liftc zero (UI i) =eq tcFn i) := prf_liftc2_tcFn i
+
+/-- El `substfc` del testigo del `∃`, con **todos** los `liftc` colapsados. -/
+theorem substfc_miPhiAt (Q I J K : Term) :
+    Prf (substfc zero K (miPhiAt Q I J)
+      =eq eqCodeFn (carcT (nthcT (tcFn Q) K))
+          (nthcT (premsOfT (nthcT (tcFn Q) (tcFn I))) (tcFn J))) := by
+  unfold miPhiAt
+  refine prf_eq_trans (prf_substfc_eq zero K _ _) ?_
+  refine prf_congr_eqCodeFn ?_ ?_
+  · refine prf_eq_trans (prf_substtc_carcT zero K _) (prf_congr_carcT ?_)
+    refine prf_eq_trans (prf_substtc_nthcT zero K _ _) ?_
+    exact prf_congr_nthcT
+      (prf_eq_trans (hinv_WQ Q 0 K) (prf_liftc_WQ Q)) (prf_substtc_varc0 K)
+  · refine prf_eq_trans (prf_substtc_nthcT zero K _ _) ?_
+    refine prf_congr_nthcT ?_
+      (prf_eq_trans (hW_chainOkBPsi J 0 K) (prf_liftc_tcFn J))
+    refine prf_eq_trans (prf_substtc_premsOfT zero K _) (prf_congr_premsOfT ?_)
+    refine prf_eq_trans (prf_substtc_nthcT zero K _ _) ?_
+    exact prf_congr_nthcT (prf_eq_trans (hinv_WQ Q 0 K) (prf_liftc_WQ Q))
+      (prf_eq_trans (hinv_UI I 0 K) (prf_liftc_UI I))
+
+
+/-! ## §7 · `hphi` — el cuerpo instanciado en el testigo, **ya sin binder**
+
+⭐ Aquí es donde se paga la MONEDA. Tres pasos, todos fuera de cualquier binder:
+`pcc_eval_carc_nthc` evalúa el accesor, la hipótesis del `∃` reescribe el valor, y
+`pcc_nthc_premsOf_bridge` cruza el accesor dotado triple a la reflexión pura. -/
+
+theorem hwLiftc_tcFn (x : Term) : Prf (hasWit (liftc zero (tcFn x))) :=
+  prf_mp (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_lift (tcFn x))
+    (ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn x)
+
+theorem hwLiftc2_tcFn (x : Term) : Prf (hasWit (liftc zero (liftc zero (tcFn x)))) :=
+  prf_mp (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_lift _) (hwLiftc_tcFn x)
+
+theorem hwLiftc3_tcFn (x : Term) :
+    Prf (hasWit (liftc zero (liftc zero (liftc zero (tcFn x))))) :=
+  prf_mp (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_lift _) (hwLiftc2_tcFn x)
+
+theorem hw_miPhiAt (Q I J : Term) : Prf (hasWitF (miPhiAt Q I J)) :=
+  prf_hasWitF_eq2 _ _
+    (prf_hasWit_carcT (prf_hasWit_nthcT (hwLiftc3_tcFn Q) (prf_hasWit_varc (numeral 0))))
+    (prf_hasWit_nthcT
+      (prf_hasWit_premsOfT (prf_hasWit_nthcT (hwLiftc3_tcFn Q) (hwLiftc2_tcFn I)))
+      (hwLiftc_tcFn J))
+
+theorem hphi_gen (Q I J : Term) :
+    Prf (lt J (lenc (premsOf (nthc Q I))) ⇒
+      (chainOk nil Q ⇒ (lt I (lenc Q) ⇒
+        (land (lt (.var 0) I)
+              (Formula.eq (carc (nthc Q (.var 0))) (nthc (premsOf (nthc Q I)) J))
+         ⇒ provFromCode (substfc zero (tcFn (.var 0)) (miPhiAt Q I J)))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux (deduction_aux ?_
+    (land (lt (.var 0) I)
+      (Formula.eq (carc (nthc Q (.var 0))) (nthc (premsOf (nthc Q I)) J)))
+    [lt I (lenc Q), chainOk nil Q, lt J (lenc (premsOf (nthc Q I)))] rfl)
+    (lt I (lenc Q)) [chainOk nil Q, lt J (lenc (premsOf (nthc Q I)))] rfl)
+    (chainOk nil Q) [lt J (lenc (premsOf (nthc Q I)))] rfl)
+  let Gm : List Formula :=
+    [land (lt (.var 0) I) (Formula.eq (carc (nthc Q (.var 0))) (nthc (premsOf (nthc Q I)) J)),
+     lt I (lenc Q), chainOk nil Q, lt J (lenc (premsOf (nthc Q I)))]
+  have hC : PrfH Gm (land (lt (.var 0) I)
+      (Formula.eq (carc (nthc Q (.var 0))) (nthc (premsOf (nthc Q I)) J))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hltk : PrfH Gm (lt (.var 0) I) := PrfH_and_elim_left hC
+  have heqc : PrfH Gm (Formula.eq (carc (nthc Q (.var 0))) (nthc (premsOf (nthc Q I)) J)) :=
+    PrfH_and_elim_right hC
+  have hIq : PrfH Gm (lt I (lenc Q)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hch : PrfH Gm (chainOk nil Q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hJL : PrfH Gm (lt J (lenc (premsOf (nthc Q I)))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
+  -- (1) el testigo del `∃` cae bajo `lenc Q`, por transitividad
+  have hk : PrfH Gm (lt (.var 0) (lenc Q)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_trans _ _ _) _) hltk) hIq
+  -- (2) evaluación del accesor `carc ∘ nthc`
+  have hev : PrfH Gm (provFromCode (eqCodeFn (carcT (nthcT (tcFn Q) (tcFn (.var 0))))
+      (tcFn (carc (nthc Q (.var 0)))))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH (pcc_eval_carc_nthc Q (.var 0)) _) hch) hk
+  -- (3) la hipótesis del `∃` reescribe el VALOR — congruencia OBJETO
+  have hev2 : PrfH Gm (provFromCode (eqCodeFn (carcT (nthcT (tcFn Q) (tcFn (.var 0))))
+      (tcFn (nthc (premsOf (nthc Q I)) J)))) :=
+    PrfH_provCode_congr (PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl _) _)
+      (PrfH_congr_tcFn heqc)) hev
+  -- (4) ⭐ LA MONEDA: el accesor dotado triple ↦ la reflexión pura
+  have hbr : PrfH Gm (provFromCode (eqc
+      (nthcT (premsOfT (nthcT (tcFn Q) (tcFn I))) (tcFn J))
+      (tcFn (nthc (premsOf (nthc Q I)) J)))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH (pcc_nthc_premsOf_bridge Q I J) _) hch) hIq) hJL
+  have hbrs : PrfH Gm (provFromCode (eqc (tcFn (nthc (premsOf (nthc Q I)) J))
+      (nthcT (premsOfT (nthcT (tcFn Q) (tcFn I))) (tcFn J)))) :=
+    PrfH_mp_code_apply (prf_to_prfH (pcc_eq_symm_code_internal
+      (nthcT (premsOfT (nthcT (tcFn Q) (tcFn I))) (tcFn J))
+      (tcFn (nthc (premsOf (nthc Q I)) J))
+      (substtc_inv_nthcT
+        (substtc_inv_premsOfT (substtc_inv_nthcT (substtc_inv_tcFn Q) (substtc_inv_tcFn I)))
+        (substtc_inv_tcFn J))
+      (prf_hasWit_nthcT
+        (prf_hasWit_premsOfT (prf_hasWit_nthcT (prf_hasWit_tcFn Q) (prf_hasWit_tcFn I)))
+        (prf_hasWit_tcFn J))
+      (prf_hasWit_tcFn (nthc (premsOf (nthc Q I)) J))) _) hbr
+  -- (5) reescribir el lado derecho — **sin binder**
+  have hG : ∀ s : Term, Prf (substfc zero s
+      (eqCodeFn (carcT (nthcT (tcFn Q) (tcFn (.var 0)))) (varc (numeral 0)))
+      =eq eqCodeFn (carcT (nthcT (tcFn Q) (tcFn (.var 0)))) s) := by
+    intro s
+    refine prf_eq_trans (prf_substfc_eq zero s _ _) ?_
+    refine prf_congr_eqCodeFn ?_ (prf_substtc_varc0 s)
+    refine prf_eq_trans (prf_substtc_carcT zero s _) (prf_congr_carcT ?_)
+    exact prf_eq_trans (prf_substtc_nthcT zero s _ _)
+      (prf_congr_nthcT (prf_substtc_tcFn s Q) (prf_substtc_tcFn s (.var 0)))
+  have hfin : PrfH Gm (provFromCode (eqCodeFn (carcT (nthcT (tcFn Q) (tcFn (.var 0))))
+      (nthcT (premsOfT (nthcT (tcFn Q) (tcFn I))) (tcFn J)))) :=
+    PrfH_pcc_rw (fun c => eqCodeFn (carcT (nthcT (tcFn Q) (tcFn (.var 0)))) c) hG _ _ hbrs hev2
+      (prf_hasWitF_eq2 _ _
+        (prf_hasWit_carcT (prf_hasWit_nthcT (prf_hasWit_tcFn Q) (prf_hasWit_tcFn (.var 0))))
+        (prf_hasWit_varc (numeral 0)))
+      (prf_hasWit_tcFn (nthc (premsOf (nthc Q I)) J))
+      (prf_hasWit_nthcT
+        (prf_hasWit_premsOfT (prf_hasWit_nthcT (prf_hasWit_tcFn Q) (prf_hasWit_tcFn I)))
+        (prf_hasWit_tcFn J))
+  -- (6) volver a la forma `substfc` del chasis
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (substfc_miPhiAt Q I J (tcFn (.var 0))))) _) hfin
+
+
+/-! ### Naturalidad, por LEMAS y no por `rfl`
+
+⚠️ **Medido**: dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hace que Lean despliegue
+`strCode "premsOf"` **carácter a carácter** y agota los heartbeats. Con `liftTerm_strCode` en el
+`simp` set sale en un instante. -/
+
+theorem liftTerm_miPhiAt (c : Nat) (Q I J : Term) :
+    liftTerm c (miPhiAt Q I J) = miPhiAt (liftTerm c Q) (liftTerm c I) (liftTerm c J) := by
+  simp only [miPhiAt, WQ, UI, eqCodeFn, carcT, nthcT, premsOfT, funcc, varc,
+    liftc, tcFn, cons, nil, zero, succ, liftTerm, liftTerms,
+    liftTerm_strCode, liftTerm_numeral]
+
+theorem liftFormula_ltPrems (c : Nat) (q i j : Term) :
+    liftFormula c (lt j (lenc (premsOf (nthc q i))))
+      = lt (liftTerm c j) (lenc (premsOf (nthc (liftTerm c q) (liftTerm c i)))) := by
+  simp only [lt, lenc, premsOf, nthc, liftFormula, liftTerm, liftTerms]
+
+/-! ## §8 · 🏁 EL ENSAMBLAJE — `DEUDA_premsBody`
+
+El cuerpo se parte por el `lor`. El disyunto **izquierdo** es `In y nil`, **refutable**
+(`prf_not_in_nil`) ⇒ su código queda **arbitrario** y no hay que calcularlo. El **derecho** lo
+cierra `pcc_bdEx_carc_reflect_gen` con el `hphi` de §7. -/
+
+theorem prf_congr_bdExCode_bnd {B B' P : Term} (h : Prf (B =eq B')) :
+    Prf (bdExCode B P =eq bdExCode B' P) :=
+  prf_congr_exc (prf_congr_andc (prf_congr_atom2CodeFn (prf_refl _) h) (prf_refl _))
+
+/-- El cuerpo del `∀` interior, con el índice ya instanciado y partido por el `lor`. -/
+theorem substfc_premsPsi_at (q i j : Term) :
+    Prf (substfc zero (tcFn j) (premsPsi q i)
+      =eq orc (substfc zero (tcFn j) (substCodeF2 1 (UI i) (WQ q)
+              (In (nthc (premsOf (nthc (.var 2) (.var 1))) (.var 0)) nil)))
+          (bdExCode (miB i) (miPhiAt q i j))) := by
+  rw [premsPsi_split]
+  refine prf_eq_trans (prf_substfc_or zero (tcFn j) _ _) ?_
+  exact prf_congr_orc (prf_refl _) (substfc_bdEx_at q i j)
+
+/-- 🏁🏁🏁 **LA NOVENA OBLIGACIÓN, PROBADA.** -/
+theorem premsBody_reflect (q i j : Term) :
+    Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ (lt j (lenc (premsOf (nthc q i))) ⇒
+      provFromCode (substfc zero (tcFn j) (premsPsi q i))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux ?_
+    (lt j (lenc (premsOf (nthc q i)))) [lt i (lenc q), chainOk nil q] rfl)
+    (lt i (lenc q)) [chainOk nil q] rfl)
+  let Gm : List Formula :=
+    [lt j (lenc (premsOf (nthc q i))), lt i (lenc q), chainOk nil q]
+  have hltj : PrfH Gm (lt j (lenc (premsOf (nthc q i)))) := PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH Gm (lt i (lenc q)) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hch : PrfH Gm (chainOk nil q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  refine PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
+    (prf_eq_symm (substfc_premsPsi_at q i j))) _) ?_
+  -- la disyunción OBJETO, desde la cadena
+  have hdisj : PrfH Gm (lor (In (nthc (premsOf (nthc q i)) j) nil)
+      (boundedCarcLt (nthc (premsOf (nthc q i)) j) q i)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH (prf_premsDisj_of_chainOk q i j) _) hch) hlt) hltj
+  refine PrfH_or_elim hdisj ?_ ?_
+  · -- ⭐ RAMA IZQUIERDA: `In y nil` es refutable ⇒ explosión. El código no se toca.
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil (nthc (premsOf (nthc q i)) j)) _)
+        (PrfH.hyp _ _ (List.Mem.head _)))
+  · -- RAMA DERECHA: el `∃` acotado, con el `Phic` que el destino impone
+    refine PrfH_orR_code _ _ ?_
+    have hgen : Prf (lt j (lenc (premsOf (nthc q i))) ⇒
+        (chainOk nil q ⇒ (lt i (lenc q) ⇒
+          (boundedCarcLt (nthc (premsOf (nthc q i)) j) q i ⇒
+            provFromCode (bdExCode (liftc zero (tcFn i)) (miPhiAt q i j)))))) :=
+      pcc_bdEx_carc_reflect_gen (nthc (premsOf (nthc q i)) j) q i
+        (miPhiAt q i j) (miPhiAt (liftTerm 0 q) (liftTerm 0 i) (liftTerm 0 j))
+        (lt j (lenc (premsOf (nthc q i))))
+        (lt (liftTerm 0 j) (lenc (premsOf (nthc (liftTerm 0 q) (liftTerm 0 i)))))
+        (liftTerm_miPhiAt 0 q i j) (liftFormula_ltPrems 0 q i j) (hw_miPhiAt _ _ _)
+        (hphi_gen (liftTerm 0 q) (liftTerm 0 i) (liftTerm 0 j))
+    have hbd : PrfH (boundedCarcLt (nthc (premsOf (nthc q i)) j) q i :: Gm)
+        (provFromCode (bdExCode (liftc zero (tcFn i)) (miPhiAt q i j))) :=
+      PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+        (prf_to_prfH hgen _)
+        (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))))
+        (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))))
+        (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
+        (PrfH.hyp _ _ (List.Mem.head _))
+    -- ⚠️ la cota del destino lleva **una capa más** de `liftc`, que colapsa a nivel OBJETO
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_bdExCode_bnd
+      (prf_eq_symm (prf_congr_liftc (prf_liftc_tcFn i))))) _) hbd
+
+/-- 🏁🏁🏁 **`DEUDA_premsBody`, SALDADA** — con los puentes del paquete. -/
+theorem premsBody_deuda : DEUDA_premsBody := by
+  intro r j
+  refine prf_deduction (deduction_aux ?_ (lt j (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBnd r))
+    [ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF r] rfl)
+  have hCF : PrfH [lt j (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBnd r),
+      ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF r]
+      (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF r) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hltj : PrfH [lt j (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBnd r),
+      ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF r]
+      (lt j (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBnd r)) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+    (prf_to_prfH (premsBody_reflect (carc r) (cdrc r) j) _)
+    (PrfH_and_elim_left hCF)) (PrfH_and_elim_right hCF)) hltj
+
+
+/-! ## §9 · EL DESEMPAQUETADO — los puentes objeto que §7 anticipó
+
+⚠️ §7 de `D3ChainDotPrf` lo dejó medido: `carc (cons q i) ≐ q` **no es `rfl`** (`carc` es un
+símbolo de función OBJETO). Hay que arrastrarlo, y se arrastra con **Leibniz objeto** sobre la
+fórmula entera — dos pasos, uno por accesor.
+
+⚠️ **Y el hueco hay que PROTEGERLO**: el argumento que no se sustituye puede mencionar `#0`, así
+que va bajo un `liftTerm 0` y se recupera con `FOL.substTerm_liftTerm`. Sin eso el Leibniz
+**capturaría** la variable y el lema sería falso. -/
+
+/-- Las piezas del chasis, **desempaquetadas**. -/
+def premsCF2 (Q I : Term) : Formula := land (chainOk nil Q) (lt I (lenc Q))
+def premsBnd2 (Q I : Term) : Term := lenc (premsOf (nthc Q I))
+
+/-- El enunciado del chasis interior, desempaquetado y como FÓRMULA (para el Leibniz). -/
+noncomputable def bodyF (Q I : Term) : Formula :=
+  Formula.impl (premsCF2 Q I)
+    (provFromCode (bdAllCode (tcFn (premsBnd2 Q I)) (premsPsi Q I)))
+
+theorem substFormula_bodyF_snd (s X X2 : Term) (hX : substTerm 0 s X = X2) :
+    substFormula 0 s (bodyF X (.var 0)) = bodyF X2 s := by
+  simp only [bodyF, premsCF2, premsBnd2, chainOk, lt, lenc, premsOf, nthc, nil, zero, succ,
+    land, bdAllCode, forallc, implc, ltCodeFn, atom2CodeFn, varc, tcFn, cons,
+    substFormula_provFromCode_open, substFormula, substTerm, substTerms,
+    substTerm_strCode, substTerm_numeral,
+    hPs_premsPsi, hX, if_true]
+
+theorem substFormula_bodyF_fst (s Y Y2 : Term) (hY : substTerm 0 s Y = Y2) :
+    substFormula 0 s (bodyF (.var 0) Y) = bodyF s Y2 := by
+  simp only [bodyF, premsCF2, premsBnd2, chainOk, lt, lenc, premsOf, nthc, nil, zero, succ,
+    land, bdAllCode, forallc, implc, ltCodeFn, atom2CodeFn, varc, tcFn, cons,
+    substFormula_provFromCode_open, substFormula, substTerm, substTerms,
+    substTerm_strCode, substTerm_numeral,
+    hPs_premsPsi, hY, if_true]
+
+/-- El chasis interior, ya **desempaquetado**. -/
+theorem hbdAllPrems_unpacked (q i : Term) : Prf (bodyF q i) := by
+  have h0 : Prf (bodyF (carc (cons q i)) (cdrc (cons q i))) :=
+    hbdAllPrems_of_body premsBody_deuda (cons q i)
+  -- (1) Leibniz sobre el SEGUNDO accesor: `cdrc (cons q i) ↦ i`
+  have hs2 : ∀ s : Term,
+      substFormula 0 s (bodyF (liftTerm 0 (carc (cons q i))) (.var 0))
+        = bodyF (carc (cons q i)) s := fun s =>
+    substFormula_bodyF_snd s _ _ (FOL.substTerm_liftTerm (carc (cons q i)) 0 s)
+  have h1 : Prf (bodyF (carc (cons q i)) i) :=
+    (hs2 i) ▸ prf_mp (prf_mp (Prf.incl (Prf₀.leibniz
+      (bodyF (liftTerm 0 (carc (cons q i))) (.var 0)) (cdrc (cons q i)) i))
+      (prf_cdrc_cons q i)) ((hs2 (cdrc (cons q i))) ▸ h0)
+  -- (2) Leibniz sobre el PRIMERO: `carc (cons q i) ↦ q`
+  have hs1 : ∀ s : Term, substFormula 0 s (bodyF (.var 0) (liftTerm 0 i)) = bodyF s i :=
+    fun s => substFormula_bodyF_fst s _ _ (FOL.substTerm_liftTerm i 0 s)
+  exact (hs1 q) ▸ prf_mp (prf_mp (Prf.incl (Prf₀.leibniz
+    (bodyF (.var 0) (liftTerm 0 i)) (carc (cons q i)) q))
+    (prf_carc_cons q i)) ((hs1 (carc (cons q i))) ▸ h1)
+
 
 end ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 
@@ -570,6 +1148,15 @@ export ROBINSON_PlusPlus.Meta.PremsBdAllPrf (
   hPsiId_premsPsi hPsiId_premsPsiPk
   premsPsi_dot_eq hwS_liftc_tcFn hwS_liftc2_tcFn hwPsi_premsPsi hwPsi_premsPsiPk
   DEUDA_premsBody hbdAllPrems_of_body prf_pkQ prf_pkI
+  WQ UI premsPsi_split miB miPhi miPhiAt hinv_UI hinv_WQ substfc_bdEx_at
+  pcc_bdEx_carc_reflect_gen
+  pcc_premsOfT_bridge pcc_nthc_premsOf_bridge prf_premsDisj_of_chainOk
+  prf_liftc2_tcFn prf_liftc3_tcFn prf_liftc_WQ prf_liftc_UI substfc_miPhiAt
+  hwLiftc_tcFn hwLiftc2_tcFn hwLiftc3_tcFn hw_miPhiAt hphi_gen
+  liftTerm_miPhiAt liftFormula_ltPrems
+  prf_congr_bdExCode_bnd substfc_premsPsi_at premsBody_reflect premsBody_deuda
+  premsCF2 premsBnd2 bodyF substFormula_bodyF_snd substFormula_bodyF_fst
+  hbdAllPrems_unpacked
 )
 
 /-! ## FOOTPRINT -/
@@ -578,3 +1165,5 @@ export ROBINSON_PlusPlus.Meta.PremsBdAllPrf (
 #print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hPsiId_premsPsi
 #print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hwPsi_premsPsi
 #print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbdAllPrems_of_body
+#print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBody_deuda
+#print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbdAllPrems_unpacked
