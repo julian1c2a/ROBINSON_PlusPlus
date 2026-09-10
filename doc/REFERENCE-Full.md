@@ -29,29 +29,64 @@ derivada, puente `numeral` + homomorfismo, acotados, divisibilidad/división, pr
 #### `Full/Induction.lean` — inducción general object-level
 
 ```lean
+-- §0bis · el andamio de certificación (ADR-023, 2026-09-10h)
+def     primAxioms : List Formula                            -- los 24 PRIMITIVOS de coreAxioms
+theorem primAxioms_len    : primAxioms.length = 24 := rfl    -- el censo, por el kernel
+theorem primAxioms_subset : ∀ f ∈ primAxioms, f ∈ axioms
+theorem prim_to_axioms {f} (h : primAxioms ⊢ f) : axioms ⊢ f -- Derives.weakening: CONSTRUCTOR
+theorem axp {f} (h : f ∈ primAxioms) : primAxioms ⊢ f        -- el `ax` sobre los primitivos
+
 def inductionFormula (φ : Formula) : Formula                 -- φ(0) ⇒ ((∀n φ(n)⇒φ(σn)) ⇒ ∀n φ(n))
-axiom ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ
-theorem induction_object {φ} (base step) : axioms ⊢ Formula.forall φ
+axiom   ax_induction_prim (φ) : primAxioms ⊢ inductionFormula φ   -- ⭐ el ÚNICO axioma del módulo
+theorem ax_induction      (φ) : axioms ⊢ inductionFormula φ       -- 🏁 ya NO es axiom
+theorem induction_object_prim {φ} (base step) : primAxioms ⊢ Formula.forall φ
+theorem induction_object      {φ} (base step) : axioms ⊢ Formula.forall φ
 -- Composición De Bruijn lift-aware (caso multivariable):
 theorem substFormula_succ_lift_gen / step_reduce …
--- Axiomas de Minimal derivados como TEOREMAS:
-theorem add_comm_thm : axioms ⊢ ax6_add_comm        -- ax6 ;  add_assoc_ax (ax7)
-theorem mul_comm_thm : axioms ⊢ ax10_mul_comm       -- ax10 ; mul_assoc_ax (ax11), mul_distrib_ax (ax12)
-theorem lt_irrefl_thm : axioms ⊢ ax18_lt_irrefl     -- ax18 ; lt_trichotomy_thm (ax19)
--- + lemas de orden: lt_succ_self, not_lt_zero, lt_succ_of_lt, zero_lt_succ, zero_or_succ_ax, lt_succ_cases
+-- 🏁 Axiomas de Minimal CERTIFICADOS sobre los primitivos (no triviales: axN ∉ primAxioms):
+theorem add_comm_thm_prim     : primAxioms ⊢ ax6_add_comm
+theorem add_assoc_thm_prim    : primAxioms ⊢ ax7_add_assoc
+theorem mul_comm_thm_prim     : primAxioms ⊢ ax10_mul_comm
+theorem mul_assoc_thm_prim    : primAxioms ⊢ ax11_mul_assoc
+theorem mul_distrib_thm_prim  : primAxioms ⊢ ax12_mul_distrib
+theorem lt_irrefl_thm_prim    : primAxioms ⊢ ax18_lt_irrefl
+theorem lt_trichotomy_thm_prim: primAxioms ⊢ ax19_lt_trichotomy
+-- y sus versiones `axioms ⊢` de siempre, por debilitamiento (add_comm_thm, …)
+-- + lemas de orden re-expuestos: lt_succ_self, not_lt_zero, lt_succ_of_lt, zero_lt_succ,
+--   zero_or_succ_ax, zero_add, succ_add, zero_mul, succ_mul, add_comm_ax, mul_comm_ax
 ```
 
-#### `Full/Mod2.lean` — ax21, ax24 (Opción C.2)
+⚠️ **`lt_succ_of_lt` es el caso que no sale por debilitamiento**: consume la hipótesis **en el
+contexto**, y ahí el debilitamiento va en la dirección contraria. Se **internaliza** la implicación
+sobre `primAxioms`, se debilita **la implicación**, y se aplica `mp`.
+
+#### `Full/Mod2.lean` — ax24 (y `ax21`, que resultó ser PRIMITIVO)
 
 ```lean
-axiom ax_mod2_alternation : axioms ⊢ ∀. (add (mod2 (σ #0)) (mod2 #0) =eq one)  -- caracteriza mod2
-theorem mod2_range_thm   : axioms ⊢ ax21_mod2_range      -- ax21 (inducción + alternancia)
-theorem mod2_of_even_thm : axioms ⊢ ax24_mod2_of_even    -- ax24
+-- 🏁 2026-09-10h: era `axiom`. Hoy es TEOREMA (6 → 5 axiomas de Lean).
+theorem ax_mod2_alternation : axioms ⊢ ∀. (add (mod2 (σ #0)) (mod2 #0) =eq one)
+  -- de ax21 (rango) + ax16 (bicondicional) + ax4 + zero_add + teo_1_11 (0 ≠ 1)
+theorem mod2_range_ax   : axioms    ⊢ ∀. (mod2 #0 =eq 0 ∨ mod2 #0 =eq 1)   -- ⚠️ ES ax21, citado
+theorem mod2_range_prim : primAxioms ⊢ …                                    -- ídem, primitivos
+theorem mod2_range_thm  : axioms ⊢ ax21_mod2_range     -- ⚠️ ax21 es PRIMITIVO, no un teorema
+theorem mod2_of_even_thm : axioms ⊢ ax24_mod2_of_even  -- ax24, derivado de verdad
 ```
+
+⚠️⚠️ **Aquí vivía una CIRCULARIDAD, y sólo se vio al retirar el postulado.** El diseño de
+2026‑06‑11 decía a la vez que *«de `ax_mod2_alternation` salen `ax21` y `ax24` por inducción»* y que
+*«`ax_mod2_alternation` es derivable de `ax21 + ax16`»*. Lean lo aceptaba **porque el círculo pasaba
+por un `axiom`**. Medido cuál es el primitivo —`ax16 + ax17` admiten un modelo con `mod2 2̄ = 2̄`—:
+**`ax21`**. ⇒ el censo pasa a **24 + 10**. Ver el addendum de [ADR‑023](../DECISIONS.md).
 
 Hallazgo: `ax16`+`ax17` dejan `mod2` subdeterminado (modelos con `mod2(σn)≥2`); `ax_mod2_alternation` lo cierra. Conservativo respecto a Minimal.
 
 #### `Full/Lists.lean` — ax_C3, ax_L3 (inducción estructural sobre listas)
+
+🏁 **Certificados sobre `primAxioms`** desde 2026‑09‑10h: `concat_assoc_prim` y `in_concat_prim`,
+con **cero cambios de axioma** porque `ax_list_induction` ya era genérico en `Γ`. Las firmas
+`axioms ⊢` (`concat_assoc_thm`, `in_concat_thm`, y los dos *pointwise* que consume
+`Meta/ProofChain.lean`) se conservan por `prim_to_axioms`. Los cuatro helpers de congruencia son
+**genéricos en `Γ`**: no citan ningún axioma.
 
 ```lean
 axiom ax_list_induction (φ : Term → Formula) (base : Γ ⊢ φ nil)
@@ -112,7 +147,7 @@ theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
 
 **TFA completo** (existencia object ∧ unicidad ℕ), autocontenido sin Mathlib/Peano. El `ax_p_tfa` de Block8 queda como forma *idealizada* (membership object + testigo object, no discharge constructivo por el "Muro 1"); `tfa_numeral` es la realización equivalente para todos los usos reales.
 
-**Axiomas extra de Full**: `ax_induction`, `ax_mod2_alternation`, `ax_list_induction`. **Estado del fragmento de Minimal en Full**: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅ + TFA ✅.
+**Axiomas extra de Full**: **`ax_induction_prim`** y `ax_list_induction` — **dos**. (`ax_induction` es hoy **teorema**; `ax_mod2_alternation` fue **retirado** el 2026‑09‑10h.) **Estado del fragmento de Minimal en Full**: ax6/7/10–12, ax18/19, ax21/24, ax_C3/L3 ✅ + TFA ✅.
 
 ---
 

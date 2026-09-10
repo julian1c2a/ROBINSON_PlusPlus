@@ -143,6 +143,34 @@ bash git-lock.bash list  # qué archivos están en estado lock/frozen
 
 ---
 
+## Parte 5bis — Tres reglas operativas que salieron del 2026‑09‑10h
+
+Van aquí porque las tres son de **método de trabajo**, no de un frente concreto.
+
+### 5bis.1 · ⚠️ Un `sorry` en el `simp set` **no mide una ruta: la FABRICA**
+
+Al medir «cuánto falta» para un empaquetado se metió en el `simp set` un lema propio dejado en
+`sorry`. **Tres** objetivos compilaron con él — y el lema era **falso**. `simp` usa la ecuación para
+reescribir **el objetivo**, así que puede llevarlo justo donde está la hipótesis: el verde no midió
+la distancia, **la borró**. ⇒ un `sorry` sirve para **posponer una rama**, nunca para **completar un
+`simp set`**; y si hace falta un lema de cancelación, **buscarlo primero** (`FOL/Theorems/`).
+
+### 5bis.2 · ⚠️ Subsumir la CLASE no es descargar la OBLIGACIÓN (M‑8)
+
+Un sondeo compilado concluía que no había que estrechar una clase porque otra la subsumía. El
+**teorema era cierto** y la **conclusión falsa**: la obligación que dejaba pedía decidir una
+igualdad numérica **incalculable**. ⇒ ante un «X ya cubre Y, no hay que tocar nada», preguntar
+**qué obligación queda después** y si **se puede pagar**.
+
+### 5bis.3 · 🔑 Cada axioma que se RETIRA audita lo que se apoyaba en él
+
+Al demostrar un postulado apareció un **círculo** que llevaba meses en el árbol: `A` se «derivaba»
+de `B` y `B` de `A`. **Lean lo aceptaba porque el círculo pasaba por un `axiom`.** ⇒ retirar un
+postulado no sólo fortalece: **revisa**. Y al romperlo, decidir cuál es el primitivo **buscando un
+modelo**, no argumentando.
+
+---
+
 ## Parte 6 — Estructura de archivos clave
 
 | Archivo | Propósito |

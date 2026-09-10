@@ -167,7 +167,29 @@ Conclusión: ax24 **es equivalente a una instancia del esquema de inducción** y
 
 **Auditoría 2026-06-11 (Opción C.2)**: Al intentar derivar `ax21` en `Full/` por inducción surgió un **bloqueante adicional no documentado anteriormente**: `ax16` (`mod2(n)=0 ⇔ mod2(σn)=1`) **sólo captura media alternancia**. En el paso inductivo, caso `mod2(n) = 1`, no podemos concluir `mod2(σn) = 0` ni con inducción simple ni fuerte: por contrapositiva de `ax16` backward sólo obtenemos `mod2(σn) ≠ 1`, y para concluir `= 0` necesitaríamos `mod2(σn) ∈ {0,1}` — que es precisamente `ax21`. Algebraicamente con `ax17(σn) = (div2(n)+1)·2`, podemos descartar `mod2(σn) = 1` por parida (lema `2A ≠ σ(2B)` sí derivable por inducción fuerte), pero **no podemos descartar `mod2(σn) ≥ 2`** sin más axiomas. **Conclusión**: `ax16+ax17` dejan `mod2` subdeterminado; cualquier modelo no estándar con `mod2(σn) = 2` para algún `n` cumple ambos.
 
-**Solución adoptada en `Full/`** (Opción C.2): añadir un único axioma extra `ax_mod2_alternation : ∀n, mod2(σn) + mod2(n) = 1` que caracteriza completamente la recursión. De este y `mod2(0) = 0` (derivable de `ax17 + teo_2_9` sin usar `ax21`) salen `ax21` y `ax24` como teoremas (`mod2_range_thm`, `mod2_of_even_thm` en `Full/Mod2.lean`). El axioma de alternancia es **conservativo respecto a Minimal**: allí derivable de `ax21 + ax16 + teo_1_3`. Ver [NEXT-STEPS.md](NEXT-STEPS.md) Eje 4.
+~~**Solución adoptada en `Full/`** (Opción C.2)~~: añadir un axioma extra
+`ax_mod2_alternation : ∀n, mod2(σn) + mod2(n) = 1`. «De este y `mod2(0) = 0` salen `ax21` y `ax24`
+como teoremas»… y a la vez «el axioma de alternancia es **conservativo respecto a Minimal**: allí
+derivable de `ax21 + ax16 + teo_1_3`».
+
+> ## ⚠️⚠️ SUPERADO el 2026‑09‑10h — y esas dos frases juntas eran un **CÍRCULO**
+>
+> `ax21` se derivaba de `ax_mod2_alternation`, y `ax_mod2_alternation` de `ax21`. **Lean lo aceptaba
+> porque el círculo pasaba por un `axiom`**: la derivación de `ax21` citaba un postulado, no un
+> teorema. Sólo se vio al **demostrar** la alternancia.
+>
+> 🏁 **`ax_mod2_alternation` está DEMOSTRADO** (`Full/Mod2.lean`) de `ax21` + `ax16` + `ax4` +
+> `zero_add` + `teo_1_11` ⇒ **retirado del inventario: 6 → 5 `axiom` de Lean**.
+>
+> ⭐ **Y el análisis de §3.2 de arriba ya decía cuál era el primitivo**: *«`ax16+ax17` dejan `mod2`
+> subdeterminado; cualquier modelo no estándar con `mod2(σn) = 2` cumple ambos»*. Eso **es** que
+> `ax21` carga información independiente. Lo que faltaba no era el análisis: era **sacar la
+> consecuencia** — `ax21` es **PRIMITIVO**, y la alternancia el teorema.
+>
+> ⇒ El censo de `coreAxioms` pasa de **23 + 11** a **24 + 10**, y `ax21` entra en `primAxioms`
+> ([ADR‑023](DECISIONS.md), addendum). `mod2_range_ax` cita el axioma en vez de fingir que lo deriva.
+
+Ver [ADR‑023](DECISIONS.md) y [NEXT-STEPS.md](NEXT-STEPS.md).
 
 ### 3.3 `ax_C3_concat_assoc` y `ax_L3_in_concat`
 

@@ -1390,7 +1390,7 @@ theorem junk_line_not_stdLine :
   medición puede ser **correcta como teorema** y **equivocada como conclusión**; hay que leer qué
   obligación queda **después** de aplicarla.
 
-**Lo que NO cambia**: 6 `axiom` de Lean, 141 axiomas objeto, `reflects_of_omega` y
+**Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `reflects_of_omega` y
 `goedel_first_undecidable_omega` **sin tocar** (son paramétricos en `StdChain`).
 
 ---
@@ -1554,5 +1554,5 @@ se retira audita lo que se apoyaba en él.**
   aplazar algo por eso, comprobar si de verdad **cambia `axioms`** o sólo **añade un enunciado
   sobre un subconjunto**.
 
-**Lo que NO cambia**: 6 `axiom` de Lean, 141 axiomas objeto, `axioms`, `coreAxioms`,
+**Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `axioms`, `coreAxioms`,
 `axiomsCodeT`, `provCodeC'`, `G`, y todas las firmas aguas abajo.
