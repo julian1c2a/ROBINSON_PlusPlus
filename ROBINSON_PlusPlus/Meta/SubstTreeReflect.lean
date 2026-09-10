@@ -4,6 +4,7 @@ import ROBINSON_PlusPlus.Meta.CodeTreeReflect
 -- ⚠️ Añadido con el nodo `lift` (2026‑09‑09e): lo paga `pcc_eval_liftfc_wit`. Sin ciclo
 --    (`EvalLiftfcPrf` no depende de este módulo) y el cierre crece en UN módulo.
 import ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
+import ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
 -- ⚠️ Añadido con §11 (2026‑09‑09g): de aquí sale `pcc_lineWF_tracked_modulo_7`, al que se
 --    le cablean los CINCO reflectores ya probados. Sin ciclo (`LineWFAssemblePrf` no depende
 --    de este módulo); el cierre pasa de 89 a 94.
@@ -58,6 +59,10 @@ open ROBINSON_PlusPlus.Meta.CodeCtorKit ROBINSON_PlusPlus.Meta.CodeTreeReflect
 open ROBINSON_PlusPlus.Meta.LineWFSchemaPrf ROBINSON_PlusPlus.Meta.LineWFTrackedPrf
 open ROBINSON_PlusPlus.Meta.LineWFGuardPrf ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 open ROBINSON_PlusPlus.Meta.DotConsPrf
+open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.TcArithPrf
+open ROBINSON_PlusPlus.Meta.Representability
+open ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -77,6 +82,7 @@ inductive STree where
   | bin  : Nat → STree → STree → STree
   | sub  : STree → STree → STree
   | lift : Nat → STree → STree
+  | tcm  : Term → STree
   deriving Repr
 
 namespace STree
@@ -89,6 +95,7 @@ def objAt (t : Term) : STree → Term
   | bin m a b => cons (numeralM m) (cons (a.objAt t) (cons (b.objAt t) nil))
   | sub s f   => substfc zero (s.objAt t) (f.objAt t)
   | lift n a  => liftfc (numeralM n) (a.objAt t)
+  | tcm x     => termCodeM x
 
 /-- El código ESTÁTICO, con el hueco `⌜v₀⌝` en las hojas. -/
 def code : STree → Term
@@ -98,6 +105,7 @@ def code : STree → Term
   | bin m a b => binT m a.code b.code
   | sub s f   => substfcT (termCode zero) s.code f.code
   | lift n a  => liftfcT (termCode (numeralM n)) a.code
+  | tcm x     => termCode (termCodeM x)
 
 /-- Forma **N** (accesores rastreados). -/
 def dotN (t : Term) : STree → Term
@@ -107,6 +115,7 @@ def dotN (t : Term) : STree → Term
   | bin m a b => binT m (a.dotN t) (b.dotN t)
   | sub s f   => substfcT (termCode zero) (s.dotN t) (f.dotN t)
   | lift n a  => liftfcT (termCode (numeralM n)) (a.dotN t)
+  | tcm x     => termCode (termCodeM x)
 
 /-- Forma **V** (valores punteados). ⚠️ En el nodo `sub` **no** se puntea el `substfc` entero:
     se deja `substfcT` sobre los `dotV` de los hijos, y el salto de
@@ -119,6 +128,7 @@ def dotV (t : Term) : STree → Term
   | bin m a b => binT m (a.dotV t) (b.dotV t)
   | sub s f   => substfcT (termCode zero) (s.dotV t) (f.dotV t)
   | lift n a  => liftfcT (termCode (numeralM n)) (a.dotV t)
+  | tcm x     => termCode (termCodeM x)
 
 /-- Cota estricta de los índices de hoja. -/
 def maxLeaf : STree → Nat
@@ -128,12 +138,34 @@ def maxLeaf : STree → Nat
   | bin _ a b => Nat.max a.maxLeaf b.maxLeaf
   | sub s f   => Nat.max s.maxLeaf f.maxLeaf
   | lift _ a  => a.maxLeaf
+  | tcm _     => 0
 
 end STree
 
 open STree
 
 /-! ## §2 · LAS IGUALDADES ESTRUCTURALES (inducción pura sobre el árbol) -/
+
+/-- ⭐ El código de un `termCodeM` es **CERRADO**, y `substtc` no lo toca. Sale de abrir
+    `substtc` hacia su gemelo computable (`prf_substtc_arith_open`) y usar que `substCodeT`
+    sobre un término cerrado devuelve su código (`substCodeT_closed`). -/
+theorem substtc_inv_termCodeM (x W : Term) :
+    Prf (substtc zero W (termCode (termCodeM x)) =eq termCode (termCodeM x)) := by
+  have h := prf_substtc_arith_open 0 W (termCodeM x)
+  rwa [substCodeT_closed 0 W (termCodeM x) (fun c => liftTerm_termCodeM c x)] at h
+
+/-- La vía NUMERAL para un `termCodeM`: es `prf_termCode_numeral` con el puente
+    `termCodeM_eq`. ⚠️ Es la MISMA salida que §3.44 registró para `prf_tc_form`: el lado
+    derecho no se puede cambiar, así que se prueba en forma numeral y se convierte
+    **dentro de `Prov`**. -/
+theorem prf_termCodeM_numeral (x : Term) :
+    Prf (termCodeM x =eq numeral (codeNatTerm x)) := by
+  rw [termCodeM_eq]; exact prf_termCode_numeral x
+
+/-- El dotado de un `termCodeM`, por la vía numeral. -/
+theorem prf_tc_termCodeM (x : Term) :
+    Prf (tcFn (termCodeM x) =eq termCode (numeral (codeNatTerm x))) :=
+  prf_eq_trans (prf_congr_tcFn (prf_termCodeM_numeral x)) (prf_tc_numeral (codeNatTerm x))
 
 /-- La expresión objeto sobre `#0` es invariante al instanciar el `∀` en `#0`. -/
 theorem substTerm_objAt :
@@ -154,6 +186,7 @@ theorem substTerm_objAt :
   | .lift n a, t => by
       simp only [objAt, liftfc, substTerm, substTerms, substTerm_numeralM,
         substTerm_objAt a t]
+  | .tcm x, t => by simp only [objAt, substTerm_termCodeM]
 
 theorem substTerm_objAt_var0 (T : STree) :
     substTerm 0 (.var 0) (T.objAt (.var 0)) = T.objAt (.var 0) := substTerm_objAt T (.var 0)
@@ -170,6 +203,7 @@ theorem code_eq_termCode : ∀ T : STree, T.code = termCode (T.objAt (.var 0))
       simp only [STree.code, objAt, code_eq_termCode s, code_eq_termCode f, substfcT_termCode]
   | .lift n a => by
       simp only [STree.code, objAt, code_eq_termCode a, liftfcT_termCode]
+  | .tcm _ => rfl
 
 /-- **Evaluación del código punteado**: rellenar el hueco con `ṫ` da la forma rastreada. -/
 theorem prf_substtc_code (t : Term) :
@@ -192,6 +226,7 @@ theorem prf_substtc_code (t : Term) :
       prf_eq_trans (prf_substtc_liftfcT zero (tcFn t) _ a.code)
         (prf_congr_liftfcT (substtc_inv_termCode_numeralM n (tcFn t))
           (prf_substtc_code t a))
+  | .tcm x => substtc_inv_termCodeM x (tcFn t)
 
 /-- `dotN` es `substtc`‑invariante. -/
 theorem substtc_inv_dotN (t : Term) :
@@ -210,6 +245,7 @@ theorem substtc_inv_dotN (t : Term) :
   | .lift n a, W =>
       prf_eq_trans (prf_substtc_liftfcT zero W _ (a.dotN t))
         (prf_congr_liftfcT (substtc_inv_termCode_numeralM n W) (substtc_inv_dotN t a W))
+  | .tcm x, W => substtc_inv_termCodeM x W
 
 /-- `dotV` es `substtc`‑invariante. -/
 theorem substtc_inv_dotV (t : Term) :
@@ -228,6 +264,7 @@ theorem substtc_inv_dotV (t : Term) :
   | .lift n a, W =>
       prf_eq_trans (prf_substtc_liftfcT zero W _ (a.dotV t))
         (prf_congr_liftfcT (substtc_inv_termCode_numeralM n W) (substtc_inv_dotV t a W))
+  | .tcm x, W => substtc_inv_termCodeM x W
 
 /-! ### La GUARDA de las dos formas (ADR-020), por la misma inducción -/
 
@@ -239,6 +276,7 @@ theorem prf_hasWit_dotV (t : Term) : ∀ T : STree, Prf (hasWit (T.dotV t))
   | .sub s f   => prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
       (prf_hasWit_dotV t s) (prf_hasWit_dotV t f)
   | .lift n a  => prf_hasWit_liftfcT (prf_hasWit_tc (numeralM n)) (prf_hasWit_dotV t a)
+  | .tcm x     => prf_hasWit_tc (termCodeM x)
 
 theorem prf_hasWit_dotN (t : Term) : ∀ T : STree, Prf (hasWit (T.dotN t))
   | .leaf i    => prf_hasWit_nthcT (prf_hasWit_tcFn t) (prf_hasWit_tc (numeralM i))
@@ -248,6 +286,7 @@ theorem prf_hasWit_dotN (t : Term) : ∀ T : STree, Prf (hasWit (T.dotN t))
   | .sub s f   => prf_hasWit_funcc3 _ _ _ _ (prf_hasWit_tc zero)
       (prf_hasWit_dotN t s) (prf_hasWit_dotN t f)
   | .lift n a  => prf_hasWit_liftfcT (prf_hasWit_tc (numeralM n)) (prf_hasWit_dotN t a)
+  | .tcm x     => prf_hasWit_tc (termCodeM x)
 
 /-! ## §3 · LA CONDICIÓN‑ÁRBOL Y SU `condD`, COMPUTADO -/
 
@@ -379,6 +418,7 @@ def SGuards (Γ : List Formula) (t : Term) : STree → Prop
   | .sub s f   => (PrfH Γ (hasWit (s.objAt t)) ∧ PrfH Γ (hasWitF (f.objAt t)))
                     ∧ SGuards Γ t s ∧ SGuards Γ t f
   | .lift _ a  => PrfH Γ (hasWitF (a.objAt t)) ∧ SGuards Γ t a
+  | .tcm _     => True
 
 /-- ⭐ **EL «CÓDIGO DEL CÓDIGO» DEL ÁRBOL, con nodos de sustitución.** El caso `sub` es el
     único con contenido: lo paga `pcc_eval_substfc_wit`, cuyo antecedente OBJETO **son** las
@@ -516,6 +556,14 @@ theorem PrfH_tc_objAt {Γ : List Formula} (t : Term) :
         (prf_hasWit_tcFn _)
         (prf_hasWit_liftfcT (prf_hasWit_tc (numeralM n)) (prf_hasWit_tcFn _))
         (prf_hasWit_liftfcT (prf_hasWit_tc (numeralM n)) (prf_hasWit_dotV t a))
+  | .tcm x, _ => by
+      -- ⭐ La vía NUMERAL, y la conversión de frontera DENTRO de `Prov` (§3.44):
+      -- fuera se prueba `ṫ(termCodeM x) ≐ ⌜numeral n⌝`, y D1 dota `numeral n ≐ termCodeM x`.
+      have hdot : Prf (provFromCode (eqCodeFn (termCode (numeral (codeNatTerm x)))
+          (termCode (termCodeM x)))) :=
+        repr_pos'_prf (prf_eq_symm (prf_termCodeM_numeral x))
+      exact prf_to_prfH (prf_mp (prf_provCode_congr
+        (prf_congr_eqCodeFn (prf_eq_symm (prf_tc_termCodeM x)) (prf_refl _))) hdot) _
 
 /-- ⭐ **`Prov(⌜dotV = dotN⌝)`** para todo árbol cuyas hojas caigan bajo la longitud canónica.
     El nodo `sub` es **pura congruencia**: no pide guardas ni evaluación. -/
@@ -599,6 +647,9 @@ theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
           (a.dotV t) (a.dotN t)
           (substtc_inv_termCode_numeralM n) (substtc_inv_dotV t a)
           (prf_hasWit_tc (numeralM n)) (prf_hasWit_dotV t a) (prf_hasWit_dotN t a)) _) (ih hb)
+  | tcm x =>
+      -- CERRADO: `dotV` y `dotN` son el MISMO término, como en el `nul`
+      intro _; exact prf_to_prfH (prf_provFromCode_eqCodeFn_refl _) _
 
 
 /-! ## §6 · EL REFLECTOR DE UNA CONDICIÓN‑ÁRBOL CON SUSTITUCIONES
@@ -863,6 +914,120 @@ theorem pcc_lineWF_tracked_qconf_imp (t : Term) :
 
 
 
+
+/-! ## §10bis · 🏁🏁🏁 ind (tag 18) y listInd (tag 20), CERRADOS — **LOS SIETE** (2026‑09‑10)
+
+Lo que los bloqueaba estaba medido desde §3.54.1: sus `liftfc` van **anidados y bajo un
+`substfc`**, así que el evaluador pide `hasWitF (liftfc k A)` —el testigo del **resultado** de un
+lift— y la cascada de ADR‑020 sólo da `hasWitF A`. Con **`prf_hasWitF_liftfc`**
+(`Meta/LiftfcWitnessPrf.lean`) eso deja de ser un hueco: se aplica una vez en `ind` y **dos** en
+`listInd`.
+
+⭐ Y el otro ingrediente es el nodo **`tcm`** del árbol: los sustituyendos de estos dos esquemas
+no son casillas de la línea sino **`termCodeM` CERRADOS** (`⌜0⌝`, `⌜σ#0⌝`, `⌜nil⌝`, `⌜cons #1 #0⌝`).
+Su dotado va por la **vía NUMERAL** (§2), que es la salida que §3.44 ya había registrado para
+`prf_tc_form`: fuera se prueba en forma numeral y la conversión se hace **dentro de `Prov`**. -/
+
+/-- El testigo de un `termCodeM` (cerrado): es el de su `termCode`, vía `termCodeM_eq`. -/
+theorem prf_hasWit_termCodeM (x : Term) : Prf (hasWit (termCodeM x)) := by
+  rw [termCodeM_eq]; exact prf_hasWit_tc x
+
+/-- **ind** (tag 18): `concl = (A[0] ⇒ ((∀(A ⇒ (↑A)[σ#0])) ⇒ ∀A))`, con `A = nthc #0 2`. -/
+def treeInd : STree :=
+  .bin 5 (.sub (.tcm zero) (.leaf 2))
+    (.bin 5 (.un 6 (.bin 5 (.leaf 2) (.sub (.tcm (succ (.var 0))) (.lift 1 (.leaf 2)))))
+            (.un 6 (.leaf 2)))
+
+/-- **listInd** (tag 20): igual, con `nil`/`cons` y **dos** `liftfc` anidados. -/
+def treeListInd : STree :=
+  .bin 5 (.sub (.tcm nil) (.leaf 2))
+    (.bin 5 (.un 6 (.un 6 (.bin 5 (.lift 1 (.leaf 2))
+                                  (.sub (.tcm (cons (.var 1) (.var 0)))
+                                        (.lift 2 (.lift 1 (.leaf 2)))))))
+            (.un 6 (.leaf 2)))
+
+example : ax_lineWF_ind =
+    forall_ (Formula.impl (tagF 18) (lwfVar ⇔ Formula.and (lencF 3)
+      (guardedCond [.witF 2] (condOfS treeInd)))) := rfl
+
+example : ax_lineWF_listInd =
+    forall_ (Formula.impl (tagF 20) (lwfVar ⇔ Formula.and (lencF 3)
+      (guardedCond [.witF 2] (condOfS treeListInd)))) := rfl
+
+example : treeInd.maxLeaf = 3 := rfl
+example : treeListInd.maxLeaf = 3 := rfl
+
+/-- ⭐ El núcleo de `ind`. La guarda `hasWitF (nthc t 2)` de la cascada se **propaga al lift**
+    con `prf_hasWitF_liftfc`; es el único sitio donde la clausura nueva paga aquí. -/
+theorem pcc_core_ind (t : Term) :
+    HcondCore 3 t (guardedCond [.witF 2] (condOfS treeInd)) (condOfS treeInd) := by
+  refine pcc_condDS_of_stree treeInd t (n := 3) Nat.le.refl _ ?_ ?_
+  · refine prf_deduction ?_
+    have h := PrfH_and_elim_right
+      (prfH_hyp_self (substFormula 0 t (guardedCond [.witF 2] (condOfS treeInd))))
+    simpa only [guardedCond, substFormula_condOfS_at] using h
+  · have hh : PrfH [substFormula 0 t (guardedCond [.witF 2] (condOfS treeInd)),
+        lenc t =eq numeralM 3, lineWF t]
+        (substFormula 0 t (guardedCond [.witF 2] (condOfS treeInd))) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hwF2 : PrfH [substFormula 0 t (guardedCond [.witF 2] (condOfS treeInd)),
+        lenc t =eq numeralM 3, lineWF t] (hasWitF (nthc t (numeralM 2))) := by
+      have h := PrfH_and_elim_left hh
+      simpa only [guardedCond, substF_witF_slot] using h
+    have hwL1 := PrfH.mp _ _ _
+      (prf_to_prfH (prf_hasWitF_liftfc (numeralM 1) (nthc t (numeralM 2))) _) hwF2
+    exact ⟨⟨⟨prf_to_prfH (prf_hasWit_termCodeM zero) _, hwF2⟩, trivial, trivial⟩,
+           ⟨trivial, ⟨⟨prf_to_prfH (prf_hasWit_termCodeM (succ (.var 0))) _, hwL1⟩,
+                      trivial, ⟨hwF2, trivial⟩⟩⟩, trivial⟩
+
+/-- ⭐⭐ El núcleo de `listInd`. Aquí la clausura se aplica **DOS veces**: el `substfc` exterior
+    pide el testigo de `liftfc 2 (liftfc 1 A)`, y el interior el de `liftfc 1 A`. -/
+theorem pcc_core_listInd (t : Term) :
+    HcondCore 3 t (guardedCond [.witF 2] (condOfS treeListInd)) (condOfS treeListInd) := by
+  refine pcc_condDS_of_stree treeListInd t (n := 3) Nat.le.refl _ ?_ ?_
+  · refine prf_deduction ?_
+    have h := PrfH_and_elim_right
+      (prfH_hyp_self (substFormula 0 t (guardedCond [.witF 2] (condOfS treeListInd))))
+    simpa only [guardedCond, substFormula_condOfS_at] using h
+  · have hh : PrfH [substFormula 0 t (guardedCond [.witF 2] (condOfS treeListInd)),
+        lenc t =eq numeralM 3, lineWF t]
+        (substFormula 0 t (guardedCond [.witF 2] (condOfS treeListInd))) :=
+      PrfH.hyp _ _ (List.Mem.head _)
+    have hwF2 : PrfH [substFormula 0 t (guardedCond [.witF 2] (condOfS treeListInd)),
+        lenc t =eq numeralM 3, lineWF t] (hasWitF (nthc t (numeralM 2))) := by
+      have h := PrfH_and_elim_left hh
+      simpa only [guardedCond, substF_witF_slot] using h
+    have hwL1 := PrfH.mp _ _ _
+      (prf_to_prfH (prf_hasWitF_liftfc (numeralM 1) (nthc t (numeralM 2))) _) hwF2
+    have hwL2 := PrfH.mp _ _ _
+      (prf_to_prfH (prf_hasWitF_liftfc (numeralM 2)
+        (liftfc (numeralM 1) (nthc t (numeralM 2)))) _) hwL1
+    exact ⟨⟨⟨prf_to_prfH (prf_hasWit_termCodeM nil) _, hwF2⟩, trivial, trivial⟩,
+           ⟨⟨⟨hwF2, trivial⟩,
+             ⟨⟨prf_to_prfH (prf_hasWit_termCodeM (cons (.var 1) (.var 0))) _, hwL2⟩,
+              trivial, hwL1, hwF2, trivial⟩⟩, trivial⟩⟩
+
+/-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 18 (`ind`), PROBADO.** -/
+theorem pcc_lineWF_tracked_ind_imp (t : Term) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 18)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_stree (k := 18) (n := 3) treeInd t [.witF 2]
+    Nat.le.refl (by omega)
+    (prf_ax (show ax_lineWF_ind ∈ axioms by simp [axioms]))
+    (hcond_absorbe_1 t 3 (.witF 2) (condOfS treeInd)
+      (pcc_hGuardF 2 3 t (by omega)) (pcc_core_ind t))
+
+/-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 20 (`listInd`), PROBADO.** Con él, **LOS SIETE**. -/
+theorem pcc_lineWF_tracked_listInd_imp (t : Term) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 20)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
+  pcc_lineWF_tracked_of_stree (k := 20) (n := 3) treeListInd t [.witF 2]
+    Nat.le.refl (by omega)
+    (prf_ax (show ax_lineWF_listInd ∈ axioms by simp [axioms]))
+    (hcond_absorbe_1 t 3 (.witF 2) (condOfS treeListInd)
+      (pcc_hGuardF 2 3 t (by omega)) (pcc_core_listInd t))
+
+
 /-! ## §11 · `pcc_lineWF_tracked` MÓDULO DOS — los cinco reflectores, cableados
 
 `pcc_lineWF_tracked_modulo_7` (`Meta/LineWFAssemblePrf.lean`) pide los siete tags de
@@ -891,6 +1056,27 @@ theorem pcc_lineWF_tracked_modulo_2 (t : Term)
     (pcc_lineWF_tracked_q3_imp t) (pcc_lineWF_tracked_leibniz_imp t)
     hind (pcc_lineWF_tracked_qconf_imp t) hlistInd hOther
 
+/-! ### 🏁🏁🏁 §11bis · `pcc_lineWF_tracked` MÓDULO `hOther` — **LOS SIETE, CABLEADOS**
+(2026‑09‑10)
+
+Con `ind` (18) y `listInd` (20) cerrados en §10bis, los **siete** reflectores de sustitución
+están probados y `pcc_lineWF_tracked_modulo_7` ya no debe ninguno.
+
+⚠️ `hOther` **sigue sin descargarse aquí, y no es un descuido**: cubre los tags `k ≥ 21`, que **no
+existen** en el verificador. Es una obligación vacua que el ensamblaje pide por exhaustividad del
+`match`; quien la tenga a mano la paga con `absurd` sobre la cota real de tags. Enunciarla como
+hipótesis es más honesto que fabricar aquí una prueba que dependa del número exacto de tags.
+
+⭐ **Y esto es exactamente `hbody`(a) de D3**: la reflexión del átomo `lineWF` que el
+`pcc_bdAll_intro` de `chainOkB` consume en el cuerpo de `lineOkB`. -/
+
+theorem pcc_lineWF_tracked_modulo_other (t : Term)
+    (hOther : ∀ k : Nat, Prf (lineWF t ⇒ ((lineTag t =eq numeralM k)
+      ⇒ provFromCode (lineWFCodeFn (tcFn t))))) :
+    Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t))) :=
+  pcc_lineWF_tracked_modulo_2 t
+    (pcc_lineWF_tracked_ind_imp t) (pcc_lineWF_tracked_listInd_imp t) hOther
+
 end ROBINSON_PlusPlus.Meta.SubstTreeReflect
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -915,7 +1101,10 @@ export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
   pcc_core_q1 pcc_core_q2 pcc_core_leibniz pcc_core_q3 pcc_core_qconf
   pcc_lineWF_tracked_q1_imp pcc_lineWF_tracked_q2_imp pcc_lineWF_tracked_leibniz_imp
   pcc_lineWF_tracked_q3_imp pcc_lineWF_tracked_qconf_imp
-  pcc_lineWF_tracked_modulo_2
+  pcc_lineWF_tracked_modulo_2 pcc_lineWF_tracked_modulo_other
+  treeInd treeListInd pcc_core_ind pcc_core_listInd
+  pcc_lineWF_tracked_ind_imp pcc_lineWF_tracked_listInd_imp
+  prf_hasWit_termCodeM substtc_inv_termCodeM prf_termCodeM_numeral prf_tc_termCodeM
 )
 
 /-! ## FOOTPRINT -/
@@ -929,3 +1118,6 @@ export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q3_imp
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_qconf_imp
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_2
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_ind_imp
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_listInd_imp
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_other
