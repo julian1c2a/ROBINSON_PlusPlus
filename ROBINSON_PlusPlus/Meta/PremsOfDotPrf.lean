@@ -95,25 +95,30 @@ theorem prf_substtc_premsOfT (v W x : Term) :
 
 /-! ## §2 · Listas objeto y su versión de CÓDIGO DOTADO -/
 
-/-- La lista objeto `⟨x₀,…⟩` como `cons` anidados. -/
-def consN : List Term → Term
+/-- La lista objeto `⟨x₀,…⟩` como `cons` anidados.
+
+    ⚠️ **Se llama `consL` (por LISTA) y no `consN` a propósito**: `Meta/CodeNumeralPrf.lean` ya
+    exporta un `consN : Nat → Nat → Nat` (el emparejamiento de Cantor) y los dos irían a la raíz.
+    Es la clase de colisión que ADR‑019 persigue; se cazó el 2026‑09‑10h al escribir un sondeo que
+    usaba los dos. -/
+def consL : List Term → Term
   | []      => nil
-  | x :: xs => cons x (consN xs)
+  | x :: xs => cons x (consL xs)
 
 /-- Su versión de código con cada componente **dotado**: `consT ẋ₀ (consT ẋ₁ … ⌜nil⌝˙)`. -/
-def consNT : List Term → Term
+def consLT : List Term → Term
   | []      => tcFn nil
-  | x :: xs => consT (tcFn x) (consNT xs)
+  | x :: xs => consT (tcFn x) (consLT xs)
 
-theorem prf_hasWit_consNT : ∀ xs : List Term, Prf (hasWit (consNT xs))
+theorem prf_hasWit_consNT : ∀ xs : List Term, Prf (hasWit (consLT xs))
   | []      => prf_hasWit_tcFn nil
   | x :: xs => prf_hasWit_consT (prf_hasWit_tcFn x) (prf_hasWit_consNT xs)
 
 theorem substtc_inv_consNT : ∀ (xs : List Term) (W : Term),
-    Prf (substtc zero W (consNT xs) =eq consNT xs)
+    Prf (substtc zero W (consLT xs) =eq consLT xs)
   | [], W      => substtc_inv_tcFn nil W
   | x :: xs, W =>
-      prf_eq_trans (prf_substtc_consT zero W (tcFn x) (consNT xs))
+      prf_eq_trans (prf_substtc_consT zero W (tcFn x) (consLT xs))
         (prf_congr_consT (prf_substtc_tcFn W x) (substtc_inv_consNT xs W))
 
 /-! ## §3 · EL TRANSPORTE EN CASCADA `consT ẋ ẏ ↦ (cons x y)˙`
@@ -127,12 +132,12 @@ theorem pcc_rw_dot_consN
     (hGs : ∀ s c : Term, Prf (substfc zero s (G c) =eq G (substtc zero s c)))
     (hGc : ∀ c c' : Term, Prf (c =eq c') → Prf (G c =eq G c'))
     (hwG : ∀ c : Term, Prf (hasWit c) → Prf (hasWitF (G c))) :
-    ∀ (xs : List Term), Prf (provFromCode (G (consNT xs))) →
-      Prf (provFromCode (G (tcFn (consN xs))))
+    ∀ (xs : List Term), Prf (provFromCode (G (consLT xs))) →
+      Prf (provFromCode (G (tcFn (consL xs))))
   | [], hbase => hbase
   | x :: xs, hbase => by
       -- (1) recursión sobre la COLA, con el contexto `G' c := G (consT ẋ c)`
-      have h1 : Prf (provFromCode (G (consT (tcFn x) (tcFn (consN xs))))) := by
+      have h1 : Prf (provFromCode (G (consT (tcFn x) (tcFn (consL xs))))) := by
         refine pcc_rw_dot_consN (fun c => G (consT (tcFn x) c)) ?_ ?_ ?_ xs hbase
         · intro s c
           refine prf_eq_trans (hGs s (consT (tcFn x) c)) (hGc _ _ ?_)
@@ -141,10 +146,10 @@ theorem pcc_rw_dot_consN
         · exact fun c c' h => hGc _ _ (prf_congr_consT (prf_refl _) h)
         · exact fun c hc => hwG _ (prf_hasWit_consT (prf_hasWit_tcFn x) hc)
       -- (2) el piso exterior
-      refine pcc_rw G ?_ _ _ (pcc_dot_cons x (consN xs)) h1
+      refine pcc_rw G ?_ _ _ (pcc_dot_cons x (consL xs)) h1
         (hwG _ (prf_hasWit_varc (numeral 0)))
-        (prf_hasWit_consT (prf_hasWit_tcFn x) (prf_hasWit_tcFn (consN xs)))
-        (prf_hasWit_tcFn (cons x (consN xs)))
+        (prf_hasWit_consT (prf_hasWit_tcFn x) (prf_hasWit_tcFn (consL xs)))
+        (prf_hasWit_tcFn (cons x (consL xs)))
       intro s
       exact prf_eq_trans (hGs s (varc (numeral 0))) (hGc _ _ (prf_substtc_varc0 s))
 
@@ -188,11 +193,11 @@ theorem pcc_premsOf_dot_thy (a : Term) :
   -- (3) los CERRADOS, dotados — a nivel OBJETO
   have hdot : Prf (GT (termCode nil)
         (consT (tcFn a) (consT (termCode (numeralM 15)) (termCode nil)))
-      =eq GT (tcFn nil) (consNT [a, numeralM 15])) := by
+      =eq GT (tcFn nil) (consLT [a, numeralM 15])) := by
     refine prf_congr_eqCodeFn (prf_congr_premsOfT ?_) (prf_eq_symm prf_tc_nil)
     exact prf_congr_consT (prf_refl _)
       (prf_congr_consT (prf_eq_symm (prf_tc_numeralM 15)) (prf_eq_symm prf_tc_nil))
-  have hbase : Prf (provFromCode (GT (tcFn nil) (consNT [a, numeralM 15]))) :=
+  have hbase : Prf (provFromCode (GT (tcFn nil) (consLT [a, numeralM 15]))) :=
     prf_mp (prf_provCode_congr (prf_eq_trans hopen hdot)) hax
   -- (4) el transporte en cascada
   exact pcc_rw_dot_consN (GT (tcFn nil))
@@ -247,12 +252,12 @@ theorem pcc_premsOf_dot_2nil (k : Nat) (a₀ a₁ : Term)
   -- (5) los CERRADOS, dotados
   have hdot : Prf (GT (termCode nil) (consT (tcFn a₀) (consT (termCode (numeralM k))
         (consT W₂ (termCode nil))))
-      =eq GT (tcFn nil) (consNT [a₀, numeralM k, a₁])) := by
+      =eq GT (tcFn nil) (consLT [a₀, numeralM k, a₁])) := by
     refine prf_congr_eqCodeFn (prf_congr_premsOfT ?_) (prf_eq_symm prf_tc_nil)
     exact prf_congr_consT (prf_refl _)
       (prf_congr_consT (prf_eq_symm (prf_tc_numeralM k))
         (prf_congr_consT (prf_refl _) (prf_eq_symm prf_tc_nil)))
-  have hbase : Prf (provFromCode (GT (tcFn nil) (consNT [a₀, numeralM k, a₁]))) :=
+  have hbase : Prf (provFromCode (GT (tcFn nil) (consLT [a₀, numeralM k, a₁]))) :=
     prf_mp (prf_provCode_congr (prf_eq_trans
       (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout) hdot)) hax
   -- (6) el transporte en cascada
@@ -369,13 +374,13 @@ theorem pcc_premsOf_dot_3nil (k : Nat) (a₀ a₁ a₂ : Term)
   -- (5) los CERRADOS, dotados
   have hdot : Prf (GT (termCode nil) (consT (tcFn a₀) (consT (termCode (numeralM k))
         (consT (tcFn a₁) (consT (tcFn a₂) (termCode nil)))))
-      =eq GT (tcFn nil) (consNT [a₀, numeralM k, a₁, a₂])) := by
+      =eq GT (tcFn nil) (consLT [a₀, numeralM k, a₁, a₂])) := by
     refine prf_congr_eqCodeFn (prf_congr_premsOfT ?_) (prf_eq_symm prf_tc_nil)
     exact prf_congr_consT (prf_refl _)
       (prf_congr_consT (prf_eq_symm (prf_tc_numeralM k))
         (prf_congr_consT (prf_refl _)
           (prf_congr_consT (prf_refl _) (prf_eq_symm prf_tc_nil))))
-  have hbase : Prf (provFromCode (GT (tcFn nil) (consNT [a₀, numeralM k, a₁, a₂]))) :=
+  have hbase : Prf (provFromCode (GT (tcFn nil) (consLT [a₀, numeralM k, a₁, a₂]))) :=
     prf_mp (prf_provCode_congr (prf_eq_trans (prf_eq_trans (prf_eq_trans
       (prf_congr_substfc_arg3 (prf_congr_substfc_arg3 h2)) (prf_congr_substfc_arg3 h1)) h0)
       hdot)) hax
@@ -494,13 +499,13 @@ theorem pcc_premsOf_dot_4nil (k : Nat) (a0 a1 a2 a3 : Term)
       (substtc_inv_termCode_numeralM 0 (tcFn a3))
   have hdot : Prf (GT (termCode nil) (consT (tcFn a0) (consT (termCode (numeralM k))
         (consT (tcFn a1) (consT (tcFn a2) (consT (tcFn a3) (termCode nil))))))
-      =eq GT (tcFn nil) (consNT [a0, numeralM k, a1, a2, a3])) := by
+      =eq GT (tcFn nil) (consLT [a0, numeralM k, a1, a2, a3])) := by
     refine prf_congr_eqCodeFn (prf_congr_premsOfT ?_) (prf_eq_symm prf_tc_nil)
     exact prf_congr_consT (prf_refl _)
       (prf_congr_consT (prf_eq_symm (prf_tc_numeralM k))
         (prf_congr_consT (prf_refl _) (prf_congr_consT (prf_refl _)
           (prf_congr_consT (prf_refl _) (prf_eq_symm prf_tc_nil)))))
-  have hbase : Prf (provFromCode (GT (tcFn nil) (consNT [a0, numeralM k, a1, a2, a3]))) :=
+  have hbase : Prf (provFromCode (GT (tcFn nil) (consLT [a0, numeralM k, a1, a2, a3]))) :=
     prf_mp (prf_provCode_congr (prf_eq_trans (prf_eq_trans (prf_eq_trans (prf_eq_trans
       (prf_congr_substfc_arg3 (prf_congr_substfc_arg3 (prf_congr_substfc_arg3 h3)))
       (prf_congr_substfc_arg3 (prf_congr_substfc_arg3 h2)))
@@ -587,7 +592,7 @@ theorem pcc_premsOf_dot_gen (a0 a1 : Term) :
         (eqCodeFn (premsOfT (consT (tcFn a0) (consT (termCode (numeralM 17))
             (consT (varc (numeral 0)) (termCode nil)))))
           (consT (varc (numeral 0)) (termCode nil)))
-      =eq eqCodeFn (premsOfT (consNT [a0, numeralM 17, a1])) (consNT [a1])) := by
+      =eq eqCodeFn (premsOfT (consLT [a0, numeralM 17, a1])) (consLT [a1])) := by
     refine prf_eq_trans (prf_substfc_eq zero W2 _ _) ?_
     refine prf_congr_eqCodeFn ?_ ?_
     · refine prf_eq_trans (prf_substtc_premsOfT zero W2 _) (prf_congr_premsOfT ?_)
@@ -603,19 +608,19 @@ theorem pcc_premsOf_dot_gen (a0 a1 : Term) :
       exact prf_congr_consT (prf_substtc_varc0 W2)
         (prf_eq_trans (substtc_inv_termCode_numeralM 0 W2) (prf_eq_symm prf_tc_nil))
   have hbase : Prf (provFromCode
-      (eqCodeFn (premsOfT (consNT [a0, numeralM 17, a1])) (consNT [a1]))) :=
+      (eqCodeFn (premsOfT (consLT [a0, numeralM 17, a1])) (consLT [a1]))) :=
     prf_mp (prf_provCode_congr (prf_eq_trans
       (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout)) hax
   -- transporte del LHS
   have hL : Prf (provFromCode
-      (eqCodeFn (premsOfT (tcFn (consN [a0, numeralM 17, a1]))) (consNT [a1]))) :=
-    pcc_rw_dot_consN (GT (consNT [a1]))
-      (GT_subst (consNT [a1]) (substtc_inv_consNT [a1]))
-      (fun _ _ h => GT_congr (consNT [a1]) h)
-      (fun c hc => GT_wit (consNT [a1]) (prf_hasWit_consNT [a1]) c hc)
+      (eqCodeFn (premsOfT (tcFn (consL [a0, numeralM 17, a1]))) (consLT [a1]))) :=
+    pcc_rw_dot_consN (GT (consLT [a1]))
+      (GT_subst (consLT [a1]) (substtc_inv_consNT [a1]))
+      (fun _ _ h => GT_congr (consLT [a1]) h)
+      (fun c hc => GT_wit (consLT [a1]) (prf_hasWit_consNT [a1]) c hc)
       [a0, numeralM 17, a1] hbase
   -- transporte del RHS
-  exact pcc_rw_dot_consN (GR (premsOfT (tcFn (consN [a0, numeralM 17, a1]))))
+  exact pcc_rw_dot_consN (GR (premsOfT (tcFn (consL [a0, numeralM 17, a1]))))
     (GR_subst _ (substtc_inv_premsOfT (substtc_inv_tcFn _)))
     (fun _ _ h => GR_congr _ h)
     (fun c hc => GR_wit _ (prf_hasWit_premsOfT (prf_hasWit_tcFn _)) c hc)
@@ -662,8 +667,8 @@ theorem pcc_premsOf_dot_mp (a0 a1 : Term) :
           (consT (consT (termCode (numeralM 5)) (consT (varc (numeral 0))
             (consT (tcFn a0) (termCode nil))))
            (consT (varc (numeral 0)) (termCode nil))))
-      =eq eqCodeFn (premsOfT (consNT [a0, numeralM 16, a1]))
-          (consT (consNT [numeralM 5, a1, a0]) (consNT [a1]))) := by
+      =eq eqCodeFn (premsOfT (consLT [a0, numeralM 16, a1]))
+          (consT (consLT [numeralM 5, a1, a0]) (consLT [a1]))) := by
     refine prf_eq_trans (prf_substfc_eq zero W2 _ _) ?_
     refine prf_congr_eqCodeFn ?_ ?_
     · refine prf_eq_trans (prf_substtc_premsOfT zero W2 _) (prf_congr_premsOfT ?_)
@@ -688,14 +693,14 @@ theorem pcc_premsOf_dot_mp (a0 a1 : Term) :
       · refine prf_eq_trans (prf_substtc_consT zero W2 _ _) ?_
         exact prf_congr_consT (prf_substtc_varc0 W2)
           (prf_eq_trans (substtc_inv_termCode_numeralM 0 W2) (prf_eq_symm prf_tc_nil))
-  have hbase : Prf (provFromCode (eqCodeFn (premsOfT (consNT [a0, numeralM 16, a1]))
-      (consT (consNT [numeralM 5, a1, a0]) (consNT [a1])))) :=
+  have hbase : Prf (provFromCode (eqCodeFn (premsOfT (consLT [a0, numeralM 16, a1]))
+      (consT (consLT [numeralM 5, a1, a0]) (consLT [a1])))) :=
     prf_mp (prf_provCode_congr (prf_eq_trans
       (prf_congr_substfc_arg3 (prf_eq_trans hin hnorm)) hout)) hax
   -- (1) transporte del LHS
-  have hL : Prf (provFromCode (eqCodeFn (premsOfT (tcFn (consN [a0, numeralM 16, a1])))
-      (consT (consNT [numeralM 5, a1, a0]) (consNT [a1])))) :=
-    pcc_rw_dot_consN (GT (consT (consNT [numeralM 5, a1, a0]) (consNT [a1])))
+  have hL : Prf (provFromCode (eqCodeFn (premsOfT (tcFn (consL [a0, numeralM 16, a1])))
+      (consT (consLT [numeralM 5, a1, a0]) (consLT [a1])))) :=
+    pcc_rw_dot_consN (GT (consT (consLT [numeralM 5, a1, a0]) (consLT [a1])))
       (GT_subst _ (fun W => prf_eq_trans (prf_substtc_consT zero W _ _)
         (prf_congr_consT (substtc_inv_consNT [numeralM 5, a1, a0] W)
           (substtc_inv_consNT [a1] W))))
@@ -704,16 +709,16 @@ theorem pcc_premsOf_dot_mp (a0 a1 : Term) :
         (prf_hasWit_consNT [a1])) c hc)
       [a0, numeralM 16, a1] hbase
   -- (2) transporte del `implc` (la CABEZA del RHS)
-  have hH : Prf (provFromCode (eqCodeFn (premsOfT (tcFn (consN [a0, numeralM 16, a1])))
-      (consT (tcFn (consN [numeralM 5, a1, a0])) (consNT [a1])))) :=
-    pcc_rw_dot_consN (GRH (premsOfT (tcFn (consN [a0, numeralM 16, a1]))) (consNT [a1]))
+  have hH : Prf (provFromCode (eqCodeFn (premsOfT (tcFn (consL [a0, numeralM 16, a1])))
+      (consT (tcFn (consL [numeralM 5, a1, a0])) (consLT [a1])))) :=
+    pcc_rw_dot_consN (GRH (premsOfT (tcFn (consL [a0, numeralM 16, a1]))) (consLT [a1]))
       (GRH_subst _ _ (substtc_inv_premsOfT (substtc_inv_tcFn _)) (substtc_inv_consNT [a1]))
       (fun _ _ h => GRH_congr _ _ h)
       (fun c hc => GRH_wit _ _ (prf_hasWit_premsOfT (prf_hasWit_tcFn _))
         (prf_hasWit_consNT [a1]) c hc)
       [numeralM 5, a1, a0] hL
   -- (3) transporte del RHS entero
-  exact pcc_rw_dot_consN (GR (premsOfT (tcFn (consN [a0, numeralM 16, a1]))))
+  exact pcc_rw_dot_consN (GR (premsOfT (tcFn (consL [a0, numeralM 16, a1]))))
     (GR_subst _ (substtc_inv_premsOfT (substtc_inv_tcFn _)))
     (fun _ _ h => GR_congr _ h)
     (fun c hc => GR_wit _ (prf_hasWit_premsOfT (prf_hasWit_tcFn _)) c hc)
@@ -1040,7 +1045,7 @@ Consumidor previsto: **B2**, el puente de la cota de `hbody`(b) dentro de `Prov`
 export ROBINSON_PlusPlus.Meta.PremsOfDotPrf (
   premsOfT premsOfT_termCode substCodeT_premsOf
   prf_hasWit_premsOfT prf_congr_premsOfT prf_substtc_premsOfT substtc_inv_premsOfT
-  consN consNT prf_hasWit_consNT substtc_inv_consNT pcc_rw_dot_consN
+  consL consLT prf_hasWit_consNT substtc_inv_consNT pcc_rw_dot_consN
   GT GT_subst GT_subst_at GT_congr GT_wit GR GR_subst GR_congr GR_wit
   GRH GRH_subst GRH_congr GRH_wit
   substtc_inv_tc_closed liftTerm_numeralM substtc_inv_tc_numeralM

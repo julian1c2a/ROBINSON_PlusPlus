@@ -1,5 +1,75 @@
 # PLAN — `NegVerifier` (cerrar `⊬¬G`)
 
+> # 🔬 VEREDICTO DEL SONDEO OBLIGATORIO DEL MÓDULO E (2026‑09‑10h)
+>
+> §8 exigía este sondeo **antes** de codificar `VerifierSound`. Hecho, compilado y guardado en
+> **`sondeos/NegVerifierModE.lean`** (cinco mediciones, todas verdes).
+>
+> ## 1. ✅ NO hay bug de solidez
+>
+> Ninguna cadena basura aceptada por los axiomas objeto concluye un `formCode φ` con `⊬φ`.
+>
+> ## 2. ⭐⭐ El módulo E sale **CASI GRATIS** — y el plan no lo vio
+>
+> El decisor que E necesita **no tiene que ser el verificador OBJETO**. Basta el **decodificador
+> META**, y entonces la solidez **ya está probada**:
+>
+> ```lean
+> def chainOkDec (l : List Term) : Bool := (decodeChain (objList l)).isSome
+> theorem modulo_E (h : decodeChain (objList l) = some rs) (hmem : …) : Prf φ :=
+>   decodeChain_prf h hmem          -- ← Meta/ChainDecode.lean, YA PROBADO
+> ```
+>
+> La pieza clave es **`decodeForm_inj : decodeForm c = some φ → c = formCodeM φ`**
+> (`Meta/CodeDecode.lean`): el decodificador es una **sección**, luego «si decodifica, era real» —
+> que es exactamente la *realidad hereditaria* que §8 pedía demostrar caso por caso.
+>
+> ## 3. ⛔ EL RIESGO NO ESTABA DONDE EL PLAN LO PONÍA
+>
+> §10 daba **E: riesgo ALTO** y **C/D: riesgo MEDIO**. Es **al revés**: E es una línea, y el que hay
+> que rediseñar es el par **(C, D)** — la completitud negativa —, porque **los esquemas objeto
+> aceptan más que el decodificador**:
+>
+> ```lean
+> -- medido: la línea es ACEPTADA por los axiomas objeto…
+> basura_p1_aceptada_objeto :
+>   axioms ⊢ lineWF ⟨implc basura (implc basura basura), 0̄, basura, basura⟩
+> -- …y RECHAZADA por el decodificador
+> basura_p1_no_decodifica : decodeForm (implc basura (implc basura basura)) = none
+> ```
+>
+> ⇒ `NegVerifier` tiene que **refutar** esas cadenas, y para eso hay que distinguir `formCode φ` de
+> `implc basura …`. **`formCode_ne` no aplica** (el lado derecho no es un `formCode`).
+>
+> ## 4. ⛔⛔ EL MURO DE FONDO: `IsCodeShaped` **NO SEPARA**
+>
+> Es la misma raíz que tumbó `canon_ne`, ahora medida sobre `StdChain`:
+>
+> * `IsCodeShaped (cons nil nil)` ✅ y `IsCodeShaped (numeralM 2)` ✅
+> * `cons nil nil ≠ numeralM 2` **como términos de Lean** ✅
+> * **`Prf (cons nil nil =eq numeralM 2)`** ⛔ — **provablemente iguales**
+> * y `StdChain [numeralM 7, numeralM 3]` ✅ es un testigo legítimo
+>
+> Un `formCode φ` **es** un numeral, sólo que astronómico. Decidir la desigualdad contra basura
+> exigiría **evaluar Cantor** — inviable.
+>
+> ## ⇒ LA DECISIÓN QUE QUEDA (va a ADR)
+>
+> **Estrechar la clase de testigos** hasta que todas las comparaciones sean **paralelas por tipo**:
+>
+> ```lean
+> def StdLine (x : Term) : Prop :=
+>   ∃ φ k args, x = cons (formCode φ) (cons (numeralM k) (objList args)) ∧ ∀ a ∈ args, IsCodeArg a
+> def StdChain (l : List Term) : Prop := ∀ x ∈ l, StdLine x
+> ```
+>
+> ⚠️ **Coste honesto**: `OmegaConsistent` se vuelve algo **más fuerte** que la ω‑consistencia
+> clásica. Atenuante medido: **ya no era la clásica pura** — cuantifica sobre `objList l`, no sobre
+> numerales arbitrarios. Es estrechar lo ya estrecho, no romper nada; pero hay que **escribirlo en
+> el enunciado**, no dejarlo implícito.
+>
+> ⚠️ **Y las estimaciones de §10 hay que rehacerlas**: E baja de 300‑500 líneas a ~10; C y D suben.
+
 > # 🧨 ESTE PLAN CONTIENE AFIRMACIONES FALSAS — corregido 2026‑08‑31
 >
 > Re‑medido contra el árbol actual (3 ángulos, 3/3 confirmados; `sondeos/MedirF_*.lean`).
@@ -624,9 +694,9 @@ theorem goedel_first_undecidable_final (hcon : ConsistentOmega) (hω : OmegaCons
 | **0** | 🔬 **SONDEO de solidez** (obligatorio) | — | — | **ALTO** | 0.5–1 |
 | **A** | `CodeDecode` (decodificador) | 1.1 | 350–500 | MEDIO | 1–1.5 |
 | **B** | `LineWFCases` (21 tags) 🔗 *compartido con D3* | — | 300–400 | MEDIO | 1–1.5 |
-| **C** | `LineWFNeg` (⊢ ¬lineWF) | B, 1.1 | 400–600 | MEDIO‑ALTO | 1.5–2 |
-| **D** | `ChainNeg` (runFn/¬In/¬chainOk) | C, 1.1 | 300–400 | MEDIO | 1–1.5 |
-| **E** | `VerifierSound` (**el corazón**) | A, D | 300–500 | **ALTO** | 1.5–2 |
+| **C** | `LineWFNeg` (⊢ ¬lineWF) | B, **la decisión de `StdChain`** | ⚠️ re‑estimar | ⚠️ **ALTO** (era MEDIO‑ALTO) | ⏳ |
+| **D** | `ChainNeg` (runFn/¬In/¬chainOk) | C, **la decisión de `StdChain`** | ⚠️ re‑estimar | ⚠️ **ALTO** (era MEDIO) | ⏳ |
+| ~~**E**~~ | ~~`VerifierSound`~~ | — | ~~300–500~~ → **~10** | ~~ALTO~~ → **NULO** | 🏁 **HECHO**: es `decodeChain_prf` (sondeo 2026‑09‑10h) |
 | **F** | `NegVerifierPrf` (ensamblaje) | E | 100–150 | BAJO | 0.5 |
 
 **Total: ~1 900–2 700 líneas · 8–11 sesiones.** Magnitud comparable a **D1** (`repr_pos'`).
