@@ -75,6 +75,7 @@ import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 import ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
 import ROBINSON_PlusPlus.Meta.ListEtaPrf
 import ROBINSON_PlusPlus.Meta.PremsOfTagPrf
+import ROBINSON_PlusPlus.Meta.PremsOfDotPrf
 import ROBINSON_PlusPlus.Meta.DotConsPrf
 import ROBINSON_PlusPlus.Meta.EvalListPrf
 import ROBINSON_PlusPlus.Meta.EvalLtPrf

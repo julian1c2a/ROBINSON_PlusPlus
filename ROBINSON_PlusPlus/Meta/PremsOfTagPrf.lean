@@ -84,12 +84,16 @@ theorem prf_lenc_of_tag {k n : Nat} {D : Formula} (t : Term)
 def etaTag (L : Term) (m k : Nat) : Term :=
   cons (carc L) (cons (numeralM k) (etaAt (cdrc (cdrc L)) m))
 
-/-- ⭐⭐ `premsOf` EVALUADO a nivel OBJETO, genérico en el tag, la aridad y el valor. -/
-theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
+/-- ⭐ **LA η POR TAG**: el bicondicional da la longitud, y la longitud da la línea entera —
+    con el tag ya sustituido por su numeral en la posición 1.
+
+    ⚠️ **Se expone a propósito**, y no sólo como paso interno de `prf_premsOf_of_tag`: la
+    reflexión **punteada** de `premsOf` (B1, `Meta/PremsOfDotPrf.lean`) necesita exactamente esta
+    igualdad para transportar `ṫ` a `(etaTag t m k)˙`. -/
+theorem prf_eta_of_tag {k m : Nat} {D : Formula} (t : Term)
     (hax : Prf (Formula.forall (Formula.impl (tagF k) (lwfVar ⇔ D))))
-    (hD : Prf (substFormula 0 t D ⇒ (lenc t =eq numeralM (m + 2))))
-    (hpre : Prf (premsOf (etaTag t m k) =eq R)) :
-    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM k) ⇒ (premsOf t =eq R))) := by
+    (hD : Prf (substFormula 0 t D ⇒ (lenc t =eq numeralM (m + 2)))) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM k) ⇒ (t =eq etaTag t m k))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM k) [lineWF t] rfl)
   have hlw : PrfH [nthc t (succ zero) =eq numeralM k, lineWF t] (lineWF t) :=
     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
@@ -110,8 +114,21 @@ theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
     show PrfH _ (cons (carc t) (cons (carc (cdrc t)) (etaAt (cdrc (cdrc t)) m))
       =eq cons (carc t) (cons (numeralM k) (etaAt (cdrc (cdrc t)) m)))
     exact PrfH_congr_cons_tail (PrfH_congr_cons_head htagc)
+  exact PrfH_eq_trans heta hshape
+
+/-- ⭐⭐ `premsOf` EVALUADO a nivel OBJETO, genérico en el tag, la aridad y el valor. -/
+theorem prf_premsOf_of_tag {k m : Nat} {D : Formula} (t R : Term)
+    (hax : Prf (Formula.forall (Formula.impl (tagF k) (lwfVar ⇔ D))))
+    (hD : Prf (substFormula 0 t D ⇒ (lenc t =eq numeralM (m + 2))))
+    (hpre : Prf (premsOf (etaTag t m k) =eq R)) :
+    Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM k) ⇒ (premsOf t =eq R))) := by
+  refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM k) [lineWF t] rfl)
+  have hlw : PrfH [nthc t (succ zero) =eq numeralM k, lineWF t] (lineWF t) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have htagH : PrfH [nthc t (succ zero) =eq numeralM k, lineWF t]
+      (nthc t (succ zero) =eq numeralM k) := PrfH.hyp _ _ (List.Mem.head _)
   have ht : PrfH [nthc t (succ zero) =eq numeralM k, lineWF t] (t =eq etaTag t m k) :=
-    PrfH_eq_trans heta hshape
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_eta_of_tag t hax hD) _) hlw) htagH
   let A : Formula := Formula.eq (premsOf (.var 0)) (liftTerm 0 R)
   have hS : ∀ s : Term, substFormula 0 s A = Formula.eq (premsOf s) R := by
     intro s
@@ -430,7 +447,7 @@ end ROBINSON_PlusPlus.Meta.PremsOfTagPrf
 Consumidor previsto: la reflexión punteada de la cota de `boundedPremsIn` (`hbody`(b) de D3),
 que necesita `premsOf` evaluado antes de poder cruzar `lencT (premsOfT …)`. -/
 export ROBINSON_PlusPlus.Meta.PremsOfTagPrf (
-  prf_lenc_of_tag etaTag prf_premsOf_of_tag
+  prf_lenc_of_tag etaTag prf_eta_of_tag prf_premsOf_of_tag
   prf_premsOf_tag_and prf_premsOf_tag_plain
   prf_premsOf_p1 prf_premsOf_p2 prf_premsOf_c1 prf_premsOf_c2 prf_premsOf_c3
   prf_premsOf_j1 prf_premsOf_j2 prf_premsOf_j3 prf_premsOf_efq
