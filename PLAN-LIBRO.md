@@ -159,7 +159,7 @@ Tres razones, las tres aprendidas a golpes aquí:
 |---|---|
 | kernel de Lean | `propext`, `Classical.choice`, `Quot.sound` |
 | meta-reglas ω de FOL (6) | `imp_intro`, `gen`, `raa`, `dne`, `or_elim`, `ex_elim` (`FOL/MetaRules.lean`) |
-| `axiom` de RPP (**6**) | `ax_induction`, `ax_list_induction`, `ax_mod2_alternation`, `ax_p_tfa`, `ax_axiomsCodeT_eq`, `prf_axiomsCodeT_eq` — **`d3` RETIRADO el 2026-09-10** (`9ca5e66`): pasó a teorema |
+| `axiom` de RPP (**5**) | **`ax_induction_prim`**, `ax_list_induction`, `ax_p_tfa`, `ax_axiomsCodeT_eq`, `prf_axiomsCodeT_eq`. — **`d3` RETIRADO el 2026-09-10g** (`9ca5e66`) y **`ax_mod2_alternation` RETIRADO el 2026-09-10h** (`4aaf12e`): los dos pasaron a **teorema**. ⚠️ Y `ax_induction` también es hoy teorema: el axioma es su versión **sobre los primitivos** (	extsc{adr}-023, ratificado) |
 
 Cualquier símbolo que aparezca en un `#print axioms` **fuera de esa tabla** es un error del libro,
 no una nota a pie de página.
@@ -733,7 +733,12 @@ Queda en `doc/book/revision/BITACORA.md`.
 - **M-6** (*una medición puede ser un teorema cierto y una conclusión falsa*) → Parte V, y reenvío
   desde el cap. 14. Sale de \textsc{adr}-022.
 - **M-7** (*el censo de los 34: qué axioma es primitivo y qué es teorema disfrazado*) → **es la
-  sección central del cap. 16**, que está en el índice y sin escribir. Incluye el episodio de la
+  sección central del cap. 16**, que está en el índice y sin escribir. ⭐⭐ **Ampliado esa misma
+  tarde con el mejor material del día**: al derivar `ax_mod2_alternation` (**6 → 5** axiomas)
+  apareció un **círculo** que llevaba en el árbol desde junio —`ax21` se «derivaba» de él y él de
+  `ax21`—, invisible **porque pasaba por un `axiom`**. Y lo más incómodo: el análisis correcto ya
+  estaba escrito en `MINIMAL-AXIOMS.md` §3.2 desde el 2026-06-11; lo que faltaba no era medir, era
+  **sacar la consecuencia**. Incluye el episodio de la
   nota falsa que bloqueó tres axiomas durante tres sesiones, y la trampa del `sorry` en un
   `simp set`. Sale de \textsc{adr}-023.
 

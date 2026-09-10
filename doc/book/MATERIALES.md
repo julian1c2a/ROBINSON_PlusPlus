@@ -449,6 +449,36 @@ en el `simp set` un lema **propio dejado en `sorry`** «para medir cuánto falta
 empaquetados compilaron con él — y el lema era **falso**. Un `sorry` en un `simp set` es una regla
 de reescritura arbitraria: **no mide la distancia, la borra**.
 
+### 7.2bis · ⭐⭐ El círculo que un postulado tenía escondido — y llevaba ahí desde junio
+
+**El mejor material del día, y no estaba previsto.** `Full/Mod2.lean` tenía un
+`axiom ax_mod2_alternation : ∀n, mod2(σn) + mod2(n) = 1`, y el diseño que lo introdujo
+(2026-06-11, «Opción C.2») afirmaba **las dos cosas a la vez**:
+
+* *«de `ax_mod2_alternation` salen `ax21` y `ax24` por inducción»* — y así estaba escrita la prueba;
+* *«`ax_mod2_alternation` es derivable de `ax21 + ax16`»*.
+
+Juntas dan un **círculo**. Y el asistente lo aceptaba **porque el círculo pasaba por un `axiom`**:
+la derivación de `ax21` citaba un **postulado**, no un teorema, y ahí la cadena se cortaba. El día
+que el postulado se **demostró** (⇒ **6 → 5** axiomas), el círculo quedó a la vista. **[medido]**
+
+**Cómo se rompe**: no argumentando, **buscando un modelo**. `ax16 + ax17` no fijan el rango de
+`mod2` —uno con `mod2 2̄ = 2̄` los satisface— ⇒ `ax21` carga información independiente y es
+**primitivo**; la alternancia es el **teorema**.
+
+⚠⚠ **Y aquí está lo que hace a esto material de la Parte V y no una anécdota**: ese análisis
+**ya estaba escrito**. `MINIMAL-AXIOMS.md` §3.2, auditoría del **2026-06-11**: *«`ax16+ax17` dejan
+`mod2` **subdeterminado**; cualquier modelo no estándar con `mod2(σn) = 2` cumple ambos»*. Es
+exactamente el modelo. **Lo que faltaba no era medir: era sacar la consecuencia** — y dos párrafos
+más abajo, en el mismo documento, la «solución adoptada» la contradecía. **[medido]**
+
+🔑 **La regla, que vale para el libro entero**: *un documento puede contener a la vez la medición
+correcta y la conclusión incompatible, y nadie lo nota mientras el código compile.* Es §2.6 en su
+forma más dura: el testimonio no falla por mentir, falla por **no cerrarse**.
+
+🔑🔑 Y su recíproca operativa: **cada axioma que se retira AUDITA lo que se apoyaba en él.**
+Retirar un postulado no sólo fortalece — **revisa**.
+
 ### 7.3 · Y lo que el censo no cierra — con una autocorrección dentro
 
 Los once se enuncian `axioms ⊢ axN` con `axN ∈ axioms`: **trivialmente ciertos**. El tipo no
