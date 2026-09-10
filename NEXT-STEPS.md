@@ -4,8 +4,8 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑10e · `master` · 🏁🏁🏁 C3 CERRADO · ✅ ÁRBOL VERDE · ✅ CI VERDE**
-`Build completed successfully (139 jobs)` — **125 módulos** (Minimal 11 + Meta 103 + Full 11) + 0 en
+**Estado 2026‑09‑10f · `master` · 🏁🏁🏁 C3 CERRADO · B1+B2 CERRADAS · ✅ ÁRBOL VERDE · ✅ CI VERDE**
+`Build completed successfully (141 jobs)` — **127 módulos** (Minimal 11 + Meta 105 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
 
 > # 🏁🏁🏁 LO GRANDE DE HOY: **`pcc_lineWF_tracked` ES INCONDICIONAL**
@@ -64,70 +64,68 @@
 
 ---
 
-> # 🎯 SIGUIENTE SESIÓN — **`hbody`(b) · la reflexión punteada de `premsOf`**
+> # 🎯 SIGUIENTE SESIÓN — **la NOVENA obligación del chasis interior, y D3 se cierra**
+
+> D3 sigue en **UNA** obligación, `hbody`, partida por `rfl` en dos mitades. **(a) está PROBADA**
+> desde el 2026‑09‑10e. De **(b)** se cerraron **B1** y **B2**, y de **B3** las **ocho**
+> obligaciones administrativas del chasis interior.
 >
-> D3 sigue en **UNA** obligación, `hbody`, partida por `rfl` en dos mitades. **(a) está PROBADA.**
-> Lo que queda es **(b)**, y ahora se sabe exactamente de qué se compone.
->
-> | mitad | qué es | estado |
+> | pieza | qué es | estado |
 > |---|---|---|
-> | **(a)** `lineWFDotAt` | reflexión de `lineWF` | 🏁 **PROBADA** (`Meta/D3BodyPrf.lean`, incondicional) |
-> | **(b)** `premsDotAt` | reflexión de `boundedPremsIn` | ⬜ tres piezas, abajo |
+> | **(a)** `lineWFDotAt` | reflexión de `lineWF` | 🏁 `Meta/D3BodyPrf.lean`, incondicional |
+> | **B1** | `Prov(premsOfT ṫ ≐ (premsOf t)˙)`, las 21 ramas | 🏁 `Meta/PremsOfDotPrf.lean` |
+> | **B2** | el puente de la **cota** dentro de `Prov` | 🏁 `Meta/D3BodyPrf.lean` §2–§3 |
+> | **B3** | el `pcc_bdAll_intro` interior, **8 de 9** | 🏁 `Meta/PremsBdAllPrf.lean` |
+> | **B3** | **`DEUDA_premsBody`** — la novena | ⬜ **lo ÚNICO que queda de D3** |
 >
-> ## Las tres piezas de (b), en orden
+> ## La novena, con la ruta MEDIDA
 >
-> **B1 · `pcc_eval_premsOf` — la reflexión PUNTEADA de `premsOf`.** El nivel objeto está hecho
-> (§3.63); falta cruzarlo a `Prov`:
+>     DEUDA_premsBody : ∀ r j, premsCF r ⇒ (j < premsBnd r ⇒
+>                          Prov(substfc 0 j̇ (premsPsiPk r)))
 >
->     Prov( premsOfT ṫ = (premsOf t)˙ )
+> **No tiene sorpresas de forma:**
+> * el cuerpo se parte por el `lor` (`prf_substfc_or`);
+> * el disyunto **izquierdo** (`In y nil`) es **vacuo** —`prf_not_in_nil`— y §6 de `D3ChainDotPrf`
+>   ya lo explota dejando su código **ARBITRARIO** (el parámetro `Ac`): **no hay que calcularlo**;
+> * el **derecho** es `boundedCarcLt`, y `pcc_bdCarcLt_reflect` (§5) lo refleja con `y`, `p`, `b`
+>   **abstractos**.
 >
-> Ruta **medida** y ya usada dos veces (`pcc_eval_carc` en `EvalListPrf`, y `pcc_eval_nthc`):
-> instanciar el **axioma CODIFICADO** (`pcc_axiom_inst2/3/4`) con testigos dotados, computar los
-> `substfc`, y transportar `consT ȧ ḃ` a `(cons a b)˙` con `pcc_dot_cons`. Coste esperado: una
-> plantilla por **aridad** (hay 4: 1, 2, 3, 4) + 21 instanciaciones finas. `prf_premsOf_of_tag` ya
-> deja expuesto el `t = etaTag t m k` que hace falta.
+> ⚠️ **La única fricción, y está localizada**: §5 escribe el testigo del `∃` como `liftc 0 ẏ`, y lo
+> que `substCodeF2` produce en esa posición es el **accesor dotado**
+> `nthcT (premsOfT (nthcT q̇ i̇)) j̇`. Es **la MONEDA de §3.55.2 por CUARTA vez**, y las dos piezas
+> que la cruzan **ya existen**: **B2** lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y `pcc_eval_nthc L j`
+> lleva `nthcT L̇ j̇` a `(nthc L j)˙` **bajo `j < lenc L`** — que es exactamente la cota del `∀`
+> interior, o sea **una hipótesis que el `hbody` tiene a mano**.
 >
-> **B2 · el PUENTE DE LA COTA, dentro de `Prov`.** El destino pide
+> ⇒ **El trabajo concreto**: generalizar `pcc_bdCarcLt_reflect` en su `Phic` (hoy fijo a
+> `bdCarcLtPhic`), porque el hueco a reescribir queda **bajo el binder del `exc`** y `pcc_rw` no
+> llega ahí. `PrfH_bdEx_intro_open` **ya es genérico** en `Phic`, así que la generalización es de la
+> **envoltura**, no del núcleo.
 >
->     bdAllCode (lencT (premsOfT (nthcT (liftc 0 q̇) i̇))) ...
+> ⇒ Con ella: `hbdAllPrems_of_body` → `hbody_of_halves` → `d3_prf_of_halves` → **se retira
+> `axiom d3`** (7 → 6 `axiom` de Lean). **Nada más aguas abajo.**
 >
-> y `pcc_bdAll_intro` entrega la cota como **reflexión pura** `tcFn (bndF p)`. La cadena, con B1 en
-> el eslabón de en medio:
->
->     nthcT q̇ i̇  ->  (nthc q i)˙   ✅ `pcc_eval_nthc`  (bajo `i < lenc q`)
->     premsOfT Ẋ  ->  (premsOf X)˙  ⬜ **B1**            (bajo `lineWF X`)
->     lencT L̇     ->  (lenc L)˙     ✅ `pcc_eval_lenc`
->
-> **B3 · el `pcc_bdAll_intro` INTERIOR** de `boundedPremsIn`, con sus nueve obligaciones sobre el
-> **triple empaquetado** `q = ⟨p,i,L⟩`. ⚠️ §7.2 de `D3ChainDotPrf` lo midió: los dos `PsiF` hay que
-> diseñarlos **JUNTOS y de fuera adentro**. El **exterior ya está** (§8, `chainOkBPsi`, casado por
-> `rfl`), así que el interior sale de él como **sub‑término** — `chainOkBPsi_split` lo exhibe. El
-> núcleo abstracto (`pcc_bdCarcLt_reflect`, `pcc_premsBody_reflect`) está probado desde §5–§6.
->
-> ⇒ **Con B1+B2+B3, `hbody_of_halves` cierra `hbody`, `d3_prf_of_halves` cierra D3, y se retira
-> `axiom d3`** (7 → 6 `axiom` de Lean). No hay nada más aguas abajo.
->
-> 🔑🔑 **LAS CINCO REGLAS DEL FRENTE — todas sobre la FORMA, ninguna sobre el tamaño:**
-> 1. **El destino fija la IMAGEN; el CHASIS fija la FORMA de escribirla** ([ADR‑021](DECISIONS.md)).
->    Hacen falta **los dos** cuerpos, y por el puente —dentro de `Prov`— han viajado ya **la forma**
->    (`hmatch`), **la prueba** (`hbdAll_of_dotted`) y **el testigo** (`hwP`).
-> 2. **El ÍNDICE no es cosmético, y van cuatro veces.** `substfc_inv_substCodeF` tiene **tres**
->    variantes no intercambiables, y la **composición** (`substCodeF2`) sube **dos** índices a la vez.
-> 3. ⚠️ **El número de obligaciones abiertas NO mide el progreso.** §3.56 lo subió de 2 a 3 y fue el
->    paso más importante del frente.
+> 🔑🔑 **LAS SEIS REGLAS DEL FRENTE — todas sobre la FORMA, ninguna sobre el tamaño:**
+> 1. 🆕 **ADR‑021, AFINADA** (§3.66.1): lo que rompe la naturalidad del `PsiF` **no es «ser un
+>    `substCodeF`»** — es que **el PARÁMETRO VIAJE DENTRO DE LA FÓRMULA**. Enunciada así predice los
+>    dos casos: en el chasis exterior `hPl` era falsa (el parámetro iba dentro), en el interior es
+>    cierta (el cuerpo es cerrado y los parámetros son sólo testigos).
+> 2. **El ÍNDICE no es cosmético, y van CINCO veces.** La cuarta variante
+>    (`substfc_id_substCodeF2`) sube la guarda de `liftFormula (v+2)` a **`(v+3)`**, porque entre el
+>    nivel actuante y el hueco alto hay **dos** casillas.
+> 3. ⚠️ **El número de obligaciones abiertas NO mide el progreso.**
 > 4. ⚠️ **Que una pieza esté enunciada sobre argumentos ABSTRACTOS no garantiza que el destino se
 >    deje instanciar con ella** (§3.59.3).
-> 5. 🆕 ⚠️ **Una obligación declarada VACUA sin pagarla sigue contando como ABIERTA** (§3.62). Y su
->    gemela: **una obstrucción medida no es una obstrucción probada** — §3.63 la levantó entera.
+> 5. ⚠️ **Una obligación declarada VACUA sin pagarla sigue contando como ABIERTA** (§3.62).
+> 6. ⚠️ **Medir un frente por el TAMAÑO del molde SOBREESTIMA** (§3.61.3): el molde incluye lo ya
+>    comprado. La medida útil se lee de su bloque `export`, no de su `wc -l`.
 >
-> ⛔ **LA TRAMPA QUE MORDIÓ TRES VECES**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`, **`premsOf`**…
-> son **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Abrir el destino hacia su
-> gemelo computable con `prf_*_arith_open`, y **entonces** casar por `rfl`. ⚠️ Y medir sobre la
-> **instancia real**: el gemelo se atasca con argumentos abstractos.
+> ⛔ **LA TRAMPA**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`, `premsOf`… son **símbolos de
+> función OBJETO, no funciones de Lean: NO reducen**. Abrir el destino hacia su gemelo computable
+> con `prf_*_arith_open` y **entonces** casar por `rfl`. ⚠️ Y medir sobre la **instancia real**.
 >
-> ⛔ **Y un VERDE no es haber comprobado**: los controles daban verde **sin comprobar casi nada**
-> (AI‑GUIDE §27.1) y la CI **no había arrancado nunca**. Arreglado; **CI en verde** desde el
-> 2026‑09‑10. Leer **la cifra medida**, no el `✅`.
+> ⛔ **Y un VERDE no es haber comprobado** (AI‑GUIDE §27.1). Leer **la cifra medida**, no el `✅`.
+
 ---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)

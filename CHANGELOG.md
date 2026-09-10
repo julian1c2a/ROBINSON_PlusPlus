@@ -14,6 +14,15 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10f — B1 y B2 CERRADAS, B3 en 8/9.** `Meta/PremsOfDotPrf.lean` (B1:
+> `pcc_eval_premsOf`, `premsOf` dentro de `Prov`, las 21 ramas), `Meta/D3BodyPrf.lean` §2–§3 (B2:
+> la cota cruzada, con `PrfH_pcc_rw` porque los eslabones son condicionales) y
+> `Meta/PremsBdAllPrf.lean` (B3: ocho de nueve, más `substfc_id_substCodeF2` — la cuarta variante
+> de la familia — y la naturalidad de `substCodeF2` en sus dos testigos). ⭐⭐ **ADR‑021 afinada**:
+> lo que rompe la naturalidad es que el **parámetro viaje dentro de la fórmula**, no el
+> `substCodeF` en sí. D3 queda en **una** obligación, `DEUDA_premsBody`, con la ruta medida.
+> Detalle en `doc/REFERENCE-Incompleteness.md` §3.64–§3.66.
+>
 > **2026‑09‑10e — 🏁🏁🏁 C3 CERRADO.** `pcc_lineWF_tracked` es **incondicional**: los 21 tags
 > cableados. Cinco piezas nuevas: `Meta/LiftfcWitnessPrf.lean` (`prf_hasWitF_liftfc`, net‑0 puro),
 > el nodo `tcm` de `STree` con `ind`/`listInd` ⇒ **los SIETE** reflectores, `pcc_tag_vacuous` (que
@@ -22,7 +31,7 @@
 > tag**, las 21 ramas a nivel objeto — la obstrucción de §3.59.2, levantada). Detalle en
 > `doc/REFERENCE-Incompleteness.md` §3.61–§3.63.
 >
-> **Último build verificado:** **139 jobs**, **125 módulos**, 0 errores, 0 warnings, **0 `sorry`** (2026‑09‑09).
+> **Último build verificado:** **141 jobs**, **127 módulos**, 0 errores, 0 warnings, **0 `sorry`** (2026‑09‑09).
 
 ---
 

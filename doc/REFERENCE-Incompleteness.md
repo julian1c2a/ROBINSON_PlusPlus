@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 139 jobs · 125 módulos activos** (Minimal 11 + Meta 103 + Full 11) **+ 0 en `cuarentena/`
+> **Build 141 jobs · 127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -5209,3 +5209,137 @@ Esto es el nivel **OBJETO**. Faltan tres piezas, y ahora se sabe cuáles:
 
 ⇒ Con B1+B2+B3, `hbody_of_halves` cierra `hbody`, `d3_prf_of_halves` cierra **D3**, y se retira
 `axiom d3`. **No hay nada más aguas abajo.**
+
+---
+
+## §3.64 · 🏁🏁 **B1** · `premsOf` REFLEJADO dentro de `Prov` — las 21 ramas (2026‑09‑10f)
+
+> `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
+> Footprint = la base sancionada.
+
+§3.63 evaluó `premsOf` a nivel **OBJETO**. Esto lo cruza a `Prov`:
+
+    ⊢ lineWF t  ⇒  Prov( ⌜ premsOf ṫ = (premsOf t)˙ ⌝ )
+
+con `t` **abstracto** y sólo `lineWF t` de guarda. Es el eslabón que a la **cota** de `hbody`(b)
+le faltaba (§13.1/§13.3 de `D3ChainDotPrf`).
+
+### §3.64.1 · La ruta, que es la de `pcc_eval_carc`
+
+1. **el axioma CODIFICADO** (`pcc_axiom_inst`/`2`/`3`/`4`) instanciado con testigos **dotados**;
+2. abrir hacia el gemelo computable (`prf_substfc_arith_open`) y **casar por `rfl`**;
+3. los `liftc` de los testigos **colapsan** (`prf_liftc_tcFn`);
+4. los `substfc` externos, distribuidos sobre el código explícito;
+5. los subtérminos **cerrados** (`k̄`, `nil`, el `5̄` de `implc`), dotados — **a nivel objeto**;
+6. y el **transporte en cascada** `consT ẋ ẏ ↦ (cons x y)˙`.
+
+⭐ **El paso 6 es lo único que hubo que inventar**, y sale genérico: `pcc_rw_dot_consN` recorre una
+lista entera. ⚠️ Su contrato sobre el contexto `G` es **más fuerte** que el de `pcc_rw`: no basta
+saber qué hace `substfc` sobre `G ⌜v₀⌝`, hace falta que `G` **conmute** con `substfc`, porque la
+recursión mete el prefijo `consT ẋ ·` DENTRO del contexto en cada piso.
+
+### §3.64.2 · ⚠️ Cuatro cosas medidas al escribirlo
+
+* **Con el tag `k` VARIABLE, `substCodeF` no computa** (`numeralM k` lo bloquea) ⇒ el `hcode` sale
+  como **parámetro**, descargado con `rfl` en cada instancia. Es la trampa de §3.53, otra vez.
+* **`nil` es `zero`**, luego `nil = numeralM 0` y su dotado es `prf_tc_numeralM 0`.
+* ⭐ **`implc a b = ⟨5̄, a, b⟩` es un `cons`**, así que el RHS de `mp` —el único tag con premisas
+  reales— se transporta con la **misma** cascada, anidada dos veces. **Cero maquinaria nueva.**
+* Los `substfc` externos de aridad ≥ 3 actúan a **nivel > 0** ⇒ hacen falta las versiones a nivel
+  arbitrario. ⚠️ **No hay decrementos de índice**: tras cada paso las variables que quedan son
+  todas `< v`.
+
+Cuatro plantillas (una por aridad, con RHS `nil`) + `gen` + `mp` + 21 instancias.
+
+---
+
+## §3.65 · 🏁🏁 **B2** · LA COTA de `hbody`(b), cruzada dentro de `Prov` (2026‑09‑10f)
+
+> `Meta/D3BodyPrf.lean` §2–§3. Footprint = la base sancionada.
+
+    ⊢ chainOk nil q ⇒ (i < lenc q ⇒
+        Prov( lencT (premsOfT (nthcT q̇ i̇)) = (lenc (premsOf (nthc q i)))˙ ))
+
+Tres eslabones, con **B1** en el que faltaba:
+
+| eslabón | pieza | guarda |
+|---|---|---|
+| `nthcT q̇ i̇ ↦ (nthc q i)˙` | `pcc_eval_nthc` | `i < lenc q` |
+| `premsOfT Ẋ ↦ (premsOf X)˙` | **`pcc_eval_premsOf`** (B1) | `lineWF X` |
+| `lencT L̇ ↦ (lenc L)˙` | `pcc_eval_lenc` | — |
+
+⚠️ **Los dos primeros son CONDICIONALES**, y eso obliga a reescribir a nivel **`PrfH`**: `pcc_rw`
+pide la igualdad interna como `Prf` y aquí sólo se tiene bajo hipótesis. De ahí **`PrfH_pcc_rw`**,
+que es la misma prueba con `PrfH_leibniz_apply`.
+
+⭐ **Y nótese quién paga qué**: la guarda `lineWF X` del eslabón de en medio la produce
+`prf_lineWF_of_chainOk` — **la misma pieza que usa la mitad (a)**. La dependencia que §13.1 midió
+(«(b) consume el análisis por tags de (a)») queda **materializada en una sola hipótesis**.
+
+### §3.65.1 · El destino, medido por `rfl`
+
+    premsDotAt q i = bdAllCode (lencT (premsOfT (nthcT (liftc 0 (liftc 0 q̇)) (liftc 0 i̇))))
+                               (premsPsi q i)
+
+**Dos** capas de `liftc`, una por cada binder que lo cubre, y **colapsan** a nivel objeto
+(`prf_bnd_collapse`). `pcc_bnd_bridge_at` deja la cota en la forma que `PrfH_bdAllCode_congr_bnd`
+consumirá cuando B3 produzca el `bdAllCode`.
+
+---
+
+## §3.66 · **B3** · el `pcc_bdAll_intro` INTERIOR — ocho de sus nueve (2026‑09‑10f)
+
+> `Meta/PremsBdAllPrf.lean` (nuevo, 580 l.). Footprint = la base sancionada.
+
+### §3.66.1 · ⭐⭐ ADR‑021 se cumple **sola** aquí — y la regla se AFINA
+
+En el chasis EXTERIOR (§3.56) la obligación `hPl` era **FALSA** para el `PsiF` que casaba el
+destino, y de ahí salió ADR‑021: hubo que escribir un `PsiF` **dotado** y puentear dentro de `Prov`.
+Aquí **no hace falta**, y la razón es estructural:
+
+> En `premsPsi q i = substCodeF2 1 (liftc 0 i̇) (liftc 0 (liftc 0 q̇)) premsBodyF`, el cuerpo
+> `premsBodyF` es una fórmula **CERRADA** (menciona sólo `#0`, `#1`, `#2`) y los parámetros entran
+> **sólo como TESTIGOS**.
+
+En el exterior, `q` aparecía **dentro** de la fórmula que se codifica, y `substCodeF` manda cada
+variable al hueco o a un `varc` cerrado **según su nivel** ⇒ el `liftTerm` la movía fuera del hueco.
+
+🔑🔑 ⇒ **La regla de ADR‑021 se afina**: lo que rompe la naturalidad **no es «ser un `substCodeF`»**
+— es que el **PARÁMETRO VIAJE DENTRO DE LA FÓRMULA**. Enunciada así, predice los dos casos.
+
+### §3.66.2 · Lo que hubo que construir
+
+* **`liftTerm_substCodeF2` / `substTerm_substCodeF2`** (+ los gemelos de términos): la naturalidad
+  de `substCodeF2` en sus **dos** testigos. No existían.
+* ⭐ **`substfc_id_substCodeF2`** — la **CUARTA** variante de la familia `substfc_inv_*`: nivel
+  actuante uno por debajo del **más bajo** de los dos huecos. ⚠️ **Y el índice sigue sin ser
+  cosmético** (van cinco veces): la guarda pasa de `liftFormula (v+2)` a **`liftFormula (v+3)`**,
+  porque entre el nivel actuante y el hueco alto hay **dos** casillas. Con `v := 0` eso dice
+  exactamente que el cuerpo menciona a lo sumo `#0`, `#1`, `#2` — que es lo que `boundedPremsIn`
+  cumple.
+* Las **ocho** obligaciones administrativas sobre el triple empaquetado `⟨p,i,L⟩`.
+* `hwPsi`, por el mismo dividendo que §10.4: **abrir el `substCodeF2` hacia su forma DOTADA** (dos
+  `substfc` sobre un `formCode` cerrado) y aplicar dos veces la rama C de ADR‑020. Es la **cuarta**
+  vez que el par dotado/computable paga en este frente.
+
+### §3.66.3 · La NOVENA, enunciada — y su ruta, medida
+
+`DEUDA_premsBody` es lo único que queda de D3. **Y su ruta no tiene sorpresas de forma:**
+
+* el cuerpo se parte por el `lor` (`prf_substfc_or`);
+* el disyunto **izquierdo** (`In y nil`) es **vacuo** —`prf_not_in_nil`— y §6 ya lo explota dejando
+  su código **ARBITRARIO** (el parámetro `Ac`): no hay que calcularlo;
+* el **derecho** es `boundedCarcLt`, y `pcc_bdCarcLt_reflect` (§5) lo refleja con `y`, `p`, `b`
+  **abstractos**.
+
+⚠️ **La única fricción, y está localizada**: §5 escribe el testigo del `∃` como `liftc 0 ẏ`, y lo
+que `substCodeF2` produce en esa posición es el **accesor dotado**
+`nthcT (premsOfT (nthcT q̇ i̇)) j̇`. Es **la misma moneda de §3.55.2 por CUARTA vez**, y las dos
+piezas que la cruzan **ya existen**: **B2** lleva `premsOfT (nthcT q̇ i̇)` a `L̇`, y
+`pcc_eval_nthc L j` lleva `nthcT L̇ j̇` a `(nthc L j)˙` **bajo `j < lenc L`** — que es exactamente
+la cota del `∀` interior, o sea una hipótesis que el `hbody` **tiene a mano**.
+
+⇒ Lo que hace falta es **generalizar `pcc_bdCarcLt_reflect` en su `Phic`** (hoy fijo a
+`bdCarcLtPhic`), porque el hueco a reescribir queda **bajo el binder del `exc`** y `pcc_rw` no
+llega ahí. `PrfH_bdEx_intro_open` ya es genérico en `Phic`, así que la generalización es de la
+envoltura, no del núcleo.

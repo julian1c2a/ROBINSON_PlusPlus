@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 139 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **125 módulos activos** (Minimal 11 + Meta 103 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 141 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **127 módulos activos** (Minimal 11 + Meta 105 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -59,7 +59,7 @@ proyecto; no introduce ninguna nueva.
 | **M-4** | **Cero `sorry` en el árbol activo.** No se «aparca» una prueba con `sorry`: o entra probada, o se queda en `sondeos/` | — | `bash check-sorry.bash` → `✅ No sorry found.` (cuenta el TOKEN, fuera de comentarios y cadenas; AI-GUIDE §27.1) |
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
 | **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
-| **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) se escribe con símbolos de función OBJETO**, nunca con un `substCodeF` sobre una fórmula que lleve el parámetro. No es preferencia: la obligación de naturalidad `hPl` es **FALSA** en el segundo caso | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
+| **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
 
 > **Sobre `Classical.*`**: este proyecto **no** lo prohíbe (2 usos verificados el
 > 2026-07-12). Lo que sí mantiene es la disciplina de **cero axiomas espurios** de M-1.
@@ -1132,6 +1132,27 @@ la decisión prometía.
 ---
 
 ## ADR-021: El `PsiF` de un chasis inductivo se escribe con símbolos OBJETO — y por eso hacen falta DOS cuerpos
+
+> ⭐⭐ **PRECISADO el 2026‑09‑10f** (`doc/REFERENCE-Incompleteness.md` §3.66.1). El chasis
+> **INTERIOR** de D3 (`boundedPremsIn`, `Meta/PremsBdAllPrf.lean`) tiene un `PsiF` que **SÍ** es un
+> `substCodeF2` y cuya `hPl` **es cierta**. La diferencia con el exterior no es el `substCodeF`:
+>
+> | chasis | `PsiF` | ¿natural? | por qué |
+> |---|---|---|---|
+> | exterior (`chainOkB`) | `substCodeF 1 (liftc 0 q̇) (lineOkB nil ↑q #0)` | ❌ | `q` va **dentro de la fórmula** |
+> | interior (`boundedPremsIn`) | `substCodeF2 1 (liftc 0 i̇) (liftc 0 (liftc 0 q̇)) premsBodyF` | ✅ | cuerpo **CERRADO**; `q`,`i` son **sólo testigos** |
+>
+> 🔑 **La regla, bien enunciada**: lo que rompe la naturalidad **no es «ser un `substCodeF`»** — es
+> que el **PARÁMETRO VIAJE DENTRO DE LA FÓRMULA**. `substCodeF` manda cada variable **al hueco o a
+> un `varc` cerrado según su nivel**; si el parámetro está dentro, `liftTerm` lo cambia de nivel y
+> por tanto de destino. Si es sólo testigo, `substCodeF` lo copia tal cual y `liftTerm` lo
+> atraviesa.
+>
+> ⚠️ **La forma vieja no era falsa, era demasiado gruesa**, y una regla que sobre‑prohíbe cuesta
+> trabajo inventado: enunciada así, en el chasis interior `hPl`/`hPs` salen con dos inducciones
+> mecánicas (`liftTerm_substCodeF2`, `substTerm_substCodeF2`) y **no hace falta ningún par
+> dotado/computable**.
+
 
 **Fecha**: 2026-09-10
 **Estado**: Aceptado — ⚠️ **forzado por una medición, no elegido**. La alternativa está
