@@ -6,7 +6,7 @@
 
 **Estado 2026‑09‑10h · `master` · 🏁 MÓDULO E · 🏁 `coreAxioms` 11/11 · ✅ ÁRBOL VERDE · ✅ CI VERDE**
 `Build completed successfully (142 jobs)` — **128 módulos** (Minimal 11 + Meta 106 + Full 11) + 0 en
-`cuarentena/` · 61 `sondeos/` · **6 `axiom` de Lean · 0 sorrys**.
+`cuarentena/` · 61 `sondeos/` · **5 `axiom` de Lean · 0 sorrys**.
 
 > # 🎯 LO DE HOY (2026‑09‑10h) — tres cosas, y una de ellas **es un frente nuevo**
 >
@@ -212,7 +212,7 @@
 >
 > La **tercera condición de derivabilidad** es un **teorema**. `GodelTwo.d3` pasa de `axiom` a
 > `theorem` ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres**, y `goedel_second'` ya no
-> depende de `d3`. **6 `axiom` de Lean** (eran 7).
+> depende de `d3`. **5 `axiom` de Lean** (eran 7).
 >
 > | pieza | estado |
 > |---|---|
@@ -241,10 +241,12 @@
 >    ratificó `axiom ax_induction_prim : primAxioms ⊢ inductionFormula φ` + `ax_induction` como
 >    **teorema**: **no añade axioma, lo MUEVE** ⇒ siguen **6**. `Full/Induction.lean` migrado entero.
 >    ⚠️ **NO** mueve la frontera de la teoría — eso era un error mío, corregido en el ADR.
->    ⬜ **Lo que queda, y es una decisión tuya**: ax21/ax24 piden una **segunda** sanción sobre
->    **`ax_mod2_alternation`**. ⚠️ **Antes de moverlo, medir si es derivable**: está documentado como
->    «teorema en sistemas con inducción», y si lo es el inventario baja de **6 a 5** en vez de
->    quedarse igual.
+>    🏁 **Y la pregunta previa se contestó el mismo día: `ax_mod2_alternation` ERA DERIVABLE** ⇒
+>    **retirado, 6 → 5 `axiom` de Lean**. ⚠️⚠️ Al retirarlo apareció una **CIRCULARIDAD**: `ax21` se
+>    «derivaba» de él y él de `ax21`. Medido cuál es el primitivo (`ax16 + ax17` admiten
+>    `mod2 2̄ = 2̄`) ⇒ **`ax21` es PRIMITIVO**, el censo pasa a **24 + 10**, y de los 10 derivables
+>    están **9 certificados**. ⬜ Queda **ax24**: falta migrar `Full/Mod2.lean` a `primAxioms`, que
+>    arrastra `teo_1_3`/`teo_2_9` de `Block1`. **Medible, no pedido.**
 >
 > 🔑🔑 **LAS SEIS REGLAS DEL FRENTE, todas sobre la FORMA:**
 > 1. **ADR‑021, AFINADA**: lo que rompe la naturalidad del `PsiF` **no es «ser un `substCodeF`»**,

@@ -9,7 +9,7 @@
 >
 > **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -1513,10 +1513,36 @@ ax21 y ax24 se derivan en `Full/Mod2.lean`, y ahí:
    tenía `ax_induction`. Certificar ax21/ax24 exige moverlo igual, y eso es **otra decisión M‑1**.
 2. Además usa dos teoremas de `Block1` (`teo_1_3`, `teo_2_9`) enunciados sobre `axioms`.
 
-⚠️ **Y hay una pregunta previa que conviene contestar antes de mover nada**: `ax_mod2_alternation`
-está documentado como *«teorema en sistemas con inducción»*. Si lo es, lo correcto no es moverlo
-sino **derivarlo** de `primAxioms` + inducción — con lo que el inventario bajaría de **6 a 5**.
-**Medir antes de prometer.**
+### 🏁 Addendum 2026‑09‑10h — la pregunta previa se contestó, y el inventario bajó a **5**
+
+`ax_mod2_alternation` **era derivable**, y no hubo que moverlo: **se retiró**. De `ax21` (rango) +
+`ax16` (el bicondicional) + `ax4` + `zero_add` + `teo_1_11` (`0 ≠ 1`). ⇒ **6 → 5 `axiom` de Lean.**
+
+⚠️⚠️ **Y al retirarlo se hizo visible una CIRCULARIDAD que el censo no había visto.** El diseño de
+2026‑06‑11 («Opción C.2») afirmaba las dos cosas a la vez:
+
+* *«de `ax_mod2_alternation` salen `ax21` y `ax24` por inducción»* — y así estaba escrito
+  `mod2_range_ax`;
+* *«en `Minimal`, `ax_mod2_alternation` es derivable de `ax21 + ax16`»*.
+
+Juntas dan un **círculo**. Mientras uno de los dos fue **`axiom`**, el círculo no se veía: Lean lo
+aceptaba porque pasaba por un postulado.
+
+🔑 **Cuál es el primitivo, medido y no argumentado**: `ax16 + ax17` **no** fijan el rango de `mod2`.
+Un modelo con `mod2 2̄ = 2̄` los satisface — `ax17` sólo pide `div2(2̄)·2̄ + mod2(2̄) = 2̄`, que con
+`div2(2̄) = 0̄` encaja, y `ax16` en `2̄` se cumple vacuamente. ⇒ **`ax21` carga información
+independiente y es PRIMITIVO**; la alternancia es el **teorema**.
+
+⇒ **El censo se corrige: `coreAxioms` = 24 primitivos + 10 derivables** (era 23 + 11), `ax21` entra
+en `primAxioms`, y `mod2_range_ax` deja de fingir que deriva algo: cita el axioma.
+
+⬜ Queda **ax24** por certificar sobre los primitivos — su derivación ya es honesta (pasa por la
+alternancia **demostrada**); falta migrar `Full/Mod2.lean`, que arrastra `teo_1_3`/`teo_2_9` de
+`Block1`. **Medible, no pedido.**
+
+🔑🔑 **La lección, y va a la lista de reglas**: *un postulado puede estar ocultando un círculo, y el
+círculo sólo se ve al retirarlo.* Es la recíproca de M‑1 (ningún axioma sin ADR): **cada axioma que
+se retira audita lo que se apoyaba en él.**
 
 ### Consecuencias operativas
 

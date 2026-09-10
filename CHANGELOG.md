@@ -14,6 +14,17 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10h (f) — 🏁🏁 `ax_mod2_alternation` DERIVADO: 6 → 5 `axiom` de Lean. Y destapa una
+> CIRCULARIDAD del censo.** El postulado `∀n, mod2(σn) + mod2(n) = 1` **era derivable** —de `ax21`
+> (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`— y su propio docstring ya lo decía. Se retira.
+> ⚠️⚠️ Al retirarlo se hizo visible que **`ax21` se «derivaba» de él y él de `ax21`**: un **círculo
+> en contenido**, invisible mientras uno de los dos fuese `axiom`. 🔑 **Cuál es el primitivo,
+> medido**: `ax16 + ax17` **no** fijan el rango de `mod2` — un modelo con `mod2 2̄ = 2̄` los
+> satisface — ⇒ **`ax21` es PRIMITIVO** y la alternancia es el teorema. El censo se corrige de
+> **23 + 11** a **24 + 10**, `ax21` entra en `primAxioms` y `mod2_range_ax` deja de fingir que
+> deriva algo. 🔑🔑 **La regla que deja**: *un postulado puede estar ocultando un círculo, y el
+> círculo sólo se ve al retirarlo* — **cada axioma retirado audita lo que se apoyaba en él**.
+>
 > **2026‑09‑10h (e) — 🏁 ADR‑023 RATIFICADO: el esquema de inducción baja a `primAxioms`, y el
 > censo queda CERTIFICADO 9 de 11.** El propietario ratificó la forma exacta:
 > `axiom ax_induction_prim (φ) : primAxioms ⊢ inductionFormula φ` más `ax_induction` como

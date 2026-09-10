@@ -5,7 +5,7 @@
 > **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 61 en `sondeos/`** (experimentos compilados, fuera del build).
-> **6 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
+> **5 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
 >
@@ -188,7 +188,7 @@ Los **31** módulos que la reparación (ADR‑012/013) apartó **han vuelto todo
 sancionado y **sin cambiar ningún enunciado público**. El directorio conserva sólo su `README` como
 registro del episodio. Ver [`cuarentena/README.md`](cuarentena/README.md) y §3.26.
 
-> **6 `axiom` de Lean** (tras F7a): 3 esquemas de inducción (`Full/`), TFA (`Block8.ax_p_tfa`),
+> **5 `axiom` de Lean** (tras F7a): 3 esquemas de inducción (`Full/`), TFA (`Block8.ax_p_tfa`),
 > 2 anclas de codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`), y `d3` (único postulado
 > gödeliano vivo). Inventario en **[`AXIOMS.md`](AXIOMS.md)**. Ninguna es un `sorry` (ADR‑010).
 >
@@ -299,7 +299,7 @@ Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.m
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
 **Estado 2026‑09‑10h.** Build **142 jobs**, **128 módulos activos**, **61 `sondeos/`**, 0 sorrys,
-**6** `axiom` de Lean (`d3` retirado el 2026‑09‑10g).
+**5** `axiom` de Lean (`d3` retirado el 2026‑09‑10g).
 
 ### Lo que está cerrado
 

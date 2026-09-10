@@ -137,10 +137,17 @@ del censo.
 
 | clase | cuántos | cuáles | por qué |
 |---|---|---|---|
-| **PRIMITIVOS / DEFINITORIOS** | **23** | ax2, ax3 (Peano) · ax4, ax5 (definen `+`) · ax8, ax9 (definen `·`) · ax13 (define `<`) · ax14, ax15 (caracterizan `√`) · ax16, ax17 (caracterizan `mod2`/`div2`) · ax25, ax26 (definen `pred`) · ax_L0, ax_L1, ax_L2 (definen `cons`/`In`) · ax_C1, ax_C2 (definen `concat`) · ax29 (caracteriza la resta truncada) · ax_pow_zero, ax_pow_succ · ax_prodp_nil, ax_prodp_cons | **irreducibles**: fijan el significado de un símbolo. Nada que derivar |
-| **DERIVABLES CON INDUCCIÓN** | **11** | ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax21, ax24, ax_C3, ax_L3 | consecuencias de las ecuaciones definitorias **+ inducción** ⇒ **deben ser teoremas en `Full`** |
+| **PRIMITIVOS / DEFINITORIOS** | **24** | ax2, ax3 (Peano) · ax4, ax5 (definen `+`) · ax8, ax9 (definen `·`) · ax13 (define `<`) · ax14, ax15 (caracterizan `√`) · ax16, ax17, **ax21** (caracterizan `mod2`/`div2`) · ax25, ax26 (definen `pred`) · ax_L0, ax_L1, ax_L2 (definen `cons`/`In`) · ax_C1, ax_C2 (definen `concat`) · ax29 (caracteriza la resta truncada) · ax_pow_zero, ax_pow_succ · ax_prodp_nil, ax_prodp_cons | **irreducibles**: fijan el significado de un símbolo. Nada que derivar |
+| **DERIVABLES CON INDUCCIÓN** | **10** | ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax24, ax_C3, ax_L3 | consecuencias de las ecuaciones definitorias **+ inducción** ⇒ **deben ser teoremas en `Full`** |
 
-#### (c) 🏁 **Estado: 11 de 11.** Y los tres últimos cayeron hoy
+⚠️⚠️ **Corregido el 2026‑09‑10h: era 23 + 11, con `ax21` en la columna equivocada.** Su «derivación»
+en `Full/Mod2.lean` usaba `ax_mod2_alternation`, y **ése se deriva de `ax21`** ⇒ **círculo en
+contenido**, invisible mientras la alternancia fue un `axiom`. Medido cuál es el primitivo:
+**`ax21`** — `ax16 + ax17` **no** fijan el rango de `mod2` (un modelo con `mod2 2̄ = 2̄` los
+satisface). ⇒ la alternancia es el **teorema**, y el postulado **se retiró**: **6 → 5** `axiom` de
+Lean. Detalle en el addendum de [ADR‑023](../DECISIONS.md).
+
+#### (c) 🏁 **Estado: 10 de 10.** Y cuatro de ellos cayeron el 2026‑09‑10h
 
 | axioma | teorema en `Full` | fichero |
 |---|---|---|
@@ -151,7 +158,6 @@ del censo.
 | **ax12 `mul_distrib`** | 🆕 **`mul_distrib_thm`** | `Full/Induction.lean` |
 | ax18 `lt_irrefl` | `lt_irrefl_thm` | `Full/Induction.lean` |
 | ax19 `lt_trichotomy` | `lt_trichotomy_thm` | `Full/Induction.lean` |
-| ax21 `mod2_range` | `mod2_range_thm` | `Full/Mod2.lean` |
 | ax24 `mod2_of_even` | `mod2_of_even_thm` | `Full/Mod2.lean` |
 | ax_C3 `concat_assoc` | `concat_assoc_thm` | `Full/Lists.lean` |
 | ax_L3 `in_concat` | `in_concat_thm` | `Full/Lists.lean` |

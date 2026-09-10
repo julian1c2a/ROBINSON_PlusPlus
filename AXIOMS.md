@@ -9,7 +9,7 @@
 >
 > **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **6 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -56,7 +56,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 
 ---
 
-## 1 · Axiomas de Lean en ROBINSON_PlusPlus (6)
+## 1 · Axiomas de Lean en ROBINSON_PlusPlus (5)
 
 > ⚠️ Esta cabecera decía **(7)** con la fila 7 tachada justo debajo. Lo cazó
 > `doc/book/AUDITORIA-2026-09-10.md` R3.
@@ -65,7 +65,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 |---|--------|--------|---------|------------|
 | 1 | **`ax_induction_prim`** | `Full/Induction.lean` | Esquema de inducción | Axioma legítimo de la teoría objeto (IΣ₁/PA), **sobre los 23 primitivos**: `primAxioms ⊢ inductionFormula φ`. 🆕 **RATIFICADO el 2026‑09‑10h** ([ADR‑023](DECISIONS.md)) — dice lo que `Full` significa: *los primitivos **más** el esquema*. ⚠️ `ax_induction` (sobre `axioms`) **ya NO es un `axiom`**: es teorema por debilitamiento ⇒ el recuento **no sube** |
 | 2 | `ax_list_induction` | `Full/Lists.lean` | Esquema de inducción | Inducción estructural sobre listas del objeto |
-| 3 | `ax_mod2_alternation` | `Full/Mod2.lean` | Esquema de inducción | `∀n. mod2(σn)+mod2(n)=1`; con él se derivan ax21/ax24 como **teoremas** |
+| ~~3~~ | ~~`ax_mod2_alternation`~~ | ~~`Full/Mod2.lean`~~ | 🏁 **RETIRADO el 2026‑09‑10h** | Era `∀n, mod2(σn) + mod2(n) = 1`. Hoy es **teorema**, derivado de `ax21` (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`. ⚠️ Su propio docstring ya decía que en `Minimal` era derivable; lo que ocultaba era una **circularidad**: `ax21` se «derivaba» de él, y él de `ax21`. Medido cuál es el primitivo: **`ax21`** (`ax16 + ax17` admiten `mod2 2̄ = 2̄`) |
 | 4 | `ax_p_tfa` | `Minimal/Theorems/Block8.lean` | Teoría objeto | Teorema Fundamental de la Aritmética (teorema en Full, postulado en Minimal) |
 | 5 | `ax_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) |
 | 6 | `prf_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`Prf (axiomsCodeT =eq listFormCodeM axioms)`** — espejo `Prf` de (5) para el cálculo finitario. **Reemplaza a `prf_inAxC`** (2026‑07‑20, `25d255b`), que pasa a ser **teorema** derivado (**net‑0 axiomas**). D1 `repr_pos'_prf` cita ahora éste |
@@ -92,12 +92,18 @@ certificados sobre `primAxioms` (7 en `Full/Induction.lean`, 2 en `Full/Lists.le
 **FALSO** (con `Γ = []` haría la inducción **lógicamente válida**). Un axioma **tiene que nombrar su
 contexto**; `ax_list_induction` puede ser genérico porque es una **regla**, no un axioma.
 
-⬜ **Los 2 que faltan (ax21, ax24) piden una SEGUNDA sanción, y no se ha pedido.** Sus derivaciones
-(`Full/Mod2.lean`) pasan por **`ax_mod2_alternation`**, que es otro `axiom` **sobre `axioms`** —
-misma situación que tenía `ax_induction`—, y además usan dos teoremas de `Block1` (`teo_1_3`,
-`teo_2_9`) enunciados sobre `axioms`. ⚠️ Y hay una pregunta previa que conviene contestar antes de
-mover nada: `ax_mod2_alternation` está documentado como *«teorema en sistemas con inducción»*, así
-que quizá lo correcto no sea moverlo sino **derivarlo** de `primAxioms` + inducción.
+🏁 **Y la pregunta previa se contestó el mismo día: `ax_mod2_alternation` era DERIVABLE.** No hubo
+que moverlo: **se retiró**, y el inventario bajó de **6 a 5**.
+
+⚠️⚠️ **Pero eso destapó una circularidad y obligó a corregir el censo.** `ax21` se «derivaba» de
+`ax_mod2_alternation`, y `ax_mod2_alternation` se deriva de `ax21`. Mientras uno de los dos fue
+**axioma**, el círculo no se veía. Medido cuál es el primitivo: **`ax21`** — `ax16 + ax17` **no**
+fijan el rango de `mod2` (un modelo con `mod2 2̄ = 2̄` los satisface). ⇒ el censo pasa de
+**23 + 11** a **24 + 10**, y `ax21` entra en `primAxioms`.
+
+⬜ Queda **ax24** por certificar sobre los primitivos (su derivación ya es honesta: pasa por la
+alternancia **demostrada**). Falta migrar `Full/Mod2.lean` a `primAxioms`, que arrastra dos teoremas
+de `Block1` (`teo_1_3`, `teo_2_9`) enunciados sobre `axioms`. **No pedido, y medible.**
 
 ### Detalle por familia
 
