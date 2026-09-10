@@ -371,3 +371,100 @@ hecho: `Meta/Hilbert.lean` está fuera del ámbito de escritura del libro (§0).
 
 El libro lo imprime como un `muro` en el capítulo 13, con las dos definiciones extraídas del repo
 una debajo de otra, que es la única manera de que no se confundan.
+
+---
+
+## M-6 · Cuando una medición es un teorema CIERTO y una conclusión FALSA
+
+**Destino:** capítulo 24 o 25 de la Parte V («Lo que no sale en los libros»), como pieza propia —
+*el error de método que más caro sale, y no es equivocarse*. Con reenvío desde el capítulo 14.
+**Origen:** \textsc{adr}-022, 10 de septiembre de 2026. **Estatuto: [medido]** — los dos ficheros
+compilan.
+
+### 6.1 · El caso
+
+Al decidir si había que estrechar la clase de testigos de la $\omega$-consistencia apareció un
+sondeo **compilado, de semanas antes** (`sondeos/MedirF_Censo.lean` §4) que concluía lo contrario:
+
+> *«¿hay que cambiar `StdChain`? **NO**: `NumTree` ya la subsume»*
+
+apoyado en un teorema, `numTree_of_isCodeShaped`, que **es verdadero**: todo término de la clase
+tiene un valor numérico.
+
+### 6.2 · Por qué la conclusión no se sigue
+
+Porque el consumidor real, `numTree_ne`, no necesita que el valor **exista**: necesita **decidir**
+`m ≠ n` a nivel meta. Y calcular ese valor es inviable — el propio sondeo lo mide:
+`codeNat (⊥⇒⊥) = 583 734`, con `triN` en recursión unaria. Para la sentencia de Gödel, astronómico.
+
+⇒ La obligación **existía y no era descargable**. La clase quedaba «cubierta» y el frente,
+bloqueado. **[medido]**
+
+### 6.3 · La regla, que quedó como \textsc{mandatory} M-8
+
+**Subsumir la CLASE no es descargar la OBLIGACIÓN.** Ante un «X ya cubre Y, no hay que tocar nada»,
+la pregunta no es si el teorema es cierto: es **qué obligación queda después**, y si se puede pagar.
+
+### 6.4 · Lo que del sondeo sí sobrevivió, y esto es lo que lo hace buen material
+
+Una medición sobre-concluida **no se tira: se le recorta el alcance**. `numTree_ne` y las cotas
+`consN_ge` / `codeNat_ge : 3 ≤ codeNat φ` siguen siendo la herramienta correcta para los choques
+contra numerales **pequeños**, por aritmética **acotada** en vez de por cómputo — que es una idea
+bonita y publicable por sí sola. **[medido]**
+
+---
+
+## M-7 · El censo de los 34: qué axioma es primitivo y qué axioma es teorema disfrazado
+
+**Destino:** capítulo 16 («La inducción como precio»), como su sección central; el capítulo ya
+existe en el índice y está sin escribir. Reenvío desde el capítulo 4 (M-4 hace la mitad del
+trabajo: cuenta el vocabulario; esto cuenta la **redundancia**).
+**Origen:** pregunta del autor, 10 de septiembre de 2026. **Estatuto: [medido]**.
+
+### 7.1 · El planteamiento correcto no es «todos»
+
+*«En `Full` deberían demostrarse como teoremas todos los axiomas de `Minimal`»* — **no todos**: una
+ecuación que **define** un símbolo de función no la deriva ningún esquema de inducción; sin ella el
+símbolo no significa nada. El censo separa las dos clases:
+
+| clase | nº | ejemplos |
+|---|---:|---|
+| **primitivos / definitorios** | **23** | Peano; las ecuaciones de $+$, $\cdot$, $<$, $\sqrt{\ }$, `mod2`, `pred`, listas, $\hat{}$, $\Pi_p$; el testigo del monus |
+| **derivables con inducción** | **11** | conmutatividad y asociatividad de $+$ y $\cdot$, distributividad, irreflexividad y tricotomía del orden, `mod2`, asociatividad de `##`, `In` sobre `##` |
+
+**Los 11 están demostrados** en `Full`. **[medido]**
+
+### 7.2 · El episodio que lo hace material de libro
+
+Los tres últimos (asociatividad de $+$ y $\cdot$, distributividad) llevaban **tres sesiones**
+bloqueados por una nota en el código que decía que el empaquetado $\forall^3$ «topa con el ajuste
+de niveles `liftTerm`» y hacía falta «un helper de empaquetado n-ario».
+
+**La nota era falsa.** No hacía falta ningún helper: el hueco que quedaba tras los dos `gen` ya
+tenía su lema en la librería desde siempre (`FOL.substTerm_liftLift`). **Cuatro líneas por axioma.**
+**[medido]**
+
+⚠️ Y en el camino, una trampa que merece su propio recuadro en la Parte V: el primer intento metió
+en el `simp set` un lema **propio dejado en `sorry`** «para medir cuánto falta». Los **tres**
+empaquetados compilaron con él — y el lema era **falso**. Un `sorry` en un `simp set` es una regla
+de reescritura arbitraria: **no mide la distancia, la borra**.
+
+### 7.3 · Y lo que el censo no cierra — con una autocorrección dentro
+
+Los once se enuncian `axioms ⊢ axN` con `axN ∈ axioms`: **trivialmente ciertos**. El tipo no
+certifica la redundancia; sólo la prueba lo hace.
+
+Al anotar esto por primera vez se escribió que certificarlo *«mueve la frontera de la teoría»*.
+**Confunde dos cosas**, y sólo una es cierta:
+
+| | qué se hace | ¿mueve la frontera? |
+|---|---|---|
+| **certificar** | añadir `primAxioms ⊆ axioms` y probar `primAxioms ⊢ axN` | **no**: `axioms` queda intacta |
+| **estrechar** | **quitar** los 11 de `axioms` | **sí** — y por eso no se hace |
+
+⇒ \textsc{adr}-023, con dos hallazgos que lo abaratan: el debilitamiento es un **constructor** del
+cálculo, no un lema; y **ninguna** de las 46 citaciones de axioma de la capa `Full` es circular.
+**2 de 11 certificados**; los 9 restantes esperan una decisión, porque el esquema de inducción es un
+**axioma** y un axioma **tiene que nombrar su contexto** — generalizarlo a «todo contexto» lo haría
+**falso**. **[medido]**
+

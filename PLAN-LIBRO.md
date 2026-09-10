@@ -728,6 +728,21 @@ Queda en `doc/book/revision/BITACORA.md`.
 **Falta escribir**: de la Parte IV, los capítulos 16 y 17; diez capítulos de la Parte V (19-21,
 23-29); y tres apéndices (inventario de axiomas, mapa de módulos, trampas de Lean).
 
+🆕 **Cantera nueva del 2026-09-10h**, y las dos entradas tienen capítulo destino ya:
+
+- **M-6** (*una medición puede ser un teorema cierto y una conclusión falsa*) → Parte V, y reenvío
+  desde el cap. 14. Sale de \textsc{adr}-022.
+- **M-7** (*el censo de los 34: qué axioma es primitivo y qué es teorema disfrazado*) → **es la
+  sección central del cap. 16**, que está en el índice y sin escribir. Incluye el episodio de la
+  nota falsa que bloqueó tres axiomas durante tres sesiones, y la trampa del `sorry` en un
+  `simp set`. Sale de \textsc{adr}-023.
+
+⚠️ **Y el cap. 14 quedó corregido el mismo día en que se escribió**: su sección «la cifra incómoda»
+afirmaba que el bloqueo de `NegVerifier` era la inyectividad de la codificación «que vive en un
+sondeo, fuera del build». **Es falso** —está en producción desde el 2 de septiembre— y la frase se
+había copiado de un plan del proyecto en vez de medirse. Es §2.6 aplicándose **hacia dentro**: el
+libro también es testimonio, no evidencia.
+
 **Siguiente sesión**, por este orden: (1) `make subir` desde el shell del autor — hay además
 renombrados de fichero pendientes de registrar; (2) `make axiomas` con Lean en el PATH — **los 67
 fragmentos de producción siguen marcados «declarado, sin medir»**, que es la verdad, y es hoy el

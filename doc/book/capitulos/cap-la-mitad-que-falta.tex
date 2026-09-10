@@ -134,9 +134,31 @@ exactamente Markov.
 \ident{NegVerifier} está escrito. Está enunciado con precisión, tiene su papel claro en la cadena y
 dos teoremas lo consumen como hipótesis.
 
-\textbf{Y no hay ni un teorema en producción que lo concluya.} Medido el 10 de septiembre de 2026:
-cero. Lo que lo bloquea —la inyectividad de la codificación numérica— vive en un sondeo, fuera del
-build.
+\textbf{Y no había ni un teorema en producción que lo concluyera.} Así se midió al escribir este
+capítulo, la mañana del 10 de septiembre de 2026: cero.
+
+\begin{observacion}[Corregido esa misma tarde, y las dos mitades de la corrección importan]
+La frase de arriba se quedó a medias en unas horas, y la parte que se cayó no es la que parece.
+
+Lo que \textbf{sigue siendo cierto} es que ningún teorema concluye \ident{NegVerifier} de manera
+incondicional. Lo que \textbf{dejó de serlo}: ya no es cierto que no haya nada. Existe
+\ident{negVerifier_of_deudas}, que lo concluye \textbf{a partir de dos obligaciones enunciadas},
+\ident{DEUDA_chainNeg} y \ident{DEUDA_inNeg}; y la solidez estructural del verificador —el módulo
+que el plan llamaba «el corazón» y estimaba en 300--500 líneas— resultó estar \textbf{ya
+demostrada}: \ident{verifier_sound} \emph{es} \ident{decodeChain_prf}.
+
+Y lo que era \textbf{directamente falso} es la causa que esta sección daba: «lo que lo bloquea
+—la inyectividad de la codificación numérica— vive en un sondeo, fuera del build». No: \ident{consN_inj}
+y \ident{codeNat_ne} están en producción desde el 2 de septiembre. Lo dice la propia auditoría de
+este libro, y es un buen ejemplo de por qué §2.6 vale también \emph{hacia dentro}: la frase se
+copió de un plan del proyecto en vez de medirse.
+
+El bloqueo real era otro, y hubo que medirlo: la clase de testigos admitía basura cuya refutación
+exigía \textbf{evaluar el emparejamiento de Cantor}, que es inviable. Se estrechó
+(\textsc{adr}-022), con el precio escrito —la $\omega$-consistencia queda algo más fuerte— y con
+la garantía que lo hace admisible: el código de \emph{cualquier} derivación real sigue siendo un
+testigo de la clase.
+\end{observacion}
 
 \avisomediagodel
 
@@ -151,7 +173,7 @@ pieza & estado \\
 \midrule
 el argumento $\noderives\lnot G$ desde la reflexión & \textbf{demostrado} \\
 la reducción reflexión $\leftarrow$ $\omega$-consistencia $+$ verificador negativo & \textbf{demostrada} \\
-el verificador negativo & \textbf{enunciado, sin construir} \\
+el verificador negativo & \textbf{reducido a dos obligaciones con nombre} \\
 \bottomrule
 \end{tabularx}
 \end{center}

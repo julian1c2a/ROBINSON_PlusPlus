@@ -487,3 +487,68 @@ El cierre de D3 dejó falsas cuatro afirmaciones impresas, todas escritas **esa 
    interrumpida **deja corrupto `libro.out`** (el fichero de marcadores) y hace fallar la siguiente
    con un «Runaway argument». Se arregla vaciando `libro.out`, `libro.aux` y `libro.toc` y forzando
    la recompilación. Anotado en el `README.md` del libro.
+
+---
+
+## R6 · 🏁 Qué se hizo con esta auditoría — **cerrada el mismo día**
+
+Se escribe aquí porque una auditoría que no registra su desenlace es exactamente el tipo de
+documento del que ella misma se queja.
+
+### R6.1 · La causa raíz: **reparada**
+
+§5 y R3 midieron que `check-doc-sync.bash` recorría **sólo las primeras 100 líneas** — *«auditar el
+banner es auditar lo que ya está bien»*. La otra tarea añadió el bloque **`[A2]`**, que recorre el
+cuerpo entero con los mismos filtros de historicidad.
+
+⚠️ **Con un matiz que la auditoría no tenía, y que es justo anotar**: la acotación **no era un
+descuido**. Sin ella, los diarios de `NEXT-STEPS.md` disparan una docena de falsos positivos, y un
+control que grita lobo se deja de usar — que es el otro fallo, el de §27.1 del `AI-GUIDE`. Por eso
+`[A2]` entra como **AVISO** y no como error: lo que rompe sigue siendo la cabecera. Documentado en
+`AI-GUIDE.md` §27.2.
+
+### R6.2 · Las contradicciones: **corregidas**
+
+Con el control puesto salieron **52 líneas**. Ocho eran afirmaciones de estado **actual** y falsas,
+y son las que R3 listaba:
+
+| dónde | qué decía | estado |
+|---|---|---|
+| `Meta/GodelTwo.lean:38` | «D3 — **postulado**… la pieza pendiente más grande» | ✅ corregido |
+| `Meta/GodelTwo.lean:110` | docstring de `goedel_second'`: «D2 real, **D3 postulado**» | ✅ corregido |
+| `Meta.lean:12` | el barril: «Gödel II, **módulo el axioma d3**» (y citaba dos teoremas inexistentes) | ✅ corregido |
+| `AXIOMS.md:59` | cabecera «Axiomas de Lean (**7**)» | ✅ corregido |
+| `REFERENCE.md` | «7 `axiom` de Lean» en el cuerpo; §5 tres sesiones obsoleta; «consolidar Gödel II **módulo el axioma D3**» | ✅ corregido |
+| `doc/REFERENCE-Incompleteness.md:15` | la cabecera: «módulo `axiom d3`, y la construcción **en curso** de D3» | ✅ corregido |
+| `CURRENT-STATUS-PROJECT.md:259` | «D3 está **FUERA** de la cadena activa (la capa rastreada está en `cuarentena/`)» — doble falsedad | ✅ corregido |
+| `PLANNING.md:35` | «Gödel I — **COMPLETO**» citando un teorema que no existe | ✅ marcado **entero** como histórico |
+
+Y dos más que la auditoría no había listado y `[A2]` sacó: `GODEL-STATUS.md` citaba
+`goedel_first_real'` (**inexistente**) y daba `NegVerifier` por «no construido, módulo B en curso»;
+y `cuarentena/README.md` presentaba los **7 reflectores** como «un problema abierto de verdad»
+desde el 23 de agosto.
+
+El resto de las 52 eran historia legítima a la que sólo le faltaba la **marca**; se marcaron.
+
+### R6.3 · Y `NegVerifier` se movió esa misma tarde
+
+R2 lo dejaba con **cuatro** módulos inexistentes de seis. Hoy:
+
+| módulo | estado |
+|---|---|
+| **E** · solidez estructural | 🏁 **hecho** — y en diez líneas: el decisor no tiene que ser el verificador objeto, basta el decodificador meta, y entonces `verifier_sound` **es** `decodeChain_prf` |
+| **C**, **D** · completitud negativa | ⬜ **enunciados** (`DEUDA_chainNeg`, `DEUDA_inNeg`) y desbloqueados por \textsc{adr}-022 |
+| **F** · ensamblaje | ⬜ — pero `negVerifier_of_deudas` ya hace su parte |
+
+⭐ **Y R2 acertó de pleno en una cosa**: el bloqueo que el plan declaraba «ya no existe». Lo que la
+auditoría no podía saber es que el bloqueo **real** era otro —la clase de testigos admitía basura
+cuya refutación exigía evaluar Cantor—, y que se resolvería estrechándola (\textsc{adr}-022).
+
+### R6.4 · La lección de método que este episodio deja al libro
+
+**Un lector que sólo puede LEER resultó el mejor detector de deriva que tiene el proyecto.** El
+libro tiene los `.lean` en sólo lectura (§0 de `PLAN-LIBRO.md`), y precisamente por eso audita sin
+poder «arreglarlo de paso» — que es como se generan la mitad de las contradicciones que encuentra.
+
+Es material para la Parte V, junto a M-6 de `MATERIALES.md`.
+
