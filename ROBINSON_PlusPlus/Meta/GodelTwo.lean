@@ -5,6 +5,9 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.DerivCond
 import ROBINSON_PlusPlus.Meta.Reflection
+-- ⚠️ 2026‑09‑10g: entra la cadena entera de D3 para **retirar el `axiom d3`**.
+-- `GodelTwo` no lo importa nadie salvo el barril, así que no hay ciclo.
+import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 
 import FOL.FOL
 import FOL.Theorems.Impl
@@ -54,11 +57,21 @@ real** en la cadena, y las piezas no-cerradas quedan **visibles** como hipótesi
 (Mejora sobre el `goedel_second` legacy, que postulaba **D2 y D3**; aquí D2 es real.)
 -/
 
-/-- **D3 (postulado)** para `provCodeC'`: la demostrabilidad es provablemente
-    provable. Único axioma gödeliano restante de la cadena (D1/D2 son teoremas).
-    Su prueba real es la Σ₁-completitud provable del verificador. -/
-axiom d3 (φ : Formula) :
-    axioms ⊢ (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))
+/-- 🏁🏁🏁 **D3 — TEOREMA desde el 2026‑09‑10g.**
+
+    Era el **último axioma gödeliano** de la cadena: `axiom d3`, postulado desde el principio
+    porque su prueba real es la Σ₁‑completitud provable del verificador. Ahora es exactamente eso,
+    probado: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10), y la cadena D1/D2/D3 **no postula
+    ninguna de las tres**.
+
+    ⚠️ Retirar un axioma sólo puede **fortalecer** el resultado: lo que antes se suponía ahora se
+    deriva, y todo lo que dependía de `d3` conserva su enunciado con un footprint más pequeño.
+
+    La ruta, entera, está en `doc/REFERENCE-Incompleteness.md` §3.55–§3.67. -/
+theorem d3 (φ : Formula) :
+    axioms ⊢ (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  ROBINSON_PlusPlus.Meta.Hilbert.prf_to_derives
+    (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real φ)
 
 /-- **Fórmula de consistencia** `Con' := ¬ Prov'(⌜⊥⌝)`. -/
 noncomputable def consistencyFormula' : Formula := neg (provCodeC' Formula.bottom)
@@ -111,3 +124,8 @@ export ROBINSON_PlusPlus.Meta.GodelTwo (
   con_imp_godel'
   goedel_second'
 )
+
+/-! ## FOOTPRINT — 🏁 **sin `d3`** desde el 2026‑09‑10g -/
+
+#print axioms ROBINSON_PlusPlus.Meta.GodelTwo.d3
+#print axioms ROBINSON_PlusPlus.Meta.GodelTwo.goedel_second'

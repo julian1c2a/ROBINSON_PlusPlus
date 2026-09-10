@@ -63,6 +63,7 @@ open ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 open ROBINSON_PlusPlus.Meta.D3BodyPrf
 open ROBINSON_PlusPlus.Meta.D3InDotPrf
 open ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
+open ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxRecDepth 40000
@@ -1133,6 +1134,224 @@ theorem hbdAllPrems_unpacked (q i : Term) : Prf (bodyF q i) := by
     (prf_carc_cons q i)) ((hs1 (carc (cons q i))) ▸ h1)
 
 
+/-! # §10 · 🏁🏁🏁 **D3, PROBADA** (2026‑09‑10g)
+
+Con la novena obligación saldada (§9bis), sólo faltaba meter la cota en el `bdAllCode` — que es
+§4 de `D3ChainDotPrf` otra vez, **un nivel más adentro**. -/
+
+
+/-! ## §1 · LA QUINTA VARIANTE: `substfc` al nivel del hueco BAJO
+
+⭐ Y es la **más barata de la familia**: el testigo del `substfc` **no aparece** en el resultado,
+así que no hace falta la hipótesis `u ≐ varc v̄` que la cuarta sí necesitaba. La razón es que a
+nivel `v+1` las variables que sobreviven en `substCodeF2 (v+1) u₀ W φ` son todas `≤ v`. -/
+
+mutual
+
+theorem substtc_inv_substCodeT2 (v : Nat) (u0 W : Term)
+    (hu0 : ∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w u0 =eq u0))
+    (hW : ∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w W =eq W)) :
+    ∀ (t : Term), liftTerm (v + 3) t = t →
+      ∀ u, Prf (substtc (numeral (v + 1)) u (substCodeT2 (v + 1) u0 W t)
+        =eq substCodeT2 (v + 1) u0 W t)
+  | .var n, hfv, u => by
+      have hn : Nat.le n (v + 2) := by
+        rcases Nat.lt_or_ge n (v + 3) with h | h
+        · exact Nat.le_of_lt_succ h
+        · have hne : ¬ (n < v + 3) := Nat.not_lt.mpr h
+          simp only [liftTerm, if_neg hne, Term.var.injEq] at hfv
+          exact absurd hfv (Nat.succ_ne_self n)
+      rcases Nat.lt_or_ge n (v + 1) with hlt | hge
+      · have hsub : substCodeT2 (v + 1) u0 W (.var n) = varc (numeral n) := by
+          simp only [substCodeT2]
+          rw [if_neg (by omega), if_neg (by omega), if_neg (by omega)]
+        rw [hsub]
+        exact prf_mp (prf_substtc_var_lt (numeral (v + 1)) u (numeral n))
+          (prf_gnum_lt (by omega))
+      · rcases Nat.lt_or_ge n (v + 2) with hlt3 | hge3
+        · have hnv : n = v + 1 := by omega
+          subst hnv
+          have hsub : substCodeT2 (v + 1) u0 W (.var (v + 1)) = u0 := by
+            simp only [substCodeT2]; rw [if_neg (by omega)]; simp
+          rw [hsub]; exact hu0 (v + 1) u
+        · have hnv : n = v + 2 := Nat.le_antisymm hn hge3
+          subst hnv
+          have hsub : substCodeT2 (v + 1) u0 W (.var (v + 2)) = W := by
+            simp only [substCodeT2]; simp
+          rw [hsub]; exact hW (v + 1) u
+  | .func sym ts, hfv, u => by
+      have hall := hfv
+      simp only [liftTerm, Term.func.injEq, true_and] at hall
+      show Prf (substtc (numeral (v + 1)) u (funcc (strCode sym) (substCodeTs2 (v + 1) u0 W ts))
+        =eq funcc (strCode sym) (substCodeTs2 (v + 1) u0 W ts))
+      refine prf_eq_trans (prf_substtc_func (numeral (v + 1)) u _ _) ?_
+      unfold funcc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_inv_substCodeTs2 v u0 W hu0 hW ts hall u
+
+theorem substtc_inv_substCodeTs2 (v : Nat) (u0 W : Term)
+    (hu0 : ∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w u0 =eq u0))
+    (hW : ∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w W =eq W)) :
+    ∀ (ts : List Term), liftTerms (v + 3) ts = ts →
+      ∀ u, Prf (substtsc (numeral (v + 1)) u (substCodeTs2 (v + 1) u0 W ts)
+        =eq substCodeTs2 (v + 1) u0 W ts)
+  | [], _, u => by
+      show Prf (substtsc (numeral (v + 1)) u nil =eq nil)
+      exact prf_substtsc_nil (numeral (v + 1)) u
+  | t :: ts, hfv, u => by
+      have h1 := hfv
+      simp only [liftTerms, List.cons.injEq] at h1
+      show Prf (substtsc (numeral (v + 1)) u
+          (cons (substCodeT2 (v + 1) u0 W t) (substCodeTs2 (v + 1) u0 W ts))
+        =eq cons (substCodeT2 (v + 1) u0 W t) (substCodeTs2 (v + 1) u0 W ts))
+      refine prf_eq_trans (prf_substtsc_cons (numeral (v + 1)) u _ _) ?_
+      exact prf_eq_trans
+        (prf_congr_cons_head (substtc_inv_substCodeT2 v u0 W hu0 hW t h1.1 u))
+        (prf_congr_cons_tail (substtc_inv_substCodeTs2 v u0 W hu0 hW ts h1.2 u))
+
+end
+
+theorem substfc_inv_substCodeF2 : ∀ (v : Nat) (u0 W : Term),
+    (∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w u0 =eq u0)) →
+    Prf (liftc zero u0 =eq u0) →
+    (∀ (k : Nat) (w : Term), Prf (substtc (numeral k) w W =eq W)) →
+    Prf (liftc zero W =eq W) →
+    ∀ (φ : Formula), liftFormula (v + 3) φ = φ →
+      ∀ u, Prf (substfc (numeral (v + 1)) u (substCodeF2 (v + 1) u0 W φ)
+        =eq substCodeF2 (v + 1) u0 W φ)
+  | v, u0, W, _, _, _, _, .bottom, _, u => by
+      show Prf (substfc (numeral (v + 1)) u botc =eq botc)
+      exact prf_substfc_bottom (numeral (v + 1)) u
+  | v, u0, W, hu0, _, hW, _, .atom P ts, hfv, u => by
+      have hts : liftTerms (v + 3) ts = ts := by
+        simpa only [liftFormula, Formula.atom.injEq, true_and] using hfv
+      show Prf (substfc (numeral (v + 1)) u (atomc (strCode P) (substCodeTs2 (v + 1) u0 W ts))
+        =eq atomc (strCode P) (substCodeTs2 (v + 1) u0 W ts))
+      refine prf_eq_trans (prf_substfc_atom (numeral (v + 1)) u _ _) ?_
+      unfold atomc
+      refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
+      exact substtc_inv_substCodeTs2 v u0 W hu0 hW ts hts u
+  | v, u0, W, hu0, _, hW, _, .eq a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.eq.injEq] at h1
+      show Prf (substfc (numeral (v + 1)) u
+          (eqCodeFn (substCodeT2 (v + 1) u0 W a) (substCodeT2 (v + 1) u0 W b))
+        =eq eqCodeFn (substCodeT2 (v + 1) u0 W a) (substCodeT2 (v + 1) u0 W b))
+      refine prf_eq_trans (prf_substfc_eq (numeral (v + 1)) u _ _) ?_
+      exact prf_congr_eqCodeFn (substtc_inv_substCodeT2 v u0 W hu0 hW a h1.1 u)
+        (substtc_inv_substCodeT2 v u0 W hu0 hW b h1.2 u)
+  | v, u0, W, hu0, hLu, hW, hL, .impl a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.impl.injEq] at h1
+      show Prf (substfc (numeral (v + 1)) u
+          (implc (substCodeF2 (v + 1) u0 W a) (substCodeF2 (v + 1) u0 W b))
+        =eq implc (substCodeF2 (v + 1) u0 W a) (substCodeF2 (v + 1) u0 W b))
+      refine prf_eq_trans (prf_substfc_impl (numeral (v + 1)) u _ _) ?_
+      exact prf_congr_implc (substfc_inv_substCodeF2 v u0 W hu0 hLu hW hL a h1.1 u)
+        (substfc_inv_substCodeF2 v u0 W hu0 hLu hW hL b h1.2 u)
+  | v, u0, W, hu0, hLu, hW, hL, .and a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.and.injEq] at h1
+      show Prf (substfc (numeral (v + 1)) u
+          (andc (substCodeF2 (v + 1) u0 W a) (substCodeF2 (v + 1) u0 W b))
+        =eq andc (substCodeF2 (v + 1) u0 W a) (substCodeF2 (v + 1) u0 W b))
+      refine prf_eq_trans (prf_substfc_and (numeral (v + 1)) u _ _) ?_
+      exact prf_congr_andc (substfc_inv_substCodeF2 v u0 W hu0 hLu hW hL a h1.1 u)
+        (substfc_inv_substCodeF2 v u0 W hu0 hLu hW hL b h1.2 u)
+  | v, u0, W, hu0, hLu, hW, hL, .or a b, hfv, u => by
+      have h1 := hfv
+      simp only [liftFormula, Formula.or.injEq] at h1
+      show Prf (substfc (numeral (v + 1)) u
+          (orc (substCodeF2 (v + 1) u0 W a) (substCodeF2 (v + 1) u0 W b))
+        =eq orc (substCodeF2 (v + 1) u0 W a) (substCodeF2 (v + 1) u0 W b))
+      refine prf_eq_trans (prf_substfc_or (numeral (v + 1)) u _ _) ?_
+      exact prf_congr_orc (substfc_inv_substCodeF2 v u0 W hu0 hLu hW hL a h1.1 u)
+        (substfc_inv_substCodeF2 v u0 W hu0 hLu hW hL b h1.2 u)
+  | v, u0, W, hu0, hLu, hW, hL, Formula.forall a, hfv, u => by
+      have h1 : liftFormula (v + 4) a = a := by
+        simpa only [liftFormula, Formula.forall.injEq] using hfv
+      show Prf (substfc (numeral (v + 1)) u
+          (forallc (substCodeF2 (v + 2) (liftc zero u0) (liftc zero W) a))
+        =eq forallc (substCodeF2 (v + 2) (liftc zero u0) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_forall (numeral (v + 1)) u _) ?_
+      unfold forallc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hu0', hLu'⟩ := substCode_hyps_lift hu0 hLu
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_inv_substCodeF2 (v + 1) (liftc zero u0) (liftc zero W)
+        hu0' hLu' hW' hL' a h1 (liftc zero u)
+  | v, u0, W, hu0, hLu, hW, hL, .ex a, hfv, u => by
+      have h1 : liftFormula (v + 4) a = a := by
+        simpa only [liftFormula, Formula.ex.injEq] using hfv
+      show Prf (substfc (numeral (v + 1)) u
+          (exc (substCodeF2 (v + 2) (liftc zero u0) (liftc zero W) a))
+        =eq exc (substCodeF2 (v + 2) (liftc zero u0) (liftc zero W) a))
+      refine prf_eq_trans (prf_substfc_ex (numeral (v + 1)) u _) ?_
+      unfold exc
+      refine prf_congr_cons_tail (prf_congr_cons_head ?_)
+      obtain ⟨hu0', hLu'⟩ := substCode_hyps_lift hu0 hLu
+      obtain ⟨hW', hL'⟩ := substCode_hyps_lift hW hL
+      exact substfc_inv_substCodeF2 (v + 1) (liftc zero u0) (liftc zero W)
+        hu0' hLu' hW' hL' a h1 (liftc zero u)
+
+/-- `hPinv` del chasis INTERIOR: el cuerpo es invariante bajo `substfc` de NIVEL 1. -/
+theorem hPinv_premsPsi (q i : Term) :
+    ∀ u : Term, Prf (substfc (succ zero) u (premsPsi q i) =eq premsPsi q i) :=
+  fun u => substfc_inv_substCodeF2 0 (liftc zero (tcFn i)) (liftc zero (liftc zero (tcFn q)))
+    (hu0_premsPsi i) (hLu0_premsPsi i) (hW_premsPsi q) (hLW_premsPsi q)
+    premsBodyF hfv_premsBodyF u
+
+
+/-! ## §2 · EL PUENTE DE LA COTA DEL CHASIS INTERIOR
+
+Es §4 de `D3ChainDotPrf` otra vez, un nivel más adentro: `pcc_bdAll_intro` entrega la cota como
+**reflexión pura** `(lenc L)˙` y el destino la pide como **accesor dotado**
+`lencT (premsOfT (nthcT …))`. El salto lo dio **B2**; aquí sólo se mete en el `bdAllCode`. -/
+
+theorem hBc'_prems (q i : Term) :
+    Prf (liftc zero (lencT (premsOfT (nthcT (WQ q) (UI i))))
+      =eq lencT (premsOfT (nthcT (WQ q) (UI i)))) := by
+  refine prf_eq_trans (prf_liftc_lencT zero _) (prf_congr_lencT ?_)
+  refine prf_eq_trans (prf_liftc_funcc1 zero (strCode "premsOf") _) (prf_congr_premsOfT ?_)
+  refine prf_eq_trans (prf_liftc_nthcT zero _ _) ?_
+  exact prf_congr_nthcT
+    (prf_congr_liftc (prf_congr_liftc (prf_liftc_tcFn q)))
+    (prf_congr_liftc (prf_liftc_tcFn i))
+
+theorem hwP_premsPsi (q i : Term) : Prf (hasWitF (bdAllBndCtx (premsPsi q i))) := by
+  unfold bdAllBndCtx bdAllCode
+  exact prf_hasWitF_forallc _ (prf_hasWitF_implc _ _ (by hw_auto) (hwPsi_premsPsi q i))
+
+/-- 🏁🏁 **`hbody`(b) de D3** — la mitad que faltaba. -/
+theorem hB_premsDotAt (q i : Term) :
+    Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ provFromCode (premsDotAt q i))) := by
+  refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
+  have hch : PrfH [lt i (lenc q), chainOk nil q] (chainOk nil q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt : PrfH [lt i (lenc q), chainOk nil q] (lt i (lenc q)) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hCF : PrfH [lt i (lenc q), chainOk nil q] (premsCF2 q i) := PrfH_and_intro hch hlt
+  have h0 : PrfH [lt i (lenc q), chainOk nil q]
+      (provFromCode (bdAllCode (tcFn (premsBnd2 q i)) (premsPsi q i))) :=
+    PrfH.mp _ _ _ (prf_to_prfH (hbdAllPrems_unpacked q i) _) hCF
+  rw [premsDotAt_split]
+  exact PrfH_bdAllCode_congr_bnd _ _ (premsPsi q i) (hPinv_premsPsi q i)
+    (prf_liftc_tcFn (premsBnd2 q i)) (hBc'_prems q i)
+    (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (pcc_bnd_bridge_at q i) _) hch) hlt)
+    h0 (by hw_auto) (by hw_auto) (hwP_premsPsi q i)
+
+/-! ## §3 · 🏁🏁🏁 **D3, PROBADA** -/
+
+/-- El `hbody` del `pcc_bdAll_intro` EXTERIOR, desde sus dos mitades. -/
+theorem hbody_prems : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+    provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q)))) :=
+  hbody_of_halves hA_lineWFDotAt hB_premsDotAt
+
+/-- 🏁🏁🏁 **LA TERCERA CONDICIÓN DE DERIVABILIDAD, PROBADA.** -/
+theorem d3_prf_real (φ : Formula) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+  d3_prf_of_halves φ hA_lineWFDotAt hB_premsDotAt
+
+
 end ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 
 /-! ## `export` — por CONSUMO -/
@@ -1157,6 +1376,8 @@ export ROBINSON_PlusPlus.Meta.PremsBdAllPrf (
   prf_congr_bdExCode_bnd substfc_premsPsi_at premsBody_reflect premsBody_deuda
   premsCF2 premsBnd2 bodyF substFormula_bodyF_snd substFormula_bodyF_fst
   hbdAllPrems_unpacked
+  substtc_inv_substCodeT2 substtc_inv_substCodeTs2 substfc_inv_substCodeF2
+  hPinv_premsPsi hBc'_prems hwP_premsPsi hB_premsDotAt hbody_prems d3_prf_real
 )
 
 /-! ## FOOTPRINT -/
@@ -1167,3 +1388,5 @@ export ROBINSON_PlusPlus.Meta.PremsBdAllPrf (
 #print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbdAllPrems_of_body
 #print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBody_deuda
 #print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbdAllPrems_unpacked
+#print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hB_premsDotAt
+#print axioms ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real
