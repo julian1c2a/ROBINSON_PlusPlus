@@ -65,12 +65,37 @@
 > es la que decide qué significa `provCodeC'` y **cuál es la sentencia G** (ADR‑015). ⇒ **ADR, no
 > limpieza.**
 >
-> ## ⬜ Y una DECISIÓN sancionada que aún no se ha escrito
+> ## 4. 🏁 **ADR‑022 ESCRITO Y EJECUTADO** — la clase de testigos, estrechada
 >
-> Estrechar **`StdChain`** a líneas `⟨formCode φ, numeralM k, args⟩` con args `formCode`/`termCode`,
-> aceptando que `OmegaConsistent` quede **algo más fuerte** que la ω‑consistencia clásica
-> (atenuante medido: **ya no era la clásica pura** — cuantifica sobre `objList l`). Sancionado por
-> el propietario el 2026‑09‑10h; **falta redactar el ADR** y con él atacar **C y D**.
+> `Meta/OmegaReflect.lean` §1bis–§1quater. `StdChain` pasa de `∀ x ∈ l, IsCodeShaped x` a
+> `∀ x ∈ l, StdLine x`, con la línea en su **forma exacta** `⟨⌜f⌝, k̄, args⟩` y args
+> `formCode`/`termCode` ⇒ todas las comparaciones de `NegVerifier` son **paralelas por tipo** y las
+> decide `formCode_ne`/`termCode_ne` **sin evaluar Cantor**.
+>
+> ⚠️⚠️ **Y en el camino apareció una CONTRADICCIÓN entre mediciones, que hubo que resolver.**
+> `sondeos/MedirF_Censo.lean` §4 —compilado, de antes— concluía lo contrario: *«¿hay que cambiar
+> `StdChain`? **NO**: `NumTree` ya la subsume»*, con `numTree_of_isCodeShaped` probado.
+>
+> 🔑🔑 **El teorema es CIERTO y la conclusión FALSA — y ésa es la regla nueva (M‑8):
+> subsumir la CLASE no es descargar la OBLIGACIÓN.** Que todo elemento tenga valor no da que el
+> valor se pueda **decidir**: `numTree_ne` pide `m ≠ n` **en META**, y `codeNat (⊥⇒⊥)` ya son
+> **583 734** con `triN` en recursión unaria. Para `G`, astronómico.
+> ⭐ Lo que del sondeo **sí** sobrevive y sigue haciendo falta: `numTree_ne` y las cotas
+> `consN_ge`/`codeNat_ge`, para los choques contra numerales **pequeños**.
+>
+> 🏁 **La garantía que hace admisible el estrechamiento** —y sin la cual sería una trampa, porque
+> con la clase vacía `NegVerifier` es trivial y `OmegaConsistent` **falsa**:
+>
+>     stdLine_lineCode'  (acc f r) : StdLine (lineCode' acc f r)              -- los 21 tags
+>     stdChain_proofCode' (rs acc) : ∃ l, StdChain l ∧ objList l = proofCode' rs acc
+>     junk_line_not_stdLine        : ¬ StdLine ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩        -- la basura, FUERA
+>
+> ⚠️ **El precio, escrito**: `OmegaConsistent` es **estrictamente más fuerte**, y el argumento
+> genérico «toda teoría sólida es ω‑consistente» **ya no la cubre**… salvo en el único `∃` al que
+> se aplica (`provBody ⌜φ⌝`), cuyos testigos honestos **son** códigos de prueba. Detalle en
+> **ADR‑022** y `doc/REFERENCE-Incompleteness.md` §3.68.
+>
+> ⇒ **C y D quedan DESBLOQUEADOS.** Son el trabajo que sigue.
 
 > # 🏁🏁🏁 LO GRANDE DE HOY: **`pcc_lineWF_tracked` ES INCONDICIONAL**
 >
@@ -156,7 +181,9 @@
 >    axiomas **es** la lista de códigos.
 > 3. 🏁 ~~**Dedup** ADR‑019~~ — **HECHO** el 2026‑09‑10h (`D3ChainDotPrf` §5bis/§5ter).
 > 4. 📖 El **libro**: hay cambios sin commitear en `doc/book/`.
-> 5. ⬜ **El ADR de `StdChain`** — sancionado, sin redactar; es lo que desbloquea **C** y **D**.
+> 5. 🏁 ~~**El ADR de `StdChain`**~~ — **ADR‑022 escrito y ejecutado** (2026‑09‑10h) ⇒ lo que
+>    queda de `⊬¬G` son los módulos **C** y **D**, con las dos deudas de `Meta/VerifierSound.lean`
+>    ya enunciadas sobre la clase estrecha.
 > 6. ⬜ **`primAxioms`** — la forma que *certifica* el censo de `coreAxioms` (§3.14.1 de
 >    `doc/REFERENCE-Full.md`). ⚠️ Mueve la frontera de la teoría ⇒ **ADR**.
 >

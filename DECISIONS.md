@@ -31,7 +31,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Última actualización:** 2026-09-05 — **ADR-019 confirmado en vivo por B3**: el general mal colocado dejaba un corolario inalcanzable, y la duplicación por INSTANCIA que ningún censo ve. ADR-018 en producción.
+**Última actualización:** 2026-09-10h — **ADR-022**: la clase de testigos de la ω‑consistencia se ESTRECHA a líneas estándar; el precio (una `OmegaConsistent` más fuerte) va escrito, y la garantía que lo hace admisible (`stdChain_proofCode'`) probada. — (previo 2026-09-05) **ADR-019 confirmado en vivo por B3**: el general mal colocado dejaba un corolario inalcanzable, y la duplicación por INSTANCIA que ningún censo ve. ADR-018 en producción.
 **Autor**: Julián Calderón Almendros
 
 Registro de decisiones arquitectónicas (ADR) de este proyecto. Cada entrada documenta
@@ -60,6 +60,7 @@ proyecto; no introduce ninguna nueva.
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
 | **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
 | **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
+| **M-8** | ⚠️ **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Antes de dar por resuelto un frente con «la clase X ya cubre la clase Y», leer **qué obligación queda después**: `numTree_of_isCodeShaped` es **cierto como teorema** y su conclusión —«no hay que cambiar `StdChain`»— **falsa**, porque la obligación que deja (`m ≠ n` con `codeNat` astronómico) **no es descargable** | ADR-022 | `stdChain_proofCode'` + `junk_line_not_stdLine` (`Meta/OmegaReflect.lean` §1ter/§1quater) |
 
 > **Sobre `Classical.*`**: este proyecto **no** lo prohíbe (2 usos verificados el
 > 2026-07-12). Lo que sí mantiene es la disciplina de **cero axiomas espurios** de M-1.
@@ -1251,3 +1252,143 @@ es sintácticamente la variable de arriba, y el puente hay que darlo igualmente.
 
 **Lo que NO cambia**: 7 `axiom` de Lean, 141 axiomas objeto, ninguna firma aguas abajo.
 Footprint de todas las piezas nuevas: los tres axiomas de Lean, o la base sancionada.
+
+---
+
+## ADR-022: La clase de testigos de la ω‑consistencia se ESTRECHA a LÍNEAS ESTÁNDAR — y se paga el precio por escrito
+
+**Fecha**: 2026-09-10
+**Estado**: Aceptado — **sancionado por el propietario** el 2026‑09‑10h.
+⚠️ **Encarece una hipótesis META.** No es una refactorización: cambia lo que `OmegaConsistent`
+afirma. Por eso va a ADR y no a un commit de limpieza.
+
+### Contexto
+
+`Meta/OmegaReflect.lean` reduce la mitad **`⊬¬G`** de Gödel I a dos piezas:
+
+    reflects_of_omega : OmegaConsistent → NegVerifier → Reflects φ
+
+y ambas cuantifican sobre la **misma** clase de testigos, `StdChain`. Hasta hoy:
+
+```lean
+def StdChain (l : List Term) : Prop := ∀ x ∈ l, IsCodeShaped x
+```
+
+con `IsCodeShaped` generada por `numeralM`, `strCodeM`, `nil` y `cons`.
+
+### El problema, MEDIDO (no argumentado)
+
+El docstring de `IsCodeShaped` justificaba la clase diciendo que las comparaciones de
+`NegVerifier` son *«PARALELAS POR TIPO — `formCode φ` contra `formCode ψ`, **nunca `cons` contra
+`numeral` en la misma ranura**»*.
+
+⛔ **Es FALSO sobre la clase que él mismo define**, y el contraejemplo está **compilado** desde
+antes, en `sondeos/MedirF_Censo.lean` §4:
+
+```lean
+theorem isCodeShaped_linea_mala :
+    IsCodeShaped ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩          -- ✅ testigo StdChain LEGÍTIMO
+```
+
+Refutar esa línea obliga a comparar **`formCode ⊥` (un `cons`) contra `numeralM 3` (un numeral)**
+en la misma ranura. Y ahí:
+
+* `formCode_ne` / `cons_ne_head` / `cons_ne_tail` (`Meta/CodeDistinct.lean`) **no pueden**: son
+  estructurales y los dos lados tienen constructores distintos sin que eso implique desigualdad —
+  `cons nil nil ≐ numeralM 2` es **provable** (`ax_L0_cons_def` + Cantor). Es la misma raíz que
+  tumbó `canon_ne`.
+* La **única** vía es por **VALOR**: `numTree_ne` (mismo sondeo), que pide `m ≠ n` **a nivel META**
+  entre los valores de Cantor.
+
+### ⚠️ Y aquí es donde la medición anterior se queda corta — la parte que hay que corregir
+
+`sondeos/MedirF_Censo.lean` §4 concluía: *«¿hay que cambiar `StdChain`? **NO**: `NumTree` ya la
+subsume»*, con `numTree_of_isCodeShaped` probado. **Ese teorema es cierto y su conclusión no.**
+
+🔑 **Subsumir la CLASE no es descargar la OBLIGACIÓN.** `NumTree` da que *todo* término
+`IsCodeShaped` **tiene** un valor; lo que `numTree_ne` necesita es **decidir `m ≠ n` en META**, y
+eso exige **calcular** el valor. El propio sondeo lo mide y lo dice:
+
+    codeNat (⊥⇒⊥) = 583 734        -- y `triN` es recursión unaria
+
+para una sentencia real —la `G` del punto fijo— es **astronómico**. El truco de aritmética acotada
+que el mismo sondeo aporta (`consN_ge`, `codeNat_ge : 3 ≤ codeNat φ`) resuelve los choques contra
+numerales **pequeños** y **sólo** ésos. ⇒ con la clase ancha, `NegVerifier` tiene obligaciones
+**existentes pero no descargables**.
+
+### Decisión
+
+Estrechar la clase a la **forma exacta de `lineCode'`**:
+
+```lean
+inductive StdArgs : Term → Prop
+  | nil                          : StdArgs nil
+  | form {t} (A : Formula)       : StdArgs t → StdArgs (cons (formCode A) t)
+  | term {t} (u : Term)          : StdArgs t → StdArgs (cons (termCode u) t)
+
+def StdLine (x : Term) : Prop :=
+  ∃ f k as, And (x = cons (formCode f) (cons (numeralM k) as)) (StdArgs as)
+
+def StdChain (l : List Term) : Prop := ∀ x ∈ l, StdLine x
+```
+
+Ahora la disciplina de tipos **es verdadera por construcción**: cabeza `formCode`, casilla del tag
+`numeralM`, argumentos `formCode`/`termCode`. Todas las comparaciones que `NegVerifier` necesita
+son paralelas y las deciden `formCode_ne`/`termCode_ne` **sin evaluar Cantor**.
+
+### La GARANTÍA — sin ella el estrechamiento sería una trampa
+
+Estrechar la clase **debilita** `NegVerifier` y **refuerza** `OmegaConsistent`. Llevado al límite
+—clase vacía— `NegVerifier` sería trivial y `OmegaConsistent` **falsa**. Lo que impide ese abuso
+está probado en el propio módulo:
+
+```lean
+theorem stdLine_lineCode' (acc f r) : StdLine (lineCode' acc f r)          -- los 21 tags
+theorem stdChain_proofCode' (rs acc) :
+    ∃ l, And (StdChain l) (objList l = proofCode' rs acc)                  -- 🏁 LA GARANTÍA
+```
+
+⇒ **el código de cualquier demostración‑secuencia real es un testigo estándar**. No se deja fuera
+ningún testigo que la teoría pueda producir honestamente; sólo la basura.
+
+Y en la otra dirección, el payoff, también probado:
+
+```lean
+theorem junk_line_not_stdLine :
+    ¬ StdLine ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩          -- la línea de MedirF_Censo §4, FUERA
+```
+
+### El PRECIO, escrito y no escondido
+
+1. **`OmegaConsistent` es estrictamente más fuerte.** Cuantifica sobre menos `l`, luego la premisa
+   interna `∀ l, StdChain l → ⊢ ¬A[objList l]` es más fácil de cumplir y su negación más difícil.
+2. ⚠️ **El argumento «toda teoría SÓLIDA es ω‑consistente» ya NO la cubre en general.** Con la
+   clase ancha, solidez ⇒ ω‑consistencia sin más. Con la estrecha, la solidez da un testigo **en
+   ℕ** que podría no tener forma de línea estándar.
+3. ⭐ **Pero sí la cubre en el ÚNICO `∃` al que se aplica.** `reflects_of_omega` la usa sobre
+   `A = provBody (formCode φ)`, cuyos testigos honestos son **códigos de prueba**, y ésos son
+   estándar por `stdChain_proofCode'`. El hueco del punto 2 es **genérico, no operativo**.
+4. Atenuante ya medido antes: **no era la ω‑consistencia clásica pura** ni siquiera antes —
+   cuantifica sobre `objList l`, no sobre numerales arbitrarios. Es **estrechar lo ya estrecho**.
+
+### Alternativas consideradas
+
+| alternativa | por qué no |
+|---|---|
+| **Dejar `StdChain` y usar `NumTree`** (`MedirF_Censo` §4) | subsume la **clase**, no la **obligación**: pide `m ≠ n` en META con `codeNat` **astronómico**. Sirve para los choques contra numerales **pequeños**, y ahí se conserva |
+| **Restringir el `∃` en vez de la clase** (una `OmegaConsistent` sólo para `provBody`) | más honesto en el papel, pero rompe la forma genérica de la hipótesis y no cambia nada operativo: el punto 3 ya lo da |
+| **Rosser** | consigue ambas mitades desde consistencia simple, pero **cambia de sentencia**. Es un frente distinto, no una variante de éste |
+
+### Consecuencias operativas
+
+* `NegVerifier` y las dos deudas de `Meta/VerifierSound.lean` (`DEUDA_chainNeg`, `DEUDA_inNeg`)
+  quedan **enunciadas sobre la clase estrecha** ⇒ los módulos **C** y **D** pueden atacarse ya.
+* `IsCodeShaped` **se conserva** (su `isClosed` sigue valiendo y los sondeos la citan), pero
+  **deja de definir `StdChain`**, y su docstring lleva la corrección de que su afirmación central
+  era falsa.
+* ⚠️ **Regla de método que este ADR deja**: *subsumir la clase no es descargar la obligación*. Una
+  medición puede ser **correcta como teorema** y **equivocada como conclusión**; hay que leer qué
+  obligación queda **después** de aplicarla.
+
+**Lo que NO cambia**: 6 `axiom` de Lean, 141 axiomas objeto, `reflects_of_omega` y
+`goedel_first_undecidable_omega` **sin tocar** (son paramétricos en `StdChain`).

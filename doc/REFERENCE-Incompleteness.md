@@ -5421,3 +5421,71 @@ y en `Meta/GodelTwo.lean`, `axiom d3` pasa a `theorem d3 := prf_to_derives (d3_p
 ⚠️ **`GodelTwo` no lo importa nadie** salvo el barril, así que meter la cadena entera de D3 no
 crea ningún ciclo. Y **retirar un axioma sólo puede fortalecer**: lo que antes se suponía ahora se
 deriva, y todo lo que dependía de `d3` conserva su enunciado con un footprint más pequeño.
+
+---
+
+## §3.68 · ⭐ **LA CLASE DE TESTIGOS, ESTRECHADA** — ADR‑022 (2026‑09‑10h)
+
+`reflects_of_omega : OmegaConsistent → NegVerifier → Reflects φ` hace pivotar toda la mitad
+`⊬¬G` sobre **una sola clase**, `StdChain`, que aparece en las **dos** hipótesis. Estrecharla
+**debilita** `NegVerifier` y **refuerza** `OmegaConsistent`: es un intercambio, no una mejora, y
+por eso va a ADR.
+
+### §3.68.1 · El motivo, y no es de gusto
+
+El docstring de `IsCodeShaped` justificaba la clase ancha diciendo que las comparaciones de
+`NegVerifier` son *«PARALELAS POR TIPO — nunca `cons` contra `numeral` en la misma ranura»*.
+
+⛔ **Era falso sobre su propia clase**, con contraejemplo **ya compilado** en
+`sondeos/MedirF_Censo.lean` §4:
+
+    IsCodeShaped ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩        -- testigo StdChain legítimo
+
+Refutarla obliga a comparar `formCode ⊥` (**un `cons`**) con `numeralM 3` (**un numeral**) en la
+misma ranura, y ahí lo estructural no vale: `cons nil nil ≐ numeralM 2` es **provable**. La única
+vía es por **VALOR** (`numTree_ne`), que pide `m ≠ n` **en META** — y `codeNat (⊥⇒⊥)` ya son
+**583 734**, con `triN` en recursión unaria. Para la `G` del punto fijo, astronómico.
+
+### §3.68.2 · ⚠️ La medición previa era CORRECTA y su conclusión NO
+
+El mismo sondeo concluía en su §4: *«¿hay que cambiar `StdChain`? **NO**: `NumTree` ya la
+subsume»*, apoyado en `numTree_of_isCodeShaped`, que **es un teorema verdadero**.
+
+🔑🔑 **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Que todo elemento de la clase *tenga*
+valor no da que el valor se pueda *decidir*. La regla queda como **M‑8** en `DECISIONS.md`.
+
+⭐ Lo que del sondeo **sí sobrevive**, y sigue haciendo falta: `numTree_ne` y las cotas
+`consN_ge`/`codeNat_ge : 3 ≤ codeNat φ`, que resuelven por **aritmética acotada** los choques
+contra numerales **pequeños** sin tocar un solo `triN`.
+
+### §3.68.3 · La clase nueva y las dos comprobaciones
+
+```lean
+inductive StdArgs : Term → Prop
+  | nil | form (A : Formula) … | term (u : Term) …
+def StdLine (x : Term) : Prop := ∃ f k as, x = ⟨formCode f, numeralM k, as⟩ ∧ StdArgs as
+def StdChain (l : List Term) : Prop := ∀ x ∈ l, StdLine x
+```
+
+| comprobación | qué asegura |
+|---|---|
+| **`stdLine_lineCode' (acc f r)`** | los **21 tags** producen líneas estándar |
+| 🏁 **`stdChain_proofCode' (rs acc)`** | **el código de CUALQUIER demostración‑secuencia es un testigo estándar** ⇒ no se deja fuera ningún testigo honesto |
+| **`junk_line_not_stdLine`** | la línea basura de `MedirF_Censo` §4 queda **FUERA** |
+
+⚠️ Sin la segunda, estrechar sería una trampa: en el límite —clase vacía— `NegVerifier` es trivial
+y `OmegaConsistent` **falsa**.
+
+### §3.68.4 · El precio, en cuatro puntos
+
+1. `OmegaConsistent` cuantifica sobre **menos** `l` ⇒ hipótesis **estrictamente más fuerte**.
+2. ⚠️ El argumento genérico «toda teoría **sólida** es ω‑consistente» **ya no la cubre**: la
+   solidez da un testigo en ℕ que podría no tener forma de línea estándar.
+3. ⭐ **Pero sí la cubre en el único `∃` al que se aplica** (`A = provBody ⌜φ⌝`), cuyos testigos
+   honestos son códigos de prueba ⇒ `stdChain_proofCode'`. El hueco del punto 2 es **genérico, no
+   operativo**.
+4. Atenuante ya medido: **tampoco antes era la ω‑consistencia clásica pura** — cuantifica sobre
+   `objList l`, no sobre numerales arbitrarios. Es **estrechar lo ya estrecho**.
+
+⇒ Con esto, **C** y **D** (la completitud negativa) quedan desbloqueados: son el trabajo que sigue.
+

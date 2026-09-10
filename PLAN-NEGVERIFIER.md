@@ -53,7 +53,15 @@
 > Un `formCode φ` **es** un numeral, sólo que astronómico. Decidir la desigualdad contra basura
 > exigiría **evaluar Cantor** — inviable.
 >
-> ## ⇒ LA DECISIÓN QUE QUEDA (va a ADR)
+> ## ⇒ 🏁 LA DECISIÓN, **TOMADA**: [ADR‑022](DECISIONS.md) (2026‑09‑10h)
+>
+> **Ejecutada en `Meta/OmegaReflect.lean` §1bis–§1quater.** Y con una corrección que el
+> plan tampoco tenía: `sondeos/MedirF_Censo.lean` §4 sostenía que **no** hacía falta
+> («`NumTree` ya subsume la clase»). Es cierto como teorema y **falso como conclusión** —
+> subsumir la clase no descarga la obligación, que pide `m ≠ n` en META con `codeNat`
+> astronómico. Regla **M‑8** de `DECISIONS.md`.
+>
+> La forma exacta que quedó, y las dos comprobaciones que la sostienen:
 >
 > **Estrechar la clase de testigos** hasta que todas las comparaciones sean **paralelas por tipo**:
 >

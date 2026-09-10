@@ -14,6 +14,20 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10h (b) — ADR‑022: la clase de testigos de la ω‑consistencia, ESTRECHADA.**
+> `Meta/OmegaReflect.lean` §1bis–§1quater: `StdChain` pasa de `IsCodeShaped` a **`StdLine`**
+> (`⟨⌜f⌝, k̄, args⟩`, args `formCode`/`termCode`) ⇒ las comparaciones de `NegVerifier` son
+> **paralelas por tipo** y se deciden **sin evaluar Cantor**. Motivo medido: el docstring de
+> `IsCodeShaped` afirmaba justo eso de su propia clase y **era falso** (contraejemplo compilado en
+> `sondeos/MedirF_Censo.lean` §4). ⚠️⚠️ **Y ese mismo sondeo concluía lo contrario** («`NumTree` ya
+> la subsume, no hay que cambiar `StdChain`»): el teorema es **cierto** y la conclusión **falsa** —
+> subsumir la clase **no descarga la obligación**, que pide `m ≠ n` en META con `codeNat`
+> astronómico. Queda como regla **M‑8**. 🏁 La garantía que hace admisible el estrechamiento:
+> **`stdChain_proofCode'`** — el código de cualquier demostración‑secuencia **es** un testigo
+> estándar (los 21 tags, vía `stdLine_lineCode'`) —, más `junk_line_not_stdLine` en la otra
+> dirección. ⚠️ Precio escrito: `OmegaConsistent` **estrictamente más fuerte**. Detalle en ADR‑022 y
+> `doc/REFERENCE-Incompleteness.md` §3.68. ⇒ **C y D desbloqueados.**
+>
 > **2026‑09‑10h — MÓDULO E de `NegVerifier`, la dedup ADR‑019, y el CENSO de `coreAxioms`.**
 > (1) `Meta/VerifierSound.lean`: la **solidez estructural del verificador** en diez líneas —
 > `verifier_sound` **es** `decodeChain_prf`, porque el decisor no tiene que ser el verificador
