@@ -68,10 +68,7 @@ theorem hwG_lineWF : Prf (hasWitF (lineWFCodeFn (varc (numeral 0)))) :=
   prf_hasWitF_atom1 (strCode "lineWF") (varc (numeral 0)) (prf_hasWit_varc (numeral 0))
 
 /-- ⭐ **`hbody`(a) de D3**: la reflexión del átomo `lineWF`, ya instanciada en el cuerpo. -/
-theorem hA_lineWFDotAt
-    (hOther : ∀ (t : Term) (k : Nat), Prf (lineWF t ⇒ ((lineTag t =eq numeralM k)
-      ⇒ provFromCode (lineWFCodeFn (tcFn t)))))
-    (q i : Term) :
+theorem hA_lineWFDotAt (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ provFromCode (lineWFDotAt q i))) := by
   refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
   have hch : PrfH [lt i (lenc q), chainOk nil q] (chainOk nil q) :=
@@ -97,7 +94,7 @@ theorem hA_lineWFDotAt
   have hprov : PrfH [lt i (lenc q), chainOk nil q]
       (provFromCode (lineWFCodeFn (tcFn (nthc q i)))) :=
     PrfH.mp _ _ _ (prf_to_prfH
-      (pcc_lineWF_tracked_modulo_other (nthc q i) (hOther (nthc q i))) _) hline
+      (pcc_lineWF_tracked (nthc q i)) _) hline
   -- (3) la MONEDA: el destino pide el ACCESOR dotado, no la reflexión pura
   have hev : PrfH [lt i (lenc q), chainOk nil q]
       (provFromCode (eqc (nthcT (tcFn q) (tcFn i)) (tcFn (nthc q i)))) :=

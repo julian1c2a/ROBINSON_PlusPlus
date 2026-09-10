@@ -63,6 +63,8 @@ open ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.TcArithPrf
 open ROBINSON_PlusPlus.Meta.Representability
 open ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
+open ROBINSON_PlusPlus.Meta.LineWFAssemblePrf ROBINSON_PlusPlus.Meta.NatMulPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
 
 set_option linter.unusedVariables false
 set_option linter.unusedSimpArgs false
@@ -1077,6 +1079,107 @@ theorem pcc_lineWF_tracked_modulo_other (t : Term)
   pcc_lineWF_tracked_modulo_2 t
     (pcc_lineWF_tracked_ind_imp t) (pcc_lineWF_tracked_listInd_imp t) hOther
 
+
+/-! ### 🏁🏁🏁 §11ter · `pcc_lineWF_tracked` **INCONDICIONAL** — C3 CERRADO (2026‑09‑10)
+
+⚠️⚠️ **Y esto CORRIGE lo que §11 y §11bis dicen tres líneas más arriba.** Allí se escribió, dos
+veces, que `hOther` «es una obligación vacua que quien la tenga a mano paga con `absurd`» y que
+«enunciarla como hipótesis es más honesto que fabricar aquí una prueba que dependa del número
+exacto de tags». Lo primero era cierto y **lo segundo era una excusa**: la prueba no depende del
+número exacto de tags, depende de que **el mismo `ax_lineWF_inv` que ya se está usando** acota el
+tag por 20. Se paga aquí, y en **veinte líneas**.
+
+**El argumento**, que es el que `absurd` esconde: si `lineWF t` y `lineTag t ≐ k̄` con `k > 20`,
+entonces `prf_lineWF_inv` da `⋁_{j≤20} lineTag t ≐ ȷ̄`; en cada rama, `ȷ̄ ≐ k̄` con `j < k`
+transporta `lt ȷ̄ k̄` (`prf_lt_numeralM`) a `lt k̄ k̄` por Leibniz, y `prf_lt_irrefl` explota.
+El recorrido de la disyunción es la **misma recursión sobre `n`** que `prf_of_tagDisj`, no
+veintiún `or_elim` a mano.
+
+🔑 **La lección de método, y es la de [[feedback-medir-la-forma]] con el signo cambiado**: una
+obligación que se declara «vacua» sin pagarla queda **contando como abierta** aguas abajo — `hbody`(a)
+la arrastró hasta aquí como parámetro. **Medir que algo es trivial no es probarlo**, exactamente
+igual que medir una obstrucción no es probarla. -/
+
+/-- De **dos tags distintos** para la misma línea sale cualquier cosa: la igualdad transporta
+    `lt ȷ̄ k̄` a `lt k̄ k̄` y la irreflexividad explota. -/
+theorem prf_tag_absurd (t : Term) (C : Formula) (j k : Nat) (h : j < k) :
+    Prf ((lineTag t =eq numeralM j) ⇒ ((lineTag t =eq numeralM k) ⇒ C)) := by
+  refine prf_deduction (deduction_aux ?_ (lineTag t =eq numeralM k)
+    [lineTag t =eq numeralM j] rfl)
+  have hj : PrfH [lineTag t =eq numeralM k, lineTag t =eq numeralM j]
+      (lineTag t =eq numeralM j) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hk : PrfH [lineTag t =eq numeralM k, lineTag t =eq numeralM j]
+      (lineTag t =eq numeralM k) := PrfH.hyp _ _ (List.Mem.head _)
+  have hjk : PrfH [lineTag t =eq numeralM k, lineTag t =eq numeralM j]
+      (numeralM j =eq numeralM k) := PrfH_eq_trans (PrfH_eq_symm hj) hk
+  have hlt : PrfH [lineTag t =eq numeralM k, lineTag t =eq numeralM j]
+      (lt (numeralM j) (numeralM k)) := prf_to_prfH (prf_lt_numeralM h) _
+  let A : Formula := lt (.var 0) (liftTerm 0 (numeralM k))
+  have hS : ∀ s : Term, substFormula 0 s A = lt s (numeralM k) := by
+    intro s
+    simp only [A, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  have hlt' : PrfH [lineTag t =eq numeralM k, lineTag t =eq numeralM j]
+      (lt (numeralM k) (numeralM k)) :=
+    (hS (numeralM k)) ▸ PrfH_leibniz_subst (A := A) hjk ((hS (numeralM j)) ▸ hlt)
+  exact PrfH_absurd_lt (numeralM k) hlt'
+
+/-- Recorre la disyunción de tags `≤ n` cuando el tag observado es `k > n`. Misma recursión que
+    `prf_of_tagDisj`, con la rama cerrada por `prf_tag_absurd` en vez de por un reflector. -/
+theorem prf_tagDisj_absurd (t : Term) (C : Formula) (k : Nat) :
+    ∀ n : Nat, n < k → Prf (tagDisj t n ⇒ ((lineTag t =eq numeralM k) ⇒ C))
+  | 0, h => prf_tag_absurd t C 0 k h
+  | n + 1, h => by
+      have hrec : Prf (tagDisj t n ⇒ ((lineTag t =eq numeralM k) ⇒ C)) :=
+        prf_tagDisj_absurd t C k n (by omega)
+      show Prf (lor (lineTag t =eq numeralM (n + 1)) (tagDisj t n) ⇒ _)
+      refine prf_deduction ?_
+      exact PrfH.mp _ _ _
+        (PrfH.mp _ _ _
+          (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 (lineTag t =eq numeralM (n + 1))
+            (tagDisj t n) ((lineTag t =eq numeralM k) ⇒ C))) (prfH_hyp_self _))
+          (prf_to_prfH (prf_tag_absurd t C (n + 1) k h) _))
+        (prf_to_prfH hrec _)
+
+/-- ⭐ **LOS TAGS `k ≥ 21` NO EXISTEN, y aquí se cobra.** El `hOther` que arrastraban `modulo_7`,
+    `modulo_2` y `modulo_other` queda descargado para cualquier conclusión `C`. -/
+theorem pcc_tag_vacuous (t : Term) (C : Formula) {k : Nat} (hk : 20 < k) :
+    Prf (lineWF t ⇒ ((lineTag t =eq numeralM k) ⇒ C)) := by
+  refine prf_deduction ?_
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_tagDisj_absurd t C k 20 hk) _)
+    (PrfH.mp _ _ _ (prf_to_prfH (prf_lineWF_inv t) _) (prfH_hyp_self _))
+
+/-- 🏁🏁🏁 **`pcc_lineWF_tracked`, SIN HIPÓTESIS.** Los 21 tags, cada uno con su reflector: los
+    catorce de `LineWFAssemblePrf`, los siete de sustitución (cinco de §10 y los dos de §10bis) y
+    la cola `k ≥ 21` por `pcc_tag_vacuous`.
+
+    ⇒ **C3 está cerrado**: la reflexión punteada del átomo `lineWF` es un teorema. -/
+theorem pcc_lineWF_tracked (t : Term) :
+    Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t))) := by
+  refine pcc_lineWF_tracked_of_branches t (fun k => ?_)
+  match k with
+  | 0  => exact pcc_lineWF_tracked_p1_imp t
+  | 1  => exact pcc_lineWF_tracked_p2_imp t
+  | 2  => exact pcc_lineWF_tracked_c1_imp t
+  | 3  => exact pcc_lineWF_tracked_c2_imp t
+  | 4  => exact pcc_lineWF_tracked_c3_imp t
+  | 5  => exact pcc_lineWF_tracked_j1_imp t
+  | 6  => exact pcc_lineWF_tracked_j2_imp t
+  | 7  => exact pcc_lineWF_tracked_j3_imp t
+  | 8  => exact pcc_lineWF_tracked_efq_imp t
+  | 9  => exact pcc_lineWF_tracked_q1_imp t
+  | 10 => exact pcc_lineWF_tracked_q2_imp t
+  | 11 => exact pcc_lineWF_tracked_q3_imp t
+  | 12 => exact pcc_lineWF_tracked_eqrefl_imp t
+  | 13 => exact pcc_lineWF_tracked_leibniz_imp t
+  | 14 => exact pcc_lineWF_tracked_p3_imp t
+  | 15 => exact pcc_lineWF_tracked_thy_imp t
+  | 16 => exact pcc_lineWF_tracked_mp_imp t
+  | 17 => exact pcc_lineWF_tracked_gen_imp t
+  | 18 => exact pcc_lineWF_tracked_ind_imp t
+  | 19 => exact pcc_lineWF_tracked_qconf_imp t
+  | 20 => exact pcc_lineWF_tracked_listInd_imp t
+  | n + 21 => exact pcc_tag_vacuous t _ (by omega)
+
 end ROBINSON_PlusPlus.Meta.SubstTreeReflect
 
 /-! ## `export` — por PROPÓSITO DECLARADO
@@ -1102,6 +1205,7 @@ export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
   pcc_lineWF_tracked_q1_imp pcc_lineWF_tracked_q2_imp pcc_lineWF_tracked_leibniz_imp
   pcc_lineWF_tracked_q3_imp pcc_lineWF_tracked_qconf_imp
   pcc_lineWF_tracked_modulo_2 pcc_lineWF_tracked_modulo_other
+  prf_tag_absurd prf_tagDisj_absurd pcc_tag_vacuous pcc_lineWF_tracked
   treeInd treeListInd pcc_core_ind pcc_core_listInd
   pcc_lineWF_tracked_ind_imp pcc_lineWF_tracked_listInd_imp
   prf_hasWit_termCodeM substtc_inv_termCodeM prf_termCodeM_numeral prf_tc_termCodeM
@@ -1121,3 +1225,4 @@ export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_ind_imp
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_listInd_imp
 #print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_other
+#print axioms ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked
