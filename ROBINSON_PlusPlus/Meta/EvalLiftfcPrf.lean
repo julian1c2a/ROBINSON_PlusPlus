@@ -1276,11 +1276,20 @@ igual que `pcc_eval_liftfc` frente a `pcc_eval_substfc`— pero **es un frente, 
 ⇒ Se **enuncia** la deuda, como manda el idioma del módulo (§2 de `Meta/D3ChainDotPrf.lean`: la
 deuda se enuncia, no se postula). No hay ningún `axiom` aquí. -/
 
-/-- **LA DEUDA**: la clausura del testigo de FÓRMULA bajo `liftfc`, a nivel arbitrario.
+/-- **LA DEUDA**, 🏁 **SALDADA el 2026‑09‑10** por `Meta/LiftfcWitnessPrf.lean`
+    (`deuda_hasWitF_liftfc`): la clausura del testigo de FÓRMULA bajo `liftfc`, a nivel arbitrario.
 
-    ⚠️ **Es un OBJETIVO enunciado, no un teorema**: aquí no se prueba ni se postula (no hay
-    ningún `axiom` en este módulo). Quien la pruebe cierra `ind` (18) y `listInd` (20) de C3 y,
-    con ellos, `hbody`(a) de D3.
+    Se conserva el `abbrev` porque `hasWitF_liftfc_of_deuda` es la forma en que los consumidores la
+    aplican, y porque documenta la **forma de la guarda**.
+
+    ⛔ **Y hay que corregir lo que este bloque decía.** Decía «es un OBJETIVO enunciado, no un
+    teorema» —cierto entonces, falso ahora— y §3.60 añadía «no hay atajo: es un FRENTE», con el
+    molde en 2 088 líneas. La **estructura** estaba bien medida; **el coste, no**: salió en
+    **657 líneas**, menos de un tercio, porque el molde ya había pagado y **exportado** toda la
+    maquinaria genérica. ⇒ §3.61.3: **medir un frente por el TAMAÑO del molde sobreestima**; la
+    medida útil es qué piezas NUEVAS hacen falta, y ésa se lee de su bloque `export`.
+
+    Cerró `ind` (18) y `listInd` (20) de C3 y, con ellos, `hbody`(a) de D3.
 
     📐 **Guarda: sólo `hasWitF X`, y el NIVEL va libre.** Se copia exactamente la forma de
     `pcc_eval_liftfc` (§11), que evalúa `liftfc` con `v` **abstracto y sin guarda**. ⚠️ La

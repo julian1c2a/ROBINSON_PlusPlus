@@ -4,62 +4,110 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑10c · `master` · 🏁 VÍA C INTEGRADA · ✅ ÁRBOL VERDE · ✅ CI VERDE**
-`Build completed successfully (135 jobs)` — **121 módulos** (Minimal 11 + Meta 99 + Full 11) + 0 en
+**Estado 2026‑09‑10e · `master` · 🏁🏁🏁 C3 CERRADO · ✅ ÁRBOL VERDE · ✅ CI VERDE**
+`Build completed successfully (139 jobs)` — **125 módulos** (Minimal 11 + Meta 103 + Full 11) + 0 en
 `cuarentena/` · 60 `sondeos/` · **7 `axiom` de Lean · 0 sorrys**.
-La rama `via-c-adr020` (20 commits) se integró en `master` con el merge `7bc2c8a`, y el build se
-verificó verde **después** del merge. La rama se conserva; no hace falta para trabajar.
-🏁 Después del merge se cerraron **tres frentes**: **B3.2** (`Meta/EvalSubsttcPrf.lean`) y el
-**chasis de `hGuard`** (`Meta/LineWFGuardPrf.lean`), documentados en **§3.41**; y ⭐ **B3.4**
-(`Meta/EvalSubstfcPrf.lean`), en **§3.42** — **el muro de `substfc` está dentro del build**.
 
-> # 🎯 SIGUIENTE SESIÓN — **`prf_hasWitF_liftfc`, y es un FRENTE**
+> # 🏁🏁🏁 LO GRANDE DE HOY: **`pcc_lineWF_tracked` ES INCONDICIONAL**
 >
-> D3 está en **UNA** obligación, `hbody`, y §3.59 la **parte por `rfl`** en sus dos mitades. Pero
-> ⛔ **las dos mitades NO son independientes**, y eso corrige lo que decía este cuadro:
+> C3 —la reflexión punteada del átomo `lineWF`, los **21 tags**— **está cerrada**. Y con ella
+> `hbody`(a) de D3, que ya no lleva hipótesis ninguna.
 >
-> | mitad | qué es | depende de |
+> La cadena de hoy, en cinco pasos y cinco commits:
+>
+> | # | pieza | dónde | resultado |
+> |---|---|---|---|
+> | 1 | **`prf_hasWitF_liftfc`** — clausura del testigo bajo `liftfc` | `Meta/LiftfcWitnessPrf.lean` (657 l.) | ✅ net‑0 PURO |
+> | 2 | **`ind` (18) + `listInd` (20)** — nodo `tcm` + los dos árboles | `Meta/SubstTreeReflect.lean` §10bis | ✅ **los SIETE** reflectores |
+> | 3 | ⭐ **`pcc_tag_vacuous`** — se paga el `hOther` «vacuo» | `Meta/SubstTreeReflect.lean` §11ter | 🏁 **`pcc_lineWF_tracked` sin hipótesis** |
+> | 4 | **`hbody`(a)** — la reflexión de `lineWF` en la cadena | `Meta/D3BodyPrf.lean` (nuevo) | ✅ incondicional |
+> | 5 | **`premsOf` evaluado por tag** — las 21 ramas | `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean` | ✅ nivel OBJETO |
+>
+> ## ⭐ El paso 3 es el que enseña algo, y es una autocorrección
+>
+> §11 y §11bis de `SubstTreeReflect` escribieron **dos veces** que `hOther` (los tags `k ≥ 21`)
+> «es una obligación vacua que quien la tenga a mano paga con `absurd`», y que «enunciarla como
+> hipótesis es más honesto que fabricar aquí una prueba que dependa del número exacto de tags».
+> **Era una excusa.** La prueba no depende del número exacto de tags: depende de que **el mismo
+> `ax_lineWF_inv` que ya se está usando** acota el tag por 20. Se paga en **veinte líneas**:
+>
+>     lineWF t + lineTag t = k̄ con k > 20
+>       -> prf_lineWF_inv da la disyunción de tags j <= 20
+>       -> en cada rama, ȷ̄ = k̄ con j < k transporta lt ȷ̄ k̄ a lt k̄ k̄ (Leibniz)
+>       -> prf_lt_irrefl explota; EFQ da cualquier C.
+>
+> 🔑🔑 **REGLA NUEVA — y es la recíproca exacta de «medir una obstrucción no es probarla»:**
+> **una obligación declarada VACUA sin pagarla sigue contando como ABIERTA aguas abajo.**
+> `hbody`(a) la arrastró como parámetro **dos módulos y tres sesiones**. Medir que algo es trivial
+> no es probarlo.
+>
+> ## ⭐⭐ Y el paso 5 corrige otra estimación mía, esta vez a la baja
+>
+> §3.59.2/§13.1 midieron que `premsOf` **no es evaluable uniformemente**: sus 21 axiomas hacen
+> *pattern‑matching* sobre un `cons` explícito, luego sobre una línea **abstracta** no hay nada que
+> evaluar. **Cierto — mientras no se sepa la LONGITUD.** Y la longitud sale del bicondicional del
+> `ax_lineWF_*` del mismo tag. La cadena, idéntica para los 21:
+>
+>     lineWF t + lineTag t = k̄
+>       -> (bicondicional del tag)      lenc t = n̄
+>       -> (prf_eta_lenc, ListEtaPrf)   t = <carc t, carc (cdrc t), ...>
+>       -> (prf_nthc1_carc_cdrc)        la posición 1 de esa η ES k̄
+>       -> (ax_premsOf_k instanciado)   premsOf t = R_k
+>
+> **Medido**: «21 casos» sugería 21 pruebas; son **dos lemas genéricos**, **dos envoltorios** y
+> **ocho líneas por tag** — 417 líneas frente a las ~1300 estimadas. Es [[feedback‑medir‑la‑forma]]
+> otra vez, y otra vez en la dirección barata: **generalizar sale más barato**, porque lo caro era
+> la instancia, no el esquema.
+>
+> ⚠️ **Hallazgo lateral**: `ax_lineWF_mp` es el **único** cuyo bicondicional **no lleva condición
+> estructural** (su fidelidad la liga entera `ax_premsOf_mp`) ⇒ dos envoltorios, no uno.
+
+---
+
+> # 🎯 SIGUIENTE SESIÓN — **`hbody`(b) · la reflexión punteada de `premsOf`**
+>
+> D3 sigue en **UNA** obligación, `hbody`, partida por `rfl` en dos mitades. **(a) está PROBADA.**
+> Lo que queda es **(b)**, y ahora se sabe exactamente de qué se compone.
+>
+> | mitad | qué es | estado |
 > |---|---|---|
-> | **(a)** `lineWFDotAt` | reflexión de `lineWF` = `pcc_lineWF_tracked` | ⬜ **`prf_hasWitF_liftfc`** (faltan `ind` 18 y `listInd` 20) |
-> | **(b)** `premsDotAt` | reflexión de `boundedPremsIn` | ⛔ **el análisis por tags de (a)** + `pcc_eval_premsOf` (21 casos) |
+> | **(a)** `lineWFDotAt` | reflexión de `lineWF` | 🏁 **PROBADA** (`Meta/D3BodyPrf.lean`, incondicional) |
+> | **(b)** `premsDotAt` | reflexión de `boundedPremsIn` | ⬜ tres piezas, abajo |
 >
-> ⛔ **Por qué (b) no era «ensamblaje»** (§3.59.2): su cota lleva el símbolo **`premsOf` DOTADO**, y
-> `premsOf` **no está definido por recursión** —como `lenc` o `nthc`— sino por **21 axiomas
-> `ax_premsOf_*`, uno por TAG**, con *pattern‑matching sobre la forma de la línea*. Para un
-> argumento **abstracto** no hay **nada que evaluar**. Sólo se evalúa tras saber el tag, y eso es
-> exactamente (a). ⇒ **el orden correcto es (a) primero**, y (b) reutiliza su análisis de casos.
+> ## Las tres piezas de (b), en orden
 >
-> ## ⛔ Y `prf_hasWitF_liftfc` es un FRENTE, medido (§3.60)
+> **B1 · `pcc_eval_premsOf` — la reflexión PUNTEADA de `premsOf`.** El nivel objeto está hecho
+> (§3.63); falta cruzarlo a `Prov`:
 >
-> Es lo único que separa a C3 de sus dos últimos reflectores y, con ellos, a `hbody`(a). **No hay
-> atajo:**
-> * lo único que existe es `prf_hasWit_liftc` —sorte **TÉRMINO** y **sólo a nivel `zero`**— y
->   `prf_hasWit_liftcT`/`liftscT`, que son sobre el **constructor dotado**, no sobre `liftfc`.
->   **Ni la mitad TÉRMINO a nivel arbitrario existe.**
-> * `pcc_eval_liftfc` **no ayuda**: da la evaluación dentro de `Prov`, no el testigo.
-> * el molde `prf_hasWitF_substfc` es la culminación de la inducción `PHIF` —§16 a §22 de un módulo
->   de **2 088 líneas**—, conjuntiva sobre los dos sortes, con la **fusión de testigos** y las
->   **ocho inyecciones**. El análogo sale **un binder más barato**, pero **es un frente**.
+>     Prov( premsOfT ṫ = (premsOf t)˙ )
 >
-> ✅ **La deuda ya está ENUNCIADA** (`DEUDA_hasWitF_liftfc`, `Meta/EvalLiftfcPrf.lean` §12), con su
-> forma de consumo (`hasWitF_liftfc_of_deuda`). Cero `axiom`.
-> 📐 **Y su guarda está medida**: sólo `hasWitF X`, con el **nivel libre** — copiando
-> `pcc_eval_liftfc`. ⚠️ Añadir `hasWit v` (como hace el molde con su sustituyendo) **haría la deuda
-> inconsumible**: `hasWit` es el testigo de un **código**, y el nivel es un **numeral**.
+> Ruta **medida** y ya usada dos veces (`pcc_eval_carc` en `EvalListPrf`, y `pcc_eval_nthc`):
+> instanciar el **axioma CODIFICADO** (`pcc_axiom_inst2/3/4`) con testigos dotados, computar los
+> `substfc`, y transportar `consT ȧ ḃ` a `(cons a b)˙` con `pcc_dot_cons`. Coste esperado: una
+> plantilla por **aridad** (hay 4: 1, 2, 3, 4) + 21 instanciaciones finas. `prf_premsOf_of_tag` ya
+> deja expuesto el `t = etaTag t m k` que hace falta.
 >
-> 🔑 **Regla nueva**: al enunciar una deuda, **la guarda se copia del CONSUMIDOR, no del molde**.
-> Una deuda demasiado guardada es tan inútil como una demasiado fuerte, y falla más tarde.
+> **B2 · el PUENTE DE LA COTA, dentro de `Prov`.** El destino pide
 >
-> ## Plan recomendado
+>     bdAllCode (lencT (premsOfT (nthcT (liftc 0 q̇) i̇))) ...
 >
-> 1. **`prf_hasWitF_liftfc`** — el frente. Empezar por la **mitad TÉRMINO a nivel arbitrario**
->    (`prf_hasWit_liftc` sólo cubre `zero`), que es el prerrequisito de la conjuntiva.
-> 2. Con él: **`ind` (18) y `listInd` (20)** ⇒ `pcc_lineWF_tracked` ⇒ **(a)**. ➕ hace falta un nodo
->    `tcm : Term → STree` para los `termCodeM` cerrados (trivial: `substTerm_termCodeM` ya existe).
-> 3. **(b)**, reutilizando el análisis por tags de (2) para evaluar `premsOf` (21 casos), y
->    ensamblando el núcleo abstracto de §3.55.3 que ya está probado.
+> y `pcc_bdAll_intro` entrega la cota como **reflexión pura** `tcFn (bndF p)`. La cadena, con B1 en
+> el eslabón de en medio:
 >
-> 🔑🔑 **LAS CUATRO REGLAS DEL FRENTE — todas sobre la FORMA, ninguna sobre el tamaño:**
+>     nthcT q̇ i̇  ->  (nthc q i)˙   ✅ `pcc_eval_nthc`  (bajo `i < lenc q`)
+>     premsOfT Ẋ  ->  (premsOf X)˙  ⬜ **B1**            (bajo `lineWF X`)
+>     lencT L̇     ->  (lenc L)˙     ✅ `pcc_eval_lenc`
+>
+> **B3 · el `pcc_bdAll_intro` INTERIOR** de `boundedPremsIn`, con sus nueve obligaciones sobre el
+> **triple empaquetado** `q = ⟨p,i,L⟩`. ⚠️ §7.2 de `D3ChainDotPrf` lo midió: los dos `PsiF` hay que
+> diseñarlos **JUNTOS y de fuera adentro**. El **exterior ya está** (§8, `chainOkBPsi`, casado por
+> `rfl`), así que el interior sale de él como **sub‑término** — `chainOkBPsi_split` lo exhibe. El
+> núcleo abstracto (`pcc_bdCarcLt_reflect`, `pcc_premsBody_reflect`) está probado desde §5–§6.
+>
+> ⇒ **Con B1+B2+B3, `hbody_of_halves` cierra `hbody`, `d3_prf_of_halves` cierra D3, y se retira
+> `axiom d3`** (7 → 6 `axiom` de Lean). No hay nada más aguas abajo.
+>
+> 🔑🔑 **LAS CINCO REGLAS DEL FRENTE — todas sobre la FORMA, ninguna sobre el tamaño:**
 > 1. **El destino fija la IMAGEN; el CHASIS fija la FORMA de escribirla** ([ADR‑021](DECISIONS.md)).
 >    Hacen falta **los dos** cuerpos, y por el puente —dentro de `Prov`— han viajado ya **la forma**
 >    (`hmatch`), **la prueba** (`hbdAll_of_dotted`) y **el testigo** (`hwP`).
@@ -68,22 +116,18 @@ verificó verde **después** del merge. La rama se conserva; no hace falta para 
 > 3. ⚠️ **El número de obligaciones abiertas NO mide el progreso.** §3.56 lo subió de 2 a 3 y fue el
 >    paso más importante del frente.
 > 4. ⚠️ **Que una pieza esté enunciada sobre argumentos ABSTRACTOS no garantiza que el destino se
->    deje instanciar con ella** (§3.59.3). Estimar por el enunciado, sin desplegar el destino, es el
->    error que costó la estimación de (b).
+>    deje instanciar con ella** (§3.59.3).
+> 5. 🆕 ⚠️ **Una obligación declarada VACUA sin pagarla sigue contando como ABIERTA** (§3.62). Y su
+>    gemela: **una obstrucción medida no es una obstrucción probada** — §3.63 la levantó entera.
 >
-> ⛔ **LA TRAMPA QUE MORDIÓ TRES VECES**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`… son
-> **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Abrir el destino hacia su gemelo
-> computable con `prf_*_arith_open`, y **entonces** casar por `rfl`. ⚠️ Y medir sobre la **instancia
-> real**: el gemelo se atasca con argumentos abstractos.
->
-> ⚠️ **MEDIR UNA OBSTRUCCIÓN NO ES PROBARLA**, y sus **dos recíprocas**: una obstrucción **sí
-> probada ahorra un frente**, y una obstrucción **bien medida se convierte en el enunciado del lema
-> que falta**.
+> ⛔ **LA TRAMPA QUE MORDIÓ TRES VECES**: `substfc`, `substtc`, `carc`, `cdrc`, `lenc`, **`premsOf`**…
+> son **símbolos de función OBJETO, no funciones de Lean: NO reducen**. Abrir el destino hacia su
+> gemelo computable con `prf_*_arith_open`, y **entonces** casar por `rfl`. ⚠️ Y medir sobre la
+> **instancia real**: el gemelo se atasca con argumentos abstractos.
 >
 > ⛔ **Y un VERDE no es haber comprobado**: los controles daban verde **sin comprobar casi nada**
 > (AI‑GUIDE §27.1) y la CI **no había arrancado nunca**. Arreglado; **CI en verde** desde el
 > 2026‑09‑10. Leer **la cifra medida**, no el `✅`.
-
 ---
 
 > # 🌳 ÁRBOL DE TAREAS DE LA FASE (establecido 2026‑08‑30)

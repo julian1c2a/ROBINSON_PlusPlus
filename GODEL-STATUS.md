@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 135 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 139 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **125 módulos activos** (Minimal 11 + Meta 103 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)

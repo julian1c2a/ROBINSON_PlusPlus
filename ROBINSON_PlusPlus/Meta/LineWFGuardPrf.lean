@@ -36,7 +36,8 @@ Este módulo es el chasis de esa deuda. Todo lo de aquí está compilado y es **
 aguas abajo desde 2026‑09‑08: `pcc_hGuardT` (`Meta/HasWitTrackedPrf.lean`, §3.44) y
 `pcc_hGuardF` (`Meta/HasWitFTrackedPrf.lean`, §3.46), las dos net‑0 puras, y con
 `hGuard_of_slots` **la cascada de ADR‑020 no tiene ninguna obligación abierta**.
-⚠️ Y eso **no cierra C3**: `pcc_lineWF_tracked_modulo_7` sigue pidiendo los 7 reflectores
+⚠️ **[HISTÓRICO — C3 se cerró el 2026‑09‑10, §3.62: `pcc_lineWF_tracked` es INCONDICIONAL.]**
+⚠️ Y eso **no cerraba C3**: `pcc_lineWF_tracked_modulo_7` seguía pidiendo los 7 reflectores
 de sustitución, a los que ahora sólo les falta su condición **estructural** (§3.47).
 
 Lo que sigue valiendo de la medición original, por si hace falta rehacerla:

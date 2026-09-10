@@ -17,7 +17,7 @@
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 135 jobs · 121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/`
+> **Build 139 jobs · 125 módulos activos** (Minimal 11 + Meta 103 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 7 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
@@ -5005,3 +5005,207 @@ tendría con qué descargarla. Se intentó, no compiló, y queda escrito en el d
 🔑 **Regla**: al enunciar una deuda, la guarda se copia del **consumidor**, no del molde. Una deuda
 demasiado guardada es tan inútil como una demasiado fuerte — y falla más tarde, cuando ya se ha
 invertido en probarla.
+
+---
+
+## §3.61 · 🏁 `prf_hasWitF_liftfc` PROBADO — y por qué la medida de §3.60 falló **a la baja** (2026‑09‑10d)
+
+> `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
+> Footprint **net‑0 PURO**: `[propext, Classical.choice, Quot.sound]`.
+
+§3.60 midió esta deuda y la clasificó como **«un FRENTE, sin atajo»**, con el molde
+(`prf_hasWitF_substfc`, `Meta/SubstfcWitnessPrf.lean`) en **2 088 líneas**. La medida acertó en la
+**estructura** —hacen falta las dos armazones, la de sorte TÉRMINO y la de sorte FÓRMULA, las dos por
+inducción fuerte de Cantor— y **falló en el coste**: salieron **657 líneas**, menos de un tercio.
+
+### §3.61.1 · Las dos armazones
+
+| armazón | cuerpo | qué prueba |
+|---|---|---|
+| `PHIL` | `BODYL w v X` — **conjuntivo** sobre `liftc`/`liftsc` | `prf_hasWit_liftc_of_isTC1`, `prf_hasWit_liftc_at`, `prf_hasWitArgs_liftsc_of` |
+| `PHILF` | `BODYFL wF wT v X` | `prf_hasWitF_liftfc_of_isFC1` ⇒ **`prf_hasWitF_liftfc`** |
+
+El enunciado final es exactamente el que `EvalLiftfcPrf` §12 había **enunciado** (no postulado):
+
+    ∀ v X, Prf (hasWitF X ⇒ hasWitF (liftfc v X))
+
+con el **nivel libre**, que es la guarda que §3.60.1 midió copiándola del **consumidor**.
+
+### §3.61.2 · ⭐ Los tres ahorros, medidos
+
+1. **El caso `varc` es una DICOTOMÍA cuyas dos ramas devuelven un `varc`.** `prf_liftc_varc_cases`
+   dice que `liftc v (varc n)` es `varc n` o `varc (succ n)`; **las dos** son códigos de variable, y
+   `prf_hasWit_varc` es **incondicional**. En el molde, el caso análogo tenía que mirar el
+   sustituyendo.
+2. **Un binder menos por armazón.** No hay sustituyendo, luego no hay `hasWit s` que arrastrar ni
+   `HasWitLift` que mantener. Es el mismo ahorro que §3.53 midió para `pcc_eval_liftfc`.
+3. **Los casos `un` no necesitan `CRIT_hasWit_lift`.**
+
+### §3.61.3 · 🔑 Por qué la estimación fue pesimista, y qué se aprende
+
+El molde **ya había pagado y exportado** toda la maquinaria genérica: `hasWitArgs`,
+`prf_hasWit_varc`, `prf_hasWit_funcc`, `prf_hasWitArgs_nil`/`_cons`, `prf_hasWitF_bot`/`_atomc`/`_eqc`,
+`prf_hasWitF_un`/`_bin`, las **ocho** inyecciones, `nilOrCons`. Lo que quedaba por escribir eran las
+**armazones**, no la maquinaria.
+
+⇒ **Medir un frente por el TAMAÑO del molde sobreestima**, porque el molde incluye lo que ya está
+comprado. La medida útil es **qué piezas NUEVAS hacen falta**, y ésa se lee del bloque `export` del
+molde, no de su `wc -l`.
+
+---
+
+## §3.62 · 🏁🏁🏁 **C3 CERRADO**: `pcc_lineWF_tracked` es INCONDICIONAL (2026‑09‑10e)
+
+> `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
+> Footprint = la base sancionada.
+
+### §3.62.1 · Los dos últimos reflectores: `ind` (18) y `listInd` (20)
+
+Con §3.61 en la mano, los dos tags que §3.54 había medido como bloqueados salen. `STree` gana un
+**séptimo constructor**:
+
+    | tcm : Term → STree      -- para los `termCodeM` CERRADOS de `ind`/`listInd`
+
+⚠️ **Su dotado es el punto delicado del nodo**, y va por la **VÍA NUMERAL** (§3.44): la ecuación
+directa `tcFn (termCodeM x) ≐ termCode (termCodeM x)` es **la que se retiró por inconsistente**
+(`ax_tc_cons`). Se prueba fuera en forma numeral (`prf_termCodeM_numeral`, `prf_tc_termCodeM`) y se
+convierte **dentro de `Prov`** con D1 dotando el puente. En `PrfH_dotVN` el caso es pura congruencia
+y en `SGuards` es `True` — el nodo **no tiene hijos**, luego no hay guarda que cobrar.
+
+Los dos árboles se casan **por `rfl` con `ax_lineWF_ind` y `ax_lineWF_listInd` ENTEROS**, cascada de
+guardas y índices de De Bruijn incluidos:
+
+    treeInd     : bin 5 (sub (tcm 0) (leaf 2)) (bin 5 (un 6 …) (un 6 (leaf 2)))
+    treeListInd : bin 5 (sub (tcm nil) (leaf 2)) (bin 5 (un 6 (un 6 …)) (un 6 (leaf 2)))
+
+⭐ `prf_hasWitF_liftfc` se cobra **una vez** en `pcc_core_ind` y **dos** en `pcc_core_listInd` — que
+es exactamente el `liftfc` anidado que §3.54 había señalado como la obstrucción.
+
+⇒ **los SIETE** reflectores de sustitución, y `pcc_lineWF_tracked_modulo_7` sin deuda.
+
+### §3.62.2 · ⭐⭐ §11ter: se paga el `hOther` que yo había declarado «vacuo»
+
+Quedaba `hOther`: la rama `k ≥ 21` del `match` de `pcc_lineWF_tracked_modulo_7`. §11 y §11bis
+escribieron, **dos veces**, esto:
+
+> «Es una obligación vacua que el ensamblaje pide por exhaustividad del `match`, y quien la tenga a
+> mano la paga con `absurd`; enunciarla como hipótesis es **más honesto** que fabricar aquí una
+> prueba que dependa del número exacto de tags.»
+
+**La primera mitad era verdad y la segunda una excusa.** La prueba **no** depende del número exacto
+de tags: depende de que **el mismo `ax_lineWF_inv` que ya se está usando** acota el tag por 20.
+
+    lineWF t  +  lineTag t ≐ k̄   con k > 20
+      → prf_lineWF_inv da  ⋁_{j≤20} lineTag t ≐ ȷ̄
+      → en cada rama, de ȷ̄ ≐ k̄ con j < k, Leibniz transporta `lt ȷ̄ k̄` a `lt k̄ k̄`
+      → prf_lt_irrefl explota, y EFQ da cualquier `C`.
+
+Tres piezas —`prf_tag_absurd`, `prf_tagDisj_absurd`, `pcc_tag_vacuous`— y **veinte líneas**. El
+recorrido de la disyunción es la **misma recursión sobre `n`** que `prf_of_tagDisj`, no veintiún
+`or_elim` a mano.
+
+⇒ **`pcc_lineWF_tracked (t) : Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))`**, con los 21
+tags cableados. **C3 está cerrado.**
+
+### §3.62.3 · 🔑🔑 La regla, y es la recíproca exacta de una que ya estaba
+
+Ya estaba escrito que **medir una obstrucción no es probarla**. Esto es su gemela:
+
+> ⚠️⚠️ **Una obligación declarada VACUA sin pagarla sigue contando como ABIERTA aguas abajo.**
+
+`hbody`(a) la arrastró como **parámetro** —`hOther` en la firma— a través de dos módulos y tres
+sesiones, y en cada informe de estado había que explicar que «no era realmente una obligación». El
+coste de esa explicación repetida superó con mucho las veinte líneas de pagarla.
+
+**Corolario operativo**: si una obligación se puede describir como «vacua», hay que intentar
+cerrarla **en el momento**, no anotarla. Y si de verdad no se puede, el docstring debe decir **qué
+falta para cerrarla**, no por qué está bien dejarla.
+
+### §3.62.4 · `hbody`(a) de D3, incondicional (`Meta/D3BodyPrf.lean`)
+
+Módulo **aparte a propósito**: junta `D3ChainDotPrf` (que fija el destino) con `SubstTreeReflect`
+(que prueba el reflector), y **ninguno de los dos importa al otro**.
+
+Tres cosas pasan en `hA_lineWFDotAt`:
+
+1. `chainOk → chainOkB` y `∀`‑elim en `i` ⇒ `lineWF (nthc q i)`.
+2. `pcc_lineWF_tracked` ⇒ `Prov(⌜lineWF (nthc q i)⌝)`, con el código en **reflexión pura**.
+3. ⚠️ **La MONEDA otra vez** (§3.55.2): el destino pide el **accesor dotado** `nthcT q̇ i̇`. El salto
+   lo paga `pcc_eval_nthc` **dentro de `Prov`** (simetría interna + Leibniz codificado), y el `liftc`
+   que el binder impone **colapsa** con `prf_liftc_tcFn`.
+
+Dos mediciones por `rfl` **antes** de escribir la prueba, según la regla de §3.44:
+
+    lineWFDotAt q i = lineWFCodeFn (nthcT (liftc 0 q̇) i̇)
+    evalNthcCode p i = eqc (nthcT ṗ i̇) ((nthc p i)˙)
+
+---
+
+## §3.63 · ⭐⭐ `premsOf` **SÍ** se evalúa — la obstrucción de §3.59.2, levantada (2026‑09‑10e)
+
+> `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
+> (nuevos, 208 + 417 l.). Footprint **net‑0 PURO** en los dos.
+
+### §3.63.1 · Lo que decía la obstrucción, y qué le faltaba
+
+§3.59.2 (y §13.1 de `D3ChainDotPrf`) midieron:
+
+> «`premsOf` no está definido por recursión, sino por **21 axiomas `ax_premsOf_*`, uno por TAG**, con
+> *pattern‑matching sobre la FORMA de la línea*. Para un `X` **abstracto**, `premsOf X` está **sin
+> restringir**: no hay nada que evaluar.»
+
+**Todo eso es cierto — y le faltaba una frase**: *mientras no se sepa la LONGITUD*. Y la longitud
+**sí** sale, del bicondicional del `ax_lineWF_*` del **mismo** tag, que todos llevan la cláusula
+canónica `lenc #0 ≐ n̄`.
+
+### §3.63.2 · La η de listas desde la longitud (`Meta/ListEtaPrf.lean`)
+
+⚠️ **No hay axioma que la dé.** `ax_lineWF_cons` da **un solo piso** (y sólo para líneas);
+`ax_lenc_*`/`ax_nthc_*` son las ecuaciones recursivas. El piso genérico sale de `prf_nil_or_cons`
+(inducción de listas, `SubstfcWitnessPrf`) descartando la rama `nil` con `prf_succ_ne_zero`:
+
+    prf_eta_of_lenc_succ : lenc L ≐ σ n  ⇒  L ≐ cons (carc L) (cdrc L)
+    prf_lenc_cdrc        : lenc L ≐ σ n  ⇒  lenc (cdrc L) ≐ n
+    prf_eta_lenc (n)     : lenc L ≐ n̄    ⇒  L ≐ ⟨carc L, carc (cdrc L), …⟩     (recursión sobre n)
+    prf_nthc1_carc_cdrc  : lenc L ≐ n̄₊₂  ⇒  nthc L 1̄ ≐ carc (cdrc L)          (el TAG, leído de la η)
+
+### §3.63.3 · La cadena, idéntica para los 21 tags
+
+    lineWF t  +  lineTag t ≐ k̄
+      → (bicondicional del tag)        lenc t ≐ n̄
+      → (prf_eta_lenc)                 t ≐ ⟨carc t, carc (cdrc t), …⟩
+      → (prf_nthc1_carc_cdrc)          la posición 1 de esa η **es** k̄
+      → (ax_premsOf_k instanciado)     premsOf t ≐ R_k
+
+### §3.63.4 · ⭐⭐ El coste, medido — y otra vez a la BAJA
+
+«21 casos» sugería 21 pruebas. Son **dos lemas genéricos** (`prf_lenc_of_tag`,
+`prf_premsOf_of_tag`), **dos envoltorios** y **ocho líneas por tag**: **417 líneas** en total.
+
+Es [[feedback‑medir‑la‑forma]] otra vez, y otra vez en la dirección barata: **generalizar sale más
+barato**, porque lo caro era la **instancia**, no el esquema. Aquí lo caro habría sido escribir 21
+veces la misma cadena; escribirla una vez con `k`, `m` y `R` abstractos la hace **una** prueba.
+
+### §3.63.5 · ⚠️ El hallazgo lateral: `mp` es distinto
+
+`ax_lineWF_mp` es el **único** de los 21 cuyo bicondicional **no lleva condición estructural**: es
+`lwfVar ⇔ lencMp`, sin `Formula.and`. La razón está en su propio comentario en `Minimal/Axioms.lean`:
+la fidelidad de `mp` **la liga íntegramente `ax_premsOf_mp`** (exige `implc premA concl` y `premA`
+entre las premisas de contexto), así que el `lineWF` no tiene nada que añadir.
+
+⇒ **dos** envoltorios (`prf_premsOf_tag_and` para los veinte, `prf_premsOf_tag_plain` para `mp`), no
+uno. Se descubrió al compilar, no al diseñar — y es justo el tipo de asimetría que la regla de
+«medir el destino por `rfl` antes de escribir» está para cazar.
+
+### §3.63.6 · Lo que queda de `hbody`(b), ya nombrado
+
+Esto es el nivel **OBJETO**. Faltan tres piezas, y ahora se sabe cuáles:
+
+| pieza | qué es | apoyo que ya existe |
+|---|---|---|
+| **B1** | `Prov(premsOfT ṫ ≐ (premsOf t)˙)` — la reflexión **punteada** | la ruta de `pcc_eval_carc` (axioma **codificado** + `pcc_dot_cons`), y §3.63 da el `t ≐ etaTag t m k` |
+| **B2** | el puente de la **cota** dentro de `Prov`: `lencT (premsOfT (nthcT q̇ i̇)) ↦ (lenc (premsOf (nthc q i)))˙` | `pcc_eval_nthc` ✅ · **B1** ⬜ · `pcc_eval_lenc` ✅ |
+| **B3** | el `pcc_bdAll_intro` **interior** de `boundedPremsIn` (9 obligaciones, triple empaquetado) | el `PsiF` exterior (§3.55.4) y `chainOkBPsi_split`; el núcleo abstracto de §5–§6 |
+
+⇒ Con B1+B2+B3, `hbody_of_halves` cierra `hbody`, `d3_prf_of_halves` cierra **D3**, y se retira
+`axiom d3`. **No hay nada más aguas abajo.**

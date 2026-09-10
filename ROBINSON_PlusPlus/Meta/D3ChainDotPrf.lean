@@ -1095,6 +1095,19 @@ pura `tcFn (bndF p)`, así que hay que cruzar —dentro de `Prov`— la cadena
 puede evaluar tras **saber el tag**, y saber el tag es exactamente el análisis de casos de
 `lineWF` — o sea, la mitad **(a)**.
 
+🏁🏁 **LEVANTADA el 2026‑09‑10** (`Meta/PremsOfTagPrf.lean`, §3.63). ⚠️ **A este diagnóstico le
+faltaba una frase**: «no hay nada que evaluar» vale *mientras no se sepa la **LONGITUD***. Y la
+longitud **sí** sale, del bicondicional del `ax_lineWF_*` del **mismo** tag (todos llevan la
+cláusula canónica `lenc #0 ≐ n̄`). Con ella, la η de listas (`Meta/ListEtaPrf.lean`,
+`prf_eta_lenc`) reconstruye la línea entera y `ax_premsOf_k` se aplica:
+
+    lineWF t + lineTag t ≐ k̄ → lenc t ≐ n̄ → t ≐ ⟨carc t, carc (cdrc t), …⟩ → premsOf t ≐ R_k
+
+⭐⭐ Y el coste, medido, salió **a la baja**: no son 21 pruebas sino **dos lemas genéricos**, dos
+envoltorios y **ocho líneas por tag**. La dependencia que este párrafo señala —que (b) consume el
+análisis por tags— **sigue siendo cierta y sigue mandando el orden**; lo que ya no es cierto es que
+sea cara.
+
 🔑 ⇒ **Las dos mitades no son independientes: (b) consume el análisis por tags de (a).** Son
 hermanas del mismo tamaño (21 tags frente a 23 esquemas `ax_lineWF_*`), no una barata y otra cara.
 
@@ -1111,10 +1124,20 @@ seguirán haciendo falta; lo que no vale es la estimación de que bastaban.
 | pieza | estado | depende de |
 |---|---|---|
 | `hbody` partido en (a) y (b), con los dos `substfc` compuestos | ✅ §13 | — |
-| **(a)** `lineWFDotAt` = `pcc_lineWF_tracked` | ⬜ **5 de 7** reflectores | `prf_hasWitF_liftfc` |
-| **(b)** `premsDotAt` | ⬜ cota con `premsOfT`; núcleo de §5–§6 probado | **el análisis por tags de (a)** + `pcc_eval_premsOf` (21 casos) |
+| **(a)** `lineWFDotAt` = `pcc_lineWF_tracked` | 🏁 **PROBADA** (`Meta/D3BodyPrf.lean`), incondicional | — |
+| **(b)** `premsDotAt` | ⬜ **tres** piezas nombradas, abajo | (a) ✅ |
 
-⇒ **El orden correcto es (a) primero**, y (b) después reutilizando su análisis de casos. -/
+⇒ El orden era **(a) primero**, y se cumplió: (a) está cerrada desde §3.62.4.
+
+### §13.3 · Lo que queda de (b), con nombre (2026‑09‑10)
+
+| pieza | qué es | apoyo |
+|---|---|---|
+| **B1** | `Prov(premsOfT ṫ ≐ (premsOf t)˙)` — la reflexión **punteada** de `premsOf` | nivel OBJETO ✅ (§3.63); la ruta es la de `pcc_eval_carc` (axioma **codificado** + `pcc_dot_cons`) |
+| **B2** | el puente de la **cota** dentro de `Prov` | `pcc_eval_nthc` ✅ · **B1** ⬜ · `pcc_eval_lenc` ✅ |
+| **B3** | el `pcc_bdAll_intro` **interior** (9 obligaciones, triple empaquetado) | el `PsiF` exterior (§8) y `chainOkBPsi_split`; el núcleo abstracto de §5–§6 |
+
+⇒ Con B1+B2+B3, `hbody_of_halves` cierra `hbody` y `d3_prf_of_halves` cierra **D3**. -/
 
 end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 

@@ -7,8 +7,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 135 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **121 módulos activos** (Minimal 11 + Meta 99 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
+> **Build 139 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **125 módulos activos** (Minimal 11 + Meta 103 + Full 11) **+ 0 en `cuarentena/` + 60 en `sondeos/`.**
 > **7 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -61,6 +61,22 @@ Extraída **por máquina** de los `import` reales de los módulos activos de `Me
 | L17–L21 | **sistema de prueba interno a nivel de código** | `ExIntroCodePrf`, `LineWFCases`, `OmegaReflect` · `Sigma1TrackedPrf` · `TrackedCorePrf` · `ForallElimCodePrf`, `Sigma1AtomPrf` · **`MpCodePrf`** |
 | L22–L24 | **LA ESCALERA (a.2)** | **`EvalArithPrf`** → **`EvalMulPrf`** → **`DotConsPrf`** |
 | L25–L28 | **REPATRIADOS** (2026-08-23, paso 1) | **`EvalListPrf`** → `EvalLtPrf`, `EvalRunFnPrf` → `EvalBoundedPrf`, `Delta0ReflectPrf`, `PropCodePrf` → **`D3DottedPrf`** |
+
+### ⚠️ NOVEDADES posteriores a la extracción (la tabla de arriba es del 2026‑08‑22)
+
+Módulos añadidos desde entonces cuyas **aristas** conviene tener a mano, medidas de los `import`
+reales el **2026‑09‑10e** (`125 módulos activos`, Meta 103):
+
+| módulo | importa | quién lo importa | por qué la arista es la que es |
+|---|---|---|---|
+| **`LiftfcWitnessPrf`** | `EvalLiftfcPrf` | `SubstTreeReflect` | descarga `DEUDA_hasWitF_liftfc`, que está **enunciada** en `EvalLiftfcPrf` §12 |
+| **`ListEtaPrf`** | `SubstfcWitnessPrf` | `PremsOfTagPrf` | la η sale de `prf_nil_or_cons`, que vive ahí (rama C de ADR‑020) |
+| **`PremsOfTagPrf`** | `ListEtaPrf`, `LineWFSchemaPrf`, `LineWFAssemblePrf` | — (hoja) | necesita la η, el chasis de esquema (`tagF`/`lencF`) y el ensamblador por tags |
+| **`D3BodyPrf`** | `D3ChainDotPrf`, `SubstTreeReflect` | — (hoja) | ⚠️ **la razón de que sea un módulo aparte**: junta el que fija el DESTINO con el que prueba el REFLECTOR, y **ninguno de los dos importa al otro**. Meterlo en cualquiera de ellos crearía una dependencia que hoy no existe |
+
+⭐ **`D3BodyPrf` es el nodo más profundo del proyecto** desde el 2026‑09‑10: es la confluencia de las
+dos ramas largas (C3 por `SubstTreeReflect`, D3 por `D3ChainDotPrf`), que hasta hoy corrían en
+paralelo sin tocarse.
 
 **Hechos estructurales medidos:**
 

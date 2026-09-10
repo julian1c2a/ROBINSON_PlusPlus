@@ -900,7 +900,8 @@ theorem pcc_core_qconf (t : Term) :
     exact ⟨⟨⟨hwF2, trivial⟩, trivial⟩, trivial, trivial⟩
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 19 (`qconf`), PROBADO.** Con él, **CINCO de los SIETE**.
-    ⚠️ Faltan `ind` (18) y `listInd` (20), y lo que les falta está MEDIDO: sus `liftfc` van
+    ⚠️ **[HISTÓRICO — cerrados en §10bis el 2026‑09‑10 con `prf_hasWitF_liftfc` + el nodo `tcm`.]**
+    ⚠️ Faltaban `ind` (18) y `listInd` (20), y lo que les faltaba estaba MEDIDO: sus `liftfc` van
     **anidados** (`liftfc 2 (liftfc 1 A)`) y bajo un `substfc`, así que la guarda que el
     evaluador pide es `hasWitF (liftfc 1 A)` — y la cascada sólo da `hasWitF A`. Hace falta la
     **clausura de `hasWitF` bajo `liftfc`**, que no existe en el árbol (sólo está la de

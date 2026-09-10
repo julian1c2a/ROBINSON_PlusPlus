@@ -14,7 +14,15 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
-> **Último build verificado:** **135 jobs**, **121 módulos**, 0 errores, 0 warnings, **0 `sorry`** (2026‑09‑09).
+> **2026‑09‑10e — 🏁🏁🏁 C3 CERRADO.** `pcc_lineWF_tracked` es **incondicional**: los 21 tags
+> cableados. Cinco piezas nuevas: `Meta/LiftfcWitnessPrf.lean` (`prf_hasWitF_liftfc`, net‑0 puro),
+> el nodo `tcm` de `STree` con `ind`/`listInd` ⇒ **los SIETE** reflectores, `pcc_tag_vacuous` (que
+> **paga** el `hOther` antes declarado «vacuo»), `Meta/D3BodyPrf.lean` (`hbody`(a) de D3,
+> incondicional) y `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean` (**`premsOf` evaluado por
+> tag**, las 21 ramas a nivel objeto — la obstrucción de §3.59.2, levantada). Detalle en
+> `doc/REFERENCE-Incompleteness.md` §3.61–§3.63.
+>
+> **Último build verificado:** **139 jobs**, **125 módulos**, 0 errores, 0 warnings, **0 `sorry`** (2026‑09‑09).
 
 ---
 
@@ -38,7 +46,8 @@ Se pasa a `run: |`.
 
 ➕ `.gitattributes` nuevo, forzando `*.bash`, `*.yml` y `*.py` a **LF**: con `core.autocrlf`
 activo en Windows un re-clone los convierte a CRLF y fallan en el runner con
-«`$'': command not found`». Cinco ficheros estaban ya en CRLF y se renormalizan.
+«`$'
+': command not found`». Cinco ficheros estaban ya en CRLF y se renormalizan.
 
 ### 🔧 Tres controles que daban verde sin comprobar
 
