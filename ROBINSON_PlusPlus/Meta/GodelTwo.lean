@@ -35,10 +35,14 @@ estructural `provCodeC'`, con la cadena de Hilbert-Bernays-Löb:
 
 * **D1** (`repr_pos'`) — real (`Meta/Representability2.lean`).
 * **D2** (`d2`) — **real** (`Meta/DerivCond.lean`), usado explícitamente aquí.
-* **D3** — **postulado** (`d3` abajo). Su prueba real (Σ₁-completitud provable por
-  inducción object internalizando `repr_pos'`) es la pieza pendiente más grande, y
-  además requiere unificar `Prf.thy → axioms` (el verificador como teoría). Ver
-  `project_godel_nivel_d_real` / análisis de D3.
+* **D3** (`d3` abajo) — 🏁 **TEOREMA desde el 2026‑09‑10g**, ya no postulado.
+  `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10) la demuestra: Σ₁‑completitud provable
+  por inducción objeto, con `pcc_eval_premsOf` (B1), el puente de la cota (B2) y el
+  chasis interior (B3). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres**, y los
+  `axiom` de Lean pasaron de **7 a 6**. Detalle: `doc/REFERENCE-Incompleteness.md` §3.67.
+  ⚠️ Este párrafo decía hasta hoy «postulado… la pieza pendiente más grande»: lo cazó la
+  auditoría de `doc/book/AUDITORIA-2026-09-10.md` R3 — un docstring que contradecía a un
+  teorema **33 líneas más abajo, en su propio fichero**.
 
 ⚠️ **ACTUALIZADO 2026‑08‑19:** el punto fijo disponible es ahora `godelCN_fixedpoint`
 (`Meta/DiagonalNumeral.lean`), sobre la sentencia **numeral** `godelCN`; el de `godelC'` se retiró
@@ -106,8 +110,10 @@ theorem con_imp_godel' (G : Formula)
 
     Prueba (la de libro): si `⊢ Con'`, por `con_imp_godel'` + mp se tiene `⊢ G`,
     contra la indemostrabilidad de `G` (`hgi`, mitad de Gödel I). Parametrizado por
-    el punto fijo (`fp_bwd`), la necesitación (`nec1`) y `hgi : ⊬ G`. **D2 real**,
-    **D3 postulado** (`d3`). -/
+    el punto fijo (`fp_bwd`), la necesitación (`nec1`) y `hgi : ⊬ G`.
+    🏁 **D1, D2 y D3 son las TRES teoremas** desde el 2026‑09‑10g (`d3` dejó de ser `axiom`).
+    Lo que le queda son sus tres hipótesis explícitas, que **no** son condiciones de
+    derivabilidad: dos son piezas construibles y `hgi` es la mitad demostrada de Gödel I. -/
 theorem goedel_second' (G : Formula)
     (fp_bwd : axioms ⊢ (neg (provCodeC' G) ⇒ G))
     (nec1 : axioms ⊢ provCodeC' (G ⇒ neg (provCodeC' G)))

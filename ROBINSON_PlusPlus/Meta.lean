@@ -8,8 +8,10 @@ Public API:
   · Godel          (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
   · Provability    (Nivel C): formCode, IsFormula, Provable (núcleo real de codificación)
   · Nivel D REAL: verificador estructural (provCodeC'/chainOk/runFn) + D1/D2 reales +
-    punto fijo real (godelC'_fixedpoint) + Gödel I real (goedel_first_real') +
-    Gödel II (goedel_second', módulo el axioma d3).
+    punto fijo real (godelCN_fixedpoint) + Gödel I real (goedel_first_numeral) +
+    Gödel II (goedel_second') — 🏁 D1, D2 y D3 las TRES demostradas (2026‑09‑10g:
+    `d3` pasó de axiom a teorema). ⚠️ `godelC'_fixedpoint`/`goedel_first_real'` NO
+    existen desde la reparación; los nombres vivos son los de arriba.
 
   Nota (F7a, 2026‑07‑09): retirada la capa Gödel LEGACY postulada — el módulo
   `Meta/Incompleteness.lean` (Gödel I/II vía D2/D3 postulados) y los 7 postulados
