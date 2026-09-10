@@ -326,48 +326,128 @@ theorem substtc_inv_bdCarcLtB (b : Term) :
     ∀ W, Prf (substtc zero W (liftc zero (tcFn b)) =eq liftc zero (tcFn b)) :=
   substtc_inv_liftc_tcFn b
 
-/-- ⭐⭐ **LA REFLEXIÓN DEL `∃` ACOTADO, CON COTA ARBITRARIA.** -/
-theorem pcc_bdCarcLt_reflect (y p b : Term) :
-    Prf (chainOk nil p ⇒ (lt b (lenc p) ⇒
-      (boundedCarcLt y p b ⇒ provFromCode (bdCarcLtDot y p b)))) := by
-  refine prf_deduction (deduction_aux (deduction_aux ?_ (boundedCarcLt y p b)
-    [lt b (lenc p), chainOk nil p] rfl) (lt b (lenc p)) [chainOk nil p] rfl)
-  have hex : PrfH [boundedCarcLt y p b, lt b (lenc p), chainOk nil p]
+/-! ### §5bis · LA MISMA, GENERALIZADA EN SU `Phic` (2026‑09‑10h)
+
+⭐ **`pcc_bdCarcLt_reflect` no era el lema general: era una instancia.** Lo que la prueba de arriba
+hace no depende de que el cuerpo del `∃` sea `bdCarcLtPhic`; sólo necesita que el cuerpo, **ya
+instanciado en el testigo**, se pueda producir. Generalizarlo cuesta **dos parámetros** (`Phic` y su
+liftado) y **una hipótesis extra `A`** que atraviese el `∃`‑elim.
+
+⚠️ **La hipótesis extra no es capricho.** El consumidor real —el chasis interior de
+`boundedPremsIn`, `Meta/PremsBdAllPrf.lean`— necesita la cota `j < lenc L` dentro de `hphi`, y por
+las tres hipótesis de §5 **no viaja**. Es la clase de cosa que sólo se ve al instanciar.
+
+⛔ **Y por qué hay que generalizar en el `Phic` y no reescribir después**: el hueco a cambiar vive
+**bajo el binder del `exc`**, y `pcc_rw` —que reescribe con `substfc zero`— **no llega ahí**. El
+único sitio donde el salto se puede dar es la obligación `hphi`, con el binder **ya abierto**.
+⭐ `PrfH_bdEx_intro_open` era genérico en `Phic` **desde siempre**; lo único especializado era la
+envoltura. -/
+
+/-- Contracción: dos hipótesis iguales seguidas se funden en una. -/
+theorem prf_contract {A B : Formula} (h : Prf (A ⇒ (A ⇒ B))) : Prf (A ⇒ B) :=
+  prf_deduction (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH h _) (prfH_hyp_self _))
+    (prfH_hyp_self _))
+
+theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
+    (hPlift : liftTerm 0 Phic = Phic')
+    (hAlift : liftFormula 0 A = A')
+    (hwPhi : Prf (hasWitF (liftTerm 0 Phic')))
+    (hphi : Prf (A' ⇒ (chainOk nil (liftTerm 0 p) ⇒ (lt (liftTerm 0 b) (lenc (liftTerm 0 p)) ⇒
+        (land (lt (.var 0) (liftTerm 0 b))
+              (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
+         ⇒ provFromCode (substfc zero (tcFn (.var 0)) Phic')))))) :
+    Prf (A ⇒ (chainOk nil p ⇒ (lt b (lenc p) ⇒ (boundedCarcLt y p b ⇒
+      provFromCode (bdExCode (liftc zero (tcFn b)) Phic))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux (deduction_aux ?_
+    (boundedCarcLt y p b) [lt b (lenc p), chainOk nil p, A] rfl)
+    (lt b (lenc p)) [chainOk nil p, A] rfl)
+    (chainOk nil p) [A] rfl)
+  have hex : PrfH [boundedCarcLt y p b, lt b (lenc p), chainOk nil p, A]
       (boundedCarcLt y p b) := PrfH.hyp _ _ (List.Mem.head _)
   refine PrfH_ex_elim hex ?_
-  rw [liftFormula_provFromCode_open, liftTerm_bdCarcLtDot]
+  rw [liftFormula_provFromCode_open]
+  have hLb : liftTerm 0 (bdExCode (liftc zero (tcFn b)) Phic)
+      = bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic' := by
+    simp only [bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral, funcc,
+      cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral,
+      hPlift]
+  rw [hLb]
   let exBody : Formula := land (lt (.var 0) (liftTerm 0 b))
     (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
-  let Γ' : List Formula :=
+  let Gm : List Formula :=
     [exBody, liftFormula 0 (boundedCarcLt y p b), liftFormula 0 (lt b (lenc p)),
-     liftFormula 0 (chainOk nil p)]
-  show PrfH Γ' (provFromCode (bdCarcLtDot (liftTerm 0 y) (liftTerm 0 p) (liftTerm 0 b)))
-  have hC : PrfH Γ' exBody := PrfH.hyp _ _ (List.Mem.head _)
-  have hlt : PrfH Γ' (lt (.var 0) (liftTerm 0 b)) := PrfH_and_elim_left hC
-  have hbody : PrfH Γ'
-      (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)) :=
-    PrfH_and_elim_right hC
-  have hble : PrfH Γ' (lt (liftTerm 0 b) (lenc (liftTerm 0 p))) :=
+     liftFormula 0 (chainOk nil p), liftFormula 0 A]
+  show PrfH Gm (provFromCode (bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic'))
+  have hC : PrfH Gm exBody := PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH Gm (lt (.var 0) (liftTerm 0 b)) := PrfH_and_elim_left hC
+  have hble : PrfH Gm (lt (liftTerm 0 b) (lenc (liftTerm 0 p))) :=
     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-  have hchain : PrfH Γ' (chainOk nil (liftTerm 0 p)) :=
+  have hchain : PrfH Gm (chainOk nil (liftTerm 0 p)) :=
     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
-  -- el testigo cae bajo `lenc p` por transitividad: es lo que `pcc_eval_carc_nthc` pide
-  have hk : PrfH Γ' (lt (.var 0) (lenc (liftTerm 0 p))) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_trans _ _ _) _) hlt) hble
-  -- COTA: directa, sin evaluación (aquí está el ahorro)
-  have hlt1 : PrfH Γ' (provFromCode (ltCodeFn (tcFn (.var 0)) (tcFn (liftTerm 0 b)))) :=
+  have hA : PrfH Gm A' := hAlift ▸ PrfH.hyp _ _
+    (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
+  -- COTA: directa, sin evaluación
+  have hlt1 : PrfH Gm (provFromCode (ltCodeFn (tcFn (.var 0)) (tcFn (liftTerm 0 b)))) :=
     PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked (.var 0) (liftTerm 0 b)) _) hlt
-  have hltB : PrfH Γ' (provFromCode
+  have hltB : PrfH Gm (provFromCode
       (ltCodeFn (tcFn (.var 0)) (liftc zero (tcFn (liftTerm 0 b))))) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_atom2CodeFn (prf_refl _)
       (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 b))))) _) hlt1
-  -- CUERPO: evaluación + congruencia OBJETO, sin cruzar la frontera D1
-  have hev : PrfH Γ' (provFromCode (eqCodeFn
+  -- CUERPO: la obligación genérica, ya con el binder ABIERTO
+  have hphi' : PrfH Gm (provFromCode (substfc zero (tcFn (.var 0)) Phic')) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
+      (prf_to_prfH hphi _) hA) hchain) hble) hC
+  exact PrfH_bdEx_intro_open _ _ (tcFn (.var 0))
+    (substtc_inv_bdCarcLtB (liftTerm 0 b)) hltB hphi'
+    (by hw_auto) hwPhi (by hw_auto)
+
+
+
+/-! ### §5ter · Y `pcc_bdCarcLt_reflect` COMO INSTANCIA (ADR‑019)
+
+El `A` extra se instancia con `chainOk nil p` —redundante— y se contrae. La obligación `hphi` es
+literalmente lo que la prueba de §5 hacía en su contexto interno, sacado a un `Prf`. -/
+
+/-- La obligación `hphi` del caso `bdCarcLtPhic`. -/
+theorem hphi_bdCarcLt (y p b : Term) :
+    Prf (chainOk nil (liftTerm 0 p) ⇒
+      (chainOk nil (liftTerm 0 p) ⇒ (lt (liftTerm 0 b) (lenc (liftTerm 0 p)) ⇒
+        (land (lt (.var 0) (liftTerm 0 b))
+              (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
+         ⇒ provFromCode (substfc zero (tcFn (.var 0))
+             (bdCarcLtPhic (liftTerm 0 y) (liftTerm 0 p))))))) := by
+  refine prf_deduction (deduction_aux (deduction_aux (deduction_aux ?_
+    (land (lt (.var 0) (liftTerm 0 b))
+          (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)))
+    [lt (liftTerm 0 b) (lenc (liftTerm 0 p)), chainOk nil (liftTerm 0 p),
+     chainOk nil (liftTerm 0 p)] rfl)
+    (lt (liftTerm 0 b) (lenc (liftTerm 0 p)))
+    [chainOk nil (liftTerm 0 p), chainOk nil (liftTerm 0 p)] rfl)
+    (chainOk nil (liftTerm 0 p)) [chainOk nil (liftTerm 0 p)] rfl)
+  let Gm : List Formula :=
+    [land (lt (.var 0) (liftTerm 0 b))
+          (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)),
+     lt (liftTerm 0 b) (lenc (liftTerm 0 p)), chainOk nil (liftTerm 0 p),
+     chainOk nil (liftTerm 0 p)]
+  have hC : PrfH Gm (land (lt (.var 0) (liftTerm 0 b))
+      (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hlt : PrfH Gm (lt (.var 0) (liftTerm 0 b)) := PrfH_and_elim_left hC
+  have hbody : PrfH Gm
+      (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y)) :=
+    PrfH_and_elim_right hC
+  have hble : PrfH Gm (lt (liftTerm 0 b) (lenc (liftTerm 0 p))) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hchain : PrfH Gm (chainOk nil (liftTerm 0 p)) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
+  have hk : PrfH Gm (lt (.var 0) (lenc (liftTerm 0 p))) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_trans _ _ _) _) hlt) hble
+  have hev : PrfH Gm (provFromCode (eqCodeFn
       (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
       (tcFn (carc (nthc (liftTerm 0 p) (.var 0)))))) :=
     PrfH.mp _ _ _
       (PrfH.mp _ _ _ (prf_to_prfH (pcc_eval_carc_nthc (liftTerm 0 p) (.var 0)) _) hchain) hk
-  have hcodeq : PrfH Γ' (eqCodeFn (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
+  have hcodeq : PrfH Gm (eqCodeFn (carcT (nthcT (tcFn (liftTerm 0 p)) (tcFn (.var 0))))
         (tcFn (carc (nthc (liftTerm 0 p) (.var 0))))
       =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
         (liftc zero (tcFn (liftTerm 0 y)))) :=
@@ -376,11 +456,10 @@ theorem pcc_bdCarcLt_reflect (y p b : Term) :
         (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 p))) (prf_refl _))) _)
       (PrfH_eq_trans (PrfH_congr_tcFn hbody)
         (prf_to_prfH (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 y))) _))
-  have hphi : PrfH Γ' (provFromCode (eqCodeFn
+  have hphi : PrfH Gm (provFromCode (eqCodeFn
       (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
       (liftc zero (tcFn (liftTerm 0 y))))) :=
     PrfH_provCode_congr hcodeq hev
-  -- el hueco `⌜v₀⌝` del cuerpo recibe el testigo `ı̇`
   have hcompPhi : Prf (substfc zero (tcFn (.var 0))
       (bdCarcLtPhic (liftTerm 0 y) (liftTerm 0 p))
       =eq eqCodeFn (carcT (nthcT (liftc zero (tcFn (liftTerm 0 p))) (tcFn (.var 0))))
@@ -393,13 +472,18 @@ theorem pcc_bdCarcLt_reflect (y p b : Term) :
     exact prf_eq_trans (prf_substtc_nthcT zero (tcFn (.var 0)) _ _)
       (prf_congr_nthcT (substtc_inv_liftc_tcFn (liftTerm 0 p) (tcFn (.var 0)))
         (prf_substtc_varc0 (tcFn (.var 0))))
-  have hphi' : PrfH Γ' (provFromCode (substfc zero (tcFn (.var 0))
-      (bdCarcLtPhic (liftTerm 0 y) (liftTerm 0 p)))) :=
-    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hcompPhi)) _) hphi
-  exact PrfH_bdEx_intro_open _ _ (tcFn (.var 0))
-    (substtc_inv_bdCarcLtB (liftTerm 0 b)) hltB hphi'
-    (by hw_auto) (by hw_auto) (by hw_auto)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm hcompPhi)) _) hphi
 
+/-- ⭐⭐ **LA REFLEXIÓN DEL `∃` ACOTADO, CON COTA ARBITRARIA** — hoy, **la instancia** de §5bis
+    (ADR‑019, 2026‑09‑10h). El enunciado es el de siempre; la prueba dejó de estar duplicada. -/
+theorem pcc_bdCarcLt_reflect (y p b : Term) :
+    Prf (chainOk nil p ⇒ (lt b (lenc p) ⇒
+      (boundedCarcLt y p b ⇒ provFromCode (bdCarcLtDot y p b)))) :=
+  prf_contract
+    (pcc_bdEx_carc_reflect_gen y p b (bdCarcLtPhic y p)
+      (bdCarcLtPhic (liftTerm 0 y) (liftTerm 0 p))
+      (chainOk nil p) (chainOk nil (liftTerm 0 p))
+      (liftTerm_bdCarcLtPhic 0 y p) rfl (by hw_auto) (hphi_bdCarcLt y p b))
 
 /-! ## §6 · EL CUERPO DEL `∀` DE `boundedPremsIn`: la disyunción, reflejada (2026‑09‑09f)
 
@@ -1151,7 +1235,8 @@ export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   hC_dot_of_chainOkBDot DEUDA_chainOkBDot d3_prf_of_chainOkBDot
   chainOkBDot_eq_substCodeF chainOkBDot_computed
   chainOkB_bnd_liftc PrfH_chainOkB_bnd_bridge DEUDA_chainOkBDot_of d3_prf_of
-  bdCarcLtPhic bdCarcLtDot liftTerm_bdCarcLtPhic liftTerm_bdCarcLtDot
+  bdCarcLtPhic bdCarcLtDot
+  prf_contract pcc_bdEx_carc_reflect_gen hphi_bdCarcLt liftTerm_bdCarcLtPhic liftTerm_bdCarcLtDot
   substtc_inv_bdCarcLtB pcc_bdCarcLt_reflect
   pcc_premsBody_reflect pcc_premsBody_reflect_at
   pkP pkI pkL premsPair premsBnd

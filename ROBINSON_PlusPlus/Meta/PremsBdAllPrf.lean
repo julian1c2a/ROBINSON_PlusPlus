@@ -641,70 +641,18 @@ theorem substfc_bdEx_at (q i j : Term) :
         (hinv_UI i 1 (liftc zero (tcFn j)))
 
 
-/-! ## §3 · §5 DE `D3ChainDotPrf`, GENERALIZADA EN SU `Phic`
+/-! ## §3 · ⬆️ EL GENÉRICO **BAJÓ** A `D3ChainDotPrf` §5bis (ADR‑019)
 
-⛔ **Por qué hace falta.** El `Phic` que `substCodeF2` produce **no** es el `bdCarcLtPhic` de §5:
-su lado derecho es el **accesor dotado** `nthcT (premsOfT (nthcT q̇ i̇)) ȷ̇` y no `liftc 0 ẏ`. Es la
-MONEDA de §3.55.2 por cuarta vez. Y el salto **no se puede dar donde está**, porque ese hueco vive
-**bajo el binder del `exc`** y `pcc_rw` (que reescribe con `substfc zero`) no llega ahí.
+Aquí se escribió `pcc_bdEx_carc_reflect_gen` —§5 de `D3ChainDotPrf` generalizada en su `Phic`—, y
+luego se midió que **`pcc_bdCarcLt_reflect` es su instancia**. ADR‑019 manda: *no se hace corolario
+a un lema aguas arriba; se **BAJA** el general*. ⇒ vive en `Meta/D3ChainDotPrf.lean` §5bis, junto a
+la instancia que ahora se deriva de él, y aquí se usa por `open`.
 
-⭐ **Dónde sí se puede dar**: en la obligación `hphi` — el cuerpo **ya instanciado en el testigo**
-del `∃`, o sea con el binder **ya abierto**. `PrfH_bdEx_intro_open` es genérico en `Phic` desde
-siempre; lo único que estaba especializado era la envoltura. -/
-
-theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
-    (hPlift : liftTerm 0 Phic = Phic')
-    (hAlift : liftFormula 0 A = A')
-    (hwPhi : Prf (hasWitF (liftTerm 0 Phic')))
-    (hphi : Prf (A' ⇒ (chainOk nil (liftTerm 0 p) ⇒ (lt (liftTerm 0 b) (lenc (liftTerm 0 p)) ⇒
-        (land (lt (.var 0) (liftTerm 0 b))
-              (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
-         ⇒ provFromCode (substfc zero (tcFn (.var 0)) Phic')))))) :
-    Prf (A ⇒ (chainOk nil p ⇒ (lt b (lenc p) ⇒ (boundedCarcLt y p b ⇒
-      provFromCode (bdExCode (liftc zero (tcFn b)) Phic))))) := by
-  refine prf_deduction (deduction_aux (deduction_aux (deduction_aux ?_
-    (boundedCarcLt y p b) [lt b (lenc p), chainOk nil p, A] rfl)
-    (lt b (lenc p)) [chainOk nil p, A] rfl)
-    (chainOk nil p) [A] rfl)
-  have hex : PrfH [boundedCarcLt y p b, lt b (lenc p), chainOk nil p, A]
-      (boundedCarcLt y p b) := PrfH.hyp _ _ (List.Mem.head _)
-  refine PrfH_ex_elim hex ?_
-  rw [liftFormula_provFromCode_open]
-  have hLb : liftTerm 0 (bdExCode (liftc zero (tcFn b)) Phic)
-      = bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic' := by
-    simp only [bdExCode, exc, andc, ltCodeFn, atom2CodeFn, liftc, varc, numeral, funcc,
-      cons, nil, zero, succ, tcFn, liftTerm, liftTerms, liftTerm_strCode, liftTerm_numeral,
-      hPlift]
-  rw [hLb]
-  let exBody : Formula := land (lt (.var 0) (liftTerm 0 b))
-    (Formula.eq (carc (nthc (liftTerm 0 p) (.var 0))) (liftTerm 0 y))
-  let Gm : List Formula :=
-    [exBody, liftFormula 0 (boundedCarcLt y p b), liftFormula 0 (lt b (lenc p)),
-     liftFormula 0 (chainOk nil p), liftFormula 0 A]
-  show PrfH Gm (provFromCode (bdExCode (liftc zero (tcFn (liftTerm 0 b))) Phic'))
-  have hC : PrfH Gm exBody := PrfH.hyp _ _ (List.Mem.head _)
-  have hlt : PrfH Gm (lt (.var 0) (liftTerm 0 b)) := PrfH_and_elim_left hC
-  have hble : PrfH Gm (lt (liftTerm 0 b) (lenc (liftTerm 0 p))) :=
-    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-  have hchain : PrfH Gm (chainOk nil (liftTerm 0 p)) :=
-    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _))))
-  have hA : PrfH Gm A' := hAlift ▸ PrfH.hyp _ _
-    (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
-  -- COTA: directa, sin evaluación
-  have hlt1 : PrfH Gm (provFromCode (ltCodeFn (tcFn (.var 0)) (tcFn (liftTerm 0 b)))) :=
-    PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked (.var 0) (liftTerm 0 b)) _) hlt
-  have hltB : PrfH Gm (provFromCode
-      (ltCodeFn (tcFn (.var 0)) (liftc zero (tcFn (liftTerm 0 b))))) :=
-    PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_atom2CodeFn (prf_refl _)
-      (prf_eq_symm (prf_liftc_tcFn (liftTerm 0 b))))) _) hlt1
-  -- CUERPO: la obligación genérica, ya con el binder ABIERTO
-  have hphi' : PrfH Gm (provFromCode (substfc zero (tcFn (.var 0)) Phic')) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
-      (prf_to_prfH hphi _) hA) hchain) hble) hC
-  exact PrfH_bdEx_intro_open _ _ (tcFn (.var 0))
-    (substtc_inv_bdCarcLtB (liftTerm 0 b)) hltB hphi'
-    (by hw_auto) hwPhi (by hw_auto)
-
+⛔ **Por qué hacía falta generalizarla**, que sigue siendo la razón de este frente: el `Phic` que
+`substCodeF2` produce **no** es el `bdCarcLtPhic` de §5 —su lado derecho es el **accesor dotado**
+`nthcT (premsOfT (nthcT q̇ i̇)) ȷ̇`—, y el salto **no se puede dar donde está**, porque ese hueco vive
+**bajo el binder del `exc`** y `pcc_rw` no llega ahí. ⭐ Donde sí se puede es en la obligación
+`hphi`, con el binder **ya abierto**. -/
 
 /-! ## §4 · EL PUENTE `premsOfT (nthcT q̇ i̇) ↦ L̇`, extraído de B2
 
@@ -1368,7 +1316,6 @@ export ROBINSON_PlusPlus.Meta.PremsBdAllPrf (
   premsPsi_dot_eq hwS_liftc_tcFn hwS_liftc2_tcFn hwPsi_premsPsi hwPsi_premsPsiPk
   DEUDA_premsBody hbdAllPrems_of_body prf_pkQ prf_pkI
   WQ UI premsPsi_split miB miPhi miPhiAt hinv_UI hinv_WQ substfc_bdEx_at
-  pcc_bdEx_carc_reflect_gen
   pcc_premsOfT_bridge pcc_nthc_premsOf_bridge prf_premsDisj_of_chainOk
   prf_liftc2_tcFn prf_liftc3_tcFn prf_liftc_WQ prf_liftc_UI substfc_miPhiAt
   hwLiftc_tcFn hwLiftc2_tcFn hwLiftc3_tcFn hw_miPhiAt hphi_gen
