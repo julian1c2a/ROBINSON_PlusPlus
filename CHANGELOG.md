@@ -14,6 +14,21 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10h (d) — el LIBRO commiteado, y su auditoría repara nuestro control.**
+> `doc/book/`: Parte IV caps. 12‑15 + `AUDITORIA-2026-09-10.md` (489 l.), en commit propio sin un
+> solo `.lean` (PLAN‑LIBRO §0). ⭐⭐ La auditoría midió la **causa raíz** de la deriva documental del
+> proyecto: `check-doc-sync.bash` recorría **sólo las primeras 100 líneas** — *«auditar el banner es
+> auditar lo que ya está bien»*. ⇒ nuevo bloque **`[A2]`** (el cuerpo entero, como **aviso**;
+> ⚠️ el límite no era un descuido: sin él los diarios disparan una docena de falsos positivos).
+> AI‑GUIDE §27.2. Con el control puesto salieron **52 líneas**; corregidas las 8 que eran
+> afirmaciones de estado **actual** y falsas: `AXIOMS.md` («(7)»), `REFERENCE.md` (§5 y la
+> «alternativa» que seguía diciendo «Gödel II módulo `d3`»), `CURRENT-STATUS-PROJECT.md` (una
+> **doble falsedad**: «D3 fuera de la cadena activa, la capa rastreada está en `cuarentena/`»),
+> `doc/REFERENCE-Incompleteness.md`, `GODEL-STATUS.md` (citaba `goedel_first_real'`, **inexistente**),
+> `cuarentena/README.md` (los 7 reflectores como problema abierto) y `PLANNING.md` (marcado **entero**
+> como histórico). Más **tres docstrings `.lean`** que negaban teoremas de su propio fichero.
+> 🔑 **Un lector que sólo puede LEER resultó el mejor detector de deriva del proyecto.**
+>
 > **2026‑09‑10h (c) — ADR‑023: el censo de `coreAxioms`, CERTIFICADO (2 de 11) — y una
 > autocorrección.** `Full/Induction.lean` §0bis: **`primAxioms`** (los 23 primitivos),
 > `primAxioms_subset`, **`prim_to_axioms`** y `axp`. `Full/Lists.lean`: **`concat_assoc_prim`** y

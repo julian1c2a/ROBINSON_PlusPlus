@@ -358,7 +358,8 @@ make docsync                        # equivalente
 
 | | control | ¿rompe? |
 |---|---|---|
-| **[A]** | **cifras**: jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean y `sorry` — contra el estado REAL. Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
+| **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean y `sorry` — contra el estado REAL. Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
+| **[A2]** | 🆕 **las mismas cifras en el CUERPO** (de la línea 101 al final), con los mismos filtros de historicidad — §27.2 | ⚠️ aviso |
 | **[B]** | **símbolos muertos** citados como vigentes en los docs autoritativos | ⚠️ aviso |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
 | **[D]** | **marcas de tiempo** (§22) presentes en los docs técnicos | ✅ sí |
@@ -372,6 +373,33 @@ menciona como historia/objetivo (→ añadir un marcador: «retirado», «falta�
 ⚠️ **Y la regla de oro que ningún script sustituye: NO basta con arreglar el banner.** Al corregir,
 recorrer también las tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría
 antiguas.
+
+#### (27.2) 🆕 ⭐ El CUERPO, y por qué el límite de 100 líneas **no era un descuido** (2026‑09‑10h)
+
+**Lo encontró una auditoría EXTERNA**, la del libro (`doc/book/AUDITORIA-2026-09-10.md` §5/R3), y
+lo dijo mejor de lo que lo habríamos dicho aquí:
+
+> *«`check-doc-sync.bash:108` — ALCANCE: sólo la REGIÓN DE CABECERA. Eso explica el patrón entero.
+> El commit `50e8864` pudo declarar la sincronía en verde con **ocho contradicciones vivas a partir
+> de la línea 218**. No es que nadie mire: es que el control mira sólo el banner, y el banner es
+> justamente la parte que sí se actualiza. **Auditar el banner es auditar lo que ya está bien.»**
+
+⚠️ **Pero la acotación estaba puesta a propósito**, y por una razón real: sin ella, los diarios de
+`NEXT-STEPS.md` disparan **una docena de falsos positivos** y el control deja de usarse — que es
+exactamente el fallo de §27.1 por la otra puerta.
+
+⇒ **La reparación no es quitar el límite: es añadir un pase que AVISE.** El bloque **`[A2]`**
+recorre el fichero entero desde la línea 101 con los mismos filtros de historicidad, y **no rompe**.
+Lo que rompe sigue siendo la cabecera.
+
+**Resultado de la primera ejecución**: 52 líneas. Ocho eran afirmaciones de estado **actual** y
+falsas —incluida una **doble falsedad** en la fila autoritativa de Gödel de
+`CURRENT-STATUS-PROJECT.md`, y tres docstrings `.lean` que negaban teoremas de su propio fichero—;
+el resto, historia legítima a la que sólo le faltaba la **marca** («previo», «era», fecha ISO).
+
+🔑🔑 **La lección de método, y es nueva: un lector que sólo puede LEER resultó el mejor detector de
+deriva que tiene el proyecto.** El libro tiene los `.lean` en sólo lectura (PLAN‑LIBRO §0) y
+precisamente por eso audita sin poder «arreglarlo de paso».
 
 #### (27.1) ⛔ El fallo peor no es el control que falla: es **el que no comprueba nada y da verde**
 
@@ -406,7 +434,8 @@ dos puntos seguidos de espacio dentro de un escalar sin comillas: YAML lo lee co
 con «mapping values are not allowed here» **antes de ejecutar nada** (0 s, «workflow file issue»).
 Se pasa a escalar de bloque. `.gitattributes` fuerza además `*.bash`, `*.yml` y `*.py` a **LF**:
 con `core.autocrlf` activo en Windows, un re-clone los convierte a CRLF y fallan en el runner con
-«$'': command not found».
+«$'
+': command not found».
 
 ### (22.) Marcas de tiempo
 

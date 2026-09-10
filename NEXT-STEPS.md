@@ -116,6 +116,39 @@
 > **ADR‑022** y `doc/REFERENCE-Incompleteness.md` §3.68.
 >
 > ⇒ **C y D quedan DESBLOQUEADOS.** Son el trabajo que sigue.
+>
+> ## 5. 📖 **EL LIBRO, COMMITEADO — y su auditoría le encuentra al CÓDIGO la causa raíz**
+>
+> `doc/book/`: **Parte IV, capítulos 12‑15** escritos (autorreferencia, Gödel I, la mitad que falta,
+> las condiciones de derivabilidad) más **`AUDITORIA-2026-09-10.md`** (489 l., medida). Commit del
+> libro **separado y sin un solo `.lean`** (PLAN‑LIBRO §0, comprobado con `scripts/ambito.py`).
+>
+> ⭐⭐ **Y lo importante para ESTA tarea**: la auditoría del libro encontró lo que nuestro propio
+> control no veía.
+>
+> | | |
+> |---|---|
+> | **la causa raíz** | `check-doc-sync.bash` miraba **sólo las primeras 100 líneas** — *«auditar el banner es auditar lo que ya está bien»* |
+> | **el efecto medido** | el commit `50e8864` declaró la sincronía **en verde** con **ocho contradicciones vivas a partir de la línea 218** |
+> | **la reparación** | bloque **`[A2]`**: el cuerpo entero, como **AVISO** (⚠️ el límite **no era un descuido**: sin él, los diarios disparan una docena de falsos positivos). AI‑GUIDE §27.2 |
+>
+> **52 líneas** salieron. Ocho eran afirmaciones de estado **actual** y falsas —incluida una
+> **doble falsedad** en la fila autoritativa de Gödel y **tres docstrings `.lean` que negaban
+> teoremas de su propio fichero** (`Meta/GodelTwo.lean:38` lo hacía **33 líneas por encima** del
+> teorema)—; el resto, historia legítima a la que faltaba la **marca**.
+>
+> 🔑🔑 **La lección, y es nueva: un lector que sólo puede LEER resultó el mejor detector de deriva
+> que tiene el proyecto.** El libro tiene los `.lean` en sólo lectura, y por eso audita sin poder
+> «arreglarlo de paso».
+>
+> ## 6. 🧹 La pasada de proyección de esta sesión, completa
+>
+> Al pasar `[A2]` por el árbol quedaron corregidos, además: `AXIOMS.md` (cabecera «(7)»),
+> `REFERENCE.md` (§5 **los frentes**, el 1 CERRADO y el 4 nuevo; y «alternativa siempre disponible»,
+> que seguía diciendo «Gödel II módulo el axioma D3»), `GODEL-STATUS.md` (citaba
+> `goedel_first_real'`, **que no existe**), `cuarentena/README.md` (presentaba los 7 reflectores como
+> problema abierto desde el 2026‑08‑23), `PLANNING.md` (marcado **entero** como histórico) y
+> `DEPENDENCIES.md`.
 
 > # 🏁🏁🏁 LO GRANDE DE HOY: **`pcc_lineWF_tracked` ES INCONDICIONAL**
 >
@@ -2083,6 +2116,8 @@
 >
 > **Después de los 21:** el **`or_elim` ×21** (`prf_lineWF_inv` da la disyunción de tags) para
 > ensamblar `pcc_lineWF_tracked` → `hC_dot` → `d3_prf` → `goedel_second_prf` → **F7b** (7→6 `axiom`).
+> ⛔ **[nombres DE ENTONCES]** — la ruta se cumplió el 2026‑09‑10g, pero por `d3_prf_real`;
+> `d3_prf`/`goedel_second_prf` **nunca existieron** con esos nombres.
 >
 > #### Trampas ya diagnosticadas en este frente (NO volver a tropezar)
 > * `numeralM k` y `Godel.numeral k` **NO son defeq** para `k` variable (`numeralM_eq` va por

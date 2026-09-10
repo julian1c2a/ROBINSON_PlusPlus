@@ -351,7 +351,8 @@
   restante en `GODEL-D3-TRACKED-DESIGN.md` §15.4. Build **76 jobs**, 0 sorrys, v4.31.0.
 
 - **2026-07-09 — F7a: retirada la capa Gödel legacy (14 → 7 `axiom`)**:
-  Auditado con `#print axioms` que la cadena real (`goedel_first_real'`, `d2_prf`, `goedel_second'`)
+  Auditado con `#print axioms` que la cadena real (**entonces** `goedel_first_real'` —hoy
+  `goedel_first_numeral`—, `d2_prf`, `goedel_second'`)
   no cita ninguno de los 7 postulados legacy. **Eliminado** el módulo `Meta/Incompleteness.lean`
   (Gödel I/II vía D2/D3 postulados) y retirados los 5 postulados de `Meta/Provability.lean`
   (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma` + `goedelSentence`/
@@ -377,8 +378,9 @@
   `c ++ [carc line]`; el paso `cons` se apoya en el lema puntual `prf_premOk_cons_iff` (fusiona (b)+(c)).
   Todos `#print axioms` = `[propext, choice, Quot.sound]`. Nuevo `ESCALANDO_EL_PROYECTO.md` (enlace con
   DeepArith sobre el kernel FOL⁼ común). Build verde (**75 jobs**), 0 sorrys, v4.31.0.
-  Siguiente: fases 3‑5 (`num` + evaluación provable + Δ₀‑completitud atómica → inducción estructural
-  → `d3_prf` → `goedel_second_prf`).
+  Siguiente **(plan de entonces, cumplido por otra ruta)**: fases 3‑5 (`num` + evaluación provable
+  + Δ₀‑completitud atómica → inducción estructural → `d3_prf` → `goedel_second_prf`). ⇒ D3 se cerró
+  el 2026‑09‑10g como **`d3_prf_real`**; `goedel_second_prf` nunca llegó a existir con ese nombre.
 
 - **2026-07-05c/d — D3: investigación de atajos (§11–§12) + arranque Σ₁‑completitud estándar (12‑A fase 1a)**:
   Investigación rigurosa: **no hay atajo para D3** (atajo por teorema de deducción imposible — D1

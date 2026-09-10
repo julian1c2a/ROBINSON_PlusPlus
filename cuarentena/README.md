@@ -59,10 +59,20 @@ teoría **reparada**, y **sin cambiar ningún enunciado público**.
 
 ## ▶ Lo que queda, y no está aquí
 
-**D3 está reducida a UN SOLO lema** — `d3_prf_of_chainOkDot`, que sólo pide `hC_dot`. Y
-`pcc_lineWF_tracked_modulo_7` dice que cerrar `pcc_lineWF_tracked` es **exactamente** cerrar los
-**7 reflectores** que faltan (`q1 q2 q3 leibniz ind qconf listInd`).
+🏁🏁 **NADA. Se cerró todo** (actualizado 2026‑09‑10h).
 
-⚠️ Esos 7 son **el muro de `substfc`**: llevan `substfc`/`liftfc` sobre argumento **abstracto** y
-necesitan `pcc_eval_substfc`, que **no existe**. Es un problema abierto de verdad — no mecánico.
-Ver `NEXT-STEPS.md` y la memoria `project-substfc-wall`.
+Lo que esta sección describía como abierto —«D3 reducida a UN SOLO lema»; los **7 reflectores**
+(`q1 q2 q3 leibniz ind qconf listInd`) como «un problema abierto de verdad, no mecánico», porque
+llevan `substfc`/`liftfc` sobre argumento **abstracto** y necesitaban un `pcc_eval_substfc` que
+«**no existe**»— está **todo hecho**:
+
+| pieza | cuándo | dónde |
+|---|---|---|
+| `pcc_eval_substfc` | 2026‑08‑31 | `Meta/EvalSubstfcPrf.lean` — **vía de CERO axiomas** ([ADR‑015](../DECISIONS.md)) |
+| los **7 reflectores** ⇒ `pcc_lineWF_tracked` **INCONDICIONAL** (C3) | 2026‑09‑10e | `Meta/SubstTreeReflect.lean` §11ter |
+| **D3 DEMOSTRADA** ⇒ `axiom d3` **RETIRADO** (7 → 6) | 2026‑09‑10g | `d3_prf_real`, `Meta/PremsBdAllPrf.lean` §10 |
+
+⚠️ **Este párrafo llevaba obsoleto desde el 2026‑08‑23**, y lo cazó la auditoría del libro
+(`doc/book/AUDITORIA-2026-09-10.md` §5, contradicción #9). Es la misma lección que el propio
+episodio de la cuarentena enseña: **un documento da fe de lo que su autor creía en una fecha**.
+Estado vivo: `NEXT-STEPS.md`. Memoria: `project-substfc-wall` (histórico), `project-d3-probada`.

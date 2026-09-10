@@ -310,26 +310,30 @@ Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-L
 3. **La ESCALERA (a.2)** ✅ **4 de 4** (§3.25): `pcc_eval_add`, `pcc_eval_mul`, el atajo de `div2`, y
    **`pcc_dot_cons`**. Es la Σ₁‑completitud internalizada para argumentos abstractos.
 
-### Los tres frentes abiertos — **todos MEDIDOS** (frente 1 actualizado 2026‑08‑30)
+### Los frentes abiertos — **todos MEDIDOS** (actualizado 2026‑09‑10h)
 
 | # | frente | estado | qué lo bloquea |
 |--:|---|---|---|
-| **1** | **muro de `substfc`** → `hC_dot` → **D3** → Gödel II → F7b | los 7 reflectores (`q1 q2 q3 leibniz ind qconf listInd`). ✅ `prf_strong_induction` existe, net‑0 y en forma OBJETO. ✅ **La decisión ya está tomada: vía (2), CERO axiomas** ([ADR‑015](DECISIONS.md)) ⇒ la objeción de conservatividad **dejó de aplicar**. ✅ Partición en tres · reflector completo · testigo para toda fórmula · **`pcc_eval_liftc` PROBADO** (§3.28) | 🏁 **`pcc_eval_substfc` PROBADO** (§3.30, CONFIRMADO, net‑0 sobre la base sancionada) — el ensamblaje **está hecho**. ✅ **y su no‑vacuidad** (§3.31, net‑0 PURO). ⛔ La «guarda sobre argumento ABSTRACTO» se **retira del árbol: es IMPOSIBLE** y está refutada. ⚠️ Queda la **promoción a `Meta/`** (§3.28.5), cuyo primer trozo es barato y está medido (§3.31.4) |
-| **2** | **`NegVerifier`** → `⊬¬G` | ⛔ el paso 1.1 del plan (`canon_ne`) es **FALSO** y reintroduciría la inconsistencia (`sondeos/CanonNeRefuta.lean`). ✅ La salida por **numerales** está verificada y es **net‑0** (`sondeos/CodeNatInj.lean`: `consN_inj` → `codeNat_inj` → `codeNat_ne`) | elegir la **representación numeral de las LÍNEAS** y rediseñar los módulos C y D |
-| **3** | **recodificar símbolos por índice** | 📏 medido (`sondeos/RecodCoste.lean`): el **98‑99 %** del `formCode` de los axiomas del verificador son los nombres de símbolos (`ax_tc_zero`: 49 015 → ~708 nodos, **69×**). Pero **hoy no es cuello de botella** | nada. ⚠️ Una tabla pura **no es total** (`Term.func` toma String arbitrario) ⇒ codificación **etiquetada**. Coste: ~10 teoremas en 4 módulos, uno `CodeDecode` (completo) |
+| ~~**1**~~ | ~~muro de `substfc` → `hC_dot` → **D3** → Gödel II → F7b~~ | 🏁🏁 **CERRADO** (2026‑09‑10e/g). Los **7 reflectores** probados ⇒ `pcc_lineWF_tracked` **incondicional** (C3); y **D3 DEMOSTRADA** (`d3_prf_real`) ⇒ `axiom d3` **retirado**, **7 → 6** | — |
+| **2** | **`NegVerifier`** → `⊬¬G` | 🏁 **módulo E hecho** (`Meta/VerifierSound.lean`): `verifier_sound` **es** `decodeChain_prf`. 🏁 **[ADR‑022](DECISIONS.md)**: la clase de testigos **estrechada** a `StdLine` ⇒ las comparaciones son **paralelas por tipo, sin evaluar Cantor**. ⚠️ El paso 1.1 del plan (`canon_ne`) sigue siendo **FALSO**, y el sustituto correcto es por **VALOR** (`numTree_ne` + las cotas `consN_ge`/`codeNat_ge`, `sondeos/MedirF_Censo.lean`) | **los módulos C y D** — las dos deudas enunciadas `DEUDA_chainNeg` y `DEUDA_inNeg` |
+| **3** | **`prf_axiomsCodeT_eq`** | el axioma que arrastra casi todo el árbol («net‑0 son CUATRO, no tres»). Es de otra naturaleza que los gödelianos: dice que el código de la lista de axiomas **es** la lista de códigos | no medido |
+| **4** | 🆕 **`primAxioms`** ([ADR‑023](DECISIONS.md)) | 🔶 **2 de 11** certificados (ax_C3, ax_L3), con **cero cambios de axioma**. ⭐ `Derives.weakening` es **constructor** y **ninguna** de las 46 citaciones `∈ axioms` es circular | **sanción del propietario**: mover `ax_induction` a `primAxioms ⊢ …` (M‑1). ⛔ Generalizarlo a `∀Γ` sería **FALSO** |
+| **5** | **recodificar símbolos por índice** | 📏 medido (`sondeos/RecodCoste.lean`): el **98‑99 %** del `formCode` de los axiomas del verificador son los nombres de símbolos (`ax_tc_zero`: 49 015 → ~708 nodos, **69×**). **Hoy no es cuello de botella** | nada. ⚠️ Una tabla pura **no es total** ⇒ codificación **etiquetada** |
 
-**Secuencia que sale de las mediciones:** (3) sólo tiene sentido **antes** de (2) —el rediseño de C‑F
-toca la codificación de todos modos—. ⚠️ **La frase «(1) cuesta axiomas, es decisión del autor» ya
-NO vale** (era de 2026‑08‑23): desde ADR‑015 el frente 1 va por la **vía de CERO axiomas** y es un
-**paso técnico**, no una decisión pendiente. La razón de fondo está en §3.27.1: la opción de
-axiomatizar **no era más cara, era OTRO TEOREMA** — sus axiomas entrarían en `axioms`,
-`ax_axiomsCodeT_eq` los metería en `axiomsCodeT` y **G cambiaría**.
+⚠️ **La frase «(1) cuesta axiomas, es decisión del autor» ya NO vale** (era de 2026‑08‑23): el
+frente 1 fue por la **vía de CERO axiomas** ([ADR‑015](DECISIONS.md)) y **está cerrado**. La razón
+de fondo sigue en §3.27.1: axiomatizar **no era más caro, era OTRO TEOREMA** — sus axiomas entrarían
+en `axioms`, `ax_axiomsCodeT_eq` los metería en `axiomsCodeT` y **G cambiaría**. Es la misma
+distinción que gobierna [ADR‑023](DECISIONS.md): **certificar sobre un subconjunto no mueve la
+frontera; cambiar `axioms` sí**.
 
 ### Alternativa siempre disponible
 
-Consolidar **Gödel II módulo el axioma D3** (`goedel_second'`, ya montado). El estado actual ya es
-publicable: Gödel I `⊬G` real sobre una teoría de la que se ha retirado la inconsistencia conocida,
-más D1 y D2 reales. D3 es notoriamente la pieza más dura de Gödel II también en Isabelle/Coq.
+⚠️ Esta sección decía «consolidar **Gödel II módulo el axioma D3**». **Ya no aplica**: `d3` es
+teorema desde el 2026‑09‑10g. Lo publicable hoy es **más**: Gödel I `⊬G` real sobre la teoría
+reparada, **D1, D2 y D3 las tres demostradas**, y Gödel II sin ningún postulado gödeliano —
+`goedel_second'` conserva tres hipótesis explícitas que **no** son condiciones de derivabilidad.
+Lo único que sigue abierto de Gödel I es la mitad **`⊬¬G`** (frente 2).
 
 ---
 

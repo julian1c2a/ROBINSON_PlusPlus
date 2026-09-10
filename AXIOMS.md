@@ -71,6 +71,20 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 | 6 | `prf_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`Prf (axiomsCodeT =eq listFormCodeM axioms)`** — espejo `Prf` de (5) para el cálculo finitario. **Reemplaza a `prf_inAxC`** (2026‑07‑20, `25d255b`), que pasa a ser **teorema** derivado (**net‑0 axiomas**). D1 `repr_pos'_prf` cita ahora éste |
 | ~~7~~ | ~~`d3`~~ | `Meta/GodelTwo.lean` | 🏁 **RETIRADO el 2026‑09‑10g** | Era la condición D3 de Hilbert‑Bernays‑Löb para `provCodeC'`. Hoy es **teorema**: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres** |
 
+### 🆕 Nota 2026‑09‑10h — `ax_induction` y [ADR‑023](DECISIONS.md)
+
+⬜ Hay una **decisión pendiente del propietario** que afecta a este inventario, y **no sube la
+cifra**: ADR‑023 propone **mover** `ax_induction` de `axioms ⊢ inductionFormula φ` a
+`primAxioms ⊢ inductionFormula φ`, recuperando el enunciado de hoy por debilitamiento — con lo que
+**`ax_induction` deja de ser `axiom` y pasa a teorema**, y el recuento sigue en 6.
+
+Sirve para **certificar** el censo de `coreAxioms` (los 11 derivables que `Full` demuestra hoy con
+enunciados `axioms ⊢ axN` que son **triviales por `ax`**). ⚠️ Es **estrictamente más fuerte** que la
+forma actual ⇒ **M‑1: sanción explícita**. ⛔ Y la salida fácil está cerrada: generalizarlo a
+`∀ {Γ}, Γ ⊢ inductionFormula φ` sería **FALSO** (con `Γ = []` haría la inducción **lógicamente
+válida**). Un axioma **tiene que nombrar su contexto**; `ax_list_induction` puede ser genérico
+porque es una **regla**, no un axioma.
+
 ### Detalle por familia
 
 - **Esquemas de inducción (1–3, en `Full/`).** Son *la* inducción que el sistema
