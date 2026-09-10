@@ -1398,9 +1398,8 @@ theorem junk_line_not_stdLine :
 ## ADR-023: El censo de `coreAxioms` se CERTIFICA con `primAxioms` — y eso NO mueve la frontera de la teoría
 
 **Fecha**: 2026-09-10
-**Estado**: **Parcialmente aceptado y ejecutado.** 2 de los 11 certificados hoy, sin coste;
-los 9 restantes **esperan una sanción del propietario** (restatar `ax_induction`), y por eso
-esto es un ADR y no un commit.
+**Estado**: 🏁 **ACEPTADO, RATIFICADO Y EJECUTADO** el 2026‑09‑10h. **9 de los 11 certificados.**
+Los 2 restantes (ax21, ax24) piden una **segunda** sanción, distinta y **no pedida** — ver el final.
 
 ### Contexto
 
@@ -1477,21 +1476,47 @@ inducción es **lógicamente válido**. `ax_list_induction` puede ser genérico 
 (lleva `base` y `step` sobre el mismo `Γ`); `ax_induction` es un **axioma**, y un axioma tiene que
 **nombrar su contexto**.
 
-⇒ **La forma correcta a sancionar** sería:
+⇒ 🏁 **RATIFICADO por el propietario el 2026‑09‑10h**, y ejecutado tal cual:
 
 ```lean
 axiom ax_induction_prim (φ : Formula) : primAxioms ⊢ inductionFormula φ
+
 theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
   prim_to_axioms (ax_induction_prim φ)          -- ⇒ `ax_induction` deja de ser axioma
 ```
 
-Nótese que **no añade un axioma: lo mueve**, y el recuento queda igual (`ax_induction` pasa a
-teorema). Dice exactamente lo que `Full` significa: *«los 23 primitivos **más** el esquema de
-inducción»*. ⚠️ Es **estrictamente más fuerte** que la forma de hoy, así que es una decisión del
-propietario.
+**No añade un axioma: lo MUEVE**, y el recuento queda igual — `ax_induction` pasa a teorema, y los
+`axiom` de Lean **siguen siendo 6**. Dice exactamente lo que `Full` significa: *«los 23 primitivos
+**más** el esquema de inducción»*.
 
-⚠️ **`Mod2.lean` tiene además un coste propio**: importa `Block1`, cuyos teoremas están enunciados
-sobre `axioms`. Certificar ax21/ax24 arrastra esa capa. **Medir antes de prometer.**
+### 🏁 Lo ejecutado con la ratificación: **9 de 11**
+
+`Full/Induction.lean` migrado entero a `primAxioms` — **35 declaraciones**, con `induction_object_prim`
+y `axp` —, y las **firmas `axioms ⊢` de siempre re‑expuestas por debilitamiento** para los diez
+lemas que consumen otros módulos (`zero_add`, `succ_add`, `add_comm_ax`, `zero_mul`, `succ_mul`,
+`mul_comm_ax`, `lt_succ_self`, `not_lt_zero`, `lt_succ_of_lt`, `zero_lt_succ`, `zero_or_succ_ax`).
+⇒ **ax6, ax7, ax10, ax11, ax12, ax18, ax19 CERTIFICADOS** (`*_thm_prim`), más ax_C3 y ax_L3.
+
+⚠️ **Un caso no salió por debilitamiento y enseña algo**: `lt_succ_of_lt` toma la hipótesis **en el
+contexto** (`axioms ⊢ lt b a → …`), y ahí el debilitamiento va **en la dirección contraria**. Se
+cierra el ángulo internando la implicación sobre `primAxioms`, **debilitando la implicación**, y
+aplicando `mp`. Regla: *un lema que consume el contexto no se debilita; se internaliza primero.*
+
+**Footprint de los certificados**: los tres de Lean + las ω‑reglas + **`ax_induction_prim`**. Nada
+de `ax_axiomsCodeT_eq` ni `prf_axiomsCodeT_eq`.
+
+### ⬜ Los 2 que faltan piden una SEGUNDA sanción — que **no** se ha pedido
+
+ax21 y ax24 se derivan en `Full/Mod2.lean`, y ahí:
+
+1. ⛔ **`ax_mod2_alternation`** es otro `axiom` **sobre `axioms`** — exactamente la situación que
+   tenía `ax_induction`. Certificar ax21/ax24 exige moverlo igual, y eso es **otra decisión M‑1**.
+2. Además usa dos teoremas de `Block1` (`teo_1_3`, `teo_2_9`) enunciados sobre `axioms`.
+
+⚠️ **Y hay una pregunta previa que conviene contestar antes de mover nada**: `ax_mod2_alternation`
+está documentado como *«teorema en sistemas con inducción»*. Si lo es, lo correcto no es moverlo
+sino **derivarlo** de `primAxioms` + inducción — con lo que el inventario bajaría de **6 a 5**.
+**Medir antes de prometer.**
 
 ### Consecuencias operativas
 

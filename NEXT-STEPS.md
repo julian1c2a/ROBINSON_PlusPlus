@@ -237,9 +237,14 @@
 > 5. 🏁 ~~**El ADR de `StdChain`**~~ — **ADR‑022 escrito y ejecutado** (2026‑09‑10h) ⇒ lo que
 >    queda de `⊬¬G` son los módulos **C** y **D**, con las dos deudas de `Meta/VerifierSound.lean`
 >    ya enunciadas sobre la clase estrecha.
-> 6. 🔶 **`primAxioms`** — **ADR‑023 escrito y 2 de 11 certificados**. ⬜ Los 9 restantes esperan
->    la sanción de **mover `ax_induction` a `primAxioms ⊢ …`** (M‑1). ⚠️ **NO** mueve la frontera de
->    la teoría — eso era un error mío, corregido en el ADR.
+> 6. 🏁 **`primAxioms` — ADR‑023 RATIFICADO y 9 de 11 CERTIFICADOS** (2026‑09‑10h). El propietario
+>    ratificó `axiom ax_induction_prim : primAxioms ⊢ inductionFormula φ` + `ax_induction` como
+>    **teorema**: **no añade axioma, lo MUEVE** ⇒ siguen **6**. `Full/Induction.lean` migrado entero.
+>    ⚠️ **NO** mueve la frontera de la teoría — eso era un error mío, corregido en el ADR.
+>    ⬜ **Lo que queda, y es una decisión tuya**: ax21/ax24 piden una **segunda** sanción sobre
+>    **`ax_mod2_alternation`**. ⚠️ **Antes de moverlo, medir si es derivable**: está documentado como
+>    «teorema en sistemas con inducción», y si lo es el inventario baja de **6 a 5** en vez de
+>    quedarse igual.
 >
 > 🔑🔑 **LAS SEIS REGLAS DEL FRENTE, todas sobre la FORMA:**
 > 1. **ADR‑021, AFINADA**: lo que rompe la naturalidad del `PsiF` **no es «ser un `substCodeF`»**,

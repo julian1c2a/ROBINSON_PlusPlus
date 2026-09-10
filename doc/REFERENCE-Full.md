@@ -199,15 +199,37 @@ theorem add_comm_thm : primAxioms ⊢ ax6_add_comm := …    -- ⬜ el enunciado
 abajo cambia), y **ninguna de las 46 citaciones `∈ axioms`** de `Full/{Induction,Mod2,Lists}.lean`
 cita uno de los 11 derivables ⇒ **no hay circularidad**, la migración es mecánica.
 
-🏁 **Hecho hoy**: `primAxioms` (los 23) + `primAxioms_subset` + `prim_to_axioms` + `axp`
-(`Full/Induction.lean` §0bis), y **`concat_assoc_prim`/`in_concat_prim`** — ax_C3 y ax_L3
-**certificados**, con **cero cambios de axioma**, porque `ax_list_induction` ya era genérico en `Γ`.
+🏁🏁 **HECHO: 9 de los 11 CERTIFICADOS** (2026‑09‑10h).
 
-⬜ **Los otros 9** pasan por `ax_induction`, que está especializado a `axioms`. ⛔ Y la salida fácil
-está cerrada: `∀ {Γ}, Γ ⊢ inductionFormula φ` sería **FALSO** (con `Γ = []` haría la inducción
-lógicamente válida). Un axioma **tiene que nombrar su contexto** ⇒ hay que **mover** `ax_induction`
-a `primAxioms ⊢ …` y recuperar el de hoy por debilitamiento — **sanción del propietario** (M‑1).
-Detalle y forma exacta en ADR‑023.
+1. `primAxioms` (los 23) + `primAxioms_len` + `primAxioms_subset` + `prim_to_axioms` + `axp`
+   (`Full/Induction.lean` §0bis).
+2. **ax_C3 y ax_L3** (`concat_assoc_prim`, `in_concat_prim`) — con **cero cambios de axioma**,
+   porque `ax_list_induction` ya era genérico en `Γ`.
+3. 🏁 **RATIFICADO por el propietario** el mismo día, el movimiento del esquema de inducción:
+
+   ```lean
+   axiom ax_induction_prim (φ : Formula) : primAxioms ⊢ inductionFormula φ
+
+   theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
+     prim_to_axioms (ax_induction_prim φ)          -- ⇒ ya NO es axioma
+   ```
+
+   **No añade un axioma: lo MUEVE** ⇒ los `axiom` de Lean **siguen siendo 6**.
+4. Con eso, `Full/Induction.lean` migrado entero (**35 declaraciones**) ⇒ **ax6, ax7, ax10, ax11,
+   ax12, ax18, ax19 CERTIFICADOS** (`*_thm_prim`), y las firmas `axioms ⊢` de siempre re‑expuestas
+   por debilitamiento para los diez lemas que consumen otros módulos.
+
+⚠️ **Un caso no salió por debilitamiento, y enseña la regla**: `lt_succ_of_lt` toma la hipótesis
+**en el contexto**, y ahí el debilitamiento va **en la dirección contraria**. Se interna la
+implicación sobre `primAxioms`, se **debilita la implicación**, y se aplica `mp`. ⇒ *un lema que
+consume el contexto no se debilita: se internaliza primero.*
+
+⬜ **Los 2 que faltan (ax21, ax24) piden una SEGUNDA sanción, y no se ha pedido.** Se derivan en
+`Full/Mod2.lean`, que pasa por **`ax_mod2_alternation`** —otro `axiom` **sobre `axioms`**, misma
+situación que tenía `ax_induction`— y por dos teoremas de `Block1` (`teo_1_3`, `teo_2_9`).
+⚠️ Y hay una pregunta previa: `ax_mod2_alternation` está documentado como *«teorema en sistemas con
+inducción»*; si lo es, lo correcto no es **moverlo** sino **derivarlo**, y entonces el inventario
+bajaría de **6 a 5**. **Medir antes de prometer.**
 
 
 ---

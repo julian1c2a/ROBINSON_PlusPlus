@@ -14,6 +14,21 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑10h (e) — 🏁 ADR‑023 RATIFICADO: el esquema de inducción baja a `primAxioms`, y el
+> censo queda CERTIFICADO 9 de 11.** El propietario ratificó la forma exacta:
+> `axiom ax_induction_prim (φ) : primAxioms ⊢ inductionFormula φ` más `ax_induction` como
+> **teorema** por debilitamiento. ⭐ **No añade un axioma: lo MUEVE** — `ax_induction` deja de ser
+> `axiom` y los `axiom` de Lean **siguen siendo 6**. Con la sanción puesta, `Full/Induction.lean`
+> migra entero (**35 declaraciones**, con `induction_object_prim` y `axp`) ⇒ **ax6, ax7, ax10, ax11,
+> ax12, ax18 y ax19 CERTIFICADOS** sobre los primitivos (`*_thm_prim`), y las firmas `axioms ⊢` de
+> siempre se re‑exponen por debilitamiento para los diez lemas que consumen otros módulos ⇒ **ningún
+> consumidor cambia**. Footprint de los certificados: los tres de Lean + las ω‑reglas +
+> `ax_induction_prim`, sin `prf_axiomsCodeT_eq`. ⚠️ **Un caso no salió por debilitamiento y deja
+> regla**: `lt_succ_of_lt` consume la hipótesis **en el contexto**, y ahí el debilitamiento va en la
+> dirección contraria — hay que **internalizar la implicación primero**. ⬜ Los 2 que faltan (ax21,
+> ax24) piden una **segunda** sanción sobre `ax_mod2_alternation`, **no pedida**; ⚠️ y antes conviene
+> medir si ese axioma es **derivable**, porque entonces el inventario bajaría de **6 a 5**.
+>
 > **2026‑09‑10h (d) — el LIBRO commiteado, y su auditoría repara nuestro control.**
 > `doc/book/`: Parte IV caps. 12‑15 + `AUDITORIA-2026-09-10.md` (489 l.), en commit propio sin un
 > solo `.lean` (PLAN‑LIBRO §0). ⭐⭐ La auditoría midió la **causa raíz** de la deriva documental del

@@ -63,7 +63,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 
 | # | Axioma | Módulo | Familia | Naturaleza |
 |---|--------|--------|---------|------------|
-| 1 | `ax_induction` | `Full/Induction.lean` | Esquema de inducción | Axioma legítimo de la teoría objeto (IΣ₁/PA): `axioms ⊢ inductionFormula φ` |
+| 1 | **`ax_induction_prim`** | `Full/Induction.lean` | Esquema de inducción | Axioma legítimo de la teoría objeto (IΣ₁/PA), **sobre los 23 primitivos**: `primAxioms ⊢ inductionFormula φ`. 🆕 **RATIFICADO el 2026‑09‑10h** ([ADR‑023](DECISIONS.md)) — dice lo que `Full` significa: *los primitivos **más** el esquema*. ⚠️ `ax_induction` (sobre `axioms`) **ya NO es un `axiom`**: es teorema por debilitamiento ⇒ el recuento **no sube** |
 | 2 | `ax_list_induction` | `Full/Lists.lean` | Esquema de inducción | Inducción estructural sobre listas del objeto |
 | 3 | `ax_mod2_alternation` | `Full/Mod2.lean` | Esquema de inducción | `∀n. mod2(σn)+mod2(n)=1`; con él se derivan ax21/ax24 como **teoremas** |
 | 4 | `ax_p_tfa` | `Minimal/Theorems/Block8.lean` | Teoría objeto | Teorema Fundamental de la Aritmética (teorema en Full, postulado en Minimal) |
@@ -73,17 +73,31 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 
 ### 🆕 Nota 2026‑09‑10h — `ax_induction` y [ADR‑023](DECISIONS.md)
 
-⬜ Hay una **decisión pendiente del propietario** que afecta a este inventario, y **no sube la
-cifra**: ADR‑023 propone **mover** `ax_induction` de `axioms ⊢ inductionFormula φ` a
-`primAxioms ⊢ inductionFormula φ`, recuperando el enunciado de hoy por debilitamiento — con lo que
-**`ax_induction` deja de ser `axiom` y pasa a teorema**, y el recuento sigue en 6.
+🏁 **RATIFICADO Y EJECUTADO** el 2026‑09‑10h. El movimiento —**no** un axioma nuevo— quedó así:
 
-Sirve para **certificar** el censo de `coreAxioms` (los 11 derivables que `Full` demuestra hoy con
-enunciados `axioms ⊢ axN` que son **triviales por `ax`**). ⚠️ Es **estrictamente más fuerte** que la
-forma actual ⇒ **M‑1: sanción explícita**. ⛔ Y la salida fácil está cerrada: generalizarlo a
-`∀ {Γ}, Γ ⊢ inductionFormula φ` sería **FALSO** (con `Γ = []` haría la inducción **lógicamente
-válida**). Un axioma **tiene que nombrar su contexto**; `ax_list_induction` puede ser genérico
-porque es una **regla**, no un axioma.
+```lean
+axiom ax_induction_prim (φ : Formula) : primAxioms ⊢ inductionFormula φ
+
+theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
+  prim_to_axioms (ax_induction_prim φ)
+```
+
+⇒ `ax_induction` **deja de ser `axiom`** y el recuento **sigue en 6**.
+
+Sirve para **certificar** el censo de `coreAxioms`: los 11 derivables se demostraban con enunciados
+`axioms ⊢ axN` que son **triviales por `ax`**. Con el axioma en su sitio, **9 de los 11** están hoy
+certificados sobre `primAxioms` (7 en `Full/Induction.lean`, 2 en `Full/Lists.lean`).
+
+⛔ **La salida fácil estaba cerrada**: generalizarlo a `∀ {Γ}, Γ ⊢ inductionFormula φ` sería
+**FALSO** (con `Γ = []` haría la inducción **lógicamente válida**). Un axioma **tiene que nombrar su
+contexto**; `ax_list_induction` puede ser genérico porque es una **regla**, no un axioma.
+
+⬜ **Los 2 que faltan (ax21, ax24) piden una SEGUNDA sanción, y no se ha pedido.** Sus derivaciones
+(`Full/Mod2.lean`) pasan por **`ax_mod2_alternation`**, que es otro `axiom` **sobre `axioms`** —
+misma situación que tenía `ax_induction`—, y además usan dos teoremas de `Block1` (`teo_1_3`,
+`teo_2_9`) enunciados sobre `axioms`. ⚠️ Y hay una pregunta previa que conviene contestar antes de
+mover nada: `ax_mod2_alternation` está documentado como *«teorema en sistemas con inducción»*, así
+que quizá lo correcto no sea moverlo sino **derivarlo** de `primAxioms` + inducción.
 
 ### Detalle por familia
 
