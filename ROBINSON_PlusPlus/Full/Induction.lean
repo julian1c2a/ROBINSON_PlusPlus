@@ -35,6 +35,55 @@ la inducción multivariable). El lema de composición `substTerm_subst_succ_lift
 únicas, manejables como en `Minimal`.
 -/
 
+/-! ### §0bis · ⭐ `primAxioms` — LOS 23 PRIMITIVOS ([ADR‑023](../../DECISIONS.md), 2026‑09‑10h)
+
+El censo de `coreAxioms` (`doc/REFERENCE-Full.md` §3.14.1) lo parte en **23 primitivos** y
+**11 derivables**, y los 11 están demostrados en `Full`. Pero se enuncian **`axioms ⊢ axN`** con
+`axN ∈ axioms` ⇒ **trivialmente ciertos por `ax`**: el tipo **no certifica** la redundancia.
+
+`primAxioms` es la lista que sí la certifica. ⚠️ **No cambia la teoría**: `axioms` queda intacta y
+`primAxioms ⊆ axioms`, así que la frontera de `axiomsCodeT`/`provCodeC'` —y con ella la sentencia
+`G`— **no se mueve** (ADR‑015). Lo único que cambia es **qué se afirma** de cada derivación.
+
+⭐ **El debilitamiento es GRATIS**: `Derives.weakening` es un **constructor** de `Derives` en
+`FOL/FOL.lean`, no un lema por probar. ⇒ de `primAxioms ⊢ f` se recupera `axioms ⊢ f` en una línea
+(`prim_to_axioms`), y **ninguna firma aguas abajo cambia**. -/
+
+/-- Los **23** axiomas **PRIMITIVOS / DEFINITORIOS** de `coreAxioms`: los que **fijan el
+    significado de un símbolo** (Peano, las ecuaciones de `+`, `·`, `<`, `√`, `mod2`/`div2`,
+    `pred`, listas, `^`, `prod_pairs` y la resta truncada). Ningún esquema de inducción los deriva
+    — sin ellos el símbolo no significa nada.
+
+    Los **11 restantes** de `coreAxioms` (ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax21, ax24,
+    ax_C3, ax_L3) **deben** ser teoremas en `Full`, y lo son. -/
+def primAxioms : List Formula :=
+  [ ax2_peano_succ_neq_zero, ax3_peano_succ_inj,
+    ax4_add_zero, ax5_add_succ, ax8_mul_zero, ax9_mul_succ,
+    ax13_lt_def, ax14_sqrt_le, ax15_lt_succ_sqrt,
+    ax16_mod2_succ, ax17_div_mod_eq, ax25_pred_zero, ax26_pred_succ,
+    ax_L0_cons_def, ax_L1_in_nil, ax_L2_in_cons,
+    ax_C1_concat_nil, ax_C2_concat_cons, ax29_sub_witness,
+    ax_pow_zero, ax_pow_succ, ax_prodp_nil, ax_prodp_cons ]
+
+/-- El censo, comprobado por el kernel: **23 + 11 = 34 = `coreAxioms`**. -/
+theorem primAxioms_len : primAxioms.length = 23 := rfl
+
+/-- Y son **de verdad** axiomas de la teoría. -/
+theorem primAxioms_subset : ∀ f ∈ primAxioms, f ∈ axioms := by
+  intro f hf
+  simp only [primAxioms, List.mem_cons, List.not_mem_nil, or_false] at hf
+  rcases hf with h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h|h <;>
+    subst h <;> simp [axioms]
+
+/-- ⭐ **El puente, en una línea**: `Derives.weakening` es constructor. ⇒ certificar sobre
+    `primAxioms` **no cuesta ninguna firma**: la versión `axioms ⊢` se recupera siempre. -/
+theorem prim_to_axioms {f : Formula} (h : primAxioms ⊢ f) : axioms ⊢ f :=
+  Derives.weakening _ _ _ h primAxioms_subset
+
+/-- El `ax` de `Minimal` está especializado a `axioms`; éste es su gemelo sobre `primAxioms`
+    (y es literalmente el constructor `hyp`). -/
+theorem axp {f : Formula} (h : f ∈ primAxioms) : primAxioms ⊢ f := Derives.hyp _ _ h
+
 /-! ### Lema de composición de sustitución (De Bruijn, offset 0) -/
 
 mutual
