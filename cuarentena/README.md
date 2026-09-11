@@ -1,6 +1,7 @@
 # `cuarentena/` — ✅ **VACÍA** (2026-08-23)
 
-**Last updated:** 2026-08-23 — repatriación COMPLETA
+**Last updated:** 2026‑09‑10h — los **7 reflectores** y **D3** cerrados: la sección «Lo que queda»
+ya no queda nada. (previo 2026-08-23 — repatriación COMPLETA)
 **Autor:** Julián Calderón Almendros
 
 > ## Los 31 módulos han vuelto. Este directorio ya no contiene código.

@@ -14,6 +14,30 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑11 — 🔬 AUDITORÍA DE DOS CICLOS, en las dos direcciones. Diez hallazgos.**
+> `doc/AUDITORIA-2026-09-11.md`. Se recorrió intención → doc → plan de prueba → código, y la vuelta,
+> y después la auditoría **contra sí misma**.
+> ⛔⛔ **F‑1, el de fondo**: **Gödel II está montado pero NO ensamblado**. `goedel_second'` pide
+> `hgi : ¬(axioms ⊢ G)` sobre el cálculo **ω** y Gödel I entrega `¬ Prf godelCN` **finitario**; por
+> `prf_to_derives` la hipótesis es **estrictamente más fuerte**, no hay vuelta `⊢ → Prf`, y **nadie
+> consume el teorema**. ⚠️ Peor: `FOL/MetaRules.lean` documenta `gen` como **ω‑regla** y `dne` con la
+> lectura *«demostrabilidad = verdad en ℕ»* ⇒ `hgi` podría ser **falsa** y el teorema **vacuo**
+> (⬜ **no medido**: exige fijar la fuerza de `axioms ⊢`, y es la pregunta abierta más importante).
+> ⭐ La salida está construible: **Gödel II sobre `Prf`** — D1/D2/D3 **ya están** ahí; faltan el
+> punto fijo y `con_imp_godel'`. ⚠️ Y el docstring que afirmaba lo contrario **se escribió el día
+> anterior, en la pasada que arreglaba docstrings falsos** (F‑1b).
+> **F‑2**: **seis** documentos autoritativos con **el mismo titular** del 09‑09 —«C3: 5 de 7 · D3 a
+> DOS obligaciones»— **con las cifras de abajo al día**. ⇒ control **`[E]`** (frescura del titular,
+> AI‑GUIDE §27.3). **F‑3**: el `README` §Description describía otro proyecto (sin incompletitud,
+> con `Intermediate/` borrado en junio). **F‑5**: CI usaba `--quick` ⇒ **no comprobaba los jobs**.
+> **F‑6**: «141 = 34 + 107» en siete banners y **ningún control** — ahora `axioms_len` /
+> `coreAxioms_len` / `codingAxioms_len` por `rfl`: si cambia, **rompe el build**. **F‑10**: mi propia
+> `MEMORY.md` tenía **siete líneas contradiciendo su banner** y **236 líneas sobre un límite de
+> 200** (⇒ truncada al cargar) — la misma enfermedad que documenta. ⬜ Abiertos: **F‑4** (no existe
+> documento de estrategia de prueba), **F‑8** (controles del libro fuera de CI), **F‑9** (`Probe/`
+> sin versionar). 🏁 **La idea NO está mal**: lo que falla es que la propuesta nunca se actualizó y
+> que Gödel II está enunciado sobre el cálculo equivocado para ensamblarse.
+>
 > **2026‑09‑10h (f) — 🏁🏁 `ax_mod2_alternation` DERIVADO: 6 → 5 `axiom` de Lean. Y destapa una
 > CIRCULARIDAD del censo.** El postulado `∀n, mod2(σn) + mod2(n) = 1` **era derivable** —de `ax21`
 > (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`— y su propio docstring ya lo decía. Se retira.

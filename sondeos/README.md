@@ -1,5 +1,7 @@
 # `sondeos/` — experimentos verificados (desde la sesión 2026‑08‑19)
 
+**Last updated:** 2026‑09‑10h — entran `NegVerifierModE.lean` y `MedirF_Censo.lean` (**61** sondeos).
+
 **NO son módulos de producción y NO entran en el build de `lake`** (la `lean_lib` está enraizada en
 `ROBINSON_PlusPlus/`; estos ficheros quedan fuera). Se versionan porque **contienen resultados
 compilados** que costó obtener y que no deben re‑derivarse.

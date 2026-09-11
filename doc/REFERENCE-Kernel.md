@@ -9,7 +9,9 @@
 
 **Contenido:** la teoría objeto FOL⁼ (Q++) — axiomas de Robinson extendidos, esquemas del verificador
 estructural (`lineWF`, `premsOf`, tags), y los axiomas de la capa Δ₀ (`lenc`/`nthc`/`ax_lineWF_inv`/
-`ax_lineWF_cons`). **Last updated:** 2026-07-12 · Lean v4.31.0.
+`ax_lineWF_cons`). **Last updated:** 2026-07-12 · Lean v4.31.0. — ⚠️ **revisado el 2026‑09‑11**: el kernel y los
+esquemas que este nodo documenta **no han cambiado** desde entonces; la fecha es correcta, no
+obsoleta. (Adjudicación del aviso `[E]` del control.)
 
 ---
 

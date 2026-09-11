@@ -1,8 +1,9 @@
 # ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026-09-09 · rama A cerrada · **A5 y B8b cerradas** · C3: **5 de 7** reflectores · D3 a **DOS** obligaciones
+> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁 **C3 (7/7)** · 🏁 **D3 PROBADA** · **5 `axiom` de Lean** · ⛔ **Gödel II montado pero NO ensamblado** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
 >
-> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
+> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
+> (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
@@ -42,9 +43,38 @@ Una implementación formal de una **Aritmética Fundacional** en Lean 4, constru
 
 ## Description
 
-Este proyecto está dedicado a explorar y formalizar diferentes sistemas axiomáticos para la aritmética. Su objetivo es fundar rigurosamente los números naturales y, a partir de ellos, construir estructuras de datos como tuplas y listas.
+> ⚠️ **Corregido el 2026‑09‑11 por la auditoría.** Este apartado —la **declaración de propósito del
+> proyecto**— describía un proyecto que ya no es éste: hablaba sólo de fundar los naturales, las
+> listas y el TFA, **sin mencionar la incompletitud**, que hoy es **el 83 % del árbol** (`Meta/`,
+> 106 de 128 módulos); citaba un directorio `Intermediate/` **eliminado el 2026‑06‑11**; y daba
+> «34 axiomas» sin decir que son los **matemáticos** (`coreAxioms`), porque `axioms` tiene **141**.
+> Ver `doc/AUDITORIA-2026-09-11.md` **F‑3**.
 
-La estrategia consiste en partir de un sistema minimalista (`Minimal/`) con 34 axiomas y sin inducción, para demostrar que es suficiente para construir la función de apareamiento de Cantor, una teoría de tuplas y listas, y la formalización de la factorización prima (TFA vía Ax-P).
+Este proyecto formaliza en Lean 4 —**sin Mathlib**, sobre una implementación propia y verificada de
+lógica de primer orden con igualdad (`FOL`)— la cadena que va de una aritmética **débil** hasta los
+**teoremas de incompletitud de Gödel**, con la disciplina de que **cada paso se demuestra desde la
+base o se declara pendiente con nombre y firma**.
+
+**Las tres capas, y qué hace cada una:**
+
+| capa | qué es | tamaño |
+|---|---|---|
+| **`Minimal/`** | la teoría objeto **Q++**: aritmética de Robinson extendida, **sin esquema de inducción**. `axioms` = **141** fórmulas = **34 matemáticas** (`coreAxioms`) **+ 107 ecuaciones de codificación** | 11 módulos |
+| **`Full/`** | Q++ **más el esquema de inducción** como axioma objeto. Aquí los **10** axiomas *derivables* de `coreAxioms` pasan a **teoremas** (9 de ellos **certificados** sobre los 24 primitivos), y se construye el TFA | 11 módulos |
+| **`Meta/`** | la **aritmetización de la sintaxis** y la cadena de Gödel: verificador de demostraciones interno, punto fijo, **D1, D2 y D3 demostradas**, Gödel I y Gödel II | 106 módulos |
+
+**Lo que sostiene el resultado, dicho sin adornos:**
+
+- 🏁 **Gödel I, la mitad `⊬G`**: `goedel_first_numeral`, real y **sin ningún postulado gödeliano**.
+  ⬜ La otra mitad (`⊬¬G`) **no está cerrada**: depende de `NegVerifier`, hoy reducido a **dos
+  obligaciones con nombre**.
+- 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada.
+- ⚠️ **Gödel II está montado pero NO ensamblado**: `goedel_second'` vive sobre el cálculo **ω** y su
+  hipótesis `hgi` **no la puede dar** el Gödel I de este árbol, que es **finitario**. Es el hallazgo
+  **F‑1** de `doc/AUDITORIA-2026-09-11.md`, y la pieza que falta está identificada.
+- **5 `axiom` de Lean** en todo el árbol, **0 `sorry`**, y ninguno de los cinco es gödeliano.
+- ⚠️ **No es una prueba de consistencia**: se retiró una inconsistencia **conocida y localizada**
+  (ADR‑012/013), lo que no es lo mismo.
 
 **Características principales:**
 

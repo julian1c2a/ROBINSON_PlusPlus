@@ -4,7 +4,29 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑10h · `master` · 🏁 MÓDULO E · 🏁 `coreAxioms` 11/11 · ✅ ÁRBOL VERDE · ✅ CI VERDE**
+**Estado 2026‑09‑11 · `master` · ✅ ÁRBOL VERDE · ✅ CI VERDE · **5 `axiom` de Lean****
+
+> # 🔬 LEER PRIMERO: `doc/AUDITORIA-2026-09-11.md` — dos ciclos, diez hallazgos
+>
+> ⛔⛔ **F‑1 · Gödel II está montado pero NO ensamblado, y es estructural.** `goedel_second'` pide
+> `hgi : ¬(axioms ⊢ G)` sobre el cálculo **ω**; Gödel I entrega `¬ Prf godelCN` **finitario**. Por
+> `prf_to_derives` la hipótesis es **estrictamente más fuerte**, **no hay vuelta `⊢ → Prf`**, y
+> **nadie consume el teorema**. ⚠️ `FOL/MetaRules.lean` documenta `gen` como **ω‑regla** y `dne` con
+> la lectura *«demostrabilidad = verdad en ℕ»* ⇒ `hgi` **podría ser falsa** y el teorema **vacuo**.
+> ⬜ **No medido** — y decidirlo (¿cuál es la fuerza real de `axioms ⊢`?) es **la pregunta abierta
+> más importante del proyecto**.
+>
+> ⭐ **La salida está identificada y es construible**: **Gödel II sobre `Prf`**
+> (`goedel_second_prf : ConsistentH → ¬ Prf Con'`). Las tres condiciones **ya están sobre `Prf`**
+> —`repr_pos'_prf`, `d2_prf`, `d3_prf_real`—; faltan el **punto fijo** y **`con_imp_godel'`** en
+> versión `Prf`. **Ninguna de las dos es una condición de derivabilidad.**
+>
+> ⬜ **Y quedan tres hallazgos abiertos**: **F‑4** no existe documento de estrategia de prueba;
+> **F‑8** los controles del libro no están en CI; **F‑9** `Probe/` está sin versionar.
+>
+> 🔑 **La pregunta de método que la auditoría deja**: *por cada teorema cabecera, ¿quién descarga
+> cada una de sus hipótesis, y con qué?* Si la respuesta es «nadie», está **montado, no
+> ensamblado** — y hay que decirlo donde se anuncia el resultado.
 `Build completed successfully (142 jobs)` — **128 módulos** (Minimal 11 + Meta 106 + Full 11) + 0 en
 `cuarentena/` · 61 `sondeos/` · **5 `axiom` de Lean · 0 sorrys**.
 
