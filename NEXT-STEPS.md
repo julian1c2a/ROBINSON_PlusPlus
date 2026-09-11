@@ -467,10 +467,17 @@
 >   B4 ⬜ pcc_axiom_inst4 → Meta/MpCodePrf.lean                ⚠️ el frente la pide 2 veces más
 >   B5 ⬜ pcc_eval_pred  → Meta/                               (la incondicional, no la guardada)
 >   B6 ⬜ prf_nil_or_cons -> Meta/ChainPrf.lean          (esto SI es promocion)
->   B6b⬜ ⚠️ NO es promocion, es TRABAJO NUEVO: PrfH_mono / PrfH_w1 (monotonia
->         del contexto en PrfH) NO existen en NINGUN sitio -- ni en produccion
->         ni en sondeos (verificado por grep 2026-08-31). Van a
->         Meta/HilbertDeduction.lean, pero hay que PROBARLOS primero.
+>   B6b✅ 🏁 **PAGADA -- y ya lo estaba.** `PrfH_mono` / `PrfH_w1` en
+>         `sondeos/PrfHMono.lean` (2026-09-11), net-0 puro, induccion sobre los
+>         8 constructores de `PrfH`.
+>         ⛔ Lo que decia esta entrada era FALSO: «NO existen en NINGUN sitio
+>         (verificado por grep 2026-08-31)» y «hay que PROBARLOS primero».
+>         Estaban PROBADOS, con 0 sorry, en `Probe/CritDesc_consumidor.lean`
+>         --que esta en .gitignore--. El grep era correcto; fallo su ALCANCE.
+>         Van CINCO veces «trabajo hecho y no recogido, ahora en Probe/».
+>         ⬜ Queda MOVERLOS de sondeos/ a Meta/HilbertDeduction.lean, junto a
+>         `prfH_weaken` y `prf_to_prfH`. Eso cierra B6b y quita el rodeo a los
+>         cuatro modulos que hoy pagan la deuda.
 >   B8b✅ SALDADA (2026-09-09c, §3.51). Era: **`prf_congr_liftc` estaba DUPLICADO en
 >         PRODUCCION** -- `Meta/CodeWitnessPrf.lean:109` (nivel `v` EXPLICITO) y
 >         `Meta/NumCodeClosedPrf.lean:53` (nivel `c` IMPLICITO). MISMO teorema, y los dos
