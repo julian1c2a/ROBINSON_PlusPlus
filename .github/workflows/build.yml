@@ -101,4 +101,49 @@ jobs:
 
       - name: Book · ningun termino se usa antes de definirse
         run: python3 doc/book/scripts/terminos.py
+
+  # ⭐ P-1 (PLAN-PRUEBAS.md §5): el control §2.1 del libro -- que el codigo IMPRESO en el PDF
+  # sea el del repo -- necesita LaTeX, asi que va en su propio job. Solo se dispara cuando
+  # cambia el libro: instalar TeX Live cuesta varios minutos y no tiene sentido en cada push.
+  libro-pdf:
+    name: libro · verificar_pdf (necesita LaTeX)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+    steps:
+      - name: Checkout ROBINSON_PlusPlus
+        uses: actions/checkout@v4
+
+      - name: ¿cambio el libro en este push?
+        id: libro
+        run: |
+          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} 2>/dev/null | grep -q '^doc/book/'; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+            echo "· sin cambios en doc/book/ — se omite el PDF"
+          fi
+
+      - name: Set up Python
+        if: steps.libro.outputs.run == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install TeX Live
+        if: steps.libro.outputs.run == 'true'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends             latexmk texlive-luatex texlive-xetex texlive-latex-extra             texlive-fonts-recommended texlive-lang-spanish
+
+      - name: Compilar el libro
+        if: steps.libro.outputs.run == 'true'
+        working-directory: doc/book
+        run: |
+          python3 scripts/extraer.py
+          latexmk -lualatex -interaction=nonstopmode -halt-on-error -file-line-error libro.tex
+
+      - name: El codigo IMPRESO es el del repo (§2.1)
+        if: steps.libro.outputs.run == 'true'
+        working-directory: doc/book
+        run: python3 scripts/verificar_pdf.py
         continue-on-error: true   # Warning only
