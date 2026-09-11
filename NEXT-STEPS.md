@@ -28,13 +28,19 @@
 > —`repr_pos'_prf`, `d2_prf`, `d3_prf_real`—; faltan el **punto fijo** y **`con_imp_godel'`** en
 > versión `Prf`. **Ninguna de las dos es una condición de derivabilidad.**
 >
+> 🏁 **2026‑09‑11 · `DEUDA_inNeg` SALDADA** (`Meta/ChainNegPrf.lean`). `NegVerifier` pasa de **dos**
+> deudas a **UNA**. Y la que queda tiene ya su **puente** (`derives_chainOk_neg_of_line`): falta
+> sólo «el decodificador rechaza ⟹ hay línea con `lineWF` refutable», y de sus **cinco** causas
+> **cuatro tienen maquinaria**. La quinta —`mp`/`gen` sin premisas— va por el conjunto
+> `premsOf ⊆ conclusiones anteriores`, no por `lineWF`. **Es lo único que separa a `⊬¬G`.**
+>
 > ⬜ **Y quedan tres hallazgos abiertos**: **F‑4** no existe documento de estrategia de prueba;
 > **F‑8** los controles del libro no están en CI; **F‑9** `Probe/` está sin versionar.
 >
 > 🔑 **La pregunta de método que la auditoría deja**: *por cada teorema cabecera, ¿quién descarga
 > cada una de sus hipótesis, y con qué?* Si la respuesta es «nadie», está **montado, no
 > ensamblado** — y hay que decirlo donde se anuncia el resultado.
-`Build completed successfully (144 jobs)` — **130 módulos** (Minimal 11 + Meta 108 + Full 11) + 0 en
+`Build completed successfully (145 jobs)` — **131 módulos** (Minimal 11 + Meta 109 + Full 11) + 0 en
 `cuarentena/` · 61 `sondeos/` · **5 `axiom` de Lean · 0 sorrys**.
 
 > # 🎯 LO DE HOY (2026‑09‑10h) — tres cosas, y una de ellas **es un frente nuevo**

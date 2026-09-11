@@ -2,8 +2,8 @@
 
 > ## ESTADO REAL — 2026‑09‑11 · **abierto por la auditoría** (`doc/AUDITORIA-2026-09-11.md` F‑4)
 >
-> **Build 144 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **130 módulos activos** · **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **131 módulos activos** · **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
 

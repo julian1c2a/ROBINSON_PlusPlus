@@ -203,8 +203,8 @@ tres»**, que es la buena noticia.
 
 | | |
 |---|---|
-| build | **144 jobs** |
-| módulos activos | **130** (Minimal 11 + Meta 108 + Full 11) |
+| build | **145 jobs** |
+| módulos activos | **130** (Minimal 11 + Meta 109 + Full 11) |
 | `axiom` de Lean | **5** — `ax_induction_prim`, `ax_list_induction`, `ax_p_tfa`, `ax_axiomsCodeT_eq`, `prf_axiomsCodeT_eq`. **Ninguno gödeliano** |
 | axiomas objeto | **141** = 34 `coreAxioms` + 107 `codingAxioms`; y los 34 = **24 primitivos + 10 derivables** |
 | `sorry` | **0** |

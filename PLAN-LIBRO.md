@@ -2,8 +2,8 @@
 
 > ## ESTADO REAL — 2026-09-10h · `master` · **Parte IV escrita hasta el cap. 15**
 >
-> **Build 144 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **130 módulos activos** (Minimal 11 + Meta 108 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
 > **6 `axiom` de Lean · 141 axiomas objeto** en `axioms` (= 34 `coreAxioms` + 107 `codingAxioms`).
 >
 > ⚠️ El banner anterior (2026-09-04, `1ab7a96`) decía **123 jobs · 109 módulos · 7 axiom**, con

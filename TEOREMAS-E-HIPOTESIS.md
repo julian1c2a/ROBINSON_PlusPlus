@@ -1,6 +1,6 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · **144 jobs · 130 módulos · 0 sorry · 5 `axiom`**
+> ## ESTADO REAL — 2026‑09‑11 · `master` · **145 jobs · 131 módulos · 0 sorry · 5 `axiom`**
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
 
@@ -43,10 +43,10 @@ un fallo.
 | | `hrefl : Reflects godelCN` | ✅ **`reflects_of_omega`** (`Meta/OmegaReflect.lean`) |
 | **`reflects_of_omega`** | `hω : OmegaConsistent` | ⬜ hipótesis META, explícita y honesta |
 | | `hneg : NegVerifier` | 🔶 **`negVerifier_of_deudas`** — pero ver la fila siguiente |
-| **`negVerifier_of_deudas`** (`Meta/VerifierSound.lean`) | `hchain : DEUDA_chainNeg` | ⛔ **NADIE** — módulo **D** de `PLAN-NEGVERIFIER.md` |
-| | `hin : DEUDA_inNeg` | ⛔ **NADIE** — módulo **C** |
+| **`negVerifier_of_deudas`** (`Meta/VerifierSound.lean`) | `hchain : DEUDA_chainNeg` | ⛔ **NADIE todavía** — pero ⭐ su **puente** está: `derives_chainOk_neg_of_line` (`Meta/ChainNegPrf.lean` §1). Queda «el decodificador rechaza ⟹ hay línea con `lineWF` refutable», y de sus **cinco** causas **cuatro tienen maquinaria** |
+| | `hin : DEUDA_inNeg` | 🏁 **SALDADA** (2026‑09‑11): **`deuda_inNeg`**, `Meta/ChainNegPrf.lean` §3 |
 | **`goedel_first_undecidable_omega`** | `hcon`, `hω` | ⬜ hipótesis |
-| | `hneg : NegVerifier` | ⛔ **NADIE de forma incondicional** ⇒ **la mitad `⊬¬G` NO está cerrada** |
+| | `hneg : NegVerifier` | 🔶 **a UNA deuda**: con `deuda_inNeg` saldada, `negVerifier_of_deudas` sólo espera `DEUDA_chainNeg` ⇒ **la mitad `⊬¬G` está a un paso, no a dos** |
 
 ### 🏁 Gödel II — sobre el cálculo finitario
 

@@ -18,7 +18,7 @@ D1/D2/D3 **no postula ninguna de las tres**.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 144 jobs · 130 módulos activos** (Minimal 11 + Meta 108 + Full 11) **+ 0 en `cuarentena/`
+> **Build 145 jobs · 131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/`
 > + 57 `sondeos/` · 5 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24

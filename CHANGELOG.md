@@ -14,6 +14,23 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑11 (d) — 🏁 MÓDULOS C/D: `DEUDA_inNeg` SALDADA. `NegVerifier` queda a UNA deuda.**
+> `Meta/ChainNegPrf.lean`. **§1 el PUENTE** `derives_chainOk_neg_of_line`: de **una** línea cuyo
+> `lineWF` la teoría refuta sale `⊢ ¬hainOk nil ⟦l⟧`, y sale de piezas **que ya estaban** —
+> `prf_lineWF_of_chainOk` (la que D3 usó en su mitad (a)), `prf_nthc_objList`, `prf_lenc_objList`,
+> `gnum_lt` — en unas 40 líneas. **§2** `decode_heads`: **las cabezas de una cadena aceptada SON los
+> códigos de sus conclusiones**; 🔑 lo hace posible **`decodeForm_inj`** —que el decodificador sea
+> una **SECCIÓN**—, extraído en `decodeLine_stepConcl`/`decodeLine_carc`. **§3** 🏁 **`deuda_inNeg`**:
+> `runFn nil ⟦l⟧ ≐ ⟦l.map carc⟧ ≐ listFormCodeM fs`, y ahí manda `prf_not_In_listFormCodeM` — que
+> **ya existía** y cuyo docstring decía literalmente *«la refutación que necesita `NegVerifier`»*.
+> ⚠️ **Sin tocar el ancla de codificación**: el footprint no cita `prf_axiomsCodeT_eq`.
+> ⬜ **Lo que queda de `DEUDA_chainNeg`, MEDIDO**: con `StdChain` estrechada, las causas de rechazo
+> del decodificador son **cinco** y **cuatro tienen maquinaria** — (a) tag fuera de rango, (b) aridad,
+> (c) la conclusión no casa (`derives_lineWF_neg_of_tag`, el grueso), (d) `thy` con `f ∉ axioms`. La
+> quinta —**(e) `mp`/`gen` sin premisas en el acumulador**— no va por `lineWF` sino por el conjunto
+> `premsOf ⊆ conclusiones anteriores` de `chainOk`, que es justo lo que D3 aritmetizó.
+> **145 jobs · 131 módulos.**
+>
 > **2026‑09‑11 (c) — 🏁🏁 P‑4: basta `ConsistentH`. LA CADENA DE GÖDEL ES ENTERAMENTE FINITARIA.**
 > La pregunta que ADR‑024 dejó abierta —¿basta `¬ Prf ⊥` en lugar de `¬ (axioms ⊢ ⊥)`?— se contestó
 > el mismo día: **sí**, y con el punto fijo ya sobre `Prf` sale en **cuatro líneas**.

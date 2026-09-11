@@ -2,8 +2,8 @@
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
-> **Build 144 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **130 módulos activos** (Minimal 11 + Meta 108 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
+> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 61 en `sondeos/`** (experimentos compilados, fuera del build).
 > **5 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
@@ -72,7 +72,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**130 módulos activos** (Minimal 11 + Meta 108 + Full 11) + barrel `Meta.lean` + raíz
+**131 módulos activos** (Minimal 11 + Meta 109 + Full 11) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **57 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -179,6 +179,7 @@ Detalle en el nodo §3.15–§3.32.
 | 84n | **`VerifierSound`** | 🆕 🏁 **MÓDULO E de `NegVerifier` · LA SOLIDEZ ESTRUCTURAL, EN DIEZ LÍNEAS** (2026‑09‑10h). `PLAN-NEGVERIFIER.md` §8 lo llamaba **«el corazón»**, riesgo **ALTO**, 300–500 líneas, y exigía un sondeo previo. ⭐⭐ **El sondeo (`sondeos/NegVerifierModE.lean`) midió que el corazón no había que construirlo**: el decisor que E necesita **no tiene que ser el verificador OBJETO**, basta el **decodificador META**, y entonces la solidez **ya estaba probada** — `verifier_sound` **es** `decodeChain_prf`. 🔑 La pieza que lo hace gratis es **`decodeForm_inj`**: el decodificador es una **SECCIÓN** («si decodifica, el código era real»), que es exactamente la *realidad hereditaria* que §8 pedía demostrar caso por caso. ⭐ La forma de consumo es la **CONTRAPOSITIVA** (`not_decodes_of_not_prf`): con `¬Prf φ`, la rama «cadena aceptada» del ensamblaje es **IMPOSIBLE**. ⬜ Lo que queda, **enunciado y no postulado**: `DEUDA_chainNeg` y `DEUDA_inNeg` (la **completitud negativa**), que `negVerifier_of_deudas` convierte en `NegVerifier`. ⛔ **Y el riesgo estaba al revés de como el plan lo ponía**: E era «ALTO» y es una línea; los que hay que rediseñar son **C y D**, porque los esquemas objeto **aceptan más que el decodificador** y `IsCodeShaped` **NO SEPARA**. Footprint de `verifier_sound`: **net‑0 PURO**. |
 | 84o | **`OmegaStrength`** | 🆕 ⛔⛔ **LA FUERZA DE `axioms ⊢`, MEDIDA** (2026‑09‑11, auditoría F‑1). `derives_completo (A) : (axioms ⊢ A) ∨ (axioms ⊢ ¬A)` — **el cálculo ω es SINTÁCTICAMENTE COMPLETO**, y sin hipótesis. La causa **no es aritmética**: `raa` toma como premisa una **función de Lean**, así que si `axioms ⊬ A` la función existe **vacuamente** y el cálculo **refuta** `A`. ⇒ **`axioms ⊢` no es una relación de derivabilidad de primer orden**: es una noción metateórica de verdad. ⚠️ **Consecuencia**: `goedel_second'` **no es** el Segundo Teorema —la incompletitud habla de teorías que **no deciden** algo—, y su `hgi` no dice «`G` es indemostrable» sino «el cálculo **refuta** `G`». ⚠️ Y corrige a `FOL/MetaRules.lean`: **`gen` NO es la ω‑regla** (su premisa recorre **todo `Term`**, no los numerales ⇒ es **más débil**); la fuerza viene de `raa`/`imp_intro`. ✅ **Gödel I no está afectado**: concluye sobre `Prf` |
 | 84p | **`GodelTwoPrf`** | 🆕 🏁🏁 **GÖDEL II SOBRE EL CÁLCULO FINITARIO** (2026‑09‑11): **`goedel_first_prf`/`goedel_second_prf`, los dos con `ConsistentH := ¬ Prf ⊥`** — la hipótesis **MÍNIMA**, **ninguna suelta**, y ⭐⭐ footprint **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`**: **un solo axioma del proyecto** (P‑4, 2026‑09‑11 — las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja**). §1 la lógica proposicional que faltaba (`prf_subst_eq_iff` directo del axioma `Prf₀.leibniz`, `prf_iff_trans`, `prf_neg_congr_iff`); §2 ⭐ **`prf_godelCN_fixedpoint`, NET‑0 PURO** — el punto fijo sobre `Prf` no usa **ningún** axioma del proyecto—, puerto directo de `diag_arith_num` con el espejo `Prf` que ya existía; §3 `Con' ⇒ G` con `prf_deduction`/`deduction_aux` en lugar del meta‑axioma `imp_intro`, sobre **D2** (`d2_prf`) y **D3** (`d3_prf_real`); §4 el ensamblaje, con **D1** (`repr_pos'_prf`) descargando la necesitación. ⇒ **la cadena D1/D2/D3 no sólo está demostrada: está ENSAMBLADA** |
+| 84q | **`ChainNegPrf`** | 🆕 🏁 **MÓDULOS C/D: `DEUDA_inNeg` SALDADA y el puente de `DEUDA_chainNeg`** (2026‑09‑11). **§1 el PUENTE**: `derives_chainOk_neg_of_line` — de **una** línea cuyo `lineWF` la teoría refuta sale `⊢ ¬chainOk nil ⟦l⟧`, con piezas que ya estaban (`prf_lineWF_of_chainOk` —la de la mitad (a) de D3—, `prf_nthc_objList`, `prf_lenc_objList`, `gnum_lt`) ⇒ `DEUDA_chainNeg` queda reducida a «el decodificador rechaza ⟹ hay línea refutable». **§2** `decode_heads`: **las cabezas de una cadena aceptada SON los códigos de sus conclusiones** — 🔑 lo hace posible **`decodeForm_inj`**, que el decodificador sea una **SECCIÓN**, extraído en `decodeLine_stepConcl`/`decodeLine_carc`. **§3** 🏁 **`deuda_inNeg`**: `runFn nil ⟦l⟧ ≐ ⟦l.map carc⟧ ≐ listFormCodeM fs` y ahí manda `prf_not_In_listFormCodeM`, que ya existía y cuyo docstring decía *«la refutación que necesita `NegVerifier`»*. ⚠️ **Sin tocar el ancla**: el footprint no cita `prf_axiomsCodeT_eq`. ⬜ De las **cinco** causas de rechazo del decodificador, **cuatro tienen maquinaria**; la que falta es `mp`/`gen` sin premisas, que no va por `lineWF` sino por el conjunto `premsOf ⊆ conclusiones anteriores` |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo; **Gödel II `goedel_second'`**, módulo `axiom d3` |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).
@@ -304,7 +305,7 @@ borrado en F7a) y está marcado como tal.
 Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**.
 Visión a largo plazo: [PLANNING.md](PLANNING.md). Libro: [PLAN-LIBRO.md](PLAN-LIBRO.md).
 
-**Estado 2026‑09‑10h.** Build **144 jobs**, **130 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+**Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
 **5** `axiom` de Lean (`d3` retirado el 2026‑09‑10g).
 
 ### Lo que está cerrado
