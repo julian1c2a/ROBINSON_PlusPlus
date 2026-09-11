@@ -361,6 +361,7 @@ make docsync                        # equivalente
 | **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean y `sorry` — contra el estado REAL. Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
 | **[A2]** | 🆕 **las mismas cifras en el CUERPO** (de la línea 101 al final), con los mismos filtros de historicidad — §27.2 | ⚠️ aviso |
 | **[B]** | **símbolos muertos** citados como vigentes en los docs autoritativos | ⚠️ aviso |
+| **[E]** | 🆕 **frescura del TITULAR**: la fecha del banner de cada doc autoritativo contra la entrada más reciente del `CHANGELOG` — §27.3 | ⚠️ aviso |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
 | **[D]** | **marcas de tiempo** (§22) presentes en los docs técnicos | ✅ sí |
 
@@ -373,6 +374,33 @@ menciona como historia/objetivo (→ añadir un marcador: «retirado», «falta�
 ⚠️ **Y la regla de oro que ningún script sustituye: NO basta con arreglar el banner.** Al corregir,
 recorrer también las tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría
 antiguas.
+
+#### (27.3) 🆕 ⭐ El TITULAR — porque **no es un número, y por eso nadie lo miraba** (2026‑09‑11)
+
+Lo encontró la auditoría del 2026‑09‑11 (hallazgo **F‑2**). **Seis** documentos autoritativos
+—`README`, `REFERENCE`, `DECISIONS`, `AXIOMS`, `DEPENDENCIES`, `GODEL-STATUS`— compartían **el
+mismo titular**, del 2026‑09‑09:
+
+> *«C3: **5 de 7** reflectores · D3 a **DOS** obligaciones»*
+
+C3 se cerró el **10e** y D3 se probó el **10g**. Y las **cifras** de debajo estaban **al día** —
+porque `[A]` las mira—. ⇒ **el banner puede estar simultáneamente al día en sus números y mintiendo
+en su frase**, que es la forma más difícil de detectar de §27: el documento *parece* recién
+revisado.
+
+⚠️ **Y el titular estaba DUPLICADO literalmente en seis ficheros**, así que el error se multiplicó
+por seis y se corrigió una sola vez. **Duplicar un titular es duplicar su caducidad.**
+
+`[E]` compara la **fecha** del titular contra la entrada más reciente del `CHANGELOG`. Es una
+heurística —no lee la frase—, pero habría cazado los seis. Entra como **AVISO**, como `[A2]`.
+
+⚠️ **Calibración del estreno, y hay que anotarla para que `[E]` no se convierta en ruido**
+(§27.1): en su primera ejecución tras adoptarlo señaló **cuatro** titulares por detrás del
+`CHANGELOG` — `doc/REFERENCE-Kernel.md` (julio), `doc/REFERENCE-Full.md`, `cuarentena/README.md` y
+`sondeos/README.md`. **Los cuatro son legítimos**: esos documentos no cambiaron ese día y su fecha
+es **correcta**, no obsoleta. ⇒ `[E]` **no dice «esto está mal», dice «míralo»**, y por eso es
+AVISO. Un titular por detrás es normal; **seis titulares idénticos** por detrás no lo era.
+
 
 #### (27.2) 🆕 ⭐ El CUERPO, y por qué el límite de 100 líneas **no era un descuido** (2026‑09‑10h)
 

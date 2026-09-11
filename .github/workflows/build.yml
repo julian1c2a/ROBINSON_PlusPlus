@@ -79,5 +79,8 @@ jobs:
       # `lake build`, que ya se hizo arriba; a cambio el control [A] de jobs no se ejecuta
       # y eso lo dice el propio script (§27.1: un control que no comprueba nada AVISA).
       - name: Check doc sync
-        run: bash check-doc-sync.bash --quick
+        # ⚠️ SIN `--quick` desde el 2026-09-11 (auditoría, F-5): con `--quick` el control [A]
+        # NO comprobaba la cifra de jobs, así que el «142 jobs» de los banners no lo verificaba
+        # nadie más que una ejecución local. `lake build` ya está cacheado aquí arriba.
+        run: bash check-doc-sync.bash
         continue-on-error: true   # Warning only

@@ -198,6 +198,41 @@ else
   echo "      sin marcar (⇒ marcarlo: fecha ISO, «previo», «era», «histórico»)?"
 fi
 
+echo ""
+echo "════ [E] FRESCURA DEL TITULAR — AVISO, requiere juicio ════"
+# ⭐ Añadido el 2026-09-11 por la auditoría (hallazgo F-2). El control [A] comprueba las
+# CIFRAS del banner y [D] que exista una marca de tiempo, pero NADIE comprobaba la FRASE.
+# Resultado medido: SEIS documentos autoritativos compartían el mismo titular del 2026-09-09
+# —«C3: 5 de 7 reflectores · D3 a DOS obligaciones»— con las cifras de abajo ya al día.
+# C3 se cerró el 10e y D3 se probó el 10g. El titular estaba duplicado ⇒ el error se multiplicó
+# por seis, y ningún control lo veía porque no es un número.
+#
+# La heurística: la fecha del TITULAR de cada doc autoritativo no debería ser anterior a la
+# entrada más reciente del CHANGELOG. Si lo es, o el titular se quedó atrás o falta marcarlo.
+NEWEST=$(grep -ohE "20[0-9]{2}[-‑][0-9]{2}[-‑][0-9]{2}" CHANGELOG.md 2>/dev/null | sed "s/‑/-/g" | sort -r | head -1)
+E_HITS=0
+if [ -n "$NEWEST" ]; then
+  for d in $DOCS; do
+    [ -e "$d" ] || continue
+    HEAD_DATE=$(head -12 "$d" | grep -ohE "20[0-9]{2}[-‑][0-9]{2}[-‑][0-9]{2}" | sed "s/‑/-/g" | sort -r | head -1)
+    [ -z "$HEAD_DATE" ] && continue
+    if [ "$HEAD_DATE" \< "$NEWEST" ]; then
+      echo "  ⚠️  $d: titular fechado $HEAD_DATE, y el CHANGELOG llega a $NEWEST"
+      echo "      $(head -12 "$d" | grep -m1 -E "ESTADO REAL|^\*\*Estado |^> \*\*Estado " | cut -c1-120)"
+      E_HITS=$((E_HITS+1))
+    fi
+  done
+  if [ "$E_HITS" = "0" ]; then
+    echo "  ✓ ningún titular se ha quedado atrás del CHANGELOG ($NEWEST)"
+  else
+    echo "  ⚠️  $E_HITS titular(es) por detrás del CHANGELOG."
+    echo "      ⚠️ El titular es una FRASE: [A] no lo ve. Comprobar que lo que AFIRMA sigue"
+    echo "      siendo cierto, no sólo que sus cifras cuadren."
+  fi
+else
+  echo "  ⚠️  no pude leer la fecha más reciente del CHANGELOG — control VACÍO"
+fi
+
 # ─── 3. SÍMBOLOS MUERTOS ─────────────────────────────────────────────────────
 # Un símbolo está MUERTO si se cita en un doc AUTORITATIVO pero ninguna declaración
 # del árbol activo empieza por él.

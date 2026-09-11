@@ -32,3 +32,21 @@ memoria `feedback-doc-audit-traps`:
   La cifra falsa (6 en vez de 8) circuló meses por cuatro documentos.
 
 $ARGUMENTS
+
+---
+
+## 🆕 Bloques nuevos (2026‑09‑10h / 2026‑09‑11)
+
+| | qué mira | ¿rompe? |
+|---|---|---|
+| **`[A2]`** | las mismas cifras que `[A]`, pero en el **CUERPO** (de la línea 101 al final) | ⚠️ aviso |
+| **`[E]`** | la **frescura del TITULAR**: su fecha contra la entrada más reciente del `CHANGELOG` | ⚠️ aviso |
+
+⚠️ **Los dos avisos hay que LEERLOS, no contarlos.** `[A2]` separa historia legítima de afirmación
+obsoleta; `[E]` avisa de que un banner puede estar **al día en sus cifras y mintiendo en su frase**
+— que es como seis documentos autoritativos llegaron a llevar el mismo titular falso.
+
+⚠️ **Y `[B]` hay que ADJUDICARLO uno a uno**, que es lo que M‑6 pide: al hacerlo por primera vez
+(2026‑09‑10h) salieron cuatro símbolos muertos leyéndose como **frentes vivos**.
+
+Detalle en `AI-GUIDE.md` §27.2 y §27.3.
