@@ -99,14 +99,62 @@ jobs:
     name: libro · controles §2.1/§2.6/§2.7
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
+
+    # ⚠️ MISMO patrón de subdirectorio que el job `build`, y por la MISMA razón: los
+    # controles del libro NO son autocontenidos. `doc/book/scripts/extraer.py` declara
+    #     PAQUETES = {"ROBINSON_PlusPlus": ".", "FOL": "../FOL"}
+    # y `simbolos.py` construye su censo por CIERRE DE IMPORTS sobre eso. Sin el árbol de
+    # FOL al lado, el cierre «se cortaría en seco justo donde empieza el capítulo 2» (su
+    # propio comentario) y `--estricto` reportaría como INEXISTENTES todos los
+    # identificadores de FOL: el control fallaría, pero por la razón equivocada.
+    # Medido el 2026‑09‑11.
+    defaults:
+      run:
+        working-directory: ROBINSON_PlusPlus
+
     steps:
       - name: Checkout ROBINSON_PlusPlus
         uses: actions/checkout@v4
+        with:
+          path: ROBINSON_PlusPlus
+          # ⚠️⚠️ `fetch-depth: 0` NO es opcional. El checkout por defecto es SHALLOW
+          # (profundidad 1), y entonces `github.event.before` no existe como objeto en el
+          # repo local: el `git diff` de la puerta de abajo abortaba con «fatal: bad
+          # object», su stderr iba a /dev/null, `grep -q` no casaba y la puerta daba
+          # SIEMPRE `run=false`. ⇒ este job terminó EN VERDE sin ejecutar NINGUNO de sus
+          # cuatro controles desde el día en que se creó. Medido el 2026‑09‑11.
+          # ⚠️ `fetch-depth: 2` NO basta: el último push real abarcaba CUATRO commits.
+          fetch-depth: 0
 
-      - name: ¿cambio el libro en este push?
+      - name: Checkout FOL (dependencia local hermana)
+        uses: actions/checkout@v4
+        with:
+          repository: julian1c2a/FOL
+          ref: master
+          path: FOL
+
+      # `PROYECTOS_CITADOS` de extraer.py: el libro lo CITA como evidencia externa —nada
+      # suyo sostiene un teorema de este libro— pero `simbolos.py` recorre su árbol, y sin
+      # él daría por desconocido lo que el texto cita de ahí.
+      - name: Checkout Peano (proyecto citado)
+        uses: actions/checkout@v4
+        with:
+          repository: julian1c2a/Peano
+          ref: master
+          path: Peano
+
+      - name: ¿cambió el libro en este push?
         id: libro
         run: |
-          if git diff --name-only ${{ github.event.before }} ${{ github.sha }} 2>/dev/null | grep -q '^doc/book/'; then
+          BEFORE='${{ github.event.before }}'
+          # ⭐ REGLA: ANTE LA DUDA, EJECUTAR EL CONTROL. Un control que no puede decidir si
+          # le toca correr debe correr — la alternativa es el verde silencioso que este
+          # mismo job estuvo dando (§27.1: un control que no comprueba nada AVISA).
+          if [ -z "$BEFORE" ] || [ "$BEFORE" = "0000000000000000000000000000000000000000" ]              || ! git cat-file -e "$BEFORE^{commit}" 2>/dev/null; then
+            echo "⚠️  no hay commit base utilizable ($BEFORE) — se ejecutan los controles igualmente"
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif git diff --name-only "$BEFORE" '${{ github.sha }}' | grep -q '^doc/book/'; then
+            echo "· el push toca doc/book/ — se ejecutan los controles del libro"
             echo "run=true" >> "$GITHUB_OUTPUT"
           else
             echo "run=false" >> "$GITHUB_OUTPUT"
@@ -123,25 +171,41 @@ jobs:
         if: steps.libro.outputs.run == 'true'
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends             latexmk texlive-luatex texlive-xetex texlive-latex-extra             texlive-fonts-recommended texlive-lang-spanish
+          sudo apt-get install -y --no-install-recommends latexmk texlive-luatex texlive-xetex texlive-latex-extra texlive-fonts-recommended texlive-lang-spanish
 
+      # ⚠️ Los scripts del libro escriben a stdout con emoji y acentos. En un runner con
+      # locale C eso revienta con UnicodeEncodeError — un traceback NO es un resultado.
       - name: Book · todo \ident{} nombra algo que existe (§2.6)
         if: steps.libro.outputs.run == 'true'
+        env:
+          PYTHONIOENCODING: utf-8
         run: python3 doc/book/scripts/simbolos.py --estricto
 
-      - name: Book · ningun termino se usa antes de definirse (§2.7)
+      - name: Book · ningún término se usa antes de definirse (§2.7)
         if: steps.libro.outputs.run == 'true'
+        env:
+          PYTHONIOENCODING: utf-8
         run: python3 doc/book/scripts/terminos.py
 
       - name: Compilar el libro
         if: steps.libro.outputs.run == 'true'
-        working-directory: doc/book
+        working-directory: ROBINSON_PlusPlus/doc/book
+        env:
+          PYTHONIOENCODING: utf-8
         run: |
           python3 scripts/extraer.py
           latexmk -lualatex -interaction=nonstopmode -halt-on-error -file-line-error libro.tex
 
-      - name: El codigo IMPRESO es el del repo (§2.1)
+      # ⚠️ `verificar_pdf.py` necesita `pdftotext` (poppler-utils) para leer el PDF. Sin
+      # él no comprueba nada, y con `continue-on-error` no se notaría.
+      - name: Install poppler-utils (para leer el PDF)
         if: steps.libro.outputs.run == 'true'
-        working-directory: doc/book
+        run: sudo apt-get install -y --no-install-recommends poppler-utils
+
+      - name: El código IMPRESO es el del repo (§2.1)
+        if: steps.libro.outputs.run == 'true'
+        working-directory: ROBINSON_PlusPlus/doc/book
+        env:
+          PYTHONIOENCODING: utf-8
         run: python3 scripts/verificar_pdf.py
         continue-on-error: true   # Warning only

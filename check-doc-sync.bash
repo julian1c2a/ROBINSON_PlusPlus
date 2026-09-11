@@ -61,8 +61,30 @@ AXIOMS=$(grep -rhE "^axiom " ROBINSON_PlusPlus/ --include=*.lean 2>/dev/null | w
 # ⚠️ El conteo de `sorry` se DELEGA en check-sorry.bash y no se reimplementa aquí: qué
 # cuenta como `sorry` (token de código, fuera de comentarios y de literales) es una
 # definición delicada, y tenerla en dos sitios garantiza que se separen.
-SORRY=$(bash check-sorry.bash 2>/dev/null | sed -n 's/^.*Total: \([0-9][0-9]*\) sorry.*//p' | head -1)
-[ -z "$SORRY" ] && SORRY=0
+# ⚠️⚠️ Esta extracción estuvo ROTA POR DOS SITIOS A LA VEZ hasta el 2026‑09‑11:
+#   (1) el reemplazo del `sed` era un BYTE DE CONTROL 0x01 en lugar de la
+#       retro‑referencia (backslash‑uno), así que de casar habría escrito un SOH
+#       donde va un número. ⭐ Y NO fue una errata: escribir esa
+#       secuencia a través de la cadena de herramientas la CONVIERTE en 0x01 — se
+#       reprodujo sola al arreglarlo. Por eso aquí no se usa ninguna retro‑referencia:
+#       se extrae con `grep -oE | grep -oE`, como ya se hacía con JOBS;
+#   (2) el patrón sólo cubría la rama «⚠️  Total: N sorry», y con CERO sorry
+#       `check-sorry.bash` imprime «✅ No sorry found.» ⇒ el `sed` NO casaba NUNCA y la
+#       línea siguiente fijaba SORRY=0 POR DEFECTO.
+# ⇒ El «0 sorry» de todos los banners se comparaba contra una CONSTANTE, no contra una
+# medición: [A] habría dado verde con el árbol lleno de `sorry`. Es la sexta causa de
+# [[feedback-controles-que-no-comprueban]], y la única que estaba en el propio control.
+# Ahora se leen LAS DOS ramas y, si no aparece ninguna, se AVISA (§27.1).
+SORRY_OUT=$(bash check-sorry.bash 2>/dev/null || true)
+SORRY_MISSING=0
+if printf '%s' "$SORRY_OUT" | grep -q 'No sorry found'; then
+  SORRY=0
+elif printf '%s' "$SORRY_OUT" | grep -qE 'Total: [0-9]+ sorry'; then
+  SORRY=$(printf '%s' "$SORRY_OUT" | grep -oE 'Total: [0-9]+ sorry' | grep -oE '[0-9]+' | head -1)
+else
+  SORRY=0
+  SORRY_MISSING=1
+fi
 
 # ⚠️ `lake` NO está en el PATH de Git Bash en la máquina de desarrollo (sí en el runner
 # de CI). Cuando no lo está, `JOBS` quedaba vacío y el control [A] de jobs — el más
@@ -90,6 +112,7 @@ printf "  sorry           : %s
 [ "$LAKE_MISSING" = "1" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake' no está en el PATH de este shell."
 [ "$LAKE_MISSING" = "1" ] && echo "                     Lánzalo desde PowerShell, o usa --quick para decirlo a propósito."
 [ "$LAKE_MISSING" = "2" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake build' no dijo 'Build completed successfully'."
+[ "$SORRY_MISSING" = "1" ] && echo "  ⚠️  sorry         : SIN MEDIR — check-sorry.bash no dijo ni 'No sorry found' ni 'Total: N sorry'."
 echo
 
 # Documentos AUTORITATIVOS: los que describen el ESTADO ACTUAL y por tanto deben cuadrar.

@@ -32,7 +32,23 @@ comprueba.*
 | **V4** | `bash check-doc-sync.bash` | `[A]` cifras de cabecera · `[A2]` cifras del cuerpo (aviso) · `[B]` símbolos muertos (aviso) · `[C]` proyección · `[D]` marcas de tiempo · `[E]` frescura del titular (aviso) | **la verdad de las frases**. Ver §4 |
 | **V5** | `sondeos/*.lean` | resultados **compilados** de preguntas cerradas antes de tocar producción | que la pregunta fuese la correcta |
 | **V6** | `doc/book/scripts/*.py` | que todo `\ident{}` del libro **exista** en el repo, que el vocabulario se introduzca antes de usarse, y que el código **impreso** sea el del repo | que lo impreso sea *verdad* — sólo que **cite bien** |
-| **V7** | CI (`.github/workflows/build.yml`) | **job `build`**: V1, V2 y V4 en cada push. **job `libro`**: V6 **entero** (símbolos, términos y el PDF) **sólo cuando el push toca `doc/book/`** — el libro y el código son **dos tareas con commits separados** (PLAN‑LIBRO §0) | ⚠️ que un cambio en `.lean` rompa una cita del libro **no se ve hasta el siguiente push del libro**. Es el precio de las dos tareas, y está medido: pasó el 2026‑09‑11 al retirar `goedel_second'` |
+| **V7** | CI (`.github/workflows/build.yml`) | **job `build`**: ⛔ **BLOQUEAN V1 (`lake build`) y V4 (`check-doc-sync`)**; 🔶 **V2 (`check-sorry`) es AVISO** — lleva `continue-on-error: true`. **job `libro`**: V6 entero **sólo cuando el push toca `doc/book/`** — el libro y el código son **dos tareas con commits separados** (PLAN‑LIBRO §0) | ⚠️ que un cambio en `.lean` rompa una cita del libro **no se ve hasta el siguiente push del libro**: el precio de las dos tareas, medido el 2026‑09‑11 al retirar `goedel_second'` |
+
+> 🔶 **Qué BLOQUEA y qué AVISA, exactamente** — corregido el 2026‑09‑11 por decisión del
+> propietario. La fila decía «V1, V2 y V4» sin distinguir, y eso hacía creer que **un `sorry`
+> rompía la CI**. No la rompe:
+>
+> | paso de CI | efecto |
+> |---|---|
+> | `lake build` | ⛔ **bloquea** |
+> | `bash check-sorry.bash` | 🔶 **avisa** (`continue-on-error: true`) |
+> | `bash check-doc-sync.bash` | ⛔ **bloquea** |
+> | los cuatro del job `libro` | ⛔ bloquean, salvo §2.1 (`verificar_pdf.py`), que avisa |
+>
+> ⭐ **Pero la red existe igual, y por otro sitio**: desde el 2026‑09‑11 `check-doc-sync`
+> **sí mide** la cifra de `sorry` (antes no: ver §4), así que un `sorry` rompe la CI **por
+> `[A]`**, aunque V2 no bloquee. Verificado metiendo un `sorry` real: `[A]` imprime
+> `✗ sorry: dice 0, real 1`. ⇒ **V2 se queda como aviso; lo que se corrige es el documento.**
 | **V8** | 🆕 **`TEOREMAS-E-HIPOTESIS.md`** | por cada teorema cabecera, **quién descarga cada hipótesis**. Es la única defensa contra **F‑1** | es **a mano**: ningún script lo comprueba |
 
 ---
@@ -94,6 +110,7 @@ Sale de `doc/AUDITORIA-2026-09-11.md` §4. **Escribirlo es la única defensa que
 | que el **README** describa el proyecto que existe | **F‑3**, meses | ⬜ ninguna |
 | que un **`sorry` de andamiaje** no falsee una medición | un `sorry` en el `simp set` **fabrica** el verde | ⬜ ninguna. **Regla**: un `sorry` pospone una rama, nunca completa un `simp set` |
 | que un **postulado** no esconda un **círculo** | `ax21` ⇄ `ax_mod2_alternation`, invisible mientras uno fue `axiom` | ⬜ ninguna. **Regla**: cada axioma retirado **audita** lo que se apoyaba en él |
+| ⭐ que **el control mismo** no esté roto por un artefacto de la cadena de herramientas | **2026‑09‑11**: `check-doc-sync.bash` llevaba un **byte 0x01** donde iba la retro‑referencia de `sed`, y su patrón sólo cubría una de las **dos** salidas de `check-sorry.bash` ⇒ **la cifra de `sorry` no se midió nunca**: se comparaba contra una constante. ⚠️⚠️ **El byte se reprodujo solo al arreglarlo** ⇒ no era una errata, es lo que produce escribir esa secuencia a través de la cadena de herramientas | 🔶 **Regla nueva**: en un control, **ninguna retro‑referencia** — extraer con `grep -oE`. Y **probar el control con el fallo puesto**: se verificó metiendo un `sorry` real y comprobando que `[A]` ROMPE |
 
 ---
 
@@ -101,7 +118,7 @@ Sale de `doc/AUDITORIA-2026-09-11.md` §4. **Escribirlo es la única defensa que
 
 | | qué | estado |
 |---|---|---|
-| **P‑1** | `verificar_pdf.py` en CI | 🏁 **HECHO** (2026‑09‑11): job `libro-pdf`, con TeX Live y **sólo cuando cambia `doc/book/`** — instalar LaTeX cuesta minutos y no tiene sentido en cada push. ⚠️ **Sin verificar hasta el primer push que toque el libro** |
+| **P‑1** | `verificar_pdf.py` en CI | 🏁 **HECHO — y RE‑HECHO el mismo día**, porque la primera versión **no podía ejecutarse nunca**. Job **`libro`** (no `libro-pdf`: el nombre estaba mal aquí), con TeX Live y sólo cuando cambia `doc/book/`. ⛔⛔ **Medido el 2026‑09‑11**: el checkout era *shallow* ⇒ `github.event.before` no existía como objeto ⇒ el `git diff` de la puerta abortaba, su stderr iba a `/dev/null` y la puerta daba **siempre `run=false`**, con el job **en verde** y **cero controles ejecutados**. Corregido con `fetch-depth: 0`, una puerta que **falla hacia EJECUTAR** ante la duda, los checkouts hermanos de `FOL` y `Peano` que `simbolos.py` necesita para su cierre de imports, `poppler-utils` para §2.1 y `PYTHONIOENCODING`. ⚠️ **Sigue sin verificarse en el runner** hasta el primer push que toque el libro |
 | **P‑2** | un control de **hipótesis descargadas** | 🏁 **HECHO**: **`TEOREMAS-E-HIPOTESIS.md`** — teorema → hipótesis → **quién la descarga**. ⚠️ Es **a mano**: se actualiza en el mismo commit que toca un teorema cabecera. Una fila «⬜ nadie» es información; una fila **ausente** es el fallo |
 | **P‑3** | medir el **tiempo** de build | ⬜ hoy no se vigila; un frente puede degradarlo sin que nadie lo vea |
 | **P‑4** | **¿basta `ConsistentH`?** | 🏁 **SÍ, y resuelto el mismo día**: `goedel_first_prf` y `goedel_second_prf` toman hoy `ConsistentH := ¬ Prf ⊥`, la hipótesis **mínima**. ⭐ Y el footprint cayó a **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del proyecto**: las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja** |
