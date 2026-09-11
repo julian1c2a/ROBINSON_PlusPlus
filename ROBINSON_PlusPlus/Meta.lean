@@ -9,7 +9,9 @@ Public API:
   · Provability    (Nivel C): formCode, IsFormula, Provable (núcleo real de codificación)
   · Nivel D REAL: verificador estructural (provCodeC'/chainOk/runFn) + D1/D2 reales +
     punto fijo real (godelCN_fixedpoint) + Gödel I real (goedel_first_numeral) +
-    Gödel II (goedel_second') — 🏁 D1, D2 y D3 las TRES demostradas (2026‑09‑10g:
+    Gödel II (goedel_second' — ⚠️ montado pero NO ensamblado: su `hgi` es sobre el
+    cálculo ω y Gödel I es finitario; ver F‑1 de doc/AUDITORIA-2026-09-11.md)
+    — 🏁 D1, D2 y D3 las TRES demostradas (2026‑09‑10g:
     `d3` pasó de axiom a teorema). ⚠️ `godelC'_fixedpoint`/`goedel_first_real'` NO
     existen desde la reparación; los nombres vivos son los de arriba.
 

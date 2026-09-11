@@ -109,11 +109,34 @@ theorem con_imp_godel' (G : Formula)
     es consistente, **no demuestra su propia consistencia** (`⊬ Con'`).
 
     Prueba (la de libro): si `⊢ Con'`, por `con_imp_godel'` + mp se tiene `⊢ G`,
-    contra la indemostrabilidad de `G` (`hgi`, mitad de Gödel I). Parametrizado por
-    el punto fijo (`fp_bwd`), la necesitación (`nec1`) y `hgi : ⊬ G`.
+    contra la indemostrabilidad de `G` (`hgi`). Parametrizado por el punto fijo (`fp_bwd`),
+    la necesitación (`nec1`) y `hgi`.
+
     🏁 **D1, D2 y D3 son las TRES teoremas** desde el 2026‑09‑10g (`d3` dejó de ser `axiom`).
-    Lo que le queda son sus tres hipótesis explícitas, que **no** son condiciones de
-    derivabilidad: dos son piezas construibles y `hgi` es la mitad demostrada de Gödel I. -/
+
+    ⛔⛔ **PERO ESTE TEOREMA NO ESTÁ ENSAMBLADO, Y LA RAZÓN ES DE FONDO** (auditoría 2026‑09‑11,
+    hallazgo **F‑1** de `doc/AUDITORIA-2026-09-11.md`). El día 2026‑09‑10h este docstring llegó a
+    afirmar que *«`hgi` es la mitad demostrada de Gödel I»*. **Es FALSO**, y la medición es simple:
+
+        hgi                     : ¬ (axioms ⊢ G)     -- el cálculo ω
+        goedel_first_numeral    : ¬ Prf godelCN      -- el cálculo FINITARIO
+        prf_to_derives          : Prf φ → axioms ⊢ φ
+
+    De la tercera sale `¬(axioms ⊢ G) → ¬ Prf G`, **no al revés**: `hgi` es **estrictamente más
+    fuerte** que lo que Gödel I entrega. Y **no existe** la vuelta `⊢ → Prf` en el árbol
+    (comprobado), ni ninguna versión ω de Gödel I.
+
+    ⚠️ **Y hay algo peor que una hipótesis no descargada**: `FOL/MetaRules.lean` documenta `gen`
+    como la **ω‑regla** y `dne` con la lectura *«demostrabilidad = verdad en ℕ»*. Bajo esa lectura
+    `G` es **verdadera**, luego `hgi` sería **falsa** y este teorema **vacuo**. ⬜ **No está medido**
+    —requiere decidir la fuerza real de `axioms ⊢`— y es la pregunta abierta más importante del
+    proyecto.
+
+    ⭐ **La salida está identificada y es construible**: Gödel II **sobre `Prf`**
+    (`goedel_second_prf : ConsistentH → ¬ Prf Con'`, el nombre que el proyecto lleva planeando
+    desde junio). Las tres condiciones **ya existen sobre `Prf`** —`repr_pos'_prf` (D1),
+    `d2_prf` (D2), `d3_prf_real` (D3)—; faltan las versiones `Prf` del **punto fijo**
+    (`godelCN_fixedpoint`) y de **`con_imp_godel'`**. -/
 theorem goedel_second' (G : Formula)
     (fp_bwd : axioms ⊢ (neg (provCodeC' G) ⇒ G))
     (nec1 : axioms ⊢ provCodeC' (G ⇒ neg (provCodeC' G)))

@@ -65,6 +65,19 @@ def primAxioms : List Formula :=
     ax_C1_concat_nil, ax_C2_concat_cons, ax29_sub_witness,
     ax_pow_zero, ax_pow_succ, ax_prodp_nil, ax_prodp_cons ]
 
+/-! #### Las cifras del banner, **comprobadas por el kernel** (auditoría 2026‑09‑11, F‑6)
+
+⚠️ «**141 axiomas objeto** = 34 core + 107 coding» aparece en **siete banners** y **ningún control
+lo comprobaba**: `check-doc-sync` `[A]` mira jobs, módulos, `axiom` de Lean y `sorry`, no esto. Era
+cierto **por suerte**, no por control. Aquí deja de serlo: si alguna lista cambia, **el build rompe**. -/
+
+set_option maxRecDepth 8000 in
+theorem axioms_len : axioms.length = 141 := rfl
+set_option maxRecDepth 4000 in
+theorem coreAxioms_len : coreAxioms.length = 34 := rfl
+set_option maxRecDepth 8000 in
+theorem codingAxioms_len : codingAxioms.length = 107 := rfl
+
 /-- El censo, comprobado por el kernel: **24 + 10 = 34 = `coreAxioms`**.
 
     ⚠️ **Eran 23 + 11 hasta el 2026‑09‑10h**, y la corrección la forzó una medición: `ax21` (el rango
