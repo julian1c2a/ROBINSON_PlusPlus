@@ -33,10 +33,12 @@ Segundo Teorema.
 
 ## ⇒ Lo que sí lo es, y está aquí
 
-    goedel_second_prf (hcon : ConsistentOmega) : ¬ Prf consistencyFormula'
+    goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+    goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
 
-**Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis** — la misma consistencia que pide
-Gödel I. **Ninguna hipótesis suelta**: el punto fijo y la necesitación se **descargan aquí**.
+**Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis: `ConsistentH := ¬ Prf ⊥`**, que es
+la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se
+**descargan aquí**. ⭐ Footprint: los tres de Lean **+ `prf_axiomsCodeT_eq` y nada más**.
 
 ## Lo que hizo falta, y es poco porque el espejo `Prf` ya estaba
 
@@ -159,13 +161,52 @@ theorem prf_con_imp_godel (G : Formula)
       (PrfH.mp _ _ _ (prf_to_prfH pg_imp_pbot _) (PrfH.hyp _ _ (List.Mem.head _))))
     (provCodeC' G) [consistencyFormula'] rfl
 
-/-! ## §4 · 🏁 GÖDEL II SOBRE EL CÁLCULO FINITARIO, sin hipótesis sueltas -/
+/-! ## §4 · 🏁🏁 LA CADENA DE GÖDEL, ENTERAMENTE FINITARIA
 
-theorem goedel_second_prf (hcon : ConsistentOmega) : ¬ Prf consistencyFormula' := by
+⭐⭐ **P‑4 (`PLAN-PRUEBAS.md` §5) resuelto el 2026‑09‑11, y con creces.** La pregunta era si bastaba
+`ConsistentH := ¬ Prf ⊥` —la consistencia del cálculo **finitario**— en lugar de
+`ConsistentOmega := ¬ (axioms ⊢ ⊥)`. **Basta**, y con el punto fijo ya sobre `Prf` sale en cuatro
+líneas.
+
+⚠️ **Por qué importa, y no es cosmético.** [ADR‑024](../../DECISIONS.md) midió que
+`ConsistentOmega` **no es «Q++ es consistente»**: como `axioms ⊢` es **completo**, afirma que una
+**compleción completa** de `axioms` sea consistente — cercano a suponer **solidez**. `ConsistentH`
+es la hipótesis **mínima y honesta**: *el cálculo finitario no demuestra `⊥`*. Y
+`consistentH_of_omega` da la implicación en el sentido bueno, así que **no se pierde nada**.
+
+⭐ **Y el footprint lo confirma**: con `ConsistentH` **desaparecen las ω‑reglas** (`dne`, `gen`,
+`imp_intro`) **y los dos esquemas de inducción** (`ax_induction_prim`, `ax_list_induction`) **y el
+ancla `⊢`** (`ax_axiomsCodeT_eq`). Queda **un solo axioma del proyecto**: `prf_axiomsCodeT_eq`.
+Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
+
+/-- 🏁 **GÖDEL I sobre el cálculo finitario, con la hipótesis MÍNIMA.** Cuatro líneas: D1 lleva
+    `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`. -/
+theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
+  intro hG
+  have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG
+  have h2 : Prf (neg (provCodeC' godelCN)) :=
+    prf_mp (prf_and_elim_left prf_godelCN_fixedpoint) hG
+  exact hcon (prf_mp h2 h1)
+
+/-- 🏁🏁 **GÖDEL II sobre el cálculo finitario**: si el cálculo es consistente, **no demuestra su
+    propia consistencia**. **Una sola hipótesis —la mínima— y ninguna suelta.** -/
+theorem goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula' := by
   intro hC
-  refine goedel_first_numeral hcon (prf_mp (prf_con_imp_godel godelCN ?_ ?_) hC)
+  refine goedel_first_prf hcon (prf_mp (prf_con_imp_godel godelCN ?_ ?_) hC)
   · exact prf_and_elim_right prf_godelCN_fixedpoint
   · exact repr_pos'_prf (prf_and_elim_left prf_godelCN_fixedpoint)
+
+/-! ### Corolarios sobre `ConsistentOmega`, por si un consumidor la tiene a mano
+
+`consistentH_of_omega` es la transferencia; se conservan porque **no cuestan nada** y porque el
+resto del árbol todavía habla de `ConsistentOmega`. ⚠️ Pero los enunciados **buenos** son los de
+arriba: éstos suponen **más**. -/
+
+theorem goedel_first_prf_of_omega (hcon : ConsistentOmega) : ¬ Prf godelCN :=
+  goedel_first_prf (consistentH_of_omega hcon)
+
+theorem goedel_second_prf_of_omega (hcon : ConsistentOmega) : ¬ Prf consistencyFormula' :=
+  goedel_second_prf (consistentH_of_omega hcon)
 
 end ROBINSON_PlusPlus.Meta.GodelTwoPrf
 
@@ -173,9 +214,12 @@ end ROBINSON_PlusPlus.Meta.GodelTwoPrf
 export ROBINSON_PlusPlus.Meta.GodelTwoPrf (
   prf_subst_eq_iff prf_iff_trans prf_neg_congr_iff
   prf_diag_arith_num prf_godelCN_fixedpoint
-  prf_con_imp_godel goedel_second_prf
+  prf_con_imp_godel
+  goedel_first_prf goedel_second_prf
+  goedel_first_prf_of_omega goedel_second_prf_of_omega
 )
 
 /-! ## FOOTPRINT -/
 #print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint
+#print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
 #print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
