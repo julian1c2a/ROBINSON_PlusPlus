@@ -27,7 +27,7 @@
 > 🔑 **La pregunta de método que la auditoría deja**: *por cada teorema cabecera, ¿quién descarga
 > cada una de sus hipótesis, y con qué?* Si la respuesta es «nadie», está **montado, no
 > ensamblado** — y hay que decirlo donde se anuncia el resultado.
-`Build completed successfully (142 jobs)` — **128 módulos** (Minimal 11 + Meta 106 + Full 11) + 0 en
+`Build completed successfully (144 jobs)` — **130 módulos** (Minimal 11 + Meta 108 + Full 11) + 0 en
 `cuarentena/` · 61 `sondeos/` · **5 `axiom` de Lean · 0 sorrys**.
 
 > # 🎯 LO DE HOY (2026‑09‑10h) — tres cosas, y una de ellas **es un frente nuevo**

@@ -83,4 +83,22 @@ jobs:
         # NO comprobaba la cifra de jobs, así que el «142 jobs» de los banners no lo verificaba
         # nadie más que una ejecución local. `lake build` ya está cacheado aquí arriba.
         run: bash check-doc-sync.bash
+
+      # ⭐ Anadido el 2026-09-11 (auditoria, F-8): los controles del LIBRO solo corrian a mano,
+      # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara. Se ejecutan los
+      # tres que no necesitan LaTeX; `verificar_pdf.py` queda pendiente (P-1 de PLAN-PRUEBAS.md).
+      - name: Set up Python (controles del libro)
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Book · extraer fragmentos del arbol
+        run: python3 doc/book/scripts/extraer.py
+        working-directory: .
+
+      - name: Book · todo \ident{} nombra algo que existe
+        run: python3 doc/book/scripts/simbolos.py --estricto
+
+      - name: Book · ningun termino se usa antes de definirse
+        run: python3 doc/book/scripts/terminos.py
         continue-on-error: true   # Warning only

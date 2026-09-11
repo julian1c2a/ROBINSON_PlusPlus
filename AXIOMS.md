@@ -1,6 +1,6 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁 **C3 (7/7)** · 🏁 **D3 PROBADA** · **5 `axiom` de Lean** · ⛔ **Gödel II montado pero NO ensamblado** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **GÖDEL II ENSAMBLADO sobre `Prf`** · 🏁 D1/D2/D3 · **5 `axiom` de Lean** · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -8,8 +8,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+> **Build 144 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **130 módulos activos** (Minimal 11 + Meta 108 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
 > **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)

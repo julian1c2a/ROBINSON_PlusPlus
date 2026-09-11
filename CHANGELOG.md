@@ -14,6 +14,25 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑11 (b) — 🏁🏁 GÖDEL II ENSAMBLADO sobre `Prf`, y la FUERZA de `axioms ⊢` MEDIDA.**
+> Las dos cosas salen de contestar la pregunta que la auditoría dejó abierta.
+> ⛔⛔ **`Meta/OmegaStrength.lean`**: `axioms ⊢` es **SINTÁCTICAMENTE COMPLETO** —
+> `derives_completo (A) : (axioms ⊢ A) ∨ (axioms ⊢ ¬A)`, **sin hipótesis**. La causa **no es
+> aritmética**: `raa` toma como premisa una **función de Lean**, así que si `axioms ⊬ A` esa función
+> existe **vacuamente** y el cálculo **refuta** `A`. ⇒ **`axioms ⊢` no es derivabilidad de primer
+> orden**, y **ningún resultado de incompletitud puede enunciarse sobre él**: `goedel_second'` **no
+> es** el Segundo Teorema, y su `hgi` significa «el cálculo **refuta** `G`». ⚠️ Corrige además a
+> `FOL/MetaRules.lean`: **`gen` NO es la ω‑regla** (su premisa recorre **todo `Term`**, no los
+> numerales ⇒ es **más débil**). ✅ **Gödel I no está afectado**: concluye sobre `Prf`.
+> 🏁🏁 **`Meta/GodelTwoPrf.lean`**: **`goedel_second_prf (hcon : ConsistentOmega) :
+> ¬ Prf consistencyFormula'`** — **una sola hipótesis, ninguna suelta**. ⭐
+> **`prf_godelCN_fixedpoint` es NET‑0 PURO**: el punto fijo sobre `Prf` no usa **ningún** axioma del
+> proyecto. El resto salió barato porque **el espejo `Prf` ya estaba** (`prf_congr_substfc_arg2/3`,
+> `prf_tc_numeral`, `prf_substFormula_arith`, `d2_prf`, `d3_prf_real`, `repr_pos'_prf`).
+> ➕ **`PLAN-PRUEBAS.md`** (F‑4): qué garantiza cada control y ⛔ **qué no garantiza ninguno**;
+> **M‑9** (F‑9): un `Probe/` que decide un ADR se **promueve a `sondeos/`**; y los **controles del
+> libro entran en CI** (F‑8). **144 jobs · 130 módulos.**
+>
 > **2026‑09‑11 — 🔬 AUDITORÍA DE DOS CICLOS, en las dos direcciones. Diez hallazgos.**
 > `doc/AUDITORIA-2026-09-11.md`. Se recorrió intención → doc → plan de prueba → código, y la vuelta,
 > y después la auditoría **contra sí misma**.

@@ -1,6 +1,6 @@
 # ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁 **C3 (7/7)** · 🏁 **D3 PROBADA** · **5 `axiom` de Lean** · ⛔ **Gödel II montado pero NO ensamblado** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **GÖDEL II ENSAMBLADO sobre `Prf`** · 🏁 D1/D2/D3 · **5 `axiom` de Lean** · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -8,8 +8,8 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 142 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+> **Build 144 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
+> **130 módulos activos** (Minimal 11 + Meta 108 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
 > **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -69,9 +69,17 @@ base o se declara pendiente con nombre y firma**.
   ⬜ La otra mitad (`⊬¬G`) **no está cerrada**: depende de `NegVerifier`, hoy reducido a **dos
   obligaciones con nombre**.
 - 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada.
-- ⚠️ **Gödel II está montado pero NO ensamblado**: `goedel_second'` vive sobre el cálculo **ω** y su
-  hipótesis `hgi` **no la puede dar** el Gödel I de este árbol, que es **finitario**. Es el hallazgo
-  **F‑1** de `doc/AUDITORIA-2026-09-11.md`, y la pieza que falta está identificada.
+- 🏁🏁 **Gödel II, sobre el cálculo finitario**: `goedel_second_prf (hcon : ConsistentOmega) :
+  ¬ Prf consistencyFormula'` (`Meta/GodelTwoPrf.lean`) — **una sola hipótesis**, la misma que Gödel I,
+  y **ninguna suelta**: el punto fijo y la necesitación se descargan ahí.
+  ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**: el punto fijo no usa **ningún** axioma del proyecto.
+- ⛔⛔ **Y una advertencia que hay que leer antes de citar nada de este repo**: el cálculo `axioms ⊢`
+  —el que se usa como herramienta de trabajo— es **sintácticamente COMPLETO**: decide **toda**
+  sentencia (`Meta/OmegaStrength.lean`, medido). La causa no es aritmética: es que los meta‑axiomas
+  `raa` e `imp_intro` toman como premisa una **función de Lean**, así que lo que el cálculo no
+  prueba, lo **refuta**. ⇒ **ningún resultado de incompletitud puede enunciarse sobre `⊢`** — por eso
+  el `goedel_second'` de `Meta/GodelTwo.lean` **no es** el Segundo Teorema, y el que sí lo es vive
+  sobre `Prf`. Detalle en `doc/AUDITORIA-2026-09-11.md` **F‑1**.
 - **5 `axiom` de Lean** en todo el árbol, **0 `sorry`**, y ninguno de los cinco es gödeliano.
 - ⚠️ **No es una prueba de consistencia**: se retiró una inconsistencia **conocida y localizada**
   (ADR‑012/013), lo que no es lo mismo.
@@ -218,4 +226,4 @@ Julián Calderón Almendros
 ---
 
 **Author**: Julián Calderón Almendros
-*Last updated: 2026-09-10 — Build ✅ **142 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI‑GUIDE §27.1), **5 `axiom` de Lean**, Lean **v4.31.0** (política: última estable). **128 módulos activos** (Minimal/ 11 + Meta/ 106 + Full/ 11) + 0 en `cuarentena/` + 61 en `sondeos/`. ✅ **CI en verde** (`.github/workflows/build.yml`, con los dos checkouts hermanos que `FOL` necesita).*
+*Last updated: 2026-09-10 — Build ✅ **144 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI‑GUIDE §27.1), **5 `axiom` de Lean**, Lean **v4.31.0** (política: última estable). **130 módulos activos** (Minimal/ 11 + Meta/ 108 + Full/ 11) + 0 en `cuarentena/` + 61 en `sondeos/`. ✅ **CI en verde** (`.github/workflows/build.yml`, con los dos checkouts hermanos que `FOL` necesita).*

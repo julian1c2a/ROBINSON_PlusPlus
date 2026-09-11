@@ -52,7 +52,7 @@
 > había arrancado nunca** (YAML inválido). Arreglado el 2026‑09‑09, y lo primero que encontró
 > fueron **siete documentos autoritativos** con la cifra de jobs obsoleta.
 >
-> 🏁 **`Build completed successfully (142 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> 🏁 **`Build completed successfully (144 jobs)`.** La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
 > `master`** el 2026-09-07 con merge commit `7bc2c8a`, y el build se verificó verde **después** del
 > merge, no sólo en la rama.
@@ -162,7 +162,7 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.51.
 >
-> **Build 142 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE** (2026‑09‑10h).
+> **Build 144 jobs · 0 sorrys · Lean v4.31.0** ✅ **VERDE** (2026‑09‑10h).
 >
 > 🏁🏁🏁 **C3 CERRADO: `pcc_lineWF_tracked` es INCONDICIONAL** (§3.62). Los **21 tags** cableados.
 > La cadena, en cinco pasos: `prf_hasWitF_liftfc` (§3.61, `Meta/LiftfcWitnessPrf.lean`, net‑0 puro)
@@ -214,7 +214,7 @@
 > exterior, `hmatch`, `hPinv`, `hPsiId` y `hwP`: probados** (§3.55–§3.58).
 > 🧹 **Dedup ADR‑019 de SEIS familias** (§3.52).
 > ⛔ **Trampa del día, tres veces**: `substfc`/`carc`/`lenc`… son símbolos OBJETO y **no reducen**.
-> **128 módulos activos** (Minimal 11 + Meta 106 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
+> **130 módulos activos** (Minimal 11 + Meta 108 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
 > **5 `axiom` de Lean · 141 axiomas objeto** en `axioms` — ⚠️ la enmienda **sustituye 7 de los 141**,
 > no añade ninguno: las listas no cambian de longitud y el inventario de Lean sigue en 7.
 >
@@ -258,7 +258,7 @@
 | Meta-axiomas matemáticos | Tras F7a: `ax_p_tfa` (Block8); `ax_induction`/`ax_mod2_alternation`/`ax_list_induction` (Full); **`ax_axiomsCodeT_eq`** (⊢, `Minimal/Axioms:1376`) / **`prf_axiomsCodeT_eq`** (Prf, `Representability2Prf:104`) — anclas de codificación; ~~`d3`~~ (GodelTwo) — 🏁 **RETIRADO el 2026‑09‑10g: es teorema.** **No queda ningún gödeliano vivo.** ⚠️ `ax_inAxC`/`prf_inAxC` **ya no son axiomas**: son teoremas derivados de las anclas. Los 7 postulados legacy (`Dem`/`dem_iff_provable`/`provFormula`/`provFormula_repr`/`diagonal_lemma` + `D2`/`D3`) **retirados**. `qconf`/`Full.ax_induction` integrados como reglas del verificador. Inventario completo en **`AXIOMS.md`** |
 | Axiomas matemáticos | **34** en `Minimal/` = **24 primitivos + 10 derivables** ([censo](doc/REFERENCE-Full.md) §3.14.1). En `Full/` los **10** derivables son **teoremas** (**ax6/7/10–12, ax18/19, ax24, ax_C3/L3**), y **9 de ellos CERTIFICADOS** sobre `primAxioms` (enunciados no triviales). ⚠️ **`ax21` NO está en esa lista desde el 2026‑09‑10h: es PRIMITIVO** — su «derivación» era circular. Más **TFA completo** (`tfa_numeral`) |
 | Gödel | **Gödel I — sólo `⊬G`**: `goedel_first_numeral (hcon : ConsistentOmega) : ¬ Prf godelCN` (`Meta/DiagonalNumeral.lean`), sobre el punto fijo real `godelCN_fixedpoint`. Footprint = la base sancionada **menos `tc_cons`**. ⚠️ **La mitad `⊬¬G` (indecidibilidad) NO está cerrada**: `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**; para descargarla falta **`NegVerifier`** (`PLAN-NEGVERIFIER.md`). *No revertir F7a — fue un arreglo de solidez.* — **D1** `repr_pos'_prf` ✅ y **D2** `d2_prf` ✅ reales sobre el cálculo finitario `Prf`. **Gödel II**: `goedel_second'` montado, y 🏁 **D3 DEMOSTRADA** (`d3_prf_real`, `Meta/PremsBdAllPrf.lean` §10, 2026‑09‑10g) ⇒ **sin `axiom d3`**. ⚠️ Esta celda decía hasta hoy «D3 está FUERA de la cadena activa (la capa rastreada está en `cuarentena/`)»: **doble falsedad** —`cuarentena/` está vacía desde el 2026‑08‑23 y D3 está probada—, cazada por `doc/book/AUDITORIA-2026-09-10.md` R3. Ver `NEXT-STEPS.md` |
-| Build status | ✅ Passing (**142 jobs**, **128 módulos**, 0 errores, **0 warnings**, **0 sorry** — verificado con el `check-sorry.bash` reparado —, **5** `axiom` de Lean, Lean v4.31.0, 2026-09-10h) |
+| Build status | ✅ Passing (**144 jobs**, **130 módulos**, 0 errores, **0 warnings**, **0 sorry** — verificado con el `check-sorry.bash` reparado —, **5** `axiom` de Lean, Lean v4.31.0, 2026-09-10h) |
 | Promoción a `Meta/` (rama B) | ⏳ **B0–B2 hechas; B3 EN CURSO.** 🆕 **B3 (2026‑09‑04)**: de `SubstfcPlanos` salieron DOS DESCENSOS —`binK` a `CodeCtorKit` y el KIT TERNARIO a `EvalArithPrf`, que retira **74 copias a mano** de `sondeos/`— y el módulo **`SubstfcCodePrf`** (17 de 39; 4 retiradas por MUERTAS). Quedan `EvalSubsttc`, `SubstfcEx` y `EvalSubstfcPrf`. 🆕 **B2 (2026‑09‑04)**: `Meta/EvalLiftcPrf.lean` — **el DESCENSO**, que pone **`pcc_eval_liftc`** en producción y descarga el `hLift` de `Paso2CasoForall`. De 198 declaraciones del sondeo se promovieron **31**. 🔑 Destapó el **CICLO DE IMPORTS** (**ADR‑019**): cuando el sondeo subsume a producción hay que **bajar el general**, no subir el corolario. Seis piezas genéricas subieron aguas arriba (`PSI_inst` estaba copiado a mano en **siete** sondeos). Detalle en [§3.34](doc/REFERENCE-Incompleteness.md) |
 | Verdad de los docstrings (rama G) | 🆕 ⚠️ **El libro se escribe leyendo del árbol, y el compilador NO verifica la prosa.** Auditoría en curso, 5 categorías con método propio cada una. Casos ya confirmados: `CodeWitnessPrf:78‑82` promete un `DescMutua` **inexistente**; `refl_isTermCodeE1_imp` se anuncia «EL RESULTADO CENTRAL» con **cero usos**. Ver `NEXT-STEPS.md` rama G |
 | `NegVerifier` (módulo A) | ✅ **Decodificador COMPLETO** (§43): `CodeDecode` (biyección `decodeForm` + inyectividad) + `ChainDecode` (`decodeChain_prf`). **Módulo B** (`LineWFCases`, 21 tags) ✅. ⚠️ `canon_ne` es FALSO (reintroduciría la inconsistencia, `sondeos/CanonNeRefuta.lean`), pero ✅ **su sustituto YA ESTÁ EN PRODUCCIÓN** (2026‑09‑01): `Meta/CodeNatInjPrf.lean` (`codeNat_ne`/`codeNatTerm_ne`). ⛔ Y el otro bloqueo que el plan documentaba (`axiomsCodeT` opaco) **es FALSO desde julio** (§3.32.3). Estimación revisada: **~800‑1 300 líneas / 3,5‑5 sesiones** |

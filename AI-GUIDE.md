@@ -328,6 +328,7 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 | `bash gen-root.bash` | Regenera el fichero de importación raíz |
 | `bash check-sorry.bash` | Localiza todos los `sorry` (excluyendo comentarios) |
 | `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |
+| **`PLAN-PRUEBAS.md`** | 🆕 **qué garantiza cada control y qué NO garantiza ninguno** (auditoría F‑4). Léelo antes de fiarte de un verde |
 | `bash update-toolchain.bash vX.Y.Z` | Actualiza el toolchain de Lean con verificación de build |
 | `make help` | Lista los targets del Makefile |
 
