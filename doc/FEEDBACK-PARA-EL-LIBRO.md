@@ -60,9 +60,25 @@ fijo sobre `Prf` no usa **ningún** axioma del proyecto.
 | **cap. 13** (Gödel I) | la hipótesis es `ConsistentOmega` | ⚠️ ver §3: **no es «consistencia simple»** |
 | **`PLAN-LIBRO.md`**, base sancionada | 5 `axiom` | ✅ correcto |
 
-⚠️ **Comprobad con `simbolos.py --estricto`**: cualquier `\ident{goedel_second'}` o
-`\ident{con_imp_godel'}` que quede **romperá el control**, porque los símbolos ya no existen. Eso es
-el control funcionando.
+⛔ **YA ESTÁ ROTO, y lo hemos comprobado**: `python3 scripts/simbolos.py --estricto` falla hoy con
+
+    ✗ \ident{goedel_second'} no nombra nada declarado en el repo
+      (cap-condiciones-derivabilidad.tex, cap-representabilidad-d1.tex)
+
+Eso es **el control funcionando**, no un accidente. **Dos arreglos posibles**, los dos del libro:
+
+1. **el bueno** — reescribir esos dos puntos con `goedel_second_prf` (ver §3bis: el resultado es
+   **más fuerte** de lo que el libro cuenta hoy);
+2. **el de urgencia** — declarar `goedel_second'` y `con_imp_godel'` en
+   `simbolos-exentos.json` con razón **`retirado`**, que es justo para lo que existe ese fichero.
+
+⚠️ **No lo hemos tocado nosotros**: `doc/book/**` es vuestro (PLAN‑LIBRO §0), y por eso este
+documento vive ahora en **`doc/`** y no dentro de `doc/book/`.
+
+📌 **Y en CI**: los controles del libro se ejecutan en el job `libro`, que **sólo se dispara cuando
+el push toca `doc/book/`**. Razón: el libro y el código son **dos tareas con commits separados**, y
+los controles de cada una corren sobre sus propios commits. ⇒ **vuestro próximo push ejecutará
+`simbolos.py` y fallará hasta que apliquéis (1) o (2).**
 
 ---
 
@@ -139,6 +155,47 @@ cercano a suponer **solidez**.
 📌 **Sugerencia editorial**: esto pide un `muro` en el capítulo 13, al lado del que ya distingue
 `ConsistentOmega` de `OmegaConsistent` (M‑5 de `MATERIALES.md`). Son **tres** nombres parecidos con
 tres contenidos distintos, y ahora uno de ellos ha cambiado de significado.
+
+---
+
+## 3bis · 🏁🏁 **ADDENDUM del mismo día — y cambia el §3 entero para mejor**
+
+Lo de arriba deca que `ConsistentOmega` había que contarlo con cuidado. **Ya no hace falta**: se
+midió (**P‑4**) que basta la hipótesis **mínima**, y los enunciados cabecera cambiaron:
+
+```lean
+goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+```
+
+con `ConsistentH := ¬ Prf ⊥` — *el cálculo finitario no demuestra `⊥`*, que es **exactamente** la
+hipótesis que el libro quiere poder escribir: **consistencia simple, y del cálculo del que se habla**.
+
+⭐⭐ **Y el footprint, que es el dato bonito para imprimir**: cae de
+
+    [3 de Lean] + dne + gen + imp_intro + ax_induction_prim + ax_list_induction
+                + ax_axiomsCodeT_eq + prf_axiomsCodeT_eq
+
+a
+
+    [propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]
+
+**Un solo axioma del proyecto.** Las ω‑reglas y los dos esquemas de inducción entraban **por la
+hipótesis vieja**, que hablaba de `⊢`.
+
+🔑 **Material de libro, y de los buenos**: *una hipótesis mal elegida no sólo debilita el enunciado
+— arrastra al footprint todo lo que ella necesita.* Cambiarla por la mínima limpió **seis**
+dependencias de golpe. Y el resultado que el libro puede anunciar es mucho más fuerte de lo que
+ayer parecía:
+
+> **La cadena de Gödel de este proyecto es ENTERAMENTE FINITARIA**: Gödel I y Gödel II sobre `Prf`,
+> desde la consistencia simple del propio `Prf`, con D1/D2/D3 demostradas y **un único axioma** —el
+> ancla de codificación— entre el resultado y los tres axiomas de Lean.
+
+⚠️ ⇒ El `muro` que §3 pedía para el cap. 13 **sigue teniendo sentido**, pero cambia de asunto:
+ya no es «cuidado, la hipótesis es más fuerte de lo que parece» sino **«hay TRES nombres parecidos
+—`ConsistentH`, `ConsistentOmega`, `OmegaConsistent`— y el que se usa es el más débil de los
+tres»**, que es la buena noticia.
 
 ---
 

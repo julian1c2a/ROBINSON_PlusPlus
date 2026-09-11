@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **GÖDEL II ENSAMBLADO sobre `Prf`** · 🏁 D1/D2/D3 · **5 `axiom` de Lean** · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -1634,9 +1634,35 @@ fuerza, muy cercano a suponer la **solidez** de `axioms` respecto de algún mode
 | ⚠️ **Lo que sí hay que escribir** | la hipótesis es **más fuerte** que «Q++ es consistente». Presentarla como «consistencia simple» a secas sería un **sobreclaim** |
 | ⬜ **Lo que queda por medir** | si `ConsistentH := ¬ Prf ⊥` bastaría. `consistentH_of_omega` da `ConsistentOmega → ConsistentH`; la **vuelta no existe**, y **ésa es la pregunta**: ¿se puede reformular Gödel I/II sobre `ConsistentH`? Sería **estrictamente mejor** |
 
-⇒ **P‑4 (nuevo, en `PLAN-PRUEBAS.md` §5)**: intentar `goedel_first_numeral` y `goedel_second_prf`
-con `ConsistentH` en lugar de `ConsistentOmega`. Si sale, la hipótesis pasa a ser la mínima
-honesta; si no sale, hay que **escribir por qué** donde se anuncia el resultado.
+### 🏁🏁 Addendum 2026‑09‑11 — **P‑4 RESUELTO: sí bastaba `ConsistentH`**
+
+Con el punto fijo ya sobre `Prf` (`prf_godelCN_fixedpoint`, net‑0 puro), los dos teoremas salen en
+**cuatro líneas**:
+
+```lean
+goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+```
+
+⇒ **la hipótesis de la cadena de Gödel es hoy la MÍNIMA honesta**: *el cálculo finitario no
+demuestra `⊥`*. `ConsistentOmega` **desaparece de los enunciados cabecera**;
+`consistentH_of_omega` la transfiere para quien la tenga a mano (corolarios `_of_omega`).
+
+⭐⭐ **Y el footprint lo certifica** — cae de
+
+    [3 de Lean] + dne + gen + imp_intro + ax_induction_prim + ax_list_induction
+              + ax_axiomsCodeT_eq + prf_axiomsCodeT_eq
+
+a
+
+    [propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]
+
+**un solo axioma del proyecto.** Las ω‑reglas y los dos esquemas de inducción entraban **por la
+hipótesis vieja**, que hablaba de `⊢`. ⇒ **la cadena de Gödel es ENTERAMENTE FINITARIA**, y lo único
+que la separa de los tres axiomas de Lean es **`prf_axiomsCodeT_eq`**, el ancla de codificación.
+
+🔑 **La lección**: *una hipótesis mal elegida no sólo debilita el enunciado — arrastra al footprint
+todo lo que ella necesita.* Cambiarla por la mínima limpió **seis** dependencias de golpe.
 
 **Lo que NO cambia**: 5 `axiom` de Lean, 141 axiomas objeto, `Prf`, `Derives`, y ningún enunciado
 sobre `Prf`.

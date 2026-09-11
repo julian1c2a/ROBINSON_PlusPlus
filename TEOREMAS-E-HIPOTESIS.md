@@ -31,8 +31,9 @@ un fallo.
 
 | teorema | hipótesis | ¿quién la descarga? |
 |---|---|---|
-| **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`) | `hcon : ConsistentOmega` | ⬜ **nadie, y es correcto**: es la hipótesis del teorema. ⚠️ Pero **no es «consistencia simple»** — ver §3 y [ADR‑024](DECISIONS.md) |
-| | *(el punto fijo)* | ✅ `godelCN_fixedpoint`, **sin hipótesis** |
+| 🏁 **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ **nadie, y es correcto**: es la hipótesis del teorema — y es **la MÍNIMA** (`¬ Prf ⊥`). **P‑4 resuelto** |
+| | *(el punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
+| `goedel_first_numeral` (`Meta/DiagonalNumeral.lean`) | `hcon : ConsistentOmega` | 🔶 **versión antigua**, sobre la hipótesis **más fuerte**. Se conserva (la usa la cadena `⊢`), pero **el enunciado bueno es el de arriba** |
 
 ### ⬜ Gödel I — la mitad `⊬¬G`
 
@@ -51,12 +52,22 @@ un fallo.
 
 | teorema | hipótesis | ¿quién la descarga? |
 |---|---|---|
-| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentOmega` | ⬜ hipótesis del teorema — **la única** |
+| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ hipótesis del teorema — **la única, y la MÍNIMA** |
 | | *(punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
 | | *(necesitación `nec1`)* | ✅ `repr_pos'_prf` (D1) sobre el punto fijo |
 | | *(`Con' ⇒ G`)* | ✅ `prf_con_imp_godel`, sobre `d2_prf` (D2) y `d3_prf_real` (D3) |
 
 ⇒ **ninguna hipótesis suelta.** Es lo que distingue *ensamblado* de *montado*.
+
+⭐⭐ **Y el footprint lo certifica** (2026‑09‑11, P‑4): con `ConsistentH`, `goedel_first_prf` y
+`goedel_second_prf` dependen de
+
+    [propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]
+
+**un solo axioma del proyecto.** Desaparecen las ω‑reglas (`dne`, `gen`, `imp_intro`), los dos
+esquemas de inducción (`ax_induction_prim`, `ax_list_induction`) y el ancla `⊢`
+(`ax_axiomsCodeT_eq`): entraban todos por la hipótesis vieja, que hablaba de `⊢`.
+⇒ **la cadena de Gödel de este proyecto es ENTERAMENTE FINITARIA.**
 
 ### 🗑️ Retirado
 
@@ -80,14 +91,14 @@ un fallo.
 
 | hipótesis | definición | qué es de verdad |
 |---|---|---|
-| **`ConsistentOmega`** | `¬ (axioms ⊢ ⊥)` | ⚠️ **NO es «Q++ es consistente»**. Como `axioms ⊢` es **completo**, dice que una **compleción completa** de `axioms` es consistente — cercano a suponer **solidez**. [ADR‑024](DECISIONS.md) |
-| **`ConsistentH`** | `¬ Prf ⊥` | **la honesta**: consistencia del cálculo **finitario**. `consistentH_of_omega` da `ConsistentOmega → ConsistentH`; **la vuelta no existe** |
+| 🏁 **`ConsistentH`** | `¬ Prf ⊥` | **LA QUE SE USA desde el 2026‑09‑11**: consistencia del cálculo **finitario**, la hipótesis **mínima**. P‑4 |
+| **`ConsistentOmega`** | `¬ (axioms ⊢ ⊥)` | ⚠️ **NO es «Q++ es consistente»**. Como `axioms ⊢` es **completo**, dice que una **compleción completa** lo sea — cercano a suponer **solidez**. 🔶 **Ya no aparece en los enunciados cabecera**; `consistentH_of_omega` la transfiere si un consumidor la tiene. [ADR‑024](DECISIONS.md) |
 | **`OmegaConsistent`** | no probar `∃A` refutando todos los testigos estándar | la ω‑consistencia, **estrechada** por [ADR‑022](DECISIONS.md) a testigos con forma de línea |
 | **`NegVerifier`** | Δ₀‑completitud negativa del verificador | ⛔ **la única obligación abierta de `⊬¬G`**, reducida a dos deudas con nombre |
 
-⬜ **P‑4** (`PLAN-PRUEBAS.md` §5): **intentar Gödel I y II con `ConsistentH`** en lugar de
-`ConsistentOmega`. Sería estrictamente mejor. Si no sale, hay que **escribir por qué** donde se
-anuncia el resultado.
+🏁 **P‑4 RESUELTO el 2026‑09‑11**: **sí bastaba**. Con el punto fijo ya sobre `Prf`, los dos
+teoremas salen en cuatro líneas con `ConsistentH`, y el footprint cae a **un solo axioma del
+proyecto**. La hipótesis de la cadena de Gödel es hoy **la mínima honesta**.
 
 ---
 
@@ -98,8 +109,8 @@ anuncia el resultado.
 | `ax_induction_prim` | el esquema de inducción sobre los 24 primitivos | ⛔ no: **es lo que `Full` significa** |
 | `ax_list_induction` | ídem, listas | ⛔ no |
 | `ax_p_tfa` | teorema fundamental de la aritmética, forma idealizada | 🔶 `tfa_numeral` es la realización real |
-| `ax_axiomsCodeT_eq` | ancla de codificación (⊢) | ⬜ **frente abierto** |
-| `prf_axiomsCodeT_eq` | ancla de codificación (`Prf`) | ⬜ **frente abierto** — arrastra casi todo el árbol |
+| `ax_axiomsCodeT_eq` | ancla de codificación (⊢) | ⬜ frente abierto. ⭐ **Ya NO está en el footprint de Gödel I/II** desde P‑4 |
+| **`prf_axiomsCodeT_eq`** | ancla de codificación (`Prf`) | ⛔ **EL ÚNICO axioma del proyecto que sostiene la cadena de Gödel**. Era «el que arrastra casi todo»; hoy es, además, **lo único que queda entre Gödel y los tres axiomas de Lean** |
 
 **Ninguno es gödeliano**: D1, D2 y D3 son teoremas.
 

@@ -32,7 +32,7 @@ comprueba.*
 | **V4** | `bash check-doc-sync.bash` | `[A]` cifras de cabecera · `[A2]` cifras del cuerpo (aviso) · `[B]` símbolos muertos (aviso) · `[C]` proyección · `[D]` marcas de tiempo · `[E]` frescura del titular (aviso) | **la verdad de las frases**. Ver §4 |
 | **V5** | `sondeos/*.lean` | resultados **compilados** de preguntas cerradas antes de tocar producción | que la pregunta fuese la correcta |
 | **V6** | `doc/book/scripts/*.py` | que todo `\ident{}` del libro **exista** en el repo, que el vocabulario se introduzca antes de usarse, y que el código **impreso** sea el del repo | que lo impreso sea *verdad* — sólo que **cite bien** |
-| **V7** | CI (`.github/workflows/build.yml`) | que V1, V2, V4 y V6 corran **en limpio**, en otra máquina. 🆕 El PDF del libro va en un job aparte, **sólo cuando cambia `doc/book/`** | lo que no esté en la lista |
+| **V7** | CI (`.github/workflows/build.yml`) | **job `build`**: V1, V2 y V4 en cada push. **job `libro`**: V6 **entero** (símbolos, términos y el PDF) **sólo cuando el push toca `doc/book/`** — el libro y el código son **dos tareas con commits separados** (PLAN‑LIBRO §0) | ⚠️ que un cambio en `.lean` rompa una cita del libro **no se ve hasta el siguiente push del libro**. Es el precio de las dos tareas, y está medido: pasó el 2026‑09‑11 al retirar `goedel_second'` |
 | **V8** | 🆕 **`TEOREMAS-E-HIPOTESIS.md`** | por cada teorema cabecera, **quién descarga cada hipótesis**. Es la única defensa contra **F‑1** | es **a mano**: ningún script lo comprueba |
 
 ---
@@ -104,7 +104,7 @@ Sale de `doc/AUDITORIA-2026-09-11.md` §4. **Escribirlo es la única defensa que
 | **P‑1** | `verificar_pdf.py` en CI | 🏁 **HECHO** (2026‑09‑11): job `libro-pdf`, con TeX Live y **sólo cuando cambia `doc/book/`** — instalar LaTeX cuesta minutos y no tiene sentido en cada push. ⚠️ **Sin verificar hasta el primer push que toque el libro** |
 | **P‑2** | un control de **hipótesis descargadas** | 🏁 **HECHO**: **`TEOREMAS-E-HIPOTESIS.md`** — teorema → hipótesis → **quién la descarga**. ⚠️ Es **a mano**: se actualiza en el mismo commit que toca un teorema cabecera. Una fila «⬜ nadie» es información; una fila **ausente** es el fallo |
 | **P‑3** | medir el **tiempo** de build | ⬜ hoy no se vigila; un frente puede degradarlo sin que nadie lo vea |
-| **P‑4** | 🆕 **¿basta `ConsistentH`?** | ⬜ intentar Gödel I y II con `¬ Prf ⊥` en lugar de `ConsistentOmega`. Sería **estrictamente mejor**: `ConsistentOmega` supone la consistencia de una compleción **completa** ([ADR‑024](DECISIONS.md)). Si no sale, **escribir por qué** donde se anuncia el resultado |
+| **P‑4** | **¿basta `ConsistentH`?** | 🏁 **SÍ, y resuelto el mismo día**: `goedel_first_prf` y `goedel_second_prf` toman hoy `ConsistentH := ¬ Prf ⊥`, la hipótesis **mínima**. ⭐ Y el footprint cayó a **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del proyecto**: las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja** |
 
 ---
 

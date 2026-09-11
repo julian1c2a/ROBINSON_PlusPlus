@@ -1,6 +1,6 @@
 # ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **GÖDEL II ENSAMBLADO sobre `Prf`** · 🏁 D1/D2/D3 · **5 `axiom` de Lean** · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría F‑1](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -69,10 +69,18 @@ base o se declara pendiente con nombre y firma**.
   ⬜ La otra mitad (`⊬¬G`) **no está cerrada**: depende de `NegVerifier`, hoy reducido a **dos
   obligaciones con nombre**.
 - 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada.
-- 🏁🏁 **Gödel II, sobre el cálculo finitario**: `goedel_second_prf (hcon : ConsistentOmega) :
-  ¬ Prf consistencyFormula'` (`Meta/GodelTwoPrf.lean`) — **una sola hipótesis**, la misma que Gödel I,
-  y **ninguna suelta**: el punto fijo y la necesitación se descargan ahí.
-  ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**: el punto fijo no usa **ningún** axioma del proyecto.
+- 🏁🏁 **La cadena de Gödel, ENTERAMENTE FINITARIA** (`Meta/GodelTwoPrf.lean`):
+
+  ```lean
+  goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+  goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+  ```
+
+  **Una sola hipótesis, y es la mínima**: `ConsistentH := ¬ Prf ⊥`, *el cálculo finitario no
+  demuestra `⊥`*. **Ninguna hipótesis suelta**: el punto fijo y la necesitación se descargan ahí.
+  ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**, y el footprint de los dos teoremas es
+  **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del
+  proyecto**, el ancla de codificación.
 - ⛔⛔ **Y una advertencia que hay que leer antes de citar nada de este repo**: el cálculo `axioms ⊢`
   —el que se usa como herramienta de trabajo— es **sintácticamente COMPLETO**: decide **toda**
   sentencia (`Meta/OmegaStrength.lean`, medido). La causa no es aritmética: es que los meta‑axiomas

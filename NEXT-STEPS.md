@@ -16,7 +16,14 @@
 > ⬜ **No medido** — y decidirlo (¿cuál es la fuerza real de `axioms ⊢`?) es **la pregunta abierta
 > más importante del proyecto**.
 >
-> ⭐ **La salida está identificada y es construible**: **Gödel II sobre `Prf`**
+> 🏁🏁 **RESUELTO el 2026‑09‑11, y por partida doble.** `Meta/GodelTwoPrf.lean` tiene hoy
+> **`goedel_first_prf`** y **`goedel_second_prf`**, los dos con **`ConsistentH := ¬ Prf ⊥`** —la
+> hipótesis **mínima**— y **ninguna suelta**. ⭐⭐ Footprint:
+> **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del
+> proyecto**. ⇒ **la cadena de Gödel es enteramente finitaria**, y lo único que la separa de los
+> tres axiomas de Lean es el **ancla de codificación**.
+>
+> *(texto de la auditoría, conservado por su valor de método)* ⭐ **La salida está identificada y es construible**: **Gödel II sobre `Prf`**
 > (`goedel_second_prf : ConsistentH → ¬ Prf Con'`). Las tres condiciones **ya están sobre `Prf`**
 > —`repr_pos'_prf`, `d2_prf`, `d3_prf_real`—; faltan el **punto fijo** y **`con_imp_godel'`** en
 > versión `Prf`. **Ninguna de las dos es una condición de derivabilidad.**

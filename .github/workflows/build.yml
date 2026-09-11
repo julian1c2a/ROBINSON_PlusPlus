@@ -85,28 +85,18 @@ jobs:
         run: bash check-doc-sync.bash
 
       # ⭐ Anadido el 2026-09-11 (auditoria, F-8): los controles del LIBRO solo corrian a mano,
-      # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara. Se ejecutan los
-      # tres que no necesitan LaTeX; `verificar_pdf.py` queda pendiente (P-1 de PLAN-PRUEBAS.md).
-      - name: Set up Python (controles del libro)
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: Book · extraer fragmentos del arbol
-        run: python3 doc/book/scripts/extraer.py
-        working-directory: .
-
-      - name: Book · todo \ident{} nombra algo que existe
-        run: python3 doc/book/scripts/simbolos.py --estricto
-
-      - name: Book · ningun termino se usa antes de definirse
-        run: python3 doc/book/scripts/terminos.py
+      # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara.
+      #
+      # ⚠️ Van en el job `libro` (abajo), NO aqui: el libro y el codigo son DOS TAREAS con commits
+      # separados (PLAN-LIBRO §0), y sus controles corren sobre sus propios commits. Ejemplo real
+      # del mismo dia: retirar `goedel_second'` del codigo dejo dos `\ident{}` huerfanos en el
+      # libro; el control lo caza cuando el libro pasa, que es cuando se puede arreglar.
 
   # ⭐ P-1 (PLAN-PRUEBAS.md §5): el control §2.1 del libro -- que el codigo IMPRESO en el PDF
   # sea el del repo -- necesita LaTeX, asi que va en su propio job. Solo se dispara cuando
   # cambia el libro: instalar TeX Live cuesta varios minutos y no tiene sentido en cada push.
-  libro-pdf:
-    name: libro · verificar_pdf (necesita LaTeX)
+  libro:
+    name: libro · controles §2.1/§2.6/§2.7
     runs-on: ubuntu-latest
     if: github.event_name == 'push'
     steps:
@@ -134,6 +124,14 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y --no-install-recommends             latexmk texlive-luatex texlive-xetex texlive-latex-extra             texlive-fonts-recommended texlive-lang-spanish
+
+      - name: Book · todo \ident{} nombra algo que existe (§2.6)
+        if: steps.libro.outputs.run == 'true'
+        run: python3 doc/book/scripts/simbolos.py --estricto
+
+      - name: Book · ningun termino se usa antes de definirse (§2.7)
+        if: steps.libro.outputs.run == 'true'
+        run: python3 doc/book/scripts/terminos.py
 
       - name: Compilar el libro
         if: steps.libro.outputs.run == 'true'

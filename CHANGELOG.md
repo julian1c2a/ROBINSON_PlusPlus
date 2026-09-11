@@ -14,6 +14,23 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑11 (c) — 🏁🏁 P‑4: basta `ConsistentH`. LA CADENA DE GÖDEL ES ENTERAMENTE FINITARIA.**
+> La pregunta que ADR‑024 dejó abierta —¿basta `¬ Prf ⊥` en lugar de `¬ (axioms ⊢ ⊥)`?— se contestó
+> el mismo día: **sí**, y con el punto fijo ya sobre `Prf` sale en **cuatro líneas**.
+>
+>     goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+>     goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+>
+> ⇒ la hipótesis de los dos teoremas de Gödel es hoy **la MÍNIMA honesta**: *el cálculo finitario no
+> demuestra `⊥`*. `ConsistentOmega` —que ADR‑024 midió que **no es «Q++ es consistente»** sino la
+> consistencia de una **complección completa**— **desaparece de los enunciados cabecera**.
+> ⭐⭐ **Y el footprint lo certifica**: cae de `[3 de Lean] + dne + gen + imp_intro +
+> ax_induction_prim + ax_list_induction + ax_axiomsCodeT_eq + prf_axiomsCodeT_eq` a
+> **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del
+> proyecto**. Las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja**.
+> 🔑 **La lección**: *una hipótesis mal elegida no sólo debilita el enunciado — arrastra al
+> footprint todo lo que ella necesita.* Cambiarla limpió **seis** dependencias de golpe.
+>
 > **2026‑09‑11 (b) — 🏁🏁 GÖDEL II ENSAMBLADO sobre `Prf`, y la FUERZA de `axioms ⊢` MEDIDA.**
 > Las dos cosas salen de contestar la pregunta que la auditoría dejó abierta.
 > ⛔⛔ **`Meta/OmegaStrength.lean`**: `axioms ⊢` es **SINTÁCTICAMENTE COMPLETO** —
