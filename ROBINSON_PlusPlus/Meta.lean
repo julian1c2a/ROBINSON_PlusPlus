@@ -127,3 +127,5 @@ import ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
 import ROBINSON_PlusPlus.Meta.D3BodyPrf
 import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 import ROBINSON_PlusPlus.Meta.VerifierSound
+import ROBINSON_PlusPlus.Meta.OmegaStrength
+import ROBINSON_PlusPlus.Meta.GodelTwoPrf
