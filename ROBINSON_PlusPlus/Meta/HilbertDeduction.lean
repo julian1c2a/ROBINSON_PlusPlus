@@ -44,6 +44,49 @@ inductive PrfH : List Formula → Formula → Prop where
 theorem prf0_id (A : Formula) : Prf₀ (A ⇒ A) :=
   Prf₀.mp _ _ (Prf₀.mp _ _ (Prf₀.p2 A (A ⇒ A) A) (Prf₀.p1 A (A ⇒ A))) (Prf₀.p1 A A)
 
+/-! ### Monotonía del contexto — la **deuda B6b**, saldada el 2026‑09‑11
+
+⚠️ Y saldada **rescatando**, no probando: estaban demostrados desde hacía semanas en `Probe/`
+—que está en `.gitignore`— mientras `NEXT-STEPS.md` afirmaba en presente que «NO existen en NINGÚN
+sitio (verificado por grep 2026‑08‑31)» y que «hay que PROBARLOS primero». El grep era correcto;
+falló su **alcance**. Evidencia versionada: `sondeos/PrfHMono.lean`.
+
+⚠️ Cuatro módulos pagaban su ausencia **por nombre** (`LiftcCodePrf:1426`, `EvalLiftfcPrf:749`,
+`HasWitFTrackedPrf:183`, `HasWitTrackedPrf:757`), con el rodeo de meter la ecuación como
+**antecedente OBJETO** para que el `or`‑elim la conservara en cada rama. Ese rodeo ya no hace falta.
+
+⭐ Y una nota de método que hoy vale doble: esta inducción **es legítima** porque `PrfH` **no tiene
+ningún `axiom` de Lean habitándolo** — se midió el 2026‑09‑11, cuando se descubrió que
+`FOL.Derives` sí los tiene (los cinco de `MetaRules`) y que por eso no admite teorema de solidez
+(ver `../../FOL/cuarentena/README.md`). Antes de inducir sobre un inductivo: comprobar que no está
+habitado. -/
+
+/-- **Monotonía del contexto en `PrfH`**: si `Γ ⊆ Δ`, todo lo demostrable desde `Γ` lo es desde `Δ`.
+    Inducción sobre los **8 constructores**; el único caso no trivial es `gen`, que reconstruye la
+    inclusión a través de `Γ.map (liftFormula 0)` con `List.mem_map`. -/
+theorem PrfH_mono : ∀ {Γ : List Formula} {ψ : Formula}, PrfH Γ ψ →
+    ∀ Δ : List Formula, (∀ φ, List.Mem φ Γ → List.Mem φ Δ) → PrfH Δ ψ := by
+  intro Γ ψ h
+  induction h with
+  | hyp Γ' φ hm => intro Δ hsub; exact PrfH.hyp Δ φ (hsub φ hm)
+  | incl0 Γ' φ h0 => intro Δ _; exact PrfH.incl0 Δ φ h0
+  | p3 Γ' A => intro Δ _; exact PrfH.p3 Δ A
+  | ind Γ' A => intro Δ _; exact PrfH.ind Δ A
+  | qconf Γ' P C => intro Δ _; exact PrfH.qconf Δ P C
+  | listInd Γ' A => intro Δ _; exact PrfH.listInd Δ A
+  | mp Γ' A B hAB hA ihAB ihA => intro Δ hsub; exact PrfH.mp Δ A B (ihAB Δ hsub) (ihA Δ hsub)
+  | gen Γ' A hdd ih =>
+      intro Δ hsub
+      refine PrfH.gen Δ A (ih (Δ.map (liftFormula 0)) ?_)
+      intro φ hm
+      have hm' : φ ∈ Γ'.map (liftFormula 0) := hm
+      rcases List.mem_map.mp hm' with ⟨ψ0, hψ0, rfl⟩
+      exact List.mem_map.mpr ⟨ψ0, hsub ψ0 hψ0, rfl⟩
+
+/-- **Debilitamiento por UNA hipótesis** — el caso que consumen los cuatro módulos. -/
+theorem PrfH_w1 {Γ : List Formula} {A ψ : Formula} (h : PrfH Γ ψ) : PrfH (A :: Γ) ψ :=
+  PrfH_mono h _ (fun _ hm => List.Mem.tail _ hm)
+
 /-- Debilitamiento por la izquierda (combinador `K`): `PrfH Γ B → PrfH Γ (A ⇒ B)`. -/
 theorem prfH_weaken {Γ : List Formula} {A B : Formula} (h : PrfH Γ B) : PrfH Γ (A ⇒ B) :=
   PrfH.mp Γ B (A ⇒ B) (PrfH.incl0 Γ (B ⇒ (A ⇒ B)) (Prf₀.p1 B A)) h
@@ -137,6 +180,8 @@ end ROBINSON_PlusPlus.Meta.HilbertDeduction
 
 export ROBINSON_PlusPlus.Meta.HilbertDeduction (
   PrfH
+  PrfH_mono
+  PrfH_w1
   prfH_weaken
   prfH_s_app
   prfH_hyp_self

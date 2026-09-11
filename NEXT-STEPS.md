@@ -4,9 +4,99 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑11 · `master` · ✅ ÁRBOL VERDE · ✅ CI VERDE · **5 `axiom` de Lean****
+**Estado 2026‑09‑11 (cierre de sesión) · `master` · ✅ ÁRBOL VERDE (145 jobs) · **5 `axiom` de Lean****
 
-> # 🔬 LEER PRIMERO: `doc/AUDITORIA-2026-09-11.md` — dos ciclos, diez hallazgos
+> # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑11 — LEER ESTO PRIMERO
+>
+> Se cerró al **92 % del límite de 24 h**, con trabajo decidido y **no ejecutado**. Todo lo de abajo
+> está **medido**; lo que falta es aplicarlo.
+>
+> ## 🏁 Lo HECHO hoy (commiteado y subido)
+>
+> | | qué | dónde |
+> |---|---|---|
+> | 1 | **Tres controles que daban VERDE sin comprobar nada**, arreglados **y probados con el fallo puesto** | `5114ac7` |
+> | 2 | **`prf0_soundness`** — la solidez de `Prf₀`, net‑0 puro. Primera medición SEMÁNTICA del proyecto | `sondeos/AnclaSoundness.lean` |
+> | 3 | ⛔⛔ **`FOL.soundness` es FALSO y con `raa` da `False` sin hipótesis** → cuarentena | FOL `76ac56d`, [ADR‑025](DECISIONS.md) |
+> | 4 | **Barrido completo de `Probe/`** (334 ficheros, 1.693 huérfanas, 121 clasificados uno a uno) | ver abajo |
+> | 5 | 🏁 **B6b CERRADA**: `PrfH_mono`/`PrfH_w1` **en producción** | `Meta/HilbertDeduction.lean` |
+>
+> ## ⛔⛔ LA REGLA DEL DÍA, y es de las caras — **M‑11**
+>
+> **Un `axiom` que HABITA un tipo inductivo prohíbe demostrar nada sobre ese tipo por INDUCCIÓN.**
+> Los habitantes que produce el axioma **no son aplicaciones de constructor**; la inducción cubre los
+> constructores y el teorema cuantifica sobre todos ⇒ el teorema es **falso**.
+> ⚠️ Lo peligroso es **eliminar** (`induction`/`cases`/`rec`), **no introducir**.
+>
+> | | inductivo | axiomas que lo habitan |
+> |---|---|---|
+> | ⛔ **PROHIBIDO inducir** | `FOL.Derives` | 6 de `MetaRules` + `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq` |
+> | ⛔ **PROHIBIDO inducir** | `Prf` | `prf_axiomsCodeT_eq` |
+> | ✅ **SEGURO** | **`Prf₀`**, **`PrfH`** | **ninguno** |
+>
+> ## ⬜ LO DECIDIDO POR EL PROPIETARIO Y **NO EJECUTADO** — el trabajo de mañana, en orden
+>
+> **(a) `ax_p_tfa` SE RETIRA** ⇒ **5 → 4 axiomas**. Medido: clausura entera en UN fichero, ningún
+> consumidor, **ningún lema que escribir**.
+> · borrar `Minimal/Theorems/Block8.lean` **288‑334** y **345‑350**; ⚠️ **CONSERVAR 335‑343**
+> (`lt_zero_one`, no depende del axioma); del `export` quitar **375, 376, 377, 379** (conservar 378).
+> · ⚠️ El daño es DOCUMENTAL: **10 fallos duros** de `check-doc-sync` por el contador, **3 del `make`
+> del libro** que el control de doc **no ve**, y un acoplamiento **por número de fila** entre
+> `AXIOMS.md` («los axiomas 5 y 6») y `cap-representabilidad-d1.tex:70` que **ningún control detecta**.
+> · ⚠️ `AXIOMS.md:70` dice «teorema en `Full`, postulado en `Minimal`»: **medible‑mente falso**, no
+> existe tal teorema. `tfa_numeral` tiene otro dominio, otra unicidad y otra hipótesis.
+>
+> **(b) `StdLine` SE ESTRECHA** (mata de raíz las causas (a), (b) y la sexta de `DEUDA_chainNeg`).
+> · **Opción A**, sin duplicar la tabla de 21 tags: `StdLine x := ∃ acc f r, x = lineCode' acc f r`
+> — `lineJustif` hace de tabla única (tag ≤ 20 + aridad + tipos por posición).
+> · ⭐ **El control de que no es trampa**: `stdChain_proofCode'` debe compilar **SIN TOCARLO**.
+> · ⚠️ Los refutadores tumbaron el plan de ejecución, no la tesis: `tagArity` y `Meta.CodeDistinct`
+> **no están en la clausura de imports** de `OmegaReflect` (reparable, no hay ciclo); y **NO retirar
+> `junk_line_not_stdLine`** — la razón que se dio era falsa (la línea basura falla por **TIPO**, no
+> por aridad) y es la **única evidencia compilada** de que ADR‑022 separa algo.
+> · ⛔⛔ **EL TOPE, medido**: una vuelta más —exigir `stepConcl acc r = some f`, o que la cadena esté
+> en la imagen de `proofCode'`— dejaría **`DEUDA_chainNeg` VACUA** y el resultado sería una **TRAMPA**.
+> **Eso va en el ADR**, junto a una frase que diga cuánto sube `OmegaConsistent`.
+>
+> **(c) `Probe/`: promover 4 y barrer.** Barrido hecho: 334 ficheros · 19.395 declaraciones ·
+> **1.693 huérfanas** · **213 ficheros sin ninguna** (borrables sin pérdida) · 121 clasificados
+> (arnés **72**, versión vieja **32**, dudoso **10**, trabajo real **7**).
+> · ⬜ **PROMOVER 4**: `B3_planos_dedup_kit.lean` y `B3_planos_dedup.lean` (el genérico
+> `pcc_congr_hole_code`, que subsumiría **19 copias** del mismo patrón en 12 módulos),
+> `VER_extra.lean`, y `CritRefl_anidado.lean` (⭐ que además **corrige un control que no ejercía la
+> rama que decía medir**: su instancia tenía lista de argumentos vacía).
+> · ⬜ Y **entonces** borrar. ⚠️ La clasificación es por **nombre**, no por enunciado.
+>
+> **(d) ADR‑023: certificar `ax24`** ⇒ censo 10/10. Medido **más barato de lo previsto**: los **8**
+> axiomas que cita `Full/Mod2.lean` están **los ocho** en `primAxioms`; `teo_1_3` era **prosa
+> obsoleta**; y `teo_2_9` es **evitable** con un lema de ~22 líneas (`add_eq_zero_right_prim`) sobre
+> `zero_or_succ_ax_prim`, que ya existe. ~200 líneas de port mecánico, con **dos formas‑trampa**
+> (`a_plus_one_eq_one_prim`, `add_eq_zero_right_prim`): consumen la hipótesis ⇒ **internalizar la
+> implicación primero**, no debilitar.
+> · ⚠️ Hallazgo colateral: **no existe ni un solo teorema `∉ primAxioms` en todo el árbol** — la
+> garantía de no‑trivialidad de los 9 ya certificados vive **sólo en comentarios**.
+>
+> **(e) `prf_axiomsCodeT_eq`: falta EL MODELO.** `prf0_soundness` ya hace la pregunta **medible**.
+> Falta `M0 : Model D` con `contextSatisfies M0 v axioms` (los 141). ⚠️ `axiomsCodeT` **no es libre**:
+> aparece en `ax_vpf_thy` y `ax_lineWF_thy`, siempre como 2.º argumento de `In`.
+> · ⛔ **NO fusionar el ancla a `Prf₀`** aunque dé 4 → 3: `Prf.incl : Prf₀ φ → Prf φ` ⇒ postular ahí
+> es **asumir MÁS**, y además **envenenaría el único cálculo limpio** (M‑11). Las dos cosas —fusión y
+> sonda semántica— son **mutuamente excluyentes**.
+>
+> **(f) La reparación de fondo de FOL** (ADR‑025): que las meta‑reglas no habiten `Derives`.
+> **Coste medido: 164 usos de `Derives.*` en RPP.** Decisión del propietario.
+>
+> **(g) 🔄 EN CURSO al cerrar**: **auditoría unificada de FOL** (5 dimensiones + refutadores +
+> síntesis), lanzada en segundo plano. Si no dejó resultado, **relanzarla** — el encargo era «que
+> deje muy claro lo que hay de forma unificada, y corrija y aúne con este proyecto».
+>
+> **(h) Sigue pendiente de TI**: revertir o no el cambio de figuras en `PLAN-LIBRO.md`, que es de la
+> tarea del LIBRO (PLAN‑LIBRO §0). Y el libro **sigue ROTO** (`simbolos.py --estricto` = EXIT 1 por
+> `goedel_second'` huérfano en dos capítulos).
+>
+> ---
+>
+> # 🔬 `doc/AUDITORIA-2026-09-11.md` — dos ciclos, diez hallazgos
 >
 > ⛔⛔ **F‑1 · Gödel II está montado pero NO ensamblado, y es estructural.** `goedel_second'` pide
 > `hgi : ¬(axioms ⊢ G)` sobre el cálculo **ω**; Gödel I entrega `¬ Prf godelCN` **finitario**. Por

@@ -61,6 +61,7 @@ proyecto; no introduce ninguna nueva.
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
 | **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
 | **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
+| **M-11** | ⛔⛔ **Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita.** Un `axiom` cuyo tipo es una aplicación de un `inductive` produce habitantes que **no son aplicaciones de constructor**; la inducción cubre los constructores, pero el teorema cuantifica sobre **todos** los habitantes ⇒ el teorema es **FALSO**. ⚠️ Es *eliminar* lo peligroso (`induction`/`cases`/`rec`), **no** *introducir*: usar los constructores para construir es seguro. **LISTA NEGRA** (prohibido inducir): `FOL.Derives` — 6 axiomas de `FOL/MetaRules.lean` + `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`; `Prf` — `prf_axiomsCodeT_eq`. **LISTA BLANCA** (seguro): **`Prf₀`** y **`PrfH`**, cero axiomas habitándolos | ADR-025 | `grep -n "^axiom "` + mirar si el tipo termina en el inductivo. ⬜ No mecanizado |
 | **M-10** | ⛔ **Ningún teorema cuyo enunciado hable de INDEMOSTRABILIDAD, indecidibilidad o consistencia puede formularse sobre `⊢`** — sólo sobre **`Prf`**. `axioms ⊢` es **sintácticamente COMPLETO** (`Meta/OmegaStrength.lean`), luego **no es r.e.** y `¬(axioms ⊢ X)` significa **«el cálculo REFUTA X»**, no «no lo demuestra» | ADR-024 | `derives_completo` + `hgi_es_refutar`; y a mano, al enunciar |
 | **M-9** | ⛔ **Un `Probe/` que decide un ADR se PROMUEVE a `sondeos/` antes de cerrar ese ADR** — o la decisión queda **sin evidencia versionada**. `Probe/` está en `.gitignore` **a propósito** (es borrador); `sondeos/` es el **resultado**, y se versiona con su fila en `sondeos/README.md`. Si el probe pasó a **producción**, la evidencia es el módulo y no hay nada que promover | [auditoría F‑9](doc/AUDITORIA-2026-09-11.md) · `PLAN-PRUEBAS.md` §2.1 | a mano: todo ADR debe citar su sondeo o su módulo |
 | **M-8** | ⚠️ **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Antes de dar por resuelto un frente con «la clase X ya cubre la clase Y», leer **qué obligación queda después**: `numTree_of_isCodeShaped` es **cierto como teorema** y su conclusión —«no hay que cambiar `StdChain`»— **falsa**, porque la obligación que deja (`m ≠ n` con `codeNat` astronómico) **no es descargable** | ADR-022 | `stdChain_proofCode'` + `junk_line_not_stdLine` (`Meta/OmegaReflect.lean` §1ter/§1quater) |
@@ -1559,6 +1560,79 @@ se retira audita lo que se apoyaba en él.**
 
 **Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `axioms`, `coreAxioms`,
 `axiomsCodeT`, `provCodeC'`, `G`, y todas las firmas aguas abajo.
+
+---
+
+## ADR-025: Un `axiom` que HABITA un inductivo prohíbe la inducción — y `FOL.soundness` era FALSO
+
+**Fecha:** 2026‑09‑11 · **Estado:** ✅ SANCIONADO (contención ejecutada; la reparación de fondo, abierta)
+
+### El hecho, medido y compilado
+
+`FOL/Soundness.lean` probaba `soundness {Γ f} (h : Γ ⊢ f) : Γ ⊨ f` por `induction h`. Eso es
+**falso**, y no por un descuido en la prueba: **el enunciado no es demostrable porque no es verdad**.
+
+    theorem inconsistencia_de_cualquier_solidez
+        (solidez : ∀ {Γ f}, (Γ ⊢ f) → satisfies Γ f) : False
+    footprint: [propext, FOL.MetaRules.raa]          ← compilado, EXIT 0
+
+⇒ **cualquier** testigo del enunciado de solidez para `Derives` demuestra `False`. Sin hipótesis.
+
+### La causa
+
+`Derives` (`FOL/FOL/FOL.lean:165`) es un `inductive` de **18 constructores**, todos semánticamente
+válidos. Pero `FOL/MetaRules.lean` declara **cinco `axiom`s que lo HABITAN** (`imp_intro`, `gen`,
+`raa`, `or_elim`, `ex_elim`) — y **tienen que ser axiomas**: sus premisas son **funciones de Lean**,
+o sea ocurrencias negativas de `Derives` en su propio constructor, que Lean rechaza en un
+`inductive`. No hay alternativa dentro del tipo.
+
+⇒ `Derives` tiene habitantes que **no son aplicaciones de constructor**. Un teorema probado por
+`induction` cubre los 18 casos, pero **se aplica a todos los habitantes**. Es el fallo clásico de
+`axiom foo : UnInductivo`: rompe la garantía de «no hay basura» del tipo.
+
+El detonador concreto: con `Γ = []` y dos modelos triviales sobre `Unit`, `raa` —cuya premisa
+`[] ⊢ P → [] ⊢ ⊥` existe **vacuamente** cuando `P` no es derivable— da `[] ⊢ ¬P`; la solidez obliga
+a `[] ⊨ ¬P`; y `P` es verdadera en el otro modelo.
+
+### La decisión
+
+1. **Contener, no reparar.** `Soundness.lean`, `Compacity.lean` (su `compactness_theorem` era
+   **vacuo**) y `Theorems/Soundness.lean` → `FOL/cuarentena/`, fuera del glob de `lean_lib «FOL»`.
+   `FOL.lean` deja de importarlos: importaba `MetaRules` **y** `Soundness` ⇒ **`import FOL` era un
+   módulo inconsistente**.
+2. **La regla, escrita**: [M‑11](#), con su LISTA NEGRA y su LISTA BLANCA.
+3. **Retirar el sobreclaim**: el docstring de `MetaRules` afirmaba que el sistema resultante es
+   «**sólido** y completo relativo a ℕ». La solidez es precisamente lo que **no** se tiene.
+
+### Qué NO dice
+
+* ⚠️ **RPP no está afectado** [medido]: no importa `FOL.Soundness` ni el barrel raíz `FOL`. Árbol
+  reconstruido: **145 jobs verdes**, footprints de Gödel intactos.
+* ⚠️ **`FOL/Semantics.lean` está BIEN** y se queda. Es lo que permitió probar `prf0_soundness`.
+* ⚠️ **Las meta‑reglas no están «mal»**: dicen lo que dicen. `⊢` es una noción metateórica de
+  verdad, no una relación de derivabilidad — [ADR‑024](#) y `Meta/OmegaStrength.lean`. Lo nuevo es
+  que eso **también impide la solidez**, y las dos caras son la misma.
+
+### La salida buena, ya ejecutada
+
+`sondeos/AnclaSoundness.lean`: **`prf0_soundness {φ} (h : Prf₀ φ) : satisfies axioms φ`**, por
+inducción sobre los 17 constructores de `Prf₀` —el único cálculo del árbol **sin axiomas
+habitándolo**—, footprint `[propext, Classical.choice, Quot.sound]`, **net‑0 puro**.
+
+⭐ **Y el hallazgo de método**: `FOL/Semantics.lean` existe **desde mayo** con 0 `sorry`, y este
+proyecto **no lo había importado nunca**. Cuatro agentes independientes midiendo el frente
+afirmaron que el árbol no tenía semántica. *Antes de construir, buscar* — van tres veces.
+
+### ⬜ Lo que queda ABIERTO (decisión del propietario)
+
+**La reparación de fondo**: que las meta‑reglas **no habiten `Derives`** — declararlas sobre una
+relación aparte `DerivesW` con `Derives Γ f → DerivesW Γ f`, dejando `Derives` limpio para que su
+solidez sea un teorema de verdad. ⚠️ **Coste medido**: RPP usa constructores `Derives.*` **164
+veces** (`Derives.subst` 58, `Derives.refl` 40, `Derives.hyp` 18, `weakening` 13, `intro_impl` 13…),
+más toda la notación `⊢`. **No es una tarde.**
+
+**Véase también:** `FOL/cuarentena/README.md` (el detalle entero),
+`FOL/cuarentena/Inconsistencia.lean` (la evidencia), `sondeos/AnclaSoundness.lean`.
 
 ---
 
