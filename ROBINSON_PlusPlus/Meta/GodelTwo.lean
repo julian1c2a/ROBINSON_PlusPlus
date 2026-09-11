@@ -80,81 +80,44 @@ theorem d3 (φ : Formula) :
 /-- **Fórmula de consistencia** `Con' := ¬ Prov'(⌜⊥⌝)`. -/
 noncomputable def consistencyFormula' : Formula := neg (provCodeC' Formula.bottom)
 
-/-- **Gödel I formalizado internamente** (`⊢ Con' ⇒ G`): el sistema demuestra "si
-    soy consistente entonces `G`". Núcleo del Segundo Teorema, vía D1 (necesitación,
-    `nec1`), **D2 real** (`d2`), D3 (`d3`) y el punto fijo (`fp_bwd`).
+/-! ## ⛔⛔ RETIRADOS el 2026‑09‑11: `con_imp_godel'` y `goedel_second'`
 
-    Parametrizado por `G` y las dos condiciones aún no cerradas:
-    * `fp_bwd` : dirección `¬Prov'(⌜G⌝) ⇒ G` del punto fijo.
-    * `nec1`   : necesitación del condicional del punto fijo `G ⇒ ¬Prov'(⌜G⌝)`. -/
-theorem con_imp_godel' (G : Formula)
-    (fp_bwd : axioms ⊢ (neg (provCodeC' G) ⇒ G))
-    (nec1 : axioms ⊢ provCodeC' (G ⇒ neg (provCodeC' G))) :
-    axioms ⊢ (consistencyFormula' ⇒ G) := by
-  -- D2(G, ¬PG): Prov'(⌜G⇒¬PG⌝) ⇒ (PG ⇒ Prov'(⌜¬PG⌝))
-  have step_a : axioms ⊢ (provCodeC' G ⇒ provCodeC' (neg (provCodeC' G))) :=
-    mp (d2 G (neg (provCodeC' G))) nec1
-  -- D2(PG, ⊥): Prov'(⌜¬PG⌝)=Prov'(⌜PG⇒⊥⌝) ⇒ (Prov'(⌜PG⌝) ⇒ Prov'(⌜⊥⌝))
-  have step_b : axioms ⊢
-      (provCodeC' G ⇒ (provCodeC' (provCodeC' G) ⇒ provCodeC' Formula.bottom)) :=
-    imp_intro (fun hpg => mp (d2 (provCodeC' G) Formula.bottom) (mp step_a hpg))
-  -- D3(G): PG ⇒ Prov'(⌜PG⌝); combinando ⟹ PG ⇒ PBot
-  have pg_imp_pbot : axioms ⊢ (provCodeC' G ⇒ provCodeC' Formula.bottom) :=
-    imp_intro (fun hpg => mp (mp step_b hpg) (mp (d3 G) hpg))
-  -- contrapositiva + punto fijo: Con' ⇒ G  (Con' = ¬PBot)
-  exact imp_intro (fun hcon =>
-    mp fp_bwd (imp_intro (fun hpg => mp hcon (mp pg_imp_pbot hpg))))
+Aquí vivían `con_imp_godel' : axioms ⊢ (Con' ⇒ G)` y `goedel_second'`, la versión del Segundo
+Teorema **sobre el cálculo `⊢`**. **Se retiran**, y no por deuda técnica: porque **decían algo que
+no es**.
 
-/-- **Segundo Teorema de Incompletitud de Gödel** (sobre `provCodeC'`): si el sistema
-    es consistente, **no demuestra su propia consistencia** (`⊬ Con'`).
+`Meta/OmegaStrength.lean` mide que **`axioms ⊢` es sintácticamente COMPLETO** —decide toda
+sentencia—, porque `raa`/`imp_intro` toman como premisa una **función de Lean** y lo que el cálculo
+no prueba, lo **refuta**. Un cálculo que decide todo **no puede** ser el sujeto de un teorema de
+incompletitud: **no es r.e.**, que es justo la hipótesis que Gödel I exige.
 
-    Prueba (la de libro): si `⊢ Con'`, por `con_imp_godel'` + mp se tiene `⊢ G`,
-    contra la indemostrabilidad de `G` (`hgi`). Parametrizado por el punto fijo (`fp_bwd`),
-    la necesitación (`nec1`) y `hgi`.
+⇒ La hipótesis `hgi : ¬(axioms ⊢ G)` de aquel teorema no significaba «`G` es indemostrable»: por
+`hgi_es_refutar`, significa **«el cálculo REFUTA `G`»**. El enunciado era una implicación correcta y
+**no era incompletitud**.
 
-    🏁 **D1, D2 y D3 son las TRES teoremas** desde el 2026‑09‑10g (`d3` dejó de ser `axiom`).
+🏁 **El Segundo Teorema de verdad está en `Meta/GodelTwoPrf.lean`**, sobre el cálculo finitario
+`Prf` —que **sí** es r.e.—:
 
-    ⛔⛔ **PERO ESTE TEOREMA NO ESTÁ ENSAMBLADO, Y LA RAZÓN ES DE FONDO** (auditoría 2026‑09‑11,
-    hallazgo **F‑1** de `doc/AUDITORIA-2026-09-11.md`). El día 2026‑09‑10h este docstring llegó a
-    afirmar que *«`hgi` es la mitad demostrada de Gödel I»*. **Es FALSO**, y la medición es simple:
+    goedel_second_prf (hcon : ConsistentOmega) : ¬ Prf consistencyFormula'
 
-        hgi                     : ¬ (axioms ⊢ G)     -- el cálculo ω
-        goedel_first_numeral    : ¬ Prf godelCN      -- el cálculo FINITARIO
-        prf_to_derives          : Prf φ → axioms ⊢ φ
+con **una sola hipótesis** y **ninguna suelta**. Su `prf_con_imp_godel` sustituye a
+`con_imp_godel'`, que sólo existía para alimentar a `goedel_second'`.
 
-    De la tercera sale `¬(axioms ⊢ G) → ¬ Prf G`, **no al revés**: `hgi` es **estrictamente más
-    fuerte** que lo que Gödel I entrega. Y **no existe** la vuelta `⊢ → Prf` en el árbol
-    (comprobado), ni ninguna versión ω de Gödel I.
-
-    ⚠️ **Y hay algo peor que una hipótesis no descargada**: `FOL/MetaRules.lean` documenta `gen`
-    como la **ω‑regla** y `dne` con la lectura *«demostrabilidad = verdad en ℕ»*. Bajo esa lectura
-    `G` es **verdadera**, luego `hgi` sería **falsa** y este teorema **vacuo**. ⬜ **No está medido**
-    —requiere decidir la fuerza real de `axioms ⊢`— y es la pregunta abierta más importante del
-    proyecto.
-
-    ⭐ **La salida está identificada y es construible**: Gödel II **sobre `Prf`**
-    (`goedel_second_prf : ConsistentH → ¬ Prf Con'`, el nombre que el proyecto lleva planeando
-    desde junio). Las tres condiciones **ya existen sobre `Prf`** —`repr_pos'_prf` (D1),
-    `d2_prf` (D2), `d3_prf_real` (D3)—; faltan las versiones `Prf` del **punto fijo**
-    (`godelCN_fixedpoint`) y de **`con_imp_godel'`**. -/
-theorem goedel_second' (G : Formula)
-    (fp_bwd : axioms ⊢ (neg (provCodeC' G) ⇒ G))
-    (nec1 : axioms ⊢ provCodeC' (G ⇒ neg (provCodeC' G)))
-    (hgi : ¬ (axioms ⊢ G)) :
-    ¬ (axioms ⊢ consistencyFormula') := by
-  intro hcon
-  exact hgi (mp (con_imp_godel' G fp_bwd nec1) hcon)
+⚠️ **Qué NO se retira**: `d3` (la tercera condición de derivabilidad sobre `⊢`, que fue `axiom`
+hasta el 2026‑09‑10g y hoy es teorema) y `consistencyFormula'`, que `GodelTwoPrf` consume.
+Decisión del propietario, 2026‑09‑11, opción (b). Ver `doc/AUDITORIA-2026-09-11.md` F‑1 y
+[ADR‑024](../../DECISIONS.md). -/
 
 end ROBINSON_PlusPlus.Meta.GodelTwo
 
 export ROBINSON_PlusPlus.Meta.GodelTwo (
   d3
   consistencyFormula'
-  con_imp_godel'
-  goedel_second'
 )
 
-/-! ## FOOTPRINT — 🏁 **sin `d3`** desde el 2026‑09‑10g -/
+/-! ## FOOTPRINT — 🏁 **sin `d3`** desde el 2026‑09‑10g.
+El de `goedel_second'` se retiró con el teorema; el que importa ahora es el de
+`goedel_second_prf` (`Meta/GodelTwoPrf.lean`). -/
 
 #print axioms ROBINSON_PlusPlus.Meta.GodelTwo.d3
-#print axioms ROBINSON_PlusPlus.Meta.GodelTwo.goedel_second'
+
