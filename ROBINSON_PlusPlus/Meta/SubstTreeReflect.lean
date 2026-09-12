@@ -425,7 +425,7 @@ def SGuards (Γ : List Formula) (t : Term) : STree → Prop
 /-- ⭐ **EL «CÓDIGO DEL CÓDIGO» DEL ÁRBOL, con nodos de sustitución.** El caso `sub` es el
     único con contenido: lo paga `pcc_eval_substfc_wit`, cuyo antecedente OBJETO **son** las
     guardas de ADR‑020 — que `SGuards` exige exactamente ahí. -/
-theorem PrfH_tc_objAt {Γ : List Formula} (t : Term) :
+theorem PrfH_tc_objAt [AnclaEq] {Γ : List Formula} (t : Term) :
     ∀ T : STree, SGuards Γ t T →
       PrfH Γ (provFromCode (eqc (tcFn (T.objAt t)) (T.dotV t)))
   | .leaf _, _ => prf_to_prfH (prf_provFromCode_eqCodeFn_refl _) _
@@ -569,7 +569,7 @@ theorem PrfH_tc_objAt {Γ : List Formula} (t : Term) :
 
 /-- ⭐ **`Prov(⌜dotV = dotN⌝)`** para todo árbol cuyas hojas caigan bajo la longitud canónica.
     El nodo `sub` es **pura congruencia**: no pide guardas ni evaluación. -/
-theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
+theorem PrfH_dotVN [AnclaEq] {Γ : List Formula} (t : Term) {n : Nat}
     (hlenc : PrfH Γ (lenc t =eq numeralM n)) (T : STree) :
     Nat.le T.maxLeaf n →
       PrfH Γ (provFromCode (eqc (T.dotV t) (T.dotN t))) := by
@@ -661,7 +661,7 @@ hipótesis reescribe el valor, `tc_objAt` lleva a `dotV` y `dotVN` a `dotN`. La 
 diferencia es que ahora el núcleo recibe la fórmula guardada **entera** (`G`), porque de ella
 salen **las dos** cosas que necesita: la ecuación estructural y las guardas de los nodos `sub`. -/
 
-theorem pcc_condDS_of_stree (T : STree) (t : Term) {n : Nat} (hmax : Nat.le T.maxLeaf n)
+theorem pcc_condDS_of_stree [AnclaEq] (T : STree) (t : Term) {n : Nat} (hmax : Nat.le T.maxLeaf n)
     (G : Formula)
     (hstruct : Prf (substFormula 0 t G ⇒ (carc t =eq T.objAt t)))
     (hguards : SGuards [substFormula 0 t G, lenc t =eq numeralM n, lineWF t] t T) :
@@ -723,7 +723,7 @@ theorem substFormula_guardedCond_var0 :
 
 /-- ⭐ **EL CIERRE DE UN TAG DE SUSTITUCIÓN**, genérico: basta declarar su árbol, su lista de
     guardas y descargar las dos obligaciones locales. -/
-theorem pcc_lineWF_tracked_of_stree {k n : Nat} (T : STree) (t : Term)
+theorem pcc_lineWF_tracked_of_stree [AnclaEq] {k n : Nat} (T : STree) (t : Term)
     (gs : List GuardSlot) (hmax : Nat.le T.maxLeaf n) (h1n : 1 < n)
     (hax : Prf (Formula.forall (Formula.impl (tagF k)
       (lwfVar ⇔ Formula.and (lencF n) (guardedCond gs (condOfS T))))))
@@ -752,7 +752,7 @@ theorem substF_witF_slot (t : Term) (i : Nat) :
     FOL.substTerm_liftTerm, if_true]
 
 /-- El núcleo estructural de **q1**, con la fórmula guardada entera a la vista. -/
-theorem pcc_core_q1 (t : Term) :
+theorem pcc_core_q1 [AnclaEq] (t : Term) :
     HcondCore 4 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ1)) (condOfS treeQ1) := by
   refine pcc_condDS_of_stree treeQ1 t (n := 4) Nat.le.refl _ ?_ ?_
   · refine prf_deduction ?_
@@ -770,7 +770,7 @@ theorem pcc_core_q1 (t : Term) :
       simpa only [guardedCond, substF_witF_slot, STree.objAt] using h
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 9 (`q1`), PROBADO.** El primero de los siete. -/
-theorem pcc_lineWF_tracked_q1_imp (t : Term) :
+theorem pcc_lineWF_tracked_q1_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 9)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 9) (n := 4) treeQ1 t [.witF 2, .wit 3] Nat.le.refl (by omega)
@@ -785,7 +785,7 @@ Con el piloto hecho, cada tag es **declarar su árbol y desempaquetar su cascada
 tiene **dos** nodos `sub` (`A[t₁]` y `A[t₂]`) y por eso su cascada trae **tres** guardas: la
 `witF` sobre el cuerpo, compartida por los dos, y una `wit` por cada sustituyendo. -/
 
-theorem pcc_core_q2 (t : Term) :
+theorem pcc_core_q2 [AnclaEq] (t : Term) :
     HcondCore 4 t (guardedCond [.witF 2, .wit 3] (condOfS treeQ2)) (condOfS treeQ2) := by
   refine pcc_condDS_of_stree treeQ2 t (n := 4) Nat.le.refl _ ?_ ?_
   · refine prf_deduction ?_
@@ -803,7 +803,7 @@ theorem pcc_core_q2 (t : Term) :
       simpa only [guardedCond, substF_witF_slot, STree.objAt] using h
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 10 (`q2`), PROBADO.** -/
-theorem pcc_lineWF_tracked_q2_imp (t : Term) :
+theorem pcc_lineWF_tracked_q2_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 10)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 10) (n := 4) treeQ2 t [.witF 2, .wit 3]
@@ -812,7 +812,7 @@ theorem pcc_lineWF_tracked_q2_imp (t : Term) :
     (hcond_absorbe_2 t 4 (.witF 2) (.wit 3) (condOfS treeQ2)
       (pcc_hGuardF 2 4 t (by omega)) (pcc_hGuardT 3 4 t (by omega)) (pcc_core_q2 t))
 
-theorem pcc_core_leibniz (t : Term) :
+theorem pcc_core_leibniz [AnclaEq] (t : Term) :
     HcondCore 5 t (guardedCond [.witF 2, .wit 3, .wit 4] (condOfS treeLeibniz))
       (condOfS treeLeibniz) := by
   refine pcc_condDS_of_stree treeLeibniz t (n := 5) Nat.le.refl _ ?_ ?_
@@ -838,7 +838,7 @@ theorem pcc_core_leibniz (t : Term) :
             PrfH_and_elim_left hh⟩, trivial, trivial⟩⟩
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 13 (`leibniz`), PROBADO.** Con él, **tres de los siete**. -/
-theorem pcc_lineWF_tracked_leibniz_imp (t : Term) :
+theorem pcc_lineWF_tracked_leibniz_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 13)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 13) (n := 5) treeLeibniz t [.witF 2, .wit 3, .wit 4]
@@ -855,7 +855,7 @@ Lo único que faltaba era `pcc_eval_liftfc`, que el nodo `lift` de §1 consume e
 El resto es el mismo gesto de §8–§9: declarar el árbol y desempaquetar su cascada — que aquí
 tiene **una sola** guarda, así que el absorbedor es `hcond_absorbe_1`. -/
 
-theorem pcc_core_q3 (t : Term) :
+theorem pcc_core_q3 [AnclaEq] (t : Term) :
     HcondCore 4 t (guardedCond [.witF 3] (condOfS treeQ3)) (condOfS treeQ3) := by
   refine pcc_condDS_of_stree treeQ3 t (n := 4) Nat.le.refl _ ?_ ?_
   · refine prf_deduction ?_
@@ -873,7 +873,7 @@ theorem pcc_core_q3 (t : Term) :
     exact ⟨⟨trivial, hwF3, trivial⟩, trivial, trivial⟩
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 11 (`q3`), PROBADO.** El primero que consume `pcc_eval_liftfc`. -/
-theorem pcc_lineWF_tracked_q3_imp (t : Term) :
+theorem pcc_lineWF_tracked_q3_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 11)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 11) (n := 4) treeQ3 t [.witF 3]
@@ -882,7 +882,7 @@ theorem pcc_lineWF_tracked_q3_imp (t : Term) :
     (hcond_absorbe_1 t 4 (.witF 3) (condOfS treeQ3)
       (pcc_hGuardF 3 4 t (by omega)) (pcc_core_q3 t))
 
-theorem pcc_core_qconf (t : Term) :
+theorem pcc_core_qconf [AnclaEq] (t : Term) :
     HcondCore 4 t (guardedCond [.witF 2] (condOfS treeQconf)) (condOfS treeQconf) := by
   refine pcc_condDS_of_stree treeQconf t (n := 4) Nat.le.refl _ ?_ ?_
   · refine prf_deduction ?_
@@ -906,7 +906,7 @@ theorem pcc_core_qconf (t : Term) :
     evaluador pide es `hasWitF (liftfc 1 A)` — y la cascada sólo da `hasWitF A`. Hace falta la
     **clausura de `hasWitF` bajo `liftfc`**, que no existe en el árbol (sólo está la de
     TÉRMINO a nivel `zero`, `prf_hasWit_liftc`). -/
-theorem pcc_lineWF_tracked_qconf_imp (t : Term) :
+theorem pcc_lineWF_tracked_qconf_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 19)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 19) (n := 4) treeQconf t [.witF 2]
@@ -962,7 +962,7 @@ example : treeListInd.maxLeaf = 3 := rfl
 
 /-- ⭐ El núcleo de `ind`. La guarda `hasWitF (nthc t 2)` de la cascada se **propaga al lift**
     con `prf_hasWitF_liftfc`; es el único sitio donde la clausura nueva paga aquí. -/
-theorem pcc_core_ind (t : Term) :
+theorem pcc_core_ind [AnclaEq] (t : Term) :
     HcondCore 3 t (guardedCond [.witF 2] (condOfS treeInd)) (condOfS treeInd) := by
   refine pcc_condDS_of_stree treeInd t (n := 3) Nat.le.refl _ ?_ ?_
   · refine prf_deduction ?_
@@ -985,7 +985,7 @@ theorem pcc_core_ind (t : Term) :
 
 /-- ⭐⭐ El núcleo de `listInd`. Aquí la clausura se aplica **DOS veces**: el `substfc` exterior
     pide el testigo de `liftfc 2 (liftfc 1 A)`, y el interior el de `liftfc 1 A`. -/
-theorem pcc_core_listInd (t : Term) :
+theorem pcc_core_listInd [AnclaEq] (t : Term) :
     HcondCore 3 t (guardedCond [.witF 2] (condOfS treeListInd)) (condOfS treeListInd) := by
   refine pcc_condDS_of_stree treeListInd t (n := 3) Nat.le.refl _ ?_ ?_
   · refine prf_deduction ?_
@@ -1011,7 +1011,7 @@ theorem pcc_core_listInd (t : Term) :
               trivial, hwL1, hwF2, trivial⟩⟩, trivial⟩⟩
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 18 (`ind`), PROBADO.** -/
-theorem pcc_lineWF_tracked_ind_imp (t : Term) :
+theorem pcc_lineWF_tracked_ind_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 18)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 18) (n := 3) treeInd t [.witF 2]
@@ -1021,7 +1021,7 @@ theorem pcc_lineWF_tracked_ind_imp (t : Term) :
       (pcc_hGuardF 2 3 t (by omega)) (pcc_core_ind t))
 
 /-- ⭐⭐⭐ **EL REFLECTOR DEL TAG 20 (`listInd`), PROBADO.** Con él, **LOS SIETE**. -/
-theorem pcc_lineWF_tracked_listInd_imp (t : Term) :
+theorem pcc_lineWF_tracked_listInd_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 20)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_stree (k := 20) (n := 3) treeListInd t [.witF 2]
@@ -1046,7 +1046,7 @@ en el verificador. Es una obligación vacua que el ensamblaje pide por exhaustiv
 y quien la tenga a mano la paga con `absurd`; enunciarla como hipótesis es más honesto que
 fabricar aquí una prueba que dependa del número exacto de tags. -/
 
-theorem pcc_lineWF_tracked_modulo_2 (t : Term)
+theorem pcc_lineWF_tracked_modulo_2 [AnclaEq] (t : Term)
     (hind : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 18)
       ⇒ provFromCode (lineWFCodeFn (tcFn t)))))
     (hlistInd : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 20)
@@ -1073,7 +1073,7 @@ hipótesis es más honesto que fabricar aquí una prueba que dependa del número
 ⭐ **Y esto es exactamente `hbody`(a) de D3**: la reflexión del átomo `lineWF` que el
 `pcc_bdAll_intro` de `chainOkB` consume en el cuerpo de `lineOkB`. -/
 
-theorem pcc_lineWF_tracked_modulo_other (t : Term)
+theorem pcc_lineWF_tracked_modulo_other [AnclaEq] (t : Term)
     (hOther : ∀ k : Nat, Prf (lineWF t ⇒ ((lineTag t =eq numeralM k)
       ⇒ provFromCode (lineWFCodeFn (tcFn t))))) :
     Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t))) :=
@@ -1154,7 +1154,7 @@ theorem pcc_tag_vacuous (t : Term) (C : Formula) {k : Nat} (hk : 20 < k) :
     la cola `k ≥ 21` por `pcc_tag_vacuous`.
 
     ⇒ **C3 está cerrado**: la reflexión punteada del átomo `lineWF` es un teorema. -/
-theorem pcc_lineWF_tracked (t : Term) :
+theorem pcc_lineWF_tracked [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t))) := by
   refine pcc_lineWF_tracked_of_branches t (fun k => ?_)
   match k with

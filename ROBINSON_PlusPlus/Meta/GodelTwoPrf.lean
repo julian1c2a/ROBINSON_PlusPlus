@@ -38,7 +38,9 @@ Segundo Teorema.
 
 **Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis: `ConsistentH := ¬ Prf ⊥`**, que es
 la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se
-**descargan aquí**. ⭐ Footprint: los tres de Lean **+ `prf_axiomsCodeT_eq` y nada más**.
+**descargan aquí**. ⭐ Footprint: **sólo los tres de Lean** — el ancla es hoy la hipótesis de clase
+`[AnclaEq]` ([ADR‑026](../../DECISIONS.md)). ⚠️ **El postulado no desapareció: se movió a la FIRMA**, y
+**no hay ninguna `instance : AnclaEq`** en el árbol. Ver `TEOREMAS-E-HIPOTESIS.md` §1.
 
 ## Lo que hizo falta, y es poco porque el espejo `Prf` ya estaba
 
@@ -140,7 +142,7 @@ theorem prf_godelCN_fixedpoint : Prf (godelCN ⇔ neg (provCodeC' godelCN)) :=
 
 /-! ## §3 · `Con' ⇒ G` sobre `Prf` -/
 
-theorem prf_con_imp_godel (G : Formula)
+theorem prf_con_imp_godel [AnclaEq] (G : Formula)
     (fp_bwd : Prf (neg (provCodeC' G) ⇒ G))
     (nec1 : Prf (provCodeC' (G ⇒ neg (provCodeC' G)))) :
     Prf (consistencyFormula' ⇒ G) := by
@@ -176,12 +178,13 @@ es la hipótesis **mínima y honesta**: *el cálculo finitario no demuestra `⊥
 
 ⭐ **Y el footprint lo confirma**: con `ConsistentH` **desaparecen las ω‑reglas** (`dne`, `gen`,
 `imp_intro`) **y los dos esquemas de inducción** (`ax_induction_prim`, `ax_list_induction`) **y el
-ancla `⊢`** (`ax_axiomsCodeT_eq`). Queda **un solo axioma del proyecto**: `prf_axiomsCodeT_eq`.
+ancla `⊢`** (`ax_axiomsCodeT_eq`). Y desde [ADR‑026](../../DECISIONS.md) **ningún axioma del proyecto**:
+el ancla `Prf` es la hipótesis de clase `[AnclaEq]`.
 Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
 
 /-- 🏁 **GÖDEL I sobre el cálculo finitario, con la hipótesis MÍNIMA.** Cuatro líneas: D1 lleva
     `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`. -/
-theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
+theorem goedel_first_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN := by
   intro hG
   have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG
   have h2 : Prf (neg (provCodeC' godelCN)) :=
@@ -190,7 +193,7 @@ theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
 
 /-- 🏁🏁 **GÖDEL II sobre el cálculo finitario**: si el cálculo es consistente, **no demuestra su
     propia consistencia**. **Una sola hipótesis —la mínima— y ninguna suelta.** -/
-theorem goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula' := by
+theorem goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula' := by
   intro hC
   refine goedel_first_prf hcon (prf_mp (prf_con_imp_godel godelCN ?_ ?_) hC)
   · exact prf_and_elim_right prf_godelCN_fixedpoint
@@ -202,10 +205,10 @@ theorem goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula' := b
 resto del árbol todavía habla de `ConsistentOmega`. ⚠️ Pero los enunciados **buenos** son los de
 arriba: éstos suponen **más**. -/
 
-theorem goedel_first_prf_of_omega (hcon : ConsistentOmega) : ¬ Prf godelCN :=
+theorem goedel_first_prf_of_omega [AnclaEq] (hcon : ConsistentOmega) : ¬ Prf godelCN :=
   goedel_first_prf (consistentH_of_omega hcon)
 
-theorem goedel_second_prf_of_omega (hcon : ConsistentOmega) : ¬ Prf consistencyFormula' :=
+theorem goedel_second_prf_of_omega [AnclaEq] (hcon : ConsistentOmega) : ¬ Prf consistencyFormula' :=
   goedel_second_prf (consistentH_of_omega hcon)
 
 end ROBINSON_PlusPlus.Meta.GodelTwoPrf

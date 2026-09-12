@@ -5,7 +5,7 @@
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 61 en `sondeos/`** (experimentos compilados, fuera del build).
-> **5 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
+> **4 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
 >
@@ -191,7 +191,7 @@ Los **31** módulos que la reparación (ADR‑012/013) apartó **han vuelto todo
 sancionado y **sin cambiar ningún enunciado público**. El directorio conserva sólo su `README` como
 registro del episodio. Ver [`cuarentena/README.md`](cuarentena/README.md) y §3.26.
 
-> **5 `axiom` de Lean** (tras F7a): 3 esquemas de inducción (`Full/`), TFA (`Block8.ax_p_tfa`),
+> **4 `axiom` de Lean** (tras F7a y [ADR‑026](DECISIONS.md)): 2 esquemas de inducción (`Full/`), TFA (`Block8.ax_p_tfa`),
 > 2 anclas de codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`), y `d3` (único postulado
 > gödeliano vivo). Inventario en **[`AXIOMS.md`](AXIOMS.md)**. Ninguna es un `sorry` (ADR‑010).
 >

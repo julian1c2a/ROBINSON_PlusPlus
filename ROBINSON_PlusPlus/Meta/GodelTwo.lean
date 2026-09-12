@@ -72,7 +72,7 @@ real** en la cadena, y las piezas no-cerradas quedan **visibles** como hipótesi
     deriva, y todo lo que dependía de `d3` conserva su enunciado con un footprint más pequeño.
 
     La ruta, entera, está en `doc/REFERENCE-Incompleteness.md` §3.55–§3.67. -/
-theorem d3 (φ : Formula) :
+theorem d3 [AnclaEq] (φ : Formula) :
     axioms ⊢ (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   ROBINSON_PlusPlus.Meta.Hilbert.prf_to_derives
     (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real φ)

@@ -145,7 +145,7 @@ def lwfDot (t : Term) : Term := substfc zero (tcFn t) (formCode lwfVar)
     `Prov(⌜TAG_dot t ⇒ ((LENC_dot t ∧ EQ_dot t) ⇒ LWF_dot t)⌝)`
 
     Es la plantilla común a los 21 casos de etiqueta: sólo cambian el axioma‑accesor y `expr_k`. -/
-theorem paso6_backbone (t : Term) :
+theorem paso6_backbone [AnclaEq] (t : Term) :
     Prf (provFromCode
       (implc (tagDot t) (implc (andc (lencDot t) (eqDot t)) (lwfDot t)))) := by
   have h := pcc_thm_inst _ prf_lineWF_eqrefl_bwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
@@ -280,7 +280,7 @@ theorem substtc_inv_termCode_numeralM' (m : Nat) :
   exact h
 
 /-- `pcc_dot_cons` en la dirección simétrica (simetría INTERNA, de `BdAllIntroPrf`). -/
-theorem pcc_dot_cons_symm (h t : Term) :
+theorem pcc_dot_cons_symm [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (tcFn (cons h t)) (consT (tcFn h) (tcFn t)))) :=
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (consT (tcFn h) (tcFn t)) (tcFn (cons h t))
@@ -291,7 +291,7 @@ theorem pcc_dot_cons_symm (h t : Term) :
 
 /-- **El sustituto**: la ecuación `tc` del árbol `eqc`, ahora **DENTRO de `Prov`**.
     Caso binario del KIT con `m = 4`: código → 2 pasos internos anidados → código. -/
-theorem pcc_dot_eqc (a b : Term) :
+theorem pcc_dot_eqc [AnclaEq] (a b : Term) :
     Prf (provFromCode (eqCodeFn (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b)))) := by
   show Prf (provFromCode (eqCodeFn
     (consT (termCode (numeralM 4)) (consT (tcFn a) (consT (tcFn b) (termCode nil))))
@@ -340,7 +340,7 @@ theorem pcc_dot_eqc (a b : Term) :
       (prf_congr_consT (prf_refl _) prf_tc_zero))) (prf_refl _))) h3
 
 /-- La dirección que el consumidor necesita. -/
-theorem pcc_dot_eqc_symm (a b : Term) :
+theorem pcc_dot_eqc_symm [AnclaEq] (a b : Term) :
     Prf (provFromCode (eqCodeFn (tcFn (eqc a b)) (eqcT (tcFn a) (tcFn b)))) :=
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b))
@@ -381,7 +381,7 @@ theorem pcc_congr_eqcT_diag_code_imp (X Y : Term)
 
 /-- **`Prov(TAG_dot t)`**: bajo la cota `1 < lenc t`, la igualdad de etiqueta `nthc t 1 = 12̇`
     produce el código punteado del antecedente de tag, DENTRO de `Prov`. -/
-theorem pcc_tagDot (t : Term) :
+theorem pcc_tagDot [AnclaEq] (t : Term) :
     Prf (lt (succ zero) (lenc t) ⇒
       ((nthc t (succ zero) =eq numeralM 12) ⇒ provFromCode (tagDot t))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 12)
@@ -413,7 +413,7 @@ theorem pcc_tagDot (t : Term) :
     Cadena: `pcc_eval_carc` evalúa `carc(ṫ)` (usando que la línea es un `cons`), `pcc_eval_nthc`
     evalúa `nthc(ṫ,2̇)`, la hipótesis `=eq` reescribe el valor vía `prf_tc_eqc`, y el encaje final
     es la congruencia diagonal `pcc_congr_eqcT_diag_code_imp` + Leibniz interno. -/
-theorem pcc_eqDot (t : Term) :
+theorem pcc_eqDot [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ (lt (numeralM 2) (lenc t) ⇒
       ((carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) ⇒
         provFromCode (eqDot t)))) := by
@@ -534,7 +534,7 @@ theorem prf_lencDot_eq (t : Term) :
     (prf_congr_lencT (prf_substtc_varc0 (tcFn t)))
 
 /-- **`Prov(LENC_dot t)`** a partir de la igualdad de longitud externa `lenc t = 3̇`. -/
-theorem pcc_lencDot (t : Term) :
+theorem pcc_lencDot [AnclaEq] (t : Term) :
     Prf ((lenc t =eq numeralM 3) ⇒ provFromCode (lencDot t)) := by
   refine prf_deduction ?_
   have hev : PrfH [lenc t =eq numeralM 3]
@@ -580,7 +580,7 @@ reflexión punteada del átomo `lineWF` en el caso `eqrefl`. -/
     Bajo la etiqueta `nthc t 1 = 12̇` y la buena‑formación estricta (`lineWF t` + la longitud
     canónica `lenc t = 3̇` + la condición `carc t = eqc (nthc t 2)(nthc t 2)`), la línea refleja su
     código punteado. Las **cotas ya NO son hipótesis**: se derivan de `lenc t = 3̇`. -/
-theorem pcc_lineWF_tracked_eqrefl (t : Term)
+theorem pcc_lineWF_tracked_eqrefl [AnclaEq] (t : Term)
     (hlw : Prf (lineWF t))
     (htag : Prf (nthc t (succ zero) =eq numeralM 12))
     (hlenc : Prf (lenc t =eq numeralM 3))
@@ -614,7 +614,7 @@ estructural. **Ya no hay hipótesis de cota** (el plan A las cerró de raíz). E
     el tag `nthc t 1 = 12̇` (que el `or_elim` de `prf_lineWF_inv` provee en este disyunto), `lineWF t`
     refleja su código punteado. **Sin** hipótesis de cota ni de condición estructural: todo se deriva
     del RHS estricto `(lenc t = 3̇) ∧ EQ`. -/
-theorem pcc_lineWF_tracked_eqrefl_imp (t : Term) :
+theorem pcc_lineWF_tracked_eqrefl_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 12) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 12) [lineWF t] rfl)

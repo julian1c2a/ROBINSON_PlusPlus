@@ -222,7 +222,7 @@ theorem prf_hasWit_dotN (t : Term) : ∀ T : CTree, Prf (hasWit (T.dotN t))
     En el caso binario hacen falta **dos** congruencias encadenadas (una por argumento), donde antes
     bastaba una `prf_congr_binT` simultánea: dentro de `Prov` los argumentos se reescriben de uno en
     uno. -/
-theorem pcc_tc_objAt (t : Term) :
+theorem pcc_tc_objAt [AnclaEq] (t : Term) :
     ∀ T : CTree, Prf (provFromCode (eqc (tcFn (T.objAt t)) (T.dotV t)))
   | .leaf _ => prf_provFromCode_eqCodeFn_refl _
   | .nul m => pcc_dot_nul_symm m
@@ -266,7 +266,7 @@ Nodos: las congruencias internas del kit, encadenadas por transitividad interna.
 
     ⚠️ La cota se escribe `Nat.le … n` y **no** `… ≤ n`: con `Minimal.Axioms` abierto, `≤` resuelve
     al orden OBJETO (sobre `Term`), no al de `Nat`, y el error que produce es opaco. -/
-theorem PrfH_dotVN {Γ : List Formula} (t : Term) {n : Nat}
+theorem PrfH_dotVN [AnclaEq] {Γ : List Formula} (t : Term) {n : Nat}
     (hlenc : PrfH Γ (lenc t =eq numeralM n)) (T : CTree) :
     Nat.le (CTree.maxLeaf T) n →
       PrfH Γ (provFromCode (eqc (CTree.dotV t T) (CTree.dotN t T))) := by
@@ -339,7 +339,7 @@ theorem prf_condD_of_tree_eq (T : CTree) (t : Term) :
 
 /-- **REFLECTOR GENÉRICO** de una condición‑árbol: exactamente la hipótesis `hcond` que pide
     `pcc_lineWF_tracked_of_schema`. Con esto, cada tag estructural se reduce a declarar su árbol. -/
-theorem pcc_condD_of_tree (T : CTree) (t : Term) {n : Nat} (hmax : Nat.le (CTree.maxLeaf T) n) :
+theorem pcc_condD_of_tree [AnclaEq] (T : CTree) (t : Term) {n : Nat} (hmax : Nat.le (CTree.maxLeaf T) n) :
     Prf (lineWF t ⇒ ((lenc t =eq numeralM n) ⇒
       (substFormula 0 t (condOf T) ⇒ provFromCode (condD (condOf T) t)))) := by
   rw [substFormula_condOf_at]
@@ -377,7 +377,7 @@ theorem pcc_condD_of_tree (T : CTree) (t : Term) {n : Nat} (hmax : Nat.le (CTree
 
 /-- **CIERRE DE UN TAG ESTRUCTURAL**, todo junto. Instanciar esto con el árbol del tag es lo único
     que queda por hacer para cada uno de los esquemas con RHS ecuacional. -/
-theorem pcc_lineWF_tracked_of_tree {k n : Nat} (T : CTree) (t : Term)
+theorem pcc_lineWF_tracked_of_tree [AnclaEq] {k n : Nat} (T : CTree) (t : Term)
     (hax : Prf (Formula.forall (Formula.impl (tagF k)
       (lwfVar ⇔ Formula.and (lencF n) (condOf T)))))
     (hmax : Nat.le (CTree.maxLeaf T) n) (h1n : 1 < n) :

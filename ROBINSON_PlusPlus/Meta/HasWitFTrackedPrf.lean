@@ -67,7 +67,7 @@ example (X : Term) (k : Nat) : formCode (shapeNul X k) = shapeFCnul (termCode X)
 example (X : Term) (k : Nat) : (treeNul1 k).dotN X = nulT k := rfl
 
 /-- La forma NULARIA, reflejada a su código `formCode`. -/
-theorem pcc_shapeNul_fc (X : Term) (k : Nat) :
+theorem pcc_shapeNul_fc [AnclaEq] (X : Term) (k : Nat) :
     Prf (shapeNul X k ⇒ provFromCode (shapeFCnul (tcFn X) k)) :=
   pcc_shape_tree X (treeNul1 k) (Nat.zero_le 1) _
     (prf_deduction (prfH_hyp_self _))
@@ -148,7 +148,7 @@ con la misma forma: reflejar el átomo con `pcc_In_atom_tracked` y transportar
 `(nthc X ȷ̇)˙ → nthcT ND ȷ̄`, que es `pcc_eval_nthc` **y por eso pide la cota** `ȷ̇ < lenc X`.
 La cota sale, en cada cláusula, de su propia forma posicional. -/
 
-theorem PrfH_clIn {Γ : List Formula} (X ND w : Term) (j : Nat)
+theorem PrfH_clIn [AnclaEq] {Γ : List Formula} (X ND w : Term) (j : Nat)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hND : PrfH Γ (provFromCode (eqCodeFn ND (tcFn X))))
     (hlt : PrfH Γ (lt (numeralM j) (lenc X)))
@@ -210,7 +210,7 @@ theorem prf_or_imp_of (E φ ψ : Formula) (Ac Bc : Term)
 example (wT X : Term) : clEq wT X = clBin wT X 4 := rfl
 
 /-- `clBot`: sólo la forma nularia, y ningún `In` que transportar. -/
-theorem pcc_clBot_fc (X ND : Term)
+theorem pcc_clBot_fc [AnclaEq] (X ND : Term)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hwND : Prf (hasWit ND) := by hw_auto) :
     Prf (provFromCode (eqCodeFn ND (tcFn X)) ⇒ (clBot X ⇒ provFromCode (clBotFC ND))) := by
@@ -227,7 +227,7 @@ theorem pcc_clBot_fc (X ND : Term)
 
 /-- `clUn` (tags 6 y 9): forma unaria + **un** `In`. La cota `1̇ < lenc X` sale de la propia
     forma (`lenc X = 2̇`). -/
-theorem pcc_clUn_fc (w X ND : Term) (k : Nat)
+theorem pcc_clUn_fc [AnclaEq] (w X ND : Term) (k : Nat)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hwND : Prf (hasWit ND) := by hw_auto) :
     Prf (provFromCode (eqCodeFn ND (tcFn X)) ⇒
@@ -263,7 +263,7 @@ theorem pcc_clUn_fc (w X ND : Term) (k : Nat)
 
 /-- `clBin` (tags 5/7/8) **y `clEq`** (tag 4): forma binaria + **dos** `In`. Las dos cotas
     (`1̇` y `2̇`) las domina la longitud que da la forma (`lenc X = 3̇`). -/
-theorem pcc_clBin_fc (w X ND : Term) (k : Nat)
+theorem pcc_clBin_fc [AnclaEq] (w X ND : Term) (k : Nat)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hwND : Prf (hasWit ND) := by hw_auto) :
     Prf (provFromCode (eqCodeFn ND (tcFn X)) ⇒
@@ -307,7 +307,7 @@ theorem pcc_clBin_fc (w X ND : Term) (k : Nat)
 
 /-- `clAtom` (tag 3): forma binaria + el `∀` acotado **anidado** de `argsIn`. Es literalmente
     la rama binaria de `pcc_isTermCodeE1_trackedC` con el tag 3 en vez del 1. -/
-theorem pcc_clAtom_fc (wT X ND : Term)
+theorem pcc_clAtom_fc [AnclaEq] (wT X ND : Term)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hNDlift : Prf (liftc zero ND =eq ND))
     (hwND : Prf (hasWit ND) := by hw_auto) :
@@ -373,7 +373,7 @@ theorem pcc_clAtom_fc (wT X ND : Term)
 
 /-- ⭐⭐ **EL RECORRIDO DE LAS OCHO CLÁUSULAS**, con `wF`, `wT` y `X` abstractos y el nodo como
     código `ND`. Siete `prf_or_imp_of` y cuatro lemas de cláusula. -/
-theorem pcc_isFormCodeE2_trackedC (wF wT X ND : Term)
+theorem pcc_isFormCodeE2_trackedC [AnclaEq] (wF wT X ND : Term)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hNDlift : Prf (liftc zero ND =eq ND))
     (hwND : Prf (hasWit ND) := by hw_auto) :
@@ -571,7 +571,7 @@ theorem prf_wfAllFPsi_id (p : Term) :
 
 /-! ### `hbody`, y el `pcc_bdAll_intro` de `wfAllF` -/
 
-theorem prf_wfAllF_body (q i : Term) :
+theorem prf_wfAllF_body [AnclaEq] (q i : Term) :
     Prf (wfAllFPair q ⇒ (lt i (lenc (carc q)) ⇒
       provFromCode (substfc zero (tcFn i) (wfAllFPsi q)))) := by
   refine prf_deduction (deduction_aux ?_ (lt i (lenc (carc q))) [wfAllFPair q] rfl)
@@ -609,7 +609,7 @@ theorem prf_wfAllF_body (q i : Term) :
     (prf_substfc_wfAllFPsi q (tcFn i) (tcFn i) (prf_liftc_tcFn i)))) _) hC
 
 /-- ⭐⭐ **`wfAllF` REFLEJADO**, con los dos testigos abstractos (empaquetados). -/
-theorem pcc_wfAllF_pair_tracked (p : Term) :
+theorem pcc_wfAllF_pair_tracked [AnclaEq] (p : Term) :
     Prf (wfAllFPair p ⇒
       provFromCode (bdAllCode (tcFn (lenc (carc p))) (wfAllFPsi p))) :=
   pcc_bdAll_intro wfAllFPair (fun q => lenc (carc q)) wfAllFPsi p
@@ -763,7 +763,7 @@ theorem hPinv_wfAllFPsiC (wF wT : Term) : ∀ u : Term,
       (prf_substfc_clUnFC_at 1 u _ _ _ _ 9 hnode hWF1))
 
 /-- ⭐⭐ **`wfAllF` REFLEJADO, con los dos testigos SEPARADOS y la cota ya DOTADA.** -/
-theorem pcc_wfAllF_trackedC (wF wT : Term) :
+theorem pcc_wfAllF_trackedC [AnclaEq] (wF wT : Term) :
     Prf (wfAllF wF wT ⇒ provFromCode (wfAllFDotC (tcFn wF) (tcFn wT))) := by
   refine prf_deduction ?_
   have h0 : PrfH [wfAllF wF wT]
@@ -856,7 +856,7 @@ theorem liftTerm_hasWitFAcT (c : Nat) (UF T I : Term) :
 /-- ⭐ **`isFC1` reflejado**, con los tres argumentos abstractos. Es una conjunción de tres, y
     las tres mitades ya estaban: §7 (`pcc_wfAllF_trackedC`), C3‑T (`pcc_wfAll1_trackedC`) y el
     kit genérico (`pcc_In_atom_tracked`). -/
-theorem pcc_isFC1_trackedC (wF wT c : Term) :
+theorem pcc_isFC1_trackedC [AnclaEq] (wF wT c : Term) :
     Prf (isFC1 wF wT c ⇒ provFromCode (isFC1DotC (tcFn wF) (tcFn wT) (tcFn c))) := by
   refine prf_deduction ?_
   have h : PrfH [isFC1 wF wT c] (isFC1 wF wT c) := prfH_hyp_self _
@@ -986,7 +986,7 @@ theorem prf_substfc_hasWitFAcT_wT (T I UF UT : Term)
 /-- ⭐⭐ **EL CUERPO, REFLEJADO Y CERRADO POR EL `∃∃`.** Los dos `pcc_exIntro_code_open` se
     encadenan por `prf_substfc_ex`, que es lo que convierte el `substfc` de nivel 0 sobre el
     `exc` en un `exc` del `substfc` de nivel 1. -/
-theorem pcc_isFC1_exc_body (t : Term) (i : Nat) :
+theorem pcc_isFC1_exc_body [AnclaEq] (t : Term) (i : Nat) :
     Prf (isFC1 (.var 1) (.var 0) (nthc t (numeralM i)) ⇒
       (lt (numeralM i) (lenc t) ⇒
         provFromCode (exc (exc (hasWitFAc (tcFn t) (termCode (numeralM i))))))) := by
@@ -1070,7 +1070,7 @@ theorem pcc_isFC1_exc_body (t : Term) (i : Nat) :
 
 /-- ⭐⭐⭐ **`hasWitF` REFLEJADO**, con `t` abstracto: el `∃∃` objeto eliminado con dos
     `prf_ex_elim_imp`, módulo la cota `ı̇ < lenc t` que `Hcond` ya trae. -/
-theorem pcc_hasWitF_exc (t : Term) (i : Nat) :
+theorem pcc_hasWitF_exc [AnclaEq] (t : Term) (i : Nat) :
     Prf (hasWitF (nthc t (numeralM i)) ⇒
       (lt (numeralM i) (lenc t) ⇒
         provFromCode (exc (exc (hasWitFAc (tcFn t) (termCode (numeralM i))))))) := by
@@ -1133,7 +1133,7 @@ theorem prf_condD_hasWitF_eq (t : Term) (i : Nat) :
 
     La cota `i < n` es la misma de C3‑T y por la misma razón: el transporte
     `(nthc t ı̇)˙ → nthcT ṫ ı̄` es `pcc_eval_nthc`, y sin ella ese paso no existe. -/
-theorem pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n) :
+theorem pcc_hGuardF [AnclaEq] (i n : Nat) (t : Term) (hin : i < n) :
     ROBINSON_PlusPlus.Meta.LineWFGuardPrf.DEUDA_hGuardF i n t := by
   show Prf (lineWF t ⇒ ((lenc t =eq numeralM n) ⇒
     (substFormula 0 t (hasWitF (nthc (.var 0) (numeralM i))) ⇒
@@ -1166,7 +1166,7 @@ theorem pcc_hGuardF (i n : Nat) (t : Term) (hin : i < n) :
     **dos** obligaciones que ADR‑020 dejó abiertas; ya no pide ninguna. Lo único que se añade
     es que los índices de casilla caigan bajo la longitud canónica — cosa que cumplen las
     **once** casillas reales, y que la cota de `pcc_eval_nthc` hace inevitable. -/
-theorem hGuard_of_slots (t : Term) (n : Nat) (C : Formula)
+theorem hGuard_of_slots [AnclaEq] (t : Term) (n : Nat) (C : Formula)
     (hC : ROBINSON_PlusPlus.Meta.LineWFGuardPrf.Hcond n t C)
     (gs : List ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot)
     (hgsT : ∀ i, List.Mem (ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot.wit i) gs → i < n)

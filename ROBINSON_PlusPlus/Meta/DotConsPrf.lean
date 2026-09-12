@@ -159,7 +159,7 @@ theorem prf_substtc_cpOfT (W X Y : Term) :
     exact prf_congr_mulcT (prf_substtc_two W)
       (prf_eq_trans (prf_substtc_succcT zero W Y) (prf_refl _))
 
-theorem pcc_axL0_inst (w₁ w₂ : Term)
+theorem pcc_axL0_inst [AnclaEq] (w₁ w₂ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
       (formCode (cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0))))))) :=
@@ -175,7 +175,7 @@ theorem prf_axL0_body_computes (W1 : Term) :
   prf_substfc_arith_open 1 W1 (cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0)))
 
 /-- **FASE A** — `⊢ Prov(⌜ cons(ḣ,ṫ) = div2(cpOfT ḣ ṫ) ⌝)`. -/
-theorem pcc_axL0_computed (h t : Term) :
+theorem pcc_axL0_computed [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (consT (tcFn h) (tcFn t))
       (div2cT (cpOfT (tcFn h) (tcFn t))))) := by
   let W1 : Term := liftc zero (tcFn h)
@@ -288,7 +288,7 @@ testigo `(cons h t)˙`. El puente con el polinomio es `prf_cons_double`, que es 
 se dota con `prf_congr_tcFn` — gratis, a nivel de código. -/
 
 /-- **FASE C** — `⊢ Prov(⌜ div2((cpOf h t)˙) = (cons h t)˙ ⌝)`. -/
-theorem pcc_div2_cons (h t : Term) :
+theorem pcc_div2_cons [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqc (div2cT (tcFn (cpOf h t))) (tcFn (cons h t)))) := by
   have hdiv : Prf (provFromCode (substfc zero (tcFn (cons h t))
       (formCode (div2 (mul (.var 0) two) =eq (.var 0))))) :=
@@ -321,7 +321,7 @@ theorem pcc_div2_cons (h t : Term) :
 
 /-- **`pcc_dot_cons`** — cuarto peldaño de la escalera (a.2):
     `⊢ Prov(⌜ cons(ḣ, ṫ) = (cons h t)˙ ⌝)`, para `h`, `t` **arbitrarios**. -/
-theorem pcc_dot_cons (h t : Term) :
+theorem pcc_dot_cons [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqc (consT (tcFn h) (tcFn t)) (tcFn (cons h t)))) := by
   have hL : ∀ W, Prf (substtc zero W (consT (tcFn h) (tcFn t)) =eq consT (tcFn h) (tcFn t)) :=
     substtc_inv_consT (substtc_inv_tcFn h) (substtc_inv_tcFn t)

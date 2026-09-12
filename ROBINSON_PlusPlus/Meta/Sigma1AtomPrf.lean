@@ -98,7 +98,7 @@ theorem prf_provCodeC'_eq_of_tracked {t u tc uc : Term}
 /-- **Reflexividad rastreada** (versión débil, con puente): se obtiene de la reflexión de `t =eq t`
     (teorema, `repr_pos'_prf (prf_refl t)`) transportada por `tc =eq termCode t`.
     **Superada** por `prf_provFromCode_eqCodeFn_refl` (libre de muro), que no necesita el puente. -/
-theorem prf_provFromCode_eqCodeFn_refl_of_tracked {t tc : Term}
+theorem prf_provFromCode_eqCodeFn_refl_of_tracked [AnclaEq] {t tc : Term}
     (ht : Prf (tc =eq termCode t)) :
     Prf (provFromCode (eqCodeFn tc tc)) := by
   -- `provCodeC'(t =eq t) = provFromCode (eqCodeFn (termCode t) (termCode t))` (rfl), reflexividad

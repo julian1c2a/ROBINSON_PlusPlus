@@ -287,7 +287,7 @@ posicional de cualquier frente. -/
     `S` es la hipótesis de la que se saca la forma (típicamente `shapeUn X k` o `shapeBin X k`);
     `hsh` dice que `S` da la ecuación posicional y `hlen` su longitud, que es lo que
     `PrfH_dotVN` necesita para acotar los índices de las hojas. -/
-theorem pcc_shape_tree (X : Term) (T : CTree) {n : Nat} (hmax : Nat.le (CTree.maxLeaf T) n)
+theorem pcc_shape_tree [AnclaEq] (X : Term) (T : CTree) {n : Nat} (hmax : Nat.le (CTree.maxLeaf T) n)
     (S : Formula) (hsh : Prf (S ⇒ (X =eq T.objAt X)))
     (hlen : Prf (S ⇒ (lenc X =eq numeralM n))) :
     Prf (S ⇒ provFromCode (eqCodeFn (tcFn X) (T.dotN X))) := by
@@ -343,7 +343,7 @@ theorem liftTerm_bdInDot (c : Nat) (x w : Term) :
     cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
 
 /-- **A1** (copia literal de `sondeos/InTracked.lean`). -/
-theorem pcc_boundedIn_tracked (x w : Term) :
+theorem pcc_boundedIn_tracked [AnclaEq] (x w : Term) :
     Prf (boundedIn x w ⇒ provFromCode (bdInDot x w)) := by
   refine prf_deduction ?_
   have hex : PrfH [boundedIn x w] (boundedIn x w) := prfH_hyp_self _
@@ -410,7 +410,7 @@ theorem prf_substtc_varc0_at1 (V : Term) :
   prf_mp (prf_substtc_var_lt (succ zero) V (numeral 0)) (prf_gnum_lt (by omega : 0 < 1))
 
 /-- **EL PUENTE**: `⊢ Prov(⌜ (∃i<lenc(ẇ). nthc(ẇ,i)=ẋ) ⇒ ẋ ∈ ẇ ⌝)`, `x`, `w` ABSTRACTOS. -/
-theorem pcc_InBwd_computed (x w : Term) :
+theorem pcc_InBwd_computed [AnclaEq] (x w : Term) :
     Prf (provFromCode (implc (bdInDot x w) (inFormCodeFn (tcFn x) (tcFn w)))) := by
   let A : Term := tcFn x
   let B : Term := tcFn w
@@ -474,7 +474,7 @@ theorem pcc_InBwd_computed (x w : Term) :
   exact prf_mp (prf_provCode_congr hout) h1
 
 /-- **Reflexión del `In` como ÁTOMO**, con `x` y `w` ABSTRACTOS. -/
-theorem pcc_In_atom_tracked (x w : Term) :
+theorem pcc_In_atom_tracked [AnclaEq] (x w : Term) :
     Prf (In x w ⇒ provFromCode (inFormCodeFn (tcFn x) (tcFn w))) := by
   refine prf_deduction ?_
   have hbd : PrfH [In x w] (boundedIn x w) :=
@@ -489,7 +489,7 @@ theorem PrfH_congr_cdrcT {Γ : List Formula} {x y : Term} (h : PrfH Γ (x =eq y)
   unfold cdrcT funcc
   exact PrfH_congr_cons_tail (PrfH_congr_cons_tail (PrfH_congr_cons_head (PrfH_congr_cons_head h)))
 
-theorem pcc_carcD_bridge_cons (X : Term) :
+theorem pcc_carcD_bridge_cons [AnclaEq] (X : Term) :
     Prf (consOk X ⇒ provFromCode (eqCodeFn (carcT (tcFn X)) (tcFn (carc X)))) := by
   refine prf_deduction ?_
   have hcons := prfH_hyp_self (consOk X)
@@ -498,7 +498,7 @@ theorem pcc_carcD_bridge_cons (X : Term) :
       (prf_to_prfH (prf_refl _) _))
     (prf_to_prfH (pcc_eval_carc (carc X) (cdrc X)) _)
 
-theorem pcc_cdrcD_bridge_cons (X : Term) :
+theorem pcc_cdrcD_bridge_cons [AnclaEq] (X : Term) :
     Prf (consOk X ⇒ provFromCode (eqCodeFn (cdrcT (tcFn X)) (tcFn (cdrc X)))) := by
   refine prf_deduction ?_
   have hcons := prfH_hyp_self (consOk X)
@@ -527,7 +527,7 @@ theorem PrfH_in_transport {Γ : List Formula} (u v W : Term)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp v)) _) h2
 
 /-- Los dos `=eq` de forma: tag y longitud, ya en forma COMPUTADA (`carcT Ẋ`, `lencT Ẋ`). -/
-theorem pcc_shape_tracked (X : Term) (k n : Nat) :
+theorem pcc_shape_tracked [AnclaEq] (X : Term) (k n : Nat) :
     Prf (consOk X ⇒ (land (Formula.eq (carc X) (numeralM k)) (Formula.eq (lenc X) (numeralM n))
       ⇒ provFromCode (shapeDot (tcFn X) k n))) := by
   refine prf_deduction (deduction_aux ?_
@@ -569,7 +569,7 @@ theorem pcc_shape_tracked (X : Term) (k n : Nat) :
     🔑 Y es la pieza que muestra que **el anidamiento del `∀` acotado NO es un muro**: las dos
     aplicaciones de `pcc_bdAll_intro` son a nivel **META** (`∀ Y i` en Lean), así que el `∀`
     anidado lo está en la fórmula OBJETO, no bajo un binder de Lean. -/
-theorem pcc_child_tracked_at (q Y i : Term) :
+theorem pcc_child_tracked_at [AnclaEq] (q Y i : Term) :
     Prf (lt i (lenc Y) ⇒ (In (nthc Y i) q ⇒
       provFromCode (inFormCodeFn (nthcT (tcFn Y) (tcFn i)) (tcFn q)))) := by
   refine prf_deduction (deduction_aux ?_ (In (nthc Y i) q) [lt i (lenc Y)] rfl)
@@ -587,7 +587,7 @@ theorem pcc_child_tracked_at (q Y i : Term) :
   exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hevS hat
 
 /-- La pertenencia de un HIJO en la casilla `j`, en forma COMPUTADA (`nthcT Ẋ ȷ̇`). -/
-theorem pcc_child_tracked (q X : Term) (j n : Nat) (hjn : j < n) :
+theorem pcc_child_tracked [AnclaEq] (q X : Term) (j n : Nat) (hjn : j < n) :
     Prf (Formula.eq (lenc X) (numeralM n) ⇒ (In (nthc X (numeralM j)) q ⇒
       provFromCode (inFormCodeFn (nthcT (tcFn X) (tcFn (numeralM j))) (tcFn q)))) := by
   refine prf_deduction (deduction_aux ?_ (In (nthc X (numeralM j)) q)
@@ -610,7 +610,7 @@ theorem pcc_child_tracked (q X : Term) (j n : Nat) (hjn : j < n) :
     PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (nthc X (numeralM j)) q) _) hin
   exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hevS hat
 
-theorem pcc_carcIn_tracked (q X : Term) :
+theorem pcc_carcIn_tracked [AnclaEq] (q X : Term) :
     Prf (consOk X ⇒ (In (carc X) q ⇒
       provFromCode (inFormCodeFn (carcT (tcFn X)) (tcFn q)))) := by
   refine prf_deduction (deduction_aux ?_ (In (carc X) q) [consOk X] rfl)
@@ -624,7 +624,7 @@ theorem pcc_carcIn_tracked (q X : Term) :
     PrfH.mp _ _ _ (prf_to_prfH (pcc_In_atom_tracked (carc X) q) _) hin
   exact PrfH_in_transport _ _ _ (substtc_inv_tcFn q) hbrS hat
 
-theorem pcc_cdrcIn_tracked (q X : Term) :
+theorem pcc_cdrcIn_tracked [AnclaEq] (q X : Term) :
     Prf (consOk X ⇒ (In (cdrc X) q ⇒
       provFromCode (inFormCodeFn (cdrcT (tcFn X)) (tcFn q)))) := by
   refine prf_deduction (deduction_aux ?_ (In (cdrc X) q) [consOk X] rfl)

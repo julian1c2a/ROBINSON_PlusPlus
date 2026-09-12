@@ -80,11 +80,11 @@ def evalMulCode (a b : Term) : Term :=
 
 /-! ### Instancias codificadas de `ax8` y `ax9` -/
 
-theorem pcc_ax8_inst (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
+theorem pcc_ax8_inst [AnclaEq] (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode (mul (.var 0) zero =eq zero)))) :=
   pcc_axiom_inst _ (show ax8_mul_zero ∈ axioms by simp [axioms]) w hw
 
-theorem pcc_ax9_inst (w₁ w₂ : Term)
+theorem pcc_ax9_inst [AnclaEq] (w₁ w₂ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
       (formCode (mul (.var 1) (succ (.var 0)) =eq add (mul (.var 1) (.var 0)) (.var 1)))))) :=
@@ -92,14 +92,14 @@ theorem pcc_ax9_inst (w₁ w₂ : Term)
 
 /-! ### BASE: `b = 0` -/
 
-theorem pcc_ax8_computed (a : Term) :
+theorem pcc_ax8_computed [AnclaEq] (a : Term) :
     Prf (provFromCode (eqCodeFn (mulcT (tcFn a) (termCode zero)) (termCode zero))) :=
   prf_mp
     (prf_provCode_congr
       (prf_substfc_arith_open 0 (tcFn a) (mul (.var 0) zero =eq zero)))
     (pcc_ax8_inst (tcFn a) (prf_hasWit_tcFn (liftTerm 0 a)))
 
-theorem pcc_eval_mul_zero (a : Term) : Prf (provFromCode (evalMulCode a zero)) := by
+theorem pcc_eval_mul_zero [AnclaEq] (a : Term) : Prf (provFromCode (evalMulCode a zero)) := by
   have hz : Prf (termCode zero =eq tcFn zero) := prf_eq_symm prf_tc_zero
   have ha : Prf (termCode zero =eq tcFn (mul a zero)) :=
     prf_eq_symm (prf_eq_trans (prf_congr_tcFn (prf_mul_zero a)) prf_tc_zero)
@@ -110,7 +110,7 @@ theorem pcc_eval_mul_zero (a : Term) : Prf (provFromCode (evalMulCode a zero)) :
 
 /-! ### La instancia de `ax9`, computada -/
 
-theorem pcc_ax9_computed (a b : Term) :
+theorem pcc_ax9_computed [AnclaEq] (a b : Term) :
     Prf (provFromCode
       (eqCodeFn (mulcT (tcFn a) (succcT (tcFn b)))
                 (addcT (mulcT (tcFn a) (tcFn b)) (tcFn a)))) := by
@@ -205,7 +205,7 @@ theorem pcc_eq_subst2_code_imp (X Z W : Term) (hX : ∀ V, Prf (substtc zero V X
 
 /-! ### PASO INDUCTIVO de `·` -/
 
-theorem pcc_eval_mul_succ_imp (a b : Term) :
+theorem pcc_eval_mul_succ_imp [AnclaEq] (a b : Term) :
     Prf (provFromCode (evalMulCode a b) ⇒ provFromCode (evalMulCode a (succ b))) := by
   have hinvA : ∀ W, Prf (substtc zero W (tcFn a) =eq tcFn a) := substtc_inv_tcFn a
   have hinvMB : ∀ W, Prf (substtc zero W (mulcT (tcFn a) (tcFn b)) =eq mulcT (tcFn a) (tcFn b)) :=
@@ -281,7 +281,7 @@ theorem step_evalMulPred (a : Term) :
   simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
 
 /-- **EVALUACIÓN PROVABLE DE `·` (∀ object)**. -/
-theorem prf_eval_mul_all (a : Term) : Prf (Formula.forall (evalMulPred a)) := by
+theorem prf_eval_mul_all [AnclaEq] (a : Term) : Prf (Formula.forall (evalMulPred a)) := by
   refine prf_nat_induction (evalMulPred a) ?base ?step
   · rw [substFormula_evalMulPred]
     exact pcc_eval_mul_zero a
@@ -293,7 +293,7 @@ theorem prf_eval_mul_all (a : Term) : Prf (Formula.forall (evalMulPred a)) := by
     exact pcc_eval_mul_succ_imp (liftTerm 0 a) (.var 0)
 
 /-- **`pcc_eval_mul`** — `⊢ Prov(⌜ȧ · ḃ = (a·b)˙⌝)` para `a`, `b` arbitrarios. -/
-theorem pcc_eval_mul (a b : Term) : Prf (provFromCode (evalMulCode a b)) := by
+theorem pcc_eval_mul [AnclaEq] (a b : Term) : Prf (provFromCode (evalMulCode a b)) := by
   have h := prf_spec (prf_eval_mul_all a) b
   rwa [substFormula_evalMulPred] at h
 

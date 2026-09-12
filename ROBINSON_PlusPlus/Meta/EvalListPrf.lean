@@ -132,7 +132,7 @@ igualdad interna. Las hipótesis sobre `F` (distribuye sobre `substtc`, es congr
 /-- **Molde de repatriación.** De `⊢ Prov(⌜F (cons(ḣ,ṫ)) = R⌝)` sale `⊢ Prov(⌜F ((cons h t)˙) = R⌝)`.
 
     Sustituye al viejo transporte por `prf_tc_cons'`, que era **de código**; éste es **interno**. -/
-theorem pcc_rw_dot_cons_un (F : Term → Term)
+theorem pcc_rw_dot_cons_un [AnclaEq] (F : Term → Term)
     (hFs : ∀ v W x : Term, Prf (substtc v W (F x) =eq F (substtc v W x)))
     (hFc : ∀ x y : Term, Prf (x =eq y) → Prf (F x =eq F y))
     (R : Term) (hR : ∀ W : Term, Prf (substtc zero W R =eq R))
@@ -159,7 +159,7 @@ usando (A) `prf_substtc_tcFn` para que los `tcFn` incrustados sobrevivan), y tra
 `consT ḣ ṫ ↦ (cons h t)˙` con **`pcc_rw_dot_cons_un`** (que es `pcc_dot_cons` por dentro). -/
 
 /-- Instancia codificada de `ax_carc`, ya computada: `⊢ Prov(⌜carc (cons h t)˙ = ḣ⌝)`. -/
-theorem pcc_eval_carc (h t : Term) :
+theorem pcc_eval_carc [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (carcT (tcFn (cons h t))) (tcFn h))) := by
   let W1 : Term := liftc zero (tcFn h)
   let W2 : Term := tcFn t
@@ -196,7 +196,7 @@ theorem pcc_eval_carc (h t : Term) :
     (prf_hasWit_carcT (prf_hasWit_varc (numeral 0))) (prf_hasWit_tcFn h)
 
 /-- Instancia codificada de `ax_cdrc`, ya computada: `⊢ Prov(⌜cdrc (cons h t)˙ = ṫ⌝)`. -/
-theorem pcc_eval_cdrc (h t : Term) :
+theorem pcc_eval_cdrc [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (cdrcT (tcFn (cons h t))) (tcFn t))) := by
   let W1 : Term := liftc zero (tcFn h)
   let W2 : Term := tcFn t
@@ -237,7 +237,7 @@ def evalLencCode (L : Term) : Term := eqCodeFn (lencT (tcFn L)) (tcFn (lenc L))
 /-- **BASE**: `⊢ Prov(⌜lenc 0̇ = (lenc nil)˙⌝)`.
     `ax_lenc_nil` es una **sentencia cerrada**: su código demostrable sale directo de D1
     (`repr_pos'_prf`), y sólo hay que transportar `⌜nil⌝ ↦ 0̇` y `0̇ ↦ (lenc nil)˙`. -/
-theorem pcc_eval_lenc_nil : Prf (provFromCode (evalLencCode nil)) := by
+theorem pcc_eval_lenc_nil [AnclaEq] : Prf (provFromCode (evalLencCode nil)) := by
   have h0 : Prf (provFromCode (formCode (lenc nil =eq zero))) :=
     repr_pos'_prf (prf_ax (show ax_lenc_nil ∈ axioms by simp [axioms]))
   -- `formCode (lenc nil =eq zero) = eqCodeFn (lencT (termCode nil)) (termCode zero)`  (rfl)
@@ -250,7 +250,7 @@ theorem pcc_eval_lenc_nil : Prf (provFromCode (evalLencCode nil)) := by
 
 /-- Instancia codificada de `ax_lenc_cons`, ya computada:
     `⊢ Prov(⌜lenc (cons h t)˙ = σ (lenc ṫ)⌝)`. -/
-theorem pcc_ax_lenc_cons_computed (h t : Term) :
+theorem pcc_ax_lenc_cons_computed [AnclaEq] (h t : Term) :
     Prf (provFromCode
       (eqCodeFn (lencT (tcFn (cons h t))) (succcT (lencT (tcFn t))))) := by
   let W1 : Term := liftc zero (tcFn h)
@@ -297,7 +297,7 @@ theorem pcc_ax_lenc_cons_computed (h t : Term) :
 
 /-- **PASO INDUCTIVO** de `lenc`, en forma implicación (lo que pide `prf_list_induction`):
     `⊢ Prov(⌜lenc ṫ = (lenc t)˙⌝) ⇒ Prov(⌜lenc (cons h t)˙ = (lenc (cons h t))˙⌝)`. -/
-theorem pcc_eval_lenc_cons_imp (h t : Term) :
+theorem pcc_eval_lenc_cons_imp [AnclaEq] (h t : Term) :
     Prf (provFromCode (evalLencCode t) ⇒ provFromCode (evalLencCode (cons h t))) := by
   have hinvT : ∀ W, Prf (substtc zero W (lencT (tcFn t)) =eq lencT (tcFn t)) :=
     substtc_inv_lencT (substtc_inv_tcFn t)
@@ -350,7 +350,7 @@ theorem substFormula_evalLencPred (L : Term) :
 /-- **EVALUACIÓN PROVABLE DE `lenc` (∀ object)**: `⊢ ∀L. Prov(⌜lenc L̇ = (lenc L)˙⌝)`.
     Inducción **de listas** (`prf_list_induction`): base `pcc_eval_lenc_nil`, paso
     `pcc_eval_lenc_cons_imp`. -/
-theorem prf_eval_lenc_all : Prf (Formula.forall evalLencPred) := by
+theorem prf_eval_lenc_all [AnclaEq] : Prf (Formula.forall evalLencPred) := by
   refine prf_list_induction evalLencPred ?base ?step
   · rw [substFormula_evalLencPred]
     exact pcc_eval_lenc_nil
@@ -369,7 +369,7 @@ theorem prf_eval_lenc_all : Prf (Formula.forall evalLencPred) := by
     exact pcc_eval_lenc_cons_imp (.var 1) (.var 0)
 
 /-- **EVALUACIÓN PROVABLE DE `lenc`**: `⊢ Prov(⌜lenc L̇ = (lenc L)˙⌝)` para `L` **arbitrario**. -/
-theorem pcc_eval_lenc (L : Term) : Prf (provFromCode (evalLencCode L)) := by
+theorem pcc_eval_lenc [AnclaEq] (L : Term) : Prf (provFromCode (evalLencCode L)) := by
   have h := prf_spec prf_eval_lenc_all L
   rwa [substFormula_evalLencPred] at h
 

@@ -47,17 +47,17 @@ theorem PrfH_pcc_mp {Γ : List Formula} {A B : Formula}
   PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (prf_to_prfH (d2_prf A B) Γ) h1) h2
 
 /-- Toda demostración de Hilbert se internaliza (`repr_pos'_prf` = D1), en `PrfH`. -/
-theorem PrfH_pcc_prf {Γ : List Formula} {φ : Formula} (h : Prf φ) : PrfH Γ (provCodeC' φ) :=
+theorem PrfH_pcc_prf [AnclaEq] {Γ : List Formula} {φ : Formula} (h : Prf φ) : PrfH Γ (provCodeC' φ) :=
   prf_to_prfH (repr_pos'_prf h) Γ
 
 /-- **∧-intro interno** en `PrfH` (vía `c1` + dos MP internos). -/
-theorem PrfH_pcc_andIntro {Γ : List Formula} {A B : Formula}
+theorem PrfH_pcc_andIntro [AnclaEq] {Γ : List Formula} {A B : Formula}
     (hA : PrfH Γ (provCodeC' A)) (hB : PrfH Γ (provCodeC' B)) : PrfH Γ (provCodeC' (A ∧ B)) :=
   PrfH_pcc_mp (PrfH_pcc_mp (PrfH_pcc_prf (Prf.incl (Prf₀.c1 A B))) hA) hB
 
 /-- **∃-intro interno** en `PrfH` (vía `q2` + MP interno): de `provCodeC' (A[t])` sale
     `provCodeC' (∃A)`. -/
-theorem PrfH_pcc_exIntro {Γ : List Formula} (A : Formula) (t : Term)
+theorem PrfH_pcc_exIntro [AnclaEq] {Γ : List Formula} (A : Formula) (t : Term)
     (h : PrfH Γ (provCodeC' (substFormula 0 t A))) : PrfH Γ (provCodeC' (Formula.ex A)) :=
   PrfH_pcc_mp (PrfH_pcc_prf (Prf.incl (Prf₀.q2 A t))) h
 
@@ -70,7 +70,7 @@ theorem PrfH_pcc_exIntro {Γ : List Formula} (A : Formula) (t : Term)
     Elimina el `∃` de la hipótesis (testigo `p = #0`, con `chainOk nil p` e
     `In ⌜φ⌝ (runFn nil p)`); promueve ambos hechos Δ₀ a demostrabilidad (`hC`/`hI`);
     los combina con `PrfH_pcc_andIntro` y los `∃`-introduce con `PrfH_pcc_exIntro`. -/
-theorem d3_prf_of_sigma1 (φ : Formula)
+theorem d3_prf_of_sigma1 [AnclaEq] (φ : Formula)
     (hC : ∀ p : Term, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p)))
     (hI : ∀ x L : Term, Prf (In x L ⇒ provCodeC' (In x L))) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) := by

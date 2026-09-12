@@ -10,7 +10,7 @@
 >
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **4 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >

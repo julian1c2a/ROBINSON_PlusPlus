@@ -133,7 +133,7 @@ def AXBOT_BODY : Formula := substfc (.var 1) (.var 0) botc =eq botc
 theorem AXBOT_BODY_ok : ax_substfc_bottom = forall_2 AXBOT_BODY := rfl
 
 /-- La instancia INTERNA del axioma `ax_substfc_bottom`, DOTADA (patrón `pcc_substfc_forall_dot`). -/
-theorem pcc_substfc_bottom_dot (v s : Term) :
+theorem pcc_substfc_bottom_dot [AnclaEq] (v s : Term) :
     Prf (provFromCode (eqCodeFn (substfcT (tcFn v) (tcFn s) (nulT 2)) (nulT 2))) := by
   let W1 : Term := liftc zero (tcFn v)
   let W0 : Term := tcFn s
@@ -160,7 +160,7 @@ theorem pcc_substfc_bottom_dot (v s : Term) :
       (tcFn v) (tcFn s) (prf_hasWit_tcFn (liftTerm 0 v)) (prf_hasWit_tcFn (liftTerm 0 s)))
 
 /-- **CASO `bottom` DE `pcc_eval_substfc`, CERRADO.** Sin hipótesis: constructor nulario. -/
-theorem paso2_caso_bottom (v s : Term) :
+theorem paso2_caso_bottom [AnclaEq] (v s : Term) :
     Prf (provFromCode (evalSubstfcCode v s botc)) := by
   unfold evalSubstfcCode
   have iA : ∀ W, Prf (substtc zero W (substfcT (tcFn v) (tcFn s) (tcFn botc))
@@ -212,7 +212,7 @@ theorem AXBIN_or : ax_substfc_or = forall_4 (AXBIN_BODY (numeralM 8)) := rfl
 
 /-- **La instancia INTERNA del axioma binario, DOTADA**, genérica en la etiqueta `T`.
     Un solo lema para `impl`, `and` y `or`. -/
-theorem pcc_substfc_bin_dot (T : Term) (hT : ∀ c : Nat, liftTerm c T = T)
+theorem pcc_substfc_bin_dot [AnclaEq] (T : Term) (hT : ∀ c : Nat, liftTerm c T = T)
     (hmem : forall_4 (AXBIN_BODY T) ∈ axioms) (v s a b : Term) :
     Prf (provFromCode (eqCodeFn
       (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (tcFn b)))

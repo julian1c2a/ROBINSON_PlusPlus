@@ -164,7 +164,7 @@ def LIFTFC_BOT_BODY : Formula := liftfc (.var 0) botc =eq botc
 theorem LIFTFC_BOT_BODY_ok : ax_liftfc_bottom = forall_ LIFTFC_BOT_BODY := rfl
 
 /-- **`ax_liftfc_bottom` DOTADA**: `⊢ Prov(⌜ liftfc(ċ, ⌜⊥⌝) = ⌜⊥⌝ ⌝)`, con `c` ABSTRACTO. -/
-theorem pcc_liftfc_bottom_code (c : Term) :
+theorem pcc_liftfc_bottom_code [AnclaEq] (c : Term) :
     Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (nulT 2)) (nulT 2))) := by
   have hin : Prf (substfc zero (tcFn c) (formCode LIFTFC_BOT_BODY)
       =eq eqCodeFn (liftfcT (tcFn c) (nulT 2)) (nulT 2)) :=
@@ -193,7 +193,7 @@ theorem LIFTFC_OR_BODY_ok   : ax_liftfc_or   = forall_3 (LIFTFC_BIN_BODY 8) := r
     de dentro del cuerpo **bloquea el cómputo** de `substCodeF`, así que
     `prf_substfc_arith_open` ya no casa por defeq con la forma explícita. Con el tag CONCRETO
     sí computa. Sacarlo fuera deja las 40 líneas compartidas y una línea por tag. -/
-theorem pcc_liftfc_bin_code (k : Nat) (hmem : forall_3 (LIFTFC_BIN_BODY k) ∈ axioms)
+theorem pcc_liftfc_bin_code [AnclaEq] (k : Nat) (hmem : forall_3 (LIFTFC_BIN_BODY k) ∈ axioms)
     (c a b : Term)
     (hin : Prf (substfc (succ (succ zero)) (liftc zero (liftc zero (tcFn c)))
         (formCode (LIFTFC_BIN_BODY k))
@@ -267,19 +267,19 @@ theorem pcc_liftfc_bin_code (k : Nat) (hmem : forall_3 (LIFTFC_BIN_BODY k) ∈ a
       (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 a))
       (prf_hasWit_tcFn (liftTerm 0 b)))
 
-theorem pcc_liftfc_impl_code (c a b : Term) :
+theorem pcc_liftfc_impl_code [AnclaEq] (c a b : Term) :
     Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (binT 5 (tcFn a) (tcFn b)))
       (binT 5 (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))) :=
   pcc_liftfc_bin_code 5 (show ax_liftfc_impl ∈ axioms by simp [axioms]) c a b
     (prf_substfc_arith_open 2 (liftc zero (liftc zero (tcFn c))) (LIFTFC_BIN_BODY 5))
 
-theorem pcc_liftfc_and_code (c a b : Term) :
+theorem pcc_liftfc_and_code [AnclaEq] (c a b : Term) :
     Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (binT 7 (tcFn a) (tcFn b)))
       (binT 7 (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))) :=
   pcc_liftfc_bin_code 7 (show ax_liftfc_and ∈ axioms by simp [axioms]) c a b
     (prf_substfc_arith_open 2 (liftc zero (liftc zero (tcFn c))) (LIFTFC_BIN_BODY 7))
 
-theorem pcc_liftfc_or_code (c a b : Term) :
+theorem pcc_liftfc_or_code [AnclaEq] (c a b : Term) :
     Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (binT 8 (tcFn a) (tcFn b)))
       (binT 8 (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))) :=
   pcc_liftfc_bin_code 8 (show ax_liftfc_or ∈ axioms by simp [axioms]) c a b
@@ -299,7 +299,7 @@ theorem LIFTFC_EX_BODY_ok : ax_liftfc_ex = forall_2 (LIFTFC_UN_BODY 9) := rfl
 
 /-- **Las dos ecuaciones UNARIAS de `liftfc`, DOTADAS** (genérico en el tag). ⚠️ El nivel del
     lado derecho es `succcT ċ`, no `ċ`: es el `σ` que sube. -/
-theorem pcc_liftfc_un_code (k : Nat) (hmem : forall_2 (LIFTFC_UN_BODY k) ∈ axioms) (c a : Term)
+theorem pcc_liftfc_un_code [AnclaEq] (k : Nat) (hmem : forall_2 (LIFTFC_UN_BODY k) ∈ axioms) (c a : Term)
     (hin : Prf (substfc (succ zero) (liftc zero (tcFn c)) (formCode (LIFTFC_UN_BODY k))
       =eq eqCodeFn (liftfcT (liftc zero (tcFn c)) (unT k (varc (numeral 0))))
                    (unT k (liftfcT (succcT (liftc zero (tcFn c))) (varc (numeral 0)))))) :
@@ -340,13 +340,13 @@ theorem pcc_liftfc_un_code (k : Nat) (hmem : forall_2 (LIFTFC_UN_BODY k) ∈ axi
     (pcc_axiom_inst2 (LIFTFC_UN_BODY k) hmem (tcFn c) (tcFn a)
       (prf_hasWit_tcFn (liftTerm 0 c)) (prf_hasWit_tcFn (liftTerm 0 a)))
 
-theorem pcc_liftfc_forall_code (c a : Term) :
+theorem pcc_liftfc_forall_code [AnclaEq] (c a : Term) :
     Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (unT 6 (tcFn a)))
       (unT 6 (liftfcT (succcT (tcFn c)) (tcFn a))))) :=
   pcc_liftfc_un_code 6 (show ax_liftfc_forall ∈ axioms by simp [axioms]) c a
     (prf_substfc_arith_open 1 (liftc zero (tcFn c)) (LIFTFC_UN_BODY 6))
 
-theorem pcc_liftfc_ex_code (c a : Term) :
+theorem pcc_liftfc_ex_code [AnclaEq] (c a : Term) :
     Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (unT 9 (tcFn a)))
       (unT 9 (liftfcT (succcT (tcFn c)) (tcFn a))))) :=
   pcc_liftfc_un_code 9 (show ax_liftfc_ex ∈ axioms by simp [axioms]) c a
@@ -725,7 +725,7 @@ theorem PrfH_congr_targetLiftfc {Γ : List Formula} (c : Term) {X X' : Term}
 /-! ### §8.1 · `CasoBotL` (tag 2) -/
 
 /-- **`CasoBotL` DESCARGADO.** -/
-theorem casoBotL : CasoBotL := by
+theorem casoBotL [AnclaEq] : CasoBotL := by
   intro c X
   refine prf_deduction ?_
   have hbase : Prf (targetLiftfc c botc) := by
@@ -747,7 +747,7 @@ theorem casoBotL : CasoBotL := by
 
 /-- El núcleo del caso BINARIO en forma IMPLICACION: las dos HI llegan como hipótesis OBJETO.
     ⚠️ Igual que en `substfc`, hay que escribirlo en `PrfH` (deuda B6b). -/
-theorem paso_caso_bin_imp_L (k : Nat) (c a b : Term)
+theorem paso_caso_bin_imp_L [AnclaEq] (k : Nat) (c a b : Term)
     (hax : Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (binT k (tcFn a) (tcFn b)))
       (binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))))
     (hobj : Prf (liftfc c (cons (numeralM k) (cons a (cons b nil)))
@@ -811,7 +811,7 @@ theorem paso_caso_bin_imp_L (k : Nat) (c a b : Term)
           (PrfH_eq_trans_code _ _ _ iX4 h5 h6 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
     <;> hw_auto
 
-theorem casoBinL_gen (k : Nat)
+theorem casoBinL_gen [AnclaEq] (k : Nat)
     (hax : ∀ c a b : Term, Prf (provFromCode (eqCodeFn
       (liftfcT (tcFn c) (binT k (tcFn a) (tcFn b)))
       (binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))))
@@ -830,11 +830,11 @@ theorem casoBinL_gen (k : Nat)
       (hobj c (nthc X (numeralM 1)) (nthc X (numeralM 2)))) _) hab
   exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
 
-theorem casoBinL5 : CasoBinL 5 :=
+theorem casoBinL5 [AnclaEq] : CasoBinL 5 :=
   casoBinL_gen 5 (fun c a b => pcc_liftfc_impl_code c a b) (fun c a b => prf_liftfc_impl c a b)
-theorem casoBinL7 : CasoBinL 7 :=
+theorem casoBinL7 [AnclaEq] : CasoBinL 7 :=
   casoBinL_gen 7 (fun c a b => pcc_liftfc_and_code c a b) (fun c a b => prf_liftfc_and c a b)
-theorem casoBinL8 : CasoBinL 8 :=
+theorem casoBinL8 [AnclaEq] : CasoBinL 8 :=
   casoBinL_gen 8 (fun c a b => pcc_liftfc_or_code c a b) (fun c a b => prf_liftfc_or c a b)
 
 /-! ### §8.3 · `CasoUnL 6/9` — ⚠️ LAS QUE SUBEN EL NIVEL
@@ -843,7 +843,7 @@ La HI llega a nivel `σc` y la conclusión es a nivel `c`. Dentro de `Prov` eso 
 `liftfcT (succcT ċ) ȧ` en el lado derecho de la ecuación dotada — de ahí que el eslabón que
 consume la HI sea el de nivel `succ c`, no el de `c`. -/
 
-theorem paso_caso_un_imp_L (k : Nat) (c a : Term)
+theorem paso_caso_un_imp_L [AnclaEq] (k : Nat) (c a : Term)
     (hax : Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (unT k (tcFn a)))
       (unT k (liftfcT (succcT (tcFn c)) (tcFn a))))))
     (hobj : Prf (liftfc c (cons (numeralM k) (cons a nil))
@@ -894,7 +894,7 @@ theorem paso_caso_un_imp_L (k : Nat) (c a : Term)
         (PrfH_eq_trans_code _ _ _ iX3 h4 h5 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
     <;> hw_auto
 
-theorem casoUnL_gen (k : Nat)
+theorem casoUnL_gen [AnclaEq] (k : Nat)
     (hax : ∀ c a : Term, Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (unT k (tcFn a)))
       (unT k (liftfcT (succcT (tcFn c)) (tcFn a))))))
     (hobj : ∀ c a : Term, Prf (liftfc c (cons (numeralM k) (cons a nil))
@@ -910,19 +910,19 @@ theorem casoUnL_gen (k : Nat)
       (hax c (nthc X (numeralM 1))) (hobj c (nthc X (numeralM 1)))) _) ha
   exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
 
-theorem casoUnL6 : CasoUnL 6 :=
+theorem casoUnL6 [AnclaEq] : CasoUnL 6 :=
   casoUnL_gen 6 (fun c a => pcc_liftfc_forall_code c a) (fun c a => prf_liftfc_forall c a)
-theorem casoUnL9 : CasoUnL 9 :=
+theorem casoUnL9 [AnclaEq] : CasoUnL 9 :=
   casoUnL_gen 9 (fun c a => pcc_liftfc_ex_code c a) (fun c a => prf_liftfc_ex c a)
 
 /-- ⭐⭐ **SEIS DE LOS OCHO, DESCARGADOS.** Lo que queda de `pcc_eval_liftfc` son
     `CasoAtomL` y `CasoEqL`, que consumen `pcc_eval_liftsc_at` / `pcc_eval_liftc_at` (A5). -/
-theorem pcc_eval_liftfc_modulo_2 (hatom : CasoAtomL) (heq : CasoEqL) :
+theorem pcc_eval_liftfc_modulo_2 [AnclaEq] (hatom : CasoAtomL) (heq : CasoEqL) :
     DEUDA_evalLiftfc_isFC1 :=
   pcc_eval_liftfc_modulo_8 casoBotL hatom heq casoBinL5 casoBinL7 casoBinL8 casoUnL6 casoUnL9
 
 /-- Y su forma con el testigo cuantificado, vía el `∃∃` de C3‑F. -/
-theorem deuda_modulo_2 (hatom : CasoAtomL) (heq : CasoEqL) : DEUDA_evalLiftfc :=
+theorem deuda_modulo_2 [AnclaEq] (hatom : CasoAtomL) (heq : CasoEqL) : DEUDA_evalLiftfc :=
   deuda_of_isFC1 (pcc_eval_liftfc_modulo_2 hatom heq)
 
 
@@ -945,7 +945,7 @@ def LIFTFC_EQ_BODY : Formula :=
 theorem LIFTFC_EQ_BODY_ok : ax_liftfc_eq = forall_3 LIFTFC_EQ_BODY := rfl
 
 /-- **`ax_liftfc_atom` DOTADA** — la casilla 1 (el símbolo) va INTACTA; sólo baja la lista. -/
-theorem pcc_liftfc_atom_code (c p ts : Term) :
+theorem pcc_liftfc_atom_code [AnclaEq] (c p ts : Term) :
     Prf (provFromCode (eqCodeFn
       (liftfcT (tcFn c) (binT 3 (tcFn p) (tcFn ts)))
       (binT 3 (tcFn p) (liftscT (tcFn c) (tcFn ts))))) := by
@@ -1012,7 +1012,7 @@ theorem pcc_liftfc_atom_code (c p ts : Term) :
       (prf_hasWit_tcFn (liftTerm 0 ts)))
 
 /-- **`ax_liftfc_eq` DOTADA** — las DOS casillas bajan al sorte TÉRMINO (`liftc`). -/
-theorem pcc_liftfc_eq_code (c a b : Term) :
+theorem pcc_liftfc_eq_code [AnclaEq] (c a b : Term) :
     Prf (provFromCode (eqCodeFn
       (liftfcT (tcFn c) (binT 4 (tcFn a) (tcFn b)))
       (binT 4 (liftcT (tcFn c) (tcFn a)) (liftcT (tcFn c) (tcFn b))))) := by
@@ -1086,7 +1086,7 @@ theorem pcc_liftfc_eq_code (c a b : Term) :
 /-! ### §9.1 · Los dos NÚCLEOS, con la evaluación de término como hipótesis OBJETO -/
 
 /-- El núcleo de `atomc`: pide **sólo** la evaluación de la LISTA de argumentos, al nivel `c`. -/
-theorem caso_atom_core_L (c p ts : Term) :
+theorem caso_atom_core_L [AnclaEq] (c p ts : Term) :
     Prf (Formula.impl (targetLiftscAt c ts)
       (targetLiftfc c (cons (numeralM 3) (cons p (cons ts nil))))) := by
   refine prf_deduction ?_
@@ -1129,7 +1129,7 @@ theorem caso_atom_core_L (c p ts : Term) :
     <;> hw_auto
 
 /-- El núcleo de `eqc`: pide la evaluación de TÉRMINO en las DOS casillas, al nivel `c`. -/
-theorem caso_eq_core_L (c a b : Term) :
+theorem caso_eq_core_L [AnclaEq] (c a b : Term) :
     Prf (Formula.impl (land (targetLiftAt c a) (targetLiftAt c b))
       (targetLiftfc c (cons (numeralM 4) (cons a (cons b nil))))) := by
   refine prf_deduction ?_
@@ -1192,7 +1192,7 @@ theorem caso_eq_core_L (c a b : Term) :
 /-- **`CasoAtomL` DESCARGADO.** Consume `DESCENSO_at_lista_imp` (A5): la evaluación provable de
     `liftsc` **al nivel `c`**, que es exactamente lo que `pcc_eval_liftc` clavado a `zero` no
     podía dar. -/
-theorem casoAtomL_thm : CasoAtomL := by
+theorem casoAtomL_thm [AnclaEq] : CasoAtomL := by
   intro wT c X
   refine prf_deduction ?_
   have hh := prfH_hyp_self (land (wfAll1 wT)
@@ -1209,7 +1209,7 @@ theorem casoAtomL_thm : CasoAtomL := by
   exact PrfH_congr_targetLiftfc c (PrfH_eq_symm hshape) hC
 
 /-- **`CasoEqL` DESCARGADO.** Consume `DESCENSO_at_imp` (A5) DOS veces. -/
-theorem casoEqL_thm : CasoEqL := by
+theorem casoEqL_thm [AnclaEq] : CasoEqL := by
   intro wT c X
   refine prf_deduction ?_
   have hh := prfH_hyp_self (land (wfAll1 wT) (land (shapeBin X 4)
@@ -1233,15 +1233,15 @@ theorem casoEqL_thm : CasoEqL := by
 /-! ## §10 · 🏁🏁 `pcc_eval_liftfc`, SIN HIPÓTESIS -/
 
 /-- ⭐⭐⭐ **`DEUDA_evalLiftfc_isFC1` PROBADA** — los ocho casos descargados. -/
-theorem pcc_eval_liftfc_isFC1 : DEUDA_evalLiftfc_isFC1 :=
+theorem pcc_eval_liftfc_isFC1 [AnclaEq] : DEUDA_evalLiftfc_isFC1 :=
   pcc_eval_liftfc_modulo_2 casoAtomL_thm casoEqL_thm
 
 /-- ⭐⭐⭐ **`DEUDA_evalLiftfc` PROBADA**: la evaluación provable de `liftfc` con el nivel `v` y
     el código `X` **abstractos**, bajo la sola guarda `hasWitF X`. -/
-theorem pcc_eval_liftfc : DEUDA_evalLiftfc := deuda_of_isFC1 pcc_eval_liftfc_isFC1
+theorem pcc_eval_liftfc [AnclaEq] : DEUDA_evalLiftfc := deuda_of_isFC1 pcc_eval_liftfc_isFC1
 
 /-- La forma desplegada, que es la que consumirá `Meta/SubstTreeReflect.lean`. -/
-theorem pcc_eval_liftfc_wit (v X : Term) :
+theorem pcc_eval_liftfc_wit [AnclaEq] (v X : Term) :
     Prf (Formula.impl (hasWitF X)
       (provFromCode (eqc (liftfcT (tcFn v) (tcFn X)) (tcFn (liftfc v X))))) :=
   pcc_eval_liftfc v X

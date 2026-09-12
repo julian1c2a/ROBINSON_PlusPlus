@@ -136,7 +136,7 @@ def SUBSTTSC_NIL_BODY : Formula := substtsc (.var 1) (.var 0) nil =eq nil
 
 theorem SUBSTTSC_NIL_BODY_ok : ax_substtsc_nil = forall_2 SUBSTTSC_NIL_BODY := rfl
 
-theorem pcc_substtsc_nil_code (v s : Term) :
+theorem pcc_substtsc_nil_code [AnclaEq] (v s : Term) :
     Prf (provFromCode (eqCodeFn
       (substtscT (tcFn v) (tcFn s) (termCode nil)) (termCode nil))) := by
   let W1 : Term := liftc zero (tcFn v)
@@ -171,7 +171,7 @@ def SUBSTTC_FUNC_BODY : Formula :=
 
 theorem SUBSTTC_FUNC_BODY_ok : ax_substtc_func = forall_4 SUBSTTC_FUNC_BODY := rfl
 
-theorem pcc_substtc_func_code (v s p b : Term) :
+theorem pcc_substtc_func_code [AnclaEq] (v s p b : Term) :
     Prf (provFromCode (eqCodeFn
       (substtcT (tcFn v) (tcFn s) (funccT (tcFn p) (tcFn b)))
       (funccT (tcFn p) (substtscT (tcFn v) (tcFn s) (tcFn b))))) := by
@@ -283,7 +283,7 @@ def SUBSTTSC_CONS_BODY : Formula :=
 
 theorem SUBSTTSC_CONS_BODY_ok : ax_substtsc_cons = forall_4 SUBSTTSC_CONS_BODY := rfl
 
-theorem pcc_substtsc_cons_code (v s h t : Term) :
+theorem pcc_substtsc_cons_code [AnclaEq] (v s h t : Term) :
     Prf (provFromCode (eqCodeFn
       (substtscT (tcFn v) (tcFn s) (consT (tcFn h) (tcFn t)))
       (consT (substtcT (tcFn v) (tcFn s) (tcFn h))
@@ -419,7 +419,7 @@ theorem SUBSTTC_VAR_EQ_BODY_ok : ax_substtc_var_eq = forall_3 SUBSTTC_VAR_EQ_BOD
 theorem SUBSTTC_VAR_GT_BODY_ok : ax_substtc_var_gt = forall_3 SUBSTTC_VAR_GT_BODY := rfl
 theorem SUBSTTC_VAR_LT_BODY_ok : ax_substtc_var_lt = forall_3 SUBSTTC_VAR_LT_BODY := rfl
 
-theorem pcc_substtc_var_eq_code (v s n : Term) :
+theorem pcc_substtc_var_eq_code [AnclaEq] (v s n : Term) :
     Prf (provFromCode (implc (eqCodeFn (tcFn v) (tcFn n))
       (eqCodeFn (substtcT (tcFn v) (tcFn s) (varcT (tcFn n))) (tcFn s)))) := by
   let W2 : Term := liftc zero (liftc zero (tcFn v))
@@ -485,7 +485,7 @@ theorem pcc_substtc_var_eq_code (v s n : Term) :
     (pcc_axiom_inst3 SUBSTTC_VAR_EQ_BODY (show ax_substtc_var_eq ∈ axioms by simp [axioms])
       (tcFn v) (tcFn s) (tcFn n) (by hw_auto) (by hw_auto) (by hw_auto))
 
-theorem pcc_substtc_var_gt_code (v s n : Term) :
+theorem pcc_substtc_var_gt_code [AnclaEq] (v s n : Term) :
     Prf (provFromCode (implc (ltCodeFn (tcFn v) (tcFn n))
       (eqCodeFn (substtcT (tcFn v) (tcFn s) (varcT (tcFn n)))
         (varcT (predcT (tcFn n)))))) := by
@@ -563,7 +563,7 @@ theorem pcc_substtc_var_gt_code (v s n : Term) :
     (pcc_axiom_inst3 SUBSTTC_VAR_GT_BODY (show ax_substtc_var_gt ∈ axioms by simp [axioms])
       (tcFn v) (tcFn s) (tcFn n) (by hw_auto) (by hw_auto) (by hw_auto))
 
-theorem pcc_substtc_var_lt_code (v s n : Term) :
+theorem pcc_substtc_var_lt_code [AnclaEq] (v s n : Term) :
     Prf (provFromCode (implc (ltCodeFn (tcFn n) (tcFn v))
       (eqCodeFn (substtcT (tcFn v) (tcFn s) (varcT (tcFn n))) (varcT (tcFn n))))) := by
   let W2 : Term := liftc zero (liftc zero (tcFn v))
@@ -714,7 +714,7 @@ theorem invAs (v s X : Term) :
   substtc_inv_substtscT (substtc_inv_tcFn v) (substtc_inv_tcFn s) (substtc_inv_tcFn X)
 
 /-- **(3) BASE de la LISTA (`nil`) — CERRADA, sin hipotesis ninguna.** -/
-theorem refl_substtc_lista_nil (v s : Term) : Prf (targetSubsttsc v s nil) := by
+theorem refl_substtc_lista_nil [AnclaEq] (v s : Term) : Prf (targetSubsttsc v s nil) := by
   unfold targetSubsttsc
   refine prf_mp (prf_provCode_congr (prf_congr_eqCodeFn ?_ ?_)) (pcc_substtsc_nil_code v s)
   · exact prf_congr_substtscT (prf_refl _) (prf_refl _) (prf_eq_symm prf_tc_zero)
@@ -747,7 +747,7 @@ theorem refl_substtc_lista_nil (v s : Term) : Prf (targetSubsttsc v s nil) := by
    más abajo resuelve solo a la de producción. -/
 
 /-- Rama `v < n` (clausula `ax_substtc_var_gt`). **La UNICA que necesita `pred` dotado.** -/
-theorem br_lt (v s n : Term)
+theorem br_lt [AnclaEq] (v s n : Term)
     (hPred : Prf (Formula.impl (lt v n)
       (provFromCode (eqc (predcT (tcFn n)) (tcFn (pred n)))))) :
     Prf (Formula.impl (lt v n)
@@ -782,7 +782,7 @@ theorem br_lt (v s n : Term)
     hchain
 
 /-- Rama `v ≐ n` (clausula `ax_substtc_var_eq`). CERRADA, sin hipotesis. -/
-theorem br_eq (v s n : Term) :
+theorem br_eq [AnclaEq] (v s n : Term) :
     Prf (Formula.impl (v =eq n)
       (provFromCode (eqc (substtcT (tcFn v) (tcFn s) (varcT (tcFn n)))
         (tcFn (substtc v s (varc n)))))) := by
@@ -800,7 +800,7 @@ theorem br_eq (v s n : Term) :
     e1
 
 /-- Rama `n < v` (clausula `ax_substtc_var_lt`). CERRADA, sin hipotesis. -/
-theorem br_gt (v s n : Term) :
+theorem br_gt [AnclaEq] (v s n : Term) :
     Prf (Formula.impl (lt n v)
       (provFromCode (eqc (substtcT (tcFn v) (tcFn s) (varcT (tcFn n)))
         (tcFn (substtc v s (varc n)))))) := by
@@ -825,7 +825,7 @@ theorem br_gt (v s n : Term) :
     hchain
 
 /-- **(1) BASE `varc`, con la TRICOTOMIA ya eliminada.** Unica hipotesis: `pred` dotado. -/
-theorem refl_caso_varc_at (v s n : Term)
+theorem refl_caso_varc_at [AnclaEq] (v s n : Term)
     (hPred : Prf (Formula.impl (lt v n)
       (provFromCode (eqc (predcT (tcFn n)) (tcFn (pred n)))))) :
     Prf (targetSubsttc v s (varc n)) := by
@@ -915,18 +915,18 @@ y gastaba una sección entera —ocho declaraciones, con `ax26_pred_succ` instan
 `pcc_eval_pred'` **sin guarda ninguna** (`Meta/EvalPredPrf.lean:200`), que es estrictamente
 más fuerte. Lo único que hace falta es debilitarla añadiendo la guarda que el punto de uso
 lleva de todos modos. -/
-theorem prf_pred_dot_guarded (v n : Term) :
+theorem prf_pred_dot_guarded [AnclaEq] (v n : Term) :
     Prf (Formula.impl (lt v n) (provFromCode (eqc (predcT (tcFn n)) (tcFn (pred n))))) :=
   prf_deduction (prf_to_prfH (pcc_eval_pred' n) [lt v n])
 
-theorem refl_substtc_shapeUn_imp (v s X : Term) :
+theorem refl_substtc_shapeUn_imp [AnclaEq] (v s X : Term) :
     Prf (Formula.impl (shapeUn X 0) (targetSubsttc v s X)) := by
   refine prf_deduction ?_
   have hh : PrfH [shapeUn X 0] (Formula.eq X (varc (nthc X (numeralM 1)))) := prfH_hyp_self _
   exact PrfH_congr_targetSubsttc (PrfH_eq_symm hh)
     (prf_to_prfH (refl_caso_varc_at v s (nthc X (numeralM 1)) (prf_pred_dot_guarded v (nthc X (numeralM 1)))) _)
 
-theorem refl_substtc_caso_funcc_imp (v s p b : Term) :
+theorem refl_substtc_caso_funcc_imp [AnclaEq] (v s p b : Term) :
     Prf (Formula.impl (targetSubsttsc v s b) (targetSubsttc v s (funcc p b))) := by
   refine prf_deduction ?_
   have hb : PrfH [targetSubsttsc v s b] (targetSubsttsc v s b) := prfH_hyp_self _
@@ -965,7 +965,7 @@ theorem refl_substtc_caso_funcc_imp (v s p b : Term) :
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_substtc_func v s p b))))) _) hchain
 
-theorem refl_substtc_shapeBin_imp (v s X : Term) :
+theorem refl_substtc_shapeBin_imp [AnclaEq] (v s X : Term) :
     Prf (Formula.impl (land (shapeBin X 1) (targetSubsttsc v s (nthc X (numeralM 2))))
       (targetSubsttc v s X)) := by
   refine prf_deduction ?_
@@ -979,7 +979,7 @@ theorem refl_substtc_shapeBin_imp (v s X : Term) :
     PrfH.mp _ _ _ (prf_to_prfH (refl_substtc_caso_funcc_imp v s p b) _) hbb
   exact PrfH_congr_targetSubsttc (PrfH_eq_symm hs) hfb
 
-theorem refl_substtc_lista_cons_imp (v s h t : Term) :
+theorem refl_substtc_lista_cons_imp [AnclaEq] (v s h t : Term) :
     Prf (Formula.impl (land (targetSubsttc v s h) (targetSubsttsc v s t))
       (targetSubsttsc v s (cons h t))) := by
   refine prf_deduction ?_
@@ -1111,7 +1111,7 @@ def PSIsubsttc3 : Formula := liftFormula 0 (liftFormula 0 (liftFormula 0 (PSI PH
 
 /-! ### El PASO de la induccion fuerte -/
 
-theorem PHIsubsttc_step : Prf (Formula.forall (Formula.impl (PSI PHIsubsttc) PHIsubsttc)) := by
+theorem PHIsubsttc_step [AnclaEq] : Prf (Formula.forall (Formula.impl (PSI PHIsubsttc) PHIsubsttc)) := by
   refine Prf.gen _ (prf_deduction ?_)
   refine PrfH.gen [PSI PHIsubsttc] (Formula.forall (Formula.forall PHIsubsttcBody)) ?_
   simp only [List.map_cons, List.map_nil]
@@ -1232,15 +1232,15 @@ theorem PHIsubsttc_step : Prf (Formula.forall (Formula.impl (PSI PHIsubsttc) PHI
 
 /-! ### §12 · EL DESCENSO y `pcc_eval_substtc` -/
 
-theorem PHIsubsttc_all (t : Term) : Prf (substFormula 0 t PHIsubsttc) :=
+theorem PHIsubsttc_all [AnclaEq] (t : Term) : Prf (substFormula 0 t PHIsubsttc) :=
   prf_strong_induction PHIsubsttc hPHIsubsttc1 (PHIsubsttc_step) t
 
-theorem DESCENSO_substtc_imp (w v s t : Term) :
+theorem DESCENSO_substtc_imp [AnclaEq] (w v s t : Term) :
     Prf (Formula.impl (isTC1 w t) (targetSubsttc v s t)) :=
   prfH_nil_to_prf
     (PrfH_and_elim_left (PHIsubsttc_use t w v s (prf_to_prfH (PHIsubsttc_all t) []))) rfl
 
-theorem DESCENSO_substtc_lista_imp (w v s t : Term) :
+theorem DESCENSO_substtc_lista_imp [AnclaEq] (w v s t : Term) :
     Prf (Formula.impl (land (wfAll1 w) (argsIn w t)) (targetSubsttsc v s t)) :=
   prfH_nil_to_prf
     (PrfH_and_elim_right (PHIsubsttc_use t w v s (prf_to_prfH (PHIsubsttc_all t) []))) rfl
@@ -1248,18 +1248,18 @@ theorem DESCENSO_substtc_lista_imp (w v s t : Term) :
 /-- **`pcc_eval_substtc`** — el objetivo del frente, con `v`, `s`, `t` **ABSTRACTOS** y el
     testigo `w` como GUARDA (igual que `pcc_eval_liftc`), y **sin ninguna hipótesis externa**:
     la que había (`PredHyp`) la descarga `prf_pred_dot_guarded` desde `pcc_eval_pred'`. -/
-theorem pcc_eval_substtc (w v s t : Term) (h : Prf (isTC1 w t)) :
+theorem pcc_eval_substtc [AnclaEq] (w v s t : Term) (h : Prf (isTC1 w t)) :
     Prf (provFromCode (eqc (substtcT (tcFn v) (tcFn s) (tcFn t)) (tcFn (substtc v s t)))) :=
   prf_mp (DESCENSO_substtc_imp w v s t) h
 
 /-- Su gemela sobre LISTAS de codigos de termino. -/
-theorem pcc_eval_substtsc (w v s t : Term)
+theorem pcc_eval_substtsc [AnclaEq] (w v s t : Term)
     (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w t)) :
     Prf (provFromCode (eqc (substtscT (tcFn v) (tcFn s) (tcFn t))
       (tcFn (substtsc v s t)))) :=
   prf_mp (DESCENSO_substtc_lista_imp w v s t) (prf_and_intro hwf hargs)
 
-theorem pcc_eval_substtc_hasWit (v s t : Term) :
+theorem pcc_eval_substtc_hasWit [AnclaEq] (v s t : Term) :
     Prf (Formula.impl (hasWit t) (targetSubsttc v s t)) := by
   refine prf_ex_elim_imp ?_
   rw [liftF_targetSubsttc]

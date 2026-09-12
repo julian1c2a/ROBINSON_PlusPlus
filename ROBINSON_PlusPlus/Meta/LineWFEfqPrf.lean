@@ -94,7 +94,7 @@ Cadena: puente `carc` → reescritura del valor por la hipótesis (vía `prf_tc_
 puente `nthc` bajo la cota → congruencia interna del kit → transitividad interna. -/
 
 /-- **`Prov(COND_dot t)`** para `efq`. -/
-theorem pcc_condDEfq (t : Term) :
+theorem pcc_condDEfq [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((lenc t =eq numeralM 3) ⇒
       (substFormula 0 t condEfq ⇒ provFromCode (condD condEfq t)))) := by
   rw [substFormula_condEfq_at]
@@ -186,7 +186,7 @@ theorem pcc_condDEfq (t : Term) :
 
 /-- **Reflector por rama, caso `efq`** — obtenido instanciando el chasis genérico. Compárese con
     `pcc_lineWF_tracked_eqrefl_imp` (≈ 45 líneas a mano): aquí el ensamblaje es **una llamada**. -/
-theorem pcc_lineWF_tracked_efq_imp (t : Term) :
+theorem pcc_lineWF_tracked_efq_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 8) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_schema t substFormula_condEfq

@@ -10,7 +10,7 @@
 >
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **5 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **4 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -1563,6 +1563,113 @@ se retira audita lo que se apoyaba en él.**
 
 ---
 
+## ADR-024: `⊢` es herramienta, `Prf` es enunciado — y qué significa exactamente `ConsistentOmega`
+
+**Fecha**: 2026-09-11
+**Estado**: **Aceptado** — decisión del propietario tras la medición de `Meta/OmegaStrength.lean`.
+Incluye la **retirada** de `goedel_second'` y `con_imp_godel'` (opción (b)).
+
+### El hecho que lo fuerza, medido
+
+```lean
+theorem derives_completo (A) : (axioms ⊢ A) ∨ (axioms ⊢ neg A)          -- sin hipótesis
+theorem derives_decide_exactamente_una (hcon : ConsistentOmega) (A) :
+    ((axioms ⊢ A) ∧ ¬(axioms ⊢ ¬A)) ∨ (¬(axioms ⊢ A) ∧ (axioms ⊢ ¬A))   -- con consistencia
+```
+
+**`axioms ⊢` es sintácticamente COMPLETO**, y con consistencia decide **exactamente una** de cada
+par. La causa **no es aritmética**: `raa` e `imp_intro` toman como premisa una **función de Lean**,
+así que de `axioms ⊬ A` sale `axioms ⊢ ¬A` **vacuamente**.
+
+⚠️ **Es un metateorema CLÁSICO**: `derives_completo` usa excluido medio en la metateoría. Sin él no
+saldría. Lo que **sí** sale sin EM es `refuta_lo_que_no_prueba`, y basta para la conclusión.
+
+### La lectura correcta, y no es que el proyecto esté roto
+
+Gödel I exige **tres** hipótesis: consistente + suficientemente fuerte + **efectivamente
+axiomatizada (r.e.)**. Lo medido dice que `axioms ⊢` **incumple la tercera**:
+
+    completa  ⟹  no r.e.
+
+`{A | axioms ⊢ A}` es una **compleción consistente** de `axioms` —tipo Lindenbaum—, no un sistema
+formal. ⇒ **no puede ser sujeto de un teorema de incompletitud**, y `Prf` **sí** puede, porque está
+definido por derivaciones **finitas** que `checkProof` verifica — que es exactamente lo que el
+verificador aritmetizado internaliza.
+
+### Decisión
+
+| | |
+|---|---|
+| **`axioms ⊢`** | ✅ **herramienta de trabajo**. `imp_intro`/`raa` ahorran el teorema de deducción, y toda la capa `Minimal`/`Full` vive ahí legítimamente |
+| **`Prf`** | ✅ **el único cálculo admisible en el ENUNCIADO** de un resultado de incompletitud |
+
+⛔ **MANDATORY (M‑10)**: *ningún teorema cuyo enunciado hable de indemostrabilidad, indecidibilidad
+o consistencia puede formularse sobre `⊢`.* Si aparece `¬(axioms ⊢ …)` en la **conclusión o en una
+hipótesis** de un resultado así, está mal enunciado: por `derives_completo` eso significa «el cálculo
+**refuta**», no «no demuestra».
+
+### Lo ejecutado
+
+* 🗑️ **Retirados** `goedel_second'` y `con_imp_godel'` (`Meta/GodelTwo.lean`), con la nota de por qué.
+  **Se conservan** `d3` —que fue `axiom` hasta el 10g y hoy es teorema— y `consistencyFormula'`.
+* 🏁 **`Meta/GodelTwoPrf.lean`**: `goedel_second_prf (hcon : ConsistentOmega) : ¬ Prf Con'`.
+* 📄 `FOL/MetaRules.lean`: corregido el docstring de `gen`, que llamaba «ω‑regla» a algo que **no lo
+  es** — su premisa recorre **todo `Term`**, no los numerales, luego como regla es **más débil**.
+
+### ⚠️ Y ahora lo que hay que mirar de frente: qué es `ConsistentOmega`
+
+`ConsistentOmega := ¬ (axioms ⊢ ⊥)`. Con lo anterior, eso **no es** «la teoría `axioms` es
+consistente» en el sentido habitual. Es:
+
+> *el conjunto `{A | axioms ⊢ A}` —que es una compleción **completa** de `axioms`— es **consistente***
+
+es decir: **existe una asignación de verdad total a las sentencias que extiende `axioms`**. Es, en
+fuerza, muy cercano a suponer la **solidez** de `axioms` respecto de algún modelo.
+
+**Dónde se usa**: es la hipótesis de **los dos** teoremas de Gödel del proyecto —
+`goedel_first_numeral` y `goedel_second_prf`.
+
+| | |
+|---|---|
+| ✅ **Lo que NO invalida** | las conclusiones son sobre **`Prf`**, que es r.e. y no completo. Los teoremas **dicen lo que parecen decir** |
+| ⚠️ **Lo que sí hay que escribir** | la hipótesis es **más fuerte** que «Q++ es consistente». Presentarla como «consistencia simple» a secas sería un **sobreclaim** |
+| ⬜ **Lo que queda por medir** | si `ConsistentH := ¬ Prf ⊥` bastaría. `consistentH_of_omega` da `ConsistentOmega → ConsistentH`; la **vuelta no existe**, y **ésa es la pregunta**: ¿se puede reformular Gödel I/II sobre `ConsistentH`? Sería **estrictamente mejor** |
+
+### 🏁🏁 Addendum 2026‑09‑11 — **P‑4 RESUELTO: sí bastaba `ConsistentH`**
+
+Con el punto fijo ya sobre `Prf` (`prf_godelCN_fixedpoint`, net‑0 puro), los dos teoremas salen en
+**cuatro líneas**:
+
+```lean
+goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+```
+
+⇒ **la hipótesis de la cadena de Gödel es hoy la MÍNIMA honesta**: *el cálculo finitario no
+demuestra `⊥`*. `ConsistentOmega` **desaparece de los enunciados cabecera**;
+`consistentH_of_omega` la transfiere para quien la tenga a mano (corolarios `_of_omega`).
+
+⭐⭐ **Y el footprint lo certifica** — cae de
+
+    [3 de Lean] + dne + gen + imp_intro + ax_induction_prim + ax_list_induction
+              + ax_axiomsCodeT_eq + prf_axiomsCodeT_eq
+
+a
+
+    [propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]
+
+**un solo axioma del proyecto.** Las ω‑reglas y los dos esquemas de inducción entraban **por la
+hipótesis vieja**, que hablaba de `⊢`. ⇒ **la cadena de Gödel es ENTERAMENTE FINITARIA**, y lo único
+que la separa de los tres axiomas de Lean es **`prf_axiomsCodeT_eq`**, el ancla de codificación.
+
+🔑 **La lección**: *una hipótesis mal elegida no sólo debilita el enunciado — arrastra al footprint
+todo lo que ella necesita.* Cambiarla por la mínima limpió **seis** dependencias de golpe.
+
+**Lo que NO cambia**: 5 `axiom` de Lean, 141 axiomas objeto, `Prf`, `Derives`, y ningún enunciado
+sobre `Prf`.
+
+---
+
 ## ADR-025: Un `axiom` que HABITA un inductivo prohíbe la inducción — y `FOL.soundness` era FALSO
 
 **Fecha:** 2026‑09‑11 · **Estado:** ✅ SANCIONADO (contención ejecutada; la reparación de fondo, abierta)
@@ -1668,107 +1775,83 @@ fantasma** — importable, invisible al build, y sin fuente que auditar.
 
 ---
 
-## ADR-024: `⊢` es herramienta, `Prf` es enunciado — y qué significa exactamente `ConsistentOmega`
+---
 
-**Fecha**: 2026-09-11
-**Estado**: **Aceptado** — decisión del propietario tras la medición de `Meta/OmegaStrength.lean`.
-Incluye la **retirada** de `goedel_second'` y `con_imp_godel'` (opción (b)).
+## ADR-026: El ancla de codificación deja de ser `axiom` y pasa a ser la CLASE `AnclaEq`
 
-### El hecho que lo fuerza, medido
+**Fecha:** 2026‑09‑12 · **Estado:** ✅ EJECUTADO (decisión del propietario: *«elegimos (A) parametrizar
+con la IGUALDAD»*) · **Consecuencia de:** [ADR‑025](#) / **M‑11**
 
-```lean
-theorem derives_completo (A) : (axioms ⊢ A) ∨ (axioms ⊢ neg A)          -- sin hipótesis
-theorem derives_decide_exactamente_una (hcon : ConsistentOmega) (A) :
-    ((axioms ⊢ A) ∧ ¬(axioms ⊢ ¬A)) ∨ (¬(axioms ⊢ A) ∧ (axioms ⊢ ¬A))   -- con consistencia
-```
+### El problema, medido
 
-**`axioms ⊢` es sintácticamente COMPLETO**, y con consistencia decide **exactamente una** de cada
-par. La causa **no es aritmética**: `raa` e `imp_intro` toman como premisa una **función de Lean**,
-así que de `axioms ⊬ A` sale `axioms ⊢ ¬A` **vacuamente**.
+`axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq listFormCodeM axioms)` **HABITA el inductivo `Prf`**.
+Por **M‑11** eso prohíbe demostrar nada sobre `Prf` por inducción — y el árbol lo hacía **tres veces**:
 
-⚠️ **Es un metateorema CLÁSICO**: `derives_completo` usa excluido medio en la metateoría. Sin él no
-saldría. Lo que **sí** sale sin EM es `refuta_lo_que_no_prueba`, y basta para la conclusión.
-
-### La lectura correcta, y no es que el proyecto esté roto
-
-Gödel I exige **tres** hipótesis: consistente + suficientemente fuerte + **efectivamente
-axiomatizada (r.e.)**. Lo medido dice que `axioms ⊢` **incumple la tercera**:
-
-    completa  ⟹  no r.e.
-
-`{A | axioms ⊢ A}` es una **compleción consistente** de `axioms` —tipo Lindenbaum—, no un sistema
-formal. ⇒ **no puede ser sujeto de un teorema de incompletitud**, y `Prf` **sí** puede, porque está
-definido por derivaciones **finitas** que `checkProof` verifica — que es exactamente lo que el
-verificador aritmetizado internaliza.
-
-### Decisión
-
-| | |
+| teorema | dónde |
 |---|---|
-| **`axioms ⊢`** | ✅ **herramienta de trabajo**. `imp_intro`/`raa` ahorran el teorema de deducción, y toda la capa `Minimal`/`Full` vive ahí legítimamente |
-| **`Prf`** | ✅ **el único cálculo admisible en el ENUNCIADO** de un resultado de incompletitud |
+| `prf_to_derives` | `Meta/Hilbert.lean:256` |
+| `prf_to_prfH` | `Meta/HilbertDeduction.lean:143` |
+| `prf_to_derivation` | `Meta/HilbertSeq.lean:379` |
 
-⛔ **MANDATORY (M‑10)**: *ningún teorema cuyo enunciado hable de indemostrabilidad, indecidibilidad
-o consistencia puede formularse sobre `⊢`.* Si aparece `¬(axioms ⊢ …)` en la **conclusión o en una
-hipótesis** de un resultado así, está mal enunciado: por `derives_completo` eso significa «el cálculo
-**refuta**», no «no demuestra».
+⛔ **Y no era latente**: `prf_to_prfH prf_axiomsCodeT_eq` está escrito literalmente en
+`Meta/InAxiomsCodePrf.lean:308`, y en `:317` **D1 se aplica al propio postulado**
+(`repr_pos'_prf (prf_eq_symm prf_axiomsCodeT_eq)`), pasando por `prf_iff_derivation` → la inducción.
 
-### Lo ejecutado
+⚠️⚠️ **Y `#print axioms` NO DETECTA esta clase**: los tres teoremas tienen footprint limpio y eran
+**injustificados**. La regla del proyecto decía que el footprint se audita «sólo con `#print axioms`»;
+esta clase de fallo **es invisible ahí**.
 
-* 🗑️ **Retirados** `goedel_second'` y `con_imp_godel'` (`Meta/GodelTwo.lean`), con la nota de por qué.
-  **Se conservan** `d3` —que fue `axiom` hasta el 10g y hoy es teorema— y `consistencyFormula'`.
-* 🏁 **`Meta/GodelTwoPrf.lean`**: `goedel_second_prf (hcon : ConsistentOmega) : ¬ Prf Con'`.
-* 📄 `FOL/MetaRules.lean`: corregido el docstring de `gen`, que llamaba «ω‑regla» a algo que **no lo
-  es** — su premisa recorre **todo `Term`**, no los numerales, luego como regla es **más débil**.
+### 🔑 El fondo, que es lo que decide el diseño
 
-### ⚠️ Y ahora lo que hay que mirar de frente: qué es `ConsistentOmega`
+Postular `Prf (ancla)` afirma que el ancla **tiene una derivación finita de Hilbert**, y
+`prf_to_derivation` **cobra esa afirmación**. Lo que queremos es que el ancla sea **VERDADERA**.
+La hipótesis dice exactamente eso y nada más.
 
-`ConsistentOmega := ¬ (axioms ⊢ ⊥)`. Con lo anterior, eso **no es** «la teoría `axioms` es
-consistente» en el sentido habitual. Es:
+### Lo medido antes de elegir: el ancla tiene TRES usos, y no piden lo mismo
 
-> *el conjunto `{A | axioms ⊢ A}` —que es una compleción **completa** de `axioms`— es **consistente***
+| # | dónde | qué necesita |
+|---|---|---|
+| 1 | `Representability2Prf.lean` (`prf_inAxC`) | sólo **pertenencia positiva** |
+| 2 | `InAxiomsCodePrf.lean:308` | **la IGUALDAD**, transportada a `PrfH` |
+| 3 | `InAxiomsCodePrf.lean:317` | **la IGUALDAD**, metida **dentro de `Prov`** por D1 |
 
-es decir: **existe una asignación de verdad total a las sentencias que extiende `axioms`**. Es, en
-fuerza, muy cercano a suponer la **solidez** de `axioms` respecto de algún modelo.
+⇒ ⛔ **`AnclaPos` (sólo pertenencia) NO basta** — cubre (1) y deja (2) y (3) fuera. El panel del
+2026‑09‑11 sólo había trazado el camino de Gödel I y por eso le pareció suficiente.
 
-**Dónde se usa**: es la hipótesis de **los dos** teoremas de Gödel del proyecto —
-`goedel_first_numeral` y `goedel_second_prf`.
+### La decisión
 
-| | |
-|---|---|
-| ✅ **Lo que NO invalida** | las conclusiones son sobre **`Prf`**, que es r.e. y no completo. Los teoremas **dicen lo que parecen decir** |
-| ⚠️ **Lo que sí hay que escribir** | la hipótesis es **más fuerte** que «Q++ es consistente». Presentarla como «consistencia simple» a secas sería un **sobreclaim** |
-| ⬜ **Lo que queda por medir** | si `ConsistentH := ¬ Prf ⊥` bastaría. `consistentH_of_omega` da `ConsistentOmega → ConsistentH`; la **vuelta no existe**, y **ésa es la pregunta**: ¿se puede reformular Gödel I/II sobre `ConsistentH`? Sería **estrictamente mejor** |
+    class AnclaEq : Prop where
+      eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
 
-### 🏁🏁 Addendum 2026‑09‑11 — **P‑4 RESUELTO: sí bastaba `ConsistentH`**
+**CLASE y no argumento explícito**, y la razón es de coste medido: el ancla alcanza **16 módulos**.
+Como argumento habría que tocar **las ~40 llamadas**; como clase, **la resolución de instancias la hila
+sola** y **ninguna llamada cambia** — sólo las firmas. Se anotaron **~440 firmas** con `[AnclaEq]`, de
+forma automática, en **54 rondas de `build → anotar → build`**.
 
-Con el punto fijo ya sobre `Prf` (`prf_godelCN_fixedpoint`, net‑0 puro), los dos teoremas salen en
-**cuatro líneas**:
+### El resultado
 
-```lean
-goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
-goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
-```
+| | antes | después |
+|---|---|---|
+| `axiom` de Lean en RPP | 5 | **4** |
+| axiomas habitando `Prf` | 1 | **0** ⇒ las tres inducciones son **legítimas** |
+| footprint de `goedel_first_prf` / `goedel_second_prf` | `[…, prf_axiomsCodeT_eq]` | **`[propext, Classical.choice, Quot.sound]`** |
+| firma | `ConsistentH → ¬Prf godelCN` | **`∀ [AnclaEq], ConsistentH → ¬Prf godelCN`** |
 
-⇒ **la hipótesis de la cadena de Gödel es hoy la MÍNIMA honesta**: *el cálculo finitario no
-demuestra `⊥`*. `ConsistentOmega` **desaparece de los enunciados cabecera**;
-`consistentH_of_omega` la transfiere para quien la tenga a mano (corolarios `_of_omega`).
+### ⛔⛔ Lo que hay que decir SIEMPRE junto al footprint
 
-⭐⭐ **Y el footprint lo certifica** — cae de
+**El postulado NO desapareció: se movió del footprint a la FIRMA.** Y **no hay ninguna
+`instance : AnclaEq` en el árbol** [medido] ⇒ la hipótesis está **abierta**.
 
-    [3 de Lean] + dne + gen + imp_intro + ax_induction_prim + ax_list_induction
-              + ax_axiomsCodeT_eq + prf_axiomsCodeT_eq
+⇒ Anunciar «Gödel I y II con cero axiomas del proyecto» **sin esa frase sería M‑8 con otro nombre**.
+La fila correspondiente está en `TEOREMAS-E-HIPOTESIS.md` §1, que es exactamente el control que
+existe para esto (**P‑2**).
 
-a
+### ⚠️ Un error de método cometido al ejecutarlo, que conviene no repetir
 
-    [propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]
+Para estimar el alcance calculé un **cierre transitivo por NOMBRES** sobre el fuente: dio **2983 de
+3527 declaraciones (85 % del árbol)**. Absurdo, y es la trampa ya documentada
+(*«el cierre por nombres sobreestimó por dos órdenes; el compilador es la única medida»*). Se
+descartó y se midió con el compilador: **~440 firmas, 54 rondas**.
 
-**un solo axioma del proyecto.** Las ω‑reglas y los dos esquemas de inducción entraban **por la
-hipótesis vieja**, que hablaba de `⊢`. ⇒ **la cadena de Gödel es ENTERAMENTE FINITARIA**, y lo único
-que la separa de los tres axiomas de Lean es **`prf_axiomsCodeT_eq`**, el ancla de codificación.
-
-🔑 **La lección**: *una hipótesis mal elegida no sólo debilita el enunciado — arrastra al footprint
-todo lo que ella necesita.* Cambiarla por la mínima limpió **seis** dependencias de golpe.
-
-**Lo que NO cambia**: 5 `axiom` de Lean, 141 axiomas objeto, `Prf`, `Derives`, y ningún enunciado
-sobre `Prf`.
+**Véase también:** [ADR‑025](#) (M‑11), `TEOREMAS-E-HIPOTESIS.md`,
+`Meta/Representability2Prf.lean` (la clase y su docstring), `doc/AUDITORIA-FOL-2026-09-12.md`.

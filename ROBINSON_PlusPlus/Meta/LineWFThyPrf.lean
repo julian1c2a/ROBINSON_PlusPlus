@@ -64,7 +64,7 @@ instanciarlo con **`yc = (carc t)˙`**, para el que el puente es la **reflexivid
 `termCode axiomsCodeT` aparece **estáticamente** dentro del código punteado `inDotT`, luego su
 invariancia bajo `substtc` es imprescindible para evaluarlo. ⚠️ **No sale por el atajo
 `substtc_inv_termCode_of_tc`**: éste pide el puente `tcFn a =eq termCode a`, y para
-`a = axiomsCodeT` ese puente es **falso** — `axiomsCodeT` es opaco y `prf_axiomsCodeT_eq` sólo lo
+`a = axiomsCodeT` ese puente es **falso** — `axiomsCodeT` es opaco y `AnclaEq.eq` sólo lo
 ancla a `listFormCodeM axioms` a nivel OBJETO, mientras que `termCode axiomsCodeT` y
 `termCode (listFormCodeM axioms)` son códigos meta distintos (de hecho, provablemente distintos).
 
@@ -135,7 +135,7 @@ def inDotT (t : Term) : Term := substfc zero (tcFn t) (formCode inThy)
 
 /-- **Columna vertebral del paso 6, caso `thy`**: el bicondicional (dirección `⇐`) transportado al
     nivel del código y punteado en `t`. Misma plantilla que `paso6_backbone` (`eqrefl`). -/
-theorem paso6_backbone_thy (t : Term) :
+theorem paso6_backbone_thy [AnclaEq] (t : Term) :
     Prf (provFromCode
       (implc (tagDotT t) (implc (andc (lencDotT t) (inDotT t)) (lwfDot t)))) := by
   have h := pcc_thm_inst _ prf_lineWF_thy_bwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
@@ -194,7 +194,7 @@ theorem prf_inDotT_eq (t : Term) :
 /-! ### Paso 6d — PRODUCCIÓN de los punteados -/
 
 /-- **`Prov(TAG_dot t)`** (caso `thy`), bajo la cota `1 < lenc t` y la igualdad de etiqueta. -/
-theorem pcc_tagDotT (t : Term) :
+theorem pcc_tagDotT [AnclaEq] (t : Term) :
     Prf (lt (succ zero) (lenc t) ⇒
       ((nthc t (succ zero) =eq numeralM 15) ⇒ provFromCode (tagDotT t))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 15)
@@ -218,7 +218,7 @@ theorem pcc_tagDotT (t : Term) :
     (PrfH_provCode_congr hcodeq hev)
 
 /-- **`Prov(LENC_dot t)`** a partir de la igualdad de longitud externa `lenc t = 2̇`. -/
-theorem pcc_lencDotT (t : Term) :
+theorem pcc_lencDotT [AnclaEq] (t : Term) :
     Prf ((lenc t =eq numeralM 2) ⇒ provFromCode (lencDotT t)) := by
   refine prf_deduction ?_
   have hev : PrfH [lenc t =eq numeralM 2]
@@ -239,7 +239,7 @@ theorem pcc_lencDotT (t : Term) :
     `⌜In (carc t)˙ axiomsCodeT~⌝`; y de `lineWF t` sale, por `pcc_eval_carc` + la estructura `cons`
     de la línea, el puente `Prov(carcT ṫ = (carc t)˙)`, que un Leibniz interno usa para cambiar
     `(carc t)˙` por `carcT ṫ` en el hueco 1 del átomo `In`. -/
-theorem pcc_inDotT (t : Term) :
+theorem pcc_inDotT [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ (In (carc t) axiomsCodeT ⇒ provFromCode (inDotT t))) := by
   refine prf_deduction (deduction_aux ?_ (In (carc t) axiomsCodeT) [lineWF t] rfl)
   let Γ : List Formula := [In (carc t) axiomsCodeT, lineWF t]
@@ -287,7 +287,7 @@ theorem pcc_inDotT (t : Term) :
 /-- **Reflector por rama, caso `thy`** (accesor estricto, dirección `⇒` descargada): asumido sólo
     el tag `nthc t 1 = 15̇` (que el `or_elim` de `prf_lineWF_inv` provee en este disyunto),
     `lineWF t` refleja su código punteado. Espejo exacto de `pcc_lineWF_tracked_eqrefl_imp`. -/
-theorem pcc_lineWF_tracked_thy_imp (t : Term) :
+theorem pcc_lineWF_tracked_thy_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 15) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 15) [lineWF t] rfl)

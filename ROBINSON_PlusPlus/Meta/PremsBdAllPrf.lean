@@ -518,7 +518,7 @@ abbrev DEUDA_premsBody : Prop :=
     provFromCode (substfc zero (tcFn j) (premsPsiPk r))))
 
 /-- ⭐⭐ **`pcc_bdAll_intro` INTERIOR**, con las ocho administrativas descargadas. -/
-theorem hbdAllPrems_of_body (hbody : DEUDA_premsBody) (r : Term) :
+theorem hbdAllPrems_of_body [AnclaEq] (hbody : DEUDA_premsBody) (r : Term) :
     Prf (premsCF r ⇒ provFromCode (bdAllCode (tcFn (premsBnd r)) (premsPsiPk r))) :=
   pcc_bdAll_intro premsCF premsBnd premsPsiPk r
     hCl_premsCF hCs_premsCF hbl_premsBnd hbs_premsBnd
@@ -659,7 +659,7 @@ la instancia que ahora se deriva de él, y aquí se usa por `open`.
 Es el paso intermedio de `pcc_bnd_bridge` (`Meta/D3BodyPrf.lean` §2). Se expone porque `hphi` lo
 necesita **sin** el `lencT` de encima. -/
 
-theorem pcc_premsOfT_bridge (q i : Term) :
+theorem pcc_premsOfT_bridge [AnclaEq] (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (eqc (premsOfT (nthcT (tcFn q) (tcFn i)))
         (tcFn (premsOf (nthc q i)))))) := by
@@ -690,7 +690,7 @@ theorem pcc_premsOfT_bridge (q i : Term) :
 /-- ⭐ **LA MONEDA, cruzada del todo**: el accesor dotado triple `nthcT (premsOfT (nthcT q̇ i̇)) ȷ̇`
     llevado a la reflexión pura `(nthc (premsOf (nthc q i)) j)˙`. Dos eslabones: el puente de
     arriba (bajo `i < lenc q`) y `pcc_eval_nthc` (bajo `j < lenc L`). -/
-theorem pcc_nthc_premsOf_bridge (q i j : Term) :
+theorem pcc_nthc_premsOf_bridge [AnclaEq] (q i j : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ (lt j (lenc (premsOf (nthc q i))) ⇒
       provFromCode (eqc (nthcT (premsOfT (nthcT (tcFn q) (tcFn i))) (tcFn j))
         (tcFn (nthc (premsOf (nthc q i)) j)))))) := by
@@ -840,7 +840,7 @@ theorem hw_miPhiAt (Q I J : Term) : Prf (hasWitF (miPhiAt Q I J)) :=
       (prf_hasWit_premsOfT (prf_hasWit_nthcT (hwLiftc3_tcFn Q) (hwLiftc2_tcFn I)))
       (hwLiftc_tcFn J))
 
-theorem hphi_gen (Q I J : Term) :
+theorem hphi_gen [AnclaEq] (Q I J : Term) :
     Prf (lt J (lenc (premsOf (nthc Q I))) ⇒
       (chainOk nil Q ⇒ (lt I (lenc Q) ⇒
         (land (lt (.var 0) I)
@@ -960,7 +960,7 @@ theorem substfc_premsPsi_at (q i j : Term) :
   exact prf_congr_orc (prf_refl _) (substfc_bdEx_at q i j)
 
 /-- 🏁🏁🏁 **LA NOVENA OBLIGACIÓN, PROBADA.** -/
-theorem premsBody_reflect (q i j : Term) :
+theorem premsBody_reflect [AnclaEq] (q i j : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ (lt j (lenc (premsOf (nthc q i))) ⇒
       provFromCode (substfc zero (tcFn j) (premsPsi q i))))) := by
   refine prf_deduction (deduction_aux (deduction_aux ?_
@@ -1009,7 +1009,7 @@ theorem premsBody_reflect (q i j : Term) :
       (prf_eq_symm (prf_congr_liftc (prf_liftc_tcFn i))))) _) hbd
 
 /-- 🏁🏁🏁 **`DEUDA_premsBody`, SALDADA** — con los puentes del paquete. -/
-theorem premsBody_deuda : DEUDA_premsBody := by
+theorem premsBody_deuda [AnclaEq] : DEUDA_premsBody := by
   intro r j
   refine prf_deduction (deduction_aux ?_ (lt j (ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBnd r))
     [ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF r] rfl)
@@ -1062,7 +1062,7 @@ theorem substFormula_bodyF_fst (s Y Y2 : Term) (hY : substTerm 0 s Y = Y2) :
     hPs_premsPsi, hY, if_true]
 
 /-- El chasis interior, ya **desempaquetado**. -/
-theorem hbdAllPrems_unpacked (q i : Term) : Prf (bodyF q i) := by
+theorem hbdAllPrems_unpacked [AnclaEq] (q i : Term) : Prf (bodyF q i) := by
   have h0 : Prf (bodyF (carc (cons q i)) (cdrc (cons q i))) :=
     hbdAllPrems_of_body premsBody_deuda (cons q i)
   -- (1) Leibniz sobre el SEGUNDO accesor: `cdrc (cons q i) ↦ i`
@@ -1271,7 +1271,7 @@ theorem hwP_premsPsi (q i : Term) : Prf (hasWitF (bdAllBndCtx (premsPsi q i))) :
   exact prf_hasWitF_forallc _ (prf_hasWitF_implc _ _ (by hw_auto) (hwPsi_premsPsi q i))
 
 /-- 🏁🏁 **`hbody`(b) de D3** — la mitad que faltaba. -/
-theorem hB_premsDotAt (q i : Term) :
+theorem hB_premsDotAt [AnclaEq] (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ provFromCode (premsDotAt q i))) := by
   refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
   have hch : PrfH [lt i (lenc q), chainOk nil q] (chainOk nil q) :=
@@ -1291,12 +1291,12 @@ theorem hB_premsDotAt (q i : Term) :
 /-! ## §3 · 🏁🏁🏁 **D3, PROBADA** -/
 
 /-- El `hbody` del `pcc_bdAll_intro` EXTERIOR, desde sus dos mitades. -/
-theorem hbody_prems : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+theorem hbody_prems [AnclaEq] : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
     provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q)))) :=
   hbody_of_halves hA_lineWFDotAt hB_premsDotAt
 
 /-- 🏁🏁🏁 **LA TERCERA CONDICIÓN DE DERIVABILIDAD, PROBADA.** -/
-theorem d3_prf_real (φ : Formula) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
+theorem d3_prf_real [AnclaEq] (φ : Formula) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_halves φ hA_lineWFDotAt hB_premsDotAt
 
 

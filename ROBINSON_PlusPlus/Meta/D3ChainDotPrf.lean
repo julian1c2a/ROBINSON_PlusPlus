@@ -96,7 +96,7 @@ theorem prf_forall_chainOkB_imp_chainOk :
     `pcc_thm_inst` mete el teorema anterior en `Prov` y lo instancia en `tcFn #0`; `substfc`
     distribuye sobre `implc` (`prf_substfc_impl`), así que lo que sale es literalmente
     `Prov(⌜chainOkBDot ⇒ chainOkDot⌝)`. -/
-theorem pcc_chainOkBDot_imp_chainOkDot :
+theorem pcc_chainOkBDot_imp_chainOkDot [AnclaEq] :
     Prf (provFromCode (implc chainOkBDot chainOkDot)) := by
   have hinst :=
     pcc_thm_inst (Formula.impl (chainOkB nil (.var 0)) (chainOk nil (.var 0)))
@@ -113,7 +113,7 @@ theorem pcc_chainOkBDot_imp_chainOkDot :
     Es la pieza que `sondeos/A3IsFCBTracked.lean` no necesitó —allí el predicado ya *era* un
     `∀` acotado—, y sin ella `pcc_bdAll_intro` no puede cerrar `hC_dot`: entrega el código
     equivocado. Independiente de la rama C. -/
-theorem hC_dot_of_chainOkBDot
+theorem hC_dot_of_chainOkBDot [AnclaEq]
     (hB : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkBDot)) :
     Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot) := by
   refine prf_deduction ?_
@@ -138,7 +138,7 @@ abbrev DEUDA_chainOkBDot : Prop :=
 
     `d3_prf_of_chainOkDot` reducía D3 a `hC_dot`; §1 reduce `hC_dot` a la forma **acotada**.
     Componiendo: D3 sale de `DEUDA_chainOkBDot` y nada más. -/
-theorem d3_prf_of_chainOkBDot (φ : Formula) (hB : DEUDA_chainOkBDot) :
+theorem d3_prf_of_chainOkBDot [AnclaEq] (φ : Formula) (hB : DEUDA_chainOkBDot) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_chainOkDot φ (hC_dot_of_chainOkBDot hB)
 
@@ -231,7 +231,7 @@ theorem chainOkB_bnd_liftc (p : Term) :
     NIVEL 1. Es la misma que pide `hPinv_wfAll1Psi`, y se paga recorriendo el cuerpo: el nivel
     exterior 1 no toca nada porque los códigos dotados (`ṗ`, `tcFn …`) son `substtc`‑invariantes
     y los huecos vivos están en `⌜v₀⌝` (nivel 0) y, bajo el binder interno, en `⌜v₀⌝`/`⌜v₁⌝`. -/
-theorem PrfH_chainOkB_bnd_bridge {Γ : List Formula} (p Phic : Term)
+theorem PrfH_chainOkB_bnd_bridge [AnclaEq] {Γ : List Formula} (p Phic : Term)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
     (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
     (h : PrfH Γ (provFromCode (bdAllCode (tcFn (lenc p)) Phic))) :
@@ -257,7 +257,7 @@ theorem PrfH_chainOkB_bnd_bridge {Γ : List Formula} (p Phic : Term)
     Con esto, D3 queda a **una sola** obligación con enunciado explícito: producir la reflexión
     del cuerpo `lineOkB nil p i`. Todo lo demás —el puente átomo↔acotada de §1, la apertura del
     destino de §3, y el puente de la cota de §4— está probado. -/
-theorem DEUDA_chainOkBDot_of (Phic : Term)
+theorem DEUDA_chainOkBDot_of [AnclaEq] (Phic : Term)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
     (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
     (hmatch : Prf (bdAllCode (lencT (liftc zero (tcFn (.var 0)))) Phic =eq chainOkBDot))
@@ -272,7 +272,7 @@ theorem DEUDA_chainOkBDot_of (Phic : Term)
     (PrfH_chainOkB_bnd_bridge (.var 0) Phic hPinv hwP h)
 
 /-- Y **D3 entera**, a partir de lo mismo. -/
-theorem d3_prf_of (φ : Formula) (Phic : Term)
+theorem d3_prf_of [AnclaEq] (φ : Formula) (Phic : Term)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
     (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
     (hmatch : Prf (bdAllCode (lencT (liftc zero (tcFn (.var 0)))) Phic =eq chainOkBDot))
@@ -348,7 +348,7 @@ theorem prf_contract {A B : Formula} (h : Prf (A ⇒ (A ⇒ B))) : Prf (A ⇒ B)
   prf_deduction (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH h _) (prfH_hyp_self _))
     (prfH_hyp_self _))
 
-theorem pcc_bdEx_carc_reflect_gen (y p b Phic Phic' : Term) (A A' : Formula)
+theorem pcc_bdEx_carc_reflect_gen [AnclaEq] (y p b Phic Phic' : Term) (A A' : Formula)
     (hPlift : liftTerm 0 Phic = Phic')
     (hAlift : liftFormula 0 A = A')
     (hwPhi : Prf (hasWitF (liftTerm 0 Phic')))
@@ -409,7 +409,7 @@ El `A` extra se instancia con `chainOk nil p` —redundante— y se contrae. La 
 literalmente lo que la prueba de §5 hacía en su contexto interno, sacado a un `Prf`. -/
 
 /-- La obligación `hphi` del caso `bdCarcLtPhic`. -/
-theorem hphi_bdCarcLt (y p b : Term) :
+theorem hphi_bdCarcLt [AnclaEq] (y p b : Term) :
     Prf (chainOk nil (liftTerm 0 p) ⇒
       (chainOk nil (liftTerm 0 p) ⇒ (lt (liftTerm 0 b) (lenc (liftTerm 0 p)) ⇒
         (land (lt (.var 0) (liftTerm 0 b))
@@ -476,7 +476,7 @@ theorem hphi_bdCarcLt (y p b : Term) :
 
 /-- ⭐⭐ **LA REFLEXIÓN DEL `∃` ACOTADO, CON COTA ARBITRARIA** — hoy, **la instancia** de §5bis
     (ADR‑019, 2026‑09‑10h). El enunciado es el de siempre; la prueba dejó de estar duplicada. -/
-theorem pcc_bdCarcLt_reflect (y p b : Term) :
+theorem pcc_bdCarcLt_reflect [AnclaEq] (y p b : Term) :
     Prf (chainOk nil p ⇒ (lt b (lenc p) ⇒
       (boundedCarcLt y p b ⇒ provFromCode (bdCarcLtDot y p b)))) :=
   prf_contract
@@ -503,7 +503,7 @@ restricción. Cuando el `pcc_bdAll_intro` de §7 fije el `PsiF`, se instanciará
 
 /-- ⭐⭐ **EL CUERPO DEL `∀`, REFLEJADO.** La disyunción se elimina a nivel OBJETO y cada rama se
     refleja por separado: la izquierda por explosión, la derecha por `pcc_bdCarcLt_reflect`. -/
-theorem pcc_premsBody_reflect (Ac y p i : Term) :
+theorem pcc_premsBody_reflect [AnclaEq] (Ac y p i : Term) :
     Prf (chainOk nil p ⇒ (lt i (lenc p) ⇒
       (lor (In y nil) (boundedCarcLt y p i) ⇒
         provFromCode (orc Ac (bdCarcLtDot y p i))))) := by
@@ -528,7 +528,7 @@ theorem pcc_premsBody_reflect (Ac y p i : Term) :
 
 /-- La forma que el `hbody` del `pcc_bdAll_intro` de `boundedPremsIn` consumirá: el cuerpo ya
     instanciado en el índice `j` de la lista `L`. -/
-theorem pcc_premsBody_reflect_at (Ac L j p i : Term) :
+theorem pcc_premsBody_reflect_at [AnclaEq] (Ac L j p i : Term) :
     Prf (chainOk nil p ⇒ (lt i (lenc p) ⇒
       (lor (In (nthc L j) nil) (boundedCarcLt (nthc L j) p i) ⇒
         provFromCode (orc Ac (bdCarcLtDot (nthc L j) p i))))) :=
@@ -689,7 +689,7 @@ theorem hmatch_chainOkB :
 /-- ⭐⭐⭐ **D3 REDUCIDA A TRES OBLIGACIONES SOBRE UN `PsiF` YA FIJADO.** Comparado con
     `DEUDA_chainOkBDot_of` (§4), el cuerpo deja de ser un parámetro libre y `hmatch` desaparece:
     lo que queda es la invariancia del cuerpo, su testigo, y el `pcc_bdAll_intro`. -/
-theorem DEUDA_chainOkBDot_of_hbdAll
+theorem DEUDA_chainOkBDot_of_hbdAll [AnclaEq]
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
       =eq chainOkBPsi (tcFn (.var 0)) (.var 0)))
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
@@ -700,7 +700,7 @@ theorem DEUDA_chainOkBDot_of_hbdAll
   DEUDA_chainOkBDot_of _ hPinv hwP hmatch_chainOkB hbdAll
 
 /-- Y **D3 entera** desde las mismas tres. -/
-theorem d3_prf_of_hbdAll (φ : Formula)
+theorem d3_prf_of_hbdAll [AnclaEq] (φ : Formula)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
       =eq chainOkBPsi (tcFn (.var 0)) (.var 0)))
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
@@ -754,7 +754,7 @@ theorem hPinv_chainOkBPsi : ∀ u : Term,
     (lineOkB nil (.var 1) (.var 0)) hfv_chainOkBPsi u
 
 /-- Y D3 baja a **DOS** obligaciones. -/
-theorem DEUDA_chainOkBDot_of_two
+theorem DEUDA_chainOkBDot_of_two [AnclaEq]
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbdAll : Prf (chainOk nil (.var 0) ⇒
       provFromCode (bdAllCode (tcFn (lenc (.var 0)))
@@ -762,7 +762,7 @@ theorem DEUDA_chainOkBDot_of_two
     DEUDA_chainOkBDot :=
   DEUDA_chainOkBDot_of_hbdAll hPinv_chainOkBPsi hwP hbdAll
 
-theorem d3_prf_of_two (φ : Formula)
+theorem d3_prf_of_two [AnclaEq] (φ : Formula)
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbdAll : Prf (chainOk nil (.var 0) ⇒
       provFromCode (bdAllCode (tcFn (lenc (.var 0)))
@@ -888,7 +888,7 @@ theorem hbdAll_of_dotted
 
 /-- ⭐⭐⭐ **`pcc_bdAll_intro`, YA APLICABLE**: siete de sus nueve obligaciones descargadas.
     Antes de §10 no lo era en absoluto — `hPl` era falsa. -/
-theorem hbdAllDot_of_body
+theorem hbdAllDot_of_body [AnclaEq]
     (hPsiId : ∀ q : Term,
       Prf (substfc zero (varc (numeral 0)) (chainOkBPsiDot q) =eq chainOkBPsiDot q))
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
@@ -900,7 +900,7 @@ theorem hbdAllDot_of_body
     liftT_chainOkBPsiDot substT_chainOkBPsiDot hPsiId hwPsi_chainOkBPsiDot hbody
 
 /-- ⭐⭐⭐ **D3 DESDE TRES OBLIGACIONES**, y las tres sobre el `PsiF` DOTADO. -/
-theorem d3_prf_of_body (φ : Formula)
+theorem d3_prf_of_body [AnclaEq] (φ : Formula)
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hPsiId : ∀ q : Term,
       Prf (substfc zero (varc (numeral 0)) (chainOkBPsiDot q) =eq chainOkBPsiDot q))
@@ -979,7 +979,7 @@ theorem hPsiId_chainOkBPsiDot (q : Term) :
         (prf_substfc_arith_open 1 (liftc zero (tcFn q)) (lineOkB nil (.var 1) (.var 0)))))
 
 /-- `pcc_bdAll_intro` con **OCHO de sus nueve** obligaciones descargadas. -/
-theorem hbdAllDot_of_hbody
+theorem hbdAllDot_of_hbody [AnclaEq]
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
     Prf (chainOk nil (.var 0) ⇒
@@ -987,7 +987,7 @@ theorem hbdAllDot_of_hbody
   hbdAllDot_of_body hPsiId_chainOkBPsiDot hbody
 
 /-- ⭐⭐⭐ **D3 DESDE DOS OBLIGACIONES**: el testigo del cuerpo y el cuerpo. -/
-theorem DEUDA_chainOkBDot_of_hbody
+theorem DEUDA_chainOkBDot_of_hbody [AnclaEq]
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
@@ -995,7 +995,7 @@ theorem DEUDA_chainOkBDot_of_hbody
   DEUDA_chainOkBDot_of_two hwP (hbdAll_of_dotted (hbdAllDot_of_hbody hbody))
 
 /-- Y **D3 entera** desde esas dos. -/
-theorem d3_prf_of_hbody (φ : Formula)
+theorem d3_prf_of_hbody [AnclaEq] (φ : Formula)
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
@@ -1042,7 +1042,7 @@ theorem hwP_chainOkBPsi :
   exact prf_hasWitF_forallc _ (prf_hasWitF_implc _ _ (by hw_auto) hPsi)
 
 /-- ⭐⭐⭐ **`DEUDA_chainOkBDot` DESDE `hbody` Y NADA MÁS.** -/
-theorem DEUDA_chainOkBDot_of_body_only
+theorem DEUDA_chainOkBDot_of_body_only [AnclaEq]
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
     DEUDA_chainOkBDot :=
@@ -1053,7 +1053,7 @@ theorem DEUDA_chainOkBDot_of_body_only
     Todo lo demás —el puente átomo↔forma acotada, la cota, el `∃` acotado, el cuerpo del `∀`, el
     empaquetado, los dos `PsiF`, `hmatch`, `hPinv`, `hPsiId` y `hwP`— está **probado**, y con
     footprint igual a la base sancionada. -/
-theorem d3_prf_of_body_only (φ : Formula)
+theorem d3_prf_of_body_only [AnclaEq] (φ : Formula)
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
@@ -1145,7 +1145,7 @@ theorem hbody_of_halves
     (PrfH_and_intro_code _ _ ha hb)
 
 /-- ⭐⭐⭐ **D3 DESDE LAS DOS MITADES DEL CUERPO, y nada más.** -/
-theorem d3_prf_of_halves (φ : Formula)
+theorem d3_prf_of_halves [AnclaEq] (φ : Formula)
     (hA : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (lineWFDotAt q i))))
     (hB : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒

@@ -101,7 +101,7 @@ será vacua. -/
 
     Los 7 pendientes (`q1`=9, `q2`=10, `q3`=11, `leibniz`=13, `ind`=18, `qconf`=19, `listInd`=20)
     están bloqueados tras `pcc_eval_substfc` (ver `NEXT-STEPS.md`, ruta 1a). -/
-theorem pcc_lineWF_tracked_modulo_7 (t : Term)
+theorem pcc_lineWF_tracked_modulo_7 [AnclaEq] (t : Term)
     (hq1 : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 9) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))))
     (hq2 : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 10) ⇒

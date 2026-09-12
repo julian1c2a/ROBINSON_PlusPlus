@@ -95,7 +95,7 @@ def lencDotM (t : Term) : Term := substfc zero (tcFn t) (formCode lencMp)
 
 /-- **Columna vertebral del paso 6, caso `mp`**. Más corta que la de `eqrefl`/`thy`: al no haber
     conjunción en el RHS, sólo hay que distribuir el `substfc` sobre **un** `implc`. -/
-theorem paso6_backbone_mp (t : Term) :
+theorem paso6_backbone_mp [AnclaEq] (t : Term) :
     Prf (provFromCode (implc (tagDotM t) (implc (lencDotM t) (lwfDot t)))) := by
   have h := pcc_thm_inst _ prf_lineWF_mp_bwd (tcFn t) (prf_hasWit_tcFn (liftTerm 0 t))
   refine prf_mp (prf_provCode_congr ?_) h
@@ -120,7 +120,7 @@ theorem prf_tagDotM_eq (t : Term) :
     (LineWFTrackedPrf.substtc_inv_termCode_of_tc (prf_tc_numeral 1) (tcFn t))
 
 /-- **`Prov(TAG_dot t)`** (caso `mp`), bajo la cota `1 < lenc t` y la igualdad de etiqueta. -/
-theorem pcc_tagDotM (t : Term) :
+theorem pcc_tagDotM [AnclaEq] (t : Term) :
     Prf (lt (succ zero) (lenc t) ⇒
       ((nthc t (succ zero) =eq numeralM 16) ⇒ provFromCode (tagDotM t))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 16)
@@ -150,7 +150,7 @@ theorem prf_lencDotM_eq (t : Term) :
   prf_lencDot_eq t
 
 /-- **`Prov(LENC_dot t)`** a partir de la igualdad de longitud externa `lenc t = 3̇`. -/
-theorem pcc_lencDotM (t : Term) :
+theorem pcc_lencDotM [AnclaEq] (t : Term) :
     Prf ((lenc t =eq numeralM 3) ⇒ provFromCode (lencDotM t)) := pcc_lencDot t
 
 /-! ### Paso 6g — reflector POR RAMA del caso `mp`, **sin hipótesis de cota** -/
@@ -158,7 +158,7 @@ theorem pcc_lencDotM (t : Term) :
 /-- **Reflector por rama, caso `mp`** (accesor estricto, dirección `⇒` descargada): asumido sólo el
     tag `nthc t 1 = 16̇`, `lineWF t` refleja su código punteado. El más corto de los tres: un único
     punteado (la longitud) y un único MP interno. -/
-theorem pcc_lineWF_tracked_mp_imp (t : Term) :
+theorem pcc_lineWF_tracked_mp_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 16) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM 16) [lineWF t] rfl)

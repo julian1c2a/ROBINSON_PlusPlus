@@ -44,7 +44,7 @@ lo eran en `d3_prf_of_sigma1`.
 
 /-- **Reducción de `hI`**: la Σ₁‑completitud provable de `In` se sigue de la de su forma acotada
     `boundedIn`. Vía las dos direcciones de `prf_In_iff_boundedIn` + `pcc_imp`. -/
-theorem prf_hI_of_reflect_boundedIn
+theorem prf_hI_of_reflect_boundedIn [AnclaEq]
     (hbI : ∀ x L : Term, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L))) :
     ∀ x L : Term, Prf (In x L ⇒ provCodeC' (In x L)) := by
   intro x L
@@ -60,7 +60,7 @@ theorem prf_hI_of_reflect_boundedIn
 
 /-- **Reducción de `hC`**: la Σ₁‑completitud provable de `chainOk nil p` se sigue de la de su
     forma acotada `chainOkB nil p`. Vía `prf_chainOk_iff_chainOkB` + `pcc_imp`. -/
-theorem prf_hC_of_reflect_chainOkB
+theorem prf_hC_of_reflect_chainOkB [AnclaEq]
     (hbC : ∀ p : Term, Prf (chainOkB nil p ⇒ provCodeC' (chainOkB nil p))) :
     ∀ p : Term, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p)) := by
   intro p
@@ -80,7 +80,7 @@ theorem prf_hC_of_reflect_chainOkB
     A partir de aquí, `hbC`/`hbI` se atacan por reflexión de los **átomos** (`<`, `=eq`, `lineWF`,
     `nthc`, `carc`) con `num`/`substfc`‑var‑equations (fase 3‑4) y por **inducción estructural**
     sobre la forma acotada (fase 5). -/
-theorem d3_prf_of_reflect_bounded (φ : Formula)
+theorem d3_prf_of_reflect_bounded [AnclaEq] (φ : Formula)
     (hbC : ∀ p : Term, Prf (chainOkB nil p ⇒ provCodeC' (chainOkB nil p)))
     (hbI : ∀ x L : Term, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L))) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=

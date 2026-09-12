@@ -95,13 +95,32 @@ theorem prf_In_runFn_of_mem {rs : List Rule} {L : List Formula} {φ : Formula}
 
 /-! ### Pertenencia de códigos de axioma a `axiomsCodeT`, en `Prf`
 
-**Meta-axioma de codificación finitario** `prf_axiomsCodeT_eq`: el anclaje del constante opaco
-`axiomsCodeT` a la lista explícita `listFormCodeM axioms`, a nivel del cálculo `Prf` (espejo de
-`ax_axiomsCodeT_eq`, que vive a nivel `axioms ⊢`; no derivable de él porque `Prf → ⊢` es de una
-sola dirección). Es **el único postulado de codificación** de la capa `Prf`: con él, `prf_inAxC`
-(la pertenencia de cada código de axioma) pasa a ser **TEOREMA** — igual que en `⊢` `ax_inAxC` se
-deriva del anclaje `ax_axiomsCodeT_eq`. -/
-axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
+**EL ANCLAJE DE CODIFICACIÓN — HIPÓTESIS CON NOMBRE, ya no `axiom`** ([ADR‑026](../../DECISIONS.md),
+2026‑09‑12; antes `axiom prf_axiomsCodeT_eq`).
+
+Ancla el constante opaco `axiomsCodeT` a la lista explícita `listFormCodeM axioms` al nivel del
+cálculo `Prf`. No es derivable de su gemelo `⊢` (`ax_axiomsCodeT_eq`): `Prf → ⊢` va en una sola
+dirección.
+
+## ⛔⛔ Por qué dejó de ser `axiom`
+
+Un `axiom` de tipo `Prf …` **HABITA el inductivo `Prf`**, y por **M‑11** eso prohíbe demostrar nada
+sobre `Prf` por inducción. Pero el árbol lo hace **tres veces** —`prf_to_derives`, `prf_to_prfH`,
+`prf_to_derivation`— y D1 **se aplica al propio postulado** en `Meta/InAxiomsCodePrf.lean:317`.
+⚠️ Y `#print axioms` **no lo detecta**: esos tres tienen footprint limpio y eran injustificados.
+
+🔑 **El fondo**: postular `Prf (ancla)` afirma que el ancla **tiene una derivación finita de
+Hilbert**. Lo que queremos es que sea **VERDADERA**. La hipótesis dice eso y nada más.
+
+## Por qué una CLASE y no un argumento explícito
+
+Medido: el ancla alcanza **16 módulos y ~40 usos**. Como argumento habría que tocar las 40 llamadas.
+Como **clase**, la resolución de instancias la hila sola: basta `variable [AnclaEq]` en cada módulo
+afectado y **ninguna llamada cambia**. El footprint sigue limpio.
+
+⇒ `Prf` queda **sin ningún `axiom` habitándolo** y las tres inducciones pasan a ser **legítimas**. -/
+class AnclaEq : Prop where
+  eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
 
 /-- **Pertenencia POSITIVA en `Prf`** de un código de fórmula a `listFormCodeM L` (recursión
     estructural sobre `L`, sin materializar el término): cabeza = `prf_in_cons_head`, cola =
@@ -115,21 +134,22 @@ theorem prf_In_listFormCodeM_prf (φ : Formula) :
       · exact prf_in_cons_tail (formCodeM g) (prf_In_listFormCodeM_prf φ gs htail)
 
 /-- **`prf_inAxC` — ahora TEOREMA** (antes meta-axioma): la pertenencia del código de un axioma a
-    `axiomsCodeT`, derivada del anclaje `prf_axiomsCodeT_eq` + la pertenencia positiva a la lista
+    `axiomsCodeT`, derivada del anclaje `AnclaEq` + la pertenencia positiva a la lista
     explícita (`prf_In_listFormCodeM_prf`) + Leibniz en el 2º argumento de `In` (`prf_eq_subst_in`). -/
-theorem prf_inAxC (a : Formula) (h : a ∈ axioms) : Prf (In (formCodeM a) axiomsCodeT) :=
-  prf_eq_subst_in (prf_eq_symm prf_axiomsCodeT_eq) (prf_In_listFormCodeM_prf a axioms h)
+theorem prf_inAxC [AnclaEq] (a : Formula) (h : a ∈ axioms) : Prf (In (formCodeM a) axiomsCodeT) :=
+  prf_eq_subst_in (prf_eq_symm AnclaEq.eq) (prf_In_listFormCodeM_prf a axioms h)
 
 /-- Pertenencia del código de un axioma a `axiomsCodeT` en `Prf` (vía `prf_inAxC`
     + puente `formCodeM_eq`). Reusado en el caso `thy`. -/
-private theorem prf_inAxiomsCodeT {f : Formula} (hmem : f ∈ axioms) :
+private theorem prf_inAxiomsCodeT [AnclaEq] {f : Formula} (hmem : f ∈ axioms) :
     Prf (In (formCode f) axiomsCodeT) := by
   have h0 : Prf (In (formCodeM f) axiomsCodeT) := prf_inAxC f hmem
   rwa [formCodeM_eq] at h0
 
 /-! ### chainOk-tracking en `Prf` (validez de la cadena) -/
 
-theorem prf_chainOk_track (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc = some L →
+theorem prf_chainOk_track [AnclaEq] (rs : List Rule) :
+    ∀ (acc L : List Formula), checkAux rs acc = some L →
     Prf (chainOk (listFormCode acc) (proofCode' rs acc)) := by
   induction rs with
   | nil =>
@@ -345,7 +365,7 @@ theorem provCodeC'_intro_prf (φ : Formula) (p : Term)
 /-- **`repr_pos'_prf` (D1 real, finitario)**: toda demostración de Hilbert `Prf φ`
     se internaliza como `Prf (provCodeC' φ)`. Necesitación internalizada al nivel del
     cálculo finitario `Prf` (cimiento de la cadena HBL hacia Gödel II real). -/
-theorem repr_pos'_prf {φ : Formula} (h : Prf φ) : Prf (provCodeC' φ) := by
+theorem repr_pos'_prf [AnclaEq] {φ : Formula} (h : Prf φ) : Prf (provCodeC' φ) := by
   obtain ⟨rs, L, hchk, hmem⟩ := prf_iff_derivation.mp h
   have hchk' : checkAux rs [] = some L := by simpa [checkProof] using hchk
   exact provCodeC'_intro_prf φ (proofCode' rs [])
@@ -354,6 +374,7 @@ theorem repr_pos'_prf {φ : Formula} (h : Prf φ) : Prf (provCodeC' φ) := by
 end ROBINSON_PlusPlus.Meta.Representability2Prf
 
 export ROBINSON_PlusPlus.Meta.Representability2Prf (
+  AnclaEq
   prf_concat_listFormCode
   prf_concat_listFormCode_singleton
   prf_runFn_track

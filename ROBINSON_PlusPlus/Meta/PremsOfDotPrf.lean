@@ -127,7 +127,7 @@ theorem substtc_inv_consNT : ∀ (xs : List Term) (W : Term),
 `substfc` sobre `G (varc 0̄)`, hace falta que `G` **conmute** con `substfc`, porque la recursión
 mete el prefijo `consT ẋ ·` DENTRO del contexto en cada piso. -/
 
-theorem pcc_rw_dot_consN
+theorem pcc_rw_dot_consN [AnclaEq]
     (G : Term → Term)
     (hGs : ∀ s c : Term, Prf (substfc zero s (G c) =eq G (substtc zero s c)))
     (hGc : ∀ c c' : Term, Prf (c =eq c') → Prf (G c =eq G c'))
@@ -178,7 +178,7 @@ theorem meas_thy (W : Term) :
 theorem prf_tc_nil : Prf (tcFn nil =eq termCode nil) := prf_tc_numeralM 0
 
 /-- 🏁 **PILOTO**: la reflexión punteada de `premsOf` para el tag 15 (`thy`). -/
-theorem pcc_premsOf_dot_thy (a : Term) :
+theorem pcc_premsOf_dot_thy [AnclaEq] (a : Term) :
     Prf (provFromCode (eqCodeFn
       (premsOfT (tcFn (cons a (cons (numeralM 15) nil)))) (tcFn nil))) := by
   let φ : Formula := premsOf (cons (.var 0) (cons (numeralM 15) nil)) =eq nil
@@ -208,7 +208,7 @@ theorem pcc_premsOf_dot_thy (a : Term) :
 
 /-! ## §5 · PLANTILLA aridad 2, RHS `nil` (efq, eqrefl, p3, ind, listInd) -/
 
-theorem pcc_premsOf_dot_2nil (k : Nat) (a₀ a₁ : Term)
+theorem pcc_premsOf_dot_2nil [AnclaEq] (k : Nat) (a₀ a₁ : Term)
     (hmem : forall_2 (premsOf (cons (.var 1) (cons (numeralM k) (cons (.var 0) nil)))
       =eq nil) ∈ axioms)
     (hcode : ∀ W : Term,
@@ -268,7 +268,7 @@ theorem pcc_premsOf_dot_2nil (k : Nat) (a₀ a₁ : Term)
     [a₀, numeralM k, a₁] hbase
 
 /-- Instancia: tag 8 (`efq`). -/
-theorem pcc_premsOf_dot_efq (a₀ a₁ : Term) :
+theorem pcc_premsOf_dot_efq [AnclaEq] (a₀ a₁ : Term) :
     Prf (provFromCode (eqCodeFn
       (premsOfT (tcFn (cons a₀ (cons (numeralM 8) (cons a₁ nil))))) (tcFn nil))) :=
   pcc_premsOf_dot_2nil 8 a₀ a₁ (show ax_premsOf_efq ∈ axioms by simp [axioms]) (fun _ => rfl)
@@ -308,7 +308,7 @@ theorem prf_substtc_varc_lt {j v : Nat} (h : j < v) (s : Term) :
 
 /-! ## §7 · PLANTILLA aridad 3, RHS `nil` -/
 
-theorem pcc_premsOf_dot_3nil (k : Nat) (a₀ a₁ a₂ : Term)
+theorem pcc_premsOf_dot_3nil [AnclaEq] (k : Nat) (a₀ a₁ a₂ : Term)
     (hmem : forall_3 (premsOf (cons (.var 2) (cons (numeralM k)
       (cons (.var 1) (cons (.var 0) nil)))) =eq nil) ∈ axioms)
     (hcode : ∀ W : Term,
@@ -391,14 +391,14 @@ theorem pcc_premsOf_dot_3nil (k : Nat) (a₀ a₁ a₂ : Term)
     [a₀, numeralM k, a₁, a₂] hbase
 
 /-- Instancia: tag 0 (`p1`). -/
-theorem pcc_premsOf_dot_p1 (a₀ a₁ a₂ : Term) :
+theorem pcc_premsOf_dot_p1 [AnclaEq] (a₀ a₁ a₂ : Term) :
     Prf (provFromCode (eqCodeFn
       (premsOfT (tcFn (cons a₀ (cons (numeralM 0) (cons a₁ (cons a₂ nil)))))) (tcFn nil))) :=
   pcc_premsOf_dot_3nil 0 a₀ a₁ a₂ (show ax_premsOf_p1 ∈ axioms by simp [axioms]) (fun _ => rfl)
 
 /-! ## §8 · PLANTILLA aridad 4, RHS `nil` -/
 
-theorem pcc_premsOf_dot_4nil (k : Nat) (a0 a1 a2 a3 : Term)
+theorem pcc_premsOf_dot_4nil [AnclaEq] (k : Nat) (a0 a1 a2 a3 : Term)
     (hmem : forall_4 (premsOf (cons (.var 3) (cons (numeralM k)
       (cons (.var 2) (cons (.var 1) (cons (.var 0) nil))))) =eq nil) ∈ axioms)
     (hcode : ∀ W : Term,
@@ -517,7 +517,7 @@ theorem pcc_premsOf_dot_4nil (k : Nat) (a0 a1 a2 a3 : Term)
     [a0, numeralM k, a1, a2, a3] hbase
 
 /-- Instancia: tag 1 (`p2`). -/
-theorem pcc_premsOf_dot_p2 (a0 a1 a2 a3 : Term) :
+theorem pcc_premsOf_dot_p2 [AnclaEq] (a0 a1 a2 a3 : Term) :
     Prf (provFromCode (eqCodeFn (premsOfT (tcFn (cons a0 (cons (numeralM 1)
       (cons a1 (cons a2 (cons a3 nil))))))) (tcFn nil))) :=
   pcc_premsOf_dot_4nil 1 a0 a1 a2 a3 (show ax_premsOf_p2 ∈ axioms by simp [axioms]) (fun _ => rfl)
@@ -564,7 +564,7 @@ theorem GRH_wit (L R : Term) (hL : Prf (hasWit L)) (hR : Prf (hasWit R))
 
 /-! ### `gen` (17): `premsOf ⟨c, 17̄, b⟩ ≐ ⟨b⟩` -/
 
-theorem pcc_premsOf_dot_gen (a0 a1 : Term) :
+theorem pcc_premsOf_dot_gen [AnclaEq] (a0 a1 : Term) :
     Prf (provFromCode (eqCodeFn
       (premsOfT (tcFn (cons a0 (cons (numeralM 17) (cons a1 nil)))))
       (tcFn (cons a1 nil)))) := by
@@ -628,7 +628,7 @@ theorem pcc_premsOf_dot_gen (a0 a1 : Term) :
 
 /-! ### `mp` (16): `premsOf ⟨c, 16̄, a⟩ ≐ ⟨implc a c, a⟩` — el RHS ANIDADO -/
 
-theorem pcc_premsOf_dot_mp (a0 a1 : Term) :
+theorem pcc_premsOf_dot_mp [AnclaEq] (a0 a1 : Term) :
     Prf (provFromCode (eqCodeFn
       (premsOfT (tcFn (cons a0 (cons (numeralM 16) (cons a1 nil)))))
       (tcFn (cons (implc a1 a0) (cons a1 nil))))) := by
@@ -795,7 +795,7 @@ theorem pcc_eval_premsOf_tag_plain {k m : Nat} (t R : Term)
 /-! ## §11 · LAS 21 RAMAS -/
 
 /-- Tag 0 (`p1`). -/
-theorem pcc_eval_premsOf_p1 (t : Term) :
+theorem pcc_eval_premsOf_p1 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 0) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 0) (m := 2) t (nil)
@@ -805,7 +805,7 @@ theorem pcc_eval_premsOf_p1 (t : Term) :
       (show ax_premsOf_p1 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 1 (`p2`). -/
-theorem pcc_eval_premsOf_p2 (t : Term) :
+theorem pcc_eval_premsOf_p2 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 1) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 1) (m := 3) t (nil)
@@ -815,7 +815,7 @@ theorem pcc_eval_premsOf_p2 (t : Term) :
       (show ax_premsOf_p2 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 2 (`c1`). -/
-theorem pcc_eval_premsOf_c1 (t : Term) :
+theorem pcc_eval_premsOf_c1 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 2) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 2) (m := 2) t (nil)
@@ -825,7 +825,7 @@ theorem pcc_eval_premsOf_c1 (t : Term) :
       (show ax_premsOf_c1 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 3 (`c2`). -/
-theorem pcc_eval_premsOf_c2 (t : Term) :
+theorem pcc_eval_premsOf_c2 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 3) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 3) (m := 2) t (nil)
@@ -835,7 +835,7 @@ theorem pcc_eval_premsOf_c2 (t : Term) :
       (show ax_premsOf_c2 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 4 (`c3`). -/
-theorem pcc_eval_premsOf_c3 (t : Term) :
+theorem pcc_eval_premsOf_c3 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 4) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 4) (m := 2) t (nil)
@@ -845,7 +845,7 @@ theorem pcc_eval_premsOf_c3 (t : Term) :
       (show ax_premsOf_c3 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 5 (`j1`). -/
-theorem pcc_eval_premsOf_j1 (t : Term) :
+theorem pcc_eval_premsOf_j1 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 5) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 5) (m := 2) t (nil)
@@ -855,7 +855,7 @@ theorem pcc_eval_premsOf_j1 (t : Term) :
       (show ax_premsOf_j1 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 6 (`j2`). -/
-theorem pcc_eval_premsOf_j2 (t : Term) :
+theorem pcc_eval_premsOf_j2 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 6) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 6) (m := 2) t (nil)
@@ -865,7 +865,7 @@ theorem pcc_eval_premsOf_j2 (t : Term) :
       (show ax_premsOf_j2 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 7 (`j3`). -/
-theorem pcc_eval_premsOf_j3 (t : Term) :
+theorem pcc_eval_premsOf_j3 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 7) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 7) (m := 3) t (nil)
@@ -875,7 +875,7 @@ theorem pcc_eval_premsOf_j3 (t : Term) :
       (show ax_premsOf_j3 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 8 (`efq`). -/
-theorem pcc_eval_premsOf_efq (t : Term) :
+theorem pcc_eval_premsOf_efq [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 8) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 8) (m := 1) t (nil)
@@ -885,7 +885,7 @@ theorem pcc_eval_premsOf_efq (t : Term) :
       (show ax_premsOf_efq ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 9 (`q1`). -/
-theorem pcc_eval_premsOf_q1 (t : Term) :
+theorem pcc_eval_premsOf_q1 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 9) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 9) (m := 2) t (nil)
@@ -895,7 +895,7 @@ theorem pcc_eval_premsOf_q1 (t : Term) :
       (show ax_premsOf_q1 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 10 (`q2`). -/
-theorem pcc_eval_premsOf_q2 (t : Term) :
+theorem pcc_eval_premsOf_q2 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 10) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 10) (m := 2) t (nil)
@@ -905,7 +905,7 @@ theorem pcc_eval_premsOf_q2 (t : Term) :
       (show ax_premsOf_q2 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 11 (`q3`). -/
-theorem pcc_eval_premsOf_q3 (t : Term) :
+theorem pcc_eval_premsOf_q3 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 11) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 11) (m := 2) t (nil)
@@ -915,7 +915,7 @@ theorem pcc_eval_premsOf_q3 (t : Term) :
       (show ax_premsOf_q3 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 12 (`eqrefl`). -/
-theorem pcc_eval_premsOf_eqrefl (t : Term) :
+theorem pcc_eval_premsOf_eqrefl [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 12) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 12) (m := 1) t (nil)
@@ -925,7 +925,7 @@ theorem pcc_eval_premsOf_eqrefl (t : Term) :
       (show ax_premsOf_eqrefl ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 13 (`leibniz`). -/
-theorem pcc_eval_premsOf_leibniz (t : Term) :
+theorem pcc_eval_premsOf_leibniz [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 13) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 13) (m := 3) t (nil)
@@ -935,7 +935,7 @@ theorem pcc_eval_premsOf_leibniz (t : Term) :
       (show ax_premsOf_leibniz ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 14 (`p3`). -/
-theorem pcc_eval_premsOf_p3 (t : Term) :
+theorem pcc_eval_premsOf_p3 [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 14) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 14) (m := 1) t (nil)
@@ -945,7 +945,7 @@ theorem pcc_eval_premsOf_p3 (t : Term) :
       (show ax_premsOf_p3 ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 15 (`thy`). -/
-theorem pcc_eval_premsOf_thy (t : Term) :
+theorem pcc_eval_premsOf_thy [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 15) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 15) (m := 0) t (nil)
@@ -954,7 +954,7 @@ theorem pcc_eval_premsOf_thy (t : Term) :
     (pcc_premsOf_dot_thy (carc t))
 
 /-- Tag 16 (`mp`). -/
-theorem pcc_eval_premsOf_mp (t : Term) :
+theorem pcc_eval_premsOf_mp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 16) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_plain (k := 16) (m := 1) t (cons (implc (carc (cdrc (cdrc t))) (carc t)) (cons (carc (cdrc (cdrc t))) nil))
@@ -963,7 +963,7 @@ theorem pcc_eval_premsOf_mp (t : Term) :
     (pcc_premsOf_dot_mp (carc t) (carc (cdrc (cdrc t))))
 
 /-- Tag 17 (`gen`). -/
-theorem pcc_eval_premsOf_gen (t : Term) :
+theorem pcc_eval_premsOf_gen [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 17) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 17) (m := 1) t (cons (carc (cdrc (cdrc t))) nil)
@@ -972,7 +972,7 @@ theorem pcc_eval_premsOf_gen (t : Term) :
     (pcc_premsOf_dot_gen (carc t) (carc (cdrc (cdrc t))))
 
 /-- Tag 18 (`ind`). -/
-theorem pcc_eval_premsOf_ind (t : Term) :
+theorem pcc_eval_premsOf_ind [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 18) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 18) (m := 1) t (nil)
@@ -982,7 +982,7 @@ theorem pcc_eval_premsOf_ind (t : Term) :
       (show ax_premsOf_ind ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 19 (`qconf`). -/
-theorem pcc_eval_premsOf_qconf (t : Term) :
+theorem pcc_eval_premsOf_qconf [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 19) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 19) (m := 2) t (nil)
@@ -992,7 +992,7 @@ theorem pcc_eval_premsOf_qconf (t : Term) :
       (show ax_premsOf_qconf ∈ axioms by simp [axioms]) (fun _ => rfl))
 
 /-- Tag 20 (`listInd`). -/
-theorem pcc_eval_premsOf_listInd (t : Term) :
+theorem pcc_eval_premsOf_listInd [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 20) ⇒
       provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t))))) :=
   pcc_eval_premsOf_tag_and (k := 20) (m := 1) t (nil)
@@ -1009,7 +1009,7 @@ es uniforme, y por eso el ensamblador por ramas se le puede aplicar tal cual. -/
 
 /-- 🏁🏁 **B1 · `premsOf`, REFLEJADO DENTRO DE `Prov`**, con `t` abstracto y sólo `lineWF t` de
     guarda. Es el eslabón que le faltaba a la cota de `hbody`(b). -/
-theorem pcc_eval_premsOf (t : Term) :
+theorem pcc_eval_premsOf [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ provFromCode (eqCodeFn (premsOfT (tcFn t)) (tcFn (premsOf t)))) := by
   refine prf_of_premsOf_branches t _ (fun k => ?_)
   match k with

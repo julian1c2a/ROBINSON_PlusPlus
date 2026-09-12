@@ -80,7 +80,7 @@ def evalAddCode (a b : Term) : Term :=
 
 /-- Paso intermedio: la instancia **codificada** de `ax4` con testigo `tcFn a`, ya **computada**.
     Da `Prov(⌜ȧ + ⌜0⌝ = ȧ⌝)` — nótese `⌜0⌝ = termCode zero`, aún no `tcFn zero`. -/
-theorem pcc_ax4_computed (a : Term) :
+theorem pcc_ax4_computed [AnclaEq] (a : Term) :
     Prf (provFromCode (eqCodeFn (addcT (tcFn a) (termCode zero)) (tcFn a))) :=
   prf_mp
     (prf_provCode_congr
@@ -93,7 +93,7 @@ theorem pcc_ax4_computed (a : Term) :
 
     * `⌜0⌝ =eq tcFn zero` — `prf_tc_zero` (simétrico);
     * `tcFn a =eq tcFn (add a zero)` — congruencia de `tcFn` sobre `add a 0 =eq a` (`prf_add_zero_t`). -/
-theorem pcc_eval_add_zero (a : Term) : Prf (provFromCode (evalAddCode a zero)) := by
+theorem pcc_eval_add_zero [AnclaEq] (a : Term) : Prf (provFromCode (evalAddCode a zero)) := by
   have hz : Prf (termCode zero =eq tcFn zero) := prf_eq_symm prf_tc_zero
   have ha : Prf (tcFn a =eq tcFn (add a zero)) :=
     prf_eq_symm (prf_congr_tcFn (prf_add_zero_t a))
@@ -231,7 +231,7 @@ theorem prf_substtc_varc0 (W : Term) : Prf (substtc zero W (varc (numeral 0)) =e
     De `pcc_ax5_inst (tcFn a) (tcFn b)`, normalizando el `liftc zero (tcFn a)` con (A)
     (`prf_liftc_tcFn`) y computando el `substfc` externo sobre el código explícito, donde (A)
     (`prf_substtc_tcFn`) garantiza que el `tcFn a` incrustado sobrevive intacto. -/
-theorem pcc_ax5_computed (a b : Term) :
+theorem pcc_ax5_computed [AnclaEq] (a b : Term) :
     Prf (provFromCode
       (eqCodeFn (addcT (tcFn a) (succcT (tcFn b))) (succcT (addcT (tcFn a) (tcFn b))))) := by
   -- abreviaturas
@@ -444,7 +444,7 @@ theorem pcc_congr_succ_code_imp (X Y : Term) (hX : ∀ W, Prf (substtc zero W X 
     Cadena: `pcc_congr_succ_code_imp` sobre la HI, luego `pcc_eq_trans_code_imp` con (B)
     (`pcc_ax5_computed`), y finalmente transporte de códigos con `prf_tc_succ'` y `prf_congr_tcFn`
     sobre `prf_add_succ_t` (`add a (σb) =eq σ(a+b)`). -/
-theorem pcc_eval_add_succ_imp (a b : Term) :
+theorem pcc_eval_add_succ_imp [AnclaEq] (a b : Term) :
     Prf (provFromCode (evalAddCode a b) ⇒ provFromCode (evalAddCode a (succ b))) := by
   -- invariancias `substtc` (descargadas por (A) + ecuaciones de `funcc`)
   have hinvAB : ∀ W, Prf (substtc zero W (addcT (tcFn a) (tcFn b)) =eq addcT (tcFn a) (tcFn b)) :=
@@ -520,7 +520,7 @@ theorem step_evalAddPred (a : Term) :
     Inducción interna (`prf_nat_induction`): base `pcc_eval_add_zero`, paso `pcc_eval_add_succ_imp`.
     Es la **primera** evaluación provable completa del proyecto: cierra el hueco que §18 identificó
     como «la bestia» para el símbolo `+`. -/
-theorem prf_eval_add_all (a : Term) : Prf (Formula.forall (evalAddPred a)) := by
+theorem prf_eval_add_all [AnclaEq] (a : Term) : Prf (Formula.forall (evalAddPred a)) := by
   refine prf_nat_induction (evalAddPred a) ?base ?step
   · rw [substFormula_evalAddPred]
     exact pcc_eval_add_zero a
@@ -533,7 +533,7 @@ theorem prf_eval_add_all (a : Term) : Prf (Formula.forall (evalAddPred a)) := by
 
 /-- **EVALUACIÓN PROVABLE DE `+`**: `⊢ Prov(⌜ȧ + ḃ = (a+b)˙⌝)` para `a`, `b` **arbitrarios**.
     Instancia del `∀` object. -/
-theorem pcc_eval_add (a b : Term) : Prf (provFromCode (evalAddCode a b)) := by
+theorem pcc_eval_add [AnclaEq] (a b : Term) : Prf (provFromCode (evalAddCode a b)) := by
   have h := prf_spec (prf_eval_add_all a) b
   rwa [substFormula_evalAddPred] at h
 

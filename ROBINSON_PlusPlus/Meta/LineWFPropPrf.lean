@@ -30,7 +30,7 @@ Diccionario de tags de constructor: `botc` = `nul 2`, `implc` = `bin 5`, `andc` 
 def tP1 : CTree := .bin 5 (.leaf 2) (.bin 5 (.leaf 3) (.leaf 2))
 theorem ax_p1_eq : ax_lineWF_p1
     = Formula.forall (Formula.impl (tagF 0) (lwfVar ⇔ Formula.and (lencF 4) (condOf tP1))) := rfl
-theorem pcc_lineWF_tracked_p1_imp (t : Term) :
+theorem pcc_lineWF_tracked_p1_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 0) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tP1 t
@@ -42,7 +42,7 @@ def tP2 : CTree :=
          (.bin 5 (.bin 5 (.leaf 2) (.leaf 3)) (.bin 5 (.leaf 2) (.leaf 4)))
 theorem ax_p2_eq : ax_lineWF_p2
     = Formula.forall (Formula.impl (tagF 1) (lwfVar ⇔ Formula.and (lencF 5) (condOf tP2))) := rfl
-theorem pcc_lineWF_tracked_p2_imp (t : Term) :
+theorem pcc_lineWF_tracked_p2_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 1) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tP2 t
@@ -52,7 +52,7 @@ theorem pcc_lineWF_tracked_p2_imp (t : Term) :
 def tC1 : CTree := .bin 5 (.leaf 2) (.bin 5 (.leaf 3) (.bin 7 (.leaf 2) (.leaf 3)))
 theorem ax_c1_eq : ax_lineWF_c1
     = Formula.forall (Formula.impl (tagF 2) (lwfVar ⇔ Formula.and (lencF 4) (condOf tC1))) := rfl
-theorem pcc_lineWF_tracked_c1_imp (t : Term) :
+theorem pcc_lineWF_tracked_c1_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 2) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tC1 t
@@ -62,7 +62,7 @@ theorem pcc_lineWF_tracked_c1_imp (t : Term) :
 def tC2 : CTree := .bin 5 (.bin 7 (.leaf 2) (.leaf 3)) (.leaf 2)
 theorem ax_c2_eq : ax_lineWF_c2
     = Formula.forall (Formula.impl (tagF 3) (lwfVar ⇔ Formula.and (lencF 4) (condOf tC2))) := rfl
-theorem pcc_lineWF_tracked_c2_imp (t : Term) :
+theorem pcc_lineWF_tracked_c2_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 3) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tC2 t
@@ -72,7 +72,7 @@ theorem pcc_lineWF_tracked_c2_imp (t : Term) :
 def tC3 : CTree := .bin 5 (.bin 7 (.leaf 2) (.leaf 3)) (.leaf 3)
 theorem ax_c3_eq : ax_lineWF_c3
     = Formula.forall (Formula.impl (tagF 4) (lwfVar ⇔ Formula.and (lencF 4) (condOf tC3))) := rfl
-theorem pcc_lineWF_tracked_c3_imp (t : Term) :
+theorem pcc_lineWF_tracked_c3_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 4) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tC3 t
@@ -82,7 +82,7 @@ theorem pcc_lineWF_tracked_c3_imp (t : Term) :
 def tJ1 : CTree := .bin 5 (.leaf 2) (.bin 8 (.leaf 2) (.leaf 3))
 theorem ax_j1_eq : ax_lineWF_j1
     = Formula.forall (Formula.impl (tagF 5) (lwfVar ⇔ Formula.and (lencF 4) (condOf tJ1))) := rfl
-theorem pcc_lineWF_tracked_j1_imp (t : Term) :
+theorem pcc_lineWF_tracked_j1_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 5) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tJ1 t
@@ -92,7 +92,7 @@ theorem pcc_lineWF_tracked_j1_imp (t : Term) :
 def tJ2 : CTree := .bin 5 (.leaf 3) (.bin 8 (.leaf 2) (.leaf 3))
 theorem ax_j2_eq : ax_lineWF_j2
     = Formula.forall (Formula.impl (tagF 6) (lwfVar ⇔ Formula.and (lencF 4) (condOf tJ2))) := rfl
-theorem pcc_lineWF_tracked_j2_imp (t : Term) :
+theorem pcc_lineWF_tracked_j2_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 6) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tJ2 t
@@ -105,7 +105,7 @@ def tJ3 : CTree :=
                  (.bin 5 (.bin 5 (.leaf 3) (.leaf 4)) (.leaf 4)))
 theorem ax_j3_eq : ax_lineWF_j3
     = Formula.forall (Formula.impl (tagF 7) (lwfVar ⇔ Formula.and (lencF 5) (condOf tJ3))) := rfl
-theorem pcc_lineWF_tracked_j3_imp (t : Term) :
+theorem pcc_lineWF_tracked_j3_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 7) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tJ3 t
@@ -115,7 +115,7 @@ theorem pcc_lineWF_tracked_j3_imp (t : Term) :
 def tP3 : CTree := .bin 5 (.bin 5 (.bin 5 (.leaf 2) (.nul 2)) (.nul 2)) (.leaf 2)
 theorem ax_p3_eq : ax_lineWF_p3
     = Formula.forall (Formula.impl (tagF 14) (lwfVar ⇔ Formula.and (lencF 3) (condOf tP3))) := rfl
-theorem pcc_lineWF_tracked_p3_imp (t : Term) :
+theorem pcc_lineWF_tracked_p3_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 14) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tP3 t
@@ -126,7 +126,7 @@ theorem pcc_lineWF_tracked_p3_imp (t : Term) :
 def tGen : CTree := .un 6 (.leaf 2)
 theorem ax_gen_eq : ax_lineWF_gen
     = Formula.forall (Formula.impl (tagF 17) (lwfVar ⇔ Formula.and (lencF 3) (condOf tGen))) := rfl
-theorem pcc_lineWF_tracked_gen_imp (t : Term) :
+theorem pcc_lineWF_tracked_gen_imp [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ ((nthc t (succ zero) =eq numeralM 17) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))) :=
   pcc_lineWF_tracked_of_tree tGen t

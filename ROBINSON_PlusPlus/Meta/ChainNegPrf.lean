@@ -45,7 +45,7 @@ La cadena entera: `runFn nil ⟦l⟧ ≐ ⟦l.map carc⟧` (`prf_runFn_objList` 
 `≐ listFormCodeM fs` (§2), y ahí manda **`prf_not_In_listFormCodeM`**, que ya existía y cuyo
 docstring decía exactamente *«la refutación que necesita `NegVerifier`»*.
 
-⚠️ **Nada de esto usa el ancla de codificación**: el footprint no cita `prf_axiomsCodeT_eq` ni
+⚠️ **Nada de esto usa el ancla de codificación**: el footprint no cita `AnclaEq` ni
 `ax_axiomsCodeT_eq`.
 
 ## ⬜ Lo que queda de `DEUDA_chainNeg`, medido

@@ -28,7 +28,7 @@ Promovido de `sondeos/EvalPredDot.lean` (2026‑08‑31). Cero `sorry`.
 
 ⚠️ **NO «cero axiomas de Lean»**, como decia antes esta linea: **11 de las 31** constantes del
 namespace —`pcc_eval_pred` y `pcc_eval_pred'` incluidos— arrastran
-`Representability2Prf.prf_axiomsCodeT_eq`, que es uno de los **7 `axiom` SANCIONADOS** del
+`AnclaEq` ([ADR‑026](../../DECISIONS.md)) — **ya no es un `axiom`**, es hipótesis de clase; era uno de los
 proyecto (`AXIOMS.md`), no un axioma estandar de Lean. No hay axioma **NUEVO** —que es lo que la
 frase queria decir— pero «cero axiomas de Lean» era **falso**, y es justo la clase de frase que
 un libro cita como garantia.
@@ -95,14 +95,14 @@ def evalPredCode (a : Term) : Term := eqCodeFn (predcT (tcFn a)) (tcFn (pred a))
 /-- La instancia codificada de `ax25_pred_zero`, ya computada: `Prov(⌜τ⌜0⌝ = ⌜0⌝⌝)`.
     Al ser el axioma CERRADO no hace falta `substfc` ninguno: `repr_pos'_prf` lo da directo,
     y `formCode (pred 0 = 0) = eqCodeFn (predcT ⌜0⌝) ⌜0⌝` **por `rfl`**. -/
-theorem pcc_ax25_computed :
+theorem pcc_ax25_computed [AnclaEq] :
     Prf (provFromCode (eqCodeFn (predcT (termCode zero)) (termCode zero))) :=
   repr_pos'_prf (prf_ax (show ax25_pred_zero ∈ axioms by simp [axioms]))
 
 /-- **BASE de la evaluacion provable de `pred`**: `⊢ Prov(⌜τ(0̇) = (pred 0)˙⌝)`.
     Transporte Leibniz de codigos: `⌜0⌝ =eq tcFn 0` (`prf_tc_zero`) en el argumento, y
     `⌜0⌝ =eq tcFn 0 =eq tcFn (pred 0)` (`prf_congr_tcFn` sobre `ax25`) en el resultado. -/
-theorem pcc_eval_pred_zero : Prf (provFromCode (evalPredCode zero)) := by
+theorem pcc_eval_pred_zero [AnclaEq] : Prf (provFromCode (evalPredCode zero)) := by
   have hz : Prf (termCode zero =eq tcFn zero) := prf_eq_symm prf_tc_zero
   have h0 : Prf (pred zero =eq zero) := prf_ax (show ax25_pred_zero ∈ axioms by simp [axioms])
   have hr : Prf (termCode zero =eq tcFn (pred zero)) :=
@@ -123,7 +123,7 @@ theorem substCodeF_AX26 (w : Term) :
 
 /-- La instancia codificada de `ax26_pred_succ` con testigo-codigo **arbitrario** `w`,
     ya computada: `Prov(⌜τ(σw) = w⌝)`. -/
-theorem pcc_ax26_computed (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
+theorem pcc_ax26_computed [AnclaEq] (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (eqCodeFn (predcT (succcT w)) w)) := by
   have hmem : Formula.forall AX26_BODY ∈ axioms := by
     show ax26_pred_succ ∈ axioms
@@ -136,7 +136,7 @@ theorem pcc_ax26_computed (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
 
     Transporte de codigos: `succcT ẋ =eq (σx)˙` (`prf_tc_succ'`) a la izquierda y
     `ẋ =eq (τ(σx))˙` (`prf_congr_tcFn` sobre `prf_pred_succ`) a la derecha. -/
-theorem pcc_eval_pred_succ (x : Term) : Prf (provFromCode (evalPredCode (succ x))) := by
+theorem pcc_eval_pred_succ [AnclaEq] (x : Term) : Prf (provFromCode (evalPredCode (succ x))) := by
   have hL : Prf (predcT (succcT (tcFn x)) =eq predcT (tcFn (succ x))) :=
     prf_congr_predcT (prf_eq_symm (prf_tc_succ' x))
   have hR : Prf (tcFn x =eq tcFn (pred (succ x))) :=
@@ -144,7 +144,7 @@ theorem pcc_eval_pred_succ (x : Term) : Prf (provFromCode (evalPredCode (succ x)
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn hL hR)) (pcc_ax26_computed (tcFn x) (prf_hasWit_tcFn (liftTerm 0 x)))
 
 /-- La forma IMPLICACION que exige `prf_nat_induction` (la HI se descarta). -/
-theorem pcc_eval_pred_succ_imp (x : Term) :
+theorem pcc_eval_pred_succ_imp [AnclaEq] (x : Term) :
     Prf (provFromCode (evalPredCode x) ⇒ provFromCode (evalPredCode (succ x))) :=
   prf_deduction (prf_to_prfH (pcc_eval_pred_succ x) _)
 
@@ -179,7 +179,7 @@ theorem step_evalPredPred :
   simp only [liftTerm, substTerm, Nat.zero_lt_one, reduceIte, Nat.lt_irrefl, if_true]
 
 /-- **EVALUACION PROVABLE DE `pred` (∀ object)**: `⊢ ∀n. Prov(⌜τ(ṅ) = (pred n)˙⌝)`. -/
-theorem prf_eval_pred_all : Prf (Formula.forall evalPredPred) := by
+theorem prf_eval_pred_all [AnclaEq] : Prf (Formula.forall evalPredPred) := by
   refine prf_nat_induction evalPredPred ?base ?step
   · rw [substFormula_evalPredPred]
     exact pcc_eval_pred_zero
@@ -192,12 +192,12 @@ theorem prf_eval_pred_all : Prf (Formula.forall evalPredPred) := by
 
 /-- **EVALUACION PROVABLE DE `pred`**: `⊢ Prov(⌜τ(ṅ) = (pred n)˙⌝)` para `n` **ARBITRARIO**.
     Es la sub-obligacion #2 de `pcc_eval_substtc`, CERRADA. -/
-theorem pcc_eval_pred (n : Term) : Prf (provFromCode (evalPredCode n)) := by
+theorem pcc_eval_pred [AnclaEq] (n : Term) : Prf (provFromCode (evalPredCode n)) := by
   have h := prf_spec prf_eval_pred_all n
   rwa [substFormula_evalPredPred] at h
 
 /-- La misma, escrita con `eqc` (que es `eqCodeFn` por `rfl`) — la forma del encargo. -/
-theorem pcc_eval_pred' (n : Term) :
+theorem pcc_eval_pred' [AnclaEq] (n : Term) :
     Prf (provFromCode (eqc (predcT (tcFn n)) (tcFn (pred n)))) := pcc_eval_pred n
 
 /-! ## §5 · CONGRUENCIA INTERNA de `predcT` (dentro de `Prov`) — la pieza que consume el
@@ -241,7 +241,7 @@ para plegar `unT 0 (predcT ṅ)` en `(varc (pred n))˙` era `predcT ṅ ↦ (pre
 theorem varc_es_un0 (n : Term) : varc n = cons (numeralM 0) (cons n nil) := rfl
 
 /-- `tcFn (varc n) = unT 0 ṅ`, dentro de `Prov`. Instancia de `pcc_dot_un` — pieza de produccion. -/
-theorem pcc_dot_varc (n : Term) :
+theorem pcc_dot_varc [AnclaEq] (n : Term) :
     Prf (provFromCode (eqCodeFn (unT 0 (tcFn n)) (tcFn (varc n)))) := pcc_dot_un 0 n
 
 /-- **EL LADO DERECHO DE `ax_substtc_var_gt`, DOTADO Y PLEGADO**:
@@ -250,7 +250,7 @@ theorem pcc_dot_varc (n : Term) :
     Es `pcc_eval_pred` bajo `unT 0` (`pcc_congr_unT_code`) encadenado con `pcc_dot_un`
     (`pcc_eq_trans_code`). Confirma que la pieza **hace falta y encaja**: sin ella el `predcT`
     se queda ahi y no hay forma de llegar a `(varc (pred n))˙`. -/
-theorem pcc_eval_varc_pred (n : Term) :
+theorem pcc_eval_varc_pred [AnclaEq] (n : Term) :
     Prf (provFromCode (eqc (unT 0 (predcT (tcFn n))) (tcFn (varc (pred n))))) :=
   pcc_eq_trans_code _ _ _
     (substtc_inv_unT (substtc_inv_predcT (substtc_inv_tcFn n)))
@@ -289,7 +289,7 @@ recorrido de `pcc_eval_substtc` recibe el codigo `varc n` con `n` **abstracto** 
 meta de partirlo). La guarda `v < n` no da un `m` a nivel Lean: solo da un ∃ OBJETO. -/
 
 /-- (i) Si el `n` del punto de uso ya viniera como `σm`, esto basta — **sin induccion**. -/
-theorem pcc_eval_pred_of_succ (m : Term) :
+theorem pcc_eval_pred_of_succ [AnclaEq] (m : Term) :
     Prf (provFromCode (evalPredCode (succ m))) := pcc_eval_pred_succ m
 
 /-- (ii) Pero con `n` abstracto la unica salida a nivel LEAN seria una disyuncion meta, que no

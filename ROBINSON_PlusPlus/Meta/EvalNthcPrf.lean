@@ -82,7 +82,7 @@ theorem prf_substtc_nthcT (v W x y : Term) :
 /-- **Ecuación `zero` de `nthc` CODIFICADA**: `⊢ Prov(⌜nthc(cons ḣ ṫ, ⌜0⌝) = ḣ⌝)`.
     De `pcc_axiom_inst2` de `ax_nthc_zero` (testigos `tcFn h`, `tcFn t`), computando el doble
     `substfc` sobre el código explícito (patrón `pcc_ax5_computed`). -/
-theorem pcc_nthc_zero_code (h t : Term) :
+theorem pcc_nthc_zero_code [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) (termCode zero)) (tcFn h))) := by
   let W1 : Term := liftc zero (tcFn h)
   let T : Term := tcFn t
@@ -118,7 +118,7 @@ theorem pcc_nthc_zero_code (h t : Term) :
     computando el `substfc` **triple** sobre el código explícito: el interno (nivel 2) por
     `prf_substfc_arith_open`, el de nivel 1 con testigo levantado (`liftc 0 (tcFn t)`, normalizado por
     (A) e invariancia `substtc`‑nivel‑1 de `tcFn h`), y el externo (nivel 0). -/
-theorem pcc_nthc_succ_code (h t i : Term) :
+theorem pcc_nthc_succ_code [AnclaEq] (h t i : Term) :
     Prf (provFromCode (eqCodeFn
       (nthcT (consT (tcFn h) (tcFn t)) (succcT (tcFn i)))
       (nthcT (tcFn t) (tcFn i)))) := by
@@ -257,7 +257,7 @@ Aquí el transporte del `cons` dotado NO tiene la forma del molde de `EvalListPr
     `Prov`**, bajo el contexto `⌜nthc(·, IDX) = RHS⌝`, y **dentro de `PrfH`**.
 
     Sustituye al viejo transporte por `pcc_dot_cons` (antes `prf_tc_cons'`, retirado)`, que era de CÓDIGO; éste es INTERNO. -/
-theorem pcc_rw_dot_cons_nthc {Γ : List Formula} (h t IDX RHS : Term)
+theorem pcc_rw_dot_cons_nthc [AnclaEq] {Γ : List Formula} (h t IDX RHS : Term)
     (hI : ∀ W : Term, Prf (substtc zero W IDX =eq IDX))
     (hR : ∀ W : Term, Prf (substtc zero W RHS =eq RHS))
     (hbase : PrfH Γ (provFromCode (eqCodeFn (nthcT (consT (tcFn h) (tcFn t)) IDX) RHS)))
@@ -286,7 +286,7 @@ theorem substtc_inv_nthcT {X Y : Term}
     (`prf_zero_or_eq_succ_pred`), reflejando `pcc_nthc_zero_code` (base) y `pcc_nthc_succ_code` + HI
     (`pcc_eq_trans_code_imp`) en el caso sucesor, transportando por igualdad de código bajo contexto
     (`PrfH_provCode_congr`). Confinación `qconf` + `PrfH_spec` (la HI es `∀i`), como `prf_nthc_runFn`. -/
-theorem nthcEvalPred_step :
+theorem nthcEvalPred_step [AnclaEq] :
     Prf (Formula.forall (Formula.forall (Formula.impl (liftFormula 1 nthcEvalPred)
       (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 nthcEvalPred)))))) := by
   refine Prf.gen _ (Prf.gen _ ?_)
@@ -364,7 +364,7 @@ theorem nthcEvalPred_step :
 
 /-- **EVALUACIÓN ACOTADA DE `nthc`**: `⊢ (i < lenc p) ⇒ Prov(⌜nthc(ṗ,ı̇) = (nthc p i)˙⌝)`, para
     `p`, `i` **arbitrarios**. Inducción de listas (`nthcEvalPred_base`/`_step`) + `prf_spec`. -/
-theorem pcc_eval_nthc (p i : Term) :
+theorem pcc_eval_nthc [AnclaEq] (p i : Term) :
     Prf ((lt i (lenc p)) ⇒ provFromCode (evalNthcCode p i)) := by
   have key : Prf (Formula.forall nthcEvalPred) :=
     prf_list_induction nthcEvalPred nthcEvalPred_base nthcEvalPred_step

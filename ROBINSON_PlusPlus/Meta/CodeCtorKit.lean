@@ -214,7 +214,7 @@ predijo la medición (`sondeos/KitPayoff.lean`), porque `nulT`/`unT`/`binT` son 
 Las hojas (`prf_tc_numeral`, `prf_tc_zero`) **nunca murieron**; sólo el paso recursivo. -/
 
 /-- `tcFn ⟨m⟩ = nulT m`, **dentro de `Prov`**. Sólo reescrituras de CÓDIGO sobre `pcc_dot_cons`. -/
-theorem pcc_dot_nul (m : Nat) :
+theorem pcc_dot_nul [AnclaEq] (m : Nat) :
     Prf (provFromCode (eqCodeFn (nulT m) (tcFn (cons (numeralM m) nil)))) := by
   unfold nulT
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
@@ -222,7 +222,7 @@ theorem pcc_dot_nul (m : Nat) :
     (pcc_dot_cons (numeralM m) nil)
 
 /-- `tcFn ⟨m,a⟩ = unT m ȧ`, **dentro de `Prov`**: código → 1 paso interno → código. -/
-theorem pcc_dot_un (m : Nat) (a : Term) :
+theorem pcc_dot_un [AnclaEq] (m : Nat) (a : Term) :
     Prf (provFromCode (eqCodeFn (unT m (tcFn a)) (tcFn (cons (numeralM m) (cons a nil))))) := by
   unfold unT
   have h1 : Prf (provFromCode (eqCodeFn (consT (termCode (numeralM m)) (tcFn (cons a nil)))
@@ -250,7 +250,7 @@ theorem pcc_dot_un (m : Nat) (a : Term) :
       (prf_congr_consT (prf_refl _) (prf_congr_consT (prf_refl _) prf_tc_zero)) (prf_refl _))) h2
 
 /-- `tcFn ⟨m,a,b⟩ = binT m ȧ ḃ`, **dentro de `Prov`**: código → 2 pasos internos anidados → código. -/
-theorem pcc_dot_bin (m : Nat) (a b : Term) :
+theorem pcc_dot_bin [AnclaEq] (m : Nat) (a b : Term) :
     Prf (provFromCode (eqCodeFn (binT m (tcFn a) (tcFn b))
       (tcFn (cons (numeralM m) (cons a (cons b nil)))))) := by
   unfold binT
@@ -298,14 +298,14 @@ theorem pcc_dot_bin (m : Nat) (a b : Term) :
       (prf_congr_consT (prf_refl _) prf_tc_zero))) (prf_refl _))) h3
 
 /-- Las direcciones simétricas, que es lo que consumen los sitios reales. -/
-theorem pcc_dot_nul_symm (m : Nat) :
+theorem pcc_dot_nul_symm [AnclaEq] (m : Nat) :
     Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) nil)) (nulT m))) :=
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (nulT m) (tcFn (cons (numeralM m) nil)) (substtc_inv_nulT m)
       (prf_hasWit_nulT m) (prf_hasWit_tcFn (cons (numeralM m) nil)))
     (pcc_dot_nul m)
 
-theorem pcc_dot_un_symm (m : Nat) (a : Term) :
+theorem pcc_dot_un_symm [AnclaEq] (m : Nat) (a : Term) :
     Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) (cons a nil))) (unT m (tcFn a)))) :=
   pcc_mp_code_apply
     (pcc_eq_symm_code_internal (unT m (tcFn a)) (tcFn (cons (numeralM m) (cons a nil)))
@@ -314,7 +314,7 @@ theorem pcc_dot_un_symm (m : Nat) (a : Term) :
       (prf_hasWit_tcFn (cons (numeralM m) (cons a nil))))
     (pcc_dot_un m a)
 
-theorem pcc_dot_bin_symm (m : Nat) (a b : Term) :
+theorem pcc_dot_bin_symm [AnclaEq] (m : Nat) (a b : Term) :
     Prf (provFromCode (eqCodeFn (tcFn (cons (numeralM m) (cons a (cons b nil))))
       (binT m (tcFn a) (tcFn b)))) :=
   pcc_mp_code_apply

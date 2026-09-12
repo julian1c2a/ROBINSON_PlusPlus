@@ -67,7 +67,7 @@ theorem prf_provCode_congr {c₁ c₂ : Term} (h : Prf (c₁ =eq c₂)) :
     de las fórmulas, que se reduce a `termCode x =eq termCode y` — el puente `termCode`/`tcFn`,
     la pieza irreducible), vale la **reflexión de igualdad** `(x=eq y) ⇒ provCodeC'(x=eq y)`.
     Transporte (`prf_provCode_congr`) de la demostrabilidad de la reflexividad `provCodeC'(x=eq x)`. -/
-theorem pcc_eq_of_codeEq (x y : Term)
+theorem pcc_eq_of_codeEq [AnclaEq] (x y : Term)
     (hcode : Prf ((x =eq y) ⇒ (formCode (Formula.eq x x) =eq formCode (Formula.eq x y)))) :
     Prf ((x =eq y) ⇒ provCodeC' (x =eq y)) := by
   refine prf_deduction ?_
@@ -85,12 +85,12 @@ theorem pcc_eq_of_codeEq (x y : Term)
 
 /-- **MP interno como esquema** (`pcc_imp`): de una implicación object cerrada
     `Prf (A ⇒ B)` sale `Prf (provCodeC' A ⇒ provCodeC' B)`. Vía D2 + D1. -/
-theorem pcc_imp {A B : Formula} (h : Prf (A ⇒ B)) :
+theorem pcc_imp [AnclaEq] {A B : Formula} (h : Prf (A ⇒ B)) :
     Prf (provCodeC' A ⇒ provCodeC' B) :=
   prf_mp (d2_prf A B) (repr_pos'_prf h)
 
 /-- Versión bi-premisa: de `Prf (A ⇒ B ⇒ C)` sale `provCodeC' A ⇒ provCodeC' B ⇒ provCodeC' C`. -/
-theorem pcc_imp2 {A B C : Formula} (h : Prf (A ⇒ (B ⇒ C))) :
+theorem pcc_imp2 [AnclaEq] {A B C : Formula} (h : Prf (A ⇒ (B ⇒ C))) :
     Prf (provCodeC' A ⇒ (provCodeC' B ⇒ provCodeC' C)) := by
   have h1 : Prf (provCodeC' A ⇒ provCodeC' (B ⇒ C)) := pcc_imp h
   exact prf_deduction (PrfH.mp _ _ _
@@ -113,17 +113,17 @@ theorem prf_in_cons_head_imp (hd x t : Term) : Prf ((x =eq hd) ⇒ In x (cons hd
 
 /-- **Reflexión de `In` — cabeza directa**: `provCodeC'(In x (cons x t))` (es instancia
     de axioma `ax_L2`, demostrable; `repr_pos'_prf`). -/
-theorem pcc_in_head (x t : Term) : Prf (provCodeC' (In x (cons x t))) :=
+theorem pcc_in_head [AnclaEq] (x t : Term) : Prf (provCodeC' (In x (cons x t))) :=
   repr_pos'_prf (prf_in_cons_head x t)
 
 /-- **Reflexión de `In` — cola** (combinador): `provCodeC'(In x t) ⇒ provCodeC'(In x (cons hd t))`. -/
-theorem pcc_in_tail (hd x t : Term) :
+theorem pcc_in_tail [AnclaEq] (hd x t : Term) :
     Prf (provCodeC' (In x t) ⇒ provCodeC' (In x (cons hd t))) :=
   pcc_imp (prf_in_cons_tail_imp hd x t)
 
 /-- **Reflexión de `In` — cabeza por igualdad** (combinador):
     `provCodeC'(x =eq hd) ⇒ provCodeC'(In x (cons hd t))`. -/
-theorem pcc_in_head_eq (hd x t : Term) :
+theorem pcc_in_head_eq [AnclaEq] (hd x t : Term) :
     Prf (provCodeC' (x =eq hd) ⇒ provCodeC' (In x (cons hd t))) :=
   pcc_imp (prf_in_cons_head_imp hd x t)
 
@@ -137,7 +137,7 @@ theorem pcc_in_nil (x : Term) : Prf (In x nil ⇒ provCodeC' (In x nil)) := by
 /-! ### Combinadores de reflexión de `chainOk` / `allIn` (vía `ax_chainOk_*` / `ax_allIn_*`) -/
 
 /-- **Reflexión de `chainOk` — base `nil`**: `provCodeC'(chainOk c nil)` (demostrable). -/
-theorem pcc_chainOk_nil (c : Term) : Prf (provCodeC' (chainOk c nil)) :=
+theorem pcc_chainOk_nil [AnclaEq] (c : Term) : Prf (provCodeC' (chainOk c nil)) :=
   repr_pos'_prf (prf_chainOk_nil c)
 
 /-- Implicación object: `lineOk c line ⇒ chainOk (c ++ [carc line]) rest ⇒ chainOk c (cons line rest)`. -/
@@ -152,13 +152,13 @@ theorem prf_chainOk_cons_imp (c line rest : Term) :
 
 /-- **Reflexión de `chainOk` — cons** (combinador): de la demostrabilidad de la cabeza
     (`lineOk`) y de la cola (`chainOk`) sale la del todo. -/
-theorem pcc_chainOk_cons (c line rest : Term) :
+theorem pcc_chainOk_cons [AnclaEq] (c line rest : Term) :
     Prf (provCodeC' (lineOk c line) ⇒ (provCodeC' (chainOk (concat c (cons (carc line) nil)) rest) ⇒
       provCodeC' (chainOk c (cons line rest)))) :=
   pcc_imp2 (prf_chainOk_cons_imp c line rest)
 
 /-- **Reflexión de `allIn` — base `nil`**: `provCodeC'(allIn c nil)` (demostrable). -/
-theorem pcc_allIn_nil (c : Term) : Prf (provCodeC' (allIn c nil)) :=
+theorem pcc_allIn_nil [AnclaEq] (c : Term) : Prf (provCodeC' (allIn c nil)) :=
   repr_pos'_prf (prf_allIn_nil c)
 
 /-- Implicación object: `In x c ⇒ allIn c t ⇒ allIn c (cons x t)`. -/
@@ -170,7 +170,7 @@ theorem prf_allIn_cons_imp (c x t : Term) :
       (PrfH.hyp _ _ (List.Mem.head _)))
 
 /-- **Reflexión de `allIn` — cons** (combinador). -/
-theorem pcc_allIn_cons (c x t : Term) :
+theorem pcc_allIn_cons [AnclaEq] (c x t : Term) :
     Prf (provCodeC' (In x c) ⇒ (provCodeC' (allIn c t) ⇒ provCodeC' (allIn c (cons x t)))) :=
   pcc_imp2 (prf_allIn_cons_imp c x t)
 

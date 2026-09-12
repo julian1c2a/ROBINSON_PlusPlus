@@ -375,7 +375,7 @@ theorem PHI_use {Γ : List Formula} (t w : Term) (h : PrfH Γ (substFormula 0 t 
     El descenso de Cantor vale para las dos mitades: `carc` y `cdrc` de un `cons` son ambos
     ESTRICTAMENTE menores (`prf_cantor_mono_left/right`). -/
 
-theorem PHI_step : Prf (Formula.forall (Formula.impl (PSI PHI) PHI)) := by
+theorem PHI_step [AnclaEq] : Prf (Formula.forall (Formula.impl (PSI PHI) PHI)) := by
   refine Prf.gen _ (prf_deduction ?_)
   refine PrfH.gen [PSI PHI] PHIbody ?_
   simp only [List.map_cons, List.map_nil]
@@ -494,29 +494,29 @@ theorem PHI_step : Prf (Formula.forall (Formula.impl (PSI PHI) PHI)) := by
 
 /-! ## §7 · EL DESCENSO -/
 
-theorem PHI_all (t : Term) : Prf (substFormula 0 t PHI) :=
+theorem PHI_all [AnclaEq] (t : Term) : Prf (substFormula 0 t PHI) :=
   prf_strong_induction PHI hPHI PHI_step t
 
 /-- **EL DESCENSO, en forma de IMPLICACION OBJETO**, con `w` y `s` **ABSTRACTOS**. -/
-theorem DESCENSO_imp (w s : Term) : Prf (Formula.impl (isTC1 w s) (targetLift s)) :=
+theorem DESCENSO_imp [AnclaEq] (w s : Term) : Prf (Formula.impl (isTC1 w s) (targetLift s)) :=
   prfH_nil_to_prf (PrfH_and_elim_left (PHI_use s w (prf_to_prfH (PHI_all s) []))) rfl
 
 /-- Su gemela sobre LISTAS de argumentos. -/
-theorem DESCENSO_lista_imp (w s : Term) :
+theorem DESCENSO_lista_imp [AnclaEq] (w s : Term) :
     Prf (Formula.impl (land (wfAll1 w) (argsIn w s)) (targetLiftsc s)) :=
   prfH_nil_to_prf (PrfH_and_elim_right (PHI_use s w (prf_to_prfH (PHI_all s) []))) rfl
 
 /-- **DESCENSO** (la forma pedida). -/
-theorem DESCENSO (w s : Term) (h : Prf (isTC1 w s)) : Prf (targetLift s) :=
+theorem DESCENSO [AnclaEq] (w s : Term) (h : Prf (isTC1 w s)) : Prf (targetLift s) :=
   prf_mp (DESCENSO_imp w s) h
 
-theorem DESCENSO_lista (w s : Term) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w s)) :
+theorem DESCENSO_lista [AnclaEq] (w s : Term) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w s)) :
     Prf (targetLiftsc s) :=
   prf_mp (DESCENSO_lista_imp w s) (prf_and_intro hwf hargs)
 
 /-- **`pcc_eval_liftc`** — el `hLift` de `sondeos/Paso2CasoForall.lean:505`, LITERAL.
     Es EL MISMO teorema que `DESCENSO`, con el objetivo desplegado. -/
-theorem pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
+theorem pcc_eval_liftc [AnclaEq] (w s : Term) (h : Prf (isTC1 w s)) :
     Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s)))) :=
   DESCENSO w s h
 
@@ -525,7 +525,7 @@ theorem pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
     `hasWit` es el de produccion: se declara en `Minimal/Axioms.lean` (ADR-020) y
     `CodeWitnessPrf.ENS` lo re-exporta. Aqui NO se redefine. -/
 
-theorem DESCENSO_hasWit (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)) := by
+theorem DESCENSO_hasWit [AnclaEq] (s : Term) : Prf (Formula.impl (hasWit s) (targetLift s)) := by
   refine prf_ex_elim_imp ?_
   rw [liftF_targetLift]
   exact PrfH.mp _ _ _ (prf_to_prfH (DESCENSO_imp (.var 0) (liftTerm 0 s)) _) (prfH_hyp_self _)
@@ -577,7 +577,7 @@ theorem PHIat_use {Γ : List Formula} (t c w : Term) (h : PrfH Γ (substFormula 
     FOL.substTerm_liftTerm, Nat.reduceAdd, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
     reduceIte, if_true] using h2
 
-theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
+theorem PHIat_step [AnclaEq] : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
   refine Prf.gen _ (prf_deduction ?_)
   refine PrfH.gen [PSI PHIat] (Formula.forall PHIatBody) ?_
   simp only [List.map_cons, List.map_nil]
@@ -703,16 +703,16 @@ theorem PHIat_step : Prf (Formula.forall (Formula.impl (PSI PHIat) PHIat)) := by
         (PrfH_and_intro hTL_hd hTLs_tl)
       exact PrfH_congr_targetLiftscAt (.var 1) (PrfH_eq_symm hcons) hres
 
-theorem PHIat_all (t : Term) : Prf (substFormula 0 t PHIat) :=
+theorem PHIat_all [AnclaEq] (t : Term) : Prf (substFormula 0 t PHIat) :=
   prf_strong_induction PHIat hPHIat PHIat_step t
 
 /-- **EL DESCENSO A NIVEL ABIERTO, en forma de IMPLICACION OBJETO.** -/
-theorem DESCENSO_at_imp (c w s : Term) :
+theorem DESCENSO_at_imp [AnclaEq] (c w s : Term) :
     Prf (Formula.impl (isTC1 w s) (targetLiftAt c s)) :=
   prfH_nil_to_prf (PrfH_and_elim_left (PHIat_use s c w (prf_to_prfH (PHIat_all s) []))) rfl
 
 /-- Su gemela sobre LISTAS de argumentos. -/
-theorem DESCENSO_at_lista_imp (c w s : Term) :
+theorem DESCENSO_at_lista_imp [AnclaEq] (c w s : Term) :
     Prf (Formula.impl (land (wfAll1 w) (argsIn w s)) (targetLiftscAt c s)) :=
   prfH_nil_to_prf (PrfH_and_elim_right (PHIat_use s c w (prf_to_prfH (PHIat_all s) []))) rfl
 
@@ -720,17 +720,17 @@ theorem DESCENSO_at_lista_imp (c w s : Term) :
     Es el prerrequisito que `Meta/EvalLiftfcPrf.lean` midió: los casos `atom`/`eq` de la
     inducción sobre códigos de FORMULA bajan a `liftsc`/`liftc` **al nivel corriente**, no a
     nivel `zero`. -/
-theorem pcc_eval_liftc_at (c w s : Term) (h : Prf (isTC1 w s)) :
+theorem pcc_eval_liftc_at [AnclaEq] (c w s : Term) (h : Prf (isTC1 w s)) :
     Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn s)) (tcFn (liftc c s)))) :=
   prf_mp (DESCENSO_at_imp c w s) h
 
 /-- La compañera sobre LISTAS. -/
-theorem pcc_eval_liftsc_at (c w s : Term) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w s)) :
+theorem pcc_eval_liftsc_at [AnclaEq] (c w s : Term) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn w s)) :
     Prf (provFromCode (eqc (liftscT (tcFn c) (tcFn s)) (tcFn (liftsc c s)))) :=
   prf_mp (DESCENSO_at_lista_imp c w s) (prf_and_intro hwf hargs)
 
 /-- Y la forma que de verdad llega río abajo: el testigo viene de un `∃` (`hasWit`). -/
-theorem DESCENSO_at_hasWit (c s : Term) :
+theorem DESCENSO_at_hasWit [AnclaEq] (c s : Term) :
     Prf (Formula.impl (hasWit s) (targetLiftAt c s)) := by
   refine prf_ex_elim_imp ?_
   rw [liftF_targetLiftAt]
@@ -769,7 +769,7 @@ theorem DESCENSO_at_hasWit (c s : Term) :
     el consumidor en produccion es `pcc_eval_liftc`).
 
     ⚠️ El ENUNCIADO no es informacion nueva (ver la cabecera de §9): lo nuevo es la RUTA. -/
-theorem CRIT_targetLift_real (t : Term) : Prf (targetLift (termCodeM t)) :=
+theorem CRIT_targetLift_real [AnclaEq] (t : Term) : Prf (targetLift (termCodeM t)) :=
   DESCENSO (objList (tcodes1 t)) (termCodeM t) (prf_isTC1_tcodes t)
 
 /-- **EL DESCENSO DISPARA (2)** — sort LISTA: sobre la lista de argumentos REAL de un
@@ -778,7 +778,7 @@ theorem CRIT_targetLift_real (t : Term) : Prf (targetLift (termCodeM t)) :=
     ⚠️ El simbolo de funcion es INTERNO y fijo (`add_sym`, de `Minimal/Axioms.lean`): no
     aparece en la conclusion, asi que exponerlo como parametro `(f : String)` — como hacia
     el sondeo — solo aparentaba generalidad. Cero simbolos de funcion objeto nuevos. -/
-theorem CRIT_targetLiftsc_real (ts : List Term) :
+theorem CRIT_targetLiftsc_real [AnclaEq] (ts : List Term) :
     Prf (targetLiftsc (termsCodeM ts)) := by
   have h := prf_isTC1_tcodes (Term.func add_sym ts)
   refine DESCENSO_lista (objList (tcodes1 (Term.func add_sym ts))) _ (prf_and_elim_left h) ?_
@@ -808,7 +808,7 @@ theorem CRIT_targetLiftsc_real (ts : List Term) :
     RUTAS al mismo enunciado — una con el testigo explicito `objList (tcodes1 t)`, la otra
     bajo el `∃` de `hasWit`. Se conservan las dos a proposito, porque la que ejercita
     `DESCENSO_hasWit` es esta, y `DESCENSO_hasWit` es la forma consumible rio abajo. -/
-theorem CRIT_hasWit_descenso (t : Term) : Prf (targetLift (termCodeM t)) :=
+theorem CRIT_hasWit_descenso [AnclaEq] (t : Term) : Prf (targetLift (termCodeM t)) :=
   prf_mp (DESCENSO_hasWit (termCodeM t)) (CRIT_hasWit_real t)
 
 /-! ### CONTROLES NEGATIVOS: los enunciados no son reflexividades disfrazadas -/
@@ -884,7 +884,7 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
     ⚠️ **NET-0 aqui significa «ningun axioma NUEVO», no «solo los tres de Lean».** Los
     resultados sustantivos de este modulo salen con **CUATRO**:
 
-        [propext, Classical.choice, Quot.sound, Representability2Prf.prf_axiomsCodeT_eq]
+        [propext, Classical.choice, Quot.sound]   -- ⭐ desde ADR‑026: el ancla es `[AnclaEq]`, hipótesis
 
     El cuarto es uno de los `axiom` de Lean ya sancionados del proyecto
     (`Meta/Representability2Prf.lean:104`) y **ya estaba en la linea base**: `LiftcCodePrf`

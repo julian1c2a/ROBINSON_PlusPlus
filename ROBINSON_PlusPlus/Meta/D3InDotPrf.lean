@@ -185,7 +185,7 @@ theorem prf_tc_form_numeral (φ : Formula) :
 
     Es `pcc_rw_imp` con el puente de **D1**: `formCode φ` y `numeral (codeNat φ)` son términos objeto
     provablemente iguales (`prf_formCode_numeral`), y `repr_pos'_prf` dota esa igualdad. -/
-theorem pcc_to_formCode_imp (φ : Formula) (G : Term → Term)
+theorem pcc_to_formCode_imp [AnclaEq] (φ : Formula) (G : Term → Term)
     (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s))
     (hwG : Prf (hasWitF (G (varc (numeral 0))))) :
     Prf (provFromCode (G (termCode (numeral (codeNat φ))))
@@ -194,7 +194,7 @@ theorem pcc_to_formCode_imp (φ : Formula) (G : Term → Term)
     hwG (prf_hasWit_tc (numeral (codeNat φ))) (prf_hasWit_tc (formCode φ))
 
 /-- Ídem, en forma directa. -/
-theorem pcc_to_formCode (φ : Formula) (G : Term → Term)
+theorem pcc_to_formCode [AnclaEq] (φ : Formula) (G : Term → Term)
     (hG : ∀ s : Term, Prf (substfc zero s (G (varc (numeral 0))) =eq G s))
     (h : Prf (provFromCode (G (termCode (numeral (codeNat φ))))))
     (hwG : Prf (hasWitF (G (varc (numeral 0))))) :
@@ -270,7 +270,7 @@ theorem liftTerm_bddCarcDotAt (c : Nat) (φ : Formula) (p : Term) :
 /-- **Step A** (testigo arbitrario): `⊢ Prov(⌜ bddCarcDotAt φ p ⇒ inDotAt φ p ⌝)`. Instancia dotada
     del teorema ⇐ (`Prf.gen` + `pcc_thm_inst` con testigo `tcFn p`), con `substfc` distribuido sobre
     el `implc`; el consecuente coincide con `inDotAt φ p` por definición. -/
-theorem pcc_bddDot_imp_inDot_at (φ : Formula) (p : Term) :
+theorem pcc_bddDot_imp_inDot_at [AnclaEq] (φ : Formula) (p : Term) :
     Prf (provFromCode (implc (bddCarcDotAt φ p) (inDotAt φ p))) := by
   have hthm : Prf (provFromCode (substfc zero (tcFn p) (formCode (inBwdBody φ)))) :=
     pcc_thm_inst (inBwdBody φ) (Prf.gen _ (prf_In_runFn_of_boundedCarcIn (formCode φ) (.var 0)))
@@ -282,7 +282,7 @@ theorem pcc_bddDot_imp_inDot_at (φ : Formula) (p : Term) :
   exact prf_mp (prf_provCode_congr hbridge) hthm
 
 /-- Step A en `p = #0`. -/
-theorem pcc_bddDot_imp_inDot (φ : Formula) :
+theorem pcc_bddDot_imp_inDot [AnclaEq] (φ : Formula) :
     Prf (provFromCode (implc (bddCarcDot φ) (inDot φ))) := pcc_bddDot_imp_inDot_at φ (.var 0)
 
 /-! ### Step B (puente) — `bddCarcDot φ` como `bdExCode` con argumentos DOTADOS
@@ -378,7 +378,7 @@ theorem prf_bddCarcDot_eq_at (φ : Formula) (p : Term) :
    forma `substfc` del código dotado. -/
 
 /-- **NÚCLEO de Step B**: la reflexión punteada del `∃` acotado `boundedCarcIn`. -/
-theorem pcc_bddCarcDot_reflect (φ : Formula) (p : Term) :
+theorem pcc_bddCarcDot_reflect [AnclaEq] (φ : Formula) (p : Term) :
     Prf (chainOk nil p ⇒ (boundedCarcIn (formCode φ) p ⇒ provFromCode (bddCarcDotAt φ p))) := by
   refine prf_deduction (deduction_aux ?_ (boundedCarcIn (formCode φ) p) [chainOk nil p] rfl)
   have hex : PrfH [boundedCarcIn (formCode φ) p, chainOk nil p]
@@ -498,7 +498,7 @@ Composición final: `In ⌜φ⌝ (runFn nil p)` ⟹ (`prf_boundedCarcIn_of_In_ru
 ⟹ (núcleo) `Prov(⌜bddCarcDotAt φ p⌝)` ⟹ (**MP interno** con Step A) `Prov(⌜inDotAt φ p⌝)`. -/
 
 /-- **`hI_dot` (testigo arbitrario)**: `chainOk nil p ⇒ In ⌜φ⌝ (runFn nil p) ⇒ Prov(⌜In ⌜φ⌝ (runFn nil ṗ)⌝)`. -/
-theorem hI_dot_at (φ : Formula) (p : Term) :
+theorem hI_dot_at [AnclaEq] (φ : Formula) (p : Term) :
     Prf (chainOk nil p ⇒ (In (formCode φ) (runFn nil p) ⇒ provFromCode (inDotAt φ p))) := by
   refine prf_deduction (deduction_aux ?_ (In (formCode φ) (runFn nil p)) [chainOk nil p] rfl)
   have hIn : PrfH [In (formCode φ) (runFn nil p), chainOk nil p]
@@ -514,14 +514,14 @@ theorem hI_dot_at (φ : Formula) (p : Term) :
   exact PrfH_mp_code_apply (prf_to_prfH (pcc_bddDot_imp_inDot_at φ p) _) hant
 
 /-- **`hI_dot`** (en `p = #0`): el segundo de los dos átomos punteados que pide `d3_prf_of_dotted_atoms`. -/
-theorem hI_dot (φ : Formula) :
+theorem hI_dot [AnclaEq] (φ : Formula) :
     Prf (chainOk nil (.var 0) ⇒
       (In (formCode φ) (runFn nil (.var 0)) ⇒ provFromCode (inDot φ))) :=
   hI_dot_at φ (.var 0)
 
 /-- **PAYOFF (§38): D3 queda reducida a `hC_dot` SOLO** — la reflexión punteada de `chainOk`.
     El átomo `In` ya está cerrado (`hI_dot`). -/
-theorem d3_prf_of_chainOkDot (φ : Formula)
+theorem d3_prf_of_chainOkDot [AnclaEq] (φ : Formula)
     (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot)) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_dotted_atoms φ hC (hI_dot φ)

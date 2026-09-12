@@ -98,7 +98,7 @@ theorem prf_lineWF_of_chainOk (q i : Term) :
   exact PrfH_and_elim_left (PrfH.mp _ _ _ hspec hlt)
 
 /-- ⭐ **`hbody`(a) de D3**: la reflexión del átomo `lineWF`, ya instanciada en el cuerpo. -/
-theorem hA_lineWFDotAt (q i : Term) :
+theorem hA_lineWFDotAt [AnclaEq] (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒ provFromCode (lineWFDotAt q i))) := by
   refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
   have hch : PrfH [lt i (lenc q), chainOk nil q] (chainOk nil q) :=
@@ -199,7 +199,7 @@ theorem hG_lencT (L : Term) (s : Term) :
     (prf_substtc_tcFn s (lenc L))
 
 /-- 🏁🏁 **B2 · LA COTA DE `hbody`(b), CRUZADA DENTRO DE `Prov`.** -/
-theorem pcc_bnd_bridge (q i : Term) :
+theorem pcc_bnd_bridge [AnclaEq] (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (eqCodeFn (lencT (premsOfT (nthcT (tcFn q) (tcFn i))))
         (tcFn (lenc (premsOf (nthc q i))))))) := by
@@ -275,7 +275,7 @@ theorem prf_bnd_collapse (q i : Term) :
 
 /-- 🏁 **La cota del DESTINO, cruzada**: `pcc_bnd_bridge` con el colapso ya aplicado. Es la forma
     que `PrfH_bdAllCode_congr_bnd` consumirá para transportar el `bdAllCode` que produzca B3. -/
-theorem pcc_bnd_bridge_at (q i : Term) :
+theorem pcc_bnd_bridge_at [AnclaEq] (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (eqCodeFn (tcFn (lenc (premsOf (nthc q i))))
         (lencT (premsOfT (nthcT (liftc zero (liftc zero (tcFn q))) (liftc zero (tcFn i)))))))) := by

@@ -257,7 +257,7 @@ theorem LIFTC_FUNC_BODY_ok : ax_liftc_func = forall_3 LIFTC_FUNC_BODY := rfl
 
 /-- **`ax_liftc_func` DOTADA**: `⊢ Prov(⌜ liftc(ċ, funcc(ȧ,ḃ)) = funcc(ȧ, liftsc(ċ,ḃ)) ⌝)`,
     con `c`, `a`, `b` **ABSTRACTOS**. -/
-theorem pcc_liftc_func_code (c a b : Term) :
+theorem pcc_liftc_func_code [AnclaEq] (c a b : Term) :
     Prf (provFromCode (eqCodeFn
       (liftcT (tcFn c) (funccT (tcFn a) (tcFn b)))
       (funccT (tcFn a) (liftscT (tcFn c) (tcFn b))))) := by
@@ -347,7 +347,7 @@ def LIFTC_VARGE_BODY : Formula :=
 theorem LIFTC_VARGE_BODY_ok : ax_liftc_var_ge = forall_2 LIFTC_VARGE_BODY := rfl
 
 /-- **`ax_liftc_var_ge` DOTADA** (con la guarda interna `ċ < σṅ` SIN descargar). -/
-theorem pcc_liftc_var_ge_code (c n : Term) :
+theorem pcc_liftc_var_ge_code [AnclaEq] (c n : Term) :
     Prf (provFromCode (implc (ltCodeFn (tcFn c) (succcT (tcFn n)))
       (eqCodeFn (liftcT (tcFn c) (varcT (tcFn n))) (varcT (succcT (tcFn n)))))) := by
   let W1 : Term := liftc zero (tcFn c)
@@ -473,7 +473,7 @@ def LIFTC_VARLT_BODY : Formula :=
 theorem LIFTC_VARLT_BODY_ok : ax_liftc_var_lt = forall_2 LIFTC_VARLT_BODY := rfl
 
 /-- **`ax_liftc_var_lt` DOTADA** (con la guarda interna `ṅ < ċ` SIN descargar). -/
-theorem pcc_liftc_var_lt_code (c n : Term) :
+theorem pcc_liftc_var_lt_code [AnclaEq] (c n : Term) :
     Prf (provFromCode (implc (ltCodeFn (tcFn n) (tcFn c))
       (eqCodeFn (liftcT (tcFn c) (varcT (tcFn n))) (varcT (tcFn n))))) := by
   let W1 : Term := liftc zero (tcFn c)
@@ -522,7 +522,7 @@ def LIFTSC_NIL_BODY : Formula := liftsc (.var 0) nil =eq nil
 theorem LIFTSC_NIL_BODY_ok : ax_liftsc_nil = Formula.forall LIFTSC_NIL_BODY := rfl
 
 /-- **`ax_liftsc_nil` DOTADA**. -/
-theorem pcc_liftsc_nil_code (c : Term) :
+theorem pcc_liftsc_nil_code [AnclaEq] (c : Term) :
     Prf (provFromCode (eqCodeFn (liftscT (tcFn c) (termCode nil)) (termCode nil))) := by
   have hin : Prf (substfc zero (tcFn c) (formCode LIFTSC_NIL_BODY)
       =eq eqCodeFn (liftscT (tcFn c) (termCode nil)) (termCode nil)) :=
@@ -538,7 +538,7 @@ def LIFTSC_CONS_BODY : Formula :=
 theorem LIFTSC_CONS_BODY_ok : ax_liftsc_cons = forall_3 LIFTSC_CONS_BODY := rfl
 
 /-- **`ax_liftsc_cons` DOTADA**, con `c`, `h`, `t` **ABSTRACTOS**. -/
-theorem pcc_liftsc_cons_code (c h t : Term) :
+theorem pcc_liftsc_cons_code [AnclaEq] (c h t : Term) :
     Prf (provFromCode (eqCodeFn
       (liftscT (tcFn c) (consT (tcFn h) (tcFn t)))
       (consT (liftcT (tcFn c) (tcFn h)) (liftscT (tcFn c) (tcFn t))))) := by
@@ -614,20 +614,20 @@ theorem pcc_liftsc_cons_code (c h t : Term) :
     con argumentos **ABIERTOS**) refleja `0 < σn` sin pedir clausura. La guarda de
     `ax_liftc_var_ge` **no es un obstaculo**. -/
 
-theorem pcc_zero_lt_succ_code (n : Term) :
+theorem pcc_zero_lt_succ_code [AnclaEq] (n : Term) :
     Prf (provFromCode (ltCodeFn (tcFn zero) (succcT (tcFn n)))) := by
   have h : Prf (provFromCode (ltCodeFn (tcFn zero) (tcFn (succ n)))) :=
     prf_mp (pcc_lt_tracked zero (succ n)) (prf_zero_lt_succ n)
   exact prf_mp (prf_provCode_congr (prf_congr_atom2CodeFn (prf_refl _) (prf_tc_succ' n))) h
 
-theorem pcc_liftc0_var_code (n : Term) :
+theorem pcc_liftc0_var_code [AnclaEq] (n : Term) :
     Prf (provFromCode (eqCodeFn (liftcT (termCode zero) (varcT (tcFn n)))
       (varcT (succcT (tcFn n))))) := by
   have h := pcc_mp_code_apply (pcc_liftc_var_ge_code zero n) (pcc_zero_lt_succ_code n)
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
     (prf_congr_liftcT prf_tc_zero (prf_refl _)) (prf_refl _))) h
 
-theorem pcc_liftc0_func_code (a b : Term) :
+theorem pcc_liftc0_func_code [AnclaEq] (a b : Term) :
     Prf (provFromCode (eqCodeFn (liftcT (termCode zero) (funccT (tcFn a) (tcFn b)))
       (funccT (tcFn a) (liftscT (termCode zero) (tcFn b))))) :=
   prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
@@ -635,13 +635,13 @@ theorem pcc_liftc0_func_code (a b : Term) :
       (prf_congr_funccT (prf_refl _) (prf_congr_liftscT prf_tc_zero (prf_refl _)))))
     (pcc_liftc_func_code zero a b)
 
-theorem pcc_liftsc0_nil_code :
+theorem pcc_liftsc0_nil_code [AnclaEq] :
     Prf (provFromCode (eqCodeFn (liftscT (termCode zero) (tcFn nil)) (tcFn nil))) :=
   prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
       (prf_congr_liftscT prf_tc_zero (prf_eq_symm prf_tc_zero)) (prf_eq_symm prf_tc_zero)))
     (pcc_liftsc_nil_code zero)
 
-theorem pcc_liftsc0_cons_code (h t : Term) :
+theorem pcc_liftsc0_cons_code [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (liftscT (termCode zero) (consT (tcFn h) (tcFn t)))
       (consT (liftcT (termCode zero) (tcFn h)) (liftscT (termCode zero) (tcFn t))))) :=
   prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
@@ -761,7 +761,7 @@ theorem pcc_congr_consT_arg1_code (B X Y : Term)
    La comparacion por NOMBRE no lo detectaba: lo caza el verificador con un `rfl` compilado. -/
 
 /-- **(1) BASE `varc` — CERRADA, sin hipotesis mas alla de la forma ecuacional.** -/
-theorem refl_caso_varc (s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLift s) := by
+theorem refl_caso_varc [AnclaEq] (s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLift s) := by
   unfold targetLift
   have hplain : Prf (liftc zero s =eq varc (succ a)) :=
     prf_eq_trans (prf_congr_liftc hs) (prf_mp (prf_liftc_var_ge zero a) (prf_zero_lt_succ a))
@@ -798,7 +798,7 @@ theorem refl_caso_varc (s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLift 
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
 
 /-- **(2) PASO `funcc`** — el unico salto: pide la companera sobre la LISTA de argumentos. -/
-theorem refl_caso_funcc (s p b : Term) (hs : Prf (s =eq funcc p b))
+theorem refl_caso_funcc [AnclaEq] (s p b : Term) (hs : Prf (s =eq funcc p b))
     (hb : Prf (targetLiftsc b)) : Prf (targetLift s) := by
   unfold targetLift
   unfold targetLiftsc at hb
@@ -858,13 +858,13 @@ theorem refl_caso_funcc (s p b : Term) (hs : Prf (s =eq funcc p b))
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
 
 /-- **(3) BASE de la LISTA (`nil`) — CERRADA, sin hipotesis ninguna.** -/
-theorem refl_lista_nil : Prf (targetLiftsc nil) := by
+theorem refl_lista_nil [AnclaEq] : Prf (targetLiftsc nil) := by
   unfold targetLiftsc
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftsc_nil zero))))) pcc_liftsc0_nil_code
 
 /-- **(4) PASO de la LISTA (`cons`)** — pide la companera sobre la cabeza y sobre la cola. -/
-theorem refl_lista_cons (h t : Term) (hh : Prf (targetLift h)) (ht : Prf (targetLiftsc t)) :
+theorem refl_lista_cons [AnclaEq] (h t : Term) (hh : Prf (targetLift h)) (ht : Prf (targetLiftsc t)) :
     Prf (targetLiftsc (cons h t)) := by
   unfold targetLift at hh
   unfold targetLiftsc at ht ⊢
@@ -964,11 +964,11 @@ theorem PrfH_congr_targetLiftAt {Γ : List Formula} (c : Term) {s s' : Term}
 `pcc_lt_tracked` (completitud‑Δ₀ provable del átomo `<`, con argumentos ABIERTOS) es lo que
 convierte la hipótesis META en la premisa que el axioma dotado pide. -/
 
-theorem PrfH_guard_lt_code {Γ : List Formula} (a c : Term) (h : PrfH Γ (lt a c)) :
+theorem PrfH_guard_lt_code [AnclaEq] {Γ : List Formula} (a c : Term) (h : PrfH Γ (lt a c)) :
     PrfH Γ (provFromCode (ltCodeFn (tcFn a) (tcFn c))) :=
   PrfH.mp _ _ _ (prf_to_prfH (pcc_lt_tracked a c) Γ) h
 
-theorem PrfH_guard_ge_code {Γ : List Formula} (c a : Term) (h : PrfH Γ (lt c (succ a))) :
+theorem PrfH_guard_ge_code [AnclaEq] {Γ : List Formula} (c a : Term) (h : PrfH Γ (lt c (succ a))) :
     PrfH Γ (provFromCode (ltCodeFn (tcFn c) (succcT (tcFn a)))) :=
   PrfH_provCode_congr
     (prf_to_prfH (prf_congr_atom2CodeFn (prf_refl _) (prf_tc_succ' a)) Γ)
@@ -982,7 +982,7 @@ theorem PrfH_guard_ge_code {Γ : List Formula} (c a : Term) (h : PrfH Γ (lt c (
     los dos módulos, así que el nombre corto sería AMBIGUO allí. No revienta hoy porque la
     ambigüedad de `open` en Lean es perezosa — y eso es justo lo que convierte a estos
     homónimos en trampas (B8b). Se desambigua en el origen. -/
-theorem refl_caso_varc_lift_at (c s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLiftAt c s) := by
+theorem refl_caso_varc_lift_at [AnclaEq] (c s a : Term) (hs : Prf (s =eq varc a)) : Prf (targetLiftAt c s) := by
   have hs1 : Prf (provFromCode (eqc (liftcT (tcFn c) (tcFn (varc a)))
       (liftcT (tcFn c) (varcT (tcFn a))))) :=
     prf_mp (pcc_congr_liftcT_arg2_code (tcFn c) (tcFn (varc a)) (varcT (tcFn a))
@@ -1036,7 +1036,7 @@ theorem refl_caso_varc_lift_at (c s a : Term) (hs : Prf (s =eq varc a)) : Prf (t
         (PrfH_congr_tcFn (PrfH_eq_symm hplain))) hchain
 
 /-- **(2‑at) PASO `funcc`** — espejo puro: el nivel viaja intacto al `liftsc`. -/
-theorem refl_caso_funcc_at (c s p b : Term) (hs : Prf (s =eq funcc p b))
+theorem refl_caso_funcc_at [AnclaEq] (c s p b : Term) (hs : Prf (s =eq funcc p b))
     (hb : Prf (targetLiftscAt c b)) : Prf (targetLiftAt c s) := by
   unfold targetLiftAt
   unfold targetLiftscAt at hb
@@ -1077,20 +1077,20 @@ theorem refl_caso_funcc_at (c s p b : Term) (hs : Prf (s =eq funcc p b))
     (prf_congr_tcFn (prf_eq_symm hplain)))) hchain
 
 /-- El puente `termCode nil` ↦ `tcFn nil` de `pcc_liftsc_nil_code`, a nivel abierto. -/
-theorem pcc_liftsc_nil_code_at (c : Term) :
+theorem pcc_liftsc_nil_code_at [AnclaEq] (c : Term) :
     Prf (provFromCode (eqCodeFn (liftscT (tcFn c) (tcFn nil)) (tcFn nil))) :=
   prf_mp (prf_provCode_congr (prf_congr_eqCodeFn
       (prf_congr_liftscT (prf_refl _) (prf_eq_symm prf_tc_zero)) (prf_eq_symm prf_tc_zero)))
     (pcc_liftsc_nil_code c)
 
 /-- **(3‑at) BASE de la LISTA (`nil`)** — sin hipótesis, a cualquier nivel. -/
-theorem refl_lista_nil_at (c : Term) : Prf (targetLiftscAt c nil) := by
+theorem refl_lista_nil_at [AnclaEq] (c : Term) : Prf (targetLiftscAt c nil) := by
   unfold targetLiftscAt
   exact prf_mp (prf_provCode_congr (prf_congr_eqCodeFn (prf_refl _)
     (prf_congr_tcFn (prf_eq_symm (prf_liftsc_nil c))))) (pcc_liftsc_nil_code_at c)
 
 /-- **(4‑at) PASO de la LISTA (`cons`)** — espejo puro. -/
-theorem refl_lista_cons_at (c h t : Term) (hh : Prf (targetLiftAt c h))
+theorem refl_lista_cons_at [AnclaEq] (c h t : Term) (hh : Prf (targetLiftAt c h))
     (ht : Prf (targetLiftscAt c t)) : Prf (targetLiftscAt c (cons h t)) := by
   unfold targetLiftAt at hh
   unfold targetLiftscAt at ht ⊢
@@ -1151,12 +1151,12 @@ theorem refl_lista_cons_at (c h t : Term) (hh : Prf (targetLiftAt c h))
 /-! ### NO VACUIDAD a nivel abierto: las cuatro clausulas `_at` cubren todo código GENUINO -/
 
 mutual
-theorem refl_termCode_at (c : Term) : ∀ t : Term, Prf (targetLiftAt c (termCode t))
+theorem refl_termCode_at [AnclaEq] (c : Term) : ∀ t : Term, Prf (targetLiftAt c (termCode t))
   | .var n     => refl_caso_varc_lift_at c (termCode (.var n)) (numeral n) (prf_refl _)
   | .func f ts =>
       refl_caso_funcc_at c (termCode (.func f ts)) (strCode f) (termsCode ts)
         (prf_refl _) (refl_termsCode_at c ts)
-theorem refl_termsCode_at (c : Term) : ∀ ts : List Term, Prf (targetLiftscAt c (termsCode ts))
+theorem refl_termsCode_at [AnclaEq] (c : Term) : ∀ ts : List Term, Prf (targetLiftscAt c (termsCode ts))
   | []      => refl_lista_nil_at c
   | t :: ts =>
       refl_lista_cons_at c (termCode t) (termsCode ts)
@@ -1170,12 +1170,12 @@ end
     clausulas son un CUBRIMIENTO COMPLETO: no falta ninguna forma. -/
 
 mutual
-theorem refl_termCode : ∀ t : Term, Prf (targetLift (termCode t))
+theorem refl_termCode [AnclaEq] : ∀ t : Term, Prf (targetLift (termCode t))
   | .var n     => refl_caso_varc (termCode (.var n)) (numeral n) (prf_refl _)
   | .func f ts =>
       refl_caso_funcc (termCode (.func f ts)) (strCode f) (termsCode ts)
         (prf_refl _) (refl_termsCode ts)
-theorem refl_termsCode : ∀ ts : List Term, Prf (targetLiftsc (termsCode ts))
+theorem refl_termsCode [AnclaEq] : ∀ ts : List Term, Prf (targetLiftsc (termsCode ts))
   | []      => refl_lista_nil
   | t :: ts => refl_lista_cons (termCode t) (termsCode ts) (refl_termCode t) (refl_termsCode ts)
 end
@@ -1284,7 +1284,7 @@ theorem PrfH_congr_targetLift {Γ : List Formula} {s s' : Term} (h : PrfH Γ (s 
 
 /-- **EL DISYUNTO `varc`, EN LA MONEDA QUE PIDE LA INDUCCION OBJETO** (implicacion interna,
     guarda como HIPOTESIS): `⊢ shapeUn X 0 ⇒ targetLift X`. CERRADO, sin hipotesis. -/
-theorem refl_shapeUn_imp (X : Term) : Prf (Formula.impl (shapeUn X 0) (targetLift X)) := by
+theorem refl_shapeUn_imp [AnclaEq] (X : Term) : Prf (Formula.impl (shapeUn X 0) (targetLift X)) := by
   refine prf_deduction ?_
   let a : Term := nthc X (numeralM 1)
   have hh : PrfH [shapeUn X 0] (Formula.eq X (varc a)) := prfH_hyp_self _
@@ -1298,7 +1298,7 @@ theorem refl_shapeUn_imp (X : Term) : Prf (Formula.impl (shapeUn X 0) (targetLif
 
 /-- **(2') PASO `funcc`, en forma IMPLICACION**: la companera de la lista entra como
     hipotesis OBJETO. Es la moneda que consume una induccion objeto. -/
-theorem refl_caso_funcc_imp (p b : Term) :
+theorem refl_caso_funcc_imp [AnclaEq] (p b : Term) :
     Prf (Formula.impl (targetLiftsc b) (targetLift (funcc p b))) := by
   refine prf_deduction ?_
   have hb : PrfH [targetLiftsc b] (targetLiftsc b) := prfH_hyp_self _
@@ -1343,7 +1343,7 @@ theorem refl_caso_funcc_imp (p b : Term) :
 
 /-- **EL DISYUNTO `funcc`, EN LA MONEDA DE LA INDUCCION OBJETO**:
     `⊢ (shapeBin X 1 ∧ targetLiftsc (nthc X 2̄)) ⇒ targetLift X`. -/
-theorem refl_shapeBin_imp (X : Term) :
+theorem refl_shapeBin_imp [AnclaEq] (X : Term) :
     Prf (Formula.impl (land (shapeBin X 1) (targetLiftsc (nthc X (numeralM 2))))
       (targetLift X)) := by
   refine prf_deduction ?_
@@ -1358,7 +1358,7 @@ theorem refl_shapeBin_imp (X : Term) :
   exact PrfH_congr_targetLift (PrfH_eq_symm hs) hfb
 
 /-- **(4') PASO de la LISTA, en forma IMPLICACION.** -/
-theorem refl_lista_cons_imp (h t : Term) :
+theorem refl_lista_cons_imp [AnclaEq] (h t : Term) :
     Prf (Formula.impl (land (targetLift h) (targetLiftsc t)) (targetLiftsc (cons h t))) := by
   refine prf_deduction ?_
   let H : Formula := land (targetLift h) (targetLiftsc t)
@@ -1438,7 +1438,7 @@ theorem PrfH_congr_targetLiftscAt {Γ : List Formula} (c : Term) {s s' : Term}
       ((substF_targetLiftscAt_hole c s) ▸ ha)
 
 /-- **EL DISYUNTO `varc` A NIVEL ABIERTO**: `⊢ shapeUn X 0 ⇒ targetLiftAt c X`. -/
-theorem refl_shapeUn_imp_at (c X : Term) :
+theorem refl_shapeUn_imp_at [AnclaEq] (c X : Term) :
     Prf (Formula.impl (shapeUn X 0) (targetLiftAt c X)) := by
   refine prf_deduction ?_
   let a : Term := nthc X (numeralM 1)
@@ -1447,7 +1447,7 @@ theorem refl_shapeUn_imp_at (c X : Term) :
     (prf_to_prfH (refl_caso_varc_lift_at c (varc a) a (prf_refl _)) _)
 
 /-- **(2'‑at) PASO `funcc`, en forma IMPLICACION**, con el nivel abierto. -/
-theorem refl_caso_funcc_imp_at (c p b : Term) :
+theorem refl_caso_funcc_imp_at [AnclaEq] (c p b : Term) :
     Prf (Formula.impl (targetLiftscAt c b) (targetLiftAt c (funcc p b))) := by
   refine prf_deduction ?_
   have hb : PrfH [targetLiftscAt c b] (targetLiftscAt c b) := prfH_hyp_self _
@@ -1493,7 +1493,7 @@ theorem refl_caso_funcc_imp_at (c p b : Term) :
     (prf_congr_tcFn (prf_eq_symm (prf_liftc_func c p b))))) _) hchain
 
 /-- **EL DISYUNTO `funcc` A NIVEL ABIERTO**, en la moneda de la inducción objeto. -/
-theorem refl_shapeBin_imp_at (c X : Term) :
+theorem refl_shapeBin_imp_at [AnclaEq] (c X : Term) :
     Prf (Formula.impl (land (shapeBin X 1) (targetLiftscAt c (nthc X (numeralM 2))))
       (targetLiftAt c X)) := by
   refine prf_deduction ?_
@@ -1508,7 +1508,7 @@ theorem refl_shapeBin_imp_at (c X : Term) :
   exact PrfH_congr_targetLiftAt c (PrfH_eq_symm hs) hfb
 
 /-- **(4'‑at) PASO de la LISTA, en forma IMPLICACION**, con el nivel abierto. -/
-theorem refl_lista_cons_imp_at (c h t : Term) :
+theorem refl_lista_cons_imp_at [AnclaEq] (c h t : Term) :
     Prf (Formula.impl (land (targetLiftAt c h) (targetLiftscAt c t))
       (targetLiftscAt c (cons h t))) := by
   refine prf_deduction ?_
@@ -1593,7 +1593,7 @@ theorem refl_lista_cons_imp_at (c h t : Term) :
       eliminacion del `∧`. Su unico papel es alimentar el DESCENSO (garantizar que los hijos
       vuelven a ser codigos), es decir producir la premisa `targetLiftsc (nthc X 2̄)`.
     * Ni un solo `bdAllCode` en la cara punteada: el consecuente es una ecuacion de codigo. -/
-theorem refl_isTermCodeE1_imp (w X : Term) :
+theorem refl_isTermCodeE1_imp [AnclaEq] (w X : Term) :
     Prf (Formula.impl (isTermCodeE1 w X)
       (Formula.impl (targetLiftsc (nthc X (numeralM 2))) (targetLift X))) := by
   unfold ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.isTermCodeE1

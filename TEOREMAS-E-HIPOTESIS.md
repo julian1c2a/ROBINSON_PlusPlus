@@ -32,6 +32,7 @@ un fallo.
 | teorema | hipótesis | ¿quién la descarga? |
 |---|---|---|
 | 🏁 **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ **nadie, y es correcto**: es la hipótesis del teorema — y es **la MÍNIMA** (`¬ Prf ⊥`). **P‑4 resuelto** |
+| | ⭐ **`[AnclaEq]`** (nuevo, 2026‑09‑12) | ⛔⛔ **NADIE. Y hay que leerlo bien.** Era el `axiom prf_axiomsCodeT_eq`; hoy es **hipótesis de instancia** ([ADR‑026](DECISIONS.md)). El footprint bajó a `[propext, Classical.choice, Quot.sound]` — **cero axiomas del proyecto**— pero eso **NO** significa «Gödel sin postulados»: el postulado **se movió a la firma**. ⚠️ **No existe ninguna `instance : AnclaEq` en el árbol** [medido] ⇒ la hipótesis está **abierta**. Anunciar el footprint sin esta fila sería **M‑8 con otro nombre** |
 | | *(el punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
 | `goedel_first_numeral` (`Meta/DiagonalNumeral.lean`) | `hcon : ConsistentOmega` | 🔶 **versión antigua**, sobre la hipótesis **más fuerte**. Se conserva (la usa la cadena `⊢`), pero **el enunciado bueno es el de arriba** |
 
@@ -52,7 +53,8 @@ un fallo.
 
 | teorema | hipótesis | ¿quién la descarga? |
 |---|---|---|
-| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ hipótesis del teorema — **la única, y la MÍNIMA** |
+| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ hipótesis del teorema — **la MÍNIMA** |
+| | ⭐ **`[AnclaEq]`** | ⛔⛔ **NADIE** — ídem que Gödel I: el ancla de codificación, **movida del footprint a la firma** ([ADR‑026](DECISIONS.md)). Sin instancia en el árbol |
 | | *(punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
 | | *(necesitación `nec1`)* | ✅ `repr_pos'_prf` (D1) sobre el punto fijo |
 | | *(`Con' ⇒ G`)* | ✅ `prf_con_imp_godel`, sobre `d2_prf` (D2) y `d3_prf_real` (D3) |
@@ -102,7 +104,7 @@ proyecto**. La hipótesis de la cadena de Gödel es hoy **la mínima honesta**.
 
 ---
 
-## 4 · Los 5 `axiom` de Lean — la otra clase de hipótesis
+## 4 · Los **4** `axiom` de Lean — la otra clase de hipótesis
 
 | axioma | qué es | ¿retirable? |
 |---|---|---|
@@ -110,9 +112,16 @@ proyecto**. La hipótesis de la cadena de Gödel es hoy **la mínima honesta**.
 | `ax_list_induction` | ídem, listas | ⛔ no |
 | `ax_p_tfa` | teorema fundamental de la aritmética, forma idealizada | 🔶 `tfa_numeral` es la realización real |
 | `ax_axiomsCodeT_eq` | ancla de codificación (⊢) | ⬜ frente abierto. ⭐ **Ya NO está en el footprint de Gödel I/II** desde P‑4 |
-| **`prf_axiomsCodeT_eq`** | ancla de codificación (`Prf`) | ⛔ **EL ÚNICO axioma del proyecto que sostiene la cadena de Gödel**. Era «el que arrastra casi todo»; hoy es, además, **lo único que queda entre Gödel y los tres axiomas de Lean** |
+| ~~`prf_axiomsCodeT_eq`~~ | ancla de codificación (`Prf`) | 🗑️ **RETIRADO el 2026‑09‑12**: ya no es `axiom`, es la **clase `AnclaEq`** ([ADR‑026](DECISIONS.md)). ⚠️ **No desapareció el supuesto** — cambió de sitio: del footprint a la **firma** de los teoremas que lo necesitan. Ver §1 |
 
 **Ninguno es gödeliano**: D1, D2 y D3 son teoremas.
+
+⭐⭐ **Y por qué se retiró, que es lo que importa**: un `axiom` de tipo `Prf …` **HABITA el inductivo
+`Prf`**, y por **M‑11** eso prohíbe demostrar nada sobre `Prf` por inducción — pero el árbol lo hacía
+**tres veces** (`prf_to_derives`, `prf_to_prfH`, `prf_to_derivation`), y D1 **se aplicaba al propio
+postulado**. ⚠️ `#print axioms` **no detecta** esa clase: los tres tenían footprint limpio y eran
+**injustificados**. Como hipótesis, `Prf` queda sin ningún axioma habitándolo y las tres inducciones
+pasan a ser legítimas.
 
 ---
 

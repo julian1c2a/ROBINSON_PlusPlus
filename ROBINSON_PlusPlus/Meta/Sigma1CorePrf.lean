@@ -149,7 +149,7 @@ def objListN : List Nat → Nat
     Meta-inducción en `elems`; cabeza vía `pcc_in_head` (el elemento es `x`), cola vía
     `pcc_in_tail` + HI. (Se usa `List.Mem` explícito: `∈` está sobrecargado como el `In`
     object por la notación scoped de `Minimal.Axioms`.) -/
-theorem pcc_in_objList_of_mem (x : Term) (elems : List Term) :
+theorem pcc_in_objList_of_mem [AnclaEq] (x : Term) (elems : List Term) :
     List.Mem x elems → Prf (provCodeC' (In x (objList elems))) := by
   induction elems with
   | nil => intro h; cases h
@@ -193,7 +193,7 @@ theorem prf_runFn_nil_objList (lines : List Term) :
     para testigos concretos): si `x` es (meta-)miembro de las conclusiones `lines.map carc`,
     entonces `provCodeC'(In x (runFn nil (objList lines)))`. Reflexión sobre `objList`
     (`pcc_in_objList_of_mem`) + transporte por el tracking (`=eq` Leibniz object + `pcc_imp`). -/
-theorem pcc_in_runFn_objList (x : Term) (lines : List Term)
+theorem pcc_in_runFn_objList [AnclaEq] (x : Term) (lines : List Term)
     (hmem : List.Mem x (lines.map carc)) :
     Prf (provCodeC' (In x (runFn nil (objList lines)))) := by
   have hrefl := pcc_in_objList_of_mem x (lines.map carc) hmem

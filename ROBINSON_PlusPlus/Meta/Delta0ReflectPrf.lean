@@ -195,7 +195,7 @@ theorem pcc_gen_code (body : Term) :
 
 /-- **Reflexión de `<` con `a`, `b` ABIERTOS, en forma implicación**: de `Prov(⌜ ȧ + σK = ḃ ⌝)` sale
     `Prov(⌜ ȧ < ḃ ⌝)`, sin exigir `a`, `b` cerrados. Es `pcc_lt_intro` con el `∃`‑intro ABIERTO. -/
-theorem pcc_lt_intro_open_imp (a b K : Term) (hwK : Prf (hasWit (liftTerm 0 K))) :
+theorem pcc_lt_intro_open_imp [AnclaEq] (a b K : Term) (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))
       ⇒ provFromCode (ltCodeFn (tcFn a) (tcFn b))) := by
   refine prf_deduction ?_
@@ -219,7 +219,7 @@ theorem pcc_lt_intro_open_imp (a b K : Term) (hwK : Prf (hasWit (liftTerm 0 K)))
       (ltCodeFn (tcFn a) (tcFn b))) (pcc_ltBwd_computed a b)) _) hex
 
 /-- **Reflexión de `<` con `a`, `b` ABIERTOS** (aplicación directa). -/
-theorem pcc_lt_intro_open (a b K : Term)
+theorem pcc_lt_intro_open [AnclaEq] (a b K : Term)
     (h : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))))
     (hwK : Prf (hasWit (liftTerm 0 K))) :
     Prf (provFromCode (ltCodeFn (tcFn a) (tcFn b))) :=
@@ -241,7 +241,7 @@ theorem liftTerm_ltCodeFn_tcFn (s t : Term) (c : Nat) :
     sumatorio simbólico `ṡ + σ(k̇)` al numeral del valor `(s+σk)˙`, que la hipótesis identifica con
     `ṫ` (`prf_congr_tcFn`); `pcc_lt_intro_open` cierra. **Ésta es la base atómica de la
     completitud‑Δ₀ provable para el orden.** -/
-theorem pcc_lt_tracked (s t : Term) :
+theorem pcc_lt_tracked [AnclaEq] (s t : Term) :
     Prf ((lt s t) ⇒ provFromCode (ltCodeFn (tcFn s) (tcFn t))) := by
   refine prf_deduction ?_
   have hiff : PrfH [lt s t]

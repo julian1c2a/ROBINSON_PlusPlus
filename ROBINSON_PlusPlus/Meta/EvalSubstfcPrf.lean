@@ -162,7 +162,7 @@ theorem substCodeF_AXBODY (m : Nat) (W : Term) :
 
 /-- **§3-GEN** — `pcc_substfc_forall_dot` con el tag ABSTRACTO. Copia estructural
     literal del caso `forall`: cambia `6` por `m` y `hin` pasa por `substCodeF_AXBODY`. -/
-theorem pcc_substfc_un_dot (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms) (a b f : Term) :
+theorem pcc_substfc_un_dot [AnclaEq] (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms) (a b f : Term) :
     Prf (provFromCode (eqCodeFn
       (substfcT (tcFn a) (tcFn b) (unT m (tcFn f)))
       (unT m (substfcT (succcT (tcFn a)) (liftcT (termCode zero) (tcFn b)) (tcFn f))))) := by
@@ -247,7 +247,7 @@ theorem pcc_substfc_un_dot (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms) (a 
     (pcc_axiom_inst3 (AXBODY m) hmem (tcFn a) (tcFn b) (tcFn f) (by hw_auto) (by hw_auto) (by hw_auto))
 
 /-- **§5-GEN** — `fuego_ab` con el tag ABSTRACTO. -/
-theorem fuego_ab_un (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms) (a b f : Term) :
+theorem fuego_ab_un [AnclaEq] (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms) (a b f : Term) :
     Prf (provFromCode (eqCodeFn
       (substfcT (tcFn a) (tcFn b) (tcFn (unc m f)))
       (unT m (substfcT (succcT (tcFn a)) (liftcT (termCode zero) (tcFn b)) (tcFn f))))) := by
@@ -734,7 +734,7 @@ theorem pcc_eval_substfc_modulo_8
 /-! ### §9.1 · CASO `bottom` -/
 
 /-- **`CasoBot` DESCARGADO** (Leibniz desde la forma ecuacional). -/
-theorem casoBot : CasoBot := by
+theorem casoBot [AnclaEq] : CasoBot := by
   intro v s X
   refine prf_deduction ?_
   exact PrfH_congr_targetSubstfc (PrfH_eq_symm (prfH_hyp_self (shapeNul X 2)))
@@ -744,7 +744,7 @@ theorem casoBot : CasoBot := by
 
 /-- **PIEZA NUEVA**: `SubstfcPlanos.paso2_caso_bin` reescrito en forma IMPLICACION
     (`PrfH Γ`), porque en la induccion la HI llega como HIPOTESIS, no como `Prf` cerrada. -/
-theorem paso2_caso_bin_imp (k : Nat) (v s a b : Term)
+theorem paso2_caso_bin_imp [AnclaEq] (k : Nat) (v s a b : Term)
     (hax : Prf (provFromCode (eqCodeFn
       (substfcT (tcFn v) (tcFn s) (binT k (tcFn a) (tcFn b)))
       (binT k (substfcT (tcFn v) (tcFn s) (tcFn a)) (substfcT (tcFn v) (tcFn s) (tcFn b))))))
@@ -813,7 +813,7 @@ theorem paso2_caso_bin_imp (k : Nat) (v s a b : Term)
     <;> hw_auto
 
 /-- **`CasoBin k` DESCARGADO**, generico en el tag. -/
-theorem casoBin_gen (k : Nat)
+theorem casoBin_gen [AnclaEq] (k : Nat)
     (hax : ∀ v s a b : Term, Prf (provFromCode (eqCodeFn
       (substfcT (tcFn v) (tcFn s) (binT k (tcFn a) (tcFn b)))
       (binT k (substfcT (tcFn v) (tcFn s) (tcFn a)) (substfcT (tcFn v) (tcFn s) (tcFn b))))))
@@ -832,19 +832,19 @@ theorem casoBin_gen (k : Nat)
       (hobj v s (nthc X (numeralM 1)) (nthc X (numeralM 2)))) _) hab
   exact PrfH_congr_targetSubstfc (PrfH_eq_symm hshape) hC
 
-theorem casoBin5 : CasoBin 5 :=
+theorem casoBin5 [AnclaEq] : CasoBin 5 :=
   casoBin_gen 5
     (fun v s a b => pcc_substfc_bin_dot (numeralM 5) (fun c => liftTerm_numeralM c 5)
       (show ax_substfc_impl ∈ axioms by simp [axioms]) v s a b)
     (fun v s a b => prf_substfc_impl v s a b)
 
-theorem casoBin7 : CasoBin 7 :=
+theorem casoBin7 [AnclaEq] : CasoBin 7 :=
   casoBin_gen 7
     (fun v s a b => pcc_substfc_bin_dot (numeralM 7) (fun c => liftTerm_numeralM c 7)
       (show ax_substfc_and ∈ axioms by simp [axioms]) v s a b)
     (fun v s a b => prf_substfc_and v s a b)
 
-theorem casoBin8 : CasoBin 8 :=
+theorem casoBin8 [AnclaEq] : CasoBin 8 :=
   casoBin_gen 8
     (fun v s a b => pcc_substfc_bin_dot (numeralM 8) (fun c => liftTerm_numeralM c 8)
       (show ax_substfc_or ∈ axioms by simp [axioms]) v s a b)
@@ -852,7 +852,7 @@ theorem casoBin8 : CasoBin 8 :=
 
 /-- **EL TEOREMA CON CUATRO HIPOTESIS MENOS**: quedan `CasoAtom`, `CasoEq`,
     `CasoUn 6`, `CasoUn 9` y `HasWitLift`. -/
-theorem pcc_eval_substfc_modulo_5
+theorem pcc_eval_substfc_modulo_5 [AnclaEq]
     (hatom : CasoAtom) (heq : CasoEq) (h6 : CasoUn 6) (h9 : CasoUn 9) (hwl : HasWitLift)
     (wF wT v s f : Term) (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
     Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f)))) :=
@@ -908,7 +908,7 @@ theorem casoHasWitLift : HasWitLift := by
 /-- **EL TEOREMA CON CINCO HIPOTESIS MENOS**: quedan SOLO `CasoAtom`, `CasoEq`,
     `CasoUn 6` y `CasoUn 9` — los CUATRO constructores de `substfc` que no estaban
     disponibles en la forma IMPLICACION que la induccion consume. -/
-theorem pcc_eval_substfc_modulo_4
+theorem pcc_eval_substfc_modulo_4 [AnclaEq]
     (hatom : CasoAtom) (heq : CasoEq) (h6 : CasoUn 6) (h9 : CasoUn 9)
     (wF wT v s f : Term) (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
     Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f)))) :=
@@ -930,12 +930,12 @@ theorem pcc_eval_substfc_modulo_4
     ############################################################################ -/
 
 /-- La evaluacion provable de `substtc`, en forma IMPLICACION y SIN hipotesis. -/
-theorem eval_substtc_imp (w v s t : Term) :
+theorem eval_substtc_imp [AnclaEq] (w v s t : Term) :
     Prf (Formula.impl (isTC1 w t) (targetSubsttc v s t)) :=
   DESCENSO_substtc_imp w v s t
 
 /-- Su gemela sobre LISTAS de codigos de termino. -/
-theorem eval_substtsc_imp (w v s t : Term) :
+theorem eval_substtsc_imp [AnclaEq] (w v s t : Term) :
     Prf (Formula.impl (land (wfAll1 w) (argsIn w t)) (targetSubsttsc v s t)) :=
   DESCENSO_substtc_lista_imp w v s t
 
@@ -971,7 +971,7 @@ def AXTER_BODY (T : Term) (nm : String) : Formula :=
 theorem AXTER_eq : ax_substfc_eq = forall_4 (AXTER_BODY (numeralM 4) "substtc") := rfl
 theorem AXTER_impl : ax_substfc_impl = forall_4 (AXTER_BODY (numeralM 5) "substfc") := rfl
 
-theorem pcc_substfc_ter_dot (T : Term) (nm : String) (hT : ∀ c : Nat, liftTerm c T = T)
+theorem pcc_substfc_ter_dot [AnclaEq] (T : Term) (nm : String) (hT : ∀ c : Nat, liftTerm c T = T)
     (hmem : forall_4 (AXTER_BODY T nm) ∈ axioms) (v s a b : Term) :
     Prf (provFromCode (eqCodeFn
       (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (tcFn b)))
@@ -1111,7 +1111,7 @@ def AXATOM_BODY : Formula :=
 
 theorem AXATOM_ok : ax_substfc_atom = forall_4 AXATOM_BODY := rfl
 
-theorem pcc_substfc_atom_dot (v s a b : Term) :
+theorem pcc_substfc_atom_dot [AnclaEq] (v s a b : Term) :
     Prf (provFromCode (eqCodeFn
       (substfcT (tcFn v) (tcFn s) (binT 3 (tcFn a) (tcFn b)))
       (binT 3 (tcFn a) (substtscT (tcFn v) (tcFn s) (tcFn b))))) := by
@@ -1234,7 +1234,7 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
 
 /-! ### §11.4 · Los DOS ensamblajes, en forma IMPLICACION -/
 
-theorem caso_eq_core (v s a b : Term) :
+theorem caso_eq_core [AnclaEq] (v s a b : Term) :
     Prf (Formula.impl
       (land (targetSubsttc v s a) (targetSubsttc v s b))
       (targetSubstfc v s (cons (numeralM 4) (cons a (cons b nil))))) := by
@@ -1299,7 +1299,7 @@ theorem caso_eq_core (v s a b : Term) :
           (PrfH_eq_trans_code _ _ _ iX4 h5 h6 ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_) ?_ ?_ ?_
     <;> hw_auto
 
-theorem caso_atom_core (v s a b : Term) :
+theorem caso_atom_core [AnclaEq] (v s a b : Term) :
     Prf (Formula.impl (targetSubsttsc v s b)
       (targetSubstfc v s (cons (numeralM 3) (cons a (cons b nil))))) := by
   refine prf_deduction ?_
@@ -1345,7 +1345,7 @@ theorem caso_atom_core (v s a b : Term) :
 
 /-! ### §11.5 · `CasoEq` y `CasoAtom`, DESCARGADOS -/
 
-theorem casoEq : CasoEq := by
+theorem casoEq [AnclaEq] : CasoEq := by
   intro wT v s X
   refine prf_deduction ?_
   have hh := prfH_hyp_self (land (wfAll1 wT) (land (shapeBin X 4)
@@ -1367,7 +1367,7 @@ theorem casoEq : CasoEq := by
     (PrfH_and_intro hTA hTB)
   exact PrfH_congr_targetSubstfc (PrfH_eq_symm hshape) hC
 
-theorem casoAtom : CasoAtom := by
+theorem casoAtom [AnclaEq] : CasoAtom := by
   intro wT v s X
   refine prf_deduction ?_
   have hh := prfH_hyp_self (land (wfAll1 wT) (land (shapeBin X 3)
@@ -1385,7 +1385,7 @@ theorem casoAtom : CasoAtom := by
 
 /-- **EL TEOREMA CON SIETE HIPOTESIS MENOS**: quedan SOLO `CasoUn 6` y `CasoUn 9`
     (`forallc` y `exc`), los DOS unicos constructores con `liftc` en el sustituyendo. -/
-theorem pcc_eval_substfc_modulo_2 (h6 : CasoUn 6) (h9 : CasoUn 9)
+theorem pcc_eval_substfc_modulo_2 [AnclaEq] (h6 : CasoUn 6) (h9 : CasoUn 9)
     (wF wT v s f : Term) (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
     Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f)))) :=
   pcc_eval_substfc_modulo_8 casoBot casoAtom casoEq casoBin5 casoBin7 casoBin8 h6 h9
@@ -1401,7 +1401,7 @@ theorem pcc_eval_substfc_modulo_2 (h6 : CasoUn 6) (h9 : CasoUn 9)
     ############################################################################ -/
 
 /-- El DESCENSO de `liftc` (`ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_hasWit`), en los simbolos de este fichero. -/
-theorem DESCENSO_hasWit_local (s : Term) :
+theorem DESCENSO_hasWit_local [AnclaEq] (s : Term) :
     Prf (Formula.impl (hasWit s)
       (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))) :=
   ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_hasWit s
@@ -1409,7 +1409,7 @@ theorem DESCENSO_hasWit_local (s : Term) :
 /-- **`paso2_caso_un_guarded` con la HI como CONJUNTO** (no como `Prf` cerrada).
     Prueba identica a `sondeos/SubstfcEx.lean:4307`, salvo que `hIHg` se lee del contexto
     en vez de obtenerse por MP con `CRIT_hasWit_lift`. -/
-theorem paso2_caso_un_conj (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
+theorem paso2_caso_un_conj [AnclaEq] (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
     (hobj : ∀ v s a : Term,
       Prf (substfc v s (unc m a) =eq unc m (substfc (succ v) (liftc zero s) a)))
     (v s f : Term) :
@@ -1488,7 +1488,7 @@ theorem paso2_caso_un_conj (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
     <;> hw_auto
 
 /-- **`CasoUn m` DESCARGADO**, generico en el tag. -/
-theorem casoUn_gen (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
+theorem casoUn_gen [AnclaEq] (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
     (hobj : ∀ v s a : Term,
       Prf (substfc v s (unc m a) =eq unc m (substfc (succ v) (liftc zero s) a))) :
     CasoUn m := by
@@ -1505,15 +1505,15 @@ theorem casoUn_gen (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
     (PrfH_and_intro hws hIH)
   exact PrfH_congr_targetSubstfc (PrfH_eq_symm hshape) hC
 
-theorem casoUn6 : CasoUn 6 := casoUn_gen 6 mem6 prf_substfc_forall
-theorem casoUn9 : CasoUn 9 := casoUn_gen 9 mem9 prf_substfc_ex
+theorem casoUn6 [AnclaEq] : CasoUn 6 := casoUn_gen 6 mem6 prf_substfc_forall
+theorem casoUn9 [AnclaEq] : CasoUn 9 := casoUn_gen 9 mem9 prf_substfc_ex
 
 /-! ############################################################################
     ## §13 · **`pcc_eval_substfc` — SIN NINGUNA HIPOTESIS**
     ############################################################################ -/
 
 /-- **EL DESCENSO COMPLETO**, sin hipotesis colgando. -/
-theorem DESCENSO_substfc (wF wT v s t : Term) :
+theorem DESCENSO_substfc [AnclaEq] (wF wT v s t : Term) :
     Prf (Formula.impl (GUARD wF wT s t) (targetSubstfc v s t)) :=
   DESCENSO_substfc_imp casoBot casoAtom casoEq casoBin5 casoBin7 casoBin8 casoUn6 casoUn9
     casoHasWitLift wF wT v s t
@@ -1521,7 +1521,7 @@ theorem DESCENSO_substfc (wF wT v s t : Term) :
 /-- **★ `pcc_eval_substfc` ★** — la evaluacion PROVABLE de `substfc` con `v`, `s`, `f`
     **ABSTRACTOS**, guardada por los DOS testigos (formula `wF` y termino `wT`).
     CERO axiomas de Lean, cero `sorry`, cero hipotesis. -/
-theorem pcc_eval_substfc (wF wT v s f : Term)
+theorem pcc_eval_substfc [AnclaEq] (wF wT v s f : Term)
     (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
     Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f)))) :=
   prf_mp (DESCENSO_substfc wF wT v s f) (prf_and_intro hws hfc)
@@ -1538,7 +1538,7 @@ theorem pcc_eval_substfc (wF wT v s f : Term)
 
 /-- **`pcc_eval_substfc` con los DOS testigos CUANTIFICADOS** (la forma que consume
     el reflector rio abajo: ninguna lista testigo aparece en el enunciado). -/
-theorem pcc_eval_substfc_wit (v s f : Term) :
+theorem pcc_eval_substfc_wit [AnclaEq] (v s f : Term) :
     Prf (Formula.impl (land (hasWit s) (hasWitF f)) (targetSubstfc v s f)) := by
   refine prf_deduction ?_
   have hh := prfH_hyp_self (land (hasWit s) (hasWitF f))

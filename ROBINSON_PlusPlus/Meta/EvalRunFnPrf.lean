@@ -55,7 +55,7 @@ noncomputable def evalRunCode (p : Term) : Term :=
 
 /-- Instancia codificada de `ax_runFn_nil` con testigo `tcFn nil`, ya **computada**:
     `⊢ Prov(⌜runFn(ṅil, ⌜nil⌝) = ṅil⌝)`. (`⌜nil⌝ = termCode nil`, aún no `tcFn nil`.) -/
-theorem pcc_ax_runFn_nil_computed :
+theorem pcc_ax_runFn_nil_computed [AnclaEq] :
     Prf (provFromCode (eqCodeFn (runFnT (tcFn nil) (termCode nil)) (tcFn nil))) :=
   prf_mp
     (prf_provCode_congr
@@ -67,7 +67,7 @@ theorem pcc_ax_runFn_nil_computed :
 /-- **BASE de la evaluación provable de `runFn`**: `⊢ Prov(⌜runFn(ṅil, ṅil) = (runFn nil nil)˙⌝)`.
     De `pcc_ax_runFn_nil_computed` transportando `⌜nil⌝ ↦ tcFn nil` (`prf_tc_zero`) y
     `tcFn nil ↦ tcFn (runFn nil nil)` (`runFn nil nil =eq nil`). -/
-theorem pcc_eval_runFn_nil : Prf (provFromCode (evalRunCode nil)) := by
+theorem pcc_eval_runFn_nil [AnclaEq] : Prf (provFromCode (evalRunCode nil)) := by
   have hb : Prf (termCode nil =eq tcFn nil) := prf_eq_symm prf_tc_zero
   have hr : Prf (tcFn nil =eq tcFn (runFn nil nil)) :=
     prf_eq_symm (prf_congr_tcFn (prf_runFn_nil nil))
@@ -108,7 +108,7 @@ theorem prf_substtc_termCode_nil (W : Term) :
 /-- **RECURSIÓN de `runFn` CODIFICADA**: `⊢ Prov(⌜runFn(⌜nil⌝, cons ḣ ṫ) = cons (carc ḣ)(runFn(⌜nil⌝, ṫ))⌝)`.
     De `pcc_thm_inst2 prf_runFn_nil_cons_forall (tcFn h)(tcFn t)`, computando el doble `substfc` sobre
     el código explícito y normalizando `liftc (tcFn h)` con (A). -/
-theorem pcc_runFn_cons_code (h t : Term) :
+theorem pcc_runFn_cons_code [AnclaEq] (h t : Term) :
     Prf (provFromCode (eqCodeFn (runFnT (termCode nil) (consT (tcFn h) (tcFn t)))
       (consT (carcT (tcFn h)) (runFnT (termCode nil) (tcFn t))))) := by
   let W1 : Term := liftc zero (tcFn h)

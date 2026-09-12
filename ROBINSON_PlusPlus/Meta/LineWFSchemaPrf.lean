@@ -138,7 +138,7 @@ theorem prf_lencD_eq (n : Nat) (t : Term) :
     (prf_congr_lencT (prf_substtc_varc0 (tcFn t)))
 
 /-- **`Prov(TAG_dot t)`**, genérico en `k`. -/
-theorem pcc_tagD (k : Nat) (t : Term) :
+theorem pcc_tagD [AnclaEq] (k : Nat) (t : Term) :
     Prf (lt (succ zero) (lenc t) ⇒
       ((nthc t (succ zero) =eq numeralM k) ⇒ provFromCode (tagD k t))) := by
   refine prf_deduction (deduction_aux ?_ (nthc t (succ zero) =eq numeralM k)
@@ -162,7 +162,7 @@ theorem pcc_tagD (k : Nat) (t : Term) :
     (PrfH_provCode_congr hcodeq hev)
 
 /-- **`Prov(LENC_dot t)`**, genérico en `n`. -/
-theorem pcc_lencD (n : Nat) (t : Term) :
+theorem pcc_lencD [AnclaEq] (n : Nat) (t : Term) :
     Prf ((lenc t =eq numeralM n) ⇒ provFromCode (lencD n t)) := by
   refine prf_deduction ?_
   have hev : PrfH [lenc t =eq numeralM n]
@@ -196,7 +196,7 @@ theorem substtc_inv_nthcT_tcFn (t : Term) (i : Nat) :
 
 /-- **Puente `carc`**: bajo `lineWF t` (que da la estructura `cons` de la línea),
     `Prov(⌜carcT ṫ = (carc t)˙⌝)`. -/
-theorem pcc_carcD_bridge (t : Term) :
+theorem pcc_carcD_bridge [AnclaEq] (t : Term) :
     Prf (lineWF t ⇒ provFromCode (eqc (carcT (tcFn t)) (tcFn (carc t)))) := by
   refine prf_deduction ?_
   have hcons := PrfH.mp _ _ _ (prf_to_prfH (prf_lineWF_cons t) _) (prfH_hyp_self (lineWF t))
@@ -206,7 +206,7 @@ theorem pcc_carcD_bridge (t : Term) :
     (prf_to_prfH (pcc_eval_carc (carc t) (cdrc t)) _)
 
 /-- **Puente `nthc`**: bajo la cota `i < lenc t`, `Prov(⌜nthcT ṫ ı̇ = (nthc t ı)˙⌝)`. -/
-theorem pcc_nthcD_bridge (t : Term) (i : Nat) :
+theorem pcc_nthcD_bridge [AnclaEq] (t : Term) (i : Nat) :
     Prf (lt (numeralM i) (lenc t) ⇒
       provFromCode (eqc (nthcT (tcFn t) (termCode (numeralM i)))
         (tcFn (nthc t (numeralM i))))) := by
@@ -258,7 +258,7 @@ theorem schema_bwd (k n : Nat) (C : Formula)
 
 /-- **Columna vertebral codificada**, genérica: el bicondicional (dirección `⇐`) transportado al
     nivel del código y punteado en `t`. Es la plantilla común a los 21 tags. -/
-theorem schema_backbone (k n : Nat) (C : Formula)
+theorem schema_backbone [AnclaEq] (k n : Nat) (C : Formula)
     (hbwd : Prf (Formula.forall (Formula.impl (tagF k)
       (Formula.impl (Formula.and (lencF n) C) lwfVar)))) (t : Term) :
     Prf (provFromCode
@@ -288,7 +288,7 @@ cotas que necesite). -/
     arbitraria, instanciar el `∀` en `#0` **no** es la identidad (De Bruijn *decrementa* los índices
     superiores), así que el chasis no puede abrir el binder sin saberlo. Toda condición real de los
     21 tags menciona sólo `#0`, luego cada tag la descarga con `rfl`. -/
-theorem pcc_lineWF_tracked_of_schema {k n : Nat} {C : Formula} (t : Term)
+theorem pcc_lineWF_tracked_of_schema [AnclaEq] {k n : Nat} {C : Formula} (t : Term)
     (hC : substFormula 0 (.var 0) C = C)
     (hax : Prf (Formula.forall (Formula.impl (tagF k) (lwfVar ⇔ Formula.and (lencF n) C))))
     (hcond : Prf (lineWF t ⇒ ((lenc t =eq numeralM n) ⇒

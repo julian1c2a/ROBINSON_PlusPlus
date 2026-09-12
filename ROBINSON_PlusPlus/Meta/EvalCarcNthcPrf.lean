@@ -114,7 +114,7 @@ theorem PrfH_congr_carcT {Γ : List Formula} {x y : Term} (h : PrfH Γ (x =eq y)
     `⊢ Prov(⌜ carc (nthc(ṗ, ı̇)) = (carc (nthc p i))˙ ⌝)`. Encadena `pcc_eval_nthc` (nthc → valor),
     `prf_line_is_cons` (la línea es un `cons`) y `pcc_eval_carc` (`carc` sobre el `cons`). Es el
     puente que `hI_dot` necesita para reflejar `carc (nthc p i)` en el cuerpo de `boundedCarcIn`. -/
-theorem pcc_eval_carc_nthc (p i : Term) :
+theorem pcc_eval_carc_nthc [AnclaEq] (p i : Term) :
     Prf (chainOk nil p ⇒ (lt i (lenc p) ⇒
       provFromCode (eqCodeFn (carcT (nthcT (tcFn p) (tcFn i))) (tcFn (carc (nthc p i)))))) := by
   refine prf_deduction (deduction_aux ?_ (lt i (lenc p)) [chainOk nil p] rfl)

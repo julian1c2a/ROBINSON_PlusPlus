@@ -199,14 +199,14 @@ theorem prf_hasWitF_substfc_lift {v s C : Term}
     `formCode (Formula.forall φ) = forallc (formCode φ)` (definicional). Es la forma general:
     `pcc_axiom_inst` es el caso `h = prf_ax hmem`. Sirve para internalizar **cualquier** teorema
     universal de la teoría objeto (p. ej. la transitividad de `=`), no sólo los axiomas. -/
-theorem pcc_thm_inst (φ : Formula) (h : Prf (Formula.forall φ)) (w : Term)
+theorem pcc_thm_inst [AnclaEq] (φ : Formula) (h : Prf (Formula.forall φ)) (w : Term)
     (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode φ))) :=
   prf_mp (pcc_forallElim_code_open (formCode φ) w (prf_hasWitF_fc_lift φ) hw)
     (repr_pos'_prf h)
 
 /-- **Instanciación de un TEOREMA `∀∀φ` codificado** (dos testigos, ambos pueden ser abiertos). -/
-theorem pcc_thm_inst2 (φ : Formula) (h : Prf (forall_2 φ)) (w₁ w₂ : Term)
+theorem pcc_thm_inst2 [AnclaEq] (φ : Formula) (h : Prf (forall_2 φ)) (w₁ w₂ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) := by
   have h0 : Prf (provFromCode (formCode (forall_2 φ))) := repr_pos'_prf h
@@ -220,14 +220,14 @@ theorem pcc_thm_inst2 (φ : Formula) (h : Prf (forall_2 φ)) (w₁ w₂ : Term)
     (prf_hasWitF_substfc_lift (prf_hasWitF_fc_lift φ) (prf_hasWit_liftc_lift hw₁)) hw₂) h2
 
 /-- **Instanciación de un axioma universal codificado** (caso `h = prf_ax hmem` de `pcc_thm_inst`). -/
-theorem pcc_axiom_inst (φ : Formula) (hmem : Formula.forall φ ∈ axioms) (w : Term)
+theorem pcc_axiom_inst [AnclaEq] (φ : Formula) (hmem : Formula.forall φ ∈ axioms) (w : Term)
     (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode φ))) :=
   pcc_thm_inst φ (prf_ax hmem) w hw
 
 /-- Instancia codificada de **`ax4_add_zero`** (`∀n. n + 0 = n`): el caso base de la evaluación
     provable de `+`. Testigo‑código `w` arbitrario (puede ser `tcFn` de una variable ligada). -/
-theorem pcc_ax4_inst (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
+theorem pcc_ax4_inst [AnclaEq] (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
     Prf (provFromCode (substfc zero w (formCode (add (.var 0) zero =eq (.var 0))))) :=
   pcc_axiom_inst _ (show ax4_add_zero ∈ axioms by simp [axioms]) w hw
 
@@ -240,14 +240,14 @@ theorem pcc_ax4_inst (w : Term) (hw : Prf (hasWit (liftTerm 0 w))) :
     **Nota:** el cuerpo de la segunda eliminación, `substfc (σ0) (liftc 0 w₁) ⌜φ⌝`, contiene `w₁` y
     por tanto **no es cerrado** cuando `w₁` es abierto. Por eso hace falta `pcc_forallElim_code_open`
     (sin `hAc`), no `pcc_forallElim_code'`. -/
-theorem pcc_axiom_inst2 (φ : Formula) (hmem : forall_2 φ ∈ axioms) (w₁ w₂ : Term)
+theorem pcc_axiom_inst2 [AnclaEq] (φ : Formula) (hmem : forall_2 φ ∈ axioms) (w₁ w₂ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁) (formCode φ)))) :=
   pcc_thm_inst2 φ (prf_ax hmem) w₁ w₂ hw₁ hw₂
 
 /-- Instancia codificada de **`ax5_add_succ`** (`∀n∀m. n + σm = σ(n+m)`): el paso inductivo de la
     evaluación provable de `+`. Ambos testigos‑código arbitrarios (pueden ser abiertos). -/
-theorem pcc_ax5_inst (w₁ w₂ : Term)
+theorem pcc_ax5_inst [AnclaEq] (w₁ w₂ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂))) :
     Prf (provFromCode (substfc zero w₂ (substfc (succ zero) (liftc zero w₁)
       (formCode (add (.var 1) (succ (.var 0)) =eq succ (add (.var 1) (.var 0))))))) :=
@@ -257,7 +257,7 @@ theorem pcc_ax5_inst (w₁ w₂ : Term)
     Extiende `pcc_thm_inst2` con un binder más: elimina el `∀` externo con `w₁`, empuja el `substfc`
     bajo cada binder (`prf_substfc_forall`, que levanta el testigo con `liftc zero`), y elimina los
     dos `∀` internos con `w₂`, `w₃`. -/
-theorem pcc_thm_inst3 (φ : Formula) (h : Prf (forall_3 φ)) (w₁ w₂ w₃ : Term)
+theorem pcc_thm_inst3 [AnclaEq] (φ : Formula) (h : Prf (forall_3 φ)) (w₁ w₂ w₃ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
     (hw₃ : Prf (hasWit (liftTerm 0 w₃))) :
     Prf (provFromCode (substfc zero w₃ (substfc (succ zero) (liftc zero w₂)
@@ -292,7 +292,7 @@ theorem pcc_thm_inst3 (φ : Formula) (h : Prf (forall_3 φ)) (w₁ w₂ w₃ : T
       (prf_hasWit_liftc_lift hw₂)) hw₃) h5
 
 /-- **Instanciación de un axioma `∀∀∀φ` codificado** (tres testigos). -/
-theorem pcc_axiom_inst3 (φ : Formula) (hmem : forall_3 φ ∈ axioms) (w₁ w₂ w₃ : Term)
+theorem pcc_axiom_inst3 [AnclaEq] (φ : Formula) (hmem : forall_3 φ ∈ axioms) (w₁ w₂ w₃ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
     (hw₃ : Prf (hasWit (liftTerm 0 w₃))) :
     Prf (provFromCode (substfc zero w₃ (substfc (succ zero) (liftc zero w₂)
@@ -310,7 +310,7 @@ Extensión **mecánica** de `pcc_thm_inst3` con un binder más: el mismo baile d
 `pcc_forallElim_code_open` + `prf_substfc_forall` + `prf_congr_substfc_arg3`, una vuelta más. -/
 
 /-- **Instanciación de un TEOREMA `∀∀∀∀φ` codificado** (cuatro testigos, todos pueden ser abiertos). -/
-theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w₄ : Term)
+theorem pcc_thm_inst4 [AnclaEq] (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w₄ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
     (hw₃ : Prf (hasWit (liftTerm 0 w₃))) (hw₄ : Prf (hasWit (liftTerm 0 w₄))) :
     Prf (provFromCode (substfc zero w₄ (substfc (numeral 1) (liftc zero w₃)
@@ -375,7 +375,7 @@ theorem pcc_thm_inst4 (φ : Formula) (h : Prf (forall_4 φ)) (w₁ w₂ w₃ w�
       (prf_hasWit_liftc_lift hw₃)) hw₄) h9
 
 /-- **Instanciación de un axioma `∀∀∀∀φ` codificado** (cuatro testigos). -/
-theorem pcc_axiom_inst4 (φ : Formula) (hmem : forall_4 φ ∈ axioms) (w₁ w₂ w₃ w₄ : Term)
+theorem pcc_axiom_inst4 [AnclaEq] (φ : Formula) (hmem : forall_4 φ ∈ axioms) (w₁ w₂ w₃ w₄ : Term)
     (hw₁ : Prf (hasWit (liftTerm 0 w₁))) (hw₂ : Prf (hasWit (liftTerm 0 w₂)))
     (hw₃ : Prf (hasWit (liftTerm 0 w₃))) (hw₄ : Prf (hasWit (liftTerm 0 w₄))) :
     Prf (provFromCode (substfc zero w₄ (substfc (numeral 1) (liftc zero w₃)

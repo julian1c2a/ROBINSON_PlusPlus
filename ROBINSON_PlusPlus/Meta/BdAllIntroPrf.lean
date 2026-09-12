@@ -130,7 +130,7 @@ theorem pcc_eq_symm_code_internal (X Y : Term) (hX : ∀ W, Prf (substtc zero W 
 /-- **BASE**: `⊢ Prov(⌜(v₀ < 0̇) ⇒ Psi⌝)` — **vacuo**, como debe ser. Codifica `∀x. ¬(x<0)`
     (instanciado en el propio `⌜v₀⌝`), puentea `termCode 0 → tcFn 0` (`prf_tc_zero`) y compone con
     **EFQ** por silogismo hipotético. -/
-theorem pcc_bdAll_base (Psi : Term) :
+theorem pcc_bdAll_base [AnclaEq] (Psi : Term) :
     Prf (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn zero)) Psi)) := by
   have hthm : Prf (Formula.forall (Formula.impl (lt (.var 0) zero) Formula.bottom)) :=
     Prf.gen _ (prf_not_lt_zero (.var 0))
@@ -160,7 +160,7 @@ def splitSchema : Formula :=
     interno computa por `rfl` (arith_open a nivel 1) y el **externo es la IDENTIDAD** sobre ese código
     concreto (su única code‑var es `⌜v₀⌝`, y el resto es `substtc`‑invariante). Puentes finales:
     `prf_liftc_tcFn` y `prf_tc_succ'`. -/
-theorem pcc_lt_succ_split_code (b : Term) :
+theorem pcc_lt_succ_split_code [AnclaEq] (b : Term) :
     Prf (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn (succ b)))
       (orc (ltCodeFn (varc (numeral 0)) (tcFn b))
            (eqCodeFn (tcFn b) (varc (numeral 0)))))) := by
@@ -209,7 +209,7 @@ theorem pcc_lt_succ_split_code (b : Term) :
     DECREMENTA las variables superiores (`prf_substtc_var_gt`), luego `substfc 0 ⌜v₀⌝ Psi` sólo es la
     identidad cuando la única code‑var de `Psi` es `⌜v₀⌝` — que es el caso de uso. Se descarga
     estructuralmente en la aplicación (patrón `prf_substfc_ltCodeFn_varc0`). -/
-theorem pcc_bdAll_step (Psi b : Term)
+theorem pcc_bdAll_step [AnclaEq] (Psi b : Term)
     (hwPsi : Prf (hasWitF Psi))
     (hPsiId : Prf (substfc zero (varc (numeral 0)) Psi =eq Psi))
     (hIH : Prf (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn b)) Psi)))
@@ -264,7 +264,7 @@ theorem PrfH_or_elim_imp_code {Γ : List Formula} (Ac Bc Cc : Term)
     (PrfH_weaken_code (orc Ac Bc) (implc Bc Cc) h2)
 
 /-- **PASO, versión `PrfH`** (la que consume la inducción objeto). -/
-theorem PrfH_bdAll_step {Γ : List Formula} (Psi b : Term)
+theorem PrfH_bdAll_step [AnclaEq] {Γ : List Formula} (Psi b : Term)
     (hwPsi : Prf (hasWitF Psi))
     (hPsiId : Prf (substfc zero (varc (numeral 0)) Psi =eq Psi))
     (hIH : PrfH Γ (provFromCode (implc (ltCodeFn (varc (numeral 0)) (tcFn b)) Psi)))
@@ -310,7 +310,7 @@ noncomputable def bdAllPred (CF : Term → Formula) (bndF PsiF : Term → Term) 
 
     La condición `CF` (en la aplicación, `chainOk nil p`) se **arrastra como antecedente**: el paso la
     necesita en cada `b` para invocar `hbody`. -/
-theorem pcc_bdAll_intro
+theorem pcc_bdAll_intro [AnclaEq]
     (CF : Term → Formula) (bndF PsiF : Term → Term) (p : Term)
     (hCl : ∀ k q, liftFormula k (CF q) = CF (liftTerm k q))
     (hCs : ∀ v t q, substFormula v t (CF q) = CF (substTerm v t q))

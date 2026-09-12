@@ -150,7 +150,7 @@ theorem ltBwd : Prf (forall_2 phiLtBwd) := by
 El `substfc` externo (testigo `tcFn b`) más la normalización de los `liftc` con (A) dan el código
 rastreado de `(∃k. ȧ + σk = ḃ) ⇒ ȧ < ḃ`. -/
 
-theorem pcc_ltBwd_computed (a b : Term) :
+theorem pcc_ltBwd_computed [AnclaEq] (a b : Term) :
     Prf (provFromCode
       (implc (exc (exBodyc (tcFn a) (tcFn b))) (ltCodeFn (tcFn a) (tcFn b)))) := by
   let A : Term := tcFn a
@@ -251,7 +251,7 @@ theorem prf_substfc_exBodyc (A B K : Term)
 
     Es el `∃`‑intro codificado (testigo `K`) sobre `exBodyc`, seguido del MP interno con la
     implicación `⇐` de `ax13` codificada (`pcc_ltBwd_computed`). -/
-theorem pcc_lt_intro (a b K : Term)
+theorem pcc_lt_intro [AnclaEq] (a b K : Term)
     (ha : ∀ c, liftTerm c a = a) (hb : ∀ c, liftTerm c b = b)
     (h : Prf (provFromCode (eqCodeFn (addcT (tcFn a) (succcT K)) (tcFn b))))
     (hwK : Prf (hasWit (liftTerm 0 K))) :

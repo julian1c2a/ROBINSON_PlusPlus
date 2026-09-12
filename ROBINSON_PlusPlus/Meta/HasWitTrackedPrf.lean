@@ -97,7 +97,7 @@ abbrev DEUDA_wfAll1_tracked (WD : Term → Term) : Prop :=
 
     La mitad derecha —el átomo `In c w` con **los dos argumentos abstractos**— la paga
     `pcc_In_atom_tracked`, que ya está en producción. La izquierda es la obligación. -/
-theorem pcc_isTC1_tracked_of {WD : Term → Term} (hwf : DEUDA_wfAll1_tracked WD) (w c : Term) :
+theorem pcc_isTC1_tracked_of [AnclaEq] {WD : Term → Term} (hwf : DEUDA_wfAll1_tracked WD) (w c : Term) :
     Prf (isTC1 w c ⇒ provFromCode (andc (WD w) (inFormCodeFn (tcFn c) (tcFn w)))) := by
   refine prf_deduction ?_
   have h := prfH_hyp_self (isTC1 w c)
@@ -170,7 +170,7 @@ theorem prf_argsInPsi_id (q : Term) :
   prf_substfc_argsInPsi q (varc (numeral 0))
 
 /-- El cuerpo, en la forma EXACTA que pide `hbody`: de la condición y la cota sale el código. -/
-theorem prf_argsIn_body (q i : Term) :
+theorem prf_argsIn_body [AnclaEq] (q i : Term) :
     Prf (argsInPair q ⇒ (lt i (lenc (cdrc q)) ⇒
       provFromCode (substfc zero (tcFn i) (argsInPsi q)))) := by
   refine prf_deduction (deduction_aux ?_ (lt i (lenc (cdrc q))) [argsInPair q] rfl)
@@ -193,7 +193,7 @@ theorem prf_argsIn_body (q i : Term) :
 /-- ⭐ **`argsIn` REFLEJADO**, con los dos argumentos abstractos (empaquetados). Es el `∀`
     acotado **anidado** que §3 daba como el contenido que faltaba, y sale de `pcc_bdAll_intro`
     sin reformular nada. -/
-theorem pcc_argsIn_pair_tracked (p : Term) :
+theorem pcc_argsIn_pair_tracked [AnclaEq] (p : Term) :
     Prf (argsInPair p ⇒
       provFromCode (bdAllCode (tcFn (lenc (cdrc p))) (argsInPsi p))) :=
   pcc_bdAll_intro argsInPair (fun q => lenc (cdrc q)) argsInPsi p
@@ -201,7 +201,7 @@ theorem pcc_argsIn_pair_tracked (p : Term) :
     liftT_argsInPsi substT_argsInPsi prf_argsInPsi_id (fun _ => by hw_auto) prf_argsIn_body
 
 /-- La misma, desempaquetada: `wT` e `Y` abstractos y separados. -/
-theorem pcc_argsIn_tracked (wT Y : Term) :
+theorem pcc_argsIn_tracked [AnclaEq] (wT Y : Term) :
     Prf (argsInPair (cons wT Y) ⇒
       provFromCode (bdAllCode (tcFn (lenc (cdrc (cons wT Y)))) (argsInPsi (cons wT Y)))) :=
   pcc_argsIn_pair_tracked (cons wT Y)
@@ -240,13 +240,13 @@ def argsInDot (wT Y : Term) : Term :=
   bdAllCode (tcFn (lenc (cdrc (cons wT Y)))) (argsInPsi (cons wT Y))
 
 /-- `argsIn` reflejado con sus dos argumentos **separados**. -/
-theorem pcc_argsIn_tracked' (wT Y : Term) :
+theorem pcc_argsIn_tracked' [AnclaEq] (wT Y : Term) :
     Prf (argsIn wT Y ⇒ provFromCode (argsInDot wT Y)) :=
   impT (prf_argsIn_to_pair wT Y) (pcc_argsIn_pair_tracked (cons wT Y))
 
 /-- La forma, de la versión posicional directamente al código: junta
     `prf_shape*_str` con `pcc_shape_tracked` descurrificando la conjunción. -/
-theorem pcc_shape_of_str (X : Term) (k n : Nat) (S : Formula)
+theorem pcc_shape_of_str [AnclaEq] (X : Term) (k n : Nat) (S : Formula)
     (hstr : Prf (Formula.impl S (land (consOk X)
       (land (Formula.eq (carc X) (numeralM k)) (Formula.eq (lenc X) (numeralM n)))))) :
     Prf (S ⇒ provFromCode (shapeDot (tcFn X) k n)) := by
@@ -298,7 +298,7 @@ example (X : Term) (k : Nat) :
       = binT k (nthcT (tcFn X) (termCode (numeralM 1))) (nthcT (tcFn X) (termCode (numeralM 2))) := rfl
 
 /-- La forma UNARIA, reflejada a su código `formCode` sobre el término objeto. -/
-theorem pcc_shapeUn_fc (X : Term) (k : Nat) :
+theorem pcc_shapeUn_fc [AnclaEq] (X : Term) (k : Nat) :
     Prf (shapeUn X k ⇒ provFromCode (shapeFCun (tcFn X) k)) :=
   pcc_shape_tree X (treeUn1 k) Nat.le.refl _
     (prf_deduction (prfH_hyp_self _))
@@ -306,7 +306,7 @@ theorem pcc_shapeUn_fc (X : Term) (k : Nat) :
       (PrfH.mp _ _ _ (prf_to_prfH (prf_shapeUn_str X k) _) (prfH_hyp_self _)))))
 
 /-- La forma BINARIA, ídem. -/
-theorem pcc_shapeBin_fc (X : Term) (k : Nat) :
+theorem pcc_shapeBin_fc [AnclaEq] (X : Term) (k : Nat) :
     Prf (shapeBin X k ⇒ provFromCode (shapeFCbin (tcFn X) k)) :=
   pcc_shape_tree X (treeBin1 k) Nat.le.refl _
     (prf_deduction (prfH_hyp_self _))
@@ -415,7 +415,7 @@ noncomputable def isTermCodeE1Dot (wT X : Term) : Term :=
         —el que trae `argsIn`— obliga a desplazar el índice exterior (`prf_substfc_forall`
         baja a `succ v` y `liftc`‑a el sustituyendo). A3 nunca tocó (2): su `PsiF` **no tiene
         binders**, por el diseño de su §2. -/
-theorem pcc_isTermCodeE1_tracked (wT X : Term) :
+theorem pcc_isTermCodeE1_tracked [AnclaEq] (wT X : Term) :
     Prf (isTermCodeE1 wT X ⇒ provFromCode (isTermCodeE1Dot wT X)) := by
   refine pcc_reflect_or _ _ _ _ (pcc_shapeUn_fc X 0) ?_
   exact pcc_reflect_and _ _ _ _ (pcc_shapeBin_fc X 1)
@@ -608,7 +608,7 @@ theorem hwPsi_wfAll1Psi (w : Term) : Prf (hasWitF (wfAll1Psi w)) := by hw_auto
 
     `CF := wfAll1` es natural en **un** parámetro, así que —a diferencia del `argsIn` de §4— no
     hubo que empaquetar nada con `cons`. -/
-theorem pcc_wfAll1_tracked_of_hbody
+theorem pcc_wfAll1_tracked_of_hbody [AnclaEq]
     (hbody : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (wfAll1Psi q)))))
     (w : Term) : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w)) :=
@@ -618,7 +618,7 @@ theorem pcc_wfAll1_tracked_of_hbody
 
 /-- **Y con ella, `DEUDA_wfAll1_tracked`**: la obligación genérica de §2 queda reducida a
     `hbody`, con la imagen punteada ya elegida (`wfAll1Dot`). -/
-theorem DEUDA_wfAll1_of_hbody
+theorem DEUDA_wfAll1_of_hbody [AnclaEq]
     (hbody : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (wfAll1Psi q))))) :
     DEUDA_wfAll1_tracked wfAll1Dot :=
@@ -626,7 +626,7 @@ theorem DEUDA_wfAll1_of_hbody
 
 /-- ⭐⭐ **Y con ella, el reflector de `isTC1` — el objetivo de §3, ya sin la hipótesis
     genérica**: de `hbody` sale directamente, con la imagen concreta. -/
-theorem pcc_isTC1_tracked_of_hbody
+theorem pcc_isTC1_tracked_of_hbody [AnclaEq]
     (hbody : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (wfAll1Psi q)))))
     (w c : Term) :
@@ -714,7 +714,7 @@ theorem prf_substfc_argsInBody_inv (q Y : Term) : ∀ u : Term,
     transportes: los `carc`/`cdrc` del `cons` son igualdad **objeto** y se mueven con
     `prf_provCode_congr`; el paso de `(lenc Y)˙` a `lencT Ẏ` **sólo vale dentro de `Prov`**
     (`pcc_eval_lenc`) y va por `PrfH_bdAllCode_congr_bnd`, con el hueco bajo el binder. -/
-theorem pcc_argsIn_trackedC (q Y : Term) :
+theorem pcc_argsIn_trackedC [AnclaEq] (q Y : Term) :
     Prf (argsIn q Y ⇒ provFromCode (argsInDotC (tcFn Y) (tcFn q))) := by
   refine prf_deduction ?_
   have h0 : PrfH [argsIn q Y] (provFromCode (argsInDot q Y)) :=
@@ -759,7 +759,7 @@ noncomputable def isTermCodeE1DotC (q ND : Term) : Term :=
 
     Y cada disyunto se transporta **dentro de su rama**, que es donde están las hipótesis: la
     cota `2̇ < lenc X` que necesita `pcc_eval_nthc` sólo existe en la rama `shapeBin`. -/
-theorem pcc_isTermCodeE1_trackedC (q X ND : Term)
+theorem pcc_isTermCodeE1_trackedC [AnclaEq] (q X ND : Term)
     (hNDinv : ∀ W, Prf (substtc zero W ND =eq ND))
     (hNDlift : Prf (liftc zero ND =eq ND))
     (hwND : Prf (hasWit ND) := by hw_auto) :
@@ -864,7 +864,7 @@ theorem pcc_isTermCodeE1_trackedC (q X ND : Term)
 /-- ⭐⭐ **`hbody`, LA NOVENA OBLIGACIÓN.** De `wfAll1 q` y la cota sale el cuerpo dotado con el
     hueco relleno. Junta todo: instancia el `∀` objeto, saca la ecuación del nodo de
     `pcc_eval_nthc`, aplica el recorrido en forma de códigos y transporta con la keystone. -/
-theorem hbody_wfAll1 : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
+theorem hbody_wfAll1 [AnclaEq] : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
     provFromCode (substfc zero (tcFn i) (wfAll1Psi q)))) := by
   intro q i
   refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [wfAll1 q] rfl)
@@ -897,15 +897,15 @@ theorem hbody_wfAll1 : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q) ⇒
 
 /-! ## §9 · ⭐⭐⭐ `DEUDA_wfAll1_tracked`, PROBADA — y con ella el reflector de `isTC1` -/
 
-theorem pcc_wfAll1_tracked (w : Term) : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w)) :=
+theorem pcc_wfAll1_tracked [AnclaEq] (w : Term) : Prf (wfAll1 w ⇒ provFromCode (wfAll1Dot w)) :=
   pcc_wfAll1_tracked_of_hbody hbody_wfAll1 w
 
-theorem DEUDA_wfAll1_tracked_proved : DEUDA_wfAll1_tracked wfAll1Dot :=
+theorem DEUDA_wfAll1_tracked_proved [AnclaEq] : DEUDA_wfAll1_tracked wfAll1Dot :=
   DEUDA_wfAll1_of_hbody hbody_wfAll1
 
 /-- ⭐⭐⭐ **EL REFLECTOR DE `isTC1`, SIN HIPÓTESIS**: `isTC1 w c ⇒ Prov(⌜isTC1 ẇ ċ⌝)`, con
     **`w` y `c` abstractos**. Es la mitad `wfAll1` de `DEUDA_hGuardT`, cerrada. -/
-theorem pcc_isTC1_tracked (w c : Term) :
+theorem pcc_isTC1_tracked [AnclaEq] (w c : Term) :
     Prf (isTC1 w c ⇒ provFromCode (andc (wfAll1Dot w) (inFormCodeFn (tcFn c) (tcFn w)))) :=
   pcc_isTC1_tracked_of DEUDA_wfAll1_tracked_proved w c
 
@@ -968,7 +968,7 @@ theorem hPinv_wfAll1Psi (w : Term) : ∀ u : Term,
 
 /-- ⭐ **`wfAll1` reflejado con la cota ya DOTADA.** Misma prueba que `pcc_argsIn_trackedC`:
     `pcc_eval_lenc` dentro de `Prov` y `PrfH_bdAllCode_congr_bnd` para meterlo bajo el binder. -/
-theorem pcc_wfAll1_trackedC (w : Term) :
+theorem pcc_wfAll1_trackedC [AnclaEq] (w : Term) :
     Prf (wfAll1 w ⇒ provFromCode (wfAll1DotC (tcFn w))) := by
   refine prf_deduction ?_
   have h0 : PrfH [wfAll1 w] (provFromCode (wfAll1Dot w)) :=
@@ -1098,7 +1098,7 @@ theorem liftTerm_hasWitAc (c : Nat) (T I : Term) :
     `pcc_In_atom_tracked`; el único transporte es de `(nthc t ı̇)˙` a `nthcT ṫ ı̄`, que es
     `pcc_eval_nthc` y **por eso pide la cota** `ı̇ < lenc t` — la que `Hcond` trae de
     `lenc t = ṅ`. -/
-theorem pcc_isTC1_exc_body (t : Term) (i : Nat) :
+theorem pcc_isTC1_exc_body [AnclaEq] (t : Term) (i : Nat) :
     Prf (isTC1 (.var 0) (nthc t (numeralM i)) ⇒
       (lt (numeralM i) (lenc t) ⇒
         provFromCode (exc (hasWitAc (tcFn t) (termCode (numeralM i)))))) := by
@@ -1148,7 +1148,7 @@ theorem pcc_isTC1_exc_body (t : Term) (i : Nat) :
     fontanería de `condD`. El `∃` objeto se elimina con `prf_ex_elim_imp`, y lo único que hay
     que cuidar es que el lift atraviese la imagen — que lo hace, porque salvo `ṫ` todo el
     cuerpo es código cerrado (`liftTerm_hasWitAc`). -/
-theorem pcc_hasWit_exc (t : Term) (i : Nat) :
+theorem pcc_hasWit_exc [AnclaEq] (t : Term) (i : Nat) :
     Prf (hasWit (nthc t (numeralM i)) ⇒
       (lt (numeralM i) (lenc t) ⇒
         provFromCode (exc (hasWitAc (tcFn t) (termCode (numeralM i)))))) := by
@@ -1206,7 +1206,7 @@ theorem prf_condD_hasWit_eq (t : Term) (i : Nat) :
     La cota `i < n` **no es un artefacto**: el transporte `(nthc t ı̇)˙ → nthcT ṫ ı̄` es
     `pcc_eval_nthc`, y sin la cota ese paso no existe. `Hcond` ya trae `lenc t = ṅ`, así que la
     única condición que se añade es aritmética y la cumplen las cuatro casillas reales. -/
-theorem pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) :
+theorem pcc_hGuardT [AnclaEq] (i n : Nat) (t : Term) (hin : i < n) :
     ROBINSON_PlusPlus.Meta.LineWFGuardPrf.DEUDA_hGuardT i n t := by
   show Prf (lineWF t ⇒ ((lenc t =eq numeralM n) ⇒
     (substFormula 0 t (hasWit (nthc (.var 0) (numeralM i))) ⇒
@@ -1243,7 +1243,7 @@ example : [(3,4), (3,4), (3,5), (4,5)].all (fun p => decide (p.1 < p.2)) = true 
     DOS deudas; la mitad `wit` ya no es hipótesis. Lo único que se añade es que los índices de
     las casillas `wit` de la lista caigan bajo la longitud canónica — cosa que cumplen las
     cuatro reales, y que la cota de `pcc_eval_nthc` hace inevitable. -/
-theorem hGuard_of_deudaF (t : Term) (n : Nat) (C : Formula)
+theorem hGuard_of_deudaF [AnclaEq] (t : Term) (n : Nat) (C : Formula)
     (hC : ROBINSON_PlusPlus.Meta.LineWFGuardPrf.Hcond n t C)
     (hF : ∀ i, ROBINSON_PlusPlus.Meta.LineWFGuardPrf.DEUDA_hGuardF i n t)
     (gs : List ROBINSON_PlusPlus.Meta.LineWFGuardPrf.GuardSlot)
