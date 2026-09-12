@@ -108,9 +108,20 @@ que moverlo: **se retiró**, y el inventario bajó de **6 a 5**.
 fijan el rango de `mod2` (un modelo con `mod2 2̄ = 2̄` los satisface). ⇒ el censo pasa de
 **23 + 11** a **24 + 10**, y `ax21` entra en `primAxioms`.
 
-⬜ Queda **ax24** por certificar sobre los primitivos (su derivación ya es honesta: pasa por la
-alternancia **demostrada**). Falta migrar `Full/Mod2.lean` a `primAxioms`, que arrastra dos teoremas
-de `Block1` (`teo_1_3`, `teo_2_9`) enunciados sobre `axioms`. **No pedido, y medible.**
+🏁🏁 **CENSO CERRADO: 10 DE 10** (2026‑09‑12). `ax24` **certificado** sobre los primitivos:
+`mod2_of_even_prim : primAxioms ⊢ ax24_mod2_of_even`, footprint
+`[propext, Classical.choice, Quot.sound, FOL.MetaRules.{ex_elim, gen, imp_intro, or_elim},
+ax_induction_prim]` — **sin `ax_list_induction`, sin anclas, sin nada de `axioms`**.
+
+⭐ **Salió más barato de lo previsto, y por una pieza**: la versión `axioms` usaba `teo_2_9` de
+`Block1` —que vive sobre `axioms` porque allí `Γ := axioms`— y portarlo habría arrastrado medio
+bloque. Se **evita** con **`add_eq_zero_right_prim`** (≈20 líneas) sobre `zero_or_succ_ax_prim`,
+que **ya existía**. ⚠️ Y `teo_1_3`, que tres documentos daban como dependencia, era **prosa
+obsoleta**: no se usaba.
+
+⭐ Y la cadena entera (`teo_1_11_prim`, `mod2_zero_prim`, `ax_mod2_alternation_prim`,
+`a_plus_one_eq_one_prim`, `mod2_two_k_eq_zero_prim`) quedó **sobre los primitivos**, con las firmas
+`axioms ⊢` como **envoltorios** por `prim_to_axioms` ⇒ **ninguna prueba duplicada**.
 
 ### Detalle por familia
 

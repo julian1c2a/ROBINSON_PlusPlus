@@ -375,8 +375,10 @@
 >    **retirado, 6 → 5 `axiom` de Lean**. ⚠️⚠️ Al retirarlo apareció una **CIRCULARIDAD**: `ax21` se
 >    «derivaba» de él y él de `ax21`. Medido cuál es el primitivo (`ax16 + ax17` admiten
 >    `mod2 2̄ = 2̄`) ⇒ **`ax21` es PRIMITIVO**, el censo pasa a **24 + 10**, y de los 10 derivables
->    están **9 certificados**. ⬜ Queda **ax24**: falta migrar `Full/Mod2.lean` a `primAxioms`, que
->    arrastra `teo_1_3`/`teo_2_9` de `Block1`. **Medible, no pedido.**
+>    están **LOS DIEZ CERTIFICADOS** 🏁 (2026‑09‑12): `ax24` cerró el censo con
+>    `mod2_of_even_prim`. ⭐ Más barato de lo previsto: `teo_2_9` se **evita** con
+>    `add_eq_zero_right_prim` (~20 l.) sobre `zero_or_succ_ax_prim`, que ya existía; y `teo_1_3`
+>    era **prosa obsoleta**.
 >
 > 🔑🔑 **LAS SEIS REGLAS DEL FRENTE, todas sobre la FORMA:**
 > 1. **ADR‑021, AFINADA**: lo que rompe la naturalidad del `PsiF` **no es «ser un `substCodeF`»**,

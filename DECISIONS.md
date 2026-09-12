@@ -1517,7 +1517,7 @@ theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
 `axiom` de Lean **siguen siendo 6**. Dice exactamente lo que `Full` significa: *«los 23 primitivos
 **más** el esquema de inducción»*.
 
-### 🏁 Lo ejecutado con la ratificación: **9 de 11**
+### 🏁 Lo ejecutado con la ratificación: **9 de 11** → 🏁🏁 **10 de 10 desde el 2026‑09‑12**
 
 `Full/Induction.lean` migrado entero a `primAxioms` — **35 declaraciones**, con `induction_object_prim`
 y `axp` —, y las **firmas `axioms ⊢` de siempre re‑expuestas por debilitamiento** para los diez
@@ -1564,9 +1564,20 @@ independiente y es PRIMITIVO**; la alternancia es el **teorema**.
 ⇒ **El censo se corrige: `coreAxioms` = 24 primitivos + 10 derivables** (era 23 + 11), `ax21` entra
 en `primAxioms`, y `mod2_range_ax` deja de fingir que deriva algo: cita el axioma.
 
-⬜ Queda **ax24** por certificar sobre los primitivos — su derivación ya es honesta (pasa por la
-alternancia **demostrada**); falta migrar `Full/Mod2.lean`, que arrastra `teo_1_3`/`teo_2_9` de
-`Block1`. **Medible, no pedido.**
+🏁🏁 **CENSO CERRADO: 10 DE 10** (2026‑09‑12). `ax24` **certificado** sobre los primitivos:
+`mod2_of_even_prim : primAxioms ⊢ ax24_mod2_of_even`, footprint
+`[propext, Classical.choice, Quot.sound, FOL.MetaRules.{ex_elim, gen, imp_intro, or_elim},
+ax_induction_prim]` — **sin `ax_list_induction`, sin anclas, sin nada de `axioms`**.
+
+⭐ **Salió más barato de lo previsto, y por una pieza**: la versión `axioms` usaba `teo_2_9` de
+`Block1` —que vive sobre `axioms` porque allí `Γ := axioms`— y portarlo habría arrastrado medio
+bloque. Se **evita** con **`add_eq_zero_right_prim`** (≈20 líneas) sobre `zero_or_succ_ax_prim`,
+que **ya existía**. ⚠️ Y `teo_1_3`, que tres documentos daban como dependencia, era **prosa
+obsoleta**: no se usaba.
+
+⭐ Y la cadena entera (`teo_1_11_prim`, `mod2_zero_prim`, `ax_mod2_alternation_prim`,
+`a_plus_one_eq_one_prim`, `mod2_two_k_eq_zero_prim`) quedó **sobre los primitivos**, con las firmas
+`axioms ⊢` como **envoltorios** por `prim_to_axioms` ⇒ **ninguna prueba duplicada**.
 
 🔑🔑 **La lección, y va a la lista de reglas**: *un postulado puede estar ocultando un círculo, y el
 círculo sólo se ve al retirarlo.* Es la recíproca de M‑1 (ningún axioma sin ADR): **cada axioma que
