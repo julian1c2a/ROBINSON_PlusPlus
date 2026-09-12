@@ -51,7 +51,22 @@ inducción sobre ordinales / W-types arbitrarios.)
     (`∀h t, φ t → φ (cons h t)`), y produce `∀L, φ L`.
 
     Conservativo respecto a `Minimal`: en `Minimal`, ax_C3 y ax_L3 son axiomas;
-    en `Full` con este meta-axioma se derivan como teoremas. -/
+    en `Full` con este meta-axioma se derivan como teoremas.
+
+⛔⛔ **AVISO M‑11 (2026‑09‑12): este `axiom` HABITA `Derives`, y con la forma MALA.**
+
+Su premisa `step` es `Γ ⊢ φ t → Γ ⊢ φ (cons h t)`: una **PREMISA‑FUNCIÓN de Lean**, que es
+exactamente la forma que hace patológico a `raa` (`FOL/MetaRules.lean`) — y su conclusión es
+`∀ L : Term`, o sea una regla infinitaria sobre términos.
+
+⇒ Consecuencias, las dos medidas:
+ * **prohibido demostrar nada sobre `Derives` por inducción** mientras esto exista (M‑11), y
+ * **mover `FOL/MetaRules` a otra relación NO limpiaría `Derives`**: este habitante es NUESTRO.
+
+🔑 **La forma correcta de añadir una regla a una relación inductiva es un CONSTRUCTOR**, no un
+`axiom`: un `axiom` **no extiende el punto fijo, afirma una falsedad sobre él**. Aquí no se hizo
+porque `Derives` vive en el repo hermano `FOL`. Ver [ADR‑025](../../DECISIONS.md) y
+[ADR‑027](../../DECISIONS.md). -/
 axiom ax_list_induction {Γ : List Formula} (φ : Term → Formula)
   (base : Γ ⊢ φ nil)
   (step : ∀ h t : Term, Γ ⊢ φ t → Γ ⊢ φ (cons h t)) :

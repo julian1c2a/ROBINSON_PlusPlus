@@ -47,33 +47,16 @@ de `ψ(σn)` con `n<σn` se concluye `φ(n)`.
 
 /-! ### Lema clave: subst deshace lift (versión Formula) -/
 
-/-- `substFormula c s (liftFormula c φ) = φ` — la sustitución al mismo índice
-    que el lift lo deshace. Versión `Formula` de `FOL.substTerm_liftTerm`. -/
+/-- `substFormula c s (liftFormula c φ) = φ`.
+
+    📌 **BAJADO A FOL el 2026‑09‑12 (R‑4)**: es lógica pura de FOL⁼ y estaba probado **TRES
+    veces** en este repo (aquí, en el gemelo, y como `subst_lift_same` en `Meta/Hilbert.lean`),
+    con **ninguno de los tres docstrings mencionando a los otros dos**. El general vive ahora en
+    `FOL/Theorems/Eq.lean`, junto a su versión de término `substTerm_liftTerm`.
+    Esto queda como **alias local** para no tocar los consumidores. -/
 theorem substFormula_liftFormula (φ : Formula) (c : Nat) (s : Term) :
-    substFormula c s (liftFormula c φ) = φ := by
-  induction φ generalizing c s with
-  | bottom => rfl
-  | atom p ts =>
-      simp only [liftFormula, substFormula]
-      rw [FOL.substTerms_liftTerms]
-  | eq t u =>
-      simp only [liftFormula, substFormula]
-      rw [FOL.substTerm_liftTerm, FOL.substTerm_liftTerm]
-  | impl a b iha ihb =>
-      simp only [liftFormula, substFormula]
-      rw [iha c s, ihb c s]
-  | «forall» a iha =>
-      simp only [liftFormula, substFormula]
-      rw [iha (c + 1) (liftTerm 0 s)]
-  | and a b iha ihb =>
-      simp only [liftFormula, substFormula]
-      rw [iha c s, ihb c s]
-  | or a b iha ihb =>
-      simp only [liftFormula, substFormula]
-      rw [iha c s, ihb c s]
-  | ex a iha =>
-      simp only [liftFormula, substFormula]
-      rw [iha (c + 1) (liftTerm 0 s)]
+    substFormula c s (liftFormula c φ) = φ :=
+  FOL.substFormula_liftFormula φ c s
 
 /-! ### Helpers aritméticos locales (los de Induction.lean son privados) -/
 

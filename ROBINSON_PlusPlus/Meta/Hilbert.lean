@@ -50,19 +50,16 @@ aplicación de DNE clásica, y la ω-regla no se invoca jamás* (GEN de Hilbert 
 
 /-- **Cancelación lift/subst a mismo nivel**: sustituir en el nivel `c` deshace
     el desplazamiento en el nivel `c`. Complementa `subst_lift_cancel_formula`
-    (la variante off-by-one). Inducción estructural; átomos/igualdades vía las
-    versiones de término `FOL.substTerm(s)_liftTerm(s)`. -/
+    (la variante off-by-one).
+
+    📌 **BAJADO A FOL el 2026‑09‑12 (R‑4)**: es lógica pura de FOL⁼, y este repo lo tenía
+    probado **TRES veces** —aquí bajo este nombre, y como `substFormula_liftFormula` en
+    `Full/StrongInduction.lean` **y** `Meta/StrongInductionPrf.lean`— con **ninguno de los
+    tres docstrings mencionando a los otros dos**. El general vive ahora en
+    `FOL/Theorems/Eq.lean`, junto a su versión de término. Esto es un **alias local**. -/
 theorem subst_lift_same (f : Formula) : ∀ (c : Nat) (s : Term),
-    substFormula c s (liftFormula c f) = f := by
-  induction f with
-  | bottom => intro c s; rfl
-  | atom p ts => intro c s; simp only [liftFormula, substFormula, FOL.substTerms_liftTerms]
-  | eq t u => intro c s; simp only [liftFormula, substFormula, FOL.substTerm_liftTerm]
-  | impl a b iha ihb => intro c s; simp only [liftFormula, substFormula]; rw [iha, ihb]
-  | «forall» a iha => intro c s; simp only [liftFormula, substFormula]; rw [iha]
-  | and a b iha ihb => intro c s; simp only [liftFormula, substFormula]; rw [iha, ihb]
-  | or a b iha ihb => intro c s; simp only [liftFormula, substFormula]; rw [iha, ihb]
-  | ex a iha => intro c s; simp only [liftFormula, substFormula]; rw [iha]
+    substFormula c s (liftFormula c f) = f :=
+  fun c s => FOL.substFormula_liftFormula f c s
 
 set_option maxRecDepth 20000 in
 /-- Los axiomas de `Minimal` son **sentencias cerradas**: desplazarlos es la

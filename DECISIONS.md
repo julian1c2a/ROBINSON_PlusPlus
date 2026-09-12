@@ -61,7 +61,16 @@ proyecto; no introduce ninguna nueva.
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
 | **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
 | **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
-| **M-11** | ⛔⛔ **Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita.** Un `axiom` cuyo tipo es una aplicación de un `inductive` produce habitantes que **no son aplicaciones de constructor**; la inducción cubre los constructores, pero el teorema cuantifica sobre **todos** los habitantes ⇒ el teorema es **FALSO**. ⚠️ Es *eliminar* lo peligroso (`induction`/`cases`/`rec`), **no** *introducir*: usar los constructores para construir es seguro. **LISTA NEGRA** (prohibido inducir): **`FOL.Derives` — DOCE** (8 en FOL: los 6 de `MetaRules` **más** un segundo `dne` en `Theorems/Neg.lean:57` y `forall_not_impl_exists_not` en `Theorems/Quantifiers.lean:115`; +4 en RPP: `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa`); **`Prf` — 1** (`prf_axiomsCodeT_eq`). **LISTA BLANCA** (seguro): **`Prf₀`** y **`PrfH`**, cero axiomas habitándolos. ⚠️ *Censo corregido el 2026‑09‑12: la primera versión contaba **nueve** y son **doce**; los dos que faltaban estaban **fuera** de `MetaRules`, que es justo donde nadie miró* | ADR-025 | `grep -rn "^axiom "` y mirar si el tipo **concluye** en el inductivo (ojo: puede concluir dentro de un `∃`, como `ax_p_tfa`). ⬜ No mecanizado |
+| **M-11** | ⛔⛔ **Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita.** Un `axiom` cuyo tipo es una aplicación de un `inductive` produce habitantes que **no son aplicaciones de constructor**; la inducción cubre los constructores, pero el teorema cuantifica sobre **todos** los habitantes ⇒ el teorema es **FALSO**. ⚠️ Es *eliminar* lo peligroso (`induction`/`cases`/`rec`), **no** *introducir*: usar los constructores para construir es seguro. ⭐ **EL CRITERIO QUE DE VERDAD SEPARA NO ES «META‑REGLA» SINO *PREMISA‑FUNCIÓN*** (2026‑09‑12,
+medido compilando): un `axiom` cuya premisa es `Γ ⊢ A → Γ ⊢ B` **tiene** que ser axioma —el kernel
+rechaza el `inductive`: *«has a non positive occurrence of the datatypes being declared»*—; uno cuya
+premisa sea un `Γ ⊢ …` directo o un `∀` sobre otro tipo **podría ser CONSTRUCTOR**.
+⚠️ **Y RPP FABRICA uno de los malos**: `ax_list_induction` (`Full/Lists.lean:55`) tiene
+`step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)` — **premisa‑FUNCIÓN**, la forma exacta de `raa`.
+🔑 **Regla de diseño**: *una regla que se quiere añadir a una relación inductiva se añade como
+**CONSTRUCTOR** (o con un inductivo que la envuelva), **nunca** como `axiom`. Un `axiom` **no
+extiende el punto fijo: afirma una falsedad sobre él**.*
+**LISTA NEGRA** (prohibido inducir): **`FOL.Derives` — DOCE** (8 en FOL: los 6 de `MetaRules` **más** un segundo `dne` en `Theorems/Neg.lean:57` y `forall_not_impl_exists_not` en `Theorems/Quantifiers.lean:115`; +4 en RPP: `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa`); **`Prf` — 1** (`prf_axiomsCodeT_eq`). **LISTA BLANCA** (seguro): **`Prf₀`** y **`PrfH`**, cero axiomas habitándolos. ⚠️ *Censo corregido el 2026‑09‑12: la primera versión contaba **nueve** y son **doce**; los dos que faltaban estaban **fuera** de `MetaRules`, que es justo donde nadie miró* | ADR-025 | `grep -rn "^axiom "` y mirar si el tipo **concluye** en el inductivo (ojo: puede concluir dentro de un `∃`, como `ax_p_tfa`). ⬜ No mecanizado |
 | **M-10** | ⛔ **Ningún teorema cuyo enunciado hable de INDEMOSTRABILIDAD, indecidibilidad o consistencia puede formularse sobre `⊢`** — sólo sobre **`Prf`**. `axioms ⊢` es **sintácticamente COMPLETO** (`Meta/OmegaStrength.lean`), luego **no es r.e.** y `¬(axioms ⊢ X)` significa **«el cálculo REFUTA X»**, no «no lo demuestra» | ADR-024 | `derives_completo` + `hgi_es_refutar`; y a mano, al enunciar |
 | **M-9** | ⛔ **Un `Probe/` que decide un ADR se PROMUEVE a `sondeos/` antes de cerrar ese ADR** — o la decisión queda **sin evidencia versionada**. `Probe/` está en `.gitignore` **a propósito** (es borrador); `sondeos/` es el **resultado**, y se versiona con su fila en `sondeos/README.md`. Si el probe pasó a **producción**, la evidencia es el módulo y no hay nada que promover | [auditoría F‑9](doc/AUDITORIA-2026-09-11.md) · `PLAN-PRUEBAS.md` §2.1 | a mano: todo ADR debe citar su sondeo o su módulo |
 | **M-8** | ⚠️ **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Antes de dar por resuelto un frente con «la clase X ya cubre la clase Y», leer **qué obligación queda después**: `numTree_of_isCodeShaped` es **cierto como teorema** y su conclusión —«no hay que cambiar `StdChain`»— **falsa**, porque la obligación que deja (`m ≠ n` con `codeNat` astronómico) **no es descargable** | ADR-022 | `stdChain_proofCode'` + `junk_line_not_stdLine` (`Meta/OmegaReflect.lean` §1ter/§1quater) |
@@ -261,7 +270,22 @@ dedicado, con un resumen en `AI-GUIDE.md`.
 ## ADR-010: Meta-axiomas en `Minimal/Axioms.lean` son meta-teoremas de aritmética, no reglas FOL
 
 **Fecha**: 2026-05-25
-**Estado**: Aceptado
+**Estado**: **Aceptado — pero su JUSTIFICACIÓN está SUPERSEDIDA por [ADR‑027](#adr-027-la-justificación-de-adr-010-está-refutada--gen-no-es-la-ω-regla-y-sí-podría-ser-constructor)** (2026‑09‑12)
+
+> ⚠️⚠️ **LEER ANTES DE CITAR ESTE ADR.** Su **decisión** (mantener los cinco como `axiom`) sigue en
+> pie para cuatro de ellos. Su **justificación** tiene **dos afirmaciones centrales refutadas**:
+>
+> 1. *«`gen` … es la **ω‑regla** (regla de Büchi)»* — **FALSO**: la ω‑regla toma como premisa
+>    `A[n̄]` para cada **NUMERAL**; `gen` la toma para **todo `Term`**. Premisa **estrictamente
+>    mayor** ⇒ regla **más débil**.
+> 2. *«Su presencia como `axiom` es **correcta e inevitable**»* — **FALSO**: medido compilando,
+>    `gen` **SÍ puede ser un constructor** (ocurrencia positiva).
+>
+> Y la «**soundness práctica**» de su §Justificación es **exactamente el detonador** de
+> `../FOL/cuarentena/Inconsistencia.lean`: la premisa vacua no es una excepción rara, es lo que
+> hace que `axioms ⊢` sea **completo** y por tanto **no r.e.** ([ADR‑024](#), `Meta/OmegaStrength.lean`).
+>
+> ⇒ Detalle en **ADR‑027**.
 
 **Contexto**:
 `Minimal/Axioms.lean` declara cinco entradas con `axiom`:
@@ -1749,10 +1773,21 @@ solidez sea un teorema de verdad. ⚠️ **Coste medido**: RPP usa constructores
 veces** (`Derives.subst` 58, `Derives.refl` 40, `Derives.hyp` 18, `weakening` 13, `intro_impl` 13…),
 más toda la notación `⊢`. **No es una tarde.**
 
-⛔ **Y con el censo corregido, esa reparación NO BASTARÍA** (2026‑09‑12): mover sólo `MetaRules`
-dejaría **seis** habitantes en `Derives` — los dos de `FOL/Theorems/` y los cuatro de RPP. Una
-reparación que deja habitantes **no repara nada**: la prohibición de inducir seguiría en pie. Quien
-acometa (f) tiene que mover **los doce**, o aceptar que `Derives` nunca admitirá inducción.
+⛔⛔ **Y con el censo corregido, esa reparación NO BASTARÍA** (2026‑09‑12): mover sólo `MetaRules`
+dejaría **seis** habitantes en `Derives` — los dos de `FOL/Theorems/` y los cuatro de RPP.
+
+⚠️ **Y hay uno que RPP FABRICA, y es de los malos**: `ax_list_induction`
+(`Full/Lists.lean:55`) tiene `step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)` — **premisa‑FUNCIÓN de
+Lean**, la forma exacta que hace patológico a `raa`, con conclusión `∀ L : Term`. ⇒ **mover
+`FOL/MetaRules` no limpia `Derives` mientras esa línea siga ahí**: el problema no es de quién es el
+fichero, es de la FORMA de la premisa.
+
+Una reparación que deja habitantes **no repara nada**: la prohibición de inducir seguiría en pie.
+Quien acometa (f) tiene que mover **los doce**, empezando por casa.
+
+🔑 **Y la regla de diseño que se deduce** (R‑1(c)): *una regla que se quiere añadir a una relación
+inductiva se añade como **CONSTRUCTOR**, o con un inductivo que la envuelva — **nunca** como
+`axiom`. Un `axiom` no extiende el punto fijo: **afirma una falsedad sobre él**.*
 ⭐ Nota: `ax_p_tfa` se retira por decisión del propietario (NEXT‑STEPS (a)) ⇒ quedarían once.
 
 ### 📌 POSDATA 2026‑09‑12 — **la cuarentena NO fue efectiva el primer día**
@@ -1855,3 +1890,45 @@ descartó y se midió con el compilador: **~440 firmas, 54 rondas**.
 
 **Véase también:** [ADR‑025](#) (M‑11), `TEOREMAS-E-HIPOTESIS.md`,
 `Meta/Representability2Prf.lean` (la clase y su docstring), `doc/AUDITORIA-FOL-2026-09-12.md`.
+
+---
+
+## ADR-027: La justificación de ADR-010 está REFUTADA — `gen` no es la ω‑regla, y sí podría ser constructor
+
+**Fecha:** 2026‑09‑12 · **Estado:** ✅ ACEPTADO · **Supersede:** la **§Justificación** de
+[ADR‑010](#adr-010-meta-axiomas-en-minimalaxiomslean-son-meta-teoremas-de-aritmética-no-reglas-fol)
+(su **decisión** queda en pie) · **Relacionado:** ADR‑024, ADR‑025 (M‑11), ADR‑026
+
+### Qué dice ADR-010 y qué está medido
+
+| ADR‑010 (2026‑05‑25) | medido |
+|---|---|
+| *«`gen` … es la **ω‑regla** (regla de Büchi)»* | ⛔ **FALSO.** La ω‑regla toma `A[n̄]` para cada **NUMERAL**; `gen` la toma para **todo `Term`** — variables libres y aplicaciones incluidas. **Premisa estrictamente mayor ⇒ regla más DÉBIL.** La fuerza del cálculo no viene de `gen`: viene de `raa` e `imp_intro` (`Meta/OmegaStrength.lean`) |
+| *«Su presencia como `axiom` es correcta e **inevitable**»* | ⛔ **FALSO, y compilado.** Un `inductive` que incluye `gen` como constructor **typechequea** (`EXIT 0`, recursor sin axiomas): su premisa `∀ n : Term, D Γ A[n]` es una **ocurrencia POSITIVA** |
+| *«**Soundness práctica**: la hipótesis meta‑nivel siempre recibe un argumento genuino»* | ⛔ **Es exactamente el detonador.** La premisa **vacua** no es un caso raro: es lo que hace que `axioms ⊢` sea **sintácticamente COMPLETO** (lo que no prueba, lo **refuta**) y por tanto **NO r.e.** — ADR‑024. Y con un teorema de solidez da **`False` sin hipótesis** (`../FOL/cuarentena/Inconsistencia.lean`) |
+
+⭐ **Lo que ADR‑010 SÍ acertó, y conviene decirlo**: separó correctamente los **cuatro** con
+hipótesis meta‑nivel (`imp_intro`, `raa`, `or_elim`, `ex_elim`) del resto, y su contraejemplo para
+`imp_intro` es **el mismo** que hoy detona `soundness`. Su análisis era **mejor** que el docstring
+de `FOL/MetaRules.lean`, que decía que los seis eran inevitables.
+
+### La decisión
+
+1. **Se mantiene la DECISIÓN de ADR‑010**: los cuatro con premisa‑función siguen como `axiom` —
+   ahora por la razón correcta (**ocurrencia no positiva**, medida), no por «soundness práctica».
+2. **Se retira la clasificación de `gen` como «ω‑regla / axioma matemático genuino»**. Es una regla
+   de generalización sobre todo `Term`, **más débil** que la ω‑regla, y **podría ser constructor**.
+3. **El criterio escrito pasa a ser PREMISA‑FUNCIÓN** (M‑11), no «meta‑regla».
+4. ⬜ **Queda abierto (D‑2 de la auditoría)**: mover a constructores los cuatro evitables de FOL
+   (`gen`, los dos `dne`, `forall_not_impl_exists_not`) ⇒ **13 → 9** axiomas en FOL y lista negra de
+   `Derives` de 8 a 4, **sin tocar la fuerza del cálculo** y con **cero pruebas tocadas en `FOL/`**.
+
+### ⬜ Lo que falta corregir aguas abajo
+
+El error «`gen` = ω‑regla» sobrevive en **8 documentos** de RPP:
+`GODEL-D-ARITHMETIZATION.md` (:13, :16, :25, :41, :52, :136), `GODEL-STATUS.md:188`,
+`MINIMAL-AXIOMS.md:266`, `doc/REFERENCE-Incompleteness.md:9`.
+
+**Véase también:** `Meta/OmegaStrength.lean` (la medición de la fuerza de `⊢`),
+`../FOL/AXIOMS.md` §2 (la doctrina corregida y D‑2),
+`doc/AUDITORIA-FOL-2026-09-12.md` R‑3.
