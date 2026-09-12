@@ -1943,3 +1943,68 @@ El error «`gen` = ω‑regla» sobrevive en **8 documentos** de RPP:
 **Véase también:** `Meta/OmegaStrength.lean` (la medición de la fuerza de `⊢`),
 `../FOL/AXIOMS.md` §2 (la doctrina corregida y D‑2),
 `doc/AUDITORIA-FOL-2026-09-12.md` R‑3.
+
+---
+
+## ADR-028: FOL pasa de 13 a 4 axiomas — y los cuatro son EXACTAMENTE los que el kernel obliga
+
+**Fecha:** 2026‑09‑12 · **Estado:** ✅ EJECUTADO · **Decisiones del propietario:** D‑2, D‑3, D‑4, D‑5
+de `doc/AUDITORIA-FOL-2026-09-12.md` · **Relacionado:** ADR‑025 (M‑11), ADR‑027
+
+### El resultado
+
+    FOL:  34 → 28 → 13 → 4 axiomas,  en un día
+
+Y los cuatro que quedan —`imp_intro`, `raa`, `or_elim`, `ex_elim`— son **exactamente** aquellos cuya
+premisa es `Γ ⊢ A → Γ ⊢ B`, es decir una **ocurrencia NO POSITIVA** que el kernel rechaza:
+
+    (kernel) arg #3 of 'D.raa' has a non positive occurrence of the datatypes being declared
+
+⇒ **no hay alternativa dentro del tipo.** El censo de FOL es hoy **irreducible**.
+
+### D‑2 · Cuatro axiomas pasan a ser CONSTRUCTORES (13 → 9)
+
+`gen`, `dne` (regla), `dne` (esquema) y `forall_not_impl_exists_not` **no tenían por qué ser
+axiomas** — ADR‑027 ya había refutado que `gen` fuese «inevitable». Hoy son
+`Derives.gen_rule`, `Derives.dne_rule`, `Derives.dne_schema` y `Derives.forall_not_ex_not`.
+
+* ⭐ **Los nombres y las firmas se conservan** (como `theorem`): las **336 citas** de RPP —`gen`
+  sola, **323**— no cambiaron ni una.
+* ⭐ **Coste medido: CERO.** No hay ni una inducción sobre `Derives` en ninguno de los dos repos.
+* 🔑 **Y no es contabilidad**: un `axiom` que habita un inductivo **afirma una falsedad sobre el
+  punto fijo**; un constructor **lo extiende**. La lista negra de M‑11 baja de **8 a 4** en FOL.
+
+### D‑3 · `Completeness.lean` a cuarentena (9 → 4)
+
+702 líneas y **cinco axiomas** en un módulo con **cero consumidores reales**. Dos de los cinco son
+**construibles** (`Formula` es numerable) y se postularon en un commit titulado «100 % sorry‑free».
+
+⇒ ⚠️ **No hay Teorema de Completitud demostrado** en el sentido en que `README.md` lo publicaba.
+
+⭐ El riesgo que la auditoría señalaba —retirarlo rompería 20 módulos de RPP vía `Theorems.Eq`, que
+**no estaba en el barrel**— se había resuelto horas antes metiéndolo.
+
+### D‑4 · El barrel se parte: `FOL.Core` + `FOL`
+
+**Medido**: RPP importa **nueve** módulos de FOL, y **nunca** el barrel. `FOL.Core` es exactamente
+esos nueve; `FOL` = `FOL.Core` + `Semantics`. Antes `import FOL` arrastraba `Completeness` y con él
+cinco postulados que el consumidor no usaba.
+
+### D‑5 · El git‑lock, apuntado
+
+⚠️ **Corrección a la auditoría**: decía que el mecanismo estaba **inerte**. **No lo estaba** — el
+hook está instalado y salta en cada commit (avisó de `sorry` en los de hoy). Lo que fallaba era
+otra cosa: `locked_files.txt` contenía la cadena literal **`an`** —basura, no una ruta— y
+`frozen_files.txt` estaba vacío. Es decir: **armado y apuntando a nada**, que es peor que inerte
+porque `make status` lo presentaba como una salvaguarda activa.
+
+### ⬜ Lo que NO cambia
+
+* **`Derives` sigue prohibido para inducción** (M‑11): quedan los 4 de FOL **más** los tres de RPP
+  (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`). ⚠️ Y `ax_list_induction` es de
+  los malos: **premisa‑FUNCIÓN** fabricada por nosotros (ADR‑027, R‑1).
+* **La fuerza del cálculo es la misma.** `⊢` sigue siendo sintácticamente completo y **no r.e.**:
+  eso lo causan las cuatro premisas‑función, que son justo las que no se han podido tocar.
+
+**Véase también:** `../FOL/AXIOMS.md` (el censo, reescrito), `../FOL/cuarentena/README.md`,
+`doc/AUDITORIA-FOL-2026-09-12.md` §5.
