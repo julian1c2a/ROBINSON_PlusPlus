@@ -104,13 +104,13 @@ proyecto**. La hipótesis de la cadena de Gödel es hoy **la mínima honesta**.
 
 ---
 
-## 4 · Los **4** `axiom` de Lean — la otra clase de hipótesis
+## 4 · Los **3** `axiom` de Lean — la otra clase de hipótesis
 
 | axioma | qué es | ¿retirable? |
 |---|---|---|
 | `ax_induction_prim` | el esquema de inducción sobre los 24 primitivos | ⛔ no: **es lo que `Full` significa** |
 | `ax_list_induction` | ídem, listas | ⛔ no |
-| `ax_p_tfa` | teorema fundamental de la aritmética, forma idealizada | 🔶 `tfa_numeral` es la realización real |
+| ~~`ax_p_tfa`~~ | teorema fundamental de la aritmética | 🗑️ **RETIRADO el 2026‑09‑12**. Medido HUÉRFANO: cero consumidores, y `IsFactorization` no aparecía ni una vez fuera de `Block8.lean`. ⚠️ Y con él cae una afirmación **medible‑mente falsa**: `tfa_numeral` **NO** es «la realización real» — tiene otro dominio (`Nat` vs `Term`), otra unicidad (`Perm` vs igualdad objeto) y otra hipótesis (meta vs objeto) |
 | `ax_axiomsCodeT_eq` | ancla de codificación (⊢) | ⬜ frente abierto. ⭐ **Ya NO está en el footprint de Gödel I/II** desde P‑4 |
 | ~~`prf_axiomsCodeT_eq`~~ | ancla de codificación (`Prf`) | 🗑️ **RETIRADO el 2026‑09‑12**: ya no es `axiom`, es la **clase `AnclaEq`** ([ADR‑026](DECISIONS.md)). ⚠️ **No desapareció el supuesto** — cambió de sitio: del footprint a la **firma** de los teoremas que lo necesitan. Ver §1 |
 

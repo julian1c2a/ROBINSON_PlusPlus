@@ -226,3 +226,46 @@ tres»**, que es la buena noticia.
 **Para responder**: anotad en `doc/book/MATERIALES.md` qué se consume y qué se descarta, como con
 las demás entradas. Si algo de aquí resulta **falso al comprobarlo contra el árbol**, decidlo — el
 canal va en las dos direcciones, y la auditoría del 2026‑09‑10 demostró que el libro acierta.
+
+---
+
+## 📌 2026‑09‑12 — cuatro cosas del libro que el desarrollo ha dejado obsoletas
+
+> Este bloque lo escribe la **tarea de desarrollo**. `doc/book/**` es de la **tarea del LIBRO**
+> (PLAN‑LIBRO §0), así que **no se ha tocado ni un `.tex`**. Aquí van los avisos.
+
+### 1 · ⛔ `cap-representabilidad-d1.tex:70` cita `AXIOMS.md` **POR NÚMERO DE FILA**
+
+Dice literalmente: *«en el inventario de `AXIOMS.md` como los **axiomas 5 y 6**, uno por cálculo»*.
+
+⚠️ **Eso es un acoplamiento que ningún control detecta**, y se ha roto **dos veces el mismo día**:
+se retiró `ax_p_tfa` (que era el 4) y el ancla `Prf` dejó de ser `axiom` (era el 6).
+
+✅ **Ya arreglado del lado del desarrollo**: `AXIOMS.md` **ha retirado la columna `#`**. Ahora los
+axiomas se citan **por nombre**. ⇒ El texto del libro debe decir algo como *«las dos anclas de
+codificación, una por cálculo»*, sin números.
+
+### 2 · El censo de axiomas ha cambiado dos veces: **5 → 4 → 3**
+
+| | |
+|---|---|
+| `prf_axiomsCodeT_eq` | **ya no es `axiom`** — es la clase `AnclaEq` ([ADR‑026](../DECISIONS.md)) |
+| `ax_p_tfa` | **retirado** (medido huérfano) |
+
+Quedan **tres**: `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`.
+
+### 3 · ⛔⛔ Y el matiz SIN EL CUAL la cifra es un sobreclaim
+
+`goedel_first_prf` y `goedel_second_prf` dan hoy footprint **`[propext, Classical.choice,
+Quot.sound]` — cero axiomas del proyecto**. **No escribir eso a secas.** Su tipo es
+
+    ∀ [AnclaEq], ConsistentH → ¬ Prf godelCN
+
+⇒ **el postulado no desapareció: se movió del footprint a la FIRMA**, y **no hay ninguna
+`instance : AnclaEq` en el árbol**. Decirlo sin esta frase sería **M‑8 con otro nombre**.
+
+### 4 · `AXIOMS.md` publicaba una afirmación **medible‑mente falsa** sobre `ax_p_tfa`
+
+Decía *«teorema en `Full`, postulado en `Minimal`»*. **No existe en `Full/` ningún teorema con ese
+enunciado**: `tfa_numeral` tiene otro dominio (`Nat` vs `Term`), otra unicidad (`Perm` vs igualdad
+objeto) y otra hipótesis (meta vs objeto). Si el libro repitió esa frase, hay que corregirla.

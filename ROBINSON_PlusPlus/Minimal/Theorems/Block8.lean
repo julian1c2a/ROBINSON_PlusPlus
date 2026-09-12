@@ -286,51 +286,25 @@ theorem isFactorization_nil_one : IsFactorization nil one := by
   exact false_elim h_bot
 
 /-!
-### Ax-P (TFA): Teorema Fundamental de la Aritmética
+### 🗑️ Ax-P (TFA) — **RETIRADO el 2026‑09‑12**
 
-Para todo `n ≥ 1`, existe una **única** factorización (módulo igualdad
-provable) de `n` en primos.
+`axiom ax_p_tfa` y sus tres corolarios (`factorization_exists`, `factorization_unique`,
+`factorization_one_eq_nil`) se retiran. **4 → 3 `axiom` de Lean.**
 
-**Justificación**: en sistemas con inducción débil este resultado es un
-teorema (vía inducción fuerte sobre `n`); en el sistema `Minimal` (sin
-inducción) se adopta como **axioma**. Esto sigue la línea del spec
-§Bloque VIII Fase 17 y §Apéndice B.4.
+**Medido antes de retirarlo**: cero consumidores fuera de este fichero, y el tipo que habitaba
+—`IsFactorization`— no aparece **ni una vez** en todo el árbol fuera de aquí. Los tres corolarios
+sólo se consumían entre sí. **Ningún lema que escribir.**
 
-**Estilo**: meta-axioma (como `imp_intro`, `gen`, `raa`, `or_elim`,
-`ex_elim`). No es expresable directamente como `Formula` porque
-`IsFactorization` es meta-Prop. -/
-axiom ax_p_tfa : ∀ n : Term, axioms ⊢ lt zero n →
-  ∃ f : Term, IsFactorization f n ∧
-    ∀ f' : Term, IsFactorization f' n → axioms ⊢ (f =eq f')
+⚠️ **Y una falsedad que se corrige con él**: `AXIOMS.md` decía «teorema en `Full`, postulado en
+`Minimal`». **Medible‑mente falso**: no existe en `Full/` ningún teorema con este enunciado.
+`tfa_numeral` (`Full/Factorization.lean`) tiene **otro dominio** (`Nat` vs `Term`), **otra
+unicidad** (`Perm` vs igualdad objeto) y **otra hipótesis** (meta vs objeto) — lo dice su propio
+docstring: «no discharge constructivo por el Muro 1».
 
-/-!
-### Corolarios del TFA (`ax_p_tfa`)
-
-Consecuencias inmediatas del Teorema Fundamental de la Aritmética. **No
-introducen axiomas nuevos**: sólo proyectan la existencia y la unicidad
-contenidas en `ax_p_tfa`.
-
-**Fuera de scope `Minimal/`** (requieren inducción / `Intermediate/` o `Full/`):
-el **lema de Euclides** (`IsPrime p → p ∣ a·b → p ∣ a ∨ p ∣ b`) y la
-**multiplicatividad** (`prod_pairs (concat f g) = prod_pairs f · prod_pairs g`)
-necesitan `prod_pairs_concat`, que es una recursión sobre la lista no demostrable
-sin inducción. Se difieren a sistemas con esquema de inducción. -/
-
-/-- **Existencia de factorización** para `n ≥ 1`: proyección directa del TFA. -/
-theorem factorization_exists (n : Term) (h : axioms ⊢ lt zero n) :
-    ∃ f : Term, IsFactorization f n := by
-  obtain ⟨f, hf, _⟩ := ax_p_tfa n h
-  exact ⟨f, hf⟩
-
-/-- **Unicidad de factorización** para `n ≥ 1`: dos factorizaciones cualesquiera
-    de `n` son provablemente iguales. Se obtiene de la unicidad del TFA pasando
-    por la factorización canónica `g`: `g =eq f` y `g =eq f'` dan `f =eq f'`
-    (vía `eq_trans` no estándar). -/
-theorem factorization_unique {n f f' : Term} (h : axioms ⊢ lt zero n)
-    (hf : IsFactorization f n) (hf' : IsFactorization f' n) :
-    axioms ⊢ (f =eq f') := by
-  obtain ⟨g, _hg, huniq⟩ := ax_p_tfa n h
-  exact eq_trans (huniq f hf) (huniq f' hf')
+⬜ **Quedan huérfanos** `IsFactorization` (def) e `isFactorization_nil_one`: se conservan porque
+son definiciones limpias y sin coste, pero ya no los consume nadie. Candidatos a la siguiente
+pasada de higiene.
+-/
 
 /-- `0 < 1`. Testigo `k := 0` en `ax13`: `0 + σ0 = 1` (es `teo_1_2`). -/
 theorem lt_zero_one : axioms ⊢ lt zero one := by
@@ -341,13 +315,6 @@ theorem lt_zero_one : axioms ⊢ lt zero one := by
   refine iff_mpr h_iff (ex_intro zero ?_)
   simp [substFormula, substTerm, substTerms, add, zero]
   exact teo_1_2
-
-/-- **La factorización de `1` es la lista vacía**: `IsFactorization f 1 → f =eq []`.
-    Une `isFactorization_nil_one` con la unicidad del TFA (`1 ≥ 1` vía
-    `lt_zero_one`). -/
-theorem factorization_one_eq_nil {f : Term} (hf : IsFactorization f one) :
-    axioms ⊢ (f =eq nil) :=
-  factorization_unique lt_zero_one hf isFactorization_nil_one
 
 end ROBINSON_PlusPlus.Minimal.Theorems.Block8
 
@@ -372,9 +339,5 @@ export ROBINSON_PlusPlus.Minimal.Theorems.Block8 (
   prod_pairs_nil
   prod_pairs_cons
   isFactorization_nil_one
-  ax_p_tfa
-  factorization_exists
-  factorization_unique
   lt_zero_one
-  factorization_one_eq_nil
 )

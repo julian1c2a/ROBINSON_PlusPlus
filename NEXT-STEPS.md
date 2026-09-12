@@ -4,7 +4,7 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑12 · `master` · ✅ ÁRBOL VERDE (145 jobs) · **4 `axiom` de Lean** (ADR‑026)**
+**Estado 2026‑09‑12 · `master` · ✅ ÁRBOL VERDE (145 jobs) · **3 `axiom` de Lean** (ADR‑026 + Ax‑P retirado)**
 
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑11 — LEER ESTO PRIMERO
 >

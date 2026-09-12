@@ -10,7 +10,7 @@
 >
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **4 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -88,7 +88,7 @@ base o se declara pendiente con nombre y firma**.
   prueba, lo **refuta**. ⇒ **ningún resultado de incompletitud puede enunciarse sobre `⊢`** — por eso
   el `goedel_second'` de `Meta/GodelTwo.lean` **no es** el Segundo Teorema, y el que sí lo es vive
   sobre `Prf`. Detalle en `doc/AUDITORIA-2026-09-11.md` **F‑1**.
-- **4 `axiom` de Lean** en todo el árbol, **0 `sorry`**, y ninguno de los cuatro es gödeliano.
+- **3 `axiom` de Lean** en todo el árbol, **0 `sorry`**, y ninguno de los tres es gödeliano.
 - ⚠️ **No es una prueba de consistencia**: se retiró una inconsistencia **conocida y localizada**
   (ADR‑012/013), lo que no es lo mismo.
 

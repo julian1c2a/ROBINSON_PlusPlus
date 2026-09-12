@@ -10,7 +10,7 @@
 >
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **4 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -62,15 +62,21 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 > ⚠️ Esta cabecera decía **(7)** con la fila 7 tachada justo debajo. Lo cazó
 > `doc/book/AUDITORIA-2026-09-10.md` R3.
 
-| # | Axioma | Módulo | Familia | Naturaleza |
-|---|--------|--------|---------|------------|
-| 1 | **`ax_induction_prim`** | `Full/Induction.lean` | Esquema de inducción | Axioma legítimo de la teoría objeto (IΣ₁/PA), **sobre los 23 primitivos**: `primAxioms ⊢ inductionFormula φ`. 🆕 **RATIFICADO el 2026‑09‑10h** ([ADR‑023](DECISIONS.md)) — dice lo que `Full` significa: *los primitivos **más** el esquema*. ⚠️ `ax_induction` (sobre `axioms`) **ya NO es un `axiom`**: es teorema por debilitamiento ⇒ el recuento **no sube** |
-| 2 | `ax_list_induction` | `Full/Lists.lean` | Esquema de inducción | Inducción estructural sobre listas del objeto |
-| ~~3~~ | ~~`ax_mod2_alternation`~~ | ~~`Full/Mod2.lean`~~ | 🏁 **RETIRADO el 2026‑09‑10h** | Era `∀n, mod2(σn) + mod2(n) = 1`. Hoy es **teorema**, derivado de `ax21` (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`. ⚠️ Su propio docstring ya decía que en `Minimal` era derivable; lo que ocultaba era una **circularidad**: `ax21` se «derivaba» de él, y él de `ax21`. Medido cuál es el primitivo: **`ax21`** (`ax16 + ax17` admiten `mod2 2̄ = 2̄`) |
-| 4 | `ax_p_tfa` | `Minimal/Theorems/Block8.lean` | Teoría objeto | Teorema Fundamental de la Aritmética (teorema en Full, postulado en Minimal) |
-| 5 | `ax_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) |
-| 6 | `prf_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`Prf (axiomsCodeT =eq listFormCodeM axioms)`** — espejo `Prf` de (5) para el cálculo finitario. **Reemplaza a `prf_inAxC`** (2026‑07‑20, `25d255b`), que pasa a ser **teorema** derivado (**net‑0 axiomas**). D1 `repr_pos'_prf` cita ahora éste |
-| ~~7~~ | ~~`d3`~~ | `Meta/GodelTwo.lean` | 🏁 **RETIRADO el 2026‑09‑10g** | Era la condición D3 de Hilbert‑Bernays‑Löb para `provCodeC'`. Hoy es **teorema**: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres** |
+> ⚠️⚠️ **LA COLUMNA `#` SE RETIRA (2026‑09‑12).** Era un **acoplamiento por número de fila**:
+> `doc/book/capitulos/cap-representabilidad-d1.tex:70` cita *«los axiomas **5 y 6**»* de esta tabla,
+> y **ningún control detecta** que al retirar un axioma esa referencia pase a apuntar a otro sitio.
+> Ha pasado **dos veces en un día** (Ax‑P retirado y el ancla `Prf` convertida en hipótesis).
+> 🔑 **Se cita por NOMBRE, nunca por número.**
+
+| Axioma | Módulo | Familia | Naturaleza |
+|--------|--------|---------|------------|
+| **`ax_induction_prim`** | `Full/Induction.lean` | Esquema de inducción | Axioma legítimo de la teoría objeto (IΣ₁/PA), **sobre los 23 primitivos**: `primAxioms ⊢ inductionFormula φ`. 🆕 **RATIFICADO el 2026‑09‑10h** ([ADR‑023](DECISIONS.md)) — dice lo que `Full` significa: *los primitivos **más** el esquema*. ⚠️ `ax_induction` (sobre `axioms`) **ya NO es un `axiom`**: es teorema por debilitamiento ⇒ el recuento **no sube** |
+| `ax_list_induction` | `Full/Lists.lean` | Esquema de inducción | Inducción estructural sobre listas del objeto |
+| ~~`ax_mod2_alternation`~~ | ~~`Full/Mod2.lean`~~ | 🏁 **RETIRADO el 2026‑09‑10h** | Era `∀n, mod2(σn) + mod2(n) = 1`. Hoy es **teorema**, derivado de `ax21` (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`. ⚠️ Su propio docstring ya decía que en `Minimal` era derivable; lo que ocultaba era una **circularidad**: `ax21` se «derivaba» de él, y él de `ax21`. Medido cuál es el primitivo: **`ax21`** (`ax16 + ax17` admiten `mod2 2̄ = 2̄`) |
+| ~~`ax_p_tfa`~~ | ~~`Minimal/Theorems/Block8.lean`~~ | 🗑️ **RETIRADO el 2026‑09‑12** | Era el TFA en forma idealizada. **Medido HUÉRFANO**: cero consumidores, y `IsFactorization` —el tipo que habitaba— **no aparecía ni una vez** fuera de `Block8.lean`. ⚠️⚠️ **Y con él cae una afirmación MEDIBLE‑MENTE FALSA que esta tabla publicó durante meses**: «*teorema en Full, postulado en Minimal*». **No existe en `Full/` ningún teorema con este enunciado.** `tfa_numeral` tiene **otro dominio** (`Nat` vs `Term`), **otra unicidad** (`Perm` vs igualdad objeto) y **otra hipótesis** (meta vs objeto) — su propio docstring lo dice: «no discharge constructivo por el Muro 1» |
+| `ax_axiomsCodeT_eq` | `Minimal/Axioms.lean` | Ancla de codificación | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) |
+| ~~`prf_axiomsCodeT_eq`~~ | ~~`Meta/Representability2Prf.lean`~~ | 🗑️ **YA NO ES `axiom`** (2026‑09‑12, [ADR‑026](DECISIONS.md)) | Es la **clase `AnclaEq`**, hipótesis de instancia. ⛔⛔ **El postulado NO desapareció: se movió del footprint a la FIRMA.** `goedel_first_prf`/`goedel_second_prf` dan hoy `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **pero su tipo es `∀ [AnclaEq], …`** y **no hay ninguna `instance : AnclaEq` en el árbol** [medido]. Anunciar el footprint sin esta frase sería **M‑8**. ¿Quién la descarga? **Nadie** — `TEOREMAS-E-HIPOTESIS.md` §1 |
+| ~~`d3`~~ | `Meta/GodelTwo.lean` | 🏁 **RETIRADO el 2026‑09‑10g** | Era la condición D3 de Hilbert‑Bernays‑Löb para `provCodeC'`. Hoy es **teorema**: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres** |
 
 ### 🆕 Nota 2026‑09‑10h — `ax_induction` y [ADR‑023](DECISIONS.md)
 
@@ -156,9 +162,8 @@ necesario** usar la inducción de `Full/`. Lo que *no* está permitido es añadi
 *nuevos* para esquivarla; en particular, la inducción fuerte sobre **códigos** es
 **derivable sin axiomas nuevos** (`ax_L0_cons_def` ancla `cons h t = pair h (succ t)`
 con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`).
-- **Teoría objeto (4).** `ax_p_tfa` es el TFA; teorema en presencia de inducción,
-  enunciado como axioma en la capa `Minimal` (que carece de ella).
-- **Anclas de codificación (5–6).** Extensión **conservadora**. `ax_axiomsCodeT_eq`
+- 🗑️ ~~**Teoría objeto.** `ax_p_tfa`~~ — **retirado el 2026‑09‑12**, medido huérfano. Ver su fila.
+- **Anclas de codificación.** Extensión **conservadora**. `ax_axiomsCodeT_eq`
   (cálculo `⊢`) es una **igualdad**: `axiomsCodeT` ES el código de la lista de
   axiomas — da **ambas** direcciones (positiva `ax_inAxC`, ahora **teorema**; y
   negativa `neg_In_axiomsCodeT`, que SÓLO los axiomas están). El término gigante
