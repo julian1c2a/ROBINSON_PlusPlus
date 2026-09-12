@@ -335,6 +335,44 @@ for f in REFERENCE.md doc/REFERENCE-*.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.
 done
 [ "$D_FAIL" = "0" ] && echo "  ✓ todos los docs técnicos llevan marca de tiempo" || FAIL=1
 
+# ─── [F] ARTEFACTOS HUÉRFANOS ───────────────────────────────────────────────
+# ⛔⛔ AÑADIDO EL 2026‑09‑12, y por un fallo REAL de la víspera.
+#
+# El 2026‑09‑11 se puso `FOL/Soundness.lean` en cuarentena porque su teorema es FALSO
+# (con `raa` demuestra `False` sin hipótesis). Se movió el fuente, se quitó del barrel,
+# se reconstruyó el árbol y dio VERDE. Pero `lake` NO recoge la basura: el
+# `.olean` COMPILADO se quedó, `import FOL.Soundness` SEGUÍA RESOLVIENDO desde él, y
+# `False` se demostraba al día siguiente exactamente igual.
+#
+# 🔑 La lección: **retirar el FUENTE no retira el MÓDULO**. Un `.olean` sin `.lean` es un
+# módulo fantasma — importable, invisible al build y sin fuente que auditar.
+#
+# Este bloque ROMPE: no hay ningún caso legítimo de `.olean` sin fuente.
+echo
+echo "════ [F] ARTEFACTOS HUÉRFANOS (.olean sin fuente) ════"
+F_FAIL=0
+for ROOT in "." "../FOL"; do
+  LAKEDIR="$ROOT/.lake/build/lib/lean"
+  [ -d "$LAKEDIR" ] || continue
+  while IFS= read -r O; do
+    [ -n "$O" ] || continue
+    REL="${O#$LAKEDIR/}"
+    SRC="$ROOT/${REL%.olean}.lean"
+    if [ ! -f "$SRC" ]; then
+      echo "  ✗ módulo FANTASMA: ${REL%.olean} — hay .olean pero NO hay fuente"
+      echo "      $O"
+      F_FAIL=1
+    fi
+  done <<< "$(find "$LAKEDIR" -name '*.olean' 2>/dev/null)"
+done
+if [ "$F_FAIL" = "0" ]; then
+  echo "  ✓ ningún .olean sin fuente (ni aquí ni en ../FOL)"
+else
+  echo "  ⚠️  un .olean sin fuente SIGUE SIENDO IMPORTABLE. Bórralo:"
+  echo "      rm -f <ruta>.olean <ruta>.olean.hash <ruta>.ilean <ruta>.ilean.hash <ruta>.trace"
+  FAIL=1
+fi
+
 # ─── RESUMEN ────────────────────────────────────────────────────────────────
 echo
 if [ "$FAIL" = "0" ]; then

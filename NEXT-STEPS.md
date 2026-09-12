@@ -28,11 +28,16 @@
 > constructores y el teorema cuantifica sobre todos ⇒ el teorema es **falso**.
 > ⚠️ Lo peligroso es **eliminar** (`induction`/`cases`/`rec`), **no introducir**.
 >
-> | | inductivo | axiomas que lo habitan |
-> |---|---|---|
-> | ⛔ **PROHIBIDO inducir** | `FOL.Derives` | 6 de `MetaRules` + `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq` |
-> | ⛔ **PROHIBIDO inducir** | `Prf` | `prf_axiomsCodeT_eq` |
-> | ✅ **SEGURO** | **`Prf₀`**, **`PrfH`** | **ninguno** |
+> ⚠️ **CENSO CORREGIDO el 2026‑09‑12** — la primera versión decía «6 de `MetaRules`» y **son OCHO
+> en FOL**; faltaban un **segundo `dne`** y `forall_not_impl_exists_not`, los dos fuera de
+> `MetaRules`. Con el lado RPP, **doce**.
+>
+> | | inductivo | axiomas que lo habitan | cuántos |
+> |---|---|---|---|
+> | ⛔ **PROHIBIDO inducir** | `FOL.Derives` | **`MetaRules`: 6** (`imp_intro`, `gen`, `raa`, `dne`, `or_elim`, `ex_elim`) · **`Theorems/Neg.lean:57`: `dne`** (⚠️ un **SEGUNDO** `dne`, en forma de esquema) · **`Theorems/Quantifiers.lean:115`: `forall_not_impl_exists_not`** | **8** en FOL |
+> | ⛔ **PROHIBIDO inducir** | `FOL.Derives`, lado RPP | `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa` | **+4** ⇒ **12** |
+> | ⛔ **PROHIBIDO inducir** | `Prf` | `prf_axiomsCodeT_eq` | 1 |
+> | ✅ **SEGURO** | **`Prf₀`**, **`PrfH`** | **ninguno** | 0 |
 >
 > ## ⬜ LO DECIDIDO POR EL PROPIETARIO Y **NO EJECUTADO** — el trabajo de mañana, en orden
 >

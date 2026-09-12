@@ -32,7 +32,8 @@ afirmaron que el árbol no tenía semántica. La tenía. *Antes de construir, bu
 
 > **Un teorema de solidez para `Derives` demuestra `False`.** Sin hipótesis.
 
-`Derives` es un `inductive` de 18 constructores, pero `FOL/MetaRules.lean` declara **cinco `axiom`s
+`Derives` es un `inductive` de 18 constructores, pero **DOCE `axiom`s lo HABITAN** (censo corregido
+el 2026‑09‑12: 8 en la librería FOL + 4 en RPP). `FOL/MetaRules.lean` declara **seis `axiom`s
 que lo HABITAN** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) — y tienen que ser axiomas,
 porque sus premisas son **funciones de Lean**, ocurrencias negativas que Lean rechazaría en un
 `inductive`. ⇒ `Derives` tiene habitantes que **no son aplicaciones de constructor**, y cualquier
