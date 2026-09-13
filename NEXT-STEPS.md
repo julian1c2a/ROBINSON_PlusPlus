@@ -17,11 +17,21 @@
 > | 4 | ⚠️ `check-axioms.bash` de FOL **cuenta ya la cuarentena** (`ESPERADO_CUAR=3`): la cifra estaba escrita en seis documentos y no la comprobaba nada. Probado en los dos sentidos | `../FOL/check-axioms.bash` |
 > | 5 | ⚠️⚠️ **Un sondeo perdido, rescatado**: la auditoría del 12 había COMPILADO la enumeración y dejó el fichero en un **scratchpad de sesión**; hoy la construí otra vez sin encontrarla | `sondeos/EnumFormulaPorInyeccion.lean`, [ADR‑030](DECISIONS.md) §4 |
 >
-> ⬜ **Lo que sigue abierto de esta línea**: ⛔ **`henkin_extension_lemma`, y sólo él.** Es el que
-> desde el primer censo estaba clasificado como «el caro de verdad»: su prueba clásica **amplía el
-> lenguaje con constantes nuevas** y hay que demostrar que la extensión es **conservativa**.
-> ⚠️ **Mientras siga postulado no hay Teorema de Completitud demostrado**: bajar de 5 a 1 mueve la
-> cifra, no el veredicto. 🔑 Lo que sí cambia es que la deuda está **concentrada y con nombre**.
+> | 2c | 🔬 **`henkin_extension_lemma` MEDIDO** — y el juicio «el caro de verdad» **era falso**: sale. ⚠️⚠️ Pero pagándolo, el footprint de `completeness` cambia `henkin_extension_lemma` por **`raa`**. ⬜ **Decisión abierta, el árbol NO se ha tocado** | [ADR‑032](DECISIONS.md), `sondeos/HenkinSaleDeRaa.lean` |
+>
+> ⬜ **LA DECISIÓN QUE ESPERA AL PROPIETARIO** — `henkin_extension_lemma`, el último axioma de
+> `cuarentena/Completeness.lean`. **Medido (ADR‑032): es demostrable.** Pero no es «1 → 0»:
+>
+> | | axiomas propios | footprint de `completeness` |
+> |---|---|---|
+> | hoy | **1** | `…, henkin_extension_lemma` |
+> | pagándolo | **0** | `…, `**`FOL.MetaRules.raa`** |
+>
+> 🔑 Sale porque `raa` hace que **todo contexto decida toda fórmula**; el obstáculo clásico
+> (constantes frescas, conservatividad) **ni se plantea**. ⚠️ Sería comprar un cero con el axioma
+> que hace el cálculo **completo y no sólido**, y obligaría a `Completeness.lean` a importar
+> `MetaRules`, cosa que hoy **no hace**. **(A)** dejarlo · **(B)** pagarlo · **(C)** pagarlo con el
+> aviso al lado. **Recomendación: (A)** — es ADR‑024 otra vez, `⊢` es la herramienta y no el sujeto.
 
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑11 — LEER ESTO PRIMERO
 >

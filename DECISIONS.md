@@ -2254,3 +2254,91 @@ vale al revés — **declarar que algo no está medido es lo que permite volver 
 
 **Véase también:** `../FOL/FOL/Theorems/Eq.lean` (las cuatro piezas nuevas),
 `../FOL/AXIOMS.md` §2.5, `../FOL/cuarentena/README.md` §9.
+
+---
+
+## ADR-032: `henkin_extension_lemma` SE MIDIÓ — sale, y por eso NO se ha pagado
+
+**Fecha:** 2026‑09‑13 · **Estado:** 🔬 **MEDIDO · ⬜ decisión abierta** (no se ha tocado el árbol) ·
+**Relacionado:** ADR‑024 (M‑10), ADR‑025 (M‑11), ADR‑030, ADR‑031
+
+### 1 · El encargo y el resultado
+
+El último axioma de `cuarentena/Completeness.lean`. El juicio publicado —mío, esa misma mañana—
+era: *«el caro de verdad: su prueba clásica amplía el lenguaje con constantes nuevas»*.
+
+⚠️⚠️ **Ese juicio era FALSO, y lo dice el compilador.** `sondeos/HenkinSaleDeRaa.lean`:
+
+    IsMaximalConsistent S → IsHenkin S        ← teorema, compilado
+    henkin_extension_lemma                     ← `lindenbaum_lemma` + tres líneas
+
+⇒ `cuarentena/Completeness.lean` llegaría a **CERO axiomas propios**.
+
+### 2 · ⚠️⚠️ Y el precio, que es el verdadero hallazgo
+
+| | axiomas propios | footprint de `completeness` |
+|---|---|---|
+| hoy | **1** | `[propext, Classical.choice, Quot.sound, henkin_extension_lemma]` |
+| pagándolo | **0** | `[propext, Classical.choice, Quot.sound, `**`FOL.MetaRules.raa`**`]` |
+
+**No es «1 → 0».** Es cambiar un postulado **propio, honesto y con nombre** por **el axioma que
+hace el cálculo completo y NO sólido** — el mismo que en `cuarentena/Inconsistencia.lean` da
+`False` en cuanto se le junta cualquier teorema de solidez.
+
+⚠️ Y hay un coste estructural aparte: obliga a que `Completeness.lean` **importe `FOL.MetaRules`**,
+cosa que hoy **no hace** (medido: siete imports, ninguno es `MetaRules`). `cuarentena/README.md` §4
+presentaba justamente ese hecho como la razón de que este módulo **no** estuviera en el radio de la
+inconsistencia. Pagarlo lo mete dentro.
+
+### 3 · Por qué sale — y por qué eso es la mala noticia
+
+`raa : (Γ ⊢ A → Γ ⊢ ⊥) → Γ ⊢ ¬A` toma una **función de Lean**: si `Γ ⊬ A` existe **vacuamente**
+⇒ `Γ ⊢ ¬A`. De ahí, en tres líneas:
+
+    derives_complete (Γ A) : (Γ ⊢ A) ∨ (Γ ⊢ ¬A)
+
+**Todo contexto decide toda fórmula.** Con eso, el obstáculo clásico —constantes frescas y
+conservatividad— **ni se plantea**: el testigo del existencial sale de la completitud sintáctica.
+
+La cadena, sin una sola constante nueva:
+
+1. `S` maximal consistente, `S (∃A)` ⇒ hay `Γ0 ⊆ S` finito con `Γ0 ⊢ ∃A`.
+2. Si ninguna instancia está en `S`, **ninguna es derivable desde `Γ0`** (si lo fuera,
+   `max_cons_contains` la metería). ⭐ **Y el contexto es UNIFORME**: `Γ0` para todas a la vez —
+   que era exactamente el punto donde el argumento parecía romperse.
+3. `no_instance_no_body`: ninguna instancia derivable ⇒ el **cuerpo** no lo es desde el contexto
+   **levantado**, por `intro_forall` seguido de `elim_forall`. ⭐ Footprint **`[propext]`**: esta
+   pieza **no usa `raa`** y es la que sustituye a la generalización sobre constante fresca.
+4. `raa` en el contexto levantado da `¬A`, y `elim_ex` cierra con `⊥`.
+
+⚠️ **M‑11 NO se viola**: no hay ni una inducción sobre `Derives` — sólo constructores, `raa` como
+**introducción**, y tercio excluido sobre la `Prop` `Γ ⊢ A`. Las pruebas son legítimas.
+⚠️ Pero **no valdrían para un cálculo sólido**, donde `derives_complete` es falso.
+🔑 **Esta Henkin sale de la patología, no de la lógica.**
+
+### 4 · Lo que NO se sigue
+
+**No** se sigue `False`. El detonador de `Inconsistencia.lean` es `raa` **más solidez**, y
+`Completeness.lean` no demuestra solidez y va en la dirección contraria. El módulo quedaría
+consistente; lo que quedaría comprometido es **lo que su teorema significa**.
+
+### 5 · ⬜ La decisión, planteada
+
+| | opción | qué publica |
+|---|---|---|
+| **A** *(recomendada)* | **dejar el axioma** y guardar la medición | `AXIOMS.md`: **1 axioma**, con nombre y con su dificultad real escrita. El lector ve dónde está la deuda |
+| **B** | **pagarlo** | `AXIOMS.md`: **0 axiomas**. ⚠️ Y un cero se lee como «Completitud demostrada», cuando lo que habría detrás es «completitud de un cálculo que, cuando no deriva `A`, deriva `¬A`» |
+| **C** | pagarlo **y** escribir el aviso al lado | el cero, con el veredicto explícito. Depende de que nadie cite la cifra sin el párrafo |
+
+🔑 **El argumento de fondo es ADR‑024 otra vez**: `⊢` es la **herramienta**, no el **sujeto**. El
+proyecto ya retiró `goedel_second'` por esto mismo (M‑10). Comprar un cero con `raa` sería la misma
+operación en la dirección contraria.
+
+⚠️ Y una lección de método, que es la tercera del día: *«el caro de verdad»* era una **estimación
+mía publicada en un documento de censo sin la etiqueta de estimación**. Las dos anteriores
+(ADR‑031 §4) estaban bien etiquetadas y por eso volvimos a medirlas. Ésta no lo estaba, y se
+publicó tres veces (`AXIOMS.md`, `cuarentena/README.md`, `NEXT-STEPS.md`) antes de medirse.
+🔑 **Una estimación sin etiqueta es una medición falsa.**
+
+**Véase también:** `sondeos/HenkinSaleDeRaa.lean`, `../FOL/AXIOMS.md` §2.6,
+`../FOL/cuarentena/README.md` §9.2, `../FOL/cuarentena/Inconsistencia.lean`.
