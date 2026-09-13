@@ -2083,3 +2083,103 @@ que tiene **cero** axiomas habitándolo y sobre el que está probado `prf0_sound
 
 **Véase también:** `Full/Lists.lean` (el axioma y su docstring), `../FOL/AXIOMS.md` §1,
 `sondeos/AnclaSoundness.lean` (`prf0_soundness`).
+
+---
+
+## ADR-030: La enumerabilidad de `Formula` deja de ser un postulado — `FOL/Enumeration.lean`
+
+**Fecha:** 2026‑09‑13 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑028 (D‑3), ADR‑029
+
+### 1 · Qué se retira
+
+`cuarentena/Completeness.lean` decía *«asumimos la enumerabilidad de las fórmulas»* y postulaba dos
+axiomas:
+
+    axiom formula_enum      : Nat → Formula
+    axiom formula_enum_surj : ∀ f : Formula, ∃ n, formula_enum n = f
+
+No hacía falta asumirla. **`FOL/Enumeration.lean`** (nuevo, ~330 líneas) la construye en cinco
+capas —`unpair` · `natToList` · `natToString` · `natToTerm`/`natToTerms` · `natToFormula`—, cada
+una con su sobreyectividad. `Completeness.lean` conserva los **nombres** (ahora `def` y `theorem`),
+así que **ninguno de sus ocho sitios de uso cambió**.
+
+| medida | valor |
+|---|---|
+| axiomas de `cuarentena/Completeness.lean` | **5 → 3** |
+| footprint de `natToFormula_surj` | `[propext, Classical.choice, Quot.sound]` |
+| ⭐ footprint de `lindenbaum_lemma` | `[propext, Classical.choice, Quot.sound]` — **net‑0 puro** |
+| axiomas de `FOL/` + `TheoryFramework/` | **4**, sin cambio |
+| build | RPP **145 jobs** · `lake build "@FOL/FOL" "@FOL/TheoryFramework"` **22 jobs** |
+
+⭐ **El Lema de Lindenbaum queda INCONDICIONAL.** No era el objetivo, pero era el único consumidor
+de los dos postulados. Recíproca de M‑1 otra vez: *cada axioma que se retira audita lo que se
+apoyaba en él.*
+
+⚠️ **Y el veredicto sobre la completitud NO cambia.** Quedan `termEqv_func_congr`,
+`termEqv_rel_congr` y —el caro— `henkin_extension_lemma`. **La cifra baja; el titular no.**
+
+### 2 · Las tres decisiones técnicas que lo hicieron barato
+
+1. ⭐ **El par de Cantor sin números triangulares.** La inversa habitual exige
+   `n = (a+b)(a+b+1)/2 + b` y con ella identidades de división entera, caras sin Mathlib. `unpair`
+   **camina la diagonal** con un paso estructural, y la sobreyectividad sale por inducción doble
+   sin una sola división. 🔑 *La recursión se pone donde la PRUEBA la quiere, no donde la fórmula
+   la sugiere.*
+2. ⚠️ **`String` se midió ANTES de construir**, porque era el único punto que podía bloquearlo
+   todo (`Formula.atom : String → List Term → …`). El núcleo da `Char.ofNat_toNat` y
+   `String.ofList_toList`, que basta. ⚠️ En v4.31 `String` ya **no** es `structure String where
+   data : List Char` sino UTF‑8 opaco: `String.mk s.data = s` **no** vale por `rfl`.
+3. ⚠️ **Las sobreyectividades de `Term` y `Formula` no son inducción sobre el inductivo**, sino
+   sobre una COTA de tamaño (`∀ N, ∀ t, size t < N → …`), el patrón de `truth_lemma_lt`. `Term` es
+   un inductivo **anidado** y así se esquiva escribir su recursor mutuo a mano.
+
+### 3 · Dónde vive, y por qué NO en `cuarentena/`
+
+`FOL/Enumeration.lean` entra por el barrel `FOL.lean`, que es `@[default_target]`.
+
+🔑 **Una construcción que retira un axioma y vive fuera del build no retira nada**: nadie la
+verifica. Es exactamente la enfermedad que este repo lleva tres días pagando (el `.olean`
+fantasma, `TheoryFramework` roto durante meses, los 15 axiomas de las librerías sin compilar).
+
+⚠️ Y se midió un **agujero de CI que nadie había visto**: `lake build` desde RPP compila **sólo los
+nueve módulos de FOL que RPP importa**. `FOL.Semantics`, `FOL.Enumeration` y `TheoryFramework`
+entera **no los compilaba nadie en CI**. Añadido el paso
+`lake build "@FOL/FOL" "@FOL/TheoryFramework"` a `.github/workflows/build.yml`.
+
+⚠️ Y `check-axioms.bash` de FOL ahora **también cuenta la cuarentena** (`ESPERADO_CUAR=3`),
+porque la cifra «3» quedó escrita en seis documentos y **no la comprobaba nada**. Probado en los
+dos sentidos.
+
+### 4 · ⚠️⚠️ El error de método, registrado
+
+**La prueba YA EXISTÍA y la volví a escribir.** La auditoría del 2026‑09‑12 la había compilado
+(**M‑2**, *«derivable — COMPILADO en 94 líneas»*) y dejó el fichero en
+`…/scratchpad/ProbeEnum.lean`. Al ir a construir busqué en los dos repos, no encontré nada, y
+construí de nuevo.
+
+🔑 **Dos reglas salen de aquí:**
+
+* *Antes de construir, buscar* — **y buscar incluye el scratchpad de la propia sesión**, no sólo
+  el árbol. (Van seis veces que esta regla paga o cobra.)
+* **Una medición cuyo artefacto vive en un directorio efímero es una medición que se evapora.** La
+  auditoría escribió la conclusión en el informe y dejó la prueba fuera del árbol; tres semanas
+  más y no habría existido.
+
+**Reparado**: el fichero está rescatado en `sondeos/EnumFormulaPorInyeccion.lean`, recompilado hoy.
+
+⚠️ Y las dos rutas **no son la misma**, así que la duplicación no fue del todo estéril:
+
+| | `FOL/Enumeration.lean` (adoptada) | `sondeos/EnumFormulaPorInyeccion.lean` |
+|---|---|---|
+| dirección | `Nat → Formula`, **computable** | `Formula → Nat` **inyectiva** + `Classical.choose` |
+| `#eval` | ✅ funciona | ❌ `noncomputable` |
+| líneas | ~330 | **102** |
+| footprint | `[propext, Classical.choice, Quot.sound]` | **idéntico** |
+
+Se adoptó la computable: en un proyecto sobre **representabilidad** y conjuntos **r.e.**, una
+enumeración obtenida por elección es una sobreyección *semántica* y nada más. El precio son 230
+líneas. ⬜ Cambiar de una a otra es **una línea** en `cuarentena/Completeness.lean`.
+
+**Véase también:** `../FOL/FOL/Enumeration.lean`, `../FOL/AXIOMS.md` §2.4,
+`../FOL/cuarentena/README.md` §9, `doc/AUDITORIA-FOL-2026-09-12.md` M‑2.

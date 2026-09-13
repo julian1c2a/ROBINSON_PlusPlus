@@ -71,6 +71,15 @@ jobs:
       - name: Build
         run: lake build
 
+      # ⭐ Anadido el 2026-09-13. `lake build` de arriba compila SOLO los modulos de FOL que
+      # ROBINSON_PlusPlus importa (nueve). Todo lo demas del arbol de FOL -- `FOL.Semantics`,
+      # `FOL.Enumeration`, la libreria `TheoryFramework` entera -- NO lo compilaba nadie en CI,
+      # que es exactamente la enfermedad que este repo lleva dos dias pagando: codigo huerfano
+      # que se autodescribe verificado. Aqui entran los DOS `@[default_target]` de FOL.
+      # ⛔ Y se hace desde la raiz de RPP, nunca con `cd FOL && lake build`.
+      - name: Build FOL (sus dos default_target completos)
+        run: lake build "@FOL/FOL" "@FOL/TheoryFramework"
+
       - name: Check for sorry
         run: bash check-sorry.bash
         continue-on-error: true   # Warning only — change to false to make it blocking

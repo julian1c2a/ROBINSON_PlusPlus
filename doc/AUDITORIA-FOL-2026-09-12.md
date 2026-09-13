@@ -400,7 +400,15 @@ y `Theorems/Neg` también ⇒ no hay ciclo. Efecto: **28 → 27**. ⚠️ Si ade
 otra: `dne` esquema pasa a **constructor** y la regla es teorema por `elim_impl` — **los dos desaparecen a
 la vez**.
 
-**M‑2 · `formula_enum`/`formula_enum_surj` son derivables — COMPILADO en 94 líneas** *(AX‑5)*. Footprint
+**M‑2 · `formula_enum`/`formula_enum_surj` son derivables — COMPILADO en 94 líneas** *(AX‑5)*.
+🏁 **RESUELTO el 2026‑09‑13** — [ADR‑030](../DECISIONS.md): `FOL/Enumeration.lean`, dentro del
+build, cero axiomas; `cuarentena/Completeness.lean` pasa de **5 a 3**.
+⚠️⚠️ **Y este hallazgo cobró su propia factura**: *«Fichero ya compilado en
+`…/scratchpad/ProbeEnum.lean`»* — un directorio **de sesión**. Al día siguiente se buscó en los dos
+repos, no apareció, y **se construyó otra vez** (~330 líneas donde había 102). 🔑 *Una medición cuyo
+artefacto vive en un directorio efímero es una medición que se evapora*: la conclusión estaba en el
+informe y la prueba fuera del árbol. **Rescatado** en `sondeos/EnumFormulaPorInyeccion.lean`.
+Footprint
 `[propext, Classical.choice, Quot.sound]`, importando **sólo `FOL.FOL`**. Efecto: **28 → 26**. ⚠️ El pago no
 es gratis: la maquinaria (`triN`/`consN`/`codeNat` + inyectividad) vive hoy en RPP, que es el
 **consumidor**; hay que **portarla** a un `FOL/Coding.lean` nuevo. Fichero ya compilado en

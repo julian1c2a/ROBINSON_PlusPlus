@@ -4,7 +4,23 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑12 · `master` · ✅ ÁRBOL VERDE (145 jobs) · **3 `axiom` de Lean** (ADR‑026 + Ax‑P retirado)**
+**Estado 2026‑09‑13 · `master` · ✅ ÁRBOL VERDE (145 jobs) · **3 `axiom` de Lean** (ADR‑026 + Ax‑P retirado)**
+
+> # 🗓️ 2026‑09‑13 — lo hecho hoy, antes del bloque de ayer
+>
+> | | qué | dónde |
+> |---|---|---|
+> | 1 | 🏁 **`ax_list_induction` pierde su premisa‑FUNCIÓN** (11 sitios) y **M‑11 sobre `Derives` se declara PERMANENTE** (suelo de cuatro) | [ADR‑029](DECISIONS.md), `8d44a70` |
+> | 2 | 🏁 **`FOL/Enumeration.lean`**: la enumerabilidad de `Formula` **construida**, cero axiomas ⇒ `cuarentena/Completeness.lean` **5 → 3**. ⭐ Y `lindenbaum_lemma` queda **net‑0 puro** | [ADR‑030](DECISIONS.md) |
+> | 3 | ⚠️ **Agujero de CI medido y tapado**: `lake build` desde RPP compilaba **sólo los nueve módulos de FOL que RPP importa**; `FOL.Semantics`, `FOL.Enumeration` y `TheoryFramework` entera **no las compilaba nadie**. Nuevo paso `lake build "@FOL/FOL" "@FOL/TheoryFramework"` | `.github/workflows/build.yml` |
+> | 4 | ⚠️ `check-axioms.bash` de FOL **cuenta ya la cuarentena** (`ESPERADO_CUAR=3`): la cifra estaba escrita en seis documentos y no la comprobaba nada. Probado en los dos sentidos | `../FOL/check-axioms.bash` |
+> | 5 | ⚠️⚠️ **Un sondeo perdido, rescatado**: la auditoría del 12 había COMPILADO la enumeración y dejó el fichero en un **scratchpad de sesión**; hoy la construí otra vez sin encontrarla | `sondeos/EnumFormulaPorInyeccion.lean`, [ADR‑030](DECISIONS.md) §4 |
+>
+> ⬜ **Lo que sigue abierto de esta línea**: los **tres** axiomas que quedan en
+> `cuarentena/Completeness.lean`. `termEqv_func_congr` y `termEqv_rel_congr` **no están medidos** y
+> parecen inducción sobre `PointwiseEqv` + `FOL/Theorems/Eq.lean`; ⛔ `henkin_extension_lemma` es el
+> caro (amplía el lenguaje con constantes). ⚠️ **Mientras ése siga postulado no hay Teorema de
+> Completitud demostrado**: bajar de 5 a 3 mueve la cifra, no el veredicto.
 
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑11 — LEER ESTO PRIMERO
 >
