@@ -2183,3 +2183,74 @@ líneas. ⬜ Cambiar de una a otra es **una línea** en `cuarentena/Completeness
 
 **Véase también:** `../FOL/FOL/Enumeration.lean`, `../FOL/AXIOMS.md` §2.4,
 `../FOL/cuarentena/README.md` §9, `doc/AUDITORIA-FOL-2026-09-12.md` M‑2.
+
+---
+
+## ADR-031: Las dos congruencias de la igualdad, DEMOSTRADAS — la Completitud queda a UN postulado
+
+**Fecha:** 2026‑09‑13 · **Estado:** ✅ EJECUTADO · **Relacionado:** ADR‑028 (D‑3), ADR‑030
+
+### 1 · Qué se retira
+
+`cuarentena/Completeness.lean` postulaba la congruencia de la igualdad bajo los dos constructores
+que llevan **lista** de argumentos:
+
+    axiom termEqv_func_congr … : PointwiseEqv S ts1 ts2 → termEqv S (func f ts1) (func f ts2)
+    axiom termEqv_rel_congr  … : PointwiseEqv S ts1 ts2 → (S (atom p ts1) ↔ S (atom p ts2))
+
+Los dos son **teoremas**. La medición pedida por el propietario (*«mide `termEqv_func_congr` y
+`termEqv_rel_congr`»*) se hizo compilando, y salió cerrada.
+
+| medida | valor |
+|---|---|
+| axiomas de `cuarentena/Completeness.lean` | **3 → 1** (y **5 → 1** en el día) |
+| `termEqv_func_congr` / `termEqv_rel_congr` | `[propext, Classical.choice, Quot.sound]` |
+| ⭐ `evalTerm_canonical` (modelo canónico) | **net‑0 puro** |
+| ⭐⭐ `truth_lemma` (Lema de la Verdad) | **net‑0 puro** |
+| `model_existence_lemma` / `completeness` | `henkin_extension_lemma`, **y nada más** |
+| coste | ~45 líneas en `FOL/Theorems/Eq.lean` + ~55 en `Completeness.lean` |
+| build | FOL **22 jobs** · RPP **145 jobs** · `check-axioms.bash` EXIT=0 (`ESPERADO_CUAR=1`) |
+
+⚠️ **Y el veredicto NO se mueve.** Con `henkin_extension_lemma` postulado, `completeness` no está
+demostrado. 🔑 Lo que cambia es **dónde está la deuda**: ya no repartida en cinco sitios, sino
+concentrada en uno, con nombre, y con su dificultad bien identificada (amplía el lenguaje con
+constantes nuevas y hay que probar la conservatividad).
+
+### 2 · 🔑 Lo que faltaba no era de LÓGICA, era de LISTAS
+
+`Derives.subst` es Leibniz **con índice 0**: `Γ ⊢ t₁ ≐ t₂ → Γ ⊢ φ[t₁] → Γ ⊢ φ[t₂]`. Sustituye **un**
+término. Pero `Term.func` y `Formula.atom` llevan una **lista** de argumentos, y la congruencia hay
+que hacerla posición a posición.
+
+La técnica de la fórmula‑contexto ya existía en el repo desde siempre —`derive_eq_symm` y
+`derive_eq_trans` la usan: se pone `Term.var 0` en el hueco, `liftTerm 0` en todo lo demás, y
+`substTerm_liftTerm` la vuelve a cerrar—. Lo único que **no** existía era **abrir el hueco dentro
+de la lista**: partirla en `pre ++ x :: post` y saber que `substTerms` distribuye sobre `++`.
+
+⇒ **`substTerms_append`, cuatro líneas, era toda la pieza que faltaba.** Con ella salen seguidos
+`substTerms_lift_hole`, `derive_eq_func_congr` y `derive_atom_congr`.
+
+🔑 *Un axioma que lleva meses en pie puede estar esperando un lema de fontanería, no un teorema.*
+Es el mismo patrón que ADR‑030 (allí el bloqueo aparente era `String` y bastaba un lema del núcleo).
+
+### 3 · Dónde va cada mitad
+
+| pieza | dónde | por qué |
+|---|---|---|
+| `substTerms_append`, `substTerms_lift_hole`, `derive_eq_func_congr`, `derive_atom_congr` | **`FOL/Theorems/Eq.lean`** — en el build | son lemas **generales de igualdad** que a la librería le faltaban, no andamiaje de la cuarentena |
+| `DerivesSet_map`/`_map2`, `pointwiseEqv_symm`, los dos teoremas | `cuarentena/Completeness.lean` | traslado a conjuntos e inducción sobre `PointwiseEqv` |
+
+⚠️ **La inducción sobre `PointwiseEqv` es legítima**: es un `inductive` **sin ningún `axiom`
+habitándolo** ⇒ **M‑11 no aplica**. Conviene comprobarlo explícitamente cada vez que se induce.
+
+### 4 · ⭐ La estimación de la mañana se comprobó la misma tarde
+
+`AXIOMS.md` §2.4 decía de estos dos: *«derivable en principio, **no medido**»*. Estaba **bien
+etiquetado**, y al medirlo resultó cierto.
+
+🔑 *Una estimación declarada como estimación no hace daño; la que se publica como medición, sí.*
+Es la cara buena de «medir una obstrucción no es probarla»: también
+vale al revés — **declarar que algo no está medido es lo que permite volver y medirlo**.
+
+**Véase también:** `../FOL/FOL/Theorems/Eq.lean` (las cuatro piezas nuevas),
+`../FOL/AXIOMS.md` §2.5, `../FOL/cuarentena/README.md` §9.
