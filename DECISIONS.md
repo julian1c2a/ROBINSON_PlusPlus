@@ -2257,9 +2257,10 @@ vale al revés — **declarar que algo no está medido es lo que permite volver 
 
 ---
 
-## ADR-032: `henkin_extension_lemma` SE MIDIÓ — sale, y por eso NO se ha pagado
+## ADR-032: `henkin_extension_lemma` SE MIDIÓ — sale, y por eso se QUEDA
 
-**Fecha:** 2026‑09‑13 · **Estado:** 🔬 **MEDIDO · ⬜ decisión abierta** (no se ha tocado el árbol) ·
+**Fecha:** 2026‑09‑13 · **Estado:** ✅ **DECIDIDO — opción (A), sanción del propietario**:
+*el axioma se queda*. El árbol no se toca; lo que se guarda es la medición y el porqué. ·
 **Relacionado:** ADR‑024 (M‑10), ADR‑025 (M‑11), ADR‑030, ADR‑031
 
 ### 1 · El encargo y el resultado
@@ -2322,13 +2323,33 @@ La cadena, sin una sola constante nueva:
 `Completeness.lean` no demuestra solidez y va en la dirección contraria. El módulo quedaría
 consistente; lo que quedaría comprometido es **lo que su teorema significa**.
 
-### 5 · ⬜ La decisión, planteada
+### 5 · ✅ La decisión: **(A)**, el axioma se queda
 
-| | opción | qué publica |
-|---|---|---|
-| **A** *(recomendada)* | **dejar el axioma** y guardar la medición | `AXIOMS.md`: **1 axioma**, con nombre y con su dificultad real escrita. El lector ve dónde está la deuda |
-| **B** | **pagarlo** | `AXIOMS.md`: **0 axiomas**. ⚠️ Y un cero se lee como «Completitud demostrada», cuando lo que habría detrás es «completitud de un cálculo que, cuando no deriva `A`, deriva `¬A`» |
-| **C** | pagarlo **y** escribir el aviso al lado | el cero, con el veredicto explícito. Depende de que nadie cite la cifra sin el párrafo |
+Sancionada por el propietario el **2026‑09‑13**. Las tres opciones que había sobre la mesa:
+
+| | opción | qué publica | |
+|---|---|---|---|
+| **A** | **dejar el axioma** y guardar la medición | `AXIOMS.md`: **1 axioma**, con nombre y con su dificultad **real** escrita. El lector ve dónde está la deuda | ✅ **ELEGIDA** |
+| **B** | **pagarlo** | `AXIOMS.md`: **0 axiomas**. ⚠️ Y un cero se lee como «Completitud demostrada», cuando lo que habría detrás es «completitud de un cálculo que, cuando no deriva `A`, deriva `¬A`» | ❌ |
+| **C** | pagarlo **y** escribir el aviso al lado | el cero, con el veredicto explícito. Depende de que **nadie cite la cifra sin el párrafo** | ❌ |
+
+🔑 **Lo que (A) compra**: que la cifra del censo siga significando lo que dice. `AXIOMS.md`
+existe porque *«un `sorry` es visible y un `axiom` no»*; un censo que baja a cero **comprando el
+cero con `raa`** deja de ser un censo y pasa a ser publicidad.
+
+#### Cómo queda protegida la decisión
+
+⚠️ Una decisión de **no** hacer algo es la más fácil de deshacer por accidente: el que llegue
+después ve un axioma, ve que es demostrable, y lo «arregla». Tres guardas:
+
+| dónde | qué |
+|---|---|
+| `cuarentena/Completeness.lean`, junto al `axiom` | el aviso completo **en el punto de uso**, con el footprint de las dos opciones y la orden de **reabrir ADR‑032** antes de tocarlo. ⚠️ Y sustituye al comentario que decía «requiere expandir el lenguaje con constantes», **medido FALSO** |
+| `check-axioms.bash` | `ESPERADO_CUAR=1` **rompe también si baja a 0**. El control ya protege la decisión **en los dos sentidos**, sin tocar nada |
+| `AXIOMS.md` §2.6 · `cuarentena/README.md` §9.2 | la medición, con el precio en footprints |
+
+⭐ **El control no hubo que cambiarlo**: `check-axioms.bash` compara con una cifra **exacta**, no
+con una cota. Un contador exacto convierte *«no pagar este axioma»* en algo que el build vigila.
 
 🔑 **El argumento de fondo es ADR‑024 otra vez**: `⊢` es la **herramienta**, no el **sujeto**. El
 proyecto ya retiró `goedel_second'` por esto mismo (M‑10). Comprar un cero con `raa` sería la misma
