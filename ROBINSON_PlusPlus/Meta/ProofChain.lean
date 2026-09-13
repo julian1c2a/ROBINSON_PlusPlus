@@ -124,7 +124,7 @@ theorem runFn_concat (c p s : Term) :
       exact FOL.derive_eq_trans (congr_runFn_2 (concat_nil_eq s))
         (FOL.derive_eq_symm (congr_runFn_1 (runFn_nil c)))
     · -- paso: HI a contexto cambiado
-      intro h t IH
+      intro h t; apply Minimal.Axioms.imp_intro; intro IH
       apply gen; intro c
       simp only [compProp, substFormula, substTerm, substTerms, runFn, concat,
         FOL.substTerm_liftTerm]
@@ -214,7 +214,7 @@ theorem In_mono (x c c0 : Term) (h : axioms ⊢ In x c) : axioms ⊢ In x (conca
   have key := Full.ax_list_induction (fun L => Formula.impl (In x c) (In x (concat L c)))
     (by apply Minimal.Axioms.imp_intro; intro hin
         exact Full.eq_subst_in (FOL.derive_eq_symm (concat_nil_eq c)) hin)
-    (by intro hd t IH
+    (by intro hd t; apply Minimal.Axioms.imp_intro; intro IH
         apply Minimal.Axioms.imp_intro; intro hin
         exact Full.eq_subst_in (FOL.derive_eq_symm (concat_cons_eq hd t c))
           (in_cons_tail hd (mp IH hin)))
@@ -227,7 +227,7 @@ theorem allIn_mono (c c0 L : Term) (h : axioms ⊢ allIn c L) :
   have key := Full.ax_list_induction
     (fun M => Formula.impl (allIn c M) (allIn (concat c0 c) M))
     (by apply Minimal.Axioms.imp_intro; intro _; exact allIn_nil (concat c0 c))
-    (by intro hd t IH
+    (by intro hd t; apply Minimal.Axioms.imp_intro; intro IH
         apply Minimal.Axioms.imp_intro; intro hM
         have hconj : axioms ⊢ land (In hd c) (allIn c t) := iff_mp (allIn_cons c hd t) hM
         have hIn2 : axioms ⊢ In hd (concat c0 c) :=
@@ -252,7 +252,7 @@ theorem lineOk_mono (c c0 line : Term) (h : axioms ⊢ lineOk c line) :
 theorem concat_nil_right (X : Term) : axioms ⊢ (concat X nil =eq X) := by
   have key := Full.ax_list_induction (fun L => Formula.eq (concat L nil) L)
     (concat_nil_eq nil)
-    (by intro h t IH
+    (by intro h t; apply Minimal.Axioms.imp_intro; intro IH
         exact FOL.derive_eq_trans (concat_cons_eq h t nil) (congr_cons_tail IH))
   exact key X
 
@@ -288,7 +288,7 @@ theorem In_mono_right (x M L : Term) (h : axioms ⊢ In x L) : axioms ⊢ In x (
         simp only [ax_L1_in_nil, substFormula, substTerm, substTerms, In, neg, nil, zero,
           FOL.substTerm_liftTerm] at hnotin
         exact mp FOL.Theorems.Neg.explosion_impl (mp hnotin hin))
-    (by intro hd t IH
+    (by intro hd t; apply Minimal.Axioms.imp_intro; intro IH
         apply Minimal.Axioms.imp_intro; intro hin
         have hiff : axioms ⊢ (In x (cons hd t) ⇔ lor (x =eq hd) (In x t)) := by
           have hh := spec (spec (spec (ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) hd) t
@@ -331,7 +331,7 @@ theorem runFn_weaken (c p : Term) : axioms ⊢ (runFn c p =eq concat c (runFn ni
       exact FOL.derive_eq_trans (runFn_nil c)
         (FOL.derive_eq_symm (FOL.derive_eq_trans
           (Full.eq_congr_concat_left (runFn_nil nil)) (concat_nil_right c)))
-    · intro h t IH
+    · intro h t; apply Minimal.Axioms.imp_intro; intro IH
       apply gen; intro c
       simp only [weakProp, substFormula, substTerm, substTerms, runFn, concat, nil, zero,
         FOL.substTerm_liftTerm]
@@ -405,7 +405,7 @@ theorem chainOk_concat (c p s : Term) :
         have hs : axioms ⊢ chainOk c s :=
           chainOk_subst1 (runFn_nil c) (Minimal.Axioms.and_elim_right hR)
         exact chainOk_subst2 (FOL.derive_eq_symm (concat_nil_eq s)) hs
-    · intro h t IH
+    · intro h t; apply Minimal.Axioms.imp_intro; intro IH
       apply gen; intro c
       simp [compChainProp, substFormula, substTerm, substTerms, chainOk, runFn, concat, land, iff,
         FOL.substTerm_liftTerm]
@@ -467,7 +467,7 @@ theorem chainOk_mono (c0 c p : Term) (h : axioms ⊢ chainOk c p) :
       simp [monoChainProp, substFormula, substTerm, substTerms, chainOk, concat,
         FOL.substTerm_liftTerm]
       exact Minimal.Axioms.imp_intro (fun _ => chainOk_nil (concat c0 c))
-    · intro h t IH
+    · intro h t; apply Minimal.Axioms.imp_intro; intro IH
       apply gen; intro c
       simp [monoChainProp, substFormula, substTerm, substTerms, chainOk, concat,
         FOL.substTerm_liftTerm]

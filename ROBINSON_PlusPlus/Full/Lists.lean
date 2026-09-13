@@ -53,23 +53,32 @@ inducción sobre ordinales / W-types arbitrarios.)
     Conservativo respecto a `Minimal`: en `Minimal`, ax_C3 y ax_L3 son axiomas;
     en `Full` con este meta-axioma se derivan como teoremas.
 
-⛔⛔ **AVISO M‑11 (2026‑09‑12): este `axiom` HABITA `Derives`, y con la forma MALA.**
+🏁 **CAMBIO DE FORMA — 2026‑09‑13 ([ADR‑029](../../DECISIONS.md)).**
 
-Su premisa `step` es `Γ ⊢ φ t → Γ ⊢ φ (cons h t)`: una **PREMISA‑FUNCIÓN de Lean**, que es
-exactamente la forma que hace patológico a `raa` (`FOL/MetaRules.lean`) — y su conclusión es
-`∀ L : Term`, o sea una regla infinitaria sobre términos.
+Hasta ayer la premisa `step` era **`Γ ⊢ φ t → Γ ⊢ φ (cons h t)`**: una **FUNCIÓN DE LEAN**, la
+misma forma que hace patológico a `raa`. Y con la misma consecuencia: **si `Γ ⊬ φ t`, esa función
+existe VACUAMENTE** y el axioma regalaba `∀L, Γ ⊢ φ L`. Era el único habitante de `Derives`
+**fabricado por nosotros** con esa forma.
 
-⇒ Consecuencias, las dos medidas:
- * **prohibido demostrar nada sobre `Derives` por inducción** mientras esto exista (M‑11), y
- * **mover `FOL/MetaRules` a otra relación NO limpiaría `Derives`**: este habitante es NUESTRO.
+Hoy la premisa es una **IMPLICACIÓN OBJETO** `Γ ⊢ (φ t ⇒ φ (cons h t))`:
 
-🔑 **La forma correcta de añadir una regla a una relación inductiva es un CONSTRUCTOR**, no un
-`axiom`: un `axiom` **no extiende el punto fijo, afirma una falsedad sobre él**. Aquí no se hizo
-porque `Derives` vive en el repo hermano `FOL`. Ver [ADR‑025](../../DECISIONS.md) y
-[ADR‑027](../../DECISIONS.md). -/
+| | antes | ahora |
+|---|---|---|
+| forma de `step` | `Derives → Derives` | `∀ h t : Term, Derives …` |
+| ocurrencia | **NO POSITIVA** | **POSITIVA** (como `gen`) |
+| vacuidad explotable | ⛔ **sí** | ✅ **no**: hay que derivar la implicación de verdad |
+
+⚠️ **Lo que esto NO arregla**: sigue **habitando `Derives`**, luego **M‑11 sigue en pie** — y eso
+es **permanente**, no deuda: los cuatro de `FOL/MetaRules.lean` son irreducibles. Ver
+[ADR‑029](../../DECISIONS.md) §«M‑11 sobre `Derives` es PERMANENTE».
+
+⬜ **Y por qué no se hace constructor**, ahora que la forma lo permitiría: porque **no es una regla
+lógica, es un axioma de TEORÍA**. Como constructor de `Derives` valdría en **todo** contexto,
+incluido `Γ = []` — diría que la inducción de listas es **lógicamente válida**, que es falso. Es el
+mismo argumento que [ADR‑023](../../DECISIONS.md) dio para `ax_induction`. -/
 axiom ax_list_induction {Γ : List Formula} (φ : Term → Formula)
   (base : Γ ⊢ φ nil)
-  (step : ∀ h t : Term, Γ ⊢ φ t → Γ ⊢ φ (cons h t)) :
+  (step : ∀ h t : Term, Γ ⊢ (φ t ⇒ φ (cons h t))) :
   ∀ L : Term, Γ ⊢ φ L
 
 /-! ### Helpers de congruencia para cons, concat, In
@@ -148,9 +157,10 @@ theorem concat_assoc_pointwise_prim (L M N : Term) :
       eq_congr_concat_right N h_nil_M
     exact FOL.derive_eq_trans h_lhs (eq_symm h_nil_MN)
   have step : ∀ h t : Term,
-    primAxioms ⊢ (concat (concat t M) N ≐ concat t (concat M N)) →
-    primAxioms ⊢ (concat (concat (cons h t) M) N ≐ concat (cons h t) (concat M N)) := by
-    intro h t IH
+    primAxioms ⊢ ((concat (concat t M) N ≐ concat t (concat M N)) ⇒
+                  (concat (concat (cons h t) M) N ≐ concat (cons h t) (concat M N))) := by
+    intro h t
+    apply Minimal.Axioms.imp_intro; intro IH
     -- ax_C2: ∀h t L, concat (cons h t) L = cons h (concat t L)
     have h_C2 := axp (by simp [primAxioms] : ax_C2_concat_cons ∈ primAxioms)
     -- ax_C2 inst en (h, t, M): (cons h t) ## M = cons h (t ## M)
@@ -241,9 +251,10 @@ theorem in_concat_pointwise_prim (x M L : Term) :
         intro h_in_M
         exact eq_subst_in h_M_nilM h_in_M
   have step : ∀ h t : Term,
-    primAxioms ⊢ iff (In x (concat t M)) (lor (In x t) (In x M)) →
-    primAxioms ⊢ iff (In x (concat (cons h t) M)) (lor (In x (cons h t)) (In x M)) := by
-    intro h t IH
+    primAxioms ⊢ (iff (In x (concat t M)) (lor (In x t) (In x M)) ⇒
+                  iff (In x (concat (cons h t) M)) (lor (In x (cons h t)) (In x M))) := by
+    intro h t
+    apply Minimal.Axioms.imp_intro; intro IH
     have h_C2 := axp (by simp [primAxioms] : ax_C2_concat_cons ∈ primAxioms)
     have h_L2 := axp (by simp [primAxioms] : ax_L2_in_cons ∈ primAxioms)
     -- ax_C2 inst (h, t, M): cons h t ## M = cons h (t ## M)

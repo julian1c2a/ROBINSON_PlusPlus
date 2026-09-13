@@ -61,7 +61,13 @@ proyecto; no introduce ninguna nueva.
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
 | **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
 | **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
-| **M-11** | ⛔⛔ **Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita.** Un `axiom` cuyo tipo es una aplicación de un `inductive` produce habitantes que **no son aplicaciones de constructor**; la inducción cubre los constructores, pero el teorema cuantifica sobre **todos** los habitantes ⇒ el teorema es **FALSO**. ⚠️ Es *eliminar* lo peligroso (`induction`/`cases`/`rec`), **no** *introducir*: usar los constructores para construir es seguro. ⭐ **EL CRITERIO QUE DE VERDAD SEPARA NO ES «META‑REGLA» SINO *PREMISA‑FUNCIÓN*** (2026‑09‑12,
+| **M-11** | ⛔⛔ **Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita.** Un `axiom` cuyo tipo es una aplicación de un `inductive` produce habitantes que **no son aplicaciones de constructor**; la inducción cubre los constructores, pero el teorema cuantifica sobre **todos** los habitantes ⇒ el teorema es **FALSO**. ⚠️ Es *eliminar* lo peligroso (`induction`/`cases`/`rec`), **no** *introducir*: usar los constructores para construir es seguro. ⛔⛔ **`Derives` NO ADMITIRÁ INDUCCIÓN NUNCA, y eso es PERMANENTE, no deuda** ([ADR‑029](#),
+2026‑09‑13): los cuatro de `FOL/MetaRules.lean` (`imp_intro`, `raa`, `or_elim`, `ex_elim`) son
+**irreducibles** —su premisa es una ocurrencia no positiva que el kernel rechaza—, así que siempre
+habrá habitantes‑basura. ⇒ **No se persiga limpiarlo.** El cálculo del que **sí** se puede decir
+algo por inducción es **`Prf₀`** (cero axiomas habitándolo), y es donde vive `prf0_soundness`.
+
+⭐ **EL CRITERIO QUE DE VERDAD SEPARA NO ES «META‑REGLA» SINO *PREMISA‑FUNCIÓN*** (2026‑09‑12,
 medido compilando): un `axiom` cuya premisa es `Γ ⊢ A → Γ ⊢ B` **tiene** que ser axioma —el kernel
 rechaza el `inductive`: *«has a non positive occurrence of the datatypes being declared»*—; uno cuya
 premisa sea un `Γ ⊢ …` directo o un `∀` sobre otro tipo **podría ser CONSTRUCTOR**.
@@ -2008,3 +2014,72 @@ porque `make status` lo presentaba como una salvaguarda activa.
 
 **Véase también:** `../FOL/AXIOMS.md` (el censo, reescrito), `../FOL/cuarentena/README.md`,
 `doc/AUDITORIA-FOL-2026-09-12.md` §5.
+
+---
+
+## ADR-029: `ax_list_induction` pierde su premisa‑función — y M‑11 sobre `Derives` se declara PERMANENTE
+
+**Fecha:** 2026‑09‑13 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑023, ADR‑025 (M‑11), ADR‑027, ADR‑028
+
+### 1 · El cambio de forma
+
+`ax_list_induction` (`Full/Lists.lean`) era **el único habitante de `Derives` fabricado por
+nosotros con premisa‑FUNCIÓN**:
+
+    (step : ∀ h t : Term, Γ ⊢ φ t → Γ ⊢ φ (cons h t))      ← función de Lean
+
+Misma forma que `raa`, y **misma patología**: si `Γ ⊬ φ t`, esa función existe **vacuamente** y el
+axioma regalaba `∀L, Γ ⊢ φ L`. Ahora la premisa es una **implicación OBJETO**:
+
+    (step : ∀ h t : Term, Γ ⊢ (φ t ⇒ φ (cons h t)))        ← familia indexada por Term
+
+| | antes | ahora |
+|---|---|---|
+| forma de `step` | `Derives → Derives` | `∀ h t : Term, Derives …` |
+| ocurrencia | **NO POSITIVA** | **POSITIVA**, como `gen` |
+| vacuidad explotable | ⛔ **sí** | ✅ **no** |
+| ¿shape legal de constructor? | ❌ | ✅ **verificado compilando** (recursor sin axiomas) |
+
+**Coste medido: 11 sitios**, todos con el mismo cambio de dos líneas
+(`intro h t IH` → `intro h t; apply imp_intro; intro IH`). ⭐ Y uno **se simplificó**:
+`list_induction_derives` ya tenía la implicación objeto a mano y consumía `mp e2 IH` sólo para
+readaptarla; ahora pasa `e2` directamente.
+
+⚠️ **Error de medición propio, registrado**: al planificarlo dije «3 sitios de uso real». Eran
+**11**. La cifra salió de un `grep | head -10` **truncado**, y el `head` se comió los 8 de
+`Meta/ProofChain.lean`. *Un grep truncado no es una medición.*
+
+⬜ **Por qué NO se hace constructor**, ahora que la forma lo permitiría: porque **no es una regla
+lógica, es un axioma de TEORÍA**. Como constructor de `Derives` valdría en **todo** contexto,
+incluido `Γ = []`, diciendo que la inducción de listas es **lógicamente válida** — falso. Es el
+mismo argumento de [ADR‑023](#) para `ax_induction`.
+
+### 2 · ⛔⛔ M‑11 sobre `Derives` es PERMANENTE
+
+Conviene decirlo como conclusión y no dejarlo como tarea abierta:
+
+> **`Derives` no admitirá inducción nunca.**
+
+Porque los cuatro de `FOL/MetaRules.lean` **no pueden dejar de ser axiomas**: su premisa
+`Γ ⊢ A → Γ ⊢ B` es una **ocurrencia no positiva**, y el kernel rechaza el `inductive` con todas las
+letras — *«has a non positive occurrence of the datatypes being declared»*. No es una limitación de
+nuestro diseño: es del tipo.
+
+⇒ Aunque se hicieran hipótesis los tres de RPP (como [ADR‑026](#) hizo con el ancla `Prf`),
+quedarían los cuatro. **La lista negra de `Derives` tiene un suelo de cuatro.**
+
+🔑 **Y la lectura correcta no es «hay que limpiar `Derives`»**, sino la que [ADR‑024](#) ya daba en
+otro plano: **`⊢` es la herramienta de trabajo; el cálculo del que se puede DECIR algo es `Prf₀`**,
+que tiene **cero** axiomas habitándolo y sobre el que está probado `prf0_soundness`.
+
+### Estado del censo tras esto
+
+| inductivo | habitantes‑axioma | ¿inducible? |
+|---|---|---|
+| `FOL.Derives` | **7** (4 FOL irreducibles + 3 RPP) | ⛔ **NUNCA** — suelo de 4 |
+| `Prf` | 0 desde [ADR‑026](#) | ✅ sí |
+| **`Prf₀`**, **`PrfH`** | **0** | ✅ sí |
+
+**Véase también:** `Full/Lists.lean` (el axioma y su docstring), `../FOL/AXIOMS.md` §1,
+`sondeos/AnclaSoundness.lean` (`prf0_soundness`).

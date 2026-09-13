@@ -203,7 +203,7 @@ theorem list_induction_derives (Φ : Formula) : axioms ⊢ listInductionFormula 
   refine Minimal.Axioms.gen ?_
   intro L
   refine ROBINSON_PlusPlus.Full.ax_list_induction (fun L' => substFormula 0 L' Φ) hbase ?step L
-  intro h t IH
+  intro h t
   have e2 := spec (spec hstep h) t
   have ha : substFormula 0 t (substFormula 1 (liftTerm 0 h) (liftFormula 1 Φ)) = substFormula 0 t Φ := by
     rw [subst_lift_same]
@@ -226,7 +226,9 @@ theorem list_induction_derives (Φ : Formula) : axioms ⊢ listInductionFormula 
        = Formula.impl (substFormula 0 t Φ) (substFormula 0 (cons h t) Φ)
     rw [ha, hc]
   rw [key] at e2
-  exact mp e2 IH
+  -- ⭐ 2026‑09‑13: con `ax_list_induction` pidiendo la implicación OBJETO, `e2` YA ES lo que
+  -- hace falta. Antes había que consumirla con `mp e2 IH` porque la premisa era meta.
+  exact e2
 
 /-! ### Capa clásica `Prf` -/
 
