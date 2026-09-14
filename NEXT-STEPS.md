@@ -41,8 +41,13 @@
 > 🏁 **Paso 2, primera pieza — HECHA** ([ADR‑035](DECISIONS.md), `../FOL/FOL/Rename.lean`):
 > `derives0_rename : Γ ⊢₀ f → Γ.map (renameFormula ρ) ⊢₀ renameFormula ρ f`, footprint
 > **`[propext, Quot.sound]`** — **ni `Classical.choice`**. Es la pieza que la extensión de Henkin
-> necesitaba y que sobre `Derives` estaba prohibida por M‑11. ⬜ Falta la **recíproca**
-> (conservatividad), que pedirá `ρ` inyectiva.
+> necesitaba y que sobre `Derives` estaba prohibida por M‑11.
+> 🏁 **Y la recíproca, el mismo día**: `derives0_rename_inv`, mismo footprint — sale de aplicar el
+> lema directo **a la inversa**, cuatro líneas y **cero casos**. ⭐ La conservatividad **no necesita
+> elección**; sólo la necesita «inyectiva ⇒ tiene inversa».
+> ⬜ **Pero Henkin NO está**: falta el paso de **eigenvariable** (`abstractConst`), que **no es un
+> renombrado** —manda una constante a una **variable**— y será **más caro**, porque sí toca los
+> índices.
 >
 > ⭐ Y el criterio §9 ya no es una promesa: **`check-footprints.bash`** compara **14 titulares** con
 > su footprint publicado, está en `make footprints` y en CI, y se probó **con el fallo puesto** en

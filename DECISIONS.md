@@ -2557,12 +2557,48 @@ En esta firma los dos son `String`, pero son **dos espacios de nombres distintos
 `Model.rel`), y lo que Henkin mueve son **constantes**, que son funciones de aridad cero.
 Renombrar también los relacionales confundiría los dos espacios.
 
-### 5 · ⬜ Lo que queda de esta línea
+### 5 · 🏁 La RECÍPROCA, el mismo día — y sale sin inducción nueva
 
-1. La **recíproca** — conservatividad —, que **sí** pedirá `ρ` inyectiva: de `ρΓ ⊢₀ ρφ` concluir
-   `Γ ⊢₀ φ`.
-2. Con las dos, la **extensión de Henkin de verdad** (plan §6.2), y con ella portar
-   `cuarentena/Completeness.lean` a `Derives₀`.
+    derives0_rename_inv (hσ : ∀ s, σ (ρ s) = s) :
+        Γ.map (renameFormula ρ) ⊢₀ renameFormula ρ f  →  Γ ⊢₀ f
+
+Es `derives0_rename σ` **aplicado a la inversa**, más la cancelación de las dos capas: **cuatro
+líneas, cero casos**.
+
+🔑 **Cuando una operación es funtorial y tiene inversa por un lado, su «conservatividad» es el
+mismo teorema aplicado a la inversa.** No hay que volver a inducir sobre el cálculo. ⚠️ Yo había
+anunciado la recíproca como «otra pieza» que «pedirá `ρ` inyectiva»; las dos mitades de esa frase
+resultaron equivocadas.
+
+| teorema | footprint |
+|---|---|
+| `derives0_rename` | `[propext, Quot.sound]` |
+| `derives0_rename_inv` | `[propext, Quot.sound]` ⭐ **constructivo** |
+| `derives0_rename_iff` (las dos direcciones) | `[propext, Quot.sound]` |
+| `derives0_rename_conservative` (hipótesis: **inyectividad**) | `[propext, Classical.choice, Quot.sound]` |
+
+⭐⭐ **La separación es exacta**: la conservatividad **no** necesita elección; la necesita **sólo**
+el paso *«inyectiva ⇒ tiene inversa»*, que se aísla en `invOf` dentro de una sección con
+`open Classical`. Por eso la forma buena del teorema pide **la inversa**, no la inyectividad — y en
+la construcción de Henkin la inversa **se tiene escrita**, porque el renombrado es explícito.
+
+### 6 · ⬜ Lo que sigue abierto, con nombre
+
+⚠️ **Con esto AÚN NO está la extensión de Henkin**, y conviene no confundirlo. Falta el paso de
+**eigenvariable**: de `Γ ⊢₀ φ(c)` con `c` fresca, concluir `Γ ⊢₀ ∀x φ(x)`.
+
+Eso **no es un renombrado**: manda una **constante** a una **variable**, con corrimiento de índices
+de De Bruijn bajo los binders. Es otra operación —llamémosla `abstractConst`— y otra inducción
+sobre los 21 constructores. ⚠️ Y será **más cara** que ésta, precisamente porque **sí toca las
+variables**, que es lo que hacía barato el renombrado.
+
+⇒ Lo entregado es la **mitad de extensión de lenguaje** (meter la teoría en un sublenguaje y
+traerse la contradicción de vuelta). La mitad del **testigo fresco** sigue abierta.
+
+⚠️ Y un aviso medido ayer que caerá sobre la próxima pieza: el renombrado concreto que Henkin use
+—del tipo `s ↦ "0" ++ s`— necesitará **descomponer cadenas** para su inversa, y en Lean v4.31 eso
+trae `Classical.choice` (`sondeos/ClassicalChoiceCenso.lean`). Un argumento más para la firma con
+`Nat` en vez de `String`.
 
 **Véase también:** `../FOL/FOL/Rename.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2,
 `check-footprints.bash` (que ya lo vigila).

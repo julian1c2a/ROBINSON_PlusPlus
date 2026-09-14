@@ -272,7 +272,13 @@ que hacer la construcción clásica:
    constructivo**. Los 21 casos, más las conmutaciones con `lift`, `subst`, `getAt?`, `replaceAt`
    y `LocalRule`. ⭐ Salió barato porque **el renombrado no toca las variables**, así que conmuta
    con todo; y porque `LocalRule` tiene **un solo constructor**.
-   ⬜ Falta la **recíproca** (conservatividad), que sí pedirá `ρ` **inyectiva**.
+   🏁 **Y la recíproca también** (`derives0_rename_inv`, mismo footprint `[propext, Quot.sound]`):
+   sale de aplicar el lema directo **a la inversa**, cuatro líneas y cero casos. ⭐ La
+   conservatividad **no necesita elección**; la necesita sólo el paso «inyectiva ⇒ tiene inversa».
+   ⬜ **Pero esto NO es todavía Henkin**: falta el paso de **eigenvariable** —de `Γ ⊢₀ φ(c)` con `c`
+   fresca concluir `Γ ⊢₀ ∀x φ(x)`—, que **no es un renombrado** (manda una constante a una
+   **variable**, con corrimiento de índices). Otra operación, `abstractConst`, y otra inducción; y
+   ⚠️ **más cara**, porque **sí toca las variables**.
 3. ⭐ Y sobrevive intacta la pieza limpia que ya está medida:
    `no_instance_no_body` (`sondeos/HenkinSaleDeRaa.lean`, footprint **`[propext]`**, sólo
    `intro_forall` + `elim_forall`). `Derives.intro_forall` **es la regla de la eigenvariable
