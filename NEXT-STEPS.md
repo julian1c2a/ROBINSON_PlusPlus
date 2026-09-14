@@ -19,6 +19,25 @@
 >
 > | 2c | 🔬 **`henkin_extension_lemma` MEDIDO** — y el juicio «el caro de verdad» **era falso**: sale. ⚠️⚠️ Pero pagándolo, el footprint de `completeness` cambia `henkin_extension_lemma` por **`raa`**. ✅ **DECIDIDO (A): se queda** | [ADR‑032](DECISIONS.md), `sondeos/HenkinSaleDeRaa.lean` |
 >
+> ## 🎯 FRENTE NUEVO · `doc/PLAN-COMPLETITUD-FINITISTA.md` (2026‑09‑14)
+>
+> Dos objetivos decididos: **(H)** Herbrand / disyunción finita —finitista de verdad— y **(W)**
+> completitud para `Γ` numerable/r.e. con su **reducción declarada** (≡ WKL₀, Π⁰₂‑conservativo
+> sobre PRA). ⛔ **Las dos comparten un bloqueante que va PRIMERO**: hoy no hay ningún cálculo de
+> FOL⁼ sobre el que estos teoremas signifiquen lo que dicen.
+>
+> ⭐ **Paso 0, medido**: el `inductive Derives` **pelado** ya tiene las versiones OBJETO de las
+> cuatro meta‑reglas (`sondeos/DerivesSinMetaReglas.lean`, las seis con footprint `[propext]`).
+> ⇒ `Derives₀` = 21 constructores, **cero habitantes‑axioma**, **M‑11 no aplica** — y **no toca
+> RPP**, porque sería un objeto NUEVO con encaje `Derives₀ → Derives`.
+> ⚠️⚠️ **Paso 1 es el agujero de verdad**: `derives0_soundness`. Hoy el repo tiene un cálculo cuya
+> solidez es **falsa**, y eso pesa más que no tener la completitud.
+>
+> ⛔ **El muro constructivo no es un axioma, es `String`** (`sondeos/ClassicalChoiceCenso.lean`):
+> **62 %** de las 5 045 declaraciones llevan `Classical.choice`, y la raíz son **dos líneas**
+> (`strCode`/`strCodeM` con `s.toList`). En v4.31 **todo lo que descompone un `String` lo trae**.
+> 🔑 *El footprint no distingue no‑constructividad MATEMÁTICA de deuda de IMPLEMENTACIÓN del núcleo.*
+
 > ## ⛔⛔ `henkin_extension_lemma` SE QUEDA — decisión tomada, **no es trabajo pendiente**
 >
 > **ADR‑032, opción (A), sancionada el 2026‑09‑13.** Está **medido que es demostrable**
