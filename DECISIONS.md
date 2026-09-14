@@ -2698,8 +2698,15 @@ del proyecto**; el `Classical.choice` viene sólo del `filter` (necesita `Decida
 un `S` arbitrario.
 
 🔑 La parte **matemática** del ensamblaje está hecha y es finitaria. Lo que falta es
-**combinatoria de nombres** — y pasa por `String`, o sea por `Classical.choice` del núcleo
-(`sondeos/ClassicalChoiceCenso.lean`). Estaba anunciado en ADR‑036 §5 y se cumplió.
+**combinatoria de nombres**.
+
+⚠️⚠️ **CORREGIDO el mismo día, y por medición**: aquí dije que eso sería el trozo **caro** y que
+«pasa por `String`». `sondeos/NombresFrescosMedicion.lean` lo refuta: `String.append_right_inj`
+**existe** (⇒ `ρ` inyectiva, y su prueba sale **limpia**), y `"g" ++ t ≠ "f" ++ s` **compila por
+`rfl` sobre `beq`**, así que la familia infinita de constantes frescas son **tres líneas**.
+⇒ **coste estimado ~80 líneas, riesgo bajo.** Lo que sí se sostiene: mete `Classical.choice`, pero
+por la **implementación** de `String`, no por la matemática. Ver el plan §6.4 para la tabla
+completa de lo que queda, medido y estimado por separado.
 
 ### 2 · ⭐ El punto fino que hace que esto funcione
 

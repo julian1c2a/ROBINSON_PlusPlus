@@ -295,12 +295,42 @@ contexto **levantado**.
 —«existe un `Γ` FINITO dentro de `S`»— entrega exactamente eso. *La compacidad sintáctica metida
 en la definición es lo que abarata el paso.*
 
-⬜ **Lo que queda, y NO es matemática sino combinatoria de nombres:**
-   1. **suministro de constantes frescas** para `S` arbitrario (vía `FOL.Rename` a un sublenguaje);
-   2. la **iteración ω** y la consistencia del límite (argumento del `max`);
-   3. `IsHenkin` del límite y el empalme con Lindenbaum.
-⚠️ Y (1) pasa por **descomponer cadenas** ⇒ `Classical.choice` por la vía del `String` del núcleo
-(§7). La parte matemática es finitaria; el suministro de nombres no lo será.
+### 6.4 · 📏 Lo que queda, MEDIDO (2026‑09‑14)
+
+⚠️⚠️ **Corrección**: aquí decía que el suministro de nombres era «combinatoria de nombres» y el
+trozo **caro**. **Medido, es barato** — `sondeos/NombresFrescosMedicion.lean`.
+
+**MEDIDO** (compilando):
+
+| pieza | medición |
+|---|---|
+| `ρ s := "f" ++ s` inyectiva | `String.append_right_inj` **existe**; `rho_inj` sale **limpio** `[propext, Quot.sound]` |
+| constantes fuera de la imagen | `"g" ++ t ≠ "f" ++ s` **compila por `rfl` sobre `beq`** (⚠️ verificado con control adversarial) |
+| familia infinita e inyectiva | `cst : Nat → String`, **3 líneas** |
+| ⛔ inversa computable de `++` | **NO existe** (`String.drop` da un `Slice`) — y **no hace falta**: la conservatividad pide inyectividad |
+| bloque Lindenbaum análogo | **110 líneas**; 10 usos de constructores, **todos presentes en `Derives₀`**; **cero** dependencias fuera del núcleo |
+| bloque `max_cons_*` | **121 líneas**, ídem |
+| bloque `DerivesSet_*` | **61 líneas** |
+| `cuarentena/Completeness.lean` entero | **801 líneas** |
+
+**ESTIMADO** ⬜ (y va etiquetado, que es la regla):
+
+| ítem | estimación | riesgo |
+|---|---|---|
+| (1) suministro de frescas | ~**80** líneas | **bajo** — las dos piezas duras están medidas |
+| (2) iteración ω | ~**190** líneas | ⚠️ **medio** — ver abajo |
+| (3) Lindenbaum sobre `Derives₀` + `IsHenkin` del límite | ~**200** líneas | **bajo** — calco medido |
+| **⇒ ensamblaje de Henkin** | ~**470** líneas | |
+| resto de la vía W (modelo canónico + `truth_lemma` + `completeness`) | ~**470** líneas | **bajo** — es lo que queda de las 801, y no usa nada fuera de `Derives₀` |
+
+⚠️ **El riesgo de (2), localizado**: `cₙ` tiene que ser fresca para `Sₙ ∪ {φₙ}`, y `φₙ` recorre
+**todas** las fórmulas — puede usar cualquier `cst m`. ⇒ no vale «`cₙ := cst n`»: hay que elegir
+`cₙ := cst (1 + máximo índice usado en φₙ y en los axiomas ya añadidos)`. Eso pide una función
+`Formula → Nat` («mayor índice de `cst` que aparece») y su lema, ~40 líneas. **Está identificado,
+no medido.**
+
+⚠️ Y lo que **sí** se sostiene de la afirmación vieja: el suministro mete `Classical.choice` en el
+footprint — pero por la **implementación** de `String` (§7), no por la matemática.
 ⚠️ Y ahí reaparecerá `String` (§7): el renombrado concreto necesita **descomponer cadenas** para su
 inversa, y eso trae `Classical.choice`. Las tres piezas son constructivas; el ensamblaje no lo será
 mientras los símbolos sean `String`.
