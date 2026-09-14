@@ -2602,3 +2602,78 @@ trae `Classical.choice` (`sondeos/ClassicalChoiceCenso.lean`). Un argumento más
 
 **Véase también:** `../FOL/FOL/Rename.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2,
 `check-footprints.bash` (que ya lo vigila).
+
+---
+
+## ADR-036: `derives0_gen_fresh` — el paso de EIGENVARIABLE, y con él las tres piezas de Henkin
+
+**Fecha:** 2026‑09‑14 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑033, ADR‑034, ADR‑035 · **Plan:** `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2
+
+### 1 · Qué se demuestra
+
+    derives0_gen_fresh (c) (hfresh : ∀ g ∈ Γ, ¬ occursFormula c g) :
+        Γ ⊢₀ φ  →  Γ ⊢₀ ∀ (absFormula c 0 φ)
+
+`../FOL/FOL/Eigenvariable.lean`. Footprint **`[propext, Quot.sound]`** — net‑0 puro, **sin
+`Classical.choice`**. Igual `absDerives` (el transporte, 21 casos) y `derives0_inst_fresh`.
+
+⚠️ **No se pide** que `c` no aparezca en `φ`: al revés, la gracia es que `φ` **la usa**, y
+`absFormula c 0 φ` es «`φ` con `c` convertida en la variable ligada».
+
+### 2 · ⚠️ Por qué costó más que el renombrado
+
+`FOL.Rename` manda símbolos a símbolos y **no toca las variables**; por eso conmutaba con todo
+gratis. Aquí la operación manda una **constante** a una **variable**, así que **sí** toca los
+índices de De Bruijn: al entrar en un binder, el índice sube.
+
+⇒ Las conmutaciones llevan **hipótesis de nivel**: `absTerm_lift`/`absFormula_lift` piden `j ≤ k`;
+`absTerm_subst`/`absFormula_subst` piden `v ≤ k`. Se usan con `j = 0` y `v = 0`, donde son
+triviales, **pero la inducción bajo binders las necesita generales**.
+
+⚠️ Y el `∀ k` tiene que estar **dentro** del enunciado de `absDerives`, en el motivo de la
+inducción: en `intro_forall` y `elim_ex` la hipótesis inductiva se usa a nivel `k + 1`. Con el `k`
+fijado fuera, la inducción **no cierra**.
+
+### 3 · ⚠️⚠️ El error de enunciado que cazó el compilador
+
+Escribí `abs_getAt?` y `abs_replaceAt` **a nivel constante**, copiando los de `FOL.Rename`. Son
+**FALSOS**: `getAt?`/`replaceAt` **atraviesan binders** (`Pos.body`), y `absFormula` **cambia de
+nivel** al entrar en uno. Hubo que introducir `posDepth : Pos → Nat` —cuántos `body` tiene el
+camino— y enunciarlos como
+
+    getAt? (absFormula c k f) p = (getAt? f p).map (absFormula c (k + posDepth p))
+
+🔑 **Cuando una operación depende de la profundidad, todo lo que navegue el árbol tiene que
+llevarla en el enunciado.** Es la trampa de copiar un lema de una operación que *no* dependía de
+ella.
+
+### 4 · ⭐ Por qué encaja tan bien en este cálculo
+
+`Derives₀.intro_forall` **ya es** la regla de la eigenvariable en forma de De Bruijn
+(`Γ.map (liftFormula 0) ⊢₀ A → Γ ⊢₀ ∀A`), y es un **constructor**. Lo único que faltaba era llevar
+la derivación desde «constante fresca» hasta «contexto levantado», y eso es exactamente
+`absFormula_eq_lift`: **si `c` no aparece, abstraerla ES levantar**.
+
+⇒ El teorema final son cuatro líneas sobre `absDerives`.
+
+### 5 · Estado de las tres piezas de Henkin
+
+| pieza | estado | footprint |
+|---|---|---|
+| transporte por renombrado | 🏁 ADR‑035 | `[propext, Quot.sound]` |
+| conservatividad (inversa) | 🏁 ADR‑035 | `[propext, Quot.sound]` |
+| **eigenvariable** | 🏁 **este ADR** | `[propext, Quot.sound]` |
+
+⬜ **Lo que queda es el ENSAMBLAJE, no más piezas**: construir la extensión de Henkin iterada
+—suministro de constantes frescas vía el renombrado a un sublenguaje, `S₁ := S ∪ {(∃A) → A[c_A]}`,
+iteración ω, y la consistencia de cada paso por contraposición con `derives0_gen_fresh`—, y con
+ella `henkin_extension_lemma` sobre `Derives₀`.
+
+⚠️ **Y ahí reaparecerá `String`**: el renombrado concreto («mete todo en un sublenguaje») necesita
+**descomponer cadenas** para su inversa, y en Lean v4.31 eso trae `Classical.choice`
+(`sondeos/ClassicalChoiceCenso.lean`). Las tres piezas son constructivas; el ensamblaje no lo será
+mientras los símbolos sean `String`.
+
+**Véase también:** `../FOL/FOL/Eigenvariable.lean`, `../FOL/FOL/Rename.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2, `check-footprints.bash` (20 titulares).

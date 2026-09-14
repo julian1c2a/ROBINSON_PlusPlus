@@ -45,9 +45,15 @@
 > 🏁 **Y la recíproca, el mismo día**: `derives0_rename_inv`, mismo footprint — sale de aplicar el
 > lema directo **a la inversa**, cuatro líneas y **cero casos**. ⭐ La conservatividad **no necesita
 > elección**; sólo la necesita «inyectiva ⇒ tiene inversa».
-> ⬜ **Pero Henkin NO está**: falta el paso de **eigenvariable** (`abstractConst`), que **no es un
-> renombrado** —manda una constante a una **variable**— y será **más caro**, porque sí toca los
-> índices.
+> 🏁🏁 **Y el paso de EIGENVARIABLE también** ([ADR‑036](DECISIONS.md),
+> `../FOL/FOL/Eigenvariable.lean`): `derives0_gen_fresh`, footprint `[propext, Quot.sound]`.
+> ⚠️ Ésta sí toca los índices: conmutaciones con hipótesis de nivel y el `∀ k` **dentro** del
+> motivo. ⚠️⚠️ Y el compilador cazó un enunciado mío falso — `abs_getAt?` a nivel constante, cuando
+> `getAt?` **atraviesa binders**; hizo falta `posDepth`. 🔑 *Si la operación depende de la
+> profundidad, todo lo que navegue el árbol la lleva en el enunciado.*
+>
+> ⇒ 🏁 **Las TRES piezas de Henkin están.** ⬜ Queda el **ENSAMBLAJE**, no más piezas. ⚠️ Y ahí
+> reaparecerá `String`: el renombrado concreto necesita descomponer cadenas para su inversa.
 >
 > ⭐ Y el criterio §9 ya no es una promesa: **`check-footprints.bash`** compara **14 titulares** con
 > su footprint publicado, está en `make footprints` y en CI, y se probó **con el fallo puesto** en

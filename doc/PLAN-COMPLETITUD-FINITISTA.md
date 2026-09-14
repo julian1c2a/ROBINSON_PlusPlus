@@ -275,10 +275,18 @@ que hacer la construcción clásica:
    🏁 **Y la recíproca también** (`derives0_rename_inv`, mismo footprint `[propext, Quot.sound]`):
    sale de aplicar el lema directo **a la inversa**, cuatro líneas y cero casos. ⭐ La
    conservatividad **no necesita elección**; la necesita sólo el paso «inyectiva ⇒ tiene inversa».
-   ⬜ **Pero esto NO es todavía Henkin**: falta el paso de **eigenvariable** —de `Γ ⊢₀ φ(c)` con `c`
-   fresca concluir `Γ ⊢₀ ∀x φ(x)`—, que **no es un renombrado** (manda una constante a una
-   **variable**, con corrimiento de índices). Otra operación, `abstractConst`, y otra inducción; y
-   ⚠️ **más cara**, porque **sí toca las variables**.
+   🏁 **Y el paso de EIGENVARIABLE, el mismo día** (ADR‑036, `../FOL/FOL/Eigenvariable.lean`):
+   `derives0_gen_fresh (c) (hfresh : ∀ g ∈ Γ, ¬ occursFormula c g) : Γ ⊢₀ φ → Γ ⊢₀ ∀ (absFormula c 0 φ)`,
+   footprint **`[propext, Quot.sound]`**. ⚠️ Ésta **sí** toca los índices, así que sus conmutaciones
+   llevan hipótesis de nivel (`j ≤ k`, `v ≤ k`) y el `∀ k` va **dentro** del motivo de la
+   inducción. ⭐ Encaja porque `intro_forall` **ya es** la eigenvariable en De Bruijn: lo único que
+   faltaba era el puente `absFormula_eq_lift` —*si `c` no aparece, abstraerla ES levantar*.
+
+⇒ 🏁 **Las TRES piezas de §6.2 están.** ⬜ Lo que queda es el **ENSAMBLAJE**, no más piezas:
+construir la extensión iterada y probar `henkin_extension_lemma` sobre `Derives₀`.
+⚠️ Y ahí reaparecerá `String` (§7): el renombrado concreto necesita **descomponer cadenas** para su
+inversa, y eso trae `Classical.choice`. Las tres piezas son constructivas; el ensamblaje no lo será
+mientras los símbolos sean `String`.
 3. ⭐ Y sobrevive intacta la pieza limpia que ya está medida:
    `no_instance_no_body` (`sondeos/HenkinSaleDeRaa.lean`, footprint **`[propext]`**, sólo
    `intro_forall` + `elim_forall`). `Derives.intro_forall` **es la regla de la eigenvariable
