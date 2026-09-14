@@ -2363,3 +2363,81 @@ publicó tres veces (`AXIOMS.md`, `cuarentena/README.md`, `NEXT-STEPS.md`) antes
 
 **Véase también:** `sondeos/HenkinSaleDeRaa.lean`, `../FOL/AXIOMS.md` §2.6,
 `../FOL/cuarentena/README.md` §9.2, `../FOL/cuarentena/Inconsistencia.lean`.
+
+---
+
+## ADR-033: `Derives₀` — el cálculo sobre el que la metateoría SÍ significa algo (Paso 0)
+
+**Fecha:** 2026‑09‑14 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑024 (M‑10), ADR‑025/ADR‑029 (M‑11), ADR‑032 ·
+**Plan:** `doc/PLAN-COMPLETITUD-FINITISTA.md` §3
+
+### 1 · El problema que resuelve
+
+`Derives` **no puede ser el sujeto** de ningún teorema metateórico, y las tres razones están
+medidas:
+
+1. ⛔ es **sintácticamente completo** (`raa` toma una función de Lean ⇒ lo que no prueba, lo
+   refuta) ⇒ **no es r.e.**;
+2. ⛔ **no es sólido** — `cuarentena/Inconsistencia.lean` compila `False` a partir de cualquier
+   teorema de solidez suyo;
+3. ⛔ **no admite inducción** (M‑11), y eso es **permanente**: suelo de cuatro axiomas.
+
+### 2 · La solución, y por qué es barata
+
+    inductive Derives₀ : List Formula → Formula → Prop     -- 21 constructores
+    derives0_to_derives : Γ ⊢₀ f → Γ ⊢ f
+
+Los **22** constructores de `Derives` **menos `gen_rule`**, y **sin** los cuatro axiomas de
+`MetaRules`. `FOL/Derives0.lean`, dentro del barrel `FOL` (`@[default_target]`).
+
+| medida | valor |
+|---|---|
+| `Derives₀.rec` | **`[propext]`** — cero axiomas del proyecto |
+| `derives0_to_derives` | `[propext]` |
+| habitantes‑axioma | **0** ⇒ **M‑11 no aplica** |
+| build FOL | 22 → **23 jobs** |
+| ⭐ build RPP | **145 jobs, SIN CAMBIO** |
+
+⭐ **No se pierde ninguna REGLA, sólo la fuerza META** — medido en
+`sondeos/DerivesSinMetaReglas.lean`: el inductivo pelado ya tiene `intro_impl` (que hace de
+`imp_intro` y de `raa` con `B := ⊥`), `elim_or`, `elim_ex`, `dne_rule` y `dne_schema`, las seis con
+footprint `[propext]`.
+
+⚠️ **`gen_rule` se queda fuera a propósito**: su premisa `∀ n : Term, …` es **infinitaria** (la
+ω‑regla sobre términos). Un cálculo finitario no la lleva, y la introducción de `∀` la da
+`intro_forall`, la regla de la eigenvariable con De Bruijn. ⭐ Coste cero para lo que ya hay:
+`cuarentena/Completeness.lean` usa **14** constructores distintos y **`gen_rule` no está entre
+ellos** (medido).
+
+### 3 · ⭐ Por qué NO toca ROBINSON_PlusPlus — y por qué eso importa
+
+`Derives₀` es un objeto **NUEVO**, no un reemplazo, y el puente va en **una** dirección. RPP sigue
+con `Derives`: `gen` 323 usos, los cuatro axiomas 320, los constructores 164. **Ni una cita
+cambia**, y el módulo entra por el barrel `FOL`, que RPP **no importa**.
+
+🔑 **Es mucho más barato que la «reparación de fondo»** de `../FOL/cuarentena/README.md` §8
+—partir `Derives`/`DerivesW`, priced allí como «no es una tarde»— y **da exactamente lo mismo para
+el objetivo**: un cálculo sobre el que se puede inducir.
+
+⇒ *Cuando un tipo está contaminado, a veces no hay que limpiarlo: hay que declarar al lado el que
+sí sirve, y quedarse con el viejo como herramienta.* Es ADR‑024 llevado al tipo.
+
+### 4 · ⭐ La prueba de que el paso funciona es el propio encaje
+
+`derives0_to_derives` se demuestra **por inducción sobre `Derives₀`** — veintiún casos, cada uno
+su constructor homónimo—, que sobre `Derives` sería **ilegítima**. El fichero compiló a la primera.
+
+⚠️ **La recíproca no vale, y a propósito.** La metateoría vive del lado de `Derives₀`.
+
+### 5 · ⬜ Lo que viene, en orden
+
+1. ⚠️⚠️ **`derives0_soundness : Γ ⊢₀ f → Γ ⊨ f`** — *el agujero de verdad del repo*. Hoy hay un
+   cálculo cuya solidez es **falsa**, y eso pesa más que no tener la completitud. Plantilla:
+   `prf0_soundness` (`sondeos/AnclaSoundness.lean`), net‑0 puro.
+2. El **lema de renombrado** sobre derivaciones — desbloqueado por este ADR — que es lo que hace
+   falta para la extensión de Henkin de verdad.
+3. Portar `cuarentena/Completeness.lean` a `Derives₀` y medir qué se rompe.
+
+**Véase también:** `../FOL/FOL/Derives0.lean`, `sondeos/DerivesSinMetaReglas.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §3 y §9.

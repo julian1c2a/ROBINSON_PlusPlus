@@ -2,6 +2,10 @@
 
 **Última actualización:** 2026-09-14 · **Autor:** Julián Calderón Almendros
 
+> 🏁 **PASO 0 EJECUTADO el 2026‑09‑14** (ADR‑033): `../FOL/FOL/Derives0.lean` está en el build.
+> `Derives₀.rec` mide **`[propext]`** — cero axiomas del proyecto, que es el criterio §9.
+> ⭐ Y RPP **no se movió**: sigue en 145 jobs.
+
 > ## Los dos objetivos, decididos
 >
 > | | objetivo | ¿finitista? | qué se puede publicar |
@@ -77,7 +81,7 @@ numerables es finitistamente REDUCIBLE, y su contenido finitario es Herbrand»*.
 
 ---
 
-## 3 · PASO 0 (bloqueante común) · `Derives₀`, el cálculo del que sí se puede hablar
+## 3 · 🏁 PASO 0 — **HECHO** (2026‑09‑14) · `Derives₀`, el cálculo del que sí se puede hablar
 
 ### 3.1 · Qué es
 
@@ -124,7 +128,30 @@ constructores `Derives.*` **164** (censo del 2026‑09‑12). **Ni una cita camb
 `../FOL/cuarentena/README.md` §8 (partir `Derives`/`DerivesW`), y da lo mismo para el objetivo:
 un cálculo sobre el que M‑11 no aplica.
 
-**Coste estimado ⬜ (no medido)**: ~60 líneas de inductivo + ~25 de encaje.
+### 3.5 · 🏁 Lo que se ejecutó, y lo que costó de verdad
+
+`../FOL/FOL/Derives0.lean`, dentro del barrel `FOL` (`@[default_target]`). **Compiló a la
+primera.**
+
+| medida | valor |
+|---|---|
+| `Derives₀.rec` | **`[propext]`** — cero axiomas del proyecto ⇒ criterio §9 cumplido |
+| `derives0_to_derives` | `[propext]` |
+| constructores | **21** (los 22 de `Derives` menos `gen_rule`) |
+| build FOL | 22 → **23 jobs** |
+| ⭐ build RPP | **145 jobs, sin cambio** — ni una cita tocada |
+| coste real | ~190 líneas con documentación; ~120 de código |
+
+⭐ **La prueba de que el paso funciona es el propio encaje**: `derives0_to_derives` se demuestra
+**por inducción sobre `Derives₀`**, que sobre `Derives` sería ilegítima (M‑11). Veintiún casos,
+cada uno su constructor homónimo.
+
+⚠️ La recíproca **no vale, y a propósito**: `Derives` tiene los cuatro habitantes‑axioma y la
+ω‑regla. La metateoría vive de este lado; `Derives` se queda como herramienta (ADR‑024).
+
+⭐ De paso, el catálogo de `../FOL/REFERENCE.md` listaba como **vivos** `Soundness.lean`,
+`Compacity.lean` y `Completeness.lean`, que están en `cuarentena/` desde hace dos días, y **no
+listaba** `Enumeration.lean`. Corregido.
 
 ---
 
@@ -256,7 +283,7 @@ aquí.**
 
 | | | depende de |
 |---|---|---|
-| **1** | `Derives₀` + encaje a `Derives` (§3) | — |
+| ~~**1**~~ | 🏁 ~~`Derives₀` + encaje a `Derives` (§3)~~ — **HECHO 2026‑09‑14** | — |
 | **2** | ⭐ `derives0_soundness` (§4) | 1 |
 | **3** | portar `Completeness.lean` a `Derives₀` y **medir qué se rompe** | 1 |
 | **4** | H1 + H2 (proposicional finito) | 1 |
@@ -279,7 +306,7 @@ aquí.**
 
 | hito | verde cuando |
 |---|---|
-| §3 | `Derives₀` compila, y `#print axioms` de su recursor no lista ningún axioma del proyecto |
+| §3 | 🏁 **CUMPLIDO**: `Derives₀` compila y `Derives₀.rec` mide `[propext]` — ningún axioma del proyecto |
 | §4 | `derives0_soundness` con footprint sin axiomas del proyecto, **y** un control que lo reejecuta |
 | §6 | `completeness₀` con footprint `[propext, Classical.choice, Quot.sound]` y **cero** axiomas propios, con la nota de reducción escrita al lado |
 | §5 | Herbrand con footprint **sin `Classical.choice`** para el fragmento sin `=`; con `=`, la capa de congruencia declarada aparte |
