@@ -372,9 +372,82 @@ es un axioma**. Censo con `collectAxioms` (`sondeos/ClassicalChoiceCenso.lean`):
 núcleo.** `strCode` es computable y constructiva.
 
 ⬜ **Si se quisiera de verdad**: cambiar `Term.func : String → List Term → Term` por un tipo de
-símbolos **numerable y con `DecidableEq` real** (`Nat`). Limpiaría también las 6 de
-`FOL/Enumeration.lean`. **Es un cambio de firma en FOL y toca a RPP entero: no está planificado
-aquí.**
+símbolos **numerable y con `DecidableEq` real**. Limpiaría también las 6 de
+`FOL/Enumeration.lean`. **Es un cambio de firma en FOL y toca a RPP entero.**
+
+---
+
+## 7.2 · ¿Por qué sustituirlo, y por qué? — análisis de **btw**, con su medición pendiente HECHA
+
+> ⚠️ Recogido aquí a petición del propietario. El análisis es de **btw**; lo que va marcado como
+> **MEDIDO el 2026‑09‑14** lo añade este documento, y es justamente la medición que el propio
+> análisis declaraba pendiente. Artefacto: `sondeos/SimbolosSinString.lean`.
+
+### El arreglo es más quirúrgico de lo que sugiere el 62 %
+
+Lo medido es que **`charsCode : List Char → Term` no depende de ningún axioma**, y que
+`strCode s := charsCode s.toList`. Es decir: **toda la cadena de Gödel está a una composición de
+estar limpia.** El problema no es la codificación: es **leer el `String`**.
+
+### Los tres candidatos
+
+| candidato | a favor | en contra |
+|---|---|---|
+| **`List Char`** | el **mínimo cambio**: `strCode` se convierte **literalmente en `charsCode`**, que ya está medido limpio. La descomposición es gratis (es un inductivo). Conserva la legibilidad si se añade una macro `sym!"succ"` que expanda en elaboración a `['s','u','c','c']` — el término resultante no menciona `String.toList`, así que no arrastra nada | — |
+| **`Nat`** | máximamente primitivo y **garantizado limpio** (`numeralM` y `axiomsCodeT` ya lo están); la codificación se vuelve trivial | ⚠️ los literales del corpus pasan a ser **números**, y sin una capa de `abbrev` por símbolo el libro y los mensajes de error se vuelven **ilegibles** |
+| **`Sym : Type` abstracto** con `[DecidableEq Sym]` y numerabilidad | lo principista, y hay **precedente** (el enhebrado de `AnclaEq` por ~440 firmas con el bucle build→anotar) | toca los **131 módulos** |
+
+### Lo que el tipo de símbolos tiene que cumplir
+
+| requisito | por qué |
+|---|---|
+| `DecidableEq` limpio | el `filter` de Henkin, la distinción de códigos |
+| **infinito numerable** | ⛔ Henkin necesita **infinitas constantes frescas** |
+| codificación limpia a `Term` | la cadena de Gödel |
+| literales legibles | el corpus y el libro |
+
+⚠️ **El segundo descarta un alfabeto finito** (`inductive Sym | zero | succ | …`), que sería lo más
+limpio de todo: **sin constantes frescas no hay extensión de Henkin.**
+
+### 📏 La medición que faltaba — HECHA, y sale LIMPIA
+
+El análisis decía: *«`Char` no está verificado del todo… Si eso arrastrara choice, `List Char`
+pierde la gracia. Es una medición de tres líneas, pero no está hecha.»*
+
+**MEDIDO el 2026‑09‑14** (`sondeos/SimbolosSinString.lean`, compilado):
+
+| constante | footprint |
+|---|---|
+| `Char` · `Char.val` · `Char.ofNat` · `Char.toNat` | **sin axiomas** |
+| `Char.ofNat_toNat` · `Char.isValidCharNat` | **sin axiomas** |
+| `instDecidableEqChar` | **sin axiomas** |
+| `DecidableEq (List Char)` | **sin axiomas** |
+| `charsCode` | **sin axiomas** |
+| ⛔ `strCode` · `String.toList` | `[propext, Classical.choice, Quot.sound]` |
+
+⇒ ⭐ **La recomendación queda confirmada**: `List Char` cumple los cuatro requisitos, y **`String`
+es lo único sucio de la cadena**.
+
+### ⬜ Lo que sigue sin medir, y el riesgo
+
+* **La propagación real.** El proyecto tiene el escarmiento escrito: el cierre por nombres
+  **sobreestimó por dos órdenes de magnitud**; sólo el compilador vale. **No medido.**
+* ⚠️ **Cambia `G`.** Al cambiar la representación de los símbolos cambia `strCode`, y con él
+  `formCode`, `axiomsCodeT`, `provCodeC'` y **la sentencia de Gödel**. Los teoremas son
+  paramétricos en eso y *deberían* sobrevivir, pero hay muchos **puentes por `rfl`** y
+  comparaciones de códigos que habría que re‑verificar **uno a uno**. 🔑 *Estimación, etiquetada.*
+* ⭐ **A cambio se simplifican las piezas más feas**: `CodeDistinct` y `codeNatChars_inj` usan hoy
+  `String.toList_inj` y `String.ext`; **con listas, la inyectividad es gratis**.
+
+### La lectura, y por qué NO es urgente
+
+**`List Char` es la apuesta correcta** —y la medición que la condicionaba sale limpia—: mantiene la
+legibilidad, convierte **dos `def` en uno que ya existe**, y no toca la estructura del lenguaje.
+
+⚠️ **Y no es urgente**: es una decisión de esta §7, y **sólo cambia lo que el footprint DICE, no lo
+que el proyecto ha demostrado**. `strCode` ya es computable y constructiva hoy — es
+**la regla** de que el footprint no distingue la no‑constructividad matemática de la deuda de
+implementación del núcleo.
 
 ---
 
