@@ -2441,3 +2441,73 @@ su constructor homónimo—, que sobre `Derives` sería **ilegítima**. El fiche
 
 **Véase también:** `../FOL/FOL/Derives0.lean`, `sondeos/DerivesSinMetaReglas.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §3 y §9.
+
+---
+
+## ADR-034: `derives0_soundness` — el repo tiene por fin un cálculo de FOL⁼ SÓLIDO (Paso 1)
+
+**Fecha:** 2026‑09‑14 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑024 (M‑10), ADR‑025 (M‑11), ADR‑033 ·
+**Plan:** `doc/PLAN-COMPLETITUD-FINITISTA.md` §4
+
+### 1 · Lo que se demuestra
+
+    derives0_soundness : Γ ⊢₀ f → Γ ⊨ f          -- `../FOL/FOL/Soundness0.lean`
+
+| medida | valor |
+|---|---|
+| `derives0_soundness` | `[propext, Classical.choice, Quot.sound]` — **cero axiomas del proyecto** |
+| 🏁 `derives0_consistent : ¬ ([] ⊢₀ ⊥)` | ídem |
+| 🏁🏁 `derives0_not_complete` | ídem |
+| build | FOL 23 → **24 jobs** · RPP **145, sin cambio** |
+
+⛔ **Para `Derives` esto es IMPOSIBLE**: su solidez es **falsa** y con `raa` da `False` sin
+hipótesis (`../FOL/cuarentena/Inconsistencia.lean`). Es M‑11: los cuatro axiomas **habitan** el
+tipo. `Derives₀` tiene **cero habitantes‑axioma** (ADR‑033) ⇒ la inducción es legítima ⇒ el
+teorema es de verdad.
+
+### 2 · 🏁 Los dos corolarios, que son lo que importa
+
+* **`derives0_consistent`** — la **primera prueba de consistencia de un cálculo de FOL⁼** en el
+  proyecto. Cinco líneas, con el modelo trivial sobre `Unit`.
+* ⭐⭐ **`derives0_not_complete`** — hay `A` con `[] ⊬₀ A` **y** `[] ⊬₀ ¬A`.
+  **Éste certifica que el Paso 0 sirvió para lo que tenía que servir**: `Derives` **sí** decide
+  toda fórmula (`raa` toma una función de Lean ⇒ lo que no prueba, lo refuta), y ésa es justamente
+  la patología que lo inhabilita como sujeto — completo ⇒ **no r.e.** ⇒ incumple la tercera
+  hipótesis de Gödel I (ADR‑024, **M‑10**). `Derives₀` **no** la padece, y la prueba son dos
+  modelos sobre `Unit`: todas las relaciones verdaderas / todas falsas.
+
+⇒ 🔑 **`Derives₀` es sólido, consistente y no decide todo.** Un cálculo del que se puede decir
+algo.
+
+### 3 · ⭐ Costó mucho menos de lo estimado, y la razón vale más que el ahorro
+
+Los **18 casos originales se rescataron de `../FOL/cuarentena/Soundness.lean`**. Aquella prueba
+**era correcta caso por caso** —deducción natural intuicionista, cada regla semánticamente
+válida—; lo que la invalidaba era **el tipo sobre el que inducía**, no su contenido.
+
+🔑 **Cuando un teorema cae por M‑11, su demostración suele estar bien: lo que hay que cambiar es el
+SUJETO, no la prueba.** Es el complemento exacto de M‑11, y conviene tenerlo escrito al lado:
+*un módulo en cuarentena no es un módulo equivocado; puede ser un módulo bien escrito sobre el
+objeto equivocado.*
+
+Sólo hubo que añadir **tres** casos: `dne_rule`, `dne_schema` y `forall_not_ex_not` —los
+constructores que D‑2 introdujo (ADR‑028) y que la prueba vieja no cubría—, y son los únicos que
+piden lógica clásica en el metanivel. De ahí el `Classical.choice`: legítimo, la semántica es
+clásica. ⚠️ Sin Mathlib **no hay `by_contra`**: `Classical.byContradiction` a mano.
+
+⚠️ **Y volvió a morder la trampa §12** de `feedback_lean_notation_traps`: en el enunciado de
+`derives0_not_complete`, `∧` se parsea como **`Formula.and`** y `¬` como **`neg`**. Hay que
+escribir `And` y `Not` explícitos cuando el enunciado es META y el fichero tiene la notación de
+FOL⁼ abierta.
+
+### 4 · ⬜ Lo que sigue
+
+1. Un **control** que reejecute los footprints de este módulo (criterio §9 del plan: *«y un control
+   que lo reejecuta»* — hoy sólo se imprimen en el build).
+2. El **lema de renombrado** sobre derivaciones de `Derives₀`, que desbloquea la extensión de
+   Henkin de verdad (plan §6.2).
+3. Portar `cuarentena/Completeness.lean` a `Derives₀` y medir qué se rompe (plan, orden 3).
+
+**Véase también:** `../FOL/FOL/Soundness0.lean`, `../FOL/cuarentena/Soundness.lean` (de donde
+salen los 18 casos), `doc/PLAN-COMPLETITUD-FINITISTA.md` §4.

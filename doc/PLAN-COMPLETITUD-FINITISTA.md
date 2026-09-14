@@ -2,9 +2,13 @@
 
 **Última actualización:** 2026-09-14 · **Autor:** Julián Calderón Almendros
 
-> 🏁 **PASO 0 EJECUTADO el 2026‑09‑14** (ADR‑033): `../FOL/FOL/Derives0.lean` está en el build.
-> `Derives₀.rec` mide **`[propext]`** — cero axiomas del proyecto, que es el criterio §9.
-> ⭐ Y RPP **no se movió**: sigue en 145 jobs.
+> 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
+> (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
+> `derives0_soundness : Γ ⊢₀ f → Γ ⊨ f`, footprint `[propext, Classical.choice, Quot.sound]` —
+> **cero axiomas del proyecto**.
+> ⭐⭐ Con ella salen **`derives0_consistent`** (la primera consistencia de un cálculo de FOL⁼ en
+> el proyecto) y **`derives0_not_complete`** (`Derives₀` **no** decide toda fórmula ⇒ el Paso 0
+> sirvió para lo que tenía que servir). ⭐ Y RPP **no se movió**: sigue en 145 jobs.
 
 > ## Los dos objetivos, decididos
 >
@@ -155,7 +159,7 @@ listaba** `Enumeration.lean`. Corregido.
 
 ---
 
-## 4 · PASO 1 · La solidez, **antes** que la completitud
+## 4 · 🏁 PASO 1 — **HECHO** (2026‑09‑14) · La solidez, **antes** que la completitud
 
     derives0_soundness : Derives₀ Γ f → Γ ⊨ f
 
@@ -167,8 +171,36 @@ plantilla está escrita: `prf0_soundness` hizo exactamente esto para `Prf₀`, n
 cuya solidez es **falsa**; eso pesa más que no tener la completitud. Y sin solidez, una completitud
 no dice nada: `⊢₀ f ↔ Γ ⊨ f` sólo tiene contenido con las **dos** direcciones.
 
-**Coste estimado ⬜**: la parte semántica está hecha; el trabajo es el caso a caso de 21
-constructores, con `intro_forall`/`elim_ex` como los caros (lifting y entornos).
+### 4.1 · 🏁 Lo que se ejecutó
+
+`../FOL/FOL/Soundness0.lean`, en el build.
+
+| medida | valor |
+|---|---|
+| `derives0_soundness` | `[propext, Classical.choice, Quot.sound]` — **cero axiomas del proyecto** ⇒ criterio §9 cumplido |
+| 🏁 `derives0_consistent : ¬ ([] ⊢₀ ⊥)` | ídem — **la primera consistencia de un cálculo de FOL⁼ en el proyecto** |
+| 🏁🏁 `derives0_not_complete` | ídem — hay `A` con `[] ⊬₀ A` y `[] ⊬₀ ¬A` |
+| build FOL | 23 → **24 jobs** · RPP **145, sin cambio** |
+
+⭐⭐ **`derives0_not_complete` es el que certifica el Paso 0.** `Derives` **sí** es sintácticamente
+completo —`raa` toma una función de Lean ⇒ lo que no prueba, lo refuta—, y ésa es la patología que
+lo inhabilita como sujeto (ADR‑024, M‑10: completo ⇒ **no r.e.**). `Derives₀` **no lo es**, y la
+prueba son dos modelos sobre `Unit`: uno con todas las relaciones verdaderas y otro con todas
+falsas.
+
+⇒ 🔑 **`Derives₀` es sólido, consistente y no decide todo.** Es un cálculo del que se puede decir
+algo — que es exactamente lo que este plan necesitaba de §3 y §4.
+
+⭐ **Y costó mucho menos de lo estimado**, por una razón que conviene guardar: los **18 casos
+originales se rescataron de `../FOL/cuarentena/Soundness.lean`**. Aquella prueba **era correcta
+caso por caso** —deducción natural intuicionista, cada regla semánticamente válida—; lo que la
+invalidaba era **el tipo sobre el que inducía**. 🔑 *Cuando un teorema cae por M‑11, su
+demostración suele estar bien: lo que hay que cambiar es el sujeto.*
+
+Sólo hubo que escribir **tres** casos nuevos (`dne_rule`, `dne_schema`, `forall_not_ex_not`,
+constructores desde D‑2), que son los únicos que piden lógica clásica en el metanivel
+(`Classical.byContradiction`; ⚠️ sin Mathlib **no hay `by_contra`**). De ahí el `Classical.choice`
+del footprint: legítimo y esperado, la semántica es clásica.
 
 ---
 
@@ -284,7 +316,7 @@ aquí.**
 | | | depende de |
 |---|---|---|
 | ~~**1**~~ | 🏁 ~~`Derives₀` + encaje a `Derives` (§3)~~ — **HECHO 2026‑09‑14** | — |
-| **2** | ⭐ `derives0_soundness` (§4) | 1 |
+| ~~**2**~~ | 🏁 ~~`derives0_soundness` (§4)~~ — **HECHO 2026‑09‑14** | 1 |
 | **3** | portar `Completeness.lean` a `Derives₀` y **medir qué se rompe** | 1 |
 | **4** | H1 + H2 (proposicional finito) | 1 |
 | **5** | Henkin real (§6.2) | 1, 2 |
@@ -307,7 +339,7 @@ aquí.**
 | hito | verde cuando |
 |---|---|
 | §3 | 🏁 **CUMPLIDO**: `Derives₀` compila y `Derives₀.rec` mide `[propext]` — ningún axioma del proyecto |
-| §4 | `derives0_soundness` con footprint sin axiomas del proyecto, **y** un control que lo reejecuta |
+| §4 | 🏁 **CUMPLIDO**: `derives0_soundness` mide `[propext, Classical.choice, Quot.sound]` — cero axiomas del proyecto. ⬜ Falta el control que lo reejecute |
 | §6 | `completeness₀` con footprint `[propext, Classical.choice, Quot.sound]` y **cero** axiomas propios, con la nota de reducción escrita al lado |
 | §5 | Herbrand con footprint **sin `Classical.choice`** para el fragmento sin `=`; con `=`, la capa de congruencia declarada aparte |
 

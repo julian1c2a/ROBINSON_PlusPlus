@@ -30,8 +30,13 @@
 > `Derives₀`, 21 constructores, **cero habitantes‑axioma** ⇒ **M‑11 no aplica**. `Derives₀.rec`
 > mide **`[propext]`**. ⭐ Y **RPP no se movió**: 145 jobs, ni una cita tocada. La prueba de que
 > funciona es el encaje `derives0_to_derives`, que es **él mismo una inducción sobre `Derives₀`**.
-> ⚠️⚠️ **Paso 1 es el agujero de verdad**: `derives0_soundness`. Hoy el repo tiene un cálculo cuya
-> solidez es **falsa**, y eso pesa más que no tener la completitud.
+> 🏁🏁 **Paso 1 — HECHO el mismo día** ([ADR‑034](DECISIONS.md), `../FOL/FOL/Soundness0.lean`):
+> `derives0_soundness : Γ ⊢₀ f → Γ ⊨ f`, footprint `[propext, Classical.choice, Quot.sound]` —
+> **cero axiomas del proyecto**. ⭐⭐ Con ella, **`derives0_consistent`** (primera consistencia de un
+> cálculo de FOL⁼ aquí) y **`derives0_not_complete`** (`Derives₀` **no** decide toda fórmula ⇒ el
+> Paso 0 sirvió). ⭐ Costó poco porque **los 18 casos se rescataron de `cuarentena/Soundness.lean`**:
+> 🔑 *cuando un teorema cae por M‑11, su prueba suele estar bien — lo que hay que cambiar es el
+> SUJETO.*
 >
 > ⛔ **El muro constructivo no es un axioma, es `String`** (`sondeos/ClassicalChoiceCenso.lean`):
 > **62 %** de las 5 045 declaraciones llevan `Classical.choice`, y la raíz son **dos líneas**
