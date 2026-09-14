@@ -282,8 +282,25 @@ que hacer la construcción clásica:
    inducción. ⭐ Encaja porque `intro_forall` **ya es** la eigenvariable en De Bruijn: lo único que
    faltaba era el puente `absFormula_eq_lift` —*si `c` no aparece, abstraerla ES levantar*.
 
-⇒ 🏁 **Las TRES piezas de §6.2 están.** ⬜ Lo que queda es el **ENSAMBLAJE**, no más piezas:
-construir la extensión iterada y probar `henkin_extension_lemma` sobre `Derives₀`.
+⇒ 🏁 **Las tres piezas de §6.2 están** — y el ensamblaje descubrió una cuarta, `derives0_lift`
+(`../FOL/FOL/Lift0.lean`), porque `∃A` contra `∀¬A` pasa por `elim_ex` y su premisa vive en el
+contexto **levantado**.
+
+🏁🏁 **Y el CORAZÓN del ensamblaje está probado** (ADR‑037, `../FOL/FOL/Henkin0.lean`):
+
+    henkin_step_consistent : IsConsistent₀ S → (c fresca en S y en A) →
+        IsConsistent₀ (S ∪ { (∃A) → A[c] })
+
+⭐ **El punto fino**: `derives0_gen_fresh` pide `c` fresca en el **contexto finito**, y `⊢₀*`
+—«existe un `Γ` FINITO dentro de `S`»— entrega exactamente eso. *La compacidad sintáctica metida
+en la definición es lo que abarata el paso.*
+
+⬜ **Lo que queda, y NO es matemática sino combinatoria de nombres:**
+   1. **suministro de constantes frescas** para `S` arbitrario (vía `FOL.Rename` a un sublenguaje);
+   2. la **iteración ω** y la consistencia del límite (argumento del `max`);
+   3. `IsHenkin` del límite y el empalme con Lindenbaum.
+⚠️ Y (1) pasa por **descomponer cadenas** ⇒ `Classical.choice` por la vía del `String` del núcleo
+(§7). La parte matemática es finitaria; el suministro de nombres no lo será.
 ⚠️ Y ahí reaparecerá `String` (§7): el renombrado concreto necesita **descomponer cadenas** para su
 inversa, y eso trae `Classical.choice`. Las tres piezas son constructivas; el ensamblaje no lo será
 mientras los símbolos sean `String`.

@@ -34,6 +34,9 @@ FOL.Rename.derives0_rename_conservative|Classical.choice,Quot.sound,propext
 FOL.Eigenvariable.absDerives|Quot.sound,propext
 FOL.Eigenvariable.derives0_gen_fresh|Quot.sound,propext
 FOL.Eigenvariable.derives0_inst_fresh|Quot.sound,propext
+FOL.Lift0.derives0_lift|Quot.sound,propext
+FOL.Lift0.derives0_ex_forall_neg_absurd|Quot.sound,propext
+FOL.Henkin0.henkin_step_consistent|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

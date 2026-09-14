@@ -2677,3 +2677,71 @@ mientras los símbolos sean `String`.
 
 **Véase también:** `../FOL/FOL/Eigenvariable.lean`, `../FOL/FOL/Rename.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2, `check-footprints.bash` (20 titulares).
+
+---
+
+## ADR-037: `henkin_step_consistent` — el corazón de Henkin, probado; el ensamblaje, NO
+
+**Fecha:** 2026‑09‑14 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑033..036 · **Plan:** `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2
+
+### 1 · Qué se demuestra, y qué NO
+
+    henkin_step_consistent : IsConsistent₀ S → (c fresca en S y en A) →
+        IsConsistent₀ (S ∪ { (∃A) → A[c] })
+
+`../FOL/FOL/Henkin0.lean`. Footprint `[propext, Classical.choice, Quot.sound]` — **cero axiomas
+del proyecto**; el `Classical.choice` viene sólo del `filter` (necesita `DecidableEq Formula`).
+
+⚠️⚠️ **Y digo lo que NO está, antes que lo que sí**: esto **no** es `henkin_extension_lemma`. Es
+**el paso**. Falta la **iteración ω** y, sobre todo, el **suministro de constantes frescas** para
+un `S` arbitrario.
+
+🔑 La parte **matemática** del ensamblaje está hecha y es finitaria. Lo que falta es
+**combinatoria de nombres** — y pasa por `String`, o sea por `Classical.choice` del núcleo
+(`sondeos/ClassicalChoiceCenso.lean`). Estaba anunciado en ADR‑036 §5 y se cumplió.
+
+### 2 · ⭐ El punto fino que hace que esto funcione
+
+`derives0_gen_fresh` pide `c` fresca **en el contexto finito**, no en todo `S`. Y `DerivesSet₀`
+—«existe un `Γ` FINITO dentro de `S` que deriva»— **entrega exactamente eso**.
+
+⇒ 🔑 **La compacidad sintáctica metida en la definición de `⊢₀*` es lo que hace barato el paso.**
+Es la misma observación que explicaba por qué `IsConsistent` es Π⁰₁ y no peor.
+
+### 3 · La pieza que el ensamblaje descubrió: `derives0_lift`
+
+Al escribir el paso 6 —`∃A` y `∀¬A` se contradicen— apareció un agujero estructural. En un cálculo
+**finitario** esa contradicción pasa obligatoriamente por `elim_ex`, cuya premisa lateral vive en
+el contexto **levantado** `A :: Γ.map (liftFormula 0)`. Había que llevar allí el `∀(¬A)`.
+
+⇒ `FOL/Lift0.lean`: **`derives0_lift : Γ ⊢₀ φ → ∀ k, Γ.map (liftFormula k) ⊢₀ liftFormula k φ`**,
+footprint `[propext, Quot.sound]`, más `substFormula_lift_var` (el lift se deshace sustituyendo la
+variable por sí misma) y `derives0_ex_forall_neg_absurd`.
+
+⚠️ **Nota de ingeniería, escrita a propósito**: `Lift0` es casi una copia de `Eigenvariable`
+—`absTerm c k` coincide con `liftTerm k` salvo en `c`—. Un `absTerm'` parametrizado por un
+**predicado** de símbolos daría los dos con una sola inducción. ⬜ **No se hizo, y por riesgo, no
+por gusto**: `Eigenvariable` ya está compilado y vigilado por `check-footprints.bash`; el refactor
+va **después** de cerrar el ensamblaje, no en medio.
+
+### 4 · Estado del Paso 2 del plan
+
+| pieza | ADR | footprint |
+|---|---|---|
+| transporte por renombrado | 035 | `[propext, Quot.sound]` |
+| conservatividad | 035 | `[propext, Quot.sound]` |
+| eigenvariable | 036 | `[propext, Quot.sound]` |
+| debilitamiento bajo lift | **037** | `[propext, Quot.sound]` |
+| **paso de Henkin** | **037** | `[propext, Classical.choice, Quot.sound]` |
+
+⬜ **Lo que queda, con nombre:**
+
+1. **Suministro de constantes frescas** — para `S` arbitrario hace falta meterlo en un sublenguaje
+   con `FOL.Rename` y quedarse con los símbolos del complemento. ⚠️ Combinatoria de `String`.
+2. **Iteración ω** — `S₀ := S`, `S_{n+1} := S_n ∪ {henkinAx cₙ φₙ}` con `cₙ` fresca, y la
+   consistencia del límite por el argumento del `max` (como `lindenbaum_limit_bound`).
+3. **`IsHenkin` del límite** y el empalme con Lindenbaum.
+
+**Véase también:** `../FOL/FOL/Henkin0.lean`, `../FOL/FOL/Lift0.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2.

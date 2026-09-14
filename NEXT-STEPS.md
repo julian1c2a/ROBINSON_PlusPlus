@@ -52,8 +52,17 @@
 > `getAt?` **atraviesa binders**; hizo falta `posDepth`. 🔑 *Si la operación depende de la
 > profundidad, todo lo que navegue el árbol la lleva en el enunciado.*
 >
-> ⇒ 🏁 **Las TRES piezas de Henkin están.** ⬜ Queda el **ENSAMBLAJE**, no más piezas. ⚠️ Y ahí
-> reaparecerá `String`: el renombrado concreto necesita descomponer cadenas para su inversa.
+> 🏁🏁 **Y el CORAZÓN del ensamblaje, probado** ([ADR‑037](DECISIONS.md), `../FOL/FOL/Henkin0.lean`):
+> `henkin_step_consistent` — añadir el testigo con constante fresca **preserva la consistencia**.
+> ⭐ El punto fino: `derives0_gen_fresh` pide frescura en el **contexto FINITO**, y `⊢₀*` entrega
+> exactamente eso. *La compacidad metida en la definición es lo que abarata el paso.*
+> ⭐ El ensamblaje descubrió además una pieza estructural que faltaba: **`derives0_lift`**
+> (`FOL/Lift0.lean`), porque `∃A` contra `∀¬A` pasa por `elim_ex` y su premisa vive en el contexto
+> levantado.
+>
+> ⬜ **Lo que queda NO es matemática, es combinatoria de nombres**: suministro de constantes
+> frescas para `S` arbitrario, iteración ω, y el empalme con Lindenbaum. ⚠️ Y (1) pasa por
+> descomponer cadenas ⇒ `Classical.choice` del núcleo. Estaba anunciado y se cumplió.
 >
 > ⭐ Y el criterio §9 ya no es una promesa: **`check-footprints.bash`** compara **14 titulares** con
 > su footprint publicado, está en `make footprints` y en CI, y se probó **con el fallo puesto** en
