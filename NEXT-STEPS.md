@@ -4,7 +4,58 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑13 · `master` · ✅ ÁRBOL VERDE (145 jobs) · **3 `axiom` de Lean** (ADR‑026 + Ax‑P retirado)**
+**Estado 2026‑09‑14 · `master` · ✅ ÁRBOL VERDE (145 jobs · FOL 28) · **3 `axiom` de Lean****
+
+> # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑14 — LEER ESTO PRIMERO
+>
+> ## 🏁 Lo HECHO hoy, y todo está commiteado y subido
+>
+> | | qué | dónde |
+> |---|---|---|
+> | 1 | 🔬 **Censo de `Classical.choice`** en los dos repos: **3 143 / 5 045**. ⭐ Dos causas: una **mecánica** (arreglada: FOL **26 → 16**) y una **irreducible** (`String`) | `sondeos/ClassicalChoiceCenso.lean` |
+> | 2 | 📄 **`doc/PLAN-COMPLETITUD-FINITISTA.md`** — dos objetivos (**H** Herbrand, **W** reducible ≡ WKL₀) y el bloqueante común | el plan |
+> | 3 | 🏁 **Paso 0 · `Derives₀`** — 21 constructores, **cero habitantes‑axioma** ⇒ **M‑11 no aplica** | [ADR‑033](DECISIONS.md) |
+> | 4 | 🏁🏁 **Paso 1 · `derives0_soundness`**, y con ella **`derives0_consistent`** (⭐ primera consistencia de un cálculo de FOL⁼ del proyecto) y **`derives0_not_complete`** | [ADR‑034](DECISIONS.md) |
+> | 5 | ⭐ **`check-footprints.bash`** — **23 titulares**, en `make footprints` y en CI, **probado con el fallo puesto** en dos modos | criterio §9 |
+> | 6 | 🏁 **`derives0_rename`** y su **conservatividad** (⭐ sale de aplicar el directo **a la inversa**: cuatro líneas) | [ADR‑035](DECISIONS.md) |
+> | 7 | 🏁 **`derives0_gen_fresh`** — el paso de **eigenvariable** | [ADR‑036](DECISIONS.md) |
+> | 8 | 🏁🏁 **`henkin_step_consistent`** — el **corazón** de Henkin. Más `derives0_lift`, que el ensamblaje descubrió | [ADR‑037](DECISIONS.md) |
+> | 9 | 📏 **Medido lo que queda** del ensamblaje (§6.4 del plan) y el análisis de **btw** sobre sustituir `String` (§7.2), con su medición pendiente **hecha** | `sondeos/NombresFrescosMedicion.lean`, `SimbolosSinString.lean` |
+>
+> ## ▶ POR DÓNDE SEGUIR
+>
+> **`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4** — lleva la tabla **medido / estimado** de las tres
+> piezas que faltan del ensamblaje, con el riesgo **localizado**:
+>
+> 1. **suministro de constantes frescas** (~80 l., riesgo **bajo**: las dos piezas duras están medidas);
+> 2. **iteración ω** (~190 l., ⚠️ riesgo **medio** — `cₙ` debe ser fresca también para `φₙ`, así que
+>    **no vale `cₙ := cst n`**: hace falta `Formula → Nat` «mayor índice usado», ~40 l.);
+> 3. **Lindenbaum sobre `Derives₀` + `IsHenkin`** (~200 l., riesgo **bajo**: calco medido de 110+121+61 líneas).
+>
+> ⬜ Y después, el resto de la vía W (~470 l., calco de lo que queda de las 801 de `Completeness`).
+>
+> ## ⚠️ LO QUE NO HAY QUE HACER
+>
+> * ⛔ **No migrar `String` → `List Char` todavía.** Está **PROYECTADO, no pendiente** (plan §7.3):
+>   cambia `G`, así que hacerlo en medio del ensamblaje obligaría a re‑verificar los puentes por
+>   `rfl` **dos veces**.
+> * ⛔ **No pagar `henkin_extension_lemma` en `Derives`** (ADR‑032, opción A; el control rompe).
+> * ⛔ **No inducir sobre `Derives`** — M‑11 es permanente.
+> * ⬜ **No refactorizar `Lift0`/`Eigenvariable`** en uno parametrizado hasta cerrar el ensamblaje
+>   (ADR‑037 §3): `Eigenvariable` ya está vigilado por `check-footprints`.
+>
+> ## 🔑 Las cuatro lecciones del día
+>
+> 1. **El footprint no distingue la no‑constructividad MATEMÁTICA de la deuda de IMPLEMENTACIÓN del
+>    núcleo.** `strCode` es computable; su `choice` viene de `String`.
+> 2. **El footprint de una táctica automática depende del ENTORNO de imports** — el mismo `by omega`
+>    sale sucio con `import FOL.FOL` y limpio con `import ROBINSON_PlusPlus`.
+> 3. **Cuando un teorema cae por M‑11, su prueba suele estar bien: lo que hay que cambiar es el
+>    SUJETO.** Los 18 casos de la solidez salieron de `cuarentena/Soundness.lean`.
+> 4. ⚠️⚠️ **Cuatro estimaciones mías refutadas hoy por medición** — «el caro de verdad», «la
+>    recíproca pedirá inyectividad», la regla sobre `omega`, y «el suministro de nombres es caro».
+>    🔑 *Una estimación sin etiqueta es una medición falsa*, y hoy la regla se cobró cuatro veces.
+
 
 > # 🗓️ 2026‑09‑13 — lo hecho hoy, antes del bloque de ayer
 >

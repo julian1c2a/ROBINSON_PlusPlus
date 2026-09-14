@@ -449,6 +449,26 @@ que el proyecto ha demostrado**. `strCode` ya es computable y constructiva hoy �
 **la regla** de que el footprint no distingue la no‑constructividad matemática de la deuda de
 implementación del núcleo.
 
+### 7.3 · ✅ Decisión: **PROYECTADO**, no pendiente (2026‑09‑14)
+
+Sanción del propietario: *«lo proyectamos para cuando termines el trabajo más inmediato y todo esté
+más limpio»*.
+
+⇒ ⛔ **Esto NO es trabajo pendiente y no debe aparecer como tal.** Es una migración **decidida en
+principio** (`List Char`, confirmada por medición) y **aplazada a propósito**, con dos condiciones
+explícitas:
+
+| condición | estado |
+|---|---|
+| cerrar el **trabajo inmediato** — el ensamblaje de Henkin (§6.4) y la vía W | ⬜ en curso |
+| que el árbol esté **más limpio** | ⬜ |
+
+⚠️ **Y una razón técnica para que sea en ese orden, no en otro**: la migración **cambia `G`**
+(§7.2), así que hacerla **en medio** del ensamblaje obligaría a re‑verificar los puentes por `rfl`
+**dos veces**. Primero se cierra, después se migra.
+
+🔑 Lo que se gana esperando no es comodidad: es **no pagar dos veces la misma re‑verificación**.
+
 ---
 
 ## 8 · Orden de trabajo, y qué NO hacer
