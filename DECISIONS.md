@@ -2513,3 +2513,56 @@ FOL⁼ abierta.
 
 **Véase también:** `../FOL/FOL/Soundness0.lean`, `../FOL/cuarentena/Soundness.lean` (de donde
 salen los 18 casos), `doc/PLAN-COMPLETITUD-FINITISTA.md` §4.
+
+---
+
+## ADR-035: `derives0_rename` — la pieza que Henkin necesitaba, y es CONSTRUCTIVA
+
+**Fecha:** 2026‑09‑14 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑033, ADR‑034 · **Plan:** `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2
+
+### 1 · Qué se demuestra
+
+    derives0_rename (ρ : String → String) :
+        Γ ⊢₀ f  →  Γ.map (renameFormula ρ) ⊢₀ renameFormula ρ f
+
+`../FOL/FOL/Rename.lean`, en el build. Footprint **`[propext, Quot.sound]`** — ⭐ **ni siquiera
+`Classical.choice`**: el renombrado es **puramente constructivo**.
+
+### 2 · Por qué hacía falta
+
+Es **la pieza que la extensión de Henkin necesita**. La construcción clásica añade testigos
+`(∃A) → A[c]` con `c` fresca, y la consistencia de cada paso se prueba por contraposición: de una
+derivación que usa `c` hay que fabricar otra que no la use. Eso es **transformar una derivación**.
+
+⛔ Sobre `Derives` es **ilegítimo** (M‑11). ✅ Sobre `Derives₀` (ADR‑033) es trabajo ordinario.
+🔑 **Es el primer rendimiento concreto del Paso 0**, y confirma que la inversión estaba bien hecha.
+
+### 3 · ⭐ Por qué salió barato
+
+| | |
+|---|---|
+| **el renombrado no toca las variables** | conmuta con `liftTerm`/`substTerm` sin capturas — es mucho más barato que una sustitución |
+| `LocalRule` tiene **un solo constructor** | el caso `rewrite_at`, que parecía el caro, son tres líneas |
+| `ρ` **no** necesita ser inyectiva | para esta dirección, un renombrado cualquiera transporta derivaciones |
+
+Lemas previos: `rename_liftTerm`/`_liftTerms`/`_liftFormula`, `rename_substTerm`/`_substTerms`/
+`_substFormula`, `rename_getAt?`, `rename_replaceAt`, `rename_localRule`, `map_rename_lift`.
+Y `rename_neg` sale por **`rfl`**.
+
+### 4 · ⚠️ Una decisión de diseño que conviene tener escrita
+
+**Sólo se renombran símbolos de FUNCIÓN**; los de relación (`Formula.atom p ts`) quedan intactos.
+En esta firma los dos son `String`, pero son **dos espacios de nombres distintos** (`Model.func` y
+`Model.rel`), y lo que Henkin mueve son **constantes**, que son funciones de aridad cero.
+Renombrar también los relacionales confundiría los dos espacios.
+
+### 5 · ⬜ Lo que queda de esta línea
+
+1. La **recíproca** — conservatividad —, que **sí** pedirá `ρ` inyectiva: de `ρΓ ⊢₀ ρφ` concluir
+   `Γ ⊢₀ φ`.
+2. Con las dos, la **extensión de Henkin de verdad** (plan §6.2), y con ella portar
+   `cuarentena/Completeness.lean` a `Derives₀`.
+
+**Véase también:** `../FOL/FOL/Rename.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2,
+`check-footprints.bash` (que ya lo vigila).

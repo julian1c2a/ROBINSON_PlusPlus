@@ -38,6 +38,16 @@
 > 🔑 *cuando un teorema cae por M‑11, su prueba suele estar bien — lo que hay que cambiar es el
 > SUJETO.*
 >
+> 🏁 **Paso 2, primera pieza — HECHA** ([ADR‑035](DECISIONS.md), `../FOL/FOL/Rename.lean`):
+> `derives0_rename : Γ ⊢₀ f → Γ.map (renameFormula ρ) ⊢₀ renameFormula ρ f`, footprint
+> **`[propext, Quot.sound]`** — **ni `Classical.choice`**. Es la pieza que la extensión de Henkin
+> necesitaba y que sobre `Derives` estaba prohibida por M‑11. ⬜ Falta la **recíproca**
+> (conservatividad), que pedirá `ρ` inyectiva.
+>
+> ⭐ Y el criterio §9 ya no es una promesa: **`check-footprints.bash`** compara **14 titulares** con
+> su footprint publicado, está en `make footprints` y en CI, y se probó **con el fallo puesto** en
+> los dos modos. 🔑 *Un `info:` en medio de 145 jobs no es un control.*
+>
 > ⛔ **El muro constructivo no es un axioma, es `String`** (`sondeos/ClassicalChoiceCenso.lean`):
 > **62 %** de las 5 045 declaraciones llevan `Classical.choice`, y la raíz son **dos líneas**
 > (`strCode`/`strCodeM` con `s.toList`). En v4.31 **todo lo que descompone un `String` lo trae**.

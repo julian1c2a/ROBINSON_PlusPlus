@@ -267,6 +267,12 @@ que hacer la construcción clásica:
 2. La consistencia de cada paso se prueba por **contraposición**, y ahí hace falta el
    **lema de renombrado sobre derivaciones** (`Γ ⊢₀ φ → ρΓ ⊢₀ ρφ`) — es **inducción sobre la
    derivación**, ⭐ **desbloqueada por el Paso 0**.
+   🏁 **HECHO el 2026‑09‑14** (ADR‑035): `../FOL/FOL/Rename.lean`, `derives0_rename`, footprint
+   **`[propext, Quot.sound]`** — *ni siquiera `Classical.choice`*: el renombrado es **puramente
+   constructivo**. Los 21 casos, más las conmutaciones con `lift`, `subst`, `getAt?`, `replaceAt`
+   y `LocalRule`. ⭐ Salió barato porque **el renombrado no toca las variables**, así que conmuta
+   con todo; y porque `LocalRule` tiene **un solo constructor**.
+   ⬜ Falta la **recíproca** (conservatividad), que sí pedirá `ρ` **inyectiva**.
 3. ⭐ Y sobrevive intacta la pieza limpia que ya está medida:
    `no_instance_no_body` (`sondeos/HenkinSaleDeRaa.lean`, footprint **`[propext]`**, sólo
    `intro_forall` + `elim_forall`). `Derives.intro_forall` **es la regla de la eigenvariable
