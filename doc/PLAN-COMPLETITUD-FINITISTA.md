@@ -339,12 +339,18 @@ aquí.**
 | hito | verde cuando |
 |---|---|
 | §3 | 🏁 **CUMPLIDO**: `Derives₀` compila y `Derives₀.rec` mide `[propext]` — ningún axioma del proyecto |
-| §4 | 🏁 **CUMPLIDO**: `derives0_soundness` mide `[propext, Classical.choice, Quot.sound]` — cero axiomas del proyecto. ⬜ Falta el control que lo reejecute |
+| §4 | 🏁 **CUMPLIDO del todo**: `derives0_soundness` mide `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **y `check-footprints.bash` lo reejecuta** (13 titulares, en CI, probado con el fallo puesto) |
 | §6 | `completeness₀` con footprint `[propext, Classical.choice, Quot.sound]` y **cero** axiomas propios, con la nota de reducción escrita al lado |
 | §5 | Herbrand con footprint **sin `Classical.choice`** para el fragmento sin `=`; con `=`, la capa de congruencia declarada aparte |
 
 ⚠️ Y el de siempre: **un verde no es haber comprobado**. Cada hito entra con su control, y el
 control se prueba **con el fallo puesto**.
+
+⭐ **El control de esta columna ya existe**: `check-footprints.bash` (raíz de RPP, en el `Makefile`
+como `make footprints` y en CI). Compara **13 titulares** de los dos repos con su footprint
+publicado y **rompe** si no cuadra. Probado en los dos modos de fallo: footprint distinto
+(`✗ … dice […], esperado […]`) y declaración ausente (`✗ … NO MEDIDO`), los dos con `EXIT=1`.
+🔑 *Un `info:` en medio de 145 jobs no es un control: nadie lo lee y, si cambia, no rompe nada.*
 
 ---
 

@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: build clean rebuild sorry status lock unlock list init new help
+.PHONY: footprints build clean rebuild sorry status lock unlock list init new help
 
 ## Build the project
 build:
@@ -22,6 +22,11 @@ sorry:
 ## Comprueba que la documentacion cuadra con el codigo (AI-GUIDE §27)
 docsync:
 	@bash check-doc-sync.bash
+
+## Footprints de los titulares (criterio §9 de doc/PLAN-COMPLETITUD-FINITISTA.md).
+## Un `info:` en medio de 145 jobs NO es un control: esto sí rompe.
+footprints:
+	@bash check-footprints.bash
 
 ## Idem, sin lake build (para iterar rapido)
 docsync-quick:

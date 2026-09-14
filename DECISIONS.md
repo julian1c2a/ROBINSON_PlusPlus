@@ -2503,8 +2503,10 @@ FOL⁼ abierta.
 
 ### 4 · ⬜ Lo que sigue
 
-1. Un **control** que reejecute los footprints de este módulo (criterio §9 del plan: *«y un control
-   que lo reejecuta»* — hoy sólo se imprimen en el build).
+1. 🏁 **HECHO el mismo día**: `check-footprints.bash` (raíz de RPP, `make footprints`, y en CI).
+   Compara **13 titulares** de los dos repos con su footprint publicado y **rompe** si no cuadra.
+   Probado con el fallo puesto en los dos modos —footprint distinto y declaración ausente—, los
+   dos con `EXIT=1`. 🔑 *Un `info:` en medio de 145 jobs no es un control.*
 2. El **lema de renombrado** sobre derivaciones de `Derives₀`, que desbloquea la extensión de
    Henkin de verdad (plan §6.2).
 3. Portar `cuarentena/Completeness.lean` a `Derives₀` y medir qué se rompe (plan, orden 3).
