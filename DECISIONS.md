@@ -3483,3 +3483,71 @@ esta vez me protegió de publicar una cifra falsa en un docstring.
 
 **Véase también:** `FOL/Sequent0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.7,
 `check-estratos.bash` (9 estratos), `check-footprints.bash` (69 titulares).
+
+---
+
+## ADR-047: La corrección de PeanoRF, ACEPTADA y BLINDADA — y su conjetura sobre `Theorems.Eq`, REFUTADA
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Origen:** `../Peano-from-ROB-n-FOL/doc/HANDOFF-FOL-2026-09-16.md` (proyecto PeanoRF)
+
+### 1 · Lo aceptado, tras medirlo
+
+En `FOL/Semantics.lean`, `shift_updateEnv_comm`, un caso **imposible** se cerraba con `omega`:
+
+    -  | zero => omega
+    +  | zero => exact absurd (Nat.le_zero.mp (Nat.not_lt.mp h1)).symm h2
+
+**Medido aquí, no aceptado de palabra** — cinco declaraciones pasan a `[propext, Quot.sound]`:
+`shift_updateEnv_comm`, `eval_liftFormula_ext`, `eval_substFormula_ext`,
+`contextSatisfies_lift_zero`, `eval_substFormula_zero`. Era el **único `Classical.choice` de toda
+la semántica de fórmulas**.
+
+⭐ **Y queda BLINDADO**: los cuatro primeros entran en `check-footprints.bash` (69 → **73**). Sin
+eso, la ganancia se pierde en el primer refactor y nadie se entera. *Una mejora sin control es una
+mejora prestada.*
+
+### 2 · 🔑 La regla, que es lo reutilizable
+
+> **`omega` sobre metas ARITMÉTICAS es limpio. Sobre metas FUERA de su lenguaje, descargadas por
+> CONTRADICCIÓN, mete `Classical.choice`.**
+
+⇒ Cuando `omega` cierre un caso imposible cuya meta **no** sea aritmética, sustituirlo por
+`absurd` / `False.elim` explícito. Es una instancia **nueva** de la familia «Classical oculto», y
+encaja con lo que este repo ya tenía medido: *el footprint de una táctica no es propiedad del
+enunciado ni de la táctica* ([[feedback-footprint-no-es-constructividad]] §2).
+
+### 3 · ⚠️ Lo NO aceptado: su conjetura sobre los tres de `FOL.Theorems.Eq`
+
+El handoff marca como «SOSPECHOSOS, muy probable que sea el mismo patrón del `omega`»
+a `substTerm_subst_comm_succ`, `substTerms_subst_comm_succ` y `subst_subst_comm_succ`.
+
+**Medido: la conjetura NO explica esos tres.** Sus `omega` están **todos** dentro de
+`show ¬ k = j from by omega` — es decir, sobre metas **aritméticas**, que es el lado **limpio** de
+su propia regla. Y en el entorno de imports de `FOL/Theorems/Eq.lean` (`import FOL.FOL`) salen
+limpios, uno a uno:
+
+| pieza | footprint |
+|---|---|
+| `Nat.lt_trichotomy` | **ningún axioma** |
+| `rcases Nat.lt_trichotomy …` | **ningún axioma** |
+| `by omega` sobre `¬ k = j` | `[propext, Quot.sound]` |
+| `simp [substTerm, show ¬ k = j from by omega]` | `[propext, Quot.sound]` |
+| `congr 1` sobre `Term.func` | **ningún axioma** |
+
+⇒ ⬜ **La causa está en una rama concreta del lema y NO está localizada.** Hace falta bisección por
+ramas del propio lema, como ellos mismos hicieron para la semántica. ⚠️ Y su propio aviso de método
+aplica aquí: *refutar con la cadena sucia es refutar ruido* — por eso esto se declara como
+**conjetura refutada**, no como diagnóstico alternativo.
+
+⬜ `FOL.Tactics.tryMem`: **no medido** por este lado.
+
+### 4 · ⚠️ Nota de proceso, para el próximo handoff
+
+El arreglo llegó **aplicado y sin commitear en el árbol de trabajo compartido**. Ese día yo hice
+varios `git add -A`, así que **pudo haberse colado en un commit mío con un mensaje que no lo
+menciona** — de hecho comprobé si había pasado, y por poco. 🔑 *Un cambio ajeno sin commitear en un
+árbol compartido es indistinguible de uno propio.* ⇒ pedir parche o rama, o avisar antes.
+
+**Véase también:** `FOL/Semantics.lean`, `check-footprints.bash`,
+`../Peano-from-ROB-n-FOL/doc/HANDOFF-FOL-2026-09-16.md`.

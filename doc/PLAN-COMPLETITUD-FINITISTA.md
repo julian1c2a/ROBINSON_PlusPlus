@@ -728,6 +728,28 @@ que el proyecto ha demostrado**. `strCode` ya es computable y constructiva hoy �
 **la regla** de que el footprint no distingue la no‑constructividad matemática de la deuda de
 implementación del núcleo.
 
+### 7.4 · 📎 Y va ENGANCHADO a la migración: el encargo de `Sugerencias.md` (2026‑09‑16)
+
+Sanción del propietario: *«lo agregas al cambio de `String` → `List Char` cuando tengamos
+realmente el módulo canónico»*. ⇒ **mismo paquete, misma condición**, no un frente aparte.
+
+**La tesis a medir** (⬜ TODO sin etiqueta de medición, y por eso va aquí y no en un ADR):
+*M‑10 puede salir del script y entrar en la FIRMA; M‑11 no —es una propiedad del ENTORNO, cuantifica
+sobre declaraciones futuras, y ningún juicio de tipos la coge.*
+
+| | qué medir | control adversarial |
+|---|---|---|
+| ⬜ | ¿bloquea de verdad? Escribir la clase `(verifier · Decidable · adecuado : P Γ f ↔ ∃ c, verifier c ⌜f⌝)`, enunciar Gödel I sobre `[EsREnumerable P]` e intentar instanciarla en `Derives` | ⭐ **que la instancia para `⊢` NO compile, y por qué**. Si compila, la idea está muerta |
+| ⬜ | ¿cuánto cuesta `adecuado` para `Prf`? Parece casi gratis porque `Prf` está definido por su verificador — *estimación, y el proyecto ya sabe cómo acaban* | ¿toca el frente `substfc` o no? |
+| ⬜ | propagación real **con el compilador**, no por cierre de nombres (el escarmiento: sobreestimó por **dos órdenes**) | ¿cuántas firmas hay que enhebrar, como con `AnclaEq`? |
+| ⬜ | ¿hay API de linter usable en v4.31 **sin Mathlib**, y salta al declarar el `axiom`? | ⚠️ punto ciego: un `axiom` en un módulo que no importe el linter **no se mira** ⇒ serían **los dos**, con la misma tabla y **siempre igualdad exacta, nunca cota** |
+
+⚠️ **Por qué va junto y no antes**: las dos cosas tocan **firmas** (`Term.func : String → …` y el
+parámetro de clase), y hacerlas por separado obliga a re‑enhebrar dos veces. Es el mismo argumento
+de §7.3.
+
+---
+
 ### 7.3 · ✅ Decisión: **PROYECTADO**, no pendiente (2026‑09‑14)
 
 Sanción del propietario: *«lo proyectamos para cuando termines el trabajo más inmediato y todo esté

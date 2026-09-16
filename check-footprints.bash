@@ -27,6 +27,10 @@ FOL.Metamath.Soundness0.derives0_soundness|Classical.choice,Quot.sound,propext
 FOL.Metamath.Soundness0.derives0_consistent|Classical.choice,Quot.sound,propext
 FOL.Metamath.Soundness0.derives0_not_complete|Classical.choice,Quot.sound,propext
 FOL.Metamath.Enumeration.natToFormula_surj|Classical.choice,Quot.sound,propext
+FOL.Metamath.Semantics.shift_updateEnv_comm|Quot.sound,propext
+FOL.Metamath.Semantics.eval_liftFormula_ext|Quot.sound,propext
+FOL.Metamath.Semantics.eval_substFormula_ext|Quot.sound,propext
+FOL.Metamath.Semantics.contextSatisfies_lift_zero|Quot.sound,propext
 FOL.Rename.derives0_rename|Quot.sound,propext
 FOL.Rename.derives0_rename_inv|Quot.sound,propext
 FOL.Rename.derives0_rename_iff|Quot.sound,propext
