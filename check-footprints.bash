@@ -43,6 +43,8 @@ FOL.Fresh0.exists_fresh|Classical.choice,Quot.sound,propext
 FOL.HenkinLimit0.not_occurs_henkinAx|-
 FOL.HenkinLimit0.henLimit_consistent|Classical.choice,Quot.sound,propext
 FOL.HenkinLimit0.henLimit_witness|Classical.choice,Quot.sound,propext
+FOL.Lindenbaum0.lindenbaum_lemma|Classical.choice,Quot.sound,propext
+FOL.Lindenbaum0.henkin_completion|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

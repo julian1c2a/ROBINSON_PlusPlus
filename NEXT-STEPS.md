@@ -53,9 +53,38 @@
 > `cst` y sin tocar `String.length`. 🔑 *El plan cotizó la solución que se le ocurrió, no el
 > problema.* Van **seis** estimaciones mías refutadas por una medición; ésta, hacia abajo.
 >
-> ▶ **POR DÓNDE SEGUIR**: pieza **(3)** — **Lindenbaum sobre `Derives₀` + maximalidad** (~200 l.,
-> riesgo bajo, calco medido de `cuarentena/Completeness.lean`: bloques de 110+121+61 líneas), y
-> después el modelo canónico y `truth_lemma` (~470 l.).
+> 🏁 **Pieza (3) HECHA el mismo día** — ver el bloque de abajo.
+
+> # 🗓️ 2026‑09‑16 (cierre) — 🏁🏁🏁 **EL ENSAMBLAJE DE HENKIN, CERRADO**
+> 
+> Las **tres** piezas de `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4, en un solo enunciado
+> ([ADR‑040](DECISIONS.md), `../FOL/FOL/Lindenbaum0.lean`, 126 l. frente a las ~200 estimadas):
+> 
+> ```
+> henkin_completion : IsConsistent₀ S →
+>   ∃ T, IsMaximalConsistent₀ T ∧ IsHenkin₀ T ∧ (∀ f, shiftTheory S f → T f)
+> ```
+> 
+> *Toda teoría consistente se extiende a una maximal consistente con testigo para cada
+> existencial.* Footprint `[propext, Classical.choice, Quot.sound]`, **cero axiomas del proyecto**.
+> 
+> ⛔⛔ **Y ahora sí: la no‑finitud está localizada, y es UNA LÍNEA** — el
+> `if IsConsistent₀ (Sₙ ∪ {φₙ})` de `LindenbaumStep`, que es **Π⁰₁**. ⚠️ Eso obliga a releer los
+> footprints: `Classical.choice` sale ya en **tres** módulos del ensamblaje por **tres causas**
+> distintas (`Classical.em`+`String`, `Exists.choose`, y **el WKL**), y **sólo la tercera es
+> matemática**. 🔑 *El footprint no distingue las causas: hay que distinguirlas por escrito.*
+> 
+> ⭐ Tres cosas salieron gratis, y las tres por la misma razón —**el sujeto correcto**:
+> `derivesSet0_intro_impl` **es el teorema de deducción y no hay que demostrarlo** (`intro_impl`
+> es **constructor** de `Derives₀`); el paso de `henLimit` a `IsHenkin₀` son **dos líneas**; y la
+> compacidad metida en `DerivesSet₀` paga **por tercera vez**.
+> 
+> ⛔ **ADR‑032 sigue vigente** y `check-axioms.bash` no se mueve: nada de esto toca `Derives`.
+> 
+> ▶ **POR DÓNDE SEGUIR**: el **modelo canónico** y **`truth_lemma`** (~470 l. ⬜, calco de lo que
+> sobra de las 801 de `cuarentena/Completeness.lean`: `termEqv`/`termSetoid`, `QuotientDomain`,
+> `canonicalModel`, `max_cons_and/or/ex/forall`, `truth_lemma_lt` por complejidad, y
+> `completeness₀`). Las congruencias de la igualdad **ya son teoremas** (ADR‑031).
 
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑14 — LEER ESTO PRIMERO
 >

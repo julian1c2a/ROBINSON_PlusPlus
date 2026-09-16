@@ -319,11 +319,17 @@ trozo **caro**. **Medido, es barato** — `sondeos/NombresFrescosMedicion.lean`.
 |---|---|---|---|
 | (1) suministro de frescas | ~**80** líneas | **bajo** — las dos piezas duras están medidas | 🏁 **150** (`FOL/Fresh0.lean`) |
 | (2) iteración ω | ~**190** líneas | ⚠️ **medio** — ver abajo | 🏁 **168** (`FOL/HenkinLimit0.lean`) |
-| (3) Lindenbaum sobre `Derives₀` + `IsHenkin` del límite | ~**200** líneas | **bajo** — calco medido | ⬜ |
-| **⇒ ensamblaje de Henkin** | ~**470** líneas | | ⬜ falta (3) |
+| (3) Lindenbaum sobre `Derives₀` + `IsHenkin` del límite | ~**200** líneas | **bajo** — calco medido | 🏁 **126** (`FOL/Lindenbaum0.lean`) |
+| **⇒ ensamblaje de Henkin** | ~**470** líneas | | 🏁🏁 **444**, COMPLETO |
 | resto de la vía W (modelo canónico + `truth_lemma` + `completeness`) | ~**470** líneas | **bajo** — es lo que queda de las 801, y no usa nada fuera de `Derives₀` | ⬜ |
 
-🏁🏁 **(1) y (2) EJECUTADAS el 2026‑09‑16** (ADR‑039). La **extensión de Henkin está construida**:
+🏁🏁🏁 **LAS TRES EJECUTADAS el 2026‑09‑16** (ADR‑039 y ADR‑040). El **ensamblaje de Henkin está
+CERRADO**:
+
+    henkin_completion : IsConsistent₀ S →
+      ∃ T, IsMaximalConsistent₀ T ∧ IsHenkin₀ T ∧ (∀ f, shiftTheory S f → T f)
+
+y por debajo, la extensión de Henkin construida:
 
     henLimit_consistent : IsConsistent₀ S → IsConsistent₀ (henLimit S)
     henLimit_witness    : ∀ A, ∃ c, henLimit S (henkinAx c A)
@@ -372,6 +378,20 @@ mientras los símbolos sean `String`.
 
 El `if IsConsistent (S_n ∪ {φ_n})` de `LindenbaumStep` es **Π⁰₁** y se resuelve por
 `Classical.propDecidable`. **Ahí cabe toda la no‑finitud del teorema.**
+
+🏁 **Escrito el 2026‑09‑16** — `FOL/Lindenbaum0.lean`, `LindenbaumStep`, y está **señalado en el
+sitio**: en el docstring del módulo, en el de la `def` y en ADR‑040 §2.
+
+⚠️⚠️ **Y de ahí sale la obligación de leer los footprints con cuidado.** `Classical.choice`
+aparece ya en tres módulos del ensamblaje por **tres causas distintas**:
+
+| dónde | causa | ¿matemática? |
+|---|---|---|
+| `FOL.Fresh0` | `Classical.em` sobre `∃ k, cst k = s`, y `String` | parcialmente — la de `String` es del núcleo |
+| `FOL.HenkinLimit0` | `Exists.choose` en `bnd` | no: es elegir un testigo que existe |
+| `FOL.Lindenbaum0` | ⛔ **el `if IsConsistent₀ …`, Π⁰₁** | ⛔ **SÍ. Es el WKL.** |
+
+🔑 **El footprint no distingue las causas, así que hay que distinguirlas por escrito.**
 
 ⇒ El entregable de W **no es un footprint limpio**, es:
 

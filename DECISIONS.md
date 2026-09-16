@@ -2906,3 +2906,69 @@ es Π⁰₁—: el que hay hoy en el footprint es de `Exists.choose` y de `Strin
 
 **Véase también:** `FOL/Fresh0.lean`, `FOL/HenkinLimit0.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4, `check-footprints.bash` (29 titulares).
+
+---
+
+## ADR-040: El ensamblaje de Henkin, CERRADO — y la no‑finitud, localizada en una línea
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑039 (piezas 1 y 2), ADR‑033 (`Derives₀`), ADR‑030 (enumeración),
+ADR‑032 (el `axiom` que NO se paga)
+
+### 1 · Qué queda demostrado
+
+La pieza (3) de `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4, en `FOL/Lindenbaum0.lean` (126 l. de
+código frente a las ~200 estimadas). Y con ella **el ensamblaje entero**, en un solo enunciado:
+
+    henkin_completion : IsConsistent₀ S →
+      ∃ T, IsMaximalConsistent₀ T ∧ IsHenkin₀ T ∧ (∀ f, shiftTheory S f → T f)
+
+*Toda teoría consistente se extiende a una **maximal consistente** con **testigo para cada
+existencial**.* Footprint `[propext, Classical.choice, Quot.sound]`, **cero axiomas del proyecto**.
+
+⇒ Las **tres** piezas del §6.4 están. ⬜ Queda el **modelo canónico** y `truth_lemma` (~470 l.),
+que es calco de lo que sobra de las 801 de `cuarentena/Completeness.lean`.
+
+### 2 · ⛔ Y la decisión de fondo: **dónde se declara la no‑finitud**
+
+Está en **una línea**, y va señalada en el docstring del módulo, en el de la `def` y aquí:
+
+    if IsConsistent₀ (Sₙ ∪ {φₙ}) then … else …
+
+Esa condición es **Π⁰₁** y se decide con `Classical.propDecidable`. **Ahí cabe toda la no‑finitud
+del teorema de completitud.**
+
+⚠️ **Y esto obliga a re‑leer los footprints de ADR‑039**: los `Classical.choice` de `Fresh0` y
+`HenkinLimit0` **no eran** éste —eran `Exists.choose` y la implementación de `String`—. El de aquí
+sí. Tres apariciones del mismo nombre en `#print axioms`, **tres causas distintas**, y sólo una es
+matemática.
+
+🔑 Es el corolario exacto de [[feedback-footprint-no-es-constructividad]]: **el footprint no
+distingue las causas, así que hay que distinguirlas por escrito.** Un `Classical.choice`
+explicado vale más que uno escondido.
+
+### 3 · Lo que salió gratis, y por qué
+
+⭐ **`derivesSet0_intro_impl` es el teorema de deducción, y no hay que demostrarlo**: sobre
+`Derives₀`, `intro_impl` es un **constructor**. La versión de `cuarentena/Completeness.lean`
+invocaba `FOL.Metamath.Deduction.deduction_theorem`; aquí todo el trabajo es sacar `A` del contexto
+finito con un `filter`.
+
+⭐ **El paso de `henLimit` a `IsHenkin₀` son dos líneas**: el axioma `(∃A) → A[c]` está en `T`
+porque `T ⊇ henLimit S`, y un maximal consistente está cerrado por modus ponens. *El trabajo estaba
+en construir `henLimit`, no en usarlo.*
+
+⭐ **Tercera vez que paga la compacidad metida en `DerivesSet₀`**: consistencia del paso de Henkin
+(ADR‑037), consistencia del límite ω (ADR‑039) y consistencia del límite de Lindenbaum (aquí).
+
+### 4 · ⚠️ Lo que este ADR **no** dice
+
+* ⛔ **No hay completitud todavía.** Falta el modelo canónico. `henkin_completion` es la
+  **hipótesis** que ese modelo consume, no el teorema.
+* ⛔ **No toca `cuarentena/Completeness.lean`.** `henkin_extension_lemma` sigue siendo un `axiom`
+  sobre `Derives`, **ADR‑032 sigue vigente**, y `check-axioms.bash` no se mueve.
+* ⚠️ La conclusión es sobre `shiftTheory S`, no sobre `S`: la extensión vive en el **sublenguaje**.
+  Es conservativa (`derivesSet0_shift_inv`), pero **el enunciado tiene que decirlo**, y lo dice.
+
+**Véase también:** `FOL/Lindenbaum0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.3 y §6.4,
+`check-footprints.bash` (31 titulares).
