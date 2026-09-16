@@ -4,7 +4,43 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑14 · `master` · ✅ ÁRBOL VERDE (145 jobs · FOL 28) · **3 `axiom` de Lean****
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 26 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **39** · `check-estratos` **5** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 (noche) — 🏁🏁🏁🏁 **COMPLETITUD DE FOL⁼, DEMOSTRADA**
+>
+> ```
+> completeness₀         : Γ ⊨ f → Γ ⊢₀ f
+> derives0_complete_iff : (Γ ⊢₀ f) ↔ (Γ ⊨ f)
+> ```
+>
+> `../FOL/FOL/Canonical0.lean` + `../FOL/FOL/Eq0.lean` ([ADR‑041](DECISIONS.md)), **510 l. de
+> código** frente a las ~470 estimadas. Footprint `[propext, Classical.choice, Quot.sound]`,
+> **cero axiomas del proyecto**. ⭐⭐ **Las DOS direcciones sobre un mismo cálculo de FOL⁼**, por
+> primera vez en el proyecto (la ida es `derives0_soundness`, ADR‑034).
+>
+> ⚠️⚠️ **Y LO QUE NO SIGNIFICA, que es lo que hay que leer:**
+>
+> | lectura tentadora | lo que hay |
+> |---|---|
+> | «Gödel I queda afectado» | ⛔ **No.** Gödel I es sobre **`Prf`**. La completitud **semántica** no es la **sintáctica**: `derives0_not_complete` sigue siendo cierto |
+> | «se puede retirar `henkin_extension_lemma`» | ⛔ **No.** Es un `axiom` sobre **`Derives`**; **ADR‑032 vigente**, `check-axioms.bash` sin cambios |
+> | «el proyecto ya es constructivo» | ⛔ **No.** Ese `Classical.choice` es el **WKL** |
+> | «`cuarentena/Completeness.lean` puede volver» | ⛔ **No.** Aquello es sobre `Derives`, cuya solidez es FALSA |
+>
+> ⭐ **Controles de NO VACUIDAD** (un teorema de completitud puede ser cierto y no servir):
+> `derives0_em : [] ⊢₀ A ∨ ¬A` y `derives0_peirce`, **producidos por completitud**, pasando por el
+> modelo canónico. Si `completeness₀` fuera vacua, no compilarían.
+>
+> ⚠️ **El único agujero que el calco no cubría**: `henkin_completion` da un modelo de
+> `shiftTheory S`, no de `S`, así que hubo que **volver del sublenguaje** —
+> `eval_pullback_formula`, ⭐ **net‑0 puro**. 🔑 *Aquel fichero POSTULABA la extensión de Henkin, y
+> por eso nunca tuvo que volver: pagar un axioma esconde también el trabajo que el axioma evitaba.*
+>
+> ▶ **POR DÓNDE SEGUIR**: la **vía H** — Herbrand / disyunción finita
+> (`doc/PLAN-COMPLETITUD-FINITISTA.md` §5), que es el **contenido finitario** y lo único de los dos
+> objetivos que queda. ⬜ Y del 09‑11: estrechar `StdLine`, promover 4 de `Probe/`, el modelo de
+> los 141.
 
 > # 🗓️ 2026‑09‑16 — los ESTRATOS, declarados y vigilados
 >
@@ -81,10 +117,7 @@
 > 
 > ⛔ **ADR‑032 sigue vigente** y `check-axioms.bash` no se mueve: nada de esto toca `Derives`.
 > 
-> ▶ **POR DÓNDE SEGUIR**: el **modelo canónico** y **`truth_lemma`** (~470 l. ⬜, calco de lo que
-> sobra de las 801 de `cuarentena/Completeness.lean`: `termEqv`/`termSetoid`, `QuotientDomain`,
-> `canonicalModel`, `max_cons_and/or/ex/forall`, `truth_lemma_lt` por complejidad, y
-> `completeness₀`). Las congruencias de la igualdad **ya son teoremas** (ADR‑031).
+> 🏁 **HECHO el mismo día** — ver el bloque de abajo.
 
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑14 — LEER ESTO PRIMERO
 >

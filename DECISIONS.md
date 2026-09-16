@@ -2972,3 +2972,90 @@ en construir `henLimit`, no en usarlo.*
 
 **Véase también:** `FOL/Lindenbaum0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.3 y §6.4,
 `check-footprints.bash` (31 titulares).
+
+---
+
+## ADR-041: **COMPLETITUD** — `completeness₀`, y las dos direcciones sobre un mismo cálculo
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑033 (`Derives₀`), ADR‑034 (solidez), ADR‑030 (enumeración), ADR‑031
+(congruencias), ADR‑039/040 (el ensamblaje de Henkin), ADR‑024 (M‑10), ADR‑032
+
+### 1 · Qué queda demostrado
+
+    completeness₀        : Γ ⊨ f → Γ ⊢₀ f
+    derives0_complete_iff : (Γ ⊢₀ f) ↔ (Γ ⊨ f)
+
+en `FOL/Canonical0.lean`, footprint `[propext, Classical.choice, Quot.sound]` y **cero axiomas del
+proyecto**. Con `FOL/Eq0.lean` (las cuatro piezas de la igualdad sobre `Derives₀`), **510 líneas de
+código** frente a las ~470 estimadas.
+
+⭐⭐ **Es la primera vez que el proyecto tiene las DOS direcciones sobre un mismo cálculo de FOL⁼.**
+La ida es `derives0_soundness` (ADR‑034).
+
+⛔ **Y sobre `Derives` no puede haberlas, ni ahora ni nunca**: su solidez es FALSA
+(`cuarentena/Inconsistencia.lean`) y `axioms ⊢` es **sintácticamente completo** ⇒ no r.e. (M‑10,
+ADR‑024). Esto **no cambia nada** de la arquitectura: `⊢` sigue siendo la herramienta y `Prf` el
+sujeto. Lo que cambia es que ahora hay **un tercer objeto** del que sí se puede decir la verdad.
+
+### 2 · ⚠️ Qué NO significa, dicho antes de que alguien lo lea de más
+
+| lectura tentadora | lo que de verdad hay |
+|---|---|
+| «Gödel I queda afectado» | ⛔ **No.** Gödel I es sobre `Prf`, y `Derives₀` **no es** `Prf`. La completitud **semántica** no es la **sintáctica**: `derives0_not_complete` (ADR‑034) sigue siendo cierto |
+| «se puede retirar `henkin_extension_lemma`» | ⛔ **No.** Ése es un `axiom` sobre **`Derives`**, y **ADR‑032 sigue vigente**. `check-axioms.bash` no se mueve |
+| «el proyecto ya es constructivo» | ⛔ **No.** El `Classical.choice` es el **WKL** — ver §4 |
+| «`cuarentena/Completeness.lean` puede salir de cuarentena» | ⛔ **No.** Aquello es sobre `Derives`. Lo de aquí es un objeto **nuevo**, escrito al lado |
+
+### 3 · ⚠️ El agujero que el calco NO cubría, y hubo que escribir
+
+`henkin_completion` (ADR‑040) entrega un maximal consistente que extiende **`shiftTheory S`**, no
+`S`: la extensión de Henkin vive en el **sublenguaje**. El modelo canónico da entonces un modelo de
+`shiftTheory S`, y hacía falta **volver**.
+
+⇒ `pullback M ρ` —reinterpretar cada símbolo `f` como `ρ f`— y
+
+    eval_pullback_formula : evalFormula (pullback M ρ) v f ↔ evalFormula M v (renameFormula ρ f)
+
+⭐ **Net‑0 puro: no depende de NINGÚN axioma.** *Renombrar símbolos de función no cambia la
+satisfacibilidad*, y eso es constructivo. ⚠️ Es la única pieza de este tramo que no estaba en
+`cuarentena/Completeness.lean`: aquel fichero **postulaba** la extensión de Henkin, así que nunca
+tuvo que volver del sublenguaje. 🔑 *Pagar un axioma esconde también el trabajo que el axioma
+evitaba.*
+
+### 4 · ⛔ El entregable es un `Classical.choice` EXPLICADO
+
+Como el plan §6.3 dijo desde el principio. El `Classical.choice` de `completeness₀` es el
+`if IsConsistent₀ (Sₙ ∪ {φₙ})` de `FOL.Lindenbaum0`, que es **Π⁰₁**:
+
+* la completitud para lenguajes numerables es **≡ WKL₀** sobre RCA₀ (Simpson, *SOSOA* IV.3.3);
+* **WKL₀ es Π⁰₂‑conservativo sobre PRA** (Friedman, *SOSOA* IX.3) ⇒ **finitistamente reducible**;
+* ⛔ **no es constructiva**: WKL falla en realizabilidad recursiva (Kleene).
+
+⇒ La frase exacta que este repo puede publicar: *«la completitud de FOL⁼ para teorías numerables
+está **demostrada** en Lean sobre `Derives₀`, con cero axiomas propios, y su contenido no finitario
+está **localizado** en una línea Π⁰₁ que es exactamente el WKL».*
+
+### 5 · ⭐ Control de NO VACUIDAD, porque un teorema puede ser cierto y no servir
+
+Un enunciado de completitud puede ser trivial si el consecuente lo es. Dos líneas lo descartan, y
+**producen derivaciones reales** pasando por el modelo canónico:
+
+    derives0_em     (A)   : [] ⊢₀ A ∨ ¬A
+    derives0_peirce (A B) : [] ⊢₀ ((A → B) → A) → A
+
+Peirce es el ejemplo canónico de tautología **clásica** que la lógica intuicionista no demuestra.
+Si `completeness₀` fuera vacua, esto no compilaría.
+
+### 6 · Lo que salió gratis, y por qué — otra vez el SUJETO
+
+* ⭐ `FOL/Eq0.lean` es un **traslado literal** de `Theorems/Eq.lean`: `refl` y `subst` son
+  constructores de los dos cálculos, y la parte difícil (`substTerms_append`, `substTerms_lift_hole`)
+  es **sintaxis pura** y se importa tal cual. *Las listas no distinguen `Derives` de `Derives₀`.*
+* ⭐ `max_cons_forall` necesitaba `forall_not_impl_exists_not`, que en `Derives` es un teorema de
+  `Theorems/Quantifiers`; en `Derives₀` es un **constructor**. Igual `dne_schema` en `completeness₀`.
+* ⭐ `derivesSet0_map`/`map2`: *la regla viaja con su contexto finito.* Cuarta vez que paga la
+  compacidad metida en `DerivesSet₀`.
+
+**Véase también:** `FOL/Canonical0.lean`, `FOL/Eq0.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §6, `check-footprints.bash` (39 titulares).

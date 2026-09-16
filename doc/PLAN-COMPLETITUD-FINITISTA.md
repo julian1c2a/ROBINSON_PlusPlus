@@ -10,6 +10,23 @@
 > el proyecto) y **`derives0_not_complete`** (`Derives₀` **no** decide toda fórmula ⇒ el Paso 0
 > sirvió para lo que tenía que servir). ⭐ Y RPP **no se movió**: sigue en 145 jobs.
 
+> # 🏁🏁🏁 **VÍA W CERRADA — 2026‑09‑16** (ADR‑039, ADR‑040, ADR‑041)
+>
+> ```
+> completeness₀         : Γ ⊨ f → Γ ⊢₀ f
+> derives0_complete_iff : (Γ ⊢₀ f) ↔ (Γ ⊨ f)
+> ```
+>
+> `FOL/Canonical0.lean`, footprint `[propext, Classical.choice, Quot.sound]`, **cero axiomas del
+> proyecto**. ⭐⭐ **Las dos direcciones sobre un mismo cálculo de FOL⁼**, por primera vez en el
+> proyecto.
+>
+> ⛔ **Y el entregable es el que este plan anunciaba: un `Classical.choice` EXPLICADO.** Está
+> localizado en **una línea** —el `if IsConsistent₀ (Sₙ ∪ {φₙ})` de `FOL.Lindenbaum0`, Π⁰₁— y es
+> exactamente el WKL. Ver §6.3.
+>
+> ⬜ **Queda la vía H** (Herbrand / disyunción finita), §5 — que es el contenido **finitario**.
+>
 > ## Los dos objetivos, decididos
 >
 > | | objetivo | ¿finitista? | qué se puede publicar |
@@ -321,7 +338,7 @@ trozo **caro**. **Medido, es barato** — `sondeos/NombresFrescosMedicion.lean`.
 | (2) iteración ω | ~**190** líneas | ⚠️ **medio** — ver abajo | 🏁 **168** (`FOL/HenkinLimit0.lean`) |
 | (3) Lindenbaum sobre `Derives₀` + `IsHenkin` del límite | ~**200** líneas | **bajo** — calco medido | 🏁 **126** (`FOL/Lindenbaum0.lean`) |
 | **⇒ ensamblaje de Henkin** | ~**470** líneas | | 🏁🏁 **444**, COMPLETO |
-| resto de la vía W (modelo canónico + `truth_lemma` + `completeness`) | ~**470** líneas | **bajo** — es lo que queda de las 801, y no usa nada fuera de `Derives₀` | ⬜ |
+| resto de la vía W (modelo canónico + `truth_lemma` + `completeness`) | ~**470** líneas | **bajo** — es lo que queda de las 801, y no usa nada fuera de `Derives₀` | 🏁 **510** (`FOL/Eq0.lean` + `FOL/Canonical0.lean`) |
 
 🏁🏁🏁 **LAS TRES EJECUTADAS el 2026‑09‑16** (ADR‑039 y ADR‑040). El **ensamblaje de Henkin está
 CERRADO**:

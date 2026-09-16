@@ -45,6 +45,14 @@ FOL.HenkinLimit0.henLimit_consistent|Classical.choice,Quot.sound,propext
 FOL.HenkinLimit0.henLimit_witness|Classical.choice,Quot.sound,propext
 FOL.Lindenbaum0.lindenbaum_lemma|Classical.choice,Quot.sound,propext
 FOL.Lindenbaum0.henkin_completion|Classical.choice,Quot.sound,propext
+FOL.Eq0.derives0_eq_func_congr|Quot.sound,propext
+FOL.Eq0.derives0_atom_congr|Quot.sound,propext
+FOL.Canonical0.truth_lemma|Classical.choice,Quot.sound,propext
+FOL.Canonical0.eval_pullback_formula|-
+FOL.Canonical0.model_existence_lemma₀|Classical.choice,Quot.sound,propext
+FOL.Canonical0.completeness₀|Classical.choice,Quot.sound,propext
+FOL.Canonical0.derives0_complete_iff|Classical.choice,Quot.sound,propext
+FOL.Canonical0.derives0_em|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext
