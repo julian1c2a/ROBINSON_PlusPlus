@@ -37,6 +37,12 @@ FOL.Eigenvariable.derives0_inst_fresh|Quot.sound,propext
 FOL.Lift0.derives0_lift|Quot.sound,propext
 FOL.Lift0.derives0_ex_forall_neg_absurd|Quot.sound,propext
 FOL.Henkin0.henkin_step_consistent|Classical.choice,Quot.sound,propext
+FOL.Fresh0.derivesSet0_shift_inv|Classical.choice,Quot.sound,propext
+FOL.Fresh0.shiftTheory_consistent|Classical.choice,Quot.sound,propext
+FOL.Fresh0.exists_fresh|Classical.choice,Quot.sound,propext
+FOL.HenkinLimit0.not_occurs_henkinAx|-
+FOL.HenkinLimit0.henLimit_consistent|Classical.choice,Quot.sound,propext
+FOL.HenkinLimit0.henLimit_witness|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

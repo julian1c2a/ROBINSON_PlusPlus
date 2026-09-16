@@ -29,6 +29,34 @@
 >
 > ▶ **Y seguimos con la tarea programada**: el ensamblaje de Henkin, plan §6.4.
 
+> # 🗓️ 2026‑09‑16 (tarde) — 🏁🏁 **LA EXTENSIÓN DE HENKIN, CONSTRUIDA**
+>
+> Las piezas **(1)** y **(2)** de `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4, hechas ([ADR‑039](DECISIONS.md)).
+>
+> | | qué | dónde |
+> |---|---|---|
+> | 1 | **Suministro de constantes frescas**: `shiftTheory` (la teoría en un sublenguaje — conservativa **en las dos direcciones** y equiconsistente), `cst`, y ⭐ **`exists_fresh`** | `../FOL/FOL/Fresh0.lean` |
+> | 2 | ⭐⭐ **La iteración ω y el límite**: **`henLimit_consistent`** y **`henLimit_witness`** — *toda teoría consistente se extiende a una consistente con testigo para cada fórmula* | `../FOL/FOL/HenkinLimit0.lean` |
+> | 3 | 🔧 `check-footprints.bash` pasa de **23 a 29** titulares. Los cuatro controles, verdes | |
+>
+> Footprint de los dos titulares: `[propext, Classical.choice, Quot.sound]`, **cero axiomas del
+> proyecto**. ⚠️ Ese `Classical.choice` es de `Exists.choose` y de `String` — **todavía no** es el
+> de la completitud (ése es el `if IsConsistent …` de Lindenbaum, Π⁰₁, §6.3 del plan).
+>
+> ⛔ **No toca `cuarentena/Completeness.lean`**: `henkin_extension_lemma` sigue siendo `axiom`
+> sobre `Derives` y **ADR‑032 sigue vigente**. Esto es sobre `Derives₀`, que es otro sujeto.
+>
+> ⚠️⚠️ **Y el «riesgo medio» que yo mismo había publicado se disolvió.** Decía que (2) necesitaba
+> una función `Formula → Nat` («mayor índice usado») con su lema, ~40 l. **No hace falta.** El
+> enunciado correcto no es «el máximo índice» sino «**a partir de cierto índice, todas son
+> frescas**» —un `∃`, no una función—, y sale por inducción estructural con `max`, sin invertir
+> `cst` y sin tocar `String.length`. 🔑 *El plan cotizó la solución que se le ocurrió, no el
+> problema.* Van **seis** estimaciones mías refutadas por una medición; ésta, hacia abajo.
+>
+> ▶ **POR DÓNDE SEGUIR**: pieza **(3)** — **Lindenbaum sobre `Derives₀` + maximalidad** (~200 l.,
+> riesgo bajo, calco medido de `cuarentena/Completeness.lean`: bloques de 110+121+61 líneas), y
+> después el modelo canónico y `truth_lemma` (~470 l.).
+
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑14 — LEER ESTO PRIMERO
 >
 > ## 🏁 Lo HECHO hoy, y todo está commiteado y subido
@@ -50,9 +78,9 @@
 > **`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4** — lleva la tabla **medido / estimado** de las tres
 > piezas que faltan del ensamblaje, con el riesgo **localizado**:
 >
-> 1. **suministro de constantes frescas** (~80 l., riesgo **bajo**: las dos piezas duras están medidas);
-> 2. **iteración ω** (~190 l., ⚠️ riesgo **medio** — `cₙ` debe ser fresca también para `φₙ`, así que
->    **no vale `cₙ := cst n`**: hace falta `Formula → Nat` «mayor índice usado», ~40 l.);
+> 1. ~~**suministro de constantes frescas**~~ 🏁 **HECHO el 2026‑09‑16** (150 l. de código);
+> 2. ~~**iteración ω**~~ 🏁 **HECHO el 2026‑09‑16** (168 l.) — ⚠️ y el «riesgo medio» resultó
+>    **falso**: la función `Formula → Nat` no hacía falta (ver el bloque de arriba);
 > 3. **Lindenbaum sobre `Derives₀` + `IsHenkin`** (~200 l., riesgo **bajo**: calco medido de 110+121+61 líneas).
 >
 > ⬜ Y después, el resto de la vía W (~470 l., calco de lo que queda de las 801 de `Completeness`).

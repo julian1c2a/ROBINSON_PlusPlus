@@ -2817,3 +2817,92 @@ código. Queda **declarado y vigilado**, no escondido: el control lo imprime y r
 
 **Véase también:** `check-estratos.bash`, `REFERENCE.md` §0bis y §0bis.2,
 `ROBINSON_PlusPlus/Minimal/Axioms.lean` (`forallN` y los puentes).
+
+---
+
+## ADR-039: La extensión de Henkin, CONSTRUIDA — y el riesgo que el plan marcaba en rojo, disuelto
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑030 (enumeración), ADR‑033 (`Derives₀`), ADR‑035 (renombrado), ADR‑036
+(eigenvariable), ADR‑037 (el paso de Henkin), ADR‑032 (el axioma que NO se paga)
+
+### 1 · Qué queda demostrado
+
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4 pedía tres piezas. **Las dos primeras están**, en dos
+módulos nuevos de FOL:
+
+| | módulo | titular |
+|---|---|---|
+| (1) | `FOL/Fresh0.lean` | `exists_fresh` — hay constante fresca para la teoría desplazada **más** cualquier lista finita de axiomas ya añadidos **más** la fórmula del turno |
+| (2) | `FOL/HenkinLimit0.lean` | ⭐⭐ `henLimit_consistent` y `henLimit_witness` — **toda teoría consistente se extiende a una consistente con testigo para cada fórmula** |
+
+⇒ La **extensión de Henkin está construida**, no postulada. Footprint
+`[propext, Classical.choice, Quot.sound]` y **cero axiomas del proyecto**.
+
+⛔ **Y esto NO toca `cuarentena/Completeness.lean`**: `henkin_extension_lemma` sigue siendo un
+`axiom` sobre `Derives`, y ADR‑032 sigue vigente. Lo de aquí es sobre **`Derives₀`**, que es otro
+sujeto. `check-axioms.bash` no se mueve.
+
+### 2 · ⚠️ La estimación que el plan publicaba, y lo medido
+
+§6.4 daba a la iteración ω **riesgo medio**, con la causa localizada y bien localizada: `cₙ` tiene
+que ser fresca también para `φₙ`, y `φₙ` recorre **todas** las fórmulas ⇒ no vale `cₙ := cst n`.
+De ahí concluía que hacía falta una función `Formula → Nat` («mayor índice de `cst` usado») **con
+su lema, ~40 líneas**, y lo marcaba *«identificado, no medido»*.
+
+**Medido: la función no hace falta, y el diagnóstico seguía siendo correcto.** Lo que falla no es
+la causa sino el **enunciado elegido para resolverla**:
+
+| enunciado | qué obliga a hacer |
+|---|---|
+| ⬜ «el mayor índice usado en `φ`» | **leer los nombres** — invertir `cst`, o `String.length` |
+| ⭐ «a partir de cierto índice, **todas** son frescas» | inducción estructural con `max`, y **nada más** |
+
+    cst_bound_formula : ∀ f, ∃ N, ∀ m ≥ N, ¬ occursFormula (cst m) f
+
+El único paso clásico queda en el **símbolo**: `∃ N, ∀ m ≥ N, cst m ≠ s` sale de
+`Classical.em (∃ k, cst k = s)` más `cst_inj`. Y `Exists.choose` convierte el `∃` en la función
+`bnd` que el índice del turno necesita.
+
+🔑 **La lección, y es de método**: el riesgo estaba bien identificado y mal **cotizado**, porque el
+plan cotizó *la solución que se le había ocurrido*, no *el problema*. Un `∃` bien elegido puede
+sustituir a una función y a su lema.
+
+### 3 · Las cifras
+
+| pieza | estimado ⬜ | fichero 📏 | de ello CÓDIGO 📏 |
+|---|---:|---:|---:|
+| (1) suministro de frescas | ~80 l. | 295 l. | **150 l.** |
+| (2) iteración ω | ~190 l. | 313 l. | **168 l.** |
+
+(«código» = líneas no vacías que no son comentario ni docstring.)
+
+⚠️ (1) salió **casi al doble** de lo estimado: la estimación contaba las dos piezas que el sondeo
+`NombresFrescosMedicion.lean` ya había medido y **no contaba la transferencia de la teoría**
+(`shiftTheory` y su conservatividad en las dos direcciones), que es la mitad del módulo. (2) salió
+**por debajo**, y por la razón del §2.
+
+⭐ **Ninguna de las dos piezas necesitó un intento fallido**: los cuatro sondeos y los dos módulos
+compilaron a la primera; el único error de toda la sesión fue un `/-- -/` delante de un `mutual`.
+
+### 4 · Lo que la construcción usa, y de dónde salió
+
+* ⭐ **`ρ s := "f" ++ s` mete la teoría en un sublenguaje**, y las constantes `cst n` quedan fuera
+  de la imagen. La conservatividad **no elige preimágenes**: **mapea con la inversa**
+  (`invOf`, ADR‑035).
+* ⭐ **La consistencia del límite sale de `DerivesSet₀`**: una derivación usa contexto **finito**,
+  luego vive en una etapa. *La compacidad sintáctica metida en la definición paga por tercera vez.*
+* ⭐ **`natToFormula_surj`** (ADR‑030) es lo que hace que el testigo exista para **toda** fórmula.
+  La enumeración se construyó para otra cosa y sirve aquí sin tocarla.
+* ⭐ **`not_occurs_henkinAx` es net‑0 puro**: las dos conmutaciones que faltaban (el lift no cambia
+  símbolos; la sustitución sólo mete los del término sustituido) no dependen de ningún axioma.
+
+### 5 · Lo que queda
+
+(3) **Lindenbaum sobre `Derives₀` + maximalidad**, ~200 l. ⬜ (calco medido de
+`cuarentena/Completeness.lean`), y después el modelo canónico y `truth_lemma`, ~470 l. ⬜
+⚠️ **Y es ahí donde entra el `Classical.choice` de verdad** —el `if IsConsistent (Sₙ ∪ {φₙ})`, que
+es Π⁰₁—: el que hay hoy en el footprint es de `Exists.choose` y de `String`, no el del teorema.
+
+**Véase también:** `FOL/Fresh0.lean`, `FOL/HenkinLimit0.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.4, `check-footprints.bash` (29 titulares).

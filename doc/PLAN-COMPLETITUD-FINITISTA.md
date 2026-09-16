@@ -313,21 +313,48 @@ trozo **caro**. **Medido, es barato** — `sondeos/NombresFrescosMedicion.lean`.
 | bloque `DerivesSet_*` | **61 líneas** |
 | `cuarentena/Completeness.lean` entero | **801 líneas** |
 
-**ESTIMADO** ⬜ (y va etiquetado, que es la regla):
+**ESTIMADO** ⬜ (y va etiquetado, que es la regla) — **con lo REAL al lado, medido el 2026‑09‑16**:
 
-| ítem | estimación | riesgo |
-|---|---|---|
-| (1) suministro de frescas | ~**80** líneas | **bajo** — las dos piezas duras están medidas |
-| (2) iteración ω | ~**190** líneas | ⚠️ **medio** — ver abajo |
-| (3) Lindenbaum sobre `Derives₀` + `IsHenkin` del límite | ~**200** líneas | **bajo** — calco medido |
-| **⇒ ensamblaje de Henkin** | ~**470** líneas | |
-| resto de la vía W (modelo canónico + `truth_lemma` + `completeness`) | ~**470** líneas | **bajo** — es lo que queda de las 801, y no usa nada fuera de `Derives₀` |
+| ítem | estimación | riesgo | 📏 real (código) |
+|---|---|---|---|
+| (1) suministro de frescas | ~**80** líneas | **bajo** — las dos piezas duras están medidas | 🏁 **150** (`FOL/Fresh0.lean`) |
+| (2) iteración ω | ~**190** líneas | ⚠️ **medio** — ver abajo | 🏁 **168** (`FOL/HenkinLimit0.lean`) |
+| (3) Lindenbaum sobre `Derives₀` + `IsHenkin` del límite | ~**200** líneas | **bajo** — calco medido | ⬜ |
+| **⇒ ensamblaje de Henkin** | ~**470** líneas | | ⬜ falta (3) |
+| resto de la vía W (modelo canónico + `truth_lemma` + `completeness`) | ~**470** líneas | **bajo** — es lo que queda de las 801, y no usa nada fuera de `Derives₀` | ⬜ |
 
-⚠️ **El riesgo de (2), localizado**: `cₙ` tiene que ser fresca para `Sₙ ∪ {φₙ}`, y `φₙ` recorre
-**todas** las fórmulas — puede usar cualquier `cst m`. ⇒ no vale «`cₙ := cst n`»: hay que elegir
-`cₙ := cst (1 + máximo índice usado en φₙ y en los axiomas ya añadidos)`. Eso pide una función
-`Formula → Nat` («mayor índice de `cst` que aparece») y su lema, ~40 líneas. **Está identificado,
-no medido.**
+🏁🏁 **(1) y (2) EJECUTADAS el 2026‑09‑16** (ADR‑039). La **extensión de Henkin está construida**:
+
+    henLimit_consistent : IsConsistent₀ S → IsConsistent₀ (henLimit S)
+    henLimit_witness    : ∀ A, ∃ c, henLimit S (henkinAx c A)
+
+footprint `[propext, Classical.choice, Quot.sound]`, **cero axiomas del proyecto**.
+
+⚠️⚠️ **Y el riesgo de (2) se disolvió — corrección de este documento.** Aquí decía:
+
+> ⚠️ **El riesgo de (2), localizado**: `cₙ` tiene que ser fresca para `Sₙ ∪ {φₙ}`, y `φₙ` recorre
+> **todas** las fórmulas — puede usar cualquier `cst m`. ⇒ no vale «`cₙ := cst n`»: hay que elegir
+> `cₙ := cst (1 + máximo índice usado en φₙ y en los axiomas ya añadidos)`. Eso pide una función
+> `Formula → Nat` («mayor índice de `cst` que aparece») y su lema, ~40 líneas. **Está identificado,
+> no medido.**
+
+**El diagnóstico era correcto; la solución cotizada, no.** Esa función **no hace falta**. El
+enunciado que la iteración consume no es «el máximo índice» sino «**a partir de cierto índice,
+todas son frescas**»:
+
+    cst_bound_formula : ∀ f, ∃ N, ∀ m ≥ N, ¬ occursFormula (cst m) f
+
+que sale por inducción estructural con `max`, **sin invertir `cst` y sin tocar `String.length`**;
+el único paso clásico está en el **símbolo** (`Classical.em (∃ k, cst k = s)` más `cst_inj`). Y
+`Exists.choose` lo convierte en la función `bnd` con la que se define el índice del turno:
+
+    hidx 0 := bnd (natToFormula 0)   ·   hidx (n+1) := max (hidx n + 1) (bnd (natToFormula (n+1)))
+
+estrictamente creciente (⇒ testigos distintos) y dominando las cotas anteriores (⇒ frescura).
+
+🔑 **La lección**: el plan cotizó *la solución que se le ocurrió*, no *el problema*. Un `∃` bien
+elegido puede sustituir a una función y a su lema. ⇒ **van seis** estimaciones mías refutadas por
+una medición, y ésta hacia **abajo**.
 
 ⚠️ Y lo que **sí** se sostiene de la afirmación vieja: el suministro mete `Classical.choice` en el
 footprint — pero por la **implementación** de `String` (§7), no por la matemática.
