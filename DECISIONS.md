@@ -2752,3 +2752,68 @@ va **después** de cerrar el ensamblaje, no en medio.
 
 **Véase también:** `../FOL/FOL/Henkin0.lean`, `../FOL/FOL/Lift0.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.2.
+
+---
+
+## ADR-038: Los ESTRATOS, declarados y vigilados — y la escalera de binders, cerrada a medias
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
+**Relacionado:** ADR‑024 (M‑10), ADR‑025/029 (M‑11), ADR‑033
+
+### 1 · El diagnóstico que lo motiva
+
+La pregunta del propietario era si el proyecto **se había quedado corto en estratificación**. La
+respuesta medida es **no en el número de capas, sino en el ROL**: hay **cinco** nociones de
+derivabilidad y, hasta el 2026‑09‑14, nadie podía decir mirando el árbol cuál era **herramienta**
+y cuál **sujeto**. Ése es el agujero que se cobró `FOL.soundness`.
+
+### 2 · La tabla, medida por el TIPO
+
+`REFERENCE.md` §0bis. Los habitantes se cuentan por la **cabeza de la conclusión** del tipo de cada
+`axiom`, no por grep sobre nombres:
+
+| noción | ctors | axiomas que la **habitan** | ¿inducción? |
+|---|---:|---:|---|
+| `Derives` | 22 | ⛔ **7** | ⛔ nunca (permanente) |
+| `Derives₀` | 21 | 0 | ✅ |
+| `Prf` | 7 | 0 | ✅ |
+| `Prf₀` | 17 | 0 | ✅ |
+| `PrfH` | 8 | 0 | ✅ |
+
+⭐ **Y el dato que ordena todo el proyecto**: **los siete axiomas habitan `Derives`**. Ninguna otra
+noción tiene ninguno.
+
+### 3 · `check-estratos.bash`, y por qué NO lo cubría `check-footprints`
+
+⛔⛔ **`#print axioms` es CIEGO a esta clase.** Un teorema probado por inducción sobre un inductivo
+habitado tiene footprint **limpio** y es **injustificado**.
+
+⇒ Son **dos controles distintos y ninguno sustituye al otro**: `check-footprints` mide **de qué
+depende** un teorema; `check-estratos` mide si **la inducción que lo probó era legítima**.
+
+Rompe en los dos sentidos, y probado con el fallo puesto en **cuatro** modos (los cuatro `EXIT=1`):
+más axiomas de los declarados —con el mensaje *«si era inducible, HA DEJADO DE SERLO»*—,
+constructores que no cuadran, estrato habitado no declarado, y peldaño de escalera no declarado.
+
+🔑 **La regla de rol, en una línea**: *si un cálculo está habitado por axiomas, es HERRAMIENTA; el
+SUJETO tiene que ser otro.* Explica `goedel_second'` retirado, Gödel reenunciado sobre `Prf`, y
+`Derives₀` declarado **al lado** de `Derives` en vez de intentar limpiarlo.
+
+### 4 · La escalera de binders: cerrada la mitad barata, medida la cara
+
+🏁 **Cerrado genéricamente el nivel de las DEFINICIONES**: `forallN : Nat → Formula → Formula` con
+los cinco puentes `forallN k f = forall_k f` **por `rfl`** y `forallN_succ`. ⭐ **Ninguno de los
+188 usos cambia** (build 145 jobs, verde).
+
+⚠️⚠️ **Y aquí corrijo mi propia estimación.** Dije *«medio día, riesgo cero… y cerrar la escalera
+`forall_n` genéricamente»*, metiendo las dos cosas en el mismo paquete. **La segunda no es de ese
+tamaño, y está medido**: la maquinaria crece **superlinealmente** —**6 → 13 → 34 → 64** líneas para
+`pcc_thm_inst`/`inst2`/`inst3`/`inst4`—, son cadenas de `prf_mp`/`prf_provCode_congr` con torres de
+`liftc`/`substfc`, y ⛔ **los símbolos objeto no reducen**. Una versión genérica en `n` es trabajo
+del orden del frente `substfc`.
+
+⚠️ **Y el desfase es real**: hay **tres axiomas de aridad 5** (`validProofFn`) sin instanciador de
+código. Queda **declarado y vigilado**, no escondido: el control lo imprime y rompe si cambia.
+
+**Véase también:** `check-estratos.bash`, `REFERENCE.md` §0bis y §0bis.2,
+`ROBINSON_PlusPlus/Minimal/Axioms.lean` (`forallN` y los puentes).

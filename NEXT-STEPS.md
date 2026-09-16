@@ -6,6 +6,29 @@
 
 **Estado 2026‑09‑14 · `master` · ✅ ÁRBOL VERDE (145 jobs · FOL 28) · **3 `axiom` de Lean****
 
+> # 🗓️ 2026‑09‑16 — los ESTRATOS, declarados y vigilados
+>
+> Salió de una pregunta del propietario: *¿me quedé corto en la estratificación?* La respuesta
+> medida: **no en el número de capas, sino en el ROL**.
+>
+> | | qué | dónde |
+> |---|---|---|
+> | 1 | ⭐⭐ **`REFERENCE.md` §0bis** — las **cinco** nociones de derivabilidad con ctors, habitantes‑axioma, ¿inducción?, solidez y **rol**. ⭐ Y el dato que ordena todo: **los SIETE axiomas del proyecto habitan `Derives`**; ninguna otra tiene ninguno | [ADR‑038](DECISIONS.md) |
+> | 2 | 🔧 **`check-estratos.bash`** — lo mide **por el TIPO** de cada axioma, no por grep, y rompe **en los dos sentidos**. Probado con el fallo puesto en **cuatro** modos. En `make estratos` y en CI | |
+> | 3 | 🏁 **`forallN`** — la escalera de binders cerrada **al nivel de las definiciones**, con cinco puentes por `rfl`. **Ninguno de los 188 usos cambia** | `Minimal/Axioms.lean` |
+>
+> ⛔⛔ **Por qué NO bastaba `check-footprints`**: `#print axioms` es **ciego** a M‑11 — un teorema
+> probado por inducción sobre un inductivo habitado tiene footprint **limpio**. Son dos controles
+> distintos: uno mide **de qué depende** un teorema, el otro si **la inducción era legítima**.
+>
+> ⚠️⚠️ **Y una corrección mía**: dije «medio día, riesgo cero **y** cerrar la escalera `forall_n`
+> genéricamente», metiendo las dos cosas en el mismo paquete. **La segunda no es de ese tamaño**:
+> medido, la maquinaria crece **superlinealmente** (**6 → 13 → 34 → 64** líneas) y son torres de
+> `liftc`/`substfc`, que **no reducen**. ⬜ Queda declarado el **desfase real**: tres axiomas de
+> aridad 5 sin instanciador de código.
+>
+> ▶ **Y seguimos con la tarea programada**: el ensamblaje de Henkin, plan §6.4.
+
 > # 🗓️ CIERRE DE LA SESIÓN 2026‑09‑14 — LEER ESTO PRIMERO
 >
 > ## 🏁 Lo HECHO hoy, y todo está commiteado y subido

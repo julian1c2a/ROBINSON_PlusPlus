@@ -87,6 +87,39 @@ proyecto: `goedel_second'` retirado por enunciarse sobre `⊢`; Gödel I y II re
 ⚠️ **Añadir un `axiom` a un estrato con 0 no es una decisión local**: invalida *retroactivamente*
 todo lo que se haya probado por inducción sobre él. El control lo dice con esas palabras.
 
+### 0bis.2 · La OTRA estratificación: la escalera de binders
+
+El proyecto está estratificado **también por número de cuantificadores**, y esa capa **existía de
+facto sin declarar**: **188 usos**, con los peldaños creados a reculones —cada uno cuando
+bloqueaba, y en sitios distintos del fichero (`forall_2`/`forall_3` en la línea 154, `forall_4` en
+la 441, `forall_5` en la 833)—.
+
+| escalera | peldaño máximo |
+|---|---:|
+| **definiciones** `forall_k` | **5** |
+| maquinaria `pcc_thm_inst_k` · `pcc_axiom_inst_k` | 4 |
+| maquinaria `PSI_inst_k` · `psi_lift_form_k` | 4 |
+
+⚠️ **El desfase es REAL y está declarado**: hay **tres axiomas de aridad 5** en `axioms`
+(`validProofFn`, `Minimal/Axioms.lean:878,881,885`) y **ningún instanciador de código** para
+ellos. `check-estratos.bash` §escalera lo imprime y **rompe si la cifra cambia** en cualquiera de
+las dos escaleras.
+
+🏁 **Lo que SÍ está cerrado genéricamente (2026‑09‑16)**: el nivel de las **definiciones**.
+
+    def forallN : Nat → Formula → Formula
+      | 0, f => f
+      | n + 1, f => .forall (forallN n f)
+
+con los cinco puentes `forallN k f = forall_k f` **por `rfl`** y `forallN_succ`. ⇒ **ninguno de
+los 188 usos cambia**, y el nivel definicional no necesita otro peldaño nunca.
+
+⛔ **Lo que NO está cerrado, y su precio está MEDIDO**: la maquinaria crece **superlinealmente** —
+**6 → 13 → 34 → 64** líneas para `pcc_thm_inst`, `inst2`, `inst3`, `inst4`. Son cadenas de
+`prf_mp`/`prf_provCode_congr` con torres de `liftc`/`substfc`, y ⛔ **los símbolos objeto no
+reducen**, así que cada peldaño necesita sus propios puentes. **El peldaño 5 no es una tarde**, y
+una versión genérica en `n` es trabajo del orden del frente `substfc`.
+
 ---
 
 ## 0 · Naming Conventions Guide for the Reader

@@ -130,6 +130,54 @@ for CAB in $(printf '%s' "$PLANA" | grep -oE '@HAB [^ ]+' | sed 's/@HAB //' | so
 done
 [ "$HUERFANOS" = "0" ] && echo "  ✓ todos los axiomas habitan estratos declarados"
 
+# ── 3 · LA ESCALERA DE BINDERS ────────────────────────────────────────────────────────────
+# La otra estratificación del proyecto: por NÚMERO DE CUANTIFICADORES. Existe de facto
+# (188 usos), y se construyó a reculones — cada peldaño cuando bloqueaba.
+#
+# ⚠️ Lo que este bloque vigila es el DESFASE: que la escalera del USO no adelante a la de la
+# MAQUINARIA sin que nadie se entere. Hoy el desfase es REAL y está declarado: hay tres
+# axiomas `forall_5` (`validProofFn`) y la maquinaria llega a 4.
+#
+# prefijo | máximo peldaño DECLARADO
+read -r -d '' ESCALERA <<'EOF'
+forall_|5
+pcc_thm_inst|4
+pcc_axiom_inst|4
+PSI_inst|4
+psi_lift_form|4
+EOF
+
+echo
+echo "════ ESCALERA DE BINDERS ════"
+MAXUSO=0
+MAXMAQ=99
+while IFS='|' read -r PREF ESP; do
+  [ -n "$PREF" ] || continue
+  REAL=0
+  for k in 1 2 3 4 5 6 7 8; do
+    if grep -rqE "^(theorem|def|abbrev) ${PREF}${k} " ROBINSON_PlusPlus/ --include=*.lean 2>/dev/null; then
+      REAL=$k
+    fi
+  done
+  if [ "$REAL" = "$ESP" ]; then
+    printf "  ✓ %-18s peldaño máximo %s\n" "$PREF" "$REAL"
+  else
+    printf "  ✗ %-18s peldaño máximo %s — declarado %s\n" "$PREF" "$REAL" "$ESP"
+    echo "      ⇒ o se construyó un peldaño nuevo (⇒ actualizar esta tabla), o se perdió uno."
+    FAIL=1
+  fi
+  if [ "$PREF" = "forall_" ]; then MAXUSO=$REAL
+  elif [ "$REAL" -lt "$MAXMAQ" ] 2>/dev/null; then MAXMAQ=$REAL; fi
+done <<< "$ESCALERA"
+
+if [ "$MAXUSO" -gt "$MAXMAQ" ] 2>/dev/null; then
+  echo "  ⚠️  DESFASE DECLARADO: el uso llega a forall_$MAXUSO y la maquinaria a $MAXMAQ."
+  echo "      Es real y conocido — hay axiomas de aridad $MAXUSO sin instanciador de código."
+  echo "      ⚠️ La maquinaria crece SUPERLINEALMENTE: medido 6 → 13 → 34 → 64 líneas"
+  echo "         (pcc_thm_inst · inst2 · inst3 · inst4). El peldaño 5 NO es una tarde."
+  echo "      ⭐ El nivel de las DEFINICIONES sí está cerrado: \`forallN\` + los cinco puentes."
+fi
+
 echo
 if [ "$N" = "0" ]; then
   echo "❌ LA TABLA ESTÁ VACÍA — el control no comprueba nada."; exit 1

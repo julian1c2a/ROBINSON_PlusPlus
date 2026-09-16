@@ -154,6 +154,21 @@ def forall_ (f : Formula) : Formula := .forall f
 def forall_2 (f : Formula) : Formula := .forall (.forall f)
 def forall_3 (f : Formula) : Formula := .forall (.forall (.forall f))
 
+/-- ⭐ **La escalera de binders, cerrada de una vez** (2026‑09‑16).
+
+`forall_2`, `forall_3` (aquí), `forall_4` (línea ~441) y `forall_5` (línea ~833) se fueron
+declarando **a reculones**, cada uno cuando hizo falta y en un sitio distinto del fichero. Esto
+es el peldaño genérico: `forall_k f = forallN k f` **por `rfl`** para todo `k`, así que el
+**nivel de las definiciones** no necesita otro peldaño nunca.
+
+⚠️ **Lo que esto NO cierra** es la escalera de la MAQUINARIA (`pcc_thm_inst_n`, `PSI_inst_n`),
+que crece **superlinealmente** —medido: **6 → 13 → 34 → 64** líneas para `inst`, `inst2`,
+`inst3`, `inst4`— y hoy va **un peldaño por detrás** del uso: hay **tres axiomas de aridad 5**
+(`validProofFn`) y la maquinaria llega a 4. Lo vigila `check-estratos.bash` §escalera. -/
+def forallN : Nat → Formula → Formula
+  | 0, f => f
+  | n + 1, f => .forall (forallN n f)
+
 
 -- ## Axioms
 
@@ -831,6 +846,21 @@ def ax_tc_cons : Formula :=
 
 /-- Cuantificación universal quíntuple. -/
 def forall_5 (f : Formula) : Formula := .forall (forall_4 f)
+
+/-! ### Los puentes al peldaño genérico — los cuatro por `rfl`
+
+⭐ Permiten escribir lo nuevo con `forallN` sin tocar ninguno de los **188 usos** de
+`forall_2..5`. -/
+
+theorem forallN_1 (f : Formula) : forallN 1 f = forall_ f := rfl
+theorem forallN_2 (f : Formula) : forallN 2 f = forall_2 f := rfl
+theorem forallN_3 (f : Formula) : forallN 3 f = forall_3 f := rfl
+theorem forallN_4 (f : Formula) : forallN 4 f = forall_4 f := rfl
+theorem forallN_5 (f : Formula) : forallN 5 f = forall_5 f := rfl
+
+/-- Y el paso genérico, que es lo que hace que no haga falta un peldaño más. -/
+theorem forallN_succ (n : Nat) (f : Formula) :
+    forallN (n + 1) f = Formula.forall (forallN n f) := rfl
 
 /-- Verificador de demostraciones-secuencia: `validProofFn checked rest` recorre
     `rest` recomputando la conclusión de cada línea y acumulando en `checked`;
