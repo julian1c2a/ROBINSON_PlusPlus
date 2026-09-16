@@ -3404,3 +3404,82 @@ fuerte**. Sin ese lado, «quitar una regla» sería sólo «cambiarla de sitio»
 
 **Véase también:** `FOL/Derives2.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.6,
 `check-estratos.bash`, `check-footprints.bash` (64 titulares).
+
+---
+
+## ADR-046: H3, tercera pieza — el CÁLCULO DE SECUENTES, y la deuda reducida a DOS `Prop`
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑043 (el consumidor y la decisión de no construir el molde), ADR‑044/045 (los
+dos obstáculos), plan §5.7
+
+### 1 · Qué queda demostrado
+
+    LK₀                    -- secuentes clásicos de dos lados, SIN corte (13 ctors)
+    LKc                    -- lo mismo MÁS el corte (14)
+    lk0_herbrand           -- ⭐⭐ la EXTRACCIÓN: de `LK₀ E ⟹ ∃xφ` salen los términos
+    herbrandExtraction_of  -- ⭐⭐⭐ CutElim + NDtoLK ⇒ HerbrandExtraction
+
+`FOL/Sequent0.lean`, **348 l. de código**. `lk0_herbrand` mide **`[propext]`**, `lk0_to_lkc`
+**ningún axioma**, la cadena `[propext, Quot.sound]` — **ni un `Classical.choice`**.
+
+⇒ **H3 queda reducida a DOS `Prop` enunciadas**, y el consumidor está escrito.
+
+### 2 · ⭐ El orden, que es el que ADR‑043 §3 había decidido
+
+Aquel ADR decidió **no** construir `LK₀` mientras no hubiera consumidor: *la guarda se copia del
+CONSUMIDOR, no del molde*. El consumidor apareció allí mismo (`HerbrandCert`) y el cálculo quedó en
+forma estándar en ADR‑045. **Sólo entonces** tiene sentido el molde — y **lo primero que se hace
+con él es probar el consumidor**, `lk0_herbrand`.
+
+🔑 Si esa prueba no hubiera salido, `LK₀` estaría mal diseñado **y no se sabría hasta el
+Hauptsatz**, es decir, después de pagar la pieza cara. La disciplina se cobró aquí.
+
+### 3 · ⭐⭐ Qué enseña `lk0_herbrand`, además de servir
+
+De sus **13** casos:
+
+| grupo | casos | qué pasa |
+|---|---|---|
+| produce el testigo | `exR` | ⭐ `∃A` en el sucedente sólo puede ser `∃φ`, y el término de la regla **es** un testigo |
+| ⛔ imposibles | `allR`, `allL`, `exL` | meten un cuantificador donde la hipótesis dice que no lo hay |
+| proposicionales | los **nueve** restantes | bookkeeping sobre `peval` |
+
+🔑 **Y ahí se ve, en una frase, para qué sirve el Hauptsatz**: la regla de **corte** tendría una
+fórmula `A` **arbitraria** —posiblemente cuantificada— que **no aparece en la conclusión**, así que
+las hipótesis de la inducción **no se heredan**. *El corte es exactamente lo que rompe esta
+lectura.*
+
+### 4 · ⬜ Lo que queda — dos `Prop`, y nada más
+
+    CutElim : ∀ Γ Δ, LKc Γ Δ → LK₀ Γ Δ                      -- el HAUPTSATZ
+    NDtoLK  : ∀ Γ f, Derives₂ Γ f →
+                ∃ E, (∀ g ∈ E, EqInstance g) ∧ LKc (E ++ Γ) [f]
+
+⚠️ **`NDtoLK` no es rutina, y su dificultad está localizada** (⬜ medida como **problema**, no como
+coste): el caso `intro_forall` **levanta el contexto**, de modo que la lista `E` de instancias que
+devuelve la hipótesis de inducción vive en el contexto **levantado** y hay que producirla desde el
+de abajo — pero una instancia con `Term.var 0` **no es el levantamiento de ninguna**. Es el mismo
+tipo de obstáculo que ADR‑045 resolvió con `derives2_lift`, en la dirección contraria.
+
+### 5 · ⚠️ Y una comprobación que NO está hecha, dicha
+
+`LK₀ Γ Δ → Derives₂ Γ (disjOf Δ)` —que `LK₀` **no sea demasiado fuerte**— ⬜ **no está**. El
+obstáculo está identificado: el caso `allR` exige sacar una disyunción de dentro de un
+cuantificador (`∀x(A ∨ C) → (∀x A) ∨ C` con `C` sin `x`), clásico pero con su propia capa de lemas
+sobre el levantamiento.
+
+⇒ **No está en el camino crítico** —las dos obligaciones del §4 no pasan por ella—, pero es lo que
+certificaría que el molde no prueba de más. Queda dicho, no escondido.
+
+### 6 · ⭐ El control cazó un error mío de conteo
+
+Declaré `LK₀|14` y `LKc|15` en `check-estratos.bash`. **Son 13 y 14.** El control rompió en el
+acto y la cifra se corrigió en los **dos** sitios (la tabla y el docstring, que también decía «14
+casos» y «los diez restantes»).
+
+🔑 *Un contador exacto rompe también hacia abajo* — es la misma propiedad que protege ADR‑032, y
+esta vez me protegió de publicar una cifra falsa en un docstring.
+
+**Véase también:** `FOL/Sequent0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.7,
+`check-estratos.bash` (9 estratos), `check-footprints.bash` (69 titulares).

@@ -236,7 +236,7 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 |---|---|---|---|
 | **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
 | **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **los DOS obstáculos retirados**; falta el Hauptsatz, §5.5–§5.6 |
+| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **reducida a DOS `Prop`**: `CutElim` y `NDtoLK`, §5.5–§5.7 |
 | **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **la mitad ⟸, HECHA** 2026‑09‑16 |
 
 #### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
@@ -409,6 +409,48 @@ meterla en el enunciado.*
 El cálculo está en la forma estándar. ⬜ Sigue faltando la eliminación de cortes —y con ella la
 extracción del certificado (`HerbrandExtraction`)—, que es **la pieza grande** y ahora es un
 problema de libro y no de este cálculo en particular.
+
+---
+
+### 5.7 · 🏁 H3, tercera pieza: **el cálculo de secuentes**, y la deuda reducida a DOS — ADR‑046
+
+    LK₀                    -- secuentes clásicos de dos lados, SIN corte (13 ctors)
+    LKc                    -- lo mismo MÁS el corte (14)
+    lk0_herbrand           -- ⭐⭐ la EXTRACCIÓN: de `LK₀ E ⟹ ∃xφ` salen los términos
+    herbrandExtraction_of  -- ⭐⭐⭐ CutElim + NDtoLK ⇒ H3
+
+`../FOL/FOL/Sequent0.lean`, **348 l. de código**. `lk0_herbrand` mide **`[propext]`**,
+`lk0_to_lkc` **ningún axioma**, y la cadena `[propext, Quot.sound]` — **ni un `Classical.choice`**.
+
+⭐ **El orden importa y es el que ADR‑043 §3 había decidido**: no construir el molde sin
+consumidor. El consumidor apareció en ADR‑043 (`HerbrandCert`) y el cálculo quedó en forma estándar
+en ADR‑045; **sólo entonces** se construye `LK₀`, y **lo primero que se hace con él es probar el
+consumidor**. Si `lk0_herbrand` no hubiera salido, el diseño estaría mal y no se sabría hasta el
+Hauptsatz.
+
+⭐⭐ **Y lo que `lk0_herbrand` enseña de paso**: de sus 13 casos, **uno** produce el testigo
+(`exR`), **tres son imposibles** (`allR`, `allL`, `exL`: meten un cuantificador donde no puede
+haberlo) y **nueve** son bookkeeping proposicional. 🔑 *La regla de corte tendría una fórmula
+arbitraria que no aparece en la conclusión, así que las hipótesis de la inducción no se heredan:
+el corte es exactamente lo que rompe esta lectura.* Ahí está, en una frase, para qué sirve el
+Hauptsatz.
+
+#### ⬜ Lo que queda de H3: **dos `Prop`, y nada más**
+
+    CutElim : ∀ Γ Δ, LKc Γ Δ → LK₀ Γ Δ                      -- el HAUPTSATZ
+    NDtoLK  : ∀ Γ f, Derives₂ Γ f →
+                ∃ E, (∀ g ∈ E, EqInstance g) ∧ LKc (E ++ Γ) [f]
+
+⚠️ **`NDtoLK` no es rutina, y su dificultad está localizada** (⬜ medida como problema, no como
+coste): el caso `intro_forall` **levanta el contexto**, así que la lista `E` que devuelve la
+hipótesis de inducción vive en el contexto **levantado**, y hay que producirla desde el de abajo —
+pero una instancia con `Term.var 0` no es el levantamiento de ninguna.
+
+⚠️ **Y una comprobación que NO está hecha**: `LK₀ Γ Δ → Derives₂ Γ (disjOf Δ)`, es decir, que `LK₀`
+no sea **demasiado fuerte**. ⬜ El obstáculo está identificado: el caso `allR` exige sacar una
+disyunción de dentro de un cuantificador (`∀x(A ∨ C) → (∀x A) ∨ C` con `C` sin `x`). No está en el
+camino crítico —las dos obligaciones de arriba no pasan por ella—, pero es lo que certificaría que
+el molde no prueba de más.
 
 ---
 

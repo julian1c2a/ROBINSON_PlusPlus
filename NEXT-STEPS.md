@@ -4,8 +4,46 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 31 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **64** · `check-estratos` **7** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 32 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **69** · `check-estratos` **9** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 (cierre) — 🏁 **H3 REDUCIDA A DOS `Prop`**: el cálculo de secuentes
+>
+> ```
+> LK₀ / LKc              -- secuentes clásicos, sin corte (13 ctors) y con corte (14)
+> lk0_herbrand           -- ⭐⭐ la EXTRACCIÓN: de `LK₀ E ⟹ ∃xφ` salen los términos
+> herbrandExtraction_of  -- ⭐⭐⭐ CutElim + NDtoLK  ⇒  HerbrandExtraction
+> ```
+>
+> `../FOL/FOL/Sequent0.lean` (348 l.) — [ADR‑046](DECISIONS.md). `lk0_herbrand` **`[propext]`**,
+> `lk0_to_lkc` **sin ningún axioma**, la cadena `[propext, Quot.sound]`.
+>
+> ⭐ **El orden es el que ADR‑043 §3 había decidido**: no construir el molde sin consumidor. Y **lo
+> primero que se hace con `LK₀` es probar el consumidor**. Si `lk0_herbrand` no hubiera salido, el
+> diseño estaría mal **y no se sabría hasta el Hauptsatz** — es decir, después de pagar la pieza
+> cara.
+>
+> ⭐⭐ De sus **13** casos: **uno** produce el testigo (`exR`), **tres son imposibles** (`allR`,
+> `allL`, `exL`) y **nueve** son bookkeeping proposicional. 🔑 *El corte tendría una fórmula
+> arbitraria que no aparece en la conclusión, así que las hipótesis de la inducción no se heredan:
+> el corte es exactamente lo que rompe esta lectura.* Ahí está para qué sirve el Hauptsatz.
+>
+> ⭐ **Y el control cazó un error mío de conteo**: declaré `LK₀|14` y son **13**. Rompió en el acto
+> y la cifra se corrigió en los dos sitios. 🔑 *Un contador exacto rompe también hacia abajo.*
+>
+> ▶ **LO QUE QUEDA DE H3 — dos `Prop`, y nada más:**
+>
+> 1. ⬜ **`CutElim`** — el **Hauptsatz**: `∀ Γ Δ, LKc Γ Δ → LK₀ Γ Δ`. La pieza grande, y ahora un
+>    problema de libro sobre un cálculo estándar.
+> 2. ⬜ **`NDtoLK`** — `Derives₂ Γ f → ∃ E de instancias de igualdad, LKc (E ++ Γ) [f]`.
+>    ⚠️ **No es rutina**: el caso `intro_forall` levanta el contexto, así que la `E` de la hipótesis
+>    de inducción vive **arriba** y hay que producirla **abajo** — y una instancia con `Term.var 0`
+>    no es el levantamiento de ninguna. *Medido como problema, no como coste.*
+>
+> ⬜ Y fuera del camino crítico, la comprobación de que `LK₀` **no es demasiado fuerte**
+> (`LK₀ Γ Δ → Derives₂ Γ (disjOf Δ)`): su obstáculo es `allR`, que exige sacar una disyunción de
+> dentro de un cuantificador.
+
 
 > # 🗓️ 2026‑09‑16 (cierre) — 🏁🏁 **H3: LOS DOS OBSTÁCULOS, RETIRADOS**
 >

@@ -78,6 +78,11 @@ FOL.Derives2.eq_substTerm|propext
 FOL.Derives2.eq_substFormula|Quot.sound,propext
 FOL.Derives2.derives1_to_derives2|Quot.sound,propext
 FOL.Derives2.derives0_iff_derives2|Quot.sound,propext
+LK₀.rec|-
+FOL.Sequent0.quantFree_subst|-
+FOL.Sequent0.lk0_herbrand|propext
+FOL.Sequent0.lk0_to_lkc|-
+FOL.Sequent0.herbrandExtraction_of|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext
