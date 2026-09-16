@@ -4,8 +4,42 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 33 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **76** · `check-estratos` **9** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 34 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **80** · `check-estratos` **9** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 — 🏁🏁 **H3 SE QUEDA CON UNA SOLA DEUDA** (paso 2 del propietario)
+>
+> ```
+> ndToLK : Derives₂ Γ f → LKc Γ [f]                       -- los 22 casos, DEMOSTRADA
+> herbrandExtraction_of_cutElim : CutElim → HerbrandExtraction
+> ```
+>
+> `../FOL/FOL/NDtoLK0.lean` (118 l.) — [ADR‑049](DECISIONS.md). `[propext, Quot.sound]`, **ni un
+> `Classical.choice`**.
+>
+> ⭐⭐ **Lo que desbloqueó no fue esfuerzo sino UNA REGLA.** ADR‑046 §4 midió bien el bloqueo (el
+> caso `intro_forall` levanta el contexto y una instancia con `Term.var 0` no es el levantamiento
+> de ninguna). La salida fue añadir **`eqAx`**, el **corte contra un axioma de la teoría**, que
+> mete el axioma **localmente**. Con él la traducción es estructural y **sin `E`**.
+> 🔑 *Cuando una obligación se bloquea por bookkeeping, a veces lo que falta es una regla.*
+> ⚠️ Con su aviso recíproco: sólo vale si la regla nueva **no encarece** lo que viene detrás —
+> aquí `CutElim` sigue siendo estándar, y eso se comprueba **antes** de añadirla.
+>
+> ⚠️ **Y el diseño está FORZADO**: `eqAx` no puede ser regla **derecha** (`⟹ t ≐ t`), porque
+> `peval` trata `t ≐ t` como **átomo**. 🔑 *La forma de `HerbrandCert` fija la forma del cálculo.*
+>
+> ⭐ `intro_forall` es literalmente `allR` y `elim_ex` es `exL` — directos, sin corte. El caso caro
+> fue `forall_not_ex_not`, que cierra con `substFormula_lift_var` **por tercera vez**.
+>
+> ▶ **LO ÚNICO QUE QUEDA DE TODO EL PLAN** (paso 3 del propietario):
+>
+> ```
+> CutElim : ∀ Γ Δ, LKc Γ Δ → LK₀ Γ Δ          -- el HAUPTSATZ
+> ```
+>
+> ⬜ Es la pieza grande (~800–1500 l., varias sesiones), y ahora es un problema **de libro** sobre
+> un cálculo estándar con axiomas **sin cuantificadores**.
+
 
 > # 🗓️ 2026‑09‑16 — 🏁 **`LK₀` NO PRUEBA DE MÁS** (paso 1 del plan del propietario)
 >

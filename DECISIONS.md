@@ -3615,3 +3615,74 @@ constructiva. *La extracción es constructiva; la solidez, no.* Separarlos es lo
 
 **Véase también:** `FOL/SequentSound0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.7,
 `check-footprints.bash` (76 titulares).
+
+---
+
+## ADR-049: `NDtoLK` demostrada — y la regla que faltaba, `eqAx`
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO · **Revisa:** ADR‑046 (diseño de `LK₀`) ·
+**Relacionado:** ADR‑045 (`Derives₂`), ADR‑048 (solidez), plan §5.8
+
+### 1 · Qué queda demostrado
+
+    ndToLK : Derives₂ Γ f → LKc Γ [f]                          -- los 22 casos
+    herbrandExtraction_of_cutElim : CutElim → HerbrandExtraction
+
+`FOL/NDtoLK0.lean`, **118 l. de código**, `[propext, Quot.sound]` — **ni un `Classical.choice`**;
+`mpLK` y `viaEqImpl` **no dependen de ningún axioma**.
+
+⇒ 🏁 **De las dos obligaciones de ADR‑046 queda UNA: el Hauptsatz.** Toda la vía H —y con ella lo
+único que faltaba del plan— cabe en una línea.
+
+### 2 · ⭐⭐ Lo que desbloqueó: una REGLA, no más esfuerzo
+
+ADR‑046 §4 midió el bloqueo, y lo midió bien: con las instancias de igualdad **en el antecedente**,
+el caso `intro_forall` **levanta el contexto**; la `E` que devuelve la hipótesis de inducción vive
+arriba y hay que producirla abajo, pero **una instancia con `Term.var 0` no es el levantamiento de
+ninguna**. No hay manera de arreglarlo con más bookkeeping.
+
+⭐ La salida fue **añadir la regla que faltaba**: `eqAx`, el **corte contra un axioma de la
+teoría** (*theory‑cut*), que mete el axioma **localmente, donde se usa**:
+
+    eqAx : EqInstance g → LK (g :: Γ) Δ → LK Γ Δ
+
+| | antes | ahora |
+|---|---|---|
+| `NDtoLK` | ⛔ bloqueada por el levantamiento | ✅ **demostrada**, traducción **estructural** sin `E` |
+| `lk0_herbrand` | devolvía sólo `ts` | ⭐ devuelve `ts` **y** la `E` que la derivación usa |
+| `CutElim` | estándar | **sigue siendo estándar**: los axiomas son **sin cuantificadores** y permutan como cualquier regla izquierda |
+
+🔑 **La lección**: *cuando una obligación se bloquea por bookkeeping, a veces lo que falta no es
+esfuerzo sino una regla.* ⚠️ Y el aviso recíproco: sólo vale si la regla nueva **no encarece** lo
+que venía detrás — aquí `CutElim` no se encarece, y eso hay que comprobarlo **antes** de añadirla,
+no después.
+
+### 3 · ⚠️ El diseño está FORZADO, no elegido
+
+`eqAx` **no puede** ser una regla **derecha** de igualdad (`⟹ t ≐ t`). `peval` trata `t ≐ t` como
+un **átomo**, así que bajo una valuación arbitraria es **falso**: el certificado sólo puede decir
+*«la disyunción se sigue de `E`»*, y por tanto la `E` **tiene que existir**.
+
+🔑 **La forma de `HerbrandCert` fija la forma del cálculo.** Es el mismo principio que ADR‑043 §3
+—*la guarda se copia del consumidor*— aplicado ahora al molde entero.
+
+### 4 · Qué se tocó, y qué no
+
+* `FOL/Sequent0.lean`: `eqAx` en `LK₀` (13 → **14** ctors) y `LKc` (14 → **15**);
+  `lk0_herbrand` **generalizada** para devolver `E`; `NDtoLK` cambia de forma (ya no lleva `E`).
+* `FOL/SequentSound0.lean`: caso `eqAx` + ⭐ **`eqInstance_valid`** —los axiomas de la igualdad son
+  **válidos en todo modelo**—, que es lo que hace sólido el theory‑cut. **Net‑0.**
+* ⛔ **`Derives₀`…`Derives₂` no se tocan.** Nada aguas arriba se movió.
+
+### 5 · Lo que salió gratis, y lo que costó
+
+⭐ **`intro_forall` es literalmente `allR`** y **`elim_ex` es `exL`** — directos, sin corte. *Los
+dos cálculos tienen la misma regla de eigenvariable, escrita de dos maneras.*
+
+⚠️ El caso con más trabajo fue `forall_not_ex_not` (`¬∀A ⟹ ∃¬A`): bajar por `allR`, subir el `∃`
+con testigo `Term.var 0` y cerrar con **`substFormula_lift_var`** — el lema del paso de
+eigenvariable de Henkin (ADR‑036), **por tercera vez**.
+
+**Véase también:** `FOL/NDtoLK0.lean`, `FOL/Sequent0.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §5.8, `check-estratos.bash` (LK₀ 14, LKc 15),
+`check-footprints.bash` (80 titulares).

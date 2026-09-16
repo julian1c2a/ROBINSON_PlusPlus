@@ -236,7 +236,7 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 |---|---|---|---|
 | **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
 | **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **reducida a DOS `Prop`**: `CutElim` y `NDtoLK`, §5.5–§5.7 |
+| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **reducida a UNA `Prop`: `CutElim`**, §5.5–§5.8 |
 | **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **la mitad ⟸, HECHA** 2026‑09‑16 |
 
 #### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
@@ -466,6 +466,50 @@ semántica* — primera vez que este plan cobra ese dividendo, y sólo se puede 
 
 ⭐⭐ **Y el caso `cut` es semánticamente TRIVIAL** (tres líneas). 🔑 *El corte es gratis para la
 verdad y carísimo para la demostración*: eso es, en una frase, todo el frente H3.
+
+---
+
+### 5.8 · 🏁 H3, cuarta pieza: **`NDtoLK` demostrada** — queda UNA deuda (ADR‑049)
+
+    ndToLK : Derives₂ Γ f → LKc Γ [f]
+    herbrandExtraction_of_cutElim : CutElim → HerbrandExtraction
+
+`../FOL/FOL/NDtoLK0.lean`, **118 l. de código**, `[propext, Quot.sound]` — **ni un
+`Classical.choice`**; `mpLK` y `viaEqImpl` **sin ningún axioma**.
+
+⇒ 🏁 **De las dos obligaciones de §5.7 queda UNA: el Hauptsatz.**
+
+#### ⭐⭐ Lo que desbloqueó la traducción: una REGLA, no más esfuerzo
+
+§5.7 midió el bloqueo y lo midió bien: con las instancias de igualdad **en el antecedente**, el
+caso `intro_forall` **levanta el contexto**, la `E` de la hipótesis de inducción vive arriba, y una
+instancia con `Term.var 0` **no es el levantamiento de ninguna**.
+
+⭐ La salida no fue pelear el bookkeeping sino **añadir la regla que faltaba** — `eqAx`, el **corte
+contra un axioma de la teoría**:
+
+| | antes | ahora |
+|---|---|---|
+| `NDtoLK` | ⛔ bloqueada | ✅ **demostrada**, traducción **estructural** y sin `E` |
+| `lk0_herbrand` | devolvía `ts` | ⭐ devuelve `ts` **y** la `E` que la derivación usa |
+| `CutElim` | estándar | estándar: los axiomas son **sin cuantificadores** y permutan como cualquier regla izquierda |
+
+🔑 *Cuando una obligación se bloquea por bookkeeping, a veces lo que falta no es esfuerzo sino una
+regla.*
+
+⚠️ **Y el diseño está FORZADO, no elegido**: `eqAx` no puede ser una regla **derecha** de igualdad
+(`⟹ t ≐ t`), porque `peval` trata `t ≐ t` como un **átomo** y bajo una valuación arbitraria es
+falso. El certificado sólo puede decir *«la disyunción se sigue de `E`»*, así que la `E` tiene que
+existir. **La forma de `HerbrandCert` fija la forma del cálculo.**
+
+⭐ Y dos cosas salieron **directas, sin corte**: `intro_forall` es literalmente `allR`, y `elim_ex`
+es `exL`. *Los dos cálculos tienen la misma regla de eigenvariable, escrita de dos maneras.*
+⚠️ El caso con más trabajo fue `forall_not_ex_not`, que cierra otra vez con
+`substFormula_lift_var` — el lema del paso de eigenvariable de Henkin, **por tercera vez**.
+
+#### ⬜ Lo que queda de toda la vía H: **una línea**
+
+    CutElim : ∀ Γ Δ, LKc Γ Δ → LK₀ Γ Δ
 
 ---
 
