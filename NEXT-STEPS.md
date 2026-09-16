@@ -4,8 +4,46 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 26 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **39** · `check-estratos` **5** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 28 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **47** · `check-estratos` **5** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 (cierre) — 🏁 **VÍA H · H1 y H2**: la completitud PROPOSICIONAL, FINITARIA
+>
+> ```
+> derives0_of_ptaut     : PTaut φ → [] ⊢₀ φ
+> derives0_of_ptaut_ctx : (∀ v, (∀ g ∈ Γ, peval v g) → peval v φ) → Γ ⊢₀ φ
+> ```
+>
+> `../FOL/FOL/Propositional0.lean` (244 l.) sobre `../FOL/FOL/DecEq.lean` (31 l.)
+> ([ADR‑042](DECISIONS.md)). Footprint **`[propext, Quot.sound]` — ni un `Classical.choice`**, y
+> `derives0_em_ctx` (`Δ ⊢₀ A ∨ ¬A`) **no depende de ningún axioma**.
+>
+> 🔑 **Ésa es la razón de ser de la vía H**: aquí **no hay König** porque `Γ` es finito y la
+> valuación recorre una lista finita de átomos. La vía W es *finitistamente reducible*; ésta es
+> **finitaria**.
+>
+> ⭐ **El control que lo mide**: `A ∨ ¬A` y Peirce ya estaban demostrados en `FOL.Canonical0` **por
+> completitud semántica**, con `Classical.choice`. Los **mismos dos teoremas** por la vía H son
+> **net‑0**. *La vía H da lo mismo con footprint estrictamente menor* — las dos vías no son
+> redundantes, y ahora está probado dentro del repo.
+>
+> ⭐ **Desviación del plan que lo mejora**: §5.2 pedía «fórmulas sin cuantificadores». Tratar `∀` y
+> `∃` **como átomos** (*esqueleto proposicional*) no cuesta nada y hace el teorema aplicable a
+> **toda** fórmula.
+>
+> ⚠️ **Dos mediciones para no volver a descubrirlas**: ⛔ `deriving instance DecidableEq for Term`
+> **NO funciona** (inductivo anidado) — la recursión mutua va a mano, 25 l. net‑0; `Formula` sí se
+> deriva después. ⚠️ Y la instancia **no reduce en el kernel**: `by decide` sobre fórmulas se
+> atasca.
+>
+> ⛔ **`FOL.DecEq` NO se retrofita** a `Henkin0`/`Lindenbaum0`: movería footprints ya publicados y
+> el `Classical.choice` de `Lindenbaum0` tiene que seguir ahí por otra razón (Π⁰₁, ADR‑040 §2).
+>
+> ▶ **POR DÓNDE SEGUIR**: ⬜ **H3** — normalización / eliminación de cortes de `Derives₀`, que
+> **sigue siendo la pieza grande** de la vía H (vía estándar: un secuentes `LK₀` sin corte, con
+> `LK₀ → Derives₀` fácil y el corte eliminado allí), y ⬜ **H4**, la extracción de testigos.
+> ⚠️ H1+H2 son la **base**, no el teorema de Herbrand.
+
 
 > # 🗓️ 2026‑09‑16 (noche) — 🏁🏁🏁🏁 **COMPLETITUD DE FOL⁼, DEMOSTRADA**
 >

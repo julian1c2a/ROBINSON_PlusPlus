@@ -3059,3 +3059,81 @@ Si `completeness₀` fuera vacua, esto no compilaría.
 
 **Véase también:** `FOL/Canonical0.lean`, `FOL/Eq0.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §6, `check-footprints.bash` (39 titulares).
+
+---
+
+## ADR-042: Vía H · **H1 y H2** — la completitud proposicional, y es FINITARIA de verdad
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑033 (`Derives₀`), ADR‑041 (completitud semántica), plan §5
+
+### 1 · Qué queda demostrado
+
+    derives0_of_ptaut     : PTaut φ → [] ⊢₀ φ
+    derives0_of_ptaut_ctx : (∀ v, (∀ g ∈ Γ, peval v g) → peval v φ) → Γ ⊢₀ φ
+
+`FOL/Propositional0.lean` (244 l. de código) sobre `FOL/DecEq.lean` (31 l.). Footprint
+**`[propext, Quot.sound]`** — ⭐⭐ **ni un `Classical.choice`** —, y `derives0_em_ctx` **no depende
+de ningún axioma**.
+
+🔑 **Ésa es toda la diferencia con la vía W, y es la razón de ser de la vía H**: aquí no hay
+König, porque `Γ` es **finito** y la valuación recorre una lista **finita** de átomos. La vía W es
+*finitistamente reducible*; ésta es **finitaria**.
+
+### 2 · ⭐ La desviación del plan, y por qué mejora el resultado
+
+§5.2 pedía «semántica proposicional para fórmulas **sin cuantificadores**». Lo implementado trata
+`∀` y `∃` **como átomos** — el *esqueleto proposicional*.
+
+| | alcance | coste |
+|---|---|---|
+| ⬜ como pedía el plan | sólo fórmulas sin cuantificadores | + un predicado `QF` y su propagación |
+| ⭐ como está | **toda** fórmula | **ninguno** |
+
+⇒ `derives0_of_ptaut` descarga **cualquier** tautología proposicional, con subfórmulas
+cuantificadas dentro, en una línea. La restricción no habría hecho el teorema más fuerte, sólo
+menos aplicable.
+
+### 3 · ⭐ El control que mide PARA QUÉ sirve la vía H
+
+`derives0_em` y `derives0_peirce` **ya estaban demostrados** (ADR‑041 §5), pero **por completitud
+semántica**, y por eso arrastran `Classical.choice`. Los mismos dos teoremas por la vía H:
+
+| teorema | vía W (`FOL.Canonical0`) | vía H (`FOL.Propositional0`) |
+|---|---|---|
+| `A ∨ ¬A` | `[propext, Classical.choice, Quot.sound]` | **`[propext, Quot.sound]`** |
+| Peirce | `[propext, Classical.choice, Quot.sound]` | **`[propext, Quot.sound]`** |
+
+🔑 *La vía H da los mismos teoremas con footprint **estrictamente menor**.* Es la demostración
+práctica, dentro del repo, de que las dos vías no son redundantes.
+
+### 4 · ⚠️ Dos cosas MEDIDAS que conviene no volver a descubrir
+
+* ⛔ **`deriving instance DecidableEq for Term` NO funciona.** `Term.func : String → List Term →
+  Term` es un inductivo **anidado** y ningún *deriving handler* de v4.31 se le aplica. Hay que
+  escribir la recursión mutua `Term`/`List Term` a mano — 25 líneas, **net‑0**.
+  ⭐ En cambio **`Formula` sí se deriva**, una vez existe la de `Term`.
+* ⚠️ La instancia **no reduce en el kernel** (recursión bien fundada): `by decide` sobre una
+  igualdad concreta de fórmulas **se atasca**. No molesta —los `if` se razonan con `split`/
+  `by_cases`—, pero hay que saberlo.
+
+### 5 · ⛔ Lo que NO se ha hecho, y NO se retrofita
+
+* **No hay recíproca**, y no puede haberla: `⊢₀ φ` no implica `PTaut φ` — `(∀x P(x)) → P(t)` es
+  derivable y su esqueleto es `p → q`. *El cálculo sabe más que su esqueleto.*
+* ⛔ **`FOL.DecEq` NO se retrofita** a `FOL.Henkin0` ni a `FOL.Lindenbaum0`: no lo importan, así
+  que su elaboración no cambia. Retrofitarlo movería footprints ya publicados y medidos, y el
+  `Classical.choice` de `Lindenbaum0` **tiene que seguir ahí** por otra razón —el
+  `if IsConsistent₀ …`, Π⁰₁ (ADR‑040 §2)—, así que no se ganaría nada y se perdería trazabilidad.
+* ⬜ **Falta H3** —normalización / eliminación de cortes—, que sigue siendo **la pieza grande** de
+  la vía H, y H4 detrás. H1+H2 son la **base**, no el teorema de Herbrand.
+
+### 6 · ⭐ El detalle técnico que vale la pena recordar
+
+En la eliminación de átomos, `v[a↦true]` y `v[a↦false]` **no coinciden con `v`** en el resto de la
+lista si `a` está repetido. No hace falta pedir la lista sin repeticiones: basta **debilitar**,
+porque el literal que discrepa es exactamente `a` (o `¬a`), que es la **cabeza** del contexto
+objetivo. *Debilitar sale más barato que una hipótesis de no‑repetición.*
+
+**Véase también:** `FOL/Propositional0.lean`, `FOL/DecEq.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §5, `check-footprints.bash` (47 titulares).

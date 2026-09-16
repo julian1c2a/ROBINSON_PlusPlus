@@ -232,12 +232,35 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 
 ### 5.2 · Los cuatro hitos
 
-| | hito | comentario |
-|---|---|---|
-| **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible |
-| **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí |
-| **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 |
+| | hito | comentario | estado |
+|---|---|---|---|
+| **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
+| **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
+| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | ⬜ |
+| **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | ⬜ |
+
+#### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
+
+    derives0_of_ptaut     : PTaut φ → [] ⊢₀ φ
+    derives0_of_ptaut_ctx : (∀ v, (∀ g ∈ Γ, peval v g) → peval v φ) → Γ ⊢₀ φ
+
+⭐⭐ Footprint **`[propext, Quot.sound]`: ni un `Classical.choice`**, y `derives0_em_ctx`
+(`Δ ⊢₀ A ∨ ¬A`) **no depende de ningún axioma**. *Aquí no hay König: `Γ` es finito y la valuación
+recorre una lista finita de átomos.* Esto es finitario de verdad, no «reducible».
+
+⭐ **Y una desviación del plan que lo mejora**: aquí decía «para fórmulas **sin cuantificadores**».
+Tratar `∀` y `∃` **como átomos** —el *esqueleto proposicional*— no cuesta nada y hace el teorema
+aplicable a **toda** fórmula. La restricción no lo habría hecho más fuerte, sólo menos útil.
+
+⚠️ **No hay recíproca, y no puede haberla**: `⊢₀ φ` no implica `PTaut φ` — `(∀x P(x)) → P(t)` es
+derivable y su esqueleto es `p → q`. *El cálculo sabe más que su esqueleto.*
+
+⭐ **El control que mide para qué sirve la vía H**: `derives0_em` y `derives0_peirce` ya estaban
+demostrados en `FOL.Canonical0` **por completitud semántica**, y arrastran `Classical.choice`.
+Los mismos dos teoremas, por la vía H, son **net‑0**. *La vía H da lo mismo con footprint
+estrictamente menor.*
+
+⬜ **Y lo que falta es H3, que sigue siendo la pieza grande.** H1+H2 son la base, no el teorema.
 
 ### 5.3 · ⚠️ Y lo que cuesta la IGUALDAD, que aquí sí cuesta
 

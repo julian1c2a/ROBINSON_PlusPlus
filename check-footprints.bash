@@ -53,6 +53,14 @@ FOL.Canonical0.model_existence_lemma₀|Classical.choice,Quot.sound,propext
 FOL.Canonical0.completeness₀|Classical.choice,Quot.sound,propext
 FOL.Canonical0.derives0_complete_iff|Classical.choice,Quot.sound,propext
 FOL.Canonical0.derives0_em|Classical.choice,Quot.sound,propext
+FOL.DecEq.instDecidableEqTerm|-
+instDecidableEqFormula|-
+FOL.Propositional0.derives0_em_ctx|-
+FOL.Propositional0.kalmar|propext
+FOL.Propositional0.derives0_of_ptaut|Quot.sound,propext
+FOL.Propositional0.derives0_of_ptaut_ctx|Quot.sound,propext
+FOL.Propositional0.derives0_em_prop|Quot.sound,propext
+FOL.Propositional0.derives0_peirce_prop|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext
