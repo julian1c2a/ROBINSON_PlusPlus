@@ -3113,9 +3113,14 @@ práctica, dentro del repo, de que las dos vías no son redundantes.
   Term` es un inductivo **anidado** y ningún *deriving handler* de v4.31 se le aplica. Hay que
   escribir la recursión mutua `Term`/`List Term` a mano — 25 líneas, **net‑0**.
   ⭐ En cambio **`Formula` sí se deriva**, una vez existe la de `Term`.
-* ⚠️ La instancia **no reduce en el kernel** (recursión bien fundada): `by decide` sobre una
-  igualdad concreta de fórmulas **se atasca**. No molesta —los `if` se razonan con `split`/
-  `by_cases`—, pero hay que saberlo.
+* ⚠️⚠️ **CORREGIDO el mismo día (ADR‑043 §5).** Aquí decía:
+  > ⚠️ La instancia **no reduce en el kernel** (recursión bien fundada): `by decide` sobre una
+  > igualdad concreta de fórmulas **se atasca**.
+
+  **Es FALSO.** Re‑medido: los tres controles compilan **por `rfl`**, la instancia **sí reduce**,
+  y gracias a eso `ptautCheck` se evalúa en el kernel. 🔑 El fallo era **del control**: probé
+  `decide (X = Y) = true` con `by decide` —un `decide` envolviendo a otro— y lo que se atascaba
+  era el de fuera. *Un control mal montado mide su propio montaje.*
 
 ### 5 · ⛔ Lo que NO se ha hecho, y NO se retrofita
 
@@ -3137,3 +3142,94 @@ objetivo. *Debilitar sale más barato que una hipótesis de no‑repetición.*
 
 **Véase también:** `FOL/Propositional0.lean`, `FOL/DecEq.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §5, `check-footprints.bash` (47 titulares).
+
+---
+
+## ADR-043: Vía H · **H4 hecho** (la mitad ⟸) y **H3 enunciada** — el certificado de Herbrand
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO (H4 ⟸) · ⬜ ABIERTO (H3) ·
+**Relacionado:** ADR‑042 (H1/H2), ADR‑031 y `FOL.Eq0` (igualdad), plan §5
+
+### 1 · Qué queda demostrado
+
+    derives0_ex_of_cert : HerbrandCert φ ts E → [] ⊢₀ ∃x φ(x)
+
+`FOL/Herbrand0.lean`, **154 l. de código**, footprint `[propext, Quot.sound]` —
+⭐ **ni un `Classical.choice` en todo el módulo**, y `derives0_discharge` **no depende de ningún
+axioma**.
+
+⭐⭐ **El certificado es DATO SINTÁCTICO y se verifica por CÓMPUTO.** `HerbrandCert φ ts E` es:
+una lista de términos, una lista de instancias de la igualdad, y la constancia de que la
+disyunción `φ(t₁) ∨ … ∨ φ(tₙ)` se sigue **proposicionalmente** de ellas — comprobable con
+`ptautCheck`, que **reduce**, así que sale **`by rfl`**.
+
+🔑 Eso es exactamente lo que §0 del plan pedía del objetivo **H**: *un certificado finito y
+verificable*. No un teorema sobre certificados: **un certificado**.
+
+### 2 · ⭐ Cómo se resuelve §5.3 (la igualdad) sin implementar clausura de congruencia
+
+§5.3 decía que con `=` la disyunción termina en tautología **ecuacional**, y que eso pide
+«clausura de congruencia (Ackermann / Nelson–Oppen): decidible y finitaria, pero una **capa entera
+más**».
+
+⭐ **No hace falta implementarla**: se convierte en un **dato del certificado**. `E` es una lista
+de `EqInstance` —refl, simetría, transitividad, congruencia de función, congruencia de relación—,
+un inductivo **cerrado**, y `derives0_of_eqInstance` prueba que **todas son derivables**. ⇒ el
+certificado **no añade fuerza**: sólo la organiza.
+
+Ejemplo compilado, y es el que justifica toda la lista: `∃x (x ≐ c)` con `ts = [c]` y
+`E = [c ≐ c]`. Su disyunción de Herbrand es `c ≐ c`, que **no** es tautología proposicional —es un
+átomo— pero **sí** es un axioma de la igualdad.
+
+🔑 *Lo que hacía falta decidir no era la teoría ecuacional, sino la tautología proposicional — y
+eso ya estaba (ADR‑042).*
+
+### 3 · ⬜ H3, ENUNCIADA con su consumidor — y por qué no se ha empezado `LK₀`
+
+    HerbrandExtraction : ∀ φ, QuantFree φ → ([] ⊢₀ ∃x φ) → ∃ ts E, HerbrandCert φ ts E
+    herbrand_iff (h3)  : ([] ⊢₀ ∃x φ) ↔ ∃ ts E, HerbrandCert φ ts E
+
+*Una deuda se **enuncia** como `Prop`, nunca se postula*, y **el consumidor va delante**. La mitad
+`←` es **incondicional**; `h3` sólo paga la `→`.
+
+⚠️ **Por qué no cae por inducción** (⬜ análisis sobre la lista de constructores, **no** medición
+compilada — y va etiquetado): el enunciado **no es inductivo**. Ya `intro_ex Γ φ t` pide que
+`φ(t)` se siga *proposicionalmente* de instancias ecuacionales, y la hipótesis de inducción sólo
+da que es *derivable*. Hay que subir a un enunciado **sobre secuentes arbitrarios** —el
+mid‑sequent—, que es la eliminación de cortes.
+
+Y el obstáculo es **contable**: de los 21 constructores de `Derives₀`, **siete** son «de corte»
+(una premisa menciona una fórmula ausente de la conclusión): `elim_impl`, `elim_and_l`,
+`elim_and_r`, `elim_or`, `elim_ex`, ⛔ `subst` y ⛔ `rewrite_at`; más `weakening`, estructural.
+Los dos marcados son los que impiden que sea un Hauptsatz de libro: `subst` es **Leibniz** —la
+igualdad no se elimina, se vuelve teoría— y `rewrite_at` **no tiene análogo en LK**.
+
+⛔ **Y `LK₀` no se ha empezado a propósito.** Diseñar un cálculo de secuentes sin poder validarlo
+contra la mitad difícil es fabricar una obligación que puede salir **inconsumible**, y el
+escarmiento está escrito: *la guarda se copia del CONSUMIDOR, no del molde*
+([[feedback-enunciar-una-deuda]]). Primero el consumidor —que ya está—, después el molde.
+
+### 4 · ⚠️ Ámbito, dicho para que no se lea de más
+
+* **Un solo cuantificador**: `∃x φ(x)`, no `∃x̄`. ⬜ La versión n‑aria es iteración rutinaria pero
+  la aritmética de De Bruijn bajo binders anidados pide su propia capa de lemas.
+* ⚠️ `QuantFree φ` **no es decoración**: para `φ` con cuantificadores el enunciado de H3 es
+  **falso**.
+* ⚠️ `derives0_discharge` **es un corte, y es admisible gratis** porque `intro_impl` es un
+  **constructor**. ⛔ **Esto NO es H3**: eliminar el corte es transformar la *derivación* para que
+  no lo use; esto sólo lo **contrae**.
+
+### 5 · ⚠️⚠️ Y una corrección: ADR‑042 §4 publicaba algo FALSO
+
+Decía que la instancia `DecidableEq Formula` **no reduce en el kernel** y que `by decide` sobre
+una igualdad de fórmulas **se atasca**. **Re‑medido: es falso.** Los tres controles compilan por
+`rfl`, la instancia **sí reduce**, y gracias a eso `ptautCheck` se evalúa y el certificado se
+comprueba a máquina.
+
+🔑 **El fallo era del CONTROL, no del código**: probé `decide (X = Y) = true` con `by decide` —un
+`decide` envolviendo a otro— y lo que se atascaba era el de fuera. *Un control mal montado mide su
+propio montaje.* Corregido en su sitio (ADR‑042 §4 y el docstring de `FOL/DecEq.lean`), con el
+texto viejo a la vista.
+
+**Véase también:** `FOL/Herbrand0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.4,
+`check-footprints.bash`.

@@ -4,8 +4,45 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 28 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **47** · `check-estratos` **5** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 29 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **53** · `check-estratos` **5** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 (noche) — 🏁 **VÍA H · H4**: el CERTIFICADO de Herbrand, y H3 ENUNCIADA
+>
+> ```
+> derives0_ex_of_cert : HerbrandCert φ ts E → [] ⊢₀ ∃x φ(x)
+> ```
+>
+> `../FOL/FOL/Herbrand0.lean` (154 l.) — [ADR‑043](DECISIONS.md). `[propext, Quot.sound]`, **ni un
+> `Classical.choice`**; `derives0_discharge` **sin ningún axioma**.
+>
+> ⭐⭐ **El certificado es DATO SINTÁCTICO y se verifica por CÓMPUTO**: términos + instancias de la
+> igualdad + una tautología proposicional comprobada con **`ptautCheck`, que reduce** ⇒ **`by rfl`**.
+> *Un certificado finito y verificable*, que es lo que §0 pedía del objetivo H. Dos ejemplos
+> compilados: `∃x (P(x) ∨ ¬P(x))` y ⭐ `∃x (x ≐ c)`.
+>
+> ⭐ **Y §5.3 (la igualdad) queda resuelta sin implementar clausura de congruencia**: se convierte
+> en un **dato del certificado** (`EqInstance`, cerrada y **toda derivable**). 🔑 *Lo que había que
+> decidir no era la teoría ecuacional sino la tautología proposicional — y eso ya estaba.*
+>
+> ⬜⬜ **H3 NO está, y está ENUNCIADA con su consumidor** (no postulada):
+> `HerbrandExtraction` + `herbrand_iff`. La mitad `←` es **incondicional**.
+> ⚠️ **No cae por inducción**: ya `intro_ex` pide consecuencia *proposicional* donde la HI sólo da
+> *derivabilidad*. De los 21 constructores, **siete** son «de corte» —`elim_impl`, `elim_and_l/r`,
+> `elim_or`, `elim_ex`, ⛔ `subst` y ⛔ `rewrite_at`—, y los dos marcados impiden que sea un
+> Hauptsatz de libro (`subst` es Leibniz; `rewrite_at` no tiene análogo en LK).
+> ⛔ **`LK₀` no se ha empezado a propósito**: diseñarlo sin poder validarlo contra la mitad difícil
+> fabrica una obligación que puede salir **inconsumible**. Primero el consumidor, después el molde.
+>
+> ⚠️⚠️ **Y una corrección mía del mismo día**: ADR‑042 §4 decía que `DecidableEq Formula` **no
+> reduce** y que `by decide` se atasca. **Es FALSO** — re‑medido, los tres controles salen por
+> `rfl`. 🔑 *El fallo era del CONTROL: un `decide` envolviendo a otro. Un control mal montado mide
+> su propio montaje.* Corregido en su sitio, con el texto viejo a la vista.
+>
+> ▶ **POR DÓNDE SEGUIR**: ⬜ **H3** — `LK₀` sin corte, `LK₀ → Derives₀`, `Derives₀ → LK₀+corte` y
+> el Hauptsatz allí, con las dos reglas problemáticas tratadas aparte. Es **la pieza grande** de
+> todo el plan y lo único que queda de los dos objetivos.
+
 
 > # 🗓️ 2026‑09‑16 (cierre) — 🏁 **VÍA H · H1 y H2**: la completitud PROPOSICIONAL, FINITARIA
 >

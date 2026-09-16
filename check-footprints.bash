@@ -61,6 +61,12 @@ FOL.Propositional0.derives0_of_ptaut|Quot.sound,propext
 FOL.Propositional0.derives0_of_ptaut_ctx|Quot.sound,propext
 FOL.Propositional0.derives0_em_prop|Quot.sound,propext
 FOL.Propositional0.derives0_peirce_prop|Quot.sound,propext
+FOL.Herbrand0.ptaut_of_check|propext
+FOL.Herbrand0.derives0_discharge|-
+FOL.Herbrand0.derives0_of_eqInstance|Quot.sound,propext
+FOL.Herbrand0.derives0_ex_of_cert|Quot.sound,propext
+FOL.Herbrand0.herbrand_iff|Quot.sound,propext
+FOL.Herbrand0.ex_igualdad|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

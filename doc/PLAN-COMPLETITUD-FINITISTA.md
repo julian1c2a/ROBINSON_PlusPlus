@@ -236,8 +236,8 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 |---|---|---|---|
 | **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
 | **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | ⬜ |
-| **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | ⬜ |
+| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | ⬜ **ENUNCIADA**, §5.4 |
+| **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **la mitad ⟸, HECHA** 2026‑09‑16 |
 
 #### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
 
@@ -261,6 +261,64 @@ Los mismos dos teoremas, por la vía H, son **net‑0**. *La vía H da lo mismo 
 estrictamente menor.*
 
 ⬜ **Y lo que falta es H3, que sigue siendo la pieza grande.** H1+H2 son la base, no el teorema.
+
+### 5.4 · 🏁 H4 EJECUTADO (la mitad ⟸) y ⬜ H3 ENUNCIADA — 2026‑09‑16, ADR‑043
+
+**Lo que hay** (`../FOL/FOL/Herbrand0.lean`, 154 l. de código, footprint `[propext, Quot.sound]`):
+
+    derives0_ex_of_cert : HerbrandCert φ ts E → [] ⊢₀ ∃x φ(x)
+
+⭐⭐ **El certificado es DATO SINTÁCTICO y se comprueba por CÓMPUTO**: `HerbrandCert φ ts E` son
+una lista de términos, una lista de instancias de la igualdad (`EqInstance`, cerrada: refl,
+simetría, transitividad, congruencia de función y de relación, **todas derivables**) y una
+tautología proposicional del esqueleto — verificable con **`ptautCheck`, que reduce**, así que
+sale `by rfl`. *Un certificado finito y verificable*, que es lo que §0 pedía del objetivo H.
+
+⭐ **Y con eso, §5.3 queda resuelta en su forma finitaria.** La «clausura de congruencia» no se
+implementa como procedimiento: **se convierte en un dato del certificado**. Ejemplo compilado:
+`∃x (x ≐ c)` con `ts = [c]` y `E = [c ≐ c]` — su disyunción de Herbrand **no** es tautología
+proposicional (es un átomo) pero sí es un axioma de la igualdad.
+
+**Lo que falta, y está ENUNCIADO como `Prop`, no postulado:**
+
+    HerbrandExtraction : ∀ φ, QuantFree φ → ([] ⊢₀ ∃x φ) → ∃ ts E, HerbrandCert φ ts E
+
+con su **consumidor escrito**: `herbrand_iff (h3) : ([] ⊢₀ ∃x φ) ↔ ∃ ts E, HerbrandCert φ ts E`.
+La mitad `←` es **incondicional**; `h3` sólo paga la `→`.
+
+#### ⚠️ Por qué H3 no cae por inducción, dicho con precisión
+
+⬜ **Análisis sobre la lista de constructores, no medición compilada** — y va etiquetado.
+
+El enunciado de H3 **no es inductivo**. Ya el caso `intro_ex Γ φ t` pide que `φ(t)` se siga
+**proposicionalmente** de instancias ecuacionales, y la hipótesis de inducción sólo da que es
+*derivable*. Para que la inducción cierre hay que subir a un enunciado **sobre secuentes
+arbitrarios** —el teorema del mid‑sequent—, y eso es exactamente la eliminación de cortes.
+
+Y el obstáculo es contable. De los **21** constructores de `Derives₀`, **siete** son «de corte»
+—tienen en una premisa una fórmula que **no aparece** en la conclusión, que es justo lo que un
+Hauptsatz tiene que eliminar o permutar—:
+
+| constructor | qué desaparece |
+|---|---|
+| `elim_impl` | `A` |
+| `elim_and_l` · `elim_and_r` | `B` · `A` |
+| `elim_or` | `A` y `B` |
+| `elim_ex` | `A` |
+| ⛔ `subst` | `t₁` — **y es la regla de la IGUALDAD** |
+| ⛔ `rewrite_at` | `sub`, `sub'` y la posición `p` — **regla no estándar de este cálculo** |
+
+más `weakening`, que es estructural. ⚠️ Los dos marcados ⛔ son los que hacen que esto **no** sea
+un Hauptsatz de libro: `subst` es Leibniz —la igualdad no se elimina, se vuelve teoría— y
+`rewrite_at` no tiene análogo en LK.
+
+⇒ ⬜ **La vía sensata sigue siendo la del §5.2**: definir `LK₀` sin corte, probar
+`LK₀ → Derives₀` (fácil) y `Derives₀ → LK₀ + corte`, y eliminar el corte allí. ⛔ **No se ha
+empezado a propósito**: diseñar `LK₀` sin poder validarlo contra la mitad difícil es fabricar una
+obligación que puede salir inconsumible — el escarmiento está escrito
+(`feedback_enunciar_una_deuda`: *la guarda se copia del CONSUMIDOR, no del molde*).
+
+---
 
 ### 5.3 · ⚠️ Y lo que cuesta la IGUALDAD, que aquí sí cuesta
 
