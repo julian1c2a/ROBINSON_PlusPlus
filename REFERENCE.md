@@ -4,7 +4,7 @@
 >
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 61 en `sondeos/`** (experimentos compilados, fuera del build).
+> **+ 70 en `sondeos/`** (experimentos compilados, fuera del build).
 > **3 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **141 axiomas objeto** en `axioms`.
 >
 > ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
@@ -26,6 +26,12 @@
 > Rédito verificado en `sondeos/CarcPayoff.lean` (`pcc_eval_carc` vuelve). Detalle en
 > [Incompletitud §3.24–§3.32](doc/REFERENCE-Incompleteness.md).
 >
+> ### 🏁🏁 Y desde el 2026‑09‑14 hay un cálculo de FOL⁼ del que SE PUEDE HABLAR
+>
+> **`Derives₀`** ([ADR‑033](DECISIONS.md)): 21 constructores, **cero habitantes‑axioma** ⇒ **la
+> inducción es legítima**. Con él: **`derives0_soundness`**, **`derives0_consistent`** (la primera
+> consistencia de un cálculo de FOL⁼ del proyecto) y **`derives0_not_complete`**. Ver §0bis.
+>
 > **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
 > → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
 
@@ -37,6 +43,49 @@
 
 **Author**: Julián Calderón Almendros
 **Lean version**: v4.31.0
+
+---
+
+## 0bis · ⭐⭐ LOS ESTRATOS — las cinco nociones de derivabilidad, y el ROL de cada una
+
+> ⛔⛔ **Ésta es la tabla que faltaba, y su ausencia se cobró `FOL.soundness`.** El proyecto tiene
+> **cinco** nociones de derivabilidad, y hasta el 2026‑09‑14 nadie podía decir, mirando el árbol,
+> cuál era **herramienta** y cuál **sujeto**.
+>
+> 🔧 **La vigila `check-estratos.bash`** (`make estratos`, y en CI). Mide los habitantes‑axioma
+> **por el TIPO** de cada axioma —la cabeza de su conclusión—, no por grep, y **rompe en los dos
+> sentidos**. Probado con el fallo puesto en tres modos.
+
+| noción | dónde | ctors | axiomas que la **HABITAN** | ¿`induction`? | solidez | **rol** |
+|---|---|---:|---:|---|---|---|
+| **`Derives`** (`⊢`) | `../FOL/FOL/FOL.lean` | 22 | ⛔ **7** — `imp_intro`, `raa`, `or_elim`, `ex_elim` (FOL) + `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq` (RPP) | ⛔ **NUNCA**, y es **PERMANENTE** ([ADR‑029](DECISIONS.md)): suelo de 4 | ⛔ **FALSA** — da `False` sin hipótesis (`../FOL/cuarentena/Inconsistencia.lean`) | **HERRAMIENTA** de trabajo. ⛔ Ningún metateorema significa lo que dice sobre él |
+| **`Derives₀`** (`⊢₀`) | `../FOL/FOL/Derives0.lean` | 21 | ✅ **0** | ✅ **sí** | ✅ `derives0_soundness` — **en el build** | **SUJETO de FOL⁼**: solidez, consistencia, renombrado, eigenvariable, Henkin |
+| **`Prf`** | `Meta/Hilbert.lean` | 7 | ✅ **0** desde [ADR‑026](DECISIONS.md) | ✅ **sí** | ⬜ no enunciada | **SUJETO de Gödel I y II** (`goedel_first_prf`, `goedel_second_prf`) |
+| **`Prf₀`** | `Meta/Hilbert.lean` | 17 | ✅ **0** | ✅ **sí** | ✅ `prf0_soundness` ⚠️ **FUERA del build** (`sondeos/AnclaSoundness.lean`) | **ANCLA SEMÁNTICA**: la primera medición semántica del proyecto |
+| **`PrfH`** | `Meta/HilbertDeduction.lean` | 8 | ✅ **0** | ✅ **sí** | ⬜ no enunciada | **deducción interna** (`PrfH_mono`, `PrfH_w1`) |
+
+### ⚠️ Cómo se lee esta tabla, y por qué la columna que decide es la tercera
+
+**El número de `axiom` que HABITAN un inductivo es lo único que decide si `induction` es
+legítima** (regla **M‑11**, [ADR‑025](DECISIONS.md)). Un axioma que habita un inductivo produce
+habitantes que **no son aplicaciones de constructor**: la inducción cubre los constructores y el
+teorema cuantifica sobre **todos**.
+
+⛔⛔ **Y `#print axioms` es CIEGO a esto.** Un teorema probado por inducción sobre un inductivo
+habitado tiene footprint **limpio** y es **injustificado**. Por eso hace falta un control aparte:
+`check-footprints.bash` mide de qué depende un teorema; `check-estratos.bash` mide si la inducción
+que lo probó era legítima. **No son el mismo control y ninguno sustituye al otro.**
+
+### 🔑 La regla de rol
+
+> **Si un cálculo está habitado por axiomas, es HERRAMIENTA. El SUJETO tiene que ser otro.**
+
+Es [ADR‑024](DECISIONS.md) (**M‑10**) dicho en una línea, y explica las tres decisiones grandes del
+proyecto: `goedel_second'` retirado por enunciarse sobre `⊢`; Gödel I y II reenunciados sobre
+`Prf`; y `Derives₀` declarado al lado de `Derives` en vez de intentar limpiarlo.
+
+⚠️ **Añadir un `axiom` a un estrato con 0 no es una decisión local**: invalida *retroactivamente*
+todo lo que se haya probado por inducción sobre él. El control lo dice con esas palabras.
 
 ---
 

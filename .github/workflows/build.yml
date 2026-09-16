@@ -84,6 +84,14 @@ jobs:
         run: bash check-sorry.bash
         continue-on-error: true   # Warning only — change to false to make it blocking
 
+      # Anadido el 2026-09-16. Mide cuantos `axiom` HABITAN cada nocion de derivabilidad, que
+      # es lo UNICO que decide si `induction` es legitima (M-11). `#print axioms` es CIEGO a
+      # esto: un teorema probado por induccion sobre un inductivo habitado tiene footprint
+      # LIMPIO. Es el control que falto en mayo, cuando `FOL.soundness` demostraba `False`.
+      # Probado con el fallo puesto en tres modos.
+      - name: Check estratos
+        run: bash check-estratos.bash
+
       # Anadido el 2026-09-14 (criterio §9 del plan finitista). Los footprints se imprimian
       # como `info:` en medio de 145 jobs: nadie los lee y, si cambian, no rompe nada.
       # Esto compara cada titular con su footprint publicado y ROMPE si no cuadra.

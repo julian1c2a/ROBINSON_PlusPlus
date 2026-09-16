@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: footprints build clean rebuild sorry status lock unlock list init new help
+.PHONY: footprints estratos build clean rebuild sorry status lock unlock list init new help
 
 ## Build the project
 build:
@@ -27,6 +27,12 @@ docsync:
 ## Un `info:` en medio de 145 jobs NO es un control: esto sí rompe.
 footprints:
 	@bash check-footprints.bash
+
+## Censo de ESTRATOS (REFERENCE.md §0bis): cuantos `axiom` HABITAN cada nocion de
+## derivabilidad, que es lo unico que decide si `induction` es legitima (M-11).
+## `#print axioms` es CIEGO a esto.
+estratos:
+	@bash check-estratos.bash
 
 ## Idem, sin lake build (para iterar rapido)
 docsync-quick:
