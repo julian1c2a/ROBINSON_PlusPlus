@@ -33,3 +33,5 @@ OptionB_Probe*.lean
 # páginas guardadas del navegador (p. ej. artefactos exportados a mano)
 *.htm
 *_files/
+ROBINSON_PlusPlus/Sugerencias.md
+Sugerencias.md

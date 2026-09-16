@@ -3321,3 +3321,86 @@ en el caso del binder, donde la sustitución **cambia de índice y levanta el t�
 
 **Véase también:** `FOL/Derives1.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.5,
 `check-estratos.bash`, `check-footprints.bash` (58 titulares).
+
+---
+
+## ADR-045: H3, segunda pieza — **`subst` es ADMISIBLE**, y el cálculo queda en forma de libro
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑044 (primera pieza), ADR‑043 §3 (el conteo), ADR‑031 (las congruencias),
+plan §5.3 y §5.6
+
+### 1 · Qué queda demostrado
+
+    Derives₂               -- `Derives₁` SIN `subst`, con TRES congruencias primitivas
+    eq_substFormula        -- ⭐⭐ Leibniz, DEMOSTRADO a partir de ellas
+    derives0_iff_derives2  -- y deriva EXACTAMENTE lo mismo que el cálculo original
+
+`FOL/Derives2.lean`, **347 l. de código**, footprint `[propext, Quot.sound]` — **ni un
+`Classical.choice`**. ⭐ `Derives₂.rec` **no depende de ningún axioma**.
+
+⇒ 🏁🏁 **Los DOS obstáculos que ADR‑043 §3 había contado ya no están.** `Derives₂` es **deducción
+natural clásica de libro más los axiomas de la igualdad**, que es exactamente la forma en que la
+literatura enuncia Herbrand con `=`. Lo que queda «de corte» son los **cinco estándar**
+—`elim_impl`, `elim_and_l/r`, `elim_or`, `elim_ex`—, que es de lo que trata Gentzen.
+
+### 2 · Qué sustituye a `subst`, y por qué justo eso
+
+| constructor | qué dice |
+|---|---|
+| `eq_func_congr` | `a ≐ b ⟹ f(…a…) ≐ f(…b…)`, en **UNA** posición |
+| `eq_atom_congr` | `a ≐ b ⟹ P(…a…) ⟹ P(…b…)`, en **UNA** posición |
+| `eq_eq_congr` | `a ≐ b ⟹ a ≐ c ⟹ b ≐ c` |
+
+⭐ **Simetría y transitividad NO son primitivas**: salen de `eq_eq_congr` + `refl` en una línea
+cada una. ⚠️ Pero `eq_eq_congr` **sí hace falta**, porque `Formula.eq` es un **constructor propio**
+de `Formula` y no un `atom`, así que `eq_atom_congr` no lo alcanza. *Una igualdad que es un
+conectivo y no un predicado necesita su propia congruencia.*
+
+### 3 · ⭐ Esto cierra §5.3 del plan, y la cierra hacia abajo
+
+§5.3 decía que la igualdad obligaba a **«una capa entera más»** de clausura de congruencia
+(Ackermann / Nelson–Oppen). **Medido: son tres constructores**, y con ellos Leibniz **se
+demuestra**. La igualdad deja de ser una **regla de inferencia** y pasa a ser **teoría** — que es
+justo lo que hacía falta para que el Hauptsatz se pueda plantear.
+
+🔑 Y encaja con ADR‑043 §2: allí la clausura de congruencia se volvió **un dato del certificado**
+(`EqInstance`); aquí se vuelve **tres axiomas del cálculo**. Es la misma reducción vista desde los
+dos lados, y las dos veces sale más barata de lo que §5.3 estimaba.
+
+### 4 · Dónde está el trabajo, en dos escalones
+
+1. **Leibniz de TÉRMINOS** (`eq_substTerm`, recursión mutua con `eq_substTerms`): en el caso `func`
+   hay que subir de igualdades **punto a punto** de la lista de argumentos a la igualdad de los dos
+   términos, iterando la congruencia de una posición **con un prefijo que crece** (`eq_func_pw`).
+   🔑 *Lo que faltaba no era lógica sino LISTAS*, por tercera vez (ADR‑031, ADR‑041, aquí).
+2. **Leibniz de FÓRMULAS** (`eq_substFormula`), por inducción estructural. ⛔ Los casos `∀`/`∃`
+   obligan a que **la ecuación viaje al contexto levantado**, porque
+   `substFormula v t (∀A) = ∀ (substFormula (v+1) (liftTerm 0 t) A)` — **cambia el índice y levanta
+   el término**. De ahí `derives2_lift`, una inducción entera sobre los 22 constructores y **la
+   mitad del coste del módulo**. Cierra otra vez con `substFormula_lift_var`.
+
+⭐ **Un contraste con ADR‑044 que vale la pena guardar**: allí `impl` obligó a un enunciado
+**bicondicional**, porque la congruencia se invierte en el antecedente. **Aquí no hace falta**: el
+enunciado ya es **simétrico en `t₁`/`t₂`**, así que basta aplicar la hipótesis de inducción con los
+términos intercambiados y la ecuación simétrica. 🔑 *Cuando la simetría está en los datos, no hay
+que meterla en el enunciado.*
+
+### 5 · Y se paga la deuda en la otra dirección
+
+ADR‑044 §4 midió que las cuatro piezas de `FOL/Eq0.lean` están **derivadas de `subst`**, de modo
+que no podían conservarse como teoremas al quitarlo. `derives2_to_derives1` paga eso: demuestra que
+las **tres nuevas son derivables** en `Derives₁` (usando `subst`), así que **`Derives₂` no es más
+fuerte**. Sin ese lado, «quitar una regla» sería sólo «cambiarla de sitio».
+
+### 6 · ⛔ Lo que NO dice
+
+* **H3 NO está.** Esto no elimina cortes: pone el cálculo en la forma en que el Hauptsatz **se
+  puede plantear**. `HerbrandExtraction` sigue abierta.
+* ⛔ **Nada se retrofita.** `Derives₀` se queda; `derives0_iff_derives2` transporta lo que haga
+  falta cuando haga falta.
+* ⚠️ `check-estratos.bash` pasa de **6** a **7** estratos. `Derives₂`: **22** ctors —más que
+  `Derives₁`, porque una regla se cambió por tres axiomas—, **0 habitantes‑axioma**.
+
+**Véase también:** `FOL/Derives2.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.6,
+`check-estratos.bash`, `check-footprints.bash` (64 titulares).

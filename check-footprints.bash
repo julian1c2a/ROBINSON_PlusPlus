@@ -72,6 +72,12 @@ FOL.Derives1.rewrite_equiv|Quot.sound,propext
 FOL.Derives1.rewrite_at_admissible|Quot.sound,propext
 FOL.Derives1.derives0_to_derives1|Quot.sound,propext
 FOL.Derives1.derives0_iff_derives1|Quot.sound,propext
+Derives₂.rec|-
+FOL.Derives2.derives2_lift|Quot.sound,propext
+FOL.Derives2.eq_substTerm|propext
+FOL.Derives2.eq_substFormula|Quot.sound,propext
+FOL.Derives2.derives1_to_derives2|Quot.sound,propext
+FOL.Derives2.derives0_iff_derives2|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

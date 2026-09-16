@@ -236,7 +236,7 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 |---|---|---|---|
 | **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
 | **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **1 de 2 obstáculos RETIRADO**, §5.5 |
+| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **los DOS obstáculos retirados**; falta el Hauptsatz, §5.5–§5.6 |
 | **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **la mitad ⟸, HECHA** 2026‑09‑16 |
 
 #### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
@@ -366,6 +366,49 @@ de andamiaje, Leibniz a nivel de **término** ~100 l., a nivel de **fórmula** ~
 del binder cambia el índice de sustitución y levanta el término: `substFormula 0 t (∀a) =
 ∀ (substFormula 1 (liftTerm 0 t) a)`), más las dos traducciones ~80 l. **Riesgo medio‑alto**, y
 concentrado en el caso del binder.
+
+---
+
+### 5.6 · 🏁 H3, segunda pieza: **`subst` RETIRADA** — 2026‑09‑16, ADR‑045
+
+    Derives₂               -- `Derives₁` SIN `subst`, con TRES congruencias primitivas
+    eq_substFormula        -- ⭐⭐ Leibniz, DEMOSTRADO a partir de ellas
+    derives0_iff_derives2  -- y deriva EXACTAMENTE lo mismo que el cálculo original
+
+`../FOL/FOL/Derives2.lean`, **347 l. de código**, `[propext, Quot.sound]` — **ni un
+`Classical.choice`**; ⭐ `Derives₂.rec` **sin ningún axioma**.
+
+⇒ 🏁🏁 **Los DOS obstáculos que §5.4 había contado ya no están.** `Derives₂` es **deducción
+natural clásica de libro más los axiomas de la igualdad** — exactamente la forma en que la
+literatura enuncia Herbrand con `=`. Y lo que queda «de corte» son los **cinco estándar**
+(`elim_impl`, `elim_and_l/r`, `elim_or`, `elim_ex`), que es de lo que trata Gentzen.
+
+⭐ **Y con esto §5.3 queda cerrada del todo.** Aquella sección decía que la igualdad obligaba a una
+«capa entera más» de clausura de congruencia. Medido: son **tres constructores** —congruencia de
+función, de relación y de `≐`— y con ellos Leibniz **se demuestra**. La igualdad deja de ser una
+regla de inferencia y pasa a ser **teoría**, que es lo que hacía falta para que el Hauptsatz se
+pueda plantear.
+
+⚠️ **Simetría y transitividad no hacen falta como primitivas**: salen de `eq_eq_congr` + `refl`.
+Pero `eq_eq_congr` **sí**, porque `Formula.eq` es un constructor propio y no un `atom`.
+
+⭐ **Dónde está el trabajo**: en dos escalones. (1) Leibniz de **términos**, donde hay que subir de
+igualdades **punto a punto** de la lista de argumentos a la igualdad de los términos — *lo que
+falta no es lógica sino LISTAS*, otra vez (ADR‑031). (2) Leibniz de **fórmulas**, donde ⛔ los
+casos `∀`/`∃` obligan a que la ecuación **viaje al contexto levantado**, porque la sustitución
+**cambia de índice y levanta el término**. De ahí `derives2_lift`, una inducción entera sobre los
+22 constructores y la mitad del coste del módulo.
+
+⭐ Y un contraste con §5.5 que vale la pena: allí `impl` obligó a un enunciado **bicondicional**;
+aquí no, porque el enunciado **ya es simétrico en `t₁`/`t₂`** y basta aplicar la hipótesis de
+inducción con los términos intercambiados. *Cuando la simetría está en los datos, no hay que
+meterla en el enunciado.*
+
+#### ⬜ Lo que queda de H3: **el Hauptsatz**, y ya sin excusas de forma
+
+El cálculo está en la forma estándar. ⬜ Sigue faltando la eliminación de cortes —y con ella la
+extracción del certificado (`HerbrandExtraction`)—, que es **la pieza grande** y ahora es un
+problema de libro y no de este cálculo en particular.
 
 ---
 

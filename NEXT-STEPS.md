@@ -4,8 +4,46 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 30 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **58** · `check-estratos` **6** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 31 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **64** · `check-estratos` **7** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 (cierre) — 🏁🏁 **H3: LOS DOS OBSTÁCULOS, RETIRADOS**
+>
+> ```
+> Derives₂               -- Derives₁ SIN `subst`, con TRES congruencias primitivas
+> eq_substFormula        -- ⭐⭐ Leibniz, DEMOSTRADO a partir de ellas
+> derives0_iff_derives2  -- y deriva EXACTAMENTE lo mismo que el cálculo original
+> ```
+>
+> `../FOL/FOL/Derives2.lean` (347 l.) — [ADR‑045](DECISIONS.md). `[propext, Quot.sound]`, **ni un
+> `Classical.choice`**; ⭐ `Derives₂.rec` **sin ningún axioma**.
+>
+> 🏁🏁 **Con ADR‑044, los DOS obstáculos que ADR‑043 §3 había contado ya no están.** `Derives₂` es
+> **ND clásica de libro + los axiomas de la igualdad**, que es como la literatura enuncia Herbrand
+> con `=`. Lo que queda «de corte» son los **cinco estándar** — de lo que trata Gentzen.
+>
+> ⭐ **Y esto cierra §5.3 del plan, hacia abajo.** Aquella sección daba la igualdad por «una capa
+> entera más» (clausura de congruencia). **Medido: son tres constructores**, y con ellos Leibniz
+> **se demuestra**. 🔑 Encaja con ADR‑043 §2: allí la clausura se volvió un **dato del
+> certificado**, aquí **tres axiomas del cálculo** — la misma reducción por los dos lados, y las
+> dos veces más barata que la estimación.
+>
+> ⚠️ Simetría y transitividad **no** son primitivas (salen de `eq_eq_congr` + `refl`), pero
+> `eq_eq_congr` **sí**: `Formula.eq` es un **constructor propio**, no un `atom`.
+>
+> ⭐ El coste está en dos escalones: Leibniz de **términos** (*lo que falta no es lógica sino
+> LISTAS*, por tercera vez) y de **fórmulas**, donde ⛔ `∀`/`∃` obligan a que la ecuación **viaje al
+> contexto levantado** — de ahí `derives2_lift`, la mitad del módulo.
+>
+> ⭐ Contraste con ADR‑044 que conviene no perder: allí `impl` obligó a un enunciado
+> **bicondicional**; aquí **no**, porque el enunciado ya es simétrico en `t₁`/`t₂`.
+> 🔑 *Cuando la simetría está en los datos, no hay que meterla en el enunciado.*
+>
+> ▶ **POR DÓNDE SEGUIR — el HAUPTSATZ**, y ya sin excusas de forma: el cálculo está en la forma
+> estándar, así que es un problema **de libro** y no de este cálculo en particular. Vía §5.2:
+> `LK₀` sin corte, `LK₀ → Derives₂` (fácil), `Derives₂ → LK₀ + corte`, y eliminar el corte allí.
+> ⬜ Y detrás, `HerbrandExtraction`, que es lo único que le falta a la vía H.
+
 
 > # 🗓️ 2026‑09‑16 (cierre) — 🔶 **H3, PRIMERA PIEZA: `rewrite_at` RETIRADA**
 >
