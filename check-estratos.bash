@@ -31,6 +31,7 @@ cd "$(dirname "$0")" || exit 2
 read -r -d '' ESTRATOS <<'EOF'
 Derives|22|7|-
 Derives₀|21|0|FOL.Metamath.Soundness0.derives0_soundness
+Derives₁|20|0|-
 ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|-
 ROBINSON_PlusPlus.Meta.Hilbert.Prf₀|17|0|-
 ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|-

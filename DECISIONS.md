@@ -3233,3 +3233,91 @@ texto viejo a la vista.
 
 **Véase también:** `FOL/Herbrand0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.4,
 `check-footprints.bash`.
+
+---
+
+## ADR-044: H3, primera pieza — **`rewrite_at` es ADMISIBLE**, y el frente pasa de dos obstáculos a uno
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑043 §3 (el conteo de obstáculos), ADR‑033 (`Derives₀`), ADR‑036
+(`substFormula_lift_var`), plan §5.5
+
+### 1 · Qué queda demostrado
+
+    Derives₁               -- los 20 constructores de `Derives₀` MENOS `rewrite_at`
+    rewrite_at_admissible  -- y no hace falta como regla
+    derives0_iff_derives1  -- los dos cálculos derivan EXACTAMENTE lo mismo
+
+`FOL/Derives1.lean`, **214 l. de código**, footprint `[propext, Quot.sound]` — **ni un
+`Classical.choice`**. ⭐ Y `Derives₁.rec` **no depende de ningún axioma** (el de `Derives₀` lleva
+`propext`).
+
+⇒ **`Derives₁` es deducción natural clásica de libro más igualdad**: hipótesis, los conectivos,
+los cuantificadores, `bot_elim`, debilitamiento, doble negación, `refl` y `subst`. Nada más.
+
+🔑 **Y eso es lo que importa para H3.** ADR‑043 §3 dejó el obstáculo contado: siete constructores
+«de corte», de los cuales **dos** impedían que la eliminación de cortes fuera un Hauptsatz de
+libro. **Uno de los dos ya no está.**
+
+### 2 · Cómo se retira, y el punto fino
+
+`LocalRule` tiene **un solo constructor**, `commuteImpl A B C : A→(B→C) ⟹ B→(A→C)`, así que
+eliminar `rewrite_at` es una **congruencia por posiciones**:
+
+    rewrite_equiv : getAt? f p = some sub → LocalRule sub sub' →
+        ∀ Γ, (Γ ⊢₁ f → replaceAt f p sub') ∧ (Γ ⊢₁ replaceAt f p sub' → f)
+
+⚠️ **Tiene que ser biconditional aunque `rewrite_at` sólo pida una dirección.** Al bajar por el
+**antecedente** de una implicación la congruencia se **invierte** (`impl_congr_l` es
+contravariante), de modo que la inducción necesita las dos mitades a la vez. *Una inducción puede
+necesitar más de lo que el consumidor pide.*
+
+⭐ **Los dos casos caros son los de `Pos.body`**, bajo el binder: `⊢₁ (∀X) → (∀Y)` desde
+`⊢₁ X → Y` sale por `intro_forall` —que **levanta el contexto**— y `elim_forall` con `Term.var 0`,
+cerrando con **`substFormula_lift_var`**. 🔑 *Es el mismo lema que sostenía el paso de
+eigenvariable de Henkin* (ADR‑036): **deshacer un lift sustituyendo la variable cero**. Salió
+gratis porque ya estaba — van varias.
+
+⭐ Y el detalle que lo hace funcionar: la hipótesis de las congruencias va cuantificada sobre
+**todos** los contextos (`∀ Δ`), no sobre uno. Es lo que permite instanciarla en el contexto
+**levantado** que `intro_forall` fabrica, **sin tener que levantar `X` ni `Y`**.
+
+### 3 · ⚠️ Una medición nueva, y de las que cuestan una tarde si no se sabe
+
+**`getAt?` y `replaceAt` NO REDUCEN.** Sus llamadas recursivas cambian **los dos** argumentos
+(`getAt? f1 p` desde `getAt? f p`), así que Lean las compila por recursión **bien fundada**, y
+
+    getAt? f Pos.root = some f      -- ⛔ NO es `rfl`
+
+Hay que ir por las **ecuaciones** (`simp only [getAt?]`). Es primo de ⛔ *los símbolos OBJETO no
+reducen*, pero por otra causa: aquí el símbolo es **de Lean** y lo que falla es el **esquema de
+recursión**, no la aritmetización.
+
+### 4 · ⬜ El obstáculo que queda — con lo MEDIDO de él
+
+`subst`, Leibniz. La vía estándar: reducirlo a **instancias de congruencia**, dejando ND puro +
+axiomas de igualdad, que es como la literatura enuncia Herbrand con `=`.
+
+⚠️⚠️ **Y aquí hay un dato medido que fija el orden**: las cuatro piezas de `FOL/Eq0.lean`
+—simetría, transitividad y las dos congruencias de una posición— están **derivadas DE `subst`**
+(`Derives₀.subst` aparece en las cuatro; `FOL/Theorems/Eq.lean` igual). ⇒ **no se puede quitar
+`subst` y conservar las congruencias como teoremas**: hay que **subirlas a constructores
+primitivos** y después probar que `subst` es admisible a partir de ellas.
+
+⬜ **Estimación, etiquetada**: `Derives₂` ~60 l. de andamiaje · Leibniz de **términos** ~100 l. ·
+Leibniz de **fórmulas** ~150 l. · las dos traducciones ~80 l. **Riesgo medio‑alto**, concentrado
+en el caso del binder, donde la sustitución **cambia de índice y levanta el término**:
+`substFormula 0 t (∀a) = ∀ (substFormula 1 (liftTerm 0 t) a)`.
+
+### 5 · ⛔ Lo que este ADR NO dice
+
+* **H3 NO está.** Esto retira **un obstáculo**, no el teorema. `HerbrandExtraction` sigue abierta.
+* ⛔ **Nada se retrofita.** `Derives₀` se queda como está y todo lo probado sobre él sigue en pie;
+  `derives0_iff_derives1` transporta lo que haga falta cuando haga falta. Reescribir los diez
+  módulos que hablan de `Derives₀` para que hablen de `Derives₁` no compra nada hoy y movería
+  footprints medidos.
+* ⚠️ `check-estratos.bash` pasa de **5** a **6** estratos declarados. `Derives₁`: 20 ctors,
+  **0 habitantes‑axioma** ⇒ inducción legítima.
+
+**Véase también:** `FOL/Derives1.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.5,
+`check-estratos.bash`, `check-footprints.bash` (58 titulares).

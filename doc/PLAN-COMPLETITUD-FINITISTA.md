@@ -236,7 +236,7 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 |---|---|---|---|
 | **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
 | **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | ⬜ **ENUNCIADA**, §5.4 |
+| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **1 de 2 obstáculos RETIRADO**, §5.5 |
 | **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **la mitad ⟸, HECHA** 2026‑09‑16 |
 
 #### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
@@ -317,6 +317,55 @@ un Hauptsatz de libro: `subst` es Leibniz —la igualdad no se elimina, se vuelv
 empezado a propósito**: diseñar `LK₀` sin poder validarlo contra la mitad difícil es fabricar una
 obligación que puede salir inconsumible — el escarmiento está escrito
 (`feedback_enunciar_una_deuda`: *la guarda se copia del CONSUMIDOR, no del molde*).
+
+---
+
+### 5.5 · 🏁 H3, primera pieza: **`rewrite_at` RETIRADA** — 2026‑09‑16, ADR‑044
+
+§5.4 dejó el obstáculo **contado**: siete constructores «de corte», y **dos** que impedían que
+esto fuera un Hauptsatz de libro — `subst` (Leibniz) y ⛔ `rewrite_at` (sin análogo en LK).
+
+**Uno de los dos ya no está** (`../FOL/FOL/Derives1.lean`, 214 l. de código,
+footprint `[propext, Quot.sound]`):
+
+    Derives₁               -- los 20 ctors de `Derives₀` MENOS `rewrite_at`
+    derives0_iff_derives1  -- y derivan EXACTAMENTE lo mismo
+
+⇒ **`Derives₁` es deducción natural clásica de libro más igualdad.** El frente de H3 pasa de
+**dos** obstáculos a **uno**. ⭐ Y `Derives₁.rec` **no depende de ningún axioma** (`Derives₀.rec`
+lleva `propext`).
+
+⭐ **Cómo se retira**: `LocalRule` tiene **un solo** constructor (`commuteImpl`), así que la
+eliminación es una **congruencia por posiciones**. ⚠️ Y tiene que ser **biconditional** aunque
+`rewrite_at` sólo pida una dirección: al bajar por el **antecedente** de una implicación la
+congruencia se **invierte**, así que la inducción necesita las dos mitades a la vez.
+
+⭐ Los dos casos caros —`Pos.body`, bajo el binder— salen por `intro_forall` (que levanta el
+contexto) y `elim_forall` con `Term.var 0`, cerrando con **`substFormula_lift_var`**: *el mismo
+lema que sostenía el paso de eigenvariable de Henkin* (ADR‑036). Salió gratis porque ya estaba.
+
+⚠️ **Y una medición que cambia el diseño del siguiente paso**: `getAt?` y `replaceAt` se compilan
+por recursión **bien fundada** (sus llamadas cambian los **dos** argumentos), así que **no
+reducen** — `getAt? f .root = some f` **no es `rfl`**. Hay que ir por sus ecuaciones. Es primo de
+⛔ *los símbolos OBJETO no reducen*, pero por otra causa: el símbolo es de Lean y lo que falla es
+el **esquema de recursión**.
+
+#### ⬜ El obstáculo que queda, y lo que se ha MEDIDO de él
+
+`subst` — Leibniz. La vía estándar es reducirlo a **instancias de congruencia**, dejando el
+cálculo en ND puro + axiomas de igualdad, que es como la literatura enuncia Herbrand con `=`.
+
+⚠️⚠️ **Pero hay un dato medido que obliga a hacerlo en el orden correcto**: las cuatro piezas de
+`FOL/Eq0.lean` —simetría, transitividad y las dos congruencias de una posición— están **derivadas
+DE `subst`** (`Derives₀.subst` aparece en las cuatro). ⇒ **no se puede quitar `subst` y conservar
+las congruencias como teoremas**: hay que **subirlas a constructores primitivos** y luego probar
+que `subst` es admisible a partir de ellas.
+
+⬜ **Estimación etiquetada, no medida**: `Derives₂` (20 ctors − `subst` + 2 congruencias) ~60 l.
+de andamiaje, Leibniz a nivel de **término** ~100 l., a nivel de **fórmula** ~150 l. (⚠️ el caso
+del binder cambia el índice de sustitución y levanta el término: `substFormula 0 t (∀a) =
+∀ (substFormula 1 (liftTerm 0 t) a)`), más las dos traducciones ~80 l. **Riesgo medio‑alto**, y
+concentrado en el caso del binder.
 
 ---
 

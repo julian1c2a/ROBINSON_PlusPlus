@@ -67,6 +67,11 @@ FOL.Herbrand0.derives0_of_eqInstance|Quot.sound,propext
 FOL.Herbrand0.derives0_ex_of_cert|Quot.sound,propext
 FOL.Herbrand0.herbrand_iff|Quot.sound,propext
 FOL.Herbrand0.ex_igualdad|Quot.sound,propext
+Derives₁.rec|-
+FOL.Derives1.rewrite_equiv|Quot.sound,propext
+FOL.Derives1.rewrite_at_admissible|Quot.sound,propext
+FOL.Derives1.derives0_to_derives1|Quot.sound,propext
+FOL.Derives1.derives0_iff_derives1|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

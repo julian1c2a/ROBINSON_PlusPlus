@@ -4,8 +4,42 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 29 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **53** · `check-estratos` **5** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 30 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **58** · `check-estratos` **6** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 (cierre) — 🔶 **H3, PRIMERA PIEZA: `rewrite_at` RETIRADA**
+>
+> ```
+> Derives₁               -- los 20 ctors de Derives₀ MENOS `rewrite_at`
+> rewrite_at_admissible  -- no hace falta como regla
+> derives0_iff_derives1  -- y derivan EXACTAMENTE lo mismo
+> ```
+>
+> `../FOL/FOL/Derives1.lean` (214 l.) — [ADR‑044](DECISIONS.md). `[propext, Quot.sound]`, **ni un
+> `Classical.choice`**; ⭐ `Derives₁.rec` **sin ningún axioma**.
+>
+> 🔑 **Por qué importa**: ADR‑043 §3 dejó el obstáculo de H3 **contado** —siete constructores «de
+> corte», de los cuales **dos** impedían que fuera un Hauptsatz de libro—. **Uno de los dos ya no
+> está.** `Derives₁` es ND clásica de libro + igualdad, y nada más.
+>
+> ⭐ `LocalRule` tiene **un solo** constructor, así que eliminarla es una congruencia por
+> posiciones. ⚠️ **Biconditional obligatoria** aunque `rewrite_at` pida una sola dirección: en el
+> **antecedente** la congruencia se invierte. *Una inducción puede necesitar más de lo que el
+> consumidor pide.* ⭐ Y los dos casos caros (bajo el binder) cierran con
+> **`substFormula_lift_var`** — *el mismo lema del paso de eigenvariable de Henkin* (ADR‑036).
+>
+> ⚠️ **Medición nueva**: `getAt?` y `replaceAt` **NO REDUCEN** — sus llamadas cambian los **dos**
+> argumentos ⇒ recursión bien fundada ⇒ `getAt? f .root = some f` **no es `rfl`**. Hay que ir por
+> sus ecuaciones. Primo de *los símbolos OBJETO no reducen*, pero por el **esquema de recursión**.
+>
+> ▶ **POR DÓNDE SEGUIR — el obstáculo que queda es `subst` (Leibniz)**, y hay un dato **medido**
+> que fija el orden: las cuatro piezas de `FOL/Eq0.lean` están **derivadas DE `subst`**, así que
+> **no se puede quitarlo conservando las congruencias como teoremas** — hay que **subirlas a
+> constructores primitivos** y luego probar `subst` admisible.
+> ⬜ Estimado (etiquetado): `Derives₂` ~60 l. · Leibniz de términos ~100 l. · de fórmulas ~150 l.
+> (⚠️ el binder cambia el índice y levanta el término) · traducciones ~80 l. **Riesgo medio‑alto.**
+> Y después de eso, el **Hauptsatz**, que sigue siendo la pieza grande.
+
 
 > # 🗓️ 2026‑09‑16 (noche) — 🏁 **VÍA H · H4**: el CERTIFICADO de Herbrand, y H3 ENUNCIADA
 >
