@@ -446,11 +446,26 @@ coste): el caso `intro_forall` **levanta el contexto**, así que la lista `E` qu
 hipótesis de inducción vive en el contexto **levantado**, y hay que producirla desde el de abajo —
 pero una instancia con `Term.var 0` no es el levantamiento de ninguna.
 
-⚠️ **Y una comprobación que NO está hecha**: `LK₀ Γ Δ → Derives₂ Γ (disjOf Δ)`, es decir, que `LK₀`
-no sea **demasiado fuerte**. ⬜ El obstáculo está identificado: el caso `allR` exige sacar una
-disyunción de dentro de un cuantificador (`∀x(A ∨ C) → (∀x A) ∨ C` con `C` sin `x`). No está en el
-camino crítico —las dos obligaciones de arriba no pasan por ella—, pero es lo que certificaría que
-el molde no prueba de más.
+🏁 **Y la comprobación de que `LK₀` no es demasiado fuerte, HECHA** (ADR‑048,
+`../FOL/FOL/SequentSound0.lean`, 173 l.):
+
+    lkc_sound       : LKc Γ Δ → ∀ M v, (todo Γ vale) → algún elemento de Δ vale
+    lk0_to_derives0 : LK₀ Γ Δ → Γ ⊢₀ disjOf Δ
+    lk0_not_empty   : ¬ LK₀ [] []
+
+⭐ **Y salió mucho más barata de lo estimado, por la ruta SEMÁNTICA.** Aquí decía:
+
+> ⚠️ **Y una comprobación que NO está hecha**: `LK₀ Γ Δ → Derives₂ Γ (disjOf Δ)` … ⬜ El obstáculo
+> está identificado: el caso `allR` exige sacar una disyunción de dentro de un cuantificador
+> (`∀x(A ∨ C) → (∀x A) ∨ C` con `C` sin `x`).
+
+Ese obstáculo es real **por la vía sintáctica**. Por la semántica el caso `allR` es rutina, y el
+resultado sintáctico cae **como corolario** vía `completeness₀` (§6) y `derives0_iff_derives2`.
+🔑 *Cuando las dos direcciones están demostradas, un resultado sintáctico se puede comprar por la
+semántica* — primera vez que este plan cobra ese dividendo, y sólo se puede desde ADR‑041.
+
+⭐⭐ **Y el caso `cut` es semánticamente TRIVIAL** (tres líneas). 🔑 *El corte es gratis para la
+verdad y carísimo para la demostración*: eso es, en una frase, todo el frente H3.
 
 ---
 

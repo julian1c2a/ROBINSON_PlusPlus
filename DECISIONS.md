@@ -3551,3 +3551,67 @@ menciona** — de hecho comprobé si había pasado, y por poco. 🔑 *Un cambio 
 
 **Véase también:** `FOL/Semantics.lean`, `check-footprints.bash`,
 `../Peano-from-ROB-n-FOL/doc/HANDOFF-FOL-2026-09-16.md`.
+
+---
+
+## ADR-048: `LK₀` no prueba de más — y el dividendo de tener las DOS direcciones
+
+**Fecha:** 2026‑09‑16 · **Estado:** ✅ EJECUTADO ·
+**Relacionado:** ADR‑046 §5 (la comprobación que quedaba), ADR‑041 (completitud), ADR‑047 (la
+corrección de la semántica), plan §5.7
+
+### 1 · Qué queda demostrado
+
+    lkc_sound       : LKc Γ Δ → ∀ M v, (todo Γ vale) → algún elemento de Δ vale
+    lk0_sound       : ídem para `LK₀`, por el encaje
+    lk0_to_derives0 : LK₀ Γ Δ → Γ ⊢₀ disjOf Δ
+    lk0_not_empty   : ¬ LK₀ [] []
+
+`FOL/SequentSound0.lean`, **173 l. de código**, `[propext, Classical.choice, Quot.sound]`.
+
+⚠️ **No es adorno.** `LK₀` es el cálculo sobre el que se va a enunciar y demostrar el Hauptsatz. Si
+fuera **demasiado fuerte**, `CutElim` podría ser cierto y no servir —o se perseguiría un teorema
+falso durante las mil líneas del Hauptsatz—. Esto lo cierra **antes** de pagar esa pieza.
+
+### 2 · ⭐ El dividendo: comprar un resultado sintáctico por la semántica
+
+ADR‑046 §5 estimó `LK₀ Γ Δ → Derives₂ Γ (disjOf Δ)` en **~250 l. con riesgo en `allR`**, que por la
+vía sintáctica exige sacar una disyunción de dentro de un cuantificador. **Por la semántica ese
+caso es rutina**, y el resultado sintáctico cae **como corolario** vía `completeness₀` (ADR‑041) y
+`derives0_iff_derives2` (ADR‑045).
+
+🔑 **La regla nueva**: *cuando las dos direcciones están demostradas, un resultado sintáctico se
+puede comprar por la semántica* — a cambio de `Classical.choice`, que aquí no cuesta nada porque el
+enunciado ya es clásico. **Es la primera vez que este repo cobra ese dividendo**, y sólo se puede
+desde ADR‑041. ⚠️ Con su condición: el precio es un footprint clásico, así que **no** sirve para
+resultados que quieran ser net‑0.
+
+### 3 · ⭐⭐ Lo que enseña el caso `cut`
+
+Se probó sobre **`LKc`** —el que **tiene** corte— y `lk0_sound` salió por `lk0_to_lkc`: **una sola
+inducción** en vez de dos. Y el caso `cut` es **semánticamente trivial**, tres líneas: si algo de
+`A :: Δ` vale y, suponiendo `A`, algo de `Δ` vale, entonces algo de `Δ` vale.
+
+🔑 **Ahí está, en una frase, todo el frente H3**: *el corte es **gratis para la verdad** y
+**carísimo para la demostración***. `lk0_herbrand` (ADR‑046) no puede con él —su fórmula de corte
+no aparece en la conclusión, así que las hipótesis de la inducción no se heredan— y eliminarlo es
+el Hauptsatz. **La semántica no distingue lo que la sintaxis paga.**
+
+### 4 · ⭐ Y ADR‑047 pagó aquí, inmediatamente
+
+Los dos casos caros (`allR`, `exL`) pasan por `contextSatisfies_lift_zero` y
+`eval_liftFormula_zero`. **Las dos acababan de quedar limpias** con la corrección de PeanoRF. Sin
+ella, este módulo habría heredado un `Classical.choice` **indistinguible del legítimo** — y el
+footprint habría dicho lo mismo por dos razones distintas, que es exactamente lo que
+[[feedback-footprint-no-es-constructividad]] §4 advierte.
+
+### 5 · ⚠️ El `Classical.choice` de aquí ES matemático
+
+La solidez de un cálculo de secuentes **multiconclusión** es clásica de raíz: `implR` decide si `A`
+vale, `allR` decide si `∀A` vale. Sin tercio excluso no hay teorema.
+
+⭐ Y por eso vive en **otro módulo**: `FOL.Sequent0` —la **extracción**— mide `[propext]` y es
+constructiva. *La extracción es constructiva; la solidez, no.* Separarlos es lo que deja verlo.
+
+**Véase también:** `FOL/SequentSound0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.7,
+`check-footprints.bash` (76 titulares).

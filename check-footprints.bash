@@ -87,6 +87,9 @@ FOL.Sequent0.quantFree_subst|-
 FOL.Sequent0.lk0_herbrand|propext
 FOL.Sequent0.lk0_to_lkc|-
 FOL.Sequent0.herbrandExtraction_of|Quot.sound,propext
+FOL.SequentSound0.lkc_sound|Classical.choice,Quot.sound,propext
+FOL.SequentSound0.lk0_to_derives0|Classical.choice,Quot.sound,propext
+FOL.SequentSound0.lk0_not_empty|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

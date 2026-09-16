@@ -4,8 +4,43 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 32 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **69** · `check-estratos` **9** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 33 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **76** · `check-estratos` **9** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑16 — 🏁 **`LK₀` NO PRUEBA DE MÁS** (paso 1 del plan del propietario)
+>
+> ```
+> lkc_sound       : LKc Γ Δ → ∀ M v, (todo Γ vale) → algún elemento de Δ vale
+> lk0_to_derives0 : LK₀ Γ Δ → Γ ⊢₀ disjOf Δ
+> lk0_not_empty   : ¬ LK₀ [] []
+> ```
+>
+> `../FOL/FOL/SequentSound0.lean` (173 l.) — [ADR‑048](DECISIONS.md). Era la comprobación que
+> ADR‑046 §5 dejó declarada como **no hecha**, y sin ella se podría perseguir un teorema falso
+> durante las mil líneas del Hauptsatz.
+>
+> ⭐ **Salió mucho más barata de lo estimado (~250 l., riesgo en `allR`) por la ruta SEMÁNTICA**: el
+> caso `allR` es rutina, y el resultado **sintáctico** cae **como corolario** vía `completeness₀` +
+> `derives0_iff_derives2`. 🔑 **Regla nueva**: *cuando las dos direcciones están demostradas, un
+> resultado sintáctico se puede comprar por la semántica* — a cambio de un footprint clásico, así
+> que ⚠️ no sirve para lo que quiera ser net‑0. Primera vez que el repo cobra ese dividendo.
+>
+> ⭐⭐ Una sola inducción (sobre `LKc`, el que **tiene** corte) y `LK₀` por el encaje. Y **el caso
+> `cut` es semánticamente TRIVIAL**, tres líneas. 🔑 *El corte es **gratis para la verdad** y
+> **carísimo para la demostración*** — eso es, en una frase, todo el frente H3.
+>
+> ⭐ **ADR‑047 pagó aquí, en el acto**: los dos casos caros pasan por `contextSatisfies_lift_zero` y
+> `eval_liftFormula_zero`, que acababan de quedar limpias. Sin esa corrección este módulo habría
+> heredado un `Classical.choice` **indistinguible del legítimo**.
+>
+> ⚠️ El `Classical.choice` de aquí **es matemático** (secuentes multiconclusión), y por eso vive en
+> **otro módulo**: `FOL.Sequent0` —la extracción— mide `[propext]`. *La extracción es constructiva;
+> la solidez, no.*
+>
+> ▶ **SIGUIENTE (paso 2 del propietario)**: ⬜ **`NDtoLK`**, con el cambio de diseño ya decidido —
+> los axiomas de igualdad **∀‑cerrados** en un antecedente **fijo**, lo que obliga a generalizar
+> `lk0_herbrand` para que el caso `allL` recoja la instancia. Y después ⬜ **`CutElim`**.
+
 
 > # 🗓️ 2026‑09‑16 (cierre) — 🏁 **H3 REDUCIDA A DOS `Prop`**: el cálculo de secuentes
 >
