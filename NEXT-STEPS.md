@@ -4,8 +4,43 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑16 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 34 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **80** · `check-estratos` **9** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 35 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **85** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑17 — 🔶 **EL ANDAMIAJE DEL HAUPTSATZ** (paso 3, en curso)
+>
+> ⛔ **El Hauptsatz NO está.** Esto es lo que hay que tener **antes** de intentarlo
+> (`../FOL/FOL/Hauptsatz0.lean`, 218 l. — [ADR‑050](DECISIONS.md)):
+>
+> ```
+> CutAdm               -- el corte ÚNICO
+> cutElim_of           -- ⭐ CutAdm ⇒ CutElim, DEMOSTRADO
+> LKh                  -- el cálculo INDEXADO POR ALTURA
+> liftFormula_subst_le -- ⭐ la conmutación De Bruijn que FALTABA
+> ```
+>
+> ⇒ **H3 se enuncia ahora sobre el CORTE ÚNICO**, que es sobre lo que la literatura razona.
+>
+> ⚠️⚠️ **La altura no se puede definir sobre `LK₀`**: vive en `Prop` ⇒ no hay eliminación grande
+> ⇒ hay que indexarla en el inductivo. 🔑 De la familia de M‑11: *el universo en el que vive un
+> inductivo decide qué se puede decir de sus habitantes.*
+>
+> ⭐ Y `LKh.struct` **preserva la altura** ⇒ debilitamiento, contracción e intercambio **gratis**
+> dentro de la inducción — justo lo que en la prueba clásica obliga a pasar por **MIX**.
+> ⚠️ Con su contrapartida: si la inducción doble no cierra, **el primer sospechoso es `struct`**.
+>
+> ⛔ **Y dos conmutaciones De Bruijn que el repo NO tenía** (medido): la mitad `k ≤ v` —**hecha**—
+> y la forma **general de Barendregt** —falta; `subst_subst_comm_succ` sólo cubre índices
+> **adyacentes**. 🔑 *Una familia de lemas De Bruijn casi nunca está completa: mirar qué mitad
+> falta ANTES de planificar.*
+>
+> ⚠️ **No hay atajo semántico**, y queda escrito: `CutAdm` no sale de `lkc_sound` + `completeness₀`
+> porque ésta devuelve `Derives₀`, no `LK₀` sin corte. 🔑 *El dividendo semántico (ADR‑048) sólo
+> paga hacia el cálculo del que se tiene completitud.*
+>
+> ▶ **SIGUIENTE**: ⬜ Barendregt general (~90 l., riesgo bajo) → ⬜ `lkh_subst` (~150 l.) →
+> ⬜ **la inducción doble** (~400–600 l., riesgo alto).
+
 
 > # 🗓️ 2026‑09‑16 — 🏁🏁 **H3 SE QUEDA CON UNA SOLA DEUDA** (paso 2 del propietario)
 >

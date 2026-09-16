@@ -3686,3 +3686,90 @@ eigenvariable de Henkin (ADR‑036), **por tercera vez**.
 **Véase también:** `FOL/NDtoLK0.lean`, `FOL/Sequent0.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.8, `check-estratos.bash` (LK₀ 14, LKc 15),
 `check-footprints.bash` (80 titulares).
+
+---
+
+## ADR-050: El andamiaje del Hauptsatz — H3 sobre el CORTE ÚNICO, y dos conmutaciones que faltaban
+
+**Fecha:** 2026‑09‑17 · **Estado:** 🔶 PARCIAL (el Hauptsatz **NO** está) ·
+**Relacionado:** ADR‑046/049 (`LK₀`, `NDtoLK`), ADR‑048 (solidez), plan §5.9
+
+### 1 · Qué queda demostrado, y qué NO
+
+`FOL/Hauptsatz0.lean`, **218 l. de código**. ⛔ **`CutAdm` no está**: esto es lo que hay que tener
+**antes** de intentarlo.
+
+    CutAdm               -- el corte ÚNICO
+    cutElim_of           -- ⭐ CutAdm ⇒ CutElim, DEMOSTRADO
+    LKh                  -- el cálculo INDEXADO POR ALTURA (14 ctors)
+    lkh_mono · lkh_to_lk0 · lk0_to_lkh
+    liftFormula_subst_le -- ⭐ la conmutación De Bruijn que FALTABA
+
+`cutElim_of`, `lkh_mono` y `lkh_to_lk0` **no dependen de ningún axioma**; el resto,
+`[propext, Quot.sound]`. **Ni un `Classical.choice`.**
+
+### 2 · ⭐ Separar el corte ÚNICO de su clausura
+
+`CutElim` es la clausura sobre derivaciones; lo que un Hauptsatz demuestra es el **corte único**,
+`CutAdm`. La conversión es una inducción de quince líneas. ⇒ **H3 se enuncia ahora sobre el objeto
+sobre el que la literatura razona**, no sobre su envoltorio.
+
+🔑 Es el mismo movimiento que ADR‑043 (enunciar la deuda con su consumidor) una vuelta más adentro:
+*una deuda bien enunciada se parece a lo que la literatura demuestra, no a lo que uno necesita.*
+
+### 3 · ⚠️⚠️ Por qué hace falta indexar por ALTURA — y es una limitación del sistema, no del diseño
+
+La prueba de Gentzen es una **inducción doble**: grado de la fórmula de corte × **suma de las
+alturas** de las subderivaciones.
+
+⛔ **La altura no se puede definir sobre `LK₀`**: vive en `Prop`, así que **no hay eliminación
+grande** y no existe `altura : LK₀ Γ Δ → Nat`. ⇒ hay que indexarla **en el propio inductivo**, y
+mantener los dos encajes.
+
+🔑 Es de la familia de M‑11 (ADR‑025): **el universo en el que vive un inductivo decide qué se
+puede decir de sus habitantes.** Allí era la inducción; aquí es la medida.
+
+### 4 · ⭐ Una decisión de diseño que se come una complicación clásica entera
+
+`LKh.struct` se declara **preservando la altura**. Eso da **debilitamiento, contracción e
+intercambio gratis dentro de la inducción** — y la contracción es exactamente lo que en la
+presentación clásica obliga a pasar por la regla **MIX** en vez del corte.
+
+🔑 *Una decisión sobre la forma del inductivo puede eliminar una complicación entera de la prueba.*
+⚠️ Con su contrapartida, que hay que vigilar: `struct` sin coste de altura es una regla **fuerte**;
+si la inducción doble no cierra, el primer sospechoso es ella.
+
+### 5 · ⛔ Dos conmutaciones De Bruijn que el repo NO tenía — MEDIDO
+
+| lema | condición | dónde |
+|---|---|---|
+| `substFormula_lift_comm` | `k = v` | `Theorems/Eq.lean` |
+| `liftFormula_subst` | `v ≤ k` | `Lift0.lean` |
+| ⭐ `liftFormula_subst_le` | **`k ≤ v`** | **hecho aquí** |
+| ⬜ Barendregt general | `substFormula v s (substFormula 0 u f) = …` | **falta** |
+
+⚠️ La segunda falta de verdad: `subst_subst_comm_succ` sólo cubre índices **adyacentes**
+(`j+1`/`j`), y el caso `allL` del lema de sustitución necesita `v` **arbitrario**.
+
+🔑 *Una familia de lemas De Bruijn casi nunca está completa: hay que mirar qué mitad falta antes de
+planificar, no a mitad de la prueba.*
+
+### 6 · ⚠️ Y no hay atajo semántico — dejado escrito para que no se intente
+
+`CutAdm` **no** sale de `lkc_sound` (ADR‑048) + `completeness₀` (ADR‑041): `completeness₀` devuelve
+una derivación de **`Derives₀`**, no de `LK₀`, y convertirla exigiría `Derives₀ → LK₀` **sin
+corte** — que **es** el Hauptsatz. **El círculo se cierra.**
+
+⚠️ Esto **no contradice** ADR‑048 §2 (*un resultado sintáctico se puede comprar por la semántica*):
+allí el destino era `Derives₂`, que la completitud sí produce. Aquí el destino es `LK₀` **cut‑free**,
+que ninguna completitud de este repo produce. 🔑 *El dividendo semántico sólo paga hacia el cálculo
+del que se tiene completitud.*
+
+### 7 · ⬜ Lo que falta, con su riesgo
+
+1. ⬜ Barendregt general, ~90 l., **riesgo bajo** (gemela de la hecha);
+2. ⬜ `lkh_subst` — cerrado por sustitución, preservando altura, ~150 l.;
+3. ⬜ **la inducción doble**, ~400–600 l., **riesgo alto**.
+
+**Véase también:** `FOL/Hauptsatz0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.9,
+`check-estratos.bash` (10 estratos), `check-footprints.bash` (85 titulares).

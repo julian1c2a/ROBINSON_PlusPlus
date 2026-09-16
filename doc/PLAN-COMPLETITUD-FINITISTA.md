@@ -513,6 +513,50 @@ es `exL`. *Los dos cálculos tienen la misma regla de eigenvariable, escrita de 
 
 ---
 
+### 5.9 · 🔶 H3, quinta pieza: el ANDAMIAJE del Hauptsatz — 2026‑09‑17, ADR‑050
+
+⛔ **El Hauptsatz NO está.** Esto es lo que hay que tener **antes** de intentarlo, construido y
+verificado por partes (`../FOL/FOL/Hauptsatz0.lean`, **218 l. de código**):
+
+    CutAdm               -- el corte ÚNICO, que es lo que un Hauptsatz demuestra
+    cutElim_of           -- ⭐ CutAdm ⇒ CutElim, DEMOSTRADO (quince líneas)
+    LKh                  -- el cálculo INDEXADO POR ALTURA (14 ctors)
+    lkh_mono · lkh_to_lk0 · lk0_to_lkh
+    liftFormula_subst_le -- ⭐ la conmutación De Bruijn que FALTABA en el repo
+
+⇒ **H3 se enuncia ahora sobre el CORTE ÚNICO**, que es el objeto sobre el que la literatura razona.
+
+⚠️⚠️ **Por qué hace falta indexar por altura**: la prueba de Gentzen es una **inducción doble**
+—grado de la fórmula de corte × suma de alturas—, y ⛔ **la altura no se puede definir sobre
+`LK₀`**: vive en `Prop`, no hay eliminación grande, no existe `altura : LK₀ Γ Δ → Nat`.
+
+⭐ Y `LKh.struct` se declara **preservando la altura**: eso da debilitamiento, contracción e
+intercambio **gratis dentro de la inducción**, que es justo lo que en la presentación clásica
+obliga a pasar por la regla **MIX** en vez del corte. *Una decisión de diseño del inductivo se come
+una complicación entera de la prueba clásica.*
+
+#### ⛔ Dos conmutaciones De Bruijn que el repo NO tenía — medido, no estimado
+
+| lema | condición | dónde |
+|---|---|---|
+| `substFormula_lift_comm` | `k = v` | `Theorems/Eq.lean` |
+| `liftFormula_subst` | `v ≤ k` | `Lift0.lean` |
+| ⭐ `liftFormula_subst_le` | **`k ≤ v`** | **hecho aquí** |
+| ⬜ Barendregt general | `substFormula v s (substFormula 0 u f) = …` | **falta** — `subst_subst_comm_succ` sólo cubre índices **adyacentes** |
+
+#### ⬜ Lo que falta para `CutAdm`
+
+1. ⬜ la segunda conmutación (Barendregt general), ~90 l., **riesgo bajo** — gemela de la hecha;
+2. ⬜ **`lkh_subst`** (el cálculo cerrado por sustitución, preservando altura), ~150 l.;
+3. ⬜ **la inducción doble**, ~400–600 l., **riesgo alto**. Es la pieza grande.
+
+⚠️ **Y no hay atajo semántico, que conviene dejar escrito**: `CutAdm` **no** sale de `lkc_sound`
++ `completeness₀`, porque `completeness₀` devuelve una derivación de **`Derives₀`**, no de `LK₀`, y
+convertirla exigiría `Derives₀ → LK₀` **sin corte** — que *es* el Hauptsatz. **El círculo se
+cierra.**
+
+---
+
 ### 5.3 · ⚠️ Y lo que cuesta la IGUALDAD, que aquí sí cuesta
 
 Sin `=`, la disyunción de Herbrand termina en **tautología proposicional**. Con `=`, termina en
