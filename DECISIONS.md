@@ -4497,13 +4497,20 @@ fue que **estaba enunciado en la forma que hacia falta**, que es lo que de verda
 ⚠️ Las cuatro versiones «por la derecha» (`and_forall_r`, …) tampoco se escribieron: salen de las
 de ADR-057 mas conmutatividad, en seis lineas cada una.
 
-### 4 · ⬜ Lo que falta, y es el puente a la skolemizacion
+### 4 · 🏁 El puente a la skolemizacion — HECHO el mismo dia
 
-⬜ `Prenex (prenex f)` — que la salida **este** de verdad en forma prenexa. El teorema de correccion
-(que es lo que se pidio) no lo necesita, pero **la skolemizacion si**: sin el no se sabe donde
-poner los simbolos de Skolem. Estimado ~70 l., riesgo bajo: `quantFree_lift`, `prenex_lift` y dos
-inducciones sobre las fusiones.
-⚠️ Etiquetado ESTIMADO, que es lo que este ADR acaba de aprender a hacer.
+`prenex_isPrenex : ∀ f, Prenex (prenex f)`, footprint `[propext]`; `quantFree_lift`, **sin ningun
+axioma**. El teorema de correccion no lo necesita, pero **la skolemizacion si**: sin el no se sabe
+donde poner los simbolos de Skolem.
+
+⚠️ **Estimado ~70 l.; medido 95.** Se deja la cifra vieja a la vista: es la primera estimacion mia
+del dia que se queda CORTA en vez de larga, y las dos cifras juntas valen mas que la buena sola.
+🔑 La causa es identificable: conte «dos inducciones sobre las fusiones» y son **seis** —
+`mergeX`/`mergeXR` por tres conectivas—. *Contar las piezas por la definicion, no por la idea.*
+
+⭐ Y sale por el mismo patron que todo lo demas: `Prenex X` y `QuantFree X` son **definicionalmente
+iguales** cuando `X` no es un cuantificador, asi que los seis casos base de cada induccion son
+`⟨hA, hB⟩` sin mas.
 
 **Controles:** RPP **145 jobs** · FOL **48 jobs** · `check-footprints` **116** ·
 `check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.

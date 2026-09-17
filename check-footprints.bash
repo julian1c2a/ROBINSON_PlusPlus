@@ -130,6 +130,8 @@ FOL.Prenex0.impl_ex_right|Quot.sound,propext
 FOL.PrenexNF0.iffAll_trans|-
 FOL.PrenexNF0.prenex_iff|Quot.sound,propext
 FOL.PrenexNF0.derives0_prenex_iff|Quot.sound,propext
+FOL.PrenexNF0.quantFree_lift|-
+FOL.PrenexNF0.prenex_isPrenex|propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

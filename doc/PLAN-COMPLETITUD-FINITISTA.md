@@ -1051,8 +1051,10 @@ dirección: **estimar por la forma del enunciado y no por la del árbol**.
 ⭐ Las congruencias no se escribieron: `FOL.Derives1` ya las tenía, y **enunciadas en la forma que
 hacía falta** (esquemáticas en el contexto). Dos líneas de envoltorio cada una.
 
-⬜ Falta `Prenex (prenex f)` — que la salida esté de verdad en forma prenexa. La corrección no lo
-necesita; **la skolemización sí**. ~70 l., riesgo bajo. ⚠️ ESTIMADO.
+🏁 Y **`prenex_isPrenex`**: la salida **está** de verdad en forma prenexa (`[propext]`). La
+corrección no lo necesita; **la skolemización sí**. ⚠️ Estimado ~70 l., **medido 95** — la primera
+estimación del día que se queda **corta**, por contar «dos inducciones» donde había **seis**
+(`mergeX`/`mergeXR` por tres conectivas). 🔑 *Contar las piezas por la DEFINICIÓN, no por la idea.*
 
 ---
 
