@@ -123,6 +123,10 @@ FOL.HerbrandBlock0.derives0_exBlock_of_cert|Quot.sound,propext
 FOL.HerbrandBlock0.ex_bloque_igualdad|Quot.sound,propext
 FOL.Skolem0.evalFormula_updateFunc|-
 FOL.Skolem0.henkin_conservative|Classical.choice,Quot.sound,propext
+FOL.Prenex0.and_forall|Quot.sound,propext
+FOL.Prenex0.or_forall|Quot.sound,propext
+FOL.Prenex0.impl_forall_left|Quot.sound,propext
+FOL.Prenex0.impl_ex_right|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

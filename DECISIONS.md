@@ -4370,3 +4370,78 @@ separado.*
 
 **Vease tambien:** `FOL/Skolem0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.6,
 ADR-037, ADR-054, ADR-055.
+
+---
+
+## ADR-057: La CAPA PRENEXA sobre `Derives₀` — las ocho equivalencias, y la clásica no la pone Lean
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: primera mitad de lo que le faltaba a **H** (ADR-056 §5). `FOL/Prenex0.lean`, 260 l.
+de codigo: las **ocho** formas de sacar un cuantificador de debajo de una conectiva.
+
+| | equivalencia | ¿clasica? |
+|---|---|---|
+| 1 | `(∀A) ∧ B ↔ ∀(A ∧ B↑)` | no |
+| 2 | `(∃A) ∧ B ↔ ∃(A ∧ B↑)` | no |
+| 3 | `(∀A) ∨ B ↔ ∀(A ∨ B↑)` | ⚠️ la vuelta |
+| 4 | `(∃A) ∨ B ↔ ∃(A ∨ B↑)` | no |
+| 5 | `(∀A) → B ↔ ∃(A → B↑)` | ⚠️ la ida |
+| 6 | `(∃A) → B ↔ ∀(A → B↑)` | no |
+| 7 | `B → (∀A) ↔ ∀(B↑ → A)` | no |
+| 8 | `B → (∃A) ↔ ∃(B↑ → A)` | ⚠️ la ida |
+
+📏 Las ocho, `[propext, Quot.sound]`. **Ni un `Classical.choice`.**
+
+### 1 · ⭐ La condicion lateral no se comprueba: se CONSTRUYE
+
+La formulacion de libro lleva una condicion lateral —*x no libre en B*— que hay que comprobar en
+cada aplicacion. En De Bruijn no hay nombres, y aqui `B↑` es `liftFormula 0 B`: **una formula
+levantada no puede mencionar la variable recien ligada**.
+🔑 *Una condicion lateral codificada en el TIPO no hay que comprobarla* — desaparece del enunciado
+y de todas sus aplicaciones futuras.
+
+### 2 · ⭐⭐ Y la logica clasica NO entra por Lean
+
+Tres de las ocho tienen una direccion que no es intuicionista (la «paradoja del bebedor» y sus
+primas). Salen de `derives0_em_ctx` (`FOL.Propositional0`, **footprint `-`, sin ningun axioma**) y
+del **constructor** `Derives₀.forall_not_ex_not`.
+
+🔑 **La fuerza clasica de este calculo esta en sus CONSTRUCTORES, no en el metanivel.** Por eso se
+puede usar sin encarecer el footprint, y por eso las ocho salen `[propext, Quot.sound]` igual que
+las cinco intuicionistas. ⚠️ Es exactamente la distincion que el proyecto lleva midiendo desde
+ADR-041: *el footprint habla del nucleo de Lean, no de la matematica*.
+
+### 3 · ⭐ El truco que hace las ocho pruebas, y es uno solo
+
+`intro_forall` **levanta el contexto** (es la regla de la eigenvariable), asi que bajo el binder la
+hipotesis `∀A` llega como `∀(A↑¹)`. Se instancia en `Term.var 0` y vuelve intacta:
+
+    inst_var0 : substFormula 0 (Term.var 0) (liftFormula 1 A) = A      -- = substFormula_lift_var
+
+Aparece en siete de las ocho. La octava usa `substFormula_liftFormula`, para devolver el `B` de
+fuera. ⇒ **el coste real por equivalencia es ~24 lineas**, medido con las dos primeras antes de
+escribir las seis restantes.
+
+⚠️ Y los unicos cuatro errores de compilacion de todo el modulo fueron **contextos mal escritos a
+mano** (poner `A ::` donde iba el cuerpo del `∃`, o mapear `lift` sobre una lista ya levantada) y
+dos `have` sin anotar que no infieren el contexto. Ninguno fue matematico.
+🔑 *Cuando la regla levanta el contexto, el error no esta en la logica: esta en la contabilidad.*
+
+### 4 · ⬜ Lo que falta para la forma NORMAL
+
+Estas ocho son el **motor**, no la forma normal. Falta `prenex : Formula → Formula` con su
+terminacion y su correccion (`Γ ⊢₀ φ ↔ Γ ⊢₀ prenex φ`).
+⬜ ~200 l., riesgo **medio**: lo caro no son las equivalencias —estan aqui— sino la **medida de
+terminacion** del algoritmo de prenexacion.
+
+⚠️ Y hay que decirlo porque cambia la cifra de ADR-056 §5: alli se estimo la capa prenexa en
+«~250-350 l., riesgo bajo **por ser un port**». **El port era falso**: `Theorems/Quantifiers.lean`
+tiene SEIS teoremas sobre `⊢` y **ninguno es una regla de desplazamiento** (son `forall_dni`, las
+dos dualidades ∃/¬ y la distribucion ∀/∧). Las ocho se han escrito **desde cero**.
+🔑 *«Es un port» es una estimacion, y hay que medirla como cualquier otra.*
+
+**Controles:** RPP **145 jobs** · FOL **47 jobs** · `check-footprints` **113** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry** · ✅ CI.
+
+**Vease tambien:** `FOL/Prenex0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.7, ADR-056.

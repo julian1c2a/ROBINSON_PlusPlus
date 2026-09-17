@@ -1011,6 +1011,30 @@ n‑arios; el de `Fresh0.lean` es de constantes).
 
 ---
 
+### 6.7 · 🏁 La CAPA PRENEXA sobre `Derives₀` — 2026‑09‑17, ADR‑057
+
+`../FOL/FOL/Prenex0.lean`, 260 l.: las **ocho** equivalencias de desplazamiento de cuantificador.
+📏 Las ocho, `[propext, Quot.sound]`. **Ni un `Classical.choice`.**
+
+⭐ **La condición lateral no se comprueba: se construye.** «x no libre en `B`» es `liftFormula 0 B`
+— una fórmula levantada no puede mencionar la variable recién ligada.
+🔑 *Una condición lateral codificada en el TIPO no hay que comprobarla.*
+
+⭐⭐ **Y la lógica clásica no entra por Lean.** Las tres direcciones no intuicionistas salen de
+`derives0_em_ctx` (**sin ningún axioma**) y del **constructor** `Derives₀.forall_not_ex_not`.
+🔑 *La fuerza clásica de este cálculo está en sus CONSTRUCTORES, no en el metanivel.*
+
+⚠️ **Y corrige una estimación del día anterior**: §6.6 dio la capa prenexa por «un port, riesgo
+bajo». **El port era falso** — `Theorems/Quantifiers.lean` tiene seis teoremas y **ninguno** es una
+regla de desplazamiento. Las ocho se escribieron desde cero, a ~24 l. cada una (medido con las dos
+primeras antes de escribir las seis restantes). 🔑 *«Es un port» es una estimación como cualquier
+otra, y hay que medirla.*
+
+⬜ **Falta la forma NORMAL**: `prenex : Formula → Formula` con su terminación y su corrección.
+~200 l., riesgo **medio** — lo caro es la **medida de terminación**, no las equivalencias.
+
+---
+
 ## 7 · ⛔ El muro constructivo, medido el 2026‑09‑14: **`String`**
 
 Si en algún momento se quiere ir más allá de «reducible» hacia «constructivo», el obstáculo **no
