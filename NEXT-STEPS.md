@@ -4,9 +4,9 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **49** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **50** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
-🔧 Controles: `check-footprints` **126** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
+🔧 Controles: `check-footprints` **132** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
@@ -109,8 +109,12 @@
 >
 > ## ⬜ Lo que queda de este frente
 >
-> * ⬜ **La forma normal de SKOLEM** — iterar el paso de §6.10 sobre `prenex f` para eliminar
->   **todos** los `∃`. **No hecho ni medido.**
+> * 🏁 ~~La forma normal de SKOLEM~~ — **PAGADA**, ADR‑062, `FOL/SkolemNF0.lean` (350 l.).
+>   ⭐⭐ La recursión **se pasa, no se mide**: con un COMBUSTIBLE es estructural, sus tres
+>   ecuaciones son `rfl` y la normalización se comprueba **por cómputo**
+>   (`skolemize 0 (∀∃∀∃ Q) = ∀∀ Q(x₁, c₀(x₁), x₀, c₁(x₀,x₁))` **`by rfl`**).
+>   ⬜ Quedan **dos** piezas medidas: la dirección `φ → skolemize φ` **con** los axiomas (regla K
+>   bajo `∀ⁿ`) y el **enchufe con Herbrand**, que pasa por la negación y no está escrito.
 > * ⬜ **F · interpolación de Craig** para `LKp` (~850 l., riesgo alto) — abierta.
 > * ⬜ La **mitad ⟹ de E** (~350–450 l.) — el invariante está confirmado.
 > * 🏁 ~~Decisión (2) del informe de PeanoRF~~ — **ADOPTADO**, ADR‑061. ⚠️ Y la premisa era

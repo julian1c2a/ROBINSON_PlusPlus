@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-17 23:10 · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-09-18 01:20 · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -43,7 +43,7 @@
 >
 > ⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.
 >
-> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.10**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058) y Skolem con término (059) y **bajo un prefijo `∀ⁿ`** (060).
+> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.11**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060) y 🏁 **la FORMA NORMAL de Skolem** (062).
 > ⚠️ Lo excluido del catálogo va con su razón **medida** en ADR‑054 §4 (propiedad de subfórmula, conservatividad de los 107 `codingAxioms`, Church): **falsos o no enunciables**, no «pendientes».
 >
 > ## Los dos objetivos, decididos
@@ -1111,8 +1111,44 @@ sin ella; y `Classical.propDecidable` va **explícito** en `skF`, porque el mód
 final de `rw` es `with_reducible`, y ni `evalTerm` ni `shiftEnv` son `@[reducible]`. El `rfl` va a
 mano. ⭐ Estaba **predicho** por el refutador del diseño.
 
-⬜ **Lo que esto NO es**: el **paso** de Skolem, no la **forma normal**. Iterar sobre `prenex f`
-(§6.8) para eliminar todos los `∃` **no está hecho** ni medido.
+🏁 **Y la forma normal, PAGADA** — §6.11.
+
+---
+
+### 6.11 · 🏁 LA FORMA NORMAL DE SKOLEM — 2026‑09‑17, ADR‑062
+
+`../FOL/FOL/SkolemNF0.lean`, módulo nuevo, **350 l. de código**:
+
+    skolemize k f          : ∀ᵐ ψ, con ψ SIN cuantificadores
+    skolem_conservative_nf : el BLOQUE ENTERO de axiomas de Skolem no inventa teoremas
+    derives0_of_skolemNF   : lo que se demuestra desde la forma normal se demuestra sin ella
+
+⭐⭐ **La recursión se PASA, no se mide.** `skolemize` recurre sobre `substFormula 0 t A`, que no
+es subtérmino de `.ex A` ⇒ Lean la compilaría por recursión **bien fundada**, y una definición WF
+**no reduce definicionalmente**. Con un **combustible** —que es exactamente `qdepth f`, y sustituir
+no lo cambia— la recursión es **estructural** y las tres ecuaciones son **`rfl`**.
+⇒ la normalización de una fórmula concreta se comprueba **por cómputo**:
+
+    skolemize 0 (∀∃∀∃ Q(x,y,z,w)) = ∀∀ Q(x₁, c₀(x₁), x₀, c₁(x₀,x₁))       -- `by rfl`
+    skolemize 0 (∃y ∀x P(x,y))    = ∀x P(x, c₀)                            -- `by rfl`
+
+🔑 *Cuando una recursión no es estructural, antes de pagar la recursión bien fundada hay que mirar
+si el argumento que decrece se puede PASAR, en vez de MEDIR.*
+
+⭐ **La dirección que vale sale NET‑0**: `skolemizeF_impAll` —la forma normal implica el original—
+es `intro_ex` bajo el prefijo y no consume **ni un axioma de Skolem**. El `Classical.choice` entra
+sólo por `skolem_conservative_n`, que cruza por `completeness₀`: es el **WKL**, y no es nuevo.
+
+⚠️ **Un puente que faltaba**: `occursFormula_lift` **no existía** (había `occursTerm_lift` y
+`occursTerms_lift`, y nada para fórmulas). Sin él la frescura no atraviesa `prenex`, y el teorema
+final pide una hipótesis que **nadie puede descargar**. *Una conservatividad cuyas hipótesis nadie
+puede descargar no es un teorema utilizable.*
+
+⬜ **Lo que NO entrega**: la dirección `φ → skolemize φ` **con** los axiomas (exige empujar el
+axioma bajo el prefijo `∀ⁿ`, la regla K iterada — **no medida**), y el **enchufe con Herbrand**:
+`skolemNF_shape` da `∀ᵐ ψ` con `QuantFree ψ`, que es la hipótesis exacta de `herbrand`, pero
+Herbrand habla de **existenciales** y Skolem los quita ⇒ el ensamblaje real pasa por la negación,
+y **no está escrito**.
 
 ---
 

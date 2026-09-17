@@ -140,6 +140,12 @@ FOL.SkolemN0.eval_skolemAxN|Classical.choice,Quot.sound,propext
 FOL.SkolemN0.skolem_conservative_n|Classical.choice,Quot.sound,propext
 FOL.Finitary0.lk0_empty_of_no_bot|-
 FOL.Finitary0.lk0_not_empty_fin|Quot.sound,propext
+FOL.SkolemNF0.occursFormula_lift|-
+FOL.SkolemNF0.qdepth_subst|propext
+FOL.SkolemNF0.skolemizeF_impAll|Quot.sound,propext
+FOL.SkolemNF0.skolemNF_shape|Quot.sound,propext
+FOL.SkolemNF0.skolem_conservative_nf|Classical.choice,Quot.sound,propext
+FOL.SkolemNF0.derives0_of_skolemNF|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

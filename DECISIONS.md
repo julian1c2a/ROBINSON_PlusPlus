@@ -4790,3 +4790,102 @@ sin demostrar**. Ahora es un teorema, y `lk0_not_empty_fin` se deriva **del fuer
 
 **Vease tambien:** `../FOL/check-doc-sync.bash`, `../FOL/REFERENCE.md` §6.15,
 `../FOL/FOL/Finitary0.lean`, ADR-060, ADR-053, ADR-046.
+
+---
+
+## ADR-062: 🏁 LA FORMA NORMAL DE SKOLEM -- y la recursion se pasa, no se mide
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: cerrar «skolemizacion de formulas arbitrarias», lo unico que ADR-060 §5 dejaba
+abierto de ese frente. `../FOL/FOL/SkolemNF0.lean`, modulo nuevo, **350 l. de codigo** (536 con
+documentacion).
+
+    skolemize k f     : Formula          -- ∀ᵐ ψ, con ψ SIN cuantificadores
+    skolemAxioms k f  : List Formula     -- los axiomas de Skolem que consume
+
+    skolemize_shape        : Prenex f → ∃ m ψ, skolemize k f = allBlock m ψ ∧ QuantFree ψ
+    skolemizeF_impAll      : la forma normal IMPLICA el original  -- ⭐ NET-0, sin axiomas
+    skolem_conservative_nf : el BLOQUE ENTERO de axiomas de Skolem no inventa teoremas
+    derives0_of_skolemNF   : 🏁 lo que se demuestra desde la forma normal se demuestra sin ella
+
+### 1 · ⭐⭐ El unico riesgo que habia, y se mata con una decision de definicion
+
+Tres disenos independientes (uno recursivo, uno de paso unico, uno semantico), cada uno con dos
+refutadores adversariales, dieron el MISMO veredicto: **ningun enunciado es falso** —los seis
+buscaron activamente un contraejemplo, desarrollaron a mano `n = 0, 1, 2` y prefijos mixtos
+`∀∃∀∃`, y no hay captura de variables— y **todo el riesgo esta en un solo sitio**:
+
+> `skolemize` recurre sobre `substFormula 0 t A`, que **no es subtermino** de `.ex A` ⇒ Lean la
+> compila por recursion **bien fundada**, y una definicion WF **no reduce definicionalmente**:
+> solo se abre por sus lemas de ecuacion.
+
+⇒ la decision: **el prefijo se recorre con un COMBUSTIBLE**, y entonces la recursion es
+**estructural sobre el primer `Nat`**. El combustible no es una cota arbitraria: es
+**exactamente** la longitud del prefijo (`qdepth`), y sustituir no la cambia (`qdepth_subst`).
+
+🔑 *Cuando una recursion no es estructural, antes de pagar la recursion bien fundada hay que
+mirar si el argumento que decrece se puede PASAR, en vez de MEDIR.*
+
+**Dividendo, y es el que hace la diferencia**: las tres ecuaciones de `skolemizeF` son **`rfl`**,
+asi que la normalizacion de una formula concreta se comprueba **por COMPUTO**, no por prueba:
+
+    skolemize 0 (∀∃∀∃ Q(x,y,z,w)) = ∀∀ Q(x₁, c₀(x₁), x₀, c₁(x₀,x₁))          -- `by rfl`
+    skolemize 0 (∃y ∀x P(x,y))    = ∀x P(x, c₀)                               -- `by rfl`
+
+⭐ El segundo ejemplo no es decorativo: con el existencial por FUERA el simbolo de Skolem es una
+CONSTANTE, y eso lo decide `vars 0 = []` sin ningun caso especial.
+
+### 2 · 🏁 Lo entregado, y las dos columnas de footprint
+
+| pieza | footprint |
+|---|---|
+| `occursFormula_lift` | **sin ningun axioma** |
+| `qdepth_subst`, `occurs_prenex` | `[propext]` |
+| `skolemizeF_shape`, `skolemizeF_impAll`, `skolemNF_shape` | `[propext, Quot.sound]` |
+| `skolem_conservative_nf`, `derives0_of_skolemNF` | `[propext, Classical.choice, Quot.sound]` |
+
+⭐ **La direccion que vale sale NET-0**: `skolemizeF_impAll` —la forma normal implica el
+original— es `intro_ex` bajo el prefijo, y no consume **ni un axioma de Skolem**. El
+`Classical.choice` entra solo por `skolem_conservative_n`, que cruza por `completeness₀`: es el
+**WKL**, y no es nuevo.
+
+### 3 · ⚠️ Un puente que faltaba, y sin el el teorema NO ES APLICABLE
+
+`occursFormula_lift` **no existia**: el arbol tenia `occursTerm_lift` y `occursTerms_lift`
+(`FOL/HenkinLimit0.lean:92,101`) y **nada** para formulas. Sin el no se puede transportar la
+frescura a traves de `prenex`, y sin eso `derives0_of_skolemNF` pide una hipotesis que ningun
+consumidor puede descargar.
+
+🔑 *Una conservatividad cuyas hipotesis nadie puede descargar no es un teorema utilizable.* Costo
+el puente (12 l.) mas las seis conmutaciones `occurs_merge*` (60 l.) mas `occurs_prenex` (12).
+
+### 4 · ⬜ Lo que este modulo NO entrega, dicho antes de que nadie lo suponga
+
+⬜ **La direccion `φ → skolemize φ` CON los axiomas.** Exige empujar el axioma de Skolem **bajo el
+prefijo `∀ⁿ`** (la regla K iterada sobre `allBlock`), y **no esta medida**. Sin ella no hay
+`iff`: hay una implicacion y una conservatividad, que juntas son lo que la skolemizacion se usa
+PARA (refutar), pero no la equivalencia.
+
+⬜ **El enchufe con Herbrand no esta escrito.** `skolemNF_shape` entrega `∀ᵐ ψ` con `QuantFree ψ`,
+que es exactamente la hipotesis de `FOL.Hauptsatz0.herbrand`, pero el puente
+`allBlock m ψ` ↔ lo que `herbrand` consume (`Formula.ex`) **va en la direccion contraria**:
+Herbrand habla de EXISTENCIALES y Skolem los quita. El ensamblaje real es
+*refutar `∀ᵐ ψ`* = *derivar `∃ᵐ ¬ψ`*, y esa negacion **no esta escrita**.
+
+### 5 · Nota de metodo sobre el diseno
+
+Los tres disenos y sus seis refutadores costaron 2,7 M de tokens y 39 min. Lo que compraron **no
+fue el diseno ganador** —ninguno de los tres se implemento tal cual— sino **la coincidencia**: los
+seis senalaron el mismo punto de riesgo, y eso convirtio «hay que elegir entre tres rutas» en «hay
+que resolver un problema de reduccion». ⚠️ Y los refutadores volvieron a acertar donde ya
+acertaron en ADR-060: el fallo que predijeron es de **reduccion**, no de matematica.
+🔑 *Cuando varios analisis independientes convergen en el mismo punto de riesgo, el punto de
+riesgo es el problema; las rutas eran la misma ruta.*
+
+**Controles:** RPP **145 jobs** · FOL **50 jobs** · `check-footprints` **132** ·
+`check-estratos` **10** · `check-doc-sync` ✅ en los DOS repos · `check-axioms` ✅ ·
+`check-sorry` ✅ · **0 sorry** · warnings **7 (RPP) + 4 (FOL)**, todos anteriores.
+
+**Vease tambien:** `../FOL/FOL/SkolemNF0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.11,
+ADR-060, ADR-058, ADR-059.
