@@ -81,6 +81,7 @@ extiende el punto fijo: afirma una falsedad sobre él**.*
 | **M-9** | ⛔ **Un `Probe/` que decide un ADR se PROMUEVE a `sondeos/` antes de cerrar ese ADR** — o la decisión queda **sin evidencia versionada**. `Probe/` está en `.gitignore` **a propósito** (es borrador); `sondeos/` es el **resultado**, y se versiona con su fila en `sondeos/README.md`. Si el probe pasó a **producción**, la evidencia es el módulo y no hay nada que promover | [auditoría F‑9](doc/AUDITORIA-2026-09-11.md) · `PLAN-PRUEBAS.md` §2.1 | a mano: todo ADR debe citar su sondeo o su módulo |
 | **M-8** | ⚠️ **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Antes de dar por resuelto un frente con «la clase X ya cubre la clase Y», leer **qué obligación queda después**: `numTree_of_isCodeShaped` es **cierto como teorema** y su conclusión —«no hay que cambiar `StdChain`»— **falsa**, porque la obligación que deja (`m ≠ n` con `codeNat` astronómico) **no es descargable** | ADR-022 | `stdChain_proofCode'` + `junk_line_not_stdLine` (`Meta/OmegaReflect.lean` §1ter/§1quater) |
 | **M-12** | ⛔ **Empujar `FOL` ANTES que `ROBINSON_PlusPlus`.** La CI de RPP **clona FOL como hermana**; si se empuja RPP primero, la CI compila contra un FOL viejo y `check-footprints` falla con «NO MEDIDO» en los titulares nuevos. ⚠️ Es una **CARRERA**, no un fallo determinista: los cuatro pushes anteriores del mismo día pasaron con el orden malo, y el quinto no. 🔑 *Un fallo intermitente es peor que uno fijo: da verde el número de veces suficiente para que nadie mire el orden.* | — | MEDIDO el 2026‑09‑17, run `35214528037`: dos titulares de `FOL.Skolem0` «NO MEDIDO» con el repo local en verde. Verificación: `gh run list` tras cada pareja de pushes |
+| **M-13** | ⚠️ **Una cifra de control se REEJECUTA o se marca con su ALCANCE.** Copiarla de una pasada a la siguiente la convierte en decoracion: «0 warnings» viajo por ADR-057/058/059 siendo la cifra de la `lean_lib FOL` **sola** (reales: 7 en RPP + 4 en FOL). Y su reciproca: **un control sin nada que contrastar no aprueba, se ABSTIENE** — `check_num` sin aparicion imprime «control VACIO» y sale con **0** | ADR-060 §6, ADR-061 §1 | ⬜ falta `check-warnings.bash`; el aviso «control VACIO» ya existe y hay que LEERLO |
 
 > **Sobre `Classical.*`**: este proyecto **no** lo prohíbe (2 usos verificados el
 > 2026-07-12). Lo que sí mantiene es la disciplina de **cero axiomas espurios** de M-1.
@@ -4678,3 +4679,114 @@ warnings: **7 (RPP) + 4 (FOL)**, todos cosmeticos y todos anteriores a esta ADR.
 
 **Vease tambien:** `FOL/SkolemN0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.10, ADR-059,
 ADR-056, ADR-055.
+
+---
+
+## ADR-061: FOL adopta `check-doc-sync` -- y en su PRIMERA ejecucion encuentra NUEVE cosas
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: la decision (2) del informe de PeanoRF («no tienes check-doc-sync.bash»), mas la
+deuda escrita en ADR-053 sobre `lk0_not_empty`. Se cierran las dos, y la segunda la destapo la
+primera. `../FOL/check-doc-sync.bash` (nuevo, 431 l. portadas), `../FOL/FOL/Finitary0.lean` (+24),
+`../FOL/FOL/SequentSound0.lean` (doc), `../FOL/REFERENCE.md` §6.15.
+
+### 1 · ⛔ La premisa del informe de PeanoRF es FALSA, y el fallo real es el contrario
+
+El informe decia: *«adoptarlo exige que `CURRENT-STATUS-PROJECT.md` lleve la linea de cifras
+canonicas, porque el control compara contra ella y falla si no existe»*.
+
+**Medido, leyendo el script**: `check-doc-sync.bash` **no lee** ninguna cifra de los documentos.
+Las **calcula del arbol** (`ls`, `grep -c`, `check-sorry.bash`) y despues las **contrasta** contra
+las cabeceras. Si la frase no aparece en ningun doc, `check_num` hace `return 0` y el script
+**sale con 0** imprimiendo «⚠️ control VACIO».
+
+⇒ No falla: **da VERDE sin haber comprobado nada**, que es estrictamente peor. La linea de cifras
+hay que ponerla igual, pero por la razon opuesta a la que el informe daba.
+🔑 *Un control sin nada que contrastar no aprueba: se ABSTIENE, y la abstencion se lee como
+aprobado.* Es la misma forma que el arreglo `255e007` del propio informe (`SIN MEDIR` tenia que
+ser rojo), una capa mas abajo.
+
+### 2 · ⭐⭐ Lo que encontro en la PRIMERA ejecucion, y por eso se adopta
+
+Antes de adoptarlo se hizo un **simulacro**: portar el script al scratchpad, adaptarle las rutas y
+ejecutarlo. Salio en rojo, y ninguno de los hallazgos era ruido:
+
+| hallazgo | desde | lo veia alguien |
+|---|---|---|
+| `README.md` — «⚠️ 1 sorry (eq/Henkin)» en el arbol de directorios | mayo 2026 | no |
+| `CURRENT-STATUS-PROJECT.md` — idem | mayo 2026 | no |
+| `CURRENT-STATUS-PROJECT.md` — «\| 6 \| FOL con Igualdad \| ✅ Complete (1 sorry pendiente) \|» | mayo 2026 | no |
+| los **SEIS** modulos de `TheoryFramework/` sin proyectar en `REFERENCE.md` | siempre | no |
+| 3 controles [A] en «VACIO» por no haber contra que contrastar | — | no |
+
+⇒ **el arbol lleva a CERO `sorry` desde el 2026-09-13** y tres documentos autoritativos seguian
+publicando «1 sorry» cuatro meses despues.
+
+⛔⛔ **Y la novena causa, otra vez**: de los seis modulos de `TheoryFramework`, **CUATRO quedaban
+ABSUELTOS POR SUBCADENA** con el matcher que traia RPP (casaba por `basename`, y `Logic`, `Theory`,
+`Properties` y `FOL` aparecen sueltos por todo `REFERENCE.md`). Solo saltaban dos.
+🔑 *Casar por subcadena no comprueba: absuelve.* Van **dos veces la misma causa en un dia** — el
+2026-09-17 por la manana ya se habia endurecido ese mismo matcher para `FOL/Theorems/Eq.lean`.
+⇒ en la copia de FOL, `TheoryFramework` va con la **misma vara** que `FOL/`: contra §6 y por
+**RUTA con frontera de palabra**.
+
+### 3 · Las cuatro adaptaciones, y la que importa es la primera
+
+* ⛔ **No ejecuta `lake build`**, y no es un olvido: es **M-3**. FOL no se construye desde FOL. La
+  cifra de jobs la mide y la publica RPP (`lake build FOL TheoryFramework` = **49**). En esta copia
+  **no hay control [A] de jobs**, y se dice en la cabecera.
+* **[B] necesita el hermano.** Los docs de FOL citan con razon simbolos de RPP (sus tres `axiom` de
+  Lean). Sin `../ROBINSON_PlusPlus` en el alcance, el control los da por MUERTOS.
+  🔑 *Un control con el alcance equivocado no comprueba: INVENTA.* En la CI se clona en `_rpp` y se
+  pasa por `RPP_DIR`, porque `actions/checkout` **no admite un `path:` fuera del workspace**. Si
+  falta, el control lo **anuncia** como «alcance REDUCIDO» en vez de callarse.
+* **[A]: una cifra entre «comillas latinas» es una CITA.** Los avisos de estado de FOL usan el
+  formato «lo que decia \| lo medido», y sin esa exclusion los CUATRO daban falso positivo citando
+  **textualmente el error que la propia fila esta corrigiendo**.
+* **[C]** contra §6 (Exports), no contra la tabla de modulos.
+
+✅ Probado **con el fallo puesto** (48 → 47 modulos, y un modulo de `TheoryFramework` renombrado en
+el catalogo): rojo con exit 1, verde al restaurar.
+
+### 4 · 🏁 Y la deuda de `lk0_not_empty`, saldada -- pero NO como estaba escrita
+
+La deuda decia «re-enunciar `lk0_not_empty` sobre `lk0_empty`/`lkc_empty`». Medido:
+
+* `FOL.SequentSound0.lk0_not_empty` mide `[propext, Classical.choice, Quot.sound]` porque pasa por
+  `lk0_to_derives0`, que **es** `completeness₀`.
+* Pero `lkc_sound` **ya mide lo mismo por su cuenta** (`evalFormula` va a `Prop`) ⇒ reprobarlo alli
+  desde `lk0_sound` **no gana nada**.
+* No hay ciclo de imports entre `SequentSound0` y `Finitary0` (son hermanos), asi que el alias
+  seria posible. ⛔ **Y se rechaza**: meteria `FOL.NDtoLK0` —la traduccion ND→LK— en un modulo
+  sobre solidez semantica, y sobre todo seria **blanquear el footprint**. El contenido de
+  `SequentSound0` es caro, y su corolario debe decirlo.
+  🔑 *El footprint de un corolario debe decir la verdad sobre el modulo en el que vive; lo que se
+  arregla es a DONDE SE MANDA AL LECTOR.*
+
+Lo entregado, en `FOL/Finitary0.lean`:
+
+    lk0_empty_of_no_bot : ¬ LK₀ [] [⊥] → ¬ LK₀ [] []        -- net-0 PURO, por `struct`
+    lkc_empty_of_no_bot : idem para LKc                      -- net-0 PURO
+    lk0_not_empty_fin   : ¬ LK₀ [] []      [propext, Quot.sound]
+    lkc_not_empty_fin   : idem
+
+⭐ Y el dividendo no estaba previsto: la **relacion de fuerza** —«`¬ LK₀ [] [⊥]` implica
+`¬ LK₀ [] []` por `struct`, y no al reves»— llevaba desde ADR-053 **en el docstring del modulo,
+sin demostrar**. Ahora es un teorema, y `lk0_not_empty_fin` se deriva **del fuerte**.
+⚠️ *Un docstring que afirma una relacion de fuerza y no la demuestra afirma mas que el modulo.*
+
+### 5 · ⬜ Lo que esto deja abierto
+
+* ⬜ **No hay `check-warnings.bash`** en ningun repo (ADR-060 §6). Warnings medidos hoy:
+  **7 en RPP** + **4 en FOL**.
+* ⬜ El `CHANGELOG.md` de FOL sigue fechado en **2026-05-16**: el control [E] compara los titulares
+  CONTRA el, asi que hoy no puede detectar nada. Control **vivo pero desarmado**.
+* ⬜ Los otros tres repos del informe (Peano, AczelSetTheory, ZfcSetTheory) siguen sin esto.
+
+**Controles:** RPP **145 jobs** · FOL **49 jobs** · `check-footprints` **126** ·
+`check-estratos` **10** · `check-doc-sync` ✅ **en los DOS repos** · `check-axioms` ✅ ·
+`check-sorry` ✅ · **0 sorry** · warnings **7 (RPP) + 4 (FOL)**.
+
+**Vease tambien:** `../FOL/check-doc-sync.bash`, `../FOL/REFERENCE.md` §6.15,
+`../FOL/FOL/Finitary0.lean`, ADR-060, ADR-053, ADR-046.

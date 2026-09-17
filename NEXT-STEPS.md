@@ -6,7 +6,7 @@
 
 **Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **49** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
-🔧 Controles: `check-footprints` **124** · `check-estratos` **10** · `check-doc-sync` · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
+🔧 Controles: `check-footprints` **126** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
@@ -113,9 +113,19 @@
 >   **todos** los `∃`. **No hecho ni medido.**
 > * ⬜ **F · interpolación de Craig** para `LKp` (~850 l., riesgo alto) — abierta.
 > * ⬜ La **mitad ⟹ de E** (~350–450 l.) — el invariante está confirmado.
-> * ⬜ Decisión (2) del informe de PeanoRF: adoptar `check-doc-sync.bash` en FOL exige crear
->   `CURRENT-STATUS-PROJECT.md` con la línea de cifras canónicas. **Sin decidir.**
-> * ⬜ Re‑enunciar `lk0_not_empty` sobre `lk0_empty`/`lkc_empty` (hoy arrastra el WKL).
+> * 🏁 ~~Decisión (2) del informe de PeanoRF~~ — **ADOPTADO**, ADR‑061. ⚠️ Y la premisa era
+>   falsa: el control **no lee** las cifras del doc, las calcula del árbol; sin la línea no
+>   falla, sale **verde sin comprobar nada**. En su **primera ejecución** encontró tres desfases
+>   vivos desde **mayo** y los **seis** módulos de `TheoryFramework/` sin proyectar — cuatro de
+>   ellos **absueltos por subcadena**.
+> * 🏁 ~~Re‑enunciar `lk0_not_empty`~~ — **SALDADA**, ADR‑061 §4, pero **no como estaba
+>   escrita**: el alias se rechaza (blanquearía el footprint). Lo entregado es
+>   `lk0_not_empty_fin` en `Finitary0`, derivado del **estrictamente más fuerte** `lk0_no_bot`
+>   vía `lk0_empty_of_no_bot` — ⭐ la relación de fuerza llevaba desde ADR‑053 en el docstring
+>   **sin demostrar**, y ahora es un teorema net‑0 puro.
+> * ⬜ **No hay `check-warnings.bash`** en ningún repo. Medidos hoy: **7 en RPP** + **4 en FOL**.
+> * ⬜ El `CHANGELOG.md` de FOL está fechado en **2026‑05‑16**: el bloque [E] compara los
+>   titulares contra él ⇒ hoy está **vivo pero desarmado**.
 
 > # 🗓️ 2026‑09‑17 — 🏁🏁🏁 **EL HAUPTSATZ, Y CON ÉL H3 Y LA VÍA H ENTERA**
 >
