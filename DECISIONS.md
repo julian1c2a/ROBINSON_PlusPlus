@@ -4291,3 +4291,81 @@ informes NO son medicion. Lo que sigue lo he verificado yo, y solo esto:
 
 **Vease tambien:** `FOL/HerbrandBlock0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.13 y §7.5,
 ADR-052, ADR-043, ADR-054.
+
+---
+
+## ADR-056: H sobre F — y el axioma de Skolem/Henkin es CONSERVATIVO
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: del catalogo de metateoremas quedaban dos, **F** (interpolacion de Craig por Maehara)
+y **H** (Skolem), ~850-1400 l. cada una. Se elige **H**. `FOL/Skolem0.lean`, 110 l. de codigo.
+
+    evalFormula_updateFunc : ¬ occursFormula c f → (eval (updateFunc M c F) v f ↔ eval M v f)
+    henkin_conservative    : c fresco para Γ, A, φ → (henkinAx c A :: Γ) ⊢₀ φ → Γ ⊢₀ φ
+
+📏 El lema de coincidencia y sus dos auxiliares, **sin ningun axioma**. `henkin_conservative`,
+`[propext, Classical.choice, Quot.sound]` — el WKL de `completeness₀` mas la eleccion del testigo.
+
+### 1 · Por que H y no F, con las razones MEDIDAS
+
+| | F (interpolacion) | H (Skolem) |
+|---|---|---|
+| obstruccion | ⛔ **CONFIRMADA**: `eqAx` no se deja repartir por signatura ⇒ lo unico entregable seria interpolacion para un calculo **distinto** (`LK₀` sin `eqAx`), que **no es el que el proyecto usa** | ⛔ falta el puente `occursFormula`↔`evalFormula` — **cierto, y son 70 lineas net-0** |
+| reutilizacion | ⛔ la unica «gratis» era FALSA: `occursFormula` **descarta el nombre del predicado** (`Eigenvariable.lean:368`, `\| .atom _ ts =>`) ⇒ `SubLang` hay que construirlo entero | ⭐ ese mismo hecho la FAVORECE: Skolem anade un simbolo de **funcion**, y para funciones `occursFormula` es exactamente la nocion correcta |
+| pieza cara | `SubLang` + Maehara desde cero | ⭐ la capa prenexa es un **PORT**: `Derives₀` tiene *verbatim* los constructores que usan las pruebas de `Theorems/Quantifiers.lean` |
+| menciones en el proyecto | **cero** (grep Craig/Maehara/Beth: 1 hit, y es ruido) | cero tambien |
+
+🔑 *Entre dos frentes que no descargan nada, gana el que se apoya en lo que el arbol ya tiene.*
+⚠️ Y F queda **abierta**, no descartada: su Nivel 1 (fragmento puro, `LKp`) sigue siendo hacible.
+
+### 2 · ⭐⭐ El bloqueo medido eran 70 lineas, y son net-0
+
+La medicion externa acerto: **no habia ningun lema que conectara `occursFormula` (sintactico,
+`Eigenvariable.lean:366`) con `evalFormula` (semantico, `Semantics.lean:54`)**. Sin el, «`c` no
+aparece en `f`» no permite concluir que reinterpretar `c` no cambia el valor de `f` — la frescura
+no decia NADA semanticamente.
+
+⭐ `evalFormula_updateFunc` **no depende de ningun axioma**, y es reutilizable por cualquier
+argumento de frescura, no solo por Skolem. ⚠️ Y el `if f = c` usa `String.decEq`, que **no** trae
+`Classical.choice`: lo que lo trae es DESCOMPONER un `String`, no compararlo (plan §7).
+
+### 3 · ⭐ El axioma de Skolem YA ESTABA ESCRITO
+
+`henkinAx c A = (∃A) ⇒ A[c]` (`FOL/Henkin0.lean:90`) **es** el axioma de Skolem para un existencial
+cuyo cuerpo no tiene mas variables libres. No hubo que definir nada. *Antes de construir, buscar* —
+y van siete.
+
+⚠️ Lo que el proyecto tenia sobre el era `henkin_step_consistent` (ADR-037): que el paso **preserva
+la CONSISTENCIA**. La conservatividad es **estrictamente mas fuerte**: preservar consistencia no
+impide inventar teoremas nuevos en el lenguaje viejo; la conservatividad si.
+
+### 4 · ⭐ Donde paga la frescura, que son tres sitios y cada uno hace algo distinto
+
+    (henkinAx c A :: Γ) ⊢₀ φ
+      --[ derives0_soundness ]->  vale en todo modelo del contexto ampliado
+      --[ se EXPANDE M en `c` con un testigo ]->  ese modelo existe
+      --[ coincidencia, DOS veces ]->  Γ ⊨ φ
+      --[ completeness₀ ]->  Γ ⊢₀ φ
+
+* en **Γ**: para transportar el contexto al modelo expandido;
+* en **A**: para elegir el testigo (y, en la rama sin testigo, para que el axioma valga **vacuamente**);
+* en **φ**: para traer la conclusion de vuelta.
+
+🔑 *Una hipotesis de frescura que se usa tres veces no es una: hay que comprobar los tres usos por
+separado.*
+
+### 5 · ⬜ Lo que H **NO** incluye, dicho sin adornos
+
+* ⬜ La **capa prenexa** sobre `Derives₀` (el port de `Theorems/Quantifiers.lean:80-171`, hoy sobre
+  `Derives` y por tanto prohibido por M-11). ~250-350 l., riesgo bajo por ser port.
+* ⬜ La **skolemizacion de una formula arbitraria** (simbolos de funcion de aridad > 0): la
+  maquinaria de frescura del arbol (`Fresh0.lean`) es de **constantes**, y el lema de coincidencia
+  de aqui ya cubre aridad arbitraria, pero falta el suministro de simbolos frescos n-arios.
+* ⇒ lo entregado es el **nucleo**: la conservatividad del axioma, con el puente que faltaba.
+
+**Controles:** RPP **145 jobs** · FOL **46 jobs** · `check-footprints` **109** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Vease tambien:** `FOL/Skolem0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.6,
+ADR-037, ADR-054, ADR-055.

@@ -4,8 +4,57 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 42 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **96** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 46 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **109** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
+>
+> Cinco piezas en un día, todas con sus controles y todas subidas:
+>
+> | | teorema | footprint | ADR |
+> |---|---|---|---|
+> | **C** | `derives0_consistent_fin` — consistencia **SIN `Classical.choice`** | `[propext, Quot.sound]` | 053 |
+> | **A** | `compactness₀` — y **repara** el `compactness_theorem` declarado **VACUO** en cuarentena | el WKL | 054 |
+> | **B** | `loewenheim_skolem_down` — el modelo canónico **ya era numerable** | el WKL | 054 |
+> | **E** | `derives0_exBlock_of_cert` — Herbrand de **bloque**, mitad ⟸ | `[propext, Quot.sound]` | 055 |
+> | **H** | `henkin_conservative` — Skolem **conservativo**, con el lema de coincidencia **net‑0** | el WKL | 056 |
+>
+> ⛔ **Fuera, con razón MEDIDA y no con opinión** (ADR‑054 §4): **D** (el enunciado literal es
+> **falso** por `eqAx`), **G** (falso: el árbol tiene su contraejemplo **compilado**, `ax_tc_cons`),
+> **I** (**no enunciable**: `Not (DecidablePred …)` ni tipa, y bien escrito es refutable por
+> `Classical.propDecidable`).
+>
+> ## ⛔⛔ Y la rectificación del día, que me corrige a mí
+>
+> ADR‑053 §4 afirmaba que el Hauptsatz pagaba en el paso `LKc → LK₀`. **Falso**: el caso `cut` de
+> la solidez booleana son **cinco líneas** —*el corte es gratis para la verdad*—, luego la
+> inducción se para en `LKc`. `FOL/Finitary0.lean` **dejó de importar `FOL.Hauptsatz0`**, y ése es
+> el control. ⇒ la consistencia finitaria estaba disponible **desde ADR‑049**.
+> 🔑 *Un dividendo atribuido a la pieza equivocada sobrevive hasta que alguien mide* — y es la
+> **segunda vez en dos días** (ADR‑052 §1 ya corrigió lo de `struct`). ⚠️ Peor: el repo lo tenía
+> escrito (`SequentSound0.lean:51‑53`) y no se leyó como una oportunidad.
+>
+> ⭐ Y un hallazgo que sube el valor: `lk0_not_empty` demuestra hoy la consistencia del cálculo de
+> secuentes **pasando por `completeness₀`** ⇒ se compra con la completitud y arrastra el WKL.
+> `lk0_empty`/`lkc_empty` lo sustituyen net‑0 y son **estrictamente más fuertes**. ⬜ Deuda escrita:
+> re‑enunciar `lk0_not_empty` sobre ellos.
+>
+> ## ⬜ Lo que queda, con cifra
+>
+> * ⬜ **F · interpolación de Craig** (~850 l., riesgo alto). **Abierta, no descartada**: su
+>   obstrucción (`eqAx` no se reparte por signatura) está **confirmada**, así que sólo es hacible
+>   para el fragmento **puro** `LKp`, que es un cálculo distinto del que el proyecto usa.
+> * ⬜ **La mitad ⟹ de E** (~350–450 l., riesgo alto): rehacer la inducción de 14 casos de
+>   `lk0_herbrand` con invariante de tuplas. Comprobado que **el invariante se cierra**.
+> * ⬜ **La capa prenexa** sobre `Derives₀` (~250–350 l., riesgo **bajo**: es un PORT de
+>   `Theorems/Quantifiers.lean`, y `Derives₀` tiene sus constructores *verbatim*).
+> * ⬜ **El paso 4 del propietario**: `String → List Char` con `Sugerencias.md`.
+>   ⛔⛔ **Pero léase antes el plan §7.5**: `List Char` es **numerable**, y si LS ascendente entra en
+>   la hoja de ruta la migración habría que hacerla **dos veces**. La firma que sirve a los dos es
+>   un **parámetro `S`**. 📐 163 módulos / 3 902 declaraciones.
+>
+> **Estado: RPP 145 jobs · FOL 46 · footprints 109 · estratos 10 · 0 sorry.**
+
 
 > # 🗓️ 2026‑09‑17 — 🏁🏁🏁 **EL HAUPTSATZ, Y CON ÉL H3 Y LA VÍA H ENTERA**
 >

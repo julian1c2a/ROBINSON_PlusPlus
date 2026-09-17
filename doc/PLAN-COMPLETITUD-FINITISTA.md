@@ -985,6 +985,32 @@ dentro. *Un `∃` que oculta un dato impide añadirle propiedades después.*
 
 ---
 
+### 6.6 · 🏁 El axioma de SKOLEM/HENKIN es CONSERVATIVO — 2026‑09‑17, ADR‑056
+
+`../FOL/FOL/Skolem0.lean`, 110 l.:
+
+    evalFormula_updateFunc : ¬ occursFormula c f → (eval (updateFunc M c F) v f ↔ eval M v f)
+    henkin_conservative    : c fresco para Γ, A, φ → (henkinAx c A :: Γ) ⊢₀ φ → Γ ⊢₀ φ
+
+⭐⭐ **El bloqueo medido eran 70 líneas, y son net‑0.** No había **ningún** lema que conectara
+`occursFormula` (sintáctico) con `evalFormula` (semántico): sin él, la frescura de un símbolo no
+decía nada semánticamente. `evalFormula_updateFunc` **no depende de ningún axioma** y es
+reutilizable por cualquier argumento de frescura.
+
+⭐ **Y el axioma de Skolem ya estaba escrito**: `henkinAx` (`Henkin0.lean:90`). *Antes de construir,
+buscar* — van siete. ⚠️ Lo que había sobre él era `henkin_step_consistent` (§6.2): que preserva la
+**consistencia**. La conservatividad es **estrictamente más fuerte**.
+
+⚠️ La frescura se usa **tres veces** y cada una hace algo distinto: en Γ transporta el contexto, en
+A elige el testigo (y en la rama sin testigo hace que el axioma valga **vacuamente**), y en φ trae
+la conclusión de vuelta. *Una hipótesis de frescura usada tres veces no es una.*
+
+⬜ **No incluye**: la capa prenexa sobre `Derives₀` (port de `Theorems/Quantifiers.lean`, ~250–350
+l., riesgo bajo) ni la skolemización de fórmulas arbitrarias (falta suministro de símbolos frescos
+n‑arios; el de `Fresh0.lean` es de constantes).
+
+---
+
 ## 7 · ⛔ El muro constructivo, medido el 2026‑09‑14: **`String`**
 
 Si en algún momento se quiere ir más allá de «reducible» hacia «constructivo», el obstáculo **no
