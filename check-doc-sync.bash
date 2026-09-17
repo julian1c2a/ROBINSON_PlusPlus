@@ -123,6 +123,17 @@ AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/RE
 DOCS="$AUTHORITATIVE"
 FAIL=0
 
+# ⚠️ SI NO SE PUEDE MEDIR, ES ROJO (añadido el 2026-09-17, medido en PeanoRF).
+# Hasta hoy `LAKE_MISSING`/`SORRY_MISSING` sólo IMPRIMÍAN «SIN MEDIR» y el script seguía y
+# salía con 0: anunciaba verde sobre cifras que nadie había comprobado. En PeanoRF eso
+# llegó a empujar un commit con el check en rojo, creyéndolo verde.
+# 🔑 Un control tiene TRES resultados —pasa, falla, NO HE PODIDO COMPROBARLO— y colapsar
+# el tercero en el primero es lo que lo convierte en decoración. El único verde sin medida
+# es el que se pide a mano con `--quick`, y ése se anuncia como tal.
+if [ "$QUICK" != "1" ] && { [ "$LAKE_MISSING" != "0" ] || [ "$SORRY_MISSING" != "0" ]; }; then
+  FAIL=1
+fi
+
 # ─── 2. CIFRAS OBSOLETAS ─────────────────────────────────────────────────────
 # CHANGELOG.md se excluye: es un diario, sus cifras son históricas por diseño.
 # Las líneas marcadas como históricas también (fecha ISO al principio, o marcador).
