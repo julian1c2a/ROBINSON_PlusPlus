@@ -236,8 +236,12 @@ vuelve a necesitar compacidad, o sea WKL. La de arriba es finitaria en las dos d
 |---|---|---|---|
 | **H1** | **semántica proposicional** para fórmulas sin cuantificadores: valuación booleana de los átomos | finitario, decidible | 🏁 **HECHO** 2026‑09‑16 |
 | **H2** | **completitud proposicional para `Γ` FINITO** | tablas de verdad. Es la base y es honesta: aquí no hay König porque `Γ` es finito | 🏁 **HECHO** 2026‑09‑16 |
-| **H3** | ⛔ **normalización / eliminación de cortes de `Derives₀`** | **la pieza grande.** Alternativa estándar: un secuentes `LK₀` sin corte, con `LK₀ → Derives₀` fácil y `Derives₀ → LK₀+corte`, y eliminar el corte allí | 🔶 **reducida a UNA `Prop`: `CutElim`**, §5.5–§5.8 |
-| **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **la mitad ⟸, HECHA** 2026‑09‑16 |
+| **H3** | **normalización / eliminación de cortes de `Derives₀`** | **era la pieza grande.** Se hizo por la ruta estándar: secuentes `LK₀` sin corte, `LK₀ → Derives₀` por la semántica y `Derives₂ → LK₀+corte` (`ndToLK`), y el corte eliminado allí | 🏁🏁🏁 **HECHA** 2026‑09‑17 — `hauptsatz`, §5.11 |
+| **H4** | **extracción de testigos** de una prueba sin cortes | mecánico una vez está H3 | 🏁 **HECHO** (⟸ el 09‑16, ⟹ con H3) |
+
+🏁🏁🏁 **LOS CUATRO HITOS, CERRADOS.** El teorema de Herbrand para `Derives₀` es un
+**bicondicional sin hipótesis** (`FOL.Hauptsatz0.herbrand`), footprint `[propext, Quot.sound]`:
+**ni un `Classical.choice`, ni un axioma del proyecto**. ⇒ **la vía H está entera** — §5.11.
 
 #### 🏁 H1 y H2, ejecutados (ADR‑042) — `../FOL/FOL/Propositional0.lean`, 244 l. de código
 
@@ -260,7 +264,8 @@ demostrados en `FOL.Canonical0` **por completitud semántica**, y arrastran `Cla
 Los mismos dos teoremas, por la vía H, son **net‑0**. *La vía H da lo mismo con footprint
 estrictamente menor.*
 
-⬜ **Y lo que falta es H3, que sigue siendo la pieza grande.** H1+H2 son la base, no el teorema.
+🏁 **Y H3 ya está** (§5.11, 2026‑09‑17). H1+H2 siguen siendo la base y no el teorema, pero el
+teorema está encima.
 
 ### 5.4 · 🏁 H4 EJECUTADO (la mitad ⟸) y ⬜ H3 ENUNCIADA — 2026‑09‑16, ADR‑043
 
@@ -602,10 +607,74 @@ debilitamiento, contracción e intercambio son **un caso más** y no una complic
 `eqInstance_subst` **sin ningún axioma**; `substFormula_subst_le` y `lkh_subst`,
 `[propext, Quot.sound]`. **Ni un `Classical.choice`** en todo el módulo.
 
-#### ⬜ Lo que queda: UNA pieza
+#### 🏁 Lo que quedaba: UNA pieza — **HECHA** (§5.11)
 
-⬜ **La inducción doble** de Gentzen — por fuera sobre el **grado** de la fórmula de corte, por
-dentro sobre la **suma de las alturas**. ~400–600 l., **riesgo alto**. Ya es la única.
+🏁 La inducción sobre el grado, estimada en ~400–600 l. y **riesgo alto** → **medido 605 l.**
+⭐ Y la inducción **doble** (grado × suma de alturas) **no hizo falta**: ver §5.11.
+
+---
+
+### 5.11 · 🏁🏁🏁 **H3 CERRADA: EL HAUPTSATZ** — 2026‑09‑17, ADR‑052
+
+`../FOL/FOL/Hauptsatz0.lean` §7‑§8, **605 l. de código nuevas** (1 023 en total):
+
+    hauptsatz           : CutAdm               -- ⭐⭐⭐ el corte es ADMISIBLE en LK₀
+    cut_elimination     : CutElim
+    herbrand_extraction : HerbrandExtraction   -- H3, que era LA deuda
+    herbrand            : ([] ⊢₀ ∃φ) ↔ ∃ ts E, HerbrandCert φ ts E   -- ⭐ ya INCONDICIONAL
+
+📏 `[propext, Quot.sound]` en todo. **Ni un `Classical.choice`, ni un axioma del proyecto.**
+
+⇒ **La vía H está entera**: H1+H2 (§5.4, Kalmár, net‑0), H3 (aquí) y H4 (§5.4, el certificado).
+El teorema de Herbrand para `Derives₀` es un **bicondicional sin hipótesis**, y su mitad `←` se
+verifica **por cómputo** (`ptautCheck` reduce ⇒ `by rfl`).
+
+#### ⛔⛔ La corrección que §5.9 dejó anotada, y era
+
+§5.9 declaró `LKh.struct` **preservando** la altura y escribió: *«si la inducción doble no cierra,
+el primer sospechoso es `struct`»*. **Lo era**: con la altura preservada el caso `struct` recurre
+sobre una premisa de la **misma** altura ⇒ la medida no decrece. Costó **tres ediciones**, y
+`lkh_subst` no se movió.
+
+⭐ **Y no se perdió el dividendo**: lo que evita la regla **MIX** de Gentzen no es la altura de
+`struct`, es que el enunciado del corte pida **PERTENENCIA** (`Or (x = A) (x ∈ Δ)`) en vez de la
+forma `A :: Δ`. 🔑 *Lo que mata a MIX es el ENUNCIADO, no el constructor.*
+
+#### ⭐⭐⭐ Y la inducción DOBLE no hizo falta
+
+La prueba clásica cruza las dos últimas reglas: 5 conectivas × 14 casos de la otra derivación.
+Aquí son **dos pasadas independientes de 14 casos**, desacopladas por un **dato uniforme**:
+
+    LeftPrin A Γ Δ   -- las premisas de la regla DERECHA principal de A, empaquetadas
+
+| pasada | induce sobre | qué hace |
+|---|---|---|
+| `cutPrinAux` | la altura `n` de `D2` | analiza `D2` **una sola vez**; los 5 casos principales son las reducciones de grado |
+| `cutLeftAux` | la altura `m` de `D1` | analiza `D1`; sus casos principales **delegan** en `cutPrinAux` |
+
+⇒ **`m + n` no aparece en ningún sitio.** 🔑 *Cuando dos análisis de casos se cruzan, lo que los
+desacopla es encontrar el DATO que uno le pasa al otro* — el mismo patrón que `eqAx` en §5.8: **el
+desbloqueo no fue esfuerzo, fue una definición.**
+
+⛔ Y `LeftPrin` es **`False`** para `⊥`, átomos e igualdades —no hay regla derecha que las
+introduzca—, lo que **cierra gratis** el caso `botL` con `A = ⊥`.
+
+#### ⭐ `lkh_lift`, la otra clausura
+
+Permutar el corte a través de un `allR`/`exL` del otro lado obliga a **levantar la derivación
+entera y la fórmula de corte** ⇒ `lkh_lift`, gemela de `lkh_subst` y también **preservando
+altura**. ⭐ Sus tres lemas ya existían y **el catálogo los decía**, porque `Theorems/Eq.lean` y
+`Lift0.lean` se proyectaron en §5.10/ADR‑051. *Antes de construir, buscar* — esta vez salió bien.
+
+⚠️ Y el índice tiene que ser **general** (`k` arbitrario): el caso `allR` recurre con `k+1`. Misma
+lección que el Barendregt de §5.10 — **generalizar es lo que cierra**.
+
+#### ⚠️ Lo que esto NO dice
+
+* **No toca `Derives`**: `hauptsatz` es sobre `LK₀`; el puente a la deducción natural es `ndToLK`
+  sobre `Derives₂`. **M‑11 y ADR‑032, intactos.**
+* **No dice nada sobre `axioms ⊢`**: ese cálculo es sintácticamente completo (ADR‑024).
+* El atajo semántico **seguía sin existir**, como §5.9 dejó escrito. Se pagó sintácticamente.
 
 ---
 

@@ -3877,3 +3877,117 @@ vigilados — un titular que no se declara no lo comprueba nadie) · `check-estr
 
 **Véase también:** `FOL/Hauptsatz0.lean` §5-§6, `FOL/REFERENCE.md` §6.13-§6.14,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.10, ADR-050, ADR-029.
+
+---
+
+## ADR-052: 🏁🏁🏁 EL HAUPTSATZ — H3 cerrada, y la inducción doble que no hizo falta
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: ADR-051 dejó `CutAdm` como la única pieza viva de H3, estimada en ~400–600 l. y
+**riesgo alto**. Se paga. `FOL/Hauptsatz0.lean` §7-§8, **605 l. de código nuevas**.
+
+    hauptsatz          : CutAdm              -- ⭐⭐⭐ el corte es ADMISIBLE en LK₀
+    cut_elimination    : CutElim
+    herbrand_extraction: HerbrandExtraction  -- H3, que era la deuda
+    herbrand           : ([] ⊢₀ ∃φ) ↔ ∃ ts E, HerbrandCert φ ts E   -- ⭐ ya INCONDICIONAL
+
+📏 **Footprint**: `[propext, Quot.sound]` en todo. **Ni un `Classical.choice`, ni un axioma del
+proyecto.** (`eqInstance_lift` y `eqInstance_subst`, sin ningún axioma.)
+
+### 1 · ⛔⛔ La corrección de diseño: `struct` TIENE que subir la altura
+
+ADR-050 declaró `LKh.struct` **preservando** la altura y anotó, en `NEXT-STEPS.md`, que *«si la
+inducción doble no cierra, el primer sospechoso es `struct`»*. **Lo era.** Con la altura
+preservada, el caso `struct` de la inducción recurre sobre una premisa de la **misma** altura: la
+medida no decrece. Y no hay escapatoria por inducción estructural, porque la prueba también recurre
+sobre el lado **derecho**, que no es subderivación del izquierdo.
+
+⭐ **Y no se perdió nada.** El debilitamiento/contracción/intercambio «gratis» que evita la regla
+**MIX** de Gentzen no venía de la altura de `struct`: viene de que el enunciado del corte pide
+**PERTENENCIA** —`Or (x = A) (x ∈ Δ)`— en vez de la forma `A :: Δ`. Con eso, que `A` aparezca
+muchas veces en el contexto es el caso normal y no hace falta contraer.
+🔑 *Lo que mata a MIX es el ENUNCIADO, no el constructor.*
+
+⚠️ Medido: el cambio costó **tres ediciones** (el constructor, `lkh_mono`, `lk0_to_lkh`) y
+`lkh_subst` **no se movió**. Una sospecha anotada un día antes se cobró en cinco minutos.
+
+### 2 · ⭐⭐⭐ `LeftPrin`, y por qué la inducción DOBLE no hizo falta
+
+La presentación clásica induce sobre el **grado** × la **suma de alturas**, con un análisis cruzado
+de las dos últimas reglas: por cada una de las 5 conectivas, los 14 casos de la otra derivación.
+Eso es ~5×14 bloques de permutación casi idénticos.
+
+Aquí se hace en **dos pasadas independientes de 14 casos**:
+
+| pasada | induce sobre | qué hace |
+|---|---|---|
+| `cutPrinAux` (§8.5) | la altura `n` de `D2` | analiza `D2` **una sola vez**; los 5 casos principales son las reducciones de grado |
+| `cutLeftAux` (§8.6) | la altura `m` de `D1` | analiza `D1`; sus casos principales **delegan** en `cutPrinAux` |
+
+Lo que las desacopla es un **dato uniforme**:
+
+    LeftPrin (b ⇒ c)  Γ Δ = LK₀ (b :: Γ) (c :: Δ)
+    LeftPrin (b ∧ c)  Γ Δ = LK₀ Γ (b :: Δ)  ∧  LK₀ Γ (c :: Δ)
+    LeftPrin (b ∨ c)  Γ Δ = LK₀ Γ (b :: c :: Δ)
+    LeftPrin (∀ b)    Γ Δ = LK₀ (Γ.map lift) (b :: Δ.map lift)
+    LeftPrin (∃ b)    Γ Δ = ∃ t, LK₀ Γ (substFormula 0 t b :: Δ)
+    LeftPrin _        _ _ = False
+
+— las premisas de la regla derecha principal de `A`, empaquetadas. Con `leftPrin_mono` y
+`leftPrin_lift` ese dato **viaja** a los contextos nuevos que cada permutación de `D2` crea.
+⇒ **la medida `m + n` no aparece en ningún sitio**: basta `m` por fuera y `n` por dentro.
+
+🔑 *Cuando dos análisis de casos se cruzan, lo que los desacopla es encontrar el DATO que uno le
+pasa al otro.* Y es el mismo patrón que ADR-049 (`eqAx`): **el desbloqueo no fue esfuerzo, fue una
+definición**.
+
+⭐ **Dividendo inesperado**: en cada regla derecha de `D1` la **misma llamada recursiva** sirve para
+las dos ramas del `by_cases` — es `LeftPrin A Γ Δ` si la principal es `A`, y la premisa de la regla
+si no lo es. Cinco casos que parecían dobles son uno.
+
+⛔ Y `LeftPrin` es **`False`** para `⊥`, átomos e igualdades —no hay regla derecha que las
+introduzca—, lo que **cierra gratis** el caso `botL` de `D2` con `A = ⊥`, que en las presentaciones
+de libro hay que argumentar aparte.
+
+### 3 · `lkh_lift`: la otra clausura, que sí hizo falta y no estaba
+
+Cuando `D2` termina en `allR` (o `exL`), permutar el corte obliga a **levantar la derivación
+entera del otro lado y la propia fórmula de corte**. ⇒ hizo falta
+`lkh_lift : LKh n Γ Δ → ∀ k, LKh n (Γ.map (liftFormula k)) (Δ.map (liftFormula k))`, gemela de
+`lkh_subst` (ADR-051) y con la misma propiedad crítica: **preserva la altura**.
+
+⭐ Los tres lemas que consume **ya existían** (`liftFormula_lift`, `liftFormula_subst`,
+`substFormula_liftFormula`): esta vez el catálogo sí los decía, porque `Theorems/Eq.lean` y
+`Lift0.lean` se proyectaron en ADR-051. *Antes de construir, buscar* — y esta vez salió bien.
+
+⚠️ El índice tiene que ser **general** (`k` arbitrario, no sólo 0): el caso `allR` recurre con
+`k+1`. Es la misma lección que el Barendregt de ADR-051 — **generalizar es lo que cierra**.
+
+### 4 · Lo que queda dicho, y lo que NO cambia
+
+* ⭐ **El atajo semántico seguía sin existir**, como ADR-050 §6 dejó escrito: `completeness₀`
+  devuelve `Derives₀`, no `LK₀` sin corte. Esto se ha pagado **sintácticamente**, que era la única
+  vía. La advertencia era correcta y ahorró el intento.
+* ⚠️ **Esto NO toca `Derives`**: `hauptsatz` es sobre `LK₀`, y el puente a la deducción natural es
+  `ndToLK` sobre `Derives₂` (ADR-049). **M-11 y ADR-032, intactos.**
+* ⚠️ `herbrand` es sobre `Derives₀`, no sobre `⊢`. Sigue valiendo ADR-024: *ningún resultado sobre
+  `axioms ⊢` dice nada*, porque ese cálculo es sintácticamente completo.
+
+### 5 · Decisión
+
+1. ✅ `LKh.struct` **sube la altura**; el comentario de §2 que decía lo contrario queda corregido
+   **en su sitio**, con la razón escrita.
+2. ✅ `FOL/Hauptsatz0.lean` gana §7 (`deg`, `lkh_lift`) y §8 (el Hauptsatz). 1 023 l. de código.
+3. ✅ `Hauptsatz0.lean` pasa a importar `FOL.NDtoLK0` (sin ciclo: `NDtoLK0` sólo importa
+   `FOL.Sequent0`).
+4. ✅ `check-footprints.bash`: **88 → 96** titulares, los ocho nuevos.
+5. ⬜ **No se retira nada**: `HerbrandExtraction` sigue siendo un `Prop` y `herbrand_iff` sigue
+   tomándolo por hipótesis. El teorema incondicional es **`herbrand`**, al lado. *Cuando una deuda
+   se salda, el enunciado condicional se queda: documenta de qué dependía.*
+
+**Controles tras el cambio:** RPP **145 jobs** · FOL **42 jobs** · `check-footprints` **96** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Véase también:** `FOL/Hauptsatz0.lean` §7-§8, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.11,
+ADR-050, ADR-051, ADR-049, ADR-043.

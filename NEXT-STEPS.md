@@ -5,7 +5,61 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 42 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **88** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+🔧 Controles: `check-footprints` **96** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+
+> # 🗓️ 2026‑09‑17 — 🏁🏁🏁 **EL HAUPTSATZ, Y CON ÉL H3 Y LA VÍA H ENTERA**
+>
+> ```
+> hauptsatz           : CutAdm               -- ⭐⭐⭐ el corte es ADMISIBLE en LK₀
+> cut_elimination     : CutElim
+> herbrand_extraction : HerbrandExtraction   -- H3, que era LA deuda
+> herbrand            : ([] ⊢₀ ∃φ) ↔ ∃ ts E, HerbrandCert φ ts E   -- ⭐ ya INCONDICIONAL
+> ```
+>
+> `../FOL/FOL/Hauptsatz0.lean` §7‑§8 — [ADR‑052](DECISIONS.md), plan §5.11. **605 l. de código
+> nuevas** (estimado ~400–600, «riesgo alto»), 1 023 en el módulo. 📏 `[propext, Quot.sound]` en
+> todo: **ni un `Classical.choice`, ni un axioma del proyecto**.
+> ⇒ 🏁🏁🏁 **LOS CUATRO HITOS DE LA VÍA H, CERRADOS** (plan §5.2).
+>
+> ## ⛔⛔ La sospecha anotada ayer era cierta: `struct`
+>
+> ADR‑050 declaró `LKh.struct` **preservando** la altura y dejó escrito *«si la inducción doble no
+> cierra, el primer sospechoso es `struct`»*. **Lo era**: con la altura preservada el caso `struct`
+> recurre sobre una premisa de la MISMA altura ⇒ la medida no decrece, y no hay salida estructural
+> porque la prueba también recurre sobre el lado derecho. Costó **tres ediciones**, y `lkh_subst`
+> no se movió. 🔑 *Anotar la sospecha en el punto exacto la convierte en cinco minutos.*
+>
+> ⭐ **Y no se perdió nada**: lo que evita la regla **MIX** de Gentzen no es la altura de `struct`,
+> es que el enunciado del corte pida **PERTENENCIA** (`Or (x = A) (x ∈ Δ)`) y no la forma `A :: Δ`.
+> 🔑 *Lo que mata a MIX es el ENUNCIADO, no el constructor.*
+>
+> ## ⭐⭐⭐ Y la inducción DOBLE no hizo falta
+>
+> La prueba clásica cruza las dos últimas reglas: 5 conectivas × 14 casos de la otra derivación.
+> Aquí son **dos pasadas independientes de 14 casos**, desacopladas por un **dato uniforme**:
+> `LeftPrin A Γ Δ` = las premisas de la regla **derecha principal** de `A`, empaquetadas por
+> conectiva. `cutPrinAux` induce sobre `n` y analiza `D2` **una sola vez**; `cutLeftAux` induce
+> sobre `m` y **delega** en ella sus casos principales. ⇒ **`m + n` no aparece en ningún sitio.**
+> 🔑 *Cuando dos análisis de casos se cruzan, lo que los desacopla es encontrar el DATO que uno le
+> pasa al otro* — el mismo patrón que `eqAx` (ADR‑049): **el desbloqueo no fue esfuerzo, fue una
+> definición.**
+> ⭐ Dividendo: en cada regla derecha de `D1` **la misma llamada recursiva sirve para las dos ramas**
+> del `by_cases`. ⛔ Y `LeftPrin` es **`False`** para `⊥`/átomos/igualdades, lo que **cierra gratis**
+> el caso `botL` con `A = ⊥` que en los libros se argumenta aparte.
+>
+> ## ⚠️ Lo que esto NO dice, y hay que repetirlo
+>
+> * **No toca `Derives`**: `hauptsatz` es sobre `LK₀`; el puente es `ndToLK` sobre `Derives₂`.
+>   **M‑11 y ADR‑032, intactos.**
+> * **No dice nada sobre `axioms ⊢`**: ese cálculo es sintácticamente completo (ADR‑024).
+> * ⬜ **No se retira `HerbrandExtraction`**: sigue siendo un `Prop` y `herbrand_iff` sigue
+>   tomándolo por hipótesis. El incondicional es **`herbrand`**, al lado. *Cuando una deuda se
+>   salda, el enunciado condicional se queda: documenta de qué dependía.*
+>
+> ▶ **SIGUIENTE**: ⬜ el paso 4 del propietario — `String → List Char` con `Sugerencias.md`
+> (plan §7.3/§7.4). ⬜ Y de sesiones viejas: estrechar `StdLine`, promover 4 de `Probe/`, el modelo
+> de los 141, `DEUDA_chainNeg`.
+
 
 > # 🗓️ 2026‑09‑17 — 🏁 **H3, A UNA SOLA PIEZA** (paso 3, `CutAdm` a falta de la inducción doble)
 >
