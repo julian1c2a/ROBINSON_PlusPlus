@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-17 18:40 · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-09-17 23:10 · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -42,6 +42,9 @@
 > `derives0_consistent`, sin `Classical.choice`.** Ver §5.12.
 >
 > ⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.
+>
+> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.10**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058) y Skolem con término (059) y **bajo un prefijo `∀ⁿ`** (060).
+> ⚠️ Lo excluido del catálogo va con su razón **medida** en ADR‑054 §4 (propiedad de subfórmula, conservatividad de los 107 `codingAxioms`, Church): **falsos o no enunciables**, no «pendientes».
 >
 > ## Los dos objetivos, decididos
 >
@@ -1074,11 +1077,42 @@ ser **constante**, y entonces no hace falta relacionar la lista de argumentos co
 Bruijn. *Cuando la interpretación que se construye es constante, los argumentos dejan de ser un
 problema.*
 
-⬜ **Falta el prefijo de universales** `∀ⁿ((∃A) → A[c(y⃗)])`, donde el testigo **depende de la
-tupla**. MEDIDO: el prefijo es copia de `exBlock` (~40 l.), la frescura está lista y la coincidencia
-semántica ya vale para aridad arbitraria; lo que **no existe** es la correspondencia **entorno ↔
-lista de valores** bajo `k` `shiftEnv` anidados. ~200 l., riesgo medio, y el riesgo está entero ahí.
-⚠️ ESTIMADO.
+🏁 **El prefijo de universales, PAGADO** — §6.10. La estimación de ~200 l. se quedó en **113**,
+y el ahorro vino de una sola elección de definición.
+
+---
+
+### 6.10 · 🏁 SKOLEM bajo un PREFIJO `∀ⁿ` — 2026‑09‑17, ADR‑060
+
+`../FOL/FOL/SkolemN0.lean`, módulo nuevo, **113 l. de código**:
+
+    skolemAxN c n A       := ∀x₀…∀x_{n-1} ( (∃y. A) → A[y := c(x₀,…,x_{n-1})] )
+    skolem_conservative_n : c fresco para Γ, A, φ → (skolemAxN c n A :: Γ) ⊢₀ φ → Γ ⊢₀ φ
+    skolemAxN c 0 A = skolemAxT c [] A                                        -- por `rfl`
+
+⭐⭐ **El entorno no se RECONSTRUYE, se CONSTRUYE.** `envPush v ds` se define **por `shiftEnv`** y
+recurriendo **sólo sobre la lista**, con lo que `envPush v [] = v` y
+`shiftEnv (envPush v ds) d = envPush v (d :: ds)` son **`rfl`** ⇒ el paso que atraviesa el binder no
+lleva ni un `rw`. 🔑 *Cuando una inducción tiene que atravesar un binder, lo que la abarata es
+definir el dato acumulado CON el constructor que el binder va a producir.*
+
+⭐ **Y la fila «no existe nada» de §6.9 era CIERTA — lo que falló fue la conclusión.** `vars` se
+escribe con `liftTerms 0` (y no con `List.map (liftTerm 0)`), y con esa forma la conmutación
+semántica que hace falta **ya existía** (`eval_liftTerms_ext`, `FOL/Semantics.lean:94`): así
+`evalTerms_vars` va de **lista a lista**, sin un solo `funext`. 🔑 *Cuando para el dato que necesitas
+no existe nada, elige la DEFINICIÓN del dato de modo que se le aplique lo que sí existe.*
+
+⚠️ **Tres detalles que no son cosméticos**: el contador va `n + ds.length` (no al revés — `Nat.add`
+recurre sobre el segundo argumento); la guarda `ds.length = n` es **necesaria**, falsa ya en `n = 1`
+sin ella; y `Classical.propDecidable` va **explícito** en `skF`, porque el módulo no abre
+`Classical` y el binder de `dite` no tipa con la instancia implícita.
+
+⚠️ **Y la trampa de compilación**: cerrar `evalTerms_vars` con `rw […]` **no vale** — el `rfl`
+final de `rw` es `with_reducible`, y ni `evalTerm` ni `shiftEnv` son `@[reducible]`. El `rfl` va a
+mano. ⭐ Estaba **predicho** por el refutador del diseño.
+
+⬜ **Lo que esto NO es**: el **paso** de Skolem, no la **forma normal**. Iterar sobre `prenex f`
+(§6.8) para eliminar todos los `∃` **no está hecho** ni medido.
 
 ---
 

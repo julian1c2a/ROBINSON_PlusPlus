@@ -4577,3 +4577,104 @@ Ahi el testigo **depende de la tupla**, luego `F : List D → D` ya no puede ser
 `check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry** · **0 warnings**.
 
 **Vease tambien:** `FOL/Skolem0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.9, ADR-056, ADR-055.
+
+---
+
+## ADR-060: SKOLEM bajo un PREFIJO de universales — el entorno no se RECONSTRUYE, se CONSTRUYE
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: ADR-059 §3 dejo una tabla de cuatro filas con **el riesgo entero en la ultima**:
+«entorno ↔ lista de valores, MEDIDO que no existe nada». Esta ADR paga esa fila.
+`FOL/SkolemN0.lean`, modulo nuevo, **113 l. de codigo** (240 con documentacion).
+
+    skolemAxN c n A        := ∀x₀…∀x_{n-1} ( (∃y. A) → A[y := c(x₀,…,x_{n-1})] )
+    skolem_conservative_n  : c fresco para Γ, A, φ → (skolemAxN c n A :: Γ) ⊢₀ φ → Γ ⊢₀ φ
+    skolemAxN c 0 A = skolemAxT c [] A                                         -- por `rfl`
+
+### 1 · ⭐⭐ La decision de diseno, y es lo unico que hace falta entender
+
+Bajo el prefijo el testigo **depende de la tupla ligada**, asi que `F : List D → D` ya no puede ser
+constante (que es lo que abarataba ADR-059). Hace falta un entorno acumulado. La eleccion:
+
+    envPush v []              = v                          -- ⭐ las dos, por `rfl`
+    shiftEnv (envPush v ds) d = envPush v (d :: ds)
+
+`envPush` se define **POR `shiftEnv`** y recurriendo **solo sobre la lista**. ⇒ el paso inductivo de
+`eval_allBlock_envPush`, que es el que atraviesa el binder, **no lleva ni un `rw`**: el `show` cae
+por definicion y la llamada recursiva es directa.
+
+🔑 *Cuando una induccion tiene que atravesar un binder, lo que la abarata es definir el dato
+acumulado CON el constructor que el binder va a producir.* El entorno no se **reconstruye** desde la
+lista: se **construye** con la misma operacion que la semantica del `∀` ya usa.
+
+### 2 · ⭐ Y la fila «no existe nada» era CIERTA — lo que fallo fue la conclusion
+
+La medicion de ADR-059 era correcta: en `FOL/Semantics.lean` no habia nada iterado `k` veces ni nada
+que reconstruyera un entorno desde una lista. Pero de ahi NO se sigue que hubiera que construirlo
+todo. `vars` se escribe
+
+    vars 0       = []
+    vars (n + 1) = Term.var 0 :: liftTerms 0 (vars n)        -- y NO `(vars n).map (liftTerm 0)`
+
+y con esa forma la conmutacion semantica que hace falta **ya existe**: `eval_liftTerms_ext`
+(`FOL/Semantics.lean:94`). ⇒ `evalTerms_vars` va de **lista a lista**, sin un solo `funext`, y el
+unico puente que se paga —`updateEnv 0 v d = shiftEnv v d`— se paga **una vez**, en un lema de tres
+lineas.
+
+🔑 *Cuando para el dato que necesitas no existe nada, elige la DEFINICION del dato de modo que se le
+aplique lo que si existe.* La estimacion de ~200 l. se quedo en **113**: casi la mitad del ahorro
+viene de esa unica eleccion de `vars`.
+
+### 3 · ⚠️ Tres detalles que NO son cosmeticos
+
+* **El orden del contador**: la guarda va `n + ds.length = k`, no `ds.length + n = k`. `Nat.add`
+  recurre sobre el **segundo** argumento ⇒ con `ds = []` la primera forma reduce sola y la segunda
+  no. Es la misma trampa que ADR-055 §`subst_exBlock` (`n + k`, no `k + n`). Van **dos**.
+* **La guarda `ds.length = n` es NECESARIA**, no decorativa: sin ella el enunciado del bloque es
+  falso ya para `n = 1`, porque `c(x₀,…,x_{n-1})` tiene `n` argumentos y el entorno acumulado
+  tendria otra longitud.
+* **`Classical.propDecidable` va EXPLICITO** en `skF`: el modulo no abre `Classical` (a proposito),
+  y con la instancia implicita el binder de `dite` **no llega a tipar**. La alternativa —quedarse
+  en `by_cases` + `Exists.choose`, como `skolem_conservative`— no sirve aqui: el testigo depende de
+  `ds`, luego hace falta una **funcion**, no una eleccion puntual.
+
+### 4 · ⚠️ La trampa que costo la unica correccion de compilacion
+
+En `evalTerms_vars`, terminar con `rw [...]` **no cierra**: el `rfl` final que `rw` intenta es
+`with_reducible rfl`, y ni `evalTerm` ni `shiftEnv` estan marcados `@[reducible]`. El objetivo que
+queda es literalmente `evalTerm M (shiftEnv w d) #0 :: ds = d :: ds`, cierto por definicion pero no
+por reducibilidad. Hay que escribir el `rfl` **a mano** en la linea siguiente.
+
+⭐ Este fallo estaba **predicho**: el refutador del diseno lo senalo como «el unico defecto real de
+compilacion», y fue exactamente uno de los dos errores del primer `lake env lean`. 🔑 *Un refutador
+que compila mentalmente el termino vale mas que uno que juzga el enunciado.*
+
+### 5 · ⬜ Lo que esto NO es, dicho antes de que nadie lo suponga
+
+Esto es **el paso de Skolem**, no la **forma normal de Skolem**. Da la conservatividad de **un**
+axioma `∀ⁿ(∃ → ·)`. Iterar sobre una formula prenexa entera —eliminar todos los `∃` de
+`prenex f` (ADR-058) reutilizando este paso— **no esta hecho**, y es la pieza que cerraria
+«skolemizacion de formulas arbitrarias». ⬜ **No medida.**
+
+Tampoco cambia nada del frente godeliano: `skolem_conservative_n` pasa por `completeness₀`, luego
+arrastra el `Classical.choice` que es el **WKL** (ADR-041 §2), como `skolem_conservative`.
+
+### 6 · ⛔ Y una cifra MIA que era FALSA, corregida aqui
+
+ADR-057, ADR-058 y ADR-059 cerraron con **«0 warnings»**. **Falso.** Medido hoy: **7 warnings en
+RPP** (`Meta/CodeWitnessPrf.lean` x4, `Meta/SubstfcWitnessPrf.lean`, `Meta/ChainNegPrf.lean` x2 —
+del 2026-09-09) y **4 en FOL** (`TheoryFramework/Relations.lean`). Lo que era cierto es que la
+`lean_lib FOL` sola sale a cero; la cifra se **generalizo** al arbol entero sin volver a medirla.
+
+🔑 *Una cifra de control se copia de una pasada a la siguiente sin volver a ejecutarla, y ahi
+deja de ser una medicion.* Los once son cosmeticos (`simp` sin usar, binder sin referenciar), pero
+la deuda que importa es la otra: **`0 warnings` no lo vigila ningun control** — no hay un
+`check-warnings.bash`. ⬜ Deuda escrita; mientras no exista, la cifra va **con su alcance al lado**.
+
+**Controles:** RPP **145 jobs** · FOL **49 jobs** · `check-footprints` **124** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · `check-sorry` ✅ · **0 sorry** ·
+warnings: **7 (RPP) + 4 (FOL)**, todos cosmeticos y todos anteriores a esta ADR.
+
+**Vease tambien:** `FOL/SkolemN0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.10, ADR-059,
+ADR-056, ADR-055.

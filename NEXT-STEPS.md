@@ -4,8 +4,9 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 46 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **109** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **49** · 0 sorry) · **3 `axiom` de Lean****
+⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
+🔧 Controles: `check-footprints` **124** · `check-estratos` **10** · `check-doc-sync` · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
@@ -53,8 +54,68 @@
 >   la hoja de ruta la migración habría que hacerla **dos veces**. La firma que sirve a los dos es
 >   un **parámetro `S`**. 📐 163 módulos / 3 902 declaraciones.
 >
-> **Estado: RPP 145 jobs · FOL 46 · footprints 109 · estratos 10 · 0 sorry.**
+> **Estado: RPP 145 jobs · FOL 49 · footprints 124 · estratos 10 · 0 sorry.**
 
+
+
+> # 🗓️ 2026‑09‑17 (tarde) — 🏁 **LA CAPA PRENEXA, LA FORMA NORMAL Y SKOLEM** (ADR‑057…060)
+>
+> Cuatro piezas encadenadas sobre `Derives₀`, todas con sus controles:
+>
+> | | teorema | módulo | footprint | ADR |
+> |---|---|---|---|---|
+> | 1 | las **ocho** equivalencias de desplazamiento de cuantificador | `Prenex0.lean` | `[propext, Quot.sound]` | 057 |
+> | 2 | `derives0_prenex_iff` — `Γ ⊢₀ φ ↔ Γ ⊢₀ prenex φ` | `PrenexNF0.lean` | `[propext, Quot.sound]` | 058 |
+> | 3 | `prenex_isPrenex` — la salida **está** en forma prenexa | `PrenexNF0.lean` | `[propext]` | 058 |
+> | 4 | `skolem_conservative` — término de Skolem con argumentos **fijos** | `Skolem0.lean` | el WKL | 059 |
+> | 5 | 🏁 **`skolem_conservative_n`** — el axioma bajo un prefijo **`∀ⁿ`** | **`SkolemN0.lean`** | el WKL | **060** |
+>
+> ## ⭐⭐ La pieza de riesgo, y cómo dejó de serlo
+>
+> ADR‑059 dejó una tabla con **el riesgo entero en una fila**: «entorno ↔ lista de valores, MEDIDO
+> que no existe nada», ~200 l. Se pagó en **113**, y el ahorro vino de **una sola elección de
+> definición**:
+>
+> * `envPush` se define **POR `shiftEnv`** ⇒ `envPush v [] = v` y
+>   `shiftEnv (envPush v ds) d = envPush v (d :: ds)` son **`rfl`**, y el paso que atraviesa el
+>   binder **no lleva ni un `rw`**.
+> * `vars` se escribe con `liftTerms 0` (no con `List.map (liftTerm 0)`) ⇒ la conmutación semántica
+>   que hace falta **ya existía** (`eval_liftTerms_ext`), y `evalTerms_vars` va de **lista a lista**,
+>   sin un solo `funext`.
+>
+> 🔑 *Cuando para el dato que necesitas no existe nada, elige la DEFINICIÓN del dato de modo que se
+> le aplique lo que sí existe.*
+>
+> ## ⚠️ Cuatro obstrucciones mías refutadas, y la primera estimación CORTA
+>
+> ADR‑052 §1, ADR‑057 §4, ADR‑058 §1 y ADR‑059 §1: las cuatro en la misma dirección — *estimar por
+> la forma del ENUNCIADO y no por la del ÁRBOL*. Y `prenex_isPrenex` fue la primera al revés:
+> estimada en ~70 l., medida en **95**, por contar «dos inducciones» donde había **seis**.
+>
+> ## ⚠️ La trampa de compilación del día
+>
+> Cerrar una prueba con `rw […]` **no basta** cuando lo que queda es cierto sólo por definición: el
+> `rfl` final que `rw` intenta es `with_reducible rfl`. En `evalTerms_vars` hay que escribir el
+> `rfl` **a mano**. ⭐ Estaba **predicho** por el refutador del diseño, y fue exactamente uno de los
+> dos errores del primer `lake env lean`.
+>
+> ## 🔧 Y dos arreglos de control (informe de PeanoRF, verificado)
+>
+> * `../FOL/check-sorry.bash` era `grep -c 'sorry'` y contaba la frase «100 % sorry‑free» **dentro
+>   de comentarios**. El árbol tenía **CERO** `sorry` reales. Portada la versión de RPP (111 l., con
+>   despiece de tokens) ⇒ el gate de la CI de FOL es ya **BLOQUEANTE** (`8a6131b`).
+> * ⛔ **M‑12**: **subir FOL ANTES que RPP.** La CI de RPP clona FOL como hermano; al revés compila
+>   contra un FOL viejo y `check-footprints` sale «NO MEDIDO» (roto y rehecho en `35214528037`).
+>
+> ## ⬜ Lo que queda de este frente
+>
+> * ⬜ **La forma normal de SKOLEM** — iterar el paso de §6.10 sobre `prenex f` para eliminar
+>   **todos** los `∃`. **No hecho ni medido.**
+> * ⬜ **F · interpolación de Craig** para `LKp` (~850 l., riesgo alto) — abierta.
+> * ⬜ La **mitad ⟹ de E** (~350–450 l.) — el invariante está confirmado.
+> * ⬜ Decisión (2) del informe de PeanoRF: adoptar `check-doc-sync.bash` en FOL exige crear
+>   `CURRENT-STATUS-PROJECT.md` con la línea de cifras canónicas. **Sin decidir.**
+> * ⬜ Re‑enunciar `lk0_not_empty` sobre `lk0_empty`/`lkc_empty` (hoy arrastra el WKL).
 
 > # 🗓️ 2026‑09‑17 — 🏁🏁🏁 **EL HAUPTSATZ, Y CON ÉL H3 Y LA VÍA H ENTERA**
 >

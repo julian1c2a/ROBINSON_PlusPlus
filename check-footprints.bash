@@ -133,6 +133,11 @@ FOL.PrenexNF0.prenex_iff|Quot.sound,propext
 FOL.PrenexNF0.derives0_prenex_iff|Quot.sound,propext
 FOL.PrenexNF0.quantFree_lift|-
 FOL.PrenexNF0.prenex_isPrenex|propext
+FOL.SkolemN0.not_occurs_vars|-
+FOL.SkolemN0.eval_allBlock_envPush|Quot.sound,propext
+FOL.SkolemN0.evalTerms_vars|Quot.sound,propext
+FOL.SkolemN0.eval_skolemAxN|Classical.choice,Quot.sound,propext
+FOL.SkolemN0.skolem_conservative_n|Classical.choice,Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext
