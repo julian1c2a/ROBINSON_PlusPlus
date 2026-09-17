@@ -544,16 +544,68 @@ una complicación entera de la prueba clásica.*
 | ⭐ `liftFormula_subst_le` | **`k ≤ v`** | **hecho aquí** |
 | ⬜ Barendregt general | `substFormula v s (substFormula 0 u f) = …` | **falta** — `subst_subst_comm_succ` sólo cubre índices **adyacentes** |
 
-#### ⬜ Lo que falta para `CutAdm`
+#### 🏁 Lo que faltaba para `CutAdm` — **dos de tres, HECHAS** (§5.10)
 
-1. ⬜ la segunda conmutación (Barendregt general), ~90 l., **riesgo bajo** — gemela de la hecha;
-2. ⬜ **`lkh_subst`** (el cálculo cerrado por sustitución, preservando altura), ~150 l.;
-3. ⬜ **la inducción doble**, ~400–600 l., **riesgo alto**. Es la pieza grande.
+1. 🏁 la segunda conmutación (**Barendregt general**), ~90 l. estimadas → **99 l.**, riesgo bajo
+   confirmado — hecha el 2026‑09‑17, §5.10;
+2. 🏁 **`lkh_subst`** (el cálculo cerrado por sustitución, preservando altura), ~150 l.
+   estimadas → **133 l.** — hecha el 2026‑09‑17, §5.10;
+3. ⬜ **la inducción doble**, ~400–600 l., **riesgo alto**. Es la pieza grande, y ya la única.
 
 ⚠️ **Y no hay atajo semántico, que conviene dejar escrito**: `CutAdm` **no** sale de `lkc_sound`
 + `completeness₀`, porque `completeness₀` devuelve una derivación de **`Derives₀`**, no de `LK₀`, y
 convertirla exigiría `Derives₀ → LK₀` **sin corte** — que *es* el Hauptsatz. **El círculo se
 cierra.**
+
+---
+
+### 5.10 · 🏁 H3, sexta pieza: las DOS conmutaciones y `lkh_subst` — 2026‑09‑17, ADR‑051
+
+⛔ **El Hauptsatz sigue sin estar.** Pero de las **tres** piezas que §5.9 dejaba abiertas, **dos
+están hechas** y queda **una sola**, que es la grande. `../FOL/FOL/Hauptsatz0.lean`, §5 y §6:
+
+    §5  substTerm_subst_le · substTerms_subst_le · substFormula_subst_le    --  99 l.
+    §6  eqInstance_subst · map_lift_subst · map_sub · lkh_subst             -- 133 l.
+
+#### ⭐ (1) Barendregt, en su forma GENERAL — y por qué generalizar ABARATÓ
+
+    substFormula v s (substFormula w u f)
+      = substFormula w (substTerm v s u) (substFormula (v+1) (liftTerm w s) f)     -- con `w ≤ v`
+
+⚠️ El enunciado que §5.9 estimaba era el caso **`w = 0`**, que es el único que `lkh_subst` usa.
+**Hubo que generalizarlo a `w` arbitrario** para que la recursión bajo el binder (`w+1 ≤ v+1`) se
+cerrara sobre sí misma. 🔑 *Y salió más barato así* — es el quinto corolario de «medir la forma»:
+**generalizar puede abaratar**, porque los pasos caros suelen ser artefactos de la instancia.
+
+El caso que paga es `.var n` con `n = v+1`, donde hay que **deshacer** un levantamiento:
+`(substTerm_liftTerm s w (substTerm v s u)).symm`. Los otros seis salen por tricotomía y `omega`.
+
+#### ⭐⭐ (2) `lkh_subst` — cerrado por sustitución, **preservando la altura**
+
+    lkh_subst : LKh n Γ Δ → ∀ v t, LKh n (Γ.map (substFormula v t)) (Δ.map (substFormula v t))
+
+**La altura es la misma `n`** — que es justo lo que la inducción doble necesitará: *sustituir no
+puede encarecer la derivación*. Catorce casos, y sólo cuatro son trabajo:
+
+| casos | qué hacen | qué paga |
+|---|---|---|
+| `allR`, `exL` | **cambian el entorno** (bajo el binder: `v+1`, `liftTerm 0 t`) | `liftFormula_subst_le` (§5.9), vía `map_lift_subst` |
+| `allL`, `exR` | **instancian** (el testigo viaja a `substTerm v t s`) | **Barendregt general** (arriba) |
+| `eqAx` | nada: `eqInstance_subst`, cinco casos, **sin ningún axioma** | — |
+| los otros nueve | `simp only [List.map_cons, substFormula]` | — |
+
+⭐ Y aquí se cobra la decisión de diseño de §5.9: **`struct` preserva la altura**, luego
+debilitamiento, contracción e intercambio son **un caso más** y no una complicación aparte.
+
+#### 📏 Footprint
+
+`eqInstance_subst` **sin ningún axioma**; `substFormula_subst_le` y `lkh_subst`,
+`[propext, Quot.sound]`. **Ni un `Classical.choice`** en todo el módulo.
+
+#### ⬜ Lo que queda: UNA pieza
+
+⬜ **La inducción doble** de Gentzen — por fuera sobre el **grado** de la fórmula de corte, por
+dentro sobre la **suma de las alturas**. ~400–600 l., **riesgo alto**. Ya es la única.
 
 ---
 

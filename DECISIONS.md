@@ -3773,3 +3773,107 @@ del que se tiene completitud.*
 
 **Véase también:** `FOL/Hauptsatz0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.9,
 `check-estratos.bash` (10 estratos), `check-footprints.bash` (85 titulares).
+
+---
+
+## ADR-051: Las dos conmutaciones y `lkh_subst` — H3 a UNA pieza, y un control que absolvía a 27 módulos
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: ADR-050 dejó `CutAdm` con **tres** piezas abiertas. Se pagan las dos primeras.
+⚠️ Y al ir a proyectar, se descubre que el catálogo de FOL llevaba meses mintiendo.
+
+### 1 · ⭐ Barendregt GENERAL — y generalizar salió MÁS BARATO
+
+    substFormula v s (substFormula w u f)
+      = substFormula w (substTerm v s u) (substFormula (v+1) (liftTerm w s) f)     -- con `w ≤ v`
+
+⚠️ **El enunciado de ADR-050 §7.1 era el caso `w = 0`**, que es el único que `lkh_subst` consume.
+Hubo que **generalizar a `w` arbitrario** para que la recursión bajo el binder (`w+1 ≤ v+1`)
+cerrara sobre sí misma. 🔑 *Y por eso salió barato*: es el **quinto corolario de «medir la
+forma»** — generalizar puede abaratar, porque los pasos caros suelen ser artefactos de la
+instancia. Estimado ~90 l.; **medido 99 l.**, riesgo bajo confirmado.
+
+El único caso con trabajo real es `.var n` con `n = v+1`, donde hay que **deshacer** un
+levantamiento: `(substTerm_liftTerm s w (substTerm v s u)).symm`. Los otros seis caen por
+tricotomía de `n` contra `w` y `v`, y `omega` sobre las guardas.
+
+### 2 · ⭐⭐ `lkh_subst` — cerrado por sustitución, PRESERVANDO la altura
+
+    lkh_subst : LKh n Γ Δ → ∀ v t, LKh n (Γ.map (substFormula v t)) (Δ.map (substFormula v t))
+
+**La altura de salida es la misma `n`.** Eso es lo que la inducción doble necesitará: *sustituir
+no puede encarecer una derivación*, o el orden de la inducción interna no estaría bien fundado.
+
+| casos | qué hacen | qué paga |
+|---|---|---|
+| `allR`, `exL` | **cambian el entorno** (bajo el binder: `v+1`, `liftTerm 0 t`) | `liftFormula_subst_le` (ADR-050), vía `map_lift_subst` |
+| `allL`, `exR` | **instancian** (el testigo viaja a `substTerm v t s`) | **Barendregt general**, §1 |
+| `eqAx` | nada: `eqInstance_subst` — cinco casos, **sin ningún axioma** | — |
+| los otros nueve | `simp only [List.map_cons, substFormula]` | — |
+
+⭐ Y aquí **se cobra la decisión de diseño de ADR-050**: como `LKh.struct` preserva la altura,
+debilitamiento, contracción e intercambio son **un caso más de la inducción** y no una
+complicación aparte. Estimado ~150 l.; **medido 133 l.**
+
+📏 **Footprint**: `eqInstance_subst` **sin ningún axioma**; `substFormula_subst_le` y `lkh_subst`,
+`[propext, Quot.sound]`. Ni un `Classical.choice` en todo `Hauptsatz0.lean`.
+
+⇒ **H3 queda con UNA sola pieza**: la inducción doble (~400–600 l., riesgo alto).
+
+### 3 · ⛔⛔ Y el hallazgo caro: `[C] PROYECCIÓN` no miraba FOL, y luego absolvía por SUBCADENA
+
+Al ir a proyectar (AI-GUIDE §14) se midió que `FOL/REFERENCE.md` §3 y §6 tenían **12 entradas**,
+**cuatro de ellas fantasma** (`Prelim.lean`, `Soundness.lean`, `Completeness.lean`,
+`Compacity.lean` — módulos que ya no existen). ⇒ de los **34** módulos que el control comprueba
+(todo `FOL/*.lean` y `FOL/Theorems/*.lean` menos el barril), había **7** proyectados y **27 NO**.
+
+⛔ **La causa no es el olvido, es el control.** El bloque `[C]` de `check-doc-sync.bash` iteraba
+**sólo** sobre `ROBINSON_PlusPlus/Meta/*`, `Minimal/*` y `Full/*` contra el REFERENCE.md **de
+RPP**: *los módulos de FOL no los miraba nadie*. Van **siete** causas medidas de «control que da
+verde sin comprobar».
+
+⚠️⚠️ Y la octava, que es mía y de hoy: la **primera versión** del control nuevo casaba con
+`grep -F "$m.lean"`, y eso **absuelve por subcadena y por basename**:
+
+| módulo | lo absolvía | por qué |
+|---|---|---|
+| `Theorems/Eq.lean` | `DecEq.lean` | `"Eq.lean"` es subcadena de `"DecEq.lean"` |
+| `Theorems/Deduction.lean` | `Deduction.lean` (§6.8) | el `basename` de los dos es el mismo |
+
+⇒ el control se endureció a la **ruta** (no el basename) con **frontera de palabra**, y entonces
+cazó los dos. 🔑 *Un control que casa por subcadena no comprueba: absuelve.*
+
+### 4 · Lo que la proyección destapó, que no era sólo documentación
+
+* ⭐ **`Theorems/Eq.lean` es el módulo de conmutaciones De Bruijn del repo** (24 nombres), y
+  estaba **sin proyectar**. Por eso `Hauptsatz0` tuvo que **medir dos veces** qué mitad de la
+  familia faltaba: el catálogo no podía decírselo a nadie. *Un módulo sin proyectar se vuelve a
+  construir* — y van **seis** con ésta.
+* ⚠️ **`Theorems/Deduction.lean` es un duplicado literal** de `FOL/Deduction.lean`: el mismo
+  teorema, la misma prueba, otro `namespace`. **No lo importa nadie.**
+* ⚠️ **Tres huérfanos medidos**: `Classical.lean`, `Tactics2.lean` y `Theorems/Deduction.lean`
+  no los importa ningún módulo del árbol. ⬜ **No se retiran aquí**: retirar es una decisión con
+  ADR, no una pasada de documentación. Quedan **escritos** en `FOL/REFERENCE.md` §6.14.
+* ⭐ **`MetaRules.lean` proyectado por fin**, y con ello el dato que más se re-aprende: de sus
+  16 nombres, **cuatro son `axiom`** (`imp_intro`, `raa`, `or_elim`, `ex_elim`) — los **cuatro
+  habitantes-axioma de `Derives`**, el suelo de M-11 (ADR-029).
+
+### 5 · Decisión
+
+1. ✅ `substFormula_subst_le` y `lkh_subst` entran en `FOL/Hauptsatz0.lean` (§5 y §6).
+2. ✅ `FOL/REFERENCE.md` gana §3.13 (tabla de descripciones de los 21 módulos del plan), §6.13
+   (338 nombres públicos **generados del árbol**) y §6.14 (los seis antiguos).
+3. ✅ `check-doc-sync.bash` `[C]` comprueba **FOL contra `../FOL/REFERENCE.md` §6**, por ruta y
+   con frontera de palabra.
+4. ⬜ Las cuatro entradas fantasma de §3/§6 llevan **banner de aviso** en vez de borrarse: lo que
+   dicen es historia del repo, y borrarlas perdería la traza. ⬜ Retirar los tres huérfanos queda
+   **abierto**, con ADR propio.
+
+**Controles tras el cambio:** RPP **145 jobs** · `lake build "@FOL/FOL" "@FOL/TheoryFramework"`
+**42 jobs** · `check-footprints` **88** (⚠️ eran 85: los tres teoremas nuevos **no estaban**
+vigilados — un titular que no se declara no lo comprueba nadie) · `check-estratos` **10** ·
+`check-doc-sync` ✅ · `check-axioms` ✅ (`ESPERADO_CUAR=1`, intacto).
+
+**Véase también:** `FOL/Hauptsatz0.lean` §5-§6, `FOL/REFERENCE.md` §6.13-§6.14,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §5.10, ADR-050, ADR-029.

@@ -99,6 +99,9 @@ FOL.Hauptsatz0.lkh_mono|-
 FOL.Hauptsatz0.lkh_to_lk0|-
 FOL.Hauptsatz0.lk0_to_lkh|propext
 FOL.Hauptsatz0.liftFormula_subst_le|Quot.sound,propext
+FOL.Hauptsatz0.substFormula_subst_le|Quot.sound,propext
+FOL.Hauptsatz0.eqInstance_subst|-
+FOL.Hauptsatz0.lkh_subst|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

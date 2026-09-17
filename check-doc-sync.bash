@@ -317,6 +317,34 @@ for f in ROBINSON_PlusPlus/Meta/*.lean ROBINSON_PlusPlus/Minimal/*.lean \
     C_FAIL=1
   fi
 done
+# ⛔⛔ AÑADIDO el 2026-09-17. Hasta hoy este control SOLO miraba los modulos de
+# ROBINSON_PlusPlus contra SU REFERENCE.md: los de FOL no los miraba NADIE, y por eso
+# veintiseis modulos llevaban dias sin proyectar en FOL/REFERENCE.md §6 sin que saltara
+# nada. Y se comprueba contra §6 (Exports), que es lo que AI-GUIDE §14 exige de verdad
+# -- no basta con que el nombre aparezca en la tabla de modulos.
+if [ -f ../FOL/REFERENCE.md ]; then
+  FOLEXP=$(sed -n '/^## 6\. Exports/,/^## 7\./p' ../FOL/REFERENCE.md)
+  for f in ../FOL/FOL/*.lean ../FOL/FOL/Theorems/*.lean; do
+    [ -e "$f" ] || continue
+    m=${f#../FOL/FOL/}; m=${m%.lean}
+    [ "$m" = "FOL" ] && continue
+    # ⚠ Frontera de palabra OBLIGATORIA, y la RUTA y no el basename:
+    #   • con `grep -F "Eq.lean"` el modulo `Theorems/Eq.lean` daba VERDE porque
+    #     "Eq.lean" es subcadena de "DecEq.lean";
+    #   • con el basename, `Deduction.lean` y `Theorems/Deduction.lean` eran el MISMO
+    #     control, y una sola entrada absolvia a los dos.
+    # Un control que casa por subcadena no comprueba: absuelve.
+    case "$m" in
+      */*) PAT="(^|[^A-Za-z0-9_])$m\.lean" ;;
+      *)   PAT="(^|[^A-Za-z0-9_/])$m\.lean" ;;
+    esac
+    if ! printf '%s' "$FOLEXP" | grep -qE "$PAT"; then
+      echo "  ✗ FOL/$m NO esta proyectado en ../FOL/REFERENCE.md §6 (AI-GUIDE §14)"
+      C_FAIL=1
+    fi
+  done
+fi
+
 for f in cuarentena/*.lean; do
   [ -e "$f" ] || continue
   m=$(basename "$f" .lean)

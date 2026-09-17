@@ -4,22 +4,23 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 35 · 0 sorry) · **3 `axiom` de Lean****
-🔧 Controles: `check-footprints` **85** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL 42 · 0 sorry) · **3 `axiom` de Lean****
+🔧 Controles: `check-footprints` **88** · `check-estratos` **10** · `check-doc-sync` · `check-axioms`.
 
-> # 🗓️ 2026‑09‑17 — 🔶 **EL ANDAMIAJE DEL HAUPTSATZ** (paso 3, en curso)
+> # 🗓️ 2026‑09‑17 — 🏁 **H3, A UNA SOLA PIEZA** (paso 3, `CutAdm` a falta de la inducción doble)
 >
-> ⛔ **El Hauptsatz NO está.** Esto es lo que hay que tener **antes** de intentarlo
-> (`../FOL/FOL/Hauptsatz0.lean`, 218 l. — [ADR‑050](DECISIONS.md)):
+> ⛔ **El Hauptsatz sigue sin estar.** Pero de las **tres** piezas que ADR‑050 dejaba abiertas,
+> **dos están hechas** (`../FOL/FOL/Hauptsatz0.lean`, 402 l. de código — [ADR‑050](DECISIONS.md)
+> + [ADR‑051](DECISIONS.md)):
 >
 > ```
-> CutAdm               -- el corte ÚNICO
-> cutElim_of           -- ⭐ CutAdm ⇒ CutElim, DEMOSTRADO
-> LKh                  -- el cálculo INDEXADO POR ALTURA
-> liftFormula_subst_le -- ⭐ la conmutación De Bruijn que FALTABA
+> §1 CutAdm · cutElim_of      -- el corte ÚNICO, y ⭐ CutAdm ⇒ CutElim DEMOSTRADO
+> §2 LKh                      -- el cálculo INDEXADO POR ALTURA (14 ctors)
+> §3 lkh_mono · lkh_to_lk0 · lk0_to_lkh
+> §4 liftFormula_subst_le     -- ⭐ conmutación De Bruijn que FALTABA   (k ≤ v)
+> §5 substFormula_subst_le    -- ⭐ Barendregt GENERAL, la otra que faltaba (w ≤ v)   🏁 HOY
+> §6 lkh_subst                -- ⭐⭐ cerrado por sustitución, PRESERVANDO ALTURA      🏁 HOY
 > ```
->
-> ⇒ **H3 se enuncia ahora sobre el CORTE ÚNICO**, que es sobre lo que la literatura razona.
 >
 > ⚠️⚠️ **La altura no se puede definir sobre `LK₀`**: vive en `Prop` ⇒ no hay eliminación grande
 > ⇒ hay que indexarla en el inductivo. 🔑 De la familia de M‑11: *el universo en el que vive un
@@ -29,17 +30,39 @@
 > dentro de la inducción — justo lo que en la prueba clásica obliga a pasar por **MIX**.
 > ⚠️ Con su contrapartida: si la inducción doble no cierra, **el primer sospechoso es `struct`**.
 >
-> ⛔ **Y dos conmutaciones De Bruijn que el repo NO tenía** (medido): la mitad `k ≤ v` —**hecha**—
-> y la forma **general de Barendregt** —falta; `subst_subst_comm_succ` sólo cubre índices
-> **adyacentes**. 🔑 *Una familia de lemas De Bruijn casi nunca está completa: mirar qué mitad
-> falta ANTES de planificar.*
+> ⭐ **Y generalizar ABARATÓ**: el Barendregt que `lkh_subst` consume es el caso `w = 0`, pero hubo
+> que enunciarlo con `w` arbitrario para que la recursión bajo el binder (`w+1 ≤ v+1`) cerrara
+> sobre sí misma. Estimado ~90 l. → **medido 99**; `lkh_subst`, ~150 → **133**. 🔑 *Quinto
+> corolario de «medir la forma»: los pasos caros suelen ser artefactos de la instancia.*
 >
 > ⚠️ **No hay atajo semántico**, y queda escrito: `CutAdm` no sale de `lkc_sound` + `completeness₀`
 > porque ésta devuelve `Derives₀`, no `LK₀` sin corte. 🔑 *El dividendo semántico (ADR‑048) sólo
 > paga hacia el cálculo del que se tiene completitud.*
 >
-> ▶ **SIGUIENTE**: ⬜ Barendregt general (~90 l., riesgo bajo) → ⬜ `lkh_subst` (~150 l.) →
-> ⬜ **la inducción doble** (~400–600 l., riesgo alto).
+> ## ⛔⛔ Y el hallazgo caro del día, que NO es matemático
+>
+> Al ir a **proyectar** se midió que, de los **34** módulos de FOL, sólo **7** estaban en
+> `../FOL/REFERENCE.md` §6 y **27 NO** — y **cuatro** de las entradas que sí había nombran módulos
+> que **ya no existen**. ⛔ La causa no es el olvido: el bloque `[C]` de `check-doc-sync.bash`
+> **sólo miraba los módulos de RPP**; los de FOL **no los miraba nadie**. Van **siete** causas
+> medidas de «control que da verde sin comprobar».
+>
+> ⚠️⚠️ Y la **octava es mía, de hoy**: la primera versión del control nuevo casaba con
+> `grep -F "$m.lean"` y **absolvía por subcadena y por basename** — `Theorems/Eq.lean` daba verde
+> porque `"Eq.lean"` está dentro de `"DecEq.lean"`, y una sola entrada `Deduction.lean` cubría los
+> **dos** ficheros con ese nombre. Endurecido a **ruta + frontera de palabra**, cazó los dos.
+> 🔑 *Un control que casa por subcadena no comprueba: **absuelve**.*
+>
+> ⭐ Y lo que la proyección destapó no era sólo documentación: **`Theorems/Eq.lean` es el módulo de
+> conmutaciones De Bruijn del repo** y estaba sin proyectar — por eso `Hauptsatz0` tuvo que
+> **medir dos veces** qué mitad de la familia faltaba. *Un módulo sin proyectar se vuelve a
+> construir* — y van **seis**. Además: `Theorems/Deduction.lean` es **duplicado literal** de
+> `FOL/Deduction.lean`, y ⬜ hay **tres huérfanos** (`Classical`, `Tactics2`,
+> `Theorems/Deduction`) que **no importa nadie** — retirarlos pide ADR propio, no se hizo.
+>
+> ▶ **SIGUIENTE**: ⬜ **la inducción doble** de `CutAdm` (~400–600 l., **riesgo alto**) — grado de
+> la fórmula de corte × suma de alturas. Es la única pieza viva de H3.
+> ⬜ Y detrás, el paso 4 del propietario: `String → List Char` con `Sugerencias.md` (plan §7.3/§7.4).
 
 
 > # 🗓️ 2026‑09‑16 — 🏁🏁 **H3 SE QUEDA CON UNA SOLA DEUDA** (paso 2 del propietario)
