@@ -4445,3 +4445,67 @@ dos dualidades ∃/¬ y la distribucion ∀/∧). Las ocho se han escrito **desd
 `check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry** · ✅ CI.
 
 **Vease tambien:** `FOL/Prenex0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.7, ADR-056.
+
+---
+
+## ADR-058: La FORMA NORMAL prenexa — y la «medida de terminación» que no hacia falta
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: segunda mitad de la capa prenexa (ADR-057 §4). `FOL/PrenexNF0.lean`, 240 l.
+
+    prenex              : Formula → Formula
+    derives0_prenex_iff : (Γ ⊢₀ φ) ↔ (Γ ⊢₀ prenex φ)
+
+📏 `[propext, Quot.sound]`. **Ni un `Classical.choice`** (`iffAll_trans`, sin ningun axioma).
+
+### 1 · ⭐⭐ La TERMINACION no hacia falta, y era lo que se daba por caro
+
+ADR-057 §4 estimo esta pieza en «~200 l., riesgo **medio**: lo caro es la **medida de
+terminacion**». **Refutado por el compilador**: las seis definiciones las acepta Lean por
+**recursion estructural**, sin `termination_by` ni `decreasing_by`.
+
+🔑 La razon es una y vale para toda la familia: **se recurre sobre UN argumento y se LEVANTA el
+otro**.
+
+    mergeAnd (∀A') B = ∀ (mergeAnd A' (liftFormula 0 B))
+
+decrece en el primero, y que el segundo cambie da igual: **no es el argumento de la recursion**.
+*Cuando la recursion y la transformacion van por argumentos distintos, no hay nada que medir.*
+
+⚠️ Y es la **tercera estimacion mia refutada en dos dias**: ADR-052 §1 (el dividendo de `struct`),
+ADR-057 §4 (el «port» de la capa prenexa) y esta. Las tres en la misma direccion — **estimar el
+coste por la forma del enunciado y no por la del ARBOL**.
+
+### 2 · ⭐ Dos fases por conectiva, y por eso son estructurales
+
+Sacar los cuantificadores de `A ∧ B` son dos pasadas: primero los de `A` (recurriendo en `A`), y
+cuando `A` ya no tiene prefijo, los de `B` (recurriendo en `B`). De ahi el par
+`mergeAnd`/`mergeAndR`, y sus gemelos para `∨` y `→`.
+⚠️ **A la izquierda de `→` el cuantificador SE DA LA VUELTA**: `mergeImpl (∀A') B = ∃(…)`. Es la
+unica asimetria de las seis, y viene de la equivalencia 5 de ADR-057.
+
+### 3 · ⭐ Las congruencias no se escribieron: se ENVOLVIERON
+
+`FOL.Derives1` ya tenia las ocho congruencias — y con la hipotesis **esquematica en el contexto**
+(`∀ Δ, Δ ⊢₁ …`), que es justo lo que hace falta para meterlas bajo un binder, donde el contexto
+llega levantado. ⇒ **dos lineas de envoltorio cada una** via `derives0_iff_derives1`, en vez de
+noventa de reescritura.
+🔑 *Antes de construir, buscar* — van **ocho**. Y esta vez lo que se encontro no fue solo el lema:
+fue que **estaba enunciado en la forma que hacia falta**, que es lo que de verdad ahorro el trabajo.
+
+⚠️ Las cuatro versiones «por la derecha» (`and_forall_r`, …) tampoco se escribieron: salen de las
+de ADR-057 mas conmutatividad, en seis lineas cada una.
+
+### 4 · ⬜ Lo que falta, y es el puente a la skolemizacion
+
+⬜ `Prenex (prenex f)` — que la salida **este** de verdad en forma prenexa. El teorema de correccion
+(que es lo que se pidio) no lo necesita, pero **la skolemizacion si**: sin el no se sabe donde
+poner los simbolos de Skolem. Estimado ~70 l., riesgo bajo: `quantFree_lift`, `prenex_lift` y dos
+inducciones sobre las fusiones.
+⚠️ Etiquetado ESTIMADO, que es lo que este ADR acaba de aprender a hacer.
+
+**Controles:** RPP **145 jobs** · FOL **48 jobs** · `check-footprints` **116** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Vease tambien:** `FOL/PrenexNF0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.8, ADR-057.

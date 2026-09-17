@@ -1035,6 +1035,27 @@ otra, y hay que medirla.*
 
 ---
 
+### 6.8 · 🏁 La FORMA NORMAL prenexa — 2026‑09‑17, ADR‑058
+
+`../FOL/FOL/PrenexNF0.lean`, 240 l.: `prenex : Formula → Formula` y
+**`derives0_prenex_iff : (Γ ⊢₀ φ) ↔ (Γ ⊢₀ prenex φ)`**. 📏 `[propext, Quot.sound]`.
+
+⭐⭐ **La terminación no hacía falta.** §6.7 la dio por «lo caro». Las seis fusiones las acepta Lean
+por **recursión estructural**: se recurre sobre **un** argumento y se **levanta** el otro, así que
+el que cambia no es el de la recursión. 🔑 *Cuando la recursión y la transformación van por
+argumentos distintos, no hay nada que medir.*
+
+⚠️ Tercera estimación mía refutada en dos días (§5.11, §6.7 y ésta), y las tres en la misma
+dirección: **estimar por la forma del enunciado y no por la del árbol**.
+
+⭐ Las congruencias no se escribieron: `FOL.Derives1` ya las tenía, y **enunciadas en la forma que
+hacía falta** (esquemáticas en el contexto). Dos líneas de envoltorio cada una.
+
+⬜ Falta `Prenex (prenex f)` — que la salida esté de verdad en forma prenexa. La corrección no lo
+necesita; **la skolemización sí**. ~70 l., riesgo bajo. ⚠️ ESTIMADO.
+
+---
+
 ## 7 · ⛔ El muro constructivo, medido el 2026‑09‑14: **`String`**
 
 Si en algún momento se quiere ir más allá de «reducible» hacia «constructivo», el obstáculo **no
