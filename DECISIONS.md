@@ -3991,3 +3991,87 @@ entera del otro lado y la propia fórmula de corte**. ⇒ hizo falta
 
 **Véase también:** `FOL/Hauptsatz0.lean` §7-§8, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.11,
 ADR-050, ADR-051, ADR-049, ADR-043.
+
+---
+
+## ADR-053: La consistencia de `Derives₀` SIN `Classical.choice` — y la no-constructividad estaba en el TIPO DE LLEGADA
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: el Hauptsatz (ADR-052) se pagó por su valor logico. Esta ADR cobra el **dividendo
+finitista**, que es la razon por la que un plan finitista lo queria. `FOL/Finitary0.lean`, 190 l.
+
+| teorema | ruta | footprint |
+|---|---|---|
+| `derives0_consistent` (ADR-034) | semantica: `derives0_soundness` + el modelo `Mtrue` | `[propext, **Classical.choice**, Quot.sound]` |
+| ⭐⭐ `derives0_consistent_fin` | **sintactica**: `ndToLK` + `cut_elimination` + `lk0_tval` | **`[propext, Quot.sound]`** |
+
+**Mismo enunciado, footprint estrictamente menor.** Es el patron de ADR-042 (`A ∨ ¬A` y Peirce,
+demostrados por completitud y por Kalmar): *la via H da lo mismo con menos supuestos*.
+
+### 1 · ⚠️ De donde venia el `Classical.choice`, MEDIDO — y NO era del modelo
+
+La sospecha natural (y la que un agente lateral formulo) es que el coste viene de «la semantica».
+**Falso, y se mide en dos minutos**: `derives0_consistent` **ya** usaba un modelo de UN PUNTO
+(`Mtrue : Model Unit`, `FOL/Soundness0.lean:204`). El `Classical.choice` sale de **cuatro
+`Classical.byContradiction`** en la prueba de `derives0_soundness` (`FOL/Soundness0.lean:172-182`),
+y estan ahi porque `eval` devuelve **`Prop`** y la semantica de Tarski es clasica.
+
+🔑 *El modelo era finitario; la SOLIDEZ no.* ⚠️ Y el docstring del propio modulo ya lo decia
+(«los unicos que necesitan logica clasica en el metanivel»): estaba escrito y nadie lo habia leido
+como una **oportunidad**.
+
+### 2 · ⭐ La salida: evaluar a `Bool`, no a `Prop`
+
+    tval (a : Bool) : Formula → Bool
+      | ⊥ => false | atom => a | eq => true
+      | impl f g => (!tval a f) || tval a g | and => && | or => ||
+      | forall f => tval a f | ex f => tval a f
+
+Es el modelo de un punto **calculado**: dominio de un elemento ⇒ los cuantificadores desaparecen, y
+`tval` no mira los terminos ⇒ ignora `lift` y `subst` (`tval_lift`, `tval_subst`, dos inducciones de
+diez lineas).
+
+⭐⭐ **Y por eso no hace falta el tercio excluido.** El caso `implR` de la solidez dice «o vale
+`A ⇒ B`, o vale algo de `Δ`». Sobre `Prop` eso exige `em`. Sobre `Bool` es `cases h : tval a A`.
+🔑 **La no-constructividad no estaba en la matematica: estaba en el TIPO DE LLEGADA del evaluador.**
+Es una leccion generalizable: antes de aceptar un `Classical.choice` «porque la semantica es
+clasica», mirar si el modelo concreto que se usa admite una version decidible.
+
+### 3 · ⭐ La regla `eqAx` no cuesta nada aqui
+
+`tval_eqInstance` **no depende de ningun axioma**: los cinco axiomas de la igualdad
+(`eqReflAx`, `eqSymmAx`, `eqTransAx`, `eqFuncAx`, `eqAtomAx`) son `eq`- o `impl`-shaped y salen por
+`rfl`. ⚠️ Salvo `eqAtomAx`, que da `!a || a` y necesita `cases a` — no es `rfl` con `a` variable, y
+fue el UNICO error de compilacion del modulo.
+
+⇒ el theory-cut de ADR-049, que fue lo que desbloqueo `NDtoLK`, **sigue sin encarecer nada**, que
+era la condicion que ADR-049 §aviso se impuso a si misma. *Una regla nueva solo vale si no encarece
+lo de detras — y se comprueba cada vez que se usa, no una sola vez.*
+
+### 4 · ⭐⭐ Donde paga el Hauptsatz, exactamente — y donde NO
+
+⚠️ **NO en `lk0_tval`**: `LK₀` ya era cut-free (el calculo con corte es `LKc`), asi que la solidez
+booleana no necesita el Hauptsatz para nada. Corrige una afirmacion que circulaba.
+
+Paga en **un solo sitio**: el puente desde la deduccion natural. `ndToLK` produce `LKc` —**con**
+corte— y `cut_elimination` es lo unico que lleva de ahi a `LK₀`:
+
+    Derives₀ [] ⊥  →  Derives₂ [] ⊥  →  LKc [] [⊥]  →  LK₀ [] [⊥]  →  False
+                (derives0_iff_derives2)  (ndToLK)  (cut_elimination)  (lk0_tval)
+
+### 5 · Decision
+
+1. ✅ Modulo nuevo `FOL/Finitary0.lean` (no dentro de `Hauptsatz0.lean`: es otro teorema, y aquel ya
+   tiene 1 023 l. y un solo trabajo). Entra en el barril `FOL.lean`.
+2. ✅ `check-footprints.bash`: **96 → 100** titulares.
+3. ⬜ **No se retira `derives0_consistent`**: se queda, y documenta la otra ruta y su precio.
+   *Cuando un enunciado se re-demuestra mas barato, el caro no estorba: mide el precio de la via.*
+4. ⬜ Queda abierto si `lk0_not_empty` (`FOL/SequentSound0.lean`, hoy con `Classical.choice`) debe
+   re-enunciarse sobre `lk0_empty`. No se toca aqui para no mover un modulo ya medido.
+
+**Controles:** RPP **145 jobs** · FOL **43 jobs** · `check-footprints` **100** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Vease tambien:** `FOL/Finitary0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.12, ADR-052,
+ADR-042, ADR-034, ADR-049.

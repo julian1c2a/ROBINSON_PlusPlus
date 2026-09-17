@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-14 · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-09-17 18:40 · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -25,7 +25,23 @@
 > localizado en **una línea** —el `if IsConsistent₀ (Sₙ ∪ {φₙ})` de `FOL.Lindenbaum0`, Π⁰₁— y es
 > exactamente el WKL. Ver §6.3.
 >
-> ⬜ **Queda la vía H** (Herbrand / disyunción finita), §5 — que es el contenido **finitario**.
+> # 🏁🏁🏁 **VÍA H CERRADA — 2026‑09‑17** (ADR‑050, ADR‑051, ADR‑052)
+>
+> ```
+> hauptsatz : CutAdm                                       -- el corte es ADMISIBLE en LK₀
+> herbrand  : ([] ⊢₀ ∃φ) ↔ ∃ ts E, HerbrandCert φ ts E      -- Herbrand, ya INCONDICIONAL
+> ```
+>
+> `FOL/Hauptsatz0.lean`, footprint `[propext, Quot.sound]`: **ni un `Classical.choice`, ni un axioma
+> del proyecto**. ⇒ **los DOS objetivos de este plan están cerrados**, y los cuatro hitos de §5.2
+> con ellos. Ver §5.11.
+>
+> ⭐ **Y el dividendo que justifica el precio**: `derives0_consistent_fin`, la consistencia de
+> `Derives₀` por la vía **sintáctica** (`ndToLK` + `cut_elimination` + evaluación booleana en el
+> modelo de un punto), footprint `[propext, Quot.sound]`. **El mismo enunciado que
+> `derives0_consistent`, sin `Classical.choice`.** Ver §5.12.
+>
+> ⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.
 >
 > ## Los dos objetivos, decididos
 >
@@ -675,6 +691,49 @@ lección que el Barendregt de §5.10 — **generalizar es lo que cierra**.
   sobre `Derives₂`. **M‑11 y ADR‑032, intactos.**
 * **No dice nada sobre `axioms ⊢`**: ese cálculo es sintácticamente completo (ADR‑024).
 * El atajo semántico **seguía sin existir**, como §5.9 dejó escrito. Se pagó sintácticamente.
+
+---
+
+### 5.12 · 🏁 EL DIVIDENDO: la consistencia de `Derives₀` **sin `Classical.choice`** — ADR‑053
+
+`../FOL/FOL/Finitary0.lean`. **El mismo enunciado, footprint estrictamente menor:**
+
+| teorema | ruta | footprint |
+|---|---|---|
+| `derives0_consistent` (§4, ADR‑034) | semántica: `derives0_soundness` + el modelo `Mtrue` | `[propext, **Classical.choice**, Quot.sound]` |
+| ⭐⭐ `derives0_consistent_fin` | **sintáctica**: `ndToLK` + `cut_elimination` + `lk0_tval` | **`[propext, Quot.sound]`** |
+
+🔑 Es el mismo patrón que `derives0_em`/`derives0_peirce` (§5.4), demostrados dos veces —por
+completitud y por Kalmár— con footprint estrictamente menor por la vía H.
+*Mismo enunciado, menos supuestos.* Y es lo que un plan finitista debería querer por encima de todo.
+
+#### ⚠️ De dónde venía el `Classical.choice`, MEDIDO — y NO era del modelo
+
+`derives0_consistent` **ya** usaba un modelo de un punto (`Mtrue : Model Unit`,
+`../FOL/FOL/Soundness0.lean`). El coste venía de `derives0_soundness`, cuya prueba usa **cuatro
+`Classical.byContradiction`** (`Soundness0.lean:172‑182): `eval` devuelve `Prop` y la semántica de
+Tarski es clásica. 🔑 *El modelo era finitario; la SOLIDEZ no.*
+
+#### ⭐ La salida: evaluar a `Bool`, no a `Prop`
+
+`tval a : Formula → Bool` — el modelo de un punto **calculado**: `⊥ ↦ false`, igualdades `↦ true`,
+átomos `↦ a`, y los cuantificadores **desaparecen** (dominio de un elemento). Entonces el caso
+`implR` —«o vale `A ⇒ B`, o vale algo de `Δ`»— se resuelve con `cases h : tval a A`, análisis de
+casos sobre un `Bool`. **La misma disyunción, sobre `Prop`, exige `em`.**
+🔑 *La no‑constructividad no estaba en la matemática: estaba en el TIPO DE LLEGADA del evaluador.*
+
+⭐ Y `tval_eqInstance` **no depende de ningún axioma**: los cinco axiomas de la igualdad son `eq`‑ o
+`impl`‑shaped ⇒ la regla `eqAx` (el theory‑cut de §5.8) **no cuesta nada aquí**.
+
+#### ⭐⭐ Dónde paga el Hauptsatz, exactamente
+
+⚠️ **No en `lk0_tval`**: `LK₀` ya era cut‑free. Paga en el puente desde la deducción natural —
+`ndToLK` produce `LKc`, **con** corte, y `cut_elimination` es lo único que lleva de ahí a `LK₀`:
+
+    Derives₀ [] ⊥  →  Derives₂ [] ⊥  →  LKc [] [⊥]  →  LK₀ [] [⊥]  →  False
+                (derives0_iff_derives2)  (ndToLK)  (cut_elimination)  (lk0_tval)
+
+⬜ **Lo que NO se retira**: `derives0_consistent` se queda. Documenta la otra ruta y su precio.
 
 ---
 
