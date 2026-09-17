@@ -933,6 +933,32 @@ aparece ya en tres módulos del ensamblaje por **tres causas distintas**:
 
 ---
 
+### 6.5 · 🏁 COMPACIDAD y LÖWENHEIM–SKOLEM DESCENDENTE — 2026‑09‑17, ADR‑054
+
+`../FOL/FOL/Compacity0.lean`, 60 l. de código:
+
+    compactness₀           : IsSatisfiable S ↔ (todo subconjunto FINITO de S es satisfacible)
+    loewenheim_skolem_down : IsSatisfiable S → IsSatisfiableCountable S
+
+📏 `[propext, Classical.choice, Quot.sound]` — el `Classical.choice` es el **WKL** de §6.3, vía
+`completeness₀`. **No se añade fuerza nueva.** ⛔ Es vía W, no vía H: **no es finitario**.
+
+⭐ **Repara** el `compactness_theorem` que `cuarentena/README.md:90` declara **VACUO** («su prueba
+pasaba por `soundness`»). Mismo teorema, **sujeto** cambiado. De los tres módulos apartados, el
+único cuyo defecto queda reparado fuera.
+
+⭐⭐ Y la mitad difícil no hubo que demostrarla: `DerivesSet₀` (`Henkin0.lean:82`) pide un contexto
+**finito por construcción** ⇒ *la compacidad sintáctica estaba metida en la definición*.
+
+⭐ LS descendente: la obstrucción era el **enunciado**, no la prueba — sin Mathlib no hay
+`Countable`, y hubo que escribir `CountableDom D := ∃ e : Nat → D, ∀ d, ∃ n, e n = d`.
+🔑 *El modelo que la completitud construye ya era numerable; faltaba poder decirlo.*
+⚠️ Con un coste que el enunciado obliga: `IsSatisfiable` esconde el dominio bajo un `∃`, luego la
+numerabilidad **no se añade a posteriori** — hay que rehacer `model_existence_lemma₀` con ella
+dentro. *Un `∃` que oculta un dato impide añadirle propiedades después.*
+
+---
+
 ## 7 · ⛔ El muro constructivo, medido el 2026‑09‑14: **`String`**
 
 Si en algún momento se quiere ir más allá de «reducible» hacia «constructivo», el obstáculo **no

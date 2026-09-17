@@ -4113,3 +4113,82 @@ modulo ya medido, pero **es deuda escrita**.
 
 **Vease tambien:** `FOL/Finitary0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.12, ADR-052,
 ADR-042, ADR-034, ADR-049.
+
+---
+
+## ADR-054: COMPACIDAD y LOEWENHEIM-SKOLEM DESCENDENTE — el patron del SUJETO, cobrado dos veces
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: cerradas las dos vias del plan (ADR-041 y ADR-052), se ataca el catalogo clasico.
+Los dos candidatos que un barrido de 18 agentes midio como SIN OBSTRUCCION.
+`FOL/Compacity0.lean`, 60 l. de codigo.
+
+    compactness₀           : IsSatisfiable S ↔ (todo subconjunto FINITO de S es satisfacible)
+    loewenheim_skolem_down : IsSatisfiable S → IsSatisfiableCountable S
+
+📏 `[propext, Classical.choice, Quot.sound]`. ⚠️ El `Classical.choice` es el de siempre y **esta
+explicado**: viene de `completeness₀` via `model_existence_lemma₀`, y es el `if IsConsistent₀`
+Π⁰₁ de `FOL.Lindenbaum0` — el **WKL** (ADR-041, plan §6.3). **No se anade fuerza nueva.**
+⛔ Esto es via W, no via H: al reves que `FOL.Finitary0` (ADR-053), NO es finitario, y hay que
+decirlo cada vez.
+
+### 1 · ⭐ Lo que esto REPARA, y no es adorno
+
+`cuarentena/Compacity.lean` esta apartado desde el 2026-09-11 y su `compactness_theorem` esta
+declarado **VACUO** —con esa palabra— en `cuarentena/README.md:90` y en `FOL.lean:89`: *«su prueba
+pasaba por `soundness`»*, y la solidez de `Derives` es FALSA (M-11).
+⇒ `compactness₀` es **el mismo teorema con el SUJETO cambiado**: la prueba de la cuarentena
+(13 lineas) se transplanta verbatim cambiando `soundness`→`derives0_soundness` y
+`model_existence_lemma`→`model_existence_lemma₀`.
+
+⭐ De los TRES modulos apartados, este es el **unico** cuyo defecto queda reparado fuera: el de
+`Soundness.lean` es un enunciado **FALSO**, no una prueba mala. Anotado en `cuarentena/README.md`.
+🔑 *Cuando un teorema cae, su prueba suele estar bien — lo que cambia es el SUJETO.* Van **tres**
+(los 18 casos de solidez rescatados en ADR-034, `Derives₀` entero, y esto).
+
+### 2 · ⭐⭐ La compacidad SINTACTICA ya estaba metida en la definicion
+
+`DerivesSet₀ S f := ∃ Γ : List Formula, (∀ g ∈ Γ, S g) ∧ (Γ ⊢₀ f)` (`FOL/Henkin0.lean:82`): la
+derivabilidad desde un CONJUNTO pide un contexto **finito por construccion**.
+⇒ la mitad que en los libros es el trabajo —«toda derivacion usa finitas hipotesis»— **no hay que
+demostrarla: esta en el tipo**. Lo unico que queda es cruzar solidez con existencia de modelo, y
+son dos `obtain`.
+
+⚠️ Esto ya estaba escrito en el repo y ya habia pagado cuatro veces; lo que faltaba era **usarlo
+aqui**. Es la misma clase de hallazgo que ADR-053 §6: *estaba escrito y no se leyo como una
+oportunidad.*
+
+### 3 · ⭐ Loewenheim-Skolem descendente: la obstruccion era el ENUNCIADO
+
+Sin Mathlib no hay `Cardinal` ni `Countable`, y el barrido midio **cero** predicados de
+numerabilidad en el arbol. Aqui se dice con lo unico que hay:
+
+    CountableDom D := ∃ e : Nat → D, ∀ d, ∃ n, e n = d
+
+Y entonces la prueba es **componer dos cosas que ya existian**: el dominio del modelo canonico es
+`QuotientDomain T hMax = Quotient (termSetoid T hMax)` (`FOL/Canonical0.lean:247`) y
+`natToTerm_surj` enumera los terminos ⇒ `Quotient.mk ∘ natToTerm` enumera el dominio.
+🔑 **El modelo que la completitud construye YA ERA numerable; lo que faltaba era poder decirlo.**
+
+⚠️ Con un detalle que NO es gratis y que conviene registrar: `IsSatisfiable` esconde el dominio bajo
+un `∃`, luego la numerabilidad **no se puede anadir a posteriori**. Hay que rehacer
+`model_existence_lemma₀` llevandola dentro (`model_existence_countable₀`) y con ella
+`satisfiable_of_shift` (`countable_of_shift`). Ocho lineas, pero el ENUNCIADO las obliga.
+🔑 *Un `∃` que oculta un dato impide anadirle propiedades despues: o viaja dentro, o se rehace.*
+
+### 4 · ⬜ Lo que NO se hace, y por que
+
+Del barrido de candidatos quedan fuera tres, y por razones medidas, no por opinion:
+
+| | por que |
+|---|---|
+| **D** propiedad de la subformula | ⛔ el enunciado LITERAL es **falso**: `LK₀.eqAx` (`Sequent0.lean:125`) mete `g` en la premisa sin que aparezca abajo. La version correcta lleva «o subformula de una `EqInstance`», y choca ademas con el muro de `Prop` (haria falta un `LK` indexado por el conjunto de formulas, como `LKh` lo esta por la altura) |
+| **G** conservatividad de los 107 | ⛔ **falso**: el arbol tiene su propio contraejemplo COMPILADO — `ax_tc_cons` vivia en `codingAxioms` y daba `axioms ⊢ falso` (M-2). Un metateorema general que los descargase «de golpe» habria demostrado algo falso |
+| **I** teorema de Church | ⛔ **no enunciable**: `Not (DecidablePred …)` ni siquiera tipa, y escrito bien es **refutable** por `Classical.propDecidable`. ⬜ Queda un sustituto honesto (~15 l.) via Godel II, sin decidir |
+
+**Controles:** RPP **145 jobs** · FOL **44 jobs** · `check-footprints` **104** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Vease tambien:** `FOL/Compacity0.lean`, `FOL/cuarentena/README.md`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §6.5, ADR-041, ADR-034, ADR-053.
