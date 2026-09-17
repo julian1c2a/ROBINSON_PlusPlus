@@ -4192,3 +4192,102 @@ Del barrido de candidatos quedan fuera tres, y por razones medidas, no por opini
 
 **Vease tambien:** `FOL/Compacity0.lean`, `FOL/cuarentena/README.md`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.5, ADR-041, ADR-034, ADR-053.
+
+---
+
+## ADR-055: Herbrand para un BLOQUE de existenciales — la mitad ⟸ pagada, la ⟹ enunciada; y lo MEDIDO sobre LS ascendente
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: el enunciado-titular de la via H (plan §5.1) lleva **barras de tupla**:
+`⊢₀ ∃x̄ φ(x̄) ⟺ ∃ t̄₁…t̄ₙ : ⊢ᵖʳᵒᵖ φ(t̄₁) ∨ … ∨ φ(t̄ₙ)`. Lo que ADR-052 entrego es el caso **n = 1**.
+`FOL/HerbrandBlock0.lean`, 120 l. de codigo.
+
+    derives0_exBlock_of_cert : HerbrandCertBlock n φ tss E → [] ⊢₀ exBlock n φ   -- ⟸, PAGADA
+    HerbrandExtractionBlock  : Prop                                              -- ⟹, ENUNCIADA
+    herbrand_block_iff       : HerbrandExtractionBlock → (⊢₀ exBlock n φ ↔ ∃ tss E, cert)
+
+📏 `[propext, Quot.sound]`. **Ni un `Classical.choice`** — como toda la via H.
+⭐ Y la ⟸ es **incondicional y sin el Hauptsatz**: es `intro_ex` n veces bajo `elim_or`.
+
+### 1 · ⭐ Por que se paga la mitad barata PRIMERO, y no es pereza
+
+Es el metodo que el propio proyecto tiene fichado y que ADR-043 ya siguio con n = 1: *primero el
+consumidor, despues el molde*. La guarda del certificado —`∀ ts ∈ tss, ts.length = n`— **sale del
+consumidor**, no se inventa; escribir antes el `abbrev` habria producido una deuda demasiado
+guardada, que es el fallo que `feedback-enunciar-una-deuda` documenta.
+
+⬜ Y `HerbrandExtractionBlock` se **enuncia** como `Prop`, nunca se postula.
+
+### 2 · ⭐ La pieza de riesgo, y una leccion de ENUNCIADO que vale para todo el repo
+
+Todo el modulo cuelga de poder sustituir **a traves** del bloque:
+
+    substFormula k t (exBlock n φ) = exBlock n (substFormula (n + k) (liftN n t) φ)
+
+⚠️ Escrito `k + n`, el caso `k = 0` obliga a reescribir con `Nat.zero_add` **en cada uso**, porque
+`0 + n` NO es `n` por definicion (`Nat.add` recurre en el segundo argumento). Escrito `n + k`,
+`n + 0` **si** reduce y el consumidor no paga nada.
+
+🔑 *El orden de una suma en un enunciado no es cosmetico: decide si el consumidor reescribe o no.*
+Es el primo del §14 de las trampas de notacion («el INDICE de nivel no es cosmetico»).
+⚠️ MEDIDO: fue el unico error de compilacion del modulo, y con el orden bueno desaparecio.
+
+### 3 · ⬜ La mitad ⟹: por que NO sale por composicion, y cuanto cuesta
+
+⛔ **No sale de `herbrand` (n = 1)**: el cuerpo de un bloque de altura ≥ 2 **no es** una formula sin
+cuantificadores, luego la hipotesis `QuantFree` de `herbrand` no se cumple. No es que sea dificil:
+no aplica.
+
+⚠️ Lo que haria falta, MEDIDO leyendo `FOL.Sequent0.lk0_herbrand`: **rehacer su induccion de 14
+casos con un invariante mas rico**. Hoy el invariante es «todo `d ∈ Δ` es sin cuantificadores **o**
+es exactamente `Formula.ex φ`» (`Sequent0.lean:203`) y la salida lleva `ts : List Term`.
+⭐ La buena noticia, y esta comprobada: el caso `exR` baja de `exBlock (m+1) ψ` a `exBlock m ψ'` con
+`ψ'` sin cuantificadores (`quantFree_instB`), luego **el invariante SI se cierra**. La mala: hay que
+llevar ademas la **tupla parcial** acumulada y la salida pasa a `List (List Term)`.
+⇒ **~350-450 l., riesgo alto**. No es la envoltura que la estimacion inicial (~250 l.) sugeria.
+
+### 4 · ⚠️ Y de paso, lo MEDIDO sobre Loewenheim-Skolem ASCENDENTE y Lindstroem
+
+Un barrido de 8 agentes los midio, pero **sus ocho refutadores murieron por limite de gasto** ⇒ sus
+informes NO son medicion. Lo que sigue lo he verificado yo, y solo esto:
+
+| afirmacion | veredicto |
+|---|---|
+| los simbolos son `String` (`FOL/FOL.lean:10-24`) | ✅ **medido** |
+| `natToTerm_surj` (`Enumeration.lean:268`) **refuta** que haya κ terminos distintos para κ no numerable | ✅ **medido** — no es una limitacion pendiente de comprobar: hay un TEOREMA compilado |
+| toda la maquinaria de Henkin es una ω-cadena: `cst : Nat → String` (`Fresh0.lean:91`), `LindenbaumStep : Nat → …` (`Lindenbaum0.lean:130`), `hen`/`hidx` (`HenkinLimit0.lean:221`/`:193`) | ✅ **medido** |
+| `Model D` **no tiene signatura**: `func : String → List D → D`, `rel : String → List D → Prop` (`Semantics.lean:23-25`) | ✅ **medido** |
+| `pullback` renombra **solo** simbolos de funcion (`Canonical0.lean:472`) — un informe decia «todos» | ✅ **medido**, el informe era falso |
+| en el nucleo NO hay `Zorn`, `zorn_le`, `Cardinal`, `Ultrafilter`, `Filter`, `WellOrderingTheorem`, `Set`, `Finset` | ✅ **medido POR EL COMPILADOR** (`#check` ⇒ unknown identifier) |
+| SI hay `Classical.choice`, `Classical.em`, `Classical.propDecidable`, `WellFounded.fix`, `Quotient.exists_rep`, **`Function.Injective`** y **`Function.Surjective`** | ✅ **medido POR EL COMPILADOR** |
+
+⇒ **Consecuencias, y la primera cambia el ORDEN del plan:**
+
+1. ⛔⛔ **`List Char` NO sirve para LS ascendente**, ni `Nat`: los dos son numerables. Y el requisito
+   que el plan escribe en §7.2 es literalmente «**infinito numerable**» (linea 1007) — que es
+   **incompatible** con LS ascendente para κ arbitrario. ⇒ si LS ascendente entra en la hoja de
+   ruta, la migracion tiene que ir a un **parametro** `S`, no a un tipo numerable concreto, o se
+   hace **dos veces**. 🔑 *Una decision de firma tomada sin mirar al consumidor de mas adelante se
+   paga dos veces* — es «primero el consumidor, despues el molde», a escala de repo.
+   📐 Tamano de parametrizar: **163 modulos / 3 902 declaraciones** (FOL 42/545, RPP 121/3 357),
+   MEDIDO. Comparable al enhebrado de `AnclaEq` (~440 firmas), pero un orden mayor.
+2. ⭐ **El ENUNCIADO de LS ascendente si es expresable**: `Model D` toma un `Type` arbitrario y
+   `Function.Injective` existe ⇒ «modelo de cardinalidad ≥ |I|» se dice sin Mathlib. Lo bloqueado
+   es la **ruta de prueba**, no el enunciado. (Esto corrige la lectura pesimista habitual.)
+3. ⛔ La ruta estandar (κ constantes nuevas + compacidad) exige **Lindenbaum transfinito** ⇒ Zorn,
+   que **no esta** y habria que construirlo desde `Classical.choice`. La alternativa por
+   ultraproductos exige el **lema del ultrafiltro**, que tambien es Zorn.
+   ⚠️ Y hay que decir lo que eso le hace a la narrativa: hoy el proyecto publica que la no-finitud
+   esta **localizada en una linea Π⁰₁ que es el WKL** (plan §6.3). Zorn es MUCHISIMO mas fuerte.
+   No cambia el footprint de Lean —`Classical.choice` ya esta—, cambia la **lectura de reversa
+   matematica**, y esa frase del plan habria que reescribirla. Es justo la distincion de
+   «el FOOTPRINT no es CONSTRUCTIVIDAD».
+
+⬜ **Nada de esto decide**. Queda escrito para que la decision se tome con cifras.
+
+**Controles:** RPP **145 jobs** · FOL **45 jobs** · `check-footprints` **107** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Vease tambien:** `FOL/HerbrandBlock0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.13 y §7.5,
+ADR-052, ADR-043, ADR-054.

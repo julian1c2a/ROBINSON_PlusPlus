@@ -118,6 +118,9 @@ FOL.Finitary0.lkc_empty|Quot.sound,propext
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.Compacity0.compactness₀|Classical.choice,Quot.sound,propext
 FOL.Compacity0.loewenheim_skolem_down|Classical.choice,Quot.sound,propext
+FOL.HerbrandBlock0.subst_exBlock|Quot.sound,propext
+FOL.HerbrandBlock0.derives0_exBlock_of_cert|Quot.sound,propext
+FOL.HerbrandBlock0.ex_bloque_igualdad|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

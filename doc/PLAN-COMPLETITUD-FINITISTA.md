@@ -751,6 +751,32 @@ sustituyen net‑0, y son **más fuertes**.
 
 ---
 
+### 5.13 · 🔶 Herbrand para un BLOQUE de existenciales — 2026‑09‑17, ADR‑055
+
+⚠️ §5.1 promete el titular **con barras de tupla**: `⊢₀ ∃x̄ φ(x̄) ⟺ ∃ t̄₁…t̄ₙ : ⊢ᵖʳᵒᵖ …`.
+Lo que §5.11 entregó es el caso **n = 1**. Aquí van las tuplas — la mitad que se puede pagar hoy:
+
+    derives0_exBlock_of_cert : HerbrandCertBlock n φ tss E → [] ⊢₀ exBlock n φ   -- ⟸ PAGADA
+    HerbrandExtractionBlock  : Prop                                              -- ⟹ ENUNCIADA
+    herbrand_block_iff       : la deuda con su CONSUMIDOR delante
+
+`../FOL/FOL/HerbrandBlock0.lean`, 120 l. 📏 `[propext, Quot.sound]`, ni un `Classical.choice`.
+⭐ Y la ⟸ es **incondicional y sin el Hauptsatz**: `intro_ex` n veces bajo `elim_or`.
+
+⭐ **La pieza de riesgo y su lección**: todo cuelga de `subst_exBlock`, y el índice va `n + k` y no
+`k + n` **a propósito** — con `k + n`, el caso `k = 0` obliga a reescribir con `Nat.zero_add` en
+cada uso, porque `0 + n` no es `n` por definición. 🔑 *El orden de una suma en un enunciado no es
+cosmético: decide si el consumidor reescribe o no.*
+
+⬜ **La mitad ⟹ NO sale por composición** —el cuerpo de un bloque de altura ≥ 2 no es sin
+cuantificadores, luego `herbrand` no aplica—: hay que **rehacer la inducción de 14 casos de
+`lk0_herbrand` con un invariante más rico**. ⭐ Está comprobado que el invariante **se cierra**
+(`exR` baja de `exBlock (m+1) ψ` a `exBlock m ψ'` con `ψ'` sin cuantificadores), pero hay que
+llevar la tupla parcial y la salida pasa a `List (List Term)`. **~350–450 l., riesgo alto** — no
+las ~250 estimadas.
+
+---
+
 ### 5.3 · ⚠️ Y lo que cuesta la IGUALDAD, que aquí sí cuesta
 
 Sin `=`, la disyunción de Herbrand termina en **tautología proposicional**. Con `=`, termina en
@@ -976,6 +1002,52 @@ núcleo.** `strCode` es computable y constructiva.
 ⬜ **Si se quisiera de verdad**: cambiar `Term.func : String → List Term → Term` por un tipo de
 símbolos **numerable y con `DecidableEq` real**. Limpiaría también las 6 de
 `FOL/Enumeration.lean`. **Es un cambio de firma en FOL y toca a RPP entero.**
+
+---
+
+## 7.5 · ⛔⛔ Lo que LÖWENHEIM–SKOLEM ASCENDENTE le exige a la firma — MEDIDO 2026‑09‑17
+
+⚠️⚠️ **Esto cambia el orden de §7.2.** Si LS ascendente entra en la hoja de ruta, la tabla de
+candidatos de §7.2 **no sirve como está**, y la razón es de una línea:
+
+> `List Char` es **numerable**. `Nat` es **numerable**. Y el requisito que §7.2 escribe —
+> «**infinito numerable**», línea 1007 — es **incompatible** con LS ascendente para κ arbitrario.
+
+MEDIDO, y esto no es una limitación pendiente de comprobar: `natToTerm_surj`
+(`../FOL/FOL/Enumeration.lean:268`) es un **teorema compilado** que refuta que existan κ términos
+cerrados distintos para κ no numerable, porque los símbolos son `String` (`../FOL/FOL/FOL.lean:12`).
+
+⇒ **migrar a `List Char` y después querer LS ascendente obliga a migrar DOS VECES.** La firma que
+sirve a los dos es un **parámetro** `S` (el tercer candidato de §7.2, el que la tabla marca como el
+caro), no un tipo numerable concreto.
+🔑 *Una decisión de firma tomada sin mirar al consumidor de más adelante se paga dos veces* — es
+«primero el consumidor, después el molde», a escala de repo.
+
+📐 **Tamaño de parametrizar**, medido hoy: **163 módulos / 3 902 declaraciones**
+(FOL 42/545 · RPP 121/3 357). Un orden por encima del enhebrado de `AnclaEq` (~440 firmas).
+
+### ⭐ Lo que NO está bloqueado, y suele darse por bloqueado
+
+El **enunciado** de LS ascendente sí es expresable sin Mathlib: `Model D` toma un `Type` arbitrario
+(`Semantics.lean:23`) y **`Function.Injective` existe en el núcleo** (medido con `#check`), luego
+«modelo de cardinalidad ≥ |I|» se dice. Lo bloqueado es la **ruta de prueba**, no el enunciado.
+
+### ⛔ Y el segundo bloqueo, que es independiente del primero
+
+Toda la maquinaria de Henkin es una **ω‑cadena**: `cst : Nat → String` (`Fresh0.lean:91`),
+`LindenbaumStep : Nat → …` (`Lindenbaum0.lean:130`), `hen`/`hidx` (`HenkinLimit0.lean:221`/`:193`).
+Para un lenguaje no numerable haría falta **Lindenbaum transfinito** ⇒ **Zorn**, y el compilador
+dice que en el núcleo **no existen** `Zorn`, `zorn_le`, `Cardinal`, `Ultrafilter`, `Filter`,
+`WellOrderingTheorem`, `Set` ni `Finset`. La vía por ultraproductos tampoco lo esquiva: el lema del
+ultrafiltro es Zorn.
+
+⚠️ **Y lo que eso le hace a la narrativa de §6.3**, que hay que decir antes de decidir: hoy el
+proyecto publica que la no‑finitud está **localizada en una línea Π⁰₁ que es el WKL**. Zorn es
+muchísimo más fuerte. No cambiaría el footprint de Lean —`Classical.choice` ya está—, cambiaría la
+**lectura de reversa matemática**, y §6.3 habría que reescribirla. Es la distinción de
+«el FOOTPRINT no es CONSTRUCTIVIDAD», aplicada a una decisión futura.
+
+⬜ **Nada de esto decide.** Queda escrito para que se decida con cifras.
 
 ---
 
