@@ -1058,6 +1058,30 @@ estimación del día que se queda **corta**, por contar «dos inducciones» dond
 
 ---
 
+### 6.9 · 🔶 SKOLEMIZACIÓN: el axioma con término de argumentos fijos — 2026‑09‑17, ADR‑059
+
+`../FOL/FOL/Skolem0.lean`, +45 l.:
+
+    skolem_conservative : c fresco → (skolemAxT c t̄ A :: Γ) ⊢₀ φ → Γ ⊢₀ φ
+
+⛔ **Un bloqueo que yo declaré y no existe.** §6.6 dijo que faltaba «suministro de símbolos frescos
+**n‑arios**». Medido: `Term.func` toma una lista de **cualquier** longitud —la aridad **no está en
+el tipo**— y `occursFormula` mira el **nombre**. `cst : Nat → String` ya los da todos.
+⚠️ **Cuatro** obstrucciones mías refutadas en dos días. 🔑 *Declarar un bloqueo es una MEDICIÓN.*
+
+⭐ **Y `t̄` no necesita ser fresco**: con argumentos fijos la interpretación del símbolo nuevo puede
+ser **constante**, y entonces no hace falta relacionar la lista de argumentos con el entorno De
+Bruijn. *Cuando la interpretación que se construye es constante, los argumentos dejan de ser un
+problema.*
+
+⬜ **Falta el prefijo de universales** `∀ⁿ((∃A) → A[c(y⃗)])`, donde el testigo **depende de la
+tupla**. MEDIDO: el prefijo es copia de `exBlock` (~40 l.), la frescura está lista y la coincidencia
+semántica ya vale para aridad arbitraria; lo que **no existe** es la correspondencia **entorno ↔
+lista de valores** bajo `k` `shiftEnv` anidados. ~200 l., riesgo medio, y el riesgo está entero ahí.
+⚠️ ESTIMADO.
+
+---
+
 ## 7 · ⛔ El muro constructivo, medido el 2026‑09‑14: **`String`**
 
 Si en algún momento se quiere ir más allá de «reducible» hacia «constructivo», el obstáculo **no

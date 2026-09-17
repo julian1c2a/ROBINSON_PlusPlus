@@ -4516,3 +4516,64 @@ iguales** cuando `X` no es un cuantificador, asi que los seis casos base de cada
 `check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
 
 **Vease tambien:** `FOL/PrenexNF0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.8, ADR-057.
+
+---
+
+## ADR-059: SKOLEMIZACION — el axioma con termino de argumentos fijos, y el bloqueo n-ario que NO existia
+
+**Fecha**: 2026-09-17
+**Estado**: ✅ ACEPTADA
+**Contexto**: ADR-056 entrego la conservatividad del axioma de Skolem con una CONSTANTE. Aqui se
+generaliza a un **termino de Skolem** con argumentos cualesquiera. `FOL/Skolem0.lean`, +45 l.
+
+    skolemAxT c t̄ A    := (∃A) ⇒ A[c(t̄)]
+    skolem_conservative : c fresco para Γ, A, φ → (skolemAxT c t̄ A :: Γ) ⊢₀ φ → Γ ⊢₀ φ
+    henkin_conservative : el caso t̄ = [], ahora un COROLARIO de una linea
+
+### 1 · ⛔ Un bloqueo que YO declare y que NO existe
+
+ADR-056 §5 dijo que faltaba «suministro de simbolos frescos **n-arios**». **Falso, y medido**:
+
+* `Term.func : String → List Term → Term` (`FOL/FOL.lean:12`) toma una lista de **cualquier**
+  longitud ⇒ **la aridad no esta en el tipo**.
+* `occursFormula c f` (`FOL/Eigenvariable.lean:366`) mira el **NOMBRE**, no la aridad.
+
+⇒ `cst : Nat → String` (`FOL/Fresh0.lean:91`) ya da infinitos simbolos de Skolem de cualquier
+aridad, y `exists_fresh` (`:281`) ya entrega frescura frente a **teoria + lista + formula**, que es
+exactamente la forma que una conservatividad necesita. **No habia nada que construir.**
+
+⚠️ Van **CUATRO** obstrucciones mias declaradas y luego refutadas en dos dias (ADR-052 §1,
+ADR-057 §4, ADR-058 §1 y esta). 🔑 *Declarar un bloqueo es una MEDICION, y hay que hacerla con el
+arbol delante — no con la intuicion de como suele ser el problema.*
+
+### 2 · ⭐ Y `t̄` no necesita ser fresco — lo que abarata el paso
+
+Con argumentos **fijos**, la interpretacion del simbolo nuevo puede ser **constante**
+(`updateFunc M c (fun _ => w)`). Entonces `c(t̄)` vale lo mismo **sean cuales sean los argumentos**,
+incluso si mencionan `c`. ⇒ **no hace falta ninguna correspondencia entre la lista de argumentos y
+el entorno De Bruijn**, que es justo lo caro del caso general.
+
+🔑 *Cuando la interpretacion que se construye es constante, los argumentos dejan de ser un
+problema.* ⇒ el paso costo **45 l.** y ADR-056 se queda como corolario de una linea.
+
+### 3 · ⬜ Lo que falta, MEDIDO pieza a pieza
+
+El axioma bajo un **prefijo de universales**:
+
+    ∀y₁…∀y_k ( (∃x A) → A[x := c(y₁,…,y_k)] )
+
+Ahi el testigo **depende de la tupla**, luego `F : List D → D` ya no puede ser constante.
+
+| pieza | estado |
+|---|---|
+| prefijo `∀ⁿ` (`forallN`, `vars`, `skolemAx`) | ⬜ ~40 l. — **copia** de `exBlock`/`subst_exBlock` (`FOL/HerbrandBlock0.lean`, ADR-055) |
+| frescura | ✅ **lista**: `exists_fresh`, `cst_bound_list` |
+| coincidencia semantica para aridad arbitraria | ✅ **ya pagada**: `evalFormula_updateFunc` vale para `F : List D → D` sin restriccion |
+| **entorno ↔ lista de valores** | ⛔ **MEDIDO que no existe nada**: `FOL/Semantics.lean` tiene `shiftEnv`/`updateEnv` y sus conmutaciones, pero **nada iterado `k` veces** ni que reconstruya un entorno desde una lista |
+
+⇒ **~200 l., riesgo medio, y el riesgo esta ENTERO en la ultima fila.** ⚠️ ESTIMADO.
+
+**Controles:** RPP **145 jobs** · FOL **48 jobs** · `check-footprints` **119** ·
+`check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry** · **0 warnings**.
+
+**Vease tambien:** `FOL/Skolem0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.9, ADR-056, ADR-055.
