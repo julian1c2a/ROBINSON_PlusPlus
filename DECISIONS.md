@@ -4049,7 +4049,7 @@ fue el UNICO error de compilacion del modulo.
 era la condicion que ADR-049 §aviso se impuso a si misma. *Una regla nueva solo vale si no encarece
 lo de detras — y se comprueba cada vez que se usa, no una sola vez.*
 
-### 4 · ⭐⭐ Donde paga el Hauptsatz, exactamente — y donde NO
+### 4 · ⛔ Donde paga el Hauptsatz — ⚠️⚠️ ESTA SECCION ESTA RECTIFICADA, ver §6
 
 ⚠️ **NO en `lk0_tval`**: `LK₀` ya era cut-free (el calculo con corte es `LKc`), asi que la solidez
 booleana no necesita el Hauptsatz para nada. Corrige una afirmacion que circulaba.
@@ -4072,6 +4072,44 @@ corte— y `cut_elimination` es lo unico que lleva de ahi a `LK₀`:
 
 **Controles:** RPP **145 jobs** · FOL **43 jobs** · `check-footprints` **100** ·
 `check-estratos` **10** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+### 6 · ⛔⛔ RECTIFICACION (mismo dia): el Hauptsatz NO hacia falta
+
+⚠️ **§4 de esta misma ADR era FALSA como afirmacion de necesidad.** Decia que el Hauptsatz pagaba
+«en un solo sitio», el paso de `LKc` a `LK₀`, porque `ndToLK` produce una derivacion **con** corte.
+Lo destapo una **medicion externa** (barrido de metateoremas candidatos, 18 agentes) y lo confirmo
+el compilador a la primera:
+
+⭐ **El caso `cut` de la solidez booleana son CINCO LINEAS.** Si la formula cortada vale, la premisa
+derecha da el resultado; si no, el testigo ya esta en Δ. Es, literalmente, lo que el propio repo
+tenia escrito en `FOL/SequentSound0.lean:51-53`: *«el caso `cut` es semanticamente TRIVIAL … Tres
+lineas»* — **escrito, y no leido como una oportunidad.** Luego la inducción se hace directamente
+sobre `LKc` (15 casos) y se para ahi:
+
+    Derives₀ [] ⊥  →  Derives₂ [] ⊥  →  LKc [] [⊥]  →  False
+                (derives0_iff_derives2)  (ndToLK)   (lkc_tval)
+
+⇒ `FOL/Finitary0.lean` **ha dejado de importar `FOL.Hauptsatz0`**, y ese es el control: si lo
+necesitara, no compilaria. `lkc_tval`, `lkc_empty`, `lkc_no_bot` anadidos.
+
+🔑 **La leccion, y es la segunda vez en dos dias**: *un dividendo atribuido a la pieza equivocada
+sobrevive hasta que alguien mide.* ADR-052 §1 ya corrigio que el debilitamiento gratis no venia de
+`struct` sino del ENUNCIADO; aqui, que la consistencia finitaria no venia del Hauptsatz sino de que
+el corte es gratis para la verdad.
+⇒ **la consistencia finitaria estaba disponible ANTES del Hauptsatz**, desde ADR-049 (`ndToLK`).
+El Hauptsatz vale por **Herbrand (H3)**, que es lo que ADR-052 dice; no por esto.
+
+### 7 · ⭐⭐ Y lo que este modulo SI mejora, que es mas de lo que se creia
+
+`lk0_not_empty` (`FOL/SequentSound0.lean:300`) demuestra hoy `¬ LK₀ [] []` pasando por
+`lk0_to_derives0`, **que es `completeness₀`** (`SequentSound0.lean:290`). Es decir: **la
+consistencia del calculo de secuentes se compra hoy con el TEOREMA DE COMPLETITUD**, y arrastra con
+el el `Classical.choice` que ADR-041 identifico como el **WKL**.
+
+⇒ `lk0_empty` / `lkc_empty` lo sustituyen con `[propext, Quot.sound]`. Y son **estrictamente mas
+fuertes**: `¬ LK₀ [] [⊥]` implica `¬ LK₀ [] []` por `struct`, no al reves.
+⬜ Queda abierto re-enunciar `lk0_not_empty` sobre `lk0_empty`; no se toca aqui para no mover un
+modulo ya medido, pero **es deuda escrita**.
 
 **Vease tambien:** `FOL/Finitary0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §5.12, ADR-052,
 ADR-042, ADR-034, ADR-049.

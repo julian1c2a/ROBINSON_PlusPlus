@@ -113,6 +113,8 @@ FOL.Hauptsatz0.herbrand|Quot.sound,propext
 FOL.Finitary0.tval_eqInstance|-
 FOL.Finitary0.lk0_tval|Quot.sound,propext
 FOL.Finitary0.lk0_empty|Quot.sound,propext
+FOL.Finitary0.lkc_tval|Quot.sound,propext
+FOL.Finitary0.lkc_empty|Quot.sound,propext
 FOL.Finitary0.derives0_consistent_fin|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext

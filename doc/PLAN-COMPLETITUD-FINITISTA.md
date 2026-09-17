@@ -725,13 +725,27 @@ casos sobre un `Bool`. **La misma disyunción, sobre `Prop`, exige `em`.**
 ⭐ Y `tval_eqInstance` **no depende de ningún axioma**: los cinco axiomas de la igualdad son `eq`‑ o
 `impl`‑shaped ⇒ la regla `eqAx` (el theory‑cut de §5.8) **no cuesta nada aquí**.
 
-#### ⭐⭐ Dónde paga el Hauptsatz, exactamente
+#### ⛔⛔ RECTIFICADO: el Hauptsatz NO hacía falta
 
-⚠️ **No en `lk0_tval`**: `LK₀` ya era cut‑free. Paga en el puente desde la deducción natural —
-`ndToLK` produce `LKc`, **con** corte, y `cut_elimination` es lo único que lleva de ahí a `LK₀`:
+⚠️ La primera versión de esta sección decía que el Hauptsatz pagaba en el paso `LKc → LK₀`.
+**Falso como afirmación de necesidad**, y lo destapó una medición externa: el caso `cut` de la
+solidez booleana son **cinco líneas** —*el corte es gratis para la verdad*—, luego la inducción se
+hace directamente sobre `LKc` (15 casos) y se para ahí:
 
-    Derives₀ [] ⊥  →  Derives₂ [] ⊥  →  LKc [] [⊥]  →  LK₀ [] [⊥]  →  False
-                (derives0_iff_derives2)  (ndToLK)  (cut_elimination)  (lk0_tval)
+    Derives₀ [] ⊥  →  Derives₂ [] ⊥  →  LKc [] [⊥]  →  False
+                (derives0_iff_derives2)  (ndToLK)   (lkc_tval)
+
+⇒ `FOL/Finitary0.lean` **no importa `FOL.Hauptsatz0`**, y ése es el control.
+🔑 *Un dividendo atribuido a la pieza equivocada sobrevive hasta que alguien mide* — segunda vez en
+dos días (§5.11 §1 ya corrigió lo de `struct`). ⇒ esto **estaba disponible desde ADR‑049**.
+El Hauptsatz vale por **Herbrand**, no por esto.
+
+#### ⭐⭐ Y lo que sí mejora, que es más de lo que parecía
+
+`lk0_not_empty` (`../FOL/FOL/SequentSound0.lean:300`) demuestra hoy `¬ LK₀ [] []` **pasando por
+`completeness₀`** ⇒ **la consistencia del cálculo de secuentes se compra con la completitud**, y
+arrastra el `Classical.choice` que §6.3 identifica como el **WKL**. `lk0_empty`/`lkc_empty` lo
+sustituyen net‑0, y son **más fuertes**.
 
 ⬜ **Lo que NO se retira**: `derives0_consistent` se queda. Documenta la otra ruta y su precio.
 
