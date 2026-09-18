@@ -47,8 +47,33 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: julian1c2a/FOL
+          # ⚠️ `ref: master` es DELIBERADO y no se fija (ADR-073): el objetivo de esta CI es
+          # cazar el dia que FOL rompe a RPP, y con un SHA fijo dejaria de cazarlo. Lo que
+          # faltaba no era fijar el dato: era DEJARLO ESCRITO — ver el paso de abajo.
           ref: master
           path: FOL
+          fetch-depth: 0
+
+      # ⭐ CERTIFICAR EL PAR (ADR-073, encargo A4 de la auditoria 2026-09-18). Hasta hoy el
+      # verde de esta CI certificaba «RPP@sha construye contra ALGUN FOL», no contra CUAL: el
+      # par (RPP@sha, FOL@sha) no quedaba escrito en ningun sitio y, pasada la retencion de 90
+      # dias de los logs, dejaba de ser CERTIFICABLE (inferible de la historia, si; certificado,
+      # no). 🔑 *Un verde que no dice contra que ha construido no es reproducible, y la
+      # diferencia solo se nota cuando ya no se puede recuperar.*
+      - name: Certificar el par (RPP@sha, FOL@sha)
+        run: |
+          FOL_SHA=$(git -C FOL rev-parse HEAD)
+          FOL_DATE=$(git -C FOL log -1 --format=%ad --date=iso)
+          RPP_SHA=$(git -C ROBINSON_PlusPlus rev-parse HEAD)
+          {
+            echo "### Par certificado"
+            echo ""
+            echo "| repo | sha | fecha |"
+            echo "|---|---|---|"
+            echo "| ROBINSON_PlusPlus | \`$RPP_SHA\` | $(git -C ROBINSON_PlusPlus log -1 --format=%ad --date=iso) |"
+            echo "| FOL (\`ref: master\`) | \`$FOL_SHA\` | $FOL_DATE |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "PAR: RPP=$RPP_SHA  FOL=$FOL_SHA"
 
       - name: Install elan (Lean version manager)
         run: |

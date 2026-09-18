@@ -5889,3 +5889,83 @@ generaliza no es el comentario, es el control.*
 
 **Véase también:** `doc/AUDITORIA-2026-09-18.md` (A1, A3), ADR-065 (el patrón de la tabla de
 deuda), ADR-041 (`completeness₀`), ADR-071.
+
+---
+
+## ADR-073: 🔧 **A4 y A2** — certificar el par, y la definición de «TITULAR» que faltaba
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ATERRIZADO · `check-footprints` **161 → 383**, cobertura **356/356**
+**Contexto**: encargos A4 y A2 de `doc/AUDITORIA-2026-09-18.md`.
+
+### 1 · A4 · el verde certificaba «contra ALGÚN FOL», no contra cuál
+
+`build.yml` clona FOL con `ref: master` y no dejaba constancia de **qué** master. ⇒ el par
+(RPP@sha, FOL@sha) no quedaba escrito, y pasada la retención de 90 días de los logs dejaba de ser
+**certificable** (inferible de la historia sí; certificado, no).
+
+⛔ **No se fija el `ref`, y es deliberado**: el objetivo de esa CI es cazar el día que FOL rompe a
+RPP, y con un SHA fijo **dejaría de cazarlo**. 🔑 *Lo que faltaba no era fijar el dato: era
+dejarlo ESCRITO.* Se añade un paso que vuelca el par al `$GITHUB_STEP_SUMMARY`, en los dos repos.
+⚠️ En FOL va con `continue-on-error`, porque su checkout hermano ya lo lleva: un alcance
+**REDUCIDO** no debe convertirse en un fallo.
+
+### 2 · A2 · lo primero que faltaba no era adjudicar: era **DEFINIR**
+
+El informe proponía repartir los 223 nombres en «41 titulares / 182 andamio», y su propio
+refutador lo marcó como **JUICIO, no medición**, porque «titular» **no tiene definición operativa
+en el repo**. Sin definición, adjudicar es opinar.
+
+⭐⭐ **La definición**: *un **TITULAR** es toda declaración cuyo `#print axioms` **EL ÁRBOL
+IMPRIME**.*
+
+🔑 Por qué ésta: **(a)** es **objetiva** —la decide un grep sobre la salida de construcción—;
+**(b)** está **alineada con el propósito** —si el proyecto se molesta en imprimir un footprint es
+que lo **publica**, y una cifra publicada hay que vigilarla—; **(c)** es **auto-mantenida**
+—poner un `#print axioms` obliga a poner la fila, y quitarlo obliga a quitarla—.
+⇒ con ella **no hay nada que adjudicar**, y el reparto 41/182 sobra.
+
+📐 Medido: **356** nombres impresos contra **161** filas ⇒ **222 sin declarar**. Tabla nueva:
+**383 filas** (356 impresos + 27 que se vigilan sin ensuciar el módulo con un `#print axioms`,
+que es legítimo). Y ⭐ **cero discrepancias** en los 161 que ya estaban: la tabla sólo crece.
+
+⭐ **`[COBERTURA]`**, el bloque nuevo: compara los nombres que el árbol imprime contra los
+declarados y **rompe si falta alguno**. Es lo que A2 pedía: *el verde decía que las filas
+declaradas cuadran, no cuántas faltan*.
+
+### 3 · ⛔⛔ Y el hallazgo técnico que casi arruina la tabla
+
+**`#print axioms` da respuestas distintas según DÓNDE se pregunte.** Medido:
+
+| dónde | `derives0_raa` |
+|---|---|
+| elaborando `FOL/Derives0.lean` | `[propext]` |
+| tras `import FOL`, en otro fichero | **`does not depend on any axioms`** |
+
+Y los **nombres de los axiomas se abrevian por el contexto**: `raa` dentro del módulo,
+`FOL.MetaRules.raa` fuera. Copiar los valores de la salida de construcción a la tabla produjo
+**5 falsos fallos** de 222.
+
+🔑 *El valor declarado hay que medirlo en el **MISMO CONTEXTO** en que el control lo verifica.*
+⇒ los **NOMBRES** salen de la salida de construcción (ésa es la definición de titular), pero los
+**VALORES** se miden en el fichero que el propio script genera. Es hermano de
+[[feedback-footprint-no-es-constructividad]] («el footprint de una táctica depende del entorno de
+imports»), una capa más abajo: aquí depende del entorno **incluso sin táctica**.
+
+### 4 · ⛔ Y mi control nuevo nació con el bug que este repo lleva DOCE veces documentando
+
+`[COBERTURA]` contaba con `printf '%s' "$X" | wc -l`. `printf '%s'` **no añade salto final**, así
+que con **exactamente un** titular sin declarar `wc -l` devolvía **0** y el control **aprobaba**.
+
+Lo cazó **su propia prueba de rotura**, a la primera: quité la fila de `completeness₀` y dijo
+«✅ LOS 382 FOOTPRINTS CUADRAN». Arreglado (`printf '%s\n'`) y re-probado: ahora dice
+«❌ 1 titular impreso y SIN declarar: `FOL.Canonical0.completeness₀`».
+
+🔑 *Un control que no se ha visto romper no es un control — y el que lo escribe no está exento:
+éste nació con la misma clase de fallo que el repo lleva doce veces midiendo.*
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **383** (cobertura
+356/356) · `check-doc-sync` · `check-estratos` **10** · `check-warnings` **11** · `check-sorry` ·
+`check-axioms` ✅ · RPP **145 jobs** · FOL **54 jobs**.
+
+**Véase también:** `doc/AUDITORIA-2026-09-18.md` (A2, A4), ADR-072, ADR-065.

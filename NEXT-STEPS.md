@@ -8,8 +8,45 @@
 
 **Estado 2026‑09‑18 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
-🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **161** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
+🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **383** (cobertura 356/356) · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
+
+> # 🗓️ 2026‑09‑18 (traca) — 🔧 **A4 y A2** (ADR‑073): el par certificado y la tabla COMPLETA
+>
+> ## A4 · el verde certificaba «contra ALGÚN FOL», no contra cuál
+>
+> ⛔ **No se fija el `ref`, y es deliberado**: el objetivo de esa CI es cazar el día que FOL rompe
+> a RPP, y con un SHA fijo dejaría de cazarlo. 🔑 *Lo que faltaba no era fijar el dato: era
+> dejarlo ESCRITO.* Un paso vuelca el par (RPP@sha, FOL@sha) al `$GITHUB_STEP_SUMMARY`.
+>
+> ## A2 · lo primero no era adjudicar: era **DEFINIR**
+>
+> El reparto «41 titulares / 182 andamio» era **JUICIO** —lo dijo su propio refutador— porque
+> «titular» **no tenía definición operativa**. Sin definición, adjudicar es opinar.
+>
+> ⭐⭐ **Un TITULAR es toda declaración cuyo `#print axioms` EL ÁRBOL IMPRIME.** Objetiva (la
+> decide un grep), alineada con el propósito (*si se imprime, se publica; y una cifra publicada
+> hay que vigilarla*) y **auto‑mantenida**. ⇒ no hay nada que adjudicar.
+>
+> 📐 356 impresos contra 161 filas ⇒ **222 sin declarar**. Tabla: **161 → 383**, y ⭐ **cero
+> discrepancias** en los que ya estaban. `[COBERTURA]` nuevo: rompe si falta alguno.
+>
+> ## ⛔⛔ El hallazgo que casi arruina la tabla
+>
+> **`#print axioms` da respuestas distintas según DÓNDE se pregunte**: `derives0_raa` es
+> `[propext]` dentro de su fichero y **net‑0** tras importarlo; y los nombres de los axiomas se
+> abrevian por el contexto (`raa` vs `FOL.MetaRules.raa`). Copiar los valores de la salida de
+> construcción dio **5 falsos fallos**.
+> 🔑 *El valor declarado hay que medirlo en el MISMO CONTEXTO en que el control lo verifica.*
+>
+> ## ⛔ Y mi control nuevo nació con el bug de siempre
+>
+> `[COBERTURA]` contaba con `printf '%s' | wc -l`, que **no añade salto final** ⇒ con
+> **exactamente uno** sin declarar contaba **0** y aprobaba. Lo cazó **su propia prueba de
+> rotura, a la primera**. 🔑 *Un control que no se ha visto romper no es un control — y el que lo
+> escribe no está exento.*
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 383 · estratos 10 · warnings 11 · 0 sorry.**
 
 > # 🗓️ 2026‑09‑18 (cierre) — 🔧 **A3 y A1: dos controles que aprobaban SIEMPRE** (ADR‑072)
 >
