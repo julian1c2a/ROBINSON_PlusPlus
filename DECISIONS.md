@@ -5599,3 +5599,72 @@ memoria agotada, no del código — hermana de «failed to read file …olean.pr
 
 **Véase también:** ADR-068, `FOL/SymClasses.lean`, `sondeos/SymbolParamCoste.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §7.5 (cuya cifra «163 módulos» se retira aquí).
+
+---
+
+## ADR-070: ⛔⛔ M-10 **NO** puede entrar en la firma — y la clase resultó ser otra cosa
+
+**Fecha**: 2026-09-18
+**Estado**: ⛔ IDEA DESCARTADA, con **caracterización exacta compilada** · `sondeos/MDiezEnLaFirma.lean`
+**Contexto**: `Sugerencias.md` ⬜1. La tesis era que **M-10 puede salir del script y entrar en la
+firma**: declarar `EsREnumerable P` (verificador · decidible · adecuado), enunciar Gödel I sobre
+`[EsREnumerable P]`, y que el TIPO impidiera enunciarlo sobre `⊢` — porque `axioms ⊢` es
+sintácticamente completo (ADR-024) y por tanto **no r.e.**
+El propietario pidió el control adversarial en estos términos: *«que la instancia para `⊢` no
+compile, y por qué. Si compila, la idea está muerta.»*
+
+### 1 · 🏁 Compila. La idea está muerta.
+
+`sondeos/MDiezEnLaFirma.lean` (compilado, cero `sorry`) construye
+`instanciaParaDerives : EsREnumerable (fun f => Derives axioms f) code`.
+
+⛔ **La raíz**: el campo `verifier : Nat → Nat → Bool` es **DATO**, y Lean permite construir dato
+**clásicamente** (`Classical.propDecidable` + `noncomputable`). El sistema de tipos **no puede
+expresar «esta función `Bool`-valuada es COMPUTABLE»**. Y `noncomputable` es una marca sintáctica,
+es decir… **otro control de script**. La idea se muerde la cola.
+
+### 2 · ⭐⭐ Y el hallazgo de verdad: la clase caracteriza EXACTAMENTE otra cosa
+
+    theorem caracterizacion_exacta (P : Formula → Nat → …) :
+      Nonempty (EsREnumerable P code) ↔ (∀ f g, code f = code g → P g → P f)
+
+**`EsREnumerable P code` es equivalente a que `P` FACTORICE por la codificación.** Ni una palabra
+sobre computabilidad ni sobre enumerabilidad: es una propiedad **de la CODIFICACIÓN**, no del
+CÁLCULO. ⭐ Y la dirección que lo demuestra, `factoriza_de_instancia`, es **net-0 pura**: el
+verificador sólo recibe `code f`, luego no puede distinguir dos fórmulas con el mismo código.
+
+⇒ `[EsREnumerable P]` en la firma de Gödel I **no excluye ningún `P`** que el proyecto quisiera
+excluir. La hipótesis es **decorativa**.
+
+🔑 *Una clase que se diseña para PROHIBIR hay que medirla por lo que ADMITE, no por lo que su
+nombre promete.* Y el modo de medirlo es construir el habitante que no debería existir.
+
+### 3 · ⚠️ Es la LENTE DE VACUIDAD otra vez, y van DOS EN UN DÍA
+
+ADR-067 mató un **teorema** cierto y vacuo; éste mata una **clase** cierta y vacua. La misma
+pregunta las caza: *¿y si es cierto y no dice nada?* ⇒ la lente entra en el repertorio fijo para
+**enunciados y para clases**, no sólo para teoremas — [[feedback-lente-de-vacuidad]].
+
+⭐ Y aquí la lente se aplicó **antes** de escribir una línea de producción: coste total **un
+sondeo de 110 l.**, frente a los 51 errores de compilación que ADR-067 costó llegar a tener.
+
+### 4 · Qué queda de `Sugerencias.md`
+
+| | encargo | estado |
+|---|---|---|
+| ⬜1 | ¿bloquea de verdad? | ⛔ **NO. Medido y descartado** (este ADR) |
+| ⬜2 | coste de `adecuado` para `Prf` | ⛔ **decae con ⬜1**: si la clase no discrimina, enhebrarla no compra nada |
+| ⬜3 | propagación real, con el compilador | ⛔ **decae con ⬜1** |
+| ⬜4 | ¿hay API de linter en v4.31 sin Mathlib? | ✅ **SIGUE VIVO y es independiente**: va de adelantar el censo de `axiom`, no de M-10 |
+
+⇒ **M-10 se queda donde está**: obligación de revisión y de script, no de tipo. ⚠️ Y eso **no**
+es un fracaso del diseño: M-10 cuantifica sobre *cómo se enuncia* un teorema, y ningún juicio de
+tipos coge eso — exactamente el mismo argumento que `Sugerencias.md` daba para M-11.
+🔑 *Si la razón por la que M-11 no cabe en la firma vale también para M-10, la tesis estaba
+refutada en su propio enunciado.*
+
+**Controles:** RPP **145 jobs** · FOL **54** · `check-footprints` **161** · `check-estratos` **10**
+· `check-warnings` **11** · `check-doc-sync` ✅ · `check-axioms` ✅ · **0 sorry**.
+
+**Véase también:** `sondeos/MDiezEnLaFirma.lean`, `Sugerencias.md`, ADR-024 (M-10),
+ADR-067 (la lente de vacuidad), ADR-069.

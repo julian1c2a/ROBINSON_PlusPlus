@@ -9,6 +9,48 @@
 🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **161** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
 
+> # 🗓️ 2026‑09‑18 (cierre) — ⛔⛔ **M‑10 NO CABE EN LA FIRMA** (ADR‑070), y la clase era otra cosa
+>
+> `Sugerencias.md` ⬜1 pedía el control adversarial: *«que la instancia para `⊢` no compile, y por
+> qué. Si compila, la idea está muerta.»*
+>
+> 🏁 **Compila.** `sondeos/MDiezEnLaFirma.lean` (compilado, cero `sorry`) construye
+> `instanciaParaDerives : EsREnumerable (fun f => Derives axioms f) code`.
+>
+> ⛔ **La raíz**: `verifier : Nat → Nat → Bool` es **DATO**, y Lean deja construir dato
+> **clásicamente**. El sistema de tipos **no puede expresar «esta función es COMPUTABLE»**, y
+> `noncomputable` es una marca sintáctica — o sea, **otro control de script**. La idea se muerde
+> la cola.
+>
+> ## ⭐⭐ Y el hallazgo de verdad: la caracterización EXACTA
+>
+>     Nonempty (EsREnumerable P code) ↔ (∀ f g, code f = code g → P g → P f)
+>
+> **La clase es equivalente a que `P` FACTORICE por la codificación.** Es una propiedad de la
+> **CODIFICACIÓN**, no del **CÁLCULO** — ni una palabra sobre computabilidad ni sobre
+> enumerabilidad. ⭐ Y la dirección que lo prueba es **net‑0 pura**: el verificador sólo recibe
+> `code f`, luego no distingue dos fórmulas con el mismo código.
+> 🔑 *Una clase diseñada para PROHIBIR se mide por lo que ADMITE, no por lo que su nombre promete.*
+>
+> ## ⚠️ Es la LENTE DE VACUIDAD otra vez — van DOS EN UN DÍA
+>
+> ADR‑067 mató un **teorema** cierto y vacuo; ADR‑070 mata una **clase** cierta y vacua. ⭐ Pero
+> esta vez la lente se aplicó **antes** de escribir producción: coste **un sondeo de 110 l.**,
+> frente a los 51 errores de compilación a los que ADR‑067 llegó.
+>
+> ## De `Sugerencias.md` queda UNO
+>
+> ⬜1 ⛔ descartado · ⬜2 y ⬜3 ⛔ **decaen con él** (si la clase no discrimina, enhebrarla no compra
+> nada) · ⬜4 ✅ **sigue vivo y es independiente**: va de adelantar el censo de `axiom` con un
+> linter, no de M‑10.
+>
+> ⇒ **M‑10 se queda donde está.** ⚠️ Y no es un fracaso del diseño: M‑10 cuantifica sobre *cómo se
+> enuncia* un teorema, y ningún juicio de tipos coge eso — que es **el mismo argumento** que
+> `Sugerencias.md` daba para descartar M‑11. 🔑 *Si la razón por la que M‑11 no cabe vale también
+> para M‑10, la tesis estaba refutada en su propio enunciado.*
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 161 · estratos 10 · warnings 11 · 0 sorry.**
+
 > # 🗓️ 2026‑09‑18 (tarde) — 🏁 **LA CAPA DE OPERACIONES, GENÉRICA** (ADR‑069) y el panel de 18 agentes
 >
 > ## ⛔⛔ Lo primero: el orden pedido era imposible, y los CUATRO planes fueron refutados
