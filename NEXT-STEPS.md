@@ -9,6 +9,66 @@
 🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **161** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
 
+> # 🗓️ 2026‑09‑18 (noche) — 🏁 **`Derives₀` GENÉRICO en DOS FIRMAS** (ADR‑071), y una atribución mía RETIRADA
+>
+> El panel dio `Derives₀` por el paso caro: inductivo, 21 ctors, 22 ficheros, y las dos asimetrías
+> de ADR‑068 reabiertas. **Costó DOS firmas y CERO errores.**
+>
+>     inductive Derives₀ {Sym : Type} : List (FormulaG Sym) → FormulaG Sym → Prop
+>     inductive LocalRule {Sym : Type} : FormulaG Sym → FormulaG Sym → Prop
+>
+> ⭐ **Por qué salió gratis, medido y no por suerte:**
+> 1. ⭐⭐ el parámetro va **IMPLÍCITO** ⇒ `infix:50 " ⊢₀ " => Derives₀` **sigue valiendo tal cual**.
+>    🔑 *En un inductivo cuyo parámetro se infiere del índice, implícito no es cosmético: es lo que
+>    salva la notación* — y con ella los 22 ficheros.
+> 2. ⭐ **las dos asimetrías NO muerden**: `grep Derives₀.noConfusion|.inj` → **cero**. Sobre una
+>    derivación se hace `induction`, nunca `injection`. 🔑 *Pesan en los inductivos de DATOS, no en
+>    los de `Prop`* — y eso se mide ANTES con un grep.
+> 3. lo que los 21 ctors mencionan ya era genérico desde ADR‑069.
+>
+> 📏 `Derives₀.rec` sigue en `[propext]` ⇒ el criterio de aceptación del Paso 0 se mantiene.
+> ✅ No vacuidad, compilada: `@Derives₀ (List Char) [A] A`.
+>
+> ## ⛔ Rectificación de ADR‑069
+>
+> Dije que `LocalRule` se quedaba en `String` «porque es premisa de `Derives` y le sigue». **Falso**:
+> es premisa de `rewrite_at`, que está **también** en `Derives₀`. 🔑 *Una premisa compartida sigue al
+> consumidor MÁS GENÉRICO, no al primero que uno mire.* Van **tres** atribuciones a la pieza
+> equivocada; ésta se cazó el mismo día y costó cero.
+>
+> ## ⛔⛔ Y la «obligación que nadie ha enunciado» era MÍA, y está REFUTADA
+>
+> La publiqué **atribuyéndola al panel**. El panel no la dijo: la puse yo en el prompt de G3 como
+> sospecha y su informe **no la confirmó**. ⚠️ Publicar como hallazgo ajeno algo que uno sembró en
+> la pregunta es peor que una estimación sin etiqueta: **inventa la procedencia**.
+>
+> Y medido, **no existe**: `grep 'structure Language|structure Signature'` en `FOL/` → **cero**.
+> Este proyecto **no tiene signatura**; una fórmula es `FormulaG Sym` y cualquier símbolo puede
+> aparecer. ⇒ no hay «lenguaje ampliado», las constantes de Henkin están en el tipo desde el
+> principio, y `EnumSym` es sobreyectiva sobre **todo** `Sym`.
+> 🔑 *Un teorema no hereda las obligaciones de su demostración DE LIBRO: hereda las de SU
+> formalización.*
+>
+> ## ⛔⛔ El muro de verdad, que el panel SÍ midió: `Model`
+>
+> `Semantics.lean:24` — `structure Model (D : Type) where func : String → List D → D`.
+> **Hasta que no sea `Model Sym D`, `Canonical0` no se generifica**, y `Model` está en **9
+> ficheros**. ⭐ Y con él, el dato de orden que faltaba: **`Canonical0` es el punto de unión de DOS
+> ramas del DAG** — la sintáctica y la **SEMÁNTICA** (`Semantics → Soundness0`), que nadie había
+> planificado ⇒ **dos entregas con verde propio**, no una.
+>
+> ## ⚠️ Y dos cosas que pagar ANTES de tocar `Enumeration`
+>
+> * ⛔ `natToFormula_surj` **bajará** de footprint (su choice entra sólo por la capa `String`), y
+>   `check-footprints` compara conjuntos exactos ⇒ **rompe también hacia abajo**. 🔧 Medirlo antes
+>   en `sondeos/SymbolParamCoste.lean`, que está **fuera del build**.
+> * ⚠️ La decisión de ENUNCIADO que decide si hay que reabrir ADR‑041: `completeness₀` genérico
+>   **baja** su footprint; `completeness₀G` + `theorem completeness₀ := completeness₀G` en `String`
+>   **no lo mueve**.
+> * ✅ Y un riesgo que no existe: `[DecidableEq Sym]` **no hace falta** en los tres de arriba.
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 161 · estratos 10 · warnings 11 · 0 sorry.**
+
 > # 🗓️ 2026‑09‑18 (cierre) — ⛔⛔ **M‑10 NO CABE EN LA FIRMA** (ADR‑070), y la clase era otra cosa
 >
 > `Sugerencias.md` ⬜1 pedía el control adversarial: *«que la instancia para `⊢` no compile, y por
@@ -123,9 +183,13 @@
 >
 > `Derives₀` (es INDUCTIVO: reabre el coste de ADR‑068 con 21 ctors y 21 ficheros) → `Lift0` →
 > `Henkin0` → `Fresh0` (con `[FreshSym Sym]`) → `Enumeration` (con `[EnumSym Sym]`) →
-> `HenkinLimit0` → `Lindenbaum0` → `Canonical0`. ⚠️ Y antes de `HenkinLimit0` hay que decidir la
-> obligación que el panel señaló y **nadie ha enunciado**: que el lenguaje ampliado con las
-> constantes de Henkin **siga siendo enumerable**.
+> `HenkinLimit0` → `Lindenbaum0` → `Canonical0`. ⛔⛔ **RECTIFICADO (ADR-071 §3)**: aquí decía que «el panel señaló una obligación que
+> nadie ha enunciado: que el lenguaje ampliado con las constantes de Henkin siga siendo
+> enumerable». **El panel NO dijo eso** — lo puse yo en el prompt como sospecha — y **la
+> obligación NO EXISTE**: este proyecto no tiene noción de lenguaje ni de signatura
+> (`grep structure Language` → cero), así que no hay «lenguaje ampliado».
+> ⛔ El muro de verdad, que el panel SÍ midió, es **`Model` (`Semantics.lean:24`), en
+> 9 ficheros**: hasta que no sea `Model Sym D`, `Canonical0` no se generifica.
 >
 > **Estado: RPP 145 jobs · FOL 54 · footprints 161 · estratos 10 · warnings 11 · 0 sorry.**
 

@@ -5668,3 +5668,114 @@ refutada en su propio enunciado.*
 
 **Véase también:** `sondeos/MDiezEnLaFirma.lean`, `Sugerencias.md`, ADR-024 (M-10),
 ADR-067 (la lente de vacuidad), ADR-069.
+
+---
+
+## ADR-071: 🏁 `Derives₀` genérico — **dos firmas** — y la obligación que yo inventé, REFUTADA
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ATERRIZADO · verde en los dos repos · **161 footprints intactos**
+**Contexto**: el panel (ADR-069 §1) dio `Derives₀` por el paso caro: inductivo, 21 constructores,
+21 ficheros consumidores, y las dos asimetrías de ADR-068 reabiertas.
+
+### 1 · 🏁 Costó **DOS firmas** y **cero errores**
+
+    inductive Derives₀ {Sym : Type} : List (FormulaG Sym) → FormulaG Sym → Prop
+    inductive LocalRule {Sym : Type} : FormulaG Sym → FormulaG Sym → Prop
+
+Y ya está. Los 22 ficheros que citan `Derives₀` compilaron **sin tocar ni una línea**, RPP
+tampoco, y `check-footprints` sigue en **161**.
+
+⭐ **Por qué salió gratis, y son tres razones medidas, no suerte:**
+
+1. ⭐⭐ **El parámetro va IMPLÍCITO** (`{Sym : Type}`, no `(Sym : Type)`) ⇒ la notación
+   `infix:50 " ⊢₀ " => Derives₀` **sigue valiendo tal cual**. Con parámetro explícito habría
+   habido que reescribirla y con ella los 22 ficheros. 🔑 *En un inductivo cuyo parámetro se
+   infiere siempre del índice, implícito no es cosmético: es lo que salva la notación.*
+2. ⭐ **Las dos asimetrías de ADR-068 NO muerden aquí**, y es medible de antemano:
+   `grep 'Derives₀.noConfusion\|Derives₀.*.inj'` en los dos repos da **cero**. Sobre una
+   derivación se hace `induction` y `cases`, nunca `injection`. 🔑 *Las asimetrías de ADR-068
+   pesan en los inductivos de DATOS, no en los de `Prop`.*
+3. Todo lo que los 21 constructores mencionan (`liftFormula`, `substFormula`, `neg`, `getAt?`,
+   `replaceAt`, `⊥`) ya era genérico desde ADR-069.
+
+📏 `Derives₀.rec` sigue en `[propext]` y `LocalRule.rec` es **net-0** ⇒ el **criterio de
+aceptación del Paso 0** (`PLAN-COMPLETITUD-FINITISTA.md` §9) se mantiene.
+✅ Y la no-vacuidad, compilada: `@Derives₀ (List Char) [A] A := Derives₀.hyp _ _ (.head _)`.
+
+### 2 · ⛔ Y una RECTIFICACIÓN de ADR-069, en el punto exacto
+
+ADR-069 §3 escribió que `LocalRule` se quedaba en `String` porque «es su premisa y le sigue»
+—refiriéndose a `Derives`—. **Falso.** `LocalRule` es premisa de `rewrite_at`, que está **también**
+en `Derives₀`. Al generificar `Derives₀`, `LocalRule` era el único bloqueante.
+
+🔑 *Una premisa compartida sigue al consumidor **MÁS GENÉRICO**, no al primero que uno mire.*
+⚠️ Es la tercera vez en el proyecto que un dividendo o una dependencia se atribuye a la pieza
+equivocada, y las tres sobrevivieron hasta que **esa pieza cambió** (ADR-050 §`struct`,
+ADR-053 §4, y ésta). Aquí el coste fue nulo porque salió el mismo día.
+
+### 3 · ⛔⛔ La «obligación que nadie ha enunciado» era **MÍA**, y está REFUTADA
+
+`NEXT-STEPS.md` publicó, atribuyéndolo al panel, que antes de `HenkinLimit0` había que decidir
+«que el lenguaje ampliado con las constantes de Henkin siga siendo enumerable».
+
+⚠️ **Eso no lo dijo el panel: lo puse yo en el prompt del agente G3 como sospecha, y su informe
+NO la confirmó.** Publicarlo como hallazgo ajeno es la misma clase de error que
+[[feedback-estimacion-sin-etiqueta]] denuncia, con el agravante de que **inventa una procedencia**.
+
+Y medido, **la obligación no existe**:
+
+* 📐 `grep 'structure Language\|structure Signature'` en `FOL/` → **cero**. Este proyecto **no
+  tiene noción de lenguaje ni de signatura**: una fórmula es `FormulaG Sym` y *cualquier* símbolo
+  de `Sym` puede aparecer en ella.
+* ⇒ **no hay «lenguaje ampliado»**: las constantes de Henkin `cst n : Sym` están en el tipo desde
+  el principio.
+* Y `natToFormula_surj : ∀ f : Formula, ∃ n, …` es sobreyectiva sobre **TODAS** las fórmulas, no
+  sobre un fragmento; igual que `EnumSym.enum_surj` lo es sobre **todo** `Sym`.
+
+🔑 *La obligación es real en la Henkin de libro —donde se extiende la signatura L ⊆ L∪{cₙ} y hay
+que argumentar que la extensión sigue siendo numerable— y **desaparece en esta formalización
+porque no hay signatura**.* ⭐ Un teorema no hereda las obligaciones de su demostración de libro:
+hereda las de **su** formalización.
+
+### 4 · ⛔⛔ Lo que SÍ encontró el panel, y es el muro de verdad: **`Model`**
+
+`FOL/Semantics.lean:24` —
+
+    structure Model (D : Type) where
+      func : String → List D → D
+      rel  : String → List D → Prop
+
+**Hasta que `Model` no sea `Model Sym D`, `Canonical0` no se puede generificar, punto.** Y `Model`
+se usa en **9 ficheros MEDIDOS**: `Canonical0`, `Compacity0`, `Finitary0`, `Rename`, `Semantics`,
+`SequentSound0`, `Skolem0`, `SkolemN0`, `Soundness0`.
+
+⭐ Y el dato de orden que no estaba en ningún sitio: **`Canonical0` es el punto de unión de DOS
+ramas del DAG que no se tocan hasta él** — la sintáctica (`FOL → Derives0 → Eigenvariable → Lift0
+→ Henkin0 → Fresh0 → HenkinLimit0 → Lindenbaum0`) y la **SEMÁNTICA** (`FOL → Semantics →
+Soundness0`), que nadie había planificado. ⇒ son **DOS entregas con verde propio**, no una.
+
+### 5 · ⚠️ Y dos avisos que hay que pagar ANTES de tocar `Enumeration`
+
+1. ⛔ **La fila que se va a mover hacia ABAJO**: `FOL.Metamath.Enumeration.natToFormula_surj`.
+   Su `Classical.choice` entra **sólo** por la capa 2 (`natToString`, `String.ofList_toList`,
+   `map_ofNat_toNat`); al generificar, `natToString_surj` se sustituye por `EnumSym.enum_surj`
+   —una proyección sin axiomas— y el fichero **deja de tocar `String`**. `check-footprints`
+   compara **conjuntos exactos** ⇒ **rompe también hacia abajo**.
+   🔧 **La medición barata y no invasiva, antes de tocar nada**: añadir a
+   `sondeos/SymbolParamCoste.lean` (fuera del build) un `natToFormulaG {Sym} [EnumSym Sym]` con su
+   sobreyectividad y su `#print axioms`. Mide la caída **sin mover ninguna fila publicada**.
+2. ⚠️ **La decisión de ENUNCIADO que decide si hay que reabrir ADR-041**: si a `completeness₀` se
+   le añaden `{Sym} [FreshSym Sym] [EnumSym Sym]`, `#print axioms` pasa a medir el teorema
+   **genérico**, que ya no arrastra las instancias y **puede bajar**. Si en cambio se hace
+   `completeness₀G` genérico **más** `theorem completeness₀ := completeness₀G` en `String`, el
+   footprint **no se mueve** y no hace falta ADR.
+3. ✅ Y un riesgo que **no** existe: `[DecidableEq Sym]` **no hace falta** en `HenkinLimit0`,
+   `Lindenbaum0` ni `Canonical0` — lo clásico va por `open Classical`, y `occursTerm` es
+   `Prop`-valued.
+
+**Controles (re-ejecutados, M-13):** RPP **145 jobs** · FOL **54 jobs** · `check-footprints`
+**161** · `check-estratos` **10** · `check-warnings` **11** · `check-axioms` ✅ · **0 sorry**.
+
+**Véase también:** ADR-068, ADR-069 (rectificada en §2), `doc/AUDITORIA-2026-09-18.md` (G3),
+`PLAN-COMPLETITUD-FINITISTA.md` §9.
