@@ -1268,7 +1268,7 @@ caro), no un tipo numerable concreto.
 🔑 *Una decisión de firma tomada sin mirar al consumidor de más adelante se paga dos veces* — es
 «primero el consumidor, después el molde», a escala de repo.
 
-📐 **Tamaño de parametrizar**, medido hoy: **163 módulos / 3 902 declaraciones**
+📐 **Tamaño de parametrizar**, medido hoy: ~~**163 módulos / 3 902 declaraciones**~~ — ⛔ **RETIRADA (ADR‑068 §2, ADR‑069)**: medía el **ALCANCE** del tipo, no el **TRABAJO**. Medido con el compilador: el parámetro costó **3 ficheros / ~40 l.**, y toda la capa de operaciones **6 firmas + 8 anotaciones de tipo**
 (FOL 42/545 · RPP 121/3 357). Un orden por encima del enhebrado de `AnclaEq` (~440 firmas).
 
 ### ⭐ Lo que NO está bloqueado, y suele darse por bloqueado

@@ -5503,3 +5503,99 @@ repos · `check-axioms` ✅ · **0 sorry**.
 
 **Véase también:** `sondeos/SymbolParamCoste.lean`, `sondeos/SymbolParam.lean`,
 `doc/PLAN-COMPLETITUD-FINITISTA.md` §7.5, ADR-067.
+
+---
+
+## ADR-069: 🏁 la CAPA DE OPERACIONES, genérica — y el orden que el panel corrigió
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ATERRIZADO · verde en los dos repos · **147 footprints intactos + 14 nuevos = 161**
+**Contexto**: ADR-068 metió el parámetro `Sym` en los dos inductivos. Esto generifica lo que va
+encima, que es lo que de verdad bloqueaba instanciar nada.
+
+### 1 · ⛔⛔ El orden pedido era imposible, y el panel lo refutó entero
+
+El encargo era «Fresh0 → Enumeration → Lindenbaum/Henkin». **Medido, el DAG lo impide**:
+
+    Fresh0 ← Henkin0 ← Lift0 ← Eigenvariable ← Derives0 ← FOL.lean
+    Fresh0 ← Rename ← Derives0          Enumeration ← FOL.lean  (INDEPENDIENTE de Fresh0)
+
+Se lanzó un panel de 18 agentes (4 planes de capa + 4 refutadores, 5 auditorías + 5 refutadores).
+⛔ **Los CUATRO planes fueron refutados**, y convergieron en lo mismo:
+
+* ⭐⭐ **La capa 0 real no es `Enumeration` ni `Fresh0`: es la capa de OPERACIONES de
+  `FOL/FOL.lean`** (`neg/top/iff`, `lift*`, `subst*`, `getAt?`/`replaceAt`). Empezar por
+  `Enumeration` habría sido **cierto y VACUO**: un `FormulaG (List Char)` que ninguna operación
+  del núcleo acepta. 🔑 *Ordenar por baratura y llamarlo dependencia es el error que ADR-068 ya
+  pagó a ×50.*
+* ⛔ **El parámetro NO puede llamarse `S`**: `S` está ocupado por la TEORÍA (`Formula → Prop`) en
+  `Henkin0`, `Fresh0`, `HenkinLimit0`, `Lindenbaum0` y `Canonical0`, y es además el binder de la
+  `local notation … ⊢₀* …`. Se llama **`Sym`**. Ese choque se habría visto **en el quinto módulo**.
+* ⛔ **`Fresh0` no puede retirar sus seis declaraciones de `String`**: `HenkinLimit0`,
+  `Lindenbaum0` y `Canonical0` usan `cst`, `shift` y `shiftTheory` **desnudos** en ~12 sitios.
+  La instancia se añade **al lado**.
+* ⚠️ Y una medición mía que el refutador tumbó: «`top` no se usa como fórmula en ningún sitio».
+  **Falso** — `Craig0.lean:344` y `:353`, y en posición de testigo dentro de un `refine ⟨top, …⟩`,
+  que es el peor sitio para un implícito. Yo había grepeado la **notación** y no el identificador:
+  es [[feedback-controles-que-no-comprueban]] otra vez, «casar por subcadena que ABSUELVE».
+
+### 2 · Lo hecho, y lo que costó — MEDIDO, paso a paso y con su verde
+
+| paso | qué | coste MEDIDO |
+|---|---|---|
+| **0‑a** | `neg`, `top`, `iff` | 3 firmas · **0 errores** |
+| **0‑b** | `liftTerm/Terms/Formula`, `substTerm/Terms/Formula` | 6 firmas · **8 anotaciones de tipo** |
+| **0‑c** | `getAt?`, `replaceAt` | 2 firmas · **0 errores** |
+| **1** | `occurs*`, `abs*` (`Eigenvariable`), `rename*` (`Rename`) | 9 firmas · **0 errores** |
+| **2** | `FOL/SymClasses.lean` + las **cuatro** instancias | 1 módulo nuevo |
+
+⭐ La capa 0‑b es la que «expone el árbol»: **32 ficheros de `FOL/` la tocan, 29 bloqueados**, y
+107 de RPP. Costó **8 anotaciones**, todas de la misma forma: un `have h : liftTerm c (.var n) =
+.var n` cuyo enunciado usa **sólo constructores anónimos**, con lo que nada fija `Sym`.
+🔑 *Al generificar, lo que se rompe no son los tipos: son los ENUNCIADOS que no mencionaban
+ninguno.* Se encuentran todos de golpe con un grep, no de uno en uno.
+
+### 3 · ⛔ Dónde se CORTA la generificación, y por qué
+
+`LocalRule` y `Derives` **se quedan en `String`**, y es decisión, no olvido:
+
+1. `Derives` es el cálculo **contaminado** (`raa`/`imp_intro` toman funciones de Lean ⇒
+   sintácticamente completo), y ADR-029 prohíbe inducir sobre él de forma **PERMANENTE** (M-11).
+2. 📐 **MEDIDO: RPP lo cita 192 veces y no cita `Derives₀` ni una.** Parametrizarlo tocaría esas
+   192 citas y reabriría el coste de ADR-068 (`noConfusion` heterogéneo, ausencia de `.inj`) con
+   22 constructores, **a cambio de nada**: la metateoría de FOL⁼ va sobre `Derives₀`.
+
+⇒ `derives0_to_derives` queda como especialización sólo-`String`. Es la misma razón por la que
+`Derives₀` existe: *cuando un tipo está contaminado, se declara al lado el que sí sirve.*
+
+### 4 · ⭐⭐ El dividendo, ahora MEDIDO EN EL ÁRBOL y no en un sondeo
+
+    FOL.instFreshSymListChar                        → [propext]
+    FOL.Fresh0.instFreshSymString                   → [propext, Classical.choice, Quot.sound]
+    FOL.Metamath.Enumeration.instEnumSymListChar    → [propext, Quot.sound]
+    FOL.Metamath.Enumeration.instEnumSymString      → [propext, Classical.choice, Quot.sound]
+
+**En las dos clases, la instancia de `List Char` es estrictamente más barata que la de `String`.**
+Y las cuatro resuelven por `inferInstance` en el árbol compilado ⇒ la capa **no es vacua**: el
+parámetro tiene dos habitantes de verdad, no uno.
+⚠️ Lo que esto **no** dice: `completeness₀` seguirá llevando `Classical.choice` pase lo que pase,
+porque el suyo es el **WKL** (ADR-041), no el `String`. Generificar la cadena de Henkin comprará
+**Löwenheim-Skolem ascendente**, no un footprint menor. Hay que decirlo así.
+
+### 5 · ⭐ Y el control que faltaba: **14 titulares nuevos declarados**
+
+El panel midió (encargo A2) que el verde de `check-footprints` dice que las filas declaradas
+cuadran, **no cuántas faltan** — y que hay **223 nombres impresos fuera de la tabla**. De ahí las
+14 filas nuevas: **147 → 161**. 🔑 *Un titular que no se declara no lo vigila nadie*, y ésta es la
+segunda vez que el mismo control se queda corto por la misma razón (la otra fue el 09‑17, 85→88).
+⬜ Queda adjudicar el resto de los 223; ⚠️ la partición «41 titulares / 182 andamio» que el panel
+propuso es **JUICIO, no medición**, porque «titular» no tiene definición operativa en el repo.
+
+**Controles (re-ejecutados, M-13):** RPP **145 jobs** · FOL **54 jobs** · `check-footprints`
+**161** · `check-estratos` **10** · `check-warnings` **11** · `check-axioms` ✅ · **0 sorry**.
+⚠️ Y un aviso de operativa: una pasada de `lake build` de RPP murió con `exit 3221226505`
+(`STATUS_STACK_BUFFER_OVERRUN`) y la siguiente, **sin tocar nada**, salió verde. Es la firma de
+memoria agotada, no del código — hermana de «failed to read file …olean.private».
+
+**Véase también:** ADR-068, `FOL/SymClasses.lean`, `sondeos/SymbolParamCoste.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §7.5 (cuya cifra «163 módulos» se retira aquí).

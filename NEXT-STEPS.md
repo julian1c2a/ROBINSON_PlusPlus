@@ -4,9 +4,88 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑18 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **53** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑18 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
-🔧 Controles (**re‑ejecutados hoy**, M‑13): `check-footprints` **147** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry` (BLOQUEANTE en la CI de FOL).
+🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **161** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
+
+
+> # 🗓️ 2026‑09‑18 (tarde) — 🏁 **LA CAPA DE OPERACIONES, GENÉRICA** (ADR‑069) y el panel de 18 agentes
+>
+> ## ⛔⛔ Lo primero: el orden pedido era imposible, y los CUATRO planes fueron refutados
+>
+> El encargo era «Fresh0 → Enumeration → Lindenbaum/Henkin». El DAG lo impide: `Fresh0` tiene
+> **cinco** módulos por delante. Y `Enumeration` es **independiente**, pero empezar por él habría
+> sido **cierto y VACUO**: un `FormulaG (List Char)` que ninguna operación del núcleo acepta.
+>
+> ⭐⭐ **La capa 0 real es la capa de OPERACIONES de `FOL/FOL.lean`.** 🔑 *Ordenar por baratura y
+> llamarlo dependencia es el error que ADR‑068 ya pagó a ×50.*
+>
+> ⛔ Y el parámetro **no puede llamarse `S`**: `S` es la TEORÍA (`Formula → Prop`) en cinco
+> módulos, y el binder de la `local notation … ⊢₀* …`. Se llama **`Sym`**. Ese choque se habría
+> visto en el quinto módulo.
+>
+> ## 🏁 Lo hecho, con su coste medido y su verde
+>
+> | paso | qué | coste MEDIDO |
+> |---|---|---|
+> | 0‑a | `neg`, `top`, `iff` | 3 firmas · 0 errores |
+> | 0‑b | `lift*`, `subst*` | 6 firmas · **8 anotaciones** |
+> | 0‑c | `getAt?`, `replaceAt` | 2 firmas · 0 errores |
+> | 1 | `occurs*`, `abs*`, `rename*` | 9 firmas · 0 errores |
+> | 2 | `FOL/SymClasses.lean` + 4 instancias | módulo nuevo |
+>
+> ⭐ 0‑b es la que expone el árbol (**32 ficheros de FOL, 29 bloqueados**; 107 de RPP) y costó
+> **8 anotaciones**, todas iguales: un `have` cuyo enunciado usa **sólo constructores anónimos**,
+> con lo que nada fija `Sym`. 🔑 *Al generificar, lo que se rompe no son los tipos: son los
+> ENUNCIADOS que no mencionaban ninguno* — y se encuentran todos con un grep, no de uno en uno.
+>
+> ## ⛔ Dónde se corta: `Derives` y `LocalRule` SE QUEDAN en `String`
+>
+> 📐 MEDIDO: RPP cita `Derives` **192** veces y `Derives₀` **cero**. Parametrizarlo tocaría esas
+> 192 citas y reabriría el coste de ADR‑068 con 22 constructores, **a cambio de nada**. Y es el
+> cálculo contaminado (M‑11 / ADR‑029). *Cuando un tipo está contaminado, se declara al lado el
+> que sí sirve.*
+>
+> ## ⭐⭐ El dividendo, ya medido EN EL ÁRBOL
+>
+> `instFreshSymListChar` → `[propext]` · `instFreshSymString` → `+Classical.choice`
+> `instEnumSymListChar` → `[propext, Quot.sound]` · `instEnumSymString` → `+Classical.choice`
+>
+> En las **dos** clases, `List Char` es estrictamente más barato. Y las cuatro resuelven por
+> `inferInstance` ⇒ la capa **no es vacua**.
+> ⚠️ Pero `completeness₀` seguirá llevando choice pase lo que pase: el suyo es el **WKL**, no el
+> `String`. Generificar Henkin comprará **LS ascendente**, no footprint.
+>
+> ## 📋 Y el encargo de auditoría (A1‑A5), medido por el panel
+>
+> * **A1** ✅ CONFIRMADO: de 24 líneas ⬜ en 16 módulos, **19 anuncian una deuda ya pagada**, más
+>   ≥7 afirmaciones falsas sin ⬜ ⇒ **≥26 sitios** (cota inferior). ⬜ Control `[G]` justificado
+>   (`check-doc-sync` no tiene nada que mire lo que un docstring **afirma que falta**), pero entra
+>   **sólo `[G.1]`** (los `def … : Prop` con testigo incondicional: 3 roturas, 0 falsos positivos).
+>   ⛔ Y OJO: `TheoryFramework/Instances/FOL.lean:47` **sigue VIGENTE** — `folSystem` instancia
+>   `derives := Derives`, no `Derives₀`, así que `completeness₀` **no paga** `CompleteLogic`.
+> * **A2** ✅ CONFIRMADO: **223 nombres impresos fuera de la tabla**. ⇒ hecho: **14 filas nuevas,
+>   147 → 161**. ⚠️ La partición «41 titulares / 182 andamio» es **JUICIO**, no medición.
+> * **A3** ✅ CONFIRMADO y es grave: el `[E]` de `check-doc-sync` compara contra el CHANGELOG, que
+>   está congelado en **2026‑05‑16** con **111 commits** desde entonces, y **sus `E_HITS` nunca
+>   tocan `FAIL`**. Control desarmado por dos vías. ⛔ Y el **mismo** `[E]` está en RPP.
+> * **A4** ✅ VISTO: los cinco commits (b787d9d, 8d91989, 37ec0e4, b22dd85, 5884ffa) en **verde**,
+>   leídos por API. ⭐ Hallazgo colateral: `build.yml` clona FOL con `ref: master` **sin fijar
+>   SHA** ⇒ el par (RPP@sha, FOL@sha) no es reproducible. ⬜ Imprimirlo en el step summary.
+> * **A5** 🔶 PARCIAL: el «5 de 7» **mezcla poblaciones** (dos ADR no publicaron cifra). Sobre las
+>   que sí: **3 sí / 1 no / 1 parcial de 5**. ⇒ **M‑14 no se escribe todavía.** ⭐ Pero destapó una
+>   cifra falsa VIVA: `PLAN-COMPLETITUD-FINITISTA.md` seguía publicando «163 módulos / 3 902
+>   declaraciones» como **MEDIDO** — la cifra que bloqueó el paso 4 dos meses. **Retirada hoy.**
+>
+> ## ⬜ Lo siguiente
+>
+> `Derives₀` (es INDUCTIVO: reabre el coste de ADR‑068 con 21 ctors y 21 ficheros) → `Lift0` →
+> `Henkin0` → `Fresh0` (con `[FreshSym Sym]`) → `Enumeration` (con `[EnumSym Sym]`) →
+> `HenkinLimit0` → `Lindenbaum0` → `Canonical0`. ⚠️ Y antes de `HenkinLimit0` hay que decidir la
+> obligación que el panel señaló y **nadie ha enunciado**: que el lenguaje ampliado con las
+> constantes de Henkin **siga siendo enumerable**.
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 161 · estratos 10 · warnings 11 · 0 sorry.**
 
 
 > # 🗓️ 2026‑09‑18 — 🏁 **EL TIPO DE LOS SÍMBOLOS ES UN PARÁMETRO** (ADR‑068, paso 4)

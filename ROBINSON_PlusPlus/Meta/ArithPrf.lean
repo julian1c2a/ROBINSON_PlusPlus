@@ -178,7 +178,7 @@ theorem prf_substTerm_arith (v : Nat) (s : Term) : ∀ (t : Term),
       show Prf
         (substtc (numeral v) (termCode s) (varc (numeral n)) =eq termCode (substTerm v s (.var n)))
       rcases Nat.lt_trichotomy n v with hlt | heq | hgt
-      · have hsub : substTerm v s (.var n) = .var n := by
+      · have hsub : (substTerm v s (.var n) : Term) = .var n := by
           simp only [substTerm]; rw [if_neg (by omega), if_neg (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral v) (termCode s) (numeral n)) (prf_gnum_lt hlt)
@@ -186,7 +186,7 @@ theorem prf_substTerm_arith (v : Nat) (s : Term) : ∀ (t : Term),
         have hsub : substTerm n s (.var n) = s := by simp [substTerm]
         rw [hsub]
         exact prf_mp (prf_substtc_var_eq (numeral n) (termCode s) (numeral n)) (prf_refl _)
-      · have hsub : substTerm v s (.var n) = .var (n - 1) := by
+      · have hsub : (substTerm v s (.var n) : Term) = .var (n - 1) := by
           simp only [substTerm]; rw [if_neg (by omega), if_pos (by omega)]
         rw [hsub]
         have hax := prf_mp (prf_substtc_var_gt (numeral v) (termCode s) (numeral n)) (prf_gnum_lt hgt)
@@ -263,10 +263,10 @@ theorem prf_liftTerm_arith (c : Nat) : ∀ (t : Term),
   | .var n => by
       show Prf (liftc (numeral c) (varc (numeral n)) =eq termCode (liftTerm c (.var n)))
       by_cases hlt : n < c
-      · have hsub : liftTerm c (.var n) = .var n := by simp [liftTerm, hlt]
+      · have hsub : (liftTerm c (.var n) : Term) = .var n := by simp [liftTerm, hlt]
         rw [hsub]
         exact prf_mp (prf_liftc_var_lt (numeral c) (numeral n)) (prf_gnum_lt hlt)
-      · have hsub : liftTerm c (.var n) = .var (n + 1) := by simp [liftTerm, hlt]
+      · have hsub : (liftTerm c (.var n) : Term) = .var (n + 1) := by simp [liftTerm, hlt]
         rw [hsub]
         exact prf_mp (prf_liftc_var_ge (numeral c) (numeral n)) (prf_gnum_lt (by omega : c < n + 1))
   | .func sym ts => by
