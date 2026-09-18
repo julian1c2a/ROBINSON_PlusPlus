@@ -1,6 +1,6 @@
 # `sondeos/` — experimentos verificados (desde la sesión 2026‑08‑19)
 
-**Last updated:** 2026‑09‑14 — entran `ClassicalChoiceCenso.lean`, `DerivesSinMetaReglas.lean`, `NombresFrescosMedicion.lean` y `SimbolosSinString.lean` (**70** sondeos). Antes:
+**Last updated:** 2026‑09‑19 — entran `CraigEqVacuo.lean`, `MDiezEnLaFirma.lean`, `SymbolParam.lean`, `SymbolParamCoste.lean` y `lintlab/` (ADR‑067/068/070/074). ⛔ Y se declara la deuda de abajo. Antes: 2026‑09‑14 — entran `ClassicalChoiceCenso.lean`, `DerivesSinMetaReglas.lean`, `NombresFrescosMedicion.lean` y `SimbolosSinString.lean` (**70** sondeos). Antes:
 2026‑09‑13, `EnumFormulaPorInyeccion.lean` (**rescatado de un scratchpad**) y
 `HenkinSaleDeRaa.lean`; 2026‑09‑11, `AnclaSoundness.lean` (la solidez de `Prf₀`) y `PrfHMono.lean`.
 
@@ -18,6 +18,11 @@ lake env lean sondeos/<fichero>.lean      # desde la raíz de RPP, NUNCA desde F
 
 | fichero | sondeo | resultado |
 |---|---|---|
+| **`CraigEqVacuo.lean`** | ⛔⛔ **¿es vacuo el `maehara_eq` relativizado a `E`?** — el control adversarial de ADR‑067 (2026‑09‑18) | 🏁 **SÍ, y hay contraejemplo**: `EqInstance.atom` toma `p : String` **libre** y `E` no tiene cota ⇒ con `C := P ⇒ P` y `E := [eqAtomAx "P" [] [] t t]` se cumplen las **cinco** condiciones con un interpolante ajeno a los dos lados. **La ruta se descartó** |
+| **`MDiezEnLaFirma.lean`** | ⛔⛔ **¿puede M‑10 salir del script y entrar en la FIRMA?** — `Sugerencias.md` ⬜1 (2026‑09‑18, ADR‑070) | 🏁 **NO. La instancia para `⊢` COMPILA**, porque `verifier : Nat → Nat → Bool` es **DATO** y Lean deja construir dato clásicamente. ⭐ Y la caracterización exacta: la clase equivale a que `P` **factorice por la codificación** — nada que ver con ser r.e. |
+| **`SymbolParam.lean`** | 📏 **¿tipa el núcleo con el símbolo como parámetro?** — viabilidad del paso 4 (2026‑09‑17) | ✅ Tipa, pero ⚠️ **no cazó ninguna de las dos asimetrías** de ADR‑068: *un sondeo que RECONSTRUYE mide si la idea tipa; sólo uno que SUSTITUYE mide si el árbol sobrevive* |
+| **`SymbolParamCoste.lean`** | 📏 **¿qué falta para INSTANCIAR `Sym`?** — tras ADR‑068 (2026‑09‑18) | ✅ Dos clases y ni una más (`FreshSym`, `EnumSym`), las dos instanciables por `List Char` **sin pasar por `String`**. ⭐⭐ Y el dividendo medido: `EnumSym (List Char)` sale `[propext, Quot.sound]` y `EnumSym String` arrastra `Classical.choice` |
+| **`lintlab/`** (2 ficheros) | ✅ **¿hay API de LINTER en v4.31 sin Mathlib, y salta al declarar un `axiom`?** — `Sugerencias.md` ⬜4 (2026‑09‑18, ADR‑074) | 🏁 **SÍ**, y avisa en el punto de declaración. ⚠️ La trampa: el linter recibe el comando **entero** y el `axiom` es un nodo **HIJO** ⇒ si no casa, **no falla: CALLA**. ⛔ Punto ciego medido: **sólo se aplica a los ficheros que lo IMPORTAN** |
 | **`SimbolosSinString.lean`** | 📏 **¿se puede sustituir `String` por algo más primitivo?** — la medición que el análisis de **btw** declaraba pendiente (2026‑09‑14) | ✅ **Sale LIMPIA**: `Char`, `Char.ofNat_toNat`, `Char.isValidCharNat`, `instDecidableEqChar` y `DecidableEq (List Char)` **no dependen de ningún axioma**. ⇒ ⭐ **`List Char` es la apuesta correcta**: `strCode` se convertiría **literalmente en `charsCode`**, que ya está limpio, y la descomposición es gratis por ser un inductivo. ⚠️ `String` es **lo único sucio de la cadena de Gödel**: está a UNA composición de estar limpia. ⛔ Y lo que descarta un alfabeto **finito**: Henkin necesita **infinitas** constantes frescas. ⬜ Sin medir: la **propagación** (el cierre por nombres sobreestimó por dos órdenes) y que **cambia `G`** — los puentes por `rfl` habría que re‑verificarlos uno a uno. Análisis completo en `doc/PLAN-COMPLETITUD-FINITISTA.md` §7.2 |
 | **`NombresFrescosMedicion.lean`** | 📏 **¿cuánto cuesta el suministro de constantes frescas?** — lo que ADR‑037 §4 dejó abierto (2026‑09‑14) | ⚠️⚠️ **Refuta lo que yo había publicado una hora antes.** Dije que era «combinatoria de nombres» y «el trozo caro»: **es barato**. ✅ `String.append_right_inj` **existe** ⇒ `ρ s := "f" ++ s` inyectiva, y `rho_inj` sale **limpio** (`[propext, Quot.sound]`). ✅ `"g" ++ t ≠ "f" ++ s` **compila por `rfl` sobre `beq`** —`String` es UTF‑8 sobre `ByteArray` y `beq` **cortocircuita** en el primer byte—, así que hay familia infinita de constantes fuera de la imagen en **tres líneas**. ⛔ Lo que NO hay: inversa computable (`String.drop` devuelve un **`Slice`**), y da igual, porque `derives0_rename_conservative` pide **inyectividad**, no la inversa. ⚠️ Lo que SÍ se sostiene de mi afirmación: el suministro mete `Classical.choice`, pero por la **implementación** de `String`, no por la matemática. 🔑 Y la lección: `exact?` propuso un `rfl` que parecía imposible; lo verifiqué **compilando y con un control adversarial** — el enunciado falso análogo **no compila**. *Una sugerencia de `exact?` no es una medición* |
 | **`DerivesSinMetaReglas.lean`** | ⭐ **¿qué se pierde si se quitan los cuatro axiomas de `MetaRules`?** — el **Paso 0** de `doc/PLAN-COMPLETITUD-FINITISTA.md` (2026‑09‑14) | ✅ **Sólo la fuerza META.** Compilado con `import FOL.FOL` **sin** `MetaRules`: el inductivo pelado ya tiene la versión OBJETO de las cuatro (`intro_impl`, `intro_impl` con `⊥`, `elim_or`, `elim_ex`), más `dne_rule` y `gen_rule` — las **seis con footprint `[propext]`**. ⇒ `Derives₀` := los 21 constructores **menos `gen_rule`** (premisa infinitaria) es deducción natural clásica completa con **cero habitantes‑axioma** ⇒ **M‑11 no aplica** y la solidez pasa a ser trabajo ordinario. ⭐ Y **no toca RPP**: sería un objeto NUEVO con encaje `Derives₀ → Derives`, así que las 320 citas de las meta‑reglas se quedan. Mucho más barato que partir `Derives`/`DerivesW` |
@@ -88,3 +93,23 @@ lake env lean sondeos/<fichero>.lean      # desde la raíz de RPP, NUNCA desde F
    para teoremas importados, así que sólo recorre **tipos**, no pruebas. Medido.
    **La técnica que SÍ funciona** es la de `S1Audit`: convertir el puente sospechoso en **`axiom` de
    Lean** y dejar que `#print axioms` delate a sus consumidores.
+
+
+## ⛔ Deuda DECLARADA: sondeos SIN PROYECTAR
+
+📐 Medido el 2026‑09‑19: **74** ficheros `.lean` en `sondeos/`, **13 sin proyectar**. Cinco han
+entrado hoy en la tabla de arriba. Los **ocho** restantes son de sesiones anteriores y **no sé qué
+midieron**, así que se listan en vez de inventarles una descripción:
+
+`ChainNegPuente` · `ClausuraFormaEcuacional` · `ClausuraNoHaceFalta` · `Div2Gen` ·
+`MedirC_Carga` · `MedirC_Deriva` · `MedirC_Enmienda` · `MedirF_Opaco` · `MedirF_Replan`
+
+⚠️ **Y `check-doc-sync [C]` no los mira**: sólo proyecta los módulos de las `lean_lib`, y
+`sondeos/` está fuera del build por diseño. ⇒ el catálogo de sondeos **no lo vigila nadie**, que
+es exactamente la condición que ya costó reconstruir dos veces algo que estaba medido
+(«un módulo sin proyectar se vuelve a construir», y van seis de «antes de construir, buscar»).
+
+⬜ **Lo que falta, y no se hace hoy**: un control `[H]` que compare `ls sondeos/*.lean` contra las
+filas de este catálogo y rompa en los dos sentidos. No se escribe al cierre de la sesión porque
+**un control que no se ha visto romper no es un control**, y probarlo pide tiempo que hoy ya no
+hay. La cifra queda medida: **13 de 74**.

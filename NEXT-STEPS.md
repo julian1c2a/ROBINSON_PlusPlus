@@ -1,15 +1,76 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-18 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-09-19 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑18 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑19 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
 🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **383** (cobertura 356/356) · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
+
+> # 🏁 CIERRE DE LA SESIÓN 2026‑09‑18/19 — **OCHO ADR** (067…074) · LEER ESTO PRIMERO
+>
+> Dos frentes en un día: **la generificación `String → Sym`** y **los controles**. Y tres cosas
+> que salieron mal y se corrigieron, las tres mías.
+>
+> ## 🏁 Lo que se ENTREGÓ
+>
+> | ADR | qué | coste MEDIDO |
+> |---|---|---|
+> | **068** | el tipo de los símbolos es un **parámetro** (`TermG`/`FormulaG` + `abbrev` + 3 shims) | **3 ficheros, ~40 l.**, 147 footprints idénticos |
+> | **069** | la **capa de operaciones** genérica + `FOL/SymClasses.lean` (`FreshSym`, `EnumSym`) | **20 firmas + 8 anotaciones** |
+> | **071** | **`Derives₀`** y `LocalRule` genéricos | **2 firmas, 0 errores** en 22 ficheros |
+> | **072** | `[E]` **rearmada** (estaba desarmada por 3 vías) y `[G.1]` **nueva** | 21 defectos destapados; deuda declarada 7+11 |
+> | **073** | la **definición de TITULAR** y la tabla completa | **161 → 383**, cobertura **356/356** |
+> | **074** | ⬜4: **sí hay linter** en core sin Mathlib, y salta | evidencia en `sondeos/lintlab/` |
+>
+> ## ⛔⛔ Lo que se DESCARTÓ, que vale tanto como lo entregado
+>
+> * **067** — `maehara_eq` relativizado a `E` es **VACUO**, con contraejemplo compilado. Iba por
+>   **3 errores de compilación de 51**: estaba a punto de aterrizar con todos los controles en
+>   verde. ⚠️ Y la prueba de la vacuidad **la había escrito yo, etiquetada como control a favor**.
+> * **070** — **M‑10 NO cabe en la firma**: la instancia para `⊢` compila, porque `verifier` es
+>   **dato** y Lean deja construir dato clásicamente. ⭐ La clase equivale a *«`P` factoriza por la
+>   codificación»*, que no tiene nada que ver con ser r.e.
+>
+> 🔑 **La lente de VACUIDAD entra en el repertorio fijo, para teoremas Y para clases**:
+> *lo que se diseña para PROHIBIR se mide por lo que ADMITE.*
+>
+> ## ⚠️ Los TRES errores míos, y lo que enseñan
+>
+> 1. **La estimación «163 módulos / 3 902 declaraciones»** bloqueó el paso 4 dos meses. Medía el
+>    **ALCANCE** del tipo, no el **TRABAJO**. Falsa por ×50. 🔑 *Una estimación inflada no
+>    desinforma: **bloquea**, y en silencio, porque nadie discute un precio alto: no compra.*
+> 2. **Publiqué como hallazgo del panel una sospecha que yo mismo había sembrado en su prompt**
+>    («el lenguaje ampliado con las constantes de Henkin debe seguir siendo enumerable»). El panel
+>    no lo dijo, y **la obligación no existe**: este proyecto no tiene signatura. 🔑 *Un teorema no
+>    hereda las obligaciones de su demostración DE LIBRO: hereda las de SU formalización.*
+> 3. **Mis dos controles nuevos nacieron rotos** y los cazó su propia prueba de rotura: `[E]`
+>    medía basura bajo el clon superficial de la CI, y `[COBERTURA]` contaba **0** con exactamente
+>    un titular sin declarar (`printf '%s' | wc -l`). 🔑 *El que escribe el control no está exento.*
+>
+> ## ⬜ LO SIGUIENTE, por orden
+>
+> 1. ⛔⛔ **`Model`** (`Semantics.lean:24`, `func : String → List D → D`) — **el muro**, en
+>    **9 ficheros**. Hasta que no sea `Model Sym D`, `Canonical0` no se generifica. Y `Canonical0`
+>    es el punto de unión de **dos ramas** del DAG, la sintáctica y la **SEMÁNTICA**, que nadie
+>    había planificado ⇒ **dos entregas con verde propio**, no una.
+> 2. ⚠️ **Antes de tocar `Enumeration`**: `natToFormula_surj` **BAJARÁ** de footprint y
+>    `check-footprints` compara conjuntos exactos ⇒ **rompe también hacia abajo**. Medirlo antes en
+>    `sondeos/SymbolParamCoste.lean`, que está **fuera del build**.
+> 3. ⚠️ **La decisión de ENUNCIADO** que decide si hay que reabrir ADR‑041: `completeness₀`
+>    genérico **baja** su footprint; `completeness₀G` + `theorem completeness₀ := completeness₀G`
+>    en `String` **no lo mueve**.
+> 4. ⬜ **El control `[H]`** de los sondeos: **13 de 74 sin proyectar** (medido), y `[C]` no los
+>    mira. Declarado en `sondeos/README.md`.
+> 5. ⬜ **Dónde colgar el linter** de ADR‑074: el barril lo haría dependencia de todo y no está
+>    medido qué le hace al tiempo de construcción.
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 383 (cobertura 356/356) · estratos 10 ·
+> warnings 11 · 0 sorry · 3 `axiom` en RPP + 4 en FOL · ✅ CI verde en los dos.**
 
 > # 🗓️ 2026‑09‑18 (traca, cierre) — ✅ **⬜4: sí hay linter, y salta** (ADR‑074)
 >
