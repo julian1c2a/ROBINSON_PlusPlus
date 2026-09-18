@@ -34,6 +34,14 @@ jobs:
         uses: actions/checkout@v4
         with:
           path: ROBINSON_PlusPlus
+          # ⚠⚠ `fetch-depth: 0` NO es opcional aqui tampoco (2026-09-18, ADR-072). El control
+          # [E] de check-doc-sync.bash compara la marca `**Last updated:**` de cada documento
+          # con la fecha del ULTIMO COMMIT QUE LO TOCO. En un clon SUPERFICIAL (profundidad 1)
+          # `git log -1 -- <fichero>` devuelve HEAD para TODOS los ficheros => el control medía
+          # una cosa en local y otra en CI, y la CI se puso roja con dos falsos positivos.
+          # El job `libro` ya llevaba esta linea con su propio aviso: la leccion estaba
+          # aprendida EN ESTE MISMO FICHERO y no se habia aplicado a este job.
+          fetch-depth: 0
 
       - name: Checkout FOL (dependencia local hermana)
         uses: actions/checkout@v4

@@ -5860,5 +5860,32 @@ pie es parte de comprobar la deuda* — y es justo lo que un barrido por patrone
 **161** · `check-estratos` **10** · `check-warnings` **11** · `check-doc-sync` ✅ con `[E]`
 rearmado y `[G.1]` nuevo · `check-axioms` ✅ · **0 sorry**.
 
+### 4 · ⛔⛔ Y la CI tumbó mi propio control en su primera ejecución
+
+`[E]` lee la **historia de git**, y el checkout por defecto de Actions es **SHALLOW**
+(profundidad 1). En un clon superficial `git log -1 -- <fichero>` devuelve **HEAD para TODOS los
+ficheros** ⇒ el control **medía una cosa en local y otra en CI**, y la puso roja con dos falsos
+positivos (`doc/REFERENCE-Godelization.md`, `sondeos/README.md`).
+
+📐 Medido en un clon superficial de verdad (`git clone --depth 1`): `REFERENCE.md`, `AXIOMS.md` y
+`AI-GUIDE.md` devuelven **los tres** la fecha de HEAD, cuando en local dan 2026‑09‑18, 2026‑09‑13
+y 2026‑07‑12.
+
+🔑 *Un control que depende de la historia de `git` mide **OTRA COSA** bajo un clon superficial, y
+la diferencia **no se ve en local**.* ⇒ dos arreglos, y hacen falta **los dos**:
+
+1. `fetch-depth: 0` en el checkout del job `build`, en los dos repos.
+2. ⭐ Una **guarda** en `[E]`: `git rev-parse --is-shallow-repository` ⇒ si es `true`, **rompe
+   diciendo qué hacer**, en vez de medir basura en silencio. Sin esto, revertir (1) devolvería el
+   control a mentir sin que nadie lo notara.
+
+⚠️⚠️ Y lo que más escuece: **el job `libro` del MISMO fichero ya llevaba `fetch-depth: 0`, con un
+comentario de once líneas explicando exactamente esta clase de bug** («el checkout por defecto es
+SHALLOW … la puerta daba SIEMPRE `run=false` … este job terminó EN VERDE sin ejecutar ninguno de
+sus pasos»). La lección estaba aprendida, escrita y a la vista, **en el mismo fichero**, y no se
+aplicó al job de al lado.
+🔑 *Una lección escrita en el punto de uso protege ESE punto de uso y ninguno más; lo que
+generaliza no es el comentario, es el control.*
+
 **Véase también:** `doc/AUDITORIA-2026-09-18.md` (A1, A3), ADR-065 (el patrón de la tabla de
 deuda), ADR-041 (`completeness₀`), ADR-071.
