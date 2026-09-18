@@ -5240,6 +5240,9 @@ el contexto**, porque un `have` con `_` no lo infiere.
 ADR-065 §4 midio que el camino barato no existe: `cut_elimination` esta probado para `LKc → LK₀` y
 que **preserve la ausencia de `eqAx` no esta enunciado**.
 
+⛔⛔ **RECTIFICADA por ADR-067**: la ruta que sigue era **VACUA**, y hay contraejemplo
+compilado (`sondeos/CraigEqVacuo.lean`). Se conserva el texto porque el error es el hallazgo.
+
 ⭐ Pero al mirarlo de nuevo aparece una tercera ruta, y es **mejor que las dos anteriores**:
 **relativizar la condicion de lenguaje a las instancias de igualdad usadas**, exactamente como
 `lk0_herbrand` hace con su `E`:
@@ -5249,8 +5252,9 @@ que **preserve la ausencia de `eqAx` no esta enunciado**.
 
 El caso `eqAx` cierra: se mete `g` en `E` y la condicion lo admite. ⚠️ **RAZONADO, NO COMPILADO.**
 
-⭐⭐ Y lo que eso entregaria es **interpolacion para `LK₀` — el calculo que el proyecto USA**, no
-para uno distinto. ⇒ **refutaria la obstruccion que ADR-056 §1 declaro CONFIRMADA** («lo unico
+⛔ ~~Y lo que eso entregaria es interpolacion para `LK₀` ⇒ refutaria la obstruccion de
+ADR-056 §1~~ — **RETIRADO** (ADR-067 §4): aun con la correccion, lo entregado seria Craig
+**modulo las instancias usadas**, mas debil que Craig clasico. La obstruccion sigue confirmada («lo unico
 entregable seria interpolacion para un calculo distinto»). Seria la **sexta** obstruccion mia
 refutada.
 
@@ -5303,3 +5307,104 @@ sobreestimaba por un orden de magnitud, y eso cambia que variante conviene.*
 
 **Vease tambien:** `../FOL/FOL/SkolemHerbrand0.lean`, `sondeos/SymbolParam.lean`, ADR-065,
 ADR-063 (Craig), ADR-056 §1 (la obstruccion que §2 pondria en duda).
+
+---
+
+## ADR-067: ⛔⛔ `maehara_eq` relativizado a `E` es VACUO -- y lo prueba un lema que yo escribi a favor
+
+**Fecha**: 2026-09-18
+**Estado**: ⛔ RUTA DESCARTADA (con contraejemplo COMPILADO) · 🔶 la corregida, MEDIDA y no empezada
+**Contexto**: ADR-066 §2 anuncio una «tercera ruta, mejor que las dos anteriores» para la
+interpolacion sobre `LK₀`, y dijo que **refutaria la obstruccion que ADR-056 §1 declaro
+CONFIRMADA**. `sondeos/CraigEqVacuo.lean` (compilado).
+
+### 1 · ⛔ El enunciado que publique es VACUO, y hay contraejemplo
+
+Lo publicado en ADR-066 §2:
+
+    maehara_eq : LK₀ Γ Δ → ∀ particiones, ∃ C E, (∀ g ∈ E, EqInstance g) ∧ … ∧
+                 PredSub C (Γ₁ ++ Δ₁ ++ E) ∧ PredSub C (Γ₂ ++ Δ₂ ++ E)
+
+⛔ **`E` es una salida existencial SIN COTA**, y `FOL.Herbrand0.EqInstance.atom`
+(`Herbrand0.lean:207`) toma `p : String` **completamente libre** — sin frescura, sin pertenencia
+al secuente, sin relacion con el resto de sus argumentos. Y `eqAtomAx p …` **menciona `p`**.
+
+⇒ para CUALQUIER interpolante se fabrica un `E` que satisface **las dos** condiciones a la vez
+**sin mirar el secuente**. Contraejemplo, compilado en `sondeos/CraigEqVacuo.lean`:
+
+    secuente : LK₀ [] [t ≐ t]          (por `eqAx` con `eqReflAx t`, y `ax`)
+    reparto  : Γ₁ = [], Γ₂ = [], Δ₁ = [], Δ₂ = [t ≐ t]
+    C := P ⇒ P                         con P := atom "P" []
+    E := [eqAtomAx "P" [] [] t t]
+
+Las cinco condiciones se cumplen (`vac_eqInstance`, `vac_der1`, `vac_der2`, `vac_cond1`,
+`vac_cond2`) **con un interpolante cuyo predicado `P` no aparece en ninguno de los dos lados**.
+Eso es exactamente lo que Craig PROHIBE. El teorema seria cierto y no diria nada.
+
+### 2 · ⛔⛔ Y la prueba de la vacuidad es un lema que YO escribi COMO CONTROL A FAVOR
+
+Al medir las cinco instancias de igualdad anote, con razon:
+
+| instancia | predicados que menciona |
+|---|---|
+| `eqReflAx`, `eqSymmAx`, `eqTransAx`, `eqFuncAx` | **ninguno** |
+| `eqAtomAx q pre post a b` | ⛔ **`q`, y `q` es ARBITRARIO** |
+
+y escribi `predF_eqAtomAx : predF p (eqAtomAx q …) ↔ q = p` presentandolo como **«lo que impide
+que la relativizacion vuelva vacua la condicion»**. Es literalmente lo contrario: ese lema, leido
+de derecha a izquierda, **construye** el `E` que la vuelve vacua
+(`eqInstance_aporta_cualquier_predicado`, tres lineas).
+
+🔑 *Una medicion correcta con la conclusion invertida es peor que no medir: viene con la prueba de
+lo contrario adjunta y con una etiqueta de «control» encima.* Es el mismo patron que ADR-060 §6
+(la cifra falsa que arrastraba su propio juicio), una capa mas arriba: aqui lo falso no era el
+dato sino **la direccion en que se leyo**.
+
+⚠️ Van **dos** anuncios mios corregidos por el panel adversarial en dos dias, y los dos en la
+direccion de anunciar valor antes de tiempo.
+
+### 3 · ✅ La correccion, MEDIDA — hay que ATAR `E` a la derivacion
+
+`LK₀` es `Prop`-valued (`Sequent0.lean:109`) ⇒ **no existe** funcion `LK₀ Γ Δ → List Formula` que
+extraiga las instancias usadas. La correccion es declarar el calculo **indexado por ellas**:
+
+    inductive LKe : List Formula → List Formula → List Formula → Prop
+      -- los 13 constructores enhebrando E; solo cambian los binarios (E₁ ++ E₂) y
+      | eqAx : ∀ Γ Δ g E, EqInstance g → LKe (g :: Γ) Δ E → LKe Γ Δ (g :: E)
+
+    lk0_of_lke : LKe Γ Δ E → LK₀ Γ Δ
+    lke_of_lk0 : LK₀ Γ Δ → ∃ E, LKe Γ Δ E
+
+    maehara_eq : LKe Γ Δ Eu → ∀ particiones, ∃ C E, (∀ g ∈ E, g ∈ Eu) ∧ …
+
+⇒ `E` deja de ser libre: queda **acotado por las instancias que la derivacion DADA usa**.
+⚠️ ESTIMADO: `LKe` + los dos puentes ~120 l.; el port de los 26 casos ~800-900 l. (los binarios
+dejan de ser copia literal: dos hipotesis con `E₁` y `E₂`).
+
+### 4 · ⚠️ Y esto NO refuta ADR-056 §1 — retiro ese anuncio
+
+ADR-066 §2 dijo que la ruta «refutaria la obstruccion que ADR-056 §1 declaro CONFIRMADA».
+**Se retira.** Aun con la correccion, lo que se entrega es Craig para `LK₀` **modulo las
+instancias de igualdad efectivamente usadas**, que es **mas debil** que Craig clasico (donde la
+igualdad es logica y no aporta predicados). Que `Eu` se pueda purgar de sus `eqAtomAx` con
+predicados ajenos al secuente es un teorema **aparte y NO MEDIDO**.
+
+⇒ la obstruccion de ADR-056 §1 sigue **CONFIRMADA** mientras eso no se mida.
+
+### 5 · ⭐ Lo que el panel compro esta vez
+
+Tres lentes; la de **vacuidad** dio `NO_SIRVE` con el contraejemplo entero escrito en la sintaxis
+del proyecto, y acerto. Las otras dos no lo vieron.
+🔑 *Un refutador que pregunta «¿y si el teorema es cierto y no dice nada?» caza lo que ninguno que
+pregunte «¿es cierto?» va a cazar.* La lente de VACUIDAD entra en el repertorio fijo.
+
+⭐ Y el coste evitado: la implementacion iba por **3 errores de compilacion restantes** de 51.
+Estaba a punto de aterrizar un teorema vacuo **con todos los controles en verde** — `check-axioms`,
+`check-footprints` y `check-doc-sync` no miran si un enunciado dice algo.
+
+**Controles:** RPP **145 jobs** · FOL **53 jobs** · `check-footprints` **147** ·
+`check-estratos` **10** · `check-warnings` **11** · `check-doc-sync` ✅ · `check-axioms` ✅ ·
+`check-sorry` ✅ · **0 sorry**.
+
+**Vease tambien:** `sondeos/CraigEqVacuo.lean`, ADR-066 §2 (rectificada aqui), ADR-063,
+ADR-056 §1 (que sigue confirmada).

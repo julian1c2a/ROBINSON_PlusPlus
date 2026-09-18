@@ -4,9 +4,63 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **52** · 0 sorry) · **3 `axiom` de Lean****
-⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
-🔧 Controles: `check-footprints` **145** · ⭐ `check-warnings` **11** (nuevo, ADR‑065) · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
+**Estado 2026‑09‑18 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **53** · 0 sorry) · **3 `axiom` de Lean****
+⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
+🔧 Controles (**re‑ejecutados hoy**, M‑13): `check-footprints` **147** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry` (BLOQUEANTE en la CI de FOL).
+
+
+> # 🗓️ 2026‑09‑18 — ⛔⛔ **`maehara_eq` ERA VACUO**: el contraejemplo, y el anuncio RETIRADO (ADR‑067)
+>
+> **Entregable del día: un contraejemplo compilado y dos rectificaciones.** Ni una línea de
+> `FOL/CraigEq0.lean` aterrizada — **y eso es el resultado correcto**.
+>
+> ## ⛔ Lo medido
+>
+> El enunciado que ADR‑066 §2 anunció como «tercera ruta, **mejor que las dos anteriores**»
+>
+>     maehara_eq : LK₀ Γ Δ → … → ∃ C E, (∀ g ∈ E, EqInstance g) ∧ …
+>                  ∧ PredSub C (Γ₁ ++ Δ₁ ++ E) ∧ PredSub C (Γ₂ ++ Δ₂ ++ E)
+>
+> es **VACUO**. `EqInstance.atom` (`FOL/Herbrand0.lean:207`) toma `p : String` **libre**, y `E` es
+> una salida existencial **sin cota** ⇒ para **cualquier** interpolante se fabrica un `E` que
+> satisface **las dos** condiciones de lenguaje **sin mirar el secuente**.
+>
+> 📐 `sondeos/CraigEqVacuo.lean` — **compilado, salida vacía**: con `C := P ⇒ P` y
+> `E := [eqAtomAx "P" [] [] t t]` se cumplen las **cinco** condiciones sobre el secuente `⊢ t ≐ t`,
+> y `P` **no aparece en ninguno de los dos lados**. Eso es justo lo que Craig prohíbe.
+>
+> ## ⛔⛔ Y la parte cara: la prueba de la vacuidad la escribí YO, etiquetada como control A FAVOR
+>
+> Medí bien —«cuatro de las cinco instancias son transparentes para `predF`»— y **leí la medición
+> al revés**. El lema `predF_eqAtomAx : predF p (eqAtomAx q …) ↔ q = p`, que documenté como *«lo
+> que impide que la relativización vuelva vacua la condición»*, leído de derecha a izquierda
+> **construye** el `E` que la vuelve vacua (tres líneas).
+> 🔑 *Una medición correcta con la conclusión invertida es peor que no medir: viene con la prueba
+> de lo contrario adjunta y con una etiqueta de «control» encima.*
+>
+> ⭐ **Coste evitado**: la implementación iba por **3 errores de compilación restantes** de 51.
+> Estaba a punto de aterrizar un teorema vacuo **con todos los controles en verde** —
+> `check-axioms`, `check-footprints` y `check-doc-sync` **no miran si un enunciado dice algo**.
+>
+> ## ✅ La corrección, medida y NO empezada
+>
+> `LK₀` es `Prop`-valued ⇒ no hay función que extraiga las instancias usadas. Hay que **indexar el
+> cálculo por ellas**: `LKe Γ Δ E` (13 ctors), `lk0_of_lke` / `lke_of_lk0`, y
+> `maehara_eq : LKe Γ Δ Eu → … ∃ C E, (∀ g ∈ E, g ∈ Eu) ∧ …`.
+> ⚠️ **ESTIMADO** (no compilado): `LKe` + puentes ~120 l.; el port de los 26 casos ~800‑900 l.
+>
+> ⚠️ **Y ni aun así refuta ADR‑056 §1** — ese anuncio queda **RETIRADO** (ADR‑067 §4). Lo entregado
+> sería Craig para `LK₀` **módulo las instancias de igualdad usadas**, más débil que Craig clásico.
+>
+> ## ⭐ El método que lo cazó
+>
+> Panel adversarial de tres lentes; sólo la de **VACUIDAD** lo vio, y trajo el contraejemplo
+> **escrito en la sintaxis del proyecto**. 🔑 *Un refutador que pregunta «¿y si el teorema es cierto
+> y no dice nada?» caza lo que ninguno que pregunte «¿es cierto?» va a cazar.* Entra en el
+> repertorio fijo.
+>
+> **Estado: RPP 145 jobs · FOL 53 · footprints 147 · estratos 10 · warnings 11 · 0 sorry.**
+
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
