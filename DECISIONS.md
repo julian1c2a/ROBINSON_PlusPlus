@@ -4889,3 +4889,123 @@ riesgo es el problema; las rutas eran la misma ruta.*
 
 **Vease tambien:** `../FOL/FOL/SkolemNF0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.11,
 ADR-060, ADR-058, ADR-059.
+
+---
+
+## ADR-063: 🏁 MAEHARA y la INTERPOLACION DE CRAIG para `LKp` -- y la condicion correcta no es la que uno escribe primero
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ACEPTADA
+**Contexto**: **F**, el ultimo frente del catalogo de metateoremas. ADR-056 §1 lo dejo ABIERTO con
+su obstruccion CONFIRMADA («lo unico entregable seria interpolacion para un calculo **distinto**»)
+y estimado en **~850 l., riesgo alto**. `../FOL/FOL/Craig0.lean`, modulo nuevo, **665 l. de
+codigo** (784 con documentacion).
+
+    LKp     -- el fragmento PURO: `LK₀` sin `eqAx`. **13 constructores**, no 14.
+    maehara : LKp Γ Δ → ∀ particiones, ∃ C interpolante con su condicion de lenguaje
+    craig   : LKp [A] [B] → ∃ C, LKp [A] [C] ∧ LKp [C] [B] ∧ PredSub C [A] ∧ PredSub C [B]
+    craig_impl : la forma reconocible -- de `A ⊢ B` salen `⊢ A ⇒ C` y `⊢ C ⇒ B`
+
+📏 **`[propext, Quot.sound]` en todo el modulo: ni un `Classical.choice`, ni un axioma del
+proyecto.** `lkp_to_lk0`, `predF_lift` y `predF_subst`, **sin ningun axioma**.
+
+### 1 · ⛔⛔ La condicion sobre simbolos de FUNCION hace FALSO el paso `allL`
+
+Al desarrollar a mano el caso `allL` aparece este contraejemplo, que es minimo:
+
+    ∀x P(x)  ⊢  P(f(c))          -- por `allL` con t = f(c), y arriba `ax`
+
+La premisa es `P(f(c)), ∀xP(x) ⊢ P(f(c))`, cuyo interpolante (caso `ax`, izquierda-derecha) es
+`P(f(c))`. Pero tras la regla el lado 1 solo tiene `∀xP(x)`, cuyos simbolos son `{P}`. El
+interpolante mete `f` y `c` ⇒ **la condicion se rompe**.
+
+⭐ Y el TEOREMA no es falso: el interpolante correcto es `∀xP(x)`. Lo falso es el **paso ingenuo**.
+La salida clasica --y es como Craig se enuncia en la mayoria de los textos-- es pedir la condicion
+**solo sobre los simbolos de RELACION**.
+
+🔑 *La condicion que hace demostrable un teorema no siempre es la que uno escribiria primero: aqui
+la correcta se descubre desarrollando el caso que falla, no leyendo el enunciado.*
+
+⇒ Y el dividendo es desproporcionado: con `predF` (solo predicados) los DOS lemas que los cuatro
+casos de cuantificador necesitan --`predF_lift` y `predF_subst`-- son **triviales y sin ningun
+axioma**, porque levantar y sustituir solo tocan **terminos**. Con simbolos de funcion dentro, esos
+mismos dos lemas son **falsos**.
+
+⭐ **Convergencia**: dos refutadores adversariales independientes (lentes «tipado» y
+«alternativas») señalaron **el mismo punto**, con el mismo contraejemplo, y los dos propusieron la
+misma correccion. Ninguno de los dos vio el modulo: solo el enunciado. Segunda vez en dos dias que
+la convergencia del panel vale mas que cualquiera de sus propuestas (ADR-062 §5).
+
+### 2 · ⭐⭐ La particion va por PERTENENCIA, y es lo que hace posible el analisis de casos
+
+    def Split (Γ Γ₁ Γ₂ : List Formula) : Prop := ∀ x, x ∈ Γ → Or (x ∈ Γ₁) (x ∈ Γ₂)
+
+Con `Γ = Γ₁ ++ Γ₂` el analisis de casos es **imposible**: cada regla pone la formula principal en
+la CABEZA, y de `Γ₁ ++ Γ₂ = A :: Γ'` no se sigue en cual de los dos cayo `A`. Por pertenencia basta
+preguntarle a la hipotesis donde fue la formula principal ⇒ **dos casos por regla**.
+
+⭐ Lo que lo autoriza es `struct`: reordena, contrae y debilita **por pertenencia**, asi que el
+secuente se comporta como un CONJUNTO. Y es tambien lo que **absorbe** la formula principal al
+final de cada caso (`sub_drop`) -- el paso que cierra los 26.
+⭐ Y `struct` como CASO de la induccion sale gratis: la particion de la premisa es la misma de la
+conclusion compuesta con la inclusion. Una linea.
+
+### 3 · ⭐⭐⭐ Los cuatro casos de eigenvariable NO des-levantan nada
+
+Era el coste que dominaba la estimacion. En `allR`/`exL` el interpolante de la hipotesis de
+induccion vive en el mundo LEVANTADO (`Γ.map (liftFormula 0)`), y la ruta obvia pide **des-levantar
+una derivacion** -- que en `LK₀` solo se tiene via `lk0_subst`, y ese pasa por `LKh` y por
+`lkh_subst`, **la pieza cara de ADR-051**: para `LKp` habria que reprobarla entera.
+
+No hace falta. El interpolante se **cuantifica con el mismo binder que la regla introduce**:
+
+| regla | lado 1 | interpolante | como sale |
+|---|---|---|---|
+| `allR` | `∀A ∈ Δ₁` | `∃C` | `exR` con `t = x₀`, reordenar, `allR` |
+| `allR` | `∀A ∈ Δ₂` | `∀C` | `allR` directo / `allL` con `t = x₀` + `allR` |
+| `exL` | `∃A ∈ Γ₁` | `∃C` | `exR` con `t = x₀` + `exL` |
+| `exL` | `∃A ∈ Γ₂` | `∀C` | `allL` con `t = x₀`, reordenar, `exL` |
+
+Los seis movimientos se midieron **antes** de escribir nada: compilaron a la primera, usando solo
+CONSTRUCTORES mas `FOL.Lift0.substFormula_lift_var`.
+🔑 *La condicion de eigenvariable es GRATIS en De Bruijn: el contexto llega literalmente como
+`Γ.map lift`, y eso ES la frescura.*
+
+### 4 · Las cifras, y donde estaba el riesgo de verdad
+
+| | ADR-056 (estimado) | medido |
+|---|---|---|
+| lineas | ~850 | **665** |
+| riesgo | alto | **medio**, y en otro sitio |
+| «pieza cara» declarada | `SubLang` + Maehara desde cero | ⛔ **falso**: `predF`+`PredSub`+`Cov` son **30 l.** |
+| donde estaba de verdad | -- | ⭐ en **elegir que simbolos se cuentan**, que es una decision de ENUNCIADO |
+
+⚠️ Y una cifra del propio encargo que era falsa: `LK₀` tiene **14** constructores, no 15, luego
+`LKp` son **13**, no 14. Lo cazo la medicion del panel leyendo el inductivo uno a uno; el docstring
+de `Sequent0.lean:25` ya decia «14 ctors» y era el que acertaba. Van dos ADR seguidas con una cifra
+mia corregida por una medicion (ADR-060 §6, y esta).
+
+⭐ La prueba entera --722 l. en el sondeo-- compilo con **SEIS errores**, todos triviales: dos
+rotaciones de lista al reves y cuatro veces el namespace de `substFormula_lift_var`. Ninguno
+matematico. *Cuando el enunciado es el correcto, los 26 casos son mecanica.*
+
+### 5 · ⬜ Lo que este modulo NO da, dicho antes de que nadie lo suponga
+
+* ⛔ **No hay puente HACIA `LKp`.** `ndToLK` produce `LK₀` y usa `eqAx`; para consumir `craig` hay
+  que exhibir una derivacion de `LKp` a mano. ⬜ **No medido.** ⭐ Por eso el modulo lleva
+  `lkp_example` y `craig_example`: controles de NO VACUIDAD, para que el teorema no pueda ser
+  cierto y no decir nada.
+* ⛔ **No es interpolacion para FOL⁼.** `LKp` no tiene los axiomas de la igualdad, y esa es
+  exactamente la obstruccion que ADR-056 §1 dejo CONFIRMADA. Este modulo es su «Nivel 1».
+* ⚠️ **No incluye la condicion sobre VARIABLES LIBRES** de la interpolacion de Craig clasica, solo
+  la de simbolos de relacion. Para **sentencias** esa condicion es vacua y el enunciado de aqui es
+  el completo; para formulas abiertas es estrictamente mas debil, y se dice.
+* ⚠️ `Formula.eq` se cuenta como simbolo **logico**. En `LKp` no hay `eqAx`, asi que `=` no tiene
+  axiomas; contarlo fuera **debilita** el enunciado, no lo falsea.
+
+**Controles:** RPP **145 jobs** · FOL **51 jobs** · `check-footprints` **138** ·
+`check-estratos` **10** · `check-doc-sync` ✅ en los DOS repos · `check-axioms` ✅ ·
+`check-sorry` ✅ · **0 sorry** · warnings **7 (RPP) + 4 (FOL)**, todos anteriores.
+
+**Vease tambien:** `../FOL/FOL/Craig0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.12,
+ADR-056 (donde F quedo abierta), ADR-062, ADR-051 (`lkh_subst`, la pieza que NO hizo falta).

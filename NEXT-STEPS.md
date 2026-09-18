@@ -4,9 +4,9 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **50** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **51** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
-🔧 Controles: `check-footprints` **132** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
+🔧 Controles: `check-footprints` **138** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
@@ -115,7 +115,12 @@
 >   (`skolemize 0 (∀∃∀∃ Q) = ∀∀ Q(x₁, c₀(x₁), x₀, c₁(x₀,x₁))` **`by rfl`**).
 >   ⬜ Quedan **dos** piezas medidas: la dirección `φ → skolemize φ` **con** los axiomas (regla K
 >   bajo `∀ⁿ`) y el **enchufe con Herbrand**, que pasa por la negación y no está escrito.
-> * ⬜ **F · interpolación de Craig** para `LKp` (~850 l., riesgo alto) — abierta.
+> * 🏁 ~~F · interpolación de Craig para `LKp`~~ — **PAGADA**, ADR‑063, `FOL/Craig0.lean`
+>   (665 l., estimada en ~850). ⛔⛔ La condición va sobre los símbolos de **RELACIÓN**: con los
+>   de función el paso `allL` es **FALSO** (`∀x P(x) ⊢ P(f(c))`). ⭐⭐ Partición por
+>   **pertenencia**, y los cuatro casos de eigenvariable **no des‑levantan nada** ⇒ no hubo que
+>   reprobar `lkh_subst`. ⬜ Queda el **puente hacia `LKp`**: `ndToLK` produce `LK₀` y usa
+>   `eqAx`. **No medido.**
 > * ⬜ La **mitad ⟹ de E** (~350–450 l.) — el invariante está confirmado.
 > * 🏁 ~~Decisión (2) del informe de PeanoRF~~ — **ADOPTADO**, ADR‑061. ⚠️ Y la premisa era
 >   falsa: el control **no lee** las cifras del doc, las calcula del árbol; sin la línea no

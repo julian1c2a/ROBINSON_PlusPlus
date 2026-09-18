@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-18 01:20 · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-09-18 10:40 · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -43,7 +43,7 @@
 >
 > ⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.
 >
-> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.11**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060) y 🏁 **la FORMA NORMAL de Skolem** (062).
+> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.12**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060), 🏁 **la FORMA NORMAL de Skolem** (062) y 🏁 **MAEHARA + CRAIG** para el fragmento puro (063).
 > ⚠️ Lo excluido del catálogo va con su razón **medida** en ADR‑054 §4 (propiedad de subfórmula, conservatividad de los 107 `codingAxioms`, Church): **falsos o no enunciables**, no «pendientes».
 >
 > ## Los dos objetivos, decididos
@@ -1149,6 +1149,50 @@ axioma bajo el prefijo `∀ⁿ`, la regla K iterada — **no medida**), y el **e
 `skolemNF_shape` da `∀ᵐ ψ` con `QuantFree ψ`, que es la hipótesis exacta de `herbrand`, pero
 Herbrand habla de **existenciales** y Skolem los quita ⇒ el ensamblaje real pasa por la negación,
 y **no está escrito**.
+
+---
+
+### 6.12 · 🏁 MAEHARA y la INTERPOLACIÓN DE CRAIG para `LKp` — 2026‑09‑18, ADR‑063
+
+`../FOL/FOL/Craig0.lean`, módulo nuevo, **665 l. de código**. Es **F**, el último frente del
+catálogo, y su «Nivel 1» — el que §6.6 dejó abierto con la obstrucción confirmada.
+
+    LKp        -- el fragmento PURO: `LK₀` sin `eqAx`. **13** constructores.
+    maehara    : LKp Γ Δ → ∀ particiones, ∃ C interpolante con su condición de lenguaje
+    craig      : LKp [A] [B] → ∃ C, LKp [A] [C] ∧ LKp [C] [B] ∧ PredSub C [A] ∧ PredSub C [B]
+    craig_impl : la forma reconocible — de `A ⊢ B` salen `⊢ A ⇒ C` y `⊢ C ⇒ B`
+
+📏 `[propext, Quot.sound]` en todo: **ni un `Classical.choice`, ni un axioma del proyecto**.
+`lkp_to_lk0`, `predF_lift` y `predF_subst`, **sin ningún axioma**.
+
+⛔⛔ **La condición va sobre los símbolos de RELACIÓN, y con los de FUNCIÓN el paso `allL` es
+FALSO.** Contraejemplo mínimo: `∀x P(x) ⊢ P(f(c))` por `allL` con `t = f(c)`; el interpolante de la
+premisa es `P(f(c))`, pero tras la regla el lado 1 sólo tiene `∀xP(x)`, cuyos símbolos son `{P}`.
+⭐ El teorema **no** es falso —el interpolante correcto es `∀xP(x)`—; lo falso es el **paso
+ingenuo**. 🔑 *La condición que hace demostrable un teorema no siempre es la que uno escribiría
+primero: la correcta se descubre desarrollando el caso que falla.*
+
+⭐⭐ **La partición va por PERTENENCIA** (`∀ x ∈ Γ, x ∈ Γ₁ ∨ x ∈ Γ₂`), no por concatenación: con
+`Γ = Γ₁ ++ Γ₂` el análisis de casos es imposible, porque cada regla pone la fórmula principal en la
+CABEZA. Lo autoriza `struct`, que reordena, contrae y debilita **por pertenencia** ⇒ el secuente se
+comporta como un CONJUNTO, y eso mismo es lo que **absorbe** la fórmula principal al cerrar cada
+uno de los 26 casos.
+
+⭐⭐⭐ **Los cuatro casos de eigenvariable no des‑levantan nada**, y ahí estaba el coste que
+dominaba la estimación: des‑levantar exigiría reprobar `lkh_subst` (§5.9, ADR‑051) para un cálculo
+nuevo. El interpolante se **cuantifica con el mismo binder que la regla introduce**, y las dos
+mitades salen de los CONSTRUCTORES más `substFormula_lift_var`.
+🔑 *La condición de eigenvariable es GRATIS en De Bruijn: el contexto llega literalmente como
+`Γ.map lift`, y eso ES la frescura.*
+
+⚠️ **Las cifras**: §6.6 estimó ~850 l. y «riesgo alto», con la pieza cara en «`SubLang` + Maehara
+desde cero». Medido: **665 l.**, y `predF`+`PredSub`+`Cov` son **30**. El riesgo estaba en
+**elegir qué símbolos se cuentan**, que es una decisión de ENUNCIADO, no de construcción.
+
+⬜ **Lo que NO da**: no hay **puente hacia `LKp`** (`ndToLK` produce `LK₀` y usa `eqAx`) — por eso
+el módulo lleva `lkp_example`/`craig_example` como controles de **no vacuidad**; no es
+interpolación para **FOLᐟ**; y no incluye la condición sobre **variables libres** (vacua para
+sentencias, estrictamente más débil para fórmulas abiertas).
 
 ---
 
