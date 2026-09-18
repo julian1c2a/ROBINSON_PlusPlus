@@ -146,6 +146,9 @@ FOL.SkolemNF0.skolemizeF_impAll|Quot.sound,propext
 FOL.SkolemNF0.skolemNF_shape|Quot.sound,propext
 FOL.SkolemNF0.skolem_conservative_nf|Classical.choice,Quot.sound,propext
 FOL.SkolemNF0.derives0_of_skolemNF|Classical.choice,Quot.sound,propext
+FOL.SkolemNF0.allBlock_forall|-
+FOL.SkolemNF0.derives0_allBlock_mp|Quot.sound,propext
+FOL.SkolemNF0.derives0_skolemize_iff|Quot.sound,propext
 FOL.Craig0.lkp_to_lk0|-
 FOL.Craig0.predF_subst|-
 FOL.Craig0.maehara|Quot.sound,propext

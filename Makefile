@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: footprints estratos build clean rebuild sorry status lock unlock list init new help
+.PHONY: footprints estratos warnings build clean rebuild sorry status lock unlock list init new help
 
 ## Build the project
 build:
@@ -33,6 +33,9 @@ footprints:
 ## `#print axioms` es CIEGO a esto.
 estratos:
 	@bash check-estratos.bash
+
+warnings:
+	@bash check-warnings.bash
 
 ## Idem, sin lake build (para iterar rapido)
 docsync-quick:

@@ -108,6 +108,15 @@ jobs:
         # nadie más que una ejecución local. `lake build` ya está cacheado aquí arriba.
         run: bash check-doc-sync.bash
 
+      # ⭐⭐ AÑADIDO el 2026-09-18 (ADR-065). Nace de un fallo MEDIDO: ADR-057/058/059 cerraron
+      # las tres con «0 warnings» y era falso — la cifra cierta era la de la `lean_lib FOL`
+      # sola. Lo que fallaba no era la cifra: era que NADA la reejecutaba. Las demás cifras de
+      # control se vuelven a medir; «0 warnings» se copiaba y se pegaba.
+      # ⭐ Rompe en los DOS sentidos: un warning nuevo es rojo, y uno que desaparece también,
+      # para que la tabla baje. Una cota no protege una cifra; sólo una igualdad lo hace.
+      - name: Check warnings
+        run: bash check-warnings.bash
+
       # ⭐ Anadido el 2026-09-11 (auditoria, F-8): los controles del LIBRO solo corrian a mano,
       # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara.
       #

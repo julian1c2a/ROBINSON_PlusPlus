@@ -6,7 +6,7 @@
 
 **Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **52** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
-🔧 Controles: `check-footprints` **142** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
+🔧 Controles: `check-footprints` **145** · ⭐ `check-warnings` **11** (nuevo, ADR‑065) · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
@@ -136,7 +136,20 @@
 >   `lk0_not_empty_fin` en `Finitary0`, derivado del **estrictamente más fuerte** `lk0_no_bot`
 >   vía `lk0_empty_of_no_bot` — ⭐ la relación de fuerza llevaba desde ADR‑053 en el docstring
 >   **sin demostrar**, y ahora es un teorema net‑0 puro.
-> * ⬜ **No hay `check-warnings.bash`** en ningún repo. Medidos hoy: **7 en RPP** + **4 en FOL**.
+> * 🏁 ~~No hay `check-warnings.bash`~~ — **HECHO**, ADR‑065. Declara los warnings por
+>   **fichero + clase + cuenta** y rompe en **los dos sentidos**. ✅ Probado con el fallo puesto
+>   en tres caminos. En la CI y en `make warnings`. **11 cuadran** (7 RPP + 4 FOL).
+> * 🏁 ~~La dirección `φ → skolemize φ`~~ — **HECHA**, ADR‑065 (`SkolemNF0` §8, +70 l.).
+>   ⭐⭐ Era **un solo lema**: `allBlock n (∀A) = allBlock (n+1) A`, así que el caso `.forall` es
+>   la hipótesis de inducción tal cual. 📏 **Las dos mitades sin `Classical.choice`** — el WKL
+>   entra sólo al RETIRAR los axiomas.
+> * ⬜ **El enchufe Skolem↔Herbrand** (~90–130 l., riesgo bajo‑medio ⚠️ ESTIMADO). La pieza
+>   existe: `Derives₀.forall_not_ex_not` (`Derives0.lean:141`) es un **constructor**. Falta
+>   iterarla sobre el bloque con `ex_congr`.
+> * ⛔ **El puente hacia `LKp`** — medido: **el camino barato NO existe**. `cut_elimination` está
+>   probado para `LKc → LK₀` y que preserve la ausencia de `eqAx` **no está enunciado**. Lo
+>   correcto es **parametrizar `Hauptsatz0` por los axiomas de teoría** — refactor de 1 256 l.,
+>   ⚠️ ESTIMADO alto. Decisión propia; no se improvisa.
 > * ⬜ El `CHANGELOG.md` de FOL está fechado en **2026‑05‑16**: el bloque [E] compara los
 >   titulares contra él ⇒ hoy está **vivo pero desarmado**.
 

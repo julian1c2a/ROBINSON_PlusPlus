@@ -269,3 +269,27 @@ Quot.sound]` — cero axiomas del proyecto**. **No escribir eso a secas.** Su ti
 Decía *«teorema en `Full`, postulado en `Minimal`»*. **No existe en `Full/` ningún teorema con ese
 enunciado**: `tfa_numeral` tiene otro dominio (`Nat` vs `Term`), otra unicidad (`Perm` vs igualdad
 objeto) y otra hipótesis (meta vs objeto). Si el libro repitió esa frase, hay que corregirla.
+
+
+## 2026-09-18 · `PrfH` es CLÁSICO, y la tabla de cálculos no lo dice
+
+`LIBRO.md:738` clasifica los cuatro cálculos así: `Γ ⊢ A` (cálculo ω, no r.e.), `Prf₀` («Hilbert
+**intuicionista**»), `Prf` («Hilbert **clásico**: el que se aritmetiza») y `PrfH` («**variante
+contextual**»).
+
+✅ Lo de `Prf₀` es **correcto** — comprobado constructor a constructor
+(`Meta/Hilbert.lean:80–94`): tiene `efq` y **no** tiene doble negación.
+
+⚠️ Pero `PrfH` no es sólo «contextual»: **es clásico**, y por un constructor con nombre opaco.
+`Meta/HilbertDeduction.lean:35`:
+
+    | p3 (Γ : List Formula) (A : Formula) : PrfH Γ (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
+
+Eso es la **doble negación**. La fila debería decir «variante contextual, **clásica** (`p3`)», o el
+lector deduce por contraste con `Prf₀` que `PrfH` es la versión intuicionista con contexto, que es
+justo lo contrario.
+
+🔑 *Ninguna lista por NOMBRE lo ve: se llama `p3`.* El hallazgo viene de una sugerencia del agente
+de PeanoRF — su gate lo clasifica **por el TIPO** del constructor, no por su nombre. Es el mismo
+criterio que `check-estratos.bash` usa ya para los `axiom` que habitan inductivos, aplicado a un eje
+distinto (los **constructores**). Ver ADR-065 §3.

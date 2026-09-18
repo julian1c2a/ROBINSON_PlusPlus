@@ -5105,3 +5105,101 @@ Medida: ≈400, y la conclusion era la contraria. Corregida antes de commitear. 
 
 **Vease tambien:** `../FOL/FOL/BlockExtraction0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.13,
 ADR-055 (donde E quedo enunciada), ADR-052 (el Hauptsatz, que esto consume), ADR-063.
+
+---
+
+## ADR-065: La direccion ⟹ de Skolem, `check-warnings.bash`, y el informe de PeanoRF MEDIDO
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ACEPTADA
+**Contexto**: tres frentes de un tiron. `../FOL/FOL/SkolemNF0.lean` §8 (+70 l.),
+`check-warnings.bash` (nuevo, 110 l.), y la medicion del informe de PeanoRF.
+
+### 1 · 🏁 La direccion ⟹ de la skolemizacion -- y sale SIN `Classical.choice`
+
+    derives0_skolemize_iff : (∀ g ∈ skolemAxioms k f, g ∈ Γ) → (Γ ⊢₀ f ↔ Γ ⊢₀ skolemize k f)
+
+ADR-062 §4 la dejo abierta: *«exige empujar el axioma de Skolem bajo el prefijo `∀ⁿ` (la regla K
+iterada), y no esta medida»*. Medida: **un solo lema**, y por una identidad que estaba delante:
+
+    allBlock n (Formula.forall A) = allBlock (n + 1) A
+
+⇒ `n` universales seguidos de `∀A` **son** `n+1` universales seguidos de `A`. Con eso, el caso
+`.forall` de la induccion es la hipotesis de induccion **tal cual, sin tocar un binder**, y todo el
+manejo de eigenvariables se concentra en `derives0_allBlock_mp` (la regla K iterada), que baja con
+`derives0_lift` + `elim_forall (var 0)` y vuelve con `intro_forall`.
+
+📏 **Y las dos mitades salen `[propext, Quot.sound]`**: el WKL entra **solo al RETIRAR** los
+axiomas (`skolem_conservative_nf`, que pasa por `completeness₀`), no al usarlos.
+🔑 *Usar un axioma es finitario; retirarlo es lo que cuesta.*
+
+⭐ Compilo **a la primera**. Van dos ADR seguidas en que la pieza «no medida» resulto ser un lema.
+
+### 2 · ⭐⭐ `check-warnings.bash` -- el control que faltaba, y nace de un fallo mio
+
+ADR-060 §6 midio que «0 warnings» era FALSO en ADR-057/058/059, y dejo escrito que **no habia
+ningun control detras**. Ahora lo hay: declara los warnings por **fichero + clase + cuenta** (no
+por numero de linea, que se mueve al editar) y rompe en **los dos sentidos**.
+
+    ✅ LOS 11 WARNINGS CUADRAN.   (7 en ROBINSON_PlusPlus + 4 en FOL)
+
+✅ Probado **con el fallo puesto** en los tres caminos: cifra de mas (`dice 5, real 4`), fila
+borrada (`NO DECLARADO`), y verde al restaurar. Cableado en la CI y en `make warnings`.
+
+🔑 *La diferencia entre una cifra de control y una costumbre es que algo la reejecute.* Es M-13
+convertida en script.
+
+### 3 · El informe de PeanoRF, medido punto por punto
+
+**(1) El `Classical.choice` de `Minimal.Axioms.axioms`.** ⛔ Su diagnostico (`HA.ctx`) describe SU
+puerta: **`HA.ctx` no existe en ROBINSON_PlusPlus**. La nuestra, medida:
+
+| medicion | resultado |
+|---|---|
+| constituyentes de `axioms` | **109** |
+| de ellos, con `Classical.choice` | **5**: `ax_vpf_ind`, `ax_vpf_listInd`, `ax_tc_zero`, `ax_tc_succ`, `ax_lineWF_listInd` |
+| `coreAxioms` | ⭐ **sin ningun axioma** (net-0 puro) |
+| causa raiz | `charsCodeM` (sobre `List Char`) **net-0**; `strCodeM s := charsCodeM s.toList` **con choice** ⇒ la puerta es **`String.toList`** |
+
+⇒ **no es una deuda matematica**, es la deuda de implementacion del nucleo que el plan §7 ya tenia
+medida. ⭐ Y la respuesta de calendario es concreta: sanearlo **es** el «paso 4: `String →
+List Char`», que esta en la mesa hoy — pero ⛔ el plan §7.5 advierte que `List Char` es numerable y
+que si LS ascendente entra en la hoja de ruta la migracion habria que hacerla **dos veces**. La
+decision es del propietario.
+⭐ **Lo que si pueden hacer hoy sin esperarnos**: si les basta `coreAxioms`, es **net-0** y rodea el
+problema entero sin tocar nada.
+
+**(2) «todo termino cerrado = numeral».** ⛔ **No esta, ni a medias.** `Full/Numerals.lean` tiene
+`numeral` y su aritmetica (`numeral_add`, `_mul`, `_pow`, `_lt`, `_ne`) — **no** el teorema de
+representacion. ⚠️ Y `natToTerm_surj` (`FOL/Enumeration.lean`) **no sirve**: enumera *todos* los
+terminos, no dice que los cerrados sean numerales. ⚠️ Aviso de M-10: si lo enuncian sobre
+`axioms ⊢`, ese calculo es **sintacticamente completo** y el enunciado saldria cierto por la razon
+equivocada.
+
+**(3) Su oferta (clasificar por TIPO).** ✅ Aceptada, y **no duplica**: nuestro
+`check-estratos.bash` ya clasifica por el tipo, pero mide otra cosa — cuantos `axiom` **HABITAN**
+cada inductivo (M-11). El suyo mira los **constructores**, que es un eje nuevo.
+⭐ Aplicado a nuestro arbol: `PrfH.p3` es nuestro (`Meta/HilbertDeduction.lean:35`) y es literalmente
+`((A ⇒ ⊥) ⇒ ⊥) ⇒ A` ⇒ **`PrfH` es clasico**. Y `Prf₀` **no** tiene `p3` (tiene `efq`) ⇒
+intuicionista ✅, como el libro dice. La unica imprecision: el libro clasifica `Prf₀` y `Prf` pero
+deja `PrfH` como «variante contextual» **sin decir que es clasico** ⇒ va por
+`doc/FEEDBACK-PARA-EL-LIBRO.md`, que es su canal.
+
+### 4 · ⬜ Lo medido y NO hecho
+
+* ⬜ **El enchufe Skolem↔Herbrand** (~90-130 l., riesgo bajo-medio ⚠️ ESTIMADO). La pieza existe:
+  `Derives₀.forall_not_ex_not` (`Derives0.lean:141`) es `¬∀A ⇒ ∃¬A`, **un constructor**. Falta
+  iterarla sobre el bloque (`¬ allBlock m ψ ⇒ exBlock m (¬ψ)`) con `ex_congr`.
+* ⛔ **El puente hacia `LKp`** — y la medicion dice que **el camino barato no existe**. `ndToLK` usa
+  `eqAx` solo en los cuatro constructores de igualdad de `Derives₂`, asi que un calculo fuente sin
+  ellos traduciria a `LKp` + `cut`. **Pero `cut_elimination` esta probado para `LKc → LK₀`**, y que
+  la eliminacion preserve la ausencia de `eqAx` **no esta enunciado**. Lo correcto es
+  **parametrizar `Hauptsatz0` por el conjunto de axiomas de teoria** — un refactor de un modulo de
+  1 256 l. ⚠️ ESTIMADO alto. Merece decision propia; **no se improvisa**.
+
+**Controles:** RPP **145 jobs** · FOL **52 jobs** · `check-footprints` **145** ·
+`check-estratos` **10** · `check-warnings` ⭐ **11** (nuevo) · `check-doc-sync` ✅ en los DOS repos ·
+`check-axioms` ✅ · `check-sorry` ✅ · **0 sorry**.
+
+**Vease tambien:** `../FOL/FOL/SkolemNF0.lean` §8, `check-warnings.bash`, ADR-062 (donde la
+direccion ⟹ quedo abierta), ADR-060 §6 (donde nacio M-13), ADR-055, ADR-063.
