@@ -47,7 +47,7 @@ Resultados de la fase:
    damos a mano por recursión estructural mutua. `Formula` ya se deriva una vez
    `Term` tiene la instancia. -/
 mutual
-def decEqTerm : (a b : Term) → Decidable (a = b)
+def decEqTerm {S : Type} [DecidableEq S] : (a b : TermG S) → Decidable (a = b)
   | .var n, .var m => if h : n = m then isTrue (by rw [h]) else isFalse (by simp_all)
   | .var _, .func _ _ => isFalse (by simp_all)
   | .func _ _, .var _ => isFalse (by simp_all)
@@ -57,7 +57,7 @@ def decEqTerm : (a b : Term) → Decidable (a = b)
         | isTrue h => isTrue (by rw [hf, h])
         | isFalse h => isFalse (by simp_all)
       else isFalse (by simp_all)
-def decEqTerms : (as bs : List Term) → Decidable (as = bs)
+def decEqTerms {S : Type} [DecidableEq S] : (as bs : List (TermG S)) → Decidable (as = bs)
   | [], [] => isTrue rfl
   | [], _ :: _ => isFalse (by simp_all)
   | _ :: _, [] => isFalse (by simp_all)
@@ -70,9 +70,9 @@ def decEqTerms : (as bs : List Term) → Decidable (as = bs)
       | isFalse h => isFalse (by simp_all)
 end
 
-instance : DecidableEq Term := decEqTerm
+instance instDecEqTermG {S : Type} [DecidableEq S] : DecidableEq (TermG S) := decEqTerm
 
-deriving instance DecidableEq for Formula
+deriving instance DecidableEq for FormulaG
 
 /-- **Regla de demostración**: justificación de una línea. Los esquemas de
     axiomas llevan sus parámetros (fórmulas/términos); `thy k` es el `k`-ésimo

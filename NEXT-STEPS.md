@@ -9,6 +9,57 @@
 🔧 Controles (**re‑ejecutados hoy**, M‑13): `check-footprints` **147** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry` (BLOQUEANTE en la CI de FOL).
 
 
+> # 🗓️ 2026‑09‑18 — 🏁 **EL TIPO DE LOS SÍMBOLOS ES UN PARÁMETRO** (ADR‑068, paso 4)
+>
+> `FOL/FOL.lean` declara `TermG (S : Type)` / `FormulaG (S : Type)`, con
+> `abbrev Term := TermG String`. **El árbol entero sigue diciendo `Term`/`Formula` y no cambió
+> ni una línea.**
+>
+> | fichero | líneas |
+> |---|---|
+> | `FOL/FOL.lean` (inductivos + 2 `abbrev` + 2 `export` + 3 shims) | ~40 |
+> | `FOL/DecEq.lean` (3 firmas + 2 `abbrev` de compatibilidad) | ~6 |
+> | `ROBINSON_PlusPlus/Meta/HilbertSeq.lean` (tiene su PROPIO `decEqTerm`) | ~3 |
+>
+> ⇒ **TRES ficheros.** RPP 145 jobs · FOL 53 · **los 147 footprints, IDÉNTICOS**.
+>
+> ## ⛔⛔ La estimación que había escrita era falsa por un factor de ~50
+>
+> Decía «163 módulos / 3 902 declaraciones». Medía el **ALCANCE** del tipo, no el **TRABAJO**.
+> 🔑 *Lo que los separa es cuánto absorbe una capa de compatibilidad, y eso sólo lo dice el
+> compilador.* ⚠️ Y esta vez la estimación no exageraba el premio sino **el precio** ⇒ el paso
+> llevaba dos meses aplazado por una cifra que nadie había medido. **Una estimación inflada no
+> desinforma: bloquea.**
+>
+> ## ⚠️ Lo que encontró el compilador y ningún sondeo previo vio
+>
+> Para un inductivo **con parámetro**, Lean 4.31 genera el `noConfusion` **heterogéneo**
+> (`S = S' → t ≍ t'`) y **no genera `Ctor.inj`** (sólo `.injEq`). 13 + 2 usos rotos, arreglados
+> con **tres shims** en `FOL/FOL.lean`. ⭐ El shim va con `{P : Prop}`: con `{P : Sort u}` no
+> tipa como `theorem` y como `def` rompe el generador de código.
+>
+> ## ⛔ Lo que esto NO hace (la mitad del valor)
+>
+> **Nada es genérico todavía.** Para instanciar `S` faltan dos clases, medidas y compiladas en
+> `sondeos/SymbolParamCoste.lean`:
+> * **`FreshSym`** (lo que `Fresh0` fabrica) — tres propiedades, ni una más.
+> * ⛔ **`EnumSym`** (la sobreyección `Nat → S`) — de ella cuelgan Lindenbaum → Henkin →
+>   `completeness₀`. **Ésta es la cara.**
+>
+> ⭐⭐ Y el dato que decide §7.5, **compilado**:
+> `EnumSym (List Char)` sale `[propext, Quot.sound]` y `EnumSym String` sale
+> `[propext, Classical.choice, Quot.sound]`. *La enumeración de `List Char` no lleva choice*, y
+> sale de `natToList_surj`, que ya estaba escrito. ⇒ el paso 4 tiene **dividendo medible**.
+>
+> ## ⬜ Lo siguiente, y NO es un big-bang
+>
+> Generificar un módulo **mueve el footprint de teoremas ya publicados**. La ruta es módulo a
+> módulo, cada uno con su verde y su tabla — y el parámetro estando dentro, cada paso es
+> independiente. Orden propuesto: `Fresh0` (clase `FreshSym`) → `Enumeration` (clase `EnumSym`)
+> → Lindenbaum/Henkin, que es donde se paga.
+>
+> **Estado: RPP 145 jobs · FOL 53 · footprints 147 · estratos 10 · warnings 11 · 0 sorry.**
+
 > # 🗓️ 2026‑09‑18 — ⛔⛔ **`maehara_eq` ERA VACUO**: el contraejemplo, y el anuncio RETIRADO (ADR‑067)
 >
 > **Entregable del día: un contraejemplo compilado y dos rectificaciones.** Ni una línea de
@@ -106,7 +157,7 @@
 > * ⬜ **El paso 4 del propietario**: `String → List Char` con `Sugerencias.md`.
 >   ⛔⛔ **Pero léase antes el plan §7.5**: `List Char` es **numerable**, y si LS ascendente entra en
 >   la hoja de ruta la migración habría que hacerla **dos veces**. La firma que sirve a los dos es
->   un **parámetro `S`**. 📐 163 módulos / 3 902 declaraciones.
+>   un **parámetro `S`**. ⛔ ~~📐 163 módulos / 3 902 declaraciones~~ — **FALSO, por un factor de ~50** (ADR-068): mediía el ALCANCE del tipo, no el TRABAJO. Medido con el compilador: **TRES ficheros, ~40 líneas, 147 footprints idénticos.**
 >
 > **Estado: RPP 145 jobs · FOL 49 · footprints 124 · estratos 10 · 0 sorry.**
 

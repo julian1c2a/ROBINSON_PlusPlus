@@ -5408,3 +5408,98 @@ Estaba a punto de aterrizar un teorema vacuo **con todos los controles en verde*
 
 **Vease tambien:** `sondeos/CraigEqVacuo.lean`, ADR-066 §2 (rectificada aqui), ADR-063,
 ADR-056 §1 (que sigue confirmada).
+
+---
+
+## ADR-068: 🏁 el TIPO DE LOS SÍMBOLOS es un PARÁMETRO — y costó **3 ficheros**, no 163
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ATERRIZADO · árbol verde en los dos repos, **147 footprints idénticos**
+**Contexto**: paso 4 del propietario (`String → S`), plan §7.3/§7.4/§7.5. Decisión del
+propietario: **parámetro `S` genérico** (no `abbrev Sym := List Char`), porque `List Char` sirve
+para Gödel pero **no** para Löwenheim-Skolem **ascendente**, y habría que migrar dos veces.
+
+### 1 · Lo hecho, y su medida
+
+`FOL/FOL.lean` declara ahora `TermG (S : Type)` y `FormulaG (S : Type)`, y
+
+    abbrev Term := TermG String
+    abbrev Formula := FormulaG String
+
+⇒ **el árbol entero sigue diciendo `Term`/`Formula` y no cambió ni una línea.**
+
+| fichero | qué | líneas |
+|---|---|---|
+| `FOL/FOL.lean` | los dos inductivos + 2 `abbrev` + 2 bloques `export` + 3 shims | ~40 |
+| `FOL/DecEq.lean` | 3 firmas generificadas + 2 `abbrev` de compatibilidad | ~6 |
+| `ROBINSON_PlusPlus/Meta/HilbertSeq.lean` | 3 firmas (tiene su PROPIO `decEqTerm`) | ~3 |
+
+**Total: TRES ficheros.** RPP **145 jobs**, FOL **53 jobs**, `check-footprints` **147** — y los
+147 footprints salen **exactamente iguales** que antes de tocar nada.
+
+### 2 · ⛔⛔ Y la estimación que había escrita era falsa **por un factor de ~50**
+
+`NEXT-STEPS.md` decía «📐 163 módulos / 3 902 declaraciones». Esa cifra medía el **ALCANCE** del
+tipo (cuántos módulos lo mencionan), no el **TRABAJO**. Un `abbrev` más un `export` absorbe el
+alcance entero.
+
+🔑 *Medir el ALCANCE de un tipo no es medir el TRABAJO de cambiarlo; lo que los separa es
+**cuánto puede absorber una capa de compatibilidad**, y eso sólo lo dice el compilador.*
+
+⚠️ Es la tercera vez que una estimación sin etiqueta viaja por los documentos
+([[feedback-estimacion-sin-etiqueta]]) — pero la primera **en la dirección contraria**: la
+estimación no exageraba el premio, exageraba el precio, y por eso el paso llevaba **dos meses
+aplazado**. ⇒ una estimación inflada no sólo desinforma: **bloquea**.
+
+### 3 · ⚠️ Lo que el compilador encontró y NINGÚN sondeo previo había visto
+
+Para un inductivo **CON parámetro**, Lean 4.31 genera cosas distintas:
+
+| | sin parámetro | con parámetro |
+|---|---|---|
+| `noConfusion` | homogéneo: `t = t' → …` | ⛔ **heterogéneo**: `S = S' → t ≍ t' → …` |
+| `Ctor.inj` | ✅ se genera | ⛔ **no se genera** (sólo `.injEq`) |
+
+⇒ 13 usos de `Formula.noConfusion` y 2 de `Formula.ex.inj` se rompen. Se arreglan con **tres
+shims de tres líneas** en `FOL/FOL.lean`, y el árbol no se entera. ⭐ El `noConfusion` shim va
+con `{P : Prop}`: con `{P : Sort u}` Lean lo rechaza como `theorem` y como `def` rompe el
+generador de código.
+
+⭐ `sondeos/SymbolParam.lean` (viabilidad, hecho antes) **no** cazó nada de esto, porque no
+instanció el núcleo genérico como el tipo que el árbol ya usa. 🔑 *Un sondeo que reconstruye el
+núcleo en vez de sustituirlo mide si la idea tipa, no si el árbol sobrevive.*
+
+### 4 · ⛔ Lo que esto **NO** hace — y es la mitad del valor
+
+**Nada del árbol es genérico todavía.** `S` no puede instanciarse en otro tipo, porque dos
+módulos son `String` por dentro:
+
+1. `FOL/Fresh0.lean` fabrica símbolos frescos (`shift`, `cst`) ⇒ clase **`FreshSym`**, tres
+   propiedades (`shift_inj`, `cst_inj`, `cst_ne_shift`) y ninguna más.
+2. ⛔ `FOL/Enumeration.lean` necesita `natToString_surj` ⇒ clase **`EnumSym`**, y de ella cuelgan
+   `Lindenbaum0` → `HenkinLimit0` → `Canonical0` → `completeness₀`. **Ésta es la cara.**
+
+📐 `sondeos/SymbolParamCoste.lean` (compilado) mide que **las dos clases son mínimas y
+instanciables por `List Char` sin pasar por `String`**. Y da el dato que decide §7.5:
+
+    #print axioms ProbeCoste.instEnumSymString    → [propext, Classical.choice, Quot.sound]
+    #print axioms ProbeCoste.instEnumSymListChar  → [propext, Quot.sound]
+
+⭐⭐ **La enumeración de `List Char` NO lleva `Classical.choice`; la de `String` SÍ** — y sale de
+la capa 1 de `Enumeration.lean` (`natToList_surj`, sobre `List Nat`), que ya estaba escrita. Es
+la confirmación *compilada* de [[feedback-footprint-no-es-constructividad]]: la raíz es
+**descomponer un `String`**. ⇒ el paso 4 tiene un dividendo medible, no sólo arquitectónico.
+
+### 5 · ⚠️ Por qué NO se generifica el resto ahora
+
+Porque generificar un módulo mueve el footprint de teoremas **ya publicados y medidos** (ADR-041,
+052, 053…). La ruta es **módulo a módulo, cada uno con su verde y su tabla de footprints**, no un
+big-bang. El parámetro estando dentro, cada paso es independiente — que es justamente lo que esta
+entrega compra.
+
+**Controles (re-ejecutados, M-13):** RPP **145 jobs** · FOL **53 jobs** · `check-footprints` **147
+idénticos** · `check-estratos` **10** · `check-warnings` **11** · `check-doc-sync` ✅ en los dos
+repos · `check-axioms` ✅ · **0 sorry**.
+
+**Véase también:** `sondeos/SymbolParamCoste.lean`, `sondeos/SymbolParam.lean`,
+`doc/PLAN-COMPLETITUD-FINITISTA.md` §7.5, ADR-067.
