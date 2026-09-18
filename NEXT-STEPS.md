@@ -1,5 +1,7 @@
 # Next Steps — ROBINSON_PlusPlus
 
+**Last updated:** 2026-09-18 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
@@ -8,6 +10,48 @@
 ⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
 🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **161** · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
+
+> # 🗓️ 2026‑09‑18 (cierre) — 🔧 **A3 y A1: dos controles que aprobaban SIEMPRE** (ADR‑072)
+>
+> ## A3 · `[E]` estaba desarmado por **TRES** vías
+>
+> 1. su **referencia** era el CHANGELOG, que un humano mantiene — congelado en **2026‑05‑16** con
+>    **115 commits** detrás ⇒ ningún doc podía estar «por detrás» ⇒ **aprobaba siempre**;
+> 2. sus `E_HITS` **no tocaban `FAIL`** en ninguna rama;
+> 3. leía la fecha con `head -12`, y `**Last updated:**` vive en la línea **22‑38** ⇒ medía la
+>    fecha del **aviso histórico**, no la marca.
+>
+> 🔑 *Un control cuya REFERENCIA es un documento que alguien tiene que mantener se pudre con él.
+> La referencia tiene que CALCULARSE.* Ahora se calcula por documento: `git log -1 -- "$d"`.
+>
+> 📐 Al rearmarlo: **21 defectos en 24 documentos**. Se declaran en tabla (patrón de
+> `check-warnings`), y **rompe en los dos sentidos** ⇒ la cifra sólo puede bajar. Hoy **7 + 11**.
+> ✅ **Probado rompiendo**, no afirmado.
+> ⭐ Y lo que destapó de paso: `FOL/REFERENCE.md` tenía marca **2026‑05‑08** y
+> **`Lean version: v4.28.0`** — las dos falsas; el árbol está en v4.31.0 desde julio.
+> 🔑 *Una marca de tiempo falsa no viene sola: viene con lo que hay a su lado.*
+>
+> ## A1 · `[G.1]`, lo que NINGÚN control miraba
+>
+> 📐 De **24** líneas ⬜ en **16** módulos, **19 anuncian una deuda ya pagada**. `Sequent0` titulaba
+> el Hauptsatz «LA ÚNICA DEUDA QUE QUEDA» **tres veces** con `hauptsatz` probado; `Skolem0` decía
+> «⬜ **MEDIDO** que no existe nada de eso» con `SkolemN0` entero al lado.
+>
+> ⭐⭐ Y se comprueba **a máquina** porque el idioma del proyecto es exacto: *una deuda se ENUNCIA
+> como `Prop`* y se paga con `theorem X : ESA_PROP := …`. 🔑 *Una convención de escritura estricta
+> convierte una revisión de prosa en un grep.* Encuentra **las 3 previstas, 0 falsos positivos**,
+> y está **probado rompiendo**. ⛔ `[G.2]` no entra: acierta 2 de 11.
+>
+> ## ⛔⛔ Y la mitad que cazó el REFUTADOR, no el informe
+>
+> `TheoryFramework` decía «cinco `axiom` de `FOL/Completeness.lean`»: ese fichero **no existe** y
+> `cuarentena/Completeness.lean` tiene **UNO** — tercera aparición de la cifra falsa. Pero la
+> **deuda sigue VIGENTE**, y su razón real nadie la había escrito: `folSystem` declara
+> `derives := Derives` (el contaminado) y `completeness₀` va sobre `Derives₀` ⇒ **no la paga**.
+> 🔑 *Una deuda puede sobrevivir a la desaparición de su motivo; comprobar que el motivo sigue en
+> pie es parte de comprobar la deuda* — y eso un barrido por patrones **no** lo hace.
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 161 · estratos 10 · warnings 11 · 0 sorry.**
 
 > # 🗓️ 2026‑09‑18 (noche) — 🏁 **`Derives₀` GENÉRICO en DOS FIRMAS** (ADR‑071), y una atribución mía RETIRADA
 >

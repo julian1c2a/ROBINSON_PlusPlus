@@ -1,5 +1,7 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
+**Last updated:** 2026-09-18 — hasta **ADR-072**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
@@ -5779,3 +5781,84 @@ Soundness0`), que nadie había planificado. ⇒ son **DOS entregas con verde pro
 
 **Véase también:** ADR-068, ADR-069 (rectificada en §2), `doc/AUDITORIA-2026-09-18.md` (G3),
 `PLAN-COMPLETITUD-FINITISTA.md` §9.
+
+---
+
+## ADR-072: 🔧 **A3 y A1** — dos controles que aprobaban siempre, rearmados y **probados rompiendo**
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ATERRIZADO · verde en los dos repos
+**Contexto**: encargos A3 y A1 de `doc/AUDITORIA-2026-09-18.md`.
+
+### 1 · A3 · `[E]` estaba desarmado por **TRES** vías, no por una
+
+| # | el defecto | medido |
+|---|---|---|
+| 1 | su **referencia** era la entrada más reciente de `CHANGELOG.md`, que un HUMANO mantiene | congelado en **2026‑05‑16** con **115 commits** detrás ⇒ `NEWEST` viejo ⇒ ningún doc podía estar «por detrás» ⇒ **aprobaba siempre** |
+| 2 | `E_HITS` **no tocaba `FAIL`** en ninguna rama, ni en la de «control VACÍO» | los `FAIL=1` están en las líneas 126/178/378/389/426; el bloque `[E]` va de la 230 a la 263 |
+| 3 | leía la fecha con `head -12`, y `**Last updated:**` vive en la **línea 22‑38** | medía la fecha del **aviso histórico** de la cabecera, no la marca |
+
+🔑 *Un control cuya **REFERENCIA** es un documento que alguien tiene que mantener se pudre con él.
+La referencia tiene que **CALCULARSE**.* Ahora se calcula, y **por documento**: la fecha del
+último commit que tocó **ese** documento (`git log -1 -- "$d"`), que no se puede quedar vieja.
+
+⭐ **La tabla de deuda, y por qué**: al rearmarlo, la medición dio **21 defectos en 24 documentos**
+(11 desfases + 10 sin marca). Ponerlo en rojo de golpe habría dejado el repo en rojo
+indefinidamente; callarlo habría sido volver al verde falso. Se **declara**, como
+`check-warnings.bash` (ADR‑065), y **rompe en los dos sentidos** ⇒ la cifra sólo puede **BAJAR**.
+📐 Hoy: **7 declarados en FOL, 11 en RPP**.
+
+✅ **PROBADO rompiendo, no afirmado** (`scratchpad/probar_E.ps1`): un doc declarado que ya está
+bien → rojo («la deuda ESTÁ SALDADA, quítalo de la tabla»); un doc que falla y no está declarado
+→ rojo; restaurado → verde.
+
+⭐ Y lo que el control destapó al mirar de verdad: `FOL/REFERENCE.md` tenía marca **2026‑05‑08**
+y **`**Lean version**: v4.28.0`** — las dos falsas, y el árbol lleva en **v4.31.0** desde julio.
+🔑 *Una marca de tiempo falsa no viene sola: viene con lo que hay a su lado.*
+
+⬜ `CHANGELOG.md` de FOL, reconstruido de 2026‑05‑28 a 2026‑09‑18 desde `git log` y las ADR.
+⚠️ **No** desde el borrador del panel: su propio refutador marcó sus cifras como no verificadas.
+
+### 2 · A1 · `[G.1]` — lo que **ningún** control miraba
+
+`[E]` mira la **FECHA** del titular; nadie miraba lo que un docstring **AFIRMA QUE FALTA**.
+📐 Medido: de **24** líneas con ⬜ en **16** módulos, **19 anuncian una deuda ya pagada**, más
+**≥7** afirmaciones falsas sin ⬜ ⇒ **≥26 sitios** (cota inferior).
+
+⭐⭐ **Y esto se puede comprobar A MÁQUINA porque el idioma del proyecto es exacto**: *una deuda
+se **ENUNCIA** como `Prop`, nunca se postula*, y se paga con `theorem X : ESA_PROP := …`. No hay
+que leer prosa: se compara un nombre con otro.
+🔑 *Una convención de escritura estricta es lo que convierte una revisión de prosa en un grep.*
+
+`[G.1]` encuentra **exactamente las tres previstas y cero falsos positivos**:
+`Herbrand0:275` (`HerbrandExtraction`), `HerbrandBlock0:183` (`HerbrandExtractionBlock`),
+`Sequent0:504` (`CutElim`). ✅ **Probado rompiendo**: al revertir una cabecera a ⬜ vuelve a rojo.
+
+⚠️ **Afinado**: dispara si la cabecera marca DEUDA **y NO** la marca PAGADA. No lo debilita —
+`[G.1]` sólo mira deudas **cuyo testigo ya existe**, luego escribir «PAGADA» ahí es escribir la
+verdad; lo que caza es *«dice ABIERTA y está CERRADA»*.
+
+⛔ **`[G.2]` NO entra**: acierta **2 de 11** (`Skolem0` cita `shiftEnv`/`exBlock` justo para decir
+«esto SÍ está, lo otro no»). 🔑 *Un control que grita lobo se deja de mirar.*
+
+### 3 · ⛔⛔ Y la mitad de A1 que el REFUTADOR cazó, no el informe
+
+`TheoryFramework` decía que «`completeness` se apoya en **cinco `axiom`** de
+`FOL/Completeness.lean`». **Doblemente falso**: ese fichero **no existe**, y
+`cuarentena/Completeness.lean` tiene **UNO**. Era su **TERCERA** aparición en el repo.
+
+⚠️ Pero el informe lo clasificó entre las 19 obsoletas, y **la deuda sigue VIGENTE**. Su razón de
+verdad es otra, y nadie la había escrito: `folSystem` declara `derives := fun Γ f => Derives Γ f`
+—el cálculo **contaminado**— mientras `completeness₀` se prueba sobre **`Derives₀`** ⇒
+**`completeness₀` NO paga `CompleteLogic Formula`**.
+
+🔑 *Una deuda puede sobrevivir a la desaparición de su motivo. Comprobar que el motivo sigue en
+pie es parte de comprobar la deuda* — y es justo lo que un barrido por patrones **no** hace.
+⬜ Las dos salidas quedan escritas en el fichero; elegir exige ADR.
+
+**Controles (re-ejecutados, M-13):** RPP **145 jobs** · FOL **54 jobs** · `check-footprints`
+**161** · `check-estratos` **10** · `check-warnings` **11** · `check-doc-sync` ✅ con `[E]`
+rearmado y `[G.1]` nuevo · `check-axioms` ✅ · **0 sorry**.
+
+**Véase también:** `doc/AUDITORIA-2026-09-18.md` (A1, A3), ADR-065 (el patrón de la tabla de
+deuda), ADR-041 (`completeness₀`), ADR-071.
