@@ -60,17 +60,22 @@ jobs:
       # dias de los logs, dejaba de ser CERTIFICABLE (inferible de la historia, si; certificado,
       # no). 🔑 *Un verde que no dice contra que ha construido no es reproducible, y la
       # diferencia solo se nota cuando ya no se puede recuperar.*
+      # ⚠️ Las rutas van RELATIVAS a `working-directory: ROBINSON_PlusPlus` (linea 19): el
+      # hermano es `../FOL`, no `FOL`. Primer intento: `fatal: cannot change to 'FOL'` y la
+      # CI muerta en 12 s. El fichero ya avisaba de esta clase en la linea ~91 para los
+      # `path:` de un `uses:` -- y no me sirvio. Validar el YAML comprueba la SINTAXIS, no
+      # las RUTAS.
       - name: Certificar el par (RPP@sha, FOL@sha)
         run: |
-          FOL_SHA=$(git -C FOL rev-parse HEAD)
-          FOL_DATE=$(git -C FOL log -1 --format=%ad --date=iso)
-          RPP_SHA=$(git -C ROBINSON_PlusPlus rev-parse HEAD)
+          FOL_SHA=$(git -C ../FOL rev-parse HEAD)
+          FOL_DATE=$(git -C ../FOL log -1 --format=%ad --date=iso)
+          RPP_SHA=$(git rev-parse HEAD)
           {
             echo "### Par certificado"
             echo ""
             echo "| repo | sha | fecha |"
             echo "|---|---|---|"
-            echo "| ROBINSON_PlusPlus | \`$RPP_SHA\` | $(git -C ROBINSON_PlusPlus log -1 --format=%ad --date=iso) |"
+            echo "| ROBINSON_PlusPlus | \`$RPP_SHA\` | $(git log -1 --format=%ad --date=iso) |"
             echo "| FOL (\`ref: master\`) | \`$FOL_SHA\` | $FOL_DATE |"
           } >> "$GITHUB_STEP_SUMMARY"
           echo "PAR: RPP=$RPP_SHA  FOL=$FOL_SHA"
