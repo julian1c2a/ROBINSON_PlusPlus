@@ -159,6 +159,8 @@ FOL.BlockExtraction0.instB_nil|-
 FOL.BlockExtraction0.lk0_herbrand_block|Quot.sound,propext
 FOL.BlockExtraction0.herbrand_extraction_block|Quot.sound,propext
 FOL.BlockExtraction0.herbrand_block|Quot.sound,propext
+FOL.SkolemHerbrand0.derives0_neg_allBlock_iff|Quot.sound,propext
+FOL.SkolemHerbrand0.herbrand_of_skolemNF|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

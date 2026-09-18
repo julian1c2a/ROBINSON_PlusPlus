@@ -5203,3 +5203,103 @@ deja `PrfH` como «variante contextual» **sin decir que es clasico** ⇒ va por
 
 **Vease tambien:** `../FOL/FOL/SkolemNF0.lean` §8, `check-warnings.bash`, ADR-062 (donde la
 direccion ⟹ quedo abierta), ADR-060 §6 (donde nacio M-13), ADR-055, ADR-063.
+
+---
+
+## ADR-066: El enchufe Skolem<->Herbrand, y la MEDICION del paso 4 (`String -> S`)
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ACEPTADA (§1) · 🔶 DECISION TOMADA, EJECUCION NO EMPEZADA (§3)
+**Contexto**: [[2.]], [[3.]] y [[5.]] de la lista del propietario.
+`../FOL/FOL/SkolemHerbrand0.lean` (nuevo, ~55 l. de codigo).
+
+### 1 · 🏁 [[2.]] El enchufe -- y las dos piezas NO componian
+
+    derives0_neg_allBlock_iff : (Γ ⊢₀ ¬∀ᵐψ) ↔ (Γ ⊢₀ ∃ᵐ¬ψ)
+    herbrand_of_skolemNF      : ∃ m ψ, QuantFree ψ ∧
+                                 ([] ⊢₀ ¬(skolemize k (prenex φ)) ↔ ∃ tss E, HerbrandCertBlock m (¬ψ) tss E)
+
+📏 `[propext, Quot.sound]`: **ni un `Classical.choice`**.
+
+ADR-062 §4 midio bien la juntura: `skolemNF_shape` entrega **exactamente** `∀ᵐψ` con `QuantFree ψ`,
+que es la hipotesis de `herbrand_block`… pero **Herbrand habla de EXISTENCIALES y Skolem los
+quita**. No es que faltara un lema: es que las dos piezas se encuentran **al otro lado de una
+negacion**.
+
+🔑 *Dos teoremas que «encajan por el tipo» pueden no componer: hay que mirar si uno habla del DUAL
+del otro.*
+
+⭐ Y la mitad cara **ya era un constructor**: `Derives₀.forall_not_ex_not` (`Derives0.lean:141`).
+Iterarla sobre el bloque son tres lineas por direccion. La reciproca es intuicionista y se
+construye con `elim_ex` + `elim_forall` — con las dos trampas de siempre: bajo `elim_ex` el
+contexto llega **levantado** (hace falta `inst_var0` a mano) y el paso hay que **generalizarlo en
+el contexto**, porque un `have` con `_` no lo infiere.
+
+### 2 · ⛔ [[3.]] El puente hacia `LKp` -- y hay una ruta MEJOR que la que se descarto
+
+ADR-065 §4 midio que el camino barato no existe: `cut_elimination` esta probado para `LKc → LK₀` y
+que **preserve la ausencia de `eqAx` no esta enunciado**.
+
+⭐ Pero al mirarlo de nuevo aparece una tercera ruta, y es **mejor que las dos anteriores**:
+**relativizar la condicion de lenguaje a las instancias de igualdad usadas**, exactamente como
+`lk0_herbrand` hace con su `E`:
+
+    maehara_eq : LK₀ Γ Δ → ∀ particiones, ∃ C E, (∀ g ∈ E, EqInstance g) ∧ … ∧
+                 PredSub C (Γ₁ ++ Δ₁ ++ E) ∧ PredSub C (Γ₂ ++ Δ₂ ++ E)
+
+El caso `eqAx` cierra: se mete `g` en `E` y la condicion lo admite. ⚠️ **RAZONADO, NO COMPILADO.**
+
+⭐⭐ Y lo que eso entregaria es **interpolacion para `LK₀` — el calculo que el proyecto USA**, no
+para uno distinto. ⇒ **refutaria la obstruccion que ADR-056 §1 declaro CONFIRMADA** («lo unico
+entregable seria interpolacion para un calculo distinto»). Seria la **sexta** obstruccion mia
+refutada.
+
+⚠️ Coste: reescribir `Craig0` entero con el parametro `E` (los 26 casos, ~700 l. mecanicas).
+⬜ No empezado: es una sesion completa, y no se improvisa un refactor de ese tamaño.
+
+### 3 · 📐 [[5.]] El paso 4 -- MEDIDO, y la cota del plan sobreestimaba por un orden
+
+**Decision del propietario: parametro `S` generico.** Antes de tocar nada, dos mediciones.
+
+**(a) El alcance real.** El plan §7 citaba «163 modulos / 3 902 declaraciones». Eso es el tamaño
+del **arbol**, no el del **cambio**:
+
+| | modulos que mencionan `String` | lineas |
+|---|---|---|
+| FOL | **19** de 46 | 144 |
+| ROBINSON_PlusPlus | **15** | 75 |
+| **total** | **34** | **219** |
+
+⚠️ Matiz honesto: al parametrizar el INDUCTIVO, todo lo que menciona `Term`/`Formula` cambia de
+tipo aunque no mencione `String` ⇒ la cota de 163 modulos vale para *eso*. El trabajo **no
+mecanico** son las 219 lineas.
+
+**(b) La viabilidad tecnica — sondeada y COMPILADA** (`sondeos/SymbolParam.lean`):
+
+* ✅ `inductive Term (S : Type)` con recursion **anidada** compila, y `deriving Repr, BEq`
+  **sobrevive** al parametro.
+* ✅ `occursTerm {S} (c : S)` compila **sin `DecidableEq`** — compara con `=` en `Prop`.
+* ✅ `updateFunc` compila con `[DecidableEq S]`.
+* ✅ Y la variante ligera (`abbrev Sym : Type := List Char`, inductivo SIN parametro) tambien
+  compila, y `symCode` sobre `List Char` sale **net-0** ⇒ confirma que la puerta del
+  `Classical.choice` (`String.toList`) **desaparece**.
+
+⚠️⚠️ **Y una consecuencia que hay que decidir antes de empezar**: con `S` **arbitrario**,
+`FOL.Metamath.Enumeration.natToTerm_surj` **deja de ser demostrable** (enumera los terminos, y eso
+exige que los simbolos sean numerables). De el cuelgan `Canonical0` (completitud) y `Compacity0`
+(compacidad y LS descendente). ⇒ el parametro generico obliga a **añadir una hipotesis de
+numerabilidad** a esa rama. ⬜ No medido cuanto cuesta.
+
+⭐ La variante ligera no tiene ese problema y cumple el objetivo declarado —«que no haya que
+migrar dos veces»— porque cambiar el tipo de simbolos pasa a ser **una linea**. Lo que NO da es
+genericidad real: ni dos signaturas a la vez, ni teoremas cuantificados sobre `S`.
+
+🔑 *Antes de ejecutar una migracion de firma, medir el alcance REAL: la cota que circulaba
+sobreestimaba por un orden de magnitud, y eso cambia que variante conviene.*
+
+**Controles:** RPP **145 jobs** · FOL **53 jobs** · `check-footprints` **147** ·
+`check-estratos` **10** · `check-warnings` **11** · `check-doc-sync` ✅ en los DOS repos ·
+`check-axioms` ✅ · `check-sorry` ✅ · **0 sorry**.
+
+**Vease tambien:** `../FOL/FOL/SkolemHerbrand0.lean`, `sondeos/SymbolParam.lean`, ADR-065,
+ADR-063 (Craig), ADR-056 §1 (la obstruccion que §2 pondria en duda).
