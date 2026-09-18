@@ -11,6 +11,34 @@
 🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **383** (cobertura 356/356) · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
 
+> # 🗓️ 2026‑09‑18 (traca, cierre) — ✅ **⬜4: sí hay linter, y salta** (ADR‑074)
+>
+> El último ⬜ de `Sugerencias.md`, y el único que sobrevivió a ADR‑070. **Respuesta: SÍ** —
+> `Lean.Elab.Command.Linter` + `addLinter` + `register_option` están en **core, sin Mathlib**, y
+> el aviso sale **en el punto de declaración**. Evidencia compilada en `sondeos/lintlab/`:
+> **dos warnings, en las dos líneas `axiom`, y ninguno** en el `def` ni en el `theorem`.
+>
+> ## ⚠️ La trampa, y costó tres intentos
+>
+> El linter recibe **el comando ENTERO** (`…Command.declaration`); el `axiom` es un nodo **HIJO**.
+> Comparar el kind de la raíz **no casa nunca** — y entonces el linter **no falla: CALLA**.
+> 🔑 *Un linter que no casa no da error: se queda mudo. Y un control mudo se lee como «no hay
+> nada».* Antes de dar con eso descarté dos hipótesis, las dos **falsas y medidas**: no era que
+> faltara la API, ni que estuviera gateada por opción. *Medir dónde NO está el fallo también es
+> medir.*
+>
+> ## ⛔ El punto ciego, MEDIDO
+>
+> Un linter **no se aplica al fichero que lo registra**; sólo a los que lo **importan** ⇒ un
+> `axiom` en un módulo que no lo importe **no lo mira nadie**. ⇒ **tienen que ser LOS DOS**: el
+> linter como aviso TEMPRANO y `check-axioms.bash` como CENSO, misma tabla e **igualdad exacta**.
+>
+> ⬜ **Sin decidir**: dónde colgarlo. El barril lo haría dependencia de todo, y no está medido qué
+> le hace al tiempo de construcción. ⚠️ Y los cuatro `axiom` de FOL viven en `MetaRules.lean`, que
+> el barril importa: habría que comprobar que el linter llega **antes** que ellos.
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 383 · estratos 10 · warnings 11 · 0 sorry.**
+
 > # 🗓️ 2026‑09‑18 (traca) — 🔧 **A4 y A2** (ADR‑073): el par certificado y la tabla COMPLETA
 >
 > ## A4 · el verde certificaba «contra ALGÚN FOL», no contra cuál

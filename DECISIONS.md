@@ -5969,3 +5969,63 @@ Lo cazó **su propia prueba de rotura**, a la primera: quité la fila de `comple
 `check-axioms` ✅ · RPP **145 jobs** · FOL **54 jobs**.
 
 **Véase también:** `doc/AUDITORIA-2026-09-18.md` (A2, A4), ADR-072, ADR-065.
+
+---
+
+## ADR-074: ✅ **⬜4** — sí hay linter en v4.31 sin Mathlib, y su punto ciego está MEDIDO
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ MEDIDO con evidencia compilada (`sondeos/lintlab/`) · ⬜ despliegue NO decidido
+**Contexto**: el último ⬜ de `Sugerencias.md`, y el único que sobrevivió a ADR-070. No iba de
+M-10: va de **adelantar el censo de `axiom`**, de un barrido posterior a un aviso **en el punto
+de declaración**.
+
+### 1 · ✅ La respuesta es SÍ, a las dos preguntas
+
+`Lean.Elab.Command.Linter` + `addLinter` + `register_option` están en **core**, sin Mathlib.
+📐 Evidencia compilada (`sondeos/lintlab/`, dos ficheros):
+
+    linters: 19 — incluye axiomCensus: true
+    Uso.lean:29:0: warning: axiom declarado -- necesita ADR y fila en AXIOMS.md
+    Uso.lean:31:0: warning: axiom declarado -- necesita ADR y fila en AXIOMS.md
+
+⭐ **Dos avisos, en las dos líneas `axiom`, y ninguno** en el `def` ni en el `theorem`: no grita
+lobo, que era la calibración que tumbó a `[G.2]` en ADR-072.
+
+### 2 · ⚠️ La trampa que costó TRES intentos, y es genérica
+
+El linter recibe **el comando ENTERO**, que para una declaración es
+`Lean.Parser.Command.declaration`; el `axiom` es un nodo **HIJO**. `stx.isOfKind
+``Lean.Parser.Command.axiom` **no casa nunca** — y el linter entonces **no falla: CALLA**.
+
+🔑 *Un linter que no casa no da error: se queda mudo. Y un control mudo se lee como «no hay
+nada».* Es la misma forma que las doce causas de [[feedback-controles-que-no-comprueban]], pero
+en una herramienta que se escribe precisamente para vigilar.
+
+⚠️ Antes de dar con eso descarté dos hipótesis, las dos **falsas** y las dos medidas: no era que
+la API no existiera (existe), ni que estuviera gateada por opción (`lintersRef` traía las 19 con
+la mía dentro, en el fichero que importa). *Medir dónde NO está el fallo también es medir.*
+
+### 3 · ⛔ El punto ciego, MEDIDO y no supuesto
+
+1. Un linter registrado con `initialize addLinter` **no se aplica al fichero que lo registra**:
+   sus propios `axiom` posteriores pasan sin aviso.
+2. Sí se aplica a los que **importan** ese módulo.
+3. ⇒ **un `axiom` en un módulo que no importe el linter no lo mira nadie.**
+
+⇒ **tienen que ser LOS DOS**, como el propietario anticipó: el linter como aviso **TEMPRANO** y
+`check-axioms.bash` como **CENSO**, con la misma tabla y siempre **igualdad exacta**, nunca cota.
+Es la doctrina de `check-warnings.bash`, de `[E]` y de `[COBERTURA]`.
+
+### 4 · ⬜ Lo que NO está decidido
+
+Dónde colgarlo para que lo importe todo el árbol. El candidato es el barril, pero eso lo
+convierte en dependencia de todo y **no está medido** qué le hace al tiempo de construcción.
+⚠️ Y ojo con el orden: los cuatro `axiom` de FOL viven en `FOL/MetaRules.lean`, que el barril
+importa — habría que comprobar que el linter llega **antes** que ellos, no después.
+
+**Controles (todos `exit 0`):** `check-footprints` **383** (cobertura 356/356) · `check-doc-sync`
+· `check-estratos` **10** · `check-warnings` **11** · `check-sorry` · `check-axioms` ✅.
+
+**Véase también:** `sondeos/lintlab/`, `Sugerencias.md` ⬜4, ADR-070 (que mató ⬜1‑⬜3),
+ADR-072 (`[G.2]` fuera por gritar lobo).
