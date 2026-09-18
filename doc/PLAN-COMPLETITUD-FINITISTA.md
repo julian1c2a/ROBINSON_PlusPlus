@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-18 10:40 · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-09-18 12:30 · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -43,7 +43,7 @@
 >
 > ⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.
 >
-> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.12**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060), 🏁 **la FORMA NORMAL de Skolem** (062) y 🏁 **MAEHARA + CRAIG** para el fragmento puro (063).
+> 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.13**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060), 🏁 **la FORMA NORMAL de Skolem** (062) 🏁 **MAEHARA + CRAIG** para el fragmento puro (063) y 🏁 **la mitad ⟹ de HERBRAND DE BLOQUE** (064). ⇒ **sin deudas enunciadas.**
 > ⚠️ Lo excluido del catálogo va con su razón **medida** en ADR‑054 §4 (propiedad de subfórmula, conservatividad de los 107 `codingAxioms`, Church): **falsos o no enunciables**, no «pendientes».
 >
 > ## Los dos objetivos, decididos
@@ -1193,6 +1193,40 @@ desde cero». Medido: **665 l.**, y `predF`+`PredSub`+`Cov` son **30**. El riesg
 el módulo lleva `lkp_example`/`craig_example` como controles de **no vacuidad**; no es
 interpolación para **FOLᐟ**; y no incluye la condición sobre **variables libres** (vacua para
 sentencias, estrictamente más débil para fórmulas abiertas).
+
+---
+
+### 6.13 · 🏁 La mitad ⟹ de HERBRAND DE BLOQUE — 2026‑09‑18, ADR‑064
+
+`../FOL/FOL/BlockExtraction0.lean`, módulo nuevo, **≈400 l. de código**. Es **E**, la última deuda
+**enunciada** del catálogo (§6.4 la dejó como `Prop` con su consumidor delante).
+
+    lk0_herbrand_block        : la inducción de 14 casos sobre `LK₀`, con el invariante de bloque
+    herbrand_extraction_block : HerbrandExtractionBlock            -- ⬜ era una deuda
+    herbrand_block            : ([] ⊢₀ exBlock n φ) ↔ ∃ tss E, HerbrandCertBlock n φ tss E
+
+📏 `[propext, Quot.sound]` en todo: **ni un `Classical.choice`**. `instB_nil`, sin ningún axioma.
+
+⭐⭐ **`instB` ya era la función de resto parcial.** §6.4 midió bien la obstrucción —hay que llevar
+la tupla parcial— pero el dato no había que construirlo: el caso que parecía basura de `instB`
+devuelve **el bloque pendiente** (`instB 2 [t] φ = exBlock 1 (φ[1 := t])`). El invariante cabe en una
+línea: `QuantFree d ∨ ∃ us, us.length ≤ n ∧ d = instB n us φ`.
+🔑 *Antes de construir el dato que falta, mirar si una función que ya existe lo devuelve en su caso
+degenerado.*
+
+⭐ **Un invariante MÁS FUERTE salió MÁS BARATO**: el testigo se pide `QuantFree` (y no «distinto del
+existencial», como en `lk0_herbrand`), y eso descarta solo el subcaso de `exR` en que queda bloque.
+
+⚠️ **El caso `n = 0` no es decorativo**: `exBlock 0 φ = φ` **sí** es sin cuantificadores, luego ahí
+el testigo es legítimo y hay que meter la **tupla vacía** en el certificado. Sin ese `cases`, el
+teorema no sale.
+
+✅ **Y la estimación de §6.4 ACERTÓ**: ~350–450 l. estimadas, **≈400** medidas — la primera de esta
+serie que cae dentro de su propio rango. Lo que se abarató fue la **pieza** conceptual, no el total.
+
+⬜ Queda: `HerbrandExtractionBlock` sigue siendo el **molde** en `HerbrandBlock0`; el teorema que lo
+habita vive en el módulo nuevo, porque fusionarlos invertiría la dependencia que §6.4 eligió.
+⇒ **el catálogo de metateoremas queda sin deudas enunciadas.**
 
 ---
 

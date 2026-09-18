@@ -152,6 +152,10 @@ FOL.Craig0.maehara|Quot.sound,propext
 FOL.Craig0.craig|Quot.sound,propext
 FOL.Craig0.craig_impl|Quot.sound,propext
 FOL.Craig0.lkp_example|-
+FOL.BlockExtraction0.instB_nil|-
+FOL.BlockExtraction0.lk0_herbrand_block|Quot.sound,propext
+FOL.BlockExtraction0.herbrand_extraction_block|Quot.sound,propext
+FOL.BlockExtraction0.herbrand_block|Quot.sound,propext
 FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.derive_atom_congr|Quot.sound,propext
 FOL.substTerm_liftTerm|Quot.sound,propext

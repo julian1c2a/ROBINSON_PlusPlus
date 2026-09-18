@@ -5009,3 +5009,99 @@ matematico. *Cuando el enunciado es el correcto, los 26 casos son mecanica.*
 
 **Vease tambien:** `../FOL/FOL/Craig0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.12,
 ADR-056 (donde F quedo abierta), ADR-062, ADR-051 (`lkh_subst`, la pieza que NO hizo falta).
+
+---
+
+## ADR-064: 🏁 La mitad ⟹ de HERBRAND DE BLOQUE -- y la funcion que ya llevaba el dato
+
+**Fecha**: 2026-09-18
+**Estado**: ✅ ACEPTADA
+**Contexto**: **E**, la ultima deuda enunciada del catalogo. ADR-055 la dejo como `Prop` con su
+consumidor delante y midio la obstruccion. `../FOL/FOL/BlockExtraction0.lean`, modulo nuevo,
+**≈400 l. de codigo** (518 con documentacion).
+
+    lk0_herbrand_block        : la induccion de 14 casos sobre `LK₀`, con el invariante de bloque
+    herbrand_extraction_block : HerbrandExtractionBlock            -- ⬜ era una deuda
+    herbrand_block            : ([] ⊢₀ exBlock n φ) ↔ ∃ tss E, HerbrandCertBlock n φ tss E
+
+📏 `[propext, Quot.sound]` en todo el modulo: **ni un `Classical.choice`** — como toda la via H.
+`instB_nil`, **sin ningun axioma**.
+
+### 1 · ⭐⭐ `instB` YA ERA la funcion de resto parcial
+
+ADR-055 midio asi la obstruccion: *«hay que llevar ademas la TUPLA PARCIAL acumulada ⇒ es un
+redisenio del enunciado, no una envoltura»*. Correcto en el QUE. Pero el dato no habia que
+construirlo: el caso que parecia basura de `instB` **no lo es**.
+
+    instB (n+1) [] φ = exBlock (n+1) φ          -- el bloque que queda PENDIENTE
+    instB 2 [t] φ    = exBlock 1 (φ[1 := t])    -- resto tras consumir UNA componente
+
+⇒ `instB n us φ` con `us` **mas corta que `n`** ES el resto parcial, y la tupla parcial **es** `us`.
+El invariante del consecuente cabe en una linea:
+
+    BlockInv n φ d := QuantFree d  ∨  ∃ us, us.length ≤ n ∧ d = instB n us φ
+
+🔑 *Antes de construir el dato que falta, mirar si una funcion que ya existe lo devuelve en su caso
+degenerado.* Van **ocho** de «antes de construir, buscar».
+
+### 2 · ⭐ La pieza de riesgo era UNA, y es la que casa con `exR`
+
+`instB_snoc`: alargar la tupla parcial por la derecha es **exactamente** lo que hace el
+constructor `exR` — pelar un `∃` y sustituir.
+
+    us.length < n  →  ∃ A, instB n us φ = ∃A  ∧  instB n (us ++ [t]) φ = A[0 := t]
+
+Se sondeo **antes** de escribir nada y compilo con dos correcciones, las dos conocidas: `instB n []`
+no reduce con `n` variable (hace falta `instB_nil`, dos lineas), y el `rfl` final de `rw` es
+`with_reducible` — **tercera vez** que aparece esa trampa (ADR-060 §4, ADR-062, esta).
+
+Con ella, los otros trece casos son el **calco** de `FOL.Sequent0.lk0_herbrand`, y la induccion
+entera compilo **a la primera, sin un solo error**.
+
+### 3 · ⭐ Un invariante MAS FUERTE salio MAS BARATO
+
+`lk0_herbrand` pide del testigo `Not (d = Formula.ex φ)`. Aqui se pide **`QuantFree d`**, que es
+estrictamente mas fuerte — y hace el trabajo solo en el subcaso de `exR` en que **queda bloque**:
+el testigo no puede ser la cabeza porque la cabeza sigue siendo un `∃`, y eso se lee del invariante
+sin ningun razonamiento adicional.
+
+🔑 *Un invariante mas fuerte puede salir MAS BARATO: descarta casos en vez de obligar a tratarlos.*
+
+### 4 · ⚠️ El caso `n = 0` no es decorativo, y sin el el teorema NO sale
+
+`exBlock 0 φ = φ` **si** es sin cuantificadores. Luego para `n = 0` el testigo de la induccion es
+legitimo y no hay contradiccion que explotar. El ensamblaje distingue: para `n = 0` mete la **tupla
+vacia** en el certificado, y entonces «todas las instancias falsas» contradice al testigo.
+⚠️ Y ahi aparecio la otra trampa conocida: `instB 0 [] φ` y `exBlock 0 φ` son **ambos** `φ`, pero
+`rw` casa por SINTAXIS — hubo que pedir la forma comun con dos `have` tipados.
+
+### 5 · ✅ Y la estimacion de ADR-055 ACERTO
+
+| | ADR-055 (estimado) | medido |
+|---|---|---|
+| lineas | ~350-450 | **≈400** ✅ dentro del rango |
+| riesgo | alto | medio |
+| «hay que llevar la tupla parcial» | ⚠️ cierto | ✅ **cierto** — pero ya la llevaba `instB` |
+
+⭐ Es la **primera** estimacion de esta serie que cae dentro de su propio rango. Lo que se abarato
+fue la PIEZA conceptual, no el total: no hubo `peelB` que escribir, pero los 14 casos se escriben
+igual.
+
+⛔ **Y una cifra mia que casi se publica sin medir**: al redactar la cabecera escribi «310 l.» y la
+compare con el rango para concluir que la estimacion se habia quedado larga. **No la habia medido.**
+Medida: ≈400, y la conclusion era la contraria. Corregida antes de commitear. Es exactamente lo que
+**M-13** dice, aplicado a mi mismo dos ADR despues de escribirla.
+
+### 6 · ⬜ Lo que queda
+
+* ⬜ `HerbrandBlock0.HerbrandExtractionBlock` sigue siendo un `def ... : Prop` (el molde). El
+  teorema que lo habita vive en el modulo nuevo. No se fusionan: `HerbrandBlock0` no puede importar
+  `Hauptsatz0` sin invertir la dependencia que ADR-055 eligio a proposito.
+* ⬜ Nada mas de E. **El catalogo de metateoremas queda sin deudas enunciadas.**
+
+**Controles:** RPP **145 jobs** · FOL **52 jobs** · `check-footprints` **142** ·
+`check-estratos` **10** · `check-doc-sync` ✅ en los DOS repos · `check-axioms` ✅ ·
+`check-sorry` ✅ · **0 sorry** · warnings **7 (RPP) + 4 (FOL)**, todos anteriores.
+
+**Vease tambien:** `../FOL/FOL/BlockExtraction0.lean`, `doc/PLAN-COMPLETITUD-FINITISTA.md` §6.13,
+ADR-055 (donde E quedo enunciada), ADR-052 (el Hauptsatz, que esto consume), ADR-063.

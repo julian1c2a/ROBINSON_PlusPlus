@@ -4,9 +4,9 @@
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **51** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑17 · `master` · ✅ ÁRBOL VERDE (RPP 145 jobs · FOL **52** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 7 en RPP** (`Meta/CodeWitnessPrf`, `Meta/SubstfcWitnessPrf`, `Meta/ChainNegPrf`, del 2026‑09‑09) **y 4 en FOL** (`TheoryFramework/Relations.lean`) — **la cifra «0 warnings» que ADR‑057…059 publicaron es FALSA** (era la de la `lean_lib FOL` sola). Todos cosméticos (`simp` sin usar / binder sin referenciar). ⬜ Deuda escrita.
-🔧 Controles: `check-footprints` **138** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
+🔧 Controles: `check-footprints` **142** · `check-estratos` **10** · `check-doc-sync` ⭐ **ya en los DOS repos** · `check-axioms` · `check-sorry` (ya **BLOQUEANTE** en la CI de FOL).
 
 > # 🗓️ 2026‑09‑17 — 🏁 **EL CATÁLOGO CLÁSICO**, tras el Hauptsatz (ADR‑053…056)
 >
@@ -121,7 +121,11 @@
 >   **pertenencia**, y los cuatro casos de eigenvariable **no des‑levantan nada** ⇒ no hubo que
 >   reprobar `lkh_subst`. ⬜ Queda el **puente hacia `LKp`**: `ndToLK` produce `LK₀` y usa
 >   `eqAx`. **No medido.**
-> * ⬜ La **mitad ⟹ de E** (~350–450 l.) — el invariante está confirmado.
+> * 🏁 ~~La mitad ⟹ de E~~ — **PAGADA**, ADR‑064, `FOL/BlockExtraction0.lean` (≈400 l.).
+>   ⭐⭐ **`instB` ya era la función de resto parcial**: su caso «basura» devuelve el bloque
+>   pendiente, así que no hubo que construir nada. La inducción de 14 casos compiló **a la
+>   primera**. ✅ Y la estimación ACERTÓ — la primera de la serie que cae en su rango.
+>   ⇒ **el catálogo de metateoremas queda sin deudas enunciadas.**
 > * 🏁 ~~Decisión (2) del informe de PeanoRF~~ — **ADOPTADO**, ADR‑061. ⚠️ Y la premisa era
 >   falsa: el control **no lee** las cifras del doc, las calcula del árbol; sin la línea no
 >   falla, sale **verde sin comprobar nada**. En su **primera ejecución** encontró tres desfases
