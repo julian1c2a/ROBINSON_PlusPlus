@@ -235,6 +235,49 @@ theorem derives_chainOk_neg_of_prems (l : List Term) (k : Nat)
   exact FOL.MetaRules.mp hne hbp
 
 
+/-- ⭐⭐ **LA REFUTACIÓN DE LA COTA.** Si ninguna de las `k` primeras líneas concluye `y`,
+la teoría **refuta** que alguna de ellas lo haga.
+
+⭐ **Y esto disuelve el paso que yo mismo había planificado.** El plan decía: «cambiar la cota»
+(`boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧`) para poder encadenar con los dos sentidos
+`boundedCarcIn ⇔ In _ (runFn nil p)` (`Meta/RunFnBoundedPrf.lean:225`, `:246`) y rematar con
+`prf_not_In_listFormCodeM`. **No hace falta nada de eso**: `prf_boundedCarcLt_zero` (la base) y
+`prf_boundedCarcLt_cons_succ_iff` (el paso) ya estaban en `Meta/ChainOkBoundedPrf.lean:428` y
+`:167`, y la refutación sale por **inducción directa** en veinte líneas — sin `l.take k`, sin
+`boundedCarcIn` y sin el puente a `In`.
+
+🔑 *Van OCHO de «antes de construir, buscar», y ésta disolvió un paso que había propuesto yo
+mismo el día anterior.*
+
+⚠️ La hipótesis `Nat.le k l.length` **no es decoración**: sin ella queda el caso `boundedCarcLt y
+nil (σ j)`, que habría que refutar aparte. Y va como `Nat.le` explícito porque `≤` resuelve al
+símbolo OBJETO `le` (trampa §de notación). -/
+theorem derives_not_boundedCarcLt (y : Term) :
+    ∀ (k : Nat) (l : List Term), Nat.le k l.length →
+      (∀ j x, j < k → l[j]? = some x → axioms ⊢ neg (Formula.eq (carc x) y)) →
+      axioms ⊢ neg (boundedCarcLt y (objList l) (numeralM k))
+  | 0, l, _, _ => by
+      exact prf_to_derives (prf_boundedCarcLt_zero y (objList l))
+  | _ + 1, [], hk, _ => by
+      exact absurd hk (by simp)
+  | k + 1, a :: as, hk, h => by
+      have hhead : axioms ⊢ neg (Formula.eq (carc a) y) :=
+        h 0 a (Nat.succ_pos k) rfl
+      have htail : axioms ⊢ neg (boundedCarcLt y (objList as) (numeralM k)) :=
+        derives_not_boundedCarcLt y k as (Nat.le_of_succ_le_succ hk)
+          (fun j x hj hx => h (j + 1) x (Nat.succ_lt_succ hj) hx)
+      show axioms ⊢ neg (boundedCarcLt y (cons a (objList as)) (succ (numeralM k)))
+      refine FOL.MetaRules.raa (fun hb => ?_)
+      have hsplit : axioms ⊢
+          lor (Formula.eq (carc a) y) (boundedCarcLt y (objList as) (numeralM k)) :=
+        FOL.MetaRules.mp
+          (prf_to_derives (prf_and_elim_left
+            (prf_boundedCarcLt_cons_succ_iff y a (objList as) (numeralM k)))) hb
+      exact FOL.MetaRules.or_elim hsplit
+        (fun hl => FOL.MetaRules.mp hhead hl)
+        (fun hr => FOL.MetaRules.mp htail hr)
+
+
 /-! ## §2 · `DEUDA_inNeg`: las CABEZAS de una cadena aceptada SON los códigos de sus conclusiones -/
 
 /-- Lo que `decodeLine` garantiza, extraído: la regla CONCLUYE la cabeza. -/
@@ -368,7 +411,7 @@ end ROBINSON_PlusPlus.Meta.ChainNegPrf
 export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_lt_congr_right derives_lineWF_congr
   derives_chainOk_neg_of_line
-  prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems
+  prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems derives_not_boundedCarcLt
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
 )
@@ -378,3 +421,4 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt
