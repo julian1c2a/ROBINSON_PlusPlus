@@ -99,6 +99,12 @@ open ROBINSON_PlusPlus.Meta.D3BodyPrf
 open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
+-- (§1ter, los cierres de (a) y (b)) todos alcanzables por transitividad
+open ROBINSON_PlusPlus.Meta.OmegaReflect
+open ROBINSON_PlusPlus.Meta.SubstTreeReflect
+open ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
+open ROBINSON_PlusPlus.Meta.NumListPrf
+open ROBINSON_PlusPlus.Meta.PremsOfTagPrf
 open ROBINSON_PlusPlus.Meta.LineWFCases
 open ROBINSON_PlusPlus.Meta.VerifierSound
 open ROBINSON_PlusPlus.Meta.CodeDecode
@@ -278,6 +284,105 @@ theorem derives_not_boundedCarcLt (y : Term) :
         (fun hr => FOL.MetaRules.mp htail hr)
 
 
+/-! ## §1ter · LOS CIERRES DE (a) y (b)
+
+⚠️ La cabecera de este módulo marcaba **(a)** y **(b)** con 🔶 «hay maquinaria». Medido: (a)
+estaba **hecha** y (b) a dos envoltorios. Van **seis** estimaciones altas seguidas en esta vía.
+🔑 *El proyecto tiene mucha más maquinaria construida de la que su propio índice refleja; lo que
+falta no es capacidad, es el mapa.* -/
+
+/-- ⭐ Un `StdArgs` **ES** un `objList`. Fontanería de forma, y la necesitan **las SEIS** causas:
+sin ella no encaja la forma `cons concl (cons k̄ (objList args))` que piden los cierres con la
+forma `cons ⌜f⌝ (cons k̄ as)` que da `StdLine`. -/
+theorem stdArgs_objList : ∀ {as : Term}, StdArgs as → as = objList (peelArgs as)
+  | _, StdArgs.nil => rfl
+  | _, StdArgs.form _ h => by
+      simp only [peelArgs_cons, objList]
+      rw [← stdArgs_objList h]
+  | _, StdArgs.term _ h => by
+      simp only [peelArgs_cons, objList]
+      rw [← stdArgs_objList h]
+
+/-- El tag de una línea CONCRETA se computa: `lineTag ⟨c, k̄, as⟩ = k̄`. -/
+theorem prf_lineTag_cons (concl as : Term) (k : Nat) :
+    Prf (Formula.eq (lineTag (cons concl (cons (numeralM k) as))) (numeralM k)) := by
+  show Prf (Formula.eq (nthc (cons concl (cons (numeralM k) as)) (succ zero)) (numeralM k))
+  exact prf_eq_trans (prf_nthc_succ concl (cons (numeralM k) as) zero)
+    (prf_nthc_zero (numeralM k) as)
+
+/-- ⭐⭐ **EL CIERRE DE (a)**: con el tag fuera de rango, la teoría refuta `lineWF`.
+
+⭐ `pcc_tag_vacuous` (`Meta/SubstTreeReflect.lean:1147`) **ya ERA el cierre**, no una acotación:
+da `Prf (lineWF t ⇒ ((lineTag t ≐ k̄) ⇒ C))` con `C` **arbitraria** y sin `[AnclaEq]`. Como
+`neg φ = Formula.impl φ Formula.bottom` **por definición**, tomar `C := ⊥` no cuesta ni una línea
+de conversión. `concl` y `as` quedan **arbitrarios**. -/
+theorem derives_lineWF_neg_of_tag_big (concl as : Term) {k : Nat} (hk : 20 < k) :
+    axioms ⊢ neg (lineWF (cons concl (cons (numeralM k) as))) :=
+  prf_to_derives
+    (prf_mp (prf_swap_imp (pcc_tag_vacuous _ Formula.bottom hk))
+            (prf_lineTag_cons concl as k))
+
+/-- Desigualdad de numerales a nivel `⊢`. -/
+theorem derives_numeralM_ne {m n : Nat} (h : m ≠ n) :
+    axioms ⊢ neg (Formula.eq (numeralM m) (numeralM n)) := by
+  have hx := gnum_ne h
+  simpa only [numeralM_eq] using hx
+
+/-- ⭐⭐ **EL MOTOR DE (b)**: si `lineWF` obliga a una longitud `n` y la línea mide `m ≠ n`, la
+teoría refuta `lineWF`. Vale igual para los veinte tags y para `mp`.
+⚠️ Arrastra `ex_elim` además de `raa`/`imp_intro`, por `gnum_ne`. -/
+theorem derives_lineWF_neg_of_lenc_imp {x : Term} {n m : Nat}
+    (himp : Prf (lineWF x ⇒ (Formula.eq (lenc x) (numeralM n))))
+    (hlen : Prf (Formula.eq (lenc x) (numeralM m))) (hnm : m ≠ n) :
+    axioms ⊢ neg (lineWF x) := by
+  refine FOL.MetaRules.raa (fun hw => ?_)
+  have h1 : axioms ⊢ (Formula.eq (lenc x) (numeralM n)) :=
+    FOL.MetaRules.mp (prf_to_derives himp) hw
+  have h2 : axioms ⊢ (Formula.eq (lenc x) (numeralM m)) := prf_to_derives hlen
+  have h3 : axioms ⊢ (Formula.eq (numeralM m) (numeralM n)) :=
+    FOL.derive_eq_trans (FOL.derive_eq_symm h2) h1
+  exact FOL.MetaRules.mp (derives_numeralM_ne hnm) h3
+
+/-- Envoltorio de longitud para los **veinte** tags con condición estructural.
+⭐ Gemelo de `prf_premsOf_tag_and` (`Meta/PremsOfTagPrf.lean:144`): el mapa del panel declaraba
+esta familia «LA pieza cara, no existe nada parecido» (85‑125 l.); **`prf_lenc_of_tag` ya estaba
+escrito** (`:66`) y esto son cuatro líneas. -/
+theorem prf_lenc_tag_and {k m : Nat} {C : Formula} (t : Term)
+    (hax : Prf (Formula.forall (Formula.impl (tagF k)
+      (lwfVar ⇔ Formula.and (lencF (m + 2)) C)))) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM k)) ⇒
+      (Formula.eq (lenc t) (numeralM (m + 2))))) :=
+  prf_lenc_of_tag t hax
+    (by
+      have hsub : substFormula 0 t (Formula.and (lencF (m + 2)) C)
+          = Formula.and (Formula.eq (lenc t) (numeralM (m + 2))) (substFormula 0 t C) := by
+        simp only [substFormula, substFormula_lencF]
+      rw [hsub]
+      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) (prfH_hyp_self _)))
+
+/-- Envoltorio de longitud para `mp` (16), el **único** sin condición estructural. -/
+theorem prf_lenc_tag_plain {k m : Nat} (t : Term)
+    (hax : Prf (Formula.forall (Formula.impl (tagF k) (lwfVar ⇔ lencF (m + 2))))) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM k)) ⇒
+      (Formula.eq (lenc t) (numeralM (m + 2))))) :=
+  prf_lenc_of_tag t hax
+    (by rw [substFormula_lencF]; exact prf_deduction (prfH_hyp_self _))
+
+/-- Tag 0 (`p1`), aridad 2 ⇒ `lenc = 4`. **El molde de los veinte**: una línea por rama. -/
+theorem prf_lenc_p1 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 0)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 0) (m := 2) t
+    (prf_ax (show ax_lineWF_p1 ∈ axioms by simp [axioms]))
+
+/-- Tag 16 (`mp`), **el molde del envoltorio `plain`**. -/
+theorem prf_lenc_mp (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 16)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_plain (k := 16) (m := 1) t
+    (prf_ax (show ax_lineWF_mp ∈ axioms by simp [axioms]))
+
+
 /-! ## §2 · `DEUDA_inNeg`: las CABEZAS de una cadena aceptada SON los códigos de sus conclusiones -/
 
 /-- Lo que `decodeLine` garantiza, extraído: la regla CONCLUYE la cabeza. -/
@@ -427,6 +532,44 @@ theorem decodeChainAux_none_first : ∀ (l : List Term) (acc : List Formula),
         · rw [hrec] at hd; simp at hd
 
 
+/-- ⭐⭐ **Cada línea del prefijo concluye algo que está en el acumulador.** Es el refinamiento
+de `decode_heads`: aquélla da la igualdad a nivel de LISTA, ésta **elemento a elemento**.
+
+⭐ La clave del abaratamiento fue enunciarlo por **PERTENENCIA** y no por índices: lo único que
+se le pide luego a `f` es `f ≠ g`, y eso sale de `f ∈ L` con `g ∉ L`, sin cuadrar ningún
+desplazamiento `acc.length + j`. 🔑 *Cuando un enunciado por índices se atasca, mirar si la
+pertenencia basta.*
+
+⚠️ Y va con `List.Mem` explícito porque `∈` resuelve al símbolo OBJETO — la misma trampa que
+`≤`/`le`, y la que `prf_not_In_listFormCodeM` ya esquivaba así. -/
+theorem decodeChainAux_carc_mem :
+    ∀ (l : List Term) (acc : List Formula) (rs : List Rule) (L : List Formula),
+      decodeChainAux acc (objList l) = some rs → checkAux rs acc = some L →
+      ∀ x, List.Mem x l → ∃ f, And (List.Mem f L) (Prf (Formula.eq (carc x) (formCodeM f)))
+  | [], _, _, _, _, _, _, hx => by cases hx
+  | line :: rest, acc, rs, L, hd, hc, x, hx => by
+      simp only [objList, cons, decodeChainAux, beq_self_eq_true, if_true] at hd
+      rcases hdl : decodeLine acc line with _ | fr
+      · rw [hdl] at hd; simp at hd
+      · rw [hdl] at hd
+        simp only [Option.bind] at hd
+        rcases hrec : decodeChainAux (acc ++ [fr.1]) (objList rest) with _ | rs'
+        · rw [hrec] at hd; simp at hd
+        · rw [hrec] at hd
+          simp only [Option.map, Option.some.injEq] at hd
+          subst hd
+          have hstep : stepConcl acc fr.2 = some fr.1 := decodeLine_stepConcl hdl
+          simp only [checkAux, hstep] at hc
+          obtain ⟨fs, hL, _⟩ := decode_heads rest (acc ++ [fr.1]) rs' L hrec hc
+          cases hx with
+          | head =>
+              refine ⟨fr.1, ?_, decodeLine_carc hdl⟩
+              rw [hL]
+              exact List.mem_append.mpr (Or.inl (List.mem_append.mpr (Or.inr (List.Mem.head _))))
+          | tail _ hm =>
+              exact decodeChainAux_carc_mem rest (acc ++ [fr.1]) rs' L hrec hc x hm
+
+
 /-! ## §3 · 🏁 `DEUDA_inNeg`, SALDADA -/
 
 /-- Transporte de una NO‑pertenencia por igualdad del contenedor. -/
@@ -462,7 +605,10 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_lt_congr_right derives_lineWF_congr
   derives_chainOk_neg_of_line
   prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems derives_not_boundedCarcLt
-  decodeChainAux_none_first
+  decodeChainAux_none_first decodeChainAux_carc_mem
+  stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
+  derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
+  prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
 )
@@ -474,3 +620,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_none_first
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_carc_mem
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p1
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_mp

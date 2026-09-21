@@ -242,6 +242,12 @@ ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk|Classical.choic
 ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems|Classical.choice,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,Quot.sound,propext,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
 ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt|Classical.choice,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,Quot.sound,propext,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
 ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_none_first|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_carc_mem|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big|Classical.choice,FOL.MetaRules.imp_intro,Quot.sound,propext,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
+ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,Quot.sound,propext,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
+ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p1|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_mp|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,Quot.sound,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,propext
 ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt|Classical.choice,Quot.sound,propext
