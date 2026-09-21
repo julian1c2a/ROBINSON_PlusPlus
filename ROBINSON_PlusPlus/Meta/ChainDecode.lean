@@ -104,6 +104,23 @@ theorem findIdx_sound (f : Formula) : ∀ (l : List Formula) (i : Nat),
         · rw [hj] at h; simp only [Option.map] at h; injection h with h; subst h
           simp only [List.getElem?_cons_succ]; exact ih j hj
 
+/-- **La búsqueda falla ⇒ no está** — contrarrecíproco útil de `findIdx_isSome_of_getElem`,
+    y **la puerta por la que entra la causa (d)** de `DEUDA_chainNeg`: `decodeRuleTag … 15 … = none`
+    **es** `findIdx f axioms = none`, y de ahí hay que salir a `¬ List.Mem f axioms`. -/
+theorem not_mem_of_findIdx_none {f : Formula} : ∀ {l : List Formula},
+    findIdx f l = none → ¬ List.Mem f l
+  | [], _, hm => by cases hm
+  | g :: gs, h, hm => by
+      simp only [findIdx] at h
+      by_cases hg : g = f
+      · rw [if_pos hg] at h; simp at h
+      · rw [if_neg hg] at h
+        rcases hj : findIdx f gs with _ | j
+        · cases hm with
+          | head => exact hg rfl
+          | tail _ hm' => exact not_mem_of_findIdx_none hj hm'
+        · rw [hj] at h; simp at h
+
 /-- **Completitud de `findIdx`**: si `f` aparece en `l`, la búsqueda tiene éxito. -/
 theorem findIdx_isSome_of_getElem (f : Formula) : ∀ (l : List Formula) (i : Nat),
     l[i]? = some f → (findIdx f l).isSome = true := by
@@ -389,7 +406,7 @@ export ROBINSON_PlusPlus.Meta.ChainDecode (
   peelArgs peelArgs_nil peelArgs_cons
   decodeRuleTag decodeRule decodeLine decodeChainAux decodeChain
   cleanRule decodeRule_lineJustif_clean
-  findIdx findIdx_sound findIdx_isSome_of_getElem
+  findIdx findIdx_sound findIdx_isSome_of_getElem not_mem_of_findIdx_none
   decodeRule_thy_eq decodeRule_mp_eq decodeRule_gen_eq
   decodeRule_thy_section decodeRule_mp_section decodeRule_gen_section
   decodeLine_sound decodeChainAux_checkAux decodeChain_checkProof decodeChain_prf

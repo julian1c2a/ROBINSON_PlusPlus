@@ -229,11 +229,21 @@ theorem derives_lineWF_neg_thy (concl : Term) (hne : axioms ⊢ neg (In concl ax
   derives_imp_trans
     (FOL.MetaRules.and_elim_left (prf_to_derives (prf_lineWF_thy concl))) hne
 
+/-- ⭐⭐ **EL CIERRE DE LA CAUSA (d)** de `DEUDA_chainNeg`: una línea `thy` cuya conclusión **no
+    está en `axioms`** queda REFUTADA. Compone con `neg_In_axiomsCodeT_of_not_mem` (§42).
+
+    ⛔ La hipótesis es `φ ∉ axioms`, **no** `¬ Prf φ`: es lo único que el decodificador entrega
+    (`decodeRuleTag … 15 …` es `(findIdx f axioms).map Rule.thy`), y la versión de abajo era
+    **inaplicable** sobre las `f` con `Prf f` y `f ∉ axioms`, que existen. Ver ADR‑076. -/
+theorem derives_lineWF_neg_thy_of_not_mem (φ : Formula) (hnm : ¬ List.Mem φ axioms) :
+    axioms ⊢ neg (lineWF (cons (formCode φ) (cons (numeralM 15) nil))) :=
+  derives_lineWF_neg_thy (formCode φ) (neg_In_axiomsCodeT_of_not_mem φ hnm)
+
 /-- **Payoff concreto**: una línea `thy` cuya conclusión NO es demostrable queda REFUTADA.
-    Compone con `neg_In_axiomsCodeT` (§42). -/
+    ⚠️ Corolario del de arriba desde 2026‑09‑21 — **no** es el que cierra (d). -/
 theorem derives_lineWF_neg_thy_of_not_prf (φ : Formula) (hnp : ¬ Prf φ) :
     axioms ⊢ neg (lineWF (cons (formCode φ) (cons (numeralM 15) nil))) :=
-  derives_lineWF_neg_thy (formCode φ) (neg_In_axiomsCodeT φ hnp)
+  derives_lineWF_neg_thy_of_not_mem φ (fun hmem => hnp (prf_ax hmem))
 
 end ROBINSON_PlusPlus.Meta.LineWFCases
 
@@ -241,5 +251,6 @@ export ROBINSON_PlusPlus.Meta.LineWFCases (
   tagArity tagConcl tagPrems prf_lineWF_tag_imp prf_premsOf_tag
   prf_imp_trans derives_imp_trans
   prf_lineWF_neg_of_tag derives_lineWF_neg_of_tag
-  derives_lineWF_neg_thy derives_lineWF_neg_thy_of_not_prf
+  derives_lineWF_neg_thy derives_lineWF_neg_thy_of_not_mem
+  derives_lineWF_neg_thy_of_not_prf
 )

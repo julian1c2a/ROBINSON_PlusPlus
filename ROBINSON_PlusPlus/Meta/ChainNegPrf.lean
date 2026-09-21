@@ -45,8 +45,13 @@ La cadena entera: `runFn nil ⟦l⟧ ≐ ⟦l.map carc⟧` (`prf_runFn_objList` 
 `≐ listFormCodeM fs` (§2), y ahí manda **`prf_not_In_listFormCodeM`**, que ya existía y cuyo
 docstring decía exactamente *«la refutación que necesita `NegVerifier`»*.
 
-⚠️ **Nada de esto usa el ancla de codificación**: el footprint no cita `AnclaEq` ni
-`ax_axiomsCodeT_eq`.
+⚠️ **Nada de esto usa el ancla de codificación**: el footprint **de `deuda_inNeg`** no cita
+`AnclaEq` ni `ax_axiomsCodeT_eq`.
+⛔ **ÁMBITO, añadido el 2026‑09‑21 (M‑13)**: la frase de arriba valía — y sigue valiendo — para
+`deuda_inNeg`, pero estaba escrita **sin etiqueta de ámbito** en la cabecera del **MÓDULO**. El
+cierre de (d) (§2ter) **sí** entra por `axiomsCodeT`, así que su footprint cita
+`ax_axiomsCodeT_eq`, y sin la etiqueta esta frase se habría vuelto falsa **sola**.
+🔑 *Una cifra sin ámbito se lee como global, y caduca en cuanto el módulo crece.*
 
 ## ⬜ Lo que queda de `DEUDA_chainNeg`, medido
 
@@ -59,7 +64,7 @@ enumerar**:
 | (a) | **tag fuera de rango** (`k ≥ 21`) | 🔶 `prf_tagDisj_absurd` acota el tag por 20 |
 | (b) | **aridad equivocada** | 🔶 los 21 `ax_lineWF_*` llevan `lenc = n̄`; es `gnum_ne` |
 | (c) | **la conclusión no casa** (`stepConcl ≠ f`) | ✅ **`derives_lineWF_neg_of_tag`** + `formCode_ne` — es el grueso, y está |
-| (d) | **`thy` con `f ∉ axioms`** | ✅ `derives_lineWF_neg_thy_of_not_prf` |
+| (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
 | (e) | **`mp`/`gen` sin premisas en el acumulador** | ⛔ **la única sin maquinaria**: no va por `lineWF` sino por el conjunto `premsOf ⊆ conclusiones anteriores` de `chainOk` |
 
 ⛔⛔ **RECTIFICADO el 2026-09-21, y las dos afirmaciones de arriba eran FALSAS** (panel
@@ -78,6 +83,15 @@ adversarial, ADR-075):
    (`grep` de `firstBad|badIdx|failIdx|takeWhile|List.take` en todo RPP: **vacío**). Ese
    **front-end** les falta a **las SEIS** causas, no sólo a (e).
    🔑 *Una afirmación de estado que viaja a una cabecera sin que nadie la compile.*
+3. ⛔⛔ **La ✅ de (d) era FALSA — y sobre una instancia ALCANZABLE** (ADR‑076). El lema que
+   citaba, `derives_lineWF_neg_thy_of_not_prf`, pide **`¬ Prf φ`**, y el decodificador sólo
+   entrega **`φ ∉ axioms`**: `decodeRuleTag acc f 15 args` **es** `(findIdx f axioms).map
+   Rule.thy` (`Meta/ChainDecode.lean:164`). `prf_ax : f ∈ axioms → Prf f` va en **un solo
+   sentido**, y como `axioms` son **141** fórmulas mientras `Prf` es infinito, **existen `f` con
+   `Prf f` y `f ∉ axioms`** — sobre ésas el lema no se podía aplicar. ⭐ El arreglo no fue
+   clonar: `neg_In_axiomsCodeT` se **generalizó en su sitio** (su primer paso era justo el que
+   sobraba) y el antiguo quedó de corolario, lo mismo en `LineWFCases`.
+   🔑 *Una ✅ que nombra un lema no dice que ese lema ACEPTE la hipótesis que le va a llegar.*
 
 ⭐ Y (e) **no** es «la única sin maquinaria»: su estructura son **dos lemas** (§1bis, aterrizados),
 y su cadena está **escrita en positivo** en `Meta/Representability2Prf.lean:307-337` — *el sujeto
@@ -570,6 +584,61 @@ theorem decodeChainAux_carc_mem :
               exact decodeChainAux_carc_mem rest (acc ++ [fr.1]) rs' L hrec hc x hm
 
 
+/-- ⭐⭐ **EL FRONT-END DE LA LÍNEA**: una línea estándar que no decodifica falla o bien porque
+la **REGLA** no sale, o bien porque la **CONCLUSIÓN no casa**. Lo primero cubre (a), (b), (d),
+(e) y (f); lo segundo **es exactamente (c)**.
+
+⭐⭐ Y esquiva el único riesgo que el panel marcó como posiblemente caro. Decía que habría que
+**invertir el `match` de 21 formas** de `decodeRuleTag`, lo que según la cabecera de
+`Meta/ChainDecode.lean:44` **revienta el `whnf`** (por eso existe `peelArgs`). **No hace falta
+invertirlo**: basta separar los **dos `bind`** de `decodeLine`, y el resultado ya apunta a
+`decodeRuleTag` con el tag y los argumentos pelados. Cada causa analiza desde ahí, con el tag
+ya en la mano.
+🔑 *El case-split de 21 formas no había que hacerlo: había que no llegar a necesitarlo.* Es la
+misma forma que `LeibnizPrin`/`eqAx` en el Hauptsatz — lo que desbloquea no es esfuerzo, es
+dónde se pone el corte.
+
+⚠️ Nota de proceso, por si alguien «limpia» esta prueba: el linter marca como *argumento no
+usado* un `simp only` que **sí** hace la reducción iota. Quitarlo rompe la prueba.
+*Un aviso de «no usado» no es una medición de que sobre.* -/
+theorem decodeLine_none_cases {acc : List Formula} {f : Formula} {k : Nat} {as : Term}
+    (h : decodeLine acc (cons (formCode f) (cons (numeralM k) as)) = none) :
+    Or (decodeRuleTag acc f k (peelArgs as) = none)
+       (∃ r, And (decodeRuleTag acc f k (peelArgs as) = some r)
+                 (stepConcl acc r ≠ some f)) := by
+  simp only [decodeLine, cons, beq_self_eq_true, if_true, decodeForm_formCode,
+    Option.bind, decodeRule, peelArgs, decodeNat_numeralM] at h
+  rcases hr : decodeRuleTag acc f k (peelArgs as) with _ | r
+  · exact Or.inl rfl
+  · refine Or.inr ⟨r, rfl, ?_⟩
+    by_cases hs : stepConcl acc r = some f
+    · rw [hr] at h; simp [hs] at h
+    · exact hs
+
+
+/-! ## §2ter · 🏁 el cierre de la causa **(d)**, de punta a punta -/
+
+/-- ⭐⭐ **(d), DE PUNTA A PUNTA**: si el decodificador rechaza una línea `thy`, la teoría
+**refuta** esa línea. Es la primera de las seis causas que queda cerrada desde el `= none` del
+verificador hasta un `axioms ⊢ neg (lineWF …)`.
+
+La cadena entera son **tres eslabones**, y los tres o existían o salían de generalizar algo que
+existía: `decodeRuleTag … 15 … = none` ⇒ `findIdx f axioms = none`
+(`Meta/ChainDecode.lean:164`, por `rfl`) ⇒ `f ∉ axioms` (`not_mem_of_findIdx_none`) ⇒ la
+refutación (`derives_lineWF_neg_thy_of_not_mem`, vía `neg_In_axiomsCodeT_of_not_mem`).
+
+⚠️ Footprint: **cita `ax_axiomsCodeT_eq`**, a diferencia de `deuda_inNeg` (§3). Es esperable —
+`axiomsCodeT` es precisamente lo que el ancla fija. -/
+theorem derives_lineWF_neg_thy_of_decode {acc : List Formula} {f : Formula} {args : List Term}
+    (h : decodeRuleTag acc f 15 args = none) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM 15) nil))) := by
+  refine derives_lineWF_neg_thy_of_not_mem f (not_mem_of_findIdx_none ?_)
+  rcases hj : findIdx f axioms with _ | j
+  · rfl
+  · rw [show decodeRuleTag acc f 15 args = (findIdx f axioms).map Rule.thy from rfl, hj] at h
+    simp at h
+
+
 /-! ## §3 · 🏁 `DEUDA_inNeg`, SALDADA -/
 
 /-- Transporte de una NO‑pertenencia por igualdad del contenedor. -/
@@ -605,7 +674,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_lt_congr_right derives_lineWF_congr
   derives_chainOk_neg_of_line
   prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems derives_not_boundedCarcLt
-  decodeChainAux_none_first decodeChainAux_carc_mem
+  decodeChainAux_none_first decodeChainAux_carc_mem decodeLine_none_cases
+  derives_lineWF_neg_thy_of_decode
   stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
   derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
@@ -621,6 +691,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_none_first
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_carc_mem
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeLine_none_cases
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_thy_of_decode
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp

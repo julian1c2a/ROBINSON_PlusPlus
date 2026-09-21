@@ -27,6 +27,8 @@ coste de ~40 s que motivó retirar el `axiomsCodeT` concreto en `7ae7b7b`.
 
 * **Positivo** `prf_In_listFormCodeM`: `f ∈ L ⟹ ⊢ In ⌜f⌝ (listFormCodeM L)` (reflexividad + recursión).
 * **Negativo** `prf_not_In_listFormCodeM`: `f ∉ L ⟹ ⊢ ¬ In ⌜f⌝ (listFormCodeM L)` (`formCode_ne` + rec.).
+* **General** `neg_In_axiomsCodeT_of_not_mem`: basta `φ ∉ axioms` — y `neg_In_axiomsCodeT`
+  (`¬ Prf φ`) es **su corolario**, no al revés (ADR‑076).
 * **Corolario** `neg_In_axiomsList_of_not_prf`: `¬ Prf φ ⟹ ⊢ ¬ In ⌜φ⌝ (listFormCodeM axioms)` — vía
   `prf_ax` (los axiomas son demostrables), **sin comparación sintáctica** de la lista.
 -/
@@ -67,7 +69,7 @@ theorem neg_In_axiomsList_of_not_prf (φ : Formula) (hnp : ¬ Prf φ) :
     demostrable, la teoría **refuta** que `⌜φ⌝` sea un axioma (`In ⌜φ⌝ axiomsCodeT`). Transporta
     `neg_In_axiomsList_of_not_prf` a `axiomsCodeT` por el anclaje `ax_axiomsCodeT_eq` (`Derives.subst`
     sobre el segundo argumento de `In`). Es el **espejo negativo** de `ax_inAxC`. -/
-theorem neg_In_axiomsCodeT (φ : Formula) (hnp : ¬ Prf φ) :
+theorem neg_In_axiomsCodeT_of_not_mem (φ : Formula) (hnm : ¬ List.Mem φ axioms) :
     axioms ⊢ neg (In (formCode φ) axiomsCodeT) := by
   have key : ∀ t : Term,
       substFormula 0 t (neg (In (formCode φ) (.var 0))) = neg (In (formCode φ) t) := by
@@ -75,14 +77,28 @@ theorem neg_In_axiomsCodeT (φ : Formula) (hnp : ¬ Prf φ) :
     rw [← formCodeM_eq φ]
     simp [neg, In, substFormula, substTerm, substTerms, substTerm_formCodeM, FOL.substTerm_liftTerm]
   have hpos : axioms ⊢ substFormula 0 (listFormCodeM axioms) (neg (In (formCode φ) (.var 0))) := by
-    rw [key]; exact neg_In_axiomsList_of_not_prf φ hnp
+    rw [key]; exact prf_not_In_listFormCodeM φ axioms hnm
   have hsub := Derives.subst axioms (listFormCodeM axioms) axiomsCodeT
     (neg (In (formCode φ) (.var 0))) (FOL.derive_eq_symm ax_axiomsCodeT_eq) hpos
   rwa [key] at hsub
+
+/-- ⛔⛔ **La versión con `¬ Prf φ` sale de la GENERAL, y no al revés** (2026‑09‑21, ADR‑076).
+
+Hasta hoy sólo existía ésta, y la cabecera de `Meta/ChainNegPrf.lean` marcaba con ✅ la causa (d)
+de `DEUDA_chainNeg` apuntando a su consumidor `derives_lineWF_neg_thy_of_not_prf`. **Era falso, y
+sobre una instancia ALCANZABLE**: el decodificador sólo entrega `φ ∉ axioms`, `prf_ax` va en **un
+solo sentido**, y como `axioms` son **141** fórmulas mientras `Prf` es infinito, **existen `f` con
+`Prf f` y `f ∉ axioms`** — justo sobre ésos el lema no se podía aplicar.
+
+⭐ La pieza no se clonó: se **generalizó en su sitio**, y lo único que sobraba era su primer paso.
+🔑 *Generalizar sale más barato que clonar — y además retira el defecto en vez de duplicarlo.* -/
+theorem neg_In_axiomsCodeT (φ : Formula) (hnp : ¬ Prf φ) :
+    axioms ⊢ neg (In (formCode φ) axiomsCodeT) :=
+  neg_In_axiomsCodeT_of_not_mem φ (fun hmem => hnp (prf_ax hmem))
 
 end ROBINSON_PlusPlus.Meta.AxiomListCode
 
 export ROBINSON_PlusPlus.Meta.AxiomListCode (
   prf_not_in_nil_D prf_not_In_listFormCodeM
-  neg_In_axiomsList_of_not_prf neg_In_axiomsCodeT
+  neg_In_axiomsList_of_not_prf neg_In_axiomsCodeT neg_In_axiomsCodeT_of_not_mem
 )

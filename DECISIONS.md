@@ -6114,3 +6114,97 @@ RPP **145 jobs** · FOL **54 jobs**.
 
 **Véase también:** ADR-073 (`[COBERTURA]` y la definición de titular), ADR-020 (las guardas
 dentro), ADR-022 (`StdChain` estrechada), `Meta/ChainNegPrf.lean` §1bis.
+
+---
+
+## ADR-076: 🏁 la causa **(d)**, CERRADA de punta a punta — y la ✅ que la daba por cerrada era **falsa**
+
+**Fecha**: 2026-09-21
+**Estado**: ✅ ATERRIZADO (4 ficheros) · **la primera de las seis causas cerrada entera**
+**Contexto**: vía A — los cierres de `DEUDA_chainNeg`, después del front-end (ADR-075).
+
+### 1 · ⛔⛔ La ✅ de (d) era falsa, y sobre una instancia **ALCANZABLE**
+
+La tabla de causas de `Meta/ChainNegPrf.lean` marcaba (d) con **✅
+`derives_lineWF_neg_thy_of_not_prf`**. Ese lema pide **`¬ Prf φ`**. Lo que el decodificador
+entrega es otra cosa:
+
+    | 15, _ => (findIdx f axioms).map Rule.thy        -- Meta/ChainDecode.lean:164
+
+es decir, **`φ ∉ axioms`** y nada más. Y `prf_ax : f ∈ axioms → Prf f` va en **un solo sentido**:
+de `φ ∉ axioms` **no** se sigue `¬ Prf φ`. Como `axioms` son **141** fórmulas mientras `Prf` es
+infinito, **existen** `f` con `Prf f` y `f ∉ axioms` — y sobre ésas el lema citado **no se podía
+aplicar**. No es un tecnicismo de dirección de implicación: es la clase mayoritaria.
+
+⭐ Es exactamente la lente de **ADR-067** aplicada a una ✅ en vez de a un teorema: *un lema
+CIERTO cuya hipótesis no es la que le va a llegar*.
+🔑 **Una ✅ que nombra un lema no dice que ese lema ACEPTE la hipótesis que le llegará.**
+La ✅ se pone mirando la **conclusión**; el fallo estaba en la **hipótesis**.
+
+### 2 · ⭐⭐ El arreglo no fue clonar: fue **generalizar en su sitio**
+
+El reflejo barato era escribir un gemelo `…_of_not_mem` al lado. No hizo falta, porque
+`neg_In_axiomsCodeT` (`Meta/AxiomListCode.lean`) **ya hacía todo el trabajo** y lo único que
+sobraba era **su primer paso**:
+
+    rw [key]; exact neg_In_axiomsList_of_not_prf φ hnp     -- ANTES
+    rw [key]; exact prf_not_In_listFormCodeM φ axioms hnm  -- AHORA
+
+Se renombró el teorema a `neg_In_axiomsCodeT_of_not_mem`, se cambió esa línea, y el antiguo quedó
+como **corolario de una línea**. Idéntico en `Meta/LineWFCases.lean` con
+`derives_lineWF_neg_thy_of_not_prf`. **Cero pruebas nuevas en los dos escalones.**
+
+🔑 *Generalizar sale más barato que clonar — y además **retira** el defecto en vez de dejarlo
+vivo al lado del arreglo.* Un clon habría dejado dos lemas y la ✅ vieja seguiría siendo cierta
+para uno de ellos.
+
+### 3 · 🏁 (d), de punta a punta — **la primera de las SEIS**
+
+`derives_lineWF_neg_thy_of_decode` (`ChainNegPrf` §2ter) va del `= none` del verificador a un
+`axioms ⊢ neg (lineWF …)`. Son **tres eslabones**, y ninguno costó una prueba de verdad:
+
+| eslabón | pieza | de dónde salió |
+|---|---|---|
+| `decodeRuleTag … 15 … = none` ⇒ `findIdx f axioms = none` | `rfl` | `ChainDecode.lean:164` |
+| ⇒ `f ∉ axioms` | `not_mem_of_findIdx_none` | contrarrecíproco, **13 l.**, `[propext]` |
+| ⇒ la refutación | `derives_lineWF_neg_thy_of_not_mem` | §2, generalizar en su sitio |
+
+⭐ `not_mem_of_findIdx_none` se colocó en `Meta/ChainDecode.lean`, **junto a sus dos gemelos**
+`findIdx_sound` y `findIdx_isSome_of_getElem` — que es donde alguien lo buscaría, no donde se usa.
+
+### 4 · ⚠️ M-13 en una frase que **todavía era cierta**
+
+La cabecera de `ChainNegPrf` decía, sin etiqueta de ámbito:
+
+> ⚠️ **Nada de esto usa el ancla de codificación**: el footprint no cita `AnclaEq` ni
+> `ax_axiomsCodeT_eq`.
+
+Valía para `deuda_inNeg`, y **sigue valiendo** para `deuda_inNeg`. Pero estaba escrita en la
+cabecera del **MÓDULO**, y el cierre de (d) **sí** entra por `axiomsCodeT` ⇒ su footprint cita
+`ax_axiomsCodeT_eq`. Sin la etiqueta, la frase se habría vuelto falsa **sola**, sin que nadie la
+tocara. Se le puso el ámbito **antes** de aterrizar (d), no después.
+
+🔑 *Una cifra sin ámbito se lee como global, y caduca en cuanto el módulo crece.*
+
+⚠️ Y un dato de la tabla de footprints: **`ax_axiomsCodeT_eq` no aparecía en NINGUNA de las 393
+filas anteriores**. (d) es el primer sitio de la cadena de `NegVerifier` por donde entra el ancla
+de codificación. No es un problema — `axiomsCodeT` es justo lo que el ancla fija — pero conviene
+que esté **declarado**, porque es la clase de dependencia que uno quiere ver moverse.
+
+### 5 · ⬜ Lo que queda de los cierres
+
+* **(e)** — todas las piezas existen (§1bis + front-end + `Representability2Prf.lean:307-337`);
+  es **el ensamblaje**.
+* **(c′)** — nombrar las 19 ecuaciones `prf_tagConcl_code`, que hoy sólo viven como subtérminos
+  anónimos dentro de un `cases` de 169 l. (`Meta/Representability2Prf.lean:180-346`), + 2 lemas
+  de inalcanzabilidad (tags 15/16) + transporte de 3 líneas.
+* **(b)** — las 19 ramas `prf_lenc_*` que faltan, una línea cada una.
+* **(f)** — no es una causa, **son tres cierres**.
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **398** (cobertura
+**368/368**, +5 filas y +2 titulares) · `check-estratos` **10** · `check-warnings` **11** ·
+`check-sorry` · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó** en esta entrada;
+sus cifras son las de ADR-074.
+
+**Véase también:** ADR-067 (la lente de vacuidad, que es la misma lente), ADR-075 (el front-end),
+ADR-073 (`[COBERTURA]`), `Meta/ChainNegPrf.lean` §2ter.

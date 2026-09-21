@@ -248,6 +248,11 @@ ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big|Classical.choic
 ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,Quot.sound,propext,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
 ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p1|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_mp|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainDecode.not_mem_of_findIdx_none|propext
+ROBINSON_PlusPlus.Meta.AxiomListCode.neg_In_axiomsCodeT_of_not_mem|propext,Classical.choice,Quot.sound,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq
+ROBINSON_PlusPlus.Meta.LineWFCases.derives_lineWF_neg_thy_of_not_mem|propext,Classical.choice,Quot.sound,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq
+ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeLine_none_cases|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_thy_of_decode|propext,Classical.choice,Quot.sound,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq
 ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,Quot.sound,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,propext
 ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt|Classical.choice,Quot.sound,propext
