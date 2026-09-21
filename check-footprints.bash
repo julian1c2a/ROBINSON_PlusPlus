@@ -261,6 +261,9 @@ ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem|propext,Classical
 ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedPremsIn_congr|propext,Classical.choice,Quot.sound
 ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem_line|propext,Classical.choice,Quot.sound,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
 ROBINSON_PlusPlus.Meta.ChainNegPrf.dispatcher|propext,Classical.choice,Quot.sound
+ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_thy|propext,Classical.choice,Quot.sound
+ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_listInd|propext,Classical.choice,Quot.sound
+ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_arity|propext,Classical.choice,Quot.sound,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
 ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,Quot.sound,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,propext
 ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt|Classical.choice,Quot.sound,propext

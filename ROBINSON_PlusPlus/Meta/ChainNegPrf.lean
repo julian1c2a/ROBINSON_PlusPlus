@@ -62,7 +62,7 @@ enumerar**:
 | # | por qué rechaza | ¿hay maquinaria? |
 |---|---|---|
 | (a) | **tag fuera de rango** (`k ≥ 21`) | 🔶 `prf_tagDisj_absurd` acota el tag por 20 |
-| (b) | **aridad equivocada** | 🔶 los 21 `ax_lineWF_*` llevan `lenc = n̄`; es `gnum_ne` |
+| (b) | **aridad equivocada** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_of_arity` + los **21** `prf_lenc_*` |
 | (c) | **la conclusión no casa** (`stepConcl ≠ f`) | ✅ **`derives_lineWF_neg_of_tag`** + `formCode_ne` — es el grueso, y está |
 | (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
 | (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑21** (§2quater, `derives_chainOk_neg_of_prem`) — no va por `lineWF` sino por `premsOf ⊆ conclusiones anteriores`. ⬜ falta sólo el **transporte** a `mp`/`gen` |
@@ -400,6 +400,170 @@ theorem prf_lenc_mp (t : Term) :
       (Formula.eq (lenc t) (numeralM 3)))) :=
   prf_lenc_tag_plain (k := 16) (m := 1) t
     (prf_ax (show ax_lineWF_mp ∈ axioms by simp [axioms]))
+
+
+/-! ### Las diecinueve ramas restantes de (b)
+
+⚠️ **Estas diecinueve estuvieron cotizadas como «19 líneas, ESTIMADO» durante tres mensajes.**
+Ahora están medidas: los diecinueve `prf_ax` salen con el envoltorio `_and`, ninguno necesita el
+`plain`, y el fichero entero elabora en **4,7 s**. La tabla de aridades se sacó del propio
+`Minimal/Axioms.lean` con un `awk`, no de memoria — el único sitio donde podía haber un error era
+la pareja (tag, lenc) de cada esquema, y ésa la dice el axioma.
+🔑 *Una tanda mecánica se ESCRIBE, no se cotiza: cotizarla cuesta más que hacerla.* -/
+
+/-- Tag 1 (`p2`) ⇒ `lenc = 5`. -/
+theorem prf_lenc_p2 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 1)) ⇒
+      (Formula.eq (lenc t) (numeralM 5)))) :=
+  prf_lenc_tag_and (k := 1) (m := 3) t
+    (prf_ax (show ax_lineWF_p2 ∈ axioms by simp [axioms]))
+
+/-- Tag 2 (`c1`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_c1 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 2)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 2) (m := 2) t
+    (prf_ax (show ax_lineWF_c1 ∈ axioms by simp [axioms]))
+
+/-- Tag 3 (`c2`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_c2 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 3)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 3) (m := 2) t
+    (prf_ax (show ax_lineWF_c2 ∈ axioms by simp [axioms]))
+
+/-- Tag 4 (`c3`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_c3 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 4)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 4) (m := 2) t
+    (prf_ax (show ax_lineWF_c3 ∈ axioms by simp [axioms]))
+
+/-- Tag 5 (`j1`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_j1 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 5)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 5) (m := 2) t
+    (prf_ax (show ax_lineWF_j1 ∈ axioms by simp [axioms]))
+
+/-- Tag 6 (`j2`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_j2 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 6)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 6) (m := 2) t
+    (prf_ax (show ax_lineWF_j2 ∈ axioms by simp [axioms]))
+
+/-- Tag 7 (`j3`) ⇒ `lenc = 5`. -/
+theorem prf_lenc_j3 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 7)) ⇒
+      (Formula.eq (lenc t) (numeralM 5)))) :=
+  prf_lenc_tag_and (k := 7) (m := 3) t
+    (prf_ax (show ax_lineWF_j3 ∈ axioms by simp [axioms]))
+
+/-- Tag 8 (`efq`) ⇒ `lenc = 3`. -/
+theorem prf_lenc_efq (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 8)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_and (k := 8) (m := 1) t
+    (prf_ax (show ax_lineWF_efq ∈ axioms by simp [axioms]))
+
+/-- Tag 9 (`q1`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_q1 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 9)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 9) (m := 2) t
+    (prf_ax (show ax_lineWF_q1 ∈ axioms by simp [axioms]))
+
+/-- Tag 10 (`q2`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_q2 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 10)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 10) (m := 2) t
+    (prf_ax (show ax_lineWF_q2 ∈ axioms by simp [axioms]))
+
+/-- Tag 11 (`q3`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_q3 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 11)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 11) (m := 2) t
+    (prf_ax (show ax_lineWF_q3 ∈ axioms by simp [axioms]))
+
+/-- Tag 12 (`eqrefl`) ⇒ `lenc = 3`. -/
+theorem prf_lenc_eqrefl (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 12)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_and (k := 12) (m := 1) t
+    (prf_ax (show ax_lineWF_eqrefl ∈ axioms by simp [axioms]))
+
+/-- Tag 13 (`leibniz`) ⇒ `lenc = 5`. -/
+theorem prf_lenc_leibniz (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 13)) ⇒
+      (Formula.eq (lenc t) (numeralM 5)))) :=
+  prf_lenc_tag_and (k := 13) (m := 3) t
+    (prf_ax (show ax_lineWF_leibniz ∈ axioms by simp [axioms]))
+
+/-- Tag 14 (`p3`) ⇒ `lenc = 3`. -/
+theorem prf_lenc_p3 (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 14)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_and (k := 14) (m := 1) t
+    (prf_ax (show ax_lineWF_p3 ∈ axioms by simp [axioms]))
+
+/-- Tag 15 (`thy`) ⇒ `lenc = 2`. -/
+theorem prf_lenc_thy (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 15)) ⇒
+      (Formula.eq (lenc t) (numeralM 2)))) :=
+  prf_lenc_tag_and (k := 15) (m := 0) t
+    (prf_ax (show ax_lineWF_thy ∈ axioms by simp [axioms]))
+
+/-- Tag 17 (`gen`) ⇒ `lenc = 3`. -/
+theorem prf_lenc_gen (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 17)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_and (k := 17) (m := 1) t
+    (prf_ax (show ax_lineWF_gen ∈ axioms by simp [axioms]))
+
+/-- Tag 18 (`ind`) ⇒ `lenc = 3`. -/
+theorem prf_lenc_ind (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 18)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_and (k := 18) (m := 1) t
+    (prf_ax (show ax_lineWF_ind ∈ axioms by simp [axioms]))
+
+/-- Tag 19 (`qconf`) ⇒ `lenc = 4`. -/
+theorem prf_lenc_qconf (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 19)) ⇒
+      (Formula.eq (lenc t) (numeralM 4)))) :=
+  prf_lenc_tag_and (k := 19) (m := 2) t
+    (prf_ax (show ax_lineWF_qconf ∈ axioms by simp [axioms]))
+
+/-- Tag 20 (`listInd`) ⇒ `lenc = 3`. -/
+theorem prf_lenc_listInd (t : Term) :
+    Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM 20)) ⇒
+      (Formula.eq (lenc t) (numeralM 3)))) :=
+  prf_lenc_tag_and (k := 20) (m := 1) t
+    (prf_ax (show ax_lineWF_listInd ∈ axioms by simp [axioms]))
+
+/-- ⭐⭐⭐ **EL CIERRE DE (b)**: la línea mide `args.length + 2` —eso lo dice `prf_lenc_objList`—,
+el tag exige `n` —eso lo dicen los veintiún `prf_lenc_*` de arriba—, y si no coinciden la teoría
+**refuta** `lineWF`.
+
+⭐ Nótese que `himp` se toma como hipótesis en vez de despacharse aquí por tag: así este lema es
+**uno solo para los veintiún tags**, y el despachador (§4) le pasa el `prf_lenc_*` que toque. -/
+theorem derives_lineWF_neg_of_arity (f : Formula) (k n : Nat) (args : List Term)
+    (himp : Prf (lineWF (objList (formCode f :: numeralM k :: args)) ⇒
+      ((Formula.eq (nthc (objList (formCode f :: numeralM k :: args)) (succ zero)) (numeralM k)) ⇒
+       (Formula.eq (lenc (objList (formCode f :: numeralM k :: args))) (numeralM n)))))
+    (hne : args.length + 2 ≠ n) :
+    axioms ⊢ neg (lineWF (objList (formCode f :: numeralM k :: args))) := by
+  have htag : Prf (Formula.eq
+      (nthc (objList (formCode f :: numeralM k :: args)) (succ zero)) (numeralM k)) :=
+    prf_lineTag_cons (formCode f) (objList args) k
+  have hlen : Prf (Formula.eq (lenc (objList (formCode f :: numeralM k :: args)))
+      (numeralM (args.length + 2))) := by
+    have := SinWTs.prf_lenc_objList (formCode f :: numeralM k :: args)
+    simpa using this
+  exact derives_lineWF_neg_of_lenc_imp (prf_mp (prf_swap_imp himp) htag) hlen hne
 
 
 /-! ## §2 · `DEUDA_inNeg`: las CABEZAS de una cadena aceptada SON los códigos de sus conclusiones -/
@@ -892,6 +1056,10 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
   derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
+  prf_lenc_p2 prf_lenc_c1 prf_lenc_c2 prf_lenc_c3 prf_lenc_j1 prf_lenc_j2 prf_lenc_j3
+  prf_lenc_efq prf_lenc_q1 prf_lenc_q2 prf_lenc_q3 prf_lenc_eqrefl prf_lenc_leibniz prf_lenc_p3
+  prf_lenc_thy prf_lenc_gen prf_lenc_ind prf_lenc_qconf prf_lenc_listInd
+  derives_lineWF_neg_of_arity
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
   dispatcher
@@ -919,3 +1087,6 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p1
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_mp
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_thy
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_listInd
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_arity

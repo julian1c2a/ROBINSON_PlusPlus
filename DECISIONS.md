@@ -6368,3 +6368,56 @@ y ése pasa a ser el siguiente, por la regla de siempre: *primero lo que puede m
 
 **Véase también:** ADR-075 (el front-end), ADR-076 ((d)), ADR-077 ((e)),
 `sondeos/DespachadorCoste.lean`, `sondeos/TagConclCoste.lean`, `Meta/ChainNegPrf.lean` §4.
+
+---
+
+## ADR-079: 🏁 la causa **(b)**, CERRADA — una tanda mecánica se ESCRIBE, no se cotiza
+
+**Fecha**: 2026-09-21
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §1ter: 19 ramas + `derives_lineWF_neg_of_arity`)
+**Contexto**: vía A, tras ADR-078 (el despachador).
+
+### 1 · ⚠️ La cotización costó más que el trabajo
+
+Las diecinueve ramas que le faltaban a (b) viajaron por **tres mensajes** como «19 líneas de una
+línea cada una, ESTIMADO». Escribirlas costó **un `awk` y un `while read`**: la tabla (tag, lenc)
+de los veintiún esquemas está en el propio `Minimal/Axioms.lean`, que es el único sitio donde
+podía haber un error, y el generador la lee de ahí en vez de de la memoria. Las diecinueve
+compilan a la primera, **4,7 s**, y las diecinueve usan el envoltorio `_and` — ninguna el `plain`,
+que sigue siendo exclusivo de `mp`.
+
+🔑 **Una tanda mecánica se ESCRIBE, no se cotiza.** Y el corolario operativo: cuando la variación
+entre los casos es una tabla que ya existe en el árbol, el generador la lee del árbol.
+
+### 2 · 🏁 `derives_lineWF_neg_of_arity`: uno solo para los veintiún tags
+
+La línea mide `args.length + 2` (`SinWTs.prf_lenc_objList`), el tag exige `n` (los veintiún
+`prf_lenc_*`), y si no coinciden la teoría refuta `lineWF`. El motor era
+`derives_lineWF_neg_of_lenc_imp`, ya escrito.
+
+⭐ `himp` se toma como **hipótesis** en vez de despacharse por tag dentro: así el lema es **uno**
+para los veintiún tags y el despachador (§4, ADR-078) le pasa el `prf_lenc_*` que toque. Es la
+misma decisión que en `derives_chainOk_neg_of_prem_line`: *el reparto vive en el despachador, no
+dentro de cada cierre*.
+
+### 3 · 📐 El inventario tras esta entrada
+
+| pieza | estado |
+|---|---|
+| despachador | 🏁 `dispatcher` (ADR-078) |
+| (a) tag ≥ 21 | ✅ `derives_lineWF_neg_of_tag_big` |
+| (b) aridad | 🏁 **CERRADA aquí** |
+| (c′) conclusión | ⬜ 21 ecuaciones: 12 por `rfl` y 7 en 3 líneas, **medidas**; ⬜ 13/18/19/20 |
+| (d) `thy` | 🏁 punta a punta (ADR-076) |
+| (e) `mp`/`gen` | 🏁 cerrada (ADR-077); ⬜ la forma de `premsOf x` por regla |
+| (f) tipo de argumento | ⬜ **tres cierres, nada escrito, nada medido** |
+
+⇒ quedan **(c′)**, **(f)** y el resto de **(e)**. (f) sigue siendo el único **sin medir**, y por
+tanto el siguiente: *primero lo que puede matar la idea*.
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **409** (cobertura
+**378/378**) · `check-estratos` **10** · `check-warnings` **11** · `check-sorry` ·
+`check-doc-sync` · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó**.
+
+**Véase también:** ADR-078 (el despachador), ADR-077 ((e)), ADR-076 ((d)),
+`Meta/ChainNegPrf.lean` §1ter.
