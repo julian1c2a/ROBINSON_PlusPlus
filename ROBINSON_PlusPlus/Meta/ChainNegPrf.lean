@@ -729,10 +729,8 @@ anterior **refuta la cadena entera**.
 `prf_not_in_nil_D` lleva ahí desde `Meta/AxiomListCode.lean`. La forma Δ₀ pagó justo aquí lo que
 prometía: **el acumulador ha desaparecido**, y por eso ese lado es trivial.
 
-⬜ Lo que queda para instanciarlo en `mp`/`gen` **no es lógica, es transporte**: `nthc ⟦l⟧ k̄ ≐
-línea`, `premsOf línea ≐ ⟨⌜fj⇒f⌝, ⌜fj⌝⟩` (escrito en positivo en `prf_premsOf_mp`) y `lenc ≐ 2̄`.
-El puente que lo alimenta es `derives_not_boundedCarcLt_of_not_mem` compuesto con
-`derives_not_boundedCarcLt_congr`. -/
+⚠️ Éste habla de `nthc` sobre la cadena. El que consume el ensamblaje es el de **más abajo**,
+`derives_chainOk_neg_of_prem_line`, que toma la **línea concreta** y hace ese transporte por dentro. -/
 theorem derives_chainOk_neg_of_prem (l : List Term) (k m : Nat) (hk : k < l.length)
     (hlt : axioms ⊢ lt (numeralM m) (lenc (premsOf (nthc (objList l) (numeralM k)))))
     (hnb : axioms ⊢ neg (boundedCarcLt
@@ -743,6 +741,51 @@ theorem derives_chainOk_neg_of_prem (l : List Term) (k m : Nat) (hk : k < l.leng
     (derives_not_boundedPremsIn_of_index (objList l) (numeralM k)
       (premsOf (nthc (objList l) (numeralM k))) m hlt
       (derives_neg_lor (prf_not_in_nil_D _) hnb))
+
+
+/-- Transporte del enunciado **entero** por la línea, en **UNA** sustitución.
+
+⭐ No hacen falta congruencias de `premsOf`, de `lenc` ni de `nthc` por separado: el molde
+`Derives.subst` con `F := neg (boundedPremsIn … (premsOf #0))` las hace **todas a la vez**,
+porque `#0` está debajo de las tres. Es el mismo molde que `derives_lineWF_congr` (§0).
+🔑 *Una congruencia por CADA capa es el error; la sustitución es UNA, en la variable de dentro.* -/
+theorem derives_not_boundedPremsIn_congr {t₁ t₂ p i : Term}
+    (h : axioms ⊢ (t₁ =eq t₂))
+    (hn : axioms ⊢ neg (boundedPremsIn nil p i (premsOf t₁))) :
+    axioms ⊢ neg (boundedPremsIn nil p i (premsOf t₂)) := by
+  have key : ∀ s : Term,
+      substFormula 0 s (neg (boundedPremsIn (liftTerm 0 nil) (liftTerm 0 p) (liftTerm 0 i)
+        (premsOf (.var 0))))
+      = neg (boundedPremsIn nil p i (premsOf s)) := by
+    intro s
+    simp only [neg, substFormula, substFormula_boundedPremsIn, premsOf, substTerm, substTerms,
+      nil, zero, FOL.substTerm_liftTerm, if_true]
+  have h0 : axioms ⊢ substFormula 0 t₁ (neg (boundedPremsIn (liftTerm 0 nil) (liftTerm 0 p)
+      (liftTerm 0 i) (premsOf (.var 0)))) := by rw [key]; exact hn
+  have hsub := Derives.subst axioms t₁ t₂ _ h h0
+  rwa [key] at hsub
+
+/-- ⭐⭐⭐ **(e) SOBRE LA LÍNEA CONCRETA** — el **gemelo exacto** de `derives_chainOk_neg_of_line`
+(§1), y la forma que de verdad consume el ensamblaje: toma la línea `x` tal como la entrega
+`decodeChainAux_none_first` (§2bis) y hace el transporte a `nthc ⟦l⟧ k̄` **por dentro**.
+
+⬜ Lo único que le queda a (e) es, por cada regla con premisas, la forma de `premsOf x`:
+`prf_premsOf_mp` y `prf_premsOf_gen` (`Meta/PremsOfTagPrf.lean`) la dan **en positivo**, y de ahí
+salen las dos hipótesis de abajo. **Eso ya no es lógica, es aritmética de listas-código.** -/
+theorem derives_chainOk_neg_of_prem_line (l : List Term) (k m : Nat) (x : Term)
+    (hk : l[k]? = some x)
+    (hlt : axioms ⊢ lt (numeralM m) (lenc (premsOf x)))
+    (hnb : axioms ⊢ neg (boundedCarcLt (nthc (premsOf x) (numeralM m))
+                            (objList l) (numeralM k))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hklt : k < l.length := by
+    rcases List.getElem?_eq_some_iff.mp hk with ⟨hb, _⟩; exact hb
+  have hnth : axioms ⊢ (nthc (objList l) (numeralM k) =eq x) :=
+    prf_to_derives (SinWTs.prf_nthc_objList l k x hk)
+  refine derives_chainOk_neg_of_prems l k hklt ?_
+  refine derives_not_boundedPremsIn_congr (FOL.derive_eq_symm hnth) ?_
+  exact derives_not_boundedPremsIn_of_index (objList l) (numeralM k) (premsOf x) m hlt
+    (derives_neg_lor (prf_not_in_nil_D _) hnb)
 
 
 /-! ## §3 · 🏁 `DEUDA_inNeg`, SALDADA -/
@@ -785,6 +828,7 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_neg_lor derives_not_boundedCarcLt_congr
   derives_not_boundedCarcLt_of_not_mem derives_not_boundedPremsIn_of_index
   derives_chainOk_neg_of_prem
+  derives_not_boundedPremsIn_congr derives_chainOk_neg_of_prem_line
   stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
   derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
@@ -806,6 +850,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt_of_not_mem
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedPremsIn_of_index
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedPremsIn_congr
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp
