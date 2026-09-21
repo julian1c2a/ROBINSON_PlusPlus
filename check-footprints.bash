@@ -238,6 +238,8 @@ FOL.SkolemNF0.occurs_prenex|propext
 FOL.SkolemNF0.skolemizeF_shape|Quot.sound,propext
 LKh.rec|-
 ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line|Classical.choice,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,Quot.sound,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems|Classical.choice,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,Quot.sound,propext,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction
 ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,Quot.sound,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,propext
 ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt|Classical.choice,Quot.sound,propext

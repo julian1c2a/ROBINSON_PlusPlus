@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-19 — hasta **ADR-074**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-21 — hasta **ADR-075**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6029,3 +6029,88 @@ importa — habría que comprobar que el linter llega **antes** que ellos, no de
 
 **Véase también:** `sondeos/lintlab/`, `Sugerencias.md` ⬜4, ADR-070 (que mató ⬜1‑⬜3),
 ADR-072 (`[G.2]` fuera por gritar lobo).
+
+---
+
+## ADR-075: 🏁 la ESTRUCTURA del caso (e) — y **dos afirmaciones falsas** en la cabecera que la describía
+
+**Fecha**: 2026-09-21
+**Estado**: ✅ ATERRIZADO (§1bis de `ChainNegPrf`) · ⬜ el alimentador, MEDIDO y no escrito
+**Contexto**: primer paso de la vía A — `DEUDA_chainNeg` caso (e) → `NegVerifier` → `⊬¬G`.
+
+### 1 · 🏁 El gemelo estaba a UNA PALABRA, y el docstring lo decía
+
+`lineOkB c p i := land (lineWF (nthc p i)) (boundedPremsIn c p i (premsOf (nthc p i)))` es un
+`land` de **dos** conjuntos, y `prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean:78`) deriva
+`lineOkB nil q i` **entero** y termina en `PrfH_and_elim_left`.
+
+⇒ el caso (e) es **la misma derivación con `and_elim_right`**. Aterrizados en `§1bis`:
+
+| | footprint (medido en el contexto del control) |
+|---|---|
+| `prf_boundedPremsIn_of_chainOk` | `[propext, Classical.choice, Quot.sound]` — **net-0 de axiomas del proyecto** |
+| `derives_chainOk_neg_of_prems` | idéntico a `derives_chainOk_neg_of_line`, su gemelo |
+
+🔑 Y el docstring de la pieza original **ya lo anunciaba**: *«lo consumen **las dos** mitades de
+`hbody`»*. La maquinaria que la cabecera daba por inexistente llevaba meses escrita.
+⇒ van **SIETE** de «antes de construir, buscar».
+
+### 2 · ⛔⛔ Las DOS afirmaciones falsas de la cabecera de `ChainNegPrf`
+
+| lo que decía | lo medido |
+|---|---|
+| «las causas son **CINCO**» | ⛔ son **SEIS**: falta el **desajuste de TIPO** de argumento (no de aridad). `decodeTerm`/`decodeForm` tienen rangos de tag **disjuntos** y `StdArgs` sólo exige `formCode _` **o** `termCode _`, **sin decir cuál** |
+| «**(a)–(d) componen con §1 y cierran**» | ⛔⛔ **FALSO**. El puente exige `k` y `x` **concretas**, y no existe nada que vaya de `decodeChainAux … = none` a esa `k` (`grep` de `firstBad\|badIdx\|failIdx\|takeWhile` : **vacío**). Ese **front-end** les falta a **las SEIS** |
+
+⭐ Pero la sexta causa **no es un muro**, y ahí el panel se equivocó y su refutador lo cazó: los
+tags 9/10 llevan las guardas `hasWitF`/`hasWit` **dentro** desde **ADR-020**, y
+`crit_isTC1_junk_refuted_open` (`Meta/CodeWitnessPrf.lean:1168`) las refuta.
+🔑 *Un `lineWF` más fuerte es más fácil de refutar* — escrito en `Meta/LineWFCases.lean:99`.
+
+⚠️ Y el patrón: **una afirmación de estado viaja a una cabecera sin que nadie la compile**, y de
+ahí a la cotización de la tanda. Quien cotizara esto como «sólo (e)» pagaba además el front-end.
+
+### 3 · ⭐⭐ La decisión de ruta, y por qué se DISUELVE
+
+`chainOk` tiene **dos** descomposiciones, y no cuestan lo mismo:
+
+* **con acumulador** — `lineOk c line := lineWF line ∧ allIn c (premsOf line)`. Tiene el corazón
+  listo (`prf_not_In_listFormCodeM`, la pieza que ya saldó `DEUDA_inNeg`), pero para llegar a la
+  línea `k` hay que **pelar `prf_chainOk_cons` `k` veces** — y `k` es **simbólica**, así que no es
+  pelar: es una inducción nueva más una distributividad `⟦a++b⟧ ≐ concat ⟦a⟧ ⟦b⟧` **que no existe**.
+* **Δ₀** — `chainOkB c p := ∀ i < lenc p. lineOkB c p i`. La línea `k` sale por **instanciación**.
+  Es la ruta de §1bis, y está compilada.
+
+⭐ Y **convergen**: `boundedCarcIn y p` es **definicionalmente** `boundedCarcLt y p (lenc p)`
+(`Meta/ChainOkBoundedPrf.lean:102`), y **los DOS sentidos** de
+`boundedCarcIn y p ⇔ In y (runFn nil p)` existen (`Meta/RunFnBoundedPrf.lean:225` y `:246`).
+Encadenando con `prf_runFn_objList` + `decode_heads` se llega a `In _ (listFormCodeM fs)` —
+**exactamente la composición que cierra `DEUDA_inNeg`** (`Meta/ChainNegPrf.lean:255-261`).
+
+⇒ la ruta Δ₀ **alcanza el corazón de la otra**. La decisión no es entre dos caminos: es pagar
+**(i) un cambio de cota** (`boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧`, molde
+`prf_ex_elim_imp`) en vez de **(ii) el pelado**. (i) es estrictamente menor.
+🔑 *La forma Δ₀ se construyó para que el acumulador desapareciera; la negación de (e) es donde
+eso paga.*
+
+### 4 · ⭐ Y el control de ayer cazó el trabajo de hoy
+
+Al aterrizar las dos piezas, `[COBERTURA]` (ADR-073) se puso **rojo** con los dos nombres nuevos
+sin declarar, y obligó a medirlos y ponerlos en la tabla: **383 → 385**, cobertura **358/358**.
+Es la primera vez que el control muerde a quien lo escribió, y funcionó.
+
+### 5 · ⬜ Lo que queda, y el orden
+
+1. **(i) el cambio de cota** — ~20 l. ESTIMADO. Va **antes** que el front-end: *primero lo que
+   puede matar la idea*. Si no sale, cae la ruta Δ₀ y **cambia la forma del front-end**.
+2. **El front-end** `decodeChainAux_none_first` — molde `decode_heads` (**32 l. medidas**),
+   ESTIMADO 70–100, y sirve a **las SEIS** causas.
+3. Los cierres de (a), (b), (c'), (d), (e), (f). ⭐ (e) está **escrita en positivo** en
+   `Meta/Representability2Prf.lean:307-337`.
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **385** (cobertura
+358/358) · `check-doc-sync` · `check-estratos` **10** · `check-warnings` **11** · `check-sorry` ·
+RPP **145 jobs** · FOL **54 jobs**.
+
+**Véase también:** ADR-073 (`[COBERTURA]` y la definición de titular), ADR-020 (las guardas
+dentro), ADR-022 (`StdChain` estrechada), `Meta/ChainNegPrf.lean` §1bis.

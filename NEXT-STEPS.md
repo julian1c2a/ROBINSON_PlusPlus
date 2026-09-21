@@ -1,15 +1,63 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-19 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-09-21 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑19 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑21 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
 ⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
-🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **383** (cobertura 356/356) · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
+🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **385** (cobertura 358/358) · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
 
+
+> # 🗓️ 2026‑09‑21 — 🏁 **LA ESTRUCTURA DEL CASO (e)**, y dos afirmaciones falsas en su cabecera (ADR‑075)
+>
+> Primer paso de la **vía A** (`DEUDA_chainNeg` → `NegVerifier` → `⊬¬G` → Gödel I completo).
+>
+> ## 🏁 El gemelo estaba a UNA PALABRA
+>
+> `lineOkB` es un `land` de **dos** conjuntos, y `prf_lineWF_of_chainOk` deriva el `land` entero
+> y termina en `and_elim_LEFT`. El caso (e) es **la misma derivación con `and_elim_RIGHT`**.
+> Aterrizados en `ChainNegPrf` §1bis: `prf_boundedPremsIn_of_chainOk` (**net‑0 de axiomas del
+> proyecto**) y `derives_chainOk_neg_of_prems` (mismo footprint que su gemelo).
+> 🔑 Y el docstring del original **ya lo decía**: *«lo consumen **las dos** mitades de `hbody`»*.
+> Van **SIETE** de «antes de construir, buscar».
+>
+> ## ⛔⛔ Las dos afirmaciones falsas de la cabecera
+>
+> * «las causas son **CINCO**» → son **SEIS**: falta el **desajuste de TIPO** de argumento.
+>   ⭐ Pero no es un muro: ADR‑020 metió las guardas `hasWitF`/`hasWit` dentro de los tags 9/10, y
+>   `crit_isTC1_junk_refuted_open` las refuta. *Un `lineWF` más fuerte es más fácil de refutar.*
+> * «**(a)–(d) componen con §1 y cierran**» → **FALSO**. A las **SEIS** les falta un **front‑end**
+>   `decodeChainAux … = none → ∃ k` que **no existe** (grep vacío).
+>
+> ## ⭐⭐ Y la decisión de ruta se DISUELVE
+>
+> La ruta con acumulador (`allIn`) tiene el corazón listo pero exige **pelar `prf_chainOk_cons` k
+> veces** con `k` **simbólica** — una inducción nueva más una distributividad que no existe. La
+> ruta Δ₀ (`boundedPremsIn`) saca la línea `k` por **instanciación**, y **converge** con la otra:
+> `boundedCarcIn` es definicionalmente `boundedCarcLt … (lenc p)`, y **los dos sentidos** hacia
+> `In _ (runFn nil p)` **ya existen** ⇒ se encadena con la composición que cerró `DEUDA_inNeg`.
+> 🔑 *La forma Δ₀ se construyó para que el acumulador desapareciera; la negación de (e) es donde
+> eso paga.*
+>
+> ## ⭐ El control de ayer cazó el trabajo de hoy
+>
+> `[COBERTURA]` se puso **rojo** con los dos nombres nuevos sin declarar y obligó a medirlos:
+> **383 → 385**, cobertura **358/358**. Primera vez que muerde a quien lo escribió.
+>
+> ## ⬜ Siguiente, en este orden
+>
+> 1. **el cambio de cota** `boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧` (~20 l. ESTIMADO).
+>    Va **antes** que el front‑end: *primero lo que puede matar la idea*.
+> 2. **el front‑end** `decodeChainAux_none_first` — molde `decode_heads` (**32 l. medidas**),
+>    ESTIMADO 70–100, sirve a **las SEIS**.
+> 3. los cierres de (a), (b), (c′), (d), (e), (f). ⭐ (e) está **escrita en positivo** en
+>    `Meta/Representability2Prf.lean:307‑337`.
+>
+> **Estado: RPP 145 jobs · FOL 54 · footprints 385 (cobertura 358/358) · estratos 10 ·
+> warnings 11 · 0 sorry.**
 
 > # 🏁 CIERRE DE LA SESIÓN 2026‑09‑18/19 — **OCHO ADR** (067…074) · LEER ESTO PRIMERO
 >

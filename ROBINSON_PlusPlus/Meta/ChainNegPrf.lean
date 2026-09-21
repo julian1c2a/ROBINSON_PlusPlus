@@ -62,8 +62,28 @@ enumerar**:
 | (d) | **`thy` con `f ∉ axioms`** | ✅ `derives_lineWF_neg_thy_of_not_prf` |
 | (e) | **`mp`/`gen` sin premisas en el acumulador** | ⛔ **la única sin maquinaria**: no va por `lineWF` sino por el conjunto `premsOf ⊆ conclusiones anteriores` de `chainOk` |
 
-⇒ **(a)–(d) componen con §1 y cierran**; **(e) es el trabajo que queda**, y es exactamente la
-mitad de `chainOk` que D3 tuvo que aritmetizar (`boundedPremsIn`).
+⛔⛔ **RECTIFICADO el 2026-09-21, y las dos afirmaciones de arriba eran FALSAS** (panel
+adversarial, ADR-075):
+
+1. ⛔ **«Las causas son CINCO» — son SEIS.** Falta el **desajuste de TIPO** de argumento (no de
+   aridad): `decodeTerm` y `decodeForm` tienen rangos de tag **disjuntos**
+   (`Meta/CodeDecode.lean:80,115`) y `StdArgs` (`Meta/OmegaReflect.lean:148`) sólo exige que cada
+   argumento sea `formCode _` **o** `termCode _`, **sin decir cuál**. ⭐ Pero no es un muro: los
+   tags 9/10 llevan las guardas `hasWitF`/`hasWit` **dentro** desde ADR-020, y
+   `crit_isTC1_junk_refuted_open` (`Meta/CodeWitnessPrf.lean:1168`) las refuta.
+   🔑 *Un `lineWF` más fuerte es más fácil de refutar* — ya estaba escrito en
+   `Meta/LineWFCases.lean:99`.
+2. ⛔⛔ **«(a)–(d) componen con §1 y cierran» — FALSO.** El puente de §1 exige una `k` y una `x`
+   **concretas**, y **no existe** ningún lema que vaya de `decodeChainAux … = none` a esa `k`
+   (`grep` de `firstBad|badIdx|failIdx|takeWhile|List.take` en todo RPP: **vacío**). Ese
+   **front-end** les falta a **las SEIS** causas, no sólo a (e).
+   🔑 *Una afirmación de estado que viaja a una cabecera sin que nadie la compile.*
+
+⭐ Y (e) **no** es «la única sin maquinaria»: su estructura son **dos lemas** (§1bis, aterrizados),
+y su cadena está **escrita en positivo** en `Meta/Representability2Prf.lean:307-337` — *el sujeto
+cambia, la prueba no*. Lo que de verdad queda es el **front-end** y el **cambio de cota**
+`boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧`, cuyos dos sentidos hacia `In` ya existen
+(`Meta/RunFnBoundedPrf.lean:225` y `:246`).
 -/
 
 open FOL
@@ -75,6 +95,10 @@ open ROBINSON_PlusPlus.Meta.CodeArith
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.D3BodyPrf
+-- (§1bis, el puente del caso (e)) la capa acotada y la deduccion
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.LineWFCases
 open ROBINSON_PlusPlus.Meta.VerifierSound
 open ROBINSON_PlusPlus.Meta.CodeDecode
@@ -131,6 +155,84 @@ theorem derives_chainOk_neg_of_line (l : List Term) (k : Nat) (x : Term)
     prf_to_derives (SinWTs.prf_nthc_objList l k x hk)
   have hwfx : axioms ⊢ lineWF x := derives_lineWF_congr hnth hwf
   exact FOL.MetaRules.mp hne hwfx
+
+
+/-! ## §1bis · EL PUENTE DEL CASO (e) — por la OTRA mitad de la línea
+
+⭐⭐ **`lineOkB` es un `land` de DOS conjuntos**, y §1 sólo ataca el primero:
+
+    lineOkB c p i := land (lineWF (nthc p i)) (boundedPremsIn c p i (premsOf (nthc p i)))
+
+`prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean:78`) deriva `lineOkB nil q i` entero y termina en
+`PrfH_and_elim_left`. ⇒ **el caso (e) es la MISMA derivación con `and_elim_right`**, y su puente
+es el gemelo literal de `derives_chainOk_neg_of_line`.
+
+🔑 *Y el docstring de `prf_lineWF_of_chainOk` ya lo decía —«lo consumen **las dos** mitades de
+`hbody`»—: la maquinaria que la cabecera daba por inexistente estaba a una palabra.* Van **siete**
+de «antes de construir, buscar».
+
+⭐ **Por qué por la forma Δ₀ y no por `allIn`.** La otra descomposición (`lineOk c line :=
+lineWF line ∧ allIn c (premsOf line)`, `Minimal/Axioms.lean:803`) obliga a pelar
+`prf_chainOk_cons` **`k` veces** — y `k` es **simbólica**, así que eso no es pelar: es una
+inducción nueva, más una distributividad `⟦a++b⟧ ≐ concat ⟦a⟧ ⟦b⟧` que **no existe** en el árbol.
+`chainOkB` es `∀ i < lenc p`, así que la línea `k` sale por **instanciación**.
+🔑 *La forma Δ₀ se construyó para que el acumulador desapareciera; la negación de (e) es donde eso
+paga.*
+
+⬜ **Lo que estas dos piezas NO hacen**, y hay que decirlo: dan la ESTRUCTURA del caso (e), no su
+alimentador. Falta producir la hipótesis `⊢ ¬ boundedPremsIn …` a partir del hecho decidible, y
+eso pide (i) el **cambio de cota** `boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧` y (ii) un
+**front-end** `decodeChainAux … = none → ∃ k` que **no existe y que necesitan las SEIS causas**,
+no sólo (e). -/
+
+/-- ⭐ **De la cadena sale la ACOTACIÓN DE PREMISAS de la línea `i`-ésima.**
+Gemelo exacto de `prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean:78`): misma derivación, y donde
+aquélla toma `and_elim_left` ésta toma `and_elim_right`. -/
+theorem prf_boundedPremsIn_of_chainOk (q i : Term) :
+    Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
+      boundedPremsIn nil q i (premsOf (nthc q i)))) := by
+  refine prf_deduction (deduction_aux ?_ (lt i (lenc q)) [chainOk nil q] rfl)
+  have hch : PrfH [lt i (lenc q), chainOk nil q] (chainOk nil q) :=
+    PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
+  have hlt : PrfH [lt i (lenc q), chainOk nil q] (lt i (lenc q)) :=
+    PrfH.hyp _ _ (List.Mem.head _)
+  have hB : PrfH [lt i (lenc q), chainOk nil q] (chainOkB nil q) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_chainOk_iff_chainOkB nil q)) _) hch
+  have hB' : PrfH [lt i (lenc q), chainOk nil q]
+      (Formula.forall (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
+        (lineOkB (liftTerm 0 nil) (liftTerm 0 q) (.var 0)))) := hB
+  have hspec := PrfH_spec hB' i
+  have heq : substFormula 0 i (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
+      (lineOkB (liftTerm 0 nil) (liftTerm 0 q) (.var 0)))
+      = Formula.impl (lt i (lenc q)) (lineOkB nil q i) := by
+    simp only [substFormula, substFormula_lineOkB, lt, lenc, nil, zero, substTerm, substTerms,
+      FOL.substTerm_liftTerm, if_true]
+  rw [heq] at hspec
+  exact PrfH_and_elim_right (PrfH.mp _ _ _ hspec hlt)
+
+/-- ⭐⭐ **EL PUENTE DEL CASO (e)**: de «las premisas de la línea `k` no están acotadas» a
+«la cadena se refuta». Gemelo exacto de `derives_chainOk_neg_of_line` (§1), y con el mismo
+footprint. -/
+theorem derives_chainOk_neg_of_prems (l : List Term) (k : Nat)
+    (hk : k < l.length)
+    (hne : axioms ⊢ neg (boundedPremsIn nil (objList l) (numeralM k)
+              (premsOf (nthc (objList l) (numeralM k))))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  refine FOL.MetaRules.raa (fun hch => ?_)
+  have hlt0 : axioms ⊢ lt (numeralM k) (numeralM l.length) := by
+    have := gnum_lt (a := k) (b := l.length) hk
+    simpa only [numeralM_eq] using this
+  have hlen : axioms ⊢ (lenc (objList l) =eq numeralM l.length) :=
+    prf_to_derives (SinWTs.prf_lenc_objList l)
+  have hlt : axioms ⊢ lt (numeralM k) (lenc (objList l)) :=
+    derives_lt_congr_right (FOL.derive_eq_symm hlen) hlt0
+  have hbp : axioms ⊢ boundedPremsIn nil (objList l) (numeralM k)
+      (premsOf (nthc (objList l) (numeralM k))) :=
+    FOL.MetaRules.mp
+      (FOL.MetaRules.mp
+        (prf_to_derives (prf_boundedPremsIn_of_chainOk (objList l) (numeralM k))) hch)
+      hlt
+  exact FOL.MetaRules.mp hne hbp
 
 
 /-! ## §2 · `DEUDA_inNeg`: las CABEZAS de una cadena aceptada SON los códigos de sus conclusiones -/
@@ -266,6 +368,7 @@ end ROBINSON_PlusPlus.Meta.ChainNegPrf
 export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_lt_congr_right derives_lineWF_congr
   derives_chainOk_neg_of_line
+  prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
 )
@@ -273,3 +376,5 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 /-! ## FOOTPRINT -/
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
