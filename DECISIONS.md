@@ -6208,3 +6208,87 @@ sus cifras son las de ADR-074.
 
 **Véase también:** ADR-067 (la lente de vacuidad, que es la misma lente), ADR-075 (el front-end),
 ADR-073 (`[COBERTURA]`), `Meta/ChainNegPrf.lean` §2ter.
+
+---
+
+## ADR-077: 🏁 la causa **(e)**, CERRADA — y la que iba a ser cara salió de **refutar por instanciación**
+
+**Fecha**: 2026-09-21
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §2quater, 5 lemas) · ⬜ el **transporte** a `mp`/`gen`
+**Contexto**: vía A — los cierres de `DEUDA_chainNeg`, tras ADR-075 (front-end) y ADR-076 ((d)).
+
+### 1 · 🔑 El hallazgo: **refutar un acotado es exhibir un testigo**
+
+La cabecera llamaba a (e) «la única sin maquinaria», y la ruta obvia era recorrer la lista de
+premisas con `prf_boundedPremsIn_cons_succ_iff` (`Meta/ChainOkBoundedPrf.lean:637`), que existe
+precisamente para eso. **No hacía falta.** `boundedPremsIn` **es** un `Formula.forall`:
+
+    boundedPremsIn c p i L := ∀ j < lenc L. (In (nthc L j) c ∨ boundedCarcLt (nthc L j) p i)
+
+y para **refutarlo** basta **un** índice malo: `spec` da la instancia, y el resto es un *modus
+ponens* contra la cota. Son **16 líneas** (`derives_not_boundedPremsIn_of_index`), y la inducción
+sobre `L` desaparece entera.
+
+🔑 **Refutar un acotado es exhibir un testigo; sólo PROBARLO obliga a recorrerlo entero.**
+⚠️ Y el aviso: la existencia de `prf_boundedPremsIn_cons_succ_iff` **empujaba** hacia la ruta cara.
+*Que exista la herramienta para recorrer no es una razón para recorrer.*
+
+### 2 · ⭐ El lado `In _ nil` sale **gratis**, y eso es la forma Δ₀ pagando
+
+El `lor` de `boundedPremsIn` tiene dos lados. El primero, `In (nthc L m̄) c`, con `c = nil` lo
+refuta `prf_not_in_nil_D`, que lleva en `Meta/AxiomListCode.lean` desde el nivel D.
+
+Eso **no es suerte**: es exactamente lo que la forma Δ₀ prometía. La descomposición con
+acumulador (`Minimal/Axioms.lean:803`) llega a la línea `k` con un `c` que ha ido creciendo;
+`chainOkB` la alcanza por **instanciación** con `c = nil` intacto. El acumulador ha desaparecido,
+y por eso ese lado del `lor` es trivial en vez de ser la mitad del trabajo.
+
+### 3 · Las cinco piezas, y sus footprints (medidos en el contexto del control)
+
+| pieza | qué hace | footprint |
+|---|---|---|
+| `derives_neg_lor` | refutar un `lor` por sus dos lados | net-0 + `or_elim`, `raa` |
+| `derives_not_boundedCarcLt_congr` | transporte por el **término buscado** | **net-0 puro** |
+| `derives_not_boundedCarcLt_of_not_mem` | ⭐⭐ **el motor**: `φ ∉ acc` ⟹ ninguna de las `k` primeras líneas concluye `⌜φ⌝` | + `ex_elim`, `imp_intro`, los dos `ax_*induction*` |
+| `derives_not_boundedPremsIn_of_index` | ⭐⭐ refutar el ∀ acotado **instanciando** | net-0 + `raa` |
+| `derives_chainOk_neg_of_prem` | ⭐⭐⭐ **el cierre**: la cadena entera queda refutada | + `imp_intro`, `or_elim`, `raa`, los dos `ax_*induction*` |
+
+⚠️ **(e) NO cita `ax_axiomsCodeT_eq`**, a diferencia de (d) (ADR-076). El ancla de codificación
+entra por `axiomsCodeT`, y (e) no pasa por ahí: va por `runFn`/`carc`. Los dos cierres tienen
+footprints **distintos**, y eso es información, no ruido.
+
+⭐ El motor salió de encajar dos cosas escritas: `decodeChainAux_carc_mem` (ADR-075, §2bis) dice
+**qué** fórmula del acumulador es el `carc` de cada línea del prefijo, y `formCode_ne` separa los
+códigos de dos fórmulas distintas. El paso de `φ ∉ L` a «distinta de cada una» es un `▸`.
+⇒ van **NUEVE** de «antes de construir, buscar».
+
+### 4 · ⚠️ Dos tropiezos de forma, los dos del mismo tipo
+
+1. **El bloque se colocó antes de su dependencia.** `derives_not_boundedCarcLt_of_not_mem` usa
+   `decodeChainAux_carc_mem`, que vive en §2bis; el bloque entró como «§1quater» y el compilador
+   lo rechazó con `Unknown identifier`. Pasó a **§2quater**. **En Lean el orden del fichero ES
+   una dependencia**, y una numeración de sección que sugiere lo contrario es una trampa.
+   ⚠️ Es la **segunda vez en dos días** — la primera fue §1ter contra `decodeLine_stepConcl`.
+2. **`formCodeM_eq` no estaba en el `open` del módulo.** El sondeo abría
+   `Meta.Representability`; `ChainNegPrf` no. Se cualificó entero en vez de añadir un `open`
+   nuevo a un fichero de 750 líneas, donde un `open` de más es una ambigüedad futura.
+
+🔑 *Un sondeo compila en SU contexto de `open`s, no en el del fichero destino.*
+
+### 5 · ⬜ Lo que queda de (e), y no es lógica
+
+El cierre pide dos hipótesis sobre la línea `k`, y las dos son **transporte**, no razonamiento:
+
+* `⊢ lt m̄ (lenc (premsOf (nthc ⟦l⟧ k̄)))`
+* `⊢ neg (boundedCarcLt (nthc (premsOf (nthc ⟦l⟧ k̄)) m̄) ⟦l⟧ k̄)`
+
+y las piezas que las alimentan existen: `SinWTs.prf_nthc_objList` (`nthc ⟦l⟧ k̄ ≐ x`),
+`prf_premsOf_mp`/`prf_premsOf_gen` (escritas **en positivo** en `Meta/PremsOfTagPrf.lean`), y el
+`derives_not_boundedCarcLt_congr` de esta misma entrada. Falta la congruencia de `premsOf`/`lenc`
+bajo `≐` y encadenarlo.
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **403** (cobertura
+**372/372**) · `check-estratos` **10** · `check-warnings` **11** · `check-sorry` ·
+`check-doc-sync` · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó**.
+
+**Véase también:** ADR-075 (el front-end y §1bis), ADR-076 ((d)), `Meta/ChainNegPrf.lean` §2quater.

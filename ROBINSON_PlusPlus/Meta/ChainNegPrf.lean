@@ -65,7 +65,7 @@ enumerar**:
 | (b) | **aridad equivocada** | 🔶 los 21 `ax_lineWF_*` llevan `lenc = n̄`; es `gnum_ne` |
 | (c) | **la conclusión no casa** (`stepConcl ≠ f`) | ✅ **`derives_lineWF_neg_of_tag`** + `formCode_ne` — es el grueso, y está |
 | (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
-| (e) | **`mp`/`gen` sin premisas en el acumulador** | ⛔ **la única sin maquinaria**: no va por `lineWF` sino por el conjunto `premsOf ⊆ conclusiones anteriores` de `chainOk` |
+| (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑21** (§2quater, `derives_chainOk_neg_of_prem`) — no va por `lineWF` sino por `premsOf ⊆ conclusiones anteriores`. ⬜ falta sólo el **transporte** a `mp`/`gen` |
 
 ⛔⛔ **RECTIFICADO el 2026-09-21, y las dos afirmaciones de arriba eran FALSAS** (panel
 adversarial, ADR-075):
@@ -639,6 +639,112 @@ theorem derives_lineWF_neg_thy_of_decode {acc : List Formula} {f : Formula} {arg
     simp at h
 
 
+/-! ## §2quater · 🏁 EL CIERRE DE LA CAUSA **(e)**
+
+⭐⭐⭐ **(e) era «la única sin maquinaria» y ha salido de cinco lemas, cuatro de ellos de diez
+líneas.** La pieza que lo hace barato es la de en medio: para **refutar** un `∀ j < lenc L` basta
+**UN índice malo**, así que se **instancia** — no se induce sobre `L`. La inducción sólo hace
+falta en la otra dirección (la cota de líneas), y ésa es `derives_not_boundedCarcLt` (§1bis).
+
+🔑 *Refutar un acotado es exhibir un testigo; sólo PROBARLO obliga a recorrerlo entero.*
+-/
+
+/-- Refutar una disyunción es refutar sus dos lados. -/
+theorem derives_neg_lor {A B : Formula} (ha : axioms ⊢ neg A) (hb : axioms ⊢ neg B) :
+    axioms ⊢ neg (lor A B) :=
+  FOL.MetaRules.raa (fun h => FOL.MetaRules.or_elim h
+    (fun x => FOL.MetaRules.mp ha x) (fun x => FOL.MetaRules.mp hb x))
+
+/-- Transporte de la refutación de la cota por su **primer** argumento (el término buscado).
+    Hace falta porque `boundedPremsIn` menciona la premisa como `nthc L m̄` —sintácticamente—,
+    y no como el código concreto que el motor de abajo refuta. -/
+theorem derives_not_boundedCarcLt_congr (y z p b : Term)
+    (h : axioms ⊢ (y =eq z)) (hn : axioms ⊢ neg (boundedCarcLt z p b)) :
+    axioms ⊢ neg (boundedCarcLt y p b) := by
+  have key : ∀ t : Term,
+      substFormula 0 t (neg (boundedCarcLt (.var 0) (liftTerm 0 p) (liftTerm 0 b)))
+      = neg (boundedCarcLt t p b) := by
+    intro t
+    simp [neg, substFormula, substFormula_boundedCarcLt, substTerm, FOL.substTerm_liftTerm]
+  have h0 : axioms ⊢
+      substFormula 0 z (neg (boundedCarcLt (.var 0) (liftTerm 0 p) (liftTerm 0 b))) := by
+    rw [key]; exact hn
+  have hsub := Derives.subst axioms z y
+    (neg (boundedCarcLt (.var 0) (liftTerm 0 p) (liftTerm 0 b))) (FOL.derive_eq_symm h) h0
+  rwa [key] at hsub
+
+/-- ⭐⭐ **EL MOTOR DE (e)**: si `φ` no está en el acumulador que el decodificador hiló con las `k`
+primeras líneas, entonces **ninguna de esas `k` líneas concluye `⌜φ⌝`** — y la teoría lo demuestra.
+
+⭐ Sale de encajar dos cosas que ya estaban: `decodeChainAux_carc_mem` (§2bis) dice, para cada
+línea del prefijo, **qué** fórmula del acumulador es su `carc`; y `formCode_ne` separa los códigos
+de dos fórmulas distintas. El paso de `φ ∉ L` a «distinta de cada una» es un `▸`. -/
+theorem derives_not_boundedCarcLt_of_not_mem
+    (l : List Term) (k : Nat) (hk : Nat.le k l.length)
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L)
+    (φ : Formula) (hnm : ¬ List.Mem φ L) :
+    axioms ⊢ neg (boundedCarcLt (formCode φ) (objList l) (numeralM k)) := by
+  refine derives_not_boundedCarcLt (formCode φ) k l hk ?_
+  intro j x hj hx
+  have hxt : (l.take k)[j]? = some x := by
+    rw [List.getElem?_take, if_pos hj]; exact hx
+  obtain ⟨f, hfL, hcarc⟩ :=
+    decodeChainAux_carc_mem (l.take k) acc rs L hd hc x (List.mem_of_getElem? hxt)
+  have hne : φ ≠ f := fun e => hnm (e ▸ hfL)
+  refine FOL.MetaRules.raa (fun heq => ?_)
+  have h1 : axioms ⊢ (formCode φ =eq formCodeM f) :=
+    FOL.derive_eq_trans (FOL.derive_eq_symm heq) (prf_to_derives hcarc)
+  rw [ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq] at h1
+  exact FOL.MetaRules.mp (formCode_ne hne) h1
+
+/-- ⭐⭐ **REFUTAR EL ∀ ACOTADO POR INSTANCIACIÓN**, no por inducción sobre `L`.
+
+⚠️ Es aquí donde (e) deja de ser caro. `prf_boundedPremsIn_cons_succ_iff` invitaba a recorrer `L`
+entero; no hace falta: `boundedPremsIn` **es** un `Formula.forall`, y `spec` da la instancia en el
+índice malo. Lo demás es un *modus ponens* contra la cota. -/
+theorem derives_not_boundedPremsIn_of_index (p i L : Term) (m : Nat)
+    (hlt : axioms ⊢ lt (numeralM m) (lenc L))
+    (hne : axioms ⊢ neg (lor (In (nthc L (numeralM m)) nil)
+                             (boundedCarcLt (nthc L (numeralM m)) p i))) :
+    axioms ⊢ neg (boundedPremsIn nil p i L) := by
+  refine FOL.MetaRules.raa (fun hbp => ?_)
+  have hspec := spec hbp (numeralM m)
+  have heq : substFormula 0 (numeralM m)
+      (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+        (lor (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 nil))
+             (boundedCarcLt (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p) (liftTerm 0 i))))
+      = Formula.impl (lt (numeralM m) (lenc L))
+          (lor (In (nthc L (numeralM m)) nil)
+               (boundedCarcLt (nthc L (numeralM m)) p i)) := by
+    simp only [substFormula, substFormula_boundedCarcLt, lt, lenc, nthc, In, lor, nil, zero,
+      substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  rw [heq] at hspec
+  exact FOL.MetaRules.mp hne (FOL.MetaRules.mp hspec hlt)
+
+/-- ⭐⭐⭐ **EL CIERRE DE (e)**: una línea cuya premisa `m`-ésima no la concluye ninguna línea
+anterior **refuta la cadena entera**.
+
+⭐ El lado `In _ nil` del `lor` sale **gratis**: el acumulador de arranque es `nil` y
+`prf_not_in_nil_D` lleva ahí desde `Meta/AxiomListCode.lean`. La forma Δ₀ pagó justo aquí lo que
+prometía: **el acumulador ha desaparecido**, y por eso ese lado es trivial.
+
+⬜ Lo que queda para instanciarlo en `mp`/`gen` **no es lógica, es transporte**: `nthc ⟦l⟧ k̄ ≐
+línea`, `premsOf línea ≐ ⟨⌜fj⇒f⌝, ⌜fj⌝⟩` (escrito en positivo en `prf_premsOf_mp`) y `lenc ≐ 2̄`.
+El puente que lo alimenta es `derives_not_boundedCarcLt_of_not_mem` compuesto con
+`derives_not_boundedCarcLt_congr`. -/
+theorem derives_chainOk_neg_of_prem (l : List Term) (k m : Nat) (hk : k < l.length)
+    (hlt : axioms ⊢ lt (numeralM m) (lenc (premsOf (nthc (objList l) (numeralM k)))))
+    (hnb : axioms ⊢ neg (boundedCarcLt
+             (nthc (premsOf (nthc (objList l) (numeralM k))) (numeralM m))
+             (objList l) (numeralM k))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  derives_chainOk_neg_of_prems l k hk
+    (derives_not_boundedPremsIn_of_index (objList l) (numeralM k)
+      (premsOf (nthc (objList l) (numeralM k))) m hlt
+      (derives_neg_lor (prf_not_in_nil_D _) hnb))
+
+
 /-! ## §3 · 🏁 `DEUDA_inNeg`, SALDADA -/
 
 /-- Transporte de una NO‑pertenencia por igualdad del contenedor. -/
@@ -676,6 +782,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems derives_not_boundedCarcLt
   decodeChainAux_none_first decodeChainAux_carc_mem decodeLine_none_cases
   derives_lineWF_neg_thy_of_decode
+  derives_neg_lor derives_not_boundedCarcLt_congr
+  derives_not_boundedCarcLt_of_not_mem derives_not_boundedPremsIn_of_index
+  derives_chainOk_neg_of_prem
   stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
   derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
@@ -693,6 +802,10 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_carc_mem
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeLine_none_cases
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_thy_of_decode
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt_congr
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt_of_not_mem
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedPremsIn_of_index
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp
