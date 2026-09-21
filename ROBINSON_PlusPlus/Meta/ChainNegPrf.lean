@@ -377,6 +377,56 @@ theorem decode_heads : ∀ (l : List Term) (acc : List Formula) (rs : List Rule)
           exact prf_eq_trans (prf_congr_cons_head hcarc) (prf_congr_cons_tail heq)
 
 
+/-! ## §2bis · EL FRONT-END — de «el decodificador rechaza» a la línea CULPABLE
+
+⛔ La cabecera de este módulo afirmaba que «(a)–(d) componen con §1 y cierran». **Era falso**:
+el puente de §1 exige una `k` y una `x` **concretas**, y no había nada que fuera de
+`decodeChainAux … = none` a esa `k` (`grep` de `firstBad|badIdx|failIdx|takeWhile`: vacío).
+Ésta es esa pieza, y **la necesitan las SEIS causas**, no sólo (e).
+
+⭐ Es el **gemelo negativo de `decode_heads`** (§2): la misma inducción sobre la lista, con los
+existenciales cambiados. `decode_heads` recorre una cadena que SÍ decodifica y saca sus cabezas;
+ésta recorre una que NO y saca la primera línea que falla, con el prefijo que sí decodificó y su
+acumulador. 🔑 *El sujeto cambia, la inducción no.*
+
+📏 **30 líneas medidas**, contra 70–100 ESTIMADAS por el panel. -/
+
+/-- ⭐⭐ **EL FRONT-END**: si el decodificador rechaza la cadena, hay una **PRIMERA** línea `k`
+que lo hace; el prefijo anterior decodifica (`rs`) y su acumulador es `L`. -/
+theorem decodeChainAux_none_first : ∀ (l : List Term) (acc : List Formula),
+    decodeChainAux acc (objList l) = none →
+    ∃ (k : Nat) (x : Term) (rs : List Rule) (L : List Formula),
+      And (l[k]? = some x)
+     (And (decodeChainAux acc (objList (l.take k)) = some rs)
+     (And (checkAux rs acc = some L)
+          (decodeLine L x = none)))
+  | [], acc, hd => by
+      -- ⛔ imposible: la cadena vacía SIEMPRE decodifica (`objList [] = nil`)
+      simp [objList, nil, zero, decodeChainAux] at hd
+  | line :: rest, acc, hd => by
+      simp only [objList, cons, decodeChainAux, beq_self_eq_true, if_true] at hd
+      rcases hdl : decodeLine acc line with _ | fr
+      · -- ⭐ la PRIMERA línea ya falla ⇒ `k = 0`, prefijo vacío, acumulador `acc`
+        exact ⟨0, line, [], acc, rfl,
+          by simp [objList, nil, zero, decodeChainAux],
+          by simp [checkAux], hdl⟩
+      · rw [hdl] at hd
+        simp only [Option.bind] at hd
+        rcases hrec : decodeChainAux (acc ++ [fr.1]) (objList rest) with _ | rs'
+        · -- la recursión falla ⇒ la primera mala está en `rest`
+          obtain ⟨k, x, rs, L, hx, hpre, hchk, hnone⟩ :=
+            decodeChainAux_none_first rest (acc ++ [fr.1]) hrec
+          refine ⟨k + 1, x, fr.2 :: rs, L, hx, ?_, ?_, hnone⟩
+          · show decodeChainAux acc (objList (line :: rest.take k)) = some (fr.2 :: rs)
+            simp only [objList, cons, decodeChainAux, beq_self_eq_true, if_true, hdl,
+              Option.bind, hpre, Option.map]
+          · -- `checkAux (fr.2 :: rs) acc`: la cabeza pasa por `stepConcl`
+            have hstep : stepConcl acc fr.2 = some fr.1 := decodeLine_stepConcl hdl
+            simp only [checkAux, hstep]
+            exact hchk
+        · rw [hrec] at hd; simp at hd
+
+
 /-! ## §3 · 🏁 `DEUDA_inNeg`, SALDADA -/
 
 /-- Transporte de una NO‑pertenencia por igualdad del contenedor. -/
@@ -412,6 +462,7 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_lt_congr_right derives_lineWF_congr
   derives_chainOk_neg_of_line
   prf_boundedPremsIn_of_chainOk derives_chainOk_neg_of_prems derives_not_boundedCarcLt
+  decodeChainAux_none_first
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
 )
@@ -422,3 +473,4 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedCarcLt
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeChainAux_none_first
