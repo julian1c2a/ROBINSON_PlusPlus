@@ -6292,3 +6292,79 @@ bajo `≐` y encadenarlo.
 `check-doc-sync` · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó**.
 
 **Véase también:** ADR-075 (el front-end y §1bis), ADR-076 ((d)), `Meta/ChainNegPrf.lean` §2quater.
+
+---
+
+## ADR-078: 🏁 el **DESPACHADOR**, aterrizado — y el riesgo declarado de la vía **se cae al medirlo**
+
+**Fecha**: 2026-09-21
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §4, `dispatcher`, **net-0 puro**) · 2 sondeos
+**Contexto**: vía A, tras ADR-075 (front-end), ADR-076 ((d)) y ADR-077 ((e)).
+
+### 1 · ⛔⛔ El riesgo estaba cotizado sobre una vía ABANDONADA
+
+Repartir entre las seis causas exige un split de 21 tags, y la cabecera de
+`Meta/ChainDecode.lean:44` avisa:
+
+> Un `match` sobre `Term` con las 21 formas anidadas revienta el `whnf` (`String.decEq` en el
+> discriminante). Se **pela** el justif a `List Term` (`peelArgs`) y se matchea `(tag, args)` —
+> superficial y barato.
+
+El aviso es **cierto**. Y su segunda frase dice que esa vía **ya se abandonó**. Aun así, la parte
+que viajó a la cotización del despachador fue la primera. **Medido**
+(`sondeos/DespachadorCoste.lean`): el split de 21 ramas sobre `Nat`, con la hipótesis
+`decodeRuleTag … = none` abierta en cada rama, elabora en **4,5 s** y sale **net-0 puro**; y cada
+ecuación por tag sale por **`rfl`**, sin táctica (muestra: aridades 1/2/3 más 15, 16 y 17).
+
+🔑 **Una nota de riesgo sobrevive al rediseño que la deja sin objeto, y se sigue cotizando.**
+⭐ Es el patrón de ADR-075/076 con el signo cambiado: allí viajaba un **logro inexistente**
+(la ✅ falsa de (d)); aquí viajaba un **coste que ya no existía**.
+
+### 2 · 🏁 `dispatcher`: doce líneas, y no prueba nada por su cuenta
+
+`ChainNegPrf` §4 va de `chainOkDec l = false` a la tabla de causas: la **primera** línea que el
+verificador rechaza, ya partida en `⟨⌜f⌝, tag, as⟩` con `StdArgs as`, más el prefijo decodificado
+`rs`, el acumulador `L` en ese punto, y el corte regla-vs-conclusión hecho.
+
+Compone cuatro piezas que ya existían y no añade ninguna:
+`chainOkDec`/`decodeChain` (definiciones) → `decodeChainAux_none_first` (ADR-075) →
+`StdChain`/`StdLine` (ADR-022) → `decodeLine_none_cases` (ADR-075).
+
+⭐ Y deja a las seis causas **con la misma entrada**: el `Or.inr` **es** (c′), el `Or.inl` reparte
+(a), (b), (d), (e) y (f), y `L` es justo el acumulador que pide
+`derives_not_boundedCarcLt_of_not_mem` (ADR-077). Footprint: `[propext, Classical.choice,
+Quot.sound]`.
+
+### 3 · ⚠️ Un precio nuevo, medido: `Nat.le` explícito ciega a `omega`
+
+La rama `k ≥ 21` se descarga de `hk : Nat.le k 20`, y **`omega` no la ve**: *«No usable
+constraints found»*. `Nat.le a b` es defeq a `a ≤ b` pero no lo mismo sintácticamente, y las
+tácticas aritméticas trabajan sobre la clase `LE`. Se cierra con
+`Nat.le_trans (Nat.le_add_left 21 n) hk` y un `decide` sobre `21 ≤ 20`.
+
+🔑 *Escribir `Nat.le` para esquivar la trampa del símbolo OBJETO `le` tiene su propio precio.*
+⇒ entrada nueva para `feedback_lean_notation_traps`: el esquive de una trampa de notación puede
+ser, él mismo, una trampa.
+
+### 4 · 📐 El inventario, ya sin estimaciones sueltas
+
+| pieza | estado |
+|---|---|
+| despachador | 🏁 **`dispatcher`**, net-0 puro |
+| (a) tag ≥ 21 | ✅ `derives_lineWF_neg_of_tag_big` |
+| (b) aridad | 🔶 motor + **2 de 21** ramas `prf_lenc_*` — 19 de una línea (ESTIMADO) |
+| (c′) conclusión | ⬜ 21 ecuaciones: **12 por `rfl`** (medido 6/6), **7 en 3 líneas** (medido 3/3 sobre 9/10/11), ⬜ 13/18/19/20 sin medir — ADR-077bis (`sondeos/TagConclCoste.lean`) |
+| (d) `thy` | 🏁 de punta a punta |
+| (e) `mp`/`gen` | 🏁 cerrada; ⬜ la forma de `premsOf x` por regla |
+| (f) tipo de argumento | ⬜ **tres cierres, nada escrito** (ESTIMADO) |
+
+⭐ **Lo que este ADR cambia en el plan**: el despachador ya no es el desconocido de la vía, así que
+el orden deja de ser «medir el reparto antes que los cierres». Ahora lo único sin medir es **(f)**,
+y ése pasa a ser el siguiente, por la regla de siempre: *primero lo que puede matar la idea*.
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **406** (cobertura
+**375/375**) · `check-estratos` **10** · `check-warnings` **11** · `check-sorry` ·
+`check-doc-sync` · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó**.
+
+**Véase también:** ADR-075 (el front-end), ADR-076 ((d)), ADR-077 ((e)),
+`sondeos/DespachadorCoste.lean`, `sondeos/TagConclCoste.lean`, `Meta/ChainNegPrf.lean` §4.

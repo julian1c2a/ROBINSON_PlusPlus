@@ -83,6 +83,11 @@ adversarial, ADR-075):
    (`grep` de `firstBad|badIdx|failIdx|takeWhile|List.take` en todo RPP: **vacío**). Ese
    **front-end** les falta a **las SEIS** causas, no sólo a (e).
    🔑 *Una afirmación de estado que viaja a una cabecera sin que nadie la compile.*
+   🏁 **CERRADO el 2026‑09‑21** (ADR‑078), y las dos piezas son **net‑0 puras**: el front‑end
+   es `decodeChainAux_none_first` (§2bis) y el despachador entero es `dispatcher` (§4).
+   ⭐ Y el **riesgo declarado de la vía también se cayó**: el aviso de `whnf` de `Meta/ChainDecode.lean:44`
+   describe un `match` sobre `Term` que **`peelArgs` ya había abandonado**; el split de 21 tags
+   sobre `Nat` cuesta **4,5 s** (`sondeos/DespachadorCoste.lean`).
 3. ⛔⛔ **La ✅ de (d) era FALSA — y sobre una instancia ALCANZABLE** (ADR‑076). El lema que
    citaba, `derives_lineWF_neg_thy_of_not_prf`, pide **`¬ Prf φ`**, y el decodificador sólo
    entrega **`φ ∉ axioms`**: `decodeRuleTag acc f 15 args` **es** `(findIdx f axioms).map
@@ -816,6 +821,61 @@ theorem deuda_inNeg : ROBINSON_PlusPlus.Meta.VerifierSound.DEUDA_inNeg := by
       prf_to_derives (prf_eq_trans hrun heads)
     exact derives_not_In_congr hchain (prf_not_In_listFormCodeM φ fs hnm')
 
+/-! ## §4 · 🏁 EL DESPACHADOR — de `chainOkDec l = false` a la TABLA DE CAUSAS
+
+⭐⭐⭐ **Esto era lo que se daba por el riesgo de la vía, y la medición lo refuta.**
+
+La cabecera de `Meta/ChainDecode.lean:44` avisa de que *«un `match` sobre `Term` con las 21 formas
+anidadas revienta el `whnf` (`String.decEq` en el discriminante)»*, y de ahí salió la idea de que
+repartir entre las seis causas sería caro. **No aplica al despachador**: `peelArgs` ya movió el
+`match` de `Term` a `(tag : Nat, args : List Term)`, y un split de 21 ramas sobre un `Nat`
+elabora en **4,5 s** y sale **net‑0 puro** (medido, `sondeos/DespachadorCoste.lean`).
+
+🔑 *El aviso de rendimiento era CIERTO y estaba en el sitio equivocado: describía la vía que
+`peelArgs` ya había abandonado.* Una nota de riesgo sobrevive al rediseño que la deja sin objeto.
+
+⚠️ Lo que este lema **no** hace: elegir el cierre. Eso es la tabla de causas, y son (b), (c′) y
+(f) más la forma de `premsOf` por regla en (e). Lo que sí hace es dejarlas **a todas** con la
+misma entrada: la línea mala, ya descompuesta, con su prefijo decodificado y el acumulador que
+el verificador tenía en ese punto. -/
+
+/-- ⭐⭐⭐ **EL DESPACHADOR.** Todo lo que hay entre `chainOkDec l = false` y la tabla de causas,
+en un solo enunciado: la **primera** línea que el verificador rechaza, ya partida en
+`⟨⌜f⌝, tag, as⟩` con `StdArgs as`, junto con el prefijo decodificado (`rs`), el acumulador de
+conclusiones en ese punto (`L`) y el **corte regla‑vs‑conclusión** hecho.
+
+Compone cuatro piezas y no prueba nada por su cuenta:
+`chainOkDec`/`decodeChain` (definiciones) → `decodeChainAux_none_first` (§2bis, el front‑end) →
+`StdChain`/`StdLine` (ADR‑022, la forma) → `decodeLine_none_cases` (§2bis, el corte).
+
+⭐ Las **seis** causas consumen exactamente esta salida:
+* el `Or.inr` **es** (c′) —`stepConcl ≠ f`—, con `tag` y argumentos ya en la mano;
+* el `Or.inl` reparte (a) (`tag > 20`), (b) (aridad), (d) (`tag = 15`), (e) (`tag ∈ {16,17}`)
+  y (f) (tipo de argumento);
+* y `L` es justo el acumulador que pide `derives_not_boundedCarcLt_of_not_mem` (§2quater). -/
+theorem dispatcher (l : List Term) (hstd : StdChain l) (hdec : chainOkDec l = false) :
+    ∃ (k : Nat) (f : Formula) (tag : Nat) (as : Term) (rs : List Rule) (L : List Formula),
+      And (l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+     (And (StdArgs as)
+     (And (decodeChainAux [] (objList (l.take k)) = some rs)
+     (And (checkAux rs [] = some L)
+          (Or (decodeRuleTag L f tag (peelArgs as) = none)
+              (∃ r, And (decodeRuleTag L f tag (peelArgs as) = some r)
+                        (stepConcl L r ≠ some f)))))) := by
+  -- (1) el decisor falla ⇒ la cadena no decodifica
+  have hnone : decodeChainAux [] (objList l) = none := by
+    simp only [chainOkDec, decodeChain, Option.isSome_eq_false_iff, Option.isNone_iff_eq_none]
+      at hdec
+    exact hdec
+  -- (2) el FRONT-END da la PRIMERA línea mala
+  obtain ⟨k, x, rs, L, hx, hd, hc, hline⟩ := decodeChainAux_none_first l [] hnone
+  -- (3) `StdChain` da su FORMA
+  obtain ⟨f, tag, as, hshape, hargs⟩ := hstd x (List.mem_of_getElem? hx)
+  subst hshape
+  -- (4) el corte regla-vs-conclusión
+  exact ⟨k, f, tag, as, rs, L, hx, hargs, hd, hc, decodeLine_none_cases hline⟩
+
+
 end ROBINSON_PlusPlus.Meta.ChainNegPrf
 
 /-! ## `export` — por CONSUMO: el módulo F (ensamblaje) necesita `deuda_inNeg` y el puente. -/
@@ -834,10 +894,12 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
+  dispatcher
 )
 
 /-! ## FOOTPRINT -/
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dispatcher
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
