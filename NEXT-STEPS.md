@@ -7,9 +7,77 @@
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
 **Estado 2026‑09‑22 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
+🏁🏁🏁🏁 **`NegVerifier` es un TEOREMA** (ADR‑097): las dos deudas de `Meta/VerifierSound.lean` están saldadas y `reflects_of_omega` pasa de **dos** hipótesis a **una**.
 ⚠️ **warnings: 11**, todos declarados en `check-warnings.bash` (rompe en las dos direcciones).
-🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **427** (cobertura **392/392**) · `check-warnings` **11** · `check-estratos` **10** · `check-sorry` **+ censo de agujeros** · `check-doc-sync` en los DOS repos, con **`[H]` nuevo** (**78/78**), **`[E]` ampliado** (universo 15 → **40**, deuda **35**) y **`[B]` con trinquete** (**44**) · `check-axioms` (FOL).
+🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **457** (cobertura **421/421**) · `check-warnings` **11** · `check-estratos` **10** · `check-sorry` **+ censo de agujeros** · `check-doc-sync` en los DOS repos, con **`[H]` nuevo** (**78/78**), **`[E]` ampliado** (universo 15 → **40**, deuda **35**) y **`[B]` con trinquete** (**44**) · `check-axioms` (FOL).
 
+
+> # 🗓️ 2026‑09‑22 (cierre) — 🏁🏁🏁🏁 **`NegVerifier` PROBADO**: las dos deudas, saldadas
+>
+> **ADR‑094 … ADR‑097.** `DEUDA_chainNeg` era la última obligación abierta de `NegVerifier`, y ya
+> no lo es. `negVerifier_proved : NegVerifier` está en el árbol, verde, y **sin axiomas nuevos**.
+>
+> ```lean
+> theorem deuda_chainNeg_proved : DEUDA_chainNeg      -- Meta/ChainNegPrf.lean §6
+> theorem negVerifier_proved    : NegVerifier
+> ```
+>
+> ⚠️⚠️ **ÁMBITO (M‑13), y es lo primero que hay que leer**: lo que cae es `NegVerifier`, **NO** la
+> ω‑consistencia. `reflects_of_omega` (`Meta/OmegaReflect.lean:297`) tomaba **dos** hipótesis y
+> ahora toma **una**: `OmegaConsistent`. Y `StdChain` sigue **estrechada** (ADR‑022), escrito en el
+> enunciado.
+>
+> ## 📐 Cómo se cerró: el REPARTO, en cuatro tandas
+>
+> | | |
+> |---|---|
+> | ADR‑094 | **un** tag de punta a punta (`cierra_tag0`, ~40 l.), para ver la máquina entera |
+> | ADR‑095 | ⭐⭐ `NotFC` — **un** refutador donde había ~32 — y `cierra_FF`: el cierre **por FORMA**, 8 tags |
+> | ADR‑096 | las otras cinco formas ⇒ **18/18 tags estructurales**; `NotTC`; y las tres ranuras OPACAS |
+> | ADR‑097 | los **tres** tags de contexto + el `match` de 21 + el ensamblado |
+>
+> ⭐⭐⭐ **Lo que hizo barato el reparto**: los 21 tags sólo tienen **seis formas** de argumentos
+> (ADR‑091), y un cierre genérico por forma convierte cada tag en **una instancia sin
+> razonamiento**. `cierra_por_tag` son 21 ramas de **una línea**.
+>
+> ## 🔑 Las tres lecciones que deja
+>
+> 1. ⭐⭐ **La ranura que no se puede refutar por la FORMA es, por construcción, la que el esquema
+>    tuvo que GUARDAR.** Las tres ranuras dentro de `substfc` (arg. de término de `q1`/`q2`, de
+>    fórmula de `leibniz`) no se refutan por sintaxis — y son exactamente las que ADR‑020 guardó
+>    con `hasWit`/`hasWitF`, hace meses y **por otra razón**. No es coincidencia: `substfc` no se
+>    evalúa sin buena formación, así que opacidad y guarda tienen la **misma causa**.
+> 2. ⭐⭐ **Un argumento que el esquema usa DOS veces sólo necesita UNA aparición transparente.**
+>    Parecía un accidente de `q3`/`qconf`; es la mitad de la forma `[F]` (tags 18 y 20).
+> 3. ⭐⭐ **El mismo refutador sirve a dos vías distintas porque refuta un HECHO SOBRE CÓDIGOS, no
+>    sobre `lineWF`.** `ax_lineWF_mp` no dice nada de la forma del argumento ⇒ una línea `mp` con
+>    un `termCode` es **bien formada**; cae por las **PREMISAS**, con el mismo `NotFC`.
+>
+> ## ⚠️ Trampas nuevas de la tanda
+>
+> * **`decide` exige un objetivo CERRADO**: `cases B <;> decide` falla («Expected type must not
+>   contain free variables») en los constructores con argumentos. Sale con `simp [formTag]`.
+> * **`Option.noConfusion` no ve a través de `Option.map`/`bind`** — cinco veces en un bloque. Lo
+>   que no acepta por sintaxis, la **ascripción de tipo** lo acepta por defeq:
+>   `have h : some (Rule.thy i) = some r := hr'`.
+> * **Un lema puede existir y no estar en el ÁMBITO**: `liftTerm_termCode` vive en
+>   `Meta/DerivCondPrf.lean` sin `export`.
+>
+> ## ⬜ Lo que queda AHORA (por orden de lo que desbloquea)
+>
+> 1. ⬜ **`OmegaConsistent`** — la única hipótesis que queda en `reflects_of_omega`. No es una
+>    deuda técnica: es una hipótesis del teorema, y se queda.
+> 2. 🏗️ **EL MODELO DE LOS 141** — lo que retira la **vacuidad** de Gödel I/II, porque nada prueba
+>    `ConsistentH`. ⛔⛔ Bloqueado por una decisión del propietario: **ℕ NO es modelo de `Prf`**
+>    (ADR‑088) y la corrección está **medida** (ADR‑093, `cons a b = σ (pair a b)`), pero cambia la
+>    codificación y con ella **`G`**.
+> 3. ⬜ **`Canonical0`** — 2.ª entrega de `ModelG`; pedirá `FreshSym`.
+> 4. ⬜ **Deudas de lectura** (con trinquete): 19 sondeos por redactar, 44 símbolos muertos por
+>    adjudicar, 35 marcas `Last updated`.
+>
+> 🔧 **Controles re‑ejecutados (M‑13)**: `check-footprints` **457** (cobertura **421/421**) ·
+> `check-warnings` **11** · `check-estratos` **10** · `check-sorry` + censo · `check-doc-sync`
+> (sondeos **80/80**). RPP **145** jobs · FOL **54** · 0 sorry · 3 `axiom` de Lean en RPP.
 
 > # 🗓️ 2026‑09‑22 — 🏁🏁 **LAS SEIS CAUSAS CERRADAS**, el muro de `Model` derribado, y el MODELO ESTÁNDAR arrancado
 >
