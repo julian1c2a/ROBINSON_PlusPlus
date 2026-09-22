@@ -323,6 +323,89 @@ theorem stdArgs_objList : ∀ {as : Term}, StdArgs as → as = objList (peelArgs
       simp only [peelArgs_cons, objList]
       rw [← stdArgs_objList h]
 
+/-! ### ⭐⭐⭐ LA INVERSIÓN DE `StdArgs` — la pieza que comparten las 21 ramas del reparto
+
+`StdArgs` (`Meta/OmegaReflect.lean:148`) vive sobre `Term`; el reparto (§4) trabaja sobre la
+**lista pelada** `peelArgs as`. `stdArgs_objList` (arriba) da la ida a nivel de término; lo que
+falta es el gemelo a nivel de **lista**, que es el que se puede **destruir por casos**.
+
+⭐⭐ **Y no es fontanería: es lo que convierte `decodeRuleTag … = none` en la tabla de causas.**
+Con la aridad correcta y los tipos correctos, `decodeRuleTag` **decodifica** (abajo,
+`decodeRuleTag_p1_some`). Ergo, para un tag estructural, `= none` **implica** aridad equivocada
+(b) **o** tipo equivocado (f), y no hay tercera opción. La dicotomía de abajo es esa implicación,
+y es la **plantilla de las diecinueve ramas**.
+
+🔑 *Un inductivo sobre `Term` se invierte mal; el mismo inductivo sobre `List Term` se destruye
+con `cases`. La inversión no es un lema, es un cambio de soporte.* -/
+
+/-- Versión a nivel de **LISTA** de `StdArgs`. -/
+inductive StdArgList : List Term → Prop
+  | nil : StdArgList []
+  | form (A : Formula) {l : List Term} : StdArgList l → StdArgList (formCode A :: l)
+  | term (u : Term) {l : List Term} : StdArgList l → StdArgList (termCode u :: l)
+
+theorem peelArgs_objList : ∀ l : List Term, peelArgs (objList l) = l
+  | [] => rfl
+  | a :: l => by
+      show peelArgs (cons a (objList l)) = a :: l
+      rw [peelArgs_cons, peelArgs_objList l]
+
+/-- ⭐⭐ **LA INVERSIÓN**: los argumentos pelados de una lista estándar forman una lista estándar
+de argumentos. -/
+theorem stdArgs_peel : ∀ {as : Term}, StdArgs as → StdArgList (peelArgs as)
+  | _, StdArgs.nil => by rw [peelArgs_nil]; exact StdArgList.nil
+  | _, StdArgs.form A h => by rw [peelArgs_cons]; exact StdArgList.form A (stdArgs_peel h)
+  | _, StdArgs.term u h => by rw [peelArgs_cons]; exact StdArgList.term u (stdArgs_peel h)
+
+/-- Y la vuelta, que es la que reconstruye el término que piden los cierres. -/
+theorem stdArgList_objList : ∀ {l : List Term}, StdArgList l → StdArgs (objList l)
+  | _, StdArgList.nil => StdArgs.nil
+  | _, StdArgList.form A h => StdArgs.form A (stdArgList_objList h)
+  | _, StdArgList.term u h => StdArgs.term u (stdArgList_objList h)
+
+/-- ⭐ **El destructor de UN paso**: la cabeza es código de fórmula o de término, y la cola sigue
+siendo estándar. Iterándolo se llega a cualquier aridad, sin un lema por aridad. -/
+theorem stdArgList_cons {a : Term} {l : List Term} (h : StdArgList (a :: l)) :
+    And (Or (∃ A, a = formCode A) (∃ u, a = termCode u)) (StdArgList l) := by
+  cases h with
+  | form A h' => exact ⟨Or.inl ⟨A, rfl⟩, h'⟩
+  | term u h' => exact ⟨Or.inr ⟨u, rfl⟩, h'⟩
+
+/-- Con aridad y tipos correctos, el tag 0 **decodifica**. -/
+theorem decodeRuleTag_p1_some (acc : List Formula) (f A B : Formula) :
+    decodeRuleTag acc f 0 [formCode A, formCode B] = some (Rule.p1 A B) := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+/-- Ídem con un argumento de **término**: el tag 9. -/
+theorem decodeRuleTag_q1_some (acc : List Formula) (f A : Formula) (t : Term) :
+    decodeRuleTag acc f 9 [formCode A, termCode t] = some (Rule.q1 A t) := by
+  simp [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode]
+
+/-- ⭐⭐⭐ **LA DICOTOMÍA, plantilla de las diecinueve ramas**: para un tag estructural,
+`decodeRuleTag … = none` sobre argumentos estándar significa **aridad equivocada** (causa (b))
+**o** **tipo equivocado** (causa (f)). No hay tercera opción, y por eso el reparto no tiene que
+razonar: sólo destruir.
+
+⚠️ El caso `[_]` va con `simp` y no con `decide`: con una variable libre dentro, `decide` se
+niega («Expected type must not contain free variables») aunque la longitud sea computable. -/
+theorem tag0_none_dichotomy {acc : List Formula} {f : Formula} {args : List Term}
+    (hs : StdArgList args) (h : decodeRuleTag acc f 0 args = none) :
+    Or (args.length ≠ 2)
+       (∃ a b, And (args = [a, b])
+         (Or (∃ u, a = termCode u) (∃ u, b = termCode u))) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [_], _ => exact Or.inl (by simp)
+  | [a, b], hs =>
+      obtain ⟨ha, hs'⟩ := stdArgList_cons hs
+      obtain ⟨hb, _⟩ := stdArgList_cons hs'
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · rcases hb with ⟨B, rfl⟩ | ⟨u, rfl⟩
+        · rw [decodeRuleTag_p1_some acc f A B] at h; exact absurd h (by simp)
+        · exact Or.inr ⟨_, _, rfl, Or.inr ⟨u, rfl⟩⟩
+      · exact Or.inr ⟨_, _, rfl, Or.inl ⟨u, rfl⟩⟩
+  | _ :: _ :: _ :: _, _ => exact Or.inl (by simp)
+
 /-- El tag de una línea CONCRETA se computa: `lineTag ⟨c, k̄, as⟩ = k̄`. -/
 theorem prf_lineTag_cons (concl as : Term) (k : Nat) :
     Prf (Formula.eq (lineTag (cons concl (cons (numeralM k) as))) (numeralM k)) := by
@@ -1338,7 +1421,10 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   prf_premsOf_mp_line prf_premsOf_gen_line prf_lenc_two prf_lenc_one prf_nthc_two_1
   derives_chainOk_neg_of_prem_code
   derives_chainOk_neg_mp_major derives_chainOk_neg_mp_minor derives_chainOk_neg_gen
-  stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
+  stdArgs_objList
+  StdArgList peelArgs_objList stdArgs_peel stdArgList_objList stdArgList_cons
+  decodeRuleTag_p1_some decodeRuleTag_q1_some tag0_none_dichotomy
+  prf_lineTag_cons derives_lineWF_neg_of_tag_big
   derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
   prf_lenc_p2 prf_lenc_c1 prf_lenc_c2 prf_lenc_c3 prf_lenc_j1 prf_lenc_j2 prf_lenc_j3
@@ -1376,6 +1462,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_mp_major
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_gen
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_peel
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgList_cons
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tag0_none_dichotomy
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p1
