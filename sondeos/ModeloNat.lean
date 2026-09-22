@@ -10,6 +10,23 @@ Objetivo último: un modelo de los **141** axiomas ⇒ `¬ Prf ⊥` = `Consisten
 retira la vacuidad de Gödel I/II (nada prueba hoy esa hipótesis). Este fichero hace la **capa
 aritmética**: la interpretación sobre `Nat` y los axiomas core que no tocan listas.
 
+## 🏁 Estado: **25 de los 34 `coreAxioms` VALIDADOS**, todos net‑0
+
+La capa aritmética está **completa**. Los **9** que faltan son **exactamente la capa de listas**
+(`ax_L0`–`ax_L3`, `ax_C1`–`ax_C3`, `ax_prodp_nil`/`_cons`), que es la que comparte maquinaria con
+los 107 de codificación.
+
+⭐ **El molde de M2 escaló sin excepciones**: los veinticinco salen con `intro` de los binders +
+un `simp` que abre la evaluación + un `Nat.*` del core o un `omega`. Ni un solo axioma pidió una
+idea nueva.
+
+⚠️ **Las dos únicas piedras**, y las dos fueron de FORMA, no de matemática:
+1. `⇔` es `FOL.iff`, un `def` que `simp` **no atraviesa** si no se lo nombra — y es justo el
+   conectivo de los dos axiomas que definen algo (`ax16` la paridad, `ax13` el orden). Va como
+   `_root_.iff`, porque `iff` **no** vive en el namespace `FOL`.
+2. En `ax13`, `simp` convierte el `∃k` del antecedente de una implicación en un `∀k`, así que se
+   introduce **como tal**: `intro k hk`, no `intro ⟨k, hk⟩`.
+
 ## ⭐ Lo que NO hubo que construir
 
 `triN`, `consN`, `two_mul_consN` y **`consN_inj`** ya estaban en producción
@@ -32,6 +49,14 @@ abajo** para lo único que aquí hace falta: **dos desigualdades**.
 
     lake env lean sondeos/ModeloNat.lean      # desde la raíz de RPP
 -/
+
+/-! ⚠️ **El linter de `simp` marca «no usado» y NO es una medición de que sobre.** Hoy ha pasado
+    dos veces en este mismo fichero: al quitar `ax25_pred_zero` (el único de los axiomas que no
+    es un `forall_`) la prueba ROMPIÓ. El nombre del axioma es redundante cuando `forall_` lo
+    abre y necesario cuando no, y el linter no distingue.
+    🔑 *Un aviso de «no usado» es una hipótesis, no una medición.* Precedente en el árbol:
+    `Meta/AxiomListCode.lean:15`. -/
+set_option linter.unusedSimpArgs false
 
 namespace ModeloNat
 
@@ -102,6 +127,7 @@ def MN : Model Nat where
     | "/₂", [a]    => a / 2
     | "%₂", [a]    => a % 2
     | "τ",  [a]    => a - 1            -- `pred`
+    | "^",  [a, b] => a ^ b
     | _, _         => 0
   rel := fun s args =>
     match s, args with
@@ -151,6 +177,101 @@ theorem v_ax15 : ∀ v : Nat → Nat, evalFormula MN v ax15_lt_succ_sqrt := by
     sqrt_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN]
   exact lt_sq_succ_sqrtN d
 
+/-! ### §2bis · El resto de la capa ARITMÉTICA
+
+⭐ Todos siguen el mismo molde que los ocho de arriba: `intro` de los binders, `simp` que abre
+la evaluación, y un `Nat.*` del core o un `omega` para rematar. **No hubo que inventar nada por
+axioma** — que es lo que M2 (ADR‑085) predijo y aquí se confirma sobre quince más. -/
+
+theorem v_ax5  : ∀ v : Nat → Nat, evalFormula MN v ax5_add_succ := by
+  intro v d d'; simp [add, succ, add_sym, succ_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_ax6  : ∀ v : Nat → Nat, evalFormula MN v ax6_add_comm := by
+  intro v d d'; simp [add, add_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_ax7  : ∀ v : Nat → Nat, evalFormula MN v ax7_add_assoc := by
+  intro v d d' d''; simp [add, add_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_ax8  : ∀ v : Nat → Nat, evalFormula MN v ax8_mul_zero := by
+  intro v d; simp [mul, zero, mul_sym, zero_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+
+theorem v_ax9  : ∀ v : Nat → Nat, evalFormula MN v ax9_mul_succ := by
+  intro v d d'; simp [mul, add, succ, mul_sym, add_sym, succ_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  exact Nat.mul_succ _ _
+
+theorem v_ax10 : ∀ v : Nat → Nat, evalFormula MN v ax10_mul_comm := by
+  intro v d d'; simp [mul, mul_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  exact Nat.mul_comm _ _
+
+theorem v_ax11 : ∀ v : Nat → Nat, evalFormula MN v ax11_mul_assoc := by
+  intro v d d' d''; simp [mul, mul_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  exact Nat.mul_assoc _ _ _
+
+theorem v_ax12 : ∀ v : Nat → Nat, evalFormula MN v ax12_mul_distrib := by
+  intro v d d' d''; simp [mul, add, mul_sym, add_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  exact Nat.mul_add _ _ _
+
+/-! #### La paridad: `omega` conoce `/2` y `%2` por literales -/
+
+theorem v_ax16 : ∀ v : Nat → Nat, evalFormula MN v ax16_mod2_succ := by
+  intro v d; simp [_root_.iff, mod2, succ, zero, one, mod2_sym, succ_sym, zero_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_ax17 : ∀ v : Nat → Nat, evalFormula MN v ax17_div_mod_eq := by
+  intro v d; simp [add, mul, div2, mod2, two, one, succ, zero,
+    add_sym, mul_sym, div2_sym, mod2_sym, succ_sym, zero_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_ax21 : ∀ v : Nat → Nat, evalFormula MN v ax21_mod2_range := by
+  intro v d; simp [mod2, zero, one, succ, mod2_sym, zero_sym, succ_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_ax24 : ∀ v : Nat → Nat, evalFormula MN v ax24_mod2_of_even := by
+  intro v d d'; simp [mod2, mul, two, one, succ, zero, mod2_sym, mul_sym, succ_sym, zero_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+/-! #### Monus y potencia -/
+
+theorem v_ax29 : ∀ v : Nat → Nat, evalFormula MN v ax29_sub_witness := by
+  intro v d d'; simp [le, lt, add, sub, lt_sym, add_sym, sub_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
+theorem v_pow_zero : ∀ v : Nat → Nat, evalFormula MN v ax_pow_zero := by
+  intro v d; simp [pow, zero, one, succ, pow_sym, zero_sym, succ_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+
+theorem v_pow_succ : ∀ v : Nat → Nat, evalFormula MN v ax_pow_succ := by
+  intro v d d'; simp [pow, mul, succ, pow_sym, mul_sym, succ_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  exact Nat.pow_succ _ _
+
+/-! #### El ORDEN. ⭐ `ax13` DEFINE `<` por un `∃`, así que aquí se comprueba que la relación
+que el modelo eligió (`a < b` de `Nat`) es **la que el axioma exige**, no una cualquiera. -/
+
+theorem v_ax13 : ∀ v : Nat → Nat, evalFormula MN v ax13_lt_def := by
+  intro v d d'; simp [_root_.iff, lt, add, succ, lt_sym, add_sym, succ_sym,
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  constructor
+  · intro h; exact ⟨d' - d - 1, by omega⟩
+  · -- ⚠️ `simp` convirtió el `∃k. …` del antecedente en un `∀k`, así que se introduce COMO TAL.
+    intro k hk; omega
+
+theorem v_ax19 : ∀ v : Nat → Nat, evalFormula MN v ax19_lt_trichotomy := by
+  intro v d d'; simp [lt, lt_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN]
+  omega
+
 end Interpretacion
 
 #print axioms ModeloNat.sqrtN_le
@@ -158,3 +279,7 @@ end Interpretacion
 #print axioms v_ax2
 #print axioms v_ax14
 #print axioms v_ax15
+#print axioms v_ax13
+#print axioms v_ax17
+#print axioms v_ax29
+#print axioms v_pow_succ

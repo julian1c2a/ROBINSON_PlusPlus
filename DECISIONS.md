@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-086**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-087**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6890,3 +6890,64 @@ contador de jobs ni los controles de proyección hasta estar completo.
 
 **Véase también:** ADR-085 (M1–M4 y el orden), ADR-083 (`ModelG`),
 `Meta/CodeNatInjPrf.lean`, `Peano/PeanoNat/Sqrt.lean`.
+
+---
+
+## ADR-087: 🏁 la capa ARITMÉTICA del modelo, COMPLETA — **25 de los 34**, y el molde no falló ni una vez
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`sondeos/ModeloNat.lean`) · ⬜ los 9 de listas + los 107
+**Contexto**: continuación directa de ADR-086.
+
+### 1 · 🏁 El molde de M2 **escaló sin excepciones**
+
+**25 de los 34 `coreAxioms` validados**, todos **net-0** (`[propext]` o `+ Quot.sound`). Los
+veinticinco tienen la **misma forma**: `intro` de los binders, un `simp` que abre la evaluación,
+y un `Nat.*` del core o un `omega` para rematar.
+
+⭐ **Ni un solo axioma pidió una idea nueva.** Eso es lo que M2 (ADR-085) predijo sobre una
+muestra de uno; aquí queda confirmado sobre veinticinco, incluyendo los que parecían distintos:
+la conmutatividad y la asociatividad (`Nat.mul_comm`/`Nat.mul_assoc`), la paridad (`omega`
+conoce `/2` y `%2` **por literales**), el monus, la potencia y el **orden**.
+
+⚠️ `ax13_lt_def` merece nota aparte: **define `<` por un `∃`**, así que validarlo no es rutina —
+es comprobar que la relación que el modelo eligió (`a < b` de `Nat`) es **la que el axioma
+exige**, y no una cualquiera que case con los demás.
+
+### 2 · ⚠️ Las dos únicas piedras, y las dos fueron de FORMA
+
+1. **`⇔` es `FOL.iff`, un `def`, y `simp` NO lo atraviesa** si no se le nombra. Y no vive en el
+   namespace `FOL`: va como **`_root_.iff`**. Fallaron **exactamente** los dos axiomas que
+   **definen** algo —`ax16` (paridad) y `ax13` (orden)—, que son justo los que usan `⇔`.
+   🔑 *El conectivo que no se reduce es el que aparece en los axiomas que DEFINEN, no en los que
+   calculan.*
+2. En `ax13`, `simp` convierte el `∃k` del **antecedente** de una implicación en un `∀k`. Se
+   introduce **como tal** (`intro k hk`), no con `⟨k, hk⟩`.
+
+### 3 · ⚠️ Y la reincidente, por tercera vez: el linter de `simp`
+
+Quitar los argumentos que el linter marca «no usado» **rompió** `v_ax25` (el único de los
+veinticinco que no es un `forall_`, así que sin el nombre del axioma no hay nada que abrir). El
+fichero lleva ahora `set_option linter.unusedSimpArgs false` **con la razón escrita al lado**, y
+precedente en `Meta/AxiomListCode.lean:15`.
+
+🔑 **Un aviso de «no usado» es una hipótesis, no una medición.** Van tres veces en esta sesión.
+
+### 4 · 📐 Lo que queda del modelo, y ya no es aritmética
+
+Los **9** que faltan de los 34 son **exactamente la capa de listas**: `ax_L0_cons_def`,
+`ax_L1_in_nil`, `ax_L2_in_cons`, `ax_C1`–`ax_C3` (concat), `ax_L3_in_concat`, `ax_prodp_nil` y
+`ax_prodp_cons`.
+
+⭐ Y esa capa **es la que abre los 107**: necesita `concatN`, `InN` y `prodpN` sobre `Nat`,
+definidos por recursión sobre la lista **decodificada** — que es la misma técnica
+(*decodificar → función de Lean → recodificar*) con la que se interpretarán los axiomas de
+codificación. `consN` y **`consN_inj`** ya están (ADR-086).
+
+⬜ Y ahí es donde el transporte desde Peano puede pagar de verdad:
+`Peano/PeanoNat/Foundation/GodelBeta.lean`.
+
+**Controles:** `check-doc-sync` (`[H]` **78/78**) · RPP **145 jobs**. ⚠️ **ÁMBITO**: FOL intacto;
+el sondeo está fuera del build a propósito.
+
+**Véase también:** ADR-086 (la capa aritmética arranca), ADR-085 §5 (el orden del frente).
