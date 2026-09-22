@@ -65,7 +65,7 @@ enumerar**:
 | (b) | **aridad equivocada** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_of_arity` + los **21** `prf_lenc_*` |
 | (c) | **la conclusión no casa** (`stepConcl ≠ f`) | 🏁 **CERRADA 2026‑09‑22**, `derives_lineWF_neg_of_concl` + los **19** `tc_*` |
 | (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
-| (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑21** (§2quater, `derives_chainOk_neg_of_prem`) — no va por `lineWF` sino por `premsOf ⊆ conclusiones anteriores`. ⬜ falta sólo el **transporte** a `mp`/`gen` |
+| (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑22** (§2quater + §2quinquies): el genérico `derives_chainOk_neg_of_prem_code` y las **tres** instancias |
 
 ⛔⛔ **RECTIFICADO el 2026-09-21, y las dos afirmaciones de arriba eran FALSAS** (panel
 adversarial, ADR-075):
@@ -1094,6 +1094,117 @@ theorem derives_chainOk_neg_of_prem_line (l : List Term) (k m : Nat) (x : Term)
     (derives_neg_lor (prf_not_in_nil_D _) hnb)
 
 
+/-! ## §2quinquies · 🏁 (e), INSTANCIADA en `mp` y `gen`
+
+⭐⭐ **La pieza que lo hace posible es que `ax_premsOf_mp` y `ax_premsOf_gen` están enunciados
+sobre la línea CONCRETA y son INCONDICIONALES**: no piden `lineWF`. Los envoltorios
+`prf_premsOf_mp`/`prf_premsOf_gen` (`Meta/PremsOfTagPrf.lean:363`, `:376`) sí lo piden —porque
+trabajan sobre una línea ABSTRACTA, con accesores— y ahí habría hecho falta meterse dentro del
+`raa`. Sobre una línea estándar, que es la que el despachador entrega, se va directo al axioma.
+
+🔑 *Un esquema con accesores vale para una línea abstracta y cuesta una hipótesis; el mismo
+esquema en forma explícita vale sólo para la línea concreta y no cuesta ninguna. Cuando se tiene
+la línea, la forma explícita es la barata.* -/
+
+/-- `premsOf` de una línea `mp` ESTÁNDAR, sin pasar por `lineWF`. -/
+theorem prf_premsOf_mp_line (cf cfj : Term) :
+    Prf (premsOf (cons cf (cons (numeralM 16) (cons cfj nil)))
+          =eq cons (implc cfj cf) (cons cfj nil)) := by
+  have h := prf_spec (prf_spec
+    (prf_ax (show ax_premsOf_mp ∈ axioms by simp [axioms])) cf) cfj
+  simpa [ax_premsOf_mp, premsOf, implc, cons, nil, numeralM, succ, zero,
+    substFormula, substTerm, substTerms, substTerm_numeralM, FOL.substTerm_liftTerm,
+    FOL.substTerm_liftLift] using h
+
+/-- `premsOf` de una línea `gen` ESTÁNDAR, sin pasar por `lineWF`. -/
+theorem prf_premsOf_gen_line (cf cg : Term) :
+    Prf (premsOf (cons cf (cons (numeralM 17) (cons cg nil))) =eq cons cg nil) := by
+  have h := prf_spec (prf_spec
+    (prf_ax (show ax_premsOf_gen ∈ axioms by simp [axioms])) cf) cg
+  simpa [ax_premsOf_gen, premsOf, cons, nil, numeralM, succ, zero,
+    substFormula, substTerm, substTerms, substTerm_numeralM, FOL.substTerm_liftTerm,
+    FOL.substTerm_liftLift] using h
+
+/-- Longitud de una lista-código de **dos** elementos. -/
+theorem prf_lenc_two (a b : Term) : Prf (lenc (cons a (cons b nil)) =eq numeralM 2) := by
+  refine prf_eq_trans (prf_lenc_cons a (cons b nil)) (prf_eq_congr_succ ?_)
+  exact prf_eq_trans (prf_lenc_cons b nil) (prf_eq_congr_succ prf_lenc_nil)
+
+/-- Longitud de una lista-código de **un** elemento. -/
+theorem prf_lenc_one (a : Term) : Prf (lenc (cons a nil) =eq numeralM 1) :=
+  prf_eq_trans (prf_lenc_cons a nil) (prf_eq_congr_succ prf_lenc_nil)
+
+/-- Segundo elemento de una lista-código de dos. -/
+theorem prf_nthc_two_1 (a b : Term) :
+    Prf (nthc (cons a (cons b nil)) (numeralM 1) =eq b) :=
+  prf_eq_trans (prf_nthc_succ a (cons b nil) zero) (prf_nthc_zero b nil)
+
+/-- ⭐⭐⭐ **EL CIERRE GENÉRICO DE (e)**: si la premisa `m`-ésima de la línea `k` es `⌜φ⌝` y `φ`
+**no** está en el acumulador que el decodificador hiló con las `k` primeras líneas, la cadena
+entera queda refutada.
+
+⭐ No menciona regla ninguna: `mp` y `gen` sólo se distinguen por las dos ecuaciones que se le
+pasan (`hlen` y `hnth`). El reparto, otra vez, vive en el despachador (§4). -/
+theorem derives_chainOk_neg_of_prem_code
+    (l : List Term) (k m n : Nat) (x : Term) (φ : Formula)
+    (hk : l[k]? = some x) (hmn : m < n)
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L)
+    (hnm : ¬ List.Mem φ L)
+    (hlen : Prf (lenc (premsOf x) =eq numeralM n))
+    (hnth : Prf (nthc (premsOf x) (numeralM m) =eq formCode φ)) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hklt : k < l.length := by
+    rcases List.getElem?_eq_some_iff.mp hk with ⟨hb, _⟩; exact hb
+  have hlt0 : axioms ⊢ lt (numeralM m) (numeralM n) := by
+    have := gnum_lt (a := m) (b := n) hmn
+    simpa only [numeralM_eq] using this
+  have hlt : axioms ⊢ lt (numeralM m) (lenc (premsOf x)) :=
+    derives_lt_congr_right (FOL.derive_eq_symm (prf_to_derives hlen)) hlt0
+  refine derives_chainOk_neg_of_prem_line l k m x hk hlt ?_
+  exact derives_not_boundedCarcLt_congr _ (formCode φ) _ _ (prf_to_derives hnth)
+    (derives_not_boundedCarcLt_of_not_mem l k (Nat.le_of_lt hklt) acc rs L hd hc φ hnm)
+
+/-- **(e) para `mp`, premisa MAYOR** (`fj ⇒ f`, índice 0). -/
+theorem derives_chainOk_neg_mp_major (l : List Term) (k : Nat) (f fj : Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 16) (cons (formCode fj) nil))))
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L)
+    (hnm : ¬ List.Mem (Formula.impl fj f) L) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hp := prf_premsOf_mp_line (formCode f) (formCode fj)
+  refine derives_chainOk_neg_of_prem_code l k 0 2 _ (Formula.impl fj f) hk (by decide)
+    acc rs L hd hc hnm ?_ ?_
+  · exact prf_eq_trans (SinWTs.prf_congr_lenc hp) (prf_lenc_two _ _)
+  · exact prf_eq_trans (SinWTs.prf_congr_nthc_lst _ hp) (prf_nthc_zero _ _)
+
+/-- **(e) para `mp`, premisa MENOR** (`fj`, índice 1). -/
+theorem derives_chainOk_neg_mp_minor (l : List Term) (k : Nat) (f fj : Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 16) (cons (formCode fj) nil))))
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L)
+    (hnm : ¬ List.Mem fj L) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hp := prf_premsOf_mp_line (formCode f) (formCode fj)
+  refine derives_chainOk_neg_of_prem_code l k 1 2 _ fj hk (by decide)
+    acc rs L hd hc hnm ?_ ?_
+  · exact prf_eq_trans (SinWTs.prf_congr_lenc hp) (prf_lenc_two _ _)
+  · exact prf_eq_trans (SinWTs.prf_congr_nthc_lst _ hp) (prf_nthc_two_1 _ _)
+
+/-- **(e) para `gen`** (premisa única, índice 0). -/
+theorem derives_chainOk_neg_gen (l : List Term) (k : Nat) (f g : Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 17) (cons (formCode g) nil))))
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L)
+    (hnm : ¬ List.Mem g L) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hp := prf_premsOf_gen_line (formCode f) (formCode g)
+  refine derives_chainOk_neg_of_prem_code l k 0 1 _ g hk (by decide)
+    acc rs L hd hc hnm ?_ ?_
+  · exact prf_eq_trans (SinWTs.prf_congr_lenc hp) (prf_lenc_one _)
+  · exact prf_eq_trans (SinWTs.prf_congr_nthc_lst _ hp) (prf_nthc_zero _ _)
+
+
 /-! ## §3 · 🏁 `DEUDA_inNeg`, SALDADA -/
 
 /-- Transporte de una NO‑pertenencia por igualdad del contenedor. -/
@@ -1190,6 +1301,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   derives_not_boundedCarcLt_of_not_mem derives_not_boundedPremsIn_of_index
   derives_chainOk_neg_of_prem
   derives_not_boundedPremsIn_congr derives_chainOk_neg_of_prem_line
+  prf_premsOf_mp_line prf_premsOf_gen_line prf_lenc_two prf_lenc_one prf_nthc_two_1
+  derives_chainOk_neg_of_prem_code
+  derives_chainOk_neg_mp_major derives_chainOk_neg_mp_minor derives_chainOk_neg_gen
   stdArgs_objList prf_lineTag_cons derives_lineWF_neg_of_tag_big
   derives_numeralM_ne derives_lineWF_neg_of_lenc_imp
   prf_lenc_tag_and prf_lenc_tag_plain prf_lenc_p1 prf_lenc_mp
@@ -1222,6 +1336,10 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_not_boundedPremsIn_congr
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem_line
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_premsOf_mp_line
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prem_code
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_mp_major
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_gen
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.stdArgs_objList
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_tag_big
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_lenc_imp
