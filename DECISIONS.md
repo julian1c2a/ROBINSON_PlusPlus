@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-083**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-084**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6645,3 +6645,100 @@ RPP **145 jobs**. ⛔ **M-12 respetada**: FOL commiteado **antes** que RPP.
 
 **Véase también:** ADR-068/069/071 (la migración del símbolo), `sondeos/SymbolParamCoste.lean`,
 `FOL/CHANGELOG.md` 2026-09-22.
+
+---
+
+## ADR-084: 🔧 la DEUDA DE CONTROL, adjudicada — y **las tres cifras publicadas estaban bajas**
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`check-doc-sync.bash`: `[H]` nuevo, `[E]` ampliado, `[B]` con trinquete)
+· ⬜ dos deudas de LECTURA, declaradas
+**Contexto**: frente C. Cuatro puntos, y **tres de los cuatro** eran una cifra que resultó ser
+más alta de lo publicado — siempre por la misma razón.
+
+### 1 · 🔑 El patrón: cada cifra se había tomado con una red más estrecha que la realidad
+
+| punto | cifra publicada | cifra MEDIDA hoy | por qué difería |
+|---|---|---|---|
+| sondeos sin proyectar | **13 de 74** | **19 de 76** | se contaba como proyectado cualquier fichero **mencionado en la prosa** de otra fila |
+| marcas `Last updated` | **11 de 18** | **35 de 40** | `[E]` sólo recorría los **15 AUTHORITATIVE**; los otros 25 `.md` no los miraba nadie |
+| símbolos muertos | **223 nombres** | **44** | 223 era el conteo de CANDIDATOS **antes** de aplicar los `DEAD_MARKER` |
+
+🔑 **Una cifra de deuda sin decir en qué punto del filtro se tomó no es comparable consigo
+misma** — y las tres se habían publicado como si lo fueran.
+⚠️ Dos de las tres se movieron **hacia arriba**; la tercera, hacia abajo. El sesgo no es
+optimismo: es que **nadie volvió a medir con la red ancha**.
+
+### 2 · 🏁 `[H]`: el catálogo de `sondeos/`, cerrado
+
+`sondeos/` está **fuera del build** por diseño ⇒ `[C]` (que proyecta las `lean_lib`) no lo mira.
+`[H]` compara `ls sondeos/*.lean` contra las **cabeceras de fila** del README y **rompe en los
+dos sentidos**: un fichero sin fila es trabajo que se repetirá, y una fila sin fichero es una
+referencia falsa (el daño de ADR-072). **Probado rompiendo las dos veces**, y la prueba A con
+**exactamente uno**, que es donde el bug de `printf '%s'` habría absuelto.
+
+⭐ Para que naciera **verde y honesto** se añadió al README la tabla **⬜ SIN REDACTAR** con los
+19, cada uno con su **primera línea útil copiada literalmente** del fichero. ⛔ No se les
+inventó un «resultado»: redactarlos exige leer ≈ **4 000 líneas**, y una fila de resultado
+escrita sin leer el fichero es exactamente la documentación que este repo lleva un año
+retirando. La deuda queda **enunciada**, no escondida.
+
+⚠️ Bug propio, cazado al primer arranque: los backticks dentro de un `echo "…"` se ejecutaron
+como **sustitución de comando** y el título salió mutilado. *Un control también es código.*
+
+### 3 · 🏁 `[E]`: mismo control, universo de 15 → 40
+
+`[E]` **ya era** el control de frescura con tabla de deuda y trinquete (ADR-072). Lo que fallaba
+era **a qué miraba**. Se amplió su universo a todos los `.md` salvo `doc/book/**`, y se declaró
+la deuda medida. ⭐ **Y el propio control cazó TRES que mi medición a mano no vio** (`comm` con
+locales distintos se las comió): `doc/PLAN-COMPLETITUD-FINITISTA.md`, `ESCALANDO_EL_PROYECTO.md`,
+`NAMING-CONVENTIONS.md`. 🔑 *Esta vez la red estrecha era la mía.* Total declarado: **35**.
+
+⛔ Lo que **no** se hizo: poner la fecha de hoy en los 35. Eso es actualizar el **banner** sin
+tocar el **cuerpo** — el defecto exacto que este control existe para cazar.
+
+### 4 · 🏁 `[B]`: de AVISO a CONTROL, y un agujero en mi propio trinquete
+
+`[B]` no rompía («requiere juicio»), y un aviso que nadie adjudica es una lista que crece sola.
+Ahora declara los **44** y rompe en los dos sentidos.
+
+⛔⛔ **Y la prueba de rotura encontró un agujero que yo había metido**: el bucle recorre los
+símbolos **CITADOS**, así que una entrada de la tabla cuyo documento se arregle **deja de entrar
+en el bucle** y la tabla guardaría fantasmas para siempre. La comprobación de «deuda saldada»
+tuvo que salir **fuera** del bucle.
+🔑 *Un trinquete que sólo mira lo que entra en el bucle no es un trinquete: es media cuenta.*
+La versión de `[E]` no tenía el agujero porque recorre **documentos**, que siempre existen; ésta
+recorre **citas**, que desaparecen. ⭐ Van tres controles nuevos este mes y **los tres** tenían un
+defecto que sólo salió al probarlos rompiendo.
+
+### 5 · ⛔ El linter de ADR-074: **medido, y la respuesta es NO desplegarlo**
+
+⬜4 dejaba abierto «dónde colgarlo y qué le hace al tiempo de construcción». Medido:
+
+* **`import Lean` cuesta +3,2 s por módulo** (`Minimal/Axioms.lean`: 5,4 s → 8,6 s).
+* El candidato que ADR-074 nombraba —**el barril**— es **inservible**: medido, **CERO** módulos
+  del árbol importan `ROBINSON_PlusPlus`. Colgarlo ahí no vigilaría nada.
+* Los tres `axiom` viven en `Minimal/Axioms.lean` (la **raíz** del DAG), `Full/Induction.lean` y
+  `Full/Lists.lean`. Y —por el punto ciego que el propio sondeo midió— **un linter sólo ve el
+  fichero que lo IMPORTA**. Para vigilar el de la raíz hay que colgarlo en la raíz, y entonces
+  los **131** módulos pagan el import.
+
+⇒ **No se despliega.** `check-axioms.bash` ya hace el censo con **igualdad exacta**, en
+milisegundos, y sobre el árbol entero. 🔑 *Un aviso más temprano no vale un build 131 veces más
+caro cuando el censo tardío es exacto.* ⬜ Si algún día hay muchos más `axiom`, se reabre.
+
+### 6 · ⬜ Lo que queda, y es de LECTURA
+
+1. Redactar el resultado de los **19** sondeos de la tabla nueva.
+2. Adjudicar los **44** de `B_DEUDA`: por cada uno, mirar su línea y decidir si es historia
+   (⇒ marcarla) o una afirmación de estado caducada (⇒ arreglar el doc).
+3. Las **35** marcas `Last updated`: leer el cuerpo y entonces bumpear.
+
+Las tres están **declaradas y con trinquete**: no pueden crecer.
+
+**Controles (re-ejecutados, M-13):** `check-doc-sync` con `[H]` **76/76**, `[E]` **35
+declaradas / 0 sin declarar / 0 sin saldar**, `[B]` **44 de 44** · `check-footprints` **427**
+(cobertura **392/392**) · RPP **145 jobs**. ⚠️ **ÁMBITO**: FOL no se tocó en esta entrada.
+
+**Véase también:** ADR-072 (`[E]` rearmado), ADR-073 (`[COBERTURA]`), ADR-074 (el linter),
+`sondeos/lintlab/`.

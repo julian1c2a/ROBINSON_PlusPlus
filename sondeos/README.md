@@ -1,6 +1,6 @@
 # `sondeos/` — experimentos verificados (desde la sesión 2026‑08‑19)
 
-**Last updated:** 2026‑09‑21 — entran **`TagConclCoste.lean`** y **`DespachadorCoste.lean`**: las dos mediciones **desmienten cotizaciones mías**, y la segunda **retira el riesgo declarado de la vía**. Antes: 2026‑09‑19 — entran `CraigEqVacuo.lean`, `MDiezEnLaFirma.lean`, `SymbolParam.lean`, `SymbolParamCoste.lean` y `lintlab/` (ADR‑067/068/070/074). ⛔ Y se declara la deuda de abajo. Antes: 2026‑09‑14 — entran `ClassicalChoiceCenso.lean`, `DerivesSinMetaReglas.lean`, `NombresFrescosMedicion.lean` y `SimbolosSinString.lean` (**70** sondeos). Antes:
+**Last updated:** 2026‑09‑22 — entra la tabla de **SIN REDACTAR** (19) y con ella el control **`[H]`**, que cierra el catálogo. Antes: 2026‑09‑21 — entran **`TagConclCoste.lean`** y **`DespachadorCoste.lean`**: las dos mediciones **desmienten cotizaciones mías**, y la segunda **retira el riesgo declarado de la vía**. Antes: 2026‑09‑19 — entran `CraigEqVacuo.lean`, `MDiezEnLaFirma.lean`, `SymbolParam.lean`, `SymbolParamCoste.lean` y `lintlab/` (ADR‑067/068/070/074). ⛔ Y se declara la deuda de abajo. Antes: 2026‑09‑14 — entran `ClassicalChoiceCenso.lean`, `DerivesSinMetaReglas.lean`, `NombresFrescosMedicion.lean` y `SimbolosSinString.lean` (**70** sondeos). Antes:
 2026‑09‑13, `EnumFormulaPorInyeccion.lean` (**rescatado de un scratchpad**) y
 `HenkinSaleDeRaa.lean`; 2026‑09‑11, `AnclaSoundness.lean` (la solidez de `Prf₀`) y `PrfHMono.lean`.
 
@@ -106,6 +106,46 @@ midieron**, así que se listan en vez de inventarles una descripción:
 `ChainNegPuente` · `ClausuraFormaEcuacional` · `ClausuraNoHaceFalta` · `Div2Gen` ·
 `MedirC_Carga` · `MedirC_Deriva` · `MedirC_Enmienda` · `MedirF_Opaco` · `MedirF_Replan`
 
+
+## ⬜ Sondeos SIN REDACTAR — el catálogo los LISTA, pero no dice qué midieron
+
+⛔⛔ **Medido el 2026‑09‑22: son DIECINUEVE de setenta y seis, no «13 de 74».** La cifra vieja
+salía de contar como proyectado cualquier fichero **mencionado en la prosa** de otra fila; casando
+sólo contra **cabeceras de fila**, nueve de los «proyectados» no lo estaban.
+🔑 *Un control que casa por subcadena ABSUELVE, y la cifra que produce es más alta que la
+verdad.* Es la novena vez que este repo paga esa misma trampa.
+
+⚠️ Estas filas **no dicen el resultado**, y eso es deliberado: redactarlos honestamente exige
+leer ≈ **4 000 líneas**, y una fila de resultado escrita sin leer el fichero sería exactamente la
+clase de documentación que este proyecto lleva un año retirando. Lo que sí hacen es **cerrar el
+catálogo**: a partir de aquí, `[H]` rompe si aparece un fichero que no esté en **ninguna** de las
+dos tablas, y también si una fila nombra un fichero que no existe.
+
+⬜ **La deuda, enunciada**: pasar cada una de estas diecinueve a la tabla de arriba, con su
+resultado medido. La columna «primera línea útil» está copiada **literalmente** del fichero.
+
+| fichero | tamaño | primera línea útil (literal) | estado |
+|---|---|---|---|
+| **`CarcPayoff.lean`** | 61 l. | `⊢ Prov(⌜ carc((cons h t)˙) = ḣ ⌝)` — el §28 recuperado. | ⬜ **sin redactar** |
+| **`ChainNegPuente.lean`** | 221 l. | ## §0 · Los dos Leibniz a nivel `⊢` que hacen falta (molde de `Full.eq_subst_in`) | ⬜ **sin redactar** |
+| **`ClausuraFormaEcuacional.lean`** | 601 l. | ## 0 · La PARTICIÓN, copiada LITERALMENTE de `Probe/PilotoParticion.lean` §1 y §17 | ⬜ **sin redactar** |
+| **`ClausuraNoHaceFalta.lean`** | 313 l. | ## §1 · La cadena sólo hace MEMBRESÍA con las conclusiones anteriores | ⬜ **sin redactar** |
+| **`Div2Gen.lean`** | 13 l. | ¿Se puede subir `prf_div2_double` a un ∀ OBJETO? Si sí, `pcc_thm_inst` lo mete | ⬜ **sin redactar** |
+| **`HasWitTcFn.lean`** | 406 l. | ## §1 · El encuadre | ⬜ **sin redactar** |
+| **`KitPayoff.lean`** | 164 l. | Las dos hojas SIGUEN VIVAS: `prf_tc_numeral` y `prf_tc_zero`. | ⬜ **sin redactar** |
+| **`Magnitud.lean`** | 73 l. | `log₂(2^a + 2^b)` sin desbordar. | ⬜ **sin redactar** |
+| **`MedirC_Carga.lean`** | 483 l. | ############################################################################ | ⬜ **sin redactar** |
+| **`MedirC_Deriva.lean`** | 444 l. | ############################################################################ | ⬜ **sin redactar** |
+| **`MedirC_Enmienda.lean`** | 654 l. | ## §1 · El esquema ACTUAL de `q1`, en forma de chasis | ⬜ **sin redactar** |
+| **`MedirF_Opaco.lean`** | 253 l. | ## §1 · `formCode` vs `formCodeM` — el puente EXISTE y NO es `rfl` | ⬜ **sin redactar** |
+| **`MedirF_Replan.lean`** | 324 l. | ############################################################################ | ⬜ **sin redactar** |
+| **`PilotoAislado.lean`** | 80 l. | ## 1 · El aislamiento, comprobado por máquina | ⬜ **sin redactar** |
+| **`PilotoDiagonal.lean`** | 108 l. | ### Lo que se ASUME de S4 (y nada más) | ⬜ **sin redactar** |
+| **`S1Audit.lean`** | 42 l. | ## Los RESULTADOS CABECERA | ⬜ **sin redactar** |
+| **`S3S5.lean`** | 121 l. | ## `codeNat` — el valor numérico del código, TOTAL y ESTRUCTURAL | ⬜ **sin redactar** |
+| **`S4.lean`** | 52 l. | ### Paso 1 — el sumando derecho de una suma nula es nulo | ⬜ **sin redactar** |
+| **`TcFormPayoff.lean`** | 121 l. | **El sustituto de `prf_tc_form`.** Misma función, código estático CAMBIADO: | ⬜ **sin redactar** |
+
 ⚠️ **Y `check-doc-sync [C]` no los mira**: sólo proyecta los módulos de las `lean_lib`, y
 `sondeos/` está fuera del build por diseño. ⇒ el catálogo de sondeos **no lo vigila nadie**, que
 es exactamente la condición que ya costó reconstruir dos veces algo que estaba medido
@@ -114,4 +154,4 @@ es exactamente la condición que ya costó reconstruir dos veces algo que estaba
 ⬜ **Lo que falta, y no se hace hoy**: un control `[H]` que compare `ls sondeos/*.lean` contra las
 filas de este catálogo y rompa en los dos sentidos. No se escribe al cierre de la sesión porque
 **un control que no se ha visto romper no es un control**, y probarlo pide tiempo que hoy ya no
-hay. La cifra queda medida: **13 de 74** (2026‑09‑19; con los dos de 09‑21 son **76** ficheros — ⚠️ y el 13 **no se re‑ejecutó**, así que va con su ÁMBITO, M‑13).
+hay. 🏁 **ESCRITO el 2026‑09‑22** (ADR‑084): el control `[H]` ya existe en `check-doc-sync.bash`, rompe en **los dos sentidos** y se ha **probado rompiendo**. ⛔⛔ Y al escribirlo la cifra cambió: no eran **13 de 74** sino **19 de 76** — la medición vieja casaba por **subcadena** y se absolvía sola.

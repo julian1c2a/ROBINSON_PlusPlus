@@ -268,6 +268,34 @@ doc/REFERENCE-Full.md
 doc/REFERENCE-Incompleteness.md
 doc/REFERENCE-Kernel.md
 cuarentena/README.md
+# ── ampliación del universo, 2026-09-22 (ADR-084): los 21 defectos de los 25
+#    documentos que `[E]` nunca había mirado. La cifra sólo puede BAJAR.
+.claude/commands/docsync.md
+AI-GUIDE.md
+CHANGELOG.md
+DISCUSIONES.md
+doc/AUDITORIA-2026-09-11.md
+doc/AUDITORIA-FOL-2026-09-12.md
+doc/FEEDBACK-PARA-EL-LIBRO.md
+GODEL-D3-TRACKED-DESIGN.md
+GODEL-D-ARITHMETIZATION.md
+MINIMAL-AXIOMS.md
+PLAN-FRENTE-A.md
+PLAN-LIBRO.md
+PLAN-NEGVERIFIER.md
+PLANNING.md
+PLAN-PRUEBAS.md
+PLAN-SORTES.md
+Sobre_el_libro.md
+TEOREMAS-E-HIPOTESIS.md
+THOUGHTS.md
+TuplasFuncionesYListas.md
+WORKFLOW.md
+# ── y estas TRES las cazó el propio control, no la medición a mano: `comm` con
+#    locales distintos se las había comido. 🔑 Mi red era la estrecha esta vez.
+doc/PLAN-COMPLETITUD-FINITISTA.md
+ESCALANDO_EL_PROYECTO.md
+NAMING-CONVENTIONS.md
 EOF
 
 # ⛔ GUARDA DEL CLON SUPERFICIAL (2026-09-18, ADR-072). En `--depth 1`, `git log -1 -- <f>`
@@ -280,10 +308,21 @@ if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
   echo "      Arreglo: \`fetch-depth: 0\` en el paso de checkout del workflow."
   FAIL=1
 fi
+# ⛔⛔ EL UNIVERSO DE ESTE CONTROL, AMPLIADO EL 2026-09-22 (ADR-084).
+# Hasta hoy `[E]` recorría `$DOCS` = los **15 AUTHORITATIVE**. Los otros **25** `.md` del repo
+# —AI-GUIDE, CHANGELOG, PLANNING, WORKFLOW, THOUGHTS, los PLAN-*, los GODEL-*, las auditorías—
+# **no los miraba nadie**, y de esos 25 había **21 defectuosos**.
+# ⚠️ La cifra publicada decía «11 de 18». Medida sobre el repo entero: **30 de 40**.
+# 🔑 *Un control con universo estrecho no mide menos: mide OTRA COSA, y publica la cifra
+#    como si fuera la del repo.* Es la misma trampa que `[COBERTURA]` (ADR-073) y que `[H]`
+#    (más abajo, mismo día): mirar lo declarado en vez de mirar el ÁRBOL.
+# ⛔ Y lo que NO se hizo: poner la fecha de hoy en los 30. Eso sería actualizar el BANNER sin
+# tocar el CUERPO, que es exactamente el defecto que este control existe para cazar.
+E_UNIVERSO="$DOCS $(git ls-files '*.md' 2>/dev/null | grep -v '^doc/book/')"
 E_BAD=0      # documentos que fallan y NO estaban declarados
 E_SALDADA=0  # documentos declarados que ya están bien ⇒ hay que quitarlos de la tabla
 E_DECL=0     # deuda declarada que sigue vigente
-for d in $DOCS; do
+for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
   [ -e "$d" ] || continue
   GIT_DATE=$(git log -1 --format=%ad --date=short -- "$d" 2>/dev/null)
   LU=$(grep -m1 -iE "^\*\*Last updated" "$d" 2>/dev/null \
@@ -335,9 +374,72 @@ fi
 #     `ax_C3_concat_assoc`, `ax_lineWF` por `ax_lineWF_c1`), y eso es legítimo.
 #     Un símbolo de verdad muerto (`goedel_first_real'`, `prf_tc_cons'`) no prefija nada.
 echo
-echo "════ [B] SÍMBOLOS MUERTOS — AVISO, requiere juicio ════"
-echo "   (no rompe el check: hay menciones legítimas en secciones de diseño e historia.)"
+echo "════ [B] SÍMBOLOS MUERTOS — ROJO, con trinquete ════"
+echo "   (deuda DECLARADA y con trinquete desde 2026-09-22: no puede crecer.)"
+# ⛔⛔ ADJUDICADO EL 2026-09-22 (ADR-084): `[B]` deja de ser AVISO y pasa a ser CONTROL.
+#
+# Nacía como aviso porque «hay menciones legítimas en secciones de diseño e historia», y eso
+# es cierto — pero un aviso que nadie adjudica es una lista que crece sola. Los `DEAD_MARKER`
+# de arriba ya absuelven las menciones históricas bien marcadas; lo que queda **no está
+# marcado**, y por tanto o se marca o se arregla.
+#
+# ⚠️ LA CIFRA: el banner del proyecto hablaba de «los 223 nombres». Medido hoy son **44**.
+# No es que se hayan adjudicado 179: es que 223 era el conteo de CANDIDATOS antes de aplicar
+# los marcadores. 🔑 *Una cifra de deuda sin decir en qué punto del filtro se tomó no es
+# comparable consigo misma.*
+#
+# ⬜ La deuda REAL que queda, y es de LECTURA, no de script: cada uno de los 44 pide mirar su
+# línea y decidir si es historia (⇒ marcarla) o una afirmación de estado caducada (⇒ arreglar
+# el doc). Mientras tanto el trinquete garantiza que **no puede crecer**.
+read -r -d '' B_DEUDA <<'EOF'
+ax_notInAxC
+ax_tc_liftfc
+ax_tc_substfc
+godelC'_fixedpoint
+goedel_first_real
+goedel_first_real'
+goedel_first_undecidable_real'
+goedel_second'
+pcc_axiom_inst_k
+pcc_binOk_tracked
+pcc_congr_hole_code
+pcc_eval_substfc_wit_REAL
+pcc_eval_substtc'
+pcc_eval_substtsc'
+pcc_In_tracked
+pcc_isFCB_tracked
+pcc_nodeOk_pure
+pcc_substfc_forall_dot
+pcc_thm_inst_k
+pcc_wfAll_tracked
+pcc_wfAll_tracked_lit
+prf_add_eq_zero_right
+prf_crit_In_F_rejects_open
+prf_div2_double_all
+prf_isFC_junk
+prf_isFC_nil
+prf_isFC_varc
+prf_isFCB_bottom
+prf_isFormCodeE_str
+prf_isTermCodeE_str
+prf_isTsC
+prf_liftc_arith_open
+prf_tagConcl_code
+prf_tc_carc
+prf_tc_cons
+prf_tc_cons'
+prf_tc_eqc
+prf_tc_nthc
+prf_tc_nul
+prf_tc_objAt
+prf_tc_of_cons
+prf_tc_substfc
+prf_wfAll_objList
+repr_neg
+EOF
 B_FAIL=0
+B_DECL=0
+B_VISTOS=$(mktemp)
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
 # Marcadores que hacen LEGÍTIMA la mención de un símbolo inexistente:
@@ -359,9 +461,23 @@ for sym in $CANDS; do
   # vivo si ALGUNA declaración empieza por el símbolo (la prosa abrevia)
   grep -qE "^${sym}" "$DECLS" && continue
   bad=$(grep -rn "\`${sym}\`" $AUTHORITATIVE 2>/dev/null | grep -vE "$DEAD_MARKER" || true)
+  EN_B=0
+  while IFS= read -r t; do
+    [ -n "$t" ] || continue
+    [ "$t" = "$sym" ] && EN_B=1
+  done <<< "$B_DEUDA"
   if [ -n "$bad" ]; then
-    echo "  ✗ \`$sym\` no existe en el árbol activo, y se cita sin marcar como retirado:"
-    echo "$bad" | head -2 | sed 's/^/      /' | cut -c1-140
+    if [ "$EN_B" = "1" ]; then
+      B_DECL=$((B_DECL + 1))
+      echo "$sym" >> "$B_VISTOS"
+    else
+      echo "  ❌ \`$sym\` no existe en el árbol activo, se cita sin marcar como retirado,"
+      echo "      y NO está en la tabla B_DEUDA de este script:"
+      echo "$bad" | head -2 | sed 's/^/      /' | cut -c1-140
+      B_FAIL=1
+    fi
+  elif [ "$EN_B" = "1" ]; then
+    echo "  ❌ \`$sym\`: la deuda ESTÁ SALDADA — quítalo de la tabla B_DEUDA de este script."
     B_FAIL=1
   fi
 done
@@ -369,7 +485,25 @@ rm -f "$DECLS"
 # [B] NO marca FAIL: es un aviso. [A], [C] y [D] sí son objetivos y sí lo marcan.
 # Razón: un control que grita lobo se acaba ignorando, y ése era justo el fallo que
 # este script existe para evitar.
-[ "$B_FAIL" = "0" ] && echo "  ✓ ningún símbolo muerto citado como vigente"                     || echo "  ⚠️  revisar los de arriba: ¿es una afirmación de que YA ESTÁ, o una mención histórica/planificada?"
+# ⛔⛔ EL AGUJERO QUE ESTO TAPA (2026-09-22, cazado por su propia prueba de rotura):
+# el bucle de arriba recorre los símbolos **CITADOS**. Una entrada de `B_DEUDA` cuyo documento
+# se arregle deja de estar citada ⇒ **no vuelve a entrar en el bucle nunca**, y la tabla se
+# quedaría con fantasmas para siempre. La comprobación de «deuda saldada» tiene que hacerse
+# DESPUÉS del bucle, contra la tabla, no dentro.
+# 🔑 *Un trinquete que sólo mira lo que entra en el bucle no es un trinquete: es media
+#    cuenta.* La versión de `[E]` no tenía el agujero porque recorre los DOCUMENTOS, que
+#    siempre existen; ésta recorre las CITAS, que desaparecen.
+while IFS= read -r t; do
+  [ -n "$t" ] || continue
+  case "$t" in '#'*) continue ;; esac
+  if ! grep -qxF "$t" "$B_VISTOS" 2>/dev/null; then
+    echo "  ❌ \`$t\`: declarado en B_DEUDA pero YA NO se cita como vigente — quítalo de la tabla."
+    B_FAIL=1
+  fi
+done <<< "$B_DEUDA"
+rm -f "$B_VISTOS"
+echo "  deuda declarada: $B_DECL de 44 · sin declarar y sin saldar: rompen arriba"
+[ "$B_FAIL" = "0" ] && echo "  ✓ ningún símbolo muerto citado como vigente" || FAIL=1
 
 # ─── 4. PROYECCIÓN: ¿está cada módulo en el catálogo? ────────────────────────
 echo
@@ -467,6 +601,61 @@ else
   echo "      rm -f <ruta>.olean <ruta>.olean.hash <ruta>.ilean <ruta>.ilean.hash <ruta>.trace"
   FAIL=1
 fi
+
+echo '════ [H] CATÁLOGO DE `sondeos/` — ROJO, y rompe en LOS DOS SENTIDOS ════'
+# ⛔⛔ POR QUÉ EXISTE (2026-09-22, ADR-084): `sondeos/` está FUERA del build por diseño, así que
+# `[C]` —que proyecta los módulos de las `lean_lib`— **no lo mira**. Resultado: el catálogo de
+# sondeos no lo vigilaba nadie, que es exactamente la condición que ya costó reconstruir dos
+# veces algo que estaba medido («un módulo sin proyectar se vuelve a construir»).
+#
+# ⛔ Y AL ESCRIBIRLO CAMBIÓ LA CIFRA. La medición vieja decía «13 de 74 sin proyectar»; salía de
+# contar como proyectado cualquier fichero **mencionado en la prosa** de otra fila. Casando sólo
+# contra **cabeceras de fila** (`| **`X.lean`** |` a principio de línea) son **19 de 76**.
+# 🔑 *Un control que casa por SUBCADENA absuelve, y la cifra que produce es más alta que la
+#    verdad.* Es la novena vez que este repo paga esa trampa; la primera en la que muerde a una
+#    cifra que ya estaba publicada como «medida».
+#
+# ⚠️ Rompe en los DOS sentidos a propósito: un fichero sin fila es trabajo que se va a repetir,
+# y una fila sin fichero es una referencia falsa —el mismo daño que el CHANGELOG congelado de
+# ADR-072—. `lintlab/` no acaba en `.lean` y por eso no entra por ninguno de los dos lados.
+H_FAIL=0
+if [ ! -d sondeos ]; then
+  echo "  ⚠️  no hay carpeta sondeos/ — nada que comprobar"
+else
+  H_FILES=$(mktemp); H_ROWS=$(mktemp)
+  ls sondeos/*.lean 2>/dev/null | xargs -r -n1 basename | sort -u > "$H_FILES"
+  grep -oE '^\| \*\*`[^`]+`\*\*' sondeos/README.md 2>/dev/null \
+    | sed -E 's/^\| \*\*`(.*)`\*\*$/\1/' | grep '\.lean$' | sort -u > "$H_ROWS"
+  H_NF=$(wc -l < "$H_FILES" | tr -d ' ')
+  H_NR=$(wc -l < "$H_ROWS" | tr -d ' ')
+  if [ "$H_NF" = "0" ]; then
+    echo "  ❌ NO PUDE MEDIR: no se listó ni un .lean en sondeos/. ¿Se movió la carpeta?"
+    H_FAIL=1
+  fi
+  H_SIN_FILA=$(comm -23 "$H_FILES" "$H_ROWS")
+  H_SIN_FICH=$(comm -13 "$H_FILES" "$H_ROWS")
+  # ⚠️ `printf '%s'` NO añade salto final: con EXACTAMENTE uno, `wc -l` cuenta 0 y el control
+  # APRUEBA. Es el bug con el que nació `[COBERTURA]` (ADR-073) y que su propia prueba de rotura
+  # cazó a la primera. Aquí va `printf '%s\n'` desde el minuto cero.
+  H_A=$(printf '%s\n' "$H_SIN_FILA" | sed '/^$/d' | wc -l | tr -d ' ')
+  H_B=$(printf '%s\n' "$H_SIN_FICH" | sed '/^$/d' | wc -l | tr -d ' ')
+  if [ "$H_A" != "0" ]; then
+    echo "  ❌ $H_A fichero(s) en sondeos/ SIN fila en el catálogo:"
+    printf '%s\n' "$H_SIN_FILA" | sed '/^$/d' | head -20 | sed 's/^/      /'
+    [ "$H_A" -gt 20 ] && echo "      … y $((H_A - 20)) más"
+    echo "      🔑 Un sondeo sin proyectar se vuelve a construir. Añádelo a sondeos/README.md."
+    H_FAIL=1
+  fi
+  if [ "$H_B" != "0" ]; then
+    echo "  ❌ $H_B fila(s) del catálogo SIN fichero en sondeos/:"
+    printf '%s\n' "$H_SIN_FICH" | sed '/^$/d' | head -20 | sed 's/^/      /'
+    echo "      🔑 Una fila que nombra un fichero que no existe es una referencia FALSA."
+    H_FAIL=1
+  fi
+  [ "$H_FAIL" = "0" ] && echo "  ✓ los $H_NF sondeos del disco y las $H_NR filas del catálogo CUADRAN"
+  rm -f "$H_FILES" "$H_ROWS"
+fi
+[ "$H_FAIL" = "0" ] || FAIL=1
 
 # ─── RESUMEN ────────────────────────────────────────────────────────────────
 echo
