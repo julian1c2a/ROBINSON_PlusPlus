@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-092**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-093**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7181,3 +7181,50 @@ aviso que ya está escrito para la migración de `String`.
 «(2) caro vs (3) imposible»: hay una **(5)** medida y más barata que la (2).
 
 **Véase también:** ADR-088 (la basura), ADR-090 (el coste de (2)), `FOL/Canonical0.lean:162`.
+
+---
+
+## ADR-093: ⭐⭐ **CÓMO se corrige la basura** — sacando el `σ` fuera, y está MEDIDO
+
+**Fecha**: 2026-09-22
+**Estado**: 📏 MEDIDO Y COMPILADO (`sondeos/CantorSobreyectivo.lean`) · ⛔ decisión del propietario
+**Contexto**: ADR-092 §2 apuntó la salida (5) pero no la verificó. Ésta la verifica.
+
+### 1 · La corrección, y por qué funciona
+
+`ax_L0_cons_def` dice `cons a b = pair a (σb)`. El `σ` sólo está para que `cons h t ≠ nil`.
+**Sáquese fuera**: `cons a b = σ (pair a b)`.
+
+| | probado |
+|---|---|
+| El Cantor **pelado** es **sobreyectivo** sobre ℕ | `cantorN_surj`, **net-0 puro** |
+| ⇒ `σ ∘ pair` es **biyección ℕ² → ℕ≥1**, con `nil = 0` fuera de la imagen | |
+| ⇒ **todo número es `nil` o un `cons`** | `sin_basura`, net-0 |
+| ⇒ la **inducción de listas es verdadera en ℕ**, y `carc`/`cdrc` son inversas **totales** | |
+
+⚠️ **Y el riesgo obvio no se materializa**: mover el `σ` podía romper la monotonía que hace
+terminar toda recursión sobre códigos. Medido (`cola_decrece`): la cola sigue siendo
+**estrictamente menor** que el `cons`. 🔑 *El riesgo evidente de un cambio se mide, no se teme.*
+
+### 2 · 📏 Comparado con la otra salida
+
+| salida | coste medido |
+|---|---|
+| (2) relativizar `listInd` | **13 teoremas de carga**, incluido `prf_chainOk_iff_chainOkB`, que sostiene la forma Δ₀ entera (ADR-090) |
+| (3) modelo de términos | ⛔ **circular** (ADR-092 §1) |
+| **(5) sacar el `σ`** | `ax_L0_cons_def`: 18 menciones / ~**5 consumidores**; `consN`: **5 ficheros, 86 ocurrencias** |
+
+⇒ (5) es **la más pequeña y la más localizada** de las tres.
+
+### 3 · ⛔ Lo que esto **no** decide
+
+Cambiar `ax_L0_cons_def` **cambia la codificación**, y con ella **`G`**. Los puentes que hoy
+cierran por `rfl` sobre la forma numérica habría que **re-verificarlos uno a uno** — el mismo
+aviso que ya está escrito para la migración de `String`. **Es una decisión sobre el sistema de
+axiomas, y es del propietario.**
+
+🔑 *Lo que un sondeo puede hacer es quitarle a la decisión la parte de adivinar: el «funciona» ya
+no es una opinión.*
+
+**Véase también:** ADR-088 (la basura), ADR-090 (el coste de (2)), ADR-092 (la circularidad
+de (3)), `sondeos/CantorSobreyectivo.lean`.

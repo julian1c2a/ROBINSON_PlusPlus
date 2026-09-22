@@ -288,6 +288,9 @@ ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_aridad|propext,Classical.choice,Quot.sou
 ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_tipo_p1|propext,Classical.choice,Quot.sound,FOL.MetaRules.imp_intro,FOL.MetaRules.raa,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,FOL.MetaRules.ex_elim,FOL.MetaRules.or_elim
 ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FF|propext,Classical.choice,Quot.sound
 ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FT|propext,Classical.choice,Quot.sound
+ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FFF|propext,Classical.choice,Quot.sound
+ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FTT|propext,Classical.choice,Quot.sound
+ROBINSON_PlusPlus.Meta.ChainNegPrf.decodes_leibniz|propext,Classical.choice,Quot.sound
 ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg|Classical.choice,FOL.MetaRules.ex_elim,FOL.MetaRules.imp_intro,FOL.MetaRules.or_elim,FOL.MetaRules.raa,Quot.sound,ROBINSON_PlusPlus.Full.ax_induction_prim,ROBINSON_PlusPlus.Full.ax_list_induction,propext
 ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt|Classical.choice,Quot.sound,propext

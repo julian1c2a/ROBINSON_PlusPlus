@@ -1518,6 +1518,147 @@ theorem dico_FT {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
       · exact Or.inr ⟨_, _, rfl, Or.inl ⟨u, rfl⟩⟩
   | _ :: _ :: _ :: _, _ => exact Or.inl (by simp)
 
+/-! ### Las dos formas que faltaban, y los DIECIOCHO `decodes_*`
+
+⭐⭐ **Y aquí sale el corte estructural del reparto.** El hecho «con la forma correcta, el tag
+decodifica» es cierto para **dieciocho** tags y **FALSO para tres**: 15 (`thy`), 16 (`mp`) y
+17 (`gen`) consultan el CONTEXTO (`findIdx` sobre `axioms` o sobre el acumulador), así que pueden
+fallar con la forma perfecta.
+
+⇒ **ésos tres son exactamente las causas (d) y (e)**, y los otros dieciocho son exactamente los
+que pasan por las dicotomías hacia (b) y (f). El corte no se eligió: **lo dicta `decodeRuleTag`**.
+
+🔑 *Un tag que consulta el contexto no puede refutarse por la FORMA; uno que no lo consulta, sí.* -/
+
+/-- Forma **[F,F,F]**: tags 1 (`p2`) y 7 (`j3`). -/
+theorem dico_FFF {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
+    (hsome : ∀ A B C : Formula,
+      decodeRuleTag acc f k [formCode A, formCode B, formCode C] ≠ none)
+    (hs : StdArgList args) (h : decodeRuleTag acc f k args = none) :
+    Or (args.length ≠ 3)
+       (∃ a b c, And (args = [a, b, c])
+         (Or (∃ u, a = termCode u) (Or (∃ u, b = termCode u) (∃ u, c = termCode u)))) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [_], _ => exact Or.inl (by simp)
+  | [_, _], _ => exact Or.inl (by simp)
+  | [a, b, c], hs =>
+      obtain ⟨ha, hs1⟩ := stdArgList_cons hs
+      obtain ⟨hb, hs2⟩ := stdArgList_cons hs1
+      obtain ⟨hc, _⟩ := stdArgList_cons hs2
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · rcases hb with ⟨B, rfl⟩ | ⟨u, rfl⟩
+        · rcases hc with ⟨C, rfl⟩ | ⟨u, rfl⟩
+          · exact absurd h (hsome A B C)
+          · exact Or.inr ⟨_, _, _, rfl, Or.inr (Or.inr ⟨u, rfl⟩)⟩
+        · exact Or.inr ⟨_, _, _, rfl, Or.inr (Or.inl ⟨u, rfl⟩)⟩
+      · exact Or.inr ⟨_, _, _, rfl, Or.inl ⟨u, rfl⟩⟩
+  | _ :: _ :: _ :: _ :: _, _ => exact Or.inl (by simp)
+
+/-- Forma **[F,T,T]**: tag 13 (`leibniz`), el único con dos testigos de término. -/
+theorem dico_FTT {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
+    (hsome : ∀ (A : Formula) (t1 t2 : Term),
+      decodeRuleTag acc f k [formCode A, termCode t1, termCode t2] ≠ none)
+    (hs : StdArgList args) (h : decodeRuleTag acc f k args = none) :
+    Or (args.length ≠ 3)
+       (∃ a b c, And (args = [a, b, c])
+         (Or (∃ u, a = termCode u) (Or (∃ B, b = formCode B) (∃ B, c = formCode B)))) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [_], _ => exact Or.inl (by simp)
+  | [_, _], _ => exact Or.inl (by simp)
+  | [a, b, c], hs =>
+      obtain ⟨ha, hs1⟩ := stdArgList_cons hs
+      obtain ⟨hb, hs2⟩ := stdArgList_cons hs1
+      obtain ⟨hc, _⟩ := stdArgList_cons hs2
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · rcases hb with ⟨B, rfl⟩ | ⟨t1, rfl⟩
+        · exact Or.inr ⟨_, _, _, rfl, Or.inr (Or.inl ⟨B, rfl⟩)⟩
+        · rcases hc with ⟨B, rfl⟩ | ⟨t2, rfl⟩
+          · exact Or.inr ⟨_, _, _, rfl, Or.inr (Or.inr ⟨B, rfl⟩)⟩
+          · exact absurd h (hsome A t1 t2)
+      · exact Or.inr ⟨_, _, _, rfl, Or.inl ⟨u, rfl⟩⟩
+  | _ :: _ :: _ :: _ :: _, _ => exact Or.inl (by simp)
+
+
+/-! Los **dieciocho** `decodes_*`: cada uno es **una línea**.
+
+⚠️ `decodeRuleTag_p1_some` y `_q1_some` (arriba) son la versión **fuerte** (`= some r`),
+que se dejó como ejemplo trabajado; ésta es la débil (`≠ none`), que es la que las
+dicotomías consumen y la que sale uniforme para los dieciocho. -/
+
+section Decodes
+variable (acc : List Formula) (f : Formula)
+theorem decodes_efq (A : Formula) : decodeRuleTag acc f 8 [formCode A] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_p3 (A : Formula) : decodeRuleTag acc f 14 [formCode A] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_ind (A : Formula) : decodeRuleTag acc f 18 [formCode A] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_listInd (A : Formula) : decodeRuleTag acc f 20 [formCode A] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_eqrefl (t : Term) : decodeRuleTag acc f 12 [termCode t] ≠ none := by
+  simp [decodeRuleTag, decodeTerm_termCode]
+
+theorem decodes_p1 (A B : Formula) :
+    decodeRuleTag acc f 0 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_c1 (A B : Formula) :
+    decodeRuleTag acc f 2 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_c2 (A B : Formula) :
+    decodeRuleTag acc f 3 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_c3 (A B : Formula) :
+    decodeRuleTag acc f 4 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_j1 (A B : Formula) :
+    decodeRuleTag acc f 5 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_j2 (A B : Formula) :
+    decodeRuleTag acc f 6 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_q3 (A B : Formula) :
+    decodeRuleTag acc f 11 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_qconf (A B : Formula) :
+    decodeRuleTag acc f 19 [formCode A, formCode B] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_p2 (A B C : Formula) :
+    decodeRuleTag acc f 1 [formCode A, formCode B, formCode C] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_j3 (A B C : Formula) :
+    decodeRuleTag acc f 7 [formCode A, formCode B, formCode C] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode]
+
+theorem decodes_q1 (A : Formula) (t : Term) :
+    decodeRuleTag acc f 9 [formCode A, termCode t] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode]
+
+theorem decodes_q2 (A : Formula) (t : Term) :
+    decodeRuleTag acc f 10 [formCode A, termCode t] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode]
+
+theorem decodes_leibniz (A : Formula) (t1 t2 : Term) :
+    decodeRuleTag acc f 13 [formCode A, termCode t1, termCode t2] ≠ none := by
+  simp [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode]
+
+end Decodes
+
+
 /-- ⭐ **RAMA (a)**: el tag se sale de rango. **No depende del tag** y cierra sola. -/
 theorem rama_tag_grande (l : List Term) (k tag : Nat) (f : Formula) (as : Term)
     (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
@@ -1611,6 +1752,10 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   rama_tag_grande rama_concl rama_thy rama_aridad
   rama_tipo_p1 rama_tipo_eqrefl
   dico_F dico_T dico_FF dico_FT
+  dico_FFF dico_FTT
+  decodes_efq decodes_p3 decodes_ind decodes_listInd decodes_eqrefl decodes_p1 decodes_c1
+  decodes_c2 decodes_c3 decodes_j1 decodes_j2 decodes_q3 decodes_qconf decodes_p2 decodes_j3
+  decodes_q1 decodes_q2 decodes_leibniz
 )
 
 /-! ## FOOTPRINT -/
@@ -1622,6 +1767,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_tipo_p1
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FF
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FT
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FFF
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FTT
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodes_leibniz
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
