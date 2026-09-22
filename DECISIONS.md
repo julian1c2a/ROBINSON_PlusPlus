@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-093**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-094**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7228,3 +7228,60 @@ no es una opinión.*
 
 **Véase también:** ADR-088 (la basura), ADR-090 (el coste de (2)), ADR-092 (la circularidad
 de (3)), `sondeos/CantorSobreyectivo.lean`.
+
+---
+
+## ADR-094: 🏁 **el cierre de UN tag, de punta a punta** — y el coste por tag queda MEDIDO
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §5, `cierra_tag0`) · ⬜ 17 tags estructurales + 15/16/17
+**Contexto**: el ensamblado del `match`, tras ADR-089 (seis ramas) y ADR-091 (seis formas).
+
+### 1 · 🏁 Qué es `cierra_tag0`
+
+Va de la **tupla que entrega `dispatcher`** hasta `axioms ⊢ neg (chainOk nil ⟦l⟧)`, cubriendo
+**las tres causas que un tag estructural puede disparar**: (b) aridad, (f) tipo y (c′) conclusión.
+Es el único sitio donde la máquina entera funciona junta, y por eso **mide** el coste por tag.
+
+**~40 líneas** para el tag, más lo que hizo falta de nuevo:
+
+| pieza nueva | alcance |
+|---|---|
+| `decodeForm_termCode` / `decodeTerm_formCode` | ⭐ **compartidas por los dieciocho** |
+| `neg_p1_slot2` | propia del tag — es lo único que se repite |
+
+### 2 · ⭐ El descubrimiento: los refutadores de (f) se COMPONEN
+
+La ranura 2 de `p1` reconstruye `implc a (implc (termCode u) a)`. No hizo falta un lema base
+nuevo: `neg_p1_slot2` es **`formCode_ne_implc_tc_1` bajo dos `cons_ne_tail`**.
+
+🔑 **El refutador de una ranura profunda se compone del de la ranura de fuera, un nivel más
+adentro.** ⇒ (f) no necesita un lema base por ranura: necesita un **ensamblaje** por tag, y la
+base (`Meta/CodeDistinct.lean`, ADR-081) ya está completa.
+
+### 3 · ⚠️ Y una pieza que faltaba y nadie había echado en falta
+
+`decodeForm` mira los tags **2..9** y `termCode` usa **0/1** — disjuntos. Que
+`decodeForm (termCode t) = none` es **evidente y no estaba probado** en ningún sitio. Es el
+gemelo, del lado del **decodificador**, de `formCode_ne_termCode` (ADR-081), que sí estaba.
+
+🔑 *Una simetría a medio construir no se nota hasta que se necesita el otro lado.*
+
+### 4 · 📐 Lo que queda del ensamblado, ya con números
+
+| | |
+|---|---|
+| tags estructurales cerrados | **1 de 18** (`cierra_tag0`) |
+| tags estructurales pendientes | **17**, misma plantilla, cambiando `decodes_*`, `prf_lenc_*`, `TagCode` y el ensamblaje de (f) |
+| tags de contexto | **3** (15 `thy`, 16 `mp`, 17 `gen`) → rutas (d) y (e), **ya cerradas** (ADR-076/077) |
+| el `match` final | ⬜ 21 llamadas de una línea, una vez estén los 21 cierres |
+
+⚠️ **No cotizo las 17.** Lo que sí está medido es que la plantilla **funciona entera** y que lo
+único que se repite por tag es el ensamblaje de (f).
+
+**Controles:** `check-footprints` **438** (cobertura **403/403**) · `check-doc-sync` ·
+`check-sorry` + censo · `check-estratos` **10** · `check-warnings` **11** · RPP **145 jobs**.
+⚠️ **ÁMBITO**: FOL intacto.
+
+**Véase también:** ADR-089 (las seis ramas), ADR-091 (las seis formas), ADR-081 (los refutadores
+de (f)).

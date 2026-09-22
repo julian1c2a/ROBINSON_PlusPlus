@@ -1716,6 +1716,80 @@ theorem rama_tipo_eqrefl (l : List Term) (k : Nat) (f A : Formula)
   derives_chainOk_neg_of_line l k _ hk (derives_lineWF_neg_eqrefl_badtype f A)
 
 
+/-! ### 🏁 EL CIERRE DE UN TAG, DE PUNTA A PUNTA — la plantilla de los dieciocho
+
+⭐⭐ `cierra_tag0` va de la **tupla que entrega `dispatcher`** hasta
+`axioms ⊢ neg (chainOk nil ⟦l⟧)`, cubriendo **las tres causas que ese tag puede disparar**:
+(b) aridad, (f) tipo y (c′) conclusión. Es el único sitio donde se ve la máquina entera
+funcionando junta, y **mide el coste por tag en vez de estimarlo**.
+
+⭐ Lo que hizo falta de NUEVO para cerrarlo entero fueron **dos lemas compartidos** —que el
+decodificador RECHAZA el tipo equivocado— y **un refutador propio del tag**. Los dos primeros
+sirven a los dieciocho; el tercero es lo único que se repite.
+
+🔑 *El refutador de una ranura profunda se COMPONE del de la ranura de fuera, un nivel más
+adentro* (`neg_p1_slot2` es `formCode_ne_implc_tc_1` bajo dos `cons_ne_tail`). Por eso (f) no
+necesita un lema base por ranura: necesita un ENSAMBLAJE por tag. -/
+
+/-- ⭐ El decodificador RECHAZA el tipo equivocado: `decodeForm` mira tags 2..9, `termCode` usa
+    0/1. Gemelo, del lado del DECODIFICADOR, de `formCode_ne_termCode`. -/
+theorem decodeForm_termCode (t : Term) : decodeForm (termCode t) = none := by
+  cases t <;> simp [decodeForm, termCode, cons, ← numeralM_eq, decodeNat_numeralM]
+
+theorem decodeTerm_formCode (A : Formula) : decodeTerm (formCode A) = none := by
+  cases A <;> simp [decodeTerm, formCode, cons, ← numeralM_eq, decodeNat_numeralM]
+
+/-- (f) para `p1` en el slot 2: el refutador se COMPONE del de slot 1, un nivel más adentro. -/
+theorem neg_p1_slot2 (f : Formula) (a u : Term) :
+    axioms ⊢ neg (formCode f =eq implc a (implc (termCode u) a)) := by
+  cases f with
+  | impl x y =>
+      exact cons_ne_tail (cons_ne_tail (cons_ne_head (formCode_ne_implc_tc_1 y u a)))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 5) _ (by simp only [formTag]; decide)
+
+/-- ⭐⭐⭐ **EL CIERRE DEL TAG 0**, desde la tupla que da `dispatcher`. -/
+theorem cierra_tag0 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 0) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 0 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 0 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · -- (b) o (f)
+    rcases dico_FF 0 (decodes_p1 L f) hsl hnone with hlen | ⟨a, b, heq, hbad⟩
+    · -- (b) ARIDAD
+      refine rama_aridad l k 0 4 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact prf_lenc_p1 _
+    · -- (f) TIPO
+      refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      rcases hbad with ⟨u, rfl⟩ | ⟨u, rfl⟩
+      · exact derives_lineWF_neg_p1_badtype f u b
+      · exact derives_lineWF_neg_of_tag 0 (formCode f) [a, termCode u] _ rfl
+          (neg_p1_slot2 f a u)
+  · -- (c′) LA CONCLUSIÓN NO CASA
+    match hpa : peelArgs as, hsl with
+    | [], _ => rw [hpa] at hr; simp [decodeRuleTag] at hr
+    | [_], _ => rw [hpa] at hr; simp [decodeRuleTag] at hr
+    | [a, b], hs =>
+        obtain ⟨ha, hs'⟩ := stdArgList_cons hs
+        obtain ⟨hb, _⟩ := stdArgList_cons hs'
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rcases hb with ⟨B, rfl⟩ | ⟨u, rfl⟩
+          · rw [hpa, decodeRuleTag_p1_some L f A B] at hr
+            simp only [Option.some.injEq] at hr
+            subst hr
+            simp only [stepConcl, ne_eq, Option.some.injEq] at hne
+            refine rama_concl l k 0 f (A ⇒ (B ⇒ A)) as hk hargs ?_ (fun h => hne h.symm)
+            rw [hpa]; exact tc_p1 A B
+          · rw [hpa] at hr; simp [decodeRuleTag, decodeForm_termCode] at hr
+        · rw [hpa] at hr; simp [decodeRuleTag, decodeForm_termCode] at hr
+    | _ :: _ :: _ :: _, _ => rw [hpa] at hr; simp [decodeRuleTag] at hr
+
+
 end ROBINSON_PlusPlus.Meta.ChainNegPrf
 
 /-! ## `export` — por CONSUMO: el módulo F (ensamblaje) necesita `deuda_inNeg` y el puente. -/
@@ -1753,6 +1827,7 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   rama_tipo_p1 rama_tipo_eqrefl
   dico_F dico_T dico_FF dico_FT
   dico_FFF dico_FTT
+  decodeForm_termCode decodeTerm_formCode neg_p1_slot2 cierra_tag0
   decodes_efq decodes_p3 decodes_ind decodes_listInd decodes_eqrefl decodes_p1 decodes_c1
   decodes_c2 decodes_c3 decodes_j1 decodes_j2 decodes_q3 decodes_qconf decodes_p2 decodes_j3
   decodes_q1 decodes_q2 decodes_leibniz
@@ -1770,6 +1845,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FFF
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FTT
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodes_leibniz
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeForm_termCode
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_tag0
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
