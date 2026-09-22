@@ -66,6 +66,7 @@ enumerar**:
 | (c) | **la conclusión no casa** (`stepConcl ≠ f`) | 🏁 **CERRADA 2026‑09‑22**, `derives_lineWF_neg_of_concl` + los **19** `tc_*` |
 | (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
 | (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑22** (§2quater + §2quinquies): el genérico `derives_chainOk_neg_of_prem_code` y las **tres** instancias |
+| (f) | **tipo de ARGUMENTO** — la **SEXTA**, que esta enumeración no tenía | 🏁 **refutadores CERRADOS 2026‑09‑22** (`Meta/CodeDistinct.lean` + §1quinquies); ⬜ queda el análisis de `StdArgs` por tag, que es **reparto**, no cierre |
 
 ⛔⛔ **RECTIFICADO el 2026-09-21, y las dos afirmaciones de arriba eran FALSAS** (panel
 adversarial, ADR-075):
@@ -703,6 +704,39 @@ theorem tc_qconf (P C : Formula) :
   ⟨_, rfl, prf_congr_bin1 (prf_congr_un (prf_congr_bin1 (prf_liftFormula_arith 0 P)))⟩
 
 
+/-! ## §1quinquies · 🏁 LOS CIERRES DE LA CAUSA **(f)** — el tipo de argumento
+
+⭐⭐ **La sexta causa** (ADR‑075): `StdArgs` sólo exige que cada argumento sea `formCode _` **o**
+`termCode _`, **sin decir cuál**, así que una línea estándar puede llevar un código de término
+donde el tag espera uno de fórmula. El decodificador entonces falla en `decodeForm`.
+
+⭐ Lo que la cierra es **álgebra de códigos**, y vive donde le toca: `Meta/CodeDistinct.lean`,
+al lado de `formCode_ne`. El hecho de fondo cabe en una línea — los tags de cabeza son
+**disjuntos**, `termCode` usa 0/1 y `formCode` usa 2…9 — y de él salen las siete ranuras.
+🔑 *La mitad cara aparente —«¿y si el tag SÍ coincide?»— sólo ocurre en un constructor por
+lema, y ahí se desciende una capa y se vuelve al mismo hecho de una línea.*
+
+⚠️ **Lo que aquí se aterriza son DOS cierres, no diecinueve**, y es deliberado: cada tag
+necesita saber **qué ranura** lleva el argumento del tipo equivocado, y eso es un análisis de
+`StdArgs` que pertenece al **reparto** (§4), no al cierre. Los dos de abajo fijan el patrón de
+las **dos direcciones** del desajuste: un `termCode` donde va fórmula (`p1`) y un `formCode`
+donde va término (`eqrefl`). -/
+
+/-- **(f) para `p1`**: código de TÉRMINO en el primer slot, que es de fórmula. -/
+theorem derives_lineWF_neg_p1_badtype (f : Formula) (u cB : Term) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM 0)
+      (objList [termCode u, cB])))) :=
+  derives_lineWF_neg_of_tag 0 (formCode f) [termCode u, cB] _ rfl
+    (formCode_ne_implc_tc_1 f u _)
+
+/-- **(f) para `eqrefl`**, en la dirección CONTRARIA: código de FÓRMULA en un slot de término. -/
+theorem derives_lineWF_neg_eqrefl_badtype (f : Formula) (A : Formula) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM 12)
+      (objList [formCode A])))) :=
+  derives_lineWF_neg_of_tag 12 (formCode f) [formCode A] _ rfl
+    (formCode_ne_eqc_fc_1 f A _)
+
+
 /-! ## §2 · `DEUDA_inNeg`: las CABEZAS de una cadena aceptada SON los códigos de sus conclusiones -/
 
 /-- Lo que `decodeLine` garantiza, extraído: la regla CONCLUYE la cabeza. -/
@@ -1312,6 +1346,7 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   prf_lenc_thy prf_lenc_gen prf_lenc_ind prf_lenc_qconf prf_lenc_listInd
   derives_lineWF_neg_of_arity
   TagCode derives_neg_eq_of_code_ne derives_lineWF_neg_of_concl
+  derives_lineWF_neg_p1_badtype derives_lineWF_neg_eqrefl_badtype
   tc_p1 tc_p2 tc_c1 tc_c2 tc_c3 tc_j1 tc_j2 tc_j3 tc_efq tc_eqrefl tc_p3 tc_gen tc_q1 tc_q2
   tc_leibniz tc_ind tc_listInd tc_q3 tc_qconf
   decodeLine_stepConcl decodeLine_carc decode_heads
@@ -1349,6 +1384,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_listInd
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_arity
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_concl
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_p1_badtype
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_eqrefl_badtype
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_p1
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_ind
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_listInd

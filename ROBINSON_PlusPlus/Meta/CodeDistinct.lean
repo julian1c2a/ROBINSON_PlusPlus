@@ -209,6 +209,91 @@ theorem formCode_ne : ∀ {A B : Formula}, A ≠ B → axioms ⊢ neg (formCode 
   | .ex _, .and _ _, _ => cons_ne_head (gnum_ne (by decide))
   | .ex _, .or _ _, _ => cons_ne_head (gnum_ne (by decide))
 
+/-! ### 🏁 Códigos de FÓRMULA contra códigos de TÉRMINO — la causa (f) de `DEUDA_chainNeg`
+
+⭐⭐ `StdArgs` (`Meta/OmegaReflect.lean:148`) sólo exige que cada argumento sea `formCode _`
+**o** `termCode _`, **sin decir cuál**. Por eso una línea estándar puede llevar un código de
+término donde el tag espera uno de fórmula, y entonces `decodeForm` falla: ésa es la **sexta**
+causa de rechazo del decodificador (ADR‑075).
+
+⭐ Lo que la cierra es puro **álgebra de códigos**, y se apoya en un hecho de una línea: los tags
+de cabeza son **disjuntos** — `termCode` usa 0/1 y `formCode` usa 2…9.
+
+🔑 *La mitad cara aparente —«¿y si el tag SÍ coincide?»— sólo ocurre en un constructor por lema,
+y ahí se desciende una capa y se vuelve al mismo hecho de una línea.* -/
+
+/-- El TAG de cabeza del código de una fórmula. -/
+def formTag : Formula → Nat
+  | .bottom => 2 | .atom _ _ => 3 | .eq _ _ => 4 | .impl _ _ => 5
+  | Formula.forall _ => 6 | .and _ _ => 7 | .or _ _ => 8 | .ex _ => 9
+
+theorem formCode_eq_cons (f : Formula) : ∃ r, formCode f = cons (numeral (formTag f)) r := by
+  cases f <;> exact ⟨_, rfl⟩
+
+/-- ⭐ **La mitad UNIFORME de (f)**: si el tag de cabeza no coincide, la teoría los separa. -/
+theorem formCode_ne_cons_of_tag (f : Formula) {n : Nat} (r : Term) (h : formTag f ≠ n) :
+    axioms ⊢ neg (formCode f =eq cons (numeral n) r) := by
+  obtain ⟨r', hr⟩ := formCode_eq_cons f
+  rw [hr]
+  exact cons_ne_head (gnum_ne h)
+
+/-- ⭐ **La pieza base de (f)**: un código de FÓRMULA nunca es un código de TÉRMINO. -/
+theorem formCode_ne_termCode (A : Formula) (t : Term) :
+    axioms ⊢ neg (formCode A =eq termCode t) := by
+  cases A <;> cases t <;> exact cons_ne_head (gnum_ne (by decide))
+
+theorem termCode_ne_formCode (t : Term) (A : Formula) :
+    axioms ⊢ neg (termCode t =eq formCode A) := neg_symm (formCode_ne_termCode A t)
+
+/-! Las **ranuras**: un `termCode` donde va un código de FÓRMULA, y al revés. Una por posición
+de argumento de cada constructor que `tagConcl` usa para reconstruir la conclusión. -/
+
+theorem formCode_ne_implc_tc_1 (f : Formula) (u X : Term) :
+    axioms ⊢ neg (formCode f =eq implc (termCode u) X) := by
+  cases f with
+  | impl a b => exact cons_ne_tail (cons_ne_head (formCode_ne_termCode a u))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 5) _ (by simp only [formTag]; decide)
+
+theorem formCode_ne_implc_tc_2 (f : Formula) (u X : Term) :
+    axioms ⊢ neg (formCode f =eq implc X (termCode u)) := by
+  cases f with
+  | impl a b =>
+      exact cons_ne_tail (cons_ne_tail (cons_ne_head (formCode_ne_termCode b u)))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 5) _ (by simp only [formTag]; decide)
+
+theorem formCode_ne_andc_tc_1 (f : Formula) (u X : Term) :
+    axioms ⊢ neg (formCode f =eq andc (termCode u) X) := by
+  cases f with
+  | and a b => exact cons_ne_tail (cons_ne_head (formCode_ne_termCode a u))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 7) _ (by simp only [formTag]; decide)
+
+theorem formCode_ne_orc_tc_1 (f : Formula) (u X : Term) :
+    axioms ⊢ neg (formCode f =eq orc (termCode u) X) := by
+  cases f with
+  | or a b => exact cons_ne_tail (cons_ne_head (formCode_ne_termCode a u))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 8) _ (by simp only [formTag]; decide)
+
+theorem formCode_ne_forallc_tc (f : Formula) (u : Term) :
+    axioms ⊢ neg (formCode f =eq forallc (termCode u)) := by
+  cases f with
+  | «forall» a => exact cons_ne_tail (cons_ne_head (formCode_ne_termCode a u))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 6) _ (by simp only [formTag]; decide)
+
+theorem formCode_ne_exc_tc (f : Formula) (u : Term) :
+    axioms ⊢ neg (formCode f =eq exc (termCode u)) := by
+  cases f with
+  | ex a => exact cons_ne_tail (cons_ne_head (formCode_ne_termCode a u))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 9) _ (by simp only [formTag]; decide)
+
+/-- ⚠️ El desajuste **INVERSO**: un código de FÓRMULA donde va un término (`eqc`, tag 12).
+No es simétrico del anterior por accidente: es la otra mitad de (f), y hay que enunciarla. -/
+theorem formCode_ne_eqc_fc_1 (f : Formula) (A : Formula) (X : Term) :
+    axioms ⊢ neg (formCode f =eq eqc (formCode A) X) := by
+  cases f with
+  | eq t1 t2 => exact cons_ne_tail (cons_ne_head (termCode_ne_formCode t1 A))
+  | _ => exact formCode_ne_cons_of_tag _ (n := 4) _ (by simp only [formTag]; decide)
+
+
 end ROBINSON_PlusPlus.Meta.CodeDistinct
 
 export ROBINSON_PlusPlus.Meta.CodeDistinct (
@@ -221,4 +306,9 @@ export ROBINSON_PlusPlus.Meta.CodeDistinct (
   termCode_ne
   termsCode_ne
   formCode_ne
+  formTag formCode_eq_cons formCode_ne_cons_of_tag
+  formCode_ne_termCode termCode_ne_formCode
+  formCode_ne_implc_tc_1 formCode_ne_implc_tc_2
+  formCode_ne_andc_tc_1 formCode_ne_orc_tc_1
+  formCode_ne_forallc_tc formCode_ne_exc_tc formCode_ne_eqc_fc_1
 )

@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-21 — hasta **ADR-075**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-080**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6486,3 +6486,73 @@ controles se re-ejecuta en la entrada de cierre de la tanda.
 
 **Véase también:** ADR-079 ((b)), ADR-078 (el despachador), `sondeos/TagConclCoste.lean`,
 `Meta/ArithPrf.lean:470-540`, `Meta/ChainNegPrf.lean` §1quater.
+
+---
+
+## ADR-081: 🏁 la causa **(f)**, MEDIDA y con sus refutadores cerrados — y no era un muro
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`Meta/CodeDistinct.lean` + `ChainNegPrf` §1quinquies) · ⬜ el reparto
+**Contexto**: vía A, último de los cierres pedidos ((c′) → (e) → (f)). (f) era **la única sin medir**.
+
+### 1 · 📏 La medición, que es lo que se pedía
+
+(f) es el **desajuste de TIPO** de argumento: `StdArgs` (`Meta/OmegaReflect.lean:148`) sólo exige
+que cada argumento sea `formCode _` **o** `termCode _`, **sin decir cuál**, así que una línea
+estándar puede llevar un código de término donde el tag espera uno de fórmula. Es la **sexta**
+causa, la que la enumeración original de la cabecera no tenía (ADR-075).
+
+**Medido: no es un muro, y el hecho de fondo cabe en una línea.** Los tags de cabeza son
+**disjuntos** — `termCode` usa 0/1 y `formCode` usa 2…9 — así que
+
+    theorem formCode_ne_termCode (A : Formula) (t : Term) :
+        axioms ⊢ neg (formCode A =eq termCode t) := by
+      cases A <;> cases t <;> exact cons_ne_head (gnum_ne (by decide))
+
+⭐ Y la mitad que parecía cara —«¿y si el tag **sí** coincide?»— resulta ser **un solo
+constructor por lema**: allí se desciende una capa y se vuelve al mismo hecho de una línea. Las
+siete ranuras (`implc` ×2, `andc`, `orc`, `forallc`, `exc`, `eqc`) salen a cuatro líneas cada una,
+sobre un `formCode_ne_cons_of_tag` uniforme que despacha todos los tags que **no** coinciden.
+
+⚠️ Lo que yo había dicho —«las guardas `hasWitF`/`hasWit` de ADR-020 la cierran»— **no era la
+ruta**: esas guardas cierran los tags 9/10, pero la vía barata no las necesita, porque el
+desajuste ya se ve en la **conclusión reconstruida**, no en los testigos.
+🔑 *Tener identificada una pieza que serviría no es haber medido por dónde sale.*
+
+### 2 · 🏁 Dónde vive cada cosa, y por qué sólo DOS cierres
+
+El álgebra de códigos entera va a `Meta/CodeDistinct.lean`, **al lado de `formCode_ne`**, que es
+donde alguien la buscaría. En `ChainNegPrf` §1quinquies van **dos** cierres, no diecinueve, y es
+deliberado: cada tag necesita saber **qué ranura** lleva el argumento del tipo equivocado, y eso
+es un análisis de `StdArgs` que pertenece al **reparto** (§4), no al cierre. Los dos aterrizados
+fijan el patrón de las **dos direcciones** del desajuste: `p1` (un `termCode` donde va fórmula) y
+`eqrefl` (un `formCode` donde va término).
+
+### 3 · ⭐ El control `[E]` mordió, y era verdad
+
+Al cerrar esta tanda, `check-doc-sync [E]` rompió: *«DECISIONS.md: la marca dice 2026-09-21 y el
+último commit que lo tocó es 2026-09-22»*. Correcto — la cabecera decía «hasta ADR-075» con cinco
+ADR nuevas dentro. Es la primera vez que el `[E]` rearmado en ADR-072 caza una desincronización
+**real** y no un autotest.
+
+### 4 · 📐 El estado de `DEUDA_chainNeg`
+
+| pieza | estado |
+|---|---|
+| despachador | 🏁 `dispatcher` (ADR-078) |
+| (a) tag ≥ 21 | ✅ |
+| (b) aridad | 🏁 (ADR-079) |
+| (c′) conclusión | 🏁 (ADR-080) |
+| (d) `thy` | 🏁 (ADR-076) |
+| (e) `mp`/`gen` | 🏁 (ADR-077 + instancias) |
+| (f) tipo de argumento | 🏁 **refutadores**; ⬜ el reparto |
+
+⬜ **Lo único que queda de `DEUDA_chainNeg` es el REPARTO**: enchufar los seis cierres a las ramas
+del `dispatcher`, con el análisis de `StdArgs` por tag. Ya no hay nada sin medir.
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **424** (cobertura
+**389/389**) · `check-estratos` **10** · `check-warnings` **11** · `check-sorry` ·
+`check-doc-sync` · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó**.
+
+**Véase también:** ADR-075 (la sexta causa), ADR-078 (el despachador), ADR-072 (`[E]`),
+`Meta/CodeDistinct.lean`, `Meta/ChainNegPrf.lean` §1quinquies.
