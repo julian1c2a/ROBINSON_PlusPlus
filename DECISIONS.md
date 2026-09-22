@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-090**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-092**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7104,3 +7104,80 @@ está dentro de su competencia, pero **ninguna de las 13 está verificada por el
 esta entrada aporta es que **(2) ya no es la barata**.
 
 **Véase también:** ADR-088 (ℕ no es modelo de `Prf`), `sondeos/ModeloBasura.lean`.
+
+---
+
+## ADR-091: ⭐⭐ los 21 tags sólo tienen **SEIS FORMAS** de argumentos
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §5, cuatro de las seis) · ⬜ `[F,F,F]` y `[F,T,T]`
+**Contexto**: el `match` que enhebra las seis ramas de ADR-089.
+
+`decodeRuleTag` distingue veintiún tags, pero sus **listas de argumentos** sólo tienen seis
+formas: `[F]` (6 tags), `[T]` (1), `[F,F]` (**8**), `[F,F,F]` (2), `[F,T]` (2), `[F,T,T]` (1), más
+`thy` (15) que **no mira los argumentos**.
+
+⭐ Y cada dicotomía toma **como hipótesis** el hecho «con esta forma, el tag decodifica» —que por
+tag es un `rfl`—, así que son **seis lemas y veintiuna instancias de una línea**, no veintiún
+lemas. Las cuatro más pobladas (17 de los 21 tags) están aterrizadas y son **net-0**.
+
+🔑 **Cuando un `case` de N ramas se repite, mira si las ramas no serán M FORMAS con N instancias.**
+Es la misma jugada que ADR-089 («seis ramas, no veintiuna»), un nivel más abajo.
+
+**Controles:** `check-footprints` **433** (cobertura **398/398**) · RPP **145 jobs**.
+
+---
+
+## ADR-092: ⛔ el modelo de TÉRMINOS es **CIRCULAR** — y aparece una salida que no había
+
+**Fecha**: 2026-09-22
+**Estado**: 📏 MEDIDO · ⛔ decisión del propietario
+**Contexto**: ADR-090 dejó la salida (2) cara. Yo había recomendado la (3), «buscar la
+consistencia por un modelo de términos». **Esta entrada me corrige.**
+
+### 1 · ⛔ La (3) no vale, y es estructural
+
+Medido en `FOL/Canonical0.lean`: **toda** la construcción del modelo canónico toma
+`IsMaximalConsistent₀ S` como hipótesis — empezando por `termSetoid`, que lo necesita ya sólo
+**para que `termEqv` sea una relación de equivalencia** (`termEqv_refl/_symm/_trans`, l. 162-176).
+
+⇒ El modelo de términos es la dirección **«consistente ⇒ tiene modelo»** de la completitud.
+Usarlo para **probar** la consistencia es **circular**.
+🔑 *Un modelo canónico no da consistencia: la consume.*
+⚠️ Y la recomendación que yo di sin medirla era ésa. Van las que van.
+
+### 2 · ⭐⭐ La salida que no había considerado: **cambiar UN axioma**
+
+La basura de ADR-088 existe porque `ax_L0_cons_def` dice `cons a b = pair a (σb)`, y
+`λ a b. cantor(a, b+1)` **se deja fuera los triangulares**. Pero el `σ` sólo está ahí para que
+`cons h t ≠ nil`. Póngase **fuera**:
+
+    cons a b = σ (pair a b)
+
+`pair` es una **biyección** ℕ²→ℕ, luego `σ ∘ pair` es una biyección **ℕ² → ℕ≥1**, y `nil = 0` no
+está en la imagen. ⇒ **todo número es `nil` o un `cons`, y la basura desaparece.** La inducción de
+listas pasa a ser **verdadera en ℕ**, y `carc`/`cdrc` a ser inversas **totales**.
+
+⚠️ Y la monotonía que sostiene la recursión sobre códigos **sobrevive**: `σ(pair h t) ≥ t+1 > t`
+igual que antes.
+
+### 3 · 📏 El radio, medido
+
+| | |
+|---|---|
+| `ax_L0_cons_def` | **18 menciones**, ~**5 consumidores reales** (`prf_cons_def`, la instancia codificada de `DotConsPrf`, dos usos en `Block6`, las listas de axiomas) |
+| `consN` (el espejo numérico) | **5 ficheros, 86 ocurrencias** |
+
+⇒ Comparado con la salida (2) —**13 teoremas de carga**, entre ellos `prf_chainOk_iff_chainOkB`,
+que sostiene la forma Δ₀ entera— esto es **más pequeño y más localizado**.
+
+### 4 · ⛔ Pero es un cambio en el SISTEMA DE AXIOMAS, y eso no lo decido yo
+
+Cambiar `ax_L0_cons_def` **cambia la codificación**, y con ella **`G`**. Los puentes que hoy
+cierran por `rfl` sobre la forma numérica habría que **re-verificarlos uno a uno** — el mismo
+aviso que ya está escrito para la migración de `String`.
+
+⬜ **Decisión del propietario.** Lo que esta entrada aporta es que la baraja ya no es
+«(2) caro vs (3) imposible»: hay una **(5)** medida y más barata que la (2).
+
+**Véase también:** ADR-088 (la basura), ADR-090 (el coste de (2)), `FOL/Canonical0.lean:162`.

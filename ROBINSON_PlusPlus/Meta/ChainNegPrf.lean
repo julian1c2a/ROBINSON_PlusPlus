@@ -1428,6 +1428,96 @@ Y eso es exactamente lo que compró la inversión de `StdArgs` (§1ter): el aná
 y pasa la entrada de la tabla. Las seis ramas ya no tienen incógnitas, y el split de 21 está
 medido en **4,5 s** (ADR‑078). -/
 
+/-! ### Las DICOTOMÍAS por FORMA — **los 21 tags sólo tienen SEIS formas de argumentos**
+
+⭐⭐ Aquí es donde el reparto deja de escalar con el número de tags. `decodeRuleTag` distingue
+veintiún tags, pero sus **listas de argumentos** sólo tienen seis formas:
+
+| forma | tags |
+|---|---|
+| `[F]` | 8, 14, 16, 17, 18, 20 |
+| `[T]` | 12 |
+| `[F,F]` | 0, 2, 3, 4, 5, 6, 11, 19 |
+| `[F,F,F]` | 1, 7 |
+| `[F,T]` | 9, 10 |
+| `[F,T,T]` | 13 |
+| *(cualquiera)* | 15 — `thy`, que no mira los argumentos |
+
+Y cada lema de abajo toma **como hipótesis** el hecho «con esta forma, el tag decodifica», que por
+tag es un `rfl`. ⇒ **seis lemas, veintiuna instancias de una línea**, en vez de veintiún lemas.
+
+🔑 *Cuando un `case` de N ramas se repite, mira si las ramas no serán M formas con N instancias.*
+Es la misma jugada que ADR‑089 («seis ramas, no veintiuna») un nivel más abajo. -/
+
+/-- Forma **[F]**: un argumento, de fórmula. -/
+theorem dico_F {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
+    (hsome : ∀ A : Formula, decodeRuleTag acc f k [formCode A] ≠ none)
+    (hs : StdArgList args) (h : decodeRuleTag acc f k args = none) :
+    Or (args.length ≠ 1) (∃ a, And (args = [a]) (∃ u, a = termCode u)) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [a], hs =>
+      obtain ⟨ha, _⟩ := stdArgList_cons hs
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · exact absurd h (hsome A)
+      · exact Or.inr ⟨_, rfl, ⟨u, rfl⟩⟩
+  | _ :: _ :: _, _ => exact Or.inl (by simp)
+
+/-- Forma **[T]**: un argumento, de término (tag 12). -/
+theorem dico_T {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
+    (hsome : ∀ t : Term, decodeRuleTag acc f k [termCode t] ≠ none)
+    (hs : StdArgList args) (h : decodeRuleTag acc f k args = none) :
+    Or (args.length ≠ 1) (∃ a, And (args = [a]) (∃ A, a = formCode A)) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [a], hs =>
+      obtain ⟨ha, _⟩ := stdArgList_cons hs
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · exact Or.inr ⟨_, rfl, ⟨A, rfl⟩⟩
+      · exact absurd h (hsome u)
+  | _ :: _ :: _, _ => exact Or.inl (by simp)
+
+/-- Forma **[F,F]**: ocho tags (0, 2, 3, 4, 5, 6, 11, 19). -/
+theorem dico_FF {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
+    (hsome : ∀ A B : Formula, decodeRuleTag acc f k [formCode A, formCode B] ≠ none)
+    (hs : StdArgList args) (h : decodeRuleTag acc f k args = none) :
+    Or (args.length ≠ 2)
+       (∃ a b, And (args = [a, b])
+         (Or (∃ u, a = termCode u) (∃ u, b = termCode u))) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [_], _ => exact Or.inl (by simp)
+  | [a, b], hs =>
+      obtain ⟨ha, hs'⟩ := stdArgList_cons hs
+      obtain ⟨hb, _⟩ := stdArgList_cons hs'
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · rcases hb with ⟨B, rfl⟩ | ⟨u, rfl⟩
+        · exact absurd h (hsome A B)
+        · exact Or.inr ⟨_, _, rfl, Or.inr ⟨u, rfl⟩⟩
+      · exact Or.inr ⟨_, _, rfl, Or.inl ⟨u, rfl⟩⟩
+  | _ :: _ :: _ :: _, _ => exact Or.inl (by simp)
+
+/-- Forma **[F,T]**: los dos tags de cuantificador con testigo (9, 10). -/
+theorem dico_FT {acc : List Formula} {f : Formula} {args : List Term} (k : Nat)
+    (hsome : ∀ (A : Formula) (t : Term),
+      decodeRuleTag acc f k [formCode A, termCode t] ≠ none)
+    (hs : StdArgList args) (h : decodeRuleTag acc f k args = none) :
+    Or (args.length ≠ 2)
+       (∃ a b, And (args = [a, b])
+         (Or (∃ u, a = termCode u) (∃ B, b = formCode B))) := by
+  match args, hs with
+  | [], _ => exact Or.inl (by decide)
+  | [_], _ => exact Or.inl (by simp)
+  | [a, b], hs =>
+      obtain ⟨ha, hs'⟩ := stdArgList_cons hs
+      obtain ⟨hb, _⟩ := stdArgList_cons hs'
+      rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+      · rcases hb with ⟨B, rfl⟩ | ⟨t, rfl⟩
+        · exact Or.inr ⟨_, _, rfl, Or.inr ⟨B, rfl⟩⟩
+        · exact absurd h (hsome A t)
+      · exact Or.inr ⟨_, _, rfl, Or.inl ⟨u, rfl⟩⟩
+  | _ :: _ :: _ :: _, _ => exact Or.inl (by simp)
+
 /-- ⭐ **RAMA (a)**: el tag se sale de rango. **No depende del tag** y cierra sola. -/
 theorem rama_tag_grande (l : List Term) (k tag : Nat) (f : Formula) (as : Term)
     (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
@@ -1520,6 +1610,7 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   dispatcher
   rama_tag_grande rama_concl rama_thy rama_aridad
   rama_tipo_p1 rama_tipo_eqrefl
+  dico_F dico_T dico_FF dico_FT
 )
 
 /-! ## FOOTPRINT -/
@@ -1529,6 +1620,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_concl
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_aridad
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_tipo_p1
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FF
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dico_FT
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
