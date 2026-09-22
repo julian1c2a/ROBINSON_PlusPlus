@@ -1790,6 +1790,273 @@ theorem cierra_tag0 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : Lis
     | _ :: _ :: _ :: _, _ => rw [hpa] at hr; simp [decodeRuleTag] at hr
 
 
+/-! ### ⭐⭐⭐ EL CIERRE GENÉRICO DE UNA FORMA — ocho tags, una instancia por tag
+
+`cierra_tag0` (arriba) mostró que un tag se cierra entero en ~40 líneas. Pero **de esas 40, casi
+todas son las mismas para los ocho tags de forma `[F,F]`**: lo que cambia son ocho hechos, y los
+ocho son de una línea.
+
+⇒ `cierra_FF` toma esos ocho como hipótesis y hace el resto. Cada tag pasa a ser **una
+instancia**, y `cierra_tag0` se queda como el **ejemplo desplegado** que enseña qué hay dentro.
+
+🔑 *Primero se cierra UNO a mano para ver la máquina; luego se factoriza lo que no cambiaba.*
+El orden inverso —factorizar antes de haber cerrado ninguno— es el que produce abstracciones que
+no encajan con ningún caso.
+
+⚠️ `hbadlen` existe porque con el tag como **variable** `decodeRuleTag` **no reduce**: hay que
+darle desde fuera que ese tag sólo decodifica con dos argumentos. Por tag es un `match` de cuatro
+ramas con tres `rfl`. -/
+theorem cierra_FF (l : List Term) (k tag : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (concl : Formula → Formula → Formula) (recon : Term → Term → Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+    (hargs : StdArgs as)
+    (hdec : ∀ A B : Formula, decodeRuleTag L f tag [formCode A, formCode B] ≠ none)
+    (hlenc : ∀ t : Term, Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM tag)) ⇒
+              (Formula.eq (lenc t) (numeralM 4)))))
+    (hbadlen : ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f tag args = none)
+    (hbadty : ∀ (u b : Term), decodeRuleTag L f tag [termCode u, b] = none)
+    (hbadty2 : ∀ (a u : Term), decodeRuleTag L f tag [a, termCode u] = none)
+    (hrecon : ∀ a b : Term, tagConcl tag [a, b] = some (recon a b))
+    (hnf1 : ∀ u b : Term, NotFC (recon (termCode u) b))
+    (hnf2 : ∀ a u : Term, NotFC (recon a (termCode u)))
+    (htc : ∀ A B : Formula, TagCode tag [formCode A, formCode B] (concl A B))
+    (hstep : ∀ (A B : Formula) (r : Rule),
+        decodeRuleTag L f tag [formCode A, formCode B] = some r →
+        stepConcl L r = some (concl A B))
+    (hcase : Or (decodeRuleTag L f tag (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f tag (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · rcases dico_FF tag hdec hsl hnone with hlen | ⟨a, b, heq, hbad⟩
+    · refine rama_aridad l k tag 4 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact hlenc _
+    · refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      rcases hbad with ⟨u, rfl⟩ | ⟨u, rfl⟩
+      · exact derives_lineWF_neg_of_tag tag (formCode f) [termCode u, b] _ (hrecon _ _)
+          (formCode_ne_notFC (hnf1 u b) f)
+      · exact derives_lineWF_neg_of_tag tag (formCode f) [a, termCode u] _ (hrecon _ _)
+          (formCode_ne_notFC (hnf2 a u) f)
+  · -- (c′): la longitud y los tipos quedan forzados por `hr : … = some r`
+    have hlen2 : (peelArgs as).length = 2 := by
+      by_cases h : (peelArgs as).length = 2
+      · exact h
+      · rw [hbadlen _ h] at hr; simp at hr
+    match hpa : peelArgs as, hsl with
+    | [a, b], hs =>
+        obtain ⟨ha, hs'⟩ := stdArgList_cons hs
+        obtain ⟨hb, _⟩ := stdArgList_cons hs'
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rcases hb with ⟨B, rfl⟩ | ⟨u, rfl⟩
+          · rw [hpa] at hr
+            have hsc := hstep A B r hr
+            rw [hsc] at hne
+            refine rama_concl l k tag f (concl A B) as hk hargs ?_ (fun h => hne (by rw [h]))
+            rw [hpa]; exact htc A B
+          · rw [hpa, hbadty2 (formCode A) u] at hr; simp at hr
+        · rw [hpa, hbadty u _] at hr; simp at hr
+    | [], _ => rw [hpa] at hlen2; simp at hlen2
+    | [_], _ => rw [hpa] at hlen2; simp at hlen2
+    | _ :: _ :: _ :: _, _ => rw [hpa] at hlen2; simp at hlen2
+
+
+/-! ### 🏁 LA FORMA `[F,F]`, COMPLETA — los ocho tags
+
+⭐ Con `cierra_FF` en la mano, cada tag es **una instancia**: ocho hechos de una línea. Aquí van
+los **siete** que faltaban; el tag 0 es `cierra_tag0` (arriba), que se deja **desplegado a
+propósito** como el ejemplo que enseña qué hay dentro — no se duplica en forma de instancia.
+
+⭐⭐ Y nótese lo que hizo posible la tanda: los refutadores de (f) son ahora **derivaciones de
+`NotFC`** de una línea, incluso en los dos tags con `liftfc` (`q3`, `qconf`), donde el argumento
+malo aparece **también** en una posición transparente. 🔑 *Un argumento que el esquema usa DOS
+veces sólo necesita una de las dos apariciones para ser refutable.* -/
+
+theorem badlen_c1 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 2 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_c1 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 2) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 2 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 2 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 2 f as L (fun A B => A ⇒ (B ⇒ Formula.and A B)) (fun a b => implc a (implc b (andc a b))) hk hargs
+    (decodes_c1 L f) (prf_lenc_c1) (badlen_c1 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcL _ (NotFC.tc u)) (fun a u => NotFC.implcR _ (NotFC.implcL _ (NotFC.tc u)))
+    (fun A B => tc_c1 A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_c2 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 3 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_c2 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 3) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 3 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 3 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 3 f as L (fun A B => Formula.and A B ⇒ A) (fun a b => implc (andc a b) a) hk hargs
+    (decodes_c2 L f) (prf_lenc_c2) (badlen_c2 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcL _ (NotFC.andcL _ (NotFC.tc u))) (fun a u => NotFC.implcL _ (NotFC.andcR _ (NotFC.tc u)))
+    (fun A B => tc_c2 A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_c3 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 4 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_c3 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 4) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 4 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 4 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 4 f as L (fun A B => Formula.and A B ⇒ B) (fun a b => implc (andc a b) b) hk hargs
+    (decodes_c3 L f) (prf_lenc_c3) (badlen_c3 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcL _ (NotFC.andcL _ (NotFC.tc u))) (fun a u => NotFC.implcL _ (NotFC.andcR _ (NotFC.tc u)))
+    (fun A B => tc_c3 A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_j1 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 5 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_j1 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 5) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 5 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 5 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 5 f as L (fun A B => A ⇒ Formula.or A B) (fun a b => implc a (orc a b)) hk hargs
+    (decodes_j1 L f) (prf_lenc_j1) (badlen_j1 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcL _ (NotFC.tc u)) (fun a u => NotFC.implcR _ (NotFC.orcR _ (NotFC.tc u)))
+    (fun A B => tc_j1 A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_j2 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 6 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_j2 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 6) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 6 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 6 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 6 f as L (fun A B => B ⇒ Formula.or A B) (fun a b => implc b (orc a b)) hk hargs
+    (decodes_j2 L f) (prf_lenc_j2) (badlen_j2 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcR _ (NotFC.orcL _ (NotFC.tc u))) (fun a u => NotFC.implcL _ (NotFC.tc u))
+    (fun A B => tc_j2 A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_q3 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 11 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_q3 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 11) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 11 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 11 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 11 f as L (fun A B => Formula.forall (A ⇒ liftFormula 0 B) ⇒ (Formula.ex A ⇒ B)) (fun a b => implc (forallc (implc a (liftfc zero b))) (implc (exc a) b)) hk hargs
+    (decodes_q3 L f) (prf_lenc_q3) (badlen_q3 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcR _ (NotFC.implcL _ (NotFC.excI (NotFC.tc u)))) (fun a u => NotFC.implcR _ (NotFC.implcR _ (NotFC.tc u)))
+    (fun A B => tc_q3 A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_qconf (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 19 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_qconf (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 19) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 19 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 19 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FF l k 19 f as L (fun P C => confinementFormula P C) (fun a b => implc (forallc (implc (liftfc zero a) b)) (implc a (forallc b))) hk hargs
+    (decodes_qconf L f) (prf_lenc_qconf) (badlen_qconf L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b => rfl) (fun u b => NotFC.implcR _ (NotFC.implcL _ (NotFC.tc u))) (fun a u => NotFC.implcR _ (NotFC.implcR _ (NotFC.forallcI (NotFC.tc u))))
+    (fun A B => tc_qconf A B)
+    (fun A B r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+
 end ROBINSON_PlusPlus.Meta.ChainNegPrf
 
 /-! ## `export` — por CONSUMO: el módulo F (ensamblaje) necesita `deuda_inNeg` y el puente. -/
@@ -1828,6 +2095,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   dico_F dico_T dico_FF dico_FT
   dico_FFF dico_FTT
   decodeForm_termCode decodeTerm_formCode neg_p1_slot2 cierra_tag0
+  cierra_FF
+  cierra_c1 cierra_c2 cierra_c3 cierra_j1 cierra_j2 cierra_q3 cierra_qconf
+  badlen_c1 badlen_c2 badlen_c3 badlen_j1 badlen_j2 badlen_q3 badlen_qconf
   decodes_efq decodes_p3 decodes_ind decodes_listInd decodes_eqrefl decodes_p1 decodes_c1
   decodes_c2 decodes_c3 decodes_j1 decodes_j2 decodes_q3 decodes_qconf decodes_p2 decodes_j3
   decodes_q1 decodes_q2 decodes_leibniz
@@ -1847,6 +2117,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodes_leibniz
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.decodeForm_termCode
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_tag0
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_FF
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_c1
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_qconf
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems

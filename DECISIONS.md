@@ -7285,3 +7285,94 @@ gemelo, del lado del **decodificador**, de `formCode_ne_termCode` (ADR-081), que
 
 **Véase también:** ADR-089 (las seis ramas), ADR-091 (las seis formas), ADR-081 (los refutadores
 de (f)).
+
+---
+
+## ADR-095: 🏁 la forma `[F,F]` COMPLETA — un refutador para ~32 ranuras y un cierre por FORMA
+
+**Fecha:** 2026-09-22 · **Estado:** ACEPTADO · **Ámbito:** RPP (`Meta/CodeDistinct.lean`,
+`Meta/ChainNegPrf.lean`). FOL intacto.
+
+### Contexto
+
+ADR-094 cerró **un** tag de punta a punta (`cierra_tag0`, ~40 líneas) y dejó **17** con la misma
+plantilla. La cotización honesta de entonces fue *«no cotizo las 17»*. Esta entrada las ataca en
+tanda y mide **qué parte de esas 40 líneas era realmente por tag**.
+
+### 1 · ⭐⭐⭐ `NotFC` — UN refutador donde había ~32
+
+El caso (f) —tipo de argumento equivocado— pide, por cada ranura de cada tag, un
+`axioms ⊢ neg (formCode f =eq <reconstrucción con un termCode dentro>)`. Con 18 tags
+estructurales y 1–3 ranuras cada uno son **~32 obligaciones**, cada una con su ensamblaje de
+`cons_ne_tail`/`cons_ne_head` a la profundidad que toque (ADR-094, §2).
+
+⇒ Se sustituyen por **un inductivo y un teorema**, en `Meta/CodeDistinct.lean`:
+
+```lean
+inductive NotFC : Term → Prop
+  | tc (u : Term) : NotFC (termCode u)
+  | implcL {a} (b) : NotFC a → NotFC (implc a b)     -- y implcR, andcL/R, orcL/R
+  | forallcI {a} : NotFC a → NotFC (forallc a)       -- y excI
+
+theorem formCode_ne_notFC : ∀ {e}, NotFC e → ∀ f, axioms ⊢ neg (formCode f =eq e)
+```
+
+`NotFC e` = «`e` **no es el código de ninguna fórmula**, y se ve por su sintaxis». La inducción
+es sobre `NotFC`, y cada constructor descarga con los refutadores base de ADR-081.
+
+🔑 **Un ensamblaje que se repite con la misma FORMA a profundidades distintas es un
+INDUCTIVO, no 32 lemas.** El refutador de la ranura profunda ya no se «compone a mano» (ADR-094):
+se **deriva**, y la derivación es de una línea (`NotFC.implcR _ (NotFC.implcL _ (NotFC.tc u))`).
+
+⚠️ **Límite MEDIDO, no estimado**: de las ~32 ranuras, **tres** caen dentro de `substfc` —el
+argumento de término de los tags 9 (`q1`) y 10 (`q2`), y el de fórmula del 13 (`leibniz`)— y ésas
+**no se refutan por la sintaxis**, porque `substfc` es un símbolo OBJETO que no reduce
+([[feedback-simbolos-objeto-no-reducen]]). Ésas necesitan las guardas de ADR-020.
+
+### 2 · ⭐⭐ `cierra_FF` — el cierre por FORMA, no por tag
+
+De las ~40 líneas de `cierra_tag0`, **casi todas eran las mismas** para los ocho tags de forma
+`[F,F]`. `cierra_FF` las toma como **ocho hipótesis de una línea** (`hdec`, `hlenc`, `hbadlen`,
+`hbadty`, `hbadty2`, `hrecon`, `hnf1`/`hnf2`, `htc`, `hstep`) y hace el resto. Cada tag pasa a
+ser **una instancia de ~15 líneas**, de las cuales las que razonan son **cero**.
+
+🔑 *Primero se cierra UNO a mano para ver la máquina; luego se factoriza lo que no cambiaba.*
+El orden inverso —factorizar antes de haber cerrado ninguno— produce abstracciones que no encajan
+con ningún caso. `cierra_tag0` **se queda desplegado a propósito**: es el ejemplo que enseña qué
+hay dentro, y **no se duplica** como instancia.
+
+⚠️ `hbadlen` existe porque con el tag como **variable** `decodeRuleTag` **no reduce**. Por tag es
+un `match` de cuatro ramas con tres `rfl`.
+
+⭐ Y un dividendo que no se esperaba: los dos tags con `liftfc` (`q3`, `qconf`) **sí** salen por
+`NotFC`, porque el argumento malo aparece **también** en una posición transparente.
+🔑 *Un argumento que el esquema usa DOS veces sólo necesita UNA de las dos apariciones para ser
+refutable.*
+
+### 3 · ⚠️ La trampa: `export` trae el TIPO pero no sus CONSTRUCTORES
+
+`export ... (NotFC formCode_ne_notFC)` compila, y luego `NotFC.implcL` es **constante
+desconocida** en el consumidor. Hay que listar los **nueve** constructores uno a uno.
+
+🔑 *Un `export` de un inductivo que no nombra los constructores exporta algo con lo que no se
+puede construir nada.*
+
+### 4 · 📐 Estado del ensamblado
+
+| | |
+|---|---|
+| forma `[F,F]` | 🏁 **8 de 8** (tag 0 desplegado + 7 instancias) |
+| formas pendientes | `[F]` (5 tags), `[F,F,F]` (2), `[T]` (1), `[F,T]` (2), `[F,T,T]` (1) |
+| de ésas, refutables por `NotFC` | **todas menos tres ranuras** (§1) |
+| tags de contexto | **3** (15/16/17) → (d) y (e), cerradas (ADR-076/077) |
+| el `match` final | ⬜ |
+
+**Coste medido de la tanda:** 7 tags = 7 `badlen_*` + 7 instancias, **ninguna con razonamiento
+nuevo**. La forma `[F,F]` es la más poblada de las seis.
+
+**Controles:** `check-footprints` **442** (cobertura **406/406**) · `check-doc-sync` ·
+`check-sorry` + censo · `check-estratos` **10** · `check-warnings` **11** · RPP **145 jobs**.
+⚠️ **ÁMBITO**: FOL intacto.
+
+**Véase también:** ADR-094 (el tag desplegado), ADR-091 (las seis formas), ADR-081 (los
+refutadores base), ADR-020 (las guardas de `substfc`).

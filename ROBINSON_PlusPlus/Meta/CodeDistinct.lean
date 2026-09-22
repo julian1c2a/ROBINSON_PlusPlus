@@ -294,6 +294,80 @@ theorem formCode_ne_eqc_fc_1 (f : Formula) (A : Formula) (X : Term) :
   | _ => exact formCode_ne_cons_of_tag _ (n := 4) _ (by simp only [formTag]; decide)
 
 
+
+/-! ### ⭐⭐⭐ UN SOLO REFUTADOR para toda la causa (f) transparente
+
+⚠️ Antes de esto, cada tag y cada ranura pedía su propio lema: `formCode_ne_implc_tc_1`,
+`_tc_2`, `_andc_tc_1`, … y el ensamblaje por tag encima. Contados: **~32**.
+
+⭐ `NotFC e` dice «este término **no es el código de ninguna fórmula**», por razones puramente
+**sintácticas**: o es un código de término, o lleva uno en una posición donde va un código de
+fórmula. Es un inductivo de **nueve** constructores, y `formCode_ne_notFC` lo refuta **de una
+vez para todos**.
+
+⇒ el refutador de cada tag y cada ranura pasa a ser **una derivación de una línea**:
+
+    -- tag 0, ranura 2:  implc a (implc (termCode u) a)
+    formCode_ne_notFC (NotFC.implcR _ (NotFC.implcL _ (NotFC.tc u))) f
+
+🔑 *Cuando los refutadores de una familia se COMPONEN (ADR‑094), la composición ya es un
+inductivo esperando a que lo escriban.* Los lemas sueltos de arriba se quedan como los casos
+base que el inductivo usa y como ejemplos trabajados.
+
+⛔ **Su límite, medido**: sólo alcanza las posiciones **TRANSPARENTES**, las construidas con
+`implc`/`andc`/`orc`/`forallc`/`exc`. De las ~32 ranuras, **tres** caen dentro de `substfc` —
+el argumento de término de los tags 9 y 10, y el de fórmula del 13— y ésas **no se refutan por
+la sintaxis**: van por las guardas que ADR‑020 metió dentro de `lineWF`. -/
+inductive NotFC : Term → Prop
+  | tc (u : Term) : NotFC (termCode u)
+  | implcL {a : Term} (b : Term) : NotFC a → NotFC (implc a b)
+  | implcR (a : Term) {b : Term} : NotFC b → NotFC (implc a b)
+  | andcL {a : Term} (b : Term) : NotFC a → NotFC (andc a b)
+  | andcR (a : Term) {b : Term} : NotFC b → NotFC (andc a b)
+  | orcL {a : Term} (b : Term) : NotFC a → NotFC (orc a b)
+  | orcR (a : Term) {b : Term} : NotFC b → NotFC (orc a b)
+  | forallcI {a : Term} : NotFC a → NotFC (forallc a)
+  | excI {a : Term} : NotFC a → NotFC (exc a)
+
+theorem formCode_ne_notFC : ∀ {e : Term}, NotFC e → ∀ f : Formula,
+    axioms ⊢ neg (formCode f =eq e)
+  | _, NotFC.tc u, f => formCode_ne_termCode f u
+  | _, NotFC.implcL b h, f => by
+      cases f with
+      | impl x y => exact cons_ne_tail (cons_ne_head (formCode_ne_notFC h x))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 5) _ (by simp only [formTag]; decide)
+  | _, NotFC.implcR a h, f => by
+      cases f with
+      | impl x y =>
+          exact cons_ne_tail (cons_ne_tail (cons_ne_head (formCode_ne_notFC h y)))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 5) _ (by simp only [formTag]; decide)
+  | _, NotFC.andcL b h, f => by
+      cases f with
+      | and x y => exact cons_ne_tail (cons_ne_head (formCode_ne_notFC h x))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 7) _ (by simp only [formTag]; decide)
+  | _, NotFC.andcR a h, f => by
+      cases f with
+      | and x y =>
+          exact cons_ne_tail (cons_ne_tail (cons_ne_head (formCode_ne_notFC h y)))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 7) _ (by simp only [formTag]; decide)
+  | _, NotFC.orcL b h, f => by
+      cases f with
+      | or x y => exact cons_ne_tail (cons_ne_head (formCode_ne_notFC h x))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 8) _ (by simp only [formTag]; decide)
+  | _, NotFC.orcR a h, f => by
+      cases f with
+      | or x y =>
+          exact cons_ne_tail (cons_ne_tail (cons_ne_head (formCode_ne_notFC h y)))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 8) _ (by simp only [formTag]; decide)
+  | _, NotFC.forallcI h, f => by
+      cases f with
+      | «forall» x => exact cons_ne_tail (cons_ne_head (formCode_ne_notFC h x))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 6) _ (by simp only [formTag]; decide)
+  | _, NotFC.excI h, f => by
+      cases f with
+      | ex x => exact cons_ne_tail (cons_ne_head (formCode_ne_notFC h x))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 9) _ (by simp only [formTag]; decide)
+
 end ROBINSON_PlusPlus.Meta.CodeDistinct
 
 export ROBINSON_PlusPlus.Meta.CodeDistinct (
@@ -311,4 +385,7 @@ export ROBINSON_PlusPlus.Meta.CodeDistinct (
   formCode_ne_implc_tc_1 formCode_ne_implc_tc_2
   formCode_ne_andc_tc_1 formCode_ne_orc_tc_1
   formCode_ne_forallc_tc formCode_ne_exc_tc formCode_ne_eqc_fc_1
+  NotFC formCode_ne_notFC
+  NotFC.tc NotFC.implcL NotFC.implcR NotFC.andcL NotFC.andcR
+  NotFC.orcL NotFC.orcR NotFC.forallcI NotFC.excI
 )
