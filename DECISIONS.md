@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-087**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-088**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6951,3 +6951,73 @@ codificación. `consN` y **`consN_inj`** ya están (ADR-086).
 el sondeo está fuera del build a propósito.
 
 **Véase también:** ADR-086 (la capa aritmética arranca), ADR-085 §5 (el orden del frente).
+
+---
+
+## ADR-088: ⛔⛔ **ℕ no es modelo de `Prf`** — la capa de listas se para antes de empezar
+
+**Fecha**: 2026-09-22
+**Estado**: 📏 MEDIDO Y COMPILADO (`sondeos/ModeloBasura.lean`) · ⛔ **decisión del propietario**
+**Contexto**: cerrada la capa aritmética (ADR-087), tocaba la de listas. Se midió **antes** de
+escribirla si el dominio ℕ era el correcto. No lo es.
+
+### 1 · El dato, compilado
+
+`ax_L0_cons_def` **obliga** a interpretar `cons a b` como `pair a (σb) = cantor_func a (b+1)`, y
+`nil` es `zero = 0`. Con `+`, `*` y `div2` estándar —que los demás core fuerzan— eso es
+exactamente `consN` de `Meta/CodeNumeralPrf.lean:65`.
+
+La imagen de `cons` es `{cantor(x,y) : y ≥ 1}`, que **deja fuera los números triangulares**.
+⇒ **el 1 no es ni `nil` ni un `cons`**, y está probado abajo, no argumentado.
+
+### 2 · ⛔⛔ La consecuencia
+
+`Prf` tiene `listInd (A) : Prf (listInductionFormula A)`, y con **Φ := «es `nil` o es un `cons`»**
+—una fórmula del lenguaje— el esquema tiene **base verdadera, paso verdadero y conclusión FALSA**
+en ℕ (falla en `1`).
+
+⇒ **`Prf` no es sólido respecto del modelo estándar de la aritmética**, y la ruta
+«modelo en ℕ ⇒ `¬ Prf ⊥` ⇒ `ConsistentH`» **no funciona tal cual**.
+
+🔑 **Un esquema de inducción sobre una clase que el lenguaje no sabe separar cuantifica sobre
+TODO el dominio — y entonces habla de lo que no debería.**
+
+### 3 · ⚠️ Lo que esto **NO** dice, y hay que decirlo con cuidado
+
+* **No dice que `Prf` sea inconsistente.** Dice que **ℕ no está entre sus modelos**. Un cálculo
+  puede ser consistente y no tener a ℕ por modelo.
+* **No es un error en ninguna prueba del árbol.** Todo lo que RPP demuestra sigue siendo teorema
+  de `Prf`; lo que cambia es qué estructuras lo satisfacen.
+* **No es un fallo de la aritmetización**: `listInd` está para razonar sobre **códigos**, y sobre
+  códigos la inducción es legítima. Lo que falla es que el lenguaje no separa los códigos del
+  resto del dominio.
+
+⚠️ Y sí conviene subrayar una cosa: `ax_list_induction` es **uno de los 3 `axiom` de Lean** del
+proyecto — un **postulado**. Esta medición dice que ese postulado es **falso en ℕ**. No lo
+invalida (el propietario puede querer justamente esa fuerza), pero **deja de ser inocuo**, y
+`AXIOMS.md` debería decirlo.
+
+### 4 · 📏 El coste de la salida que parece buena
+
+De las cuatro salidas posibles —dominio distinto, relativizar `listInd`, renunciar al modelo
+estándar, o comprobar que las instancias ya llevan guarda— la única que conserva **a la vez** la
+aritmética y la codificación es **relativizar `listInd`** con una guarda de buena formación.
+
+**Medido: `prf_list_induction` se consume en 42 sitios** del árbol. Ése es el tamaño de esa
+salida. ⬜ Lo que **no** está medido es cuántos de los 42 ya tienen la guarda por otra vía, y ésa
+es la medición que decide — no la cotizo.
+
+### 5 · ⭐ Por qué esto es un buen resultado, y no un revés
+
+Se midió **antes** de escribir los 9 axiomas de la capa de listas. Si se hubieran escrito
+primero, habrían compilado igual —son ciertos en ℕ, uno a uno— y el problema habría aparecido
+**al intentar la solidez de `Prf`**, con la capa entera ya construida sobre un dominio
+equivocado.
+
+🔑 *La pregunta «¿es éste el dominio correcto?» no se contesta validando axiomas uno a uno: se
+contesta buscando un elemento que sobre.*
+
+**Controles:** `check-doc-sync` (`[H]` **79/79**) · RPP **145 jobs**. ⚠️ **ÁMBITO**: FOL intacto.
+
+**Véase también:** ADR-087 (la capa aritmética), ADR-085 §5 (el orden del frente, que esto
+reordena), `Meta/CodeNumeralPrf.lean:65`, `Meta/ChainPrf.lean:29`.
