@@ -7376,3 +7376,165 @@ nuevo**. La forma `[F,F]` es la más poblada de las seis.
 
 **Véase también:** ADR-094 (el tag desplegado), ADR-091 (las seis formas), ADR-081 (los
 refutadores base), ADR-020 (las guardas de `substfc`).
+
+---
+
+## ADR-096: 🏁 los DIECIOCHO tags estructurales, cerrados — y `NotTC`, la mitad que faltaba
+
+**Fecha:** 2026-09-22 · **Estado:** ACEPTADO · **Ámbito:** RPP (`Meta/CodeDistinct.lean`,
+`Meta/ReprPrf.lean`, `Meta/ChainNegPrf.lean`). FOL intacto.
+
+### Contexto
+
+ADR-095 cerró la forma `[F,F]` (8 tags) y dejó **diez**: `[F]` (4), `[F,F,F]` (2), `[T]` (1),
+`[F,T]` (2), `[F,T,T]` (1). Los tres últimos tenían el límite **medido** de `NotFC`: tres ranuras
+caen dentro de `substfc` y no se refutan por la sintaxis.
+
+### 1 · ⭐ Las formas `[F]`, `[F,F,F]` y `[T]` — sin sorpresa, con un dividendo
+
+`cierra_F` (4 instancias: 8 `efq`, 14 `p3`, 18 `ind`, 20 `listInd`) y `cierra_FFF` (2: 1 `p2`,
+7 `j3`), mismo molde que `cierra_FF`. El tag 12 (`eqrefl`, forma `[T]`) **no se factoriza**: un
+cierre genérico con una sola instancia no es abstracción, es indirección.
+
+⭐⭐ Y el dividendo: los tags **18 y 20** meten su único argumento dentro de un `substfc` en la
+primera aparición… y **salen igual por `NotFC`**, porque el esquema lo usa **también** en el
+`forallc` final. 🔑 *Un argumento que el esquema usa dos veces sólo necesita UNA aparición
+transparente.* Lo que en `q3`/`qconf` parecía un accidente de dos tags resulta ser **la mitad de
+la forma `[F]`**.
+
+### 2 · ⭐⭐ `NotTC` — (f) tiene DOS direcciones, y sólo había una
+
+`NotFC` dice «no es código de fórmula». Los tags 12 y 13 necesitan la contraria: un `formCode`
+donde va un código de TÉRMINO. ⇒ `NotTC` (un constructor, `fc`) más dos constructoras de `NotFC`:
+
+```lean
+| eqcL {a} (b) : NotTC a → NotFC (eqc a b)
+| eqcR (a) {b} : NotTC b → NotFC (eqc a b)
+```
+
+`eqc` es la **única** constructora transparente que abre un hueco de término. Con eso, las dos
+ranuras de término del tag 13 (`eqc t₁ t₂`) salen por sintaxis y **no** piden guarda.
+
+⚠️ `NotTC` tiene **una sola** constructora y eso es deliberado: es lo que hace falta, **medido**.
+
+### 3 · ⭐⭐⭐ Las tres ranuras OPACAS — las cierra la GUARDA de ADR-020
+
+Ranuras: argumento de TÉRMINO de los tags 9 (`q1`) y 10 (`q2`), y de FÓRMULA del 13 (`leibniz`).
+
+🔑 **La ranura que no se puede refutar por la forma es, por construcción, la que el esquema tuvo
+que guardar.** No es coincidencia: `substfc` no se evalúa sin buena formación, así que la
+opacidad y la guarda **tienen la misma causa**. ADR-020 metió `hasWitF`/`hasWit` dentro de
+`lineWF` por la fidelidad de la reconstrucción; sirven aquí sin tocar nada.
+
+Y los dos refutadores de la guarda salen **baratos**, porque los reconocedores son ecuacionales:
+
+| refutador | el reconocedor es | coste |
+|---|---|---|
+| `neg_hasWit_formCode` | `isTermCodeE1` = **2** formas, cabezas 0 y 1 | 2 `formCode_ne_cons_of_tag` |
+| `neg_hasWitF_termCode` | `isFormCodeE2` = **8** formas, cabezas 2…9 | 8 `termCode_ne_cons_of_tag` |
+
+⭐ Las piezas de enganche **ya estaban**: `prf_isTermCodeE1_of_In`, `prf_isFormCodeE2_of_In`,
+`substF_isTC1`, `substF_isFC1`. Lo nuevo son tres **proyecciones** de la guarda en `ReprPrf.lean`
+(`prf_lineWF_q1_hasWit`, `_q2_hasWit`, `_leibniz_hasWitF`), gemelas de los `prf_lineWF_*_imp` y
+con el mismo cuerpo salvo **qué conjunto se proyecta**; y `termTag`/`termCode_ne_cons_of_tag`, el
+espejo exacto de `formTag`/`formCode_ne_cons_of_tag`.
+
+Van **trece** de «antes de construir, buscar» — [[feedback-antes-de-construir-buscar]].
+
+### 4 · ⚠️ Dos trampas
+
+* **`decide` exige un objetivo CERRADO**: `by cases B <;> decide` falla con
+  *«Expected type must not contain free variables»* en los constructores con argumentos
+  (`formTag (.atom p ts) ≠ 0` conserva `p`, `ts`). Sale con `simp [formTag]`, que **reduce
+  antes**.
+* **Un lema puede existir y no estar en el ámbito**: `liftTerm_termCode` está en
+  `Meta/DerivCondPrf.lean`, sin `export`, y ese módulo no llega. La salida es el puente
+  `termCodeM_eq` + `liftTerm_termCodeM`, dos líneas.
+
+**Controles:** `check-footprints` **457** (cobertura **421/421**) · el resto verde · 145 jobs.
+
+---
+
+## ADR-097: 🏁🏁🏁🏁 `DEUDA_chainNeg` SALDADA y **`NegVerifier` PROBADO**
+
+**Fecha:** 2026-09-22 · **Estado:** ACEPTADO · **Ámbito:** RPP (`Meta/ChainNegPrf.lean` §6).
+FOL intacto.
+
+### El resultado
+
+```lean
+theorem deuda_chainNeg_proved : DEUDA_chainNeg
+theorem negVerifier_proved : NegVerifier
+```
+
+`Meta/VerifierSound.lean` (2026-09-10h) dejó `NegVerifier` reducido a **dos obligaciones con
+nombre y firma**. `deuda_inNeg` se pagó el 2026-09-21; `deuda_chainNeg_proved` la cierra hoy, y
+`negVerifier_of_deudas` las junta. ⇒ **`NegVerifier` deja de ser hipótesis.**
+
+⚠️ **ÁMBITO (M-13)**: lo que cae es `NegVerifier`, **no** la ω-consistencia. `reflects_of_omega`
+tomaba **dos** hipótesis y ahora toma **una** (`OmegaConsistent`). Y `StdChain` sigue estrechada
+(ADR-022), escrito en el enunciado.
+
+**Footprint de `negVerifier_proved`** (medido, no estimado): `propext, Classical.choice,
+Quot.sound, ex_elim, imp_intro, or_elim, raa, ax_induction_prim, ax_list_induction,
+ax_axiomsCodeT_eq`. **Ningún axioma nuevo**: los tres de RPP son los sancionados.
+
+### 1 · ⭐⭐ Los tres tags de CONTEXTO no tenían cierre, sólo piezas
+
+Los dieciocho estructurales estaban (ADR-094/095/096); 15/16/17 tenían las rutas (d) y (e)
+**sueltas**. Lo que faltaba era repartir su propio `hcase`:
+
+| tag | lo que tenía | lo que faltaba |
+|---|---|---|
+| 15 `thy` | `rama_thy`, que pide la línea con `nil` EXPLÍCITO | el caso `args ≠ []` ⇒ (b) aridad, y cerrar el `Or.inr` |
+| 16 `mp` | las dos instancias de (e), con la premisa YA identificada | leer `findIdx` para saber CUÁL falta, y el caso de tipo |
+| 17 `gen` | la instancia de (e) | ídem, más **(c′)** |
+
+⭐ **`thy` y `mp` no pueden fallar por (c′)**, y eso lo dice `findIdx_sound`: si el decodificador
+devuelve índice, ahí está lo que buscaba, luego `stepConcl = some f`. `gen` **sí** puede: `∀g` no
+tiene por qué ser `f`. 🔑 *Qué causas puede disparar un tag no se elige: lo dicta el decodificador.*
+
+### 2 · ⭐⭐⭐ El dividendo que no estaba previsto: `NotFC` sirve a DOS vías
+
+`ax_lineWF_mp` **no dice nada de la forma del argumento** (sólo `lenc = 3`), así que una línea
+`mp` con un `termCode` donde va una fórmula es **bien formada**. Parecía un agujero. No lo es:
+su premisa mayor es `↑u ⇒ ⌜f⌝`, que **no es el código de ninguna fórmula**, luego ninguna línea
+anterior la concluye ⇒ cae por la vía de las **PREMISAS**.
+
+🔑 *El mismo refutador sirve a dos vías distintas porque lo que refuta es un HECHO SOBRE CÓDIGOS,
+no sobre `lineWF`.* Costó dos lemas: `derives_not_boundedCarcLt_of_notFC` (gemelo de
+`_of_not_mem`, con `NotFC` en vez de `φ ∉ L`) y `derives_chainOk_neg_of_prem_at` — que es
+`derives_chainOk_neg_of_prem_code` **generalizado en el sitio**: la premisa mala no tiene por qué
+ser un `formCode`.
+
+### 3 · 🏁 El `match`: veintiún tags, veintiuna líneas
+
+`cierra_por_tag` es un `match` sobre `tag` por el compilador de ecuaciones; **cada rama es una
+línea**, y `n+21` no menciona ningún tag. 🔑 *Un `match` de 21 ramas cuyas ramas son todas de una
+línea no es un `match` de 21 ramas: es una TABLA.* El coste del split estaba medido en 4,5 s
+(ADR-078) y no dio sorpresas.
+
+### 4 · ⚠️ La trampa de la tanda
+
+`Option.noConfusion` **no ve a través de `Option.map`/`bind`**: `(none).map f = some r` no es
+sintácticamente `none = some r`, así que hay que dejar que `simp` reduzca primero. Cinco veces en
+el mismo bloque. ⭐ En cambio **sí** vale `have h2 : some (Rule.thy i) = some r := hr'`:
+`Option.map` sobre `some` reduce por `rfl`, y ahí `injection` entra. 🔑 *Lo que `noConfusion` no
+acepta por sintaxis, la ASCRIPCIÓN de tipo lo acepta por defeq.*
+
+### 5 · 📐 El estado de la vía
+
+| | |
+|---|---|
+| `DEUDA_inNeg` | 🏁 saldada (2026-09-21) |
+| `DEUDA_chainNeg` | 🏁 **saldada** |
+| `NegVerifier` | 🏁 **teorema** |
+| `OmegaConsistent` | ⬜ sigue siendo **hipótesis** — es la única que queda en `reflects_of_omega` |
+
+**Controles:** `check-footprints` **457** (**421/421**) · `check-doc-sync` · `check-sorry` +
+censo · `check-estratos` **10** · `check-warnings` **11** (los 6 nuevos se **retiraron**, no se
+declararon: el build siguió verde sin ellos) · RPP **145 jobs**.
+⚠️ **ÁMBITO**: FOL intacto.
+
+**Véase también:** ADR-022 (`StdChain` estrechada), ADR-076…081 (las seis causas), ADR-089 (las
+seis ramas), ADR-091 (las seis formas), ADR-094/095/096 (los 18 tags).

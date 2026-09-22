@@ -980,6 +980,65 @@ theorem prf_lineWF_leibniz_imp (concl A t1 t2 : Term) :
   have hlenc : Prf (lenc (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) =eq numeralM 5) := prf_lenc_5_loc _ _ _ _ _
   exact prf_lineWF_imp_transport (prf_imp_and_right (prf_imp_and_right (prf_imp_and_right (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag)))))) hc (prf_congr_bin (prf_congr_bin (h_t1) (h_t2)) (prf_congr_bin (prf_eq_trans (prf_congr_substfc_a2_loc (h_t1)) (prf_congr_substfc_a3_loc (h_A))) (prf_eq_trans (prf_congr_substfc_a2_loc (h_t2)) (prf_congr_substfc_a3_loc (h_A)))))
 
+/-! ### ⭐⭐ LAS PROYECCIONES DE LA **GUARDA** (ADR‑020) — lo que cierra las tres ranuras opacas
+
+⛔ `NotFC` (ADR‑095) alcanza sólo las posiciones **transparentes**. Tres ranuras caen dentro de un
+`substfc` y no se refutan por la sintaxis: el argumento de TÉRMINO de los tags 9 y 10, y el de
+FÓRMULA del 13.
+
+⭐⭐ Pero esas tres son **exactamente** las que ADR‑020 obligó a guardar, y por la MISMA razón:
+`substfc` no se evalúa sin buena formación. ⇒ la ranura opaca **lleva guarda**, y la guarda sí es
+refutable. Estas tres proyecciones la sacan del bicondicional; son los gemelos de los
+`prf_lineWF_*_imp` de arriba, cambiando qué conjunto se proyecta.
+
+🔑 *La ranura que no se puede refutar por la forma es, por construcción, la que el esquema tuvo
+que guardar.* -/
+
+/-- Gemelo izquierdo de `prf_imp_and_right`. -/
+theorem prf_imp_and_left {A P Q : Formula} (h : Prf (A ⇒ Formula.and P Q)) : Prf (A ⇒ P) :=
+  prf_syll h (Prf.incl (Prf₀.c2 P Q))
+
+theorem prf_lineWF_q1_hasWit (concl A t : Term) :
+    Prf (lineWF (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) ⇒
+      hasWit (nthc (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) (numeralM 3))) := by
+  have hax := prf_spec (prf_ax (show ax_lineWF_q1 ∈ axioms by simp [axioms]))
+    (cons concl (cons (numeralM 9) (cons A (cons t (nil)))))
+  simp only [ax_lineWF_q1, substF_hasWitF, substF_hasWit, substFormula, substTerm, substTerms,
+    lineWF, carc, nthc, forallc, implc, substfc,
+    numeralM, cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hax
+  have htag : Prf (nthc (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) (succ zero)
+      =eq numeralM 9) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
+  exact prf_imp_and_left (prf_imp_and_right (prf_imp_and_right
+    (prf_and_elim_left (prf_mp hax htag))))
+
+theorem prf_lineWF_q2_hasWit (concl A t : Term) :
+    Prf (lineWF (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) ⇒
+      hasWit (nthc (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) (numeralM 3))) := by
+  have hax := prf_spec (prf_ax (show ax_lineWF_q2 ∈ axioms by simp [axioms]))
+    (cons concl (cons (numeralM 10) (cons A (cons t (nil)))))
+  simp only [ax_lineWF_q2, substF_hasWitF, substF_hasWit, substFormula, substTerm, substTerms,
+    lineWF, carc, nthc, exc, implc, substfc,
+    numeralM, cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hax
+  have htag : Prf (nthc (cons concl (cons (numeralM 10) (cons A (cons t (nil))))) (succ zero)
+      =eq numeralM 10) := prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
+  exact prf_imp_and_left (prf_imp_and_right (prf_imp_and_right
+    (prf_and_elim_left (prf_mp hax htag))))
+
+theorem prf_lineWF_leibniz_hasWitF (concl A t1 t2 : Term) :
+    Prf (lineWF (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil)))))) ⇒
+      hasWitF (nthc (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil))))))
+        (numeralM 2))) := by
+  have hax := prf_spec (prf_ax (show ax_lineWF_leibniz ∈ axioms by simp [axioms]))
+    (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil))))))
+  simp only [ax_lineWF_leibniz, substF_hasWitF, substF_hasWit, substFormula, substTerm, substTerms,
+    lineWF, carc, nthc, eqc, implc, substfc,
+    numeralM, cons, nil, zero, succ, iff, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hax
+  have htag : Prf (nthc (cons concl (cons (numeralM 13) (cons A (cons t1 (cons t2 (nil))))))
+      (succ zero) =eq numeralM 13) :=
+    prf_eq_trans (prf_nthc_succ_loc _ _ _) (prf_nthc_zero_loc _ _)
+  exact prf_imp_and_left (prf_imp_and_right (prf_and_elim_left (prf_mp hax htag)))
+
+
 theorem prf_lineWF_ind_imp (concl a : Term) :
     Prf (lineWF (cons concl (cons (numeralM 18) (cons a (nil)))) ⇒
       (concl =eq implc (substfc (zero) (termCodeM zero) (a)) (implc (forallc (implc (a) (substfc (zero) (termCodeM (succ (.var 0))) (liftfc (succ zero) (a))))) (forallc (a))))) := by
@@ -1027,6 +1086,8 @@ theorem prf_lineWF_listInd_imp (concl a : Term) :
 end ROBINSON_PlusPlus.Meta.ReprPrf
 
 export ROBINSON_PlusPlus.Meta.ReprPrf (
+  prf_imp_and_left
+  prf_lineWF_q1_hasWit prf_lineWF_q2_hasWit prf_lineWF_leibniz_hasWitF
   -- ⚠️ `prf_syll` se exporta desde el dedup del 2026‑09‑09d: `HasWitTcFnPrf` tenía una copia
   --    LITERAL (ADR‑019) y `SubstfcWitnessPrf` lo consumía ya cualificado, tres veces.
   prf_syll

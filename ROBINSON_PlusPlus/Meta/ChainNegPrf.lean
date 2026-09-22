@@ -13,10 +13,15 @@ import ROBINSON_PlusPlus.Meta.ChainDecode
 import ROBINSON_PlusPlus.Full.Lists
 
 /-!
-# MÓDULOS C/D de `NegVerifier` — **`DEUDA_inNeg` SALDADA**, y el puente de `DEUDA_chainNeg`
+# MÓDULOS C/D de `NegVerifier` — 🏁🏁🏁🏁 **LAS DOS DEUDAS SALDADAS**
 
-`Meta/VerifierSound.lean` dejó `NegVerifier` reducido a **dos** obligaciones enunciadas. Aquí se
-**paga una** y se construye el **núcleo reutilizable** de la otra.
+`Meta/VerifierSound.lean` dejó `NegVerifier` reducido a **dos** obligaciones enunciadas.
+Aquí se **pagan las dos** — `deuda_inNeg` (§3) y `deuda_chainNeg_proved` (§6) — y
+`negVerifier_proved` las junta: **`NegVerifier` deja de ser hipótesis**.
+
+⚠️ **ÁMBITO (M‑13)**: lo que esto cierra es `NegVerifier`, no la ω‑consistencia.
+`reflects_of_omega` (`Meta/OmegaReflect.lean:297`) seguía tomando **dos** hipótesis; ahora toma
+**una**. Y `StdChain` sigue estrechada (ADR‑022), escrito en el enunciado.
 
 ## §1 · El PUENTE: de una línea refutada a la cadena refutada
 
@@ -53,7 +58,7 @@ cierre de (d) (§2ter) **sí** entra por `axiomsCodeT`, así que su footprint ci
 `ax_axiomsCodeT_eq`, y sin la etiqueta esta frase se habría vuelto falsa **sola**.
 🔑 *Una cifra sin ámbito se lee como global, y caduca en cuanto el módulo crece.*
 
-## ⬜ Lo que queda de `DEUDA_chainNeg`, medido
+## 🏁 Las SEIS causas de `DEUDA_chainNeg` — **las seis cerradas y ENHEBRADAS** (§6)
 
 Con `StdChain` estrechada ([ADR‑022](../../DECISIONS.md)) toda línea es `⟨⌜f⌝, k̄, args⟩` con args
 `formCode`/`termCode`, así que **las causas de rechazo del decodificador son cinco, y se pueden
@@ -66,7 +71,7 @@ enumerar**:
 | (c) | **la conclusión no casa** (`stepConcl ≠ f`) | 🏁 **CERRADA 2026‑09‑22**, `derives_lineWF_neg_of_concl` + los **19** `tc_*` |
 | (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
 | (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑22** (§2quater + §2quinquies): el genérico `derives_chainOk_neg_of_prem_code` y las **tres** instancias |
-| (f) | **tipo de ARGUMENTO** — la **SEXTA**, que esta enumeración no tenía | 🏁 **refutadores CERRADOS 2026‑09‑22** (`Meta/CodeDistinct.lean` + §1quinquies); ⬜ queda el análisis de `StdArgs` por tag, que es **reparto**, no cierre |
+| (f) | **tipo de ARGUMENTO** — la **SEXTA**, que esta enumeración no tenía | 🏁 **CERRADA 2026‑09‑22**: `NotFC`/`NotTC` para las posiciones transparentes (ADR‑095/096) y las **guardas** `hasWit`/`hasWitF` de ADR‑020 para las tres opacas |
 
 ⛔⛔ **RECTIFICADO el 2026-09-21, y las dos afirmaciones de arriba eran FALSAS** (panel
 adversarial, ADR-075):
@@ -1424,9 +1429,8 @@ un tag a otro es **qué lema de la tabla se le pasa**, no la estructura de la ra
 Y eso es exactamente lo que compró la inversión de `StdArgs` (§1ter): el análisis por tag se hace
 **destruyendo**, no razonando.
 
-⬜ **Lo que queda para ensamblar `DEUDA_chainNeg` entero**: el `match` sobre `tag` que elige rama
-y pasa la entrada de la tabla. Las seis ramas ya no tienen incógnitas, y el split de 21 está
-medido en **4,5 s** (ADR‑078). -/
+🏁 **Y el `match` está en §6** (`cierra_por_tag`): veintiuna ramas de **una línea** cada una.
+El split de 21 estaba medido en 4,5 s (ADR‑078) y no dio sorpresas. -/
 
 /-! ### Las DICOTOMÍAS por FORMA — **los 21 tags sólo tienen SEIS formas de argumentos**
 
@@ -2057,6 +2061,1031 @@ theorem cierra_qconf (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : Li
     hcase
 
 
+
+/-! ### 🏁 LA FORMA `[F]`, COMPLETA — cuatro tags, y el dividendo de la aparición DOBLE
+
+⭐⭐ Los cuatro tags de forma `[F]` son 8 (`efq`), 14 (`p3`), 18 (`ind`) y 20 (`listInd`). Los dos
+últimos meten su único argumento **dentro de un `substfc`** —posición opaca, irrefutable por la
+sintaxis— y aun así salen por `NotFC`, porque el esquema lo usa **también** en el `forallc` final.
+
+🔑 *Un argumento que el esquema usa dos veces sólo necesita UNA aparición transparente.* Es el
+mismo dividendo que en `q3`/`qconf` (ADR‑095), y aquí no es un accidente de dos tags: es la mitad
+de la forma.
+
+⚠️ Los cuatro miden `lenc = 3`, así que la aridad va **fija** en el cierre genérico y no como
+parámetro: cotizarla como variable habría sido inventar generalidad que ningún tag usa. -/
+theorem cierra_F (l : List Term) (k tag : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (concl : Formula → Formula) (recon : Term → Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+    (hargs : StdArgs as)
+    (hdec : ∀ A : Formula, decodeRuleTag L f tag [formCode A] ≠ none)
+    (hlenc : ∀ t : Term, Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM tag)) ⇒
+              (Formula.eq (lenc t) (numeralM 3)))))
+    (hbadlen : ∀ args : List Term, args.length ≠ 1 → decodeRuleTag L f tag args = none)
+    (hbadty : ∀ u : Term, decodeRuleTag L f tag [termCode u] = none)
+    (hrecon : ∀ a : Term, tagConcl tag [a] = some (recon a))
+    (hnf : ∀ u : Term, NotFC (recon (termCode u)))
+    (htc : ∀ A : Formula, TagCode tag [formCode A] (concl A))
+    (hstep : ∀ (A : Formula) (r : Rule),
+        decodeRuleTag L f tag [formCode A] = some r → stepConcl L r = some (concl A))
+    (hcase : Or (decodeRuleTag L f tag (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f tag (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · rcases dico_F tag hdec hsl hnone with hlen | ⟨a, heq, u, rfl⟩
+    · refine rama_aridad l k tag 3 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact hlenc _
+    · refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      exact derives_lineWF_neg_of_tag tag (formCode f) [termCode u] _ (hrecon _)
+        (formCode_ne_notFC (hnf u) f)
+  · have hlen2 : (peelArgs as).length = 1 := by
+      by_cases h : (peelArgs as).length = 1
+      · exact h
+      · rw [hbadlen _ h] at hr; simp at hr
+    match hpa : peelArgs as, hsl with
+    | [a], hs =>
+        obtain ⟨ha, _⟩ := stdArgList_cons hs
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rw [hpa] at hr
+          have hsc := hstep A r hr
+          rw [hsc] at hne
+          refine rama_concl l k tag f (concl A) as hk hargs ?_ (fun h => hne (by rw [h]))
+          rw [hpa]; exact htc A
+        · rw [hpa, hbadty u] at hr; simp at hr
+    | [], _ => rw [hpa] at hlen2; simp at hlen2
+    | _ :: _ :: _, _ => rw [hpa] at hlen2; simp at hlen2
+
+theorem badlen_efq (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 1 → decodeRuleTag L f 8 args = none
+  | [], _ => rfl
+  | [_], h => absurd rfl h
+  | _ :: _ :: _, _ => rfl
+
+theorem cierra_efq (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 8) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 8 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 8 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_F l k 8 f as L (fun A => Formula.bottom ⇒ A) (fun a => implc botc a) hk hargs
+    (decodes_efq L f) (prf_lenc_efq) (badlen_efq L f)
+    (fun u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a => rfl) (fun u => NotFC.implcR _ (NotFC.tc u))
+    (fun A => tc_efq A)
+    (fun A r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_p3 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 1 → decodeRuleTag L f 14 args = none
+  | [], _ => rfl
+  | [_], h => absurd rfl h
+  | _ :: _ :: _, _ => rfl
+
+theorem cierra_p3 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 14) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 14 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 14 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_F l k 14 f as L (fun A => ((A ⇒ Formula.bottom) ⇒ Formula.bottom) ⇒ A)
+    (fun a => implc (implc (implc a botc) botc) a) hk hargs
+    (decodes_p3 L f) (prf_lenc_p3) (badlen_p3 L f)
+    (fun u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a => rfl) (fun u => NotFC.implcR _ (NotFC.tc u))
+    (fun A => tc_p3 A)
+    (fun A r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+/-- ⭐⭐ Tag 18: el argumento va **dentro de un `substfc`** en la primera aparición y **suelto**
+en la última. `NotFC` entra por la última. -/
+theorem badlen_ind (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 1 → decodeRuleTag L f 18 args = none
+  | [], _ => rfl
+  | [_], h => absurd rfl h
+  | _ :: _ :: _, _ => rfl
+
+theorem cierra_ind (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 18) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 18 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 18 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_F l k 18 f as L (fun A => ROBINSON_PlusPlus.Full.inductionFormula A)
+    (fun a => implc (substfc zero (termCodeM zero) a)
+      (implc (forallc (implc a (substfc zero (termCodeM (succ (.var 0)))
+        (liftfc (succ zero) a)))) (forallc a))) hk hargs
+    (decodes_ind L f) (prf_lenc_ind) (badlen_ind L f)
+    (fun u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a => rfl)
+    (fun u => NotFC.implcR _ (NotFC.implcR _ (NotFC.forallcI (NotFC.tc u))))
+    (fun A => tc_ind A)
+    (fun A r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_listInd (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 1 → decodeRuleTag L f 20 args = none
+  | [], _ => rfl
+  | [_], h => absurd rfl h
+  | _ :: _ :: _, _ => rfl
+
+theorem cierra_listInd (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 20) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 20 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 20 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_F l k 20 f as L (fun A => listInductionFormula A)
+    (fun a => implc (substfc zero (termCodeM nil) a)
+      (implc (forallc (forallc (implc (liftfc (succ zero) a)
+        (substfc zero (termCodeM (cons (.var 1) (.var 0)))
+          (liftfc (succ (succ zero)) (liftfc (succ zero) a)))))) (forallc a))) hk hargs
+    (decodes_listInd L f) (prf_lenc_listInd) (badlen_listInd L f)
+    (fun u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a => rfl)
+    (fun u => NotFC.implcR _ (NotFC.implcR _ (NotFC.forallcI (NotFC.tc u))))
+    (fun A => tc_listInd A)
+    (fun A r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+
+/-! ### 🏁 LA FORMA `[F,F,F]`, COMPLETA — los dos tags de tres premisas
+
+⭐ Tags 1 (`p2`) y 7 (`j3`). Las **tres** ranuras de cada uno son transparentes, así que los seis
+refutadores de (f) son derivaciones de `NotFC` de una línea. Ambos miden `lenc = 5`. -/
+theorem cierra_FFF (l : List Term) (k tag : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (concl : Formula → Formula → Formula → Formula) (recon : Term → Term → Term → Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+    (hargs : StdArgs as)
+    (hdec : ∀ A B C : Formula,
+      decodeRuleTag L f tag [formCode A, formCode B, formCode C] ≠ none)
+    (hlenc : ∀ t : Term, Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM tag)) ⇒
+              (Formula.eq (lenc t) (numeralM 5)))))
+    (hbadlen : ∀ args : List Term, args.length ≠ 3 → decodeRuleTag L f tag args = none)
+    (hbadty1 : ∀ (u b c : Term), decodeRuleTag L f tag [termCode u, b, c] = none)
+    (hbadty2 : ∀ (a u c : Term), decodeRuleTag L f tag [a, termCode u, c] = none)
+    (hbadty3 : ∀ (a b u : Term), decodeRuleTag L f tag [a, b, termCode u] = none)
+    (hrecon : ∀ a b c : Term, tagConcl tag [a, b, c] = some (recon a b c))
+    (hnf1 : ∀ u b c : Term, NotFC (recon (termCode u) b c))
+    (hnf2 : ∀ a u c : Term, NotFC (recon a (termCode u) c))
+    (hnf3 : ∀ a b u : Term, NotFC (recon a b (termCode u)))
+    (htc : ∀ A B C : Formula,
+      TagCode tag [formCode A, formCode B, formCode C] (concl A B C))
+    (hstep : ∀ (A B C : Formula) (r : Rule),
+        decodeRuleTag L f tag [formCode A, formCode B, formCode C] = some r →
+        stepConcl L r = some (concl A B C))
+    (hcase : Or (decodeRuleTag L f tag (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f tag (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · rcases dico_FFF tag hdec hsl hnone with hlen | ⟨a, b, c, heq, hbad⟩
+    · refine rama_aridad l k tag 5 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact hlenc _
+    · refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      rcases hbad with ⟨u, rfl⟩ | ⟨u, rfl⟩ | ⟨u, rfl⟩
+      · exact derives_lineWF_neg_of_tag tag (formCode f) [termCode u, b, c] _ (hrecon _ _ _)
+          (formCode_ne_notFC (hnf1 u b c) f)
+      · exact derives_lineWF_neg_of_tag tag (formCode f) [a, termCode u, c] _ (hrecon _ _ _)
+          (formCode_ne_notFC (hnf2 a u c) f)
+      · exact derives_lineWF_neg_of_tag tag (formCode f) [a, b, termCode u] _ (hrecon _ _ _)
+          (formCode_ne_notFC (hnf3 a b u) f)
+  · have hlen2 : (peelArgs as).length = 3 := by
+      by_cases h : (peelArgs as).length = 3
+      · exact h
+      · rw [hbadlen _ h] at hr; simp at hr
+    match hpa : peelArgs as, hsl with
+    | [a, b, c], hs =>
+        obtain ⟨ha, hs1⟩ := stdArgList_cons hs
+        obtain ⟨hb, hs2⟩ := stdArgList_cons hs1
+        obtain ⟨hc, _⟩ := stdArgList_cons hs2
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rcases hb with ⟨B, rfl⟩ | ⟨u, rfl⟩
+          · rcases hc with ⟨C, rfl⟩ | ⟨u, rfl⟩
+            · rw [hpa] at hr
+              have hsc := hstep A B C r hr
+              rw [hsc] at hne
+              refine rama_concl l k tag f (concl A B C) as hk hargs ?_
+                (fun h => hne (by rw [h]))
+              rw [hpa]; exact htc A B C
+            · rw [hpa, hbadty3 _ _ u] at hr; simp at hr
+          · rw [hpa, hbadty2 _ u _] at hr; simp at hr
+        · rw [hpa, hbadty1 u _ _] at hr; simp at hr
+    | [], _ => rw [hpa] at hlen2; simp at hlen2
+    | [_], _ => rw [hpa] at hlen2; simp at hlen2
+    | [_, _], _ => rw [hpa] at hlen2; simp at hlen2
+    | _ :: _ :: _ :: _ :: _, _ => rw [hpa] at hlen2; simp at hlen2
+
+theorem badlen_p2 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 3 → decodeRuleTag L f 1 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], _ => rfl
+  | [_, _, _], h => absurd rfl h
+  | _ :: _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_p2 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 1) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 1 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 1 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FFF l k 1 f as L (fun A B C => (A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C)))
+    (fun a b c => implc (implc a (implc b c)) (implc (implc a b) (implc a c))) hk hargs
+    (decodes_p2 L f) (prf_lenc_p2) (badlen_p2 L f)
+    (fun u b c => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u c => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b c => rfl)
+    (fun u b c => NotFC.implcL _ (NotFC.implcL _ (NotFC.tc u)))
+    (fun a u c => NotFC.implcL _ (NotFC.implcR _ (NotFC.implcL _ (NotFC.tc u))))
+    (fun a b u => NotFC.implcL _ (NotFC.implcR _ (NotFC.implcR _ (NotFC.tc u))))
+    (fun A B C => tc_p2 A B C)
+    (fun A B C r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_j3 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 3 → decodeRuleTag L f 7 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], _ => rfl
+  | [_, _, _], h => absurd rfl h
+  | _ :: _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_j3 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 7) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 7 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 7 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FFF l k 7 f as L (fun A B C => Formula.or A B ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C)))
+    (fun a b c => implc (orc a b) (implc (implc a c) (implc (implc b c) c))) hk hargs
+    (decodes_j3 L f) (prf_lenc_j3) (badlen_j3 L f)
+    (fun u b c => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a u c => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b u => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a b c => rfl)
+    (fun u b c => NotFC.implcL _ (NotFC.orcL _ (NotFC.tc u)))
+    (fun a u c => NotFC.implcL _ (NotFC.orcR _ (NotFC.tc u)))
+    (fun a b u => NotFC.implcR _ (NotFC.implcL _ (NotFC.implcR _ (NotFC.tc u))))
+    (fun A B C => tc_j3 A B C)
+    (fun A B C r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+
+/-! ### 🏁 LA FORMA `[T]` — un solo tag, y la causa (f) al REVÉS
+
+⭐⭐ El tag 12 (`eqrefl`) es el único con forma `[T]`, así que **no se factoriza**: un cierre
+genérico con una sola instancia no es una abstracción, es una indirección.
+
+⭐ Lo interesante es otra cosa: aquí (f) va **en la dirección contraria** —un código de FÓRMULA
+donde el tag espera uno de TÉRMINO—, y por eso hizo falta `NotTC` (ADR‑096), la mitad simétrica
+de `NotFC`. `eqc` es la única constructora transparente que abre un hueco de término. -/
+theorem badlen_eqrefl (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 1 → decodeRuleTag L f 12 args = none
+  | [], _ => rfl
+  | [_], h => absurd rfl h
+  | _ :: _ :: _, _ => rfl
+
+theorem cierra_eqrefl (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 12) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 12 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 12 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · rcases dico_T 12 (decodes_eqrefl L f) hsl hnone with hlen | ⟨a, heq, A, rfl⟩
+    · refine rama_aridad l k 12 3 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact prf_lenc_eqrefl _
+    · refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      exact derives_lineWF_neg_of_tag 12 (formCode f) [formCode A] _ rfl
+        (formCode_ne_notFC (NotFC.eqcL _ (NotTC.fc A)) f)
+  · have hlen2 : (peelArgs as).length = 1 := by
+      by_cases h : (peelArgs as).length = 1
+      · exact h
+      · rw [badlen_eqrefl L f _ h] at hr; simp at hr
+    match hpa : peelArgs as, hsl with
+    | [a], hs =>
+        obtain ⟨ha, _⟩ := stdArgList_cons hs
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rw [hpa] at hr; simp [decodeRuleTag, decodeTerm_formCode] at hr
+        · rw [hpa] at hr
+          simp only [decodeRuleTag, decodeTerm_termCode, Option.map,
+            Option.some.injEq] at hr
+          subst hr
+          simp only [stepConcl, ne_eq, Option.some.injEq] at hne
+          refine rama_concl l k 12 f (Formula.eq u u) as hk hargs ?_ (fun h => hne (by rw [h]))
+          rw [hpa]; exact tc_eqrefl u
+    | [], _ => rw [hpa] at hlen2; simp at hlen2
+    | _ :: _ :: _, _ => rw [hpa] at hlen2; simp at hlen2
+
+
+/-! ### ⛔→🏁 LAS RANURAS OPACAS — las cierra la GUARDA, no la sintaxis
+
+⛔ ADR‑095 midió el límite de `NotFC`: tres ranuras caen **dentro de un `substfc`** —el argumento
+de TÉRMINO de los tags 9 (`q1`) y 10 (`q2`), y el de FÓRMULA del 13 (`leibniz`)— y ésas no se
+refutan por la sintaxis, porque `substfc` es un símbolo OBJETO que no reduce.
+
+⭐⭐ Lo que las cierra estaba escrito desde ADR‑020 y **puesto por otra razón**: `lineWF` de los
+siete esquemas de sustitución exige `hasWit`/`hasWitF` de la ranura que va bajo `substfc`.
+⇒ **la ranura opaca es exactamente la que lleva guarda**, y la guarda sí es refutable.
+
+🔑 *La ranura que no se puede refutar por la forma es, por construcción, la que el esquema tuvo
+que guardar.* No es coincidencia: `substfc` necesita buena formación para evaluarse, y la opacidad
+y la guarda tienen la MISMA causa. Van **trece** de «antes de construir, buscar».
+
+⚠️ Y el refutador de la guarda sale **barato**: `isTermCodeE1` es una disyunción de dos formas con
+tags de cabeza **0 y 1**, y `formCode B` tiene tag **2…9** ⇒ dos `formCode_ne_cons_of_tag`. -/
+
+/-- Congruencia de `hasWit` a nivel `⊢`. Gemelo de `derives_lineWF_congr` (§0). -/
+theorem derives_hasWit_congr {Γ : List Formula} {t₁ t₂ : Term}
+    (h : Γ ⊢ (t₁ =eq t₂)) (hp : Γ ⊢ hasWit t₁) : Γ ⊢ hasWit t₂ := by
+  let g : Formula := hasWit (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s g = hasWit s := by
+    intro s; simp only [g, substF_hasWit, substTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ g h ((hS t₁) ▸ hp)
+
+/-- ⭐⭐⭐ **EL REFUTADOR DE LA GUARDA DE TÉRMINO**: un código de FÓRMULA no tiene testigo de
+código de término. `wfAll1 w ∧ (⌜B⌝ ∈ w)` fuerza `isTermCodeE1 w ⌜B⌝`, que son dos formas de
+cabeza 0 y 1; `⌜B⌝` tiene cabeza 2…9. -/
+theorem neg_hasWit_formCode (B : Formula) : axioms ⊢ neg (hasWit (formCode B)) := by
+  refine FOL.MetaRules.raa (fun hw => ?_)
+  have hw' : axioms ⊢ Formula.ex (isTC1 (.var 0) (liftTerm 0 (formCode B))) := hw
+  refine FOL.MetaRules.ex_elim hw' (fun w hsub => ?_)
+  have heq : substFormula 0 w (isTC1 (.var 0) (liftTerm 0 (formCode B)))
+      = isTC1 w (formCode B) := by
+    simp only [substF_isTC1, substTerm, if_true, FOL.substTerm_liftTerm]
+  rw [heq] at hsub
+  have hsub' : axioms ⊢ Formula.and (wfAll1 w) (In (formCode B) w) := hsub
+  have hit : axioms ⊢ isTermCodeE1 w (formCode B) :=
+    FOL.MetaRules.mp
+      (FOL.MetaRules.mp (prf_to_derives (prf_isTermCodeE1_of_In w (formCode B)))
+        (FOL.MetaRules.and_elim_right hsub'))
+      (FOL.MetaRules.and_elim_left hsub')
+  have hit' : axioms ⊢ Formula.or (shapeUn (formCode B) 0)
+      (Formula.and (shapeBin (formCode B) 1)
+        (argsIn w (nthc (formCode B) (numeralM 2)))) := hit
+  refine FOL.MetaRules.or_elim hit' (fun h0 => ?_) (fun h1 => ?_)
+  · exact FOL.MetaRules.mp
+      (formCode_ne_cons_of_tag B (n := 0)
+        (cons (nthc (formCode B) (numeralM 1)) nil) (by cases B <;> simp [formTag])) h0
+  · exact FOL.MetaRules.mp
+      (formCode_ne_cons_of_tag B (n := 1)
+        (cons (nthc (formCode B) (numeralM 1)) (cons (nthc (formCode B) (numeralM 2)) nil))
+        (by cases B <;> simp [formTag]))
+      (FOL.MetaRules.and_elim_left h1)
+
+/-- (f) en la ranura de TÉRMINO del tag 9: la proyección de la guarda + el refutador. -/
+theorem derives_lineWF_neg_q1_badterm (f : Formula) (a : Term) (B : Formula) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM 9) (objList [a, formCode B])))) := by
+  refine FOL.MetaRules.raa (fun hw => ?_)
+  have hg : axioms ⊢ hasWit (nthc (cons (formCode f) (cons (numeralM 9)
+      (cons a (cons (formCode B) nil)))) (numeralM 3)) :=
+    FOL.MetaRules.mp (prf_to_derives (prf_lineWF_q1_hasWit (formCode f) a (formCode B))) hw
+  have h_t : axioms ⊢ (nthc (objList [formCode f, numeralM 9, a, formCode B]) (numeralM 3)
+      =eq formCode B) :=
+    prf_to_derives (SinWTs.prf_nthc_objList [formCode f, numeralM 9, a, formCode B] 3 _ rfl)
+  exact FOL.MetaRules.mp (neg_hasWit_formCode B) (derives_hasWit_congr h_t hg)
+
+/-- (f) en la ranura de TÉRMINO del tag 10. Literalmente la misma, cambiando 9 por 10. -/
+theorem derives_lineWF_neg_q2_badterm (f : Formula) (a : Term) (B : Formula) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM 10) (objList [a, formCode B])))) := by
+  refine FOL.MetaRules.raa (fun hw => ?_)
+  have hg : axioms ⊢ hasWit (nthc (cons (formCode f) (cons (numeralM 10)
+      (cons a (cons (formCode B) nil)))) (numeralM 3)) :=
+    FOL.MetaRules.mp (prf_to_derives (prf_lineWF_q2_hasWit (formCode f) a (formCode B))) hw
+  have h_t : axioms ⊢ (nthc (objList [formCode f, numeralM 10, a, formCode B]) (numeralM 3)
+      =eq formCode B) :=
+    prf_to_derives (SinWTs.prf_nthc_objList [formCode f, numeralM 10, a, formCode B] 3 _ rfl)
+  exact FOL.MetaRules.mp (neg_hasWit_formCode B) (derives_hasWit_congr h_t hg)
+
+
+/-! ### 🏁 LA FORMA `[F,T]`, COMPLETA — los dos tags de cuantificador con testigo
+
+⭐ Tags 9 (`q1`) y 10 (`q2`). La ranura 0 (fórmula) es transparente ⇒ `NotFC`; la ranura 1
+(término) es opaca ⇒ la guarda. **Las dos vías conviven en el mismo cierre**, una por disyunto de
+`dico_FT`. -/
+theorem cierra_FT (l : List Term) (k tag : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (concl : Formula → Term → Formula) (recon : Term → Term → Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+    (hargs : StdArgs as)
+    (hdec : ∀ (A : Formula) (t : Term),
+      decodeRuleTag L f tag [formCode A, termCode t] ≠ none)
+    (hlenc : ∀ t : Term, Prf (lineWF t ⇒ ((Formula.eq (nthc t (succ zero)) (numeralM tag)) ⇒
+              (Formula.eq (lenc t) (numeralM 4)))))
+    (hbadlen : ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f tag args = none)
+    (hbadty : ∀ (u b : Term), decodeRuleTag L f tag [termCode u, b] = none)
+    (hbadty2 : ∀ (a : Term) (B : Formula), decodeRuleTag L f tag [a, formCode B] = none)
+    (hrecon : ∀ a b : Term, tagConcl tag [a, b] = some (recon a b))
+    (hnf1 : ∀ u b : Term, NotFC (recon (termCode u) b))
+    (hguard : ∀ (a : Term) (B : Formula),
+      axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM tag) (objList [a, formCode B])))))
+    (htc : ∀ (A : Formula) (t : Term), TagCode tag [formCode A, termCode t] (concl A t))
+    (hstep : ∀ (A : Formula) (t : Term) (r : Rule),
+        decodeRuleTag L f tag [formCode A, termCode t] = some r →
+        stepConcl L r = some (concl A t))
+    (hcase : Or (decodeRuleTag L f tag (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f tag (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · rcases dico_FT tag hdec hsl hnone with hlen | ⟨a, b, heq, hbad⟩
+    · refine rama_aridad l k tag 4 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact hlenc _
+    · refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      rcases hbad with ⟨u, rfl⟩ | ⟨B, rfl⟩
+      · exact derives_lineWF_neg_of_tag tag (formCode f) [termCode u, b] _ (hrecon _ _)
+          (formCode_ne_notFC (hnf1 u b) f)
+      · exact hguard a B
+  · have hlen2 : (peelArgs as).length = 2 := by
+      by_cases h : (peelArgs as).length = 2
+      · exact h
+      · rw [hbadlen _ h] at hr; simp at hr
+    match hpa : peelArgs as, hsl with
+    | [a, b], hs =>
+        obtain ⟨ha, hs'⟩ := stdArgList_cons hs
+        obtain ⟨hb, _⟩ := stdArgList_cons hs'
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rcases hb with ⟨B, rfl⟩ | ⟨t, rfl⟩
+          · rw [hpa, hbadty2 (formCode A) B] at hr; simp at hr
+          · rw [hpa] at hr
+            have hsc := hstep A t r hr
+            rw [hsc] at hne
+            refine rama_concl l k tag f (concl A t) as hk hargs ?_ (fun h => hne (by rw [h]))
+            rw [hpa]; exact htc A t
+        · rw [hpa, hbadty u _] at hr; simp at hr
+    | [], _ => rw [hpa] at hlen2; simp at hlen2
+    | [_], _ => rw [hpa] at hlen2; simp at hlen2
+    | _ :: _ :: _ :: _, _ => rw [hpa] at hlen2; simp at hlen2
+
+theorem badlen_q1 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 9 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_q1 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 9) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 9 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 9 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FT l k 9 f as L (fun A t => Formula.forall A ⇒ substFormula 0 t A)
+    (fun a b => implc (forallc a) (substfc zero b a)) hk hargs
+    (decodes_q1 L f) (prf_lenc_q1) (badlen_q1 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a B => by simp [decodeRuleTag, decodeTerm_formCode])
+    (fun a b => rfl) (fun u b => NotFC.implcL _ (NotFC.forallcI (NotFC.tc u)))
+    (derives_lineWF_neg_q1_badterm f)
+    (fun A t => tc_q1 A t)
+    (fun A t r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+theorem badlen_q2 (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 2 → decodeRuleTag L f 10 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], h => absurd rfl h
+  | _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_q2 (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 10) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 10 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 10 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  cierra_FT l k 10 f as L (fun A t => substFormula 0 t A ⇒ Formula.ex A)
+    (fun a b => implc (substfc zero b a) (exc a)) hk hargs
+    (decodes_q2 L f) (prf_lenc_q2) (badlen_q2 L f)
+    (fun u b => by simp [decodeRuleTag, decodeForm_termCode])
+    (fun a B => by simp [decodeRuleTag, decodeTerm_formCode])
+    (fun a b => rfl) (fun u b => NotFC.implcR _ (NotFC.excI (NotFC.tc u)))
+    (derives_lineWF_neg_q2_badterm f)
+    (fun A t => tc_q2 A t)
+    (fun A t r hr => by
+      simp only [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode, Option.bind, Option.map,
+        Option.some.injEq] at hr
+      subst hr; rfl)
+    hcase
+
+
+/-! ### 🏁 LA FORMA `[F,T,T]` — el tag 13, y las DOS vías en un mismo cierre
+
+⭐ `leibniz` (13) es el único con dos testigos de término, y reparte sus tres ranuras entre las
+dos vías: la de FÓRMULA es **opaca** (sólo aparece bajo `substfc`) ⇒ guarda `hasWitF`; las dos de
+TÉRMINO aparecen en `eqc t₁ t₂`, que es **transparente** ⇒ `NotFC`, por las constructoras `eqcL`/
+`eqcR` que ADR‑096 añadió.
+
+🔑 *El mismo tag que obligó a inventar `NotTC` es el que demuestra por qué hacía falta: sin `eqc`,
+las dos ranuras de término del 13 habrían pedido guarda, y la guarda ahí NO existe.* -/
+
+/-- Congruencia de `hasWitF` a nivel `⊢`. -/
+theorem derives_hasWitF_congr {Γ : List Formula} {t₁ t₂ : Term}
+    (h : Γ ⊢ (t₁ =eq t₂)) (hp : Γ ⊢ hasWitF t₁) : Γ ⊢ hasWitF t₂ := by
+  let g : Formula := hasWitF (.var 0)
+  have hS : ∀ s : Term, substFormula 0 s g = hasWitF s := by
+    intro s; simp only [g, substF_hasWitF, substTerm, if_true]
+  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ g h ((hS t₁) ▸ hp)
+
+/-- ⭐⭐⭐ **EL REFUTADOR DE LA GUARDA DE FÓRMULA**, gemelo de `neg_hasWit_formCode`: un código de
+TÉRMINO no tiene testigo de código de fórmula. `isFormCodeE2` son **ocho** formas con cabezas
+2…9, y `termCode u` tiene cabeza 0 o 1. -/
+theorem neg_hasWitF_termCode (u : Term) : axioms ⊢ neg (hasWitF (termCode u)) := by
+  refine FOL.MetaRules.raa (fun hw => ?_)
+  have hlift : liftTerm 0 (termCode u) = termCode u := by
+    rw [← ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq]; exact liftTerm_termCodeM 0 u
+  have hsubst : ∀ (v : Nat) (s : Term), substTerm v s (termCode u) = termCode u := by
+    intro v s
+    rw [← ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq]; exact substTerm_termCodeM v s u
+  have hw' : axioms ⊢ Formula.ex (Formula.ex (isFC1 (.var 1) (.var 0) (termCode u))) := by
+    simpa only [hasWitF, hlift] using hw
+  refine FOL.MetaRules.ex_elim hw' (fun wF h1 => ?_)
+  have e1 : substFormula 0 wF (Formula.ex (isFC1 (.var 1) (.var 0) (termCode u)))
+      = Formula.ex (isFC1 (liftTerm 0 wF) (.var 0) (termCode u)) := by
+    simp only [substFormula, substF_isFC1, substTerm, hsubst, Nat.zero_add,
+      Nat.reduceGT, Nat.reduceSub, Nat.reduceEqDiff, reduceIte, if_true]
+  rw [e1] at h1
+  refine FOL.MetaRules.ex_elim h1 (fun wT h2 => ?_)
+  have e2 : substFormula 0 wT (isFC1 (liftTerm 0 wF) (.var 0) (termCode u))
+      = isFC1 wF wT (termCode u) := by
+    simp only [substF_isFC1, substTerm, hsubst, FOL.substTerm_liftTerm, if_true]
+  rw [e2] at h2
+  have h2' : axioms ⊢ Formula.and (Formula.and (wfAll1 wT) (wfAllF wF wT))
+      (In (termCode u) wF) := h2
+  have hfc : axioms ⊢ isFormCodeE2 wF wT (termCode u) :=
+    FOL.MetaRules.mp
+      (FOL.MetaRules.mp (prf_to_derives (ENS.prf_isFormCodeE2_of_In wF wT (termCode u)))
+        (FOL.MetaRules.and_elim_right h2'))
+      (FOL.MetaRules.and_elim_right (FOL.MetaRules.and_elim_left h2'))
+  have hfc' : axioms ⊢ Formula.or (clBot (termCode u))
+      (Formula.or (clAtom wT (termCode u))
+      (Formula.or (clEq wT (termCode u))
+      (Formula.or (clBin wF (termCode u) 5)
+      (Formula.or (clUn wF (termCode u) 6)
+      (Formula.or (clBin wF (termCode u) 7)
+      (Formula.or (clBin wF (termCode u) 8) (clUn wF (termCode u) 9))))))) := hfc
+  refine FOL.MetaRules.or_elim hfc' (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 2) nil (by cases u <;> simp [termTag])) h
+  refine FOL.MetaRules.or_elim h (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 3) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+  refine FOL.MetaRules.or_elim h (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 4) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+  refine FOL.MetaRules.or_elim h (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 5) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+  refine FOL.MetaRules.or_elim h (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 6) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+  refine FOL.MetaRules.or_elim h (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 7) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+  refine FOL.MetaRules.or_elim h (fun h => ?_) (fun h => ?_)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 8) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+  · exact FOL.MetaRules.mp
+      (termCode_ne_cons_of_tag u (n := 9) _ (by cases u <;> simp [termTag]))
+      (FOL.MetaRules.and_elim_left h)
+
+/-- (f) en la ranura de FÓRMULA del tag 13: la proyección de la guarda + el refutador. -/
+theorem derives_lineWF_neg_leibniz_badform (f : Formula) (u b c : Term) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM 13)
+      (objList [termCode u, b, c])))) := by
+  refine FOL.MetaRules.raa (fun hw => ?_)
+  have hg : axioms ⊢ hasWitF (nthc (cons (formCode f) (cons (numeralM 13)
+      (cons (termCode u) (cons b (cons c nil))))) (numeralM 2)) :=
+    FOL.MetaRules.mp
+      (prf_to_derives (prf_lineWF_leibniz_hasWitF (formCode f) (termCode u) b c)) hw
+  have h_A : axioms ⊢ (nthc (objList [formCode f, numeralM 13, termCode u, b, c]) (numeralM 2)
+      =eq termCode u) :=
+    prf_to_derives
+      (SinWTs.prf_nthc_objList [formCode f, numeralM 13, termCode u, b, c] 2 _ rfl)
+  exact FOL.MetaRules.mp (neg_hasWitF_termCode u) (derives_hasWitF_congr h_A hg)
+
+theorem badlen_leibniz (L : List Formula) (f : Formula) :
+    ∀ args : List Term, args.length ≠ 3 → decodeRuleTag L f 13 args = none
+  | [], _ => rfl
+  | [_], _ => rfl
+  | [_, _], _ => rfl
+  | [_, _, _], h => absurd rfl h
+  | _ :: _ :: _ :: _ :: _, _ => rfl
+
+theorem cierra_leibniz (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 13) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 13 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 13 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · rcases dico_FTT 13 (decodes_leibniz L f) hsl hnone with hlen | ⟨a, b, c, heq, hbad⟩
+    · refine rama_aridad l k 13 5 f (peelArgs as) (by rw [← hobj]; exact hk) ?_ (by omega)
+      exact prf_lenc_leibniz _
+    · refine derives_chainOk_neg_of_line l k _ hk ?_
+      rw [hobj, heq]
+      rcases hbad with ⟨u, rfl⟩ | ⟨B, rfl⟩ | ⟨B, rfl⟩
+      · exact derives_lineWF_neg_leibniz_badform f u b c
+      · exact derives_lineWF_neg_of_tag 13 (formCode f) [a, formCode B, c] _ rfl
+          (formCode_ne_notFC (NotFC.implcL _ (NotFC.eqcL _ (NotTC.fc B))) f)
+      · exact derives_lineWF_neg_of_tag 13 (formCode f) [a, b, formCode B] _ rfl
+          (formCode_ne_notFC (NotFC.implcL _ (NotFC.eqcR _ (NotTC.fc B))) f)
+  · have hlen2 : (peelArgs as).length = 3 := by
+      by_cases h : (peelArgs as).length = 3
+      · exact h
+      · rw [badlen_leibniz L f _ h] at hr; simp at hr
+    match hpa : peelArgs as, hsl with
+    | [a, b, c], hs =>
+        obtain ⟨ha, hs1⟩ := stdArgList_cons hs
+        obtain ⟨hb, hs2⟩ := stdArgList_cons hs1
+        obtain ⟨hc, _⟩ := stdArgList_cons hs2
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rcases hb with ⟨B, rfl⟩ | ⟨t1, rfl⟩
+          · rw [hpa] at hr; simp [decodeRuleTag, decodeForm_formCode, decodeTerm_formCode] at hr
+          · rcases hc with ⟨B, rfl⟩ | ⟨t2, rfl⟩
+            · rw [hpa] at hr
+              simp [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode,
+                decodeTerm_formCode] at hr
+            · rw [hpa] at hr
+              simp only [decodeRuleTag, decodeForm_formCode, decodeTerm_termCode, Option.bind,
+                Option.map, Option.some.injEq] at hr
+              subst hr
+              simp only [stepConcl, ne_eq, Option.some.injEq] at hne
+              refine rama_concl l k 13 f
+                (Formula.eq t1 t2 ⇒ (substFormula 0 t1 A ⇒ substFormula 0 t2 A)) as hk hargs ?_
+                (fun h => hne (by rw [h]))
+              rw [hpa]; exact tc_leibniz A t1 t2
+        · rw [hpa] at hr; simp [decodeRuleTag, decodeForm_termCode] at hr
+    | [], _ => rw [hpa] at hlen2; simp at hlen2
+    | [_], _ => rw [hpa] at hlen2; simp at hlen2
+    | [_, _], _ => rw [hpa] at hlen2; simp at hlen2
+    | _ :: _ :: _ :: _ :: _, _ => rw [hpa] at hlen2; simp at hlen2
+
+
+/-! ## §6 · 🏁🏁🏁 EL ENSAMBLADO — `DEUDA_chainNeg`, SALDADA
+
+⭐⭐ Los dieciocho tags estructurales están cerrados (§5) y los tres de contexto tienen sus rutas
+(d)/(e) desde ADR‑076/077. Falta **enhebrarlos**: un `match` sobre `tag` que elige cierre.
+
+⚠️ Pero los tres de contexto **no tenían cierre por tag**, sólo las piezas: `rama_thy` pide la
+línea con `nil` explícito, y las tres instancias de (e) piden la premisa **ya identificada**. Los
+tres `cierra_*` de aquí abajo son lo que faltaba, y cada uno reparte su propio `hcase`.
+
+⭐ Y aparece un dividendo que no estaba previsto: **`mp` y `gen` con un argumento de tipo
+equivocado se refutan por `NotFC`**, igual que los estructurales — sólo que por la vía de las
+PREMISAS, no por `lineWF`. `ax_lineWF_mp` no dice nada de la forma del argumento, así que la
+línea es bien formada; lo que falla es que su premisa `↑u ⇒ ⌜f⌝` **no es el código de ninguna
+fórmula**, luego ninguna línea anterior la concluye. 🔑 *El mismo refutador sirve a dos vías
+distintas porque lo que refuta es un HECHO sobre códigos, no sobre `lineWF`.* -/
+
+/-- ⭐ Generalización de `derives_chainOk_neg_of_prem_code`: la premisa mala **no tiene por qué
+ser un `formCode`**. Lo único que hace falta es que ninguna línea anterior la concluya. -/
+theorem derives_chainOk_neg_of_prem_at
+    (l : List Term) (k m n : Nat) (x y : Term)
+    (hk : l[k]? = some x) (hmn : m < n)
+    (hy : axioms ⊢ neg (boundedCarcLt y (objList l) (numeralM k)))
+    (hlen : Prf (lenc (premsOf x) =eq numeralM n))
+    (hnth : Prf (nthc (premsOf x) (numeralM m) =eq y)) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hklt : k < l.length := by
+    rcases List.getElem?_eq_some_iff.mp hk with ⟨hb, _⟩; exact hb
+  have hlt0 : axioms ⊢ lt (numeralM m) (numeralM n) := by
+    have := gnum_lt (a := m) (b := n) hmn
+    simpa only [numeralM_eq] using this
+  have hlt : axioms ⊢ lt (numeralM m) (lenc (premsOf x)) :=
+    derives_lt_congr_right (FOL.derive_eq_symm (prf_to_derives hlen)) hlt0
+  refine derives_chainOk_neg_of_prem_line l k m x hk hlt ?_
+  exact derives_not_boundedCarcLt_congr _ y _ _ (prf_to_derives hnth) hy
+
+/-- ⭐⭐ **Ninguna línea anterior concluye algo que no sea un código de fórmula.** Gemelo de
+`derives_not_boundedCarcLt_of_not_mem`, con `NotFC` en lugar de `φ ∉ L`. -/
+theorem derives_not_boundedCarcLt_of_notFC
+    (l : List Term) (k : Nat) (hk : Nat.le k l.length)
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L)
+    (y : Term) (hy : NotFC y) :
+    axioms ⊢ neg (boundedCarcLt y (objList l) (numeralM k)) := by
+  refine derives_not_boundedCarcLt y k l hk ?_
+  intro j x hj hx
+  have hxt : (l.take k)[j]? = some x := by
+    rw [List.getElem?_take, if_pos hj]; exact hx
+  obtain ⟨g, _, hcarc⟩ :=
+    decodeChainAux_carc_mem (l.take k) acc rs L hd hc x (List.mem_of_getElem? hxt)
+  refine FOL.MetaRules.raa (fun heq => ?_)
+  have h1 : axioms ⊢ (formCodeM g =eq y) :=
+    FOL.derive_eq_trans (FOL.derive_eq_symm (prf_to_derives hcarc)) heq
+  rw [ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq] at h1
+  exact FOL.MetaRules.mp (formCode_ne_notFC hy g) h1
+
+/-- **(f) para `mp`**: el argumento es un código de TÉRMINO ⇒ la premisa MAYOR no es código de
+fórmula ⇒ ninguna línea anterior la concluye. -/
+theorem derives_chainOk_neg_mp_badtype (l : List Term) (k : Nat) (f : Formula) (u : Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 16) (cons (termCode u) nil))))
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hklt : k < l.length := by
+    rcases List.getElem?_eq_some_iff.mp hk with ⟨hb, _⟩; exact hb
+  have hp := prf_premsOf_mp_line (formCode f) (termCode u)
+  refine derives_chainOk_neg_of_prem_at l k 0 2 _ (implc (termCode u) (formCode f)) hk (by decide)
+    (derives_not_boundedCarcLt_of_notFC l k (Nat.le_of_lt hklt) acc rs L hd hc _
+      (NotFC.implcL _ (NotFC.tc u))) ?_ ?_
+  · exact prf_eq_trans (SinWTs.prf_congr_lenc hp) (prf_lenc_two _ _)
+  · exact prf_eq_trans (SinWTs.prf_congr_nthc_lst _ hp) (prf_nthc_zero _ _)
+
+/-- **(f) para `gen`**: la única premisa es el propio argumento. -/
+theorem derives_chainOk_neg_gen_badtype (l : List Term) (k : Nat) (f : Formula) (u : Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 17) (cons (termCode u) nil))))
+    (acc : List Formula) (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux acc (objList (l.take k)) = some rs) (hc : checkAux rs acc = some L) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hklt : k < l.length := by
+    rcases List.getElem?_eq_some_iff.mp hk with ⟨hb, _⟩; exact hb
+  have hp := prf_premsOf_gen_line (formCode f) (termCode u)
+  refine derives_chainOk_neg_of_prem_at l k 0 1 _ (termCode u) hk (by decide)
+    (derives_not_boundedCarcLt_of_notFC l k (Nat.le_of_lt hklt) acc rs L hd hc _
+      (NotFC.tc u)) ?_ ?_
+  · exact prf_eq_trans (SinWTs.prf_congr_lenc hp) (prf_lenc_one _)
+  · exact prf_eq_trans (SinWTs.prf_congr_nthc_lst _ hp) (prf_nthc_zero _ _)
+
+
+/-! ### Los TRES tags de contexto, cerrados por tag -/
+
+/-- **Tag 15 (`thy`)**: o la aridad falla, o `f ∉ axioms`. El `Or.inr` es **imposible**: si
+`findIdx` devuelve índice, `findIdx_sound` dice que ahí está `f`. -/
+theorem cierra_thy (l : List Term) (k : Nat) (f : Formula) (as : Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 15) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 15 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 15 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · match hpa : peelArgs as with
+    | [] =>
+        have hnil : as = nil := by rw [hobj, hpa]; rfl
+        rw [hnil] at hk
+        exact rama_thy l k f (peelArgs as) L hk hnone
+    | b :: bs =>
+        refine rama_aridad l k 15 2 f (peelArgs as) (by rw [← hobj]; exact hk)
+          (prf_lenc_thy _) ?_
+        rw [hpa]; simp
+  · exfalso
+    have hr' : (findIdx f axioms).map Rule.thy = some r := hr
+    rcases hfi : findIdx f axioms with _ | i
+    · rw [hfi] at hr'; simp at hr'
+    · rw [hfi] at hr'
+      have hr2 : some (Rule.thy i) = some r := hr'
+      injection hr2 with hr3
+      subst hr3
+      exact hne (findIdx_sound f axioms i hfi)
+
+/-- **Tag 16 (`mp`)**: aridad, tipo (por las PREMISAS) o premisa ausente. El `Or.inr` es
+**imposible**: los dos `findIdx` que devolvieron índice apuntan a `fj ⇒ f` y a `fj`. -/
+theorem cierra_mp (l : List Term) (k : Nat) (f : Formula) (as : Term)
+    (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux [] (objList (l.take k)) = some rs) (hc : checkAux rs [] = some L)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 16) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 16 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 16 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  have hk' : l[k]? = some (cons (formCode f) (cons (numeralM 16) (objList (peelArgs as)))) := by
+    rw [← hobj]; exact hk
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · match hpa : peelArgs as, hsl with
+    | [a], hs =>
+        rw [hpa] at hk'
+        obtain ⟨ha, _⟩ := stdArgList_cons hs
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rw [hpa] at hnone
+          have hnone' : (findIdx A L).bind
+              (fun j => (findIdx (Formula.impl A f) L).map fun i => Rule.mp i j) = none := by
+            simpa only [decodeRuleTag, decodeForm_formCode, Option.bind] using hnone
+          rcases hfj : findIdx A L with _ | j
+          · exact derives_chainOk_neg_mp_minor l k f A hk' [] rs L hd hc
+              (not_mem_of_findIdx_none hfj)
+          · rw [hfj] at hnone'
+            have hnone2 : (findIdx (Formula.impl A f) L).map (fun i => Rule.mp i j) = none :=
+              hnone'
+            rcases hfi : findIdx (Formula.impl A f) L with _ | i
+            · exact derives_chainOk_neg_mp_major l k f A hk' [] rs L hd hc
+                (not_mem_of_findIdx_none hfi)
+            · rw [hfi] at hnone2; simp at hnone2
+        · exact derives_chainOk_neg_mp_badtype l k f u hk' [] rs L hd hc
+    | [], _ =>
+        refine rama_aridad l k 16 3 f (peelArgs as) (by rw [← hobj]; exact hk)
+          (prf_lenc_mp _) ?_
+        rw [hpa]; simp
+    | b :: c :: cs, _ =>
+        refine rama_aridad l k 16 3 f (peelArgs as) (by rw [← hobj]; exact hk)
+          (prf_lenc_mp _) ?_
+        rw [hpa]; simp
+  · exfalso
+    match hpa : peelArgs as, hsl with
+    | [a], hs =>
+        obtain ⟨ha, _⟩ := stdArgList_cons hs
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rw [hpa] at hr
+          have hr' : (findIdx A L).bind
+              (fun j => (findIdx (Formula.impl A f) L).map fun i => Rule.mp i j) = some r := by
+            simpa only [decodeRuleTag, decodeForm_formCode, Option.bind] using hr
+          rcases hfj : findIdx A L with _ | j
+          · rw [hfj] at hr'; simp at hr'
+          · rw [hfj] at hr'
+            have hr2 : (findIdx (Formula.impl A f) L).map (fun i => Rule.mp i j) = some r := hr'
+            rcases hfi : findIdx (Formula.impl A f) L with _ | i
+            · rw [hfi] at hr2; simp at hr2
+            · rw [hfi] at hr2
+              have hr3 : some (Rule.mp i j) = some r := hr2
+              injection hr3 with hr4
+              subst hr4
+              refine hne ?_
+              have hi := findIdx_sound (Formula.impl A f) L i hfi
+              have hj := findIdx_sound A L j hfj
+              simp [stepConcl, hi, hj, mpConcl]
+        · rw [hpa] at hr; simp [decodeRuleTag, decodeForm_termCode] at hr
+    | [], _ => rw [hpa] at hr; simp [decodeRuleTag] at hr
+    | _ :: _ :: _, _ => rw [hpa] at hr; simp [decodeRuleTag] at hr
+
+/-- **Tag 17 (`gen`)**: aridad, tipo, premisa ausente — y, a diferencia de `thy` y `mp`, el
+`Or.inr` **sí** es posible: es (c′), porque `∀g` no tiene por qué ser `f`. -/
+theorem cierra_gen (l : List Term) (k : Nat) (f : Formula) (as : Term)
+    (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux [] (objList (l.take k)) = some rs) (hc : checkAux rs [] = some L)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 17) as)))
+    (hargs : StdArgs as)
+    (hcase : Or (decodeRuleTag L f 17 (peelArgs as) = none)
+                (∃ r, And (decodeRuleTag L f 17 (peelArgs as) = some r)
+                          (stepConcl L r ≠ some f))) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  have hsl : StdArgList (peelArgs as) := stdArgs_peel hargs
+  have hk' : l[k]? = some (cons (formCode f) (cons (numeralM 17) (objList (peelArgs as)))) := by
+    rw [← hobj]; exact hk
+  rcases hcase with hnone | ⟨r, hr, hne⟩
+  · match hpa : peelArgs as, hsl with
+    | [a], hs =>
+        rw [hpa] at hk'
+        obtain ⟨ha, _⟩ := stdArgList_cons hs
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rw [hpa] at hnone
+          have hnone' : (findIdx A L).map Rule.gen = none := by
+            simpa only [decodeRuleTag, decodeForm_formCode, Option.bind] using hnone
+          rcases hfj : findIdx A L with _ | j
+          · exact derives_chainOk_neg_gen l k f A hk' [] rs L hd hc
+              (not_mem_of_findIdx_none hfj)
+          · rw [hfj] at hnone'; exact absurd hnone' (by simp)
+        · exact derives_chainOk_neg_gen_badtype l k f u hk' [] rs L hd hc
+    | [], _ =>
+        refine rama_aridad l k 17 3 f (peelArgs as) (by rw [← hobj]; exact hk)
+          (prf_lenc_gen _) ?_
+        rw [hpa]; simp
+    | b :: c :: cs, _ =>
+        refine rama_aridad l k 17 3 f (peelArgs as) (by rw [← hobj]; exact hk)
+          (prf_lenc_gen _) ?_
+        rw [hpa]; simp
+  · match hpa : peelArgs as, hsl with
+    | [a], hs =>
+        obtain ⟨ha, _⟩ := stdArgList_cons hs
+        rcases ha with ⟨A, rfl⟩ | ⟨u, rfl⟩
+        · rw [hpa] at hr
+          have hr' : (findIdx A L).map Rule.gen = some r := by
+            simpa only [decodeRuleTag, decodeForm_formCode, Option.bind] using hr
+          rcases hfj : findIdx A L with _ | j
+          · rw [hfj] at hr'; simp at hr'
+          · rw [hfj] at hr'
+            have hr2 : some (Rule.gen j) = some r := hr'
+            injection hr2 with hr3
+            subst hr3
+            have hj := findIdx_sound A L j hfj
+            have hsc : stepConcl L (Rule.gen j) = some (Formula.forall A) := by
+              simp [stepConcl, hj]
+            rw [hsc] at hne
+            refine rama_concl l k 17 f (Formula.forall A) as hk hargs ?_
+              (fun h => hne (by rw [h]))
+            rw [hpa]; exact tc_gen A
+        · exfalso; rw [hpa] at hr; simp [decodeRuleTag, decodeForm_termCode] at hr
+    | [], _ => exfalso; rw [hpa] at hr; simp [decodeRuleTag] at hr
+    | _ :: _ :: _, _ => exfalso; rw [hpa] at hr; simp [decodeRuleTag] at hr
+
+
+/-! ### 🏁🏁🏁 EL `match` — veintiún tags, veintiuna líneas
+
+⭐⭐⭐ Y aquí se ve por qué el reparto valía la pena: **cada tag es UNA línea**, y las veintiuna
+son la misma línea salvo el nombre del cierre. El caso `n+21` no menciona ningún tag concreto.
+
+🔑 *Un `match` de 21 ramas cuyas ramas son todas de una línea no es un `match` de 21 ramas: es
+una TABLA.* -/
+theorem cierra_por_tag (l : List Term) (k : Nat) (f : Formula)
+    (rs : List Rule) (L : List Formula)
+    (hd : decodeChainAux [] (objList (l.take k)) = some rs) (hc : checkAux rs [] = some L) :
+    ∀ (tag : Nat) (as : Term),
+      l[k]? = some (cons (formCode f) (cons (numeralM tag) as)) → StdArgs as →
+      Or (decodeRuleTag L f tag (peelArgs as) = none)
+         (∃ r, And (decodeRuleTag L f tag (peelArgs as) = some r) (stepConcl L r ≠ some f)) →
+      axioms ⊢ neg (chainOk nil (objList l))
+  | 0, as, hk, hargs, hcase => cierra_tag0 l k f as L hk hargs hcase
+  | 1, as, hk, hargs, hcase => cierra_p2 l k f as L hk hargs hcase
+  | 2, as, hk, hargs, hcase => cierra_c1 l k f as L hk hargs hcase
+  | 3, as, hk, hargs, hcase => cierra_c2 l k f as L hk hargs hcase
+  | 4, as, hk, hargs, hcase => cierra_c3 l k f as L hk hargs hcase
+  | 5, as, hk, hargs, hcase => cierra_j1 l k f as L hk hargs hcase
+  | 6, as, hk, hargs, hcase => cierra_j2 l k f as L hk hargs hcase
+  | 7, as, hk, hargs, hcase => cierra_j3 l k f as L hk hargs hcase
+  | 8, as, hk, hargs, hcase => cierra_efq l k f as L hk hargs hcase
+  | 9, as, hk, hargs, hcase => cierra_q1 l k f as L hk hargs hcase
+  | 10, as, hk, hargs, hcase => cierra_q2 l k f as L hk hargs hcase
+  | 11, as, hk, hargs, hcase => cierra_q3 l k f as L hk hargs hcase
+  | 12, as, hk, hargs, hcase => cierra_eqrefl l k f as L hk hargs hcase
+  | 13, as, hk, hargs, hcase => cierra_leibniz l k f as L hk hargs hcase
+  | 14, as, hk, hargs, hcase => cierra_p3 l k f as L hk hargs hcase
+  | 15, as, hk, hargs, hcase => cierra_thy l k f as L hk hargs hcase
+  | 16, as, hk, hargs, hcase => cierra_mp l k f as rs L hd hc hk hargs hcase
+  | 17, as, hk, hargs, hcase => cierra_gen l k f as rs L hd hc hk hargs hcase
+  | 18, as, hk, hargs, hcase => cierra_ind l k f as L hk hargs hcase
+  | 19, as, hk, hargs, hcase => cierra_qconf l k f as L hk hargs hcase
+  | 20, as, hk, hargs, hcase => cierra_listInd l k f as L hk hargs hcase
+  | n + 21, as, hk, _, _ => rama_tag_grande l k (n + 21) f as hk (by omega)
+
+/-- 🏁🏁🏁 **`DEUDA_chainNeg`, SALDADA.** El despachador (§4) da la línea mala y el reparto (§5)
+la cierra. Lo que enunció `Meta/VerifierSound.lean` como deuda es ahora un **teorema**. -/
+theorem deuda_chainNeg_proved : DEUDA_chainNeg := by
+  intro l hstd hdec
+  obtain ⟨k, f, tag, as, rs, L, hk, hargs, hd, hc, hcase⟩ := dispatcher l hstd hdec
+  exact cierra_por_tag l k f rs L hd hc tag as hk hargs hcase
+
+
+/-- 🏁🏁🏁🏁 **`NegVerifier`, PROBADO.** `Meta/VerifierSound.lean` lo dejó reducido a **dos**
+obligaciones con nombre y firma; las dos son ya teoremas (`deuda_inNeg`, §3, y
+`deuda_chainNeg_proved`, §6), así que deja de ser hipótesis.
+
+⭐⭐ Lo que esto desbloquea: `reflects_of_omega` (`Meta/OmegaReflect.lean:297`) tomaba
+`NegVerifier` **como hipótesis**. Ya no hace falta pasarla — la ω‑consistencia se queda como la
+única hipótesis clásica y visible.
+
+⚠️ **Lo que NO cambia**: `OmegaConsistent` sigue siendo hipótesis, y el estrechamiento de
+`StdChain` (ADR‑022) sigue escrito en el enunciado — `NegVerifier` refuta las cadenas
+**estándar**, que es lo que la ω‑consistencia estrechada cuantifica. -/
+theorem negVerifier_proved : ROBINSON_PlusPlus.Meta.OmegaReflect.NegVerifier :=
+  ROBINSON_PlusPlus.Meta.VerifierSound.negVerifier_of_deudas deuda_chainNeg_proved deuda_inNeg
+
 end ROBINSON_PlusPlus.Meta.ChainNegPrf
 
 /-! ## `export` — por CONSUMO: el módulo F (ensamblaje) necesita `deuda_inNeg` y el puente. -/
@@ -2098,6 +3127,18 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   cierra_FF
   cierra_c1 cierra_c2 cierra_c3 cierra_j1 cierra_j2 cierra_q3 cierra_qconf
   badlen_c1 badlen_c2 badlen_c3 badlen_j1 badlen_j2 badlen_q3 badlen_qconf
+  cierra_F cierra_FFF
+  cierra_FT derives_hasWit_congr neg_hasWit_formCode
+  derives_lineWF_neg_q1_badterm derives_lineWF_neg_q2_badterm
+  cierra_q1 cierra_q2 badlen_q1 badlen_q2
+  derives_hasWitF_congr neg_hasWitF_termCode derives_lineWF_neg_leibniz_badform
+  cierra_leibniz badlen_leibniz
+  derives_chainOk_neg_of_prem_at derives_not_boundedCarcLt_of_notFC
+  derives_chainOk_neg_mp_badtype derives_chainOk_neg_gen_badtype
+  cierra_thy cierra_mp cierra_gen cierra_por_tag deuda_chainNeg_proved
+  negVerifier_proved
+  cierra_efq cierra_p3 cierra_ind cierra_listInd cierra_p2 cierra_j3 cierra_eqrefl
+  badlen_efq badlen_p3 badlen_ind badlen_listInd badlen_p2 badlen_j3 badlen_eqrefl
   decodes_efq decodes_p3 decodes_ind decodes_listInd decodes_eqrefl decodes_p1 decodes_c1
   decodes_c2 decodes_c3 decodes_j1 decodes_j2 decodes_q3 decodes_qconf decodes_p2 decodes_j3
   decodes_q1 decodes_q2 decodes_leibniz
@@ -2120,6 +3161,21 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_FF
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_c1
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_qconf
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_F
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_FFF
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_listInd
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_eqrefl
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.neg_hasWit_formCode
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_FT
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_q1
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.neg_hasWitF_termCode
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_leibniz
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_thy
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_mp
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_gen
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.cierra_por_tag
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_chainNeg_proved
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.negVerifier_proved
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems

@@ -237,6 +237,22 @@ theorem formCode_ne_cons_of_tag (f : Formula) {n : Nat} (r : Term) (h : formTag 
   rw [hr]
   exact cons_ne_head (gnum_ne h)
 
+/-- El TAG de cabeza del código de un término. Gemelo de `formTag`. -/
+def termTag : Term → Nat
+  | .var _ => 0 | .func _ _ => 1
+
+theorem termCode_eq_cons (t : Term) : ∃ r, termCode t = cons (numeral (termTag t)) r := by
+  cases t <;> exact ⟨_, rfl⟩
+
+/-- ⭐ Gemelo de `formCode_ne_cons_of_tag` para el sort TÉRMINO. Lo consume el refutador de la
+    guarda `hasWitF`: `isFormCodeE2` son ocho formas con cabezas 2…9, y un `termCode` tiene
+    cabeza 0 o 1. -/
+theorem termCode_ne_cons_of_tag (t : Term) {n : Nat} (r : Term) (h : termTag t ≠ n) :
+    axioms ⊢ neg (termCode t =eq cons (numeral n) r) := by
+  obtain ⟨r', hr⟩ := termCode_eq_cons t
+  rw [hr]
+  exact cons_ne_head (gnum_ne h)
+
 /-- ⭐ **La pieza base de (f)**: un código de FÓRMULA nunca es un código de TÉRMINO. -/
 theorem formCode_ne_termCode (A : Formula) (t : Term) :
     axioms ⊢ neg (formCode A =eq termCode t) := by
@@ -317,9 +333,26 @@ base que el inductivo usa y como ejemplos trabajados.
 ⛔ **Su límite, medido**: sólo alcanza las posiciones **TRANSPARENTES**, las construidas con
 `implc`/`andc`/`orc`/`forallc`/`exc`. De las ~32 ranuras, **tres** caen dentro de `substfc` —
 el argumento de término de los tags 9 y 10, y el de fórmula del 13— y ésas **no se refutan por
-la sintaxis**: van por las guardas que ADR‑020 metió dentro de `lineWF`. -/
+la sintaxis**: van por las guardas que ADR‑020 metió dentro de `lineWF`.
+
+⭐⭐ **Y la otra mitad**: `NotTC e` dice «este término **no es el código de ningún término**».
+Hace falta porque (f) tiene **dos direcciones** —`termCode` donde va fórmula, y `formCode` donde
+va término (tags 12 y 13)— y `eqc` es la única constructora transparente que abre un hueco de
+TÉRMINO. Por eso `NotFC` gana dos constructoras `eqc*` que consumen un `NotTC`.
+
+⚠️ `NotTC` tiene **una sola** constructora, y eso es deliberado: es lo que hace falta, medido.
+Crecerá si aparece una posición de término transparente más. -/
+inductive NotTC : Term → Prop
+  | fc (A : Formula) : NotTC (formCode A)
+
+theorem termCode_ne_notTC : ∀ {e : Term}, NotTC e → ∀ t : Term,
+    axioms ⊢ neg (termCode t =eq e)
+  | _, NotTC.fc A, t => termCode_ne_formCode t A
+
 inductive NotFC : Term → Prop
   | tc (u : Term) : NotFC (termCode u)
+  | eqcL {a : Term} (b : Term) : NotTC a → NotFC (eqc a b)
+  | eqcR (a : Term) {b : Term} : NotTC b → NotFC (eqc a b)
   | implcL {a : Term} (b : Term) : NotFC a → NotFC (implc a b)
   | implcR (a : Term) {b : Term} : NotFC b → NotFC (implc a b)
   | andcL {a : Term} (b : Term) : NotFC a → NotFC (andc a b)
@@ -332,6 +365,15 @@ inductive NotFC : Term → Prop
 theorem formCode_ne_notFC : ∀ {e : Term}, NotFC e → ∀ f : Formula,
     axioms ⊢ neg (formCode f =eq e)
   | _, NotFC.tc u, f => formCode_ne_termCode f u
+  | _, NotFC.eqcL b h, f => by
+      cases f with
+      | eq x y => exact cons_ne_tail (cons_ne_head (termCode_ne_notTC h x))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 4) _ (by simp only [formTag]; decide)
+  | _, NotFC.eqcR a h, f => by
+      cases f with
+      | eq x y =>
+          exact cons_ne_tail (cons_ne_tail (cons_ne_head (termCode_ne_notTC h y)))
+      | _ => exact formCode_ne_cons_of_tag _ (n := 4) _ (by simp only [formTag]; decide)
   | _, NotFC.implcL b h, f => by
       cases f with
       | impl x y => exact cons_ne_tail (cons_ne_head (formCode_ne_notFC h x))
@@ -381,6 +423,7 @@ export ROBINSON_PlusPlus.Meta.CodeDistinct (
   termsCode_ne
   formCode_ne
   formTag formCode_eq_cons formCode_ne_cons_of_tag
+  termTag termCode_eq_cons termCode_ne_cons_of_tag
   formCode_ne_termCode termCode_ne_formCode
   formCode_ne_implc_tc_1 formCode_ne_implc_tc_2
   formCode_ne_andc_tc_1 formCode_ne_orc_tc_1
@@ -388,4 +431,5 @@ export ROBINSON_PlusPlus.Meta.CodeDistinct (
   NotFC formCode_ne_notFC
   NotFC.tc NotFC.implcL NotFC.implcR NotFC.andcL NotFC.andcR
   NotFC.orcL NotFC.orcR NotFC.forallcI NotFC.excI
+  NotTC termCode_ne_notTC NotTC.fc NotFC.eqcL NotFC.eqcR
 )
