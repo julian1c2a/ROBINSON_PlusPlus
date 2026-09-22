@@ -1,14 +1,98 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-21 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-09-22 — el bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
-**Estado 2026‑09‑21 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
-⚠️ **warnings: 11** (7 en RPP + 4 en FOL), todos cosméticos y todos **DECLARADOS** en `check-warnings.bash` desde ADR‑065 — la deuda dejó de estar escrita y pasó a estar **vigilada** (el control rompe en las dos direcciones).
-🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **385** (cobertura 358/358) · `check-warnings` **11** · `check-estratos` **10** · `check-doc-sync` en los DOS repos · `check-axioms` · `check-sorry`.
+**Estado 2026‑09‑22 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
+⚠️ **warnings: 11**, todos declarados en `check-warnings.bash` (rompe en las dos direcciones).
+🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **427** (cobertura **392/392**) · `check-warnings` **11** · `check-estratos` **10** · `check-sorry` **+ censo de agujeros** · `check-doc-sync` en los DOS repos, con **`[H]` nuevo** (**78/78**), **`[E]` ampliado** (universo 15 → **40**, deuda **35**) y **`[B]` con trinquete** (**44**) · `check-axioms` (FOL).
+
+
+> # 🗓️ 2026‑09‑22 — 🏁🏁 **LAS SEIS CAUSAS CERRADAS**, el muro de `Model` derribado, y el MODELO ESTÁNDAR arrancado
+>
+> Día de tres frentes cerrados y uno arrancado. **ADR‑076 … ADR‑087**.
+>
+> ## 🏁🏁 `DEUDA_chainNeg`: **las seis causas tienen cierre**, y el despachador está
+>
+> | causa | cierre |
+> |---|---|
+> | (a) tag ≥ 21 | `derives_lineWF_neg_of_tag_big` |
+> | (b) aridad | 🏁 **ADR‑079** — `derives_lineWF_neg_of_arity` + los **21** `prf_lenc_*` |
+> | (c′) conclusión | 🏁 **ADR‑080** — `derives_lineWF_neg_of_concl` + los **19** `tc_*` |
+> | (d) `thy` | 🏁 **ADR‑076** — de punta a punta |
+> | (e) `mp`/`gen` | 🏁 **ADR‑077** + las tres instancias |
+> | (f) tipo de argumento | 🏁 **ADR‑081** — refutadores en `Meta/CodeDistinct.lean` |
+> | **despachador** | 🏁 **ADR‑078** — `dispatcher`, **net‑0 puro** |
+>
+> ⭐⭐ **Lo único que queda de `DEUDA_chainNeg` es el REPARTO**: enchufar los seis cierres a las
+> ramas del `dispatcher`. **Sin incógnitas.** La pieza compartida ya está (**ADR‑082**): la
+> **inversión de `StdArgs`** — que no es un lema, es un **cambio de soporte** (`StdArgList` sobre
+> `List Term` se destruye con `cases`; sobre `Term` no) — y con ella `tag0_none_dichotomy`, **16
+> líneas net‑0** que son la **plantilla de las 19 ramas**.
+> 🔑 *El reparto no tiene que razonar: sólo destruir.*
+>
+> ## 🏁 El muro de `Model`: **alcance 9 ficheros, trabajo 1** (ADR‑083)
+>
+> `structure ModelG (S D)` + `abbrev Model (D) := ModelG String D`. **Los ocho ficheros restantes
+> no se tocaron.** FOL 54 y RPP 145 verdes a la primera. Medido **sustituyendo**, no reconstruyendo.
+> 🔑 *Medir el ALCANCE de un tipo no es medir el TRABAJO* — van **dos** veces en esta migración.
+> ⬜ Segunda entrega: `Canonical0`, que une la rama sintáctica con la semántica y pedirá `FreshSym`.
+>
+> ## 🏗️ EL MODELO DE LOS 141 — arrancado, y **la capa aritmética está COMPLETA**
+>
+> **Por qué importa**: `goedel_second_prf` es condicional en `ConsistentH`, y **nada lo prueba**.
+> Si `axioms` fuese inconsistente, **los dos resultados estrella no dicen nada**. Un modelo lo mata.
+>
+> **M1–M4 (ADR‑085): las cuatro a favor.** `ConsistentH ↔ ¬ Prf ⊥` es **net‑0** ⇒ un modelo lo
+> descarga entero; la mecánica de `evalFormula` sale `[propext]`; y ⭐ **el aparato semántico
+> entero ya existe** (13 lemas en `FOL/Semantics.lean`, probados por `lkc_sound`) ⇒ la solidez de
+> `Prf` es inducción sobre `Prf`, y **M‑11 no la bloquea**.
+>
+> **ADR‑086/087**: `sondeos/ModeloNat.lean` con **25 de los 34 `coreAxioms` VALIDADOS**, todos
+> net‑0 — aritmética, paridad, monus, potencia **y orden**. ⭐ El molde no falló ni una vez:
+> `intro` + `simp` + un `Nat.*` o un `omega`, **sin una sola idea nueva por axioma**.
+> ⛔ Lo único que hubo que construir: la **raíz entera** (`Nat.sqrt` **no está en el core**), 30 l.
+>
+> ⬜ **Faltan 9, y son EXACTAMENTE la capa de listas** (`ax_L0`–`ax_L3`, `ax_C1`–`ax_C3`,
+> `prodp`) — ⭐ **la que abre los 107**, porque pide `concatN`/`InN`/`prodpN` sobre `Nat` por la
+> misma técnica *decodificar → función de Lean → recodificar*. `consN` y `consN_inj` **ya están**.
+>
+> ## 🔧 Deuda de control (ADR‑084): **las tres cifras publicadas estaban bajas**
+>
+> | | publicada | medida |
+> |---|---|---|
+> | sondeos sin proyectar | 13 de 74 | **19 de 76** |
+> | marcas `Last updated` | 11 de 18 | **35 de 40** |
+> | símbolos muertos | 223 | **44** |
+>
+> 🔑 *Una cifra de deuda sin decir en qué punto del filtro se tomó no es comparable consigo misma.*
+> `[H]` nuevo (cierra el catálogo de `sondeos/`), `[E]` ampliado, `[B]` con trinquete. Los tres
+> **probados rompiendo**, y ⛔ el de `[B]` tenía **un agujero mío** que sólo salió al probarlo.
+> ⭐ **El linter de ADR‑074 se cierra en NO**: `import Lean` cuesta **+3,2 s × 131 módulos** y el
+> barril que se proponía **no lo importa nadie**. En su lugar, **censo de agujeros de confianza**:
+> `native_decide`, `unsafe`, `opaque`, `@[implemented_by]`, `@[extern]` a **CERO** en los dos repos,
+> ahora vigilados con igualdad exacta.
+>
+> ## ⛔⛔ Y el patrón del día: **van DOCE de «antes de construir, buscar»**
+>
+> * **#11 (ADR‑080)**: cinco de los siete lemas duros de (c′) estaban en `Meta/ArithPrf.lean:470`,
+>   **exportados**, incluidos los dos que yo había marcado como los más gnarly. Los re‑derivé
+>   **línea por línea idénticos**.
+> * **#12 (ADR‑086)**: `triN`, `consN` y **`consN_inj`** estaban en producción — el crux de M3.
+> 🔑 *Cuando la re‑derivación sale idéntica, no es que fuera fácil: es que ya estaba resuelto.*
+> ⭐ Y la #12 **la cazó la instrucción de mirar antes**, no yo: *mirar primero funciona antes.*
+>
+> ## ⚠️ Trampas nuevas de esta tanda
+>
+> * `omega` **no reconoce `Nat.le`** escrito como aplicación explícita (ADR‑078) — y esquivar con
+>   `≤` choca con el símbolo OBJETO `le`: **las dos se muerden**, y la salida es **acotar el `open`**.
+> * Para `omega` un producto es un **ÁTOMO**: `(k+2)*(k+2)` y `(k+1+1)*(k+1+1)` son **distintos**.
+> * `⇔` es `FOL.iff`, un `def` que `simp` **no atraviesa**, y va como **`_root_.iff`**.
+> * ⚠️ **Tres veces**: quitar un `simp` que el linter marca «no usado» **rompe**.
+>   *Un aviso de «no usado» es una hipótesis, no una medición.*
 
 
 > # 🗓️ 2026‑09‑21 — 🏁 **LA ESTRUCTURA DEL CASO (e)**, y dos afirmaciones falsas en su cabecera (ADR‑075)
