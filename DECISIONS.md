@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-088**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-090**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7021,3 +7021,86 @@ contesta buscando un elemento que sobre.*
 
 **Véase también:** ADR-087 (la capa aritmética), ADR-085 §5 (el orden del frente, que esto
 reordena), `Meta/CodeNumeralPrf.lean:65`, `Meta/ChainPrf.lean:29`.
+
+---
+
+## ADR-089: 🏁 EL REPARTO — **son SEIS ramas, no veintiuna**
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §5) · ⬜ el `match` que las enhebra
+**Contexto**: lo único que le quedaba a `DEUDA_chainNeg` tras ADR-076…082.
+
+### 1 · ⭐⭐ La sorpresa: el reparto casi no depende del tag
+
+El `dispatcher` (ADR-078) entrega **siempre la misma tupla**, y cada causa la consume de **una**
+forma. Lo que cambia de un tag a otro no es la estructura de la rama: es **qué entrada de la
+tabla se le pasa**.
+
+| rama | qué le queda por tag |
+|---|---|
+| (a) `rama_tag_grande` | ⭐ **nada** — ni menciona el tag |
+| (b) `rama_aridad` | el `prf_lenc_*` — los **21** están |
+| (c′) `rama_concl` | el `TagCode` — los **19** están |
+| (d) `rama_thy` | ⭐ **nada** |
+| (e) `mp`/`gen` | ⭐ **nada**: `derives_chainOk_neg_mp_major`/`_minor`/`_gen` **ya son** la rama |
+| (f) `rama_tipo_*` | el refutador de `Meta/CodeDistinct.lean` |
+
+🔑 **El reparto no es un `case` de veintiuna ramas: es un `case` de seis, con una TABLA dentro.**
+Y eso es exactamente lo que compró la **inversión de `StdArgs`** (ADR-082): el análisis por tag se
+hace **destruyendo**, no razonando. El `rw [stdArgs_objList hargs]` de `rama_concl` es el punto
+donde se ve.
+
+⬜ Queda el `match` sobre `tag` que elige rama y pasa la entrada. **Sin incógnitas**: las seis
+ramas compilan y el split de 21 está medido en 4,5 s.
+
+**Controles:** `check-footprints` **431** (cobertura **396/396**) · RPP **145 jobs**.
+
+---
+
+## ADR-090: ⛔⛔ relativizar `listInd` **NO es barato** — toca los activos del núcleo
+
+**Fecha**: 2026-09-22
+**Estado**: 📏 MEDIDO (censo con 8 agentes, **lectura**, no compilación) · ⛔ decisión del propietario
+**Contexto**: ADR-088 dejó cuatro salidas y dijo que la medición que decide es «¿cuántas
+instancias de `listInd` ya llevan guarda?». Ésta es esa medición.
+
+### 1 · ⚠️ Primero, la cifra se movió — **otra vez**
+
+Mi `grep` había dicho **42**. Contando sólo **usos reales** (no menciones en docstring ni
+apariciones del tipo `listInductionFormula`): **21**. Es la **tercera** cifra que se corrige hoy
+al medirla bien (ADR-084 tenía las otras dos).
+🔑 *Un `grep` cuenta apariciones; un censo cuenta usos.*
+
+### 2 · 📏 El reparto de los 21
+
+| | nº |
+|---|---|
+| con guarda de buena formación (vacuas sobre basura) | **7** |
+| **SIN guarda** | **13** |
+| dudoso | 1 |
+
+⛔⛔ **Y los 13 sin guarda incluyen los activos**:
+
+* **`prf_chainOk_iff_chainOkB`** — *el* asset reutilizable de toda la vía (e)/Δ₀. Es un
+  bicondicional incondicional, y ⭐ sobre basura el lado Δ₀ (`∀ i < lenc p …`) es **vacuamente
+  cierto**, así que la Φ **obliga** a `chainOk c basura`.
+* **`prf_nil_or_cons_all`** — literalmente la Φ del contraejemplo de ADR-088, confirmada por una
+  lectura independiente que no sabía que la buscaba.
+* `prf_concat_assoc`, `prf_concat_nil_right`, `prf_runFn_concat`, `prf_runFn_weaken`,
+  `prf_chainOk_concat`, `prf_lenc_runFn`, `prf_allIn_of_boundedAllIn`, `prf_lenc_liftsc_all`,
+  `prf_eval_lenc_all`, `prf_In_mono_imp`, y el propio envoltorio `prf_list_induction`.
+
+### 3 · ⇒ La salida (2) de ADR-088 **se encarece**
+
+Relativizar `listInd` con una guarda obliga a **re-enunciar 13 teoremas**, y entre ellos el que
+sostiene la forma Δ₀ entera. No es una tanda mecánica: es rediseñar la capa de cadenas.
+
+⚠️ **ÁMBITO de esta medición**: es una **lectura** de ocho agentes, no una compilación. La
+clasificación «¿tiene antecedente que la haga vacua sobre basura?» es una pregunta de lectura y
+está dentro de su competencia, pero **ninguna de las 13 está verificada por el compilador**.
+🔑 *Los agentes miden bien y estiman mal porque no compilan; esto es medición, pero de LECTURA.*
+
+⬜ **Queda abierto** —y es del propietario— cuál de las cuatro salidas de ADR-088 se toma. Lo que
+esta entrada aporta es que **(2) ya no es la barata**.
+
+**Véase también:** ADR-088 (ℕ no es modelo de `Prf`), `sondeos/ModeloBasura.lean`.

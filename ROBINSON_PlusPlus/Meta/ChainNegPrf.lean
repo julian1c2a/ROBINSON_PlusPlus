@@ -1405,6 +1405,86 @@ theorem dispatcher (l : List Term) (hstd : StdChain l) (hdec : chainOkDec l = fa
   exact ⟨k, f, tag, as, rs, L, hx, hargs, hd, hc, decodeLine_none_cases hline⟩
 
 
+/-! ## §5 · 🏁 EL REPARTO — las RAMAS, y por qué son seis y no veintiuna
+
+⭐⭐ **La sorpresa del reparto es que casi no depende del tag.** El `dispatcher` (§4) entrega
+siempre la misma tupla, y cada causa consume esa tupla de **una** forma; lo único que cambia de
+un tag a otro es **qué lema de la tabla se le pasa**, no la estructura de la rama.
+
+| rama | qué le queda por tag |
+|---|---|
+| (a) `rama_tag_grande` | ⭐ **nada** — no menciona el tag |
+| (b) `rama_aridad` | el `prf_lenc_*` que toque — los **21** están (§1ter) |
+| (c′) `rama_concl` | el `TagCode` que toque — los **19** están (§1quater) |
+| (d) `rama_thy` | ⭐ **nada** |
+| (e) `mp`/`gen` | ⭐ **nada**: `derives_chainOk_neg_mp_major`/`_minor`/`_gen` (§2quinquies) **ya son** la rama |
+| (f) `rama_tipo_*` | el refutador de `Meta/CodeDistinct.lean` que toque |
+
+🔑 *El reparto no es un `case` de veintiuna ramas: es un `case` de seis, con una TABLA dentro.*
+Y eso es exactamente lo que compró la inversión de `StdArgs` (§1ter): el análisis por tag se hace
+**destruyendo**, no razonando.
+
+⬜ **Lo que queda para ensamblar `DEUDA_chainNeg` entero**: el `match` sobre `tag` que elige rama
+y pasa la entrada de la tabla. Las seis ramas ya no tienen incógnitas, y el split de 21 está
+medido en **4,5 s** (ADR‑078). -/
+
+/-- ⭐ **RAMA (a)**: el tag se sale de rango. **No depende del tag** y cierra sola. -/
+theorem rama_tag_grande (l : List Term) (k tag : Nat) (f : Formula) (as : Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+    (hbig : 20 < tag) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  derives_chainOk_neg_of_line l k _ hk (derives_lineWF_neg_of_tag_big (formCode f) as hbig)
+
+/-- ⭐⭐ **RAMA (c′)**: la conclusión no casa. La forma es general; lo único por tag es el
+`TagCode`, y los diecinueve están escritos.
+
+⚠️ El `rw [hobj]` es lo que la inversión de `StdArgs` hace posible: convierte la `as` abstracta
+que da `StdLine` en el `objList` que piden los cierres. -/
+theorem rama_concl (l : List Term) (k tag : Nat) (f c : Formula) (as : Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) as)))
+    (hargs : StdArgs as)
+    (htc : TagCode tag (peelArgs as) c) (hne : f ≠ c) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  have hobj : as = objList (peelArgs as) := stdArgs_objList hargs
+  refine derives_chainOk_neg_of_line l k _ hk ?_
+  rw [hobj]
+  exact derives_lineWF_neg_of_concl htc hne
+
+/-- ⭐ **RAMA (d)**: `thy` sin argumentos. -/
+theorem rama_thy (l : List Term) (k : Nat) (f : Formula) (args : List Term) (L : List Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 15) nil)))
+    (hnone : decodeRuleTag L f 15 args = none) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  derives_chainOk_neg_of_line l k _ hk (derives_lineWF_neg_thy_of_decode hnone)
+
+/-- ⭐⭐ **RAMA (b)**: la aridad no casa. General sobre el tag; lo único por tag es el
+`prf_lenc_*`, y los veintiuno están escritos. -/
+theorem rama_aridad (l : List Term) (k tag n : Nat) (f : Formula) (args : List Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM tag) (objList args))))
+    (himp : Prf (lineWF (objList (formCode f :: numeralM tag :: args)) ⇒
+      ((Formula.eq (nthc (objList (formCode f :: numeralM tag :: args)) (succ zero))
+          (numeralM tag)) ⇒
+       (Formula.eq (lenc (objList (formCode f :: numeralM tag :: args))) (numeralM n)))))
+    (hne : args.length + 2 ≠ n) :
+    axioms ⊢ neg (chainOk nil (objList l)) := by
+  refine derives_chainOk_neg_of_line l k _ hk ?_
+  show axioms ⊢ neg (lineWF (objList (formCode f :: numeralM tag :: args)))
+  exact derives_lineWF_neg_of_arity f tag n args himp hne
+
+/-- ⭐ **RAMA (f)**: un código de TÉRMINO donde el tag espera uno de fórmula (`p1`, slot 0).
+Es la plantilla; las demás ranuras cambian **sólo** el refutador de `Meta/CodeDistinct.lean`. -/
+theorem rama_tipo_p1 (l : List Term) (k : Nat) (f : Formula) (u cB : Term)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 0) (objList [termCode u, cB])))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  derives_chainOk_neg_of_line l k _ hk (derives_lineWF_neg_p1_badtype f u cB)
+
+/-- ⭐ **RAMA (f), la dirección contraria**: un código de FÓRMULA en un slot de término. -/
+theorem rama_tipo_eqrefl (l : List Term) (k : Nat) (f A : Formula)
+    (hk : l[k]? = some (cons (formCode f) (cons (numeralM 12) (objList [formCode A])))) :
+    axioms ⊢ neg (chainOk nil (objList l)) :=
+  derives_chainOk_neg_of_line l k _ hk (derives_lineWF_neg_eqrefl_badtype f A)
+
+
 end ROBINSON_PlusPlus.Meta.ChainNegPrf
 
 /-! ## `export` — por CONSUMO: el módulo F (ensamblaje) necesita `deuda_inNeg` y el puente. -/
@@ -1438,11 +1518,17 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
   dispatcher
+  rama_tag_grande rama_concl rama_thy rama_aridad
+  rama_tipo_p1 rama_tipo_eqrefl
 )
 
 /-! ## FOOTPRINT -/
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.deuda_inNeg
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.dispatcher
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_tag_grande
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_concl
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_aridad
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.rama_tipo_p1
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_line
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_chainOk_neg_of_prems
