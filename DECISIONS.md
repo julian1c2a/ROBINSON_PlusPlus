@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-085**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-086**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6821,3 +6821,72 @@ sustitución de comando**. *Un control también es código, y el mío falló igu
 
 **Véase también:** ADR-083 (`ModelG`), ADR-084 §5 (el linter, cerrado en NO),
 `sondeos/ModeloDiscriminador.lean`.
+
+---
+
+## ADR-086: 🏗️ el MODELO ESTÁNDAR arranca — **8 de los 34 core**, y la raíz entera era lo único que faltaba
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`sondeos/ModeloNat.lean`) · ⬜ 26 core + los 107
+**Contexto**: pasos ① y ② del orden que fijó ADR-085 §5.
+
+### 1 · ⛔⛔ Y van DOCE — pero esta vez lo cazó la instrucción de buscar
+
+`triN` (`Meta/CodeNumeralPrf.lean:46`), `consN`, `two_mul_consN` y **`consN_inj`**
+(`Meta/CodeNatInjPrf.lean:85`) estaban **en producción**: el emparejamiento de Cantor sobre `Nat`
+y **su inyectividad**, que es exactamente el crux que M3 midió ayer… re-derivándolo.
+
+⭐ La diferencia con las once anteriores: aquí no lo cacé yo, lo cazó **la instrucción explícita
+de mirar antes**. 🔑 *La señal «la re-derivación sale idéntica» funciona a posteriori; mirar
+primero funciona antes.*
+
+### 2 · 📏 `Nat.sqrt`: no está, y el transporte de Peano NO compensa **para esto**
+
+**`Nat.sqrt` no existe en el core de Lean**, y `ax14_sqrt_le`/`ax15_lt_succ_sqrt` lo piden.
+Se miró `Peano/PeanoNat/Sqrt.lean`: tiene desarrollo **completo** —`sqrtMod`, `sqrtRem`,
+`sqrtMod_spec`, `sqrt_upper_bound`, `csqrt`— pero sobre **`ℕ₀`**, el natural propio de Peano.
+
+ℕ₀ es isomorfo a `Nat`, así que transportar es posible. Medido: aquí sólo hacen falta **dos
+desigualdades**, y escribirlas directamente son **30 líneas net-0 puras**; el transporte pide el
+iso más la preservación de `*` y `≤`. **No compensa.**
+
+🔑 **Un desarrollo ajeno se reutiliza por lo que hay que TRANSPORTAR, no por lo que contiene.**
+⬜ Donde el transporte **sí** puede pagar es más adelante: `div`/`mod`, `pow`, y sobre todo
+`Peano/PeanoNat/Foundation/GodelBeta.lean` — la **β de Gödel**, que la capa de listas necesitará.
+
+### 3 · 🏁 Lo validado, y con qué footprint
+
+**8 de los 34 `coreAxioms`**, todos **net-0**: `ax2`, `ax3`, `ax4`, `ax14`, `ax15`, `ax18`,
+`ax25`, `ax26`. La forma es siempre la misma — `intro v d; simp […]` — y los dos de la raíz
+rematan con `omega` contra `sqrtN_le` / `lt_sq_succ_sqrtN`.
+
+⇒ el molde de M2 (ADR-085) **escala**: no hubo que inventar nada por axioma.
+
+### 4 · ⚠️ Dos trampas, y una es reincidente
+
+1. **Nueva**: el sucesor de un cuadrado va como `k+1+1` y **no** como `k+2`. Para `omega` el
+   producto es un **ÁTOMO**, y `(k+2)*(k+2)` y `(k+1+1)*(k+1+1)` son átomos **distintos**: con
+   `k+2` el lema no cierra aunque sea la misma desigualdad.
+2. **Reincidente, y es la segunda vez en esta sesión**: el linter marcó `ax25_pred_zero` como
+   argumento `simp` «no usado», se quitó, y **rompió** — `ax25` es el único de los ocho que no
+   es un `forall_`, así que sin su nombre no hay nada que abrir.
+   🔑 *Un aviso de «no usado» no es una medición de que sobre.*
+
+### 5 · ⬜ Lo que queda, por capas
+
+| capa | qué falta |
+|---|---|
+| aritmética | `ax5`–`ax12`, `ax16`, `ax17`, `ax21`, `ax24`, `ax29`, `pow` — mecánicos, molde fijado |
+| orden | `ax13_lt_def` (define `<` por un `∃`) y `ax19_lt_trichotomy` |
+| **listas** | `ax_L0`–`ax_L3`, `ax_C1`–`ax_C3`, `prodp` — ⭐ **es la que comparte maquinaria con los 107**, y ya tiene `consN`/`consN_inj` |
+| **los 107** | interpretando por **decodificar → función de Lean → recodificar** |
+| solidez de `Prf` | inducción sobre `Prf` reusando los 13 lemas de M4 |
+
+⚠️ Vive en `sondeos/` **a propósito**: es un frente de varias sesiones y no debe mover el
+contador de jobs ni los controles de proyección hasta estar completo.
+
+**Controles:** `check-doc-sync` (`[H]` **78/78**) · RPP **145 jobs**, 0 errores.
+⚠️ **ÁMBITO**: FOL no se tocó.
+
+**Véase también:** ADR-085 (M1–M4 y el orden), ADR-083 (`ModelG`),
+`Meta/CodeNatInjPrf.lean`, `Peano/PeanoNat/Sqrt.lean`.
