@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-080**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-083**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6556,3 +6556,92 @@ del `dispatcher`, con el análisis de `StdArgs` por tag. Ya no hay nada sin medi
 
 **Véase también:** ADR-075 (la sexta causa), ADR-078 (el despachador), ADR-072 (`[E]`),
 `Meta/CodeDistinct.lean`, `Meta/ChainNegPrf.lean` §1quinquies.
+
+---
+
+## ADR-082: ⭐⭐⭐ la INVERSIÓN de `StdArgs` — un cambio de **SOPORTE**, no un lema
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §1ter) · es el arranque del **reparto**
+**Contexto**: cerradas las seis causas (ADR-076…081), lo único que le queda a `DEUDA_chainNeg`
+es enchufarlas a las ramas del `dispatcher` (ADR-078).
+
+### 1 · El problema no era probar nada: era el soporte
+
+`StdArgs` (`Meta/OmegaReflect.lean:148`) vive sobre `Term` y **ahí se invierte mal** — para
+destruirlo hay que casar contra `cons (formCode A) t`, con `cons` un `Term.func`. El reparto
+trabaja sobre la **lista pelada** `peelArgs as`, donde el mismo inductivo se destruye con `cases`.
+
+⇒ `StdArgList : List Term → Prop`, los mismos tres constructores, más `stdArgs_peel` (ida) y
+`stdArgList_objList` (vuelta, que es la que reconstruye el término que piden los cierres).
+
+🔑 **Un inductivo sobre `Term` se invierte mal; el mismo inductivo sobre `List Term` se destruye
+con `cases`. La inversión no es un lema: es un cambio de soporte.**
+
+⭐ Y `stdArgList_cons` (destructor de **un** paso) evita la familia «un lema por aridad»:
+iterándolo se llega a cualquiera.
+
+### 2 · ⭐⭐ Por qué no es fontanería
+
+Con la aridad correcta **y los tipos correctos**, `decodeRuleTag` **decodifica**
+(`decodeRuleTag_p1_some`, `decodeRuleTag_q1_some`). Ergo, para un tag estructural,
+`decodeRuleTag … = none` **implica** aridad equivocada (b) **o** tipo equivocado (f), y **no hay
+tercera opción**. `tag0_none_dichotomy` es esa implicación: **16 líneas, net-0 puro**, y es la
+**plantilla de las diecinueve ramas**.
+
+⇒ el reparto **no tiene que razonar: sólo destruir**. Eso es lo que la inversión compra.
+
+⚠️ Trampa nueva, para `feedback_lean_notation_traps`: el caso `[_]` va con `simp` y **no** con
+`decide` — con una variable libre dentro, `decide` se niega («Expected type must not contain free
+variables») aunque la longitud sea computable. Es la gemela de la de ADR-078 (`omega` y `Nat.le`).
+
+**Controles:** `check-footprints` **427** (cobertura **392/392**) · RPP **145 jobs**, 0 errores.
+
+---
+
+## ADR-083: 🏁 el MURO de `Model` — alcance **9 ficheros**, trabajo **1**
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`FOL/FOL/Semantics.lean`, commit `2d5b7c8`) · ⬜ segunda entrega
+**Contexto**: `Model (D : Type)` con `func : String → List D → D` era **el muro declarado** de la
+migración del símbolo a parámetro (ADR-068/069/071): en el banner del proyecto, «**9 ficheros**».
+
+### 1 · 📏 Medido por SUSTITUCIÓN, y el muro no estaba
+
+`Model` se citaba en **9 ficheros, 68 veces**. La migración fue:
+
+    structure ModelG (S D : Type) where
+      func : S → List D → D
+      rel  : S → List D → Prop
+    abbrev Model (D : Type) := ModelG String D
+
+más `evalTerm`/`evalTerms`/`evalFormula`/`contextSatisfies` a `{S D}` sobre `TermG S`/`FormulaG S`.
+**Cinco ediciones, un fichero.** Los **ocho** restantes **no se tocaron**: el `abbrev` los deja
+intactos, igual que `abbrev Term := TermG String` hizo con el núcleo. FOL **54 jobs** y RPP
+**145 jobs**, verdes **a la primera**.
+
+🔑 **Medir el ALCANCE de un tipo no es medir el TRABAJO** — van **dos** veces en esta misma
+migración (ADR-068 cotizó 163 módulos y eran 3 ficheros).
+⭐ Y la regla de método que lo hizo barato: *un sondeo que RECONSTRUYE mide si la idea tipa; sólo
+uno que SUSTITUYE mide si el árbol sobrevive* (ADR-068 §2). Aquí se fue directo a sustituir.
+
+### 2 · ⬜ La segunda entrega, que sí es trabajo
+
+`Canonical0` (el modelo canónico, 22 de las 68 citas) sigue en `String`, y es **la que une la
+rama sintáctica con la SEMÁNTICA** del DAG. Necesitará `FreshSym` — la clase que
+`sondeos/SymbolParamCoste.lean` ya midió como una de las **dos y sólo dos** que hacen falta.
+⚠️ No la cotizo: el historial de esta migración dice que cualquier número que ponga aquí sería
+una estimación sin etiqueta.
+
+### 3 · ⚠️ Lo que este ADR **no** arregla
+
+`ModelG` es condición necesaria para un **modelo de los 141 axiomas**, que es lo que retiraría la
+vacuidad de Gödel I/II (nada prueba `ConsistentH`). Pero **no es ese modelo**: aquí sólo se ha
+generificado la estructura. La solidez de `Prf` respecto de un modelo **sigue sin existir** en
+RPP — medido: FOL tiene `lk0_sound` (secuentes) y nada más.
+
+**Controles:** FOL `check-sorry` · `check-axioms` · `check-doc-sync` · **54 jobs**;
+RPP **145 jobs**. ⛔ **M-12 respetada**: FOL commiteado **antes** que RPP.
+
+**Véase también:** ADR-068/069/071 (la migración del símbolo), `sondeos/SymbolParamCoste.lean`,
+`FOL/CHANGELOG.md` 2026-09-22.
