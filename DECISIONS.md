@@ -6421,3 +6421,68 @@ tanto el siguiente: *primero lo que puede matar la idea*.
 
 **Véase también:** ADR-078 (el despachador), ADR-077 ((e)), ADR-076 ((d)),
 `Meta/ChainNegPrf.lean` §1ter.
+
+---
+
+## ADR-080: 🏁 la causa **(c′)**, CERRADA — y **cinco de los siete lemas duros ya estaban escritos**
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ ATERRIZADO (`ChainNegPrf` §1quater: `TagCode` + cierre + los **19** `tc_*`)
+**Contexto**: vía A, tras ADR-079 ((b)). Orden pedido: (c′) → (e) → (f).
+
+### 1 · ⭐⭐ La forma que hace UNO el cierre de diecinueve tags
+
+El cierre de (c′) es `derives_lineWF_neg_of_tag k concl args e (h : tagConcl k args = some e)
+(hne : ⊢ ¬ concl ≐ e)`, y `hne` sale de `formCode_ne` **sólo si `e` se identifica como el código
+de una fórmula**. La igualdad de Lean `tagConcl k args = some ⌜c⌝` sirve para **doce** de los
+diecinueve; para los otros siete **no existe**, porque `substfc` y `liftfc` son símbolos OBJETO y
+no reducen.
+
+La pieza que unifica los dos grupos es
+
+    def TagCode (k : Nat) (args : List Term) (c : Formula) : Prop :=
+      ∃ e, And (tagConcl k args = some e) (Prf (e =eq formCode c))
+
+—la ecuación **literal** de `tagConcl` más una igualdad **demostrable** hasta el código. Los doce
+fáciles ponen `prf_refl`; los siete duros ponen su reconstrucción aritmética. El cierre
+`derives_lineWF_neg_of_concl` es entonces **uno solo** para los diecinueve.
+
+🔑 *Cuando una igualdad de Lean sólo vale para parte de los casos, el enunciado que los une no es
+el débil: es el que lleva la igualdad DEMOSTRABLE al lado de la definicional.*
+
+### 2 · ⛔⛔ Y el hallazgo caro: cinco de los siete **ya estaban**
+
+`prf_q1_concl_code`, `prf_q2_concl_code`, `prf_leibniz_concl_code`, `prf_ind_concl_code` y
+`prf_listInd_concl_code` viven en `Meta/ArithPrf.lean:470-540`, **exportados a la raíz**. Entre
+ellos los **dos que yo había marcado como los más gnarly** (`ind` y `listInd`, los que anidan
+`substfc` dentro de `liftfc`). Los re-derivé antes de encontrarlos, y las re-derivaciones salieron
+**línea por línea idénticas** a las que ya estaban.
+
+🔑 **Cuando la re-derivación sale idéntica a la original, no es que el problema fuera fácil: es
+que ya estaba resuelto y no se buscó.** Ésa es la señal barata que tenía a mano y no usé.
+⇒ van **ONCE** de «antes de construir, buscar», y es la más cara de las once en líneas evitables.
+
+⚠️ El sondeo `sondeos/TagConclCoste.lean` (ADR-079, del día anterior) **midió bien y buscó mal**:
+dijo «`prf_substFormula_arith` es la ecuación que falta» —cierto— y no miró **dos declaraciones
+más abajo**, donde estaban ya compuestas para los cinco tags. *Encontrar el ingrediente no es
+haber buscado el plato.*
+
+⭐ Lo que de verdad faltaba eran **dos**: `q3` (11) y `qconf` (19), los del `liftfc`. Difieren sólo
+en si el `liftfc` va en el antecedente o en el consecuente del `∀`, y por eso ninguna de las dos
+se habría heredado de la otra. Dos líneas cada una.
+
+### 3 · 📐 El inventario
+
+| pieza | estado |
+|---|---|
+| despachador | 🏁 `dispatcher` (ADR-078) |
+| (a), (b), (c′), (d) | 🏁 **CERRADAS** |
+| (e) `mp`/`gen` | 🏁 cerrada (ADR-077); ⬜ la forma de `premsOf x` por regla |
+| (f) tipo de argumento | ⬜ tres cierres, nada escrito, **nada medido** |
+
+**Controles (re-ejecutados, M-13, todos `exit 0`):** `check-footprints` **414** (cobertura
+**383/383**) · RPP **145 jobs**, 0 errores. ⚠️ **ÁMBITO**: FOL **no se tocó**; el resto de
+controles se re-ejecuta en la entrada de cierre de la tanda.
+
+**Véase también:** ADR-079 ((b)), ADR-078 (el despachador), `sondeos/TagConclCoste.lean`,
+`Meta/ArithPrf.lean:470-540`, `Meta/ChainNegPrf.lean` §1quater.

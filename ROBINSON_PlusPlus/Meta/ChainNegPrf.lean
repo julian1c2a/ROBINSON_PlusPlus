@@ -63,7 +63,7 @@ enumerar**:
 |---|---|---|
 | (a) | **tag fuera de rango** (`k ≥ 21`) | 🔶 `prf_tagDisj_absurd` acota el tag por 20 |
 | (b) | **aridad equivocada** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_of_arity` + los **21** `prf_lenc_*` |
-| (c) | **la conclusión no casa** (`stepConcl ≠ f`) | ✅ **`derives_lineWF_neg_of_tag`** + `formCode_ne` — es el grueso, y está |
+| (c) | **la conclusión no casa** (`stepConcl ≠ f`) | 🏁 **CERRADA 2026‑09‑22**, `derives_lineWF_neg_of_concl` + los **19** `tc_*` |
 | (d) | **`thy` con `f ∉ axioms`** | 🏁 **CERRADA 2026‑09‑21**, `derives_lineWF_neg_thy_of_decode` — la ✅ anterior era **falsa** (ver 3 abajo) |
 | (e) | **`mp`/`gen` sin premisas en el acumulador** | 🏁 **CERRADA 2026‑09‑21** (§2quater, `derives_chainOk_neg_of_prem`) — no va por `lineWF` sino por `premsOf ⊆ conclusiones anteriores`. ⬜ falta sólo el **transporte** a `mp`/`gen` |
 
@@ -566,6 +566,143 @@ theorem derives_lineWF_neg_of_arity (f : Formula) (k n : Nat) (args : List Term)
   exact derives_lineWF_neg_of_lenc_imp (prf_mp (prf_swap_imp himp) htag) hlen hne
 
 
+/-! ## §1quater · 🏁 EL CIERRE DE LA CAUSA **(c′)** — la conclusión no casa
+
+⭐⭐ **Un solo cierre para los diecinueve tags estructurales**, y el reparto se queda fuera.
+La forma que lo permite es `TagCode`: en vez de pedir la igualdad de Lean
+`tagConcl k args = some ⌜c⌝` —que **sólo vale para doce de los diecinueve**, porque `substfc` y
+`liftfc` son símbolos OBJETO y no reducen—, se pide el par «la ecuación literal de `tagConcl`
+**más** una igualdad DEMOSTRABLE hasta el código». Los doce fáciles ponen `prf_refl`; los siete
+duros ponen su reconstrucción aritmética.
+
+⛔⛔ **Y de esos siete, CINCO ya estaban escritos** (`prf_q1_concl_code`, `prf_q2_concl_code`,
+`prf_leibniz_concl_code`, `prf_ind_concl_code`, `prf_listInd_concl_code`, en
+`Meta/ArithPrf.lean:470-540`), **exportados a la raíz**, y entre ellos los **dos que yo había
+marcado como los más gnarly** (`ind` y `listInd`). Los re-derivé antes de encontrarlos, y las
+re-derivaciones salieron **línea por línea idénticas**. Van **ONCE** de «antes de construir,
+buscar».
+🔑 *Cuando la re-derivación sale idéntica a la primera, no es que el problema fuera fácil: es que
+ya estaba resuelto y no se buscó.*
+
+⭐ Lo que de verdad faltaba eran **dos**: `q3` (11) y `qconf` (19), los del `liftfc` — y son dos
+líneas cada uno. -/
+
+/-- **El tag `k` con argumentos `args` reconstruye el CÓDIGO de `c`.**
+El par, y no la igualdad de Lean, porque `substfc`/`liftfc` **no reducen**: para doce tags la
+segunda componente es `prf_refl`, para siete es una reconstrucción aritmética. -/
+def TagCode (k : Nat) (args : List Term) (c : Formula) : Prop :=
+  ∃ e, And (tagConcl k args = some e) (Prf (e =eq formCode c))
+
+/-- Si el código reconstruido es el de `c` y `f ≠ c`, la teoría refuta que sean iguales. -/
+theorem derives_neg_eq_of_code_ne {f c : Formula} {e : Term}
+    (hcode : Prf (e =eq formCode c)) (hne : f ≠ c) :
+    axioms ⊢ neg (formCode f =eq e) := by
+  refine FOL.MetaRules.raa (fun heq => ?_)
+  exact FOL.MetaRules.mp (formCode_ne hne)
+    (FOL.derive_eq_trans heq (prf_to_derives hcode))
+
+/-- ⭐⭐⭐ **EL CIERRE DE (c′)**, uno para los diecinueve tags estructurales: si la línea dice
+concluir `f` y el tag reconstruye `c ≠ f`, la teoría **refuta** `lineWF`.
+
+⚠️ `htc` entra como hipótesis en vez de despacharse por tag aquí dentro — igual que en
+`derives_lineWF_neg_of_arity` (§1ter) y `derives_chainOk_neg_of_prem_line` (§2quater):
+*el reparto vive en el despachador (§4), no dentro de cada cierre*. -/
+theorem derives_lineWF_neg_of_concl {f c : Formula} {k : Nat} {args : List Term}
+    (htc : TagCode k args c) (hne : f ≠ c) :
+    axioms ⊢ neg (lineWF (cons (formCode f) (cons (numeralM k) (objList args)))) := by
+  obtain ⟨e, h1, h2⟩ := htc
+  exact derives_lineWF_neg_of_tag k (formCode f) args e h1
+    (derives_neg_eq_of_code_ne h2 hne)
+
+/-! ### Los DOCE tags cuyo código sale por `rfl` -/
+
+theorem tc_p1 (A B : Formula) : TagCode 0 [formCode A, formCode B] (A ⇒ (B ⇒ A)) :=
+  ⟨_, rfl, prf_refl _⟩
+
+theorem tc_p2 (A B C : Formula) :
+    TagCode 1 [formCode A, formCode B, formCode C]
+      ((A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C))) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_c1 (A B : Formula) :
+    TagCode 2 [formCode A, formCode B] (A ⇒ (B ⇒ Formula.and A B)) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_c2 (A B : Formula) :
+    TagCode 3 [formCode A, formCode B] (Formula.and A B ⇒ A) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_c3 (A B : Formula) :
+    TagCode 4 [formCode A, formCode B] (Formula.and A B ⇒ B) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_j1 (A B : Formula) :
+    TagCode 5 [formCode A, formCode B] (A ⇒ Formula.or A B) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_j2 (A B : Formula) :
+    TagCode 6 [formCode A, formCode B] (B ⇒ Formula.or A B) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_j3 (A B C : Formula) :
+    TagCode 7 [formCode A, formCode B, formCode C]
+      (Formula.or A B ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C))) := ⟨_, rfl, prf_refl _⟩
+
+theorem tc_efq (A : Formula) :
+    TagCode 8 [formCode A] (Formula.bottom ⇒ A) := ⟨_, rfl, prf_refl _⟩
+
+/-- ⚠️ Éste lleva `termCode`, no `formCode`, y aun así es `rfl`. -/
+theorem tc_eqrefl (t : Term) : TagCode 12 [termCode t] (Formula.eq t t) :=
+  ⟨_, rfl, prf_refl _⟩
+
+theorem tc_p3 (A : Formula) :
+    TagCode 14 [formCode A] (((A ⇒ Formula.bottom) ⇒ Formula.bottom) ⇒ A) :=
+  ⟨_, rfl, prf_refl _⟩
+
+/-- ⚠️ `gen` (17) **sí** está en `tagConcl`; los que no están son `thy` (15) y `mp` (16). -/
+theorem tc_gen (A : Formula) : TagCode 17 [formCode A] (Formula.forall A) :=
+  ⟨_, rfl, prf_refl _⟩
+
+/-! ### Los SIETE con `substfc`/`liftfc`
+
+⭐ Cinco son **una línea**, porque su reconstrucción estaba ya en `Meta/ArithPrf.lean`. -/
+
+theorem tc_q1 (A : Formula) (t : Term) :
+    TagCode 9 [formCode A, termCode t] (Formula.forall A ⇒ substFormula 0 t A) :=
+  ⟨_, rfl, prf_q1_concl_code A t⟩
+
+theorem tc_q2 (A : Formula) (t : Term) :
+    TagCode 10 [formCode A, termCode t] (substFormula 0 t A ⇒ Formula.ex A) :=
+  ⟨_, rfl, prf_q2_concl_code A t⟩
+
+theorem tc_leibniz (A : Formula) (t₁ t₂ : Term) :
+    TagCode 13 [formCode A, termCode t₁, termCode t₂]
+      (Formula.eq t₁ t₂ ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A)) :=
+  ⟨_, rfl, prf_leibniz_concl_code A t₁ t₂⟩
+
+/-- ⚠️ Los dos `rw [termCodeM_eq]` son todo lo que separa la forma de `tagConcl` (que usa
+`termCodeM`) de la de `ArithPrf` (que usa `termCode`). -/
+theorem tc_ind (A : Formula) :
+    TagCode 18 [formCode A] (ROBINSON_PlusPlus.Full.inductionFormula A) := by
+  refine ⟨_, rfl, ?_⟩
+  rw [ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq,
+      ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq]
+  exact prf_ind_concl_code A
+
+theorem tc_listInd (A : Formula) :
+    TagCode 20 [formCode A] (listInductionFormula A) := by
+  refine ⟨_, rfl, ?_⟩
+  rw [ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq,
+      ROBINSON_PlusPlus.Meta.Representability.termCodeM_eq]
+  exact prf_listInd_concl_code A
+
+/-- ⭐ **Uno de los dos que NO estaban**: el `liftfc` va en el consecuente del `∀`. -/
+theorem tc_q3 (A B : Formula) :
+    TagCode 11 [formCode A, formCode B]
+      (Formula.forall (A ⇒ liftFormula 0 B) ⇒ (Formula.ex A ⇒ B)) :=
+  ⟨_, rfl, prf_congr_bin1 (prf_congr_un (prf_congr_bin2 (prf_liftFormula_arith 0 B)))⟩
+
+/-- ⭐ **El otro**: aquí el `liftfc` va en el ANTECEDENTE. Es la única diferencia con `tc_q3`,
+y es la que ninguna de las dos habría heredado de la otra. -/
+theorem tc_qconf (P C : Formula) :
+    TagCode 19 [formCode P, formCode C] (confinementFormula P C) :=
+  ⟨_, rfl, prf_congr_bin1 (prf_congr_un (prf_congr_bin1 (prf_liftFormula_arith 0 P)))⟩
+
+
 /-! ## §2 · `DEUDA_inNeg`: las CABEZAS de una cadena aceptada SON los códigos de sus conclusiones -/
 
 /-- Lo que `decodeLine` garantiza, extraído: la regla CONCLUYE la cabeza. -/
@@ -1060,6 +1197,9 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
   prf_lenc_efq prf_lenc_q1 prf_lenc_q2 prf_lenc_q3 prf_lenc_eqrefl prf_lenc_leibniz prf_lenc_p3
   prf_lenc_thy prf_lenc_gen prf_lenc_ind prf_lenc_qconf prf_lenc_listInd
   derives_lineWF_neg_of_arity
+  TagCode derives_neg_eq_of_code_ne derives_lineWF_neg_of_concl
+  tc_p1 tc_p2 tc_c1 tc_c2 tc_c3 tc_j1 tc_j2 tc_j3 tc_efq tc_eqrefl tc_p3 tc_gen tc_q1 tc_q2
+  tc_leibniz tc_ind tc_listInd tc_q3 tc_qconf
   decodeLine_stepConcl decodeLine_carc decode_heads
   derives_not_In_congr deuda_inNeg
   dispatcher
@@ -1090,3 +1230,8 @@ export ROBINSON_PlusPlus.Meta.ChainNegPrf (
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_thy
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_listInd
 #print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_arity
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.derives_lineWF_neg_of_concl
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_p1
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_ind
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_listInd
+#print axioms ROBINSON_PlusPlus.Meta.ChainNegPrf.tc_qconf
