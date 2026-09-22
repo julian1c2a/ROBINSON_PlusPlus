@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-084**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-22 — hasta **ADR-085**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6742,3 +6742,82 @@ declaradas / 0 sin declarar / 0 sin saldar**, `[B]` **44 de 44** · `check-footp
 
 **Véase también:** ADR-072 (`[E]` rearmado), ADR-073 (`[COBERTURA]`), ADR-074 (el linter),
 `sondeos/lintlab/`.
+
+---
+
+## ADR-085: 📏 **M1–M4**: el modelo de los 141 es alcanzable — y el censo de agujeros sale **limpio**
+
+**Fecha**: 2026-09-22
+**Estado**: ✅ MEDIDO (`sondeos/ModeloDiscriminador.lean`) · ✅ censo aterrizado en `check-sorry.bash`
+**Contexto**: las cuatro mediciones que decidían el frente del modelo, más el censo que sustituye
+al linter de ADR-074 (cerrado en NO por ADR-084 §5).
+
+### 1 · Las cuatro mediciones, y **las cuatro salen a favor**
+
+| | qué | resultado |
+|---|---|---|
+| **M1** | ¿de qué depende `ConsistentH ↔ ¬ Prf ⊥`? | ✅ **net-0** ⇒ un modelo lo descarga **entero**, sin residuo de los 3 `axiom` de Lean |
+| **M2** | ¿es tratable `evalFormula` sobre un axioma real? | ✅ `intro v d; simp […]`, y **`[propext]`** — el mejor footprint posible |
+| **M3** | ¿se puede montar la capa de LISTAS sobre ℕ? | ✅ la inyectividad de Cantor es **net-0 pura**; `carc` existe como inversa clásica |
+| **M4** | ¿cuánto de la solidez de `Prf` está? | ✅ **el aparato semántico entero**: 13 lemas en `FOL/Semantics.lean`, probados en uso por `lkc_sound` (14 reglas) |
+
+⭐ **M4 es el que cambia la cotización**: la parte cara de toda solidez —la semántica de
+sustitución y lifting— **ya está escrita**. La solidez de `Prf` es inducción sobre `Prf`
+reusándola, y **M-11 no la bloquea** porque `Prf` está en la lista blanca.
+⇒ el frente pasa de «¿es posible?» a «¿en qué orden?».
+
+### 2 · ⛔ Lo que M3 encontró EN CONTRA, y no es matemática
+
+1. **`Nat.sqrt` no está en el core de Lean.** `coreAxioms` tiene `ax14_sqrt_le` y
+   `ax15_lt_succ_sqrt`, así que el modelo tendrá que **definir** una raíz entera y probar esas
+   dos. Acotado, pero no gratis.
+2. **Sin Mathlib no hay `ring` ni `by_contra`**, y **`omega` no ve** un producto como
+   `s*(s+1)/2`: el número triangular hay que definirlo **por recursión** para que lo trate
+   linealmente.
+
+🔑 **El obstáculo del frente no era la matemática: era qué trae el core de Lean sin Mathlib.**
+
+### 3 · ⚠️⚠️ Una trampa de notación NUEVA: **las dos se muerden**
+
+Con `Minimal.Axioms` abierto, **`≤` resuelve al símbolo OBJETO `le`** (trampa vieja). Esquivarla
+escribiendo `Nat.le` explícito **ciega a `omega`** (ADR-078). En M3 saltaron **las dos, en el
+mismo lema**, y sólo al **promover** el sondeo — en el scratchpad no estaba ese `open`.
+
+🔑 *Cuando dos trampas de notación se muerden, la salida no es elegir una: es **acotar el
+`open`** para que no coincidan.* M3 vive fuera del `open`; M1/M2, dentro de una `section`.
+⇒ entrada nueva para `feedback_lean_notation_traps`.
+
+### 4 · 🏁 El censo de agujeros de confianza — **limpio, y ahora vigilado**
+
+ADR-084 §5 cerró el linter en NO y propuso medir **los otros** agujeros. Medido en los dos repos:
+
+| | RPP | FOL | |
+|---|---|---|---|
+| `native_decide` | 0 | 0 | ⭐ el peor de todos, y **no está** |
+| `unsafe` · `opaque` · `@[implemented_by]` · `@[extern]` | 0 | 0 | ⭐ ninguna implementación nativa sin verificar |
+| `sorry` | **0** | 0 | los 12 *hits* del grep son **comentarios**; `check-sorry` tenía razón |
+| `partial def` | 1 | 3 | ⚠️ los cuatro **inocuos**: `termToString` y tres ayudantes en `MetaM` — no entran en ningún término de prueba |
+
+⇒ el censo se aterriza en `check-sorry.bash`, con **igualdad exacta** y **probado rompiendo**
+(un `native_decide` de juguete lo pone rojo).
+🔑 *Un agujero que hoy vale cero y que nadie vigila es un agujero abierto, no uno cerrado.*
+⚠️ `partial def` se deja **fuera** del control y se dice por qué: hoy la cifra no discrimina
+entre inocuo y peligroso, y un control que no discrimina se acaba ignorando.
+
+⚠️ Y por segunda vez en el mismo día, **backticks dentro de un `echo "…"` ejecutados como
+sustitución de comando**. *Un control también es código, y el mío falló igual dos veces.*
+
+### 5 · ⬜ El orden que esto deja para el frente del modelo
+
+1. Raíz entera sobre ℕ + `ax14`/`ax15`.
+2. Los **34 core** (molde: M2).
+3. La capa de listas (molde: M3) y de ahí los **107 coding**, interpretando por
+   **decodificar → función de Lean → recodificar**.
+4. **Solidez de `Prf`** por inducción, reusando los 13 lemas de M4.
+5. ⇒ `¬ Prf ⊥` = `ConsistentH`.
+
+**Controles:** `check-doc-sync` (`[H]` **77/77**) · `check-sorry` + censo · RPP **145 jobs**.
+⚠️ **ÁMBITO**: FOL no se tocó en esta entrada.
+
+**Véase también:** ADR-083 (`ModelG`), ADR-084 §5 (el linter, cerrado en NO),
+`sondeos/ModeloDiscriminador.lean`.

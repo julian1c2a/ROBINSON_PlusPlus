@@ -105,7 +105,57 @@ done <<< "$LEAN_FILES"
 echo ""
 if [ "$TOTAL" -eq 0 ]; then
     echo "✅ No sorry found."
+    SORRY_FAIL=0
 else
     echo "⚠️  Total: $TOTAL sorry in $FILES_WITH_SORRY file(s)."
-    exit 1
+    SORRY_FAIL=1
+fi
+
+# ═══ CENSO DE LOS OTROS AGUJEROS DE CONFIANZA ═══════════════════════════════
+# ⛔⛔ POR QUÉ EXISTE (2026-09-22, ADR-085). `check-axioms.bash` censa los `axiom` y este
+# script los `sorry`. Medido hoy: **nadie miraba el resto de la familia** — `native_decide`
+# (que ejecuta código fuera del kernel), `unsafe`, `opaque`, `@[implemented_by]`, `@[extern]`.
+#
+# ⭐ Y la medición salió LIMPIA: los cinco están a CERO en los dos repos. Precisamente por eso
+# se declara ahora: el coste de fijar un cero es nulo, y el de descubrir el primero tarde, no.
+# 🔑 *Un agujero que hoy vale cero y que nadie vigila es un agujero abierto, no un agujero
+#    cerrado.* Es la misma doctrina que `check-warnings`: igualdad EXACTA, nunca cota.
+#
+# ⚠️ Lo que NO entra, y por qué: `partial def` sale 1 en RPP y 3 en FOL, y los cuatro son
+# inocuos —`termToString` (pretty-printing) y tres ayudantes de táctica en `MetaM`—: no
+# aparecen en ningún término de prueba. Si algún día un `partial def` entra en una prueba,
+# eso sí es un agujero; hoy la cifra no discrimina, así que se deja fuera y se dice.
+echo ""
+echo "════ CENSO DE AGUJEROS DE CONFIANZA (esperado: 0 en todos) ════"
+AG_FAIL=0
+for pat in 'native_decide' '^unsafe ' '^opaque ' '@\[implemented_by' '@\[extern'; do
+  N=0
+  for D in "ROBINSON_PlusPlus" "../FOL/FOL"; do
+    [ -d "$D" ] || continue
+    K=$(grep -rn "$pat" --include=*.lean "$D" 2>/dev/null | grep -c . || true)
+    N=$((N + K))
+  done
+  if [ "$N" = "0" ]; then
+    printf '  ✓ %-22s 0\n' "$pat"
+  else
+    printf '  ❌ %-22s %s  ← esperado 0\n' "$pat" "$N"
+    for D in "ROBINSON_PlusPlus" "../FOL/FOL"; do
+      [ -d "$D" ] || continue
+      grep -rn "$pat" --include=*.lean "$D" 2>/dev/null | head -5 | sed 's/^/      /' | cut -c1-140
+    done
+    AG_FAIL=1
+  fi
+done
+if [ "$AG_FAIL" = "0" ]; then
+  echo "  ✓ los cinco agujeros graves siguen a CERO en los dos repos"
+else
+  echo "  🔑 Cada uno de éstos saca una prueba del kernel. Ninguno entra sin su ADR."
+fi
+
+echo ""
+if [ "$SORRY_FAIL" = "0" ] && [ "$AG_FAIL" = "0" ]; then
+  echo '✅ NI `sorry` NI AGUJEROS DE CONFIANZA.'
+else
+  echo '❌ HAY `sorry` O AGUJEROS DE CONFIANZA.'
+  exit 1
 fi
