@@ -20,6 +20,8 @@
       "PowerShell(Get-FileHash *)"
     ],
     "additionalDirectories": [
+      "e:\\Dropbox\\GitHub\\lean4\\FOL",
+      "e:\\Dropbox\\GitHub\\lean4\\FOL\\FOL",
       "e:\\Dropbox\\GitHub\\lean4\\FOL\\FOL\\Theorems"
     ]
   }

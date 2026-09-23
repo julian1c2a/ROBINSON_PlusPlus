@@ -46,6 +46,7 @@ FOL.BlockExtraction0.herbrand_extraction_block|Quot.sound,propext
 FOL.BlockExtraction0.instB_nil|-
 FOL.BlockExtraction0.lk0_herbrand_block|Quot.sound,propext
 FOL.Complexity.complexity_substFormula|propext
+FOL.Inconsistencia.derives0_no_disjunction_property|propext,Classical.choice,Quot.sound
 FOL.Inconsistencia.inconsistencia_de_cualquier_solidez|propext,FOL.MetaRules.raa
 FOL.Canonical0.completeness₀|Classical.choice,Quot.sound,propext
 FOL.Canonical0.derives0_complete_iff|Classical.choice,Quot.sound,propext
