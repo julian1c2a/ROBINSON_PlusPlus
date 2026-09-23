@@ -7538,3 +7538,180 @@ declararon: el build siguió verde sin ellos) · RPP **145 jobs**.
 
 **Véase también:** ADR-022 (`StdChain` estrechada), ADR-076…081 (las seis causas), ADR-089 (las
 seis ramas), ADR-091 (las seis formas), ADR-094/095/096 (los 18 tags).
+
+---
+
+## ADR-098: ⛔⛔ la propiedad de disyunción para `Derives₀` es **FALSA** — y la que se quería **ya estaba probada**
+
+**Fecha:** 2026-09-23 · **Estado:** 📏 MEDIDO Y COMPILADO · **Ámbito:** FOL (medición) + PeanoRF (lectura).
+
+### Contexto
+
+El propietario decidió ir a por la **propiedad de disyunción** como último resultado antes de
+congelar FOL. Antes de construir nada se verificó el objetivo. No sobrevivió.
+
+### 1 · ⛔⛔ El objetivo, como estaba enunciado, es FALSO
+
+`Derives₀` es deducción natural **CLÁSICA** — su cabecera lo dice (`FOL/Derives0.lean:95`) y
+tiene `dne_rule`, `dne_schema` y `forall_not_ex_not` como **constructores**. La propiedad de
+disyunción es la marca de lo **intuicionista**.
+
+El contraejemplo estaba **partido en dos mitades del propio árbol**, a dos módulos de distancia:
+
+| pieza | dónde | qué da |
+|---|---|---|
+| `derives0_em_ctx` | `FOL/Propositional0.lean:78` | `Δ ⊢₀ A ∨ ¬A`, finitario, por `dne_rule` |
+| `derives0_not_complete` | `FOL/Soundness0.lean:235` | `∃A, ⊬₀ A ∧ ⊬₀ ¬A`, dos modelos sobre `Unit` |
+
+Juntas: `[] ⊢₀ A ∨ ¬A` con **ninguno de los dos disyuntos derivable**. Compilado, **net‑0**,
+cinco líneas de prueba.
+
+🔑 Van **CATORCE** de «antes de construir, buscar», y ésta en su forma más cara: no es un lema
+que se habría re‑derivado, es **la refutación del objetivo**, que se habría encontrado *después*
+de abrir el frente.
+
+### 2 · ⭐⭐⭐ Y la propiedad que SÍ se quería ya estaba probada — en PeanoRF
+
+`PeanoRF/Calculus/DerivesI.lean` define `Derivesᵢ` = **literalmente `Derives₀` menos los tres
+constructores clásicos**, sobre nuestra `FOL.Formula`, importando nuestro `FOL.Derives0`, **con
+`refl`, `subst` y `rewrite_at`**. Y `Slash.lean:899` prueba `disjunction_property` por la **barra
+de Kleene**; `:930` la de existencia; `:964` la separación `⊢ᵢ ≠ ⊢₀` — **cuyo testigo es nuestro
+`derives0_em_ctx`**. Cero `sorry`, cero `axiom` en los ocho ficheros (2 667 l.).
+
+⇒ **QUINCE.** El trabajo estaba en el repositorio de al lado.
+
+### 3 · ⛔⛔ Las dos rutas de construcción, medidas y cerradas
+
+* **Ruta A (secuentes).** Restringir `LK₀` a succedente único **no se hereda** en `orR` (su
+  premisa lleva **dos** fórmulas a la derecha; en LJ eso se parte en `orR1`/`orR2`, reglas
+  *distintas*), `implL` y `struct` (contracción a la derecha, justo lo que lo hace clásico). Y
+  mata **`LeftPrin`**, el dato que reduce el Hauptsatz de 5×14 casos a dos pasadas de 14.
+  ⇒ `LJ₀` sería un inductivo nuevo con eliminación de corte nueva, del orden de las **1 256
+  líneas** de `Hauptsatz0.lean`, **con cero reutilización**.
+* **Ruta B (importar la de PeanoRF).** ⛔ **Imposible**: la cadena baja a `PeanoRF.Prelim`, que
+  importa `ROBINSON_PlusPlus.Minimal.Axioms` y `Peano.PeanoNat.Axioms`. **La DP existe,
+  compilada, y es inalcanzable desde FOL.**
+
+### 4 · ⚠️ Una medida NUESTRA, rectificada
+
+Se iba a decir a PeanoRF que `Subst.lean` «no es adoptable tal cual» porque `Prelim` importa RPP
+y Peano. **La premisa sobre `Prelim` es cierta y la conclusión sobre `Subst.lean` es falsa**:
+medido, su cuerpo (l. 54‑346) **no menciona ni un identificador de RPP ni de Peano**; todo lo
+externo son 8 nombres del nivel raíz de `FOL/FOL.lean` más core de Lean 4.31, y el acoplamiento
+con `Prelim` es **un `open FOL` vestigial**. Son **4 líneas**.
+
+🔑 *Medir el acoplamiento de un módulo por el de su import no es medirlo.*
+
+### 5 · ⇒ La propuesta (C), sancionada por el propietario
+
+Que **`Subst.lean`, `DerivesI.lean` y `Slash.lean` bajen a FOL**: son sobre `FOL.Formula` y
+`FOL.Derives0`, no sobre HA. ⭐ Y es barato por un dato medido: **el acoplamiento de toda esa
+cadena con RPP y Peano es UNA SOLA LÍNEA** (`Collapse.lean:72`, `zero`).
+
+⬜ Enviada como propuesta en `../FOL/RESPUESTA-PEANORF-2026-09-23.md`. **FOL no se sella hasta
+que contesten.**
+
+### 6 · ⚠️ Lo que NO se sigue, y lo escribe PeanoRF
+
+`Slash.lean:845‑867`: son las propiedades de la **lógica `⊢ᵢ`**, **no las de HA** — barrar el
+esquema de inducción es el caso difícil y no está hecho. Y el testigo de `existence_property` en
+el caso `[]` **puede llevar variables libres**: es más débil que la propiedad de existencia de HA.
+
+**Véase también:** ADR-050/052 (el Hauptsatz), `sondeos/` no aplica (esto se midió en solo lectura).
+
+---
+
+## ADR-099: 🏁 el CIERRE de FOL — (D)(B)(C), el encargo §3, la cuarentena vaciada y `folSystem` retirada
+
+**Fecha:** 2026-09-23 · **Estado:** ✅ EJECUTADO · **Ámbito:** FOL. RPP sin cambios de código.
+
+### 1 · (D) El rojo vivo
+
+`REFERENCE.md` marcaba 2026‑09‑18 con su último commit el 2026‑09‑22 (ADR‑083, `ModelG`). El
+**cuerpo sí estaba al día**; lo que faltaba era la marca. Lo cazó `[E]`.
+
+### 2 · (B) NUEVE cabeceras que anunciaban ABIERTO lo probado al lado
+
+| decía ⬜ | lo paga |
+|---|---|
+| `Herbrand0` (×3) | `Hauptsatz0.herbrand_extraction` / `BlockExtraction0` |
+| `Derives1`, `Derives2`, `Propositional0`, `Sequent0` | `Hauptsatz0.cut_elimination` |
+| `Prenex0` | `PrenexNF0` — que **refuta su propia estimación** de ~200 l. |
+| `Skolem0` | `SkolemN0.skolem_conservative_n` (decía «**MEDIDO** que no existe nada de eso») |
+| `Lindenbaum0` | `Canonical0` — era una **predicción cumplida** |
+| `Rename` | `Eigenvariable.derives0_gen_fresh` |
+| `Derives0` | los **tres** puntos de su hoja de ruta, hechos |
+
+Todas corregidas **nombrando quién las paga**, y dejando el párrafo original como historial.
+
+### 3 · (C) ⭐⭐ `[G.2]`, y el hueco MEDIDO de `[G.1]`
+
+`[G.1]` (ADR‑072) sólo lee el docstring **pegado a un `def X : Prop`** y sólo acepta como pago un
+`theorem X : X :=`. ⇒ no ve **(a)** la marca de deuda que vive en la cabecera `/-! … -/` del
+módulo, ni **(b)** la deuda que paga **otro módulo entero**. Las dos clases estaban pobladas y
+`[G.1]` estaba en **VERDE**.
+
+`[G.2]` es el **censo** de marcadores con trinquete en los dos sentidos: cada uno se clasifica
+como `ABIERTA` / `DIFERIDA` / `OFERTA` / `HISTORIAL`. **Probado rompiendo** en las tres
+direcciones (marcador sin declarar · fila que ya no casa · ancla ambigua) y verde al restaurar.
+
+🔑 *`[G.1]` comprueba que la deuda tiene TESTIGO; `[G.2]`, que ha sido MIRADA.*
+⚠️ Y el recuento es el mismo que ADR‑072 midió al crear `[G.1]` (19 de 24): **sin trinquete, el
+problema vuelve a crecer**.
+
+### 4 · 🏁 El encargo §3 de PeanoRF
+
+`FOL/Complexity.lean`: `formulaComplexity` y `complexity_substFormula` bajan de `Canonical0` §5 —
+estaban detrás de toda la cadena clásica de completitud sin necesitarla. Footprint **`[propext]`**.
+
+⛔ **Y un fallo de método, con nombre**: se verificó con `lake build` desde RPP y dio **VERDE sin
+haber compilado el módulo** — RPP no importa `FOL.Canonical0`, así que su build no alcanza la capa
+₀. El build de FOL es `lake build "@FOL/FOL" "@FOL/TheoryFramework"` desde la raíz de RPP.
+🔑 *Un verde puede no ser haber comprobado* — [[feedback-build-cache]].
+
+### 5 · (E) La cuarentena, VACIADA
+
+| fichero | qué | por qué |
+|---|---|---|
+| `Soundness.lean`, `Compacity.lean`, `Theorems_Soundness.lean` | **BORRADOS** | teoremas FALSOS; sujetos reparados en `Soundness0`/`Compacity0` |
+| `Completeness.lean` | **BORRADO** | superado por `Canonical0.completeness₀` |
+| `Inconsistencia.lean` | ⭐ **SUBE AL BUILD** → `FOL/Inconsistencia.lean` | era la EVIDENCIA |
+
+⚠️ **E2 no revierte ADR‑032**, que decidió que `henkin_extension_lemma` se quedaba: desaparece el
+**módulo** que lo alojaba, superado por un teorema que no lo necesita. La decisión queda **sin
+objeto**, no revocada. ⇒ el repositorio pasa a **4 `axiom` y ni uno más en ninguna parte**.
+
+⭐⭐ **E3 es el que importa.** `Inconsistencia.lean` prueba que la solidez de `Derives` es falsa, y
+vivía en un directorio que **no se compila** — que es lo que `cuarentena/README.md` §7 identifica
+como la causa de que un `axiom` falso sobreviviera **ochenta días**. Footprint medido:
+`[propext, FOL.MetaRules.raa]`. Seguro en la librería principal porque el teorema es
+**CONDICIONAL**: `(solidez : …) → False`, no afirma `False`.
+
+🔑 **Congelar un repositorio con su pieza de evidencia sin compilar es congelar una afirmación,
+no un hecho.**
+
+### 6 · (1) `folSystem`, RETIRADA
+
+**Medido**: se declaraba **una vez** (`TheoryFramework/Instances/FOL.lean:77`) y **no la consumía
+nadie en código** — las otras tres apariciones del nombre eran prosa. Declaraba
+`derives := Derives`, el cálculo contaminado, y por eso `SoundLogic Formula` era **inhabitable** y
+`CompleteLogic Formula` **no** la pagaba `completeness₀`.
+
+⚠️ **El módulo se queda**, y a propósito: lo que vale de él es la cabecera que explica **por qué
+no hay instancia** y la vía para reabrirlo (declararla sobre `Derives₀`, con lo que `SoundLogic`
+la pagaría `derives0_soundness` y `CompleteLogic` la pagaría `completeness₀`).
+🔑 *Borrar la explicación de una deuda es cómo la deuda sobrevive a su propio motivo.*
+
+⬜ **Y queda una pregunta abierta que el propietario no ha contestado**: con `folSystem` retirada,
+`TheoryFramework` (6 módulos, 456 l.) queda **sin ningún habitante y sin ningún consumidor**. Es
+exactamente la forma que mandó `FOLPure`/`PropLogic`/`FOL_poli` a cuarentena. **No se ha tocado.**
+
+### 7 · ⚠️ Hallazgo de proceso
+
+`FOL/DECISIONS.md` lleva **dormido desde ADR‑010** mientras todas las decisiones de FOL van a
+este fichero. Avisado en su cabecera. 🔑 *Un log de decisiones que nadie escribe no es un log
+vacío: es un puntero falso* — la misma causa que congeló el `CHANGELOG` y con él el control `[E]`
+(ADR‑072). Y con PeanoRF hay **colisión de numeración**: prefijos `RPP‑` / `PRF‑` desde hoy.
+
+**Controles:** FOL `check-doc-sync` · `check-axioms` · `check-sorry` en verde. **FOL 56 jobs**
+(54 → 55 módulos activos, 0 en cuarentena). RPP 145 jobs, sin cambios.
