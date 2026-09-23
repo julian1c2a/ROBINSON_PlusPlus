@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-22 — hasta **ADR-094**. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-23 — hasta **ADR-099**. ⬜ La tarde del 2026‑09‑23 (decisiones de cierre de FOL, T1/T2/T3/T5) va en ADR‑100, **sin escribir** al cortarse la sesión. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
