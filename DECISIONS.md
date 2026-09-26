@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-26 — hasta **ADR-100** (el cierre de FOL: la tarde del 2026‑09‑23 y su ejecución del 2026‑09‑26). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-26 — hasta **ADR-101** (las decisiones D1-D7 del cierre de FOL y la condición para PeanoRF). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7814,3 +7814,23 @@ TRANSITIVO toca 14 módulos de FOL, no 4); *medir un cono por la palabra que lo 
 
 **Controles:** FOL 57 jobs · 54 módulos activos · 4 `axiom` · 0 `sorry` · `[G.2]` 19/19.
 RPP `check-footprints` con las 14 filas de hoy.
+
+## ADR-101: las decisiones D1-D7 del propietario sobre el cierre de FOL, y la condición para PeanoRF
+
+**Fecha:** 2026-09-26 · **Estado:** 🔄 EN EJECUCIÓN (D1 hecho) · **Ámbito:** FOL. Detalle vivo en
+`FOL/NEXT-STEPS.md` («Lo que queda para CERRAR FOL»).
+
+| # | decisión del propietario | estado |
+|---|---|---|
+| D1 | borrar `FOL/Tactics2.lean` | ✅ borrado: era idéntico, salvo el `import`, a `librerias-retiradas/FOL_poli/Tactics2.lean`. El 2026‑09‑23 se había comparado con el fichero equivocado (`Tactics.lean`). FOL: **53 módulos** |
+| D2 | renombrar `IsSyntacticallyComplete₀` antes de congelar `Canonical0` | ⬜ nombre medido: `IsMemComplete₀` |
+| D3 | las dos ABIERTA de `[G.2]` | ⏸ «lo hablamos al final» |
+| D4 | cerrar la vía de `ModelG` «si está terminada» | ✅ medido TERMINADA ⇒ ⬜ se cierra |
+| D5 | hacer el refactor de `Lift0` | ⬜ los dos diseños convergen en el genérico (`absTermP`); juez en curso |
+| D6 | ¿qué marca `₀`? (con el FOL intuicionista a la vista) | medido: ninguna regla; nació como ordinal de plan (ADR‑033). ⚠️ En RPP, `Prf₀` es la capa **intuicionista**: la misma marca dice lo contrario en los dos repos. ⬜ decisión sobre la regla |
+| D7 | cerrar la migración `String`→`List Char` «si está terminada» | ⛔ NO lo está (los `abbrev` siguen en `String`) ⇒ no se cierra; recomendación medida: abandonarla en FOL |
+
+⛔ **Condición nueva, no negociable, para la propuesta (C)** (ADR‑100 §1.7): **FOL no puede depender
+de nada más allá de sí mismo.** Medido: los siete módulos de PeanoRF la incumplen hoy (todos importan
+`PeanoRF.Prelim`, que trae RPP y Peano; `Collapse` y `Eq` usan `zero`/`succ` de RPP; y `Eq` usa
+`FOL.substTerm_liftTerm`, que le llega **a través de RPP**, dependencia que ninguna carta había visto).
