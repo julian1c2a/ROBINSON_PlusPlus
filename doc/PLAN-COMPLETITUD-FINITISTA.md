@@ -41,7 +41,7 @@
 > modelo de un punto), footprint `[propext, Quot.sound]`. **El mismo enunciado que
 > `derives0_consistent`, sin `Classical.choice`.** Ver §5.12.
 >
-> ⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.
+> ~~⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.~~ ⛔ *(anotado el 2026-09-26)* La migración de firma quedó **ABANDONADA en FOL** (§7.3, D7, ADR-102): `Term`/`Formula` siguen sobre `String` a propósito.
 >
 > 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.13**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060), 🏁 **la FORMA NORMAL de Skolem** (062) 🏁 **MAEHARA + CRAIG** para el fragmento puro (063) y 🏁 **la mitad ⟹ de HERBRAND DE BLOQUE** (064). ⇒ **sin deudas enunciadas.**
 > ⚠️ Lo excluido del catálogo va con su razón **medida** en ADR‑054 §4 (propiedad de subfórmula, conservatividad de los 107 `codingAxioms`, Church): **falsos o no enunciables**, no «pendientes».
@@ -104,7 +104,7 @@ numerables es finitistamente REDUCIBLE, y su contenido finitario es Herbrand»*.
 |---|---|---|
 | enumerabilidad de `Formula`, **computable** | `../FOL/FOL/Enumeration.lean` (ADR‑030) | `[propext, Classical.choice, Quot.sound]` |
 | congruencias de la igualdad | `../FOL/FOL/Theorems/Eq.lean` (ADR‑031) | **`[propext, Quot.sound]`** desde el arreglo del 09‑14 |
-| Lema de Lindenbaum | `cuarentena/Completeness.lean` | `[propext, Classical.choice, Quot.sound]`, **incondicional** |
+| Lema de Lindenbaum | `cuarentena/Completeness.lean` (⛔ **BORRADO** el 2026-09-23, ADR-099 §5; hoy, sobre `Derives₀`: `FOL/Lindenbaum0.lean` `lindenbaum_lemma` y `FOL/Canonical0.lean` `truth_lemma` · *anotado el 2026-09-26*) | `[propext, Classical.choice, Quot.sound]`, **incondicional** |
 | modelo canónico y **Lema de la Verdad** | ídem | net‑0 puros |
 | solidez de un cálculo sin axiomas habitándolo | `sondeos/AnclaSoundness.lean` (`prfI_soundness`) | net‑0 puro |
 
@@ -566,7 +566,7 @@ una complicación entera de la prueba clásica.*
 | `substFormula_lift_comm` | `k = v` | `Theorems/Eq.lean` |
 | `liftFormula_subst` | `v ≤ k` | `Lift0.lean` |
 | ⭐ `liftFormula_subst_le` | **`k ≤ v`** | **hecho aquí** |
-| ⬜ Barendregt general | `substFormula v s (substFormula 0 u f) = …` | **falta** — `subst_subst_comm_succ` sólo cubre índices **adyacentes** |
+| ~~⬜~~ 🏁 Barendregt general | `substFormula v s (substFormula 0 u f) = …` | ~~**falta** — `subst_subst_comm_succ` sólo cubre índices **adyacentes**~~ → 🏁 `Hauptsatz0.lean` §5, `substFormula_subst_le`, general en `w ≤ v` (ésta es su instancia `w = 0`) — 2026-09-17, §5.10, ADR-051 · *anotado el 2026-09-26* |
 
 #### 🏁 Lo que faltaba para `CutAdm` — **dos de tres, HECHAS** (§5.10)
 
@@ -574,7 +574,7 @@ una complicación entera de la prueba clásica.*
    confirmado — hecha el 2026‑09‑17, §5.10;
 2. 🏁 **`lkh_subst`** (el cálculo cerrado por sustitución, preservando altura), ~150 l.
    estimadas → **133 l.** — hecha el 2026‑09‑17, §5.10;
-3. ⬜ **la inducción doble**, ~400–600 l., **riesgo alto**. Es la pieza grande, y ya la única.
+3. ~~⬜~~ 🏁 **la inducción doble**, ~400–600 l., **riesgo alto**. ~~Es la pieza grande, y ya la única.~~ → **605 l.** medidas, hecha el 2026-09-17 (§5.11, ADR-052: `Hauptsatz0.hauptsatz : CutAdm`), y la inducción **doble** no hizo falta · *anotado el 2026-09-26*.
 
 ⚠️ **Y no hay atajo semántico, que conviene dejar escrito**: `CutAdm` **no** sale de `lkc_sound`
 + `completeness₀`, porque `completeness₀` devuelve una derivación de **`Derives₀`**, no de `LK₀`, y
@@ -807,7 +807,7 @@ ninguno de los dos es el núcleo no finitario.
 
 ### 6.1 · Lo que ya está
 
-Casi todo. `cuarentena/Completeness.lean` porta a `Derives₀` **sin tocar nada sustancial**
+Casi todo. `cuarentena/Completeness.lean` (⛔ *BORRADO el 2026-09-23, ADR-099 §5: no se portó tal cual, se rehízo en módulos nuevos, ver §6.4; anotado el 2026-09-26*) porta a `Derives₀` **sin tocar nada sustancial**
 ⬜ (estimación, no medida — pero apoyada en que usa 14 constructores y ninguno es `gen_rule`, y en
 que ni importa `MetaRules`):
 
@@ -1148,7 +1148,7 @@ puede descargar no es un teorema utilizable.*
 axioma bajo el prefijo `∀ⁿ`, la regla K iterada — **no medida**), y el **enchufe con Herbrand**:
 `skolemNF_shape` da `∀ᵐ ψ` con `QuantFree ψ`, que es la hipótesis exacta de `herbrand`, pero
 Herbrand habla de **existenciales** y Skolem los quita ⇒ el ensamblaje real pasa por la negación,
-y **no está escrito**.
+y **no está escrito**. → 🏁 *(anotado el 2026-09-26)* Las dos cosas, hechas el 2026-09-18: la dirección con los axiomas, `SkolemNF0.derives0_skolemize`/`derives0_skolemize_iff` (`SkolemNF0` §8, ADR-065: la regla K iterada resultó ser un solo lema), y el enchufe, `SkolemHerbrand0.herbrand_of_skolemNF` (ADR-066); D3b lo llevó a `φ` y `Γ` cualesquiera (`herbrand_validity_ctx₀`, ADR-103 §1).
 
 ---
 
@@ -1192,7 +1192,7 @@ desde cero». Medido: **665 l.**, y `predF`+`PredSub`+`Cov` son **30**. El riesg
 ⬜ **Lo que NO da**: no hay **puente hacia `LKp`** (`ndToLK` produce `LK₀` y usa `eqAx`) — por eso
 el módulo lleva `lkp_example`/`craig_example` como controles de **no vacuidad**; no es
 interpolación para **FOLᐟ**; y no incluye la condición sobre **variables libres** (vacua para
-sentencias, estrictamente más débil para fórmulas abiertas).
+sentencias, estrictamente más débil para fórmulas abiertas). → 🏁 *(anotado el 2026-09-26)* El **puente** y la interpolación **con igualdad**, hechos el 2026-09-26 (D3a, ADR-103 §2): `../FOL/FOL/Interpolation0.lean`, `lk0_to_lkp` y `craig₀ : [A] ⊢₀ B → ∃ C, …`, `[propext, Quot.sound]`, sin borrar predicados. La condición sobre variables libres sigue fuera: `craig₀` sólo pide `PredSub`.
 
 ---
 
@@ -1429,16 +1429,16 @@ también está CERRADA (ADR-100 §1.1, definitiva el 2026-09-26).
 |---|---|---|
 | ~~**1**~~ | 🏁 ~~`Derives₀` + encaje a `Derives` (§3)~~ — **HECHO 2026‑09‑14** | — |
 | ~~**2**~~ | 🏁 ~~`derives0_soundness` (§4)~~ — **HECHO 2026‑09‑14** | 1 |
-| **3** | portar `Completeness.lean` a `Derives₀` y **medir qué se rompe** | 1 |
-| **4** | H1 + H2 (proposicional finito) | 1 |
-| **5** | Henkin real (§6.2) | 1, 2 |
-| **6** | ⛔ H3, normalización | 1 |
-| **7** | H4 + la capa de congruencia con `=` (§5.3) | 6 |
+| ~~**3**~~ | 🏁 ~~portar `Completeness.lean` a `Derives₀` y **medir qué se rompe**~~ — **HECHO 2026-09-16**, rehecho sobre `Derives₀` en módulos nuevos (`Fresh0`, `HenkinLimit0`, `Lindenbaum0`, `Eq0`, `Canonical0`; §6.4) ⇒ `Canonical0.completeness₀` (ADR-039, ADR-040, ADR-041); `cuarentena/Completeness.lean`, **BORRADO** el 2026-09-23 (ADR-099 §5) · *anotado el 2026-09-26* | 1 |
+| ~~**4**~~ | 🏁 ~~H1 + H2 (proposicional finito)~~ — **HECHO 2026-09-16**: `Propositional0.derives0_of_ptaut` y `derives0_of_ptaut_ctx` (ADR-042, §5.2) · *anotado el 2026-09-26* | 1 |
+| ~~**5**~~ | 🏁 ~~Henkin real (§6.2)~~ — **HECHO**, cerrado el 2026-09-16: `Henkin0.henkin_step_consistent` (ADR-037), `HenkinLimit0.henLimit_consistent` (ADR-039) y `Lindenbaum0.henkin_completion` (ADR-040); §6.2, §6.4 · *anotado el 2026-09-26* | 1, 2 |
+| ~~**6**~~ | 🏁 ~~⛔ H3, normalización~~ — **HECHO 2026-09-17**: `Hauptsatz0.hauptsatz` y `cut_elimination` (ADR-052, §5.11) · *anotado el 2026-09-26* | 1 |
+| ~~**7**~~ | 🏁 ~~H4 + la capa de congruencia con `=` (§5.3)~~ — **HECHO**: H4 ⟸ `Herbrand0.derives0_ex_of_cert` (2026-09-16, ADR-043) y ⟹ `Hauptsatz0.herbrand_extraction`, juntas en `Hauptsatz0.herbrand` (2026-09-17, ADR-052); la congruencia, como **dato** del certificado (`Herbrand0.EqInstance` dentro de `HerbrandCert`, ADR-043, §5.4) y como regla `eqAx` de `LK₀` (ADR-049) · *anotado el 2026-09-26* | 6 |
 
 ⛔ **Lo que NO hay que hacer:**
 
-* **No pagar `henkin_extension_lemma` en `Derives`.** Decidido (ADR‑032, opción A); para tocarlo
-  hay que reabrir el ADR, y `check-axioms.bash` (`ESPERADO_CUAR=1`) rompe también si baja a 0.
+* ~~**No pagar `henkin_extension_lemma` en `Derives`.** Decidido (ADR‑032, opción A); para tocarlo
+  hay que reabrir el ADR, y `check-axioms.bash` (`ESPERADO_CUAR=1`) rompe también si baja a 0.~~ ⛔ **Sin objeto desde el 2026-09-23** (ADR-099 §5): el módulo que alojaba el `axiom`, `cuarentena/Completeness.lean`, se BORRÓ, superado por `Canonical0.completeness₀`, que no lo necesita; ADR-032 queda **sin objeto, no revocada**. `../FOL/check-axioms.bash` tiene hoy `ESPERADO_CUAR=0`, y FOL, 4 `axiom` (los de `MetaRules`) · *anotado el 2026-09-26*.
 * **No perseguir un footprint sin `Classical.choice` en la vía W.** Es el teorema, no la
   formalización (§6.3).
 * **No tocar las 320 citas de las meta‑reglas en RPP.** `Derives₀` es un objeto nuevo (§3.4).
@@ -1452,8 +1452,8 @@ también está CERRADA (ADR-100 §1.1, definitiva el 2026-09-26).
 |---|---|
 | §3 | 🏁 **CUMPLIDO**: `Derives₀` compila y `Derives₀.rec` mide `[propext]` — ningún axioma del proyecto |
 | §4 | 🏁 **CUMPLIDO del todo**: `derives0_soundness` mide `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **y `check-footprints.bash` lo reejecuta** (13 titulares, en CI, probado con el fallo puesto) |
-| §6 | `completeness₀` con footprint `[propext, Classical.choice, Quot.sound]` y **cero** axiomas propios, con la nota de reducción escrita al lado |
-| §5 | Herbrand con footprint **sin `Classical.choice`** para el fragmento sin `=`; con `=`, la capa de congruencia declarada aparte |
+| §6 | 🏁 **CUMPLIDO** (2026-09-16, ADR-041; fila de `check-footprints.bash`; la nota de reducción, en la cabecera de `FOL/Lindenbaum0.lean`, §6.3) · *anotado el 2026-09-26*: `completeness₀` con footprint `[propext, Classical.choice, Quot.sound]` y **cero** axiomas propios, con la nota de reducción escrita al lado |
+| §5 | 🏁 **CUMPLIDO, y más fuerte** (2026-09-17, ADR-052; fila de `check-footprints.bash`): `Hauptsatz0.herbrand` mide `[propext, Quot.sound]` **con** `=` dentro, porque la congruencia va en el certificado (`EqInstance`, ADR-043) · *anotado el 2026-09-26*. Criterio: Herbrand con footprint **sin `Classical.choice`** para el fragmento sin `=`; con `=`, la capa de congruencia declarada aparte |
 
 ⚠️ Y el de siempre: **un verde no es haber comprobado**. Cada hito entra con su control, y el
 control se prueba **con el fallo puesto**.

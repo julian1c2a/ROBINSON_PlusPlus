@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-26 — hasta **ADR-103** (D3 cerrada: Craig para `Derives₀` con igualdad y Herbrand para `φ`/`Γ` cualesquiera). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-104** (`Prf` sin subíndice; la documentación de FOL al día; la criba de congelación con refutación). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7920,3 +7920,34 @@ del juez **compiló a la primera**.
   incomparables y una igualdad necesaria.
 * **Rectifica** ADR‑056 §1 y ADR‑067 §4, que dejaban la interpolación con igualdad como no entregable
   por la condición de lenguaje: lo era, sin borrado.
+
+## ADR-104: `Prf` sin subíndice; la documentación de FOL al día; y la criba de congelación con refutación
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ EJECUTADO; ⬜ el `freeze` espera la confirmación del propietario · **Ámbito:** FOL y RPP.
+
+### 1 · `Prf` se queda sin subíndice (decisión del propietario)
+
+El Hilbert CLÁSICO de RPP, `Prf`, y `PrfH` no llevan subíndice: excepción histórica, como `Derives` en
+FOL (regla 4 de `../FOL/NAMING-CONVENTIONS.md` §9). Cierra lo que ADR‑102 §2 dejaba abierto.
+
+### 2 · Documentación de FOL (W2, W3, W4)
+
+* `REFERENCE.md` contrastado con el árbol (60 ediciones; §2 regenerado de las líneas `import`).
+* `DEPENDENCIES.md` REGENERADO por un script nuevo, `FOL/gen-dependencies.py` (`--check`); sale de la
+  deuda de `[E]`. 🔑 *Un grafo escrito a mano se pudre con el árbol; éste se calcula.*
+* `doc/PLAN-COMPLETITUD-FINITISTA.md` de RPP: filas obsoletas anotadas (16).
+
+### 3 · La criba de congelación, con refutación
+
+`FOL/criba-congelacion.py` (criterios 1, 3, 4) dejó pasar 23; dos refutadores (estabilidad; verdad de
+lo escrito) y un juez. Resultado: **1 congelable ya** (`PrenexNF0`), **4 tras arreglos** (`Prenex0`,
+`SequentSound0`, `Soundness0`, `Rename`; arreglos aplicados), **18 todavía no**. 59 correcciones de
+docstrings en 18 módulos (falsedades medidas; p.ej. `Craig0` llamaba «CONFIRMADA» la obstrucción que
+`craig₀` refutó). El script aprende dos cosas que no veía: una OFERTA es una decisión pendiente, y
+`Complexity` tiene un consumidor futuro (`Slash` al retirar `fdepth`) ⇒ la cadena de PeanoRF es de 15.
+
+⬜ **Lo que retiene a los 18**: la entrega de PeanoRF (`Complexity`, `Inconsistencia`) y tres
+decisiones del propietario — **P2** los titulares de la capa `₀` sin subíndice (`hauptsatz`,
+`herbrand`, `craig`, `maehara`, `truth_lemma`, `lindenbaum_lemma`, `skolem_conservative*`…) frente a
+la regla 3 de §9; **P3** los cinco `sub_*` duplicados literalmente en `Hauptsatz0` y `Craig0`; **P4** la
+OFERTA de `Hauptsatz0` (la versión acotada de `derives0_qf_iff`).

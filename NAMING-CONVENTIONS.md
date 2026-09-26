@@ -363,7 +363,8 @@ En RPP la aplica un renombre: el Hilbert intuicionista de `Meta/Hilbert.lean` se
 `sondeos/` incluidos). ⚠️ `Prf` (el Hilbert **clásico**) y `PrfH` quedan SIN subíndice como
 excepción histórica, igual que `Derives` en FOL (regla 4 de FOL): llamarlo `Prf₀` reutilizaría la
 marca que acaba de cambiar de sentido, y costaría 4565 apariciones en 97 ficheros (más 16079
-prefijos `prf_`), medido el 2026-09-26. ⬜ Queda como decisión abierta del propietario. ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
+prefijos `prf_`), medido el 2026-09-26. **Decisión del propietario (2026-09-26): `Prf` se queda sin
+subíndice** (ADR-104). ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
 `CHANGELOG.md`, `doc/AUDITORIA-*`, `doc/book/`) conservan `Prf₀` tal como se escribió.
 
 ---
