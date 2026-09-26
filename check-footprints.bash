@@ -201,6 +201,13 @@ FOL.Skolem0.henkin_conservative|Classical.choice,Quot.sound,propext
 FOL.Skolem0.skolem_conservative|Classical.choice,Quot.sound,propext
 FOL.SkolemHerbrand0.derives0_neg_allBlock_iff|Quot.sound,propext
 FOL.SkolemHerbrand0.herbrand_of_skolemNF|Quot.sound,propext
+FOL.SkolemHerbrand0.derives0_neg_iff_neg_skolemNF|propext,Classical.choice,Quot.sound
+FOL.SkolemHerbrand0.herbrand_refutation₀|propext,Classical.choice,Quot.sound
+FOL.SkolemHerbrand0.derives0_iff_neg_neg|-
+FOL.SkolemHerbrand0.herbrand_validity₀|propext,Classical.choice,Quot.sound
+FOL.SkolemHerbrand0.implChain_of_derives0|propext
+FOL.SkolemHerbrand0.derives0_iff_implChain|propext
+FOL.SkolemHerbrand0.herbrand_validity_ctx₀|propext,Classical.choice,Quot.sound
 FOL.SkolemN0.evalTerms_vars|Quot.sound,propext
 FOL.SkolemN0.eval_allBlock_envPush|Quot.sound,propext
 FOL.SkolemN0.eval_skolemAxN|Classical.choice,Quot.sound,propext
