@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-23 — hasta **ADR-099**. ⬜ La tarde del 2026‑09‑23 (decisiones de cierre de FOL, T1/T2/T3/T5) va en ADR‑100, **sin escribir** al cortarse la sesión. ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-26 — hasta **ADR-100** (el cierre de FOL: la tarde del 2026‑09‑23 y su ejecución del 2026‑09‑26). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7715,3 +7715,102 @@ vacío: es un puntero falso* — la misma causa que congeló el `CHANGELOG` y co
 
 **Controles:** FOL `check-doc-sync` · `check-axioms` · `check-sorry` en verde. **FOL 56 jobs**
 (54 → 55 módulos activos, 0 en cuarentena). RPP 145 jobs, sin cambios.
+
+## ADR-100: 🏁 el CIERRE de FOL, la tarde — seis teoremas, cuatro decisiones y una política de congelación POR FICHERO
+
+**Fecha:** decisiones 2026-09-23 (tarde) · ejecución 2026-09-23 y 2026-09-26 · **Estado:** ✅ EJECUTADO
+salvo lo marcado ⬜ · **Ámbito:** FOL. RPP: las 14 filas de `check-footprints.bash` del 2026‑09‑23 y
+las 14 del 2026‑09‑26, y el arreglo de `git-lock.bash`.
+
+### 1 · Las decisiones del propietario (2026-09-23, tarde)
+
+1. **La vía de la 2ª entrega de `ModelG` queda CERRADA.** Su única justificación escrita
+   (`FOL/FOL.lean`: LS ascendente) era FALSA: a LS↑ lo bloquea la indexación por `Nat` de la cadena de
+   completitud (`LindenbaumStep : Nat → …`, `FreshSym.cst : Nat → Sym`), y `EnumSym` es falsa para los
+   tipos no numerables que LS↑ necesita (`SymClasses.lean`). El parámetro de `ModelG` se queda. La receta
+   para reabrir la vía queda DIFERIDA en `[G.2]`.
+2. **Entran los cinco resultados «a un paso»** del sondeo de candidatos (journal `wf_749c5bbe-663`).
+3. **Entra el modelo infinito por compacidad** ⇒ FOL tiene teoría de modelos.
+4. **Se borran los duplicados literales**: `FOL/Theorems/Deduction.lean` y `FOL/Classical.lean`.
+   ⬜ `Tactics2.lean` se dejó sin decidir.
+5. (Contesta ADR‑099 §6) **`TheoryFramework` se queda**, sin habitantes, con la vía **cerrada y
+   documentada** y su mapa de vuelta escrito (`538d5f8`).
+6. **Política de congelación**: nada se congela hasta estar terminado; `lock` por fichero; `freeze`
+   sólo de lo MEDIDO como intocable. «Congelar FOL» deja de ser un acto: es una **lista**. Criba de
+   cinco criterios: sin deuda propia · fuera del cono de una decisión pendiente · no base de la
+   cadena entrante · footprint vigilado por módulo y compilado · no hogar de un resultado pendiente.
+7. **PeanoRF, propuesta (C)**: bajan a FOL **siete** módulos, no tres (su corrección, PRF‑049):
+   `Subst`, `DerivesI`, `SubstDerives`, `Consistency`, `Eq`, `Collapse`, `Slash`. `Slash` entra con
+   `lock`, no con `freeze`. El acoplamiento que NO puede viajar es `Collapse.lean:61` (`open
+   ROBINSON_PlusPlus.Minimal.Axioms`, que dentro de FOL sería un ciclo) — corrige ADR‑098 §5, que lo
+   situaba en «una sola línea» de la `:72`. PeanoRF parametriza `collapseT` antes de entregar.
+
+### 2 · El catálogo: los seis, y lo que NO entra
+
+| | teorema | módulo | footprint MEDIDO |
+|---|---|---|---|
+| T1 | `model_existence_iff : IsConsistent₀ S ↔ IsSatisfiable S` | `Compacity0` | `[propext, Classical.choice, Quot.sound]` |
+| T2 | `max_cons_neg`, `IsSyntacticallyComplete₀`, `max_cons_complete` | `Canonical0` | ídem |
+| T3 | `pcheck_complete`, `ptautCheck_iff`, `instDecidablePTaut` | `Herbrand0` | `[propext]` (los dos teoremas; la instancia no se imprime) |
+| T4 | `EqPropCert`, `derives0_qf_iff` (§9) | `Hauptsatz0` | `[propext, Quot.sound]` |
+| T5 | once inversiones: las nueve proposicionales, `inv_allR`, `inv_exL` | `Inversion0` | `[propext, Quot.sound]` |
+| T6 | `infinite_model_of_large` y cía. (§3) | `Compacity0` | `[propext, Classical.choice, Quot.sound]`; `evalFormula_updateCsts` `[propext]` |
+
+⭐ **T4 resuelve la duda de vacuidad** que dejó abierta el 2026‑09‑23 (el precedente es el Maehara
+relativizado de ADR‑067): la `E` sin cota **no** trivializa el lado derecho, porque la valuación
+constante `true` satisface toda `EqInstance`; dos `example` lo compilan. ⚠️ **Caracteriza, NO
+decide**: la versión ACOTADA queda como OFERTA en `[G.2]`, sin medir. Y ⚠️ **va en `Hauptsatz0`**,
+que `d961bb2` había evitado reabrir creando `Inversion0` aparte: es el módulo MÁS BAJO que tiene
+las cuatro piezas, y nada está congelado todavía.
+
+⭐ **T6 NO es LS↑**: sube de «finitos arbitrariamente grandes» a «numerable e infinito», nunca de un
+infinito a un cardinal mayor. Sin hipótesis de frescura (`shiftTheory` + `pullback`). Cuatro
+controles de no vacuidad.
+
+🔑 **`inv_allR`/`inv_exL` (2026‑09‑26)**: la DIFERIDA de `Inversion0` decía que la identidad
+`substFormula 0 (var 0) (liftFormula 1 A) = A` «no se ha medido». **Existía dos veces**
+(`Lift0.substFormula_lift_var`, `Theorems/Quantifiers.subst_lift_cancel_formula`) y el diseño de las
+dos inversiones estaba en el journal del 2026‑09‑23 con `planCierra = True`. Compilaron a la primera.
+*Antes de construir, buscar — y antes de DIFERIR, también.*
+
+⛔ **Falsos en este marco** (no abrir): la propiedad de subfórmula tal cual (`eqAx` y las
+instancias de `allL`/`exR`; ya estaba medido en ADR‑054 §4); «el fragmento QF es decidible por
+tabla de verdad»; Herbrand para φ y Γ componiendo lo que hay. **Lejos**: Beth y Robinson (piden un
+puente `LK₀`→`LKp`), LS↑ a cardinal arbitrario, la noción de **sentencia** (bloqueo transversal),
+la independencia de axiomas vía `IsAxiomRedundant`.
+
+### 3 · La auditoría de cierre (2026‑09‑26, 8 agentes, con refutación)
+
+* ⚠️ **T1‑T3 estaban sin proyectar** en `REFERENCE.md` desde `f9efd94`, y el `CHANGELOG` no recogía
+  T1‑T3 ni T5: `[C]` casa por MÓDULO en §6, no por declaración. Proyectados.
+* ⚠️ **Tres docstrings míos afirmaban más que lo medido** (la séptima clase): la cabecera de footprint
+  de `Hauptsatz0` (`lk0_to_lkh` mide `[propext]`), el «(hasta ℵ₀)» y la procedencia del
+  `Classical.choice` de `Compacity0` §3 (en `infTheory_finSat`/`evalTerm_updateCsts` es el de
+  `Fresh0`, no el WKL), y el de `Herbrand0.instDecidablePTaut`, que se leía como «la versión relativa
+  DECIDE». Corregidos antes del commit.
+* ⛔ **`git-lock.bash` borraba por SUBCADENA** (`grep -Fv` sin `-x`) en `unlock` y `thaw`: el `unlock
+  FOL.lean` de `d961bb2` se llevó también `FOL/FOL.lean`, que quedó read‑only en disco pero fuera de
+  `locked_files.txt` — y el hook ya no lo guardaba. Es la causa «casar por SUBCADENA» de
+  `feedback_controles_que_no_comprueban`, otra vez. Arreglado en los dos repos (`-Fxv`).
+* `[G.2]` no reconocía «no está medido/a»: ampliado. Hoy **19** marcadores (2 ABIERTA, 4 DIFERIDA,
+  1 OFERTA, 12 HISTORIAL).
+* **La criba de congelación**, re‑corrida (`FOL/criba-congelacion.py`, traída del scratchpad): 16
+  módulos pasan los criterios medibles; **la refutación objeta 13**. Sólo resisten `Prenex0`,
+  `PrenexNF0` y `SkolemN0`. ⇒ **no se congela nada todavía**.
+
+### 4 · ⬜ Lo que queda — en `FOL/NEXT-STEPS.md`
+
+Siete decisiones del propietario (D1 `Tactics2`, que resulta idéntico a la copia de
+`librerias-retiradas/FOL_poli`; D2 la definición de T2, por pertenencia y no sobre sentencias; D3 las
+dos ABIERTA; D4 `ModelG` a CERRADA; D5 el refactor de `Lift0`; D6 el `₀` de T1; D7 la migración
+`String`→`List Char`), la entrega de PeanoRF — ⚠️ con una condición que nuestra respuesta (2) omitió:
+`Subst`/`DerivesI` importan `PeanoRF.Prelim`, que importa RPP y Peano —, y una pasada de higiene de
+docstrings antes de cualquier `freeze`.
+
+🔑 **Lecciones**: *contar una cadena por los módulos que nombras no es contarla* (y su cierre
+TRANSITIVO toca 14 módulos de FOL, no 4); *medir un cono por la palabra que lo nombra no es medirlo*;
+*un censo que comprueba que un marcador está CLASIFICADO no comprueba que lo que nombra EXISTA*
+(`73476af`); ⛔ *el commit se condiciona al verde* (`6bdf8bc` subió con `[G.2]` en rojo).
+
+**Controles:** FOL 57 jobs · 54 módulos activos · 4 `axiom` · 0 `sorry` · `[G.2]` 19/19.
+RPP `check-footprints` con las 14 filas de hoy.
