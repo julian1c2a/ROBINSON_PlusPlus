@@ -208,6 +208,15 @@ FOL.SkolemHerbrand0.herbrand_validity₀|propext,Classical.choice,Quot.sound
 FOL.SkolemHerbrand0.implChain_of_derives0|propext
 FOL.SkolemHerbrand0.derives0_iff_implChain|propext
 FOL.SkolemHerbrand0.herbrand_validity_ctx₀|propext,Classical.choice,Quot.sound
+FOL.Interpolation0.lk0_refute|propext,Quot.sound
+FOL.Interpolation0.lk0_to_derives0_fin|propext,Quot.sound
+FOL.Interpolation0.lk0_to_lkp|propext,Quot.sound
+FOL.Interpolation0.predF_em|-
+FOL.Interpolation0.eqGen_side|-
+FOL.Interpolation0.craig_ctx₀|propext,Quot.sound
+FOL.Interpolation0.craig₀|propext,Quot.sound
+FOL.Interpolation0.craig_impl₀|propext,Quot.sound
+FOL.Interpolation0.craig₀_example|propext,Quot.sound
 FOL.SkolemN0.evalTerms_vars|Quot.sound,propext
 FOL.SkolemN0.eval_allBlock_envPush|Quot.sound,propext
 FOL.SkolemN0.eval_skolemAxN|Classical.choice,Quot.sound,propext

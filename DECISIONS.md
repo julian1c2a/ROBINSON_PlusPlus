@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-26 — hasta **ADR-102** (D2, D4, D5, D6 y D7 ejecutadas; la regla de subíndices y `Prf₀` → `Prfᵢ`). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-26 — hasta **ADR-103** (D3 cerrada: Craig para `Derives₀` con igualdad y Herbrand para `φ`/`Γ` cualesquiera). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7883,3 +7883,40 @@ Carta `FOL/RESPUESTA-PEANORF-2026-09-26.md`: la condición **«FOL no depende de
 mismo»** (ADR‑101), lo que hoy la incumple (los siete módulos), el parámetro de `collapseT` (un
 SÍMBOLO, no «un término cerrado»: `collapseT_zero` necesita que el colapso lo fije), D5 (su API de
 `Eigenvariable` —sólo `posDepth`— intacta) y la nomenclatura de D6 para `Slash`.
+
+## ADR-103: D3 CERRADA — Craig para `Derives₀` CON igualdad, y Herbrand para `φ` y `Γ` cualesquiera
+
+**Fecha:** 2026-09-26 · **Estado:** ✅ EJECUTADO · **Ámbito:** FOL. RPP: 16 filas de `check-footprints.bash` (504).
+
+Las dos deudas que `[G.2]` de FOL tenía como **ABIERTA** (D3 de `FOL/NEXT-STEPS.md`; el propietario:
+«vamos a por D3»). ⇒ **cero ABIERTA** en FOL.
+
+### 1 · D3b — `FOL/SkolemHerbrand0.lean` §3
+
+`herbrand_validity_ctx₀`: `Γ ⊢₀ φ` sii hay certificado de Herbrand de bloque para la matriz de
+`skolemize k (prenex ¬(Γ ⇒ φ))` —la forma de Herbrand de `Γ ⇒ φ`—, con las constantes de Skolem frescas.
+La cabecera decía que había que «mover la negación a través de la skolemización» (sin medir). **No**:
+se skolemiza la fórmula que se REFUTA (`derives0_neg_iff_neg_skolemNF`: `⊢₀ ¬φ ⟺ ⊢₀ ¬Sk(prenex φ)`).
+Footprint `[propext, Classical.choice, Quot.sound]`: retirar los axiomas de Skolem pasa por la
+completitud (el WKL). ⚠️ La ecuación `skolemize … = allBlock m ψ` va dentro del enunciado.
+
+### 2 · D3a — `FOL/Interpolation0.lean` (módulo nuevo)
+
+`craig₀ : [A] ⊢₀ B → ∃ C, [A] ⊢₀ C ∧ [C] ⊢₀ B ∧ PredSub C [A] ∧ PredSub C [B]` (y `craig_ctx₀`), con
+`≐` como símbolo lógico. **`[propext, Quot.sound]`**. Dos diseños independientes y un juez; la síntesis
+del juez **compiló a la primera**.
+
+* **El puente** `lk0_to_lkp`: las instancias de igualdad de `eqAx` se quedan en el antecedente de una
+  derivación de `LKp`, cerradas con `∀` (`EqGen`) para atravesar `allR`/`exL` (`lift₀ (∀e) = ∀(lift₁ e)`
+  y `allL` en `#0` devuelve `e`).
+* ⭐⭐ **Sin borrar predicados**: la estrategia inicial borraba los predicados ajenos; el diseñador A
+  midió que sobraba. Cada instancia menciona a lo sumo un símbolo de relación; las de predicados
+  ajenos a `A` van al lado 2 de Maehara, y la intersección de lenguajes las excluye. 201 líneas menos.
+  🔑 *No hace falta quitar lo ajeno: basta ponerlo en el lado donde no puede sobrevivir.*
+* ⭐ **Dividendo**: `lk0_to_derives0_fin`, `LK₀ → ⊢₀` SINTÁCTICO; `SequentSound0.lk0_to_derives0` era la
+  completitud.
+* ⚠️ **El juez cazó dos controles VACUOS** en los borradores (`A := ⊤`, o un `B` sin predicados: los
+  cumplen `C := ⊤` / `C := B` sin `craig₀`), el patrón de ADR‑067 §2. El control que entra usa lenguajes
+  incomparables y una igualdad necesaria.
+* **Rectifica** ADR‑056 §1 y ADR‑067 §4, que dejaban la interpolación con igualdad como no entregable
+  por la condición de lenguaje: lo era, sin borrado.
