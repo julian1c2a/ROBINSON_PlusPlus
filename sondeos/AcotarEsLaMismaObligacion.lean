@@ -104,7 +104,7 @@ theorem prf_bdAll_numeral (Φ : Formula) (hΦ : substFormula 0 (.var 0) Φ = Φ)
       Prf (Formula.forall (Formula.impl (lt (.var 0) (numeralM n)) Φ))
   | 0, _ => by
       refine Prf.gen _ (prf_deduction ?_)
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq Φ))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
   | n + 1, h => by

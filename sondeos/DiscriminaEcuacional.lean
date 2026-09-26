@@ -88,7 +88,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 theorem prf_orL_imp (Ac Bc : Term) : Prf (provFromCode Ac ⇒ provFromCode (orc Ac Bc)) :=
@@ -98,10 +98,10 @@ theorem prf_orR_imp (Ac Bc : Term) : Prf (provFromCode Bc ⇒ provFromCode (orc 
   prf_mp (pcc_mp_code_open Bc (orc Ac Bc)) (pcc_j2_code Ac Bc)
 
 theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j1 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j1 A B)) h
 
 theorem prf_orR {A B : Formula} (h : Prf B) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j2 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j2 A B)) h
 
 /-! ## 1 · EL PAR OBJETO — vocabulario EXISTENTE, cero axiomas
 
@@ -253,7 +253,7 @@ theorem prf_bdAll_numeral (Φ : Formula) (hΦ : substFormula 0 (.var 0) Φ = Φ)
       Prf (Formula.forall (Formula.impl (lt (.var 0) (numeralM n)) Φ))
   | 0, _ => by
       refine Prf.gen _ (prf_deduction ?_)
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq Φ))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
   | n + 1, h => by
@@ -1512,7 +1512,7 @@ theorem hbody_F_core (A B C i : Term) :
       land, lor, In, lt, carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm,
       substTerms, substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 _ _
-    (Prf₀.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc A)))
+    (Prfᵢ.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc A)))
       (isFormCodeB (liftTerm 0 A) (liftTerm 0 B) (liftTerm 0 C)
         (nthc (liftTerm 0 A) (.var 0)))) i)) hwf
   rw [hsubst] at h0
@@ -1703,7 +1703,7 @@ theorem hbody_Tg (aT aTs : Term → Term) : ∀ q i : Term,
       carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm, substTerms,
       substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [lt i (bndTgen aT q), wfAllTgen aT aTs q] _
-    (Prf₀.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (bndTgen aT q)))
+    (Prfᵢ.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (bndTgen aT q)))
       (isTermCodeB (liftTerm 0 (aT q)) (liftTerm 0 (aTs q))
         (nthc (liftTerm 0 (aT q)) (.var 0)))) i)) hwf
   rw [hsubst] at h0
@@ -1742,7 +1742,7 @@ theorem hbody_Tsg (aT aTs : Term → Term) : ∀ q i : Term,
       carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm, substTerms,
       FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [lt i (bndTsgen aTs q), wfAllTsgen aT aTs q] _
-    (Prf₀.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (bndTsgen aTs q)))
+    (Prfᵢ.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (bndTsgen aTs q)))
       (isTermsCodeB (liftTerm 0 (aT q)) (liftTerm 0 (aTs q))
         (nthc (liftTerm 0 (aTs q)) (.var 0)))) i)) hwf
   rw [hsubst] at h0
@@ -2542,11 +2542,11 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j1 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j1 A B)) h
 
 theorem prf_cdrc_cons (h t : Term) : Prf (cdrc (cons h t) =eq t) := by
   have hax : Prf ax_cdrc := prf_ax (by simp [axioms])
@@ -2966,13 +2966,13 @@ theorem crit_isFormCodeB_implc_child1 (wF wT wTs a b : Term) :
         (cOk (implc a b) (land (land (Formula.eq (carc (implc a b)) (numeralM m)) G) H))
         (In a wF)) := fun m hm G H =>
     impT (crit_cOk3_absurd (implc a b) 5 m (fun e => hm e.symm) hc G H)
-      (Prf.incl (Prf₀.efq (In a wF)))
+      (Prf.incl (Prfᵢ.efq (In a wF)))
   have bad2 : ∀ (m : Nat), m ≠ 5 → ∀ G : Formula,
       Prf (Formula.impl
         (cOk (implc a b) (land (Formula.eq (carc (implc a b)) (numeralM m)) G)) (In a wF)) :=
     fun m hm G =>
       impT (crit_cOk2_absurd (implc a b) 5 m (fun e => hm e.symm) hc G)
-        (Prf.incl (Prf₀.efq (In a wF)))
+        (Prf.incl (Prfᵢ.efq (In a wF)))
   have good : Prf (Formula.impl (cOk (implc a b) (binOkF wF wF (implc a b) 5)) (In a wF)) := by
     refine prf_deduction ?_
     have hyp := prfH_hyp_self (cOk (implc a b) (binOkF wF wF (implc a b) 5))
@@ -3419,8 +3419,8 @@ theorem prf_shapeBin_real (k : Nat) (a b : Term) :
     `cOk X …`, y `consOk X` **es** `X ≐ cons (carc X) (cdrc X)`. No hay nada que reformular. -/
 
 /-- Or-intro OBJETO como implicación (el `prf_orL_imp` del fichero es el INTERNO, sobre `orc`). -/
-theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prf₀.j1 A B)
-theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prf₀.j2 A B)
+theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prfᵢ.j1 A B)
+theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prfᵢ.j2 A B)
 
 def isTermCodeE (wT wTs X : Term) : Formula :=
   lor (shapeUn X 0) (land (shapeBin X 1) (In (nthc X (numeralM 2)) wTs))

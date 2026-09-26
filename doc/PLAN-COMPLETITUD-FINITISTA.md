@@ -106,7 +106,7 @@ numerables es finitistamente REDUCIBLE, y su contenido finitario es Herbrand»*.
 | congruencias de la igualdad | `../FOL/FOL/Theorems/Eq.lean` (ADR‑031) | **`[propext, Quot.sound]`** desde el arreglo del 09‑14 |
 | Lema de Lindenbaum | `cuarentena/Completeness.lean` | `[propext, Classical.choice, Quot.sound]`, **incondicional** |
 | modelo canónico y **Lema de la Verdad** | ídem | net‑0 puros |
-| solidez de un cálculo sin axiomas habitándolo | `sondeos/AnclaSoundness.lean` (`prf0_soundness`) | net‑0 puro |
+| solidez de un cálculo sin axiomas habitándolo | `sondeos/AnclaSoundness.lean` (`prfI_soundness`) | net‑0 puro |
 
 ⛔ **Lo que NO está**, y es de fondo:
 
@@ -200,7 +200,7 @@ listaba** `Enumeration.lean`. Corregido.
     derives0_soundness : Derives₀ Γ f → Γ ⊨ f
 
 Inducción sobre los 21 constructores. **M‑11 ya no bloquea** (cero habitantes‑axioma), y la
-plantilla está escrita: `prf0_soundness` hizo exactamente esto para `Prf₀`, net‑0 puro, con
+plantilla está escrita: `prfI_soundness` hizo exactamente esto para `Prfᵢ`, net‑0 puro, con
 `FOL/Semantics.lean`, que ya existe y ya es correcto.
 
 ⚠️⚠️ **Éste es el agujero de verdad del repo, y va antes que todo lo demás.** Hoy hay un cálculo
@@ -1390,7 +1390,7 @@ de §7.3.
 
 ---
 
-### 7.3 · ✅ Decisión: **PROYECTADO**, no pendiente (2026‑09‑14)
+### 7.3 · ~~✅ Decisión: **PROYECTADO**, no pendiente (2026‑09‑14)~~ — ⛔ **CERRADA como ABANDONADA en FOL** (2026-09-26, D7; ver el final de la tabla)
 
 Sanción del propietario: *«lo proyectamos para cuando termines el trabajo más inmediato y todo esté
 más limpio»*.
@@ -1401,8 +1401,19 @@ explícitas:
 
 | condición | estado |
 |---|---|
-| cerrar el **trabajo inmediato** — el ensamblaje de Henkin (§6.4) y la vía W | ⬜ en curso |
-| que el árbol esté **más limpio** | ⬜ |
+| cerrar el **trabajo inmediato** — el ensamblaje de Henkin (§6.4) y la vía W | ✅ CUMPLIDA — `completeness₀` (`FOL/Canonical0.lean`, 2026-09-16) y el catálogo T1-T6 del cierre (ADR-100) |
+| que el árbol esté **más limpio** | — ya no aplica |
+
+⛔⛔ **CERRADA el 2026-09-26 como ABANDONADA EN FOL** (D7 de `../FOL/NEXT-STEPS.md`, decisión del
+propietario; ADR-102). Medido antes de cerrar: el objetivo concreto de esta §7.3 (`List Char`) lo
+**sustituyó** ADR-068 por un **parámetro** (§7.5), y eso SÍ está hecho —`TermG`/`FormulaG`, la capa
+de operaciones (ADR-069), `Derives₀`/`LocalRule` (ADR-071), `ModelG` (ADR-083) y `FreshSym`/`EnumSym`
+con instancias `List Char` sin `Classical.choice`—. Lo que **no** se hace es instanciar: `abbrev Term
+:= TermG String` (y `Formula`, `Model`) se quedan en `String`. Razón: no mueve ninguna fila titular de
+T1-T6 (su `Classical.choice` es el WKL, ADR-069 §4); de las 51 filas de FOL con choice en
+`check-footprints.bash`, como mucho 5 lo deben sólo a `String`; y el dividendo sería de RPP
+(`strCode`/`strCodeM`), no de FOL. La vía de enhebrar las clases por la cadena de completitud
+también está CERRADA (ADR-100 §1.1, definitiva el 2026-09-26).
 
 ⚠️ **Y una razón técnica para que sea en ese orden, no en otro**: la migración **cambia `G`**
 (§7.2), así que hacerla **en medio** del ensamblaje obligaría a re‑verificar los puentes por `rfl`

@@ -45,7 +45,7 @@ la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y l
 ## Lo que hizo falta, y es poco porque el espejo `Prf` ya estaba
 
 * **§1** la lógica proposicional que faltaba: `prf_subst_eq_iff` (Leibniz con `⇔`, directo del
-  axioma `Prf₀.leibniz`), `prf_iff_trans`, `prf_neg_congr_iff`.
+  axioma `Prfᵢ.leibniz`), `prf_iff_trans`, `prf_neg_congr_iff`.
 * **§2** el **punto fijo** sobre `Prf`: puerto directo de `diag_arith_num` usando las piezas que ya
   existían (`prf_congr_substfc_arg2/3`, `prf_tc_numeral`, `prf_substFormula_arith`,
   `prf_formCode_numeral`). ⭐ **`prf_godelCN_fixedpoint` es net‑0 PURO**: no usa **ningún** axioma
@@ -86,8 +86,8 @@ namespace ROBINSON_PlusPlus.Meta.GodelTwoPrf
 theorem prf_subst_eq_iff {t₁ t₂ : Term} (φ : Formula) (h : Prf (t₁ =eq t₂)) :
     Prf (substFormula 0 t₁ φ ⇔ substFormula 0 t₂ φ) :=
   prf_and_intro
-    (prf_mp (Prf.incl (Prf₀.leibniz φ t₁ t₂)) h)
-    (prf_mp (Prf.incl (Prf₀.leibniz φ t₂ t₁)) (prf_eq_symm h))
+    (prf_mp (Prf.incl (Prfᵢ.leibniz φ t₁ t₂)) h)
+    (prf_mp (Prf.incl (Prfᵢ.leibniz φ t₂ t₁)) (prf_eq_symm h))
 
 theorem prf_iff_trans {A B C : Formula} (h₁ : Prf (A ⇔ B)) (h₂ : Prf (B ⇔ C)) :
     Prf (A ⇔ C) :=

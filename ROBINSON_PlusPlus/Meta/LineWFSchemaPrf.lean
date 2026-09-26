@@ -253,7 +253,7 @@ theorem schema_bwd (k n : Nat) (C : Formula)
       hC] using hh
   have hiff : PrfH [Formula.and (lencF n) C, tagF k] (lwfVar ⇔ Formula.and (lencF n) C) :=
     PrfH.mp _ _ _ (prf_to_prfH hspec _) (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
-  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hiff)
+  exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hiff)
     (PrfH.hyp _ _ (List.Mem.head _))
 
 /-- **Columna vertebral codificada**, genérica: el bicondicional (dirección `⇐`) transportado al
@@ -308,11 +308,11 @@ theorem pcc_lineWF_tracked_of_schema [AnclaEq] {k n : Nat} {C : Formula} (t : Te
   have hiff : PrfH Γ (lineWF t ⇔ Formula.and (lenc t =eq numeralM n) (substFormula 0 t C)) :=
     PrfH.mp _ _ _ (prf_to_prfH hacc _) htagH
   have hand : PrfH Γ (Formula.and (lenc t =eq numeralM n) (substFormula 0 t C)) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hiff) hlw
   have hlencH : PrfH Γ (lenc t =eq numeralM n) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have hcondH : PrfH Γ (substFormula 0 t C) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   -- cota del tag (`1 < lenc t`), derivada de la longitud canónica
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) := by
     have := PrfH_lt_of_lenc_eq (i := 1) (n := n) h1n hlencH

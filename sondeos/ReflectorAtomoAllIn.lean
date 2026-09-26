@@ -39,7 +39,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 theorem prf_orL_imp (Ac Bc : Term) : Prf (provFromCode Ac ⇒ provFromCode (orc Ac Bc)) :=
@@ -590,7 +590,7 @@ theorem hbody_ok (hR : AllInReflector) : ∀ q i : Term, Prf (wfAll1' q ⇒ (lt 
       cons, nil, zero, substFormula, substTerm, substTerms, substTerm_numeralM,
       FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [lt i (lenc q), wfAll1' q] _
-    (Prf₀.q1 (wfAll1'Body q) i)) hwf
+    (Prfᵢ.q1 (wfAll1'Body q) i)) hwf
   rw [hsubst] at h0
   have hnode : PrfH [lt i (lenc q), wfAll1' q] (isTermCodeE1' q (nthc q i)) :=
     PrfH.mp _ _ _ h0 hlt
@@ -782,7 +782,7 @@ theorem prf_boundedAllIn_spec (c L i : Term) :
     simp only [lt, lenc, nthc, In, cons, nil, zero, substFormula, substTerm, substTerms,
       FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [boundedAllIn c L] _
-    (Prf₀.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
+    (Prfᵢ.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc L)))
       (In (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 c))) i)) hwf
   rw [hsubst] at h0
   exact h0
@@ -1024,8 +1024,8 @@ def wfAll1 (w : Term) : Formula := Formula.forall (wfAll1Body w)
 
 def isTC1 (w c : Term) : Formula := land (wfAll1 w) (In c w)
 
-theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prf₀.j1 A B)
-theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prf₀.j2 A B)
+theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prfᵢ.j1 A B)
+theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prfᵢ.j2 A B)
 
 theorem prf_and_mono_right {A B B' : Formula} (h : Prf (B ⇒ B')) :
     Prf (land A B ⇒ land A B') := by
@@ -1077,7 +1077,7 @@ theorem hbody_lit : ∀ q i : Term, Prf (wfAll1 q ⇒ (lt i (lenc q)
       substFormula_boundedAllIn, lor, land, lt, lenc, nthc, cons, nil, zero,
       substFormula, substTerm, substTerms, substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [lt i (lenc q), wfAll1 q] _
-    (Prf₀.q1 (wfAll1Body q) i)) hwf
+    (Prfᵢ.q1 (wfAll1Body q) i)) hwf
   rw [hsubst] at h0
   have hnode : PrfH [lt i (lenc q), wfAll1 q] (isTermCodeE1' q (nthc q i)) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_isTCE1_of_literal q (nthc q i)) _)
@@ -1216,7 +1216,7 @@ theorem prf_isTC1_Xv : Prf (isTC1 wV Xv) := by
     PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_split (.var 0) zero) _) hlt1
   refine PrfH_or_elim hsplit ?brA ?brB
   case brA =>
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) (PrfH.hyp _ _ (List.Mem.head _)))
   case brB =>
     have hi : PrfH (Formula.eq (.var 0) zero :: [lt (.var 0) (lenc wV)])

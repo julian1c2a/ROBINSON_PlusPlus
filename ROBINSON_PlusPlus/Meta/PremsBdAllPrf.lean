@@ -981,7 +981,7 @@ theorem premsBody_reflect [AnclaEq] (q i j : Term) :
       (prf_to_prfH (prf_premsDisj_of_chainOk q i j) _) hch) hlt) hltj
   refine PrfH_or_elim hdisj ?_ ?_
   · -- ⭐ RAMA IZQUIERDA: `In y nil` es refutable ⇒ explosión. El código no se toca.
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil (nthc (premsOf (nthc q i)) j)) _)
         (PrfH.hyp _ _ (List.Mem.head _)))
   · -- RAMA DERECHA: el `∃` acotado, con el `Phic` que el destino impone
@@ -1071,13 +1071,13 @@ theorem hbdAllPrems_unpacked [AnclaEq] (q i : Term) : Prf (bodyF q i) := by
         = bodyF (carc (cons q i)) s := fun s =>
     substFormula_bodyF_snd s _ _ (FOL.substTerm_liftTerm (carc (cons q i)) 0 s)
   have h1 : Prf (bodyF (carc (cons q i)) i) :=
-    (hs2 i) ▸ prf_mp (prf_mp (Prf.incl (Prf₀.leibniz
+    (hs2 i) ▸ prf_mp (prf_mp (Prf.incl (Prfᵢ.leibniz
       (bodyF (liftTerm 0 (carc (cons q i))) (.var 0)) (cdrc (cons q i)) i))
       (prf_cdrc_cons q i)) ((hs2 (cdrc (cons q i))) ▸ h0)
   -- (2) Leibniz sobre el PRIMERO: `carc (cons q i) ↦ q`
   have hs1 : ∀ s : Term, substFormula 0 s (bodyF (.var 0) (liftTerm 0 i)) = bodyF s i :=
     fun s => substFormula_bodyF_fst s _ _ (FOL.substTerm_liftTerm i 0 s)
-  exact (hs1 q) ▸ prf_mp (prf_mp (Prf.incl (Prf₀.leibniz
+  exact (hs1 q) ▸ prf_mp (prf_mp (Prf.incl (Prfᵢ.leibniz
     (bodyF (.var 0) (liftTerm 0 i)) (carc (cons q i)) q))
     (prf_carc_cons q i)) ((hs1 (carc (cons q i))) ▸ h1)
 

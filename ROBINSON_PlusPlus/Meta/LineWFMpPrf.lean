@@ -82,7 +82,7 @@ theorem prf_lineWF_mp_bwd :
   have hiff : PrfH [lencMp, tagMp] (lwfVar ⇔ lencMp) :=
     PrfH.mp _ _ _ hax (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
   have hmpr : PrfH [lencMp, tagMp] (Formula.impl lencMp lwfVar) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hiff
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hiff
   exact PrfH.mp _ _ _ hmpr (PrfH.hyp _ _ (List.Mem.head _))
 
 /-! ### Paso 6b — el bicondicional TRANSPORTADO al nivel del código -/
@@ -174,7 +174,7 @@ theorem pcc_lineWF_tracked_mp_imp [AnclaEq] (t : Term) :
   have hiff : PrfH Γ (lineWF t ⇔ (lenc t =eq numeralM 3)) :=
     PrfH.mp _ _ _ (prf_to_prfH hacc _) htagH
   have hlencH : PrfH Γ (lenc t =eq numeralM 3) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hiff) hlw
   -- cota DERIVADA de la longitud canónica
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
     PrfH_lt_subst2 (PrfH_eq_symm hlencH)

@@ -8,15 +8,15 @@ import ROBINSON_PlusPlus.Meta.OmegaStrength
 import FOL.Semantics
 
 /-!
-# SONDEO · `prf0_soundness` — la SOLIDEZ de `Prf₀`, y con ella el ancla se vuelve MEDIBLE
+# SONDEO · `prfI_soundness` — la SOLIDEZ de `Prfᵢ`, y con ella el ancla se vuelve MEDIBLE
 
 **Pregunta que contesta (2026‑09‑11):** *¿se puede decir algo SEMÁNTICO sobre los cálculos de este
 proyecto?* De ella dependía la única pregunta abierta sobre `prf_axiomsCodeT_eq`: no «¿es
 derivable?» —eso ya estaba medido que no— sino **«¿es siquiera VERDADERO?»**.
 
-## 🏁 Respuesta: SÍ, y sobre `Prf₀` sale gratis
+## 🏁 Respuesta: SÍ, y sobre `Prfᵢ` sale gratis
 
-    theorem prf0_soundness {φ} (h : Prf₀ φ) : satisfies axioms φ
+    theorem prfI_soundness {φ} (h : Prfᵢ φ) : satisfies axioms φ
     footprint: [propext, Classical.choice, Quot.sound]     ← net‑0 PURO
 
 Los 17 constructores, con la maquinaria semántica de `FOL/Semantics.lean` (`eval_substFormula_zero`,
@@ -45,17 +45,17 @@ evidencia compilada en `../../FOL/cuarentena/Inconsistencia.lean` — footprint
 
 🔑 **La regla que queda**: *un `axiom` que habita un tipo inductivo prohíbe demostrar nada sobre ese
 tipo por inducción.* En este árbol eso afecta a `Derives` (9 axiomas) y a `Prf` (uno,
-`prf_axiomsCodeT_eq`). **`Prf₀` es el único cálculo con CERO** — y por eso es el único del que se
+`prf_axiomsCodeT_eq`). **`Prfᵢ` es el único cálculo con CERO** — y por eso es el único del que se
 puede decir algo semántico.
 
 ## Qué desbloquea (§3)
 
-Con `prf0_soundness` en la mano, dos corolarios que antes no eran ni enunciables:
+Con `prfI_soundness` en la mano, dos corolarios que antes no eran ni enunciables:
 
-* `prf0_consistent` — **la primera consistencia SEMÁNTICA del proyecto**: un modelo de `axioms` da
-  `¬ Prf₀ ⊥` directamente. (Hasta hoy, `ConsistentH` era siempre hipótesis.)
-* `ancla_underivable_prf0` — si algún modelo de `axioms` interpreta `axiomsCodeT` distinto de
-  `listFormCodeM axioms`, entonces el ancla **no es demostrable en `Prf₀`**.
+* `prfI_consistent` — **la primera consistencia SEMÁNTICA del proyecto**: un modelo de `axioms` da
+  `¬ Prfᵢ ⊥` directamente. (Hasta hoy, `ConsistentH` era siempre hipótesis.)
+* `ancla_underivable_prfI` — si algún modelo de `axioms` interpreta `axiomsCodeT` distinto de
+  `listFormCodeM axioms`, entonces el ancla **no es demostrable en `Prfᵢ`**.
 
 ## ⬜ Lo que sigue faltando, y es la mitad cara
 
@@ -72,7 +72,7 @@ comprobar que esos dos siguen valiendo.
 
 * **No** dice que `prf_axiomsCodeT_eq` sea falso. Dice que ahora es **medible**.
 * **No** toca la cadena de Gödel: `goedel_first_prf`/`goedel_second_prf` viven sobre `Prf`, y
-  `prf0_soundness` habla de `Prf₀`. `Prf.incl : Prf₀ φ → Prf φ` va **en un solo sentido**.
+  `prfI_soundness` habla de `Prfᵢ`. `Prf.incl : Prfᵢ φ → Prf φ` va **en un solo sentido**.
 * **No** vale para `Prf`: ese cálculo ya está habitado por `prf_axiomsCodeT_eq`, luego un
   `prf_soundness` por inducción tendría el mismo defecto que el de `Derives`.
 -/
@@ -95,11 +95,11 @@ theorem ctx_shift {D : Type} (M : Model D) (v : Nat → D) (d : D)
   rw [axioms_lift_eq] at hx
   exact hx
 
-/-! ## §2 · 🏁 LA SOLIDEZ DE `Prf₀`, los 17 constructores -/
+/-! ## §2 · 🏁 LA SOLIDEZ DE `Prfᵢ`, los 17 constructores -/
 
-/-- 🏁 **`Prf₀` es SÓLIDO**: todo lo que demuestra es verdadero en todo modelo de `axioms`.
+/-- 🏁 **`Prfᵢ` es SÓLIDO**: todo lo que demuestra es verdadero en todo modelo de `axioms`.
     Inducción sobre los 17 constructores. **Footprint net‑0 puro.** -/
-theorem prf0_soundness {φ : Formula} (h : Prf₀ φ) : satisfies axioms φ := by
+theorem prfI_soundness {φ : Formula} (h : Prfᵢ φ) : satisfies axioms φ := by
   induction h with
   | p1 A B => intro D M v _ hA _; exact hA
   | p2 A B C => intro D M v _ hABC hAB hA; exact hABC hA (hAB hA)
@@ -137,30 +137,30 @@ theorem prf0_soundness {φ : Formula} (h : Prf₀ φ) : satisfies axioms φ := b
 
 /-! ## §3 · Lo que desbloquea -/
 
-/-- ⭐ **La primera consistencia SEMÁNTICA del proyecto**: un modelo de `axioms` da `¬ Prf₀ ⊥`.
+/-- ⭐ **La primera consistencia SEMÁNTICA del proyecto**: un modelo de `axioms` da `¬ Prfᵢ ⊥`.
     Hasta hoy la consistencia era siempre **hipótesis** (`ConsistentH`, `ConsistentOmega`). -/
-theorem prf0_consistent {D : Type} (M : Model D) (v : Nat → D)
-    (hM : contextSatisfies M v axioms) : ¬ Prf₀ ⊥ :=
-  fun h => prf0_soundness h D M v hM
+theorem prfI_consistent {D : Type} (M : Model D) (v : Nat → D)
+    (hM : contextSatisfies M v axioms) : ¬ Prfᵢ ⊥ :=
+  fun h => prfI_soundness h D M v hM
 
 /-- ⭐ **El ancla, vuelta MEDIBLE**: un modelo de `axioms` que separe los dos lados demuestra que
-    `axiomsCodeT ≐ listFormCodeM axioms` **no es demostrable en `Prf₀`**.
+    `axiomsCodeT ≐ listFormCodeM axioms` **no es demostrable en `Prfᵢ`**.
     ⬜ Falta el modelo — ver §«Lo que sigue faltando» de la cabecera. -/
-theorem ancla_underivable_prf0 {D : Type} (M : Model D) (v : Nat → D)
+theorem ancla_underivable_prfI {D : Type} (M : Model D) (v : Nat → D)
     (hM : contextSatisfies M v axioms)
     (hne : evalTerm M v axiomsCodeT ≠ evalTerm M v (listFormCodeM axioms)) :
-    ¬ Prf₀ (axiomsCodeT =eq listFormCodeM axioms) :=
-  fun h => hne (prf0_soundness h D M v hM)
+    ¬ Prfᵢ (axiomsCodeT =eq listFormCodeM axioms) :=
+  fun h => hne (prfI_soundness h D M v hM)
 
-/-- Y la recíproca, que dice **qué se estaría suponiendo** si el ancla se postulase en `Prf₀`:
+/-- Y la recíproca, que dice **qué se estaría suponiendo** si el ancla se postulase en `Prfᵢ`:
     exactamente que es **válida en todo modelo** de `axioms`. -/
-theorem ancla_valida_si_prf0 (h : Prf₀ (axiomsCodeT =eq listFormCodeM axioms)) :
+theorem ancla_valida_si_prfI (h : Prfᵢ (axiomsCodeT =eq listFormCodeM axioms)) :
     satisfies axioms (axiomsCodeT =eq listFormCodeM axioms) :=
-  prf0_soundness h
+  prfI_soundness h
 
 end Sondeos.AnclaSoundness
 
 /-! ## FOOTPRINT -/
-#print axioms Sondeos.AnclaSoundness.prf0_soundness
-#print axioms Sondeos.AnclaSoundness.prf0_consistent
-#print axioms Sondeos.AnclaSoundness.ancla_underivable_prf0
+#print axioms Sondeos.AnclaSoundness.prfI_soundness
+#print axioms Sondeos.AnclaSoundness.prfI_consistent
+#print axioms Sondeos.AnclaSoundness.ancla_underivable_prfI

@@ -89,7 +89,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 theorem prf_orL_imp (Ac Bc : Term) : Prf (provFromCode Ac ⇒ provFromCode (orc Ac Bc)) :=
@@ -837,8 +837,8 @@ theorem pcc_wfAllB1_tracked (w : Term) : Prf (wfAllB1 w ⇒ provFromCode (wfAllB
     Copias literales del sondeo: la forma ecuacional FORTALECE la forma `carc`/`lenc`, luego el
     reflector de arriba vale tal cual para `wfAll1`. -/
 
-theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prf₀.j1 A B)
-theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prf₀.j2 A B)
+theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prfᵢ.j1 A B)
+theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prfᵢ.j2 A B)
 
 def shapeUn (X : Term) (k : Nat) : Formula :=
   Formula.eq X (cons (numeralM k) (cons (nthc X (numeralM 1)) nil))
@@ -1030,7 +1030,7 @@ theorem prf_argsIn_nil (q : Term) : Prf (argsIn q nil) := by
   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
     ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
 
 /-- `⌜0⌝` como código de TERMINO: `funcc ⌜"0"⌝ nil` (símbolo nulario, lista de args vacía). -/
@@ -1073,7 +1073,7 @@ theorem prf_wfAll1_wz : Prf (wfAll1 wz) := by
     PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_split (.var 0) zero) _) hlt1
   refine PrfH_or_elim hsplit ?brA ?brB
   case brA =>
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) (PrfH.hyp _ _ (List.Mem.head _)))
   case brB =>
     have hi : PrfH (Formula.eq (.var 0) zero :: [lt (.var 0) (liftTerm 0 (lenc wz))])

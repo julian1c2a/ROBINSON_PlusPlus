@@ -17,7 +17,7 @@ condición de siempre `C`, sale el de `P ∧ C`, **que es exactamente la `hcond`
 ⇒ **Enmendar los 7 esquemas NO obliga a rehacer el chasis.** El coste marginal es *sólo* el
 reflector del predicado nuevo. Las dos piezas que lo hacen salir:
 
-* `Prf₀.c2` / `Prf₀.c3` — proyecciones de la conjunción **fuera** de `Prov`;
+* `Prfᵢ.c2` / `Prfᵢ.c3` — proyecciones de la conjunción **fuera** de `Prov`;
 * `prf_substfc_and` (`Meta/ArithPrf.lean`) — `substfc` **distribuye** sobre `andc`, luego
   `condD (P ∧ C) t` **es** `andc (condD P t) (condD C t)`, y `PrfH_and_intro_code` cierra
   **dentro** de `Prov`. Es la lección 1 de la repatriación otra vez: *el transporte cambia de
@@ -127,9 +127,9 @@ theorem hcond_absorbe_extra (P C : Formula) (t : Term) (n : Nat)
   have hand : PrfH Γ (Formula.and (substFormula 0 t P) (substFormula 0 t C)) :=
     PrfH.hyp _ _ (List.Mem.head _)
   have hPt : PrfH Γ (substFormula 0 t P) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have hCt : PrfH Γ (substFormula 0 t C) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   have hPd : PrfH Γ (provFromCode (condD P t)) :=
     PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hP _) hlw) hln) hPt
   have hCd : PrfH Γ (provFromCode (condD C t)) :=

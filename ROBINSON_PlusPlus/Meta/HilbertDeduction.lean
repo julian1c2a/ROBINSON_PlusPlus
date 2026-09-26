@@ -31,7 +31,7 @@ Resultado clave: `prf_deduction : PrfH [A] B → Prf (A ⇒ B)` y
     `gen` usa contexto-lift (eigenvariable seguro, como `Derives.intro_forall`). -/
 inductive PrfH : List Formula → Formula → Prop where
   | hyp (Γ : List Formula) (φ : Formula) : List.Mem φ Γ → PrfH Γ φ
-  | incl0 (Γ : List Formula) (φ : Formula) : Prf₀ φ → PrfH Γ φ
+  | incl0 (Γ : List Formula) (φ : Formula) : Prfᵢ φ → PrfH Γ φ
   | p3 (Γ : List Formula) (A : Formula) : PrfH Γ (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
   | ind (Γ : List Formula) (A : Formula) : PrfH Γ (Full.inductionFormula A)
   | qconf (Γ : List Formula) (P C : Formula) : PrfH Γ (confinementFormula P C)
@@ -41,8 +41,8 @@ inductive PrfH : List Formula → Formula → Prop where
       PrfH (Γ.map (liftFormula 0)) A → PrfH Γ (Formula.forall A)
 
 /-- `A ⇒ A` intuicionista (de `p1`/`p2`/`mp`; combinador `I = S K K`). -/
-theorem prf0_id (A : Formula) : Prf₀ (A ⇒ A) :=
-  Prf₀.mp _ _ (Prf₀.mp _ _ (Prf₀.p2 A (A ⇒ A) A) (Prf₀.p1 A (A ⇒ A))) (Prf₀.p1 A A)
+theorem prfI_id (A : Formula) : Prfᵢ (A ⇒ A) :=
+  Prfᵢ.mp _ _ (Prfᵢ.mp _ _ (Prfᵢ.p2 A (A ⇒ A) A) (Prfᵢ.p1 A (A ⇒ A))) (Prfᵢ.p1 A A)
 
 /-! ### Monotonía del contexto — la **deuda B6b**, saldada el 2026‑09‑11
 
@@ -89,13 +89,13 @@ theorem PrfH_w1 {Γ : List Formula} {A ψ : Formula} (h : PrfH Γ ψ) : PrfH (A 
 
 /-- Debilitamiento por la izquierda (combinador `K`): `PrfH Γ B → PrfH Γ (A ⇒ B)`. -/
 theorem prfH_weaken {Γ : List Formula} {A B : Formula} (h : PrfH Γ B) : PrfH Γ (A ⇒ B) :=
-  PrfH.mp Γ B (A ⇒ B) (PrfH.incl0 Γ (B ⇒ (A ⇒ B)) (Prf₀.p1 B A)) h
+  PrfH.mp Γ B (A ⇒ B) (PrfH.incl0 Γ (B ⇒ (A ⇒ B)) (Prfᵢ.p1 B A)) h
 
 /-- Aplicación del combinador `S`: de `Γ ⊢ A⇒(C⇒B)` y `Γ ⊢ A⇒C` sale `Γ ⊢ A⇒B`. -/
 theorem prfH_s_app {Γ : List Formula} {A C B : Formula}
     (h1 : PrfH Γ (A ⇒ (C ⇒ B))) (h2 : PrfH Γ (A ⇒ C)) : PrfH Γ (A ⇒ B) :=
   PrfH.mp Γ (A ⇒ C) (A ⇒ B)
-    (PrfH.mp Γ (A ⇒ (C ⇒ B)) ((A ⇒ C) ⇒ (A ⇒ B)) (PrfH.incl0 Γ _ (Prf₀.p2 A C B)) h1) h2
+    (PrfH.mp Γ (A ⇒ (C ⇒ B)) ((A ⇒ C) ⇒ (A ⇒ B)) (PrfH.incl0 Γ _ (Prfᵢ.p2 A C B)) h1) h2
 
 /-- Hipótesis única: `PrfH [A] A`. -/
 theorem prfH_hyp_self (A : Formula) : PrfH [A] A := PrfH.hyp [A] A (List.Mem.head _)
@@ -107,7 +107,7 @@ theorem deduction_aux {Δ B} (h : PrfH Δ B) : ∀ A Γ, Δ = A :: Γ → PrfH �
   | hyp Δ' φ hmem =>
       intro A Γ hΔ; subst hΔ
       rcases List.mem_cons.mp hmem with rfl | hin
-      · exact PrfH.incl0 Γ _ (prf0_id _)
+      · exact PrfH.incl0 Γ _ (prfI_id _)
       · exact prfH_weaken (PrfH.hyp Γ φ hin)
   | incl0 Δ' φ h0 => intro A Γ hΔ; subst hΔ; exact prfH_weaken (PrfH.incl0 Γ φ h0)
   | p3 Δ' A0 => intro A Γ hΔ; subst hΔ; exact prfH_weaken (PrfH.p3 Γ A0)
@@ -159,12 +159,12 @@ theorem prf_deduction {A B : Formula} (h : PrfH [A] B) : Prf (A ⇒ B) :=
     +deducción). Núcleo del `provCodeC'_elim` finitario para `d2_prf`. -/
 theorem prf_ex_elim_imp {A C : Formula} (h : PrfH [A] (liftFormula 0 C)) :
     Prf (Formula.ex A ⇒ C) :=
-  Prf.mp _ _ (Prf.incl (Prf₀.q3 A C)) (Prf.gen _ (prf_deduction h))
+  Prf.mp _ _ (Prf.incl (Prfᵢ.q3 A C)) (Prf.gen _ (prf_deduction h))
 
 /-- **Introducción del ∃ en `PrfH`** (vía `q2`): de `PrfH Γ (A[t])` sale `PrfH Γ (∃A)`. -/
 theorem PrfH_ex_intro {Γ : List Formula} {A : Formula} (t : Term)
     (h : PrfH Γ (substFormula 0 t A)) : PrfH Γ (Formula.ex A) :=
-  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.q2 A t)) h
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.q2 A t)) h
 
 /-- **Eliminación del ∃ en `PrfH`** (vía `q3`+`gen`+deducción): de `PrfH Γ (∃A)` y
     `PrfH (A :: Γ.map ↑) (↑C)` sale `PrfH Γ C`. Permite eliminar testigos anidados
@@ -172,7 +172,7 @@ theorem PrfH_ex_intro {Γ : List Formula} {A : Formula} (t : Term)
 theorem PrfH_ex_elim {Γ : List Formula} {A C : Formula} (hex : PrfH Γ (Formula.ex A))
     (hbody : PrfH (A :: Γ.map (liftFormula 0)) (liftFormula 0 C)) : PrfH Γ C :=
   PrfH.mp Γ _ _
-    (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.q3 A C))
+    (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.q3 A C))
       (PrfH.gen Γ (A ⇒ liftFormula 0 C) (deduction_aux hbody A (Γ.map (liftFormula 0)) rfl)))
     hex
 

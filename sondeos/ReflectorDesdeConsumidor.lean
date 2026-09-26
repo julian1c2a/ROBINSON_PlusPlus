@@ -892,7 +892,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 /-- **EL RESULTADO CENTRAL DE ESTE FICHERO.**
@@ -912,7 +912,7 @@ theorem refl_isTermCodeE1_imp (w X : Term) :
   unfold isTermCodeE1
   refine prf_or_elim_imp ?_ ?_
   · exact impT (refl_shapeUn_imp X)
-      (Prf.incl (Prf₀.p1 (targetLift X) (targetLiftsc (nthc X (numeralM 2)))))
+      (Prf.incl (Prfᵢ.p1 (targetLift X) (targetLiftsc (nthc X (numeralM 2)))))
   · refine prf_deduction (deduction_aux ?_ (targetLiftsc (nthc X (numeralM 2)))
       [land (shapeBin X 1) (argsIn w (nthc X (numeralM 2)))] rfl)
     have hT : PrfH [targetLiftsc (nthc X (numeralM 2)),

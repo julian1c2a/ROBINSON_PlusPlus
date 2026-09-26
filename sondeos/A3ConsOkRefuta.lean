@@ -73,17 +73,17 @@ def nodeOkOrig (w X : Term) : Formula :=
 /-- Con la definicion ORIGINAL, `nil` SI es un nodo valido (disyunto `X = nil`). -/
 theorem prf_nodeOkOrig_nil (w : Term) : Prf (nodeOkOrig w nil) := by
   unfold nodeOkOrig lorAll
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  refine prf_mp (Prf.incl (Prf₀.j2 _ _)) ?_
-  exact prf_mp (Prf.incl (Prf₀.j1 _ _)) (prf_refl nil)
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  refine prf_mp (Prf.incl (Prfᵢ.j2 _ _)) ?_
+  exact prf_mp (Prf.incl (Prfᵢ.j1 _ _)) (prf_refl nil)
 
 theorem neg_consOk_nil : axioms ⊢ neg (consOk nil) :=
   nil_ne_cons (carc nil) (cdrc nil)

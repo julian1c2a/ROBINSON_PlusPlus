@@ -121,16 +121,16 @@ theorem prf_isTermCodeE1_mono (a w X : Term) :
     Prf (Formula.impl (isTermCodeE1 w X) (isTermCodeE1 (cons a w) X)) := by
   unfold isTermCodeE1
   refine prf_or_elim_imp ?_ ?_
-  · exact Prf.incl (Prf₀.j1 _ _)
+  · exact Prf.incl (Prfᵢ.j1 _ _)
   · refine prf_deduction ?_
     have hh : PrfH [land (shapeBin X 1) (argsIn w (nthc X (numeralM 2)))]
         (land (shapeBin X 1) (argsIn w (nthc X (numeralM 2)))) := prfH_hyp_self _
-    have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hh
-    have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hh
+    have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hh
+    have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hh
     have h2' := PrfH.mp _ _ _
       (prf_to_prfH (prf_argsIn_mono a w (nthc X (numeralM 2))) _) h2
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
-      (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _)) h1) h2')
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
+      (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 _ _)) h1) h2')
 
 /-! ## §4 · `wfAll1` DE UN TESTIGO EXTENDIDO — el corazón del paso
 
@@ -165,8 +165,8 @@ theorem prf_wfAll1_cons (A w : Term) :
       (land (isTermCodeE1 (cons (liftTerm 0 A) (liftTerm 0 w)) (liftTerm 0 A))
         (wfAll1 (liftTerm 0 w))) :=
     PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
-  have hA := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
-  have hw := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+  have hA := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
+  have hw := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   clear hA hw
   refine PrfH_or_elim (prf_to_prfH (prf_zero_or_eq_succ_pred (.var 0)) _) ?zc ?sc
   case zc =>
@@ -175,7 +175,7 @@ theorem prf_wfAll1_cons (A w : Term) :
         (land (isTermCodeE1 (cons (liftTerm 0 A) (liftTerm 0 w)) (liftTerm 0 A))
           (wfAll1 (liftTerm 0 w))) :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-    have hA2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand2
+    have hA2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand2
     have hnth : PrfH (Formula.eq (.var 0) zero :: CTX0 A w) (nthc (cons (liftTerm 0 A) (liftTerm 0 w)) (.var 0) =eq liftTerm 0 A) :=
       PrfH_eq_trans (PrfH_congr_nthc_idx _ hz)
         (prf_to_prfH (prf_nthc_zero (liftTerm 0 A) (liftTerm 0 w)) _)
@@ -188,7 +188,7 @@ theorem prf_wfAll1_cons (A w : Term) :
         (land (isTermCodeE1 (cons (liftTerm 0 A) (liftTerm 0 w)) (liftTerm 0 A))
           (wfAll1 (liftTerm 0 w))) :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-    have hw2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand2
+    have hw2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand2
     have hltS : PrfH (Formula.eq (.var 0) (succ (pred (.var 0))) :: CTX0 A w) (lt (succ (pred (.var 0))) (succ (lenc (liftTerm 0 w)))) :=
       PrfH_lt_subst2 (prf_to_prfH (prf_lenc_cons (liftTerm 0 A) (liftTerm 0 w)) _)
         (PrfH_lt_subst1 hs hlt2)
@@ -270,7 +270,7 @@ theorem prf_argsIn_singleton (W hd : Term) :
       PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _)
         (PrfH.mp _ _ _ (prf_to_prfH
           (prf_lt_of_succ_lt_succ (pred (.var 0)) (lenc nil)) _) hltS)
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (pred (.var 0))) _) hzero)
 
 /-! ## §7 · EL NODO `σ` ES UN `isTermCodeE1` — si su argumento está en el testigo -/
@@ -300,8 +300,8 @@ theorem prf_isTermCodeE1_succnode (W x : Term) :
     PrfH.mp _ _ _ (prf_to_prfH (prf_argsIn_singleton W (tcFn x)) _) hin
   have hargs2 : PrfH [In (tcFn x) W] (argsIn W (nthc (SUCCNODE x) (numeralM 2))) :=
     PrfH_congr_argsIn (PrfH_eq_symm (prf_to_prfH (prf_nthc_succnode_2 x) _)) hargs
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
-    (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
+    (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 _ _))
       (prf_to_prfH (prf_shapeBin_succnode x) _)) hargs2)
 
 /-! ## §8 · Congruencia de `hasWit` en `PrfH` (la necesita el ensamblaje) -/
@@ -344,11 +344,11 @@ theorem step_at (x : Term) :
   have hctx : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))]
       (isTC1 (.var 0) (liftTerm 0 (tcFn x))) := prfH_hyp_self _
   have hwf : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))] (wfAll1 (.var 0)) := by
-    have := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hctx
+    have := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hctx
     simpa only [isTC1, land] using this
   have hin0 : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))]
       (In (liftTerm 0 (tcFn x)) (.var 0)) := by
-    have := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hctx
+    have := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hctx
     simpa only [isTC1, land] using this
   -- el argumento del nodo sigue en el testigo EXTENDIDO
   have hinW : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))]
@@ -366,12 +366,12 @@ theorem step_at (x : Term) :
   have hwf' : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))]
       (wfAll1 (cons (liftTerm 0 (SUCCNODE x)) (.var 0))) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_wfAll1_cons (liftTerm 0 (SUCCNODE x)) (.var 0)) _)
-      (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _)) hnode) hwf)
+      (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 _ _)) hnode) hwf)
   have hinH : PrfH [isTC1 (.var 0) (liftTerm 0 (tcFn x))]
       (In (liftTerm 0 (SUCCNODE x)) (cons (liftTerm 0 (SUCCNODE x)) (.var 0))) :=
     prf_to_prfH (prf_in_cons_head _ _) _
   simpa only [isTC1, land] using
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _)) hwf') hinH
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 _ _)) hwf') hinH
 
 /-! ## §10 · EL CIERRE — inducción objeto -/
 

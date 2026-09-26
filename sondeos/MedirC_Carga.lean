@@ -215,9 +215,9 @@ theorem hcond_absorbe_extra (P C : Formula) (t : Term) (n : Nat)
   have hand : PrfH Γ (Formula.and (substFormula 0 t P) (substFormula 0 t C)) :=
     PrfH.hyp _ _ (List.Mem.head _)
   have hPt : PrfH Γ (substFormula 0 t P) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have hCt : PrfH Γ (substFormula 0 t C) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   have hPd : PrfH Γ (provFromCode (condD P t)) :=
     PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hP _) hlw) hln) hPt
   have hCd : PrfH Γ (provFromCode (condD C t)) :=
@@ -423,7 +423,7 @@ theorem M5_LA_GUARDA_COLGANTE_IMPLICA_BOT (h : Prf GUARDA_COLGANTE) : Prf Formul
   have h1 : Prf (substFormula 0 (nthc lineaMala (numeralM 2)) (ENS.hasWitF (.var 0))) := by
     rw [hS]; exact hwit
   have h2 : Prf (substFormula 0 (varc (numeralM 0)) (ENS.hasWitF (.var 0))) :=
-    prf_mp (prf_mp (Prf.incl (Prf₀.leibniz (ENS.hasWitF (.var 0)) _ _)) heq) h1
+    prf_mp (prf_mp (Prf.incl (Prfᵢ.leibniz (ENS.hasWitF (.var 0)) _ _)) heq) h1
   rw [hS] at h2
   exact prf_mp (CRIT_hasWitF_rejects_varc (numeralM 0)) h2
 
@@ -440,14 +440,14 @@ theorem M5_la_forma_GENERICA_tambien_implica_BOT (h : ∀ t : Term, Prf (GQ1 t))
   have h1 : Prf (substFormula 0 (nthc lineaMala (numeralM 2)) (ENS.hasWitF (.var 0))) := by
     rw [hS]; exact hwit
   have h2 : Prf (substFormula 0 (varc (numeralM 0)) (ENS.hasWitF (.var 0))) :=
-    prf_mp (prf_mp (Prf.incl (Prf₀.leibniz (ENS.hasWitF (.var 0)) _ _)) heq) h1
+    prf_mp (prf_mp (Prf.incl (Prfᵢ.leibniz (ENS.hasWitF (.var 0)) _ _)) heq) h1
   rw [hS] at h2
   exact prf_mp (CRIT_hasWitF_rejects_varc (numeralM 0)) h2
 
 /-- Y por tanto, bajo la guarda colgante **TODO** es demostrable: la «D3 condicionada» de §4
     no aporta informacion ninguna. -/
 theorem M5_bajo_la_guarda_todo_es_demostrable (h : Prf GUARDA_COLGANTE) (A : Formula) : Prf A :=
-  prf_mp (Prf.incl (Prf₀.efq A)) (M5_LA_GUARDA_COLGANTE_IMPLICA_BOT h)
+  prf_mp (Prf.incl (Prfᵢ.efq A)) (M5_LA_GUARDA_COLGANTE_IMPLICA_BOT h)
 
 end MC_carga
 

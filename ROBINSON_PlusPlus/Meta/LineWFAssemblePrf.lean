@@ -59,7 +59,7 @@ theorem prf_of_tagDisj (t : Term) (C : Formula)
       refine prf_deduction ?_
       exact PrfH.mp _ _ _
         (PrfH.mp _ _ _
-          (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 (lineTag t =eq numeralM (n + 1))
+          (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 (lineTag t =eq numeralM (n + 1))
             (tagDisj t n) C)) (prfH_hyp_self _))
           (prf_to_prfH (hbranch (n + 1)) _))
         (prf_to_prfH hrec _)

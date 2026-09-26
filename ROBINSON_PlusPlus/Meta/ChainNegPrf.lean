@@ -466,7 +466,7 @@ theorem prf_lenc_tag_and {k m : Nat} {C : Formula} (t : Term)
           = Formula.and (Formula.eq (lenc t) (numeralM (m + 2))) (substFormula 0 t C) := by
         simp only [substFormula, substFormula_lencF]
       rw [hsub]
-      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) (prfH_hyp_self _)))
+      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) (prfH_hyp_self _)))
 
 /-- Envoltorio de longitud para `mp` (16), el **único** sin condición estructural. -/
 theorem prf_lenc_tag_plain {k m : Nat} (t : Term)

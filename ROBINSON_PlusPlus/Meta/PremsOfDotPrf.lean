@@ -779,7 +779,7 @@ theorem pcc_eval_premsOf_tag_and {k m : Nat} {C : Formula} (t R : Term)
           = Formula.and (lenc t =eq numeralM (m + 2)) (substFormula 0 t C) := by
         simp only [substFormula, substFormula_lencF]
       rw [hsub]
-      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) (prfH_hyp_self _)))
+      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) (prfH_hyp_self _)))
     hobj hdot
 
 /-- Envoltorio para `mp` (16), el **único** sin condición estructural. -/

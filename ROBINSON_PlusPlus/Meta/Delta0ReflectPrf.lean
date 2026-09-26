@@ -270,7 +270,7 @@ theorem pcc_lt_tracked [AnclaEq] (s t : Term) :
   -- transporta `heval` a `Prov(⌜ ṡ' + σ(#0˙) = ṫ' ⌝)` (Leibniz sobre `provFormulaC'`)
   have h2 : PrfH Γ (provFromCode (eqCodeFn (addcT (tcFn s') (succcT (tcFn (.var 0)))) (tcFn t'))) :=
     PrfH.mp _ _ _
-      (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcodeq)
+      (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.leibniz provFormulaC' _ _)) hcodeq)
       (prf_to_prfH heval _)
   exact PrfH.mp _ _ _
     (prf_to_prfH (pcc_lt_intro_open_imp s' t' (tcFn (.var 0))

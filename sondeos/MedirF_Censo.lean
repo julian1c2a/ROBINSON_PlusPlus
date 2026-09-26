@@ -67,7 +67,7 @@ namespace MFCenso
 #check @gnum_ne
 #check @prf_refl
 #check @Prf.incl
-#check @Prf₀.c2
+#check @Prfᵢ.c2
 #check @objList
 #check @prf_lineWF_q1
 #check @prf_formCode_numeral
@@ -121,7 +121,7 @@ theorem derives_lineWF_neg_of_lenc {L : Term} {Q : Formula} {n m : Nat}
     axioms ⊢ neg (lineWF L) := by
   have hfwd : Prf (lineWF L ⇒ Formula.and (lenc L =eq numeralM n) Q) := prf_and_elim_left hiff
   have hgetN : axioms ⊢ (lineWF L ⇒ (lenc L =eq numeralM n)) :=
-    prf_to_derives (prf_imp_trans hfwd (Prf.incl (Prf₀.c2 _ _)))
+    prf_to_derives (prf_imp_trans hfwd (Prf.incl (Prfᵢ.c2 _ _)))
   have hlenD : axioms ⊢ (lenc L =eq numeralM m) := prf_to_derives hlen
   exact FOL.MetaRules.imp_intro (fun hwf =>
     FOL.MetaRules.mp (numM_ne hnm)

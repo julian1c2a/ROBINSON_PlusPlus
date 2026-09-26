@@ -57,7 +57,7 @@ theorem prf_in_cons_nil_iff (y x : Term) : Prf (In y (cons x nil) ⇔ (y =eq x))
         (prfH_hyp_self _)
     refine PrfH_or_elim hor ?_ ?_
     · exact PrfH.hyp _ _ (List.Mem.head _)
-    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (PrfH.hyp _ _ (List.Mem.head _)))
   · refine prf_deduction ?_
     exact PrfH_eq_subst_in (PrfH_congr_cons_head (prfH_hyp_self _))
@@ -73,18 +73,18 @@ theorem prf_in_concat_singleton_iff (y c x : Term) :
       PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_in_concat_iff y c (cons x nil))) _)
         (prfH_hyp_self _)
     refine PrfH_or_elim hor ?_ ?_
-    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
-    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
+    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_in_cons_nil_iff y x)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
   · refine prf_deduction ?_
     refine PrfH_or_elim (prfH_hyp_self (lor (In y c) (Formula.eq y x))) ?_ ?_
     · exact PrfH.mp _ _ _
         (prf_to_prfH (prf_and_elim_right (prf_in_concat_iff y c (cons x nil))) _)
-        (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _)))
+        (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _)))
     · exact PrfH.mp _ _ _
         (prf_to_prfH (prf_and_elim_right (prf_in_concat_iff y c (cons x nil))) _)
-        (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
+        (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_right (prf_in_cons_nil_iff y x)) _)
             (PrfH.hyp _ _ (List.Mem.head _))))
 
@@ -186,7 +186,7 @@ theorem prf_boundedCarcLt_cons_succ_iff (y line rest j : Term) :
       have heq : PrfH [Z, C]
           (Formula.eq (carc (nthc (liftTerm 0 (cons line rest)) (.var 0))) (liftTerm 0 y)) :=
         PrfH_and_elim_right (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
-      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) ?_
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) ?_
       exact PrfH_eq_trans
         (PrfH_eq_symm (PrfH_eq_trans (PrfH_eq_congr_carc (PrfH_eq_congr_nthc2 hz))
           (PrfH_eq_congr_carc (prf_to_prfH
@@ -203,7 +203,7 @@ theorem prf_boundedCarcLt_cons_succ_iff (y line rest j : Term) :
         PrfH.mp _ _ _
           (prf_to_prfH (prf_lt_of_succ_lt_succ (pred (.var 0)) (liftTerm 0 j)) _)
           (PrfH_lt_subst1 hs hlt)
-      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
       refine PrfH_ex_intro (pred (.var 0)) ?_
       simp only [boundedCarcLt, substFormula, substTerm, substTerms, land, lt, nthc, carc, cons,
         pred, succ, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true, FOL.substTerm_liftTerm]
@@ -263,7 +263,7 @@ theorem prf_boundedAllIn_nil (c : Term) : Prf (boundedAllIn c nil) := by
   refine Prf.gen _ ?_
   simp only [boundedAllIn, lt, lenc, nthc, In, nil, zero, liftTerm, liftTerms]
   refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 
@@ -453,9 +453,9 @@ theorem prf_premOk_cons_iff (y c line rest i : Term) :
     refine PrfH_or_elim (prfH_hyp_self
       (lor (In y c) (boundedCarcLt y (cons line rest) (succ i)))) ?_ ?_
     · -- In y c : va al contexto ampliado
-      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) ?_
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) ?_
       refine PrfH_iff_mpr (prf_in_concat_singleton_iff y c (carc line)) ?_
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
     · -- ∃k<σi : se parte por (c)
       let Hb : Formula := boundedCarcLt y (cons line rest) (succ i)
       let H : Formula := lor (In y c) Hb
@@ -464,12 +464,12 @@ theorem prf_premOk_cons_iff (y c line rest i : Term) :
           (PrfH.hyp _ _ (List.Mem.head _))
       refine PrfH_or_elim hsplit ?_ ?_
       · -- carc line =eq y : entra en el contexto ampliado (por (b))
-        refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) ?_
+        refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) ?_
         refine PrfH_iff_mpr (prf_in_concat_singleton_iff y c (carc line)) ?_
-        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
+        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
           (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
       · -- ∃k<i sobre rest
-        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
   · -- ⇐
     refine prf_deduction ?_
     refine PrfH_or_elim (prfH_hyp_self (lor (In y cx) (boundedCarcLt y rest i))) ?_ ?_
@@ -480,12 +480,12 @@ theorem prf_premOk_cons_iff (y c line rest i : Term) :
         PrfH_iff_mp (prf_in_concat_singleton_iff y c (carc line))
           (PrfH.hyp _ _ (List.Mem.head _))
       refine PrfH_or_elim hsplit ?_ ?_
-      · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
-      · refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (PrfH.hyp _ _ (List.Mem.head _))
+      · refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
         exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedCarcLt_cons_of_head y line rest i) _)
           (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
     · -- ∃k<i sobre rest : se reindexa k ↦ σk
-      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
       exact PrfH.mp _ _ _ (prf_to_prfH (prf_boundedCarcLt_cons_of_tail y line rest i) _)
         (PrfH.hyp _ _ (List.Mem.head _))
 
@@ -590,7 +590,7 @@ theorem prf_boundedPremsIn_zero_iff (c p L : Term) :
       lt, lenc, nthc, In, lor, reduceIte, if_true, FOL.substTerm_liftTerm] at hs
     refine PrfH_or_elim (PrfH.mp _ _ _ hs hB) ?_ ?_
     · exact PrfH.hyp _ _ (List.Mem.head _)
-    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
         (PrfH.mp _ _ _ (prf_to_prfH
           (prf_boundedCarcLt_zero (nthc (liftTerm 0 L) (.var 0)) (liftTerm 0 p)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
@@ -609,7 +609,7 @@ theorem prf_boundedPremsIn_zero_iff (c p L : Term) :
     have hs := PrfH_spec hA (.var 0)
     simp only [A0, boundedAllIn, substFormula, substTerm, substTerms, lt, lenc, nthc, In,
       reduceIte, if_true, FOL.substTerm_liftTerm] at hs
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH.mp _ _ _ hs hB)
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (PrfH.mp _ _ _ hs hB)
 
 /-- **Mitad `i = 0`**: la línea `0` de `line :: rest` no tiene líneas anteriores, así que su
     validez acotada es exactamente `lineOk c line` (usa (a) y `prf_boundedPremsIn_zero_iff`). -/
@@ -701,7 +701,7 @@ theorem prf_chainOkB_nil (c : Term) : Prf (chainOkB c nil) := by
   refine Prf.gen _ ?_
   simp only [chainOkB, lt, lenc, nil, zero, liftTerm, liftTerms]
   refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 

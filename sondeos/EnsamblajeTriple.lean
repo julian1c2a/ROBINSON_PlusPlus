@@ -74,7 +74,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 /-! ############################################################################
@@ -853,7 +853,7 @@ theorem prf_j3_perm (A B C : Formula) :
     [Formula.impl B C, Formula.impl A C] rfl) (Formula.impl B C)
     [Formula.impl A C] rfl)
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (PrfH.hyp _ _ (List.Mem.head _)))
+    (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (PrfH.hyp _ _ (List.Mem.head _)))
     (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))))
     (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
 
@@ -1184,8 +1184,8 @@ theorem prf_congr_In_left {u v w : Term} (h : Prf (u =eq v)) (hin : Prf (In u w)
   exact prfH_nil_to_prf
     ((hS v) ▸ PrfH_leibniz_subst (A := f) (prf_to_prfH h []) ((hS u) ▸ prf_to_prfH hin [])) rfl
 
-theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) := prf_mp (Prf.incl (Prf₀.j1 A B)) h
-theorem prf_orR {A B : Formula} (h : Prf B) : Prf (lor A B) := prf_mp (Prf.incl (Prf₀.j2 A B)) h
+theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) := prf_mp (Prf.incl (Prfᵢ.j1 A B)) h
+theorem prf_orR {A B : Formula} (h : Prf B) : Prf (lor A B) := prf_mp (Prf.incl (Prfᵢ.j2 A B)) h
 
 /-- Un nodo binario REAL satisface su forma ecuacional (copia de
     `DiscriminaEcuacional.PasoUno.prf_shapeBin_real`). -/

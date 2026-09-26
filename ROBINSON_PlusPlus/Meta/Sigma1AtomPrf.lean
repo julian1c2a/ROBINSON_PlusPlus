@@ -267,7 +267,7 @@ theorem pcc_eq_tracked (t u : Term) :
   have hcode : PrfH [t =eq u] (eqCodeFn (tcFn t) (tcFn t) =eq eqCodeFn (tcFn t) (tcFn u)) :=
     PrfH_congr_eqCodeFn (prf_to_prfH (prf_refl (tcFn t)) _) htc
   exact PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcode) hbase
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.leibniz provFormulaC' _ _)) hcode) hbase
 
 /-- **Reflexión completa del átomo `=eq`** cuando los términos están rastreados por `tcFn`
     (puente `tcFn t =eq termCode t`, descargable con numerales vía `prf_tc_numeral`):

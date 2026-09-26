@@ -136,7 +136,7 @@ theorem nthRunPred_base : Prf (substFormula 0 nil nthRunPred) := by
     nil, zero, Nat.reduceEqDiff, Nat.reduceGT, reduceIte, if_true,
     FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 

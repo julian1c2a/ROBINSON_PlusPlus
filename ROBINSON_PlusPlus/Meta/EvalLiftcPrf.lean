@@ -136,7 +136,7 @@ modulo lleva estos 20, **cada uno justificado por el simbolo que lo pide**:
 | `CodeWitnessPrf`  | `SinWTs` (`tcodes1`, `crit_*`, y por alias `isTC1`/`wfAll1`/`argsIn`/`isTermCodeE1`) y `ENS` (`liftF_isTC1`, `substF_isTC1`, `substF_wfAll1`, `CRIT_hasWit_real`, y por alias `hasWit`). ⚠️ Los predicados de guarda se DECLARAN en `Minimal/Axioms.lean` desde ADR-020 |
 | `DerivCondPrf`    | `liftTerm_termCode`, `liftTerm_strCode`, `substTerm_strCode` (§1)     |
 | `EvalRunFnPrf`    | `prf_substtc_termCode_nil` — SOLO para el puente anti‑`iz_inv` de §0  |
-| `Hilbert`         | `Prf`, `PrfH`, `Prf₀.p1`/`j1`/`j2`, `Prf.gen`, `Prf.qconf`            |
+| `Hilbert`         | `Prf`, `PrfH`, `Prfᵢ.p1`/`j1`/`j2`, `Prf.gen`, `Prf.qconf`            |
 | `HilbertDeduction`| `prf_deduction`, `deduction_aux`, `prf_to_prfH`, `prfH_nil_to_prf`, `prf_ex_elim_imp` |
 | `LiftcCodePrf`    | ⚠️ **EL IMPORT CENTRAL**: `targetLift`, `targetLiftsc`, `liftcT`, `liftscT`, `refl_shapeUn_imp`, `refl_shapeBin_imp`, `refl_lista_nil`, `refl_lista_cons_imp`, `substTerm_termCode`, `prf_substtc_termCode_zero` |
 | `NatArithPrf`     | `prf_zero_lt_succ`, `prf_succ_lt_succ_of_lt` (§3, §6)                 |

@@ -17,7 +17,7 @@
 #    su conclusión—, no por grep sobre los nombres.
 #
 # ⭐ Rompe en LOS DOS SENTIDOS, y el que importa es el de subida: si alguien declara un `axiom`
-#    que habita `Prf₀`, este control dice que la inducción sobre `Prf₀` acaba de volverse
+#    que habita `Prfᵢ`, este control dice que la inducción sobre `Prfᵢ` acaba de volverse
 #    ILEGÍTIMA — que es exactamente el aviso que faltó en mayo.
 #
 # 🔧 EJECUTAR DESDE POWERSHELL (desde Bash, `lake` no está en el PATH — y el script lo DICE).
@@ -37,7 +37,7 @@ LK₀|14|0|-
 LKc|15|0|-
 LKh|14|0|-
 ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|-
-ROBINSON_PlusPlus.Meta.Hilbert.Prf₀|17|0|-
+ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|-
 ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|-
 EOF
 

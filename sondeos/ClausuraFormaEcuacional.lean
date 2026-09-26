@@ -217,7 +217,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 theorem prf_eq_of_in_singleton {z y : Term} (h : Prf (In z (cons y nil))) : Prf (z =eq y) := by
@@ -225,7 +225,7 @@ theorem prf_eq_of_in_singleton {z y : Term} (h : Prf (In z (cons y nil))) : Prf 
     prf_mp (prf_and_elim_left (prf_in_cons_iff z y nil)) h
   have h1 : Prf ((z =eq y) ⇒ (z =eq y)) := prf_deduction (prfH_hyp_self _)
   have h2 : Prf (In z nil ⇒ (z =eq y)) :=
-    prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (z =eq y)))
+    prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq (z =eq y)))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil z) _) (prfH_hyp_self _)))
   exact prf_mp (prf_or_elim_imp h1 h2) hor
 
@@ -355,7 +355,7 @@ theorem map_mem_tc (v t y : Term) : ∀ w : Term,
           (substtsc (liftTerm 0 v) (liftTerm 0 t) (.var 0))))) := by
     refine prf_list_induction _ ?base ?step
     · have hb : Prf (Formula.impl (In y nil) (In (substtc v t y) (substtsc v t nil))) :=
-        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (prfH_hyp_self _)))
       simpa only [substFormula, substTerm, substTerms, In, substtc, substtsc, nil, cons, zero,
         FOL.substTerm_liftTerm, if_true] using hb
@@ -422,7 +422,7 @@ theorem map_mem_fc (v t y : Term)
           (substfsc (liftTerm 0 v) (liftTerm 0 t) (.var 0))))) := by
     refine prf_list_induction _ ?base ?step
     · have hb : Prf (Formula.impl (In y nil) (In (substfc v t y) (substfsc v t nil))) :=
-        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (prfH_hyp_self _)))
       simpa only [substFormula, substTerm, substTerms, In, substfc, substfsc, nil, cons, zero,
         FOL.substTerm_liftTerm, if_true] using hb

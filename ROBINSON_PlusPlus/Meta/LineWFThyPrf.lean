@@ -119,7 +119,7 @@ theorem prf_lineWF_thy_bwd :
     PrfH.mp _ _ _ hax (PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
   have hmpr : PrfH [Formula.and lencThy inThy, tagThy]
       (Formula.impl (Formula.and lencThy inThy) lwfVar) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hiff
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hiff
   exact PrfH.mp _ _ _ hmpr (PrfH.hyp _ _ (List.Mem.head _))
 
 /-! ### Paso 6b — el bicondicional TRANSPORTADO al nivel del código, instanciado en `tcFn t` -/
@@ -304,11 +304,11 @@ theorem pcc_lineWF_tracked_thy_imp [AnclaEq] (t : Term) :
       (In (carc t) axiomsCodeT)) :=
     PrfH.mp _ _ _ (prf_to_prfH hacc _) htagH
   have hand : PrfH Γ (Formula.and (lenc t =eq numeralM 2) (In (carc t) axiomsCodeT)) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hiff) hlw
   have hlencH : PrfH Γ (lenc t =eq numeralM 2) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have hinH : PrfH Γ (In (carc t) axiomsCodeT) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   -- cota DERIVADA de la longitud canónica (`thy` sólo necesita `1 < lenc t`)
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
     PrfH_lt_subst2 (PrfH_eq_symm hlencH)

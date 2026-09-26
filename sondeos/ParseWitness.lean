@@ -150,7 +150,7 @@ theorem prf_bdAll_numeral (Φ : Formula) (hΦ : substFormula 0 (.var 0) Φ = Φ)
       Prf (Formula.forall (Formula.impl (lt (.var 0) (numeralM n)) Φ))
   | 0, _ => by
       refine Prf.gen _ (prf_deduction ?_)
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq Φ))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
   | n + 1, h => by
@@ -254,7 +254,7 @@ theorem prf_nodeOk_bot (w : Term) : Prf (nodeOk w (formCodeM Formula.bottom)) :=
     prf_eq_trans (prf_lenc_cons (numeralM 2) nil) (prf_eq_congr_succ prf_lenc_nil)
   have hnul : Prf (nulOk (formCodeM Formula.bottom) 2) := prf_and_intro htag hlen
   unfold nodeOk lorAll
-  exact prf_mp (Prf.incl (Prf₀.j1 _ _)) hnul
+  exact prf_mp (Prf.incl (Prfᵢ.j1 _ _)) hnul
 
 theorem prf_isFCB_bottom : Prf (isFCB wBot (formCodeM Formula.bottom)) := by
   refine prf_and_intro ?_ (prf_In_objList _ _ (List.Mem.head _))
@@ -272,7 +272,7 @@ theorem prf_isFCB_bottom : Prf (isFCB wBot (formCodeM Formula.bottom)) := by
     PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_split (.var 0) zero) _) hlt1
   refine PrfH_or_elim hsplit ?brA ?brB
   case brA =>
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) (PrfH.hyp _ _ (List.Mem.head _)))
   case brB =>
     let Δ : List Formula := Formula.eq (.var 0) zero :: [lt (.var 0) (lenc wBot)]

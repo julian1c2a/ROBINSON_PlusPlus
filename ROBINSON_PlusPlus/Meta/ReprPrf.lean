@@ -35,18 +35,18 @@ habilitó: `Prf` ya puede usar TODO axioma (incluida la maquinaria de coding) v�
 
 **Infraestructura de porte.** Los lemas-ecuación del verificador se demostraron a
 nivel `axioms ⊢` con `ax`(=`Derives.hyp`/thy) + `spec`(=`elim_forall`) + `simp`. Su
-contraparte `Prf` usa `prf_ax`(=`Prf₀.thy`) + `prf_spec`(=`q1`+`mp`) + el MISMO
+contraparte `Prf` usa `prf_ax`(=`Prfᵢ.thy`) + `prf_spec`(=`q1`+`mp`) + el MISMO
 `simp` (que solo manipula la igualdad meta de fórmulas). Esta sonda valida el patrón.
 -/
 
 /-- **Axioma como teorema de `Prf`** (regla `thy`, ahora sobre todo `axioms`). -/
-theorem prf_ax {f : Formula} (h : f ∈ axioms) : Prf f := Prf.incl (Prf₀.thy f h)
+theorem prf_ax {f : Formula} (h : f ∈ axioms) : Prf f := Prf.incl (Prfᵢ.thy f h)
 
 /-- **Especialización en `Prf`** (instancia del esquema `q1` + `mp`): de `Prf (∀A)`
     y un término `t` sale `Prf (A[t])`. Contraparte finitaria de `spec`. -/
 theorem prf_spec {A : Formula} (h : Prf (Formula.forall A)) (t : Term) :
     Prf (substFormula 0 t A) :=
-  Prf.mp _ _ (Prf.incl (Prf₀.q1 A t)) h
+  Prf.mp _ _ (Prf.incl (Prfᵢ.q1 A t)) h
 
 /-- **Modus ponens en `Prf`** (alias cómodo). -/
 theorem prf_mp {A B : Formula} (hAB : Prf (A ⇒ B)) (hA : Prf A) : Prf B :=
@@ -73,18 +73,18 @@ theorem prf_runFn_cons (c line rest : Term) :
 /-! ### Primitivos lógicos en `Prf` (igualdad, Leibniz, ∧, ⇔, ∨) -/
 
 /-- Reflexividad de la igualdad en `Prf`. -/
-theorem prf_refl (t : Term) : Prf (t =eq t) := Prf.incl (Prf₀.eqrefl t)
+theorem prf_refl (t : Term) : Prf (t =eq t) := Prf.incl (Prfᵢ.eqrefl t)
 
 /-- **Leibniz en `Prf`**: de `Prf (t₁ ≐ t₂)` y `Prf (A[t₁])` sale `Prf (A[t₂])`. -/
 theorem prf_leibniz_subst {A : Formula} {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂))
     (hA : Prf (substFormula 0 t₁ A)) : Prf (substFormula 0 t₂ A) :=
-  prf_mp (prf_mp (Prf.incl (Prf₀.leibniz A t₁ t₂)) h) hA
+  prf_mp (prf_mp (Prf.incl (Prfᵢ.leibniz A t₁ t₂)) h) hA
 
 /-! ### Congruencia de las guardas de buena formación (ADR-020)
 
 Las necesitan los siete `prf_lineWF_*` de sustitución: el esquema enmendado habla de
 `hasWitF (nthc line 2̄)` y el consumidor tiene `hasWitF A`, así que hay que transportar por la
-ecuación `nthc line 2̄ ≐ A`. Es Leibniz OBJETO (`Prf₀.leibniz`), igual que
+ecuación `nthc line 2̄ ≐ A`. Es Leibniz OBJETO (`Prfᵢ.leibniz`), igual que
 `prf_lineWF_iff_transport`. Se prueban aquí —y no en `CodeWitnessPrf`, donde estaba la
 maquinaria de testigos— porque `ReprPrf` está **aguas arriba** de aquél; por eso las guardas y su
 fontanería `substF_*` bajaron a `Minimal/Axioms.lean`. -/
@@ -104,20 +104,20 @@ theorem prf_congr_hasWitF {a b : Term} (h : Prf (a =eq b)) (hw : Prf (hasWitF a)
   exact (e b) ▸ prf_leibniz_subst (A := hasWitF (.var 0)) h ((e a) ▸ hw)
 
 theorem prf_and_intro {a b : Formula} (ha : Prf a) (hb : Prf b) : Prf (a ∧ b) :=
-  prf_mp (prf_mp (Prf.incl (Prf₀.c1 a b)) ha) hb
+  prf_mp (prf_mp (Prf.incl (Prfᵢ.c1 a b)) ha) hb
 theorem prf_and_elim_left {a b : Formula} (h : Prf (a ∧ b)) : Prf a :=
-  prf_mp (Prf.incl (Prf₀.c2 a b)) h
+  prf_mp (Prf.incl (Prfᵢ.c2 a b)) h
 theorem prf_and_elim_right {a b : Formula} (h : Prf (a ∧ b)) : Prf b :=
-  prf_mp (Prf.incl (Prf₀.c3 a b)) h
+  prf_mp (Prf.incl (Prfᵢ.c3 a b)) h
 /-- `iff a b = (a⇒b) ∧ (b⇒a)`; `iff_mpr` extrae `b⇒a` y aplica MP. -/
 theorem prf_iff_mpr {a b : Formula} (h : Prf (a ⇔ b)) (hb : Prf b) : Prf a :=
   prf_mp (prf_and_elim_right h) hb
 theorem prf_iff_mp {a b : Formula} (h : Prf (a ⇔ b)) (ha : Prf a) : Prf b :=
   prf_mp (prf_and_elim_left h) ha
 theorem prf_or_intro_left {a b : Formula} (ha : Prf a) : Prf (a ∨ b) :=
-  prf_mp (Prf.incl (Prf₀.j1 a b)) ha
+  prf_mp (Prf.incl (Prfᵢ.j1 a b)) ha
 theorem prf_or_intro_right {a b : Formula} (hb : Prf b) : Prf (a ∨ b) :=
-  prf_mp (Prf.incl (Prf₀.j2 a b)) hb
+  prf_mp (Prf.incl (Prfᵢ.j2 a b)) hb
 
 /-- Transitividad de `=eq` en `Prf` (vía Leibniz sobre `· =eq c`). -/
 theorem prf_eq_trans {a b c : Term} (h1 : Prf (a =eq b)) (h2 : Prf (b =eq c)) : Prf (a =eq c) := by
@@ -247,10 +247,10 @@ theorem prf_iff_drop_left_conj {A P Q : Formula} (h : Prf (A ⇔ Formula.and P Q
     Prf (A ⇔ Q) := by
   have imp_trans : ∀ {a b c : Formula}, Prf (a ⇒ b) → Prf (b ⇒ c) → Prf (a ⇒ c) := by
     intro a b c hab hbc
-    exact prf_mp (prf_mp (Prf.incl (Prf₀.p2 a b c))
-      (prf_mp (Prf.incl (Prf₀.p1 (b ⇒ c) a)) hbc)) hab
-  refine prf_and_intro (imp_trans (prf_and_elim_left h) (Prf.incl (Prf₀.c3 P Q))) ?_
-  exact imp_trans (prf_mp (Prf.incl (Prf₀.c1 P Q)) hP) (prf_and_elim_right h)
+    exact prf_mp (prf_mp (Prf.incl (Prfᵢ.p2 a b c))
+      (prf_mp (Prf.incl (Prfᵢ.p1 (b ⇒ c) a)) hbc)) hab
+  refine prf_and_intro (imp_trans (prf_and_elim_left h) (Prf.incl (Prfᵢ.c3 P Q))) ?_
+  exact imp_trans (prf_mp (Prf.incl (Prfᵢ.c1 P Q)) hP) (prf_and_elim_right h)
 
 /-! ### Longitud canónica de las líneas explícitas (esquemas ESTRICTOS, plan A)
 
@@ -345,12 +345,12 @@ usa `prf_and_elim_left` — y por eso la enmienda la ABARATA en vez de romperla.
 
 /-- Silogismo hipotético en `Prf`. -/
 theorem prf_syll {a b c : Formula} (h1 : Prf (a ⇒ b)) (h2 : Prf (b ⇒ c)) : Prf (a ⇒ c) :=
-  prf_mp (prf_mp (Prf.incl (Prf₀.p2 a b c))
-    (prf_mp (Prf.incl (Prf₀.p1 (Formula.impl b c) a)) h2)) h1
+  prf_mp (prf_mp (Prf.incl (Prfᵢ.p2 a b c))
+    (prf_mp (Prf.incl (Prfᵢ.p1 (Formula.impl b c) a)) h2)) h1
 
 /-- De `A ⇒ (P ∧ Q)` sale `A ⇒ Q`. -/
 theorem prf_imp_and_right {A P Q : Formula} (h : Prf (A ⇒ Formula.and P Q)) : Prf (A ⇒ Q) :=
-  prf_syll h (Prf.incl (Prf₀.c3 P Q))
+  prf_syll h (Prf.incl (Prfᵢ.c3 P Q))
 
 /-- Transporte de `lineWF L ⇒ (x ≐ y)`, análogo de `prf_lineWF_iff_transport`. -/
 theorem prf_lineWF_imp_transport {L x x' y y' : Term}
@@ -996,7 +996,7 @@ que guardar.* -/
 
 /-- Gemelo izquierdo de `prf_imp_and_right`. -/
 theorem prf_imp_and_left {A P Q : Formula} (h : Prf (A ⇒ Formula.and P Q)) : Prf (A ⇒ P) :=
-  prf_syll h (Prf.incl (Prf₀.c2 P Q))
+  prf_syll h (Prf.incl (Prfᵢ.c2 P Q))
 
 theorem prf_lineWF_q1_hasWit (concl A t : Term) :
     Prf (lineWF (cons concl (cons (numeralM 9) (cons A (cons t (nil))))) ⇒

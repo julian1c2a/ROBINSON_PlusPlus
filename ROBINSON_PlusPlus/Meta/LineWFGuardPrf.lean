@@ -96,9 +96,9 @@ theorem hcond_absorbe_extra (P C : Formula) (t : Term) (n : Nat)
   have hand : PrfH Γ (Formula.and (substFormula 0 t P) (substFormula 0 t C)) :=
     PrfH.hyp _ _ (List.Mem.head _)
   have hPt : PrfH Γ (substFormula 0 t P) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have hCt : PrfH Γ (substFormula 0 t C) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   have hPd : PrfH Γ (provFromCode (condD P t)) :=
     PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hP _) hlw) hln) hPt
   have hCd : PrfH Γ (provFromCode (condD C t)) :=
@@ -259,7 +259,7 @@ theorem hcond_absorbe_1 (t : Term) (n : Nat) (g : GuardSlot) (C : Formula)
   have hall : PrfH [substFormula 0 t (guardedCond [g] C), lenc t =eq numeralM n, lineWF t]
       (substFormula 0 t (guardedCond [g] C)) := PrfH.hyp _ _ (List.Mem.head _)
   have hg1 : PrfH [substFormula 0 t (guardedCond [g] C), lenc t =eq numeralM n, lineWF t]
-      (substFormula 0 t g.toF) := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hall
+      (substFormula 0 t g.toF) := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hall
   have hgd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg _) hlw) hln) hg1
   have hcd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hC _) hlw) hln) hall
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr
@@ -280,9 +280,9 @@ theorem hcond_absorbe_2 (t : Term) (n : Nat) (g₁ g₂ : GuardSlot) (C : Formul
       (lenc t =eq numeralM n) := PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.head _))
   have hall : PrfH [substFormula 0 t (guardedCond [g₁, g₂] C), lenc t =eq numeralM n, lineWF t]
       (substFormula 0 t (guardedCond [g₁, g₂] C)) := PrfH.hyp _ _ (List.Mem.head _)
-  have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hall
-  have hrest := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hall
-  have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hrest
+  have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hall
+  have hrest := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hall
+  have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hrest
   have hd1 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₁ _) hlw) hln) h1
   have hd2 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₂ _) hlw) hln) h2
   have hcd := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hC _) hlw) hln) hall
@@ -311,11 +311,11 @@ theorem hcond_absorbe_3 (t : Term) (n : Nat) (g₁ g₂ g₃ : GuardSlot) (C : F
   have hall : PrfH [substFormula 0 t (guardedCond [g₁, g₂, g₃] C),
       lenc t =eq numeralM n, lineWF t]
       (substFormula 0 t (guardedCond [g₁, g₂, g₃] C)) := PrfH.hyp _ _ (List.Mem.head _)
-  have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hall
-  have hr1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hall
-  have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hr1
-  have hr2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hr1
-  have h3 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hr2
+  have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hall
+  have hr1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hall
+  have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hr1
+  have hr2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hr1
+  have h3 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hr2
   have hd1 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₁ _) hlw) hln) h1
   have hd2 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₂ _) hlw) hln) h2
   have hd3 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hg₃ _) hlw) hln) h3

@@ -445,17 +445,17 @@ theorem substF_targetLiftscAt (k : Nat) (u c b : Term) :
     genuinamente nuevo del sorte término. -/
 theorem prf_liftc_varc_cases (c a : Term) : Prf (lor (lt a c) (lt c (succ a))) := by
   refine ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_or_elim (prf_lt_trichotomy a c) ?_ ?_
-  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (prfH_hyp_self _))
+  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (prfH_hyp_self _))
   · refine prf_deduction ?_
     refine PrfH_or_elim (prfH_hyp_self _) ?_ ?_
     · -- `a = c` ⟹ `c < σa`  (por `c < σc` y Leibniz)
-      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
       exact PrfH_lt_subst2
         (ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_congr_succ
           (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _))))
         (prf_to_prfH (prf_lt_succ_self c) _)
     · -- `c < a` ⟹ `c < σa`
-      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+      refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
       exact PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_of_lt c a) _)
         (PrfH.hyp _ _ (List.Mem.head _))
 
@@ -1599,7 +1599,7 @@ theorem refl_isTermCodeE1_imp [AnclaEq] (w X : Term) :
   unfold ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.isTermCodeE1
   refine prf_or_elim_imp ?_ ?_
   · exact impT (refl_shapeUn_imp X)
-      (Prf.incl (Prf₀.p1 (targetLift X) (targetLiftsc (nthc X (numeralM 2)))))
+      (Prf.incl (Prfᵢ.p1 (targetLift X) (targetLiftsc (nthc X (numeralM 2)))))
   · refine prf_deduction (deduction_aux ?_ (targetLiftsc (nthc X (numeralM 2)))
       [land (shapeBin X 1) (argsIn w (nthc X (numeralM 2)))] rfl)
     have hT : PrfH [targetLiftsc (nthc X (numeralM 2)),

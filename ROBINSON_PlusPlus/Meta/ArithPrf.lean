@@ -41,7 +41,7 @@ conservan literalmente.
 /-- Introducción del `∃` en `Prf` (esquema `q2` + mp). -/
 theorem prf_ex_intro {A : Formula} (t : Term) (h : Prf (substFormula 0 t A)) :
     Prf (Formula.ex A) :=
-  prf_mp (Prf.incl (Prf₀.q2 A t)) h
+  prf_mp (Prf.incl (Prfᵢ.q2 A t)) h
 
 /-- Congruencia de `succ` respecto de `=eq` en `Prf`. -/
 theorem prf_eq_congr_succ {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (succ t₁ =eq succ t₂) := by

@@ -294,7 +294,7 @@ theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
       refine Prf.gen _ (prf_deduction ?_)
       have hlt0 : PrfH [lt (.var 0) (liftTerm 0 zero)] (lt (.var 0) zero) := by
         simpa only [liftTerm, liftTerms, zero] using prfH_hyp_self (lt (.var 0) (liftTerm 0 zero))
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq Φ))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt0)
     · refine Prf.gen _ ?_
       rw [psi_step_motive]
@@ -312,7 +312,7 @@ theorem prf_strong_induction (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ)
           liftFormula 0 (PSI Φ)]
         have hpsi : PrfH ΓA (liftFormula 0 (PSI Φ)) :=
           PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-        have hinst := PrfH.mp _ _ _ (PrfH.incl0 ΓA _ (Prf₀.q1 _ (.var 0))) hpsi
+        have hinst := PrfH.mp _ _ _ (PrfH.incl0 ΓA _ (Prfᵢ.q1 _ (.var 0))) hpsi
         simp only [PSI, liftFormula, substFormula, lt, liftTerms, liftTerm, substTerms, substTerm,
           Nat.reduceLT, Nat.reduceGT, Nat.reduceEqDiff, reduceIte, Nat.reduceAdd, Nat.reduceSub,
           hΦ, subst1_id Φ hΦ, subst0_var0_id Φ hΦ] at hinst

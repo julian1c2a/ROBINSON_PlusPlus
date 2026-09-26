@@ -97,9 +97,9 @@ Conversión de D1/D2/D3 de **postulados** a **teoremas** sobre un cálculo de Hi
 
 ```lean
 theorem subst_lift_same (f) (c) (s) : substFormula c s (liftFormula c f) = f
-inductive Prf₀ : Formula → Prop   -- Hilbert intuicionista (P1/P2, C, J, efq, Q1-3, refl, leibniz, thy, mp, gen)
-inductive Prf  : Formula → Prop   -- clásico: incl (Prf₀) + p3 (DNE) + mp + gen
-theorem prf0_to_derives : Prf₀ φ → axioms ⊢ φ   -- SOLO constructores de Derives (sin dne)
+inductive Prfᵢ : Formula → Prop   -- Hilbert intuicionista (P1/P2, C, J, efq, Q1-3, refl, leibniz, thy, mp, gen)
+inductive Prf  : Formula → Prop   -- clásico: incl (Prfᵢ) + p3 (DNE) + mp + gen
+theorem prfI_to_derives : Prfᵢ φ → axioms ⊢ φ   -- SOLO constructores de Derives (sin dne)
 theorem prf_to_derives  : Prf φ → axioms ⊢ φ    -- + dne en un único punto (esquema p3)
 theorem consistentH_of_omega : ¬(axioms ⊢ ⊥) → ¬ Prf ⊥
 -- #print axioms: prf0 sin dne; prf con FOL.MetaRules.dne (diferencia exacta = {dne})
@@ -1135,7 +1135,7 @@ de vuelta** por el bicondicional codificado (el corazón denso, «subproyecto de
 * **Pasos 1–3 validados** (inversión + bicondicional‑accesor + `pcc_eq_tracked`).
 * **PASO 4 — columna vertebral CONSTRUIDA y compilando** (`[propext, choice, Quot.sound, prf_inAxC]`),
   confirmando la plantilla `pcc_bddDot_imp_inDot`: **`hbwd`** = `∀.(tag ⇒ (=eq ⇒ lineWF))` (dirección ⇐
-  currificada bajo el tag: `Prf.gen` + `prf_deduction`×2 + `iff.mpr` interno vía `Prf₀.c3`); y
+  currificada bajo el tag: `Prf.gen` + `prf_deduction`×2 + `iff.mpr` interno vía `Prfᵢ.c3`); y
   **`paso6_backbone`** = `Prov(⌜implc TAG_dot (implc EQ_dot LWF_dot)⌝)` (reflejar `hbwd` con
   `pcc_thm_inst` testigo `tcFn t` → distribuir `substfc` con `prf_substfc_impl`×2 → `prf_provCode_congr`).
   Código exacto en `NEXT-STEPS.md`.
@@ -1864,7 +1864,7 @@ la inducción es sobre el **VALOR** del código (`prf_strong_induction`), así q
 falta que `t` sea de verdad un código de término, y eso es exactamente lo que dice `isTC1 w t`.
 
 **Las dos obstrucciones de §3.28.4, resueltas:**
-* **La tricotomía** sale por **or‑elim EXTERNO** (`Prf₀.j3`), no interno. Producción **sí** tiene
+* **La tricotomía** sale por **or‑elim EXTERNO** (`Prfᵢ.j3`), no interno. Producción **sí** tiene
   or‑elim interno (`pcc_or_elim_code`, `Meta/PropCodePrf.lean:112`) pero **no hizo falta**.
 * **El `pred` dotado**: `PredHyp` **declarada y descargada** (`predHyp`), vía
   `prf_lt_iff` → `prf_add_succ_t` → `ax26_pred_succ` dentro de `Prov`, **sin inducción**.

@@ -102,7 +102,7 @@ saber que `cantor_poly` es par, basta acotar su resto. -/
     inline en varios sitios). -/
 theorem prf_or_elim {A B C : Formula} (hor : Prf (lor A B))
     (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ C)) : Prf C :=
-  prf_mp (prf_mp (prf_mp (Prf.incl (Prf₀.j3 A B C)) hor) h1) h2
+  prf_mp (prf_mp (prf_mp (Prf.incl (Prfᵢ.j3 A B C)) hor) h1) h2
 
 /-- `0 ≤ 1`. (`one = σ0` es defeq, así que `prf_zero_lt_succ zero` ya **es** `lt zero one`.) -/
 theorem prf_le_zero_one : Prf (le zero one) :=
@@ -314,13 +314,13 @@ theorem prf_cantor_mono_left (h t : Term) : Prf (lt h (cons h t)) := by
         [lor (Formula.eq h (cons h t)) (lt (cons h t) h)]) (le (cons h t) h) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (cons h t) h) _)
         (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons h t) _) hle)
   · -- rama `C < h`: idem
     have hle : PrfH (lt (cons h t) h ::
         [lor (Formula.eq h (cons h t)) (lt (cons h t) h)]) (le (cons h t) h) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt (cons h t) h) _) (PrfH.hyp _ _ (List.Mem.head _))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons h t) _) hle)
 
 /-! ### Paso 13 — MITAD DERECHA: `t < cons h t`
@@ -373,12 +373,12 @@ theorem prf_cantor_mono_right (h t : Term) : Prf (lt t (cons h t)) := by
         [lor (Formula.eq t (cons h t)) (lt (cons h t) t)]) (le (cons h t) t) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (cons h t) t) _)
         (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons_right h t) _) hle)
   · have hle : PrfH (lt (cons h t) t ::
         [lor (Formula.eq t (cons h t)) (lt (cons h t) t)]) (le (cons h t) t) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt (cons h t) t) _) (PrfH.hyp _ _ (List.Mem.head _))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons_right h t) _) hle)
 
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf

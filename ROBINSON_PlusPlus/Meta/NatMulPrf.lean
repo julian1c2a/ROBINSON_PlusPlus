@@ -118,7 +118,7 @@ theorem prf_mul_one (n : Term) : Prf (mul n one =eq n) := by
     `a < a + σ(m + a)`, que es `prf_lt_add_succ`. -/
 theorem prf_le_add_self (x a : Term) : Prf (le a (add x a)) := by
   have hcase := prf_zero_or_succ x
-  refine prf_mp (prf_mp (prf_mp (Prf.incl (Prf₀.j3 _ _ (le a (add x a)))) hcase) ?_) ?_
+  refine prf_mp (prf_mp (prf_mp (Prf.incl (Prfᵢ.j3 _ _ (le a (add x a)))) hcase) ?_) ?_
   · -- rama `x = 0`: `0 + a = a`
     refine prf_deduction ?_
     have hx : PrfH [Formula.eq x zero] (x =eq zero) := prfH_hyp_self _
@@ -247,7 +247,7 @@ theorem prf_mul_le_mono_right (x y c : Term) : Prf (le x y ⇒ le (mul x c) (mul
     · -- `x·0 = 0 = y·0`
       simp only [substFormula, substTerm, substTerms, le, lt, lor, mul, zero,
         Nat.reduceEqDiff, reduceIte, if_true, FOL.substTerm_liftTerm]
-      refine prf_mp (Prf.incl (Prf₀.p1 _ (le x y))) ?_
+      refine prf_mp (Prf.incl (Prfᵢ.p1 _ (le x y))) ?_
       exact prf_le_subst2 (prf_eq_symm (prf_mul_zero y))
         (prf_le_subst1 (prf_eq_symm (prf_mul_zero x)) (prf_le_refl zero))
     · refine Prf.gen _ ?_
@@ -298,7 +298,7 @@ theorem prf_lt_trichotomy (a b : Term) :
 /-- De una contradicción `a < a` sale cualquier cosa (irreflexividad + ex falso). -/
 theorem PrfH_absurd_lt {Γ : List Formula} {C : Formula} (a : Term)
     (h : PrfH Γ (lt a a)) : PrfH Γ C :=
-  PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq C))
+  PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq C))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_irrefl a) _) h)
 
 /-- **CANCELACIÓN multiplicativa**: `x·c < y·c ⟹ x < y`. Recíproca de la monotonía; sale por

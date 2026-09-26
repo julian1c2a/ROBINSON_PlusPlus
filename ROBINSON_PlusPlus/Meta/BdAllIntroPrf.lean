@@ -96,9 +96,9 @@ theorem prf_lt_succ_split' (i b : Term) :
   have hsplit : PrfH [lt i (succ b)] (lor (lt i b) (Formula.eq i b)) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_split i b) _) (prfH_hyp_self _)
   refine PrfH_or_elim hsplit ?_ ?_
-  · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 (lt i b) (Formula.eq b i)))
+  · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 (lt i b) (Formula.eq b i)))
       (PrfH.hyp _ _ (List.Mem.head _))
-  · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 (lt i b) (Formula.eq b i)))
+  · exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 (lt i b) (Formula.eq b i)))
       (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
 
 /-! ### Simetría interna de `=` (forma INTERNA, no externa) -/

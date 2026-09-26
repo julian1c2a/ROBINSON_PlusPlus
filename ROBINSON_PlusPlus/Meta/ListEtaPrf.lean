@@ -64,7 +64,7 @@ theorem prf_nil_of_lenc_zero (L : Term) : Prf ((lenc L =eq zero) ⇒ (L =eq nil)
     have hlc : PrfH [consOk L, lenc L =eq zero] (lenc L =eq succ (lenc (cdrc L))) :=
       (hS L) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm hcons)
         ((hS (cons (carc L) (cdrc L))) ▸ prf_to_prfH (prf_lenc_cons (carc L) (cdrc L)) _)
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero (lenc (cdrc L))) _)
         (PrfH_eq_trans (PrfH_eq_symm hlc) hz))
 
@@ -86,7 +86,7 @@ theorem prf_eta_of_lenc_succ (L n : Term) :
     have hlz : PrfH [Formula.eq L nil, lenc L =eq succ n] (lenc L =eq zero) :=
       (hS L) ▸ PrfH_leibniz_subst (A := A) (PrfH_eq_symm hnil)
         ((hS nil) ▸ prf_to_prfH prf_lenc_nil _)
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero n) _)
         (PrfH_eq_trans (PrfH_eq_symm hs) hlz))
   · exact PrfH.hyp _ _ (List.Mem.head _)

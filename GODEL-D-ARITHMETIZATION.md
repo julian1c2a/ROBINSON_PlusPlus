@@ -108,21 +108,21 @@ GEN   de ⊢ᴴ A                concluye ⊢ᴴ (∀A)
 ## 3 · Resultados de la Fase 0  ✅
 
 Implementado en `Meta/Hilbert.lean` (build verde, 40 jobs, 0 sorry, **0 axiomas
-nuevos** — `Prf₀`/`Prf` son *definiciones* inductivas, los puentes son
+nuevos** — `Prfᵢ`/`Prf` son *definiciones* inductivas, los puentes son
 *teoremas*). El sistema se factoriza en **dos capas** para exhibir la clasicidad:
 
-1. **`Prf₀` (intuicionista)** — todos los esquemas salvo DNE, + MP + GEN.
-   Puente **`prf0_to_derives : Prf₀ φ → axioms ⊢ φ`** construido con **solo
+1. **`Prfᵢ` (intuicionista)** — todos los esquemas salvo DNE, + MP + GEN.
+   Puente **`prfI_to_derives : Prfᵢ φ → axioms ⊢ φ`** construido con **solo
    constructores de `Derives`** (reusando los teoremas constructor-puros de
    `FOL.Theorems`).
-2. **`Prf` (clásico)** — `incl (Prf₀)` + esquema DNE (`p3`) + MP + GEN.
+2. **`Prf` (clásico)** — `incl (Prfᵢ)` + esquema DNE (`p3`) + MP + GEN.
    Puente **`prf_to_derives : Prf φ → axioms ⊢ φ`** que reusa el intuicionista y
    emplea **`dne` en un único punto** (caso `p3`).
 
 **Verificación mecánica de dónde entra lo clásico** (`#print axioms`):
 
 ```text
-prf0_to_derives  depends on: [propext, Quot.sound, subst_lift_cancel_formula]
+prfI_to_derives  depends on: [propext, Quot.sound, subst_lift_cancel_formula]
 prf_to_derives   depends on: [propext, Quot.sound, FOL.MetaRules.dne,
                               subst_lift_cancel_formula]
 ```
@@ -150,7 +150,7 @@ incompleto y Gödel aplica.)
 
 | Fase | Entrega | Estado |
 |---|---|---|
-| **0** | `Meta/Hilbert.lean`: `Prf₀`/`Prf` + puentes `prf0_to_derives`/`prf_to_derives` + consistencia transferida | ✅ |
+| **0** | `Meta/Hilbert.lean`: `Prfᵢ`/`Prf` + puentes `prfI_to_derives`/`prf_to_derives` + consistencia transferida | ✅ |
 | **1a/b** | `Meta/HilbertSeq.lean`: `Rule`, verificador decidible `checkProof`, `Derivation`, **solidez + completitud** ⟹ `Prf φ ↔ ∃ rs, Derivation rs φ` | ✅ |
 | **1c** | `Meta/HilbertSeq.lean` (cont.): coding `ruleCode`/`rulesCode` → `Term`, `Dem` **concreto** + `dem_tracks : (∃ d, Dem d ⌜φ⌝) ↔ Prf φ` (solo axiomas estándar de Lean) | ✅ |
 | **2** | Aritmetización (CodeArith/SubstArith/StepArith/CheckArith/Representability): sustitución y lift De Bruijn como funciones object, verificador `validProofFn`, `provFormulaC` Σ₁, **representabilidad positiva** `repr_pos`. Desglose y estado fino en **§7**. | ✅ (2.1–2.5 ✅; 2.6 negativa diferida) |
@@ -206,7 +206,7 @@ y su corrección sobre entradas concretas se prueba por inducción meta.
 | **2.4-c** | `Meta/CheckArith.lean` (cimientos): `numeralM` (`= Godel.numeral`), extractores `carc`/`cdrc` + cómputo | ✅ |
 | **2.4-v** | verificador `validProofFn` + `forall_5` + **17 ecuaciones** en `Minimal.axioms` (params directos por binders, etiqueta de regla embebida; MP/Gen condicionales por `In`); `substTerm_liftLiftLiftLift` (4-lift); 17 step lemmas `vpf_*`; **`provFormulaC := ∃p, In x (validProofFn nil p)`** (Σ₁) + `provCodeC` | ✅ |
 | **2.4-thy** | regla `thy`: la línea **transporta el código** del axioma (no su índice); `ruleCode (.thy k)` emite `formCode (coreAxioms[k])`. Verificador **completo: 18 reglas** | ✅ |
-| **thy-sound** | **solidez de `thy`** (predicado fiel): `formCodeM` a nivel `Minimal` + teoría `coreAxioms` (34 axiomas matemáticos, sin las ecuaciones de coding) + `axiomsCodeT` (código object, **opaco** → sin ciclo: `axiomsCodeT ∌ formCode(ax_vpf_thy)`) anclado por `ax_axiomsCodeT`. `ax_vpf_thy` pasa a **condicional** `In c axiomsCodeT ⇒ …`; `Prf₀.thy`/`stepConcl` recorren `coreAxioms`. Clausura De Bruijn `liftTerm_formCodeM` (los códigos tienen numerales gigantes de símbolos Unicode ⟹ `axioms_lift_eq` se prueba estructuralmente, no por `rfl`). Puente `formCodeM = formCode`. **`provCodeC` ya no es trivialmente ⊤** | ✅ |
+| **thy-sound** | **solidez de `thy`** (predicado fiel): `formCodeM` a nivel `Minimal` + teoría `coreAxioms` (34 axiomas matemáticos, sin las ecuaciones de coding) + `axiomsCodeT` (código object, **opaco** → sin ciclo: `axiomsCodeT ∌ formCode(ax_vpf_thy)`) anclado por `ax_axiomsCodeT`. `ax_vpf_thy` pasa a **condicional** `In c axiomsCodeT ⇒ …`; `Prfᵢ.thy`/`stepConcl` recorren `coreAxioms`. Clausura De Bruijn `liftTerm_formCodeM` (los códigos tienen numerales gigantes de símbolos Unicode ⟹ `axioms_lift_eq` se prueba estructuralmente, no por `rfl`). Puente `formCodeM = formCode`. **`provCodeC` ya no es trivialmente ⊤** | ✅ |
 | **2.5** | **Representabilidad positiva** ✅ `Meta/Representability.lean`: `repr_pos : Prf φ → axioms ⊢ provCodeC φ`. Encoder object **a medida** `proofCode`/`lineCode` (las líneas `mp`/`gen`/`thy` transportan códigos de fórmulas resueltos, alineado con `validProofFn`; el `ruleCode` de 1c era por índices). Inducción de seguimiento `vpf_run` (18 casos; Q1/Q2/Q3/Leibniz vía `*_concl_code` + `liftFormula_arith`; MP/Gen descargan la pertenencia con `In_listFormCode`). Ensamblaje por `intro_ex` (el lift de `provFormulaC` se cancela con la sustitución del testigo, sin necesitar clausura de `formCode`). `#print axioms repr_pos` = solo `propext/Classical.choice/Quot.sound` | ✅ |
 | **2.6** | representabilidad **negativa** `¬Dem d x → ⊢ᴴ ¬provCodeC φ` (reflexión/D3). **Aritmética negativa de códigos ✅** (`Meta/CodeDistinct.lean`): `formCode_ne : A≠B → ⊢ ¬(⌜A⌝=⌜B⌝)` + familia `termCode_ne`/`strCode_ne`/`charsCode_ne` + primitivos `cons_ne_head/tail`/`neg_symm`. El resultado titular `⊢ ¬provCodeC φ` es **Π₁** y necesita el **esquema de inducción (Fase 5)** | 🟡 (aritmética negativa ✅; falta inducción) |
 

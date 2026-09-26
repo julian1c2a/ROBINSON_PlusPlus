@@ -307,7 +307,7 @@ theorem prf_bdAll_numeral (Φ : Formula) (hΦ : substFormula 0 (.var 0) Φ = Φ)
       Prf (Formula.forall (Formula.impl (lt (.var 0) (numeralM n)) Φ))
   | 0, _ => by
       refine Prf.gen _ (prf_deduction ?_)
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq Φ))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
   | n + 1, h => by
@@ -402,10 +402,10 @@ theorem prf_isFCB_of_wfAll (φ : Formula) (hwf : Prf (wfAll (objList (subCodes �
 /-! ## 10 · LO NUEVO — combinadores para elegir disyunto -/
 
 theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j1 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j1 A B)) h
 
 theorem prf_orR {A B : Formula} (h : Prf B) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j2 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j2 A B)) h
 
 theorem prf_lorAll_head : ∀ (a : Formula) (bs : List Formula), Prf a → Prf (lorAll a bs)
   | _, [],     h => h

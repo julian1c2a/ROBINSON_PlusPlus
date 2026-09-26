@@ -77,7 +77,7 @@ theorem prf_lenc_of_tag {k n : Nat} {D : Formula} (t : Term)
     have hh := prf_spec hax t
     simpa [iff, substFormula, substFormula_tagF, substFormula_lwfVar] using hh
   have hiff := PrfH.mp _ _ _ (prf_to_prfH hacc _) htagH
-  have hD' := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
+  have hD' := PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hiff) hlw
   exact PrfH.mp _ _ _ (prf_to_prfH hD _) hD'
 
 /-- La línea reconstruida CON EL TAG ya sustituido por su numeral. -/
@@ -152,7 +152,7 @@ theorem prf_premsOf_tag_and {k m : Nat} {C : Formula} (t R : Term)
           = Formula.and (lenc t =eq numeralM (m + 2)) (substFormula 0 t C) := by
         simp only [substFormula, substFormula_lencF]
       rw [hsub]
-      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) (prfH_hyp_self _)))
+      exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) (prfH_hyp_self _)))
     hpre
 
 /-- Envoltorio para `mp` (16), el **único** sin condición estructural. -/

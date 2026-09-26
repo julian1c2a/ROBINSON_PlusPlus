@@ -512,7 +512,7 @@ theorem pcc_premsBody_reflect [AnclaEq] (Ac y p i : Term) :
     (lt i (lenc p)) [chainOk nil p] rfl)
   refine PrfH_or_elim (PrfH.hyp _ _ (List.Mem.head _)) ?_ ?_
   · -- ⭐ RAMA IZQUIERDA: `In y nil` es refutable ⇒ explosión. El código `Ac` no se toca.
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (PrfH.hyp _ _ (List.Mem.head _)))
   · -- RAMA DERECHA: el `∃` acotado de §5, con el contexto ya en su sitio
     refine PrfH_orR_code Ac _ ?_

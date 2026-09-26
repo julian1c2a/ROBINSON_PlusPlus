@@ -727,7 +727,7 @@ theorem refl_substtc_lista_nil [AnclaEq] (v s : Term) : Prf (targetSubsttsc v s 
 
     Las tres clausulas de `substtc _ _ (varc n)` estan guardadas por `v ≐ n` / `v < n` / `n < v`
     con `v` **ABSTRACTO**. La tricotomia se elimina a nivel **OBJETO** (`prf_lt_trichotomy` +
-    `Prf₀.j3`), y cada guarda se **refleja** dentro de `Prov`:
+    `Prfᵢ.j3`), y cada guarda se **refleja** dentro de `Prov`:
     * `<` por `pcc_lt_tracked` (produccion, argumentos ABIERTOS);
     * `=` por reflexividad codificada + Leibniz (`pcc_eq_tracked`, aqui abajo).
 

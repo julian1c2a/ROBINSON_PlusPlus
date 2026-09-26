@@ -202,7 +202,7 @@ han extendido a `mp`; hacerlo es trabajo pendiente barato si el módulo C lo nec
 
 /-- Silogismo hipotético en `Prf` (composición de implicaciones). -/
 theorem prf_imp_trans {a b c : Formula} (h1 : Prf (a ⇒ b)) (h2 : Prf (b ⇒ c)) : Prf (a ⇒ c) :=
-  prf_mp (prf_mp (Prf.incl (Prf₀.p2 a b c)) (prf_mp (Prf.incl (Prf₀.p1 (b ⇒ c) a)) h2)) h1
+  prf_mp (prf_mp (Prf.incl (Prfᵢ.p2 a b c)) (prf_mp (Prf.incl (Prfᵢ.p1 (b ⇒ c) a)) h2)) h1
 
 /-- Silogismo hipotético en `⊢` (nivel Derives). -/
 theorem derives_imp_trans {a b c : Formula}

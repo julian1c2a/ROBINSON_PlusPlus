@@ -937,7 +937,7 @@ theorem refl_lista_cons (v s h t : Term) (hh : Prf (targetSubsttc v s h))
 
     Las tres clausulas de `substtc _ _ (varc n)` estan guardadas por `v ≐ n` / `v < n` / `n < v`
     con `v` **ABSTRACTO**. La tricotomia se elimina a nivel **OBJETO** (`prf_lt_trichotomy` +
-    `Prf₀.j3`), y cada guarda se **refleja** dentro de `Prov`:
+    `Prfᵢ.j3`), y cada guarda se **refleja** dentro de `Prov`:
     * `<` por `pcc_lt_tracked` (produccion, argumentos ABIERTOS);
     * `=` por reflexividad codificada + Leibniz (`pcc_eq_tracked`, aqui abajo).
 
@@ -948,7 +948,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 /- ⛔ **RETIRADA 2026‑08‑31 — `pcc_eq_tracked` YA EXISTE EN PRODUCCIÓN.**
@@ -1216,9 +1216,9 @@ theorem PrfH_inst_wfAll1 {Γ : List Formula} (w i : Term) (h : PrfH Γ (wfAll1 w
     FOL.substTerm_liftTerm, FOL.substTerm_lift_comm_zero, substTerm_numeralM, if_true] using hi
 
 theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j1 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j1 A B)) h
 theorem prf_orR {A B : Formula} (h : Prf B) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j2 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j2 A B)) h
 
 /-! ### D.1 · `⊢ Y ≐ nil ∨ consOk Y` para `Y` ARBITRARIO -/
 
@@ -1240,7 +1240,7 @@ theorem prf_nil_or_cons_all : Prf (Formula.forall nilOrCons) := by
         liftTerm, liftTerms, substTerm, substTerms, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT,
         reduceIte, if_true]
     rw [hR]
-    exact prf_mp (Prf.incl (Prf₀.p1 _ _)) (prf_orR (prf_consOk_cons _ _))
+    exact prf_mp (Prf.incl (Prfᵢ.p1 _ _)) (prf_orR (prf_consOk_cons _ _))
 
 theorem prf_nil_or_cons (Y : Term) : Prf (lor (Formula.eq Y nil) (consOk Y)) := by
   have h := prf_spec prf_nil_or_cons_all Y

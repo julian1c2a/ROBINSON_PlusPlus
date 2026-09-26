@@ -100,11 +100,11 @@ theorem prf_add_comm (a b : Term) : Prf (add a b =eq add b a) := by
 
 /-- `a < b ⟹ a ≤ b`. -/
 theorem prf_le_of_lt (a b : Term) : Prf (lt a b ⇒ le a b) :=
-  Prf.incl (Prf₀.j1 (lt a b) (Formula.eq a b))
+  Prf.incl (Prfᵢ.j1 (lt a b) (Formula.eq a b))
 
 /-- `a = b ⟹ a ≤ b`. -/
 theorem prf_le_of_eq (a b : Term) : Prf ((a =eq b) ⇒ le a b) :=
-  Prf.incl (Prf₀.j2 (lt a b) (Formula.eq a b))
+  Prf.incl (Prfᵢ.j2 (lt a b) (Formula.eq a b))
 
 /-- **Reflexividad de `≤`**. -/
 theorem prf_le_refl (a : Term) : Prf (le a a) :=

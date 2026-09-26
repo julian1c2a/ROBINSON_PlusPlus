@@ -44,7 +44,7 @@ theorem prf_add_eq_zero_right (a b : Term) : Prf ((add a b =eq zero) ⇒ (b =eq 
         (succ (add a (pred b)) =eq zero) :=
       PrfH_eq_trans
         (PrfH_eq_symm (PrfH_eq_trans h1 (prf_to_prfH (prf_add_succ_t a (pred b)) _))) hH
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero (add a (pred b))) _) h2)
 
 end S4

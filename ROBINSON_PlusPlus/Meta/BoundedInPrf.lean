@@ -153,9 +153,9 @@ theorem prf_zero_or_eq_succ_pred (n : Term) :
       PrfH_eq_trans (PrfH_eq_congr_pred (prfH_hyp_self _))
         (prf_to_prfH (prf_pred_succ (.var 0)) _)
     exact PrfH_eq_trans (prfH_hyp_self _) (PrfH_eq_congr_succ (PrfH_eq_symm hp))
-  refine prf_mp (prf_mp (prf_mp (Prf.incl (Prf₀.j3 _ _ _)) (prf_zero_or_succ n)) ?_) ?_
-  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (prfH_hyp_self _))
-  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
+  refine prf_mp (prf_mp (prf_mp (Prf.incl (Prfᵢ.j3 _ _ _)) (prf_zero_or_succ n)) ?_) ?_
+  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (prfH_hyp_self _))
+  · exact prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
       (PrfH.mp _ _ _ (prf_to_prfH himp _) (prfH_hyp_self _)))
 
 /-! ### Ley de sucesor de `<` : `i < σb ⇒ i < b ∨ i = b`
@@ -190,7 +190,7 @@ theorem prf_lt_succ_helper (i b k : Term) :
       PrfH_eq_trans (prf_to_prfH (prf_eq_symm hcomp) _) hadd0
     have hib : PrfH [Formula.eq k zero, add i (succ k) =eq succ b] (Formula.eq i b) :=
       PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj i b) _) hsi
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 (lt i b) (Formula.eq i b))) hib
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 (lt i b) (Formula.eq i b))) hib
   · -- k = σ(pred k)  ⇒  lt i b  (testigo pred k)
     have hks := (PrfH.hyp [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b] _
       (List.Mem.head _))
@@ -214,7 +214,7 @@ theorem prf_lt_succ_helper (i b k : Term) :
       PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj (add i (succ (pred k))) b) _) hsplit
     have hlt : PrfH [Formula.eq k (succ (pred k)), add i (succ k) =eq succ b] (lt i b) :=
       PrfH_lt_intro i b (pred k) hib
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 (lt i b) (Formula.eq i b))) hlt
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 (lt i b) (Formula.eq i b))) hlt
 
 /-- **`i < σb ⇒ i < b ∨ i = b`** (ley de sucesor de `<`). -/
 theorem prf_lt_succ_split (i b : Term) :
@@ -276,7 +276,7 @@ theorem prf_boundedIn_cons (x hd t : Term) :
     have h1 : PrfH [Z, A] (nthc (liftTerm 0 (cons hd t)) (.var 0) =eq liftTerm 0 hd) :=
       PrfH_eq_trans (PrfH_eq_congr_nthc2 hz)
         (prf_to_prfH (prf_nthc_zero (liftTerm 0 hd) (liftTerm 0 t)) _)
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j1 _ _)) (PrfH_eq_trans (PrfH_eq_symm heq) h1)
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 _ _)) (PrfH_eq_trans (PrfH_eq_symm heq) h1)
   · -- i = σ(pred i)  ⇒  boundedIn x t con testigo `pred i`
     have hs : PrfH [S, A] (Formula.eq (.var 0) (succ (pred (.var 0)))) :=
       PrfH.hyp _ _ (List.Mem.head _)
@@ -285,7 +285,7 @@ theorem prf_boundedIn_cons (x hd t : Term) :
       PrfH_and_elim_left hand
     have heq : PrfH [S, A] (Formula.eq (nthc (liftTerm 0 (cons hd t)) (.var 0)) (liftTerm 0 x)) :=
       PrfH_and_elim_right hand
-    refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _)) ?_
+    refine PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _)) ?_
     refine PrfH_ex_intro (pred (.var 0)) ?_
     simp only [boundedIn, substFormula, substTerm, substTerms, land, lt, nthc, lenc, pred, cons,
       succ, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub, reduceIte, if_true,
@@ -311,7 +311,7 @@ theorem prf_boundedIn_of_In (x L : Term) : Prf (In x L ⇒ boundedIn x L) := by
       (boundedIn (liftTerm 0 x) (.var 0)))) := by
     refine prf_list_induction _ ?base ?step
     · have hb : Prf (Formula.impl (In x nil) (boundedIn x nil)) :=
-        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (boundedIn x nil)))
+        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq (boundedIn x nil)))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil x) _) (prfH_hyp_self _)))
       simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
         FOL.substTerm_liftTerm, if_true] using hb
@@ -346,7 +346,7 @@ theorem prf_In_of_boundedIn (x L : Term) : Prf (boundedIn x L ⇒ In x L) := by
       (In (liftTerm 0 x) (.var 0)))) := by
     refine prf_list_induction _ ?base ?step
     · have hb : Prf (Formula.impl (boundedIn x nil) (In x nil)) :=
-        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (In x nil)))
+        prf_deduction (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq (In x nil)))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_nil x) _) (prfH_hyp_self _)))
       simpa only [substFormula, substTerm, substTerms, In, substFormula_boundedIn,
         FOL.substTerm_liftTerm, if_true] using hb

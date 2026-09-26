@@ -38,7 +38,7 @@ theorem prf_list_induction (Φ : Formula)
 /-- Leibniz en `PrfH`: de `PrfH Γ (t₁ ≐ t₂)` y `PrfH Γ A[t₁]` sale `PrfH Γ A[t₂]`. -/
 theorem PrfH_leibniz_subst {Γ : List Formula} {A : Formula} {t₁ t₂ : Term}
     (h : PrfH Γ (t₁ =eq t₂)) (hA : PrfH Γ (substFormula 0 t₁ A)) : PrfH Γ (substFormula 0 t₂ A) :=
-  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.leibniz A t₁ t₂)) h) hA
+  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.leibniz A t₁ t₂)) h) hA
 
 /-- Transitividad de `=eq` en `PrfH`. -/
 theorem PrfH_eq_trans {Γ : List Formula} {a b c : Term}
@@ -112,8 +112,8 @@ theorem PrfH_in_cons_tail {Γ : List Formula} (hd : Term) {x t : Term} (hx : Prf
       FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hh
     exact hh
   have hor : PrfH Γ (lor (x =eq hd) (In x t)) :=
-    PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.j2 (x =eq hd) (In x t))) hx
-  exact PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c3 _ _)) (prf_to_prfH hiff Γ)) hor
+    PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.j2 (x =eq hd) (In x t))) hx
+  exact PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.c3 _ _)) (prf_to_prfH hiff Γ)) hor
 
 /-- Normalización De Bruijn: `subst 0 s (lift 2 (lift 1 (lift 0 t))) = lift 1 (lift 0 t)`.
     (El parámetro externo `t`, doblemente protegido bajo dos binders del `step`, vuelve
@@ -179,13 +179,13 @@ theorem norm_s (z s : Term) :
 
 theorem PrfH_and_intro {Γ : List Formula} {A B : Formula} (ha : PrfH Γ A) (hb : PrfH Γ B) :
     PrfH Γ (land A B) :=
-  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c1 A B)) ha) hb
+  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.c1 A B)) ha) hb
 
 theorem PrfH_and_elim_left {Γ : List Formula} {A B : Formula} (h : PrfH Γ (land A B)) : PrfH Γ A :=
-  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c2 A B)) h
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.c2 A B)) h
 
 theorem PrfH_and_elim_right {Γ : List Formula} {A B : Formula} (h : PrfH Γ (land A B)) : PrfH Γ B :=
-  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.c3 A B)) h
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.c3 A B)) h
 
 /-- `iff`-mp con un bicondicional **cerrado** (`Prf`) y una hipótesis `PrfH`. -/
 theorem PrfH_iff_mp {Γ : List Formula} {A B : Formula} (hiff : Prf (A ⇔ B)) (ha : PrfH Γ A) :
@@ -334,10 +334,10 @@ theorem prf_In_mono_imp (x c c0 : Term) : Prf (Formula.impl (In x c) (In x (conc
 theorem prf_In_mono (x c c0 : Term) (h : Prf (In x c)) : Prf (In x (concat c0 c)) :=
   prf_mp (prf_In_mono_imp x c c0) h
 
-/-- Eliminación de la disyunción en `PrfH` (vía `Prf₀.j3` + teorema de deducción). -/
+/-- Eliminación de la disyunción en `PrfH` (vía `Prfᵢ.j3` + teorema de deducción). -/
 theorem PrfH_or_elim {Γ : List Formula} {A B C : Formula} (hor : PrfH Γ (lor A B))
     (hA : PrfH (A :: Γ) C) (hB : PrfH (B :: Γ) C) : PrfH Γ C :=
-  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.j3 A B C)) hor)
+  PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.j3 A B C)) hor)
     (deduction_aux hA A Γ rfl)) (deduction_aux hB B Γ rfl)
 
 /-- Congruencia de `cons` en la cabeza, en `PrfH`. -/
@@ -374,7 +374,7 @@ theorem prf_In_mono_right_imp (x M L : Term) :
     · -- base: In x nil ⇒ In x (concat nil M) (vacío, por explosión)
       have hb : Prf (Formula.impl (In x nil) (In x (concat nil M))) := by
         refine prf_deduction ?_
-        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (In x (concat nil M))))
+        exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq (In x (concat nil M))))
           (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil x) _) (prfH_hyp_self _))
       simpa only [substFormula, substTerm, substTerms, In, concat, nil, zero, if_true,
         FOL.substTerm_liftTerm] using hb
@@ -485,10 +485,10 @@ Los lemas `runFn_concat`/`chainOk_concat`/`chainOk_mono` generalizan el acumulad
 `prf_runFn_concat` valida el patrón end-to-end. `chainOk_concat`/`chainOk_mono` lo reutilizan
 (misma profundidad 2, mismos `norm32`/`norm_s`). -/
 
-/-- `∀-elim` en `PrfH` (vía `Prf₀.q1` + `mp`). Helper para la HI-`∀c` del `step`. -/
+/-- `∀-elim` en `PrfH` (vía `Prfᵢ.q1` + `mp`). Helper para la HI-`∀c` del `step`. -/
 theorem PrfH_spec {Γ : List Formula} {A : Formula} (h : PrfH Γ (Formula.forall A)) (t : Term) :
     PrfH Γ (substFormula 0 t A) :=
-  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prf₀.q1 A t)) h
+  PrfH.mp Γ _ _ (PrfH.incl0 Γ _ (Prfᵢ.q1 A t)) h
 
 /-- Predicado inductivo de compositividad de `runFn` con acumulador `∀` object.
     `Ψ(p) = ∀c. runFn c (p ++ s) =eq runFn (runFn c p) s` (lista `p` = `#0`). -/

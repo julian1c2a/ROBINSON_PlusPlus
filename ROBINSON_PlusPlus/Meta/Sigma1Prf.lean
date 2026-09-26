@@ -60,7 +60,7 @@ theorem provCodeC'_eq_provFromCode (φ : Formula) :
     aparece como término honesto, no absorbido — por eso Leibniz funciona aquí. -/
 theorem prf_provCode_congr {c₁ c₂ : Term} (h : Prf (c₁ =eq c₂)) :
     Prf (provFromCode c₁ ⇒ provFromCode c₂) :=
-  prf_mp (Prf.incl (Prf₀.leibniz provFormulaC' c₁ c₂)) h
+  prf_mp (Prf.incl (Prfᵢ.leibniz provFormulaC' c₁ c₂)) h
 
 /-- **Reflexión de igualdad REDUCIDA** al puente de doble-codificación: dada la implicación
     object `(x=eq y) ⇒ (formCode(x=eq x) =eq formCode(x=eq y))` (igualdad de los *códigos*
@@ -79,7 +79,7 @@ theorem pcc_eq_of_codeEq [AnclaEq] (x y : Term)
     prf_to_prfH (repr_pos'_prf (prf_refl x)) _
   -- transporta por el código vía Leibniz object (`provFromCode`)
   exact PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' _ _)) hcodeEq) hrefl
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.leibniz provFormulaC' _ _)) hcodeEq) hrefl
 
 /-! ### Combinador clave: elevar implicaciones object a implicaciones de demostrabilidad -/
 
@@ -131,7 +131,7 @@ theorem pcc_in_head_eq [AnclaEq] (hd x t : Term) :
     es falso, por explosión). -/
 theorem pcc_in_nil (x : Term) : Prf (In x nil ⇒ provCodeC' (In x nil)) := by
   refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq (provCodeC' (In x nil))))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq (provCodeC' (In x nil))))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil x) _) (prfH_hyp_self _))
 
 /-! ### Combinadores de reflexión de `chainOk` / `allIn` (vía `ax_chainOk_*` / `ax_allIn_*`) -/

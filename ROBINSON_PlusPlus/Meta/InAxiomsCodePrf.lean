@@ -266,7 +266,7 @@ theorem pcc_In_lfc_tracked [AnclaEq] (yc y : Term)
         provFromCode (inFormCodeFn yc (termCode (listFormCodeM L))))
   | [] => by
       refine prf_deduction ?_
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil y) _) (prfH_hyp_self _))
   | f :: fs => by
       refine prf_deduction ?_

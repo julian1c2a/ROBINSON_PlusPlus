@@ -222,7 +222,7 @@ theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
     substFormula, substTerm, substTerms, lt, lenc, nil, zero, Nat.reduceEqDiff,
     reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
   refine prf_deduction ?_
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
       (PrfH_lt_subst2 (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)))
 
@@ -230,7 +230,7 @@ theorem nthcEvalPred_base : Prf (substFormula 0 nil nthcEvalPred) := by
     `provFormulaC'`). -/
 theorem PrfH_provCode_congr {Γ : List Formula} {C₁ C₂ : Term}
     (h : PrfH Γ (C₁ =eq C₂)) (hp : PrfH Γ (provFromCode C₁)) : PrfH Γ (provFromCode C₂) :=
-  PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.leibniz provFormulaC' C₁ C₂)) h) hp
+  PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.leibniz provFormulaC' C₁ C₂)) h) hp
 
 /-- Congruencia de `nthcT` en `PrfH`. -/
 theorem PrfH_congr_nthcT {Γ : List Formula} {x x' y y' : Term}

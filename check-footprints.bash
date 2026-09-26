@@ -50,7 +50,7 @@ FOL.Inconsistencia.derives0_no_disjunction_property|propext,Classical.choice,Quo
 FOL.Inconsistencia.inconsistencia_de_cualquier_solidez|propext,FOL.MetaRules.raa
 FOL.Canonical0.max_cons_neg|propext,Classical.choice,Quot.sound
 FOL.Canonical0.max_cons_complete|propext,Classical.choice,Quot.sound
-FOL.Compacity0.model_existence_iff|propext,Classical.choice,Quot.sound
+FOL.Compacity0.model_existence_iff₀|propext,Classical.choice,Quot.sound
 FOL.Herbrand0.pcheck_complete|propext
 FOL.Herbrand0.ptautCheck_iff|propext
 FOL.Inversion0.inv_implR|propext,Quot.sound
@@ -82,7 +82,7 @@ FOL.Canonical0.derives0_em|Classical.choice,Quot.sound,propext
 FOL.Canonical0.eval_pullback_formula|-
 FOL.Canonical0.model_existence_lemma₀|Classical.choice,Quot.sound,propext
 FOL.Canonical0.truth_lemma|Classical.choice,Quot.sound,propext
-FOL.Compacity0.compactness₀|Classical.choice,Quot.sound,propext
+FOL.Compacity0.compactness|Classical.choice,Quot.sound,propext
 FOL.Compacity0.loewenheim_skolem_down|Classical.choice,Quot.sound,propext
 FOL.Craig0.craig|Quot.sound,propext
 FOL.Craig0.craig_impl|Quot.sound,propext

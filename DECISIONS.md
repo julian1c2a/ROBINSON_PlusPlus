@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-26 — hasta **ADR-101** (las decisiones D1-D7 del cierre de FOL y la condición para PeanoRF). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-26 — hasta **ADR-102** (D2, D4, D5, D6 y D7 ejecutadas; la regla de subíndices y `Prf₀` → `Prfᵢ`). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -5581,8 +5581,10 @@ ninguno.* Se encuentran todos de golpe con un grep, no de uno en uno.
 Y las cuatro resuelven por `inferInstance` en el árbol compilado ⇒ la capa **no es vacua**: el
 parámetro tiene dos habitantes de verdad, no uno.
 ⚠️ Lo que esto **no** dice: `completeness₀` seguirá llevando `Classical.choice` pase lo que pase,
-porque el suyo es el **WKL** (ADR-041), no el `String`. Generificar la cadena de Henkin comprará
-**Löwenheim-Skolem ascendente**, no un footprint menor. Hay que decirlo así.
+porque el suyo es el **WKL** (ADR-041), no el `String`. ~~Generificar la cadena de Henkin comprará
+**Löwenheim-Skolem ascendente**, no un footprint menor. Hay que decirlo así.~~ ⛔ **FALSO**, medido el
+2026-09-23 (ADR-100 §1.1): la cadena está indexada por `Nat` por construcción y `EnumSym` es falsa
+para los tipos no numerables; generificarla **no** da LS↑.
 
 ### 5 · ⭐ Y el control que faltaba: **14 titulares nuevos declarados**
 
@@ -5757,7 +5759,7 @@ ramas del DAG que no se tocan hasta él** — la sintáctica (`FOL → Derives0 
 → Henkin0 → Fresh0 → HenkinLimit0 → Lindenbaum0`) y la **SEMÁNTICA** (`FOL → Semantics →
 Soundness0`), que nadie había planificado. ⇒ son **DOS entregas con verde propio**, no una.
 
-### 5 · ⚠️ Y dos avisos que hay que pagar ANTES de tocar `Enumeration`
+### 5 · ⚠️ Y dos avisos que hay que pagar ANTES de tocar `Enumeration` — ⛔ decaen: `Enumeration` no se generifica (vía CERRADA, ADR-100 §1.1; definitiva el 2026-09-26)
 
 1. ⛔ **La fila que se va a mover hacia ABAJO**: `FOL.Metamath.Enumeration.natToFormula_surj`.
    Su `Classical.choice` entra **sólo** por la capa 2 (`natToString`, `String.ofList_toList`,
@@ -6602,7 +6604,7 @@ variables») aunque la longitud sea computable. Es la gemela de la de ADR-078 (`
 ## ADR-083: 🏁 el MURO de `Model` — alcance **9 ficheros**, trabajo **1**
 
 **Fecha**: 2026-09-22
-**Estado**: ✅ ATERRIZADO (`FOL/FOL/Semantics.lean`, commit `2d5b7c8`) · ⬜ segunda entrega
+**Estado**: ✅ ATERRIZADO (`FOL/FOL/Semantics.lean`, commit `2d5b7c8`) · ~~⬜ segunda entrega~~ ⛔ CERRADA (ADR-100 §1.1, 2026-09-23; definitiva el 2026-09-26)
 **Contexto**: `Model (D : Type)` con `func : String → List D → D` era **el muro declarado** de la
 migración del símbolo a parámetro (ADR-068/069/071): en el banner del proyecto, «**9 ficheros**».
 
@@ -6625,7 +6627,7 @@ migración (ADR-068 cotizó 163 módulos y eran 3 ficheros).
 ⭐ Y la regla de método que lo hizo barato: *un sondeo que RECONSTRUYE mide si la idea tipa; sólo
 uno que SUSTITUYE mide si el árbol sobrevive* (ADR-068 §2). Aquí se fue directo a sustituir.
 
-### 2 · ⬜ La segunda entrega, que sí es trabajo
+### 2 · ~~⬜ La segunda entrega, que sí es trabajo~~ — ⛔ CERRADA (ADR-100 §1.1; definitiva el 2026-09-26)
 
 `Canonical0` (el modelo canónico, 22 de las 68 citas) sigue en `String`, y es **la que une la
 rama sintáctica con la SEMÁNTICA** del DAG. Necesitará `FreshSym` — la clase que
@@ -7728,7 +7730,8 @@ las 14 del 2026‑09‑26, y el arreglo de `git-lock.bash`.
    (`FOL/FOL.lean`: LS ascendente) era FALSA: a LS↑ lo bloquea la indexación por `Nat` de la cadena de
    completitud (`LindenbaumStep : Nat → …`, `FreshSym.cst : Nat → Sym`), y `EnumSym` es falsa para los
    tipos no numerables que LS↑ necesita (`SymClasses.lean`). El parámetro de `ModelG` se queda. La receta
-   para reabrir la vía queda DIFERIDA en `[G.2]`.
+   para reabrir la vía quedó DIFERIDA en `[G.2]`. ⛔ **2026-09-26: CERRADA definitiva** (D4 de
+   `FOL/NEXT-STEPS.md`): sin receta de reapertura, y la fila sale de `[G.2]`.
 2. **Entran los cinco resultados «a un paso»** del sondeo de candidatos (journal `wf_749c5bbe-663`).
 3. **Entra el modelo infinito por compacidad** ⇒ FOL tiene teoría de modelos.
 4. **Se borran los duplicados literales**: `FOL/Theorems/Deduction.lean` y `FOL/Classical.lean`.
@@ -7834,3 +7837,49 @@ RPP `check-footprints` con las 14 filas de hoy.
 de nada más allá de sí mismo.** Medido: los siete módulos de PeanoRF la incumplen hoy (todos importan
 `PeanoRF.Prelim`, que trae RPP y Peano; `Collapse` y `Eq` usan `zero`/`succ` de RPP; y `Eq` usa
 `FOL.substTerm_liftTerm`, que le llega **a través de RPP**, dependencia que ninguna carta había visto).
+
+## ADR-102: D2, D4, D5, D6 y D7 ejecutadas — y la regla de subíndices de cálculo, también en RPP (`Prf₀` → `Prfᵢ`)
+
+**Fecha:** 2026-09-26 · **Estado:** ✅ EJECUTADO (D3 aplazada por el propietario) · **Ámbito:** FOL y RPP.
+
+### 1 · En FOL
+
+* **D5, el refactor de `Lift0`**: el núcleo es `absTerm' P` en `FOL/Eigenvariable.lean`, genérico en un
+  predicado de símbolos; `absTerm c` es su caso `(· = c)` por definición y `liftTerm k` su caso sin
+  símbolos por un lema (`Lift0.absFormula'_none`). `FOL/FOL.lean` no se toca; los 40 nombres se
+  conservan; footprints idénticos; compiló a la primera (dos diseños independientes y un juez).
+  ⚠️ La nota de ingeniería de ADR‑037 prometía «~150 líneas»: medido, **806 → 797** (−56 de código). Lo
+  que compra es una inducción de lift/subst y un transporte de 21 casos menos, de los ocho que hay.
+* **D2**: `IsSyntacticallyComplete₀` → **`IsMemComplete`** (completa por pertenencia; sin subíndice).
+* **D4**: la vía de `ModelG`, medida TERMINADA y **CERRADA definitiva** (ADR‑100 §1.1).
+* **D7**: la migración `String`→`List Char` (plan §7.3), **CERRADA como ABANDONADA en FOL**: no estaba
+  terminada (los `abbrev` siguen en `String`) y terminarla no movería ningún footprint titular.
+* **W1**: 58 correcciones de docstrings en 16 módulos (citas a `cuarentena/` borrado, prosa caducada).
+
+### 2 · D6: la regla de subíndices de cálculo — para FOL **y** RPP
+
+Decisión del propietario: *«utilizaremos ₀ el clásico, ᵢ el intuicionista, y sin subíndice lo que no
+dependa de ninguno, y así lo pasaremos también a RPP, de forma que no quede al aire»*. Medido antes:
+el `₀` de FOL no seguía ninguna regla (nació como ordinal de plan, ADR‑033) y **en RPP `Prf₀` era el
+Hilbert INTUICIONISTA**: la misma marca decía lo contrario en los dos repos.
+
+| antes | después |
+|---|---|
+| FOL `Compacity0.model_existence_iff` | `model_existence_iff₀` |
+| FOL `Compacity0.compactness₀` | `compactness` |
+| FOL `Lindenbaum0.IsHenkin₀` | `IsHenkin` |
+| FOL `Inconsistencia.DisjunctionProperty` | `DisjunctionProperty₀` |
+| RPP `Meta/Hilbert.Prf₀` | **`Prfᵢ`**; `prf0_…` → `prfI_…`; `ancla_…_prf0` → `ancla_…_prfI` (1297 sustituciones, 200 ficheros con `Probe/` y `sondeos/`) |
+
+⚠️ **Los registros históricos no se reescriben**: las ADR anteriores, el `CHANGELOG`, las auditorías y
+`doc/book/` conservan `Prf₀` como se escribió; esta ADR es el puente. ⬜ **Queda abierta** una cosa, y
+es del propietario: `Prf` (el Hilbert CLÁSICO) y `PrfH` siguen sin subíndice, como `Derives` en FOL
+(excepción histórica). Llamarlo `Prf₀` costaría 4565 apariciones en 97 ficheros, más 16079 prefijos
+`prf_`, y reutilizaría la marca que acaba de cambiar de sentido.
+
+### 3 · PeanoRF
+
+Carta `FOL/RESPUESTA-PEANORF-2026-09-26.md`: la condición **«FOL no depende de nada más allá de sí
+mismo»** (ADR‑101), lo que hoy la incumple (los siete módulos), el parámetro de `collapseT` (un
+SÍMBOLO, no «un término cerrado»: `collapseT_zero` necesita que el colapso lo fije), D5 (su API de
+`Eigenvariable` —sólo `posDepth`— intacta) y la nomenclatura de D6 para `Slash`.

@@ -21,7 +21,7 @@ namespace ROBINSON_PlusPlus.Meta.HilbertSeq
 /-!
 ## META — NIVEL D (real): demostraciones como secuencias  (Fase 1)
 
-`Prf`/`Prf₀` son inductivos en `Prop`: sus términos son finitos, pero `Prop`
+`Prf`/`Prfᵢ` son inductivos en `Prop`: sus términos son finitos, pero `Prop`
 borra el contenido computacional, así que no se pueden inspeccionar/codificar.
 Para aritmetizar la demostrabilidad necesitamos una representación de las
 demostraciones como **datos finitos**: una lista de líneas, cada una justificada
@@ -177,28 +177,28 @@ theorem mpConcl_eq {fi fj f : Formula} (h : mpConcl fi fj = some f) : fi = (fj �
 theorem stepConcl_prf {acc : List Formula} {r : Rule} {f : Formula}
     (hacc : ∀ g ∈ acc, Prf g) (h : stepConcl acc r = some f) : Prf f := by
   cases r with
-  | p1 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.p1 A B)
-  | p2 A B C => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.p2 A B C)
-  | c1 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.c1 A B)
-  | c2 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.c2 A B)
-  | c3 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.c3 A B)
-  | j1 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.j1 A B)
-  | j2 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.j2 A B)
-  | j3 A B C => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.j3 A B C)
-  | efq A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.efq A)
-  | q1 A t => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.q1 A t)
-  | q2 A t => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.q2 A t)
-  | q3 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.q3 A B)
-  | eqrefl t => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.eqrefl t)
+  | p1 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.p1 A B)
+  | p2 A B C => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.p2 A B C)
+  | c1 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.c1 A B)
+  | c2 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.c2 A B)
+  | c3 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.c3 A B)
+  | j1 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.j1 A B)
+  | j2 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.j2 A B)
+  | j3 A B C => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.j3 A B C)
+  | efq A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.efq A)
+  | q1 A t => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.q1 A t)
+  | q2 A t => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.q2 A t)
+  | q3 A B => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.q3 A B)
+  | eqrefl t => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.eqrefl t)
   | leibniz A t₁ t₂ =>
-      simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prf₀.leibniz A t₁ t₂)
+      simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.incl (Prfᵢ.leibniz A t₁ t₂)
   | p3 A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.p3 A
   | ind A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.ind A
   | qconf P C => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.qconf P C
   | listInd A => simp only [stepConcl, Option.some.injEq] at h; subst h; exact Prf.listInd A
   | thy k =>
       simp only [stepConcl] at h
-      exact Prf.incl (Prf₀.thy f (List.mem_of_getElem? h))
+      exact Prf.incl (Prfᵢ.thy f (List.mem_of_getElem? h))
   | mp i j =>
       simp only [stepConcl] at h
       cases hi : acc[i]? with
@@ -344,7 +344,7 @@ theorem combine_mp {rs1 rs2 : List Rule} {A B : Formula}
   simp [checkAux, stepConcl, hidxi, hidxj, mpConcl]
 
 /-- Completitud para la capa intuicionista. -/
-theorem prf0_to_derivation {φ : Formula} (h : Prf₀ φ) : ∃ rs, Derivation rs φ := by
+theorem prfI_to_derivation {φ : Formula} (h : Prfᵢ φ) : ∃ rs, Derivation rs φ := by
   induction h with
   | p1 A B => exact ⟨_, derivation_single (r := Rule.p1 A B) rfl⟩
   | p2 A B C => exact ⟨_, derivation_single (r := Rule.p2 A B C) rfl⟩
@@ -378,7 +378,7 @@ theorem prf0_to_derivation {φ : Formula} (h : Prf₀ φ) : ∃ rs, Derivation r
     `Prf φ ↔ ∃ rs, Derivation rs φ`. -/
 theorem prf_to_derivation {φ : Formula} (h : Prf φ) : ∃ rs, Derivation rs φ := by
   induction h with
-  | incl h0 => exact prf0_to_derivation h0
+  | incl h0 => exact prfI_to_derivation h0
   | p3 A => exact ⟨_, derivation_single (r := Rule.p3 A) rfl⟩
   | ind A => exact ⟨_, derivation_single (r := Rule.ind A) rfl⟩
   | qconf P C => exact ⟨_, derivation_single (r := Rule.qconf P C) rfl⟩

@@ -46,11 +46,11 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
-theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prf₀.j1 A B)
-theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prf₀.j2 A B)
+theorem prf_lorL (A B : Formula) : Prf (Formula.impl A (lor A B)) := Prf.incl (Prfᵢ.j1 A B)
+theorem prf_lorR (A B : Formula) : Prf (Formula.impl B (lor A B)) := Prf.incl (Prfᵢ.j2 A B)
 
 theorem prf_cdrc_cons (h t : Term) : Prf (cdrc (cons h t) =eq t) := by
   have hax : Prf ax_cdrc := prf_ax (by simp [axioms])
@@ -422,7 +422,7 @@ theorem nthLiftPred_base : Prf (substFormula 0 nil nthLiftPred) := by
   have hlt : PrfH [lt (.var 0) (lenc nil)] (lt (.var 0) zero) :=
     ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2
       (prf_to_prfH prf_lenc_nil _) (prfH_hyp_self _)
-  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+  exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
     (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) hlt)
 
 theorem nthLiftPred_step :
@@ -759,9 +759,9 @@ theorem prf_congr_In_left {u v w : Term} (h : Prf (u =eq v)) (hin : Prf (In u w)
   prfH_nil_to_prf (PrfH_congr_In_left (prf_to_prfH h []) (prf_to_prfH hin [])) rfl
 
 theorem prf_orL {A B : Formula} (h : Prf A) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j1 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j1 A B)) h
 theorem prf_orR {A B : Formula} (h : Prf B) : Prf (lor A B) :=
-  prf_mp (Prf.incl (Prf₀.j2 A B)) h
+  prf_mp (Prf.incl (Prfᵢ.j2 A B)) h
 
 /-! ### `∀` acotado con cota ABSTRACTA igual a un numeral (copia del piloto §3) -/
 
@@ -770,7 +770,7 @@ theorem prf_bdAll_numeral (Φ : Formula) (hΦ : substFormula 0 (.var 0) Φ = Φ)
       Prf (Formula.forall (Formula.impl (lt (.var 0) (numeralM n)) Φ))
   | 0, _ => by
       refine Prf.gen _ (prf_deduction ?_)
-      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq Φ))
+      exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq Φ))
         (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _)
           (PrfH.hyp _ _ (List.Mem.head _)))
   | n + 1, h => by
@@ -1273,7 +1273,7 @@ theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ 
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 /-! ############################################################################
@@ -1577,7 +1577,7 @@ theorem bridge_shapeBin (X : Term) (k : Nat) : SinWTs.shapeBin X k = ENS.shapeBi
        NODOS REALES. Aqui es donde la forma ECUACIONAL sale MAS BARATA que la
        posicional: una sola ecuacion, sin `consOk` ni `carc ≐ k̄` ni `lenc ≐ n̄`. -/
 
-theorem prf_refl' (t : Term) : Prf (t =eq t) := Prf.incl (Prf₀.eqrefl t)
+theorem prf_refl' (t : Term) : Prf (t =eq t) := Prf.incl (Prfᵢ.eqrefl t)
 
 theorem prf_shapeNul_real (k : Nat) : Prf (ENS.shapeNul (cons (numeralM k) nil) k) :=
   prf_refl' _

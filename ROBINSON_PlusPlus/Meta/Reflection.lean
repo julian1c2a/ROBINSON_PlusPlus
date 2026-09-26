@@ -61,13 +61,13 @@ theorem pcc_prf {φ : Formula} (h : Prf φ) : axioms ⊢ provCodeC' φ := repr_p
 /-- **∧-intro interno** (vía C1 + dos MP internos). -/
 theorem pcc_andIntro {A B : Formula} (hA : axioms ⊢ provCodeC' A) (hB : axioms ⊢ provCodeC' B) :
     axioms ⊢ provCodeC' (A ∧ B) :=
-  pcc_mp (pcc_mp (pcc_prf (Prf.incl (Prf₀.c1 A B))) hA) hB
+  pcc_mp (pcc_mp (pcc_prf (Prf.incl (Prfᵢ.c1 A B))) hA) hB
 
 /-- **∃-intro interno** (vía Q2 + MP interno): de `⊢ provCodeC' (A[t])` sale
     `⊢ provCodeC' (∃A)`. -/
 theorem pcc_exIntro (A : Formula) (t : Term) (h : axioms ⊢ provCodeC' (substFormula 0 t A)) :
     axioms ⊢ provCodeC' (Formula.ex A) :=
-  pcc_mp (pcc_prf (Prf.incl (Prf₀.q2 A t))) h
+  pcc_mp (pcc_prf (Prf.incl (Prfᵢ.q2 A t))) h
 
 /-! ### Reducción de D3 a la Σ₁-completitud provable del verificador -/
 

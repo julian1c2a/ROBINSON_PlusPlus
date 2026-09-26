@@ -88,12 +88,12 @@ theorem impT {A B C : Formula} (h1 : Prf (A ⇒ B)) (h2 : Prf (B ⇒ C)) : Prf (
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (prf_to_prfH h2 _) (PrfH.mp _ _ _ (prf_to_prfH h1 _) (prfH_hyp_self _))
 
-/-- `∨`-elim en forma de implicación (`Prf₀.j3`). -/
+/-- `∨`-elim en forma de implicación (`Prfᵢ.j3`). -/
 theorem prf_or_elim_imp {A B C : Formula} (h1 : Prf (A ⇒ C)) (h2 : Prf (B ⇒ C)) :
     Prf (lor A B ⇒ C) := by
   refine prf_deduction ?_
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j3 A B C)) (prfH_hyp_self _))
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j3 A B C)) (prfH_hyp_self _))
     (prf_to_prfH h1 _)) (prf_to_prfH h2 _)
 
 /-- `∨`-intro izquierdo INTERNO, en forma de implicación. -/
@@ -779,7 +779,7 @@ theorem hbody_ok : ∀ q i : Term, Prf (wfAll q ⇒ (lt i (lenc q)
       lt, carc, cdrc, lenc, nthc, cons, nil, zero, substFormula, substTerm, substTerms,
       substTerm_numeralM, FOL.substTerm_liftTerm, if_true]
   have h0 := PrfH.mp _ _ _ (PrfH.incl0 [lt i (lenc q), wfAll q] _
-    (Prf₀.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
+    (Prfᵢ.q1 (Formula.impl (lt (.var 0) (liftTerm 0 (lenc q)))
       (nodeOk (liftTerm 0 q) (nthc (liftTerm 0 q) (.var 0)))) i)) hwf
   rw [hsubst] at h0
   have hnode : PrfH [lt i (lenc q), wfAll q] (nodeOk q (nthc q i)) := PrfH.mp _ _ _ h0 hlt
@@ -855,7 +855,7 @@ theorem prf_nodeOk_bot (w : Term) : Prf (nodeOk w (formCodeM Formula.bottom)) :=
   have hnul : Prf (cOk (formCodeM Formula.bottom) (nulOk (formCodeM Formula.bottom) 2)) :=
     prf_and_intro (prf_consOk_cons (numeralM 2) nil) (prf_and_intro htag hlen)
   unfold nodeOk lorAll
-  exact prf_mp (Prf.incl (Prf₀.j1 _ _)) hnul
+  exact prf_mp (Prf.incl (Prfᵢ.j1 _ _)) hnul
 
 theorem prf_lenc_objList : ∀ L : List Term,
     Prf (Formula.eq (lenc (objList L)) (numeralM L.length))
@@ -905,7 +905,7 @@ theorem prf_isFCB_bottom : Prf (isFCB wBot (formCodeM Formula.bottom)) := by
     PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_split (.var 0) zero) _) hlt1
   refine PrfH_or_elim hsplit ?brA ?brB
   case brA =>
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.efq _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
       (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero (.var 0)) _) (PrfH.hyp _ _ (List.Mem.head _)))
   case brB =>
     have hi : PrfH (Formula.eq (.var 0) zero :: [lt (.var 0) (lenc wBot)])

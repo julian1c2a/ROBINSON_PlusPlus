@@ -53,13 +53,13 @@ theorem PrfH_pcc_prf [AnclaEq] {Γ : List Formula} {φ : Formula} (h : Prf φ) :
 /-- **∧-intro interno** en `PrfH` (vía `c1` + dos MP internos). -/
 theorem PrfH_pcc_andIntro [AnclaEq] {Γ : List Formula} {A B : Formula}
     (hA : PrfH Γ (provCodeC' A)) (hB : PrfH Γ (provCodeC' B)) : PrfH Γ (provCodeC' (A ∧ B)) :=
-  PrfH_pcc_mp (PrfH_pcc_mp (PrfH_pcc_prf (Prf.incl (Prf₀.c1 A B))) hA) hB
+  PrfH_pcc_mp (PrfH_pcc_mp (PrfH_pcc_prf (Prf.incl (Prfᵢ.c1 A B))) hA) hB
 
 /-- **∃-intro interno** en `PrfH` (vía `q2` + MP interno): de `provCodeC' (A[t])` sale
     `provCodeC' (∃A)`. -/
 theorem PrfH_pcc_exIntro [AnclaEq] {Γ : List Formula} (A : Formula) (t : Term)
     (h : PrfH Γ (provCodeC' (substFormula 0 t A))) : PrfH Γ (provCodeC' (Formula.ex A)) :=
-  PrfH_pcc_mp (PrfH_pcc_prf (Prf.incl (Prf₀.q2 A t))) h
+  PrfH_pcc_mp (PrfH_pcc_prf (Prf.incl (Prfᵢ.q2 A t))) h
 
 /-! ### Reducción de `d3_prf` a la Σ₁-completitud provable del verificador -/
 

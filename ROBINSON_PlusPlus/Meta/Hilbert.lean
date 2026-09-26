@@ -33,11 +33,11 @@ infinitas), luego no es r.e. y `provFormula` no puede ser Σ₁ (Tarski). Ver
 Aquí definimos un **cálculo de Hilbert clásico fresco** sobre `Minimal.axioms`,
 **en dos capas** para que se vea exactamente dónde entra la lógica clásica:
 
-* **`Prf₀`** (intuicionista): todos los esquemas salvo DNE. Su puente
-  `prf0_to_derives` se construye usando **solo los constructores nativos de
+* **`Prfᵢ`** (intuicionista): todos los esquemas salvo DNE. Su puente
+  `prfI_to_derives` se construye usando **solo los constructores nativos de
   `Derives`** (deducción natural) — **cero meta-axiomas, cero `dne`**.
 * **`Prf`** (clásico): añade el esquema DNE (P3) y se cierra bajo MP/GEN. Su
-  puente `prf_to_derives` reusa `prf0_to_derives` y emplea **`dne` en un único
+  puente `prf_to_derives` reusa `prfI_to_derives` y emplea **`dne` en un único
   punto**: el caso `p3`. Esa es **toda** la dependencia clásica.
 
 Esto materializa la observación: *nuestro FOL (los constructores de `Derives`)
@@ -70,38 +70,42 @@ theorem axioms_lift_eq : axioms.map (liftFormula 0) = axioms := by
   simp only [axioms, List.map_cons, List.map_nil]
   rfl
 
-/-! ### Capa intuicionista `Prf₀` -/
+/-! ### Capa intuicionista `Prfᵢ`
+
+Se llamó `Prf₀` hasta el 2026-09-26. Se renombró por la regla de subíndices de cálculo (ADR-102;
+`../FOL/NAMING-CONVENTIONS.md` §9): el subíndice nombra un CÁLCULO, `₀` es el clásico `Derives₀`
+de FOL y `ᵢ` el intuicionista. Con `Prf₀`, la misma marca decía lo contrario en los dos repos. -/
 
 /-- **Cálculo de Hilbert intuicionista** sobre `Minimal.axioms`: esquemas
     proposicionales (P1/P2), conjunción (C), disyunción (J, en la forma de
     `Derived.or_elim`), ex falso (efq), cuantificadores (Q), igualdad
     (refl/leibniz), axiomas de la teoría (thy), y reglas **MP** y **GEN**
     (generalización de una premisa, modo-teorema). **Sin** DNE. -/
-inductive Prf₀ : Formula → Prop where
-  | p1 (A B : Formula) : Prf₀ (A ⇒ (B ⇒ A))
-  | p2 (A B C : Formula) : Prf₀ ((A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C)))
-  | c1 (A B : Formula) : Prf₀ (A ⇒ (B ⇒ (A ∧ B)))
-  | c2 (A B : Formula) : Prf₀ ((A ∧ B) ⇒ A)
-  | c3 (A B : Formula) : Prf₀ ((A ∧ B) ⇒ B)
-  | j1 (A B : Formula) : Prf₀ (A ⇒ (A ∨ B))
-  | j2 (A B : Formula) : Prf₀ (B ⇒ (A ∨ B))
-  | j3 (A B C : Formula) : Prf₀ ((A ∨ B) ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C)))
-  | efq (A : Formula) : Prf₀ (⊥ ⇒ A)
-  | q1 (A : Formula) (t : Term) : Prf₀ ((Formula.forall A) ⇒ substFormula 0 t A)
-  | q2 (A : Formula) (t : Term) : Prf₀ (substFormula 0 t A ⇒ Formula.ex A)
-  | q3 (A B : Formula) : Prf₀ ((Formula.forall (A ⇒ liftFormula 0 B)) ⇒ ((Formula.ex A) ⇒ B))
-  | eqrefl (t : Term) : Prf₀ (t ≐ t)
+inductive Prfᵢ : Formula → Prop where
+  | p1 (A B : Formula) : Prfᵢ (A ⇒ (B ⇒ A))
+  | p2 (A B C : Formula) : Prfᵢ ((A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C)))
+  | c1 (A B : Formula) : Prfᵢ (A ⇒ (B ⇒ (A ∧ B)))
+  | c2 (A B : Formula) : Prfᵢ ((A ∧ B) ⇒ A)
+  | c3 (A B : Formula) : Prfᵢ ((A ∧ B) ⇒ B)
+  | j1 (A B : Formula) : Prfᵢ (A ⇒ (A ∨ B))
+  | j2 (A B : Formula) : Prfᵢ (B ⇒ (A ∨ B))
+  | j3 (A B C : Formula) : Prfᵢ ((A ∨ B) ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C)))
+  | efq (A : Formula) : Prfᵢ (⊥ ⇒ A)
+  | q1 (A : Formula) (t : Term) : Prfᵢ ((Formula.forall A) ⇒ substFormula 0 t A)
+  | q2 (A : Formula) (t : Term) : Prfᵢ (substFormula 0 t A ⇒ Formula.ex A)
+  | q3 (A B : Formula) : Prfᵢ ((Formula.forall (A ⇒ liftFormula 0 B)) ⇒ ((Formula.ex A) ⇒ B))
+  | eqrefl (t : Term) : Prfᵢ (t ≐ t)
   | leibniz (A : Formula) (t₁ t₂ : Term) :
-      Prf₀ ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
-  | thy (a : Formula) : List.Mem a axioms → Prf₀ a
-  | mp (A B : Formula) : Prf₀ (A ⇒ B) → Prf₀ A → Prf₀ B
-  | gen (A : Formula) : Prf₀ A → Prf₀ (Formula.forall A)
+      Prfᵢ ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A))
+  | thy (a : Formula) : List.Mem a axioms → Prfᵢ a
+  | mp (A B : Formula) : Prfᵢ (A ⇒ B) → Prfᵢ A → Prfᵢ B
+  | gen (A : Formula) : Prfᵢ A → Prfᵢ (Formula.forall A)
 
-/-- **Puente intuicionista**: todo teorema de `Prf₀` es teorema de `Derives`
+/-- **Puente intuicionista**: todo teorema de `Prfᵢ` es teorema de `Derives`
     sobre `axioms`, usando **únicamente los constructores de `Derives`** (más los
     teoremas lógicos constructor-puros de `FOL.Theorems`). **No usa `dne` ni
-    ninguna meta-regla ω.** Verificable con `#print axioms prf0_to_derives`. -/
-theorem prf0_to_derives {φ : Formula} (h : Prf₀ φ) : axioms ⊢ φ := by
+    ninguna meta-regla ω.** Verificable con `#print axioms prfI_to_derives`. -/
+theorem prfI_to_derives {φ : Formula} (h : Prfᵢ φ) : axioms ⊢ φ := by
   induction h with
   | p1 A B => exact FOL.Theorems.Impl.k_impl
   | p2 A B C => exact FOL.Theorems.Impl.s_impl
@@ -161,7 +165,7 @@ def confinementFormula (P C : Formula) : Formula :=
 /-- **Confinamiento ∀ es teorema de `Derives`** (cálculo finitario con contexto):
     derivación De Bruijn directa (intro_impl×2 + intro_forall + elim_forall a `#0`
     con cancelación `subst_lift_cancel_formula`, espejo del caso `q3` de
-    `prf0_to_derives`). Justifica el esquema `Prf.qconf` vía el puente. -/
+    `prfI_to_derives`). Justifica el esquema `Prf.qconf` vía el puente. -/
 theorem confinement_derives (P C : Formula) : axioms ⊢ confinementFormula P C := by
   apply Derives.intro_impl
   apply Derives.intro_impl
@@ -237,7 +241,7 @@ theorem list_induction_derives (Φ : Formula) : axioms ⊢ listInductionFormula 
     GEN. Clásico, coherente con el `dne` y la inducción del proyecto, sólido para
     ℕ. Es r.e. (Fase 1). -/
 inductive Prf : Formula → Prop where
-  | incl {φ : Formula} : Prf₀ φ → Prf φ
+  | incl {φ : Formula} : Prfᵢ φ → Prf φ
   | p3 (A : Formula) : Prf (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
   | ind (A : Formula) : Prf (Full.inductionFormula A)
   | qconf (P C : Formula) : Prf (confinementFormula P C)
@@ -249,12 +253,12 @@ inductive Prf : Formula → Prop where
 scoped notation "⊢ᴴ " φ => Prf φ
 
 /-- **Puente clásico**: todo teorema de `Prf` es teorema de `Derives` sobre
-    `axioms`. Reusa `prf0_to_derives` para la capa intuicionista; **`dne`
+    `axioms`. Reusa `prfI_to_derives` para la capa intuicionista; **`dne`
     aparece exactamente una vez**, en el caso `p3`. Verificable con
-    `#print axioms` (compárese con `prf0_to_derives`, que no depende de `dne`). -/
+    `#print axioms` (compárese con `prfI_to_derives`, que no depende de `dne`). -/
 theorem prf_to_derives {φ : Formula} (h : Prf φ) : axioms ⊢ φ := by
   induction h with
-  | incl h0 => exact prf0_to_derives h0
+  | incl h0 => exact prfI_to_derives h0
   | p3 A =>
       -- ⭐ EL ÚNICO USO DE `dne` (lógica clásica) en todo el puente.
       apply Derives.intro_impl
@@ -297,8 +301,8 @@ end ROBINSON_PlusPlus.Meta.Hilbert
 -- Exports: Nivel D real, Fase 0
 export ROBINSON_PlusPlus.Meta.Hilbert (
   subst_lift_same
-  Prf₀
-  prf0_to_derives
+  Prfᵢ
+  prfI_to_derives
   Prf
   prf_to_derives
   ConsistentOmega

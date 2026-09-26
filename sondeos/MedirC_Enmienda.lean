@@ -164,9 +164,9 @@ theorem hcond_absorbe_extra (P C : Formula) (t : Term) (n : Nat)
   have hand : PrfH Γ (Formula.and (substFormula 0 t P) (substFormula 0 t C)) :=
     PrfH.hyp _ _ (List.Mem.head _)
   have hPt : PrfH Γ (substFormula 0 t P) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have hCt : PrfH Γ (substFormula 0 t C) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   have hPd : PrfH Γ (provFromCode (condD P t)) :=
     PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH hP _) hlw) hln) hPt
   have hCd : PrfH Γ (provFromCode (condD C t)) :=
@@ -224,11 +224,11 @@ theorem enm_implica_actual (Ln P C : Formula) :
   refine prf_deduction ?_
   have hh := prfH_hyp_self (Formula.and Ln (Formula.and P C))
   have hL : PrfH [Formula.and Ln (Formula.and P C)] Ln :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hh
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hh
   have hPC : PrfH [Formula.and Ln (Formula.and P C)] (Formula.and P C) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hh
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hh
   have hC : PrfH [Formula.and Ln (Formula.and P C)] C :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hPC
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hPC
   exact PrfH_and_intro hL hC
 
 /-- **(a) ACEPTACION — no se acepta NI UNA linea mas.** Si con la enmienda una linea pasa el `⇐`,
@@ -277,7 +277,7 @@ theorem prf_hasWit_real (t : Term) : Prf (ENS.hasWit (termCodeM t)) := by
       (SinWTs.isTC1 (.var 0) (liftTerm 0 (termCodeM t)))
       = SinWTs.isTC1 (objList (SinWTs.tcodes1 t)) (termCodeM t) := by
     simp only [ENS.substF_isTC1, substTerm, FOL.substTerm_liftTerm, if_true]
-  have hq := Prf.incl (Prf₀.q2 (SinWTs.isTC1 (.var 0) (liftTerm 0 (termCodeM t)))
+  have hq := Prf.incl (Prfᵢ.q2 (SinWTs.isTC1 (.var 0) (liftTerm 0 (termCodeM t)))
     (objList (SinWTs.tcodes1 t)))
   rw [hs] at hq
   exact prf_mp hq hw
@@ -287,7 +287,7 @@ theorem prf_congr_hasWit {a b : Term} (h : Prf (a =eq b)) (hw : Prf (ENS.hasWit 
     Prf (ENS.hasWit b) := by
   have e : ∀ s : Term, substFormula 0 s (ENS.hasWit (.var 0)) = ENS.hasWit s := by
     intro s; simp only [ENS.substF_hasWit, substTerm, if_true]
-  have hl := Prf.incl (Prf₀.leibniz (ENS.hasWit (.var 0)) a b)
+  have hl := Prf.incl (Prfᵢ.leibniz (ENS.hasWit (.var 0)) a b)
   rw [e a, e b] at hl
   exact prf_mp (prf_mp hl h) hw
 
@@ -296,7 +296,7 @@ theorem prf_congr_hasWitF {a b : Term} (h : Prf (a =eq b)) (hw : Prf (ENS.hasWit
     Prf (ENS.hasWitF b) := by
   have e : ∀ s : Term, substFormula 0 s (ENS.hasWitF (.var 0)) = ENS.hasWitF s := by
     intro s; simp only [substF_hasWitF, substTerm, if_true]
-  have hl := Prf.incl (Prf₀.leibniz (ENS.hasWitF (.var 0)) a b)
+  have hl := Prf.incl (Prfᵢ.leibniz (ENS.hasWitF (.var 0)) a b)
   rw [e a, e b] at hl
   exact prf_mp (prf_mp hl h) hw
 
@@ -341,7 +341,7 @@ theorem guarda_disponible_en_hcond (t : Term) (X : Formula)
       (substFormula 0 t condQ1E) := PrfH.hyp _ _ (List.Mem.head _)
   rw [substFormula_condQ1E_at] at hh
   exact PrfH.mp _ _ _ (prf_to_prfH huso _)
-    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hh)
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hh)
 
 /-- **LA DEUDA, enunciada exactamente.** Es lo unico que la via (C) deja abierto en `q1`
     (ademas de la enmienda misma). No se prueba aqui: se MIDE. -/
@@ -510,7 +510,7 @@ abbrev CODINGAX : Name := `ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms
 abbrev Q1 : Name := `ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q1
 abbrev GODEL : Name := `ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN
 abbrev PROVC : Name := `ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC'
-abbrev PRF : Name := `ROBINSON_PlusPlus.Meta.Hilbert.Prf₀.thy
+abbrev PRF : Name := `ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ.thy
 abbrev D1Q1 : Name := `ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1
 abbrev ENSAM : Name := `ROBINSON_PlusPlus.Meta.LineWFAssemblePrf.pcc_lineWF_tracked_modulo_7
 
@@ -532,17 +532,17 @@ run_cmd do
     provFormulaC': {dp.toList.length} constantes; contiene `axioms` = {dp.contains AXIOMS}."
 
 /-! **CONTROL DE QUE LA MEDICION NO ES VACUA**: lo que SI depende de `ax_lineWF_q1` es la
-    TEORIA (`Prf₀.thy`, o sea `⊢`) y los teoremas D1/D3 de produccion. O sea: **cambia la
+    TEORIA (`Prfᵢ.thy`, o sea `⊢`) y los teoremas D1/D3 de produccion. O sea: **cambia la
     TEORIA, no la SENTENCIA**. -/
 open Elab Command in
 run_cmd do
   let env ← getEnv
   let d := deps env [PRF] {}
-  if !d.contains AXIOMS then throwError "FALSO: Prf₀.thy NO depende de `axioms` (medicion vacua)"
-  if !d.contains Q1 then throwError "FALSO: Prf₀.thy NO depende de `ax_lineWF_q1` (vacua)"
+  if !d.contains AXIOMS then throwError "FALSO: Prfᵢ.thy NO depende de `axioms` (medicion vacua)"
+  if !d.contains Q1 then throwError "FALSO: Prfᵢ.thy NO depende de `ax_lineWF_q1` (vacua)"
   let dd := deps env [D1Q1] {}
   let de := deps env [ENSAM] {}
-  logInfo m!"[CONTROL] Prf₀.thy: axioms={d.contains AXIOMS}, ax_lineWF_q1={d.contains Q1}. \
+  logInfo m!"[CONTROL] Prfᵢ.thy: axioms={d.contains AXIOMS}, ax_lineWF_q1={d.contains Q1}. \
     ReprPrf.prf_lineWF_q1: existe={(env.find? D1Q1).isSome}, \
     valor={((env.find? D1Q1).bind (·.value?)).isSome}, \
     ax_lineWF_q1={dd.contains Q1}, axioms={dd.contains AXIOMS} ({dd.toList.length} const.). \

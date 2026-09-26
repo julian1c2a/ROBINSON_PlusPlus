@@ -9,7 +9,7 @@
 > La prosa de este documento (explicaciones, motivación) va en español para que quede
 > clara sin ambigüedad.
 
-**Última actualización:** 2026-09-09
+**Última actualización:** 2026-09-26 — §9: subíndices de cálculo (`Prf₀` → `Prfᵢ`, ADR-102)
 **Autor**: Julián Calderón Almendros
 
 ---
@@ -349,6 +349,22 @@ fichero. Los cinco meta-axiomas de `Minimal/Axioms.lean` documentados en
 `DECISIONS.md` ADR-010 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son la
 excepción histórica — no llevan el prefijo por ser anteriores a esta convención;
 no renombrarlos retroactivamente sin coordinar con ADR-010.
+
+### Subíndices de cálculo — `₀` clásico, `ᵢ` intuicionista (decidida 2026-09-26, ADR-102)
+
+La misma regla que FOL (`../FOL/NAMING-CONVENTIONS.md` §9, donde está entera): **el subíndice
+nombra un CÁLCULO**. `₀` es el clásico (`Derives₀` de FOL), `ᵢ` el intuicionista, y **sin
+subíndice** va lo que no depende de ningún cálculo. En snake_case, `…0_` / `…I_`
+(`derives0_…`, `derivesI_…`, `prfI_…`).
+
+En RPP la aplica un renombre: el Hilbert intuicionista de `Meta/Hilbert.lean` se llamaba `Prf₀`
+—lo contrario de lo que `₀` dice en FOL— y desde el 2026-09-26 es **`Prfᵢ`** (`prf0_…` →
+`prfI_…`, `ancla_…_prf0` → `ancla_…_prfI`; 1297 sustituciones en 200 ficheros, `Probe/` y
+`sondeos/` incluidos). ⚠️ `Prf` (el Hilbert **clásico**) y `PrfH` quedan SIN subíndice como
+excepción histórica, igual que `Derives` en FOL (regla 4 de FOL): llamarlo `Prf₀` reutilizaría la
+marca que acaba de cambiar de sentido, y costaría 4565 apariciones en 97 ficheros (más 16079
+prefijos `prf_`), medido el 2026-09-26. ⬜ Queda como decisión abierta del propietario. ⚠️ Los registros HISTÓRICOS (`DECISIONS.md`,
+`CHANGELOG.md`, `doc/AUDITORIA-*`, `doc/book/`) conservan `Prf₀` tal como se escribió.
 
 ---
 

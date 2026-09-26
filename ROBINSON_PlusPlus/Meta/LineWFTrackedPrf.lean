@@ -93,7 +93,7 @@ theorem ax_lineWF_eqrefl_eq :
 
 De `ax_lineWF_eqrefl : ∀. (TAG ⇒ (LWF ⇔ (LENC ∧ EQ)))` sale `∀. (TAG ⇒ ((LENC ∧ EQ) ⇒ LWF))`:
 se instancia en `#0`, se descargan las dos hipótesis con deducción y se toma la 2ª componente del
-`⇔` con `Prf₀.c3` (`iff.mpr` interno). -/
+`⇔` con `Prfᵢ.c3` (`iff.mpr` interno). -/
 
 /-- **Dirección `⇐` del bicondicional `ax_lineWF_eqrefl` estricto, currificada bajo el tag.** -/
 theorem prf_lineWF_eqrefl_bwd :
@@ -118,7 +118,7 @@ theorem prf_lineWF_eqrefl_bwd :
   -- `c3` = 2ª componente del `⇔` = la dirección `(LENC ∧ EQ) ⇒ LWF`
   have hmpr : PrfH [Formula.and lencEqrefl eqEqrefl, tagEqrefl]
       (Formula.impl (Formula.and lencEqrefl eqEqrefl) lwfVar) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hiff
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hiff
   -- MP con `LENC ∧ EQ` (1ª hipótesis del contexto)
   exact PrfH.mp _ _ _ hmpr (PrfH.hyp _ _ (List.Mem.head _))
 
@@ -604,7 +604,7 @@ theorem pcc_lineWF_tracked_eqrefl [AnclaEq] (t : Term)
 
 /-! ### Paso 6g — (c) para `eqrefl`: reflector POR RAMA, **sin hipótesis de cota**
 
-Del accesor ESTRICTO `ax_lineWF_eqrefl` en la dirección `⇒` (`iff.mp` = `Prf₀.c2`): bajo `lineWF t`
+Del accesor ESTRICTO `ax_lineWF_eqrefl` en la dirección `⇒` (`iff.mp` = `Prfᵢ.c2`): bajo `lineWF t`
 y el tag `nthc t 1 = 12̇`, el RHS `(lenc t = 3̇) ∧ (carc t = eqc (nthc t 2)(nthc t 2))` **se deriva
 entero**. Su primer conjunto da la longitud canónica ⇒ las cotas; el segundo, la condición
 estructural. **Ya no hay hipótesis de cota** (el plan A las cerró de raíz). Es el reflector que el
@@ -635,11 +635,11 @@ theorem pcc_lineWF_tracked_eqrefl_imp [AnclaEq] (t : Term) :
   -- del RHS estricto: longitud canónica + condición estructural
   have hand : PrfH Γ (Formula.and (lenc t =eq numeralM 3)
       (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2)))) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hiff) hlw
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hiff) hlw
   have hlencH : PrfH Γ (lenc t =eq numeralM 3) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
   have heqH : PrfH Γ (carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) :=
-    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
   -- cotas DERIVADAS de la longitud canónica (en `PrfH`)
   have hb1 : PrfH Γ (lt (succ zero) (lenc t)) :=
     PrfH_lt_subst2 (PrfH_eq_symm hlencH)

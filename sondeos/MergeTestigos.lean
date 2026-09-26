@@ -73,7 +73,7 @@ theorem prf_in_nthc (L i : Term) :
     unfold boundedIn
     refine PrfH_ex_intro i ?_
     rw [hsub]
-    exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _)) hlt)
+    exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 _ _)) hlt)
       (prf_to_prfH (prf_refl (nthc L i)) _)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_In_of_boundedIn (nthc L i) L) _) hb
 
@@ -105,16 +105,16 @@ theorem prf_isTermCodeE1_mono_of (w w' X : Term)
     Prf (Formula.impl (isTermCodeE1 w X) (isTermCodeE1 w' X)) := by
   unfold isTermCodeE1
   refine prf_or_elim_imp ?_ ?_
-  · exact Prf.incl (Prf₀.j1 _ _)
+  · exact Prf.incl (Prfᵢ.j1 _ _)
   · refine prf_deduction ?_
     have hh : PrfH [land (shapeBin X 1) (argsIn w (nthc X (numeralM 2)))]
         (land (shapeBin X 1) (argsIn w (nthc X (numeralM 2)))) := prfH_hyp_self _
-    have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hh
-    have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hh
+    have h1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hh
+    have h2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hh
     have h2' := PrfH.mp _ _ _
       (prf_to_prfH (prf_argsIn_mono_of w w' (nthc X (numeralM 2)) hsub) _) h2
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.j2 _ _))
-      (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c1 _ _)) h1) h2')
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 _ _))
+      (PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 _ _)) h1) h2')
 
 /-! ## §3 · LA FUSIÓN
 
@@ -157,7 +157,7 @@ theorem prf_wfAll1_concat (W₁ W₂ : Term) :
   have hor : PrfH (CTXc W₁ W₂)
       (lor (In (nthc (concat (liftTerm 0 W₁) (liftTerm 0 W₂)) (.var 0)) (liftTerm 0 W₁))
            (In (nthc (concat (liftTerm 0 W₁) (liftTerm 0 W₂)) (.var 0)) (liftTerm 0 W₂))) :=
-    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _))
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _))
       (prf_to_prfH (prf_in_concat (nthc (concat (liftTerm 0 W₁) (liftTerm 0 W₂)) (.var 0))
         (liftTerm 0 W₁) (liftTerm 0 W₂)) _)) hinC
   refine PrfH_or_elim hor ?iz ?dr
@@ -170,7 +170,7 @@ theorem prf_wfAll1_concat (W₁ W₂ : Term) :
           (liftTerm 0 W₁) :: CTXc W₁ W₂)
         (land (wfAll1 (liftTerm 0 W₁)) (wfAll1 (liftTerm 0 W₂))) :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-    have hw1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c2 _ _)) hand
+    have hw1 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 _ _)) hand
     have hnode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH
       (prf_isTermCodeE1_of_In (liftTerm 0 W₁)
         (nthc (concat (liftTerm 0 W₁) (liftTerm 0 W₂)) (.var 0))) _) hin) hw1
@@ -188,7 +188,7 @@ theorem prf_wfAll1_concat (W₁ W₂ : Term) :
           (liftTerm 0 W₂) :: CTXc W₁ W₂)
         (land (wfAll1 (liftTerm 0 W₁)) (wfAll1 (liftTerm 0 W₂))) :=
       PrfH.hyp _ _ (List.Mem.tail _ (List.Mem.tail _ (List.Mem.head _)))
-    have hw2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prf₀.c3 _ _)) hand
+    have hw2 := PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 _ _)) hand
     have hnode := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH
       (prf_isTermCodeE1_of_In (liftTerm 0 W₂)
         (nthc (concat (liftTerm 0 W₁) (liftTerm 0 W₂)) (.var 0))) _) hin) hw2

@@ -21,7 +21,7 @@ namespace ProbeCoste
 
 -- ══════════════════════════════════════════════════════════════════════════
 -- §1 · obstrucción (1): `Fresh0` fabrica símbolos frescos.
--- Hoy: `shift s := "f" ++ s`, `cst n := "c" ++ toString n`, con TRES propiedades
+-- En el árbol (`FOL/Fresh0.lean`): `shift s := "f" ++ s`, `cst 0 := "g"`, `cst (n+1) := "a" ++ cst n`, con TRES propiedades
 -- (`shift_inj`, `cst_inj`, `cst_ne_shift`). La clase es exactamente esas tres:
 -- ni una más, y ninguna de ellas pide decidibilidad ni orden.
 -- ══════════════════════════════════════════════════════════════════════════
