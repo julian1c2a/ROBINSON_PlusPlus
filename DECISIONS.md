@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-107** (P4 hecha: `FOL/QFDecide0.lean`, el fragmento sin cuantificadores acotado y decidido). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-108** (la segunda criba de congelación de FOL: 10 congelables propuestos, decisiones N1‑N4). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -8015,3 +8015,39 @@ Decisión del propietario sobre ADR-106: «Hacemos la versión acotada». Módul
   certificado) queda FUERA de alcance en `FOL/NEXT-STEPS.md`, sin medir.
 * Consecuencia para la criba: `Hauptsatz0` ya no la retiene ninguna OFERTA; re-correrla con
   refutación antes de congelar nada más.
+
+## ADR-108: La segunda criba de congelación de FOL — 71 correcciones, 10 congelables propuestos, decisiones N1‑N4
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ criba hecha; ⬜ freeze y N1‑N4, del propietario · **Ámbito:** FOL
+(`092ce8b`, re-lock `211040b`).
+
+Sobre los 18 no congelados que deja pasar `criba-congelacion.py` (liberados por P2, P3 y P4; los 15 de
+la cadena de PeanoRF siguen fuera): cuatro lentes de VERDAD por grupos, dos de ESTABILIDAD
+(nomenclatura; consumidores y decisiones), un juez y dos escépticos (contra el veredicto y contra las
+ediciones). El escéptico del veredicto refutó 26 de 27 puntos (casi todos arreglables) y sacó a
+`Fresh0` de la lista.
+
+* ✏️ **71 correcciones** de comentarios/docstrings en los 18 + `Finitary0`; código IDÉNTICO token a
+  token, `[G.2]` intacto, build y controles verdes. Tres FALSEDADES matemáticas en cabeceras:
+  (1) `Craig0`/`Interpolation0`: «para sentencias la condición de variables es vacua» — el enunciado
+  no da `C` cerrada (Maehara devuelve `C = P(x₀)` para `∀xP(x) ⟹ ∃xP(x)`); (2) la firma de
+  `herbrand_block₀` omitía `QuantFree φ`; (3) la de `herbrand_validity₀`, la frescura de las
+  constantes de Skolem. Además: `QFDecide0.qfT` da UN paso de mezclas de prefijo, no un cierre (lo que
+  ADR-107 llamó «cierre de subtérminos» es ese paso); procedencias de `Classical.choice`; citas a
+  memorias privadas; prosa temporal sin fecha.
+* ❄️ **Congelables**, ⬜ confirmación del propietario: `Interpolation0`, `Craig0`, `QFDecide0`,
+  `Inversion0`, `Skolem0`, `SkolemN0`, `SkolemHerbrand0`, `Canonical0`, `Compacity0`, `Henkin0`.
+  Ninguno cita en su texto un nombre que N1‑N3 puedan cambiar (grep).
+* ⬜ **N1** (retiene `Hauptsatz0`, `HerbrandBlock0`, `BlockExtraction0`): once definiciones POR
+  DERIVABILIDAD sin marca (`CutAdm`, `CutAt`, `CutBelow`, `LeftPrin`, `HerbrandExtractionBlock`,
+  `HerbrandExtraction`, `CutElim`, `NDtoLK`, `PwEq`, y `ImpAll`/`IffAll` en `PrenexNF0` 🧊) contradicen
+  la regla 1 de NAMING §9. Recomendado: excepción escrita (la marca la lleva el titular que paga la
+  obligación), lo único compatible con el freeze de `PrenexNF0`.
+* ⬜ **N2** (retiene `HenkinLimit0`, `Lindenbaum0`, `Fresh0`): `henLimit_consistent` y
+  `shiftTheory_consistent` dependen de `⊢₀`, se imprimen y no llevan marca; su gemelo
+  `henkin_step_consistent₀` sí. ¿Titulares o auxiliares? (ADR-073 llama titular a lo que el árbol
+  imprime; §9 pone `max_cons_neg` e `inv_allR`, impresos, como auxiliares.)
+* ⬜ **N3** (retiene `SkolemNF0`): `quantFree_subst` duplicado en `SkolemNF0` y `Sequent0`.
+  Recomendado: deduplicar en `SkolemNF0`. **N4** (`Inconsistencia`, retenida además por X1):
+  `Mfalse`/`Mtrue`/`P` repiten las de `Soundness0`; se contesta con la entrega de PeanoRF.
+* Artefactos: `artefactos-criba2/` en la carpeta de la sesión de FOL (lentes, juez, escépticos).

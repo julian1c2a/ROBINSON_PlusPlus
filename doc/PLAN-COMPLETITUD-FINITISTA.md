@@ -242,6 +242,11 @@ del footprint: legítimo y esperado, la semántica es clásica.
 
 ## 5 · VÍA H · Herbrand / disyunción finita
 
+> ⚠️ *Anotado el 2026‑09‑27* (ADR‑105, P2 de FOL): los titulares de la capa ₀ llevan hoy el
+> subíndice de su cálculo — `hauptsatz₀`, `cut_elimination₀`, `herbrand₀`, `herbrand_extraction₀`,
+> `herbrand_block₀`, `truth_lemma₀`, `skolem_conservative₀`… (`FOL/NAMING-CONVENTIONS.md` §9). Este
+> plan, aquí y en §6‑§8, conserva los nombres de cuando se escribió.
+
 ### 5.1 · El enunciado, y cuál es el que importa
 
     ⊢₀ ∃x̄ φ(x̄)   ⟺   ∃ t̄₁…t̄ₙ :  ⊢ᵖʳᵒᵖ  φ(t̄₁) ∨ … ∨ φ(t̄ₙ)        (φ sin cuantificadores)
