@@ -26,7 +26,7 @@
 > exactamente el WKL. Ver §6.3.
 >
 > ⛔ **Rectificado el 2026‑09‑27 (ADR‑110)**: esa localización es FALSA en Lean. La etapa de
-> Lindenbaum se define sin decidir la condición (`Prop` es impredicativo) y `lindenbaum_lemma₀` y
+> Lindenbaum se define sin decidir la condición (un predicado en `Prop` no tiene que ser decidible) y `lindenbaum_lemma₀` y
 > `henkin_completion₀` son `[propext, Quot.sound]`; lo clásico de `completeness₀` está en el lema de
 > la verdad sobre un maximal ARBITRARIO y en su `byContradiction`
 > final. Vale para todas las frases de este plan que llaman «el WKL» a un `Classical.choice` (§0, §5.12,
@@ -976,7 +976,7 @@ aparece ya en tres módulos del ensamblaje por **tres causas distintas**:
 
 📝 **2026‑09‑27 · el `if` de `LindenbaumStep` ya no decide nada** (auditoría de constructividad de FOL,
 ADR‑110). La etapa es hoy IMPREDICATIVA: la condición `IsConsistent₀ (Sₙ ∪ {φₙ})` va DENTRO del
-predicado, como conjunción, sin decidirse (`Prop` es impredicativo; consistencia y maximalidad son
+predicado, como conjunción, sin decidirse (un predicado en `Prop` no tiene que ser decidible; consistencia y maximalidad son
 negativas y basta `¬¬(C ∨ ¬C)`), y con `lindenbaum_limit_closed` **`lindenbaum_lemma₀` y
 `henkin_completion₀` son `[propext, Quot.sound]`**. ⇒ «Ahí cabe toda la no‑finitud» y la fila
 ⛔ «SÍ. Es el WKL» de la tabla son FALSAS como localización: las tres causas eran de presentación, y hoy

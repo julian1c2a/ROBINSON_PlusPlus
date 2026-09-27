@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-111** (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -5233,7 +5233,7 @@ direccion ⟹ quedo abierta), ADR-060 §6 (donde nacio M-13), ADR-055, ADR-063.
     herbrand_of_skolemNF      : ∃ m ψ, QuantFree ψ ∧
                                  ([] ⊢₀ ¬(skolemize k (prenex φ)) ↔ ∃ tss E, HerbrandCertBlock m (¬ψ) tss E)
 
-📏 `[propext, Quot.sound]`: **ni un `Classical.choice`**.
+📏 `[propext, Quot.sound]`: **ni un `Classical.choice`**. ⚠️ **Reforzado por ADR-112** (2026‑09‑27, N7): hoy es `herbrand_of_skolemNF₀` y lleva además `skolemize k (prenex φ) = allBlock m ψ`; sin esa ecuación el `↔` de arriba lo cumplía cualquier `P : Prop`. Mismo footprint.
 
 ADR-062 §4 midio bien la juntura: `skolemNF_shape` entrega **exactamente** `∀ᵐψ` con `QuantFree ψ`,
 que es la hipotesis de `herbrand_block`… pero **Herbrand habla de EXISTENCIALES y Skolem los
@@ -8253,3 +8253,38 @@ D1 cambió el código de siete candidatos y D2 la documentación de casi todos.
   (medido: misma prueba, `[propext, Quot.sound]`, sin consumidores).
 * `Inconsistencia`, retenida por X1.
 * Artefactos: `artefactos-criba3/` en la carpeta de la sesión de FOL.
+
+## ADR-112: FOL — el segundo y el tercer lote CONGELADOS (23 módulos); N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ HECHA · **Ámbito:** FOL (segundo lote, `0eeaa70`; N5, N7 y el tercer lote, `fe9384e`, y el freeze del tercer lote, `f2f7188`). RPP: ninguna fila de `check-footprints.bash` cambia (517).
+
+Resuelve lo que ADR-111 dejó al propietario (N6 ya estaba aplicada allí).
+
+* 🧊 **Segundo lote** (propietario: «congela lo congelable»): los 10 congelables de ADR-111 —`Compacity0`,
+  `Inversion0`, `QFDecide0`, `SkolemN0`, `Craig0`, `Interpolation0`, `Canonical0`, `Fresh0`,
+  `HenkinLimit0` y `TheoryFramework/Instances/FOL`—. Con el primer lote (ADR-105), 15.
+* 🏷️ **N5 — auxiliares.** Los nombres técnicos que dependen de un cálculo y que la cabecera de su módulo
+  nombra —`henkin_step_derives`; `lindenbaum_limit_consistent`/`_max`/`_closed`; `skolemizeF_impAll`;
+  `cutElim_of`, `cutPrinAux`, `cutLeftAux`, `leftPrin_mono`, `leftPrin_lift`; `herbrand_block_iff` y
+  `Herbrand0.herbrand_iff`— no llevan marca: ningún renombre. La regla queda escrita en
+  `../FOL/NAMING-CONVENTIONS.md` §9, regla 3 («Qué es TITULAR»): titular es el RESULTADO que la cabecera
+  presenta como entrega (N2); los pasos de una prueba, los lemas de un límite, las formas intermedias,
+  las pasadas de una inducción y los consumidores condicionales son auxiliares aunque la cabecera los
+  nombre o tengan fila de footprint.
+* ✏️ **N7 — (B), reforzar el enunciado.** `SkolemHerbrand0.herbrand_of_skolemNF₀` lleva la ecuación
+  `skolemize k (prenex φ) = allBlock m ψ`, como los de §3: sin ella `ψ` no quedaba atada a la matriz y
+  el `↔` lo cumplía cualquier `P : Prop`. Misma prueba, mismo footprint (`[propext, Quot.sound]`);
+  sin consumidores.
+* 🧊 **Tercer lote**: `Henkin0`, `Skolem0`, `Lindenbaum0`, `SkolemNF0`, `SkolemHerbrand0`,
+  `Hauptsatz0`, `HerbrandBlock0` y `BlockExtraction0`. ⇒ **23 congelados**: los 17 candidatos de las
+  cribas, `TheoryFramework/Instances/FOL` y los cinco de ADR-105. De los 19 de ADR-111 sólo queda fuera
+  `Inconsistencia` (X1).
+* ✏️ **Terminología** (verificación previa al tercer lote): «`Prop` es impredicativo» no era la razón de que
+  la etapa de Lindenbaum se defina sin decidir. `LindenbaumStep` no cuantifica sobre `Prop`; lo que la
+  hace legítima es que un predicado en `Prop` no tiene que ser decidible (con `Or`/`And` en vez de un
+  `if` no hace falta `Decidable`). Corregido en los textos vivos (`Lindenbaum0`, `DecEq`, `Enumeration`,
+  `AXIOMS.md`, `REFERENCE.md`, `NEXT-STEPS.md`, el README de la auditoría, el PLAN y la carta a PeanoRF);
+  quedan con la palabra, y se leen con esta precisión, ADR-110 §2 y los congelados `Canonical0` y
+  `Compacity0`.
+* ✏️ ADR-111 decía «217 de las 256 filas de FOL no llevan marca ni prefijo de cálculo»: son **220** sin
+  marca y **138** sin marca ni prefijo (medido). El argumento se sostiene igual.
