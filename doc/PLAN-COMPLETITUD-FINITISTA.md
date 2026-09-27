@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-18 12:30 · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-09-27 (notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -24,6 +24,14 @@
 > ⛔ **Y el entregable es el que este plan anunciaba: un `Classical.choice` EXPLICADO.** Está
 > localizado en **una línea** —el `if IsConsistent₀ (Sₙ ∪ {φₙ})` de `FOL.Lindenbaum0`, Π⁰₁— y es
 > exactamente el WKL. Ver §6.3.
+>
+> ⛔ **Rectificado el 2026‑09‑27 (ADR‑110)**: esa localización es FALSA en Lean. La etapa de
+> Lindenbaum se define sin decidir la condición (`Prop` es impredicativo) y `lindenbaum_lemma₀` y
+> `henkin_completion₀` son `[propext, Quot.sound]`; lo clásico de `completeness₀` está en el lema de
+> la verdad sobre un maximal ARBITRARIO y en su `byContradiction`
+> final. Vale para todas las frases de este plan que llaman «el WKL» a un `Classical.choice` (§0, §5.12,
+> §6.3, §6.5, §6.11, §7.3, §7.5): «el WKL» nombra la FUERZA de la completitud sobre RCA₀, no un
+> sitio del código. Ver la nota fechada de §6.3; no se reescribe nada de lo de abajo.
 >
 > # 🏁🏁🏁 **VÍA H CERRADA — 2026‑09‑17** (ADR‑050, ADR‑051, ADR‑052)
 >
@@ -966,6 +974,19 @@ aparece ya en tres módulos del ensamblaje por **tres causas distintas**:
 
 🔑 **Un `Classical.choice` explicado vale más que un `Classical.choice` escondido.**
 
+📝 **2026‑09‑27 · el `if` de `LindenbaumStep` ya no decide nada** (auditoría de constructividad de FOL,
+ADR‑110). La etapa es hoy IMPREDICATIVA: la condición `IsConsistent₀ (Sₙ ∪ {φₙ})` va DENTRO del
+predicado, como conjunción, sin decidirse (`Prop` es impredicativo; consistencia y maximalidad son
+negativas y basta `¬¬(C ∨ ¬C)`), y con `lindenbaum_limit_closed` **`lindenbaum_lemma₀` y
+`henkin_completion₀` son `[propext, Quot.sound]`**. ⇒ «Ahí cabe toda la no‑finitud» y la fila
+⛔ «SÍ. Es el WKL» de la tabla son FALSAS como localización: las tres causas eran de presentación, y hoy
+`Fresh0`, `Henkin0` y `HenkinLimit0` no llevan `Classical.choice`. Lo clásico de `completeness₀` está en
+el lema de la verdad sobre un maximal ARBITRARIO (`max_cons_*`) y
+en su `byContradiction` final (forma de Markov). La nota de reducción sigue valiendo como FUERZA
+—completitud ≡ WKL₀ sobre RCA₀, y WKL₀ Π⁰₂‑conservativo sobre PRA— porque en segundo orden la extensión
+maximal tiene que existir como conjunto; en CIC se define gratis. No se reescribe lo de arriba: el
+error es el hallazgo.
+
 ---
 
 ### 6.5 · 🏁 COMPACIDAD y LÖWENHEIM–SKOLEM DESCENDENTE — 2026‑09‑17, ADR‑054
@@ -1253,6 +1274,20 @@ núcleo.** `strCode` es computable y constructiva.
 ⬜ **Si se quisiera de verdad**: cambiar `Term.func : String → List Term → Term` por un tipo de
 símbolos **numerable y con `DecidableEq` real**. Limpiaría también las 6 de
 `FOL/Enumeration.lean`. **Es un cambio de firma en FOL y toca a RPP entero.**
+
+📝 **2026‑09‑27 · matiz medido** (auditoría de constructividad de FOL, ADR‑110): lo que trae
+`Classical.choice` en v4.31 no es «descomponer» un `String` sino **DECODIFICAR UTF‑8** —la raíz es una
+prueba de `BitVec`/`Nat` dentro de la prueba de validez del decodificador del núcleo
+(`String.toList` → … → `ByteArray.utf8DecodeChar?` → … → `Classical.propDecidable`)— y **el ORDEN de
+`String`** (`String.lt` está definido vía `toList`: `instOrd`, `compare`, `instLawfulEqOrd`…). La
+**capa de bytes está limpia**: `String.decEq`, `instLawfulBEqString` y `utf8ByteSize` no llevan ningún
+axioma; `append` y `exists_eq_ofList`, sólo `[propext]`. Con eso, `FOL/Enumeration.lean` y
+`FOL/Fresh0.lean` quedaron sin `Classical.choice` **sin cambiar la firma**: `natToString_surj` por
+`String.exists_eq_ofList`, `cst_zero_ne` por `of_decide_eq_false`, una cota por `utf8ByteSize`, y
+`Fresh0.unshift`, inversa computable de `shift` sobre bytes. ⚠️ Una trampa aparte:
+`not_eq_of_beq_eq_false` sobre `String` sintetiza `ReflBEq` por `String.instOrd` y trae choice sin
+descomponer nada. ⇒ La migración de §7.3 no hacía falta para esto. HIPÓTESIS, sin medir: el mismo
+recurso (codificar `s.toByteArray` en vez de `s.toList`) podría limpiar `strCode`/`strCodeM` de RPP.
 
 ---
 

@@ -46,7 +46,7 @@ FOL.BlockExtraction0.herbrand_extraction_block₀|Quot.sound,propext
 FOL.BlockExtraction0.instB_nil|-
 FOL.BlockExtraction0.lk0_herbrand_block|Quot.sound,propext
 FOL.Complexity.complexity_substFormula|propext
-FOL.Inconsistencia.derives0_no_disjunction_property|propext,Classical.choice,Quot.sound
+FOL.Inconsistencia.derives0_no_disjunction_property|Quot.sound,propext
 FOL.Inconsistencia.inconsistencia_de_cualquier_solidez|propext,FOL.MetaRules.raa
 FOL.Canonical0.max_cons_neg|propext,Classical.choice,Quot.sound
 FOL.Canonical0.max_cons_complete|propext,Classical.choice,Quot.sound
@@ -69,8 +69,8 @@ FOL.Hauptsatz0.eqPropCert_of_derives0|propext,Quot.sound
 FOL.Hauptsatz0.derives0_qf_iff|propext,Quot.sound
 FOL.Hauptsatz0.peval_true_eqInstance|-
 FOL.Compacity0.evalFormula_updateCsts|propext
-FOL.Compacity0.evalTerm_updateCsts|propext,Classical.choice,Quot.sound
-FOL.Compacity0.infTheory_finSat|propext,Classical.choice,Quot.sound
+FOL.Compacity0.evalTerm_updateCsts|Quot.sound,propext
+FOL.Compacity0.infTheory_finSat|Quot.sound,propext
 FOL.Compacity0.infinite_model_of_large_fresh|propext,Classical.choice,Quot.sound
 FOL.Compacity0.infinite_model_of_large|propext,Classical.choice,Quot.sound
 FOL.Compacity0.countable_infinite_of_infinite|propext,Classical.choice,Quot.sound
@@ -115,12 +115,12 @@ FOL.Finitary0.lk0_tval|Quot.sound,propext
 FOL.Finitary0.lkc_empty|Quot.sound,propext
 FOL.Finitary0.lkc_tval|Quot.sound,propext
 FOL.Finitary0.tval_eqInstance|-
-FOL.Fresh0.cst_bound_formula|Classical.choice,Quot.sound,propext
-FOL.Fresh0.cst_bound_sym|Classical.choice,Quot.sound,propext
-FOL.Fresh0.derivesSet0_shift_inv|Classical.choice,Quot.sound,propext
-FOL.Fresh0.exists_fresh|Classical.choice,Quot.sound,propext
-FOL.Fresh0.instFreshSymString|Classical.choice,Quot.sound,propext
-FOL.Fresh0.shiftTheory_consistent₀|Classical.choice,Quot.sound,propext
+FOL.Fresh0.cst_bound_formula|Quot.sound,propext
+FOL.Fresh0.cst_bound_sym|Quot.sound,propext
+FOL.Fresh0.derivesSet0_shift_inv|Quot.sound,propext
+FOL.Fresh0.exists_fresh|Quot.sound,propext
+FOL.Fresh0.instFreshSymString|Quot.sound,propext
+FOL.Fresh0.shiftTheory_consistent₀|Quot.sound,propext
 FOL.Hauptsatz0.cutElim_of|-
 FOL.Hauptsatz0.cutLeftAux|Quot.sound,propext
 FOL.Hauptsatz0.cutPrinAux|Quot.sound,propext
@@ -137,9 +137,9 @@ FOL.Hauptsatz0.lkh_mono|-
 FOL.Hauptsatz0.lkh_subst|Quot.sound,propext
 FOL.Hauptsatz0.lkh_to_lk0|-
 FOL.Hauptsatz0.substFormula_subst_le|Quot.sound,propext
-FOL.Henkin0.henkin_step_consistent₀|Classical.choice,Quot.sound,propext
-FOL.HenkinLimit0.henLimit_consistent₀|Classical.choice,Quot.sound,propext
-FOL.HenkinLimit0.henLimit_witness|Classical.choice,Quot.sound,propext
+FOL.Henkin0.henkin_step_consistent₀|Quot.sound,propext
+FOL.HenkinLimit0.henLimit_consistent₀|Quot.sound,propext
+FOL.HenkinLimit0.henLimit_witness|Quot.sound,propext
 FOL.HenkinLimit0.not_occurs_henkinAx|-
 FOL.Herbrand0.derives0_discharge|-
 FOL.Herbrand0.derives0_ex_of_cert|Quot.sound,propext
@@ -152,12 +152,12 @@ FOL.HerbrandBlock0.ex_bloque_igualdad|Quot.sound,propext
 FOL.HerbrandBlock0.subst_exBlock|Quot.sound,propext
 FOL.Lift0.derives0_ex_forall_neg_absurd|Quot.sound,propext
 FOL.Lift0.derives0_lift|Quot.sound,propext
-FOL.Lindenbaum0.henkin_completion₀|Classical.choice,Quot.sound,propext
-FOL.Lindenbaum0.lindenbaum_lemma₀|Classical.choice,Quot.sound,propext
+FOL.Lindenbaum0.henkin_completion₀|Quot.sound,propext
+FOL.Lindenbaum0.lindenbaum_lemma₀|Quot.sound,propext
 FOL.Metamath.Enumeration.instEnumSymListChar|Quot.sound,propext
-FOL.Metamath.Enumeration.instEnumSymString|Classical.choice,Quot.sound,propext
-FOL.Metamath.Enumeration.natToFormula_surj|Classical.choice,Quot.sound,propext
-FOL.Metamath.Enumeration.natToString_surj|Classical.choice,Quot.sound,propext
+FOL.Metamath.Enumeration.instEnumSymString|Quot.sound,propext
+FOL.Metamath.Enumeration.natToFormula_surj|Quot.sound,propext
+FOL.Metamath.Enumeration.natToString_surj|Quot.sound,propext
 FOL.Metamath.Semantics.contextSatisfies_lift_zero|Quot.sound,propext
 FOL.Metamath.Semantics.eval_liftFormula_ext|Quot.sound,propext
 FOL.Metamath.Semantics.eval_substFormula_ext|Quot.sound,propext
@@ -184,7 +184,7 @@ FOL.Propositional0.derives0_of_ptaut_ctx|Quot.sound,propext
 FOL.Propositional0.derives0_peirce_prop|Quot.sound,propext
 FOL.Propositional0.kalmar|propext
 FOL.Rename.derives0_rename|Quot.sound,propext
-FOL.Rename.derives0_rename_conservative|Classical.choice,Quot.sound,propext
+FOL.Rename.derives0_rename_conservative|Quot.sound,propext
 FOL.Rename.derives0_rename_iff|Quot.sound,propext
 FOL.Rename.derives0_rename_inv|Quot.sound,propext
 FOL.Rename.renameFormula|-
@@ -197,7 +197,7 @@ FOL.SequentSound0.lk0_not_empty|Classical.choice,Quot.sound,propext
 FOL.SequentSound0.lk0_to_derives0|Classical.choice,Quot.sound,propext
 FOL.SequentSound0.lkc_sound|Classical.choice,Quot.sound,propext
 FOL.Skolem0.evalFormula_updateFunc|-
-FOL.Skolem0.henkin_conservative₀|Classical.choice,Quot.sound,propext
+FOL.Skolem0.henkin_conservative₀|Quot.sound,propext
 FOL.Skolem0.skolem_conservative₀|Classical.choice,Quot.sound,propext
 FOL.SkolemHerbrand0.derives0_neg_allBlock_iff|Quot.sound,propext
 FOL.SkolemHerbrand0.herbrand_of_skolemNF₀|Quot.sound,propext
@@ -245,6 +245,10 @@ FOL.derive_eq_func_congr|Quot.sound,propext
 FOL.instFreshSymListChar|propext
 FOL.substTerm_liftTerm|Quot.sound,propext
 LK₀.rec|-
+TheoryFramework.Instances.fol0System|-
+TheoryFramework.Instances.fol0Sound|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0Complete|Classical.choice,Quot.sound,propext
+TheoryFramework.Instances.fol0_proves_iff_models|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
@@ -269,11 +273,11 @@ FOL.Finitary0.lk0_no_bot|Quot.sound,propext
 FOL.Finitary0.lkc_empty_of_no_bot|-
 FOL.Finitary0.lkc_no_bot|Quot.sound,propext
 FOL.Finitary0.lkc_not_empty_fin|Quot.sound,propext
-FOL.HenkinLimit0.hen_consistent|Classical.choice,Quot.sound,propext
+FOL.HenkinLimit0.hen_consistent|Quot.sound,propext
 FOL.Herbrand0.ex_tercio|Quot.sound,propext
 FOL.HerbrandBlock0.derives0_exBlock_of_disj|Quot.sound,propext
 FOL.HerbrandBlock0.derives0_exBlock_of_inst|Quot.sound,propext
-FOL.Lindenbaum0.derivesSet0_intro_impl|Classical.choice,Quot.sound,propext
+FOL.Lindenbaum0.derivesSet0_intro_impl|-
 FOL.Lindenbaum0.max_cons_contains|Classical.choice,Quot.sound,propext
 FOL.NDtoLK0.viaEqImpl|-
 FOL.Prenex0.and_ex|Quot.sound,propext
@@ -558,6 +562,8 @@ LEANFILE="$TMP/Footprints.lean"
 {
   echo "import ROBINSON_PlusPlus"
   echo "import FOL"
+  # TheoryFramework no la importa el barril FOL: su instancia sobre Derives₀ (2026-09-27) se mide aparte
+  echo "import TheoryFramework.Instances.FOL"
   while IFS='|' read -r NOMBRE _; do
     [ -n "$NOMBRE" ] || continue
     echo "#print axioms $NOMBRE"

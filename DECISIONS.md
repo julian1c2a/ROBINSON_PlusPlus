@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-109** (N1‑N4 de FOL resueltas: 13 renombres, dos duplicados retirados; los 10 congelables, sólo bloqueados). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-110** (la auditoría de constructividad de FOL y D1‑D8: `Classical.choice` 157 → 84 constantes; la LOCALIZACIÓN del WKL de ADR-040 §2 y ADR-041 §4, refutada; la instancia de `TheoryFramework` sobre `Derives₀`). Antes, ADR-109 (N1‑N4 de FOL resueltas: 13 renombres, dos duplicados retirados; los 10 congelables, sólo bloqueados). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -2935,6 +2935,12 @@ que es calco de lo que sobra de las 801 de `cuarentena/Completeness.lean`.
 
 ### 2 · ⛔ Y la decisión de fondo: **dónde se declara la no‑finitud**
 
+⛔⛔ **RECTIFICADA por ADR-110** (2026‑09‑27): la línea de abajo (el `if IsConsistent₀ …`) no era necesaria. La etapa se define hoy con la
+condición DENTRO del predicado, sin decidirla (`Prop` es impredicativo), y `lindenbaum_lemma₀` y
+`henkin_completion₀` son `[propext, Quot.sound]`: la no‑finitud **no** está aquí. Lo clásico de la
+completitud está en el lema de la verdad sobre un maximal arbitrario, en la semántica en `Prop` y en
+el `byContradiction` final (ADR-110 §2). Se conserva el texto porque el error es el hallazgo.
+
 Está en **una línea**, y va señalada en el docstring del módulo, en el de la `def` y aquí:
 
     if IsConsistent₀ (Sₙ ∪ {φₙ}) then … else …
@@ -3028,6 +3034,12 @@ tuvo que volver del sublenguaje. 🔑 *Pagar un axioma esconde también el traba
 evitaba.*
 
 ### 4 · ⛔ El entregable es un `Classical.choice` EXPLICADO
+
+⛔⛔ **RECTIFICADA por ADR-110** (2026‑09‑27) **la LOCALIZACIÓN**: el `Classical.choice` de
+`completeness₀` no es el `if` de `FOL.Lindenbaum0`, que hoy no decide nada (`lindenbaum_lemma₀` es
+`[propext, Quot.sound]`). Las tres viñetas sobre la FUERZA (≡ WKL₀ sobre RCA₀, Π⁰₂‑conservativo sobre
+PRA, no constructivo) siguen en pie; la «frase exacta» de abajo, no. Se conserva el texto porque el
+error es el hallazgo.
 
 Como el plan §6.3 dijo desde el principio. El `Classical.choice` de `completeness₀` es el
 `if IsConsistent₀ (Sₙ ∪ {φₙ})` de `FOL.Lindenbaum0`, que es **Π⁰₁**:
@@ -8077,3 +8089,136 @@ LOCK (no freeze) y N1 se hace descongelando lo necesario.
   de su cono; congelar cualquiera pide confirmación (y, para esos 7, refutar antes sus renombres).
 * Controles: 59 jobs; check-doc-sync, check-axioms, check-sorry verdes; check-footprints **513**;
   warnings 11.
+
+## ADR-110: La auditoría de constructividad de FOL y D1‑D8 — `Classical.choice` 157 → 84, y la LOCALIZACIÓN del WKL (ADR-040 §2, ADR-041 §4), refutada
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ HECHA · **Ámbito:** FOL (`aced2a1`, re-freeze `6dae532`: código de 11 módulos y
+`TheoryFramework/Instances/FOL.lean`; `Rename` descongelado y vuelto a congelar) y RPP
+(`check-footprints.bash`: 21 filas de FOL pierden `Classical.choice`, 4 filas nuevas de
+`TheoryFramework.Instances`, y el fichero de medida importa `TheoryFramework.Instances.FOL` ⇒ **517**).
+**Sustituye** la localización de ADR-040 §2 y ADR-041 §4, y anota el banner de la vía W, §6.3 y §7 de
+`doc/PLAN-COMPLETITUD-FINITISTA.md`.
+
+Artefactos, versionados en FOL: `../FOL/auditoria/constructividad-2026-09-27/` (metaprograma, datos
+antes y después, experimentos compilados, informes del juez y del escéptico; su `README.md` dice cómo
+relanzarlo). La clasificación vigente, en `../FOL/AXIOMS.md` §4.
+
+### 1 · La auditoría
+
+Sobre FOL `537cc20` y RPP `7487ca1`. `Audit.lean` recorre el entorno compilado y, para CADA constante
+de `FOL*` y `TheoryFramework*`, anota `collectAxioms`, si es `noncomputable` y las constantes que usa
+DIRECTAMENTE que también llevan `Classical.choice`; la **frontera** son las que usan directamente una
+constante EXTERNA con choice. Seis tareas de experimento (instancias de igualdad, `bnd` e `invOf`,
+`String`, varios, esencialidad, inventario), un juez, y un escéptico que recompiló los 42 experimentos
+y refutó 13 de 25 puntos con medida (entre ellos, que una inversa global de `shift` sin choice «no era
+viable»: lo es, sobre bytes). **Esencialidad**: el ENUNCIADO se toma como hipótesis y se deriva de él
+un principio clásico sobre un `P : Prop` arbitrario, sin `Classical.choice`; si compila, ninguna prueba
+de ese enunciado puede evitarlo.
+
+### 2 · ⛔ La tesis del WKL, REFUTADA como localización
+
+ADR-040 §2 («ahí cabe toda la no‑finitud del teorema de completitud») y ADR-041 §4 («el
+`Classical.choice` de `completeness₀` es el `if IsConsistent₀ (Sₙ ∪ {φₙ})` de `FOL.Lindenbaum0`»,
+«exactamente el WKL») son **falsos en Lean, y está medido**:
+
+* `Prop` es impredicativo: la etapa de Lindenbaum se define con la condición Π⁰₁ DENTRO del predicado,
+  como conjunción, sin decidirla; consistencia y maximalidad son negativas y basta `¬¬(C ∨ ¬C)`. Con
+  `lindenbaum_limit_closed` (el límite concreto está cerrado por derivación sin tercio excluso),
+  **`lindenbaum_lemma₀` y `henkin_completion₀` son `[propext, Quot.sound]`**, con los mismos enunciados.
+* El WKL es necesario en aritmética de segundo orden —completitud ⇔ WKL₀ sobre RCA₀ (Simpson, *SOSOA*
+  IV.3.3)— porque allí la extensión maximal tiene que existir como CONJUNTO definible. En CIC se
+  define gratis; lo clásico aparece al USARLA.
+* Lo clásico de la completitud, en Lean: el **lema de la verdad sobre un maximal ARBITRARIO**
+  (`max_cons_contains`, `max_cons_impl_iff`, `max_cons_or`, `max_cons_complete`, `max_cons_forall`: cada
+  enunciado implica `¬¬P → P`, medido), la **semántica de Tarski en `Prop`** (`derives0_soundness`
+  implica `¬¬P → P`; `lkc_sound`, `P ∨ ¬P`; medido) y el **`byContradiction` final** de `completeness₀`
+  (forma de Markov: HIPÓTESIS, por el argumento de Kreisel y Forster–Kirst–Wehr, no compilado). Aparte,
+  las **funciones de Skolem semánticas** (`skF`: la expansión de Skolem implica AC, y AC implica EM;
+  medido).
+* ADR-040 §2 separaba tres causas de `Classical.choice` en el ensamblaje (`Fresh0`, `HenkinLimit0`,
+  `Lindenbaum0`) y llamaba matemática sólo a la de `Lindenbaum0`: **las tres eran de presentación**. Hoy
+  `Fresh0`, `Henkin0` y `HenkinLimit0` no llevan ninguno, y en `Lindenbaum0` sólo quedan
+  `max_cons_contains` y `max_cons_impl`, que son del lema de la verdad.
+* **Regla de redacción** (D2, opción b): se CORRIGE toda afirmación de localización («el choice de X es
+  el WKL», «aquí está toda la no‑finitud», «el WKL de Lindenbaum»); «el WKL» puede quedar como apodo de
+  la FUERZA lógica («la completitud tiene la fuerza del WKL sobre RCA₀»). Las viñetas de ADR-041 §4
+  sobre la fuerza (WKL₀ Π⁰₂‑conservativo sobre PRA; WKL no constructivo) siguen en pie.
+
+### 3 · Las respuestas del propietario, y lo hecho
+
+«D1: elimina lo eliminable antes de congelar; D2: Ok; D3: se reprueban sin elección; D5: se hace antes
+de congelar `Skolem0`; D7: declara la instancia de `TheoryFramework`; D8: mañana le paso a PeanoRF la
+información que me des, o bien la escribes directamente en [su repositorio]; y sí, deja los
+artefactos‑auditoría guardados en el repo». D4 y D6 no se
+preguntaron: D4, fuera de alcance como recomendaba la auditoría; D6 entra con D1.
+
+* **D1**, con los mismos enunciados de los titulares:
+  - `Fresh0`: `cst_zero_ne`/`cst_ne_shift` por `of_decide_eq_false` (`String.decEq`, sin axiomas: la
+    síntesis de `ReflBEq String` para `not_eq_of_beq_eq_false` pasaba por `String.instOrd`, que
+    decodifica UTF‑8); `cst_bound_sym` por una cota `utf8ByteSize` en vez de tercio excluso; `unshift`,
+    inversa GLOBAL y COMPUTABLE de `shift`, sobre bytes (`valid_tail`, `shift_bytes`, `unshift_shift`).
+  - `Enumeration`: `natToString_surj` por `String.exists_eq_ofList`.
+  - `Henkin0`: `ctx_split` (partir un contexto finito sin decidir la igualdad: ningún axioma) y
+    `henkin_step_derives` (el paso de Henkin en positivo); fuera el `open Classical`.
+  - `Lindenbaum0`: la etapa impredicativa (deja de ser `noncomputable`), `lindenbaum_limit_consistent`,
+    `_max` y `_closed`; `derivesSet0_intro_impl` por `ctx_split`, sin ningún axioma.
+  - `HenkinLimit0`: `bnd` CALCULADA por recursión; `bnd`, `hidx` y `hen`, computables.
+  - `Canonical0`: el modelo canónico por `Quot.lift` sobre listas (`listQuot`); fuera `quotientOut` y
+    `quotientOut_eq`; `canonicalModel`, computable. ⚠️ La CONSTANTE `quotientOut`, con su especificación,
+    implica el tercio excluso (medido): lo evitable era su USO.
+  - 🧊↩️ `Rename`: **su primer `thaw --confirm`** desde el freeze de ADR-105, para retirar `invOf` e
+    `invOf_spec`: inversa LOCAL `locInv` sobre la lista finita de símbolos; `derives0_rename_conservative`
+    sin choice. Vuelve a congelarse en el mismo ciclo.
+  - `Compacity0`: `hasLargeModels_shift` con `Fresh0.unshift`.
+  - `Theorems/Eq` (D6): tres `simp` sin `Nat.left_eq_add`/`Nat.add_eq_left`, que en v4.31 llevan
+    choice ⇒ `FOL.Core` sin él salvo el código meta de `FOL.Tactics`. Ninguna fila de RPP cambia: los
+    titulares de RPP que alcanzan ese trío tienen otras fuentes (`strCodeM` → `String.toList`).
+* **D2**: las docstrings de FOL, `../FOL/AXIOMS.md` §4.5, esta ADR y las notas del PLAN (§6.3, §7, y
+  una nota fechada bajo su banner de la vía W). 🧊 Salvo `FOL/SequentSound0.lean`, CONGELADO: conserva
+  tres localizaciones del WKL, que se rectifican en su próximo `thaw` autorizado (`../FOL/AXIOMS.md` §4.5).
+* **D3 y D5**: `Skolem0.henkin_conservative₀` por la vía SINTÁCTICA (`henkin_step_derives`, `ctx_split`,
+  `dne_rule`) —es el caso Henkin de Skolem de D5— e `Inconsistencia.derives0_no_disjunction_property`
+  por la valuación booleana de `Finitary0`: los dos `[propext, Quot.sound]`. Los corolarios de ruta de
+  `Soundness0`/`SequentSound0` 🧊 y los controles `derives0_em`/`derives0_peirce` se conservan (ADR-061).
+* **D7**: `fol0System : LogicSystem Formula` sobre `Derives₀` (ningún axioma), `fol0Sound`,
+  `fol0Complete` y `fol0_proves_iff_models` (`[propext, Classical.choice, Quot.sound]`):
+  `proves_iff_models` se aplica por fin a FOL⁼. `Derives` sigue sin instancia (su solidez es falsa).
+  Salen las 2 DIFERIDA de `[G.2]` de FOL ⇒ 12 marcadores.
+* **D8**: sin plazo; la información para PeanoRF va en una carta que se deja en su repositorio.
+* Fuera de alcance, en `../FOL/NEXT-STEPS.md`: **D4** (variantes constructivas de lo irreducible:
+  `[DecidablePred S]`, semántica ¬¬ o de Kripke, modelos «explosivos» de Krivine) y la **vía sintáctica
+  general de Skolem** (Herbrand/ε).
+
+### 4 · Cifras (`decls.tsv`, antes → después)
+
+| medida | antes | después |
+|---|---:|---:|
+| constantes de FOL + TheoryFramework | 2978 | 3074 |
+| con `Classical.choice` | 157, en 17 módulos | **84**, en 11 (3 son código meta de `FOL.Tactics`) |
+| `noncomputable` | 8 | **1** (`SkolemN0.skF`) |
+| frontera: declaraciones lógicas por donde entra choice | 30 | **13** (más 3 meta) |
+| titulares de FOL con choice (252 filas) | 55 | **34** |
+| filas de `check-footprints.bash` | 513 | 517 |
+
+Los 34 son los 27 irreducibles de la auditoría (10 esenciales medidos, 3 por inclusión, `completeness₀`
+como hipótesis, 5 semánticos sin clasificar y 8 de enunciado sintáctico que sólo llevan choice por la
+ruta semántica) y 7 corolarios de ruta conservados a propósito (`derives0_em`, `derives0_peirce`,
+`derives0_consistent`, `derives0_not_complete`, `lk0_not_empty`, `lk0_to_derives0`, `lk0_to_derives2`).
+Los axiomas de FOL son los mismos cuatro de `MetaRules`; dentro de FOL sólo los usa
+`Inconsistencia.inconsistencia_de_cualquier_solidez` (`raa`).
+
+⭐ **La migración `String` → `List Char` (D7 del 2026-09-26, ADR-102) no hacía falta**: lo que trae
+`Classical.choice` en v4.31 es DECODIFICAR UTF‑8 —una prueba de `BitVec`/`Nat` dentro del
+decodificador del núcleo— y el ORDEN de `String`, definido vía `toList`; la capa de bytes
+(`String.decEq`, `utf8ByteSize`, `toByteArray`, `ofByteArray`) está limpia.
+
+### 5 · ⚠️ Lo que esta ADR no dice
+
+* ⛔ No hace constructiva la completitud: lo que queda es esencial para los ENUNCIADOS tal como están
+  (un maximal arbitrario, la semántica en `Prop`).
+* ⚠️ No congela nada: los 17 candidatos de FOL siguen sólo bloqueados, y los veredictos de las cribas
+  son de antes de estos cambios de código.
+* ⚠️ Lo medido es 84, no los 65–66 que proyectaban el juez y el escéptico: la proyección reprobaba
+  también los corolarios de ruta (conservados, D3) y no contaba los lemas nuevos del cociente por
+  listas (heredan el choice de `max_cons_contains` por `termSetoid`) ni la instancia.
+* Controles: build y `check-*` verdes en FOL y RPP; check-footprints **517**, todas cuadran.
