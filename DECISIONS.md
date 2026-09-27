@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-104** (`Prf` sin subíndice; la documentación de FOL al día; la criba de congelación con refutación). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-105** (los cinco primeros módulos de FOL congelados; P2 y P3). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7951,3 +7951,20 @@ decisiones del propietario — **P2** los titulares de la capa `₀` sin subínd
 `herbrand`, `craig`, `maehara`, `truth_lemma`, `lindenbaum_lemma`, `skolem_conservative*`…) frente a
 la regla 3 de §9; **P3** los cinco `sub_*` duplicados literalmente en `Hauptsatz0` y `Craig0`; **P4** la
 OFERTA de `Hauptsatz0` (la versión acotada de `derives0_qf_iff`).
+
+## ADR-105: 🧊 los cinco primeros módulos de FOL CONGELADOS; P2 (18 renombres) y P3 (los `sub_*`)
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ EJECUTADO; ⬜ P4 en cotización · **Ámbito:** FOL. RPP: 18 filas de `check-footprints.bash` renombradas.
+
+* 🧊 **FREEZE** de `PrenexNF0`, `Prenex0`, `SequentSound0`, `Soundness0` y `Rename` (FOL `bad1227`),
+  confirmado por el propietario tras la criba con refutación de ADR‑104. Medido antes: ninguno usa los
+  nombres que P2 iba a cambiar ni los lemas que P3 iba a mover.
+* 🏷️ **P2 — decisión del propietario: RENOMBRAR** (no escribir una excepción). Regla 3 de
+  `FOL/NAMING-CONVENTIONS.md` §9, ahora explícita: **los titulares llevan siempre la marca**; los
+  auxiliares pueden ir sin ella. 15 titulares de `⊢₀`/`LK₀` pasan a `…₀` (`hauptsatz₀`,
+  `cut_elimination₀`, `herbrand₀`, `truth_lemma₀`, `lindenbaum_lemma₀`, `skolem_conservative_nf₀`…) y
+  los tres de `LKp` estrenan marca propia, **`ₚ`** (`maeharaₚ`, `craigₚ`, `craig_implₚ`), que distingue
+  el Craig del fragmento puro del `craig₀` con igualdad.
+* ♻️ **P3 — deduplicar**: los cinco `sub_*` viven en `FOL.Sequent0`, que importan `Hauptsatz0` y `Craig0`.
+* ⬜ **P4**: el propietario pregunta el coste de la versión ACOTADA de `derives0_qf_iff` (la OFERTA de
+  `Hauptsatz0`). Cotización con dos rutas y un juez, en curso.
