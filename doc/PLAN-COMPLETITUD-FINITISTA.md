@@ -244,7 +244,8 @@ del footprint: legítimo y esperado, la semántica es clásica.
 
 > ⚠️ *Anotado el 2026‑09‑27* (ADR‑105, P2 de FOL): los titulares de la capa ₀ llevan hoy el
 > subíndice de su cálculo — `hauptsatz₀`, `cut_elimination₀`, `herbrand₀`, `herbrand_extraction₀`,
-> `herbrand_block₀`, `truth_lemma₀`, `skolem_conservative₀`… (`FOL/NAMING-CONVENTIONS.md` §9). Este
+> `herbrand_block₀`, `truth_lemma₀`, `skolem_conservative₀`…; y, por N1 (ADR‑109), las definiciones
+> `CutAdm₀`, `CutElim₀`, `NDtoLK₀`, `HerbrandExtraction₀`, `ImpAll₀`… (`FOL/NAMING-CONVENTIONS.md` §9). Este
 > plan, aquí y en §6‑§8, conserva los nombres de cuando se escribió.
 
 ### 5.1 · El enunciado, y cuál es el que importa

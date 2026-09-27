@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-108** (la segunda criba de congelación de FOL: 10 congelables propuestos, decisiones N1‑N4). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-109** (N1‑N4 de FOL resueltas: 13 renombres, dos duplicados retirados; los 10 congelables, sólo bloqueados). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -8051,3 +8051,29 @@ ediciones). El escéptico del veredicto refutó 26 de 27 puntos (casi todos arre
   Recomendado: deduplicar en `SkolemNF0`. **N4** (`Inconsistencia`, retenida además por X1):
   `Mfalse`/`Mtrue`/`P` repiten las de `Soundness0`; se contesta con la entrega de PeanoRF.
 * Artefactos: `artefactos-criba2/` en la carpeta de la sesión de FOL (lentes, juez, escépticos).
+
+## ADR-109: N1‑N4 de FOL resueltas — 13 renombres, dos duplicados retirados; los 10 congelables, sólo bloqueados
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ HECHA · **Ámbito:** FOL (`ca83ec8`, re-freeze/re-lock `537cc20`)
+y RPP (`check-footprints.bash`, 2 filas renombradas).
+
+Respuestas del propietario a ADR-108: «N1: renombre; N2: son titulares; N3: si está duplicado, se
+retira; N4: la solución que decidas es buena; bloquea los 10 módulos» — y, preguntado, «bloquear» es
+LOCK (no freeze) y N1 se hace descongelando lo necesario.
+
+* 🏷️ **N1**: `CutAdm₀`, `CutAt₀`, `CutBelow₀`, `LeftPrin₀` (`Hauptsatz0`), `CutElim₀`, `NDtoLK₀`
+  (`Sequent0`), `HerbrandExtraction₀` (`Herbrand0`), `HerbrandExtractionBlock₀` (`HerbrandBlock0`),
+  `ImpAll₀`, `IffAll₀` (`PrenexNF0`), `PwEq₂` (`Derives2`: su cálculo es `⊢₂`). La regla 1 de NAMING §9
+  queda SIN excepción. `NDtoLK₀` (de `⊢₂` a `LKc`) lleva `₀`, como la familia clásica y su módulo.
+* 🧊↩️ **`thaw --confirm`** de `PrenexNF0` (define `ImpAll`/`IffAll`) y
+  `SequentSound0` (cita `CutElim` en su prosa), autorizados por el propietario; vueltos a congelar en
+  el mismo ciclo. MEDIDO: su diff se deshace entero con el renombre inverso (sólo cambian los nombres).
+* 🏷️ **N2**: `henLimit_consistent₀`, `shiftTheory_consistent₀` (titulares: piezas con nombre del
+  ensamblaje de la completitud, como `henkin_step_consistent₀`); sus 2 filas aquí, renombradas.
+* ✂️ **N3**: `SkolemNF0` usa `FOL.Sequent0.quantFree_subst` (importa `FOL.Sequent0`; 99 aristas).
+  **N4** (a criterio, por la política de P3/N3): `Inconsistencia` usa `Mfalse`/`Mtrue`/`P` de
+  `Soundness0`.
+* 🔒 Los 10 congelables de ADR-108 quedan **bloqueados, no congelados**. Los 7 retenidos por N1‑N3 salen
+  de su cono; congelar cualquiera pide confirmación (y, para esos 7, refutar antes sus renombres).
+* Controles: 59 jobs; check-doc-sync, check-axioms, check-sorry verdes; check-footprints **513**;
+  warnings 11.

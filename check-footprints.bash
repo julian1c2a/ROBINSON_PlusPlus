@@ -120,7 +120,7 @@ FOL.Fresh0.cst_bound_sym|Classical.choice,Quot.sound,propext
 FOL.Fresh0.derivesSet0_shift_inv|Classical.choice,Quot.sound,propext
 FOL.Fresh0.exists_fresh|Classical.choice,Quot.sound,propext
 FOL.Fresh0.instFreshSymString|Classical.choice,Quot.sound,propext
-FOL.Fresh0.shiftTheory_consistent|Classical.choice,Quot.sound,propext
+FOL.Fresh0.shiftTheory_consistent₀|Classical.choice,Quot.sound,propext
 FOL.Hauptsatz0.cutElim_of|-
 FOL.Hauptsatz0.cutLeftAux|Quot.sound,propext
 FOL.Hauptsatz0.cutPrinAux|Quot.sound,propext
@@ -138,7 +138,7 @@ FOL.Hauptsatz0.lkh_subst|Quot.sound,propext
 FOL.Hauptsatz0.lkh_to_lk0|-
 FOL.Hauptsatz0.substFormula_subst_le|Quot.sound,propext
 FOL.Henkin0.henkin_step_consistent₀|Classical.choice,Quot.sound,propext
-FOL.HenkinLimit0.henLimit_consistent|Classical.choice,Quot.sound,propext
+FOL.HenkinLimit0.henLimit_consistent₀|Classical.choice,Quot.sound,propext
 FOL.HenkinLimit0.henLimit_witness|Classical.choice,Quot.sound,propext
 FOL.HenkinLimit0.not_occurs_henkinAx|-
 FOL.Herbrand0.derives0_discharge|-
