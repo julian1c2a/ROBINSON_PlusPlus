@@ -217,6 +217,15 @@ FOL.Interpolation0.craig_ctx₀|propext,Quot.sound
 FOL.Interpolation0.craig₀|propext,Quot.sound
 FOL.Interpolation0.craig_impl₀|propext,Quot.sound
 FOL.Interpolation0.craig₀_example|propext,Quot.sound
+FOL.QFDecide0.instsOf_eqInstance|propext,Quot.sound
+FOL.QFDecide0.ext_eqInstance|propext
+FOL.QFDecide0.evI_S|propext,Quot.sound
+FOL.QFDecide0.ext_agree|propext,Quot.sound
+FOL.QFDecide0.eqPropCert_prune|propext,Quot.sound
+FOL.QFDecide0.qfCheck_iff|propext
+FOL.QFDecide0.derives0_qf_iff_bounded|propext,Quot.sound
+FOL.QFDecide0.derives0_qf_iff_sub|propext,Quot.sound
+FOL.QFDecide0.decideDerives0QF|propext,Quot.sound
 FOL.SkolemN0.evalTerms_vars|Quot.sound,propext
 FOL.SkolemN0.eval_allBlock_envPush|Quot.sound,propext
 FOL.SkolemN0.eval_skolemAxN|Classical.choice,Quot.sound,propext

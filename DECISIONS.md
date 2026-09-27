@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-106** (P4 cotizada: la versión acotada de `derives0_qf_iff`). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-107** (P4 hecha: `FOL/QFDecide0.lean`, el fragmento sin cuantificadores acotado y decidido). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7991,3 +7991,27 @@ Borradores: `C:\Users\julia\.claude\projects\e--dropbox-github-lean4-FOL\dc39082
   otra propuesta, sin medir.
 * 🔧 Hecho ya, se acepte o no: la docstring de `derives0_qf_iff` proponía la cota FALSA; corregida
   (FOL `e6a6954`). La OFERTA sigue abierta en `[G.2]`.
+
+## ADR-107: P4 hecha — `FOL/QFDecide0.lean`: el fragmento sin cuantificadores de `Derives₀`, ACOTADO y DECIDIDO
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ HECHA · **Ámbito:** FOL (`9fcf14c`, lock `7da7885`).
+
+Decisión del propietario sobre ADR-106: «Hacemos la versión acotada». Módulo hoja nuevo
+`FOL/QFDecide0.lean` (884 líneas, importa `FOL.Hauptsatz0` **sin reabrirlo**; FOL pasa a **55 módulos**,
+59 jobs), portado del borrador semántico de ADR-106; compiló en el árbol a la primera.
+
+* ✅ `derives0_qf_iff_bounded`: para `Γ`, `φ` sin cuantificadores,
+  `(Γ ⊢₀ φ) ↔ EqPropCert Γ φ (qfInst Γ φ)` — UNA lista finita de instancias de igualdad, FIJA y
+  calculable (`qfInst` = instancias sobre el cierre de subtérminos por mezclas de prefijo).
+* ✅ `decideDerives0QF : Decidable (Γ ⊢₀ φ)` — `def`, no `instance` (FOL no es decidible), con la
+  corrección demostrada por `qfCheck_iff` y `eqPropCert_iff_ptaut`. Controles compilados: `decide`
+  resuelve `[a≐b] ⟹ b≐a` (sí) y `[] ⟹ a≐b` (no), y `¬ ([] ⊢₀ a≐b)` sale por `of_decide_eq_false`.
+* ⛔ Queda compilado, como control, el contraejemplo a la cota INGENUA por subtérminos (ADR-106).
+* Footprints: `derives0_qf_iff_bounded`, `decideDerives0QF`, `eqPropCert_prune`, … = `[propext, Quot.sound]`;
+  `ext_eqInstance`, `qfCheck_iff` = `[propext]`. 9 filas nuevas ⇒ check-footprints **513**.
+* `[G.2]`: sale la OFERTA de `Hauptsatz0` ⇒ **14** marcadores, 0 ⬜ en `Hauptsatz0`. Las docstrings de
+  `derives0_qf_iff` y de `instDecidablePTaut` (`Herbrand0`) apuntan ya a `FOL.QFDecide0`.
+* ⚠️ Sigue siendo un decisor de JUGUETE (2^átomos, ADR-106). Uno práctico (cierre de congruencia con
+  certificado) queda FUERA de alcance en `FOL/NEXT-STEPS.md`, sin medir.
+* Consecuencia para la criba: `Hauptsatz0` ya no la retiene ninguna OFERTA; re-correrla con
+  refutación antes de congelar nada más.
