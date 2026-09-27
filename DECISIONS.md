@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-110** (la auditoría de constructividad de FOL y D1‑D8: `Classical.choice` 157 → 84 constantes; la LOCALIZACIÓN del WKL de ADR-040 §2 y ADR-041 §4, refutada; la instancia de `TheoryFramework` sobre `Derives₀`). Antes, ADR-109 (N1‑N4 de FOL resueltas: 13 renombres, dos duplicados retirados; los 10 congelables, sólo bloqueados). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-111** (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -8222,3 +8222,34 @@ decodificador del núcleo— y el ORDEN de `String`, definido vía `toList`; la 
   también los corolarios de ruta (conservados, D3) y no contaba los lemas nuevos del cociente por
   listas (heredan el choice de `max_cons_contains` por `termSetoid`) ni la instancia.
 * Controles: build y `check-*` verdes en FOL y RPP; check-footprints **517**, todas cuadran.
+
+## ADR-111: La tercera criba de congelación de FOL, tras D1‑D8 — 10 congelables propuestos; N6 aplicada; N5 y N7 al propietario
+
+**Fecha:** 2026-09-27 · **Estado:** ✅ criba hecha; ⬜ freeze, N5 y N7, del propietario · **Ámbito:** FOL
+(`c1c8d0b`, re-lock `86d5208`).
+
+Sobre los 19 no congelados que deja pasar `criba-congelacion.py` (los 17 de ADR-108/109, `Inconsistencia`
+y `TheoryFramework/Instances/FOL.lean`, que desde D7 tiene sus `#print` y sus 4 filas): cuatro lentes de
+verdad, nomenclatura, consumidores, un juez y dos escépticos. Los veredictos de ADR-108 ya no valían:
+D1 cambió el código de siete candidatos y D2 la documentación de casi todos.
+
+* ✏️ **31 correcciones** de comentarios y docstrings (código idéntico, `[G.2]` intacto), entre ellas:
+  resúmenes de footprint que decían «en todo» donde hay constantes con menos axiomas; `Fresh0.exists_fresh`,
+  que la iteración de `HenkinLimit0` nunca usó (`git log -S`); el presente de `Hauptsatz0` §4; y
+  `TheoryFramework/Logic`/`MetaTheorems`, desfasados desde D7.
+* ✂️ **N6**, aplicada por la política de P3/N3/N4: `Lindenbaum0.not_not_em` repetía nombre y enunciado
+  del `not_not_em` del núcleo (`Init.PropLemmas`) y creaba ambigüedad bajo `open FOL.Lindenbaum0`.
+* ❄️ **Congelables**, ⬜ confirmación del propietario: ya, `Compacity0`, `Inversion0`, `QFDecide0`,
+  `SkolemN0`; con sus correcciones (aplicadas), `Craig0` e `Interpolation0` (juntos), `Canonical0`,
+  `Fresh0`, `HenkinLimit0`, `TheoryFramework/Instances/FOL`.
+* ⬜ **N5**: ¿titulares (→ marca) o auxiliares los nombres técnicos que dependen de un cálculo, no llevan
+  marca y la cabecera de su módulo nombra como piezas? (a) `henkin_step_derives`; (b)
+  `lindenbaum_limit_consistent/_max/_closed`; (c) `skolemizeF_impAll`; (d) `cutElim_of`, `cutPrinAux`,
+  `cutLeftAux`, `leftPrin_mono`, `leftPrin_lift`, `herbrand_block_iff`. Retiene `Henkin0`, `Skolem0`,
+  `Lindenbaum0`, `SkolemNF0`, `Hauptsatz0`, `HerbrandBlock0`, `BlockExtraction0`. ⚠️ «Titular = lo que
+  tiene fila» no sirve: 217 de las 256 filas de FOL no llevan marca ni prefijo de cálculo.
+* ⬜ **N7**: `SkolemHerbrand0.herbrand_of_skolemNF₀` no ata `ψ` a la matriz y su `↔` lo cumple cualquier
+  `P : Prop` (medido); (A) decirlo en la docstring o (B) reforzar el enunciado con la ecuación de §3
+  (medido: misma prueba, `[propext, Quot.sound]`, sin consumidores).
+* `Inconsistencia`, retenida por X1.
+* Artefactos: `artefactos-criba3/` en la carpeta de la sesión de FOL.
