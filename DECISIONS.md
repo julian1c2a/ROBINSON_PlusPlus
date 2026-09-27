@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-105** (los cinco primeros módulos de FOL congelados; P2 y P3). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
+**Last updated:** 2026-09-27 — hasta **ADR-106** (P4 cotizada: la versión acotada de `derives0_qf_iff`). ⚠️ Este fichero **no tenía** marca de tiempo y por eso el control `[E]` no podía comprobarlo (ADR-072 §2). Se añade aquí, y se actualiza **con cada ADR nueva**.
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -7968,3 +7968,26 @@ OFERTA de `Hauptsatz0` (la versión acotada de `derives0_qf_iff`).
 * ♻️ **P3 — deduplicar**: los cinco `sub_*` viven en `FOL.Sequent0`, que importan `Hauptsatz0` y `Craig0`.
 * ⬜ **P4**: el propietario pregunta el coste de la versión ACOTADA de `derives0_qf_iff` (la OFERTA de
   `Hauptsatz0`). Cotización con dos rutas y un juez, en curso.
+
+## ADR-106: P4 cotizada — la versión ACOTADA de `derives0_qf_iff`, y el decisor del fragmento sin cuantificadores
+
+**Fecha:** 2026-09-27 · **Estado:** 📐 COTIZADA; ⬜ decisión del propietario · **Ámbito:** FOL.
+
+Dos cotizaciones independientes y un juez; las dos rutas llegaron a la MISMA construcción y los dos
+borradores **compilan en aislado** (lean v4.31 a pelo, sin `lake`), con `[propext, Quot.sound]`.
+Borradores: `C:\Users\julia\.claude\projects\e--dropbox-github-lean4-FOL\dc390825-…\artefactos-qf\`.
+
+* ⛔ **El enunciado tal como se ofrecía es FALSO**: con `S` = subtérminos no basta, porque
+  `EqInstance.func` cambia UN argumento — `[a≐b, c≐d] ⟹ g(a,c) ≐ g(b,d)` es derivable y necesita
+  `g(b,c)`. Refutado y compilado en tres lecturas. **Filtrar** `E` tampoco sirve (otro contraejemplo).
+* ✅ **Lo cierto**: cerrar `S` por las «mezclas de prefijo» (`|T| ≤ |S| + (k+1)|S|²`) y SUSTITUIR `E` por
+  todas las instancias sobre `T`: `(Γ ⊢₀ φ) ↔ EqPropCert Γ φ (qfInst Γ φ)`, con UNA `E` fija. La poda
+  (`eqPropCert_prune`) extiende la valuación con un núcleo de congruencia composicional; no pide el
+  Hauptsatz. Y un decisor (`def`, no `instance`: FOL no es decidible), constructivo y calculable.
+* 📏 **Coste**: ~1000 líneas tocadas (horquilla 720–1150), de las que ~600–800 son código ya compilado;
+  el resto, portado y prosa. Un módulo hoja nuevo que importa `Hauptsatz0`, **sin reabrirlo**.
+* ⚠️ **El decisor es de juguete**: 2^(átomos distintos) — 2^4 al instante, 2^16 en ~2 min, 2^112 para
+  `g(a,c)≐g(b,d)`. Un decisor usable (saturación Horn / cierre de congruencia con certificado) sería
+  otra propuesta, sin medir.
+* 🔧 Hecho ya, se acepte o no: la docstring de `derives0_qf_iff` proponía la cota FALSA; corregida
+  (FOL `e6a6954`). La OFERTA sigue abierta en `[G.2]`.
