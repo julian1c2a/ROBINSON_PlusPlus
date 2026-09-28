@@ -23,6 +23,10 @@ import ROBINSON_PlusPlus.Meta
 demuestra con ejemplos: con las MISMAS hipótesis salen `Prf godelCN` y `Prf consistencyFormula'`.
 D1, D3 y `pcc_lineWF_tracked` bajo `[AnclaEq]` no dicen nada que `efq` no diga ya.
 
+**ADR‑113** (`cons a b = σ (pair a b)`, rama `claude/project-thread-bgzgkr`, `ae528f8`): este
+mismo fichero, sin cambios, recompila allí con el mismo resultado y el mismo footprint (medido el
+2026‑09‑28). ADR‑113 no toca ni los dos axiomas ni `ax_L2`, y `prf_cantor_mono_right` sigue en pie.
+
 ## Cómo (la prueba es sintáctica: no hace falta ningún modelo)
 
 1. **Medido** (§2, `filtro_occ`, por el núcleo): de los 141 axiomas sólo DOS nombran `axiomsCodeT`
