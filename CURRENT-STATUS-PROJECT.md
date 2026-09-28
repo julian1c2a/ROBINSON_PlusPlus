@@ -302,7 +302,7 @@
 | `Meta/NatOrderPrf.lean` | 0 | ✅ Orden `≤` en `Prf`: transitividades, sustitución, `prf_add_assoc`/`prf_add_comm`. ⚠️ Asoc./conm. de `+` son **axiomas objeto** (ax6/ax7), no se prueban por inducción |
 | `Meta/NatMulPrf.lean` | 0 | ✅ Producto en `Prf` (leyes = ax8–ax12), monotonía, **cancelación** `prf_lt_of_mul_lt_mul_right`, tricotomía, `div2`/`mod2` (ax17/ax21) |
 | `Meta/CantorMonoPrf.lean` | 0 | ✅ **`prf_cantor_mono_left/right`** — sub‑código < código, en 13 pasos troceados. Aquí vive `abbrev cpOf` |
-| `Meta/Div2ParityPrf.lean` | 0 | ✅ **`prf_div2_numeral`** (cadena L1–L5, forma OBJETO, net‑0) + **paridad de Cantor**: `prf_mod2_consec`, `prf_mod2_cpOf`, **`prf_cons_double`** (el puente de la fase C de `pcc_dot_cons`) |
+| `Meta/Div2ParityPrf.lean` | 0 | ✅ **`prf_div2_numeral`** (cadena L1–L5, forma OBJETO, net‑0) + **paridad de Cantor**: `prf_mod2_consec`, `prf_mod2_cpOf`, **`prf_pair_double`** (el puente de la fase C de `pcc_dot_cons`; `prf_cons_double`, retirado por ADR-113) |
 | `Meta/CodeNumeralPrf.lean` | 0 | ✅ **LA REPARACIÓN**: `triN`/`consN` (números triangulares ⇒ **sin división**), `codeNat`, **`prf_formCode_numeral`** por meta‑recursión |
 | `Meta/DiagonalNumeral.lean` | 0 | ✅ Lema diagonal por la **vía NUMERAL**: `hFN`, `godelCN`, `godelCN_fixedpoint`, `provCode_transfer`, **`goedel_first_numeral`** (Gödel I), `goedel_first_undecidable_numeral` |
 | `Meta/StrongInductionPrf.lean` | 0 | ✅ `prf_strong_induction` (inducción fuerte en `Prf`) + `prf_le_of_lt_succ` |
@@ -325,7 +325,7 @@
   ecuaciones recursivas propias (`ax_L0_cons_def` lo define por `div2 (cantor_poly h (σt))`), así que
   fue **ensamblaje** en tres fases — (A) la instancia codificada **computa por `rfl`**, (B) el
   polinomio se evalúa dentro de `Prov` en 5 pasos, (C) el `div2` se cancela vía `pcc_thm_inst` con
-  `prf_cons_double` de puente. Dos herramientas reutilizables: `pcc_rw` y `pcc_rw_div2`.
+  `prf_cons_double` de puente (retirado por ADR-113: hoy `prf_pair_double`). Dos herramientas reutilizables: `pcc_rw` y `pcc_rw_div2`.
   **Rédito verificado** (`sondeos/CarcPayoff.lean`): `pcc_eval_carc` vuelve con el mismo enunciado y
   footprint, sustituyendo `prf_tc_cons'` por un único `pcc_rw`. Build **97 jobs**.
   *Las dos lecciones:* (1) todo teorema **OBJETO** se «dota» gratis con `prf_congr_tcFn`, sin entrar

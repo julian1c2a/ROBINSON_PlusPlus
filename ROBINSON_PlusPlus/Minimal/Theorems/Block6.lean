@@ -38,102 +38,55 @@ def Γ := axioms
 -/
 
 -- Teo L1: ∀ h,t, Cons(h,t) ≠ Nil
--- Estrategia: cons h t = pair h (succ t) [ax_L0]. Si esto = nil = zero, entonces
--- pair h (succ t) = 0, luego mul two (pair h (succ t)) = mul two zero = zero. Por
--- `is_cantor_pair`, cantor_poly h (succ t) = 0. Por teo_2_9 (add a b = 0 → a=0 ∧ b=0),
--- mul two (succ t) = 0. Pero mul two (succ t) = succ(succ(mul two t)) ≠ 0 por ax2.
+-- Estrategia: cons h t = σ(pair h t) [ax_L0]. Si esto = nil = zero, entonces
+-- σ(pair h t) = 0, que contradice ax2.
 theorem cons_neq_nil (h t : Term) : Γ ⊢ neg (cons h t =eq nil) := by
   have h_ax2 := ax (by simp [axioms] : ax2_peano_succ_neq_zero ∈ axioms)
-  have h_ax5 := ax (by simp [axioms] : ax5_add_succ ∈ axioms)
-  have h_ax9 := ax (by simp [axioms] : ax9_mul_succ ∈ axioms)
   have h_axL0 := ax (by simp [axioms] : ax_L0_cons_def ∈ axioms)
   apply raa; intro h_eq
-  -- cons h t =eq pair h (succ t)  [ax_L0 spec]  -- sin ascripción: deja inferencia
-  have h_cons_pair := by
+  -- cons h t =eq σ(pair h t)  [ax_L0 spec]
+  have h_cons_pair : Γ ⊢ (cons h t =eq succ (pair h t)) := by
     have hh := spec (spec h_axL0 h) t
     simp [substFormula, substTerm, substTerms, cons, pair, cantor_func, div2,
           cantor_poly, mul, add, succ, two, one, zero,
           FOL.substTerm_liftTerm] at hh
     exact hh
-  -- pair h (succ t) =eq zero
-  have h_pair_zero := FOL.derive_eq_trans (eq_symm h_cons_pair) h_eq
-  -- mul two (pair h (succ t)) =eq mul two zero
-  have h_two_pair := eq_congr_mul_left (u := two) h_pair_zero
-  -- mul two zero =eq zero  (teo_2_3 spec)
-  have h_mul_two_zero : Γ ⊢ (mul two zero =eq zero) := by
-    have hh := spec teo_2_3 two
-    simp [substFormula, substTerm, substTerms, mul, zero] at hh
+  -- σ(pair h t) =eq zero
+  have h_succ_zero : Γ ⊢ (succ (pair h t) =eq zero) :=
+    FOL.derive_eq_trans (eq_symm h_cons_pair) h_eq
+  have h_neq : Γ ⊢ neg (succ (pair h t) =eq zero) := by
+    have hh := spec h_ax2 (pair h t)
+    simp [substFormula, substTerm, substTerms, succ, zero, pair, cantor_func, div2,
+          cantor_poly, mul, add, two, one, FOL.substTerm_liftTerm] at hh
     exact hh
-  -- cantor_poly h (succ t) =eq zero, vía is_cantor_pair
-  have h_isc := is_cantor_pair h (succ t)
-  have h_cp_zero : Γ ⊢ (cantor_poly h (succ t) =eq zero) :=
-    FOL.derive_eq_trans (eq_symm h_isc) (FOL.derive_eq_trans h_two_pair h_mul_two_zero)
-  -- teo_2_9: add a b = 0 ⇒ a=0 ∧ b=0; cantor_poly = add ... (mul two (succ t))
-  have h_t29 := by
-    have hh := spec (spec teo_2_9 (mul (add h (succ t)) (succ (add h (succ t))))) (mul two (succ t))
-    simp [substFormula, substTerm, substTerms, add, mul, succ, zero,
-          liftTerm, liftTerms, FOL.substTerm_liftTerm] at hh
-    exact hh
-  have h_split := mp h_t29 h_cp_zero
-  have h_2st_zero : Γ ⊢ (mul two (succ t) =eq zero) := Axioms.and_elim_right h_split
-  -- mul two (succ t) =eq add (mul two t) two  [ax9]
-  have h9 : Γ ⊢ (mul two (succ t) =eq add (mul two t) two) := by
-    have hh := spec (spec h_ax9 two) t
-    simp [substFormula, substTerm, substTerms, mul, add, succ,
-          FOL.substTerm_liftTerm] at hh
-    exact hh
-  -- add x two = succ(succ x): ax5(x,succ zero) + ax5(x,zero) + ax4
-  have h_add_two_eq_succsucc : Γ ⊢ (add (mul two t) two =eq succ (succ (mul two t))) := by
-    have h_a := spec (spec h_ax5 (mul two t)) one
-    simp [substFormula, substTerm, substTerms, add, succ,
-          FOL.substTerm_liftTerm] at h_a
-    have h_b := spec (spec h_ax5 (mul two t)) zero
-    simp [substFormula, substTerm, substTerms, add, succ,
-          FOL.substTerm_liftTerm] at h_b
-    have h_ax4 := ax (by simp [axioms] : ax4_add_zero ∈ axioms)
-    have h_c := spec h_ax4 (mul two t)
-    simp [substFormula, substTerm, substTerms, add, zero] at h_c
-    exact FOL.derive_eq_trans h_a
-      (eq_congr_succ (FOL.derive_eq_trans h_b (eq_congr_succ h_c)))
-  have h_2st_succsucc : Γ ⊢ (mul two (succ t) =eq succ (succ (mul two t))) :=
-    FOL.derive_eq_trans h9 h_add_two_eq_succsucc
-  have h_succsucc_zero : Γ ⊢ (succ (succ (mul two t)) =eq zero) :=
-    FOL.derive_eq_trans (eq_symm h_2st_succsucc) h_2st_zero
-  have h_neq : Γ ⊢ neg (succ (succ (mul two t)) =eq zero) := by
-    have hh := spec h_ax2 (succ (mul two t))
-    simp [succ, zero] at hh
-    exact hh
-  exact mp h_neq h_succsucc_zero
+  exact mp h_neq h_succ_zero
 
 -- Teo L2: Cons(h,t) = Cons(h',t') ⇒ h = h' ∧ t = t'
--- Vía ax_L0 (cons = pair h (succ t)) + pair_inj + ax3 (succ inyectivo).
+-- Vía ax_L0 (cons = σ(pair h t)) + ax3 (succ inyectivo) + pair_inj.
 theorem cons_inj {h t h' t' : Term} : Γ ⊢ (cons h t =eq cons h' t') ⇒ land (h =eq h') (t =eq t') := by
   apply Axioms.imp_intro; intro h_eq
   have h_ax3 := ax (by simp [axioms] : ax3_peano_succ_inj ∈ axioms)
   have h_axL0 := ax (by simp [axioms] : ax_L0_cons_def ∈ axioms)
-  -- cons h t = pair h (succ t)  (sin ascripción)
-  have h_l0_ht := by
+  have h_l0_ht : Γ ⊢ (cons h t =eq succ (pair h t)) := by
     have hh := spec (spec h_axL0 h) t
     simp [substFormula, substTerm, substTerms, cons, pair, cantor_func, div2,
           cantor_poly, mul, add, succ, two, one, zero,
           FOL.substTerm_liftTerm] at hh
     exact hh
-  have h_l0_h't' := by
+  have h_l0_h't' : Γ ⊢ (cons h' t' =eq succ (pair h' t')) := by
     have hh := spec (spec h_axL0 h') t'
     simp [substFormula, substTerm, substTerms, cons, pair, cantor_func, div2,
           cantor_poly, mul, add, succ, two, one, zero,
           FOL.substTerm_liftTerm] at hh
     exact hh
-  have h_pair_eq :=
+  have h_succ_eq : Γ ⊢ (succ (pair h t) =eq succ (pair h' t')) :=
     FOL.derive_eq_trans (eq_symm h_l0_ht) (FOL.derive_eq_trans h_eq h_l0_h't')
-  have h_inj := mp pair_inj h_pair_eq
-  have h_h_eq := Axioms.and_elim_left h_inj
-  have h_st_eq := Axioms.and_elim_right h_inj
-  have h_succ_imp : Γ ⊢ ((succ t =eq succ t') ⇒ (t =eq t')) := by
-    have hh := spec (spec h_ax3 t) t'
-    simp [substFormula, substTerm, substTerms, succ, FOL.substTerm_liftTerm] at hh
+  have h_succ_imp : Γ ⊢ ((succ (pair h t) =eq succ (pair h' t')) ⇒ (pair h t =eq pair h' t')) := by
+    have hh := spec (spec h_ax3 (pair h t)) (pair h' t')
+    simp [substFormula, substTerm, substTerms, succ, pair, cantor_func, div2,
+          cantor_poly, mul, add, two, one, zero, FOL.substTerm_liftTerm] at hh
     exact hh
-  exact Axioms.and_intro h_h_eq (mp h_succ_imp h_st_eq)
+  exact mp pair_inj (mp h_succ_imp h_succ_eq)
 
 /-!
 ### Fase 13: Pertenencia

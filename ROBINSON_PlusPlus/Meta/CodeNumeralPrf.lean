@@ -35,7 +35,7 @@ no se recupera del valor. Con `⌈φ⌉` escrito como **numeral** la ambigüedad
 canónico. Este módulo es el puente entre las dos representaciones.
 
 **La aritmética sale sin división.** `consN` se define con **números triangulares** (`triN`), de modo
-que `2 · consN a b = (a+(b+1))·((a+(b+1))+1) + 2·(b+1)` — exactamente `cpOf ā b̄` — es una identidad
+que `2 · pairN a b = (a+b)·((a+b)+1) + 2·b` — exactamente `cpOf ā b̄` — es una identidad
 `Nat` demostrable **sin** razonar sobre divisibilidad. Eso es lo que hace que
 `prf_div2_numeral` (`Div2ParityPrf`) enganche en la forma `2*m` exacta que pide.
 -/
@@ -61,13 +61,17 @@ theorem two_mul_triN : ∀ n : Nat, 2 * triN n = n * (n + 1)
       generalize n * (n + 1) = A
       omega
 
-/-- Valor de `cons a b`, **sin división**. -/
-def consN (a b : Nat) : Nat := triN (a + (b + 1)) + (b + 1)
+/-- Valor de `pair a b` (Cantor pelado, sobreyectivo), **sin división**. -/
+def pairN (a b : Nat) : Nat := triN (a + b) + b
 
-/-- **LA VERIFICACIÓN**: el polinomio de Cantor de `⟨a,b⟩` es exactamente `2 · consN a b`. -/
-theorem two_mul_consN (a b : Nat) :
-    2 * consN a b = (a + (b + 1)) * ((a + (b + 1)) + 1) + 2 * (b + 1) := by
-  show 2 * (triN (a + (b + 1)) + (b + 1)) = _
+/-- Valor de `cons a b = σ (pair a b)` (ADR-093, salida (5)), **sin división**. Es `pairN a b + 1`
+    por definición. -/
+def consN (a b : Nat) : Nat := triN (a + b) + b + 1
+
+/-- **LA VERIFICACIÓN**: el polinomio de Cantor de `⟨a,b⟩` es exactamente `2 · pairN a b`. -/
+theorem two_mul_pairN (a b : Nat) :
+    2 * pairN a b = (a + b) * ((a + b) + 1) + 2 * b := by
+  show 2 * (triN (a + b) + b) = _
   rw [Nat.mul_add, two_mul_triN]
 
 /-! ### PARTE B — evaluación provable -/
@@ -77,41 +81,34 @@ theorem prf_gnum_add (a b : Nat) : Prf (add (numeral a) (numeral b) =eq numeral 
   rw [numeral_bridge, numeral_bridge, numeral_bridge]
   exact prf_numeral_add a b
 
-/-- El polinomio de Cantor sobre numerales se evalúa a `numeral (2 · consN a b)`. -/
+/-- El polinomio de Cantor sobre numerales se evalúa a `numeral (2 · pairN a b)`. -/
 theorem prf_cpOf_eval (a b : Nat) :
-    Prf (cpOf (numeral a) (numeral b) =eq numeral (2 * consN a b)) := by
-  -- `s = a + (b+1)`;  `succ (numeral b) = numeral (b+1)` y `two = numeral 2` son DEFEQ
-  have hS : Prf (add (numeral a) (succ (numeral b)) =eq numeral (a + (b + 1))) :=
-    prf_gnum_add a (b + 1)
-  have hSs : Prf (succ (add (numeral a) (succ (numeral b))) =eq numeral (a + (b + 1) + 1)) :=
+    Prf (cpOf (numeral a) (numeral b) =eq numeral (2 * pairN a b)) := by
+  have hS : Prf (add (numeral a) (numeral b) =eq numeral (a + b)) :=
+    prf_gnum_add a b
+  have hSs : Prf (succ (add (numeral a) (numeral b)) =eq numeral (a + b + 1)) :=
     prf_eq_congr_succ hS
-  have h1 : Prf (mul (add (numeral a) (succ (numeral b)))
-                     (succ (add (numeral a) (succ (numeral b))))
-              =eq numeral ((a + (b + 1)) * ((a + (b + 1)) + 1))) :=
+  have h1 : Prf (mul (add (numeral a) (numeral b))
+                     (succ (add (numeral a) (numeral b)))
+              =eq numeral ((a + b) * ((a + b) + 1))) :=
     prf_eq_trans (prf_eq_congr_mul1 _ hS)
-      (prf_eq_trans (prf_eq_congr_mul2 _ hSs) (prf_gnum_mul (a + (b+1)) (a + (b+1) + 1)))
-  have h2 : Prf (mul two (succ (numeral b)) =eq numeral (2 * (b + 1))) :=
-    prf_gnum_mul 2 (b + 1)
+      (prf_eq_trans (prf_eq_congr_mul2 _ hSs) (prf_gnum_mul (a + b) (a + b + 1)))
+  have h2 : Prf (mul two (numeral b) =eq numeral (2 * b)) :=
+    prf_gnum_mul 2 b
   have hsum : Prf (cpOf (numeral a) (numeral b)
-      =eq numeral ((a + (b+1)) * ((a + (b+1)) + 1) + 2 * (b + 1))) :=
+      =eq numeral ((a + b) * ((a + b) + 1) + 2 * b)) :=
     prf_eq_trans (prf_eq_congr_add1 _ h1)
       (prf_eq_trans (prf_eq_congr_add2 _ h2) (prf_gnum_add _ _))
-  rw [two_mul_consN]
+  rw [two_mul_pairN]
   exact hsum
 
-/-- **`prf_cons_eval`** — `cons ā b̄ = numeral (consN a b)`. -/
+/-- **`prf_cons_eval`** — `cons ā b̄ = numeral (consN a b)`: `cons = σ (div2 cp)`, y
+    `numeral (pairN a b + 1)` es `succ (numeral (pairN a b))` por definición. -/
 theorem prf_cons_eval (a b : Nat) :
     Prf (cons (numeral a) (numeral b) =eq numeral (consN a b)) :=
   prf_eq_trans (prf_cons_div2 (numeral a) (numeral b))
-    (prf_eq_trans (prf_eq_congr_div2 (prf_cpOf_eval a b))
-      (prf_div2_numeral (consN a b)))
-
-
-
-
-
-
-
+    (prf_eq_congr_succ (prf_eq_trans (prf_eq_congr_div2 (prf_cpOf_eval a b))
+      (prf_div2_numeral (pairN a b))))
 
 /-! ### PARTE C — `prf_formCode_numeral` por META-RECURSIÓN
 
@@ -219,8 +216,8 @@ theorem prf_formCode_numeral : ∀ φ : Formula, Prf (formCode φ =eq numeral (c
 end ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 export ROBINSON_PlusPlus.Meta.CodeNumeralPrf (
-  triN two_mul_triN consN two_mul_consN
-  prf_gnum_add prf_cpOf_eval prf_cons_eval prf_cons_eval_of
+  triN two_mul_triN consN two_mul_pairN
+  pairN prf_gnum_add prf_cpOf_eval prf_cons_eval prf_cons_eval_of
   codeNatChars codeNatStr codeNatTerm codeNatTerms codeNat
   prf_charsCode_numeral prf_strCode_numeral
   prf_termCode_numeral prf_termsCode_numeral prf_formCode_numeral

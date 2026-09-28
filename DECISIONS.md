@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -8288,3 +8288,67 @@ Resuelve lo que ADR-111 dejó al propietario (N6 ya estaba aplicada allí).
   `Compacity0`.
 * ✏️ ADR-111 decía «217 de las 256 filas de FOL no llevan marca ni prefijo de cálculo»: son **220** sin
   marca y **138** sin marca ni prefijo (medido). El argumento se sostiene igual.
+
+## ADR-113: 🏁 la salida (5) ADOPTADA — `cons a b = σ (pair a b)`, y el radio medido por el compilador
+
+**Fecha:** 2026-09-28 · **Estado:** ✅ HECHA (rama `claude/project-thread-bgzgkr`) · **Ámbito:** RPP (FOL intacto).
+**Decisión del propietario** (2026-09-28): entre (2) relativizar `listInd` y (5) sacar el `σ` de ADR-092/093,
+**se adopta (5)**. Cierra la decisión que ADR-088, ADR-090, ADR-092 y ADR-093 dejaron abierta.
+
+### 1 · Por qué (5) y no (2)
+
+(2) cambiaba la **lógica** y el **verificador**: la regla `listInd` de `Prf`/`PrfH`/`HilbertSeq`, los dos axiomas
+de codificación del tag 20 (`ax_vpf_listInd`, `ax_lineWF_listInd`) y con ellos el cierre del tag 20 de
+`NegVerifier`. Pedía un predicado de lista **hereditaria** que el lenguaje no tiene, y dejaba sin salida una guarda
+del testigo `ṗ` dentro de `Prov` (`D3ChainDotPrf`: `∀p (chainOkB → chainOk)` metido en `Prov`). Además
+`prf_nil_or_cons_all` pasaba a ser falso, y lo consumen `ListEtaPrf` y la maquinaria de testigos de
+`substfc`/`liftfc`. (5) sólo cambia la **codificación**: D1-D3 y `NegVerifier` usan del emparejamiento que
+sea inyectivo, no nulo y monótono, y las tres propiedades estaban compiladas (`sondeos/CantorSobreyectivo.lean`).
+Comparativa completa: carpeta del proyecto, `planes/comparativa-listInd-vs-cons-2026-09-28.md`.
+
+### 2 · El cambio
+
+* `ax_L0_cons_def : ∀∀. cons #1 #0 = σ (pair #1 #0)` (antes `pair #1 (σ#0)`). Siguen siendo **141** axiomas.
+* Espejo numérico: `consN a b = triN (a+b) + b + 1` (antes `triN (a+b+1) + (b+1)`), y `pairN a b = triN (a+b) + b`
+  nuevo (`consN a b = pairN a b + 1` por definición).
+* ⇒ `σ ∘ pair` es biyección ℕ² → ℕ≥1: **todo número es `nil` o `cons`**, `ax_list_induction` y la regla `listInd`
+  son **verdaderos en ℕ**, y la capa de listas de `ModeloNat` (A2) ya no choca con la basura.
+* ⚠️ Cambian los **valores** de `codeNat` y, con ellos, el numeral dentro de `godelCN`. La **forma** de `G`, `Prov`,
+  la regla `listInd` y los 107 `codingAxioms` no cambian.
+
+### 3 · 📏 El radio, MEDIDO con el compilador (M-13)
+
+Línea base: `master` `08e76b3`, **145 jobs verdes** (Lean v4.31.0). Con el cambio, `lake build` rompió en
+**seis módulos, uno tras otro, y en ningún otro**:
+
+| módulo | qué cambió |
+|---|---|
+| `Minimal/Theorems/Block6` | `cons_neq_nil` sale directo de `ax2` (σ ≠ 0); `cons_inj` de `ax3` + `pair_inj`. Las dos pruebas **se acortan** |
+| `Meta/CantorMonoPrf` | `cpOf h t = cantor_poly h t`; un núcleo común `prf_lt_succ_div2 : a + a ≤ c ⟹ a < σ(div2 c)` da las dos monotonías; como `h + t` puede ser `0`, `prf_le_self_mul_self_all` (inducción, el paso no usa la hipótesis) |
+| `Meta/Div2ParityPrf` | `prf_mod2_cpOf` con `t` en vez de `σt`; `prf_cons_double` (retirado) → **`prf_pair_double`** (`(div2 cp)·2 = cp`) |
+| `Meta/CodeNumeralPrf` | `pairN`, `two_mul_consN` → `two_mul_pairN`, `prf_cpOf_eval`, `prf_cons_eval` (un `succ` más) |
+| `Meta/CodeNatInjPrf` | `consN_inj` con la diagonal `a+b` |
+| `Meta/DotConsPrf` | fase A con `succcT` exterior; molde `pcc_rw_sdiv2`; fase C `pcc_div2_cons` (retirado) → **`pcc_div2_pair`** y el `σ` se pliega a nivel de código |
+
+Los otros **139 módulos compilan sin tocarlos**, incluidos los 13 que usan `consN`/`codeNat` (eran genéricos, como
+predijo la lectura) y toda la cadena de Gödel.
+
+**Controles re-ejecutados en la rama y en `master`, con el mismo resultado**: `check-sorry` (0 y los cinco agujeros a
+cero) · `check-warnings` **11/11** · `check-estratos` **10** · `check-footprints` **517** (cobertura 481/481) — **ningún
+footprint cambia**. `check-doc-sync` falla igual en los dos por causas ajenas (clon superficial; la marca de
+`doc/REFERENCE-Godelization.md`); los tres símbolos retirados quedaron citados como tales.
+
+### 4 · Sondeos
+
+`sondeos/ModeloBasura.lean` medía la codificación anterior con el `consN` de producción y dejó de compilar: ahora lleva
+su propia copia `consOldN` y conserva la medición histórica. `ModeloNat`, `CantorSobreyectivo` y
+`ModeloDiscriminador` compilan sin cambios.
+
+### 5 · Lo que queda (A2…A5)
+
+A2, la capa de listas de `ModeloNat` (los 9: `ax_L0`–`ax_L3`, `ax_C1`–`ax_C3`, `prodp`); A3, los 107
+`codingAxioms`; A4, la solidez de `Prf`; A5, `ConsistentH` como teorema. ⚠️ Y `AnclaEq` sigue sin instancia
+(`AXIOMS.md`): el modelo tendrá que darla o el resultado lo arrastrará en la firma.
+PeanoRF puede fijar ya `consNat` con la codificación nueva.
+
+**Véase también:** ADR-088, ADR-090, ADR-092, ADR-093; `sondeos/CantorSobreyectivo.lean`.

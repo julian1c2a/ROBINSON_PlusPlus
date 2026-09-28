@@ -83,9 +83,9 @@ theorem subst_provBody (φ : Formula) (t : Term) :
 
     ⚠️ **Por qué NO «cerrado» ni «canónico genérico».** La def anterior `IsClosed x := ∀k, liftTerm k
     x = x` era **inservible**: la igualdad de términos cerrados **no es refutable** (`add zero zero =eq
-    zero` es demostrable). Y «canónico» tampoco: `cons h t =eq pair h (succ t)` (`ax_L0_cons_def`) hace
-    que un `cons` **sea un número**, luego `cons a b` puede igualar un `numeralM` (p.ej.
-    `cons 0̇ [] =eq 2̇`). La refutabilidad **NO** es genérica sobre `IsCodeShaped`.
+    zero` es demostrable). Y «canónico» tampoco: `cons h t =eq succ (pair h t)` (`ax_L0_cons_def`,
+    ADR-113) hace que un `cons` **sea un número**, luego `cons a b` puede igualar un `numeralM` (p.ej.
+    `cons 0̇ [] =eq 1̇`). La refutabilidad **NO** es genérica sobre `IsCodeShaped`.
 
     ⛔⛔ **CORRECCIÓN 2026‑09‑10h (ADR‑022) — este docstring afirmaba algo FALSO.** Decía: *«las
     comparaciones de `NegVerifier` son PARALELAS POR TIPO — `formCode φ` contra `formCode ψ`, nunca
