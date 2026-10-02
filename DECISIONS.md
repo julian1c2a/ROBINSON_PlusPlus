@@ -8447,7 +8447,7 @@ sobre `⊢`) · el arreglo de F1 (preferido: un único axioma diagonal `axiomsCo
 <a id="adr-115"></a>
 ## ADR-115: 🗑️ la capa `⊢` RETIRADA de RPP — 27 módulos, 633 declaraciones, 0 `axiom` de Lean, y la cadena sobre `Prf` intacta
 
-**Fecha:** 2026-10-02 · **Estado:** ✅ RPP · ⬜ FOL (`FOL/MetaRules.lean`), en el paso siguiente ·
+**Fecha:** 2026-10-02 · **Estado:** ✅ RPP (`b1dedd1`) · ✅ FOL (`3b355d7`: `FOL/MetaRules.lean` borrado, §8) ·
 **Ámbito:** RPP; FOL en un segundo paso. **Decisión del propietario** (ADR-114 §4, punto 2): «`⊢` se retira como capa
 de trabajo: queda `Prf`, más un puente a `Derives₀` si hace falta. Las meta-reglas de FOL, si dicen cosas falsas, se
 retiran: no hacemos uso de herramientas que no sean verdaderas».
@@ -8460,8 +8460,8 @@ retiran: no hacemos uso de herramientas que no sean verdaderas».
 Tarski, y eso refuta `ex_elim` (modelo de dos puntos) y `or_elim` (tercio excluso) — `sondeos/MetaReglasRefutables.lean`
 §2 y §4, footprints `[propext, Quot.sound]` y `[propext, Classical.choice, Quot.sound]`. Lean + cualquiera de ellos ⊢
 `False`. Los otros dos (`ax_induction_prim`, `ax_axiomsCodeT_eq`, retirados también) **no se midieron**. Los cuatro primeros son los
-`axiom` de `FOL/MetaRules.lean` (RPP ya no los importa; en FOL quedan retirados en el paso siguiente); `ax_list_induction` era de RPP y
-quedó retirado.
+`axiom` de `FOL/MetaRules.lean` (RPP ya no los importa, y FOL los borró el mismo día: §8); `ax_list_induction`, retirado,
+era de RPP.
 
 ### 2 · El radio, medido ANTES de borrar (ronda 2, `wf_0f4ca25d-649`, y compilado)
 
@@ -8486,7 +8486,7 @@ quedó retirado.
 | módulos activos | 131 (Minimal 11 + Meta 109 + Full 11) | **104** (Minimal 1 + Meta 100 + Full 3) |
 | `axiom` de Lean en RPP | 3, hoy retirados (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) | **0** |
 | filas de `check-footprints.bash` | 517 | **463** (las 54 quitadas, todas de declaraciones borradas) |
-| `check-estratos.bash`, `Derives` | 22 ctors · 7 axiomas | 22 · **4** (los de FOL; → 0 cuando FOL retire `MetaRules`) |
+| `check-estratos.bash`, `Derives` | 22 ctors · 7 axiomas | 22 · **4** (los de FOL) → **0** con FOL sin `MetaRules` (§8) |
 
 * **27 módulos borrados**: `Minimal/Theorems/Block1–8` (10 ficheros), `Full/{Mod2, Lists, StrongInduction, Bounded,
   Divisibility, Division, Primality, Factorization}` y `Meta/{AxiomListCode, DerivCond, Induction, LineWFDerives,
@@ -8562,8 +8562,8 @@ propietario** (una sola capa de trabajo, `Prf`), no por falsas. Lo notable:
   `AnclaSoundness`**, reparado después y compilado aparte (exit 0) ⇒ 32. De los 53 que no compilan, **10** usan en
   código algo retirado (medían `⊢`: no se reparan), **3** sólo lo citan en comentarios y caen, con los otros **40**,
   por causas anteriores (`[AnclaEq]` sin instancia, `PrfH_lt_subst2` movido, una ambigüedad) — clasificado por
-  mensaje y por nombres, **no** medido contra la base anterior. Al retirar `MetaRules` en FOL cae además
-  `HenkinSaleDeRaa` (usa `FOL.MetaRules.raa`); la cifra se re-mide entonces.
+  mensaje y por nombres, **no** medido contra la base anterior. Al retirar `MetaRules` en FOL cayó además
+  `HenkinSaleDeRaa` (usa `FOL.MetaRules.raa`): re‑medido en §8, **31 de 85**.
 * ⬜ **El libro** (`doc/book/`, otra tarea): `fragmentos.json` extrae dos fragmentos de `FOL/MetaRules.lean` y varios
   capítulos citan sus nombres con `\ident{}`: el job `libro` de la CI fallará en el próximo push que toque
   `doc/book/`.
@@ -8598,13 +8598,13 @@ de la revisión— (M-13):
 
 ### 7 · Lo que queda
 
-* **FOL** (paso siguiente): borrar `MetaRules.lean` y su import en `Core.lean`; reescribir `Inconsistencia.lean`
+* ✅ **FOL** (hecho: §8): borrar `MetaRules.lean` y su import en `Core.lean`; reescribir `Inconsistencia.lean`
   (sube `derives_to_derives0`, `derives_soundness` y las cuatro refutaciones; se va
   `inconsistencia_de_cualquier_solidez`, cuyo enunciado pasa a ser falso); censo de axiomas 4 → 0; borrar sus
   `.olean` huérfanos; corregir los textos que se vuelven falsos (51 sitios medidos) —⛔ cinco de ellos están en
   módulos **congelados** (`Soundness0`, `Canonical0`, `Compacity0`, `Rename`, `TheoryFramework/Instances/FOL`) y
   necesitan un `thaw` autorizado por el propietario—. También `FOL/AXIOMS.md:293`, de la lista de ADR-114 §3.
-* **RPP, en el push que sigue al de FOL**: `check-estratos` `Derives|22|0|FOL.Inconsistencia.derives_soundness`;
+* ✅ **RPP, en el push que sigue al de FOL** (hecho: §8): `check-estratos` `Derives|22|0|FOL.Inconsistencia.derives_soundness`;
   las filas `FOL.Inconsistencia.*` de `check-footprints.bash`; y **el prefijo de la caché de la CI** (`key` y
   `restore-keys`): la caché guarda `FOL/.lake` entero, cada CI verde contra un FOL con `MetaRules` guarda su
   `.olean`, y un `.olean` sin fuente sigue siendo importable. Cambiarlo **antes** del borrado no sirve —la primera CI
@@ -8616,6 +8616,79 @@ de la revisión— (M-13):
   No se toca: queda escrito para cuando se desbloquee.
 * Luego, en orden: F1 (L2-3) · D7 · el modelo de los 141 · `⊬¬G` por **Rosser** · ronda 3 · los sondeos de control
   negativo en CI (R2-5-1).
+
+### 8 · El paso de FOL y el ajuste de RPP (2026-10-02, tarde)
+
+**FOL** (`3b355d7`, más el re‑lock `96b5efb`; rama `retiro-metarules`, en `master` por avance rápido):
+
+* `FOL/MetaRules.lean` **borrado**: FOL queda con **0 `axiom` de Lean** (`check-axioms` 4 → 0) y **54 módulos
+  activos** (`FOL/` 43 + `FOL/Theorems/` 5 + `TheoryFramework/` 6). `FOL/Core.lean` ya no lo importa; sus `.olean`
+  huérfanos, borrados.
+* `FOL/Inconsistencia.lean` **reescrito**: sube al build lo que §3 dejó en `sondeos/MetaReglasRefutables.lean` §4
+  —`derives_to_derives0` (`gen_rule` es admisible con una constante fresca) y `derives_soundness` (Tarski)— y los
+  enunciados `ImpIntro`, `Raa`, `OrElim` y `ExElim` con sus refutaciones. Footprints en el build:
+  `[propext, Quot.sound]` para `derives_to_derives0` y las refutaciones de `imp_intro`, `raa` y `or_elim` (⭐ la de
+  `or_elim`, por la vía finitaria, ya sin el `Classical.choice` que llevaba en el sondeo);
+  `[propext, Classical.choice, Quot.sound]` para `derives_soundness` y `ex_elim_refutable`. Se van
+  `inconsistencia_de_cualquier_solidez` —su enunciado es falso: `derives_soundness` es testigo de su hipótesis— y
+  su auxiliar `ctx_nil`.
+* `FOL/Tactics.lean`: la táctica `derive_raa`, retirada. Expandía a `Derives.raa`, que dejó de existir el
+  2026‑04‑25, y nadie la usaba.
+* **Textos.** De los 51 sitios medidos (§7), los 37 que no estaban en módulos congelados ni en lo hecho a mano, corregidos por
+  cinco editores en ficheros disjuntos (`wf_9f9ece80-b57`; en los `.lean`, sólo comentarios, comprobado contra
+  HEAD sin comentarios). Una revisión adversarial de sólo lectura (`wf_9d3b6655-051`) encontró **30** defectos en
+  esas correcciones, aplicados (`wf_ed417ffb-a0a`). Entre ellos:
+  * rectificaciones que repetían el error que corregían: «la solidez de `Derives` era indemostrable con las
+    meta‑reglas», cuando era demostrable, y por eso el entorno era inconsistente;
+  * «`raa` nunca fue constructor de `Derives`», cuando lo fue del 2026‑04‑22 al 2026‑04‑25;
+  * que los módulos de PeanoRF que FOL espera recibir «caían», cuando no importan `Prelim`.
+* ⬜ **Deuda declarada en FOL**: cinco módulos **congelados** (`Soundness0`, `Canonical0`, `Compacity0`, `Rename`,
+  `TheoryFramework/Instances/FOL`) conservan textos que dan por falsa la solidez de `Derives`, por sintácticamente
+  completo `axioms ⊢` o por prohibida la inducción. El inventario por línea está en `../FOL/NEXT-STEPS.md`. Esperan
+  un `thaw` autorizado por el propietario.
+* Controles de FOL, después del último cambio: `lake build "@FOL/FOL" "@FOL/TheoryFramework"` desde la raíz de RPP
+  (2026‑10‑02: **58 jobs** de FOL, 0 errores); `check-sorry` 0; `check-axioms` FOL 0 + TheoryFramework 0;
+  `check-doc-sync` verde; `gen-dependencies --check` al día.
+
+**RPP** (este commit):
+
+* `check-estratos.bash`: `Derives|22|0|FOL.Inconsistencia.derives_soundness`. ⛔ **Defecto del control, cazado al
+  tocarlo**: la cuarta columna —la solidez «en el build»— se declaraba y **no se comprobaba** (el bloque que la
+  miraba era un `:` vacío), así que un nombre inventado daba verde. Ahora el fichero Lean busca el teorema y exige
+  que su TIPO mencione el inductivo de la fila. Probado con el fallo puesto en los dos modos: nombre inexistente ⇒ ✗;
+  teorema existente que no habla de `Derives` (`raa_refutable`) ⇒ ✗.
+* La doctrina M‑11, corregida donde seguía al revés: mensajes y cabecera de `check-estratos.bash`, `REFERENCE.md`
+  §0bis y `Meta/HilbertDeduction.lean`. Un teorema probado por inducción sobre un inductivo habitado es VÁLIDO; lo
+  que puede ser falso es el axioma (ADR‑114 §2).
+* `check-footprints.bash`: fuera `inconsistencia_de_cualquier_solidez`; entran las seis de `FOL.Inconsistencia`
+  ⇒ **468** filas, `[COBERTURA]` **440/440**.
+* CI: prefijo de la caché `lake-v2-` (`key` y `restore-keys`), con la regla escrita junto al paso: se sube cada
+  vez que se BORRA un módulo de FOL.
+* Textos: `REFERENCE.md` §0bis (fila de `Derives`), `AXIOMS.md` §2, `DEPENDENCIES.md`, `NEXT-STEPS.md` (punto 1,
+  hecho), `sondeos/README.md`, `doc/AUDITORIA-BASE-2026-10-02.md` §4, tres comentarios de `ROBINSON_PlusPlus/`
+  que daban `MetaRules` por vivo (`Meta/ReprPrf.lean`, `Minimal/Axioms.lean`, `Meta/HilbertDeduction.lean`) y la
+  nota de `sondeos/AnclaSoundness.lean`.
+* **Sondeos, re‑medidos** (pasada completa sobre los 85): **31 compilan, 54 no**. Cambian dos: `AnclaSoundness`
+  ❌ → ✅ (reparado) y `HenkinSaleDeRaa` ✅ → ❌ (`Unknown identifier FOL.MetaRules.raa`). Los otros 83 dan el
+  mismo estado y el mismo primer error (`doc/AUDITORIA-BASE-2026-10-02.md` §4).
+* **PeanoRF**: con FOL sin `MetaRules` cae `Prelim` y lo que lo importa (la raíz, `Omega/Basic`,
+  `Meta/AxiomCheck` y `_template`); los módulos de `Calculus/` no lo importan. El propietario lo previó al
+  bloquearlo («se romperá en cuanto cambie esa base. Es lo esperado», `BLOQUEO-2026-10-01.md`). No se toca.
+
+Controles de RPP, re‑ejecutados después del último cambio (M‑13):
+
+| control | resultado |
+|---|---|
+| `lake build` | ✅ **117 jobs**, 0 errores |
+| `check-sorry` | ✅ 0 `sorry`, 0 agujeros de confianza |
+| `check-estratos` | ✅ los 10 estratos; `Derives` 22 · **0**, con su solidez en el build comprobada |
+| `check-warnings` | ✅ 11 declarados = 11 medidos |
+| `check-footprints` | ✅ **468** cuadran · `[COBERTURA]` **440/440** |
+| `check-doc-sync` | ✅ `[A]` · `[E]` deuda 34 · `[B]` 44/44 · `[C]` `[D]` `[F]` · `[H]` 85/85 · `[A2]` aviso: 132 líneas |
+
+🔑 *Una columna que se declara y no se comprueba no es una columna: es un comentario con forma de tabla.* Y la
+segunda lección de la tarde: *una rectificación puede repetir el error que rectifica*. «Indemostrable mientras
+estaban las meta‑reglas» volvía a decir que la inducción no cubre a los habitantes fabricados.
 
 **Véase también:** ADR-024, ADR-025, ADR-029, ADR-113, ADR-114; `sondeos/MetaReglasRefutables.lean`,
 `sondeos/DerivesSinMetaReglas.lean`, `TEOREMAS-E-HIPOTESIS.md`.

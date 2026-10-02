@@ -95,6 +95,12 @@ jobs:
 
       # ⚠️ Los `path:`/`hashFiles` de un `uses:` NO ven el `working-directory` de arriba:
       # van con el prefijo del subdirectorio.
+      # ⛔ 2026-10-02 (ADR-115): el prefijo `lake-v2-` es a propósito. La caché guarda `FOL/.lake`
+      # ENTERO, y una entrada de caché no se reescribe nunca: cada CI anterior al borrado de
+      # `FOL/MetaRules.lean` restauraba su `.olean`, que `[F]` de `check-doc-sync.bash` caza como
+      # módulo FANTASMA (y que seguiría siendo importable). Con prefijo nuevo, ni `key` ni
+      # `restore-keys` casan con las entradas viejas: la primera CI construye desde cero.
+      # 🔑 Si se BORRA otro módulo de FOL, se sube el prefijo (v3, …) en el mismo push.
       - name: Cache Lake packages
         uses: actions/cache@v4
         with:
@@ -102,9 +108,9 @@ jobs:
             ~/.elan
             ROBINSON_PlusPlus/.lake/packages
             FOL/.lake
-          key: ${{ runner.os }}-lake-${{ hashFiles('ROBINSON_PlusPlus/lean-toolchain', 'ROBINSON_PlusPlus/lakefile.lean', 'FOL/lakefile.lean') }}
+          key: ${{ runner.os }}-lake-v2-${{ hashFiles('ROBINSON_PlusPlus/lean-toolchain', 'ROBINSON_PlusPlus/lakefile.lean', 'FOL/lakefile.lean') }}
           restore-keys: |
-            ${{ runner.os }}-lake-
+            ${{ runner.os }}-lake-v2-
 
       - name: Build
         run: lake build

@@ -1057,7 +1057,7 @@ la misma: **bajar el general**. `CodeWitnessPrf` los recupera por `export`‑ali
 árbol y de `sondeos/` siguen resolviendo sin tocar ni una.
 
 ⚠️ Son **DEFINICIONES**, no axiomas: no tocan el inventario de `axiom` (0 en RPP desde ADR‑115;
-los 4 de `FOL/MetaRules.lean` siguen en FOL, pero RPP ya no lo importa). -/
+los 4 de `FOL/MetaRules.lean`, que RPP dejó de importar, los borró FOL el mismo día). -/
 
 /-- Forma NULARIA: `X = ⟨k⟩`. -/
 def shapeNul (X : Term) (k : Nat) : Formula := Formula.eq X (cons (numeralM k) nil)

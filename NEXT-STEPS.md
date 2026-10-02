@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-02 — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
@@ -10,15 +10,17 @@
 >
 > RPP ya no usa `⊢`: **27 módulos** y **633 declaraciones** fuera, **0 `axiom` de Lean**, **117 jobs**, y la
 > cadena de Gödel sobre `Prf` intacta (sus footprints no cambian; `check-footprints` **463**). Las cuatro
-> meta‑reglas de FOL, **refutadas sin usarlas** (`sondeos/MetaReglasRefutables.lean`); su retirada en FOL va
-> después de RPP, porque RPP las importaba. ⛔ **Esto NO arregla F1**: Gödel I/II siguen **vacuos** por
+> meta‑reglas de FOL, **refutadas sin usarlas** (`sondeos/MetaReglasRefutables.lean`); FOL las borró después,
+> el mismo día, cuando RPP ya no las importaba (ADR‑115 §8: FOL tiene hoy 0 `axiom`). ⛔ **Esto NO arregla F1**: Gödel I/II siguen **vacuos** por
 > `[AnclaEq]` (ADR‑114). Detalle, cifras y lo que se perdió en ADR‑115.
 >
 > ## ⬜ Lo que queda AHORA, en orden
 >
-> 1. ⬜ **FOL**: borrar `FOL/MetaRules.lean` y su import en `FOL/Core.lean`; reescribir
->    `FOL/Inconsistencia.lean` con las refutaciones sin axiomas, `Derives ≡ Derives₀` y la solidez; censo de
->    `check-axioms` 4 → 0. Después, en RPP, `check-estratos`: `Derives|22|0|-`.
+> 1. ✅ **FOL** (hecho el 2026‑10‑02, ADR‑115 §8): `FOL/MetaRules.lean` borrado y su import fuera de
+>    `FOL/Core.lean`; `FOL/Inconsistencia.lean` reescrito con `derives_to_derives0`, `derives_soundness` y las
+>    cuatro refutaciones; `check-axioms` 4 → 0. En RPP, `check-estratos`:
+>    `Derives|22|0|FOL.Inconsistencia.derives_soundness`. ⬜ Queda en FOL la deuda de cinco módulos CONGELADOS
+>    con textos que dan por falsa la solidez de `Derives` (esperan un `thaw` autorizado por el propietario).
 > 2. ⬜ **F1**, lo que hace vacuos a Gödel I/II: anclar `axiomsCodeT` por punto fijo — un único axioma diagonal
 >    `axiomsCodeT = LR ++ [δ]` con `diagTerm` y `prf_diag_arith_num` (L2‑3).
 > 3. ⬜ **D7** (`String` → `List Char` en FOL), en su momento: tras esto y antes del punto fijo de F1 (L5‑09).
@@ -31,7 +33,7 @@
 >    llevaba meta‑reglas refutadas en el footprint). Lo que queda sobre `Prf` y META (109 declaraciones de
 >    `Meta/ChainNegPrf.lean`) y la prueba vieja de `1dac85a` sirven de guía de casos, no de prueba.
 > 6. ⬜ Ronda 3 de la auditoría; y un paso de CI que compile los sondeos de control negativo (R2‑5‑1): de los 85,
->    hoy compilan 32 (`sondeos/README.md`).
+>    hoy compilan 31 (`sondeos/README.md`; `HenkinSaleDeRaa` cayó con `FOL/MetaRules.lean`).
 > 7. ⬜ La deuda de documentación declarada en ADR‑115 §5.
 >
 > 🎯 **Horizonte declarado por el propietario (2026‑10‑02), tras Gödel II**: **Gödel‑Rosser** (consistencia

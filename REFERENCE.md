@@ -76,7 +76,7 @@
 
 | noción | dónde | ctors | axiomas que la **HABITAN** | ¿`induction`? | solidez | **rol** |
 |---|---|---:|---:|---|---|---|
-| **`Derives`** (`⊢`) | `../FOL/FOL/FOL.lean` | 22 | ⛔ **4** — `imp_intro`, `raa`, `or_elim`, `ex_elim` (FOL; se retiran en FOL). En RPP, **0**: sus tres (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) quedaron retirados el 2026‑10‑02 ([ADR‑115](DECISIONS.md)) | ⛔ **NUNCA** mientras haya axiomas que la habiten ([ADR‑029](DECISIONS.md)) | sin las meta‑reglas, ✅ **SÍ**: se traduce a `Derives₀` (`sondeos/MetaReglasRefutables.lean` §4) | 🗑️ **RETIRADA como capa de trabajo de RPP** (ADR‑115): RPP no la usa. Con las meta‑reglas era refutable |
+| **`Derives`** (`⊢`) | `../FOL/FOL/FOL.lean` | 22 | ✅ **0** desde el 2026‑10‑02. Los cuatro de FOL (`imp_intro`, `raa`, `or_elim`, `ex_elim`) se borraron con `FOL/MetaRules.lean` porque eran refutables (`FOL/Inconsistencia.lean` §3); los tres de RPP (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) quedaron retirados con la capa ([ADR‑115](DECISIONS.md)) | ✅ **sí** (antes, con los siete, ⛔ prohibida por [ADR‑029](DECISIONS.md)) | ✅ `derives_soundness` — **en el build** (`FOL/Inconsistencia.lean` §1: se traduce a `Derives₀` con `derives_to_derives0`) | 🗑️ **RETIRADA como capa de trabajo de RPP** (ADR‑115): RPP no la usa. Con las meta‑reglas era refutable |
 | **`Derives₀`** (`⊢₀`) | `../FOL/FOL/Derives0.lean` | 21 | ✅ **0** | ✅ **sí** | ✅ `derives0_soundness` — **en el build** | **SUJETO de FOL⁼**: solidez, consistencia, renombrado, eigenvariable, Henkin |
 | **`Prf`** | `Meta/Hilbert.lean` | 7 | ✅ **0** desde [ADR‑026](DECISIONS.md) | ✅ **sí** | ⬜ no enunciada | **SUJETO de Gödel I y II** (`goedel_first_prf`, `goedel_second_prf`) |
 | **`Prfᵢ`** | `Meta/Hilbert.lean` | 17 | ✅ **0** | ✅ **sí** | ✅ `prfI_soundness` ⚠️ **FUERA del build** (`sondeos/AnclaSoundness.lean`) | **ANCLA SEMÁNTICA**: la primera medición semántica del proyecto |
@@ -84,15 +84,21 @@
 
 ### ⚠️ Cómo se lee esta tabla, y por qué la columna que decide es la tercera
 
-**El número de `axiom` que HABITAN un inductivo es lo único que decide si `induction` es
-legítima** (regla **M‑11**, [ADR‑025](DECISIONS.md)). Un axioma que habita un inductivo produce
-habitantes que **no son aplicaciones de constructor**: la inducción cubre los constructores y el
-teorema cuantifica sobre **todos**.
+**El número de `axiom` que HABITAN un inductivo es la cifra que dice si lo que se demuestre por
+inducción sobre él puede chocar con un postulado.** Un axioma que habita un inductivo produce
+habitantes que **no son aplicaciones de constructor**, pero el recursor los cubre igual: un teorema
+probado por inducción sobre un inductivo habitado es **válido**. Lo que puede ser falso es el
+**axioma**: si contradice lo que la inducción demuestra, Lean + él ⊢ `False`. Así eran los cuatro
+de `FOL/MetaRules.lean`, borrados el 2026‑10‑02 ([ADR‑115](DECISIONS.md)).
 
-⛔⛔ **Y `#print axioms` es CIEGO a esto.** Un teorema probado por inducción sobre un inductivo
-habitado tiene footprint **limpio** y es **injustificado**. Por eso hace falta un control aparte:
-`check-footprints.bash` mide de qué depende un teorema; `check-estratos.bash` mide si la inducción
-que lo probó era legítima. **No son el mismo control y ninguno sustituye al otro.**
+⛔⛔ **Y `#print axioms` es CIEGO a esto**: el footprint de un teorema probado por inducción no lleva
+los axiomas que habitan el inductivo. Por eso hace falta un control aparte: `check-footprints.bash`
+mide de qué depende un teorema; `check-estratos.bash` mide qué postulados habitan cada inductivo.
+**No son el mismo control y ninguno sustituye al otro.**
+
+✏️ *Registro*: hasta el 2026‑10‑02 este apartado decía que esa cifra «decide si `induction` es
+legítima» (regla **M‑11**, [ADR‑025](DECISIONS.md)) y que un teorema así «es injustificado». Era al
+revés ([ADR‑114](DECISIONS.md) §2): *M‑11 evitaba ESCRIBIR la contradicción, no la quitaba.*
 
 ### 🔑 La regla de rol
 
@@ -102,8 +108,12 @@ Es [ADR‑024](DECISIONS.md) (**M‑10**) dicho en una línea, y explica las tre
 proyecto: `goedel_second'` retirado por enunciarse sobre `⊢`; Gödel I y II reenunciados sobre
 `Prf`; y `Derives₀` declarado al lado de `Derives` en vez de intentar limpiarlo.
 
-⚠️ **Añadir un `axiom` a un estrato con 0 no es una decisión local**: invalida *retroactivamente*
-todo lo que se haya probado por inducción sobre él. El control lo dice con esas palabras.
+✏️ 2026‑10‑02: la limpieza de `Derives` llegó al fin por retirada —sus cuatro axiomas eran
+refutables— y hoy **ningún** cálculo de la tabla está habitado.
+
+⚠️ **Añadir un `axiom` a un estrato con 0 no es una decisión local**: hay que comprobarlo contra todo
+lo que ya se probó por inducción sobre él, porque si lo contradice, el axioma es falso y Lean + él
+⊢ `False`. El control lo avisa.
 
 ### 0bis.2 · La OTRA estratificación: la escalera de binders
 

@@ -227,12 +227,13 @@ con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`)
 
 ---
 
-## 2 · Meta-reglas de FOL — 4 `axiom` en `FOL/MetaRules.lean`, REFUTABLES, y RPP ya no las importa
+## 2 · Meta-reglas de FOL — los 4 `axiom` de `FOL/MetaRules.lean`, REFUTABLES: RPP dejó de importarlas y FOL las borró
 
-✏️ **2026‑10‑02 (ADR‑115).** `imp_intro`, `raa`, `or_elim` y `ex_elim` son `axiom` de `FOL/MetaRules.lean`, y sus
-enunciados se **refutan sin usarlos** (`sondeos/MetaReglasRefutables.lean` §2 y §4): Lean + cualquiera de ellos
-demuestra `False`. `gen` y `dne` son teoremas (constructores de `Derives` desde D‑2). Desde ADR‑115 RPP **no
-importa** `FOL.MetaRules` ni lo re‑exporta; FOL retira el módulo a continuación. Lo que sigue es el **registro**
+✏️ **2026‑10‑02 (ADR‑115).** `imp_intro`, `raa`, `or_elim` y `ex_elim` eran `axiom` de `FOL/MetaRules.lean`, y sus
+enunciados se **refutan sin usarlos** (`sondeos/MetaReglasRefutables.lean` §2 y §4; en el build de FOL,
+`FOL/Inconsistencia.lean` §3): Lean + cualquiera de ellos demuestra `False`. `gen` y `dne` son constructores de
+`Derives` desde D‑2. RPP dejó de importar `FOL.MetaRules` con ADR‑115, y **FOL borró el módulo** el mismo día
+(ADR‑115 §8): hoy FOL tiene **0** `axiom` de Lean, como RPP. Lo que sigue es el **registro**
 de cómo se describían: «las reglas de deducción de la lógica ω viven en `FOL/MetaRules.lean` y RPP las
 re‑exporta desde `Minimal/Axioms.lean`; no cuentan entre los 7 `axiom` de RPP».
 

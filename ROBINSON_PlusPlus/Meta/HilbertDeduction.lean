@@ -62,11 +62,13 @@ falló su **alcance**. Evidencia versionada: `sondeos/PrfHMono.lean`.
 `HasWitFTrackedPrf:183`, `HasWitTrackedPrf:757`), con el rodeo de meter la ecuación como
 **antecedente OBJETO** para que el `or`‑elim la conservara en cada rama. Ese rodeo ya no hace falta.
 
-⭐ Y una nota de método que hoy vale doble: esta inducción **es legítima** porque `PrfH` **no tiene
-ningún `axiom` de Lean habitándolo** — se midió el 2026‑09‑11, cuando se descubrió que
-`FOL.Derives` sí los tiene (los cinco de `MetaRules`) y que por eso no admite teorema de solidez
-(ver `../../FOL/cuarentena/README.md`). Antes de inducir sobre un inductivo: comprobar que no está
-habitado. -/
+⭐ Y una nota de método: `PrfH` **no tiene ningún `axiom` de Lean habitándolo** — se midió el
+2026‑09‑11, cuando se descubrió que `FOL.Derives` sí los tenía (los de `MetaRules`) y se leyó que por
+eso no admitía teorema de solidez. ✏️ 2026‑10‑02 (ADR‑114 §2, ADR‑115): era al revés. La inducción
+sobre un inductivo habitado es válida —el recursor cubre a todo habitante—, y la solidez de `Derives`
+es hoy un teorema (`FOL.Inconsistencia.derives_soundness`); lo falso eran los axiomas, que FOL borró.
+Lo que se comprueba antes de postular un `axiom` sobre un inductivo es que no contradiga lo que la
+inducción ya demuestra. -/
 
 /-- **Monotonía del contexto en `PrfH`**: si `Γ ⊆ Δ`, todo lo demostrable desde `Γ` lo es desde `Δ`.
     Inducción sobre los **8 constructores**; el único caso no trivial es `gen`, que reconstruye la

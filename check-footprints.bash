@@ -47,7 +47,12 @@ FOL.BlockExtraction0.instB_nil|-
 FOL.BlockExtraction0.lk0_herbrand_block|Quot.sound,propext
 FOL.Complexity.complexity_substFormula|propext
 FOL.Inconsistencia.derives0_no_disjunction_property|Quot.sound,propext
-FOL.Inconsistencia.inconsistencia_de_cualquier_solidez|propext,FOL.MetaRules.raa
+FOL.Inconsistencia.derives_soundness|propext,Classical.choice,Quot.sound
+FOL.Inconsistencia.derives_to_derives0|propext,Quot.sound
+FOL.Inconsistencia.ex_elim_refutable|propext,Classical.choice,Quot.sound
+FOL.Inconsistencia.imp_intro_refutable|propext,Quot.sound
+FOL.Inconsistencia.or_elim_refutable|propext,Quot.sound
+FOL.Inconsistencia.raa_refutable|propext,Quot.sound
 FOL.Canonical0.max_cons_neg|propext,Classical.choice,Quot.sound
 FOL.Canonical0.max_cons_complete|propext,Classical.choice,Quot.sound
 FOL.Compacity0.model_existence_iff₀|propext,Classical.choice,Quot.sound

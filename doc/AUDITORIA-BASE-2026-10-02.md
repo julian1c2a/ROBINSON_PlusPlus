@@ -165,8 +165,8 @@ elab "#capaD_en_la_cadena" : command => do
 
 `lake env lean sondeos/<f>.lean` sobre los 85, de uno en uno: **32 compilan, 53 no** (31 en la pasada completa
 más `AnclaSoundness`, reparado después y recompilado aparte). Clasificación de los 53 en ADR‑115 §5 y en
-`sondeos/README.md`. ⚠️ Esta tabla es de su fecha: al retirar `FOL/MetaRules.lean` cae además
-`HenkinSaleDeRaa`.
+`sondeos/README.md`. ⚠️ Esta tabla es de su fecha: al retirar `FOL/MetaRules.lean` cayó además
+`HenkinSaleDeRaa` (re‑medido: §4).
 
 | sondeo | compila | primer error |
 |---|:---:|---|
@@ -255,3 +255,19 @@ más `AnclaSoundness`, reparado después y recompilado aparte). Clasificación d
 | `TagConclCoste.lean` | ✅ |  |
 | `TcFormPayoff.lean` | ❌ | error(lean.synthInstanceFailed): failed to synthesize instance of type class |
 | `TestigoAbierto.lean` | ❌ | error: don't know how to synthesize implicit argument `α` |
+
+## 4 · Re‑medición tras borrar FOL `FOL/MetaRules.lean` (2026‑10‑02, tarde; ADR‑115 §8)
+
+La misma pasada de §3 —`lake env lean sondeos/<f>.lean` sobre los 85, de uno en uno, desde la raíz de RPP—
+contra el árbol de ADR‑115 §8 (FOL sin `MetaRules`, RPP reconstruido contra él): **31 compilan, 54 no**.
+Respecto de la tabla de §3 cambian exactamente **dos** filas; los otros 83 dan el mismo estado y el mismo
+primer error.
+
+| sondeo | §3 | ahora | primer error |
+|---|:---:|:---:|---|
+| `AnclaSoundness.lean` | ❌ | ✅ | — (reparado tras la pasada de §3: importaba `Meta/OmegaStrength.lean`) |
+| `HenkinSaleDeRaa.lean` | ✅ | ❌ | `sondeos/HenkinSaleDeRaa.lean:94:18`: Unknown identifier `FOL.MetaRules.raa` |
+
+Los siete sondeos de la auditoría (`PrfBotCodificacionVieja`, `MetaReglasRefutables`,
+`ListInductionAxiomRefutable`, `OmegaConsistentRefutable`, `AnclaEqInconsistente`, `ModeloBasura`,
+`AnclaSoundness`) **compilan**, y `DerivesSinMetaReglas` también.

@@ -342,7 +342,7 @@ por módulo. Resumen:
 3. **Selective exports**: cada módulo termina con un bloque `export` que enumera su API pública.
 4. **Sin Mathlib** (ADR-001): solo `FOL` como dependencia externa.
 5. **One namespace per module** (ADR-005): mirrors file path.
-6. ~~**6 meta-reglas ω** (ADR-010) … re-exportadas desde `Minimal.Axioms`.~~ ✏️ **2026‑10‑02 (ADR‑115):** RPP no usa `⊢`; las meta‑reglas de FOL (4 `axiom`, refutables: L1‑3) ya no se importan, y FOL las retira.
+6. ~~**6 meta-reglas ω** (ADR-010) … re-exportadas desde `Minimal.Axioms`.~~ ✏️ **2026‑10‑02 (ADR‑115):** RPP no usa `⊢`; las meta‑reglas de FOL (4 `axiom`, refutables: L1‑3) ya no se importan, y FOL las borró el mismo día (ADR‑115 §8).
 
 ---
 

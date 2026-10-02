@@ -44,7 +44,7 @@ maquinaria de coding) vía `thy`.
 postulados se refutan sin usarlos, Lean + cualquiera de ellos demuestra `False`, y
 `ax_list_induction` (un `axiom` de RPP, retirado) daba por sí solo `axioms ⊢ ⊥`
 (`sondeos/MetaReglasRefutables.lean`, `sondeos/ListInductionAxiomRefutable.lean`). La capa `⊢`
-se retiró de RPP (ADR‑115); en FOL, `FOL/MetaRules.lean` sigue pendiente de retirar.
+se retiró de RPP (ADR‑115), y FOL borró `FOL/MetaRules.lean` el mismo día.
 
 **Infraestructura de porte.** Los lemas-ecuación del verificador se demostraron a
 nivel `axioms ⊢` con `ax`(=`Derives.hyp`/thy) + `spec`(=`elim_forall`) + `simp`. Su

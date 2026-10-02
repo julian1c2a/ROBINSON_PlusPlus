@@ -5,20 +5,25 @@
 # ⛔⛔ POR QUÉ EXISTE (2026-09-16)
 #
 # El proyecto tiene CINCO nociones de derivabilidad, y hasta el 2026-09-14 nadie podía decir,
-# mirando el árbol, cuál era HERRAMIENTA y cuál SUJETO. Ese es el agujero que se cobró
-# `FOL.soundness`: un teorema que demostraba `False` sin hipótesis, y que vivió meses porque
-# NADA medía que `Derives` estuviera habitado por axiomas.
+# mirando el árbol, cuál era HERRAMIENTA y cuál SUJETO. NADA medía que `Derives` estuviera
+# habitado por axiomas, y con ellos en el entorno `FOL.soundness` daba `False` sin hipótesis.
 #
-# ⚠️ `#print axioms` NO lo habría cazado: un teorema probado por inducción sobre un inductivo
-# habitado tiene footprint LIMPIO. Es la clase M-11, y es ciega al footprint.
+# ✏️ 2026-10-02 (ADR-114 §2, ADR-115): aquello se leyó al revés. El recursor cubre a TODO
+# habitante, también a los que fabrica un axioma: un teorema probado por inducción sobre un
+# inductivo habitado es VÁLIDO (`FOL.soundness` lo era). Lo que puede ser falso es el AXIOMA:
+# si contradice lo que la inducción demuestra, Lean + él ⊢ `False`. Así eran los cuatro de
+# `FOL/MetaRules.lean`, borrados. M-11 («no inducir») evitaba ESCRIBIR la contradicción, no la quitaba.
 #
-# 🔑 Lo que este control mide es la ÚNICA cifra que decide si `induction` es legítima:
-#    cuántos `axiom` HABITAN cada inductivo. Y lo mide por el TIPO de cada axioma —la cabeza de
-#    su conclusión—, no por grep sobre los nombres.
+# ⚠️ `#print axioms` NO lo ve: el footprint de un teorema probado por inducción no lleva los
+#    axiomas que habitan el inductivo. Por eso hace falta este censo aparte.
+#
+# 🔑 Lo que este control mide: cuántos `axiom` HABITAN cada inductivo, y lo mide por el TIPO de
+#    cada axioma —la cabeza de su conclusión—, no por grep sobre los nombres. Con 0, nada que se
+#    demuestre por inducción puede chocar con un postulado sobre ese inductivo.
 #
 # ⭐ Rompe en LOS DOS SENTIDOS, y el que importa es el de subida: si alguien declara un `axiom`
-#    que habita `Prfᵢ`, este control dice que la inducción sobre `Prfᵢ` acaba de volverse
-#    ILEGÍTIMA — que es exactamente el aviso que faltó en mayo.
+#    que habita `Prfᵢ`, este control lo dice, y lo primero es comprobar que lo ya probado por
+#    inducción sobre `Prfᵢ` (su solidez, por ejemplo) no lo refuta.
 #
 # 🔧 EJECUTAR DESDE POWERSHELL (desde Bash, `lake` no está en el PATH — y el script lo DICE).
 # ⛔ Desde la raíz de ROBINSON_PlusPlus, NUNCA `cd FOL && lake ...`.
@@ -28,8 +33,10 @@ cd "$(dirname "$0")" || exit 2
 # ── LA TABLA DECLARADA ─────────────────────────────────────────────────────────────────────
 # nombre | constructores | axiomas que lo HABITAN | teorema de solidez EN EL BUILD ('-' = ninguno)
 # ⚠️ Esta tabla es la misma de `REFERENCE.md` §0bis. Si cambia una, cambian las dos.
+# 2026-10-02 (ADR-115): `Derives` baja de 4 a 0 al borrarse `FOL/MetaRules.lean`, y gana su solidez
+# en el build (`FOL/Inconsistencia.lean` §1).
 read -r -d '' ESTRATOS <<'EOF'
-Derives|22|4|-
+Derives|22|0|FOL.Inconsistencia.derives_soundness
 Derives₀|21|0|FOL.Metamath.Soundness0.derives0_soundness
 Derives₁|20|0|-
 Derives₂|22|0|-
@@ -73,6 +80,24 @@ run_cmd do
     | _ => pure ()
 LEANEOF
 
+# ⛔ 2026-10-02 (ADR-115): la cuarta columna, la SOLIDEZ, se declaraba y NO se comprobaba: el
+# bloque que la «miraba» era un `:` vacío, y un nombre inventado daba verde. Ahora, por cada
+# fila con solidez, el fichero busca el teorema en el entorno y exige que su TIPO mencione el
+# inductivo de la fila; si no, no imprime su marca y el control rompe.
+while IFS='|' read -r NOMBRE _ _ SOLIDEZ; do
+  { [ -n "$NOMBRE" ] && [ "$SOLIDEZ" != "-" ]; } || continue
+  cat >> "$LEANFILE" <<SOLEOF
+
+run_cmd do
+  let env ← Lean.getEnv
+  match env.find? (String.toName "$SOLIDEZ") with
+  | none => pure ()
+  | some ci =>
+    if ci.type.getUsedConstants.contains (String.toName "$NOMBRE") then
+      logInfo m!"@SOL $NOMBRE $SOLIDEZ"
+SOLEOF
+done <<< "$ESTRATOS"
+
 echo "════ CENSO DE ESTRATOS ════"
 
 if ! command -v lake >/dev/null 2>&1; then
@@ -106,19 +131,23 @@ while IFS='|' read -r NOMBRE CTORS HABS SOLIDEZ; do
     if [ "$HABS" = "0" ]; then
       printf "  ✓ %-46s %3s ctors · %s axiomas ⇒ INDUCCIÓN LEGÍTIMA\n" "$NOMBRE" "$REAL_C" "$REAL_H"
     else
-      printf "  ✓ %-46s %3s ctors · %s axiomas ⛔ INDUCCIÓN PROHIBIDA (M-11)\n" "$NOMBRE" "$REAL_C" "$REAL_H"
+      printf "  ✓ %-46s %3s ctors · %s axiomas ⛔ HABITADO: compruébalos contra lo que la inducción demuestra (ADR-115)\n" "$NOMBRE" "$REAL_C" "$REAL_H"
     fi
   else
     printf "  ✗ %-46s %s ctors / %s axiomas — declarado %s / %s\n" \
       "$NOMBRE" "$REAL_C" "$REAL_H" "$CTORS" "$HABS"
     [ "$REAL_H" -gt "$HABS" ] 2>/dev/null && \
-      echo "      ⛔⛔ HAY MÁS AXIOMAS HABITÁNDOLO: si era inducible, HA DEJADO DE SERLO."
+      echo "      ⛔⛔ HAY MÁS AXIOMAS HABITÁNDOLO: si contradicen lo ya probado por inducción, son FALSOS."
     FAIL=1
   fi
-  # solidez declarada en el build
+  # solidez declarada en el build: la marca `@SOL` sólo sale si el teorema existe y habla de él
   if [ "$SOLIDEZ" != "-" ]; then
-    if printf '%s' "$PLANA" | grep -qF "$SOLIDEZ"; then
-      : # se vio en la salida (aparece en algún @HAB/@CTORS sólo si es axioma/inductivo)
+    if printf '%s' "$PLANA" | grep -qF "@SOL $NOMBRE $SOLIDEZ"; then
+      printf "      └ solidez en el build: %s\n" "$SOLIDEZ"
+    else
+      printf "  ✗ %-46s solidez declarada '%s': NO está en el entorno, o su tipo no menciona '%s'\n" \
+        "$NOMBRE" "$SOLIDEZ" "$NOMBRE"
+      FAIL=1
     fi
   fi
 done <<< "$ESTRATOS"
@@ -189,12 +218,13 @@ if [ "$N" = "0" ]; then
 fi
 if [ "$FAIL" = "0" ]; then
   echo "✅ LOS $N ESTRATOS CUADRAN."
-  echo "   ⚠️  Recordatorio: \`#print axioms\` es CIEGO a esto. Un teorema probado por inducción"
-  echo "       sobre un inductivo habitado tiene footprint LIMPIO y es injustificado (M-11)."
+  echo "   ⚠️  Recordatorio: \`#print axioms\` es CIEGO a esto. El footprint de un teorema probado por"
+  echo "       inducción no lleva los axiomas que habitan el inductivo, y el teorema es válido: lo que"
+  echo "       puede ser falso es el AXIOMA (ADR-115). Por eso se cuentan aquí."
 else
   echo "❌ EL CENSO DE ESTRATOS NO CUADRA."
   echo "   Si subió el número de axiomas de un estrato, lo PRIMERO es mirar qué se demostró"
-  echo "   por inducción sobre él: puede haber dejado de ser legítimo."
+  echo "   por inducción sobre él: si el axioma nuevo lo contradice, Lean + él ⊢ False."
   echo "   Y si el cambio es correcto, actualizar ESTA tabla Y la de REFERENCE.md §0bis."
 fi
 exit "$FAIL"
