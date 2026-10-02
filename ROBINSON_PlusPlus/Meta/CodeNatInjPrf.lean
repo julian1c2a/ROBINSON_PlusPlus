@@ -78,14 +78,16 @@ theorem tri_diag_unique {s y s' y' : Nat} (hy : y ≤ s) (hy' : y' ≤ s')
     rw [triN_succ] at h1
     omega
 
-/-- **`consN` es INYECTIVA.** Es el emparejamiento de Cantor: `consN a b = triN (a+b+1) + (b+1)`,
-    con el offset `b+1` acotado por la diagonal `a+b+1`. -/
+/-- **`consN` es INYECTIVA.** Es el emparejamiento de Cantor más uno:
+    `consN a b = triN (a+b) + b + 1`, con el offset `b` acotado por la diagonal `a+b`. -/
 -- ⚠️ `∧` resuelve a `Formula.and` con `Minimal.Axioms` abierto (trampa de notación conocida):
 --    aquí hace falta `And` de `Prop`, explícito.
 theorem consN_inj {a b a' b' : Nat} (h : consN a b = consN a' b') :
     And (a = a') (b = b') := by
-  have h' : triN (a + (b + 1)) + (b + 1) = triN (a' + (b' + 1)) + (b' + 1) := h
-  have hs : a + (b + 1) = a' + (b' + 1) :=
+  have h' : triN (a + b) + b = triN (a' + b') + b' := by
+    have h0 : triN (a + b) + b + 1 = triN (a' + b') + b' + 1 := h
+    omega
+  have hs : a + b = a' + b' :=
     tri_diag_unique (by omega) (by omega) h'
   -- con la diagonal ya igualada, los dos `triN` son el MISMO término y se cancelan
   rw [hs] at h'
@@ -94,7 +96,7 @@ theorem consN_inj {a b a' b' : Nat} (h : consN a b = consN a' b') :
 
 
 
-/-- `consN` nunca vale 0 (su offset es `b+1 ≥ 1`) ⟹ separa lista vacía de no vacía. -/
+/-- `consN` nunca vale 0 (es un sucesor) ⟹ separa lista vacía de no vacía. -/
 theorem consN_ne_zero (a b : Nat) : consN a b ≠ 0 := by
   unfold consN; omega
 

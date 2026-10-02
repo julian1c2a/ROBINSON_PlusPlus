@@ -1209,15 +1209,16 @@ Todo en forma **OBJETO** (argumentos abstractos ⇒ vale para todo numeral) y **
 | **`div2(2m‾) = m̄`** | **`theorem prf_div2_numeral (m : Nat) : Prf (div2 (numeral (2 * m)) =eq numeral m)`** |
 | `mod2(S·σS) = 0` (consecutivos) | `theorem prf_mod2_consec (S : Term) : Prf (mod2 (mul S (succ S)) =eq zero)` |
 | `mod2(cpOf h t) = 0` | `theorem prf_mod2_cpOf (h t : Term) : Prf (mod2 (cpOf h t) =eq zero)` |
-| **`(cons h t)·2 = cpOf h t`** | **`theorem prf_cons_double (h t : Term) : Prf (mul (cons h t) two =eq cpOf h t)`** |
+| **`(pair h t)·2 = cpOf h t`** | **`theorem prf_pair_double (h t : Term) : Prf (mul (div2 (cpOf h t)) two =eq cpOf h t)`** |
 
 Álgebra auxiliar portada aquí porque **eran axiomas objeto, no teoremas**: `prf_mul_distrib` (ax12),
 `prf_mul_assoc` (ax11), `prf_mul_distrib_right`, `prf_swap_mul2`, más los homomorfismos
 `prf_numeral_mul`/`prf_gnum_mul` (el de `·` sólo existía en la capa ω) y las congruencias
 `prf_eq_congr_div2`/`prf_eq_congr_mod2`.
 
-⚠️ `prf_cons_double` es **el puente** de la fase C de `pcc_dot_cons` (§3.25.3): es un teorema OBJETO,
-luego se «dota» con `prf_congr_tcFn` **sin coste**.
+⚠️ `prf_pair_double` es **el puente** de la fase C de `pcc_dot_cons` (§3.25.3): es un teorema OBJETO,
+luego se «dota» con `prf_congr_tcFn` **sin coste**. (`prf_cons_double`, retirado por ADR-113, sobre
+`cons h t = pair h (σt)`; con `cons h t = σ (pair h t)` el puente habla de `pair`.)
 
 #### 3.24.4 `Meta/NatOrderPrf.lean` · `Meta/NatMulPrf.lean` · `Meta/CantorMonoPrf.lean`
 
@@ -1235,9 +1236,10 @@ cálculo finitario `Prf` y construyen encima.
   **cancelación** `prf_lt_of_mul_lt_mul_right`; tricotomía `prf_lt_trichotomy` e irreflexividad
   `prf_lt_irrefl`; `div2`/`mod2` (`prf_div_mod_eq` = ax17, `prf_mod2_range` = ax21).
 * **`CantorMonoPrf`** — **`prf_cantor_mono_left (h t) : Prf (lt h (cons h t))`** y
-  `prf_cantor_mono_right`: *el sub‑código es estrictamente menor que el código*. 13 pasos troceados.
-  Aquí vive `abbrev cpOf (h t : Term) : Term` ( `= cantor_poly h (σt)` ) y `prf_cons_div2`,
-  `prf_cons_div_mod`.
+  `prf_cantor_mono_right`: *el sub‑código es estrictamente menor que el código*. Desde ADR-113 salen
+  de un núcleo común, `prf_lt_succ_div2 : a + a ≤ c ⟹ a < σ(div2 c)`. Aquí vive
+  `abbrev cpOf (h t : Term) : Term` ( `= cantor_poly h t` ), `prf_cons_div2`
+  (`cons h t = σ(div2 (cpOf h t))`) y `prf_pair_div_mod`.
 
 #### 3.24.5 `Meta/DiagonalNumeral.lean` — el lema diagonal rehecho, y **Gödel I**
 
@@ -1361,14 +1363,14 @@ theorem pcc_dot_cons (h t : Term) :
 ```
 
 **Sin inducción nueva.** `cons` no tiene ecuaciones recursivas propias: `ax_L0_cons_def` lo define
-como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, los tres ya internalizados. Es
+como `σ (div2 (cantor_poly h t))` (ADR-113), o sea `σ`, `+`, `·` y `div2`, todos ya internalizados. Es
 **ensamblaje**, en tres fases:
 
 | fase | qué | pieza |
 |---|---|---|
 | **A** | la instancia codificada de `ax_L0_cons_def` **computa por `rfl`** (igual que `ax5`/`ax9`) | `prf_axL0_body_computes`, `pcc_axL0_computed` |
-| **B** | el polinomio de Cantor se evalúa dentro de `Prov` en **cinco** pasos | `pcc_rw`, `pcc_rw_div2` |
-| **C** | el `div2` se cancela contra `prf_div2_double`; puente `prf_cons_double` | `pcc_div2_cons` |
+| **B** | el polinomio de Cantor se evalúa dentro de `Prov` en **cinco** pasos, bajo el `σ` | `pcc_rw`, `pcc_rw_sdiv2` |
+| **C** | el `div2` se cancela contra `prf_div2_double`; puente `prf_pair_double`; el `σ` se pliega a nivel de código | `pcc_div2_pair` |
 
 **API pública:**
 
@@ -1379,8 +1381,9 @@ como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, los tres ya interna
 | código del polinomio de Cantor | `def cpOfT (X Y : Term) : Term` · variante plegada `def cpOfT' (X Y1 : Term) : Term` |
 | **reescritura interna en un hueco** | `theorem pcc_rw (G : Term → Term) (hG : ∀ s, Prf (substfc zero s (G (varc (numeral 0))) =eq G s)) (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) (hbase : Prf (provFromCode (G X))) : Prf (provFromCode (G Y))` |
 | su molde para `L = div2(D ·)` | `theorem pcc_rw_div2 (L : Term) (hL …) (D : Term → Term) (hD …) …` |
-| fase A | `theorem pcc_axL0_computed (h t : Term) : Prf (provFromCode (eqCodeFn (consT (tcFn h) (tcFn t)) (div2cT (cpOfT (tcFn h) (tcFn t)))))` |
-| fase C | `theorem pcc_div2_cons (h t : Term) : Prf (provFromCode (eqc (div2cT (tcFn (cpOf h t))) (tcFn (cons h t))))` |
+| su molde para `L = σ(div2(D ·))` | `theorem pcc_rw_sdiv2 (L : Term) (hL …) (D : Term → Term) (hD …) …` |
+| fase A | `theorem pcc_axL0_computed (h t : Term) : Prf (provFromCode (eqCodeFn (consT (tcFn h) (tcFn t)) (succcT (div2cT (cpOfT (tcFn h) (tcFn t))))))` |
+| fase C | `theorem pcc_div2_pair (h t : Term) : Prf (provFromCode (eqc (div2cT (tcFn (cpOf h t))) (tcFn (div2 (cpOf h t)))))` |
 | `⌜2⌝ = 2˙` | `theorem prf_tc_two : Prf (tcFn two =eq termCode two)` |
 | congruencias / `substtc` | `prf_congr_consT`, `prf_congr_div2cT`, `prf_congr_cpOfT`, `prf_congr_cpOfT2`, `prf_substtc_consT`, `prf_substtc_div2cT`, `prf_substtc_cpOfT`, `prf_substtc_two`, `substtc_inv_consT`, `substtc_inv_div2cT` |
 
@@ -1388,7 +1391,7 @@ como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, los tres ya interna
 
 1. **Todo teorema OBJETO se «dota» GRATIS.** `tcFn` es un símbolo de función, luego `prf_congr_tcFn`
    transporta cualquier `Prf (a =eq b)` a `Prf (ȧ =eq ḃ)` **a nivel de código, sin entrar en `Prov`**.
-   Por eso `prf_cons_double` sirve de puente sin coste y los pasos `σ(ẋ) ⟶ (σx)˙` son libres
+   Por eso `prf_pair_double` sirve de puente sin coste y los pasos `σ(ẋ) ⟶ (σx)˙` son libres
    (`prf_tc_succ'`). **Antes de razonar dentro de `Prov`, comprobar si el paso es objeto.**
 2. **`substfc` sustituye TODAS las ocurrencias del hueco.** El polinomio `(x+y)·σ(x+y)+2y` menciona
    `x+y` **dos veces**; reescribir por posiciones exigiría congruencias a cada profundidad. Con el

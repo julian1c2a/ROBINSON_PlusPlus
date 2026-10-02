@@ -14,6 +14,17 @@
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están repatriados a la cadena activa.
 > * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 >
+> **2026‑09‑28 — 🏁 ADR‑113: `cons a b = σ (pair a b)`, la salida (5) ADOPTADA.** Decisión del
+> propietario entre relativizar `listInd` y sacar el `σ` (ADR‑088/090/092/093). `ax_L0_cons_def` pasa a
+> `∀∀. cons #1 #0 = σ (pair #1 #0)` y `consN a b` a `triN (a+b) + b + 1` (nuevo `pairN`). Con ello
+> **todo número es `nil` o `cons`** y la inducción de listas es verdadera en ℕ. **Radio medido por el
+> compilador**: seis módulos (`Block6`, `CantorMonoPrf`, `Div2ParityPrf`, `CodeNumeralPrf`,
+> `CodeNatInjPrf`, `DotConsPrf`); los otros 139 compilan sin tocarlos. Renombres: `prf_cons_double` →
+> `prf_pair_double`, `prf_cons_div_mod` → `prf_pair_div_mod`, `pcc_div2_cons` → `pcc_div2_pair`,
+> `two_mul_consN` → `two_mul_pairN`; nuevos `prf_le_self_mul_self_all`, `prf_lt_succ_div2`,
+> `pcc_rw_sdiv2`. **145 jobs · 0 sorry · 11 warnings · 517 footprints, ninguno cambia.**
+> `sondeos/ModeloBasura.lean` conserva la medición de la codificación anterior con `consOldN`.
+>
 > **2026‑09‑11 (d) — 🏁 MÓDULOS C/D: `DEUDA_inNeg` SALDADA. `NegVerifier` queda a UNA deuda.**
 > `Meta/ChainNegPrf.lean`. **§1 el PUENTE** `derives_chainOk_neg_of_line`: de **una** línea cuyo
 > `lineWF` la teoría refuta sale `⊢ ¬hainOk nil ⟦l⟧`, y sale de piezas **que ya estaban** —
@@ -1014,7 +1025,7 @@ lo define como `div2 (cantor_poly h (σt))`, o sea `+`, `·` y `div2`, ya intern
   `ax_L0_cons_def`, igual que sobre `ax5`/`ax9`. Era la pregunta arriesgada de la fase.
 * **(B)** el polinomio de Cantor se evalúa dentro de `Prov` en **cinco** pasos.
 * **(C)** el `div2` se cancela con `pcc_thm_inst` sobre `prf_div2_double_all`; el puente es
-  `prf_cons_double` (`Div2ParityPrf`).
+  `prf_cons_double` (`Div2ParityPrf`; retirado por ADR-113, hoy `prf_pair_double`).
 
 Dos herramientas nuevas, reutilizables: **`pcc_rw`** (reescritura interna en un hueco de
 código‑contexto) y **`pcc_rw_div2`** (su molde para `L = div2(D ·)`).

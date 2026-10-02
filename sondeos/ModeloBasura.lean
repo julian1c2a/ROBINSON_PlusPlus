@@ -57,6 +57,12 @@ todo el dominio — y entonces habla de lo que no debería.**
 
 ⇒ **(4) primero**: es una medición, y las otras tres son decisiones que dependen de ella.
 
+## ✅ Resuelto (ADR-113, 2026-09-28)
+
+El propietario adoptó la salida (5) de ADR-093: `ax_L0_cons_def` es hoy `cons a b = σ (pair a b)`.
+Este sondeo mide la codificación **anterior** con una copia local (`consOldN`); con la vigente no hay
+basura (`sondeos/CantorSobreyectivo.lean`, `sin_basura`).
+
 ## Cómo re‑ejecutarlo
 
     lake env lean sondeos/ModeloBasura.lean      # desde la raíz de RPP
@@ -66,13 +72,16 @@ open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 namespace ModeloBasura
 
-/-- La interpretación que `ax_L0_cons_def` fuerza, y que ya estaba en producción. -/
-example (h t : Nat) : consN h t = triN (h + (t + 1)) + (t + 1) := rfl
+/-- La interpretación que `ax_L0_cons_def` forzaba ANTES de ADR-113, y que entonces estaba en
+    producción como `consN`. Desde ADR-113 (`cons a b = σ (pair a b)`) el `consN` de producción es
+    `triN (a+b) + b + 1` y no deja basura (`sondeos/CantorSobreyectivo.lean`); esta copia local
+    conserva la medición histórica. -/
+def consOldN (a b : Nat) : Nat := triN (a + (b + 1)) + (b + 1)
 
 /-- ⛔⛔ **EL 1 NO ES UN `cons`.** -/
-theorem uno_no_es_cons : ∀ h t : Nat, consN h t ≠ 1 := by
+theorem uno_no_es_cons : ∀ h t : Nat, consOldN h t ≠ 1 := by
   intro h t hc
-  simp only [consN] at hc
+  simp only [consOldN] at hc
   have : triN (h + (t + 1)) ≥ 1 := by
     cases hs : h + (t + 1) with
     | zero => omega
@@ -81,11 +90,11 @@ theorem uno_no_es_cons : ∀ h t : Nat, consN h t ≠ 1 := by
 
 /-- «Es `nil` o es un `cons`» — la Φ del contraejemplo.
     ⚠️ `Or` explícito: con `Minimal.Axioms` en contexto, `∨` se parsea como `Formula.or`. -/
-def EsLista (n : Nat) : Prop := Or (n = 0) (∃ h t, consN h t = n)
+def EsLista (n : Nat) : Prop := Or (n = 0) (∃ h t, consOldN h t = n)
 
 theorem base : EsLista 0 := Or.inl rfl
 
-theorem paso : ∀ h t, EsLista t → EsLista (consN h t) :=
+theorem paso : ∀ h t, EsLista t → EsLista (consOldN h t) :=
   fun h t _ => Or.inr ⟨h, t, rfl⟩
 
 /-- ⛔⛔ **Y sin embargo NO vale para todo el dominio.** Base + paso + esto es exactamente la

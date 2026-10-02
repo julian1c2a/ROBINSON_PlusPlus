@@ -1,10 +1,28 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
+
+> # 🗓️ 2026‑09‑28 — 🏁 **ADR‑113: `cons a b = σ (pair a b)`**, y el frente del modelo DESBLOQUEADO
+>
+> El propietario adoptó la salida (5) de ADR‑093 frente a relativizar `listInd`. Aplicada y **medida por el
+> compilador**: seis módulos adaptados, los otros 139 intactos, **145 jobs**, 0 sorry, 11 warnings,
+> **517 footprints sin un solo cambio**. Detalle y tabla en ADR‑113.
+>
+> ## ⬜ Lo que queda AHORA — el modelo de los 141
+>
+> 1. ⬜ **A2** — la capa de listas de `sondeos/ModeloNat.lean`: `ax_L0`–`ax_L3`, `ax_C1`–`ax_C3`, `prodp`
+>    (9 de los 34 `coreAxioms`), con `concatN`/`InN`/`prodpN` sobre `Nat` por *decodificar → función de
+>    Lean → recodificar*. Ya no hay basura que interpretar.
+> 2. ⬜ **A3** — los 107 `codingAxioms`. Sin cotizar: primero un sondeo que mida uno por forma.
+> 3. ⬜ **A4** — la solidez de `Prf` por inducción sobre `Prf`, con los 13 lemas de `FOL/Semantics.lean`.
+> 4. ⬜ **A5** — `ConsistentH` como teorema. ⚠️ `AnclaEq` sigue sin instancia (`AXIOMS.md`).
+> 5. ⬜ **Deuda de documentación**: `doc/REFERENCE-Incompleteness.md` no proyecta ADR‑075…097 ni el modelo;
+>    este fichero no recoge ADR‑098…112.
+
 
 **Estado 2026‑09‑22 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
 🏁🏁🏁🏁 **`NegVerifier` es un TEOREMA** (ADR‑097): las dos deudas de `Meta/VerifierSound.lean` están saldadas y `reflects_of_omega` pasa de **dos** hipótesis a **una**.
@@ -2760,7 +2778,7 @@
 >   internas (`pcc_rw`) con reescrituras **de código**, que son gratis (`succcT (tcFn x) = tcFn (σx)`
 >   es `prf_tc_succ'`, y `tcFn` es congruente ⇒ todo teorema OBJETO se «dota» sin coste).
 > * **(C)** el `div2` se cancela contra `prf_div2_double` vía `pcc_thm_inst`; el puente con el
->   polinomio es **`prf_cons_double`** (`Div2ParityPrf`), que es objeto y se dota con `prf_congr_tcFn`.
+>   polinomio es **`prf_cons_double`** (`Div2ParityPrf`; retirado por ADR-113, hoy `prf_pair_double`), que es objeto y se dota con `prf_congr_tcFn`.
 >
 > 🔑 **La idea que abarató (B):** el polinomio `(x+y)·σ(x+y)+2y` menciona `x+y` **dos veces**.
 > Reescribir por posiciones exigiría congruencias a cada profundidad — pero `substfc` sustituye

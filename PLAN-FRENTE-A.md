@@ -166,13 +166,13 @@ peldaño es **ensamblaje**, en tres fases:
 |---|---|---|
 | **A** | ¿computa `substCodeF` por `rfl` sobre el cuerpo de `ax_L0_cons_def`? (la pregunta arriesgada) | **Sí**, igual que sobre `ax5`/`ax9`. `prf_axL0_body_computes` |
 | **B** | evaluar el polinomio dentro de `Prov` | 5 pasos, alternando `pcc_rw` (interno) con reescrituras **de código** (gratis) |
-| **C** | cancelar el `div2` | `pcc_thm_inst` sobre `prf_div2_double_all`; puente `prf_cons_double`, dotado con `prf_congr_tcFn` |
+| **C** | cancelar el `div2` | `pcc_thm_inst` sobre `prf_div2_double_all`; puente `prf_cons_double` (retirado por ADR-113, hoy `prf_pair_double`), dotado con `prf_congr_tcFn` |
 
 #### Las dos lecciones que abarataron el ensamblaje
 
 1. **Todo teorema OBJETO se «dota» gratis.** `tcFn` es un símbolo de función, así que
    `prf_congr_tcFn` transporta cualquier `Prf (a =eq b)` a `Prf (ȧ =eq ḃ)` a nivel de código, **sin
-   entrar en `Prov`**. Por eso `prf_cons_double` (`(cons h t)·2 = cpOf h t`, `Div2ParityPrf`) sirve
+   entrar en `Prov`**. Por eso `prf_cons_double` (`(cons h t)·2 = cpOf h t`, `Div2ParityPrf`; retirado por ADR-113) sirve
    de puente sin coste, y por eso los pasos `σ(ẋ) ⟶ (σx)˙` son gratis (`prf_tc_succ'`).
 2. **`substfc` sustituye TODAS las ocurrencias del hueco.** El polinomio `(x+y)·σ(x+y)+2y` menciona
    `x+y` dos veces; reescribir por posiciones exigiría congruencias a cada profundidad. Con el

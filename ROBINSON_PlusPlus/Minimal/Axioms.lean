@@ -125,7 +125,7 @@ def pair (x y : Term) : Term :=
 -- List constructors
 def nil : Term := zero
 -- `cons h t` es un constructor de lista con cabeza `h` y cola `t`. El símbolo de
--- función es `cons_sym = "::"`, opaco; ax_L0_cons_def lo conecta con `pair h (succ t)`.
+-- función es `cons_sym = "::"`, opaco; ax_L0_cons_def lo conecta con `succ (pair h t)` (ADR-113).
 
 -- ## Display
 
@@ -352,8 +352,9 @@ def ax26_pred_succ : Formula :=
 -- ### Axioms of Lists
 
 -- Ax L0: Connects Cons to the underlying pair definition
+-- A0 (ADR-093, salida (5)): `cons a b = σ (pair a b)` — sin basura en ℕ.
 def ax_L0_cons_def : Formula :=
-  forall_2 (cons (.var 1) (.var 0) =eq pair (.var 1) (succ (.var 0)))
+  forall_2 (cons (.var 1) (.var 0) =eq succ (pair (.var 1) (.var 0)))
 
 -- Ax L1: In(x, Nil) is always false
 def ax_L1_in_nil : Formula :=

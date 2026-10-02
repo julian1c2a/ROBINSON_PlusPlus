@@ -368,34 +368,35 @@ theorem prf_mod2_consec (S : Term) : Prf (mod2 (mul S (succ S)) =eq zero) := by
     exact PrfH_eq_trans (PrfH_eq_congr_mod2 hchain)
       (prf_to_prfH (prf_mod2_double (mul S (succ (div2 S)))) _)
 
-/-! ### `cpOf` es par, y por tanto `(cons h t)·2 = cpOf h t` -/
+/-! ### `cpOf` es par, y por tanto `(div2 (cpOf h t))·2 = cpOf h t` -/
 
-/-- **`cpOf h t` es PAR.** `cpOf = S·σS + 2·σt`: el primer sumando es par por
+/-- **`cpOf h t` es PAR.** `cpOf = S·σS + 2·t`: el primer sumando es par por
     `prf_mod2_consec`, el segundo lo es por construcción, y la suma de dos pares es par
     porque se factoriza el `·2` con distributividad. -/
 theorem prf_mod2_cpOf (h t : Term) : Prf (mod2 (cpOf h t) =eq zero) := by
-  let S : Term := add h (succ t)
+  let S : Term := add h t
   let P : Term := div2 (mul S (succ S))
   -- (1) `S·σS = P·2`
   have h1 : Prf (mul S (succ S) =eq mul P two) :=
     prf_eq_symm (prf_mp (prf_deduction (PrfH_double_div2_of_even (prfH_hyp_self _)))
       (prf_mod2_consec S))
-  -- (2) `2·σt = (σt)·2`
-  have h2 : Prf (mul two (succ t) =eq mul (succ t) two) := prf_mul_comm two (succ t)
-  -- (3) `cpOf = P·2 + (σt)·2 = (P + σt)·2`
-  have h3 : Prf (cpOf h t =eq mul (add P (succ t)) two) :=
+  -- (2) `2·t = t·2`
+  have h2 : Prf (mul two t =eq mul t two) := prf_mul_comm two t
+  -- (3) `cpOf = P·2 + t·2 = (P + t)·2`
+  have h3 : Prf (cpOf h t =eq mul (add P t) two) :=
     prf_eq_trans (prf_eq_trans (prf_eq_congr_add1 _ h1) (prf_eq_congr_add2 _ h2))
-      (prf_eq_symm (prf_mul_distrib_right P (succ t) two))
+      (prf_eq_symm (prf_mul_distrib_right P t two))
   exact prf_eq_trans (prf_eq_congr_mod2 h3)
-    (prf_mod2_double (add P (succ t)))
+    (prf_mod2_double (add P t))
 
-/-- **LA PIEZA DEL ENSAMBLAJE**: `(cons h t)·2 = cpOf h t`.
-    De `prf_cons_div_mod` (que es `ax17` en `cpOf`) anulando el resto con `prf_mod2_cpOf`. -/
-theorem prf_cons_double (h t : Term) : Prf (mul (cons h t) two =eq cpOf h t) :=
+/-- **LA PIEZA DEL ENSAMBLAJE**: `(pair h t)·2 = cpOf h t`, con `pair h t = div2 (cpOf h t)`
+    (y `cons h t = σ (pair h t)`, `prf_cons_div2`). De `prf_pair_div_mod` (que es `ax17` en
+    `cpOf`) anulando el resto con `prf_mod2_cpOf`. -/
+theorem prf_pair_double (h t : Term) : Prf (mul (div2 (cpOf h t)) two =eq cpOf h t) :=
   prf_eq_trans
-    (prf_eq_symm (prf_eq_trans (prf_eq_congr_add2 (mul (cons h t) two) (prf_mod2_cpOf h t))
-      (prf_add_zero_t (mul (cons h t) two))))
-    (prf_cons_div_mod h t)
+    (prf_eq_symm (prf_eq_trans (prf_eq_congr_add2 (mul (div2 (cpOf h t)) two) (prf_mod2_cpOf h t))
+      (prf_add_zero_t (mul (div2 (cpOf h t)) two))))
+    (prf_pair_div_mod h t)
 
 
 end ROBINSON_PlusPlus.Meta.Div2ParityPrf
@@ -409,5 +410,5 @@ export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
   prf_mul_assoc prf_mul_distrib_right prf_swap_mul2
   prf_eq_congr_mod2 PrfH_eq_congr_mod2
   PrfH_double_div2_of_even PrfH_succ_double_of_odd
-  prf_mod2_consec prf_mod2_cpOf prf_cons_double
+  prf_mod2_consec prf_mod2_cpOf prf_pair_double
 )

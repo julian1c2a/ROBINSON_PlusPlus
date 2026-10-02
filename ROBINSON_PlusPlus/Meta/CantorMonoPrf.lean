@@ -27,21 +27,21 @@ namespace ROBINSON_PlusPlus.Meta.CantorMonoPrf
 la inducción fuerte sobre códigos (ii) es derivable de `ax_induction`, y con ella
 `pcc_eval_substfc` (iii) y los 7 tags de `lineWF` que faltan.
 
-⚠️ **`cons h t` NO es defeq a `pair h (σt)`** (verificado): `cons` es `.func "::"` opaco y la
+⚠️ **`cons h t` NO es defeq a `σ (pair h t)`** (verificado): `cons` es `.func "::"` opaco y la
 conexión con la aritmética es el **axioma objeto** `ax_L0_cons_def`. Todo el cálculo de esta
 sección va por tanto a nivel `Prf`, no por `rfl`.
 
 Cadena de definiciones (`Minimal/Axioms.lean`):
-* `cons h t = pair h (σt)`  — `ax_L0_cons_def`
+* `cons h t = σ (pair h t)`  — `ax_L0_cons_def` (ADR-113; antes `pair h (σt)`)
 * `pair x y = cantor_func x y = div2 (cantor_poly x y)` — definicional
 * `cantor_poly x y = (x + y)·σ(x + y) + 2·y` — definicional
 -/
 
 /-! ### Paso 1 — el puente `cons ↔ pair` (el único que no es definicional) -/
 
-/-- **`cons h t = pair h (σt)`** — instancia de `ax_L0_cons_def`. Es el puente entre el
-    constructor de listas (opaco) y la aritmética de Cantor. -/
-theorem prf_cons_def (h t : Term) : Prf (cons h t =eq pair h (succ t)) := by
+/-- **`cons h t = σ (pair h t)`** — instancia de `ax_L0_cons_def` (salida (5) de ADR-093). Es el
+    puente entre el constructor de listas (opaco) y la aritmética de Cantor. -/
+theorem prf_cons_def (h t : Term) : Prf (cons h t =eq succ (pair h t)) := by
   have hh := prf_spec (prf_spec (prf_ax (show ax_L0_cons_def ∈ axioms by simp [axioms])) h) t
   simp [ax_L0_cons_def, substFormula, substTerm, substTerms, cons, pair, cantor_func,
     cantor_poly, div2, add, mul, succ, two, one, zero,
@@ -141,8 +141,8 @@ theorem prf_le_succ_succ (a b : Term) : Prf (le a b ⇒ le (succ a) (succ b)) :=
 /-! ### Paso 6 — el núcleo contradictorio: `¬ (σw ≤ w)`
 
 Es el lema que cierra el argumento por contradicción de las dos mitades: cuando la hipótesis
-`cons h t ≤ h` se propaga por la ecuación de Cantor, desemboca exactamente en `σσz ≤ σz`, o sea
-en una instancia de éste. Ambas ramas mueren en `w < w` (irreflexividad). -/
+`σ(div2 c) ≤ a` se propaga por la ecuación de Cantor, desemboca exactamente en `σσz ≤ σz`, o sea
+en una instancia de éste (paso 11c). Ambas ramas mueren en `w < w` (irreflexividad). -/
 
 /-- **`σw ≤ w ⟹ ⊥`**. -/
 theorem prf_not_le_succ_self (w : Term) : Prf (le (succ w) w ⇒ Formula.bottom) := by
@@ -163,13 +163,13 @@ theorem prf_not_le_succ_self (w : Term) : Prf (le (succ w) w ⇒ Formula.bottom)
 
 /-! ### Pasos 7–8 — el término CUADRÁTICO de Cantor domina al doble
 
-La clave de la mitad izquierda: `cantor_poly h (σt)` contiene `s·σs` con `s = h + σt`, y hay que
-ver que eso ya supera a `2h+2`. Se hace en dos escalones, evitando la **monotonía estricta del
-producto** (que no existe en el catálogo y costaría construir).
+`cantor_poly h t` contiene `s·σs` con `s = h + t`, y hay que ver que eso ya supera a `s+s`. Se
+hace en dos escalones, evitando la **monotonía estricta del producto** (que no existe en el
+catálogo y costaría construir).
 
-⚠️ **La hipótesis `a = σk` es OBLIGATORIA** en esta forma, no un adorno: el catálogo sólo ofrece
-`prf_le_mul_succ a k : le a (a·σk)`, es decir, la cota necesita que el multiplicador sea
-**un sucesor**. Se suministra siempre desde `prf_add_succ_t h t` (que da `s = σ(h+t)`). -/
+⚠️ En esta forma **la hipótesis `a = σk` es obligatoria**: el catálogo sólo ofrece
+`prf_le_mul_succ a k : le a (a·σk)`. Con `cons = σ (pair h t)` (ADR-113) `s = h + t` puede ser `0`,
+y por eso existen las variantes `_all` de abajo (inducción, el paso no usa la hipótesis). -/
 
 /-- **`a ≤ a·a`**, para `a` un sucesor. -/
 theorem prf_le_self_mul_self {a k : Term} (h : Prf (a =eq succ k)) : Prf (le a (mul a a)) :=
@@ -182,56 +182,59 @@ theorem prf_le_double_self_mul_succ {a k : Term} (h : Prf (a =eq succ k)) :
   prf_le_subst2 (prf_eq_symm (prf_mul_succ a a))
     (prf_mp (prf_add_le_mono_right a (mul a a) a) (prf_le_self_mul_self h))
 
-/-! ### Pasos 9–10 — de `s+s` a `cantor_poly`, y de ahí a `2(σh)`
+/-- **`a ≤ a·a` para TODO `a`** — por inducción; el paso no usa la hipótesis (`σk ≤ σk·σk` es
+    `prf_le_mul_succ`) y la base es `0·0 = 0`. Sustituye a la hipótesis `a = σk` de
+    `prf_le_self_mul_self` donde `a` puede ser `0`. -/
+theorem prf_le_self_mul_self_all (a : Term) : Prf (le a (mul a a)) := by
+  have key : Prf (Formula.forall (le (.var 0) (mul (.var 0) (.var 0)))) := by
+    refine prf_nat_induction _ ?base ?step
+    · show Prf (le zero (mul zero zero))
+      exact prf_mp (prf_le_of_eq zero (mul zero zero)) (prf_eq_symm (prf_mul_zero zero))
+    · refine Prf.gen _ ?_
+      simp only [le, lt, substFormula, substTerm, substTerms, zero, succ, mul, liftFormula, liftTerm,
+        liftTerms, Nat.reduceAdd, Nat.reduceLT, Nat.reduceEqDiff, Nat.reduceGT, Nat.reduceSub,
+        reduceIte, if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+      exact prf_deduction (prf_to_prfH (prf_le_mul_succ (succ (.var 0)) (.var 0)) _)
+  have ha := prf_spec key a
+  simpa only [le, lt, substFormula, substTerm, substTerms, mul, Nat.reduceEqDiff, reduceIte,
+    if_true, FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using ha
 
-Con `s := h + σt`, `cantor_poly h (σt) = s·σs + 2·σt`. Dos observaciones que abaratan el tramo:
+/-- **`a + a ≤ a·σa`** para TODO `a`. -/
+theorem prf_le_double_self_mul_succ_all (a : Term) : Prf (le (add a a) (mul a (succ a))) :=
+  prf_le_subst2 (prf_eq_symm (prf_mul_succ a a))
+    (prf_mp (prf_add_le_mono_right a (mul a a) a) (prf_le_self_mul_self_all a))
 
-* El sumando `2·σt` se trata como **OPACO**: sólo hace falta que *esté* (`a ≤ a + x`), no calcularlo.
-  Por eso **`ax11`/`ax12`** (asociatividad y distributividad del producto) **no hacen falta**.
-* `s` es un sucesor por `prf_add_succ_t h t` (`s = σ(h+t)`), que es justo la hipótesis que exigen
-  los pasos 7–8. -/
+/-! ### Pasos 9–10 — de `s+s` a `cantor_poly h t`
 
-/-- **`s + s ≤ cantor_poly h (σt)`** con `s = h + σt`. El término cuadrático acota el doble, y el
-    sumando `2·σt` sólo se añade. -/
+Con `s := h + t`, `cantor_poly h t = s·σs + 2·t`. El sumando `2·t` se trata como **OPACO**: sólo
+hace falta que *esté* (`a ≤ a + x`). -/
+
+/-- Abreviatura: el polinomio de Cantor de `⟨h,t⟩` (es `cantor_poly h t` desplegado). -/
+abbrev cpOf (h t : Term) : Term :=
+  add (mul (add h t) (succ (add h t))) (mul two t)
+
+/-- **`s + s ≤ cantor_poly h t`** con `s = h + t`. -/
 theorem prf_le_double_s_cantor (h t : Term) :
-    Prf (le (add (add h (succ t)) (add h (succ t)))
-           (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t)))) :=
+    Prf (le (add (add h t) (add h t)) (cpOf h t)) :=
   prf_mp
-    (prf_mp (prf_le_trans (add (add h (succ t)) (add h (succ t)))
-        (mul (add h (succ t)) (succ (add h (succ t))))
-        (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))))
-      (prf_le_double_self_mul_succ (k := add h t) (prf_add_succ_t h t)))
-    (prf_le_self_add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t)))
+    (prf_mp (prf_le_trans (add (add h t) (add h t)) (mul (add h t) (succ (add h t))) (cpOf h t))
+      (prf_le_double_self_mul_succ_all (add h t)))
+    (prf_le_self_add (mul (add h t) (succ (add h t))) (mul two t))
 
-/-- **`σh ≤ s`** con `s = h + σt`: `h ≤ h + t`, se sube con `σ`, y se reescribe la cola. -/
-theorem prf_le_succ_h_s (h t : Term) : Prf (le (succ h) (add h (succ t))) :=
-  prf_le_subst2 (prf_eq_symm (prf_add_succ_t h t))
-    (prf_mp (prf_le_succ_succ h (add h t)) (prf_le_self_add h t))
-
-/-- **`σh + σh ≤ cantor_poly h (σt)`** — monotonía aditiva doble sobre `σh ≤ s`, compuesta con
-    el paso 9. Es la cota `2(σh) = 2h+2` que la contradicción final necesita. -/
-theorem prf_le_two_succ_h_cantor (h t : Term) :
-    Prf (le (add (succ h) (succ h))
-           (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t)))) :=
+/-- De `a ≤ s` a `a + a ≤ cantor_poly h t`. -/
+theorem prf_le_double_cantor_of_le {a h t : Term} (ha : Prf (le a (add h t))) :
+    Prf (le (add a a) (cpOf h t)) :=
   prf_mp
-    (prf_mp (prf_le_trans (add (succ h) (succ h))
-        (add (add h (succ t)) (add h (succ t)))
-        (add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))))
-      (prf_mp (prf_mp (prf_add_le_mono (succ h) (add h (succ t)) (succ h) (add h (succ t)))
-        (prf_le_succ_h_s h t)) (prf_le_succ_h_s h t)))
+    (prf_mp (prf_le_trans (add a a) (add (add h t) (add h t)) (cpOf h t))
+      (prf_mp (prf_mp (prf_add_le_mono a (add h t) a (add h t)) ha) ha))
     (prf_le_double_s_cantor h t)
 
 /-! ### Paso 11a — las dos identidades que hacen encajar la contradicción
 
-El argumento por contradicción desemboca en `σh + σh ≤ h·2 + 1`, y hay que reconocer ahí una
-instancia de `prf_not_le_succ_self` (`σw ≤ w`). Estas dos igualdades son las que lo revelan, con
-`w := σ(h+h)`:
+* `σa + σa = σσ(a+a)`
+* `n·2 + 1 = σ(n+n)` -/
 
-* `σa + σa = σσ(a+a)`  — o sea `σw`
-* `n·2 + 1 = σ(n+n)`   — o sea `w` -/
-
-/-- `σa + σa = σσ(a+a)`. (`σa + σa = σ(σa + a)` por `ax5`, y `σa + a = σ(a+a)` por
-    `prf_add_succ_left`.) -/
+/-- `σa + σa = σσ(a+a)`. -/
 theorem prf_succ_add_succ_eq (a : Term) :
     Prf (add (succ a) (succ a) =eq succ (succ (add a a))) :=
   prf_eq_trans (prf_add_succ_t (succ a) a) (prf_eq_congr_succ (prf_add_succ_left a a))
@@ -241,145 +244,79 @@ theorem prf_mul_two_add_one (n : Term) :
     Prf (add (mul n two) one =eq succ (add n n)) :=
   prf_eq_trans (prf_eq_congr_add1 one (prf_mul_two n)) (prf_add_one (add n n))
 
-/-! ### Paso 11b — la ecuación de `ax17` en términos de `cons`
+/-! ### Paso 11b — la ecuación de `ax17` sobre `pair h t = div2 (cantor_poly h t)` -/
 
-`ax17` habla de `div2 n`. Como `cons h t = pair h (σt)` y `pair h (σt)` **es defeq** a
-`div2 (cantor_poly h (σt))` (los tres `def` de `pair`/`cantor_func`/`cantor_poly` son planos),
-la ecuación se reescribe con `prf_cons_def` para que hable de `cons h t`. -/
-
-/-- Abreviatura: el polinomio de Cantor de la línea `⟨h,t⟩`. -/
-abbrev cpOf (h t : Term) : Term :=
-  add (mul (add h (succ t)) (succ (add h (succ t)))) (mul two (succ t))
-
-/-- **`cons h t = div2 (cantor_poly h (σt))`** — `prf_cons_def` con el lado derecho ya desplegado
-    (es pura reducción definicional: `pair → cantor_func → cantor_poly`). -/
-theorem prf_cons_div2 (h t : Term) : Prf (cons h t =eq div2 (cpOf h t)) :=
+/-- **`cons h t = σ (div2 (cantor_poly h t))`** — `prf_cons_def` con `pair` desplegado. -/
+theorem prf_cons_div2 (h t : Term) : Prf (cons h t =eq succ (div2 (cpOf h t))) :=
   prf_cons_def h t
 
-/-- **La ecuación de `ax17` para `cons`**: `(cons h t)·2 + mod2(cp) = cp`. -/
-theorem prf_cons_div_mod (h t : Term) :
-    Prf (add (mul (cons h t) two) (mod2 (cpOf h t)) =eq cpOf h t) :=
-  prf_eq_trans
-    (prf_eq_congr_add1 (mod2 (cpOf h t)) (prf_eq_congr_mul1 two (prf_cons_div2 h t)))
-    (prf_div_mod_eq (cpOf h t))
+/-- **La ecuación de `ax17` para `pair h t`**: `(div2 cp)·2 + mod2(cp) = cp`. -/
+theorem prf_pair_div_mod (h t : Term) :
+    Prf (add (mul (div2 (cpOf h t)) two) (mod2 (cpOf h t)) =eq cpOf h t) :=
+  prf_div_mod_eq (cpOf h t)
 
-/-! ### Paso 11c — la CONTRADICCIÓN: `cons h t ≤ h ⟹ ⊥`
+/-! ### Paso 11c — el núcleo: `a + a ≤ c ⟹ a < σ(div2 c)`
 
-Cadena: si `C := cons h t` cumpliera `C ≤ h`, entonces `C·2 ≤ h·2`; sumando la cota del resto
-(`mod2 ≤ 1`) queda `C·2 + mod2(cp) ≤ h·2 + 1`, y el lado izquierdo **es** `cp` (paso 11b). Pero el
-paso 10 da `σh + σh ≤ cp`. Componiendo: `σh + σh ≤ h·2 + 1`, que por las identidades de 11a es
-exactamente `σw ≤ w` con `w = σ(h+h)`. -/
+Si `σP ≤ a` (con `P := div2 c`), entonces `(σP)·2 ≤ a + a ≤ c = P·2 + mod2 c ≤ P·2 + 1`, y por las
+identidades de 11a eso es `σσ(P+P) ≤ σ(P+P)`: `prf_not_le_succ_self`. -/
 
-/-- **`cons h t ≤ h ⟹ ⊥`**. -/
-theorem prf_bot_of_le_cons (h t : Term) : Prf (le (cons h t) h ⇒ Formula.bottom) := by
+/-- **`σ(div2 c) ≤ a ⟹ ⊥`**, si `a + a ≤ c`. -/
+theorem prf_bot_of_le_succ_div2 {a c : Term} (hac : Prf (le (add a a) c)) :
+    Prf (le (succ (div2 c)) a ⇒ Formula.bottom) := by
   refine prf_deduction ?_
-  let Γ : List Formula := [le (cons h t) h]
-  -- (1) el doble, monótono
-  have hC2 : PrfH Γ (le (mul (cons h t) two) (mul h two)) :=
-    PrfH.mp _ _ _ (prf_to_prfH (prf_mul_le_mono_right (cons h t) h two) _) (prfH_hyp_self _)
-  -- (2) + la cota del resto
-  have hsum : PrfH Γ (le (add (mul (cons h t) two) (mod2 (cpOf h t)))
-      (add (mul h two) one)) :=
-    PrfH.mp _ _ _
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono (mul (cons h t) two) (mul h two)
-        (mod2 (cpOf h t)) one) _) hC2)
-      (prf_to_prfH (prf_le_mod2_one (cpOf h t)) _)
-  -- (3) el lado izquierdo ES `cp` (ax17 reescrito)
-  have hcp : PrfH Γ (le (cpOf h t) (add (mul h two) one)) :=
-    PrfH_le_subst1 (prf_to_prfH (prf_cons_div_mod h t) _) hsum
-  -- (4) pero `2(σh) ≤ cp`
-  have htr : PrfH Γ (le (add (succ h) (succ h)) (add (mul h two) one)) :=
-    PrfH.mp _ _ _
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans (add (succ h) (succ h)) (cpOf h t)
-        (add (mul h two) one)) _) (prf_to_prfH (prf_le_two_succ_h_cantor h t) _))
-      hcp
-  -- (5) reconocer `σw ≤ w` con `w = σ(h+h)`
-  have hfin : PrfH Γ (le (succ (succ (add h h))) (succ (add h h))) :=
-    PrfH_le_subst2 (prf_to_prfH (prf_mul_two_add_one h) _)
-      (PrfH_le_subst1 (prf_to_prfH (prf_succ_add_succ_eq h) _) htr)
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_le_succ_self (succ (add h h))) _) hfin
+  let P : Term := div2 c
+  let Γ : List Formula := [le (succ P) a]
+  -- (1) el doble, monótono, y `a·2 = a + a`
+  have hC2 : PrfH Γ (le (mul (succ P) two) (add a a)) :=
+    PrfH_le_subst2 (prf_to_prfH (prf_mul_two a) _)
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_mul_le_mono_right (succ P) a two) _) (prfH_hyp_self _))
+  -- (2) hasta `c`
+  have hc : PrfH Γ (le (mul (succ P) two) c) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans _ _ _) _) hC2) (prf_to_prfH hac _)
+  -- (3) `c = P·2 + mod2 c ≤ P·2 + 1`
+  have hcb : Prf (le c (add (mul P two) one)) :=
+    prf_le_subst1 (prf_div_mod_eq c)
+      (prf_mp (prf_mp (prf_add_le_mono (mul P two) (mul P two) (mod2 c) one) (prf_le_refl _))
+        (prf_le_mod2_one c))
+  have htr : PrfH Γ (le (mul (succ P) two) (add (mul P two) one)) :=
+    PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans _ _ _) _) hc) (prf_to_prfH hcb _)
+  -- (4) reconocer `σw ≤ w` con `w = σ(P+P)`
+  have hfin : PrfH Γ (le (succ (succ (add P P))) (succ (add P P))) :=
+    PrfH_le_subst2 (prf_to_prfH (prf_mul_two_add_one P) _)
+      (PrfH_le_subst1 (prf_to_prfH (prf_eq_trans (prf_mul_two (succ P)) (prf_succ_add_succ_eq P)) _)
+        htr)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_le_succ_self (succ (add P P))) _) hfin
 
-/-! ### Paso 12 — MITAD IZQUIERDA: `h < cons h t`
+/-- **`a + a ≤ c ⟹ a < σ(div2 c)`**, por tricotomía. -/
+theorem prf_lt_succ_div2 {a c : Term} (hac : Prf (le (add a a) c)) :
+    Prf (lt a (succ (div2 c))) := by
+  let C : Term := succ (div2 c)
+  refine prf_or_elim (prf_lt_trichotomy a C) (prf_deduction (prfH_hyp_self _)) ?_
+  refine prf_deduction ?_
+  refine PrfH_or_elim (prfH_hyp_self (lor (Formula.eq a C) (lt C a))) ?_ ?_
+  · have hle : PrfH (Formula.eq a C :: [lor (Formula.eq a C) (lt C a)]) (le C a) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq C a) _)
+        (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_succ_div2 hac) _) hle)
+  · have hle : PrfH (lt C a :: [lor (Formula.eq a C) (lt C a)]) (le C a) :=
+      PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt C a) _) (PrfH.hyp _ _ (List.Mem.head _))
+    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_succ_div2 hac) _) hle)
 
-Por tricotomía sobre `h` y `C := cons h t`: la rama buena es la conclusión, y las otras dos
-(`h = C` y `C < h`) producen ambas `C ≤ h`, que el paso 11c convierte en `⊥`. -/
+/-! ### Pasos 12–13 — las dos mitades
+
+`h ≤ h + t` y `t ≤ h + t`; el núcleo da `· < σ(div2 cp)`, y `prf_cons_div2` lo reescribe a `cons`. -/
 
 /-- **`h < cons h t`** — sub‑código (cabeza) estrictamente menor que el código. -/
-theorem prf_cantor_mono_left (h t : Term) : Prf (lt h (cons h t)) := by
-  refine prf_or_elim (prf_lt_trichotomy h (cons h t)) (prf_deduction (prfH_hyp_self _)) ?_
-  refine prf_deduction ?_
-  refine PrfH_or_elim (prfH_hyp_self (lor (Formula.eq h (cons h t)) (lt (cons h t) h))) ?_ ?_
-  · -- rama `h = C`: da `C ≤ h`, y 11c cierra
-    have hle : PrfH (Formula.eq h (cons h t) ::
-        [lor (Formula.eq h (cons h t)) (lt (cons h t) h)]) (le (cons h t) h) :=
-      PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (cons h t) h) _)
-        (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons h t) _) hle)
-  · -- rama `C < h`: idem
-    have hle : PrfH (lt (cons h t) h ::
-        [lor (Formula.eq h (cons h t)) (lt (cons h t) h)]) (le (cons h t) h) :=
-      PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt (cons h t) h) _) (PrfH.hyp _ _ (List.Mem.head _))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons h t) _) hle)
-
-/-! ### Paso 13 — MITAD DERECHA: `t < cons h t`
-
-Misma cadena, con **una sola pieza distinta**: donde la izquierda usaba `σh ≤ s`
-(`prf_le_succ_h_s`, que costaba subir por `σ`), aquí vale `σt ≤ s` directamente desde
-`prf_le_add_self h (σt)` — la cola está bajo la suma sin más. El resto es idéntico
-sustituyendo `h` por `t` en la contradicción. -/
-
-/-- **`σt + σt ≤ cantor_poly h (σt)`** — análogo del paso 10 para la cola. -/
-theorem prf_le_two_succ_t_cantor (h t : Term) :
-    Prf (le (add (succ t) (succ t)) (cpOf h t)) :=
-  prf_mp
-    (prf_mp (prf_le_trans (add (succ t) (succ t))
-        (add (add h (succ t)) (add h (succ t))) (cpOf h t))
-      (prf_mp (prf_mp (prf_add_le_mono (succ t) (add h (succ t)) (succ t) (add h (succ t)))
-        (prf_le_add_self h (succ t))) (prf_le_add_self h (succ t))))
-    (prf_le_double_s_cantor h t)
-
-/-- **`cons h t ≤ t ⟹ ⊥`** — espejo de `prf_bot_of_le_cons`. -/
-theorem prf_bot_of_le_cons_right (h t : Term) : Prf (le (cons h t) t ⇒ Formula.bottom) := by
-  refine prf_deduction ?_
-  let Γ : List Formula := [le (cons h t) t]
-  have hC2 : PrfH Γ (le (mul (cons h t) two) (mul t two)) :=
-    PrfH.mp _ _ _ (prf_to_prfH (prf_mul_le_mono_right (cons h t) t two) _) (prfH_hyp_self _)
-  have hsum : PrfH Γ (le (add (mul (cons h t) two) (mod2 (cpOf h t)))
-      (add (mul t two) one)) :=
-    PrfH.mp _ _ _
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_add_le_mono (mul (cons h t) two) (mul t two)
-        (mod2 (cpOf h t)) one) _) hC2)
-      (prf_to_prfH (prf_le_mod2_one (cpOf h t)) _)
-  have hcp : PrfH Γ (le (cpOf h t) (add (mul t two) one)) :=
-    PrfH_le_subst1 (prf_to_prfH (prf_cons_div_mod h t) _) hsum
-  have htr : PrfH Γ (le (add (succ t) (succ t)) (add (mul t two) one)) :=
-    PrfH.mp _ _ _
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_le_trans (add (succ t) (succ t)) (cpOf h t)
-        (add (mul t two) one)) _) (prf_to_prfH (prf_le_two_succ_t_cantor h t) _))
-      hcp
-  have hfin : PrfH Γ (le (succ (succ (add t t))) (succ (add t t))) :=
-    PrfH_le_subst2 (prf_to_prfH (prf_mul_two_add_one t) _)
-      (PrfH_le_subst1 (prf_to_prfH (prf_succ_add_succ_eq t) _) htr)
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_le_succ_self (succ (add t t))) _) hfin
+theorem prf_cantor_mono_left (h t : Term) : Prf (lt h (cons h t)) :=
+  prf_lt_subst2_cm (prf_eq_symm (prf_cons_div2 h t))
+    (prf_lt_succ_div2 (prf_le_double_cantor_of_le (prf_le_self_add h t)))
 
 /-- **`t < cons h t`** — sub‑código (cola) estrictamente menor que el código. -/
-theorem prf_cantor_mono_right (h t : Term) : Prf (lt t (cons h t)) := by
-  refine prf_or_elim (prf_lt_trichotomy t (cons h t)) (prf_deduction (prfH_hyp_self _)) ?_
-  refine prf_deduction ?_
-  refine PrfH_or_elim (prfH_hyp_self (lor (Formula.eq t (cons h t)) (lt (cons h t) t))) ?_ ?_
-  · have hle : PrfH (Formula.eq t (cons h t) ::
-        [lor (Formula.eq t (cons h t)) (lt (cons h t) t)]) (le (cons h t) t) :=
-      PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_eq (cons h t) t) _)
-        (PrfH_eq_symm (PrfH.hyp _ _ (List.Mem.head _)))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons_right h t) _) hle)
-  · have hle : PrfH (lt (cons h t) t ::
-        [lor (Formula.eq t (cons h t)) (lt (cons h t) t)]) (le (cons h t) t) :=
-      PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt (cons h t) t) _) (PrfH.hyp _ _ (List.Mem.head _))
-    exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
-      (PrfH.mp _ _ _ (prf_to_prfH (prf_bot_of_le_cons_right h t) _) hle)
+theorem prf_cantor_mono_right (h t : Term) : Prf (lt t (cons h t)) :=
+  prf_lt_subst2_cm (prf_eq_symm (prf_cons_div2 h t))
+    (prf_lt_succ_div2 (prf_le_double_cantor_of_le (prf_le_add_self h t)))
 
 end ROBINSON_PlusPlus.Meta.CantorMonoPrf
 
@@ -388,9 +325,9 @@ export ROBINSON_PlusPlus.Meta.CantorMonoPrf (
   prf_or_elim prf_le_zero_one prf_le_mod2_one
   prf_le_succ_succ prf_not_le_succ_self
   prf_le_self_mul_self prf_le_double_self_mul_succ
-  prf_le_double_s_cantor prf_le_succ_h_s prf_le_two_succ_h_cantor
+  prf_le_self_mul_self_all prf_le_double_self_mul_succ_all
+  cpOf prf_le_double_s_cantor prf_le_double_cantor_of_le
   prf_succ_add_succ_eq prf_mul_two_add_one
-  cpOf prf_cons_div2 prf_cons_div_mod prf_bot_of_le_cons
-  prf_cantor_mono_left
-  prf_le_two_succ_t_cantor prf_bot_of_le_cons_right prf_cantor_mono_right
+  prf_cons_div2 prf_pair_div_mod prf_bot_of_le_succ_div2 prf_lt_succ_div2
+  prf_cantor_mono_left prf_cantor_mono_right
 )
