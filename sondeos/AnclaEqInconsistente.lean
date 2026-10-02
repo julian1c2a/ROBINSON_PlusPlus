@@ -585,3 +585,27 @@ example (c : Term) : Prf (In c rr ⇒ In c axiomsCodeT) :=
 #print axioms Sondeos.AnclaEqInconsistente.anclaEq_prf_bot
 #print axioms Sondeos.AnclaEqInconsistente.hipotesis_goedel_insatisfacibles
 #print axioms Sondeos.AnclaEqInconsistente.prf_rep
+
+
+/-! ## §7 · Control independiente (2026-10-01): las hipótesis EXACTAS de `goedel_first_prf` / `goedel_second_prf`
+
+El mismo `hcon` alimenta a `goedel_first_prf` (luego es de su tipo) y a `absurd` contra `anclaEq_prf_bot`
+(luego es `¬ Prf ⊥` del MISMO `Prf`): F1 no es un homónimo de `ConsistentH` ni de `Prf`. -/
+#print ROBINSON_PlusPlus.Meta.Representability2Prf.AnclaEq
+#check @ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
+#check @ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
+
+open ROBINSON_PlusPlus.Meta.GodelTwoPrf ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.GodelTwo in
+/-- El MISMO `hcon` alimenta a `goedel_first_prf` (luego es de su tipo) y a `absurd` contra
+    `anclaEq_prf_bot` (luego es `¬ Prf ⊥` del MISMO `Prf`). Si las constantes difirieran, no compilaría. -/
+theorem verif_g1_vacuo [inst : ROBINSON_PlusPlus.Meta.Representability2Prf.AnclaEq] (hcon : ConsistentH) :
+    And (¬ ROBINSON_PlusPlus.Meta.Hilbert.Prf godelCN) (ROBINSON_PlusPlus.Meta.Hilbert.Prf godelCN) :=
+  ⟨@goedel_first_prf inst hcon, absurd Sondeos.AnclaEqInconsistente.anclaEq_prf_bot hcon⟩
+
+open ROBINSON_PlusPlus.Meta.GodelTwoPrf ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.GodelTwo in
+theorem verif_g2_vacuo [inst : ROBINSON_PlusPlus.Meta.Representability2Prf.AnclaEq] (hcon : ConsistentH) :
+    And (¬ ROBINSON_PlusPlus.Meta.Hilbert.Prf consistencyFormula') (ROBINSON_PlusPlus.Meta.Hilbert.Prf consistencyFormula') :=
+  ⟨@goedel_second_prf inst hcon, absurd Sondeos.AnclaEqInconsistente.anclaEq_prf_bot hcon⟩
+
+#print axioms verif_g1_vacuo
+#print axioms verif_g2_vacuo

@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-02 — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
 >
@@ -6998,7 +6998,7 @@ TODO el dominio — y entonces habla de lo que no debería.**
 
 ### 3 · ⚠️ Lo que esto **NO** dice, y hay que decirlo con cuidado
 
-* **No dice que `Prf` sea inconsistente.** Dice que **ℕ no está entre sus modelos**. Un cálculo
+* ✏️ **FALSO (ADR‑114, 2026‑10‑02): `Prf` SÍ era inconsistente** — `PrfBotCodificacionVieja.lean`. Decía: **No dice que `Prf` sea inconsistente.** Dice que **ℕ no está entre sus modelos**. Un cálculo
   puede ser consistente y no tener a ℕ por modelo.
 * **No es un error en ninguna prueba del árbol.** Todo lo que RPP demuestra sigue siendo teorema
   de `Prf`; lo que cambia es qué estructuras lo satisfacen.
@@ -8352,3 +8352,59 @@ A2, la capa de listas de `ModeloNat` (los 9: `ax_L0`–`ax_L3`, `ax_C1`–`ax_C3
 PeanoRF puede fijar ya `consNat` con la codificación nueva.
 
 **Véase también:** ADR-088, ADR-090, ADR-092, ADR-093; `sondeos/CantorSobreyectivo.lean`.
+
+## ADR-114: 🚨 la auditoría de la BASE, ronda 1 — cuatro defectos COMPILADOS, y las cuatro decisiones del propietario
+
+**Fecha:** 2026-10-02 · **Estado:** ✅ decisiones 1, 3 (lanzada) y 4 ejecutadas; ⬜ decisión 2 por ejecutar ·
+**Ámbito:** RPP y FOL. Workflow `wf_6ab7eb53-016` (5 lentes + 5 verificadores adversariales, sólo lectura):
+36 hallazgos, 27 confirmados por lectura, 9 plausibles, 0 refutados. ⛔ Los agentes no compilan: los cuatro
+decisivos los compilé yo (M-13), y quedan en `sondeos/`.
+
+### 1 · Lo compilado
+
+| hallazgo | sondeo | footprint |
+|---|---|---|
+| **L1-1** · en `master` `2510f70`, con `cons a b = pair a (σb)`, **`Prf ⊥` sin hipótesis**: `prf_nil_or_cons 1` (`Prf.listInd`, sin guarda) + Cantor (`cons h t ≠ 1`, porque allí `cons 0 0 = 2`) | `PrfBotCodificacionVieja.lean` (registro + control negativo `cons 0 0 = 1`) | `[propext, Classical.choice, Quot.sound]`: ningún axioma del proyecto |
+| **L1-2** · `ax_list_induction` sola da `axioms ⊢ ⊥`: su `φ : Term → Formula` no es uniforme y su `Γ` es libre | `ListInductionAxiomRefutable.lean` | `[…, ax_list_induction]` |
+| **L1-3** · los 22 constructores de `Derives` son sólidos para la valuación booleana, **por inducción y sin axiomas** ⇒ los enunciados de `imp_intro`, `raa` y `ax_list_induction` son FALSOS, y Lean + cualquiera de ellos ⊢ `False` | `MetaReglasRefutables.lean` | refutaciones `[propext, Quot.sound]`; `False` con el axioma |
+| **L1-4** · `OmegaConsistent` es refutable por su DEFINICIÓN (testigos sólo `StdChain`; `A := #0 = 1`), en las dos codificaciones | `OmegaConsistentRefutable.lean` | la reducción `not_omega_of`, limpia |
+| control independiente de **F1**: el mismo `hcon` alimenta a `goedel_first_prf` y a `absurd` | `AnclaEqInconsistente.lean` §7 | — |
+
+### 2 · Lo que dejaban sin contenido
+
+* **master `2510f70`**: TODO lo demostrado en `Prf` (L1-1). ADR-113 cierra esa ruta (`cons 0 0 = 1`): **no era una
+  mejora del modelo, era la retirada de una inconsistencia**. No prueba la consistencia: eso es el modelo de los 141.
+* **la capa `⊢`**: 53 de las 517 filas de `check-footprints.bash` llevan `imp_intro`, `raa`, `or_elim` o
+  `ax_list_induction` — `negVerifier_proved` (ADR-094…097), `derives_completo`, `GodelTwo.d3`, el censo de
+  `coreAxioms`, la librería de `Minimal`/`Full`, la mitad `⊬¬G`. 🔑 *M-11 evitaba ESCRIBIR la contradicción, no la
+  quitaba: el recursor cubre a todo habitante, y son los axiomas los que lo contradicen.*
+* **la mitad `⊬¬G`**: además por L1-4, y lo seguiría siendo tras reparar el resto si no cambia la definición.
+* **Gödel I (`⊬G`) y II sobre `Prf`**: su derivación es correcta y su footprint limpio; lo que falla son las
+  hipótesis — L1-1 en `master` viejo, y F1 (`[AnclaEq]`) tras ADR-113.
+
+### 3 · Textos que eran FALSOS
+
+ADR-088 §3 y `sondeos/ModeloBasura.lean` («no significa que `Prf` sea inconsistente»: corregidos hoy) · ADR-029
+(«vacuidad explotable: no») · ADR-025 («RPP no está afectado») · ADR-022 y `Meta/OmegaReflect.lean:266` («toda
+teoría sólida es ω-consistente», falso para esta definición) · `FOL/AXIOMS.md:293`, `FOL/FOL/Inconsistencia.lean:16-18`
+y `:66`, `FOL/FOL/MetaRules.lean:40-42` (que el recursor no cubre a los habitantes fabricados) ·
+`Meta/Hilbert.lean:39-46` y `:240-241` · ADR-113 §1-2 (lo presenta como mejora del modelo). Se corrigen al
+ejecutar la decisión 2, que reescribe esa capa.
+
+### 4 · Las decisiones del propietario (2026-10-02)
+
+1. **ADR-113 se fusiona YA** — hecho: PR #1, fusión `f6d59db` (145 jobs, 517 footprints sin cambio). Medido además que la derivación de L1-1 ya NO compila sobre ella (falla en el paso `cons 0 0 = 2`).
+2. **`⊢` se retira como capa de trabajo**: queda `Prf`, más un puente a `Derives₀` si hace falta. **Las meta-reglas
+   de FOL se retiran**: «si dicen cosas falsas, las retiramos; no hacemos uso de herramientas que no sean
+   verdaderas». ⬜ Por ejecutar, con el radio medido por el compilador.
+3. **Ronda 2 de la auditoría**, después del punto 1 y sobre la base reparada — lanzada (`wf_0f4ca25d-649`).
+4. **Las cuatro sondas y el control de F1, a `sondeos/`** como evidencia y control negativo — hecho.
+
+### 5 · Lo que queda, en orden
+
+Ejecutar la decisión 2 (incluye retirar `ax_list_induction`, `ax_induction_prim` y `ax_axiomsCodeT_eq`, que viven
+sobre `⊢`) · el arreglo de F1 (preferido: un único axioma diagonal `axiomsCodeT = LR ++ [δ]` con `diagTerm` y
+`prf_diag_arith_num`, hallazgo L2-3) · D7 en su momento (tras la decisión 2 y antes del punto fijo de F1, L5-09) ·
+`⊬¬G` sobre `Prf` (`OmegaConsistentProv` o Rosser) · el modelo de los 141.
+
+**Véase también:** ADR-022, ADR-025, ADR-029, ADR-088, ADR-113; `sondeos/AnclaEqInconsistente.lean` (F1).

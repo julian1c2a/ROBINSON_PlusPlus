@@ -35,7 +35,9 @@ el modelo estándar**, y `Prf` la demuestra.
 
 * **`Prf` no es sólido respecto del modelo estándar de la aritmética.** ⇒ la ruta «modelo en ℕ ⇒
   `¬ Prf ⊥` ⇒ `ConsistentH`» **no funciona tal cual**.
-* ⚠️ **NO significa que `Prf` sea inconsistente.** Significa que **ℕ, con esta interpretación, no
+* ✏️ **CORREGIDO 2026‑10‑02 (ADR‑114): FALSO.** Con la codificación de entonces `Prf` ERA inconsistente:
+  demostraba que el 1 no es ni `nil` ni `cons`, y con `listInd` eso da `Prf ⊥` (`PrfBotCodificacionVieja.lean`).
+  Decía: «⚠️ **NO significa que `Prf` sea inconsistente.** Significa que **ℕ, con esta interpretación, no
   es uno de sus modelos**. Un cálculo puede ser consistente y no tener a ℕ por modelo.
 * ⚠️ Y **no es un fallo de la aritmetización**: `listInd` está ahí para razonar sobre **códigos**,
   y sobre códigos la inducción es legítima. Lo que falla es que el lenguaje **no distingue** los
