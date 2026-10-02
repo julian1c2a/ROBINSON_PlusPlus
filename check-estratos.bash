@@ -29,7 +29,7 @@ cd "$(dirname "$0")" || exit 2
 # nombre | constructores | axiomas que lo HABITAN | teorema de solidez EN EL BUILD ('-' = ninguno)
 # ⚠️ Esta tabla es la misma de `REFERENCE.md` §0bis. Si cambia una, cambian las dos.
 read -r -d '' ESTRATOS <<'EOF'
-Derives|22|7|-
+Derives|22|4|-
 Derives₀|21|0|FOL.Metamath.Soundness0.derives0_soundness
 Derives₁|20|0|-
 Derives₂|22|0|-

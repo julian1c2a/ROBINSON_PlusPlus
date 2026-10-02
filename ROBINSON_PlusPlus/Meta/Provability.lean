@@ -196,7 +196,9 @@ theorem formCode_injective : ∀ {φ φ' : Formula}, formCode φ = formCode φ' 
 
 `IsFormula x` (Def 29): `x` es el código de una fórmula bien formada (i.e. está
 en la imagen de `formCode`; toda fórmula de FOL `Formula` es wff por
-construcción). `Provable x`: `x` codifica un teorema de `Minimal`.
+construcción). `Provable x`: `x` codificaba un teorema de `Minimal` **en `⊢`**; se retiró con esa
+capa (ADR‑115, 2026‑10‑02). La demostrabilidad que queda es la de `Prf` y su aritmetización
+`provCodeC'`.
 -/
 
 /-- **Def 29** — `x` codifica una fórmula bien formada del lenguaje. -/
@@ -204,16 +206,6 @@ def IsFormula (x : Term) : Prop := ∃ φ : Formula, x = formCode φ
 
 theorem isFormula_formCode (φ : Formula) : IsFormula (formCode φ) := ⟨φ, rfl⟩
 
-/-- `x` codifica un teorema de `Minimal` (`axioms ⊢ φ` con `x = ⌜φ⌝`). -/
-def Provable (x : Term) : Prop := ∃ φ : Formula, (x = formCode φ) ∧ (axioms ⊢ φ)
-
-/-- **`Provable` rastrea fielmente la derivabilidad** (teorema real, no postulado):
-    `Provable ⌜φ⌝ ↔ axioms ⊢ φ`. Usa `formCode_injective`. -/
-theorem provable_formCode_iff (φ : Formula) : Provable (formCode φ) ↔ (axioms ⊢ φ) := by
-  constructor
-  · rintro ⟨ψ, hcode, hψ⟩
-    rw [formCode_injective hcode]; exact hψ
-  · intro hφ; exact ⟨φ, rfl, hφ⟩
 
 /-!
 ### Nivel C — sólo el núcleo real de codificación
@@ -232,6 +224,10 @@ theorem provable_formCode_iff (φ : Formula) : Provable (formCode φ) ↔ (axiom
 > existen** (dependían de `ax_tc_cons`, retirado por inconsistente). Gödel I vive como
 > **`goedel_first_numeral`** y el punto fijo como **`godelCN_fixedpoint`**, ambos en
 > `Meta/DiagonalNumeral.lean`.
+>
+> 🗑️ **ACTUALIZADO 2026‑10‑02 (ADR‑115):** esos dos también se retiraron, con la capa `⊢` sobre la
+> que estaban enunciados. Hoy Gödel I es `goedel_first_prf` y el punto fijo
+> `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), los dos sobre `Prf`.
 -/
 
 end ROBINSON_PlusPlus.Meta.Provability
@@ -250,6 +246,4 @@ export ROBINSON_PlusPlus.Meta.Provability (
   formCode_injective
   IsFormula
   isFormula_formCode
-  Provable
-  provable_formCode_iff
 )

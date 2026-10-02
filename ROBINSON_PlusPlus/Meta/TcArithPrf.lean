@@ -22,12 +22,15 @@ namespace ROBINSON_PlusPlus.Meta.TcArithPrf
 /-!
 ## META — NIVEL D real: `tcFn` (código del código) a nivel `Prf` (cimiento de la Σ₁-completitud object)
 
-Porte finitario de la cadena `tc_arith` de `Meta/Diagonal.lean` (ω) al cálculo `Prf`.
+Porte finitario de la cadena `tc_arith` que vivía en `Meta/Diagonal.lean` sobre `⊢` (ω) al cálculo
+`Prf`. La cadena ω está retirada: la familia sintáctica con `ax_tc_cons`, y `tc_zero`/`tc_succ`/
+`tc_numeral`/`congr_tc2` con la capa `⊢` (ADR‑115); aquí quedan sus versiones `prf_*`.
 `tcFn` es la **función object** que computa `termCode`; sus ecuaciones se re-derivan de
-`Minimal.axioms` (vía `prf_ax`+`prf_spec`), y `prf_tc_numeral`/`prf_tc_form` prueban por
-inducción meta que `tcFn` computa `termCode` sobre **todo código**. Es la herramienta base
-para reformular la Σ₁-completitud del verificador (`hC`/`hI`) al nivel del código object
-(donde `tcFn` **tiene congruencia Leibniz**, a diferencia de la `termCode` meta).
+`Minimal.axioms` (vía `prf_ax`+`prf_spec`), y `prf_tc_numeral` prueba por inducción meta que
+`tcFn` computa `termCode` sobre **numerales** (`prf_tc_form`, sobre todo código, se retiró con
+`ax_tc_cons`). Es la herramienta base para reformular la Σ₁-completitud del verificador
+(`hC`/`hI`) al nivel del código object (donde `tcFn` **tiene congruencia Leibniz**, a diferencia
+de la `termCode` meta).
 -/
 
 /-- `tcFn 0 = ⌜0⌝`. -/
@@ -47,7 +50,8 @@ theorem prf_tc_succ (x : Term) :
   exact h
 
 -- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
--- Sustituida por la via NUMERAL: ver `Meta/CodeNumeralPrf.lean` y `Meta/DiagonalNumeral.lean`.
+-- Sustituida por la via NUMERAL: `prf_formCode_numeral` (`Meta/CodeNumeralPrf.lean`) y, sobre
+-- `Prf`, `prf_diag_arith_num`/`prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`).
 
 /-- **Cómputo de `tcFn` sobre numerales**: `tcFn (numeral n) = ⌜numeral n⌝` (inducción meta). -/
 theorem prf_tc_numeral : ∀ n : Nat, Prf (tcFn (numeral n) =eq termCode (numeral n))
@@ -75,7 +79,8 @@ theorem prf_congr_tc2 {S A A' B B' : Term} (hA : Prf (A =eq A')) (hB : Prf (B =e
     (prf_eq_trans (prf_congr_cons_head hA) (prf_congr_cons_tail (prf_congr_cons_head hB)))))
 
 -- [REPARACION] Familia SINTACTICA de `tc` RETIRADA con `ax_tc_cons`.
--- Sustituida por la via NUMERAL: ver `Meta/CodeNumeralPrf.lean` y `Meta/DiagonalNumeral.lean`.
+-- Sustituida por la via NUMERAL: `prf_formCode_numeral` (`Meta/CodeNumeralPrf.lean`) y, sobre
+-- `Prf`, `prf_diag_arith_num`/`prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`).
 
 /-- **Congruencia de `tcFn`** en `Prf` (Leibniz object): `x =eq y → tcFn x =eq tcFn y`.
     A diferencia de `termCode` (meta), `tcFn` es una **función object** y respeta la igualdad

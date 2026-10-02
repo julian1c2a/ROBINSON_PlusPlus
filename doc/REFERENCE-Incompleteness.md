@@ -1,25 +1,33 @@
 # REFERENCE — Incompletitud Nivel D · Gödel I/II, D1–D3, Σ₁-completitud provable · ROBINSON_PlusPlus
 
+> 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` se retiró: de `Meta/` salen 9 módulos (`AxiomListCode`,
+> `DerivCond`, `Induction`, `LineWFDerives`, `ListInductionArith`, `Necessitation`, `OmegaStrength`,
+> `Reflection`, `StepArith`) y todo lo enunciado sobre `⊢` en los demás, retirado también — `goedel_first_numeral`,
+> `goedel_second'`, `NegVerifier` y la mitad `⊬¬G`. La cadena sobre `Prf` (D1 `repr_pos'_prf`, D2
+> `d2_prf`, D3 `d3_prf_real`, `goedel_first_prf`, `goedel_second_prf`) **sigue entera**, y ⛔ **sigue
+> vacua** por `[AnclaEq]` (F1, ADR‑114). Las secciones de abajo que hablan de `⊢` son registro.
+
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5). Es el subsistema **activo**
 > del proyecto. Índice raíz: [REFERENCE.md](../REFERENCE.md).
 > **Nodos relacionados:** [Gödelización](REFERENCE-Godelization.md) (`formCode`/`provCodeC'`, base de
 > todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
-> `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral`
+> `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > → reglas `ind`/`listInd`).
 > **Ficheros `.lean`:** la cadena `Meta/` (90 módulos en el build, barrel
 > [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **0 módulos en `cuarentena/`**, que **NO están
 > en el build** (ver [cuarentena/README.md](../cuarentena/README.md)).
 
 **Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
-`Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo
+`Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 (`goedel_second'`) — 🏁 **D3 DEMOSTRADA** el 2026‑09‑10g (`d3_prf_real`), con lo que la cadena
 D1/D2/D3 **no postula ninguna de las tres**.
 **Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 145 jobs · 131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/`
-> + 64 `sondeos/` · 3 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 warnings / 0 sorrys.**
+> **Build 117 jobs · 104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/`
+> + 85 `sondeos/` · 0 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 sorrys.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -27,7 +35,7 @@ D1/D2/D3 **no postula ninguna de las tres**.
 >    `axioms`: hacía la teoría objeto **inconsistente**. Los códigos de Gödel pasan a escribirse como
 >    **NUMERALES** (`numeral (codeNat φ)`), no como árboles `cons`. En consecuencia:
 >    * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO
->      EXISTEN.** Gödel I es hoy **`goedel_first_numeral`** (§3.24.2), sobre la sentencia `godelCN`.
+>      EXISTEN.** Gödel I es hoy **`goedel_first_numeral`** (§3.24.2), sobre la sentencia `godelCN`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >    * 21 módulos a **cuarentena** ([ADR‑013](../DECISIONS.md)) — sus teoremas eran formalmente
 >      correctos pero **vacuos**, probados sobre una teoría que probaba ⊥.
 >    * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
@@ -928,7 +936,7 @@ imp_intro}, ax_induction, ax_list_induction, ax_axiomsCodeT_eq]` — **ni un pos
 #### 3.21.2 `Meta/AxiomListCode.lean` + anclaje (§42) — `axiomsCodeT` concretado
 
 El sondeo de solidez (`PLAN-NEGVERIFIER.md` §🔬) halló que **`axiomsCodeT` era opaco** (sólo dirección
-positiva `ax_inAxC`), lo que impedía refutar `In v0 axiomsCodeT` y **bloqueaba `NegVerifier`**. Opción
+positiva `ax_inAxC`), lo que impedía refutar `In v0 axiomsCodeT` y **bloqueaba `NegVerifier`**. Opción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 1: concretar el anclaje, **net‑0 axiomas de Lean**.
 
 ```lean
@@ -1264,11 +1272,11 @@ arbitrario**, luego traga un numeral sin más; y `godelPred`, `godelBeta`, `diag
 `subst_eq_iff provFormulaC' (hFN φ)`** ⇒ D1 y la cadena existente se transfieren **componiendo con
 ese bicondicional, sin re‑demostrarse**.
 
-**Footprint de `goedel_first_numeral`** (verificado con `#print axioms`):
+**Footprint de `goedel_first_numeral`** (verificado con `#print axioms`): 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `[propext, Classical.choice, Quot.sound, dne, gen, imp_intro, ax_induction, ax_list_induction,
 ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
 
-⚠️ `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**. La reducción
+⚠️ `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**. La reducción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 a ω‑consistencia (`reflects_of_omega`, §3.21) sigue vigente, pero **`NegVerifier` sigue abierto**:
 `⊬¬G` **no** está cerrado en la cadena real. Ver `PLAN-NEGVERIFIER.md`.
 
@@ -1511,7 +1519,7 @@ necesitan `pcc_eval_substfc`, que **no existe**. Requiere sancionar un predicado
 > para no hacerlo, pero **es un argumento distinto** del que se escribió aquí, y mucho más débil
 > como razón de coste. Se conserva el texto como registro del razonamiento del 08‑26.
 
-La comparación se cerró con un dato de fuente, no de estimación: `ax_axiomsCodeT_eq`
+La comparación se cerró con un dato de fuente, no de estimación: `ax_axiomsCodeT_eq` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 (`Minimal/Axioms.lean:1376`) ancla a **`axioms`** (los 141, `:1199`) y **no** a `coreAxioms`
 (`:922`). Luego los axiomas de la opción (1) **tienen** que entrar en `axioms` para funcionar,
 `axiomsCodeT` los absorbe, el verificador interno los cita y **`provCodeC'` cambia ⇒ G cambia**
@@ -2126,7 +2134,7 @@ terminan corrigiendo un documento del proyecto.
 
 Este documento viene repitiendo —§3.27.1, y con él parte del razonamiento de ADR‑015— que
 axiomatizar «no es más caro: es **otro teorema**», porque un axioma nuevo entraría en `axioms`,
-`ax_axiomsCodeT_eq` lo metería en `axiomsCodeT`, cambiaría `provCodeC'` y **cambiaría G**.
+`ax_axiomsCodeT_eq` lo metería en `axiomsCodeT`, cambiaría `provCodeC'` y **cambiaría G**. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 Medido sobre el `Environment` de Lean, no por grep ni por lectura:
 

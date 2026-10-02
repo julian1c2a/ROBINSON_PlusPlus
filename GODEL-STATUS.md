@@ -1,6 +1,23 @@
 # Frente Gödel — Estado y Roadmap
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+>
+> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
+> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
+> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
+> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
+> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
+> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
+> con **0 `axiom` de Lean**.
+> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
+> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+>
+> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
+>
+> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
+> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -8,16 +25,17 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   **numeral** `godelCN`.
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
 >   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
@@ -168,7 +186,7 @@ partir de las condiciones de demostrabilidad postuladas en el Nivel C:
   existe** en la cadena real:
   `repr_neg : ConsistentOmega → Prf (provCodeC' φ) → Prf φ`. Con ella el argumento se porta tal cual
   (~8 líneas): `⊢¬G` →(punto fijo) `⊢¬¬Prov⌜G⌝` →(`dne`) `⊢Prov⌜G⌝` →(**`repr_neg`**) `⊢G` →(con `⊢¬G`)
-  `⊥`. Ya están el **punto fijo real** —hoy **`godelCN_fixedpoint`**, el `godelC'_fixedpoint` de
+  `⊥`. Ya están el **punto fijo real** —hoy **`godelCN_fixedpoint`**, el `godelC'_fixedpoint` de 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   entonces murió con ADR‑012—, **D1** (`repr_pos'_prf`) y `dne`.
   `repr_neg` debería salir de la **fidelidad del verificador** + `ConsistentOmega`; hay groundwork en
   `Meta/CodeDistinct.lean` («aritmética negativa de códigos»).» — *(fin del texto de entonces)*
@@ -205,7 +223,7 @@ En la formalización clásica de Gödel, la codificación de secuencias usa la *
 
 > Una secuencia `(a₁, a₂, …, aₖ)` se codifica como `prod_pairs [(p₁, a₁), (p₂, a₂), …, (pₖ, aₖ)]`, donde `pᵢ` es el `i`-ésimo primo.
 
-La **descodificación** es única gracias al TFA (`ax_p_tfa`): dada una factorización, la lista de pares está determinada. Esto convierte la β-función en innecesaria para muchos propósitos de Gödelización.
+La **descodificación** es única gracias al TFA (`ax_p_tfa`): dada una factorización, la lista de pares está determinada. Esto convierte la β-función en innecesaria para muchos propósitos de Gödelización. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### 3.2 ¿Es Ax-P estrictamente necesario para Meta/Godel.lean?
 

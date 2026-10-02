@@ -4,11 +4,18 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Hilbert
-import ROBINSON_PlusPlus.Meta.OmegaStrength
 import FOL.Semantics
 
 /-!
 # SONDEO · `prfI_soundness` — la SOLIDEZ de `Prfᵢ`, y con ella el ancla se vuelve MEDIBLE
+
+> ✏️ **2026‑10‑02 (ADR‑115) — dos correcciones a lo de abajo.** (1) Importaba
+> `Meta/OmegaStrength.lean`, retirado con la capa `⊢`; no usaba nada de él y se quitó el import.
+> (2) ⛔ **Dos frases de abajo eran FALSAS desde el 2026‑09‑12** (ADR‑026, cuando el ancla de `Prf`
+> pasó de `axiom` a hipótesis de clase): «`Prf` está habitado por `prf_axiomsCodeT_eq`» y, por eso,
+> «no vale para `Prf`». **`Prf` tiene CERO `axiom` que lo habiten**: su solidez es inducción sobre
+> `Prf`, igual que ésta (frente A4). Y la capa `⊢` tiene hoy 4 (los de `FOL/MetaRules.lean`, que FOL
+> retira), no los de abajo. Se conservan como estaban, como registro.
 
 **Pregunta que contesta (2026‑09‑11):** *¿se puede decir algo SEMÁNTICO sobre los cálculos de este
 proyecto?* De ella dependía la única pregunta abierta sobre `prf_axiomsCodeT_eq`: no «¿es

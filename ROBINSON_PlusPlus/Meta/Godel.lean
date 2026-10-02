@@ -4,7 +4,6 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Minimal.Axioms
-import ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
 import FOL.FOL
 import FOL.Tactics
@@ -13,9 +12,9 @@ import FOL.Theorems.Neg
 import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
 import FOL.Deduction
+import FOL.Theorems.Eq
 
 open ROBINSON_PlusPlus.Minimal.Axioms
-open ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
 set_option linter.unusedSimpArgs false
 
@@ -36,7 +35,7 @@ meta-inductivo. Ver `GODEL-STATUS.md` §2.2.
 
 El enunciado del spec, `⌜S⌝ = ⌜S'⌝ ⟹ S = S'`, mezcla un antecedente sobre
 códigos (`Term`) con una conclusión meta (igualdad de cadenas de símbolos
-`S = S' : List Sym`). Hay dos lecturas, ambas presentes aquí:
+`S = S' : List Sym`). Hay dos lecturas; aquí queda sólo la meta‑inyectividad:
 
 * **Meta-inyectividad (consistency-free)** — `encode_injective`: si los `Term`
   `⌜S⌝` y `⌜S'⌝` son *idénticos como objetos Lean*, entonces `S = S'`. Se
@@ -51,6 +50,8 @@ códigos (`Term`) con una conclusión meta (igualdad de cadenas de símbolos
   inconsistente prueba cualquier igualdad de códigos). Por eso la inyectividad
   plena se establece a nivel meta; la conexión interna completa pertenece al
   Nivel C/D (junto a `Dem`).
+  🗑️ **2026‑10‑02 · ADR‑115**: esta versión objeto estaba enunciada sobre `⊢` y se retiró con
+  esa capa (y `Block6` con ella). Aquí queda sólo la meta‑inyectividad.
 -/
 
 /-- **Def 27** — alfabeto `Λ` del lenguaje de `Minimal` (símbolos relevantes
@@ -147,27 +148,6 @@ theorem encode_injective : ∀ (S S' : List Sym), ⌜S⌝ = ⌜S'⌝ → S = S'
       injection hargs2 with hTail _
       rw [G_injective hHead, encode_injective S S' hTail]
 
-/-!
-### Versión object-level (bloques de la prueba del spec, vía Block6)
--/
-
-/-- Bloque object-level de Teo G1 (vía `cons_inj`, Block6): de la igualdad de
-    códigos `⌜s::S⌝ =eq ⌜s'::S'⌝` el sistema deriva la igualdad de cabezas y de
-    colas. Faithful al "Teo L2 aplicado repetidamente" del spec. -/
-theorem encode_cons_inj (s s' : Sym) (S S' : List Sym) :
-    axioms ⊢ (⌜s :: S⌝ =eq ⌜s' :: S'⌝)
-      ⇒ land (G s =eq G s') (⌜S⌝ =eq ⌜S'⌝) := by
-  show axioms ⊢ (cons (G s) ⌜S⌝ =eq cons (G s') ⌜S'⌝)
-    ⇒ land (G s =eq G s') (⌜S⌝ =eq ⌜S'⌝)
-  exact cons_inj
-
-/-- Object-level: el sistema deriva que el código de una lista no vacía es
-    distinto del código de la lista vacía (`⌜[]⌝ = nil`), vía `cons_neq_nil`. -/
-theorem encode_cons_neq_nil (s : Sym) (S : List Sym) :
-    axioms ⊢ neg (⌜s :: S⌝ =eq ⌜([] : List Sym)⌝) := by
-  show axioms ⊢ neg (cons (G s) ⌜S⌝ =eq nil)
-  exact cons_neq_nil (G s) ⌜S⌝
-
 end ROBINSON_PlusPlus.Meta.Godel
 
 -- Exports: API pública del Nivel B de Gödelización
@@ -183,6 +163,4 @@ export ROBINSON_PlusPlus.Meta.Godel (
   encode_nil
   encode_cons
   encode_injective
-  encode_cons_inj
-  encode_cons_neq_nil
 )

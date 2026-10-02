@@ -7,6 +7,13 @@ import ROBINSON_PlusPlus.Meta.Sigma1Prf
 import ROBINSON_PlusPlus.Meta.TcArithPrf
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`runFn_cons`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability

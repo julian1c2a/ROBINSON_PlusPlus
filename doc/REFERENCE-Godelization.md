@@ -2,15 +2,18 @@
 
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5).
 > Índice raíz: [REFERENCE.md](../REFERENCE.md).
-> **Nodos relacionados:** [Núcleo](REFERENCE-Kernel.md) (axiomas), [Aritmética](REFERENCE-Arithmetic.md)
-> (`Block6` listas, base de la codificación), [Incompletitud](REFERENCE-Incompleteness.md) (Nivel D se
-> construye sobre `formCode`/`provCodeC'`).
+> **Nodos relacionados:** [Núcleo](REFERENCE-Kernel.md) (axiomas), [Incompletitud](REFERENCE-Incompleteness.md)
+> (Nivel D se construye sobre `formCode`/`provCodeC'`). ([Aritmética](REFERENCE-Arithmetic.md), con `Block6`,
+> se retiró con la capa `⊢`: ADR‑115.)
 > **Ficheros `.lean`:** [Meta/Godel.lean](../ROBINSON_PlusPlus/Meta/Godel.lean),
 > [Meta/Provability.lean](../ROBINSON_PlusPlus/Meta/Provability.lean).
 
-**Contenido:** Nivel B (codificación `⌜·⌝`, sentencia `G`, Teorema G1) y Nivel C (`formCode`,
-`IsFormula`, `Provable` — núcleo real de codificación; la capa legacy postulada se retiró en F7a).
-**Last updated:** 2026-07-12 · Lean v4.31.0.
+**Contenido:** Nivel B (codificación `⌜·⌝`, `G`, Teorema G1 como **meta‑inyectividad**) y Nivel C
+(`formCode`, `IsFormula` — núcleo real de codificación). La capa legacy postulada se retiró en F7a; lo
+que había sobre `⊢` (`Provable`, la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
+**Last updated:** 2026-10-02 · Lean v4.31.0 — revisado entero tras retirar la capa `⊢` (ADR‑115):
+fuera `Block6`, `encode_cons_inj`/`encode_cons_neq_nil`, `Provable`/`provable_formCode_iff`, y los
+meta‑axiomas de F7a marcados como lo que son, un registro.
 
 ---
 
@@ -23,7 +26,7 @@
 **@importance**: `high`
 **@axiom_system**: `none` (meta-codificación pura sobre `Minimal/`; **no añade axiomas**)
 **Last updated**: 2026-06-06 (creado)
-**Dependencias**: `Axioms`, `Block6` (usa `cons`, `nil`, `cons_inj`, `cons_neq_nil`).
+**Dependencias**: `Axioms` (usa `cons`, `nil`); `FOL.Theorems.Eq`. (Hasta ADR‑115 importaba `Block6`.)
 
 #### Defs
 
@@ -48,19 +51,18 @@ theorem encode_nil  : ⌜([] : List Sym)⌝ = nil
 theorem encode_cons (s S) : ⌜s :: S⌝ = cons (G s) ⌜S⌝
 -- Teo G1 (meta-inyectividad, consistency-free):
 theorem encode_injective (S S' : List Sym) : ⌜S⌝ = ⌜S'⌝ → S = S'
--- Versión object-level (vía Block6, faithful al "Teo L2 repetidamente" del spec):
-theorem encode_cons_inj (s s' S S') :
-  axioms ⊢ (⌜s::S⌝ =eq ⌜s'::S'⌝) ⇒ land (G s =eq G s') (⌜S⌝ =eq ⌜S'⌝)
-theorem encode_cons_neq_nil (s S) : axioms ⊢ neg (⌜s::S⌝ =eq ⌜[]⌝)
 ```
+
+🗑️ La versión object‑level (`encode_cons_inj`, `encode_cons_neq_nil`: `axioms ⊢ …`, vía `Block6`) se
+retiró con la capa `⊢` (ADR‑115).
 
 **Sobre Teo G1**: el enunciado del spec `⌜S⌝ = ⌜S'⌝ ⟹ S = S'` mezcla antecedente
 sobre códigos (`Term`) con conclusión meta (`S = S' : List Sym`). La inyectividad
 **plena** (`encode_injective`) se establece a nivel meta (Lean), por inducción
 estructural sobre la lista vía inyectividad de `cons`/`func`/`G` (`injection` +
 `decide` sobre los símbolos `String` distintos). **No requiere `Con(axioms)`**.
-Pasar de la versión object-level (`encode_cons_inj`) a la conclusión meta sí
-requeriría consistencia, por lo que esa conexión interna queda para el Nivel C/D.
+Pasar de la versión object-level (retirada, ver arriba) a la conclusión meta sí
+requeriría consistencia, por lo que esa conexión interna quedaba para el Nivel C/D.
 Ver `GODEL-STATUS.md` §2.
 
 ---
@@ -70,7 +72,7 @@ Ver `GODEL-STATUS.md` §2.
 **Namespace**: `ROBINSON_PlusPlus.Meta.Provability`
 **Status**: ✅ Complete (Nivel C: codificación de la sintaxis + Def 29/30 + diagonalización)
 **@importance**: `high`
-**@axiom_system**: `none` (meta-codificación; añade **5 meta-axiomas** de Gödel)
+**@axiom_system**: `none` (meta-codificación; **no añade axiomas** desde F7a)
 **Last updated**: 2026-06-06 (creado)
 **Dependencias**: `Axioms`, `Meta.Godel`, `FOL.FOL`/`FOL.Theorems.*`.
 
@@ -85,9 +87,10 @@ mutual
 end
 def formCode : Formula → Term             -- tags: ⊥2 atom3 eq4 impl5 ∀6 ∧7 ∨8 ∃9
 def IsFormula (x : Term) : Prop := ∃ φ : Formula, x = formCode φ                 -- Def 29
-def Provable  (x : Term) : Prop := ∃ φ : Formula, (x = formCode φ) ∧ (axioms ⊢ φ)
-noncomputable def goedelSentence : Formula                                        -- punto fijo de ¬Prov
 ```
+
+🗑️ `Provable` (`∃ φ, x = formCode φ ∧ axioms ⊢ φ`) se retiró con la capa `⊢` (ADR‑115);
+`goedelSentence` (punto fijo de `¬Prov`) se retiró en F7a.
 
 #### Exports — demostrado (consistency-free)
 
@@ -98,12 +101,11 @@ theorem termCode_injective  {t t'} : termCode t = termCode t' → t = t'      --
 theorem termsCode_injective {ts ts'} : termsCode ts = termsCode ts' → ts = ts'
 theorem formCode_injective  {φ φ'} : formCode φ = formCode φ' → φ = φ'      -- Teo G1 (fórmulas)
 theorem isFormula_formCode  (φ) : IsFormula (formCode φ)
-theorem provable_formCode_iff (φ) : Provable (formCode φ) ↔ (axioms ⊢ φ)
-theorem goedelSentence_fixedpoint :
-  axioms ⊢ (goedelSentence ⇔ substFormula 0 (formCode goedelSentence) (neg provFormula))
 ```
 
-#### Meta-axiomas (postulados, estilo `ax_p_tfa`; pasan a teoremas en Nivel D)
+🗑️ `provable_formCode_iff` (ADR‑115) y `goedelSentence_fixedpoint` (F7a), retirados.
+
+#### 🗑️ REGISTRO — los meta‑axiomas que hubo aquí (postulados, estilo `ax_p_tfa`), retirados en F7a
 
 ```lean
 axiom Dem : Term → Term → Prop                                              -- Def 30
@@ -113,11 +115,11 @@ axiom provFormula_repr (φ) : (axioms ⊢ substFormula 0 (formCode φ) provFormu
 axiom diagonal_lemma (φ) : ∃ ψ, axioms ⊢ (ψ ⇔ substFormula 0 (formCode ψ) φ) -- punto fijo
 ```
 
-**Sobre el alcance**: toda la **codificación + inyectividad** y `provable_formCode_iff` se
-demuestran sin postular nada. La **aritmetización de `Dem`**, la **representabilidad** y el
-**lema de diagonalización** requieren inducción y se adoptan como meta-axiomas (Nivel C según
-`GODEL-STATUS.md` §2.2). El **Nivel D** (Gödel I/II: `Minimal ⊬ G_Min`, `⊬ Con`) requiere
-`Intermediate/`/`Full/` y queda pendiente.
+**Sobre el alcance**: toda la **codificación + inyectividad** se demuestra sin postular nada.
+Los meta‑axiomas de arriba se retiraron en F7a: la aritmetización (`Dem`, `Meta/HilbertSeq.lean`), la
+representabilidad y el punto fijo viven hoy como teoremas sobre `Prf` en el Nivel D
+([Incompletitud](REFERENCE-Incompleteness.md)), donde Gödel I/II son `goedel_first_prf`/
+`goedel_second_prf` — ⛔ hoy vacuos por `[AnclaEq]` (F1, ADR‑114).
 
 ---
 

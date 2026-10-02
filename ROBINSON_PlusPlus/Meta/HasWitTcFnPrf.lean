@@ -210,8 +210,8 @@ theorem prf_wfAll1_cons (A w : Term) :
 /-! ## §5 · EL NODO `σ`
 
 `ax_tc_succ` dice que `tcFn (σ x)` es el nodo funcional `⟨1̄, ⌜σ⌝, [tcFn x]⟩`. Espejo en `Prf`
-de `Meta/Diagonal.tc_succ` (que está en `⊢`), y en vocabulario `Minimal` (`numeralM`/`strCodeM`),
-que es el que usan las guardas. -/
+de `Meta/Diagonal.tc_succ` —que era de `⊢` y quedó retirado (ADR‑115)—, y en vocabulario
+`Minimal` (`numeralM`/`strCodeM`), que es el que usan las guardas. -/
 
 /-- El nodo que `ax_tc_succ` asigna a `tcFn (σ x)`. -/
 def SUCCNODE (x : Term) : Term :=

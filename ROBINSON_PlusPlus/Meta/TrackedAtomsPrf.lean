@@ -21,7 +21,7 @@ módulo pone en producción las piezas **genéricas** de esa operación, promovi
     pcc_carcIn_tracked  (q X)   ·  pcc_cdrcIn_tracked (q X)
 
 ⭐ **`pcc_In_atom_tracked` es la pieza clave**: `In` es un **átomo** del lenguaje
-(`Minimal/Axioms.lean:149`), y reflejarlo con `x` y `w` **abstractos** es lo que permite que
+(`Minimal/Axioms.lean`), y reflejarlo con `x` y `w` **abstractos** es lo que permite que
 `isTC1 w c = wfAll1 w ∧ In c w` —la guarda de ADR‑020— se refleje por partes. La ruta es
 `prf_In_iff_boundedIn` (`Meta/BoundedInPrf.lean:391`) → `pcc_boundedIn_tracked` → transporte
 por `pcc_InBwd_computed`.

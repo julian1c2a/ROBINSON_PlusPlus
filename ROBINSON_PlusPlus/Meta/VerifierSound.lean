@@ -7,6 +7,14 @@ import ROBINSON_PlusPlus.Meta.ChainDecode
 import ROBINSON_PlusPlus.Meta.OmegaReflect
 
 /-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`NegVerifier`, `formCode_ne`, `termCode_ne`, `OmegaConsistent`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Tampoco las dos deudas de §4 (`DEUDA_chainNeg`, `DEUDA_inNeg`) ni `negVerifier_of_deudas`, que las juntaba.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
+/-!
 # MÓDULO E · SOLIDEZ ESTRUCTURAL DEL VERIFICADOR
 
 `PLAN-NEGVERIFIER.md` §8 llamaba a este módulo **«el corazón»** y le ponía **riesgo ALTO** y
@@ -15,7 +23,8 @@ objeto aceptara cadenas basura que «prueban» `⌜φ⌝` sin `Prf φ`.
 
 ## ⭐⭐ El sondeo se hizo (2026‑09‑10h) y el módulo sale en DIEZ líneas
 
-`sondeos/NegVerifierModE.lean`, cinco mediciones, todas verdes. Dos resultados:
+`sondeos/NegVerifierModE.lean`, cinco mediciones, todas verdes entonces (hoy es registro y no
+compila: cita lo retirado con ADR‑115). Dos resultados:
 
 1. ✅ **No hay bug de solidez.**
 2. ⭐⭐ **Y el corazón no hacía falta construirlo**, porque el decisor que este módulo necesita
@@ -32,7 +41,7 @@ real, la ecuación estructural fuerza a que los args sean `formCode` reales»—
 
 ## ⛔ Dónde está el riesgo de verdad (y el plan lo tenía al revés)
 
-Este módulo cubre la mitad **(a)**: *el decisor acepta ⟹ `Prf φ`*. `NegVerifier` necesita también
+Este módulo cubre la mitad **(a)**: *el decisor acepta ⟹ `Prf φ`*. `NegVerifier` necesitaba también
 la mitad **(b)**, la **completitud negativa**: *el decisor rechaza ⟹ la teoría REFUTA `chainOk`*.
 Y ahí sí hay discrepancia **medida**: los esquemas objeto cuantifican sobre códigos **cualesquiera**
 y aceptan cadenas que el decodificador rechaza —
@@ -40,7 +49,9 @@ y aceptan cadenas que el decodificador rechaza —
     axioms ⊢ lineWF ⟨implc basura (implc basura basura), 0̄, basura, basura⟩
     decodeForm (implc basura (implc basura basura)) = none
 
-⇒ El par **(C, D)** es lo que hay que rediseñar, no éste. Detalle en `sondeos/NegVerifierModE.lean`.
+⇒ El par **(C, D)** era lo que había que rediseñar, no éste; se rediseñó (ADR‑022) y se construyó en
+`Meta/ChainNegPrf.lean`, cuyo resultado, sobre `⊢`, se retiró con ADR‑115. Detalle en
+`sondeos/NegVerifierModE.lean`.
 
 **Footprint**: el de `decodeChain_prf`.
 -/
@@ -92,9 +103,11 @@ theorem verifier_sound_concls {l : List Term} {L : List Formula} {φ : Formula}
 
 /-! ## §3 · LA FORMA DE CONSUMO — la CONTRAPOSITIVA
 
-Es lo que el ensamblaje (módulo F) pide: de `¬ Prf φ` sale que el decisor **no puede** aceptar una
-cadena que concluya `φ`. ⇒ en el `by_cases` de F, **la rama «aceptada» es imposible**, y todo el
-trabajo que queda cae en la otra: refutar en la teoría (módulos C+D). -/
+Era lo que pedía el ensamblaje (`negVerifier_of_deudas`, aquí, y `negVerifier_proved`, en
+`Meta/ChainNegPrf.lean`): de `¬ Prf φ` sale que el decisor **no puede** aceptar una cadena que
+concluya `φ`. ⇒ en aquel `by_cases`, **la rama «aceptada» era imposible**, y todo el trabajo caía
+en la otra: refutar en la teoría (módulos C+D). 🗑️ El ensamblaje era sobre `⊢` y se retiró con
+ADR‑115: las dos contrapositivas de abajo siguen probadas, pero hoy **no tienen consumidor**. -/
 
 /-- 🏁 **La contrapositiva.** `φ` indemostrable ⟹ ninguna cadena estándar la concluye para el
     decisor META.
@@ -106,77 +119,31 @@ theorem not_decodes_of_not_prf {φ : Formula} (hnp : ¬ Prf φ) (l : List Term) 
       (∀ L, checkProof rs = some L → φ ∈ L) :=
   fun ⟨_, h, hmem⟩ => hnp (verifier_sound h hmem)
 
-/-- Y sobre `conclsDec`, que es la forma en que `runFn` se comparará. -/
+/-- Y sobre `conclsDec`, la forma en que se comparaba con `runFn` (en `DEUDA_inNeg` y
+    `negVerifier_of_deudas`, sobre `⊢`, retirados con ADR‑115). -/
 theorem not_mem_conclsDec_of_not_prf {φ : Formula} (hnp : ¬ Prf φ)
     (l : List Term) (L : List Formula) (h : conclsDec l = some L) : φ ∉ L :=
   fun hmem => hnp (verifier_sound_concls h hmem)
 
-/-! ## §4 · LO QUE FALTA, **ENUNCIADO** (no postulado)
-
-La otra mitad de `NegVerifier`: la **completitud negativa**. Se enuncia aquí para que el frente
-tenga su obligación con nombre y firma, como manda el idioma del proyecto (§2 de
-`Meta/D3ChainDotPrf.lean`: *la deuda se enuncia, no se postula*).
-
-🏁 **YA SON CONSUMIBLES (2026‑09‑10h, [ADR‑022](../../DECISIONS.md)).** La nota que había aquí
-decía que no se podían consumir *«hasta el ADR de `StdChain`»*: con `StdChain = IsCodeShaped` la
-clase **no separaba** (`cons nil nil ≐ numeralM 2` es provable) y refutar una línea basura exigía
-**evaluar Cantor**. Ese ADR está tomado: `StdChain` es hoy `∀ x ∈ l, StdLine x`, con la línea en su
-forma exacta `⟨⌜f⌝, k̄, args⟩` y args `formCode`/`termCode` ⇒ **todas** las comparaciones son
-paralelas por tipo y las decide `formCode_ne`/`termCode_ne`, sin Cantor.
-
-⚠️ **El precio va escrito en el ADR**: `OmegaConsistent` es estrictamente **más fuerte**. La
-garantía que lo hace admisible —y sin la cual esto sería una trampa— es `stdChain_proofCode'`
-(`Meta/OmegaReflect.lean` §1ter): **la clase contiene los códigos de prueba REALES**. -/
-
-/-- **La mitad (b) de `NegVerifier`**: si el decisor META rechaza, la teoría REFUTA la cadena. -/
-abbrev DEUDA_chainNeg : Prop :=
-  ∀ l : List Term, StdChain l → chainOkDec l = false →
-    axioms ⊢ neg (chainOk nil (objList l))
-
-/-- **La mitad (b′)**: si el decisor acepta pero `φ` **no** está entre las conclusiones, la teoría
-    refuta la pertenencia. -/
-abbrev DEUDA_inNeg : Prop :=
-  ∀ (φ : Formula) (l : List Term) (L : List Formula), StdChain l →
-    conclsDec l = some L → φ ∉ L →
-      axioms ⊢ neg (In (formCode φ) (runFn nil (objList l)))
-
-/-- ⭐ **`NegVerifier` DESDE LAS DOS DEUDAS Y NADA MÁS.** La rama «aceptada y concluye `φ`» la
-    cierra §3 —es **imposible**—, así que el ensamblaje sólo tiene que repartir entre las otras
-    dos. Es el análogo de `d3_prf_of_halves` para este frente. -/
-theorem negVerifier_of_deudas (hchain : DEUDA_chainNeg) (hin : DEUDA_inNeg) : NegVerifier := by
-  intro φ hnp l hl
-  rcases hdec : chainOkDec l with _ | _
-  · -- el decisor RECHAZA ⇒ se refuta `chainOk`, y con él la conjunción
-    exact FOL.MetaRules.imp_intro (fun hv =>
-      FOL.MetaRules.mp (hchain l hl hdec) (Minimal.Axioms.and_elim_left hv))
-  · -- el decisor ACEPTA ⇒ `φ` **no** puede estar entre las conclusiones (§3) ⇒ se refuta el `In`
-    have hsome : (decodeChain (objList l)).isSome = true := hdec
-    rcases hd : decodeChain (objList l) with _ | rs
-    · rw [hd] at hsome; simp at hsome
-    · rcases hc : checkProof rs with _ | L
-      · -- no puede pasar: `decodeChain` acepta ⇒ `checkProof` acepta
-        obtain ⟨L', hL'⟩ := decodeChain_checkProof hd
-        rw [hc] at hL'; simp at hL'
-      · have hcd : conclsDec l = some L := by
-          unfold conclsDec; rw [hd]; simpa only [Option.bind] using hc
-        have hnm : φ ∉ L := not_mem_conclsDec_of_not_prf hnp l L hcd
-        exact FOL.MetaRules.imp_intro (fun hv =>
-          FOL.MetaRules.mp (hin φ l L hl hcd hnm) (Minimal.Axioms.and_elim_right hv))
+/-! ## §4 · 🗑️ (Aquí se enunciaban `DEUDA_chainNeg`/`DEUDA_inNeg` y `negVerifier_of_deudas`, sobre `⊢`;
+retirados con ADR‑115. La mitad `⊬¬G` no tiene hoy formulación sobre `Prf`: ADR‑115 §7.) -/
 
 end ROBINSON_PlusPlus.Meta.VerifierSound
 
 /-! ## `export` — por CONSUMO
 
-Consumidor previsto: el módulo F (`NegVerifierPrf`), que sólo tiene que descargar las dos deudas
-de §4. -/
+Sin consumidor tras ADR‑115, salvo `chainOkDec` (lo usa `dispatcher`, en `Meta/ChainNegPrf.lean`,
+que tampoco tiene consumidor). El previsto era el módulo F (`NegVerifierPrf`, que no llegó a
+existir), para descargar las dos deudas de §4, retiradas con `⊢`. -/
 export ROBINSON_PlusPlus.Meta.VerifierSound (
-  chainOkDec conclsDec
-  verifier_sound verifier_sound_concls
-  not_decodes_of_not_prf not_mem_conclsDec_of_not_prf
-  DEUDA_chainNeg DEUDA_inNeg negVerifier_of_deudas
+  chainOkDec
+  conclsDec
+  verifier_sound
+  verifier_sound_concls
+  not_decodes_of_not_prf
+  not_mem_conclsDec_of_not_prf
 )
 
 /-! ## FOOTPRINT -/
 
 #print axioms ROBINSON_PlusPlus.Meta.VerifierSound.verifier_sound
-#print axioms ROBINSON_PlusPlus.Meta.VerifierSound.negVerifier_of_deudas

@@ -9,9 +9,12 @@
 
 **Contenido:** la teoría objeto FOL⁼ (Q++) — axiomas de Robinson extendidos, esquemas del verificador
 estructural (`lineWF`, `premsOf`, tags), y los axiomas de la capa Δ₀ (`lenc`/`nthc`/`ax_lineWF_inv`/
-`ax_lineWF_cons`). **Last updated:** 2026-07-12 · Lean v4.31.0. — ⚠️ **revisado el 2026‑09‑11**: el kernel y los
-esquemas que este nodo documenta **no han cambiado** desde entonces; la fecha es correcta, no
-obsoleta. (Adjudicación del aviso `[E]` del control.)
+`ax_lineWF_cons`). **Last updated:** 2026-07-12 · Lean v4.31.0. — ⚠️ revisado el 2026‑09‑11 (entonces el kernel no
+había cambiado; adjudicación del aviso `[E]` del control).
+
+> 🗑️ **2026‑10‑02 · ADR‑115.** `Minimal/Axioms.lean` sí cambió: perdió el `import` y el re‑export de `FOL.MetaRules`,
+> la `CoeFun` sobre `Derives` y sus lemas sobre `⊢` (el ancla `ax_axiomsCodeT_eq`, `ax_inAxC`, los *helpers*: todos retirados).
+> **Las listas y las 141 fórmulas no cambian.** §3.1.6 y §3.1.7 de abajo describen lo retirado: son registro.
 
 ---
 
@@ -20,7 +23,7 @@ obsoleta. (Adjudicación del aviso `[E]` del control.)
 ### 3.1 `Minimal/Axioms.lean`
 
 **Namespace**: `ROBINSON_PlusPlus.Minimal.Axioms`
-**Status**: ✅ Complete — **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización) + 5 meta-reglas FOL.
+**Status**: ✅ Complete — **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización); 0 `axiom` de Lean (las meta-reglas de FOL ya no se importan, ADR‑115).
 **@axiom_system**: `Minimal`
 **@importance**: `foundational`
 **Last updated**: 2026-06-06 (Bloque VIII ext.: +pow, +prod_pairs, +4 axiomas)
@@ -149,7 +152,7 @@ abbrev ex := @Formula.ex
 **Ax 23** (`ax23_cantor_proj_uniq`): **ELIMINADO 2026-06-02** — `cantor_uniqueness` (Block4_C6_C7) probado constructivamente; ax23 nunca se usó en código.
 **Ax 28** (`ax28_mul_two_cancel`): **ELIMINADO 2026-06-02** — derivable sin inducción, ver `teo_2_11` (Block1). El `def` permanece comentado en `Axioms.lean` como nota histórica.
 
-#### 3.1.6 Meta-reglas FOL (5 `axiom`, ADR-008)
+#### 3.1.6 🗑️ REGISTRO — Meta-reglas FOL (5 `axiom`, ADR-008), retiradas con la capa `⊢` (ADR‑115)
 
 ```lean
 axiom imp_intro {Γ A B} (h : Γ ⊢ A → Γ ⊢ B) : Γ ⊢ (A ⇒ B)
@@ -160,7 +163,7 @@ axiom ex_elim  {Γ A C}   (h : Γ ⊢ Formula.ex A)
                           (cont : ∀ t, Γ ⊢ substFormula 0 t A → Γ ⊢ C) : Γ ⊢ C
 ```
 
-#### 3.1.7 Helper theorems
+#### 3.1.7 🗑️ REGISTRO — Helper theorems sobre `⊢`, retirados con ADR‑115
 
 ```lean
 theorem ax {f : Formula} (h : f ∈ axioms) : axioms ⊢ f

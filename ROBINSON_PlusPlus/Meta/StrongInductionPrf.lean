@@ -66,9 +66,9 @@ theorem prf_le_of_lt_succ (m n : Term) : Prf (lt m (succ n) ⇒ le m n) := by
 
 /-! ### Paso ii.2 — el motivo auxiliar `PSI` y sus lemas de sustitución
 
-Guion de `Full/StrongInduction.lean` portado a `Prf`. `PSI Φ := ∀m. m<#1 ⇒ ↑Φ` es el «curso de
-valores». `substFormula_liftFormula` es de nivel FOL (no usa el cálculo) pero vive en `Full`; se
-re‑declara aquí para no acoplar `Meta → Full`. -/
+Guion de `Full/StrongInduction.lean` —sobre `⊢`, retirado (ADR‑115)— portado a `Prf`. `PSI Φ :=
+∀m. m<#1 ⇒ ↑Φ` es el «curso de valores». `substFormula_liftFormula` es de nivel FOL (no usa el
+cálculo); la copia de `Full` quedó retirada con ese módulo, y aquí sigue el alias local de FOL. -/
 
 /-- `substFormula c s (liftFormula c φ) = φ`.
 
@@ -161,7 +161,7 @@ diagnóstico, pero sólo a medias en el remedio.** Con la hipótesis `hΦ : lift
   (`psi_lift_eq_subst`), que era el bloqueo estructural;
 * la discrepancia (b) —`substFormula 0 #1 Φ` vs `liftFormula 1 Φ`— **NO desaparece, y no debe**:
   son `Φ(n)` y `Φ(m)`, y se transportan con **Leibniz** usando la hipótesis de rama `m = n`
-  (exactamente lo que hace `Full.strong_induction` con `Derives.subst`).
+  —exactamente lo que hacía `Full.strong_induction` con `Derives.subst`, retirado (ADR‑115)—.
 
 ⟹ **`PSI` se queda como está** y las 4 piezas verdes previas no se re‑prueban. `hΦ` es inofensiva
 para (iii): el predicado de `pcc_eval_substfc` cuantifica `v`/`s` **internamente**, luego sólo tiene

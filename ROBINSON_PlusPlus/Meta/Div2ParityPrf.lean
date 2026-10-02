@@ -45,8 +45,8 @@ Todo en forma **OBJETO** (`x` abstracto ⟹ vale para todos los numerales a la v
 no añade nada.
 
 **Además este módulo cubre dos huecos que no estaban registrados**: `ax12_mul_distrib` y el
-homomorfismo `numeral a · numeral b = numeral (a·b)` **no existían a nivel `Prf`** (sólo la versión
-ω, en `Full/Numerals.lean`, que es de la capa `Derives` y no sirve aquí).
+homomorfismo `numeral a · numeral b = numeral (a·b)` **no existían a nivel `Prf`**: sólo la versión
+ω, en `Full/Numerals.lean`, de la capa `Derives`, que no servía aquí y quedó retirada (ADR‑115).
 -/
 
 /-! ### Piezas que faltaban del producto -/
@@ -72,7 +72,7 @@ theorem PrfH_eq_congr_mul2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
 
 /-! ### Homomorfismo del producto sobre numerales
 
-Espejo exacto de `prf_numeral_add` (`Meta/ArithPrf.lean:93`). Inducción **meta** en `b`: para `b`
+Espejo exacto de `prf_numeral_add` (`Meta/ArithPrf.lean`). Inducción **meta** en `b`: para `b`
 simbólico queda una aplicación, Lean no la despliega (medido en el sondeo S3). -/
 
 /-- `numeral a · numeral b = numeral (a·b)` sobre `Full.numeral`. -/
@@ -222,7 +222,7 @@ theorem prf_mod2_double (x : Term) : Prf (mod2 (mul x two) =eq zero) := by
 
 /-! ### P2 — congruencia de `div2` (Leibniz objeto)
 
-No existía a nivel `Prf` (la de `Full/Mod2.lean` es de la capa ω). -/
+No existía a nivel `Prf`: la de `Full/Mod2.lean` era de la capa ω y quedó retirada (ADR‑115). -/
 
 /-- `t₁ = t₂ ⟹ div2 t₁ = div2 t₂`. -/
 theorem prf_eq_congr_div2 {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) :

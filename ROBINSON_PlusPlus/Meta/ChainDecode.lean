@@ -6,6 +6,13 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.CodeDecode
 import ROBINSON_PlusPlus.Meta.Representability2
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`DEUDA_chainNeg`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.CodeDecode
 open ROBINSON_PlusPlus.Meta.HilbertSeq
@@ -23,7 +30,7 @@ Inversos de los codificadores de prueba `lineJustif` / `lineCode'` / `proofCode'
 
 ### ⚠️ El codificador es LOSSY para `thy`/`mp`/`gen` ⟹ **sección**, no *retract*
 
-`lineJustif` **descarta los índices** de tres reglas (ver `Representability2.lean:46`):
+`lineJustif` **descarta los índices** de tres reglas (ver el docstring de `lineJustif` en `Representability2.lean`):
 * `thy k    ↦ cons 15̇ nil`                       — la `k` NO se guarda;
 * `mp i j   ↦ cons 16̇ (cons ⌜acc[j]⌝ nil)`        — guarda la **premisa resuelta**, no `i`/`j`;
 * `gen i    ↦ cons 17̇ (cons ⌜acc[i]⌝ nil)`        — guarda `acc[i]`, no `i`.
@@ -105,8 +112,10 @@ theorem findIdx_sound (f : Formula) : ∀ (l : List Formula) (i : Nat),
           simp only [List.getElem?_cons_succ]; exact ih j hj
 
 /-- **La búsqueda falla ⇒ no está** — contrarrecíproco útil de `findIdx_isSome_of_getElem`,
-    y **la puerta por la que entra la causa (d)** de `DEUDA_chainNeg`: `decodeRuleTag … 15 … = none`
-    **es** `findIdx f axioms = none`, y de ahí hay que salir a `¬ List.Mem f axioms`. -/
+    y **la puerta por la que entraba la causa (d)** de `DEUDA_chainNeg`: `decodeRuleTag … 15 … = none`
+    **es** `findIdx f axioms = none`, y de ahí había que salir a `¬ List.Mem f axioms`.
+    🗑️ Sus consumidores (los cierres de (d) y de `mp` en `Meta/ChainNegPrf.lean`) eran sobre `⊢` y
+    se retiraron con ADR‑115: hoy no tiene consumidor fuera de este módulo. -/
 theorem not_mem_of_findIdx_none {f : Formula} : ∀ {l : List Formula},
     findIdx f l = none → ¬ List.Mem f l
   | [], _, hm => by cases hm

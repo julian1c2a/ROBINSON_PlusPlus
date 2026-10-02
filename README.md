@@ -1,6 +1,23 @@
 # ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+>
+> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
+> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
+> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
+> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
+> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
+> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
+> con **0 `axiom` de Lean**.
+> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
+> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+>
+> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
+>
+> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
+> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -8,16 +25,17 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   **numeral** `godelCN`.
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
 >   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
@@ -59,36 +77,42 @@ base o se declara pendiente con nombre y firma**.
 
 | capa | qué es | tamaño |
 |---|---|---|
-| **`Minimal/`** | la teoría objeto **Q++**: aritmética de Robinson extendida, **sin esquema de inducción**. `axioms` = **141** fórmulas = **34 matemáticas** (`coreAxioms`) **+ 107 ecuaciones de codificación** | 11 módulos |
-| **`Full/`** | Q++ **más el esquema de inducción** como axioma objeto. Aquí los **10** axiomas *derivables* de `coreAxioms` pasan a **teoremas** (9 de ellos **certificados** sobre los 24 primitivos), y se construye el TFA | 11 módulos |
-| **`Meta/`** | la **aritmetización de la sintaxis** y la cadena de Gödel: verificador de demostraciones interno, punto fijo, **D1, D2 y D3 demostradas**, Gödel I y Gödel II | 106 módulos |
+| **`Minimal/`** | la teoría objeto **Q++**: aritmética de Robinson extendida, **sin esquema de inducción**. `axioms` = **141** fórmulas = **34 matemáticas** (`coreAxioms`) **+ 107 ecuaciones de codificación** | 1 módulo (`Axioms`; los diez `Block`, todo teoremas sobre `⊢`, se retiraron con ADR‑115) |
+| **`Full/`** | lo que queda tras [ADR‑115](DECISIONS.md): `primAxioms` y las longitudes del censo, los lemas de sustitución e `inductionFormula` (`Full/Induction.lean`), `numeral` (`Full/Numerals.lean`) y la teoría de números en ℕ pura (`Full/PrimeFactor.lean`). 🗑️ El esquema de inducción sobre `⊢`, el censo certificado sobre `⊢` y el TFA objeto se retiraron con esa capa | 3 módulos |
+| **`Meta/`** | la **aritmetización de la sintaxis** y la cadena de Gödel: verificador de demostraciones interno, punto fijo, **D1, D2 y D3 demostradas**, Gödel I y Gödel II | 100 módulos |
 
 **Lo que sostiene el resultado, dicho sin adornos:**
 
-- 🏁 **Gödel I, la mitad `⊬G`**: `goedel_first_numeral`, real y **sin ningún postulado gödeliano**.
-  ⬜ La otra mitad (`⊬¬G`) **no está cerrada**: depende de `NegVerifier`, hoy reducido a **dos
-  obligaciones con nombre**.
-- 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada.
+- 🗑️ **Gödel I sobre `⊢`** (`goedel_first_numeral`) quedó retirado con esa capa (ADR‑115). El de hoy es `goedel_first_prf` (abajo), sobre `Prf`.
+  ⬜ La otra mitad (`⊬¬G`) **no está cerrada**: `NegVerifier` (ADR‑097) iba **sobre `⊢`** y con meta‑reglas refutadas en
+  su footprint —no estaba demostrado— y se retiró con esa capa; sobre `Prf` hay que rehacerla, y ⛔ la ω‑consistencia NO puede enunciarse como antes:
+  sobre `Prf` esa definición es refutable (L1‑4, `sondeos/OmegaConsistentRefutable.lean`).
+- 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada. ⚠️ D1
+  (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevan la hipótesis de clase `[AnclaEq]`; D2 (`d2_prf`) no.
 - 🏁🏁 **La cadena de Gödel, ENTERAMENTE FINITARIA** (`Meta/GodelTwoPrf.lean`):
 
   ```lean
-  goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
-  goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+  goedel_first_prf  [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN
+  goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula'
   ```
 
-  **Una sola hipótesis, y es la mínima**: `ConsistentH := ¬ Prf ⊥`, *el cálculo finitario no
-  demuestra `⊥`*. **Ninguna hipótesis suelta**: el punto fijo y la necesitación se descargan ahí.
+  ⛔ **No es «una sola hipótesis, la mínima»** (así lo decía este párrafo): son **dos**, `ConsistentH := ¬ Prf ⊥`
+  y la clase `[AnclaEq]`, y **no pueden valer a la vez**, porque `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114) ⇒ hoy los dos
+  teoremas son **vacuos**. **Ninguna hipótesis suelta**: el punto fijo y la necesitación se descargan ahí.
   ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**, y el footprint de los dos teoremas es
   **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del
-  proyecto**, el ancla de codificación.
-- ⛔⛔ **Y una advertencia que hay que leer antes de citar nada de este repo**: el cálculo `axioms ⊢`
-  —el que se usa como herramienta de trabajo— es **sintácticamente COMPLETO**: decide **toda**
+  proyecto**, el ancla de codificación *(entonces; desde ADR‑026 el ancla es la clase `[AnclaEq]` y el
+  footprint son los tres de Lean)*. ⛔⛔ **Y desde el 2026‑10‑02 se sabe que `[AnclaEq]` da `Prf ⊥`**
+  (F1, ADR‑114): los dos teoremas son, hoy, **vacuos**.
+- ⛔⛔ **Y una advertencia que hay que leer antes de citar nada de este repo** *(hasta el 2026‑10‑02: ese día
+  la capa `⊢` se retiró de RPP precisamente por esto, ADR‑115)*: el cálculo `axioms ⊢`
+  —el que se usaba como herramienta de trabajo— era **sintácticamente COMPLETO**: decide **toda**
   sentencia (`Meta/OmegaStrength.lean`, medido). La causa no es aritmética: es que los meta‑axiomas
   `raa` e `imp_intro` toman como premisa una **función de Lean**, así que lo que el cálculo no
   prueba, lo **refuta**. ⇒ **ningún resultado de incompletitud puede enunciarse sobre `⊢`** — por eso
   el `goedel_second'` de `Meta/GodelTwo.lean` **no es** el Segundo Teorema, y el que sí lo es vive
   sobre `Prf`. Detalle en `doc/AUDITORIA-2026-09-11.md` **F‑1**.
-- **3 `axiom` de Lean** en todo el árbol, **0 `sorry`**, y ninguno de los tres es gödeliano.
+- **0 `axiom` de Lean** en todo el árbol (los 3 que había vivían sobre `⊢` y se retiraron con esa capa, ADR-115), **0 `sorry`**.
 - ⚠️ **No es una prueba de consistencia**: se retiró una inconsistencia **conocida y localizada**
   (ADR‑012/013), lo que no es lo mismo.
 
@@ -103,38 +127,18 @@ base o se declara pendiente con nombre y firma**.
 
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
-| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL` | ✅ Complete (5 meta-axiomas intencionales) |
-| `Minimal/Theorems/Block1.lean` | `ROBINSON_PlusPlus.Minimal.Theorems.Block1` | `Minimal.Axioms`, `FOL.Tactics` | ✅ Complete |
-| `Minimal/Theorems/Block2.lean` | `Minimal.Theorems.Block2` | `Minimal.Axioms`, `Block1` | ✅ Complete |
-| `Minimal/Theorems/Block3.lean` | `Minimal.Theorems.Block3` | `Minimal.Axioms`, `Block1` | ✅ Complete (verboso: enumera div2/mod2 por numeral, sin inducción) |
-| `Minimal/Theorems/Block4.lean` | `Minimal.Theorems.Block4` | `Minimal.Axioms`, `Block1`, `Block3` | ✅ Complete |
-| `Minimal/Theorems/Block4_C5.lean` | `Minimal.Theorems.Block4_C5` | `Block1`, `Block2`, `Block3` | ✅ Complete — `lemma_C5` (∃) + `lemma_C5_unique` + `cantor_bounds` |
-| `Minimal/Theorems/Block4_C6_C7.lean` | `Minimal.Theorems.Block4_C6_C7` | `Block1..4`, `Block4_C5` | ✅ Complete — `add_left_cancel`, `mod2_of_even`, `proj1`/`proj2` (defs), `proj_is_cantor`, `cantor_uniqueness`, `cantor_surjectivity` |
-| `Minimal/Theorems/Block5.lean` | `Minimal.Theorems.Block5` | `Block1..4`, `Block4_C5`, `Block4_C6_C7` | ✅ Complete — `proj1/2_pair`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` |
-| `Minimal/Theorems/Block6.lean` | `Minimal.Theorems.Block6` | `Block1`, `Block4`, `Block5` | ✅ Complete — listas, pertenencia, concat (assoc/in_concat vía ax_C3/ax_L3 postulados) |
-| `Minimal/Theorems/Block7.lean` | `Minimal.Theorems.Block7` | `Block1`, `Block4`, `Block4_C6_C7`, `Block5` | ✅ Complete — `IsFunction`, `Functional`, F1/F2/F3 (Bloque VII spec) |
-| `Minimal/Theorems/Block8.lean` | `Minimal.Theorems.Block8` | `Block1`, `Block2`, `Block4_C5` | ✅ Complete — `Dvd`, `IsPrime`, `IsFactorization`, `pow`/`prod_pairs` (Bloque VIII Fase 17 + Ax-P TFA) |
+| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL`, `FOL.Theorems.Eq` | ✅ El lenguaje y los 141 axiomas objeto. **0 `axiom` de Lean** (los «meta‑axiomas» de FOL ya no se importan: ADR‑115) |
+| ~~`Minimal/Theorems/Block1–8.lean`~~ (10 ficheros) | — | — | 🗑️ **RETIRADOS el 2026‑10‑02** ([ADR‑115](DECISIONS.md)): todo eran teoremas `axioms ⊢ …` |
 
 ## Project Structure
 
 ```text
 ROBINSON_PlusPlus/
 ├── Minimal/
-│   ├── Axioms.lean            # Lenguaje + 34 axiomas + 5 meta-axiomas (reglas de deducción)
-│   └── Theorems/
-│       ├── Block1.lean        # Block I: Aritmética básica, constantes
-│       ├── Block2.lean        # Block II: Raíz cuadrada, cotas, unicidad
-│       ├── Block3.lean        # Block III: div2, mod2 (enumeración por numeral)
-│       ├── Block4.lean        # Block IV: Cantor — totalidad e inyectividad
-│       ├── Block4_C5.lean     # Lema C5: ∃ w, w(w+1) ≤ 2c < (w+1)(w+2) ✅
-│       ├── Block4_C6_C7.lean  # add_left_cancel + Cantor sobreyectividad/unicidad
-│       ├── Block5.lean        # Pares y proyecciones (proj1/2_pair, pair_inj)
-│       ├── Block6.lean        # Listas (cons_neq_nil, concat_assoc, in_concat)
-│       ├── Block7.lean        # Funciones discretas (IsFunction, Functional, F1/F2/F3)
-│       └── Block8.lean        # Primos y factorización (Dvd, IsPrime, IsFactorization, Ax-P TFA)
+│   ├── Axioms.lean            # Lenguaje + los 141 axiomas objeto (34 matemáticos + 107 de codificación)
+│   └── (Theorems/Block1–8 — 🗑️ retirados con la capa `⊢`, ADR‑115)
 ├── Meta/                      # Gödelización + Gödel I/II en `Prf`: G, ⌜·⌝, incompletitud, cadena HBL (D1/D2, D3 en curso)
-├── Intermediate/              # (Planned, paralelo a Meta/) System with restricted induction
-└── Full/                      # (Planned) System with full Peano induction
+└── Full/                      # Induction (primAxioms, inductionFormula), Numerals, PrimeFactor (ℕ pura)
 ```
 
 > As the project grows, organize modules into thematic subdirectories.

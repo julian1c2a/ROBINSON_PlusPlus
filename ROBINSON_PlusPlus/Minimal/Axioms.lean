@@ -6,7 +6,6 @@ License: MIT
 
 import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬ ⇒ ⇔ ∀. ∃. ⊥ ⊤ #
 import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
-import FOL.MetaRules    -- meta-reglas ω de deducción (imp_intro, gen, raa, or_elim, ex_elim, wrappers)
 
 set_option linter.unusedSimpArgs false
 
@@ -26,6 +25,12 @@ This module defines the language and the 21 axioms of the minimal arithmetic
 system as described in `TuplasFuncionesYListas.md`. This system is strong
 enough to develop a theory of pairs (via Cantor's pairing function) and lists,
 but it lacks a general induction principle.
+
+🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` (`Derives`) se retiró de RPP: sus postulados eran falsos
+(`sondeos/MetaReglasRefutables.lean`). Con ella se borraron `Minimal/Theorems/Block1–8` y los
+teoremas `axioms ⊢ …` de `Full/`. Los comentarios de este fichero que remiten a un teorema de un
+`Block` («ver `concat_assoc` en Block6», …) describen material RETIRADO: se conservan como registro
+de por qué cada axioma está (o dejó de estar) en la lista. Las listas y las fórmulas no cambian.
 -/
 
 -- ## Language Definition
@@ -827,9 +832,9 @@ con `cons`/`succ`/`zero`). Sus 3 ecuaciones espejan la cláusula `.func` de
 * `termCode (func s ts) = ⟨1, strCode s, termsCode ts⟩`.
 
 Es la única pieza que falta para representar la **diagonalización** (substituir el
-código de una fórmula en sí misma necesita el código de ese código). El puente
-`tcFn (formCode ψ) = termCode (formCode ψ)` (`tc_arith`) se prueba por inducción
-meta en `Meta/Diagonal.lean`. -/
+código de una fórmula en sí misma necesita el código de ese código). El puente sobre la estructura de código
+(`tc_arith`, por inducción meta en `Meta/Diagonal.lean`) se retiró con `ax_tc_cons`, que era
+inconsistente (ADR‑012); hoy el puente va por NUMERALES: `prf_tc_numeral` (`Meta/TcArithPrf.lean`). -/
 def tcFn (t : Term) : Term := Term.func "tcFn" [t]
 
 -- `termCode zero = ⟨1, strCode "0", []⟩`  (nil = zero, termsCode [] = nil)
@@ -939,9 +944,14 @@ def ax_vpf_gen : Formula :=
 /-! ### El código de la teoría, `axiomsCodeT`
 
 `axiomsCodeT` se declara **opaco** (símbolo `Term.func "axiomsCodeT" []`) para que la
-sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida), y se ancla por
-el axioma **`ax_axiomsCodeT_eq`** (`axioms ⊢ axiomsCodeT =eq listFormCodeM axioms`) a la lista
-**`axioms`**.
+sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida).
+
+🗑️ **2026‑10‑02 · ADR‑115 — su ancla.** Hasta hoy lo anclaba a la lista `axioms` el `axiom` de Lean
+`ax_axiomsCodeT_eq` (`axioms ⊢ axiomsCodeT =eq listFormCodeM axioms`), que vivía sobre `⊢` y se
+retiró con esa capa. **En este fichero ya no lo ancla nada.** En `Prf` lo ancla la hipótesis de clase
+`AnclaEq` (`Meta/Representability2Prf.lean`), y ⛔ **esa hipótesis da `Prf ⊥`** (F1, ADR‑114,
+`sondeos/AnclaEqInconsistente.lean`). La reparación prevista (L2‑3) es anclarlo por punto fijo. Lo que
+sigue (la corrección del 2026‑09‑05) describe el ancla sobre `⊢`, y se conserva como registro.
 
 ⚠️ **Corrección 2026‑09‑05 — este párrafo describía un diseño ANTERIOR y decía lo contrario
 de lo que hace el verificador.** Afirmaba dos cosas falsas:
@@ -983,15 +993,16 @@ def coreAxioms : List Formula := [
   ax_prodp_nil, ax_prodp_cons
 ]
 
-/-- Código object (opaco) de la teoría. Su contenido positivo (qué códigos
-    contiene) lo fija el meta-axioma `ax_inAxC` (más abajo): el código de todo
-    axioma de `axioms` pertenece a `axiomsCodeT`. Mantenerlo **opaco** evita
-    anclarlo a un literal gigante `listFormCodeM axioms` (auto-referencia +
-    término astronómico). -/
+/-- Código object (opaco) de la teoría. Mantenerlo **opaco** evita anclarlo a un literal
+    gigante `listFormCodeM axioms` (auto-referencia + término astronómico). Su contenido
+    positivo (qué códigos contiene) lo fijaba el teorema `ax_inAxC` sobre `⊢` (vía el ancla
+    `ax_axiomsCodeT_eq`); los dos se retiraron con esa capa (ADR‑115, 2026‑10‑02). En `Prf` lo
+    fija hoy la hipótesis `AnclaEq`, que es inconsistente (F1, ADR‑114): ver la sección anterior. -/
 def axiomsCodeT : Term := Term.func "axiomsCodeT" []
 
 -- Thy (c=.var 1, el código del axioma de teoría): **condicional** a que `c`
--- pertenezca a `axiomsCodeT` (el código de `coreAxioms`). Así el verificador solo
+-- pertenezca a `axiomsCodeT` (el código de las 141 de `axioms`; decía «de `coreAxioms`», y era
+-- falso: ver la corrección del 2026‑09‑05 en la sección de `axiomsCodeT`). Así el verificador solo
 -- acepta como axioma de teoría los códigos de axiomas REALES → `provCodeC` es fiel
 -- (no demostrable para `φ` arbitraria). `axiomsCodeT` es opaco ⟹ la sustitución
 -- sobre él es trivial. (La dirección negativa plena —probar `¬In c …` para no
@@ -1005,9 +1016,10 @@ def ax_vpf_thy : Formula :=
 -- de inducción es axioma legítimo de la aritmética, IΣ₁). El verificador
 -- reconstruye el código de `inductionFormula φ` a partir de `⌜φ⌝` con
 -- `substfc`/`liftfc` y los códigos cerrados de `O` (`termCodeM zero`) y de `σ#0`
--- (`termCodeM (succ #0)`). La **fidelidad** la da `ind_concl_code` (Meta/Induction):
--- la reconstrucción `=eq formCode (inductionFormula φ)`, y `Full.ax_induction` la
--- hace **sólida**. Tag 18. (`termCodeM (succ #0)` es un código CERRADO: `termCodeM`
+-- (`termCodeM (succ #0)`). La **fidelidad** —la reconstrucción `=eq formCode (inductionFormula φ)`—
+-- la da, en `Prf`, `prf_ind_concl_code` (`Meta/ArithPrf.lean`), y lo que el tag acepta es derivable
+-- por el constructor `Prf.ind`. `ind_concl_code` y `Full.ax_induction`, sobre `⊢`, quedaron
+-- retirados (ADR‑115). Tag 18. (`termCodeM (succ #0)` es un código CERRADO: `termCodeM`
 -- consume el `Term.var 0` codificándolo, no es la variable ligada por `forall_3`.)
 def ax_vpf_ind : Formula :=
   forall_3 (validProofFn (.var 2) (cons (cons (numeralM 18) (cons (.var 1) nil)) (.var 0)) =eq
@@ -1044,7 +1056,8 @@ la misma: **bajar el general**. `CodeWitnessPrf` los recupera por `export`‑ali
 `SinWTs` y `ENS`, así que **son la misma constante** —no una copia— y las ~5 300 referencias del
 árbol y de `sondeos/` siguen resolviendo sin tocar ni una.
 
-⚠️ Son **DEFINICIONES**, no axiomas: no tocan el inventario de `axiom`, que sigue en 7. -/
+⚠️ Son **DEFINICIONES**, no axiomas: no tocan el inventario de `axiom` (0 en RPP desde ADR‑115;
+los 4 de `FOL/MetaRules.lean` siguen en FOL, pero RPP ya no lo importa). -/
 
 /-- Forma NULARIA: `X = ⟨k⟩`. -/
 def shapeNul (X : Term) (k : Nat) : Formula := Formula.eq X (cons (numeralM k) nil)
@@ -1215,7 +1228,9 @@ Para el verificador estructural `runFn` (Nivel D real, hacia D2/D3): cada línea
 `cons ⌜concl⌝ justif`. `lineWF line` es la validez INDEPENDIENTE del contexto;
 `premsOf line` la lista de premisas que deben estar en el contexto (vía `allIn`).
 Aquí van las reglas de **inferencia** (mp/gen) y `thy`; las de esquema (cuya
-conclusión se reconstruye del payload) se añaden con el encoder de `repr_pos'`. -/
+conclusión se reconstruye del payload) van en las dos secciones siguientes. Las líneas de todas
+ellas las emite el codificador de D1 (`lineCode'`, `Meta/Representability2.lean`), que consume
+`repr_pos'_prf`; el `repr_pos'` sobre `⊢` quedó retirado (ADR‑115). -/
 
 -- MP: línea `cons ⌜B⌝ (cons 16 (cons ⌜A⌝ nil))`. Validez = premisas `⌜A⇒B⌝`, `⌜A⌝`
 -- en contexto (vía `premsOf`); `lineWF` incondicional.
@@ -1343,7 +1358,9 @@ def ax_premsOf_p3 : Formula :=
 /-! ### `lineWF`/`premsOf` de los esquemas de SUSTITUCIÓN (q1 q2 q3 leibniz ind qconf listInd)
 
 Reconstrucciones con `substfc`/`liftfc` (espejo de los `ax_vpf_*`); la fidelidad
-se cierra con los `*_concl_code` (StepArith) y `ind_concl_code` (Induction).
+se cierra, en `Prf`, con los `prf_*_concl_code` de `Meta/ArithPrf.lean` (q1, q2, leibniz, ind,
+listInd) y con `prf_liftFormula_arith` para q3 y qconf. Los `*_concl_code` de `StepArith` e
+`ind_concl_code` de `Induction`, sobre `⊢`, quedaron retirados con esos módulos (ADR‑115).
 
 ⚠️ **Son SIETE, no cinco** — el encabezado listaba `q1/q2/q3/leibniz/ind` y se dejaba fuera
 `qconf` (19) y `listInd` (20), que están en este mismo bloque. Corregido 2026‑09‑05.
@@ -1547,7 +1564,9 @@ def axioms : List Formula := [
   -- Es la ecuacion que hacia INCONSISTENTE la teoria: `tcFn` no puede recurrir a la vez
   -- sobre estructura NUMERAL (ax_tc_succ) y sobre estructura de CODIGO (ax_tc_cons),
   -- porque en N el mismo valor es ambas cosas (`cons 0 nil = 2 = sigma sigma 0`).
-  -- El lema diagonal se reconstruye sin ella en `Meta/DiagonalNumeral.lean`.
+  -- El lema diagonal se reconstruyó sin ella con la lectura NUMERAL (`godelCN`, en
+  -- `Meta/DiagonalNumeral.lean`); sobre `Prf` es `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`).
+  -- El de `⊢` (`godelCN_fixedpoint`) quedó retirado (ADR‑115).
   -- ax_tc_cons,
   ax_runFn_nil,
   ax_runFn_cons,
@@ -1612,182 +1631,6 @@ theorem coreAxioms_subset_axioms : coreAxioms ⊆ axioms :=
 theorem mem_axioms_of_mem_core {f : Formula} (h : f ∈ coreAxioms) : f ∈ axioms :=
   coreAxioms_subset_axioms h
 
-/-- **Anclaje de `axiomsCodeT`** (meta-axioma, extensión definicional): `axiomsCodeT` **es** el código
-    de la lista de axiomas. Reemplaza al meta-axioma `ax_inAxC` (que fijaba **sólo** el contenido
-    positivo); esta igualdad da **AMBAS** direcciones — la positiva `ax_inAxC` (derivada abajo, para
-    `repr_pos'`/D1) **y la negativa** (que SÓLO los axiomas están, `Meta/AxiomListCode.lean`), necesaria
-    para la completitud‑Δ₀ NEGATIVA del verificador (`⊬¬G`, `PLAN-NEGVERIFIER.md` opción 1).
 
-    Conservativo (le da un valor a un átomo opaco; `listFormCodeM axioms` menciona `axiomsCodeT` sólo
-    por su **nombre** —`termCodeM` del átomo—, no por su valor, luego NO es circular). El término
-    gigante NO se materializa en las pruebas: se decide por recursión estructural sobre la lista
-    (`prf_In_listFormCodeM` / `prf_not_In_listFormCodeM`). -/
-axiom ax_axiomsCodeT_eq : axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)
-
--- ## Helper Theorems
--- Estas herramientas son usadas en todos los archivos Block*.lean.
-
-/-- Obtiene un axioma del conjunto de axiomas por membresía en la lista. -/
-theorem ax {f : Formula} (h : f ∈ axioms) : axioms ⊢ f :=
-  Derives.hyp axioms f h
-
-/-- Especializa una fórmula ∀A con un término concreto t (un paso de sustitución). -/
-theorem spec {Γ : List Formula} {A : Formula} (h : Γ ⊢ Formula.forall A) (t : Term) :
-    Γ ⊢ substFormula 0 t A :=
-  Derives.elim_forall Γ A t h
-
-/-! ### Pertenencia POSITIVA al código de una lista + `ax_inAxC` derivado
-
-`ax_inAxC` (antes meta-axioma) es ahora un **teorema**, derivado del anclaje `ax_axiomsCodeT_eq` +
-la pertenencia positiva `prf_In_listFormCodeM` (recursión estructural sobre la lista, **sin
-materializar** el código gigante). -/
-
-/-- `In x (cons h t) ⇔ (x ≐ h) ∨ In x t` a nivel `⊢` (instancia de `ax_L2_in_cons`). -/
-theorem prf_in_cons_iff_D (x h t : Term) :
-    axioms ⊢ (In x (cons h t) ⇔ lor (x =eq h) (In x t)) := by
-  have hh := spec (spec (spec (ax (show ax_L2_in_cons ∈ axioms by simp [axioms])) x) h) t
-  simpa [substFormula, substTerm, substTerms, In, cons, zero, nil, lor, iff,
-    FOL.substTerm_liftTerm, FOL.substTerm_liftLift] using hh
-
-/-- **Pertenencia POSITIVA** al código de una lista (inductivo sobre `L`, no materializa el gigante). -/
-theorem prf_In_listFormCodeM (f : Formula) :
-    ∀ (L : List Formula), List.Mem f L → axioms ⊢ In (formCodeM f) (listFormCodeM L)
-  | [], hmem => by cases hmem
-  | g :: gs, hmem => by
-      show axioms ⊢ In (formCodeM f) (cons (formCodeM g) (listFormCodeM gs))
-      refine FOL.MetaRules.iff_mpr (prf_in_cons_iff_D (formCodeM f) (formCodeM g) (listFormCodeM gs)) ?_
-      rcases List.mem_cons.mp hmem with heq | htail
-      · subst heq; exact FOL.MetaRules.or_intro_left (Derives.refl axioms _)
-      · exact FOL.MetaRules.or_intro_right (prf_In_listFormCodeM f gs htail)
-
-/-- **Contenido POSITIVO de `axiomsCodeT`** (antes meta-axioma `ax_inAxC`, ahora **teorema**): el
-    código de todo axioma pertenece a `axiomsCodeT`. Deriva de `ax_axiomsCodeT_eq` + `prf_In_listFormCodeM`
-    por sustitución (`Derives.subst`) sobre el segundo argumento de `In`. -/
-theorem ax_inAxC (a : Formula) (h : a ∈ axioms) : axioms ⊢ In (formCodeM a) axiomsCodeT := by
-  have key : ∀ t : Term, substFormula 0 t (In (formCodeM a) (.var 0)) = In (formCodeM a) t := fun t => by
-    simp [In, substFormula, substTerm, substTerms, substTerm_formCodeM, FOL.substTerm_liftTerm]
-  have hpos : axioms ⊢ substFormula 0 (listFormCodeM axioms) (In (formCodeM a) (.var 0)) := by
-    rw [key]; exact prf_In_listFormCodeM a axioms h
-  have hsub := Derives.subst axioms (listFormCodeM axioms) axiomsCodeT (In (formCodeM a) (.var 0))
-    (FOL.derive_eq_symm ax_axiomsCodeT_eq) hpos
-  rwa [key] at hsub
-
-/-- Reflexividad: Γ ⊢ (t ≐ t) (funciona bajo igualdad definitional). -/
-theorem eq_refl {Γ : List Formula} (t : Term) : Γ ⊢ (t ≐ t) :=
-  Derives.refl Γ t
-
-/-- Simetría de la igualdad. -/
-theorem eq_symm {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) : Γ ⊢ (t₂ ≐ t₁) :=
-  FOL.derive_eq_symm h
-
-/-- Transitividad no-estándar: de t₁≐t₂ y t₁≐t₃, concluye t₂≐t₃ (sym + trans estándar). -/
-theorem eq_trans {Γ : List Formula} {t₁ t₂ t₃ : Term}
-    (h1 : Γ ⊢ (t₁ ≐ t₂)) (h2 : Γ ⊢ (t₁ ≐ t₃)) : Γ ⊢ (t₂ ≐ t₃) :=
-  FOL.derive_eq_trans (FOL.derive_eq_symm h1) h2
-
-/-- Congruencia: succ respeta la igualdad. -/
-theorem eq_congr_succ {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
-    Γ ⊢ (succ t₁ ≐ succ t₂) := by
-  -- Estrategia: Derives.subst con f = Formula.eq (succ (liftTerm 0 t₁)) (succ #0)
-  -- substFormula 0 s f  =  Formula.eq (succ t₁) (succ s)   para cualquier s : Term
-  --   LHS: substTerm 0 s (succ (liftTerm 0 t₁))
-  --       = succ (substTerms 0 s [liftTerm 0 t₁])
-  --       = succ [substTerm 0 s (liftTerm 0 t₁)]
-  --       = succ [t₁]                               (por FOL.substTerm_liftTerm)
-  --       = succ t₁
-  --   RHS: substTerm 0 s (succ (.var 0))
-  --       = succ (substTerms 0 s [.var 0])
-  --       = succ [substTerm 0 s (.var 0)]
-  --       = succ [s]                                (0 = 0 → ite_true)
-  --       = succ s
-  let f : Formula := Formula.eq (succ (liftTerm 0 t₁)) (succ (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (succ t₁) (succ s) := by
-    intro s
-    simp only [f, substFormula, succ, substTerm, substTerms,
-               FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (succ t₁))
-
-/-- Congruencia: pred respeta la igualdad (análogo a `eq_congr_succ`). -/
-theorem eq_congr_pred {Γ : List Formula} {t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
-    Γ ⊢ (pred t₁ ≐ pred t₂) := by
-  let f : Formula := Formula.eq (pred (liftTerm 0 t₁)) (pred (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (pred t₁) (pred s) := by
-    intro s
-    simp only [f, substFormula, pred, substTerm, substTerms,
-               FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (pred t₁))
-
--- ## Additional Proof Helpers
---
--- Las meta-reglas de deducción (5 meta-axiomas ω — `imp_intro`, `gen`, `raa`,
--- `or_elim`, `ex_elim` — y los wrappers derivables `mp`, `and_intro`,
--- `and_elim_left/right`, `or_intro_left/right`, `false_elim`, `ex_intro`,
--- `iff_mp`, `iff_mpr`) son **lógica pura de FOL=** y viven ahora en
--- `FOL/MetaRules.lean` (refactor 2026-06-12, ver ADR-008 y
--- MINIMAL-AXIOMS.md §3.5.1). Se **re-exportan** aquí para que todo el código
--- existente (`Minimal.Axioms.or_elim`, `open Minimal.Axioms`, …) siga
--- resolviendo sin cambios.
-export FOL.MetaRules (mp imp_intro gen raa dne and_intro and_elim_left and_elim_right
-  or_intro_left or_intro_right or_elim false_elim ex_intro ex_elim iff_mp iff_mpr)
-
-/-- Equality substitution (used to rewrite equality hypotheses). -/
-theorem eq_subst {Γ : List Formula} {t₁ t₂ : Term} {A : Formula}
-    (_heq : Γ ⊢ (t₁ ≐ t₂)) (hp : Γ ⊢ A) : Γ ⊢ A :=
-  hp
-
-/-- Negation respects equality symmetry: ¬(b = a) → ¬(a = b). -/
-theorem eq_symm_neg {Γ : List Formula} {t₁ t₂ : Term}
-    (h : Γ ⊢ ¬(t₂ ≐ t₁)) : Γ ⊢ ¬(t₁ ≐ t₂) :=
-  Derives.intro_impl Γ (Formula.eq t₁ t₂) Formula.bottom
-    (Derives.elim_impl (Formula.eq t₁ t₂ :: Γ) (Formula.eq t₂ t₁) Formula.bottom
-      (Derives.weakening Γ (Formula.eq t₁ t₂ :: Γ) _ h
-        (fun _ hx => List.Mem.tail _ hx))
-      (FOL.derive_eq_symm
-        (Derives.hyp (Formula.eq t₁ t₂ :: Γ) _ (List.Mem.head _))))
-
-/-- Congruence: add respects equality in the right argument. -/
-theorem eq_congr_add_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
-    Γ ⊢ (add u t₁ ≐ add u t₂) := by
-  let f : Formula := Formula.eq (add (liftTerm 0 u) (liftTerm 0 t₁)) (add (liftTerm 0 u) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add u t₁) (add u s) := by
-    intro s
-    simp only [f, substFormula, add, substTerm, substTerms,
-               FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (add u t₁))
-
-/-- Congruence: add respects equality in the left argument. -/
-theorem eq_congr_add_right {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
-    Γ ⊢ (add t₁ u ≐ add t₂ u) := by
-  let f : Formula := Formula.eq (add (liftTerm 0 t₁) (liftTerm 0 u)) (add (.var 0) (liftTerm 0 u))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (add t₁ u) (add s u) := by
-    intro s
-    simp only [f, substFormula, add, substTerm, substTerms,
-               FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (add t₁ u))
-
-/-- Congruence: mul respects equality in the right argument. -/
-theorem eq_congr_mul_left {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
-    Γ ⊢ (mul u t₁ ≐ mul u t₂) := by
-  let f : Formula := Formula.eq (mul (liftTerm 0 u) (liftTerm 0 t₁)) (mul (liftTerm 0 u) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul u t₁) (mul u s) := by
-    intro s
-    simp only [f, substFormula, mul, substTerm, substTerms,
-               FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (mul u t₁))
-
-/-- Congruence: mul respects equality in the left argument. -/
-theorem eq_congr_mul_right {Γ : List Formula} {u t₁ t₂ : Term} (h : Γ ⊢ (t₁ ≐ t₂)) :
-    Γ ⊢ (mul t₁ u ≐ mul t₂ u) := by
-  let f : Formula := Formula.eq (mul (liftTerm 0 t₁) (liftTerm 0 u)) (mul (.var 0) (liftTerm 0 u))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (mul t₁ u) (mul s u) := by
-    intro s
-    simp only [f, substFormula, mul, substTerm, substTerms,
-               FOL.substTerm_liftTerm, if_true]
-  exact (hS t₂) ▸ Derives.subst Γ t₁ t₂ f h ((hS t₁) ▸ Derives.refl Γ (mul t₁ u))
-
-/-- Coercion: use Γ ⊢ A ⇒ B as a function Γ ⊢ A → Γ ⊢ B. -/
-instance {Γ : List Formula} {A B : Formula} :
-    CoeFun (Derives Γ (Formula.impl A B)) (fun _ => Derives Γ A → Derives Γ B) where
-  coe h ha := Derives.elim_impl Γ A B h ha
 
 end ROBINSON_PlusPlus.Minimal.Axioms

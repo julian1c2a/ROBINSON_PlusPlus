@@ -1,6 +1,23 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+>
+> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
+> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
+> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
+> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
+> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
+> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
+> con **0 `axiom` de Lean**.
+> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
+> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+>
+> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
+>
+> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
+> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -8,16 +25,17 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   **numeral** `godelCN`.
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
 >   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
@@ -37,6 +55,13 @@
 
 Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos.
 
+> 🗑️ **2026‑10‑02 (ADR‑115) — el grafo de abajo es ANTERIOR a la retirada de `⊢`.** Se borraron 27
+> módulos: `Minimal/Theorems/Block1–8` (10), `Full/{Mod2,Lists,StrongInduction,Bounded,Divisibility,
+> Division,Primality,Factorization}` (8) y `Meta/{AxiomListCode,DerivCond,Induction,LineWFDerives,
+> ListInductionArith,Necessitation,OmegaStrength,Reflection,StepArith}` (9). Quedan **104** (Minimal 1 +
+> Meta 100 + Full 3), sin ciclos (`lake build` verde). Lo que sigue describe el árbol de **131** y se
+> conserva como registro hasta regenerar la vista.
+>
 > ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
 > solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
 > [`doc/REFERENCE-Full.md`](doc/REFERENCE-Full.md). Para **`Meta/`** (106 módulos) se adopta la **vista
@@ -66,7 +91,7 @@ Extraída **por máquina** de los `import` reales de los módulos activos de `Me
 ### ⚠️ NOVEDADES posteriores a la extracción (la tabla de arriba es del 2026‑08‑22)
 
 Módulos añadidos desde entonces cuyas **aristas** conviene tener a mano, medidas de los `import`
-reales el **2026‑09‑10h** (`131 módulos activos`, Meta 109):
+reales el **2026‑09‑10h** (entonces `131 módulos activos`, Meta 109):
 
 | módulo | importa | quién lo importa | por qué la arista es la que es |
 |---|---|---|---|
@@ -317,7 +342,7 @@ por módulo. Resumen:
 3. **Selective exports**: cada módulo termina con un bloque `export` que enumera su API pública.
 4. **Sin Mathlib** (ADR-001): solo `FOL` como dependencia externa.
 5. **One namespace per module** (ADR-005): mirrors file path.
-6. **6 meta-reglas ω** (ADR-010): `imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne` — meta-teoremas válidos en aritmética, no derivables como reglas FOL puras. Viven en `FOL/MetaRules.lean`, re-exportadas desde `Minimal.Axioms`.
+6. ~~**6 meta-reglas ω** (ADR-010) … re-exportadas desde `Minimal.Axioms`.~~ ✏️ **2026‑10‑02 (ADR‑115):** RPP no usa `⊢`; las meta‑reglas de FOL (4 `axiom`, refutables: L1‑3) ya no se importan, y FOL las retira.
 
 ---
 

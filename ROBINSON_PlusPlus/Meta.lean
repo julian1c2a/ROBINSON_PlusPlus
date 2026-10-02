@@ -6,14 +6,17 @@ License: MIT
 Barrel file for `Meta/` — Gödelización del sistema `Minimal`.
 Public API:
   · Godel          (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
-  · Provability    (Nivel C): formCode, IsFormula, Provable (núcleo real de codificación)
-  · Nivel D REAL: verificador estructural (provCodeC'/chainOk/runFn) + D1/D2 reales +
-    punto fijo real (godelCN_fixedpoint) + Gödel I real (goedel_first_numeral) +
-    Gödel II (goedel_second' — ⚠️ montado pero NO ensamblado: su `hgi` es sobre el
-    cálculo ω y Gödel I es finitario; ver F‑1 de doc/AUDITORIA-2026-09-11.md)
-    — 🏁 D1, D2 y D3 las TRES demostradas (2026‑09‑10g:
-    `d3` pasó de axiom a teorema). ⚠️ `godelC'_fixedpoint`/`goedel_first_real'` NO
-    existen desde la reparación; los nombres vivos son los de arriba.
+  · Provability    (Nivel C): formCode, IsFormula (núcleo real de codificación)
+  · Nivel D, sobre el cálculo finitario `Prf`: verificador estructural
+    (provCodeC'/chainOk/runFn); D1 `repr_pos'_prf`, D2 `d2_prf`, D3 `d3_prf_real`;
+    punto fijo `prf_godelCN_fixedpoint`; Gödel I y II `goedel_first_prf` /
+    `goedel_second_prf [AnclaEq] (hcon : ConsistentH)` (Meta/GodelTwoPrf.lean).
+    ⛔ Hoy VACUOS: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114). D1 y D3 llevan también `[AnclaEq]`.
+
+  🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
+  sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
+  `NegVerifier` y la mitad `⊬¬G`. (`goedel_second'` se retiró el 2026‑09‑11; `godelC'_fixedpoint`
+  y `goedel_first_real'`, con la reparación de ADR‑012.)
 
   Nota (F7a, 2026‑07‑09): retirada la capa Gödel LEGACY postulada — el módulo
   `Meta/Incompleteness.lean` (Gödel I/II vía D2/D3 postulados) y los 7 postulados
@@ -29,20 +32,13 @@ import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.HilbertSeq
 import ROBINSON_PlusPlus.Meta.CodeArith
 import ROBINSON_PlusPlus.Meta.SubstArith
-import ROBINSON_PlusPlus.Meta.StepArith
 import ROBINSON_PlusPlus.Meta.CheckArith
 import ROBINSON_PlusPlus.Meta.Representability
-import ROBINSON_PlusPlus.Meta.Necessitation
 import ROBINSON_PlusPlus.Meta.Diagonal
 import ROBINSON_PlusPlus.Meta.CodeDistinct
-import ROBINSON_PlusPlus.Meta.Induction
-import ROBINSON_PlusPlus.Meta.ListInductionArith
 import ROBINSON_PlusPlus.Meta.ProofChain
-import ROBINSON_PlusPlus.Meta.DerivCond
 import ROBINSON_PlusPlus.Meta.Representability2
-import ROBINSON_PlusPlus.Meta.Reflection
 import ROBINSON_PlusPlus.Meta.ReprPrf
-import ROBINSON_PlusPlus.Meta.LineWFDerives
 import ROBINSON_PlusPlus.Meta.ArithPrf
 import ROBINSON_PlusPlus.Meta.Representability2Prf
 import ROBINSON_PlusPlus.Meta.ChainPrf
@@ -109,7 +105,6 @@ import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 import ROBINSON_PlusPlus.Meta.LineWFThyPrf
 import ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
-import ROBINSON_PlusPlus.Meta.AxiomListCode
 import ROBINSON_PlusPlus.Meta.CodeDecode
 import ROBINSON_PlusPlus.Meta.ChainDecode
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
@@ -128,5 +123,12 @@ import ROBINSON_PlusPlus.Meta.D3BodyPrf
 import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 import ROBINSON_PlusPlus.Meta.VerifierSound
 import ROBINSON_PlusPlus.Meta.ChainNegPrf
-import ROBINSON_PlusPlus.Meta.OmegaStrength
 import ROBINSON_PlusPlus.Meta.GodelTwoPrf
+import FOL.Deduction
+import FOL.FOL
+import FOL.Theorems.Derived
+import FOL.Theorems.Eq
+import FOL.Theorems.Impl
+import FOL.Theorems.Neg
+import FOL.Theorems.Quantifiers
+import ROBINSON_PlusPlus.Full.Induction

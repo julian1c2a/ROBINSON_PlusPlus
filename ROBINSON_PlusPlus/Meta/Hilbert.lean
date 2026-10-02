@@ -5,7 +5,6 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Minimal.Axioms
 import ROBINSON_PlusPlus.Full.Induction
-import ROBINSON_PlusPlus.Full.Lists
 
 import FOL.FOL
 import FOL.Theorems.Impl
@@ -14,6 +13,7 @@ import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
 import FOL.Theorems.Eq
 import FOL.Deduction
+import FOL.Tactics
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 
@@ -26,24 +26,29 @@ namespace ROBINSON_PlusPlus.Meta.Hilbert
 
 Para demostrar las condiciones de demostrabilidad **D1–D3** como teoremas (no
 postulados) hace falta un sistema de demostrabilidad **finitario y r.e.** que
-aritmetizar. El `axioms ⊢ φ` del proyecto incluye la ω-regla `gen` (premisas
-infinitas), luego no es r.e. y `provFormula` no puede ser Σ₁ (Tarski). Ver
+aritmetizar. El `axioms ⊢ φ` que el proyecto usaba entonces no lo era: sus meta‑reglas
+(`raa`, `imp_intro`…) toman una función de Lean como premisa. Quedó retirado (ADR‑115).
+✏️ Aquí se achacaba a la «ω‑regla `gen`», y `gen` no es la ω‑regla. Ver
 `GODEL-D-ARITHMETIZATION.md`.
 
 Aquí definimos un **cálculo de Hilbert clásico fresco** sobre `Minimal.axioms`,
 **en dos capas** para que se vea exactamente dónde entra la lógica clásica:
 
-* **`Prfᵢ`** (intuicionista): todos los esquemas salvo DNE. Su puente
-  `prfI_to_derives` se construye usando **solo los constructores nativos de
-  `Derives`** (deducción natural) — **cero meta-axiomas, cero `dne`**.
-* **`Prf`** (clásico): añade el esquema DNE (P3) y se cierra bajo MP/GEN. Su
-  puente `prf_to_derives` reusa `prfI_to_derives` y emplea **`dne` en un único
-  punto**: el caso `p3`. Esa es **toda** la dependencia clásica.
+* **`Prfᵢ`** (intuicionista): todos los esquemas salvo DNE.
+* **`Prf`** (clásico): añade el esquema DNE (P3), la inducción (`ind`, `listInd`) y el
+  confinamiento (`qconf`), y se cierra bajo MP/GEN.
 
-Esto materializa la observación: *nuestro FOL (los constructores de `Derives`)
-deriva todo el cálculo de Hilbert; el único ingrediente no constructivo es una
-aplicación de DNE clásica, y la ω-regla no se invoca jamás* (GEN de Hilbert es
-`Derives.intro_forall`, finitaria de una premisa).
+🗑️ **2026‑10‑02 · ADR‑115 — los puentes a `⊢`, RETIRADOS, y lo que decían de ellos era FALSO.**
+Aquí vivían `prfI_to_derives` y `prf_to_derives` (`Prf → axioms ⊢`). La doctrina decía que el
+primero usaba «solo los constructores nativos de `Derives` … cero meta‑axiomas, cero `dne`» y que el
+segundo lo reusaba y empleaba «`dne` en un único punto … Esa es toda la dependencia clásica». No era
+cierto para el segundo: el footprint de `prf_to_derives` llevaba además los `axiom`
+`ax_induction_prim`, `ax_list_induction` y `MetaRules.imp_intro` (medido: es el de
+`not_omegaConsistent` en el registro de `sondeos/OmegaConsistentRefutable.lean`, que a `prf_to_derives`
+sólo le añade lemas limpios; el del primero no se midió). Y las meta‑reglas de `⊢` son refutables
+(`sondeos/MetaReglasRefutables.lean`). Con la capa `⊢` retirada, `Prf` **ya no tiene puente a `⊢`**; sí
+a sus auxiliares de RPP —`PrfH` (`prf_to_prfH`, deducción finitaria) y las secuencias del verificador
+(`prf_to_derivation`)—, que la cadena de Gödel usa. Su solidez es inducción sobre `Prf` (frente A4).
 -/
 
 /-! ### Identidad De Bruijn auxiliar (cancelación a mismo nivel) -/
@@ -101,85 +106,17 @@ inductive Prfᵢ : Formula → Prop where
   | mp (A B : Formula) : Prfᵢ (A ⇒ B) → Prfᵢ A → Prfᵢ B
   | gen (A : Formula) : Prfᵢ A → Prfᵢ (Formula.forall A)
 
-/-- **Puente intuicionista**: todo teorema de `Prfᵢ` es teorema de `Derives`
-    sobre `axioms`, usando **únicamente los constructores de `Derives`** (más los
-    teoremas lógicos constructor-puros de `FOL.Theorems`). **No usa `dne` ni
-    ninguna meta-regla ω.** Verificable con `#print axioms prfI_to_derives`. -/
-theorem prfI_to_derives {φ : Formula} (h : Prfᵢ φ) : axioms ⊢ φ := by
-  induction h with
-  | p1 A B => exact FOL.Theorems.Impl.k_impl
-  | p2 A B C => exact FOL.Theorems.Impl.s_impl
-  | c1 A B => exact FOL.Theorems.Derived.and_intro
-  | c2 A B => exact FOL.Theorems.Derived.and_elim_left
-  | c3 A B => exact FOL.Theorems.Derived.and_elim_right
-  | j1 A B => exact FOL.Theorems.Derived.or_intro_left
-  | j2 A B => exact FOL.Theorems.Derived.or_intro_right
-  | j3 A B C => exact FOL.Theorems.Derived.or_elim
-  | efq A => exact FOL.Theorems.Neg.explosion_impl
-  | q1 A t =>
-      apply Derives.intro_impl
-      exact Derives.elim_forall _ A t (Derives.hyp _ _ (List.Mem.head _))
-  | q2 A t =>
-      apply Derives.intro_impl
-      exact Derives.intro_ex _ A t (Derives.hyp _ _ (List.Mem.head _))
-  | q3 A B =>
-      apply Derives.intro_impl
-      apply Derives.intro_impl
-      apply Derives.elim_ex _ A B
-      · exact Derives.hyp _ _ (List.Mem.head _)
-      · -- contexto: A :: ((∃A)::(∀(A⇒↑B))::axioms).map (liftFormula 0)
-        have hall := Derives.hyp
-          (A :: (((Formula.ex A) :: (Formula.forall (A ⇒ liftFormula 0 B)) :: axioms).map
-            (liftFormula 0)))
-          (liftFormula 0 (Formula.forall (A ⇒ liftFormula 0 B)))
-          (List.mem_cons_of_mem _ (List.mem_map_of_mem (List.Mem.tail _ (List.Mem.head _))))
-        simp only [liftFormula] at hall
-        have hinst := Derives.elim_forall _ _ (#0) hall
-        simp only [substFormula] at hinst
-        rw [subst_lift_cancel_formula, subst_lift_cancel_formula] at hinst
-        exact Derives.elim_impl _ A (liftFormula 0 B) hinst (Derives.hyp _ _ (List.Mem.head _))
-  | eqrefl t => exact Derives.refl _ t
-  | leibniz A t₁ t₂ =>
-      apply Derives.intro_impl
-      apply Derives.intro_impl
-      exact Derives.subst _ t₁ t₂ A
-        (Derives.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
-        (Derives.hyp _ _ (List.Mem.head _))
-  | thy a ha => exact Derives.hyp _ a ha
-  | mp A B _ _ ihAB ihA => exact Derives.elim_impl _ A B ihAB ihA
-  | gen A _ ihA =>
-      apply Derives.intro_forall
-      rw [axioms_lift_eq]
-      exact ihA
 
 /-! ### Esquema de confinamiento ∀ (para el teorema de deducción de `Prf`) -/
 
 /-- **Fórmula de confinamiento ∀** (la variable ligada no ocurre en el antecedente
     `P`, codificada como `liftFormula 0 P`): `(∀(↑P ⇒ C)) ⇒ (P ⇒ ∀C)`. Es el
     esquema lógico que cierra el caso `gen` del teorema de deducción de un cálculo
-    de Hilbert. Logicamente válido (teorema de `Derives`, ver `confinement_derives`);
-    se añadirá como esquema de `Prf`/regla del verificador. -/
+    de Hilbert. Lógicamente válido; es el constructor `Prf.qconf` y una regla del verificador.
+    (Su prueba sobre `⊢`, `confinement_derives`, se retiró con esa capa: ADR‑115.) -/
 def confinementFormula (P C : Formula) : Formula :=
   (Formula.forall (liftFormula 0 P ⇒ C)) ⇒ (P ⇒ Formula.forall C)
 
-/-- **Confinamiento ∀ es teorema de `Derives`** (cálculo finitario con contexto):
-    derivación De Bruijn directa (intro_impl×2 + intro_forall + elim_forall a `#0`
-    con cancelación `subst_lift_cancel_formula`, espejo del caso `q3` de
-    `prfI_to_derives`). Justifica el esquema `Prf.qconf` vía el puente. -/
-theorem confinement_derives (P C : Formula) : axioms ⊢ confinementFormula P C := by
-  apply Derives.intro_impl
-  apply Derives.intro_impl
-  apply Derives.intro_forall
-  apply Derives.elim_impl (A := liftFormula 0 P)
-  · have h := Derives.elim_forall
-      (((P :: (Formula.forall (liftFormula 0 P ⇒ C)) :: axioms).map (liftFormula 0)))
-      (liftFormula 1 (liftFormula 0 P) ⇒ liftFormula 1 C) (.var 0)
-      (Derives.hyp _ _ (List.Mem.tail _ (List.Mem.head _)))
-    rw [show substFormula 0 (.var 0) (liftFormula 1 (liftFormula 0 P) ⇒ liftFormula 1 C)
-          = (liftFormula 0 P ⇒ C) from by
-          simp only [substFormula]; rw [subst_lift_cancel_formula, subst_lift_cancel_formula]] at h
-    exact h
-  · exact Derives.hyp _ _ (List.Mem.head _)
 
 /-! ### Esquema de inducción de listas (para los lemas de cadena en `Prf`) -/
 
@@ -196,50 +133,16 @@ def listInductionFormula (Φ : Formula) : Formula :=
           (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ))))))
       (Formula.forall Φ))
 
-/-- **Inducción de listas es teorema de `Derives`** (vía la regla ω `ax_list_induction`
-    + ω-gen): la identidad del paso (antecedente `Φ[t]` vía `subst_lift_same`; consecuente
-    `Φ[cons h t]` vía Barendregt `subst_subst_comm_succ` + `subst_subst_lift_gen`) reduce
-    `∀h∀t (Φ[t]⇒Φ[cons h t])` a la forma que `ax_list_induction` consume. Justifica el
-    esquema `Prf.listInd`/regla del verificador. -/
-theorem list_induction_derives (Φ : Formula) : axioms ⊢ listInductionFormula Φ := by
-  apply Minimal.Axioms.imp_intro; intro hbase
-  apply Minimal.Axioms.imp_intro; intro hstep
-  refine Minimal.Axioms.gen ?_
-  intro L
-  refine ROBINSON_PlusPlus.Full.ax_list_induction (fun L' => substFormula 0 L' Φ) hbase ?step L
-  intro h t
-  have e2 := spec (spec hstep h) t
-  have ha : substFormula 0 t (substFormula 1 (liftTerm 0 h) (liftFormula 1 Φ)) = substFormula 0 t Φ := by
-    rw [subst_lift_same]
-  have hc : substFormula 0 t (substFormula 1 (liftTerm 0 h)
-      (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ))))
-      = substFormula 0 (cons h t) Φ := by
-    rw [FOL.subst_subst_comm_succ (j := 0),
-        show substTerm 1 (liftTerm 0 h) (cons (.var 1) (.var 0)) = cons (liftTerm 0 h) (.var 0) from by
-          simp [cons, substTerm, substTerms],
-        subst_lift_same, FOL.subst_subst_lift_gen,
-        show substTerm 0 t (cons (liftTerm 0 h) (.var 0)) = cons h t from by
-          simp [cons, substTerm, substTerms, FOL.substTerm_liftTerm]]
-  have key : substFormula 0 t (substFormula 1 (liftTerm 0 h)
-      (Formula.impl (liftFormula 1 Φ)
-        (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ)))))
-      = Formula.impl (substFormula 0 t Φ) (substFormula 0 (cons h t) Φ) := by
-    show Formula.impl (substFormula 0 t (substFormula 1 (liftTerm 0 h) (liftFormula 1 Φ)))
-                      (substFormula 0 t (substFormula 1 (liftTerm 0 h)
-                        (substFormula 0 (cons (.var 1) (.var 0)) (liftFormula 2 (liftFormula 1 Φ)))))
-       = Formula.impl (substFormula 0 t Φ) (substFormula 0 (cons h t) Φ)
-    rw [ha, hc]
-  rw [key] at e2
-  -- ⭐ 2026‑09‑13: con `ax_list_induction` pidiendo la implicación OBJETO, `e2` YA ES lo que
-  -- hace falta. Antes había que consumirla con `mp e2 IH` porque la premisa era meta.
-  exact e2
 
 /-! ### Capa clásica `Prf` -/
 
-/-- **Cálculo de Hilbert clásico**: la capa intuicionista (`incl`), el esquema
-    **DNE** (`p3`) y el **esquema de inducción** (`ind`, IΣ₁), cerrado bajo MP y
-    GEN. Clásico, coherente con el `dne` y la inducción del proyecto, sólido para
-    ℕ. Es r.e. (Fase 1). -/
+/-- **Cálculo de Hilbert clásico**: la capa intuicionista (`incl`), el esquema **DNE** (`p3`), la
+    **inducción** (`ind`, el esquema `Full.inductionFormula` para toda fórmula), el
+    **confinamiento** ∀ (`qconf`) y la **inducción de listas** (`listInd`), cerrado bajo MP y GEN.
+    Es r.e. (Fase 1). ⚠️ Su **solidez para ℕ NO está demostrada** (frente A4): depende del modelo
+    de los 141 axiomas de `axioms`, pendiente (ADR‑115 §7). (Hasta el 2026‑10‑02 decía «coherente
+    con el `dne` y la inducción del proyecto» —los de la capa `⊢`, retirada con ADR‑115— y daba
+    «sólido para ℕ» por hecho.) -/
 inductive Prf : Formula → Prop where
   | incl {φ : Formula} : Prfᵢ φ → Prf φ
   | p3 (A : Formula) : Prf (((A ⇒ ⊥) ⇒ ⊥) ⇒ A)
@@ -252,49 +155,16 @@ inductive Prf : Formula → Prop where
 /-- Notación local para la demostrabilidad de Hilbert (clásica). -/
 scoped notation "⊢ᴴ " φ => Prf φ
 
-/-- **Puente clásico**: todo teorema de `Prf` es teorema de `Derives` sobre
-    `axioms`. Reusa `prfI_to_derives` para la capa intuicionista; **`dne`
-    aparece exactamente una vez**, en el caso `p3`. Verificable con
-    `#print axioms` (compárese con `prfI_to_derives`, que no depende de `dne`). -/
-theorem prf_to_derives {φ : Formula} (h : Prf φ) : axioms ⊢ φ := by
-  induction h with
-  | incl h0 => exact prfI_to_derives h0
-  | p3 A =>
-      -- ⭐ EL ÚNICO USO DE `dne` (lógica clásica) en todo el puente.
-      apply Derives.intro_impl
-      exact Minimal.Axioms.dne (Derives.hyp _ _ (List.Mem.head _))
-  | ind A =>
-      -- Esquema de inducción: axioma legítimo de la aritmética (IΣ₁), sólido vía
-      -- `Full.ax_induction` (misma `Minimal.axioms`; `Meta` importa `Full`).
-      exact Full.ax_induction A
-  | qconf P C =>
-      -- Confinamiento ∀: teorema de `Derives` (lógica de primer orden, ver
-      -- `confinement_derives`), sólido y conservativo.
-      exact confinement_derives P C
-  | listInd A =>
-      -- Inducción estructural de listas: teorema de `Derives` vía la regla ω
-      -- `ax_list_induction` (ver `list_induction_derives`); axioma legítimo, sólido.
-      exact list_induction_derives A
-  | mp A B _ _ ihAB ihA => exact Derives.elim_impl _ A B ihAB ihA
-  | gen A _ ihA =>
-      apply Derives.intro_forall
-      rw [axioms_lift_eq]
-      exact ihA
 
-/-! ### Consistencia transferida -/
+/-! ### Consistencia
 
-/-- Consistencia del sistema **fuerte** del proyecto (`Derives` + meta-reglas):
-    no deriva `⊥`. -/
-def ConsistentOmega : Prop := ¬ (axioms ⊢ Formula.bottom)
+(Hasta el 2026‑10‑02 esta sección se llamaba «Consistencia transferida»: transfería la de `⊢` a `Prf`
+por `prf_to_derives`. Retirado con la capa `⊢`, ADR‑115; queda la definición.) -/
+
 
 /-- Consistencia del **cálculo de Hilbert** `⊢ᴴ`: no demuestra `⊥`. -/
 def ConsistentH : Prop := ¬ Prf Formula.bottom
 
-/-- **Transferencia de consistencia**: si el sistema fuerte es consistente,
-    también lo es el cálculo de Hilbert (por el puente). Así la hipótesis de
-    Gödel sobre `⊢ᴴ` se hereda. -/
-theorem consistentH_of_omega (h : ConsistentOmega) : ConsistentH :=
-  fun hp => h (prf_to_derives hp)
 
 end ROBINSON_PlusPlus.Meta.Hilbert
 
@@ -302,10 +172,6 @@ end ROBINSON_PlusPlus.Meta.Hilbert
 export ROBINSON_PlusPlus.Meta.Hilbert (
   subst_lift_same
   Prfᵢ
-  prfI_to_derives
   Prf
-  prf_to_derives
-  ConsistentOmega
   ConsistentH
-  consistentH_of_omega
 )

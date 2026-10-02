@@ -31,7 +31,7 @@ catalogada como generalización suelta; está en la ruta crítica.
 ## Lo que sí está, medido
 
 * ✅ **Las ocho ecuaciones objeto** ya existen y son **genéricas en el nivel**:
-  `prf_liftfc_bottom/atom/eq/impl/forall/and/or/ex` (`Meta/ArithPrf.lean:386-442`).
+  `prf_liftfc_bottom/atom/eq/impl/forall/and/or/ex` (`Meta/ArithPrf.lean`).
 * ✅ La maquinaria de inducción fuerte es **genérica en `Φ`** (`prf_strong_induction`,
   `psi_lift_form1/2/3`, `PSI_inst*`, `Meta/StrongInductionPrf.lean`).
 * ✅ El chasis de B3.4 (`pcc_eval_substfc_modulo_8`) es el **molde**: predicado + gate +

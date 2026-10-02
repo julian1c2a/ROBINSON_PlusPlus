@@ -18,26 +18,37 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 /-!
 # 🏁🏁 GÖDEL II SOBRE EL CÁLCULO FINITARIO `Prf`
 
+⛔⛔ **Estado 2026‑10‑02 — leer antes que nada.** Las derivaciones de este módulo son correctas y su
+footprint es `[propext, Classical.choice, Quot.sound]`, pero **`goedel_first_prf` y
+`goedel_second_prf` son hoy VACUOS**: su hipótesis de clase `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114,
+`sondeos/AnclaEqInconsistente.lean`, compilado), así que `[AnclaEq]` y `ConsistentH` no pueden valer
+a la vez. Repararlo es anclar `axiomsCodeT` de otro modo (L2‑3). Y la capa `⊢` contra la que se
+escribió la historia de abajo **se retiró** (ADR‑115): `prf_to_derives`, `diag_arith_num`,
+`goedel_first_numeral`, `ConsistentOmega`, `consistentH_of_omega` y el módulo `Meta/OmegaStrength.lean`
+ya no existen (`goedel_second'` se había retirado antes, el 2026‑09‑11).
+
 ## Por qué este módulo existe: la auditoría del 2026‑09‑11, hallazgo **F‑1**
 
-`Meta/GodelTwo.lean` tiene `goedel_second'`, y está **montado pero NO ensamblado**: su hipótesis
-es `hgi : ¬ (axioms ⊢ G)` —el cálculo **ω**— mientras Gödel I entrega `¬ Prf godelCN` —el
-**finitario**—. Por `prf_to_derives` la primera es **estrictamente más fuerte**, y **no existe** la
+`Meta/GodelTwo.lean` tenía `goedel_second'`, y estaba **montado pero NO ensamblado**: su hipótesis
+era `hgi : ¬ (axioms ⊢ G)` —el cálculo **ω**— mientras Gödel I entrega `¬ Prf godelCN` —el
+**finitario**—. Por `prf_to_derives` la primera era **estrictamente más fuerte**, y **no existía** la
 vuelta `⊢ → Prf`.
 
-⛔⛔ **Y la medición posterior es peor que eso**: `axioms ⊢` es **sintácticamente COMPLETO**
-(`Meta/OmegaStrength.lean`): decide toda sentencia, porque `raa` toma como premisa una **función de
-Lean** y la no‑derivabilidad se convierte en derivabilidad de la negación. Un cálculo que decide
-todo **no puede** ser el sujeto de un teorema de incompletitud ⇒ `goedel_second'` **no es** el
-Segundo Teorema.
+⛔⛔ **Y la medición posterior fue peor que eso**: `axioms ⊢` era **sintácticamente COMPLETO**
+(`Meta/OmegaStrength.lean`, módulo retirado con ADR‑115): decidía toda sentencia, porque `raa` toma
+como premisa una **función de Lean** y la no‑derivabilidad se convierte en derivabilidad de la
+negación. Un cálculo que decide todo **no puede** ser el sujeto de un teorema de incompletitud ⇒
+`goedel_second'` **no era** el Segundo Teorema. (ADR‑114 y ADR‑115 midieron después algo peor: Lean
+más cualquiera de las meta‑reglas demuestra `False`; por eso la capa `⊢` entera se retiró.)
 
 ## ⇒ Lo que sí lo es, y está aquí
 
-    goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
-    goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+    goedel_first_prf  [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN
+    goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula'
 
-**Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis: `ConsistentH := ¬ Prf ⊥`**, que es
-la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se
+**Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis explícita: `ConsistentH := ¬ Prf ⊥`** —más la
+de clase `[AnclaEq]`, que la contradice (aviso de cabecera)—,
+que es la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se
 **descargan aquí**. ⭐ Footprint: **sólo los tres de Lean** — el ancla es hoy la hipótesis de clase
 `[AnclaEq]` ([ADR‑026](../../DECISIONS.md)). ⚠️ **El postulado no desapareció: se movió a la FIRMA**, y
 **no hay ninguna `instance : AnclaEq`** en el árbol. Ver `TEOREMAS-E-HIPOTESIS.md` §1.
@@ -46,17 +57,18 @@ la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y l
 
 * **§1** la lógica proposicional que faltaba: `prf_subst_eq_iff` (Leibniz con `⇔`, directo del
   axioma `Prfᵢ.leibniz`), `prf_iff_trans`, `prf_neg_congr_iff`.
-* **§2** el **punto fijo** sobre `Prf`: puerto directo de `diag_arith_num` usando las piezas que ya
-  existían (`prf_congr_substfc_arg2/3`, `prf_tc_numeral`, `prf_substFormula_arith`,
-  `prf_formCode_numeral`). ⭐ **`prf_godelCN_fixedpoint` es net‑0 PURO**: no usa **ningún** axioma
-  del proyecto.
+* **§2** el **punto fijo** sobre `Prf`: puerto directo de `diag_arith_num` (sobre `⊢`, retirado con
+  ADR‑115) usando las piezas que ya existían (`prf_congr_substfc_arg2/3`, `prf_tc_numeral`,
+  `prf_substFormula_arith`, `prf_formCode_numeral`). ⭐ **`prf_godelCN_fixedpoint` es net‑0 PURO**:
+  no usa **ningún** axioma del proyecto.
 * **§3** `Con' ⇒ G` sobre `Prf`: el mismo argumento, con `prf_deduction`/`deduction_aux` en lugar
   del meta‑axioma `imp_intro`. Usa **D2** (`d2_prf`) y **D3** (`d3_prf_real`), las dos ya sobre `Prf`.
 * **§4** el ensamblaje, con **D1** (`repr_pos'_prf`) descargando la necesitación.
 
-**Footprint**: los tres de Lean + las ω‑reglas ambiente (entran por `goedel_first_numeral`, cuya
-hipótesis `ConsistentOmega` habla de `⊢`) + `ax_induction_prim`, `ax_list_induction` y las dos
-anclas de codificación. **Ningún postulado gödeliano.**
+**Footprint** (registro, anterior a ADR‑026 y a ADR‑115): los tres de Lean + las ω‑reglas ambiente
+(entraban por `goedel_first_numeral`, cuya hipótesis `ConsistentOmega` hablaba de `⊢`) +
+`ax_induction_prim`, `ax_list_induction` y las dos anclas de codificación. **Hoy**: sólo los tres de
+Lean, con `[AnclaEq]` en la firma (ver el aviso de arriba).
 -/
 
 open FOL
@@ -171,19 +183,22 @@ theorem prf_con_imp_godel [AnclaEq] (G : Formula)
 líneas.
 
 ⚠️ **Por qué importa, y no es cosmético.** [ADR‑024](../../DECISIONS.md) midió que
-`ConsistentOmega` **no es «Q++ es consistente»**: como `axioms ⊢` es **completo**, afirma que una
-**compleción completa** de `axioms` sea consistente — cercano a suponer **solidez**. `ConsistentH`
-es la hipótesis **mínima y honesta**: *el cálculo finitario no demuestra `⊥`*. Y
-`consistentH_of_omega` da la implicación en el sentido bueno, así que **no se pierde nada**.
+`ConsistentOmega` (retirada con ADR‑115) **no era «Q++ es consistente»**: como `axioms ⊢` era
+**completo**, afirmaba que una **compleción completa** de `axioms` fuera consistente — cercano a
+suponer **solidez**. (Y era refutable: `ax_list_induction` daba `axioms ⊢ ⊥`, L1‑2 de ADR‑114.)
+`ConsistentH` es la hipótesis **mínima y honesta**: *el cálculo finitario no demuestra `⊥`*. Y
+`consistentH_of_omega` daba la implicación en el sentido bueno, así que **no se perdía nada**
+(retirado con la capa `⊢`, ADR‑115).
 
-⭐ **Y el footprint lo confirma**: con `ConsistentH` **desaparecen las ω‑reglas** (`dne`, `gen`,
-`imp_intro`) **y los dos esquemas de inducción** (`ax_induction_prim`, `ax_list_induction`) **y el
-ancla `⊢`** (`ax_axiomsCodeT_eq`). Y desde [ADR‑026](../../DECISIONS.md) **ningún axioma del proyecto**:
-el ancla `Prf` es la hipótesis de clase `[AnclaEq]`.
-Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
+⭐ **Y el footprint lo confirma**: con `ConsistentH` **desaparecen las «ω‑reglas»** —así se llamaban; `gen` no
+es la ω‑regla— (`dne`, `gen`, `imp_intro`) **y los dos esquemas de inducción** (`ax_induction_prim`, `ax_list_induction`) **y el
+ancla `⊢`** (`ax_axiomsCodeT_eq`) —esos tres `axiom`, retirados de RPP con ADR‑115—. Y desde
+[ADR‑026](../../DECISIONS.md) **ningún axioma del proyecto**: el ancla `Prf` es la hipótesis de clase
+`[AnclaEq]`. Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
 
 /-- 🏁 **GÖDEL I sobre el cálculo finitario, con la hipótesis MÍNIMA.** Cuatro líneas: D1 lleva
-    `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`. -/
+    `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`.
+    ⛔ Hoy vacuo: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114), así que choca con `hcon`. -/
 theorem goedel_first_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN := by
   intro hG
   have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG
@@ -192,34 +207,29 @@ theorem goedel_first_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN := by
   exact hcon (prf_mp h2 h1)
 
 /-- 🏁🏁 **GÖDEL II sobre el cálculo finitario**: si el cálculo es consistente, **no demuestra su
-    propia consistencia**. **Una sola hipótesis —la mínima— y ninguna suelta.** -/
+    propia consistencia**. **Una sola hipótesis explícita —la mínima— y ninguna suelta.**
+    ⛔ Hoy vacuo: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114), así que choca con `hcon`. -/
 theorem goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula' := by
   intro hC
   refine goedel_first_prf hcon (prf_mp (prf_con_imp_godel godelCN ?_ ?_) hC)
   · exact prf_and_elim_right prf_godelCN_fixedpoint
   · exact repr_pos'_prf (prf_and_elim_left prf_godelCN_fixedpoint)
 
-/-! ### Corolarios sobre `ConsistentOmega`, por si un consumidor la tiene a mano
-
-`consistentH_of_omega` es la transferencia; se conservan porque **no cuestan nada** y porque el
-resto del árbol todavía habla de `ConsistentOmega`. ⚠️ Pero los enunciados **buenos** son los de
-arriba: éstos suponen **más**. -/
-
-theorem goedel_first_prf_of_omega [AnclaEq] (hcon : ConsistentOmega) : ¬ Prf godelCN :=
-  goedel_first_prf (consistentH_of_omega hcon)
-
-theorem goedel_second_prf_of_omega [AnclaEq] (hcon : ConsistentOmega) : ¬ Prf consistencyFormula' :=
-  goedel_second_prf (consistentH_of_omega hcon)
+/-! (Aquí vivían los corolarios sobre `ConsistentOmega` —`goedel_first_prf_of_omega` y
+`goedel_second_prf_of_omega`—; retirados con la capa `⊢`, ADR‑115.) -/
 
 end ROBINSON_PlusPlus.Meta.GodelTwoPrf
 
 /-! ## `export` — por CONSUMO -/
 export ROBINSON_PlusPlus.Meta.GodelTwoPrf (
-  prf_subst_eq_iff prf_iff_trans prf_neg_congr_iff
-  prf_diag_arith_num prf_godelCN_fixedpoint
+  prf_subst_eq_iff
+  prf_iff_trans
+  prf_neg_congr_iff
+  prf_diag_arith_num
+  prf_godelCN_fixedpoint
   prf_con_imp_godel
-  goedel_first_prf goedel_second_prf
-  goedel_first_prf_of_omega goedel_second_prf_of_omega
+  goedel_first_prf
+  goedel_second_prf
 )
 
 /-! ## FOOTPRINT -/

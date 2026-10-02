@@ -1,10 +1,18 @@
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 import ROBINSON_PlusPlus.Full.Numerals
+
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`codeNat_ne`, `numeral_ne`, `codeNatTerm_ne`, `ax_induction`…) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
 /-!
 # `Meta/CodeNatInjPrf.lean` — INYECTIVIDAD de la codificación numeral, y `codeNat_ne`
 
 `Meta/CodeNumeralPrf.lean` define `triN`, `consN`, `codeNatChars`, `codeNatTerm` y `codeNat`.
-Aquí se prueba que **son inyectivas**, y de ahí sale el resultado que consume el frente:
+Aquí se prueba que **son inyectivas**, y de ahí salía el resultado que consumía el frente (sobre
+`⊢`; retirado con esa capa, ADR‑115):
 
 ```lean
 codeNat_ne     {φ ψ : Formula} (h : φ ≠ ψ) : axioms ⊢ neg (numeral (codeNat φ) =eq numeral (codeNat ψ))
@@ -28,9 +36,11 @@ acotado por la diagonal. De él salen en cascada `codeNatChars_inj` → `codeNat
 `consN` desde hojas inyectivas queda inyectiva.**
 
 ⚠️ **Deuda que este módulo hace visible**: hay **DOS `numeral`** —`Full.numeral`
-(`Full/Numerals.lean:49`) y `Meta.Godel.numeral` (`Meta/Godel.lean:77`)—, definiciones idénticas en
-namespaces distintos que Lean **no** identifica. `numeral_ne` usa la de `Full` y los códigos la de
-`Godel`, así que hace falta el puente **`num_bridge`**, que se prueba aquí por inducción.
+(`Full/Numerals.lean`) y `Meta.Godel.numeral` (`Meta/Godel.lean`)—, definiciones idénticas en
+namespaces distintos que Lean **no** identifica. `numeral_ne` usaba la de `Full` y los códigos usan
+la de `Godel`, así que hacía falta el puente **`num_bridge`**, que se prueba aquí por inducción.
+🗑️ `numeral_ne` era de `⊢` y quedó retirado (ADR‑115): hoy ningún otro módulo de
+`ROBINSON_PlusPlus/` usa `num_bridge`.
 
 Promovido de `sondeos/CodeNatInj.lean` (2026‑09‑01). Cero `sorry`.
 
@@ -45,6 +55,8 @@ Las cinco meta-reglas ω y `ax_induction` entran enteras por `Full.numeral_ne`, 
 mismo footprint. **No hay axioma NUEVO** —que es lo que la frase quería decir— pero «cero
 axiomas» era falso, y es justo la clase de frase que un libro cita como garantía.
 Desbloquea los casos 3 y 4 del módulo C de `NegVerifier` (ver `PLAN-NEGVERIFIER.md`).
+🗑️ Este párrafo es REGISTRO: `codeNat_ne`, `codeNatTerm_ne` y `Full.numeral_ne` eran de `⊢` y se
+retiraron con esa capa (ADR‑115), como el frente de `NegVerifier` al que desbloqueaban.
 -/
 
 open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
@@ -94,8 +106,6 @@ theorem consN_inj {a b a' b' : Nat} (h : consN a b = consN a' b') :
   exact And.intro (by omega) (by omega)
 
 
-
-
 /-- `consN` nunca vale 0 (es un sucesor) ⟹ separa lista vacía de no vacía. -/
 theorem consN_ne_zero (a b : Nat) : consN a b ≠ 0 := by
   unfold consN; omega
@@ -113,7 +123,6 @@ theorem codeNatChars_inj : ∀ {cs ds : List Char},
 theorem codeNatStr_inj {s t : String} (h : codeNatStr s = codeNatStr t) : s = t := by
   have := codeNatChars_inj (cs := s.toList) (ds := t.toList) h
   exact String.ext (by simpa [String.toList] using this)
-
 
 
 mutual
@@ -158,24 +167,25 @@ theorem codeNat_inj : ∀ {φ ψ : Formula}, codeNat φ = codeNat ψ → φ = ψ
            | rw [codeNat_inj h2.1])
 
 
-
-
 /-! ### El puente, y el sustituto de `canon_ne`
 
 ⚠️ Estas dos necesitan `Minimal.Axioms` abierto, pero **NO se puede abrir arriba del fichero**:
 con él, `≤` y `<` resuelven al orden **OBJETO** (sobre `Term`) y `triN_mono` deja de tipar con un
 error **opaco** que no menciona `≤`. Es la trampa de notación registrada del proyecto
 (`feedback-lean-notation-traps` §1), y mordió exactamente así al promover. Por eso el `open` va
-**confinado a esta sección**. -/
+**confinado a esta sección**.
+
+🗑️ El sustituto (`codeNat_ne`/`codeNatTerm_ne`) era de `⊢` y se retiró con esa capa (ADR‑115):
+aquí queda sólo el puente. -/
 
 section CanonNeSustituto
 open ROBINSON_PlusPlus.Minimal.Axioms
 
 /-- ⚠️ **HALLAZGO LATERAL: hay DOS `numeral` duplicados** en el proyecto —
-    `ROBINSON_PlusPlus.Full.numeral` (`Full/Numerals.lean:49`) y
-    `ROBINSON_PlusPlus.Meta.Godel.numeral` (`Meta/Godel.lean:77`). Definiciones idénticas en
+    `ROBINSON_PlusPlus.Full.numeral` (`Full/Numerals.lean`) y
+    `ROBINSON_PlusPlus.Meta.Godel.numeral` (`Meta/Godel.lean`). Definiciones idénticas en
     namespaces distintos, así que Lean **no** las identifica: el puente hay que probarlo.
-    `numeral_ne` usa la de `Full`; los códigos usan la de `Godel`. -/
+    `numeral_ne` (retirado con `⊢`, ADR‑115) usaba la de `Full`; los códigos usan la de `Godel`. -/
 theorem num_bridge : ∀ n : Nat,
     ROBINSON_PlusPlus.Full.numeral n = ROBINSON_PlusPlus.Meta.Godel.numeral n
   | 0 => rfl
@@ -183,33 +193,21 @@ theorem num_bridge : ∀ n : Nat,
       show succ (ROBINSON_PlusPlus.Full.numeral n) = succ (ROBINSON_PlusPlus.Meta.Godel.numeral n)
       rw [num_bridge n]
 
-/-- **EL SUSTITUTO DE `canon_ne`.** Fórmulas distintas ⟹ sus códigos NUMERALES son
-    provablemente distintos.
-
-    ⚠️ Nótese la diferencia con el `canon_ne` refutado (`sondeos/CanonNeRefuta.lean`): allí se
-    comparaban **términos con forma de código**, donde un árbol `cons` y un numeral pueden denotar
-    el mismo número — y de ahí el `⊥`. Aquí se comparan **numerales**, donde la distinción SÍ es
-    provable. Es la misma corrección que ADR‑012. -/
-theorem codeNat_ne {φ ψ : Formula} (h : φ ≠ ψ) :
-    axioms ⊢ neg (ROBINSON_PlusPlus.Meta.Godel.numeral (codeNat φ)
-             =eq ROBINSON_PlusPlus.Meta.Godel.numeral (codeNat ψ)) := by
-  rw [← num_bridge, ← num_bridge]
-  exact ROBINSON_PlusPlus.Full.numeral_ne (fun heq => h (codeNat_inj heq))
-
-/-- Y su versión para TÉRMINOS. -/
-theorem codeNatTerm_ne {t u : Term} (h : t ≠ u) :
-    axioms ⊢ neg (ROBINSON_PlusPlus.Meta.Godel.numeral (codeNatTerm t)
-             =eq ROBINSON_PlusPlus.Meta.Godel.numeral (codeNatTerm u)) := by
-  rw [← num_bridge, ← num_bridge]
-  exact ROBINSON_PlusPlus.Full.numeral_ne (fun heq => h (codeNatTerm_inj heq))
-
 
 end CanonNeSustituto
 
 end ROBINSON_PlusPlus.Meta.CodeNatInjPrf
 
 export ROBINSON_PlusPlus.Meta.CodeNatInjPrf (
-  triN_succ triN_mono tri_diag_unique consN_inj consN_ne_zero
-  codeNatChars_inj codeNatStr_inj codeNatTerm_inj codeNatTerms_inj codeNat_inj
-  num_bridge codeNat_ne codeNatTerm_ne
+  triN_succ
+  triN_mono
+  tri_diag_unique
+  consN_inj
+  consN_ne_zero
+  codeNatChars_inj
+  codeNatStr_inj
+  codeNatTerm_inj
+  codeNatTerms_inj
+  codeNat_inj
+  num_bridge
 )

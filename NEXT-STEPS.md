@@ -1,15 +1,53 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-02 — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
+> # 🗓️ 2026‑10‑02 — 🗑️ **ADR‑115: la capa `⊢` RETIRADA de RPP** (decisión 2 del propietario, ADR‑114)
+>
+> RPP ya no usa `⊢`: **27 módulos** y **633 declaraciones** fuera, **0 `axiom` de Lean**, **117 jobs**, y la
+> cadena de Gödel sobre `Prf` intacta (sus footprints no cambian; `check-footprints` **463**). Las cuatro
+> meta‑reglas de FOL, **refutadas sin usarlas** (`sondeos/MetaReglasRefutables.lean`); su retirada en FOL va
+> después de RPP, porque RPP las importaba. ⛔ **Esto NO arregla F1**: Gödel I/II siguen **vacuos** por
+> `[AnclaEq]` (ADR‑114). Detalle, cifras y lo que se perdió en ADR‑115.
+>
+> ## ⬜ Lo que queda AHORA, en orden
+>
+> 1. ⬜ **FOL**: borrar `FOL/MetaRules.lean` y su import en `FOL/Core.lean`; reescribir
+>    `FOL/Inconsistencia.lean` con las refutaciones sin axiomas, `Derives ≡ Derives₀` y la solidez; censo de
+>    `check-axioms` 4 → 0. Después, en RPP, `check-estratos`: `Derives|22|0|-`.
+> 2. ⬜ **F1**, lo que hace vacuos a Gödel I/II: anclar `axiomsCodeT` por punto fijo — un único axioma diagonal
+>    `axiomsCodeT = LR ++ [δ]` con `diagTerm` y `prf_diag_arith_num` (L2‑3).
+> 3. ⬜ **D7** (`String` → `List Char` en FOL), en su momento: tras esto y antes del punto fijo de F1 (L5‑09).
+> 4. ⬜ **El modelo de los 141** (A2–A5) ⇒ `ConsistentH` como teorema. A4 (solidez de `Prf` por inducción sobre
+>    `Prf`) no tiene obstáculo: `Prf` no está habitado por ningún `axiom`.
+> 5. ⬜ **`⊬¬G` sobre `Prf`**, que ya no existe en ningún cálculo: **por Rosser** (consistencia simple; es el
+>    objetivo declarado del propietario, abajo). ⛔ La ω‑consistencia de antes es refutable por su definición,
+>    también sobre `Prf` (`sondeos/OmegaConsistentRefutable.lean`). La pieza que falta es la Δ₀‑completitud
+>    NEGATIVA del verificador sobre `Prf` (lo que era `NegVerifier`, ADR‑097, que **no** estaba demostrado: su prueba
+>    llevaba meta‑reglas refutadas en el footprint). Lo que queda sobre `Prf` y META (109 declaraciones de
+>    `Meta/ChainNegPrf.lean`) y la prueba vieja de `1dac85a` sirven de guía de casos, no de prueba.
+> 6. ⬜ Ronda 3 de la auditoría; y un paso de CI que compile los sondeos de control negativo (R2‑5‑1): de los 85,
+>    hoy compilan 32 (`sondeos/README.md`).
+> 7. ⬜ La deuda de documentación declarada en ADR‑115 §5.
+>
+> 🎯 **Horizonte declarado por el propietario (2026‑10‑02), tras Gödel II**: **Gödel‑Rosser** (consistencia
+> simple, sin ω‑consistencia) · **la consistencia de Gentzen** (inducción transfinita hasta ε₀) · **Tarski**
+> (la verdad formal no es representable en el propio sistema). ⭐ Tarski no usa el predicado de demostrabilidad
+> ni `[AnclaEq]`: le basta el lema diagonal para fórmula arbitraria (`prf_diag_arith_num`, ya general) y
+> `ConsistentH` ⇒ se puede hacer **antes** de reparar F1 y no le afecta. Para Gentzen importa la FORMA de los
+> 141 axiomas (lo cómodo es que sean abiertos o Π₁; los que llevan `∃` piden un paso más) y que `Prf` tiene dos
+> reglas de inducción (`ind`, `listInd`).
+>
+> 🗓️ *Lo que sigue es el bloque del 2026‑09‑28, como registro.*
+>
 > # 🗓️ 2026‑09‑28 — 🏁 **ADR‑113: `cons a b = σ (pair a b)`**, y el frente del modelo DESBLOQUEADO
 >
 > El propietario adoptó la salida (5) de ADR‑093 frente a relativizar `listInd`. Aplicada y **medida por el
-> compilador**: seis módulos adaptados, los otros 139 intactos, **145 jobs**, 0 sorry, 11 warnings,
+> compilador**: seis módulos adaptados, los otros 139 intactos, **145 jobs** entonces, 0 sorry, 11 warnings,
 > **517 footprints sin un solo cambio**. Detalle y tabla en ADR‑113.
 >
 > ## ⬜ Lo que queda AHORA — el modelo de los 141
@@ -24,7 +62,7 @@
 >    este fichero no recoge ADR‑098…112.
 
 
-**Estado 2026‑09‑22 · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
+**Estado 2026‑09‑22 (entonces) · `master` · ✅ ÁRBOL VERDE (RPP **145** jobs · FOL **54** · 0 sorry) · **3 `axiom` de Lean****
 🏁🏁🏁🏁 **`NegVerifier` es un TEOREMA** (ADR‑097): las dos deudas de `Meta/VerifierSound.lean` están saldadas y `reflects_of_omega` pasa de **dos** hipótesis a **una**.
 ⚠️ **warnings: 11**, todos declarados en `check-warnings.bash` (rompe en las dos direcciones).
 🔧 Controles (**re‑ejecutados**, M‑13): `check-footprints` **457** (cobertura **421/421**) · `check-warnings` **11** · `check-estratos` **10** · `check-sorry` **+ censo de agujeros** · `check-doc-sync` en los DOS repos, con **`[H]` nuevo** (**78/78**), **`[E]` ampliado** (universo 15 → **40**, deuda **35**) y **`[B]` con trinquete** (**44**) · `check-axioms` (FOL).
@@ -95,7 +133,7 @@
 >
 > 🔧 **Controles re‑ejecutados (M‑13)**: `check-footprints` **457** (cobertura **421/421**) ·
 > `check-warnings` **11** · `check-estratos` **10** · `check-sorry` + censo · `check-doc-sync`
-> (sondeos **80/80**). RPP **145** jobs · FOL **54** · 0 sorry · 3 `axiom` de Lean en RPP.
+> (sondeos **80/80**). RPP **145** jobs · FOL **54** · 0 sorry · 3 `axiom` de Lean en RPP (entonces).
 
 > # 🗓️ 2026‑09‑22 — 🏁🏁 **LAS SEIS CAUSAS CERRADAS**, el muro de `Model` derribado, y el MODELO ESTÁNDAR arrancado
 >
@@ -1365,7 +1403,7 @@
 >
 > | | qué | dónde |
 > |---|---|---|
-> | 1 | 🏁 **`ax_list_induction` pierde su premisa‑FUNCIÓN** (11 sitios) y **M‑11 sobre `Derives` se declara PERMANENTE** (suelo de cuatro) | [ADR‑029](DECISIONS.md), `8d44a70` |
+> | 1 | 🏁 **`ax_list_induction` pierde su premisa‑FUNCIÓN** (11 sitios) y **M‑11 sobre `Derives` se declara PERMANENTE** (suelo de cuatro) | [ADR‑029](DECISIONS.md), `8d44a70` | 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > | 2 | 🏁 **`FOL/Enumeration.lean`**: la enumerabilidad de `Formula` **construida**, cero axiomas ⇒ `cuarentena/Completeness.lean` **5 → 3**. ⭐ Y `lindenbaum_lemma` queda **net‑0 puro** | [ADR‑030](DECISIONS.md) |
 > | 2b | 🏁🏁 **Las dos congruencias de la igualdad, DEMOSTRADAS** ⇒ **3 → 1**. ⭐⭐ `truth_lemma` y el modelo canónico quedan **net‑0 puros**; `completeness` depende de **un solo** postulado. 🔑 Lo que faltaba no era de lógica sino de **listas**: `substTerms_append`, cuatro líneas | [ADR‑031](DECISIONS.md), `FOL/Theorems/Eq.lean` |
 > | 3 | ⚠️ **Agujero de CI medido y tapado**: `lake build` desde RPP compilaba **sólo los nueve módulos de FOL que RPP importa**; `FOL.Semantics`, `FOL.Enumeration` y `TheoryFramework` entera **no las compilaba nadie**. Nuevo paso `lake build "@FOL/FOL" "@FOL/TheoryFramework"` | `.github/workflows/build.yml` |
@@ -1476,13 +1514,13 @@
 > | | inductivo | axiomas que lo habitan | cuántos |
 > |---|---|---|---|
 > | ⛔ **PROHIBIDO inducir** | `FOL.Derives` | **`MetaRules`: 6** (`imp_intro`, `gen`, `raa`, `dne`, `or_elim`, `ex_elim`) · **`Theorems/Neg.lean:57`: `dne`** (⚠️ un **SEGUNDO** `dne`, en forma de esquema) · **`Theorems/Quantifiers.lean:115`: `forall_not_impl_exists_not`** | **8** en FOL |
-> | ⛔ **PROHIBIDO inducir** | `FOL.Derives`, lado RPP | `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa` | **+4** ⇒ **12** |
+> | ⛔ **PROHIBIDO inducir** | `FOL.Derives`, lado RPP | `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa` | **+4** ⇒ **12** | 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > | ⛔ **PROHIBIDO inducir** | `Prf` | `prf_axiomsCodeT_eq` | 1 |
 > | ✅ **SEGURO** | **`Prfᵢ`**, **`PrfH`** | **ninguno** | 0 |
 >
 > ## ⬜ LO DECIDIDO POR EL PROPIETARIO Y **NO EJECUTADO** — el trabajo de mañana, en orden
 >
-> **(a) `ax_p_tfa` SE RETIRA** ⇒ **5 → 4 axiomas**. Medido: clausura entera en UN fichero, ningún
+> **(a) `ax_p_tfa` SE RETIRA** ⇒ **5 → 4 axiomas**. Medido: clausura entera en UN fichero, ningún 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > consumidor, **ningún lema que escribir**.
 > · borrar `Minimal/Theorems/Block8.lean` **288‑334** y **345‑350**; ⚠️ **CONSERVAR 335‑343**
 > (`lt_zero_one`, no depende del axioma); del `export` quitar **375, 376, 377, 379** (conservar 378).
@@ -1546,7 +1584,7 @@
 >
 > ⛔⛔ **F‑1 · Gödel II está montado pero NO ensamblado, y es estructural.** `goedel_second'` pide
 > `hgi : ¬(axioms ⊢ G)` sobre el cálculo **ω**; Gödel I entrega `¬ Prf godelCN` **finitario**. Por
-> `prf_to_derives` la hipótesis es **estrictamente más fuerte**, **no hay vuelta `⊢ → Prf`**, y
+> `prf_to_derives` la hipótesis es **estrictamente más fuerte**, **no hay vuelta `⊢ → Prf`**, y 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > **nadie consume el teorema**. ⚠️ `FOL/MetaRules.lean` documenta `gen` como **ω‑regla** y `dne` con
 > la lectura *«demostrabilidad = verdad en ℕ»* ⇒ `hgi` **podría ser falsa** y el teorema **vacuo**.
 > ⬜ **No medido** — y decidirlo (¿cuál es la fuerza real de `axioms ⊢`?) es **la pregunta abierta
@@ -1646,13 +1684,13 @@
 >
 > 🏁 **Hecho**: `primAxioms` (los 23) + `primAxioms_subset` + `prim_to_axioms` + `axp`
 > (`Full/Induction.lean` §0bis) y **ax_C3/ax_L3 CERTIFICADOS** (`concat_assoc_prim`,
-> `in_concat_prim`) con **cero cambios de axioma**, porque `ax_list_induction` ya era genérico en `Γ`.
+> `in_concat_prim`) con **cero cambios de axioma**, porque `ax_list_induction` ya era genérico en `Γ`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >
-> ⬜ **Los otros 9 esperan UNA SANCIÓN**: pasan por `ax_induction`, especializado a `axioms`.
+> ⬜ **Los otros 9 esperan UNA SANCIÓN**: pasan por `ax_induction`, especializado a `axioms`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > ⛔ Y la salida fácil está **cerrada**: `∀ {Γ}, Γ ⊢ inductionFormula φ` sería **FALSO** (con
 > `Γ = []` haría la inducción lógicamente válida). Un axioma **tiene que nombrar su contexto** ⇒ la
-> forma correcta es **mover** `ax_induction` a `primAxioms ⊢ …` y recuperar el de hoy por
-> debilitamiento —con lo que `ax_induction` **deja de ser axioma** y el recuento no sube—, pero es
+> forma correcta es **mover** `ax_induction` a `primAxioms ⊢ …` y recuperar el de hoy por 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+> debilitamiento —con lo que `ax_induction` **deja de ser axioma** y el recuento no sube—, pero es 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > **estrictamente más fuerte** ⇒ **M‑1, decisión del propietario**. ⚠️ `Mod2` arrastra además la
 > capa `Block1`, enunciada sobre `axioms`: **medir antes de prometer**.
 >
@@ -1809,10 +1847,10 @@
 >    queda de `⊬¬G` son los módulos **C** y **D**, con las dos deudas de `Meta/VerifierSound.lean`
 >    ya enunciadas sobre la clase estrecha.
 > 6. 🏁 **`primAxioms` — ADR‑023 RATIFICADO y 9 de 11 CERTIFICADOS** (2026‑09‑10h). El propietario
->    ratificó `axiom ax_induction_prim : primAxioms ⊢ inductionFormula φ` + `ax_induction` como
+>    ratificó `axiom ax_induction_prim : primAxioms ⊢ inductionFormula φ` + `ax_induction` como 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >    **teorema**: **no añade axioma, lo MUEVE** ⇒ siguen **6**. `Full/Induction.lean` migrado entero.
 >    ⚠️ **NO** mueve la frontera de la teoría — eso era un error mío, corregido en el ADR.
->    🏁 **Y la pregunta previa se contestó el mismo día: `ax_mod2_alternation` ERA DERIVABLE** ⇒
+>    🏁 **Y la pregunta previa se contestó el mismo día: `ax_mod2_alternation` ERA DERIVABLE** ⇒ 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >    **retirado, 6 → 5 `axiom` de Lean**. ⚠️⚠️ Al retirarlo apareció una **CIRCULARIDAD**: `ax21` se
 >    «derivaba» de él y él de `ax21`. Medido cuál es el primitivo (`ax16 + ax17` admiten
 >    `mod2 2̄ = 2̄`) ⇒ **`ax21` es PRIMITIVO**, el censo pasa a **24 + 10**, y de los 10 derivables
@@ -2275,8 +2313,8 @@
 >   **no ocurre en `Prf`**: ocurre en `⊢`, que es clásico (`FOL/MetaRules.lean:59`), y **ya está en
 >   la prueba compilada** (`Meta/DiagonalTwo.lean:129`).
 >
-> ✅ `goedel_first_unrefutable_real'` (`DiagonalTwo.lean:119`) **está probado**, módulo `Reflects`.
-> ✅ `goedel_first_undecidable_omega` (`OmegaReflect.lean:168`) **está ensamblado**.
+> ✅ `goedel_first_unrefutable_real'` (`DiagonalTwo.lean:119`) **está probado**, módulo `Reflects`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+> ✅ `goedel_first_undecidable_omega` (`OmegaReflect.lean:168`) **está ensamblado**. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > ⇒ **la ÚNICA obligación abierta es `NegVerifier`**:
 > ```lean
 > NegVerifier : ∀ φ, ¬ Prf φ → ∀ l, StdChain l → axioms ⊢ neg (Verifies φ (objList l))
@@ -2736,9 +2774,9 @@
 >
 > | | |
 > |---|---|
-> | **`goedel_first_numeral`** | `ConsistentOmega → ¬Prf godelCN` — **Gödel I** |
-> | `goedel_first_undecidable_numeral` | `… → Reflects godelCN → ⊬G ∧ ⊬¬G` |
-> | `goedel_first_undecidable_omega` | lo mismo desde ω‑consistencia (`OmegaReflect`) |
+> | **`goedel_first_numeral`** | `ConsistentOmega → ¬Prf godelCN` — **Gödel I** | 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+> | `goedel_first_undecidable_numeral` | `… → Reflects godelCN → ⊬G ∧ ⊬¬G` | 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+> | `goedel_first_undecidable_omega` | lo mismo desde ω‑consistencia (`OmegaReflect`) | 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > | `repr_pos'_prf` | **D1**, intacta |
 > | `prf_formCode_numeral` | `formCode φ =eq numeral (codeNat φ)`, net‑0 |
 > | `prf_div2_numeral`, `prf_cons_eval` | la cadena aritmética, net‑0 |
@@ -2865,7 +2903,7 @@
 >
 > ### ⚖️ VEREDICTO: **(2), sin matices** — y la razón de peso NO es el ahorro
 > **(1) no es más caro: es OTRO TEOREMA.** Sus axiomas tienen que entrar en `axioms` para
-> funcionar; `ax_axiomsCodeT_eq` los mete en `axiomsCodeT`; el verificador interno los cita;
+> funcionar; `ax_axiomsCodeT_eq` los mete en `axiomsCodeT`; el verificador interno los cita; 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > **`provCodeC'` cambia ⇒ G cambia**. 141 → ~159. Ningún ahorro de líneas compra eso.
 > Y la única ventaja genuina de (1) —«inducir dentro de `Prov` es más fácil»— se apoyaba en que a
 > (2) le faltaba el puente `In`⇄`nthc`: **ese puente ya está en producción**
@@ -3103,7 +3141,7 @@
 > coste está acotado: 2 predicados + 2 reflectores por la receta de `pcc_eval_lenc`. Lo que sigue
 > abierto es lo de siempre y es **una decisión, no un problema**: `isFormCode`/`isTermCode` son
 > **axiomas objeto nuevos** y por tanto **requieren SANCIÓN explícita**, con el agravante ya
-> registrado de que `ax_axiomsCodeT_eq` ancla a los **141** axiomas (no a `coreAxioms`), luego el
+> registrado de que `ax_axiomsCodeT_eq` ancla a los **141** axiomas (no a `coreAxioms`), luego el 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > argumento de julio «`isFormCode` queda fuera del sujeto gödeliano» es **FALSO**.
 >
 > ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena** — el rédito ya está VERIFICADO
@@ -3346,7 +3384,7 @@
 > ### 🎯 FOTO DE REANUDACIÓN (2026‑07‑20)
 >
 > **⚠️ FOOTPRINT CAMBIÓ (`25d255b`):** nuevo `axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq
-> listFormCodeM axioms)` (espejo `Prf` del `ax_axiomsCodeT_eq` de `⊢`) ⇒ **`prf_inAxC` es ahora
+> listFormCodeM axioms)` (espejo `Prf` del `ax_axiomsCodeT_eq` de `⊢`) ⇒ **`prf_inAxC` es ahora 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > TEOREMA** (derivado; net‑0 axiomas). **D1 `repr_pos'_prf` cita ahora `prf_axiomsCodeT_eq`** (antes
 > `prf_inAxC`); `d2_prf` limpio; `goedel_second'` sigue citando sólo `d3`. Cadena real intacta.
 >
@@ -3406,7 +3444,7 @@
 > **dirección negativa** (`derives_lineWF_neg_of_tag`, y `derives_lineWF_neg_thy_of_not_prf` que ya
 > **refuta** una línea `thy` de conclusión indemostrable); y la **des‑duplicación** del nivel `⊢`
 > (`Meta/LineWFDerives.lean`: los 42 `lineWF_*`/`premsOf_*` que `ProofChain` probaba **por segunda vez**
-> pasan a ser `prf_to_derives` de sus gemelos; `ProofChain` 870→540; D1/D2 con axiomas intactos).
+> pasan a ser `prf_to_derives` de sus gemelos; `ProofChain` 870→540; D1/D2 con axiomas intactos). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >
 > ⚠️ **`tagConcl` cubre 19, NO 21**: `thy` (15) va por `In … axiomsCodeT` (no es ecuación) y `mp` (16)
 > es **INCONDICIONAL** ⟹ **`mp` no se puede refutar por `lineWF`**, sólo por `premsOf`/`boundedPremsIn`.
@@ -3488,12 +3526,12 @@
 > códigos no son números con medida». **ERROR.** `cons_sym` es opaco como símbolo, **pero
 > `ax_L0_cons_def` lo ancla a la aritmética**: `cons h t = pair h (succ t)` con
 > `pair = cantor_func` (emparejamiento de Cantor, `Minimal/Axioms.lean:122`). ⟹ **los códigos SÍ
-> son números**, existe medida, y la inducción fuerte sobre el numeral se deriva de `ax_induction`
+> son números**, existe medida, y la inducción fuerte sobre el numeral se deriva de `ax_induction` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > (que ya existe en `Full/`). **NO hace falta (1b) ni ningún axioma nuevo: net‑0.**
-> * La inducción de listas (`ax_list_induction`) sí es insuficiente por sí sola: su paso es
+> * La inducción de listas (`ax_list_induction`) sí es insuficiente por sí sola: su paso es 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   `∀h t. φ t → φ (cons h t)` — induce sobre el **espinazo**, sin IH sobre la cabeza `h`, y
 >   `substfc` recurre en las **cabezas**. Por eso hay que ir por la vía aritmética.
-> * La única inducción de listas disponible (`ax_list_induction` / `prf_list_induction`) tiene paso
+> * La única inducción de listas disponible (`ax_list_induction` / `prf_list_induction`) tiene paso 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   **`∀h t. φ t → φ (cons h t)`**: induce sobre el **ESPINAZO (la cola)**, con la cabeza `h`
 >   universalmente cuantificada y **sin hipótesis de inducción sobre `h`**.
 > * Pero `substfc v t f` **recurre en las CABEZAS**: `⟨5,a,b⟩` es `cons 5̇ (cons a (cons b nil))` y
@@ -3502,7 +3540,7 @@
 > ⟹ **RUTA (1a), sin axiomas nuevos:** (i) probar la monotonía del emparejamiento de Cantor
 > (`h ≤ pair h (succ t)`, `t < pair h (succ t)`) ⟹ **sub‑código < código**, apoyándose en lo que ya
 > hay en `Minimal/Theorems/Block5.lean` (`is_cantor_pair`, `cantor_uniqueness`, `cantor_poly`);
-> (ii) derivar **inducción fuerte** del `ax_induction` ordinario (truco estándar: inducir sobre
+> (ii) derivar **inducción fuerte** del `ax_induction` ordinario (truco estándar: inducir sobre 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > `∀y ≤ x. φ(y)`, usando el aparato acotado ya existente); (iii) con eso, `pcc_eval_substfc` /
 > `pcc_eval_liftfc` por inducción sobre el código. ⚠️ (i) es trabajo real (aritmética de Cantor en
 > Q++), pero es **teoría de números, no metamatemática**, y no toca la solidez del verificador.
@@ -3531,7 +3569,7 @@
 >   (`prf_lt_iff`, `prf_lt_intro`, `prf_zero_lt_succ`, `prf_succ_lt_succ_of_lt`,
 >   `prf_not_lt_zero`, `prf_nat_induction`, `prf_succ_inj`, `prf_zero_or_succ`).
 >   **Cero teoremas de `mul`, cero de `le`.**
-> * ⚠️ **No hay puente `⊢ → Prf`** (`Derives` tiene la ω‑regla; sólo existe `prf_to_derives`).
+> * ⚠️ **No hay puente `⊢ → Prf`** (`Derives` tiene la ω‑regla; sólo existe `prf_to_derives`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   Los ~24 hay que **re‑probarlos** en `Prf`, como se hizo con `Meta/ArithPrf.lean`. Es
 >   mecánico (esas pruebas no usan la ω‑regla) pero es **volumen real**.
 > * `le` no es primitivo: `le a b := lt a b ∨ a =eq b` (`Axioms.lean:145`) ⟹ cada lema de `le`
@@ -3687,7 +3725,7 @@
 > i‑a…iii y descubrir después un problema aguas abajo.
 >
 > 1. **RUTA ELEGIDA — (1a) aritmética, net‑0 axiomas:** monotonía de Cantor ⟹ sub‑código < código ⟹
->    inducción fuerte desde `ax_induction` ⟹ `pcc_eval_substfc`/`_liftfc` ⟹ los 7 tags.
+>    inducción fuerte desde `ax_induction` ⟹ `pcc_eval_substfc`/`_liftfc` ⟹ los 7 tags. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > 2. ~~Reformular los 7 esquemas~~ — **DESCARTADA** (no ahorra; la variante que sí ahorraría es insólida).
 > 2b. ~~Axioma de inducción estructural~~ — **INNECESARIA** (la vía aritmética es net‑0).
 > 3. **Reordenar el frente**: dejar B.3c al 14/21 y atacar antes otra pieza (p. ej. el `or_elim` ×21
@@ -3853,7 +3891,7 @@
 >   con el anclaje `prf_axiomsCodeT_eq` en LOS DOS lados (object `In y axiomsCodeT → In y
 >   (listFormCodeM axioms)`; código dentro de `Prov` por Leibniz reflejada del anclaje).
 > **Refactor de footprint (net‑0):** nuevo `axiom prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq
-> listFormCodeM axioms)` (espejo `Prf` del `ax_axiomsCodeT_eq` de `⊢`) ⇒ `prf_inAxC` pasa a TEOREMA.
+> listFormCodeM axioms)` (espejo `Prf` del `ax_axiomsCodeT_eq` de `⊢`) ⇒ `prf_inAxC` pasa a TEOREMA. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > D1 cita ahora `prf_axiomsCodeT_eq` (antes `prf_inAxC`); `goedel_second'` sigue citando sólo `d3`.
 >
 > **FALTA sólo el ENSAMBLAJE de `thy`** (mecánico, espejo de `eqrefl`): instanciar
@@ -3971,13 +4009,13 @@ un enunciado Δ₀ concreto**, más una hipótesis clásica y **visible**. `Omeg
 > `thy` sólo inyecta axiomas reales, y la realidad hereditaria (rigidez+inyectividad de `formCode`)
 > cierra el argumento. **No hay bug; el módulo E es viable.**
 > **(B) HALLAZGO que BLOQUEA `NegVerifier`:** `axiomsCodeT` es un átomo **OPACO** con sólo
-> dirección positiva (`ax_inAxC`) ⇒ **no se puede refutar `In v0 axiomsCodeT`** ⇒ el módulo D no
+> dirección positiva (`ax_inAxC`) ⇒ **no se puede refutar `In v0 axiomsCodeT`** ⇒ el módulo D no 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > puede refutar líneas `thy` basura ⇒ **`NegVerifier` NO es demostrable con `axiomsCodeT` opaco**.
 > **No es insoldez** — es que la teoría no “sabe” que `axiomsCodeT` = sus axiomas (fue concreto y
 > se retiró en `7ae7b7b` por rendimiento). **(C)** el fix de `StdChain` que planeé («canónico») es
 > **falso** (`cons` es una pareja de Cantor, `ax_L0_cons_def`).
 > **⟹ NUEVO PASO BLOQUEANTE 0.5 (requiere SANCIÓN):** concretar `axiomsCodeT` — recomendado un
-> ancla negativa `ax_notInAxC` (dual de `ax_inAxC`). Ver `PLAN-NEGVERIFIER.md` §🔬.
+> ancla negativa `ax_notInAxC` (dual de `ax_inAxC`). Ver `PLAN-NEGVERIFIER.md` §🔬. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 Estado de sus piezas:
 
@@ -4139,7 +4177,7 @@ patrón Step A, barato. **Estimación honesta de ②+③: 2‑4 sesiones.**
    - **F7a ✅ VIABLE AHORA** (verificado con `#print axioms`): `goedel_second'` NO cita `diagonal_lemma`/`provFormula_repr`/`Dem`/`Incompleteness.D2`/`Incompleteness.D3`. Esos 7 postulados solo los usa la **capa legacy** (`Provability.goedelSentence` + teoremas legacy de `Incompleteness.lean`); las menciones en `Necessitation`/`Diagonal`/`HilbertSeq` son solo docstrings. Retirarlos (junto con los teoremas legacy) **no toca la cadena real** y bajaría de 14 a 7 `axiom` de Lean.
    - **F7b ⛔ BLOQUEADA:** `GodelTwo.d3` sí es portante (`goedel_second'` lo cita). Espera al D3 real.
 
-> **Estado real de la cadena (auditado 2026‑07‑08 con `#print axioms`):** D1 `repr_pos'_prf` = estándar + `prf_inAxC`; **D2 `d2_prf` = estándar, cero postulados**; `d3_prf_of_sigma1` = estándar + `prf_inAxC`; **Gödel I real** `goedel_first_real'` = estándar + ω‑reglas + `ax_induction`/`ax_list_induction`/`ax_inAxC` (ningún postulado gödeliano); **Gödel II** `goedel_second'` = estándar + ω‑reglas + `ax_list_induction` + **`d3`** (único postulado gödeliano). Los 4 axiomas `lenc`/`nthc` añadidos a `Minimal.axioms` son `def ax_*` de teoría object (extensión definicional conservadora), NO `axiom` de Lean.
+> **Estado real de la cadena (auditado 2026‑07‑08 con `#print axioms`):** D1 `repr_pos'_prf` = estándar + `prf_inAxC`; **D2 `d2_prf` = estándar, cero postulados**; `d3_prf_of_sigma1` = estándar + `prf_inAxC`; **Gödel I real** `goedel_first_real'` = estándar + ω‑reglas + `ax_induction`/`ax_list_induction`/`ax_inAxC` (ningún postulado gödeliano); **Gödel II** `goedel_second'` = estándar + ω‑reglas + `ax_list_induction` + **`d3`** (único postulado gödeliano). Los 4 axiomas `lenc`/`nthc` añadidos a `Minimal.axioms` son `def ax_*` de teoría object (extensión definicional conservadora), NO `axiom` de Lean. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 <!-- -->
 
@@ -4161,7 +4199,7 @@ patrón Step A, barato. **Estimación honesta de ②+③: 2‑4 sesiones.**
 
 ## Situación actual
 
-Build: ✅ `lake build` exit 0. **0 sorrys reales** y **0 warnings RPP** en los 11 módulos. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas de FOL; `ax_p_tfa` en `Block8.lean` es un meta-axioma adicional (TFA). Ninguno es `:= sorry`.
+Build: ✅ `lake build` exit 0. **0 sorrys reales** y **0 warnings RPP** en los 11 módulos. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas de FOL; `ax_p_tfa` en `Block8.lean` es un meta-axioma adicional (TFA). Ninguno es `:= sorry`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md): **34 axiomas matemáticos sin esquema de inducción son suficientes para construir la función de Cantor, las tuplas con proyecciones, las listas con concatenación y pertenencia, las funciones discretas, los primos y la factorización prima** (TFA vía Ax-P).
 
@@ -4187,7 +4225,7 @@ Todos los hitos completados:
 | `ax_L3_in_concat` | postulado | requiere inducción sobre `L` (irreducible) |
 | `ax_pow_zero`, `ax_pow_succ` | postulados | definicionales puros (recursión primitiva base — [MINIMAL-AXIOMS.md](MINIMAL-AXIOMS.md) §3.4.1) |
 | `ax_prodp_nil`, `ax_prodp_cons` | postulados | definicionales puros sobre listas (§3.4.2) |
-| `ax_p_tfa` (TFA) | meta-axioma | requiere inducción fuerte; pasa a teorema en `Full/` |
+| `ax_p_tfa` (TFA) | meta-axioma | requiere inducción fuerte; pasa a teorema en `Full/` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | ~~`ax20`, `ax22`, `ax23`, `ax27`, `ax28`~~ | **ELIMINADOS** | derivables sin inducción o redundantes (ver CHANGELOG) |
 
 **Pendientes menores** (no bloquean cierre):
@@ -4244,17 +4282,17 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 
 > **✅ `Full/Induction.lean` + `Full/Mod2.lean` + `Full/Lists.lean` (2026-06-07 + 2026-06-11)** — Inducción general como **axioma object-level** (`ax_induction : ⊢ inductionFormula φ`), con codificación **lift-aware** de `φ(σn)`. Composición De Bruijn generalizada (`substFormula_succ_lift_gen` + `step_reduce`). **Derivados como teoremas en forma object-level pura**: ax6 (`add_comm_thm`), ax7 (`add_assoc_ax`), ax10/11/12 (mul algebraicos), ax18 (`lt_irrefl_thm`), ax19 (`lt_trichotomy_thm`), y — **2026-06-11 vía Opción C.2** con axioma extra `ax_mod2_alternation : ∀n, mod2(σn)+mod2(n)=1` — `mod2_range_thm : ⊢ ax21_mod2_range` y `mod2_of_even_thm : ⊢ ax24_mod2_of_even`, y — **2026-06-11 vía meta-axioma `ax_list_induction`** (inducción estructural sobre listas, estilo `imp_intro`/`gen` parametrizado por `φ : Term → Formula`) — `concat_assoc_thm : ⊢ ax_C3_concat_assoc` y `in_concat_thm : ⊢ ax_L3_in_concat`. Lemas auxiliares: `mod2_zero_aux`, `a_plus_one_eq_one`, `eq_congr_mod2`, `eq_congr_cons_right_full`, `eq_congr_concat_left/right`, `eq_subst_in`, `iff_intro` (helper local). **`Intermediate/` eliminado** (caso finito de Full). **Estado**: fragmento aritmético + listas de Minimal totalmente cubierto en Full salvo Ax-P (TFA) y los testigos `ax21`/`ax24`/`ax_C3`/`ax_L3` que ya son teoremas. Siguiente: **Ax-P (TFA, inducción fuerte)**, Gödel Nivel D.
 
-**Objetivo (PLANNING §6.3)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax_C3, ax_L3) y el meta-axioma `ax_p_tfa` (TFA) se vuelven teoremas. Habilita el **Nivel D** del frente Gödel: Gödel I y II demostrados internamente.
+**Objetivo (PLANNING §6.3)**: Axiomas de Peano puros + **esquema de inducción general** sobre todas las fórmulas del lenguaje. Todos los axiomas postulados en `Minimal/` (ax21, ax24, ax_C3, ax_L3) y el meta-axioma `ax_p_tfa` (TFA) se vuelven teoremas. Habilita el **Nivel D** del frente Gödel: Gödel I y II demostrados internamente. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### 4.1. Roadmap de Ax-P / TFA — reencuadre **numerales + representabilidad** (2026-06-11)
 
-**Obstrucción foundational detectada** al intentar F2 meta-nivel: en FOL=, (Muro 1) los existenciales object no dan testigos meta — `ex_elim` sólo concluye `axioms ⊢ C`; y (Muro 2) las disyunciones object (tricotomía) no se eliminan a conclusión meta. Por eso `strong_induction_meta` con case-split **no funciona**, y derivar el `ax_p_tfa` *meta* de Block8 con testigos usables es **equivalente a la maquinaria de representabilidad de Gödel** (no hay atajo).
+**Obstrucción foundational detectada** al intentar F2 meta-nivel: en FOL=, (Muro 1) los existenciales object no dan testigos meta — `ex_elim` sólo concluye `axioms ⊢ C`; y (Muro 2) las disyunciones object (tricotomía) no se eliminan a conclusión meta. Por eso `strong_induction_meta` con case-split **no funciona**, y derivar el `ax_p_tfa` *meta* de Block8 con testigos usables es **equivalente a la maquinaria de representabilidad de Gödel** (no hay atajo). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 **Decisión (Opción A, Gödel-aware)**: como Gödel Nivel D necesita representabilidad de todos modos, se construye esa capa una vez y TFA cae como corolario. Se trabaja sobre **numerales** (`numeral n = σⁿ(0)`) con **cómputo meta en ℕ + transferencia** vía homomorfismo. Disuelve los dos muros (lo decisional/constructivo ocurre en ℕ). Reutiliza Peano como cómputo meta.
 
 **Capa de representabilidad (cimientos) — HECHO 2026-06-11**:
 
-- [x] **F1 — Inducción fuerte object** (`Full/StrongInduction.lean`): `strong_induction` derivada de `ax_induction` sin axioma nuevo + `substFormula_liftFormula` + `lt_succ_split`.
+- [x] **F1 — Inducción fuerte object** (`Full/StrongInduction.lean`): `strong_induction` derivada de `ax_induction` sin axioma nuevo + `substFormula_liftFormula` + `lt_succ_split`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 - [x] **Numerales** (`Full/Numerals.lean`): `numeral : ℕ → Term` + homomorfismo `numeral_add/mul/pow`, orden `numeral_lt`, separación `numeral_ne`. El puente meta↔object.
 - [x] **Cuantificación acotada** (`Full/Bounded.lean`): `le_numeral_split` — `d ≤ numeral n` ⇒ casos finitos `d = numeral i`. Convierte ∀ acotado en análisis finito.
 - [x] **Divisibilidad** (`Full/Divisibility.lean`): `numeral_dvd` (meta ∣ → object Dvd) + `divisor_le` (divisor de positivo es ≤).
@@ -4271,14 +4309,14 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 - [x] **Unicidad ℕ** (`Full/PrimeFactor.lean`): `euclid` (lema de Euclides vía `Nat.Coprime.dvd_of_dvd_mul_left` de core), `euclid_list`, `prime_dvd_prime_eq`, `natProd_erase`, `count_unique` (misma multiplicidad de cada primo) y **`factorization_perm_unique`** (dos factorizaciones del mismo `n` son permutaciones). Todo ℕ puro, sin Mathlib.
 - [x] **TFA completo** (`Full/Factorization.lean`): **`tfa_numeral`** — `∀ n≥1, ∃ ps, (∀p∈ps, IsPrimeNat p) ∧ (⊢ prod_pairs (toTerm ps) =eq numeral n) ∧ (∀ qs factorización de n → ps.Perm qs)`. Existencia object + unicidad ℕ. La unicidad usa hipótesis meta `natProd qs = n` (evita reflejar igualdad de numerales, que necesitaría `Con(axioms)`).
 
-> **`ax_p_tfa` de Block8** (membership object + testigo único object) queda como la forma **idealizada**: no admite discharge constructivo por el Muro 1 (object→meta). `tfa_numeral` es la realización constructiva equivalente para todos los usos reales (numerales/códigos).
+> **`ax_p_tfa` de Block8** (membership object + testigo único object) queda como la forma **idealizada**: no admite discharge constructivo por el Muro 1 (object→meta). `tfa_numeral` es la realización constructiva equivalente para todos los usos reales (numerales/códigos). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### 4.2. Restantes tras TFA
 
 - [x] **Nivel D Gödel — Gödel I (mitad esencial)** (`Meta/Incompleteness.lean`, 2026-06-12): `goedel_first_unprovable` (`Consistent → ⊬ G`), `goedel_first_true`, `incompleteness`. Derivado de D1 + diagonalización del Nivel C.
 - [x] **Gödel II** (`goedel_second`, 2026-06-12): `Consistent → ⊬ Con` (`Con := ¬Prov(⌜⊥⌝)`). **Postulando D2/D3**; lema crucial `con_imp_goedelSentence : ⊢ Con⇒G`.
 - [ ] ⚠️ **Gödel I completo — REVERTIDO por la auditoría 2026-07-13.** Se marcó ✅ el 2026-06-13
-      (`goedel_first_unrefutable`, `goedel_first_undecidable`: `⊬¬G`, luego `⊬G ∧ ⊬¬G`, G indecidible),
+      (`goedel_first_unrefutable`, `goedel_first_undecidable`: `⊬¬G`, luego `⊬G ∧ ⊬¬G`, G indecidible), 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
       **pero en la capa LEGACY**, apoyándose en el postulado **falso en general** `provFormula_repr`
       (su dirección `.mp` es la representabilidad **negativa**, que NO se sigue de la consistencia
       simple — y el teorema se enunciaba bajo `Consistent`). **F7a lo retiró, y con razón: era un
@@ -4306,7 +4344,7 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 - [x] **Fase 2.4** (`Meta/CheckArith.lean` + `Minimal/Axioms`): `numeralM`, extractores `carc`/`cdrc`; **`validProofFn`** + `forall_5` + 17 ecuaciones del verificador (params directos; MP/Gen condicionados por `In`) + 17 step lemmas `vpf_*` + lema 4-lift `substTerm_liftLiftLiftLift`; **`provFormulaC`** (demostrabilidad Σ₁) + `provCodeC`. **Pendiente regla `thy`**: nudo de capas (`formCode`/Meta vs `Minimal.axioms`); plan `formCode` a nivel Minimal vía `numeralM`.
 - [x] **Fase 2.4-thy + soundness de `thy`** (`Minimal/Axioms` + `Meta/CheckArith`): verificador completo (18 reglas). `thy` recorre `coreAxioms` y es condicional a `In c axiomsCodeT` (`provCodeC` fiel). `formCodeM` + clausura De Bruijn estructural (numerales gigantes de símbolos Unicode).
 - [x] **Fase 2.5** (`Meta/Representability.lean`): representabilidad positiva `repr_pos : Prf φ → axioms ⊢ provCodeC φ` (encoder object a medida `proofCode`/`lineCode` + inducción de seguimiento `vpf_run`). `#print axioms` = estándar.
-- [x] **Fase 3 (D1)** (`Meta/Necessitation.lean`): `d1`/`necessitation` (= `repr_pos`) + Gödel I modular `goedel_first_unprovable_real`.
+- [x] **Fase 3 (D1)** (`Meta/Necessitation.lean`): `d1`/`necessitation` (= `repr_pos`) + Gödel I modular `goedel_first_unprovable_real`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 - [x] **Lema diagonal real** (`Meta/Diagonal.lean`): `tcFn`/`tc_arith` + `diag_arith` + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`** + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (sin postulados gödelianos).
 - [x] **Fase 2.6 cimiento** (`Meta/CodeDistinct.lean`): aritmética negativa de códigos `formCode_ne` + familia.
 - [x] **Fase 5 — regla `ind` INTEGRADA** (`Meta/Induction.lean` + stack): `ind_concl_code` + `Prf.ind`/`Rule.ind`/**`ax_vpf_ind`** sólida + `vpf_ind` + caso ind de `vpf_run`. **Verificador: 19 reglas.** `provCodeC` rastrea **IΣ₁**. `repr_pos`/`vpf_ind` `#print axioms` = estándar; `goedel_first_real` cita además `Full.ax_induction` (honesto: Prf modela IΣ₁).
@@ -4331,7 +4369,7 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
   - **Camino a Gödel II 100% real** (descubierto al analizar D3):
     - [x] **Refactor `Prf.thy → axioms`** ✅ (2026-06-21): `Prfᵢ.thy` recorre todo `axioms`
       (core++coding); la teoría razona sobre su propia maquinaria (como IΣ₁). Ancla gigante
-      `ax_axiomsCodeT` ELIMINADA, `axiomsCodeT` opaco, nuevo meta-axioma
+      `ax_axiomsCodeT` ELIMINADA, `axiomsCodeT` opaco, nuevo meta-axioma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
       `ax_inAxC (a ∈ axioms) : ⊢ In (formCodeM a) axiomsCodeT` (sin término gigante ni
       auto-referencia; sonda validó el lift en un paso). Fixes thy en
       `Hilbert`/`HilbertSeq`/`Representability`/`Representability2`. Build 55 jobs.
@@ -4348,7 +4386,7 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
       - [ ] **D3 real** (Σ₁-completitud provable, núcleo).
     - [ ] **R6 — D3 real** (Σ₁-completitud provable): `⊢ ∀q. (R(q) ⇒ Prov(⌜R(q)⌝))` por inducción
       OBJECT sobre `q` (internaliza `repr_pos'`/`chainOk_track`) + ∃-intro interno + ex_elim.
-      La pieza más grande del proyecto. (NOTA: `d3_of_sigma1` en `Reflection.lean` fue descomposición
+      La pieza más grande del proyecto. (NOTA: `d3_of_sigma1` en `Reflection.lean` fue descomposición 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
       errónea —ex_elim sobre witness opaco—; superada por este plan.)
   - [ ] **R7**: replicar `con_imp_goedelSentence`/`goedel_second` con `provCodeC'`/`godelC` → **Gödel II real** (`⊬ Con`).
 - [ ] **⊬¬G real** (reflexión / ω-soundness) + representabilidad **negativa** plena.

@@ -4,42 +4,45 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import FOL.FOL
-import FOL.MetaRules
 import FOL.Finitary0
-import ROBINSON_PlusPlus.Full.Lists
+import FOL.Fresh0
+import FOL.Soundness0
+import FOL.Propositional0
+import ROBINSON_PlusPlus.Minimal.Axioms
 
 /-!
 # SONDEO · L1‑3 — los postulados de la capa `⊢` son REFUTABLES (2026‑10‑02)
 
-**Pregunta** (auditoría de la base, ronda 1: L1‑3, L2‑4 y L4‑1): ¿es consistente el entorno que RPP
-importa, `FOL.FOL` + `FOL.MetaRules`? La doctrina escrita decía que sí mientras nadie indujera sobre
-`Derives` (M‑11; `FOL/AXIOMS.md:293`, `FOL/FOL/Inconsistencia.lean:16-18` y `:66`, ADR‑025: «RPP no está
-afectado»).
+**Pregunta** (auditoría de la base, ronda 1: L1‑3, L2‑4 y L4‑1; ronda 2: R2‑4‑1): ¿es consistente el
+entorno que RPP importaba, `FOL.FOL` + `FOL.MetaRules`? La doctrina escrita decía que sí mientras nadie
+indujera sobre `Derives` (M‑11; `FOL/AXIOMS.md:293`, `FOL/FOL/Inconsistencia.lean:16-18` y `:66`,
+ADR‑025: «RPP no está afectado»).
 
 ## 🏁 Respuesta, COMPILADA: no
 
-1. `derives_tval`: los 22 constructores de `Derives` son sólidos para la valuación booleana `tval` de
-   `FOL.Finitary0`, por INDUCCIÓN y sin ningún axioma (`[propext, Quot.sound]`). El recursor cubre por
+1. `derives_tval` (§1): los 22 constructores de `Derives` son sólidos para la valuación booleana `tval`
+   de `FOL.Finitary0`, por INDUCCIÓN y sin ningún axioma (`[propext, Quot.sound]`). El recursor cubre por
    definición a TODOS los habitantes, también a los que fabrican los `axiom`.
 2. ⇒ los ENUNCIADOS de `imp_intro`, `raa` y `ax_list_induction` son FALSOS, y se demuestra sin usarlos
    (§2: `imp_intro_refutable`, `raa_refutable`, `ax_list_induction_refutable`).
-3. ⇒ el entorno que los postula demuestra `False` (§3: `imp_intro_false`, `raa_false`,
-   `ax_list_induction_false`, cada uno con su axioma en el footprint).
+3. ⇒ el entorno que los postulaba demostraba `False` (§3, hoy un REGISTRO: se borró al retirarlos).
+4. Y los otros dos (§4, ronda 2): sin las meta‑reglas, `Derives` se traduce a `Derives₀`
+   (`derives_to_derives0`) y es sólido para Tarski (`derives_soundness`) ⇒ `ex_elim` cae con un modelo
+   de dos puntos y `or_elim` con el tercio excluso (`ex_elim_refutable`, `or_elim_refutable`).
+   **Las cuatro meta‑reglas de `FOL/MetaRules.lean` son falsas**, no sólo dos.
 
 🔑 *El problema nunca fue INDUCIR: el axioma es falso, y el recursor lo demuestra.* M‑11 evitaba ESCRIBIR la
-contradicción, no la quitaba. Todo teorema con uno de estos axiomas en el footprint es teorema de una teoría
-inconsistente: 53 de las 517 filas de `check-footprints.bash` el 2026‑10‑02 (`negVerifier_proved`,
-`derives_completo`, `GodelTwo.d3`, el censo de `coreAxioms`, la librería de `Minimal`/`Full`…).
+contradicción, no la quitaba. Todo teorema con uno de estos axiomas en el footprint era teorema de una
+teoría inconsistente: 53 de las 517 filas de `check-footprints.bash` el 2026‑10‑02 (42 de `ChainNegPrf`, con
+`negVerifier_proved`; 5 de `CodeDistinct`; y `AxiomListCode`, `GodelTwo.d3`, `LineWFCases`, `OmegaStrength`
+—`derives_completo`—, `VerifierSound` y una de FOL).
 
 ## Uso como control negativo
 
 Decisión del propietario (2026‑10‑02): la capa `⊢` se retira como capa de trabajo y las meta‑reglas de FOL
-se retiran, «no hacemos uso de herramientas que no sean verdaderas». Cuando eso ocurra, la §3 dejará de
-compilar y se borra; **la §2 sigue valiendo para siempre**: dice que esos enunciados no se pueden volver a
-postular sin hacer inconsistente a Lean.
-
-⚠️ No medido aquí: `or_elim` (con `P ∨ ¬P` pide una derivación del tercio excluso sólo con constructores) y
-`ex_elim` (pide un modelo de dos puntos).
+se retiran, «no hacemos uso de herramientas que no sean verdaderas» (ADR‑115). Hecho: la §3 dejó de
+compilar y se ha borrado (queda su registro). **La §2 y la §4 valen para siempre**: dicen que esos
+enunciados no se pueden volver a postular sin hacer inconsistente a Lean.
 -/
 
 open FOL.Finitary0
@@ -104,13 +107,15 @@ theorem P_no : Not (([] : List Formula) ⊢ Formula.atom "P" []) := fun h => by
 
 /-! ## §2 · Los ENUNCIADOS de los postulados, refutados SIN usarlos (valen para siempre) -/
 
-/-- El enunciado de `FOL.MetaRules.imp_intro` (`MetaRules.lean:78`). -/
+/-- El enunciado de `FOL.MetaRules.imp_intro` (`MetaRules.lean:78`; RPP dejó de importarlo con ADR‑115 y FOL lo
+    retira). -/
 def ImpIntro : Prop := ∀ {Γ : List Formula} {A B : Formula}, (Γ ⊢ A → Γ ⊢ B) → Γ ⊢ (A ⇒ B)
 
-/-- El enunciado de `FOL.MetaRules.raa` (`MetaRules.lean:110`). -/
+/-- El enunciado de `FOL.MetaRules.raa` (`MetaRules.lean:110`; RPP dejó de importarlo con ADR‑115 y FOL lo retira). -/
 def Raa : Prop := ∀ {Γ : List Formula} {A : Formula}, (Γ ⊢ A → Γ ⊢ Formula.bottom) → Γ ⊢ neg A
 
-/-- El enunciado de `ROBINSON_PlusPlus.Full.ax_list_induction` (`Full/Lists.lean:79-82`). -/
+/-- El enunciado de `ROBINSON_PlusPlus.Full.ax_list_induction` (`Full/Lists.lean:79-82`, retirado con
+    ADR‑115). -/
 def AxListInduction : Prop :=
   ∀ {Γ : List Formula} (φ : Term → Formula), (Γ ⊢ φ ROBINSON_PlusPlus.Minimal.Axioms.nil) →
     (∀ h t : Term, Γ ⊢ (φ t ⇒ φ (ROBINSON_PlusPlus.Minimal.Axioms.cons h t))) → ∀ L : Term, Γ ⊢ φ L
@@ -143,12 +148,121 @@ theorem ax_list_induction_refutable : Not AxListInduction := fun H => by
   have := derives_tval hb true (fun _ hx => absurd hx List.not_mem_nil)
   simp [tval] at this
 
-/-! ## §3 · Y por tanto el ENTORNO que los postula demuestra `False` (se borra al retirarlos) -/
+/-! ## §3 · REGISTRO — el ENTORNO que los postulaba demostraba `False` (borrado con ADR‑115)
 
+Compilado el 2026‑10‑02 contra FOL `80d598c` y RPP `1dac85a`, antes de la retirada:
+
+```lean
 theorem imp_intro_false : False := imp_intro_refutable (fun h => FOL.MetaRules.imp_intro h)
 theorem raa_false : False := raa_refutable (fun h => FOL.MetaRules.raa h)
 theorem ax_list_induction_false : False :=
   ax_list_induction_refutable (fun φ b s L => ROBINSON_PlusPlus.Full.ax_list_induction φ b s L)
+```
+
+con footprints MEDIDOS `imp_intro_false` → `[propext, Quot.sound, FOL.MetaRules.imp_intro]` y
+`raa_false` → `[propext, Quot.sound, FOL.MetaRules.raa]` (el de `ax_list_induction_false` quedó truncado en
+la salida guardada: no se cita). Hoy no compilan: este fichero ya no importa `FOL.MetaRules` (que FOL
+retira) y `ax_list_induction` ya no existe, que es exactamente lo que se buscaba.
+-/
+
+/-! ## §4 · Sin las meta‑reglas, `Derives` ES `Derives₀`, es sólido para Tarski, y las otras dos caen
+
+Ronda 2 de la auditoría (R2‑4‑1). Esto es lo que respalda que retirar `FOL/MetaRules.lean` no pierde
+NADA: lo que queda de `⊢` (los 22 constructores) se traduce al cálculo sólido y completo `⊢₀`. -/
+
+section DerivesEsDerives0
+
+open FOL.Eigenvariable FOL.Lift0 FOL.Fresh0 FOL.Metamath.Semantics
+open FOL.Metamath.Soundness0 (Mtrue Mfalse P)
+
+/-- El núcleo de `Henkin0.abs_neg_witness` (`:163`) sin el `neg`. -/
+theorem abs_witness (c : String) (A : Formula) (hcA : Not (occursFormula c A)) :
+    absFormula c 0 (substFormula 0 (Term.func c []) A) = A := by
+  rw [absFormula_subst c A 0 0 (Nat.le_refl 0), absFormula_eq_lift c A 1 hcA]
+  have hc : absTerm c 0 (Term.func c []) = Term.var 0 := by simp [absTerm]
+  rw [hc, substFormula_lift_var A 0]
+
+/-- 🏁 Los 22 constructores de `Derives` se traducen a `Derives₀`; `gen_rule` es ADMISIBLE: basta su
+    premisa en UNA constante fresca. -/
+theorem derives_to_derives0 {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) : Γ ⊢₀ f := by
+  induction h with
+  | hyp Γ f hm => exact Derives₀.hyp Γ f hm
+  | intro_impl Γ A B _ ih => exact Derives₀.intro_impl Γ A B ih
+  | elim_impl Γ A B _ _ ih1 ih2 => exact Derives₀.elim_impl Γ A B ih1 ih2
+  | intro_and Γ A B _ _ ih1 ih2 => exact Derives₀.intro_and Γ A B ih1 ih2
+  | elim_and_l Γ A B _ ih => exact Derives₀.elim_and_l Γ A B ih
+  | elim_and_r Γ A B _ ih => exact Derives₀.elim_and_r Γ A B ih
+  | intro_or_l Γ A B _ ih => exact Derives₀.intro_or_l Γ A B ih
+  | intro_or_r Γ A B _ ih => exact Derives₀.intro_or_r Γ A B ih
+  | elim_or Γ A B C _ _ _ ih1 ih2 ih3 => exact Derives₀.elim_or Γ A B C ih1 ih2 ih3
+  | intro_forall Γ A _ ih => exact Derives₀.intro_forall Γ A ih
+  | elim_forall Γ A t _ ih => exact Derives₀.elim_forall Γ A t ih
+  | intro_ex Γ A t _ ih => exact Derives₀.intro_ex Γ A t ih
+  | elim_ex Γ A B _ _ ih1 ih2 => exact Derives₀.elim_ex Γ A B ih1 ih2
+  | bot_elim Γ A _ ih => exact Derives₀.bot_elim Γ A ih
+  | weakening Γ Γ' f _ hsub ih => exact Derives₀.weakening Γ Γ' f ih hsub
+  | rewrite_at Γ f f' p sub sub' _ hget hrule heq ih =>
+      exact Derives₀.rewrite_at Γ f f' p sub sub' ih hget hrule heq
+  | gen_rule Γ A _ ih =>
+      obtain ⟨N1, h1⟩ := cst_bound_list Γ
+      obtain ⟨N2, h2⟩ := cst_bound_formula A
+      have hΓ := h1 (max N1 N2) (Nat.le_max_left _ _)
+      have hA := h2 (max N1 N2) (Nat.le_max_right _ _)
+      have h := derives0_gen_fresh (cst (max N1 N2)) hΓ (ih (Term.func (cst (max N1 N2)) []))
+      rwa [abs_witness _ A hA] at h
+  | dne_rule Γ A _ ih => exact Derives₀.dne_rule Γ A ih
+  | dne_schema Γ A => exact Derives₀.dne_schema Γ A
+  | forall_not_ex_not Γ A => exact Derives₀.forall_not_ex_not Γ A
+  | refl Γ t => exact Derives₀.refl Γ t
+  | subst Γ t₁ t₂ f _ _ ih1 ih2 => exact Derives₀.subst Γ t₁ t₂ f ih1 ih2
+
+/-- 🏁 La solidez de TARSKI de `Derives`: la que los docstrings de FOL llamaban FALSA. -/
+theorem derives_soundness {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) : satisfies Γ f :=
+  derives0_soundness (derives_to_derives0 h)
+
+private def MB : Model Bool := ⟨fun _ _ => false, fun _ ds => ds = [true]⟩
+private def vB : Nat → Bool := fun _ => false
+private def PA : Formula := Formula.atom "P" [Term.var 0]
+
+/-- 🏁 El ENUNCIADO de `FOL.MetaRules.ex_elim`, refutado sin usarlo (modelo de dos puntos). -/
+theorem ex_elim_refutable :
+    Not (∀ {Γ : List Formula} {A C : Formula}, (Γ ⊢ Formula.ex A) →
+      (∀ t : Term, (Γ ⊢ substFormula 0 t A) → (Γ ⊢ C)) → (Γ ⊢ C)) := by
+  intro hex
+  have hΓ : contextSatisfies MB vB [Formula.ex PA] := by
+    intro g hg
+    cases hg with
+    | head => simp [PA, MB, evalFormula, evalTerms, evalTerm, shiftEnv]
+    | tail _ h => exact absurd h List.not_mem_nil
+  have hterm : ∀ t : Term, evalTerm MB vB t = false := by
+    intro t; cases t <;> simp [evalTerm, MB, vB]
+  have hno : ∀ t : Term, Not ([Formula.ex PA] ⊢ substFormula 0 t PA) := by
+    intro t ht
+    have := derives_soundness ht Bool MB vB hΓ
+    simp [PA, MB, substFormula, substTerms, substTerm, evalFormula, evalTerms] at this
+    exact absurd this (by simpa [MB] using hterm t)
+  exact derives_soundness
+    (hex (Γ := [Formula.ex PA]) (A := PA) (C := Formula.bottom)
+      (Derives.hyp _ _ (List.Mem.head _)) (fun t ht => absurd ht (hno t)))
+    Bool MB vB hΓ
+
+/-- 🏁 El ENUNCIADO de `FOL.MetaRules.or_elim`, refutado sin usarlo (tercio excluso y los dos modelos
+    sobre `Unit`). -/
+theorem or_elim_refutable :
+    Not (∀ {Γ : List Formula} {A B C : Formula}, (Γ ⊢ Formula.or A B) →
+      ((Γ ⊢ A) → (Γ ⊢ C)) → ((Γ ⊢ B) → (Γ ⊢ C)) → (Γ ⊢ C)) := by
+  intro hor
+  have hem : ([] : List Formula) ⊢ Formula.or P (neg P) :=
+    derives0_to_derives (FOL.Propositional0.derives0_em_ctx [] P)
+  have h1 : Not (([] : List Formula) ⊢ P) := fun h =>
+    derives_soundness h Unit Mfalse (fun _ => ()) (fun _ hf => absurd hf List.not_mem_nil)
+  have h2 : Not (([] : List Formula) ⊢ neg P) := fun h =>
+    derives_soundness h Unit Mtrue (fun _ => ()) (fun _ hf => absurd hf List.not_mem_nil) trivial
+  exact derives0_consistent (derives_to_derives0
+    (hor (Γ := []) (A := P) (B := neg P) (C := Formula.bottom) hem
+      (fun h => absurd h h1) (fun h => absurd h h2)))
+
+end DerivesEsDerives0
 
 end Sondeos.MetaReglasRefutables
 
@@ -156,6 +270,7 @@ end Sondeos.MetaReglasRefutables
 #print axioms Sondeos.MetaReglasRefutables.imp_intro_refutable
 #print axioms Sondeos.MetaReglasRefutables.raa_refutable
 #print axioms Sondeos.MetaReglasRefutables.ax_list_induction_refutable
-#print axioms Sondeos.MetaReglasRefutables.imp_intro_false
-#print axioms Sondeos.MetaReglasRefutables.raa_false
-#print axioms Sondeos.MetaReglasRefutables.ax_list_induction_false
+#print axioms Sondeos.MetaReglasRefutables.derives_to_derives0
+#print axioms Sondeos.MetaReglasRefutables.derives_soundness
+#print axioms Sondeos.MetaReglasRefutables.ex_elim_refutable
+#print axioms Sondeos.MetaReglasRefutables.or_elim_refutable

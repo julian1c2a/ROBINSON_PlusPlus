@@ -287,7 +287,7 @@ PLANNING.md
 PLAN-PRUEBAS.md
 PLAN-SORTES.md
 Sobre_el_libro.md
-TEOREMAS-E-HIPOTESIS.md
+# TEOREMAS-E-HIPOTESIS.md — SALDADA el 2026-10-02 (ADR-115): reescrito entero, con su marca.
 THOUGHTS.md
 TuplasFuncionesYListas.md
 WORKFLOW.md
@@ -445,6 +445,11 @@ AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/RE
 # Marcadores que hacen LEGÍTIMA la mención de un símbolo inexistente:
 #   (a) se declara retirado;  (b) es hipotético/propuesto/descartado;  (c) va en una
 #   entrada fechada (histórico por diseño).
+# ⚠️⚠️ MEDIDO EL 2026-10-02 (ADR-115): en msys (GNU grep 3.0, locale es_ES.UTF-8) la alternativa
+# `🗑️` de abajo NO CASA NUNCA — grep no maneja en UTF-8 un carácter fuera del BMP (`⏳` y `✏` sí casan;
+# `🗑` no, con o sin U+FE0F; con LC_ALL=C sí). En la CI (Linux) casa. ⇒ el MISMO documento podía dar
+# verde en CI y rojo en local. Regla: una marca de retirada lleva SIEMPRE una palabra (`retirad…`),
+# no sólo el emoji. 🔑 *Un patrón que no casa en el entorno donde se ejecuta no es un patrón.*
 DEAD_MARKER='YA NO EXISTE|NO EXISTEN|retirad|RETIRADO|eliminad|borrad|legacy|F7a|histórico|ANTERIORES|🗑️|muert|Aquí vivía|tampoco existe|inexistente|desapareci|ya no son|se borró'
 DEAD_MARKER="$DEAD_MARKER"'|propuest|candidat|hipot[eé]tic|har[ií]a falta|si se |habr[ií]a que|añadir |descartad|no existe|NO EXISTE|sin materializar|20[0-9]{2}-[0-9]{2}-[0-9]{2}'
 #   (d) es un OBJETIVO declarado, no una afirmación de que ya está.

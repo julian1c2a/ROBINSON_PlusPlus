@@ -1,5 +1,19 @@
 # Current Project Status — ROBINSON_PlusPlus
 
+> ### 🗑️ 2026‑10‑02 · la capa `⊢` RETIRADA ([ADR‑115](DECISIONS.md)) — y lo que eso NO arregla
+>
+> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
+> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
+> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
+> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
+> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
+> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
+> con **0 `axiom` de Lean**.
+> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
+> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+> Lo que sigue es el estado del 2026‑09‑10c y se conserva como registro.
+
 > ## ESTADO REAL — 2026-09-10c · **`master`** · 🏁 **VÍA C INTEGRADA** (ADR-020) · ✅ **ÁRBOL VERDE** · ✅ **CI VERDE**
 >
 > 🏁🏁🏁 **D3 ESTÁ EN UNA SOLA OBLIGACIÓN: `hbody`** (§3.58). `d3_prf_of_body_only` la cierra desde
@@ -52,7 +66,7 @@
 > había arrancado nunca** (YAML inválido). Arreglado el 2026‑09‑09, y lo primero que encontró
 > fueron **siete documentos autoritativos** con la cifra de jobs obsoleta.
 >
-> 🏁 **`Build completed successfully (145 jobs)`.** La enmienda de los 7 esquemas está aplicada y
+> 🏁 **`Build completed successfully (145 jobs)`** (entonces). La enmienda de los 7 esquemas está aplicada y
 > **el árbol entero compila con ella**. La rama `via-c-adr020` (20 commits) se **integró en
 > `master`** el 2026-09-07 con merge commit `7bc2c8a`, y el build se verificó verde **después** del
 > merge, no sólo en la rama.
@@ -226,7 +240,7 @@
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   **numeral** `godelCN`.
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
 >   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
@@ -287,7 +301,7 @@
 | `Minimal/Theorems/Block5.lean` | 0 | ✅ `proj1_pair_eq_x`, `proj2_pair_eq_y`, `pair_proj_eq_c`, `pair_inj`, `is_cantor_pair` (mod2_of_even movido a Block4_C6_C7 el 2026-06-03) |
 | `Minimal/Theorems/Block6.lean` | 0 | ✅ Todos probados (`concat_assoc` e `in_concat_iff` vía ax_C3/ax_L3 nuevos) |
 | `Minimal/Theorems/Block7.lean` | 0 | ✅ `IsFunction`, `Functional`, `teo_F1`, `teo_F2`, `teo_F3` (Bloque VII spec) |
-| `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `IsFactorization`, `ax_p_tfa` (TFA), pow/prod_pairs + **10 teoremas** (álgebra de `Dvd`, corolarios TFA) — Bloque VIII Fase 17 completa |
+| `Minimal/Theorems/Block8.lean` | 0 | ✅ `Dvd`, `IsPrime`, `IsFactorization`, `ax_p_tfa` (TFA), pow/prod_pairs + **10 teoremas** (álgebra de `Dvd`, corolarios TFA) — Bloque VIII Fase 17 completa 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | `Meta/Godel.lean` | 0 | ✅ Nivel B Gödelización: `Sym`, `gNat`, `numeral`, `G`, `encode` (`⌜·⌝`), `encode_injective` (Teo G1) |
 | `Meta/Provability.lean` | 0 | ✅ Nivel C (núcleo real): `formCode`+inyectividad, `IsFormula`, `Provable` (+`provable_formCode_iff`). Capa legacy (`Dem`/`diagonal_lemma`/`goedelSentence`/…) retirada en F7a |
 | `Meta/NumListPrf.lean` | 0 | ✅ 12‑A/1a: `prf_lenc_nil/cons`, `prf_nthc_zero/succ` |
@@ -297,20 +311,20 @@
 | `Meta/ChainOkBoundedPrf.lean` | 0 | ✅ 12‑A/2 (`chainOk`): `prf_premOk_cons_iff`, `prf_allIn_iff_boundedAllIn`, **`prf_chainOk_iff_chainOkB`** |
 | `Meta/CodeDecode.lean` | 0 | ✅ `NegVerifier` A.1 (§43): `decodeNat`/`decodeChars`/`decodeStr`/`decodeTerm`/`decodeForm` + round‑trips + **inyectividad** ⟹ `decodeForm` es una **biyección** |
 | `Meta/LineWFCases.lean` | 0 | ✅ `NegVerifier` B (§44): `tagArity`/`tagConcl`/`tagPrems` + `prf_lineWF_tag`/`prf_premsOf_tag` + dirección negativa (`derives_lineWF_neg_*`). `tagConcl` cubre **19, no 21** (`thy` va por `In`; `mp` es incondicional) |
-| `Meta/LineWFDerives.lean` | 0 | ✅ Des‑duplicación: los 42 `lineWF_*`/`premsOf_*` de `⊢` son `prf_to_derives` de sus gemelos `prf_*` (antes: probados dos veces) |
+| `Meta/LineWFDerives.lean` | 0 | ✅ Des‑duplicación: los 42 `lineWF_*`/`premsOf_*` de `⊢` son `prf_to_derives` de sus gemelos `prf_*` (antes: probados dos veces) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | `Meta/ChainDecode.lean` | 0 | ✅ `NegVerifier` A.2 (§43): `decodeRule`/`decodeLine`/`decodeChain`, `DecidableEq Term`/`Formula` + `findIdx`, secciones `thy`/`mp`/`gen`, ensamblado **`decodeChain_prf`** (cadena aceptada ⟹ `Prf`) |
 | `Meta/NatOrderPrf.lean` | 0 | ✅ Orden `≤` en `Prf`: transitividades, sustitución, `prf_add_assoc`/`prf_add_comm`. ⚠️ Asoc./conm. de `+` son **axiomas objeto** (ax6/ax7), no se prueban por inducción |
 | `Meta/NatMulPrf.lean` | 0 | ✅ Producto en `Prf` (leyes = ax8–ax12), monotonía, **cancelación** `prf_lt_of_mul_lt_mul_right`, tricotomía, `div2`/`mod2` (ax17/ax21) |
 | `Meta/CantorMonoPrf.lean` | 0 | ✅ **`prf_cantor_mono_left/right`** — sub‑código < código, en 13 pasos troceados. Aquí vive `abbrev cpOf` |
 | `Meta/Div2ParityPrf.lean` | 0 | ✅ **`prf_div2_numeral`** (cadena L1–L5, forma OBJETO, net‑0) + **paridad de Cantor**: `prf_mod2_consec`, `prf_mod2_cpOf`, **`prf_pair_double`** (el puente de la fase C de `pcc_dot_cons`; `prf_cons_double`, retirado por ADR-113) |
 | `Meta/CodeNumeralPrf.lean` | 0 | ✅ **LA REPARACIÓN**: `triN`/`consN` (números triangulares ⇒ **sin división**), `codeNat`, **`prf_formCode_numeral`** por meta‑recursión |
-| `Meta/DiagonalNumeral.lean` | 0 | ✅ Lema diagonal por la **vía NUMERAL**: `hFN`, `godelCN`, `godelCN_fixedpoint`, `provCode_transfer`, **`goedel_first_numeral`** (Gödel I), `goedel_first_undecidable_numeral` |
+| `Meta/DiagonalNumeral.lean` | 0 | ✅ Lema diagonal por la **vía NUMERAL**: `hFN`, `godelCN`, `godelCN_fixedpoint`, `provCode_transfer`, **`goedel_first_numeral`** (Gödel I), `goedel_first_undecidable_numeral` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | `Meta/StrongInductionPrf.lean` | 0 | ✅ `prf_strong_induction` (inducción fuerte en `Prf`) + `prf_le_of_lt_succ` |
 | `Meta/EvalMulPrf.lean` | 0 | ✅ Escalera (a.2) peldaño 2: **`pcc_eval_mul`** + `pcc_congr_addcT1_code_imp`, `pcc_eq_subst2_code_imp` |
 | `Meta/DotConsPrf.lean` | 0 | ✅ Escalera (a.2) peldaño 4: **`pcc_dot_cons`** — `⊢ Prov(⌜cons(ḣ,ṫ) = (cons h t)˙⌝)`, argumentos abstractos. Herramientas nuevas `pcc_rw`/`pcc_rw_div2` |
-| `Full/Induction.lean` | 0 | ✅ Inducción general object-level. 🆕 **2026‑09‑10h ([ADR‑023](DECISIONS.md))**: el axioma es hoy **`ax_induction_prim`** (sobre `primAxioms`) y **`ax_induction` es TEOREMA**; el módulo migró entero (35 declaraciones) ⇒ **ax6/7/10/11/12/18/19 CERTIFICADOS** (`*_thm_prim`), con las firmas `axioms ⊢` re‑expuestas por debilitamiento. Más `primAxioms`/`prim_to_axioms`/`axp` |
-| `Full/Mod2.lean` | 0 | ✅ 🆕 **2026‑09‑10h: `ax_mod2_alternation` DEMOSTRADO** (era `axiom`) ⇒ **6 → 5** `axiom` de Lean. ⚠️ Y al retirarlo se vio que la Opción C.2 (2026‑06‑11) tenía un **CÍRCULO**: `ax21` se derivaba de él y él de `ax21`. **`ax21` es PRIMITIVO** (lo decía ya `MINIMAL-AXIOMS.md` §3.2: `ax16+ax17` dejan `mod2` subdeterminado) ⇒ censo **24 + 10**. **ax24 sigue derivado** |
-| `Full/Lists.lean` | 0 | ✅ Listas: meta-axioma `ax_list_induction` + **ax_C3 y ax_L3 derivados**. 🆕 **2026‑09‑10h: CERTIFICADOS sobre `primAxioms`** (`concat_assoc_prim`, `in_concat_prim`), con **cero cambios de axioma** porque `ax_list_induction` ya era genérico en `Γ` |
+| `Full/Induction.lean` | 0 | ✅ Inducción general object-level. 🆕 **2026‑09‑10h ([ADR‑023](DECISIONS.md))**: el axioma es hoy **`ax_induction_prim`** (sobre `primAxioms`) y **`ax_induction` es TEOREMA**; el módulo migró entero (35 declaraciones) ⇒ **ax6/7/10/11/12/18/19 CERTIFICADOS** (`*_thm_prim`), con las firmas `axioms ⊢` re‑expuestas por debilitamiento. Más `primAxioms`/`prim_to_axioms`/`axp` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
+| `Full/Mod2.lean` | 0 | ✅ 🆕 **2026‑09‑10h: `ax_mod2_alternation` DEMOSTRADO** (era `axiom`) ⇒ **6 → 5** `axiom` de Lean. ⚠️ Y al retirarlo se vio que la Opción C.2 (2026‑06‑11) tenía un **CÍRCULO**: `ax21` se derivaba de él y él de `ax21`. **`ax21` es PRIMITIVO** (lo decía ya `MINIMAL-AXIOMS.md` §3.2: `ax16+ax17` dejan `mod2` subdeterminado) ⇒ censo **24 + 10**. **ax24 sigue derivado** 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
+| `Full/Lists.lean` | 0 | ✅ Listas: meta-axioma `ax_list_induction` + **ax_C3 y ax_L3 derivados**. 🆕 **2026‑09‑10h: CERTIFICADOS sobre `primAxioms`** (`concat_assoc_prim`, `in_concat_prim`), con **cero cambios de axioma** porque `ax_list_induction` ya era genérico en `Γ` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | **Total** | **0** | 🎉 |
 
 *Status codes*: ✅ Complete · 🧊 Frozen · 🔶 Partial · 🔄 In progress · ❌ Pending
@@ -353,7 +367,7 @@
 
 - **2026-07-09 — F7a: retirada la capa Gödel legacy (14 → 7 `axiom`)**:
   Auditado con `#print axioms` que la cadena real (**entonces** `goedel_first_real'` —hoy
-  `goedel_first_numeral`—, `d2_prf`, `goedel_second'`)
+  `goedel_first_numeral`—, `d2_prf`, `goedel_second'`) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   no cita ninguno de los 7 postulados legacy. **Eliminado** el módulo `Meta/Incompleteness.lean`
   (Gödel I/II vía D2/D3 postulados) y retirados los 5 postulados de `Meta/Provability.lean`
   (`Dem`, `dem_iff_provable`, `provFormula`, `provFormula_repr`, `diagonal_lemma` + `goedelSentence`/

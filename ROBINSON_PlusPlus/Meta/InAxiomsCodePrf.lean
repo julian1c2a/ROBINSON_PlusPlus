@@ -9,6 +9,13 @@ import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf
 import ROBINSON_PlusPlus.Meta.D3InDotPrf
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`NegVerifier`, `prf_In_listFormCodeM`, `ax_axiomsCodeT_eq`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
@@ -56,7 +63,7 @@ código, RASTREADO), que `pcc_eval_carc` **evalúa** dentro de `Prov`. En el dis
 termCode (formCodeM f)` deja el argumento en una forma **concreta**, y ahí la pertenencia es libre
 (`repr_pos'_prf (prf_inAxiomsCodeT)`). El código rastreado **esquiva el muro**.
 
-### Diseño de la recursión (pendiente — el grueso `NegVerifier`)
+### Diseño de la recursión (hecho: abajo y en `Meta/LineWFThyPrf.lean`; era «el grueso de `NegVerifier`», retirado con ADR‑115)
 
 `pcc_In_lfc_tracked (yc y) (hbr : Prov(yc = tcFn y)) : ∀ L,
    Prf (In y (listFormCodeM L) ⇒ provFromCode (inFormCodeFn yc (termCode (listFormCodeM L))))`
@@ -70,7 +77,8 @@ por recursión sobre `L` (lista de axiomas ABSTRACTA — sin materializar el té
   - cola: **recursión** sobre `fs` + extensión de cola rastreada (reflejo de `ax_L2_in_cons` a
     códigos vía `pcc_thm_inst`).
 Luego el **puente `axiomsCodeT ↔ listFormCodeM axioms`** ocurre DENTRO de `Prov` (Leibniz reflejada
-del axioma `ax_axiomsCodeT_eq`), y la **evaluación de `carc t`** (`pcc_eval_carc` + `lineWF t` da la
+del anclaje `AnclaEq.eq`; aquí se citaba el `axiom` `ax_axiomsCodeT_eq`, su gemelo sobre `⊢`,
+retirado con ADR‑115), y la **evaluación de `carc t`** (`pcc_eval_carc` + `lineWF t` da la
 estructura `cons`) conecta `carcT (tcFn t)` con el `yc` de la recursión.
 
 ### Lo que este módulo entrega ya (libre de muro)
@@ -82,8 +90,8 @@ ya establecida `prf_inAxiomsCodeT`. Es la pieza que cada disyunto cabeza de la r
 
 /-- **Pertenencia CONCRETA reflejada en `Prov`** (payload del caso cabeza de la recursión):
     para un axioma `f`, `Prov(⌜In ⌜f⌝ axiomsCodeT⌝)` es demostrable **libre de muro** — la
-    pertenencia `In (formCode f) axiomsCodeT` es un `Prf` (`prf_inAxiomsCodeT` vía el meta‑axioma
-    `prf_inAxC`) y D1 (`repr_pos'_prf`) la internaliza. -/
+    pertenencia `In (formCode f) axiomsCodeT` es un `Prf` (`prf_inAxiomsCodeT` vía `prf_inAxC`,
+    un teorema con `[AnclaEq]` —no un meta‑axioma, como decía este docstring—) y D1 (`repr_pos'_prf`) la internaliza. -/
 theorem pcc_inAxiomsCodeT_concrete [AnclaEq] {f : Formula} (hmem : f ∈ axioms) :
     Prf (provCodeC' (In (formCode f) axiomsCodeT)) := by
   have h0 : Prf (In (formCodeM f) axiomsCodeT) := prf_inAxC f hmem

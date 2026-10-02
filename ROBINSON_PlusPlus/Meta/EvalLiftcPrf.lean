@@ -228,7 +228,7 @@ theorem hasWit_es_el_del_sondeo (c : Term) :
 theorem isTC1_es_el_del_sondeo (w c : Term) : isTC1 w c = land (wfAll1 w) (In c w) := rfl
 
 /-- **El duplicado `iz_inv` (`sondeos/DescensoLiftc.lean:538`) NO se promueve**: es
-    `EvalRunFnPrf.prf_substtc_termCode_nil`, porque `nil := zero` (`Minimal/Axioms.lean:126`)
+    `EvalRunFnPrf.prf_substtc_termCode_nil`, porque `nil := zero` (`Minimal/Axioms.lean`)
     y por tanto `termCode nil` y `termCode zero` son EL MISMO termino.
 
     ⚠️ El puente se enuncia como igualdad de PROPOSICIONES, no como `rfl` entre las dos

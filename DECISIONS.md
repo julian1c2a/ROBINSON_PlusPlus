@@ -1,8 +1,25 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-02 — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, se retiran después en FOL). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
-> ## ESTADO REAL — 2026‑09‑11 · `master` · 🏁🏁 **CADENA DE GÖDEL FINITARIA** (Gödel I y II sobre `Prf`, hipótesis **mínima** `ConsistentH`, **un solo axioma** en el footprint) · ⛔⛔ **`axioms ⊢` es COMPLETO** ([auditoría](doc/AUDITORIA-2026-09-11.md))
+> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+>
+> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
+> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
+> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
+> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
+> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
+> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
+> con **0 `axiom` de Lean**.
+> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
+> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+>
+> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
+>
+> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
+> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -10,16 +27,17 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
-> **131 módulos activos** (Minimal 11 + Meta 109 + Full 11) **+ 0 en `cuarentena/` + 61 en `sondeos/`.**
-> **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
 > * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
 >   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
 > * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia
+>   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   **numeral** `godelCN`.
 > * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
 >   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
@@ -73,7 +91,7 @@ algo por inducción es **`Prf₀`** (cero axiomas habitándolo), y es donde vive
 medido compilando): un `axiom` cuya premisa es `Γ ⊢ A → Γ ⊢ B` **tiene** que ser axioma —el kernel
 rechaza el `inductive`: *«has a non positive occurrence of the datatypes being declared»*—; uno cuya
 premisa sea un `Γ ⊢ …` directo o un `∀` sobre otro tipo **podría ser CONSTRUCTOR**.
-⚠️ **Y RPP FABRICA uno de los malos**: `ax_list_induction` (`Full/Lists.lean:55`) tiene
+⚠️ **Y RPP FABRICA uno de los malos**: `ax_list_induction` (`Full/Lists.lean:55`) tiene 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)` — **premisa‑FUNCIÓN**, la forma exacta de `raa`.
 🔑 **Regla de diseño**: *una regla que se quiere añadir a una relación inductiva se añade como
 **CONSTRUCTOR** (o con un inductivo que la envuelva), **nunca** como `axiom`. Un `axiom` **no
@@ -478,7 +496,7 @@ directa, sin razonar sobre divisibilidad.
 
 ### Consecuencias
 
-* **Gödel I sobrevive**: `goedel_first_numeral`, con la base sancionada de siempre **menos
+* **Gödel I sobrevive**: `goedel_first_numeral`, con la base sancionada de siempre **menos 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   `tc_cons`**. D1 y el argumento modular **no se re‑demostraron**: son modulares.
 * `provCode_transfer` puentea las dos representaciones en **un** paso de Leibniz.
 * **D3 y Gödel II salen de la cadena activa** (ver ADR-013).
@@ -590,7 +608,7 @@ buena‑formación sobre códigos. Dos opciones: **(1)** sancionarlo como axioma
 
 **Decisión**: **(2)**.
 
-**Justificación — y la razón de peso NO es el ahorro de líneas.** `ax_axiomsCodeT_eq`
+**Justificación — y la razón de peso NO es el ahorro de líneas.** `ax_axiomsCodeT_eq` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 (`Minimal/Axioms.lean:1376`) ancla a **`axioms`** (los 141, `:1199`), **no** a `coreAxioms` (`:922`).
 Luego los axiomas de (1) **tienen** que entrar en `axioms` para funcionar; `axiomsCodeT` los
 absorbe; el verificador interno los cita; **`provCodeC'` cambia ⇒ G cambia** (141 → ~159).
@@ -1406,6 +1424,9 @@ theorem junk_line_not_stdLine :
 3. ⭐ **Pero sí la cubre en el ÚNICO `∃` al que se aplica.** `reflects_of_omega` la usa sobre
    `A = provBody (formCode φ)`, cuyos testigos honestos son **códigos de prueba**, y ésos son
    estándar por `stdChain_proofCode'`. El hueco del punto 2 es **genérico, no operativo**.
+   ✏️ **FALSO (ADR‑114 L1‑4 · ADR‑115, 2026‑10‑02)**: el hueco no era sólo genérico. Con `A := #0 = 1` la
+   definición es **REFUTABLE** (`sondeos/OmegaConsistentRefutable.lean`), y una hipótesis refutable hace
+   vacuo el teorema que la supone, aunque la prueba sólo la aplique a `provBody`.
 4. Atenuante ya medido antes: **no era la ω‑consistencia clásica pura** ni siquiera antes —
    cuantifica sobre `objList l`, no sobre numerales arbitrarios. Es **estrechar lo ya estrecho**.
 
@@ -1428,8 +1449,8 @@ theorem junk_line_not_stdLine :
   medición puede ser **correcta como teorema** y **equivocada como conclusión**; hay que leer qué
   obligación queda **después** de aplicarla.
 
-**Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `reflects_of_omega` y
-`goedel_first_undecidable_omega` **sin tocar** (son paramétricos en `StdChain`).
+**Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `reflects_of_omega` y 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+`goedel_first_undecidable_omega` **sin tocar** (son paramétricos en `StdChain`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ---
 
@@ -1475,7 +1496,7 @@ Este ADR decide **(A)**. **(B)** queda descartada.
        Full/Induction.lean  : ax2, ax3, ax4, ax5, ax8, ax9, ax13            (7)
 
    ⇒ **no hay circularidad que romper**: la migración es **mecánica**.
-3. ⭐ **`ax_list_induction` YA es genérico en `Γ`** (`Full/Lists.lean`). ⇒ `ax_C3` y `ax_L3` se
+3. ⭐ **`ax_list_induction` YA es genérico en `Γ`** (`Full/Lists.lean`). ⇒ `ax_C3` y `ax_L3` se 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
    certifican **sin tocar ningún axioma**.
 
 ### Lo EJECUTADO hoy
@@ -1509,9 +1530,9 @@ que está **especializado a `axioms`**. Para certificar sobre `primAxioms` hace 
 axioma sobre `primAxioms` — y eso es **restatar un axioma** ⇒ **M‑1: sanción explícita**.
 
 ⚠️⚠️ **Y la salida fácil está CERRADA**: generalizarlo a `∀ {Γ}, Γ ⊢ inductionFormula φ` —la forma
-que `ax_list_induction` sí tiene— sería **FALSO**, porque con `Γ = []` diría que el esquema de
-inducción es **lógicamente válido**. `ax_list_induction` puede ser genérico porque es una **regla**
-(lleva `base` y `step` sobre el mismo `Γ`); `ax_induction` es un **axioma**, y un axioma tiene que
+que `ax_list_induction` sí tiene— sería **FALSO**, porque con `Γ = []` diría que el esquema de 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+inducción es **lógicamente válido**. `ax_list_induction` puede ser genérico porque es una **regla** 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+(lleva `base` y `step` sobre el mismo `Γ`); `ax_induction` es un **axioma**, y un axioma tiene que 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 **nombrar su contexto**.
 
 ⇒ 🏁 **RATIFICADO por el propietario el 2026‑09‑10h**, y ejecutado tal cual:
@@ -1520,10 +1541,10 @@ inducción es **lógicamente válido**. `ax_list_induction` puede ser genérico 
 axiom ax_induction_prim (φ : Formula) : primAxioms ⊢ inductionFormula φ
 
 theorem ax_induction (φ : Formula) : axioms ⊢ inductionFormula φ :=
-  prim_to_axioms (ax_induction_prim φ)          -- ⇒ `ax_induction` deja de ser axioma
+  prim_to_axioms (ax_induction_prim φ)          -- ⇒ `ax_induction` deja de ser axioma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 ```
 
-**No añade un axioma: lo MUEVE**, y el recuento queda igual — `ax_induction` pasa a teorema, y los
+**No añade un axioma: lo MUEVE**, y el recuento queda igual — `ax_induction` pasa a teorema, y los 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `axiom` de Lean **siguen siendo 6**. Dice exactamente lo que `Full` significa: *«los 23 primitivos
 **más** el esquema de inducción»*.
 
@@ -1540,28 +1561,28 @@ contexto** (`axioms ⊢ lt b a → …`), y ahí el debilitamiento va **en la di
 cierra el ángulo internando la implicación sobre `primAxioms`, **debilitando la implicación**, y
 aplicando `mp`. Regla: *un lema que consume el contexto no se debilita; se internaliza primero.*
 
-**Footprint de los certificados**: los tres de Lean + las ω‑reglas + **`ax_induction_prim`**. Nada
-de `ax_axiomsCodeT_eq` ni `prf_axiomsCodeT_eq`.
+**Footprint de los certificados**: los tres de Lean + las ω‑reglas + **`ax_induction_prim`**. Nada 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+de `ax_axiomsCodeT_eq` ni `prf_axiomsCodeT_eq`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### ⬜ Los 2 que faltan piden una SEGUNDA sanción — que **no** se ha pedido
 
 ax21 y ax24 se derivan en `Full/Mod2.lean`, y ahí:
 
-1. ⛔ **`ax_mod2_alternation`** es otro `axiom` **sobre `axioms`** — exactamente la situación que
+1. ⛔ **`ax_mod2_alternation`** es otro `axiom` **sobre `axioms`** — exactamente la situación que 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
    tenía `ax_induction`. Certificar ax21/ax24 exige moverlo igual, y eso es **otra decisión M‑1**.
 2. Además usa dos teoremas de `Block1` (`teo_1_3`, `teo_2_9`) enunciados sobre `axioms`.
 
 ### 🏁 Addendum 2026‑09‑10h — la pregunta previa se contestó, y el inventario bajó a **5**
 
-`ax_mod2_alternation` **era derivable**, y no hubo que moverlo: **se retiró**. De `ax21` (rango) +
+`ax_mod2_alternation` **era derivable**, y no hubo que moverlo: **se retiró**. De `ax21` (rango) + 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `ax16` (el bicondicional) + `ax4` + `zero_add` + `teo_1_11` (`0 ≠ 1`). ⇒ **6 → 5 `axiom` de Lean.**
 
 ⚠️⚠️ **Y al retirarlo se hizo visible una CIRCULARIDAD que el censo no había visto.** El diseño de
 2026‑06‑11 («Opción C.2») afirmaba las dos cosas a la vez:
 
-* *«de `ax_mod2_alternation` salen `ax21` y `ax24` por inducción»* — y así estaba escrito
+* *«de `ax_mod2_alternation` salen `ax21` y `ax24` por inducción»* — y así estaba escrito 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   `mod2_range_ax`;
-* *«en `Minimal`, `ax_mod2_alternation` es derivable de `ax21 + ax16`»*.
+* *«en `Minimal`, `ax_mod2_alternation` es derivable de `ax21 + ax16`»*. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 Juntas dan un **círculo**. Mientras uno de los dos fue **`axiom`**, el círculo no se veía: Lean lo
 aceptaba porque pasaba por un postulado.
@@ -1577,7 +1598,7 @@ en `primAxioms`, y `mod2_range_ax` deja de fingir que deriva algo: cita el axiom
 🏁🏁 **CENSO CERRADO: 10 DE 10** (2026‑09‑12). `ax24` **certificado** sobre los primitivos:
 `mod2_of_even_prim : primAxioms ⊢ ax24_mod2_of_even`, footprint
 `[propext, Classical.choice, Quot.sound, FOL.MetaRules.{ex_elim, gen, imp_intro, or_elim},
-ax_induction_prim]` — **sin `ax_list_induction`, sin anclas, sin nada de `axioms`**.
+ax_induction_prim]` — **sin `ax_list_induction`, sin anclas, sin nada de `axioms`**. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ⭐ **Salió más barato de lo previsto, y por una pieza**: la versión `axioms` usaba `teo_2_9` de
 `Block1` —que vive sobre `axioms` porque allí `Γ := axioms`— y portarlo habría arrastrado medio
@@ -1585,7 +1606,7 @@ bloque. Se **evita** con **`add_eq_zero_right_prim`** (≈20 líneas) sobre `zer
 que **ya existía**. ⚠️ Y `teo_1_3`, que tres documentos daban como dependencia, era **prosa
 obsoleta**: no se usaba.
 
-⭐ Y la cadena entera (`teo_1_11_prim`, `mod2_zero_prim`, `ax_mod2_alternation_prim`,
+⭐ Y la cadena entera (`teo_1_11_prim`, `mod2_zero_prim`, `ax_mod2_alternation_prim`, 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `a_plus_one_eq_one_prim`, `mod2_two_k_eq_zero_prim`) quedó **sobre los primitivos**, con las firmas
 `axioms ⊢` como **envoltorios** por `prim_to_axioms` ⇒ **ninguna prueba duplicada**.
 
@@ -1603,7 +1624,7 @@ se retira audita lo que se apoyaba en él.**
   aplazar algo por eso, comprobar si de verdad **cambia `axioms`** o sólo **añade un enunciado
   sobre un subconjunto**.
 
-**Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `axioms`, `coreAxioms`,
+**Lo que NO cambia**: 6 `axiom` de Lean (**la cifra de entonces**; hoy **5**, `ax_mod2_alternation` derivado), 141 axiomas objeto, `axioms`, `coreAxioms`, 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `axiomsCodeT`, `provCodeC'`, `G`, y todas las firmas aguas abajo.
 
 ---
@@ -1672,7 +1693,7 @@ es decir: **existe una asignación de verdad total a las sentencias que extiende
 fuerza, muy cercano a suponer la **solidez** de `axioms` respecto de algún modelo.
 
 **Dónde se usa**: es la hipótesis de **los dos** teoremas de Gödel del proyecto —
-`goedel_first_numeral` y `goedel_second_prf`.
+`goedel_first_numeral` y `goedel_second_prf`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 | | |
 |---|---|
@@ -1742,7 +1763,7 @@ estaban **fuera** de `MetaRules`, que es justo donde nadie miró*:
 | `FOL/MetaRules.lean` | `imp_intro`, `gen`, `raa`, `dne`, `or_elim`, `ex_elim` | 6 |
 | `FOL/Theorems/Neg.lean:57` | **un SEGUNDO `dne`** (forma de esquema `Γ ⊢ (¬¬A ⇒ A)`, distinto del de `MetaRules`, que es regla). Lo consume `Completeness.lean` | 1 |
 | `FOL/Theorems/Quantifiers.lean:115` | `forall_not_impl_exists_not` | 1 |
-| RPP | `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa` ⚠️ (este último **concluye dentro de un `∃`** — por eso un `grep` ingenuo no lo ve) | 4 |
+| RPP | `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa` ⚠️ (este último **concluye dentro de un `∃`** — por eso un `grep` ingenuo no lo ve) | 4 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | | | **12** |
 
 Los seis de `MetaRules` **tienen que ser axiomas**: sus premisas son **funciones de Lean**, o sea
@@ -1771,10 +1792,16 @@ a `[] ⊨ ¬P`; y `P` es verdadera en el otro modelo.
 
 * ⚠️ **RPP no está afectado** [medido]: no importa `FOL.Soundness` ni el barrel raíz `FOL`. Árbol
   reconstruido: **145 jobs verdes**, footprints de Gödel intactos.
+  ✏️ **FALSO (ADR‑114 L1‑3 · ADR‑115, 2026‑10‑02)**: RPP importaba `FOL.MetaRules` (vía
+  `Minimal/Axioms.lean`), y esas meta‑reglas son **refutables sin usarlas**: el entorno de RPP demostraba
+  `False` (`sondeos/MetaReglasRefutables.lean`). Lo que RPP no importaba era el teorema que lo ESCRIBÍA.
 * ⚠️ **`FOL/Semantics.lean` está BIEN** y se queda. Es lo que permitió probar `prf0_soundness`.
 * ⚠️ **Las meta‑reglas no están «mal»**: dicen lo que dicen. `⊢` es una noción metateórica de
   verdad, no una relación de derivabilidad — [ADR‑024](#) y `Meta/OmegaStrength.lean`. Lo nuevo es
   que eso **también impide la solidez**, y las dos caras son la misma.
+  ✏️ **FALSO (ADR‑114 L1‑3 · ADR‑115)**: las meta‑reglas **sí estaban mal** — no son una noción de verdad, son
+  enunciados que Lean refuta (`imp_intro_refutable`, `raa_refutable`, `or_elim_refutable`,
+  `ex_elim_refutable`). Se retiraron.
 
 ### La salida buena, ya ejecutada
 
@@ -1797,7 +1824,7 @@ más toda la notación `⊢`. **No es una tarde.**
 ⛔⛔ **Y con el censo corregido, esa reparación NO BASTARÍA** (2026‑09‑12): mover sólo `MetaRules`
 dejaría **seis** habitantes en `Derives` — los dos de `FOL/Theorems/` y los cuatro de RPP.
 
-⚠️ **Y hay uno que RPP FABRICA, y es de los malos**: `ax_list_induction`
+⚠️ **Y hay uno que RPP FABRICA, y es de los malos**: `ax_list_induction` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 (`Full/Lists.lean:55`) tiene `step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)` — **premisa‑FUNCIÓN de
 Lean**, la forma exacta que hace patológico a `raa`, con conclusión `∀ L : Term`. ⇒ **mover
 `FOL/MetaRules` no limpia `Derives` mientras esa línea siga ahí**: el problema no es de quién es el
@@ -1809,7 +1836,7 @@ Quien acometa (f) tiene que mover **los doce**, empezando por casa.
 🔑 **Y la regla de diseño que se deduce** (R‑1(c)): *una regla que se quiere añadir a una relación
 inductiva se añade como **CONSTRUCTOR**, o con un inductivo que la envuelva — **nunca** como
 `axiom`. Un `axiom` no extiende el punto fijo: **afirma una falsedad sobre él**.*
-⭐ Nota: `ax_p_tfa` se retira por decisión del propietario (NEXT‑STEPS (a)) ⇒ quedarían once.
+⭐ Nota: `ax_p_tfa` se retira por decisión del propietario (NEXT‑STEPS (a)) ⇒ quedarían once. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### 📌 POSDATA 2026‑09‑12 — **la cuarentena NO fue efectiva el primer día**
 
@@ -1845,7 +1872,7 @@ Por **M‑11** eso prohíbe demostrar nada sobre `Prf` por inducción — y el �
 
 | teorema | dónde |
 |---|---|
-| `prf_to_derives` | `Meta/Hilbert.lean:256` |
+| `prf_to_derives` | `Meta/Hilbert.lean:256` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | `prf_to_prfH` | `Meta/HilbertDeduction.lean:143` |
 | `prf_to_derivation` | `Meta/HilbertSeq.lean:379` |
 
@@ -2011,7 +2038,7 @@ porque `make status` lo presentaba como una salvaguarda activa.
 ### ⬜ Lo que NO cambia
 
 * **`Derives` sigue prohibido para inducción** (M‑11): quedan los 4 de FOL **más** los tres de RPP
-  (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`). ⚠️ Y `ax_list_induction` es de
+  (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`). ⚠️ Y `ax_list_induction` es de 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   los malos: **premisa‑FUNCIÓN** fabricada por nosotros (ADR‑027, R‑1).
 * **La fuerza del cálculo es la misma.** `⊢` sigue siendo sintácticamente completo y **no r.e.**:
   eso lo causan las cuatro premisas‑función, que son justo las que no se han podido tocar.
@@ -2021,14 +2048,14 @@ porque `make status` lo presentaba como una salvaguarda activa.
 
 ---
 
-## ADR-029: `ax_list_induction` pierde su premisa‑función — y M‑11 sobre `Derives` se declara PERMANENTE
+## ADR-029: `ax_list_induction` pierde su premisa‑función — y M‑11 sobre `Derives` se declara PERMANENTE 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 **Fecha:** 2026‑09‑13 · **Estado:** ✅ EJECUTADO (sanción del propietario) ·
 **Relacionado:** ADR‑023, ADR‑025 (M‑11), ADR‑027, ADR‑028
 
 ### 1 · El cambio de forma
 
-`ax_list_induction` (`Full/Lists.lean`) era **el único habitante de `Derives` fabricado por
+`ax_list_induction` (`Full/Lists.lean`) era **el único habitante de `Derives` fabricado por 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 nosotros con premisa‑FUNCIÓN**:
 
     (step : ∀ h t : Term, Γ ⊢ φ t → Γ ⊢ φ (cons h t))      ← función de Lean
@@ -2043,6 +2070,7 @@ axioma regalaba `∀L, Γ ⊢ φ L`. Ahora la premisa es una **implicación OBJE
 | forma de `step` | `Derives → Derives` | `∀ h t : Term, Derives …` |
 | ocurrencia | **NO POSITIVA** | **POSITIVA**, como `gen` |
 | vacuidad explotable | ⛔ **sí** | ✅ **no** |
+| ✏️ **FALSO (ADR‑114 L1‑2 · ADR‑115)** | | la de **ahora** también era explotable: su `φ : Term → Formula` mira la sintaxis del término y su `Γ` es libre ⇒ `[] ⊢ ⊥` con dos constructores (`sondeos/ListInductionAxiomRefutable.lean`). Retirado con la capa `⊢` |
 | ¿shape legal de constructor? | ❌ | ✅ **verificado compilando** (recursor sin axiomas) |
 
 **Coste medido: 11 sitios**, todos con el mismo cambio de dos líneas
@@ -2057,7 +2085,7 @@ readaptarla; ahora pasa `e2` directamente.
 ⬜ **Por qué NO se hace constructor**, ahora que la forma lo permitiría: porque **no es una regla
 lógica, es un axioma de TEORÍA**. Como constructor de `Derives` valdría en **todo** contexto,
 incluido `Γ = []`, diciendo que la inducción de listas es **lógicamente válida** — falso. Es el
-mismo argumento de [ADR‑023](#) para `ax_induction`.
+mismo argumento de [ADR‑023](#) para `ax_induction`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### 2 · ⛔⛔ M‑11 sobre `Derives` es PERMANENTE
 
@@ -6089,7 +6117,7 @@ ahí a la cotización de la tanda. Quien cotizara esto como «sólo (e)» pagaba
 `chainOk` tiene **dos** descomposiciones, y no cuestan lo mismo:
 
 * **con acumulador** — `lineOk c line := lineWF line ∧ allIn c (premsOf line)`. Tiene el corazón
-  listo (`prf_not_In_listFormCodeM`, la pieza que ya saldó `DEUDA_inNeg`), pero para llegar a la
+  listo (`prf_not_In_listFormCodeM`, la pieza que ya saldó `DEUDA_inNeg`), pero para llegar a la 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   línea `k` hay que **pelar `prf_chainOk_cons` `k` veces** — y `k` es **simbólica**, así que no es
   pelar: es una inducción nueva más una distributividad `⟦a++b⟧ ≐ concat ⟦a⟧ ⟦b⟧` **que no existe**.
 * **Δ₀** — `chainOkB c p := ∀ i < lenc p. lineOkB c p i`. La línea `k` sale por **instanciación**.
@@ -6191,16 +6219,16 @@ para uno de ellos.
 La cabecera de `ChainNegPrf` decía, sin etiqueta de ámbito:
 
 > ⚠️ **Nada de esto usa el ancla de codificación**: el footprint no cita `AnclaEq` ni
-> `ax_axiomsCodeT_eq`.
+> `ax_axiomsCodeT_eq`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 Valía para `deuda_inNeg`, y **sigue valiendo** para `deuda_inNeg`. Pero estaba escrita en la
 cabecera del **MÓDULO**, y el cierre de (d) **sí** entra por `axiomsCodeT` ⇒ su footprint cita
-`ax_axiomsCodeT_eq`. Sin la etiqueta, la frase se habría vuelto falsa **sola**, sin que nadie la
+`ax_axiomsCodeT_eq`. Sin la etiqueta, la frase se habría vuelto falsa **sola**, sin que nadie la 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 tocara. Se le puso el ámbito **antes** de aterrizar (d), no después.
 
 🔑 *Una cifra sin ámbito se lee como global, y caduca en cuanto el módulo crece.*
 
-⚠️ Y un dato de la tabla de footprints: **`ax_axiomsCodeT_eq` no aparecía en NINGUNA de las 393
+⚠️ Y un dato de la tabla de footprints: **`ax_axiomsCodeT_eq` no aparecía en NINGUNA de las 393 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 filas anteriores**. (d) es el primer sitio de la cadena de `NegVerifier` por donde entra el ancla
 de codificación. No es un problema — `axiomsCodeT` es justo lo que el ancla fija — pero conviene
 que esté **declarado**, porque es la clase de dependencia que uno quiere ver moverse.
@@ -6250,7 +6278,7 @@ sobre `L` desaparece entera.
 ### 2 · ⭐ El lado `In _ nil` sale **gratis**, y eso es la forma Δ₀ pagando
 
 El `lor` de `boundedPremsIn` tiene dos lados. El primero, `In (nthc L m̄) c`, con `c = nil` lo
-refuta `prf_not_in_nil_D`, que lleva en `Meta/AxiomListCode.lean` desde el nivel D.
+refuta `prf_not_in_nil_D`, que lleva en `Meta/AxiomListCode.lean` desde el nivel D. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 Eso **no es suerte**: es exactamente lo que la forma Δ₀ prometía. La descomposición con
 acumulador (`Minimal/Axioms.lean:803`) llega a la línea `k` con un `c` que ha ido creciendo;
@@ -6267,7 +6295,7 @@ y por eso ese lado del `lor` es trivial en vez de ser la mitad del trabajo.
 | `derives_not_boundedPremsIn_of_index` | ⭐⭐ refutar el ∀ acotado **instanciando** | net-0 + `raa` |
 | `derives_chainOk_neg_of_prem` | ⭐⭐⭐ **el cierre**: la cadena entera queda refutada | + `imp_intro`, `or_elim`, `raa`, los dos `ax_*induction*` |
 
-⚠️ **(e) NO cita `ax_axiomsCodeT_eq`**, a diferencia de (d) (ADR-076). El ancla de codificación
+⚠️ **(e) NO cita `ax_axiomsCodeT_eq`**, a diferencia de (d) (ADR-076). El ancla de codificación 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 entra por `axiomsCodeT`, y (e) no pasa por ahí: va por `runFn`/`carc`. Los dos cierres tienen
 footprints **distintos**, y eso es información, no ruido.
 
@@ -7006,7 +7034,7 @@ TODO el dominio — y entonces habla de lo que no debería.**
   códigos la inducción es legítima. Lo que falla es que el lenguaje no separa los códigos del
   resto del dominio.
 
-⚠️ Y sí conviene subrayar una cosa: `ax_list_induction` es **uno de los 3 `axiom` de Lean** del
+⚠️ Y sí conviene subrayar una cosa: `ax_list_induction` es **uno de los 3 `axiom` de Lean** del 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 proyecto — un **postulado**. Esta medición dice que ese postulado es **falso en ℕ**. No lo
 invalida (el propietario puede querer justamente esa fuerza), pero **deja de ser inocuo**, y
 `AXIOMS.md` debería decirlo.
@@ -8311,8 +8339,13 @@ Comparativa completa: carpeta del proyecto, `planes/comparativa-listInd-vs-cons-
 * `ax_L0_cons_def : ∀∀. cons #1 #0 = σ (pair #1 #0)` (antes `pair #1 (σ#0)`). Siguen siendo **141** axiomas.
 * Espejo numérico: `consN a b = triN (a+b) + b + 1` (antes `triN (a+b+1) + (b+1)`), y `pairN a b = triN (a+b) + b`
   nuevo (`consN a b = pairN a b + 1` por definición).
-* ⇒ `σ ∘ pair` es biyección ℕ² → ℕ≥1: **todo número es `nil` o `cons`**, `ax_list_induction` y la regla `listInd`
+* ⇒ `σ ∘ pair` es biyección ℕ² → ℕ≥1: **todo número es `nil` o `cons`**, `ax_list_induction` y la regla `listInd` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   son **verdaderos en ℕ**, y la capa de listas de `ModeloNat` (A2) ya no choca con la basura.
+  ✏️ **FALSO en una mitad, y mal enmarcado (ADR‑114 · ADR‑115, 2026‑10‑02)**: `ax_list_induction` (hoy retirado) no es un
+  enunciado sobre ℕ sino un postulado de derivabilidad con `φ` no uniforme, y da `[] ⊢ ⊥` en **cualquier**
+  codificación (L1‑2); lo verdadero en ℕ es la regla `listInd` de `Prf`. Y ADR‑113 no fue una mejora del
+  modelo: fue la **retirada de una inconsistencia** de `Prf` (L1‑1: con la codificación vieja, `Prf ⊥` sin
+  hipótesis).
 * ⚠️ Cambian los **valores** de `codeNat` y, con ellos, el numeral dentro de `godelCN`. La **forma** de `G`, `Prov`,
   la regla `listInd` y los 107 `codingAxioms` no cambian.
 
@@ -8355,7 +8388,7 @@ PeanoRF puede fijar ya `consNat` con la codificación nueva.
 
 ## ADR-114: 🚨 la auditoría de la BASE, ronda 1 — cuatro defectos COMPILADOS, y las cuatro decisiones del propietario
 
-**Fecha:** 2026-10-02 · **Estado:** ✅ decisiones 1, 3 (lanzada) y 4 ejecutadas; ⬜ decisión 2 por ejecutar ·
+**Fecha:** 2026-10-02 · **Estado:** ✅ decisiones 1, 3 y 4 ejecutadas; ✅ la 2, en RPP ([ADR-115](#adr-115)), y ⬜ en FOL ·
 **Ámbito:** RPP y FOL. Workflow `wf_6ab7eb53-016` (5 lentes + 5 verificadores adversariales, sólo lectura):
 36 hallazgos, 27 confirmados por lectura, 9 plausibles, 0 refutados. ⛔ Los agentes no compilan: los cuatro
 decisivos los compilé yo (M-13), y quedan en `sondeos/`.
@@ -8365,8 +8398,8 @@ decisivos los compilé yo (M-13), y quedan en `sondeos/`.
 | hallazgo | sondeo | footprint |
 |---|---|---|
 | **L1-1** · en `master` `2510f70`, con `cons a b = pair a (σb)`, **`Prf ⊥` sin hipótesis**: `prf_nil_or_cons 1` (`Prf.listInd`, sin guarda) + Cantor (`cons h t ≠ 1`, porque allí `cons 0 0 = 2`) | `PrfBotCodificacionVieja.lean` (registro + control negativo `cons 0 0 = 1`) | `[propext, Classical.choice, Quot.sound]`: ningún axioma del proyecto |
-| **L1-2** · `ax_list_induction` sola da `axioms ⊢ ⊥`: su `φ : Term → Formula` no es uniforme y su `Γ` es libre | `ListInductionAxiomRefutable.lean` | `[…, ax_list_induction]` |
-| **L1-3** · los 22 constructores de `Derives` son sólidos para la valuación booleana, **por inducción y sin axiomas** ⇒ los enunciados de `imp_intro`, `raa` y `ax_list_induction` son FALSOS, y Lean + cualquiera de ellos ⊢ `False` | `MetaReglasRefutables.lean` | refutaciones `[propext, Quot.sound]`; `False` con el axioma |
+| **L1-2** · `ax_list_induction` sola da `axioms ⊢ ⊥`: su `φ : Term → Formula` no es uniforme y su `Γ` es libre | `ListInductionAxiomRefutable.lean` | `[…, ax_list_induction]` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
+| **L1-3** · los 22 constructores de `Derives` son sólidos para la valuación booleana, **por inducción y sin axiomas** ⇒ los enunciados de `imp_intro`, `raa` y `ax_list_induction` son FALSOS, y Lean + cualquiera de ellos ⊢ `False` | `MetaReglasRefutables.lean` | refutaciones `[propext, Quot.sound]`; `False` con el axioma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | **L1-4** · `OmegaConsistent` es refutable por su DEFINICIÓN (testigos sólo `StdChain`; `A := #0 = 1`), en las dos codificaciones | `OmegaConsistentRefutable.lean` | la reducción `not_omega_of`, limpia |
 | control independiente de **F1**: el mismo `hcon` alimenta a `goedel_first_prf` y a `absurd` | `AnclaEqInconsistente.lean` §7 | — |
 
@@ -8375,7 +8408,7 @@ decisivos los compilé yo (M-13), y quedan en `sondeos/`.
 * **master `2510f70`**: TODO lo demostrado en `Prf` (L1-1). ADR-113 cierra esa ruta (`cons 0 0 = 1`): **no era una
   mejora del modelo, era la retirada de una inconsistencia**. No prueba la consistencia: eso es el modelo de los 141.
 * **la capa `⊢`**: 53 de las 517 filas de `check-footprints.bash` llevan `imp_intro`, `raa`, `or_elim` o
-  `ax_list_induction` — `negVerifier_proved` (ADR-094…097), `derives_completo`, `GodelTwo.d3`, el censo de
+  `ax_list_induction` — `negVerifier_proved` (ADR-094…097), `derives_completo`, `GodelTwo.d3`, el censo de 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   `coreAxioms`, la librería de `Minimal`/`Full`, la mitad `⊬¬G`. 🔑 *M-11 evitaba ESCRIBIR la contradicción, no la
   quitaba: el recursor cubre a todo habitante, y son los axiomas los que lo contradicen.*
 * **la mitad `⊬¬G`**: además por L1-4, y lo seguiría siendo tras reparar el resto si no cambia la definición.
@@ -8396,15 +8429,193 @@ ejecutar la decisión 2, que reescribe esa capa.
 1. **ADR-113 se fusiona YA** — hecho: PR #1, fusión `f6d59db` (145 jobs, 517 footprints sin cambio). Medido además que la derivación de L1-1 ya NO compila sobre ella (falla en el paso `cons 0 0 = 2`).
 2. **`⊢` se retira como capa de trabajo**: queda `Prf`, más un puente a `Derives₀` si hace falta. **Las meta-reglas
    de FOL se retiran**: «si dicen cosas falsas, las retiramos; no hacemos uso de herramientas que no sean
-   verdaderas». ⬜ Por ejecutar, con el radio medido por el compilador.
+   verdaderas». ✅ **Ejecutada en RPP el mismo día: [ADR-115](#adr-115)**, con el radio medido por el compilador; ⬜ FOL, después.
 3. **Ronda 2 de la auditoría**, después del punto 1 y sobre la base reparada — lanzada (`wf_0f4ca25d-649`).
 4. **Las cuatro sondas y el control de F1, a `sondeos/`** como evidencia y control negativo — hecho.
 
 ### 5 · Lo que queda, en orden
 
-Ejecutar la decisión 2 (incluye retirar `ax_list_induction`, `ax_induction_prim` y `ax_axiomsCodeT_eq`, que viven
+Ejecutar la decisión 2 (incluye retirar `ax_list_induction`, `ax_induction_prim` y `ax_axiomsCodeT_eq`, que viven 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 sobre `⊢`) · el arreglo de F1 (preferido: un único axioma diagonal `axiomsCodeT = LR ++ [δ]` con `diagTerm` y
 `prf_diag_arith_num`, hallazgo L2-3) · D7 en su momento (tras la decisión 2 y antes del punto fijo de F1, L5-09) ·
 `⊬¬G` sobre `Prf` (`OmegaConsistentProv` o Rosser) · el modelo de los 141.
 
 **Véase también:** ADR-022, ADR-025, ADR-029, ADR-088, ADR-113; `sondeos/AnclaEqInconsistente.lean` (F1).
+
+---
+
+<a id="adr-115"></a>
+## ADR-115: 🗑️ la capa `⊢` RETIRADA de RPP — 27 módulos, 633 declaraciones, 0 `axiom` de Lean, y la cadena sobre `Prf` intacta
+
+**Fecha:** 2026-10-02 · **Estado:** ✅ RPP · ⬜ FOL (`FOL/MetaRules.lean`), en el paso siguiente ·
+**Ámbito:** RPP; FOL en un segundo paso. **Decisión del propietario** (ADR-114 §4, punto 2): «`⊢` se retira como capa
+de trabajo: queda `Prf`, más un puente a `Derives₀` si hace falta. Las meta-reglas de FOL, si dicen cosas falsas, se
+retiran: no hacemos uso de herramientas que no sean verdaderas».
+
+### 1 · Por qué, en una línea
+
+**Cinco de los siete postulados de `⊢` eran falsos**, no sólo peligrosos para la inducción. Los 22 constructores de
+`Derives` son sólidos para la valuación booleana (por inducción y sin axiomas), y eso refuta los enunciados de
+`imp_intro`, `raa` y `ax_list_induction` (retirado); sin meta‑reglas, `Derives` se traduce a `Derives₀` y es sólido para
+Tarski, y eso refuta `ex_elim` (modelo de dos puntos) y `or_elim` (tercio excluso) — `sondeos/MetaReglasRefutables.lean`
+§2 y §4, footprints `[propext, Quot.sound]` y `[propext, Classical.choice, Quot.sound]`. Lean + cualquiera de ellos ⊢
+`False`. Los otros dos (`ax_induction_prim`, `ax_axiomsCodeT_eq`, retirados también) **no se midieron**. Los cuatro primeros son los
+`axiom` de `FOL/MetaRules.lean` (RPP ya no los importa; en FOL quedan retirados en el paso siguiente); `ax_list_induction` era de RPP y
+quedó retirado.
+
+### 2 · El radio, medido ANTES de borrar (ronda 2, `wf_0f4ca25d-649`, y compilado)
+
+* **P0 — ¿usa la cadena de Gödel algo de `⊢`?** (sondeo y salida en `doc/AUDITORIA-BASE-2026-10-02.md` §1) Cierre por constantes de `goedel_first_prf` y `goedel_second_prf`
+  —tipo **y cuerpo** (`value? (allowOpaque := true)`: sin eso el sondeo era **vacuo**, porque en v4.31 `value?`
+  no devuelve el cuerpo de un `theorem`, y lo cazó el control positivo)—: **6 710 constantes, 0 de las 12
+  prohibidas** (`Derives`, las cuatro meta-reglas, los tres `axiom` de RPP, `ConsistentOmega`, `Reflects`,
+  `NegVerifier`, `OmegaConsistent`). Controles: positivo (`d3_prf_real`, `repr_pos'_prf`, `prf_inAxC`, `AnclaEq`,
+  `prf_godelCN_fixedpoint` están en el cierre) y del detector (el cierre de `negVerifier_proved` contiene **9 de
+  las 12**). ⚠️ El criterio pre-registrado («en módulos a borrar: 0») dio **1**: `Minimal.Axioms.le.eq_1`, el lema
+  de ecuación autogenerado de `le` —una `def` que sobrevive— materializado en `Block2`. No es una de las 633 y Lean
+  lo regenera; se siguió con el plan, y el build lo confirma.
+* **El plan**: las declaraciones que dependen de `Derives` (`TDB`), por cierre sobre el árbol, y los módulos que
+  quedan vacíos. Ejecutado con un bucle «compilar → arreglar por el mensaje de error» que **para** ante cualquier
+  error que no sea de la clase prevista.
+
+### 3 · Lo hecho
+
+| | antes | después |
+|---|---:|---:|
+| `lake build` | 145 jobs | **117 jobs** (−27 módulos, −`FOL.MetaRules`) |
+| módulos activos | 131 (Minimal 11 + Meta 109 + Full 11) | **104** (Minimal 1 + Meta 100 + Full 3) |
+| `axiom` de Lean en RPP | 3, hoy retirados (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) | **0** |
+| filas de `check-footprints.bash` | 517 | **463** (las 54 quitadas, todas de declaraciones borradas) |
+| `check-estratos.bash`, `Derives` | 22 ctors · 7 axiomas | 22 · **4** (los de FOL; → 0 cuando FOL retire `MetaRules`) |
+
+* **27 módulos borrados**: `Minimal/Theorems/Block1–8` (10 ficheros), `Full/{Mod2, Lists, StrongInduction, Bounded,
+  Divisibility, Division, Primality, Factorization}` y `Meta/{AxiomListCode, DerivCond, Induction, LineWFDerives,
+  ListInductionArith, Necessitation, OmegaStrength, Reflection, StepArith}`.
+* **633 declaraciones**: las **606** que dependían de `⊢` (266 en esos módulos + **340 en otros 23**, borradas en su
+  sitio) y **27** que no dependían pero vivían en los módulos borrados y nadie más usaba (los `Γ := axioms` de cada
+  `Block`, `three`/`four`, `proj1`/`proj2`, `PSI`/`psi_at`, `toTerm`…). Medido: HEAD 3 765 declaraciones, la rama
+  3 132, el reparto por fichero igual al del plan.
+* `Minimal/Axioms.lean` ya no importa `FOL.MetaRules` (ni lo re-exporta: 16 entradas, ni tiene la `CoeFun` sobre
+  `Derives`); imports reescritos en 15 módulos; **236** entradas de `export` de nombres borrados.
+* **Footprints de la cadena, sin cambio**: `goedel_first_prf`, `goedel_second_prf`, `prf_godelCN_fixedpoint`,
+  `d3_prf_real` → `[propext, Classical.choice, Quot.sound]`.
+* **El puente a `Derives₀` NO hace falta en RPP** (P0: la cadena no toca `⊢`). Existe igualmente, compilado, para
+  FOL: `derives_to_derives0 : Γ ⊢ f → Γ ⊢₀ f` (`gen_rule` es admisible con una constante fresca) y
+  `derives_soundness` (Tarski), en `sondeos/MetaReglasRefutables.lean` §4; sube al build de FOL al retirar
+  `MetaRules`. Ya lo anticipaba `sondeos/DerivesSinMetaReglas.lean` (2026‑09‑14): «sin los cuatro axiomas, sólo se
+  pierde la fuerza META».
+* En local, `[F]` de `check-doc-sync` cazó los 27 `.olean` huérfanos (216 ficheros, borrados).
+
+### 4 · Lo que se perdió
+
+⚠️ **Entorno no es footprint.** De las 606 declaraciones que dependían de `⊢`, **356** dependen además, por el grafo
+de dependencias, de alguno de los siete postulados (heurística por nombres sobre `parsed.json`, no `#print axioms`;
+en la TABLA de footprints eran **53** filas): ésas eran teoremas de una teoría inconsistente. Las otras **250** eran
+teoremas **verdaderos** sobre `⊢` —`Derives` sin meta‑reglas es sólido—, y se retiran **por decisión del
+propietario** (una sola capa de trabajo, `Prf`), no por falsas. Lo notable:
+
+* `NegVerifier` y `negVerifier_proved` (ADR-094…097) y con ellos **toda la mitad `⊬¬G`**: `reflects_of_omega`,
+  `goedel_first_undecidable_numeral`, `goedel_first_undecidable_omega` (retirados todos). ⛔ `NegVerifier` **no
+  estaba demostrado**: la prueba de `negVerifier_proved` llevaba meta‑reglas refutadas en su footprint. Y la
+  definición de `OmegaConsistent` tiene un defecto propio (L1-4), que se ve limpio **sobre `Prf`**
+  (`not_omegaConsistentPrf`); sobre `⊢` la refutación compilada pasaba por axiomas refutados. ⭐ Lo que aquella
+  prueba tenía sobre `Prf` y META **sobrevive** (109 declaraciones en `Meta/ChainNegPrf.lean`, `verifier_sound`,
+  `not_decodes_of_not_prf`), hoy sin consumidor: guía de casos —no prueba— para **Rosser**, el camino elegido para
+  `⊬¬G` (ver NEXT-STEPS).
+* También retirados: `goedel_first_numeral`, `godelCN_fixedpoint` y la familia de Gödel I sobre `⊢`; `derives_completo`
+  (`OmegaStrength`); D1/D2/D3 sobre `⊢` (`repr_pos'`, `d2`, `d3`); los puentes retirados `prf_to_derives`/`prfI_to_derives`
+  y `consistentH_of_omega`; `Provable`.
+* El censo certificado de `coreAxioms` (`*_thm_prim`, ADR-023) y la librería aritmética de `Minimal`/`Full`: Cantor,
+  pares, listas, funciones, primos y el TFA objeto (`tfa_numeral`). Hoy **no hay** certificado de que los 10
+  derivables de `coreAxioms` se deriven de los primitivos.
+
+⇒ **Gödel I (`⊬G`) y II sobre `Prf` siguen exactamente como estaban**: derivados, net-0, y ⛔ **vacuos por
+`[AnclaEq]`** (F1, ADR-114). Esta retirada **no arregla F1**; sí deja a `Prf` (con su capa `Prfᵢ` y el auxiliar
+`PrfH`) como únicos cálculos de RPP, ninguno habitado por un `axiom`.
+
+### 5 · Textos corregidos (los que ADR-114 §3 prometió, y los que encontró la revisión) y deuda declarada
+
+* **En el código** (sólo comentarios y docstrings): `Meta/Hilbert.lean` —el docstring de los puentes decía que
+  `prfI_to_derives` usaba «sólo los constructores nativos de `Derives` … cero meta‑axiomas» y que `prf_to_derives` (retirado)
+  añadía «`dne` en un único punto … toda la dependencia clásica»; el footprint de `prf_to_derives` (hoy retirado)
+  llevaba además los retirados `ax_induction_prim`, `ax_list_induction` e `imp_intro`; y el de `Prf` decía «sólido para ℕ», que no
+  está demostrado—; el ancla de `axiomsCodeT`
+  en `Minimal/Axioms.lean`; `Meta/GodelTwoPrf.lean` (aviso de vacuidad en cabecera); `Godel.lean`, `Provability.lean`,
+  `Meta.lean`, `Full/Induction.lean`; y en 31 módulos, una nota tras los `import` de que los nombres de `⊢` que citan
+  ya no existen. ⭐ **Una revisión adversarial de seis agentes** (`wf_0df3d11b-ef0`, sólo lectura, con verificador
+  por hallazgo) encontró **23** afirmaciones más en docstrings que la nota genérica no cubría —módulos sin nota
+  porque sólo citaban nombres «genéricos» (`ax`, `spec`, `d2`, `d3`…) que el script excluía, frases de supervivencia
+  («se conservan», «se movieron a…»), firmas con `ConsistentOmega`, referencias `Fichero.lean:N` desplazadas,
+  secciones vacías—; corregidas (`wf_34b5eeb9-2ea`). ⚠️ El recuento inicial («260 menciones en 43 ficheros») tenía
+  ámbito estrecho: sólo identificadores entre backticks, sin homónimo vivo y fuera de la lista de genéricos.
+* **En este fichero**: ADR-022 punto 3, ADR-025 («RPP no está afectado», «las meta-reglas no están mal»), ADR-029
+  (la tabla de vacuidad) y ADR-113 §2 (`ax_list_induction`, retirado, «verdadero en ℕ»), marcados ✏️ FALSO.
+* **Fuera**: `TEOREMAS-E-HIPOTESIS.md`, reescrito entero (decía que D1 y D3 no tenían hipótesis: llevan `[AnclaEq]`
+  desde ADR-026), y sale de la deuda `[E]`; `sondeos/AnclaSoundness.lean` (dos frases falsas sobre `Prf`, y el import
+  de `OmegaStrength`, que no usaba); los bloques de estado de los documentos autoritativos —el H2 «ESTADO REAL» pasa
+  a ser el de hoy en seis documentos—, `REFERENCE.md` §1/§3/§5, `AXIOMS.md` §1.1/§2, `README.md`,
+  `doc/REFERENCE-Kernel.md`.
+* ⬜ **Deuda declarada**: los nodos `doc/REFERENCE-*`, `DEPENDENCIES.md` y el cuerpo de `CURRENT-STATUS-PROJECT.md`
+  describen el árbol de 131 módulos; llevan un aviso en cabecera, no una reescritura. Las líneas que citan nombres
+  retirados llevan la marca 🗑️ (146).
+* ⬜ **`sondeos/`**: de los 85, compilan **31** en la pasada completa (`doc/AUDITORIA-BASE-2026-10-02.md` §3) **más
+  `AnclaSoundness`**, reparado después y compilado aparte (exit 0) ⇒ 32. De los 53 que no compilan, **10** usan en
+  código algo retirado (medían `⊢`: no se reparan), **3** sólo lo citan en comentarios y caen, con los otros **40**,
+  por causas anteriores (`[AnclaEq]` sin instancia, `PrfH_lt_subst2` movido, una ambigüedad) — clasificado por
+  mensaje y por nombres, **no** medido contra la base anterior. Al retirar `MetaRules` en FOL cae además
+  `HenkinSaleDeRaa` (usa `FOL.MetaRules.raa`); la cifra se re-mide entonces.
+* ⬜ **El libro** (`doc/book/`, otra tarea): `fragmentos.json` extrae dos fragmentos de `FOL/MetaRules.lean` y varios
+  capítulos citan sus nombres con `\ident{}`: el job `libro` de la CI fallará en el próximo push que toque
+  `doc/book/`.
+
+### 6 · Controles
+
+Re-ejecutados el 2026-10-02 (19:30–19:45) sobre la rama, **después del último cambio** —incluidos los docstrings
+de la revisión— (M-13):
+
+| control | resultado |
+|---|---|
+| `lake build` | ✅ **117 jobs**, 0 errores (rebuild completo, 7,3 min) |
+| `check-sorry` | ✅ 0 `sorry`; los cinco agujeros de confianza a cero en los dos repos |
+| `check-estratos` | ✅ los 10 estratos cuadran (`Derives` 22 · 4) |
+| `check-warnings` | ✅ 11 declarados = 11 medidos |
+| `check-footprints` | ✅ **463** cuadran · `[COBERTURA]` **435/435** |
+| `check-doc-sync` | ✅ `[A]` sin cifras obsoletas · `[E]` deuda **34** (era 35: `TEOREMAS-E-HIPOTESIS.md` saldada) · `[B]` 44/44 · `[C]` `[D]` `[F]` · `[H]` 85/85 · `[A2]`, aviso: 132 líneas del cuerpo con cifras de su fecha (registro) |
+| sondeos de la auditoría | ✅ los siete compilan (`doc/AUDITORIA-BASE-2026-10-02.md` §2) |
+
+⚠️ **Tres defectos de los controles, cazados al pasarlos**:
+
+* `[B]`: en msys (GNU grep 3.0, locale UTF-8) la alternativa `🗑️` de `DEAD_MARKER` **no casa nunca** —grep no
+  maneja un carácter fuera del BMP en UTF-8; `⏳` y `✏` sí—, y en la CI (Linux) sí casa ⇒ el mismo documento daba
+  rojo en local y verde en CI. Las marcas de retirada llevan ahora una palabra («retirado»), y el script lo explica
+  junto al patrón.
+* `[A]`: la fecha ISO que puse en la misma línea que las cifras del banner las **eximía** de `[A]` (una línea con
+  fecha cuenta como registro) — y el control lo dijo: «`sorry`: control VACÍO». Las cifras van en una línea y la
+  fecha en otra. 🔑 *Anotar una cifra con su fecha puede apagar el control que la vigila.*
+* `[B]`, ámbito: sólo mira nombres con los prefijos `prf_|pcc_|goedel_|godel|d[123]_|repr_|ax_`. **No ve**
+  `NegVerifier`, `Reflects`, `OmegaConsistent`, `ConsistentOmega`, `negVerifier_proved`… ⇒ su verde **no certifica**
+  que los documentos no citen lo retirado; eso lo hizo la revisión adversarial.
+
+### 7 · Lo que queda
+
+* **FOL** (paso siguiente): borrar `MetaRules.lean` y su import en `Core.lean`; reescribir `Inconsistencia.lean`
+  (sube `derives_to_derives0`, `derives_soundness` y las cuatro refutaciones; se va
+  `inconsistencia_de_cualquier_solidez`, cuyo enunciado pasa a ser falso); censo de axiomas 4 → 0; borrar sus
+  `.olean` huérfanos; corregir los textos que se vuelven falsos (51 sitios medidos) —⛔ cinco de ellos están en
+  módulos **congelados** (`Soundness0`, `Canonical0`, `Compacity0`, `Rename`, `TheoryFramework/Instances/FOL`) y
+  necesitan un `thaw` autorizado por el propietario—. También `FOL/AXIOMS.md:293`, de la lista de ADR-114 §3.
+* **RPP, en el push que sigue al de FOL**: `check-estratos` `Derives|22|0|FOL.Inconsistencia.derives_soundness`;
+  las filas `FOL.Inconsistencia.*` de `check-footprints.bash`; y **el prefijo de la caché de la CI** (`key` y
+  `restore-keys`): la caché guarda `FOL/.lake` entero, cada CI verde contra un FOL con `MetaRules` guarda su
+  `.olean`, y un `.olean` sin fuente sigue siendo importable. Cambiarlo **antes** del borrado no sirve —la primera CI
+  con la clave nueva la volvería a llenar—, así que se cambia **después**. 🔑 *Invalidar una caché antes de borrar
+  lo que guarda no la invalida.*
+* **PeanoRF** (BLOQUEADO por el propietario) depende de FOL y de RPP **por ruta**: con este paso cae su
+  `Meta/AxiomCheck.lean` (cita los retirados `ROBINSON_PlusPlus.Full.ax_induction`, `ax_list_induction`, `ax_axiomsCodeT_eq`…), y con
+  el de FOL cae entero (`Prelim.lean` importa `FOL.MetaRules`; `Omega/Basic.lean` crea alias de los cuatro axiomas).
+  No se toca: queda escrito para cuando se desbloquee.
+* Luego, en orden: F1 (L2-3) · D7 · el modelo de los 141 · `⊬¬G` por **Rosser** · ronda 3 · los sondeos de control
+  negativo en CI (R2-5-1).
+
+**Véase también:** ADR-024, ADR-025, ADR-029, ADR-113, ADR-114; `sondeos/MetaReglasRefutables.lean`,
+`sondeos/DerivesSinMetaReglas.lean`, `TEOREMAS-E-HIPOTESIS.md`.

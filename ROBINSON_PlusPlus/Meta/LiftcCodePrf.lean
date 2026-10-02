@@ -756,7 +756,7 @@ theorem pcc_congr_consT_arg1_code (B X Y : Term)
 /- ⛔ **`iz_inv` RETIRADO al promover (decimo duplicado).** Era
    `∀ W, Prf (substtc zero W (termCode zero) =eq termCode zero)`, que es EXACTAMENTE
    `ROBINSON_PlusPlus.Meta.EvalRunFnPrf.prf_substtc_termCode_nil` — porque `nil := zero`
-   (`Minimal/Axioms.lean:126`), asi que `termCode nil` y `termCode zero` son EL MISMO termino.
+   (`Minimal/Axioms.lean`), asi que `termCode nil` y `termCode zero` son EL MISMO termino.
    Ya esta `export`ado a la raiz (`EvalRunFnPrf.lean:157`), luego visible sin cualificar.
    La comparacion por NOMBRE no lo detectaba: lo caza el verificador con un `rfl` compilado. -/
 

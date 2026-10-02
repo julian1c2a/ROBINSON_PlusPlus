@@ -9,15 +9,20 @@ import ROBINSON_PlusPlus.Meta.Representability2
 import FOL.FOL
 import FOL.Theorems.Eq
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`ax_axiomsCodeT_eq`, `prf_to_derives`, `prf_In_listFormCodeM`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.SubstArith
-open ROBINSON_PlusPlus.Meta.StepArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.HilbertSeq
 open ROBINSON_PlusPlus.Meta.Representability
-open ROBINSON_PlusPlus.Meta.Induction
 open ROBINSON_PlusPlus.Meta.ProofChain
 open ROBINSON_PlusPlus.Meta.Representability2
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -35,8 +40,8 @@ Porte finitario de `Representability2` (encoder `runFn`/`chainOk` + tracking) a
 `Prf`, culminando en **`repr_pos'_prf : Prf φ → Prf (provCodeC' φ)`** (necesitación
 internalizada al nivel del cálculo finitario, lo que necesita la cadena HBL hacia
 Gödel II real). Reusa los defs system-agnósticos `lineJustif`/`lineCode'`/`proofCode'`
-de `Representability2` y los lemas `Prf` de `ReprPrf`/`ArithPrf`; cada prueba espeja
-su versión `axioms ⊢`.
+de `Representability2` y los lemas `Prf` de `ReprPrf`/`ArithPrf`; cada prueba espejaba
+su versión `axioms ⊢` de `Representability2`, retirada (ADR‑115).
 -/
 
 /-! ### `concat`/`In` sobre códigos de listas en `Prf` -/
@@ -99,15 +104,19 @@ theorem prf_In_runFn_of_mem {rs : List Rule} {L : List Formula} {φ : Formula}
 2026‑09‑12; antes `axiom prf_axiomsCodeT_eq`).
 
 Ancla el constante opaco `axiomsCodeT` a la lista explícita `listFormCodeM axioms` al nivel del
-cálculo `Prf`. No es derivable de su gemelo `⊢` (`ax_axiomsCodeT_eq`): `Prf → ⊢` va en una sola
-dirección.
+cálculo `Prf`. No era derivable de su gemelo sobre `⊢` (`ax_axiomsCodeT_eq`, retirado con ADR‑115):
+el puente `Prf → ⊢` (también retirado) iba en una sola dirección.
 
 ## ⛔⛔ Por qué dejó de ser `axiom`
 
 Un `axiom` de tipo `Prf …` **HABITA el inductivo `Prf`**, y por **M‑11** eso prohíbe demostrar nada
-sobre `Prf` por inducción. Pero el árbol lo hace **tres veces** —`prf_to_derives`, `prf_to_prfH`,
-`prf_to_derivation`— y D1 **se aplica al propio postulado** en `Meta/InAxiomsCodePrf.lean:317`.
-⚠️ Y `#print axioms` **no lo detecta**: esos tres tienen footprint limpio y eran injustificados.
+sobre `Prf` por inducción. Pero el árbol lo hacía **tres veces** —`prf_to_derives` (retirado con
+ADR‑115), `prf_to_prfH` y `prf_to_derivation`— y D1 **se aplicaba al propio postulado** (hoy, a
+`AnclaEq.eq`) en `pcc_In_axiomsCodeT_tracked` (`Meta/InAxiomsCodePrf.lean`).
+⚠️ Y `#print axioms` **no lo detecta**: `prf_to_prfH` y `prf_to_derivation` tienen footprint limpio
+y eran injustificados. ✏️ Aquí se decía lo mismo de `prf_to_derives`, y era FALSO: su footprint
+llevaba `axiom` de la capa `⊢` —dos de RPP, retirados con ADR‑115, y uno de `FOL/MetaRules.lean`,
+que RPP ya no importa— (cuáles, en la nota ADR‑115 de `Meta/Hilbert.lean`).
 
 🔑 **El fondo**: postular `Prf (ancla)` afirma que el ancla **tiene una derivación finita de
 Hilbert**. Lo que queremos es que sea **VERDADERA**. La hipótesis dice eso y nada más.
@@ -118,7 +127,8 @@ Medido: el ancla alcanza **16 módulos y ~40 usos**. Como argumento habría que 
 Como **clase**, la resolución de instancias la hila sola: basta `variable [AnclaEq]` en cada módulo
 afectado y **ninguna llamada cambia**. El footprint sigue limpio.
 
-⇒ `Prf` queda **sin ningún `axiom` habitándolo** y las tres inducciones pasan a ser **legítimas**. -/
+⇒ `Prf` queda **sin ningún `axiom` habitándolo** y las inducciones sobre `Prf` pasan a ser
+**legítimas** (eran tres; quedan dos, `prf_to_prfH` y `prf_to_derivation`). -/
 class AnclaEq : Prop where
   eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
 

@@ -602,7 +602,7 @@ sobre `W` siguen siendo **cerradas bajo `liftc zero`** (`substCode_hyps_lift`), 
 que hacía falta.
 
 📖 **Y el testigo va como PARÁMETRO con su ecuación, no clavado.** Existe
-`prf_congr_substfc_arg2` (`Meta/ArithPrf.lean:59`) y se podría clavar el testigo a
+`prf_congr_substfc_arg2` (`Meta/ArithPrf.lean`) y se podría clavar el testigo a
 `varc v̄` transportando; **no se hace**, y la razón está escrita desde A5 en
 `doc/REFERENCE-Incompleteness.md` §3.50: *cuando un cuerpo bajo binder necesita el mismo
 parámetro a dos niveles, no lo escribas con `liftc` — parametrízalo por los dos*. Es la misma

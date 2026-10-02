@@ -5,6 +5,13 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.NatArithPrf
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`prf_to_derives`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
@@ -21,10 +28,10 @@ namespace ROBINSON_PlusPlus.Meta.NatOrderPrf
 /-!
 ## META — NIVEL D real: ORDEN (`≤`) y asociatividad de `+` en `Prf`
 
-Entregable **i‑a** de la ruta (1a) (`NEXT-STEPS.md`): la aritmética de orden existe hoy sólo a
-nivel `⊢` (`Minimal/Theorems/Block3‑5`) y **no puede importarse** desde allí — no hay puente
-`⊢ → Prf` (`Derives` tiene la ω‑regla; sólo existe `prf_to_derives`). Se re‑prueba en `Prf`, como
-en su día se hizo con `Meta/ArithPrf.lean`.
+Entregable **i‑a** de la ruta (1a) (`NEXT-STEPS.md`): la aritmética de orden existía entonces sólo
+a nivel `⊢`, en `Minimal/Theorems/Block3‑5` —hoy retirados (ADR‑115)—, y **no podía importarse**:
+no había puente `⊢ → Prf` (`Derives` tenía la ω‑regla; sólo existía `prf_to_derives`, también
+retirado). Se re‑prueba en `Prf`, como en su día se hizo con `Meta/ArithPrf.lean`.
 
 **Destino:** monotonía del emparejamiento de Cantor ⟹ `sub‑código < código` ⟹ inducción fuerte
 ⟹ `pcc_eval_substfc` ⟹ los 7 tags de `lineWF` que faltan.
@@ -72,7 +79,7 @@ theorem PrfH_eq_congr_add2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
 
 ⚠️ **CORRECCIÓN (2026‑07‑23).** La primera versión de este lema se probó **por inducción**, lo cual
 era **trabajo innecesario**: `ax7_add_assoc` es un **axioma de la teoría** (está en la lista
-`axioms`, `Minimal/Axioms.lean:1205`), igual que `ax6_add_comm`, y las leyes de `mul` (`ax8`–`ax12`).
+`axioms` de `Minimal/Axioms.lean`), igual que `ax6_add_comm`, y las leyes de `mul` (`ax8`–`ax12`).
 Lo que hay que probar por inducción es sólo lo que **no** es axioma (p. ej. `0 + n = n`, porque
 `add` recurre por la derecha). Se deja la instanciación directa. -/
 

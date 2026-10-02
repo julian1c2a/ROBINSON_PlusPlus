@@ -10,6 +10,13 @@ import ROBINSON_PlusPlus.Meta.Representability
 import FOL.FOL
 import FOL.Theorems.Eq
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`runFn_nil`, `vpf_ind`, `ax`, `spec`) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
@@ -28,10 +35,16 @@ namespace ROBINSON_PlusPlus.Meta.ReprPrf
 ## META — NIVEL D real: re-nivelación de la cadena a `Prf` (hacia Gödel II real)
 
 Para Gödel II real (`ConsistentH → ¬ Prf Con'`) la cadena HBL debe vivir en el
-cálculo **finitario `Prf`** (no en `axioms ⊢`), porque `provCodeC'` rastrea `Prf` y
-`¬⊢Con'` es falso (el ω-sistema es sólido). El refactor `Prf.thy → axioms` lo
-habilitó: `Prf` ya puede usar TODO axioma (incluida la maquinaria de coding) vía
-`thy`.
+cálculo **finitario `Prf`** (no en `axioms ⊢`), porque `provCodeC'` rastrea `Prf`. El
+refactor `Prf.thy → axioms` lo habilitó: `Prf` ya puede usar TODO axioma (incluida la
+maquinaria de coding) vía `thy`.
+
+✏️ **Una frase de aquí era FALSA** (ADR‑114 · ADR‑115, 2026‑10‑02): añadía «y `¬⊢Con'` es falso
+(el ω‑sistema es sólido)». El cálculo `⊢` con las meta‑reglas de FOL **no era sólido**: sus
+postulados se refutan sin usarlos, Lean + cualquiera de ellos demuestra `False`, y
+`ax_list_induction` (un `axiom` de RPP, retirado) daba por sí solo `axioms ⊢ ⊥`
+(`sondeos/MetaReglasRefutables.lean`, `sondeos/ListInductionAxiomRefutable.lean`). La capa `⊢`
+se retiró de RPP (ADR‑115); en FOL, `FOL/MetaRules.lean` sigue pendiente de retirar.
 
 **Infraestructura de porte.** Los lemas-ecuación del verificador se demostraron a
 nivel `axioms ⊢` con `ax`(=`Derives.hyp`/thy) + `spec`(=`elim_forall`) + `simp`. Su

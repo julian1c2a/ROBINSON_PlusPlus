@@ -5,6 +5,13 @@ License: MIT
 -/
 
 /-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella
+> los consumidores de este módulo que transferían su cómputo al objeto (`Full/Primality.lean`,
+> `Full/Factorization.lean`: `isPrime_numeral`, `tfa_numeral`). Este módulo, ℕ pura, no cambia; lo
+> que el texto de abajo diga de esa transferencia es REGISTRO, no estado.
+-/
+
+/-!
 ## FULL — Teoría de números META (pura ℕ, sin Mathlib)
 
 Capa meta-nivel autocontenida sobre `ℕ` (no usa FOL ni Mathlib): primalidad,

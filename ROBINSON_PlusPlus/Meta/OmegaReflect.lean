@@ -7,6 +7,13 @@ import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 import ROBINSON_PlusPlus.Meta.DiagonalNumeral
 
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`OmegaConsistent`, `ConsistentOmega`, `NegVerifier`, `repr_pos'`…) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
+
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.DiagonalNumeral
 open ROBINSON_PlusPlus.Meta.Hilbert
@@ -22,11 +29,25 @@ set_option linter.unusedSimpArgs false
 namespace ROBINSON_PlusPlus.Meta.OmegaReflect
 
 /-!
-## META — NIVEL D real (§41): descargar la REFLEXIÓN desde la ω‑CONSISTENCIA
+## META — NIVEL D real (§41): los TESTIGOS ESTÁNDAR del `∃` de `provCodeC'`
 
-`goedel_first_undecidable_real'` (`Meta/DiagonalTwo.lean`) demuestra `⊬G ∧ ⊬¬G` **sin ningún postulado
-gödeliano**, pero con la reflexión (`Reflects φ := (axioms ⊢ provCodeC' φ) → Prf φ`) como **hipótesis
-META explícita**. Aquí se **reduce** esa hipótesis a dos piezas honestas y separadas.
+🗑️ **Lo que este módulo era, y ya no es (ADR‑115).** `goedel_first_undecidable_numeral`
+(`Meta/DiagonalNumeral.lean`; heredero de `goedel_first_undecidable_real'`, que ya se había retirado
+con el punto fijo roto) daba `⊬G ∧ ⊬¬G` con la reflexión (`Reflects φ := (axioms ⊢ provCodeC' φ) →
+Prf φ`) como **hipótesis META explícita**, y aquí se **reducía** esa hipótesis a dos piezas,
+`OmegaConsistent` y `NegVerifier`, compuestas en `reflects_of_omega` y `goedel_first_undecidable_omega`.
+Todo eso era sobre `⊢` y se **retiró** con esa capa. ⛔ Y `OmegaConsistent` era, además, **refutable
+por su propia definición** (L1‑4, `sondeos/OmegaConsistentRefutable.lean`): aquellos teoremas eran vacuos.
+
+**Lo que queda** (nada de `⊢`): el `∃` de `provCodeC'`, explícito (`provBody`, `Verifies`,
+`subst_provBody`); las clases de testigos (`IsCodeShaped`, `StdArgs`/`StdLine`/`StdChain`); y la
+garantía `stdChain_proofCode'`, con su payoff `junk_line_not_stdLine`. ⚠️ Sin consumidor fuera del
+módulo salvo `StdArgs`/`StdChain`, que usa `Meta/ChainNegPrf.lean` —sin consumidor él tampoco—
+(medido el 2026‑10‑02). La mitad `⊬¬G` sobre `Prf` está por formular, **por Rosser** (ADR‑115 §7):
+la ω‑consistencia de antes tampoco vale sobre `Prf` (`not_omegaConsistentPrf`, en
+`sondeos/OmegaConsistentRefutable.lean`).
+
+El resto de esta cabecera es **REGISTRO** del diseño retirado.
 
 ### Por qué la reflexión NO puede venir de dentro de la teoría (cerrado por Gödel)
 
@@ -37,18 +58,22 @@ numerales, así que tampoco se aplica desde hechos sobre testigos concretos: par
 `x`, `⊢ ¬A(x)` **es** la universal — circular. Ésta es la razón por la que el postulado legacy
 `provFormula_repr` era **falso en general** (lo enunciaba bajo consistencia simple).
 
-### La descomposición honesta
+### La descomposición honesta (retirada con ADR‑115)
 
-1. **`OmegaConsistent`** — la **ω‑consistencia clásica**, como hipótesis META explícita. NO es
-   `ConsistentOmega` (que es sólo `¬(axioms ⊢ ⊥)`): es estrictamente más fuerte, y es **exactamente**
+1. **`OmegaConsistent`** — la **ω‑consistencia clásica**, como hipótesis META explícita. NO era
+   `ConsistentOmega` (que era sólo `¬(axioms ⊢ ⊥)`): era estrictamente más fuerte, y era **exactamente**
    lo que Gödel necesita para `⊬¬G`. Es **creíble**: toda teoría **sólida** (correcta en ℕ) la cumple.
+   ✏️ **FALSO (ADR‑114 L1‑4 · ADR‑115, 2026‑10‑02)**: con la clase estrecha de testigos (§1bis) la
+   definición era **refutable**. Con `A := (#0 = 1)`, `∃A` es demostrable y la teoría refuta, en
+   `Prf`, que una cadena estándar valga 1 —lo que es cierto en ℕ—, así que hasta una teoría sólida
+   la viola (`sondeos/OmegaConsistentRefutable.lean`).
 2. **`NegVerifier`** — la **Δ₀‑completitud NEGATIVA del verificador**: si `φ` no es demostrable, la
-   teoría **refuta** que cualquier testigo **estándar** sea una prueba suya. Es el **espejo de
-   `repr_pos'`** (D1) y **sí es alcanzable**: para un testigo CONCRETO el chequeo es finito y
+   teoría **refuta** que cualquier testigo **estándar** sea una prueba suya. Era el **espejo de
+   `repr_pos'`** (D1) y **era alcanzable**: para un testigo CONCRETO el chequeo es finito y
    estructural, a diferencia de la Π₁ universal (que Gödel bloquea).
 
-`reflects_of_omega` compone ambas. Con esto, la reflexión deja de ser un enunciado bloqueado por Gödel
-y pasa a ser un enunciado **Δ₀ concreto** (`NegVerifier`) más una hipótesis clásica y visible.
+`reflects_of_omega` componía ambas: la reflexión dejaba de ser un enunciado bloqueado por Gödel y
+pasaba a ser un enunciado **Δ₀ concreto** (`NegVerifier`) más una hipótesis clásica y visible.
 -/
 
 /-! ### El `∃` de `provCodeC'`, explícito -/
@@ -74,7 +99,7 @@ theorem subst_provBody (φ : Formula) (t : Term) :
   simp only [provBody, Verifies, substFormula, substTerm, substTerms, land, chainOk, In, runFn,
     nil, zero, FOL.substTerm_liftTerm, reduceIte, if_true]
 
-/-! ### 1 · ω‑CONSISTENCIA (hipótesis META, explícita) — testigos «con forma de código» -/
+/-! ### 1 · Testigos «con forma de código» (la ω‑consistencia que los cuantificaba se retiró: ADR‑115) -/
 
 /-- **Términos CON FORMA DE CÓDIGO**: los generados por los constructores del lenguaje de códigos
     (`numeralM` para tags/numerales, `strCodeM` para símbolos, `nil`, `cons`). Es la imagen sintáctica
@@ -90,16 +115,17 @@ theorem subst_provBody (φ : Formula) (t : Term) :
     ⛔⛔ **CORRECCIÓN 2026‑09‑10h (ADR‑022) — este docstring afirmaba algo FALSO.** Decía: *«las
     comparaciones de `NegVerifier` son PARALELAS POR TIPO — `formCode φ` contra `formCode ψ`, nunca
     `cons` contra `numeral` en la misma ranura»*. **No es cierto sobre esta clase**, y el
-    contraejemplo está compilado (`sondeos/MedirF_Censo.lean` §4): `⟨formCode (⊥⇒⊥), 8̄, 3̄⟩` es
-    `IsCodeShaped`, y refutarla obliga a comparar `formCode ⊥` (un `cons`) contra `numeralM 3` (un
-    numeral) **en la misma ranura**. La única vía es por **VALOR** (`numTree_ne`), y el valor de un
-    código **no es calculable** (`codeNat (⊥⇒⊥) = 583 734`; para una sentencia real, astronómico).
+    contraejemplo se compiló (`sondeos/MedirF_Censo.lean` §4; hoy es registro y no compila: cita lo
+    retirado con ADR‑115): `⟨formCode (⊥⇒⊥), 8̄, 3̄⟩` es `IsCodeShaped`, y refutarla obliga a
+    comparar `formCode ⊥` (un `cons`) contra `numeralM 3` (un numeral) **en la misma ranura**. La
+    única vía es por **VALOR** (`numTree_ne`), y el valor de un código **no es calculable**
+    (`codeNat (⊥⇒⊥) = 583 734`; para una sentencia real, astronómico).
 
     ⇒ **Por eso `StdChain` YA NO se define sobre esta clase** sino sobre `StdLine` (§1bis): ahí la
-    disciplina de tipos es **verdadera por construcción**, y entonces sí mandan
+    disciplina de tipos es **verdadera por construcción**, y entonces sí mandaban
     `formCode_ne`/`termCode_ne`/`cons_ne_head`/`cons_ne_tail`/`strCode_ne`
-    (`Meta/CodeDistinct.lean`). `IsCodeShaped` se conserva porque `isClosed` (abajo) sigue siendo
-    útil y porque los sondeos la citan. -/
+    (`Meta/CodeDistinct.lean`; sobre `⊢`, retirados con ADR‑115). `IsCodeShaped` se conserva
+    porque `isClosed` (abajo) sigue siendo útil y porque los sondeos la citan. -/
 inductive IsCodeShaped : Term → Prop
   | numeral (n : Nat) : IsCodeShaped (numeralM n)
   | strCode (s : String) : IsCodeShaped (strCodeM s)
@@ -122,26 +148,31 @@ theorem IsCodeShaped.isClosed {x : Term} (hx : IsCodeShaped x) : ∀ k, liftTerm
 
 ⛔ **Por qué `IsCodeShaped` no servía, medido y no argumentado.** Su propio docstring (arriba)
 afirmaba que las comparaciones de `NegVerifier` son *«PARALELAS POR TIPO — nunca `cons` contra
-`numeral` en la misma ranura»*. **Es falso sobre la clase que él mismo define**, y hay contraejemplo
-compilado en `sondeos/MedirF_Censo.lean` §4:
+`numeral` en la misma ranura»*. **Es falso sobre la clase que él mismo define**, y hubo contraejemplo
+compilado en `sondeos/MedirF_Censo.lean` §4 (hoy registro: no compila desde ADR‑115, cita lo retirado):
 
     IsCodeShaped ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩        -- ✅ testigo `StdChain` legítimo del diseño viejo
 
 y refutarla exige comparar `formCode ⊥` (un **`cons`**) contra `numeralM 3` (un **numeral**) en la
-misma ranura. `formCode_ne`/`cons_ne_head` **no pueden**; sólo se puede por **VALOR** (`numTree_ne`,
+misma ranura. `formCode_ne`/`cons_ne_head` **no podían**; sólo se podía por **VALOR** (`numTree_ne`,
 mismo sondeo), y el valor de un código **no es calculable** (`codeNat (⊥⇒⊥)` ya son **583 734**, y
 para una sentencia real es astronómico). ⇒ la obligación existía pero **no era descargable**.
 
 ⭐ **La clase estrechada la elimina de raíz**: la cabeza de una línea es **sintácticamente** un
 `formCode`, la casilla del tag un `numeralM`, y los argumentos `formCode`/`termCode`. Todas las
-comparaciones quedan **paralelas por tipo de verdad**, y las decide `formCode_ne`/`termCode_ne`
-(`Meta/CodeDistinct.lean`) **sin evaluar Cantor**.
+comparaciones quedan **paralelas por tipo de verdad**, y las decidían `formCode_ne`/`termCode_ne`
+(`Meta/CodeDistinct.lean`; sobre `⊢`, retirados con ADR‑115) **sin evaluar Cantor**.
 
-⚠️ **El precio, escrito y no escondido**: `OmegaConsistent` (abajo) cuantifica sobre **menos**
-testigos ⇒ es una hipótesis **estrictamente más fuerte** que con la clase ancha. Ver la discusión
-completa —incluido por qué el argumento «toda teoría sólida es ω‑consistente» ya **no** la cubre en
-general, y por qué sí la cubre en el único `∃` al que se aplica— en **ADR‑022**. La garantía que lo
-hace admisible es `stdChain_proofCode'` (§1ter): **la clase contiene los códigos de prueba REALES**. -/
+⚠️ **El precio, escrito y no escondido** (registro: `OmegaConsistent` se retiró con ADR‑115):
+`OmegaConsistent` cuantificaba sobre **menos** testigos ⇒ era una hipótesis **estrictamente más
+fuerte** que con la clase ancha. Ver la discusión completa —incluido por qué el argumento «toda
+teoría sólida es ω‑consistente» ya **no** la cubría en general, y por qué sí la cubría en el único
+`∃` al que se aplicaba— en **ADR‑022**.
+✏️ **FALSO (ADR‑114 L1‑4 · ADR‑115, 2026‑10‑02)** lo de «sí la cubría en el único `∃`»: con la clase
+estrecha la definición era **refutable** (`A := #0 = 1`, `sondeos/OmegaConsistentRefutable.lean`), y
+una hipótesis refutable hace vacuo el teorema que la supone, aunque la prueba sólo la aplique a
+`provBody`. Lo que sí sigue en pie es la garantía `stdChain_proofCode'` (§1ter): **la clase contiene
+los códigos de prueba REALES**. -/
 
 /-- Los **ARGUMENTOS** de una justificación estándar: la lista‑código formada por códigos de
     fórmula (`formCode`) y de término (`termCode`), que es exactamente lo que produce `lineJustif`. -/
@@ -162,8 +193,9 @@ def StdChain (l : List Term) : Prop := ∀ x ∈ l, StdLine x
 
 /-! ### 1ter · 🏁 LA GARANTÍA: la clase contiene los códigos de prueba REALES
 
-Sin esto el estrechamiento sería una trampa: se podría hacer `NegVerifier` trivial vaciando la
-clase, y `OmegaConsistent` se volvería **falsa**. Lo que sigue lo impide. -/
+Sin esto el estrechamiento habría sido una trampa: se podía hacer `NegVerifier` trivial vaciando la
+clase, y `OmegaConsistent` se volvía **falsa** (las dos, retiradas con ADR‑115; y `OmegaConsistent`
+resultó refutable sin vaciar nada, L1‑4). Lo que sigue lo impedía, y sigue probado. -/
 
 /-- Toda línea producida por `lineCode'` es estándar — los **21 tags**. -/
 theorem stdLine_lineCode' (acc : List Formula) (f : Formula) (r : Rule) :
@@ -192,8 +224,9 @@ theorem stdLine_lineCode' (acc : List Formula) (f : Formula) (r : Rule) :
   | listInd A => exact ⟨f, 20, _, rfl, .form A .nil⟩
 
 /-- 🏁 **LA GARANTÍA DE ADR‑022**: el código de **cualquier** demostración‑secuencia es un testigo
-    estándar. ⇒ estrechar la clase **no deja fuera ningún testigo real**, que es lo único que
-    hace admisible la `OmegaConsistent` reforzada. -/
+    estándar. ⇒ estrechar la clase **no deja fuera ningún testigo real**. Era lo único que hacía
+    admisible la `OmegaConsistent` reforzada (retirada con ADR‑115, y refutable: L1‑4); el
+    teorema vale por sí solo. -/
 theorem stdChain_proofCode' : ∀ (rs : List Rule) (acc : List Formula),
     ∃ l : List Term, And (StdChain l) (objList l = proofCode' rs acc) := by
   intro rs
@@ -255,66 +288,22 @@ theorem junk_line_not_stdLine :
   have hs : as = cons (numeralM 3) nil := by simp [cons] at heq; exact heq.2.2.symm
   exact not_stdArgs_numeralM 3 nil (hs ▸ has)
 
-/-- **ω‑CONSISTENCIA** (hipótesis META, la clásica): la teoría **no demuestra un `∃` mientras refuta
-    TODOS sus testigos estándar**.
-
-    ⚠️ **NO es `ConsistentOmega`** (que es sólo `¬(axioms ⊢ ⊥)`, consistencia a secas). Es
-    estrictamente **más fuerte**, y es **exactamente** la hipótesis que Gödel necesita para `⊬¬G` —
-    por eso existe **Rosser**, que consigue ambas mitades desde consistencia simple, pero **cambiando
-    de sentencia**.
-
-    Es **creíble**: toda teoría **SÓLIDA** (correcta en ℕ) es ω‑consistente. -/
-def OmegaConsistent : Prop :=
-  ∀ A : Formula, (axioms ⊢ Formula.ex A) →
-    ¬ (∀ l : List Term, StdChain l → axioms ⊢ neg (substFormula 0 (objList l) A))
-
-/-! ### 2 · Δ₀‑COMPLETITUD NEGATIVA del verificador (lo que queda por construir) -/
-
-/-- **Δ₀‑COMPLETITUD NEGATIVA DEL VERIFICADOR**: si `φ` **no** es demostrable, la teoría **REFUTA**
-    que cualquier testigo **estándar** sea una prueba suya.
-
-    Es el **espejo de `repr_pos'`** (D1) en la dirección negativa, y **es alcanzable**: para un testigo
-    CONCRETO (cerrado) el chequeo es **finito y estructural**. Contrasta con la versión Π₁ universal
-    `⊢ ¬provCodeC' φ`, que está **CERRADA POR GÖDEL II** (para `φ = ⊥` sería `Con(T)`).
-
-    **Descomposición para construirlo** (ver `NEXT-STEPS.md`):
-    * evaluar `runFn nil ⟦l⟧` en un testigo concreto (los axiomas de `runFn` computan);
-    * si `⌜φ⌝` **no** está entre las conclusiones ⇒ refutar el `In` (base: `formCode_ne`,
-      `Meta/CodeDistinct.lean`);
-    * si **sí** está ⇒ la cadena no puede ser válida (si lo fuera, `φ` sería demostrable, contra la
-      hipótesis) ⇒ refutar `chainOk` (vía `ax_lineWF_inv` + distinción de códigos). Esto último exige
-      la **solidez estructural del verificador** respecto de `Prf` — el punto delicado. -/
-def NegVerifier : Prop :=
-  ∀ (φ : Formula), ¬ Prf φ →
-    ∀ l : List Term, StdChain l → axioms ⊢ neg (Verifies φ (objList l))
-
-/-! ### 3 · La REDUCCIÓN -/
-
-/-- **ω‑consistencia + Δ₀‑completitud negativa ⟹ REFLEXIÓN.** Descarga la hipótesis `Reflects` de
-    `goedel_first_undecidable_real'`. La prueba es inmediata una vez las definiciones encajan: si
-    `φ` no fuera demostrable, `NegVerifier` refutaría **todos** los testigos estándar del `∃` que la
-    teoría demuestra — violando la ω‑consistencia. -/
-theorem reflects_of_omega (hω : OmegaConsistent) (hneg : NegVerifier) (φ : Formula) :
-    Reflects φ := by
-  intro hprov
-  refine Classical.byContradiction (fun hnp => ?_)
-  refine hω (provBody (formCode φ)) hprov ?_
-  intro l hl
-  rw [subst_provBody]
-  exact hneg φ hnp l hl
-
-/-- **PRIMER TEOREMA DE GÖDEL — `G` INDECIDIBLE desde la ω‑CONSISTENCIA** (la hipótesis honesta y
-    clásica), sin ningún postulado gödeliano. Sólo queda por construir `NegVerifier` (Δ₀, alcanzable). -/
-theorem goedel_first_undecidable_omega
-    (hcon : ConsistentOmega) (hω : OmegaConsistent) (hneg : NegVerifier) :
-    (¬ Prf godelCN) ∧ (¬ Prf (neg godelCN)) :=
-  goedel_first_undecidable_numeral hcon (reflects_of_omega hω hneg godelCN)
+-- (Aquí vivían `OmegaConsistent`, §2 `NegVerifier` y §3 la reducción `reflects_of_omega`, sobre `⊢`; retirados con ADR‑115.)
 
 end ROBINSON_PlusPlus.Meta.OmegaReflect
 
 export ROBINSON_PlusPlus.Meta.OmegaReflect (
-  provBody provFromCode_eq_ex provCodeC'_eq_ex Verifies subst_provBody
-  IsCodeShaped StdArgs StdLine StdChain OmegaConsistent NegVerifier
-  stdLine_lineCode' stdChain_proofCode' not_stdArgs_numeralM junk_line_not_stdLine
-  reflects_of_omega goedel_first_undecidable_omega
+  provBody
+  provFromCode_eq_ex
+  provCodeC'_eq_ex
+  Verifies
+  subst_provBody
+  IsCodeShaped
+  StdArgs
+  StdLine
+  StdChain
+  stdLine_lineCode'
+  stdChain_proofCode'
+  not_stdArgs_numeralM
+  junk_line_not_stdLine
 )

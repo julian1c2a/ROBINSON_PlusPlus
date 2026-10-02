@@ -5,15 +5,14 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.CheckArith
 -- ⚠️ Añadido en el dedup del 2026‑09‑09d: este módulo tenía copias LITERALES de
---    `concat_nil_eq`, `concat_cons_eq`, `in_cons_head` e `in_cons_tail`, que ya declara y
---    **exporta** `Meta/ProofChain.lean`. Los dos módulos eran independientes, así que la
---    salida barata era este `import` (no hay ciclo: `ProofChain` no depende de este módulo,
---    y sólo dos módulos del árbol pasan a verlo que no lo vieran ya).
+--    `concat_nil_eq`, `concat_cons_eq`, `in_cons_head` e `in_cons_tail`, que declaraba y
+--    **exportaba** `Meta/ProofChain.lean`. Los dos módulos eran independientes, así que la
+--    salida barata fue este `import` (sin ciclo: `ProofChain` no depende de este módulo).
+--    🗑️ Las cuatro eran de `⊢` y quedaron retiradas también de `ProofChain` (ADR‑115). Sus
+--    versiones `Prf` son `prf_concat_nil_eq`, `prf_concat_cons_eq`, `prf_in_cons_head` y
+--    `prf_in_cons_tail` (`Meta/ReprPrf.lean`).
 import ROBINSON_PlusPlus.Meta.ProofChain
 import ROBINSON_PlusPlus.Meta.HilbertSeq
-import ROBINSON_PlusPlus.Meta.Induction
-import ROBINSON_PlusPlus.Meta.ListInductionArith
-import ROBINSON_PlusPlus.Minimal.Theorems.Block6
 
 import FOL.FOL
 import FOL.Tactics
@@ -23,15 +22,24 @@ import FOL.Theorems.Neg
 import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
 import FOL.Deduction
+import ROBINSON_PlusPlus.Full.Induction
+import ROBINSON_PlusPlus.Meta.Hilbert
+import ROBINSON_PlusPlus.Meta.SubstArith
+import ROBINSON_PlusPlus.Minimal.Axioms
+
+/-!
+> 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
+> que este módulo tenía sobre `⊢`. Los nombres de esa capa que cite el texto de abajo
+> (`concat_nil_eq`, `concat_cons_eq`, `in_cons_head`, `in_cons_tail`…) **ya no existen**: lo que se lea sobre ellos es REGISTRO, no estado.
+> Lo que queda en el módulo no depende de `⊢`.
+-/
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
 open ROBINSON_PlusPlus.Meta.SubstArith
-open ROBINSON_PlusPlus.Meta.StepArith
 open ROBINSON_PlusPlus.Meta.CheckArith
 open ROBINSON_PlusPlus.Meta.HilbertSeq
-open ROBINSON_PlusPlus.Meta.Induction
 
 set_option linter.unusedSimpArgs false
 
@@ -40,7 +48,8 @@ namespace ROBINSON_PlusPlus.Meta.Representability
 /-!
 ## META — NIVEL D (real): representabilidad positiva  (Fase 2.5)
 
-Cierra la dirección **positiva** del puente de demostrabilidad object:
+Cerraba (sobre `⊢`; ver el registro de abajo) la dirección **positiva** del puente de
+demostrabilidad object:
 
 > `repr_pos : Prf φ → axioms ⊢ provCodeC φ`
 
@@ -57,10 +66,17 @@ secuencia acumulando conclusiones y emite cada línea con los códigos resueltos
 Como `provFormulaC` cuantifica sobre **cualquier** código de prueba, basta
 exhibir éste.
 
-La **inducción de seguimiento** `vpf_run` demuestra que `validProofFn` calcula,
+La **inducción de seguimiento** `vpf_run` demostraba que `validProofFn` calcula,
 sobre `proofCode rs acc`, el código object de la lista de conclusiones de
-`checkAux rs acc`; cada paso usa el step-lemma `vpf_*` correspondiente (los
+`checkAux rs acc`; cada paso usaba el step-lemma `vpf_*` correspondiente (los
 esquemas de sustitución Q1/Q2/Q3/Leibniz, vía los `*_concl_code` de StepArith).
+
+🗑️ **2026‑10‑02 (ADR‑115) — registro.** `repr_pos`, `vpf_run`, los `vpf_*` y sus auxiliares de
+este módulo (`congr_vpf_checked`, `congr_concat2`, `concat_listFormCode`, `In_listFormCode`) eran de
+`⊢` y quedaron retirados con esa capa (`StepArith` también). Aquí quedan `listFormCode`, el puente
+`formCodeM = formCode` y el encoder `lineCode`/`proofCode`. En `Prf`, D1 es `repr_pos'_prf`, que
+lleva `[AnclaEq]`, y los auxiliares son `prf_concat_listFormCode` (ambos en
+`Meta/Representability2Prf.lean`) y `prf_In_listFormCode` (`Meta/ReprPrf.lean`).
 -/
 
 /-! ### Código object de una lista de fórmulas -/
@@ -70,62 +86,13 @@ def listFormCode : List Formula → Term
   | [] => nil
   | f :: fs => cons (formCode f) (listFormCode fs)
 
-/-! ### Congruencias auxiliares (patrón `Derives.subst`) -/
-
-/-- Congruencia de `validProofFn` en el 1er argumento (acumulador). -/
-theorem congr_vpf_checked {c₁ c₂ rest : Term} (h : axioms ⊢ (c₁ =eq c₂)) :
-    axioms ⊢ (validProofFn c₁ rest =eq validProofFn c₂ rest) := by
-  let f : Formula :=
-    Formula.eq (validProofFn (liftTerm 0 c₁) (liftTerm 0 rest)) (validProofFn (.var 0) (liftTerm 0 rest))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (validProofFn c₁ rest) (validProofFn s rest) := by
-    intro s
-    simp only [f, substFormula, validProofFn, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS c₂) ▸ Derives.subst axioms c₁ c₂ f h ((hS c₁) ▸ Derives.refl axioms (validProofFn c₁ rest))
-
-/-- Congruencia de `concat` en el 2º argumento. -/
-theorem congr_concat2 {T a b : Term} (h : axioms ⊢ (a =eq b)) :
-    axioms ⊢ (concat T a =eq concat T b) := by
-  let f : Formula := Formula.eq (concat (liftTerm 0 T) (liftTerm 0 a)) (concat (liftTerm 0 T) (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (concat T a) (concat T s) := by
-    intro s
-    simp only [f, substFormula, concat, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS b) ▸ Derives.subst axioms a b f h ((hS a) ▸ Derives.refl axioms (concat T a))
-
-/-! ### Cómputo de `concat` sobre códigos de listas -/
-
-/-! ⛔ **`concat_nil_eq` y `concat_cons_eq` se borraron aquí** (2026‑09‑09d, dedup ADR‑019):
-eran copias literales de las de `Meta/ProofChain.lean`, que sí las exporta. Llegan ahora por el
-`import` de arriba. -/
-
-/-- `concat ⌜a⌝ ⌜b⌝ = ⌜a ++ b⌝` (sobre códigos de listas de fórmulas). -/
-theorem concat_listFormCode : ∀ (a b : List Formula),
-    axioms ⊢ (concat (listFormCode a) (listFormCode b) =eq listFormCode (a ++ b))
-  | [], b => by simpa [listFormCode] using concat_nil_eq (listFormCode b)
-  | f :: fs, b => by
-      simp only [listFormCode, List.cons_append]
-      exact FOL.derive_eq_trans (concat_cons_eq (formCode f) (listFormCode fs) (listFormCode b))
-        (congr_cons_tail (concat_listFormCode fs b))
-
-/-! ### Pertenencia object en una lista codificada -/
-
-/-! ⛔ **`in_cons_head` e `in_cons_tail` se borraron aquí** por la misma razón: copias literales
-de las de `Meta/ProofChain.lean`. -/
-
-/-- Reflexión de pertenencia: `g ∈ l ⟹ axioms ⊢ In ⌜g⌝ ⌜l⌝`. -/
-theorem In_listFormCode {g : Formula} : ∀ {l : List Formula},
-    List.Mem g l → axioms ⊢ In (formCode g) (listFormCode l)
-  | [], hmem => by cases hmem
-  | x :: xs, hmem => by
-      rcases List.mem_cons.mp hmem with heq | htail
-      · subst heq; exact in_cons_head (formCode g) (listFormCode xs)
-      · exact in_cons_tail (formCode x) (In_listFormCode htail)
-
 /-! ### Puente `formCodeM = formCode`
 
 La codificación local de `Minimal` (`formCodeM`, con `numeralM`) coincide con la
 de `Meta/Provability` (`formCode`, con `Godel.numeral`); vía `numeralM_eq`. Permite
-relacionar `axiomsCodeT` (anclado a `listFormCodeM coreAxioms`) con la pertenencia
-`In_listFormCode` (que usa `formCode`). -/
+relacionar `axiomsCodeT` (anclado por `[AnclaEq]` a `listFormCodeM axioms`) con la pertenencia
+sobre `formCode`: era `In_listFormCode`, sobre `⊢`, retirado (ADR‑115); en `Prf` es
+`prf_In_listFormCode`. -/
 
 theorem charsCodeM_eq : ∀ cs : List Char, charsCodeM cs = charsCode cs
   | []      => rfl
@@ -194,213 +161,9 @@ def proofCode : List Rule → List Formula → Term
       | some f => cons (lineCode acc f r) (proofCode rs (acc ++ [f]))
       | none => nil
 
-/-! ### Inducción de seguimiento -/
-
-/-- **Seguimiento del verificador**: sobre `proofCode rs acc`, `validProofFn`
-    calcula el código de la lista de conclusiones que `checkAux rs acc` produce. -/
-theorem vpf_run (rs : List Rule) : ∀ (acc L : List Formula), checkAux rs acc = some L →
-    axioms ⊢ (validProofFn (listFormCode acc) (proofCode rs acc) =eq listFormCode L) := by
-  induction rs with
-  | nil =>
-      intro acc L h
-      simp only [checkAux, Option.some.injEq] at h
-      subst h
-      simpa [proofCode] using vpf_nil (listFormCode acc)
-  | cons r rs ih =>
-      intro acc L h
-      cases hsc : stepConcl acc r with
-      | none => simp [checkAux, hsc] at h
-      | some f =>
-          have hcheck : checkAux rs (acc ++ [f]) = some L := by
-            have h2 := h; simp only [checkAux, hsc] at h2; exact h2
-          have ihf := ih (acc ++ [f]) L hcheck
-          have hmerge : axioms ⊢
-              (validProofFn (concat (listFormCode acc) (cons (formCode f) nil)) (proofCode rs (acc ++ [f]))
-                =eq validProofFn (listFormCode (acc ++ [f])) (proofCode rs (acc ++ [f]))) :=
-            congr_vpf_checked (by simpa [listFormCode] using concat_listFormCode acc [f])
-          rw [show proofCode (r :: rs) acc = cons (lineCode acc f r) (proofCode rs (acc ++ [f]))
-                from by simp [proofCode, hsc]]
-          refine FOL.derive_eq_trans ?_ (FOL.derive_eq_trans hmerge ihf)
-          -- queda el paso `validProofFn acc (cons (lineCode …) rest) =eq validProofFn (concat acc [⌜f⌝]) rest`
-          clear hmerge ihf hcheck h
-          cases r with
-          | p1 A B =>
-              have hf : f = (A ⇒ (B ⇒ A)) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_p1 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))
-          | p2 A B C =>
-              have hf : f = ((A ⇒ (B ⇒ C)) ⇒ ((A ⇒ B) ⇒ (A ⇒ C))) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_p2 (listFormCode acc) (formCode A) (formCode B) (formCode C) (proofCode rs (acc ++ [_]))
-          | c1 A B =>
-              have hf : f = (A ⇒ (B ⇒ (A ∧ B))) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_c1 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))
-          | c2 A B =>
-              have hf : f = ((A ∧ B) ⇒ A) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_c2 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))
-          | c3 A B =>
-              have hf : f = ((A ∧ B) ⇒ B) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_c3 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))
-          | j1 A B =>
-              have hf : f = (A ⇒ (A ∨ B)) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_j1 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))
-          | j2 A B =>
-              have hf : f = (B ⇒ (A ∨ B)) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_j2 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))
-          | j3 A B C =>
-              have hf : f = ((A ∨ B) ⇒ ((A ⇒ C) ⇒ ((B ⇒ C) ⇒ C))) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_j3 (listFormCode acc) (formCode A) (formCode B) (formCode C) (proofCode rs (acc ++ [_]))
-          | efq A =>
-              have hf : f = (⊥ ⇒ A) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_efq (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))
-          | q1 A t =>
-              have hf : f = ((Formula.forall A) ⇒ substFormula 0 t A) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_q1 (listFormCode acc) (formCode A) (termCode t) (proofCode rs (acc ++ [_]))) ?_
-              exact congr_vpf_checked (congr_concat2 (congr_cons_head (q1_concl_code A t)))
-          | q2 A t =>
-              have hf : f = (substFormula 0 t A ⇒ Formula.ex A) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_q2 (listFormCode acc) (formCode A) (termCode t) (proofCode rs (acc ++ [_]))) ?_
-              exact congr_vpf_checked (congr_concat2 (congr_cons_head (q2_concl_code A t)))
-          | q3 A B =>
-              have hf : f = ((Formula.forall (A ⇒ liftFormula 0 B)) ⇒ ((Formula.ex A) ⇒ B)) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_q3 (listFormCode acc) (formCode A) (formCode B) (proofCode rs (acc ++ [_]))) ?_
-              exact congr_vpf_checked (congr_concat2 (congr_cons_head
-                (congr_bin1 (congr_un (congr_bin2 (liftFormula_arith 0 B))))))
-          | eqrefl t =>
-              have hf : f = (t ≐ t) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_eqrefl (listFormCode acc) (termCode t) (proofCode rs (acc ++ [_]))
-          | leibniz A t₁ t₂ =>
-              have hf : f = ((t₁ ≐ t₂) ⇒ (substFormula 0 t₁ A ⇒ substFormula 0 t₂ A)) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_leibniz (listFormCode acc) (formCode A) (termCode t₁) (termCode t₂)
-                  (proofCode rs (acc ++ [_]))) ?_
-              exact congr_vpf_checked (congr_concat2 (congr_cons_head (leibniz_concl_code A t₁ t₂)))
-          | p3 A =>
-              have hf : f = (((A ⇒ ⊥) ⇒ ⊥) ⇒ A) := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              exact vpf_p3 (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))
-          | ind A =>
-              have hf : f = Full.inductionFormula A := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_ind (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))) ?_
-              refine congr_vpf_checked (congr_concat2 (congr_cons_head ?_))
-              rw [termCodeM_eq zero, termCodeM_eq (succ (Term.var 0))]
-              exact ind_concl_code A
-          | qconf P C =>
-              have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.confinementFormula P C := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_qconf (listFormCode acc) (formCode P) (formCode C) (proofCode rs (acc ++ [_]))) ?_
-              exact congr_vpf_checked (congr_concat2 (congr_cons_head
-                (congr_bin1 (congr_un (congr_bin1 (liftFormula_arith 0 P))))))
-          | listInd A =>
-              have hf : f = ROBINSON_PlusPlus.Meta.Hilbert.listInductionFormula A := by
-                simp only [stepConcl, Option.some.injEq] at hsc; exact hsc.symm
-              subst hf; simp only [lineCode]
-              refine FOL.derive_eq_trans
-                (vpf_listInd (listFormCode acc) (formCode A) (proofCode rs (acc ++ [_]))) ?_
-              refine congr_vpf_checked (congr_concat2 (congr_cons_head ?_))
-              rw [termCodeM_eq nil, termCodeM_eq (cons (Term.var 1) (Term.var 0))]
-              exact ROBINSON_PlusPlus.Meta.ListInductionArith.listInd_concl_code A
-          | thy k =>
-              have hmem : f ∈ axioms := List.mem_of_getElem? (by simpa only [stepConcl] using hsc)
-              simp only [lineCode]
-              refine vpf_thy (listFormCode acc) (formCode f) (proofCode rs (acc ++ [f])) ?_
-              -- objetivo: `axioms ⊢ In ⌜f⌝ axiomsCodeT`, vía el meta-axioma `ax_inAxC`
-              have h0 : axioms ⊢ In (formCodeM f) axiomsCodeT := ax_inAxC f hmem
-              rwa [formCodeM_eq] at h0
-          | mp i j =>
-              -- f = conclusión del MP; fi = acc[i] = (fj ⇒ f), fj = acc[j]
-              rcases hi : acc[i]? with _ | fi
-              · simp [stepConcl, hi] at hsc
-              rcases hj : acc[j]? with _ | fj
-              · simp [stepConcl, hi, hj] at hsc
-              rcases hm : mpConcl fi fj with _ | fmp
-              · simp [stepConcl, hi, hj, hm] at hsc
-              have hffmp : f = fmp := by
-                simp only [stepConcl, hi, hj, hm, Option.bind_some, Option.some.injEq] at hsc
-                exact hsc.symm
-              subst hffmp
-              have hfi_eq : fi = (fj ⇒ f) := mpConcl_eq hm
-              simp only [lineCode, hj, Option.getD_some]
-              refine vpf_mp (listFormCode acc) (formCode f) (formCode fj)
-                (proofCode rs (acc ++ [f])) ?_ ?_
-              · have hin : axioms ⊢ In (formCode fi) (listFormCode acc) :=
-                  In_listFormCode (List.mem_of_getElem? hi)
-                rw [hfi_eq] at hin; exact hin
-              · exact In_listFormCode (List.mem_of_getElem? hj)
-          | gen i =>
-              rcases hi : acc[i]? with _ | fi
-              · simp [stepConcl, hi] at hsc
-              have hf : f = Formula.forall fi := by
-                simp only [stepConcl, hi, Option.map_some, Option.some.injEq] at hsc
-                exact hsc.symm
-              subst hf
-              simp only [lineCode, hi, Option.getD_some]
-              refine vpf_gen (listFormCode acc) (formCode fi) (proofCode rs (acc ++ [Formula.forall fi])) ?_
-              exact In_listFormCode (List.mem_of_getElem? hi)
-
-/-! ### Representabilidad positiva -/
-
-/-- **Representabilidad positiva (Fase 2.5)**: toda demostración de Hilbert `Prf φ`
-    se internaliza como una prueba de la fórmula Σ₁ `provCodeC φ`. Es la dirección
-    que necesita **D1** (necesitación). La dirección negativa (reflexión) se
-    difiere a 2.6. -/
-theorem repr_pos {φ : Formula} (h : Prf φ) : axioms ⊢ provCodeC φ := by
-  obtain ⟨rs, L, hchk, hmem⟩ := prf_iff_derivation.mp h
-  have hrun : axioms ⊢ (validProofFn nil (proofCode rs []) =eq listFormCode L) := by
-    have hr := vpf_run rs [] L (by simpa [checkProof] using hchk)
-    simpa [listFormCode] using hr
-  have hin : axioms ⊢ In (formCode φ) (listFormCode L) := In_listFormCode hmem
-  have hin2 : axioms ⊢ In (formCode φ) (validProofFn nil (proofCode rs [])) := by
-    have ht := Derives.subst axioms (listFormCode L) (validProofFn nil (proofCode rs []))
-      (In (liftTerm 0 (formCode φ)) (.var 0)) (FOL.derive_eq_symm hrun)
-      (by simpa [substFormula, substTerm, substTerms, In, FOL.substTerm_liftTerm] using hin)
-    simpa [substFormula, substTerm, substTerms, In, validProofFn, nil, FOL.substTerm_liftTerm] using ht
-  have hex := Derives.intro_ex axioms (In (liftTerm 0 (formCode φ)) (validProofFn nil (.var 0)))
-    (proofCode rs [])
-    (by simpa [substFormula, substTerm, substTerms, In, validProofFn, nil, zero, FOL.substTerm_liftTerm] using hin2)
-  simpa [provCodeC, provFormulaC, substFormula, substTerm, substTerms, In, validProofFn, nil, zero,
-    FOL.substTerm_liftTerm] using hex
-
 end ROBINSON_PlusPlus.Meta.Representability
 
 export ROBINSON_PlusPlus.Meta.Representability (
   listFormCode
   proofCode
-  vpf_run
-  repr_pos
 )

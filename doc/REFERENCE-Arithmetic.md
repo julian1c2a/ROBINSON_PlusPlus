@@ -1,5 +1,10 @@
 # REFERENCE — Aritmética desarrollada · `Minimal/Theorems/Block1–8` · ROBINSON_PlusPlus
 
+> 🗑️🗑️ **2026‑10‑02 · TODO LO QUE DESCRIBE ESTE NODO SE RETIRÓ** ([ADR‑115](../DECISIONS.md)).
+> `Minimal/Theorems/Block1–8` eran teoremas `axioms ⊢ …`, y la capa `⊢` se retiró de RPP porque sus
+> postulados eran falsos (`sondeos/MetaReglasRefutables.lean`). El nodo se conserva **sólo como
+> registro** de lo que hubo; ninguno de sus ficheros existe ya.
+
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5).
 > Índice raíz: [REFERENCE.md](../REFERENCE.md).
 > **Nodos relacionados:** [Núcleo](REFERENCE-Kernel.md) (axiomas base), [Full](REFERENCE-Full.md)
