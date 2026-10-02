@@ -28,7 +28,7 @@ la §3, como registro; desde ADR‑113 ya no compila.
 ## El control (§2)
 
 Con ADR‑113 (`cons a b = σ (pair a b)`, fusionado el 2026‑10‑02) el paso 3 es imposible: `cons 0 0 = 1`.
-`prf_cons_cero_cero` lo fija DENTRO de `Prf`, y `consN_cero_cero` a nivel meta. Si la codificación volviera
+`cons_cero_cero_en_Prf` lo fija DENTRO de `Prf`, y `consN_cero_cero` a nivel meta. Si la codificación volviera
 atrás, `consN 0 0` sería `2` y los dos dejarían de compilar.
 
 ⚠️ Lo que este sondeo NO dice: que `Prf` sea consistente tras ADR‑113. Sólo cierra ESTA ruta. La
@@ -46,7 +46,7 @@ namespace Sondeos.PrfBotCodificacionVieja
 theorem consN_cero_cero : consN 0 0 = 1 := by decide
 
 /-- Dentro de `Prf`: `cons 0 0 = 1`. Con esto `Prf` refutaría el paso 3 de la derivación vieja. -/
-theorem prf_cons_cero_cero : Prf (cons zero zero =eq succ zero) := prf_cons_eval 0 0
+theorem cons_cero_cero_en_Prf : Prf (cons zero zero =eq succ zero) := prf_cons_eval 0 0
 
 end Sondeos.PrfBotCodificacionVieja
 
@@ -80,4 +80,4 @@ theorem prf_bot : Prf Formula.bottom :=
 ```
 -/
 
-#print axioms Sondeos.PrfBotCodificacionVieja.prf_cons_cero_cero
+#print axioms Sondeos.PrfBotCodificacionVieja.cons_cero_cero_en_Prf
