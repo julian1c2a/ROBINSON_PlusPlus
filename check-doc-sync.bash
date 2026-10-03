@@ -57,7 +57,45 @@ SOND=$(ls sondeos/*.lean 2>/dev/null | wc -l)
 # ⚠️ Sin `bc`: no está instalado en Git Bash ni, por defecto, en el runner de CI, y
 # `paste -sd+ | bc` fallaba en silencio dejando la cifra VACÍA. `wc -l` sobre las
 # líneas que casan cuenta lo mismo y no depende de nada.
-AXIOMS=$(grep -rhE "^axiom " ROBINSON_PlusPlus/ --include=*.lean 2>/dev/null | wc -l)
+# ⛔ 2026-10-03 (ADR-116): antes era `grep "^axiom "`, ciego a `private`/`@[…]`/sangrados y crédulo con
+# los docstrings. Ahora es el mismo patrón que `check-axioms.bash` (de FOL), sobre el código sin
+# comentarios (`strip-lean.awk`). El censo autoritativo, por entorno, es `check-estratos.bash` de RPP.
+# ⛔⛔ 2026-10-04 (ADR-116, segunda revisión): y la primera versión de esa línea daba SIEMPRE 0. Donde
+# iba la continuación de línea había un `\n` LITERAL (la cadena de herramientas se comió la barra al
+# escribirla): `find` recibía «\n» como un camino más y fallaba, y el `|| true` del final se tragaba
+# el fallo. Como el árbol tiene de verdad 0 `axiom`, la cifra cuadraba con los documentos y nadie lo
+# vio: un `axiom` nuevo habría dado VERDE. Ahora la cuenta es una función que DEVUELVE su fallo, y
+# antes de medir el árbol mide un fixture con TRES `axiom` reales y cinco señuelos: si no salen 3,
+# no se mide (y no medir es rojo).
+# 🔑 *Un `|| true` al final de una tubería convierte «no he podido medir» en «cero».*
+AX_RE='^[[:space:]]*(@\[[^]]*\][[:space:]]*)*((private|protected|noncomputable|unsafe|partial)[[:space:]]+)*axiom[[:space:]]+[^[:space:]:({]+'
+cuenta_axiomas () {   # $@ = caminos; imprime la cifra, o nada y estado 2 si no ha podido medir
+  local p n
+  for p in "$@"; do [ -e "$p" ] || return 2; done
+  [ -n "$(find "$@" -name '*.lean' ! -path '*/.lake/*' -print -quit)" ] || return 2
+  n=$(find "$@" -name '*.lean' ! -path '*/.lake/*' -print0 \
+        | xargs -0 env LC_ALL=C awk -f strip-lean.awk \
+        | { grep -E "$AX_RE" || [ $? -eq 1 ]; } | wc -l) || return 2
+  printf '%s\n' "$n" | tr -d ' '
+}
+AX_FIX=$(mktemp -d)
+cat > "$AX_FIX/Fixture.lean" <<'EOF'
+/-- un docstring con «axiom senuelo1 : True» -/
+axiom real1 : True
+-- axiom senuelo2 : True
+@[simp] private axiom real2 : True
+def s := "axiom senuelo3 : True"
+/-- doc -/ axiom real3 : True
+/- axiom senuelo4 : True -/ def t := 0
+theorem u : True := trivial -- axiom senuelo5
+EOF
+AXIOMS=""
+if [ "$(cuenta_axiomas "$AX_FIX" || true)" = "3" ]; then
+  AXIOMS=$(cuenta_axiomas ROBINSON_PlusPlus/ || true)
+fi
+rm -rf "$AX_FIX"
+AXIOMS_MISSING=0
+[ -n "$AXIOMS" ] || AXIOMS_MISSING=1
 # ⚠️ El conteo de `sorry` se DELEGA en check-sorry.bash y no se reimplementa aquí: qué
 # cuenta como `sorry` (token de código, fuera de comentarios y de literales) es una
 # definición delicada, y tenerla en dos sitios garantiza que se separen.
@@ -106,13 +144,13 @@ printf "  módulos activos : %s  (Minimal %s + Meta %s + Full %s)\n" "$ACTIVE" "
 printf "  cuarentena      : %s\n" "$QUAR"
 printf "  sondeos         : %s\n" "$SOND"
 printf "  axiom de Lean   : %s\n" "$AXIOMS"
-printf "  sorry           : %s
-" "$SORRY"
+printf "  sorry           : %s\n" "$SORRY"
 [ -n "$JOBS" ] && printf "  build jobs      : %s\n" "$JOBS"
 [ "$LAKE_MISSING" = "1" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake' no está en el PATH de este shell."
 [ "$LAKE_MISSING" = "1" ] && echo "                     Lánzalo desde PowerShell, o usa --quick para decirlo a propósito."
 [ "$LAKE_MISSING" = "2" ] && echo "  ⚠️  build jobs    : SIN MEDIR — 'lake build' no dijo 'Build completed successfully'."
 [ "$SORRY_MISSING" = "1" ] && echo "  ⚠️  sorry         : SIN MEDIR — check-sorry.bash no dijo ni 'No sorry found' ni 'Total: N sorry'."
+[ "$AXIOMS_MISSING" = "1" ] && echo "  ⚠️  axiom de Lean : SIN MEDIR — el autotest de cuenta_axiomas no dio 3 (¿strip-lean.awk, LC_ALL?)."
 echo
 
 # Documentos AUTORITATIVOS: los que describen el ESTADO ACTUAL y por tanto deben cuadrar.
@@ -133,6 +171,8 @@ FAIL=0
 if [ "$QUICK" != "1" ] && { [ "$LAKE_MISSING" != "0" ] || [ "$SORRY_MISSING" != "0" ]; }; then
   FAIL=1
 fi
+# El censo de `axiom` no depende de `lake`: no medirlo es rojo también con `--quick`.
+[ "$AXIOMS_MISSING" != "0" ] && FAIL=1
 
 # ─── 2. CIFRAS OBSOLETAS ─────────────────────────────────────────────────────
 # CHANGELOG.md se excluye: es un diario, sus cifras son históricas por diseño.
@@ -177,7 +217,7 @@ check_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = e
 check_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
 check_num "Meta ([0-9]+ \+|[0-9]+\))" "$META" "conteo de Meta"
 check_num "[0-9]+ (módulos )?en \`cuarentena/\`" "$QUAR" "cuarentena"
-check_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
+[ -n "$AXIOMS" ] && check_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
 check_num '[0-9]+ sorrys?' "$SORRY" "sorry"
 rm -f "$HEADREGION"
 [ "$A_FAIL" = "0" ] && echo "  ✓ sin cifras obsoletas" || FAIL=1
@@ -221,7 +261,7 @@ warn_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = et
 }
 [ -n "$JOBS" ] && warn_num "[0-9]+ jobs" "$JOBS" "jobs"
 warn_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
-warn_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
+[ -n "$AXIOMS" ] && warn_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
 warn_num '[0-9]+ sorrys?' "$SORRY" "sorry"
 rm -f "$BODYREGION"
 if [ "$A2_HITS" = "0" ]; then
@@ -364,15 +404,15 @@ fi
 
 # ─── 3. SÍMBOLOS MUERTOS ─────────────────────────────────────────────────────
 # Un símbolo está MUERTO si se cita en un doc AUTORITATIVO pero ninguna declaración
-# del árbol activo empieza por él.
+# del árbol activo se llama así.
 #
 # Dos calibraciones aprendidas al estrenar este control (2026-08-23):
 #   * Sólo se miran los docs AUTORITATIVOS (los que describen el estado actual). Los
 #     de diseño e historia — MINIMAL-AXIOMS, THOUGHTS, GODEL-*-DESIGN, PLAN-* — citan
 #     por diseño cosas que ya no están, y marcarlos sería ruido.
-#   * Se compara por PREFIJO, no por igualdad: la prosa abrevia (`ax_C3` por
-#     `ax_C3_concat_assoc`, `ax_lineWF` por `ax_lineWF_c1`), y eso es legítimo.
-#     Un símbolo de verdad muerto (`goedel_first_real'`, `prf_tc_cons'`) no prefija nada.
+#   * (✏️ 2026-10-03, ADR-116: REVOCADA.) Se comparaba por PREFIJO («la prosa abrevia»), y eso
+#     absolvía a todo nombre que empezara como uno vivo. Hoy se casa el nombre EXACTO, y una
+#     familia se cita con `_` final (`ax_C3_`): ver (2) más abajo.
 echo
 echo "════ [B] SÍMBOLOS MUERTOS — ROJO, con trinquete ════"
 echo "   (deuda DECLARADA y con trinquete desde 2026-09-22: no puede crecer.)"
@@ -391,12 +431,14 @@ echo "   (deuda DECLARADA y con trinquete desde 2026-09-22: no puede crecer.)"
 # ⬜ La deuda REAL que queda, y es de LECTURA, no de script: cada uno de los 44 pide mirar su
 # línea y decidir si es historia (⇒ marcarla) o una afirmación de estado caducada (⇒ arreglar
 # el doc). Mientras tanto el trinquete garantiza que **no puede crecer**.
+# 2026-10-03 (ADR-116): 44 → 41. Al pasar [B] a nombre exacto, las líneas de 16 símbolos que pasaban
+# por un homónimo más largo se corrigieron una a una, y de paso quedaron marcadas las últimas citas
+# de `goedel_first_real`, `prf_isTsC` y `prf_tc_substfc`: el trinquete las pidió quitar.
 read -r -d '' B_DEUDA <<'EOF'
 ax_notInAxC
 ax_tc_liftfc
 ax_tc_substfc
 godelC'_fixedpoint
-goedel_first_real
 goedel_first_real'
 goedel_first_undecidable_real'
 goedel_second'
@@ -422,7 +464,6 @@ prf_isFC_varc
 prf_isFCB_bottom
 prf_isFormCodeE_str
 prf_isTermCodeE_str
-prf_isTsC
 prf_liftc_arith_open
 prf_tagConcl_code
 prf_tc_carc
@@ -433,13 +474,15 @@ prf_tc_nthc
 prf_tc_nul
 prf_tc_objAt
 prf_tc_of_cons
-prf_tc_substfc
 prf_wfAll_objList
 repr_neg
 EOF
 B_FAIL=0
-B_DECL=0
-B_VISTOS=$(mktemp)
+# ⛔ 2026-10-04 (ADR-116, segunda revisión): el «de 41» del final era un literal que nada comparaba.
+# Ahora el tope es un dato y se compara con la tabla en los DOS sentidos: crece la tabla sin subir
+# el tope ⇒ rojo; se salda una deuda y no se baja ⇒ rojo. 🔑 *El tope sólo BAJA: subirlo es aceptar
+# deuda nueva, y eso pide un ADR, no un commit de documentación.*
+B_TOPE=41
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
 # Marcadores que hacen LEGÍTIMA la mención de un símbolo inexistente:
@@ -450,64 +493,138 @@ AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/RE
 # `🗑` no, con o sin U+FE0F; con LC_ALL=C sí). En la CI (Linux) casa. ⇒ el MISMO documento podía dar
 # verde en CI y rojo en local. Regla: una marca de retirada lleva SIEMPRE una palabra (`retirad…`),
 # no sólo el emoji. 🔑 *Un patrón que no casa en el entorno donde se ejecuta no es un patrón.*
+# ⭐ 2026-10-04: desde la segunda revisión los marcadores se aplican por BYTES (awk con LC_ALL=C), así
+# que casan igual en msys y en Linux — `🗑️` incluido. Por eso un acento va con `(e|é)` y no con `[eé]`
+# (en modo byte un corchete casa UN byte, y `é` son dos), y la fecha sin `{2}` (no todo awk lo lee).
 DEAD_MARKER='YA NO EXISTE|NO EXISTEN|retirad|RETIRADO|eliminad|borrad|legacy|F7a|histórico|ANTERIORES|🗑️|muert|Aquí vivía|tampoco existe|inexistente|desapareci|ya no son|se borró'
-DEAD_MARKER="$DEAD_MARKER"'|propuest|candidat|hipot[eé]tic|har[ií]a falta|si se |habr[ií]a que|añadir |descartad|no existe|NO EXISTE|sin materializar|20[0-9]{2}-[0-9]{2}-[0-9]{2}'
+DEAD_MARKER="$DEAD_MARKER"'|propuest|candidat|hipot(e|é)tic|har(i|í)a falta|si se |habr(i|í)a que|añadir |descartad|no existe|NO EXISTE|sin materializar|20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
 #   (d) es un OBJETIVO declarado, no una afirmación de que ya está.
 DEAD_MARKER="$DEAD_MARKER"'|falta|FALTA|construir|objetivo|medir|sin medir|pendiente|⏳|abiert|necesita|exige|pide|TAREA|hace falta|no hay ni habrá|sub‑familia|sub-familia|buscaba|buscó|usan la'
-DECLS=$(mktemp)
+#   (e) 2026-10-03 (ADR-116): vive en `sondeos/`, FUERA del árbol activo, y la línea lo dice. No es un
+#       marcador de texto (eximía líneas que nombran `sondeos/` por otra razón): se exime la línea que
+#       nombra el FICHERO que lo declara (`sondeos/Foo.lean`, o `sondeos/Foo`) — desde la segunda
+#       revisión, ese fichero y no otro sondeo cualquiera.
 # El árbol de declaraciones incluye `cuarentena/`: esos símbolos EXISTEN (están fuera
 # del build, no borrados), y los docs los discuten con razón.
-grep -rhoE "(theorem|def|abbrev|axiom|noncomputable def) +[A-Za-z_][A-Za-z0-9_']*"      ROBINSON_PlusPlus/ cuarentena/ ../FOL/ --include=*.lean 2>/dev/null      | awk '{print $NF}' | sort -u > "$DECLS"
-CANDS=$(grep -rhoE '`(prf_|pcc_|goedel_|godel|d[123]_|repr_|ax_)[A-Za-z0-9_'"'"']+`' $AUTHORITATIVE 2>/dev/null         | tr -d '`' | sort -u)
-for sym in $CANDS; do
-  # los axiomas objeto son snake_case: `ax_UpperCamel` es un PLACEHOLDER de convención
-  # de nombres (`ax_TagDescriptor`), no un símbolo. Se ignora.
-  case "$sym" in ax_[A-Z]*) continue ;; esac
-  # vivo si ALGUNA declaración empieza por el símbolo (la prosa abrevia)
-  grep -qE "^${sym}" "$DECLS" && continue
-  bad=$(grep -rn "\`${sym}\`" $AUTHORITATIVE 2>/dev/null | grep -vE "$DEAD_MARKER" || true)
-  EN_B=0
+# ⛔⛔ 2026-10-03 (ADR-116 de RPP): dos defectos de este bloque, medidos. (1) Las declaraciones se
+# sacaban del texto ENTERO, comentarios incluidos: un nombre que sólo aparece en prosa (p. ej. el
+# «axiom ax_list_induction» de un docstring de RPP) pasaba por VIVO. Ahora salen del código SIN
+# comentarios ni cadenas (`strip-lean.awk`), y con todas las palabras clave de declaración.
+# (2) Se casaba por PREFIJO («la prosa abrevia»): `ax_list_induction` pasaba por vivo porque existe
+# `ax_list_induction_refutable`, y `d3_prf` porque existe `d3_prf_real`. Ahora se casa el nombre
+# EXACTO; la abreviatura de una FAMILIA se escribe con `_` final (`prf_tc_`), y sólo ésa casa por
+# prefijo. 🔑 *Un control que casa por prefijo absuelve a todo nombre que empiece igual que uno vivo.*
+# (3) 2026-10-03, v2 (revisión adversarial): el NOMBRE se toma entero (`prf_foo₀`, `Prf.prf_bar`: antes
+# se cortaba en el primer carácter no ASCII o en el primer `.`) y se guarda también su último
+# componente; el ALCANCE es explícito (antes entraban `auditoria/`, las librerías muertas y, en local,
+# `Probe/`, que la CI no tiene); y si la lista sale vacía o sin un nombre que existe seguro, NO se mide.
+# (4) 2026-10-04, segunda revisión: (a) las CITAS se leen enteras también: calificadas
+# (`GodelTwo.goedel_second'`, que vale por su último componente) y con caracteres no ASCII
+# (`prf_zz₀`); antes el patrón se paraba en el `.` o en el subíndice y esas citas no las miraba nadie;
+# (b) `def prf_univ.{u}` declara `prf_univ` (antes, `prf_univ.` y un nombre vacío); (c) la pasada es
+# UNA sola de awk sobre los documentos —antes, un grep por símbolo y documento: ~90 s en msys—;
+# (d) si falta la copia de FOL del despojador, rojo (antes se saltaba la comparación en silencio).
+# ⚠️ Lo que NO ve: los constructores y los campos de estructura no son declaraciones de primer nivel,
+# así que citar uno sale como MUERTO — falso rojo, nunca falso verde; se arregla citando el tipo.
+if [ ! -f ../FOL/strip-lean.awk ]; then
+  echo "  ❌ falta ../FOL/strip-lean.awk: no puedo comprobar que las dos copias del despojador sean la misma."
+  B_FAIL=1
+elif ! cmp -s <(grep -v '^#' strip-lean.awk | tr -d '\r') <(grep -v '^#' ../FOL/strip-lean.awk | tr -d '\r'); then
+  # (sin los `\r`: FOL no fuerza LF y, con core.autocrlf, su copia sale con CRLF tras un checkout en Windows)
+  echo "  ❌ strip-lean.awk y ../FOL/strip-lean.awk ya no tienen el mismo código: unifícalos."
+  B_FAIL=1
+fi
+DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class) +[^[:space:]:({[]+"
+# el nombre entero y su último componente; `prf_univ.{u}` → `prf_univ`
+NOMBRES='{n = $NF; sub(/[.]$/, "", n); if (n == "") next; print n; k = n; sub(/.*[.]/, "", k); if (k != n && k != "") print k}'
+DECLS=$(mktemp); DECLS_SOND=$(mktemp); B_SALIDA=$(mktemp); B_VISTOS=$(mktemp)
+find ROBINSON_PlusPlus/ cuarentena/ ../FOL/FOL/ ../FOL/TheoryFramework/ ../FOL/FOL.lean -name '*.lean' ! -path '*/.lake/*' -print0 2>/dev/null \
+  | xargs -0 env LC_ALL=C awk -f strip-lean.awk | grep -oE "$DECL_RE" | awk "$NOMBRES" | sort -u > "$DECLS"
+# (e): «nombre|fichero» de cada declaración de un sondeo
+find sondeos/ -name '*.lean' 2>/dev/null | sort | while IFS= read -r f; do
+  LC_ALL=C awk -f strip-lean.awk "$f" | grep -oE "$DECL_RE" | awk "$NOMBRES" | awk -v f="$f" '{print $0 "|" f}'
+done | sort -u > "$DECLS_SOND"
+B_MEDIDO=1
+if [ "$(wc -l < "$DECLS" | tr -d ' ')" -lt 1000 ] || ! grep -qxF goedel_first_prf "$DECLS" \
+   || ! grep -qxF derives0_soundness "$DECLS" || ! grep -q '^prf_wfAll_objList|sondeos/' "$DECLS_SOND"; then
+  echo "  ❌ NO PUDE MEDIR [B]: las declaraciones salen vacías o sin \`goedel_first_prf\`, \`derives0_soundness\`"
+  echo "      o \`prf_wfAll_objList\` (de un sondeo), que existen seguro (¿strip-lean.awk?)."
+  B_FAIL=1; B_MEDIDO=0
+fi
+B_DOCS=""
+for d in $AUTHORITATIVE; do [ -f "$d" ] && B_DOCS="$B_DOCS $d"; done
+if [ "$B_MEDIDO" = "1" ]; then
+  # UNA pasada: cada cita `…` con la forma de un símbolo; viva si su nombre entero o su último
+  # componente está declarado (una familia, con `_` final, por prefijo); si no, la línea se exime
+  # por un marcador o por nombrar el sondeo que lo declara; lo que queda sale como «clave|cita|línea».
+  LC_ALL=C awk -v MARK="$DEAD_MARKER" '
+    FILENAME == ARGV[1] { vivo[$0] = 1; next }
+    FILENAME == ARGV[2] { p = index($0, "|"); k = substr($0, 1, p - 1); sond[k] = sond[k] "|" substr($0, p + 1); next }
+    {
+      s = $0
+      # un carácter de nombre: ASCII, o en UTF-8 una letra (2 bytes), un subíndice, un letterlike, ⱼ,
+      # el griego extendido o el alfabeto matemático — NO la puntuación general (`1‑3`, `a–b`, `…`)
+      while (match(s, /`([A-Z][A-Za-z0-9_]*[.])*(prf_|pcc_|goedel_|godel|d[123]_|repr_|ax_)([A-Za-z0-9_'"'"'!?]|[\303-\337][\200-\277]|\342(\202|\204|\205|\261)[\200-\277]|\341[\265-\277][\200-\277]|\360\235[\200-\277][\200-\277])+`/)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
+        k = t; sub(/^([A-Z][A-Za-z0-9_]*[.])*/, "", k)
+        # los axiomas objeto son snake_case: `ax_UpperCamel` es un PLACEHOLDER de convención
+        # de nombres (`ax_TagDescriptor`), no un símbolo
+        if (k ~ /^ax_[A-Z]/) continue
+        if ((t in vivo) || (k in vivo)) continue
+        if (k ~ /_$/) {
+          if (!(k in fam)) { fam[k] = 0; for (v in vivo) if (index(v, k) == 1) { fam[k] = 1; break } }
+          if (fam[k]) continue
+        }
+        if ($0 ~ MARK) continue
+        if (k in sond) {
+          nf = split(substr(sond[k], 2), fs, "|"); ex = 0
+          for (q = 1; q <= nf; q++) { b = fs[q]; sub(/[.]lean$/, "", b); if (match($0, b "([^A-Za-z0-9_]|$)")) ex = 1 }
+          if (ex) continue
+        }
+        print k "|" t "|" FILENAME ":" FNR ":" $0
+      }
+    }' "$DECLS" "$DECLS_SOND" $B_DOCS > "$B_SALIDA"
+  cut -d'|' -f1 "$B_SALIDA" | sort -u | while IFS= read -r k; do
+    if printf '%s\n' "$B_DEUDA" | grep -qxF "$k"; then
+      echo "$k" >> "$B_VISTOS"
+    else
+      echo "  ❌ \`$k\` no existe en el árbol activo, se cita sin marcar como retirado,"
+      echo "      y NO está en la tabla B_DEUDA de este script:"
+      awk -F'|' -v k="$k" '$1 == k' "$B_SALIDA" | head -2 | cut -d'|' -f3- | sed 's/^/      /' | cut -c1-140
+      echo x >> "$B_SALIDA.rojo"
+    fi
+  done
+  [ -s "$B_SALIDA.rojo" ] && B_FAIL=1
+  # ⛔⛔ EL AGUJERO QUE ESTO TAPA (2026-09-22, cazado por su propia prueba de rotura):
+  # el bucle de arriba recorre los símbolos **CITADOS**. Una entrada de `B_DEUDA` cuyo documento
+  # se arregle deja de estar citada ⇒ **no vuelve a entrar en el bucle nunca**, y la tabla se
+  # quedaría con fantasmas para siempre. La comprobación de «deuda saldada» tiene que hacerse
+  # DESPUÉS del bucle, contra la tabla, no dentro.
+  # 🔑 *Un trinquete que sólo mira lo que entra en el bucle no es un trinquete: es media
+  #    cuenta.* La versión de `[E]` no tenía el agujero porque recorre los DOCUMENTOS, que
+  #    siempre existen; ésta recorre las CITAS, que desaparecen.
   while IFS= read -r t; do
     [ -n "$t" ] || continue
-    [ "$t" = "$sym" ] && EN_B=1
-  done <<< "$B_DEUDA"
-  if [ -n "$bad" ]; then
-    if [ "$EN_B" = "1" ]; then
-      B_DECL=$((B_DECL + 1))
-      echo "$sym" >> "$B_VISTOS"
-    else
-      echo "  ❌ \`$sym\` no existe en el árbol activo, se cita sin marcar como retirado,"
-      echo "      y NO está en la tabla B_DEUDA de este script:"
-      echo "$bad" | head -2 | sed 's/^/      /' | cut -c1-140
+    case "$t" in '#'*) continue ;; esac
+    if ! grep -qxF "$t" "$B_VISTOS" 2>/dev/null; then
+      echo "  ❌ \`$t\`: declarado en B_DEUDA pero YA NO se cita como vigente — quítalo de la tabla."
       B_FAIL=1
     fi
-  elif [ "$EN_B" = "1" ]; then
-    echo "  ❌ \`$sym\`: la deuda ESTÁ SALDADA — quítalo de la tabla B_DEUDA de este script."
-    B_FAIL=1
-  fi
-done
-rm -f "$DECLS"
-# [B] NO marca FAIL: es un aviso. [A], [C] y [D] sí son objetivos y sí lo marcan.
-# Razón: un control que grita lobo se acaba ignorando, y ése era justo el fallo que
-# este script existe para evitar.
-# ⛔⛔ EL AGUJERO QUE ESTO TAPA (2026-09-22, cazado por su propia prueba de rotura):
-# el bucle de arriba recorre los símbolos **CITADOS**. Una entrada de `B_DEUDA` cuyo documento
-# se arregle deja de estar citada ⇒ **no vuelve a entrar en el bucle nunca**, y la tabla se
-# quedaría con fantasmas para siempre. La comprobación de «deuda saldada» tiene que hacerse
-# DESPUÉS del bucle, contra la tabla, no dentro.
-# 🔑 *Un trinquete que sólo mira lo que entra en el bucle no es un trinquete: es media
-#    cuenta.* La versión de `[E]` no tenía el agujero porque recorre los DOCUMENTOS, que
-#    siempre existen; ésta recorre las CITAS, que desaparecen.
-while IFS= read -r t; do
-  [ -n "$t" ] || continue
-  case "$t" in '#'*) continue ;; esac
-  if ! grep -qxF "$t" "$B_VISTOS" 2>/dev/null; then
-    echo "  ❌ \`$t\`: declarado en B_DEUDA pero YA NO se cita como vigente — quítalo de la tabla."
-    B_FAIL=1
-  fi
-done <<< "$B_DEUDA"
-rm -f "$B_VISTOS"
-echo "  deuda declarada: $B_DECL de 44 · sin declarar y sin saldar: rompen arriba"
+  done <<< "$B_DEUDA"
+fi
+B_NT=$(printf '%s\n' "$B_DEUDA" | grep -v '^#' | grep -c . || true)
+if [ "$B_NT" != "$B_TOPE" ]; then
+  echo "  ❌ la tabla B_DEUDA tiene $B_NT entradas y su tope (B_TOPE) es $B_TOPE: tabla y tope cambian juntos,"
+  echo "      y el tope sólo baja."
+  B_FAIL=1
+fi
+B_DECL=$(sort -u "$B_VISTOS" | grep -c . || true)
+rm -f "$DECLS" "$DECLS_SOND" "$B_SALIDA" "$B_SALIDA.rojo" "$B_VISTOS"
+if [ "$B_MEDIDO" = "1" ]; then
+  echo "  deuda declarada: $B_DECL de $B_NT (tope $B_TOPE) · sin declarar y sin saldar: rompen arriba"
+else
+  echo "  deuda declarada: SIN MEDIR"
+fi
 [ "$B_FAIL" = "0" ] && echo "  ✓ ningún símbolo muerto citado como vigente" || FAIL=1
 
 # ─── 4. PROYECCIÓN: ¿está cada módulo en el catálogo? ────────────────────────

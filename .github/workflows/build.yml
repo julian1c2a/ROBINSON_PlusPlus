@@ -124,9 +124,12 @@ jobs:
       - name: Build FOL (sus dos default_target completos)
         run: lake build "@FOL/FOL" "@FOL/TheoryFramework"
 
+      # ⛔ 2026-10-04 (ADR-116): BLOQUEANTE. Hasta hoy llevaba `continue-on-error: true` («Warning only»):
+      # un `sorry` nuevo dejaba esta CI en VERDE. FOL lo hizo bloqueante el 2026-09-17. Desde ADR-116 el
+      # script tiene autotest y sale con 2 si no puede medir (p. ej. un awk que no lee el despojador),
+      # y el `sorry` lo censa también, por entorno, `check-estratos.bash`.
       - name: Check for sorry
         run: bash check-sorry.bash
-        continue-on-error: true   # Warning only — change to false to make it blocking
 
       # Anadido el 2026-09-16. Mide cuantos `axiom` HABITAN cada nocion de derivabilidad, que
       # es lo UNICO que decide si `induction` es legitima (M-11). `#print axioms` es CIEGO a

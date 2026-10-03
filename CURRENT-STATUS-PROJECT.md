@@ -310,7 +310,7 @@
 | `Meta/RunFnBoundedPrf.lean` | 0 | ✅ 12‑A/2 (`In`): `prf_runFn_nil_cons` (map de `carc`), `prf_nthc_runFn`, **`prf_In_runFn_iff`** |
 | `Meta/ChainOkBoundedPrf.lean` | 0 | ✅ 12‑A/2 (`chainOk`): `prf_premOk_cons_iff`, `prf_allIn_iff_boundedAllIn`, **`prf_chainOk_iff_chainOkB`** |
 | `Meta/CodeDecode.lean` | 0 | ✅ `NegVerifier` A.1 (§43): `decodeNat`/`decodeChars`/`decodeStr`/`decodeTerm`/`decodeForm` + round‑trips + **inyectividad** ⟹ `decodeForm` es una **biyección** |
-| `Meta/LineWFCases.lean` | 0 | ✅ `NegVerifier` B (§44): `tagArity`/`tagConcl`/`tagPrems` + `prf_lineWF_tag`/`prf_premsOf_tag` + dirección negativa (`derives_lineWF_neg_*`). `tagConcl` cubre **19, no 21** (`thy` va por `In`; `mp` es incondicional) |
+| `Meta/LineWFCases.lean` | 0 | ✅ `NegVerifier` B (§44): `tagArity`/`tagConcl`/`tagPrems` + `prf_lineWF_tag_imp`/`prf_premsOf_tag` + dirección negativa (`prf_lineWF_neg_of_tag`; la de `⊢`, `derives_lineWF_neg_*`, retirada con ADR-115). `tagConcl` cubre **19, no 21** (`thy` va por `In`; `mp` es incondicional) |
 | `Meta/LineWFDerives.lean` | 0 | ✅ Des‑duplicación: los 42 `lineWF_*`/`premsOf_*` de `⊢` son `prf_to_derives` de sus gemelos `prf_*` (antes: probados dos veces) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 | `Meta/ChainDecode.lean` | 0 | ✅ `NegVerifier` A.2 (§43): `decodeRule`/`decodeLine`/`decodeChain`, `DecidableEq Term`/`Formula` + `findIdx`, secciones `thy`/`mp`/`gen`, ensamblado **`decodeChain_prf`** (cadena aceptada ⟹ `Prf`) |
 | `Meta/NatOrderPrf.lean` | 0 | ✅ Orden `≤` en `Prf`: transitividades, sustitución, `prf_add_assoc`/`prf_add_comm`. ⚠️ Asoc./conm. de `+` son **axiomas objeto** (ax6/ax7), no se prueban por inducción |
@@ -394,8 +394,8 @@
   Todos `#print axioms` = `[propext, choice, Quot.sound]`. Nuevo `ESCALANDO_EL_PROYECTO.md` (enlace con
   DeepArith sobre el kernel FOL⁼ común). Build verde (**75 jobs**), 0 sorrys, v4.31.0.
   Siguiente **(plan de entonces, cumplido por otra ruta)**: fases 3‑5 (`num` + evaluación provable
-  + Δ₀‑completitud atómica → inducción estructural → `d3_prf` → `goedel_second_prf`). ⇒ D3 se cerró
-  el 2026‑09‑10g como **`d3_prf_real`**; `goedel_second_prf` nunca llegó a existir con ese nombre.
+  + Δ₀‑completitud atómica → inducción estructural → `d3_prf` (nombre propuesto, nunca declarado) → `goedel_second_prf`). ⇒ D3 se cerró
+  el 2026‑09‑10g como **`d3_prf_real`**; `goedel_second_prf` sí llegó con ese nombre, al día siguiente (2026‑09‑11, `900410a`).
 
 - **2026-07-05c/d — D3: investigación de atajos (§11–§12) + arranque Σ₁‑completitud estándar (12‑A fase 1a)**:
   Investigación rigurosa: **no hay atajo para D3** (atajo por teorema de deducción imposible — D1

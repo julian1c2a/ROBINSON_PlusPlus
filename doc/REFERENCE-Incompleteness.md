@@ -673,7 +673,7 @@ theorem pcc_eq_of_tc_bridge (t u) (ht : Prf (tcFn t =eq termCode t)) (hu)
 -- #print axioms de los tres = [propext, Classical.choice, Quot.sound]  (¡ni siquiera prf_inAxC!)
 ```
 
-Al no pasar ya por `repr_pos'`, **desaparece incluso la dependencia de `prf_inAxC`**. El **muro de
+Al no pasar ya por `repr_pos'_prf`, **desaparece incluso la dependencia de `prf_inAxC`**. El **muro de
 Tarski queda confinado al último paso**: el puente `tcFn t =eq termCode t`, descargable con
 **numerales** (`prf_tc_numeral`) en la inducción de fase 5 — exactamente como predice
 Hilbert‑Bernays.
@@ -681,7 +681,7 @@ Hilbert‑Bernays.
 **Estado de fase 3‑5** (plan en `GODEL-D3-TRACKED-DESIGN.md` §15.5): ✅ puente + átomo `=eq` cerrado
 libre de muro; ⏳ átomos `<`/`lineWF` (`atom1CodeFn`; `<` se reduce a `=eq` + `∃` acotado), reflexión
 de cuantificadores acotados (∀/∃), e inducción estructural sobre `boundedIn`/`chainOkB` → `hbI`/`hbC`
-→ `d3_prf` → `goedel_second_prf`.
+→ `d3_prf` *(nombre del plan, que nunca existió con ese nombre: no existe; D3 se probó el 2026‑09‑10 como `d3_prf_real`)* → `goedel_second_prf`.
 
 ---
 
@@ -800,7 +800,7 @@ theorem d3_prf_of_chainOkDot (φ) (hC : Prf (chainOk nil #0 ⇒ provFromCode cha
    evaluación provable `pcc_eval_lenc`), en la dirección contraria a la que transporta Leibniz. De ahí
    `PrfH_eq_symm_code` + `prf_substfc_ltCodeFn_snd` (hueco `⌜v₀⌝` en 2ª posición).
 3. El **CUERPO NO necesita simetría**: la hipótesis del `∃` es una igualdad **objeto**, así que basta
-   congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form` + `prf_liftc_tcFn`) + `PrfH_provCode_congr`
+   congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form` —retirado el 2026‑08‑18 con ADR‑012— + `prf_liftc_tcFn`) + `PrfH_provCode_congr`
    sobre `pcc_eval_carc_nthc` — que consume `chainOk`, y por eso `hI` debe recibirlo (`hbody_of_atoms`
    reestructurado).
 
@@ -1298,8 +1298,8 @@ Tres declaraciones cambiaron de **enunciado**, no sólo de prueba:
 
 | antes | ahora |
 |---|---|
-| `prf_provCodeC'_In_formCode_of_tracked` vía `prf_tc_form` | vía `prf_tc_numeral`; ⚠️ concluye sobre `In (numeral (codeNat φ)) L` |
-| `prf_tc_objList` vía `prf_tc_of_cons` | `prf_objList_numeral` vía `prf_cons_eval_of` |
+| `prf_provCodeC'_In_formCode_of_tracked` vía `prf_tc_form` (retirado el 2026‑08‑18, ADR‑012) | vía `prf_tc_numeral`; ⚠️ concluye sobre `In (numeral (codeNat φ)) L` |
+| `prf_tc_objList` (retirado en esta refundación, el 2026‑08‑19) vía `prf_tc_of_cons` | `prf_objList_numeral` vía `prf_cons_eval_of` |
 | `prf_tc_objList_formCode` | `prf_objList_formCode_numeral`, con `termCode (numeral N)` a la derecha |
 
 Refundar el keystone **devolvió 10 módulos** de la cuarentena de golpe (31 → 21), entre ellos
@@ -1442,7 +1442,7 @@ Todos han vuelto, **con el footprint sancionado** y **sin cambiar ningún enunci
 | reescritura interna, forma **implicación** | `theorem pcc_rw_imp (G : Term → Term) (hG : ∀ s, Prf (substfc zero s (G (varc (numeral 0))) =eq G s)) (X Y : Term) (heq : Prf (provFromCode (eqc X Y))) : Prf (provFromCode (G X) ⇒ provFromCode (G Y))` | `DotConsPrf` |
 | molde unario (`Prf`) | `theorem pcc_rw_dot_cons_un (F : Term → Term) (hFs …) (hFc …) (R : Term) (hR …) (h t : Term) (hbase …) : Prf (provFromCode (eqCodeFn (F (tcFn (cons h t))) R))` | `EvalListPrf` |
 | molde binario (`PrfH`) | `theorem pcc_rw_dot_cons_nthc {Γ} (h t IDX RHS : Term) (hI …) (hR …) (hbase …) : PrfH Γ (provFromCode (eqCodeFn (nthcT (tcFn (cons h t)) IDX) RHS))` | `EvalNthcPrf` |
-| sustituto de `prf_tc_form` | `theorem prf_tc_form_numeral (φ : Formula) : Prf (tcFn (formCode φ) =eq termCode (numeral (codeNat φ)))` | `D3InDotPrf` |
+| sustituto de `prf_tc_form` (retirado el 2026‑08‑18) | `theorem prf_tc_form_numeral (φ : Formula) : Prf (tcFn (formCode φ) =eq termCode (numeral (codeNat φ)))` | `D3InDotPrf` |
 | **convertidor de frontera** | `theorem pcc_to_formCode_imp (φ : Formula) (G : Term → Term) (hG …) : Prf (provFromCode (G (termCode (numeral (codeNat φ)))) ⇒ provFromCode (G (termCode (formCode φ))))` | `D3InDotPrf` |
 | KIT internalizado | `pcc_dot_nul (m)` · `pcc_dot_un (m a)` · `pcc_dot_bin (m a b)` (+ `_symm`) | `CodeCtorKit` |
 | ecuación `tc` del árbol `eqc` | `theorem pcc_dot_eqc (a b : Term) : Prf (provFromCode (eqCodeFn (eqcT (tcFn a) (tcFn b)) (tcFn (eqc a b))))` | `LineWFTrackedPrf` |
@@ -2006,7 +2006,7 @@ la guarda **DISCRIMINA** y no es un colador — `CRIT_E2_rejects_varc`, `CRIT_E2
 `CRIT_isFC1_rejects_varc`, vía `prf_isFormCodeE2_str` (la forma ecuacional **fortalece** la
 posicional y hereda su discriminación de los 8 tags).
 **Dos precedentes exactos** para transportar: `SinWTs.prf_isTC1_tcodes` (misma forma, sort término)
-y `ParticionTresPredicados.prf_isFCB3_fcodes` (sort fórmula, predicado posicional de tres
+y `ParticionTresPredicados.prf_isFCB3_fcodes` (`sondeos/ParticionTresPredicados.lean`; sort fórmula, predicado posicional de tres
 testigos). **Los tres sondeos coinciden en señalar esta misma pieza como residuo**, lo que la
 confirma.
 
@@ -2045,7 +2045,7 @@ theorem prf_hasWitF_real (φ : Formula) : Prf (ENS.hasWitF (formCodeM φ))
 ```
 
 🔑 **Footprint `[propext, Classical.choice, Quot.sound]` — net‑0 PURO**, ni siquiera arrastra
-`prf_axiomsCodeT_eq`. Los enunciados hablan de las constantes **reales** `ENS.isFC1`/`ENS.hasWitF`
+`prf_axiomsCodeT_eq` (el `axiom` de entonces, retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`). Los enunciados hablan de las constantes **reales** `ENS.isFC1`/`ENS.hasWitF`
 —no de copias homónimas—, verificado con puentes `rfl` net‑0.
 
 ⇒ **`pcc_eval_substfc` deja de ser condicional para códigos reales**: `pcc_eval_substfc_wit_REAL`
@@ -2475,7 +2475,7 @@ En la práctica: los constructores genéricos de línea (`prf_lineOk_q1`/`_q2`, 
 * **D1 estaba pagado desde agosto.** `prf_hasWitF_real` y `CRIT_hasWit_real` (rama A) son
   exactamente lo que la enmienda exige sobre líneas concretas. `sondeos/MedirC_Enmienda.lean` ya lo
   había demostrado (`guardQ1_se_paga`) y no se sabía.
-* **La rama F se ABARATA.** `prf_lineWF_tag` pasa de bicondicional a **implicación**: el `⇔` deja
+* **La rama F se ABARATA.** `prf_lineWF_tag` (hoy `prf_lineWF_tag_imp`: el nombre viejo ya no existe) pasa de bicondicional a **implicación**: el `⇔` deja
   de ser cierto para argumentos arbitrarios (el punto de la enmienda) pero la mitad `→` sigue
   siéndolo **y sale gratis**. Y era la única que se usaba: sus dos consumidores aplicaban
   `and_elim_left` acto seguido. Un `lineWF` más fuerte es más fácil de refutar.
@@ -2537,7 +2537,7 @@ verdad y que un cambio deliberado vuelve falsa** — y por eso es la única *ant
 un esquema, la documentación que presume de generalidad caduca en bloque. Cinco casos, todos de la
 misma familia: `Sigma1CorePrf` («incondicionalmente válida»), `pcc_leibniz_code` («arbitrarios»),
 `pcc_exIntro_code` y `pcc_forallElim_code'` (una hipótesis dada por muerta que **vuelve a
-usarse** — el mismo caso en los **dos espejos**), y `prf_lineWF_tag` (bicondicional).
+usarse** — el mismo caso en los **dos espejos**), y `prf_lineWF_tag` (bicondicional; hoy `prf_lineWF_tag_imp`, el nombre viejo ya no existe).
 
 🔑 **Marcador léxico**: al cambiar un esquema o una firma, buscar **«arbitrario», «incondicional»,
 «libre de», «ya no se usa», «cualquier»**. Y **corregir no es borrar**: en tres de los cinco, parte
@@ -3603,7 +3603,7 @@ en el antecedente, el `or`‑elim la conserva en su rama.
 ## §3.44 · 🏁 C3‑T CERRADO — `DEUDA_hGuardT` PROBADA, y media cascada de ADR‑020 descargada (2026‑09‑08c)
 
 > `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
-> (`prf_axiomsCodeT_eq` + los tres de Lean). **Net‑0 puro**, ni un axioma nuevo.
+> (`prf_axiomsCodeT_eq` —`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`— + los tres de Lean). **Net‑0 puro**, ni un axioma nuevo.
 
 ```
 pcc_hGuardT (i n : Nat) (t : Term) (hin : i < n) : DEUDA_hGuardT i n t
@@ -4168,7 +4168,7 @@ listInd) están **aguas abajo** de él.
 
 > `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
 > `Meta/EvalLiftcPrf.lean` (§7bis), `Meta/StrongInductionPrf.lean` (`PSI_inst2`).
-> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq`,
+> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq` (`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`),
 > que ya estaba en la línea base. **Cero módulos nuevos.**
 
 §3.49.1 dejó A5 en la ruta crítica: `pcc_eval_liftc` está clavado a nivel `zero` y
@@ -4325,7 +4325,7 @@ hablar **en pasado**. Es la clase de mentira de docstring más barata de produci
 de cazar: el comentario **sobrevive al hecho que describía**, y `check-doc-sync` no la ve
 porque `[B]` sólo detecta símbolos inexistentes.
 
-> ⚠️ **Hallazgo colateral, NO tocado**: `CodeWitnessPrf.SinWTs.prf_congr_liftsc` tiene
+> ⚠️ **Hallazgo colateral, NO tocado**: `CodeWitnessPrf.SinWTs.prf_congr_liftsc` (✏️ 2026-10-04: se borró después; lo cuenta `Meta/CodeWitnessPrf.lean`) tiene
 > **también cero consumidores** en todo el árbol, y ni siquiera está exportado. Es código
 > muerto de la misma clase, pero **no es B8b**: se deja a decisión del autor.
 
@@ -4384,7 +4384,7 @@ precio de la independencia de capas, no un duplicado que retirar.**
 ## §3.53 · 🏁🏁 `pcc_eval_liftfc` PROBADO — el frente entero, de la fontanería al teorema (2026‑09‑09e)
 
 > `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
-> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq`.
+> Footprint **NET‑0**: los tres axiomas de Lean + el sancionado `prf_axiomsCodeT_eq` (`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`).
 
     pcc_eval_liftfc (v X) : Prf (hasWitF X ⇒ Prov(⌜ liftfc(v̇, Ẋ) = (liftfc v X)˙ ⌝))
 

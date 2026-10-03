@@ -50,9 +50,18 @@ EOF
 
 TMP=$(mktemp -d)
 LEANFILE="$TMP/Estratos.lean"
-cat > "$LEANFILE" <<'LEANEOF'
-import ROBINSON_PlusPlus
-import FOL
+# ⛔⛔ 2026-10-03 (ADR-116): dos huecos de este censo, cerrados. (1) No importaba `TheoryFramework`, la
+# otra librería del build de FOL: un `axiom` allí no lo veía nadie por entorno. Ahora se importan todos
+# sus módulos, y se exige verlos (`@TF`, abajo): un import que no carga nada no es un control. (2) Saltaba
+# los nombres `isInternal` también para los AXIOMAS, y un `private axiom` se llama `_private.…`: no lo
+# contaba. Ahora el filtro sólo se aplica a los inductivos.
+{
+  echo "import ROBINSON_PlusPlus"
+  echo "import FOL"
+  for f in $(find ../FOL/TheoryFramework -name '*.lean' ! -path '*/.lake/*' 2>/dev/null | sort); do
+    m="${f#../FOL/}"; m="${m%.lean}"; echo "import ${m//\//.}"
+  done
+  cat <<'LEANEOF'
 
 open Lean
 
@@ -63,6 +72,7 @@ def esNuestro (env : Environment) (n : Name) : Bool :=
     let m := env.header.moduleNames[idx.toNat]!
     (`FOL).isPrefixOf m || m == `FOL
       || (`ROBINSON_PlusPlus).isPrefixOf m || m == `ROBINSON_PlusPlus
+      || (`TheoryFramework).isPrefixOf m || m == `TheoryFramework
 
 /-- La cabeza de la CONCLUSIÓN del tipo: el inductivo que el axioma HABITA. -/
 def cabeza (e : Expr) : Name :=
@@ -72,13 +82,23 @@ def cabeza (e : Expr) : Name :=
 
 run_cmd do
   let env ← Lean.getEnv
+  let mut tf := 0
+  let mut nuestras := 0
   for (n, ci) in env.constants.toList do
-    if n.isInternal || !(esNuestro env n) then continue
+    if !(esNuestro env n) then continue
+    nuestras := nuestras + 1
+    if let some idx := env.getModuleIdxFor? n then
+      if (`TheoryFramework).isPrefixOf env.header.moduleNames[idx.toNat]! then tf := tf + 1
     match ci with
     | .axiomInfo ax => logInfo m!"@HAB {cabeza ax.type} {n}"
-    | .inductInfo ind => logInfo m!"@CTORS {n} {ind.ctors.length}"
+    | .inductInfo ind => if !n.isInternal then logInfo m!"@CTORS {n} {ind.ctors.length}"
     | _ => pure ()
+    -- tipo y valor, también el de un teorema (`getUsedConstantsAsSet` lee con `allowOpaque`)
+    if ci.getUsedConstantsAsSet.contains ``sorryAx then logInfo m!"@SORRY {n}"
+  logInfo m!"@TF {tf}"
+  logInfo m!"@NUESTRAS {nuestras}"
 LEANEOF
+} > "$LEANFILE"
 
 # ⛔ 2026-10-02 (ADR-115): la cuarta columna, la SOLIDEZ, se declaraba y NO se comprobaba: el
 # bloque que la «miraba» era un `:` vacío, y un nombre inventado daba verde. Ahora, por cada
@@ -156,13 +176,42 @@ done <<< "$ESTRATOS"
 echo
 echo "════ ¿algún axioma habita un estrato NO DECLARADO? ════"
 HUERFANOS=0
+# ⛔ 2026-10-04 (ADR-116, segunda revisión): se casa el PRIMER CAMPO entero. Con `grep -F "$CAB|"`,
+# un axioma que habitara `Prf` (a secas) pasaba por declarado gracias a `…Hilbert.Prf|`: subcadena.
 for CAB in $(printf '%s' "$PLANA" | grep -oE '@HAB [^ ]+' | sed 's/@HAB //' | sort -u); do
-  if ! printf '%s' "$ESTRATOS" | grep -qF "$CAB|"; then
+  if ! printf '%s\n' "$ESTRATOS" | cut -d'|' -f1 | grep -qxF "$CAB"; then
     echo "  ✗ axiomas habitando \`$CAB\`, que NO está en la tabla"
     HUERFANOS=1; FAIL=1
   fi
 done
 [ "$HUERFANOS" = "0" ] && echo "  ✓ todos los axiomas habitan estratos declarados"
+# Control positivo del alcance (ADR-116): el censo tiene que haber VISTO TheoryFramework.
+NTF=$(printf '%s' "$PLANA" | grep -oE '@TF [0-9]+' | grep -oE '[0-9]+' | head -1)
+if [ -n "$NTF" ] && [ "$NTF" -gt 0 ] 2>/dev/null; then
+  echo "  ✓ el censo incluye TheoryFramework ($NTF constantes suyas en el entorno)"
+else
+  echo "  ✗ el censo NO vio TheoryFramework (@TF='$NTF'): sus axiomas no los está mirando nadie"
+  FAIL=1
+fi
+
+# ── 2bis · `sorry` en el ENTORNO ──────────────────────────────────────────────────────────
+# ⭐ 2026-10-04 (ADR-116, segunda revisión): el contraste de `check-sorry.bash`, que lee TEXTO. Aquí
+# no hay forma de escribir un `sorry` que no se vea: toda constante de RPP, FOL o TheoryFramework cuyo
+# tipo o valor nombra `sorryAx`. (Sólo lo que el build compila: los sondeos y `Probe/` no entran.)
+echo
+echo "════ sorry EN EL ENTORNO (constantes cuyo tipo o valor nombra sorryAx) ════"
+NNU=$(printf '%s' "$PLANA" | grep -oE '@NUESTRAS [0-9]+' | grep -oE '[0-9]+' | head -1)
+SORRYS=$(printf '%s' "$PLANA" | grep -oE '@SORRY [^ ]+' | sed 's/@SORRY //' | sort -u)
+if [ -z "$NNU" ] || [ "$NNU" -le 0 ] 2>/dev/null; then
+  echo "  ✗ NO PUDE MEDIR: el censo no vio ninguna constante de los dos repos (@NUESTRAS='$NNU')"
+  FAIL=1
+elif [ -z "$SORRYS" ]; then
+  echo "  ✓ ninguna usa sorryAx  (de $NNU constantes de RPP, FOL y TheoryFramework)"
+else
+  echo "  ✗ $(printf '%s\n' "$SORRYS" | wc -l | tr -d ' ') constante(s) usan sorryAx:"
+  printf '%s\n' "$SORRYS" | head -10 | sed 's/^/      · /'
+  FAIL=1
+fi
 
 # ── 3 · LA ESCALERA DE BINDERS ────────────────────────────────────────────────────────────
 # La otra estratificación del proyecto: por NÚMERO DE CUANTIFICADORES. Existe de facto

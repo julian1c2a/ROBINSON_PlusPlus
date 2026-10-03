@@ -56,7 +56,7 @@ teoría **reparada**, y **sin cambiar ningún enunciado público**.
    cuando hacía falta.
 4. **Medir antes de comprometerse.** Las tres familias se midieron en `sondeos/` (`CarcPayoff`,
    `TcFormPayoff`, `KitPayoff`) **antes** de tocar producción. Ninguna medición falló, y una
-   (`prf_tc_form`) cambió la estrategia por completo.
+   (`prf_tc_form`, retirado el 2026‑08‑18) cambió la estrategia por completo.
 
 ## ▶ Lo que queda, y no está aquí
 

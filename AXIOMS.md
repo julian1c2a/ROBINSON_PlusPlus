@@ -215,7 +215,7 @@ con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`)
   negativa `neg_In_axiomsCodeT`, que SÓLO los axiomas están). El término gigante
   `listFormCodeM axioms` **no se materializa** en las pruebas (recursión estructural,
   `Meta/AxiomListCode.lean`), evitando el coste que retiró el `ax_axiomsCodeT` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-  original en `7ae7b7b`. **`prf_axiomsCodeT_eq`** (cálculo `Prf`) es su espejo exacto:
+  original en `7ae7b7b`. **`prf_axiomsCodeT_eq`** (cálculo `Prf`; **retirado** como `axiom` el 2026‑09‑12, [ADR‑026](DECISIONS.md), `24b3550`: hoy es la clase `AnclaEq`) es su espejo exacto:
   desde 2026‑07‑20 (`25d255b`) sustituye al antiguo `prf_inAxC` —que era sólo
   positivo y ahora es **teorema** derivado—, también **net‑0 axiomas**. Lo exige el
   `In`‑reflect de `axiomsCodeT` (`Meta/InAxiomsCodePrf.lean`), que necesita las **dos**
@@ -269,7 +269,7 @@ Gödel vieja (Gödel I/II vía D2/D3 postulados). Retirados:
 
 El módulo `Meta/Incompleteness.lean` (Gödel I/II legacy completo) se eliminó; sus
 teoremas (`goedel_first_unprovable`, `incompleteness`, `con_imp_goedelSentence`, 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-`goedel_second`) tenían equivalentes reales (`goedel_first_real'`, `goedel_second'`).
+`goedel_second`; retirados con él en F7a, `f03eacf`) tenían equivalentes reales (`goedel_first_real'`, `goedel_second'`).
 
 ---
 

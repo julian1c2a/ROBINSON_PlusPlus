@@ -12,6 +12,10 @@
 # Ídem: los workflows los interpreta el runner de Linux.
 *.yml text eol=lf
 
+# Ídem (2026-10-04, ADR-116): `strip-lean.awk` lo leen awk de Windows y de Linux, y
+# `check-doc-sync.bash` compara su código con la copia de FOL línea a línea.
+*.awk text eol=lf
+
 # ⚠️ Los scripts del libro (`doc/book/scripts/*.py`) también se ejecutan con
 # `python3` desde Git Bash y desde el Makefile: mismo motivo.
 *.py text eol=lf
