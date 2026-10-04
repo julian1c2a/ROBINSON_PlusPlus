@@ -56,6 +56,7 @@ LEANFILE="$TMP/Estratos.lean"
 # los nombres `isInternal` también para los AXIOMAS, y un `private axiom` se llama `_private.…`: no lo
 # contaba. Ahora el filtro sólo se aplica a los inductivos.
 {
+  echo "import Lean"
   echo "import ROBINSON_PlusPlus"
   echo "import FOL"
   for f in $(find ../FOL/TheoryFramework -name '*.lean' ! -path '*/.lake/*' 2>/dev/null | sort); do
@@ -84,6 +85,9 @@ run_cmd do
   let env ← Lean.getEnv
   let mut tf := 0
   let mut nuestras := 0
+  -- los tres axiomas de Lean que el proyecto acepta; cualquier OTRO axioma ajeno que use una constante
+  -- nuestra (`Lean.ofReduceBool`, `Lean.ofReduceNat`, `Lean.trustCompiler`, …) es @TRUST
+  let estandar : NameSet := ((({} : NameSet).insert ``propext).insert ``Classical.choice).insert ``Quot.sound
   for (n, ci) in env.constants.toList do
     if !(esNuestro env n) then continue
     nuestras := nuestras + 1
@@ -94,9 +98,18 @@ run_cmd do
     | .inductInfo ind => if !n.isInternal then logInfo m!"@CTORS {n} {ind.ctors.length}"
     | _ => pure ()
     -- tipo y valor, también el de un teorema (`getUsedConstantsAsSet` lee con `allowOpaque`)
-    if ci.getUsedConstantsAsSet.contains ``sorryAx then logInfo m!"@SORRY {n}"
+    let usadas := ci.getUsedConstantsAsSet
+    if usadas.contains ``sorryAx then logInfo m!"@SORRY {n}"
+    for u in usadas do
+      if let some (.axiomInfo _) := env.find? u then
+        if !estandar.contains u && u != ``sorryAx && !(esNuestro env u) then logInfo m!"@TRUST {n} {u}"
+    if (Lean.Compiler.getImplementedBy? env n).isSome || Lean.isExtern env n then logInfo m!"@NATIVO {n}"
   logInfo m!"@TF {tf}"
   logInfo m!"@NUESTRAS {nuestras}"
+  -- ¿alguna librería cargada que ningún censo mira? (una nueva, importada por FOL o por RPP, quedaría fuera)
+  for m in env.header.moduleNames do
+    if !([`Init, `Std, `Lean, `Lake, `FOL, `TheoryFramework, `ROBINSON_PlusPlus].contains m.getRoot) then
+      logInfo m!"@AJENO {m}"
 LEANEOF
 } > "$LEANFILE"
 
@@ -212,6 +225,25 @@ else
   printf '%s\n' "$SORRYS" | head -10 | sed 's/^/      · /'
   FAIL=1
 fi
+
+# ── 2ter · CONFIANZA, código NATIVO y librerías AJENAS, en el ENTORNO ─────────────────────────
+# ⭐ 2026-10-04 (cuarta revisión de ADR-116): el censo de `sorry` sólo miraba `sorryAx`. Una constante que
+# use `Lean.ofReduceBool` (confiar en el compilador: con `implemented_by`, el compilador «demuestra» `False`,
+# y el core lo avisa) pasaba por limpia; y una librería nueva, importada por FOL, no la censaba nadie.
+echo
+echo "════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════"
+for par in "TRUST|constante(s) usan un axioma de confianza" "NATIVO|constante(s) con implemented_by o extern" "AJENO|módulo(s) de una librería que ningún censo mira"; do
+  var="${par%%|*}"; txt="${par#*|}"
+  case "$var" in TRUST) re="@TRUST [^ ]+ [^ ]+" ;; *) re="@$var [^ ]+" ;; esac
+  val=$(printf '%s' "$PLANA" | grep -oE "$re" | sed "s/@$var //" | sort -u)
+  if [ -z "$val" ]; then
+    printf "  ✓ %-8s ninguno\n" "$var"
+  else
+    printf "  ✗ %-8s %s %s:\n" "$var" "$(printf '%s\n' "$val" | wc -l | tr -d ' ')" "$txt"
+    printf '%s\n' "$val" | head -10 | sed 's/^/      · /'
+    FAIL=1
+  fi
+done
 
 # ── 3 · LA ESCALERA DE BINDERS ────────────────────────────────────────────────────────────
 # La otra estratificación del proyecto: por NÚMERO DE CUANTIFICADORES. Existe de facto

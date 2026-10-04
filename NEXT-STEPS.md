@@ -10,10 +10,12 @@
 >
 > Decisiones del propietario del 2026‑10‑03: arreglar «[B] casa los nombres por prefijo» y «check‑axioms de FOL
 > es un grep»; descongelar los cinco módulos de FOL que daban por falsa la solidez de `Derives` (sólo sus
-> comentarios, y re‑congelados en el mismo ciclo); la etiqueta `pre-adr115` en `1dac85a`. Hecho, con dos
-> revisiones adversariales de los arreglos: la segunda encontró que el conteo de `axiom` de `[A]` daba SIEMPRE 0
-> (un `\n` literal donde iba una continuación de línea). El `[B]` nuevo corrigió 41 líneas de este fichero.
-> Detalle en ADR‑116.
+> comentarios, y re‑congelados en el mismo ciclo); la etiqueta `pre-adr115` en `1dac85a`. Hecho, con cuatro
+> revisiones adversariales de los arreglos. La segunda encontró que el conteo de `axiom` de `[A]` daba SIEMPRE 0
+> (un `\n` literal donde iba una continuación de línea); la cuarta, que los censos no veían la confianza en el
+> compilador (con `implemented_by`, `Lean.ofReduceBool` demuestra `False`) ni una declaración que el kernel no
+> comprobó: ahora hay `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno, y `leanchecker` en las dos CI. El
+> `[B]` nuevo corrigió 41 líneas de este fichero. Detalle en ADR‑116.
 >
 > ## ⬜ Lo que queda AHORA, en orden
 >

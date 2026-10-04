@@ -9,7 +9,10 @@ on:
 jobs:
   build:
     name: lake build
-    runs-on: ubuntu-latest
+    # ⛔ 2026-10-04 (ADR-116): FIJADO a ubuntu-24.04. `ubuntu-latest` pasa a Ubuntu 26.04 desde el 2026-10-19
+    # (otro mawk, coreutils en Rust), y un verde que no dice contra qué entorno se midió no es reproducible
+    # (ADR-073). Los controles se validaron también en 26.04 (WSL); el cambio de imagen se hará a propósito.
+    runs-on: ubuntu-24.04
 
     # Todos los `run` se ejecutan desde la raíz de ROBINSON_PlusPlus, que aquí es un
     # SUBDIRECTORIO del workspace (ver el comentario de los dos checkouts).
@@ -124,6 +127,14 @@ jobs:
       - name: Build FOL (sus dos default_target completos)
         run: lake build "@FOL/FOL" "@FOL/TheoryFramework"
 
+      # ⭐ 2026-10-04 (ADR-116, cuarta revisión): `leanchecker` vuelve a pasar cada declaración por el KERNEL
+      # (Lean/LeanChecker.lean: «a tool to detect environment hacking»). Sin él, una declaración añadida con
+      # `debug.skipKernelTC` o `addDeclWithoutChecking` no la ve ningún censo: no es un `axiom` ni nombra
+      # `sorryAx`, y su `#print axioms` sale vacío. Probado con un señuelo así en TheoryFramework: rojo.
+      # Medido en local: RPP ~5 min; FOL y TheoryFramework ~20 s.
+      - name: Check kernel (leanchecker)
+        run: lake env leanchecker ROBINSON_PlusPlus FOL TheoryFramework
+
       # ⛔ 2026-10-04 (ADR-116): BLOQUEANTE. Hasta hoy llevaba `continue-on-error: true` («Warning only»):
       # un `sorry` nuevo dejaba esta CI en VERDE. FOL lo hizo bloqueante el 2026-09-17. Desde ADR-116 el
       # script tiene autotest y sale con 2 si no puede medir (p. ej. un awk que no lee el despojador),
@@ -177,7 +188,10 @@ jobs:
   # cambia el libro: instalar TeX Live cuesta varios minutos y no tiene sentido en cada push.
   libro:
     name: libro · controles §2.1/§2.6/§2.7
-    runs-on: ubuntu-latest
+    # ⛔ 2026-10-04 (ADR-116): FIJADO a ubuntu-24.04. `ubuntu-latest` pasa a Ubuntu 26.04 desde el 2026-10-19
+    # (otro mawk, coreutils en Rust), y un verde que no dice contra qué entorno se midió no es reproducible
+    # (ADR-073). Los controles se validaron también en 26.04 (WSL); el cambio de imagen se hará a propósito.
+    runs-on: ubuntu-24.04
     if: github.event_name == 'push'
 
     # ⚠️ MISMO patrón de subdirectorio que el job `build`, y por la MISMA razón: los

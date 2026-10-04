@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-04 — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y dos revisiones adversariales de los arreglos, la segunda con el conteo de `axiom` de `[A]` a 0 fijo; `strip-lean.awk` v3; el `sorry`, censado también por entorno; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-04 — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
 >
@@ -8692,3 +8692,329 @@ estaban las meta‑reglas» volvía a decir que la inducción no cubre a los hab
 
 **Véase también:** ADR-024, ADR-025, ADR-029, ADR-113, ADR-114; `sondeos/MetaReglasRefutables.lean`,
 `sondeos/DerivesSinMetaReglas.lean`, `TEOREMAS-E-HIPOTESIS.md`.
+
+---
+
+<a id="adr-116"></a>
+## ADR-116: 🔧 los controles que daban verde sin comprobar — `[B]` por prefijo, `check-axioms` por grep, `check-estratos` sin `TheoryFramework` ni `private` —, cuatro revisiones adversariales de los arreglos, y el `thaw` de los cinco congelados de FOL
+
+**Fecha:** 2026-10-03/04 · **Estado:** ✅ RPP (este commit, tras `57ad71f`: §8) · ✅ FOL (`0b62f88` y
+`9d8e21e`, el `thaw`; `fdd35a6` y `9507c20`, los controles) · **Ámbito:** RPP y FOL. **Decisiones del propietario** (2026-10-03):
+arreglar «las dos debilidades de los controles: [B] casa los nombres por prefijo, y check-axioms de FOL es un grep»;
+`thaw` de los cinco módulos congelados de FOL con textos falsos («Sí, los cinco»: sólo comentarios y re‑congelados en
+el mismo ciclo); la etiqueta `pre-adr115` en `1dac85a`.
+
+### 1 · `[B]` de `check-doc-sync` (los dos repos): nombre EXACTO, y declaraciones del código sin comentarios
+
+* **Defecto 1, el casado por PREFIJO** («la prosa abrevia»): un nombre citado pasaba por vivo si alguna declaración
+  EMPEZABA por él. `ax_list_induction` (retirado) pasaba por `ax_list_induction_refutable`; `d3_prf` (nombre del plan,
+  nunca declarado) por `d3_prf_real`. **Ahora se casa el nombre exacto**; una FAMILIA se cita con `_` final
+  (`prf_tc_`), y sólo ésa casa por prefijo.
+* **Defecto 2, las declaraciones con COMENTARIOS**: la lista de declaraciones salía de un grep sobre el texto entero,
+  así que un nombre escrito en prosa («axiom ax_list_induction» en un docstring) contaba como declarado. **Ahora sale
+  del código sin comentarios ni cadenas** (`strip-lean.awk`, §4), con todas las palabras clave de declaración.
+* **Defecto 3, cazado al pasarlo**: el marcador que exime una línea se aplicaba a la salida de `grep -rn`, que empieza
+  por «fichero:línea:»; el marcador nuevo `sondeos/` casaba con la RUTA de `sondeos/README.md` y eximía el fichero
+  entero (el trinquete daba por «saldadas» deudas que no lo estaban). Ahora el marcador mira el CONTENIDO de la línea.
+* **Medido**: en FOL, 1 símbolo nuevo (`ax_list_induction`, retirado: 2 líneas); en RPP, **16** símbolos en **60** líneas
+  (`NEXT-STEPS.md` 37, `doc/REFERENCE-Incompleteness.md` 12, `sondeos/README.md` 4, `AXIOMS.md` 2,
+  `CURRENT-STATUS-PROJECT.md` 2, `REFERENCE.md` 1, `DECISIONS.md` 1, `cuarentena/README.md` 1) que pasaban por un
+  homónimo más largo. Corregidos uno a uno por tres editores (`wf_581f4cad-d49`), cada uno con su evidencia
+  (`git log -G`, `git show`):
+  * nombre exacto —el citado no existe—: `repr_pos'` → `repr_pos'_prf`, `prf_lineWF_tag` → `…_tag_imp`,
+    `pcc_lineWF_tracked_thy` → `…_thy_imp` (tampoco existe);
+  * familia: `prf_cantor_mono_` (`_left`/`_right`), `ax_lineWF_` (23 `def`);
+  * retirado o nunca declarado, con su marca: `prf_axiomsCodeT_eq` (el `axiom`, retirado el 2026‑09‑12 con
+    ADR‑026), `prf_tc_form` (retirado el 2026‑08‑18, ADR‑012), `prf_tc_objList`, `goedel_second`, `repr_pos`,
+    `d3_prf`, `pcc_eval_runFn` y `prf_substtc_substfc`, que tampoco existen;
+  * vive en un sondeo, fuera del árbol activo: `prf_isTC` y `prf_congr_isFC` (`sondeos/SubCodesCritica.lean`),
+    `prf_congr_carc` (`sondeos/MedirC_Deriva.lean`, entre otros); la línea dice dónde viven.
+  Dos líneas eran FALSAS además de no estar marcadas: decían que `goedel_second_prf` «nunca existió», y existe desde
+  `900410a` (2026‑09‑11). Corregidas.
+* **El trinquete bajó 44 → 41**: `goedel_first_real`, `prf_isTsC` y `prf_tc_substfc`, que no existen en el árbol
+  activo, quedaron saldados al marcar sus últimas citas, y el control pidió quitarlos de la tabla.
+
+### 2 · `check-axioms` (FOL): el censo por ENTORNO, el grep como contraste
+
+Era un grep de `^axiom `: no veía `private`/`protected`/`@[…] axiom`, uno sangrado ni uno en los barrels, y un patrón
+más ancho casaba con los ejemplos de los docstrings (`Enumeration.lean`). Ahora:
+1. el censo de las dos librerías del build se mide en el **entorno de Lean** (`lake env lean` sobre un fichero que
+   importa `FOL` y todo `TheoryFramework`; cuenta cada `axiomInfo` cuyo módulo es suyo, se declare como se declare);
+2. el grep queda como **contraste**, sobre el código sin comentarios y con todas las formas de declaración: si el grep
+   y el entorno no dan lo mismo, rompe (un `axiom` en un módulo que el build no compila, o uno que el grep no lee);
+3. la cuarentena, que no se compila, se mide por grep sin comentarios (desde la tercera revisión, el grep busca el
+   TOKEN `axiom`, no sólo a principio de línea: `open Nat in axiom x` también cuenta);
+4. (segunda revisión) el **`sorry` también se censa en el entorno**: toda constante de FOL o de `TheoryFramework` cuyo
+   tipo o valor nombra `sorryAx` (`getUsedConstantsAsSet`, que lee el valor de los teoremas). Control positivo: el
+   censo tiene que haber visto constantes de las dos librerías (hoy 2 991 + 86).
+**Pruebas de rotura** (señuelos temporales en `TheoryFramework/`, construidos y borrados con sus artefactos): un
+`private axiom`, uno con `@[simp]` y uno normal, más tres falsos (docstring, comentario, cadena) ⇒ el entorno ve los 3
+y el grep también; un `axiom` en un módulo fuera del build ⇒ el grep lo ve y el entorno no ⇒ rompe; tres `sorry`
+(`theorem`, `def`, `private theorem … := by sorry`) ⇒ «✗ 3 constante(s) usan sorryAx», los tres por su nombre.
+
+### 3 · `check-estratos` (RPP): `TheoryFramework` dentro, los `private axiom`, el `sorry` por entorno
+
+Huecos del censo por entorno: (1) no importaba `TheoryFramework`; (2) saltaba los nombres `isInternal` también para
+los AXIOMAS, y un `private axiom` se llama `_private.…`; (3, segunda revisión) «estrato no declarado» casaba por
+SUBCADENA (`grep -F "$CAB|"`): un axioma que habitara `Prf` a secas pasaba por declarado gracias a
+`…Hilbert.Prf|`. Ahora importa todos los módulos de `TheoryFramework` y exige haberlos visto (control positivo: «el
+censo incluye TheoryFramework (86 constantes suyas)»), sólo filtra `isInternal` en los inductivos, casa el primer
+campo entero, y censa el `sorry` por entorno en RPP, FOL y `TheoryFramework` (hoy 8 838 constantes, ninguna con
+`sorryAx`). **Pruebas de rotura**: `private axiom … : Derives [] Formula.bottom` y `axiom … : True` ⇒ «`Derives` 22
+ctors / 1 axiomas — declarado 22 / 0» y «axiomas habitando `True`, que NO está en la tabla»; `inductive Prf` (raíz)
+con un `axiom` que lo habita y un `theorem … := sorry` ⇒ «axiomas habitando `Prf`, que NO está en la tabla» (con la
+subcadena de antes, verde) y «✗ 1 constante(s) usan sorryAx».
+
+### 4 · `strip-lean.awk`: el despojador, en un solo sitio y siguiendo al lexer de Lean
+
+El despojador de comentarios y cadenas vivía dentro de `check-sorry.bash`. Pasa a `strip-lean.awk`, con el CÓDIGO
+idéntico en los dos repos (sólo cambia la cabecera; `check-doc-sync` de RPP lo compara, y la falta de la copia de FOL
+es rojo). Lo usan `check-sorry`, `[A]` y `[B]` de `check-doc-sync` y, en FOL, `check-axioms`.
+* **v1** (2026‑10‑03): el de `check-sorry`, con el estado reiniciado en cada fichero (`FNR == 1`).
+* **v2** (el mismo día, tras la primera revisión adversarial): siete construcciones que la v1 leía mal — literales
+  de carácter (`'"'`), cadenas de varias líneas, cadenas en bruto, el código de las interpolaciones, `«…»`, `/-` que
+  consume tres caracteres.
+* **v3** (2026‑10‑04, tras la segunda revisión, §7): una **pila de contextos** (interpolaciones anidadas); la
+  interpolación la decide el **TOKEN anterior**, con la lista del core (`s!` `m!` `f!` `println!` `throwError`
+  `throwErrorAt t` `dbg_trace` `trace[…]` `Macro.trace[…]` `trace_goal[…]` `report…Issue!` y las variantes
+  `…Named…`; `!"…"` es una cadena normal); **modo byte** con `LC_ALL=C` y el UTF‑8 decodificado a mano, con las
+  clases `isIdFirst`/`isIdRest` del core (un literal de carácter en todo comienzo de token, también tras `⟨` o `·`;
+  la prima de `Γ'` no lo es); un comentario de bloque deja un **espacio** (`exact/- c -/sorry` son dos tokens);
+  `«…»` de varias líneas. Fuera de modo byte se niega (sale con 2), y el autotest de quien lo llama da «SIN MEDIR».
+* **Validación**: contra un lexer de referencia escrito función a función sobre el de Lean v4.31.0
+  (`Lean/Parser/Basic.lean`, `StrInterpolation.lean`, `Init/Meta/Defs.lean`) — los 25 fixtures de la segunda
+  revisión y el corpus entero (**627 ficheros** de RPP, sondeos, `Probe/`, cuarentenas y FOL): **0 líneas distintas**.
+  Con mawk y con gawk la salida es idéntica en los 624 `.lean` de los dos árboles (la CI usa mawk).
+* El autotest de `check-sorry` pasa de 6 a **13** `sorry` reales —uno por cada construcción que alguna versión leyó
+  mal— y siete falsos; con la v2 da 6 de 13 ⇒ «SIN MEDIR».
+* **v4** (2026‑10‑04, tras la tercera revisión, §8): seis familias más, todas latentes —0 casos en los dos repos— y
+  tres con VERDE falso. Los tokens `\/`, `//` y `<-` se leen enteros antes de mirar si sigue un comentario
+  (`{ x : Int //-x > 0 }` abría un comentario de bloque que no se cerraba nunca y se comía el resto del fichero); la
+  interpolación vale también tras `!`, un número o `..` (`!s!"…"`), y una letra no ASCII delante de la palabra la
+  hace identificador (`φs!`); cada línea pierde su `\r` final (los awk de Linux lo conservan, y `throwErrorAt⏎`
+  dejaba de interpolar); tras `.`, `|>.` o la comilla invertida, `r` es un identificador y no abre cadena en bruto;
+  el carácter que es un salto de línea literal; `⊕'`; y `throwErrorAt x[…]`. Validada contra el lexer de
+  referencia corregido por esa revisión: los 60 fixtures de las revisiones y los 624 `.lean` de los dos árboles,
+  **0 líneas distintas**, con el mawk de la CI y con gawk. El autotest de `check-sorry` pasa a **17** `sorry`
+  reales y ocho falsos, más uno con CRLF; con la v3 da 13 de 17 ⇒ «SIN MEDIR».
+* **v5** (2026‑10‑04, tras la cuarta revisión, §9): dos regresiones de la v4. Los tokens de varios caracteres se
+  leen por máxima longitud (`<<<`, `...<`, `/\`…), y vuelve `throwErrorAt x[…]! "…"`. El autotest de `check-sorry`
+  ya no cuenta: compara el CONJUNTO de líneas, con 39 `sorry` reales en 65 líneas más la de CRLF.
+
+### 5 · El `thaw` de los cinco congelados de FOL
+
+`Soundness0`, `Canonical0`, `Compacity0`, `Rename` y `TheoryFramework/Instances/FOL` decían que la solidez de
+`Derives` era FALSA, que M‑11 prohibía inducir sobre él y que `Derives` (`axioms ⊢`) era sintácticamente completo.
+Descongelados con autorización, corregidos SÓLO sus comentarios (código idéntico a HEAD, comprobado sin comentarios),
+y re‑congelados en el commit siguiente: 23 congelados otra vez. Una revisión doctrinal de sólo lectura
+(`wf_f245c8c3-79b`) encontró nueve defectos en las correcciones, aplicados antes del commit; los de más peso: el
+módulo seguía diciendo que «hasta el 2026‑09‑14 el repo no tenía ninguna» dirección de la solidez (la de `Derives`
+estuvo en el build hasta el 2026‑09‑11, válida), una rectificación volvía al marco de M‑11 («ningún postulado puede
+contradecirla»), y las marcas ✏️ llevaban la fecha del diagnóstico en vez de la de la corrección. De paso,
+`TheoryFramework/Logic.lean` (bloqueado, no congelado) tenía la misma lectura sobre `CompleteLogic`.
+
+### 6 · La etiqueta `pre-adr115`
+
+`1dac85a`, el último estado de RPP con la capa `⊢` y su dependencia de `FOL.MetaRules`, queda etiquetado
+(`pre-adr115`, anotada, en GitHub). Es la referencia para lo retirado: `NegVerifier` (guía de casos para Rosser), el
+censo de `coreAxioms`, la librería aritmética de `Minimal`/`Full`.
+
+### 7 · La segunda revisión adversarial de los arreglos (`wf_6bf69615-ed7`): catorce hallazgos
+
+El más grave estaba **en el arreglo**, no en lo arreglado:
+
+* **A · `[A]` contaba los `axiom` SIEMPRE 0** (los dos repos). Donde iba la continuación de línea había un `\n`
+  LITERAL —la cadena de herramientas se comió la barra al escribirla—: `find` recibía «\n» como un camino más y
+  fallaba, y el `|| true` del final se tragaba el fallo. Como el árbol tiene de verdad 0 `axiom`, la cifra cuadraba
+  con los documentos: un `axiom` nuevo habría dado **verde**. Ahora la cuenta es una función que **devuelve** su fallo
+  y, antes de medir el árbol, mide un fixture con **3** `axiom` reales y 5 señuelos (docstring, comentario, cadena,
+  comentario de bloque, `-- axiom` tras código): si no salen 3, «SIN MEDIR», que es rojo también con `--quick`. En FOL
+  el alcance incluye ya el barrel `TheoryFramework.lean`. Prueba de rotura: dos `axiom` (uno `@[simp] private` y
+  sangrado, otro tras un docstring en la misma línea) ⇒ 2; sin el despojador ⇒ SIN MEDIR.
+* **B–E · el despojador**: la interpolación se decidía por carácter (`!` antes de `"`), así que `throwError "…{…}"`
+  (que se usa en `sondeos/`) no era código y `!"{"` desincronizaba el resto del fichero; las interpolaciones anidadas
+  no tenían pila; tras un símbolo no ASCII (`⟨'«', "»", sorry⟩`, `⟨r"\", sorry⟩`) no se reconocían los literales;
+  y un comentario de bloque pegaba los tokens vecinos. Todo en la v3 (§4).
+* **F · `_root_.sorryAx`** no casaba el patrón de `check-sorry`: ya casa. Y el `sorry` se censa por entorno (§2, §3).
+* **G · el control positivo de `[B]` en FOL** era un umbral de 1 000 declaraciones: sin el hermano RPP salen 990 y daba
+  «NO PUDE MEDIR» (y seguía, y decía «✓»). Ahora es por NOMBRE (`derives0_soundness`, y `goedel_first_prf` si está el
+  hermano), con un suelo según el alcance; si no mide, no recorre y lo dice.
+* **H · el tope del trinquete** («de 41») era un literal que nada comparaba: ahora `B_TOPE` se compara con la tabla en
+  los dos sentidos. 🔑 El tope sólo baja.
+* **I · `[B]` no leía las citas calificadas ni las no ASCII** (el patrón se paraba en el `.` o en el subíndice). Ahora
+  sí (una cita calificada vale por su último componente), y salieron **cuatro** citas muertas sin marcar, corregidas:
+  `Full.ax_induction`/`Full.ax_list_induction` (retirados), `SinWTs.prf_congr_liftsc` (borrado el 2026‑09‑09, en dos
+  ficheros) y `ParticionTresPredicados.prf_isFCB3_fcodes` (vive en `sondeos/ParticionTresPredicados.lean`: la línea
+  nombra ya su fichero, en dos ficheros). La puntuación general de Unicode (`prf_liftc_funcc1‑3`) no es carácter de nombre.
+* **J · la exención por sondeo** valía con nombrar CUALQUIER `sondeos/`: ahora la línea tiene que nombrar el fichero
+  que declara el símbolo (con frontera: `sondeos/ParticionTres` no vale por `…TresPredicados`).
+* **K · `def x.{u}`** declaraba `x.` y un nombre vacío: ahora `x`. Los constructores y campos siguen sin verse (falso
+  rojo, nunca falso verde): documentado en el script.
+* **L · la comparación de las dos copias del despojador** se saltaba en silencio si faltaba la de FOL: ahora es rojo.
+* **M · «estrato no declarado» por subcadena** (§3).
+* **N · `[B]` tardaba ~90 s** en msys (un grep por símbolo y documento): ahora es una pasada de awk, **~12 s**. Los
+  marcadores van por bytes, así que casan igual en msys y en Linux (`🗑️` incluido; antes, no en msys) — un acento se
+  escribe `(e|é)`: en modo byte un corchete casa UN byte.
+
+Además: la CI de RPP tenía `check-sorry` como **aviso** (`continue-on-error: true`, «Warning only»): ahora es
+bloqueante, como en FOL desde el 2026‑09‑17. Y `.gitattributes` fuerza LF en `*.awk`.
+Pruebas de rotura de `[B]`: 18 casos en RPP (cita muerta simple, calificada y no ASCII; calificada viva; sondeo con su
+fichero, sin `.lean`, con otro fichero y con un prefijo de fichero; familia viva y muerta; marcador, emoji y acento;
+puntuación; `.{u}`; tabla con una entrada menos que el tope; sin la copia de FOL; despojador roto ⇒ SIN MEDIR y no una
+lluvia de muertos) y 7 en FOL: todos dan lo esperado. Con mawk, los bloques `[A]` y `[B]` y `check-sorry` dan lo
+mismo que con gawk.
+
+### 8 · La tercera revisión (`wf_fe1b9e60-851`), y un commit que no es de esta sesión
+
+La primera ejecución (`wf_36c46da8-e66`) murió entera por el límite de sesión, sin devolver nada; la segunda
+reutilizó sus fixtures, entre ellos el mawk 1.3.4 20240123 de la CI, sacado de su `.deb` y ejecutable desde WSL. De
+sus cuatro frentes, tres acabaron con su verificador; el cuarto, los censos por entorno, se colgó, y lo cubre la
+cuarta revisión (§9). Lo de abajo está reproducido por el verificador de cada frente.
+* **El despojador** (seis, todos reales; dos altas —`!s!"…"` y los tokens `//`/`\/`—, una media —CRLF— y tres
+  bajas): la v4 (§4).
+* **`check-doc-sync`** (siete reales de ocho):
+  - **alta**: con `--quick`, un `check-sorry` que no podía medir (con su autotest en rojo, p. ej.) dejaba comparar el
+    «0 sorry» de los documentos con un 0 por defecto: verde con un `sorry` real. Ahora no medir el `sorry` es rojo
+    siempre, como el `axiom`;
+  - [A] de RPP no contaba el barrel raíz `ROBINSON_PlusPlus.lean`, que el build compila: ahora sí;
+  - [A] veía el `axiom` sólo a principio de línea (`open Nat in axiom x`, `def t := 0 axiom x`, `public axiom x`, el
+    nombre en la línea siguiente): ahora cuenta el TOKEN, en los dos repos y en el grep de `check-axioms`;
+  - el autotest de [A] no ejercía el despojador (el patrón anclado rechazaba los señuelos aunque no se despojara
+    nada): ahora tiene 8 `axiom` reales —detrás de una comilla escapada, de `'"'`, de una interpolación, de una cadena
+    en bruto, tras `open … in`— y señuelos que empiezan línea DENTRO de un docstring, de una cadena de dos líneas y de
+    un comentario anidado. Prueba de rotura: el despojador sin el escape de las cadenas ⇒ «SIN MEDIR» en [A] y en
+    `check-sorry`;
+  - el resumen de `check-sorry` se buscaba en toda su salida, que reimprime las líneas fuente: ahora se leen sus dos
+    líneas de resumen, enteras;
+  - el marcador de [B] se miraba en la línea con la propia cita: un nombre muerto que contuviera un marcador
+    (`prf_x_muerto`, hipotético) se eximía a sí mismo. Ahora las citas van en blanco;
+  - en FOL, un checkout fallido del hermano (deja `_rpp/` con su `.git`) daba «NO PUDE MEDIR» en vez de alcance
+    reducido: regresión de §7 (G), arreglada reconociendo al hermano por su contenido.
+  - El octavo —que `B_TOPE` no impide subir tabla y tope a la vez— lo refutó el verificador («el código hace lo que dice
+    su comentario»). Aun así el trinquete se hace efectivo: el tope se compara con el del commit anterior, y subirlo
+    exige `B_TOPE_ADR` con un ADR que exista.
+* **Portabilidad**: el tramo de [B] y el grep de `check-axioms` corrían en el locale del usuario (en msys, `grep -o`
+  cortaba un carácter fuera del BMP y `sort -u` fundía nombres canónicamente equivalentes): ahora en modo byte;
+  `check-sorry` recorría `./_rpp` (el clon de RPP en la CI de FOL) y `./Probe` (local, fuera de git): ya no; y las
+  dos CI usaban `ubuntu-latest`, que pasa a 26.04 desde el 2026‑10‑19 (otro mawk, coreutils en Rust): fijadas a
+  `ubuntu-24.04`, con los controles probados también en 26.04 (WSL).
+* **⚠️ El incidente.** El revisor de portabilidad encontró que **RPP `57ad71f`** —«Add strip-lean.awk script…», un
+  mensaje en inglés autogenerado, sin ADR, a las 01:39 del 2026‑10‑04— contenía los catorce ficheros de ADR‑116 tal
+  como estaban en el árbol y **estaba publicado**, con la CI en rojo: FOL@master no tenía aún `strip-lean.awk`, y [B]
+  lo exige (M‑12: FOL antes que RPP). Ese commit no lo hizo esta sesión. Se arregló publicando FOL `fdd35a6` (sus
+  controles, ya verificados en local) y relanzando la CI de RPP: verde. El texto de este ADR y los arreglos de la
+  tercera revisión van en el commit siguiente.
+
+### 9 · La cuarta revisión (`wf_4248c19a-99b`), y los controles
+
+Dos frentes: los censos, que la tercera dejó sin revisar, y las regresiones de los arreglos de la v4. **Dieciséis
+hallazgos, los dieciséis reales** según su verificador (once y cinco; dos coinciden: el `sed` voraz de
+`check-axioms`). La mayoría daban VERDE falso. Cinco eran regresiones de mis propios arreglos de §8: tres daban
+verde falso y dos, rojo falso.
+
+* **El despojador** (dos altas, regresiones de la v4; la v3 acertaba):
+  - la regla nueva de `\/`, `//` y `<-` saltaba también en medio de tokens del core que ya se habían comido ese
+    `<` o esa `\` (`<<<`, `=<<`, `<=<`, `...<`, `*...<`, `<...<`, `/\`): en `a <<<-- "` el comentario pasaba a ser
+    código, la `"` abría una cadena falsa y el `sorry` de la línea siguiente desaparecía. Ahora esos tokens se leen
+    enteros, por máxima longitud, como hace `matchPrefix` en el lexer;
+  - `throwErrorAt args[0]! "…{sorry}…"` dejó de leerse como cadena interpolada: el término de referencia tenía que
+    ACABAR en `]`. Ahora admite lo que siga a cada índice (`]!`, `]?`, `].campo`, `][1]`).
+  Es la **v5**.
+* **El autotest de `check-sorry`** (dos altas): contaba LÍNEAS, y la cuenta se compensaba: un mutante de una línea
+  perdía el `sorry` 17 y hacía contar el señuelo `φs!`, y seguía dando 17. Y no ejercía siete familias que la v4
+  decía cubrir: de 184 mutantes de un punto del revisor, 108 pasaban el autotest y 27 perdían `sorry` reales de los
+  fixtures. Ahora se compara el **CONJUNTO** de líneas con `sorry`, sobre 65 líneas con **39** `sorry` reales —una
+  por familia, sacadas de los fixtures de las cuatro revisiones— más la de CRLF. **Prueba de mutación** propia: 76
+  mutantes de un punto del despojador, contra 182 fixtures. Con la primera ampliación quedaban dos PELIGROSOS
+  (pasan el autotest y pierden un `sorry` real: el cuerpo de `subind` y `br[sp]--`); con dos líneas más —llaves
+  anidadas dentro de una interpolación y el señuelo `x₁throwError`—, sobreviven 21 y **ninguno es peligroso**, con
+  gawk y con el mawk de la CI.
+* **`check-sorry`** (baja): medía en el directorio desde el que se lanzaba (desde uno sin `.lean`, «No .lean files
+  found.» y 0, sin pasar por el autotest), y `staged` leía el árbol en vez del índice. Ahora se sitúa en su
+  directorio, pasa el autotest antes de buscar ficheros, «ningún `.lean`» en modo `all` es SIN MEDIR, y `staged`
+  despoja `git show :FICHERO` de lo añadido o cambiado.
+* **El censo de agujeros de `check-sorry` de RPP** (alta): era un grep crudo y anclado (`^unsafe `, `^opaque `,
+  `@\[implemented_by`, `@\[extern`) sobre RPP y `FOL/`. No veía `attribute [implemented_by f] g`,
+  `@[simp, implemented_by f]`, `private opaque`, `noncomputable opaque` ni `private unsafe def`, ni leía
+  `TheoryFramework` ni los barrels; y con `implemented_by` y `Lean.ofReduceBool` se demuestra `False` (lo avisa el
+  propio core). Ahora busca el TOKEN en el código despojado de todo lo que compila el build, y si falta un camino es
+  SIN MEDIR. Tiene dos familias más: la confianza en el compilador (`ofReduceBool`, `ofReduceNat`, `trustCompiler`) y
+  saltarse el kernel (`skipKernelTC`, `addDeclWithoutChecking`). Son ocho familias, hoy todas a 0. FOL no lleva
+  este bloque: allí manda el censo por entorno y `leanchecker` (abajo), y el de RPP lee también FOL y `TheoryFramework`.
+* **Los censos por entorno** (tres medias), en `check-axioms` (FOL) y en `check-estratos` (RPP):
+  - sólo miraban `sorryAx` y los `axiom` declarados en los repos, así que una constante que usara
+    `Lean.ofReduceBool` pasaba por limpia. Ahora **`@TRUST`** marca toda constante nuestra que use un axioma ajeno
+    fuera de `propext`, `Classical.choice` y `Quot.sound`. **`@NATIVO`** marca toda constante con `implemented_by` o
+    `extern` (`Lean.Compiler.getImplementedBy?`, `Lean.isExtern`). Las dos son rojo;
+  - filtraban por prefijo de módulo: una librería nueva importada por FOL (`lean_lib «FOLUtil»`) entraba en el
+    build sin que nadie contara sus axiomas. Ahora **`@AJENO`** lista, y es rojo, todo módulo cargado cuya raíz no
+    sea `Init`, `Std`, `Lean`, `Lake` ni una librería del proyecto. La guarda de las librerías retiradas casa también
+    `lean_lib X` sin `«»`;
+  - una declaración que el kernel no ha comprobado (`set_option debug.skipKernelTC true`) no es `axiomInfo` ni
+    nombra `sorryAx`: no la veía ningún censo, y su `#print axioms` sale vacío. Ahora las dos CI pasan
+    **`leanchecker`**, que vuelve a pasar cada declaración por el kernel (`lake env leanchecker ROBINSON_PlusPlus FOL
+    TheoryFramework` en RPP, `… FOL TheoryFramework` en FOL). En local tarda 294 s en RPP y 20 s en FOL.
+  **Prueba de rotura en el entorno**, con un señuelo temporal en `TheoryFramework/`, construido y borrado con sus
+  artefactos: una constante con `implemented_by`, un teorema que usa `Lean.ofReduceBool` y un `zzTrampa : False`
+  añadido con `skipKernelTC`. Resultado: `@TRUST` y `@NATIVO` en rojo en los dos censos, y `leanchecker` sale con
+  1 («declaration type mismatch, 'zzTrampa'»).
+* **El grep de `check-axioms` y de `[A]`**:
+  - (alta) `grep_axiomas $(lean_de cuarentena)` partía por espacios los nombres de fichero. Un `axiom` en
+    «cuarentena/X - copia.lean», el nombre que da el Explorador a una copia, no se contaba. Ahora la lista se lee por
+    líneas, y un argumento que no es un fichero es SIN MEDIR;
+  - (media, regresión de la v4) el `sed` sacaba el nombre con un `.*axiom` voraz: `axiom my_axiom` salía «?» y
+    `axiom axiom_of_choice`, «_of_choice». Daba rojo falso en «¿los cita AXIOMS.md?». Ahora se ancla a la frontera;
+  - (media y baja) el patrón del token (`AX_TOK`, el mismo que usa `[A]` en los dos repos) contaba el literal de
+    nombre `` `axiom `` y el identificador `αaxiom`: era un rojo falso nuevo de la v4, porque en modo byte el byte
+    de continuación de la `α` hacía de frontera. Y no veía `axiom«x»`. Ahora la frontera excluye la comilla
+    invertida y los bytes de continuación UTF‑8, y tras `axiom` vale `«`. El autotest de `check-axioms` pasa de 3
+    a 6 axiomas reales (uno con «axiom» dentro del nombre, uno con el nombre en la línea siguiente, que sale «?», y
+    uno con nombre `«…»`) y de 4 a 6 señuelos. El fixture de `[A]` pasa de 8 a 9.
+* **El trinquete de `B_TOPE`** (alta, regresión de mi arreglo de §8): comparaba con el commit PADRE. Bastaba subir
+  tope y tabla y hacer cualquier commit encima para dar verde. Ahora se compara con el **mínimo de toda su
+  historia** (la CI clona con `fetch-depth: 0`). Subirlo exige `B_TOPE_ADR="ADR-NNN:valor"`, con un ADR que exista y
+  el valor exacto del tope nuevo.
+
+**Validación de la v5**: contra el lexer de referencia corregido por esta revisión, el corpus de los dos árboles da
+**0 líneas distintas**, con gawk y con el mawk de la CI. De los fixtures difieren dos líneas, y en ellas el que se
+equivoca es el oráculo: no lee `throwNamedErrorAt args[0]! …` como interpolación. Las pruebas de rotura de texto
+dan todas lo esperado: `[A]` con `axiom«x»` y los señuelos nuevos; el censo de agujeros con las formas de arriba y
+un fichero en `TheoryFramework`; `check-sorry` desde otro directorio y sin `.lean`; el trinquete contra el mínimo,
+con un ADR para otro valor y con el suyo; la cuarentena con espacios. `check-sorry`, `[A]` y `[B]` dan lo mismo con
+gawk, con el mawk de la CI y con el de 26.04 (WSL).
+
+**Lo que queda abierto**, conocido y anotado:
+* **«¿los cita AXIOMS.md?» se cumple con la historia**: el AXIOMS.md de FOL nombra `raa` 27 veces como retirado, y un
+  `axiom raa` vuelto a meter pasaría esa comprobación. El arreglo es una tabla de axiomas VIGENTES, entre marcas,
+  comparada en los dos sentidos con el entorno. Ese documento está bloqueado y hoy hay 0 axiomas, así que la tabla
+  irá con el primer axioma que se proponga, que pide su propio ADR. Mientras tanto ese axioma tampoco entra en
+  silencio: hay que subir a mano `ESPERADO_FOL` y la cifra de cabecera de AXIOMS.md, que `[A]` compara con
+  «0 `axiom`».
+* **El contraste de `check-axioms` compara cuántos, no cuáles**: con `ESPERADO` a 0 basta, porque todo axioma del
+  entorno es rojo. Con axiomas vigentes, cambiar uno por otro pasaría.
+* **Tres casos inverosímiles en los que el despojador difiere de Lean**: `0x1F?s!` y `0x1F'\\'`, que ya fallaban antes
+  de la v4, y `..r"…"`. Hoy no aparecen en ningún árbol.
+* **Cuando el censo de `check-estratos` no puede medir, no muestra los errores de `lean`**: da rojo, pero no dice
+  por qué.
+
+| control | RPP | FOL |
+|---|---|---|
+| build | ✅ 117 jobs | ✅ 58 jobs (desde RPP) |
+| `check-sorry` | ✅ 0 `sorry`; los 8 agujeros a 0; autotest 39 líneas + 1 | ✅ 0; autotest 39 + 1 |
+| censo por entorno | `check-estratos` ✅ los 10 estratos; 0 `sorryAx` en 8 838 constantes; ningún `@TRUST`, `@NATIVO` ni `@AJENO` | `check-axioms` ✅ 0 + 0 `axiom`; 0 `sorryAx` en 2 991 + 86; ningún `@TRUST`, `@NATIVO` ni `@AJENO` |
+| `leanchecker` (nuevo en la CI) | ✅ en local, 294 s | ✅ en local, 20 s |
+| `check-warnings` | ✅ 11 = 11 | — |
+| `check-footprints` | ✅ 468 | — |
+| `check-doc-sync` | ✅ [A] 0 `axiom` (autotest 9) · [E] deuda 34 · [B] 41 de 41 (tope 41, su mínimo) · [C] [D] [F] · [H] 85/85 · [A2] aviso 132 | ✅ [A] (autotest 9) · [E] deuda 4 · [B] · [C] [D] [F] [G] |
+| con el mawk de la CI y el de 26.04 (WSL) | `check-sorry`, [A] y [B]: lo mismo | lo mismo |
+
+🔑 *Un control que casa por prefijo absuelve a todo nombre que empiece igual que uno vivo.* Y dos más, de las que este
+repo ya conoce: *el que arregla el control no está exento* — el marcador `sondeos/` nació eximiendo un fichero entero,
+y el conteo de `axiom` de `[A]` salió de mi arreglo a 0 fijo —; y *un `|| true` al final de una tubería convierte «no
+he podido medir» en «cero»*: toda medición que pueda valer 0 de verdad lleva un fixture con una cifra que no lo es.
+La cuarta revisión añadió tres: *un autotest que compara una CUENTA se compensa*, y lo que se compara es el
+CONJUNTO; *un censo que sólo cuenta lo que el proyecto DECLARA no ve lo que el proyecto USA* (la confianza en el
+compilador es un axioma del core); y *a un autotest se le prueba mutando lo que prueba*: los dos mutantes que
+sobrevivían perdiendo un `sorry` real dieron sus dos líneas.
+
+**Véase también:** ADR‑084 (el trinquete de `[B]`), ADR‑114 §2, ADR‑115.
