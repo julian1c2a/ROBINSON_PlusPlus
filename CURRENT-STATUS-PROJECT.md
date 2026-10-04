@@ -1,5 +1,14 @@
 # Current Project Status — ROBINSON_PlusPlus
 
+> ### 🏁 2026‑10‑04 · F1 reparado ([ADR‑117](DECISIONS.md)) — el ancla es un TEOREMA, y lo que eso NO dice
+>
+> `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre
+> (`axiomsBase`) y `ax_axiomsCodeT_def`, el último. El ancla de antes, la hipótesis de clase `AnclaEq`, es hoy
+> el teorema `prf_ancla` (instancia `instAnclaEq`), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
+> su footprint sigue siendo los tres de Lean, y **F1 ya no los hace vacuos**. ⚠️ **Lo que NO dice**: que
+> `ConsistentH` se cumpla —sólo vale si los 142 axiomas son consistentes, y no hay modelo—, ni `⊬¬G`, que sigue
+> sin existir en ningún cálculo (irá por Rosser). Del bloque de abajo sigue vigente lo de `⊢`; su «VACUOS», no.
+
 > ### 🗑️ 2026‑10‑02 · la capa `⊢` RETIRADA ([ADR‑115](DECISIONS.md)) — y lo que eso NO arregla
 >
 > RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
@@ -9,8 +18,8 @@
 > (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
 > de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
 > con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
-> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> ⛔ **Lo que NO arregla** *(hasta ADR‑117, 2026‑10‑04)*: `goedel_first_prf` y `goedel_second_prf` llevan la clase
+> `[AnclaEq]`, y `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
 > los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
 > Lo que sigue es el estado del 2026‑09‑10c y se conserva como registro.
 

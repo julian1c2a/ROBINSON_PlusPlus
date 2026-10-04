@@ -25,7 +25,7 @@ obligaciones administrativas.
 
 ⚠️ **Pero aquel caso no tenía el hueco que tiene éste.** Allí `wfAll` **es** un `∀` acotado, así
 que lo que `pcc_bdAll_intro` entrega —el código de un `∀` acotado— *es* lo que se pedía. Aquí
-no: `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:790`, `Formula.atom "chainOk" [c,p]`), y su
+no: `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:864`, `Formula.atom "chainOk" [c,p]`), y su
 forma acotada `chainOkB` es otra fórmula. `pcc_bdAll_intro` daría `Prov(⌜chainOkB nil ṗ⌝)`, y
 `hC_dot` pide `Prov(⌜chainOk nil ṗ⌝)`.
 

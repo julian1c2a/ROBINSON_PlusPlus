@@ -884,10 +884,10 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
     ⚠️ **NET-0 aqui significa «ningun axioma NUEVO», no «solo los tres de Lean».** Los
     resultados sustantivos de este modulo salen con **CUATRO**:
 
-        [propext, Classical.choice, Quot.sound]   -- ⭐ desde ADR‑026: el ancla es `[AnclaEq]`, hipótesis
+        [propext, Classical.choice, Quot.sound]   -- ⭐ el ancla: hipótesis `[AnclaEq]` (ADR‑026); desde ADR‑117, `prf_ancla`
 
     El cuarto es uno de los `axiom` de Lean ya sancionados del proyecto
-    (`Meta/Representability2Prf.lean:104`) y **ya estaba en la linea base**: `LiftcCodePrf`
+    (`prf_axiomsCodeT_eq`, retirado con ADR‑026; hoy no hay cuarto) y **ya estaba en la linea base**: `LiftcCodePrf`
     lo arrastra en `refl_termCode` y en `refl_shapeUn_imp`, ambos anteriores a este modulo.
     Medido, no supuesto.
 

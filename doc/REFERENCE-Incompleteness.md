@@ -1,11 +1,21 @@
 # REFERENCE — Incompletitud Nivel D · Gödel I/II, D1–D3, Σ₁-completitud provable · ROBINSON_PlusPlus
 
+> 🏁 **2026‑10‑04 · ADR‑117 — F1 reparado.** `axioms` tiene 142 fórmulas: los 141 de `axiomsBase` y, la última, el
+> axioma DIAGONAL `ax_axiomsCodeT_def`. El ancla `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
+> `Meta/Representability2Prf.lean`) y `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf` y
+> `goedel_second_prf` toman sólo `(hcon : ConsistentH)`, con los tres axiomas de Lean: F1 ya no los hace vacuos.
+> ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes, y no hay modelo;
+> `f1_traduccion_refutada` bloquea el argumento de F1 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no
+> prueba la consistencia). `⊬¬G` sigue sin existir:
+> irá por Rosser, sobre `Prf`.
+
 > 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` se retiró: de `Meta/` salen 9 módulos (`AxiomListCode`,
 > `DerivCond`, `Induction`, `LineWFDerives`, `ListInductionArith`, `Necessitation`, `OmegaStrength`,
 > `Reflection`, `StepArith`) y todo lo enunciado sobre `⊢` en los demás, retirado también — `goedel_first_numeral`,
 > `goedel_second'`, `NegVerifier` y la mitad `⊬¬G`. La cadena sobre `Prf` (D1 `repr_pos'_prf`, D2
 > `d2_prf`, D3 `d3_prf_real`, `goedel_first_prf`, `goedel_second_prf`) **sigue entera**, y ⛔ **sigue
-> vacua** por `[AnclaEq]` (F1, ADR‑114). Las secciones de abajo que hablan de `⊢` son registro.
+> vacua** por `[AnclaEq]` (F1, ADR‑114; hasta ADR‑117, 2026‑10‑04: ver arriba). Las secciones de abajo que
+> hablan de `⊢` son registro.
 
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5). Es el subsistema **activo**
 > del proyecto. Índice raíz: [REFERENCE.md](../REFERENCE.md).
@@ -26,8 +36,9 @@ D1/D2/D3 **no postula ninguna de las tres**.
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
 > **Build 117 jobs · 104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/`
-> + 85 `sondeos/` · 0 `axiom` de Lean · 141 axiomas objeto · 0 errores / 0 sorrys.**
+> + 85 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -415,6 +426,7 @@ de listas para D3, §12‑A): `lenc l := func "lenc" [l]`, `nthc l i := func "nt
 `ax_lenc_nil` (`lenc nil = 0`), `ax_lenc_cons` (`lenc (cons h t) = σ (lenc t)`), `ax_nthc_zero`
 (`nthc (cons h t) 0 = h`), `ax_nthc_succ` (`nthc (cons h t) (σ i) = nthc t i`). Añadidos a `axioms`
 y `codingAxioms` (`axioms_eq` rfl preservado; verificador/`prf_iff_derivation`/D1 intactos).
+(`axioms_eq` se retiró con ADR‑117, 2026‑10‑04: hoy `axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def]`.)
 
 ---
 
@@ -1196,9 +1208,13 @@ La pieza clave del diseño: `consN` se define con **números triangulares**, de 
 `codeNat` va acompañado de `codeNatChars`/`codeNatStr`/`codeNatTerm`/`codeNatTerms`, y cada uno de su
 lema de evaluación (`prf_charsCode_numeral`, `prf_strCode_numeral`, `prf_termCode_numeral`,
 `prf_termsCode_numeral`). `prf_formCode_numeral` es **meta‑recursión** sobre la estructura de `φ`.
+✏️ 2026‑10‑04 (ADR‑117): `triN`, `consN` y la familia `codeNat` se definen hoy en `Minimal/Axioms.lean` —el
+axioma diagonal lleva `numeralM (codeNat ψ)`, y `axioms` no puede importar `Meta`—; este módulo los reexporta.
 
 **Hecho de magnitud medido** (`sondeos/S3S5.lean`): Lean **nunca reduce** `codeNat φ` — se mantiene
 simbólico incluso con `φ` concreta. La vía es viable del lado de Lean.
+✏️ 2026‑10‑04 (ADR‑117): «nunca» vale al ELABORAR; con `simp only` sobre las definiciones del ancla, el núcleo
+evaluaba el numeral («(kernel) deep recursion detected»), y por eso `axD_lift` va por `rw`.
 
 #### 3.24.3 `Meta/Div2ParityPrf.lean` — `div2` sobre numerales, y la paridad de Cantor
 

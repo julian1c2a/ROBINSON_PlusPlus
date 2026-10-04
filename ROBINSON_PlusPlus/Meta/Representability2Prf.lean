@@ -5,6 +5,8 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ArithPrf
 import ROBINSON_PlusPlus.Meta.Representability2
+import ROBINSON_PlusPlus.Meta.TcArithPrf
+import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 import FOL.FOL
 import FOL.Theorems.Eq
@@ -98,7 +100,85 @@ theorem prf_In_runFn_of_mem {rs : List Rule} {L : List Formula} {φ : Formula}
     simpa [listFormCode] using prf_runFn_track rs [] L hchk
   exact prf_eq_subst_in (prf_eq_symm htrack) (prf_In_listFormCode hmem)
 
+/-! ### ⭐ El ANCLA de `axiomsCodeT`, TEOREMA (L2‑3, ADR‑117)
+
+El axioma diagonal `ax_axiomsCodeT_def = axD axiomsBase` (`Minimal/Axioms.lean`) dice
+`axiomsCodeT =eq ⌜axiomsBase⌝ ++ [δ]`, con δ = `substfc 0 (tcFn N̄) N̄`. Aquí se prueba que δ ES el código de
+`axD L` misma (`prf_deltaD`, para toda `L`: el lema diagonal con la plantilla fija), y de ahí sale el
+ancla de antes, `axiomsCodeT =eq listFormCodeM axioms`, como TEOREMA (`prf_ancla`). -/
+
+/-- El paso diagonal para una plantilla ψ ARBITRARIA: `substfc 0 (tcFn N̄) N̄ = ⌜ψ(N̄)⌝`, con N̄ el numeral
+    del código de ψ. Son los pasos p1–p3 de `prf_diag_arith_num` (`Meta/GodelTwoPrf.lean`), sin
+    `diagTerm` ni `selfAppN`; el numeral queda PLEGADO: ningún paso lo evalúa. -/
+theorem prf_diag_numeral (ψ : Formula) :
+    Prf (substfc zero (tcFn (numeral (codeNat ψ))) (numeral (codeNat ψ)) =eq
+      formCode (substFormula 0 (numeral (codeNat ψ)) ψ)) := by
+  have p1 : Prf (substfc zero (tcFn (numeral (codeNat ψ))) (numeral (codeNat ψ)) =eq
+      substfc zero (termCode (numeral (codeNat ψ))) (numeral (codeNat ψ))) :=
+    prf_congr_substfc_arg2 (prf_tc_numeral (codeNat ψ))
+  have p2 : Prf (substfc zero (termCode (numeral (codeNat ψ))) (numeral (codeNat ψ)) =eq
+      substfc zero (termCode (numeral (codeNat ψ))) (formCode ψ)) :=
+    prf_congr_substfc_arg3 (prf_eq_symm (prf_formCode_numeral ψ))
+  -- la ascripción convierte `numeral 0 ≡ zero` (un término pequeño); el numeral grande no se toca
+  have p3 : Prf (substfc zero (termCode (numeral (codeNat ψ))) (formCode ψ) =eq
+      formCode (substFormula 0 (numeral (codeNat ψ)) ψ)) :=
+    prf_substFormula_arith 0 (numeral (codeNat ψ)) ψ
+  exact prf_eq_trans p1 (prf_eq_trans p2 p3)
+
+/-- δ es el código del axioma diagonal: `deltaD L =eq ⌜axD L⌝`. Sólo `rw` de patrón cerrado: nada
+    despliega `numeral` ni `nD`. -/
+theorem prf_deltaD (L : List Formula) : Prf (deltaD L =eq formCodeM (axD L)) := by
+  have h := prf_diag_numeral (psiD L)
+  have eδ : substfc zero (tcFn (numeral (codeNat (psiD L)))) (numeral (codeNat (psiD L)))
+      = deltaD L := by
+    rw [deltaD, nD, numeralM_eq]
+  have eA : substFormula 0 (numeral (codeNat (psiD L))) (psiD L) = axD L := by
+    rw [subst_psiD, axD, deltaD, nD, numeralM_eq]
+  rw [eδ, eA, ← formCodeM_eq (axD L)] at h
+  exact h
+
+/-- `⌜L⌝ ++ [⌜axD L⌝] = ⌜L ++ [axD L]⌝`. -/
+theorem prf_cola_axD (L : List Formula) :
+    Prf (concat (listFormCodeM L) (cons (formCodeM (axD L)) nil) =eq
+      listFormCodeM (L ++ [axD L])) := by
+  rw [listFormCodeM_eq L, listFormCodeM_eq (L ++ [axD L]), formCodeM_eq (axD L)]
+  exact prf_concat_listFormCode_singleton L (axD L)
+
+/-- El ancla de `L ++ [axD L]`, CONDICIONAL al axioma diagonal sobre `L`. -/
+theorem ancla_de_diagonal (L : List Formula) (hax : Prf (axD L)) :
+    Prf (axiomsCodeT =eq listFormCodeM (L ++ [axD L])) := by
+  have h1 := hax
+  rw [axD] at h1
+  exact prf_eq_trans h1
+    (prf_eq_trans (prf_congr_concat_left (prf_congr_cons_head (prf_deltaD L))) (prf_cola_axD L))
+
+/-- 🏁 **EL ANCLA, TEOREMA** (ADR‑117). Hasta ahora era la hipótesis de clase `AnclaEq` (ADR‑026), que daba
+    `Prf ⊥` (F1, ADR‑114): ver la clase, más abajo, y su instancia. -/
+theorem prf_ancla : Prf (axiomsCodeT =eq listFormCodeM axioms) := by
+  rw [axioms_split]
+  exact ancla_de_diagonal axiomsBase (prf_ax ax_axiomsCodeT_def_mem)
+
+/-- Control (ADR‑117): con la hipótesis `AnclaEq`, la traducción `axiomsCodeT ↦ cons a axiomsCodeT` conservaba
+    los 141 axiomas y daba `Prf ⊥` (F1, `sondeos/AnclaEqInconsistente.lean`). Aquí: si conservara también el
+    ancla diagonal —si su imagen fuera teorema—, ya habría `Prf ⊥` (Cantor: `axiomsCodeT < cons a axiomsCodeT`).
+    El argumento de F1 ya no da `⊥` sin partir de él. ⚠️ No prueba la consistencia: que no la conserve EQUIVALE a ella. -/
+theorem f1_traduccion_refutada (a : Term)
+    (htr : Prf (cons a axiomsCodeT =eq
+      concat (listFormCodeM axiomsBase) (cons (deltaD axiomsBase) nil))) :
+    Prf Formula.bottom := by
+  have hT : Prf (axiomsCodeT =eq
+      concat (listFormCodeM axiomsBase) (cons (deltaD axiomsBase) nil)) :=
+    prf_ax ax_axiomsCodeT_def_mem
+  exact prf_mp (prf_lt_irrefl axiomsCodeT)
+    (prf_lt_subst2_cm (prf_eq_trans htr (prf_eq_symm hT)) (prf_cantor_mono_right a axiomsCodeT))
+
 /-! ### Pertenencia de códigos de axioma a `axiomsCodeT`, en `Prf`
+
+⭐ **2026‑10‑04 · ADR‑117.** La clase de abajo tiene INSTANCIA (`instAnclaEq := ⟨prf_ancla⟩`, justo tras ella):
+el ancla es un teorema, por el axioma diagonal. Lo que sigue explica por qué fue una clase (ADR‑026) y por
+qué no podía ser un `axiom` de Lean; sigue siendo cierto. Lo que ya no vale: el argumento de F1 (ADR‑114), que
+era sobre la teoría de 141 axiomas, sin el ancla, y no se traslada a los 142. La clase se retira después, en un
+commit mecánico aparte (sus ligaduras: 423, en 43 ficheros, sin las tres de Gödel).
 
 **EL ANCLAJE DE CODIFICACIÓN — HIPÓTESIS CON NOMBRE, ya no `axiom`** ([ADR‑026](../../DECISIONS.md),
 2026‑09‑12; antes `axiom prf_axiomsCodeT_eq`).
@@ -123,7 +203,8 @@ Hilbert**. Lo que queremos es que sea **VERDADERA**. La hipótesis dice eso y na
 
 ## Por qué una CLASE y no un argumento explícito
 
-Medido: el ancla alcanza **16 módulos y ~40 usos**. Como argumento habría que tocar las 40 llamadas.
+Medido: el ancla alcanza **16 módulos y ~40 usos** (✏️ 2026‑10‑03: 426 ligaduras en 44 ficheros). Como
+argumento habría que tocar las 40 llamadas.
 Como **clase**, la resolución de instancias la hila sola: basta `variable [AnclaEq]` en cada módulo
 afectado y **ninguna llamada cambia**. El footprint sigue limpio.
 
@@ -131,6 +212,11 @@ afectado y **ninguna llamada cambia**. El footprint sigue limpio.
 **legítimas** (eran tres; quedan dos, `prf_to_prfH` y `prf_to_derivation`). -/
 class AnclaEq : Prop where
   eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
+
+/-- 🏁 **El ancla, INSTANCIA** (ADR‑117): `AnclaEq` deja de ser una hipótesis. Las ligaduras `[AnclaEq]` del
+    árbol (423, en 43 ficheros) la reciben por resolución de instancias, sin tocar una llamada; la clase
+    se retira después, en un commit mecánico aparte. -/
+instance instAnclaEq : AnclaEq := ⟨prf_ancla⟩
 
 /-- **Pertenencia POSITIVA en `Prf`** de un código de fórmula a `listFormCodeM L` (recursión
     estructural sobre `L`, sin materializar el término): cabeza = `prf_in_cons_head`, cola =
@@ -385,6 +471,12 @@ end ROBINSON_PlusPlus.Meta.Representability2Prf
 
 export ROBINSON_PlusPlus.Meta.Representability2Prf (
   AnclaEq
+  prf_diag_numeral
+  prf_deltaD
+  prf_cola_axD
+  ancla_de_diagonal
+  prf_ancla
+  f1_traduccion_refutada
   prf_concat_listFormCode
   prf_concat_listFormCode_singleton
   prf_runFn_track
@@ -394,3 +486,7 @@ export ROBINSON_PlusPlus.Meta.Representability2Prf (
   provCodeC'_intro_prf
   repr_pos'_prf
 )
+
+/-! ## FOOTPRINT (ADR‑117) -/
+#print axioms ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla
+#print axioms ROBINSON_PlusPlus.Meta.Representability2Prf.f1_traduccion_refutada

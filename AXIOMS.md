@@ -1,6 +1,6 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+> ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md)) · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md))
 >
 > RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
 > (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
@@ -9,15 +9,22 @@
 > (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
 > de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
 > con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
-> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
-> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+> ⛔ **Lo que NO arreglaba** (hasta ADR‑117, 2026‑10‑04): `goedel_first_prf` y `goedel_second_prf` llevaban la
+> clase `[AnclaEq]`, y `AnclaEq` **daba `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`)
+> ⇒ los dos teoremas eran **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) era lo siguiente.
+>
+> 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
+> último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
+> `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
+> llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
+> `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
 >
 > ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
 >
 > Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
 > axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
-> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; la hipótesis mínima volvió con ADR‑117, el
+> 2026‑10‑04, ya sin ningún axioma del proyecto en el footprint), y `⊢` ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -26,9 +33,9 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
-> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` y el ancla diagonal, ADR‑117).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -69,6 +76,8 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 >   objeto; `d3` es metamatemático (sobre demostrabilidad). Son niveles distintos.
 > - **Dos cálculos.** `Derives` (`⊢`) y `Prf` necesitan cada uno su ancla de
 >   codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`); no son un duplicado a fusionar. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+>   ✏️ **2026‑10‑04 ([ADR‑117](DECISIONS.md))**: hoy sólo queda `Prf`, y su ancla no es un `axiom` de Lean sino el
+>   axioma OBJETO `ax_axiomsCodeT_def`, el 142.º de `axioms` (ver «Anclas de codificación», más abajo).
 >
 > Este fichero es el «sitio único» **documental**: la fuente de verdad sobre el
 > inventario, aunque el código mantenga cada axioma en su capa correcta.
@@ -82,8 +91,10 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 > `ax_list_induction` (retirado) era además **falso**: daba `[] ⊢ ⊥` con dos constructores (L1‑2,
 > `sondeos/ListInductionAxiomRefutable.lean`); y las cuatro meta‑reglas de FOL que `⊢` traía también lo
 > son (L1‑3, `sondeos/MetaReglasRefutables.lean`). La tabla de abajo es el **REGISTRO** de lo que hubo.
-> ⛔ Lo único postulado que queda en el proyecto es la **clase `AnclaEq`** (hipótesis de instancia, no
-> `axiom`), y **da `Prf ⊥`** (F1, ADR‑114).
+> ⛔ Lo único postulado que quedaba en el proyecto era la **clase `AnclaEq`** (hipótesis de instancia, no
+> `axiom`), y **daba `Prf ⊥`** (F1, ADR‑114). 🏁 Desde el 2026‑10‑04 ([ADR‑117](DECISIONS.md)) tiene instancia
+> (`instAnclaEq := ⟨prf_ancla⟩`): el ancla es un TEOREMA, que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`,
+> el 142.º de `axioms` (ver «Anclas de codificación», más abajo). La clase se retira en un commit aparte.
 
 
 > ⚠️ Esta cabecera decía **(7)** con la fila 7 tachada justo debajo. Lo cazó
@@ -102,7 +113,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 | ~~`ax_mod2_alternation`~~ | ~~`Full/Mod2.lean`~~ | 🏁 **RETIRADO el 2026‑09‑10h** | Era `∀n, mod2(σn) + mod2(n) = 1`. Hoy es **teorema**, derivado de `ax21` (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`. ⚠️ Su propio docstring ya decía que en `Minimal` era derivable; lo que ocultaba era una **circularidad**: `ax21` se «derivaba» de él, y él de `ax21`. Medido cuál es el primitivo: **`ax21`** (`ax16 + ax17` admiten `mod2 2̄ = 2̄`) |
 | ~~`ax_p_tfa`~~ | ~~`Minimal/Theorems/Block8.lean`~~ | 🗑️ **RETIRADO el 2026‑09‑12** | Era el TFA en forma idealizada. **Medido HUÉRFANO**: cero consumidores, y `IsFactorization` —el tipo que habitaba— **no aparecía ni una vez** fuera de `Block8.lean`. ⚠️⚠️ **Y con él cae una afirmación MEDIBLE‑MENTE FALSA que esta tabla publicó durante meses**: «*teorema en Full, postulado en Minimal*». **No existe en `Full/` ningún teorema con este enunciado.** `tfa_numeral` tiene **otro dominio** (`Nat` vs `Term`), **otra unicidad** (`Perm` vs igualdad objeto) y **otra hipótesis** (meta vs objeto) — su propio docstring lo dice: «no discharge constructivo por el Muro 1» |
 | ~~`ax_axiomsCodeT_eq`~~ | `Minimal/Axioms.lean` | 🗑️ **RETIRADO el 2026‑10‑02** ([ADR‑115](DECISIONS.md)) · era: ancla de codificación sobre `⊢` | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
-| ~~`prf_axiomsCodeT_eq`~~ | ~~`Meta/Representability2Prf.lean`~~ | 🗑️ **YA NO ES `axiom`** (2026‑09‑12, [ADR‑026](DECISIONS.md)) | Es la **clase `AnclaEq`**, hipótesis de instancia. ⛔⛔ **El postulado NO desapareció: se movió del footprint a la FIRMA.** `goedel_first_prf`/`goedel_second_prf` dan hoy `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **pero su tipo es `∀ [AnclaEq], …`** y **no hay ninguna `instance : AnclaEq` en el árbol** [medido]. Anunciar el footprint sin esta frase sería **M‑8**. ¿Quién la descarga? **Nadie** — `TEOREMAS-E-HIPOTESIS.md` §1 |
+| ~~`prf_axiomsCodeT_eq`~~ | ~~`Meta/Representability2Prf.lean`~~ | 🗑️ **YA NO ES `axiom`** (2026‑09‑12, [ADR‑026](DECISIONS.md)) | 🏁 **Desde ADR‑117 (2026‑10‑04), TEOREMA**: `prf_ancla : Prf (axiomsCodeT =eq listFormCodeM axioms)` (`Meta/Representability2Prf.lean`, footprint `[propext, Classical.choice, Quot.sound]`), que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`, el 142.º de `axioms`. La clase tiene instancia (`instAnclaEq`), y `goedel_first_prf`/`goedel_second_prf` ya no la llevan en la firma. ¿Quién la descarga? **`prf_ancla`**. Registro, hasta ADR‑117: era la **clase `AnclaEq`**, hipótesis de instancia. ⛔⛔ **El postulado NO desapareció: se movió del footprint a la FIRMA.** `goedel_first_prf`/`goedel_second_prf` dan hoy `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **pero su tipo es `∀ [AnclaEq], …`** y **no hay ninguna `instance : AnclaEq` en el árbol** [medido]. Anunciar el footprint sin esta frase sería **M‑8**. ¿Quién la descarga? **Nadie** — `TEOREMAS-E-HIPOTESIS.md` §1 |
 | ~~`d3`~~ | `Meta/GodelTwo.lean` | 🏁 **RETIRADO el 2026‑09‑10g** | Era la condición D3 de Hilbert‑Bernays‑Löb para `provCodeC'`. Hoy es **teorema**: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres** |
 
 ### 🆕 Nota 2026‑09‑10h — `ax_induction` y [ADR‑023](DECISIONS.md) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
@@ -153,8 +164,9 @@ obsoleta**: no se usaba.
 ### Detalle por familia
 
 > 🗄️ **Registro, anterior a ADR‑115.** Hoy no hay esquemas `axiom`: la inducción de la cadena de Gödel entra
-> por los constructores `Prf.ind` y `Prf.listInd`, y el ancla de codificación es la clase `[AnclaEq]`, que da
-> `Prf ⊥` (F1). Las cifras de abajo («quedan 6 axiomas»…) son de su fecha.
+> por los constructores `Prf.ind` y `Prf.listInd`, y el ancla de codificación es, desde ADR‑117 (2026‑10‑04), el
+> axioma OBJETO diagonal `ax_axiomsCodeT_def` (hasta entonces, la clase `[AnclaEq]`, que daba `Prf ⊥`: F1). Las
+> cifras de abajo («quedan 6 axiomas»…) son de su fecha.
 
 - **Esquemas de inducción (1–3, en `Full/`).** Son *la* inducción que el sistema
   `Full` añade sobre el débil `Minimal`. No pueden vivir en `Minimal/` sin destruir
@@ -209,17 +221,28 @@ necesario** usar la inducción de `Full/`. Lo que *no* está permitido es añadi
 **derivable sin axiomas nuevos** (`ax_L0_cons_def` ancla `cons h t = succ (pair h t)` desde ADR‑113
 con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 - 🗑️ ~~**Teoría objeto.** `ax_p_tfa`~~ — **retirado el 2026‑09‑12**, medido huérfano. Ver su fila.
-- **Anclas de codificación.** Extensión **conservadora**. `ax_axiomsCodeT_eq` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+- **Anclas de codificación.** Extensión **conservadora** (✏️ nunca se probó, y el ancla de `Prf` daba `Prf ⊥`: F1, ADR‑114). `ax_axiomsCodeT_eq` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   (cálculo `⊢`) es una **igualdad**: `axiomsCodeT` ES el código de la lista de
   axiomas — da **ambas** direcciones (positiva `ax_inAxC`, ahora **teorema**; y 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   negativa `neg_In_axiomsCodeT`, que SÓLO los axiomas están). El término gigante
   `listFormCodeM axioms` **no se materializa** en las pruebas (recursión estructural,
   `Meta/AxiomListCode.lean`), evitando el coste que retiró el `ax_axiomsCodeT` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-  original en `7ae7b7b`. **`prf_axiomsCodeT_eq`** (cálculo `Prf`; **retirado** como `axiom` el 2026‑09‑12, [ADR‑026](DECISIONS.md), `24b3550`: hoy es la clase `AnclaEq`) es su espejo exacto:
+  original en `7ae7b7b`. **`prf_axiomsCodeT_eq`** (cálculo `Prf`; **retirado** como `axiom` el 2026‑09‑12, [ADR‑026](DECISIONS.md), `24b3550`: fue una hipótesis —la clase `AnclaEq`, sin instancia— hasta ADR‑117, y hoy es el teorema `prf_ancla`) es su espejo exacto:
   desde 2026‑07‑20 (`25d255b`) sustituye al antiguo `prf_inAxC` —que era sólo
   positivo y ahora es **teorema** derivado—, también **net‑0 axiomas**. Lo exige el
   `In`‑reflect de `axiomsCodeT` (`Meta/InAxiomsCodePrf.lean`), que necesita las **dos**
   direcciones dentro de `Prf`.
+  ⭐ **2026‑10‑04 · [ADR‑117](DECISIONS.md) — el ancla de hoy es un axioma OBJETO**, no un `axiom` de Lean: el último
+  de los **142** de `axioms` (los 141 de `axiomsBase` = 34 de `coreAxioms` + 107 de `codingAxioms`, y él).
+  `ax_axiomsCodeT_def := axD axiomsBase` (`Minimal/Axioms.lean`) es el axioma DIAGONAL
+  `axiomsCodeT =eq ⌜axiomsBase⌝ ++ [δ]`, con δ = `deltaD` = `substfc 0 (tcFn N̄) N̄` y N̄ = `nD`, el numeral (plegado)
+  del código de la plantilla `psiD`. No se contiene a sí mismo —habla de la base—, y δ es, PROBADAMENTE, el código
+  del propio axioma (`prf_deltaD`, el lema diagonal); de ahí sale el ancla de antes como TEOREMA, `prf_ancla`
+  (`Meta/Representability2Prf.lean`), y `axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def]` (por `rfl`)
+  sustituye a `axioms_eq`, retirado. ⛔ Nada puede EJECUTAR `axioms`: construiría el numeral entero (`check-sorry`
+  vigila las órdenes que lo harían; las reducciones del núcleo recorren la espina y no despliegan el numeral).
+  ⚠️ Lo que NO dice: que los 142 sean consistentes (no hay modelo); `f1_traduccion_refutada` sólo prueba que,
+  si la traducción de F1 conservara el ancla —si su imagen fuera teorema—, ya habría `Prf ⊥`: el argumento de F1 no da `⊥` sin partir de él.
 - 🏁🏁🏁 **NINGÚN postulado gödeliano vivo desde el 2026‑09‑10g.** `d3` era la última condición de derivabilidad
   aún postulada. Su prueba real (Σ₁-completitud provable del verificador) es el
   objetivo del plan **12‑A** (`GODEL-D3-TRACKED-DESIGN.md` §12–§14); fases 1a/1b/2

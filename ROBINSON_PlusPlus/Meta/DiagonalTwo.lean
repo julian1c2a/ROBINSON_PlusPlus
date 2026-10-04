@@ -49,8 +49,8 @@ con el predicado de demostrabilidad **estructural** `provFormulaC'` (verificador
 > 🗑️ **2026‑10‑02 (ADR‑115):** `godelCN_fixedpoint`, `goedel_first_numeral` y los dos teoremas
 > **modulares** de este módulo (`goedel_first_unprovable_real'` / `_unrefutable_real'`, que tomaban
 > el punto fijo como hipótesis) se retiraron con la capa `⊢`. El punto fijo sobre `Prf` es
-> `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), y Gödel I es `goedel_first_prf` (⛔ vacuo por
-> `[AnclaEq]`, F1, ADR‑114).
+> `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), y Gödel I es `goedel_first_prf` (vacuo por
+> `[AnclaEq]` hasta ADR‑117, F1; hoy, sólo con `ConsistentH`).
 >
 > ⟹ **`godelC'` es hoy una definición sin punto fijo.** Lo que se usa es `godelCN`. Aquí sólo
 > quedan las definiciones (`godelPred'`, `godelBeta'`, `godelC'`) y `godel_comp'`, que consume

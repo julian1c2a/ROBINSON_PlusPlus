@@ -261,7 +261,7 @@ El plan (§B, lin. 120) dice que «`axioms` es una lista finita concreta
 
 #eval ROBINSON_PlusPlus.Minimal.Axioms.coreAxioms.length
 #eval ROBINSON_PlusPlus.Minimal.Axioms.codingAxioms.length
-#eval ROBINSON_PlusPlus.Minimal.Axioms.axioms.length
+#eval ROBINSON_PlusPlus.Minimal.Axioms.axiomsBase.length  -- (ADR‑117: `axioms` lleva al final el ancla diagonal, y evaluarla construiría el numeral `numeralM (codeNat ψ)`, que es astronómico: no acabaría)
 
 /-! ### FOOTPRINTS (auditoria por `#print axioms`, unica fuente valida) -/
 

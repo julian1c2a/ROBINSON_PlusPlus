@@ -67,13 +67,18 @@ theorem subst_lift_same (f : Formula) : ∀ (c : Nat) (s : Term),
   fun c s => FOL.substFormula_liftFormula f c s
 
 set_option maxRecDepth 20000 in
-/-- Los axiomas de `Minimal` son **sentencias cerradas**: desplazarlos es la
-    identidad. Ya no hay ancla gigante (`ax_axiomsCodeT` eliminado; `axiomsCodeT` es
-    opaco), así que el lift de cada axioma se cierra por cómputo (`rfl`).
-    `maxRecDepth` cubre los numerales de símbolos (`σ` = codepoint 963). -/
-theorem axioms_lift_eq : axioms.map (liftFormula 0) = axioms := by
-  simp only [axioms, List.map_cons, List.map_nil]
+/-- La lista BASE (los 141 de antes de ADR‑117) es de **sentencias cerradas**: su lift se cierra por
+    cómputo (`rfl`). `maxRecDepth` cubre los numerales de símbolos (`σ` = codepoint 963). -/
+theorem axiomsBase_lift_eq : axiomsBase.map (liftFormula 0) = axiomsBase := by
+  simp only [axiomsBase, coreAxioms, codingAxioms, List.map_append, List.map_cons, List.map_nil]
   rfl
+
+/-- Los axiomas de `Minimal` son **sentencias cerradas**: desplazarlos es la identidad. La base, por
+    cómputo (`axiomsBase_lift_eq`); el ancla, por ESTRUCTURA (`ax_axiomsCodeT_def_lift`), porque su
+    `rfl` tendría que recorrer el numeral `numeralM (codeNat ψ)`, que es astronómico (ADR‑117). -/
+theorem axioms_lift_eq : axioms.map (liftFormula 0) = axioms := by
+  rw [axioms_split, List.map_append, axiomsBase_lift_eq, List.map_cons, List.map_nil,
+    ax_axiomsCodeT_def_lift]
 
 /-! ### Capa intuicionista `Prfᵢ`
 
@@ -140,8 +145,8 @@ def listInductionFormula (Φ : Formula) : Formula :=
     **inducción** (`ind`, el esquema `Full.inductionFormula` para toda fórmula), el
     **confinamiento** ∀ (`qconf`) y la **inducción de listas** (`listInd`), cerrado bajo MP y GEN.
     Es r.e. (Fase 1). ⚠️ Su **solidez para ℕ NO está demostrada** (frente A4): depende del modelo
-    de los 141 axiomas de `axioms`, pendiente (ADR‑115 §7). (Hasta el 2026‑10‑02 decía «coherente
-    con el `dne` y la inducción del proyecto» —los de la capa `⊢`, retirada con ADR‑115— y daba
+    de los 142 axiomas de `axioms` (141 y el ancla, ADR‑117), pendiente (ADR‑115 §7). (Hasta el 2026‑10‑02
+    decía «coherente con el `dne` y la inducción del proyecto» —los de la capa `⊢`, retirada con ADR‑115— y daba
     «sólido para ℕ» por hecho.) -/
 inductive Prf : Formula → Prop where
   | incl {φ : Formula} : Prfᵢ φ → Prf φ

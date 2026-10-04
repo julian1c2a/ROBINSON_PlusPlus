@@ -70,4 +70,5 @@ def report (nombre : String) (φ : Formula) : String :=
 #eval report "ax_tc_cons        " ax_tc_cons
 
 -- ¿Cuántas líneas tiene una lista de axiomas? (la cota REAL de boundedCarcIn es `lenc p`)
-#eval s!"nº de axiomas del sistema = {axioms.length}"
+-- (ADR‑117: `axioms` lleva al final el ancla diagonal, y evaluarla construiría el numeral `numeralM (codeNat ψ)`, que es astronómico: no acabaría)
+#eval s!"nº de axiomas de la base = {axiomsBase.length} (y el ancla, el 142.º)"

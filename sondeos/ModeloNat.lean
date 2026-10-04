@@ -29,8 +29,8 @@ idea nueva.
 
 ## ⭐ Lo que NO hubo que construir
 
-`triN`, `consN`, `two_mul_consN` y **`consN_inj`** ya estaban en producción
-(`Meta/CodeNumeralPrf.lean:46`, `Meta/CodeNatInjPrf.lean:85`) — el emparejamiento de Cantor sobre
+`triN`, `consN`, `two_mul_consN` (hoy `two_mul_pairN`, ADR‑113) y **`consN_inj`** ya estaban en producción
+(`Minimal/Axioms.lean:626` desde ADR‑117, `Meta/CodeNatInjPrf.lean:97`) — el emparejamiento de Cantor sobre
 `Nat` y su inyectividad, que es lo que hace existir `carc`/`cdrc` en el modelo.
 🔑 Van **DOCE** de «antes de construir, buscar»: M3 (ADR‑085) los re‑derivó sin saberlo.
 

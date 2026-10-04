@@ -297,7 +297,7 @@ theorem pcc_In_lfc_tracked [AnclaEq] (yc y : Term)
 
 /-! ### Puente `axiomsCodeT ↔ listFormCodeM axioms` + reflexión rastreada sobre `axiomsCodeT`
 
-`axiomsCodeT` es opaco; se ancla a `listFormCodeM axioms` por `AnclaEq` (hipótesis, [ADR‑026](../../DECISIONS.md)). El puente se
+`axiomsCodeT` es opaco; se ancla a `listFormCodeM axioms` por `AnclaEq` (hipótesis hasta ADR‑117; hoy, el teorema `prf_ancla`). El puente se
 aplica en los DOS lados: la hipótesis object (`In y axiomsCodeT → In y (listFormCodeM axioms)`,
 Leibniz object) y el código dentro de `Prov` (swap del 2º argumento del átomo `In`, Leibniz
 reflejada del anclaje). -/

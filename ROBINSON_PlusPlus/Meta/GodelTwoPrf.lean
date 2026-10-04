@@ -18,11 +18,15 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 /-!
 # 🏁🏁 GÖDEL II SOBRE EL CÁLCULO FINITARIO `Prf`
 
-⛔⛔ **Estado 2026‑10‑02 — leer antes que nada.** Las derivaciones de este módulo son correctas y su
-footprint es `[propext, Classical.choice, Quot.sound]`, pero **`goedel_first_prf` y
-`goedel_second_prf` son hoy VACUOS**: su hipótesis de clase `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114,
-`sondeos/AnclaEqInconsistente.lean`, compilado), así que `[AnclaEq]` y `ConsistentH` no pueden valer
-a la vez. Repararlo es anclar `axiomsCodeT` de otro modo (L2‑3). Y la capa `⊢` contra la que se
+🏁 **Estado 2026‑10‑04 (ADR‑117) — leer antes que nada.** `goedel_first_prf` y `goedel_second_prf`
+tienen UNA sola hipótesis, `ConsistentH`, y footprint `[propext, Classical.choice, Quot.sound]`: el ancla
+de `axiomsCodeT` es un TEOREMA (`prf_ancla`, por el axioma diagonal `ax_axiomsCodeT_def`), y la clase
+`AnclaEq` tiene instancia. ⚠️ Lo que NO dice: que `ConsistentH` se cumpla. Eso depende de la consistencia
+de los 142 axiomas, y no hay modelo de ellos todavía.
+
+⛔ **Hasta el 2026‑10‑04 eran VACUOS** (estado del 2026‑10‑02): su hipótesis de clase `[AnclaEq]` daba
+`Prf ⊥` (F1, ADR‑114, `sondeos/AnclaEqInconsistente.lean`, compilado), así que `[AnclaEq]` y `ConsistentH`
+no podían valer a la vez. Y la capa `⊢` contra la que se
 escribió la historia de abajo **se retiró** (ADR‑115): `prf_to_derives`, `diag_arith_num`,
 `goedel_first_numeral`, `ConsistentOmega`, `consistentH_of_omega` y el módulo `Meta/OmegaStrength.lean`
 ya no existen (`goedel_second'` se había retirado antes, el 2026‑09‑11).
@@ -43,15 +47,15 @@ más cualquiera de las meta‑reglas demuestra `False`; por eso la capa `⊢` en
 
 ## ⇒ Lo que sí lo es, y está aquí
 
-    goedel_first_prf  [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN
-    goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+    goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+    goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
 
-**Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis explícita: `ConsistentH := ¬ Prf ⊥`** —más la
-de clase `[AnclaEq]`, que la contradice (aviso de cabecera)—,
-que es la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se
-**descargan aquí**. ⭐ Footprint: **sólo los tres de Lean** — el ancla es hoy la hipótesis de clase
-`[AnclaEq]` ([ADR‑026](../../DECISIONS.md)). ⚠️ **El postulado no desapareció: se movió a la FIRMA**, y
-**no hay ninguna `instance : AnclaEq`** en el árbol. Ver `TEOREMAS-E-HIPOTESIS.md` §1.
+**Sobre `Prf`, el cálculo finitario, y con UNA sola hipótesis: `ConsistentH := ¬ Prf ⊥`**, que es la
+**mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se **descargan
+aquí**. ⭐ Footprint: **sólo los tres de Lean**. El ancla de codificación es, desde ADR‑117, el ÚLTIMO de los
+142 axiomas objeto —el axioma diagonal—, y la clase `[AnclaEq]` que lo había sustituido
+([ADR‑026](../../DECISIONS.md); hasta ese día, sin instancia y contradictoria con `ConsistentH`) tiene
+instancia (`instAnclaEq`). Ver `TEOREMAS-E-HIPOTESIS.md` §1.
 
 ## Lo que hizo falta, y es poco porque el espejo `Prf` ya estaba
 
@@ -68,7 +72,7 @@ que es la **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto f
 **Footprint** (registro, anterior a ADR‑026 y a ADR‑115): los tres de Lean + las ω‑reglas ambiente
 (entraban por `goedel_first_numeral`, cuya hipótesis `ConsistentOmega` hablaba de `⊢`) +
 `ax_induction_prim`, `ax_list_induction` y las dos anclas de codificación. **Hoy**: sólo los tres de
-Lean, con `[AnclaEq]` en la firma (ver el aviso de arriba).
+Lean, y ninguna hipótesis más que `ConsistentH` (ver el aviso de arriba).
 -/
 
 open FOL
@@ -154,7 +158,7 @@ theorem prf_godelCN_fixedpoint : Prf (godelCN ⇔ neg (provCodeC' godelCN)) :=
 
 /-! ## §3 · `Con' ⇒ G` sobre `Prf` -/
 
-theorem prf_con_imp_godel [AnclaEq] (G : Formula)
+theorem prf_con_imp_godel (G : Formula)
     (fp_bwd : Prf (neg (provCodeC' G) ⇒ G))
     (nec1 : Prf (provCodeC' (G ⇒ neg (provCodeC' G)))) :
     Prf (consistencyFormula' ⇒ G) := by
@@ -193,13 +197,15 @@ suponer **solidez**. (Y era refutable: `ax_list_induction` daba `axioms ⊢ ⊥`
 ⭐ **Y el footprint lo confirma**: con `ConsistentH` **desaparecen las «ω‑reglas»** —así se llamaban; `gen` no
 es la ω‑regla— (`dne`, `gen`, `imp_intro`) **y los dos esquemas de inducción** (`ax_induction_prim`, `ax_list_induction`) **y el
 ancla `⊢`** (`ax_axiomsCodeT_eq`) —esos tres `axiom`, retirados de RPP con ADR‑115—. Y desde
-[ADR‑026](../../DECISIONS.md) **ningún axioma del proyecto**: el ancla `Prf` es la hipótesis de clase
-`[AnclaEq]`. Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
+[ADR‑026](../../DECISIONS.md) **ningún axioma del proyecto**: el ancla `Prf` fue la hipótesis `[AnclaEq]` hasta
+ADR‑117, y hoy es el teorema `prf_ancla`. Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
 
 /-- 🏁 **GÖDEL I sobre el cálculo finitario, con la hipótesis MÍNIMA.** Cuatro líneas: D1 lleva
     `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`.
-    ⛔ Hoy vacuo: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114), así que choca con `hcon`. -/
-theorem goedel_first_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN := by
+    🏁 (ADR‑117) Su única hipótesis es `ConsistentH`: el ancla de `axiomsCodeT` es un TEOREMA
+    (`prf_ancla`, por el axioma diagonal), y no una hipótesis que daba `Prf ⊥` (F1). ⚠️ Que
+    `ConsistentH` se pueda cumplir depende de la consistencia de los 142 axiomas, que NO está probada. -/
+theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
   intro hG
   have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG
   have h2 : Prf (neg (provCodeC' godelCN)) :=
@@ -208,8 +214,8 @@ theorem goedel_first_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN := by
 
 /-- 🏁🏁 **GÖDEL II sobre el cálculo finitario**: si el cálculo es consistente, **no demuestra su
     propia consistencia**. **Una sola hipótesis explícita —la mínima— y ninguna suelta.**
-    ⛔ Hoy vacuo: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114), así que choca con `hcon`. -/
-theorem goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula' := by
+    🏁 (ADR‑117) Su única hipótesis es `ConsistentH` (ver `goedel_first_prf`). -/
+theorem goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula' := by
   intro hC
   refine goedel_first_prf hcon (prf_mp (prf_con_imp_godel godelCN ?_ ?_) hC)
   · exact prf_and_elim_right prf_godelCN_fixedpoint

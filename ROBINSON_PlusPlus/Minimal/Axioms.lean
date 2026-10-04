@@ -30,7 +30,7 @@ but it lacks a general induction principle.
 (`sondeos/MetaReglasRefutables.lean`). Con ella se borraron `Minimal/Theorems/Block1–8` y los
 teoremas `axioms ⊢ …` de `Full/`. Los comentarios de este fichero que remiten a un teorema de un
 `Block` («ver `concat_assoc` en Block6», …) describen material RETIRADO: se conservan como registro
-de por qué cada axioma está (o dejó de estar) en la lista. Las listas y las fórmulas no cambian.
+de por qué cada axioma está (o dejó de estar) en la lista. Las listas y las fórmulas no cambian (✏️ hasta ADR‑117).
 -/
 
 -- ## Language Definition
@@ -614,13 +614,57 @@ def listFormCodeM : List Formula → Term
   | []      => nil
   | f :: fs => cons (formCodeM f) (listFormCodeM fs)
 
+/-! ### El VALOR de un código, a nivel `Nat` (bajado de `Meta/CodeNumeralPrf.lean`, ADR‑117)
+
+El enunciado del axioma diagonal (`ax_axiomsCodeT_def`, más abajo) lleva el numeral
+`numeralM (codeNat ψ)`, y `axioms` no puede importar `Meta`: por eso la familia vive aquí. Son las
+definiciones de `Meta/CodeNumeralPrf.lean`, sin cambios, y aquel módulo las reexporta con su nombre
+de siempre. `consN` se define con números triangulares (`triN`), sin división: lo que lo hace exacto
+está en `CodeNumeralPrf` (`two_mul_triN`, `two_mul_pairN`). -/
+
+/-- Números triangulares, definidos por recursión (no por división). -/
+def triN : Nat → Nat
+  | 0     => 0
+  | n + 1 => triN n + (n + 1)
+
+/-- Valor de `cons a b = σ (pair a b)` (ADR-093, salida (5)), **sin división**. Es `pairN a b + 1`
+    por definición (`pairN`, en `Meta/CodeNumeralPrf.lean`). -/
+def consN (a b : Nat) : Nat := triN (a + b) + b + 1
+
+def codeNatChars : List Char → Nat
+  | []      => 0
+  | c :: cs => consN c.toNat (codeNatChars cs)
+
+def codeNatStr (s : String) : Nat := codeNatChars s.toList
+
+mutual
+def codeNatTerm : Term → Nat
+  | .var n     => consN 0 (consN n 0)
+  | .func s ts => consN 1 (consN (codeNatStr s) (consN (codeNatTerms ts) 0))
+def codeNatTerms : List Term → Nat
+  | []      => 0
+  | t :: ts => consN (codeNatTerm t) (codeNatTerms ts)
+end
+
+/-- El código de una fórmula como número: `formCodeM φ` se evalúa en `Prf` a `numeralM (codeNat φ)`
+    (`prf_formCode_numeral`, `Meta/CodeNumeralPrf.lean`). Espejo exacto de `formCodeM`. -/
+def codeNat : Formula → Nat
+  | .bottom          => consN 2 0
+  | .atom p ts       => consN 3 (consN (codeNatStr p) (consN (codeNatTerms ts) 0))
+  | .eq t u          => consN 4 (consN (codeNatTerm t) (consN (codeNatTerm u) 0))
+  | .impl a b        => consN 5 (consN (codeNat a) (consN (codeNat b) 0))
+  | Formula.forall a => consN 6 (consN (codeNat a) 0)
+  | .and a b         => consN 7 (consN (codeNat a) (consN (codeNat b) 0))
+  | .or a b          => consN 8 (consN (codeNat a) (consN (codeNat b) 0))
+  | .ex a            => consN 9 (consN (codeNat a) 0)
+
 /-! ### Clausura De Bruijn de los códigos `formCodeM`
 
 Los códigos no contienen variables libres ⟹ `liftTerm` es la identidad sobre
 ellos. Se prueban por **inducción estructural** (no por `rfl`/cómputo del kernel),
 lo cual es esencial: los códigos de símbolos (`σ`, `∈`, …) contienen numerales
 gigantes (`numeralM` del codepoint Unicode) que harían explotar cualquier `rfl`.
-Necesarias para `axioms_lift_eq` (con `ax_axiomsCodeT` en `axioms`). -/
+Necesarias para `axioms_lift_eq` (con `ax_axiomsCodeT` en `axioms`, eliminado después); desde ADR‑117, para `axD_lift`. -/
 
 theorem liftTerm_nil (c : Nat) : liftTerm c nil = nil := rfl
 
@@ -737,6 +781,15 @@ theorem substTerm_formCodeM (v : Nat) (s : Term) : ∀ φ : Formula, substTerm v
   | .ex a      => by
       simp only [formCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_nil,
         substTerm_formCodeM v s a]
+
+/-- `substTerm` es la identidad sobre el código de una LISTA de fórmulas (gemelo de
+    `liftTerm_listFormCodeM`; inducción estructural, sin `rfl` sobre códigos). ADR‑117. -/
+theorem substTerm_listFormCodeM (v : Nat) (s : Term) : ∀ L : List Formula,
+    substTerm v s (listFormCodeM L) = listFormCodeM L
+  | []      => rfl
+  | f :: fs => by
+      simp only [listFormCodeM, cons, substTerm, substTerms, substTerm_formCodeM v s f,
+        substTerm_listFormCodeM v s fs]
 
 /-- Cabeza de un `cons`. -/
 def carc (l : Term) : Term := Term.func "carc" [l]
@@ -946,24 +999,29 @@ def ax_vpf_gen : Formula :=
 `axiomsCodeT` se declara **opaco** (símbolo `Term.func "axiomsCodeT" []`) para que la
 sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida).
 
-🗑️ **2026‑10‑02 · ADR‑115 — su ancla.** Hasta hoy lo anclaba a la lista `axioms` el `axiom` de Lean
+⭐ **2026‑10‑04 · ADR‑117 — su ancla, hoy.** Lo ancla el ÚLTIMO de `axioms`, el axioma DIAGONAL
+`ax_axiomsCodeT_def` (definido más abajo, tras `axiomsCodeT`), y `axiomsCodeT =eq listFormCodeM axioms` es
+un TEOREMA de `Prf` (`prf_ancla`, `Meta/Representability2Prf.lean`). Lo que sigue es su historia.
+
+🗑️ **2026‑10‑02 · ADR‑115 — su ancla.** Hasta ese día lo anclaba a la lista `axioms` el `axiom` de Lean
 `ax_axiomsCodeT_eq` (`axioms ⊢ axiomsCodeT =eq listFormCodeM axioms`), que vivía sobre `⊢` y se
-retiró con esa capa. **En este fichero ya no lo ancla nada.** En `Prf` lo ancla la hipótesis de clase
-`AnclaEq` (`Meta/Representability2Prf.lean`), y ⛔ **esa hipótesis da `Prf ⊥`** (F1, ADR‑114,
-`sondeos/AnclaEqInconsistente.lean`). La reparación prevista (L2‑3) es anclarlo por punto fijo. Lo que
-sigue (la corrección del 2026‑09‑05) describe el ancla sobre `⊢`, y se conserva como registro.
+retiró con esa capa. Desde ese día y hasta ADR‑117, **en este fichero no lo anclaba nada**: en `Prf` lo
+anclaba la hipótesis de clase `AnclaEq` (`Meta/Representability2Prf.lean`), y ⛔ **esa hipótesis daba
+`Prf ⊥`** sobre los 141 (F1, ADR‑114, `sondeos/AnclaEqInconsistente.lean`). La reparación prevista (L2‑3)
+era anclarlo por punto fijo (✏️ hecha: ADR‑117, arriba). Lo que sigue (la corrección del 2026‑09‑05)
+describe el ancla sobre `⊢`, y se conserva como registro.
 
 ⚠️ **Corrección 2026‑09‑05 — este párrafo describía un diseño ANTERIOR y decía lo contrario
 de lo que hace el verificador.** Afirmaba dos cosas falsas:
 
 1. que el ancla es **`ax_axiomsCodeT`** — ese axioma **no existe**: no hay ninguna declaración
    con ese nombre en el árbol, sus únicas apariciones son comentarios, y `Meta/Hilbert.lean`
-   lo da por **eliminado** explícitamente;
+   lo da por **eliminado** explícitamente (✏️ hasta ADR‑117, que reescribió el docstring de `axioms_lift_eq`);
 2. que ancla a **`listFormCodeM coreAxioms`** — el axioma vivo ancla a **`axioms`**.
 
 Y la consecuencia **no es cosmética**, que es lo que obliga a corregirlo aquí: la regla `thy`
 del verificador (`ax_lineWF_thy`, tag 15) acepta una línea como axioma de teoría si
-`In (carc ·) axiomsCodeT`. Por el anclaje, eso son **las 141 de `axioms`**, no las 34 de
+`In (carc ·) axiomsCodeT`. Por el anclaje, eso son **las 141 de `axioms`** (✏️ 142 desde ADR‑117), no las 34 de
 `coreAxioms`. Quién lea el párrafo viejo concluye justo lo contrario sobre dónde está la
 frontera de la teoría — y esa frontera es la que decide qué significa `provCodeC'`, y por tanto
 cuál es la sentencia G ([ADR‑015](../../DECISIONS.md)).
@@ -971,6 +1029,9 @@ cuál es la sentencia G ([ADR‑015](../../DECISIONS.md)).
 Medido con `#eval ·.length`, no contado a ojo:
 
     coreAxioms = 34      codingAxioms = 107      axioms = 141      (34 + 107 = 141)
+
+(✏️ Desde ADR‑117, `axiomsBase` = 141 y `axioms` = 142 —la base y el ancla—, comprobado por el núcleo en
+`Full/Induction.lean`, `axioms_len`. Ya no se mide con `#eval`: evaluar `axioms` no acabaría.)
 
 **Sigue evitando el ciclo**, que era el punto bueno del párrafo original y se conserva:
 `axiomsCodeT` es un símbolo **opaco**, así que no aparece dentro de la lista que codifica y
@@ -981,7 +1042,7 @@ Detectado por la auditoría de verdad de docstrings (rama G, caso #5 de
 definición, ni una lista han cambiado. -/
 
 /-- Los 34 axiomas **matemáticos** de la teoría (sin las ecuaciones de coding). Es
-    `axioms` truncada antes del bloque Nivel D (ver `axioms_eq`). -/
+    `axioms` truncada antes del bloque Nivel D (ver `axioms_split`). -/
 def coreAxioms : List Formula := [
   ax2_peano_succ_neq_zero, ax3_peano_succ_inj, ax4_add_zero, ax5_add_succ,
   ax6_add_comm, ax7_add_assoc, ax8_mul_zero, ax9_mul_succ, ax10_mul_comm,
@@ -996,12 +1057,85 @@ def coreAxioms : List Formula := [
 /-- Código object (opaco) de la teoría. Mantenerlo **opaco** evita anclarlo a un literal
     gigante `listFormCodeM axioms` (auto-referencia + término astronómico). Su contenido
     positivo (qué códigos contiene) lo fijaba el teorema `ax_inAxC` sobre `⊢` (vía el ancla
-    `ax_axiomsCodeT_eq`); los dos se retiraron con esa capa (ADR‑115, 2026‑10‑02). En `Prf` lo
-    fija hoy la hipótesis `AnclaEq`, que es inconsistente (F1, ADR‑114): ver la sección anterior. -/
+    `ax_axiomsCodeT_eq`); los dos se retiraron con esa capa (ADR‑115, 2026‑10‑02). En `Prf` lo fija,
+    desde ADR‑117, el axioma diagonal `ax_axiomsCodeT_def` (abajo); entre medias lo fijaba la hipótesis
+    `AnclaEq`, que era inconsistente (F1, ADR‑114). -/
 def axiomsCodeT : Term := Term.func "axiomsCodeT" []
 
--- Thy (c=.var 1, el código del axioma de teoría): **condicional** a que `c`
--- pertenezca a `axiomsCodeT` (el código de las 141 de `axioms`; decía «de `coreAxioms`», y era
+/-! ### ⭐ El ANCLA de `axiomsCodeT`, por un axioma DIAGONAL (L2‑3, ADR‑117)
+
+El ancla de antes, `axiomsCodeT =eq listFormCodeM axioms` (la hipótesis `AnclaEq`), no se puede
+POSTULAR: `axioms` la contendría a ella, y su código contendría el suyo. Se postula en su lugar UNA
+ecuación que no se contiene: para la lista BASE `L` (los 141 de siempre),
+
+    axD L  ≝  axiomsCodeT =eq  ⌜L⌝ ++ [δ]       con δ = substfc 0 (tcFn N̄) N̄,  N̄ = ⌜ψ⌝ numeral,
+                                                 ψ = (axiomsCodeT =eq ⌜L⌝ ++ [diag(x₀)])
+
+y δ es, PROBADAMENTE, el código de `axD L` misma (`prf_deltaD`, en `Meta/Representability2Prf.lean`):
+es el lema diagonal, hecho a mano. Con `axioms = L ++ [axD L]` sale el ancla de antes como TEOREMA
+(`prf_ancla`). Tres cuidados de diseño:
+* `axiomsCodeT` va a la IZQUIERDA y el numeral está PLEGADO (`nD`): nada de lo que se evalúa por `rfl`
+  o `simp` sobre `axioms` llega a desplegar `numeralM (codeNat ψ)`, que es astronómico;
+* el lift del axioma se prueba por ESTRUCTURA (`axD_lift`), nunca por cómputo;
+* todo es computable (decisión del propietario, 2026‑10‑03): por eso ⛔ nada puede EJECUTAR `axioms`
+  (un `#eval` construiría el numeral entero y no acabaría). -/
+
+/-- `diag(x₀)`: el término que, sustituido `x₀ := N̄`, da `substfc 0 (tcFn N̄) N̄`. -/
+def diagTermM : Term := substfc zero (tcFn (.var 0)) (.var 0)
+
+/-- La plantilla ψ del axioma diagonal sobre la lista base `L`: el hueco en `diagTermM`, y
+    `axiomsCodeT` a la IZQUIERDA. -/
+def psiD (L : List Formula) : Formula :=
+  axiomsCodeT =eq concat (listFormCodeM L) (cons diagTermM nil)
+
+/-- N̄ = `numeralM (codeNat ψ)`, PLEGADO tras un nombre. -/
+def nD (L : List Formula) : Term := numeralM (codeNat (psiD L))
+
+/-- δ = `substfc 0 (tcFn N̄) N̄`. -/
+def deltaD (L : List Formula) : Term := substfc zero (tcFn (nD L)) (nD L)
+
+/-- El axioma diagonal sobre la lista base `L`, en forma REDUCIDA (sin `substFormula` en la raíz). -/
+def axD (L : List Formula) : Formula :=
+  axiomsCodeT =eq concat (listFormCodeM L) (cons (deltaD L) nil)
+
+theorem subst_diagTermM (s : Term) : substTerm 0 s diagTermM = substfc zero (tcFn s) s := rfl
+
+theorem subst_psiD (L : List Formula) (s : Term) :
+    substFormula 0 s (psiD L) =
+      (axiomsCodeT =eq concat (listFormCodeM L) (cons (substfc zero (tcFn s) s) nil)) := by
+  simp only [psiD, substFormula, axiomsCodeT, concat, cons, nil, zero, substTerm, substTerms,
+    substTerm_listFormCodeM, subst_diagTermM]
+
+-- El lift, por ESTRUCTURA: cada paso es una ecuación `rfl` de un constructor genérico (`a b d`
+-- variables), así que el `rw` no le pide al núcleo reducir `nD L`. (Con `simp only` sobre las
+-- definiciones, el núcleo acaba evaluando el numeral: «(kernel) deep recursion detected», medido
+-- en la sonda del 2026‑10‑03.)
+private theorem liftFormula_eq_eq (c : Nat) (a b : Term) :
+    liftFormula c (a =eq b) = (liftTerm c a =eq liftTerm c b) := rfl
+private theorem liftTerm_axiomsCodeT (c : Nat) : liftTerm c axiomsCodeT = axiomsCodeT := rfl
+private theorem liftTerm_concat_eq (c : Nat) (a b : Term) :
+    liftTerm c (concat a b) = concat (liftTerm c a) (liftTerm c b) := rfl
+private theorem liftTerm_cons_eq (c : Nat) (a b : Term) :
+    liftTerm c (cons a b) = cons (liftTerm c a) (liftTerm c b) := rfl
+private theorem liftTerm_zero_eq (c : Nat) : liftTerm c zero = zero := rfl
+private theorem liftTerm_substfc_eq (c : Nat) (a b d : Term) :
+    liftTerm c (substfc a b d) = substfc (liftTerm c a) (liftTerm c b) (liftTerm c d) := rfl
+private theorem liftTerm_tcFn_eq (c : Nat) (a : Term) : liftTerm c (tcFn a) = tcFn (liftTerm c a) := rfl
+
+theorem liftTerm_nD (c : Nat) (L : List Formula) : liftTerm c (nD L) = nD L := by
+  rw [nD]
+  exact liftTerm_numeralM c (codeNat (psiD L))
+
+theorem liftTerm_deltaD (c : Nat) (L : List Formula) : liftTerm c (deltaD L) = deltaD L := by
+  rw [deltaD, liftTerm_substfc_eq, liftTerm_zero_eq, liftTerm_tcFn_eq, liftTerm_nD]
+
+/-- El axioma diagonal es una sentencia CERRADA: el lift es la identidad (por estructura). -/
+theorem axD_lift (c : Nat) (L : List Formula) : liftFormula c (axD L) = axD L := by
+  rw [axD, liftFormula_eq_eq, liftTerm_axiomsCodeT, liftTerm_concat_eq, liftTerm_listFormCodeM,
+    liftTerm_cons_eq, liftTerm_deltaD, liftTerm_nil]
+
+-- Thy (c=.var 1, el código del axioma de teoría): **condicional** a que `c` pertenezca a
+-- `axiomsCodeT` (el código de las 142 de `axioms` —la base y el ancla, ADR‑117—; decía «de `coreAxioms`», y era
 -- falso: ver la corrección del 2026‑09‑05 en la sección de `axiomsCodeT`). Así el verificador solo
 -- acepta como axioma de teoría los códigos de axiomas REALES → `provCodeC` es fiel
 -- (no demostrable para `φ` arbitraria). `axiomsCodeT` es opaco ⟹ la sustitución
@@ -1459,9 +1593,51 @@ def ax_lineWF_inv : Formula :=
 def ax_lineWF_cons : Formula :=
   forall_ (Formula.impl (lineWF (.var 0)) ((.var 0) =eq cons (carc (.var 0)) (cdrc (.var 0))))
 
+/-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
+    matemática). `axiomsBase = coreAxioms ++ codingAxioms`, y `axioms` es la base con el ancla al
+    final (`axioms_split`, ADR‑117). -/
+def codingAxioms : List Formula := [
+  ax_substtc_var_eq, ax_substtc_var_gt, ax_substtc_var_lt, ax_substtc_func,
+  ax_substtsc_nil, ax_substtsc_cons, ax_liftc_var_lt, ax_liftc_var_ge, ax_liftc_func,
+  ax_liftsc_nil, ax_liftsc_cons, ax_substfc_bottom, ax_substfc_atom, ax_substfc_eq,
+  ax_substfc_impl, ax_substfc_forall, ax_substfc_and, ax_substfc_or, ax_substfc_ex,
+  ax_liftfc_bottom, ax_liftfc_atom, ax_liftfc_eq, ax_liftfc_impl, ax_liftfc_forall,
+  ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
+  ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
+  ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
+  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf, ax_vpf_listInd,
+  ax_tc_zero, ax_tc_succ, ax_runFn_nil, ax_runFn_cons,   -- ax_tc_cons RETIRADO (ver arriba)
+  ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
+  ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
+  ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
+  ax_lineWF_c1, ax_premsOf_c1, ax_lineWF_c2, ax_premsOf_c2, ax_lineWF_c3, ax_premsOf_c3,
+  ax_lineWF_j1, ax_premsOf_j1, ax_lineWF_j2, ax_premsOf_j2, ax_lineWF_j3, ax_premsOf_j3,
+  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3,
+  ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
+  ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
+  ax_lineWF_qconf, ax_premsOf_qconf,
+  ax_lineWF_listInd, ax_premsOf_listInd,
+  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
+  ax_lineWF_inv, ax_lineWF_cons
+]
+
+/-- La lista BASE: los 141 axiomas de antes de ADR‑117, en su orden (34 de la teoría + 107 de
+    codificación). El ancla habla de ella, no de `axioms`, para no contenerse a sí misma. -/
+def axiomsBase : List Formula := coreAxioms ++ codingAxioms
+
+/-- ⭐ **EL ANCLA de `axiomsCodeT`** (L2‑3, ADR‑117): el axioma diagonal sobre `axiomsBase`. Es el
+    ÚLTIMO de `axioms`, y con él `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
+    `Meta/Representability2Prf.lean`): la hipótesis `AnclaEq`, que daba `Prf ⊥` (F1), deja de serlo. -/
+def ax_axiomsCodeT_def : Formula := axD axiomsBase
+
+theorem ax_axiomsCodeT_def_lift (c : Nat) :
+    liftFormula c ax_axiomsCodeT_def = ax_axiomsCodeT_def :=
+  axD_lift c axiomsBase
+
 -- ## Axiom Set
 
-/-- The complete list of axioms for the Minimal system. -/
+/-- The complete list of axioms for the Minimal system: los 141 de `axiomsBase`, en su orden, y el ancla
+    `ax_axiomsCodeT_def` AL FINAL (ADR‑117). Sigue siendo un LITERAL: los `simp [axioms]` lo despliegan. -/
 def axioms : List Formula := [
   ax2_peano_succ_neq_zero,
   ax3_peano_succ_inj,
@@ -1589,43 +1765,24 @@ def axioms : List Formula := [
   ax_lineWF_qconf, ax_premsOf_qconf,
   ax_lineWF_listInd, ax_premsOf_listInd,
   ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
-  ax_lineWF_inv, ax_lineWF_cons
+  ax_lineWF_inv, ax_lineWF_cons,
+  ax_axiomsCodeT_def   -- ⭐ ADR‑117: el ancla de `axiomsCodeT`, SIEMPRE la última
 ]
 
-/-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
-    matemática). `axioms = coreAxioms ++ codingAxioms` (por `rfl`, ver
-    `axioms_eq`). -/
-def codingAxioms : List Formula := [
-  ax_substtc_var_eq, ax_substtc_var_gt, ax_substtc_var_lt, ax_substtc_func,
-  ax_substtsc_nil, ax_substtsc_cons, ax_liftc_var_lt, ax_liftc_var_ge, ax_liftc_func,
-  ax_liftsc_nil, ax_liftsc_cons, ax_substfc_bottom, ax_substfc_atom, ax_substfc_eq,
-  ax_substfc_impl, ax_substfc_forall, ax_substfc_and, ax_substfc_or, ax_substfc_ex,
-  ax_liftfc_bottom, ax_liftfc_atom, ax_liftfc_eq, ax_liftfc_impl, ax_liftfc_forall,
-  ax_liftfc_and, ax_liftfc_or, ax_liftfc_ex, ax_carc, ax_cdrc, ax_vpf_nil, ax_vpf_p1,
-  ax_vpf_p2, ax_vpf_c1, ax_vpf_c2, ax_vpf_c3, ax_vpf_j1, ax_vpf_j2, ax_vpf_j3,
-  ax_vpf_efq, ax_vpf_q1, ax_vpf_q2, ax_vpf_q3, ax_vpf_eqrefl, ax_vpf_leibniz,
-  ax_vpf_p3, ax_vpf_mp, ax_vpf_gen, ax_vpf_thy, ax_vpf_ind, ax_vpf_qconf, ax_vpf_listInd,
-  ax_tc_zero, ax_tc_succ, ax_runFn_nil, ax_runFn_cons,   -- ax_tc_cons RETIRADO (ver arriba)
-  ax_allIn_nil, ax_allIn_cons, ax_chainOk_nil, ax_chainOk_cons,
-  ax_lineWF_mp, ax_premsOf_mp, ax_lineWF_gen, ax_premsOf_gen, ax_lineWF_thy, ax_premsOf_thy,
-  ax_lineWF_p1, ax_premsOf_p1, ax_lineWF_p2, ax_premsOf_p2,
-  ax_lineWF_c1, ax_premsOf_c1, ax_lineWF_c2, ax_premsOf_c2, ax_lineWF_c3, ax_premsOf_c3,
-  ax_lineWF_j1, ax_premsOf_j1, ax_lineWF_j2, ax_premsOf_j2, ax_lineWF_j3, ax_premsOf_j3,
-  ax_lineWF_efq, ax_premsOf_efq, ax_lineWF_eqrefl, ax_premsOf_eqrefl, ax_lineWF_p3, ax_premsOf_p3,
-  ax_lineWF_q1, ax_premsOf_q1, ax_lineWF_q2, ax_premsOf_q2, ax_lineWF_q3, ax_premsOf_q3,
-  ax_lineWF_leibniz, ax_premsOf_leibniz, ax_lineWF_ind, ax_premsOf_ind,
-  ax_lineWF_qconf, ax_premsOf_qconf,
-  ax_lineWF_listInd, ax_premsOf_listInd,
-  ax_lenc_nil, ax_lenc_cons, ax_nthc_zero, ax_nthc_succ,
-  ax_lineWF_inv, ax_lineWF_cons
-]
+set_option maxRecDepth 8000 in
+/-- `axioms` = la base + el ancla. El `rfl` sólo recorre la ESPINA de las listas: compara los
+    elementos por nombre y no despliega ninguno (el ancla tampoco). -/
+theorem axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def] := rfl
 
-/-- `axioms` se parte en la teoría matemática y la maquinaria de coding. -/
-theorem axioms_eq : axioms = coreAxioms ++ codingAxioms := rfl
+/-- El ancla es un axioma de la teoría. -/
+theorem ax_axiomsCodeT_def_mem : ax_axiomsCodeT_def ∈ axioms := by
+  rw [axioms_split]
+  exact List.mem_append_right _ (List.mem_singleton_self _)
 
-/-- Todo axioma de la teoría está en `axioms`. -/
-theorem coreAxioms_subset_axioms : coreAxioms ⊆ axioms :=
-  axioms_eq ▸ List.subset_append_left _ _
+/-- Todo axioma de `coreAxioms` es un axioma de la teoría. -/
+theorem coreAxioms_subset_axioms : coreAxioms ⊆ axioms := by
+  rw [axioms_split]
+  exact List.subset_append_of_subset_left _ (List.subset_append_left _ _)
 
 /-- Pertenencia a la teoría implica pertenencia a `axioms`. -/
 theorem mem_axioms_of_mem_core {f : Formula} (h : f ∈ coreAxioms) : f ∈ axioms :=

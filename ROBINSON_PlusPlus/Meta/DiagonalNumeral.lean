@@ -50,8 +50,8 @@ reparación). La reparación usa la lectura **NUMERAL**, que es consistente y ti
 (`Meta/ArithPrf.lean`) acepta un `s` **ARBITRARIO**, luego traga un numeral igual que tragaba un
 árbol; y `godelPred'`, `godelBeta'`, `diagTerm` y `godel_comp'` **no mencionan la representación
 del código**, así que se reutilizan tal cual. El resultado se compone con `prf_provCode_transfer`
-para dejarlo en la forma `godelCN ⇔ ¬ provCodeC' godelCN` que consume `goedel_first_prf` (⛔ vacuo
-por `[AnclaEq]`, F1, ADR‑114).
+para dejarlo en la forma `godelCN ⇔ ¬ provCodeC' godelCN` que consume `goedel_first_prf` (vacuo por
+`[AnclaEq]` hasta ADR‑117, F1; hoy, sólo con `ConsistentH`).
 -/
 
 /-! ### La sentencia de Gödel, con el código escrito como NUMERAL -/

@@ -20,6 +20,11 @@ import FOL.Semantics
 > solidez es hoy un teorema (`FOL.Inconsistencia.derives_soundness`). Se conservan como estaban, como
 > registro.
 
+> ✏️ **2026‑10‑04 (ADR‑117).** Con el axioma diagonal `ax_axiomsCodeT_def` en `axioms`, el ancla es TEOREMA de
+> `Prf` (`prf_ancla`) y vale en TODO modelo de los 142 —su lado derecho, `δ` incluido, lo fijan instancias
+> cerradas de las ecuaciones de codificación—. Así que la hipótesis `hne` de `ancla_underivable_prfI` no se
+> puede cumplir: ese corolario queda VACUO, y se conserva como registro. `prfI_consistent` sigue con contenido.
+
 **Pregunta que contesta (2026‑09‑11):** *¿se puede decir algo SEMÁNTICO sobre los cálculos de este
 proyecto?* De ella dependía la única pregunta abierta sobre `prf_axiomsCodeT_eq`: no «¿es
 derivable?» —eso ya estaba medido que no— sino **«¿es siquiera VERDADERO?»**.

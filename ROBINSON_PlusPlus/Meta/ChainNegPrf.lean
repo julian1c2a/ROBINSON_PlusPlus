@@ -128,8 +128,8 @@ adversarial, ADR-075):
    citaba, `derives_lineWF_neg_thy_of_not_prf`, pide **`¬ Prf φ`**, y el decodificador sólo
    entrega **`φ ∉ axioms`**: `decodeRuleTag acc f 15 args` **es** `(findIdx f axioms).map
    Rule.thy` (la rama `15` de `decodeRuleTag`, `Meta/ChainDecode.lean`).
-   `prf_ax : f ∈ axioms → Prf f` va en **un solo
-   sentido**, y como `axioms` son **141** fórmulas mientras `Prf` es infinito, **existen `f` con
+   `prf_ax : f ∈ axioms → Prf f` va en **un solo sentido**, y como `axioms` son **141** fórmulas
+   (✏️ 142 desde ADR‑117) mientras `Prf` es infinito, **existen `f` con
    `Prf f` y `f ∉ axioms`** — sobre ésas el lema no se podía aplicar. ⭐ El arreglo no fue
    clonar: `neg_In_axiomsCodeT` se **generalizó en su sitio** (su primer paso era justo el que
    sobraba) y el antiguo quedó de corolario, lo mismo en `LineWFCases`.

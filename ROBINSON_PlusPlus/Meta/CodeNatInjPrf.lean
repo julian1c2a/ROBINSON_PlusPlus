@@ -10,7 +10,7 @@ import ROBINSON_PlusPlus.Full.Numerals
 /-!
 # `Meta/CodeNatInjPrf.lean` — INYECTIVIDAD de la codificación numeral, y `codeNat_ne`
 
-`Meta/CodeNumeralPrf.lean` define `triN`, `consN`, `codeNatChars`, `codeNatTerm` y `codeNat`.
+`Minimal/Axioms.lean` define `triN`, `consN`, `codeNatChars`, `codeNatTerm` y `codeNat` (antes de ADR‑117, `Meta/CodeNumeralPrf.lean`).
 Aquí se prueba que **son inyectivas**, y de ahí salía el resultado que consumía el frente (sobre
 `⊢`; retirado con esa capa, ADR‑115):
 

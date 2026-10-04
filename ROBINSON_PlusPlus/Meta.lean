@@ -10,8 +10,10 @@ Public API:
   · Nivel D, sobre el cálculo finitario `Prf`: verificador estructural
     (provCodeC'/chainOk/runFn); D1 `repr_pos'_prf`, D2 `d2_prf`, D3 `d3_prf_real`;
     punto fijo `prf_godelCN_fixedpoint`; Gödel I y II `goedel_first_prf` /
-    `goedel_second_prf [AnclaEq] (hcon : ConsistentH)` (Meta/GodelTwoPrf.lean).
-    ⛔ Hoy VACUOS: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114). D1 y D3 llevan también `[AnclaEq]`.
+    `goedel_second_prf (hcon : ConsistentH)` (Meta/GodelTwoPrf.lean).
+    🏁 Desde ADR‑117, con `ConsistentH` como ÚNICA hipótesis: el ancla de `axiomsCodeT` es un teorema
+    (`prf_ancla`, instancia `instAnclaEq`). Hasta ese día eran VACUOS: `[AnclaEq]` daba `Prf ⊥` (F1,
+    ADR‑114). ⚠️ La consistencia de los 142 axiomas no está probada (no hay modelo).
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),

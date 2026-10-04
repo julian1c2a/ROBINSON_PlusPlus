@@ -43,7 +43,8 @@ namespace ROBINSON_PlusPlus.Meta.GodelTwo
 🗑️ **2026‑10‑02 (ADR‑115) — registro.** Este docstring describe el módulo cuando tenía la cadena
 de Gödel II sobre `⊢`: `goedel_second'` (retirado el 2026‑09‑11, ver abajo) y el teorema `d3`
 (retirado con ADR‑115). **Hoy el módulo sólo define `consistencyFormula'`.** Gödel II está en
-`Meta/GodelTwoPrf.lean`, sobre `Prf`, y es ⛔ **vacuo** por `[AnclaEq]` (F1, ADR‑114).
+`Meta/GodelTwoPrf.lean`, sobre `Prf`: era ⛔ **vacuo** por `[AnclaEq]` (F1, ADR‑114) hasta ADR‑117, que
+hizo del ancla un teorema; hoy su única hipótesis es `ConsistentH`.
 
 Cierre del **núcleo lógico** de Gödel II para el predicado de demostrabilidad
 estructural `provCodeC'`, con la cadena de Hilbert-Bernays-Löb:
@@ -57,7 +58,8 @@ estructural `provCodeC'`, con la cadena de Hilbert-Bernays-Löb:
   demuestra sobre `Prf`: Σ₁‑completitud provable por inducción objeto, con `pcc_eval_premsOf` (B1),
   el puente de la cota (B2) y el chasis interior (B3). ⇒ **ninguna de las tres es `axiom`**, y los
   `axiom` de Lean pasaron de **7 a 6** (cifra del 2026‑09‑10g; hoy 0 en RPP, ADR‑115). ⛔ Pero D1 y
-  D3 llevan `[AnclaEq]` en la firma, y `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114). Detalle:
+  D3 llevan `[AnclaEq]` en la firma, y `[AnclaEq]` daba `Prf ⊥` (F1, ADR‑114) hasta ADR‑117 (hoy la
+  ligadura la llena la instancia `instAnclaEq`, un teorema). Detalle:
   `doc/REFERENCE-Incompleteness.md` §3.67.
   ⚠️ Este párrafo decía hasta el 2026‑09‑10 «postulado… la pieza pendiente más grande»: lo cazó la
   auditoría de `doc/book/AUDITORIA-2026-09-10.md` R3 — un docstring que contradecía a un
@@ -107,9 +109,10 @@ enunciado era una implicación correcta y **no era incompletitud**.
 🏁 **El Segundo Teorema sobre el cálculo finitario `Prf`** —que **sí** es r.e.— está en
 `Meta/GodelTwoPrf.lean`:
 
-    goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+    goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
 
-⛔ **Vacuo hoy**: `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114), así que no puede valer a la vez que `hcon`.
+Hasta ADR‑117 llevaba también `[AnclaEq]`, que daba `Prf ⊥` (F1, ADR‑114): era vacuo. ⚠️ Hoy no lo es por
+F1, pero la consistencia de los 142 axiomas sigue sin probar.
 Su `prf_con_imp_godel` sustituye a `con_imp_godel'`, que sólo existía para alimentar a
 `goedel_second'`.
 

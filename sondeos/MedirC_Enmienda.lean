@@ -595,18 +595,18 @@ namespace MCcifras
 open ROBINSON_PlusPlus.Minimal.Axioms
 
 /-! Cifras: longitud de las listas de axiomas OBJETO. -/
-#eval axioms.length          -- 141
+#eval axiomsBase.length      -- 141 (ADR‑117: `axioms` lleva al final el ancla diagonal, y evaluarla construiría el numeral `numeralM (codeNat ψ)`, que es astronómico: no acabaría)
 #eval codingAxioms.length    -- 107
 #eval coreAxioms.length      --  34
 
 /-- **La enmienda NO cambia el NUMERO de axiomas**: sustituye el CONTENIDO de 7 elementos de
     la lista. La longitud —y por tanto el numero de pasos de `prf_In_listFormCodeM` /
     `prf_not_In_listFormCodeM`— es la misma. -/
-example : axioms.length = 141 := by decide
+example : axiomsBase.length = 141 := by decide   -- (ADR‑117: `axioms` tiene 142; ésta es la base)
 
 /-- Y `axioms = coreAxioms ++ codingAxioms` sigue siendo `rfl` tras la enmienda: los 7
     esquemas viven en `codingAxioms`, no en `coreAxioms` (la teoria MATEMATICA no se toca). -/
-example : axioms = coreAxioms ++ codingAxioms := axioms_eq
+example : axioms = axiomsBase ++ [ax_axiomsCodeT_def] := axioms_split   -- (ADR‑117: `axioms_eq`, retirado)
 
 end MCcifras
 

@@ -1,11 +1,39 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-04 — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
+> # 🗓️ 2026‑10‑04 (tarde) — 🏁 **ADR‑117: F1 REPARADO, el ancla es un TEOREMA**
+>
+> `axiomsCodeT` queda anclado por un axioma DIAGONAL (L2‑3): `axioms` = **142** = los 141 de la base
+> (`axiomsBase`) y `ax_axiomsCodeT_def`, el último. `axiomsCodeT =eq listFormCodeM axioms` es ya el teorema
+> `prf_ancla`, y la clase `AnclaEq` tiene su instancia (`instAnclaEq`). Gödel I/II sobre `Prf`
+> (`goedel_first_prf`, `goedel_second_prf`) dependen sólo de `ConsistentH`, con los tres axiomas de Lean: **F1
+> ya no los hace vacuos**. ⚠️ Siguen siendo condicionales: los 142 axiomas no tienen todavía un modelo construido
+> (`ConsistentH`, sin probar). Decidido por el propietario: todo computable —nada EJECUTA `axioms` ni despliega el
+> numeral del ancla, y `check-sorry` vigila las órdenes que lo harían— y las firmas limpias desde este commit.
+> Detalle en ADR‑117.
+>
+> ## ⬜ Lo que queda AHORA, en orden
+>
+> 1. ⬜ **Retirar la clase `AnclaEq`** y sus 423 ligaduras del build (43 ficheros), en un commit mecánico aparte:
+>    `[AnclaEq]` fuera de las firmas, y `AnclaEq.eq` → `prf_ancla` en sus tres usos. ⚠️ Y el sondeo de F1
+>    (`sondeos/AnclaEqInconsistente.lean`) usa la clase en código vivo: tres ligaduras y su control «la instancia».
+> 2. ⬜ **El modelo de los 142** (A2–A5) ⇒ `ConsistentH` como teorema. El ancla es verdadera en ℕ si
+>    `axiomsCodeT` se interpreta como el código de `axioms`, y `substfc` y `tcFn` como la sustitución y el código
+>    reales (razonamiento, sin compilar: ADR‑117 §4).
+> 3. ⬜ **`⊬¬G` sobre `Prf`, por Rosser** (el punto 5 de la lista del 2026‑10‑02, abajo).
+> 4. ⬜ **D7** (`String` → `List Char` en FOL), en su momento: neutral para F1, con una sola copia de `codeNat`
+>    (ESTIMACIÓN, ADR‑117 §5).
+> 5. ⬜ Ronda 3 de la auditoría, y un paso de CI que compile los sondeos de control negativo. Hoy compilan **32** de
+>    85 (`sondeos/README.md`): `SegundoMuro` volvió con la instancia.
+> 6. ⬜ La deuda de documentación declarada en ADR‑115 §5.
+>
+> 🗓️ *Lo que sigue es el bloque de la mañana del 2026‑10‑04, como registro.*
+>
 > # 🗓️ 2026‑10‑04 — 🔧 **ADR‑116: los controles que daban verde sin comprobar, endurecidos**
 >
 > Decisiones del propietario del 2026‑10‑03: arreglar «[B] casa los nombres por prefijo» y «check‑axioms de FOL
@@ -19,9 +47,10 @@
 >
 > ## ⬜ Lo que queda AHORA, en orden
 >
-> 1. ⬜ **F1 (L2‑3)**, ADR‑117. Decidido por el propietario: **todo computable** (nada evalúa `axioms`), y las
->    firmas de Gödel I/II **limpias desde el primer commit** (`instance : AnclaEq := ⟨prf_ancla⟩`); la clase y
->    sus 426 ligaduras se retiran después, en un commit mecánico aparte.
+> 1. ✅ **F1 (L2‑3)**, ADR‑117 —hecho el mismo día, bloque de arriba—. Decidido por el propietario: **todo
+>    computable** (nada evalúa `axioms`), y las firmas de Gödel I/II **limpias desde el primer commit**
+>    (`instance : AnclaEq := ⟨prf_ancla⟩`); la clase y sus 426 ligaduras se retiran después, en un commit mecánico
+>    aparte.
 > 2. ⬜ Los puntos 3–7 de la lista del 2026‑10‑02 (abajo): D7, el modelo de los 141, `⊬¬G` por Rosser, la ronda 3
 >    de la auditoría y la deuda de documentación de ADR‑115 §5.
 >
@@ -46,7 +75,10 @@
 >    re‑congelados.
 > 2. ⬜ **F1**, lo que hace vacuos a Gödel I/II: anclar `axiomsCodeT` por punto fijo — un único axioma diagonal
 >    `axiomsCodeT = LR ++ [δ]` con `diagTerm` y `prf_diag_arith_num` (L2‑3).
+>    ✅ Hecho el 2026‑10‑04 (ADR‑117): el axioma es `ax_axiomsCodeT_def`, y el ancla, el teorema `prf_ancla`.
 > 3. ⬜ **D7** (`String` → `List Char` en FOL), en su momento: tras esto y antes del punto fijo de F1 (L5‑09).
+>    ✏️ 2026‑10‑04: ADR‑117 decidió el orden contrario, F1 primero (O8): D7 queda neutral con una sola copia de
+>    `codeNat` (ESTIMACIÓN).
 > 4. ⬜ **El modelo de los 141** (A2–A5) ⇒ `ConsistentH` como teorema. A4 (solidez de `Prf` por inducción sobre
 >    `Prf`) no tiene obstáculo: `Prf` no está habitado por ningún `axiom`.
 > 5. ⬜ **`⊬¬G` sobre `Prf`**, que ya no existe en ningún cálculo: **por Rosser** (consistencia simple; es el

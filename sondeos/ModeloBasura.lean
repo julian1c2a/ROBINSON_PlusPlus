@@ -16,7 +16,7 @@ La capa aritmética del modelo está cerrada (**25 de los 34**, ADR‑087). Ante
 `ax_L0_cons_def` **obliga** a interpretar `cons a b` como `pair a (σb) = cantor_func a (b+1)`, y
 `nil` es `zero = 0`. Con la interpretación estándar de `+`, `*` y `div2` —que los otros axiomas
 core también fuerzan— eso es exactamente `consN a b = triN (a + (b+1)) + (b+1)`, que es la
-función que **ya está en producción** (`Meta/CodeNumeralPrf.lean:65`).
+función que **ya está en producción** (`Meta/CodeNumeralPrf.lean:63`).
 
 ⇒ La imagen de `cons` es `{cantor(x,y) : y ≥ 1}`, y **se deja fuera los números triangulares**
 `T(1)=1`, `T(2)=3`, `T(3)=6`, … **El 1 no es ni `nil` ni un `cons`**, y abajo está compilado.

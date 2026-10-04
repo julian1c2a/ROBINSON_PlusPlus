@@ -481,6 +481,8 @@ ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_of_premsOf_branches|Classical.choice,Qu
 ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_mp|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_of_tag|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_thy|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Representability2Prf.f1_traduccion_refutada|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SubstTreeReflect.PrfH_tc_objAt|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_ind_imp|Classical.choice,Quot.sound,propext

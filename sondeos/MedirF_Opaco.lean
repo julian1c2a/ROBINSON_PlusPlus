@@ -233,7 +233,7 @@ theorem negVerifier_en_testigo_thy_no_demostrable (φ ψ : Formula) (hnp : ¬ Pr
 
 -- Cuantas desigualdades puntuales pide `neg_In_axiomsCodeT_gen`: una por axioma objeto.
 -- Sale 141: la obligacion residual es FINITA Y ENUMERADA, no un muro.
-#eval axioms.length
+#eval axiomsBase.length  -- (ADR‑117: `axioms` lleva al final el ancla diagonal, y evaluarla construiría el numeral `numeralM (codeNat ψ)`, que es astronómico: no acabaría)
 
 
 #print axioms neg_In_axiomsCodeT_of_notMem

@@ -17,8 +17,8 @@ Las secciones §1‑§11 son el descenso, y siguen siendo el mapa de dónde est�
 
 ## El descenso
 
-    hasWit c   =  ∃w. isTC1 w ↑c                            (`Minimal/Axioms.lean:1052`)
-    isTC1 w c  =  wfAll1 w ∧ In c w                         (`Minimal/Axioms.lean:1049`)
+    hasWit c   =  ∃w. isTC1 w ↑c                            (`Minimal/Axioms.lean:1230`)
+    isTC1 w c  =  wfAll1 w ∧ In c w                         (`Minimal/Axioms.lean:1227`)
 
 ⭐ Esa segunda línea es **exactamente** la forma `isFCB w c = wfAll w ∧ In c w` que
 `sondeos/A3IsFCBTracked.lean` reflejó entera (`pcc_isFCB_tracked`), y por eso el escalón sale
@@ -984,7 +984,7 @@ theorem pcc_wfAll1_trackedC [AnclaEq] (w : Term) :
 
 /-! ## §11 · ⭐ EL PASO `∃`: DE `isTC1` A `hasWit`, CON EL HUECO DEL TESTIGO
 
-`hasWit c = ∃x. isTC1 x c` (`Minimal/Axioms.lean:1052`), así que subir §9 por el `∃` es
+`hasWit c = ∃x. isTC1 x c` (`Minimal/Axioms.lean:1230`), así que subir §9 por el `∃` es
 `pcc_exIntro_code_open` (`Meta/Delta0ReflectPrf.lean:74`) — la variante **abierta**, que no
 exige clausurar `Ac`.
 

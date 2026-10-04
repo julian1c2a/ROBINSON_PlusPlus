@@ -166,7 +166,9 @@ theorem tfa_numeral (n) (hn : 1 ≤ n) : ∃ ps, (∀ p∈ps, IsPrimeNat p)
 > nada. El censo separa las dos clases y **mide** cuántos quedan.
 
 `Minimal` tiene `axioms = coreAxioms ++ codingAxioms` (`axioms_eq`, por `rfl`), medido con
-`#eval ·.length`: **34 + 107 = 141**.
+`#eval ·.length`: **34 + 107 = 141** (hasta ADR‑117, 2026‑10‑04: esa lista es hoy `axiomsBase`, y `axioms` =
+`axiomsBase ++ [ax_axiomsCodeT_def]` —`axioms_split`; `axioms_eq`, retirado— = **142**, con el ancla diagonal,
+que no entra en el censo. Lo comprueba el núcleo, `axioms_len`/`axiomsBase_len`: evaluar `axioms` no acabaría).
 
 #### (a) Los **107** `codingAxioms` — **extensión definicional, irreducibles por diseño**
 

@@ -6,6 +6,18 @@ License: MIT
 import ROBINSON_PlusPlus.Meta
 
 /-!
+> ✏️ **2026‑10‑04 · ADR‑117 — leer antes que el resto.** Lo que este sondeo midió (abajo, sin cambios) era
+> sobre la teoría de 141 axiomas, con el ancla como HIPÓTESIS de clase. Desde ADR‑117 el ancla se postula
+> como el último de 142 axiomas —el axioma diagonal `ax_axiomsCodeT_def`, que nombra `axiomsCodeT` FUERA
+> de `In`—, y `AnclaEq` es un TEOREMA (`prf_ancla`, instancia `instAnclaEq`). El argumento de F1 ya no da `⊥`
+> sin partir de él: si la traducción conservara el ancla, ya habría `Prf ⊥` (`f1_traduccion_refutada`, §8).
+> ⇒ §1, §3 y §4 siguen compilando (la maquinaria del reemplazo); lo que dependía de que sólo DOS axiomas
+> nombraran `axiomsCodeT` (`filtro_occ`, `occ_casos`, `hax_rr`, §5, §6, los controles 1 y 3 y §7) pasa a
+> REGISTRO, y §8 es el control de ahora. ⚠️ Nada de esto prueba que los 142 sean consistentes: no hay
+> modelo.
+-/
+
+/-!
 # SONDEO · F1 — `[AnclaEq]` implica `Prf ⊥` (2026‑09‑28)
 
 **Pregunta** (hallazgo F1 de la auditoría del 2026‑09‑28, que lo dejó como INFERENCIA): la clase
@@ -289,10 +301,11 @@ theorem occT_listFormCodeM : ∀ L : List Formula, occT (listFormCodeM L) = fals
       simp only [listFormCodeM, cons, occT, esAC, occTs, occT_formCodeM f,
         occT_listFormCodeM fs]; rfl
 
--- 📏 Medido: posiciones de `axioms` donde aparece `axiomsCodeT`.
-#eval ((List.range axioms.length).filter (fun i => occF (axioms.getD i .bottom)))
-#eval axioms.length
+-- 📏 Medido (2026‑09‑28): posiciones de `axioms` donde aparecía `axiomsCodeT` (81 y 97, de 141). Eran dos
+-- `#eval`; desde ADR‑117 evaluar `axioms` no acaba (construiría el numeral del ancla), y se quitaron.
 
+/-! ### REGISTRO (no compila desde ADR‑117: con el ancla son TRES los axiomas que nombran `axiomsCodeT`;
+ver `filtro_occ'`, en §8)
 
 /-- ✅ Medido por el núcleo: exactamente DOS de los 141 axiomas mencionan `axiomsCodeT`. -/
 theorem filtro_occ : List.filter occF axioms = ([ax_vpf_thy, ax_lineWF_thy] : List Formula) := by
@@ -308,6 +321,7 @@ theorem occ_casos {a : Formula} (ha : List.Mem a axioms) (ho : occF a = true) :
       cases h with
       | head => exact Or.inr rfl
       | tail _ h => cases h
+-/
 
 /-! ## §3 · `Prf` es cerrado bajo el reemplazo (dado que lo sean los axiomas) -/
 
@@ -493,6 +507,9 @@ theorem prf_rep_lwt [AnclaEq] : Prf (repF rr ax_lineWF_thy) := by
     (and_mono (P := lwP) (in_rr_imp (carc (.var 0))))
   exact Prf.gen _ (prf_imp_trans hbody hsw)
 
+/-! ### REGISTRO (no compila desde ADR‑117): `hax_rr`, §5 y la vacuidad de §6. Con el ancla diagonal,
+la imagen de `ax_axiomsCodeT_def` por el reemplazo no es un teorema: con él da `Prf ⊥` (§8).
+
 /-- Los 141 axiomas siguen siendo teoremas de `Prf` tras el reemplazo (con el ancla). -/
 theorem hax_rr [AnclaEq] : ∀ a, List.Mem a axioms → Prf (repF rr a) := by
   intro a ha
@@ -533,11 +550,7 @@ theorem anclaEq_no_consistente (h : AnclaEq) : ¬ ConsistentH :=
 theorem hipotesis_goedel_insatisfacibles : ¬ (AnclaEq ∧ ConsistentH) :=
   fun ⟨h, hcon⟩ => anclaEq_no_consistente h hcon
 
-
-/-! ## §6 · Vacuidad, con ejemplos, y controles vistos fallar -/
-
-open ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.GodelTwo
-open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
+## §6 · Vacuidad, con ejemplos, y controles vistos fallar
 
 /-- Ejemplo de vacuidad (1): con las MISMAS hipótesis que `goedel_first_prf`, sale lo contrario de
     su conclusión. -/
@@ -557,15 +570,73 @@ example [AnclaEq] (φ : Formula) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC'
 /-- Control 1 (el detector no es trivialmente verde): la lista de ocurrencias NO es otra. -/
 example : List.filter occF axioms ≠ ([ax_vpf_thy] : List Formula) := by
   rw [filtro_occ]; intro h; cases h
+-/
+
+open ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.GodelTwo
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
 
 /-- Control 2 (el detector ve la constante): `occF` es `true` en los dos y `false` en `ax18`. -/
 example : And (occF ax_vpf_thy = true) (And (occF ax_lineWF_thy = true) (occF ax18_lt_irrefl = false)) :=
   ⟨rfl, rfl, rfl⟩
 
+/-! ## §8 · Control (ADR‑117): el ancla es un AXIOMA de la teoría, y la ruta de F1 queda cerrada -/
+
+/-- `AnclaEq` tiene instancia (antes no la tenía). -/
+example : AnclaEq := inferInstance
+
+/-- Gödel I y II con la hipótesis MÍNIMA, y ninguna más: en modo EXPLÍCITO (`@`), un `[AnclaEq]` que quedara en
+    la firma no lo rellenaría la instancia, y el `example` dejaría de tipar. -/
+example : ConsistentH → ¬ Prf godelCN := @goedel_first_prf
+example : ConsistentH → ¬ Prf consistencyFormula' := @goedel_second_prf
+example : ∀ G : Formula, Prf (neg (provCodeC' G) ⇒ G) → Prf (provCodeC' (G ⇒ neg (provCodeC' G))) →
+    Prf (consistencyFormula' ⇒ G) := @prf_con_imp_godel
+
+/-- `axiomsCodeT` va a la IZQUIERDA del ancla: por eso `filtro_occ'` no recorre el numeral (`occT T` es
+    `true`, y `true || _` no mira lo de la derecha). -/
+theorem ancla_orientada : ∃ r, ax_axiomsCodeT_def = (axiomsCodeT =eq r) := ⟨_, rfl⟩
+
+/-- ✅ Medido por el núcleo: ahora son TRES los axiomas que nombran `axiomsCodeT`; el tercero, el ancla. -/
+theorem filtro_occ' :
+    List.filter occF axioms = ([ax_vpf_thy, ax_lineWF_thy, ax_axiomsCodeT_def] : List Formula) := by
+  set_option maxRecDepth 20000 in rfl
+
+/-- El numeral del ancla no nombra `axiomsCodeT`: `occT_numeralM` vale para TODO `n`, así que no se despliega
+    `nD`. ⚠️ Todo lo de abajo va por `rw` y sin `simp`: con `simp only [occT, …]` el NÚCLEO desplegaba el numeral
+    («(kernel) deep recursion detected», medido el 2026‑10‑04, con 11 GB de memoria). -/
+theorem occT_nD (L : List Formula) : occT (nD L) = false := occT_numeralM _
+
+/-- `δ` tampoco: sus símbolos son estructurales, y `nD` queda PLEGADO (de dentro afuera, un `rw` por nivel). -/
+theorem occTs_nD (L : List Formula) : occTs [nD L] = false := by
+  rw [occTs, occT_nD, occTs]; rfl
+
+theorem occT_tcFn_nD (L : List Formula) : occT (Term.func "tcFn" [nD L]) = false := by
+  rw [occT, occTs_nD]; rfl
+
+theorem occT_deltaD (L : List Formula) : occT (deltaD L) = false := by
+  show occT (Term.func "substfc" [zero, Term.func "tcFn" [nD L], nD L]) = false
+  rw [occT, occTs, occTs, occTs, occTs, occT_tcFn_nD, occT_nD]; rfl
+
+/-- La imagen REAL del ancla por el reemplazo de §1 (`axiomsCodeT ↦ rr`): sólo cambia el lado izquierdo. -/
+theorem rep_ancla : repF rr ax_axiomsCodeT_def =
+    (rr =eq concat (listFormCodeM axiomsBase) (cons (deltaD axiomsBase) nil)) := by
+  have hc : occT (Term.func cons_sym [deltaD axiomsBase, nil]) = false := by
+    rw [occT, occTs, occT_deltaD, occTs]; rfl
+  have h : occT (concat (listFormCodeM axiomsBase) (cons (deltaD axiomsBase) nil)) = false := by
+    show occT (Term.func concat_sym [listFormCodeM axiomsBase, Term.func cons_sym [deltaD axiomsBase, nil]]) = false
+    rw [occT, occTs, occTs, hc, occT_listFormCodeM]; rfl
+  rw [ax_axiomsCodeT_def, axD, repF, repT_axiomsCodeT, repT_of_occ rr _ h]
+
+/-- Y la traducción de F1, aplicada al ancla: si su imagen fuera teorema, `Prf ⊥`. El argumento de F1 ya no
+    da `⊥` sin partir de él. ⚠️ No prueba la consistencia: que la imagen NO sea teorema equivale a ella. -/
+example (h : Prf (repF rr ax_axiomsCodeT_def)) : Prf Formula.bottom :=
+  f1_traduccion_refutada a0 (rep_ancla ▸ h)
+
 end Sondeos.AnclaEqInconsistente
 
+/-! ### REGISTRO (desde ADR‑117 el ancla es una instancia, y la resolución de clases la encuentra: el error
+que el control 3 fijaba ya no sale). Y la medición de los footprints de §5 y el control de §7, también.
 
-/-! ### Control 3 (el ancla hace falta): sin `[AnclaEq]`, `in_rr_imp` NO compila. -/
+### Control 3 (el ancla hace falta): sin `[AnclaEq]`, `in_rr_imp` NO compila.
 open Sondeos.AnclaEqInconsistente in
 /--
 error: failed to synthesize instance of type class
@@ -581,10 +652,8 @@ example (c : Term) : Prf (In c rr ⇒ In c axiomsCodeT) :=
         (prf_to_prfH (prf_inAxC ax18_lt_irrefl ax18_mem) _)))
       (Prf.incl (prfI_id _)))
 
-/-! ### Medición del footprint (depende de los imports: este fichero importa `ROBINSON_PlusPlus.Meta`) -/
 #print axioms Sondeos.AnclaEqInconsistente.anclaEq_prf_bot
 #print axioms Sondeos.AnclaEqInconsistente.hipotesis_goedel_insatisfacibles
-#print axioms Sondeos.AnclaEqInconsistente.prf_rep
 
 
 /-! ## §7 · Control independiente (2026-10-01): las hipótesis EXACTAS de `goedel_first_prf` / `goedel_second_prf`
@@ -609,3 +678,8 @@ theorem verif_g2_vacuo [inst : ROBINSON_PlusPlus.Meta.Representability2Prf.Ancla
 
 #print axioms verif_g1_vacuo
 #print axioms verif_g2_vacuo
+-/
+
+/-! ### Medición del footprint (depende de los imports: este fichero importa `ROBINSON_PlusPlus.Meta`) -/
+#print axioms Sondeos.AnclaEqInconsistente.prf_rep
+#print axioms Sondeos.AnclaEqInconsistente.filtro_occ'

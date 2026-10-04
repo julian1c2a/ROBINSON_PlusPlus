@@ -42,10 +42,8 @@ que `2 · pairN a b = (a+b)·((a+b)+1) + 2·b` — exactamente `cpOf ā b̄` —
 
 /-! ### PARTE A — la aritmética meta, SIN división -/
 
-/-- Números triangulares, definidos por recursión (no por división). -/
-def triN : Nat → Nat
-  | 0     => 0
-  | n + 1 => triN n + (n + 1)
+-- `triN` y `consN` viven en `Minimal/Axioms.lean` desde ADR‑117 (el enunciado del axioma diagonal lleva
+-- `numeralM (codeNat ψ)`, y `axioms` no puede importar `Meta`); este módulo los reexporta.
 
 /-- `2·T(n) = n·(n+1)`. Es lo que hace exacta la división por 2 del polinomio de Cantor. -/
 theorem two_mul_triN : ∀ n : Nat, 2 * triN n = n * (n + 1)
@@ -63,10 +61,6 @@ theorem two_mul_triN : ∀ n : Nat, 2 * triN n = n * (n + 1)
 
 /-- Valor de `pair a b` (Cantor pelado, sobreyectivo), **sin división**. -/
 def pairN (a b : Nat) : Nat := triN (a + b) + b
-
-/-- Valor de `cons a b = σ (pair a b)` (ADR-093, salida (5)), **sin división**. Es `pairN a b + 1`
-    por definición. -/
-def consN (a b : Nat) : Nat := triN (a + b) + b + 1
 
 /-- **LA VERIFICACIÓN**: el polinomio de Cantor de `⟨a,b⟩` es exactamente `2 · pairN a b`. -/
 theorem two_mul_pairN (a b : Nat) :
@@ -127,30 +121,8 @@ theorem prf_cons_eval_of {A B : Term} {a b : Nat}
 
 /-! ### Los códigos, a nivel `Nat` (espejo exacto de `Provability.lean:34-63`) -/
 
-def codeNatChars : List Char → Nat
-  | []      => 0
-  | c :: cs => consN c.toNat (codeNatChars cs)
-
-def codeNatStr (s : String) : Nat := codeNatChars s.toList
-
-mutual
-def codeNatTerm : Term → Nat
-  | .var n     => consN 0 (consN n 0)
-  | .func s ts => consN 1 (consN (codeNatStr s) (consN (codeNatTerms ts) 0))
-def codeNatTerms : List Term → Nat
-  | []      => 0
-  | t :: ts => consN (codeNatTerm t) (codeNatTerms ts)
-end
-
-def codeNat : Formula → Nat
-  | .bottom          => consN 2 0
-  | .atom p ts       => consN 3 (consN (codeNatStr p) (consN (codeNatTerms ts) 0))
-  | .eq t u          => consN 4 (consN (codeNatTerm t) (consN (codeNatTerm u) 0))
-  | .impl a b        => consN 5 (consN (codeNat a) (consN (codeNat b) 0))
-  | Formula.forall a => consN 6 (consN (codeNat a) 0)
-  | .and a b         => consN 7 (consN (codeNat a) (consN (codeNat b) 0))
-  | .or a b          => consN 8 (consN (codeNat a) (consN (codeNat b) 0))
-  | .ex a            => consN 9 (consN (codeNat a) 0)
+-- La familia `codeNatChars` · `codeNatStr` · `codeNatTerm`/`codeNatTerms` · `codeNat` vive en
+-- `Minimal/Axioms.lean` desde ADR‑117, con las mismas definiciones; este módulo la reexporta.
 
 /-! ### La transferencia, por recursión estructural -/
 
@@ -213,12 +185,21 @@ theorem prf_formCode_numeral : ∀ φ : Formula, Prf (formCode φ =eq numeral (c
 
 
 
+-- Bajados a `Minimal/Axioms.lean` (ADR‑117): también con su nombre calificado de antes
+-- (`ROBINSON_PlusPlus.Meta.CodeNumeralPrf.consN`…), que se cita en `simp only [...]`.
+export ROBINSON_PlusPlus.Minimal.Axioms (
+  triN consN codeNatChars codeNatStr codeNatTerm codeNatTerms codeNat
+)
+
 end ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 export ROBINSON_PlusPlus.Meta.CodeNumeralPrf (
-  triN two_mul_triN consN two_mul_pairN
+  two_mul_triN two_mul_pairN
   pairN prf_gnum_add prf_cpOf_eval prf_cons_eval prf_cons_eval_of
-  codeNatChars codeNatStr codeNatTerm codeNatTerms codeNat
   prf_charsCode_numeral prf_strCode_numeral
   prf_termCode_numeral prf_termsCode_numeral prf_formCode_numeral
+)
+-- Bajados a `Minimal/Axioms.lean` (ADR‑117); se reexportan para que ningún importador note el cambio.
+export ROBINSON_PlusPlus.Minimal.Axioms (
+  triN consN codeNatChars codeNatStr codeNatTerm codeNatTerms codeNat
 )

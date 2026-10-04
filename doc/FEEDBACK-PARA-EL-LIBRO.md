@@ -191,6 +191,9 @@ ayer parecía:
 > **La cadena de Gödel de este proyecto es ENTERAMENTE FINITARIA**: Gödel I y Gödel II sobre `Prf`,
 > desde la consistencia simple del propio `Prf`, con D1/D2/D3 demostradas y **un único axioma** —el
 > ancla de codificación— entre el resultado y los tres axiomas de Lean.
+>
+> ✏️ *2026‑10‑04: el «único axioma» no duró: al día siguiente pasó a ser la hipótesis `[AnclaEq]`, que los hacía
+> VACUOS (F1); hoy es un TEOREMA, por el axioma objeto 142.º (ADR‑117). El matiz, en el 📌 2026‑09‑12, §3.*
 
 ⚠️ ⇒ El `muro` que §3 pedía para el cap. 13 **sigue teniendo sentido**, pero cambia de asunto:
 ya no es «cuidado, la hipótesis es más fuerte de lo que parece» sino **«hay TRES nombres parecidos
@@ -208,6 +211,9 @@ tres»**, que es la buena noticia.
 | `axiom` de Lean | **5** — `ax_induction_prim`, `ax_list_induction`, `ax_p_tfa`, `ax_axiomsCodeT_eq`, `prf_axiomsCodeT_eq`. **Ninguno gödeliano** |
 | axiomas objeto | **141** = 34 `coreAxioms` + 107 `codingAxioms`; y los 34 = **24 primitivos + 10 derivables** |
 | `sorry` | **0** |
+
+✏️ *2026‑10‑04: cifras de aquel día (las vigentes, en [README.md](../README.md)). Desde ADR‑117, por ejemplo,
+los axiomas objeto son **142** = 34 + 107 + 1: el ancla diagonal `ax_axiomsCodeT_def`.*
 
 ---
 
@@ -263,6 +269,14 @@ Quot.sound]` — cero axiomas del proyecto**. **No escribir eso a secas.** Su ti
 
 ⇒ **el postulado no desapareció: se movió del footprint a la FIRMA**, y **no hay ninguna
 `instance : AnclaEq` en el árbol**. Decirlo sin esta frase sería **M‑8 con otro nombre**.
+
+✏️ **2026‑10‑04 (ADR‑117) — esto ya no es así, y el matiz que hay que decir es otro.** El ancla es
+hoy un TEOREMA, `prf_ancla`, por un axioma objeto nuevo —el diagonal `ax_axiomsCodeT_def`, el 142.º de
+`axioms`—; `instAnclaEq` es su instancia, y el tipo es `ConsistentH → ¬ Prf godelCN`, con el mismo
+footprint. Entre medias, la hipótesis `[AnclaEq]` daba `Prf ⊥` (F1, ADR‑114): los dos teoremas eran
+VACUOS. Hoy no lo son por F1, pero «cero axiomas del proyecto» sigue sin poder escribirse a secas: los
+dos son CONDICIONALES a `ConsistentH`, y la consistencia de los 142 axiomas no está probada (no hay
+modelo).
 
 ### 4 · `AXIOMS.md` publicaba una afirmación **medible‑mente falsa** sobre `ax_p_tfa`
 

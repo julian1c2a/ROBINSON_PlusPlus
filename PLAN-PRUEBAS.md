@@ -4,6 +4,8 @@
 >
 > **Build 145 jobs · 0 errores · 0 warnings · 0 sorrys · Lean v4.31.0.**
 > **131 módulos activos** · **3 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> ✏️ *2026‑10‑04: cifras de aquel día (las vigentes, en [README.md](README.md)). Desde ADR‑117, por ejemplo,
+> `axioms` tiene **142**: los 141 y el ancla diagonal `ax_axiomsCodeT_def`.*
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
 
@@ -121,7 +123,7 @@ Sale de `doc/AUDITORIA-2026-09-11.md` §4. **Escribirlo es la única defensa que
 | **P‑1** | `verificar_pdf.py` en CI | 🏁 **HECHO — y RE‑HECHO el mismo día**, porque la primera versión **no podía ejecutarse nunca**. Job **`libro`** (no `libro-pdf`: el nombre estaba mal aquí), con TeX Live y sólo cuando cambia `doc/book/`. ⛔⛔ **Medido el 2026‑09‑11**: el checkout era *shallow* ⇒ `github.event.before` no existía como objeto ⇒ el `git diff` de la puerta abortaba, su stderr iba a `/dev/null` y la puerta daba **siempre `run=false`**, con el job **en verde** y **cero controles ejecutados**. Corregido con `fetch-depth: 0`, una puerta que **falla hacia EJECUTAR** ante la duda, los checkouts hermanos de `FOL` y `Peano` que `simbolos.py` necesita para su cierre de imports, `poppler-utils` para §2.1 y `PYTHONIOENCODING`. ⚠️ **Sigue sin verificarse en el runner** hasta el primer push que toque el libro |
 | **P‑2** | un control de **hipótesis descargadas** | 🏁 **HECHO**: **`TEOREMAS-E-HIPOTESIS.md`** — teorema → hipótesis → **quién la descarga**. ⚠️ Es **a mano**: se actualiza en el mismo commit que toca un teorema cabecera. Una fila «⬜ nadie» es información; una fila **ausente** es el fallo |
 | **P‑3** | medir el **tiempo** de build | ⬜ hoy no se vigila; un frente puede degradarlo sin que nadie lo vea |
-| **P‑4** | **¿basta `ConsistentH`?** | 🏁 **SÍ, y resuelto el mismo día**: `goedel_first_prf` y `goedel_second_prf` toman hoy `ConsistentH := ¬ Prf ⊥`, la hipótesis **mínima**. ⭐ Y el footprint cayó a **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del proyecto**: las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja** |
+| **P‑4** | **¿basta `ConsistentH`?** | 🏁 **SÍ, y resuelto el mismo día**: `goedel_first_prf` y `goedel_second_prf` toman hoy `ConsistentH := ¬ Prf ⊥`, la hipótesis **mínima**. ⭐ Y el footprint cayó a **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del proyecto**: las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja** · ✏️ **2026‑10‑04 (ADR‑117)**: el ancla `prf_axiomsCodeT_eq` (un `axiom`, retirado) pasó después a ser la clase `[AnclaEq]` (ADR‑026), que daba `Prf ⊥` (F1, ADR‑114: los dos eran vacuos); hoy es un TEOREMA (`prf_ancla`), y los dos toman sólo `ConsistentH`, con footprint `[propext, Classical.choice, Quot.sound]`. ⚠️ Siguen siendo condicionales: la consistencia de los 142 axiomas no está probada (no hay modelo) |
 
 ---
 

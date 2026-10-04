@@ -11,7 +11,8 @@
 **Contenido:** Nivel B (codificación `⌜·⌝`, `G`, Teorema G1 como **meta‑inyectividad**) y Nivel C
 (`formCode`, `IsFormula` — núcleo real de codificación). La capa legacy postulada se retiró en F7a; lo
 que había sobre `⊢` (`Provable`, la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
-**Last updated:** 2026-10-02 · Lean v4.31.0 — revisado entero tras retirar la capa `⊢` (ADR‑115):
+**Last updated:** 2026-10-04 · Lean v4.31.0 — Gödel I/II, ya no vacuos por F1 y condicionales a
+`ConsistentH` (ADR‑117). Antes, 2026-10-02 — revisado entero tras retirar la capa `⊢` (ADR‑115):
 fuera `Block6`, `encode_cons_inj`/`encode_cons_neq_nil`, `Provable`/`provable_formCode_iff`, y los
 meta‑axiomas de F7a marcados como lo que son, un registro.
 
@@ -119,7 +120,8 @@ axiom diagonal_lemma (φ) : ∃ ψ, axioms ⊢ (ψ ⇔ substFormula 0 (formCode 
 Los meta‑axiomas de arriba se retiraron en F7a: la aritmetización (`Dem`, `Meta/HilbertSeq.lean`), la
 representabilidad y el punto fijo viven hoy como teoremas sobre `Prf` en el Nivel D
 ([Incompletitud](REFERENCE-Incompleteness.md)), donde Gödel I/II son `goedel_first_prf`/
-`goedel_second_prf` — ⛔ hoy vacuos por `[AnclaEq]` (F1, ADR‑114).
+`goedel_second_prf` — ⛔ vacuos por `[AnclaEq]` (F1, ADR‑114) hasta ADR‑117 (2026‑10‑04); hoy su única
+hipótesis es `ConsistentH` (el ancla es el teorema `prf_ancla`), y siguen condicionales: no hay modelo de los 142.
 
 ---
 

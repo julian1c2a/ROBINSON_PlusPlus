@@ -32,7 +32,7 @@ namespace —`pcc_eval_pred` y `pcc_eval_pred'` incluidos— arrastran
 proyecto (`AXIOMS.md`), no un axioma estandar de Lean. No hay axioma **NUEVO** —que es lo que la
 frase queria decir— pero «cero axiomas de Lean» era **falso**, y es justo la clase de frase que
 un libro cita como garantia.
--/
+✏️ Desde ADR‑117 `AnclaEq` tiene instancia, `instAnclaEq := ⟨prf_ancla⟩`: el ancla es un teorema. -/
 
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.Hilbert

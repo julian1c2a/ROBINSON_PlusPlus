@@ -12,9 +12,18 @@ estructural (`lineWF`, `premsOf`, tags), y los axiomas de la capa Δ₀ (`lenc`/
 `ax_lineWF_cons`). **Last updated:** 2026-07-12 · Lean v4.31.0. — ⚠️ revisado el 2026‑09‑11 (entonces el kernel no
 había cambiado; adjudicación del aviso `[E]` del control).
 
+> 🏁 **2026‑10‑04 · ADR‑117.** `Minimal/Axioms.lean` cambia otra vez: `axioms` tiene **142** fórmulas, los 141 de
+> `axiomsBase := coreAxioms ++ codingAxioms` y, AL FINAL, el ancla diagonal `ax_axiomsCodeT_def := axD axiomsBase`;
+> `axioms_split : axioms = axiomsBase ++ [ax_axiomsCodeT_def]` (por `rfl`) sustituye a `axioms_eq`, retirado.
+> Entran `diagTermM`, `psiD`, `nD`, `deltaD`, `axD` y `axD_lift`, y bajan aquí `triN`, `consN` y la familia
+> `codeNat` (los reexporta `Meta/CodeNumeralPrf.lean`). ⛔ Nada puede EJECUTAR `axioms`: un `#eval` construiría el
+> numeral de `nD`, astronómico, y no acabaría. El ancla de antes, `axiomsCodeT =eq listFormCodeM axioms`, es hoy un
+> teorema de `Prf` (`prf_ancla`, `Meta/Representability2Prf.lean`).
+
 > 🗑️ **2026‑10‑02 · ADR‑115.** `Minimal/Axioms.lean` sí cambió: perdió el `import` y el re‑export de `FOL.MetaRules`,
 > la `CoeFun` sobre `Derives` y sus lemas sobre `⊢` (el ancla `ax_axiomsCodeT_eq`, `ax_inAxC`, los *helpers*: todos retirados).
-> **Las listas y las 141 fórmulas no cambian.** §3.1.6 y §3.1.7 de abajo describen lo retirado: son registro.
+> **Las listas y las 141 fórmulas no cambian** (hasta ADR‑117, 2026‑10‑04: ver arriba). §3.1.6 y §3.1.7 de abajo
+> describen lo retirado: son registro.
 
 ---
 

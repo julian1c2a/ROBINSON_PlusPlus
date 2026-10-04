@@ -83,10 +83,13 @@ def primAxioms : List Formula :=
 
 ⚠️ «**141 axiomas objeto** = 34 core + 107 coding» aparece en **siete banners** y **ningún control
 lo comprobaba**: `check-doc-sync` `[A]` mira jobs, módulos, `axiom` de Lean y `sorry`, no esto. Era
-cierto **por suerte**, no por control. Aquí deja de serlo: si alguna lista cambia, **el build rompe**. -/
+cierto **por suerte**, no por control. Aquí deja de serlo: si alguna lista cambia, **el build rompe**.
+✏️ Desde ADR‑117 son **142** = 141 de la base (`axiomsBase` = 34 + 107) y el ancla diagonal. -/
 
 set_option maxRecDepth 8000 in
-theorem axioms_len : axioms.length = 141 := rfl
+theorem axioms_len : axioms.length = 142 := rfl
+set_option maxRecDepth 8000 in
+theorem axiomsBase_len : axiomsBase.length = 141 := rfl
 set_option maxRecDepth 4000 in
 theorem coreAxioms_len : coreAxioms.length = 34 := rfl
 set_option maxRecDepth 8000 in

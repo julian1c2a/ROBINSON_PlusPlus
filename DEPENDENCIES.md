@@ -1,6 +1,6 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+> ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md)) · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md))
 >
 > RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
 > (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
@@ -9,15 +9,22 @@
 > (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
 > de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
 > con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
-> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
-> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
+> ⛔ **Lo que NO arreglaba** (hasta ADR‑117, 2026‑10‑04): `goedel_first_prf` y `goedel_second_prf` llevaban la
+> clase `[AnclaEq]`, y `AnclaEq` **daba `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`)
+> ⇒ los dos teoremas eran **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) era lo siguiente.
+>
+> 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
+> último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
+> `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
+> llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
+> `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
 >
 > ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
 >
 > Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
 > axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
-> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; la hipótesis mínima volvió con ADR‑117, el
+> 2026‑10‑04, ya sin ningún axioma del proyecto en el footprint), y `⊢` ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -26,9 +33,9 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
-> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` y el ancla diagonal, ADR‑117).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -61,6 +68,13 @@ Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos
 > ListInductionArith,Necessitation,OmegaStrength,Reflection,StepArith}` (9). Quedan **104** (Minimal 1 +
 > Meta 100 + Full 3), sin ciclos (`lake build` verde). Lo que sigue describe el árbol de **131** y se
 > conserva como registro hasta regenerar la vista.
+>
+> 🆕 **2026‑10‑04 (ADR‑117) — dos aristas nuevas y un traslado, sin módulos nuevos (siguen 104).**
+> `Meta/Representability2Prf.lean` importa ahora también `TcArithPrf` y `CodeNumeralPrf` (sin ciclo): ahí se prueba
+> el ancla, `prf_ancla`. Y la familia `codeNat` (`triN`, `consN`, `codeNatChars`, `codeNatStr`,
+> `codeNatTerm`/`codeNatTerms`, `codeNat`) baja de `Meta/CodeNumeralPrf.lean` a `Minimal/Axioms.lean` —el enunciado
+> del axioma diagonal la lleva, y `axioms` no puede importar `Meta`—: `Minimal/Axioms.lean` sigue importando sólo
+> `FOL.FOL` y `FOL.Theorems.Eq`, y `CodeNumeralPrf` la reexporta. La tabla de niveles de §0 no lo recoge.
 >
 > ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
 > solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
@@ -142,7 +156,7 @@ ROBINSON_PlusPlus/                  # raíz del proyecto Lean
 ├── Intermediate_template.lean
 ├── Full_template.lean
 └── ROBINSON_PlusPlus/Minimal/
-    ├── Axioms.lean                 # Lenguaje + 141 axiomas objeto + esquemas del verificador
+    ├── Axioms.lean                 # Lenguaje + 141 axiomas objeto (142 desde ADR‑117) + esquemas del verificador
     └── Theorems/
         ├── Block1.lean             # Aritmética básica + teo_2_11 (cancelación *2)
         ├── Block2.lean             # Raíz cuadrada, sqrt_*, succ_le_of_lt, le/lt-trans
@@ -264,6 +278,7 @@ Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
 
 * `FOL.*` (proyecto sibling, dependencia local vía `lakefile.lean`).
 * `Minimal/Axioms.lean` — lenguaje + **141 axiomas objeto** (`def axioms`, línea 1199) + los esquemas del verificador + la capa Δ₀ (`lenc`/`nthc`). Solo importa `FOL.FOL` y `FOL.Theorems.Eq`.
+  ✏️ Los 141 valen hasta ADR‑117 (2026‑10‑04): hoy son **142** —los 141 de `axiomsBase` y el ancla diagonal `ax_axiomsCodeT_def`, el último—, y el fichero aloja también la familia `codeNat`, bajada de `Meta/CodeNumeralPrf.lean`. Sigue importando sólo esos dos.
   ⚠️ Las **6 meta-reglas ω** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) **ya no viven aquí**: se movieron a `FOL/MetaRules.lean` y se re-exportan (ADR-010).
 
 ### Level 1 — Aritmética básica

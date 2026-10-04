@@ -225,23 +225,76 @@ for p in $AG_ALCANCE; do
 done
 AG_B0="(^|[^A-Za-z0-9_'.«\`])"
 AG_B1="([^A-Za-z0-9_'!?»]|\$)"
-AG_COD=$(mktemp)
-find $AG_ALCANCE -name '*.lean' ! -path '*/.lake/*' | sort | while IFS= read -r f; do
-  STRIP "$f" | LC_ALL=C grep -nE "${AG_B0}(native_decide|decide[[:space:]]+[+]native|unsafe|opaque|implemented_by|extern|(Lean[.])?(ofReduceBool|ofReduceNat|trustCompiler)|(debug[.])?skipKernelTC|addDeclWithoutChecking)${AG_B1}" \
-    | sed "s|^|$f:|" || true
-done > "$AG_COD"
-AG_N=0
-for etiqueta in 'native_decide' 'decide +native' 'unsafe' 'opaque' 'implemented_by' 'extern' 'ofReduceBool · ofReduceNat · trustCompiler' 'skipKernelTC · addDeclWithoutChecking'; do
-  case "$etiqueta" in
-    'native_decide')  pat='native_decide' ;;
-    'decide +native') pat='decide[[:space:]]+[+]native' ;;
-    'unsafe')         pat='unsafe' ;;
-    'opaque')         pat='opaque' ;;
-    'implemented_by') pat='implemented_by' ;;
-    'extern')         pat='extern' ;;
-    'ofReduceBool'*)  pat='(Lean[.])?(ofReduceBool|ofReduceNat|trustCompiler)' ;;
-    'skipKernelTC'*)  pat='(debug[.])?skipKernelTC|addDeclWithoutChecking' ;;
+ag_patron () {   # $1 = etiqueta → el patrón de esa familia (la ÚNICA copia: la recogida sale de aquí)
+  case "$1" in
+    'native_decide')  echo 'native_decide' ;;
+    'decide +native') echo 'decide[[:space:]]*([+]native|[(][^)]*native[[:space:]]*:=[[:space:]]*true)' ;;
+    'unsafe')         echo 'unsafe' ;;
+    'opaque')         echo 'opaque' ;;
+    'implemented_by') echo 'implemented_by' ;;
+    'extern')         echo 'extern' ;;
+    'ofReduceBool'*)  echo '([A-Za-z0-9_]+[.])*(ofReduceBool|ofReduceNat|trustCompiler)' ;;
+    'skipKernelTC'*)  echo '([A-Za-z0-9_]+[.])*(skipKernelTC|addDeclWithoutChecking)' ;;
   esac
+}
+AG_ETIQUETAS=('native_decide' 'decide +native' 'unsafe' 'opaque' 'implemented_by' 'extern' 'ofReduceBool · ofReduceNat · trustCompiler' 'skipKernelTC · addDeclWithoutChecking')
+# ⛔ (revisión final de ADR-117) la recogida tenía su PROPIA copia de los patrones: una errata en ella
+# (`extrn`) dejaba pasar el autotest —su caso salía por otra familia de la misma línea— y daba verde con un
+# `@[extern]` real. Ahora se construye de `ag_patron`, y no hay dos copias que puedan divergir.
+AG_FAMILIAS=$(for e in "${AG_ETIQUETAS[@]}"; do ag_patron "$e"; done | paste -sd'|' -)
+ag_recoge () {   # $@ = caminos → «fichero:línea:código» de cada línea despojada con un agujero
+  find "$@" -name '*.lean' ! -path '*/.lake/*' | sort | while IFS= read -r f; do
+    STRIP "$f" | LC_ALL=C grep -nE "${AG_B0}(${AG_FAMILIAS})${AG_B1}" | sed "s|^|$f:|" || true
+  done
+}
+# ⛔ 2026-10-04 (ADR-117): AUTOTEST. Los ocho dan 0 de verdad, y un patrón que dejara de casar (una errata
+# en una edición) daría 0 también: verde sin medir (la causa 16 de los controles que no comprueban). Un
+# fixture con UNA LÍNEA POR ALTERNATIVA —en las formas que el grep anclado de antes no veía, y las
+# calificadas— y señuelos en un comentario, en una cadena, dentro de un identificador y un `decide` normal.
+# Se compara el CONJUNTO de líneas de cada familia (como en el humo de arriba), no una cuenta.
+AG_FIX=$(mktemp -d)
+cat > "$AG_FIX/Agujeros.lean" <<'EOF'
+attribute [implemented_by realF] fakeF
+@[extern "c_fn"] def cfn : Nat → Nat := id
+noncomputable opaque secreto : Nat
+private unsafe def peligro : Nat := 0
+theorem a1 : 2 + 2 = 4 := by native_decide
+theorem a2 : 2 + 2 = 4 := by decide +native
+theorem a3 : 2 + 2 = 4 := by decide (native := true)
+theorem a4 : 2 + 2 = 4 := by decide (config := { native := true })
+theorem a5 : c = false := Lean.ofReduceBool c false rfl
+theorem a6 : n = 0 := _root_.Lean.ofReduceNat n 0 rfl
+example := Lean.trustCompiler
+set_option debug.skipKernelTC true in theorem a8 : True := trivial
+run_cmd liftCoreM (Lean.Kernel.Environment.addDeclWithoutChecking env d)
+#eval env.addDeclWithoutChecking d
+-- unsafe opaque extern native_decide implemented_by ofReduceBool skipKernelTC
+def s := "unsafe opaque extern native_decide implemented_by"
+def unsafeX := 0
+def x_opaque := opaqueY
+theorem a9 : 2 + 2 = 4 := by decide
+EOF
+AG_FIXCOD=$(ag_recoge "$AG_FIX")
+rm -rf "$AG_FIX"
+AG_ESPERADO=('5 ' '6 7 8 ' '4 ' '3 ' '1 ' '2 ' '9 10 11 ' '12 13 14 ')
+AG_AUTO=""
+[ "$(printf '%s\n' "$AG_FIXCOD" | cut -d: -f2 | tr '\n' ' ')" = "1 2 3 4 5 6 7 8 9 10 11 12 13 14 " ] \
+  || AG_AUTO=" la recogida da «$(printf '%s\n' "$AG_FIXCOD" | cut -d: -f2 | tr '\n' ' ')»;"
+k=0
+for etiqueta in "${AG_ETIQUETAS[@]}"; do
+  L=$(printf '%s\n' "$AG_FIXCOD" | { LC_ALL=C grep -E "${AG_B0}($(ag_patron "$etiqueta"))${AG_B1}" || true; } | cut -d: -f2 | tr '\n' ' ')
+  [ "$L" = "${AG_ESPERADO[$k]}" ] || AG_AUTO="$AG_AUTO «$etiqueta» da «$L» (esperadas «${AG_ESPERADO[$k]}»);"
+  k=$((k + 1))
+done
+if [ -n "$AG_AUTO" ]; then
+  echo "  ⚠️  SIN MEDIR — el autotest del censo no da sus líneas:$AG_AUTO"
+  exit 2
+fi
+AG_COD=$(mktemp)
+ag_recoge $AG_ALCANCE > "$AG_COD"
+AG_N=0
+for etiqueta in "${AG_ETIQUETAS[@]}"; do
+  pat=$(ag_patron "$etiqueta")
   AG_N=$((AG_N + 1))
   N=$(LC_ALL=C grep -cE "${AG_B0}(${pat})${AG_B1}" "$AG_COD" || true)
   if [ "$N" = "0" ]; then
@@ -260,9 +313,99 @@ else
 fi
 
 echo ""
-if [ "$SORRY_FAIL" = "0" ] && [ "$AG_FAIL" = "0" ]; then
+echo "════ EVALUAR EL ANCLA (ADR-117; esperado: ninguna orden) ════"
+# ⛔ 2026-10-04 (ADR-117, decisión O1 del propietario: «todo computable»). `axioms` lleva al final el ancla
+# diagonal, `ax_axiomsCodeT_def := axD axiomsBase`, cuyo enunciado contiene el numeral
+# `nD = numeralM (codeNat ψ)`: un código de Cantor astronómico. Nada lo marca `noncomputable`, así que una
+# orden que EVALÚE `axioms` —o el ancla, `axD`, `nD`, `deltaD`, `psiD`— construiría el numeral y no acabaría:
+# en el build, la CI colgada; en un sondeo, su tiempo límite. Se buscan `#eval`, `#reduce` y `#guard` en el
+# código despojado del build y de `sondeos/`, con la orden ENTERA (sus líneas sangradas siguientes).
+# Lo que reduce el ancla DENTRO de una prueba (`decide`, `rfl`, `simp`) no se busca: falla a la vista
+# —«(kernel) deep recursion detected», medido en la sonda del 2026-10-03—, nunca en verde.
+EV_ALCANCE="ROBINSON_PlusPlus.lean ROBINSON_PlusPlus sondeos"
+# (y los evaluadores META que llegan a `axioms`: `stepConcl` —`.thy k ⇒ axioms[k]?`—, y con él `checkAux`,
+#  `checkProof`, `proofCode`, `proofCode'`; `ruleCode`/`rulesCode`; `decodeRuleTag` y la cadena de
+#  `decodeChain` —revisión final de ADR-117—. Un `#eval` de cualquiera de ellos sobre una línea `thy` se colgaría.)
+EV_TOK="(^|[^A-Za-z0-9_'«])(axioms|ax_axiomsCodeT_def|axD|nD|deltaD|psiD|stepConcl|checkAux|checkProof|ruleCode|rulesCode|proofCode'?|decodeRuleTag|decodeRule|decodeLine|decodeChainAux|decodeChain)([^A-Za-z0-9_'!?»]|\$)"
+ev_ordenes () {   # stdin: código despojado → «línea:orden» de cada orden que evalúa, entera
+  # Una orden abierta sigue en las líneas sangradas; NO se cierra en una línea en blanco (un comentario
+  # despojado lo es); se cierra en una línea sin sangría o en otra orden o declaración. Si tras la palabra
+  # clave no hay nada, toma la línea siguiente, tenga la sangría que tenga (`#eval` ⏎ `axioms.length` es Lean
+  # válido: `"#eval " >> termParser`, sin comprobar la columna).
+  LC_ALL=C awk '
+    function cierra() { if (en) print n0 ":" txt; en = 0; pend = 0 }
+    {
+      if (en) {
+        if ($0 ~ /^[ \t]*$/) next
+        if (pend) { txt = txt " " $0; pend = 0; next }
+        if ($0 ~ /^[^ \t]/ || $0 ~ /^[ \t]*(#[a-z_]+|theorem|lemma|def|example|instance|abbrev|structure|inductive|@\[)/) cierra()
+        else { txt = txt " " $0; next }
+      }
+      if ($0 ~ /(^|[^A-Za-z0-9_#])(#eval|#reduce|#guard|run_cmd|run_elab|run_meta)!?([^A-Za-z0-9_]|$)/) {
+        en = 1; n0 = NR; txt = $0
+        t = $0; sub(/^.*(#eval|#reduce|#guard|run_cmd|run_elab|run_meta)!?/, "", t); pend = (t ~ /^[ \t]*$/)
+      }
+    }
+    END { cierra() }'
+}
+ev_recoge () {   # $@ = caminos → «fichero:línea:orden» de cada orden que toca el ancla
+  find "$@" -name '*.lean' ! -path '*/.lake/*' | sort | while IFS= read -r f; do
+    STRIP "$f" | ev_ordenes | { LC_ALL=C grep -E "$EV_TOK" || true; } | sed "s|^|$f:|"
+  done
+}
+for p in $EV_ALCANCE; do
+  [ -e "$p" ] || { echo "  ⚠️  SIN MEDIR — falta $p"; exit 2; }
+done
+# AUTOTEST: una orden real por ficha y por forma —calificada, de varias líneas con una en blanco y un
+# comentario, `#guard`, el término en la línea siguiente sin sangría, `run_cmd`, un evaluador META— y señuelos:
+# la base, un comentario, una cadena, un teorema que NO es una orden, `#print axioms`, una línea sin sangría
+# tras un `#eval` inocuo, y un `#print axioms` sangrado tras otro `#eval` sangrado. Se compara el CONJUNTO.
+EV_FIX=$(mktemp -d)
+cat > "$EV_FIX/Evalua.lean" <<'EOF'
+#eval axioms.length
+#eval ROBINSON_PlusPlus.Minimal.Axioms.axioms.length
+#reduce
+
+  -- el ancla
+  ax_axiomsCodeT_def
+#guard nD == nD
+#eval axD axiomsBase
+#reduce (deltaD axiomsBase)
+#eval
+psiD axiomsBase
+run_cmd Lean.logInfo m!"{axioms.length}"
+#eval checkProof []
+#eval axiomsBase.length
+-- #eval axioms.length
+def s := "#eval axioms"
+theorem t : axioms.length = 142 := rfl
+#print axioms prf_ancla
+#eval 1
+theorem u : axioms.length = 142 := rfl
+  #eval 2
+  #print axioms foo
+EOF
+EV_AUTO=$(ev_recoge "$EV_FIX" | sed "s|^$EV_FIX/Evalua.lean:||" | cut -d: -f1 | tr '\n' ' ')
+rm -rf "$EV_FIX"
+if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 " ]; then
+  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 »)."
+  exit 2
+fi
+EV_FAIL=0
+EV_HITS=$(ev_recoge $EV_ALCANCE)
+if [ -z "$EV_HITS" ]; then
+  echo "  ✓ ninguna orden \`#eval\`, \`#reduce\`, \`#guard\` ni \`run_cmd\` toca \`axioms\`, el ancla ni un evaluador META (el build y sondeos/)"
+else
+  printf '  ❌ %s orden(es) evalúan el ancla (no acabarían):\n' "$(printf '%s\n' "$EV_HITS" | wc -l | tr -d ' ')"
+  printf '%s\n' "$EV_HITS" | head -10 | cut -c1-160 | sed 's/^/      /'
+  echo "  🔑 Para medir, \`axiomsBase\` (los 141 de la base): el ancla es el 142.º."
+  EV_FAIL=1
+fi
+
+echo ""
+if [ "$SORRY_FAIL" = "0" ] && [ "$AG_FAIL" = "0" ] && [ "$EV_FAIL" = "0" ]; then
   echo '✅ NI `sorry` NI AGUJEROS DE CONFIANZA.'
 else
-  echo '❌ HAY `sorry` O AGUJEROS DE CONFIANZA.'
+  echo '❌ HAY `sorry` O AGUJEROS DE CONFIANZA (o una orden que evalúa el ancla).'
   exit 1
 fi

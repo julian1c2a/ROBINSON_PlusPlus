@@ -1,6 +1,15 @@
 # ROBINSON_PlusPlus
 
-> ## ESTADO REAL — 2026‑10‑02 · `master` · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` (F1, [ADR‑114](DECISIONS.md))
+> ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md))
+>
+> `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre
+> (`axiomsBase`) y `ax_axiomsCodeT_def`, el último. El ancla de antes, la hipótesis de clase `AnclaEq`, es hoy
+> el teorema `prf_ancla` (instancia `instAnclaEq`), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
+> su footprint sigue siendo los tres de Lean, y **F1 ya no los hace vacuos**. ⚠️ Siguen siendo **CONDICIONALES**:
+> `ConsistentH` sólo vale si los 142 axiomas son consistentes, y no hay modelo; y `⊬¬G` sigue sin existir en
+> ningún cálculo (irá por Rosser, sobre `Prf`).
+>
+> ### 2026‑10‑02 · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` hasta ADR‑117 (F1, [ADR‑114](DECISIONS.md))
 >
 > RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
 > (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
@@ -9,15 +18,16 @@
 > (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
 > de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
 > con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arregla**: `goedel_first_prf` y `goedel_second_prf` llevan la clase `[AnclaEq]`, y
-> `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
+> ⛔ **Lo que NO arregla** *(hasta ADR‑117, 2026‑10‑04)*: `goedel_first_prf` y `goedel_second_prf` llevan la clase
+> `[AnclaEq]`, y `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
 > los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
 >
 > ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
 >
 > Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
 > axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
-> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`), y `⊢` ya no está en RPP. Se conserva:
+> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; lo primero vuelve a serlo desde ADR‑117), y `⊢`
+> ya no está en RPP. Se conserva:
 >
 > Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
 > (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
@@ -26,9 +36,9 @@
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
 > **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
-> **0 `axiom` de Lean · 141 axiomas objeto** en `axioms`.
+> **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >
@@ -65,7 +75,7 @@ Una implementación formal de una **Aritmética Fundacional** en Lean 4, constru
 > proyecto**— describía un proyecto que ya no es éste: hablaba sólo de fundar los naturales, las
 > listas y el TFA, **sin mencionar la incompletitud**, que hoy es **el 83 % del árbol** (`Meta/`,
 > 106 de 128 módulos); citaba un directorio `Intermediate/` **eliminado el 2026‑06‑11**; y daba
-> «34 axiomas» sin decir que son los **matemáticos** (`coreAxioms`), porque `axioms` tiene **141**.
+> «34 axiomas» sin decir que son los **matemáticos** (`coreAxioms`), porque `axioms` tiene **141** (hoy 142: ADR‑117).
 > Ver `doc/AUDITORIA-2026-09-11.md` **F‑3**.
 
 Este proyecto formaliza en Lean 4 —**sin Mathlib**, sobre una implementación propia y verificada de
@@ -77,7 +87,7 @@ base o se declara pendiente con nombre y firma**.
 
 | capa | qué es | tamaño |
 |---|---|---|
-| **`Minimal/`** | la teoría objeto **Q++**: aritmética de Robinson extendida, **sin esquema de inducción**. `axioms` = **141** fórmulas = **34 matemáticas** (`coreAxioms`) **+ 107 ecuaciones de codificación** | 1 módulo (`Axioms`; los diez `Block`, todo teoremas sobre `⊢`, se retiraron con ADR‑115) |
+| **`Minimal/`** | la teoría objeto **Q++**: aritmética de Robinson extendida, **sin esquema de inducción**. `axioms` = **142** fórmulas = **34 matemáticas** (`coreAxioms`) **+ 107 ecuaciones de codificación** (`codingAxioms`; juntas, los 141 de `axiomsBase`) **+ el ancla diagonal** de `axiomsCodeT` (`ax_axiomsCodeT_def`, la última: ADR‑117) | 1 módulo (`Axioms`; los diez `Block`, todo teoremas sobre `⊢`, se retiraron con ADR‑115) |
 | **`Full/`** | lo que queda tras [ADR‑115](DECISIONS.md): `primAxioms` y las longitudes del censo, los lemas de sustitución e `inductionFormula` (`Full/Induction.lean`), `numeral` (`Full/Numerals.lean`) y la teoría de números en ℕ pura (`Full/PrimeFactor.lean`). 🗑️ El esquema de inducción sobre `⊢`, el censo certificado sobre `⊢` y el TFA objeto se retiraron con esa capa | 3 módulos |
 | **`Meta/`** | la **aritmetización de la sintaxis** y la cadena de Gödel: verificador de demostraciones interno, punto fijo, **D1, D2 y D3 demostradas**, Gödel I y Gödel II | 100 módulos |
 
@@ -88,22 +98,25 @@ base o se declara pendiente con nombre y firma**.
   su footprint —no estaba demostrado— y se retiró con esa capa; sobre `Prf` hay que rehacerla, y ⛔ la ω‑consistencia NO puede enunciarse como antes:
   sobre `Prf` esa definición es refutable (L1‑4, `sondeos/OmegaConsistentRefutable.lean`).
 - 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada. ⚠️ D1
-  (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevan la hipótesis de clase `[AnclaEq]`; D2 (`d2_prf`) no.
+  (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevan la hipótesis de clase `[AnclaEq]`; D2 (`d2_prf`) no. 🏁 Desde ADR‑117
+  la rellena la instancia `instAnclaEq` (el teorema `prf_ancla`): ya no es un supuesto, y la clase se retirará en
+  un commit aparte.
 - 🏁🏁 **La cadena de Gödel, ENTERAMENTE FINITARIA** (`Meta/GodelTwoPrf.lean`):
 
   ```lean
-  goedel_first_prf  [AnclaEq] (hcon : ConsistentH) : ¬ Prf godelCN
-  goedel_second_prf [AnclaEq] (hcon : ConsistentH) : ¬ Prf consistencyFormula'
+  goedel_first_prf  (hcon : ConsistentH) : ¬ Prf godelCN
+  goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
   ```
 
-  ⛔ **No es «una sola hipótesis, la mínima»** (así lo decía este párrafo): son **dos**, `ConsistentH := ¬ Prf ⊥`
-  y la clase `[AnclaEq]`, y **no pueden valer a la vez**, porque `[AnclaEq]` da `Prf ⊥` (F1, ADR‑114) ⇒ hoy los dos
-  teoremas son **vacuos**. **Ninguna hipótesis suelta**: el punto fijo y la necesitación se descargan ahí.
+  🏁 **Desde ADR‑117 (2026‑10‑04), una sola hipótesis, la mínima**: `ConsistentH := ¬ Prf ⊥`. Hasta ese día eran
+  **dos**, con la clase `[AnclaEq]`, y **no podían valer a la vez** (F1, abajo). ⚠️ Siguen siendo **CONDICIONALES**:
+  `ConsistentH` sólo vale si los 142 axiomas son consistentes, y no hay modelo. **Ninguna hipótesis suelta**: el
+  punto fijo y la necesitación se descargan ahí.
   ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**, y el footprint de los dos teoremas es
   **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del
-  proyecto**, el ancla de codificación *(entonces; desde ADR‑026 el ancla es la clase `[AnclaEq]` y el
-  footprint son los tres de Lean)*. ⛔⛔ **Y desde el 2026‑10‑02 se sabe que `[AnclaEq]` da `Prf ⊥`**
-  (F1, ADR‑114): los dos teoremas son, hoy, **vacuos**.
+  proyecto**, el ancla de codificación *(entonces; desde ADR‑026 el ancla fue la clase `[AnclaEq]`, y desde ADR‑117
+  es el teorema `prf_ancla`; el footprint, los tres de Lean)*. ⛔⛔ **Y el 2026‑10‑02 se supo que `[AnclaEq]` daba
+  `Prf ⊥`** (F1, ADR‑114): los dos teoremas fueron **vacuos** hasta ADR‑117.
 - ⛔⛔ **Y una advertencia que hay que leer antes de citar nada de este repo** *(hasta el 2026‑10‑02: ese día
   la capa `⊢` se retiró de RPP precisamente por esto, ADR‑115)*: el cálculo `axioms ⊢`
   —el que se usaba como herramienta de trabajo— era **sintácticamente COMPLETO**: decide **toda**
@@ -127,7 +140,7 @@ base o se declara pendiente con nombre y firma**.
 
 | Module | Namespace | Dependencies | Status |
 |--------|-----------|--------------|--------|
-| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL`, `FOL.Theorems.Eq` | ✅ El lenguaje y los 141 axiomas objeto. **0 `axiom` de Lean** (los «meta‑axiomas» de FOL ya no se importan: ADR‑115) |
+| `Minimal/Axioms.lean` | `ROBINSON_PlusPlus.Minimal.Axioms` | `FOL.FOL`, `FOL.Theorems.Eq` | ✅ El lenguaje y los 142 axiomas objeto (los 141 de `axiomsBase` y el ancla diagonal `ax_axiomsCodeT_def`, ADR‑117). **0 `axiom` de Lean** (los «meta‑axiomas» de FOL ya no se importan: ADR‑115) |
 | ~~`Minimal/Theorems/Block1–8.lean`~~ (10 ficheros) | — | — | 🗑️ **RETIRADOS el 2026‑10‑02** ([ADR‑115](DECISIONS.md)): todo eran teoremas `axioms ⊢ …` |
 
 ## Project Structure
@@ -135,7 +148,7 @@ base o se declara pendiente con nombre y firma**.
 ```text
 ROBINSON_PlusPlus/
 ├── Minimal/
-│   ├── Axioms.lean            # Lenguaje + los 141 axiomas objeto (34 matemáticos + 107 de codificación)
+│   ├── Axioms.lean            # Lenguaje + los 142 axiomas objeto (34 matemáticos + 107 de codificación + el ancla)
 │   └── (Theorems/Block1–8 — 🗑️ retirados con la capa `⊢`, ADR‑115)
 ├── Meta/                      # Gödelización + Gödel I/II en `Prf`: G, ⌜·⌝, incompletitud, cadena HBL (D1/D2, D3 en curso)
 └── Full/                      # Induction (primAxioms, inductionFormula), Numerals, PrimeFactor (ℕ pura)

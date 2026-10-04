@@ -316,7 +316,7 @@ theorem caso3_barato_p1 {ψ : Formula} (hψ : ∀ A B, ψ ≠ Formula.impl A B) 
 ⚠️ La trampa que hay que evitar: **NO** codificar la línea con `codeNatTerm` — eso codifica
 **SINTAXIS**, y es el error de categoría que hizo falso a `canon_ne`. Lo que hay que distinguir es
 el **VALOR**, y `consN` es la operación de valor. El motor ya está en producción:
-`prf_cons_eval_of` (`Meta/CodeNumeralPrf.lean:125`).
+`prf_cons_eval_of` (`Meta/CodeNumeralPrf.lean:116`).
 
 `NumTree t n` = «el árbol `t` denota el número `n`». Cuatro constructores; `nil` sale gratis
 (`nil := zero`) y `formCode φ` también (`prf_formCode_numeral`, producción). -/
