@@ -21,7 +21,7 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 🏁 **Estado 2026‑10‑04 (ADR‑117) — leer antes que nada.** `goedel_first_prf` y `goedel_second_prf`
 tienen UNA sola hipótesis, `ConsistentH`, y footprint `[propext, Classical.choice, Quot.sound]`: el ancla
 de `axiomsCodeT` es un TEOREMA (`prf_ancla`, por el axioma diagonal `ax_axiomsCodeT_def`), y la clase
-`AnclaEq` tiene instancia. ⚠️ Lo que NO dice: que `ConsistentH` se cumpla. Eso depende de la consistencia
+`AnclaEq` se retiró (ADR‑118). ⚠️ Lo que NO dice: que `ConsistentH` se cumpla. Eso depende de la consistencia
 de los 142 axiomas, y no hay modelo de ellos todavía.
 
 ⛔ **Hasta el 2026‑10‑04 eran VACUOS** (estado del 2026‑10‑02): su hipótesis de clase `[AnclaEq]` daba
@@ -54,8 +54,8 @@ más cualquiera de las meta‑reglas demuestra `False`; por eso la capa `⊢` en
 **mínima honesta** (P‑4). **Ninguna hipótesis suelta**: el punto fijo y la necesitación se **descargan
 aquí**. ⭐ Footprint: **sólo los tres de Lean**. El ancla de codificación es, desde ADR‑117, el ÚLTIMO de los
 142 axiomas objeto —el axioma diagonal—, y la clase `[AnclaEq]` que lo había sustituido
-([ADR‑026](../../DECISIONS.md); hasta ese día, sin instancia y contradictoria con `ConsistentH`) tiene
-instancia (`instAnclaEq`). Ver `TEOREMAS-E-HIPOTESIS.md` §1.
+([ADR‑026](../../DECISIONS.md); hasta ese día, sin instancia y contradictoria con `ConsistentH`) se
+retiró con ADR‑118. Ver `TEOREMAS-E-HIPOTESIS.md` §1.
 
 ## Lo que hizo falta, y es poco porque el espejo `Prf` ya estaba
 

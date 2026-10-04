@@ -9,7 +9,7 @@
 > llevaban además la clase `[AnclaEq]`, que daba `Prf ⊥` —F1, [ADR‑114](DECISIONS.md)—: eran VACUOS.)*
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
+**Last updated:** 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
 `[AnclaEq]`: su única hipótesis es `ConsistentH` (banner, §1, §4–§6); D1 y D3 sí la llevan, rellenada por la
 instancia (§3). Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)) y con ella
 toda la mitad `⊬¬G` que vivía allí; F1 está compilado (`[AnclaEq]` ⇒ `Prf ⊥`), y **D1 y D3 también
@@ -81,12 +81,12 @@ que se usa, `provBody`) o **Rosser** (las dos mitades desde consistencia simple,
 
 | | teorema | hipótesis |
 |---|---|---|
-| **D1** | **`repr_pos'_prf`** (`Meta/Representability2Prf.lean`) | `[AnclaEq]`, que desde ADR‑117 descarga `prf_ancla` (instancia `instAnclaEq`): ya no es un supuesto |
+| **D1** | **`repr_pos'_prf`** (`Meta/Representability2Prf.lean`) | ninguna desde ADR‑118 (hasta entonces `[AnclaEq]`, que desde ADR‑117 descargaba el teorema `prf_ancla`) |
 | **D2** | **`d2_prf`** (`Meta/DerivCondPrf.lean`) | ninguna |
-| **D3** | **`d3_prf_real`** (`Meta/PremsBdAllPrf.lean`) | `[AnclaEq]`, ídem (D3 fue el `axiom` `d3` sobre `⊢` hasta el 2026‑09‑10g; `d3_prf_real` nació teorema) |
+| **D3** | **`d3_prf_real`** (`Meta/PremsBdAllPrf.lean`) | ninguna desde ADR‑118, ídem (D3 fue el `axiom` `d3` sobre `⊢` hasta el 2026‑09‑10g; `d3_prf_real` nació teorema) |
 
-Las versiones sobre `⊢` (`repr_pos'`, `d2`, `d3`) se retiraron con esa capa. La ligadura `[AnclaEq]` de D1 y D3
-(y las demás del árbol) se retira después, en un commit mecánico aparte (ADR‑117 §5).
+Las versiones sobre `⊢` (`repr_pos'`, `d2`, `d3`) se retiraron con esa capa. La ligadura `[AnclaEq]` de D1 y D3,
+y las demás del árbol (426), se retiraron con la clase el 2026‑10‑05 ([ADR‑118](DECISIONS.md)).
 
 ---
 
@@ -95,7 +95,7 @@ Las versiones sobre `⊢` (`repr_pos'`, `d2`, `d3`) se retiraron con esa capa. L
 | hipótesis | definición | qué es de verdad |
 |---|---|---|
 | **`ConsistentH`** | `¬ Prf ⊥` | la de los dos teoremas, y desde ADR‑117 la ÚNICA: consistencia del cálculo **finitario** sobre los 142 axiomas, la **mínima honesta**. Nada la prueba todavía (A4: solidez de `Prf` por inducción sobre `Prf`; A5: con un modelo de los 142) |
-| **`[AnclaEq]`** | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **Ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 142 (`prf_deltaD`: su δ es el código del propio axioma); `instance instAnclaEq : AnclaEq := ⟨prf_ancla⟩`. Control: `f1_traduccion_refutada` —si la traducción de F1 conservara el ancla —si su imagen fuera teorema—, ya habría `Prf ⊥`: el argumento de F1 no da `⊥` sin partir de él; no prueba la consistencia—. Hasta ese día era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) y no tenía instancia; y hasta ADR‑026 (2026‑09‑12) fue el `axiom prf_axiomsCodeT_eq`, que ese ADR movió del footprint a la FIRMA sin quitar el supuesto |
+| **`[AnclaEq]`** | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **Ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 142 (`prf_deltaD`: su δ es el código del propio axioma); la clase, con su instancia, se retiró el 2026‑10‑05 (ADR‑118). Control: `f1_traduccion_refutada` —si la traducción de F1 conservara el ancla —si su imagen fuera teorema—, ya habría `Prf ⊥`: el argumento de F1 no da `⊥` sin partir de él; no prueba la consistencia—. Hasta ese día era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) y no tenía instancia; y hasta ADR‑026 (2026‑09‑12) fue el `axiom prf_axiomsCodeT_eq`, que ese ADR movió del footprint a la FIRMA sin quitar el supuesto |
 
 🗑️ **Retiradas con la capa `⊢`** (ADR‑115): `ConsistentOmega` (`¬ (axioms ⊢ ⊥)`), `OmegaConsistent`,
 `NegVerifier`, `Reflects`.
@@ -118,7 +118,8 @@ axioma OBJETO de la teoría —el último de los 142, `ax_axiomsCodeT_def`—, n
 |---|---|
 | ~~`goedel_second'`~~, ~~`con_imp_godel'`~~ | retirados el 2026‑09‑11 ([ADR‑024](DECISIONS.md), opción (b)): su `hgi : ¬(axioms ⊢ G)` decía «el cálculo refuta `G`», porque `axioms ⊢` era completo |
 | ~~`goedel_first_numeral`~~, ~~`goedel_first_undecidable_numeral`~~, ~~`goedel_first_undecidable_omega`~~, ~~`reflects_of_omega`~~, ~~`negVerifier_proved`~~ | retirados el 2026‑10‑02 con la capa `⊢` ([ADR‑115](DECISIONS.md)) |
-| ~~`[AnclaEq]`~~ en `goedel_first_prf`, `goedel_second_prf` y `prf_con_imp_godel` | retirada de las tres firmas el 2026‑10‑04 ([ADR‑117](DECISIONS.md)): el ancla es el teorema `prf_ancla`; la clase, ya con instancia, se retira después en un commit aparte |
+| ~~`[AnclaEq]`~~ en `goedel_first_prf`, `goedel_second_prf` y `prf_con_imp_godel` | retirada de las tres firmas el 2026‑10‑04 ([ADR‑117](DECISIONS.md)): el ancla es el teorema `prf_ancla` |
+| ~~`class AnclaEq`~~, ~~`instAnclaEq`~~ y sus 426 ligaduras | retiradas el 2026‑10‑05 ([ADR‑118](DECISIONS.md)): un commit mecánico; los tres usos de `AnclaEq.eq`, a `prf_ancla` |
 
 ---
 

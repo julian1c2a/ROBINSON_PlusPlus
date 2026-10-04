@@ -15,7 +15,7 @@
 >
 > 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
 > último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
-> `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
+> la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
 > llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
 > `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
 >
@@ -92,9 +92,9 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 > `sondeos/ListInductionAxiomRefutable.lean`); y las cuatro meta‑reglas de FOL que `⊢` traía también lo
 > son (L1‑3, `sondeos/MetaReglasRefutables.lean`). La tabla de abajo es el **REGISTRO** de lo que hubo.
 > ⛔ Lo único postulado que quedaba en el proyecto era la **clase `AnclaEq`** (hipótesis de instancia, no
-> `axiom`), y **daba `Prf ⊥`** (F1, ADR‑114). 🏁 Desde el 2026‑10‑04 ([ADR‑117](DECISIONS.md)) tiene instancia
-> (`instAnclaEq := ⟨prf_ancla⟩`): el ancla es un TEOREMA, que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`,
-> el 142.º de `axioms` (ver «Anclas de codificación», más abajo). La clase se retira en un commit aparte.
+> `axiom`), y **daba `Prf ⊥`** (F1, ADR‑114). 🏁 Desde el 2026‑10‑04 ([ADR‑117](DECISIONS.md)) el ancla es un
+> TEOREMA (`prf_ancla`), que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`, el 142.º de `axioms` (ver
+> «Anclas de codificación», más abajo); y la clase se RETIRÓ el 2026‑10‑05 ([ADR‑118](DECISIONS.md)).
 
 
 > ⚠️ Esta cabecera decía **(7)** con la fila 7 tachada justo debajo. Lo cazó
@@ -113,7 +113,7 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 | ~~`ax_mod2_alternation`~~ | ~~`Full/Mod2.lean`~~ | 🏁 **RETIRADO el 2026‑09‑10h** | Era `∀n, mod2(σn) + mod2(n) = 1`. Hoy es **teorema**, derivado de `ax21` (rango) + `ax16` + `ax4` + `zero_add` + `teo_1_11`. ⚠️ Su propio docstring ya decía que en `Minimal` era derivable; lo que ocultaba era una **circularidad**: `ax21` se «derivaba» de él, y él de `ax21`. Medido cuál es el primitivo: **`ax21`** (`ax16 + ax17` admiten `mod2 2̄ = 2̄`) |
 | ~~`ax_p_tfa`~~ | ~~`Minimal/Theorems/Block8.lean`~~ | 🗑️ **RETIRADO el 2026‑09‑12** | Era el TFA en forma idealizada. **Medido HUÉRFANO**: cero consumidores, y `IsFactorization` —el tipo que habitaba— **no aparecía ni una vez** fuera de `Block8.lean`. ⚠️⚠️ **Y con él cae una afirmación MEDIBLE‑MENTE FALSA que esta tabla publicó durante meses**: «*teorema en Full, postulado en Minimal*». **No existe en `Full/` ningún teorema con este enunciado.** `tfa_numeral` tiene **otro dominio** (`Nat` vs `Term`), **otra unicidad** (`Perm` vs igualdad objeto) y **otra hipótesis** (meta vs objeto) — su propio docstring lo dice: «no discharge constructivo por el Muro 1» |
 | ~~`ax_axiomsCodeT_eq`~~ | `Minimal/Axioms.lean` | 🗑️ **RETIRADO el 2026‑10‑02** ([ADR‑115](DECISIONS.md)) · era: ancla de codificación sobre `⊢` | **`axioms ⊢ (axiomsCodeT =eq listFormCodeM axioms)`** — `axiomsCodeT` **es** el código de la lista de axiomas (extensión conservadora, cálculo `⊢`). **Reemplaza a `ax_inAxC`** (2026‑07‑13), que pasa a ser **teorema** derivado; a diferencia de `ax_inAxC` (sólo positivo), da **ambas direcciones** — la negativa `neg_In_axiomsCodeT` (que SÓLO los axiomas están) desbloquea `⊬¬G` (ver `PLAN-NEGVERIFIER.md`). El término gigante NO se materializa (recursión estructural, `Meta/AxiomListCode.lean`) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
-| ~~`prf_axiomsCodeT_eq`~~ | ~~`Meta/Representability2Prf.lean`~~ | 🗑️ **YA NO ES `axiom`** (2026‑09‑12, [ADR‑026](DECISIONS.md)) | 🏁 **Desde ADR‑117 (2026‑10‑04), TEOREMA**: `prf_ancla : Prf (axiomsCodeT =eq listFormCodeM axioms)` (`Meta/Representability2Prf.lean`, footprint `[propext, Classical.choice, Quot.sound]`), que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`, el 142.º de `axioms`. La clase tiene instancia (`instAnclaEq`), y `goedel_first_prf`/`goedel_second_prf` ya no la llevan en la firma. ¿Quién la descarga? **`prf_ancla`**. Registro, hasta ADR‑117: era la **clase `AnclaEq`**, hipótesis de instancia. ⛔⛔ **El postulado NO desapareció: se movió del footprint a la FIRMA.** `goedel_first_prf`/`goedel_second_prf` dan hoy `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **pero su tipo es `∀ [AnclaEq], …`** y **no hay ninguna `instance : AnclaEq` en el árbol** [medido]. Anunciar el footprint sin esta frase sería **M‑8**. ¿Quién la descarga? **Nadie** — `TEOREMAS-E-HIPOTESIS.md` §1 |
+| ~~`prf_axiomsCodeT_eq`~~ | ~~`Meta/Representability2Prf.lean`~~ | 🗑️ **YA NO ES `axiom`** (2026‑09‑12, [ADR‑026](DECISIONS.md)) | 🏁 **Desde ADR‑117 (2026‑10‑04), TEOREMA**: `prf_ancla : Prf (axiomsCodeT =eq listFormCodeM axioms)` (`Meta/Representability2Prf.lean`, footprint `[propext, Classical.choice, Quot.sound]`), que sale del axioma OBJETO diagonal `ax_axiomsCodeT_def`, el 142.º de `axioms`. La clase se retiró el 2026‑10‑05 (ADR‑118), y ninguna firma la lleva. ¿Quién la descarga? **`prf_ancla`**. Registro, hasta ADR‑117: era la **clase `AnclaEq`**, hipótesis de instancia. ⛔⛔ **El postulado NO desapareció: se movió del footprint a la FIRMA.** `goedel_first_prf`/`goedel_second_prf` dan hoy `[propext, Classical.choice, Quot.sound]` —cero axiomas del proyecto— **pero su tipo es `∀ [AnclaEq], …`** y **no hay ninguna `instance : AnclaEq` en el árbol** [medido]. Anunciar el footprint sin esta frase sería **M‑8**. ¿Quién la descarga? **Nadie** — `TEOREMAS-E-HIPOTESIS.md` §1 |
 | ~~`d3`~~ | `Meta/GodelTwo.lean` | 🏁 **RETIRADO el 2026‑09‑10g** | Era la condición D3 de Hilbert‑Bernays‑Löb para `provCodeC'`. Hoy es **teorema**: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10). ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres** |
 
 ### 🆕 Nota 2026‑09‑10h — `ax_induction` y [ADR‑023](DECISIONS.md) 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*

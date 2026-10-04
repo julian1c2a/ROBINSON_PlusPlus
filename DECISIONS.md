@@ -1,12 +1,12 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md))
 >
 > `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre
 > (`axiomsBase`) y `ax_axiomsCodeT_def`, el último. El ancla de antes, la hipótesis de clase `AnclaEq`, es hoy
-> el teorema `prf_ancla` (instancia `instAnclaEq`), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
+> el teorema `prf_ancla` (la clase se retiró con ADR‑118), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
 > su footprint sigue siendo los tres de Lean, y **F1 ya no los hace vacuos**. ⚠️ Siguen siendo **CONDICIONALES**:
 > `ConsistentH` sólo vale si los 142 axiomas son consistentes, y no hay modelo; y `⊬¬G` sigue sin existir en
 > ningún cálculo (irá por Rosser, sobre `Prf`).
@@ -9180,3 +9180,46 @@ Cuatro cuidados de diseño, y por qué:
 lema diagonal, y el punto fijo es el axioma.*
 
 **Véase también:** ADR‑026 (la clase), ADR‑114 (F1), ADR‑115, ADR‑116; `sondeos/AnclaEqInconsistente.lean` §8.
+
+---
+
+<a id="adr-118"></a>
+## ADR-118: 🗑️ la clase `AnclaEq` RETIRADA — 426 ligaduras, un commit mecánico
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ (este commit) · **Ámbito:** RPP. **Decisión del propietario** (2026-10-03,
+O3 de ADR‑117, y confirmada el 2026-10-05): retirar la clase en un commit mecánico aparte, después de ADR‑117.
+
+### 1 · Por qué
+
+Desde ADR‑117 el ancla `Prf (axiomsCodeT =eq listFormCodeM axioms)` es un teorema, `prf_ancla`, y la clase
+`AnclaEq` sólo tenía una instancia que la rellenaba. Conservarla dejaba en 426 firmas una hipótesis que ya no es
+tal: un lector podía tomarla por un supuesto, y cualquiera podía volver a usar la clase para meter otra
+hipótesis sin que ningún control lo viera. Sin la clase, el árbol dice lo que hay: un teorema.
+
+### 2 · Lo hecho
+
+* **426 ligaduras `[AnclaEq]` fuera**: 423 del build, en 43 ficheros, y 3 del sondeo de F1. Se quitaron sólo del
+  CÓDIGO —las líneas que el código despojado (`strip-lean.awk`) marca, y en ellas, fuera de comillas invertidas y
+  de comentarios—, y la cuenta cuadra con el censo hecho antes de tocar nada. Ninguna línea quedó en blanco y el
+  número de líneas de cada fichero no cambia.
+* **`AnclaEq.eq` → `prf_ancla`** en sus tres usos (`Meta/InAxiomsCodePrf.lean` dos, `Meta/Representability2Prf.lean`
+  uno). Fuera `class AnclaEq`, `instance instAnclaEq` y `AnclaEq` de la lista de `export`.
+* **El sondeo de F1** (`sondeos/AnclaEqInconsistente.lean`): sus tres ligaduras, fuera; el control «la instancia»
+  pasa a ser `example : Prf (axiomsCodeT =eq listFormCodeM axioms) := prf_ancla`.
+* **Los comentarios** que hablaban de la clase en presente, en ocho módulos, y los documentos de estado.
+  Cada cambio de comentario conserva el número de líneas, para que las referencias `Fichero.lean:N` no se muevan.
+* Los teoremas no cambian: las firmas pierden un argumento implícito de instancia, y los footprints son los mismos
+  (`check-footprints`, 470).
+
+### 3 · Medido
+
+Después del último cambio (M‑13): `lake build` 117 jobs, 0 errores; `check-sorry` 0 `sorry`, los 8 agujeros a 0
+y ninguna orden que evalúe el ancla; `check-estratos` los 10 —`Prf` 7 · 0—, 0 `sorryAx` en 8 865 constantes (8
+menos: la clase, su estructura y su instancia) y ningún `@TRUST`, `@NATIVO` ni `@AJENO`; `check-warnings` 11 = 11;
+`check-footprints` 470 y cobertura 442, sin cambios; `check-doc-sync` verde ([E] deuda 34, [B] 41/41, [H] 85/85);
+`leanchecker` sobre RPP, FOL y `TheoryFramework`, sin errores, en 227 s. Los 85 sondeos, uno a uno: 32 compilan y
+53 no, con la MISMA tabla, fila a fila y primer error a primer error, que la de ADR‑117.
+
+🔑 *Una hipótesis que ya es un teorema no se deja en la firma: confunde al lector y deja abierta la puerta.*
+
+**Véase también:** ADR‑026 (la clase), ADR‑114 (F1), ADR‑117 (el ancla, teorema).

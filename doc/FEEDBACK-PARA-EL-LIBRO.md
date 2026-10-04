@@ -272,7 +272,7 @@ Quot.sound]` — cero axiomas del proyecto**. **No escribir eso a secas.** Su ti
 
 ✏️ **2026‑10‑04 (ADR‑117) — esto ya no es así, y el matiz que hay que decir es otro.** El ancla es
 hoy un TEOREMA, `prf_ancla`, por un axioma objeto nuevo —el diagonal `ax_axiomsCodeT_def`, el 142.º de
-`axioms`—; `instAnclaEq` es su instancia, y el tipo es `ConsistentH → ¬ Prf godelCN`, con el mismo
+`axioms`— (la clase `AnclaEq`, con su instancia, se retiró el 2026‑10‑05), y el tipo es `ConsistentH → ¬ Prf godelCN`, con el mismo
 footprint. Entre medias, la hipótesis `[AnclaEq]` daba `Prf ⊥` (F1, ADR‑114): los dos teoremas eran
 VACUOS. Hoy no lo son por F1, pero «cero axiomas del proyecto» sigue sin poder escribirse a secas: los
 dos son CONDICIONALES a `ConsistentH`, y la consistencia de los 142 axiomas no está probada (no hay

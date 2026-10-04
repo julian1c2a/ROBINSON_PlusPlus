@@ -421,7 +421,7 @@ theorem vpf_mem : List.Mem ax_vpf_thy axioms := (show ax_vpf_thy ∈ axioms by s
 theorem lwt_mem : List.Mem ax_lineWF_thy axioms := (show ax_lineWF_thy ∈ axioms by simp [axioms])
 
 /-- Con el ancla, la pertenencia a `rr` implica la pertenencia a `axiomsCodeT` (término `c` libre). -/
-theorem in_rr_imp [AnclaEq] (c : Term) : Prf (In c rr ⇒ In c axiomsCodeT) := by
+theorem in_rr_imp (c : Term) : Prf (In c rr ⇒ In c axiomsCodeT) := by
   have hA0 : Prf (In a0 axiomsCodeT) := prf_inAxC ax18_lt_irrefl ax18_mem
   have hmp : Prf (In c rr ⇒ lor (c =eq a0) (In c axiomsCodeT)) :=
     prf_and_elim_left (prf_in_cons_iff c a0 axiomsCodeT)
@@ -448,7 +448,7 @@ theorem rep_vpf : repF rr ax_vpf_thy = forall_3 (In (.var 1) rr ⇒ vpfE) := by
   simp only [forall_3, repF, In, repTs, repT_axiomsCodeT, repF_of_occ rr vpfE vpfE_occ]
   rfl
 
-theorem prf_rep_vpf [AnclaEq] : Prf (repF rr ax_vpf_thy) := by
+theorem prf_rep_vpf : Prf (repF rr ax_vpf_thy) := by
   rw [rep_vpf]
   have hax : Prf (forall_3 (In (.var 1) axiomsCodeT ⇒ vpfE)) := vpf_eq ▸ prf_ax vpf_mem
   -- abrir los tres `∀` instanciando con #2, #1, #0 devuelve el cuerpo tal cual
@@ -496,7 +496,7 @@ theorem iff_swap {L X X' : Formula} (h1 : Prf (X ⇒ X')) (h2 : Prf (X' ⇒ X)) 
   have b' := compH (prf_to_prfH h2 _) b
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 (L ⇒ X') (X' ⇒ L))) a') b'
 
-theorem prf_rep_lwt [AnclaEq] : Prf (repF rr ax_lineWF_thy) := by
+theorem prf_rep_lwt : Prf (repF rr ax_lineWF_thy) := by
   rw [rep_lwt]
   have hax : Prf (forall_ (lwN ⇒ (lwL ⇔ Formula.and lwP (In (carc (.var 0)) axiomsCodeT)))) :=
     lwt_eq ▸ prf_ax lwt_mem
@@ -581,8 +581,9 @@ example : And (occF ax_vpf_thy = true) (And (occF ax_lineWF_thy = true) (occF ax
 
 /-! ## §8 · Control (ADR‑117): el ancla es un AXIOMA de la teoría, y la ruta de F1 queda cerrada -/
 
-/-- `AnclaEq` tiene instancia (antes no la tenía). -/
-example : AnclaEq := inferInstance
+/-- El ancla es un TEOREMA (antes, la hipótesis de clase `AnclaEq`, sin instancia; desde ADR‑118 la clase ya no
+    existe). -/
+example : Prf (axiomsCodeT =eq listFormCodeM axioms) := prf_ancla
 
 /-- Gödel I y II con la hipótesis MÍNIMA, y ninguna más: en modo EXPLÍCITO (`@`), un `[AnclaEq]` que quedara en
     la firma no lo rellenaría la instancia, y el `example` dejaría de tipar. -/

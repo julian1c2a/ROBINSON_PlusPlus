@@ -4,7 +4,7 @@
 >
 > `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre
 > (`axiomsBase`) y `ax_axiomsCodeT_def`, el último. El ancla de antes, la hipótesis de clase `AnclaEq`, es hoy
-> el teorema `prf_ancla` (instancia `instAnclaEq`), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
+> el teorema `prf_ancla` (la clase se retiró con ADR‑118), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
 > su footprint sigue siendo los tres de Lean, y **F1 ya no los hace vacuos**. ⚠️ Siguen siendo **CONDICIONALES**:
 > `ConsistentH` sólo vale si los 142 axiomas son consistentes, y no hay modelo; y `⊬¬G` sigue sin existir en
 > ningún cálculo (irá por Rosser, sobre `Prf`).
@@ -98,9 +98,8 @@ base o se declara pendiente con nombre y firma**.
   su footprint —no estaba demostrado— y se retiró con esa capa; sobre `Prf` hay que rehacerla, y ⛔ la ω‑consistencia NO puede enunciarse como antes:
   sobre `Prf` esa definición es refutable (L1‑4, `sondeos/OmegaConsistentRefutable.lean`).
 - 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada. ⚠️ D1
-  (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevan la hipótesis de clase `[AnclaEq]`; D2 (`d2_prf`) no. 🏁 Desde ADR‑117
-  la rellena la instancia `instAnclaEq` (el teorema `prf_ancla`): ya no es un supuesto, y la clase se retirará en
-  un commit aparte.
+  (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevaban la hipótesis de clase `[AnclaEq]`; D2 (`d2_prf`) no. 🏁 Desde
+  ADR‑117 el ancla es el teorema `prf_ancla`, y desde ADR‑118 la clase no existe: ninguna firma la lleva.
 - 🏁🏁 **La cadena de Gödel, ENTERAMENTE FINITARIA** (`Meta/GodelTwoPrf.lean`):
 
   ```lean

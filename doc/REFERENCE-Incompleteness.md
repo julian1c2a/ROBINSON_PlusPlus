@@ -2,7 +2,7 @@
 
 > 🏁 **2026‑10‑04 · ADR‑117 — F1 reparado.** `axioms` tiene 142 fórmulas: los 141 de `axiomsBase` y, la última, el
 > axioma DIAGONAL `ax_axiomsCodeT_def`. El ancla `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
-> `Meta/Representability2Prf.lean`) y `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf` y
+> `Meta/Representability2Prf.lean`) y la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf` y
 > `goedel_second_prf` toman sólo `(hcon : ConsistentH)`, con los tres axiomas de Lean: F1 ya no los hace vacuos.
 > ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes, y no hay modelo;
 > `f1_traduccion_refutada` bloquea el argumento de F1 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no

@@ -50,16 +50,16 @@ Cierre del **núcleo lógico** de Gödel II para el predicado de demostrabilidad
 estructural `provCodeC'`, con la cadena de Hilbert-Bernays-Löb:
 
 * **D1** — sobre `⊢` era `repr_pos'` (`Meta/Representability2.lean`), retirado (ADR‑115). Sobre
-  `Prf`: `repr_pos'_prf` (`Meta/Representability2Prf.lean`), con `[AnclaEq]`.
+  `Prf`: `repr_pos'_prf` (`Meta/Representability2Prf.lean`), con `[AnclaEq]` hasta ADR‑118.
 * **D2** — sobre `⊢` era `d2` (`Meta/DerivCond.lean`, módulo retirado, ADR‑115). Sobre `Prf`:
   `d2_prf` (`Meta/DerivCondPrf.lean`).
 * **D3** — sobre `⊢` era el teorema `d3` de este módulo, retirado (ADR‑115). 🏁 **TEOREMA desde el
-  2026‑09‑10g**, ya no postulado: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10, con `[AnclaEq]`) la
+  2026‑09‑10g**, ya no postulado: `d3_prf_real` (`Meta/PremsBdAllPrf.lean` §10; `[AnclaEq]`, hasta ADR‑118) la
   demuestra sobre `Prf`: Σ₁‑completitud provable por inducción objeto, con `pcc_eval_premsOf` (B1),
   el puente de la cota (B2) y el chasis interior (B3). ⇒ **ninguna de las tres es `axiom`**, y los
   `axiom` de Lean pasaron de **7 a 6** (cifra del 2026‑09‑10g; hoy 0 en RPP, ADR‑115). ⛔ Pero D1 y
-  D3 llevan `[AnclaEq]` en la firma, y `[AnclaEq]` daba `Prf ⊥` (F1, ADR‑114) hasta ADR‑117 (hoy la
-  ligadura la llena la instancia `instAnclaEq`, un teorema). Detalle:
+  D3 llevaban `[AnclaEq]` en la firma, que daba `Prf ⊥` (F1, ADR‑114) hasta ADR‑117; desde ADR‑118 no hay
+  ligadura: el ancla es el teorema `prf_ancla`. Detalle:
   `doc/REFERENCE-Incompleteness.md` §3.67.
   ⚠️ Este párrafo decía hasta el 2026‑09‑10 «postulado… la pieza pendiente más grande»: lo cazó la
   auditoría de `doc/book/AUDITORIA-2026-09-10.md` R3 — un docstring que contradecía a un

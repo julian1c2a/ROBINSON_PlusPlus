@@ -1,11 +1,19 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada (bloque nuevo, arriba); lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
+> # 🗓️ 2026‑10‑05 — 🗑️ **ADR‑118: la clase `AnclaEq` RETIRADA**
+>
+> Un commit mecánico: las 426 ligaduras `[AnclaEq]` fuera (423 del build y 3 del sondeo de F1), `AnclaEq.eq` →
+> `prf_ancla` en sus tres usos, y fuera la clase y su instancia. Los teoremas y sus footprints no cambian. Detalle en
+> ADR‑118. Lo que queda es la lista de abajo, sin su punto 1.
+>
+> 🗓️ *Lo que sigue es el bloque del 2026‑10‑04 por la tarde, como registro.*
+>
 > # 🗓️ 2026‑10‑04 (tarde) — 🏁 **ADR‑117: F1 REPARADO, el ancla es un TEOREMA**
 >
 > `axiomsCodeT` queda anclado por un axioma DIAGONAL (L2‑3): `axioms` = **142** = los 141 de la base
@@ -19,7 +27,7 @@
 >
 > ## ⬜ Lo que queda AHORA, en orden
 >
-> 1. ⬜ **Retirar la clase `AnclaEq`** y sus 423 ligaduras del build (43 ficheros), en un commit mecánico aparte:
+> 1. ✅ (2026‑10‑05, ADR‑118) **Retirar la clase `AnclaEq`** y sus 423 ligaduras del build (43 ficheros), en un commit mecánico aparte:
 >    `[AnclaEq]` fuera de las firmas, y `AnclaEq.eq` → `prf_ancla` en sus tres usos. ⚠️ Y el sondeo de F1
 >    (`sondeos/AnclaEqInconsistente.lean`) usa la clase en código vivo: tres ligaduras y su control «la instancia».
 > 2. ⬜ **El modelo de los 142** (A2–A5) ⇒ `ConsistentH` como teorema. El ancla es verdadera en ℕ si

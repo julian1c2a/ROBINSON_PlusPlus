@@ -15,7 +15,7 @@
 >
 > 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
 > último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
-> `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
+> la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
 > llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
 > `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
 >

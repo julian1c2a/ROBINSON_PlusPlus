@@ -15,7 +15,7 @@
 >
 > 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
 > último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
-> `AnclaEq` tiene instancia (`instAnclaEq`). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
+> la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
 > llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
 > `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
 >
@@ -398,14 +398,13 @@ Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** (bloque del 2026‑10�
 
 🏁 **F1 reparado.** `axiomsCodeT` lo ancla el último de los **142** axiomas objeto, el axioma DIAGONAL
 `ax_axiomsCodeT_def` (`Minimal/Axioms.lean`), y `axiomsCodeT =eq listFormCodeM axioms` es el TEOREMA `prf_ancla`
-(`Meta/Representability2Prf.lean`); la clase `AnclaEq` tiene instancia (`instAnclaEq`). Gödel I (`⊬G`) y Gödel II
+(`Meta/Representability2Prf.lean`); la clase `AnclaEq` se retiró (ADR‑118). Gödel I (`⊬G`) y Gödel II
 sobre `Prf` —`goedel_first_prf`, `goedel_second_prf (hcon : ConsistentH)`— ya no llevan `[AnclaEq]`, y su
 footprint es el de los tres de Lean: **F1 ya no los hace vacuos**. ⚠️ Siguen **CONDICIONALES**: `ConsistentH`
 sólo se cumple si los 142 son consistentes, y no hay modelo; `f1_traduccion_refutada` bloquea el argumento de F1
-(si la traducción conservara el ancla, ya habría `Prf ⊥`; no prueba la consistencia). D1 (`repr_pos'_prf`) y D3
-(`d3_prf_real`) conservan `[AnclaEq]`, que hoy
-descarga la instancia; D2 (`d2_prf`) no lo lleva. La mitad `⊬¬G` sigue sin existir en ningún cálculo. Lo que
-sigue, en orden: retirar la clase `AnclaEq` (un commit mecánico aparte) · el modelo de los 142 (⇒ `ConsistentH`) ·
+(si la traducción conservara el ancla, ya habría `Prf ⊥`; no prueba la consistencia). D1 (`repr_pos'_prf`), D2
+(`d2_prf`) y D3 (`d3_prf_real`) ya no llevan ninguna hipótesis de clase (ADR‑118). La mitad `⊬¬G` sigue sin existir
+en ningún cálculo. Lo que sigue, en orden: el modelo de los 142 (⇒ `ConsistentH`) ·
 `⊬¬G` por **Rosser** · D7 · y el horizonte declarado: Gentzen (ε₀) y Tarski.
 
 ### 🗄️ Registro del 2026‑10‑02 (ADR‑115; lo de F1, superado por ADR‑117)

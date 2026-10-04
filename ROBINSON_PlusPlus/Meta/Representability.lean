@@ -75,7 +75,7 @@ esquemas de sustitución Q1/Q2/Q3/Leibniz, vía los `*_concl_code` de StepArith)
 este módulo (`congr_vpf_checked`, `congr_concat2`, `concat_listFormCode`, `In_listFormCode`) eran de
 `⊢` y quedaron retirados con esa capa (`StepArith` también). Aquí quedan `listFormCode`, el puente
 `formCodeM = formCode` y el encoder `lineCode`/`proofCode`. En `Prf`, D1 es `repr_pos'_prf`, que
-lleva `[AnclaEq]`, y los auxiliares son `prf_concat_listFormCode` (ambos en
+usa el ancla `prf_ancla`, y los auxiliares son `prf_concat_listFormCode` (ambos en
 `Meta/Representability2Prf.lean`) y `prf_In_listFormCode` (`Meta/ReprPrf.lean`).
 -/
 
@@ -90,7 +90,7 @@ def listFormCode : List Formula → Term
 
 La codificación local de `Minimal` (`formCodeM`, con `numeralM`) coincide con la
 de `Meta/Provability` (`formCode`, con `Godel.numeral`); vía `numeralM_eq`. Permite
-relacionar `axiomsCodeT` (anclado por `[AnclaEq]` a `listFormCodeM axioms`) con la pertenencia
+relacionar `axiomsCodeT` (anclado por `prf_ancla` a `listFormCodeM axioms`) con la pertenencia
 sobre `formCode`: era `In_listFormCode`, sobre `⊢`, retirado (ADR‑115); en `Prf` es
 `prf_In_listFormCode`. -/
 

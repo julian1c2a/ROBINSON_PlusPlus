@@ -1627,7 +1627,7 @@ def axiomsBase : List Formula := coreAxioms ++ codingAxioms
 
 /-- ⭐ **EL ANCLA de `axiomsCodeT`** (L2‑3, ADR‑117): el axioma diagonal sobre `axiomsBase`. Es el
     ÚLTIMO de `axioms`, y con él `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
-    `Meta/Representability2Prf.lean`): la hipótesis `AnclaEq`, que daba `Prf ⊥` (F1), deja de serlo. -/
+    `Meta/Representability2Prf.lean`): la hipótesis `AnclaEq`, que daba `Prf ⊥` (F1), dejó de serlo (ADR‑118). -/
 def ax_axiomsCodeT_def : Formula := axD axiomsBase
 
 theorem ax_axiomsCodeT_def_lift (c : Nat) :

@@ -152,8 +152,8 @@ theorem ancla_de_diagonal (L : List Formula) (hax : Prf (axD L)) :
   exact prf_eq_trans h1
     (prf_eq_trans (prf_congr_concat_left (prf_congr_cons_head (prf_deltaD L))) (prf_cola_axD L))
 
-/-- 🏁 **EL ANCLA, TEOREMA** (ADR‑117). Hasta ahora era la hipótesis de clase `AnclaEq` (ADR‑026), que daba
-    `Prf ⊥` (F1, ADR‑114): ver la clase, más abajo, y su instancia. -/
+/-- 🏁 **EL ANCLA, TEOREMA** (ADR‑117). Hasta ese día era la hipótesis de clase `AnclaEq` (ADR‑026), que daba
+    `Prf ⊥` (F1, ADR‑114); la clase se RETIRÓ con ADR‑118, y quien la usaba llama a este teorema. -/
 theorem prf_ancla : Prf (axiomsCodeT =eq listFormCodeM axioms) := by
   rw [axioms_split]
   exact ancla_de_diagonal axiomsBase (prf_ax ax_axiomsCodeT_def_mem)
@@ -174,11 +174,11 @@ theorem f1_traduccion_refutada (a : Term)
 
 /-! ### Pertenencia de códigos de axioma a `axiomsCodeT`, en `Prf`
 
-⭐ **2026‑10‑04 · ADR‑117.** La clase de abajo tiene INSTANCIA (`instAnclaEq := ⟨prf_ancla⟩`, justo tras ella):
-el ancla es un teorema, por el axioma diagonal. Lo que sigue explica por qué fue una clase (ADR‑026) y por
-qué no podía ser un `axiom` de Lean; sigue siendo cierto. Lo que ya no vale: el argumento de F1 (ADR‑114), que
-era sobre la teoría de 141 axiomas, sin el ancla, y no se traslada a los 142. La clase se retira después, en un
-commit mecánico aparte (sus ligaduras: 423, en 43 ficheros, sin las tres de Gödel).
+⭐ **2026‑10‑04/05 · ADR‑117 y ADR‑118.** El ancla es un teorema (`prf_ancla`, arriba), por el axioma diagonal,
+y la clase `AnclaEq` que la llevaba como hipótesis se RETIRÓ (ADR‑118): sus 426 ligaduras, fuera —423 del build
+y 3 del sondeo de F1—, y sus tres usos de `AnclaEq.eq`, a `prf_ancla`. Lo que sigue es su historia: por qué
+fue una clase (ADR‑026) y por qué no podía ser un `axiom` de Lean, que sigue siendo cierto. Lo que ya no vale:
+el argumento de F1 (ADR‑114), que era sobre la teoría de 141 axiomas, sin el ancla, y no se traslada a los 142.
 
 **EL ANCLAJE DE CODIFICACIÓN — HIPÓTESIS CON NOMBRE, ya no `axiom`** ([ADR‑026](../../DECISIONS.md),
 2026‑09‑12; antes `axiom prf_axiomsCodeT_eq`).
@@ -192,7 +192,7 @@ el puente `Prf → ⊢` (también retirado) iba en una sola dirección.
 Un `axiom` de tipo `Prf …` **HABITA el inductivo `Prf`**, y por **M‑11** eso prohíbe demostrar nada
 sobre `Prf` por inducción. Pero el árbol lo hacía **tres veces** —`prf_to_derives` (retirado con
 ADR‑115), `prf_to_prfH` y `prf_to_derivation`— y D1 **se aplicaba al propio postulado** (hoy, a
-`AnclaEq.eq`) en `pcc_In_axiomsCodeT_tracked` (`Meta/InAxiomsCodePrf.lean`).
+`AnclaEq.eq` hasta ADR‑118; hoy, al teorema `prf_ancla`) en `pcc_In_axiomsCodeT_tracked` (`Meta/InAxiomsCodePrf.lean`).
 ⚠️ Y `#print axioms` **no lo detecta**: `prf_to_prfH` y `prf_to_derivation` tienen footprint limpio
 y eran injustificados. ✏️ Aquí se decía lo mismo de `prf_to_derives`, y era FALSO: su footprint
 llevaba `axiom` de la capa `⊢` —dos de RPP, retirados con ADR‑115, y uno de `FOL/MetaRules.lean`,
@@ -210,13 +210,6 @@ afectado y **ninguna llamada cambia**. El footprint sigue limpio.
 
 ⇒ `Prf` queda **sin ningún `axiom` habitándolo** y las inducciones sobre `Prf` pasan a ser
 **legítimas** (eran tres; quedan dos, `prf_to_prfH` y `prf_to_derivation`). -/
-class AnclaEq : Prop where
-  eq : Prf (axiomsCodeT =eq listFormCodeM axioms)
-
-/-- 🏁 **El ancla, INSTANCIA** (ADR‑117): `AnclaEq` deja de ser una hipótesis. Las ligaduras `[AnclaEq]` del
-    árbol (423, en 43 ficheros) la reciben por resolución de instancias, sin tocar una llamada; la clase
-    se retira después, en un commit mecánico aparte. -/
-instance instAnclaEq : AnclaEq := ⟨prf_ancla⟩
 
 /-- **Pertenencia POSITIVA en `Prf`** de un código de fórmula a `listFormCodeM L` (recursión
     estructural sobre `L`, sin materializar el término): cabeza = `prf_in_cons_head`, cola =
@@ -230,21 +223,21 @@ theorem prf_In_listFormCodeM_prf (φ : Formula) :
       · exact prf_in_cons_tail (formCodeM g) (prf_In_listFormCodeM_prf φ gs htail)
 
 /-- **`prf_inAxC` — ahora TEOREMA** (antes meta-axioma): la pertenencia del código de un axioma a
-    `axiomsCodeT`, derivada del anclaje `AnclaEq` + la pertenencia positiva a la lista
+    `axiomsCodeT`, derivada del ancla `prf_ancla` + la pertenencia positiva a la lista
     explícita (`prf_In_listFormCodeM_prf`) + Leibniz en el 2º argumento de `In` (`prf_eq_subst_in`). -/
-theorem prf_inAxC [AnclaEq] (a : Formula) (h : a ∈ axioms) : Prf (In (formCodeM a) axiomsCodeT) :=
-  prf_eq_subst_in (prf_eq_symm AnclaEq.eq) (prf_In_listFormCodeM_prf a axioms h)
+theorem prf_inAxC (a : Formula) (h : a ∈ axioms) : Prf (In (formCodeM a) axiomsCodeT) :=
+  prf_eq_subst_in (prf_eq_symm prf_ancla) (prf_In_listFormCodeM_prf a axioms h)
 
 /-- Pertenencia del código de un axioma a `axiomsCodeT` en `Prf` (vía `prf_inAxC`
     + puente `formCodeM_eq`). Reusado en el caso `thy`. -/
-private theorem prf_inAxiomsCodeT [AnclaEq] {f : Formula} (hmem : f ∈ axioms) :
+private theorem prf_inAxiomsCodeT {f : Formula} (hmem : f ∈ axioms) :
     Prf (In (formCode f) axiomsCodeT) := by
   have h0 : Prf (In (formCodeM f) axiomsCodeT) := prf_inAxC f hmem
   rwa [formCodeM_eq] at h0
 
 /-! ### chainOk-tracking en `Prf` (validez de la cadena) -/
 
-theorem prf_chainOk_track [AnclaEq] (rs : List Rule) :
+theorem prf_chainOk_track (rs : List Rule) :
     ∀ (acc L : List Formula), checkAux rs acc = some L →
     Prf (chainOk (listFormCode acc) (proofCode' rs acc)) := by
   induction rs with
@@ -461,7 +454,7 @@ theorem provCodeC'_intro_prf (φ : Formula) (p : Term)
 /-- **`repr_pos'_prf` (D1 real, finitario)**: toda demostración de Hilbert `Prf φ`
     se internaliza como `Prf (provCodeC' φ)`. Necesitación internalizada al nivel del
     cálculo finitario `Prf` (cimiento de la cadena HBL hacia Gödel II real). -/
-theorem repr_pos'_prf [AnclaEq] {φ : Formula} (h : Prf φ) : Prf (provCodeC' φ) := by
+theorem repr_pos'_prf {φ : Formula} (h : Prf φ) : Prf (provCodeC' φ) := by
   obtain ⟨rs, L, hchk, hmem⟩ := prf_iff_derivation.mp h
   have hchk' : checkAux rs [] = some L := by simpa [checkProof] using hchk
   exact provCodeC'_intro_prf φ (proofCode' rs [])
@@ -470,7 +463,6 @@ theorem repr_pos'_prf [AnclaEq] {φ : Formula} (h : Prf φ) : Prf (provCodeC' φ
 end ROBINSON_PlusPlus.Meta.Representability2Prf
 
 export ROBINSON_PlusPlus.Meta.Representability2Prf (
-  AnclaEq
   prf_diag_numeral
   prf_deltaD
   prf_cola_axD

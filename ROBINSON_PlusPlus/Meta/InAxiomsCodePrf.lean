@@ -77,7 +77,7 @@ por recursión sobre `L` (lista de axiomas ABSTRACTA — sin materializar el té
   - cola: **recursión** sobre `fs` + extensión de cola rastreada (reflejo de `ax_L2_in_cons` a
     códigos vía `pcc_thm_inst`).
 Luego el **puente `axiomsCodeT ↔ listFormCodeM axioms`** ocurre DENTRO de `Prov` (Leibniz reflejada
-del anclaje `AnclaEq.eq`; aquí se citaba el `axiom` `ax_axiomsCodeT_eq`, su gemelo sobre `⊢`,
+del ancla `prf_ancla` —`AnclaEq.eq` hasta ADR‑118—; aquí se citaba el `axiom` `ax_axiomsCodeT_eq`, su gemelo sobre `⊢`,
 retirado con ADR‑115), y la **evaluación de `carc t`** (`pcc_eval_carc` + `lineWF t` da la
 estructura `cons`) conecta `carcT (tcFn t)` con el `yc` de la recursión.
 
@@ -91,8 +91,8 @@ ya establecida `prf_inAxiomsCodeT`. Es la pieza que cada disyunto cabeza de la r
 /-- **Pertenencia CONCRETA reflejada en `Prov`** (payload del caso cabeza de la recursión):
     para un axioma `f`, `Prov(⌜In ⌜f⌝ axiomsCodeT⌝)` es demostrable **libre de muro** — la
     pertenencia `In (formCode f) axiomsCodeT` es un `Prf` (`prf_inAxiomsCodeT` vía `prf_inAxC`,
-    un teorema con `[AnclaEq]` —no un meta‑axioma, como decía este docstring—) y D1 (`repr_pos'_prf`) la internaliza. -/
-theorem pcc_inAxiomsCodeT_concrete [AnclaEq] {f : Formula} (hmem : f ∈ axioms) :
+    un teorema, por `prf_ancla` —no un meta‑axioma, como decía este docstring—) y D1 (`repr_pos'_prf`) la internaliza. -/
+theorem pcc_inAxiomsCodeT_concrete {f : Formula} (hmem : f ∈ axioms) :
     Prf (provCodeC' (In (formCode f) axiomsCodeT)) := by
   have h0 : Prf (In (formCodeM f) axiomsCodeT) := prf_inAxC f hmem
   rw [formCodeM_eq] at h0
@@ -170,7 +170,7 @@ declaración era el `export`. Otra vez exportada por EXISTENCIA, no por consumo 
     (`termCode`). El transporte entre ambos ya no existe a nivel de código, así que se hace en dos
     tramos: (2) a la forma NUMERAL, que sí sobrevive (`prf_tc_form_numeral`), y (3) de ahí a la forma
     `formCode` **dentro de `Prov`**, con el convertidor de frontera `pcc_to_formCode`. -/
-theorem pcc_tc_formCode_internal [AnclaEq] (f : Formula) :
+theorem pcc_tc_formCode_internal (f : Formula) :
     Prf (provFromCode (eqCodeFn (tcFn (formCode f)) (termCode (formCode f)))) := by
   have h0 : Prf (provFromCode (eqCodeFn (tcFn (formCode f)) (tcFn (formCode f)))) :=
     prf_provFromCode_eqCodeFn_refl _
@@ -190,7 +190,7 @@ Reflejo del teorema object `∀ x. In x t ⇒ In x (cons a t)` (vía `pcc_thm_in
 código‑testigo `yc`), con el hueco `⌜v₀⌝` recibiendo `yc`. -/
 
 /-- **Cola rastreada**: `Prov(⌜In yc t̃⌝) ⇒ Prov(⌜In yc (cons a t)~⌝)`, con `yc` código arbitrario. -/
-theorem pcc_in_tail_tracked [AnclaEq] (yc a t : Term)
+theorem pcc_in_tail_tracked (yc a t : Term)
     (hwyc : Prf (hasWit (liftTerm 0 yc)))
     (ht : ∀ W, Prf (substtc zero W (termCode t) =eq termCode t))
     (hat : ∀ W, Prf (substtc zero W (termCode (cons a t)) =eq termCode (cons a t))) :
@@ -218,7 +218,7 @@ códigos RASTREADOS (`tcFn`), no aparece `termCode y` para `y` abstracto — no 
 
 /-- **Cabeza rastreada**: bajo `y =eq a` (con `a` código, `tcFn a = termCode a`) y el puente
     `Prov(yc = tcFn y)`, la pertenencia `Prov(⌜In yc (cons a t)~⌝)` es demostrable. -/
-theorem pcc_in_head_swap [AnclaEq] {Γ : List Formula} (yc y a t : Term)
+theorem pcc_in_head_swap {Γ : List Formula} (yc y a t : Term)
     (hwyc : Prf (hasWit yc))
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
     (haform : Prf (provFromCode (eqCodeFn (tcFn a) (termCode a))))
@@ -265,7 +265,7 @@ recursión + `pcc_in_tail_tracked`. -/
 /-- **Reflexión RASTREADA de la pertenencia a `listFormCodeM L`** (recursión sobre `L`): con `yc`
     código `substtc`‑invariante y el puente `Prov(yc = tcFn y)`, de `In y (listFormCodeM L)` sale
     `Prov(⌜In yc (listFormCodeM L)~⌝)`. Núcleo de la Σ₁‑completitud de pertenencia a axiomas. -/
-theorem pcc_In_lfc_tracked [AnclaEq] (yc y : Term)
+theorem pcc_In_lfc_tracked (yc y : Term)
     (hwyc : Prf (hasWit yc)) (hwycL : Prf (hasWit (liftTerm 0 yc)))
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
     (hbr : Prf (provFromCode (eqCodeFn yc (tcFn y)))) :
@@ -297,15 +297,15 @@ theorem pcc_In_lfc_tracked [AnclaEq] (yc y : Term)
 
 /-! ### Puente `axiomsCodeT ↔ listFormCodeM axioms` + reflexión rastreada sobre `axiomsCodeT`
 
-`axiomsCodeT` es opaco; se ancla a `listFormCodeM axioms` por `AnclaEq` (hipótesis hasta ADR‑117; hoy, el teorema `prf_ancla`). El puente se
+`axiomsCodeT` es opaco; se ancla a `listFormCodeM axioms` por el teorema `prf_ancla` (hasta ADR‑117, la hipótesis `AnclaEq`). El puente se
 aplica en los DOS lados: la hipótesis object (`In y axiomsCodeT → In y (listFormCodeM axioms)`,
 Leibniz object) y el código dentro de `Prov` (swap del 2º argumento del átomo `In`, Leibniz
 reflejada del anclaje). -/
 
 /-- **Reflexión RASTREADA de la pertenencia a `axiomsCodeT`**: con `yc` `substtc`‑invariante y el
     puente `Prov(yc = tcFn y)`, de `In y axiomsCodeT` sale `Prov(⌜In yc axiomsCodeT~⌝)`. Compone la
-    recursión `pcc_In_lfc_tracked` con el anclaje `AnclaEq.eq` en ambos lados. -/
-theorem pcc_In_axiomsCodeT_tracked [AnclaEq] (yc y : Term)
+    recursión `pcc_In_lfc_tracked` con el ancla `prf_ancla` en ambos lados. -/
+theorem pcc_In_axiomsCodeT_tracked (yc y : Term)
     (hwyc : Prf (hasWit yc)) (hwycL : Prf (hasWit (liftTerm 0 yc)))
     (hycinv : ∀ W, Prf (substtc zero W yc =eq yc))
     (hbr : Prf (provFromCode (eqCodeFn yc (tcFn y)))) :
@@ -313,7 +313,7 @@ theorem pcc_In_axiomsCodeT_tracked [AnclaEq] (yc y : Term)
   refine prf_deduction ?_
   -- lado OBJECT: In y axiomsCodeT → In y (listFormCodeM axioms)
   have hlist : PrfH [In y axiomsCodeT] (In y (listFormCodeM axioms)) :=
-    PrfH_eq_subst_in (prf_to_prfH AnclaEq.eq _) (prfH_hyp_self _)
+    PrfH_eq_subst_in (prf_to_prfH prf_ancla _) (prfH_hyp_self _)
   -- recursión
   have hrec : PrfH [In y axiomsCodeT]
       (provFromCode (inFormCodeFn yc (termCode (listFormCodeM axioms)))) :=
@@ -322,7 +322,7 @@ theorem pcc_In_axiomsCodeT_tracked [AnclaEq] (yc y : Term)
   let Ac : Term := inFormCodeFn yc (varc (numeral 0))
   have heq : PrfH [In y axiomsCodeT]
       (provFromCode (eqc (termCode (listFormCodeM axioms)) (termCode axiomsCodeT))) :=
-    prf_to_prfH (repr_pos'_prf (prf_eq_symm AnclaEq.eq)) _
+    prf_to_prfH (repr_pos'_prf (prf_eq_symm prf_ancla)) _
   have h1 : PrfH [In y axiomsCodeT]
       (provFromCode (substfc zero (termCode (listFormCodeM axioms)) Ac)) :=
     PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (prf_eq_symm
