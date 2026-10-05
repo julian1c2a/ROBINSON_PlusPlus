@@ -1,6 +1,10 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑04 · `master` · **117 jobs · 104 módulos · 0 sorry · 0 `axiom` de Lean**
+> ## ESTADO REAL — 2026‑10‑05 · `master` · **123 jobs · 109 módulos · 0 sorry · 0 `axiom` de Lean**
+>
+> 🏁🏁 **Desde ADR‑120, SIN HIPÓTESIS**: `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
+> (`Meta/Consistencia.lean`) son Gödel I y II con `ConsistentH` DESCARGADA en el build por `consistencia` —un
+> modelo de los 142 y la solidez de `Prf`—. Lo de abajo es el estado de ADR‑117, como registro.
 >
 > 🏁 **En una línea**: Gödel I (`⊬G`) y Gödel II están **derivados** sobre `Prf`, su footprint son sólo los
 > tres de Lean, y su ÚNICA hipótesis es `ConsistentH` ([ADR‑117](DECISIONS.md): el ancla es el teorema
@@ -9,7 +13,7 @@
 > llevaban además la clase `[AnclaEq]`, que daba `Prf ⊥` —F1, [ADR‑114](DECISIONS.md)—: eran VACUOS.)*
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
+**Last updated:** 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
 `[AnclaEq]`: su única hipótesis es `ConsistentH` (banner, §1, §4–§6); D1 y D3 sí la llevan, rellenada por la
 instancia (§3). Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)) y con ella
 toda la mitad `⊬¬G` que vivía allí; F1 está compilado (`[AnclaEq]` ⇒ `Prf ⊥`), y **D1 y D3 también
@@ -44,18 +48,18 @@ un fallo.
 
 | teorema | hipótesis | ¿quién la descarga? |
 |---|---|---|
-| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 desde el 2026‑10‑05 (ADR‑119) la descarga `consistentH`, en el SONDEO `sondeos/ModeloNat.lean` (un modelo de los 142); en el build, ⬜ nadie hasta su promoción. Es la hipótesis **mínima** (`¬ Prf ⊥`) |
+| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁🏁 desde el 2026‑10‑05 (ADR‑120) la descarga **`consistencia`** (`Meta/Consistencia.lean`), **en el build**: un modelo de los 142 (`MN_axioms`) y la solidez de `Prf` (`prf_sound`); el corolario sin hipótesis es `goedel_I` (ADR‑119 la probó antes en el sondeo `sondeos/ModeloNat.lean`). Es la hipótesis **mínima** (`¬ Prf ⊥`) |
 | | ~~`[AnclaEq]`~~ | 🏁 **fuera de la firma desde ADR‑117** (2026‑10‑04): el ancla es el teorema `prf_ancla` (§4). Hasta ese día, ⛔⛔ **NADIE, y NO PODÍA**: `AnclaEq` ⇒ `Prf ⊥` sobre los 141 (`sondeos/AnclaEqInconsistente.lean`, hoy REGISTRO: `anclaEq_prf_bot`, y `hipotesis_goedel_insatisfacibles` — `[AnclaEq]` y `ConsistentH` **no valían a la vez**) |
 | | *(el punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
-| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ ídem |
+| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁🏁 ídem, `consistencia`; el corolario sin hipótesis es `goedel_II` (ADR‑120) |
 | | ~~`[AnclaEq]`~~ | 🏁 ídem: fuera de la firma desde ADR‑117 |
 | | *(punto fijo · necesitación · `Con' ⇒ G`)* | ✅ `prf_godelCN_fixedpoint` · `repr_pos'_prf` (D1) · `prf_con_imp_godel`, sobre `d2_prf` (D2) y `d3_prf_real` (D3) — D1 y D3 llevan todavía la ligadura `[AnclaEq]`, que rellena la instancia `instAnclaEq` (ADR‑117, §3); `prf_con_imp_godel`, ya no |
 
 **Footprint** (medido, `check-footprints.bash`): `goedel_first_prf`, `goedel_second_prf`,
 `prf_godelCN_fixedpoint`, `d3_prf_real`, `prf_ancla` y `f1_traduccion_refutada` → `[propext, Classical.choice,
 Quot.sound]`. ⇒ **ningún axioma del proyecto**, y hasta ADR‑117, aun así, **vacuos**: lo que fallaba era la
-hipótesis de clase, que el footprint no ve. 🔑 *Un footprint limpio no dice que el teorema diga algo* — y hoy
-tampoco dice que `ConsistentH` se cumpla.
+hipótesis de clase, que el footprint no ve. 🔑 *Un footprint limpio no dice que el teorema diga algo* — y
+tampoco dice que `ConsistentH` se cumpla (✏️ desde ADR‑120 lo dice otro teorema: `consistencia`, un modelo de los 142).
 
 ---
 
@@ -94,7 +98,7 @@ y las demás del árbol (426), se retiraron con la clase el 2026‑10‑05 ([ADR
 
 | hipótesis | definición | qué es de verdad |
 |---|---|---|
-| **`ConsistentH`** | `¬ Prf ⊥` | la de los dos teoremas, y desde ADR‑117 la ÚNICA: consistencia del cálculo **finitario** sobre los 142 axiomas, la **mínima honesta**. Nada la prueba todavía (A4: solidez de `Prf` por inducción sobre `Prf`; A5: con un modelo de los 142) |
+| **`ConsistentH`** | `¬ Prf ⊥` | la de los dos teoremas, y desde ADR‑117 la ÚNICA: consistencia del cálculo **finitario** sobre los 142 axiomas, la **mínima honesta**. 🏁🏁 **TEOREMA desde ADR‑120** (2026‑10‑05): `consistencia` (`Meta/Consistencia.lean`), por A4 (`prf_sound`, `Meta/SolidezPrf.lean`) y A5 (el modelo `MNV V₀` de los 142, `MN_axioms`) |
 | **`[AnclaEq]`** | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **Ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 142 (`prf_deltaD`: su δ es el código del propio axioma); la clase, con su instancia, se retiró el 2026‑10‑05 (ADR‑118). Control: `f1_traduccion_refutada` —si la traducción de F1 conservara el ancla —si su imagen fuera teorema—, ya habría `Prf ⊥`: el argumento de F1 no da `⊥` sin partir de él; no prueba la consistencia—. Hasta ese día era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) y no tenía instancia; y hasta ADR‑026 (2026‑09‑12) fue el `axiom prf_axiomsCodeT_eq`, que ese ADR movió del footprint a la FIRMA sin quitar el supuesto |
 
 🗑️ **Retiradas con la capa `⊢`** (ADR‑115): `ConsistentOmega` (`¬ (axioms ⊢ ⊥)`), `OmegaConsistent`,

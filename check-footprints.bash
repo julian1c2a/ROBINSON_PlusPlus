@@ -256,6 +256,11 @@ TheoryFramework.Instances.fol0Complete|Classical.choice,Quot.sound,propext
 TheoryFramework.Instances.fol0_proves_iff_models|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.axiomsCodeT|-
 derives0_to_derives|propext

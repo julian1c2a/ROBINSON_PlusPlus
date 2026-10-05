@@ -121,7 +121,7 @@ Los meta‑axiomas de arriba se retiraron en F7a: la aritmetización (`Dem`, `Me
 representabilidad y el punto fijo viven hoy como teoremas sobre `Prf` en el Nivel D
 ([Incompletitud](REFERENCE-Incompleteness.md)), donde Gödel I/II son `goedel_first_prf`/
 `goedel_second_prf` — ⛔ vacuos por `[AnclaEq]` (F1, ADR‑114) hasta ADR‑117 (2026‑10‑04); hoy su única
-hipótesis es `ConsistentH` (el ancla es el teorema `prf_ancla`), y siguen condicionales: no hay modelo de los 142.
+hipótesis es `ConsistentH` (el ancla es el teorema `prf_ancla`); ✏️ desde ADR‑120 (2026‑10‑05) la descarga `consistencia`, un modelo de los 142, y `goedel_I`/`goedel_II` van sin hipótesis.
 
 ---
 

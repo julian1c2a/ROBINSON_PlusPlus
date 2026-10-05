@@ -48,7 +48,7 @@ cierto para el segundo: el footprint de `prf_to_derives` llevaba además los `ax
 sólo le añade lemas limpios; el del primero no se midió). Y las meta‑reglas de `⊢` son refutables
 (`sondeos/MetaReglasRefutables.lean`). Con la capa `⊢` retirada, `Prf` **ya no tiene puente a `⊢`**; sí
 a sus auxiliares de RPP —`PrfH` (`prf_to_prfH`, deducción finitaria) y las secuencias del verificador
-(`prf_to_derivation`)—, que la cadena de Gödel usa. Su solidez es inducción sobre `Prf` (frente A4).
+(`prf_to_derivation`)—, que la cadena de Gödel usa. Su solidez es inducción sobre `Prf`: `prf_sound` (`Meta/SolidezPrf.lean`, ADR‑120).
 -/
 
 /-! ### Identidad De Bruijn auxiliar (cancelación a mismo nivel) -/
@@ -144,8 +144,8 @@ def listInductionFormula (Φ : Formula) : Formula :=
 /-- **Cálculo de Hilbert clásico**: la capa intuicionista (`incl`), el esquema **DNE** (`p3`), la
     **inducción** (`ind`, el esquema `Full.inductionFormula` para toda fórmula), el
     **confinamiento** ∀ (`qconf`) y la **inducción de listas** (`listInd`), cerrado bajo MP y GEN.
-    Es r.e. (Fase 1). ⚠️ Su **solidez para ℕ NO está demostrada** (frente A4): depende del modelo
-    de los 142 axiomas de `axioms` (141 y el ancla, ADR‑117), pendiente (ADR‑115 §7). (Hasta el 2026‑10‑02
+    Es r.e. (Fase 1). 🏁 Su **solidez para ℕ está demostrada** desde ADR‑120 (`prf_sound`, `Meta/SolidezPrf.lean`), con el modelo
+    de los 142 axiomas de `axioms` (141 y el ancla, ADR‑117) de `Meta/ModeloCodificacion.lean`; hasta ese día, pendiente. (Hasta el 2026‑10‑02
     decía «coherente con el `dne` y la inducción del proyecto» —los de la capa `⊢`, retirada con ADR‑115— y daba
     «sólido para ℕ» por hecho.) -/
 inductive Prf : Formula → Prop where

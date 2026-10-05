@@ -1,5 +1,15 @@
 # Current Project Status — ROBINSON_PlusPlus
 
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+>
+> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
+> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
+> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
+> (`Meta/Consistencia.lean`), con footprint los tres de Lean. ⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS
+> en el modelo, ni `⊬¬G` (irá por Rosser, ⬜).
+>
+> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
+
 > ### 🏁 2026‑10‑04 · F1 reparado ([ADR‑117](DECISIONS.md)) — el ancla es un TEOREMA, y lo que eso NO dice
 >
 > `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre

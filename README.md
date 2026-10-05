@@ -1,5 +1,15 @@
 # ROBINSON_PlusPlus
 
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+>
+> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
+> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
+> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
+> (`Meta/Consistencia.lean`), con footprint los tres de Lean. ⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS
+> en el modelo, ni `⊬¬G` (irá por Rosser, ⬜).
+>
+> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
+
 > ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md))
 >
 > `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre
@@ -35,9 +45,9 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> **Build 123 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -109,7 +119,7 @@ base o se declara pendiente con nombre y firma**.
 
   🏁 **Desde ADR‑117 (2026‑10‑04), una sola hipótesis, la mínima**: `ConsistentH := ¬ Prf ⊥`. Hasta ese día eran
   **dos**, con la clase `[AnclaEq]`, y **no podían valer a la vez** (F1, abajo). ⚠️ Siguen siendo **CONDICIONALES**:
-  `ConsistentH` sólo vale si los 142 axiomas son consistentes, y no hay modelo. **Ninguna hipótesis suelta**: el
+  `ConsistentH` sólo vale si los 142 axiomas son consistentes (✏️ desde ADR‑120 lo es: `consistencia`, un modelo de los 142, y `goedel_I`/`goedel_II` van sin hipótesis). **Ninguna hipótesis suelta**: el
   punto fijo y la necesitación se descargan ahí.
   ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**, y el footprint de los dos teoremas es
   **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del

@@ -1,11 +1,29 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
 ## ▶ PUNTO DE REANUDACIÓN (leer PRIMERO)
 
+> # 🗓️ 2026‑10‑05 — 🏁🏁 **ADR‑120: `ConsistentH` es un TEOREMA del build — Gödel I y II SIN HIPÓTESIS**
+>
+> El modelo de los 142 (ADR‑119) está en el build, en cinco módulos de `Meta/`: `consistencia : ConsistentH`,
+> `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'` (`Meta/Consistencia.lean`), con footprint
+> los tres de Lean. Detalle en ADR‑120.
+>
+> ## ⬜ Lo que queda AHORA, en orden
+>
+> 1. ⬜ **`⊬¬G` por Rosser** (la medición del 2026‑10‑05: W1 —la solidez ancha del verificador— y la
+>    representabilidad negativa numeral a numeral; ⊬¬`godelCN` saldría antes por solidez Σ₁: modelo + W1).
+> 2. ⬜ **Tarski** (medido: ~70 líneas sobre `Prf`, sin el ancla; con el modelo, también el semántico en ℕ), y la
+>    ampliación del censo «evaluar el ancla» de `check-sorry` a `selfAppN`/`godelCN` que esa medición pidió.
+> 3. ⬜ **E10**: que `G` y `Con` sean verdaderas en `MNV V₀`.
+> 4. ⬜ El control negativo apartado en ADR‑119 (el modelo REFUTA `ax_tc_cons`), con otra forma.
+> 5. ⬜ **D7** (`String` → `List Char` en FOL), en su momento: obligará a tocar el despacho por `String` del modelo.
+>
+> 🗓️ *Lo que sigue es el bloque de ADR‑119, como registro.*
+>
 > # 🗓️ 2026‑10‑05 — 🏁 **ADR‑119: el MODELO de los 142 — `ConsistentH` DEMOSTRADA (en un sondeo)**
 >
 > `sondeos/ModeloNat.lean` construye `MNV V₀`, un modelo de los 142 axiomas, y con la solidez de `Prf` prueba
@@ -15,7 +33,7 @@
 >
 > ## ⬜ Lo que queda AHORA, en orden
 >
-> 1. ⬜ **Promover el modelo al build**: los titulares (`goedel_first_prf`, `goedel_second_prf`) dejan de ser
+> 1. ✅ (2026‑10‑05, ADR‑120) **Promover el modelo al build**: los titulares (`goedel_first_prf`, `goedel_second_prf`) dejan de ser
 >    condicionales sólo cuando `ConsistentH` sea un teorema DEL BUILD, con su fila de footprint y la columna de
 >    solidez de `check-estratos`. Partir el fichero en módulos (hoy, 5,5 GB de pico en uno solo).
 > 2. ⬜ El control negativo apartado (el modelo REFUTA `ax_tc_cons`), con otra forma.

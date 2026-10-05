@@ -13,7 +13,7 @@ Public API:
     `goedel_second_prf (hcon : ConsistentH)` (Meta/GodelTwoPrf.lean).
     🏁 Desde ADR‑117, con `ConsistentH` como ÚNICA hipótesis: el ancla de `axiomsCodeT` es un teorema
     (`prf_ancla`; la clase `AnclaEq`, retirada con ADR‑118). Hasta ese día eran VACUOS: `[AnclaEq]` daba `Prf ⊥` (F1,
-    ADR‑114). ⚠️ La consistencia de los 142 axiomas no está probada (no hay modelo).
+    ADR‑114). 🏁 La consistencia de los 142 está probada desde ADR‑120 (`consistencia`, un modelo de los 142).
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -126,6 +126,11 @@ import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 import ROBINSON_PlusPlus.Meta.VerifierSound
 import ROBINSON_PlusPlus.Meta.ChainNegPrf
 import ROBINSON_PlusPlus.Meta.GodelTwoPrf
+import ROBINSON_PlusPlus.Meta.ModeloCodigo
+import ROBINSON_PlusPlus.Meta.ModeloEstandar
+import ROBINSON_PlusPlus.Meta.ModeloCodificacion
+import ROBINSON_PlusPlus.Meta.SolidezPrf
+import ROBINSON_PlusPlus.Meta.Consistencia
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived

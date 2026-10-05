@@ -1,5 +1,15 @@
 # Technical Reference — ROBINSON_PlusPlus
 
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+>
+> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
+> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
+> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
+> (`Meta/Consistencia.lean`), con footprint los tres de Lean. ⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS
+> en el modelo, ni `⊬¬G` (irá por Rosser, ⬜).
+>
+> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
+
 > ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md)) · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md))
 >
 > RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
@@ -26,9 +36,9 @@
 > cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; la hipótesis mínima volvió con ADR‑117, el
 > 2026‑10‑04, ya sin ningún axioma del proyecto en el footprint), y `⊢` ya no está en RPP. Se conserva:
 >
-> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> **Build 123 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
+> **109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 85 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 32 de 85, [ADR‑117](DECISIONS.md) §3).
 > **0 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **142 axiomas objeto** en `axioms` (los 141 de `axiomsBase`
 > y el ancla diagonal, ADR‑117).
@@ -86,8 +96,8 @@
 |---|---|---:|---:|---|---|---|
 | **`Derives`** (`⊢`) | `../FOL/FOL/FOL.lean` | 22 | ✅ **0** desde el 2026‑10‑02. Los cuatro de FOL (`imp_intro`, `raa`, `or_elim`, `ex_elim`) se borraron con `FOL/MetaRules.lean` porque eran refutables (`FOL/Inconsistencia.lean` §3); los tres de RPP (`ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`) quedaron retirados con la capa ([ADR‑115](DECISIONS.md)) | ✅ **sí** (antes, con los siete, ⛔ prohibida por [ADR‑029](DECISIONS.md)) | ✅ `derives_soundness` — **en el build** (`FOL/Inconsistencia.lean` §1: se traduce a `Derives₀` con `derives_to_derives0`) | 🗑️ **RETIRADA como capa de trabajo de RPP** (ADR‑115): RPP no la usa. Con las meta‑reglas era refutable |
 | **`Derives₀`** (`⊢₀`) | `../FOL/FOL/Derives0.lean` | 21 | ✅ **0** | ✅ **sí** | ✅ `derives0_soundness` — **en el build** | **SUJETO de FOL⁼**: solidez, consistencia, renombrado, eigenvariable, Henkin |
-| **`Prf`** | `Meta/Hilbert.lean` | 7 | ✅ **0** desde [ADR‑026](DECISIONS.md) | ✅ **sí** | ⬜ no enunciada | **SUJETO de Gödel I y II** (`goedel_first_prf`, `goedel_second_prf`) |
-| **`Prfᵢ`** | `Meta/Hilbert.lean` | 17 | ✅ **0** | ✅ **sí** | ✅ `prfI_soundness` ⚠️ **FUERA del build** (`sondeos/AnclaSoundness.lean`) | **ANCLA SEMÁNTICA**: la primera medición semántica del proyecto |
+| **`Prf`** | `Meta/Hilbert.lean` | 7 | ✅ **0** desde [ADR‑026](DECISIONS.md) | ✅ **sí** | ✅ `prf_sound` — **en el build** (`Meta/SolidezPrf.lean`, ADR‑120), en todo modelo ESTÁNDAR | **SUJETO de Gödel I y II** (`goedel_first_prf`, `goedel_second_prf`; sin hipótesis, `goedel_I`/`goedel_II`) |
+| **`Prfᵢ`** | `Meta/Hilbert.lean` | 17 | ✅ **0** | ✅ **sí** | ✅ `prfI_sound` — **en el build** (`Meta/SolidezPrf.lean`, ADR‑120); antes, `prfI_soundness`, FUERA (`sondeos/AnclaSoundness.lean`) | **ANCLA SEMÁNTICA**: la primera medición semántica del proyecto |
 | **`PrfH`** | `Meta/HilbertDeduction.lean` | 8 | ✅ **0** | ✅ **sí** | ⬜ no enunciada | **deducción interna** (`PrfH_mono`, `PrfH_w1`) |
 
 ### ⚠️ Cómo se lee esta tabla, y por qué la columna que decide es la tercera
@@ -190,7 +200,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**104 módulos activos** (Minimal 1 + Meta 100 + Full 3) + barrel `Meta.lean` + raíz
+**109 módulos activos** (Minimal 1 + Meta 105 + Full 3) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **85 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -282,6 +292,11 @@ Detalle en el nodo §3.15–§3.32.
 | 84o | ~~**`OmegaStrength`**~~ | 🗑️ **RETIRADO el 2026‑10‑02 con la capa `⊢`** ([ADR‑115](DECISIONS.md)); registro: 🆕 ⛔⛔ **LA FUERZA DE `axioms ⊢`, MEDIDA** (2026‑09‑11, auditoría F‑1). `derives_completo (A) : (axioms ⊢ A) ∨ (axioms ⊢ ¬A)` — **el cálculo ω es SINTÁCTICAMENTE COMPLETO**, y sin hipótesis. La causa **no es aritmética**: `raa` toma como premisa una **función de Lean**, así que si `axioms ⊬ A` la función existe **vacuamente** y el cálculo **refuta** `A`. ⇒ **`axioms ⊢` no es una relación de derivabilidad de primer orden**: es una noción metateórica de verdad. ⚠️ **Consecuencia**: `goedel_second'` **no es** el Segundo Teorema —la incompletitud habla de teorías que **no deciden** algo—, y su `hgi` no dice «`G` es indemostrable» sino «el cálculo **refuta** `G`». ⚠️ Y corrige a `FOL/MetaRules.lean`: **`gen` NO es la ω‑regla** (su premisa recorre **todo `Term`**, no los numerales ⇒ es **más débil**); la fuerza viene de `raa`/`imp_intro`. ✅ **Gödel I no está afectado**: concluye sobre `Prf` |
 | 84p | **`GodelTwoPrf`** | 🏁 **HOY (2026‑10‑04, ADR‑117)**: `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)`, footprint los tres de Lean y sin `[AnclaEq]`: el ancla es el teorema `prf_ancla`, y F1 ya no los hace vacuos. ⚠️ Siguen condicionales: no hay modelo de los 142. Hasta ADR‑117 llevaban `[AnclaEq]`, que daba `Prf ⊥` (F1, ADR‑114), y eran **VACUOS**. El footprint con `prf_axiomsCodeT_eq` de abajo es de antes de ADR‑026. Registro: 🆕 🏁🏁 **GÖDEL II SOBRE EL CÁLCULO FINITARIO** (2026‑09‑11): **`goedel_first_prf`/`goedel_second_prf`, los dos con `ConsistentH := ¬ Prf ⊥`** — la hipótesis **MÍNIMA**, **ninguna suelta**, y ⭐⭐ footprint **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`**: **un solo axioma del proyecto** (P‑4, 2026‑09‑11 — las ω‑reglas y los dos esquemas de inducción entraban **por la hipótesis vieja**). §1 la lógica proposicional que faltaba (`prf_subst_eq_iff` directo del axioma `Prfᵢ.leibniz`, `prf_iff_trans`, `prf_neg_congr_iff`); §2 ⭐ **`prf_godelCN_fixedpoint`, NET‑0 PURO** — el punto fijo sobre `Prf` no usa **ningún** axioma del proyecto—, puerto directo de `diag_arith_num` con el espejo `Prf` que ya existía; §3 `Con' ⇒ G` con `prf_deduction`/`deduction_aux` en lugar del meta‑axioma `imp_intro`, sobre **D2** (`d2_prf`) y **D3** (`d3_prf_real`); §4 el ensamblaje, con **D1** (`repr_pos'_prf`) descargando la necesitación. ⇒ **la cadena D1/D2/D3 no sólo está demostrada: está ENSAMBLADA** |
 | 84q | **`ChainNegPrf`** | 🗑️ **2026‑10‑02 (ADR‑115)**: lo que cerraba `NegVerifier` sobre `⊢` (`derives_chainOk_neg_of_line`, `deuda_inNeg`, `negVerifier_proved`…) quedó retirado; siguen **109** declaraciones sobre `Prf` y META (`decodeRuleTag_*`, `prf_lenc_*`, `stdArgs_*`…), la base para Rosser. Registro: 🆕 🏁 **MÓDULOS C/D: `DEUDA_inNeg` SALDADA y el puente de `DEUDA_chainNeg`** (2026‑09‑11). **§1 el PUENTE**: `derives_chainOk_neg_of_line` — de **una** línea cuyo `lineWF` la teoría refuta sale `⊢ ¬chainOk nil ⟦l⟧`, con piezas que ya estaban (`prf_lineWF_of_chainOk` —la de la mitad (a) de D3—, `prf_nthc_objList`, `prf_lenc_objList`, `gnum_lt`) ⇒ `DEUDA_chainNeg` queda reducida a «el decodificador rechaza ⟹ hay línea refutable». **§2** `decode_heads`: **las cabezas de una cadena aceptada SON los códigos de sus conclusiones** — 🔑 lo hace posible **`decodeForm_inj`**, que el decodificador sea una **SECCIÓN**, extraído en `decodeLine_stepConcl`/`decodeLine_carc`. **§3** 🏁 **`deuda_inNeg`**: `runFn nil ⟦l⟧ ≐ ⟦l.map carc⟧ ≐ listFormCodeM fs` y ahí manda `prf_not_In_listFormCodeM`, que ya existía y cuyo docstring decía *«la refutación que necesita `NegVerifier`»*. ⚠️ **Sin tocar el ancla**: el footprint no cita `prf_axiomsCodeT_eq`. ⬜ De las **cinco** causas de rechazo del decodificador, **cuatro tienen maquinaria**; la que falta es `mp`/`gen` sin premisas, que no va por `lineWF` sino por el conjunto `premsOf ⊆ conclusiones anteriores` |
+| 84r | **`ModeloCodigo`** | 🆕 🏁 **EL MODELO ESTÁNDAR, a nivel `Nat`** (2026‑10‑05, ADR‑120; de `sondeos/ModeloNat.lean`, ADR‑119): las listas por Cantor (`unpairN`, `decodeL`/`encodeL`), los accesores con `nthN_lt`, las funciones de codificación (`substtcN`…`chainOkN`, `stepT`), las guardas `hasWitN`/`hasWitFN`, `lineWFT` (las 21 RHS, generadas) y `V₀`, el valor del lado derecho del ancla, PLEGADO |
+| 84s | **`ModeloEstandar`** | 🆕 🏁 **`MNV V`, paramétrico en el valor de `axiomsCodeT`** (ADR‑120): un lema `rfl` por símbolo para `V` VARIABLE (⛔ ninguno contra `V₀`: altura de definición), la evaluación de los códigos cerrados por inducción (`ev_*`), las guardas para un término arbitrario, el `simp` `abre` (scoped) y los 34 `coreAxioms` (`MN_coreAxioms`) |
+| 84t | **`ModeloCodificacion`** | 🆕 🏁 **los 107 de codificación, el ANCLA y los 142** (ADR‑120): `MN_codingAxioms`, `v_ancla` (por `rw` con lemas ∀, sin lema diagonal semántico) y `MN_axioms : ∀ v, contextSatisfies (MNV V₀) v axioms` |
+| 84u | **`SolidezPrf`** | 🆕 🏁 **la SOLIDEZ de `Prf`** (ADR‑120): `Estandar M`, `prfI_sound`, `prf_sound` (los 7 + 17 constructores) y `consistentH_de : Estandar M → ConsistentH` |
+| 84v | **`Consistencia`** | 🆕 🏁🏁 **`consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN`, `goedel_II : ¬ Prf consistencyFormula'`** (ADR‑120): Gödel I y II SIN HIPÓTESIS, footprint los tres de Lean |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo (`godelPred'`, `godelBeta'`, `godelC'`) y `consistencyFormula'`. Gödel II vive en `GodelTwoPrf`; `goedel_second'` (retirado el 2026‑09‑11) y el teorema `d3` sobre `⊢` (retirado con ADR‑115) ya no están |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).
@@ -401,7 +416,7 @@ Punto de reanudación: **[NEXT-STEPS.md](NEXT-STEPS.md)** (bloque del 2026‑10�
 (`Meta/Representability2Prf.lean`); la clase `AnclaEq` se retiró (ADR‑118). Gödel I (`⊬G`) y Gödel II
 sobre `Prf` —`goedel_first_prf`, `goedel_second_prf (hcon : ConsistentH)`— ya no llevan `[AnclaEq]`, y su
 footprint es el de los tres de Lean: **F1 ya no los hace vacuos**. ⚠️ Siguen **CONDICIONALES**: `ConsistentH`
-sólo se cumple si los 142 son consistentes, y no hay modelo; `f1_traduccion_refutada` bloquea el argumento de F1
+sólo se cumple si los 142 son consistentes (✏️ desde ADR‑120 lo son: `consistencia`, `Meta/Consistencia.lean`); `f1_traduccion_refutada` bloquea el argumento de F1
 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no prueba la consistencia). D1 (`repr_pos'_prf`), D2
 (`d2_prf`) y D3 (`d3_prf_real`) ya no llevan ninguna hipótesis de clase (ADR‑118). La mitad `⊬¬G` sigue sin existir
 en ningún cálculo. Lo que sigue, en orden: el modelo de los 142 (⇒ `ConsistentH`) ·

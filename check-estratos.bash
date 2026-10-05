@@ -43,8 +43,8 @@ Derives₂|22|0|-
 LK₀|14|0|-
 LKc|15|0|-
 LKh|14|0|-
-ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|-
-ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|-
+ROBINSON_PlusPlus.Meta.Hilbert.Prf|7|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
+ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ|17|0|ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound
 ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH|8|0|-
 EOF
 

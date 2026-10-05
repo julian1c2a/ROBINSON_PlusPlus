@@ -4,7 +4,7 @@
 > axioma DIAGONAL `ax_axiomsCodeT_def`. El ancla `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
 > `Meta/Representability2Prf.lean`) y la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf` y
 > `goedel_second_prf` toman sólo `(hcon : ConsistentH)`, con los tres axiomas de Lean: F1 ya no los hace vacuos.
-> ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes, y no hay modelo;
+> ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes (✏️ desde ADR‑120 lo son: `consistencia`, y `goedel_I`/`goedel_II` van sin hipótesis);
 > `f1_traduccion_refutada` bloquea el argumento de F1 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no
 > prueba la consistencia). `⊬¬G` sigue sin existir:
 > irá por Rosser, sobre `Prf`.
@@ -35,7 +35,7 @@ D1/D2/D3 **no postula ninguna de las tres**.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 117 jobs · 104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/`
+> **Build 123 jobs · 109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/`
 > + 85 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*

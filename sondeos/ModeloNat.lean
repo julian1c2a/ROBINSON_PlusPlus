@@ -7,6 +7,10 @@ import FOL.Semantics
 **Fecha**: 2026‑10‑05 (ADR‑119). Antes, del 2026‑09‑22 (ADR‑086) al 2026‑10‑05, este fichero era la capa
 ARITMÉTICA sola: 25 de los 34 `coreAxioms`.
 
+⬆️ **PROMOVIDO al build el mismo día (ADR‑120)**, partido en `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
+`Meta/ModeloCodificacion.lean`, `Meta/SolidezPrf.lean` y `Meta/Consistencia.lean`: allí `consistencia`, `goedel_I` y
+`goedel_II` son los nombres de producción. Este fichero se conserva como la versión en un solo fichero.
+
 ## 🏁 Qué demuestra
 
 * `MN_axioms : ∀ v, contextSatisfies (MNV V₀) v axioms` — **un modelo de los 142**: los 34 de la teoría, los 107 de
@@ -15,7 +19,8 @@ ARITMÉTICA sola: 25 de los 34 `coreAxioms`.
 * `incompletitud_I : ¬ Prf godelCN` e `incompletitud_II : ¬ Prf consistencyFormula'` — `goedel_first_prf` y
   `goedel_second_prf` aplicados a `consistentH`: **Gödel I y II SIN HIPÓTESIS**.
 
-Footprint de los cinco: `[propext, Classical.choice, Quot.sound]`. Ni `sorry`, ni `axiom`, ni `native_decide`.
+Footprint de los cuatro, y de todo lo que imprime `#print axioms` al final: `[propext, Classical.choice,
+Quot.sound]`. Ni `sorry`, ni `axiom`, ni `native_decide`.
 
 ## Cómo
 
@@ -45,16 +50,17 @@ Footprint de los cinco: `[propext, Classical.choice, Quot.sound]`. Ni `sorry`, n
 
 ## Medido (2026‑10‑05, en local)
 
-`lake env lean sondeos/ModeloNat.lean`: 0 errores, 0 avisos, ~60 s, pico de memoria ~5,4 GB.
+`lake env lean sondeos/ModeloNat.lean`: 0 errores, 0 avisos (con `linter.unusedSimpArgs` apagado), 56 s, pico de
+memoria 5,48 GB.
 ⚠️ Un control negativo (que el modelo REFUTA `ax_tc_cons`, el axioma retirado que hacía inconsistente la teoría)
 subió el pico por encima de 14 GB y se apartó: está pendiente, con otra forma.
 
 ## Lo que NO dice
 
 * No dice que `G` ni `Con` sean VERDADERAS en `MNV V₀` (E10): `consistentH` no lo necesita.
+* No dice que `V₀ = codeNatList axioms` (que en el modelo la regla `thy` acepte exactamente los 142): E10 lo pediría.
 * No dice nada de `⊬¬G` (Rosser).
-* Vive en `sondeos/`, FUERA del build: hasta su promoción, los titulares del build siguen con `ConsistentH` como
-  hipótesis.
+* Vive en `sondeos/`, FUERA del build (✏️ hasta ADR‑120, que lo promovió).
 
 ## Cómo re‑ejecutarlo
 
@@ -595,7 +601,9 @@ def V₀ : Nat :=
 
 /-! ### `lineWF`, por etiqueta -/
 
-/-- Las 21 RHS de `ax_lineWF_K`, traducidas a `Prop` sobre `Nat` (generado por `gen_lineWF.py`). -/
+/-- Las 21 RHS de `ax_lineWF_K`, traducidas a `Prop` sobre `Nat`: generadas del fuente por un script (en el
+    scratchpad de la sesión del 2026‑10‑05, no versionado) y después parametrizadas en `V` a mano (la firma y
+    el caso `thy`). La correspondencia la comprueba el núcleo: `v_lineWF_*` cierra por `Iff.rfl`. -/
 def lineWFT (V : Nat) : Nat → Nat → Prop
   | 0, x => And (lenN x = 4)
       ((carN x) = implcN (nthN x (2))
@@ -661,8 +669,10 @@ open ModeloNat
 variable {V : Nat}
 
 /-- **El modelo estándar**: los 28 símbolos de función y los 5 de relación de los 142. Las listas, por la
-    biyección de Cantor (§1bis); los símbolos de codificación, por recursión sobre la forma de su argumento
-    (§1ter); y `axiomsCodeT` por el valor `V₀` del lado derecho de su ancla (§1ter, al final). -/
+    biyección de Cantor; los símbolos de codificación, por recursión (sobre la etiqueta de su argumento los de
+    sustitución y lift, sobre `decodeL` `validProofFn`/`runFn`/`chainOk`, sobre el número `tcFn`); y
+    `axiomsCodeT` por `V`, el PARÁMETRO: sólo la instancia `MNV V₀` lo fija en el valor del lado derecho del
+    ancla. -/
 def MNV (V : Nat) : Model Nat where
   func := fun s args =>
     match s, args with
@@ -853,7 +863,7 @@ theorem ev_hasWitF (v : Nat → Nat) (t : Term) : evalFormula (MNV V) v (hasWitF
 /-- El `simp` que ABRE un axioma de codificación: los conectivos, los constructores de código, la evaluación
     y un lema `rfl` por símbolo. ⛔ Sin `numeralM`, `termCodeM`, `strCodeM` ni ningún `codeNat*`: los códigos
     cerrados se evalúan por sus lemas ∀ (`ev_*`), nunca desplegándolos. -/
-macro "abre" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, forall_5, _root_.iff,
+local macro "abre" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, forall_5, _root_.iff,
     land, lor, cons, nil, zero, succ, pred, concat, lt, In, cons_sym, zero_sym, succ_sym, pred_sym,
     concat_sym, lt_sym, in_sym, substtc, substtsc, liftc, liftsc, substfc, liftfc, carc, cdrc, lenc, nthc,
     runFn, validProofFn, tcFn, premsOf, allIn, lineWF, chainOk, lineOk, varc, funcc, botc, atomc, eqc,
@@ -1083,7 +1093,7 @@ theorem mem_nil_elim {α : Type} {p : α → Prop} : ∀ x, List.Mem x ([] : Lis
   fun _ h => nomatch h
 
 /-- 🏁 **El modelo estándar satisface los 34 `coreAxioms`** (2026‑10‑05): la capa aritmética (25) y la de
-    listas (9). Lo que falta para un modelo de los 142: los 107 de `codingAxioms` y el ancla. -/
+    listas (9). Los 107 de `codingAxioms` y el ancla van aparte, y `MN_axioms` junta los 142. -/
 theorem MN_coreAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ coreAxioms → evalFormula (MNV V) v φ := by
   unfold coreAxioms
   exact mem_cons_elim (v_ax2 v) (mem_cons_elim (v_ax3 v) (mem_cons_elim (v_ax4 v) (mem_cons_elim (v_ax5 v) (mem_cons_elim (v_ax6 v) (mem_cons_elim (v_ax7 v) (mem_cons_elim (v_ax8 v) (mem_cons_elim (v_ax9 v) (mem_cons_elim (v_ax10 v) (mem_cons_elim (v_ax11 v) (mem_cons_elim (v_ax12 v) (mem_cons_elim (v_ax13 v) (mem_cons_elim (v_ax14 v) (mem_cons_elim (v_ax15 v) (mem_cons_elim (v_ax16 v) (mem_cons_elim (v_ax17 v) (mem_cons_elim (v_ax18 v) (mem_cons_elim (v_ax19 v) (mem_cons_elim (v_ax21 v) (mem_cons_elim (v_ax24 v) (mem_cons_elim (v_ax25 v) (mem_cons_elim (v_ax26 v) (mem_cons_elim (v_axL0 v) (mem_cons_elim (v_axL1 v) (mem_cons_elim (v_axL2 v) (mem_cons_elim (v_axC1 v) (mem_cons_elim (v_axC2 v) (mem_cons_elim (v_axC3 v) (mem_cons_elim (v_axL3 v) (mem_cons_elim (v_ax29 v) (mem_cons_elim (v_pow_zero v) (mem_cons_elim (v_pow_succ v) (mem_cons_elim (v_prodp_nil v) (mem_cons_elim (v_prodp_cons v) (mem_nil_elim))))))))))))))))))))))))))))))))))
@@ -1194,7 +1204,7 @@ theorem v_chainOk_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_chainOk_c
 /-! ### `validProofFn` (22): la conclusión la da `stepT`, sea cual sea la condición -/
 
 /-- La línea `⟨K, …⟩` se consume por `vpfN_consN` y `stepT` la decide por su etiqueta. -/
-macro "vpf_paso" : tactic => `(tactic| (rw [vpfN_consN]; simp only [stepN, nthN_cz, nthN_cs, nthN_zero_l, stepT]))
+local macro "vpf_paso" : tactic => `(tactic| (rw [vpfN_consN]; simp only [stepN, nthN_cz, nthN_cs, nthN_zero_l, stepT]))
 
 theorem v_vpf_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_nil := by
   intro v c; abre; exact vpfN_zero c
@@ -1243,7 +1253,7 @@ theorem v_vpf_listInd : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_vpf_listIn
 
 /-! ### `premsOf` (21) -/
 
-macro "prems" : tactic => `(tactic| ((simp only [premsOfN, nthN_cz, nthN_cs, nthN_zero_l]) <;> rfl))
+local macro "prems" : tactic => `(tactic| ((simp only [premsOfN, nthN_cz, nthN_cs, nthN_zero_l]) <;> rfl))
 
 theorem v_premsOf_mp : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsOf_mp := by
   intro v b a; abre; prems
@@ -1290,7 +1300,7 @@ theorem v_premsOf_listInd : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_premsO
 
 /-! ### `lineWF` (23): la RHS de cada etiqueta es, por construcción, la de `lineWFT` -/
 
-macro "lwf" : tactic => `(tactic| (intro h; exact ⟨(lineWFN_of_tag h (by decide)).mp, (lineWFN_of_tag h (by decide)).mpr⟩))
+local macro "lwf" : tactic => `(tactic| (intro h; exact ⟨(lineWFN_of_tag h (by decide)).mp, (lineWFN_of_tag h (by decide)).mpr⟩))
 
 theorem v_lineWF_mp : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_lineWF_mp := by
   intro v x; abre; lwf
@@ -1573,7 +1583,7 @@ theorem prf_sound (hM : Estandar M) {φ : Formula} (h : Prf φ) : ∀ v, evalFor
   | mp A B _ _ ih1 ih2 => intro v; exact ih1 v (ih2 v)
   | gen A _ ih => intro v d; exact ih (shiftEnv v d)
 
-/-- ConsistentH, a falta SÓLO de construir el modelo (A2/A3). -/
+/-- `ConsistentH` a partir de CUALQUIER modelo estándar; `estandar_MN` lo instancia en `MNV V₀`. -/
 theorem consistentH_de (hM : Estandar M) : ConsistentH :=
   fun h => prf_sound hM h (fun _ => 0)
 
@@ -1590,8 +1600,10 @@ open FOL FOL.Metamath.Semantics
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
 open ModeloNat
 
-/-- `MNV V₀` es estándar. ⛔ Cada campo INSTANCIA un lema demostrado para `V` arbitrario: ningún `rfl` compara
-    nada con `V₀` (el núcleo desplegaría `V₀` antes que `MNV`, por altura de definición, y no acabaría). -/
+/-- `MNV V₀` es estándar. `hzero`, `hsucc` y `hcons` INSTANCIAN lemas `rfl` demostrados para `V` arbitrario —⛔
+    ningún `rfl` compara nada con `V₀`: el núcleo desplegaría `V₀` antes que `MNV`, por altura de definición, y no
+    acabaría—; `haxs` es `MN_axioms`, propio de `V₀` porque el ancla fija `V`: junta `MN_coreAxioms` y
+    `MN_codingAxioms` (genéricos en `V`) con `v_ancla`. -/
 theorem estandar_MN : Sondeos.SolidezPrfParam.Estandar (MNV V₀) where
   hzero := MN_zero
   hsucc := MN_succ

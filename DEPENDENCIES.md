@@ -1,5 +1,15 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+>
+> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
+> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
+> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
+> (`Meta/Consistencia.lean`), con footprint los tres de Lean. ⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS
+> en el modelo, ni `⊬¬G` (irá por Rosser, ⬜).
+>
+> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
+
 > ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md)) · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md))
 >
 > RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
@@ -32,9 +42,9 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 117 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> **Build 123 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **104 módulos activos** (Minimal 1 + Meta 100 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` y el ancla diagonal, ADR‑117).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -66,7 +76,7 @@ Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos
 > módulos: `Minimal/Theorems/Block1–8` (10), `Full/{Mod2,Lists,StrongInduction,Bounded,Divisibility,
 > Division,Primality,Factorization}` (8) y `Meta/{AxiomListCode,DerivCond,Induction,LineWFDerives,
 > ListInductionArith,Necessitation,OmegaStrength,Reflection,StepArith}` (9). Quedan **104** (Minimal 1 +
-> Meta 100 + Full 3), sin ciclos (`lake build` verde). Lo que sigue describe el árbol de **131** y se
+> Meta 100 + Full 3, antes de ADR‑120), sin ciclos (`lake build` verde). Lo que sigue describe el árbol de **131** y se
 > conserva como registro hasta regenerar la vista.
 >
 > 🆕 **2026‑10‑04 (ADR‑117) — dos aristas nuevas y un traslado, sin módulos nuevos (siguen 104).**

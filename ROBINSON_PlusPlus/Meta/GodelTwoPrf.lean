@@ -22,7 +22,7 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 tienen UNA sola hipótesis, `ConsistentH`, y footprint `[propext, Classical.choice, Quot.sound]`: el ancla
 de `axiomsCodeT` es un TEOREMA (`prf_ancla`, por el axioma diagonal `ax_axiomsCodeT_def`), y la clase
 `AnclaEq` se retiró (ADR‑118). ⚠️ Lo que NO dice: que `ConsistentH` se cumpla. Eso depende de la consistencia
-de los 142 axiomas, y no hay modelo de ellos todavía.
+de los 142 axiomas: ✏️ desde ADR‑120 hay modelo, y `consistencia` (`Meta/Consistencia.lean`) la descarga.
 
 ⛔ **Hasta el 2026‑10‑04 eran VACUOS** (estado del 2026‑10‑02): su hipótesis de clase `[AnclaEq]` daba
 `Prf ⊥` (F1, ADR‑114, `sondeos/AnclaEqInconsistente.lean`, compilado), así que `[AnclaEq]` y `ConsistentH`
@@ -204,7 +204,7 @@ ADR‑117, y hoy es el teorema `prf_ancla`. Entraban todos por `goedel_first_num
     `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`.
     🏁 (ADR‑117) Su única hipótesis es `ConsistentH`: el ancla de `axiomsCodeT` es un TEOREMA
     (`prf_ancla`, por el axioma diagonal), y no una hipótesis que daba `Prf ⊥` (F1). ⚠️ Que
-    `ConsistentH` se pueda cumplir depende de la consistencia de los 142 axiomas, que NO está probada. -/
+    `ConsistentH` se cumpla depende de la consistencia de los 142: ✏️ probada desde ADR‑120 (`consistencia`). -/
 theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
   intro hG
   have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG

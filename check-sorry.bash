@@ -326,7 +326,11 @@ EV_ALCANCE="ROBINSON_PlusPlus.lean ROBINSON_PlusPlus sondeos"
 # (y los evaluadores META que llegan a `axioms`: `stepConcl` —`.thy k ⇒ axioms[k]?`—, y con él `checkAux`,
 #  `checkProof`, `proofCode`, `proofCode'`; `ruleCode`/`rulesCode`; `decodeRuleTag` y la cadena de
 #  `decodeChain` —revisión final de ADR-117—. Un `#eval` de cualquiera de ellos sobre una línea `thy` se colgaría.)
-EV_TOK="(^|[^A-Za-z0-9_'«])(axioms|ax_axiomsCodeT_def|axD|nD|deltaD|psiD|stepConcl|checkAux|checkProof|ruleCode|rulesCode|proofCode'?|decodeRuleTag|decodeRule|decodeLine|decodeChainAux|decodeChain)([^A-Za-z0-9_'!?»]|\$)"
+# ⭐ 2026-10-05 (ADR-120): y los valores del modelo que llevan dentro el numeral del ancla —`V₀`, el valor de
+# `axiomsCodeT` en `MNV V₀`, y `codeNatList`, el código de una lista de fórmulas—, más las sentencias de Gödel y de
+# Tarski, cuyo enunciado lleva el numeral de su propio código: `selfAppN`, `godelCN`, `liar` (lo pidió la medición
+# de Tarski del 2026-10-05: el censo no las veía).
+EV_TOK="(^|[^A-Za-z0-9_'«])(axioms|ax_axiomsCodeT_def|axD|nD|deltaD|psiD|stepConcl|checkAux|checkProof|ruleCode|rulesCode|proofCode'?|decodeRuleTag|decodeRule|decodeLine|decodeChainAux|decodeChain|V₀|codeNatList|selfAppN|godelCN|liar)([^A-Za-z0-9_'!?»]|\$)"
 ev_ordenes () {   # stdin: código despojado → «línea:orden» de cada orden que evalúa, entera
   # Una orden abierta sigue en las líneas sangradas; NO se cierra en una línea en blanco (un comentario
   # despojado lo es); se cierra en una línea sin sangría o en otra orden o declaración. Si tras la palabra
@@ -384,11 +388,14 @@ theorem t : axioms.length = 142 := rfl
 theorem u : axioms.length = 142 := rfl
   #eval 2
   #print axioms foo
+#eval V₀
+#reduce ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN
+#eval codeNatList axiomsBase
 EOF
 EV_AUTO=$(ev_recoge "$EV_FIX" | sed "s|^$EV_FIX/Evalua.lean:||" | cut -d: -f1 | tr '\n' ' ')
 rm -rf "$EV_FIX"
-if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 " ]; then
-  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 »)."
+if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 23 24 25 " ]; then
+  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 23 24 25 »)."
   exit 2
 fi
 EV_FAIL=0
