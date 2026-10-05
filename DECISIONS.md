@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -47,7 +47,7 @@
 >
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 89 en `sondeos/`.**
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 90 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -9835,7 +9835,7 @@ se vuelven a congelar en el commit siguiente de FOL, que sólo toca las dos list
   48»—. Las cuatro filas nuevas (`strCode`, `strCodeM`, `codeNatStr`, `symProbe`) no dependen de ningún axioma.
   `sondeos/D7Contrafactual.lean`, re‑ejecutado: «con choice hoy: 182 · cortando String.*: 182» —ya no entra ningún
   `Classical.choice` por `String`—. NO lo pierden los titulares de Gödel, la solidez ni Tarski: su `choice` es el de la
-  solidez clásica (`prf_sound`, el axioma `p3`). En FOL, las 39 filas con `Classical.choice` siguen; dos pierden
+  solidez clásica (`prf_sound`, el axioma `p3`). ✏️ *(2026‑10‑05, [ADR‑131](DECISIONS.md))*: la causa era una INFERENCIA, y es falsa: MEDIDO (`sondeos/ChoiceFrontera.lean`), 168 de las 182 filas con `Classical.choice` no pasan por `prf_sound`; 158 lo reciben sólo de dos cancelaciones de lift (`SubstArith.substTerm_liftLiftLift` y `…LiftLiftLift`), entre ellas `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`. En FOL, las 39 filas con `Classical.choice` siguen; dos pierden
   `propext`/`Quot.sound` (`Compacity0.evalFormula_updateCsts`, `evalTerm_updateCsts`).
 
 ### 3 · Medido
@@ -9943,3 +9943,57 @@ Las tres, corregidas con su marca; la memoria `feedback-lean-kernel-ite-string`,
 encontró una tercera causa.*
 
 **Véase también:** ADR‑129 (D7, que sacó `String` de los símbolos sin tocar esto).
+
+---
+
+<a id="adr-131"></a>
+## ADR-131: 📏 De dónde viene el `Classical.choice` de los titulares — NO de `p3`: dos cancelaciones de lift lo traen a 158 de 182 filas
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ medición y fe de erratas (este commit) · **Ámbito:** `sondeos/ChoiceFrontera.lean`
+(nuevo: lee el entorno, no evalúa nada del lenguaje objeto); notas fechadas en ADR‑129 §2, el banner de `REFERENCE.md`
+y `doc/PLAN-COMPLETITUD-FINITISTA.md` §7.3. Origen: la auditoría del suelo (`wf_1f61bc0d-738`), que la marcó.
+
+### 1 · Lo que ADR‑129 dijo
+
+«NO lo pierden los titulares de Gödel, la solidez ni Tarski: su `choice` es el de la solidez clásica (`prf_sound`,
+el axioma `p3`)». Era una INFERENCIA escrita como hecho, repetida en el banner de `REFERENCE.md`, en el plan y en el
+informe al propietario.
+
+### 2 · Lo medido
+
+La FRONTERA de un titular: las constantes del proyecto (también las `private`) de su cierre de dependencias que
+nombran DIRECTAMENTE una constante ajena cuyo cierre contiene `Classical.choice`. Por ahí entra.
+
+| titular | puntos de entrada |
+|---|---|
+| `goedel_first_prf`, `prf_tarski` | sólo `SubstArith.substTerm_liftLiftLift` (`Classical.byContradiction`) |
+| `goedel_second_prf` | `substTerm_liftLiftLift` y `substTerm_liftLiftLiftLift` |
+| `prf_sound` | ella misma: el caso `p3` (`Classical.byContradiction`) |
+| `consistencia` | `prf_sound` y `ModeloEstandar.v_ax16` (`Classical.propDecidable`) |
+| `goedel_I`, `tarski` | `prf_sound`, `v_ax16` y `substTerm_liftLiftLift` |
+| `goedel_II` | los de `goedel_I` y `substTerm_liftLiftLiftLift` |
+| `goedel_I_neg` | los de `goedel_I` y su propia prueba (`Classical.byContradiction`) |
+
+Censo sobre las 182 filas de RPP de `check-footprints` que declaran `Classical.choice` (117 s): pasan por
+`prf_sound`, **14**; por `substTerm_liftLiftLift`, **169**; por `…LiftLiftLift`, **126**; por `v_ax16`, 14; el resto,
+4 o menos cada uno (los round‑trips de `CodeDecode`, `ChainDecode`, `ChainNegPrf`). **158** tienen TODA su frontera en
+las dos cancelaciones de lift.
+
+### 3 · Veredicto
+
+La frase de ADR‑129 es falsa para las 168 filas que no pasan por `prf_sound`, entre ellas `goedel_first_prf`,
+`goedel_second_prf` y `prf_tarski`; y en `goedel_I`, `goedel_II`, `consistencia` y `tarski`, `prf_sound` es uno de dos
+a cuatro puntos de entrada. Lo cierto de ADR‑129: ya no entra ningún `choice` por `String` (`D7Contrafactual`).
+
+### 4 · Lo que NO dice
+
+* «158» es el contrafactual de CORTAR esas dos constantes, como `D7Contrafactual` cortaba `String.*`: cuántas filas
+  perderían `choice` si las dos cancelaciones se probaran sin él. Es una cota INFERIDA: no se ha reescrito ninguna
+  prueba, y reescribirlas podría meterlo por otro sitio. ⬜ Medirlo es reescribirlas (sus `omega`/`by_cases`/`simp`).
+* No se ha medido qué táctica de esas dos pruebas trae `Classical.byContradiction`.
+* Las 14 que pasan por `prf_sound` lo conservarán mientras la semántica sea en `Prop`: validar `p3` (la doble
+  negación) pide tercio excluso (INFERIDO). `v_ax16` (`Classical.propDecidable`) no se ha mirado.
+
+🔑 *La causa de un footprint se MIDE en la frontera de su cierre; no se deduce del lema que parece más clásico.*
+
+**Véase también:** ADR‑129 (la frase corregida), ADR‑122 (`D7Contrafactual`, el mismo método con `String`).

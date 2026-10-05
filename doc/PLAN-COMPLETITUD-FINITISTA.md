@@ -1492,7 +1492,7 @@ Lo de arriba queda como registro. Compilado (FOL 58 jobs, RPP 129) y MEDIDO:
   `evalTerm_updateCsts` (antes `[propext, Quot.sound]`). En RPP lo pierden **44** filas
   (lo llevaban 226 de 229; hoy, 182 de 233; la puerta de ADR‑122 decía hasta 48), entre ellas `v_ancla` y
   `MN_codingAxioms`. No lo pierden los titulares de Gödel, la solidez ni Tarski: su `Classical.choice` es el de la
-  solidez clásica (`prf_sound`, el axioma `p3`), no el de `String`.
+  solidez clásica (`prf_sound`, el axioma `p3`), no el de `String`. ✏️ *(2026‑10‑05, [ADR‑131](DECISIONS.md))*: la causa era una INFERENCIA, y es falsa: MEDIDO (`sondeos/ChoiceFrontera.lean`), 168 de las 182 filas con `Classical.choice` no pasan por `prf_sound`; 158 lo reciben sólo de dos cancelaciones de lift (`SubstArith.substTerm_liftLiftLift` y `…LiftLiftLift`), entre ellas `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`.
 * **Fuera de los dos repos**: PeanoRF (bloqueado, sólo lectura) depende de `../FOL` y `../ROBINSON_PlusPlus` por
   ruta y dejará de compilar contra el FOL nuevo hasta que se adapte; no se toca.
 

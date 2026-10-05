@@ -11,7 +11,7 @@
 > 🏁 **D7 ejecutada (ADR‑129, 2026‑10‑05)**: los símbolos de FOL son `List Char` (antes `String`), en FOL y en RPP; los
 > literales de varios caracteres se escriben `sym!"…"` (`Minimal/SymLit.lean`). Ningún valor cambia (`codeNat`, `V₀`,
 > `godelCN`, el ancla); 44 filas de `check-footprints` pierden `Classical.choice`, ninguna de los titulares de Gödel
-> (su `choice` es el de la solidez clásica, `prf_sound`).
+> (su `choice` es el de la solidez clásica, `prf_sound`). ✏️ *(2026‑10‑05, [ADR‑131](DECISIONS.md))*: la causa era una INFERENCIA, y es falsa: MEDIDO (`sondeos/ChoiceFrontera.lean`), 168 de las 182 filas con `Classical.choice` no pasan por `prf_sound`; 158 lo reciben sólo de dos cancelaciones de lift (`SubstArith.substTerm_liftLiftLift` y `…LiftLiftLift`), entre ellas `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`.
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
 
@@ -44,7 +44,7 @@
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 89 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 36 de 89, [ADR‑130](DECISIONS.md); la última pasada entera, la de D7, [ADR‑129](DECISIONS.md)).
+> **+ 90 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 37 de 90, [ADR‑131](DECISIONS.md); la última pasada entera, la de D7, [ADR‑129](DECISIONS.md)).
 > **0 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **142 axiomas objeto** en `axioms` (los 141 de `axiomsBase`
 > y el ancla diagonal, ADR‑117).
 >
