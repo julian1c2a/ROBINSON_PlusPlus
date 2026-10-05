@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md))
 >
@@ -9223,3 +9223,74 @@ menos: la clase, su estructura y su instancia) y ningún `@TRUST`, `@NATIVO` ni 
 🔑 *Una hipótesis que ya es un teorema no se deja en la firma: confunde al lector y deja abierta la puerta.*
 
 **Véase también:** ADR‑026 (la clase), ADR‑114 (F1), ADR‑117 (el ancla, teorema).
+
+---
+
+<a id="adr-119"></a>
+## ADR-119: 🏁 el MODELO de los 142 — `ConsistentH` DEMOSTRADA, en `sondeos/ModeloNat.lean`
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ (este commit; un SONDEO, fuera del build) · **Ámbito:** RPP, `sondeos/`.
+Es el punto 2 de la lista de ADR‑117 («el modelo de los 142 ⇒ `ConsistentH` como teorema»), pedido por el
+propietario el 2026-10-05.
+
+### 1 · Lo que hay
+
+`sondeos/ModeloNat.lean` (1 620 líneas; antes, la capa aritmética sola, 25 de los 34 `coreAxioms`) construye un
+modelo `MNV V₀ : Model Nat` de los **142** axiomas y lo junta con la solidez de `Prf`:
+
+* `MN_axioms : ∀ v, contextSatisfies (MNV V₀) v axioms` — los 34 de la teoría, los 107 de codificación y el ancla;
+* `consistentH : ConsistentH` — `¬ Prf ⊥`, por `prf_sound` (§6 de `sondeos/ModeloNat.lean`: la solidez de `Prf` en todo modelo ESTÁNDAR, de la
+  sonda R2‑1‑2 de la ronda 2, corregida: un `∧` que se leía como `Formula.and`, y fuera `no_anclaEq_de`);
+* `incompletitud_I : ¬ Prf godelCN` e `incompletitud_II : ¬ Prf consistencyFormula'` — `goedel_first_prf` y
+  `goedel_second_prf` aplicados a `consistentH`: Gödel I y II **sin hipótesis**, en el sondeo.
+
+Footprint de todos: `[propext, Classical.choice, Quot.sound]`.
+
+### 2 · Cómo
+
+* **Listas.** `cons a b = consN a b = pairN a b + 1` (ADR‑113) es una biyección `ℕ² → ℕ⁺`: todo `n` es una lista,
+  y una sola. `unpairN` la invierte por recursión; `decodeL`/`encodeL` son la biyección `ℕ ≅ List ℕ`.
+* **Codificación.** Cada uno de los 15 símbolos de función de codificación es una función de `Nat` que mira la
+  etiqueta de su argumento (`nthN c 0`) y recurre sobre componentes MENORES (`nthN_lt`). La validez de las 107 se
+  comprueba con un molde por forma: ecuación, ecuación condicional, `validProofFn` (la conclusión la da `stepT`,
+  sea cual sea la condición), `premsOf`, y las 21 `lineWF`, cuyas RHS se GENERARON del fuente (`lineWFT`). Las
+  guardas `hasWit`/`hasWitF` son `Prop` sobre `Nat`, y su evaluación es esa `Prop` para un término ARBITRARIO.
+* **El ancla, por construcción.** El modelo es PARAMÉTRICO en `V`, el valor de `axiomsCodeT`: los 141 de la base
+  valen para todo `V`. `V₀` es, por definición, el valor del lado derecho de `ax_axiomsCodeT_def`, que no nombra
+  `axiomsCodeT`, y en `MNV V₀` el ancla vale. Lo había anticipado la medición del frente (2026-10-05): **no hizo
+  falta el lema diagonal semántico** que pedían ADR‑117 §4 y NEXT‑STEPS.
+
+### 3 · Las trampas, medidas
+
+1. **La altura de definición en el núcleo.** Con el modelo NO paramétrico, `MN.func "axiomsCodeT" [] = V₀ := rfl`
+   pasó de 2,5 GB en 12 s sin acabar, y con `V₀` marcado `@[irreducible]` igual: el núcleo ignora el atributo y
+   despliega primero el lado de MÁS altura —`V₀`, que contiene el numeral astronómico— y lo sigue evaluando. Con
+   `MNV V` y `V` VARIABLE, cada `rfl` es sobre una variable, y `V₀` entra sólo por INSTANCIACIÓN.
+2. **El numeral plegado** (ADR‑117): `v_ancla` va por `rw` con lemas ∀ (`ev_numeralM`, `ev_listFormCodeM`,
+   `ev_substfc`, …); el único `rfl` (`V₀_def`) compara dos expresiones idénticas tras desplegar `V₀` un nivel.
+3. **`simp only` no normalizó la aritmética de literales** en este fichero (`0 + 1`, `0 < 0` quedaron tal cual):
+   `lineWF_inv` y las guardas piden `Nat.zero_add`, `Nat.not_lt_zero` y `↓reduceIte` explícitos, y `premsOf`
+   cierra por `rfl`.
+4. **Un control negativo** —que el modelo REFUTA `ax_tc_cons`, el axioma retirado que hacía inconsistente la
+   teoría (ADR‑012)— subió el pico por encima de 14 GB y se apartó. ⬜ Pendiente, con otra forma.
+
+### 4 · Medido
+
+`lake env lean sondeos/ModeloNat.lean`, en local, después del último cambio: 0 errores, 0 avisos, 56 s, pico de
+memoria 5,48 GB. Ámbito: sólo ese sondeo —ningún fichero de `ROBINSON_PlusPlus/` cambia, así que el build y los
+otros 84 sondeos (ninguno importa a otro) siguen como en ADR‑118: compilan 32 de 85, y `ModeloNat` era ya uno de
+ellos—. `check-doc-sync` verde.
+
+### 5 · Lo que NO dice
+
+* Vive en `sondeos/`, **fuera del build**: los titulares del build (`goedel_first_prf`, `goedel_second_prf`)
+  siguen tomando `ConsistentH` como hipótesis hasta que el modelo se promueva (⬜ el paso siguiente).
+* No dice que `G` ni `Con` sean VERDADERAS en `MNV V₀` (E10 de la medición del frente): `consistentH` no lo
+  necesita.
+* No dice nada de `⊬¬G` (Rosser, ⬜).
+
+🔑 *Un `rfl` contra un término gigante plegado no lo salva ningún atributo: el núcleo despliega primero el lado de
+más altura. Se demuestra el lema para una VARIABLE y se instancia.*
+
+**Véase también:** ADR‑085/086 (el modelo, capa aritmética), ADR‑113 (`cons = σ∘pair`), ADR‑117 (el ancla
+diagonal), ADR‑118 (la clase, retirada).

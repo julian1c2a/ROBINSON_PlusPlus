@@ -9,7 +9,7 @@
 > llevaban además la clase `[AnclaEq]`, que daba `Prf ⊥` —F1, [ADR‑114](DECISIONS.md)—: eran VACUOS.)*
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
+**Last updated:** 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
 `[AnclaEq]`: su única hipótesis es `ConsistentH` (banner, §1, §4–§6); D1 y D3 sí la llevan, rellenada por la
 instancia (§3). Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)) y con ella
 toda la mitad `⊬¬G` que vivía allí; F1 está compilado (`[AnclaEq]` ⇒ `Prf ⊥`), y **D1 y D3 también
@@ -44,7 +44,7 @@ un fallo.
 
 | teorema | hipótesis | ¿quién la descarga? |
 |---|---|---|
-| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ nadie, y es correcto: es la hipótesis del teorema, y la **mínima** (`¬ Prf ⊥`). Nada del árbol la prueba: es el frente del **modelo de los 142** (A2–A5) |
+| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 desde el 2026‑10‑05 (ADR‑119) la descarga `consistentH`, en el SONDEO `sondeos/ModeloNat.lean` (un modelo de los 142); en el build, ⬜ nadie hasta su promoción. Es la hipótesis **mínima** (`¬ Prf ⊥`) |
 | | ~~`[AnclaEq]`~~ | 🏁 **fuera de la firma desde ADR‑117** (2026‑10‑04): el ancla es el teorema `prf_ancla` (§4). Hasta ese día, ⛔⛔ **NADIE, y NO PODÍA**: `AnclaEq` ⇒ `Prf ⊥` sobre los 141 (`sondeos/AnclaEqInconsistente.lean`, hoy REGISTRO: `anclaEq_prf_bot`, y `hipotesis_goedel_insatisfacibles` — `[AnclaEq]` y `ConsistentH` **no valían a la vez**) |
 | | *(el punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
 | **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | ⬜ ídem |
