@@ -68,16 +68,16 @@ invariancia bajo `substtc` es imprescindible para evaluarlo. ⚠️ **No sale po
 ancla a `listFormCodeM axioms` a nivel OBJETO, mientras que `termCode axiomsCodeT` y
 `termCode (listFormCodeM axioms)` son códigos meta distintos (de hecho, provablemente distintos).
 
-Se prueba en cambio **estructuralmente**: `axiomsCodeT = .func "axiomsCodeT" []`, así que su código
-es `funcc ⌜"axiomsCodeT"⌝ nil`, un árbol cerrado sin ningún `varc` ⟹ `substtc` es la identidad por
+Se prueba en cambio **estructuralmente**: `axiomsCodeT = .func sym!"axiomsCodeT" []`, así que su código
+es `funcc (strCode sym!"axiomsCodeT") nil`, un árbol cerrado sin ningún `varc` ⟹ `substtc` es la identidad por
 las ecuaciones `ax_substtc_func` / `ax_substtsc_nil`. -/
 
 /-- **`termCode axiomsCodeT` es `substtc`‑invariante** (código cerrado, sin huecos). -/
 theorem substtc_inv_termCode_axiomsCodeT (W : Term) :
     Prf (substtc zero W (termCode axiomsCodeT) =eq termCode axiomsCodeT) := by
-  show Prf (substtc zero W (funcc (strCode "axiomsCodeT") nil)
-    =eq funcc (strCode "axiomsCodeT") nil)
-  exact prf_eq_trans (prf_substtc_func zero W (strCode "axiomsCodeT") nil)
+  show Prf (substtc zero W (funcc (strCode sym!"axiomsCodeT") nil)
+    =eq funcc (strCode sym!"axiomsCodeT") nil)
+  exact prf_eq_trans (prf_substtc_func zero W (strCode sym!"axiomsCodeT") nil)
     (prf_congr_bin2 (prf_substtsc_nil zero W))
 
 /-! ### Los componentes del bicondicional `ax_lineWF_thy` (ESTRICTO), sobre la línea abstracta `#0` -/

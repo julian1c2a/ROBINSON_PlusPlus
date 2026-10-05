@@ -120,10 +120,10 @@ theorem m1_stmt : ConsistentH ↔ ¬ Prf Formula.bottom := Iff.rfl
 def MN : Model Nat where
   func := fun s args =>
     match s, args with
-    | "0", []      => 0
-    | "S", [a]     => a + 1
-    | "+", [a, b]  => a + b
-    | "*", [a, b]  => a * b
+    | sym!"0", []      => 0
+    | sym!"S", [a]     => a + 1
+    | sym!"+", [a, b]  => a + b
+    | sym!"*", [a, b]  => a * b
     | _, _         => 0
   rel := fun _ _ => False
 

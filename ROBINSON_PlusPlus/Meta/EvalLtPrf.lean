@@ -146,7 +146,7 @@ theorem ltBwd : Prf (forall_2 phiLtBwd) := by
 /-! ### La implicación `⇐` de `ax13`, CODIFICADA en forma rastreada
 
 `substCodeF 1 w phiLtBwd` computa por `rfl` a
-`implc (exc (eqCodeFn (addcT (liftc 0 w) (succcT ⌜v₀⌝)) ⌜v₁⌝)) (atom2CodeFn "<" w ⌜v₀⌝)`.
+`implc (exc (eqCodeFn (addcT (liftc 0 w) (succcT ⌜v₀⌝)) ⌜v₁⌝)) (atom2CodeFn sym!"<" w ⌜v₀⌝)`.
 El `substfc` externo (testigo `tcFn b`) más la normalización de los `liftc` con (A) dan el código
 rastreado de `(∃k. ȧ + σk = ḃ) ⇒ ȧ < ḃ`. -/
 

@@ -62,7 +62,7 @@ namespace ROBINSON_PlusPlus.Meta.D3BodyPrf
 theorem hG_lineWF (s : Term) :
     Prf (substfc zero s (lineWFCodeFn (varc (numeral 0))) =eq lineWFCodeFn s) := by
   unfold lineWFCodeFn atom1CodeFn
-  refine prf_eq_trans (prf_substfc_atom zero s (strCode "lineWF")
+  refine prf_eq_trans (prf_substfc_atom zero s (strCode sym!"lineWF")
     (cons (varc (numeral 0)) nil)) ?_
   refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
   exact prf_eq_trans (prf_substtsc_cons zero s (varc (numeral 0)) nil)
@@ -70,7 +70,7 @@ theorem hG_lineWF (s : Term) :
       (prf_congr_cons_tail (prf_substtsc_nil zero s)))
 
 theorem hwG_lineWF : Prf (hasWitF (lineWFCodeFn (varc (numeral 0)))) :=
-  prf_hasWitF_atom1 (strCode "lineWF") (varc (numeral 0)) (prf_hasWit_varc (numeral 0))
+  prf_hasWitF_atom1 (strCode sym!"lineWF") (varc (numeral 0)) (prf_hasWit_varc (numeral 0))
 
 /-- ⭐ **De la cadena sale la buena-formación de la línea `i`-ésima.** Es el `∀`-elim en `i`
     del `chainOkB`, y lo consumen **las dos** mitades de `hbody`: (a) para reflejar `lineWF`, y (b)

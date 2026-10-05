@@ -282,21 +282,21 @@ theorem pcc_eq_of_tc_bridge (t u : Term)
 
 /-! ### Átomos unarios: `atom1CodeFn` (constructor object del código de `Formula.atom s [a]`)
 
-Necesario para el átomo `lineWF t = Formula.atom "lineWF" [t]` del cuerpo de `chainOkB`.
+Necesario para el átomo `lineWF t = Formula.atom sym!"lineWF" [t]` del cuerpo de `chainOkB`.
 Espeja `atom2CodeFn` (`Meta/TrackedCorePrf.lean`), que cubre los átomos binarios (`In`,
 `chainOk`, `allIn`). -/
 
 /-- Constructor object del código de un **átomo unario** `Formula.atom s [a]` desde el código `a`
     de su argumento: `⟨3, ⌜s⌝, [a]⟩`. -/
-def atom1CodeFn (s : String) (a : Term) : Term :=
+def atom1CodeFn (s : List Char) (a : Term) : Term :=
   cons (numeral 3) (cons (strCode s) (cons (cons a nil) nil))
 
 /-- **Puente definicional** con `formCode` (por definición de `formCode` sobre `.atom`). -/
-theorem atom1CodeFn_termCode (s : String) (a : Term) :
+theorem atom1CodeFn_termCode (s : List Char) (a : Term) :
     atom1CodeFn s (termCode a) = formCode (Formula.atom s [a]) := rfl
 
 /-- **Clausura** de `atom1CodeFn s a` bajo `liftTerm`: cerrado si `a` lo es. -/
-theorem liftTerm_atom1CodeFn (s : String) (a : Term)
+theorem liftTerm_atom1CodeFn (s : List Char) (a : Term)
     (ha : ∀ lvl, liftTerm lvl a = a) :
     ∀ lvl, liftTerm lvl (atom1CodeFn s a) = atom1CodeFn s a := by
   intro lvl
@@ -304,25 +304,25 @@ theorem liftTerm_atom1CodeFn (s : String) (a : Term)
     liftTerm_numeral, liftTerm_strCode, ha lvl]
 
 /-- **Congruencia** de `atom1CodeFn` en su argumento (`Prf`). -/
-theorem prf_congr_atom1CodeFn {s : String} {a a' : Term} (ha : Prf (a =eq a')) :
+theorem prf_congr_atom1CodeFn {s : List Char} {a a' : Term} (ha : Prf (a =eq a')) :
     Prf (atom1CodeFn s a =eq atom1CodeFn s a') := by
   unfold atom1CodeFn
   exact prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head (prf_congr_cons_head ha)))
 
 /-- **Transporte** de la demostrabilidad de un átomo unario por igualdad del código de su
     argumento (Leibniz object vía `provFromCode`). -/
-theorem prf_provFromCode_atom1_congr {s : String} {a a' : Term} (ha : Prf (a =eq a')) :
+theorem prf_provFromCode_atom1_congr {s : List Char} {a a' : Term} (ha : Prf (a =eq a')) :
     Prf (provFromCode (atom1CodeFn s a) ⇒ provFromCode (atom1CodeFn s a')) :=
   prf_provCode_congr (prf_congr_atom1CodeFn ha)
 
 /-- **Clausura** de `provFromCode (atom1CodeFn s a)` bajo `liftFormula` (arg cerrado). -/
-theorem liftFormula_provFromCode_atom1 (k : Nat) (s : String) (a : Term)
+theorem liftFormula_provFromCode_atom1 (k : Nat) (s : List Char) (a : Term)
     (ha : ∀ lvl, liftTerm lvl a = a) :
     liftFormula k (provFromCode (atom1CodeFn s a)) = provFromCode (atom1CodeFn s a) :=
   liftFormula_provFromCode k (atom1CodeFn s a) (liftTerm_atom1CodeFn s a ha)
 
 /-- Constructor object del código de `lineWF t` desde el código `tc` de `t`. -/
-def lineWFCodeFn (tc : Term) : Term := atom1CodeFn "lineWF" tc
+def lineWFCodeFn (tc : Term) : Term := atom1CodeFn sym!"lineWF" tc
 
 /-- Puente `lineWFCodeFn (termCode t) = formCode (lineWF t)` (rfl). -/
 theorem lineWFCodeFn_termCode (t : Term) :

@@ -46,7 +46,7 @@ una inducción de listas (receta §28), con la base aquí resuelta.
 -/
 
 /-- Constructor de código del término simbólico `runFn x y`: `⟨1, ⌜runFn⌝, [x, y]⟩`. -/
-def runFnT (x y : Term) : Term := funcc (strCode "runFn") (cons x (cons y nil))
+def runFnT (x y : Term) : Term := funcc (strCode sym!"runFn") (cons x (cons y nil))
 
 /-- Código de la evaluación de `runFn nil p`: *el término simbólico `runFn(ṅil, ṗ)` es igual al
     numeral del valor `(runFn nil p)˙`*. -/
@@ -98,7 +98,7 @@ theorem prf_congr_runFnT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =
 /-- `substtc` atraviesa `runFnT` (funcc de 2 argumentos). -/
 theorem prf_substtc_runFnT (v W x y : Term) :
     Prf (substtc v W (runFnT x y) =eq runFnT (substtc v W x) (substtc v W y)) :=
-  prf_substtc_funcc2 v W (strCode "runFn") x y
+  prf_substtc_funcc2 v W (strCode sym!"runFn") x y
 
 /-- `substtc` deja invariante `termCode nil` (código cerrado; `nil = zero`). -/
 theorem prf_substtc_termCode_nil (W : Term) :

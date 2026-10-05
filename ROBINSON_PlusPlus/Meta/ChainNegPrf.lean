@@ -931,10 +931,10 @@ theorem prf_nthc_two_1 (a b : Term) :
 ⭐⭐⭐ **Esto era lo que se daba por el riesgo de la vía, y la medición lo refuta.**
 
 La «Nota de rendimiento» de la cabecera de `Meta/ChainDecode.lean` avisa de que *«un `match` sobre
-`Term` con las 21 formas anidadas revienta el `whnf` (`String.decEq` en el discriminante)»*, y de
-ahí salió la idea de que repartir entre las seis causas sería caro. **No aplica al despachador**:
-`peelArgs` ya movió el `match` de `Term` a `(tag : Nat, args : List Term)`, y un split de 21 ramas
-sobre un `Nat` elabora en **4,5 s** y sale **net‑0 puro** (medido, `sondeos/DespachadorCoste.lean`).
+`Term` con las 21 formas anidadas revienta el `whnf` (`String.decEq` en el discriminante)»* (con símbolos
+`String`; ✏️ desde D7 son `List Char`), y de ahí salió la idea de que repartir entre las seis causas sería
+caro. **No aplica al despachador**: `peelArgs` ya movió el `match` de `Term` a `(tag : Nat, args : List Term)`,
+y un split de 21 ramas sobre un `Nat` elabora en **4,5 s** y sale **net‑0 puro** (medido, `sondeos/DespachadorCoste.lean`).
 
 🔑 *El aviso de rendimiento era CIERTO y estaba en el sitio equivocado: describía la vía que
 `peelArgs` ya había abandonado.* Una nota de riesgo sobrevive al rediseño que la deja sin objeto.

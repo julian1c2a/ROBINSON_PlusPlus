@@ -225,22 +225,22 @@ theorem prf_liftc_funcc2 (c s a b : Term) :
 /-- `liftc` atraviesa `nthcT`. -/
 theorem prf_liftc_nthcT (c x y : Term) :
     Prf (liftc c (nthcT x y) =eq nthcT (liftc c x) (liftc c y)) :=
-  prf_liftc_funcc2 c (strCode "nthc") x y
+  prf_liftc_funcc2 c (strCode sym!"nthc") x y
 
 /-- `liftc` atraviesa `lencT`. -/
 theorem prf_liftc_lencT (c x : Term) :
     Prf (liftc c (lencT x) =eq lencT (liftc c x)) :=
-  prf_liftc_funcc1 c (strCode "lenc") x
+  prf_liftc_funcc1 c (strCode sym!"lenc") x
 
 /-- `liftc` atraviesa `carcT`. -/
 theorem prf_liftc_carcT (c x : Term) :
     Prf (liftc c (carcT x) =eq carcT (liftc c x)) :=
-  prf_liftc_funcc1 c (strCode "carc") x
+  prf_liftc_funcc1 c (strCode sym!"carc") x
 
 /-- `liftc` atraviesa `cdrcT`. -/
 theorem prf_liftc_cdrcT (c x : Term) :
     Prf (liftc c (cdrcT x) =eq cdrcT (liftc c x)) :=
-  prf_liftc_funcc1 c (strCode "cdrc") x
+  prf_liftc_funcc1 c (strCode sym!"cdrc") x
 
 /-- **`substfc` sobre una forma `shapeDot`**: sólo toca la ranura del nodo. Es la pieza que
     consume cualquier recorrido de disyuntos por forma (C3‑T, C3‑F). -/

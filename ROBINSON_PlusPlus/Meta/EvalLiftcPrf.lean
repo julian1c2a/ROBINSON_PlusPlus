@@ -776,8 +776,8 @@ theorem CRIT_targetLift_real (t : Term) : Prf (targetLift (termCodeM t)) :=
     `funcc` (el testigo es el mismo del termino entero, `tcodes1`).
 
     ⚠️ El simbolo de funcion es INTERNO y fijo (`add_sym`, de `Minimal/Axioms.lean`): no
-    aparece en la conclusion, asi que exponerlo como parametro `(f : String)` — como hacia
-    el sondeo — solo aparentaba generalidad. Cero simbolos de funcion objeto nuevos. -/
+    aparece en la conclusion, asi que exponerlo como parametro —`(f : String)` en el sondeo; hoy
+    seria `List Char`, D7— solo aparentaba generalidad. Cero simbolos de funcion objeto nuevos. -/
 theorem CRIT_targetLiftsc_real (ts : List Term) :
     Prf (targetLiftsc (termsCodeM ts)) := by
   have h := prf_isTC1_tcodes (Term.func add_sym ts)

@@ -131,8 +131,8 @@ theorem prf_charsCode_numeral : ∀ cs : List Char,
   | []      => prf_refl _
   | c :: cs => prf_cons_eval_of (prf_refl (numeral c.toNat)) (prf_charsCode_numeral cs)
 
-theorem prf_strCode_numeral (s : String) : Prf (strCode s =eq numeral (codeNatStr s)) :=
-  prf_charsCode_numeral s.toList
+theorem prf_strCode_numeral (s : List Char) : Prf (strCode s =eq numeral (codeNatStr s)) :=
+  prf_charsCode_numeral s
 
 mutual
 theorem prf_termCode_numeral : ∀ t : Term, Prf (termCode t =eq numeral (codeNatTerm t))

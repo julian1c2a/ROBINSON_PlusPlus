@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -45,9 +45,9 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 128 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 88 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -9779,3 +9779,106 @@ automáticas. Los `set_option autoImplicit false` de los módulos nuevos (ADR‑
 🔑 *Una opción de Lake puede llegar sólo al editor: el control es una sonda que DEBE fallar en el build.*
 
 **Véase también:** ADR‑002 (rectificado), ADR‑121 (la auditoría que lo vio).
+
+---
+
+<a id="adr-129"></a>
+## ADR-129: 🔤 D7 EJECUTADA — los símbolos de FOL son `List Char`, en FOL y en RPP
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ (este commit; FOL `14b1692` y el re‑freeze `f53953f`) · **Ámbito:** FOL
+(25 módulos con código —los 24 con sitios `String` del inventario y `SymClasses`, que retira una instancia— y 3 sólo
+con prosa; 16 descongelados) y RPP (28 módulos con código y uno nuevo, 12 sólo con prosa, diez sondeos, documentos).
+Decisión del propietario, el 2026-10-05:
+*«la decisión es completar la sustitución String->List Char, D7 se cierra solo cuando esté completamente lista y
+terminada la sustitución»*. Reabre la D7 que ADR‑101/102 cerraron como ABANDONADA en FOL y que la puerta de ADR‑122
+recomendaba cerrar. El `thaw --confirm` de los módulos CONGELADOS de FOL que la sustitución exige (no se puede hacer
+por `*Ext.lean`: los binders `String` dejan de tipar contra los `abbrev` nuevos) queda autorizado por esa decisión;
+se vuelven a congelar en el commit siguiente de FOL, que sólo toca las dos listas (como en ADR‑116: `0b62f88` →
+`9d8e21e`).
+
+### 1 · FOL
+
+* `FOL/FOL.lean`: `abbrev Term := TermG (List Char)`, `abbrev Formula := FormulaG (List Char)`, los dos shims de
+  `noConfusion`; se RETIRA la `instance : Coe String Formula` (sin consumidores, medido). `FOL/Semantics.lean`:
+  `abbrev Model (D) := ModelG (List Char) D`.
+* `FOL/Fresh0.lean`: `shift s := 'f' :: s`; `cst 0 = ['g']`, `cst (n+1) = 'a' :: cst n` (los nombres de siempre);
+  `cst_utf8ByteSize` → `cst_length`; `unshift` es un `match` y `unshift_shift` es `rfl`; se retiran `valid_tail` y
+  `shift_bytes` (la capa de bytes de `String`). La instancia `FOL.Fresh0.instFreshSymListChar` no depende de ningún
+  axioma (la de `String`: `[propext, Quot.sound]`). `FOL/SymClasses.lean`: su instancia de medida `FreshSym (List Char)`
+  se retira (la de `Fresh0` es ya la de `List Char`). `FOL/Enumeration.lean`: `natToString` → `natToSym`,
+  `natToString_surj` → `natToSym_surj`, una sola instancia `EnumSym (List Char)`. `FOL/HenkinLimit0.lean`: las cotas por
+  `length` en vez de `utf8ByteSize`.
+* El resto, mecánico (`String` → `List Char` en los tipos, `"P"` → `['P']`), compiló a la primera; `Fresh0`,
+  `HenkinLimit0` y `Enumeration` llevaron arreglos de API escritos a mano. FOL compila entero (58 jobs).
+* Prueba de cierre, MEDIDA: 0 `String` en el CÓDIGO de `FOL/**` y `TheoryFramework/**`, 0 literales de símbolo.
+* Descongelados (`thaw --confirm`) y vueltos a congelar: los 14 con código (Fresh0, HenkinLimit0, Henkin0, Rename,
+  Canonical0, Craig0, Interpolation0, QFDecide0, Skolem0, SkolemN0, SkolemNF0, SkolemHerbrand0, HerbrandBlock0,
+  Soundness0) y Compacity0 y Lindenbaum0 (sólo prosa). Los bloqueados, desbloqueados y vueltos a bloquear.
+
+### 2 · RPP
+
+* `Minimal/SymLit.lean`, nuevo: la macro `sym!"…"` —`syntax:max`, construye `List.cons` de literales de carácter al
+  ELABORAR, vale en término y en patrón, con un `unexpander`—; su sonda `symProbe` no depende de ningún axioma. Diseño:
+  `doc/PLAN-COMPLETITUD-FINITISTA.md` §7.2 y la exploración `wf_cac4ffca-a10`.
+* Los 17 `*_sym : List Char := sym!"…"` (mismos puntos de código), los 164 literales de símbolo del inventario a
+  `sym!"…"` (con los ocho `MN_*` nuevos, 172 `sym!` en el código de 21 ficheros, fuera de `SymLit.lean`), y la cadena
+  `strCode`/`strCodeM`/`codeNatStr` sobre `List Char` SIN `.toList` y con los mismos nombres; `strCode_injective`,
+  `codeNatStr_inj`, `decodeStr_*` y `decS_codeNatStr` pierden sus lemas de `String`. **Ningún VALOR cambia**
+  (`codeNat`, `V₀`, `godelCN`, el ancla): son los mismos caracteres.
+* El modelo `MNV` despacha por patrones `sym!"σ"`, … ⛔ Sus 34 validaciones `v_*` desplegaban `MNV` en el `simp`, y con
+  patrones `List Char` se agotaba el límite de `whnf` (medido: los 34 fallaron así); ahora reescriben con un lema `rfl`
+  por símbolo (`MN_*`, ocho nuevos). `Meta/ModeloEstandar.lean` compila en 11 s.
+* El TIPO `String` sólo se nombra, en el código de todo el árbol de RPP, en `termToString` (impresión, tres líneas);
+  la macro de `Minimal/SymLit.lean` maneja la cadena del literal al ELABORAR, y su resultado no la nombra.
+* **El dividendo, MEDIDO** (`check-footprints`): de las 229 filas de RPP de antes, 226 llevaban `Classical.choice`;
+  hoy **182 de 233** —**44 lo pierden**, entre ellas `v_ancla` y `MN_codingAxioms`; la puerta de ADR‑122 decía «hasta
+  48»—. Las cuatro filas nuevas (`strCode`, `strCodeM`, `codeNatStr`, `symProbe`) no dependen de ningún axioma.
+  `sondeos/D7Contrafactual.lean`, re‑ejecutado: «con choice hoy: 182 · cortando String.*: 182» —ya no entra ningún
+  `Classical.choice` por `String`—. NO lo pierden los titulares de Gödel, la solidez ni Tarski: su `choice` es el de la
+  solidez clásica (`prf_sound`, el axioma `p3`). En FOL, las 39 filas con `Classical.choice` siguen; dos pierden
+  `propext`/`Quot.sound` (`Compacity0.evalFormula_updateCsts`, `evalTerm_updateCsts`).
+
+### 3 · Medido
+
+* **Build**: FOL, 58 jobs (desde la raíz de RPP, `lake build "@FOL/FOL" "@FOL/TheoryFramework"`; los 4 avisos de
+  siempre, en `TheoryFramework/Relations.lean`); RPP, **129 jobs** (uno más: `Minimal/SymLit.lean`), 383 s, 0
+  errores; `Meta/ModeloEstandar.lean`, 11 s.
+* **El primer build de RPP tras la sustitución**: 34 errores, los 34 en `Meta/ModeloEstandar.lean`, los 34 un `simp`
+  que agota `whnf` (los `v_*`); el arreglo, el de §2.
+* **Controles**, todos verdes. RPP: `check-sorry` (0 `sorry`, los 8 agujeros de confianza a 0, el censo «EVALUAR EL
+  ANCLA» sin órdenes), `check-estratos` (los 10), `check-warnings` (los 11 declarados, ninguno nuevo),
+  `check-footprints` (**492 filas**, cobertura 463), `leanchecker` sobre RPP, FOL y TheoryFramework (526 s, rc 0) y
+  `check-doc-sync`. FOL: `check-axioms`, `check-sorry` y `check-doc-sync`.
+* **Líneas**: por script (pasada en seco), 229 en FOL (24 ficheros), 210 en RPP y 105 en los sondeos; lo demás, a
+  mano. Diff de CÓDIGO (sin comentarios, con `strip-lean.awk`; sin líneas en blanco): FOL +232 −308 en 25 módulos;
+  RPP +292 −262 en 29; sondeos +142 −145 en 10. La ESTIMACIÓN de ADR‑122 (500–750 líneas) no fijaba su unidad: no se
+  compara.
+* **Prueba de cierre**: 0 líneas de código con `String` en `FOL/**` y `TheoryFramework/**`; en el árbol de RPP, 3,
+  las de `termToString`. En `sondeos/`, 16 ficheros lo nombran en código: los que compilan, para imprimir, para
+  nombres de constantes (`#print axioms String.toList`, la tabla de `D7Contrafactual`) o para medir el propio `String`
+  (`NombresFrescosMedicion`, del 2026‑09‑14); los demás ya no compilaban antes de D7 y son registro.
+* **Sondeos**: los 88, re‑medidos (dos en paralelo, 6 min de límite): **35 compilan** —los mismos 35 que en ADR‑127:
+  D7 rompió diez y los diez se migraron—, 52 no, y 1 por tiempo: `SubCodesCritica`, que no compilaba, sigue con el
+  mismo primer error (`:132:12`); su tiempo varía con la carga —a solas, 297 s y 500 s antes de D7 y 478 s hoy; en las
+  pasadas de ADR‑121 y ADR‑127, 335–353 s— y esta vez pasó del límite. `D7Contrafactual`: «titulares: 233 · declaran
+  choice en la tabla: 182 · con choice hoy: 182 · con choice cortando String.*: 182».
+
+### 4 · Lo que NO dice
+
+* PeanoRF (bloqueado, sólo lectura) depende de `../FOL` y `../ROBINSON_PlusPlus` por ruta: dejará de compilar contra el
+  FOL nuevo hasta que se adapte. Medido hoy con `strip-lean.awk` (sólo lectura): 88 líneas de código con `String` en 8
+  ficheros de su árbol de build (la exploración decía 89), y 83 más en 7 sondeos; no todas son de símbolos. No se toca.
+* Los otros cuatro que requieren `../FOL` por ruta —`FOL_Compiler`, `FOL_CompStructs`, `Lean4_vs_PureLogic`,
+  `Ordinals_Induction_Recursion`— están en toolchains anteriores (v4.29.0 a v4.30.0) y su último commit es de junio de
+  2026: no se han compilado contra este FOL, ni antes ni después de D7. Líneas de código con `String`, medidas igual:
+  36, 12, 0 y 1.
+* Los sondeos que ya no compilaban antes de D7 conservan su `String` (registro): migrar su tipo no los haría
+  compilar, porque fallan por otras causas (nombres retirados, ambigüedades), medidas en `sondeos/README.md`.
+* El riesgo de evaluación en el núcleo (`wf_cac4ffca-a10`): D7 no hace evaluable nada nuevo —`String.toList` ya se
+  reducía—; la barrera es `triN`, unaria, y no cambia. El censo «EVALUAR EL ANCLA» de `check-sorry` sigue verde.
+
+🔑 *Medir antes de migrar fijó el ALCANCE, que salió exacto (24 + 28 ficheros, 164 literales); el único tropiezo cayó
+donde la medición había puesto su riesgo R3 —los 34 `v_*` del despacho del modelo—, aunque por otra causa: el `whnf`
+del `simp`, no la ortografía de los símbolos.*
+
+**Véase también:** ADR‑101/102 (D7 abandonada, en su día), ADR‑122 (la puerta contrafactual).

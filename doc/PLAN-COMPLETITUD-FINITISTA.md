@@ -1,6 +1,6 @@
 # PLAN-COMPLETITUD-FINITISTA.md — dos objetivos, un bloqueante común
 
-**Última actualización:** 2026-09-27 (notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros
+**Última actualización:** 2026-10-05 (D7 ejecutada (ADR‑129 de RPP): notas fechadas en el banner, §7, §7.5, §7.2, §7.4 y §7.3, y el resultado medido al final de §7.3; antes, 2026-09-27, notas fechadas de ADR‑110: bajo el banner de la vía W, en §6.3 y en §7; antes, 2026-09-18 12:30) · **Autor:** Julián Calderón Almendros
 
 > 🏁🏁 **PASOS 0 y 1 EJECUTADOS el 2026‑09‑14** (ADR‑033, ADR‑034). `Derives₀` está en el build
 > (`Derives₀.rec` mide `[propext]`) **y su SOLIDEZ está demostrada**:
@@ -49,7 +49,7 @@
 > modelo de un punto), footprint `[propext, Quot.sound]`. **El mismo enunciado que
 > `derives0_consistent`, sin `Classical.choice`.** Ver §5.12.
 >
-> ~~⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.~~ ⛔ *(anotado el 2026-09-26)* La migración de firma quedó **ABANDONADA en FOL** (§7.3, D7, ADR-102): `Term`/`Formula` siguen sobre `String` a propósito.
+> ~~⬜ **Lo que queda no es matemática sino firma**: el muro `String`, §7.~~ ⛔ *(anotado el 2026-09-26)* La migración de firma quedó **ABANDONADA en FOL** (§7.3, D7, ADR-102): `Term`/`Formula` siguen sobre `String` a propósito. ✏️ *(2026-10-05)* **REABIERTA y EJECUTADA** (D7, ADR‑129 de RPP, decisión del propietario): `Term`, `Formula` y `Model` son hoy `TermG (List Char)`, `FormulaG (List Char)` y `ModelG (List Char)`; el resultado medido, al final de §7.3.
 >
 > 🏁 **Y sobre las dos vías cerradas se ha ido construyendo un CATÁLOGO de metateoremas**, §6.5–§**6.13**: compacidad y LS descendente (054), consistencia finitaria (053), Herbrand de bloque (055), Skolem/Henkin conservativo (056), la capa prenexa (057), la forma normal prenexa (058), Skolem con término (059), bajo un prefijo `∀ⁿ` (060), 🏁 **la FORMA NORMAL de Skolem** (062) 🏁 **MAEHARA + CRAIG** para el fragmento puro (063) y 🏁 **la mitad ⟹ de HERBRAND DE BLOQUE** (064). ⇒ **sin deudas enunciadas.**
 > ⚠️ Lo excluido del catálogo va con su razón **medida** en ADR‑054 §4 (propiedad de subfórmula, conservatividad de los 107 `codingAxioms`, Church): **falsos o no enunciables**, no «pendientes».
@@ -1266,14 +1266,17 @@ es un axioma**. Censo con `collectAxioms` (`sondeos/ClassicalChoiceCenso.lean`):
 * En Lean v4.31 **toda operación que DESCOMPONE un `String` lo trae** (`toList`, `data`, `foldr`,
   `foldl`, `length`, `get`); construirla o compararla, **no** (`ofList`, `decEq`).
 * La raíz en RPP son **dos líneas**: `strCode s := charsCode s.toList` y `strCodeM`. `charsCode`,
-  `numeralM` y `axiomsCodeT` están **limpios**.
+  `numeralM` y `axiomsCodeT` están **limpios**. ✏️ *(2026‑10‑05, D7 EJECUTADA, ADR‑129 de RPP)*: hoy
+  `strCode s := charsCode s` y `strCodeM s := charsCodeM s`, sin ningún axioma.
 
 🔑 **El footprint no distingue la no‑constructividad MATEMÁTICA de la deuda de IMPLEMENTACIÓN del
 núcleo.** `strCode` es computable y constructiva.
 
 ⬜ **Si se quisiera de verdad**: cambiar `Term.func : String → List Term → Term` por un tipo de
 símbolos **numerable y con `DecidableEq` real**. Limpiaría también las 6 de
-`FOL/Enumeration.lean`. **Es un cambio de firma en FOL y toca a RPP entero.**
+`FOL/Enumeration.lean`. **Es un cambio de firma en FOL y toca a RPP entero.** ✏️ *(2026‑10‑05)* **HECHO el
+cambio de firma** (D7, ADR‑129 de RPP): el tipo es `List Char`. Las 6 de `FOL/Enumeration.lean` no las limpió D7:
+ya lo había hecho ADR‑110 sin cambiar la firma (nota de abajo). Lo medido, al final de §7.3.
 
 📝 **2026‑09‑27 · matiz medido** (auditoría de constructividad de FOL, ADR‑110): lo que trae
 `Classical.choice` en v4.31 no es «descomponer» un `String` sino **DECODIFICAR UTF‑8** —la raíz es una
@@ -1288,6 +1291,9 @@ axioma; `append` y `exists_eq_ofList`, sólo `[propext]`. Con eso, `FOL/Enumerat
 `not_eq_of_beq_eq_false` sobre `String` sintetiza `ReflBEq` por `String.instOrd` y trae choice sin
 descomponer nada. ⇒ La migración de §7.3 no hacía falta para esto. HIPÓTESIS, sin medir: el mismo
 recurso (codificar `s.toByteArray` en vez de `s.toList`) podría limpiar `strCode`/`strCodeM` de RPP.
+✏️ *(2026‑10‑05, D7 EJECUTADA, ADR‑129 de RPP)*: los nombres de esta nota son de antes de la migración —hoy
+`natToSym_surj`, la cota va por la longitud (`cst_length`) y `unshift` es un `match` sobre `List Char`—, y
+`strCode`/`strCodeM` quedaron sin ningún axioma por la migración, no por la vía de los bytes.
 
 ---
 
@@ -1302,6 +1308,8 @@ candidatos de §7.2 **no sirve como está**, y la razón es de una línea:
 MEDIDO, y esto no es una limitación pendiente de comprobar: `natToTerm_surj`
 (`../FOL/FOL/Enumeration.lean:268`) es un **teorema compilado** que refuta que existan κ términos
 cerrados distintos para κ no numerable, porque los símbolos son `String` (`../FOL/FOL/FOL.lean:12`).
+✏️ *(2026‑10‑05)*: hoy son `List Char` (D7, ADR‑129 de RPP; `../FOL/FOL/FOL.lean:76`), igual de numerable:
+`natToTerm_surj` sigue (`../FOL/FOL/Enumeration.lean:312`).
 
 ⇒ **migrar a `List Char` y después querer LS ascendente obliga a migrar DOS VECES.** La firma que
 sirve a los dos es un **parámetro** `S` (el tercer candidato de §7.2, el que la tabla marca como el
@@ -1320,7 +1328,8 @@ El **enunciado** de LS ascendente sí es expresable sin Mathlib: `Model D` toma 
 
 ### ⛔ Y el segundo bloqueo, que es independiente del primero
 
-Toda la maquinaria de Henkin es una **ω‑cadena**: `cst : Nat → String` (`Fresh0.lean:91`),
+Toda la maquinaria de Henkin es una **ω‑cadena**: `cst : Nat → String` (`Fresh0.lean:91`; ✏️ 2026‑10‑05, D7:
+hoy `cst : Nat → List Char`, `Fresh0.lean:137`),
 `LindenbaumStep : Nat → …` (`Lindenbaum0.lean:130`), `hen`/`hidx` (`HenkinLimit0.lean:221`/`:193`).
 Para un lenguaje no numerable haría falta **Lindenbaum transfinito** ⇒ **Zorn**, y el compilador
 dice que en el núcleo **no existen** `Zorn`, `zorn_le`, `Cardinal`, `Ultrafilter`, `Filter`,
@@ -1392,12 +1401,17 @@ es lo único sucio de la cadena**.
 
 * **La propagación real.** El proyecto tiene el escarmiento escrito: el cierre por nombres
   **sobreestimó por dos órdenes de magnitud**; sólo el compilador vale. **No medido.**
+  ✏️ *(2026‑10‑05)*: ejecutada (D7, ADR‑129 de RPP), sin cifra de propagación: en FOL, los módulos que
+  sólo cambiaban tipos y literales compilaron a la primera.
 * ⚠️ **Cambia `G`.** Al cambiar la representación de los símbolos cambia `strCode`, y con él
   `formCode`, `axiomsCodeT`, `provCodeC'` y **la sentencia de Gödel**. Los teoremas son
   paramétricos en eso y *deberían* sobrevivir, pero hay muchos **puentes por `rfl`** y
   comparaciones de códigos que habría que re‑verificar **uno a uno**. 🔑 *Estimación, etiquetada.*
+  ✏️ *(2026‑10‑05, D7 EJECUTADA)*: **no cambió**: los literales son los mismos caracteres, y `codeNat`, `V₀`,
+  `godelCN`, el ancla y `tcFnN` dan los mismos números.
 * ⭐ **A cambio se simplifican las piezas más feas**: `CodeDistinct` y `codeNatChars_inj` usan hoy
-  `String.toList_inj` y `String.ext`; **con listas, la inyectividad es gratis**.
+  `String.toList_inj` y `String.ext`; **con listas, la inyectividad es gratis**. ✏️ *(2026‑10‑05)*: así
+  salió: `strCode_injective` es `charsCode_injective`, y `codeNatStr_inj`, `codeNatChars_inj`.
 
 ### La lectura, y por qué NO es urgente
 
@@ -1413,6 +1427,10 @@ implementación del núcleo.
 
 Sanción del propietario: *«lo agregas al cambio de `String` → `List Char` cuando tengamos
 realmente el módulo canónico»*. ⇒ **mismo paquete, misma condición**, no un frente aparte.
+
+✏️ *(2026‑10‑05)*: la migración se ejecutó SIN este paquete (D7, ADR‑129 de RPP). Ya no iba con ella: la tesis
+de M‑10 la cerró ADR‑070 (2026‑09‑18: la instancia para `⊢` compila, la idea está muerta) y la pregunta del
+linter, ADR‑074 (hay API y salta; ver `Sugerencias.md`). La tabla de abajo es la de 2026‑09‑16.
 
 **La tesis a medir** (⬜ TODO sin etiqueta de medición, y por eso va aquí y no en un ADR):
 *M‑10 puede salir del script y entrar en la FIRMA; M‑11 no —es una propiedad del ENTORNO, cuantifica
@@ -1431,7 +1449,7 @@ de §7.3.
 
 ---
 
-### 7.3 · ~~✅ Decisión: **PROYECTADO**, no pendiente (2026‑09‑14)~~ — ⛔ **CERRADA como ABANDONADA en FOL** (2026-09-26, D7; ver el final de la tabla)
+### 7.3 · ~~✅ Decisión: **PROYECTADO**, no pendiente (2026‑09‑14)~~ — ⛔ **CERRADA como ABANDONADA en FOL** (2026-09-26, D7; ver el final de la tabla) — ✏️ 🏁 **REABIERTA y EJECUTADA el 2026‑10‑05** (ADR‑129 de RPP; ver el final de la sección)
 
 Sanción del propietario: *«lo proyectamos para cuando termines el trabajo más inmediato y todo esté
 más limpio»*.
@@ -1456,9 +1474,31 @@ T1-T6 (su `Classical.choice` es el WKL, ADR-069 §4); de las 51 filas de FOL con
 (`strCode`/`strCodeM`), no de FOL. La vía de enhebrar las clases por la cadena de completitud
 también está CERRADA (ADR-100 §1.1, definitiva el 2026-09-26).
 
+🏁 **2026‑10‑05 · REABIERTA y EJECUTADA** (ADR‑129 de RPP). Decisión del propietario: *«la decisión es completar
+la sustitución String->List Char, D7 se cierra solo cuando esté completamente lista y terminada la sustitución»*.
+Lo de arriba queda como registro. Compilado (FOL 58 jobs, RPP 129) y MEDIDO:
+
+* **FOL**: `abbrev Term := TermG (List Char)`, `abbrev Formula := FormulaG (List Char)` y `Model D := ModelG (List
+  Char) D`; la instancia `Coe String Formula`, retirada (sin consumidores). `FreshSym (List Char)` es la de
+  `FOL/Fresh0.lean`, `instFreshSymListChar`, sin ningún axioma (la de `String` llevaba `[propext, Quot.sound]`), y
+  `EnumSym` tiene una sola instancia, `instEnumSymListChar`. Cero `String` en el código de `FOL/**` y de
+  `TheoryFramework/**`.
+* **RPP**: los 17 `*_sym` son `List Char := sym!"…"` (macro nueva, `Minimal/SymLit.lean`); `strCode`, `strCodeM` y
+  `codeNatStr` no dependen de ningún axioma. **Ningún valor cambia**: `codeNat`, `V₀`, `godelCN`, el ancla y
+  `tcFnN` dan los mismos números.
+* **Footprints** (`check-footprints.bash`): se confirma lo que decía la razón del 2026-09-26, que el dividendo es de
+  RPP y no de FOL. De las 39 filas de FOL con `Classical.choice`, ninguna lo pierde. Aparte, dos lemas de
+  `Compacity0` que no lo llevaban se quedan sin ningún axioma: `evalFormula_updateCsts` (antes `[propext]`) y
+  `evalTerm_updateCsts` (antes `[propext, Quot.sound]`). En RPP lo pierden **44** filas
+  (lo llevaban 226 de 229; hoy, 182 de 233; la puerta de ADR‑122 decía hasta 48), entre ellas `v_ancla` y
+  `MN_codingAxioms`. No lo pierden los titulares de Gödel, la solidez ni Tarski: su `Classical.choice` es el de la
+  solidez clásica (`prf_sound`, el axioma `p3`), no el de `String`.
+* **Fuera de los dos repos**: PeanoRF (bloqueado, sólo lectura) depende de `../FOL` y `../ROBINSON_PlusPlus` por
+  ruta y dejará de compilar contra el FOL nuevo hasta que se adapte; no se toca.
+
 ⚠️ **Y una razón técnica para que sea en ese orden, no en otro**: la migración **cambia `G`**
 (§7.2), así que hacerla **en medio** del ensamblaje obligaría a re‑verificar los puentes por `rfl`
-**dos veces**. Primero se cierra, después se migra.
+**dos veces**. Primero se cierra, después se migra. ✏️ *(2026‑10‑05)*: ningún código cambió de valor (ver arriba).
 
 🔑 Lo que se gana esperando no es comodidad: es **no pagar dos veces la misma re‑verificación**.
 

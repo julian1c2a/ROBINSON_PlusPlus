@@ -22,7 +22,7 @@ sitios**, no en uno:
 
 ## Por qué la ruta es única, y quedó medido antes de empezar
 
-`tcFn` es un ATOMO OPACO (`Term.func "tcFn" [t]`) caracterizado por **sólo dos axiomas vivos**:
+`tcFn` es un ATOMO OPACO (`Term.func sym!"tcFn" [t]`) caracterizado por **sólo dos axiomas vivos**:
 `ax_tc_zero` y `ax_tc_succ` (`ax_tc_cons` sigue RETIRADO por la reparación de inconsistencia).
 Para `t` abstracto no hay nada que desplegar ⟹ la única ruta es **inducción OBJETO** sobre
 `zero`/`succ`, que es exactamente el fragmento que esos dos axiomas cubren.
@@ -37,8 +37,8 @@ los 57 sondeos.
 ⚠️ **LA MONEDA DE LA INDUCCION OBJETO** (§3.31): el paso NO puede llevar la HI como hipótesis
 META. Tiene que ser la implicación OBJETO `∀. Φ ⇒ Φ[σ#0]`, que es la firma de `prf_nat_induction`.
 
-**Footprint**: `[propext, Classical.choice, Quot.sound]` — **net-0 puro**, ni un axioma del
-proyecto (la inducción entra por `Prf.ind`, constructor del cálculo).
+**Footprint**: `[propext, Quot.sound]` — **net-0 puro**, ni un axioma del proyecto (la inducción entra por
+`Prf.ind`, constructor del cálculo). ✏️ 2026‑10‑05, D7: con símbolos `String` llevaba también `Classical.choice`.
 -/
 
 open FOL

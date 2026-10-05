@@ -94,8 +94,8 @@ namespace Sondeos.AnclaEqInconsistente
 /-! ## §1 · Reemplazar el símbolo `axiomsCodeT` por un término `r` -/
 
 /-- ¿Es `t` la constante `axiomsCodeT`? (símbolo `"axiomsCodeT"` sin argumentos). -/
-def esAC : String → List Term → Bool
-  | f, [] => f == "axiomsCodeT"
+def esAC : List Char → List Term → Bool
+  | f, [] => f == sym!"axiomsCodeT"
   | _, _ :: _ => false
 
 mutual
@@ -118,15 +118,15 @@ def repF (r : Term) : Formula → Formula
   | .or a b => .or (repF r a) (repF r b)
   | .ex a => .ex (repF r a)
 
-theorem esAC_liftTerms (f : String) (c : Nat) (ts : List Term) :
+theorem esAC_liftTerms (f : List Char) (c : Nat) (ts : List Term) :
     esAC f (liftTerms c ts) = esAC f ts := by
   cases ts <;> rfl
 
-theorem esAC_substTerms (f : String) (v : Nat) (s : Term) (ts : List Term) :
+theorem esAC_substTerms (f : List Char) (v : Nat) (s : Term) (ts : List Term) :
     esAC f (substTerms v s ts) = esAC f ts := by
   cases ts <;> rfl
 
-theorem esAC_true {f : String} {ts : List Term} (h : esAC f ts = true) : ts = [] := by
+theorem esAC_true {f : List Char} {ts : List Term} (h : esAC f ts = true) : ts = [] := by
   cases ts with
   | nil => rfl
   | cons _ _ => simp [esAC] at h
@@ -610,11 +610,11 @@ theorem occT_nD (L : List Formula) : occT (nD L) = false := occT_numeralM _
 theorem occTs_nD (L : List Formula) : occTs [nD L] = false := by
   rw [occTs, occT_nD, occTs]; rfl
 
-theorem occT_tcFn_nD (L : List Formula) : occT (Term.func "tcFn" [nD L]) = false := by
+theorem occT_tcFn_nD (L : List Formula) : occT (Term.func sym!"tcFn" [nD L]) = false := by
   rw [occT, occTs_nD]; rfl
 
 theorem occT_deltaD (L : List Formula) : occT (deltaD L) = false := by
-  show occT (Term.func "substfc" [zero, Term.func "tcFn" [nD L], nD L]) = false
+  show occT (Term.func sym!"substfc" [zero, Term.func sym!"tcFn" [nD L], nD L]) = false
   rw [occT, occTs, occTs, occTs, occTs, occT_tcFn_nD, occT_nD]; rfl
 
 /-- La imagen REAL del ancla por el reemplazo de §1 (`axiomsCodeT ↦ rr`): sólo cambia el lado izquierdo. -/

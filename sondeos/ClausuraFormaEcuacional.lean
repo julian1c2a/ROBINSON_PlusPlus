@@ -399,7 +399,7 @@ theorem map_mem_tc (v t y : Term) : ∀ w : Term,
     ═══════════════════════════════════════════════════════════════════════════ -/
 
 /-- El map de `substfc` sobre listas de códigos de FÓRMULA. Símbolo NUEVO, sin axiomas. -/
-def substfsc (v t l : Term) : Term := Term.func "substfsc" [v, t, l]
+def substfsc (v t l : Term) : Term := Term.func sym!"substfsc" [v, t, l]
 
 /-- La ecuación `cons` que HARÍA FALTA axiomatizar, en la forma cerrada que tendría en
     `Minimal/Axioms.lean` (espejo EXACTO de `ax_substtsc_cons`). -/

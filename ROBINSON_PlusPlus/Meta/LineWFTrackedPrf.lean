@@ -560,9 +560,9 @@ theorem prf_lt_numeralM {a b : Nat} (h : a < b) : Prf (lt (numeralM a) (numeralM
 /-- `lwfDot t =eq lineWFCodeFn (tcFn t)`. -/
 theorem prf_lwfDot_eq (t : Term) :
     Prf (lwfDot t =eq lineWFCodeFn (tcFn t)) := by
-  show Prf (substfc zero (tcFn t) (atomc (strCode "lineWF") (cons (varc (numeral 0)) nil))
-    =eq atomc (strCode "lineWF") (cons (tcFn t) nil))
-  refine prf_eq_trans (prf_substfc_atom zero (tcFn t) (strCode "lineWF")
+  show Prf (substfc zero (tcFn t) (atomc (strCode sym!"lineWF") (cons (varc (numeral 0)) nil))
+    =eq atomc (strCode sym!"lineWF") (cons (tcFn t) nil))
+  refine prf_eq_trans (prf_substfc_atom zero (tcFn t) (strCode sym!"lineWF")
     (cons (varc (numeral 0)) nil)) ?_
   refine prf_congr_cons_tail (prf_congr_cons_tail (prf_congr_cons_head ?_))
   refine prf_eq_trans (prf_substtsc_cons zero (tcFn t) (varc (numeral 0)) nil) ?_

@@ -498,6 +498,9 @@ theorem formCode_decodeForm {c : Term} {φ : Formula} (hc : IsCanon c) :
 > ⚠️ **Trampa (`strCode`):** los símbolos van como `charsCode s.toList`. El decodificador debe
 > reconstruir la `String` desde los `Char.toNat`. Usar `charToNat_ne` / `charsCode_ne` (ya existen)
 > para la inyectividad.
+>
+> ✏️ *(2026‑10‑05, D7 EJECUTADA, ADR‑129 de RPP)*: hoy los símbolos son `List Char`: `strCode s := charsCode s`,
+> y `decodeStr : Term → Option (List Char)` es `decodeChars`; ya no hay `String` que reconstruir.
 
 **Luego, el decodificador de reglas y cadenas** (necesita el acumulador para `mp`/`gen`/`thy`, que
 referencian líneas anteriores **por índice**):

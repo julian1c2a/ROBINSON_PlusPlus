@@ -48,9 +48,9 @@ Espeja EXACTAMENTE el análisis de casos de `substtcN`/`substfcN`: la etiqueta `
 es de nadie va a una constante cerrada (`dflt`) o a `⊥`. Así la sustitución CONMUTA con la decodificación para TODO
 número, basura incluida, y no hace falta saber qué números son códigos de verdad. -/
 
-def decS (n : Nat) : String := String.ofList ((decodeL n).map Char.ofNat)
+def decS (n : Nat) : List Char := (decodeL n).map Char.ofNat
 
-def dflt : Term := Term.func "" []
+def dflt : Term := Term.func sym!"" []
 
 mutual
 def decT (c : Nat) : Term :=
@@ -152,10 +152,10 @@ theorem decodeL_codeNatChars : ∀ cs : List Char, decodeL (codeNatChars cs) = c
   | [] => decodeL_zero
   | c :: cs => by rw [codeNatChars, decodeL_consN, decodeL_codeNatChars cs]; rfl
 
-theorem decS_codeNatStr (s : String) : decS (codeNatStr s) = s := by
+theorem decS_codeNatStr (s : List Char) : decS (codeNatStr s) = s := by
   rw [decS, codeNatStr, decodeL_codeNatChars, List.map_map]
   have e : (Char.ofNat ∘ Char.toNat) = id := funext (fun c => Char.ofNat_toNat c)
-  rw [e, List.map_id, String.ofList_toList]
+  rw [e, List.map_id]
 
 mutual
 theorem decT_codeNatTerm (t : Term) : decT (codeNatTerm t) = t := by

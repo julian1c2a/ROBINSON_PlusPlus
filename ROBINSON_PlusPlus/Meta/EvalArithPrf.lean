@@ -182,7 +182,7 @@ theorem prf_congr_funcc3 {sc x x' y y' z z' : Term}
 
 /-- El constructor de código `substfc` (DEFINICIÓN; ninguna ecuación suya se postula). -/
 def substfcT (v s f : Term) : Term :=
-  funcc (strCode "substfc") (cons v (cons s (cons f nil)))
+  funcc (strCode sym!"substfc") (cons v (cons s (cons f nil)))
 
 theorem substfcT_termCode (v s f : Term) :
     substfcT (termCode v) (termCode s) (termCode f) = termCode (substfc v s f) := rfl
@@ -194,7 +194,7 @@ theorem prf_congr_substfcT {v v' s s' f f' : Term}
 theorem prf_substtc_substfcT (v W x y z : Term) :
     Prf (substtc v W (substfcT x y z)
       =eq substfcT (substtc v W x) (substtc v W y) (substtc v W z)) :=
-  prf_substtc_funcc3 v W (strCode "substfc") x y z
+  prf_substtc_funcc3 v W (strCode sym!"substfc") x y z
 
 theorem substtc_inv_substfcT {X Y Z : Term}
     (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))

@@ -42,9 +42,9 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 128 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 88 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` y el ancla diagonal, ADR‑117).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -85,6 +85,10 @@ Grafo de dependencias verificado contra los `import` de cada `.lean`. Sin ciclos
 > `codeNatTerm`/`codeNatTerms`, `codeNat`) baja de `Meta/CodeNumeralPrf.lean` a `Minimal/Axioms.lean` —el enunciado
 > del axioma diagonal la lleva, y `axioms` no puede importar `Meta`—: `Minimal/Axioms.lean` sigue importando sólo
 > `FOL.FOL` y `FOL.Theorems.Eq`, y `CodeNumeralPrf` la reexporta. La tabla de niveles de §0 no lo recoge.
+>
+> 🆕 **2026‑10‑05 (ADR‑129, D7) — un módulo nuevo y una arista.** `Minimal/SymLit.lean` (la macro `sym!"…"`, sin
+> imports) y `Minimal/Axioms.lean` → `Minimal/SymLit.lean`: desde D7, `Minimal/Axioms.lean` importa `FOL.FOL`,
+> `FOL.Theorems.Eq` y `Minimal.SymLit`.
 >
 > ⚠️ **Alcance (nota 2026-07-12, ampliada 2026-08-22)**: el **grafo módulo‑a‑módulo** de abajo cubre
 > solo **`Minimal/`** (Axioms + Block1–8, 11 módulos). `Full/` (11 módulos) se documenta en
@@ -200,6 +204,7 @@ graph TD
 
     subgraph RPP ["Project: ROBINSON_PlusPlus"]
         direction TB
+        SymLit["Minimal/SymLit"]
         Axioms["Minimal/Axioms"]
         Block1["Block1 (aritmética)"]
         Block2["Block2 (sqrt + orden)"]
@@ -215,6 +220,7 @@ graph TD
 
     FOL_FOL --> Axioms
     FOL_Eq --> Axioms
+    SymLit --> Axioms
     Axioms --> Block1
     Axioms --> Block2
     Axioms --> Block3
@@ -287,7 +293,8 @@ Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
 ### Level 0 — Foundation
 
 * `FOL.*` (proyecto sibling, dependencia local vía `lakefile.lean`).
-* `Minimal/Axioms.lean` — lenguaje + **141 axiomas objeto** (`def axioms`, línea 1199) + los esquemas del verificador + la capa Δ₀ (`lenc`/`nthc`). Solo importa `FOL.FOL` y `FOL.Theorems.Eq`.
+* `Minimal/SymLit.lean` — la macro `sym!"…"` (D7, ADR‑129): sin imports.
+* `Minimal/Axioms.lean` — lenguaje + **141 axiomas objeto** (`def axioms`, línea 1199) + los esquemas del verificador + la capa Δ₀ (`lenc`/`nthc`). Solo importa `FOL.FOL` y `FOL.Theorems.Eq` (✏️ y desde D7, 2026‑10‑05, `Minimal.SymLit`).
   ✏️ Los 141 valen hasta ADR‑117 (2026‑10‑04): hoy son **142** —los 141 de `axiomsBase` y el ancla diagonal `ax_axiomsCodeT_def`, el último—, y el fichero aloja también la familia `codeNat`, bajada de `Meta/CodeNumeralPrf.lean`. Sigue importando sólo esos dos.
   ⚠️ Las **6 meta-reglas ω** (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`, `dne`) **ya no viven aquí**: se movieron a `FOL/MetaRules.lean` y se re-exportan (ADR-010).
 

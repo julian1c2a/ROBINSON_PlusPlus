@@ -11,7 +11,8 @@
 **Contenido:** Nivel B (codificación `⌜·⌝`, `G`, Teorema G1 como **meta‑inyectividad**) y Nivel C
 (`formCode`, `IsFormula` — núcleo real de codificación). La capa legacy postulada se retiró en F7a; lo
 que había sobre `⊢` (`Provable`, la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
-**Last updated:** 2026-10-05 · Lean v4.31.0 — Gödel I/II SIN HIPÓTESIS (ADR‑120: `ConsistentH` es teorema, un
+**Last updated:** 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos son `List Char` y
+`strCode` es `charsCode` (§3.12, §3.13). Antes, 2026-10-05 — Gödel I/II SIN HIPÓTESIS (ADR‑120: `ConsistentH` es teorema, un
 modelo de los 142) y Gödel I ENTERO (ADR‑121: `⊬ ¬G`). Antes, 2026-10-04 — Gödel I/II, ya no vacuos por F1 y
 condicionales a `ConsistentH` (ADR‑117). Antes, 2026-10-02 — revisado entero tras retirar la capa `⊢` (ADR‑115):
 fuera `Block6`, `encode_cons_inj`/`encode_cons_neq_nil`, `Provable`/`provable_formCode_iff`, y los
@@ -62,7 +63,7 @@ retiró con la capa `⊢` (ADR‑115).
 sobre códigos (`Term`) con conclusión meta (`S = S' : List Sym`). La inyectividad
 **plena** (`encode_injective`) se establece a nivel meta (Lean), por inducción
 estructural sobre la lista vía inyectividad de `cons`/`func`/`G` (`injection` +
-`decide` sobre los símbolos `String` distintos). **No requiere `Con(axioms)`**.
+`decide` sobre los símbolos distintos, `List Char` desde D7; antes `String`). **No requiere `Con(axioms)`**.
 Pasar de la versión object-level (retirada, ver arriba) a la conclusión meta sí
 requeriría consistencia, por lo que esa conexión interna quedaba para el Nivel C/D.
 Ver `GODEL-STATUS.md` §2.
@@ -82,7 +83,7 @@ Ver `GODEL-STATUS.md` §2.
 
 ```lean
 def charsCode : List Char → Term          -- cadena de caracteres
-def strCode   : String → Term             -- símbolo (vía s.toList)
+def strCode   : List Char → Term          -- símbolo: := charsCode s (D7; antes String, vía s.toList)
 mutual
   def termCode  : Term → Term             -- var n ↦ ⟨0,n⟩ ; func s ts ↦ ⟨1, strCode s, termsCode ts⟩
   def termsCode : List Term → Term
@@ -98,7 +99,7 @@ def IsFormula (x : Term) : Prop := ∃ φ : Formula, x = formCode φ            
 
 ```lean
 theorem charsCode_injective {l l'} : charsCode l = charsCode l' → l = l'
-theorem strCode_injective   {s t}  : strCode s = strCode t → s = t
+theorem strCode_injective   {s t}  : strCode s = strCode t → s = t       -- := charsCode_injective (D7)
 theorem termCode_injective  {t t'} : termCode t = termCode t' → t = t'      -- (mutuo)
 theorem termsCode_injective {ts ts'} : termsCode ts = termsCode ts' → ts = ts'
 theorem formCode_injective  {φ φ'} : formCode φ = formCode φ' → φ = φ'      -- Teo G1 (fórmulas)

@@ -118,7 +118,7 @@ theorem encode_cons (s : Sym) (S : List Sym) :
     ⌜s :: S⌝ = cons (G s) ⌜S⌝ := rfl
 
 /-- Lean-level: `nil` y `cons` se construyen con símbolos de función distintos
-    (`"0"` vs `"::"`), luego nunca son el mismo `Term`. -/
+    (`sym!"0"` vs `sym!"::"`), luego nunca son el mismo `Term`. -/
 private theorem nil_ne_cons (a b : Term) : nil ≠ cons a b := by
   intro h
   simp only [nil, zero, cons] at h

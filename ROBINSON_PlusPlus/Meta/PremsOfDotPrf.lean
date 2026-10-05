@@ -75,7 +75,7 @@ namespace ROBINSON_PlusPlus.Meta.PremsOfDotPrf
 /-! ## §1 · `premsOfT` y su fontanería -/
 
 /-- Código object del término `premsOf x` desde el código `x`. -/
-def premsOfT (x : Term) : Term := funcc (strCode "premsOf") (cons x nil)
+def premsOfT (x : Term) : Term := funcc (strCode sym!"premsOf") (cons x nil)
 
 theorem premsOfT_termCode (a : Term) : premsOfT (termCode a) = termCode (premsOf a) := rfl
 
@@ -84,14 +84,14 @@ theorem substCodeT_premsOf (v : Nat) (W X : Term) :
     substCodeT v W (premsOf X) = premsOfT (substCodeT v W X) := rfl
 
 theorem prf_hasWit_premsOfT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (premsOfT X)) :=
-  prf_hasWit_funcc1 (strCode "premsOf") X hX
+  prf_hasWit_funcc1 (strCode sym!"premsOf") X hX
 
 theorem prf_congr_premsOfT {x y : Term} (h : Prf (x =eq y)) : Prf (premsOfT x =eq premsOfT y) :=
   prf_congr_funcc2 (prf_congr_cons_head h)
 
 theorem prf_substtc_premsOfT (v W x : Term) :
     Prf (substtc v W (premsOfT x) =eq premsOfT (substtc v W x)) :=
-  prf_substtc_funcc1 v W (strCode "premsOf") x
+  prf_substtc_funcc1 v W (strCode sym!"premsOf") x
 
 /-! ## §2 · Listas objeto y su versión de CÓDIGO DOTADO -/
 

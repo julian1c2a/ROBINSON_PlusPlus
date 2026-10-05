@@ -31,14 +31,17 @@
 `Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 (`goedel_second'`) — 🏁 **D3 DEMOSTRADA** el 2026‑09‑10g (`d3_prf_real`), con lo que la cadena
 D1/D2/D3 **no postula ninguna de las tres**.
-**Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0.
+**Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0. ✏️ 2026‑10‑05,
+D7 ejecutada (ADR‑129 de RPP): las cifras del ESTADO REAL de abajo, §3.22 (`decodeStr` da `Option (List Char)`) y
+los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 128 jobs · 111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/`
-> + 85 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
+> **Build 129 jobs · 112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/`
+> + 88 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
+> *(Y el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -398,7 +401,7 @@ theorem pcc_exIntro_code_objList (A lines) (hclosed) (h) : Prf (provCodeC' (Form
 ```lean
 theorem liftFormula_provFromCode (k c) (hc : ∀ lvl, liftTerm lvl c = c)
   : liftFormula k (provFromCode c) = provFromCode c   -- clausura genérica (código cerrado arbitrario)
-def atom2CodeFn (s a b : Term) : Term := ⟨3, strCode s, [a, b]⟩   -- código de Formula.atom s [a,b]
+def atom2CodeFn (s : List Char) (a b : Term) : Term := ⟨3, strCode s, [a, b]⟩   -- código de Formula.atom s [a,b]
 theorem atom2CodeFn_termCode (s a b) : atom2CodeFn s (termCode a)(termCode b) = formCode (.atom s [a,b])  -- rfl
 theorem inFormCodeFn_eq_atom2 (xc Lc) : inFormCodeFn xc Lc = atom2CodeFn in_sym xc Lc   -- rfl
 theorem liftTerm_atom2CodeFn (s a b) (ha hb) : ∀ lvl, liftTerm lvl (atom2CodeFn s a b) = atom2CodeFn s a b
@@ -407,8 +410,8 @@ theorem prf_congr_atom2CodeFn {s a a' b b'} (ha : Prf (a =eq a')) (hb : Prf (b =
 theorem prf_provFromCode_atom2_congr {s a a' b b'} (ha) (hb)
   : Prf (provFromCode (atom2CodeFn s a b) ⇒ provFromCode (atom2CodeFn s a' b'))
 theorem liftFormula_provFromCode_atom2 (k s a b) (ha hb) : liftFormula k (provFromCode (atom2CodeFn s a b)) = provFromCode (atom2CodeFn s a b)
-def chainOkCodeFn (cc pc) := atom2CodeFn "chainOk" cc pc   -- + chainOkCodeFn_termCode (rfl)
-def allInCodeFn (cc Lc) := atom2CodeFn "allIn" cc Lc        -- + allInCodeFn_termCode (rfl)
+def chainOkCodeFn (cc pc) := atom2CodeFn sym!"chainOk" cc pc   -- + chainOkCodeFn_termCode (rfl)
+def allInCodeFn (cc Lc) := atom2CodeFn sym!"allIn" cc Lc        -- + allInCodeFn_termCode (rfl)
 ```
 
 **`Meta/NumListPrf.lean`** — namespace `…Meta.NumListPrf`: capa numérica de listas en `Prf`
@@ -422,7 +425,7 @@ theorem prf_nthc_succ (h t i) : Prf (nthc (cons h t) (succ i) =eq nthc t i)
 ```
 
 **Nuevas defs/axiomas en `Minimal/Axioms.lean`** (extensión definicional conservadora, capa numérica
-de listas para D3, §12‑A): `lenc l := func "lenc" [l]`, `nthc l i := func "nthc" [l, i]`; axiomas
+de listas para D3, §12‑A): `lenc l := func sym!"lenc" [l]`, `nthc l i := func sym!"nthc" [l, i]`; axiomas
 `ax_lenc_nil` (`lenc nil = 0`), `ax_lenc_cons` (`lenc (cons h t) = σ (lenc t)`), `ax_nthc_zero`
 (`nthc (cons h t) 0 = h`), `ax_nthc_succ` (`nthc (cons h t) (σ i) = nthc t i`). Añadidos a `axioms`
 y `codingAxioms` (`axioms_eq` rfl preservado; verificador/`prf_iff_derivation`/D1 intactos).
@@ -981,7 +984,7 @@ dan la biyección.
 ```lean
 def decodeNat   : Term → Option Nat            -- σⁿ0 ↦ n
 def decodeChars : Term → Option (List Char)    -- guard (Char.ofNat code).toNat == code  ⟵ imprescindible
-def decodeStr   : Term → Option String         -- (decodeChars ·).map String.ofList
+def decodeStr   : Term → Option (List Char)    -- := decodeChars c (D7; antes Option String, vía String.ofList)
 mutual def decodeTerm : Term → Option Term  def decodeTerms : Term → Option (List Term) end
 def decodeForm  : Term → Option Formula        -- los 9 tags (⊥ 2 · atom 3 · =eq 4 · ⇒ 5 · ∀ 6 · ∧ 7 · ∨ 8 · ∃ 9)
 
@@ -999,7 +1002,8 @@ theorem decodeForm_inj {c φ} : decodeForm c = some φ → c = formCodeM φ    -
 > estructuralmente rígidos ⟹ la inyectividad vale para **todo** `c : Term`.
 >
 > ⚠️ **Dos trampas reales** (ver [[feedback-lean-kernel-ite-string]]):
-> 1. **Kernel + `DecidableEq String`.** `split`/`rw`/`simp only [decodeX]` **manuales** sobre `if s == sym`
+> 1. **Kernel + `DecidableEq String`** (medido con símbolos `String`; ✏️ 2026‑10‑05: desde D7 son `List Char`, y no
+>    se ha vuelto a medir). `split`/`rw`/`simp only [decodeX]` **manuales** sobre `if s == sym`
 >    fabrican un cast `congrFun'` que **el núcleo RECHAZA**. Se sortea con **inducción funcional**
 >    (`fun_induction`; para las mutuas `decodeTerm.induct` con `motive_2` explícito) + `unfold … at h`.
 > 2. **`Char.ofNat` CLAMPA** ⟹ `decodeChars` no es inyectiva sin el guard `(Char.ofNat code).toNat == code`
@@ -1009,7 +1013,7 @@ theorem decodeForm_inj {c φ} : decodeForm c = some φ → c = formCodeM φ    -
 
 Invierte `lineJustif`/`lineCode'`/`proofCode'` (`Representability2.lean`). El justif se **pela** a
 `List Term` (`peelArgs`) para matchear `(tag : Nat, args)` — un `match` sobre las 21 formas anidadas de
-`Term` reventaría el `whnf` (`String.decEq`).
+`Term` reventaría el `whnf` (`String.decEq`; medido con símbolos `String`. ✏️ 2026‑10‑05: desde D7 son `List Char`, y no se ha vuelto a medir).
 
 ```lean
 def peelArgs   : Term → List Term                              -- cons a (cons b nil) ↦ [a, b]
@@ -2159,8 +2163,8 @@ godelCN: 483 dependencias transitivas
 ¿depende de  axioms / ax_lineWF_q1 / coreAxioms / codingAxioms ?  ->  NINGUNA
 ```
 
-**Razón estructural, y comprobable**: `axiomsCodeT := Term.func "axiomsCodeT" []`,
-`lineWF l := Formula.atom "lineWF" [l]`, `chainOk c p := Formula.atom "chainOk" [c,p]` y `runFn`
+**Razón estructural, y comprobable**: `axiomsCodeT := Term.func sym!"axiomsCodeT" []`,
+`lineWF l := Formula.atom sym!"lineWF" [l]`, `chainOk c p := Formula.atom sym!"chainOk" [c,p]` y `runFn`
 son **átomos OPACOS**. `provFormulaC' = ∃p. chainOk nil p ∧ In #1 (runFn nil p)` los menciona
 **sólo por su nombre**, y `godelBeta'`/`godelPred'`/`diagTerm`/`selfAppN` se construyen encima.
 ⇒ **la sentencia G, como fórmula, no depende de `axioms`.**
@@ -3331,7 +3335,7 @@ condición no se puede escribir… hasta que se empaquetan:
 def argsInPair (p : Term) : Formula := argsIn (carc p) (cdrc p)
 ```
 
-`carc p = Term.func "carc" [p]`, así que `liftTerm k (carc p) = carc (liftTerm k p)` **por
+`carc p = Term.func sym!"carc" [p]`, así que `liftTerm k (carc p) = carc (liftTerm k p)` **por
 computación**, y la naturalidad sale sola. Es la misma necesidad con la que se topó aquel
 sondeo, y por eso el kit trae `pcc_carcD_bridge_cons`/`pcc_cdrcD_bridge_cons`.
 
@@ -4706,7 +4710,7 @@ falta, y ninguno sustituye al otro:
 
 | obligación | cómo |
 |---|---|
-| `hCl`, `hCs` | `chainOk nil q` es un **átomo** (`Formula.atom "chainOk" [nil, q]`): `simp` |
+| `hCl`, `hCs` | `chainOk nil q` es un **átomo** (`Formula.atom sym!"chainOk" [nil, q]`): `simp` |
 | `hbl`, `hbs` | `lenc` es símbolo objeto: `simp` |
 | `hPl`, `hPs` | §3.56.3 — y eran **falsas** con el `PsiF` de §8 |
 | **`hwPsi`** | ⭐ **cae entera con la rama C de ADR‑020**, sin trabajo nuevo |
@@ -5412,7 +5416,8 @@ especializado era la envoltura.
    extra `A`** que atraviese el `∃`‑elim — con su `A'` liftada, porque `PrfH_ex_elim` lifta todo el
    contexto.
 2. ⚠️ **Dejar que `rfl` case `liftTerm 0 (miPhiAt …)` agota los heartbeats.** Lean despliega
-   `strCode "premsOf"` **carácter a carácter**. Con `liftTerm_strCode`/`liftTerm_numeral` en un
+   `strCode "premsOf"` **carácter a carácter** (medido con símbolos `String`; ✏️ 2026‑10‑05: desde D7,
+   `strCode sym!"premsOf"`, y no se ha vuelto a medir). Con `liftTerm_strCode`/`liftTerm_numeral` en un
    `simp only` sale en un instante. 🔑 **Regla**: la naturalidad de un código con nombres de
    símbolo dentro se da **por lemas, nunca por `rfl`**.
 3. ⚠️ **Al desempaquetar con Leibniz hay que PROTEGER el hueco.** `carc (cons q i) ≐ q` no es

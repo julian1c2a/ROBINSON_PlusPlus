@@ -120,9 +120,8 @@ theorem codeNatChars_inj : ∀ {cs ds : List Char},
       have hc : c = d := Char.ext (UInt32.toNat_inj.mp this.1)
       rw [hc, codeNatChars_inj this.2]
 
-theorem codeNatStr_inj {s t : String} (h : codeNatStr s = codeNatStr t) : s = t := by
-  have := codeNatChars_inj (cs := s.toList) (ds := t.toList) h
-  exact String.ext (by simpa [String.toList] using this)
+theorem codeNatStr_inj {s t : List Char} (h : codeNatStr s = codeNatStr t) : s = t :=
+  codeNatChars_inj h
 
 
 mutual

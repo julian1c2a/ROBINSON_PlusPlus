@@ -73,7 +73,7 @@ theorem consN_inj {a b a' b' : Nat} (h : consN a b = consN a' b') : And (a = a')
 theorem consN_ne_zero (a b : Nat) : consN a b ≠ 0 := by unfold consN; omega
 
 def codeNatChars : List Char → Nat | [] => 0 | c :: cs => consN c.toNat (codeNatChars cs)
-def codeNatStr (s : String) : Nat := codeNatChars s.toList
+def codeNatStr (s : List Char) : Nat := codeNatChars s
 mutual
 def codeNatTerm : Term → Nat
   | .var n => consN 0 (consN n 0)
@@ -100,9 +100,8 @@ theorem codeNatChars_inj : ∀ {cs ds : List Char}, codeNatChars cs = codeNatCha
       have := consN_inj h
       have hc : c = d := Char.ext (UInt32.toNat_inj.mp this.1)
       rw [hc, codeNatChars_inj this.2]
-theorem codeNatStr_inj {s t : String} (h : codeNatStr s = codeNatStr t) : s = t := by
-  have := codeNatChars_inj (cs := s.toList) (ds := t.toList) h
-  exact String.ext (by simpa [String.toList] using this)
+theorem codeNatStr_inj {s t : List Char} (h : codeNatStr s = codeNatStr t) : s = t :=
+  codeNatChars_inj h
 mutual
 theorem codeNatTerm_inj : ∀ {t u : Term}, codeNatTerm t = codeNatTerm u → t = u
   | .var _, .var _, h => by have h1 := consN_inj h; have h2 := consN_inj h1.2; rw [h2.1]

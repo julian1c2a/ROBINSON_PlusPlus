@@ -22,15 +22,15 @@ open FOL.Herbrand0
 -- ══════════════════════════════════════════════════════════════════════════
 
 private def t : Term := Term.var 0
-private def P : Formula := Formula.atom "P" []
+private def P : Formula := Formula.atom ['P'] []
 private def C : Formula := Formula.impl P P
-private def Ebad : List Formula := [eqAtomAx "P" [] [] t t]
+private def Ebad : List Formula := [eqAtomAx ['P'] [] [] t t]
 
 /-- (i) `Ebad` son instancias de igualdad legítimas. -/
 theorem vac_eqInstance : ∀ g, g ∈ Ebad → EqInstance g := by
   intro g hg
   cases hg with
-  | head => exact EqInstance.atom "P" [] [] t t
+  | head => exact EqInstance.atom ['P'] [] [] t t
   | tail _ hm => exact absurd hm List.not_mem_nil
 
 /-- (ii)/(iii) las dos derivaciones existen. -/
@@ -45,12 +45,12 @@ theorem vac_der2 : LK₀ (C :: []) [Formula.eq t t] :=
 predicado `P` **no aparece en ninguno de los dos lados del secuente**. -/
 theorem vac_cond1 : PredSub C ([] ++ [] ++ Ebad) := by
   intro p hp
-  refine ⟨eqAtomAx "P" [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
+  refine ⟨eqAtomAx ['P'] [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
   exact Or.inr (Or.inl (hp.elim (fun h => h) (fun h => h)))
 
 theorem vac_cond2 : PredSub C ([] ++ [Formula.eq t t] ++ Ebad) := by
   intro p hp
-  refine ⟨eqAtomAx "P" [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
+  refine ⟨eqAtomAx ['P'] [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
   exact Or.inr (Or.inl (hp.elim (fun h => h) (fun h => h)))
 
 -- ══════════════════════════════════════════════════════════════════════════
@@ -58,21 +58,21 @@ theorem vac_cond2 : PredSub C ([] ++ [Formula.eq t t] ++ Ebad) := by
 -- toma un predicado ARBITRARIO
 -- ══════════════════════════════════════════════════════════════════════════
 
-theorem predF_eqReflAx (p : String) (u : Term) : Not (predF p (eqReflAx u)) := id
+theorem predF_eqReflAx (p : List Char) (u : Term) : Not (predF p (eqReflAx u)) := id
 
-theorem predF_eqSymmAx (p : String) (u v : Term) : Not (predF p (eqSymmAx u v)) :=
+theorem predF_eqSymmAx (p : List Char) (u v : Term) : Not (predF p (eqSymmAx u v)) :=
   fun h => h.elim id id
 
-theorem predF_eqTransAx (p : String) (u v w : Term) : Not (predF p (eqTransAx u v w)) :=
+theorem predF_eqTransAx (p : List Char) (u v w : Term) : Not (predF p (eqTransAx u v w)) :=
   fun h => h.elim id (fun h2 => h2.elim id id)
 
-theorem predF_eqFuncAx (p f : String) (pre post : List Term) (a b : Term) :
+theorem predF_eqFuncAx (p f : List Char) (pre post : List Term) (a b : Term) :
     Not (predF p (eqFuncAx f pre post a b)) := fun h => h.elim id id
 
 /-- ⛔⛔ **LA QUINTA, Y ES LA QUE LO ROMPE TODO.** `EqInstance.atom` toma `q : String`
 **libre** —sin frescura, sin pertenencia al secuente— y el axioma MENCIONA `q`. ⇒ para
 cualquier `p` existe una instancia de igualdad legítima que lo aporta. -/
-theorem predF_eqAtomAx (p q : String) (pre post : List Term) (a b : Term) :
+theorem predF_eqAtomAx (p q : List Char) (pre post : List Term) (a b : Term) :
     Iff (predF p (eqAtomAx q pre post a b)) (q = p) := by
   constructor
   · intro h
@@ -82,7 +82,7 @@ theorem predF_eqAtomAx (p q : String) (pre post : List Term) (a b : Term) :
 
 /-- ⛔ **Y de ahí sale la vacuidad en general**: para todo `p` hay una `EqInstance` que lo
 aporta, luego un `E` sin cota satisface cualquier condición de lenguaje. -/
-theorem eqInstance_aporta_cualquier_predicado (p : String) :
+theorem eqInstance_aporta_cualquier_predicado (p : List Char) :
     ∃ g, And (EqInstance g) (predF p g) :=
   ⟨eqAtomAx p [] [] t t, EqInstance.atom p [] [] t t, Or.inr (Or.inl rfl)⟩
 

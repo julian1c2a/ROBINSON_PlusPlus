@@ -25,7 +25,7 @@ obligaciones administrativas.
 
 ⚠️ **Pero aquel caso no tenía el hueco que tiene éste.** Allí `wfAll` **es** un `∀` acotado, así
 que lo que `pcc_bdAll_intro` entrega —el código de un `∀` acotado— *es* lo que se pedía. Aquí
-no: `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:864`, `Formula.atom "chainOk" [c,p]`), y su
+no: `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:865`, `Formula.atom sym!"chainOk" [c,p]`), y su
 forma acotada `chainOkB` es otra fórmula. `pcc_bdAll_intro` daría `Prov(⌜chainOkB nil ṗ⌝)`, y
 `hC_dot` pide `Prov(⌜chainOk nil ṗ⌝)`.
 
@@ -581,7 +581,7 @@ theorem hbs_premsBnd (v : Nat) (s q : Term) :
 
 El instinto dice que `premsPair (cons p (cons i L)) = boundedPremsIn nil p i L` por `rfl`.
 **Es falso**, y por la misma razón que `chainOkBDot` no reduce (§3): `carc` y `cdrc` son
-**símbolos de función OBJETO** (`Term.func "carc" […]`), no funciones de Lean. `carc (cons p X)`
+**símbolos de función OBJETO** (`Term.func sym!"carc" […]`), no funciones de Lean. `carc (cons p X)`
 se queda tal cual; que valga `p` es un **teorema de la teoría** (`prf_carc_cons`), no un cómputo.
 
 ⇒ El empaquetado de `pcc_bdAll_intro` **no es gratis** aquí, al revés de lo que sugiere leer
@@ -840,7 +840,7 @@ theorem chainOkBPsiDot_eq :
 
 /-! ### §10.3 · Las cuatro obligaciones administrativas
 
-`CF q := chainOk nil q` es un **átomo** (`Formula.atom "chainOk" [nil, q]`) y `bndF q := lenc q`
+`CF q := chainOk nil q` es un **átomo** (`Formula.atom sym!"chainOk" [nil, q]`) y `bndF q := lenc q`
 un símbolo de función objeto: las cuatro son `simp`. -/
 
 theorem hCl_chainOk (k : Nat) (q : Term) :

@@ -22,8 +22,8 @@ verificador** (`VerifierSound`, módulo E): de un testigo aceptado se recupera l
 sin `termination_by` (los subtérminos aparecen en el patrón). Detalle De Bruijn: `nil = zero =
 numeralM 0` (mismo término), de ahí el cuidado al distinguir «lista vacía» de «numeral 0».
 
-**Nota (String es UTF‑8 en Lean v4.31.0):** `String` no es una estructura sobre `List Char`, así que el
-round‑trip `String ↔ List Char` no es `rfl`; se cierra con **`String.ofList_toList`**.
+**Nota (D7, ADR‑129):** los símbolos son `List Char` y `decodeStr` es `decodeChars`. Con `String` (UTF‑8 en
+Lean v4.31.0, no una estructura sobre `List Char`) el round‑trip no era `rfl` y pedía `String.ofList_toList`.
 -/
 
 /-- Inverso de `numeralM`/`numeral`: `σⁿ0 ↦ n`. -/
@@ -51,8 +51,8 @@ def decodeChars : Term → Option (List Char)
                       else none
   | _ => none
 
-/-- Inverso de `strCodeM`: código de símbolo `↦ String`. -/
-def decodeStr (c : Term) : Option String := (decodeChars c).map String.ofList
+/-- Inverso de `strCodeM`: código de símbolo `↦` símbolo (`List Char`, D7; antes `String`). -/
+def decodeStr (c : Term) : Option (List Char) := decodeChars c
 
 theorem decodeChars_charsCodeM (cs : List Char) : decodeChars (charsCodeM cs) = some cs := by
   induction cs with
@@ -61,8 +61,8 @@ theorem decodeChars_charsCodeM (cs : List Char) : decodeChars (charsCodeM cs) = 
       simp only [charsCodeM, cons, decodeChars, decodeNat_numeralM, ih, Option.bind, Option.map,
         Char.ofNat_toNat, beq_self_eq_true, if_true]
 
-theorem decodeStr_strCodeM (s : String) : decodeStr (strCodeM s) = some s := by
-  simp only [decodeStr, strCodeM, decodeChars_charsCodeM, Option.map, String.ofList_toList]
+theorem decodeStr_strCodeM (s : List Char) : decodeStr (strCodeM s) = some s :=
+  decodeChars_charsCodeM s
 
 /- Inverso de `termCodeM`/`termsCodeM` (mutuo). -/
 mutual
@@ -70,9 +70,10 @@ mutual
 
     ⚠️ Las comparaciones de símbolo van con **`==` (Bool)**, NO con `= … then` (Prop). Es
     deliberado: `decodeTerm`/`decodeTerms` son **mutuas** ⇒ sin `fun_induction`, y la inyectividad se
-    prueba con `split`/`rw` sobre los `if`. Un `if (s = sym)` sobre `DecidableEq String` hace que
-    `split`/`if_pos` fabriquen un cast de instancia que el **núcleo rechaza**; con `==` los `split` son
-    limpios. (`decodeNat`/`decodeChars`/`decodeForm` no lo necesitan: usan `fun_induction`.) -/
+    prueba con `split`/`rw` sobre los `if`. Con símbolos `String` (antes de D7), un `if (s = sym)` hacía que
+    `split`/`if_pos` fabricaran un cast que el **núcleo rechazaba** (con `List Char`, sin volver a medir); con
+    `==` son limpios: lo comprueba hoy el build (`decodeTerm_inj`). (`decodeNat`/`decodeChars`/`decodeForm` no
+    lo necesitan: usan `fun_induction`.) -/
 def decodeTerm : Term → Option Term
   | .func cs [h, t] =>
       if cs == cons_sym then
@@ -164,10 +165,10 @@ theorem decodeForm_formCodeM (φ : Formula) : decodeForm (formCodeM φ) = some �
 decodificado. Es la pieza que hace el trabajo en `VerifierSound` (módulo E): de un testigo aceptado por
 el verificador se recupera —de forma **única**— la derivación real.
 
-**Nota de implementación (kernel + De Bruijn).** El `if s == sym` sobre `DecidableEq String` es
-kernel‑frágil bajo `split`/`rw`/`simp` manuales (fabrican un cast `congrFun'` que el núcleo rechaza).
-Se evita usando **inducción funcional** (`fun_induction` / `.induct`), que genera los casos ya reducidos
-—como en los round‑trips— y `unfold … at h` (limpio) donde hace falta destapar la definición.
+**Nota de implementación (kernel + De Bruijn).** El `if s == sym` sobre `DecidableEq String` era
+kernel‑frágil bajo `split`/`rw`/`simp` manuales (fabricaban un cast `congrFun'` que el núcleo rechaza;
+medido con `String`, antes de D7; con `List Char`, sin volver a medir). Se evita con **inducción funcional**
+(`fun_induction` / `.induct`), que genera los casos ya reducidos, y `unfold … at h` (limpio) donde hace falta.
 -/
 
 /-- Inyectividad de `decodeNat` (⟸ del round‑trip). -/
@@ -208,14 +209,8 @@ theorem decodeChars_inj {c : Term} {cs : List Char} (h : decodeChars c = some cs
   · simp at h
 
 /-- Inyectividad de `decodeStr`. -/
-theorem decodeStr_inj {c : Term} {s : String} (h : decodeStr c = some s) : c = strCodeM s := by
-  simp only [decodeStr] at h
-  rcases hc : decodeChars c with _ | cs
-  · rw [hc] at h; simp at h
-  · rw [hc] at h; simp only [Option.map] at h; injection h with h
-    have hcc := decodeChars_inj hc
-    subst h; rw [hcc]
-    simp only [strCodeM, String.toList_ofList]
+theorem decodeStr_inj {c : Term} {s : List Char} (h : decodeStr c = some s) : c = strCodeM s :=
+  decodeChars_inj h
 
 /-- Inyectividad de `decodeTerm`/`decodeTerms` (mutua, vía el principio de inducción funcional
     `decodeTerm.induct` — el `motive_2` es la inyectividad de `decodeTerms`). -/

@@ -51,22 +51,22 @@ a la izquierda del código va el **término simbólico**, a la derecha el **nume
 /-! ### Constructores de código de los términos de lista -/
 
 /-- Código object del término `carc x` desde el código `x`. -/
-def carcT (x : Term) : Term := funcc (strCode "carc") (cons x nil)
+def carcT (x : Term) : Term := funcc (strCode sym!"carc") (cons x nil)
 /-- Código object del término `cdrc x`. -/
-def cdrcT (x : Term) : Term := funcc (strCode "cdrc") (cons x nil)
+def cdrcT (x : Term) : Term := funcc (strCode sym!"cdrc") (cons x nil)
 /-- Código object del término `lenc x`. -/
-def lencT (x : Term) : Term := funcc (strCode "lenc") (cons x nil)
+def lencT (x : Term) : Term := funcc (strCode sym!"lenc") (cons x nil)
 
 /-! ### La GUARDA de los tres accesores (ADR-020): escalera de aridad, §28 -/
 
 theorem prf_hasWit_carcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (carcT X)) :=
-  prf_hasWit_funcc1 (strCode "carc") X hX
+  prf_hasWit_funcc1 (strCode sym!"carc") X hX
 
 theorem prf_hasWit_cdrcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (cdrcT X)) :=
-  prf_hasWit_funcc1 (strCode "cdrc") X hX
+  prf_hasWit_funcc1 (strCode sym!"cdrc") X hX
 
 theorem prf_hasWit_lencT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (lencT X)) :=
-  prf_hasWit_funcc1 (strCode "lenc") X hX
+  prf_hasWit_funcc1 (strCode sym!"lenc") X hX
 -- `consT` (y su congruencia, `substtc` e invariancia) viven ahora en `Meta/DotConsPrf.lean`:
 -- eran duplicados textuales. Aquí se usan vía `open`.
 
@@ -99,13 +99,13 @@ theorem prf_congr_lencT {x y : Term} (h : Prf (x =eq y)) : Prf (lencT x =eq lenc
 
 theorem prf_substtc_carcT (v W x : Term) :
     Prf (substtc v W (carcT x) =eq carcT (substtc v W x)) :=
-  prf_substtc_funcc1 v W (strCode "carc") x
+  prf_substtc_funcc1 v W (strCode sym!"carc") x
 theorem prf_substtc_cdrcT (v W x : Term) :
     Prf (substtc v W (cdrcT x) =eq cdrcT (substtc v W x)) :=
-  prf_substtc_funcc1 v W (strCode "cdrc") x
+  prf_substtc_funcc1 v W (strCode sym!"cdrc") x
 theorem prf_substtc_lencT (v W x : Term) :
     Prf (substtc v W (lencT x) =eq lencT (substtc v W x)) :=
-  prf_substtc_funcc1 v W (strCode "lenc") x
+  prf_substtc_funcc1 v W (strCode sym!"lenc") x
 
 /-! #### Invariancias `substtc` (descargan la hipótesis `hX` de §26) -/
 

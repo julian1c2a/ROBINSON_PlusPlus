@@ -61,12 +61,12 @@ partialidad de `carc` (esa se resuelve con `chainOk` → la línea es `cons`).
 -/
 
 /-- Constructor de código del término `nthc x y`: `⟨1, ⌜nthc⌝, [x, y]⟩`. -/
-def nthcT (x y : Term) : Term := funcc (strCode "nthc") (cons x (cons y nil))
+def nthcT (x y : Term) : Term := funcc (strCode sym!"nthc") (cons x (cons y nil))
 
 /-- La GUARDA de `nthcT` (ADR-020): es un `funcc` binario ⇒ escalera de aridad, §28. -/
 theorem prf_hasWit_nthcT {X Y : Term} (hX : Prf (hasWit X)) (hY : Prf (hasWit Y)) :
     Prf (hasWit (nthcT X Y)) :=
-  prf_hasWit_funcc2 (strCode "nthc") X Y hX hY
+  prf_hasWit_funcc2 (strCode sym!"nthc") X Y hX hY
 
 /-- Congruencia de `nthcT` en ambos argumentos. -/
 theorem prf_congr_nthcT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =eq y')) :
@@ -77,7 +77,7 @@ theorem prf_congr_nthcT {x x' y y' : Term} (hx : Prf (x =eq x')) (hy : Prf (y =e
 /-- `substtc` atraviesa `nthcT` (funcc de 2 argumentos). -/
 theorem prf_substtc_nthcT (v W x y : Term) :
     Prf (substtc v W (nthcT x y) =eq nthcT (substtc v W x) (substtc v W y)) :=
-  prf_substtc_funcc2 v W (strCode "nthc") x y
+  prf_substtc_funcc2 v W (strCode sym!"nthc") x y
 
 /-- **Ecuación `zero` de `nthc` CODIFICADA**: `⊢ Prov(⌜nthc(cons ḣ ṫ, ⌜0⌝) = ḣ⌝)`.
     De `pcc_axiom_inst2` de `ax_nthc_zero` (testigos `tcFn h`, `tcFn t`), computando el doble

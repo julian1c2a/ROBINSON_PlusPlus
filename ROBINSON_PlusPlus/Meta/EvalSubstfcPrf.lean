@@ -124,8 +124,8 @@ theorem pcc_congr_substfcT_arg2_code (A C X Y : Term)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
     (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
       (prf_hasWitF_eq2 (substfcT A X C) (substfcT A (varc (numeral 0)) C)
-        (prf_hasWit_funcc3 (strCode "substfc") A X C hwA hwX hwC)
-        (prf_hasWit_funcc3 (strCode "substfc") A (varc (numeral 0)) C hwA
+        (prf_hasWit_funcc3 (strCode sym!"substfc") A X C hwA hwX hwC)
+        (prf_hasWit_funcc3 (strCode sym!"substfc") A (varc (numeral 0)) C hwA
           (prf_hasWit_varc (numeral 0)) hwC)) hwX hwY)
 
 /-- Constructor UNARIO de codigo de FORMULA, parametrizado por el tag. -/
@@ -941,20 +941,20 @@ theorem eval_substtsc_imp (w v s t : Term) :
 
 /-! ### §11.1 · La funcion ternaria GENERICA (para escribir UN solo lema `dot`) -/
 
-def gO (nm : String) (v s f : Term) : Term := Term.func nm [v, s, f]
-def gT (nm : String) (v s f : Term) : Term :=
+def gO (nm : List Char) (v s f : Term) : Term := Term.func nm [v, s, f]
+def gT (nm : List Char) (v s f : Term) : Term :=
   funcc (strCode nm) (cons v (cons s (cons f nil)))
 
-theorem prf_congr_gT (nm : String) {v v' s s' f f' : Term}
+theorem prf_congr_gT (nm : List Char) {v v' s s' f f' : Term}
     (hv : Prf (v =eq v')) (hs : Prf (s =eq s')) (hf : Prf (f =eq f')) :
     Prf (gT nm v s f =eq gT nm v' s' f') := prf_congr_funcc3 hv hs hf
 
-theorem prf_substtc_gT (nm : String) (v W x y z : Term) :
+theorem prf_substtc_gT (nm : List Char) (v W x y z : Term) :
     Prf (substtc v W (gT nm x y z)
       =eq gT nm (substtc v W x) (substtc v W y) (substtc v W z)) :=
   prf_substtc_funcc3 v W (strCode nm) x y z
 
-theorem substtc_inv_gT (nm : String) {X Y Z : Term}
+theorem substtc_inv_gT (nm : List Char) {X Y Z : Term}
     (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
     (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :
     ∀ W, Prf (substtc zero W (gT nm X Y Z) =eq gT nm X Y Z) := fun W =>
@@ -964,14 +964,14 @@ theorem substtc_inv_gT (nm : String) {X Y Z : Term}
     `substfc v s (⟨T⟩ a b) ≐ ⟨T⟩ (F v s a) (F v s b)` con `F` GENERICA.
     Con `F = substfc` reproduce `pcc_substfc_bin_dot`; con `F = substtc` da `eqc`. -/
 
-def AXTER_BODY (T : Term) (nm : String) : Formula :=
+def AXTER_BODY (T : Term) (nm : List Char) : Formula :=
   substfc (.var 3) (.var 2) (binct T (.var 1) (.var 0))
     =eq binct T (gO nm (.var 3) (.var 2) (.var 1)) (gO nm (.var 3) (.var 2) (.var 0))
 
-theorem AXTER_eq : ax_substfc_eq = forall_4 (AXTER_BODY (numeralM 4) "substtc") := rfl
-theorem AXTER_impl : ax_substfc_impl = forall_4 (AXTER_BODY (numeralM 5) "substfc") := rfl
+theorem AXTER_eq : ax_substfc_eq = forall_4 (AXTER_BODY (numeralM 4) sym!"substtc") := rfl
+theorem AXTER_impl : ax_substfc_impl = forall_4 (AXTER_BODY (numeralM 5) sym!"substfc") := rfl
 
-theorem pcc_substfc_ter_dot (T : Term) (nm : String) (hT : ∀ c : Nat, liftTerm c T = T)
+theorem pcc_substfc_ter_dot (T : Term) (nm : List Char) (hT : ∀ c : Nat, liftTerm c T = T)
     (hmem : forall_4 (AXTER_BODY T nm) ∈ axioms) (v s a b : Term) :
     Prf (provFromCode (eqCodeFn
       (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (tcFn b)))
@@ -1107,7 +1107,7 @@ theorem pcc_substfc_ter_dot (T : Term) (nm : String) (hT : ∀ c : Nat, liftTerm
 
 def AXATOM_BODY : Formula :=
   substfc (.var 3) (.var 2) (binct (numeralM 3) (.var 1) (.var 0))
-    =eq binct (numeralM 3) (.var 1) (gO "substtsc" (.var 3) (.var 2) (.var 0))
+    =eq binct (numeralM 3) (.var 1) (gO sym!"substtsc" (.var 3) (.var 2) (.var 0))
 
 theorem AXATOM_ok : ax_substfc_atom = forall_4 AXATOM_BODY := rfl
 
@@ -1134,19 +1134,19 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
         (substfcT W3 (varc (numeral 2))
           (binK (substCodeT 3 W3 T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (substCodeT 3 W3 T) (varc (numeral 1))
-          (gT "substtsc" W3 (varc (numeral 2)) (varc (numeral 0))))) :=
+          (gT sym!"substtsc" W3 (varc (numeral 2)) (varc (numeral 0))))) :=
     prf_substfc_arith_open 3 W3 AXATOM_BODY
   rw [hkc] at hin0
   have hnorm3 : Prf (eqCodeFn
         (substfcT W3 (varc (numeral 2))
           (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (varc (numeral 1))
-          (gT "substtsc" W3 (varc (numeral 2)) (varc (numeral 0))))
+          (gT sym!"substtsc" W3 (varc (numeral 2)) (varc (numeral 0))))
       =eq eqCodeFn
         (substfcT (tcFn v) (varc (numeral 2))
           (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (varc (numeral 1))
-          (gT "substtsc" (tcFn v) (varc (numeral 2)) (varc (numeral 0))))) :=
+          (gT sym!"substtsc" (tcFn v) (varc (numeral 2)) (varc (numeral 0))))) :=
     prf_congr_eqCodeFn
       (prf_congr_substfcT hv3 (prf_refl _) (prf_refl _))
       (prf_congr_binK (prf_refl _) (prf_congr_gT _ hv3 (prf_refl _) (prf_refl _)))
@@ -1163,11 +1163,11 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
         (substfcT (tcFn v) (varc (numeral 2))
           (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (varc (numeral 1))
-          (gT "substtsc" (tcFn v) (varc (numeral 2)) (varc (numeral 0)))))
+          (gT sym!"substtsc" (tcFn v) (varc (numeral 2)) (varc (numeral 0)))))
       =eq eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (varc (numeral 1))
-          (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0))))) := by
+          (gT sym!"substtsc" (tcFn v) (tcFn s) (varc (numeral 0))))) := by
     refine prf_eq_trans (prf_substfc_eq (numeral 2) W2 _ _) ?_
     refine prf_congr_eqCodeFn ?_ ?_
     · refine prf_eq_trans (prf_substtc_substfcT (numeral 2) W2 _ _ _) ?_
@@ -1187,11 +1187,11 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
   have hmid1 : Prf (substfc (numeral 1) W1 (eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (varc (numeral 1))
-          (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0)))))
+          (gT sym!"substtsc" (tcFn v) (tcFn s) (varc (numeral 0)))))
       =eq eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (varc (numeral 0))))
         (binK (termCode T) (tcFn a)
-          (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0))))) := by
+          (gT sym!"substtsc" (tcFn v) (tcFn s) (varc (numeral 0))))) := by
     refine prf_eq_trans (prf_substfc_eq (numeral 1) W1 _ _) ?_
     refine prf_congr_eqCodeFn ?_ ?_
     · refine prf_eq_trans (prf_substtc_substfcT (numeral 1) W1 _ _ _) ?_
@@ -1208,10 +1208,10 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
   have hout : Prf (substfc zero W0 (eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (varc (numeral 0))))
         (binK (termCode T) (tcFn a)
-          (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0)))))
+          (gT sym!"substtsc" (tcFn v) (tcFn s) (varc (numeral 0)))))
       =eq eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (tcFn b)))
-        (binK (termCode T) (tcFn a) (gT "substtsc" (tcFn v) (tcFn s) (tcFn b)))) := by
+        (binK (termCode T) (tcFn a) (gT sym!"substtsc" (tcFn v) (tcFn s) (tcFn b)))) := by
     refine prf_eq_trans (prf_substfc_eq zero W0 _ _) ?_
     refine prf_congr_eqCodeFn ?_ ?_
     · refine prf_eq_trans (prf_substtc_substfcT zero W0 _ _ _) ?_
@@ -1224,7 +1224,7 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
         (substfc (numeral 3) W3 (formCode AXATOM_BODY))))
       =eq eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (tcFn a) (tcFn b)))
-        (binK (termCode T) (tcFn a) (gT "substtsc" (tcFn v) (tcFn s) (tcFn b)))) :=
+        (binK (termCode T) (tcFn a) (gT sym!"substtsc" (tcFn v) (tcFn s) (tcFn b)))) :=
     prf_eq_trans (prf_congr_substfc_arg3
       (prf_eq_trans (prf_congr_substfc_arg3
         (prf_eq_trans (prf_congr_substfc_arg3 (prf_eq_trans hin0 hnorm3)) hmid2)) hmid1)) hout
@@ -1274,7 +1274,7 @@ theorem caso_eq_core (v s a b : Term) :
       (substtc_inv_tcFn (cons (numeralM 4) (cons a (cons b nil)))))
     (pcc_dot_bin_symm 4 a b))
     [land (targetSubsttc v s a) (targetSubsttc v s b)]
-  have h2 := prf_to_prfH (pcc_substfc_ter_dot (numeralM 4) "substtc"
+  have h2 := prf_to_prfH (pcc_substfc_ter_dot (numeralM 4) sym!"substtc"
       (fun c => liftTerm_numeralM c 4)
       (show ax_substfc_eq ∈ axioms by simp [axioms]) v s a b)
     [land (targetSubsttc v s a) (targetSubsttc v s b)]

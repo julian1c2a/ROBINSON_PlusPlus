@@ -5,6 +5,7 @@ License: MIT
 -/
 
 import FOL.FOL        -- Term, Formula, Derives (⊢), notaciones ≐ ∧ ∨ ¬ ⇒ ⇔ ∀. ∃. ⊥ ⊤ #
+import ROBINSON_PlusPlus.Minimal.SymLit  -- `sym!"…"`: los literales de símbolo, `List Char` (D7)
 import FOL.Theorems.Eq -- derive_eq_symm, derive_eq_trans, substTerm_liftTerm
 
 set_option linter.unusedSimpArgs false
@@ -36,34 +37,34 @@ de por qué cada axioma está (o dejó de estar) en la lista. Las listas y las f
 -- ## Language Definition
 
 -- ### Function Symbols
-def succ_sym : String := "σ"
-def add_sym  : String := "+"
-def mul_sym  : String := "*"
-def sub_sym  : String := "−"   -- subtraction (monus): sub a b = max(a-b, 0)
-def sqrt_sym : String := "√"
-def div2_sym : String := "/₂"
-def mod2_sym : String := "%₂"
+def succ_sym : List Char := sym!"σ"
+def add_sym  : List Char := sym!"+"
+def mul_sym  : List Char := sym!"*"
+def sub_sym  : List Char := sym!"−"   -- subtraction (monus): sub a b = max(a-b, 0)
+def sqrt_sym : List Char := sym!"√"
+def div2_sym : List Char := sym!"/₂"
+def mod2_sym : List Char := sym!"%₂"
 -- proj1_sym, proj2_sym ELIMINADOS 2026-06-02: proj1/proj2 ya no son símbolos
 -- opacos del lenguaje, sino defs concretas en Block4_C6_C7 (proj1 := x_of_c,
 -- proj2 := y_of_c). Con ello ax22 deja de ser necesario (proj_is_cantor lo
 -- demuestra como teorema).
--- El símbolo de display del predecesor es "τ", pero los axiomas se nombran con el
+-- El símbolo de display del predecesor es sym!"τ", pero los axiomas se nombran con el
 -- prefijo `pred_` (más legible que `tau_`). Ver ax25_pred_zero, ax26_pred_succ.
-def pred_sym : String := "τ"
-def nil_sym : String := "[]"
-def cons_sym : String := "::"
-def concat_sym : String := "##"
+def pred_sym : List Char := sym!"τ"
+def nil_sym : List Char := sym!"[]"
+def cons_sym : List Char := sym!"::"
+def concat_sym : List Char := sym!"##"
 -- Bloque VIII extendido: potencia y producto sobre listas de pares.
-def pow_sym  : String := "^"
-def prodp_sym : String := "Π_p"
+def pow_sym  : List Char := sym!"^"
+def prodp_sym : List Char := sym!"Π_p"
 
 -- ### Predicate Symbols
-def lt_sym : String := "<"
-def le_sym : String := "≤"
-def in_sym : String := "∈"
+def lt_sym : List Char := sym!"<"
+def le_sym : List Char := sym!"≤"
+def in_sym : List Char := sym!"∈"
 
 -- ### Constant Symbols
-def zero_sym : String := "0"
+def zero_sym : List Char := sym!"0"
 
 -- ## Term Constructors
 
@@ -130,7 +131,7 @@ def pair (x y : Term) : Term :=
 -- List constructors
 def nil : Term := zero
 -- `cons h t` es un constructor de lista con cabeza `h` y cola `t`. El símbolo de
--- función es `cons_sym = "::"`, opaco; ax_L0_cons_def lo conecta con `succ (pair h t)` (ADR-113).
+-- función es `cons_sym = sym!"::"`, opaco; ax_L0_cons_def lo conecta con `succ (pair h t)` (ADR-113).
 
 -- ## Display
 
@@ -138,8 +139,8 @@ def nil : Term := zero
     Ejemplos: `σ⟦0⟧`, `+⟦σ⟦0⟧, σ⟦σ⟦0⟧⟧⟧`, `#0`. -/
 partial def termToString : Term → String
   | .var n      => s!"#{n}"
-  | .func f []  => f
-  | .func f args => f ++ "⟦" ++ ", ".intercalate (args.map termToString) ++ "⟧"
+  | .func f []  => String.ofList f
+  | .func f args => String.ofList f ++ "⟦" ++ ", ".intercalate (args.map termToString) ++ "⟧"
 
 instance : ToString Term := ⟨termToString⟩
 
@@ -342,7 +343,7 @@ def ax24_mod2_of_even : Formula :=
   )
 
 -- ### Axioms of Predecessor Function
--- `pred` usa el símbolo opaco `pred_sym = "τ"`. Sin estos dos axiomas, cualquier
+-- `pred` usa el símbolo opaco `pred_sym = sym!"τ"`. Sin estos dos axiomas, cualquier
 -- función satisface el sistema (el símbolo no está fijado por los axiomas anteriores).
 -- Son necesarios para las pruebas de C5 (Block4_C5) que usan `spec (ax ax26_pred_succ)`.
 
@@ -454,9 +455,9 @@ def varc (n : Term) : Term := cons zero (cons n nil)
 /-- Código de `Term.func`: `⟨1, sym, ts⟩`. -/
 def funcc (sc tsc : Term) : Term := cons (succ zero) (cons sc (cons tsc nil))
 /-- Sustitución aritmetizada sobre códigos de término. -/
-def substtc (v s c : Term) : Term := Term.func "substtc" [v, s, c]
+def substtc (v s c : Term) : Term := Term.func sym!"substtc" [v, s, c]
 /-- Sustitución aritmetizada sobre códigos de lista de términos. -/
-def substtsc (v s c : Term) : Term := Term.func "substtsc" [v, s, c]
+def substtsc (v s c : Term) : Term := Term.func sym!"substtsc" [v, s, c]
 
 /-- Cuantificación universal cuádruple (De Bruijn). -/
 def forall_4 (f : Formula) : Formula := .forall (.forall (.forall (.forall f)))
@@ -480,9 +481,9 @@ def ax_substtsc_cons : Formula :=
 
 -- Desplazamiento (lift) De Bruijn aritmetizado sobre códigos de término / lista.
 /-- Lift aritmetizado sobre códigos de término. -/
-def liftc (c t : Term) : Term := Term.func "liftc" [c, t]
+def liftc (c t : Term) : Term := Term.func sym!"liftc" [c, t]
 /-- Lift aritmetizado sobre códigos de lista de términos. -/
-def liftsc (c t : Term) : Term := Term.func "liftsc" [c, t]
+def liftsc (c t : Term) : Term := Term.func sym!"liftsc" [c, t]
 
 -- Ecuaciones recursivas de `liftTerm`. Para el caso `n ≥ c` usamos la condición
 -- equivalente `c < n+1` (`lt c (succ n)`), evitando `le`.
@@ -512,7 +513,7 @@ def exc (a : Term) : Term :=
   cons (succ (succ (succ (succ (succ (succ (succ (succ (succ zero))))))))) (cons a nil)
 
 /-- Sustitución aritmetizada sobre códigos de **fórmula**. -/
-def substfc (v t f : Term) : Term := Term.func "substfc" [v, t, f]
+def substfc (v t f : Term) : Term := Term.func sym!"substfc" [v, t, f]
 
 -- Ecuaciones recursivas de `substFormula` (8 constructores; los binders ∀/∃
 -- incrementan el nivel con `succ` y desplazan el substituyendo con `liftc zero`).
@@ -542,7 +543,7 @@ def ax_substfc_ex : Formula :=
 
 /-- Lift aritmetizado sobre códigos de **fórmula** (necesario para el esquema Q3,
     que usa `liftFormula 0 B`). -/
-def liftfc (c f : Term) : Term := Term.func "liftfc" [c, f]
+def liftfc (c f : Term) : Term := Term.func sym!"liftfc" [c, f]
 
 -- Ecuaciones recursivas de `liftFormula` (los binders ∀/∃ incrementan el nivel
 -- con `succ`; átomos/igualdades usan `liftc`/`liftsc`).
@@ -585,8 +586,8 @@ def charsCodeM : List Char → Term
   | []      => nil
   | c :: cs => cons (numeralM c.toNat) (charsCodeM cs)
 
-/-- Código de un símbolo `String` (nivel `Minimal`). -/
-def strCodeM (s : String) : Term := charsCodeM s.toList
+/-- Código de un símbolo (`List Char` desde D7; antes `String`), nivel `Minimal`: es `charsCodeM`. -/
+def strCodeM (s : List Char) : Term := charsCodeM s
 
 /- Código de Gödel de términos (nivel `Minimal`), mutuo con `termsCodeM`. -/
 mutual
@@ -635,7 +636,7 @@ def codeNatChars : List Char → Nat
   | []      => 0
   | c :: cs => consN c.toNat (codeNatChars cs)
 
-def codeNatStr (s : String) : Nat := codeNatChars s.toList
+def codeNatStr (s : List Char) : Nat := codeNatChars s
 
 mutual
 def codeNatTerm : Term → Nat
@@ -678,8 +679,8 @@ theorem liftTerm_charsCodeM (c : Nat) : ∀ cs : List Char, liftTerm c (charsCod
   | _ :: cs => by
       simp only [charsCodeM, cons, liftTerm, liftTerms, liftTerm_numeralM, liftTerm_charsCodeM c cs]
 
-theorem liftTerm_strCodeM (c : Nat) (s : String) : liftTerm c (strCodeM s) = strCodeM s :=
-  liftTerm_charsCodeM c s.toList
+theorem liftTerm_strCodeM (c : Nat) (s : List Char) : liftTerm c (strCodeM s) = strCodeM s :=
+  liftTerm_charsCodeM c s
 
 mutual
 theorem liftTerm_termCodeM (c : Nat) : ∀ t : Term, liftTerm c (termCodeM t) = termCodeM t
@@ -742,9 +743,9 @@ theorem substTerm_charsCodeM (v : Nat) (s : Term) :
   | _ :: cs => by
       simp only [charsCodeM, cons, substTerm, substTerms, substTerm_numeralM, substTerm_charsCodeM v s cs]
 
-theorem substTerm_strCodeM (v : Nat) (s : Term) (str : String) :
+theorem substTerm_strCodeM (v : Nat) (s : Term) (str : List Char) :
     substTerm v s (strCodeM str) = strCodeM str :=
-  substTerm_charsCodeM v s str.toList
+  substTerm_charsCodeM v s str
 
 mutual
 theorem substTerm_termCodeM (v : Nat) (s : Term) : ∀ t : Term, substTerm v s (termCodeM t) = termCodeM t
@@ -792,9 +793,9 @@ theorem substTerm_listFormCodeM (v : Nat) (s : Term) : ∀ L : List Formula,
         substTerm_listFormCodeM v s fs]
 
 /-- Cabeza de un `cons`. -/
-def carc (l : Term) : Term := Term.func "carc" [l]
+def carc (l : Term) : Term := Term.func sym!"carc" [l]
 /-- Cola de un `cons`. -/
-def cdrc (l : Term) : Term := Term.func "cdrc" [l]
+def cdrc (l : Term) : Term := Term.func sym!"cdrc" [l]
 
 def ax_carc : Formula := forall_2 (carc (cons (.var 1) (.var 0)) =eq (.var 1))
 def ax_cdrc : Formula := forall_2 (cdrc (cons (.var 1) (.var 0)) =eq (.var 0))
@@ -808,9 +809,9 @@ funciones object con recursión estructural sobre `cons`/`nil` (extensión defin
 como `carc`/`cdrc`). -/
 
 /-- Longitud (número de elementos) de una lista‑código. -/
-def lenc (l : Term) : Term := Term.func "lenc" [l]
+def lenc (l : Term) : Term := Term.func sym!"lenc" [l]
 /-- `i`-ésimo elemento (base 0) de una lista‑código. -/
-def nthc (l i : Term) : Term := Term.func "nthc" [l, i]
+def nthc (l i : Term) : Term := Term.func sym!"nthc" [l, i]
 
 /-- `lenc nil = 0`. -/
 def ax_lenc_nil : Formula := lenc nil =eq zero
@@ -833,7 +834,7 @@ estructura `cons`/`nil`, **sin depender de la regla de la línea**. Esto es lo q
 permite la **inducción object-level** (compositividad/debilitamiento) que D2/D3
 necesitan y que la `validProofFn` condicional bloqueaba. La validez de cada línea
 se separa en el predicado `chainOk` (Fase R2). -/
-def runFn (checked rest : Term) : Term := Term.func "runFn" [checked, rest]
+def runFn (checked rest : Term) : Term := Term.func sym!"runFn" [checked, rest]
 
 /-- `runFn c nil = c`. -/
 def ax_runFn_nil : Formula := forall_ (runFn (.var 0) nil =eq (.var 0))
@@ -853,15 +854,15 @@ contexto `c`. `allIn` recurre **uniformemente** sobre su lista, de modo que la
 para líneas ARBITRARIAS — clave para `chainOk`-monotonía y D2. -/
 
 /-- `allIn c L`: todo elemento de la lista `L` pertenece (`In`) a `c`. -/
-def allIn (c L : Term) : Formula := Formula.atom "allIn" [c, L]
+def allIn (c L : Term) : Formula := Formula.atom sym!"allIn" [c, L]
 /-- `lineWF line`: bien-formación de la línea independiente del contexto. -/
-def lineWF (line : Term) : Formula := Formula.atom "lineWF" [line]
+def lineWF (line : Term) : Formula := Formula.atom sym!"lineWF" [line]
 /-- `premsOf line`: lista de premisas (códigos de fórmula) que la línea referencia. -/
-def premsOf (line : Term) : Term := Term.func "premsOf" [line]
+def premsOf (line : Term) : Term := Term.func sym!"premsOf" [line]
 /-- `lineOk c line`: la línea es válida en el contexto `c`. -/
 def lineOk (c line : Term) : Formula := land (lineWF line) (allIn c (premsOf line))
 /-- `chainOk c p`: la secuencia `p` es una demostración válida desde el acumulador `c`. -/
-def chainOk (c p : Term) : Formula := Formula.atom "chainOk" [c, p]
+def chainOk (c p : Term) : Formula := Formula.atom sym!"chainOk" [c, p]
 
 /-- `allIn c nil` (vacuamente cierto). -/
 def ax_allIn_nil : Formula := forall_ (allIn (.var 0) nil)
@@ -888,16 +889,16 @@ Es la única pieza que falta para representar la **diagonalización** (substitui
 código de una fórmula en sí misma necesita el código de ese código). El puente sobre la estructura de código
 (`tc_arith`, por inducción meta en `Meta/Diagonal.lean`) se retiró con `ax_tc_cons`, que era
 inconsistente (ADR‑012); hoy el puente va por NUMERALES: `prf_tc_numeral` (`Meta/TcArithPrf.lean`). -/
-def tcFn (t : Term) : Term := Term.func "tcFn" [t]
+def tcFn (t : Term) : Term := Term.func sym!"tcFn" [t]
 
--- `termCode zero = ⟨1, strCode "0", []⟩`  (nil = zero, termsCode [] = nil)
+-- `termCode zero = ⟨1, strCode sym!"0", []⟩`  (nil = zero, termsCode [] = nil)
 def ax_tc_zero : Formula :=
   tcFn zero =eq cons (numeralM 1) (cons (strCodeM zero_sym) (cons nil nil))
--- `termCode (σ x) = ⟨1, strCode "σ", [termCode x]⟩`
+-- `termCode (σ x) = ⟨1, strCode sym!"σ", [termCode x]⟩`
 def ax_tc_succ : Formula :=
   forall_ (tcFn (succ (.var 0)) =eq
     cons (numeralM 1) (cons (strCodeM succ_sym) (cons (cons (tcFn (.var 0)) nil) nil)))
--- `termCode (a :: b) = ⟨1, strCode "::", [termCode a, termCode b]⟩`
+-- `termCode (a :: b) = ⟨1, strCode sym!"::", [termCode a, termCode b]⟩`
 def ax_tc_cons : Formula :=
   forall_2 (tcFn (cons (.var 1) (.var 0)) =eq
     cons (numeralM 1) (cons (strCodeM cons_sym)
@@ -924,7 +925,7 @@ theorem forallN_succ (n : Nat) (f : Formula) :
 /-- Verificador de demostraciones-secuencia: `validProofFn checked rest` recorre
     `rest` recomputando la conclusión de cada línea y acumulando en `checked`;
     devuelve la lista final de conclusiones para una demostración válida. -/
-def validProofFn (checked rest : Term) : Term := Term.func "validProofFn" [checked, rest]
+def validProofFn (checked rest : Term) : Term := Term.func sym!"validProofFn" [checked, rest]
 
 -- Ecuaciones de `validProofFn`. Una línea es `cons (numeralM K) (cons p₁ (… nil)))`;
 -- la etiqueta K (embebida en el patrón) distingue la regla (axiomas incondicionales
@@ -996,7 +997,7 @@ def ax_vpf_gen : Formula :=
       validProofFn (concat (.var 2) (cons (forallc (.var 1)) nil)) (.var 0)))
 /-! ### El código de la teoría, `axiomsCodeT`
 
-`axiomsCodeT` se declara **opaco** (símbolo `Term.func "axiomsCodeT" []`) para que la
+`axiomsCodeT` se declara **opaco** (símbolo `Term.func sym!"axiomsCodeT" []`) para que la
 sustitución sobre él en las pruebas de los step-lemmas sea trivial (rápida).
 
 ⭐ **2026‑10‑04 · ADR‑117 — su ancla, hoy.** Lo ancla el ÚLTIMO de `axioms`, el axioma DIAGONAL
@@ -1060,7 +1061,7 @@ def coreAxioms : List Formula := [
     `ax_axiomsCodeT_eq`); los dos se retiraron con esa capa (ADR‑115, 2026‑10‑02). En `Prf` lo fija,
     desde ADR‑117, el axioma diagonal `ax_axiomsCodeT_def` (abajo); entre medias lo fijaba la hipótesis
     `AnclaEq`, que era inconsistente (F1, ADR‑114). -/
-def axiomsCodeT : Term := Term.func "axiomsCodeT" []
+def axiomsCodeT : Term := Term.func sym!"axiomsCodeT" []
 
 /-! ### ⭐ El ANCLA de `axiomsCodeT`, por un axioma DIAGONAL (L2‑3, ADR‑117)
 

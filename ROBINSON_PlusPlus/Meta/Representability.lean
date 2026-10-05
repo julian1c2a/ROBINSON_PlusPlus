@@ -98,7 +98,7 @@ theorem charsCodeM_eq : ∀ cs : List Char, charsCodeM cs = charsCode cs
   | []      => rfl
   | _ :: cs => by simp only [charsCodeM, charsCode, numeralM_eq, charsCodeM_eq cs]
 
-theorem strCodeM_eq (s : String) : strCodeM s = strCode s := charsCodeM_eq s.toList
+theorem strCodeM_eq (s : List Char) : strCodeM s = strCode s := charsCodeM_eq s
 
 mutual
 theorem termCodeM_eq : ∀ t : Term, termCodeM t = termCode t

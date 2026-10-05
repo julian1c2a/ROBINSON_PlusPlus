@@ -84,9 +84,9 @@ namespace ROBINSON_PlusPlus.Meta.EvalSubsttcPrf
     ############################################################################ -/
 
 def substtcT (v s t : Term) : Term :=
-  funcc (strCode "substtc") (cons v (cons s (cons t nil)))
+  funcc (strCode sym!"substtc") (cons v (cons s (cons t nil)))
 def substtscT (v s ts : Term) : Term :=
-  funcc (strCode "substtsc") (cons v (cons s (cons ts nil)))
+  funcc (strCode sym!"substtsc") (cons v (cons s (cons ts nil)))
 theorem substtcT_termCode (v s t : Term) :
     substtcT (termCode v) (termCode s) (termCode t) = termCode (substtc v s t) := rfl
 theorem substtscT_termCode (v s t : Term) :
@@ -104,11 +104,11 @@ theorem prf_congr_substtscT {v v' s s' t t' : Term}
 theorem prf_substtc_substtcT (v W x y z : Term) :
     Prf (substtc v W (substtcT x y z)
       =eq substtcT (substtc v W x) (substtc v W y) (substtc v W z)) :=
-  prf_substtc_funcc3 v W (strCode "substtc") x y z
+  prf_substtc_funcc3 v W (strCode sym!"substtc") x y z
 theorem prf_substtc_substtscT (v W x y z : Term) :
     Prf (substtc v W (substtscT x y z)
       =eq substtscT (substtc v W x) (substtc v W y) (substtc v W z)) :=
-  prf_substtc_funcc3 v W (strCode "substtsc") x y z
+  prf_substtc_funcc3 v W (strCode sym!"substtsc") x y z
 theorem substtc_inv_substtcT {X Y Z : Term}
     (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y))
     (hZ : ∀ W, Prf (substtc zero W Z =eq Z)) :

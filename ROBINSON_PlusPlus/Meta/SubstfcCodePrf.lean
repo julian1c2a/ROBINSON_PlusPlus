@@ -105,8 +105,8 @@ theorem pcc_congr_substfcT_arg3_code (A B X Y : Term)
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_provCode_congr (hcomp Y)) _)
     (PrfH_leibniz_apply Ac X Y (prfH_hyp_self _) (prf_to_prfH hAX _)
       (prf_hasWitF_eq2 (substfcT A B X) (substfcT A B (varc (numeral 0)))
-        (prf_hasWit_funcc3 (strCode "substfc") A B X hwA hwB hwX)
-        (prf_hasWit_funcc3 (strCode "substfc") A B (varc (numeral 0)) hwA hwB
+        (prf_hasWit_funcc3 (strCode sym!"substfc") A B X hwA hwB hwX)
+        (prf_hasWit_funcc3 (strCode sym!"substfc") A B (varc (numeral 0)) hwA hwB
           (prf_hasWit_varc (numeral 0)))) hwX hwY)
 
 /-! ## §4 · El código de la ecuación interna (idéntico a `Paso2CasoForall` §6) -/

@@ -102,7 +102,7 @@ theorem derives_tval {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) :
   | subst _ _ _ _ _ _ _ ih2 => intro a hΓ; have := ih2 a hΓ; rw [tval_subst] at this ⊢; exact this
 
 /-- Un átomo no es derivable sin hipótesis: con la valuación `false`, `tval` lo hace falso. -/
-theorem P_no : Not (([] : List Formula) ⊢ Formula.atom "P" []) := fun h => by
+theorem P_no : Not (([] : List Formula) ⊢ Formula.atom sym!"P" []) := fun h => by
   have := derives_tval h false (fun _ hx => absurd hx List.not_mem_nil); simp [tval] at this
 
 /-! ## §2 · Los ENUNCIADOS de los postulados, refutados SIN usarlos (valen para siempre) -/
@@ -122,13 +122,13 @@ def AxListInduction : Prop :=
 
 /-- 🏁 `imp_intro` es FALSO: su premisa, una función de Lean, se cumple VACUAMENTE para `P` no derivable. -/
 theorem imp_intro_refutable : Not ImpIntro := fun H => by
-  have := derives_tval (H (Γ := []) (A := Formula.atom "P" []) (B := Formula.bottom) (fun h => absurd h P_no))
+  have := derives_tval (H (Γ := []) (A := Formula.atom sym!"P" []) (B := Formula.bottom) (fun h => absurd h P_no))
     true (fun _ hx => absurd hx List.not_mem_nil)
   simp [tval] at this
 
 /-- 🏁 `raa` es FALSO, por la misma razón. -/
 theorem raa_refutable : Not Raa := fun H => by
-  have := derives_tval (H (Γ := []) (A := Formula.atom "P" []) (fun h => absurd h P_no))
+  have := derives_tval (H (Γ := []) (A := Formula.atom sym!"P" []) (fun h => absurd h P_no))
     true (fun _ hx => absurd hx List.not_mem_nil)
   simp [tval, neg] at this
 
@@ -176,7 +176,7 @@ open FOL.Eigenvariable FOL.Lift0 FOL.Fresh0 FOL.Metamath.Semantics
 open FOL.Metamath.Soundness0 (Mtrue Mfalse P)
 
 /-- El núcleo de `Henkin0.abs_neg_witness` (`:163`) sin el `neg`. -/
-theorem abs_witness (c : String) (A : Formula) (hcA : Not (occursFormula c A)) :
+theorem abs_witness (c : List Char) (A : Formula) (hcA : Not (occursFormula c A)) :
     absFormula c 0 (substFormula 0 (Term.func c []) A) = A := by
   rw [absFormula_subst c A 0 0 (Nat.le_refl 0), absFormula_eq_lift c A 1 hcA]
   have hc : absTerm c 0 (Term.func c []) = Term.var 0 := by simp [absTerm]
@@ -222,7 +222,7 @@ theorem derives_soundness {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) : sat
 
 private def MB : Model Bool := ⟨fun _ _ => false, fun _ ds => ds = [true]⟩
 private def vB : Nat → Bool := fun _ => false
-private def PA : Formula := Formula.atom "P" [Term.var 0]
+private def PA : Formula := Formula.atom sym!"P" [Term.var 0]
 
 /-- 🏁 El ENUNCIADO de `FOL.MetaRules.ex_elim`, refutado sin usarlo (modelo de dos puntos). -/
 theorem ex_elim_refutable :

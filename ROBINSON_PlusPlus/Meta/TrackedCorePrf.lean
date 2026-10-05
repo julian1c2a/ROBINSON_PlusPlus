@@ -99,12 +99,12 @@ el `inFormCodeFn` de `Sigma1CorePrf` (que era el caso `In`) a un **constructor o
 
 /-- Constructor object del código de un **átomo binario** `Formula.atom s [a, b]` a partir de los
     códigos `a`, `b` de sus argumentos: `⟨3, ⌜s⌝, [a, b]⟩`. Generaliza `inFormCodeFn` (s = `∈`). -/
-def atom2CodeFn (s : String) (a b : Term) : Term :=
+def atom2CodeFn (s : List Char) (a b : Term) : Term :=
   cons (numeral 3) (cons (strCode s) (cons (cons a (cons b nil)) nil))
 
 /-- **Puente definicional**: con los códigos meta `termCode` de los argumentos, `atom2CodeFn`
     coincide con `formCode` del átomo (por definición de `formCode` sobre `.atom`). -/
-theorem atom2CodeFn_termCode (s : String) (a b : Term) :
+theorem atom2CodeFn_termCode (s : List Char) (a b : Term) :
     atom2CodeFn s (termCode a) (termCode b) = formCode (Formula.atom s [a, b]) := rfl
 
 /-- `inFormCodeFn` es la instancia `s = in_sym` de `atom2CodeFn` (definicional). -/
@@ -113,7 +113,7 @@ theorem inFormCodeFn_eq_atom2 (xc Lc : Term) :
 
 /-- **Clausura** de `atom2CodeFn s a b` bajo `liftTerm`: cerrado si `a`, `b` lo son
     (el resto — `numeral 3`/`strCode s`/`cons`/`nil` — es cerrado). -/
-theorem liftTerm_atom2CodeFn (s : String) (a b : Term)
+theorem liftTerm_atom2CodeFn (s : List Char) (a b : Term)
     (ha : ∀ lvl, liftTerm lvl a = a) (hb : ∀ lvl, liftTerm lvl b = b) :
     ∀ lvl, liftTerm lvl (atom2CodeFn s a b) = atom2CodeFn s a b := by
   intro lvl
@@ -121,7 +121,7 @@ theorem liftTerm_atom2CodeFn (s : String) (a b : Term)
     liftTerm_numeral, liftTerm_strCode, ha lvl, hb lvl]
 
 /-- **Congruencia** de `atom2CodeFn` en ambos argumentos (`Prf`). -/
-theorem prf_congr_atom2CodeFn {s : String} {a a' b b' : Term}
+theorem prf_congr_atom2CodeFn {s : List Char} {a a' b b' : Term}
     (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
     Prf (atom2CodeFn s a b =eq atom2CodeFn s a' b') := by
   unfold atom2CodeFn
@@ -130,13 +130,13 @@ theorem prf_congr_atom2CodeFn {s : String} {a a' b b' : Term}
 
 /-- **Transporte** de la demostrabilidad de un átomo binario por igualdad de los códigos de sus
     argumentos (Leibniz object vía `provFromCode`). Generaliza `prf_provFromCode_In_congr`. -/
-theorem prf_provFromCode_atom2_congr {s : String} {a a' b b' : Term}
+theorem prf_provFromCode_atom2_congr {s : List Char} {a a' b b' : Term}
     (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) :
     Prf (provFromCode (atom2CodeFn s a b) ⇒ provFromCode (atom2CodeFn s a' b')) :=
   prf_provCode_congr (prf_congr_atom2CodeFn ha hb)
 
 /-- **Clausura** de `provFromCode (atom2CodeFn s a b)` bajo `liftFormula` (args cerrados). -/
-theorem liftFormula_provFromCode_atom2 (k : Nat) (s : String) (a b : Term)
+theorem liftFormula_provFromCode_atom2 (k : Nat) (s : List Char) (a b : Term)
     (ha : ∀ lvl, liftTerm lvl a = a) (hb : ∀ lvl, liftTerm lvl b = b) :
     liftFormula k (provFromCode (atom2CodeFn s a b)) = provFromCode (atom2CodeFn s a b) :=
   liftFormula_provFromCode k (atom2CodeFn s a b) (liftTerm_atom2CodeFn s a b ha hb)
@@ -144,14 +144,14 @@ theorem liftFormula_provFromCode_atom2 (k : Nat) (s : String) (a b : Term)
 /-! ### Instancias `chainOk` / `allIn` (los otros átomos del cuerpo Σ₁) -/
 
 /-- Constructor object del código de `chainOk c p` desde los códigos `cc`, `pc`. -/
-def chainOkCodeFn (cc pc : Term) : Term := atom2CodeFn "chainOk" cc pc
+def chainOkCodeFn (cc pc : Term) : Term := atom2CodeFn sym!"chainOk" cc pc
 
 /-- Puente `chainOkCodeFn (termCode c) (termCode p) = formCode (chainOk c p)` (rfl). -/
 theorem chainOkCodeFn_termCode (c p : Term) :
     chainOkCodeFn (termCode c) (termCode p) = formCode (chainOk c p) := rfl
 
 /-- Constructor object del código de `allIn c L` desde los códigos `cc`, `Lc`. -/
-def allInCodeFn (cc Lc : Term) : Term := atom2CodeFn "allIn" cc Lc
+def allInCodeFn (cc Lc : Term) : Term := atom2CodeFn sym!"allIn" cc Lc
 
 /-- Puente `allInCodeFn (termCode c) (termCode L) = formCode (allIn c L)` (rfl). -/
 theorem allInCodeFn_termCode (c L : Term) :

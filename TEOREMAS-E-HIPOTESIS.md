@@ -1,6 +1,6 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑05 · `master` · **128 jobs · 111 módulos · 0 sorry · 0 `axiom` de Lean**
+> ## ESTADO REAL — 2026‑10‑05 · `master` · **129 jobs · 112 módulos · 0 sorry · 0 `axiom` de Lean**
 >
 > 🏁🏁 **Desde ADR‑120, SIN HIPÓTESIS**: `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
 > (`Meta/Consistencia.lean`) son Gödel I y II con `ConsistentH` DESCARGADA en el build por `consistencia` —un
@@ -13,7 +13,7 @@
 > llevaban además la clase `[AnclaEq]`, que daba `Prf ⊥` —F1, [ADR‑114](DECISIONS.md)—: eran VACUOS.)*
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
+**Last updated:** 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
 `[AnclaEq]`: su única hipótesis es `ConsistentH` (banner, §1, §4–§6); D1 y D3 sí la llevan, rellenada por la
 instancia (§3). Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)) y con ella
 toda la mitad `⊬¬G` que vivía allí; F1 está compilado (`[AnclaEq]` ⇒ `Prf ⊥`), y **D1 y D3 también
@@ -61,8 +61,9 @@ un fallo.
 | | *(punto fijo · necesitación · `Con' ⇒ G`)* | ✅ `prf_godelCN_fixedpoint` · `repr_pos'_prf` (D1) · `prf_con_imp_godel`, sobre `d2_prf` (D2) y `d3_prf_real` (D3) — D1 y D3 llevan todavía la ligadura `[AnclaEq]`, que rellena la instancia `instAnclaEq` (ADR‑117, §3); `prf_con_imp_godel`, ya no |
 
 **Footprint** (medido, `check-footprints.bash`): `goedel_first_prf`, `goedel_second_prf`,
-`prf_godelCN_fixedpoint`, `d3_prf_real`, `prf_ancla` y `f1_traduccion_refutada` → `[propext, Classical.choice,
-Quot.sound]`. ⇒ **ningún axioma del proyecto**, y hasta ADR‑117, aun así, **vacuos**: lo que fallaba era la
+`prf_godelCN_fixedpoint`, `d3_prf_real` y `prf_ancla` → `[propext, Classical.choice, Quot.sound]`;
+`f1_traduccion_refutada` → `[propext, Quot.sound]` (✏️ desde D7, 2026‑10‑05: su `choice` lo traía `String`). ⇒ **ningún
+axioma del proyecto**, y hasta ADR‑117, aun así, **vacuos**: lo que fallaba era la
 hipótesis de clase, que el footprint no ve. 🔑 *Un footprint limpio no dice que el teorema diga algo* — y
 tampoco dice que `ConsistentH` se cumpla (✏️ desde ADR‑120 lo dice otro teorema: `consistencia`, un modelo de los 142).
 

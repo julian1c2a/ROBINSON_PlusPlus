@@ -550,8 +550,9 @@ correcta** y está ejecutada en §9bis. Se conserva porque su valor es de métod
 **Lo que la previsión NO vio, y salió al escribir** — tres cosas, todas de forma:
 * ⚠️ `hphi` necesita la cota `j < lenc L`, que **no viajaba** por el genérico ⇒ hubo que darle una
   **hipótesis extra `A`** que atraviese el `∃`‑elim;
-* ⚠️ dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hace que Lean despliegue `strCode "premsOf"`
-  **carácter a carácter** y agota los heartbeats: hay que dárselo por **lemas**;
+* ⚠️ dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hacía que Lean desplegara `strCode "premsOf"`
+  **carácter a carácter** y agotara los heartbeats (medido con `String`, antes de D7; hoy `sym!"premsOf"`, sin
+  volver a medir): hay que dárselo por **lemas**;
 * ⚠️ al desempaquetar con Leibniz, el argumento que **no** se sustituye puede mencionar `#0` ⇒ hay
   que protegerlo con `liftTerm 0`, o el lema es **FALSO**. -/
 
@@ -924,9 +925,9 @@ theorem hphi_gen (Q I J : Term) :
 
 /-! ### Naturalidad, por LEMAS y no por `rfl`
 
-⚠️ **Medido**: dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hace que Lean despliegue
-`strCode "premsOf"` **carácter a carácter** y agota los heartbeats. Con `liftTerm_strCode` en el
-`simp` set sale en un instante. -/
+⚠️ **Medido** (con símbolos `String`, antes de D7): dejar que `rfl` case `liftTerm 0 (miPhiAt …)` hacía que Lean
+desplegara `strCode "premsOf"` **carácter a carácter** y agotara los heartbeats (hoy `sym!"premsOf"`; con
+`List Char`, sin volver a medir). Con `liftTerm_strCode` en el `simp` set sale en un instante. -/
 
 theorem liftTerm_miPhiAt (c : Nat) (Q I J : Term) :
     liftTerm c (miPhiAt Q I J) = miPhiAt (liftTerm c Q) (liftTerm c I) (liftTerm c J) := by
@@ -1260,7 +1261,7 @@ theorem hBc'_prems (q i : Term) :
     Prf (liftc zero (lencT (premsOfT (nthcT (WQ q) (UI i))))
       =eq lencT (premsOfT (nthcT (WQ q) (UI i)))) := by
   refine prf_eq_trans (prf_liftc_lencT zero _) (prf_congr_lencT ?_)
-  refine prf_eq_trans (prf_liftc_funcc1 zero (strCode "premsOf") _) (prf_congr_premsOfT ?_)
+  refine prf_eq_trans (prf_liftc_funcc1 zero (strCode sym!"premsOf") _) (prf_congr_premsOfT ?_)
   refine prf_eq_trans (prf_liftc_nthcT zero _ _) ?_
   exact prf_congr_nthcT
     (prf_congr_liftc (prf_congr_liftc (prf_liftc_tcFn q)))

@@ -34,7 +34,7 @@ namespace ROBINSON_PlusPlus.Meta.CantorMonoPrf
 la inducción fuerte sobre códigos (ii) es derivable de `ax_induction`, y con ella
 `pcc_eval_substfc` (iii) y los 7 tags de `lineWF` que faltan.
 
-⚠️ **`cons h t` NO es defeq a `σ (pair h t)`** (verificado): `cons` es `.func "::"` opaco y la
+⚠️ **`cons h t` NO es defeq a `σ (pair h t)`** (verificado): `cons` es `.func sym!"::"` opaco y la
 conexión con la aritmética es el **axioma objeto** `ax_L0_cons_def`. Todo el cálculo de esta
 sección va por tanto a nivel `Prf`, no por `rfl`.
 

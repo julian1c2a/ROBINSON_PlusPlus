@@ -15,7 +15,8 @@ valen para TODO `V`, y sólo el ancla (`Meta/ModeloCodificacion.lean`) lo fija e
 
 * Un lema `rfl` por símbolo (`MN_*`), para `V` VARIABLE. ⛔ No se escribe ningún `rfl` contra `V₀`: el núcleo
   despliega primero el lado de MÁS altura —`V₀`— y no acaba (2,5 GB en 12 s, medido; `@[irreducible]` no lo
-  evita, ADR‑119 §3).
+  evita, ADR‑119 §3). Los 34 `v_*` reescriben con ellos y no despliegan `MNV` (D7, ADR‑129: con `List Char`,
+  desplegar `MNV` en el `simp` agotaba el límite de `whnf`).
 * La evaluación de los códigos cerrados por inducción, nunca por cómputo: `ev_numeralM`, `ev_strCodeM`,
   `ev_termCodeM`, `ev_formCodeM`, `ev_listFormCodeM`; y la de las guardas, para un término ARBITRARIO
   (`ev_hasWit`, `ev_hasWitF`).
@@ -44,75 +45,83 @@ variable {V : Nat}
     biyección de Cantor; los símbolos de codificación, por recursión (sobre la etiqueta de su argumento los de
     sustitución y lift, sobre `decodeL` `validProofFn`/`runFn`/`chainOk`, sobre el número `tcFn`); y
     `axiomsCodeT` por `V`, el PARÁMETRO: sólo la instancia `MNV V₀` lo fija en el valor del lado derecho del
-    ancla. -/
+    ancla. Despacha por patrones `sym!"…"` sobre el símbolo (`List Char`, D7). -/
 def MNV (V : Nat) : Model Nat where
   func := fun s args =>
     match s, args with
-    | "0",  []     => 0
-    | "σ",  [a]    => a + 1
-    | "+",  [a, b] => a + b
-    | "*",  [a, b] => a * b
-    | "−",  [a, b] => a - b            -- monus, como dice el comentario de `sub_sym`
-    | "√",  [a]    => sqrtN a
-    | "/₂", [a]    => a / 2
-    | "%₂", [a]    => a % 2
-    | "τ",  [a]    => a - 1            -- `pred`
-    | "^",  [a, b] => a ^ b
-    | "::", [a, b] => consN a b
-    | "##", [a, b] => concatN a b
-    | "Π_p", [l]   => prodpN l
-    | "substtc", [k, s, c] => substtcN k s c
-    | "substtsc", [k, s, c] => substtscN k s c
-    | "liftc", [c, t] => liftcN c t
-    | "liftsc", [c, t] => liftscN c t
-    | "substfc", [v, t, f] => substfcN v t f
-    | "liftfc", [c, f] => liftfcN c f
-    | "carc", [l] => carN l
-    | "cdrc", [l] => cdrN l
-    | "lenc", [l] => lenN l
-    | "nthc", [l, i] => nthN l i
-    | "runFn", [c, r] => runFnN c r
-    | "validProofFn", [c, r] => vpfN c r
-    | "tcFn", [t] => tcFnN t
-    | "premsOf", [l] => premsOfN l
-    | "axiomsCodeT", [] => V
+    | sym!"0",  []     => 0
+    | sym!"σ",  [a]    => a + 1
+    | sym!"+",  [a, b] => a + b
+    | sym!"*",  [a, b] => a * b
+    | sym!"−",  [a, b] => a - b            -- monus, como dice el comentario de `sub_sym`
+    | sym!"√",  [a]    => sqrtN a
+    | sym!"/₂", [a]    => a / 2
+    | sym!"%₂", [a]    => a % 2
+    | sym!"τ",  [a]    => a - 1            -- `pred`
+    | sym!"^",  [a, b] => a ^ b
+    | sym!"::", [a, b] => consN a b
+    | sym!"##", [a, b] => concatN a b
+    | sym!"Π_p", [l]   => prodpN l
+    | sym!"substtc", [k, s, c] => substtcN k s c
+    | sym!"substtsc", [k, s, c] => substtscN k s c
+    | sym!"liftc", [c, t] => liftcN c t
+    | sym!"liftsc", [c, t] => liftscN c t
+    | sym!"substfc", [v, t, f] => substfcN v t f
+    | sym!"liftfc", [c, f] => liftfcN c f
+    | sym!"carc", [l] => carN l
+    | sym!"cdrc", [l] => cdrN l
+    | sym!"lenc", [l] => lenN l
+    | sym!"nthc", [l, i] => nthN l i
+    | sym!"runFn", [c, r] => runFnN c r
+    | sym!"validProofFn", [c, r] => vpfN c r
+    | sym!"tcFn", [t] => tcFnN t
+    | sym!"premsOf", [l] => premsOfN l
+    | sym!"axiomsCodeT", [] => V
     | _, _         => 0
   rel := fun s args =>
     match s, args with
-    | "<", [a, b] => a < b
-    | "∈", [x, l] => memN x l
-    | "allIn", [c, l] => allInN c l
-    | "lineWF", [l] => lineWFN V l
-    | "chainOk", [c, p] => chainOkN V c p
+    | sym!"<", [a, b] => a < b
+    | sym!"∈", [x, l] => memN x l
+    | sym!"allIn", [c, l] => allInN c l
+    | sym!"lineWF", [l] => lineWFN V l
+    | sym!"chainOk", [c, p] => chainOkN V c p
     | _, _        => False
 
 /-! ### Un lema `rfl` por símbolo: así `simp` no tiene que abrir el `match` de 33 ramas -/
 
-theorem MN_zero : (MNV V).func "0" [] = 0 := rfl
-theorem MN_succ (a : Nat) : (MNV V).func "σ" [a] = a + 1 := rfl
-theorem MN_pred (a : Nat) : (MNV V).func "τ" [a] = a - 1 := rfl
-theorem MN_cons (a b : Nat) : (MNV V).func "::" [a, b] = consN a b := rfl
-theorem MN_concat (a b : Nat) : (MNV V).func "##" [a, b] = concatN a b := rfl
-theorem MN_substtc (k s c : Nat) : (MNV V).func "substtc" [k, s, c] = substtcN k s c := rfl
-theorem MN_substtsc (k s c : Nat) : (MNV V).func "substtsc" [k, s, c] = substtscN k s c := rfl
-theorem MN_liftc (c t : Nat) : (MNV V).func "liftc" [c, t] = liftcN c t := rfl
-theorem MN_liftsc (c t : Nat) : (MNV V).func "liftsc" [c, t] = liftscN c t := rfl
-theorem MN_substfc (v t f : Nat) : (MNV V).func "substfc" [v, t, f] = substfcN v t f := rfl
-theorem MN_liftfc (c f : Nat) : (MNV V).func "liftfc" [c, f] = liftfcN c f := rfl
-theorem MN_carc (l : Nat) : (MNV V).func "carc" [l] = carN l := rfl
-theorem MN_cdrc (l : Nat) : (MNV V).func "cdrc" [l] = cdrN l := rfl
-theorem MN_lenc (l : Nat) : (MNV V).func "lenc" [l] = lenN l := rfl
-theorem MN_nthc (l i : Nat) : (MNV V).func "nthc" [l, i] = nthN l i := rfl
-theorem MN_runFn (c r : Nat) : (MNV V).func "runFn" [c, r] = runFnN c r := rfl
-theorem MN_vpf (c r : Nat) : (MNV V).func "validProofFn" [c, r] = vpfN c r := rfl
-theorem MN_tcFn (t : Nat) : (MNV V).func "tcFn" [t] = tcFnN t := rfl
-theorem MN_premsOf (l : Nat) : (MNV V).func "premsOf" [l] = premsOfN l := rfl
-theorem MN_axiomsCodeT : (MNV V).func "axiomsCodeT" [] = V := rfl
-theorem MN_lt (a b : Nat) : (MNV V).rel "<" [a, b] = (a < b) := rfl
-theorem MN_mem (x l : Nat) : (MNV V).rel "∈" [x, l] = memN x l := rfl
-theorem MN_allIn (c l : Nat) : (MNV V).rel "allIn" [c, l] = allInN c l := rfl
-theorem MN_lineWF (l : Nat) : (MNV V).rel "lineWF" [l] = lineWFN V l := rfl
-theorem MN_chainOk (c p : Nat) : (MNV V).rel "chainOk" [c, p] = chainOkN V c p := rfl
+theorem MN_zero : (MNV V).func sym!"0" [] = 0 := rfl
+theorem MN_add (a b : Nat) : (MNV V).func sym!"+" [a, b] = a + b := rfl
+theorem MN_mul (a b : Nat) : (MNV V).func sym!"*" [a, b] = a * b := rfl
+theorem MN_sub (a b : Nat) : (MNV V).func sym!"−" [a, b] = a - b := rfl
+theorem MN_sqrt (a : Nat) : (MNV V).func sym!"√" [a] = sqrtN a := rfl
+theorem MN_div2 (a : Nat) : (MNV V).func sym!"/₂" [a] = a / 2 := rfl
+theorem MN_mod2 (a : Nat) : (MNV V).func sym!"%₂" [a] = a % 2 := rfl
+theorem MN_pow (a b : Nat) : (MNV V).func sym!"^" [a, b] = a ^ b := rfl
+theorem MN_prodp (l : Nat) : (MNV V).func sym!"Π_p" [l] = prodpN l := rfl
+theorem MN_succ (a : Nat) : (MNV V).func sym!"σ" [a] = a + 1 := rfl
+theorem MN_pred (a : Nat) : (MNV V).func sym!"τ" [a] = a - 1 := rfl
+theorem MN_cons (a b : Nat) : (MNV V).func sym!"::" [a, b] = consN a b := rfl
+theorem MN_concat (a b : Nat) : (MNV V).func sym!"##" [a, b] = concatN a b := rfl
+theorem MN_substtc (k s c : Nat) : (MNV V).func sym!"substtc" [k, s, c] = substtcN k s c := rfl
+theorem MN_substtsc (k s c : Nat) : (MNV V).func sym!"substtsc" [k, s, c] = substtscN k s c := rfl
+theorem MN_liftc (c t : Nat) : (MNV V).func sym!"liftc" [c, t] = liftcN c t := rfl
+theorem MN_liftsc (c t : Nat) : (MNV V).func sym!"liftsc" [c, t] = liftscN c t := rfl
+theorem MN_substfc (v t f : Nat) : (MNV V).func sym!"substfc" [v, t, f] = substfcN v t f := rfl
+theorem MN_liftfc (c f : Nat) : (MNV V).func sym!"liftfc" [c, f] = liftfcN c f := rfl
+theorem MN_carc (l : Nat) : (MNV V).func sym!"carc" [l] = carN l := rfl
+theorem MN_cdrc (l : Nat) : (MNV V).func sym!"cdrc" [l] = cdrN l := rfl
+theorem MN_lenc (l : Nat) : (MNV V).func sym!"lenc" [l] = lenN l := rfl
+theorem MN_nthc (l i : Nat) : (MNV V).func sym!"nthc" [l, i] = nthN l i := rfl
+theorem MN_runFn (c r : Nat) : (MNV V).func sym!"runFn" [c, r] = runFnN c r := rfl
+theorem MN_vpf (c r : Nat) : (MNV V).func sym!"validProofFn" [c, r] = vpfN c r := rfl
+theorem MN_tcFn (t : Nat) : (MNV V).func sym!"tcFn" [t] = tcFnN t := rfl
+theorem MN_premsOf (l : Nat) : (MNV V).func sym!"premsOf" [l] = premsOfN l := rfl
+theorem MN_axiomsCodeT : (MNV V).func sym!"axiomsCodeT" [] = V := rfl
+theorem MN_lt (a b : Nat) : (MNV V).rel sym!"<" [a, b] = (a < b) := rfl
+theorem MN_mem (x l : Nat) : (MNV V).rel sym!"∈" [x, l] = memN x l := rfl
+theorem MN_allIn (c l : Nat) : (MNV V).rel sym!"allIn" [c, l] = allInN c l := rfl
+theorem MN_lineWF (l : Nat) : (MNV V).rel sym!"lineWF" [l] = lineWFN V l := rfl
+theorem MN_chainOk (c p : Nat) : (MNV V).rel sym!"chainOk" [c, p] = chainOkN V c p := rfl
 
 /-! ### La evaluación de los CÓDIGOS cerrados: por inducción, nunca por cómputo -/
 
@@ -129,8 +138,8 @@ theorem ev_charsCodeM (v : Nat → Nat) : ∀ cs : List Char, evalTerm (MNV V) v
         consN c.toNat (codeNatChars cs)
       rw [ev_numeralM, ev_charsCodeM v cs]; rfl
 
-theorem ev_strCodeM (v : Nat → Nat) (s : String) : evalTerm (MNV V) v (strCodeM s) = codeNatStr s :=
-  ev_charsCodeM v s.toList
+theorem ev_strCodeM (v : Nat → Nat) (s : List Char) : evalTerm (MNV V) v (strCodeM s) = codeNatStr s :=
+  ev_charsCodeM v s
 
 mutual
 theorem ev_termCodeM (v : Nat → Nat) (t : Term) : evalTerm (MNV V) v (termCodeM t) = codeNatTerm t := by
@@ -249,43 +258,43 @@ scoped macro "abre" : tactic => `(tactic| simp only [forall_, forall_2, forall_3
 
 theorem v_ax2  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax2_peano_succ_neq_zero := by
   intro v d; simp [succ, zero, succ_sym, zero_sym, neg,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_ax3  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax3_peano_succ_inj := by
   intro v d d'; simp [succ, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_ax4  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax4_add_zero := by
   intro v d; simp [add, zero, add_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_ax18 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax18_lt_irrefl := by
   intro v d; simp [lt, lt_sym, neg,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_ax25 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax25_pred_zero := by
   -- ⚠️ `ax25_pred_zero` NO es un `forall_`: sin su nombre en el `simp` no hay nada que abrir.
   -- El linter lo marcó «no usado» en los OTROS siete (allí `forall_` lo abre) y aquí NO.
   -- 🔑 *Un aviso de «no usado» no es una medición de que sobre.* Segunda vez en esta sesión.
   intro v; simp [ax25_pred_zero, pred, zero, pred_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, MNV]
+    evalFormula, evalTerm, evalTerms, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_ax26 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax26_pred_succ := by
   intro v d; simp [pred, succ, pred_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 /-- ⭐ Los dos que necesitaban la raíz. -/
 theorem v_ax14 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax14_sqrt_le := by
   intro v d
   simp only [ax14_sqrt_le, forall_, le, lt, sq, mul, sqrt, lt_sym, mul_sym, sqrt_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   have := sqrtN_le d
   omega
 
 theorem v_ax15 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax15_lt_succ_sqrt := by
   intro v d
   simp only [ax15_lt_succ_sqrt, forall_, lt, sq, mul, succ, sqrt, lt_sym, mul_sym, succ_sym,
-    sqrt_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    sqrt_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact lt_sq_succ_sqrtN d
 
 /-! ### §2bis · El resto de la capa ARITMÉTICA
@@ -296,76 +305,76 @@ axioma** — que es lo que M2 (ADR‑085) predijo y aquí se confirma sobre quin
 
 theorem v_ax5  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax5_add_succ := by
   intro v d d'; simp [add, succ, add_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_ax6  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax6_add_comm := by
-  intro v d d'; simp [add, add_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+  intro v d d'; simp [add, add_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_ax7  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax7_add_assoc := by
-  intro v d d' d''; simp [add, add_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+  intro v d d' d''; simp [add, add_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_ax8  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax8_mul_zero := by
   intro v d; simp [mul, zero, mul_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_ax9  : ∀ v : Nat → Nat, evalFormula (MNV V) v ax9_mul_succ := by
   intro v d d'; simp [mul, add, succ, mul_sym, add_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact Nat.mul_succ _ _
 
 theorem v_ax10 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax10_mul_comm := by
-  intro v d d'; simp [mul, mul_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+  intro v d d'; simp [mul, mul_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact Nat.mul_comm _ _
 
 theorem v_ax11 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax11_mul_assoc := by
-  intro v d d' d''; simp [mul, mul_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+  intro v d d' d''; simp [mul, mul_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact Nat.mul_assoc _ _ _
 
 theorem v_ax12 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax12_mul_distrib := by
   intro v d d' d''; simp [mul, add, mul_sym, add_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact Nat.mul_add _ _ _
 
 /-! #### La paridad: `omega` conoce `/2` y `%2` por literales -/
 
 theorem v_ax16 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax16_mod2_succ := by
   intro v d; simp [_root_.iff, mod2, succ, zero, one, mod2_sym, succ_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_ax17 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax17_div_mod_eq := by
   intro v d; simp [add, mul, div2, mod2, two, one, succ, zero,
     add_sym, mul_sym, div2_sym, mod2_sym, succ_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_ax21 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax21_mod2_range := by
   intro v d; simp [mod2, zero, one, succ, mod2_sym, zero_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_ax24 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax24_mod2_of_even := by
   intro v d d'; simp [mod2, mul, two, one, succ, zero, mod2_sym, mul_sym, succ_sym, zero_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 /-! #### Monus y potencia -/
 
 theorem v_ax29 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax29_sub_witness := by
   intro v d d'; simp [le, lt, add, sub, lt_sym, add_sym, sub_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 theorem v_pow_zero : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_pow_zero := by
   intro v d; simp [pow, zero, one, succ, pow_sym, zero_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
 
 theorem v_pow_succ : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_pow_succ := by
   intro v d d'; simp [pow, mul, succ, pow_sym, mul_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact Nat.pow_succ _ _
 
 /-! #### El ORDEN. ⭐ `ax13` DEFINE `<` por un `∃`, así que aquí se comprueba que la relación
@@ -373,14 +382,14 @@ que el modelo eligió (`a < b` de `Nat`) es **la que el axioma exige**, no una c
 
 theorem v_ax13 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax13_lt_def := by
   intro v d d'; simp [_root_.iff, lt, add, succ, lt_sym, add_sym, succ_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   constructor
   · intro h; exact ⟨d' - d - 1, by omega⟩
   · -- ⚠️ `simp` convirtió el `∃k. …` del antecedente en un `∀k`, así que se introduce COMO TAL.
     intro k hk; omega
 
 theorem v_ax19 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax19_lt_trichotomy := by
-  intro v d d'; simp [lt, lt_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+  intro v d d'; simp [lt, lt_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   omega
 
 /-! ### Los axiomas core de LISTAS, validados (2026‑10‑05)
@@ -397,7 +406,7 @@ theorem v_axL0 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_L0_cons_def := by
   intro v d d'
   simp only [ax_L0_cons_def, forall_2, cons, succ, pair, cantor_func, cantor_poly, div2, add, mul, two, one,
     zero, cons_sym, succ_sym, div2_sym, add_sym, mul_sym, zero_sym, evalFormula, evalTerm, evalTerms,
-    shiftEnv, MNV]
+    shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   have h := eval_cantor d d'
   rw [consN_eq]
   omega
@@ -405,49 +414,49 @@ theorem v_axL0 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_L0_cons_def := by
 theorem v_axL1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_L1_in_nil := by
   intro v d
   simp only [ax_L1_in_nil, forall_, neg, In, nil, zero, in_sym, zero_sym, evalFormula, evalTerm, evalTerms,
-    shiftEnv, MNV]
+    shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact memN_zero d
 
 theorem v_axL2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_L2_in_cons := by
   intro v d d' d''
   simp only [ax_L2_in_cons, forall_3, _root_.iff, lor, In, cons, in_sym, cons_sym, evalFormula, evalTerm,
-    evalTerms, shiftEnv, MNV]
+    evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact ⟨(memN_consN d d' d'').mp, (memN_consN d d' d'').mpr⟩
 
 theorem v_axC1 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_C1_concat_nil := by
   intro v d
   simp only [ax_C1_concat_nil, forall_, concat, nil, zero, concat_sym, zero_sym, evalFormula, evalTerm,
-    evalTerms, shiftEnv, MNV]
+    evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact concatN_zero d
 
 theorem v_axC2 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_C2_concat_cons := by
   intro v d d' d''
   simp only [ax_C2_concat_cons, forall_3, concat, cons, concat_sym, cons_sym, evalFormula, evalTerm,
-    evalTerms, shiftEnv, MNV]
+    evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact concatN_consN d d' d''
 
 theorem v_axC3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_C3_concat_assoc := by
   intro v d d' d''
-  simp only [ax_C3_concat_assoc, forall_3, concat, concat_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+  simp only [ax_C3_concat_assoc, forall_3, concat, concat_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact concatN_assoc d d' d''
 
 theorem v_axL3 : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_L3_in_concat := by
   intro v d d' d''
   simp only [ax_L3_in_concat, forall_3, _root_.iff, lor, In, concat, in_sym, concat_sym, evalFormula,
-    evalTerm, evalTerms, shiftEnv, MNV]
+    evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact ⟨(memN_concatN d d' d'').mp, (memN_concatN d d' d'').mpr⟩
 
 theorem v_prodp_nil : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_prodp_nil := by
   intro v
   simp only [ax_prodp_nil, prod_pairs, nil, one, succ, zero, prodp_sym, succ_sym, zero_sym, evalFormula,
-    evalTerm, evalTerms, MNV]
+    evalTerm, evalTerms, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   exact prodpN_zero
 
 theorem v_prodp_cons : ∀ v : Nat → Nat, evalFormula (MNV V) v ax_prodp_cons := by
   intro v d d' d''
   simp only [ax_prodp_cons, forall_3, prod_pairs, cons, pair, cantor_func, cantor_poly, div2, add, mul, two,
     one, succ, zero, pow, prodp_sym, cons_sym, div2_sym, add_sym, mul_sym, succ_sym, zero_sym, pow_sym,
-    evalFormula, evalTerm, evalTerms, shiftEnv, MNV]
+    evalFormula, evalTerm, evalTerms, shiftEnv, MN_zero, MN_succ, MN_pred, MN_add, MN_mul, MN_sub, MN_sqrt, MN_div2, MN_mod2, MN_pow, MN_prodp, MN_cons, MN_concat, MN_substtc, MN_substtsc, MN_liftc, MN_liftsc, MN_substfc, MN_liftfc, MN_carc, MN_cdrc, MN_lenc, MN_nthc, MN_runFn, MN_vpf, MN_tcFn, MN_premsOf, MN_axiomsCodeT, MN_lt, MN_mem, MN_allIn, MN_lineWF, MN_chainOk]
   have h : ((d + d') * (d + d' + 1) + (0 + 1 + 1) * d') / 2 = pairN d d' := by
     have := eval_cantor d d'
     omega

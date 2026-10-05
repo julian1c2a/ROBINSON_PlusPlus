@@ -9,8 +9,14 @@
 
 **Contenido:** la teoría objeto FOL⁼ (Q++) — axiomas de Robinson extendidos, esquemas del verificador
 estructural (`lineWF`, `premsOf`, tags), y los axiomas de la capa Δ₀ (`lenc`/`nthc`/`ax_lineWF_inv`/
-`ax_lineWF_cons`). **Last updated:** 2026-07-12 · Lean v4.31.0. — ⚠️ revisado el 2026‑09‑11 (entonces el kernel no
+`ax_lineWF_cons`). **Last updated:** 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos de
+§3.1.1 son `List Char` y se escriben `sym!"…"`. Antes, 2026-07-12 — ⚠️ revisado el 2026‑09‑11 (entonces el kernel no
 había cambiado; adjudicación del aviso `[E]` del control).
+
+> 🏁 **2026‑10‑05 · D7 (ADR‑129).** Los símbolos son `List Char`, no `String`: los 17 `*_sym` son
+> `List Char := sym!"…"` (§3.1.1), con la macro de `Minimal/SymLit.lean`, que arma la lista de caracteres al
+> elaborar; `strCodeM s := charsCodeM s` y `codeNatStr s := codeNatChars s`, sin `.toList`. Son los mismos
+> caracteres, así que ningún código cambia de valor (`codeNat`, el ancla). `termToString` sigue dando `String`.
 
 > 🏁 **2026‑10‑04 · ADR‑117.** `Minimal/Axioms.lean` cambia otra vez: `axioms` tiene **142** fórmulas, los 141 de
 > `axiomsBase := coreAxioms ++ codingAxioms` y, AL FINAL, el ancla diagonal `ax_axiomsCodeT_def := axD axiomsBase`;
@@ -35,31 +41,32 @@ había cambiado; adjudicación del aviso `[E]` del control).
 **Status**: ✅ Complete — **34 axiomas matemáticos** (25 aritm + 7 listas + 2 factorización); 0 `axiom` de Lean (las meta-reglas de FOL ya no se importan, ADR‑115).
 **@axiom_system**: `Minimal`
 **@importance**: `foundational`
-**Last updated**: 2026-06-06 (Bloque VIII ext.: +pow, +prod_pairs, +4 axiomas)
+**Last updated**: 2026-06-06 (Bloque VIII ext.: +pow, +prod_pairs, +4 axiomas) · ✏️ 2026‑10‑05: §3.1.1, símbolos `List Char` (D7, ADR‑129)
 
 #### 3.1.1 Language symbols
 
 ```lean
-def succ_sym  : String := "σ"
-def add_sym   : String := "+"
-def mul_sym   : String := "*"
-def sub_sym   : String := "−"     -- monus
-def sqrt_sym  : String := "√"
-def div2_sym  : String := "/₂"
-def mod2_sym  : String := "%₂"
-def proj1_sym : String := "π₁"
-def proj2_sym : String := "π₂"
-def pred_sym  : String := "τ"
-def nil_sym   : String := "[]"
-def cons_sym  : String := "::"
-def concat_sym: String := "##"
-def pow_sym   : String := "^"     -- 2026-06-06, Bloque VIII ext.
-def prodp_sym : String := "Π_p"   -- 2026-06-06, Bloque VIII ext.
-def lt_sym    : String := "<"
-def le_sym    : String := "≤"
-def in_sym    : String := "∈"
-def zero_sym  : String := "0"
+def succ_sym  : List Char := sym!"σ"
+def add_sym   : List Char := sym!"+"
+def mul_sym   : List Char := sym!"*"
+def sub_sym   : List Char := sym!"−"     -- monus
+def sqrt_sym  : List Char := sym!"√"
+def div2_sym  : List Char := sym!"/₂"
+def mod2_sym  : List Char := sym!"%₂"
+def pred_sym  : List Char := sym!"τ"
+def nil_sym   : List Char := sym!"[]"
+def cons_sym  : List Char := sym!"::"
+def concat_sym: List Char := sym!"##"
+def pow_sym   : List Char := sym!"^"     -- 2026-06-06, Bloque VIII ext.
+def prodp_sym : List Char := sym!"Π_p"   -- 2026-06-06, Bloque VIII ext.
+def lt_sym    : List Char := sym!"<"
+def le_sym    : List Char := sym!"≤"
+def in_sym    : List Char := sym!"∈"
+def zero_sym  : List Char := sym!"0"
 ```
+
+> ✏️ **2026‑10‑05 (D7, ADR‑129)**: hasta ese día, `String := "σ"`, …, con los mismos caracteres. `proj1_sym`/`proj2_sym`
+> (`"π₁"`/`"π₂"`) ya no existen (nota de abajo) y salen de la tabla.
 
 > **Nota 2026-06-02**: `proj1_sym`/`proj2_sym` ya **no son símbolos opacos** del lenguaje. `proj1`/`proj2` son ahora defs concretas en `Block4_C6_C7.lean` (`proj1 := x_of_c`, `proj2 := y_of_c`).
 

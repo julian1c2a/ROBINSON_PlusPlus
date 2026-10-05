@@ -110,15 +110,15 @@ namespace ROBINSON_PlusPlus.Meta.LiftcCodePrf
     INCONSISTENTE— es la ecuacion de recursion de su imagen dotada. -/
 
 /-- `⌜liftc c t⌝` como constructor de codigo. -/
-def liftcT (c t : Term) : Term := funcc (strCode "liftc") (cons c (cons t nil))
+def liftcT (c t : Term) : Term := funcc (strCode sym!"liftc") (cons c (cons t nil))
 /-- `⌜liftsc c ts⌝` como constructor de codigo. -/
-def liftscT (c ts : Term) : Term := funcc (strCode "liftsc") (cons c (cons ts nil))
+def liftscT (c ts : Term) : Term := funcc (strCode sym!"liftsc") (cons c (cons ts nil))
 
 /-! ### La GUARDA de los dos constructores (ADR-020): `funcc` binarios ⇒ escalera §28 -/
 theorem prf_hasWit_liftcT {c t : Term} (hc : Prf (hasWit c)) (ht : Prf (hasWit t)) :
-    Prf (hasWit (liftcT c t)) := prf_hasWit_funcc2 (strCode "liftc") c t hc ht
+    Prf (hasWit (liftcT c t)) := prf_hasWit_funcc2 (strCode sym!"liftc") c t hc ht
 theorem prf_hasWit_liftscT {c t : Term} (hc : Prf (hasWit c)) (ht : Prf (hasWit t)) :
-    Prf (hasWit (liftscT c t)) := prf_hasWit_funcc2 (strCode "liftsc") c t hc ht
+    Prf (hasWit (liftscT c t)) := prf_hasWit_funcc2 (strCode sym!"liftsc") c t hc ht
 
 /-- `varc x = cons 0 (cons x nil)` ⇒ su imagen punteada es el `unT 0` del KIT
     (`Meta/CodeCtorKit.lean:60`). CERO simbolos nuevos: es un alias defeq. -/
@@ -164,10 +164,10 @@ theorem prf_congr_funccT {X X' Y Y' : Term} (hx : Prf (X =eq X')) (hy : Prf (Y =
 
 theorem prf_substtc_liftcT (v W x y : Term) :
     Prf (substtc v W (liftcT x y) =eq liftcT (substtc v W x) (substtc v W y)) :=
-  prf_substtc_funcc2 v W (strCode "liftc") x y
+  prf_substtc_funcc2 v W (strCode sym!"liftc") x y
 theorem prf_substtc_liftscT (v W x y : Term) :
     Prf (substtc v W (liftscT x y) =eq liftscT (substtc v W x) (substtc v W y)) :=
-  prf_substtc_funcc2 v W (strCode "liftsc") x y
+  prf_substtc_funcc2 v W (strCode sym!"liftsc") x y
 
 theorem substtc_inv_liftcT {X Y : Term}
     (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :
@@ -325,7 +325,7 @@ theorem pcc_liftc_func_code (c a b : Term) :
 /-- `substfc` atraviesa un atomo binario de codigo. Generaliza los dos casos particulares de
     produccion (`D3InDotPrf.prf_substfc_ltCodeFn_snd`, `EvalBoundedPrf.prf_substfc_ltCodeFn_varc0`),
     que fijan uno de los dos argumentos. -/
-theorem prf_substfc_atom2CodeFn (v t : Term) (s : String) (a b : Term) :
+theorem prf_substfc_atom2CodeFn (v t : Term) (s : List Char) (a b : Term) :
     Prf (substfc v t (atom2CodeFn s a b)
       =eq atom2CodeFn s (substtc v t a) (substtc v t b)) := by
   unfold atom2CodeFn

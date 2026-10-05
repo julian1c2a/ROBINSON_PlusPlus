@@ -50,15 +50,15 @@ vía `derivation_to_prf`. La clave es que `decodeLine` **verifica** `stepConcl a
 
 ### Nota de rendimiento
 
-Un `match` sobre `Term` con las 21 formas anidadas revienta el `whnf` (`String.decEq` en el
-discriminante). Se **pela** el justif a `List Term` (`peelArgs`) y se matchea `(tag : Nat, args)` —
-superficial y barato.
+Un `match` sobre `Term` con las 21 formas anidadas reventaba el `whnf` (`String.decEq` en el
+discriminante; medido con símbolos `String`, antes de D7: con `List Char` no se ha vuelto a medir).
+Se **pela** el justif a `List Term` (`peelArgs`) y se matchea `(tag : Nat, args)` — superficial y barato.
 -/
 
 /-! ### Igualdad decidible y buscador de índices (para recuperar los índices de `thy`/`mp`/`gen`)
 
 `Term`/`Formula` sólo derivan `BEq` (estructural, anidado) — **no** `DecidableEq` ni `LawfulBEq`, y
-el handler de `deriving DecidableEq` no cubre el anidamiento (`func : String → List Term`). Se
+el handler de `deriving DecidableEq` no cubre el anidamiento (`func : List Char → List Term`). Se
 construye a mano (mutuo para `Term`) y se usa un buscador propio `findIdx` con `=` (no `List.idxOf?`,
 que va por `BEq` y exigiría `LawfulBEq`). -/
 

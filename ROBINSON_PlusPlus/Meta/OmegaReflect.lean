@@ -128,7 +128,7 @@ theorem subst_provBody (φ : Formula) (t : Term) :
     porque `isClosed` (abajo) sigue siendo útil y porque los sondeos la citan. -/
 inductive IsCodeShaped : Term → Prop
   | numeral (n : Nat) : IsCodeShaped (numeralM n)
-  | strCode (s : String) : IsCodeShaped (strCodeM s)
+  | strCode (s : List Char) : IsCodeShaped (strCodeM s)
   | nil : IsCodeShaped nil
   | cons {h t : Term} : IsCodeShaped h → IsCodeShaped t → IsCodeShaped (cons h t)
 

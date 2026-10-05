@@ -441,7 +441,7 @@ abbrev orcN (a b : Nat) : Nat := consN 8 (consN a (consN b 0))
 abbrev excN (a : Nat) : Nat := consN 9 (consN a 0)
 
 /-- Los códigos CERRADOS que incrustan `ax_vpf_ind`/`_listInd` y `ax_lineWF_ind`/`_listInd`: su valor se nombra,
-    nunca se calcula (`codeNatTerm` de un símbolo `String`). -/
+    nunca se calcula: `consN` va por `triN`, que es recursión UNARIA. -/
 def TC0 : Nat := codeNatTerm zero
 def TCS : Nat := codeNatTerm (succ (.var 0))
 def TNIL : Nat := codeNatTerm nil
@@ -527,7 +527,7 @@ theorem allInN_consN (c a t : Nat) : allInN c (consN a t) ↔ And (memN a c) (al
     | inl e => rw [e]; exact h.1
     | inr h' => exact h.2 y h'
 
-/-! ### Las guardas `hasWit`/`hasWitF`, como `Prop` sobre `Nat` (espejo de `Minimal/Axioms.lean:1196-1277`) -/
+/-! ### Las guardas `hasWit`/`hasWitF`, como `Prop` sobre `Nat` (espejo de `Minimal/Axioms.lean:1197-1278`) -/
 
 def shapeUnN (X k : Nat) : Prop := X = consN k (consN (nthN X 1) 0)
 def shapeBinN (X k : Nat) : Prop := X = consN k (consN (nthN X 1) (consN (nthN X 2) 0))

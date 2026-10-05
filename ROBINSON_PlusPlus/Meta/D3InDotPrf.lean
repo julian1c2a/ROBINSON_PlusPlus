@@ -149,7 +149,7 @@ El `∃`-elim **liftea** `p` (de `#0` a `#1`), así que los lemas fijados en `#0
 todo lo dotado se generaliza sobre un testigo `p` **arbitrario** (igual que `pcc_lt_tracked` hace con
 `s`,`t`), y estos lemas garantizan que el lift atraviesa `tcFn`/`inDot`/`bddCarcDot` moviendo `p`. -/
 
-/-- El lift atraviesa `tcFn` (es `Term.func "tcFn" [·]`). -/
+/-- El lift atraviesa `tcFn` (es `Term.func sym!"tcFn" [·]`). -/
 theorem liftTerm_tcFn (c : Nat) (t : Term) : liftTerm c (tcFn t) = tcFn (liftTerm c t) := by
   simp only [tcFn, liftTerm, liftTerms]
 

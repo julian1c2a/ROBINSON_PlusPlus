@@ -67,7 +67,7 @@ namespace ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 `liftcT` (`Meta/LiftcCodePrf.lean:111`). Nunca como axioma. -/
 
 /-- `⌜liftfc c f⌝` como constructor de código. -/
-def liftfcT (c f : Term) : Term := funcc (strCode "liftfc") (cons c (cons f nil))
+def liftfcT (c f : Term) : Term := funcc (strCode sym!"liftfc") (cons c (cons f nil))
 
 /-- El puente definicional con `termCode`: es lo que `formCode` produce de un `liftfc`. -/
 theorem liftfcT_termCode (c f : Term) :
@@ -123,7 +123,7 @@ example (X : Term) :
     `funcc` binario, así que todo sale del mismo escalón §28 del KIT. -/
 
 theorem prf_hasWit_liftfcT {c f : Term} (hc : Prf (hasWit c)) (hf : Prf (hasWit f)) :
-    Prf (hasWit (liftfcT c f)) := prf_hasWit_funcc2 (strCode "liftfc") c f hc hf
+    Prf (hasWit (liftfcT c f)) := prf_hasWit_funcc2 (strCode sym!"liftfc") c f hc hf
 
 theorem prf_congr_liftfcT {c c' f f' : Term} (hc : Prf (c =eq c')) (hf : Prf (f =eq f')) :
     Prf (liftfcT c f =eq liftfcT c' f') :=
@@ -132,7 +132,7 @@ theorem prf_congr_liftfcT {c c' f f' : Term} (hc : Prf (c =eq c')) (hf : Prf (f 
 
 theorem prf_substtc_liftfcT (v W x y : Term) :
     Prf (substtc v W (liftfcT x y) =eq liftfcT (substtc v W x) (substtc v W y)) :=
-  prf_substtc_funcc2 v W (strCode "liftfc") x y
+  prf_substtc_funcc2 v W (strCode sym!"liftfc") x y
 
 theorem substtc_inv_liftfcT {X Y : Term}
     (hX : ∀ W, Prf (substtc zero W X =eq X)) (hY : ∀ W, Prf (substtc zero W Y =eq Y)) :

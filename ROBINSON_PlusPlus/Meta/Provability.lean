@@ -35,11 +35,11 @@ def charsCode : List Char → Term
   | []      => nil
   | c :: cs => cons (numeral c.toNat) (charsCode cs)
 
-/-- Código de un símbolo (String) — carácter a carácter. -/
-def strCode (s : String) : Term := charsCode s.toList
+/-- Código de un símbolo (`List Char` desde D7; antes `String`) — carácter a carácter: es `charsCode`. -/
+def strCode (s : List Char) : Term := charsCode s
 
 /- Código de Gödel de términos del lenguaje (mutuo con `termsCode` por el
-   anidamiento `func : String → List Term → Term`).
+   anidamiento `func : List Char → List Term → Term`).
    `var n ↦ ⟨0, n⟩`, `func s ts ↦ ⟨1, strCode s, termsCode ts⟩`. -/
 mutual
 def termCode : Term → Term
@@ -64,7 +64,7 @@ def formCode : Formula → Term
 
 /-! ### Inyectividad de la codificación (consistency-free, vía `injection`) -/
 
-/-- `nil` y `cons` nunca coinciden como `Term` (símbolos "0" vs "::"). -/
+/-- `nil` y `cons` nunca coinciden como `Term` (símbolos `sym!"0"` vs `sym!"::"`). -/
 private theorem nil_ne_cons (a b : Term) : nil ≠ cons a b := by
   intro h
   simp only [nil, zero, cons] at h
@@ -89,14 +89,8 @@ theorem charsCode_injective : ∀ {l l' : List Char}, charsCode l = charsCode l'
       have hcn : c.toNat = c'.toNat := numeral_injective _ _ hc
       rw [char_toNat_inj hcn, charsCode_injective hrest]
 
-theorem strCode_injective {s t : String} (h : strCode s = strCode t) : s = t := by
-  have h' : charsCode s.toList = charsCode t.toList := h
-  have hd : s.toList = t.toList := charsCode_injective h'
-  first
-    | exact String.toList_inj.mp hd
-    | exact String.toList_injective hd
-    | exact String.ext hd
-    | (rw [← String.asString_toList s, ← String.asString_toList t, hd])
+theorem strCode_injective {s t : List Char} (h : strCode s = strCode t) : s = t :=
+  charsCode_injective h
 
 -- Peeling de `cons` a nivel Lean (constructor `func`).
 private theorem cons_inj_lean {a b c d : Term}

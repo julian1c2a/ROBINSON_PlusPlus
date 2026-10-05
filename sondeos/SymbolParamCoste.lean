@@ -15,6 +15,10 @@ import FOL
 --
 -- ⚠️ Cero `sorry`, cero `axiom`. Lo que aquí se mide es que **las dos clases existen,
 -- son mínimas y son instanciables por `List Char` SIN pasar por `String`**.
+--
+-- ✏️ D7 (2026‑10‑05, ADR‑129 de RPP): los símbolos de FOL SON ya `List Char`. Las dos instancias que aquí se
+-- construían sobre `String` con lo que FOL tenía probado (`Fresh0.shift`/`cst`, `Enumeration.natToString_surj`)
+-- se retiran: la de `Fresh0` es ya `FreshSym (List Char)`, y `natToString` es hoy `natToSym`.
 -- ══════════════════════════════════════════════════════════════════════════
 
 namespace ProbeCoste
@@ -51,16 +55,6 @@ instance : FreshSym (List Char) where
     injection h with h1 _
     exact absurd h1 (by decide)
 
-/-- ⚠️ Y `String` también, con lo que `FOL/Fresh0.lean` **ya tiene probado**: la clase no
-pide nada que el árbol no pague hoy. Este testigo es el control de que la clase no se
-quedó corta ni se pasó de larga. -/
-instance : FreshSym String where
-  shift := FOL.Fresh0.shift
-  cst := FOL.Fresh0.cst
-  shift_inj := FOL.Fresh0.shift_inj
-  cst_inj := FOL.Fresh0.cst_inj
-  cst_ne_shift := FOL.Fresh0.cst_ne_shift
-
 -- ══════════════════════════════════════════════════════════════════════════
 -- §2 · ⛔⛔ obstrucción (2), LA CARA: `Enumeration.natToString_surj`.
 -- `Lindenbaum0` enumera las FÓRMULAS (`φₙ`), y para eso enumera los SÍMBOLOS.
@@ -73,11 +67,6 @@ instance : FreshSym String where
 class EnumSym (S : Type) where
   enum      : Nat → S
   enum_surj : ∀ s, ∃ n, enum n = s
-
-/-- ✅ `String` la satisface con lo que `FOL/Enumeration.lean` **ya tiene probado**. -/
-instance : EnumSym String where
-  enum := FOL.Metamath.Enumeration.natToString
-  enum_surj := FOL.Metamath.Enumeration.natToString_surj
 
 /-- ⭐⭐ Y `List Char` la satisface **más barato todavía**: sale de la capa 1 de
 `Enumeration.lean` (`natToList_surj`, sobre `List Nat`) más `map_ofNat_toNat`, y **no toca
@@ -123,4 +112,3 @@ end ProbeCoste
 #print axioms ProbeCoste.atom_surj
 #print axioms ProbeCoste.instFreshSymListChar
 #print axioms ProbeCoste.instEnumSymListChar
-#print axioms ProbeCoste.instEnumSymString

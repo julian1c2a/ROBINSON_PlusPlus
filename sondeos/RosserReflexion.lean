@@ -67,7 +67,7 @@ theorem ev_numeral (v : Nat → Nat) (n : Nat) :
     evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.Godel.numeral n) = n := by
   rw [← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq, ev_numeralM]
 
-theorem ev_strCode (v : Nat → Nat) (s : String) :
+theorem ev_strCode (v : Nat → Nat) (s : List Char) :
     evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.Provability.strCode s) = codeNatStr s := by
   rw [← ROBINSON_PlusPlus.Meta.Representability.strCodeM_eq, ev_strCodeM]
 
@@ -80,7 +80,7 @@ theorem ev_cuatro (v : Nat → Nat) : evalTerm (MNV V) v (succ (succ (succ (succ
 /-- El valor del código de la ecuación de la evaluación interna de `substfc`, sobre numerales. -/
 theorem ev_evalSubstfcCode (v : Nat → Nat) (a b c : Nat) :
     evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.SubstfcCodePrf.evalSubstfcCode (numeralM a) (numeralM b) (numeralM c))
-      = consN 4 (consN (consN 1 (consN (codeNatStr "substfc")
+      = consN 4 (consN (consN 1 (consN (codeNatStr sym!"substfc")
           (consN (consN (tcFnN a) (consN (tcFnN b) (consN (tcFnN c) 0))) 0)))
         (consN (tcFnN (substfcN a b c)) 0)) := by
   rw [ROBINSON_PlusPlus.Meta.SubstfcCodePrf.evalSubstfcCode, ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.eqCodeFn,
@@ -91,7 +91,7 @@ theorem ev_evalSubstfcCode (v : Nat → Nat) (a b c : Nat) :
 theorem ev_eqcLiftfc (v : Nat → Nat) (a c : Nat) :
     evalTerm (MNV V) v (eqc (ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.liftfcT (tcFn (numeralM a)) (tcFn (numeralM c)))
       (tcFn (liftfc (numeralM a) (numeralM c))))
-      = consN 4 (consN (consN 1 (consN (codeNatStr "liftfc")
+      = consN 4 (consN (consN 1 (consN (codeNatStr sym!"liftfc")
           (consN (consN (tcFnN a) (consN (tcFnN c) 0)) 0)))
         (consN (tcFnN (liftfcN a c)) 0)) := by
   rw [eqc, ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.liftfcT, funcc]

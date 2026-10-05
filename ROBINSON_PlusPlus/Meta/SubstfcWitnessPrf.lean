@@ -49,7 +49,8 @@ maquinaria genérica de la inducción fuerte) y `PrfH_congr_substfc3` bajó a
 `Meta/NumCodeClosedPrf.lean` desde `BdAllIntroPrf` (ADR-019). La familia `PHI…` del sondeo se
 renombró a `PHIT…` para no colisionar con las de `EvalLiftcPrf` y `HasWitTcFnPrf`.
 
-**Footprint**: `[propext, Classical.choice, Quot.sound]` — **net-0 puro**.
+**Footprint**: `[propext, Classical.choice, Quot.sound]` — **net-0 puro**. ✏️ D7 (2026‑10‑05):
+`prf_hasWitF_bin`, `prf_hasWitF_implc`, `prf_hasWit_funcc2` y `prf_nil_or_cons` salen ya `[propext, Quot.sound]`.
 -/
 
 open FOL
@@ -2028,18 +2029,18 @@ para el sucesor punteado, y `implc`/`eqc` sobre códigos punteados es lo que pid
 `EvalBoundedPrf:237` — el único sitio de ③ cuyo código **no** es un `formCode`. -/
 
 /-- El sucesor punteado, `funcc ⌜succ⌝ [x]`, con testigo. -/
-example (x : Term) : Prf (hasWit (funcc (strCode "succ") (cons (tcFn x) nil))) :=
+example (x : Term) : Prf (hasWit (funcc (strCode sym!"succ") (cons (tcFn x) nil))) :=
   prf_hasWit_funcc1 _ _ (prf_hasWit_tcFn x)
 
 /-- Un constructor punteado BINARIO (`addcT`/`mulcT`/`nthcT`/`consT` son todos así). -/
 example (x y : Term) :
-    Prf (hasWit (funcc (strCode "add") (cons (tcFn x) (cons (tcFn y) nil)))) :=
+    Prf (hasWit (funcc (strCode sym!"add") (cons (tcFn x) (cons (tcFn y) nil)))) :=
   prf_hasWit_funcc2 _ _ _ (prf_hasWit_tcFn x) (prf_hasWit_tcFn y)
 
 /-- `hw_auto` sobre una torre real de constructores dotados anidados. -/
 example (p h t : Term) :
-    Prf (hasWit (funcc (strCode "liftsc") (cons (termCode nil)
-      (cons (funcc (strCode "cons") (cons (tcFn h) (cons (tcFn t) nil))) nil)))) := by
+    Prf (hasWit (funcc (strCode sym!"liftsc") (cons (termCode nil)
+      (cons (funcc (strCode sym!"cons") (cons (tcFn h) (cons (tcFn t) nil))) nil)))) := by
   hw_auto
 
 /-- `hw_auto` tambien en el sorte FORMULA: un nodo compuesto sobre codigos punteados. -/
