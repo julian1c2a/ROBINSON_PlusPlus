@@ -10,26 +10,41 @@ en `sondeos/RosserReflexion.lean`): donde la guarda es FALSA, la reflexión no d
 
     Prf (¬ hasWit 0̄)                                         -- el 0 (= nil) no es código de término
     Prf (¬ hasWit c)   para c cerrado con Prf (carc c = k̄), k ∉ {0, 1}
-    Prf (¬ hasWit ⟨k, r⟩‾)   para todo k ∉ {0, 1} y todo r     -- un numeral, sin hipótesis
-    Prf (¬ hasWit ⟨1, s, [0]⟩‾)   para todo símbolo s          -- profundidad 2: la basura, DENTRO (ADR‑126)
+    Prf (¬ hasWit (consN k r)‾)   para todo k ∉ {0, 1} y todo r     -- un numeral, sin hipótesis
+    Prf (¬ hasWit [1, s, [0]]‾)    para todo s                     -- la basura, en el ÚNICO argumento (ADR‑126)
 
-y el control de DISCRIMINACIÓN: sobre el numeral del código de CUALQUIER término, `¬ hasWit` NO es demostrable
-(`control_codigo_no_refutable`, por la solidez): el método no refuta guardas verdaderas.
+`[1, s, [0]]` es la lista de TRES elementos `consN 1 (consN s (consN (consN 0 0) 0))`: etiqueta `1`, casilla de
+símbolo `s` (que la guarda no mira) y una lista de UN argumento, el `0`. «Profundidad» cuenta aquí PROYECCIONES hasta
+el dato que falla (0: el numeral es `0`; 1: su etiqueta; 2: un argumento); en el ÁRBOL del término, la basura de
+`[1, s, [0]]` está a profundidad 1.
+
+Y un control (`control_codigo_no_refutable`): sobre el numeral del código CANÓNICO de cualquier término, `¬ hasWit`
+NO es demostrable en `Prf` por ningún método —la solidez en `MNV V₀` lo impide, porque allí esa guarda es verdadera—.
+No mide el método sino la guarda: `¬ hasWit` no es demostrable en todas partes, así que lo refutado depende de la
+basura. Sólo códigos canónicos; la forma general (`hasWitN c → ¬ Prf ¬hasWit c̄`) sale igual y no está escrita.
+
+**Precedentes** (✏️ auditoría `wf_e04d70c1-e0c`): la guarda ENTERA ya se había refutado en `Prf` sobre términos
+CERRADOS —no numerales— con la misma prueba que §2: `CRIT_hasWit_rejects` (`sondeos/MedirC_Deriva.lean`) y
+`CRIT_hasWit_rejects_tag` (`sondeos/HasWitFCritica.lean`), y la de fórmula, `CRIT_hasWitF_rejects_tag` y
+`CRIT_hasWitF_rejects_varc` (`sondeos/MedirC_Carga.lean`); ninguno compila hoy. Lo nuevo aquí es el NUMERAL, el `0`
+y el caso del argumento.
 
 **Cómo**: lo que había en `Meta/CodeWitnessPrf.lean` —el refutador de PROFUNDIDAD 1 con testigo abierto
 (`prf_crit_In_rejects_open1`) y la forma de pertenencia de `wfAll1` (`prf_isTermCodeE1_of_In`)— más el `∃`‑elim
 (`prf_ex_elim_imp`), el puente `∈ → índice` (`prf_boundedIn_of_In`), y, para el numeral, `carc ⟨k, r⟩‾ = k̄` por
-`prf_cons_eval`. Lo nuevo: `0 ≠ cons a b` en `Prf` (por los axiomas de lista L1/L2) y la congruencia de `carc`. A
+`prf_cons_eval`. Lo nuevo: `0 ≠ cons a b` en `Prf` (por los axiomas de lista L1/L2) y la congruencia de `carc` en
+`Prf` (la de `PrfH` ya estaba: `PrfH_eq_congr_carc`). A
 profundidad 2 (§4): la forma `B1` (`prf_isTermCodeE1_str`); su rama de variable cae por la etiqueta
 (`crit_cOk2_absurd`); la de función da `argsIn`, instanciado en `0` (`PrfH_inst_argsIn`), con `nthc`/`lenc`
 evaluados sobre el numeral (`prf_nthc_c2`, `prf_lenc_c1`, `prf_nthc_zero`), y el `0` cae por §1.
 
-⚠️ Lo que NO dice: la versión hereditaria GENERAL (profundidad `d` cualquiera, por inducción sobre el numeral:
-aquí hay un caso de profundidad 2, con un argumento); nada de `hasWitF`; ni una línea `q1` basura.
+⚠️ Lo que NO dice: la versión hereditaria GENERAL (por inducción sobre el numeral: aquí hay UN caso, con un
+argumento); la etiqueta buena con forma mala (`[0]‾`, `[1, s]‾`: longitud distinta de 2 o 3), que ningún titular
+cubre; nada de `hasWitF`; ni una línea `q1` basura.
 
 ## Medido (2026‑10‑05, RPP con ADR‑124)
 
-Compila en 4 s (1,07 GB), 0 errores y 0 avisos; 210 líneas, 16 teoremas. `#print axioms` de los
+Compila en 4 s (1,07 GB), 0 errores y 0 avisos; 217 líneas, 14 teoremas (`wc -l`). `#print axioms` de los
 cuatro titulares: `[propext, Classical.choice, Quot.sound]`. La §4 compiló a la tercera; la §5, a la primera.
 
 ## Cómo re‑ejecutarlo
@@ -108,32 +123,23 @@ theorem prf_neg_hasWit_num (k r : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1) :
   prf_neg_hasWit_tag _ k hk0 hk1 (fun n => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM n _)
     (prf_carc_numeral k r)
 
-/-! ## §4 · Profundidad 2, HEREDITARIA: la basura en la lista de argumentos
+/-! ## §4 · Profundidad 2 (en proyecciones), un caso HEREDITARIO: la basura en la lista de argumentos
 
-`⟨1, s, [0]⟩` tiene la etiqueta de un término (`1`) y una lista de UN argumento, el `0`, que no es código de nada.
+`[1, s, [0]]` tiene la etiqueta de un término (`1`) y una lista de UN argumento, el `0`, que no es código de nada.
 Refutarlo pide bajar: de `X ∈ w` y `wfAll1 w`, la forma `B1` (`prf_isTermCodeE1_str`); su rama de variable cae por la
 etiqueta; la de función da `argsIn w (nthc X 2̄)`, que en el índice `0` pone el `0` en `w`, y §1 lo refuta. -/
 
-theorem prf_congr_lenc {x y : Term} (h : Prf (x =eq y)) : Prf (lenc x =eq lenc y) := by
-  let f : Formula := Formula.eq (lenc (liftTerm 0 x)) (lenc (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (lenc x) (lenc s) := by
-    intro s; simp only [f, substFormula, lenc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS y) ▸ prf_leibniz_subst (A := f) h ((hS x) ▸ prf_refl (lenc x))
+-- `prf_congr_lenc` y `prf_lt_subst2` son los del árbol (`SinWTs.prf_congr_lenc` en `Meta/CodeWitnessPrf.lean`,
+-- `prf_lt_subst2` en `Meta/BoundedInPrf.lean`), abiertos arriba: la primera redacción los re‑derivaba.
 
-theorem prf_lt_subst2 {a b c : Term} (h : Prf (b =eq c)) (hl : Prf (lt a b)) : Prf (lt a c) := by
-  let f : Formula := lt (liftTerm 0 a) (.var 0)
-  have hS : ∀ s : Term, substFormula 0 s f = lt a s := by
-    intro s; simp only [f, lt, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS c) ▸ prf_leibniz_subst (A := f) h ((hS b) ▸ hl)
-
-/-- `cons ā b̄ = ⟨a, b⟩‾`, con `numeralM`. -/
+/-- `cons ā b̄ = (consN a b)‾`, con `numeralM`. -/
 theorem prf_cons_evalM (a b : Nat) : Prf (cons (numeralM a) (numeralM b) =eq numeralM (consN a b)) := by
   have h1 := ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval a b
   rw [← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq, ← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq,
     ← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq] at h1
   exact h1
 
-/-- El numeral de `⟨1, s, [0]⟩`, partido: `cons 1̄ (cons s̄ (cons A (0̄)))`, con `A = ⟨0, 0⟩‾`. -/
+/-- El numeral de `[1, s, [0]]`, partido: `cons 1̄ (cons s̄ (cons A (0̄)))`, con `A = (consN 0 0)‾ = [0]‾`. -/
 theorem prf_parte (s : Nat) :
     Prf (numeralM (consN 1 (consN s (consN (consN 0 0) 0))) =eq
       cons (numeralM 1) (cons (numeralM s) (cons (numeralM (consN 0 0)) (numeralM 0)))) :=
@@ -141,7 +147,7 @@ theorem prf_parte (s : Nat) :
     (prf_congr_cons_tail (prf_eq_trans (prf_eq_symm (prf_cons_evalM s _))
       (prf_congr_cons_tail (prf_eq_symm (prf_cons_evalM (consN 0 0) 0)))))
 
-/-- La lista de argumentos de `⟨1, s, [0]⟩`, evaluada: `nthc X̄ 2̄ = cons 0̄ nil`. -/
+/-- La lista de argumentos de `[1, s, [0]]`, evaluada: `nthc X̄ 2̄ = cons 0̄ nil`. -/
 theorem prf_args (s : Nat) :
     Prf (nthc (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))) (numeralM 2) =eq cons (numeralM 0) nil) :=
   prf_eq_trans (prf_congr_nthc_lst _ (prf_parte s))
@@ -157,7 +163,7 @@ theorem prf_nth0_args (s : Nat) :
       =eq numeralM 0) :=
   prf_eq_trans (prf_congr_nthc_lst _ (prf_args s)) (ROBINSON_PlusPlus.Meta.NumListPrf.prf_nthc_zero _ _)
 
-/-- 🏁 **Profundidad 2**: `Prf (¬ hasWit ⟨1, s, [0]⟩‾)` para TODO símbolo `s` — la basura está DENTRO. -/
+/-- 🏁 **La basura en el argumento**: `Prf (¬ hasWit [1, s, [0]]‾)` para TODO `s`. -/
 theorem prf_neg_hasWit_prof2 (s : Nat) : Prf (neg (hasWit (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))))) := by
   refine prf_ex_elim_imp ?_
   rw [ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
@@ -187,10 +193,11 @@ theorem prf_neg_hasWit_prof2 (s : Nat) : Prf (neg (hasWit (numeralM (consN 1 (co
     have hz := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_of_In (.var 0) zero) _) hin0) hwf
     exact PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_zero_absurd (.var 0)) _) hz
 
-/-! ## §5 · Control de DISCRIMINACIÓN: la misma guarda, sobre un código de verdad, NO se refuta
+/-! ## §5 · Control: sobre un código CANÓNICO, `¬ hasWit` no es demostrable
 
-Si el método refutara también las guardas VERDADERAS, no distinguiría nada. No puede: para el numeral del código de
-CUALQUIER término, la solidez (`prf_sound`) y la guarda que ya se demostraba (`prf_hasWit_termCodeM`) lo impiden. -/
+No mide el método sino la guarda: por la solidez (`prf_sound`) y la guarda que ya se demostraba
+(`prf_hasWit_termCodeM`), `¬ hasWit` no es demostrable en `Prf` sobre el numeral del código de NINGÚN término; lo
+refutado en §1–§4 depende, pues, de la basura. Sólo códigos canónicos. -/
 
 theorem control_codigo_no_refutable (t : Term) : ¬ Prf (neg (hasWit (numeralM (codeNatTerm t)))) := by
   intro h

@@ -23,8 +23,8 @@ lema diagonal semántico.
 **§6 · El control negativo** (`control_tc_cons`, ADR‑124): el modelo NO valida cualquier cosa —refuta `ax_tc_cons`,
 el axioma retirado que hizo INCONSISTENTE la teoría (ADR‑012)—. ⛔ Sus códigos cerrados (`strCodeM cons_sym`,
 `numeralM 1`) no se evalúan: entran como TÉRMINOS variables de un lema `rfl`, y el argumento es la longitud de la
-lista de argumentos (uno contra dos). La forma con `simp` sobre la hipótesis concreta agotaba la memoria en el
-NÚCLEO (>3 GB en 14 s; en ADR‑119, >14 GB).
+lista de argumentos (uno contra dos). La forma con `simp` sobre la hipótesis concreta no acababa (>3 GB a los 14 s; en
+ADR‑119, >14 GB): según la bisección, el coste está en comprobar su prueba —el NÚCLEO, por inferencia, no medido—.
 -/
 
 set_option autoImplicit false
@@ -360,7 +360,9 @@ retiró de la lista (ADR‑012). `MNV V` lo REFUTA: `cons a b` vale un sucesor, 
 
 ⛔ Sin evaluar un solo código: `strCodeM cons_sym` y `numeralM 1` entran como términos VARIABLES (`N`, `S`) de un lema
 `rfl`, y `tcFnN_consN_ne` vale para todo `a`, `b`, `N`, `X`. La forma con `simp only` sobre la hipótesis concreta
-compila en la elaboración, pero su prueba agota la memoria en el NÚCLEO (medido: >3 GB en 14 s; ADR‑124). -/
+elabora (con un `sorry` que no usa la hipótesis, 4 s), pero en cuanto su prueba entra en el término pasa de 3 GB a
+los 14 s sin acabar (medido, ADR‑124); que el coste sea el NÚCLEO comprobándola es una inferencia de esa bisección
+(ADR‑127). -/
 
 theorem tcFnN_succ (n : Nat) :
     tcFnN (n + 1) = consN 1 (consN (codeNatStr succ_sym) (consN (consN (tcFnN n) 0) 0)) := rfl

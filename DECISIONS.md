@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -9573,15 +9573,22 @@ sucesor es el código de `σ(·)`, con UN argumento, y el axioma le pide DOS (`t
 etiqueta y símbolo).
 
 ⛔ **La trampa, medida.** La forma de ADR‑119 (`abre` sobre la hipótesis concreta) pasaba de 14 GB; rehecha con
-`simp only` de lemas ∀, >3 GB en 14 s. Y la bisección con `sorry` la situaba MAL: toda variante que acababa en `sorry`
-compilaba en 4 s, porque la β‑reducción del término DESCARTA la prueba de una hipótesis que nadie usa, y el NÚCLEO no
-la veía. Lo que agota la memoria es el núcleo comprobando la prueba de `simp` sobre una hipótesis con códigos
-CERRADOS (`strCodeM cons_sym`, `numeralM 1`): desplegar `consN` sobre ellos evalúa números triangulares de cientos
-de miles. La salida: los códigos cerrados entran como TÉRMINOS variables de dos lemas `rfl` (`ev_tc_cons_izq`,
-`ev_tc_cons_der`), y `rw` con ellos: 4 s, 0,77 GB, en el sondeo de prueba.
+`simp only` de lemas ∀, a los 14 s pasaba de 3 GB y el arnés la paró sin que acabara (cota inferior, no pico). Y la
+bisección con `sorry` la situaba MAL (✏️ ADR‑127): las variantes en que la hipótesis reescrita no llegaba al término
+final —un `sorry` que no la usa, también justo después del `simp`— compilaban en 4 s; las que la usaban no acababan,
+aunque terminaran en `sorry`: `have h2 := (consN_inj h1).2; sorry` (por eso la bisección culpó a `consN_inj`, que era
+inocente) y `exact absurd h1 sorry`. INFERENCIA, coherente con las fuentes de Lean 4.31 pero sin inspeccionar el
+término: `simp … at h1` y `rw … at h1` dejan una aplicación que `instantiateMVars` β‑reduce, y si nada usa la
+hipótesis su prueba desaparece; un `have` queda como `let` y sí se comprueba. Que el coste sea el NÚCLEO es también
+inferencia (no se aisló con `debug.skipKernelTC`), sobre una hipótesis enteramente CERRADA (`strCodeM cons_sym`,
+`numeralM 1` y, con la valoración concreta, `tcFnN 0`). ESTIMACIÓN de lo que costaría desplegarla: `triN` es recursión
+unaria; `codeNatStr "::"` = 1 569 048, `codeNatStr "σ"` = 464 167 y `tcFnN 0` ≈ 2,4·10¹¹. La salida: los códigos
+cerrados entran como TÉRMINOS variables (`N`, `S`) de un lema `rfl` (`ev_tc_cons_der`; el lado izquierdo, sin códigos,
+lo da `ev_tc_cons_izq`), y `rw` con los dos: unos 4 s, en una sonda del scratchpad de la sesión, NO versionada.
 
-🔑 *Un `sorry` al final de una bisección no mide lo que cuestan los pasos de antes si su resultado no se usa: la
-β‑reducción lo tira antes de llegar al núcleo.*
+🔑 *Un `sorry` al final de una bisección no mide lo que cuestan los pasos de antes si su resultado no llega al
+término: lo que dejan `simp`/`rw … at h` se β‑reduce y desaparece si nada lo usa (un `have` no: queda como `let`). Para
+medir ese coste, el `sorry` tiene que USAR la hipótesis (`exact absurd h sorry`).*
 
 ### 2 · La auditoría adversarial de ADR‑123 (`wf_107c9121-80b`: duplicados, lectura adversarial, exploración)
 
@@ -9630,60 +9637,114 @@ la guarda es FALSA la reflexión no da nada, y hay que refutarla en `Prf`.
 
 ### 1 · Lo que da
 
-Por primera vez, la guarda de término ENTERA —con su `∃` eliminado— refutada en `Prf`, y sobre un NUMERAL: el `0`
-(= `nil`) no es código de término, ni lo es el numeral de `⟨k, r⟩` para TODO `k ∉ {0, 1}` y todo `r`, sin hipótesis
-(los titulares de `sondeos/RosserBasura.lean`). Sale de lo que la auditoría de ADR‑124 encontró en
+Por primera vez SOBRE UN NUMERAL (✏️ rectificado por ADR‑127), la guarda de término ENTERA —con su `∃` eliminado—
+refutada en `Prf`: el `0` (= `nil`) no es código de término, ni lo es el numeral de `consN k r` para TODO `k ∉ {0, 1}`
+y todo `r`, sin hipótesis (los titulares de `sondeos/RosserBasura.lean`). No es la primera refutación de la guarda
+entera en `Prf`: sobre términos CERRADOS la hicieron el 2026-09-01 dos sondeos con la misma prueba (ADR‑127 §1), que
+hoy no compilan. Sale de lo que la exploración de `wf_107c9121-80b` encontró en
 `Meta/CodeWitnessPrf.lean` —el refutador de profundidad 1 con testigo abierto (`prf_crit_In_rejects_open1`) y la forma
 de pertenencia de `wfAll1` (`prf_isTermCodeE1_of_In`)—, más el `∃`‑elim (`prf_ex_elim_imp`), el puente `∈ → índice`
 (`prf_boundedIn_of_In`) y, para el numeral, su etiqueta en `Prf` por `prf_cons_eval`. Lo nuevo, en
 `sondeos/RosserBasura.lean`: `0 ≠ cons a b` por los axiomas de lista L1/L2 y la congruencia de `carc`.
 
-Medido: 5 s (0,80 GB), 0 errores, 0 avisos; 106 líneas, 7 teoremas; los dos titulares,
+Medido: 5 s (0,80 GB), 0 errores, 0 avisos; 107 líneas (`wc -l`; decía 106), 7 teoremas; los dos titulares,
 `[propext, Classical.choice, Quot.sound]`. Compiló a la primera.
 
 ### 2 · Lo que NO dice, y lo que sigue
 
 Nada HEREDITARIO: la basura a profundidad 2 —un argumento basura bajo una etiqueta buena (`1`)— pide recorrer
 `argsIn` y evaluar `nthc`/`lenc` sobre el numeral (hay piezas en `Meta/ChainNegPrf.lean`, sin medir); nada de
-`hasWitF`; ni la línea `q1` basura. Con ADR‑123, la Etapa 0 tiene dos de sus tres piezas, la segunda a profundidad 1.
+`hasWitF` (hay precedentes, hoy sin compilar: ADR‑127 §1); ni la línea `q1` basura. Con ADR‑123, la Etapa 0 tiene una
+de sus tres piezas y media de la segunda (la guarda, a profundidad 0 y 1; la pieza es la de profundidad 2).
 
-🔑 *La pieza que faltaba no era un refutador nuevo: era el `∃`‑elim sobre uno que ya estaba, y llevarlo a un numeral.*
+🔑 *La pieza que faltaba no era un refutador nuevo: el `∃`‑elim sobre el de profundidad 1 ya estaba en dos sondeos que
+dejaron de compilar; faltaba rehacerlo contra el árbol de hoy y llevarlo a un numeral.*
 
 **Véase también:** ADR‑123 (la reflexión), ADR‑124 §2 (la auditoría que encontró los refutadores).
 
 ---
 
 <a id="adr-126"></a>
-## ADR-126: 🔬 Rosser, Etapa 0 — la refutación HEREDITARIA a profundidad 2, y el control de DISCRIMINACIÓN (sondeo)
+## ADR-126: 🔬 Rosser, Etapa 0 — un caso HEREDITARIO (la basura en la lista de argumentos), y un control (sondeo)
 
 **Fecha:** 2026-10-05 · **Estado:** ✅ sondeo (este commit) · **Ámbito:** RPP, `sondeos/RosserBasura.lean` (§4 y §5)
 y documentos; ningún fichero de `ROBINSON_PlusPlus/` cambia. Es «la guarda de profundidad 2» de la Etapa 0
-(ADR‑122 §2), que ADR‑125 dejó abierta.
+(ADR‑123 §2), que ADR‑125 dejó abierta. ✏️ Rectificado por ADR‑127: el título, la notación, el control y las cifras.
 
 ### 1 · Lo que da
 
-`Prf (¬ hasWit ⟨1, s, [0]⟩‾)` para TODO símbolo `s`: la etiqueta es la de un término y la basura está DENTRO, en
-la lista de argumentos (el titular de profundidad 2 de `sondeos/RosserBasura.lean`). La prueba baja un nivel: de
+`Prf (¬ hasWit [1, s, [0]]‾)` para TODO `s`, donde `[1, s, [0]]` es la lista de TRES elementos
+`consN 1 (consN s (consN (consN 0 0) 0))`: la etiqueta es la de un término y la basura está en el ÚNICO argumento (el
+titular de `sondeos/RosserBasura.lean`). «Profundidad» cuenta PROYECCIONES hasta el dato que falla (0: el numeral es
+`0`; 1: su etiqueta; 2: un argumento); en el árbol del término, esa basura está a profundidad 1. La prueba baja un nivel: de
 `X ∈ w` y `wfAll1 w`, la forma `B1` (`prf_isTermCodeE1_str`); su rama de variable cae por la etiqueta
 (`crit_cOk2_absurd`); la de función da `argsIn w (nthc X 2̄)`, instanciado en `0` (`PrfH_inst_argsIn`) con `nthc` y
 `lenc` evaluados sobre el numeral (`prf_nthc_c2`, `prf_lenc_c1`, `prf_nthc_zero`, `prf_cons_eval`), y el `0` que
-queda en `w` cae por la profundidad 0 de ADR‑125. Todo con piezas que ya estaban, más tres congruencias.
+queda en `w` cae por la profundidad 0 de ADR‑125. Todo con piezas que ya estaban: lo demás de §4 son evaluaciones
+sobre ese numeral (la primera redacción re‑derivaba además dos congruencias del árbol, `prf_lt_subst2` de
+`Meta/BoundedInPrf.lean` y `prf_congr_lenc` de `Meta/CodeWitnessPrf.lean`; ahora las usa).
 
-**El control de DISCRIMINACIÓN** (en `sondeos/RosserBasura.lean`): sobre el numeral del código de CUALQUIER término,
-`¬ hasWit` NO es demostrable —la solidez (`prf_sound`) y la guarda que ya se demostraba (`prf_hasWit_termCodeM`) lo
-impiden—: el método refuta la basura y no las guardas verdaderas.
+**El control** (en `sondeos/RosserBasura.lean`): sobre el numeral del código CANÓNICO de cualquier término,
+`¬ hasWit` NO es demostrable en `Prf` por NINGÚN método —la solidez en `MNV V₀` (`prf_sound`) lo impide, porque allí
+esa guarda es verdadera (la solidez de `prf_hasWit_termCodeM`)—. No mide el método, sino la guarda: `¬ hasWit` no es
+demostrable en todas partes, así que lo refutado en §1–§4 depende de la basura. Sólo códigos canónicos; la forma
+general (`hasWitN c → ¬ Prf ¬hasWit c̄`) sale con la misma prueba y no está escrita.
 
-Medido: 4 s (1,07 GB), 0 errores, 0 avisos; 210 líneas, 16 teoremas; los cuatro titulares,
+Medido: 4 s (1,07 GB), 0 errores, 0 avisos; 210 líneas, 16 teoremas (tras ADR‑127, sin los dos duplicados: 217
+líneas con el docstring rectificado, 14 teoremas, 4 s); los cuatro titulares,
 `[propext, Classical.choice, Quot.sound]`. La §4 compiló a la tercera (dos errores de contexto en el `∨`‑elim).
 
 ### 2 · Lo que NO dice, y lo que sigue
 
-La versión hereditaria GENERAL —profundidad `d` cualquiera, por inducción sobre el numeral— no está: aquí hay UN caso
-de profundidad 2, con un argumento. Ni `hasWitF`, ni la línea `q1` basura. Con ADR‑123/125, la Etapa 0 tiene sus tres
-piezas en forma de caso (la reflexión; la guarda a profundidad 0, 1 y 2); la ESTIMACIÓN de 120–200 líneas para la
-Etapa 0 la superan los dos sondeos (189 + 210 líneas, con docstrings y controles).
+La versión hereditaria GENERAL —por inducción sobre el numeral— no está: aquí hay UN caso, con un argumento; ni la
+etiqueta buena con forma mala (`[0]‾`, `[1, s]‾`: longitud distinta de 2 o 3), que ningún titular cubre. Ni `hasWitF`,
+ni la línea `q1` basura. Con ADR‑123/125, la Etapa 0 tiene DOS de sus tres piezas en forma de caso (la reflexión; la
+guarda, a profundidad 0, 1 y 2); falta la tercera, una línea `q1` basura. La ESTIMACIÓN de 120–200 líneas era de la
+Etapa 0 ENTERA: los dos sondeos suman 399 líneas de fichero (189 + 210) y 194 de declaraciones (86 + 108); en fichero
+ya la superan, en declaraciones están en su tope, y sin la tercera pieza.
 
 🔑 *A profundidad 2 la prueba no pidió nada nuevo de fondo: la forma `B1`, `argsIn` y la evaluación de `nthc`/`lenc`
 sobre numerales ya estaban; faltaba encadenarlas bajo el `∃`.*
 
-**Véase también:** ADR‑125 (las profundidades 0 y 1), ADR‑122 §2 (el plan).
+**Véase también:** ADR‑125 (las profundidades 0 y 1), ADR‑122 §2 (el plan), ADR‑127 (la auditoría).
+
+---
+
+<a id="adr-127"></a>
+## ADR-127: 🔎 La auditoría de ADR‑124/125/126 —y los 88 sondeos, re‑medidos
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ (este commit) · **Ámbito:** RPP, documentos, `sondeos/RosserBasura.lean` y
+dos docstrings de `Meta/ModeloCodificacion.lean` (sólo comentarios). Auditoría adversarial `wf_e04d70c1-e0c` (dos
+agentes, sin ejecutar Lean), como la de ADR‑124 sobre ADR‑123.
+
+### 1 · Lo que se rectifica
+
+1. ⛔ **REFUTADO** «por primera vez, la guarda ENTERA refutada en `Prf`» (ADR‑125): sólo es nuevo «sobre un
+   NUMERAL». El 2026-09-01, `CRIT_hasWit_rejects` (`sondeos/MedirC_Deriva.lean`) y `CRIT_hasWit_rejects_tag`
+   (`sondeos/HasWitFCritica.lean`) refutaron la guarda de término entera sobre términos CERRADOS, con la misma prueba
+   que el §2 de `sondeos/RosserBasura.lean`; y la de FÓRMULA, `CRIT_hasWitF_rejects_tag` (`sondeos/HasWitFCritica.lean`)
+   y `CRIT_hasWitF_rejects_varc` (`sondeos/MedirC_Carga.lean`). Ninguno compila hoy (sus primeros errores, en la tabla
+   de la pasada). La causa: ADR‑124 §2 sólo buscó refutadores en el build y sobre ⊢.
+2. El control de ADR‑126 no mide el MÉTODO: es la solidez sobre una guarda verdadera; dice que `¬ hasWit` no es
+   demostrable en todas partes, y sólo sobre códigos canónicos.
+3. Dos lemas de `sondeos/RosserBasura.lean` re‑derivaban congruencias del árbol (`prf_lt_subst2`,
+   `prf_congr_lenc`): ahora usa las del árbol (compila igual, 4 s).
+4. En ADR‑124 (auditor propio): «toda variante con `sorry` compilaba» era FALSO —`have … ; sorry` y
+   `exact absurd h1 sorry` no acababan—; el mecanismo y el lugar (el núcleo) son INFERENCIAS; «cientos de miles» se
+   quedaba corto (`tcFnN 0` ≈ 2,4·10¹¹); «agotaba la memoria» era «pasaba de 3 GB sin acabar»; las sondas viven sólo en
+   el scratchpad. Corregido en ADR‑124 §1, en el docstring de `Meta/ModeloCodificacion.lean` §6 y en NEXT‑STEPS.
+5. Imprecisiones: la notación `⟨1, s, [0]⟩` (es `[1, s, [0]]`, una lista de tres); «profundidad», sin definir (cuenta
+   proyecciones; en el árbol, 1); «sus tres piezas» (son dos: falta la línea `q1`); «la superan» (en declaraciones,
+   194, dentro de 120–200); «106 líneas» (107); la cita «ADR‑122 §2» (es ADR‑123 §2); el mecanismo de la trampa de
+   ADR‑124 (MEDIDO lo que compila y lo que no; INFERIDO dónde y por qué).
+
+### 2 · Los 88 sondeos, re‑medidos enteros
+
+La pasada completa (dos a la vez, 6 min de tope cada uno) tras ADR‑126: **35 de 88 compilan, 53 no, 0 por tiempo**.
+Fila a fila, las 85 de ADR‑121 dan lo mismo, y las tres nuevas (`D7Contrafactual`, `RosserReflexion`, `RosserBasura`)
+compilan: la inferencia de ADR‑124 («los demás, sin cambio») queda MEDIDA.
+
+🔑 *Una búsqueda de precedentes que no mira los sondeos que dejaron de compilar declara «por primera vez» lo que ya
+se hizo.*
+
+**Véase también:** ADR‑124 §2 (la auditoría anterior), ADR‑125, ADR‑126.
