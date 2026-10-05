@@ -68,12 +68,16 @@ theorem decodeStr_strCodeM (s : List Char) : decodeStr (strCodeM s) = some s :=
 mutual
 /-- Inverso de `termCodeM` (los dos tags de término: `var`/`func`).
 
-    ⚠️ Las comparaciones de símbolo van con **`==` (Bool)**, NO con `= … then` (Prop). Es
-    deliberado: `decodeTerm`/`decodeTerms` son **mutuas** ⇒ sin `fun_induction`, y la inyectividad se
-    prueba con `split`/`rw` sobre los `if`. Con símbolos `String` (antes de D7), un `if (s = sym)` hacía que
-    `split`/`if_pos` fabricaran un cast que el **núcleo rechazaba** (con `List Char`, sin volver a medir); con
-    `==` son limpios: lo comprueba hoy el build (`decodeTerm_inj`). (`decodeNat`/`decodeChars`/`decodeForm` no
-    lo necesitan: usan `fun_induction`.) -/
+    ⚠️ **No desplegar por defeq**: `dsimp only [decodeTerm] at h` o `simp only [decodeTerm] at h`, y luego
+    usar `h`, deja un término que el **núcleo RECHAZA** (`(kernel) application type mismatch`), aunque el
+    elaborador lo acepte. Con `unfold decodeTerm at h` (reescribe con `decodeTerm.eq_def`, una prueba) es
+    limpio: así lo hacen `decodeTerm_inj`/`decodeTerms_inj`, por `decodeTerm.induct`. MEDIDO en `sondeos/IteSimboloNucleo.lean` (2026‑10‑05): el rechazo
+    aparece con las recursiones MUTUAS que llaman a un subtérmino que sólo sale tras un `match` interior
+    (aquí, `decodeTerms hts` bajo el `match` sobre `t`), y no depende del `if`, de `==` frente a `=` ni de
+    `String` frente a `List Char`. ✏️ Hasta el 2026‑10‑05 esta nota decía que `if (s = sym)` era el frágil y
+    `==` el limpio, y que la inyectividad se probaba con `split`/`rw` sobre los `if`: no se había medido, y
+    era falso. (Esta función compara con `==`; `decodeNat`, `decodeChars` y el primer `if` de `decodeForm`,
+    con `=`.) -/
 def decodeTerm : Term → Option Term
   | .func cs [h, t] =>
       if cs == cons_sym then
@@ -165,10 +169,15 @@ theorem decodeForm_formCodeM (φ : Formula) : decodeForm (formCodeM φ) = some �
 decodificado. Es la pieza que hace el trabajo en `VerifierSound` (módulo E): de un testigo aceptado por
 el verificador se recupera —de forma **única**— la derivación real.
 
-**Nota de implementación (kernel + De Bruijn).** El `if s == sym` sobre `DecidableEq String` era
-kernel‑frágil bajo `split`/`rw`/`simp` manuales (fabricaban un cast `congrFun'` que el núcleo rechaza;
-medido con `String`, antes de D7; con `List Char`, sin volver a medir). Se evita con **inducción funcional**
-(`fun_induction` / `.induct`), que genera los casos ya reducidos, y `unfold … at h` (limpio) donde hace falta.
+**Nota de implementación (kernel + De Bruijn).** `split`/`rw`/`simp` manuales sobre `h` tras desplegar
+`decodeTerm` por defeq (`dsimp only`/`simp only [decodeTerm] at h`) fabrican un cast `congrFun'` que el
+núcleo rechaza. Se evita con **inducción funcional** (`fun_induction` / `.induct`), que genera los casos
+ya reducidos, y `unfold … at h` (limpio) donde hace falta. ✏️ 2026‑10‑05: esta nota atribuía el rechazo
+al `if s == sym` sobre `DecidableEq String` (julio, con `String`). MEDIDO en `sondeos/IteSimboloNucleo.lean`:
+el `if` sobre un símbolo pasa el núcleo con `String` y con `List Char`, con `==` y con `=` (16 de 16
+réplicas); lo rechazado es el despliegue por defeq de una recursión estructural MUTUA cuya llamada
+recursiva va a un subtérmino que sólo aparece tras un `match` interior —aun sin ningún `if` y sin comparar
+símbolos—, y en `decodeTerm`, en las 5 formas medidas.
 -/
 
 /-- Inyectividad de `decodeNat` (⟸ del round‑trip). -/
@@ -333,8 +342,10 @@ theorem decodeTerms_inj {c : Term} {ts : List Term} (h : decodeTerms c = some ts
     `=eq` 4, `⇒` 5, `∀` 6, `∧` 7, `∨` 8, `∃` 9) se cierran reflejando la ecuación estructural con
     `decodeNat_inj` / `decodeStr_inj` / `decodeTerm_inj` / `decodeTerms_inj` y las IH; los **14
     restantes** (guard falso, sub‑decodificación fallida, forma no‑código) son vacíos y caen con un
-    reductor uniforme. Nótese `unfold` (limpio) en vez de `simp only [decodeForm]` (kernel‑frágil, ver
-    la nota de arriba). -/
+    reductor uniforme. Nótese `unfold` en vez de `simp only [decodeForm]`. (✏️ 2026‑10‑05: aquí decía que
+    `simp only [decodeForm]` era kernel‑frágil. MEDIDO en `sondeos/IteSimboloNucleo.lean`: `decodeForm` no
+    es mutua; en la forma concreta de un caso, `simp only [decodeForm, hnat]` pasa el núcleo, y sobre una
+    forma con variables `simp only`/`dsimp` no la despliegan. Lo frágil es la mutua `decodeTerm`.) -/
 theorem decodeForm_inj : ∀ {c : Term} {φ : Formula}, decodeForm c = some φ → c = formCodeM φ := by
   intro c
   induction c using decodeForm.induct with

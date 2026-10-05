@@ -452,6 +452,7 @@ es el **puente objeto → meta** (decodificador + acuerdo negativo), no una soli
 >      explícito (la inyectividad de `decodeTerms`); el companion `decodeTerms_inj` se prueba con
 >      `decodeTerms.induct (motive_1 := fun _ => True)` reusando `decodeTerm_inj`;
 >    * **`unfold decodeX at h`** (limpio) en vez de `simp only [decodeX] at h` (frágil).
+>    ✏️ *(2026‑10‑05, ADR‑130)* La causa no era ésa. MEDIDO en `sondeos/IteSimboloNucleo.lean`: el `if` sobre un símbolo pasa el núcleo con `String` y con `List Char`, con `==` y con `=`; lo que el núcleo rechaza es desplegar **por defeq** (`dsimp only`/`simp only [f] at h`) una recursión estructural MUTUA cuya llamada recursiva va a un subtérmino que sólo sale tras un `match` interior —`decodeTerm`, y réplicas sin ningún `if`—. El remedio sigue siendo el de aquí: `unfold` y la inducción funcional.
 > 2. **`Char.ofNat` CLAMPA ⇒ `decodeChars` NO era inyectiva.** Un numeral fuera del rango Unicode
 >    decodifica a un char cuyo `toNat` **ya no vuelve**. Hubo que añadir el guard
 >    `(Char.ofNat code).toNat == code`. El round‑trip lo cumple gratis (`Char.ofNat_toNat`).

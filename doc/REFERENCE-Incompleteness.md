@@ -1006,6 +1006,7 @@ theorem decodeForm_inj {c φ} : decodeForm c = some φ → c = formCodeM φ    -
 >    se ha vuelto a medir). `split`/`rw`/`simp only [decodeX]` **manuales** sobre `if s == sym`
 >    fabrican un cast `congrFun'` que **el núcleo RECHAZA**. Se sortea con **inducción funcional**
 >    (`fun_induction`; para las mutuas `decodeTerm.induct` con `motive_2` explícito) + `unfold … at h`.
+>    ✏️ *(2026‑10‑05, ADR‑130)* La causa no era ésa. MEDIDO en `sondeos/IteSimboloNucleo.lean`: el `if` sobre un símbolo pasa el núcleo con `String` y con `List Char`, con `==` y con `=`; lo que el núcleo rechaza es desplegar **por defeq** (`dsimp only`/`simp only [f] at h`) una recursión estructural MUTUA cuya llamada recursiva va a un subtérmino que sólo sale tras un `match` interior —`decodeTerm`, y réplicas sin ningún `if`—. El remedio sigue siendo el de aquí: `unfold` y la inducción funcional.
 > 2. **`Char.ofNat` CLAMPA** ⟹ `decodeChars` no es inyectiva sin el guard `(Char.ofNat code).toNat == code`
 >    (el round‑trip lo cumple gratis por `Char.ofNat_toNat`).
 

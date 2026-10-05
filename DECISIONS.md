@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -47,7 +47,7 @@
 >
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 88 en `sondeos/`.**
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 89 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -9882,3 +9882,64 @@ donde la medición había puesto su riesgo R3 —los 34 `v_*` del despacho del m
 del `simp`, no la ortografía de los símbolos.*
 
 **Véase también:** ADR‑101/102 (D7 abandonada, en su día), ADR‑122 (la puerta contrafactual).
+
+---
+
+<a id="adr-130"></a>
+## ADR-130: 🔬 Las dos notas de `CodeDecode`, MEDIDAS — el `if` sobre un símbolo no es frágil en el núcleo; lo es desplegar por defeq una recursión MUTUA
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ medición (este commit) · **Ámbito:** `sondeos/IteSimboloNucleo.lean`
+(nuevo); comentarios de `Meta/CodeDecode.lean` (ninguna línea de código); notas fechadas en
+`doc/REFERENCE-Incompleteness.md`, `NEXT-STEPS.md` y `PLAN-NEGVERIFIER.md`. Encargo del propietario: *«mide para
+saber cuál de las dos notas es la cierta»*.
+
+### 1 · Las dos notas
+
+* El docstring de `decodeTerm`: «`==` (Bool), NO `=` (Prop): un `if (s = sym)` hacía que `split`/`if_pos`
+  fabricaran un cast que el núcleo rechazaba; con `==` los `split` son limpios».
+* La nota de la §B: «el `if s == sym` sobre `DecidableEq String` es kernel‑frágil bajo `split`/`rw`/`simp`
+  manuales (un cast `congrFun'`); se evita con inducción funcional y `unfold`».
+
+Nacieron en el mismo commit (`9b178ae`, 2026‑07‑14) y se contradicen; la memoria del proyecto copiaba la segunda.
+
+### 2 · Lo medido (Lean v4.31.0)
+
+59 teoremas; los 24 mensajes de error, FIJADOS con `#guard_msgs`: el sondeo compila, y deja de compilar si una
+versión de Lean cambia lo medido.
+
+| forma | resultado |
+|---|---|
+| 16 réplicas sin recursión: `String`/`List Char` × `==`/`=` × `split`, `rw [if_neg]`, `simp only [f, if_neg]`, `simp only [f]` + `split` | 16 aceptadas |
+| 4 mutuas con las llamadas recursivas a subtérminos DIRECTOS, `dsimp` + `split` | 4 aceptadas |
+| 6 mutuas con la llamada bajo un `match` interior sobre una variable, desplegadas con `dsimp`: con `==`, con `=` y SIN comparar símbolos (`id`), con `String` y con `List Char` | **6 RECHAZADAS** por el núcleo |
+| las variantes con `unfold f at h` (mutuas, no mutuas y el decodificador real) | 12 aceptadas |
+| no mutuas con la llamada bajo un `match` interior | `dsimp` no despliega («made no progress») |
+| `decodeTerm` real: `dsimp`/`simp only` + `split`/`rw`, con variables o con las formas concretas que da la inducción funcional | **5 RECHAZADAS** |
+| `decodeTerms` y `decodeChars` con `dsimp`; `decodeForm` con `unfold`, y con `simp only [decodeForm, hnat]` en forma concreta | aceptadas |
+| `decodeTerm.eq_1` | `#print axioms`: `[propext]`; `rfl` sobre la ecuación desplegada: el ELABORADOR ya dice «Not a definitional equality» |
+
+El mensaje del núcleo es el de julio, `Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some _)) h`: `h` conserva su
+tipo de antes y el núcleo no lo reconoce igual al desplegado.
+
+### 3 · Veredicto
+
+**Ninguna de las dos notas acertaba en la causa.** De la §B son ciertos el SÍNTOMA y el REMEDIO (`unfold` en vez
+de `dsimp`/`simp only`; la inducción funcional, que trae los casos ya reducidos); la causa —el `if`, `==`,
+`String`—, no. El docstring de `decodeTerm` era falso entero: `=` y `==` dan lo mismo, y la inyectividad se prueba
+con `decodeTerm.induct` y `unfold`, no con `split`/`rw` sobre los `if`. Y la nota de `decodeForm_inj` («`simp only
+[decodeForm]`, kernel‑frágil») tampoco se sostiene: `decodeForm` no es mutua, y `simp only [decodeForm, hnat]` pasa.
+Las tres, corregidas con su marca; la memoria `feedback-lean-kernel-ite-string`, reescrita.
+
+### 4 · Lo que NO dice
+
+* El MECANISMO es INFERIDO, sin medir: el despliegue que aplica `dsimp` a una recursión estructural mutua no
+  coincide, bajo un `match` atascado, con lo que compila `TermG.brecOn` (`#print decodeTerm`). Parece un defecto de
+  Lean —el elaborador acepta un cambio por defeq que el núcleo no puede comprobar—; `mhNL_dsimp` es una
+  reproducción mínima, sin símbolos. No se ha consultado si está registrado aguas arriba.
+* No se midieron otras recursiones mutuas del build (`termCodeM`/`termsCodeM`, …) ni otra versión de Lean. Ninguna
+  prueba del build usa la forma rechazada: el build compila.
+
+🔑 *Dos notas del mismo commit que se contradicen dicen que ninguna se midió; la medición no eligió entre ellas:
+encontró una tercera causa.*
+
+**Véase también:** ADR‑129 (D7, que sacó `String` de los símbolos sin tocar esto).

@@ -44,7 +44,7 @@
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 88 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 35 de 88, [ADR‑127](DECISIONS.md) §2; tras D7, [ADR‑129](DECISIONS.md)).
+> **+ 89 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 36 de 89, [ADR‑130](DECISIONS.md); la última pasada entera, la de D7, [ADR‑129](DECISIONS.md)).
 > **0 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **142 axiomas objeto** en `axioms` (los 141 de `axiomsBase`
 > y el ancla diagonal, ADR‑117).
 >
