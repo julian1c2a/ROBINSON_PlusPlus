@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -9497,3 +9497,45 @@ Ruta híbrida: ESTIMACIÓN 1 400–2 250 líneas en siete etapas; la primera, un
 🔑 *Antes de pagar una migración, medir lo que compra: una puerta contrafactual de 60 líneas decide 500.*
 
 **Véase también:** ADR‑101/102 (D7, abandonada en FOL), ADR‑120/121 (el modelo y lo que da).
+
+---
+
+<a id="adr-123"></a>
+## ADR-123: 🔬 Rosser, Etapa 0 — la REFLEXIÓN numeral de `substfc`/`liftfc`, CONFIRMADA (sondeo)
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ sondeo (este commit) · **Ámbito:** RPP, `sondeos/RosserReflexion.lean` y
+documentos; ningún fichero de `ROBINSON_PlusPlus/` cambia. Es la primera pieza del plan de Rosser re‑medido en
+ADR‑122 §2 (ruta híbrida): la que, según la medición, más lo acorta.
+
+### 1 · Lo que confirma
+
+La evaluación EXTERNA de `substfc` y `liftfc` sobre numerales sale de la REFLEXIÓN, sin inducción sobre la fórmula
+y sin tocar a mano un axioma de codificación: para numerales cuyas guardas son VERDADERAS en `MNV V₀`, la teoría
+prueba `substfc ā b̄ c̄ =eq` el numeral de `substfcN a b c`, y lo mismo para `liftfc` (los dos titulares del sondeo,
+en `sondeos/RosserReflexion.lean`). Cuatro piezas que ya estaban:
+
+1. la evaluación INTERNA (`pcc_eval_substfc_wit`, `pcc_eval_liftfc_wit`): `Prf (guardas → Prov⌜s(ā,b̄,c̄) = valor⌝)`;
+2. la SOLIDEZ (`prf_sound`): en el modelo, con las guardas verdaderas allí, `Prov⌜…⌝` vale;
+3. W1 (`verificador_solido`): lo que el modelo cree demostrable, DECODIFICADO, es teorema;
+4. el decodificador sobre el código de la ecuación; lo único nuevo es que `tcFn` codifica `numeralM` (un lema de
+   dos casos).
+
+No pide `Prf guarda`: basta que la guarda sea verdadera en el modelo. **No vacuidad**: las guardas valen en los
+códigos de verdad (por la solidez de `prf_hasWit_termCodeM` y `prf_hasWitF_fc`), así que la forma sin hipótesis
+—sobre `⌜t⌝` y `⌜φ⌝`— también está, y el numeral de la derecha, decodificado, es `φ[t/n]` (y `liftFormula n φ`).
+
+Medido: compila en 4 s (0,78 GB), 0 errores, 0 avisos; 180 líneas y 18 teoremas, unas 110 de prueba (la ESTIMACIÓN
+de la Etapa 0 era 120–200); los tres titulares, `[propext, Classical.choice, Quot.sound]`.
+
+### 2 · Lo que NO dice, y lo que sigue
+
+Nada de los numerales BASURA, que es la otra mitad de NegNum: allí las guardas son FALSAS y la reflexión no da
+nada; hay que REFUTAR en `Prf` una guarda (`∃w. wfAll1 w ∧ x ∈ w`) sobre un numeral, de forma hereditaria. Hoy ningún
+lema refuta una guarda (0 apariciones de `neg (hasWit` en `Meta/`); el puente `nthc → ∈` (`prf_in_nthc`) existe, y
+el inverso no lo busqué. Son las otras dos piezas de la Etapa 0: una guarda de profundidad 2 y una línea `q1` basura.
+La estimación del resto del plan (ADR‑122 §2) no se re‑mide aquí.
+
+🔑 *Con un modelo estándar, la reflexión es una regla ADMISIBLE: un `Prov` interno, verdadero en el modelo, se
+vuelve un teorema externo por W1 — y la guarda sólo tiene que ser VERDADERA, no demostrable.*
+
+**Véase también:** ADR‑121 (W1, `modelo_prov_iff`), ADR‑122 §2 (el plan de Rosser).
