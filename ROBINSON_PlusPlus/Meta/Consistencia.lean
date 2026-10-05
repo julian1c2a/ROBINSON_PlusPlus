@@ -18,9 +18,9 @@ import ROBINSON_PlusPlus.Meta.GodelTwoPrf
 
 Footprint de los tres: `[propext, Classical.choice, Quot.sound]` (`check-footprints`).
 
-⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS en `MNV V₀` —no hace falta para lo de arriba—; que
-`V₀ = codeNatList axioms`, es decir, que en el modelo la regla `thy` acepte exactamente los 142 (E10 lo pediría;
-un cálculo a mano dice que sí, sin medir); ni nada de `⊬¬G` (Rosser).
+Y `V₀_eq_codigo : V₀ = codeNatList axioms` (ADR‑121): en el modelo, la regla `thy` acepta exactamente los 142.
+La otra mitad de Gödel I (`⊬ ¬G`), y que `G` y `Con` son VERDADERAS en `MNV V₀`, están en
+`Meta/SolidezVerificador.lean` (ADR‑121). ⚠️ Lo que NO dice: nada de Rosser.
 -/
 
 set_option autoImplicit false
@@ -49,13 +49,23 @@ theorem estandar_MN : ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar (MNV V₀) wher
 /-- 🏁 **Los 142 son CONSISTENTES**: `Prf ⊥` no tiene prueba, porque `MNV V₀` satisface los 142 (`MN_axioms`). -/
 theorem consistencia : ConsistentH := ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de estandar_MN
 
-/-- 🏁 **GÖDEL I, sin hipótesis.** -/
+/-- 🏁 **GÖDEL I, la mitad `⊬ G`, sin hipótesis** (la otra, `goedel_I_neg`, en `Meta/SolidezVerificador.lean`). -/
 theorem goedel_I : ¬ Prf ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN :=
   ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf consistencia
 
 /-- 🏁 **GÖDEL II, sin hipótesis.** -/
 theorem goedel_II : ¬ Prf ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
   ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf consistencia
+
+/-- 🏁 En `MNV V₀`, `axiomsCodeT` vale EXACTAMENTE el código de los 142 (ADR‑121): `prf_ancla` —el ancla es teorema—
+    por la solidez. Es lo que dice que, en el modelo, la regla `thy` acepta exactamente los 142. -/
+theorem V₀_eq_codigo : V₀ = codeNatList axioms := by
+  have h := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound estandar_MN
+    ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla (fun _ => 0)
+  have h' : evalTerm (MNV V₀) (fun _ => 0) axiomsCodeT =
+      evalTerm (MNV V₀) (fun _ => 0) (listFormCodeM axioms) := h
+  rw [ev_axiomsCodeT, ev_listFormCodeM] at h'
+  exact h'
 
 end Final
 
@@ -64,3 +74,4 @@ end ROBINSON_PlusPlus.Meta.Consistencia
 #print axioms ROBINSON_PlusPlus.Meta.Consistencia.consistencia
 #print axioms ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
 #print axioms ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+#print axioms ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo

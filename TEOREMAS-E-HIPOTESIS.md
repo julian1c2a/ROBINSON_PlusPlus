@@ -1,6 +1,6 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑05 · `master` · **123 jobs · 109 módulos · 0 sorry · 0 `axiom` de Lean**
+> ## ESTADO REAL — 2026‑10‑05 · `master` · **128 jobs · 111 módulos · 0 sorry · 0 `axiom` de Lean**
 >
 > 🏁🏁 **Desde ADR‑120, SIN HIPÓTESIS**: `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
 > (`Meta/Consistencia.lean`) son Gödel I y II con `ConsistentH` DESCARGADA en el build por `consistencia` —un
@@ -13,7 +13,7 @@
 > llevaban además la clase `[AnclaEq]`, que daba `Prf ⊥` —F1, [ADR‑114](DECISIONS.md)—: eran VACUOS.)*
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
+**Last updated:** 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
 `[AnclaEq]`: su única hipótesis es `ConsistentH` (banner, §1, §4–§6); D1 y D3 sí la llevan, rellenada por la
 instancia (§3). Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)) y con ella
 toda la mitad `⊬¬G` que vivía allí; F1 está compilado (`[AnclaEq]` ⇒ `Prf ⊥`), y **D1 y D3 también
@@ -52,6 +52,11 @@ un fallo.
 | | ~~`[AnclaEq]`~~ | 🏁 **fuera de la firma desde ADR‑117** (2026‑10‑04): el ancla es el teorema `prf_ancla` (§4). Hasta ese día, ⛔⛔ **NADIE, y NO PODÍA**: `AnclaEq` ⇒ `Prf ⊥` sobre los 141 (`sondeos/AnclaEqInconsistente.lean`, hoy REGISTRO: `anclaEq_prf_bot`, y `hipotesis_goedel_insatisfacibles` — `[AnclaEq]` y `ConsistentH` **no valían a la vez**) |
 | | *(el punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
 | **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁🏁 ídem, `consistencia`; el corolario sin hipótesis es `goedel_II` (ADR‑120) |
+| **`goedel_I_neg`** (`Meta/SolidezVerificador.lean`) | ninguna | 🏁🏁 ADR‑121: `¬ Prf ¬godelCN`, la mitad `⊬¬G`; por W1 (`verificador_solido`), el modelo y el punto fijo. Con `goedel_I`, `G` es INDECIDIBLE |
+| **`godelCN_verdadera`**, **`con_verdadera`** (`Meta/SolidezVerificador.lean`) | ninguna | 🏁 ADR‑121 (E10): `G` y `Con` son VERDADERAS en `MNV V₀` —y, por `goedel_I`/`goedel_II`, no demostrables— |
+| **`prf_tarski`**, **`tarski`** (`Meta/TarskiPrf.lean`) | ninguna | 🏁 ADR‑121: la teoría refuta `Tr(⌜L⌝) ⇔ L` en el mentiroso `L`; `tarski : ¬ Prf (Tr(⌜L⌝) ⇔ L)`, por `prf_tarski` y `consistencia` |
+| **`godelCN_indecidible`**, **`modelo_prov_iff`** (`Meta/SolidezVerificador.lean`) | ninguna | 🏁 ADR‑121: ni `G` ni `¬G`; y `MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ` |
+| **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | 🏁 ADR‑121: ninguna fórmula define la verdad en `MNV V₀` (solidez + mentiroso) |
 | | ~~`[AnclaEq]`~~ | 🏁 ídem: fuera de la firma desde ADR‑117 |
 | | *(punto fijo · necesitación · `Con' ⇒ G`)* | ✅ `prf_godelCN_fixedpoint` · `repr_pos'_prf` (D1) · `prf_con_imp_godel`, sobre `d2_prf` (D2) y `d3_prf_real` (D3) — D1 y D3 llevan todavía la ligadura `[AnclaEq]`, que rellena la instancia `instAnclaEq` (ADR‑117, §3); `prf_con_imp_godel`, ya no |
 

@@ -11,8 +11,9 @@
 **Contenido:** Nivel B (codificación `⌜·⌝`, `G`, Teorema G1 como **meta‑inyectividad**) y Nivel C
 (`formCode`, `IsFormula` — núcleo real de codificación). La capa legacy postulada se retiró en F7a; lo
 que había sobre `⊢` (`Provable`, la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
-**Last updated:** 2026-10-04 · Lean v4.31.0 — Gödel I/II, ya no vacuos por F1 y condicionales a
-`ConsistentH` (ADR‑117). Antes, 2026-10-02 — revisado entero tras retirar la capa `⊢` (ADR‑115):
+**Last updated:** 2026-10-05 · Lean v4.31.0 — Gödel I/II SIN HIPÓTESIS (ADR‑120: `ConsistentH` es teorema, un
+modelo de los 142) y Gödel I ENTERO (ADR‑121: `⊬ ¬G`). Antes, 2026-10-04 — Gödel I/II, ya no vacuos por F1 y
+condicionales a `ConsistentH` (ADR‑117). Antes, 2026-10-02 — revisado entero tras retirar la capa `⊢` (ADR‑115):
 fuera `Block6`, `encode_cons_inj`/`encode_cons_neq_nil`, `Provable`/`provable_formCode_iff`, y los
 meta‑axiomas de F7a marcados como lo que son, un registro.
 

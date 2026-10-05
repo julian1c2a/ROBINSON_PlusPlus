@@ -131,6 +131,8 @@ import ROBINSON_PlusPlus.Meta.ModeloEstandar
 import ROBINSON_PlusPlus.Meta.ModeloCodificacion
 import ROBINSON_PlusPlus.Meta.SolidezPrf
 import ROBINSON_PlusPlus.Meta.Consistencia
+import ROBINSON_PlusPlus.Meta.TarskiPrf
+import ROBINSON_PlusPlus.Meta.SolidezVerificador
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived

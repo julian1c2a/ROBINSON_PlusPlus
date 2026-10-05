@@ -349,3 +349,7 @@ theorem MN_axioms (v : Nat → Nat) : contextSatisfies (MNV V₀) v axioms := by
 end Codificacion
 
 end ROBINSON_PlusPlus.Meta.ModeloCodificacion
+
+#print axioms ROBINSON_PlusPlus.Meta.ModeloCodificacion.MN_codingAxioms
+#print axioms ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_ancla
+#print axioms ROBINSON_PlusPlus.Meta.ModeloCodificacion.MN_axioms

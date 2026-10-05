@@ -391,11 +391,13 @@ theorem u : axioms.length = 142 := rfl
 #eval V₀
 #reduce ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN
 #eval codeNatList axiomsBase
+#reduce selfAppN P
+#eval liar Tr
 EOF
 EV_AUTO=$(ev_recoge "$EV_FIX" | sed "s|^$EV_FIX/Evalua.lean:||" | cut -d: -f1 | tr '\n' ' ')
 rm -rf "$EV_FIX"
-if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 23 24 25 " ]; then
-  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 23 24 25 »)."
+if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 23 24 25 26 27 " ]; then
+  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 23 24 25 26 27 »)."
   exit 2
 fi
 EV_FAIL=0

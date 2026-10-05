@@ -5,8 +5,9 @@
 > Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
 > `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
 > dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`), con footprint los tres de Lean. ⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS
-> en el modelo, ni `⊬¬G` (irá por Rosser, ⬜).
+> (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁🏁 Y desde ADR‑121, **Gödel I ENTERO**:
+> `goedel_I_neg : ¬ Prf ¬godelCN` (`Meta/SolidezVerificador.lean`, por la solidez del verificador en el modelo), y
+> **Tarski** (`Meta/TarskiPrf.lean`); y `G` y `Con` son VERDADERAS en el modelo (E10). ⚠️ Lo que NO dice: Rosser (⬜).
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
 
@@ -45,9 +46,9 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 123 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> **Build 128 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)

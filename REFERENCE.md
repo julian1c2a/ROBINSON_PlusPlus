@@ -5,8 +5,8 @@
 > Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
 > `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
 > dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`), con footprint los tres de Lean. ⚠️ Lo que NO dice: que `G` y `Con` sean VERDADERAS
-> en el modelo, ni `⊬¬G` (irá por Rosser, ⬜).
+> (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁 Y desde ADR‑121, Gödel I ENTERO (`goedel_I_neg`),
+> E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ Lo que NO dice: Rosser (⬜).
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
 
@@ -36,9 +36,9 @@
 > cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; la hipótesis mínima volvió con ADR‑117, el
 > 2026‑10‑04, ya sin ningún axioma del proyecto en el footprint), y `⊢` ya no está en RPP. Se conserva:
 >
-> **Build 123 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> **Build 128 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
+> **111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
 > **+ 85 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 32 de 85, [ADR‑117](DECISIONS.md) §3).
 > **0 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **142 axiomas objeto** en `axioms` (los 141 de `axiomsBase`
 > y el ancla diagonal, ADR‑117).
@@ -200,7 +200,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**109 módulos activos** (Minimal 1 + Meta 105 + Full 3) + barrel `Meta.lean` + raíz
+**111 módulos activos** (Minimal 1 + Meta 107 + Full 3) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **85 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -296,7 +296,9 @@ Detalle en el nodo §3.15–§3.32.
 | 84s | **`ModeloEstandar`** | 🆕 🏁 **`MNV V`, paramétrico en el valor de `axiomsCodeT`** (ADR‑120): un lema `rfl` por símbolo para `V` VARIABLE (⛔ ninguno contra `V₀`: altura de definición), la evaluación de los códigos cerrados por inducción (`ev_*`), las guardas para un término arbitrario, el `simp` `abre` (scoped) y los 34 `coreAxioms` (`MN_coreAxioms`) |
 | 84t | **`ModeloCodificacion`** | 🆕 🏁 **los 107 de codificación, el ANCLA y los 142** (ADR‑120): `MN_codingAxioms`, `v_ancla` (por `rw` con lemas ∀, sin lema diagonal semántico) y `MN_axioms : ∀ v, contextSatisfies (MNV V₀) v axioms` |
 | 84u | **`SolidezPrf`** | 🆕 🏁 **la SOLIDEZ de `Prf`** (ADR‑120): `Estandar M`, `prfI_sound`, `prf_sound` (los 7 + 17 constructores) y `consistentH_de : Estandar M → ConsistentH` |
-| 84v | **`Consistencia`** | 🆕 🏁🏁 **`consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN`, `goedel_II : ¬ Prf consistencyFormula'`** (ADR‑120): Gödel I y II SIN HIPÓTESIS, footprint los tres de Lean |
+| 84v | **`Consistencia`** | 🆕 🏁🏁 **`consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN`, `goedel_II : ¬ Prf consistencyFormula'`** (ADR‑120): Gödel I y II SIN HIPÓTESIS, footprint los tres de Lean; y (ADR‑121) `V₀_eq_codigo : V₀ = codeNatList axioms` |
+| 84w | **`TarskiPrf`** | 🆕 🏁 **TARSKI** (2026‑10‑05, ADR‑121): `prf_diagonal` (el lema diagonal para un predicado ARBITRARIO, por `FOL.subst_subst_lift_gen`), `liar`, `prf_tarski` y `tarski` (sin hipótesis: `Tr` falla en su propio mentiroso, una sentencia), y `tarski_semantico` (ni en `MNV V₀`) |
+| 84x | **`SolidezVerificador`** | 🆕 🏁🏁 **W1 y GÖDEL I ENTERO** (ADR‑121): el decodificador TOTAL (`dec`, que conmuta con `substfcN`/`liftfcN` para todo número), `verificador_solido` (lo que `MNV V₀` acepta como prueba concluye, decodificado, teoremas de `Prf`), `goedel_I_neg : ¬ Prf ¬godelCN`, `godelCN_indecidible`, `modelo_prov_iff` y E10 (`godelCN_verdadera`, `con_verdadera`) |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo (`godelPred'`, `godelBeta'`, `godelC'`) y `consistencyFormula'`. Gödel II vive en `GodelTwoPrf`; `goedel_second'` (retirado el 2026‑09‑11) y el teorema `d3` sobre `⊢` (retirado con ADR‑115) ya no están |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).

@@ -1,12 +1,12 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
 > `consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`), por un modelo de los 142 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). ⚠️ No dice
-> que `G` y `Con` sean verdaderas en el modelo, ni `⊬¬G` (Rosser, ⬜).
+> (`Meta/Consistencia.lean`), por un modelo de los 142 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). 🏁 Y desde
+> ADR‑121, Gödel I ENTERO (`goedel_I_neg`), E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ No dice: Rosser (⬜).
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro.*
 
@@ -45,9 +45,9 @@
 > Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
 > [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
 >
-> **Build 123 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
+> **Build 128 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
+> **111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 85 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -9370,3 +9370,90 @@ Los 85 sondeos, uno a uno: **32 compilan y 53 no**, la MISMA tabla que la de ADR
 sondeo que la prueba es una medición, no un estado.*
 
 **Véase también:** ADR‑117 (el ancla diagonal), ADR‑118 (la clase, retirada), ADR‑119 (el modelo, en sondeo).
+
+---
+
+<a id="adr-121"></a>
+## ADR-121: 🏁🏁 GÖDEL I ENTERO (`⊬ ¬G`, por W1) y TARSKI, sin hipótesis
+
+**Fecha:** 2026-10-05 · **Estado:** ✅ (este commit; arregla además el rojo de la CI de ADR‑120: [E] de
+`doc/REFERENCE-Godelization.md`, cuyo cuerpo se tocó sin subir su marca) · **Ámbito:** RPP: tres teoremas nuevos sobre el modelo de
+ADR‑120 —`Meta/SolidezVerificador.lean` y `Meta/TarskiPrf.lean`, nuevos, y `V₀_eq_codigo` en
+`Meta/Consistencia.lean`—, `check-footprints` y los documentos. El propietario pidió `⊬¬G` (por Rosser) y preguntó
+por Tarski; la medición del 2026-10-05 (`wf_ecc8b532-080`) dejó escrito que `⊬¬godelCN` sale antes por la
+solidez del verificador en el modelo (W1), y que W1 es la pieza común con Rosser.
+
+### 1 · Lo que hay
+
+* **`goedel_I_neg : ¬ Prf ¬godelCN`** (`Meta/SolidezVerificador.lean`) — **la mitad de Gödel I que faltaba**, sin
+  hipótesis. Con `goedel_I` (ADR‑120), Gödel I está ENTERO: `G` es indecidible en `Prf`.
+* **W1, `verificador_solido`**: si `MNV V₀` cree que la cadena `p` es una prueba (`chainOkN V₀ 0 p`), todo lo que
+  concluye, DECODIFICADO, es teorema de `Prf`. El decodificador (`dec`) es TOTAL —espeja el análisis de casos de
+  `substfcN`, y la basura va a `⊥` o a una constante cerrada—, así que la sustitución y el lift CONMUTAN con él
+  para TODO número (`dec_substfc`, `dec_liftfc`), y cada una de las 21 reglas, decodificada, es una instancia de
+  un constructor de `Prf`. La medición daba W1 por lo más caro de Rosser (600–1 500 líneas, ESTIMACIÓN); medido:
+  el módulo tiene 588 líneas con su documentación, unas 490 sin ella.
+* **`godelCN_indecidible`** — las dos mitades juntas: ni `G` ni `¬G`.
+* **`modelo_prov_iff : MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ`** — `Prov` es FIEL en el modelo estándar: la ida es W1, la
+  vuelta D1 (`repr_pos'_prf`) y la solidez. Es también el control de vacuidad de W1 (lo pidió la auditoría).
+* **E10, `godelCN_verdadera` y `con_verdadera`** — `G` y `Con` son VERDADERAS en `MNV V₀`: si el modelo creyera
+  demostrable `G` (o `⊥`), W1 daría `Prf G` (o `Prf ⊥`). Con `goedel_I`/`goedel_II`: verdaderas y no demostrables.
+* **`V₀_eq_codigo : V₀ = codeNatList axioms`** (`Meta/Consistencia.lean`) — en el modelo, `axiomsCodeT` vale el
+  código de los 142: `prf_ancla` por la solidez. Es lo que necesita la regla `thy` de W1, y lo que ADR‑120 dejó en
+  «lo que NO dice».
+* **Tarski** (`Meta/TarskiPrf.lean`): `prf_diagonal` —el lema diagonal para un predicado ARBITRARIO, que hasta hoy
+  sólo existía para `godelPred'`; la composición es `FOL.subst_subst_lift_gen`—, `prf_tarski` (la teoría refuta
+  `Tr(⌜L⌝) ⇔ L` en el mentiroso `L := liar Tr`), `tarski` (`¬ Prf (Tr(⌜L⌝) ⇔ L)`: ninguna `Tr` define la verdad en
+  la teoría, y falla en su propio mentiroso, una sentencia del lenguaje de `Tr` y de la aritmética) y
+  `tarski_semantico` (ni en `MNV V₀`). El borrador era el de la medición de Tarski (`wf_281298ec-639`), escrito sin
+  compilar: compiló a la primera. ⚠️ La auditoría adversarial (`wf_68cece92-90b`) mostró que su forma «no hay
+  `Tr` con `Prf (Tr(⌜φ⌝) ⇔ φ)` para TODA `φ`» —y la variante sobre sentencias— es verdadera pero BARATA: una
+  fórmula abierta, o un símbolo ajeno al lenguaje, la refuta sin mentiroso. Se reescribió en la forma fiel, y la
+  barata no se enuncia.
+
+Footprint de los once titulares nuevos: `[propext, Classical.choice, Quot.sound]` (once filas en
+`check-footprints`), y cuatro filas más de titulares del modelo de ADR‑120 que no se imprimían (`MN_coreAxioms`,
+`MN_codingAxioms`, `v_ancla`, `MN_axioms`): ADR‑120 decía «los cinco, con footprint en sus titulares», y tres de los
+cinco módulos no tenían ninguno.
+
+### 1bis · La auditoría adversarial, y lo que cambió por ella
+
+Cuatro lentes (`wf_68cece92-90b`: Gödel I entero, W1, Tarski, la promoción de ADR‑120). Ninguna refutó un
+teorema; lo que cambió:
+* **Tarski**, a la forma fiel (arriba): la forma «para toda `φ`» era barata.
+* **`godelCN_indecidible`** y **`modelo_prov_iff`**, nuevos (el segundo es el control de vacuidad de W1).
+* **`check-doc-sync` [E] ya no está ciego antes del commit**: si el documento tiene cambios sin commitear, la fecha
+  que cuenta es la de hoy. Visto fallar con un mutante que la versión vieja dejaba pasar (una línea añadida a
+  `doc/AUDITORIA-2026-09-18.md` sin subir su marca).
+* **El autotest del censo «evaluar el ancla»** cubre también `selfAppN` y `liar` (dos líneas más).
+* Los docstrings y banners que decían lo contrario de lo demostrado, corregidos.
+* Queda para el propietario: el `lakefile` sólo desactiva `autoImplicit` en el servidor del editor, no en `lake
+  build` (medido en las trazas del build); en la cadena de Gödel no hay ninguna captura (medido en los `.ilean`), y
+  los módulos de ADR‑120/121 la desactivan en el fichero. Activarla en el `lakefile` de RPP y de FOL es un cambio
+  de ámbito propio.
+* Medido que las tácticas‑macro no reservan palabras: un fichero que importa `ROBINSON_PlusPlus` y define `abre`,
+  `prems`, `lwf`, `vpf_paso` y `decodifica` como identificadores compila (4 s).
+* Medido: `TarskiPrf` mete en el cierre del build `FOL.Lift0` (y con él `FOL.Eigenvariable` y `FOL.Derives0`); la
+  pasada de los 85 sondeos sale igual.
+
+### 2 · Medido
+
+Después del último cambio (M‑13), en local: `lake build` **128 jobs** (cinco más: los dos módulos, y `FOL.Lift0` con
+`FOL.Eigenvariable` y `FOL.Derives0`, que `TarskiPrf` trae), 0 errores; `check-sorry` 0 y ninguna orden que evalúe el
+ancla (autotest con dos líneas más); `check-estratos` los 10, 0 `sorryAx` en 9 946 constantes; `check-warnings`
+11 = 11 (los módulos nuevos, ninguno); `check-footprints` **490** y cobertura **462** (quince y quince más: los once
+titulares nuevos y los cuatro del modelo que no se imprimían); `check-doc-sync` verde —con [E] endurecido, y la marca
+de `doc/REFERENCE-Godelization.md` subida—; `leanchecker` sobre RPP, FOL y `TheoryFramework`, sin errores, en 372 (con carga) s.
+Sondeos: **32 compilan y 53 no**, la MISMA tabla que la de ADR‑118/120, fila a fila. Los dos módulos nuevos compilan en 3,8 s y 3,9 s.
+
+### 3 · Lo que NO dice
+
+* **Rosser** (⬜): `⊬R ∧ ⊬¬R` con SÓLO `ConsistentH`. `goedel_I_neg` usa más —el modelo estándar, que es un
+  teorema—, y habla de `G`. Lo que Rosser pide y falta: la representabilidad negativa del verificador numeral a
+  numeral. W1 y `prf_diagonal`, las otras dos piezas, ya están.
+* `tarski_semantico` habla del modelo ESTÁNDAR `MNV V₀`, no de todo modelo.
+
+🔑 *Un decodificador TOTAL que espeja el análisis de casos de la función codificada hace conmutar a las dos con
+toda la basura: no hace falta saber qué números son códigos «de verdad».*
+
+**Véase también:** ADR‑117 (el ancla), ADR‑119/120 (el modelo y `ConsistentH`).

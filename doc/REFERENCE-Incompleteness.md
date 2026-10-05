@@ -35,7 +35,7 @@ D1/D2/D3 **no postula ninguna de las tres**.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 123 jobs · 109 módulos activos** (Minimal 1 + Meta 105 + Full 3) **+ 0 en `cuarentena/`
+> **Build 128 jobs · 111 módulos activos** (Minimal 1 + Meta 107 + Full 3) **+ 0 en `cuarentena/`
 > + 85 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*

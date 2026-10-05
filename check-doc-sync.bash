@@ -393,6 +393,11 @@ E_DECL=0     # deuda declarada que sigue vigente
 for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
   [ -e "$d" ] || continue
   GIT_DATE=$(git log -1 --format=%ad --date=short -- "$d" 2>/dev/null)
+  # ⛔ 2026-10-05 (ADR-121): [E] estaba CIEGO antes del commit. Comparaba la marca con la fecha del último commit
+  # que tocó el documento, y un documento editado en el árbol de trabajo sin subir su marca pasaba en local y daba
+  # ROJO en la CI del commit (medido: ADR-120, `doc/REFERENCE-Godelization.md`). Si el documento tiene cambios sin
+  # commitear, la fecha que cuenta es la de HOY: la que va a tener el commit.
+  if [ -n "$(git status --porcelain -- "$d" 2>/dev/null)" ]; then GIT_DATE=$(date +%F); fi
   LU=$(grep -m1 -iE "^\*\*Last updated" "$d" 2>/dev/null \
        | grep -ohE "20[0-9]{2}[-‑][0-9]{2}[-‑][0-9]{2}" | sed "s/‑/-/g" | head -1)
   EN_TABLA=0
@@ -408,7 +413,7 @@ for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
   elif [ -z "$GIT_DATE" ]; then
     ESTADO="mal"; MOTIVO="sin historia en git"
   elif [ "$LU" \< "$GIT_DATE" ]; then
-    ESTADO="mal"; MOTIVO="la marca dice $LU y el último commit que lo tocó es $GIT_DATE"
+    ESTADO="mal"; MOTIVO="la marca dice $LU y el último commit que lo tocó es $GIT_DATE (hoy, si tiene cambios sin commitear)"
   fi
 
   if [ "$ESTADO" = "mal" ] && [ "$EN_TABLA" = "0" ]; then

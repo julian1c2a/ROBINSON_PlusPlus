@@ -473,3 +473,5 @@ theorem MN_coreAxioms (v : Nat → Nat) : ∀ φ, List.Mem φ coreAxioms → eva
 end Interpretacion
 
 end ROBINSON_PlusPlus.Meta.ModeloEstandar
+
+#print axioms ROBINSON_PlusPlus.Meta.ModeloEstandar.MN_coreAxioms
