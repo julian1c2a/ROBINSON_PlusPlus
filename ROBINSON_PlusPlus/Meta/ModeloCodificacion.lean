@@ -19,6 +19,12 @@ salen también `ax_lineWF_inv` y `ax_lineWF_cons`.
 lema diagonal semántico.
 
 `MN_axioms : ∀ v, contextSatisfies (MNV V₀) v axioms` — el modelo de los 142.
+
+**§6 · El control negativo** (`control_tc_cons`, ADR‑124): el modelo NO valida cualquier cosa —refuta `ax_tc_cons`,
+el axioma retirado que hizo INCONSISTENTE la teoría (ADR‑012)—. ⛔ Sus códigos cerrados (`strCodeM cons_sym`,
+`numeralM 1`) no se evalúan: entran como TÉRMINOS variables de un lema `rfl`, y el argumento es la longitud de la
+lista de argumentos (uno contra dos). La forma con `simp` sobre la hipótesis concreta agotaba la memoria en el
+NÚCLEO (>3 GB en 14 s; en ADR‑119, >14 GB).
 -/
 
 set_option autoImplicit false
@@ -345,6 +351,48 @@ theorem MN_axioms (v : Nat → Nat) : contextSatisfies (MNV V₀) v axioms := by
   | inr h =>
     have e : φ = ax_axiomsCodeT_def := List.mem_singleton.mp h
     rw [e]; exact v_ancla v
+
+/-! ## §6 · CONTROL NEGATIVO: el modelo no valida cualquier cosa
+
+`ax_tc_cons` (`tcFn (cons a b) = ⟨1, ⌜::⌝, [tcFn a, tcFn b]⟩`) es el axioma que hizo INCONSISTENTE la teoría y se
+retiró de la lista (ADR‑012). `MNV V` lo REFUTA: `cons a b` vale un sucesor, y `tcFnN` de un sucesor es el código de
+`σ(·)`, cuya lista de argumentos tiene UNO; el axioma le pide DOS.
+
+⛔ Sin evaluar un solo código: `strCodeM cons_sym` y `numeralM 1` entran como términos VARIABLES (`N`, `S`) de un lema
+`rfl`, y `tcFnN_consN_ne` vale para todo `a`, `b`, `N`, `X`. La forma con `simp only` sobre la hipótesis concreta
+compila en la elaboración, pero su prueba agota la memoria en el NÚCLEO (medido: >3 GB en 14 s; ADR‑124). -/
+
+theorem tcFnN_succ (n : Nat) :
+    tcFnN (n + 1) = consN 1 (consN (codeNatStr succ_sym) (consN (consN (tcFnN n) 0) 0)) := rfl
+
+/-- `tcFnN` de un sucesor tiene UN argumento; `ax_tc_cons` le pide DOS —para todo `a`, `b`, etiqueta `N` y símbolo
+    `X`—. -/
+theorem tcFnN_consN_ne (a b N X : Nat) :
+    tcFnN (consN a b) ≠ consN N (consN X (consN (consN (tcFnN a) (consN (tcFnN b) 0)) 0)) := by
+  intro h
+  rw [show consN a b = triN (a + b) + b + 1 from rfl, tcFnN_succ] at h
+  have h2 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h).2
+  have h3 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h2).2
+  have h4 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h3).1
+  have h5 := (ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_inj h4).2
+  exact ROBINSON_PlusPlus.Meta.CodeNatInjPrf.consN_ne_zero _ _ h5.symm
+
+theorem ev_tc_cons_izq (v : Nat → Nat) :
+    evalTerm (MNV V) v (tcFn (cons (.var 1) (.var 0))) = tcFnN (consN (v 1) (v 0)) := rfl
+
+theorem ev_tc_cons_der (v : Nat → Nat) (N S : Term) :
+    evalTerm (MNV V) v (cons N (cons S (cons (cons (tcFn (.var 1)) (cons (tcFn (.var 0)) nil)) nil)))
+      = consN (evalTerm (MNV V) v N) (consN (evalTerm (MNV V) v S)
+          (consN (consN (tcFnN (v 1)) (consN (tcFnN (v 0)) 0)) 0)) := rfl
+
+/-- ⛔ **Control negativo**: `MNV V` REFUTA `ax_tc_cons`, el axioma que hizo inconsistente la teoría (ADR‑012). -/
+theorem control_tc_cons : ¬ ∀ v : Nat → Nat, evalFormula (MNV V) v ax_tc_cons := by
+  intro h
+  have h1 : evalTerm (MNV V) (shiftEnv (shiftEnv (fun _ => 0) 0) 0) (tcFn (cons (.var 1) (.var 0)))
+      = evalTerm (MNV V) (shiftEnv (shiftEnv (fun _ => 0) 0) 0) (cons (numeralM 1) (cons (strCodeM cons_sym)
+          (cons (cons (tcFn (.var 1)) (cons (tcFn (.var 0)) nil)) nil))) := h (fun _ => 0) 0 0
+  rw [ev_tc_cons_izq, ev_tc_cons_der] at h1
+  exact tcFnN_consN_ne _ _ _ _ h1
 
 end Codificacion
 

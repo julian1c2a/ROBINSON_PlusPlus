@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — ADR‑123: Rosser, Etapa 0 —la reflexión numeral, confirmada en `sondeos/RosserReflexion.lean`—; ADR‑122: D7 medida (la puerta dice NO: 48 de 226) y Rosser re‑medido; ADR‑121: Gödel I ENTERO (`⊬ ¬G`) y TARSKI, sin hipótesis (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-05 — ADR‑124: el control negativo del modelo, en el build (punto 3, hecho), y la auditoría de ADR‑123 (el punto 1, rectificado); ADR‑123: Rosser, Etapa 0 —la reflexión numeral, confirmada en `sondeos/RosserReflexion.lean`—; ADR‑122: D7 medida (la puerta dice NO: 48 de 226) y Rosser re‑medido; ADR‑121: Gödel I ENTERO (`⊬ ¬G`) y TARSKI, sin hipótesis (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
@@ -16,13 +16,17 @@
 > ## ⬜ Lo que queda AHORA, en orden
 >
 > 1. ⬜ **Rosser** (`⊬R ∧ ⊬¬R` con sólo `ConsistentH`): falta NegNum —la representabilidad negativa del verificador
->    numeral a numeral, con las guardas Π₁—; W1 y el lema diagonal general ya están. Plan re‑medido (ADR‑122 §2):
->    ruta híbrida, ESTIMACIÓN 1 400–2 250 líneas. ✅ Etapa 0, primera pieza (ADR‑123, `sondeos/RosserReflexion.lean`):
->    la REFLEXIÓN da la evaluación externa de `substfc`/`liftfc` sobre numerales con las guardas verdaderas. ⬜ Lo
->    siguiente: la mitad BASURA —refutar en `Prf` una guarda de profundidad 2 y una línea `q1` basura—.
+>    numeral a numeral, refutando las guardas (Σ₁: sus negaciones son Π₁)—; W1 y el lema diagonal general ya están.
+>    Plan re‑medido (ADR‑122 §2): ruta híbrida, ESTIMACIÓN 1 400–2 250 líneas. ✅ Etapa 0, primera pieza (ADR‑123,
+>    `sondeos/RosserReflexion.lean`; rectificada en ADR‑124): la REFLEXIÓN da la evaluación externa de
+>    `substfc`/`liftfc` sobre todo numeral con las guardas verdaderas (sobre los canónicos ya existía sin el modelo).
+>    ⬜ Lo siguiente: la mitad BASURA —una guarda de profundidad 2 y una línea `q1` basura—; la de profundidad 1, por
+>    la etiqueta de cabeza y con testigo abierto, ya está en `Meta/CodeWitnessPrf.lean` (falta el ∃‑elim, la versión
+>    hereditaria y aplicarla a un numeral).
 > 2. ⬜ **D7**: ⬜ DECISIÓN del propietario. Medida (ADR‑122 §1, `sondeos/D7Contrafactual.lean`): sólo 48 de 226
 >    footprints perderían `Classical.choice`; la puerta de la medición recomienda cerrarla.
-> 3. ⬜ El control negativo de ADR‑119 (el modelo REFUTA `ax_tc_cons`), con otra forma.
+> 3. ✅ El control negativo de ADR‑119: `control_tc_cons` (`Meta/ModeloCodificacion.lean` §6, ADR‑124) —el modelo
+>    REFUTA `ax_tc_cons`—, con los códigos cerrados como variables (la forma con `simp` agotaba la memoria del núcleo).
 > 4. ⬜ `autoImplicit`: el `lakefile` sólo lo desactiva en el editor, no en `lake build` (auditoría de ADR‑121).
 >
 > 🗓️ *Lo que sigue es el bloque de ADR‑120, como registro.*

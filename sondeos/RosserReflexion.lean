@@ -11,28 +11,38 @@ Este sondeo la CONFIRMA, y mide lo que cuesta.
 
     Prf (substfc ā b̄ c̄ =eq ⟨substfcN a b c⟩‾)        Prf (liftfc ā c̄ =eq ⟨liftfcN a c⟩‾)
 
-—la teoría CALCULA la sustitución y el lift de códigos sobre numerales—, sin inducción sobre la fórmula y sin tocar
-un solo axioma de codificación a mano.
+—la teoría CALCULA la sustitución y el lift de códigos sobre numerales—, sin inducción NUEVA sobre la fórmula y sin
+abrir aquí ningún axioma de codificación: la inducción sobre el código (interna en `pcc_eval_substfc`/
+`pcc_eval_liftfc`; externa en `dec_substfc`/`dec_liftfc`, que usa W1) y la apertura de los axiomas (sus `Caso*` y
+`MN_axioms`) ya estaban pagadas; lo de aquí sólo induce sobre `Nat` (`decT_tcFnN`).
 
-**Cómo** (cuatro piezas que ya estaban):
+**Cómo** (cuatro piezas que ya estaban, y lo que se les añade):
 1. la evaluación INTERNA (`pcc_eval_substfc_wit`, `pcc_eval_liftfc_wit`): `Prf (guardas → Prov⌜s(ā,b̄,c̄) = valor⌝)`;
 2. la SOLIDEZ (`prf_sound`): en `MNV V₀`, con las guardas verdaderas allí, `Prov⌜…⌝` vale;
 3. lo que el modelo cree demostrable lo es (`verificador_solido`, W1), DECODIFICADO;
-4. el decodificador sobre el código de la ecuación (`dec_eq`, `decT_func`, y `decT_tcFnN`, nuevo: `tcFn` codifica
-   el numeral `numeralM`).
-No hace falta `Prf guarda`: basta que la guarda sea VERDADERA en el modelo.
+4. el decodificador sobre el código de la ecuación (`dec_eq`, `decT_func`).
+Lo nuevo: `decT_tcFnN` (`tcFn` codifica el numeral `numeralM`), W1 para un término‑código CUALQUIERA
+(`ev_provFromCode`, `prf_dec_of_prov`; `prf_of_prov` sólo toma `provCodeC' φ`) y la evaluación de los dos códigos de
+ecuación (`ev_evalSubstfcCode`, `ev_eqcLiftfc`). No exige `Prf guarda`: basta que la guarda sea VERDADERA en el modelo.
 
-**No vacuidad**: `hasWitN_codigo`/`hasWitFN_codigo` (las guardas valen en los códigos de verdad, por la solidez de
-`prf_hasWit_termCodeM`/`prf_hasWitF_fc`), y `prf_eval_substfc_codigo` con su valor DECODIFICADO
-(`dec_valor_substfc`: es el código de `φ[t/n]`).
+**No vacuidad**: `hasWitN_codigo`/`hasWitFN_codigo` (las guardas valen en los numerales de los códigos de verdad, por
+la solidez de `prf_hasWit_termCodeM`/`prf_hasWitF_fc`), y `prf_eval_substfc_codigo` sin hipótesis, sobre
+`numeralM (codeNatTerm t)` y `numeralM (codeNat φ)`; su valor DECODIFICA a `φ[t/n]` (`dec_valor_substfc`).
+
+**Lo que añade a lo que había**: sobre los códigos CANÓNICOS la evaluación externa ya existía SIN el modelo
+—`prf_substFormula_arith`/`prf_liftFormula_arith` (`Meta/ArithPrf.lean`), sobre `formCode φ`, con los puentes
+`prf_termCode_numeral`/`prf_formCode_numeral`—. La reflexión la extiende a TODO numeral con las guardas verdaderas,
+también a los NO canónicos (p. ej., un campo de símbolo que no es `codeNatStr` de ninguna cadena: las guardas no lo
+miran), que son los que NegNum tiene que tratar al recorrer numerales arbitrarios.
 
 ⚠️ Lo que NO dice: nada de los numerales BASURA (las guardas falsas), que es la otra mitad de NegNum; ni que el
-resto del plan de Rosser cueste lo estimado.
+resto del plan de Rosser cueste lo estimado. Revisado por una auditoría adversarial (`wf_107c9121-80b`, ADR‑124).
 
 ## Medido (2026‑10‑05, RPP con ADR‑122)
 
-Compila en 4 s (0,78 GB), 0 errores y 0 avisos; 180 líneas, 18 teoremas (unas 110 de prueba; la ESTIMACIÓN de la
-Etapa 0 era 120–200). `#print axioms` de los tres titulares: `[propext, Classical.choice, Quot.sound]`.
+Compila en 4 s (0,78 GB), 0 errores y 0 avisos; 189 líneas, 18 teoremas, 86 de declaraciones (38 de enunciado,
+48 de prueba). Es la primera de las tres piezas de la Etapa 0, cuya ESTIMACIÓN conjunta era 120–200.
+`#print axioms` de los tres titulares: `[propext, Classical.choice, Quot.sound]`.
 
 ## Cómo re‑ejecutarlo
 
@@ -53,11 +63,9 @@ namespace RosserReflexion
 section Evaluacion
 variable {V : Nat}
 
-theorem ev_numeral (v : Nat → Nat) : ∀ n : Nat, evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.Godel.numeral n) = n
-  | 0 => rfl
-  | n + 1 => by
-      show (MNV V).func succ_sym [evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.Godel.numeral n)] = n + 1
-      rw [ev_numeral v n]; rfl
+theorem ev_numeral (v : Nat → Nat) (n : Nat) :
+    evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.Godel.numeral n) = n := by
+  rw [← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq, ev_numeralM]
 
 theorem ev_strCode (v : Nat → Nat) (s : String) :
     evalTerm (MNV V) v (ROBINSON_PlusPlus.Meta.Provability.strCode s) = codeNatStr s := by
@@ -116,7 +124,7 @@ theorem prf_dec_of_prov (c : Term) (v : Nat → Nat) :
 
 /-! ## §3 · 🏁 LA REFLEXIÓN: la teoría calcula `substfc` y `liftfc` sobre numerales -/
 
-/-- 🏁 **`substfc` sobre numerales**, con las guardas VERDADERAS en el modelo (no demostradas). -/
+/-- 🏁 **`substfc` sobre numerales**, con las guardas VERDADERAS en el modelo (sin exigir su `Prf`). -/
 theorem prf_eval_substfc_num (a b c : Nat) (hb : hasWitN b) (hc : hasWitFN c) :
     Prf (Formula.eq (substfc (numeralM a) (numeralM b) (numeralM c)) (numeralM (substfcN a b c))) := by
   have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN
@@ -156,13 +164,13 @@ theorem hasWitFN_codigo (φ : Formula) : hasWitFN (codeNat φ) := by
   rw [ev_hasWitF, ← ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq, ev_formCodeM] at h
   exact h
 
-/-- La evaluación externa sobre los códigos de verdad: `substfc n̄ ⌜t⌝ ⌜φ⌝`, calculado en la teoría. -/
+/-- La evaluación externa sobre los NUMERALES de los códigos de verdad, calculada en la teoría. -/
 theorem prf_eval_substfc_codigo (n : Nat) (t : Term) (φ : Formula) :
     Prf (Formula.eq (substfc (numeralM n) (numeralM (codeNatTerm t)) (numeralM (codeNat φ)))
       (numeralM (substfcN n (codeNatTerm t) (codeNat φ)))) :=
   prf_eval_substfc_num n _ _ (hasWitN_codigo t) (hasWitFN_codigo φ)
 
-/-- …y el numeral de la derecha es, decodificado, `φ[t/n]`. -/
+/-- …y el valor de la derecha DECODIFICA a `φ[t/n]`. -/
 theorem dec_valor_substfc (n : Nat) (t : Term) (φ : Formula) :
     dec (substfcN n (codeNatTerm t) (codeNat φ)) = substFormula n t φ := by
   rw [dec_substfc, decT_codeNatTerm, dec_codeNat]
