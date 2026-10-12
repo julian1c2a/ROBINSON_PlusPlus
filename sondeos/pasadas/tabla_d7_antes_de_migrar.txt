@@ -1,0 +1,88 @@
+A3ConsOkRefuta.lean|1|7|A3ConsOkRefuta.lean:89:2: error(lean.unknownIdentifier): Unknown identifier `nil_ne_cons`
+A3IsFCBTracked.lean|1|8|A3IsFCBTracked.lean:355:4: error: Type mismatch
+AcotarEsLaMismaObligacion.lean|0|5|
+AnclaEqInconsistente.lean|1|7|AnclaEqInconsistente.lean:105:26: error: Application type mismatch: The argument
+AnclaSoundness.lean|0|5|
+CanonNeRefuta.lean|1|5|CanonNeRefuta.lean:56:2: error: Type mismatch: After simplification, term
+CantorSobreyectivo.lean|0|5|
+CarcPayoff.lean|1|5|CarcPayoff.lean:15:46: error: Application type mismatch: The argument
+ChainNegPuente.lean|1|5|ChainNegPuente.lean:50:9: error(lean.unknownIdentifier): Unknown identifier `FOL.MetaRules.raa`
+ClassicalChoiceCenso.lean|0|5|
+ClausuraFormaEcuacional.lean|1|5|ClausuraFormaEcuacional.lean:402:48: error: Application type mismatch: The argument
+ClausuraLiftSinWTs.lean|1|7|ClausuraLiftSinWTs.lean:417:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+ClausuraNoHaceFalta.lean|1|6|ClausuraNoHaceFalta.lean:138:0: error: Not a definitional equality: the left-hand side
+ClausuraSubsttc.lean|1|6|ClausuraSubsttc.lean:178:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+CodeNatInj.lean|1|7|CodeNatInj.lean:85:78: error: Type mismatch
+CraigEqVacuo.lean|1|5|CraigEqVacuo.lean:25:40: error: Application type mismatch: The argument
+CtorDotados.lean|1|6|CtorDotados.lean:85:17: error: Application type mismatch: The argument
+D7Contrafactual.lean|0|7|
+DerivesSinMetaReglas.lean|0|3|
+DescargaHFN.lean|1|5|DescargaHFN.lean:18:5: error: unknown namespace `ROBINSON_PlusPlus.Meta.Induction`
+DescensoLiftc.lean|1|7|DescensoLiftc.lean:56:49: error: Application type mismatch: The argument
+DespachadorCoste.lean|0|6|
+DiscriminaEcuacional.lean|1|14|DiscriminaEcuacional.lean:294:5: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+DiscriminaTestigoAbierto.lean|1|13|DiscriminaTestigoAbierto.lean:294:5: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+Div2Gen.lean|0|5|
+EnsamblajeMedida.lean|1|6|EnsamblajeMedida.lean:111:48: error: Ambiguous term
+EnsamblajeTriple.lean|1|7|EnsamblajeTriple.lean:85:55: error: Application type mismatch: The argument
+EnumFormulaPorInyeccion.lean|1|4|EnumFormulaPorInyeccion.lean:80:45: error: Application type mismatch: The argument
+EqTransCodeImp2.lean|1|7|EqTransCodeImp2.lean:65:17: error: Application type mismatch: The argument
+EvalPredDot.lean|1|6|EvalPredDot.lean:107:4: error: Application type mismatch: The argument
+EvalSubstfcPrf.lean|1|12|EvalSubstfcPrf.lean:426:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+EvalSubsttc.lean|1|32|EvalSubsttc.lean:45:17: error: Application type mismatch: The argument
+GateGuardaEnriquecida.lean|1|5|GateGuardaEnriquecida.lean:76:48: error: Ambiguous term
+HasWitFCritica.lean|1|8|HasWitFCritica.lean:426:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+HasWitFReal.lean|1|11|HasWitFReal.lean:433:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+HasWitFRealMin.lean|1|8|HasWitFRealMin.lean:423:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+HasWitTcFn.lean|1|7|HasWitTcFn.lean:177:6: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+HenkinSaleDeRaa.lean|1|5|HenkinSaleDeRaa.lean:94:18: error(lean.unknownIdentifier): Unknown identifier `FOL.MetaRules.raa`
+InTracked.lean|1|5|InTracked.lean:127:4: error: Type mismatch
+KitPayoff.lean|1|5|KitPayoff.lean:72:4: error: Application type mismatch: The argument
+ListInductionAxiomRefutable.lean|0|5|
+Magnitud.lean|0|9|
+MDiezEnLaFirma.lean|0|5|
+MedirC_Carga.lean|1|6|MedirC_Carga.lean:39:0: error: Not a definitional equality: the left-hand side
+MedirC_Deriva.lean|1|6|MedirC_Deriva.lean:45:0: error: Not a definitional equality: the left-hand side
+MedirC_Enmienda.lean|1|8|MedirC_Enmienda.lean:63:0: error: Not a definitional equality: the left-hand side
+MedirF_Censo.lean|1|7|MedirF_Censo.lean:61:5: error: unknown namespace `ROBINSON_PlusPlus.Meta.AxiomListCode`
+MedirF_Opaco.lean|1|6|MedirF_Opaco.lean:37:5: error: unknown namespace `ROBINSON_PlusPlus.Meta.AxiomListCode`
+MedirF_Replan.lean|1|6|MedirF_Replan.lean:17:5: error: unknown namespace `ROBINSON_PlusPlus.Meta.AxiomListCode`
+MergeTestigos.lean|0|5|
+MetaReglasRefutables.lean|1|3|MetaReglasRefutables.lean:105:55: error: Application type mismatch: The argument
+ModeloBasura.lean|0|5|
+ModeloDiscriminador.lean|1|6|ModeloDiscriminador.lean:123:6: error: Type mismatch
+ModeloNat.lean|1|9|ModeloNat.lean:679:6: error: Type mismatch
+NegVerifierModE.lean|1|5|NegVerifierModE.lean:74:2: error(lean.unknownIdentifier): Unknown identifier `derives_lineWF_neg_of_tag`
+NombresFrescosMedicion.lean|0|6|
+OmegaConsistentRefutable.lean|0|5|
+ParseWitness.lean|1|5|ParseWitness.lean:268:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+ParticionDiscrimina.lean|1|11|ParticionDiscrimina.lean:294:5: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+ParticionTresPredicados.lean|1|12|ParticionTresPredicados.lean:294:5: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+Paso2CasoForall.lean|1|7|Paso2CasoForall.lean:85:17: error: Application type mismatch: The argument
+Paso2Guardado.lean|1|10|Paso2Guardado.lean:423:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+PilotoAislado.lean|0|6|
+PilotoDiagonal.lean|1|5|PilotoDiagonal.lean:25:5: error: unknown namespace `ROBINSON_PlusPlus.Meta.Induction`
+PilotoRastreada.lean|1|5|PilotoRastreada.lean:30:27: error: Type mismatch
+PrfBotCodificacionVieja.lean|0|5|
+PrfHMono.lean|0|6|
+RecodCoste.lean|1|6|RecodCoste.lean:71:20: error: Application type mismatch: The argument
+ReflectorAtomoAllIn.lean|1|8|ReflectorAtomoAllIn.lean:117:63: error: Application type mismatch: The argument
+ReflectorDesdeConsumidor.lean|1|9|ReflectorDesdeConsumidor.lean:53:49: error: Application type mismatch: The argument
+ReflectorForallAnidado.lean|1|9|ReflectorForallAnidado.lean:308:66: error: Ambiguous term
+RosserBasura.lean|0|7|
+RosserReflexion.lean|1|8|RosserReflexion.lean:71:67: error: Application type mismatch: The argument
+S1Audit.lean|1|7|S1Audit.lean:13:14: error(lean.unknownIdentifier): Unknown constant `ROBINSON_PlusPlus.Meta.DiagonalTwo.goedel_first_real'`
+S3S5.lean|1|6|S3S5.lean:27:15: error: Ambiguous term
+S4.lean|0|5|
+SegundoMuro.lean|0|6|
+SimbolosSinString.lean|0|6|
+SubCodesCritica.lean|TIMEOUT|360|SubCodesCritica.lean:132:12: error: Ambiguous term
+SubCodesWitness.lean|1|7|SubCodesWitness.lean:174:12: error: Ambiguous term
+SubstfcEx.lean|1|15|SubstfcEx.lean:450:4: error(lean.unknownIdentifier): Unknown identifier `ROBINSON_PlusPlus.Meta.BoundedInPrf.PrfH_lt_subst2`
+SubstfcPlanos.lean|1|9|SubstfcPlanos.lean:63:17: error: Application type mismatch: The argument
+SustituyendoOpaco.lean|0|6|
+SymbolParam.lean|0|3|
+SymbolParamCoste.lean|1|6|SymbolParamCoste.lean:58:11: error: Type mismatch
+TagConclCoste.lean|0|5|
+TcFormPayoff.lean|1|5|TcFormPayoff.lean:109:2: error: Type mismatch
+TestigoAbierto.lean|1|5|TestigoAbierto.lean:122:10: error: don't know how to synthesize implicit argument `α`

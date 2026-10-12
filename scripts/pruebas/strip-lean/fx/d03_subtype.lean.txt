@@ -1,0 +1,3 @@
+def Neg := { x : Int //-x > 0 }
+theorem bar : True := sorry
+axiom ax : False

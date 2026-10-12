@@ -1,0 +1,4 @@
+inductive T where
+  | r (a : String) (h : True) (b : String) : T
+def u : T := .r"\"" sorry "x"
+theorem t7 : True := trivial

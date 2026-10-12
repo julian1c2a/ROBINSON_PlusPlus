@@ -1,0 +1,3 @@
+import ROBINSON_PlusPlus
+#print axioms ROBINSON_PlusPlus.Full.add_comm_thm_prim       -- esperado: …, FOL.MetaRules.imp_intro, ax_induction_prim
+#print axioms ROBINSON_PlusPlus.Full.lt_trichotomy_thm_prim  -- esperado: …, imp_intro, or_elim, ex_elim

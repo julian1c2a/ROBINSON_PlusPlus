@@ -1,0 +1,3 @@
+def g : Lean.MetaM Unit := throwError "bad {toString '"'}"
+theorem t : 1 = 2 := sorry
+def h := "x"

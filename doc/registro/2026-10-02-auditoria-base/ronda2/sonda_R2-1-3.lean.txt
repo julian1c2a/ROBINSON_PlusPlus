@@ -1,0 +1,3 @@
+-- En la sonda de R2-1-2: `no_anclaEq_de (hM : Estandar M) (hT : ∀ v, evalTerm M v axiomsCodeT = 0) : ¬ AnclaEq`.
+-- Con el modelo de A2/A3 interpretando axiomsCodeT como 0:
+-- theorem no_anclaEq : ¬ ROBINSON_PlusPlus.Meta.Representability2Prf.AnclaEq := no_anclaEq_de estandar_MN (fun _ => rfl)

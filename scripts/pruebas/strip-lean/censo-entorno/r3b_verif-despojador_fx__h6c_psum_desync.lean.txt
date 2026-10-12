@@ -1,0 +1,2 @@
+def U := Nat ⊕'"'" = "x"
+theorem t9 : True := sorry

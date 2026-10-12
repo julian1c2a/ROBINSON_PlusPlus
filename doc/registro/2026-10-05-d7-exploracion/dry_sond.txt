@@ -1,0 +1,221 @@
+===== sondeos/AnclaEqInconsistente.lean 7 líneas
+  97: def esAC : String → List Term → Bool
+   → def esAC : List Char → List Term → Bool
+  98: | f, [] => f == "axiomsCodeT"
+   → | f, [] => f == sym!"axiomsCodeT"
+  121: theorem esAC_liftTerms (f : String) (c : Nat) (ts : List Term) :
+   → theorem esAC_liftTerms (f : List Char) (c : Nat) (ts : List Term) :
+  125: theorem esAC_substTerms (f : String) (v : Nat) (s : Term) (ts : List Term) :
+   → theorem esAC_substTerms (f : List Char) (v : Nat) (s : Term) (ts : List Term) :
+  129: theorem esAC_true {f : String} {ts : List Term} (h : esAC f ts = true) : ts = [] := by
+   → theorem esAC_true {f : List Char} {ts : List Term} (h : esAC f ts = true) : ts = [] := by
+  613: theorem occT_tcFn_nD (L : List Formula) : occT (Term.func "tcFn" [nD L]) = false := by
+   → theorem occT_tcFn_nD (L : List Formula) : occT (Term.func sym!"tcFn" [nD L]) = false := by
+  617: show occT (Term.func "substfc" [zero, Term.func "tcFn" [nD L], nD L]) = false
+   → show occT (Term.func sym!"substfc" [zero, Term.func sym!"tcFn" [nD L], nD L]) = false
+===== sondeos/ClausuraFormaEcuacional.lean 1 líneas
+  402: def substfsc (v t l : Term) : Term := Term.func "substfsc" [v, t, l]
+   → def substfsc (v t l : Term) : Term := Term.func sym!"substfsc" [v, t, l]
+===== sondeos/CraigEqVacuo.lean 11 líneas
+  25: private def P : Formula := Formula.atom "P" []
+   → private def P : Formula := Formula.atom sym!"P" []
+  27: private def Ebad : List Formula := [eqAtomAx "P" [] [] t t]
+   → private def Ebad : List Formula := [eqAtomAx sym!"P" [] [] t t]
+  33: | head => exact EqInstance.atom "P" [] [] t t
+   → | head => exact EqInstance.atom sym!"P" [] [] t t
+  48: refine ⟨eqAtomAx "P" [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
+   → refine ⟨eqAtomAx sym!"P" [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
+  53: refine ⟨eqAtomAx "P" [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
+   → refine ⟨eqAtomAx sym!"P" [] [] t t, List.mem_append.mpr (Or.inr (List.Mem.head _)), ?_⟩
+  61: theorem predF_eqReflAx (p : String) (u : Term) : Not (predF p (eqReflAx u)) := id
+   → theorem predF_eqReflAx (p : List Char) (u : Term) : Not (predF p (eqReflAx u)) := id
+  63: theorem predF_eqSymmAx (p : String) (u v : Term) : Not (predF p (eqSymmAx u v)) :=
+   → theorem predF_eqSymmAx (p : List Char) (u v : Term) : Not (predF p (eqSymmAx u v)) :=
+  66: theorem predF_eqTransAx (p : String) (u v w : Term) : Not (predF p (eqTransAx u v w)) :=
+   → theorem predF_eqTransAx (p : List Char) (u v w : Term) : Not (predF p (eqTransAx u v w)) :=
+  69: theorem predF_eqFuncAx (p f : String) (pre post : List Term) (a b : Term) :
+   → theorem predF_eqFuncAx (p f : List Char) (pre post : List Term) (a b : Term) :
+  75: theorem predF_eqAtomAx (p q : String) (pre post : List Term) (a b : Term) :
+   → theorem predF_eqAtomAx (p q : List Char) (pre post : List Term) (a b : Term) :
+  85: theorem eqInstance_aporta_cualquier_predicado (p : String) :
+   → theorem eqInstance_aporta_cualquier_predicado (p : List Char) :
+===== sondeos/EnumFormulaPorInyeccion.lean 3 líneas
+  76: def codeNatStr (s : String) : Nat := codeNatChars s.toList
+   → def codeNatStr (s : List Char) : Nat := codeNatChars s.toList
+  103: theorem codeNatStr_inj {s t : String} (h : codeNatStr s = codeNatStr t) : s = t := by
+   → theorem codeNatStr_inj {s t : List Char} (h : codeNatStr s = codeNatStr t) : s = t := by
+  105: exact String.ext (by simpa [String.toList] using this)
+   → exact (List Char).ext (by simpa [List Char.toList] using this)
+===== sondeos/MetaReglasRefutables.lean 5 líneas
+  105: theorem P_no : Not (([] : List Formula) ⊢ Formula.atom "P" []) := fun h => by
+   → theorem P_no : Not (([] : List Formula) ⊢ Formula.atom sym!"P" []) := fun h => by
+  125: have := derives_tval (H (Γ := []) (A := Formula.atom "P" []) (B := Formula.bottom) (fun h => absurd h P_no))
+   → have := derives_tval (H (Γ := []) (A := Formula.atom sym!"P" []) (B := Formula.bottom) (fun h => absurd h P_no))
+  131: have := derives_tval (H (Γ := []) (A := Formula.atom "P" []) (fun h => absurd h P_no))
+   → have := derives_tval (H (Γ := []) (A := Formula.atom sym!"P" []) (fun h => absurd h P_no))
+  179: theorem abs_witness (c : String) (A : Formula) (hcA : Not (occursFormula c A)) :
+   → theorem abs_witness (c : List Char) (A : Formula) (hcA : Not (occursFormula c A)) :
+  225: private def PA : Formula := Formula.atom "P" [Term.var 0]
+   → private def PA : Formula := Formula.atom sym!"P" [Term.var 0]
+===== sondeos/ModeloDiscriminador.lean 4 líneas
+  123: | "0", []      => 0
+   → | sym!"0", []      => 0
+  124: | "S", [a]     => a + 1
+   → | sym!"S", [a]     => a + 1
+  125: | "+", [a, b]  => a + b
+   → | sym!"+", [a, b]  => a + b
+  126: | "*", [a, b]  => a * b
+   → | sym!"*", [a, b]  => a * b
+===== sondeos/ModeloNat.lean 59 líneas
+  679: | "0",  []     => 0
+   → | sym!"0",  []     => 0
+  680: | "σ",  [a]    => a + 1
+   → | sym!"σ",  [a]    => a + 1
+  681: | "+",  [a, b] => a + b
+   → | sym!"+",  [a, b] => a + b
+  682: | "*",  [a, b] => a * b
+   → | sym!"*",  [a, b] => a * b
+  683: | "−",  [a, b] => a - b            -- monus, como dice el comentario de `sub_sym`
+   → | sym!"−",  [a, b] => a - b            -- monus, como dice el comentario de `sub_sym`
+  684: | "√",  [a]    => sqrtN a
+   → | sym!"√",  [a]    => sqrtN a
+  685: | "/₂", [a]    => a / 2
+   → | sym!"/₂", [a]    => a / 2
+  686: | "%₂", [a]    => a % 2
+   → | sym!"%₂", [a]    => a % 2
+  687: | "τ",  [a]    => a - 1            -- `pred`
+   → | sym!"τ",  [a]    => a - 1            -- `pred`
+  688: | "^",  [a, b] => a ^ b
+   → | sym!"^",  [a, b] => a ^ b
+  689: | "::", [a, b] => consN a b
+   → | sym!"::", [a, b] => consN a b
+  690: | "##", [a, b] => concatN a b
+   → | sym!"##", [a, b] => concatN a b
+  691: | "Π_p", [l]   => prodpN l
+   → | sym!"Π_p", [l]   => prodpN l
+  692: | "substtc", [k, s, c] => substtcN k s c
+   → | sym!"substtc", [k, s, c] => substtcN k s c
+  693: | "substtsc", [k, s, c] => substtscN k s c
+   → | sym!"substtsc", [k, s, c] => substtscN k s c
+  694: | "liftc", [c, t] => liftcN c t
+   → | sym!"liftc", [c, t] => liftcN c t
+  695: | "liftsc", [c, t] => liftscN c t
+   → | sym!"liftsc", [c, t] => liftscN c t
+  696: | "substfc", [v, t, f] => substfcN v t f
+   → | sym!"substfc", [v, t, f] => substfcN v t f
+  697: | "liftfc", [c, f] => liftfcN c f
+   → | sym!"liftfc", [c, f] => liftfcN c f
+  698: | "carc", [l] => carN l
+   → | sym!"carc", [l] => carN l
+  699: | "cdrc", [l] => cdrN l
+   → | sym!"cdrc", [l] => cdrN l
+  700: | "lenc", [l] => lenN l
+   → | sym!"lenc", [l] => lenN l
+  701: | "nthc", [l, i] => nthN l i
+   → | sym!"nthc", [l, i] => nthN l i
+  702: | "runFn", [c, r] => runFnN c r
+   → | sym!"runFn", [c, r] => runFnN c r
+  703: | "validProofFn", [c, r] => vpfN c r
+   → | sym!"validProofFn", [c, r] => vpfN c r
+  704: | "tcFn", [t] => tcFnN t
+   → | sym!"tcFn", [t] => tcFnN t
+  705: | "premsOf", [l] => premsOfN l
+   → | sym!"premsOf", [l] => premsOfN l
+  706: | "axiomsCodeT", [] => V
+   → | sym!"axiomsCodeT", [] => V
+  710: | "<", [a, b] => a < b
+   → | sym!"<", [a, b] => a < b
+  711: | "∈", [x, l] => memN x l
+   → | sym!"∈", [x, l] => memN x l
+  712: | "allIn", [c, l] => allInN c l
+   → | sym!"allIn", [c, l] => allInN c l
+  713: | "lineWF", [l] => lineWFN V l
+   → | sym!"lineWF", [l] => lineWFN V l
+  714: | "chainOk", [c, p] => chainOkN V c p
+   → | sym!"chainOk", [c, p] => chainOkN V c p
+  719: theorem MN_zero : (MNV V).func "0" [] = 0 := rfl
+   → theorem MN_zero : (MNV V).func sym!"0" [] = 0 := rfl
+  720: theorem MN_succ (a : Nat) : (MNV V).func "σ" [a] = a + 1 := rfl
+   → theorem MN_succ (a : Nat) : (MNV V).func sym!"σ" [a] = a + 1 := rfl
+  721: theorem MN_pred (a : Nat) : (MNV V).func "τ" [a] = a - 1 := rfl
+   → theorem MN_pred (a : Nat) : (MNV V).func sym!"τ" [a] = a - 1 := rfl
+  722: theorem MN_cons (a b : Nat) : (MNV V).func "::" [a, b] = consN a b := rfl
+   → theorem MN_cons (a b : Nat) : (MNV V).func sym!"::" [a, b] = consN a b := rfl
+  723: theorem MN_concat (a b : Nat) : (MNV V).func "##" [a, b] = concatN a b := rfl
+   → theorem MN_concat (a b : Nat) : (MNV V).func sym!"##" [a, b] = concatN a b := rfl
+  724: theorem MN_substtc (k s c : Nat) : (MNV V).func "substtc" [k, s, c] = substtcN k s c := rfl
+   → theorem MN_substtc (k s c : Nat) : (MNV V).func sym!"substtc" [k, s, c] = substtcN k s c := rfl
+  725: theorem MN_substtsc (k s c : Nat) : (MNV V).func "substtsc" [k, s, c] = substtscN k s c := rfl
+   → theorem MN_substtsc (k s c : Nat) : (MNV V).func sym!"substtsc" [k, s, c] = substtscN k s c := rfl
+  726: theorem MN_liftc (c t : Nat) : (MNV V).func "liftc" [c, t] = liftcN c t := rfl
+   → theorem MN_liftc (c t : Nat) : (MNV V).func sym!"liftc" [c, t] = liftcN c t := rfl
+  727: theorem MN_liftsc (c t : Nat) : (MNV V).func "liftsc" [c, t] = liftscN c t := rfl
+   → theorem MN_liftsc (c t : Nat) : (MNV V).func sym!"liftsc" [c, t] = liftscN c t := rfl
+  728: theorem MN_substfc (v t f : Nat) : (MNV V).func "substfc" [v, t, f] = substfcN v t f := rfl
+   → theorem MN_substfc (v t f : Nat) : (MNV V).func sym!"substfc" [v, t, f] = substfcN v t f := rfl
+  729: theorem MN_liftfc (c f : Nat) : (MNV V).func "liftfc" [c, f] = liftfcN c f := rfl
+   → theorem MN_liftfc (c f : Nat) : (MNV V).func sym!"liftfc" [c, f] = liftfcN c f := rfl
+  730: theorem MN_carc (l : Nat) : (MNV V).func "carc" [l] = carN l := rfl
+   → theorem MN_carc (l : Nat) : (MNV V).func sym!"carc" [l] = carN l := rfl
+  731: theorem MN_cdrc (l : Nat) : (MNV V).func "cdrc" [l] = cdrN l := rfl
+   → theorem MN_cdrc (l : Nat) : (MNV V).func sym!"cdrc" [l] = cdrN l := rfl
+  732: theorem MN_lenc (l : Nat) : (MNV V).func "lenc" [l] = lenN l := rfl
+   → theorem MN_lenc (l : Nat) : (MNV V).func sym!"lenc" [l] = lenN l := rfl
+  733: theorem MN_nthc (l i : Nat) : (MNV V).func "nthc" [l, i] = nthN l i := rfl
+   → theorem MN_nthc (l i : Nat) : (MNV V).func sym!"nthc" [l, i] = nthN l i := rfl
+  734: theorem MN_runFn (c r : Nat) : (MNV V).func "runFn" [c, r] = runFnN c r := rfl
+   → theorem MN_runFn (c r : Nat) : (MNV V).func sym!"runFn" [c, r] = runFnN c r := rfl
+  735: theorem MN_vpf (c r : Nat) : (MNV V).func "validProofFn" [c, r] = vpfN c r := rfl
+   → theorem MN_vpf (c r : Nat) : (MNV V).func sym!"validProofFn" [c, r] = vpfN c r := rfl
+  736: theorem MN_tcFn (t : Nat) : (MNV V).func "tcFn" [t] = tcFnN t := rfl
+   → theorem MN_tcFn (t : Nat) : (MNV V).func sym!"tcFn" [t] = tcFnN t := rfl
+  737: theorem MN_premsOf (l : Nat) : (MNV V).func "premsOf" [l] = premsOfN l := rfl
+   → theorem MN_premsOf (l : Nat) : (MNV V).func sym!"premsOf" [l] = premsOfN l := rfl
+  738: theorem MN_axiomsCodeT : (MNV V).func "axiomsCodeT" [] = V := rfl
+   → theorem MN_axiomsCodeT : (MNV V).func sym!"axiomsCodeT" [] = V := rfl
+  739: theorem MN_lt (a b : Nat) : (MNV V).rel "<" [a, b] = (a < b) := rfl
+   → theorem MN_lt (a b : Nat) : (MNV V).rel sym!"<" [a, b] = (a < b) := rfl
+  740: theorem MN_mem (x l : Nat) : (MNV V).rel "∈" [x, l] = memN x l := rfl
+   → theorem MN_mem (x l : Nat) : (MNV V).rel sym!"∈" [x, l] = memN x l := rfl
+  741: theorem MN_allIn (c l : Nat) : (MNV V).rel "allIn" [c, l] = allInN c l := rfl
+   → theorem MN_allIn (c l : Nat) : (MNV V).rel sym!"allIn" [c, l] = allInN c l := rfl
+  742: theorem MN_lineWF (l : Nat) : (MNV V).rel "lineWF" [l] = lineWFN V l := rfl
+   → theorem MN_lineWF (l : Nat) : (MNV V).rel sym!"lineWF" [l] = lineWFN V l := rfl
+  743: theorem MN_chainOk (c p : Nat) : (MNV V).rel "chainOk" [c, p] = chainOkN V c p := rfl
+   → theorem MN_chainOk (c p : Nat) : (MNV V).rel sym!"chainOk" [c, p] = chainOkN V c p := rfl
+  760: theorem ev_strCodeM (v : Nat → Nat) (s : String) : evalTerm (MNV V) v (strCodeM s) = codeNatStr s :=
+   → theorem ev_strCodeM (v : Nat → Nat) (s : List Char) : evalTerm (MNV V) v (strCodeM s) = codeNatStr s :=
+===== sondeos/RecodCoste.lean 10 líneas
+  69: partial def symsT : Term → List String
+   → partial def symsT : Term → List (List Char)
+  72: partial def symsF : Formula → List String
+   → partial def symsF : Formula → List (List Char)
+  83: def tabla : List String :=
+   → def tabla : List (List Char) :=
+  86: "::", "carc", "cdrc", "lenc", "nthc", "liftc", "liftfc", "liftsc",
+   → sym!"::", sym!"carc", sym!"cdrc", sym!"lenc", sym!"nthc", sym!"liftc", sym!"liftfc", sym!"liftsc",
+  87: "substfc", "substtc", "substtsc", "tcFn", "runFn", "premsOf", "validProofFn", "axiomsCodeT"]
+   → sym!"substfc", sym!"substtc", sym!"substtsc", sym!"tcFn", sym!"runFn", sym!"premsOf", sym!"validProofFn", sym!"axiomsCodeT"]
+  88: def idxOf (s : String) : Nat := (tabla.findIdx? (· == s)).getD 99
+   → def idxOf (s : List Char) : Nat := (tabla.findIdx? (· == s)).getD 99
+  90: partial def report (nombre : String) (f : Formula) : String :=
+   → partial def report (nombre : List Char) (f : Formula) : List Char :=
+  99: #eval report "ax_tc_zero     " ax_tc_zero
+   → #eval report sym!"ax_tc_zero     " ax_tc_zero
+  100: #eval report "ax_L0_cons_def " ax_L0_cons_def
+   → #eval report sym!"ax_L0_cons_def " ax_L0_cons_def
+  101: #eval report "ax4_add_zero   " ax4_add_zero
+   → #eval report sym!"ax4_add_zero   " ax4_add_zero
+===== sondeos/RosserReflexion.lean 3 líneas
+  70: theorem ev_strCode (v : Nat → Nat) (s : String) :
+   → theorem ev_strCode (v : Nat → Nat) (s : List Char) :
+  83: = consN 4 (consN (consN 1 (consN (codeNatStr "substfc")
+   → = consN 4 (consN (consN 1 (consN (codeNatStr sym!"substfc")
+  94: = consN 4 (consN (consN 1 (consN (codeNatStr "liftfc")
+   → = consN 4 (consN (consN 1 (consN (codeNatStr sym!"liftfc")
+===== sondeos/SymbolParamCoste.lean 2 líneas
+  57: instance : FreshSym String where
+   → instance : FreshSym (List Char) where
+  78: instance : EnumSym String where
+   → instance : EnumSym (List Char) where
+TOTAL 105

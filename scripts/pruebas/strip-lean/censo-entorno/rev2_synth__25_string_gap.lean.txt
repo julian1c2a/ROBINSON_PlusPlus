@@ -1,0 +1,2 @@
+def sg : String := "abc\
+    def" ++ toString (sorry : Nat)

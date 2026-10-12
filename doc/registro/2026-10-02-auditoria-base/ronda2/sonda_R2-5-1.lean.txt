@@ -1,0 +1,14 @@
+-- ROBINSON_PlusPlus/Controles/Firmas.lean — DENTRO de la lean_lib: rompe si entra o sale una hipótesis
+import ROBINSON_PlusPlus
+open FOL ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.GodelTwoPrf
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwo
+open ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.Representability2Prf
+-- hoy
+example [AnclaEq] : ConsistentH → ¬ Prf godelCN := goedel_first_prf
+example [AnclaEq] : ConsistentH → ¬ Prf consistencyFormula' := goedel_second_prf
+example : Prf (godelCN ⇔ neg (provCodeC' godelCN)) := prf_godelCN_fixedpoint
+-- el día del arreglo de F1 (instance : AnclaEq), en el MISMO commit:
+-- example : ConsistentH → ¬ Prf godelCN := goedel_first_prf
+-- example : ConsistentH → ¬ Prf consistencyFormula' := goedel_second_prf
+-- y en el manifiesto de check-sondeos: AnclaEqInconsistente.lean | FALLA (si compila: Prf ⊥)
+-- (sin compilar; los nombres de los open pueden necesitar ajuste)

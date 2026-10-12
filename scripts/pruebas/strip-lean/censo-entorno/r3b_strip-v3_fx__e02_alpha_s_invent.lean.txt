@@ -1,0 +1,2 @@
+def φs! (s : String) : String := s
+def w := φs! "{sorry}"

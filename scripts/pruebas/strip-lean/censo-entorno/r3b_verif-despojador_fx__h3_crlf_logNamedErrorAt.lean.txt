@@ -1,0 +1,5 @@
+import Lean
+open Lean
+def g (stx : Syntax) : CoreM Unit := do
+  logNamedErrorAt stx
+    lean.foo "a {(sorry : Nat)}"

@@ -35,3 +35,6 @@ OptionB_Probe*.lean
 *_files/
 ROBINSON_PlusPlus/Sugerencias.md
 Sugerencias.md
+
+# Salida de scripts/sondeos_todos.ps1 (las tablas que valen se copian a sondeos/pasadas/)
+sondeos/pasadas/salida/

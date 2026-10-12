@@ -1,0 +1,66 @@
+import FOL.FOL
+import FOL.MetaRules
+import FOL.Finitary0
+/-! Sonda L1-3 · `imp_intro` (o `raa`) sola demuestra `False`. Detalles tácticos a ajustar. -/
+open FOL.Finitary0
+namespace SondaL1c
+theorem tval_localRule (a : Bool) {s s' : Formula} (h : LocalRule s s') : tval a s' = tval a s := by
+  cases h with
+  | commuteImpl A B C => simp only [tval]; cases tval a A <;> cases tval a B <;> rfl
+theorem tval_replaceAt (a : Bool) (p : Pos) : ∀ (f s s' : Formula),
+    getAt? f p = some s → tval a s' = tval a s → tval a (replaceAt f p s') = tval a f := by
+  induction p with
+  | root => intro f s s' hg hv; simp only [getAt?, Option.some.injEq] at hg; subst hg; simpa [replaceAt] using hv
+  | left p ih => intro f s s' hg hv; cases f <;> simp [getAt?] at hg <;> simp only [replaceAt, tval, ih _ s s' hg hv]
+  | right p ih => intro f s s' hg hv; cases f <;> simp [getAt?] at hg <;> simp only [replaceAt, tval, ih _ s s' hg hv]
+  | body p ih => intro f s s' hg hv; cases f <;> simp [getAt?] at hg <;> simp only [replaceAt, tval, ih _ s s' hg hv]
+/-- Los 22 constructores de `Derives` son sólidos para `tval`. -/
+theorem derives_tval {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) :
+    ∀ a, allTrue a Γ → tval a f = true := by
+  induction h with
+  | hyp _ _ hf => exact fun a hΓ => hΓ _ hf
+  | intro_impl _ A _ _ ih =>
+      intro a hΓ; cases hA : tval a A
+      · simp [tval, hA]
+      · simp [tval, hA, ih a (allTrue_cons hA hΓ)]
+  | elim_impl _ _ _ _ _ ih1 ih2 => intro a hΓ; have h1 := ih1 a hΓ; have h2 := ih2 a hΓ; simp_all [tval]
+  | intro_and _ _ _ _ _ ih1 ih2 => intro a hΓ; simp [tval, ih1 a hΓ, ih2 a hΓ]
+  | elim_and_l _ _ _ _ ih => intro a hΓ; have := ih a hΓ; simp_all [tval]
+  | elim_and_r _ _ _ _ ih => intro a hΓ; have := ih a hΓ; simp_all [tval]
+  | intro_or_l _ _ _ _ ih => intro a hΓ; simp [tval, ih a hΓ]
+  | intro_or_r _ _ _ _ ih => intro a hΓ; simp [tval, ih a hΓ]
+  | elim_or _ _ _ _ _ _ _ ih ih1 ih2 =>
+      intro a hΓ; have h := ih a hΓ; simp only [tval, Bool.or_eq_true] at h
+      rcases h with h | h
+      · exact ih1 a (allTrue_cons h hΓ)
+      · exact ih2 a (allTrue_cons h hΓ)
+  | intro_forall _ _ _ ih => intro a hΓ; simpa [tval] using ih a (allTrue_lift hΓ)
+  | elim_forall _ _ _ _ ih => intro a hΓ; rw [tval_subst]; simpa [tval] using ih a hΓ
+  | intro_ex _ _ _ _ ih => intro a hΓ; have := ih a hΓ; rw [tval_subst] at this; simpa [tval] using this
+  | elim_ex _ A _ _ _ ih1 ih2 =>
+      intro a hΓ; have hA : tval a A = true := by simpa [tval] using ih1 a hΓ
+      have := ih2 a (allTrue_cons hA (allTrue_lift hΓ)); rwa [tval_lift] at this
+  | bot_elim _ _ _ ih => intro a hΓ; have := ih a hΓ; simp [tval] at this
+  | weakening _ _ _ _ hs ih => intro a hΓ; exact ih a (allTrue_sub hs hΓ)
+  | rewrite_at _ f _ p s s' _ hg hr he ih =>
+      intro a hΓ; subst he; rw [tval_replaceAt a p f s s' hg (tval_localRule a hr)]; exact ih a hΓ
+  | gen_rule _ _ _ ih => intro a hΓ; have := ih (.var 0) a hΓ; rw [tval_subst] at this; simpa [tval] using this
+  | dne_rule _ A _ ih => intro a hΓ; have := ih a hΓ; cases hA : tval a A <;> simp_all [tval, neg]
+  | dne_schema _ A => intro a _; cases hA : tval a A <;> simp [tval, neg, hA]
+  | forall_not_ex_not _ A => intro a _; cases hA : tval a A <;> simp [tval, neg, hA]
+  | refl _ _ => intro _ _; rfl
+  | subst _ _ _ _ _ _ _ ih2 => intro a hΓ; have := ih2 a hΓ; rw [tval_subst] at this ⊢; exact this
+theorem P_no : Not (([] : List Formula) ⊢ Formula.atom "P" []) := fun h => by
+  have := derives_tval h false (fun _ hx => absurd hx List.not_mem_nil); simp [tval] at this
+theorem imp_intro_false : False := by
+  have := derives_tval (FOL.MetaRules.imp_intro (Γ := []) (A := Formula.atom "P" [])
+    (B := Formula.bottom) (fun h => absurd h P_no)) true (fun _ hx => absurd hx List.not_mem_nil)
+  simp [tval] at this
+theorem raa_false : False := by
+  have := derives_tval (FOL.MetaRules.raa (Γ := []) (A := Formula.atom "P" [])
+    (fun h => absurd h P_no)) true (fun _ hx => absurd hx List.not_mem_nil)
+  simp [tval, neg] at this
+end SondaL1c
+#print axioms SondaL1c.derives_tval
+#print axioms SondaL1c.imp_intro_false
+#print axioms SondaL1c.raa_false

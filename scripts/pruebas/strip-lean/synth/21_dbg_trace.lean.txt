@@ -1,0 +1,1 @@
+def dt : Nat := dbg_trace "v {(sorry : Nat)}"; 0

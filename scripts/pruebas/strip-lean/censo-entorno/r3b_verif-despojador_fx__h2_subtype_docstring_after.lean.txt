@@ -1,0 +1,5 @@
+def NegInt := { x : Int //-x > 0 }
+/-- doc -/
+theorem bar : True := sorry
+/-- otro -/
+axiom ax : False

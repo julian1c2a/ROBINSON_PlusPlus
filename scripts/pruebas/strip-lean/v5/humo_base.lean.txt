@@ -1,0 +1,28 @@
+-- sorry
+"sorry" -- una cadena
+/- sorry -/ sorry -- 1
+('"', sorry) -- 2: '"' es un carácter, no abre cadena
+s!"v {(sorry : Nat)}" -- 3: el código de una interpolación
+theorem «a--b» : True := sorry -- 4: «…» es opaco
+/-/- x -/ sorry -- 5: `/-` consume tres caracteres
+r#"sorry"# -- una cadena en bruto
+"uno
+sorry dos" -- una cadena de dos líneas
+by admit -- 6
+throwError "x {(sorry : Nat)}" -- 7: throwError interpola
+#eval !"{".isEmpty -- `!"…"` es el not de una cadena normal: su `{` no abre nada
+sorry -- 8
+s!"a {s!"b {(sorry : Nat)} c"} d" -- 9: interpolaciones anidadas
+⟨'«', "»", sorry⟩ -- 10: un carácter tras un símbolo no ASCII
+⟨r"\", sorry⟩ -- 11: una cadena en bruto tras un símbolo no ASCII
+exact/- c -/sorry -- 12: un comentario es espacio
+_root_.sorryAx Nat -- 13
+(`sorryAx, h₀', Γ') -- un literal de nombre y dos primas
+def b := !s!"{(sorry : Nat)}".isEmpty -- 14: el not de una interpolada
+def N := { x : Int //-x > 0 }
+sorry -- 15: `//` es un token, y lo que le sigue no abre comentario
+def u := p |>.r"\"" sorry "x" -- 16: tras `|>.`, `r` es un identificador y su cadena es normal
+def g := f '
+'"' "
+sorry -- 17: un carácter que es un salto de línea literal
+def w := φs! "{sorry}" -- `φs!` es UN identificador: su cadena es normal

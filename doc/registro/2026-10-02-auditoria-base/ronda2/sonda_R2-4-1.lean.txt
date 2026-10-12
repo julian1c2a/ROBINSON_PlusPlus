@@ -1,0 +1,102 @@
+-- sondeos/DerivesEsDerives0.lean (RPP). SIN COMPILAR. NO importa FOL.MetaRules.
+import FOL.Fresh0
+import FOL.Soundness0
+import FOL.Propositional0
+
+open FOL.Eigenvariable FOL.Lift0 FOL.Fresh0 FOL.Metamath.Semantics
+open FOL.Metamath.Soundness0 (Mtrue Mfalse P)
+
+namespace SondaR2L4
+
+/-- El nucleo de `Henkin0.abs_neg_witness` (:163) sin el `neg`. -/
+theorem abs_witness (c : String) (A : Formula) (hcA : Not (occursFormula c A)) :
+    absFormula c 0 (substFormula 0 (Term.func c []) A) = A := by
+  rw [absFormula_subst c A 0 0 (Nat.le_refl 0), absFormula_eq_lift c A 1 hcA]
+  have hc : absTerm c 0 (Term.func c []) = Term.var 0 := by simp [absTerm]
+  rw [hc, substFormula_lift_var A 0]
+
+/-- Sin MetaRules, los 22 constructores de `Derives` se traducen a `Derives₀`;
+`gen_rule` es ADMISIBLE: basta su premisa en UNA constante fresca. -/
+theorem derives_to_derives0 {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) : Γ ⊢₀ f := by
+  induction h with
+  | hyp Γ f hm => exact Derives₀.hyp Γ f hm
+  | intro_impl Γ A B _ ih => exact Derives₀.intro_impl Γ A B ih
+  | elim_impl Γ A B _ _ ih1 ih2 => exact Derives₀.elim_impl Γ A B ih1 ih2
+  | intro_and Γ A B _ _ ih1 ih2 => exact Derives₀.intro_and Γ A B ih1 ih2
+  | elim_and_l Γ A B _ ih => exact Derives₀.elim_and_l Γ A B ih
+  | elim_and_r Γ A B _ ih => exact Derives₀.elim_and_r Γ A B ih
+  | intro_or_l Γ A B _ ih => exact Derives₀.intro_or_l Γ A B ih
+  | intro_or_r Γ A B _ ih => exact Derives₀.intro_or_r Γ A B ih
+  | elim_or Γ A B C _ _ _ ih1 ih2 ih3 => exact Derives₀.elim_or Γ A B C ih1 ih2 ih3
+  | intro_forall Γ A _ ih => exact Derives₀.intro_forall Γ A ih
+  | elim_forall Γ A t _ ih => exact Derives₀.elim_forall Γ A t ih
+  | intro_ex Γ A t _ ih => exact Derives₀.intro_ex Γ A t ih
+  | elim_ex Γ A B _ _ ih1 ih2 => exact Derives₀.elim_ex Γ A B ih1 ih2
+  | bot_elim Γ A _ ih => exact Derives₀.bot_elim Γ A ih
+  | weakening Γ Γ' f _ hsub ih => exact Derives₀.weakening Γ Γ' f ih hsub
+  | rewrite_at Γ f f' p sub sub' _ hget hrule heq ih =>
+      exact Derives₀.rewrite_at Γ f f' p sub sub' ih hget hrule heq
+  | gen_rule Γ A _ ih =>
+      obtain ⟨N1, h1⟩ := cst_bound_list Γ
+      obtain ⟨N2, h2⟩ := cst_bound_formula A
+      have hΓ := h1 (max N1 N2) (Nat.le_max_left _ _)
+      have hA := h2 (max N1 N2) (Nat.le_max_right _ _)
+      have h := derives0_gen_fresh (cst (max N1 N2)) hΓ (ih (Term.func (cst (max N1 N2)) []))
+      rwa [abs_witness _ A hA] at h
+  | dne_rule Γ A _ ih => exact Derives₀.dne_rule Γ A ih
+  | dne_schema Γ A => exact Derives₀.dne_schema Γ A
+  | forall_not_ex_not Γ A => exact Derives₀.forall_not_ex_not Γ A
+  | refl Γ t => exact Derives₀.refl Γ t
+  | subst Γ t₁ t₂ f _ _ ih1 ih2 => exact Derives₀.subst Γ t₁ t₂ f ih1 ih2
+
+/-- La solidez de TARSKI de `Derives`: la que los docstrings de FOL llaman FALSA. -/
+theorem derives_soundness {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) : satisfies Γ f :=
+  derives0_soundness (derives_to_derives0 h)
+
+private def MB : Model Bool := ⟨fun _ _ => false, fun _ ds => ds = [true]⟩
+private def vB : Nat → Bool := fun _ => false
+private def PA : Formula := Formula.atom "P" [Term.var 0]
+
+/-- El ENUNCIADO de `ex_elim`, refutado sin usarlo (modelo de dos puntos). -/
+theorem ex_elim_refutable :
+    Not (∀ {Γ : List Formula} {A C : Formula}, (Γ ⊢ Formula.ex A) →
+      (∀ t : Term, (Γ ⊢ substFormula 0 t A) → (Γ ⊢ C)) → (Γ ⊢ C)) := by
+  intro hex
+  have hΓ : contextSatisfies MB vB [Formula.ex PA] := by
+    intro g hg
+    cases hg with
+    | head => simp [PA, MB, evalFormula, evalTerms, evalTerm, shiftEnv]
+    | tail _ h => exact absurd h List.not_mem_nil
+  have hterm : ∀ t : Term, evalTerm MB vB t = false := by
+    intro t; cases t <;> simp [evalTerm, MB, vB]
+  have hno : ∀ t : Term, Not ([Formula.ex PA] ⊢ substFormula 0 t PA) := by
+    intro t ht
+    have := derives_soundness ht Bool MB vB hΓ
+    simp [PA, MB, substFormula, substTerms, substTerm, evalFormula, evalTerms] at this
+    exact absurd this (by simpa [MB] using hterm t)
+  exact derives_soundness
+    (hex (Γ := [Formula.ex PA]) (A := PA) (C := Formula.bottom)
+      (Derives.hyp _ _ (List.Mem.head _)) (fun t ht => absurd ht (hno t)))
+    Bool MB vB hΓ
+
+/-- El ENUNCIADO de `or_elim`, refutado sin usarlo (tercio excluso y los dos modelos sobre Unit). -/
+theorem or_elim_refutable :
+    Not (∀ {Γ : List Formula} {A B C : Formula}, (Γ ⊢ Formula.or A B) →
+      ((Γ ⊢ A) → (Γ ⊢ C)) → ((Γ ⊢ B) → (Γ ⊢ C)) → (Γ ⊢ C)) := by
+  intro hor
+  have hem : ([] : List Formula) ⊢ Formula.or P (neg P) :=
+    derives0_to_derives (FOL.Propositional0.derives0_em_ctx [] P)
+  have h1 : Not (([] : List Formula) ⊢ P) := fun h =>
+    derives_soundness h Unit Mfalse (fun _ => ()) (fun _ hf => absurd hf List.not_mem_nil)
+  have h2 : Not (([] : List Formula) ⊢ neg P) := fun h =>
+    derives_soundness h Unit Mtrue (fun _ => ()) (fun _ hf => absurd hf List.not_mem_nil) trivial
+  exact derives0_consistent (derives_to_derives0
+    (hor (Γ := []) (A := P) (B := neg P) (C := Formula.bottom) hem
+      (fun h => absurd h h1) (fun h => absurd h h2)))
+
+end SondaR2L4
+
+#print axioms SondaR2L4.derives_to_derives0  -- ESTIMACION: [propext, Quot.sound]
+#print axioms SondaR2L4.derives_soundness    -- ESTIMACION: [propext, Classical.choice, Quot.sound]
+#print axioms SondaR2L4.ex_elim_refutable
+#print axioms SondaR2L4.or_elim_refutable

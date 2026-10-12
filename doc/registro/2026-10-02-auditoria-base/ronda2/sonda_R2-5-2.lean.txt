@@ -1,0 +1,15 @@
+import ROBINSON_PlusPlus
+open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ChainPrf ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.CodeNatInjPrf
+/-- Distinción de códigos DENTRO de Prf, sin ⊢ ni raa (L2-5(c) decía que sólo existe sobre ⊢). -/
+theorem prf_formCode_ne {φ ψ : Formula} (h : φ ≠ ψ) :
+    Prf (Formula.impl (formCode φ =eq formCode ψ) Formula.bottom) := by
+  have hne := ROBINSON_PlusPlus.Meta.CodeWitnessPrf.crit_num_ne (codeNat φ) (codeNat ψ)
+    (fun e => h (codeNat_inj e))
+  rw [ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq, ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq] at hne
+  exact prf_deduction (PrfH.mp _ _ _ (prf_to_prfH hne _)
+    (PrfH_eq_trans (PrfH_eq_trans (prf_to_prfH (prf_eq_symm (prf_formCode_numeral φ)) _)
+      (prfH_hyp_self _)) (prf_to_prfH (prf_formCode_numeral ψ) _)))
+#print axioms prf_formCode_ne   -- esperado: [propext, Classical.choice, Quot.sound]
+-- (sin compilar; PrfH_eq_trans/prfH_hyp_self/prf_to_prfH como en sondeos/PrfBotCodificacionVieja.lean §3)

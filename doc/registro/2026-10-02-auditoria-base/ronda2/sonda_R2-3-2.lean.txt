@@ -1,0 +1,20 @@
+-- reutiliza psiT, nPsi y axNew de la sonda R2-3-1 (mismo fichero, mismo namespace)
+/-- Sustituto ESTRUCTURAL del rfl de axioms_lift_eq (patron de ax_axiomsCodeT_lift, retirado en 7ae7b7b). -/
+theorem axNew_lift (c : Nat) : liftFormula c axNew = axNew := by
+  simp only [axNew, nPsi, liftFormula, axiomsCodeT, concat, cons, nil, zero, substfc, tcFn,
+    liftTerm, liftTerms, liftTerm_listFormCodeM, liftTerm_numeralM]
+
+/-- Control: el rfl NO cierra sobre el numeral (debe fallar por heartbeats; ni colgar ni dar verde). -/
+set_option maxHeartbeats 20000 in
+example : liftTerm 0 nPsi = nPsi := by
+  fail_if_success rfl
+  exact liftTerm_numeralM 0 _
+
+/-- La forma que tendra axioms_lift_eq con el ancla al final (aqui sobre una copia local). -/
+example : (axioms ++ [axNew]).map (liftFormula 0) = axioms ++ [axNew] := by
+  simp only [List.map_append, List.map_cons, List.map_nil,
+    ROBINSON_PlusPlus.Meta.Hilbert.axioms_lift_eq, axNew_lift]
+
+-- En el arbol (Hilbert.lean:69-71), tras el arreglo:
+--   simp only [axioms, List.map_cons, List.map_nil, ax_axiomsCodeT_def_lift]
+--   rfl

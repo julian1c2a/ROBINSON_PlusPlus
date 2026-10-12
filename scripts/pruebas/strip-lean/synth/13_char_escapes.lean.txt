@@ -1,0 +1,1 @@
+example : List Char × Nat := (['\x41', '\u03B1', '\\', '\'', '\"', '"', '\t'], sorry)

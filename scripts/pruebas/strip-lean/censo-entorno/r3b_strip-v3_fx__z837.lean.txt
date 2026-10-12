@@ -1,0 +1,11 @@
+'𝔸' /- c -/ throwError"é{'#'
+
+} {f! "\{" /- c -/ } r#"----
+a"#'»' r"\/-}--" }" throwErrorAt (← getRef)""
+
+r##"##"{"## /- c -/ {ℕstop -- c
+logNamedWarning lean.w
+  "" --{r"}
+ ·
+
+_root_.sorryAx }/-c-/"\x41»" 

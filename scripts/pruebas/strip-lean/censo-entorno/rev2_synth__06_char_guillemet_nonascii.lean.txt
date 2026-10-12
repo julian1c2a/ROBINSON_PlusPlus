@@ -1,0 +1,1 @@
+def c : Char × String × Nat := ⟨'«', "»", sorry⟩

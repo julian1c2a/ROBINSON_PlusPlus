@@ -1,0 +1,12 @@
+-- Tras el arreglo (reutiliza occF y compania del sondeo F1):
+/-- Ahora son TRES los axiomas que nombran axiomsCodeT; el rfl vigila tambien la orientacion
+    (con axiomsCodeT a la derecha, occF recorreria el numeral y no terminaria). -/
+theorem filtro_occ' :
+    List.filter occF axioms = [ax_vpf_thy, ax_lineWF_thy, ax_axiomsCodeT_def] := by
+  set_option maxRecDepth 20000 in rfl
+
+/-- El ancla ya NO es una hipotesis: tiene instancia. -/
+example : AnclaEq := inferInstance
+
+/-- Control 3 invertido: in_rr_imp compila ahora SIN [AnclaEq] explicita. -/
+example (c : Term) : Prf (In c rr ⇒ In c axiomsCodeT) := in_rr_imp c

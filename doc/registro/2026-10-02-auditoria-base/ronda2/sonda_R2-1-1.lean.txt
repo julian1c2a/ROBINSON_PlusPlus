@@ -1,0 +1,17 @@
+-- ESQUELETO A2/A3 (SIN COMPILAR: la forma, no las pruebas). Va encima de la sonda de R2-1-2 (wN, descompone, Estandar).
+def unpairN (h : Nat) : Nat × Nat := (wN h - (h - triN (wN h)), h - triN (wN h))
+def carcN : Nat → Nat | 0 => 0 | m + 1 => (unpairN m).1   -- carc 0: valor LIBRE (aquí 0)
+def cdrcN : Nat → Nat | 0 => 0 | m + 1 => (unpairN m).2
+theorem consN_unpair (m : Nat) : consN (carcN (m+1)) (cdrcN (m+1)) = m + 1  -- = descompone
+theorem carcN_consN (a b : Nat) : carcN (consN a b) = a ∧ cdrcN (consN a b) = b  -- consN_inj
+-- A2: inN, concatN y prodpN por recursión bien fundada sobre la cola (cdrcN (m+1) < m+1);
+--     prodpN desempareja la CABEZA con unpairN (ax_prodp_cons pide cons (pair p e) t).
+-- A3, en este orden y sin ciclos: lencN, nthcN → substtcN⊕substtscN → liftcN⊕liftscN → substfcN →
+--     liftfcN → tcFnN (recursión 0 / n+1) → vpfN (incondicional en las 21 formas: los
+--     condicionales mp/gen/thy valen igual) → runFnN → allInN → premsOfN →
+--     lineWFN L := evalFormula MN₀ (shiftEnv v L) (⋁_{k≤20} (nthc #0 1̄ = k̄ ∧ RHS_k)), con MN₀ sin
+--     lineWF/chainOk y un lema de irrelevancia de símbolos → chainOkN (recursión sobre la cola).
+-- MN : Model Nat := match sobre los 33 nombres de Axioms.lean:34-61 y :452-991; el resto ↦ 0 / False.
+-- theorem axioms_MN : ∀ v, contextSatisfies MN v axioms        -- 9 + 107 + re-ejecutar los 25 (M-13)
+-- theorem estandar_MN : Estandar MN := ⟨rfl, fun _ => rfl, fun _ _ => rfl, axioms_MN⟩
+-- theorem consistentH : ConsistentH := consistentH_de estandar_MN   -- en producción: CONTROL de build

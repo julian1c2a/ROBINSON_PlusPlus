@@ -1,0 +1,15 @@
+import ROBINSON_PlusPlus.Meta
+open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.DiagonalTwo
+
+-- Lo que `axioms_lift_eq` (Hilbert.lean:69, rfl) tendría que hacer con UN axioma que lleve el numeral
+-- de un código. maxHeartbeats bajo para que FALLE en vez de colgar.
+set_option maxHeartbeats 20000 in
+set_option maxRecDepth 20000 in
+example : liftFormula 0 (axiomsCodeT =eq numeral (codeNat godelBeta')) =
+    (axiomsCodeT =eq numeral (codeNat godelBeta')) := by rfl   -- esperado: timeout / maxRecDepth
+
+-- La vía estructural (la que necesitaría un axioms_lift_eq nuevo) sí cierra:
+example : liftFormula 0 (axiomsCodeT =eq numeral (codeNat godelBeta')) =
+    (axiomsCodeT =eq numeral (codeNat godelBeta')) := by
+  simp only [liftFormula, liftTerm, liftTerms, axiomsCodeT, ← numeralM_eq, liftTerm_numeralM]

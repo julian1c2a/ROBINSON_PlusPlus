@@ -1,0 +1,2 @@
+def h (n : Nat) (s : String) : String := s
+def k := h 1s!"{(sorry : Nat)}"

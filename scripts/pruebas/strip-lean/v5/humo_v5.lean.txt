@@ -1,0 +1,65 @@
+-- sorry
+"sorry" -- una cadena
+/- sorry -/ sorry -- 1
+('"', sorry) -- 2: '"' es un carácter, no abre cadena
+s!"v {(sorry : Nat)}" -- 3: el código de una interpolación
+theorem «a--b» : True := sorry -- 4: «…» es opaco
+/-/- x -/ sorry -- 5: `/-` consume tres caracteres
+r#"sorry"# -- una cadena en bruto
+"uno
+sorry dos" -- una cadena de dos líneas
+by admit -- 6
+throwError "x {(sorry : Nat)}" -- 7: throwError interpola
+#eval !"{".isEmpty -- `!"…"` es el not de una cadena normal: su `{` no abre nada
+sorry -- 8
+s!"a {s!"b {(sorry : Nat)} c"} d" -- 9: interpolaciones anidadas
+⟨'«', "»", sorry⟩ -- 10: un carácter tras un símbolo no ASCII
+⟨r"\", sorry⟩ -- 11: una cadena en bruto tras un símbolo no ASCII
+exact/- c -/sorry -- 12: un comentario es espacio
+_root_.sorryAx Nat -- 13
+(`sorryAx, h₀', Γ') -- un literal de nombre y dos primas
+def b := !s!"{(sorry : Nat)}".isEmpty -- 14: el not de una interpolada
+def N := { x : Int //-x > 0 }
+sorry -- 15: `//` es un token, y lo que le sigue no abre comentario
+def u := p |>.r"\"" sorry "x" -- 16: tras `|>.`, `r` es un identificador y su cadena es normal
+def g := f '
+'"' "
+sorry -- 17: un carácter que es un salto de línea literal
+def w := φs! "{sorry}" -- `φs!` es UN identificador: su cadena es normal
+theorem t18 (p q : Prop) (hp : p) : p \/-- la izquierda
+  q := Or.inl sorry -- 18: `\/` es un token
+def m : IO Int := do
+  let x <-- sorry -- 19: `<-` es un token
+  return x
+def u := f `r"\"" sorry "x" -- 20: tras la comilla invertida, `r` es un identificador
+def U := Nat ⊕'"'" = "x"
+theorem t21 : True := sorry -- 21: `⊕'` es un token
+def k := 0...s!"{(sorry : Nat)}".length -- 22: `..` + `s!`
+  throwErrorAt stx[0] "b {(sorry : Nat)}" -- 23: throwErrorAt x[…]
+  throwErrorAt (← getRef) "c {(sorry : Nat)}" -- 24: throwErrorAt (…)
+def pl : IO Unit := println! "v {(sorry : Nat)}" -- 25
+def dt : Nat := dbg_trace "v {(sorry : Nat)}"; 0 -- 26
+  trace[Meta.debug] "x {(sorry : Nat)}" -- 27
+  Macro.trace[foo] "z {(sorry : Nat)}" -- 28
+  logInfo m!"m {(sorry : Nat)}" -- 29
+  let s := f!"f {(sorry : Nat)}" -- 30
+  throwNamedError
+    lean.foo "a {(sorry : Nat)}" -- 31
+  logNamedErrorAt stx
+    lean.foo "a {(sorry : Nat)}" -- 32
+/- a /- b -/ "c -/
+theorem t33 : True := sorry -- 33: los comentarios anidan
+/- sorry -/
+def r := r#"a "b"#
+theorem t34 : True := sorry -- 34: la cadena en bruto acaba en `"#`
+/- Says "hi -/
+theorem t35 : True := sorry -- 35: una comilla dentro de un comentario
+def q := p.1'"'
+theorem t36 : True := sorry -- 36: tras `p.1`, `'"'` es un carácter
+def f (args : Array Syntax) : MetaM Unit := throwErrorAt args[0]! "falta {(sorry : Nat)}" -- 37: throwErrorAt x[i]!
+def f2 (a b : Nat) : Nat := a <<<-- "
+  b
+theorem t38 : True := sorry -- 38: `<<<` es un token, y lo de detrás un comentario
+def nb := s!"{({a := 1} : P).a} y" -- llaves anidadas dentro de una interpolación
+theorem t39 : True := sorry -- 39: detrás de las llaves anidadas
+def w2 := x₁throwError "{sorry}" -- `x₁throwError` es UN identificador: su cadena es normal

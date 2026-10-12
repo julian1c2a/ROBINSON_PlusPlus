@@ -1,0 +1,72 @@
+import ROBINSON_PlusPlus.Meta
+/-! SONDA R2-3 · el ancla por el axioma diagonal (L2-3), SIN tocar Minimal. Sobre master 1dac85a es
+    CONDICIONAL en `Prf axNew`; tras el arreglo esa hipotesis es `prf_ax` sobre el `axioms` de 142.
+    Zanja: (1) delta se evalua a ⌜axNew⌝ sin exponer el numeral; (2) la cola es ⌜axioms ++ [axNew]⌝;
+    (3) footprint net-0. -/
+open FOL ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.Godel ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.Representability ROBINSON_PlusPlus.Meta.Diagonal
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.Representability2Prf
+
+namespace Sondeos.AnclaDiagonalR2
+
+/-- Falta en el arbol (grep vacio): gemelo de `liftTerm_listFormCodeM` (Axioms.lean:670). -/
+theorem substTerm_listFormCodeM (v : Nat) (s : Term) :
+    ∀ L : List Formula, substTerm v s (listFormCodeM L) = listFormCodeM L
+  | [] => rfl
+  | f :: fs => by
+      simp only [listFormCodeM, cons, substTerm, substTerms, substTerm_formCodeM v s f,
+        substTerm_listFormCodeM v s fs]
+
+/-- `diagTerm` a nivel Minimal (`numeral 0` ≡ `zero`). -/
+def diagTermM : Term := substfc zero (tcFn (.var 0)) (.var 0)
+theorem diagTermM_eq : diagTermM = diagTerm := rfl
+
+/-- Plantilla: hueco en la RAIZ y `axiomsCodeT` a la IZQUIERDA (para que `occF` corte). -/
+def psiT : Formula := axiomsCodeT =eq concat (listFormCodeM axioms) (cons diagTermM nil)
+noncomputable def nPsi : Term := numeralM (codeNat psiT)
+/-- El axioma nuevo, en forma REDUCIDA (sin `substFormula` en la raiz). -/
+noncomputable def axNew : Formula :=
+  axiomsCodeT =eq concat (listFormCodeM axioms) (cons (substfc zero (tcFn nPsi) nPsi) nil)
+
+/-- (i) `axNew` ES `selfAppN psiT`: sintactico, no evalua el numeral. -/
+theorem axNew_selfApp : axNew = selfAppN psiT := by
+  rw [selfAppN, ← numeralM_eq]
+  simp only [axNew, nPsi, psiT, diagTermM, substFormula, axiomsCodeT, concat, cons, nil, zero,
+    substfc, tcFn, substTerm, substTerms, substTerm_listFormCodeM, if_true]
+
+/-- (ii) delta = ⌜axNew⌝, con `prf_diag_arith_num` tal cual. -/
+theorem prf_delta : Prf (substfc zero (tcFn nPsi) nPsi =eq formCodeM axNew) := by
+  have h1 := prf_diag_arith_num psiT
+  have hl : substTerm 0 (numeral (codeNat psiT)) diagTerm = substfc zero (tcFn nPsi) nPsi := by
+    rw [nPsi, numeralM_eq]; rfl
+  rw [hl, ← axNew_selfApp] at h1
+  have h2 := prf_eq_symm (prf_formCode_numeral axNew)
+  rw [← formCodeM_eq] at h2
+  exact prf_eq_trans h1 h2
+
+/-- (iii) La cola: LR ++ [⌜axNew⌝] = ⌜axioms ++ [axNew]⌝. -/
+theorem prf_cola : Prf (concat (listFormCodeM axioms) (cons (formCodeM axNew) nil)
+    =eq listFormCodeM (axioms ++ [axNew])) := by
+  have h := prf_concat_listFormCode_singleton axioms axNew
+  rw [← listFormCodeM_eq, ← listFormCodeM_eq, ← formCodeM_eq] at h
+  exact h
+
+/-- (iv) EL ANCLA de la lista de 142, condicional en el axioma nuevo. -/
+theorem ancla_de (hax : Prf axNew) :
+    Prf (axiomsCodeT =eq listFormCodeM (axioms ++ [axNew])) :=
+  prf_eq_trans (a := axiomsCodeT)
+    (show Prf (axiomsCodeT =eq concat (listFormCodeM axioms)
+      (cons (substfc zero (tcFn nPsi) nPsi) nil)) from hax)
+    (prf_eq_trans (prf_congr_concat_left (prf_congr_cons_head prf_delta)) prf_cola)
+
+#print axioms ancla_de   -- esperado: [propext, Classical.choice, Quot.sound]
+
+/- En el arbol, tras el arreglo (axiomsBase := coreAxioms ++ codingAxioms; ancla_de sobre axiomsBase):
+   theorem prf_axiomsCodeT_eq : Prf (axiomsCodeT =eq listFormCodeM axioms) := by
+     rw [axioms_split]
+     exact ancla_de (prf_ax (show ax_axiomsCodeT_def ∈ axioms by simp [axioms]))
+   instance : AnclaEq := ⟨prf_axiomsCodeT_eq⟩   -- justo tras `class AnclaEq` (Representability2Prf:122) -/
+end Sondeos.AnclaDiagonalR2

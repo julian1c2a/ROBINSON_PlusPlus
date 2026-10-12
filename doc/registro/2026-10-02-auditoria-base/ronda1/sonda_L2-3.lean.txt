@@ -1,0 +1,32 @@
+import ROBINSON_PlusPlus.Meta
+open FOL ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.Godel ROBINSON_PlusPlus.Meta.Provability
+open ROBINSON_PlusPlus.Meta.Representability ROBINSON_PlusPlus.Meta.Diagonal
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.Representability2Prf
+
+namespace Sondeos.AnclaDiagonal
+/-- Los 141 de hoy en código: literal CERRADO que no contiene su propio código. -/
+def LR : Term := listFormCodeM axioms
+/-- Plantilla del axioma nuevo; hueco (var libre 0) en la RAÍZ, fuera de binders. -/
+def ψ : Formula := axiomsCodeT =eq concat LR (cons diagTerm nil)
+noncomputable def axTdef : Formula := selfAppN ψ
+noncomputable def δ : Term := substTerm 0 (numeral (codeNat ψ)) diagTerm
+
+theorem substTerm_LR (v : Nat) (s : Term) : substTerm v s LR = LR := by
+  sorry  -- versión de LISTA de substTerm_formCodeM (Axioms.lean:712), como liftTerm_listFormCodeM (:669)
+
+theorem axTdef_eq : axTdef = (axiomsCodeT =eq concat LR (cons δ nil)) := by
+  simp only [axTdef, selfAppN, ψ, substFormula, substTerm, substTerms, concat, cons, nil, zero,
+    axiomsCodeT, substTerm_LR]; rfl
+
+/-- La cola del axioma nuevo ES el código de la lista de 142. Esperado: sin axiomas del proyecto. -/
+theorem eval_cola :
+    Prf (concat LR (cons δ nil) =eq listFormCodeM (axioms ++ [axTdef])) := by
+  have h1 : Prf (δ =eq numeral (codeNat axTdef)) := prf_diag_arith_num ψ
+  have h2 : Prf (numeral (codeNat axTdef) =eq formCode axTdef) := prf_hFN axTdef
+  have h3 := prf_concat_listFormCode_singleton axioms axTdef
+  sorry  -- congruencias de cons/concat + listFormCodeM_eq, formCodeM_eq
+
+#print axioms eval_cola   -- esperado: [propext, Classical.choice, Quot.sound]
+end Sondeos.AnclaDiagonal

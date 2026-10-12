@@ -1,0 +1,2 @@
+def «a».r (s : String) (h : True) (t : String) : Nat := 0
+def u := «a».r"\"" sorry "x"

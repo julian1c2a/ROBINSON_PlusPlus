@@ -1,0 +1,192 @@
+categoria de modulo: {'BORRAR': 15, 'BORRAR+meta': 15, 'PARTIR': 20, 'LIMPIO': 81}
+KEEP: 3159  DROP: 606  R_P∩RPP: 2781  R_G12∩RPP: 2428
+BORRAR       ROBINSON_PlusPlus.Full.Bounded                       drop=   1 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Full.Divisibility                  drop=   8 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Full.Division                      drop=   1 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Full.Lists                         drop=  14 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Full.Mod2                          drop=  12 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Full.Primality                     drop=   3 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.AxiomListCode                 drop=   5 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.DerivCond                     drop=   1 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.Induction                     drop=   2 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.LineWFDerives                 drop=  42 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.ListInductionArith            drop=   2 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.Necessitation                 drop=   3 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.OmegaStrength                 drop=   7 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.Reflection                    drop=   5 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR       ROBINSON_PlusPlus.Meta.StepArith                     drop=   3 keepUsedByPrf=   0 keepOther=   0 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Full.Factorization                 drop=   3 keepUsedByPrf=   0 keepOther=   3 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Full.StrongInduction               drop=   5 keepUsedByPrf=   0 keepOther=   3 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Meta.CodeDistinct                  drop=  22 keepUsedByPrf=   0 keepOther=   7 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Meta.CodeNatInjPrf                 drop=   2 keepUsedByPrf=   0 keepOther=  11 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Meta.OmegaReflect                  drop=   4 keepUsedByPrf=   0 keepOther=  18 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block1            drop=  31 keepUsedByPrf=   0 keepOther=   3 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block2            drop=  13 keepUsedByPrf=   0 keepOther=   1 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block3            drop=  18 keepUsedByPrf=   0 keepOther=   1 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block4            drop=   8 keepUsedByPrf=   0 keepOther=   2 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5         drop=  35 keepUsedByPrf=   0 keepOther=   2 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7      drop=   6 keepUsedByPrf=   0 keepOther=   8 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block5            drop=   5 keepUsedByPrf=   0 keepOther=   1 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block6            drop=   8 keepUsedByPrf=   0 keepOther=   1 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block7            drop=   5 keepUsedByPrf=   0 keepOther=   1 inG12=   0
+BORRAR+meta  ROBINSON_PlusPlus.Minimal.Theorems.Block8            drop=  20 keepUsedByPrf=   0 keepOther=   1 inG12=   0
+PARTIR       ROBINSON_PlusPlus.Full.Induction                     drop=  59 keepUsedByPrf=   1 keepOther=  15 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Full.Numerals                      drop=  12 keepUsedByPrf=   1 keepOther=   4 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Meta.ChainNegPrf                   drop=  73 keepUsedByPrf=  34 keepOther=  75 inG12=   0
+PARTIR       ROBINSON_PlusPlus.Meta.CheckArith                    drop=  24 keepUsedByPrf=   1 keepOther=   2 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Meta.CodeArith                     drop=   5 keepUsedByPrf=   1 keepOther=   0 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Meta.Diagonal                      drop=   5 keepUsedByPrf=   1 keepOther=   5 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Meta.DiagonalNumeral               drop=   9 keepUsedByPrf=   3 keepOther=   0 inG12=   3
+PARTIR       ROBINSON_PlusPlus.Meta.DiagonalTwo                   drop=   3 keepUsedByPrf=   3 keepOther=   1 inG12=   3
+PARTIR       ROBINSON_PlusPlus.Meta.Godel                         drop=   2 keepUsedByPrf=   6 keepOther=   6 inG12=   4
+PARTIR       ROBINSON_PlusPlus.Meta.GodelTwo                      drop=   1 keepUsedByPrf=   1 keepOther=   0 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Meta.GodelTwoPrf                   drop=   2 keepUsedByPrf=  11 keepOther=   0 inG12=  11
+PARTIR       ROBINSON_PlusPlus.Meta.Hilbert                       drop=   6 keepUsedByPrf=   5 keepOther=   2 inG12=   5
+PARTIR       ROBINSON_PlusPlus.Meta.LineWFCases                   drop=   5 keepUsedByPrf=   6 keepOther=   1 inG12=   1
+PARTIR       ROBINSON_PlusPlus.Meta.ProofChain                    drop=  31 keepUsedByPrf=   2 keepOther=   4 inG12=   2
+PARTIR       ROBINSON_PlusPlus.Meta.Provability                   drop=   2 keepUsedByPrf=  13 keepOther=   2 inG12=   5
+PARTIR       ROBINSON_PlusPlus.Meta.Representability              drop=   6 keepUsedByPrf=   6 keepOther=   3 inG12=   6
+PARTIR       ROBINSON_PlusPlus.Meta.Representability2             drop=   6 keepUsedByPrf=   5 keepOther=   0 inG12=   5
+PARTIR       ROBINSON_PlusPlus.Meta.SubstArith                    drop=  40 keepUsedByPrf=   4 keepOther=   0 inG12=   4
+PARTIR       ROBINSON_PlusPlus.Meta.VerifierSound                 drop=   3 keepUsedByPrf=   5 keepOther=   1 inG12=   0
+PARTIR       ROBINSON_PlusPlus.Minimal.Axioms                     drop=  18 keepUsedByPrf= 272 keepOther=  20 inG12= 272
+
+## BORRAR+meta ROBINSON_PlusPlus.Full.Factorization
+   keep usado por Prf : 
+   keep resto         : toTerm(d) toTerm_nil(t) toTerm_cons(t)
+
+## BORRAR+meta ROBINSON_PlusPlus.Full.StrongInduction
+   keep usado por Prf : 
+   keep resto         : substFormula_liftFormula(t) PSI(d) psi_at(t)
+
+## BORRAR+meta ROBINSON_PlusPlus.Meta.CodeDistinct
+   keep usado por Prf : 
+   keep resto         : charToNat_ne(t) formTag(d) formCode_eq_cons(t) termTag(d) termCode_eq_cons(t) NotTC(i) NotFC(i)
+
+## BORRAR+meta ROBINSON_PlusPlus.Meta.CodeNatInjPrf
+   keep usado por Prf : 
+   keep resto         : triN_succ(t) triN_mono(t) tri_diag_unique(t) consN_inj(t) consN_ne_zero(t) codeNatChars_inj(t) codeNatStr_inj(t) codeNatTerm_inj(t) codeNatTerms_inj(t) codeNat_inj(t) num_bridge(t)
+
+## BORRAR+meta ROBINSON_PlusPlus.Meta.OmegaReflect
+   keep usado por Prf : 
+   keep resto         : provBody(d) provFromCode_eq_ex(t) provCodeC'_eq_ex(t) Verifies(d) subst_provBody(t) IsCodeShaped(i) IsCodeShaped.isClosed(t) StdArgs(i) StdLine(d) StdChain(d) stdLine_lineCode'(t) stdChain_proofCode'(t) formCode_is_cons(t) termCode_is_cons(t) cons_ne_numeralM(t) stdArgs_head(t) not_stdArgs_numeralM(t) junk_line_not_stdLine(t)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block1
+   keep usado por Prf : 
+   keep resto         : Γ(d) three(d) four(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block2
+   keep usado por Prf : 
+   keep resto         : Γ(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block3
+   keep usado por Prf : 
+   keep resto         : Γ(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block4
+   keep usado por Prf : 
+   keep resto         : Γ(d) w_w_plus_1(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5
+   keep usado por Prf : 
+   keep resto         : Γ(d) w_candidate(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7
+   keep usado por Prf : 
+   keep resto         : Γ(d) lift_01_eq_00(t) lift_01_eq_00_list(t) w_of_c(d) y_of_c(d) x_of_c(d) proj1(d) proj2(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block5
+   keep usado por Prf : 
+   keep resto         : Γ(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block6
+   keep usado por Prf : 
+   keep resto         : Γ(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block7
+   keep usado por Prf : 
+   keep resto         : Γ(d)
+
+## BORRAR+meta ROBINSON_PlusPlus.Minimal.Theorems.Block8
+   keep usado por Prf : 
+   keep resto         : Γ(d)
+
+## PARTIR ROBINSON_PlusPlus.Full.Induction
+   keep usado por Prf : inductionFormula(d*)
+   keep resto         : primAxioms(d) axioms_len(t) coreAxioms_len(t) codingAxioms_len(t) primAxioms_len(t) primAxioms_subset(t) substTerm_subst_succ_lift(t) substTerms_subst_succ_lift(t) substTerm_subst_succ_lift_gen(t) substTerms_subst_succ_lift_gen(t) substFormula_succ_lift_gen(t) substFormula_succ_lift(t) step_reduce(t) substFormula_eq_succ_lift(t) step_eq_reduce(t)
+
+## PARTIR ROBINSON_PlusPlus.Full.Numerals
+   keep usado por Prf : numeral(d*)
+   keep resto         : numeral_zero(t) numeral_succ(t) numeral_one(t) numeral_two(t)
+
+## PARTIR ROBINSON_PlusPlus.Meta.ChainNegPrf
+   keep usado por Prf : prf_boundedPremsIn_of_chainOk(t) prf_lineTag_cons(t) prf_lenc_tag_and(t) prf_lenc_tag_plain(t) prf_lenc_p1(t) prf_lenc_mp(t) prf_lenc_p2(t) prf_lenc_c1(t) prf_lenc_c2(t) prf_lenc_c3(t) prf_lenc_j1(t) prf_lenc_j2(t) prf_lenc_j3(t) prf_lenc_efq(t) prf_lenc_q1(t) prf_lenc_q2(t) prf_lenc_q3(t) prf_lenc_eqrefl(t) prf_lenc_leibniz(t) prf_lenc_p3(t) prf_lenc_thy(t) prf_lenc_gen(t) prf_lenc_ind(t) prf_lenc_qconf(t) prf_lenc_listInd(t) decodeLine_stepConcl(t) decodeLine_carc(t) decode_heads(t) decodeChainAux_carc_mem(t) prf_premsOf_mp_line(t) prf_premsOf_gen_line(t) prf_lenc_two(t) prf_lenc_one(t) prf_nthc_two_1(t)
+   keep resto         : stdArgs_objList(t) StdArgList(i) peelArgs_objList(t) stdArgs_peel(t) stdArgList_objList(t) stdArgList_cons(t) decodeRuleTag_p1_some(t) decodeRuleTag_q1_some(t) tag0_none_dichotomy(t) TagCode(d) tc_p1(t) tc_p2(t) tc_c1(t) tc_c2(t) tc_c3(t) tc_j1(t) tc_j2(t) tc_j3(t) tc_efq(t) tc_eqrefl(t) tc_p3(t) tc_gen(t) tc_q1(t) tc_q2(t) tc_leibniz(t) tc_ind(t) tc_listInd(t) tc_q3(t) tc_qconf(t) decodeChainAux_none_first(t) decodeLine_none_cases(t) dispatcher(t) dico_F(t) dico_T(t) dico_FF(t) dico_FT(t) dico_FFF(t) dico_FTT(t) decodes_efq(t) decodes_p3(t) decodes_ind(t) decodes_listInd(t) decodes_eqrefl(t) decodes_p1(t) decodes_c1(t) decodes_c2(t) decodes_c3(t) decodes_j1(t) decodes_j2(t) decodes_q3(t) decodes_qconf(t) decodes_p2(t) decodes_j3(t) decodes_q1(t) decodes_q2(t) decodes_leibniz(t) decodeForm_termCode(t) decodeTerm_formCode(t) badlen_c1(t) badlen_c2(t) badlen_c3(t) badlen_j1(t) badlen_j2(t) badlen_q3(t) badlen_qconf(t) badlen_efq(t) badlen_p3(t) badlen_ind(t) badlen_listInd(t) badlen_p2(t) badlen_j3(t) badlen_eqrefl(t) badlen_q1(t) badlen_q2(t) badlen_leibniz(t)
+
+## PARTIR ROBINSON_PlusPlus.Meta.CheckArith
+   keep usado por Prf : numeralM_eq(t*)
+   keep resto         : provFormulaC(d) provCodeC(d)
+
+## PARTIR ROBINSON_PlusPlus.Meta.CodeArith
+   keep usado por Prf : numeral_bridge(t*)
+   keep resto         : 
+
+## PARTIR ROBINSON_PlusPlus.Meta.Diagonal
+   keep usado por Prf : diagTerm(d*)
+   keep resto         : selfApp(d) godelPred(d) godelBeta(d) godelC(d) godel_comp(t)
+
+## PARTIR ROBINSON_PlusPlus.Meta.DiagonalNumeral
+   keep usado por Prf : selfAppN(d*) provCodeN(d*) godelCN(d*)
+   keep resto         : 
+
+## PARTIR ROBINSON_PlusPlus.Meta.DiagonalTwo
+   keep usado por Prf : godelPred'(d*) godelBeta'(d*) godel_comp'(t*)
+   keep resto         : godelC'(d)
+
+## PARTIR ROBINSON_PlusPlus.Meta.Godel
+   keep usado por Prf : Sym(i*) gNat(d*) numeral(d*) numeral_injective(t) G(d*) nil_ne_cons(t)
+   keep resto         : gNat_injective(t) G_injective(t) encode(d) encode_nil(t) encode_cons(t) encode_injective(t)
+
+## PARTIR ROBINSON_PlusPlus.Meta.GodelTwo
+   keep usado por Prf : consistencyFormula'(d*)
+   keep resto         : 
+
+## PARTIR ROBINSON_PlusPlus.Meta.GodelTwoPrf
+   keep usado por Prf : prf_subst_eq_iff(t*) prf_iff_trans(t*) prf_neg_congr_iff(t*) prf_hFN(t*) prf_diag_arith_num(t*) prf_godelCN_fixedpoint_N(t*) prf_provCode_transfer(t*) prf_godelCN_fixedpoint(t*) prf_con_imp_godel(t*) goedel_first_prf(t*) goedel_second_prf(t*)
+   keep resto         : 
+
+## PARTIR ROBINSON_PlusPlus.Meta.Hilbert
+   keep usado por Prf : Prfᵢ(i*) confinementFormula(d*) listInductionFormula(d*) Prf(i*) ConsistentH(d*)
+   keep resto         : subst_lift_same(t) axioms_lift_eq(t)
+
+## PARTIR ROBINSON_PlusPlus.Meta.LineWFCases
+   keep usado por Prf : tagConcl(d) prf_lineWF_tag_imp(t) tagPrems(d) prf_premsOf_tag(t) prf_imp_trans(t*) prf_lineWF_neg_of_tag(t)
+   keep resto         : tagArity(d)
+
+## PARTIR ROBINSON_PlusPlus.Meta.ProofChain
+   keep usado por Prf : provFormulaC'(d*) provCodeC'(d*)
+   keep resto         : compProp(d) weakProp(d) compChainProp(d) monoChainProp(d)
+
+## PARTIR ROBINSON_PlusPlus.Meta.Provability
+   keep usado por Prf : charsCode(d*) strCode(d*) termCode(d*) termsCode(d*) formCode(d*) nil_ne_cons(t) char_toNat_inj(t) charsCode_injective(t) strCode_injective(t) cons_inj_lean(t) termCode_injective(t) termsCode_injective(t) formCode_injective(t)
+   keep resto         : IsFormula(d) isFormula_formCode(t)
+
+## PARTIR ROBINSON_PlusPlus.Meta.Representability
+   keep usado por Prf : listFormCode(d*) charsCodeM_eq(t*) strCodeM_eq(t*) termCodeM_eq(t*) termsCodeM_eq(t*) formCodeM_eq(t*)
+   keep resto         : listFormCodeM_eq(t) lineCode(d) proofCode(d)
+
+## PARTIR ROBINSON_PlusPlus.Meta.Representability2
+   keep usado por Prf : lineJustif(d*) lineCode'(d*) proofCode'(d*) prf_hasWitF_fc(t*) prf_hasWit_tc(t*)
+   keep resto         : 
+
+## PARTIR ROBINSON_PlusPlus.Meta.SubstArith
+   keep usado por Prf : substTerm_liftLiftLift(t*) substTerms_liftLiftLift(t*) substTerm_liftLiftLiftLift(t*) substTerms_liftLiftLiftLift(t*)
+   keep resto         : 
+
+## PARTIR ROBINSON_PlusPlus.Meta.VerifierSound
+   keep usado por Prf : conclsDec(d) verifier_sound(t) verifier_sound_concls(t) not_decodes_of_not_prf(t) not_mem_conclsDec_of_not_prf(t)
+   keep resto         : chainOkDec(d)
+
+## PARTIR ROBINSON_PlusPlus.Minimal.Axioms
+   keep usado por Prf : ex(a*) succ_sym(d*) add_sym(d*) mul_sym(d*) sub_sym(d*) sqrt_sym(d*) div2_sym(d*) mod2_sym(d*) pred_sym(d*) cons_sym(d*) concat_sym(d*) pow_sym(d*) prodp_sym(d*) lt_sym(d*) in_sym(d*) zero_sym(d*) zero(d*) succ(d*) add(d*) mul(d*) sub(d*) sqrt(d*) div2(d*) mod2(d*) pred(d*) cons(d*) concat(d*) pow(d*) prod_pairs(d*) sq(d*) one(d*) two(d*) cantor_poly(d*) cantor_func(d*) pair(d*) nil(d*) lt(d*) le(d*) In(d*) forall_(d*) forall_2(d*) forall_3(d*) ax2_peano_succ_neq_zero(d*) ax3_peano_succ_inj(d*) ax4_add_zero(d*) ax5_add_succ(d*) ax6_add_comm(d*) ax7_add_assoc(d*) ax8_mul_zero(d*) ax9_mul_succ(d*) ax10_mul_comm(d*) ax11_mul_assoc(d*) ax12_mul_distrib(d*) ax13_lt_def(d*) ax14_sqrt_le(d*) ax15_lt_succ_sqrt(d*) ax16_mod2_succ(d*) ax17_div_mod_eq(d*) ax18_lt_irrefl(d*) ax19_lt_trichotomy(d*) ax21_mod2_range(d*) land(d*) lor(d*) ax24_mod2_of_even(d*) ax25_pred_zero(d*) ax26_pred_succ(d*) ax_L0_cons_def(d*) ax_L1_in_nil(d*) ax_L2_in_cons(d*) ax_C1_concat_nil(d*) ax_C2_concat_cons(d*) ax_C3_concat_assoc(d*) ax_L3_in_concat(d*) ax_pow_zero(d*) ax_pow_succ(d*) ax_prodp_nil(d*) ax_prodp_cons(d*) ax29_sub_witness(d*) varc(d*) funcc(d*) substtc(d*) substtsc(d*) forall_4(d*) ax_substtc_var_eq(d*) ax_substtc_var_gt(d*) ax_substtc_var_lt(d*) ax_substtc_func(d*) ax_substtsc_nil(d*) ax_substtsc_cons(d*) liftc(d*) liftsc(d*) ax_liftc_var_lt(d*) ax_liftc_var_ge(d*) ax_liftc_func(d*) ax_liftsc_nil(d*) ax_liftsc_cons(d*) botc(d*) atomc(d*) eqc(d*) implc(d*) forallc(d*) andc(d*) orc(d*) exc(d*) substfc(d*) ax_substfc_bottom(d*) ax_substfc_atom(d*) ax_substfc_eq(d*) ax_substfc_impl(d*) ax_substfc_forall(d*) ax_substfc_and(d*) ax_substfc_or(d*) ax_substfc_ex(d*) liftfc(d*) ax_liftfc_bottom(d*) ax_liftfc_atom(d*) ax_liftfc_eq(d*) ax_liftfc_impl(d*) ax_liftfc_forall(d*) ax_liftfc_and(d*) ax_liftfc_or(d*) ax_liftfc_ex(d*) numeralM(d*) charsCodeM(d*) strCodeM(d*) termCodeM(d*) termsCodeM(d*) formCodeM(d*) listFormCodeM(d*) liftTerm_nil(t*) liftTerm_numeralM(t*) liftTerm_charsCodeM(t*) liftTerm_strCodeM(t*) liftTerm_termCodeM(t*) liftTerm_termsCodeM(t*) liftTerm_formCodeM(t*) liftTerm_listFormCodeM(t*) substTerm_nil(t*) substTerm_numeralM(t*) substTerm_charsCodeM(t*) substTerm_strCodeM(t*) substTerm_termCodeM(t*) substTerm_termsCodeM(t*) substTerm_formCodeM(t*) carc(d*) cdrc(d*) ax_carc(d*) ax_cdrc(d*) lenc(d*) nthc(d*) ax_lenc_nil(d*) ax_lenc_cons(d*) ax_nthc_zero(d*) ax_nthc_succ(d*) runFn(d*) ax_runFn_nil(d*) ax_runFn_cons(d*) allIn(d*) lineWF(d*) premsOf(d*) lineOk(d*) chainOk(d*) ax_allIn_nil(d*) ax_allIn_cons(d*) ax_chainOk_nil(d*) ax_chainOk_cons(d*) tcFn(d*) ax_tc_zero(d*) ax_tc_succ(d*) forall_5(d*) validProofFn(d*) ax_vpf_nil(d*) ax_vpf_p1(d*) ax_vpf_c1(d*) ax_vpf_c2(d*) ax_vpf_c3(d*) ax_vpf_j1(d*) ax_vpf_j2(d*) ax_vpf_q1(d*) ax_vpf_q2(d*) ax_vpf_q3(d*) ax_vpf_p2(d*) ax_vpf_j3(d*) ax_vpf_leibniz(d*) ax_vpf_efq(d*) ax_vpf_eqrefl(d*) ax_vpf_p3(d*) ax_vpf_mp(d*) ax_vpf_gen(d*) axiomsCodeT(d*) ax_vpf_thy(d*) ax_vpf_ind(d*) ax_vpf_qconf(d*) ax_vpf_listInd(d*) shapeNul(d*) shapeUn(d*) shapeBin(d*) argsInBody(d*) argsIn(d*) isTermCodeE1(d*) wfAll1Body(d*) wfAll1(d*) isTC1(d*) hasWit(d*) lorAll(d*) clBot(d*) clAtom(d*) clEq(d*) clBin(d*) clUn(d*) isFormCodeE2(d*) wfAllFBody(d*) wfAllF(d*) isFC1(d*) hasWitF(d*) substF_argsIn(t*) substF_isTermCodeE1(t*) substF_wfAll1(t*) substF_isTC1(t*) substF_hasWit(t*) substF_isFormCodeE2(t*) substF_wfAllF(t*) substF_isFC1(t*) objList(d*) substF_hasWitF(t*) ax_lineWF_mp(d*) ax_premsOf_mp(d*) ax_lineWF_gen(d*) ax_premsOf_gen(d*) ax_lineWF_thy(d*) ax_premsOf_thy(d*) ax_lineWF_p1(d*) ax_premsOf_p1(d*) ax_lineWF_p2(d*) ax_premsOf_p2(d*) ax_lineWF_c1(d*) ax_premsOf_c1(d*) ax_lineWF_c2(d*) ax_premsOf_c2(d*) ax_lineWF_c3(d*) ax_premsOf_c3(d*) ax_lineWF_j1(d*) ax_premsOf_j1(d*) ax_lineWF_j2(d*) ax_premsOf_j2(d*) ax_lineWF_j3(d*) ax_premsOf_j3(d*) ax_lineWF_efq(d*) ax_premsOf_efq(d*) ax_lineWF_eqrefl(d*) ax_premsOf_eqrefl(d*) ax_lineWF_p3(d*) ax_premsOf_p3(d*) ax_lineWF_q1(d*) ax_premsOf_q1(d*) ax_lineWF_q2(d*) ax_premsOf_q2(d*) ax_lineWF_q3(d*) ax_premsOf_q3(d*) ax_lineWF_leibniz(d*) ax_premsOf_leibniz(d*) ax_lineWF_ind(d*) ax_premsOf_ind(d*) ax_lineWF_qconf(d*) ax_premsOf_qconf(d*) ax_lineWF_listInd(d*) ax_premsOf_listInd(d*) lineTag(d*) tagDisj(d*) ax_lineWF_inv(d*) ax_lineWF_cons(d*) axioms(d*)
+   keep resto         : nil_sym(d) le_sym(d) eight(d) is_cantor(d) termToString(d) _inst_139(i) forallN(d) ax20_eq_decidable(d) ax_tc_cons(d) forallN_1(t) forallN_2(t) forallN_3(t) forallN_4(t) forallN_5(t) forallN_succ(t) coreAxioms(d) codingAxioms(d) axioms_eq(t) coreAxioms_subset_axioms(t) mem_axioms_of_mem_core(t)

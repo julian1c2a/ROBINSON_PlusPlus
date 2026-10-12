@@ -1,0 +1,4 @@
+def check (xs : List String) : IO Unit := do
+  if !s!"{String.intercalate "\"" xs}".isEmpty then
+    IO.println "ok"
+theorem foo : True := sorry

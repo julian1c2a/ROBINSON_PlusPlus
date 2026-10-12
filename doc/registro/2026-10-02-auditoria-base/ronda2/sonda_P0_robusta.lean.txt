@@ -1,0 +1,98 @@
+import Lean
+import Std.Data.HashSet
+import ROBINSON_PlusPlus
+/-! Sonda R2-2 · ¿usa la cadena Gödel I/II sobre `Prf` algo de la capa `⊢`? Cierre por constantes
+(tipo + valor + constructores). Predicción del grafo (sin compilar): «⊢ en el tipo: 0 · en módulos a borrar: 0». -/
+open Lean Elab Command
+
+namespace SondaR22
+
+def usadas (env : Environment) (c : Name) : Array Name :=
+  match env.find? c with
+  | none => #[]
+  | some ci =>
+    let v : Array Name := match ci.value? (allowOpaque := true) with
+      | some e => e.getUsedConstants
+      | none => #[]
+    let k : Array Name := match ci with
+      | .inductInfo i => i.ctors.toArray
+      | .ctorInfo i => #[i.induct]
+      | _ => #[]
+    ci.type.getUsedConstants ++ v ++ k
+
+def cierre (env : Environment) (raices : List Name) : Std.HashSet Name := Id.run do
+  let mut vis : Std.HashSet Name := {}
+  let mut pila : Array Name := raices.toArray
+  while pila.size > 0 do
+    let c := pila.back!
+    pila := pila.pop
+    if vis.contains c then continue
+    vis := vis.insert c
+    for d in usadas env c do
+      if !vis.contains d then pila := pila.push d
+  return vis
+
+def modulo (env : Environment) (c : Name) : Name :=
+  match env.getModuleIdxFor? c with
+  | some i => env.header.moduleNames[i.toNat]!
+  | none => Name.anonymous
+
+/-- Los 27 módulos que el plan borra enteros, más `FOL.MetaRules`. -/
+def aBorrar : List Name :=
+  [`FOL.MetaRules, `ROBINSON_PlusPlus.Full.Bounded, `ROBINSON_PlusPlus.Full.Divisibility,
+   `ROBINSON_PlusPlus.Full.Division, `ROBINSON_PlusPlus.Full.Lists, `ROBINSON_PlusPlus.Full.Mod2,
+   `ROBINSON_PlusPlus.Full.Primality, `ROBINSON_PlusPlus.Full.Factorization,
+   `ROBINSON_PlusPlus.Full.StrongInduction, `ROBINSON_PlusPlus.Meta.AxiomListCode,
+   `ROBINSON_PlusPlus.Meta.DerivCond, `ROBINSON_PlusPlus.Meta.Induction,
+   `ROBINSON_PlusPlus.Meta.LineWFDerives, `ROBINSON_PlusPlus.Meta.ListInductionArith,
+   `ROBINSON_PlusPlus.Meta.Necessitation, `ROBINSON_PlusPlus.Meta.OmegaStrength,
+   `ROBINSON_PlusPlus.Meta.Reflection, `ROBINSON_PlusPlus.Meta.StepArith,
+   `ROBINSON_PlusPlus.Minimal.Theorems.Block1, `ROBINSON_PlusPlus.Minimal.Theorems.Block2,
+   `ROBINSON_PlusPlus.Minimal.Theorems.Block3, `ROBINSON_PlusPlus.Minimal.Theorems.Block4,
+   `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C5, `ROBINSON_PlusPlus.Minimal.Theorems.Block4_C6_C7,
+   `ROBINSON_PlusPlus.Minimal.Theorems.Block5, `ROBINSON_PlusPlus.Minimal.Theorems.Block6,
+   `ROBINSON_PlusPlus.Minimal.Theorems.Block7, `ROBINSON_PlusPlus.Minimal.Theorems.Block8]
+
+end SondaR22
+
+open SondaR22 in
+elab "#capaD_en_la_cadena" : command => do
+  let env ← getEnv
+  let S := cierre env [``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf,
+                       ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf]
+  let mut nD : Nat := 0
+  let mut nB : Nat := 0
+  for c in S.toList do
+    if let some ci := env.find? c then
+      if c != ``Derives && ci.type.getUsedConstants.contains ``Derives then
+        nD := nD + 1
+        logInfo m!"⊢ en el TIPO: {c}"
+      if aBorrar.contains (modulo env c) then
+        nB := nB + 1
+        logInfo m!"en un módulo que el plan borra: {c} ∈ {modulo env c}"
+  logInfo m!"cierre: {S.size} constantes · ⊢ en el tipo: {nD} · en módulos a borrar: {nB}"
+  -- Criterio ROBUSTO (verificador de R22-1): el cierre es de tipo Y valor; ninguna de estas debe estar.
+  let prohibidas : List Name := [``Derives, ``FOL.MetaRules.imp_intro, ``FOL.MetaRules.raa,
+    ``FOL.MetaRules.or_elim, ``FOL.MetaRules.ex_elim, ``ROBINSON_PlusPlus.Full.ax_induction_prim,
+    ``ROBINSON_PlusPlus.Full.ax_list_induction, ``ROBINSON_PlusPlus.Minimal.Axioms.ax_axiomsCodeT_eq,
+    ``ROBINSON_PlusPlus.Meta.Hilbert.ConsistentOmega, ``ROBINSON_PlusPlus.Meta.DiagonalTwo.Reflects,
+    ``ROBINSON_PlusPlus.Meta.OmegaReflect.NegVerifier, ``ROBINSON_PlusPlus.Meta.OmegaReflect.OmegaConsistent]
+  let mut malas : Nat := 0
+  for p in prohibidas do
+    if S.contains p then
+      malas := malas + 1
+      logInfo m!"⛔ PROHIBIDA en el cierre: {p}"
+  logInfo m!"criterio robusto: {malas} de {prohibidas.length} prohibidas en el cierre"
+  -- CONTROL POSITIVO: el cierre tiene que contener piezas que la cadena SÍ usa.
+  for q in [``ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real, ``ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf,
+            ``ROBINSON_PlusPlus.Meta.Representability2Prf.prf_inAxC, ``ROBINSON_PlusPlus.Meta.Representability2Prf.AnclaEq,
+            ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint] do
+    logInfo m!"control positivo · {q} ∈ cierre: {S.contains q}"
+  -- CONTROL DE QUE EL DETECTOR VE: el cierre de un teorema de la capa ⊢ SÍ debe contener lo prohibido.
+  let T := cierre env [``ROBINSON_PlusPlus.Meta.ChainNegPrf.negVerifier_proved]
+  let mut vistas : Nat := 0
+  for p in prohibidas do
+    if T.contains p then vistas := vistas + 1
+  logInfo m!"control del detector · cierre de negVerifier_proved: {T.size} constantes, {vistas} de {prohibidas.length} prohibidas (debe ser > 0)"
+
+#capaD_en_la_cadena

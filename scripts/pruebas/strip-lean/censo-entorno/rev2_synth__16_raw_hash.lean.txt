@@ -1,0 +1,4 @@
+def rh : String := r#"he said "sorry" -- /- "#
+def rh2 : Nat := sorry
+def rh3 : String := r##"a"#b"##
+theorem rr : True := sorry

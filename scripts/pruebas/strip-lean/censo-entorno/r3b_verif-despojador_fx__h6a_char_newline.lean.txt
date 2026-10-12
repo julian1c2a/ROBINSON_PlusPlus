@@ -1,0 +1,4 @@
+def f (c : Char) (s : String) : Nat := 0
+def g := f '
+'"' "
+theorem t : True := sorry

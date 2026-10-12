@@ -1,0 +1,954 @@
+===== inv:FOL 23008
+# FOL D7 inventory: `String` → `List Char`
+
+## 0. Scope, method and caveats
+
+- **Repos.** FOL was at `782928c` when the run started. During the run HEAD moved to `1df51b3` (another session, ADR-128). That commit changed only `lakefile.lean` and `DECISIONS.md` and no `.lean` module, so every line number below is still valid. RPP is at `8fd14f4`; another session has uncommitted edits there (`DECISIONS.md`, `NEXT-STEPS.md`, `lakefile.lean`). I did not touch either repo.
+- **Method.**
+  - I ran `LC_ALL=C awk -f FOL/strip-lean.awk` on every module in the build: `FOL.lean`, the 49 files under `FOL/**` (all reachable from `FOL.lean`) and the 6 under `TheoryFramework/**`. Its output keeps only code.
+  - To find literals in code, I ran a variant of the stripper through process substitution (`awk -f <(sed 's/out = out " "; tb = tb "\\""/out = out "@@L@@"; …/' strip-lean.awk)`). It marks each literal instead of deleting it.
+  - No file was written. lake, lean, elan and leanchecker were not run, so every "compiles" claim below is an ESTIMATE.
+- **Site classes.**
+  - **TYPE**: rename `String` → `List Char`. A † means the type is an argument and needs parentheses.
+  - **LITERAL**: `"X"` → `['X']`.
+  - **API**: needs redesign.
+  - **PROOF**: the proof uses a `String` lemma or `String.decEq`.
+  - **KDEC**: a proof that computes symbol equality in the kernel (`decide`/`rfl`) with no String lemma named. It should keep working; it must be re-checked by a build.
+  - **PRINT**: printing or syntax only, no change.
+
+### Summary (MEASURED)
+
+| Figure | Value |
+|---|---|
+| FOL files needing code changes | **24** (14 frozen, 9 locked only, 1 free = `Semantics.lean`). Matches ADR-122 §1. |
+| Files needing design changes only | `SymClasses.lean` (duplicate instance after D7, §2.6) |
+| Lean files with stale comments only | `Compacity0`, `Lindenbaum0` (both frozen), `DecEq` (locked) |
+| TheoryFramework files with sites | 0 |
+| Code lines containing `String` | 184 lines, 225 tokens |
+| …of which bare type `String` | 201 tokens |
+| …of which `String.*` API | 15 tokens, in 3 files (`Fresh0`, `HenkinLimit0`, `Enumeration`) |
+| …of which `natToString*` | 9 tokens |
+| Declarations containing `String` in code | 167 |
+| Symbol string literals | 76 tokens on 54 lines in 11 files, all single-character (P Q R a b c d f g) |
+| Sites needing parentheses (†) | 10: FOL.lean 69, 70, 123; Semantics 32; Rename 419, 423, 428, 438, 448, 453; plus the two redesigned instances Fresh0 153, Enumeration 219 |
+| Non-TYPE work in the 24 files (outside Fresh0/HenkinLimit0/Enumeration) | the `Coe String Formula` instance, the `SymClasses` duplicate instance, and the KDEC sites |
+
+## 1. Inventory by file
+
+Status: F = frozen (`frozen_files.txt`), L = locked (`locked_files.txt`), free = neither.
+
+| File | Status | TYPE | LITERAL | API / PROOF / KDEC |
+|---|---|---|---|---|
+| `FOL/FOL.lean` | L | 69†, 70†, 80, 91 (`(S := String) (S' := String)`) | 342 (×2), 350 | API 123–124 `instance : Coe String Formula` (comment at 122). PRINT 56, 67 (`deriving Repr, BEq`), 111–120 (notation). |
+| `FOL/Semantics.lean` | free | 32† `abbrev Model … := ModelG String D` | – | – |
+| `FOL/Enumeration.lean` | L | – | – | API 208 `natToString`; 213–216 `natToString_surj` (PROOF 214 `s.exists_eq_ofList`, 216 `String.ofList`); 219–221 `instance EnumSym String`; call sites 252 and 346 (`natToString`), 303 and 377 (`natToString_surj`). Reusable: 232–239 `EnumSym (List Char)`. |
+| `FOL/SymClasses.lean` | L | – | (Char literals 101–102, already List Char) | Design issue: 100–114 `FreshSym (List Char)` becomes a second instance for the same type (§2.6). |
+| `FOL/Fresh0.lean` | F+L | 117, 139, 408 (`exists_fresh` statement) | 113, 118, 126, 127, 147, 204, 334 (all inside API sites) | API: 113 `shift`; 125–127 `cst`; 153–158 instance; 201–207 `cst_utf8ByteSize`; 215–219 `cst_bound_sym`; 291–324 `valid_tail`; 327–330 `unshift`; 332–336 `shift_bytes`; 338–347 `unshift_shift`. PROOF: 118 and 147 `String.append_right_inj`; 135, 140, 141 `of_decide_eq_false rfl` (relies on `String.decEq`); 205 `String.utf8ByteSize_append`; 217 `String.utf8ByteSize`; 293–324 `isValidUTF8`, `utf8EncodeChar`, `List.utf8Encode`; 335 `String.toByteArray_append`; 339 `String.toByteArray_inj`. |
+| `FOL/HenkinLimit0.lean` | F+L | 127, 135, 145, 159, 169, 198, 395 (`henLimit_witness : ∃ c : String`) | – | API 216–220 `cst_ne_of_size` (PROOF 219 `String.utf8ByteSize`); 226 `bndTerm` uses `s.utf8ByteSize`. |
+| `FOL/Henkin0.lean` | F+L | 130, 163, 213, 237 | – | – |
+| `FOL/Rename.lean` | F+L | 31 lines, 60 tokens: 146, 154, 166, 175, 193, 207, 216, 237, 246, 257, 267, 286, 361, 371, 381, 394, 404, 419†, 423†, 428†, 438†, 442, 448†, 452, 453†, 465, 473, 482, 523, 536, 547 | – | – (`locInv` decides with whichever `DecidableEq` the type has) |
+| `FOL/Canonical0.lean` | F+L | 281, 297, 562, 567, 576, 585 | – | – |
+| `FOL/Craig0.lean` | F+L | 189, 199, 210 | 802–806, 811–814 (17 tokens) | – |
+| `FOL/Interpolation0.lean` | F+L | 505, 516 | 653–661, 663, 664, 668 (23 tokens) | KDEC 685 (`by decide` proves `"Q" ≠ "R"`) |
+| `FOL/QFDecide0.lean` | F+L | 191, 200, 331, 337, 396, 401, 452, 457, 472, 476, 547 (field of `Good`), 566, 572, 580, 604, 712 | 847, 848, 863, 864, 866 (×2) | KDEC 852, 854, 858, 879 (`maxRecDepth 100000`), 880, 881 |
+| `FOL/Skolem0.lean` | F+L | 150, 156, 166, 177, 226, 235, 241, 253, 291 | – | – |
+| `FOL/SkolemN0.lean` | F+L | 104, 182, 186, 189, 227, 246 | – | – |
+| `FOL/SkolemNF0.lean` | F+L | 277, 282, 369, 388, 403, 418, 433, 448, 463, 479, 496 | 186, 187, 193, 194, 200, 201 | KDEC 188, 195, 204 (`rfl`) |
+| `FOL/SkolemHerbrand0.lean` | F+L | 265 | – | – |
+| `FOL/HerbrandBlock0.lean` | F+L | – | 206 | – |
+| `FOL/Soundness0.lean` | F+L | – | 229 | – |
+| `FOL/Eigenvariable.lean` | L | 32 lines: 125, 133, 156, 167, 185, 189, 193, 202, 236, 247, 271, 275, 279, 301, 313, 329, 335, 339, 344, 352, 360, 374, 435, 464, 479, 493, 518, 522, 529, 534, 552, 561 | – | – |
+| `FOL/Derives2.lean` | L | 118, 121 (constructors of `Derives₂`), 232, 245, 382, 402 | – | – |
+| `FOL/Eq0.lean` | L | 79, 100 | – | – |
+| `FOL/Theorems/Eq.lean` | L | 409, 430 | – | – |
+| `FOL/Herbrand0.lean` | L | 231, 235, 245, 246 (constructors of `EqInstance`) | 337, 338 | KDEC 344 (`by rfl`), 366, 369, 373 (`by decide`) |
+| `FOL/Inconsistencia.lean` | L | 61 | 154, 207, 211, 216, 221, 227 (×2), 228, 234 | – |
+| `FOL/Finitary0.lean` | L | – | 445 | – |
+| `FOL/Tactics.lean` | free | – | – | PRINT only (24 `throwError "prove_mem failed"`, 26 `elab "prove_mem"`). No change. |
+| `TheoryFramework/**` (6 files) | Instances/FOL F+L | 0 | 0 | 0 |
+
+**Who uses the coercion (MEASURED).** No FOL code relies on `Coe String Formula`: each of the 76 literals sits in a `String`-typed argument (`.atom`, `.func`, `predF p C → p = "P"`, `derives0_atom_congr "P"`). A heuristic grep of RPP's library found no bare literal in a Formula position either (ESTIMATE).
+
+## 2. API redesign
+
+### 2.1 `FOL/FOL.lean`
+
+```lean
+abbrev Term := TermG (List Char)                                          -- :69
+abbrev Formula := FormulaG (List Char)                                    -- :70
+  TermG.noConfusion (S := List Char) (S' := List Char) rfl (heq_of_eq h)     -- :80
+  FormulaG.noConfusion (S := List Char) (S' := List Char) rfl (heq_of_eq h)  -- :91
+-- :122-124  instance : Coe String Formula  → DELETE (recommended)
+  .impl (.atom ['P'] []) (neg (neg (.atom ['Q'] [])))                     -- :342
+  replaceAt formula_ejemplo posicion_Q (.atom ['Q'] [])                   -- :350
+```
+
+Why delete the coercion rather than retarget it:
+- It has zero users in FOL (MEASURED).
+- A `Coe (List Char) Formula` would silently turn any symbol into an atom wherever a Formula is expected. During the migration that hides type errors.
+- Keeping `Coe String Formula` through `String.toList` would keep both String and UTF-8 decoding in FOL.
+
+An optional convenience is a `sym!"P"` macro that expands to `['P']` at elaboration time. It would add a meta-level constant, so it belongs in `Tactics.lean` (which already imports `Lean`), not in `FOL.FOL`.
+
+`deriving Repr, BEq` and `DecEq.lean`'s `[DecidableEq S]` are generic and need no change. `instDecidableEqList` and `instDecidableEqChar` (Init/Prelude.lean:2883, :2982) reduce structurally.
+
+### 2.2 `FOL/Semantics.lean:32`
+
+`abbrev Model (D : Type) := ModelG (List Char) D`
+
+### 2.3 `FOL/Fresh0.lean`
+
+This keeps the current naming scheme (`g`, `ag`, `aag`, …), so docstrings keep their meaning. All of it is ESTIMATE: it is untested.
+
+```lean
+def shift (s : List Char) : List Char := 'f' :: s                                   -- :113
+theorem shift_inj : ∀ s t : List Char, shift s = shift t → s = t :=
+  fun _ _ h => (List.cons_inj_right 'f').mp h           -- :117-118 (Init/Data/List/Lemmas.lean:170)
+def cst : Nat → List Char
+  | 0 => ['g']
+  | n + 1 => 'a' :: cst n                                                           -- :125-127
+theorem cst_zero_ne (n : Nat) : cst 0 ≠ cst (n + 1) := of_decide_eq_false rfl      -- :135, text unchanged
+theorem cst_ne_shift : ∀ (n : Nat) (s : List Char), cst n ≠ shift s
+  | 0, _ => of_decide_eq_false rfl
+  | _ + 1, _ => of_decide_eq_false rfl                                              -- :139-141
+--   the List instance fails at the first Char, as the String one did at the first byte.
+--   Fallback: `fun h => by injection h with h1 _; exact absurd h1 (by decide)`,
+--   the pattern already compiling at SymClasses.lean:111-114.
+theorem cst_inj …  | m + 1, n + 1, h =>
+  congrArg (· + 1) (cst_inj m n ((List.cons_inj_right 'a').mp h))                   -- :147
+instance : FOL.FreshSym (List Char) where …   -- :153-158, same fields; auto-name FOL.Fresh0.instFreshSymListChar
+theorem cst_length : ∀ m : Nat, (cst m).length = m + 1   -- replaces cst_utf8ByteSize :201-207 (name would be false)
+  | 0 => rfl
+  | m + 1 => congrArg (· + 1) (cst_length m)
+theorem cst_bound_sym (s : List Char) : ∃ N, ∀ m, N ≤ m → cst m ≠ s :=
+  ⟨s.length, fun m hm he => by
+    have h := congrArg List.length he; rw [cst_length] at h; omega⟩                  -- :215-219
+-- DELETE valid_tail (:291-324) and shift_bytes (:332-336)
+def unshift : List Char → List Char := List.tail   -- :327-330; a left inverse is all that
+                                                   -- derivesSet0_shift_inv and Compacity0:291-294 need
+theorem unshift_shift (s : List Char) : unshift (shift s) = s := rfl               -- :338-347
+-- :408  ∃ c : List Char, …
+```
+
+Net change in Fresh0 is about −40 lines (ESTIMATE). Consumers that keep compiling unchanged: `Compacity0` 223–308 (uses `cst`, `cst_inj`, `shift`, `unshift`, `unshift_shift`), `Canonical0` 634–638, `Inconsistencia` 91–96, `SkolemNF0`, `SkolemHerbrand0:173`.
+
+### 2.4 `FOL/HenkinLimit0.lean`
+
+```lean
+theorem cst_ne_of_size {s : List Char} {m : Nat} (hm : s.length ≤ m) : cst m ≠ s := by
+  intro h
+  have h1 : m + 1 = s.length := (cst_length m).symm.trans (congrArg List.length h)
+  exact Nat.not_succ_le_self m (Nat.le_trans (Nat.le_of_eq h1) hm)        -- :216-220
+  | .func s ts => max s.length (bndTerms ts)                              -- :226 bndTerm
+```
+
+The seven binders at 127, 135, 145, 159, 169, 198 and 395 just become `List Char`.
+
+### 2.5 `FOL/Enumeration.lean` (reuses the instance body at 233–239)
+
+```lean
+def natToSym (n : Nat) : List Char := (natToList n).map Char.ofNat           -- replaces :208
+theorem natToSym_surj (s : List Char) : ∃ n, natToSym n = s := by            -- replaces :213-216
+  obtain ⟨n, hn⟩ := natToList_surj (s.map Char.toNat)
+  exact ⟨n, by show (natToList n).map Char.ofNat = s; rw [hn]; exact map_ofNat_toNat s⟩
+-- DELETE :218-221  instance FOL.EnumSym String
+instance : FOL.EnumSym (List Char) where      -- :232-239; auto-name instEnumSymListChar unchanged
+  enum := natToSym
+  enum_surj := natToSym_surj
+-- :252, :346  natToString → natToSym ;  :303, :377  natToString_surj → natToSym_surj
+```
+
+After this, nothing in FOL uses `String.ofList` or `String.exists_eq_ofList`.
+
+### 2.6 Duplicate `FreshSym (List Char)` instance
+
+After §2.3 the tree would hold two different `FreshSym (List Char)` instances: `FOL.instFreshSymListChar` (SymClasses, with `cst n = 'c' :: replicate n 'i'`) and Fresh0's. Lean accepts this, but which `cst` a future consumer gets would depend on its imports.
+
+- **Option A (recommended).** Keep Fresh0's instance and delete SymClasses.lean:97–114. The class is then witnessed by the very definitions the completeness chain uses.
+- **Option B (fewest row edits).** Keep SymClasses' instance and delete Fresh0.lean:149–158.
+- Either way, the "two inhabitants" claim at SymClasses:97–99 becomes false.
+- Recommendation: also drop `EnumSym String` (§2.5). Keeping String instances keeps String API in FOL, which conflicts with the D7 closing criterion.
+
+### 2.7 Statement changes in frozen modules
+
+114 declarations in frozen modules change their source statement (MEASURED; small judgment in splitting statement from body).
+
+| Module | Declarations |
+|---|---|
+| Canonical0 (6) | `termEqv_func_congr`, `termEqv_rel_congr`, `pullback`, `eval_pullback_term`, `eval_pullback_terms`, `eval_pullback_formula` |
+| Craig0 (5) | `predF`, `predF_lift`, `predF_subst`; `lkp_example`, `craig_example` (literals in the statement) |
+| Fresh0 (12) | `shift`, `shift_inj`, `cst`, `cst_ne_shift`, the instance (type and name), `cst_utf8ByteSize`→`cst_length` (**new statement**), `cst_bound_sym`, `valid_tail` (**deleted**), `unshift` (**new body**), `shift_bytes` (**deleted**), `unshift_shift`, `exists_fresh`. Proof-only changes: `cst_zero_ne`, `cst_inj`. |
+| HenkinLimit0 (8) | `occursTerm_lift`, `occursTerms_lift`, `not_occurs_substTerm`, `not_occurs_substTerms`, `not_occurs_substFormula`, `not_occurs_henkinAx`, `henLimit_witness`, `cst_ne_of_size` (**hypothesis changes from bytes to chars**). Body: `bndTerm`, which changes the values of `bnd`. |
+| Henkin0 (4) | `henkinAx`, `abs_neg_witness`, `henkin_step_derives`, `henkin_step_consistent₀` |
+| Interpolation0 (3) | `predF_em`, `predL_em`, `craig₀_example` (literals) |
+| QFDecide0 (16) | `subT_closed`, `subTs_closed`, `mem_qfT_mix`, `mem_qfA_mix`, `func_mem`, `atom_mem`, `headF`, `node`, `headA`, `atomVal`, `Good` (field `closed`), `Good.func`, `Good.atom`, `chainF`, `chainA`, `atom_congr`. Bodies: private `ca`, `cb`, `cc`, `cd`, `φx`. |
+| Rename (30) | `rename_neg`, `rename_liftTerm`, `rename_liftTerms`, `rename_liftFormula`, `rename_substTerm`, `rename_substTerms`, `rename_substFormula`, `rename_getAt?`, `rename_replaceAt`, `rename_localRule`, `map_rename_lift`, `derives0_rename`, `rename_rename_term`, `rename_rename_terms`, `rename_rename_formula`, `map_rename_rename`, `derives0_rename_inv`, `symsTerm`, `symsTerms`, `symsFormula`, `symsList`, `symsList_mem`, `locInv`, `locInv_spec`, the four `rename_rename_*_loc`/`map_rename_rename_loc`, `derives0_rename_conservative`, `derives0_rename_iff` |
+| Skolem0 (9) | `updateFunc`, `evalTerm_updateFunc`, `evalTerms_updateFunc`, `evalFormula_updateFunc`, `evalTerm_new`, `skolemAxT`, `evalTerm_newT`, `skolem_conservative₀`, `henkin_conservative₀` |
+| SkolemHerbrand0 (1) | `not_occurs_implChain` |
+| SkolemN0 (6) | `not_occurs_vars`, `skolemAxN`, `example`@186, `eval_skolemAxN`, `skolem_conservative_n₀`, `skolem_conservative_n_zero` |
+| SkolemNF0 (14) | `occurs_allBlock`, `not_occurs_skolemAxN`, `occursFormula_lift`, `occurs_merge{And,Or,Impl}{R,}`, `occurs_prenex`, `not_occurs_prenex`, plus examples @185, @192, @198 |
+| HerbrandBlock0, Soundness0 | Bodies only (private `c`; `def P`). No theorem statement changes. |
+
+Notes:
+- Every other declaration over `Term`, `Formula` or `Model` changes its elaborated type with no text change. Nine of the 23 frozen files need no code edit (Prenex0, PrenexNF0, Inversion0, Hauptsatz0, BlockExtraction0, SequentSound0, Compacity0, Lindenbaum0, TheoryFramework/Instances/FOL); Compacity0 and Lindenbaum0 only need a thaw if their comments are corrected.
+- A `*Ext.lean` workaround is impossible: the textual `String` binders stop type-checking against the new abbrevs, so all 14 frozen files must be thawed.
+
+### 2.8 KDEC risk
+
+Fourteen sites compute symbol equality in the kernel: Herbrand0 344, 366, 369, 373; QFDecide0 852, 854, 858, 879–881; Interpolation0 685; SkolemNF0 188, 195, 204. Three more are in Fresh0 (135, 140, 141).
+
+They should still work (ESTIMATE): one-character `List Char` comparison reduces through `UInt32` to `Nat.decEq`, and `SymClasses.lean:114` already proves a `Char` disequality `by decide` in today's build. QFDecide0:879, which needs `maxRecDepth 100000`, is the one to watch.
+
+## 3. Footprint rows in RPP's `check-footprints.bash`
+
+There are 490 rows; 245 are `FOL.*` and 16 are root-level or TheoryFramework (MEASURED).
+
+**Rows that change name or disappear:**
+
+| Line | Row | Fate |
+|---|---|---|
+| :127 | `FOL.Fresh0.instFreshSymString` | Option A: renamed to `FOL.Fresh0.instFreshSymListChar` (auto-name; ESTIMATE, following the existing `instEnumSymListChar` precedent). Option B: deleted. |
+| :163 | `FOL.Metamath.Enumeration.instEnumSymString` | Deleted |
+| :165 | `FOL.Metamath.Enumeration.natToString_surj` | Renamed to `natToSym_surj` |
+| :250 | `FOL.instFreshSymListChar` | Deleted under Option A; kept under B |
+
+- `:162` `instEnumSymListChar` keeps its name.
+- No other row names a declaration that D7 deletes or renames (MEASURED; `cst_utf8ByteSize`, `valid_tail`, `shift_bytes`, `unshift`, `natToString`, `bnd*` have no rows).
+- The control fails "NO MEDIDO" on any stale row.
+- Under Option A, `FOL/criba-congelacion.py:70` (`'FOL.instFreshSymListChar'` in `root_map`) must also be removed.
+
+**Same name, value at risk (ESTIMATE; the control re-measures every row):**
+- Fresh0 :123–126, :128
+- HenkinLimit0 :146–148, :301
+- Enumeration :162, :164
+- Everything downstream of `cst`, `shift`, `unshift` or `natToFormula` (Lindenbaum0, Canonical0, Compacity0, Skolem*, TheoryFramework :253–256)
+
+The likely direction is losing `Quot.sound` and/or `propext` where String byte lemmas are replaced by List lemmas. Gaining `Classical.choice` is unlikely, since nothing decodes UTF-8 any more.
+
+## 4. FOL prose that becomes false
+
+**Calls D7 abandoned or unnecessary:**
+- `FOL/FOL.lean:17–19`
+- `FOL/SymClasses.lean:57–60`
+- `NEXT-STEPS.md:79` (the D7 row) and `:29` ("D7 … ejecutadas")
+- `AXIOMS.md:537–540` (AXIOMS.md is locked)
+- `REFERENCE.md:1059–1060`
+- `CHANGELOG.md:116, 257–258, 274` are history: append a new dated entry instead of editing them.
+
+**Lean docstrings and comments that become false:**
+
+| File | Lines and what they say |
+|---|---|
+| `FOL/FOL.lean` | 13–14 (`S := String`); 36–38 ("sólo instancian String"); 44–48 ("son String por dentro y así se quedan"); 50–51 (`Fresh0.cst : Nat → String`); 122; 239, 255–261 (`Derives` "se queda en String", "especialización sólo-String") |
+| `SymClasses.lean` | 16–17, 19–31, 53–56, 61–70, 97–99 |
+| `Enumeration.lean` | 40, 63–78, 92–96, 198, 210–212, 218, 223–231 ("la metateoría no se instancia en List Char") |
+| `Fresh0.lean` | 25–37, 50–54, 64–96 (including "propext entra … por literales y ++ de String"), 111–116, 124, 129–134, 149–152, 199–200, 209–214, 285–289, 326 |
+| `HenkinLimit0.lean` | 59–64, 72–76, 85–108, 214–215, 223, 233 |
+| `Henkin0.lean` | 78, 86–110 (present-tense claims at 97–98 and 105) |
+| `Rename.lean` | 23, 42, 70–74, 413 |
+| `Skolem0.lean` | 40–41, 145–148 |
+| `Semantics.lean` | 23–26 |
+| `Compacity0.lean` | 75, 116–121 |
+| `DecEq.lean` | 32–33, 46–50 (decide controls with `"P"`) |
+| `Interpolation0.lean` | 504, 680 |
+| `Lindenbaum0.lean` | 90 |
+
+**Markdown:**
+- `REFERENCE.md`: 152, 154, 162, 163, 169, 407–408, 601, 606, 706, 842, 901 and 921 (name lists must be re-projected), 1041–1060.
+- `AXIOMS.md`: 266–276, 515–516, 525–528.
+- `CURRENT-STATUS-PROJECT.md:97`.
+- The PeanoRF letters recommend `(k : String)` and are now outdated: `RESPUESTA-PEANORF-2026-09-26.md:109, 130`, `CARTA-DE-PEANORF-2026-09-28.md:57`.
+- `PLANNING.md:80, 121` describe a text parser and printer, not the symbol type; a parser would need `String.toList`. Note only.
+
+**Two cautions:**
+- FOL has a *second* "D7": the 2026‑09‑27 decision that declared the TheoryFramework instance (`TheoryFramework/Instances/FOL.lean:21`, `NEXT-STEPS.md:140, 151`, `CURRENT-STATUS-PROJECT.md:74`, `REFERENCE.md:196–197, 1089–1098`). Do not touch those.
+- A stale claim unrelated to D7: `FOL.lean:53–54` says RPP imports exactly 8 FOL modules. It now imports 12 (§5).
+
+**Controls:**
+- `[E]` freshness turns red after commit if an edited authoritative doc's "Last updated" is not bumped.
+- If editing makes `AXIOMS.md` pass `[E]`, it must also be removed from `E_DEUDA` (`check-doc-sync.bash`, around line 313); otherwise `[E]` turns red the other way.
+- `[B]` warns on retired names left in docs.
+- `[A]` is unaffected unless a module is added.
+
+## 5. Import closures
+
+**RPP → FOL (MEASURED, BFS from `ROBINSON_PlusPlus.lean` over 113 RPP modules):** 12 modules.
+- `FOL.FOL`, `Tactics`, `Deduction`, `Theorems.{Impl, Neg, Derived, Quantifiers, Eq}` (the 8 of `FOL.Core`).
+- `FOL.Semantics` (added by `Meta/ModeloEstandar.lean` and `Meta/SolidezPrf.lean`, ADR-120 `f8aaa99`).
+- `FOL.Lift0`, which brings in `Eigenvariable` and `Derives0` (`Meta/TarskiPrf.lean:8`, ADR-121 `464bd45`).
+- Of these 12, only four have sites: `FOL/FOL.lean`, `Semantics`, `Eigenvariable`, `Theorems/Eq`. RPP's exposure is therefore `Term`, `Formula`, `Model` and the coercion; it uses none of `derive_*_congr`, `abs*`, `occurs*` or `derives0_gen_fresh` (0 files each, MEASURED).
+- Outside RPP's build: `sondeos/SymbolParamCoste.lean:79–80, 126` uses `natToString`, `natToString_surj` and `instEnumSymString`.
+
+**TheoryFramework → FOL:** only `TheoryFramework/Instances/FOL.lean:11` imports FOL (`FOL.Canonical0`). Its closure is 17 modules: Canonical0, Complexity, Derives0, Eigenvariable, Enumeration, Eq0, FOL, Fresh0, Henkin0, HenkinLimit0, Lift0, Lindenbaum0, Rename, Semantics, Soundness0, SymClasses, Theorems.Eq. TheoryFramework itself has 0 sites, and its 4 footprint rows keep their names.
+
+**Other consumers:**
+- PeanoRF requires FOL by local path (`Peano-from-ROB-n-FOL/lakefile.lean:22`) and has 89 code lines with `String` in 8 files (MEASURED). It is blocked, and will break the next time it builds against FOL.
+- 43 out-of-build Lean files in `auditoria/` and `cuarentena/` have String code. They are archives and need no change.
+
+**Ordering.**
+- The abbrev change is atomic: all 24 files must land in one FOL commit.
+- RPP's CI checks out FOL at `ref: master`, unpinned (`RPP/.github/workflows/build.yml:49–57`). RPP will therefore be red between the FOL push and the RPP push (M‑12 order), unless both are prepared on branches.
+
+**Proposed closing test for D7:** on the stripped code of `FOL/**`, `FOL.lean` and `TheoryFramework/**`, there are 0 `String` tokens (today 225) and 0 symbol literals (today 76). The only string literals left should be the PRINT ones: `Tactics.lean:24, 26` and the notation declarations.
+===== design:sym-macro 18640
+No `sym!` exists in Lean 4.31 core or in either repo, and one macro covers both term and pattern position. Nothing was compiled or written, and no lake/lean/elan was run. Every claim about Lean below comes from reading the toolchain sources (paths are relative to `<home>\.elan\toolchains\leanprover--lean4---v4.31.0\src\lean`). RPP paths are relative to `E:\dropbox\github\lean4\ROBINSON_PlusPlus`.
+
+## 1. Does `sym!` already exist?
+
+- **Lean core: no.** A grep for `sym!` over Init, Lean and Std finds 0 hits (MEASURED). Two unrelated things carry the name:
+  - the grind tactic `sym … =>` (`Init/Grind/Tactics.lean:311-314`);
+  - the symbolic-simulation library under `Init/Sym.lean` / `Lean.Meta.Sym`.
+- **The tactic does not reserve the word `sym`.** The tactic category is registered as `.both` (`Lean/Parser/Term/Basic.lean:33`), and in such categories the first atom of a syntax is made non-reserved (`Lean/Elab/Syntax.lean:267-274`).
+- **Repos: no.** 0 occurrences of `sym!` in any `.lean` file of RPP or FOL (MEASURED). The only mention is the proposal in `doc/PLAN-COMPLETITUD-FINITISTA.md:1356`. Plain `['f']` literals already appear in `sondeos/SymbolParam.lean:64,107`.
+- **The new token breaks no existing identifier.** 44 lines use the identifier `sym` (MEASURED, comments included), e.g. `Meta/ArithPrf.lean:205`. The tokenizer only prefers a token over an identifier when the token is at least as long (`Lean/Parser/Basic.lean:934-940, 959-973, 1041-1045`). So `sym ts` still reads as an identifier.
+
+## 2. The macro
+
+The same code works in terms and in `match` patterns. It needs no imports, because everything it uses is in `Init`.
+
+```lean
+set_option autoImplicit false
+
+namespace ROBINSON_PlusPlus.Minimal.SymLit
+
+/-- `sym!"abc"` is the symbol `['a', 'b', 'c'] : List Char`; `sym!""` is `([] : List Char)`. -/
+syntax:max (name := symLit) "sym!" str : term
+
+macro_rules (kind := symLit)
+  | `(sym! $s:str) => do
+    let mut acc : Lean.Term ← ``(List.nil)
+    for c in s.getString.toList.reverse do
+      let lit : Lean.Term := Lean.Syntax.mkCharLit c
+      acc ← ``(List.cons $lit $acc)
+    ``(($acc : List Char))
+
+end ROBINSON_PlusPlus.Minimal.SymLit
+```
+
+Why each piece is there:
+
+- **`syntax:max` is required.** Without an explicit precedence, a syntax that does not end in an atom gets `leadPrec` (`Lean/Elab/Syntax.lean:413-417`). Function arguments are parsed at `argPrec` (`Lean/Parser/Term.lean:877-885`; the levels are in `Init/Notation.lean:117-121`). Without `:max`, `.func sym!"σ" [t]` and `| sym!"σ", [a]` would need parentheses. Core's `s!` uses `syntax:max` for the same reason (`Init/Data/ToString/Macro.lean:14`).
+- **Reading the string and building chars:**
+  - `getString` decodes escape sequences and raw strings (`Init/Meta/Defs.lean:1150-1165, 1347-1348`).
+  - `Syntax.mkCharLit c` builds a char literal from `Char.quote` (`Defs.lean:860-861`). `Char.quoteCore` escapes only `\n`, `\t`, `\\`, `"`, `'` and control characters; σ, Π, ⊢ are written as-is (`Init/Data/Repr.lean:360-373`).
+  - `decodeCharLit` reads it back (`Defs.lean:1167-1178`), and `Coe CharLit Term` exists (`Defs.lean:480-481`).
+- **It builds `List.cons` directly instead of a `[…]` literal.** The core list-literal macro switches to `%[…|…]` at 64 elements-plus-separators, i.e. from 33 elements (`Init/Data/List/Notation.lean:58-62`). From 8 elements on, `%[…]` introduces a `let` (`Init/NotationExtra.lean:286-296`). A `let` is rejected in patterns (`Lean/Elab/PatternVar.lean:306-316`) and changes the term's shape. The longest RPP symbol is 12 characters (`validProofFn`, MEASURED), so `[…]` would work today; the direct build has no length limit.
+- **Double backquotes make it capture-proof.** Identifiers inside a quotation are resolved when the macro is defined and carry macro scopes (`Lean/Elab/Quotation.lean:126-143`). The `` `` `` form also checks them at definition time (`Lean/Elab/Quotation/Precheck.lean:59-79, 156-159`). At the use site, those pre-resolved names win (`Lean/Elab/Term/TermElabM.lean:2158-2170`). So `def cons` in `Minimal/Axioms.lean:84` cannot hijack `List.cons`.
+- **The `: List Char` ascription is always added.** It makes `sym!""` work on its own, since `List.nil` alone has no element type. The type-ascription elaborator returns the term unchanged when the types agree (`Lean/Elab/BuiltinNotation.lean:428-436`; `TermElabM.lean:1307-1313`), so nothing is added to the term.
+- **No silent fallback to `String`.** No coercion from `List Char` exists in Init, Lean or Std (MEASURED, grep). A slot that still expects `String` gives a type error instead of reintroducing a String.
+
+## 3. What it produces, and its axiom footprint
+
+- **The term.** `'c'` elaborates to `Char.ofNat` applied to a raw nat literal (`Lean/Elab/BuiltinTerm.lean:267-270`). So `sym!"substfc"` becomes `@List.cons Char (Char.ofNat 115) (… (@List.nil Char))`.
+  - The only constants are `List.cons`, `List.nil`, `Char` and `Char.ofNat`, plus raw literals.
+  - There is no `String` and no `String.toList`, in the kernel or at runtime. The macro's own `String` code runs only while elaborating.
+- **The definitions involved.** `Char.ofNat` (`Init/Prelude.lean:2865-2869`, tagged `@[noinline, match_pattern]`) is built from `Nat.isValidChar` (2823-2824) and `Char.ofNatAux` (2853-2859). `DecidableEq Char` (2883-2887) goes through `UInt32.decEq` (2639-2644), `BitVec.decEq` (2374-2381) and `Nat.decEq` (1853-1857). None of their bodies uses propext, Quot.sound or Classical.choice (ESTIMATE, from reading the sources).
+- **The project's own earlier measurement agrees.** It was recorded, not re-run by me: `sondeos/SimbolosSinString.lean:32,35,36` lists `Char.ofNat`, `instDecidableEqChar` and `DecidableEq (List Char)` as having no axioms. It was taken on 2026-09-14 on v4.31.0 (the toolchain since commit 61f9852, 2026-07-04). The probe still compiles (`doc/AUDITORIA-BASE-2026-10-02.md:247`). For contrast, `String.toList` is recorded as `[propext, Classical.choice, Quot.sound]` (`doc/PLAN-COMPLETITUD-FINITISTA.md:1386`).
+- **The macro and unexpander definitions themselves do use `String`.** No theorem refers to them, so no footprint changes. But a D7 closure check that greps for `String` must exempt this one file.
+
+## 4. Why it works in patterns
+
+- **Macros are expanded before patterns are analysed.** `Lean/Elab/Match.lean:1126` calls `expandMacrosInPatterns` (154-157). That calls `expandMacros`, which recurses through every node (`Init/Meta/Defs.lean:688-700`). The comment at `PatternVar.lean:31` says the same. `fun |` and `do` patterns take the same path (`PatternVar.lean:449-454`).
+- **The pattern collector accepts every node the macro produces:**
+  - the type ascription: it collects the inner term and ignores the type (`PatternVar.lean:227-231`; the node layout is in `Lean/Parser/Term.lean:167-168, 182-183`);
+  - the `List.cons` application, with the `α` parameter turned into `_` (`PatternVar.lean:215-216, 320-332, 397-418, 178-188, 370-374`);
+  - the bare `List.nil` identifier, recognised as a constructor (338-351);
+  - the char literal (280-281).
+- **Chars become value patterns.** `Char.ofNat 963` is recognised as a match value (`Lean/Meta/Match/Value.lean:16-28`, via `getCharValue?` in `Lean/Meta/LitValues.lean:72-76`). It is then normalised to a value pattern (`LitValues.lean:140-152`; `Lean/ToExpr.lean:189-191`; `Match.lean:519-520, 617-618`).
+- **The model after D7** reads `| sym!"σ", [a] => a + 1`, …, `| sym!"axiomsCodeT", [] => V`, `| _, _ => 0`. The lemmas read `theorem MN_succ (a : Nat) : (MNV V).func sym!"σ" [a] = a + 1 := rfl`. That is 33 pattern alternatives (`Meta/ModeloEstandar.lean:51-86`) plus 25 per-symbol lemmas (91-115), i.e. 58 literals (MEASURED). This matches the "58 in the model dispatch" recorded in ADR-122.
+
+## 5. Is a big match on `['σ']` patterns efficient?
+
+**How it compiles.** Each list position compiles to a `List.casesOn` split (`Lean/Meta/Match/Match.lean:280-292`). Each character position compiles to a chain of `dite (x = 'c')` tests, in the order the characters first appear (Match.lean:294-299, 646-650, 668-697; `Lean/Meta/Match/CaseValues.lean:21-35, 57-81`). The catch-all row is copied into every branch, and the else branch keeps only that row (Match.lean:694-697). The result is a trie over the symbol names. With `String` patterns there is instead one whole-string test per alternative.
+
+**Size of that trie for the model** (MEASURED, computed from the symbols at `Meta/ModeloEstandar.lean:51-86`):
+
+| | symbols | total chars | trie nodes | distinct first chars |
+|---|---|---|---|---|
+| `func` | 28 | 113 | 92 | 22 |
+| `rel` | 5 | 20 | 20 | 5 |
+
+**Tests needed to reach a symbol** (MEASURED, assuming the order of Match.lean:646-650):
+
+| | char tests (List Char) | string tests (String) |
+|---|---|---|
+| worst, `axiomsCodeT` | 32 | 28 |
+| `validProofFn` | 30 | 25 |
+| total over the 28 `func` symbols | 434 | 406 |
+
+Each char test is a `Nat` comparison after unfolding `Char.ofNat`, `UInt32.decEq` and `BitVec.decEq`. The matcher term has more test nodes (92+20 against 28+5), but I expect compile time and the 25 `rfl` lemmas to stay cheap (ESTIMATE, not measured).
+
+**The real risk: the 34 `simp [..., MNV]` calls in `ModeloEstandar.lean`** (MEASURED; `sondeos/ModeloNat.lean` has another 34). Each one opens the match. I could not settle by reading which way simp reduces it:
+- simp tries to reduce the match at `.reducible` transparency (`Lean/Meta/Tactic/Simp/Types.lean:162-174`; `Rewrite.lean:376-380`);
+- the special unfold list for matches includes `decEq`, `Char.ofNat`, `Char.ofNatAux`, `UInt32.decEq`, `String.decEq` and `List.hasDecEq`, but not `BitVec.decEq` (`Lean/Meta/WHNF.lean:498-519`);
+- instances such as `instDecidableEqChar` are `implicit_reducible` (`Lean/Elab/MutualDef.lean:1228-1235`), which does not unfold at `.reducible` (`Lean/Meta/GetUnfoldableConst.lean:16-28`).
+
+So, as with today's String instance, simp most likely falls back to the match's equation lemmas (`Rewrite.lean:368-374`). Those must be regenerated for the larger trie. This needs a measurement in the D7 sondeo.
+
+**Cheap mitigation**, in line with the file's own rule at `ModeloEstandar.lean:89`: 8 `func` symbols have no per-symbol lemma (`+ * − √ /₂ %₂ ^ Π_p`, MEASURED). Add `rfl` lemmas for them and remove `MNV` from those simp sets.
+
+When simp does meet a char equality, built-in simprocs decide it (`BuiltinSimprocs/Char.lean:56-57`). The proof goes through `eq_false_of_decide` and `eq_false`, which brings only `propext` (`Init/SimpLemmas.lean:25-26, 33-34`). simp never looks inside a char literal (`Char.lean:70`; `Simp/Main.lean:62, 513, 522`).
+
+## 6. Optional unexpander (prints `sym!"…"` in goals)
+
+Place it right after the macro, inside the same namespace:
+
+```lean
+/-- Prints a `List.cons` chain of char literals ending in `[]` back as `sym!"…"`.
+Unexpanders run bottom-up, so the tail is already `[]` or `sym!"…"`. -/
+@[app_unexpander List.cons]
+def unexpandSymLit : Lean.PrettyPrinter.Unexpander
+  | `($(_) $c:char $tail) =>
+    match tail with
+    | `([])          => `(sym! $(Lean.Syntax.mkStrLit c.getChar.toString))
+    | `(sym! $s:str) => `(sym! $(Lean.Syntax.mkStrLit (c.getChar.toString ++ s.getString)))
+    | _              => throw ()
+  | _ => throw ()
+```
+
+Why it works:
+- **No `import Lean` needed.** `Unexpander` lives in Init, and its doc says it "can be declared without importing Lean" (`Init/Prelude.lean:5965-5973`). The attribute is built in (`Lean/PrettyPrinter/Delaborator/Basic.lean:482`).
+- **`meta` is not needed.** That check only applies to files that start with `module` (`Lean/Attributes.lean:158-163`), and neither repo has any (MEASURED, 0 files).
+- **It runs before core's list printer.**
+  - A char is printed as a char literal (`Lean/PrettyPrinter/Delaborator/Builtins.lean:1099-1104`) and `List.nil` as `[]` (`Init/NotationExtra.lean:152-153`).
+  - Arguments are printed before the head's unexpanders run (Builtins.lean:375-389).
+  - Unexpanders are tried until one succeeds (441-445, 457-476), newest first (`Lean/KeyedDeclsAttribute.lean:92-95, 176-186`).
+  - So this one runs before core's `unexpandListCons` (`NotationExtra.lean:155-162`), and `throw ()` hands non-literal heads or tails back to it.
+
+Limits:
+- `sym!""` still prints as `[]`. Unexpanders never see the implicit `Char` argument (Builtins.lean:432-437). Telling an empty symbol from an empty list would need a full delaborator, which requires `import Lean`.
+- Every literal `List Char` prints as `sym!"…"`, symbol or not.
+- `pp.notation false` or `pp.explicit` show the raw chain (Builtins.lean:386).
+- `#eval` and `Repr` output still show `['s', …]`.
+- I expect it to print `sym!"Π_p"` with no space between `sym!` and the string (ESTIMATE, from `Lean/PrettyPrinter/Formatter.lean:383-407`).
+
+## 7. Pitfalls
+
+1. **Missing `:max`.** Arguments fail to parse without it (section 2).
+2. **Empty string.** The ascription is what makes `sym!""` give `[] : List Char`. It is needed for `def dflt : Term := Term.func sym!"" []` (`Meta/SolidezVerificador.lean:53`).
+3. **Unicode.** Code points in the source (MEASURED with iconv): σ = U+03C3 = 963, τ = U+03C4 = 964, − = U+2212 = 8722, √ = U+221A = 8730, ₂ = U+2082 = 8322, Π = U+03A0 = 928, ≤ = U+2264 = 8804, ∈ = U+2208 = 8712, ⊢ = U+22A2 = 8866.
+   - All are below 0xD800, so `Char.ofNat` never clamps them to `'\0'` (`Prelude.lean:2823-2824, 2866-2869`).
+   - The source spelling decides the length: `/₂` is 2 chars and `Π_p` is 3 (MEASURED).
+   - `−` (U+2212, used by `sub_sym`) and ASCII `-` look the same but are different symbols, exactly as with String today.
+4. **Never put a symbol definition's name in a pattern unless it is tagged `@[match_pattern]`.** Otherwise it silently becomes a pattern variable (`PatternVar.lean:345-349`). In practice Lean then reports the following alternatives as redundant (`Match.lean:1043-1063`).
+   - **An option worth taking:** `@[match_pattern] def succ_sym : List Char := sym!"σ"`, then `| succ_sym, [a] => …`. Core documents exactly this use (`Lean/Meta/Match/MatchPatternAttr.lean:15-32`), and the pattern compiler unfolds the definition (`Match.lean:486-491, 535-537`).
+   - It gives one source of truth for 17 of the 33 model symbols (MEASURED: the 17 `_sym` definitions at `Minimal/Axioms.lean:39-66`).
+5. **Do not write `Char.ofNat 963` by hand.** It elaborates with an `OfNat` literal rather than a raw one, so it no longer matches `'σ'` syntactically, and `delabChar` will not print it as a char (Builtins.lean:1102-1103).
+6. **Long symbols.** Long literals make deep terms, and macro expansion counts recursion depth per node (`Defs.lean:696`). This is irrelevant here: the longest symbol is 12 chars (MEASURED).
+7. **FOL side.**
+   - FOL's own symbol literals are all single-character: 72 occurrences in 11 files (MEASURED by grep, lower bound). FOL can write `['P']` and needs no macro.
+   - `instance : Coe String Formula` (`FOL/FOL/FOL.lean:122-124`) must be removed under D7, or it keeps a `String` entry point. My grep found no uses of it (ESTIMATE).
+
+## 8. Where to put it
+
+**Recommendation:** a new module with no imports, `ROBINSON_PlusPlus/Minimal/SymLit.lean`, imported by `Minimal/Axioms.lean` (add the line after the imports at 7-8). Reasons:
+- the D7 "no String" check can exempt exactly one file;
+- the self-checks stay out of Axioms.lean (1793 lines, MEASURED);
+- the file can move to FOL unchanged if FOL ever needs it.
+
+Every RPP module reaches Axioms through its imports, except `Full/PrimeFactor.lean`, which contains no string literals (MEASURED). Sondeos import the root, so `sym!` is available everywhere a symbol is written.
+
+**Avoid naming the file `Sym.lean`.** The doc-sync catalog check `[C]` greps for the file's base name as a plain substring of REFERENCE.md (`check-doc-sync.bash:695-703`). "Sym" already matches "Symbol" at `REFERENCE.md:182,184` (MEASURED), so the check would pass without a real catalog entry. "SymLit" has 0 hits (MEASURED).
+
+**Steps a new module needs:**
+- `new-module.bash` requires `ROBINSON_PlusPlus/_template.lean` (`new-module.bash:48-50`), which does not exist (MEASURED). Create the file by hand and run `bash gen-root.bash`.
+- Add the REFERENCE.md §1 entry.
+- The banner figures "módulos activos" and "jobs" checked by `[A]` each go up by 1 (ESTIMATE); update them in the same commit.
+- RPP's frozen and locked lists are empty (MEASURED: 0 and 2 bytes), so nothing needs unlocking.
+
+**Alternative:** put the same code inside `Minimal/Axioms.lean`, between the imports and `-- ## Language Definition` (lines 9-37). This avoids the doc changes but mixes macro code into the axiom file.
+
+## 9. Self-checks to put in the module
+
+```lean
+example : sym!"substfc" = ['s', 'u', 'b', 's', 't', 'f', 'c'] := rfl
+example : sym!"" = ([] : List Char) := rfl
+example : sym!"Π_p" = ['Π', '_', 'p'] := rfl
+def symMatchProbe : List Char → List Nat → Nat
+  | sym!"σ", [a] => a + 1
+  | sym!"Π_p", [l] => l
+  | sym!"", [] => 7
+  | _, _ => 0
+example : symMatchProbe sym!"τ" [4] = 0 := rfl
+example : symMatchProbe sym!"" [] = 7 := rfl
+/-- Footprint guard: a String-based expansion would show `Classical.choice` here. -/
+def symProbe : List Char := sym!"axiomsCodeT"
+#print axioms symProbe   -- expected (ESTIMATE): no axioms
+```
+
+- The `rfl` checks do not prove the term is String-free, because `rfl` would also hold through evaluation. The `#print axioms` line is the real guard.
+- That line makes `symProbe` a "titular" (`check-footprints.bash:5-21`), so the footprint table needs a row for it with "-".
+- An optional `#guard_msgs in #check sym!"Π_p"` would test the unexpander. Both pieces are available without `import Lean` (`Init/Notation.lean:775ff`, `Lean/Elab/GuardMsgs.lean:203`). Take the exact expected text from the first compile.
+
+## 10. Other notes
+
+- **Concurrent edits in RPP.** Uncommitted changes appeared during this run in `DECISIONS.md`, `NEXT-STEPS.md` and `lakefile.lean` (ADR-128: `leanOptions := #[⟨autoImplicit, false⟩, ⟨relaxedAutoImplicit, false⟩]`). If that lands, the module's `set_option autoImplicit false` becomes redundant but harmless. None of the `.lean` files cited above were among the changes.
+- **Earlier D7 figures** (24 FOL files of which 14 frozen, 28 RPP files, 164 literals) are as recorded in ADR-122 (`DECISIONS.md:9480-9485`); I did not re-measure them, apart from the 58 cross-checked above.
+- **MCP connectors.** The `engineering` plugin's connectors (asana, atlassian, datadog, github, linear, notion, pagerduty, slack) remain unauthorized and unavailable until you authorize them in the claude.ai connector settings.
+===== risk:kernel-eval 13109
+**D7 kernel-evaluation risk (RPP 8fd14f4, FOL 782928c)**
+
+I only read sources. I ran no Lean.
+
+**Bottom line:** D7 does not make symbol codes newly evaluable by the kernel. They already are today. What D7 changes is the cost of evaluating them, the definition heights, the spelling of symbols and the equality instance. The real barrier to evaluation is unary `triN` and `numeralM`, and D7 does not touch either.
+
+## 0. The premise does not hold for v4.31.0
+
+**Evidence from the toolchain sources (INFERENCE):**
+- `String.toList` is defined as `(String.Internal.toArray s).toList` (`Init/Data/String/Basic.lean:240-242`).
+- `toArray` calls `ByteArray.utf8Decode?` (`:222-223`). Its inner loop `go` is marked `@[semireducible]` and uses `termination_by b.size - i` (`:74-86`).
+- Well-founded definitions with a Nat measure are compiled to `WellFounded.Nat.fix` (`Lean/Elab/PreDefinition/WF/Fix.lean:281-301`; `Main.lean:62-67` warns about `@[semireducible]` on any other kind).
+- `Nat.fix` is documented as "reduces on closed terms" (`Init/WF.lean:478-497`).
+- The built-in `String.reduceToList` dsimproc depends on that reduction (`Lean/Meta/Tactic/Simp/BuiltinSimprocs/String.lean:39-42`).
+
+**The build already relies on it:**
+- `Meta/Hilbert.lean:69-74` (`axiomsBase_lift_eq`) proves its statement with `rfl` ("por cómputo"). It sets `maxRecDepth 20000`, and its docstring says this "cubre los numerales de símbolos (σ = 963)".
+- The 141 base axioms contain closed codes: `strCodeM zero_sym` and `strCodeM succ_sym` (`Minimal/Axioms.lean:894-899`), and `termCodeM` of `zero`, `succ #0`, `nil` and `cons #1 #0` (`:1158-1179`, `:1543-1545`).
+- `strCodeM s` is `charsCodeM s.toList` (`:589`). This `rfl` cannot be checked without decoding "0", "σ" and "::" and walking `numeralM` 48, 963 and 58 (INFERENCE from the definitions; the proof is in the green build).
+
+**The barrier D7 leaves alone** (unary `triN`, `Minimal/Axioms.lean:626-632`; unary `numeralM`, `:571-573`). Values computed from the definitions (MEASURED):
+
+| Code | Value |
+|---|---|
+| `codeNatStr "0"` | 1,177 |
+| `codeNatStr "σ"` | 464,167 |
+| `codeNatStr "::"` | 1,569,048 |
+| `codeNatStr "∈"` | 37,953,829 |
+| TC0 = `tcFnN 0` | 241,120,331,829 (needs `triN 694,434`) |
+| TCS | ≈5.80·10²¹ (needs `triN ≈1.08·10¹¹`) |
+
+So any Nat-level code with a symbol inside a `consN`, and therefore the anchor, `V₀`, `godelCN` and `liar`, is out of the kernel's reach both before and after D7.
+
+**What D7 does change:**
+- Definition heights: the `String.toList` and `String.decEq` layers disappear from every constant built on symbols.
+- The spelling of symbols, and the compiled form of the `MNV` dispatch.
+- The equality instance: `String.decEq` becomes `instDecidableEqList` on `Char`.
+
+**A cheap check to settle this before D7** (not run). Put three examples in a sondeo:
+- `"σ".toList = ['σ'] := by decide +kernel` (should pass today).
+- `codeNatStr "σ" = 464167 := by decide +kernel` (should pass today).
+- `set_option maxHeartbeats 2000 in #guard_msgs in example : tcFnN 0 = 241120331829 := by decide +kernel` (should fail in the kernel).
+
+`decide +kernel` exists in v4.31 (`Init/Tactics.lean:1377-1381`), and the kernel honours `maxHeartbeats` (`Lean/AddDecl.lean:25,29`; `Lean/Environment.lean:274-277`).
+
+## 1. Ranked list (likelihood D7 changes kernel behaviour × damage)
+
+**R1 — MEDIUM-HIGH: closed `rfl` closes over Nat-level symbol codes (no free variables)**
+- Where:
+  - `Meta/ModeloCodificacion.lean:126-129` (`v_tc_zero`, `v_tc_succ`: `abre; rfl`).
+  - `:189-194` (`v_vpf_ind`, `v_vpf_listInd`).
+  - `:245` and `:283-288` (`lwf` on tags 18 and 20).
+  - `:367-368`.
+  - The data they use: `Meta/ModeloCodigo.lean:445-454`, `477-482`, `591`, `593`.
+- Why it is risky: they pass only because both sides become syntactically equal after unfolding names (TC0 → `codeNatTerm zero`, `zero_sym` → literal). On closed terms the kernel's eager Nat evaluation is armed (INFERENCE from the kernel algorithm). If D7 makes one side differ, the kernel goes to `triN 694,434` and hits deep recursion or hangs. Examples of such drift: `tcFnN` switches to `codeNatChars` but `ev_strCodeM` still produces `codeNatStr`, or `abre` gains `consN`/`codeNatChars` so one side turns into arithmetic.
+- Mitigation:
+  - Unfold explicitly with `rw [tcFnN, TC0, TCS, TNIL, TCONS]`, then close with `with_reducible rfl`, which fails fast (`rw` itself only tries this; `Init/Tactics.lean:609`).
+  - Keep the `*_sym` constants folded: remove them from `abre` (`Meta/ModeloEstandar.lean:238-246`) and state the `MN_*` lemmas over the constants.
+  - Rewrite with a ∀-lemma such as `evalTerm … (cons (numeralM 1) (cons (strCodeM s) (cons nil nil))) = consN 1 (consN (codeNatChars s) (consN 0 0))`.
+
+**R2 — MEDIUM: existing proofs that do evaluate symbol codes at term level**
+- (a) `Meta/Hilbert.lean:69-74`, described in §0.
+- (b) `Meta/ReprPrf.lean:871`, `893`, `1055`, `1084` (`prf_lineWF_ind`, `prf_lineWF_listInd` and their `_imp` forms). Their `simp only` sets (for example `:876-877`) do not include `substTerm_termCodeM` (`Minimal/Axioms.lean:750`). So `substTerm 0 X (termCodeM …)` is closed by evaluation in the final `exact` (INFERENCE). The file also sets `maxRecDepth 16000` (`:30`). For contrast, `HasWitTcFnPrf.lean:220-224` does include `substTerm_strCodeM`.
+- Why it is risky: the cost is bounded today, but these proofs are the pattern for "compute through codes". Spelling symbols as `"…".toList` adds a decode to every comparison, a non-ASCII symbol (∈ = 8,712) multiplies the depth, and extending (a) to `axioms` would reach the anchor.
+- Mitigation: use the closure lemmas instead (`Minimal/Axioms.lean:684-724`, `745-750`), then lower the raised limits. MEASURED: the build has 24 `set_option maxRecDepth` lines (2×40000, 3×20000, 1×16000, 17×8000, 1×4000).
+
+**R3 — MEDIUM: the D7 epicentre, the `MNV` model dispatch**
+- Where (MEASURED): `Meta/ModeloEstandar.lean:48-87` (33 String patterns), `:91-115` (25 `MN_*` `rfl` lemmas, with `V` a variable), `:238-246` (`abre`), `:250-454` (34 `v_*` proofs using `simp [..., MNV]`). 33 + 25 = 58, which matches ADR-122's figure for the dispatch.
+- Why it is risky: the matcher gets recompiled from a `String.decEq` chain into a List/Char decision tree. If the spelling drifts, simp lemmas stop firing. A `"σ".toList` in a kernel-checked position costs a UTF-8 decode, whereas today's `String.decEq` only encodes (`Init/Prelude.lean:3534`).
+- Mitigation: use one spelling only, `def succ_sym : List Char := ['σ']`, with patterns identical to the constants' bodies, and never `.toList` of a literal. Measure compile time and memory against ADR-120 (17 s and 38 s, 5.1 GB; quoted, not re-measured).
+
+**R4 — MEDIUM-LOW (unlikely, but catastrophic): the only places `V₀` meets a defeq check**
+- Where: `Meta/ModeloCodificacion.lean:325-335` (`V₀_def` by `rfl`; `v_ancla` ending in `exact V₀_def`), `Meta/ModeloCodigo.lean:559-561`, `Meta/Consistencia.lean:43-47` and `:62-70`.
+- Why it is risky: if D7 edits the body of `V₀` but not the hand-written right-hand side of `V₀_def`, the check becomes a real closed defeq and hits the measured trap.
+- Mitigation: use the generated equation lemma (`V₀.eq_1`, or `rw [V₀]`), and end `v_ancla` with `rw` instead of `exact`.
+
+**R5 — MEDIUM-LOW: closed astronomical numeral under `simpa`**
+- Where: `Meta/GodelTwoPrf.lean:146-150` (`rw … at hiff; simpa only [godelCN, selfAppN, provCodeN, …]`), with the definitions in `Meta/DiagonalNumeral.lean:60-67`.
+- Why it is risky: `simpa` ends with a default-transparency defeq. If heights or normal forms change, the check may unfold towards `codeNat godelBeta'`.
+- Mitigation: an explicit `rw` chain closed with `with_reducible`, or prove the statement for an arbitrary numeral `N` and instantiate.
+
+**R6 — LOW-MEDIUM: kernel rejection rather than evaluation**
+- Where: `Meta/CodeDecode.lean:25-26`, `54-65`, `167`, `211-218`, and the memory note `feedback_lean_kernel_ite_string`.
+- D7 swaps the `ite` instance to `instDecidableEqList`. Keep the functional-induction workaround and re-test `decodeTerm_inj` and `decodeForm_inj` first.
+
+**R7 — LOW: the anchor family**
+- Where: `Minimal/Axioms.lean:1084-1135` and `1631-1635`; `Meta/Representability2Prf.lean:113-174`.
+- These are generic in `L` and `ψ`, and the anchor enters only by application, so D7 leaves them unchanged.
+- Keep `subst_psiD` (`:1103-1107`) free of `"…".toList` literals; the dsimproc would add kernel-checked decode steps.
+
+**R8 — LOW: list-spine computations only**
+- Where: `Minimal/Axioms.lean:1772-1775`, `Full/Induction.lean:89-96` and `108-112`, plus 309 `simp [… axioms …]` proof lines in 40 files (MEASURED).
+- Elements are compared by name, so nothing is unfolded. Keep the axioms as named constants.
+
+**R9 — LOW (gets cheaper with D7): symbol inequality by `decide`**
+- Where: `Meta/Godel.lean:85-92` and `122-126`; `Meta/Provability.lean:68-72`; `FOL/FOL/DecEq.lean:49-50`.
+
+**R10 — LOW: docstrings that give the wrong reason**
+- `Meta/ModeloCodigo.lean:443-444` says TC0..TCONS are not computed because of "un símbolo String". The real reason is `triN`.
+- `Meta/ModeloEstandar.lean:16-18` and `Meta/Consistencia.lean:39-41` explain the `V₀` trap "by height". See §3.
+
+## 2. The «EVALUAR EL ANCLA» census (`check-sorry.bash:316-412`)
+
+- **Still adequate after D7.** The objects that carry the anchor numeral (`EV_TOK`, `:333`) come from `codeNat` and `numeralM`, not from String. Compiled `String.toList` is already native (`@[extern]`, `Basic.lean:240`), so `#eval` feasibility does not change. No token is a symbol name. Re-run the autotest (`:368-402`) after D7.
+- **Gaps that exist already, not caused by D7:**
+  - `provCodeN` (`DiagonalNumeral.lean:63-64`; it is used on `godelCN` at `GodelTwoPrf.lean:147`).
+  - `TC0`, `TCS`, `TNIL`, `TCONS` and `tcFnN`. Compiled `triN` would need recursion depth 694,434 or about 10¹¹ (ESTIMATE: stack overflow or no end).
+  - Add these to `EV_TOK`, with autotest lines.
+- **Its assumption at `:323-324`** ("falla a la vista, nunca en verde") still holds for the anchor. But "visible" can mean an unattributed CI hang.
+- **Extra controls:**
+  - (a) A canary sondeo, kernel-only and bounded: `set_option maxHeartbeats 2000 in #guard_msgs in example : liftTerm 0 (nD axiomsBase) = nD axiomsBase := by decide +kernel`, and the same shape for `V₀` and for `tcFnN 0`. Pin the exact kernel message on the first run.
+  - (b) A dosimeter in the same sondeo: the three §0 examples, re-run after D7.
+  - (c) A kernel-time census: build with `-Dprofiler=true -Dprofiler.threshold=N`. Kernel checks are reported under "type checking" (`Lean/AddDecl.lean:172`). Add a per-module timeout and diff the results before and after D7.
+  - (d) A census of proof positions. Baseline today (MEASURED): the 309 `simp [axioms]` lines plus 13 others (`Full/Induction.lean:90`; `ChainDecode.lean:266`; `EvalPredPrf.lean:129`; `GodelTwoPrf.lean:150`; `ModeloCodificacion.lean:322,326,331,368,383,388`; `ModeloEstandar.lean:108`; `Minimal/Axioms.lean:1106,1775`). Also 0 `decide` lines on code functions. Any new line flags.
+  - (e) `debug.skipKernelTC` in a scratch file only, to separate elaborator cost from kernel cost. It is a banned hole in versioned code.
+
+## 3. The two traps
+
+**(a) The definition-height trap** (recorded at `DECISIONS.md:9277-9280`: 2.5 GB in 12 s; quoted, not re-measured)
+- D7 lowers the heights above the symbol layer. The order stays the same between a definition and what it is built from (`V₀` over `concatN`; TC0 over `codeNatTerm`; the anchor over `axD` over `nD`). Between unrelated constants (`MNV` and `V₀`) the order may change; I have not measured this.
+- The measured trap does not depend on that order: the left side is stuck at a projection of `MNV V₀`, so `V₀` is the only side the kernel can unfold (INFERENCE). D7 neither fixes it nor creates it.
+- Keep proving for a variable `V` and instantiating. Add the change in R4 and the canary. `opaque` is not an option: the census flags it, and `V₀_def` needs the equation.
+
+**(b) The ADR-124 blow-up** (`DECISIONS.md:9575-9591`: more than 3 GB at 14 s; quoted)
+- The values do not depend on how symbols are stored (`"::"` = 1,569,048; `tcFnN 0` = 241,120,331,829; MEASURED). The cost comes from `triN`, so D7 neither causes nor cures it. It only removes the decode prefix, so the blow-up would arrive sooner.
+- Turning the closed codes into variables works because the kernel evaluates Nat arithmetic eagerly only on terms with no free variables (INFERENCE; this is what `ev_tc_cons_der` at `:385-388` does). Keep doing that: never `simp`, `decide` or default `rfl` on closed hypotheses that contain symbol codes, `tcFnN`, TC0..TCONS, `V₀` or `nD`.
+
+## Notes
+
+- I broke the read-only rule once: a grep redirect created `<tmp-claude>_anchor_proofpos.txt` (43,142 bytes). I did not delete it, because deleting is also forbidden; please remove it.
+- ADR-122's counts (24 FOL files, 14 of them frozen; 28 RPP files; 164 literals) are quoted, not re-measured.
+- The engineering plugin's MCP servers are still unauthorized in this session.
+===== inv:RPP 21906
+# D7 inventory for RPP: String → List Char
+
+**Scope.** RPP `master` at `8fd14f4`, FOL at `782928c`. Nothing was edited and no Lean tooling was run.
+
+**Caveat on line numbers.** While I worked, another session was editing `DECISIONS.md`, `NEXT-STEPS.md` and `lakefile.lean` (ADR‑128, `autoImplicit`; uncommitted). The `NEXT-STEPS.md` lines below come from that working tree. Lines after 35 sit one line later than in HEAD.
+
+**Method (all MEASURED with grep).**
+- Identifier sites: `LC_ALL=C awk -f strip-lean.awk`, which drops comments and literals.
+- Literal sites: the same awk script, altered in memory so that it keeps literals. No file was written.
+- Notation, `macro` and `syntax` tokens are not counted as sites.
+
+## 0. Summary
+
+| Figure | Value | Label |
+|---|---|---|
+| `.lean` files in the build tree | 112 | MEASURED |
+| Files that need edits | **28**: 21 have symbol literals, 7 have only TYPE/API sites. Matches ADR‑122. | MEASURED |
+| Symbol literals | **164**, one per line, in 21 files. Matches ADR‑122's 164, with 58 in the model dispatch. | MEASURED |
+| TYPE lines (code naming `String` as a type) | 55 | MEASURED |
+| API lines (`toList`, `ofList`, `asString`, `String.*`) | 23 | MEASURED |
+| PRINT lines | 4 (`Axioms.lean` 139, 141, 142, 144) | MEASURED |
+| Distinct code lines to edit | 223 | MEASURED |
+| Lines that use the chain names but need no edit if the names are kept | 249, in 45 files | MEASURED |
+| Comment and docstring lines that say `String` | 13, in 7 files | MEASURED |
+| RPP `frozen_files.txt` / `locked_files.txt` | both empty: no thaw needed on the RPP side | MEASURED |
+| `char` literals in RPP code | 0 | MEASURED |
+| Uses of FOL's `Coe String Formula` (`FOL/FOL.lean:123`) | none. Every code literal is accounted for below. | MEASURED |
+
+## 1. Code sites in the build tree, by file
+
+Classes: **TYPE** · **LITERAL** · **API** · **PROOF** · **PRINT**. "Dep." means the site depends on the symbol type but needs no edit.
+
+### `ROBINSON_PlusPlus/Minimal/Axioms.lean`
+
+| Lines | Class | Site |
+|---|---|---|
+| 39–45, 52–55, 57–58, 61–63, 66 | TYPE+LITERAL | the 17 `*_sym : String := "…"` definitions. `nil_sym` (53) and `le_sym` (62) are never used in RPP or the sondeos. |
+| 457, 459, 483, 485, 515, 545, 795, 797, 811, 813, 836, 860, 891, 927, 1063 | LITERAL | `Term.func "substtc"`, `"substtsc"`, `"liftc"`, `"liftsc"`, `"substfc"`, `"liftfc"`, `"carc"`, `"cdrc"`, `"lenc"`, `"nthc"`, `"runFn"`, `"premsOf"`, `"tcFn"`, `"validProofFn"`, `"axiomsCodeT"` |
+| 856, 858, 864 | LITERAL | `Formula.atom "allIn"`, `"lineWF"`, `"chainOk"` |
+| 589 | TYPE+API | `strCodeM (s : String) := charsCodeM s.toList` |
+| 638 | TYPE+API | `codeNatStr (s : String) := codeNatChars s.toList` |
+| 681–682 | TYPE+API | `liftTerm_strCodeM` (`s.toList`) |
+| 745–747 | TYPE+API | `substTerm_strCodeM` (`str.toList`) |
+| 139, 141, 142, 144 | PRINT | `termToString : Term → String`. Lines 141–142 need `String.ofList f`. The `ToString` instance is unchanged. |
+| 595, 604, 643, 653, 688, 699, 753, 765, 895, 899, 903 | Dep. | uses of `strCodeM`/`codeNatStr` on a symbol variable or a `_sym` |
+
+Code points that must be kept exactly (MEASURED):
+- `σ` U+03C3, `−` U+2212 (not `-`), `√` U+221A, `₂` U+2082, `τ` U+03C4
+- `Π` U+03A0, `≤` U+2264, `∈` U+2208
+
+### `Meta/Provability.lean`
+- **39** TYPE+API: `strCode (s : String) := charsCode s.toList`.
+- **92–99** TYPE+API+PROOF: `strCode_injective`. Its proof uses `s.toList`, `String.toList_inj`, `String.toList_injective`, `String.ext` and `String.asString_toList`.
+- **72** PROOF, dep.: `nil_ne_cons` closes `absurd hs (by decide)`, where `hs : zero_sym = cons_sym`.
+- Dep.: 47, 57, 130, 158, and the exports at 237–243.
+
+### `Meta/Representability.lean`
+- **101** TYPE+API: `strCodeM_eq (s : String) … := charsCodeM_eq s.toList`.
+- Dep.: 106, 114.
+
+### `Meta/CodeNumeralPrf.lean`
+- **134–135** TYPE+API: `prf_strCode_numeral (s : String) … := prf_charsCode_numeral s.toList`.
+- Dep.: 144, 158, and the re-exports at 191, 199, 204.
+
+### `Meta/DerivCondPrf.lean`
+- **45–46**, **65–67** TYPE+API: `liftTerm_strCode` and `substTerm_strCode` (`s.toList`, `str.toList`).
+
+### `Meta/CodeNatInjPrf.lean`
+- **123–125** TYPE+API+PROOF: `codeNatStr_inj` (`s.toList`, `String.ext`, `simpa [String.toList]`).
+- Dep.: 140, 162, 207–208.
+
+### `Meta/CodeDecode.lean`
+- **55** TYPE+API: `decodeStr : … Option String := (decodeChars c).map String.ofList`.
+- **64–65** TYPE+PROOF: `decodeStr_strCodeM`, which uses `String.ofList_toList`.
+- **211–218** TYPE+PROOF: `decodeStr_inj`, which uses `String.toList_ofList`.
+- PROOF, dep.: lines 31, 32, 45, 46, 78, 81, 83, 90, 91, 113, 116, 118, 122, 126, 131, 133, 138 and 143 compare symbols with `=` or `==` against the `_sym` constants. Their inversion proofs (`decodeChars_inj` at 187–209, `decodeTerm_inj` from 222) use `beq_iff_eq` and `eq_of_beq`. The docstrings at 72–75 and 167–171 warn that the `DecidableEq String` casts were fragile in the kernel.
+
+### `Meta/ModeloEstandar.lean`
+- **51–78** LITERAL: 28 function-symbol patterns of `MNV.func`.
+- **82–86** LITERAL: 5 relation patterns of `MNV.rel`.
+- **91–115** LITERAL: the 25 `MN_*` statements, each proved by `rfl`.
+- **132–133** TYPE+API: `ev_strCodeM` (`s.toList`).
+- PROOF, dep.:
+  - 118–206: `show (MNV V).func cons_sym …; …; rfl`.
+  - 238–246: the macro `abre`. It unfolds the `_sym` constants to literals and then rewrites with `MN_*`. It is used 107 times in `ModeloCodificacion.lean`.
+  - 251–450: 34 `simp [… MNV]` calls that must reduce the symbol matcher.
+
+### `Meta/SolidezVerificador.lean`
+- **51** TYPE+API: `decS : Nat → String := String.ofList (…)`.
+- **53** LITERAL: `dflt := Term.func "" []`.
+- **155–158** TYPE+API+PROOF: `decS_codeNatStr`, which uses `String.ofList_toList`.
+- Dep.: 57–128, 167–181, and the `rfl` lemmas at 203–204.
+
+### `Meta/OmegaReflect.lean`
+- **131** TYPE: the constructor `IsCodeShaped.strCode (s : String)`.
+
+### `Meta/Sigma1AtomPrf.lean`
+- **291, 295, 299, 307, 314, 319** TYPE: the `atom1CodeFn` family, each with `(s : String)`.
+- **325** LITERAL: `lineWFCodeFn := atom1CodeFn "lineWF" tc`.
+- PROOF: the `rfl` bridges at 296 and 328–329.
+
+### `Meta/TrackedCorePrf.lean`
+- **102, 107, 116, 124, 133, 139** TYPE: the `atom2CodeFn` family.
+- **147** LITERAL `"chainOk"`, **154** LITERAL `"allIn"`.
+- PROOF: the `rfl` bridges at 108, 150–151 and 157–158.
+
+### `Meta/LiftcCodePrf.lean`
+- **328** TYPE: `prf_substfc_atom2CodeFn (s : String)`. This is a TABLA row.
+- **113, 115** LITERAL: the bodies of `liftcT` and `liftscT`.
+- **119, 121, 167, 170** LITERAL: proof terms.
+- PROOF: the `rfl` bridges at 140–145.
+
+### `Meta/EvalSubstfcPrf.lean`
+- **944, 945, 948, 952, 957, 967, 974** TYPE: `gO`, `gT`, `prf_congr_gT`, `prf_substtc_gT`, `substtc_inv_gT`, `AXTER_BODY` and `pcc_substfc_ter_dot`, each with `(nm : String)`.
+- LITERAL, 16 in all:
+  - 127–128: `pcc_congr_substfcT_arg2_code`
+  - 971–972: `AXTER_eq` and `AXTER_impl`, both `rfl`
+  - 1110: `AXATOM_BODY`, tied to its definition by `AXATOM_ok` (`rfl`, line 1112)
+  - 1137, 1144, 1149, 1166, 1170, 1190, 1194, 1211, 1214, 1227: `pcc_substfc_atom_dot`
+  - 1277: `caso_eq_core`
+
+### Files whose only sites are `strCode "…"` literals
+
+| File | Lines (enclosing declaration) |
+|---|---|
+| `D3BodyPrf` | 65 `hG_lineWF`, 73 `hwG_lineWF` |
+| `EvalArithPrf` | 185 `substfcT` (definition), 197 |
+| `EvalLiftfcPrf` | 70 `liftfcT` (definition), 126, 135 |
+| `EvalListPrf` | 54, 56, 58 `carcT`/`cdrcT`/`lencT` (definitions); 63, 66, 69, 102, 105, 108 |
+| `EvalNthcPrf` | 64 `nthcT` (definition), 69, 80. No `rfl` bridge. |
+| `EvalRunFnPrf` | 49 `runFnT` (definition), 101. No `rfl` bridge. |
+| `EvalSubsttcPrf` | 87, 89 `substtcT`/`substtscT` (definitions); 107, 111 |
+| `LineWFThyPrf` | 78–80 `"axiomsCodeT"` |
+| `LineWFTrackedPrf` | 563–565 `"lineWF"` |
+| `PremsBdAllPrf` | 1263 `"premsOf"` |
+| `PremsOfDotPrf` | 78 `premsOfT` (definition), 87, 94 |
+| `SubstfcCodePrf` | 108–109 `"substfc"` |
+| `SubstfcWitnessPrf` | 2031 `"succ"`, 2036 `"add"`, 2041 `"liftsc"`, 2042 `"cons"`, all in `example`s. `"succ"`, `"add"` and `"cons"` are not the real symbol spellings. |
+| `TrackedAtomsPrf` | 228 `"nthc"`, 233 `"lenc"`, 238 `"carc"`, 243 `"cdrc"` |
+
+How the 164 literals split up (MEASURED):
+- 35 in `Axioms.lean`
+- 58 in the model (`ModeloEstandar.lean`)
+- 53 as `strCode "…"` arguments
+- 14 as arguments of the `gO`/`gT`/`AXTER` helpers
+- 3 as arguments of `atom1CodeFn`/`atom2CodeFn`
+- 1 for `dflt`
+
+### PROOF dependencies in files with no text to edit (expected to keep working; only a build can confirm)
+- `Meta/Godel.lean` 88 and 92 (`numeral_injective`) and 126 (`nil_ne_cons`): `absurd hsym (by decide)` with `hsym : zero_sym = succ_sym` or `zero_sym = cons_sym`.
+- `Meta/ChainDecode.lean` 66–89 (`decEqTerm` uses the symbol type's `DecidableEq`), plus 162, 208, 217, 219 and 362 (`==` on `_sym`).
+- `Meta/ChainNegPrf.lean` 714 (`simpa using hcs`) and 725, 732, 782, 796, 822, 866 (`beq_self_eq_true` on symbols).
+- `Meta/ModeloCodificacion.lean`: the 107 `abre` calls, plus 368 (`rfl` with `codeNatStr succ_sym`) and 394.
+- `Meta/HasWitTcFnPrf.lean:79` (`rfl`) and `Meta/ModeloCodigo.lean:453–454`.
+
+The core of the toolchain has what these need:
+- `instance [BEq α] : BEq (List α)` and `LawfulBEq (List α)` (`Init/Data/List/Basic.lean:144,152`)
+- `DecidableEq (List α)` (`Prelude.lean:2982`)
+- the simprocs `Char.reduceEq` and `Char.reduceNe` (`BuiltinSimprocs/Char.lean:56–57`)
+
+There is **no** `Coe String (List Char)` in the core, so every literal must be rewritten.
+
+### Comments and docstrings that say `String` (13 lines)
+- `CodeDecode.lean` 25, 26, 54, 73, 167
+- `Provability.lean` 38, 42
+- `ChainDecode.lean` 53, 61
+- `Axioms.lean` 588
+- `ModeloCodigo.lean` 444
+- `EvalLiftcPrf.lean` 779
+- `ChainNegPrf.lean` 934
+
+## 2. The definitional chain after D7: names kept, values unchanged
+
+```lean
+-- Minimal/Axioms.lean
+def succ_sym : List Char := ['σ']   -- … the 17 *_sym defs, same code points
+def strCodeM (s : List Char) : Term := charsCodeM s
+def codeNatStr (s : List Char) : Nat := codeNatChars s
+theorem liftTerm_strCodeM (c : Nat) (s : List Char) : … := liftTerm_charsCodeM c s
+theorem substTerm_strCodeM (v : Nat) (s : Term) (str : List Char) : … := substTerm_charsCodeM v s str
+-- Meta/Provability.lean
+def strCode (s : List Char) : Term := charsCode s
+theorem strCode_injective {s t : List Char} (h : strCode s = strCode t) : s = t := charsCode_injective h
+-- Meta/Representability.lean
+theorem strCodeM_eq (s : List Char) : strCodeM s = strCode s := charsCodeM_eq s
+-- Meta/CodeNumeralPrf.lean
+theorem prf_strCode_numeral (s : List Char) : … := prf_charsCode_numeral s
+-- Meta/DerivCondPrf.lean
+theorem liftTerm_strCode (c) (s : List Char) : … := liftTerm_charsCode c s
+theorem substTerm_strCode (v) (s : Term) (str : List Char) : … := substTerm_charsCode v s str
+-- Meta/CodeNatInjPrf.lean
+theorem codeNatStr_inj {s t : List Char} (h : codeNatStr s = codeNatStr t) : s = t := codeNatChars_inj h
+-- Meta/CodeDecode.lean
+def decodeStr (c : Term) : Option (List Char) := decodeChars c
+theorem decodeStr_strCodeM (s : List Char) : decodeStr (strCodeM s) = some s := decodeChars_charsCodeM s
+theorem decodeStr_inj {c : Term} {s : List Char} (h : decodeStr c = some s) : c = strCodeM s := decodeChars_inj h
+-- Meta/ModeloEstandar.lean
+theorem ev_strCodeM (v) (s : List Char) : … := ev_charsCodeM v s
+-- Meta/SolidezVerificador.lean
+def decS (n : Nat) : List Char := (decodeL n).map Char.ofNat
+def dflt : Term := Term.func [] []
+theorem decS_codeNatStr (s : List Char) : decS (codeNatStr s) = s := by
+  rw [decS, codeNatStr, decodeL_codeNatChars, List.map_map]
+  have e : (Char.ofNat ∘ Char.toNat) = id := funext Char.ofNat_toNat
+  rw [e, List.map_id]
+```
+
+**Why the values do not change.** Each literal `L` becomes `L.toList`. The new `strCodeM (L.toList)` unfolds to `charsCodeM L.toList`, which is exactly what the old `strCodeM L` unfolded to. The same holds for `strCode` and `codeNatStr`.
+- So `codeNatTerm`, `codeNat`, `tcFnN`, `V₀`, the anchor and `godelCN` keep the same natural-number values.
+- The code `Term`s correspond to the old ones through `toList`.
+- `""` maps to `[]` (`dflt`).
+- All of this holds only if the code points are transcribed exactly.
+
+Keep these as plain `def`, not `abbrev`, so `simp` and `rw` keys stay as they are. This is an ESTIMATE of the safer choice.
+
+**Declarations whose statement changes** (`String` → `List Char`):
+- `Axioms.lean`: the 17 `*_sym`, `strCodeM`, `codeNatStr`, `liftTerm_strCodeM`, `substTerm_strCodeM`
+- `Provability.lean`: `strCode`, `strCode_injective`
+- `strCodeM_eq`, `prf_strCode_numeral`, `liftTerm_strCode`, `substTerm_strCode`, `codeNatStr_inj`
+- `CodeDecode.lean`: `decodeStr`, `decodeStr_strCodeM`, `decodeStr_inj`
+- `ev_strCodeM`, `decS`, `decS_codeNatStr`, the constructor `IsCodeShaped.strCode`
+- the 6 `atom1CodeFn` declarations, the 6 `atom2CodeFn` declarations, `prf_substfc_atom2CodeFn`
+- the 7 `gO`/`gT`/`AXTER_BODY` declarations
+- the 25 `MN_*` lemmas and `AXTER_eq`/`AXTER_impl` (literals in their statements)
+
+**Declarations whose proof changes:**
+- the eight terms that pass `s.toList` (listed above)
+- `strCode_injective`, `codeNatStr_inj`, `decodeStr_strCodeM`, `decodeStr_inj`, `decS_codeNatStr`: their String lemmas are dropped
+
+**Declarations whose body changes (literal only):**
+- the 18 coding definitions in `Axioms.lean`
+- `MNV`, `dflt`, `termToString`
+- `lineWFCodeFn`, `chainOkCodeFn`, `allInCodeFn`, `AXATOM_BODY`
+- the dotted constructors `substfcT`, `liftfcT`, `carcT`, `cdrcT`, `lencT`, `nthcT`, `runFnT`, `substtcT`, `substtscT`, `liftcT`, `liftscT`, `premsOfT`
+- about 40 proof terms that carry a literal (§1)
+
+**Unchanged:** `charsCode(M)`, `codeNatChars`, `charsCode_injective`, `charsCodeM_eq`, `prf_charsCode_numeral`, `liftTerm_charsCode(M)`, `substTerm_charsCode(M)`, `codeNatChars_inj`, `decodeChars` and its two lemmas, `ev_charsCodeM`, `decodeL_codeNatChars`, `termCode(M)`, `formCode(M)`, `codeNatTerm(s)`, `codeNat`, `decT`, `dec`, `decodeTerm`, `decodeForm`.
+
+**How to rewrite the literals** (the choice is the owner's):
+- **A. Hand-transcribe** all 164 literals as character lists.
+- **B. Named constants.** Add 18 named constants for the coding symbols (`substtc_sym` … `chainOk_sym`). Then only the 35 definitions and the 33 match patterns keep literals, because a `match` pattern cannot name a definition.
+- **C. A `sym!"…"` macro**, already proposed in `doc/PLAN-COMPLETITUD-FINITISTA.md` §7.2. It expands to a character list at elaboration time, keeps the code points exact, and works in patterns. The toolchain has the helpers it needs (`Lean.Syntax.mkCharLit` at `Init/Meta/Defs.lean:860`, `TSyntax.getString` at 1347). It must live in a module that `Axioms.lean` imports. ESTIMATE, untested.
+
+Several bridges compare literal spellings by `rfl` and would catch a typo: `*T_termCode` in `EvalArithPrf`, `EvalLiftfcPrf`, `EvalListPrf`, `EvalSubsttcPrf`, `LiftcCodePrf` and `PremsOfDotPrf`, plus `lineWFCodeFn_termCode`, `chainOkCodeFn_termCode`, `allInCodeFn_termCode`, `AXTER_*` and `AXATOM_ok`. `nthcT` and `runFnT` have no such bridge.
+
+## 3. Sondeos that compile today (35 of 88, `_tabla.txt`, exit code 0)
+
+**Affected by D7: they will stop compiling unless migrated.** Counts are MEASURED.
+
+| Sondeo | LITERAL | TYPE lines | API lines | Where |
+|---|---|---|---|---|
+| `ModeloNat` | 58 | 1 | 1 | 679–706 and 710–714 (patterns), 719–743 (`MN_*`), 760–761 |
+| `RecodCoste` | 16 | 4 | 0 | 86–87; 69, 72, 83, 88 (`List String` holding FOL symbols) |
+| `CraigEqVacuo` | 5 | 6 | 0 | `"P"` at 25, 27, 33, 48, 53; `(p : String)` at 61, 63, 66, 69, 75, 85 |
+| `AnclaEqInconsistente` | 4 | 4 | 0 | 98, 613, 617; `esAC : String → …` at 97, 121, 125, 129 |
+| `MetaReglasRefutables` | 4 | 1 | 0 | `"P"` at 105, 125, 131, 225; 179 |
+| `ModeloDiscriminador` | 4 | 0 | 0 | model patterns at 123–126 |
+| `RosserReflexion` | 2 | 1 | 0 | 70, 83, 94 |
+| `ClausuraFormaEcuacional` | 1 | 0 | 0 | 402 |
+| `EnumFormulaPorInyeccion` | 0 | 2 | 3 | 76, 103–105 (its own copies of `codeNatStr` and `codeNatStr_inj`) |
+| **Total** | **94** | **19** | **4** | |
+
+**Depends on FOL names.** `SymbolParamCoste` (57–63, 78–80, 126) builds `FreshSym String` and `EnumSym String` on `FOL.Fresh0.{shift, cst, …}` and `natToString(_surj)`. It breaks only if FOL removes those names.
+
+**Lean meta-programming only: they compile unchanged.**
+- `ClassicalChoiceCenso`: 11 `#print axioms String.*`, lines 127–139
+- `D7Contrafactual`: Lean names; its result becomes history
+- `Magnitud`: `report` labels
+- `NombresFrescosMedicion`: String-only lemmas, no `Term`
+- `PilotoAislado`: `elab` messages
+- `SimbolosSinString`
+
+**No sites: the other 19.** Their `_sym` hits were all `…_symm`.
+
+For context: 25 of the 53 sondeos that do not compile today also have String sites (268 literals). This is a heuristic count and was not classified.
+
+## 4. `check-footprints.bash` TABLA (490 rows: 229 RPP, 261 others; MEASURED)
+
+**RPP rows whose name changes or disappears: none**, under the keep-names proposal. The chain appears in only two rows, and both stay:
+- `Provability.charsCode` (file line 279)
+- `Axioms.axiomsCodeT` (280); its body's literal changes, its footprint `-` does not
+
+The **statement** changes for `LiftcCodePrf.prf_substfc_atom2CodeFn` (458), but not its name.
+
+**Footprint values.** The comparison is exact, so up to **48 of the 226** RPP rows that carry `Classical.choice` will go red until updated. That count comes from ADR‑122's counterfactual; the sondeo prints only counts, not which rows.
+- One likely case: `EvalLiftfcPrf.liftfcT_termCode` (404) is an `rfl` lemma whose only source of choice is the `String` inside `strCode`. ESTIMATE.
+
+**FOL rows in RPP's table (FOL decides; RPP must edit the table).** A row whose declaration no longer exists fails as "NO MEDIDO".
+
+| Effect | Rows (file line) |
+|---|---|
+| Disappear or get renamed if FOL drops the String instances | `FOL.Fresh0.instFreshSymString` (127), `FOL.Metamath.Enumeration.instEnumSymString` (163), `natToString_surj` (165) |
+| Statement changes | `FOL.Fresh0.cst_bound_sym` (124), `FOL.derive_atom_congr` (248), `FOL.derive_eq_func_congr` (249), all with `(p : String)` |
+| Proofs go through Fresh0 or `natToString` | 123, 125, 126, 128, 164 |
+| Stay, and become the live instances | 162 and 250 (the `ListChar` instances) |
+
+There are 39 FOL rows with choice today (MEASURED). The plan doc's 2026‑09‑26 figure was "at most 5 of 51 owe it only to String" (ESTIMATE).
+
+**Suggested closing gate (ESTIMATE).** Add rows `Provability.strCode|-`, `Axioms.strCodeM|-` and `Axioms.codeNatStr|-`, and re-run `D7Contrafactual`. After D7, "today" should equal "cutting String".
+
+## 5. Docs that will be false or stale after D7 (DECISIONS ADR‑101/102/122 and CHANGELOG are history and stay)
+
+| Where | What it says now |
+|---|---|
+| `NEXT-STEPS.md:29–30` (the current block) | "D7: ⬜ DECISIÓN del propietario … la puerta de la medición recomienda cerrarla". Already superseded by the owner's decision. |
+| `NEXT-STEPS.md:54, 103, 153–154, 1512` | Older blocks marked "como registro"; they stay. Line 1512 reads "No migrar … PROYECTADO". |
+| `doc/PLAN-COMPLETITUD-FINITISTA.md:52` | "ABANDONADA en FOL … siguen sobre `String` a propósito" |
+| same file, :1434 (heading) and :1448–1458 | "CERRADA como ABANDONADA … se quedan en `String`" |
+| same file, :1268 | "La raíz en RPP son dos líneas: `strCode s := charsCode s.toList`" |
+| same file, :1395–1397 | "Cambia `G`". False if the values are preserved; ADR‑122 §1 already says no value changes. |
+| same file, §7.4 :1412–1432 | ties the `Sugerencias.md` work to this migration. The owner needs to confirm whether that still applies. |
+| `sondeos/README.md:83` | `D7Contrafactual` row: "La puerta … da NO; la decisión es del propietario" |
+| `sondeos/README.md:13` | "35 de 88 compilan". Nine of those 35 break unless migrated: rows 80, 77, 86, 87, 90, 100, 149, 198 and `RosserReflexion` at 85. |
+| `REFERENCE.md:425` (section "Hoy") | lists D7 as pending. Line 435 is a record. |
+| `doc/REFERENCE-Kernel.md:43–61` | `def … : String := …`. Already stale: it still lists `proj1_sym` and `proj2_sym`. |
+| `doc/REFERENCE-Godelization.md:65, 85, 101` | describe `String` symbols and the `strCode` signature |
+| `doc/REFERENCE-Incompleteness.md:984` (plus 1002, 1012 as lessons) | `decodeStr : Term → Option String` |
+| `PLAN-NEGVERIFIER.md:445, 472, 498–499` | plan, low priority |
+| `doc/book/extraido/fol_Term.tex:9`, `fol_Formula.tex:9`, `revision/LIBRO.md:415, 541, 549`, `MATERIALES.md:120` | `func : String → …`; regenerate from FOL |
+
+`CURRENT-STATUS-PROJECT.md`, `README.md` and `AXIOMS.md` have 0 mentions of D7, `String` or `List Char` (MEASURED). They only need a new line once D7 is done.
+
+On the FOL side, which is not part of this inventory: `../FOL/NEXT-STEPS.md:79` reads "D7 … CERRADA como ABANDONADA". The same file reuses the label "D7" at :151 for an unrelated decision.
+
+## 6. Open risks a build would settle (all unmeasured)
+- **The model's match on character lists.** 33 branches, 25 `rfl` lemmas, 34 `simp [… MNV]` calls and 107 `abre` calls; its cost is unknown.
+- **Decoder proofs.** `split` and `if_pos` over `DecidableEq`/`BEq (List Char)` in `CodeDecode`, `ChainDecode` and `ChainNegPrf`, where the `String` versions were fragile in the kernel.
+- **The exact warnings table** in `check-warnings.bash`: `CodeWitnessPrf` 4, `ChainNegPrf` 2, `SubstfcWitnessPrf` 1.
+- **How many lines the RPP edit takes.** I count 223 code lines with a site; the edit should come to about 230–260 lines (ESTIMATE). ADR‑122's 500–750 covers FOL and RPP together.
+
+---
+
+Separately: the `engineering` plugin's MCP connectors (asana, atlassian, datadog, github, linear, notion, pagerduty, slack) are still not authorised. They are authorised in claude.ai's connector settings (or with `/mcp` in an interactive session), and stay unavailable until then.

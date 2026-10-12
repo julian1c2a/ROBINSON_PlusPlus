@@ -1,0 +1,195 @@
+===== design:sym-macro 18640
+No `sym!` exists in Lean 4.31 core or in either repo, and one macro covers both term and pattern position. Nothing was compiled or written, and no lake/lean/elan was run. Every claim about Lean below comes from reading the toolchain sources (paths are relative to `<home>\.elan\toolchains\leanprover--lean4---v4.31.0\src\lean`). RPP paths are relative to `E:\dropbox\github\lean4\ROBINSON_PlusPlus`.
+
+## 1. Does `sym!` already exist?
+
+- **Lean core: no.** A grep for `sym!` over Init, Lean and Std finds 0 hits (MEASURED). Two unrelated things carry the name:
+  - the grind tactic `sym … =>` (`Init/Grind/Tactics.lean:311-314`);
+  - the symbolic-simulation library under `Init/Sym.lean` / `Lean.Meta.Sym`.
+- **The tactic does not reserve the word `sym`.** The tactic category is registered as `.both` (`Lean/Parser/Term/Basic.lean:33`), and in such categories the first atom of a syntax is made non-reserved (`Lean/Elab/Syntax.lean:267-274`).
+- **Repos: no.** 0 occurrences of `sym!` in any `.lean` file of RPP or FOL (MEASURED). The only mention is the proposal in `doc/PLAN-COMPLETITUD-FINITISTA.md:1356`. Plain `['f']` literals already appear in `sondeos/SymbolParam.lean:64,107`.
+- **The new token breaks no existing identifier.** 44 lines use the identifier `sym` (MEASURED, comments included), e.g. `Meta/ArithPrf.lean:205`. The tokenizer only prefers a token over an identifier when the token is at least as long (`Lean/Parser/Basic.lean:934-940, 959-973, 1041-1045`). So `sym ts` still reads as an identifier.
+
+## 2. The macro
+
+The same code works in terms and in `match` patterns. It needs no imports, because everything it uses is in `Init`.
+
+```lean
+set_option autoImplicit false
+
+namespace ROBINSON_PlusPlus.Minimal.SymLit
+
+/-- `sym!"abc"` is the symbol `['a', 'b', 'c'] : List Char`; `sym!""` is `([] : List Char)`. -/
+syntax:max (name := symLit) "sym!" str : term
+
+macro_rules (kind := symLit)
+  | `(sym! $s:str) => do
+    let mut acc : Lean.Term ← ``(List.nil)
+    for c in s.getString.toList.reverse do
+      let lit : Lean.Term := Lean.Syntax.mkCharLit c
+      acc ← ``(List.cons $lit $acc)
+    ``(($acc : List Char))
+
+end ROBINSON_PlusPlus.Minimal.SymLit
+```
+
+Why each piece is there:
+
+- **`syntax:max` is required.** Without an explicit precedence, a syntax that does not end in an atom gets `leadPrec` (`Lean/Elab/Syntax.lean:413-417`). Function arguments are parsed at `argPrec` (`Lean/Parser/Term.lean:877-885`; the levels are in `Init/Notation.lean:117-121`). Without `:max`, `.func sym!"σ" [t]` and `| sym!"σ", [a]` would need parentheses. Core's `s!` uses `syntax:max` for the same reason (`Init/Data/ToString/Macro.lean:14`).
+- **Reading the string and building chars:**
+  - `getString` decodes escape sequences and raw strings (`Init/Meta/Defs.lean:1150-1165, 1347-1348`).
+  - `Syntax.mkCharLit c` builds a char literal from `Char.quote` (`Defs.lean:860-861`). `Char.quoteCore` escapes only `\n`, `\t`, `\\`, `"`, `'` and control characters; σ, Π, ⊢ are written as-is (`Init/Data/Repr.lean:360-373`).
+  - `decodeCharLit` reads it back (`Defs.lean:1167-1178`), and `Coe CharLit Term` exists (`Defs.lean:480-481`).
+- **It builds `List.cons` directly instead of a `[…]` literal.** The core list-literal macro switches to `%[…|…]` at 64 elements-plus-separators, i.e. from 33 elements (`Init/Data/List/Notation.lean:58-62`). From 8 elements on, `%[…]` introduces a `let` (`Init/NotationExtra.lean:286-296`). A `let` is rejected in patterns (`Lean/Elab/PatternVar.lean:306-316`) and changes the term's shape. The longest RPP symbol is 12 characters (`validProofFn`, MEASURED), so `[…]` would work today; the direct build has no length limit.
+- **Double backquotes make it capture-proof.** Identifiers inside a quotation are resolved when the macro is defined and carry macro scopes (`Lean/Elab/Quotation.lean:126-143`). The `` `` `` form also checks them at definition time (`Lean/Elab/Quotation/Precheck.lean:59-79, 156-159`). At the use site, those pre-resolved names win (`Lean/Elab/Term/TermElabM.lean:2158-2170`). So `def cons` in `Minimal/Axioms.lean:84` cannot hijack `List.cons`.
+- **The `: List Char` ascription is always added.** It makes `sym!""` work on its own, since `List.nil` alone has no element type. The type-ascription elaborator returns the term unchanged when the types agree (`Lean/Elab/BuiltinNotation.lean:428-436`; `TermElabM.lean:1307-1313`), so nothing is added to the term.
+- **No silent fallback to `String`.** No coercion from `List Char` exists in Init, Lean or Std (MEASURED, grep). A slot that still expects `String` gives a type error instead of reintroducing a String.
+
+## 3. What it produces, and its axiom footprint
+
+- **The term.** `'c'` elaborates to `Char.ofNat` applied to a raw nat literal (`Lean/Elab/BuiltinTerm.lean:267-270`). So `sym!"substfc"` becomes `@List.cons Char (Char.ofNat 115) (… (@List.nil Char))`.
+  - The only constants are `List.cons`, `List.nil`, `Char` and `Char.ofNat`, plus raw literals.
+  - There is no `String` and no `String.toList`, in the kernel or at runtime. The macro's own `String` code runs only while elaborating.
+- **The definitions involved.** `Char.ofNat` (`Init/Prelude.lean:2865-2869`, tagged `@[noinline, match_pattern]`) is built from `Nat.isValidChar` (2823-2824) and `Char.ofNatAux` (2853-2859). `DecidableEq Char` (2883-2887) goes through `UInt32.decEq` (2639-2644), `BitVec.decEq` (2374-2381) and `Nat.decEq` (1853-1857). None of their bodies uses propext, Quot.sound or Classical.choice (ESTIMATE, from reading the sources).
+- **The project's own earlier measurement agrees.** It was recorded, not re-run by me: `sondeos/SimbolosSinString.lean:32,35,36` lists `Char.ofNat`, `instDecidableEqChar` and `DecidableEq (List Char)` as having no axioms. It was taken on 2026-09-14 on v4.31.0 (the toolchain since commit 61f9852, 2026-07-04). The probe still compiles (`doc/AUDITORIA-BASE-2026-10-02.md:247`). For contrast, `String.toList` is recorded as `[propext, Classical.choice, Quot.sound]` (`doc/PLAN-COMPLETITUD-FINITISTA.md:1386`).
+- **The macro and unexpander definitions themselves do use `String`.** No theorem refers to them, so no footprint changes. But a D7 closure check that greps for `String` must exempt this one file.
+
+## 4. Why it works in patterns
+
+- **Macros are expanded before patterns are analysed.** `Lean/Elab/Match.lean:1126` calls `expandMacrosInPatterns` (154-157). That calls `expandMacros`, which recurses through every node (`Init/Meta/Defs.lean:688-700`). The comment at `PatternVar.lean:31` says the same. `fun |` and `do` patterns take the same path (`PatternVar.lean:449-454`).
+- **The pattern collector accepts every node the macro produces:**
+  - the type ascription: it collects the inner term and ignores the type (`PatternVar.lean:227-231`; the node layout is in `Lean/Parser/Term.lean:167-168, 182-183`);
+  - the `List.cons` application, with the `α` parameter turned into `_` (`PatternVar.lean:215-216, 320-332, 397-418, 178-188, 370-374`);
+  - the bare `List.nil` identifier, recognised as a constructor (338-351);
+  - the char literal (280-281).
+- **Chars become value patterns.** `Char.ofNat 963` is recognised as a match value (`Lean/Meta/Match/Value.lean:16-28`, via `getCharValue?` in `Lean/Meta/LitValues.lean:72-76`). It is then normalised to a value pattern (`LitValues.lean:140-152`; `Lean/ToExpr.lean:189-191`; `Match.lean:519-520, 617-618`).
+- **The model after D7** reads `| sym!"σ", [a] => a + 1`, …, `| sym!"axiomsCodeT", [] => V`, `| _, _ => 0`. The lemmas read `theorem MN_succ (a : Nat) : (MNV V).func sym!"σ" [a] = a + 1 := rfl`. That is 33 pattern alternatives (`Meta/ModeloEstandar.lean:51-86`) plus 25 per-symbol lemmas (91-115), i.e. 58 literals (MEASURED). This matches the "58 in the model dispatch" recorded in ADR-122.
+
+## 5. Is a big match on `['σ']` patterns efficient?
+
+**How it compiles.** Each list position compiles to a `List.casesOn` split (`Lean/Meta/Match/Match.lean:280-292`). Each character position compiles to a chain of `dite (x = 'c')` tests, in the order the characters first appear (Match.lean:294-299, 646-650, 668-697; `Lean/Meta/Match/CaseValues.lean:21-35, 57-81`). The catch-all row is copied into every branch, and the else branch keeps only that row (Match.lean:694-697). The result is a trie over the symbol names. With `String` patterns there is instead one whole-string test per alternative.
+
+**Size of that trie for the model** (MEASURED, computed from the symbols at `Meta/ModeloEstandar.lean:51-86`):
+
+| | symbols | total chars | trie nodes | distinct first chars |
+|---|---|---|---|---|
+| `func` | 28 | 113 | 92 | 22 |
+| `rel` | 5 | 20 | 20 | 5 |
+
+**Tests needed to reach a symbol** (MEASURED, assuming the order of Match.lean:646-650):
+
+| | char tests (List Char) | string tests (String) |
+|---|---|---|
+| worst, `axiomsCodeT` | 32 | 28 |
+| `validProofFn` | 30 | 25 |
+| total over the 28 `func` symbols | 434 | 406 |
+
+Each char test is a `Nat` comparison after unfolding `Char.ofNat`, `UInt32.decEq` and `BitVec.decEq`. The matcher term has more test nodes (92+20 against 28+5), but I expect compile time and the 25 `rfl` lemmas to stay cheap (ESTIMATE, not measured).
+
+**The real risk: the 34 `simp [..., MNV]` calls in `ModeloEstandar.lean`** (MEASURED; `sondeos/ModeloNat.lean` has another 34). Each one opens the match. I could not settle by reading which way simp reduces it:
+- simp tries to reduce the match at `.reducible` transparency (`Lean/Meta/Tactic/Simp/Types.lean:162-174`; `Rewrite.lean:376-380`);
+- the special unfold list for matches includes `decEq`, `Char.ofNat`, `Char.ofNatAux`, `UInt32.decEq`, `String.decEq` and `List.hasDecEq`, but not `BitVec.decEq` (`Lean/Meta/WHNF.lean:498-519`);
+- instances such as `instDecidableEqChar` are `implicit_reducible` (`Lean/Elab/MutualDef.lean:1228-1235`), which does not unfold at `.reducible` (`Lean/Meta/GetUnfoldableConst.lean:16-28`).
+
+So, as with today's String instance, simp most likely falls back to the match's equation lemmas (`Rewrite.lean:368-374`). Those must be regenerated for the larger trie. This needs a measurement in the D7 sondeo.
+
+**Cheap mitigation**, in line with the file's own rule at `ModeloEstandar.lean:89`: 8 `func` symbols have no per-symbol lemma (`+ * − √ /₂ %₂ ^ Π_p`, MEASURED). Add `rfl` lemmas for them and remove `MNV` from those simp sets.
+
+When simp does meet a char equality, built-in simprocs decide it (`BuiltinSimprocs/Char.lean:56-57`). The proof goes through `eq_false_of_decide` and `eq_false`, which brings only `propext` (`Init/SimpLemmas.lean:25-26, 33-34`). simp never looks inside a char literal (`Char.lean:70`; `Simp/Main.lean:62, 513, 522`).
+
+## 6. Optional unexpander (prints `sym!"…"` in goals)
+
+Place it right after the macro, inside the same namespace:
+
+```lean
+/-- Prints a `List.cons` chain of char literals ending in `[]` back as `sym!"…"`.
+Unexpanders run bottom-up, so the tail is already `[]` or `sym!"…"`. -/
+@[app_unexpander List.cons]
+def unexpandSymLit : Lean.PrettyPrinter.Unexpander
+  | `($(_) $c:char $tail) =>
+    match tail with
+    | `([])          => `(sym! $(Lean.Syntax.mkStrLit c.getChar.toString))
+    | `(sym! $s:str) => `(sym! $(Lean.Syntax.mkStrLit (c.getChar.toString ++ s.getString)))
+    | _              => throw ()
+  | _ => throw ()
+```
+
+Why it works:
+- **No `import Lean` needed.** `Unexpander` lives in Init, and its doc says it "can be declared without importing Lean" (`Init/Prelude.lean:5965-5973`). The attribute is built in (`Lean/PrettyPrinter/Delaborator/Basic.lean:482`).
+- **`meta` is not needed.** That check only applies to files that start with `module` (`Lean/Attributes.lean:158-163`), and neither repo has any (MEASURED, 0 files).
+- **It runs before core's list printer.**
+  - A char is printed as a char literal (`Lean/PrettyPrinter/Delaborator/Builtins.lean:1099-1104`) and `List.nil` as `[]` (`Init/NotationExtra.lean:152-153`).
+  - Arguments are printed before the head's unexpanders run (Builtins.lean:375-389).
+  - Unexpanders are tried until one succeeds (441-445, 457-476), newest first (`Lean/KeyedDeclsAttribute.lean:92-95, 176-186`).
+  - So this one runs before core's `unexpandListCons` (`NotationExtra.lean:155-162`), and `throw ()` hands non-literal heads or tails back to it.
+
+Limits:
+- `sym!""` still prints as `[]`. Unexpanders never see the implicit `Char` argument (Builtins.lean:432-437). Telling an empty symbol from an empty list would need a full delaborator, which requires `import Lean`.
+- Every literal `List Char` prints as `sym!"…"`, symbol or not.
+- `pp.notation false` or `pp.explicit` show the raw chain (Builtins.lean:386).
+- `#eval` and `Repr` output still show `['s', …]`.
+- I expect it to print `sym!"Π_p"` with no space between `sym!` and the string (ESTIMATE, from `Lean/PrettyPrinter/Formatter.lean:383-407`).
+
+## 7. Pitfalls
+
+1. **Missing `:max`.** Arguments fail to parse without it (section 2).
+2. **Empty string.** The ascription is what makes `sym!""` give `[] : List Char`. It is needed for `def dflt : Term := Term.func sym!"" []` (`Meta/SolidezVerificador.lean:53`).
+3. **Unicode.** Code points in the source (MEASURED with iconv): σ = U+03C3 = 963, τ = U+03C4 = 964, − = U+2212 = 8722, √ = U+221A = 8730, ₂ = U+2082 = 8322, Π = U+03A0 = 928, ≤ = U+2264 = 8804, ∈ = U+2208 = 8712, ⊢ = U+22A2 = 8866.
+   - All are below 0xD800, so `Char.ofNat` never clamps them to `'\0'` (`Prelude.lean:2823-2824, 2866-2869`).
+   - The source spelling decides the length: `/₂` is 2 chars and `Π_p` is 3 (MEASURED).
+   - `−` (U+2212, used by `sub_sym`) and ASCII `-` look the same but are different symbols, exactly as with String today.
+4. **Never put a symbol definition's name in a pattern unless it is tagged `@[match_pattern]`.** Otherwise it silently becomes a pattern variable (`PatternVar.lean:345-349`). In practice Lean then reports the following alternatives as redundant (`Match.lean:1043-1063`).
+   - **An option worth taking:** `@[match_pattern] def succ_sym : List Char := sym!"σ"`, then `| succ_sym, [a] => …`. Core documents exactly this use (`Lean/Meta/Match/MatchPatternAttr.lean:15-32`), and the pattern compiler unfolds the definition (`Match.lean:486-491, 535-537`).
+   - It gives one source of truth for 17 of the 33 model symbols (MEASURED: the 17 `_sym` definitions at `Minimal/Axioms.lean:39-66`).
+5. **Do not write `Char.ofNat 963` by hand.** It elaborates with an `OfNat` literal rather than a raw one, so it no longer matches `'σ'` syntactically, and `delabChar` will not print it as a char (Builtins.lean:1102-1103).
+6. **Long symbols.** Long literals make deep terms, and macro expansion counts recursion depth per node (`Defs.lean:696`). This is irrelevant here: the longest symbol is 12 chars (MEASURED).
+7. **FOL side.**
+   - FOL's own symbol literals are all single-character: 72 occurrences in 11 files (MEASURED by grep, lower bound). FOL can write `['P']` and needs no macro.
+   - `instance : Coe String Formula` (`FOL/FOL/FOL.lean:122-124`) must be removed under D7, or it keeps a `String` entry point. My grep found no uses of it (ESTIMATE).
+
+## 8. Where to put it
+
+**Recommendation:** a new module with no imports, `ROBINSON_PlusPlus/Minimal/SymLit.lean`, imported by `Minimal/Axioms.lean` (add the line after the imports at 7-8). Reasons:
+- the D7 "no String" check can exempt exactly one file;
+- the self-checks stay out of Axioms.lean (1793 lines, MEASURED);
+- the file can move to FOL unchanged if FOL ever needs it.
+
+Every RPP module reaches Axioms through its imports, except `Full/PrimeFactor.lean`, which contains no string literals (MEASURED). Sondeos import the root, so `sym!` is available everywhere a symbol is written.
+
+**Avoid naming the file `Sym.lean`.** The doc-sync catalog check `[C]` greps for the file's base name as a plain substring of REFERENCE.md (`check-doc-sync.bash:695-703`). "Sym" already matches "Symbol" at `REFERENCE.md:182,184` (MEASURED), so the check would pass without a real catalog entry. "SymLit" has 0 hits (MEASURED).
+
+**Steps a new module needs:**
+- `new-module.bash` requires `ROBINSON_PlusPlus/_template.lean` (`new-module.bash:48-50`), which does not exist (MEASURED). Create the file by hand and run `bash gen-root.bash`.
+- Add the REFERENCE.md §1 entry.
+- The banner figures "módulos activos" and "jobs" checked by `[A]` each go up by 1 (ESTIMATE); update them in the same commit.
+- RPP's frozen and locked lists are empty (MEASURED: 0 and 2 bytes), so nothing needs unlocking.
+
+**Alternative:** put the same code inside `Minimal/Axioms.lean`, between the imports and `-- ## Language Definition` (lines 9-37). This avoids the doc changes but mixes macro code into the axiom file.
+
+## 9. Self-checks to put in the module
+
+```lean
+example : sym!"substfc" = ['s', 'u', 'b', 's', 't', 'f', 'c'] := rfl
+example : sym!"" = ([] : List Char) := rfl
+example : sym!"Π_p" = ['Π', '_', 'p'] := rfl
+def symMatchProbe : List Char → List Nat → Nat
+  | sym!"σ", [a] => a + 1
+  | sym!"Π_p", [l] => l
+  | sym!"", [] => 7
+  | _, _ => 0
+example : symMatchProbe sym!"τ" [4] = 0 := rfl
+example : symMatchProbe sym!"" [] = 7 := rfl
+/-- Footprint guard: a String-based expansion would show `Classical.choice` here. -/
+def symProbe : List Char := sym!"axiomsCodeT"
+#print axioms symProbe   -- expected (ESTIMATE): no axioms
+```
+
+- The `rfl` checks do not prove the term is String-free, because `rfl` would also hold through evaluation. The `#print axioms` line is the real guard.
+- That line makes `symProbe` a "titular" (`check-footprints.bash:5-21`), so the footprint table needs a row for it with "-".
+- An optional `#guard_msgs in #check sym!"Π_p"` would test the unexpander. Both pieces are available without `import Lean` (`Init/Notation.lean:775ff`, `Lean/Elab/GuardMsgs.lean:203`). Take the exact expected text from the first compile.
+
+## 10. Other notes
+
+- **Concurrent edits in RPP.** Uncommitted changes appeared during this run in `DECISIONS.md`, `NEXT-STEPS.md` and `lakefile.lean` (ADR-128: `leanOptions := #[⟨autoImplicit, false⟩, ⟨relaxedAutoImplicit, false⟩]`). If that lands, the module's `set_option autoImplicit false` becomes redundant but harmless. None of the `.lean` files cited above were among the changes.
+- **Earlier D7 figures** (24 FOL files of which 14 frozen, 28 RPP files, 164 literals) are as recorded in ADR-122 (`DECISIONS.md:9480-9485`); I did not re-measure them, apart from the 58 cross-checked above.
+- **MCP connectors.** The `engineering` plugin's connectors (asana, atlassian, datadog, github, linear, notion, pagerduty, slack) remain unauthorized and unavailable until you authorize them in the claude.ai connector settings.

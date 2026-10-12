@@ -1,0 +1,22 @@
+import ROBINSON_PlusPlus
+open ROBINSON_PlusPlus.Minimal.Axioms
+
+/-! SONDA L3-4 (sin compilar; el simp final puede necesitar ajuste). -/
+def φNC (L : Term) : Formula :=
+  Formula.or (Formula.eq L nil)
+    (Formula.ex (Formula.ex (Formula.eq (liftTerm 0 (liftTerm 0 L)) (cons (.var 1) (.var 0)))))
+
+/-- Falso en el modelo {0,1} con nil ↦ 0, cons ↦ 0, foo ↦ 1; y sale en logica pura. -/
+theorem lista_en_logica_pura : ([] : List Formula) ⊢ φNC (Term.func "foo" []) := by
+  refine ROBINSON_PlusPlus.Full.ax_list_induction φNC ?_ ?_ _
+  · exact FOL.MetaRules.or_intro_left (Derives.refl _ _)
+  · intro h t
+    apply Derives.intro_impl
+    apply FOL.MetaRules.or_intro_right
+    refine Derives.intro_ex _ _ h ?_
+    refine Derives.intro_ex _ _ t ?_
+    simp only [φNC, substFormula, substTerm, substTerms, liftTerm, liftTerms, cons,
+      FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
+    exact Derives.refl _ _
+
+#print axioms lista_en_logica_pura  -- esperado: incluye ROBINSON_PlusPlus.Full.ax_list_induction

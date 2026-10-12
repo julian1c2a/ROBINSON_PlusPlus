@@ -1,0 +1,6 @@
+-- Medicion de la cascada (con el arreglo ya en Minimal), SIN ejecutar nada:
+--   1) marcar SOLO `noncomputable def nPsi`; compilar; contar los errores
+--      «failed to compile definition, consider marking it as 'noncomputable'».
+-- NO escribir `#eval axioms.length` con axioms computable: el interprete evalua nPsi
+-- (codeNat psiT, astronomico) y maxHeartbeats no lo para. Si hubiera que medirlo, con timeout externo:
+--   timeout 60 lake env lean sondeos/AnclaEqInconsistente.lean   (desde PowerShell, fuera de la CI)

@@ -1,0 +1,41 @@
+/- Sonda L4-4 (sin compilar): ESQUELETO DE MEDIDA del puente Prf ↔ Derives₀. Cada `sorry` es trabajo pendiente. -/
+import ROBINSON_PlusPlus.Meta.ChainPrf   -- PrfH_or_elim
+import FOL.Derives1                       -- Derives₁, FOL.Derives1.derives0_iff_derives1
+import FOL.Henkin0                        -- FOL.Henkin0.DerivesSet₀
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.ChainPrf
+
+/-- ⬜ El ÚNICO lema lógico nuevo (no existe en Prf). -/
+theorem prf_forall_not_ex_not (A : Formula) :
+    Prf (neg (Formula.forall A) ⇒ Formula.ex (neg A)) := sorry
+
+/-- ND sin `rewrite_at` ⟹ Hilbert con contexto. Inducción legítima: nada habita `Derives₁`. -/
+theorem derives1_to_prfH {Γ : List Formula} {φ : Formula} (h : Γ ⊢₁ φ) : PrfH Γ φ := by
+  induction h with
+  | hyp Γ f hm => exact PrfH.hyp Γ f hm
+  | intro_impl Γ A B _ ih => exact deduction_aux ih A Γ rfl
+  | elim_impl Γ A B _ _ ih1 ih2 => exact PrfH.mp Γ A B ih1 ih2
+  | intro_and Γ A B _ _ ih1 ih2 => exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c1 A B)) ih1) ih2
+  | elim_and_l Γ A B _ ih => exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c2 A B)) ih
+  | elim_and_r Γ A B _ ih => exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.c3 A B)) ih
+  | intro_or_l Γ A B _ ih => exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j1 A B)) ih
+  | intro_or_r Γ A B _ ih => exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.j2 A B)) ih
+  | elim_or Γ A B C _ _ _ ih ihA ihB => exact PrfH_or_elim ih ihA ihB
+  | intro_forall Γ A _ ih => exact PrfH.gen Γ A ih
+  | elim_forall Γ A t _ ih => exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.q1 A t)) ih
+  | intro_ex Γ A t _ ih => exact PrfH_ex_intro t ih
+  | elim_ex Γ A B _ _ ih1 ih2 => exact PrfH_ex_elim ih1 ih2
+  | bot_elim Γ A _ ih => exact PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq A)) ih
+  | weakening Γ Γ' f _ hsub ih => exact PrfH_mono ih Γ' hsub
+  | dne_rule Γ A _ ih => exact PrfH.mp _ _ _ (PrfH.p3 Γ A) ih
+  | dne_schema Γ A => exact PrfH.p3 Γ A
+  | forall_not_ex_not Γ A => exact prf_to_prfH (prf_forall_not_ex_not A) Γ
+  | refl Γ t => exact PrfH.incl0 _ _ (Prfᵢ.eqrefl t)
+  | subst Γ t₁ t₂ f _ _ ih1 ih2 =>
+      exact PrfH.mp _ _ _ (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.leibniz f t₁ t₂)) ih1) ih2
+
+-- ⬜ Lo que queda (no compila hasta definir `closeAll`, el ∀ sobre todas las variables libres):
+-- def TPrf (g : Formula) : Prop := List.Mem g axioms ∨ (∃ A, g = closeAll (Full.inductionFormula A))
+--                                   ∨ (∃ A, g = closeAll (listInductionFormula A))
+-- theorem derivesSet0_to_prf {φ} (h : FOL.Henkin0.DerivesSet₀ TPrf φ) : Prf φ   -- derives0_iff_derives1 + derives1_to_prfH + deducción iterada
+-- theorem prf_to_derivesSet0 {φ} (h : Prf φ) : FOL.Henkin0.DerivesSet₀ TPrf φ   -- inducción sobre Prf; tautologías por derives0_of_ptaut

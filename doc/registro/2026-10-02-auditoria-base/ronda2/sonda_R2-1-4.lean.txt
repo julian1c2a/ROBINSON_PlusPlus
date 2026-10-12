@@ -1,0 +1,28 @@
+-- Se añade a la sonda de R2-1-2, dentro del mismo `section Modelo` / namespace:
+open ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.GodelTwo
+open ROBINSON_PlusPlus.Meta.DiagonalNumeral ROBINSON_PlusPlus.Meta.GodelTwoPrf
+
+/-- En un modelo estándar donde Prov⌜G⌝ vale, G es falso: Prf ⊬ G, sin Gödel. -/
+theorem no_prf_godelCN_por_modelo (hM : Estandar M)
+    (hProv : evalFormula M (fun _ => 0) (provCodeC' godelCN)) : ¬ Prf godelCN := by
+  intro hG
+  have hfp := prf_sound hM prf_godelCN_fixedpoint (fun _ => 0)
+  have hg := prf_sound hM hG (fun _ => 0)
+  simp only [_root_.iff, neg, evalFormula] at hfp
+  exact hfp.1 hg hProv
+
+/-- Ídem Gödel II. -/
+theorem no_prf_con_por_modelo (hM : Estandar M)
+    (hProv : evalFormula M (fun _ => 0) (provCodeC' Formula.bottom)) :
+    ¬ Prf consistencyFormula' := by
+  intro hC
+  have hc := prf_sound hM hC (fun _ => 0)
+  simp only [consistencyFormula', neg, evalFormula] at hc
+  exact hc hProv
+
+-- Para descargar hProv (A3 + ~30 líneas, ESTIMACIÓN):
+--   prf_prov_of_In (c : Term) : Prf (In c axiomsCodeT ⇒ provFromCode c)   -- SIN [AnclaEq]
+--   más un M con evalTerm M v axiomsCodeT = consN (evalTerm M v (formCode godelCN)) 0;
+--   In ⌜G⌝ axiomsCodeT es verdadero en M por ax_L2.
+-- CONTROL NEGATIVO del arreglo de F1:
+--   theorem modelo_param (A : Nat) : Estandar (MN A)   -- hoy compila; tras fijar axiomsCodeT, sólo para A = ⟦LR ++ [δ]⟧

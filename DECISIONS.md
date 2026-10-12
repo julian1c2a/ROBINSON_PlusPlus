@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -47,7 +47,7 @@
 >
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 90 en `sondeos/`.**
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 91 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -9883,6 +9883,10 @@ del `simp`, no la ortografía de los símbolos.*
 
 **Véase también:** ADR‑101/102 (D7 abandonada, en su día), ADR‑122 (la puerta contrafactual).
 
+✏️ *(2026‑10‑12, ADR‑132)*: la revisión adversarial de la prosa de D7 que anuncian `14b1692` y `048dde6` es la de
+`wf_4c5aee66-ebf` (9 defectos en FOL y 10 en RPP, aplicados antes del commit); su registro, en
+`doc/registro/2026-10-05-d7-revision/`, y la exploración previa (`wf_cac4ffca-a10`), en `doc/registro/2026-10-05-d7-exploracion/`.
+
 ---
 
 <a id="adr-130"></a>
@@ -9997,3 +10001,59 @@ a cuatro puntos de entrada. Lo cierto de ADR‑129: ya no entra ningún `choice`
 🔑 *La causa de un footprint se MIDE en la frontera de su cierre; no se deduce del lema que parece más clásico.*
 
 **Véase también:** ADR‑129 (la frase corregida), ADR‑122 (`D7Contrafactual`, el mismo método con `String`).
+
+---
+
+<a id="adr-132"></a>
+## ADR-132: 📋 La auditoría del suelo, versionada —81 trabajos priorizados— y T00: los artefactos que vivían fuera de git, rescatados
+
+**Fecha:** 2026-10-12 · **Estado:** ✅ (este commit) · **Ámbito:** `doc/AUDITORIA-SUELO-2026-10-12.md` y `doc/registro/`
+(nuevos), `scripts/pruebas/`, `scripts/sondeos_todos.ps1`, `sondeos/pasadas/`, `sondeos/D3Sigma1Vacuo.lean` (nuevo),
+`.gitignore`, banners (91 sondeos). Ninguna línea del build cambia.
+
+### 1 · La auditoría
+
+El propietario preguntó el 2026‑10‑05 qué trabajos quedan «sin dejar pasar cuestiones de medida, de fundamentos, tareas
+underground… que dejen un suelo muy firme». Dos workflows de sólo lectura: `wf_1f61bc0d-738` (2026‑10‑05: seis barridos
+y seis verificadores; 162 candidatos vivos) y `wf_7a6e4ce2-b37` (2026‑10‑12: agrupar, crítico de completitud, cinco
+verificadores adversariales sobre los P0/P1 y síntesis). Resultado: **81 trabajos**, con su evidencia y cómo cerrar
+cada uno, en `doc/AUDITORIA-SUELO-2026-10-12.md`:
+
+* **P0 (4)**: T01, Rosser con un enunciado con contenido antes de pagarlo (con `ConsistentH` teorema, todo
+  `rosser (hcon : ConsistentH)` sobre T fija es trivial); T02, la teoría `T_Prf` descrita con precisión (README dice «sin
+  esquema de inducción» y `Prf` tiene inducción completa); T03, la tabla MANDATORIES (M‑11 al revés, M‑10 y M‑6 falsas);
+  T04, el núcleo de `[B]` (absuelve citas muertas por subcadena).
+* **P1 (7)**: T00 (éste), T04b, T06 (sondeos en la CI con las opciones del build), T07 (contrato de enunciados), T08
+  (control de pureza del cierre), T09 (TEOREMAS‑E‑HIPOTESIS) y T15 (todo `.lean` en el build).
+* **P2 (51)** y **P3 (19)**; **21 decisiones del propietario**. La segunda verificación sólo cubrió T01–T23 y CRI‑01…03.
+
+### 2 · Medido el 2026‑10‑12
+
+* **T05**: `sondeos/D3Sigma1Vacuo.lean` compila (entre 4 y 76 s en tres ejecuciones) y refuta `hI` y `hbI` con el modelo:
+  `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded` (`Meta/ReflectionPrf.lean`, `Meta/Sigma1BoundedPrf.lean`) son VACUOS.
+  Ninguno tiene consumidor; el D3 que se usa, `d3_prf_real`, no lo es. ⬜ Retirarlos o marcarlos.
+* **T11b**: `#print axioms` de `repr_pos'_prf` y `prf_con_imp_godel`, `[propext, Classical.choice, Quot.sound]`; de
+  `d2_prf` y `prfI_sound`, `[propext, Quot.sound]`. ⬜ Darles fila en `check-footprints.bash`.
+
+### 3 · T00: lo rescatado
+
+`doc/registro/README.md` es el índice: las rondas 1 y 2 de la auditoría de la base (2026‑10‑02), la medición de D7 y el
+plan de Rosser (ADR‑122), las auditorías de ADR‑121, ADR‑123…125 y ADR‑124…126, la exploración de D7 y la revisión de su
+prosa (ADR‑129), y los registros de esta auditoría; fuera de `doc/`, el runner de los sondeos y sus tablas
+(`scripts/sondeos_todos.ps1`, `sondeos/pasadas/`), la réplica de `[B]` (`scripts/pruebas/b/`) y las herramientas que
+validaron `strip-lean.awk` (`scripts/pruebas/`). Las rutas locales absolutas, saneadas; las sondas del registro, como
+`.lean.txt`; omitido `parsed.json` (4,3 MB, regenerable). ⚠️ Los scripts de `scripts/pruebas/strip-lean/` apuntan todavía
+al temporal de la sesión: hacerlos ejecutables desde aquí es T47.
+
+ADR‑129 decía «revisión adversarial aplicada» sin decir cuál: ahora la cita (T17, en parte).
+
+### 4 · Lo que NO dice
+
+* Los 81 trabajos son los hallazgos de los agentes, con sus etiquetas; T24–T74 no tuvieron segunda verificación.
+* Ninguna de las 21 decisiones está tomada: T01 (Rosser) sigue abierta, y es la que desbloquea más.
+* El registro es REGISTRO: lo que diga sobre el código es de su fecha.
+
+🔑 *Una auditoría que no se versiona se audita dos veces: ésta redescubrió al menos siete hallazgos de las rondas 1 y 2,
+que vivían fuera de git.*
+
+**Véase también:** ADR‑114/115 (la auditoría de la base), ADR‑129 (D7), ADR‑131 (la frontera del `choice`).

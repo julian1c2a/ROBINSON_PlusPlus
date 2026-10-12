@@ -1,0 +1,135 @@
+===== review:FOL 7674
+**Revisión adversarial de la prosa de D7 en FOL**
+
+Encuentro un defecto que bloquea el commit y varios menores. Lo comprobado, sin defectos:
+
+- **Código (5):** comparé el código sin comentarios (`strip-lean.awk`) entre HEAD y el árbol. Sólo cambian `FOL.lean` (la `Coe`), `Fresh0`, `Enumeration`, `HenkinLimit0` y `SymClasses`, exactamente lo que dice HECHOS. `Compacity0`, `DecEq` y `Lindenbaum0` no cambian ninguna línea de código.
+- **Delimitadores (5):** los 28 `.lean` acaban con profundidad 0, y la prosa añadida no lleva ningún `/-` ni `-/` suelto.
+- **Marcas (4):** los cinco `.md` llevan la marca a 2026‑10‑05. También `SymClasses.lean:6` y REFERENCE §3.2 y §3.9. Las secciones que citan las marcas casan con los hunks.
+- **Nombres (2):** todos existen o van marcados («retirado», «hasta D7»). Las instancias anónimas existen como filas: `FOL.Fresh0.instFreshSymListChar` y `FOL.Metamath.Enumeration.instEnumSymListChar`.
+- **Cifras (1):** en RPP `check-footprints.bash`, las filas de FOL y TheoryFramework con `Classical.choice` son 39, igual que en HEAD. Las filas que cambian son exactamente las 6 de HECHOS. Las filas que cita la prosa (Henkin0, HenkinLimit0, Lindenbaum0, Rename, Fresh0, Skolem0, Compacity0) casan una a una.
+- **`String` en código:** 0 apariciones en `FOL/**` y `TheoryFramework/**`.
+
+**Defectos**
+
+1. **Bloquea el commit.** `locked_files.txt:19` sigue listando `AXIOMS.md`, que está modificado. `.git/hooks/pre-commit` (L25‑37) rechazará el commit con «ERROR LOCKED: AXIOMS.md».
+   - Arreglo: `bash git-lock.bash unlock AXIOMS.md` antes del commit y `lock` después, como en b919b57 y 9d8e21e.
+   - Además, de `locked_files.txt` salieron 27 ficheros, 11 de ellos no congelados: `FOL/FOL.lean`, `Enumeration`, `SymClasses`, `DecEq`, `Eq0`, `Eigenvariable`, `Derives2`, `Herbrand0`, `Theorems/Eq`, `Finitary0` e `Inconsistencia`. CHANGELOG.md:54‑56 y NEXT-STEPS.md:106‑108 sólo dicen «se vuelven a congelar». Añadir: «y se re‑bloquean los 27 que salieron de `locked_files.txt`».
+
+2. **La frase sobre «la instancia que usa la cadena» choca con el código y con la propia prosa.** Aparece en SymClasses.lean:106‑108, CHANGELOG.md:36‑37, REFERENCE.md:1045 y, como «las instancias son las de la cadena», en REFERENCE.md:169. Leída tal cual, es falsa: ninguna firma lleva `[FreshSym _]` ni `[EnumSym _]`. Lo dicen SymClasses.lean:53 («**ningún** módulo las consume») y Fresh0.lean:158‑161 (la cadena usa `cst`/`shift` «desnudos»; «la instancia se añade al lado»). HECHOS usa la misma frase con el sentido «la de Fresh0, el módulo de la cadena»; el arreglo sólo explicita ese sentido.
+   - SymClasses.lean:107‑108: «…la instancia es la de `FOL.Fresh0` —hecha con la `cst` y el `shift` que la cadena de completitud usa desnudos; la cadena no consume la instancia—, y dos instancias…».
+   - CHANGELOG.md:37 y REFERENCE.md:1045: «…la instancia es la de `Fresh0` (con la `cst` y el `shift` que usa la cadena de completitud, que no consume la instancia)».
+   - REFERENCE.md:169: «las instancias son las de los módulos de la cadena, `Fresh0.instFreshSymListChar` y `Enumeration.instEnumSymListChar` (§6.16); ninguna firma las consume».
+
+3. **Dos bloques fechados el 2026‑09‑27 se reescribieron en el sitio (anacronismo).** No borra historia, porque lo antiguo queda entre paréntesis, pero el bloque afirma bajo la fecha del 09‑27 el estado del 10‑05.
+   - HenkinLimit0.lean:59‑62 «⚠️ Rectificación, 2026‑09‑27» dice ahora «la mayor longitud», «contar caracteres» y `Fresh0.cst_length`.
+   - SymClasses.lean:25‑33 «⚠️ RECTIFICACIÓN (2026‑09‑27)» dice ahora `s.length`, `Fresh0.cst_length` y «la de `List Char`», y borró «La instancia de `List Char` de abajo también la tendría (`cst n` mide `n + 1`)».
+   - Arreglo: restaurar el texto de HEAD (`git show HEAD:FOL/HenkinLimit0.lean`, L59‑61; `git show HEAD:FOL/SymClasses.lean`, L24‑31) y añadir:
+     - en HenkinLimit0, tras «(`cst m` ocupa `m + 1`).»: «(✏️ 2026‑10‑05, D7: hoy la mayor LONGITUD, y `bnd_spec` cuenta caracteres: `Fresh0.cst_length`.)»;
+     - en SymClasses, tras «…ningún módulo la consume.»: «✏️ 2026‑10‑05 (D7, ADR‑129 de RPP): la cota es hoy `s.length` (`Fresh0.cst_length`; `cst_utf8ByteSize`, retirado), y la instancia de abajo se retiró: la de la clase es `FOL.Fresh0.instFreshSymListChar`. La clase sigue sin ampliarse y sin consumidores.»
+
+4. **Registro borrado en un docstring.** Enumeration.lean:227‑228: el docstring de la instancia `EnumSym (List Char)`, que sigue existiendo, perdió su «⚠️ RECTIFICACIÓN (2026‑09‑27)». El contenido sobrevive sólo en REFERENCE §6.16. Añadir: «(2026‑09‑27: se decía que ésta era «más barata» que la de `String`; desde `String.exists_eq_ofList` las dos medían `[propext, Quot.sound]`.)»
+
+5. **El razonamiento sobre «No hacía falta» es incoherente.** AXIOMS.md:553‑556 dice «“No hacía falta” deja de valer… pero…», y lo que pone tras «pero» (`instFreshSymListChar` y los dos `*_updateCsts`) pierde `propext`/`Quot.sound`, no `Classical.choice`. Además diverge de REFERENCE.md:1070‑1071 y NEXT-STEPS.md:79, que dicen «valía para el `Classical.choice` de FOL». Arreglo: «“No hacía falta” deja de valer: la migración se hizo por decisión del propietario, y en RPP 44 filas pierden `Classical.choice`. En FOL ninguna de las 39 filas con él (con las de `TheoryFramework`) lo pierde; lo que cambia es menor: `FOL.Fresh0.instFreshSymListChar` (la de `String`, `[propext, Quot.sound]`), `Compacity0.evalFormula_updateCsts` y `evalTerm_updateCsts` (antes, `[propext]` y `[propext, Quot.sound]`) ya no dependen de ningún axioma.»
+
+6. **Estilo.** En FOL.lean:28‑29, «ya no lo son» no tiene antecedente. Cambiar a «…; desde D7 los símbolos ya no son `String`.)»
+
+7. **Omisión.** FOL.lean:42‑44 actualiza RPP pero calla PeanoRF. Añadir: «; PeanoRF, bloqueado, sigue en `String` y deja de compilar contra este FOL hasta que se adapte».
+
+8. **Referencia colgante (condición previa).** «ADR‑129 de RPP» se cita unas 30 veces, y `DECISIONS.md` de RPP aún no tiene `## ADR-129`: el último es ADR‑128 (L9759), y ADR‑129 sólo sale en la línea de cifras (L49). Hay que escribirlo antes de los commits; por M‑12, la cita colgará entre el push de FOL y el de RPP.
+
+9. **El CHANGELOG está incompleto.** CHANGELOG.md:22‑58 no registra:
+   - `check-doc-sync.bash`: `AXIOMS.md` sale de `E_DEUDA`;
+   - `criba-congelacion.py`: el `root_map` pierde `FOL.instFreshSymListChar`;
+   - `DecEq.lean`: cambio sólo de prosa.
+
+   Añadir: «* 🔧 `check-doc-sync.bash`: `AXIOMS.md` sale de la deuda de `[E]` (ya lleva `**Last updated:**`); `criba-congelacion.py`: fuera `FOL.instFreshSymListChar`, retirada. `DecEq.lean`: sólo prosa.» Fuera de D7, el CHANGELOG no tiene ninguna entrada para los 12 commits de b919b57 a 1df51b3.
+
+**Riesgo de calendario.** `[E]` compara cada marca con la fecha del commit. Si el commit cae el 2026‑10‑06 o después, las cinco marcas quedan rojas, y también `AXIOMS.md`, que ya no está en la deuda declarada.
+
+**Comentarios de FOL que aún presentan `String` o D7 abandonada como vigente: ninguno.** Las 94 apariciones de `String` en comentarios de `FOL/**` están en bloques fechados o con «hasta D7». En `TheoryFramework/**` no hay ninguna. Las que no tienen marca en la propia línea (por ejemplo Compacity0:108‑131, Henkin0:89‑90, SymClasses:22 y 67‑71) caen todas dentro de bloques fechados. Fuera del pase:
+- NEXT-STEPS.md:148 (fila D1 de la auditoría del 2026‑09‑27: «la cota `utf8ByteSize`, `unshift` sobre bytes») es registro de ese día. Opcional: «(✏️ desde D7: `s.length` y un `match`)».
+- RESPUESTA-PEANORF-2026-09-26.md:109 y 130, CARTA-DE-PEANORF-2026-09-28.md:57 y auditoria/constructividad-2026-09-27/README.md:69‑73 son históricos y no se tocan.
+===== review:RPP 9216
+**Revisión de la prosa de D7 en RPP**
+
+La pasada de prosa no cambió ninguna línea de código, todos los `.lean` editados se compilaron después del último cambio, y ninguna marca de fecha pone rojo `[E]`. Encontré 10 defectos, 4 de ellos de peso, más unos cuantos opcionales.
+
+Para lo del código, apliqué de nuevo la transformación de `sustituye_rpp.py` al HEAD de los 40 `.lean` modificados y comparé solo las líneas de código. Lo que sobra son exactamente las categorías de D7: `decodeStr`, `decodeStr_strCodeM` y `decodeStr_inj`; `codeNatStr_inj` y `strCode_injective`; los `.toList` que se quitan; `decS`; los 8 `MN_*` nuevos y los conjuntos de `simp` de los `v_*`; el `import` de `SymLit` y el `String.ofList` de `termToString`.
+
+## Defectos de peso
+
+**1. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/REFERENCE-Incompleteness.md:413-414`**
+El bloque de API vigente sigue con literales `String`. La pasada actualizó la línea 404 de ese mismo bloque, y la marca de la línea 34 dice «los literales de símbolo, hoy `sym!"…"`».
+Arreglo:
+- `def chainOkCodeFn (cc pc) := atom2CodeFn sym!"chainOk" cc pc   -- + chainOkCodeFn_termCode (rfl)`
+- `def allInCodeFn (cc Lc) := atom2CodeFn sym!"allIn" cc Lc        -- + allInCodeFn_termCode (rfl)`
+
+**2. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/PLAN-COMPLETITUD-FINITISTA.md:1310-1311` y `:1331`**
+Las tres referencias a líneas de FOL están mal ya en el árbol de FOL del momento en que se escribió la nota. Dos son las de HEAD y la tercera no corresponde a ninguna versión.
+- `../FOL/FOL/FOL.lean:69` → `:76` (`abbrev Term := TermG (List Char)`).
+- `../FOL/FOL/Enumeration.lean:303` → `:310` (`natToTerm_surj`).
+- `Fresh0.lean:125` → `Fresh0.lean:137` (`def cst : Nat → List Char`).
+
+Conviene volver a comprobarlas justo antes del commit, por si FOL sigue cambiando.
+
+**3. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/PLAN-COMPLETITUD-FINITISTA.md:1277-1278`**
+El «**HECHO**» va pegado a «Limpiaría también las 6 de `FOL/Enumeration.lean`». Se lee como que D7 las limpió. Los HECHOS dicen que D7 no limpia FOL, y en HEAD esas filas ya iban sin `Classical.choice` (las limpió ADR‑110).
+Arreglo: «✏️ *(2026‑10‑05)* **HECHO el cambio de firma** (D7, ADR‑129 de RPP): el tipo es `List Char`. Las 6 de `FOL/Enumeration.lean` no las limpió D7: ya lo había hecho ADR‑110 sin cambiar la firma (nota de abajo). Lo medido, al final de §7.3.»
+
+**4. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/PLAN-COMPLETITUD-FINITISTA.md:1489-1490`**
+El paréntesis sobre `Compacity0` va justo después de «ninguna lo pierde» y sugiere una excepción entre las 39 filas. Esos dos lemas no llevaban `Classical.choice`.
+Arreglo: «…ninguna lo pierde. Aparte, dos lemas de `Compacity0` que no lo llevaban se quedan sin ningún axioma: `evalFormula_updateCsts` (antes `[propext]`) y `evalTerm_updateCsts` (antes `[propext, Quot.sound]`).»
+
+## Defectos menores
+
+**5. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/CodeDecode.lean:73-75`**
+«(con `List Char`, sin volver a medir)» va colgado de la vía `==`. Esa vía es la que sigue en el código (línea 78), y el build la comprueba hoy en `decodeTerm_inj`. Lo que no se ha vuelto a medir es la vía `=`. Además «eran limpios» sugiere que `==` ya no se usa.
+Arreglo: «…un `if (s = sym)` hacía que `split`/`if_pos` fabricaran un cast que el **núcleo rechazaba** (con `List Char`, sin volver a medir); con `==` son limpios: lo comprueba hoy el build (`decodeTerm_inj`). (`decodeNat`/`decodeChars`/`decodeForm` no lo necesitan: usan `fun_induction`.)»
+
+**6. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:553-554` y `:927-928`**
+Una medición hecha con `String` aparece escrita como `strCode sym!"premsOf"`, que reescribe lo que se midió. Además, a la 553 le falta «sin volver a medir».
+- Arreglo en 553-554: «…hacía que Lean desplegara `strCode "premsOf"` **carácter a carácter** y agotara los heartbeats (medido con `String`, antes de D7; hoy `sym!"premsOf"`, sin volver a medir): hay que dárselo por **lemas**;»
+- Arreglo en 927-928: «…hacía que Lean desplegara `strCode "premsOf"` **carácter a carácter** y agotara los heartbeats (hoy `sym!"premsOf"`; con `List Char`, sin volver a medir).»
+
+**7. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/REFERENCE-Incompleteness.md:5418-5419` y `:1016`**
+- En 5418-5419 (§3.67.2), la misma medición que en el punto 6 va sin la etiqueta de D7. Añadir tras «carácter a carácter»: «(medido con símbolos `String`; ✏️ 2026‑10‑05: desde D7, `strCode sym!"premsOf"`, y no se ha vuelto a medir)».
+- En 1016 falta la coletilla. Sustituir el paréntesis por «(`String.decEq`; medido con símbolos `String`. ✏️ 2026‑10‑05: desde D7 son `List Char`, y no se ha vuelto a medir)».
+
+**8. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/PLAN-COMPLETITUD-FINITISTA.md`, tras la 1493 (resultado de §7.3)**
+Falta la consecuencia que recogen los HECHOS. Pesa porque la decisión del propietario es que D7 solo se cierra con la sustitución terminada.
+Añadir: «* **Fuera de los dos repos**: PeanoRF (bloqueado, sólo lectura) depende de `../FOL` y `../ROBINSON_PlusPlus` por ruta y dejará de compilar contra el FOL nuevo hasta que se adapte; no se toca.»
+
+**9. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/ModeloCodigo.lean:444`**
+«y el valor es astronómico» es una cualidad sin medir. Cuenta a mano: `TC0` sale en torno a 2,4·10¹¹. Ese adjetivo el módulo ya lo usa para el numeral del ancla (líneas 23 y 552).
+Arreglo: dejar «…`consN` va por `triN`, que es recursión UNARIA.» y quitar el resto.
+
+**10. `E:/dropbox/github/lean4/ROBINSON_PlusPlus/doc/PLAN-COMPLETITUD-FINITISTA.md:1403`**
+«la midió el compilador» no da ninguna cifra.
+Arreglo: dar la cifra de ADR‑129, o escribir «✏️ *(2026‑10‑05)*: ejecutada (D7, ADR‑129 de RPP), sin cifra de propagación: en FOL, los módulos que sólo cambiaban tipos y literales compilaron a la primera.»
+
+## Opcionales
+
+- **`E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Minimal/Axioms.lean:51`**: `"τ"` es el único literal de símbolo con la notación vieja que queda en comentarios del árbol. Cambiarlo a `sym!"τ"`.
+- **`E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:52`**: para que cuadre con el tratamiento de `LiftfcWitnessPrf`, añadir «✏️ D7 (2026‑10‑05): `prf_hasWitF_bin`, `prf_hasWitF_implc`, `prf_hasWit_funcc2` y `prf_nil_or_cons` salen ya `[propext, Quot.sound]`».
+- **`E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/ChainDecode.lean:53`**: «revienta» → «reventaba».
+- **`E:/dropbox/github/lean4/ROBINSON_PlusPlus/ROBINSON_PlusPlus/Meta/CodeDecode.lean:167`**: problema que ya estaba antes. `==` es `BEq`, no `DecidableEq String`, y la nota contradice a la de las líneas 73-75.
+- **Fuera del alcance**: `E:/dropbox/github/lean4/ROBINSON_PlusPlus/sondeos/ModeloNat.lean:569` sigue con `Axioms.lean:1196-1277`. Es la gemela de `ModeloCodigo.lean:530`, que ya se pasó a 1197-1278.
+
+## Lo que se comprobó sin defecto
+
+- **(1) Coherencia con los HECHOS y el código.**
+  - Recalculé las cifras de footprints comparando `check-footprints.bash` de HEAD con el del árbol de trabajo: 44 filas pierden `Classical.choice`; en RPP, 226 de 229 → 182 de 233; en FOL, 39 (36 `FOL.*` + 3 `TheoryFramework.*`).
+  - Las afirmaciones de footprint en `HasWitTcFnPrf` y `LiftfcWitnessPrf` cuadran con sus filas.
+  - Hay 34 `v_*` y 33 `MN_*` de tipo `rfl`. Las referencias `Axioms.lean:865/1228/1231/1197-1278` apuntan donde deben.
+  - Hay 88 sondeos y 2+107+3 módulos. Los titulares de Gödel, la solidez y Tarski conservan `Classical.choice`.
+- **(2) Nombres entre comillas invertidas.** Todos existen o van marcados como retirados. `instFreshSymListChar` e `instEnumSymListChar` son instancias anónimas con nombre automático y tienen su fila. ADR‑070, ADR‑074 y `Sugerencias.md` existen.
+- **(3) Historia.** Todo va como notas añadidas. La única excepción es el punto 6.
+- **(4) «Last updated».**
+  - `doc/REFERENCE-Godelization.md` no está en `E_DEUDA` y `[E]` lee 2026-10-05. Pasa si el commit lleva fecha 2026-10-05; si sale el 06, hay que subir la marca.
+  - `REFERENCE-Incompleteness` (`[E]` lee 2026-09-10), `REFERENCE-Kernel` (lee la línea 44, 2026-06-06), `PLAN-COMPLETITUD` (`[E]` no lee «Última actualización») y `PLAN-NEGVERIFIER.md` (sin marca) están en `E_DEUDA`.
+  - Está bien que su primera fecha siga vieja: ponerla al día daría ROJO de «deuda saldada» si no se quitan de la tabla. `PLAN-NEGVERIFIER.md` no tiene marca, así que no hay nada que subir.
+- **(5) Delimitadores de comentario.** Los 41 `.lean` (40 del diff más `SymLit.lean`) se reconstruyeron después de su última edición: fuentes de 10:57 a 11:03, `.olean` de 11:26 a 11:32. En el markdown, bloques de código y citas están cerrados.
+- **Comentarios del árbol de build que presenten `String` como vigente:** ninguno. Todas las menciones de `String` en comentarios de `ROBINSON_PlusPlus/**` están fechadas o marcadas como «antes de D7». En el código, `String` solo queda en `termToString` (impresión), y el tipo solo se usa en la propia macro de `SymLit.lean`.
+
+**Antes del commit:** ADR‑129 todavía no está en `DECISIONS.md`, y lo citan 22 veces (20 líneas del diff y 2 en `SymLit.lean`).

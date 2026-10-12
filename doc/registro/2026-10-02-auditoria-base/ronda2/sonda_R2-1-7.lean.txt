@@ -1,0 +1,5 @@
+theorem no_consH_sucio : ¬ ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH :=
+  Sondeos.MetaReglasRefutables.imp_intro_false.elim
+theorem consH_sucio : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH :=
+  Sondeos.MetaReglasRefutables.imp_intro_false.elim
+#print axioms no_consH_sucio   -- esperado: [..., FOL.MetaRules.imp_intro]

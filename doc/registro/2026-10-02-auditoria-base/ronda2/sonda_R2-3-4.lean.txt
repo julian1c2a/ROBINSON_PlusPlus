@@ -1,0 +1,33 @@
+import ROBINSON_PlusPlus.Meta
+open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.Godel
+open ROBINSON_PlusPlus.Meta.Provability ROBINSON_PlusPlus.Meta.Representability ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.ArithPrf ROBINSON_PlusPlus.Meta.NatMulPrf ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.CodeNumeralPrf
+open ROBINSON_PlusPlus.Meta.CodeNatInjPrf ROBINSON_PlusPlus.Meta.Representability2Prf
+
+theorem prf_numeral_ne {a b : Nat} (h : a ≠ b) : Prf (neg (numeral a =eq numeral b)) := by
+  rcases Nat.lt_or_gt_of_ne h with hlt | hgt
+  · refine prf_deduction ?_
+    have hab := prfH_hyp_self (numeral a =eq numeral b)
+    have hlt' := prf_to_prfH (prf_gnum_lt hlt) [numeral a =eq numeral b]
+    exact PrfH.mp _ _ _ (prf_to_prfH (prf_lt_irrefl _) _) (PrfH_lt_subst2 (PrfH_eq_symm hab) hlt')
+  · sorry  -- simetrico (b < a): Leibniz en el primer argumento de lt
+
+theorem prf_formCode_ne {φ ψ : Formula} (h : φ ≠ ψ) : Prf (neg (formCode φ =eq formCode ψ)) := by
+  have hn := prf_numeral_ne (fun e => h (codeNat_inj e))
+  sorry  -- transportar por prf_formCode_numeral φ y ψ (Leibniz en los dos lados, bajo neg)
+
+theorem prf_not_In_listFormCodeM' (φ : Formula) :
+    ∀ L : List Formula, ¬ List.Mem φ L → Prf (neg (In (formCode φ) (listFormCodeM L)))
+  | [], _ => by simpa [listFormCodeM, neg] using prf_not_in_nil (formCode φ)
+  | f :: fs, hm => by
+      sorry  -- prf_in_cons_iff + PrfH_or_elim: cabeza con prf_formCode_ne (formCodeM_eq), cola por recursion
+
+theorem prf_neg_In_axiomsCodeT_of_not_mem [AnclaEq] (φ : Formula) (h : ¬ List.Mem φ axioms) :
+    Prf (neg (In (formCode φ) axiomsCodeT)) := by
+  refine prf_deduction ?_
+  have hin : PrfH [In (formCode φ) axiomsCodeT] (In (formCode φ) (listFormCodeM axioms)) :=
+    PrfH_eq_subst_in (prf_to_prfH AnclaEq.eq _) (prfH_hyp_self _)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_In_listFormCodeM' φ axioms h) _) hin
+
+#print axioms prf_neg_In_axiomsCodeT_of_not_mem  -- esperado: [propext, Classical.choice, Quot.sound]

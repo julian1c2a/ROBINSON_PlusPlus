@@ -1,0 +1,1 @@
+def r := [0:s!"{(sorry : Nat)}".length]

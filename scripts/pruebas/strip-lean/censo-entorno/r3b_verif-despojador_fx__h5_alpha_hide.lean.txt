@@ -1,0 +1,2 @@
+def αs! (a : String) (h : True) (b : String) : String := a
+def v := αs! "{" sorry "}"

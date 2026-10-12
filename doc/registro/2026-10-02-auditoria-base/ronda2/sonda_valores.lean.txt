@@ -1,0 +1,23 @@
+import Lean
+import ROBINSON_PlusPlus
+/-! ¿Devuelve `ConstantInfo.value?` la PRUEBA de un teorema importado en v4.31? -/
+open Lean Elab Command
+
+elab "#mira_valor" : command => do
+  let env ← getEnv
+  let c := ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
+  match env.find? c with
+  | none => logInfo m!"no encuentro {c}"
+  | some ci =>
+    let tipo := match ci with
+      | .thmInfo _ => "thmInfo" | .defnInfo _ => "defnInfo" | .opaqueInfo _ => "opaqueInfo"
+      | .axiomInfo _ => "axiomInfo" | _ => "otro"
+    logInfo m!"{c}: {tipo}"
+    logInfo m!"value? = {(ci.value?).isSome} · value? (allowOpaque := true) = {(ci.value? (allowOpaque := true)).isSome}"
+    match ci with
+    | .thmInfo t =>
+      let us := t.value.getUsedConstants
+      logInfo m!"thmInfo.value: {us.size} constantes; contiene repr_pos'_prf: {us.contains ``ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf}"
+    | _ => pure ()
+
+#mira_valor

@@ -1,0 +1,4 @@
+/-- A docstring
+with a "quote
+-/
+theorem t : True := sorry

@@ -1,0 +1,14 @@
+-- Sonda L5-02 (raíz de RPP: lake env lean l5_02.lean)
+import ROBINSON_PlusPlus.Meta
+open ROBINSON_PlusPlus.Minimal.Axioms
+partial def tsize : Term → Nat
+  | .var _ => 1
+  | .func _ args => 1 + args.foldl (fun a t => a + tsize t) 0
+#eval tsize (strCodeM in_sym)          -- PREDICCIÓN: 8715 (8712 succ + cero + cons + nil)
+#eval tsize (strCodeM succ_sym)        -- 966, ya medido en RecodCoste.lean:16
+#eval tsize (listFormCodeM coreAxioms)
+#eval tsize (listFormCodeM axioms)     -- lo que el punto fijo de F1 dejaría DENTRO de axioms. ESTIMACIÓN: millones de nodos
+-- Predicción para el diseño de F1 (worktree, NO en master):
+--   def axiomsCodeT : Term := listFormCodeM coreAxioms   -- sustituto MÍNIMO de τ
+--   ⇒ Meta/Hilbert.lean:69 axioms_lift_eq (simp only [axioms, …]; rfl) deja de cerrar con maxRecDepth 20000;
+--   la ruta estructural ya existe: liftTerm_formCodeM / substTerm_formCodeM (Minimal/Axioms.lean:613-733)

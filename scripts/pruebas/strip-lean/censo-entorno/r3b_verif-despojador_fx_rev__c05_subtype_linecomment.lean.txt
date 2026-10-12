@@ -1,0 +1,3 @@
+def S := { n : Nat //-- positivo
+  0 < n }
+theorem t : True := sorry

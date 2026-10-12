@@ -1,0 +1,2 @@
+theorem t (p : Prop) : p \/--x
+  True := Or.inr sorry

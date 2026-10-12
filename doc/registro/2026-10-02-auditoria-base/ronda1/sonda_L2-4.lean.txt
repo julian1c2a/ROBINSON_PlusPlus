@@ -1,0 +1,24 @@
+import FOL.MetaRules
+import FOL.Semantics
+import FOL.Soundness0
+import FOL.Inconsistencia
+open FOL.Metamath.Semantics
+open FOL.Metamath.Soundness0 (Mfalse Mtrue P)
+
+/-- Solidez de `Derives` para modelos sobre `Unit`, POR INDUCCIÓN (22 constructores). Los 21 de
+    Derives₀ como en `derives0_soundness`; `gen_rule` con `n := #0` (en `Unit` todo elemento es `v 0`).
+    Viola M-11 A PROPÓSITO: es lo que se mide. NO meter en el árbol. -/
+theorem sound_unit {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) :
+    ∀ (M : Model Unit) (v : Nat → Unit), contextSatisfies M v Γ → evalFormula M v f := by
+  induction h with
+  | _ => sorry
+
+theorem falso_sin_hipotesis : False := by
+  have hnd : ¬ (([] : List Formula) ⊢ P) := fun h =>
+    sound_unit h Mfalse (fun _ => ()) (fun _ hf => absurd hf List.not_mem_nil)
+  have hneg : ([] : List Formula) ⊢ neg P := FOL.MetaRules.raa (fun h => absurd h hnd)
+  have h := sound_unit hneg Mtrue (fun _ => ()) (fun _ hf => absurd hf List.not_mem_nil)
+  simp only [evalFormula, neg] at h
+  exact h trivial
+
+#print axioms falso_sin_hipotesis   -- esperado: [propext, FOL.MetaRules.raa] (+ Quot.sound)

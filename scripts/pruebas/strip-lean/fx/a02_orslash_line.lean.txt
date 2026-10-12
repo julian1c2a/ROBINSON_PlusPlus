@@ -1,0 +1,3 @@
+theorem t2 (p q : Prop) (hp : p) : p \/-- la izquierda
+  q := Or.inl sorry
+theorem t3 : True := trivial

@@ -1,0 +1,2 @@
+def chk (x : Nat) : Bool := !s!"a {f "b" sorry "c"} d".isEmpty
+theorem t1 : True := trivial

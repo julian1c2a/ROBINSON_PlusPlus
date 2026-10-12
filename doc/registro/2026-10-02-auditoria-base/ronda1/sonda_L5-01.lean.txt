@@ -1,0 +1,60 @@
+-- Sonda L5-01. Antes: awk '/^read -r -d .. TABLA <<.EOF.$/{f=1;next} /^EOF$/{f=0} f' check-footprints.bash | grep '^ROBINSON_PlusPlus' > l5_rpp.txt
+import ROBINSON_PlusPlus
+open Lean
+open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.Provability
+
+theorem l5_tipo_prf (φ : Formula) (h : Prf φ) : Prf φ := h
+theorem l5_tipo_code (φ : Formula) : formCode φ = formCode φ := rfl
+#print axioms l5_tipo_prf                                  -- PREDICCIÓN: incluye Classical.choice (sólo por el TIPO)
+#print axioms l5_tipo_code                                 -- PREDICCIÓN: incluye Classical.choice
+#print axioms ROBINSON_PlusPlus.Minimal.Axioms.axioms      -- PREDICCIÓN: incluye Classical.choice
+#print axioms ROBINSON_PlusPlus.Minimal.Axioms.charsCodeM  -- PREDICCIÓN: ninguno
+
+def usedOf (env : Environment) (c : Name) : Array Name :=
+  match env.find? c with
+  | none => #[]
+  | some ci =>
+    let base := ci.type.getUsedConstants ++ ((ci.value? (allowOpaque := true)).map (·.getUsedConstants) |>.getD #[])
+    match ci with
+    | .inductInfo iv => base ++ iv.ctors.toArray
+    | _ => base
+
+def isStr (n : Name) : Bool :=
+  let s := n.toString
+  s.startsWith "String." || s.startsWith "ByteArray.utf8" || s.startsWith "_private.Init.Data.String"
+
+def propagate (rev : Std.HashMap Name (Array Name)) (cut : Name → Bool) : NameSet := Id.run do
+  let mut bad : NameSet := {}
+  let mut st : Array Name := #[``Classical.choice]
+  while !st.isEmpty do
+    let c := st.back!
+    st := st.pop
+    if bad.contains c || cut c then continue
+    bad := bad.insert c
+    for u in rev.getD c #[] do
+      unless bad.contains u do st := st.push u
+  return bad
+
+#eval show CoreM Unit from do
+  let env ← getEnv
+  let tit := (← IO.FS.lines "l5_rpp.txt").filterMap fun l =>
+    let n := ((l.splitOn "|")[0]!).toName
+    if env.contains n then some n else none
+  let mut seen : NameSet := {}
+  let mut stack := tit
+  while !stack.isEmpty do
+    let c := stack.back!
+    stack := stack.pop
+    if seen.contains c then continue
+    seen := seen.insert c
+    for d in usedOf env c do
+      unless seen.contains d do stack := stack.push d
+  let mut rev : Std.HashMap Name (Array Name) := {}
+  for c in seen.toList do
+    for d in usedOf env c do
+      rev := rev.insert d ((rev.getD d #[]).push c)
+  let hoy := propagate rev (fun _ => false)
+  let sinStr := propagate rev isStr
+  let quedan := tit.filter sinStr.contains
+  IO.println s!"titulares: {tit.size} · con choice hoy: {(tit.filter hoy.contains).size} · con choice cortando String.*: {quedan.size}"
+  for n in quedan do IO.println s!"  sigue con choice: {n}"

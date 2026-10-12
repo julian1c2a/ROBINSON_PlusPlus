@@ -1,0 +1,3 @@
+import ROBINSON_PlusPlus
+#print axioms ROBINSON_PlusPlus.Meta.Hilbert.prf_to_derives        -- esperado: …, FOL.MetaRules.imp_intro, ax_induction_prim, ax_list_induction
+#print axioms ROBINSON_PlusPlus.Meta.Hilbert.consistentH_of_omega

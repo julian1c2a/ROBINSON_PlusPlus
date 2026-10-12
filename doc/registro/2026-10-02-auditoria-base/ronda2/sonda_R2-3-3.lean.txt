@@ -1,0 +1,9 @@
+-- Tras el arreglo; reutiliza repT/repF/occT/occF/rr/a0/occT_listFormCodeM/occT_numeralM del sondeo F1.
+/-- Por que F1 ya no pasa: el axioma nuevo, trasladado por T ↦ cons a₀ T, es REFUTABLE en Prf. -/
+theorem rep_ancla_refutable : Prf (neg (repF rr ax_axiomsCodeT_def)) := by
+  -- (1) repF rr ax_axiomsCodeT_def = (rr =eq concat LR (cons δ nil)):
+  --     repT_axiomsCodeT a la izquierda; repT_of_occ con occT_listFormCodeM y occT_numeralM a la derecha.
+  -- (2) prf_ax ax_axiomsCodeT_def (T = LR ++ [δ]) + simetria/transitividad: rr = T.
+  -- (3) prf_cantor_mono_right a0 axiomsCodeT : T < rr; Leibniz (Prfᵢ.leibniz): T < T; prf_lt_irrefl.
+  -- Misma maquinaria que anclaEq_prf_bot (:509-527), con el axioma nuevo en lugar del ancla.
+  sorry

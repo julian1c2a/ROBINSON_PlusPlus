@@ -1,0 +1,75 @@
+# D7 — lo que es CIERTO hoy (2026-10-05), para corregir la prosa
+
+Fuente: el árbol de trabajo de FOL y de RPP (sin commit todavía; FOL HEAD 1df51b3, RPP HEAD 765a645). El ADR que lo
+registra será **ADR‑129** de RPP (`DECISIONS.md`). Todo lo de abajo está COMPILADO (FOL 58 jobs, RPP 129 jobs) y los
+footprints, MEDIDOS (check-footprints: 492 filas, cobertura 463).
+
+## La decisión
+
+El propietario, el 2026-10-05: «la decisión es completar la sustitución String->List Char, D7 se cierra solo cuando
+esté completamente lista y terminada la sustitución». Reabre la D7 que ADR‑101/102 (2026‑09‑26) habían cerrado como
+ABANDONADA en FOL. Esos ADR y el CHANGELOG son HISTORIA: no se reescriben; la prosa VIGENTE que diga que D7 está
+abandonada, que «no hacía falta», o que los símbolos son `String`, pasa a ser FALSA y se corrige.
+
+## FOL
+
+* `FOL/FOL.lean`: `abbrev Term := TermG (List Char)`, `abbrev Formula := FormulaG (List Char)`; los shims de
+  `noConfusion` con `(S := List Char)`. La `instance : Coe String Formula` se RETIRA (sin consumidores).
+* `FOL/Semantics.lean`: `abbrev Model (D : Type) := ModelG (List Char) D`.
+* `FOL/Fresh0.lean`: `shift s := 'f' :: s`; `cst 0 = ['g']`, `cst (n+1) = 'a' :: cst n` (los mismos nombres de
+  siempre: g, ag, aag…); `cst_zero_ne`/`cst_ne_shift` siguen con `of_decide_eq_false rfl` (la igualdad decidible de
+  `List Char` compara carácter a carácter cortocircuitando); `shift_inj`/`cst_inj` por inyectividad de `cons`;
+  `cst_utf8ByteSize` → **`cst_length`** (`(cst m).length = m + 1`); `cst_bound_sym` acota con `s.length`;
+  **retirados** `valid_tail` y `shift_bytes` (capa de bytes de `String`); `unshift` es un `match`
+  (`'f' :: t => t | x => x`) y `unshift_shift` es `rfl`; la instancia `FreshSym (List Char)` se llama
+  `FOL.Fresh0.instFreshSymListChar` y **no depende de ningún axioma** (antes, la de `String`: `[propext, Quot.sound]`).
+* `FOL/SymClasses.lean`: su instancia de MEDIDA `FreshSym (List Char)` (`'c' :: replicate n 'i'`) se RETIRA: la
+  instancia es la de `Fresh0`, la que usa la cadena de completitud. Las clases `FreshSym`/`EnumSym` se quedan.
+* `FOL/Enumeration.lean`: `natToString` → **`natToSym`** (`(natToList n).map Char.ofNat`), `natToString_surj` →
+  **`natToSym_surj`** (sin `String.exists_eq_ofList`); se RETIRA la instancia `EnumSym String`; queda una sola,
+  `instEnumSymListChar` (`[propext, Quot.sound]`).
+* `FOL/HenkinLimit0.lean`: `cst_ne_of_size` con `s.length ≤ m`; `bndTerm` toma la mayor LONGITUD de un símbolo (antes
+  `utf8ByteSize`).
+* El resto (Henkin0, Rename, Canonical0, Craig0, Interpolation0, QFDecide0, Skolem0, SkolemN0, SkolemNF0,
+  SkolemHerbrand0, HerbrandBlock0, Soundness0, Eigenvariable, Derives2, Eq0, Theorems/Eq, Herbrand0, Inconsistencia,
+  Finitary0): `String` → `List Char` en los tipos y los literales de un carácter `"P"` → `['P']`. Compiló a la primera.
+* Prueba de cierre de D7 en FOL, MEDIDA: 0 apariciones de `String` en el CÓDIGO (sin comentarios) de `FOL/**` y
+  `TheoryFramework/**`, y 0 literales de símbolo (queda sólo un mensaje de error de `Tactics.lean`).
+* Congelación: los 14 congelados con código (Fresh0, HenkinLimit0, Henkin0, Rename, Canonical0, Craig0,
+  Interpolation0, QFDecide0, Skolem0, SkolemN0, SkolemNF0, SkolemHerbrand0, HerbrandBlock0, Soundness0) y Compacity0 y
+  Lindenbaum0 (sólo prosa) se DESCONGELAN (`thaw --confirm`, autorizado por la decisión del propietario) y se vuelven
+  a congelar tras el commit.
+* Footprints de FOL (filas en `ROBINSON_PlusPlus/check-footprints.bash`): las 39 con `Classical.choice` siguen con él;
+  `FOL.Compacity0.evalFormula_updateCsts` pasa de `[propext]` a ninguno y `evalTerm_updateCsts` de
+  `[propext, Quot.sound]` a ninguno; `FOL.Fresh0.instFreshSymListChar`, ninguno.
+* La razón de fondo que daban los textos («lo que trae `Classical.choice` a `String` es DECODIFICAR UTF‑8; la capa de
+  bytes está limpia») era CIERTA para `String`; hoy ya no hay `String` en los símbolos. No se dice que D7 limpie los
+  titulares de FOL: no los limpia (los 39 siguen).
+
+## RPP
+
+* Macro nueva `sym!"…"` en `ROBINSON_PlusPlus/Minimal/SymLit.lean` (sin imports; `syntax:max`; construye
+  `List.cons` de literales de carácter al ELABORAR: el término no nombra `String`; vale en término y en patrón; un
+  `unexpander` la imprime de vuelta). `#print axioms` de su sonda `symProbe`: ninguno. Es el ÚNICO fichero del árbol de
+  RPP con `String` en código (el de la propia macro).
+* `Minimal/Axioms.lean`: los 17 `*_sym : List Char := sym!"…"` (mismos puntos de código: σ U+03C3, − U+2212, √, /₂,
+  %₂, τ, Π_p, ≤, ∈…); `strCodeM (s : List Char) := charsCodeM s` y `codeNatStr (s : List Char) := codeNatChars s` (sin
+  `.toList`, mismos nombres); `termToString` sigue devolviendo `String` (impresión: `String.ofList f`).
+* `Meta/Provability.lean`: `strCode (s : List Char) := charsCode s`; `strCode_injective` es `charsCode_injective`.
+  `Meta/CodeDecode.lean`: `decodeStr : Term → Option (List Char) := decodeChars`. `Meta/SolidezVerificador.lean`:
+  `decS : Nat → List Char := (decodeL n).map Char.ofNat`; `dflt := Term.func sym!"" []`.
+* **Ningún VALOR cambia**: `codeNat`, `V₀`, `godelCN`, el ancla y `tcFnN` dan los mismos números (los literales son
+  los mismos caracteres).
+* El modelo `MNV` (`Meta/ModeloEstandar.lean`) despacha por patrones `sym!"σ"`, … Sus 34 validaciones `v_*` ya no
+  despliegan `MNV` en el `simp` (con `List Char` se agotaba el límite de `whnf`): reescriben con un lema `rfl` por
+  símbolo (`MN_*`; ocho nuevos: `MN_add`, `MN_mul`, `MN_sub`, `MN_sqrt`, `MN_div2`, `MN_mod2`, `MN_pow`,
+  `MN_prodp`). El módulo compila en 10 s.
+* Footprints de RPP, MEDIDOS: de las 229 filas de RPP de antes, 226 llevaban `Classical.choice`; hoy **182 de 233**
+  (las 4 filas nuevas —`strCode`, `strCodeM`, `codeNatStr`, `symProbe`— no dependen de ningún axioma). **44 filas
+  pierden `Classical.choice`** (la puerta contrafactual de ADR‑122 decía hasta 48). Entre ellas, `v_ancla` y
+  `MN_codingAxioms`. NO lo pierden los titulares de Gödel, la solidez ni Tarski (`consistencia`, `goedel_I`,
+  `goedel_II`, `goedel_I_neg`, `prf_sound`, `MN_axioms`…): su `Classical.choice` viene de la solidez clásica
+  (`prf_sound`, el axioma `p3`), no de `String`.
+* Cifras del build: 129 jobs (uno más: `Minimal/SymLit.lean`), 112 módulos activos (Minimal 2 + Meta 107 + Full 3).
+* PeanoRF (bloqueado, sólo lectura) depende de `../FOL` y `../ROBINSON_PlusPlus` por ruta: dejará de compilar contra
+  el FOL nuevo hasta que se adapte. No se toca.

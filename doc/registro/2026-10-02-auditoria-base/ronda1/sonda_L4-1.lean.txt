@@ -1,0 +1,141 @@
+/- Sonda L4-1 (sin compilar). Ejecutar desde la RAÍZ de RPP. -/
+import FOL.FOL
+import FOL.MetaRules
+
+namespace SondaL4
+
+/-- Verdad en el modelo de UN punto: todo átomo vale `b`, `≐` vale siempre. Booleana: `dne_rule` no pide `Classical`. -/
+def val (b : Bool) : Formula → Bool
+  | .bottom => false
+  | .atom _ _ => b
+  | .eq _ _ => true
+  | .impl A B => !(val b A) || val b B
+  | .and A B => val b A && val b B
+  | .or A B => val b A || val b B
+  | .forall A => val b A
+  | .ex A => val b A
+
+theorem val_lift (b : Bool) (A : Formula) : ∀ c, val b (liftFormula c A) = val b A := by
+  induction A with
+  | bottom => intro c; simp [liftFormula, val]
+  | atom p ts => intro c; simp [liftFormula, val]
+  | eq t u => intro c; simp [liftFormula, val]
+  | impl A B ihA ihB => intro c; simp [liftFormula, val, ihA, ihB]
+  | «forall» A ih => intro c; simp [liftFormula, val, ih]
+  | and A B ihA ihB => intro c; simp [liftFormula, val, ihA, ihB]
+  | or A B ihA ihB => intro c; simp [liftFormula, val, ihA, ihB]
+  | ex A ih => intro c; simp [liftFormula, val, ih]
+
+theorem val_subst (b : Bool) (A : Formula) : ∀ k (t : Term), val b (substFormula k t A) = val b A := by
+  induction A with
+  | bottom => intro k t; simp [substFormula, val]
+  | atom p ts => intro k t; simp [substFormula, val]
+  | eq u w => intro k t; simp [substFormula, val]
+  | impl A B ihA ihB => intro k t; simp [substFormula, val, ihA, ihB]
+  | «forall» A ih => intro k t; simp [substFormula, val, ih]
+  | and A B ihA ihB => intro k t; simp [substFormula, val, ihA, ihB]
+  | or A B ihA ihB => intro k t; simp [substFormula, val, ihA, ihB]
+  | ex A ih => intro k t; simp [substFormula, val, ih]
+
+-- getAt?/replaceAt van por recursión bien fundada (FOL/Derives1.lean): se abren por sus ecuaciones.
+theorem val_replaceAt (b : Bool) : ∀ (p : Pos) (f sub sub' : Formula),
+    getAt? f p = some sub → val b sub' = val b sub → val b (replaceAt f p sub') = val b f
+  | .root, f, sub, sub', h, hv => by
+      simp only [getAt?, Option.some.injEq] at h; subst h; simpa [replaceAt] using hv
+  | .left p, f, sub, sub', h, hv => by
+      cases f <;> simp [getAt?] at h <;> simp [replaceAt, val, val_replaceAt b p _ sub sub' h hv]
+  | .right p, f, sub, sub', h, hv => by
+      cases f <;> simp [getAt?] at h <;> simp [replaceAt, val, val_replaceAt b p _ sub sub' h hv]
+  | .body p, f, sub, sub', h, hv => by
+      cases f <;> simp [getAt?] at h <;> simp [replaceAt, val, val_replaceAt b p _ sub sub' h hv]
+
+/-- Solidez para modelos de un punto, por INDUCCIÓN sobre los 22 constructores de `Derives`. -/
+theorem sound1 (b : Bool) {Γ : List Formula} {f : Formula} (h : Γ ⊢ f) :
+    (∀ g ∈ Γ, val b g = true) → val b f = true := by
+  induction h with
+  | hyp Γ f hm => exact fun hΓ => hΓ f hm
+  | intro_impl Γ A B _ ih =>
+      intro hΓ
+      cases hA : val b A
+      · simp [val, hA]
+      · have hB := ih (fun g hg => by
+          cases hg with
+          | head => exact hA
+          | tail _ hg => exact hΓ g hg)
+        simp [val, hA, hB]
+  | elim_impl Γ A B _ _ ih1 ih2 =>
+      intro hΓ; have h1 := ih1 hΓ; have h2 := ih2 hΓ; simp [val, h2] at h1; exact h1
+  | intro_and Γ A B _ _ ih1 ih2 => intro hΓ; simp [val, ih1 hΓ, ih2 hΓ]
+  | elim_and_l Γ A B _ ih => intro hΓ; have h := ih hΓ; simp [val] at h; exact h.1
+  | elim_and_r Γ A B _ ih => intro hΓ; have h := ih hΓ; simp [val] at h; exact h.2
+  | intro_or_l Γ A B _ ih => intro hΓ; simp [val, ih hΓ]
+  | intro_or_r Γ A B _ ih => intro hΓ; simp [val, ih hΓ]
+  | elim_or Γ A B C _ _ _ ih ihA ihB =>
+      intro hΓ
+      have hor := ih hΓ
+      simp only [val, Bool.or_eq_true] at hor
+      rcases hor with hA | hB
+      · exact ihA (fun g hg => by
+          cases hg with
+          | head => exact hA
+          | tail _ hg => exact hΓ g hg)
+      · exact ihB (fun g hg => by
+          cases hg with
+          | head => exact hB
+          | tail _ hg => exact hΓ g hg)
+  | intro_forall Γ A _ ih =>
+      intro hΓ
+      show val b A = true
+      exact ih (fun g hg => by
+        obtain ⟨g', hg', rfl⟩ := List.mem_map.mp hg
+        rw [val_lift]; exact hΓ g' hg')
+  | elim_forall Γ A t _ ih => intro hΓ; rw [val_subst]; exact ih hΓ
+  | intro_ex Γ A t _ ih => intro hΓ; have h := ih hΓ; rw [val_subst] at h; exact h
+  | elim_ex Γ A B _ _ ih1 ih2 =>
+      intro hΓ
+      have hA : val b A = true := ih1 hΓ
+      have h := ih2 (fun g hg => by
+        cases hg with
+        | head => exact hA
+        | tail _ hg =>
+            obtain ⟨g', hg', rfl⟩ := List.mem_map.mp hg
+            rw [val_lift]; exact hΓ g' hg')
+      rwa [val_lift] at h
+  | bot_elim Γ A _ ih => intro hΓ; have h := ih hΓ; simp [val] at h
+  | weakening Γ Γ' f _ hsub ih => intro hΓ'; exact ih (fun g hg => hΓ' g (hsub g hg))
+  | rewrite_at Γ f f' p sub sub' _ hget hrule heq ih =>
+      intro hΓ; subst heq
+      have hv : val b sub' = val b sub := by
+        cases hrule with
+        | commuteImpl A B C => cases val b A <;> cases val b B <;> simp [val]
+      rw [val_replaceAt b p f sub sub' hget hv]; exact ih hΓ
+  | gen_rule Γ A _ ih => intro hΓ; have h := ih (.var 0) hΓ; rw [val_subst] at h; exact h
+  | dne_rule Γ A _ ih =>
+      intro hΓ; have h := ih hΓ
+      cases hA : val b A <;> simp [val, neg, hA] at h ⊢
+  | dne_schema Γ A => intro _; cases val b A <;> simp [val, neg]
+  | forall_not_ex_not Γ A => intro _; cases val b A <;> simp [val, neg]
+  | refl Γ t => intro _; simp [val]
+  | subst Γ t₁ t₂ f _ _ _ ih2 => intro hΓ; have h := ih2 hΓ; rw [val_subst] at h ⊢; exact h
+
+/-- ⛔ `False` con `raa` como ÚNICO axioma del proyecto. -/
+theorem falso_con_raa : False := by
+  have hP : ¬ (([] : List Formula) ⊢ Formula.atom "P" []) := fun h => by
+    have h0 := sound1 false h (fun _ hg => nomatch hg); simp [val] at h0
+  have hn : ([] : List Formula) ⊢ neg (Formula.atom "P" []) :=
+    FOL.MetaRules.raa (fun h => absurd h hP)
+  have h1 := sound1 true hn (fun _ hg => nomatch hg); simp [val, neg] at h1
+
+/-- Lo mismo con `imp_intro` SOLO. -/
+theorem falso_con_imp_intro : False := by
+  have hP : ¬ (([] : List Formula) ⊢ Formula.atom "P" []) := fun h => by
+    have h0 := sound1 false h (fun _ hg => nomatch hg); simp [val] at h0
+  have hn : ([] : List Formula) ⊢ (Formula.atom "P" [] ⇒ ⊥) :=
+    FOL.MetaRules.imp_intro (fun h => absurd h hP)
+  have h1 := sound1 true hn (fun _ hg => nomatch hg); simp [val] at h1
+
+#print axioms falso_con_raa        -- esperado: [FOL.MetaRules.raa] (± propext)
+#print axioms falso_con_imp_intro  -- esperado: [FOL.MetaRules.imp_intro] (± propext)
+end SondaL4
+-- Corolario (con `import ROBINSON_PlusPlus.Meta.OmegaReflect`):
+-- example : ROBINSON_PlusPlus.Meta.OmegaReflect.NegVerifier := SondaL4.falso_con_raa.elim

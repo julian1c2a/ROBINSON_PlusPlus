@@ -1,0 +1,5 @@
+import Lean
+open Lean
+def g : CoreM Unit := do
+  throwNamedError
+    lean.foo "a {(sorry : Nat)}"

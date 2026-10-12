@@ -1,0 +1,1 @@
+def f : Lean.MetaM Unit := throwError "x {(sorry : Nat)}"

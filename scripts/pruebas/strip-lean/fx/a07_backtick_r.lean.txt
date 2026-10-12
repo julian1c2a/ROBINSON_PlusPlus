@@ -1,0 +1,2 @@
+def f (n : Lean.Name) (s : String) (h : True) (t : String) : Unit := ()
+def u := f `r"\"" sorry "x"

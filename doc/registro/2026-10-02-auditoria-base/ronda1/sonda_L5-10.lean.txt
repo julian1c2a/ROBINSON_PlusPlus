@@ -1,0 +1,5 @@
+import ROBINSON_PlusPlus.Meta.ChainDecode
+#synth DecidableEq Term
+-- (el nombre de la instancia de ChainDecode es autogenerado; si difiere, copiarlo de #synth)
+example : (ROBINSON_PlusPlus.Meta.HilbertSeq.instDecEqTermG : DecidableEq Term)
+    = ROBINSON_PlusPlus.Meta.ChainDecode.instDecidableEqTerm := rfl   -- PREDICCIÓN: no cierra por rfl

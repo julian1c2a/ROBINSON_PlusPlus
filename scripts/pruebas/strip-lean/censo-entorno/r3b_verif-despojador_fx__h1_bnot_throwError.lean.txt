@@ -1,0 +1,4 @@
+import Lean
+open Lean
+def g : CoreM Bool := do
+  return !(← (throwError "x {(sorry : Nat)}" : CoreM Bool))

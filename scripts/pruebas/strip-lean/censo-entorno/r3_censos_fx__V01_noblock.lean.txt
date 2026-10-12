@@ -1,0 +1,2 @@
+/- Says "hi -/
+theorem t : True := sorry

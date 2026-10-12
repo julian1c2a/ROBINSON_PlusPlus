@@ -1,0 +1,6 @@
+-- Sonda L5-07
+import FOL.Derives0
+inductive RSym | zero | succ | add | mul | cons | ext (s : List Char)
+  deriving DecidableEq, Repr
+example : Derives₀ ([] : List (FormulaG RSym)) (.eq (.var 0) (.var 0)) := Derives₀.refl _ _   -- PREDICCIÓN: compila
+-- example : Derives ([] : List (FormulaG RSym)) (.eq (.var 0) (.var 0)) := Derives.refl _ _ -- PREDICCIÓN: error de tipo (Derives sólo sobre FormulaG String)

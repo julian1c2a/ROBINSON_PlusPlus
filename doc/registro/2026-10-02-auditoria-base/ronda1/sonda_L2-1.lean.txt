@@ -1,0 +1,32 @@
+import ROBINSON_PlusPlus.Meta
+open FOL ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.NatArithPrf ROBINSON_PlusPlus.Meta.CantorMonoPrf ROBINSON_PlusPlus.Meta.CodeNumeralPrf
+open ROBINSON_PlusPlus.Meta.CodeWitnessPrf ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf ROBINSON_PlusPlus.Meta.Godel
+
+namespace Sondeos.BasuraPrfBot
+
+/-- (1) `x < 1 ⇒ x = 0`: `prf_zero_or_succ x`; rama `x = σy`: `prf_lt_of_succ_lt_succ` + `prf_not_lt_zero`. -/
+theorem lt_one (x : Term) : Prf (lt x (succ zero) ⇒ (x =eq zero)) := by
+  sorry
+
+/-- (2) `1 = cons c d ⇒ ⊥`. -/
+theorem uno_no_cons (c d : Term) : Prf ((succ zero =eq cons c d) ⇒ Formula.bottom) := by
+  refine prf_deduction ?_
+  have hE : PrfH [succ zero =eq cons c d] (succ zero =eq cons c d) := prfH_hyp_self _
+  have hc := PrfH_lt_subst2 (PrfH_eq_symm hE) (prf_to_prfH (prf_cantor_mono_left c d) _)   -- c < 1
+  have hd := PrfH_lt_subst2 (PrfH_eq_symm hE) (prf_to_prfH (prf_cantor_mono_right c d) _)  -- d < 1
+  have hc0 := PrfH.mp _ _ _ (prf_to_prfH (lt_one c) _) hc
+  have hd0 := PrfH.mp _ _ _ (prf_to_prfH (lt_one d) _) hd
+  -- cons c d = cons 0 0 = numeral (consN 0 0) = 2  (prf_cons_eval 0 0; consN 0 0 = 2 por rfl)
+  -- => σ0 = σσ0 => (prf_succ_inj) 0 = σ0 => (prf_succ_ne_zero) ⊥
+  sorry
+
+/-- (3) Prf ⊥ en master. -/
+theorem prf_bot_master : Prf Formula.bottom :=
+  prf_mp (prf_or_elim_imp (prf_succ_ne_zero zero)
+    (uno_no_cons (carc (succ zero)) (cdrc (succ zero)))) (prf_nil_or_cons (succ zero))
+
+#print axioms prf_bot_master   -- esperado: [propext, Classical.choice, Quot.sound]
+end Sondeos.BasuraPrfBot
+-- Control: en la rama de ADR-113 (consN 0 0 = 1) `uno_no_cons` NO debe cerrar.

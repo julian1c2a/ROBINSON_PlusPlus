@@ -1,0 +1,2 @@
+def Neg' := { x : Int //-x > 0 }
+theorem t4 : True := sorry

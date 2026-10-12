@@ -1,0 +1,43 @@
+import ROBINSON_PlusPlus
+/-! Sonda L1-1 · `Prf ⊥` en master. Esperado: [propext, Classical.choice, Quot.sound].
+    Control negativo: en ae528f8 (ADR-113) `prf_cons_ne_one` NO debe compilar. -/
+open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.NatArithPrf ROBINSON_PlusPlus.Meta.BoundedInPrf ROBINSON_PlusPlus.Meta.CantorMonoPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf ROBINSON_PlusPlus.Meta.CodeWitnessPrf ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
+open ROBINSON_PlusPlus.Meta.GodelTwo ROBINSON_PlusPlus.Meta.Representability2Prf
+namespace SondaL1a
+
+theorem PrfH_eq_zero_of_lt_one {Γ : List Formula} {x : Term}
+    (h : PrfH Γ (lt x (succ zero))) : PrfH Γ (x =eq zero) :=
+  PrfH_or_elim (PrfH.mp _ _ _ (prf_to_prfH (prf_lt_succ_split x zero) _) h)
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero x) _) (PrfH.hyp _ _ (List.Mem.head _))))
+    (PrfH.hyp _ _ (List.Mem.head _))
+
+/-- `cons h t ≠ 1` para términos ARBITRARIOS (en master `cons 0 0 = 2`). -/
+theorem prf_cons_ne_one (h t : Term) : Prf (neg (cons h t =eq succ zero)) := by
+  refine prf_deduction ?_
+  have E : PrfH [cons h t =eq succ zero] (cons h t =eq succ zero) := prfH_hyp_self _
+  have hh := PrfH_eq_zero_of_lt_one (PrfH_lt_subst2 E (prf_to_prfH (prf_cantor_mono_left h t) _))
+  have ht := PrfH_eq_zero_of_lt_one (PrfH_lt_subst2 E (prf_to_prfH (prf_cantor_mono_right h t) _))
+  have h2 : PrfH [cons h t =eq succ zero] (cons h t =eq succ (succ zero)) :=
+    PrfH_eq_trans (PrfH_eq_trans (PrfH_congr_cons_head hh) (PrfH_congr_cons_tail ht))
+      (prf_to_prfH (prf_cons_eval 0 0) _)   -- consN 0 0 = triN 1 + 1 = 2
+  have h01 : PrfH [cons h t =eq succ zero] (zero =eq succ zero) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj zero (succ zero)) _) (PrfH_eq_trans (PrfH_eq_symm E) h2)
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero zero) _) (PrfH_eq_symm h01)
+
+/-- ⛔⛔ `Prf ⊥`: `prf_nil_or_cons` (listInd con la Φ de ADR-088) en `Y := 1`. -/
+theorem prf_bot : Prf Formula.bottom :=
+  ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_or_elim (prf_nil_or_cons (succ zero))
+    (prf_succ_ne_zero zero)                                     -- 1 = nil (= 0)
+    (prf_deduction (PrfH.mp _ _ _ (prf_to_prfH (prf_cons_ne_one _ _) _)
+      (PrfH_eq_symm (prfH_hyp_self _))))                        -- 1 = cons (carc 1) (cdrc 1)
+
+theorem no_consistentH : Not ConsistentH := fun hc => hc prf_bot
+instance anclaTrivial : AnclaEq := ⟨Prf.mp _ _ (Prf.incl (Prfᵢ.efq _)) prf_bot⟩
+example : Prf consistencyFormula' := Prf.mp _ _ (Prf.incl (Prfᵢ.efq _)) prf_bot
+example : Not ConsistentOmega := fun hc => hc (prf_to_derives prf_bot)
+end SondaL1a
+#print axioms SondaL1a.prf_bot

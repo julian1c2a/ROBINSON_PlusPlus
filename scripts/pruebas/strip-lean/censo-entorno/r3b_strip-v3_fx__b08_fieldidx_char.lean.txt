@@ -1,0 +1,4 @@
+def p : (Char -> Nat) × Nat := (fun _ => 0, 1)
+def q := p.1'"'
+theorem t8 : True := sorry
+"

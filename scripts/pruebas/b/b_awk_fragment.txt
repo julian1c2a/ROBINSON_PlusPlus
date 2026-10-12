@@ -1,0 +1,36 @@
+if [ "$B_MEDIDO" = "1" ]; then
+  # UNA pasada: cada cita `…` con la forma de un símbolo; viva si su nombre entero o su último
+  # componente está declarado (una familia, con `_` final, por prefijo); si no, la línea se exime
+  # por un marcador o por nombrar el sondeo que lo declara; lo que queda sale como «clave|cita|línea».
+  LC_ALL=C awk -v MARK="$DEAD_MARKER" '
+    BEGIN { CAND = "`([A-Z][A-Za-z0-9_]*[.])*(prf_|pcc_|goedel_|godel|d[123]_|repr_|ax_)([A-Za-z0-9_'"'"'!?]|[\303-\337][\200-\277]|\342(\202|\204|\205|\261)[\200-\277]|\341[\265-\277][\200-\277]|\360\235[\200-\277][\200-\277])+`" }
+    FILENAME == ARGV[1] { vivo[$0] = 1; next }
+    FILENAME == ARGV[2] { p = index($0, "|"); k = substr($0, 1, p - 1); sond[k] = sond[k] "|" substr($0, p + 1); next }
+    {
+      s = $0
+      # un carácter de nombre: ASCII, o en UTF-8 una letra (2 bytes), un subíndice, un letterlike, ⱼ,
+      # el griego extendido o el alfabeto matemático — NO la puntuación general (`1‑3`, `a–b`, `…`)
+      while (match(s, CAND)) {
+        t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
+        k = t; sub(/^([A-Z][A-Za-z0-9_]*[.])*/, "", k)
+        # los axiomas objeto son snake_case: `ax_UpperCamel` es un PLACEHOLDER de convención
+        # de nombres (`ax_TagDescriptor`), no un símbolo
+        if (k ~ /^ax_[A-Z]/) continue
+        if ((t in vivo) || (k in vivo)) continue
+        if (k ~ /_$/) {
+          if (!(k in fam)) { fam[k] = 0; for (v in vivo) if (index(v, k) == 1) { fam[k] = 1; break } }
+          if (fam[k]) continue
+        }
+        # el marcador se mira en la línea con las CITAS en blanco: un nombre muerto que contenga un
+        # marcador (`prf_x_muerto`, `ax_medir`) no puede eximirse a sí mismo (tercera revisión)
+        l = $0; gsub(CAND, "``", l)
+        if (l ~ MARK) continue
+        if (k in sond) {
+          nf = split(substr(sond[k], 2), fs, "|"); ex = 0
+          for (q = 1; q <= nf; q++) { b = fs[q]; sub(/[.]lean$/, "", b); if (match($0, b "([^A-Za-z0-9_]|$)")) ex = 1 }
+          if (ex) continue
+        }
+        print k "|" t "|" FILENAME ":" FNR ":" $0
+      }
+    }' "$DECLS" "$DECLS_SOND" $B_DOCS > "$B_SALIDA"
+  cut -d'|' -f1 "$B_SALIDA" | LC_ALL=C sort -u | while IFS= read -r k; do

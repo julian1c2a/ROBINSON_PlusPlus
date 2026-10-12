@@ -1,0 +1,5 @@
+def f : CoreM Unit := do
+  trace[Meta.debug] "x {(sorry : Nat)}"
+  trace[Meta.debug]
+    "y {(sorry : Nat)}"
+  Macro.trace[foo] "z {(sorry : Nat)}"

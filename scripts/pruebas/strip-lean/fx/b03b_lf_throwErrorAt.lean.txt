@@ -1,0 +1,3 @@
+def g (stx : Syntax) : CoreM Unit := do
+  throwErrorAt
+    stx "a {(sorry : Nat)}"

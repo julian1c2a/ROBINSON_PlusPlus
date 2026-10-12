@@ -1,0 +1,5 @@
+def g (stx : Syntax) : CoreM Unit := do
+  throwErrorAt stx "a {(sorry : Nat)}"
+  throwErrorAt stx[0] "b {(sorry : Nat)}"
+  throwErrorAt (← getRef) "c {(sorry : Nat)}"
+  throwErrorAt stx[1 + 1] "d {(sorry : Nat)}"

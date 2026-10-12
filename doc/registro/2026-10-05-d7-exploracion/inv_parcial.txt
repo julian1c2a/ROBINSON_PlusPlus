@@ -1,0 +1,292 @@
+===== inv:FOL 23008
+# FOL D7 inventory: `String` → `List Char`
+
+## 0. Scope, method and caveats
+
+- **Repos.** FOL was at `782928c` when the run started. During the run HEAD moved to `1df51b3` (another session, ADR-128). That commit changed only `lakefile.lean` and `DECISIONS.md` and no `.lean` module, so every line number below is still valid. RPP is at `8fd14f4`; another session has uncommitted edits there (`DECISIONS.md`, `NEXT-STEPS.md`, `lakefile.lean`). I did not touch either repo.
+- **Method.**
+  - I ran `LC_ALL=C awk -f FOL/strip-lean.awk` on every module in the build: `FOL.lean`, the 49 files under `FOL/**` (all reachable from `FOL.lean`) and the 6 under `TheoryFramework/**`. Its output keeps only code.
+  - To find literals in code, I ran a variant of the stripper through process substitution (`awk -f <(sed 's/out = out " "; tb = tb "\\""/out = out "@@L@@"; …/' strip-lean.awk)`). It marks each literal instead of deleting it.
+  - No file was written. lake, lean, elan and leanchecker were not run, so every "compiles" claim below is an ESTIMATE.
+- **Site classes.**
+  - **TYPE**: rename `String` → `List Char`. A † means the type is an argument and needs parentheses.
+  - **LITERAL**: `"X"` → `['X']`.
+  - **API**: needs redesign.
+  - **PROOF**: the proof uses a `String` lemma or `String.decEq`.
+  - **KDEC**: a proof that computes symbol equality in the kernel (`decide`/`rfl`) with no String lemma named. It should keep working; it must be re-checked by a build.
+  - **PRINT**: printing or syntax only, no change.
+
+### Summary (MEASURED)
+
+| Figure | Value |
+|---|---|
+| FOL files needing code changes | **24** (14 frozen, 9 locked only, 1 free = `Semantics.lean`). Matches ADR-122 §1. |
+| Files needing design changes only | `SymClasses.lean` (duplicate instance after D7, §2.6) |
+| Lean files with stale comments only | `Compacity0`, `Lindenbaum0` (both frozen), `DecEq` (locked) |
+| TheoryFramework files with sites | 0 |
+| Code lines containing `String` | 184 lines, 225 tokens |
+| …of which bare type `String` | 201 tokens |
+| …of which `String.*` API | 15 tokens, in 3 files (`Fresh0`, `HenkinLimit0`, `Enumeration`) |
+| …of which `natToString*` | 9 tokens |
+| Declarations containing `String` in code | 167 |
+| Symbol string literals | 76 tokens on 54 lines in 11 files, all single-character (P Q R a b c d f g) |
+| Sites needing parentheses (†) | 10: FOL.lean 69, 70, 123; Semantics 32; Rename 419, 423, 428, 438, 448, 453; plus the two redesigned instances Fresh0 153, Enumeration 219 |
+| Non-TYPE work in the 24 files (outside Fresh0/HenkinLimit0/Enumeration) | the `Coe String Formula` instance, the `SymClasses` duplicate instance, and the KDEC sites |
+
+## 1. Inventory by file
+
+Status: F = frozen (`frozen_files.txt`), L = locked (`locked_files.txt`), free = neither.
+
+| File | Status | TYPE | LITERAL | API / PROOF / KDEC |
+|---|---|---|---|---|
+| `FOL/FOL.lean` | L | 69†, 70†, 80, 91 (`(S := String) (S' := String)`) | 342 (×2), 350 | API 123–124 `instance : Coe String Formula` (comment at 122). PRINT 56, 67 (`deriving Repr, BEq`), 111–120 (notation). |
+| `FOL/Semantics.lean` | free | 32† `abbrev Model … := ModelG String D` | – | – |
+| `FOL/Enumeration.lean` | L | – | – | API 208 `natToString`; 213–216 `natToString_surj` (PROOF 214 `s.exists_eq_ofList`, 216 `String.ofList`); 219–221 `instance EnumSym String`; call sites 252 and 346 (`natToString`), 303 and 377 (`natToString_surj`). Reusable: 232–239 `EnumSym (List Char)`. |
+| `FOL/SymClasses.lean` | L | – | (Char literals 101–102, already List Char) | Design issue: 100–114 `FreshSym (List Char)` becomes a second instance for the same type (§2.6). |
+| `FOL/Fresh0.lean` | F+L | 117, 139, 408 (`exists_fresh` statement) | 113, 118, 126, 127, 147, 204, 334 (all inside API sites) | API: 113 `shift`; 125–127 `cst`; 153–158 instance; 201–207 `cst_utf8ByteSize`; 215–219 `cst_bound_sym`; 291–324 `valid_tail`; 327–330 `unshift`; 332–336 `shift_bytes`; 338–347 `unshift_shift`. PROOF: 118 and 147 `String.append_right_inj`; 135, 140, 141 `of_decide_eq_false rfl` (relies on `String.decEq`); 205 `String.utf8ByteSize_append`; 217 `String.utf8ByteSize`; 293–324 `isValidUTF8`, `utf8EncodeChar`, `List.utf8Encode`; 335 `String.toByteArray_append`; 339 `String.toByteArray_inj`. |
+| `FOL/HenkinLimit0.lean` | F+L | 127, 135, 145, 159, 169, 198, 395 (`henLimit_witness : ∃ c : String`) | – | API 216–220 `cst_ne_of_size` (PROOF 219 `String.utf8ByteSize`); 226 `bndTerm` uses `s.utf8ByteSize`. |
+| `FOL/Henkin0.lean` | F+L | 130, 163, 213, 237 | – | – |
+| `FOL/Rename.lean` | F+L | 31 lines, 60 tokens: 146, 154, 166, 175, 193, 207, 216, 237, 246, 257, 267, 286, 361, 371, 381, 394, 404, 419†, 423†, 428†, 438†, 442, 448†, 452, 453†, 465, 473, 482, 523, 536, 547 | – | – (`locInv` decides with whichever `DecidableEq` the type has) |
+| `FOL/Canonical0.lean` | F+L | 281, 297, 562, 567, 576, 585 | – | – |
+| `FOL/Craig0.lean` | F+L | 189, 199, 210 | 802–806, 811–814 (17 tokens) | – |
+| `FOL/Interpolation0.lean` | F+L | 505, 516 | 653–661, 663, 664, 668 (23 tokens) | KDEC 685 (`by decide` proves `"Q" ≠ "R"`) |
+| `FOL/QFDecide0.lean` | F+L | 191, 200, 331, 337, 396, 401, 452, 457, 472, 476, 547 (field of `Good`), 566, 572, 580, 604, 712 | 847, 848, 863, 864, 866 (×2) | KDEC 852, 854, 858, 879 (`maxRecDepth 100000`), 880, 881 |
+| `FOL/Skolem0.lean` | F+L | 150, 156, 166, 177, 226, 235, 241, 253, 291 | – | – |
+| `FOL/SkolemN0.lean` | F+L | 104, 182, 186, 189, 227, 246 | – | – |
+| `FOL/SkolemNF0.lean` | F+L | 277, 282, 369, 388, 403, 418, 433, 448, 463, 479, 496 | 186, 187, 193, 194, 200, 201 | KDEC 188, 195, 204 (`rfl`) |
+| `FOL/SkolemHerbrand0.lean` | F+L | 265 | – | – |
+| `FOL/HerbrandBlock0.lean` | F+L | – | 206 | – |
+| `FOL/Soundness0.lean` | F+L | – | 229 | – |
+| `FOL/Eigenvariable.lean` | L | 32 lines: 125, 133, 156, 167, 185, 189, 193, 202, 236, 247, 271, 275, 279, 301, 313, 329, 335, 339, 344, 352, 360, 374, 435, 464, 479, 493, 518, 522, 529, 534, 552, 561 | – | – |
+| `FOL/Derives2.lean` | L | 118, 121 (constructors of `Derives₂`), 232, 245, 382, 402 | – | – |
+| `FOL/Eq0.lean` | L | 79, 100 | – | – |
+| `FOL/Theorems/Eq.lean` | L | 409, 430 | – | – |
+| `FOL/Herbrand0.lean` | L | 231, 235, 245, 246 (constructors of `EqInstance`) | 337, 338 | KDEC 344 (`by rfl`), 366, 369, 373 (`by decide`) |
+| `FOL/Inconsistencia.lean` | L | 61 | 154, 207, 211, 216, 221, 227 (×2), 228, 234 | – |
+| `FOL/Finitary0.lean` | L | – | 445 | – |
+| `FOL/Tactics.lean` | free | – | – | PRINT only (24 `throwError "prove_mem failed"`, 26 `elab "prove_mem"`). No change. |
+| `TheoryFramework/**` (6 files) | Instances/FOL F+L | 0 | 0 | 0 |
+
+**Who uses the coercion (MEASURED).** No FOL code relies on `Coe String Formula`: each of the 76 literals sits in a `String`-typed argument (`.atom`, `.func`, `predF p C → p = "P"`, `derives0_atom_congr "P"`). A heuristic grep of RPP's library found no bare literal in a Formula position either (ESTIMATE).
+
+## 2. API redesign
+
+### 2.1 `FOL/FOL.lean`
+
+```lean
+abbrev Term := TermG (List Char)                                          -- :69
+abbrev Formula := FormulaG (List Char)                                    -- :70
+  TermG.noConfusion (S := List Char) (S' := List Char) rfl (heq_of_eq h)     -- :80
+  FormulaG.noConfusion (S := List Char) (S' := List Char) rfl (heq_of_eq h)  -- :91
+-- :122-124  instance : Coe String Formula  → DELETE (recommended)
+  .impl (.atom ['P'] []) (neg (neg (.atom ['Q'] [])))                     -- :342
+  replaceAt formula_ejemplo posicion_Q (.atom ['Q'] [])                   -- :350
+```
+
+Why delete the coercion rather than retarget it:
+- It has zero users in FOL (MEASURED).
+- A `Coe (List Char) Formula` would silently turn any symbol into an atom wherever a Formula is expected. During the migration that hides type errors.
+- Keeping `Coe String Formula` through `String.toList` would keep both String and UTF-8 decoding in FOL.
+
+An optional convenience is a `sym!"P"` macro that expands to `['P']` at elaboration time. It would add a meta-level constant, so it belongs in `Tactics.lean` (which already imports `Lean`), not in `FOL.FOL`.
+
+`deriving Repr, BEq` and `DecEq.lean`'s `[DecidableEq S]` are generic and need no change. `instDecidableEqList` and `instDecidableEqChar` (Init/Prelude.lean:2883, :2982) reduce structurally.
+
+### 2.2 `FOL/Semantics.lean:32`
+
+`abbrev Model (D : Type) := ModelG (List Char) D`
+
+### 2.3 `FOL/Fresh0.lean`
+
+This keeps the current naming scheme (`g`, `ag`, `aag`, …), so docstrings keep their meaning. All of it is ESTIMATE: it is untested.
+
+```lean
+def shift (s : List Char) : List Char := 'f' :: s                                   -- :113
+theorem shift_inj : ∀ s t : List Char, shift s = shift t → s = t :=
+  fun _ _ h => (List.cons_inj_right 'f').mp h           -- :117-118 (Init/Data/List/Lemmas.lean:170)
+def cst : Nat → List Char
+  | 0 => ['g']
+  | n + 1 => 'a' :: cst n                                                           -- :125-127
+theorem cst_zero_ne (n : Nat) : cst 0 ≠ cst (n + 1) := of_decide_eq_false rfl      -- :135, text unchanged
+theorem cst_ne_shift : ∀ (n : Nat) (s : List Char), cst n ≠ shift s
+  | 0, _ => of_decide_eq_false rfl
+  | _ + 1, _ => of_decide_eq_false rfl                                              -- :139-141
+--   the List instance fails at the first Char, as the String one did at the first byte.
+--   Fallback: `fun h => by injection h with h1 _; exact absurd h1 (by decide)`,
+--   the pattern already compiling at SymClasses.lean:111-114.
+theorem cst_inj …  | m + 1, n + 1, h =>
+  congrArg (· + 1) (cst_inj m n ((List.cons_inj_right 'a').mp h))                   -- :147
+instance : FOL.FreshSym (List Char) where …   -- :153-158, same fields; auto-name FOL.Fresh0.instFreshSymListChar
+theorem cst_length : ∀ m : Nat, (cst m).length = m + 1   -- replaces cst_utf8ByteSize :201-207 (name would be false)
+  | 0 => rfl
+  | m + 1 => congrArg (· + 1) (cst_length m)
+theorem cst_bound_sym (s : List Char) : ∃ N, ∀ m, N ≤ m → cst m ≠ s :=
+  ⟨s.length, fun m hm he => by
+    have h := congrArg List.length he; rw [cst_length] at h; omega⟩                  -- :215-219
+-- DELETE valid_tail (:291-324) and shift_bytes (:332-336)
+def unshift : List Char → List Char := List.tail   -- :327-330; a left inverse is all that
+                                                   -- derivesSet0_shift_inv and Compacity0:291-294 need
+theorem unshift_shift (s : List Char) : unshift (shift s) = s := rfl               -- :338-347
+-- :408  ∃ c : List Char, …
+```
+
+Net change in Fresh0 is about −40 lines (ESTIMATE). Consumers that keep compiling unchanged: `Compacity0` 223–308 (uses `cst`, `cst_inj`, `shift`, `unshift`, `unshift_shift`), `Canonical0` 634–638, `Inconsistencia` 91–96, `SkolemNF0`, `SkolemHerbrand0:173`.
+
+### 2.4 `FOL/HenkinLimit0.lean`
+
+```lean
+theorem cst_ne_of_size {s : List Char} {m : Nat} (hm : s.length ≤ m) : cst m ≠ s := by
+  intro h
+  have h1 : m + 1 = s.length := (cst_length m).symm.trans (congrArg List.length h)
+  exact Nat.not_succ_le_self m (Nat.le_trans (Nat.le_of_eq h1) hm)        -- :216-220
+  | .func s ts => max s.length (bndTerms ts)                              -- :226 bndTerm
+```
+
+The seven binders at 127, 135, 145, 159, 169, 198 and 395 just become `List Char`.
+
+### 2.5 `FOL/Enumeration.lean` (reuses the instance body at 233–239)
+
+```lean
+def natToSym (n : Nat) : List Char := (natToList n).map Char.ofNat           -- replaces :208
+theorem natToSym_surj (s : List Char) : ∃ n, natToSym n = s := by            -- replaces :213-216
+  obtain ⟨n, hn⟩ := natToList_surj (s.map Char.toNat)
+  exact ⟨n, by show (natToList n).map Char.ofNat = s; rw [hn]; exact map_ofNat_toNat s⟩
+-- DELETE :218-221  instance FOL.EnumSym String
+instance : FOL.EnumSym (List Char) where      -- :232-239; auto-name instEnumSymListChar unchanged
+  enum := natToSym
+  enum_surj := natToSym_surj
+-- :252, :346  natToString → natToSym ;  :303, :377  natToString_surj → natToSym_surj
+```
+
+After this, nothing in FOL uses `String.ofList` or `String.exists_eq_ofList`.
+
+### 2.6 Duplicate `FreshSym (List Char)` instance
+
+After §2.3 the tree would hold two different `FreshSym (List Char)` instances: `FOL.instFreshSymListChar` (SymClasses, with `cst n = 'c' :: replicate n 'i'`) and Fresh0's. Lean accepts this, but which `cst` a future consumer gets would depend on its imports.
+
+- **Option A (recommended).** Keep Fresh0's instance and delete SymClasses.lean:97–114. The class is then witnessed by the very definitions the completeness chain uses.
+- **Option B (fewest row edits).** Keep SymClasses' instance and delete Fresh0.lean:149–158.
+- Either way, the "two inhabitants" claim at SymClasses:97–99 becomes false.
+- Recommendation: also drop `EnumSym String` (§2.5). Keeping String instances keeps String API in FOL, which conflicts with the D7 closing criterion.
+
+### 2.7 Statement changes in frozen modules
+
+114 declarations in frozen modules change their source statement (MEASURED; small judgment in splitting statement from body).
+
+| Module | Declarations |
+|---|---|
+| Canonical0 (6) | `termEqv_func_congr`, `termEqv_rel_congr`, `pullback`, `eval_pullback_term`, `eval_pullback_terms`, `eval_pullback_formula` |
+| Craig0 (5) | `predF`, `predF_lift`, `predF_subst`; `lkp_example`, `craig_example` (literals in the statement) |
+| Fresh0 (12) | `shift`, `shift_inj`, `cst`, `cst_ne_shift`, the instance (type and name), `cst_utf8ByteSize`→`cst_length` (**new statement**), `cst_bound_sym`, `valid_tail` (**deleted**), `unshift` (**new body**), `shift_bytes` (**deleted**), `unshift_shift`, `exists_fresh`. Proof-only changes: `cst_zero_ne`, `cst_inj`. |
+| HenkinLimit0 (8) | `occursTerm_lift`, `occursTerms_lift`, `not_occurs_substTerm`, `not_occurs_substTerms`, `not_occurs_substFormula`, `not_occurs_henkinAx`, `henLimit_witness`, `cst_ne_of_size` (**hypothesis changes from bytes to chars**). Body: `bndTerm`, which changes the values of `bnd`. |
+| Henkin0 (4) | `henkinAx`, `abs_neg_witness`, `henkin_step_derives`, `henkin_step_consistent₀` |
+| Interpolation0 (3) | `predF_em`, `predL_em`, `craig₀_example` (literals) |
+| QFDecide0 (16) | `subT_closed`, `subTs_closed`, `mem_qfT_mix`, `mem_qfA_mix`, `func_mem`, `atom_mem`, `headF`, `node`, `headA`, `atomVal`, `Good` (field `closed`), `Good.func`, `Good.atom`, `chainF`, `chainA`, `atom_congr`. Bodies: private `ca`, `cb`, `cc`, `cd`, `φx`. |
+| Rename (30) | `rename_neg`, `rename_liftTerm`, `rename_liftTerms`, `rename_liftFormula`, `rename_substTerm`, `rename_substTerms`, `rename_substFormula`, `rename_getAt?`, `rename_replaceAt`, `rename_localRule`, `map_rename_lift`, `derives0_rename`, `rename_rename_term`, `rename_rename_terms`, `rename_rename_formula`, `map_rename_rename`, `derives0_rename_inv`, `symsTerm`, `symsTerms`, `symsFormula`, `symsList`, `symsList_mem`, `locInv`, `locInv_spec`, the four `rename_rename_*_loc`/`map_rename_rename_loc`, `derives0_rename_conservative`, `derives0_rename_iff` |
+| Skolem0 (9) | `updateFunc`, `evalTerm_updateFunc`, `evalTerms_updateFunc`, `evalFormula_updateFunc`, `evalTerm_new`, `skolemAxT`, `evalTerm_newT`, `skolem_conservative₀`, `henkin_conservative₀` |
+| SkolemHerbrand0 (1) | `not_occurs_implChain` |
+| SkolemN0 (6) | `not_occurs_vars`, `skolemAxN`, `example`@186, `eval_skolemAxN`, `skolem_conservative_n₀`, `skolem_conservative_n_zero` |
+| SkolemNF0 (14) | `occurs_allBlock`, `not_occurs_skolemAxN`, `occursFormula_lift`, `occurs_merge{And,Or,Impl}{R,}`, `occurs_prenex`, `not_occurs_prenex`, plus examples @185, @192, @198 |
+| HerbrandBlock0, Soundness0 | Bodies only (private `c`; `def P`). No theorem statement changes. |
+
+Notes:
+- Every other declaration over `Term`, `Formula` or `Model` changes its elaborated type with no text change. Nine of the 23 frozen files need no code edit (Prenex0, PrenexNF0, Inversion0, Hauptsatz0, BlockExtraction0, SequentSound0, Compacity0, Lindenbaum0, TheoryFramework/Instances/FOL); Compacity0 and Lindenbaum0 only need a thaw if their comments are corrected.
+- A `*Ext.lean` workaround is impossible: the textual `String` binders stop type-checking against the new abbrevs, so all 14 frozen files must be thawed.
+
+### 2.8 KDEC risk
+
+Fourteen sites compute symbol equality in the kernel: Herbrand0 344, 366, 369, 373; QFDecide0 852, 854, 858, 879–881; Interpolation0 685; SkolemNF0 188, 195, 204. Three more are in Fresh0 (135, 140, 141).
+
+They should still work (ESTIMATE): one-character `List Char` comparison reduces through `UInt32` to `Nat.decEq`, and `SymClasses.lean:114` already proves a `Char` disequality `by decide` in today's build. QFDecide0:879, which needs `maxRecDepth 100000`, is the one to watch.
+
+## 3. Footprint rows in RPP's `check-footprints.bash`
+
+There are 490 rows; 245 are `FOL.*` and 16 are root-level or TheoryFramework (MEASURED).
+
+**Rows that change name or disappear:**
+
+| Line | Row | Fate |
+|---|---|---|
+| :127 | `FOL.Fresh0.instFreshSymString` | Option A: renamed to `FOL.Fresh0.instFreshSymListChar` (auto-name; ESTIMATE, following the existing `instEnumSymListChar` precedent). Option B: deleted. |
+| :163 | `FOL.Metamath.Enumeration.instEnumSymString` | Deleted |
+| :165 | `FOL.Metamath.Enumeration.natToString_surj` | Renamed to `natToSym_surj` |
+| :250 | `FOL.instFreshSymListChar` | Deleted under Option A; kept under B |
+
+- `:162` `instEnumSymListChar` keeps its name.
+- No other row names a declaration that D7 deletes or renames (MEASURED; `cst_utf8ByteSize`, `valid_tail`, `shift_bytes`, `unshift`, `natToString`, `bnd*` have no rows).
+- The control fails "NO MEDIDO" on any stale row.
+- Under Option A, `FOL/criba-congelacion.py:70` (`'FOL.instFreshSymListChar'` in `root_map`) must also be removed.
+
+**Same name, value at risk (ESTIMATE; the control re-measures every row):**
+- Fresh0 :123–126, :128
+- HenkinLimit0 :146–148, :301
+- Enumeration :162, :164
+- Everything downstream of `cst`, `shift`, `unshift` or `natToFormula` (Lindenbaum0, Canonical0, Compacity0, Skolem*, TheoryFramework :253–256)
+
+The likely direction is losing `Quot.sound` and/or `propext` where String byte lemmas are replaced by List lemmas. Gaining `Classical.choice` is unlikely, since nothing decodes UTF-8 any more.
+
+## 4. FOL prose that becomes false
+
+**Calls D7 abandoned or unnecessary:**
+- `FOL/FOL.lean:17–19`
+- `FOL/SymClasses.lean:57–60`
+- `NEXT-STEPS.md:79` (the D7 row) and `:29` ("D7 … ejecutadas")
+- `AXIOMS.md:537–540` (AXIOMS.md is locked)
+- `REFERENCE.md:1059–1060`
+- `CHANGELOG.md:116, 257–258, 274` are history: append a new dated entry instead of editing them.
+
+**Lean docstrings and comments that become false:**
+
+| File | Lines and what they say |
+|---|---|
+| `FOL/FOL.lean` | 13–14 (`S := String`); 36–38 ("sólo instancian String"); 44–48 ("son String por dentro y así se quedan"); 50–51 (`Fresh0.cst : Nat → String`); 122; 239, 255–261 (`Derives` "se queda en String", "especialización sólo-String") |
+| `SymClasses.lean` | 16–17, 19–31, 53–56, 61–70, 97–99 |
+| `Enumeration.lean` | 40, 63–78, 92–96, 198, 210–212, 218, 223–231 ("la metateoría no se instancia en List Char") |
+| `Fresh0.lean` | 25–37, 50–54, 64–96 (including "propext entra … por literales y ++ de String"), 111–116, 124, 129–134, 149–152, 199–200, 209–214, 285–289, 326 |
+| `HenkinLimit0.lean` | 59–64, 72–76, 85–108, 214–215, 223, 233 |
+| `Henkin0.lean` | 78, 86–110 (present-tense claims at 97–98 and 105) |
+| `Rename.lean` | 23, 42, 70–74, 413 |
+| `Skolem0.lean` | 40–41, 145–148 |
+| `Semantics.lean` | 23–26 |
+| `Compacity0.lean` | 75, 116–121 |
+| `DecEq.lean` | 32–33, 46–50 (decide controls with `"P"`) |
+| `Interpolation0.lean` | 504, 680 |
+| `Lindenbaum0.lean` | 90 |
+
+**Markdown:**
+- `REFERENCE.md`: 152, 154, 162, 163, 169, 407–408, 601, 606, 706, 842, 901 and 921 (name lists must be re-projected), 1041–1060.
+- `AXIOMS.md`: 266–276, 515–516, 525–528.
+- `CURRENT-STATUS-PROJECT.md:97`.
+- The PeanoRF letters recommend `(k : String)` and are now outdated: `RESPUESTA-PEANORF-2026-09-26.md:109, 130`, `CARTA-DE-PEANORF-2026-09-28.md:57`.
+- `PLANNING.md:80, 121` describe a text parser and printer, not the symbol type; a parser would need `String.toList`. Note only.
+
+**Two cautions:**
+- FOL has a *second* "D7": the 2026‑09‑27 decision that declared the TheoryFramework instance (`TheoryFramework/Instances/FOL.lean:21`, `NEXT-STEPS.md:140, 151`, `CURRENT-STATUS-PROJECT.md:74`, `REFERENCE.md:196–197, 1089–1098`). Do not touch those.
+- A stale claim unrelated to D7: `FOL.lean:53–54` says RPP imports exactly 8 FOL modules. It now imports 12 (§5).
+
+**Controls:**
+- `[E]` freshness turns red after commit if an edited authoritative doc's "Last updated" is not bumped.
+- If editing makes `AXIOMS.md` pass `[E]`, it must also be removed from `E_DEUDA` (`check-doc-sync.bash`, around line 313); otherwise `[E]` turns red the other way.
+- `[B]` warns on retired names left in docs.
+- `[A]` is unaffected unless a module is added.
+
+## 5. Import closures
+
+**RPP → FOL (MEASURED, BFS from `ROBINSON_PlusPlus.lean` over 113 RPP modules):** 12 modules.
+- `FOL.FOL`, `Tactics`, `Deduction`, `Theorems.{Impl, Neg, Derived, Quantifiers, Eq}` (the 8 of `FOL.Core`).
+- `FOL.Semantics` (added by `Meta/ModeloEstandar.lean` and `Meta/SolidezPrf.lean`, ADR-120 `f8aaa99`).
+- `FOL.Lift0`, which brings in `Eigenvariable` and `Derives0` (`Meta/TarskiPrf.lean:8`, ADR-121 `464bd45`).
+- Of these 12, only four have sites: `FOL/FOL.lean`, `Semantics`, `Eigenvariable`, `Theorems/Eq`. RPP's exposure is therefore `Term`, `Formula`, `Model` and the coercion; it uses none of `derive_*_congr`, `abs*`, `occurs*` or `derives0_gen_fresh` (0 files each, MEASURED).
+- Outside RPP's build: `sondeos/SymbolParamCoste.lean:79–80, 126` uses `natToString`, `natToString_surj` and `instEnumSymString`.
+
+**TheoryFramework → FOL:** only `TheoryFramework/Instances/FOL.lean:11` imports FOL (`FOL.Canonical0`). Its closure is 17 modules: Canonical0, Complexity, Derives0, Eigenvariable, Enumeration, Eq0, FOL, Fresh0, Henkin0, HenkinLimit0, Lift0, Lindenbaum0, Rename, Semantics, Soundness0, SymClasses, Theorems.Eq. TheoryFramework itself has 0 sites, and its 4 footprint rows keep their names.
+
+**Other consumers:**
+- PeanoRF requires FOL by local path (`Peano-from-ROB-n-FOL/lakefile.lean:22`) and has 89 code lines with `String` in 8 files (MEASURED). It is blocked, and will break the next time it builds against FOL.
+- 43 out-of-build Lean files in `auditoria/` and `cuarentena/` have String code. They are archives and need no change.
+
+**Ordering.**
+- The abbrev change is atomic: all 24 files must land in one FOL commit.
+- RPP's CI checks out FOL at `ref: master`, unpinned (`RPP/.github/workflows/build.yml:49–57`). RPP will therefore be red between the FOL push and the RPP push (M‑12 order), unless both are prepared on branches.
+
+**Proposed closing test for D7:** on the stripped code of `FOL/**`, `FOL.lean` and `TheoryFramework/**`, there are 0 `String` tokens (today 225) and 0 symbol literals (today 76). The only string literals left should be the PRINT ones: `Tactics.lean:24, 26` and the notation declarations.

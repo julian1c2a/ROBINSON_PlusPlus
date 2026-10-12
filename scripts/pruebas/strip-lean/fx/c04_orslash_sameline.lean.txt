@@ -1,0 +1,2 @@
+example (p : Prop) (h : p) : p \/--x
+  False := Or.inl sorry

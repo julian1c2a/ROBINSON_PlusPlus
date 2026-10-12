@@ -1,0 +1,16 @@
+import Lean
+import ROBINSON_PlusPlus
+import FOL
+/-! Control de la retirada: `axiom` de Lean declarados por el proyecto en el entorno completo.
+Hoy 7 (4 de FOL.MetaRules + 3 de RPP); tras P2, 4; tras P3-P4, 0. -/
+open Lean Elab Command
+elab "#axiomas_del_proyecto" : command => do
+  let env ← getEnv
+  let mut n := 0
+  for (c, ci) in env.constants.toList do
+    if let .axiomInfo _ := ci then
+      if (`FOL).isPrefixOf c || (`ROBINSON_PlusPlus).isPrefixOf c then
+        n := n + 1
+        logInfo m!"axiom del proyecto: {c}"
+  logInfo m!"total: {n}"
+#axiomas_del_proyecto

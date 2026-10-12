@@ -1,0 +1,5 @@
+congr_substfc_arg3
+ind_concl_code
+leibniz_concl_code
+q1_concl_code
+q2_concl_code

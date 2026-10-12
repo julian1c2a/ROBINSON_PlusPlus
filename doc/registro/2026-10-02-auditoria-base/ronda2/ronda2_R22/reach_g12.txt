@@ -1,0 +1,205 @@
+roots: ['ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf', 'ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf']
+reachable: 2458
+by lib: {'RPP': 2428, 'FOL': 30}
+by kind: {('RPP', 'def'): 610, ('RPP', 'theorem'): 1794, ('RPP', 'abbrev'): 15, ('RPP', 'inductive'): 8, ('RPP', 'class'): 1, ('FOL', 'inductive'): 5, ('FOL', 'abbrev'): 2, ('FOL', 'def'): 12, ('FOL', 'theorem'): 11}
+by class: {('RPP', 'otro'): 1002, ('RPP', 'P'): 1426, ('FOL', 'otro'): 27, ('FOL', 'D'): 3}
+
+== reachable axioms:
+
+== reachable RPP decls with class D or mixto:
+
+== reachable FOL modules (count):
+   FOL.FOL 18
+   FOL.MetaRules 2
+   FOL.Theorems.Eq 7
+   FOL.Theorems.Quantifiers 3
+
+== reachable RPP modules: (defs, theorems, D/mixto)
+   ROBINSON_PlusPlus.Full.Induction                        defs=  1 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Full.Numerals                         defs=  1 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ArithPrf                         defs=  0 thms=  49 D/mix=  0
+   ROBINSON_PlusPlus.Meta.BdAllIntroPrf                    defs=  3 thms=  16 D/mix=  0
+   ROBINSON_PlusPlus.Meta.BoundedInPrf                     defs=  1 thms=  17 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CantorMonoPrf                    defs=  1 thms=  21 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf                defs=  7 thms=  41 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ChainPrf                         defs=  5 thms=  43 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CheckArith                       defs=  0 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CodeArith                        defs=  0 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CodeCtorKit                      defs=  4 thms=  27 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CodeNumeralPrf                   defs=  8 thms=  11 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CodeTreeReflect                  defs=  7 thms=  15 D/mix=  0
+   ROBINSON_PlusPlus.Meta.CodeWitnessPrf                   defs=  8 thms= 120 D/mix=  0
+   ROBINSON_PlusPlus.Meta.D3BodyPrf                        defs=  1 thms=  11 D/mix=  0
+   ROBINSON_PlusPlus.Meta.D3ChainDotPrf                    defs=  8 thms=  39 D/mix=  0
+   ROBINSON_PlusPlus.Meta.D3DottedPrf                      defs=  3 thms=   4 D/mix=  0
+   ROBINSON_PlusPlus.Meta.D3InDotPrf                       defs=  5 thms=  23 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Delta0ReflectPrf                 defs=  0 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.DerivCondPrf                     defs=  0 thms=  11 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Diagonal                         defs=  1 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.DiagonalNumeral                  defs=  3 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.DiagonalTwo                      defs=  2 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Div2ParityPrf                    defs=  0 thms=  20 D/mix=  0
+   ROBINSON_PlusPlus.Meta.DotConsPrf                       defs=  3 thms=  19 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalArithPrf                     defs=  5 thms=  34 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalBoundedPrf                   defs=  5 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf                  defs=  0 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalLiftcPrf                     defs=  4 thms=  16 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalLiftfcPrf                    defs= 20 thms=  62 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalListPrf                      defs=  4 thms=  18 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalLtPrf                        defs=  4 thms=   9 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalMulPrf                       defs=  3 thms=  18 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalNthcPrf                      defs=  3 thms=  14 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalPredPrf                      defs=  4 thms=  15 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalRunFnPrf                     defs=  0 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalSubstfcPrf                   defs= 19 thms=  59 D/mix=  0
+   ROBINSON_PlusPlus.Meta.EvalSubsttcPrf                   defs= 14 thms=  46 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ExIntroCodePrf                   defs=  0 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ForallElimCodePrf                defs=  0 thms=   4 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Godel                            defs=  4 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.GodelTwo                         defs=  1 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.GodelTwoPrf                      defs=  0 thms=  11 D/mix=  0
+   ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf                defs= 17 thms=  52 D/mix=  0
+   ROBINSON_PlusPlus.Meta.HasWitTcFnPrf                    defs=  3 thms=  21 D/mix=  0
+   ROBINSON_PlusPlus.Meta.HasWitTrackedPrf                 defs= 20 thms=  53 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Hilbert                          defs=  5 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.HilbertDeduction                 defs=  1 thms=  11 D/mix=  0
+   ROBINSON_PlusPlus.Meta.HilbertSeq                       defs=  7 thms=  13 D/mix=  0
+   ROBINSON_PlusPlus.Meta.InAxiomsCodePrf                  defs=  0 thms=   8 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LiftcCodePrf                     defs= 13 thms=  62 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf                 defs= 16 thms=  34 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFAssemblePrf                defs=  0 thms=   3 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFCases                      defs=  0 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFConsPrf                    defs=  0 thms=   3 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFEfqPrf                     defs=  1 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFGuardPrf                   defs=  7 thms=   3 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFMpPrf                      defs=  4 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFPropPrf                    defs= 10 thms=  20 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFSchemaPrf                  defs=  5 thms=  17 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFThyPrf                     defs=  6 thms=  10 D/mix=  0
+   ROBINSON_PlusPlus.Meta.LineWFTrackedPrf                 defs=  9 thms=  21 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ListEtaPrf                       defs=  1 thms=   5 D/mix=  0
+   ROBINSON_PlusPlus.Meta.MpCodePrf                        defs=  0 thms=  16 D/mix=  0
+   ROBINSON_PlusPlus.Meta.NatArithPrf                      defs=  0 thms=  15 D/mix=  0
+   ROBINSON_PlusPlus.Meta.NatMulPrf                        defs=  0 thms=  20 D/mix=  0
+   ROBINSON_PlusPlus.Meta.NatOrderPrf                      defs=  0 thms=  20 D/mix=  0
+   ROBINSON_PlusPlus.Meta.NumCodeClosedPrf                 defs=  2 thms=  15 D/mix=  0
+   ROBINSON_PlusPlus.Meta.NumListPrf                       defs=  0 thms=   4 D/mix=  0
+   ROBINSON_PlusPlus.Meta.PremsBdAllPrf                    defs= 13 thms=  68 D/mix=  0
+   ROBINSON_PlusPlus.Meta.PremsOfDotPrf                    defs=  6 thms=  55 D/mix=  0
+   ROBINSON_PlusPlus.Meta.PremsOfTagPrf                    defs=  1 thms=  27 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ProofChain                       defs=  2 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.PropCodePrf                      defs=  0 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Provability                      defs=  5 thms=   0 D/mix=  0
+   ROBINSON_PlusPlus.Meta.ReprPrf                          defs=  0 thms=  96 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Representability                 defs=  1 thms=   5 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Representability2                defs=  3 thms=   2 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Representability2Prf             defs=  1 thms=  10 D/mix=  0
+   ROBINSON_PlusPlus.Meta.RunFnBoundedPrf                  defs=  2 thms=  12 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Sigma1AtomPrf                    defs=  5 thms=  15 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Sigma1CorePrf                    defs=  1 thms=   1 D/mix=  0
+   ROBINSON_PlusPlus.Meta.Sigma1Prf                        defs=  1 thms=   4 D/mix=  0
+   ROBINSON_PlusPlus.Meta.StrongInductionPrf               defs=  1 thms=  20 D/mix=  0
+   ROBINSON_PlusPlus.Meta.SubstArith                       defs=  0 thms=   4 D/mix=  0
+   ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf                 defs=  5 thms=  11 D/mix=  0
+   ROBINSON_PlusPlus.Meta.SubstTreeReflect                 defs= 12 thms=  40 D/mix=  0
+   ROBINSON_PlusPlus.Meta.SubstfcCodePrf                   defs=  4 thms=   6 D/mix=  0
+   ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf                defs= 28 thms= 103 D/mix=  0
+   ROBINSON_PlusPlus.Meta.TcArithPrf                       defs=  0 thms=   4 D/mix=  0
+   ROBINSON_PlusPlus.Meta.TrackedAtomsPrf                  defs=  5 thms=  23 D/mix=  0
+   ROBINSON_PlusPlus.Meta.TrackedCorePrf                   defs=  1 thms=   3 D/mix=  0
+   ROBINSON_PlusPlus.Minimal.Axioms                        defs=248 thms=  24 D/mix=  0
+
+== reachable RPP NON-theorem decls by module:
+   ROBINSON_PlusPlus.Full.Induction : inductionFormula
+   ROBINSON_PlusPlus.Full.Numerals : numeral
+   ROBINSON_PlusPlus.Meta.ArithPrf : 
+   ROBINSON_PlusPlus.Meta.BdAllIntroPrf : bdAllPred splitSchema substCodeF2
+   ROBINSON_PlusPlus.Meta.BoundedInPrf : boundedIn
+   ROBINSON_PlusPlus.Meta.CantorMonoPrf : cpOf
+   ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf : boundedAllIn boundedCarcLt boundedPremsIn chainBPred chainOkB lineOkB lineOkBAt
+   ROBINSON_PlusPlus.Meta.ChainPrf : ccIHbody prfCompChainPred prfCompPred prfMonoPred prfWeakPred
+   ROBINSON_PlusPlus.Meta.CheckArith : 
+   ROBINSON_PlusPlus.Meta.CodeArith : 
+   ROBINSON_PlusPlus.Meta.CodeCtorKit : binK binT nulT unT
+   ROBINSON_PlusPlus.Meta.CodeNumeralPrf : codeNat codeNatChars codeNatStr codeNatTerm codeNatTerms consN pairN triN
+   ROBINSON_PlusPlus.Meta.CodeTreeReflect : CTree code condOf dotN dotV maxLeaf objAt
+   ROBINSON_PlusPlus.Meta.CodeWitnessPrf : CodeClosed consOk fcodesF lencLiftPred nthLiftPred tcodes1 tcodes1s tcodesF
+   ROBINSON_PlusPlus.Meta.D3BodyPrf : premsPsi
+   ROBINSON_PlusPlus.Meta.D3ChainDotPrf : DEUDA_chainOkBDot chainOkBDot chainOkBPsi chainOkBPsiDot lineWFDotAt pkL premsBnd premsDotAt
+   ROBINSON_PlusPlus.Meta.D3DottedPrf : bodyF chainOkDot inDot
+   ROBINSON_PlusPlus.Meta.D3InDotPrf : bdCarcBAt bdCarcPhicAt bddCarcDotAt inBwdBody inDotAt
+   ROBINSON_PlusPlus.Meta.Delta0ReflectPrf : 
+   ROBINSON_PlusPlus.Meta.DerivCondPrf : 
+   ROBINSON_PlusPlus.Meta.Diagonal : diagTerm
+   ROBINSON_PlusPlus.Meta.DiagonalNumeral : godelCN provCodeN selfAppN
+   ROBINSON_PlusPlus.Meta.DiagonalTwo : godelBeta' godelPred'
+   ROBINSON_PlusPlus.Meta.Div2ParityPrf : 
+   ROBINSON_PlusPlus.Meta.DotConsPrf : consT cpOfT div2cT
+   ROBINSON_PlusPlus.Meta.EvalArithPrf : addcT evalAddCode evalAddPred substfcT succcT
+   ROBINSON_PlusPlus.Meta.EvalBoundedPrf : bdAllCode bdExCode c1Line j1Line j2Line
+   ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf : 
+   ROBINSON_PlusPlus.Meta.EvalLiftcPrf : PHI PHIat PHIatBody PHIbody
+   ROBINSON_PlusPlus.Meta.EvalLiftfcPrf : BODYliftfc CTXFliftfc CasoAtomL CasoBinL CasoBotL CasoEqL CasoUnL DEUDA_evalLiftfc DEUDA_evalLiftfc_isFC1 LIFTFC_ATOM_BODY LIFTFC_BIN_BODY LIFTFC_BOT_BODY LIFTFC_EQ_BODY LIFTFC_UN_BODY PHIliftfc PHIliftfcBody PSIatL evalLiftfcCode liftfcT targetLiftfc
+   ROBINSON_PlusPlus.Meta.EvalListPrf : carcT evalLencCode evalLencPred lencT
+   ROBINSON_PlusPlus.Meta.EvalLtPrf : exBodyc ltCodeFn phiLtBwd substtcTcPredAt
+   ROBINSON_PlusPlus.Meta.EvalMulPrf : evalMulCode evalMulPred mulcT
+   ROBINSON_PlusPlus.Meta.EvalNthcPrf : evalNthcCode nthcEvalPred nthcT
+   ROBINSON_PlusPlus.Meta.EvalPredPrf : AX26_BODY evalPredCode evalPredPred predcT
+   ROBINSON_PlusPlus.Meta.EvalRunFnPrf : 
+   ROBINSON_PlusPlus.Meta.EvalSubstfcPrf : AXATOM_BODY AXBODY AXTER_BODY BODYsubstfc CTXFsubstfc CasoAtom CasoBin CasoBot CasoEq CasoUn GUARD HasWitLift PHIsubstfc PHIsubstfcBody PSIat gO gT targetSubstfc unc
+   ROBINSON_PlusPlus.Meta.EvalSubsttcPrf : CONJsubsttc PHIsubsttc PHIsubsttcBody PSIsubsttc3 SUBSTTC_FUNC_BODY SUBSTTC_VAR_EQ_BODY SUBSTTC_VAR_GT_BODY SUBSTTC_VAR_LT_BODY SUBSTTSC_CONS_BODY SUBSTTSC_NIL_BODY substtcT substtscT targetSubsttc targetSubsttsc
+   ROBINSON_PlusPlus.Meta.ExIntroCodePrf : 
+   ROBINSON_PlusPlus.Meta.ForallElimCodePrf : 
+   ROBINSON_PlusPlus.Meta.Godel : G Sym gNat numeral
+   ROBINSON_PlusPlus.Meta.GodelTwo : consistencyFormula'
+   ROBINSON_PlusPlus.Meta.GodelTwoPrf : 
+   ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf : clAtomFC clBinFC clBotFC clUnFC hasWitFAc hasWitFAcT isFC1DotC isFCE2DotC isFCE2PsiAtC shapeFCnul shapeNulCtx treeNul1 wfAllFDotAtC wfAllFDotC wfAllFPair wfAllFPsi wfAllFPsiC
+   ROBINSON_PlusPlus.Meta.HasWitTcFnPrf : CTX0 PHI SUCCNODE
+   ROBINSON_PlusPlus.Meta.HasWitTrackedPrf : argsInCtx argsInDot argsInDotC argsInPair argsInPsi hasWitAc isTermCodeE1DotC shapeBinCtx shapeFCbin shapeFCun shapeUnCtx treeBin1 treeUn1 wfAll1Dot wfAll1DotAtC wfAll1DotC wfAll1Psi wfAll1PsiAt wfAll1PsiAtC wfAll1PsiC
+   ROBINSON_PlusPlus.Meta.Hilbert : ConsistentH Prf Prfᵢ confinementFormula listInductionFormula
+   ROBINSON_PlusPlus.Meta.HilbertDeduction : PrfH
+   ROBINSON_PlusPlus.Meta.HilbertSeq : Derivation Rule checkAux checkProof mpConcl shiftRule stepConcl
+   ROBINSON_PlusPlus.Meta.InAxiomsCodePrf : 
+   ROBINSON_PlusPlus.Meta.LiftcCodePrf : LIFTC_FUNC_BODY LIFTC_VARGE_BODY LIFTC_VARLT_BODY LIFTSC_CONS_BODY LIFTSC_NIL_BODY funccT liftcT liftscT targetLift targetLiftAt targetLiftsc targetLiftscAt varcT
+   ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf : AA AF BF BODYFL BODYL CTX1 CTX2 CTXF HD NN PHIL PHILF PHILFbody PHILbody SS TL
+   ROBINSON_PlusPlus.Meta.LineWFAssemblePrf : 
+   ROBINSON_PlusPlus.Meta.LineWFCases : 
+   ROBINSON_PlusPlus.Meta.LineWFConsPrf : 
+   ROBINSON_PlusPlus.Meta.LineWFEfqPrf : condEfq
+   ROBINSON_PlusPlus.Meta.LineWFGuardPrf : DEUDA_hGuardF DEUDA_hGuardT GuardSlot GuardSlot.toF Hcond HcondCore guardedCond
+   ROBINSON_PlusPlus.Meta.LineWFMpPrf : lencDotM lencMp tagDotM tagMp
+   ROBINSON_PlusPlus.Meta.LineWFPropPrf : tC1 tC2 tC3 tGen tJ1 tJ2 tJ3 tP1 tP2 tP3
+   ROBINSON_PlusPlus.Meta.LineWFSchemaPrf : condD lencD lencF tagD tagF
+   ROBINSON_PlusPlus.Meta.LineWFThyPrf : inDotT inThy lencDotT lencThy tagDotT tagThy
+   ROBINSON_PlusPlus.Meta.LineWFTrackedPrf : eqDot eqEqrefl eqcT lencDot lencEqrefl lwfDot lwfVar tagDot tagEqrefl
+   ROBINSON_PlusPlus.Meta.ListEtaPrf : etaAt
+   ROBINSON_PlusPlus.Meta.MpCodePrf : 
+   ROBINSON_PlusPlus.Meta.NatArithPrf : 
+   ROBINSON_PlusPlus.Meta.NatMulPrf : 
+   ROBINSON_PlusPlus.Meta.NatOrderPrf : 
+   ROBINSON_PlusPlus.Meta.NumCodeClosedPrf : liftcTcPred substtcTcPred
+   ROBINSON_PlusPlus.Meta.NumListPrf : 
+   ROBINSON_PlusPlus.Meta.PremsBdAllPrf : DEUDA_premsBody UI WQ bodyF miB miPhi miPhiAt premsBnd premsBnd2 premsBodyF premsCF premsCF2 premsPsiPk
+   ROBINSON_PlusPlus.Meta.PremsOfDotPrf : GR GRH GT consL consLT premsOfT
+   ROBINSON_PlusPlus.Meta.PremsOfTagPrf : etaTag
+   ROBINSON_PlusPlus.Meta.ProofChain : provCodeC' provFormulaC'
+   ROBINSON_PlusPlus.Meta.PropCodePrf : 
+   ROBINSON_PlusPlus.Meta.Provability : charsCode formCode strCode termCode termsCode
+   ROBINSON_PlusPlus.Meta.ReprPrf : 
+   ROBINSON_PlusPlus.Meta.Representability : listFormCode
+   ROBINSON_PlusPlus.Meta.Representability2 : lineCode' lineJustif proofCode'
+   ROBINSON_PlusPlus.Meta.Representability2Prf : AnclaEq
+   ROBINSON_PlusPlus.Meta.RunFnBoundedPrf : boundedCarcIn nthRunPred
+   ROBINSON_PlusPlus.Meta.Sigma1AtomPrf : atom1CodeFn eqCodeFn eqreflLine leibnizLine lineWFCodeFn
+   ROBINSON_PlusPlus.Meta.Sigma1CorePrf : inFormCodeFn
+   ROBINSON_PlusPlus.Meta.Sigma1Prf : provFromCode
+   ROBINSON_PlusPlus.Meta.StrongInductionPrf : PSI
+   ROBINSON_PlusPlus.Meta.SubstArith : 
+   ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf : substCodeF substCodeT substCodeT2 substCodeTs substCodeTs2
+   ROBINSON_PlusPlus.Meta.SubstTreeReflect : SGuards STree code condOfS objAt treeInd treeLeibniz treeListInd treeQ1 treeQ2 treeQ3 treeQconf
+   ROBINSON_PlusPlus.Meta.SubstfcCodePrf : AXBIN_BODY AXBOT_BODY binct evalSubstfcCode
+   ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf : AA AF BF BODY BODYF CTX1 CTX2 CTXF CTXa CTXb CTXc CTXe CTXf CTXfc CTXs CTXu HD NN PHIF PHIFbody PHIT PHITbody SS TL binN hasWitArgs nilOrCons unN
+   ROBINSON_PlusPlus.Meta.TcArithPrf : 
+   ROBINSON_PlusPlus.Meta.TrackedAtomsPrf : bdAllBndCtx bdInB bdInDot bdInPhic phiInBwd
+   ROBINSON_PlusPlus.Meta.TrackedCorePrf : atom2CodeFn
+   ROBINSON_PlusPlus.Minimal.Axioms : In add add_sym allIn andc argsIn argsInBody atomc ax10_mul_comm ax11_mul_assoc ax12_mul_distrib ax13_lt_def ax14_sqrt_le ax15_lt_succ_sqrt ax16_mod2_succ ax17_div_mod_eq ax18_lt_irrefl ax19_lt_trichotomy ax21_mod2_range ax24_mod2_of_even ax25_pred_zero ax26_pred_succ ax29_sub_witness ax2_peano_succ_neq_zero ax3_peano_succ_inj ax4_add_zero ax5_add_succ ax6_add_comm ax7_add_assoc ax8_mul_zero ax9_mul_succ ax_C1_concat_nil ax_C2_concat_cons ax_C3_concat_assoc ax_L0_cons_def ax_L1_in_nil ax_L2_in_cons ax_L3_in_concat ax_allIn_cons ax_allIn_nil ax_carc ax_cdrc ax_chainOk_cons ax_chainOk_nil ax_lenc_cons ax_lenc_nil ax_liftc_func ax_liftc_var_ge ax_liftc_var_lt ax_liftfc_and ax_liftfc_atom ax_liftfc_bottom ax_liftfc_eq ax_liftfc_ex ax_liftfc_forall ax_liftfc_impl ax_liftfc_or ax_liftsc_cons ax_liftsc_nil ax_lineWF_c1 ax_lineWF_c2 ax_lineWF_c3 ax_lineWF_cons ax_lineWF_efq ax_lineWF_eqrefl ax_lineWF_gen ax_lineWF_ind ax_lineWF_inv ax_lineWF_j1 ax_lineWF_j2 ax_lineWF_j3 ax_lineWF_leibniz ax_lineWF_listInd ax_lineWF_mp ax_lineWF_p1 ax_lineWF_p2 ax_lineWF_p3 ax_lineWF_q1 ax_lineWF_q2 ax_lineWF_q3 ax_lineWF_qconf ax_lineWF_thy ax_nthc_succ ax_nthc_zero ax_pow_succ ax_pow_zero ax_premsOf_c1 ax_premsOf_c2 ax_premsOf_c3 ax_premsOf_efq ax_premsOf_eqrefl ax_premsOf_gen ax_premsOf_ind ax_premsOf_j1 ax_premsOf_j2 ax_premsOf_j3 ax_premsOf_leibniz ax_premsOf_listInd ax_premsOf_mp ax_premsOf_p1 ax_premsOf_p2 ax_premsOf_p3 ax_premsOf_q1 ax_premsOf_q2 ax_premsOf_q3 ax_premsOf_qconf ax_premsOf_thy ax_prodp_cons ax_prodp_nil ax_runFn_cons ax_runFn_nil ax_substfc_and ax_substfc_atom ax_substfc_bottom ax_substfc_eq ax_substfc_ex ax_substfc_forall ax_substfc_impl ax_substfc_or ax_substtc_func ax_substtc_var_eq ax_substtc_var_gt ax_substtc_var_lt ax_substtsc_cons ax_substtsc_nil ax_tc_succ ax_tc_zero ax_vpf_c1 ax_vpf_c2 ax_vpf_c3 ax_vpf_efq ax_vpf_eqrefl ax_vpf_gen ax_vpf_ind ax_vpf_j1 ax_vpf_j2 ax_vpf_j3 ax_vpf_leibniz ax_vpf_listInd ax_vpf_mp ax_vpf_nil ax_vpf_p1 ax_vpf_p2 ax_vpf_p3 ax_vpf_q1 ax_vpf_q2 ax_vpf_q3 ax_vpf_qconf ax_vpf_thy axioms axiomsCodeT botc cantor_func cantor_poly carc cdrc chainOk charsCodeM clAtom clBin clBot clEq clUn concat concat_sym cons cons_sym div2 div2_sym eqc ex exc forall_ forall_2 forall_3 forall_4 forall_5 forallc formCodeM funcc hasWit hasWitF implc in_sym isFC1 isFormCodeE2 isTC1 isTermCodeE1 land le lenc liftc liftfc liftsc lineOk lineTag lineWF listFormCodeM lor lorAll lt lt_sym mod2 mod2_sym mul mul_sym nil nthc numeralM objList one orc pair pow pow_sym pred pred_sym premsOf prod_pairs prodp_sym runFn shapeBin shapeNul shapeUn sq sqrt sqrt_sym strCodeM sub sub_sym substfc substtc substtsc succ succ_sym tagDisj tcFn termCodeM termsCodeM two validProofFn varc wfAll1 wfAll1Body wfAllF wfAllFBody zero zero_sym

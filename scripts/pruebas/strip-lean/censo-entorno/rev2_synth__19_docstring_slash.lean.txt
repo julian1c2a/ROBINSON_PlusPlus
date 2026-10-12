@@ -1,0 +1,3 @@
+/--/ sorry -/ theorem d1 : True := sorry
+/-/- x -/ theorem d2 : True := sorry
+/- a --/ theorem d3 : True := sorry

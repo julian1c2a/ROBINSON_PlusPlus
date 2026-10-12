@@ -1,0 +1,483 @@
+===== FOL/FOL.lean 7 líneas
+  69: abbrev Term := TermG String
+   → abbrev Term := TermG (List Char)
+  70: abbrev Formula := FormulaG String
+   → abbrev Formula := FormulaG (List Char)
+  80: TermG.noConfusion (S := String) (S' := String) rfl (heq_of_eq h)
+   → TermG.noConfusion (S := List Char) (S' := List Char) rfl (heq_of_eq h)
+  91: FormulaG.noConfusion (S := String) (S' := String) rfl (heq_of_eq h)
+   → FormulaG.noConfusion (S := List Char) (S' := List Char) rfl (heq_of_eq h)
+  123: instance : Coe String Formula where
+   → instance : Coe (List Char) Formula where
+  342: .impl (.atom "P" []) (neg (neg (.atom "Q" [])))
+   → .impl (.atom ['P'] []) (neg (neg (.atom ['Q'] [])))
+  350: replaceAt formula_ejemplo posicion_Q (.atom "Q" [])
+   → replaceAt formula_ejemplo posicion_Q (.atom ['Q'] [])
+===== FOL/Semantics.lean 1 líneas
+  32: abbrev Model (D : Type) := ModelG String D
+   → abbrev Model (D : Type) := ModelG (List Char) D
+===== FOL/Enumeration.lean 4 líneas
+  208: def natToString (n : Nat) : String := String.ofList ((natToList n).map Char.ofNat)
+   → def natToString (n : Nat) : List Char := List Char.ofList ((natToList n).map Char.ofNat)
+  213: theorem natToString_surj (s : String) : ∃ n, natToString n = s := by
+   → theorem natToString_surj (s : List Char) : ∃ n, natToString n = s := by
+  216: exact ⟨n, congrArg String.ofList (by rw [hn, map_ofNat_toNat])⟩
+   → exact ⟨n, congrArg (List Char).ofList (by rw [hn, map_ofNat_toNat])⟩
+  219: instance : FOL.EnumSym String where
+   → instance : FOL.EnumSym (List Char) where
+===== FOL/Fresh0.lean 27 líneas
+  113: def shift (s : String) : String := "f" ++ s
+   → def shift (s : List Char) : List Char := ['f'] ++ s
+  117: theorem shift_inj : ∀ s t : String, shift s = shift t → s = t :=
+   → theorem shift_inj : ∀ s t : List Char, shift s = shift t → s = t :=
+  118: fun _ _ h => (String.append_right_inj "f").mp h
+   → fun _ _ h => (List Char.append_right_inj ['f']).mp h
+  125: def cst : Nat → String
+   → def cst : Nat → List Char
+  126: | 0 => "g"
+   → | 0 => ['g']
+  127: | n + 1 => "a" ++ cst n
+   → | n + 1 => ['a'] ++ cst n
+  139: theorem cst_ne_shift : ∀ (n : Nat) (s : String), cst n ≠ shift s
+   → theorem cst_ne_shift : ∀ (n : Nat) (s : List Char), cst n ≠ shift s
+  147: | m + 1, n + 1, h => congrArg (· + 1) (cst_inj m n ((String.append_right_inj "a").mp h))
+   → | m + 1, n + 1, h => congrArg (· + 1) (cst_inj m n ((List Char.append_right_inj ['a']).mp h))
+  153: instance : FOL.FreshSym String where
+   → instance : FOL.FreshSym (List Char) where
+  204: show ("a" ++ cst m).utf8ByteSize = m + 1 + 1
+   → show (['a'] ++ cst m).utf8ByteSize = m + 1 + 1
+  205: rw [String.utf8ByteSize_append, cst_utf8ByteSize m]
+   → rw [List Char.utf8ByteSize_append, cst_utf8ByteSize m]
+  215: theorem cst_bound_sym (s : String) : ∃ N, ∀ m, N ≤ m → cst m ≠ s :=
+   → theorem cst_bound_sym (s : List Char) : ∃ N, ∀ m, N ≤ m → cst m ≠ s :=
+  217: have h := congrArg String.utf8ByteSize he
+   → have h := congrArg (List Char).utf8ByteSize he
+  291: theorem valid_tail {x : String} (h : x.toByteArray.data.toList.head? = some 102) :
+   → theorem valid_tail {x : List Char} (h : x.toByteArray.data.toList.head? = some 102) :
+  294: have hl : x.toByteArray.data.toList = m.flatMap String.utf8EncodeChar := by
+   → have hl : x.toByteArray.data.toList = m.flatMap (List Char).utf8EncodeChar := by
+  305: simp only [String.utf8EncodeChar, if_neg hlt'] at h
+   → simp only [List Char.utf8EncodeChar, if_neg hlt'] at h
+  321: simp only [String.utf8EncodeChar, if_pos hv]
+   → simp only [List Char.utf8EncodeChar, if_pos hv]
+  322: have e : (m'.flatMap String.utf8EncodeChar).toByteArray.data =
+   → have e : (m'.flatMap (List Char).utf8EncodeChar).toByteArray.data =
+  323: (m'.flatMap String.utf8EncodeChar).toArray := List.data_toByteArray
+   → (m'.flatMap (List Char).utf8EncodeChar).toArray := List.data_toByteArray
+  327: def unshift (x : String) : String :=
+   → def unshift (x : List Char) : List Char :=
+  329: String.ofByteArray ⟨x.toByteArray.data.toList.tail.toArray⟩ (valid_tail h)
+   → List Char.ofByteArray ⟨x.toByteArray.data.toList.tail.toArray⟩ (valid_tail h)
+  332: theorem shift_bytes (s : String) :
+   → theorem shift_bytes (s : List Char) :
+  334: show ("f" ++ s).toByteArray.data.toList = _
+   → show (['f'] ++ s).toByteArray.data.toList = _
+  335: rw [String.toByteArray_append, ByteArray.toList_data_append]
+   → rw [List Char.toByteArray_append, ByteArray.toList_data_append]
+  338: theorem unshift_shift (s : String) : unshift (shift s) = s := by
+   → theorem unshift_shift (s : List Char) : unshift (shift s) = s := by
+  339: apply String.toByteArray_inj.mp
+   → apply (List Char).toByteArray_inj.mp
+  408: ∃ c : String, And (∀ g, shiftTheory S g → Not (occursFormula c g))
+   → ∃ c : List Char, And (∀ g, shiftTheory S g → Not (occursFormula c g))
+===== FOL/HenkinLimit0.lean 9 líneas
+  127: theorem occursTerm_lift (c : String) : ∀ (k : Nat) (t : Term),
+   → theorem occursTerm_lift (c : List Char) : ∀ (k : Nat) (t : Term),
+  135: theorem occursTerms_lift (c : String) : ∀ (k : Nat) (ts : List Term),
+   → theorem occursTerms_lift (c : List Char) : ∀ (k : Nat) (ts : List Term),
+  145: theorem not_occurs_substTerm (c : String) : ∀ (v : Nat) (s t : Term),
+   → theorem not_occurs_substTerm (c : List Char) : ∀ (v : Nat) (s t : Term),
+  159: theorem not_occurs_substTerms (c : String) : ∀ (v : Nat) (s : Term) (ts : List Term),
+   → theorem not_occurs_substTerms (c : List Char) : ∀ (v : Nat) (s : Term) (ts : List Term),
+  169: theorem not_occurs_substFormula (c : String) : ∀ (f : Formula) (v : Nat) (s : Term),
+   → theorem not_occurs_substFormula (c : List Char) : ∀ (f : Formula) (v : Nat) (s : Term),
+  198: theorem not_occurs_henkinAx {c d : String} {A : Formula}
+   → theorem not_occurs_henkinAx {c d : List Char} {A : Formula}
+  216: theorem cst_ne_of_size {s : String} {m : Nat} (hm : s.utf8ByteSize ≤ m) : cst m ≠ s := by
+   → theorem cst_ne_of_size {s : List Char} {m : Nat} (hm : s.utf8ByteSize ≤ m) : cst m ≠ s := by
+  219: (cst_utf8ByteSize m).symm.trans (congrArg String.utf8ByteSize h)
+   → (cst_utf8ByteSize m).symm.trans (congrArg (List Char).utf8ByteSize h)
+  395: ∃ c : String, henLimit S (henkinAx c A) := by
+   → ∃ c : List Char, henLimit S (henkinAx c A) := by
+===== FOL/Henkin0.lean 4 líneas
+  130: def henkinAx (c : String) (A : Formula) : Formula :=
+   → def henkinAx (c : List Char) (A : Formula) : Formula :=
+  163: theorem abs_neg_witness (c : String) (A : Formula) (hcA : Not (occursFormula c A)) :
+   → theorem abs_neg_witness (c : List Char) (A : Formula) (hcA : Not (occursFormula c A)) :
+  213: theorem henkin_step_derives {S : Formula → Prop} (c : String) (A : Formula)
+   → theorem henkin_step_derives {S : Formula → Prop} (c : List Char) (A : Formula)
+  237: (c : String) (A : Formula)
+   → (c : List Char) (A : Formula)
+===== FOL/Rename.lean 31 líneas
+  146: theorem rename_neg (ρ : String → String) (A : Formula) :
+   → theorem rename_neg (ρ : List Char → List Char) (A : Formula) :
+  154: theorem rename_liftTerm (ρ : String → String) (c : Nat) (t : Term) :
+   → theorem rename_liftTerm (ρ : List Char → List Char) (c : Nat) (t : Term) :
+  166: theorem rename_liftTerms (ρ : String → String) (c : Nat) (ts : List Term) :
+   → theorem rename_liftTerms (ρ : List Char → List Char) (c : Nat) (ts : List Term) :
+  175: theorem rename_liftFormula (ρ : String → String) : ∀ (c : Nat) (f : Formula),
+   → theorem rename_liftFormula (ρ : List Char → List Char) : ∀ (c : Nat) (f : Formula),
+  193: theorem rename_substTerm (ρ : String → String) (v : Nat) (s : Term) (t : Term) :
+   → theorem rename_substTerm (ρ : List Char → List Char) (v : Nat) (s : Term) (t : Term) :
+  207: theorem rename_substTerms (ρ : String → String) (v : Nat) (s : Term) (ts : List Term) :
+   → theorem rename_substTerms (ρ : List Char → List Char) (v : Nat) (s : Term) (ts : List Term) :
+  216: theorem rename_substFormula (ρ : String → String) : ∀ (f : Formula) (v : Nat) (s : Term),
+   → theorem rename_substFormula (ρ : List Char → List Char) : ∀ (f : Formula) (v : Nat) (s : Term),
+  237: theorem rename_getAt? (ρ : String → String) : ∀ (p : Pos) (f : Formula),
+   → theorem rename_getAt? (ρ : List Char → List Char) : ∀ (p : Pos) (f : Formula),
+  246: theorem rename_replaceAt (ρ : String → String) : ∀ (p : Pos) (f newSub : Formula),
+   → theorem rename_replaceAt (ρ : List Char → List Char) : ∀ (p : Pos) (f newSub : Formula),
+  257: theorem rename_localRule (ρ : String → String) {A B : Formula} (h : LocalRule A B) :
+   → theorem rename_localRule (ρ : List Char → List Char) {A B : Formula} (h : LocalRule A B) :
+  267: theorem map_rename_lift (ρ : String → String) (Γ : List Formula) :
+   → theorem map_rename_lift (ρ : List Char → List Char) (Γ : List Formula) :
+  286: theorem derives0_rename (ρ : String → String) {Γ : List Formula} {f : Formula} (h : Γ ⊢₀ f) :
+   → theorem derives0_rename (ρ : List Char → List Char) {Γ : List Formula} {f : Formula} (h : Γ ⊢₀ f) :
+  361: theorem rename_rename_term {ρ σ : String → String} (hσ : ∀ s, σ (ρ s) = s) :
+   → theorem rename_rename_term {ρ σ : List Char → List Char} (hσ : ∀ s, σ (ρ s) = s) :
+  371: theorem rename_rename_terms {ρ σ : String → String} (hσ : ∀ s, σ (ρ s) = s) :
+   → theorem rename_rename_terms {ρ σ : List Char → List Char} (hσ : ∀ s, σ (ρ s) = s) :
+  381: theorem rename_rename_formula {ρ σ : String → String} (hσ : ∀ s, σ (ρ s) = s) :
+   → theorem rename_rename_formula {ρ σ : List Char → List Char} (hσ : ∀ s, σ (ρ s) = s) :
+  394: theorem map_rename_rename {ρ σ : String → String} (hσ : ∀ s, σ (ρ s) = s) (Γ : List Formula) :
+   → theorem map_rename_rename {ρ σ : List Char → List Char} (hσ : ∀ s, σ (ρ s) = s) (Γ : List Formula) :
+  404: theorem derives0_rename_inv {ρ σ : String → String} (hσ : ∀ s, σ (ρ s) = s)
+   → theorem derives0_rename_inv {ρ σ : List Char → List Char} (hσ : ∀ s, σ (ρ s) = s)
+  419: def symsTerm : Term → List String
+   → def symsTerm : Term → List (List Char)
+  423: def symsTerms : List Term → List String
+   → def symsTerms : List Term → List (List Char)
+  428: def symsFormula : Formula → List String
+   → def symsFormula : Formula → List (List Char)
+  438: def symsList : List Formula → List String
+   → def symsList : List Formula → List (List Char)
+  442: theorem symsList_mem : ∀ {l : List Formula} {g : Formula} {s : String},
+   → theorem symsList_mem : ∀ {l : List Formula} {g : Formula} {s : List Char},
+  448: def locInv (ρ : String → String) : List String → String → String
+   → def locInv (ρ : List Char → List Char) : List (List Char) → List Char → List Char
+  452: theorem locInv_spec {ρ : String → String} (hinj : ∀ s t, ρ s = ρ t → s = t) :
+   → theorem locInv_spec {ρ : List Char → List Char} (hinj : ∀ s t, ρ s = ρ t → s = t) :
+  453: ∀ {L : List String} {s : String}, s ∈ L → locInv ρ L (ρ s) = s
+   → ∀ {L : List (List Char)} {s : List Char}, s ∈ L → locInv ρ L (ρ s) = s
+  465: theorem rename_rename_term_loc {ρ σ : String → String} : ∀ t : Term,
+   → theorem rename_rename_term_loc {ρ σ : List Char → List Char} : ∀ t : Term,
+  473: theorem rename_rename_terms_loc {ρ σ : String → String} : ∀ ts : List Term,
+   → theorem rename_rename_terms_loc {ρ σ : List Char → List Char} : ∀ ts : List Term,
+  482: theorem rename_rename_formula_loc {ρ σ : String → String} : ∀ f : Formula,
+   → theorem rename_rename_formula_loc {ρ σ : List Char → List Char} : ∀ f : Formula,
+  523: theorem map_rename_rename_loc {ρ σ : String → String} : ∀ Γ : List Formula,
+   → theorem map_rename_rename_loc {ρ σ : List Char → List Char} : ∀ Γ : List Formula,
+  536: theorem derives0_rename_conservative {ρ : String → String} (hinj : ∀ s t, ρ s = ρ t → s = t)
+   → theorem derives0_rename_conservative {ρ : List Char → List Char} (hinj : ∀ s t, ρ s = ρ t → s = t)
+  547: theorem derives0_rename_iff {ρ σ : String → String} (hσ : ∀ s, σ (ρ s) = s)
+   → theorem derives0_rename_iff {ρ σ : List Char → List Char} (hσ : ∀ s, σ (ρ s) = s)
+===== FOL/Canonical0.lean 6 líneas
+  281: theorem termEqv_func_congr {S : Formula → Prop} (hMax : IsMaximalConsistent₀ S) (f : String)
+   → theorem termEqv_func_congr {S : Formula → Prop} (hMax : IsMaximalConsistent₀ S) (f : List Char)
+  297: theorem termEqv_rel_congr {S : Formula → Prop} (hMax : IsMaximalConsistent₀ S) (p : String)
+   → theorem termEqv_rel_congr {S : Formula → Prop} (hMax : IsMaximalConsistent₀ S) (p : List Char)
+  562: def pullback {D : Type} (M : Model D) (ρ : String → String) : Model D where
+   → def pullback {D : Type} (M : Model D) (ρ : List Char → List Char) : Model D where
+  567: theorem eval_pullback_term {D : Type} (M : Model D) (ρ : String → String) (v : Nat → D) :
+   → theorem eval_pullback_term {D : Type} (M : Model D) (ρ : List Char → List Char) (v : Nat → D) :
+  576: theorem eval_pullback_terms {D : Type} (M : Model D) (ρ : String → String) (v : Nat → D) :
+   → theorem eval_pullback_terms {D : Type} (M : Model D) (ρ : List Char → List Char) (v : Nat → D) :
+  585: theorem eval_pullback_formula {D : Type} (M : Model D) (ρ : String → String) :
+   → theorem eval_pullback_formula {D : Type} (M : Model D) (ρ : List Char → List Char) :
+===== FOL/Craig0.lean 12 líneas
+  189: def predF (p : String) : Formula → Prop
+   → def predF (p : List Char) : Formula → Prop
+  199: theorem predF_lift (p : String) : ∀ (f : Formula) (k : Nat),
+   → theorem predF_lift (p : List Char) : ∀ (f : Formula) (k : Nat),
+  210: theorem predF_subst (p : String) : ∀ (f : Formula) (k : Nat) (t : Term),
+   → theorem predF_subst (p : List Char) : ∀ (f : Formula) (k : Nat) (t : Term),
+  802: LKp [Formula.and (Formula.atom "P" []) (Formula.atom "Q" [])]
+   → LKp [Formula.and (Formula.atom ['P'] []) (Formula.atom ['Q'] [])]
+  803: [Formula.or (Formula.atom "P" []) (Formula.atom "R" [])] :=
+   → [Formula.or (Formula.atom ['P'] []) (Formula.atom ['R'] [])] :=
+  804: LKp.andL [] _ (Formula.atom "P" []) (Formula.atom "Q" [])
+   → LKp.andL [] _ (Formula.atom ['P'] []) (Formula.atom ['Q'] [])
+  805: (LKp.orR _ [] (Formula.atom "P" []) (Formula.atom "R" [])
+   → (LKp.orR _ [] (Formula.atom ['P'] []) (Formula.atom ['R'] [])
+  806: (LKp.ax _ _ (Formula.atom "P" []) (List.Mem.head _) (List.Mem.head _)))
+   → (LKp.ax _ _ (Formula.atom ['P'] []) (List.Mem.head _) (List.Mem.head _)))
+  811: ∃ C, And (LKp [Formula.and (Formula.atom "P" []) (Formula.atom "Q" [])] [C])
+   → ∃ C, And (LKp [Formula.and (Formula.atom ['P'] []) (Formula.atom ['Q'] [])] [C])
+  812: (And (LKp [C] [Formula.or (Formula.atom "P" []) (Formula.atom "R" [])])
+   → (And (LKp [C] [Formula.or (Formula.atom ['P'] []) (Formula.atom ['R'] [])])
+  813: (And (PredSub C [Formula.and (Formula.atom "P" []) (Formula.atom "Q" [])])
+   → (And (PredSub C [Formula.and (Formula.atom ['P'] []) (Formula.atom ['Q'] [])])
+  814: (PredSub C [Formula.or (Formula.atom "P" []) (Formula.atom "R" [])]))) :=
+   → (PredSub C [Formula.or (Formula.atom ['P'] []) (Formula.atom ['R'] [])]))) :=
+===== FOL/Interpolation0.lean 14 líneas
+  505: theorem predF_em (p : String) : ∀ (f : Formula), Or (predF p f) (Not (predF p f))
+   → theorem predF_em (p : List Char) : ∀ (f : Formula), Or (predF p f) (Not (predF p f))
+  516: theorem predL_em (P : String) : ∀ (Γ : List Formula),
+   → theorem predL_em (P : List Char) : ∀ (Γ : List Formula),
+  653: ∃ C, And ([Formula.and (Formula.atom "P" [Term.func "c" []])
+   → ∃ C, And ([Formula.and (Formula.atom ['P'] [Term.func ['c'] []])
+  654: (Formula.and (Formula.eq (Term.func "c" []) (Term.func "d" []))
+   → (Formula.and (Formula.eq (Term.func ['c'] []) (Term.func ['d'] []))
+  655: (Formula.atom "Q" []))] ⊢₀ C)
+   → (Formula.atom ['Q'] []))] ⊢₀ C)
+  656: (And ([C] ⊢₀ Formula.or (Formula.atom "P" [Term.func "d" []]) (Formula.atom "R" []))
+   → (And ([C] ⊢₀ Formula.or (Formula.atom ['P'] [Term.func ['d'] []]) (Formula.atom ['R'] []))
+  657: (∀ p, predF p C → p = "P")) := by
+   → (∀ p, predF p C → p = ['P'])) := by
+  658: have hd : [Formula.and (Formula.atom "P" [Term.func "c" []])
+   → have hd : [Formula.and (Formula.atom ['P'] [Term.func ['c'] []])
+  659: (Formula.and (Formula.eq (Term.func "c" []) (Term.func "d" []))
+   → (Formula.and (Formula.eq (Term.func ['c'] []) (Term.func ['d'] []))
+  660: (Formula.atom "Q" []))]
+   → (Formula.atom ['Q'] []))]
+  661: ⊢₀ Formula.or (Formula.atom "P" [Term.func "d" []]) (Formula.atom "R" []) := by
+   → ⊢₀ Formula.or (Formula.atom ['P'] [Term.func ['d'] []]) (Formula.atom ['R'] []) := by
+  663: [Formula.and (Formula.atom "P" [Term.func "c" []])
+   → [Formula.and (Formula.atom ['P'] [Term.func ['c'] []])
+  664: (Formula.and (Formula.eq (Term.func "c" []) (Term.func "d" [])) (Formula.atom "Q" []))]
+   → (Formula.and (Formula.eq (Term.func ['c'] []) (Term.func ['d'] [])) (Formula.atom ['Q'] []))]
+  668: exact Derives₀.intro_or_l _ _ _ (FOL.Eq0.derives0_atom_congr "P" [] [] hcd hPc)
+   → exact Derives₀.intro_or_l _ _ _ (FOL.Eq0.derives0_atom_congr ['P'] [] [] hcd hPc)
+===== FOL/QFDecide0.lean 21 líneas
+  191: theorem subT_closed : ∀ (u : Term) {f : String} {ss : List Term},
+   → theorem subT_closed : ∀ (u : Term) {f : List Char} {ss : List Term},
+  200: theorem subTs_closed : ∀ (us : List Term) {f : String} {ss : List Term},
+   → theorem subTs_closed : ∀ (us : List Term) {f : List Char} {ss : List Term},
+  331: theorem mem_qfT_mix {S : List Term} {f g : String} {xs ys zs : List Term}
+   → theorem mem_qfT_mix {S : List Term} {f g : List Char} {xs ys zs : List Term}
+  337: theorem mem_qfA_mix {A : List Formula} {p q : String} {xs ys zs : List Term}
+   → theorem mem_qfA_mix {A : List Formula} {p q : List Char} {xs ys zs : List Term}
+  396: theorem func_mem {f : String} {pre post : List Term} {a b : Term}
+   → theorem func_mem {f : List Char} {pre post : List Term} {a b : Term}
+  401: theorem atom_mem {p : String} {pre post : List Term} {a b : Term}
+   → theorem atom_mem {p : List Char} {pre post : List Term} {a b : Term}
+  452: def headF (f : String) (us : List Term) : Term → Bool
+   → def headF (f : List Char) (us : List Term) : Term → Bool
+  457: def node (f : String) (us : List Term) : Term :=
+   → def node (f : List Char) (us : List Term) : Term :=
+  472: def headA (p : String) (us : List Term) : Formula → Bool
+   → def headA (p : List Char) (us : List Term) : Formula → Bool
+  476: def atomVal (p : String) (us : List Term) : Bool :=
+   → def atomVal (p : List Char) (us : List Term) : Bool :=
+  547: closed : ∀ {f : String} {ss : List Term}, Term.func f ss ∈ S → ∀ y, y ∈ ss → y ∈ S
+   → closed : ∀ {f : List Char} {ss : List Term}, Term.func f ss ∈ S → ∀ y, y ∈ ss → y ∈ S
+  566: theorem Good.func (hG : Good v S A) {f : String} {pre post : List Term} {a b : Term}
+   → theorem Good.func (hG : Good v S A) {f : List Char} {pre post : List Term} {a b : Term}
+  572: theorem Good.atom (hG : Good v S A) {p : String} {pre post : List Term} {a b : Term}
+   → theorem Good.atom (hG : Good v S A) {p : List Char} {pre post : List Term} {a b : Term}
+  580: theorem chainF (hG : Good v S A) {f : String} :
+   → theorem chainF (hG : Good v S A) {f : List Char} :
+  604: theorem chainA (hG : Good v S A) {p : String} :
+   → theorem chainA (hG : Good v S A) {p : List Char} :
+  712: theorem atom_congr (hG : Good v S A) {p : String} {xs ys : List Term}
+   → theorem atom_congr (hG : Good v S A) {p : List Char} {xs ys : List Term}
+  847: private def ca : Term := Term.func "a" []
+   → private def ca : Term := Term.func ['a'] []
+  848: private def cb : Term := Term.func "b" []
+   → private def cb : Term := Term.func ['b'] []
+  863: private def cc : Term := Term.func "c" []
+   → private def cc : Term := Term.func ['c'] []
+  864: private def cd : Term := Term.func "d" []
+   → private def cd : Term := Term.func ['d'] []
+  866: private def φx : Formula := Formula.eq (Term.func "g" [ca, cc]) (Term.func "g" [cb, cd])
+   → private def φx : Formula := Formula.eq (Term.func ['g'] [ca, cc]) (Term.func ['g'] [cb, cd])
+===== FOL/Skolem0.lean 9 líneas
+  150: def updateFunc {D : Type} (M : Model D) (c : String) (F : List D → D) : Model D where
+   → def updateFunc {D : Type} (M : Model D) (c : List Char) (F : List D → D) : Model D where
+  156: theorem evalTerm_updateFunc {D : Type} (M : Model D) (c : String) (F : List D → D) :
+   → theorem evalTerm_updateFunc {D : Type} (M : Model D) (c : List Char) (F : List D → D) :
+  166: theorem evalTerms_updateFunc {D : Type} (M : Model D) (c : String) (F : List D → D) :
+   → theorem evalTerms_updateFunc {D : Type} (M : Model D) (c : List Char) (F : List D → D) :
+  177: theorem evalFormula_updateFunc {D : Type} (M : Model D) (c : String) (F : List D → D) :
+   → theorem evalFormula_updateFunc {D : Type} (M : Model D) (c : List Char) (F : List D → D) :
+  226: theorem evalTerm_new {D : Type} (M : Model D) (c : String) (w : D) (v : Nat → D) :
+   → theorem evalTerm_new {D : Type} (M : Model D) (c : List Char) (w : D) (v : Nat → D) :
+  235: def skolemAxT (c : String) (ts : List Term) (A : Formula) : Formula :=
+   → def skolemAxT (c : List Char) (ts : List Term) (A : Formula) : Formula :=
+  241: theorem evalTerm_newT {D : Type} (M : Model D) (c : String) (w : D) (v : Nat → D)
+   → theorem evalTerm_newT {D : Type} (M : Model D) (c : List Char) (w : D) (v : Nat → D)
+  253: theorem skolem_conservative₀ {c : String} {A φ : Formula} {Γ : List Formula} {ts : List Term}
+   → theorem skolem_conservative₀ {c : List Char} {A φ : Formula} {Γ : List Formula} {ts : List Term}
+  291: theorem henkin_conservative₀ {c : String} {A φ : Formula} {Γ : List Formula}
+   → theorem henkin_conservative₀ {c : List Char} {A φ : Formula} {Γ : List Formula}
+===== FOL/SkolemN0.lean 6 líneas
+  104: theorem not_occurs_vars (c : String) : ∀ n : Nat, Not (occursTerms c (vars n))
+   → theorem not_occurs_vars (c : List Char) : ∀ n : Nat, Not (occursTerms c (vars n))
+  182: def skolemAxN (c : String) (n : Nat) (A : Formula) : Formula :=
+   → def skolemAxN (c : List Char) (n : Nat) (A : Formula) : Formula :=
+  186: example (c : String) (A : Formula) : skolemAxN c 0 A = skolemAxT c [] A := rfl
+   → example (c : List Char) (A : Formula) : skolemAxN c 0 A = skolemAxT c [] A := rfl
+  189: theorem eval_skolemAxN {D : Type} (M : Model D) (c : String) (n : Nat) (A : Formula)
+   → theorem eval_skolemAxN {D : Type} (M : Model D) (c : List Char) (n : Nat) (A : Formula)
+  227: theorem skolem_conservative_n₀ {c : String} {n : Nat} {A φ : Formula} {Γ : List Formula}
+   → theorem skolem_conservative_n₀ {c : List Char} {n : Nat} {A φ : Formula} {Γ : List Formula}
+  246: theorem skolem_conservative_n_zero {c : String} {A φ : Formula} {Γ : List Formula}
+   → theorem skolem_conservative_n_zero {c : List Char} {A φ : Formula} {Γ : List Formula}
+===== FOL/SkolemNF0.lean 17 líneas
+  186: skolemize 0 (Formula.forall (Formula.ex (Formula.atom "P" [Term.var 1, Term.var 0])))
+   → skolemize 0 (Formula.forall (Formula.ex (Formula.atom ['P'] [Term.var 1, Term.var 0])))
+  187: = Formula.forall (Formula.atom "P" [Term.var 0, Term.func (cst 0) [Term.var 0]]) := by
+   → = Formula.forall (Formula.atom ['P'] [Term.var 0, Term.func (cst 0) [Term.var 0]]) := by
+  193: skolemize 0 (Formula.ex (Formula.forall (Formula.atom "P" [Term.var 0, Term.var 1])))
+   → skolemize 0 (Formula.ex (Formula.forall (Formula.atom ['P'] [Term.var 0, Term.var 1])))
+  194: = Formula.forall (Formula.atom "P" [Term.var 0, Term.func (cst 0) []]) := by
+   → = Formula.forall (Formula.atom ['P'] [Term.var 0, Term.func (cst 0) []]) := by
+  200: (Formula.atom "Q" [Term.var 3, Term.var 2, Term.var 1, Term.var 0])))))
+   → (Formula.atom ['Q'] [Term.var 3, Term.var 2, Term.var 1, Term.var 0])))))
+  201: = Formula.forall (Formula.forall (Formula.atom "Q"
+   → = Formula.forall (Formula.forall (Formula.atom ['Q']
+  277: theorem occurs_allBlock (c : String) : ∀ (n : Nat) (X : Formula),
+   → theorem occurs_allBlock (c : List Char) : ∀ (n : Nat) (X : Formula),
+  282: theorem not_occurs_skolemAxN {c d : String} {n : Nat} {A : Formula}
+   → theorem not_occurs_skolemAxN {c d : List Char} {n : Nat} {A : Formula}
+  369: theorem occursFormula_lift (c : String) : ∀ (f : Formula) (k : Nat),
+   → theorem occursFormula_lift (c : List Char) : ∀ (f : Formula) (k : Nat),
+  388: theorem occurs_mergeAndR (c : String) : ∀ (A B : Formula),
+   → theorem occurs_mergeAndR (c : List Char) : ∀ (A B : Formula),
+  403: theorem occurs_mergeAnd (c : String) : ∀ (A B : Formula),
+   → theorem occurs_mergeAnd (c : List Char) : ∀ (A B : Formula),
+  418: theorem occurs_mergeOrR (c : String) : ∀ (A B : Formula),
+   → theorem occurs_mergeOrR (c : List Char) : ∀ (A B : Formula),
+  433: theorem occurs_mergeOr (c : String) : ∀ (A B : Formula),
+   → theorem occurs_mergeOr (c : List Char) : ∀ (A B : Formula),
+  448: theorem occurs_mergeImplR (c : String) : ∀ (A B : Formula),
+   → theorem occurs_mergeImplR (c : List Char) : ∀ (A B : Formula),
+  463: theorem occurs_mergeImpl (c : String) : ∀ (A B : Formula),
+   → theorem occurs_mergeImpl (c : List Char) : ∀ (A B : Formula),
+  479: theorem occurs_prenex (c : String) : ∀ (f : Formula),
+   → theorem occurs_prenex (c : List Char) : ∀ (f : Formula),
+  496: theorem not_occurs_prenex {c : String} {f : Formula} (h : Not (occursFormula c f)) :
+   → theorem not_occurs_prenex {c : List Char} {f : Formula} (h : Not (occursFormula c f)) :
+===== FOL/SkolemHerbrand0.lean 1 líneas
+  265: theorem not_occurs_implChain {c : String} :
+   → theorem not_occurs_implChain {c : List Char} :
+===== FOL/HerbrandBlock0.lean 1 líneas
+  206: private def c : Term := Term.func "c" []
+   → private def c : Term := Term.func ['c'] []
+===== FOL/Soundness0.lean 1 líneas
+  229: def P : Formula := Formula.atom "P" []
+   → def P : Formula := Formula.atom ['P'] []
+===== FOL/Eigenvariable.lean 32 líneas
+  125: theorem abs_neg (c : String) (k : Nat) (A : Formula) :
+   → theorem abs_neg (c : List Char) (k : Nat) (A : Formula) :
+  133: theorem absTerm'_lift (P : String → Prop) [DecidablePred P] : ∀ (j k : Nat) (_ : j ≤ k) (t : Term),
+   → theorem absTerm'_lift (P : List Char → Prop) [DecidablePred P] : ∀ (j k : Nat) (_ : j ≤ k) (t : Term),
+  156: theorem absTerms'_lift (P : String → Prop) [DecidablePred P] :
+   → theorem absTerms'_lift (P : List Char → Prop) [DecidablePred P] :
+  167: theorem absFormula'_lift (P : String → Prop) [DecidablePred P] :
+   → theorem absFormula'_lift (P : List Char → Prop) [DecidablePred P] :
+  185: theorem absTerm_lift (c : String) : ∀ (j k : Nat) (_ : j ≤ k) (t : Term),
+   → theorem absTerm_lift (c : List Char) : ∀ (j k : Nat) (_ : j ≤ k) (t : Term),
+  189: theorem absTerms_lift (c : String) : ∀ (j k : Nat) (_ : j ≤ k) (ts : List Term),
+   → theorem absTerms_lift (c : List Char) : ∀ (j k : Nat) (_ : j ≤ k) (ts : List Term),
+  193: theorem absFormula_lift (c : String) : ∀ (f : Formula) (j k : Nat), j ≤ k →
+   → theorem absFormula_lift (c : List Char) : ∀ (f : Formula) (j k : Nat), j ≤ k →
+  202: theorem absTerm'_subst (P : String → Prop) [DecidablePred P] :
+   → theorem absTerm'_subst (P : List Char → Prop) [DecidablePred P] :
+  236: theorem absTerms'_subst (P : String → Prop) [DecidablePred P] :
+   → theorem absTerms'_subst (P : List Char → Prop) [DecidablePred P] :
+  247: theorem absFormula'_subst (P : String → Prop) [DecidablePred P] :
+   → theorem absFormula'_subst (P : List Char → Prop) [DecidablePred P] :
+  271: theorem absTerm_subst (c : String) : ∀ (v k : Nat) (_ : v ≤ k) (s : Term) (t : Term),
+   → theorem absTerm_subst (c : List Char) : ∀ (v k : Nat) (_ : v ≤ k) (s : Term) (t : Term),
+  275: theorem absTerms_subst (c : String) : ∀ (v k : Nat) (_ : v ≤ k) (s : Term) (ts : List Term),
+   → theorem absTerms_subst (c : List Char) : ∀ (v k : Nat) (_ : v ≤ k) (s : Term) (ts : List Term),
+  279: theorem absFormula_subst (c : String) : ∀ (f : Formula) (v k : Nat), v ≤ k → ∀ (s : Term),
+   → theorem absFormula_subst (c : List Char) : ∀ (f : Formula) (v k : Nat), v ≤ k → ∀ (s : Term),
+  301: theorem abs'_getAt? (P : String → Prop) [DecidablePred P] : ∀ (p : Pos) (k : Nat) (f : Formula),
+   → theorem abs'_getAt? (P : List Char → Prop) [DecidablePred P] : ∀ (p : Pos) (k : Nat) (f : Formula),
+  313: theorem abs'_replaceAt (P : String → Prop) [DecidablePred P] :
+   → theorem abs'_replaceAt (P : List Char → Prop) [DecidablePred P] :
+  329: theorem abs'_localRule (P : String → Prop) [DecidablePred P] (k : Nat) {A B : Formula}
+   → theorem abs'_localRule (P : List Char → Prop) [DecidablePred P] (k : Nat) {A B : Formula}
+  335: theorem abs_getAt? (c : String) : ∀ (p : Pos) (k : Nat) (f : Formula),
+   → theorem abs_getAt? (c : List Char) : ∀ (p : Pos) (k : Nat) (f : Formula),
+  339: theorem abs_replaceAt (c : String) : ∀ (p : Pos) (k : Nat) (f newSub : Formula),
+   → theorem abs_replaceAt (c : List Char) : ∀ (p : Pos) (k : Nat) (f newSub : Formula),
+  344: theorem abs_localRule (c : String) (k : Nat) {A B : Formula} (h : LocalRule A B) :
+   → theorem abs_localRule (c : List Char) (k : Nat) {A B : Formula} (h : LocalRule A B) :
+  352: theorem map_abs'_lift (P : String → Prop) [DecidablePred P] (k : Nat) (Γ : List Formula) :
+   → theorem map_abs'_lift (P : List Char → Prop) [DecidablePred P] (k : Nat) (Γ : List Formula) :
+  360: theorem map_abs_lift (c : String) (k : Nat) (Γ : List Formula) :
+   → theorem map_abs_lift (c : List Char) (k : Nat) (Γ : List Formula) :
+  374: theorem absDerives' (P : String → Prop) [DecidablePred P] {Γ : List Formula} {φ : Formula}
+   → theorem absDerives' (P : List Char → Prop) [DecidablePred P] {Γ : List Formula} {φ : Formula}
+  435: theorem absDerives (c : String) {Γ : List Formula} {φ : Formula} (h : Γ ⊢₀ φ) :
+   → theorem absDerives (c : List Char) {Γ : List Formula} {φ : Formula} (h : Γ ⊢₀ φ) :
+  464: theorem absTerm'_eq_lift (P : String → Prop) [DecidablePred P] : ∀ (k : Nat) (t : Term),
+   → theorem absTerm'_eq_lift (P : List Char → Prop) [DecidablePred P] : ∀ (k : Nat) (t : Term),
+  479: theorem absTerms'_eq_lift (P : String → Prop) [DecidablePred P] : ∀ (k : Nat) (ts : List Term),
+   → theorem absTerms'_eq_lift (P : List Char → Prop) [DecidablePred P] : ∀ (k : Nat) (ts : List Term),
+  493: theorem absFormula'_eq_lift (P : String → Prop) [DecidablePred P] : ∀ (f : Formula) (k : Nat),
+   → theorem absFormula'_eq_lift (P : List Char → Prop) [DecidablePred P] : ∀ (f : Formula) (k : Nat),
+  518: theorem absTerm_eq_lift (c : String) : ∀ (k : Nat) (t : Term), Not (occursTerm c t) →
+   → theorem absTerm_eq_lift (c : List Char) : ∀ (k : Nat) (t : Term), Not (occursTerm c t) →
+  522: theorem absTerms_eq_lift (c : String) : ∀ (k : Nat) (ts : List Term), Not (occursTerms c ts) →
+   → theorem absTerms_eq_lift (c : List Char) : ∀ (k : Nat) (ts : List Term), Not (occursTerms c ts) →
+  529: theorem absFormula_eq_lift (c : String) : ∀ (f : Formula) (k : Nat), Not (occursFormula c f) →
+   → theorem absFormula_eq_lift (c : List Char) : ∀ (f : Formula) (k : Nat), Not (occursFormula c f) →
+  534: theorem map_abs_eq_map_lift (c : String) {Γ : List Formula}
+   → theorem map_abs_eq_map_lift (c : List Char) {Γ : List Formula}
+  552: theorem derives0_gen_fresh (c : String) {Γ : List Formula} {φ : Formula}
+   → theorem derives0_gen_fresh (c : List Char) {Γ : List Formula} {φ : Formula}
+  561: theorem derives0_inst_fresh (c : String) {Γ : List Formula} {φ : Formula}
+   → theorem derives0_inst_fresh (c : List Char) {Γ : List Formula} {φ : Formula}
+===== FOL/Derives2.lean 6 líneas
+  118: | eq_func_congr : ∀ Γ (p : String) (pre post : List Term) (a b : Term),
+   → | eq_func_congr : ∀ Γ (p : List Char) (pre post : List Term) (a b : Term),
+  121: | eq_atom_congr : ∀ Γ (p : String) (pre post : List Term) (a b : Term),
+   → | eq_atom_congr : ∀ Γ (p : List Char) (pre post : List Term) (a b : Term),
+  232: theorem eq_func_pw {G : List Formula} (p : String) : ∀ {l1 l2 : List Term},
+   → theorem eq_func_pw {G : List Formula} (p : List Char) : ∀ {l1 l2 : List Term},
+  245: theorem eq_atom_pw {G : List Formula} (p : String) : ∀ {l1 l2 : List Term},
+   → theorem eq_atom_pw {G : List Formula} (p : List Char) : ∀ {l1 l2 : List Term},
+  382: theorem derives1_eq_func_congr {Γ : List Formula} (p : String) (pre post : List Term)
+   → theorem derives1_eq_func_congr {Γ : List Formula} (p : List Char) (pre post : List Term)
+  402: theorem derives1_atom_congr {Γ : List Formula} (p : String) (pre post : List Term)
+   → theorem derives1_atom_congr {Γ : List Formula} (p : List Char) (pre post : List Term)
+===== FOL/Eq0.lean 2 líneas
+  79: theorem derives0_eq_func_congr {Γ : List Formula} (p : String) (pre post : List Term)
+   → theorem derives0_eq_func_congr {Γ : List Formula} (p : List Char) (pre post : List Term)
+  100: theorem derives0_atom_congr {Γ : List Formula} (p : String) (pre post : List Term)
+   → theorem derives0_atom_congr {Γ : List Formula} (p : List Char) (pre post : List Term)
+===== FOL/Theorems/Eq.lean 2 líneas
+  409: theorem derive_eq_func_congr {Γ : List Formula} (p : String) (pre post : List Term)
+   → theorem derive_eq_func_congr {Γ : List Formula} (p : List Char) (pre post : List Term)
+  430: theorem derive_atom_congr {Γ : List Formula} (p : String) (pre post : List Term)
+   → theorem derive_atom_congr {Γ : List Formula} (p : List Char) (pre post : List Term)
+===== FOL/Herbrand0.lean 6 líneas
+  231: def eqFuncAx (f : String) (pre post : List Term) (a b : Term) : Formula :=
+   → def eqFuncAx (f : List Char) (pre post : List Term) (a b : Term) : Formula :=
+  235: def eqAtomAx (p : String) (pre post : List Term) (a b : Term) : Formula :=
+   → def eqAtomAx (p : List Char) (pre post : List Term) (a b : Term) : Formula :=
+  245: | func (f : String) (pre post : List Term) (a b : Term) : EqInstance (eqFuncAx f pre post a b)
+   → | func (f : List Char) (pre post : List Term) (a b : Term) : EqInstance (eqFuncAx f pre post a b)
+  246: | atom (p : String) (pre post : List Term) (a b : Term) : EqInstance (eqAtomAx p pre post a b)
+   → | atom (p : List Char) (pre post : List Term) (a b : Term) : EqInstance (eqAtomAx p pre post a b)
+  337: private def Px : Formula := Formula.atom "P" [Term.var 0]
+   → private def Px : Formula := Formula.atom ['P'] [Term.var 0]
+  338: private def c : Term := Term.func "c" []
+   → private def c : Term := Term.func ['c'] []
+===== FOL/Inconsistencia.lean 9 líneas
+  61: theorem abs_witness (c : String) (A : Formula) (hcA : Not (occursFormula c A)) :
+   → theorem abs_witness (c : List Char) (A : Formula) (hcA : Not (occursFormula c A)) :
+  154: theorem derives0_not_negP_fin : Not (([] : List Formula) ⊢₀ neg (Formula.atom "P" [])) := by
+   → theorem derives0_not_negP_fin : Not (([] : List Formula) ⊢₀ neg (Formula.atom ['P'] [])) := by
+  207: theorem derives_not_P : Not (([] : List Formula) ⊢ Formula.atom "P" []) := fun h =>
+   → theorem derives_not_P : Not (([] : List Formula) ⊢ Formula.atom ['P'] []) := fun h =>
+  211: theorem derives_not_negP : Not (([] : List Formula) ⊢ neg (Formula.atom "P" [])) := fun h =>
+   → theorem derives_not_negP : Not (([] : List Formula) ⊢ neg (Formula.atom ['P'] [])) := fun h =>
+  216: derives_not_negP (H (Γ := []) (A := Formula.atom "P" []) (B := Formula.bottom)
+   → derives_not_negP (H (Γ := []) (A := Formula.atom ['P'] []) (B := Formula.bottom)
+  221: derives_not_negP (H (Γ := []) (A := Formula.atom "P" []) (fun h => absurd h derives_not_P))
+   → derives_not_negP (H (Γ := []) (A := Formula.atom ['P'] []) (fun h => absurd h derives_not_P))
+  227: (H (Γ := []) (A := Formula.atom "P" []) (B := neg (Formula.atom "P" [])) (C := Formula.bottom)
+   → (H (Γ := []) (A := Formula.atom ['P'] []) (B := neg (Formula.atom ['P'] [])) (C := Formula.bottom)
+  228: (derives0_to_derives (FOL.Propositional0.derives0_em_ctx [] (Formula.atom "P" [])))
+   → (derives0_to_derives (FOL.Propositional0.derives0_em_ctx [] (Formula.atom ['P'] [])))
+  234: private def PA : Formula := Formula.atom "P" [Term.var 0]
+   → private def PA : Formula := Formula.atom ['P'] [Term.var 0]
+===== FOL/Finitary0.lean 1 líneas
+  445: theorem derives0_not_P_fin : Not (([] : List Formula) ⊢₀ Formula.atom "P" []) := by
+   → theorem derives0_not_P_fin : Not (([] : List Formula) ⊢₀ Formula.atom ['P'] []) := by
+TOTAL 229

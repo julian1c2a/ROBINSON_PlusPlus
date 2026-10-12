@@ -1,0 +1,18 @@
+import ROBINSON_PlusPlus
+open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.ReprPrf ROBINSON_PlusPlus.Meta.Provability
+namespace Sondeos.LineaBasura
+/-- `cons 3 nil` (vale 7 con ADR-113): cabeza de átomo SIN nombre ni argumentos; no es código de nada. -/
+def junk : Term := cons (numeralM 3) nil
+/-- Línea efq ⟨⊥ ⇒ junk, 8, junk⟩. -/
+def lineJ : Term := cons (implc botc junk) (cons (numeralM 8) (cons junk nil))
+/-- Prf demuestra que la línea basura está bien formada (ax_lineWF_efq no guarda la ranura 2). -/
+theorem lineWF_junk : Prf (lineWF lineJ) :=
+  prf_iff_mpr (prf_lineWF_efq (implc botc junk) junk) (prf_refl _)
+/-- Y `junk` no es el formCode de ninguna fórmula. -/
+theorem junk_no_es_formCode (φ : Formula) : formCode φ ≠ junk := by
+  cases φ <;> simp [formCode, junk, cons, nil, zero, numeralM, ROBINSON_PlusPlus.Meta.Godel.numeral]
+end Sondeos.LineaBasura
+#print axioms Sondeos.LineaBasura.lineWF_junk   -- esperado: [propext, Classical.choice, Quot.sound]
+-- Siguiente paso, Prov de un no-código: prf_chainOk_cons/nil + prf_premsOf_efq + prf_allIn_nil + provCodeC'_intro_prf.
+-- (sin compilar; el simp de junk_no_es_formCode puede pedir decide para los literales de cadena)

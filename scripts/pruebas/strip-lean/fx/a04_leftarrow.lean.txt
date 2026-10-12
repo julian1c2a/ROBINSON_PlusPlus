@@ -1,0 +1,3 @@
+def m : IO Int := do
+  let x <-- sorry
+  return x

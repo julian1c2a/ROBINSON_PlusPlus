@@ -1,0 +1,4 @@
+import ROBINSON_PlusPlus
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
+example : consN 0 0 = 1 ∧ consN 1 0 = 2 ∧ consN 0 1 = 3 ∧ consN 2 0 = 4 ∧ consN 1 1 = 5 ∧
+    consN 0 2 = 6 ∧ consN 3 0 = 7 ∧ consN 2 1 = 8 ∧ consN 1 2 = 9 ∧ consN 0 3 = 10 := by decide

@@ -1,0 +1,1 @@
+def p : String × Nat := ⟨r"\", sorry⟩

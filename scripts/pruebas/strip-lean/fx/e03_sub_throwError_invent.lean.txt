@@ -1,0 +1,2 @@
+def x₁throwError (s : String) : String := s
+def w := x₁throwError "{admit}"

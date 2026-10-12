@@ -1,0 +1,22 @@
+vivo (inocuo en los fixtures) L64: || (cp >= 256 && cp <= 383)
+vivo (inocuo en los fixtures) L87: d = substr(line, j, 1)
+vivo (inocuo en los fixtures) L88: if (idf[d]) return 1
+vivo (inocuo en los fixtures) L89: if (substr(line, j, 2) == G1) return 1
+vivo (inocuo en los fixtures) L90: if (ord[d] >= 192) { m = lenu(d); return letra(cpde(substr(line, j, m))) }
+vivo (inocuo en los fixtures) L91: return 0
+vivo (inocuo en los fixtures) L96: print "strip-lean.awk: hace falta LC_ALL=C (despoja por BYTES); no se ha leído nada" > "/d
+vivo (inocuo en los fixtures) L97: exit 2
+vivo (inocuo en los fixtures) L99: for (k = 48; k <= 57; k++) { idr[sprintf("%c", k)] = 1 }
+vivo (inocuo en los fixtures) L100: for (k = 65; k <= 90; k++) { idf[sprintf("%c", k)] = 1; idr[sprintf("%c", k)] = 1 }
+vivo (inocuo en los fixtures) L101: for (k = 97; k <= 122; k++) { idf[sprintf("%c", k)] = 1; idr[sprintf("%c", k)] = 1 }
+vivo (inocuo en los fixtures) L102: idf["_"] = 1; idr["_"] = 1; idr["'"] = 1; idr["!"] = 1; idr["?"] = 1
+vivo (inocuo en los fixtures) L104: reinicia()
+vivo (inocuo en los fixtures) L106: FNR == 1 { reinicia() }
+vivo (inocuo en los fixtures) L138: if (c == "\\") { i += 2; continue }
+vivo (inocuo en los fixtures) L160: else if (substr(line, i, 4) == "...<") tk = "...<"
+vivo (inocuo en los fixtures) L181: e = substr(line, i + 2, 1); m = (e == "x") ? 4 : (e == "u") ? 6 : 2
+vivo (inocuo en los fixtures) L192: out = out " "; tb = tb "\""; inid = 0; lastc = ""; i++; continue
+vivo (inocuo en los fixtures) L200: cp = (m > 1) ? cpde(ch) : 0
+vivo (inocuo en los fixtures) L205: tb = tb " "
+vivo (inocuo en los fixtures) L206: if (length(tb) > 240) tb = substr(tb, length(tb) - 159)
+mutantes=76 sobreviven_al_humo=21 peligrosos=0 fixtures=182

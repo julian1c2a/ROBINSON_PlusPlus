@@ -1,0 +1,3 @@
+#eval !"{".isEmpty
+theorem t2 : 1 = 2 := sorry
+def h2 := "x"

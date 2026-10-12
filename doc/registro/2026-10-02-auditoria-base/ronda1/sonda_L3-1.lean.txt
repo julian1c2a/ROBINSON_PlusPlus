@@ -1,0 +1,51 @@
+import ROBINSON_PlusPlus
+
+/-! SONDA L3-1 (sin compilar por el auditor). En master 08e76b3: Prf ⊥ sin hipotesis.
+    Control: contra la rama de ADR-113 (ae528f8) debe ROMPER en `hev` (alli consN 0 0 = 1). -/
+
+open ROBINSON_PlusPlus.Minimal.Axioms
+open ROBINSON_PlusPlus.Meta.Hilbert
+open ROBINSON_PlusPlus.Meta.HilbertDeduction
+open ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.ChainPrf
+open ROBINSON_PlusPlus.Meta.NatArithPrf
+open ROBINSON_PlusPlus.Meta.StrongInductionPrf
+open ROBINSON_PlusPlus.Meta.CantorMonoPrf
+open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
+open ROBINSON_PlusPlus.Meta.CodeWitnessPrf
+open ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf
+
+namespace Sondeos.BasuraPrfBot
+
+/-- `x < σ0 ⟹ x = 0`, en cualquier contexto. -/
+theorem prfH_eq_zero_of_lt_one {Γ : List Formula} {x : Term}
+    (h : PrfH Γ (lt x (succ zero))) : PrfH Γ (x =eq zero) :=
+  PrfH_or_elim (PrfH.mp _ _ _ (prf_to_prfH (prf_le_of_lt_succ x zero) _) h)
+    (PrfH.mp _ _ _ (PrfH.incl0 _ _ (Prfᵢ.efq _))
+      (PrfH.mp _ _ _ (prf_to_prfH (prf_not_lt_zero x) _) (PrfH.hyp _ _ (List.Mem.head _))))
+    (PrfH.hyp _ _ (List.Mem.head _))
+
+/-- Prf ⊥ en master, sin [AnclaEq]. -/
+theorem prf_bot_master : Prf Formula.bottom := by
+  refine prf_or_elim (prf_nil_or_cons (succ zero)) (prf_succ_ne_zero zero) (prf_deduction ?_)
+  have hE : PrfH [consOk (succ zero)]
+      (succ zero =eq cons (carc (succ zero)) (cdrc (succ zero))) := prfH_hyp_self _
+  have hc := prfH_eq_zero_of_lt_one (PrfH_lt_subst2 (PrfH_eq_symm hE)
+    (prf_to_prfH (prf_cantor_mono_left (carc (succ zero)) (cdrc (succ zero))) _))
+  have hd := prfH_eq_zero_of_lt_one (PrfH_lt_subst2 (PrfH_eq_symm hE)
+    (prf_to_prfH (prf_cantor_mono_right (carc (succ zero)) (cdrc (succ zero))) _))
+  -- master: consN 0 0 = triN 1 + 1 = 2
+  have hev : Prf (cons zero zero =eq succ (succ zero)) := prf_cons_eval 0 0
+  have h12 : PrfH [consOk (succ zero)] (succ zero =eq succ (succ zero)) :=
+    PrfH_eq_trans hE (PrfH_eq_trans
+      (PrfH_eq_trans (PrfH_congr_cons_head hc) (PrfH_congr_cons_tail hd)) (prf_to_prfH hev _))
+  exact PrfH.mp _ _ _ (prf_to_prfH (prf_succ_ne_zero zero) _)
+    (PrfH_eq_symm (PrfH.mp _ _ _ (prf_to_prfH (prf_succ_inj zero (succ zero)) _) h12))
+
+theorem not_consistentH_master : ¬ ConsistentH := fun h => h prf_bot_master
+theorem not_consistentOmega_master : ¬ ConsistentOmega :=
+  fun h => h (prf_to_derives prf_bot_master)
+
+end Sondeos.BasuraPrfBot
+
+#print axioms Sondeos.BasuraPrfBot.prf_bot_master   -- esperado: [propext, Classical.choice, Quot.sound]

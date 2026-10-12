@@ -1,0 +1,1 @@
+def c2 : Char × String × Nat := ('«', "»", sorry)

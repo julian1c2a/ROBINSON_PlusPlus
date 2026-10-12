@@ -1,0 +1,4 @@
+def m : IO Int := do
+  let y <--(5 : Int)
+  pure y
+theorem t : True := sorry

@@ -1,0 +1,1 @@
+def chk : Bool := !s!"{(sorry : Nat)}".isEmpty

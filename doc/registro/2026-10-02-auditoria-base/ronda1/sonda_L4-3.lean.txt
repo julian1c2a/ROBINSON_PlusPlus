@@ -1,0 +1,6 @@
+import ROBINSON_PlusPlus.Meta
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.Provability
+-- (b) MEDIR: ¿hay ruta sin ancla? Se espera que no (la teoría sólo conoce axiomsCodeT por `In`, cf. F1).
+example (φ : Formula) (h : ¬ List.Mem φ axioms) : Prf (neg (In (formCode φ) axiomsCodeT)) := by
+  sorry
+#print axioms ROBINSON_PlusPlus.Meta.OmegaReflect.goedel_first_undecidable_omega

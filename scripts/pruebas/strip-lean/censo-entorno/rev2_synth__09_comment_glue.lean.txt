@@ -1,0 +1,1 @@
+theorem t3 : True := by exact/- c -/sorry

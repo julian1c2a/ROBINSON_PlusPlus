@@ -1,0 +1,3 @@
+def chk (x : Nat) : Bool := !s!"{x}{"\""}".isEmpty
+theorem t : True := sorry
+def z := "x"

@@ -1,0 +1,2 @@
+def tr : Lean.CoreM Unit := do
+  trace[Meta.debug] "v {(sorry : Nat)}"

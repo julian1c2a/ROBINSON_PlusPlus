@@ -1,0 +1,5 @@
+structure P where
+  r : String -> True -> String -> Nat
+def p : P := ⟨fun _ _ _ => 0⟩
+def u := p |>.r"\"" sorry "x"
+theorem t6 : True := trivial

@@ -1,0 +1,8 @@
+-- Sonda L5-04 (ESQUELETO de diseño; no compila tal cual)
+-- structure RuleSchema where
+--   tag : Nat
+--   slots : List Bool        -- true = ranura de fórmula, false = de término
+--   concl : STree            -- plantilla de la conclusión (Meta/SubstTreeReflect.lean)
+-- def ruleTable : List RuleSchema := [ … 18 estructurales … ]
+-- def lineWFAxiomOf : RuleSchema → Formula := …
+-- example : ruleTable.map lineWFAxiomOf = [ax_lineWF_p1, ax_lineWF_p2, …] := rfl   -- si cierra, G no cambia

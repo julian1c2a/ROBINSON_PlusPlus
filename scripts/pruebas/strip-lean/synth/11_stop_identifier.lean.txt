@@ -1,0 +1,1 @@
+def span (start stop : Nat) : Nat := stop - start

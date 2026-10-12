@@ -1,0 +1,176 @@
+ROBINSON_PlusPlus/Meta/D3BodyPrf.lean:65: "lineWF"   ‖ refine prf_eq_trans (prf_substfc_atom zero s (strCode "lineWF")
+ROBINSON_PlusPlus/Meta/D3BodyPrf.lean:73: "lineWF"   ‖ prf_hasWitF_atom1 (strCode "lineWF") (varc (numeral 0)) (prf_hasWit_varc (numeral 0))
+ROBINSON_PlusPlus/Meta/EvalArithPrf.lean:185: "substfc"   ‖ funcc (strCode "substfc") (cons v (cons s (cons f nil)))
+ROBINSON_PlusPlus/Meta/EvalArithPrf.lean:197: "substfc"   ‖ prf_substtc_funcc3 v W (strCode "substfc") x y z
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:70: "liftfc"   ‖ def liftfcT (c f : Term) : Term := funcc (strCode "liftfc") (cons c (cons f nil))
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:126: "liftfc"   ‖ Prf (hasWit (liftfcT c f)) := prf_hasWit_funcc2 (strCode "liftfc") c f hc hf
+ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:135: "liftfc"   ‖ prf_substtc_funcc2 v W (strCode "liftfc") x y
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:54: "carc"   ‖ def carcT (x : Term) : Term := funcc (strCode "carc") (cons x nil)
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:56: "cdrc"   ‖ def cdrcT (x : Term) : Term := funcc (strCode "cdrc") (cons x nil)
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:58: "lenc"   ‖ def lencT (x : Term) : Term := funcc (strCode "lenc") (cons x nil)
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:63: "carc"   ‖ prf_hasWit_funcc1 (strCode "carc") X hX
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:66: "cdrc"   ‖ prf_hasWit_funcc1 (strCode "cdrc") X hX
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:69: "lenc"   ‖ prf_hasWit_funcc1 (strCode "lenc") X hX
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:102: "carc"   ‖ prf_substtc_funcc1 v W (strCode "carc") x
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:105: "cdrc"   ‖ prf_substtc_funcc1 v W (strCode "cdrc") x
+ROBINSON_PlusPlus/Meta/EvalListPrf.lean:108: "lenc"   ‖ prf_substtc_funcc1 v W (strCode "lenc") x
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean:64: "nthc"   ‖ def nthcT (x y : Term) : Term := funcc (strCode "nthc") (cons x (cons y nil))
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean:69: "nthc"   ‖ prf_hasWit_funcc2 (strCode "nthc") X Y hX hY
+ROBINSON_PlusPlus/Meta/EvalNthcPrf.lean:80: "nthc"   ‖ prf_substtc_funcc2 v W (strCode "nthc") x y
+ROBINSON_PlusPlus/Meta/EvalRunFnPrf.lean:49: "runFn"   ‖ def runFnT (x y : Term) : Term := funcc (strCode "runFn") (cons x (cons y nil))
+ROBINSON_PlusPlus/Meta/EvalRunFnPrf.lean:101: "runFn"   ‖ prf_substtc_funcc2 v W (strCode "runFn") x y
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:127: "substfc"   ‖ (prf_hasWit_funcc3 (strCode "substfc") A X C hwA hwX hwC)
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:128: "substfc"   ‖ (prf_hasWit_funcc3 (strCode "substfc") A (varc (numeral 0)) C hwA
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:971: "substtc"   ‖ theorem AXTER_eq : ax_substfc_eq = forall_4 (AXTER_BODY (numeralM 4) "substtc") := rfl
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:972: "substfc"   ‖ theorem AXTER_impl : ax_substfc_impl = forall_4 (AXTER_BODY (numeralM 5) "substfc") := rfl
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1110: "substtsc"   ‖ =eq binct (numeralM 3) (.var 1) (gO "substtsc" (.var 3) (.var 2) (.var 0))
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1137: "substtsc"   ‖ (gT "substtsc" W3 (varc (numeral 2)) (varc (numeral 0))))) :=
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1144: "substtsc"   ‖ (gT "substtsc" W3 (varc (numeral 2)) (varc (numeral 0))))
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1149: "substtsc"   ‖ (gT "substtsc" (tcFn v) (varc (numeral 2)) (varc (numeral 0))))) :=
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1166: "substtsc"   ‖ (gT "substtsc" (tcFn v) (varc (numeral 2)) (varc (numeral 0)))))
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1170: "substtsc"   ‖ (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0))))) := by
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1190: "substtsc"   ‖ (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0)))))
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1194: "substtsc"   ‖ (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0))))) := by
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1211: "substtsc"   ‖ (gT "substtsc" (tcFn v) (tcFn s) (varc (numeral 0)))))
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1214: "substtsc"   ‖ (binK (termCode T) (tcFn a) (gT "substtsc" (tcFn v) (tcFn s) (tcFn b)))) := by
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1227: "substtsc"   ‖ (binK (termCode T) (tcFn a) (gT "substtsc" (tcFn v) (tcFn s) (tcFn b)))) :=
+ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1277: "substtc"   ‖ have h2 := prf_to_prfH (pcc_substfc_ter_dot (numeralM 4) "substtc"
+ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:87: "substtc"   ‖ funcc (strCode "substtc") (cons v (cons s (cons t nil)))
+ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:89: "substtsc"   ‖ funcc (strCode "substtsc") (cons v (cons s (cons ts nil)))
+ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:107: "substtc"   ‖ prf_substtc_funcc3 v W (strCode "substtc") x y z
+ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:111: "substtsc"   ‖ prf_substtc_funcc3 v W (strCode "substtsc") x y z
+ROBINSON_PlusPlus/Meta/Godel.lean:113: "⌜"   ‖ @[inherit_doc encode] scoped notation:max "⌜" S "⌝" => encode S
+ROBINSON_PlusPlus/Meta/Godel.lean:113: "⌝"   ‖ @[inherit_doc encode] scoped notation:max "⌜" S "⌝" => encode S
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:113: "liftc"   ‖ def liftcT (c t : Term) : Term := funcc (strCode "liftc") (cons c (cons t nil))
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:115: "liftsc"   ‖ def liftscT (c ts : Term) : Term := funcc (strCode "liftsc") (cons c (cons ts nil))
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:119: "liftc"   ‖ Prf (hasWit (liftcT c t)) := prf_hasWit_funcc2 (strCode "liftc") c t hc ht
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:121: "liftsc"   ‖ Prf (hasWit (liftscT c t)) := prf_hasWit_funcc2 (strCode "liftsc") c t hc ht
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:167: "liftc"   ‖ prf_substtc_funcc2 v W (strCode "liftc") x y
+ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:170: "liftsc"   ‖ prf_substtc_funcc2 v W (strCode "liftsc") x y
+ROBINSON_PlusPlus/Meta/LineWFThyPrf.lean:78: "axiomsCodeT"   ‖ show Prf (substtc zero W (funcc (strCode "axiomsCodeT") nil)
+ROBINSON_PlusPlus/Meta/LineWFThyPrf.lean:79: "axiomsCodeT"   ‖ =eq funcc (strCode "axiomsCodeT") nil)
+ROBINSON_PlusPlus/Meta/LineWFThyPrf.lean:80: "axiomsCodeT"   ‖ exact prf_eq_trans (prf_substtc_func zero W (strCode "axiomsCodeT") nil)
+ROBINSON_PlusPlus/Meta/LineWFTrackedPrf.lean:563: "lineWF"   ‖ show Prf (substfc zero (tcFn t) (atomc (strCode "lineWF") (cons (varc (numeral 0)) nil))
+ROBINSON_PlusPlus/Meta/LineWFTrackedPrf.lean:564: "lineWF"   ‖ =eq atomc (strCode "lineWF") (cons (tcFn t) nil))
+ROBINSON_PlusPlus/Meta/LineWFTrackedPrf.lean:565: "lineWF"   ‖ refine prf_eq_trans (prf_substfc_atom zero (tcFn t) (strCode "lineWF")
+ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean:149: "vpf_paso"   ‖ local macro "vpf_paso" : tactic => `(tactic| (rw [vpfN_consN]; simp only [stepN, nthN_cz, nthN_cs, nthN_zero_l
+ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean:198: "prems"   ‖ local macro "prems" : tactic => `(tactic| ((simp only [premsOfN, nthN_cz, nthN_cs, nthN_zero_l]) <;> rfl))
+ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean:245: "lwf"   ‖ local macro "lwf" : tactic => `(tactic| (intro h; exact ⟨(lineWFN_of_tag h (by decide)).mp, (lineWFN_of_tag h 
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:51: "0"   ‖ | "0",  []     => 0
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:52: "σ"   ‖ | "σ",  [a]    => a + 1
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:53: "+"   ‖ | "+",  [a, b] => a + b
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:54: "*"   ‖ | "*",  [a, b] => a * b
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:55: "−"   ‖ | "−",  [a, b] => a - b            -- monus, como dice el comentario de `sub_sym`
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:56: "√"   ‖ | "√",  [a]    => sqrtN a
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:57: "/₂"   ‖ | "/₂", [a]    => a / 2
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:58: "%₂"   ‖ | "%₂", [a]    => a % 2
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:59: "τ"   ‖ | "τ",  [a]    => a - 1            -- `pred`
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:60: "^"   ‖ | "^",  [a, b] => a ^ b
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:61: "::"   ‖ | "::", [a, b] => consN a b
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:62: "##"   ‖ | "##", [a, b] => concatN a b
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:63: "Π_p"   ‖ | "Π_p", [l]   => prodpN l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:64: "substtc"   ‖ | "substtc", [k, s, c] => substtcN k s c
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:65: "substtsc"   ‖ | "substtsc", [k, s, c] => substtscN k s c
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:66: "liftc"   ‖ | "liftc", [c, t] => liftcN c t
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:67: "liftsc"   ‖ | "liftsc", [c, t] => liftscN c t
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:68: "substfc"   ‖ | "substfc", [v, t, f] => substfcN v t f
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:69: "liftfc"   ‖ | "liftfc", [c, f] => liftfcN c f
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:70: "carc"   ‖ | "carc", [l] => carN l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:71: "cdrc"   ‖ | "cdrc", [l] => cdrN l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:72: "lenc"   ‖ | "lenc", [l] => lenN l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:73: "nthc"   ‖ | "nthc", [l, i] => nthN l i
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:74: "runFn"   ‖ | "runFn", [c, r] => runFnN c r
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:75: "validProofFn"   ‖ | "validProofFn", [c, r] => vpfN c r
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:76: "tcFn"   ‖ | "tcFn", [t] => tcFnN t
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:77: "premsOf"   ‖ | "premsOf", [l] => premsOfN l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:78: "axiomsCodeT"   ‖ | "axiomsCodeT", [] => V
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:82: "<"   ‖ | "<", [a, b] => a < b
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:83: "∈"   ‖ | "∈", [x, l] => memN x l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:84: "allIn"   ‖ | "allIn", [c, l] => allInN c l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:85: "lineWF"   ‖ | "lineWF", [l] => lineWFN V l
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:86: "chainOk"   ‖ | "chainOk", [c, p] => chainOkN V c p
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:91: "0"   ‖ theorem MN_zero : (MNV V).func "0" [] = 0 := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:92: "σ"   ‖ theorem MN_succ (a : Nat) : (MNV V).func "σ" [a] = a + 1 := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:93: "τ"   ‖ theorem MN_pred (a : Nat) : (MNV V).func "τ" [a] = a - 1 := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:94: "::"   ‖ theorem MN_cons (a b : Nat) : (MNV V).func "::" [a, b] = consN a b := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:95: "##"   ‖ theorem MN_concat (a b : Nat) : (MNV V).func "##" [a, b] = concatN a b := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:96: "substtc"   ‖ theorem MN_substtc (k s c : Nat) : (MNV V).func "substtc" [k, s, c] = substtcN k s c := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:97: "substtsc"   ‖ theorem MN_substtsc (k s c : Nat) : (MNV V).func "substtsc" [k, s, c] = substtscN k s c := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:98: "liftc"   ‖ theorem MN_liftc (c t : Nat) : (MNV V).func "liftc" [c, t] = liftcN c t := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:99: "liftsc"   ‖ theorem MN_liftsc (c t : Nat) : (MNV V).func "liftsc" [c, t] = liftscN c t := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:100: "substfc"   ‖ theorem MN_substfc (v t f : Nat) : (MNV V).func "substfc" [v, t, f] = substfcN v t f := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:101: "liftfc"   ‖ theorem MN_liftfc (c f : Nat) : (MNV V).func "liftfc" [c, f] = liftfcN c f := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:102: "carc"   ‖ theorem MN_carc (l : Nat) : (MNV V).func "carc" [l] = carN l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:103: "cdrc"   ‖ theorem MN_cdrc (l : Nat) : (MNV V).func "cdrc" [l] = cdrN l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:104: "lenc"   ‖ theorem MN_lenc (l : Nat) : (MNV V).func "lenc" [l] = lenN l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:105: "nthc"   ‖ theorem MN_nthc (l i : Nat) : (MNV V).func "nthc" [l, i] = nthN l i := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:106: "runFn"   ‖ theorem MN_runFn (c r : Nat) : (MNV V).func "runFn" [c, r] = runFnN c r := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:107: "validProofFn"   ‖ theorem MN_vpf (c r : Nat) : (MNV V).func "validProofFn" [c, r] = vpfN c r := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:108: "tcFn"   ‖ theorem MN_tcFn (t : Nat) : (MNV V).func "tcFn" [t] = tcFnN t := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:109: "premsOf"   ‖ theorem MN_premsOf (l : Nat) : (MNV V).func "premsOf" [l] = premsOfN l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:110: "axiomsCodeT"   ‖ theorem MN_axiomsCodeT : (MNV V).func "axiomsCodeT" [] = V := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:111: "<"   ‖ theorem MN_lt (a b : Nat) : (MNV V).rel "<" [a, b] = (a < b) := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:112: "∈"   ‖ theorem MN_mem (x l : Nat) : (MNV V).rel "∈" [x, l] = memN x l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:113: "allIn"   ‖ theorem MN_allIn (c l : Nat) : (MNV V).rel "allIn" [c, l] = allInN c l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:114: "lineWF"   ‖ theorem MN_lineWF (l : Nat) : (MNV V).rel "lineWF" [l] = lineWFN V l := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:115: "chainOk"   ‖ theorem MN_chainOk (c p : Nat) : (MNV V).rel "chainOk" [c, p] = chainOkN V c p := rfl
+ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:238: "abre"   ‖ scoped macro "abre" : tactic => `(tactic| simp only [forall_, forall_2, forall_3, forall_4, forall_5, _root_.i
+ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1263: "premsOf"   ‖ refine prf_eq_trans (prf_liftc_funcc1 zero (strCode "premsOf") _) (prf_congr_premsOfT ?_)
+ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean:78: "premsOf"   ‖ def premsOfT (x : Term) : Term := funcc (strCode "premsOf") (cons x nil)
+ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean:87: "premsOf"   ‖ prf_hasWit_funcc1 (strCode "premsOf") X hX
+ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean:94: "premsOf"   ‖ prf_substtc_funcc1 v W (strCode "premsOf") x
+ROBINSON_PlusPlus/Meta/Sigma1AtomPrf.lean:325: "lineWF"   ‖ def lineWFCodeFn (tc : Term) : Term := atom1CodeFn "lineWF" tc
+ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:53: ""   ‖ def dflt : Term := Term.func "" []
+ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:423: "decodifica"   ‖ local macro "decodifica" : tactic => `(tactic| simp only [dec_impl, dec_and, dec_or, dec_bot, dec_eq,
+ROBINSON_PlusPlus/Meta/SubstfcCodePrf.lean:108: "substfc"   ‖ (prf_hasWit_funcc3 (strCode "substfc") A B X hwA hwB hwX)
+ROBINSON_PlusPlus/Meta/SubstfcCodePrf.lean:109: "substfc"   ‖ (prf_hasWit_funcc3 (strCode "substfc") A B (varc (numeral 0)) hwA hwB
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2031: "succ"   ‖ example (x : Term) : Prf (hasWit (funcc (strCode "succ") (cons (tcFn x) nil))) :=
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2036: "add"   ‖ Prf (hasWit (funcc (strCode "add") (cons (tcFn x) (cons (tcFn y) nil)))) :=
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2041: "liftsc"   ‖ Prf (hasWit (funcc (strCode "liftsc") (cons (termCode nil)
+ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2042: "cons"   ‖ (cons (funcc (strCode "cons") (cons (tcFn h) (cons (tcFn t) nil))) nil)))) := by
+ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:228: "nthc"   ‖ prf_liftc_funcc2 c (strCode "nthc") x y
+ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:233: "lenc"   ‖ prf_liftc_funcc1 c (strCode "lenc") x
+ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:238: "carc"   ‖ prf_liftc_funcc1 c (strCode "carc") x
+ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:243: "cdrc"   ‖ prf_liftc_funcc1 c (strCode "cdrc") x
+ROBINSON_PlusPlus/Meta/TrackedCorePrf.lean:147: "chainOk"   ‖ def chainOkCodeFn (cc pc : Term) : Term := atom2CodeFn "chainOk" cc pc
+ROBINSON_PlusPlus/Meta/TrackedCorePrf.lean:154: "allIn"   ‖ def allInCodeFn (cc Lc : Term) : Term := atom2CodeFn "allIn" cc Lc
+ROBINSON_PlusPlus/Minimal/Axioms.lean:39: "σ"   ‖ def succ_sym : String := "σ"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:40: "+"   ‖ def add_sym  : String := "+"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:41: "*"   ‖ def mul_sym  : String := "*"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:42: "−"   ‖ def sub_sym  : String := "−"   -- subtraction (monus): sub a b = max(a-b, 0)
+ROBINSON_PlusPlus/Minimal/Axioms.lean:43: "√"   ‖ def sqrt_sym : String := "√"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:44: "/₂"   ‖ def div2_sym : String := "/₂"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:45: "%₂"   ‖ def mod2_sym : String := "%₂"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:52: "τ"   ‖ def pred_sym : String := "τ"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:53: "[]"   ‖ def nil_sym : String := "[]"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:54: "::"   ‖ def cons_sym : String := "::"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:55: "##"   ‖ def concat_sym : String := "##"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:57: "^"   ‖ def pow_sym  : String := "^"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:58: "Π_p"   ‖ def prodp_sym : String := "Π_p"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:61: "<"   ‖ def lt_sym : String := "<"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:62: "≤"   ‖ def le_sym : String := "≤"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:63: "∈"   ‖ def in_sym : String := "∈"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:66: "0"   ‖ def zero_sym : String := "0"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:140: "#{n}"   ‖ | .var n      => s!"#{n}"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:142: "⟦"   ‖ | .func f args => f ++ "⟦" ++ ", ".intercalate (args.map termToString) ++ "⟧"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:142: ", "   ‖ | .func f args => f ++ "⟦" ++ ", ".intercalate (args.map termToString) ++ "⟧"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:142: "⟧"   ‖ | .func f args => f ++ "⟦" ++ ", ".intercalate (args.map termToString) ++ "⟧"
+ROBINSON_PlusPlus/Minimal/Axioms.lean:457: "substtc"   ‖ def substtc (v s c : Term) : Term := Term.func "substtc" [v, s, c]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:459: "substtsc"   ‖ def substtsc (v s c : Term) : Term := Term.func "substtsc" [v, s, c]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:483: "liftc"   ‖ def liftc (c t : Term) : Term := Term.func "liftc" [c, t]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:485: "liftsc"   ‖ def liftsc (c t : Term) : Term := Term.func "liftsc" [c, t]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:515: "substfc"   ‖ def substfc (v t f : Term) : Term := Term.func "substfc" [v, t, f]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:545: "liftfc"   ‖ def liftfc (c f : Term) : Term := Term.func "liftfc" [c, f]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:795: "carc"   ‖ def carc (l : Term) : Term := Term.func "carc" [l]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:797: "cdrc"   ‖ def cdrc (l : Term) : Term := Term.func "cdrc" [l]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:811: "lenc"   ‖ def lenc (l : Term) : Term := Term.func "lenc" [l]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:813: "nthc"   ‖ def nthc (l i : Term) : Term := Term.func "nthc" [l, i]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:836: "runFn"   ‖ def runFn (checked rest : Term) : Term := Term.func "runFn" [checked, rest]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:856: "allIn"   ‖ def allIn (c L : Term) : Formula := Formula.atom "allIn" [c, L]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:858: "lineWF"   ‖ def lineWF (line : Term) : Formula := Formula.atom "lineWF" [line]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:860: "premsOf"   ‖ def premsOf (line : Term) : Term := Term.func "premsOf" [line]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:864: "chainOk"   ‖ def chainOk (c p : Term) : Formula := Formula.atom "chainOk" [c, p]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:891: "tcFn"   ‖ def tcFn (t : Term) : Term := Term.func "tcFn" [t]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:927: "validProofFn"   ‖ def validProofFn (checked rest : Term) : Term := Term.func "validProofFn" [checked, rest]
+ROBINSON_PlusPlus/Minimal/Axioms.lean:1063: "axiomsCodeT"   ‖ def axiomsCodeT : Term := Term.func "axiomsCodeT" []
+LITERALES en código (no notación): 175 · en líneas de notación/macro: 5
