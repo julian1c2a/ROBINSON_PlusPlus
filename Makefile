@@ -29,7 +29,9 @@ footprints:
 	@bash check-footprints.bash
 
 ## Censo de ESTRATOS (REFERENCE.md §0bis): cuantos `axiom` HABITAN cada nocion de
-## derivabilidad, que es lo unico que decide si `induction` es legitima (M-11).
+## derivabilidad, que es lo que dice si un postulado puede contradecir lo que se demuestra por
+## induccion sobre ella (M-11, corregida en ADR-114 §2 y ADR-133: la induccion es valida; hasta
+## 2026-10-12 decia «lo unico que decide si `induction` es legitima»).
 ## `#print axioms` es CIEGO a esto.
 estratos:
 	@bash check-estratos.bash

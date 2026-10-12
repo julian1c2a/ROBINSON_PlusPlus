@@ -11,6 +11,8 @@
 #   2. Se citan como vigentes símbolos que YA NO EXISTEN en el código
 #      (`goedel_first_real'`, `prf_tc_cons'`, …).
 #
+# ✏️ 2026-10-12 (ADR-133): hoy rompen [A], [B], [C], [D], [E], [F], [H] y [M]; sólo [A2] es aviso. Lo que
+# sigue es la cabecera de entonces:
 # [A], [C] y [D] son OBJETIVOS y rompen el check. [B] es un AVISO que pide juicio:
 # hay menciones legítimas de símbolos inexistentes (históricas, planificadas, descartadas).
 #
@@ -42,7 +44,7 @@ for a in "$@"; do
   case "$a" in
     --quick)     QUICK=1 ;;
     --fix-hint)  HINT=1 ;;
-    -h|--help)   sed -n '2,20p' "$0"; exit 0 ;;
+    -h|--help)   awk 'NR > 1 && /^#/ { print; next } NR > 1 { exit }' "$0"; exit 0 ;;
     *) echo "opción desconocida: $a" >&2; exit 2 ;;
   esac
 done
@@ -572,6 +574,8 @@ DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|stru
 # el nombre entero y su último componente; `prf_univ.{u}` → `prf_univ`
 NOMBRES='{n = $NF; sub(/[.]$/, "", n); if (n == "") next; print n; k = n; sub(/.*[.]/, "", k); if (k != n && k != "") print k}'
 DECLS=$(mktemp); DECLS_SOND=$(mktemp); B_SALIDA=$(mktemp); B_VISTOS=$(mktemp)
+# (las borra [M]; si el script se corta antes, este trap)
+trap 'rm -f "$DECLS" "$DECLS_SOND"' EXIT
 # (todo el tramo en modo byte, LC_ALL=C: con el locale de msys, `grep -o` cortaba un carácter fuera del
 #  BMP y `sort -u` fundía nombres canónicamente equivalentes —tercera revisión—)
 find ROBINSON_PlusPlus/ ROBINSON_PlusPlus.lean cuarentena/ ../FOL/FOL/ ../FOL/TheoryFramework/ ../FOL/FOL.lean -name '*.lean' ! -path '*/.lake/*' -print0 2>/dev/null \
@@ -680,7 +684,8 @@ if [ -n "$B_TOPE_MIN" ] && [ "$B_TOPE" -gt "$B_TOPE_MIN" ]; then
   fi
 fi
 B_DECL=$(sort -u "$B_VISTOS" | grep -c . || true)
-rm -f "$DECLS" "$DECLS_SOND" "$B_SALIDA" "$B_SALIDA.rojo" "$B_VISTOS"
+# (las listas $DECLS y $DECLS_SOND las usa también [M]: se borran allí)
+rm -f "$B_SALIDA" "$B_SALIDA.rojo" "$B_VISTOS"
 if [ "$B_MEDIDO" = "1" ]; then
   echo "  deuda declarada: $B_DECL de $B_NT (tope $B_TOPE) · sin declarar y sin saldar: rompen arriba"
 else
@@ -839,6 +844,136 @@ else
   rm -f "$H_FILES" "$H_ROWS"
 fi
 [ "$H_FAIL" = "0" ] || FAIL=1
+
+# ─── [M] MANDATORIES: lo que nombra la columna «Verificación», existe ───────────────
+echo '════ [M] MANDATORIES — la columna «Verificación» nombra cosas que EXISTEN (ROJO) ════'
+# ⛔ POR QUÉ EXISTE (2026-10-12, ADR-133; T03 de doc/AUDITORIA-SUELO-2026-10-12.md): la tabla de lectura
+# obligatoria de DECISIONS.md verificaba M-10 con `derives_completo` y `hgi_es_refutar`, que no tenían
+# declaración desde ADR-115, y ningún control lo veía: [B] sólo mira citas con siete prefijos y absuelve por
+# marcador. Aquí no hay marcador que valga.
+# Cada fila `| **M…** |` debe ocupar UNA línea y tener 4 columnas: si no, ROJO (la M-11 vieja, partida en 16
+# líneas, escondía así su verificación). En la ÚLTIMA columna, cada cita entre comillas invertidas se comprueba
+# según su forma:
+#   · una ORDEN (lleva espacios): sus palabras con forma de ruta deben existir (`bash X` → X); las que tienen
+#     forma de nombre Lean con `_` (sin comillas pegadas: un patrón de grep no cuenta) deben estar declaradas,
+#     y si acaban en `_`, como familia (por prefijo);
+#   · una RUTA (lleva `/` o acaba en .bash/.lean/.md/.yml/.awk/.py; se quita `:línea`): debe existir, mirada
+#     desde la raíz, desde ROBINSON_PlusPlus/, desde ../FOL/ y desde ../FOL/FOL/;
+#   · un NÚMERO (un run de CI): no se comprueba;
+#   · un SUFIJO (`_rhs` tras `substCodeT_hole_lhs`, en la MISMA fila): se arma con la cita anterior;
+#   · una palabra clave de Lean (M_KW: `axiom`, `export`, `rfl`): no se comprueba;
+#   · un MÓDULO (`FOL.Skolem0`): debe existir su fichero; si no, se trata como un nombre;
+#   · un NOMBRE: debe estar DECLARADO (el nombre entero o su último componente) en el build, en FOL o en un
+#     sondeo — las listas de [B]; si acaba en `_`, es una familia y basta uno con ese prefijo.
+# ⚠️ Lo que NO mira: lo que no va entre comillas invertidas, y si la verificación verifica de verdad la regla.
+# ⭐ Con AUTOTEST: dos filas sintéticas —una con un nombre, una ruta y un nombre‑en‑orden inexistentes, más uno
+#    que sólo declara un sondeo y que debe pasar; otra partida en dos líneas— deben dar exactamente 4 fallos; si
+#    no, el control no mide y lo dice. Se estrenó con el fallo puesto (ADR-133): ver ese ADR.
+# 🔧 Para probarlo contra otra versión de la tabla: M_DOC=fichero bash check-doc-sync.bash. Es un MODO DE
+#    PRUEBA: dice qué fichero miró y nunca da verde.
+M_FAIL=0
+M_KW=" axiom export rfl "
+M_IDRE="^[A-Za-z_][A-Za-z0-9_.'!?]*$"
+m_tokens() {   # stdin: líneas de la tabla → «fila<TAB>cita»; una fila mal formada → «fila<TAB>@@FILA»
+  LC_ALL=C awk '
+    /^\| \*\*M/ {
+      s = $0; sub(/[ \t\r]+$/, "", s)
+      id = s; sub(/^\| \*\*/, "", id); sub(/\*\*.*$/, "", id)
+      if (s !~ /\|$/) { print id "\t@@FILA"; next }
+      sub(/^\| /, "", s); sub(/ \|$/, "", s)
+      n = split(s, c, / \| /)
+      if (n != 4) { print id "\t@@FILA"; next }
+      v = c[4]
+      while (match(v, /`[^`]+`/)) { print id "\t" substr(v, RSTART + 1, RLENGTH - 2); v = substr(v, RSTART + RLENGTH) }
+    }'
+}
+m_ruta() {
+  local r="${1%%:*}"; r="${r%/}"
+  local p
+  for p in "" "ROBINSON_PlusPlus/" "../FOL/" "../FOL/FOL/"; do [ -e "$p$r" ] && return 0; done
+  return 1
+}
+m_declarado() {   # sin tuberías: con `pipefail`, un `grep -q` que corta a su productor daba 141 (falso «no»)
+  LC_ALL=C grep -qxF -- "$1" "$DECLS" && return 0
+  LC_ALL=C awk -F'|' -v n="$1" '$1 == n { f = 1; exit } END { exit !f }' "$DECLS_SOND"
+}
+m_familia() {     # algún nombre declarado empieza por $1
+  LC_ALL=C awk -v p="$1" 'index($0, p) == 1 { f = 1; exit } END { exit !f }' "$DECLS" && return 0
+  LC_ALL=C awk -F'|' -v p="$1" 'index($1, p) == 1 { f = 1; exit } END { exit !f }' "$DECLS_SOND"
+}
+m_modulo() {
+  local p="${1//.//}.lean" q
+  for q in "" "../FOL/"; do [ -f "$q$p" ] && return 0; done
+  return 1
+}
+m_revisa() {   # stdin: líneas de la tabla → stdout: «fila|cita|motivo» por cada fallo
+  local prev="" f0="" fila tok w cand
+  m_tokens | while IFS=$'\t' read -r fila tok; do
+    if [ "$fila" != "$f0" ]; then prev=""; f0="$fila"; fi
+    if [ "$tok" = "@@FILA" ]; then echo "$fila|(la fila)|no ocupa UNA línea con 4 columnas"; continue; fi
+    case "$tok" in
+      *" "*)
+        read -ra M_PALABRAS <<< "$tok"
+        for w in "${M_PALABRAS[@]}"; do
+          case "$w" in
+            \'*|*\'|\"*|*\") : ;;
+            */*|*.bash|*.lean|*.md|*.yml|*.awk|*.py) m_ruta "$w" || echo "$fila|$tok|ruta inexistente: $w" ;;
+            *)
+              w="${w%[,;:)]}"; w="${w#[(]}"
+              if [[ "$w" =~ $M_IDRE ]] && [[ "$w" == *_* ]]; then
+                if [[ "$w" == *_ ]]; then m_familia "$w" || echo "$fila|$tok|familia sin ningún nombre declarado: $w"
+                elif ! m_declarado "$w" && ! m_declarado "${w##*.}"; then echo "$fila|$tok|no declarado: $w"; fi
+              fi ;;
+          esac
+        done ;;
+      */*|*.bash|*.lean|*.md|*.yml|*.awk|*.py) m_ruta "$tok" || echo "$fila|$tok|ruta inexistente" ;;
+      [0-9]*) : ;;
+      _*) if [ -n "$prev" ]; then cand="${prev%_*}$tok"; m_declarado "$cand" || echo "$fila|$tok|no declarado: $cand"
+          else echo "$fila|$tok|sufijo sin nombre delante en su fila"; fi ;;
+      *)
+        if [[ "$M_KW" == *" $tok "* ]]; then :
+        elif [[ "$tok" == *_ ]]; then m_familia "$tok" || echo "$fila|$tok|familia sin ningún nombre declarado"
+        elif [[ "$tok" == *.* ]] && m_modulo "$tok"; then :
+        elif m_declarado "$tok" || m_declarado "${tok##*.}"; then prev="$tok"
+        else echo "$fila|$tok|no declarado"; fi ;;
+    esac
+  done
+}
+M_FICH="${M_DOC:-DECISIONS.md}"
+if [ -n "${M_DOC:-}" ]; then echo "  ⚠️ MODO DE PRUEBA: la tabla se lee de $M_FICH (en este modo [M] nunca da verde)"; fi
+if [ "$B_MEDIDO" != "1" ]; then
+  echo "  ❌ NO PUDE MEDIR [M]: sin las listas de declaraciones de [B]."
+  M_FAIL=1
+elif [ ! -f "$M_FICH" ]; then
+  echo "  ❌ NO PUDE MEDIR [M]: no existe $M_FICH."
+  M_FAIL=1
+else
+  M_AUTO=$(printf '%s\n' \
+    '| **M-0** | prueba | — | `no_existe_jamas_m0`, `ROBINSON_PlusPlus/NoExiste_m0.lean`, `#print axioms muerto_m0_zz`, `goedel_first_prf` y `prf_wfAll_objList` |' \
+    '| **M-00** | prueba partida | — | `goedel_first_prf`' \
+    '  y su continuación |' | m_revisa | wc -l | tr -d ' ')
+  M_TABLA=$(awk '/^## ⚠️ MANDATORIES/{f=1; next} f && /^## /{exit} f && /^\| \*\*M/{print}' "$M_FICH")
+  M_NF=$(printf '%s\n' "$M_TABLA" | grep -c '^| \*\*M' || true)
+  M_NT=$(printf '%s\n' "$M_TABLA" | m_tokens | grep -vc '@@FILA$' || true)
+  if [ "$M_AUTO" != "4" ]; then
+    echo "  ❌ NO PUDE MEDIR [M]: el autotest debía dar 4 fallos y da $M_AUTO."
+    M_FAIL=1
+  elif [ "$M_NF" -lt 10 ] || [ "$M_NT" -lt 20 ]; then
+    echo "  ❌ NO PUDE MEDIR [M]: sólo $M_NF filas y $M_NT citas en la tabla MANDATORIES (¿cambió su cabecera?)."
+    M_FAIL=1
+  else
+    M_ROJO=$(printf '%s\n' "$M_TABLA" | m_revisa)
+    if [ -n "$M_ROJO" ]; then
+      printf '%s\n' "$M_ROJO" | while IFS='|' read -r f t m; do echo "  ✗ $f: \`$t\` — $m"; done
+      M_FAIL=1
+    else
+      echo "  ✓ las $M_NT citas de la columna «Verificación» ($M_NF filas) nombran cosas que existen"
+    fi
+  fi
+fi
+[ -n "${M_DOC:-}" ] && M_FAIL=1
+rm -f "$DECLS" "$DECLS_SOND"
+[ "$M_FAIL" = "0" ] || FAIL=1
 
 # ─── RESUMEN ────────────────────────────────────────────────────────────────
 echo

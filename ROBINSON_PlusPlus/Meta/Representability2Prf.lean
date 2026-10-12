@@ -177,7 +177,8 @@ theorem f1_traduccion_refutada (a : Term)
 ⭐ **2026‑10‑04/05 · ADR‑117 y ADR‑118.** El ancla es un teorema (`prf_ancla`, arriba), por el axioma diagonal,
 y la clase `AnclaEq` que la llevaba como hipótesis se RETIRÓ (ADR‑118): sus 426 ligaduras, fuera —423 del build
 y 3 del sondeo de F1—, y sus tres usos de `AnclaEq.eq`, a `prf_ancla`. Lo que sigue es su historia: por qué
-fue una clase (ADR‑026) y por qué no podía ser un `axiom` de Lean, que sigue siendo cierto. Lo que ya no vale:
+fue una clase (ADR‑026) y por qué no podía ser un `axiom` de Lean (lo que sigue siendo cierto es la razón de fondo;
+la de M‑11 estaba al revés: ver la nota ✏️ 2026‑10‑12 al final de esta sección). Lo que ya no vale:
 el argumento de F1 (ADR‑114), que era sobre la teoría de 141 axiomas, sin el ancla, y no se traslada a los 142.
 
 **EL ANCLAJE DE CODIFICACIÓN — HIPÓTESIS CON NOMBRE, ya no `axiom`** ([ADR‑026](../../DECISIONS.md),
@@ -209,7 +210,11 @@ Como **clase**, la resolución de instancias la hila sola: basta `variable [Ancl
 afectado y **ninguna llamada cambia**. El footprint sigue limpio.
 
 ⇒ `Prf` queda **sin ningún `axiom` habitándolo** y las inducciones sobre `Prf` pasan a ser
-**legítimas** (eran tres; quedan dos, `prf_to_prfH` y `prf_to_derivation`). -/
+**legítimas** (eran tres; quedan dos, `prf_to_prfH` y `prf_to_derivation`).
+
+✏️ 2026‑10‑12 (ADR‑133): esta nota lee M‑11 al revés (ADR‑114 §2). Las tres inducciones eran VÁLIDAS: el recursor
+cubre también al habitante que fabrica un `axiom`. Lo que se arriesgaba era el postulado: si `Prf (ancla)`
+contradecía lo que se demuestra por inducción sobre `Prf` (la solidez, por ejemplo), Lean + él ⊢ `False`. -/
 
 /-- **Pertenencia POSITIVA en `Prf`** de un código de fórmula a `listFormCodeM L` (recursión
     estructural sobre `L`, sin materializar el término): cabeza = `prf_in_cons_head`, cola =

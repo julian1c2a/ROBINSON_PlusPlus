@@ -162,7 +162,8 @@ while IFS='|' read -r NOMBRE CTORS HABS SOLIDEZ; do
   [ "$REAL_H" = "$HABS" ]  || OK=0
   if [ "$OK" = "1" ]; then
     if [ "$HABS" = "0" ]; then
-      printf "  ✓ %-46s %3s ctors · %s axiomas ⇒ INDUCCIÓN LEGÍTIMA\n" "$NOMBRE" "$REAL_C" "$REAL_H"
+      # ✏️ 2026-10-12 (ADR-133): decía «⇒ INDUCCIÓN LEGÍTIMA», la lectura vieja de M-11.
+      printf "  ✓ %-46s %3s ctors · %s axiomas ⇒ ningún postulado que contrastar\n" "$NOMBRE" "$REAL_C" "$REAL_H"
     else
       printf "  ✓ %-46s %3s ctors · %s axiomas ⛔ HABITADO: compruébalos contra lo que la inducción demuestra (ADR-115)\n" "$NOMBRE" "$REAL_C" "$REAL_H"
     fi

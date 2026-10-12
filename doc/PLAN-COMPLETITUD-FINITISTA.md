@@ -1523,7 +1523,9 @@ Lo de arriba queda como registro. Compilado (FOL 58 jobs, RPP 129) y MEDIDO:
 * **No perseguir un footprint sin `Classical.choice` en la vía W.** Es el teorema, no la
   formalización (§6.3).
 * **No tocar las 320 citas de las meta‑reglas en RPP.** `Derives₀` es un objeto nuevo (§3.4).
-* **No inducir sobre `Derives`.** M‑11 es permanente (ADR‑029): suelo de cuatro.
+* ~~**No inducir sobre `Derives`.** M‑11 es permanente (ADR‑029): suelo de cuatro.~~ ✏️ *(2026‑10‑12, ADR‑133)*: era al
+  revés (ADR‑114 §2): inducir sobre `Derives` es válido, y hoy ningún `axiom` lo habita (los cuatro de `MetaRules` se
+  borraron con ADR‑115).
 
 ---
 
@@ -1547,6 +1549,6 @@ publicado y **rompe** si no cuadra. Probado en los dos modos de fallo: footprint
 
 ---
 
-**Véase también:** `DECISIONS.md` ADR‑024 (M‑10), ADR‑029 (M‑11 permanente), ADR‑030, ADR‑031,
+**Véase también:** `DECISIONS.md` ADR‑024 (M‑10), ADR‑029 (M‑11 «permanente»; al revés, ADR‑114 §2), ADR‑030, ADR‑031,
 ADR‑032 · `sondeos/HenkinSaleDeRaa.lean` · `sondeos/ClassicalChoiceCenso.lean` ·
 `sondeos/AnclaSoundness.lean` · `../FOL/AXIOMS.md` · `../FOL/cuarentena/README.md`.

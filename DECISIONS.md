@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
 >
@@ -92,34 +92,19 @@ proyecto; no introduce ninguna nueva.
 
 | # | MANDATORY | ADR | Verificación |
 |---|---|---|---|
-| **M-1** | ⛔ **Ningún `axiom` nuevo —de Lean o de la teoría objeto— sin sanción explícita del autor y su ADR.** Un axioma sin ADR ya hizo **inconsistente** la teoría objeto | ADR-010/011/012/013 | `AXIOMS.md` (inventario) · `check-doc-sync.bash` [A] contrasta la cifra «N `axiom` de Lean» con `grep '^axiom '` · `#print axioms` en cada frente |
+| **M-1** | ⛔ **Ningún `axiom` nuevo —de Lean o de la teoría objeto— sin sanción explícita del autor y su ADR.** Un axioma sin ADR ya hizo **inconsistente** la teoría objeto | ADR-010/011/012/013 | `AXIOMS.md` (inventario) · `check-doc-sync.bash` [A] contrasta la cifra «N `axiom` de Lean» con el patrón de `check-axioms.bash` (de FOL), sobre el código sin comentarios · `#print axioms` en cada frente. ✏️ *(2026‑10‑12, ADR‑133)*: decía «con grep '^axiom '», que ADR‑116 sustituyó (era ciego a private, a los atributos y a la sangría) |
 | **M-2** | ⛔ **Las imágenes punteadas (`substfcT`, `substtcT`, `liftcT`, `liftfcT`, `predcT`) son DEFINICIONES, jamás axiomas.** Postular la ecuación de rastreo (`ax_tc_substfc`, `ax_tc_cons`) da `axioms ⊢ ⊥`; los puentes se escriben `:= rfl` y el salto sólo vale **dentro de `Prov`** | ADR-012/013/015 | `grep -rn '^axiom ax_tc_' ROBINSON_PlusPlus/` debe dar **0** |
 | **M-3** | ⛔ **NUNCA `cd FOL && lake build`.** `FOL` es dependencia LOCAL (`require FOL from "../FOL"`) y compilarla desde su propio directorio usa **otro toolchain**. Todo se compila desde la raíz de `ROBINSON_PlusPlus` | — | `update-toolchain.bash` compila desde la raíz; el `lakefile.lean` es la única fuente del target |
 | **M-4** | **Cero `sorry` en el árbol activo.** No se «aparca» una prueba con `sorry`: o entra probada, o se queda en `sondeos/` | — | `bash check-sorry.bash` → `✅ No sorry found.` (cuenta el TOKEN, fuera de comentarios y cadenas; AI-GUIDE §27.1) |
 | **M-5** | **Todo módulo de producción aparece en el catálogo `REFERENCE.md` §1** y termina con su bloque `export` — puesto **por CONSUMO, no por existencia** | AI-GUIDE §1/§14/§17 | `check-doc-sync.bash` [C] (proyección). ⚠️ El «por consumo» del `export` **no** tiene verificación mecánica todavía: se audita a mano (así se detectaron B8b y el dedup de §3.52) |
-| **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación.** `[A]`, `[C]` y `[D]` rompen; `[B]` es aviso y **pide juicio**, no se ignora | AI-GUIDE §27 | el propio script (exit 0) |
-| **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y el propio `hPl` no compila |
-| **M-11** | ⛔⛔ **Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita.** Un `axiom` cuyo tipo es una aplicación de un `inductive` produce habitantes que **no son aplicaciones de constructor**; la inducción cubre los constructores, pero el teorema cuantifica sobre **todos** los habitantes ⇒ el teorema es **FALSO**. ⚠️ Es *eliminar* lo peligroso (`induction`/`cases`/`rec`), **no** *introducir*: usar los constructores para construir es seguro. ⛔⛔ **`Derives` NO ADMITIRÁ INDUCCIÓN NUNCA, y eso es PERMANENTE, no deuda** ([ADR‑029](#),
-2026‑09‑13): los cuatro de `FOL/MetaRules.lean` (`imp_intro`, `raa`, `or_elim`, `ex_elim`) son
-**irreducibles** —su premisa es una ocurrencia no positiva que el kernel rechaza—, así que siempre
-habrá habitantes‑basura. ⇒ **No se persiga limpiarlo.** El cálculo del que **sí** se puede decir
-algo por inducción es **`Prf₀`** (cero axiomas habitándolo), y es donde vive `prf0_soundness`.
-
-⭐ **EL CRITERIO QUE DE VERDAD SEPARA NO ES «META‑REGLA» SINO *PREMISA‑FUNCIÓN*** (2026‑09‑12,
-medido compilando): un `axiom` cuya premisa es `Γ ⊢ A → Γ ⊢ B` **tiene** que ser axioma —el kernel
-rechaza el `inductive`: *«has a non positive occurrence of the datatypes being declared»*—; uno cuya
-premisa sea un `Γ ⊢ …` directo o un `∀` sobre otro tipo **podría ser CONSTRUCTOR**.
-⚠️ **Y RPP FABRICA uno de los malos**: `ax_list_induction` (`Full/Lists.lean:55`) tiene 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-`step : ∀ h t, Γ ⊢ φ t → Γ ⊢ φ (cons h t)` — **premisa‑FUNCIÓN**, la forma exacta de `raa`.
-🔑 **Regla de diseño**: *una regla que se quiere añadir a una relación inductiva se añade como
-**CONSTRUCTOR** (o con un inductivo que la envuelva), **nunca** como `axiom`. Un `axiom` **no
-extiende el punto fijo: afirma una falsedad sobre él**.*
-**LISTA NEGRA** (prohibido inducir): **`FOL.Derives` — DOCE** (8 en FOL: los 6 de `MetaRules` **más** un segundo `dne` en `Theorems/Neg.lean:57` y `forall_not_impl_exists_not` en `Theorems/Quantifiers.lean:115`; +4 en RPP: `ax_induction_prim`, `ax_list_induction`, `ax_axiomsCodeT_eq`, `ax_p_tfa`); **`Prf` — 1** (`prf_axiomsCodeT_eq`). **LISTA BLANCA** (seguro): **`Prf₀`** y **`PrfH`**, cero axiomas habitándolos. ⚠️ *Censo corregido el 2026‑09‑12: la primera versión contaba **nueve** y son **doce**; los dos que faltaban estaban **fuera** de `MetaRules`, que es justo donde nadie miró* | ADR-025 | `grep -rn "^axiom "` y mirar si el tipo **concluye** en el inductivo (ojo: puede concluir dentro de un `∃`, como `ax_p_tfa`). ⬜ No mecanizado |
-| **M-10** | ⛔ **Ningún teorema cuyo enunciado hable de INDEMOSTRABILIDAD, indecidibilidad o consistencia puede formularse sobre `⊢`** — sólo sobre **`Prf`**. `axioms ⊢` es **sintácticamente COMPLETO** (`Meta/OmegaStrength.lean`), luego **no es r.e.** y `¬(axioms ⊢ X)` significa **«el cálculo REFUTA X»**, no «no lo demuestra» | ADR-024 | `derives_completo` + `hgi_es_refutar`; y a mano, al enunciar |
+| **M-6** | **`bash check-doc-sync.bash` en verde antes de cerrar cualquier pasada de documentación**, lanzado desde PowerShell: desde Bash `lake` no está en el PATH y el script da ROJO por no poder medir. Rompen `[A]`, `[B]`, `[C]`, `[D]`, `[E]`, `[F]`, `[H]` y `[M]`; sólo `[A2]` es aviso, y pide juicio. ✏️ *(2026‑10‑12, ADR‑133)*: decía «`[A]`, `[C]` y `[D]` rompen; `[B]` es aviso»: `[B]` rompe desde ADR‑084 (con trinquete), y `[E]`, `[F]`, `[H]` y `[M]` llegaron después | AI-GUIDE §27 · ADR-084 · ADR-133 | el propio script (exit 0) |
+| **M-7** | ⚠️ **El `PsiF` de un chasis inductivo (`pcc_bdAll_intro`) sólo es natural si el PARÁMETRO NO VIAJA DENTRO DE LA FÓRMULA que se codifica.** Si va dentro, `hPl` es **FALSA** y hace falta escribirlo con símbolos OBJETO y puentear dentro de `Prov`; si entra **sólo como testigo** (cuerpo cerrado), el `substCodeF`/`substCodeF2` **es** natural y no hace falta nada. ⚠️ **Afinada el 2026‑09‑10f** (§3.66.1): la forma vieja —«nunca un `substCodeF`»— sobre‑prohibía | ADR-021 | dos `rfl` (`substCodeT_hole_lhs`/`_rhs`, `Meta/D3ChainDotPrf.lean` §10.1) — y la hipótesis hPl, escrita con un `substCodeF` del parámetro, no compila. ✏️ *(2026‑10‑12, ADR‑133)*: decía «y el propio hPl no compila», con hPl entre comillas invertidas como si fuera una declaración; es una hipótesis de pcc_bdAll_intro |
+| **M-11** | ⛔⛔ **Antes de POSTULAR un `axiom` cuya conclusión es un inductivo (lo HABITA), comprobar que no contradice lo que se demuestra por inducción sobre él.** El recursor cubre a TODO habitante, también a los que fabrica un axioma: un teorema probado por inducción sobre un inductivo habitado es **VÁLIDO**. Lo que puede ser falso es el **axioma**: si contradice lo que la inducción demuestra, Lean + él ⊢ `False`, como los cuatro de `FOL/MetaRules.lean` (borrados con ADR‑115). ⚠️ `#print axioms` es CIEGO a esto: el footprint de un teorema probado por inducción no lleva los axiomas que habitan el inductivo. 🔑 **Regla de diseño**, que sigue en pie: una regla que se quiere añadir a una relación inductiva se añade como CONSTRUCTOR (o con un inductivo que la envuelva), nunca como `axiom`; un `axiom` no extiende el punto fijo, afirma algo sobre él. Hoy ningún estrato está habitado. ✏️ *(2026‑10‑12, ADR‑133)*: hasta hoy esta fila decía lo contrario —«Antes de demostrar algo por INDUCCIÓN sobre un tipo inductivo, comprobar que NINGÚN `axiom` lo habita… ⇒ el teorema es FALSO», «`Derives` NO ADMITIRÁ INDUCCIÓN NUNCA», con las listas negra y blanca del 2026‑09‑12/13, en dieciséis líneas—, y era al revés (ADR‑114 §2: *M‑11 evitaba ESCRIBIR la contradicción, no la quitaba*). El build induce hoy sobre `Derives` (`derives_to_derives0`) y sobre `Prf` (`prf_sound`, en la que descansa `ConsistentH`). La regla vieja y sus listas quedan como registro en ADR‑025 y ADR‑029 | ADR-025 · ADR-114 §2 · ADR-115 | `bash check-estratos.bash` (desde PowerShell): cuántos `axiom` habitan cada inductivo, medido por el tipo de cada axioma, y rompe en los dos sentidos; mecanizado desde el 2026‑09‑16 |
+| **M-10** | ⛔ **Los enunciados de indemostrabilidad, indecidibilidad o consistencia van sobre `Prf`** (el cálculo de Hilbert de `Meta/Hilbert.lean`), y no sobre otro cálculo sin un puente demostrado. ✏️ *(2026‑10‑12, ADR‑133)*: la razón que daba esta fila —que `axioms ⊢` era sintácticamente COMPLETO, en el `Meta/OmegaStrength.lean` de entonces, verificado con los teoremas `derives_completo` y `hgi_es_refutar`— es de un `axioms ⊢` que ya no existe: la capa `⊢` salió de RPP con ADR‑115 (`b1dedd1`) y las cuatro meta‑reglas de FOL con `3b355d7` (`Derives` sigue en FOL, sin ellas); los dos teoremas no tienen hoy declaración y el módulo ya no existe | ADR-024 · ADR-115 | las filas de `goedel_I`, `goedel_I_neg`, `goedel_II` y `goedel_second_prf` en `check-footprints.bash` (existen, y con los tres axiomas de Lean); que su ENUNCIADO hable de `Prf` lo fijará el contrato de T07 (`doc/AUDITORIA-SUELO-2026-10-12.md`); hasta entonces, a mano, al enunciar |
 | **M-9** | ⛔ **Un `Probe/` que decide un ADR se PROMUEVE a `sondeos/` antes de cerrar ese ADR** — o la decisión queda **sin evidencia versionada**. `Probe/` está en `.gitignore` **a propósito** (es borrador); `sondeos/` es el **resultado**, y se versiona con su fila en `sondeos/README.md`. Si el probe pasó a **producción**, la evidencia es el módulo y no hay nada que promover | [auditoría F‑9](doc/AUDITORIA-2026-09-11.md) · `PLAN-PRUEBAS.md` §2.1 | a mano: todo ADR debe citar su sondeo o su módulo |
 | **M-8** | ⚠️ **Subsumir la CLASE no es descargar la OBLIGACIÓN.** Antes de dar por resuelto un frente con «la clase X ya cubre la clase Y», leer **qué obligación queda después**: `numTree_of_isCodeShaped` es **cierto como teorema** y su conclusión —«no hay que cambiar `StdChain`»— **falsa**, porque la obligación que deja (`m ≠ n` con `codeNat` astronómico) **no es descargable** | ADR-022 | `stdChain_proofCode'` + `junk_line_not_stdLine` (`Meta/OmegaReflect.lean` §1ter/§1quater) |
 | **M-12** | ⛔ **Empujar `FOL` ANTES que `ROBINSON_PlusPlus`.** La CI de RPP **clona FOL como hermana**; si se empuja RPP primero, la CI compila contra un FOL viejo y `check-footprints` falla con «NO MEDIDO» en los titulares nuevos. ⚠️ Es una **CARRERA**, no un fallo determinista: los cuatro pushes anteriores del mismo día pasaron con el orden malo, y el quinto no. 🔑 *Un fallo intermitente es peor que uno fijo: da verde el número de veces suficiente para que nadie mire el orden.* | — | MEDIDO el 2026‑09‑17, run `35214528037`: dos titulares de `FOL.Skolem0` «NO MEDIDO» con el repo local en verde. Verificación: `gh run list` tras cada pareja de pushes |
-| **M-13** | ⚠️ **Una cifra de control se REEJECUTA o se marca con su ALCANCE.** Copiarla de una pasada a la siguiente la convierte en decoracion: «0 warnings» viajo por ADR-057/058/059 siendo la cifra de la `lean_lib FOL` **sola** (reales: 7 en RPP + 4 en FOL). Y su reciproca: **un control sin nada que contrastar no aprueba, se ABSTIENE** — `check_num` sin aparicion imprime «control VACIO» y sale con **0** | ADR-060 §6, ADR-061 §1 | ⬜ falta `check-warnings.bash`; el aviso «control VACIO» ya existe y hay que LEERLO |
+| **M-13** | ⚠️ **Una cifra de control se REEJECUTA o se marca con su ALCANCE.** Copiarla de una pasada a la siguiente la convierte en decoracion: «0 warnings» viajo por ADR-057/058/059 siendo la cifra de la `lean_lib FOL` **sola** (reales: 7 en RPP + 4 en FOL). Y su reciproca: **un control sin nada que contrastar no aprueba, se ABSTIENE** — `check_num` sin aparicion imprime «control VACIO» y sale con **0** | ADR-060 §6, ADR-061 §1 | `bash check-warnings.bash` (desde PowerShell; los avisos declarados, por fichero y clase), y el aviso «control VACÍO» de check-doc-sync, que hay que LEERLO. ✏️ *(2026‑10‑12, ADR‑133)*: aquí decía «⬜ falta check-warnings.bash», que existe desde ADR‑065 (b22dd85, 2026‑09‑18) |
 
 > **Sobre `Classical.*`**: este proyecto **no** lo prohíbe (2 usos verificados el
 > 2026-07-12). Lo que sí mantiene es la disciplina de **cero axiomas espurios** de M-1.
@@ -1762,6 +1747,8 @@ sobre `Prf`.
 
 **Fecha:** 2026‑09‑11 · **Estado:** ✅ SANCIONADO (contención ejecutada; la reparación de fondo, abierta)
 
+✏️ *(2026‑10‑12, ADR‑133)*: la regla que este ADR sancionó (M‑11: «un `axiom` que habita un inductivo prohíbe la inducción») era al revés —ADR‑114 §2: la inducción es válida; lo que puede ser falso es el axioma—, y la fila M‑11 de MANDATORIES está reescrita. Y también eran al revés su título y su frase «el enunciado no es demostrable porque no es verdad»: ese enunciado es hoy el teorema `derives_soundness` (`../FOL/FOL/Inconsistencia.lean:107`), y lo falso era `raa` (`../FOL/FOL/Inconsistencia.lean:11`). Lo que sigue es registro.
+
 ### El hecho, medido y compilado
 
 `FOL/Soundness.lean` probaba `soundness {Γ f} (h : Γ ⊢ f) : Γ ⊨ f` por `induction h`. Eso es
@@ -1886,6 +1873,8 @@ fantasma** — importable, invisible al build, y sin fuente que auditar.
 
 **Fecha:** 2026‑09‑12 · **Estado:** ✅ EJECUTADO (decisión del propietario: *«elegimos (A) parametrizar
 con la IGUALDAD»*) · **Consecuencia de:** [ADR‑025](#) / **M‑11**
+
+✏️ *(2026‑10‑12, ADR‑133)*: M‑11 se leía al revés (ADR‑114 §2): las inducciones sobre `Prf` eran válidas y lo que se arriesgaba era el postulado. Lo que este ADR convirtió en clase es hoy el TEOREMA `prf_ancla` (`Meta/Representability2Prf.lean:157`), que se apoya en el axioma objeto diagonal `ax_axiomsCodeT_def` (ADR‑117); la clase `AnclaEq` daba `Prf ⊥` (ADR‑114) y se retiró (ADR‑118). Lo que sigue es registro.
 
 ### El problema, medido
 
@@ -2110,6 +2099,8 @@ incluido `Γ = []`, diciendo que la inducción de listas es **lógicamente váli
 mismo argumento de [ADR‑023](#) para `ax_induction`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 ### 2 · ⛔⛔ M‑11 sobre `Derives` es PERMANENTE
+
+✏️ *(2026‑10‑12, ADR‑133)*: era al revés (ADR‑114 §2). La inducción sobre `Derives` era válida; lo falso eran los cuatro axiomas de `FOL/MetaRules.lean`, borrados con ADR‑115, y hoy el build induce sobre `Derives` (`derives_to_derives0`). Lo que sigue es registro.
 
 Conviene decirlo como conclusión y no dejarlo como tarea abierta:
 
@@ -2838,6 +2829,8 @@ y cuál **sujeto**. Ése es el agujero que se cobró `FOL.soundness`.
 noción tiene ninguno.
 
 ### 3 · `check-estratos.bash`, y por qué NO lo cubría `check-footprints`
+
+✏️ *(2026‑10‑12, ADR‑133)*: «es **injustificado**» y «si **la inducción que lo probó era legítima**» son de la M‑11 vieja (ADR‑114 §2): la inducción es válida, y `check-estratos` mide qué postulados habitan cada inductivo, que es lo que podría contradecirla. Y el mensaje «si era inducible, HA DEJADO DE SERLO» es hoy «si contradicen lo ya probado por inducción, son FALSOS» (`check-estratos.bash`). Lo demás de esta sección sigue en pie.
 
 ⛔⛔ **`#print axioms` es CIEGO a esta clase.** Un teorema probado por inducción sobre un inductivo
 habitado tiene footprint **limpio** y es **injustificado**.
@@ -10057,3 +10050,76 @@ ADR‑129 decía «revisión adversarial aplicada» sin decir cuál: ahora la ci
 que vivían fuera de git.*
 
 **Véase también:** ADR‑114/115 (la auditoría de la base), ADR‑129 (D7), ADR‑131 (la frontera del `choice`).
+
+---
+
+<a id="adr-133"></a>
+## ADR-133: 📜 La tabla MANDATORIES, corregida —M‑11 al derecho, M‑10 y M‑6— y el control [M]
+
+**Fecha:** 2026-10-12 · **Estado:** ✅ (este commit) · **Ámbito:** `DECISIONS.md` (MANDATORIES: M‑6, M‑10, M‑11 y la
+verificación de M‑7 y M‑13; notas fechadas en ADR‑025, ADR‑026, ADR‑029 §2 y ADR‑038 §3), `check-doc-sync.bash` (el bloque
+`[M]`, nuevo, y su cabecera), `Meta/Representability2Prf.lean` (un comentario), `.github/workflows/build.yml` y `Makefile`
+(comentarios), `doc/PLAN-COMPLETITUD-FINITISTA.md`; y la memoria de los dos chats. Es T03 (P0) de
+`doc/AUDITORIA-SUELO-2026-10-12.md`.
+
+### 1 · Lo que decía la tabla de lectura obligatoria
+
+`AI-GUIDE.md` obliga a leer MANDATORIES antes de tocar un `.lean`. Diez días después de ADR‑114 seguía enseñando:
+
+* **M‑11**, al revés: «antes de demostrar algo por INDUCCIÓN… comprobar que NINGÚN `axiom` lo habita… ⇒ el teorema es
+  FALSO», «`Derives` NO ADMITIRÁ INDUCCIÓN NUNCA», con las listas negra y blanca de septiembre (`Prf₀`, `prf0_soundness`…).
+  ADR‑114 §2 lo había invertido, y el build hace lo contrario: induce sobre `Derives` (`derives_to_derives0`) y sobre
+  `Prf` (`prf_sound`, en la que descansa `ConsistentH`).
+* **M‑10**, verificada con `derives_completo` y `hgi_es_refutar`, sin declaración desde ADR‑115, y apoyada en
+  `Meta/OmegaStrength.lean`, borrado en `b1dedd1`.
+* **M‑6**: «`[A]`, `[C]` y `[D]` rompen; `[B]` es aviso». `[B]` rompe desde ADR‑084.
+* Y de paso: **M‑13** decía «⬜ falta `check-warnings.bash`», que existe desde ADR‑065; **M‑7** citaba en su
+  verificación `hPl`, una hipótesis, no una declaración; **M‑1** verificaba con `grep '^axiom '`, sustituido en ADR‑116.
+
+### 2 · Lo que dice ahora
+
+* **M‑11**: antes de POSTULAR un `axiom` que habita un inductivo, comprobar que no contradice lo que se demuestra por
+  inducción sobre él; la inducción es válida, lo que puede ser falso es el axioma. La regla de diseño (una regla nueva de
+  una relación inductiva va como CONSTRUCTOR, nunca como `axiom`) sigue. Verificación: `check-estratos.bash`.
+* **M‑10**: los enunciados de indemostrabilidad, indecidibilidad o consistencia van sobre `Prf`. Verificación: las filas
+  de `goedel_I`, `goedel_I_neg`, `goedel_II` y `goedel_second_prf`; que el ENUNCIADO hable de `Prf`, lo fijará T07.
+* **M‑6**: rompen `[A]`, `[B]`, `[C]`, `[D]`, `[E]`, `[F]`, `[H]` y `[M]`; sólo `[A2]` avisa; y se lanza desde PowerShell.
+* Cada fila corregida lleva su ✏️ con lo que decía. Las copias de la doctrina vieja llevan la suya: ADR‑025, ADR‑026,
+  ADR‑029 §2, ADR‑038 §3, `Meta/Representability2Prf.lean`, `build.yml`, `Makefile`, la cabecera de `check-doc-sync.bash`
+  y PLAN‑COMPLETITUD; y la memoria de RPP y la del chat de FOL, que repetían M‑11 vieja o la premisa de M‑10.
+
+### 3 · El control `[M]`
+
+Cada fila de la tabla debe ocupar UNA línea con 4 columnas (la M‑11 vieja, partida en dieciséis, escondía así su
+verificación). En la columna «Verificación», cada cita entre comillas invertidas se comprueba según su forma: una
+ruta, que exista; un nombre, que esté DECLARADO en el build, en FOL o en un sondeo (las listas de `[B]`); una orden,
+por sus rutas y por sus palabras con forma de nombre Lean con `_` (las de un patrón entrecomillado no cuentan; con `_`
+final, como familia); un sufijo como `_rhs`, con la cita anterior de su fila; un módulo, por su fichero. Sólo tres
+palabras clave de Lean (`axiom`, `export`, `rfl`) quedan fuera, y ningún marcador absuelve. Lleva un autotest (dos
+filas sintéticas: tres citas muertas, una viva que sólo declara un sondeo, y una fila partida, deben dar 4 fallos) y
+se niega a medir con menos de 10 filas o 20 citas. Con `M_DOC=` lee otra tabla en MODO DE PRUEBA, que nunca da verde.
+
+**Se estrenó con el fallo puesto** (MEDIDO, con `M_DOC=` la tabla de antes de este ADR): ROJO con la fila M‑11
+partida, `hPl` en M‑7, y `derives_completo` y `hgi_es_refutar` en M‑10. Sobre una tabla de prueba con los casos de la
+revisión (una fila partida, un `|` dentro de una cita, nombres muertos dentro de una orden y de una lista, una fila con
+guion no separable, un sufijo sin nombre delante), ROJO en los nueve; el nombre que sólo declara un sondeo y la familia
+`ax_tc_`, en verde. Sobre la tabla de hoy: 33 citas en 13 filas, todas existen.
+
+La revisión adversarial de esta pasada (un agente, sólo lectura) encontró doce defectos, todos aplicados antes del
+commit: cuatro de `[M]` que daban verde sin comprobar (la fila partida, la rama de las órdenes, un `|` dentro de una
+cita, una fila con guion no separable) o rojo falso (`pipefail` cortaba la búsqueda en los sondeos), y ocho de texto.
+
+### 4 · Lo que NO dice
+
+* `[M]` comprueba que lo citado EXISTE, no que la verificación verifique la regla; y sólo mira lo que va entre comillas
+  invertidas.
+* M‑3 (T16) y M‑5 (T35) no se tocan: esperan su propio trabajo. `AI-GUIDE.md` §27 y la receta `/docsync` siguen dando
+  `[B]` y `[E]` por avisos y no nombran `[M]`: es T21. La copia de FOL (`../FOL/FOL/Derives0.lean:181-182`) espera a un
+  commit de FOL; las filas del catálogo de sondeos y sus docstrings, registro, llevan una línea fechada en
+  `sondeos/README.md`.
+* Los ADR históricos conservan su texto; la nota fechada de arriba lo marca.
+
+🔑 *Una regla obligatoria que nadie verifica se pudre como cualquier texto: la tabla que todo agente lee antes de tocar
+un `.lean` enseñaba M‑11 al revés diez días después de corregirla.*
+
+**Véase también:** ADR‑114 §2 (M‑11, invertida), ADR‑115 (la capa `⊢`, retirada), ADR‑132 (la auditoría).

@@ -143,9 +143,13 @@ jobs:
         run: bash check-sorry.bash
 
       # Anadido el 2026-09-16. Mide cuantos `axiom` HABITAN cada nocion de derivabilidad, que
-      # es lo UNICO que decide si `induction` es legitima (M-11). `#print axioms` es CIEGO a
+      # es lo que dice si un postulado puede contradecir lo que se demuestra por induccion sobre
+      # ella (M-11; corregida en ADR-114 §2 y ADR-133: la induccion es valida, lo que puede
+      # ser falso es el axioma; hasta 2026-10-12 aqui decia que decidia si `induction` es
+      # legitima). `#print axioms` es CIEGO a
       # esto: un teorema probado por induccion sobre un inductivo habitado tiene footprint
-      # LIMPIO. Es el control que falto en mayo, cuando `FOL.soundness` demostraba `False`.
+      # LIMPIO. Es el control que falto en mayo, cuando `FOL.soundness` (valida) y `raa` (falsa)
+      # daban juntos `False`.
       # Probado con el fallo puesto en tres modos.
       - name: Check estratos
         run: bash check-estratos.bash
