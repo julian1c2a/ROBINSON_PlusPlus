@@ -7,6 +7,9 @@
     'A3Directa.pcc_isFCB_tracked' depends on axioms: [propext, Classical.choice, Quot.sound,
      ROBINSON_PlusPlus.Meta.Representability2Prf.prf_axiomsCodeT_eq]
 
+   (✏️ 2026‑10‑14, ADR‑134: ese axioma ya no existe; desde ADR‑117 el ancla es el axioma diagonal
+   `ax_axiomsCodeT_def` y `prf_ancla` es teorema.)
+
 Fichero AUTOCONTENIDO (sólo `import ROBINSON_PlusPlus.Meta`).
 
 ## Las tres decisiones que lo hicieron salir

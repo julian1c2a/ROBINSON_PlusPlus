@@ -7,6 +7,9 @@ import ROBINSON_PlusPlus
 -- decidible · adecuado), enunciar Gödel I sobre `[EsREnumerable P]`, y que entonces el
 -- TIPO impida enunciarlo sobre `⊢` — porque `axioms ⊢` es sintácticamente COMPLETO y
 -- por tanto NO r.e. (M-10, ADR-024).
+-- (✏️ 2026‑10‑14, ADR‑134: la completitud de `axioms ⊢` venía de `raa` e `imp_intro` (ADR‑024), que
+-- FOL borró con `FOL/MetaRules.lean`; RPP retiró la capa `⊢` (ADR‑115) y ADR‑133 reescribió M‑10.
+-- Es registro.)
 --
 -- ⛔ EL CONTROL ADVERSARIAL QUE PIDIÓ EL PROPIETARIO: «que la instancia para `⊢` no
 -- compile, y por qué. Si compila, la idea está muerta.»

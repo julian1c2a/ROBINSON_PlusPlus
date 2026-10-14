@@ -45,7 +45,9 @@ garantía `stdChain_proofCode'`, con su payoff `junk_line_not_stdLine`. ⚠️ S
 módulo salvo `StdArgs`/`StdChain`, que usa `Meta/ChainNegPrf.lean` —sin consumidor él tampoco—
 (medido el 2026‑10‑02). La mitad `⊬¬G` sobre `Prf` está por formular, **por Rosser** (ADR‑115 §7):
 la ω‑consistencia de antes tampoco vale sobre `Prf` (`not_omegaConsistentPrf`, en
-`sondeos/OmegaConsistentRefutable.lean`).
+`sondeos/OmegaConsistentRefutable.lean`). (✏️ 2026‑10‑14, ADR‑134: la mitad `⊬¬G` está sobre `Prf` desde
+ADR‑121, `goedel_I_neg` en `Meta/SolidezVerificador.lean`, sin ω‑consistencia ni Rosser y sin este módulo,
+que `SolidezVerificador` no importa. Rosser —`⊬R ∧ ⊬¬R` sólo con la consistencia— sigue ⬜, T01.)
 
 El resto de esta cabecera es **REGISTRO** del diseño retirado.
 
@@ -53,7 +55,8 @@ El resto de esta cabecera es **REGISTRO** del diseño retirado.
 
 Se necesitaría `axioms ⊢ ¬ provCodeC' φ` para `φ` indemostrable. Con **`φ = ⊥`** eso es **literalmente
 `Con(T)`** — indemostrable por **Gödel II**. (Con `φ = G` tampoco: por el punto fijo,
-`⊢ ¬provCodeC' G ⟺ ⊢ G`, y `⊬G`.) Y la ω‑regla `gen` cuantifica sobre **todo `Term`**, no sólo sobre
+`⊢ ¬provCodeC' G ⟺ ⊢ G`, y `⊬G`.) Y la regla `gen` (✏️ 2026‑10‑14: decía «la ω‑regla `gen`»; no lo
+es, ADR‑027) cuantifica sobre **todo `Term`**, no sólo sobre
 numerales, así que tampoco se aplica desde hechos sobre testigos concretos: para una variable libre
 `x`, `⊢ ¬A(x)` **es** la universal — circular. Ésta es la razón por la que el postulado legacy
 `provFormula_repr` era **falso en general** (lo enunciaba bajo consistencia simple).
@@ -125,7 +128,9 @@ theorem subst_provBody (φ : Formula) (t : Term) :
     disciplina de tipos es **verdadera por construcción**, y entonces sí mandaban
     `formCode_ne`/`termCode_ne`/`cons_ne_head`/`cons_ne_tail`/`strCode_ne`
     (`Meta/CodeDistinct.lean`; sobre `⊢`, retirados con ADR‑115). `IsCodeShaped` se conserva
-    porque `isClosed` (abajo) sigue siendo útil y porque los sondeos la citan. -/
+    porque los sondeos la citan. (✏️ 2026‑10‑14: decía también «porque `isClosed` (abajo) sigue siendo
+    útil»; `isClosed` no tiene ningún uso (grep del 2026‑10‑14), y los cinco sondeos que citan la clase no
+    compilan: rc 1 en `sondeos/pasadas/tabla_adr129.txt`, medido el 2026‑10‑05.) -/
 inductive IsCodeShaped : Term → Prop
   | numeral (n : Nat) : IsCodeShaped (numeralM n)
   | strCode (s : List Char) : IsCodeShaped (strCodeM s)

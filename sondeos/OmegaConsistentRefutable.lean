@@ -43,6 +43,8 @@ lección, trasladada al cálculo que queda: `OmegaConsistentPrf` es la definici�
 
 ⚠️ Para la mitad `⊬¬G` sobre `Prf`: la ω‑consistencia NO puede enunciarse así. Arreglo propuesto por la
 auditoría: restringir al único `∃` que se usa (`OmegaConsistentProv`, sólo `provBody`), o Rosser.
+(✏️ 2026‑10‑14, ADR‑134: `⊬¬G` salió sin ω‑consistencia ni Rosser: `goedel_I_neg : ¬ Prf (neg godelCN)`,
+`Meta/SolidezVerificador.lean`, ADR‑121, por la solidez del verificador en el modelo `MNV V₀`.)
 -/
 
 open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert

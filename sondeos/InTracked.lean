@@ -10,6 +10,8 @@ Este sondeo lo tapa y mide el eslabón siguiente.
 ## Lo que está COMPILADO aquí — footprint SANCIONADO
 
 `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`, el de todo lo que toca `provFromCode`.
+(✏️ 2026‑10‑14, ADR‑134: ese axioma ya no existe; desde ADR‑117 el ancla es el axioma diagonal
+`ax_axiomsCodeT_def` y `prf_ancla` es teorema.)
 
 | pieza | qué asegura |
 |---|---|
@@ -19,7 +21,7 @@ Este sondeo lo tapa y mide el eslabón siguiente.
 
 ## Por qué A1 salió, y por qué es MÁS SIMPLE que su precedente
 
-Molde: `pcc_bddCarcDot_reflect` (`D3InDotPrf.lean:334`), el núcleo de `hI_dot`. Cinco pasos:
+Molde: `pcc_bddCarcDot_reflect` (`D3InDotPrf.lean`), el núcleo de `hI_dot`. Cinco pasos:
 `PrfH_ex_elim` del `∃` acotado (el testigo pasa a ser `#0` y `w` se liftea) · `pcc_lt_tracked`
 para la cota, transportada con **simetría INTERNA** (`PrfH_eq_symm_code`, porque Leibniz va al
 revés) contra `pcc_eval_lenc` · `pcc_eval_nthc` para el cuerpo · `PrfH_bdEx_intro_open` con
@@ -63,6 +65,8 @@ es trabajo real, pero con precedente directo (`prf_substfc_exBodyc`, `EvalLtPrf.
 ## Cómo re-ejecutarlo
 
     lake env lean sondeos/InTracked.lean
+
+(✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 -/
 import ROBINSON_PlusPlus.Meta
 

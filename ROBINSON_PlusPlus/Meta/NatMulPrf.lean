@@ -32,7 +32,9 @@ Sólo hay que **probar** lo que no es axioma: la identidad izquierda (`0 · n = 
 recurren por la derecha) y la **monotonía** (`a ≤ a · σk`), que es lo que Cantor necesita.
 
 **Destino:** `prf_cantor_mono` (i‑c) ⟹ `sub‑código < código` ⟹ inducción fuerte ⟹
-`pcc_eval_substfc` ⟹ los 7 tags de `lineWF` que faltan.
+`pcc_eval_substfc` ⟹ los 7 tags de `lineWF` que faltan. (✏️ 2026‑10‑14, ADR‑134: hecho; la monotonía
+quedó como `prf_cantor_mono_left`/`prf_cantor_mono_right` en `Meta/CantorMonoPrf.lean`, y los 7 tags están
+cerrados desde el 2026‑09‑10: `pcc_lineWF_tracked`, en `Meta/SubstTreeReflect.lean`.)
 -/
 
 /-! ### Las leyes, por instanciación directa de los axiomas -/
@@ -93,7 +95,8 @@ theorem PrfH_eq_congr_mul1 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
 
 `0 · n = 0` **no** es axioma (`ax8` da `n · 0 = 0`, y `mul` recurre por la derecha), pero sale
 gratis de la conmutatividad — que **sí** lo es (`ax10`). Nótese el contraste con `+`: allí
-`0 + n = n` necesitó inducción sólo porque se probó **antes** de disponer de `ax6_add_comm`. -/
+`0 + n = n` necesitó inducción sólo porque se probó **antes** de disponer de `ax6_add_comm`. (✏️ 2026‑10‑14, ADR‑134:
+no fue antes de disponer de él —`ax6` está en la lista desde mayo y `NatArithPrf` es de julio—, sino sin reparar en él.) -/
 
 /-- `0 · n = 0` — vía conmutatividad. -/
 theorem prf_zero_mul (n : Term) : Prf (mul zero n =eq zero) :=
@@ -156,8 +159,9 @@ theorem prf_le_mul_succ (a k : Term) : Prf (le a (mul a (succ k))) :=
 
 /-! ### Puentes `div2`/`mod2` (instancias de axioma) — cimiento de i‑c
 
-Los tres son instanciación directa: `ax17_div_mod_eq`, `ax21_mod2_range` y `ax24_mod2_of_even`
-están en la lista `axioms`. Son el cimiento del cálculo con `pair = div2 ∘ cantor_poly`. -/
+Los dos son instanciación directa: `ax17_div_mod_eq` y `ax21_mod2_range` están en la lista `axioms`.
+(✏️ 2026‑10‑14: decía «los tres», con `ax24_mod2_of_even`, que también está en la lista, pero su
+puente no se escribió aquí ni en otro módulo.) Son el cimiento del cálculo con `pair = div2 ∘ cantor_poly`. -/
 
 /-- `div2(n)·2 + mod2(n) = n` — `ax17_div_mod_eq`. -/
 theorem prf_div_mod_eq (n : Term) :

@@ -61,7 +61,9 @@ código, RASTREADO), que `pcc_eval_carc` **evalúa** dentro de `Prov`. En el dis
 `carc t =eq formCodeM f` (con `f` un axioma CONCRETO), la cadena
 `carcT (tcFn t) →[pcc_eval_carc] tcFn (carc t) →[carc t = f̄] tcFn (formCodeM f) →[prf_tc_form]
 termCode (formCodeM f)` deja el argumento en una forma **concreta**, y ahí la pertenencia es libre
-(`repr_pos'_prf (prf_inAxiomsCodeT)`). El código rastreado **esquiva el muro**.
+(`repr_pos'_prf (prf_inAxiomsCodeT)`). El código rastreado **esquiva el muro**. (✏️ 2026‑10‑14,
+ADR‑134: `prf_tc_form` ya no existe —se retiró con ADR‑012, el 2026‑08‑18—; ese tramo se hace hoy
+DENTRO de `Prov` con `pcc_tc_formCode_internal`, vía `prf_tc_form_numeral` y `pcc_to_formCode`.)
 
 ### Diseño de la recursión (hecho: abajo y en `Meta/LineWFThyPrf.lean`; era «el grueso de `NegVerifier`», retirado con ADR‑115)
 
@@ -73,7 +75,9 @@ por recursión sobre `L` (lista de axiomas ABSTRACTA — sin materializar el té
 * `L = f :: fs`: `prf_in_cons_iff` da `y = formCodeM f ∨ In y (listFormCodeM fs)`; `PrfH_or_elim`:
   - cabeza (`y = formCodeM f`): **`pcc_in_head`** libre + swap del código `termCode (formCodeM f) → yc`
     por Leibniz DENTRO de `Prov` (`pcc_leibniz_code`), con la igualdad de códigos armada de
-    `hbr` + `pcc_eq_tracked (y) (formCodeM f)` + `repr_pos'_prf (prf_tc_form f)`.
+    `hbr` + `pcc_eq_tracked (y) (formCodeM f)` + `repr_pos'_prf (prf_tc_form f)` (✏️ 2026‑10‑14,
+    ADR‑134: hoy el tercer tramo es `pcc_tc_formCode_internal f`, ya en forma INTERNA; ver
+    `pcc_in_head_swap`).
   - cola: **recursión** sobre `fs` + extensión de cola rastreada (reflejo de `ax_L2_in_cons` a
     códigos vía `pcc_thm_inst`).
 Luego el **puente `axiomsCodeT ↔ listFormCodeM axioms`** ocurre DENTRO de `Prov` (Leibniz reflejada
@@ -213,7 +217,9 @@ theorem pcc_in_tail_tracked (yc a t : Term)
 En el disyunto `y =eq a` (con `a = formCodeM f` un código concreto), la pertenencia cabeza
 `pcc_in_head` es libre (`a` ES la cabeza). El *swap* del código `termCode a → yc` se hace por
 Leibniz DENTRO de `Prov` (`PrfH_leibniz_apply`), con la igualdad de códigos armada de:
-`yc =[hbr] tcFn y =[pcc_eq_tracked, y=a] tcFn a =[prf_tc_form] termCode a`. Como todo va con los
+`yc =[hbr] tcFn y =[pcc_eq_tracked, y=a] tcFn a =[prf_tc_form] termCode a` (✏️ 2026‑10‑14,
+ADR‑134: el último tramo ya no es `prf_tc_form`, retirado con ADR‑012: es la hipótesis INTERNA
+`haform`, que para `a = formCodeM f` da `pcc_tc_formCode_internal f`). Como todo va con los
 códigos RASTREADOS (`tcFn`), no aparece `termCode y` para `y` abstracto — no hay muro de Tarski. -/
 
 /-- **Cabeza rastreada**: bajo `y =eq a` (con `a` código, `tcFn a = termCode a`) y el puente

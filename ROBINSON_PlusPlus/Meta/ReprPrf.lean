@@ -269,7 +269,9 @@ theorem prf_iff_drop_left_conj {A P Q : Formula} (h : Prf (A ⇔ Formula.and P Q
 
 Cada `ax_lineWF_<tag>` estricto lleva como primer conjunto la cláusula `lenc = n̄` con `n` la
 longitud canónica de su línea. Al recuperar el accesor concreto hay que **descargarla**, y sobre la
-línea explícita es puro cómputo. Se tabulan las tres longitudes que aparecen (3, 4 y 5). -/
+línea explícita es puro cómputo. Se tabulan las de 3, 4 y 5; la cuarta que aparece, 2 (sólo la
+línea `thy`), se descarga en línea en `prf_lineWF_thy`. (✏️ 2026‑10‑14: decía «las tres longitudes
+que aparecen (3, 4 y 5)».) -/
 
 private theorem prf_lenc_3_loc (a b c : Term) :
     Prf (lenc (cons a (cons b (cons c nil))) =eq numeralM 3) :=

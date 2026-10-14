@@ -22,8 +22,10 @@ cualquiera de ellos crearía una dependencia que hoy no existe.
 ## Las tres cosas que pasan aquí
 
 1. **`chainOk → chainOkB`** y `∀`‑elim en `i`: de la cadena válida sale `lineWF (nthc q i)`.
-2. **El reflector**, `pcc_lineWF_tracked_modulo_other`, que da `Prov(⌜lineWF (nthc q i)⌝)` con el
-   código en forma de **reflexión pura** `(nthc q i)˙`.
+2. **El reflector**, `pcc_lineWF_tracked` (`Meta/SubstTreeReflect.lean`, sin hipótesis), que da
+   `Prov(⌜lineWF (nthc q i)⌝)` con el código en forma de **reflexión pura** `(nthc q i)˙`.
+   (✏️ 2026‑10‑14, ADR‑134: decía «`pcc_lineWF_tracked_modulo_other`», que pedía la hipótesis
+   `hOther`; la prueba usa el incondicional desde el cierre de C3, el 2026‑09‑10.)
 3. ⚠️ **La MONEDA** (§3.55.2 otra vez): el destino pide el **ACCESOR dotado** `nthcT q̇ i̇`, no la
    reflexión pura. El salto lo paga `pcc_eval_nthc` **dentro de `Prov`**, con el Leibniz
    codificado; y el `liftc` que el binder impone **colapsa** (`prf_liftc_tcFn`).
@@ -274,7 +276,8 @@ theorem prf_bnd_collapse (q i : Term) :
     (prf_liftc_tcFn i)))
 
 /-- 🏁 **La cota del DESTINO, cruzada**: `pcc_bnd_bridge` con el colapso ya aplicado. Es la forma
-    que `PrfH_bdAllCode_congr_bnd` consumirá para transportar el `bdAllCode` que produzca B3. -/
+    que `PrfH_bdAllCode_congr_bnd` consumirá para transportar el `bdAllCode` que produzca B3.
+    (✏️ 2026‑10‑14, ADR‑134: ya la consume, en `hB_premsDotAt`, `Meta/PremsBdAllPrf.lean`.) -/
 theorem pcc_bnd_bridge_at (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (eqCodeFn (tcFn (lenc (premsOf (nthc q i))))
@@ -309,7 +312,11 @@ end ROBINSON_PlusPlus.Meta.D3BodyPrf
 /-! ## `export` — por CONSUMO
 
 El consumidor previsto es el ensamblaje de D3: `d3_prf_of_halves` (`D3ChainDotPrf` §13) pide
-exactamente `hA` y `hB`, y ésta es `hA`. -/
+exactamente `hA` y `hB`, y ésta es `hA`. (✏️ 2026‑10‑14, ADR‑134: ya lo es: `d3_prf_real`
+(`Meta/PremsBdAllPrf.lean`) es `d3_prf_of_halves φ hA_lineWFDotAt hB_premsDotAt`. Consumen además
+`PremsBdAllPrf` —`premsPsi`, `pcc_bnd_bridge_at`, `PrfH_pcc_rw`, `prf_lineWF_of_chainOk`…—; `ChainNegPrf` lo
+importa, pero sólo cita `prf_lineWF_of_chainOk` en docstrings, como molde de su gemelo
+`prf_boundedPremsIn_of_chainOk`.) -/
 export ROBINSON_PlusPlus.Meta.D3BodyPrf (
   hG_lineWF hwG_lineWF prf_lineWF_of_chainOk hA_lineWFDotAt
   PrfH_pcc_rw hG_premsOfT hG_lencT pcc_bnd_bridge

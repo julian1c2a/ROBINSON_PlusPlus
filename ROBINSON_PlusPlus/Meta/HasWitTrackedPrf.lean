@@ -17,14 +17,16 @@ Las secciones §1‑§11 son el descenso, y siguen siendo el mapa de dónde est�
 
 ## El descenso
 
-    hasWit c   =  ∃w. isTC1 w ↑c                            (`Minimal/Axioms.lean:1231`)
-    isTC1 w c  =  wfAll1 w ∧ In c w                         (`Minimal/Axioms.lean:1228`)
+    hasWit c   =  ∃w. isTC1 w ↑c                            (`Minimal/Axioms.lean`, `def hasWit`)
+    isTC1 w c  =  wfAll1 w ∧ In c w                         (`Minimal/Axioms.lean`, `def isTC1`)
 
 ⭐ Esa segunda línea es **exactamente** la forma `isFCB w c = wfAll w ∧ In c w` que
 `sondeos/A3IsFCBTracked.lean` reflejó entera (`pcc_isFCB_tracked`), y por eso el escalón sale
 en cuatro líneas apoyado en el kit genérico que ya está en producción
 (`Meta/TrackedAtomsPrf.lean`): la mitad derecha es `pcc_In_atom_tracked`, con `c` y `w`
-**abstractos**.
+**abstractos**. (✏️ 2026‑10‑14, ADR‑134: el sondeo es hoy registro: no compila —rc 1, error en su
+:355— en ninguna de las cuatro tablas de `sondeos/pasadas/`, la última `tabla_adr129.txt`, medida el
+2026‑10‑05; su kit genérico vive en `Meta/TrackedAtomsPrf.lean`.)
 
 ⇒ Queda **una** obligación de contenido para esta mitad: reflejar el `∀` acotado `wfAll1`.
 
@@ -407,7 +409,7 @@ noncomputable def isTermCodeE1Dot (wT X : Term) : Term :=
     ⚠️ **Ojo a la forma de la imagen**: aquí `X` es el término OBJETO y el código sale como
     `tcFn X`. Para alimentar el `pcc_bdAll_intro` EXTERIOR hace falta la variante sobre
     CÓDIGOS —con el hueco del índice en `varc 0`, o sea `nthcT (tcFn w) (varc 0)` en vez de
-    `tcFn (nthc w i)`—, que es como `sondeos/A3IsFCBTracked.lean:205` define su `PsiF`.
+    `tcFn (nthc w i)`—, que es como `sondeos/A3IsFCBTracked.lean` define su `PsiF`.
     ⚠️ Y hay **dos** restricciones sobre esa imagen, las dos forzadas (§3.43.5):
     (1) el índice sólo puede aparecer como `varc 0` en una ranura de código, porque `hbody`
         lo mete con `substfc zero (tcFn i) ·` ⇒ aguas abajo, accesores **dotados**;
@@ -605,6 +607,8 @@ theorem hwPsi_wfAll1Psi (w : Term) : Prf (hasWitF (wfAll1Psi w)) := by hw_auto
 
 /-- ⭐ **EL `pcc_bdAll_intro` EXTERIOR, INSTANCIADO.** Ocho de las nueve obligaciones están
     descargadas aquí; la novena, `hbody`, es lo único que queda de esta mitad de C3‑T.
+    (✏️ 2026‑10‑14, ADR‑134: ya no queda: la prueba `hbody_wfAll1` (§8), y §9 la aplica en
+    `pcc_wfAll1_tracked` y `DEUDA_wfAll1_tracked_proved`.)
 
     `CF := wfAll1` es natural en **un** parámetro, así que —a diferencia del `argsIn` de §4— no
     hubo que empaquetar nada con `cons`. -/
@@ -755,7 +759,9 @@ noncomputable def isTermCodeE1DotC (q ND : Term) : Term :=
     ⚠️ La ecuación `ND = Ẋ` entra como **antecedente OBJETO**, no como hipótesis Lean: en el
     punto de uso sólo se tiene bajo el contexto (viene de `pcc_eval_nthc` con la cota), y el
     proyecto **no tiene debilitamiento de contexto** para `PrfH` (deuda B6b). Metiéndola en el
-    antecedente, el `or`-elim la conserva en su rama.
+    antecedente, el `or`-elim la conserva en su rama. (✏️ 2026‑10‑14, ADR‑134: B6b se saldó el
+    2026‑09‑11 —`PrfH_mono` y `PrfH_w1`, `Meta/HilbertDeduction.lean`—; el rodeo sigue siendo
+    correcto, sólo ya no es obligado.)
 
     Y cada disyunto se transporta **dentro de su rama**, que es donde están las hipótesis: la
     cota `2̇ < lenc X` que necesita `pcc_eval_nthc` sólo existe en la rama `shapeBin`. -/
@@ -984,7 +990,7 @@ theorem pcc_wfAll1_trackedC (w : Term) :
 
 /-! ## §11 · ⭐ EL PASO `∃`: DE `isTC1` A `hasWit`, CON EL HUECO DEL TESTIGO
 
-`hasWit c = ∃x. isTC1 x c` (`Minimal/Axioms.lean:1231`), así que subir §9 por el `∃` es
+`hasWit c = ∃x. isTC1 x c` (`Minimal/Axioms.lean`, `def hasWit`), así que subir §9 por el `∃` es
 `pcc_exIntro_code_open` (`Meta/Delta0ReflectPrf.lean:74`) — la variante **abierta**, que no
 exige clausurar `Ac`.
 
@@ -1259,6 +1265,13 @@ theorem hGuard_of_deudaF (t : Term) (n : Nat) (C : Formula)
 end ROBINSON_PlusPlus.Meta.HasWitTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
+
+✏️ 2026‑10‑14 (ADR‑134): registro — `DEUDA_wfAll1_tracked` está probada en este mismo módulo
+(`DEUDA_wfAll1_tracked_proved`, §9), y el módulo SÍ tiene consumidores: lo importa
+`Meta/HasWitFTrackedPrf.lean`, que reusa sus formas (`shapeFCun`/`shapeFCbin`),
+`pcc_wfAll1_trackedC`, `pcc_argsIn_trackedC` y `pcc_hGuardT`, y `Meta/SubstTreeReflect.lean` usa
+`pcc_hGuardT` en los reflectores de los tags 9, 10 y 13. Lo que sigue describe el estado del
+2026‑09‑07.
 
 El consumidor previsto es **C3**: quien pruebe `DEUDA_wfAll1_tracked` obtiene el reflector de
 `isTC1` sin una línea más, y de ahí sale la mitad `hasWit` de `DEUDA_hGuardT` con el paso `∃`

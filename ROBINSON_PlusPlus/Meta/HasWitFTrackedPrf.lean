@@ -182,7 +182,9 @@ theorem PrfH_clIn {Γ : List Formula} (X ND w : Term) (j : Nat)
 ⚠️ Igual que en C3‑T: la ecuación `ND = Ẋ` entra como **antecedente OBJETO**, porque el
 proyecto no tiene debilitamiento de contexto para `PrfH` (deuda B6b) y el `or`‑elim tiene que
 conservarla en cada rama. Con `lorAll` de ocho ramas, hacerlo a mano ocho veces sería ilegible;
-este combinador lo hace una vez. -/
+este combinador lo hace una vez. (✏️ 2026‑10‑14, ADR‑134: la deuda B6b se saldó el 2026‑09‑11:
+`PrfH_mono` y `PrfH_w1` (`Meta/HilbertDeduction.lean`) dan hoy ese debilitamiento; el rodeo sigue
+siendo correcto, sólo ya no es obligado.) -/
 
 /-- `pcc_reflect_or` **arrastrando un antecedente** `E`. Siete aplicaciones cierran `lorAll`. -/
 theorem prf_or_imp_of (E φ ψ : Formula) (Ac Bc : Term)
@@ -1190,6 +1192,12 @@ example :
 end ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf
 
 /-! ## `export` — por PROPÓSITO DECLARADO
+
+✏️ 2026‑10‑14 (ADR‑134): registro — desde el 2026‑09‑10 (C3 cerrado) `pcc_lineWF_tracked`
+(`Meta/SubstTreeReflect.lean`) es INCONDICIONAL: los 21 tags, con los siete de sustitución en §8–§10bis
+de ese módulo. Y este módulo SÍ tiene consumidor: `SubstTreeReflect` lo importa y usa
+`pcc_hGuardF` en esos siete reflectores; `hGuard_of_slots` sigue sin uso en código. Lo que sigue
+describe el estado del 2026‑09‑07.
 
 El consumidor previsto es el chasis de ADR‑020: probada `DEUDA_hGuardF`, `hGuard_of_slots`
 absorbe la cascada **sin ninguna obligación abierta**.

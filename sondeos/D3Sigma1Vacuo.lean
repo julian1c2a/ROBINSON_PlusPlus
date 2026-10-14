@@ -11,16 +11,17 @@ import ROBINSON_PlusPlus
 **Fecha:** 2026‑10‑12 · **Origen:** la auditoría del suelo (`doc/AUDITORIA-SUELO-2026-10-12.md`, trabajo T05). El
 enunciado lo propuso su verificador de vacuidad, por lectura y sin compilar; aquí se compila.
 
-`d3_prf_of_sigma1` (`Meta/ReflectionPrf.lean:80-82`) toma la hipótesis
+`d3_prf_of_sigma1` (`Meta/ReflectionPrf.lean`) toma la hipótesis
 `hI : ∀ x L : Term, Prf (In x L ⇒ provCodeC' (In x L))`, y `d3_prf_of_reflect_bounded`
-(`Meta/Sigma1BoundedPrf.lean:83-87`) la saca de `hbI`, la misma reflexión para `boundedIn`. Sus docstrings los
+(`Meta/Sigma1BoundedPrf.lean`) la saca de `hbI`, la misma reflexión para `boundedIn`. Sus docstrings los
 presentan como reducciones de D3 a un núcleo «claramente especificado».
 
 **La refutación**, con el modelo `MNV V₀` y la solidez `prf_sound`: con `x := #0` y `L := cons zero nil`, la
 fórmula `In #0 L` vale bajo la valoración `0`; por `hI` y la solidez, vale también `provCodeC' (In #0 L)`, y
 `prf_of_prov` da `Prf (In #0 L)`; pero bajo la valoración `1` la fórmula es falsa (`1 ∉ [0]`), contra la solidez.
 ⇒ ninguna de las dos hipótesis se puede descargar: los dos teoremas son ciertos y VACUOS. Ninguno tiene
-consumidor; el D3 que se usa, `d3_prf_real`, va por otra vía y no lo es.
+consumidor fuera del par (✏️ 2026‑10‑14: decía «Ninguno tiene consumidor»; `d3_prf_of_reflect_bounded` consume a
+`d3_prf_of_sigma1`, `Meta/Sigma1BoundedPrf.lean`); el D3 que se usa, `d3_prf_real`, va por otra vía y no lo es.
 
 ⛔ Ni `simp` sobre `h0` ni `rfl` contra `V₀` (la trampa de `Meta/Consistencia.lean:39-42`).
 

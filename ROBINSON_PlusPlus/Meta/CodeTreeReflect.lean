@@ -49,7 +49,8 @@ Este módulo reifica esos árboles (`CTree`) y prueba genéricamente:
 
 * `prf_substtc_code` — la evaluación del código punteado (distribución de `substtc` sobre el árbol);
 * `substtc_inv_dotN` / `substtc_inv_dotV` — las invariancias que consumen los Leibniz internos;
-* `prf_tc_objAt` — el «código del código» del árbol;
+* `pcc_tc_objAt` — el «código del código» del árbol, dentro de `Prov` (✏️ 2026‑10‑14: decía
+  «`prf_tc_objAt`», retirado con `ax_tc_cons`, ADR‑012; hoy es `pcc_tc_objAt`);
 * **`PrfH_dotVN`** — la pieza cara: `Prov(⌜E(valores) = E(accesores)⌝)`, por inducción, usando
   `pcc_nthcD_bridge` en las hojas y las congruencias internas del kit en los nodos;
 * `pcc_condD_of_tree` — el **reflector `hcond` que pide el chasis**, ya genérico.
@@ -376,7 +377,9 @@ theorem pcc_condD_of_tree (T : CTree) (t : Term) {n : Nat} (hmax : Nat.le (CTree
     (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_condD_of_tree_eq T t))) _) hfin
 
 /-- **CIERRE DE UN TAG ESTRUCTURAL**, todo junto. Instanciar esto con el árbol del tag es lo único
-    que queda por hacer para cada uno de los esquemas con RHS ecuacional. -/
+    que queda por hacer para cada uno de los esquemas con RHS ecuacional. (✏️ 2026‑10‑14, ADR‑134:
+    hecho: lo instancian los diez reflectores de `Meta/LineWFPropPrf.lean`, y C3 está cerrado,
+    `pcc_lineWF_tracked`.) -/
 theorem pcc_lineWF_tracked_of_tree {k n : Nat} (T : CTree) (t : Term)
     (hax : Prf (Formula.forall (Formula.impl (tagF k)
       (lwfVar ⇔ Formula.and (lencF n) (condOf T)))))

@@ -346,8 +346,8 @@ consistentemente el prefijo `ax_` (`ax_induction`, `ax_list_induction`,
 `ax_mod2_alternation`, `ax_inAxC`, `ax_p_tfa`, `ax_lineWF_cons`, …). Esto las hace
 distinguibles a simple vista de los teoremas ordinarios sin necesidad de abrir el
 fichero. Los cinco meta-axiomas de `Minimal/Axioms.lean` documentados en
-`DECISIONS.md` ADR-010 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son la
-excepción histórica — no llevan el prefijo por ser anteriores a esta convención;
+`DECISIONS.md` ADR-010 (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) eran la
+excepción histórica (✏️ 2026‑10‑14, ADR‑134: retirados con la capa `⊢`, ADR‑115; hoy no existen) — no llevan el prefijo por ser anteriores a esta convención;
 no renombrarlos retroactivamente sin coordinar con ADR-010.
 
 ### Subíndices de cálculo — `₀` clásico, `ᵢ` intuicionista (decidida 2026-09-26, ADR-102)

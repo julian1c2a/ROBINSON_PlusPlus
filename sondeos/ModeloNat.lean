@@ -53,13 +53,15 @@ Quot.sound]`. Ni `sorry`, ni `axiom`, ni `native_decide`.
 `lake env lean sondeos/ModeloNat.lean`: 0 errores, 0 avisos (con `linter.unusedSimpArgs` apagado), 56 s, pico de
 memoria 5,48 GB.
 ⚠️ Un control negativo (que el modelo REFUTA `ax_tc_cons`, el axioma retirado que hacía inconsistente la teoría)
-subió el pico por encima de 14 GB y se apartó: está pendiente, con otra forma.
+subió el pico por encima de 14 GB y se apartó: está pendiente, con otra forma. (✏️ 2026‑10‑14, ADR‑134: hecho en
+el build con otra forma, ADR‑124: `control_tc_cons`, en `Meta/ModeloCodificacion.lean`, para todo `V`.)
 
 ## Lo que NO dice
 
 * No dice que `G` ni `Con` sean VERDADERAS en `MNV V₀` (E10): `consistentH` no lo necesita.
 * No dice que `V₀ = codeNatList axioms` (que en el modelo la regla `thy` acepte exactamente los 142): E10 lo pediría.
-* No dice nada de `⊬¬G` (Rosser).
+* No dice nada de `⊬¬G` (Rosser). (✏️ 2026‑10‑14, ADR‑134: `⊬¬G` salió después sin Rosser: `goedel_I_neg`,
+  `Meta/SolidezVerificador.lean`, ADR‑121, por la solidez del verificador en este modelo.)
 * Vive en `sondeos/`, FUERA del build (✏️ hasta ADR‑120, que lo promovió).
 
 ## Cómo re‑ejecutarlo

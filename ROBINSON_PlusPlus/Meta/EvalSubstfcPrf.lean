@@ -34,7 +34,8 @@ sorts**: los tags 3 y 4 (`atomc`, `eqc`) descienden por `substtc`/`substtsc` —
 
 🔑 **El puente de testigos SE DISUELVE**: no se prueba, se **define**. El reconocedor
 `isFormCodeE2` tiene las casillas de término apuntando a `wT` en la forma exacta que consume
-`EvalSubsttcPrf`, así que la premisa sale por `rfl` (`bridge_isTC1`). El «gate» sale gratis
+`EvalSubsttcPrf`, así que la premisa sale por `rfl` (`bridge_isTC1` en el sondeo; en el build no
+hace falta: hay un solo `isTC1`, el de `Minimal/Axioms.lean`). El «gate» sale gratis
 porque el paquete de testigos ya venía en un solo término.
 
 ## PROMOCIÓN B3.4 (2026‑09‑08) — 806 declaraciones, entran 90
@@ -289,7 +290,7 @@ theorem mem9 : forall_3 (AXBODY 9) ∈ axioms := show ax_substfc_ex ∈ axioms b
     exactamente como `isTermCodeE1` es la version ecuacional de `isTermCodeB1`.
     Ocho disyuntos ↔ ocho ecuaciones de `substfc`. Las casillas de TERMINO apuntan a `wT`
     (`In` para `eqc`, `argsIn` para `atomc`), que es LITERALMENTE lo que pide
-    `pcc_eval_substtc'` / `pcc_eval_substtsc'` ⇒ **el puente no hace falta: es la
+    `pcc_eval_substtc` / `pcc_eval_substtsc` ⇒ **el puente no hace falta: es la
     definicion.**
     ############################################################################ -/
 
@@ -497,13 +498,13 @@ theorem descenso_bin2 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (n
 def CasoBot : Prop := ∀ v s X : Term,
   Prf (Formula.impl (shapeNul X 2) (targetSubstfc v s X))
 
-/-- tag 3 · `atomc`. Consume `pcc_eval_substtsc'` (lista de terminos). -/
+/-- tag 3 · `atomc`. Consume `pcc_eval_substtsc` (lista de terminos). -/
 def CasoAtom : Prop := ∀ wT v s X : Term,
   Prf (Formula.impl
     (land (wfAll1 wT) (land (shapeBin X 3) (argsIn wT (nthc X (numeralM 2)))))
     (targetSubstfc v s X))
 
-/-- tag 4 · `eqc`. Consume `pcc_eval_substtc'` DOS veces. -/
+/-- tag 4 · `eqc`. Consume `pcc_eval_substtc` DOS veces. -/
 def CasoEq : Prop := ∀ wT v s X : Term,
   Prf (Formula.impl
     (land (wfAll1 wT) (land (shapeBin X 4)
@@ -1520,7 +1521,9 @@ theorem DESCENSO_substfc (wF wT v s t : Term) :
 
 /-- **★ `pcc_eval_substfc` ★** — la evaluacion PROVABLE de `substfc` con `v`, `s`, `f`
     **ABSTRACTOS**, guardada por los DOS testigos (formula `wF` y termino `wT`).
-    CERO axiomas de Lean, cero `sorry`, cero hipotesis. -/
+    Footprint: los tres de Lean; ningún `axiom` del proyecto, cero `sorry`, y sólo las dos
+    guardas (`hws`, `hfc`): ninguno de los ocho `Caso*` queda como hipótesis.
+    (✏️ 2026‑10‑14: decía «CERO axiomas de Lean, cero `sorry`, cero hipotesis».) -/
 theorem pcc_eval_substfc (wF wT v s f : Term)
     (hws : Prf (hasWit s)) (hfc : Prf (isFC1 wF wT f)) :
     Prf (provFromCode (eqc (substfcT (tcFn v) (tcFn s) (tcFn f)) (tcFn (substfc v s f)))) :=
@@ -1573,12 +1576,12 @@ example (wF wT X : Term) : True := by
   fail_if_success exact (rfl : isFormCodeE2 wF wT X = isTermCodeE1 wT X)
   trivial
 
-/-- La guarda de FORMULA lleva DENTRO la guarda de TERMINO que pide `pcc_eval_substtc'`
+/-- La guarda de FORMULA lleva DENTRO la guarda de TERMINO que pide `pcc_eval_substtc`
     — la mitad `wfAll1 wT` es LITERALMENTE la de `sondeos/EvalSubsttc.lean`. -/
 example (wF wT c : Term) :
     isFC1 wF wT c = land (land (wfAll1 wT) (wfAllF wF wT)) (In c wF) := rfl
 
-/-- Y de la guarda de FORMULA sale, por `rfl`, el `isTC1` que consume `pcc_eval_substtc'`
+/-- Y de la guarda de FORMULA sale, por `rfl`, el `isTC1` que consume `pcc_eval_substtc`
     en cuanto se tiene la pertenencia del SUBcodigo a `wT`. -/
 example (wT z : Term) : isTC1 wT z = land (wfAll1 wT) (In z wT) := rfl
 
@@ -1606,7 +1609,13 @@ prueba, pero ya no tienen consumidor porque el teorema completo existe.
 
 ⭐ El consumidor previsto es **C3**: el antecedente de `pcc_eval_substfc_wit` es literalmente el
 conjunto extra que ADR‑020 metió dentro del `⇔` de los 7 esquemas (ver `Meta/LineWFGuardPrf.lean`
-§2), así que con este módulo el reflector `hCarc` pasa a ser una MP. -/
+§2), así que con este módulo el reflector `hCarc` pasa a ser una MP.
+
+(✏️ 2026‑10‑14, ADR‑134: hoy sí hay consumo. C3, cerrado con `pcc_lineWF_tracked`, consume de aquí
+`pcc_eval_substfc_wit` (en `PrfH_tc_objAt`) y `pcc_congr_substfcT_arg2_code` (en `PrfH_tc_objAt` y
+`PrfH_dotVN`), en `Meta/SubstTreeReflect.lean`; `Meta/EvalLiftfcPrf.lean` usa `descenso_bin1`/`_bin2`/
+`descenso_un`, cualificados; y el sondeo `sondeos/RosserReflexion.lean` usa
+`pcc_eval_substfc_wit` (compila: rc 0 en `sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05).) -/
 export ROBINSON_PlusPlus.Meta.EvalSubstfcPrf (
   pcc_eval_substfc pcc_eval_substfc_wit DESCENSO_substfc pcc_eval_substfc_modulo_8
   targetSubstfc liftF_targetSubstfc substF_targetSubstfc

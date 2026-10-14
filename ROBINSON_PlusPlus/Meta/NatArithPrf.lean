@@ -33,6 +33,9 @@ descansa sobre lemas generales de `<` a nivel del cálculo finitario `Prf`. Como
 `a < b ⇔ ∃k. a + σk = b` (`ax13_lt_def`) y `add` recurre por la derecha (`add a 0 = a`,
 `add a (σb) = σ(add a b)`), la identidad izquierda `0 + n = n` **no es teorema de Q**
 (independiente sin inducción); se prueba con la regla `Prf.ind`.
+✏️ 2026‑10‑12 (ADR‑134): en Q no, pero aquí sí sale SIN inducción: `ax6_add_comm` es axioma de la lista, y
+`0 + n = n + 0 = n` (`ax4`). Se probó por inducción antes de reparar en ello (`Meta/NatMulPrf.lean`, «Identidad
+izquierda del producto»); lo mismo `σm + n = σ(m + n)`, con `ax6` y `ax5`. Y D1 los usa (`AXIOMS.md` §0.3).
 
 Este módulo entrega el **eliminador de inducción natural** `prf_nat_induction` (análogo de
 `prf_list_induction`, envolviendo `Prf.ind`) y la **identidad izquierda** `prf_add_zero_left`,
@@ -56,7 +59,7 @@ theorem prf_nat_induction (Φ : Formula)
   prf_mp (prf_mp (Prf.ind Φ) base) step
 
 /-- **Identidad izquierda de `add`** en `Prf`: `0 + n = n` (por `prf_nat_induction`;
-    NO derivable sin inducción). -/
+    ✏️ 2026‑10‑12, ADR‑134: decía «NO derivable sin inducción», y sí lo es: `ax6_add_comm` y `ax4_add_zero`). -/
 theorem prf_add_zero_left (n : Term) : Prf (add zero n =eq n) := by
   have key : Prf (Formula.forall (Formula.eq (add zero (.var 0)) (.var 0))) := by
     refine prf_nat_induction (Formula.eq (add zero (.var 0)) (.var 0)) ?base ?step
@@ -80,8 +83,8 @@ theorem norm11 (s t : Term) : substTerm 0 s (liftTerm 1 (liftTerm 0 t)) = liftTe
   rw [(FOL.liftTerm_comm_zero t 0).symm]
   exact FOL.substTerm_liftTerm (liftTerm 0 t) 0 s
 
-/-- **`σm + n = σ(m + n)`** en `Prf` (add por la izquierda; inducción sobre `n`, NO
-    derivable sin inducción). -/
+/-- **`σm + n = σ(m + n)`** en `Prf` (add por la izquierda; inducción sobre `n`; ✏️ 2026‑10‑12, ADR‑134:
+    decía «NO derivable sin inducción», y sí lo es: `ax6_add_comm` y `ax5_add_succ`). -/
 theorem prf_add_succ_left (m n : Term) : Prf (add (succ m) n =eq succ (add m n)) := by
   have key : Prf (Formula.forall (Formula.eq
       (add (succ (liftTerm 0 m)) (.var 0)) (succ (add (liftTerm 0 m) (.var 0))))) := by

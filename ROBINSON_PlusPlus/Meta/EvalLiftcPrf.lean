@@ -41,7 +41,9 @@ Dos auditorias mecanicas seguidas encontraron que **practicamente todas** las ci
 `fichero.lean:NNN` de esta cabecera eran falsas a las pocas horas de escribirlas — y las peores
 aterrizaban sobre OTRO teorema real del vecindario, que es el modo mas peligroso de fallar:
 quien la sigue encuentra codigo plausible y no sospecha. `PrfH_congr_targetLift` se cito como
-`:797`, se midio en `:816` y hoy esta en `:821`: tres valores en un dia.
+`:797`, se midio en `:816` y hoy esta en `:821`: tres valores en un dia. (✏️ 2026‑10‑14: hoy
+vive en `Meta/LiftcCodePrf.lean`; se cita por nombre, porque el número volvió a moverse con las notas de este
+mismo día.)
 
 Los numeros que quedan apuntan a **`sondeos/`**, que esta fuera del build y no se toca; aun asi,
 van como referencia a la version del sondeo, no como direccion estable.
@@ -61,6 +63,9 @@ sobre `env.constants` — no sobre el fuente:
 * **23** se declaran AQUI y **8** en otros modulos (las dos tablas de mas abajo) = **31**;
   mas **6** puentes de consumo (§0) y **5** controles negativos (`example`), que no anaden
   constantes al frente. Este modulo declara **29** nombres: 23 + los 6 puentes.
+  (✏️ 2026‑10‑14, ADR‑134: hoy declara **36**: los 6 puentes, 19 de los 23 —los cuatro
+  `nilOrCons*`/`prf_nil_or_cons*` de §2 bajaron a `Meta/SubstfcWitnessPrf.lean` (ADR‑019)— y
+  los 11 de A5, §7bis.)
 
 | bloque del sondeo         | lineas      | ya vive en                                    |
 |---------------------------|-------------|-----------------------------------------------|
@@ -98,7 +103,9 @@ demuestran, y por tanto el descenso CONECTA con el vocabulario ya promovido.
 * `DESCENSO_hasWit` — la forma CONSUMIBLE (testigo bajo un `∃`, contra `ENS.hasWit`).
 * **CUATRO lemas GENERICOS** (§2) que no mencionan `targetLift` y que el frente `substfc`
   vuelve a necesitar palabra por palabra: `nilOrCons`, `nilOrCons_at`, `prf_nil_or_cons_all`,
-  `prf_nil_or_cons`. Ver la nota del bloque `export`.
+  `prf_nil_or_cons`. Ver la nota del bloque `export`. (✏️ 2026‑10‑14, ADR‑134: ya no los
+  entrega este modulo: bajaron a `Meta/SubstfcWitnessPrf.lean` (ADR‑019, ver §2), que los
+  exporta a la raiz.)
 
 ⚠️ **SEIS piezas mas se subieron a modulos de aguas ARRIBA, no aqui** — eran genericas y
 desde el modulo del descenso quedaban invisibles para los sondeos que las tienen copiadas:
@@ -126,6 +133,15 @@ como su corolario. Es la restriccion que manda en esta rama.
 
 El borrador de `Probe/` llevaba `import ROBINSON_PlusPlus.Meta` porque ahi SI vale. **Este**
 modulo lleva estos 20, **cada uno justificado por el simbolo que lo pide**:
+
+✏️ 2026‑10‑14 (ADR‑134): registro — la tabla es la de la promocion (2026‑09‑04) y se ha movido
+(medido con grep): `PrfH_lt_subst2` vive hoy en `ChainPrf`, y de `BoundedInPrf` el modulo ya no
+usa ningun nombre; `objList`, en `Minimal/Axioms.lean`; `prf_substtc_termCode_zero`, en
+`CodeCtorKit` (§0 lo cita cualificado); `prf_eq_symm`/`prf_eq_trans`/`prf_refl` se declaran en
+`ReprPrf`, no en `ArithPrf`, y de los tres solo se usa `prf_eq_symm`; y `prf_list_induction`,
+`substTerm_strCode`, `substTerm_termCode`,
+`substFormula_provFromCode_open`, `Prf.qconf`, `prf_succ_lt_succ_of_lt`, `prf_nthc_succ`,
+`prf_spec` y `prf_carc_cons` ya no aparecen en el codigo del modulo.
 
 | import (`ROBINSON_PlusPlus.Meta.…`) | simbolo que lo exige                                    |
 |-------------------------------------|---------------------------------------------------------|
@@ -205,7 +221,8 @@ namespace ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 
 /-! ## §0 · PUENTES DE CONSUMO — `net-0`; **cinco por `rfl` y uno por `.symm`**
 
-    Estos cuatro `rfl` son la MEDIDA de que este modulo consume el vocabulario de produccion
+    Estos cuatro `rfl` —los `*_es_el_del_sondeo`; el quinto, `iz_inv_es_…`, es el del
+    duplicado— son la MEDIDA de que este modulo consume el vocabulario de produccion
     y no fabrica constantes nuevas. Si alguno dejara de ser `rfl`, el descenso estaria
     hablando de otro objetivo y NO conectaria con `Meta/LiftcCodePrf.lean`. -/
 
@@ -297,8 +314,8 @@ theorem PrfH_congr_targetLiftsc {Γ : List Formula} {s s' : Term} (h : PrfH Γ (
 /-! ## §3 · `argsIn` se parte en CABEZA y COLA
 
     ⚠️ **`prf_argsIn_head` y `prf_argsIn_tail` NO viven aqui.** Son genericos —no mencionan
-    `targetLift`— y al promover se bajaron a `Meta/CodeWitnessPrf.lean` (`SinWTs`, :680 y
-    :692), junto a `PrfH_inst_argsIn`, que es de quien salen.
+    `targetLift`— y al promover se bajaron a `Meta/CodeWitnessPrf.lean` (`SinWTs`), junto
+    a `PrfH_inst_argsIn`, que es de quien salen.
 
     Razon: `prf_argsIn_tail` esta copiado a mano en SEIS sondeos del frente y
     `prf_argsIn_head` en CINCO — `EvalSubsttc` copia solo la cola — (`DescensoLiftc`,
@@ -361,7 +378,7 @@ theorem PHI_use {Γ : List Formula} (t w : Term) (h : PrfH Γ (substFormula 0 t 
     `Φ := PHI`, pero son maquinaria GENERICA de la induccion fuerte: `psi_lift_form` sale en
     dos lineas de `psi_lift_eq_subst` + `psi_at`, y `PSI_inst` es la version `PrfH` de
     `prf_psi_elim`. Al promover se subieron **genericos en `Φ`** a
-    `Meta/StrongInductionPrf.lean:195,203`, junto a sus padres.
+    `Meta/StrongInductionPrf.lean`, junto a sus padres.
 
     No es cosmetica: `PSI_inst` esta copiado a mano en **OCHO** sondeos, con **DIEZ**
     declaraciones (`EvalSubstfcPrf` ×2, `HasWitFReal` ×2, `EvalSubsttc`, `EnsamblajeMedida`,
@@ -748,8 +765,8 @@ theorem DESCENSO_at_hasWit (c s : Term) :
 
     Estos controles **NO** prueban que el enunciado sea alcanzable: eso ya lo tenia
     produccion **sin ningun descenso**, componiendo `LiftcCodePrf.refl_termCode` /
-    `refl_termsCode` (:752, :757) con los puentes `Representability.termCodeM_eq` /
-    `termsCodeM_eq` (:158, :161). Medido y compilado en la auditoria de promocion.
+    `refl_termsCode` con los puentes `Representability.termCodeM_eq` /
+    `termsCodeM_eq`. Medido y compilado en la auditoria de promocion.
 
     Lo que SI miden, y es lo que se quiere: que **el DESCENSO DISPARA** — que el
     antecedente `isTC1 W ⌜t⌝` es demostrable con testigo explicito y computable, de modo
@@ -851,7 +868,13 @@ end ROBINSON_PlusPlus.Meta.EvalLiftcPrf
     transportes De Bruijn de los objetivos, y (c) **los ocho lemas GENERICOS de §2–§4**, que
     NO mencionan `targetLift` y que los otros dos descensos vuelven a necesitar palabra por
     palabra (`EvalSubstfcPrf.lean:5333‑5424`, `:2469‑2567`). Al salir de aqui, la promocion
-    siguiente los CONSUME en vez de redefinirlos por tercera vez. -/
+    siguiente los CONSUME en vez de redefinirlos por tercera vez.
+
+    (✏️ 2026‑10‑14, ADR‑134: el `export` de abajo ya no saca (c) ni la mitad de (b). De (b)
+    quedan `liftF_targetLift`/`liftF_targetLiftsc`: los dos `substF_*` los exporta `LiftcCodePrf`.
+    Los ocho de (c) llegan a la raiz por los `export` de `Meta/SubstfcWitnessPrf.lean` (los cuatro
+    de §2) y de `Meta/CodeWitnessPrf.lean`, `SinWTs` (los cuatro de §3–§4). Salen ademas
+    `PrfH_congr_targetLiftsc` y los cinco de A5, §7bis.) -/
 
 export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
   liftF_targetLift liftF_targetLiftsc
@@ -872,6 +895,10 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
   -- `Meta/EvalLiftfcPrf.lean` — sus casos `atom`/`eq` bajan a `liftsc`/`liftc` AL NIVEL
   -- CORRIENTE, y por eso `pcc_eval_liftc` (clavado a `zero`) no le vale. **Nada lo consume
   -- todavia**, y se dice en vez de fingir una medicion de consumo (§17).
+  -- (✏️ 2026‑10‑14, ADR‑134: ya lo consume `Meta/EvalLiftfcPrf.lean`: `DESCENSO_at_lista_imp` en
+  -- `casoAtomL_thm` y `DESCENSO_at_imp`, dos veces, en `casoEqL_thm`. `pcc_eval_liftc_at`,
+  -- `pcc_eval_liftsc_at` y `DESCENSO_at_hasWit` no los usa ningun codigo de `ROBINSON_PlusPlus/`
+  -- ni de `sondeos/`, medido con grep; solo los citan comentarios.)
   -- `PHIat`, `PHIat_step`, `PHIat_all`, `PHIat_use`, `hPHIat`, `PHIatBody` se quedan
   -- CUALIFICADOS por la misma razon que sus gemelos sin `at`: colisionarian con los otros
   -- dos descensos.
@@ -880,6 +907,12 @@ export ROBINSON_PlusPlus.Meta.EvalLiftcPrf (
 )
 
 /-! ## CONTROL DE FOOTPRINT
+
+    ✏️ 2026‑10‑14 (ADR‑134): registro — hoy los resultados sustantivos salen con los TRES de Lean,
+    `[propext, Classical.choice, Quot.sound]`, sin cuarto ni hipotesis de ancla (la clase
+    `AnclaEq` se retiro con ADR‑118), y los tres puentes de la tabla de `check-footprints.bash`,
+    con ninguno; lo que sigue describe el estado de antes de ADR‑026, cuando el cuarto era el
+    axioma del ancla (la lista ya lo perdio en ADR‑026), y su aviso contra «net-0 puro» ya no vale.
 
     ⚠️ **NET-0 aqui significa «ningun axioma NUEVO», no «solo los tres de Lean».** Los
     resultados sustantivos de este modulo salen con **CUATRO**:

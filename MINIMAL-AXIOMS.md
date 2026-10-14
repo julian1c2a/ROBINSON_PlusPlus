@@ -4,6 +4,12 @@
 **Author:** Julián Calderón Almendros
 **Estado:** 34 axiomas matemáticos (25 aritméticos + 7 listas + 2 factorización) + 5 meta-reglas FOL + 1 meta-axioma Ax-P (TFA), 0 sorrys reales.
 
+> ✏️ **2026‑10‑12 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es el análisis de junio de 2026 de la LISTA de
+> axiomas, y no se ha re‑medido: las meta‑reglas de FOL y Ax‑P se retiraron (ADR‑115; `ax_p_tfa`, el 2026‑09‑12), y
+> `axioms` tiene hoy 142 (los 34, 107 de codificación y el ancla). Lo que dice de la lista, que no tiene esquema de
+> inducción, es cierto; la teoría de los titulares, `T_Prf`, sí lo tiene y contiene a PA ([AXIOMS.md](AXIOMS.md) §0). Y
+> §5 tenía frases falsas: ver su nota.
+
 Este documento recoge la información obtenida por **web research** y por **razonamiento sobre el sistema actual** para evaluar si el conjunto de 34 axiomas que sustenta `Minimal/` es minimal — o cerca de serlo — relativo a su objetivo de diseño: **construir aritmética de Cantor + tuplas + listas + factorización prima sin esquema de inducción**.
 
 > **Bloque VIII extendido (2026-06-06)**: añadidos `pow` y `prod_pairs` al lenguaje, 4 axiomas definitorios (`ax_pow_zero`, `ax_pow_succ`, `ax_prodp_nil`, `ax_prodp_cons`) y el meta-axioma `ax_p_tfa` (Teorema Fundamental de la Aritmética: existencia y unicidad de factorización para `n ≥ 1`). Spec §BLOQUE VIII Fase 17 cubierta por completo. Las Fases 18–19 (Gödelización) permanecen fuera del scope `Minimal/`.
@@ -341,6 +347,16 @@ Más precisamente:
 - Como teoría, `Minimal` es **estrictamente más débil que PA** (no tiene inducción) pero **estrictamente más fuerte que Q** y que el fragmento universal de PA⁻ (porque tiene más vocabulario).
 - En la jerarquía habitual (`Q ⊊ PA⁻ ⊊ EA ⊊ I∆₀ ⊊ I∆₀+Exp ⊊ IΣ₁ ⊊ PA`), `Minimal` no encaja directamente — es un sistema construido **para un propósito** (Cantor + tuplas + listas + factorización constructivos), no para encajar en la jerarquía clásica. La comparación más fina con I∆₀+Exp se discute en §5.5.
 
+> ✏️ **2026‑10‑12 · [ADR‑134](DECISIONS.md).** Cuatro cosas de esta sección, corregidas (dos eran falsas siempre):
+> * «`Minimal` es un fortalecimiento conservativo de Q»: **FALSO**. `ax6` (la conmutatividad de `+`) está en el
+>   lenguaje de Q, es axioma de `Minimal`, y Q no la demuestra (lo dice §1.1).
+> * «estrictamente más débil que PA (no tiene inducción)»: es de la LISTA, y sin demostrar. La teoría de los titulares,
+>   `T_Prf`, añade la inducción para toda fórmula y contiene a PA ([AXIOMS.md](AXIOMS.md) §0).
+> * La cadena de la jerarquía está mal: EA *es* I∆₀ + exp. El orden habitual es Q ⊊ PA⁻ ⊊ IOpen ⊊ I∆₀ ⊊ EA = I∆₀ +
+>   exp ⊊ IΣ₁ ⊊ PA.
+> * Y el diagrama de arriba: `Intermediate/` ya no existe, y la inducción no está en `Full/` sino en `Prf` (los
+>   constructores `ind` y `listInd`); Ax‑P se retiró el 2026‑09‑12.
+
 ### 5.5 Comparación con EFA / I∆₀+Exp (2026-06-06)
 
 Tras la extensión del Bloque VIII (`pow` + TFA), conviene comparar `Minimal` con dos sistemas estándar de la jerarquía clásica que también tienen exponenciación:
@@ -366,6 +382,11 @@ EFA = I∆₀ + un axioma que postula la totalidad de la exponenciación (`∀x,
 Esta posición ortogonal es interesante: `Minimal` es **suficiente para enunciar TFA** (por eso pudimos meterlo como meta-axioma) pero **insuficiente para demostrarlo** (porque no tiene inducción). EFA invierte la situación: lo demuestra, pero el enunciado vive en un vocabulario más pobre.
 
 #### 5.5.2 I∆₀+Exp
+
+> ✏️ **2026‑10‑14 · [ADR‑134](DECISIONS.md).** I∆₀+Exp no es «más débil aún» que EFA: es la misma teoría. Y en §5.5.3,
+> «la prueba de Gödel I no es internalizable en `Minimal`: requiere inducción» no vale para el teorema: Gödel I (con
+> Rosser) vale para toda teoría r.e. y consistente que contenga a Q, y la lista la contiene. `Intermediate/` y Ax‑P
+> ya no existen.
 
 I∆₀+Exp = I∆₀ extendido con `Exp` (existencia y graph definability de `2^x`). Más débil que IΣ₁ pero todavía demuestra resultados importantes de teoría de números.
 

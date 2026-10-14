@@ -397,7 +397,10 @@ private theorem caso_funcc :
 
 ⚠️ `prf_nil_or_cons` vive en `Meta/EvalLiftcPrf.lean`, que hoy está **en rojo** (aguas abajo de
 `MpCodePrf`) y no se puede importar. Se reproduce aquí: `prf_list_induction` está en `ChainPrf`,
-que sí compila, y el paso **no usa la hipótesis de inducción**. -/
+que sí compila, y el paso **no usa la hipótesis de inducción**.
+(✏️ 2026‑10‑14, ADR‑134: es al revés desde esta misma promoción, `e68c313`: `nilOrCons*` y
+`prf_nil_or_cons*` se declaran AQUÍ y `Meta/EvalLiftcPrf.lean` ya no los declara —los recibe por el
+`export` de este módulo—; y `EvalLiftcPrf` compila, build del 2026‑10‑14.) -/
 
 def nilOrCons : Formula := lor (Formula.eq (.var 0) nil) (consOk (.var 0))
 
@@ -541,7 +544,9 @@ private theorem caso_nil :
 /-! ## §10 · LA FUSIÓN DE TESTIGOS — copiada de `sondeos/MergeTestigos.lean` (TAREA A)
 
 ⚠️ Se COPIA porque `sondeos/` está fuera del build y no es importable. Al promover, esto queda
-como una sola constante; aquí es la duplicación normal entre sondeos.
+como una sola constante; aquí es la duplicación normal entre sondeos. (✏️ 2026‑10‑14, ADR‑134:
+ya está promovido —este fichero es el módulo de producción— y en el build `prf_in_nthc` es una
+sola constante, la de aquí; la copia de `sondeos/MergeTestigos.lean` sigue fuera del build.)
 
 🔑 Es lo que el caso `cons` necesita y no existía: la HI da un testigo para la CABEZA y otro para
 la COLA, y hay que fusionarlos. La ruta es pasar a forma de PERTENENCIA (donde `concat` es un
@@ -1479,7 +1484,9 @@ escalón de la escalera `psi` —`PHIF` tiene CUATRO binders y `PSI_inst3` sólo
 TÉRMINO y no necesitan la HI.
 
 ⚠️ `PrfH_congr_substfc3` vive en `Meta/BdAllIntroPrf.lean`, que importa `MpCodePrf` y está en
-ROJO: **tercera** pieza que el árbol parado obliga a reproducir. -/
+ROJO: **tercera** pieza que el árbol parado obliga a reproducir. (✏️ 2026‑10‑14, ADR‑134: vive en
+`Meta/NumCodeClosedPrf.lean`, adonde bajó en esta misma promoción, `e68c313`; aquí no se reproduce,
+y `BdAllIntroPrf` compila, build del 2026‑10‑14.) -/
 
 /-- El testigo de FÓRMULAS vacío es bien formado (vacuamente). -/
 theorem prf_wfAllF_nil (wT : Term) : Prf (wfAllF nil wT) := by

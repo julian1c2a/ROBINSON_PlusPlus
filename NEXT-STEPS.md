@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-12 — ADR‑133: T03 hecho (la tabla MANDATORIES y el control `[M]`). Antes, 2026-10-12 — ADR‑132: la auditoría del suelo, versionada (`doc/AUDITORIA-SUELO-2026-10-12.md`, 81 trabajos: es la lista de trabajo vigente; bloque nuevo, arriba) y T00 hecho. Antes, 2026-10-05 — ADR‑131: el `Classical.choice` de los titulares, medido (punto 6, nuevo); ADR‑130: las dos notas de `Meta/CodeDecode.lean`, medidas (punto 5, hecho); ADR‑129: D7 EJECUTADA (punto 2, hecho); ADR‑128: `autoImplicit` desactivado también en `lake build` (punto 4, hecho); ADR‑127: la auditoría de ADR‑124/125/126 (el punto 1, rectificado) y los 88 sondeos re‑medidos (35 compilan); ADR‑126: la refutación a profundidad 2 y el control de discriminación (`sondeos/RosserBasura.lean`, punto 1); ADR‑125: la guarda de término refutada sobre un numeral (`sondeos/RosserBasura.lean`, punto 1); ADR‑124: el control negativo del modelo, en el build (punto 3, hecho), y la auditoría de ADR‑123 (el punto 1, rectificado); ADR‑123: Rosser, Etapa 0 —la reflexión numeral, confirmada en `sondeos/RosserReflexion.lean`—; ADR‑122: D7 medida (la puerta dice NO: 48 de 226) y Rosser re‑medido; ADR‑121: Gödel I ENTERO (`⊬ ¬G`) y TARSKI, sin hipótesis (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-14 — ADR‑134: T02 hecho (la teoría de los titulares, `T_Prf`, descrita en `AXIOMS.md` §0: contiene a PA; y dónde entra la inducción, medido: `sondeos/InduccionTitulares.lean`), con su revisión adversarial y los comentarios de los `.lean` al día (T31). Antes, 2026-10-12 — ADR‑133: T03 hecho (la tabla MANDATORIES y el control `[M]`). Antes, 2026-10-12 — ADR‑132: la auditoría del suelo, versionada (`doc/AUDITORIA-SUELO-2026-10-12.md`, 81 trabajos: es la lista de trabajo vigente; bloque nuevo, arriba) y T00 hecho. Antes, 2026-10-05 — ADR‑131: el `Classical.choice` de los titulares, medido (punto 6, nuevo); ADR‑130: las dos notas de `Meta/CodeDecode.lean`, medidas (punto 5, hecho); ADR‑129: D7 EJECUTADA (punto 2, hecho); ADR‑128: `autoImplicit` desactivado también en `lake build` (punto 4, hecho); ADR‑127: la auditoría de ADR‑124/125/126 (el punto 1, rectificado) y los 88 sondeos re‑medidos (35 compilan); ADR‑126: la refutación a profundidad 2 y el control de discriminación (`sondeos/RosserBasura.lean`, punto 1); ADR‑125: la guarda de término refutada sobre un numeral (`sondeos/RosserBasura.lean`, punto 1); ADR‑124: el control negativo del modelo, en el build (punto 3, hecho), y la auditoría de ADR‑123 (el punto 1, rectificado); ADR‑123: Rosser, Etapa 0 —la reflexión numeral, confirmada en `sondeos/RosserReflexion.lean`—; ADR‑122: D7 medida (la puerta dice NO: 48 de 226) y Rosser re‑medido; ADR‑121: Gödel I ENTERO (`⊬ ¬G`) y TARSKI, sin hipótesis (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
@@ -9,10 +9,12 @@
 > # 🗓️ 2026‑10‑12 — 📋 **ADR‑132: la lista de trabajo vigente es `doc/AUDITORIA-SUELO-2026-10-12.md`**
 >
 > 81 trabajos priorizados con su evidencia y cómo cerrarlos. **P0**: T01 (Rosser: un enunciado con contenido antes
-> de pagarlo; decide el propietario), T02 (la teoría `T_Prf` descrita con precisión), T03 (MANDATORIES: M‑11, M‑10 y
+> de pagarlo; decide el propietario), T02 (la teoría `T_Prf` descrita con precisión; ✅ ADR‑134: contiene a PA, `AXIOMS.md` §0), T03 (MANDATORIES: M‑11, M‑10 y
 > M‑6; ✅ ADR‑133), T04 (el núcleo de `[B]`). **P1**: T00 (✅ ADR‑132), T04b, T06, T07, T08, T09, T15. Orden recomendado:
-> T03 (✅) → T02 → T09 → T01 (decisión) → T08 → T04 → T06 → … Medido el 2026‑10‑12: `d3_prf_of_sigma1` y
-> `d3_prf_of_reflect_bounded` son VACUOS (`sondeos/D3Sigma1Vacuo.lean`; T05, P2).
+> T03 (✅) → T02 (✅) → T09 → T01 (decisión) → T08 → T04 → T06 → … Medido el 2026‑10‑12: `d3_prf_of_sigma1` y
+> `d3_prf_of_reflect_bounded` son VACUOS (`sondeos/D3Sigma1Vacuo.lean`; T05, P2). Y D1 usa la inducción, D2 la de
+> listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, al decodificar el modelo
+> (`sondeos/InduccionTitulares.lean`; ADR‑134).
 >
 > 🗓️ *Lo que sigue es el bloque del 2026‑10‑05, como registro: su lista la absorbe la auditoría.*
 
@@ -3695,6 +3697,13 @@
 > `pcc_eval_liftfc` por inducción sobre el código. ⚠️ (i) es trabajo real (aritmética de Cantor en
 > Q++), pero es **teoría de números, no metamatemática**, y no toca la solidez del verificador.
 >
+> ✏️ *2026‑10‑12 ([ADR‑134](DECISIONS.md); revisado el 2026‑10‑14): esta nota entera es registro, y cuatro de sus
+> frases son falsas hoy. «Gödel II no es alcanzable sobre Q»: `Q ⊬ Con_Q` es teorema, y la vía de Hilbert–Bernays–Löb
+> llega a Q con el predicado relativizado a un corte. «D1 y D2 NO usan inducción»: sobre `Prf`, sí (D1 la aritmética,
+> D2 la de listas). «La cadena real ya vive en `Full`»: la inducción entra por `Prf.ind` y `Prf.listInd`, y `Full/` sólo
+> define la fórmula. «`Minimal` es la teoría OBJETO que se aritmetiza»: la que se aritmetiza es `T_Prf`. Ver
+> [AXIOMS.md](AXIOMS.md) §0, §0.3 y §1.1.*
+>
 > **Nota foundacional (respuesta a «¿esto exige inducción?»): SÍ, y es lo esperado.** Gödel II no es
 > alcanzable sobre Q sola — es un resultado clásico: Q **no** satisface D2/D3 (la Σ₁‑completitud
 > *provable* requiere inducción; hace falta IΣ₁/EA). La cadena real de este proyecto **ya vive en
@@ -4102,6 +4111,10 @@
 
 ## 🎯 LO QUE QUEDA (3 tareas, por orden de valor)
 
+> 🗄️ ✏️ **2026‑10‑14 ([ADR‑134](DECISIONS.md)) · REGISTRO de julio de 2026, como todo lo que sigue hasta el final del
+> fichero.** Sus tres tareas están hechas o superadas, y varias de sus frases son falsas hoy («`OmegaConsistent` es
+> creíble», «la ω‑regla `gen`», «falta sólo `NegVerifier`»). Lo vigente, en el PUNTO DE REANUDACIÓN de arriba.
+
 > Nada de esto es una incógnita: de las tres se sabe **exactamente** cómo se hace. Lo que queda es
 > volumen, no diseño.
 
@@ -4350,6 +4363,10 @@ patrón Step A, barato. **Estimación honesta de ②+③: 2‑4 sesiones.**
 
 ## Situación actual
 
+> 🗄️ ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md)) · REGISTRO de junio y julio de 2026, desde aquí hasta el final del
+> fichero.** No describe el estado de hoy: la teoría de los titulares y lo que se supone, en [AXIOMS.md](AXIOMS.md) §0;
+> lo vigente, en el PUNTO DE REANUDACIÓN de arriba.
+
 Build: ✅ `lake build` exit 0. **0 sorrys reales** y **0 warnings RPP** en los 11 módulos. Los 5 `axiom` de `Axioms.lean` (`imp_intro`, `gen`, `raa`, `or_elim`, `ex_elim`) son meta-reglas de FOL; `ax_p_tfa` en `Block8.lean` es un meta-axioma adicional (TFA). Ninguno es `:= sorry`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 
 El sistema `Minimal/` cumple su objetivo declarado en [PLANNING.md](PLANNING.md): **34 axiomas matemáticos sin esquema de inducción son suficientes para construir la función de Cantor, las tuplas con proyecciones, las listas con concatenación y pertenencia, las funciones discretas, los primos y la factorización prima** (TFA vía Ax-P).
@@ -4498,7 +4515,7 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
 - [x] **Fase 3 (D1)** (`Meta/Necessitation.lean`): `d1`/`necessitation` (= `repr_pos`) + Gödel I modular `goedel_first_unprovable_real`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 - [x] **Lema diagonal real** (`Meta/Diagonal.lean`): `tcFn`/`tc_arith` + `diag_arith` + **`godelC_fixedpoint : ⊢ G ⇔ ¬provCodeC G`** + **`goedel_first_real : ConsistentOmega → ¬ Prf G`** (sin postulados gödelianos).
 - [x] **Fase 2.6 cimiento** (`Meta/CodeDistinct.lean`): aritmética negativa de códigos `formCode_ne` + familia.
-- [x] **Fase 5 — regla `ind` INTEGRADA** (`Meta/Induction.lean` + stack): `ind_concl_code` + `Prf.ind`/`Rule.ind`/**`ax_vpf_ind`** sólida + `vpf_ind` + caso ind de `vpf_run`. **Verificador: 19 reglas.** `provCodeC` rastrea **IΣ₁**. `repr_pos`/`vpf_ind` `#print axioms` = estándar; `goedel_first_real` cita además `Full.ax_induction` (honesto: Prf modela IΣ₁). 🗑️ *(retirados: `repr_pos`, `vpf_ind` e `ind_concl_code`, con la capa `⊢` —ADR‑115—; `goedel_first_real`, el 2026‑08‑18 con ADR‑012)*
+- [x] **Fase 5 — regla `ind` INTEGRADA** (`Meta/Induction.lean` + stack): `ind_concl_code` + `Prf.ind`/`Rule.ind`/**`ax_vpf_ind`** sólida + `vpf_ind` + caso ind de `vpf_run`. **Verificador: 19 reglas.** `provCodeC` rastrea **IΣ₁** *(✏️ 2026‑10‑12, ADR‑134: no; `Prf.ind` vale para toda fórmula, y la teoría contiene a PA: [AXIOMS.md](AXIOMS.md) §0)*. `repr_pos`/`vpf_ind` `#print axioms` = estándar; `goedel_first_real` cita además `Full.ax_induction` (honesto: Prf modela IΣ₁ *—✏️ 2026‑10‑14, ADR‑134: no; contiene a PA—*). 🗑️ *(retirados: `repr_pos`, `vpf_ind` e `ind_concl_code`, con la capa `⊢` —ADR‑115—; `goedel_first_real`, el 2026‑08‑18 con ADR‑012)*
 - **D2/D3 → Gödel II real — rediseño honesto del verificador (EN CURSO, 2026-06-21)**.
   Hallazgo: `validProofFn` (opaca/condicional) sirve para la dirección positiva pero
   **bloquea** la inducción sobre testigos de prueba arbitrarios que D2/D3 exigen. Nuevo
@@ -4542,7 +4559,7 @@ Todo lo que iba a desarrollarse en `Intermediate/` (derivar ax6, ax7, ax10-12, a
   - [ ] **R7**: replicar `con_imp_goedelSentence`/`goedel_second` (de la capa legacy, retirados en F7a, `f03eacf`) con `provCodeC'`/`godelC` → **Gödel II real** (`⊬ Con`).
 - [ ] **⊬¬G real** (reflexión / ω-soundness) + representabilidad **negativa** plena.
 
-> **Integración ✅ (2026-06-13)**: las ecuaciones recursivas de las funciones de coding están ahora en `Minimal.axioms` (extensión definicional conservadora), por lo que `⊢ᴴ` también las tiene (vía `Prf.thy`). Ya no hay `axiom` local en `SubstArith`.
+> **Integración ✅ (2026-06-13)**: las ecuaciones recursivas de las funciones de coding están ahora en `Minimal.axioms` (extensión definicional conservadora *—✏️ 2026‑10‑12, ADR‑134: una pretensión, nunca probada—*), por lo que `⊢ᴴ` también las tiene (vía `Prf.thy`). Ya no hay `axiom` local en `SubstArith`.
 
 ---
 

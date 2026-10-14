@@ -276,7 +276,9 @@ hoy un TEOREMA, `prf_ancla`, por un axioma objeto nuevo —el diagonal `ax_axiom
 footprint. Entre medias, la hipótesis `[AnclaEq]` daba `Prf ⊥` (F1, ADR‑114): los dos teoremas eran
 VACUOS. Hoy no lo son por F1, pero «cero axiomas del proyecto» sigue sin poder escribirse a secas: los
 dos son CONDICIONALES a `ConsistentH`, y la consistencia de los 142 axiomas no está probada (no hay
-modelo).
+modelo). ✏️ **2026‑10‑12 ([ADR‑134](../DECISIONS.md))**: desde ADR‑120 sí lo está —`consistencia`, por un modelo estándar de
+los 142 (`MNV V₀`) y `prf_sound`—, y es la de toda la teoría `T_Prf`, que contiene a PA; `goedel_I` y `goedel_II` van
+sin hipótesis. La teoría, en [AXIOMS.md](../AXIOMS.md) §0.
 
 ### 4 · `AXIOMS.md` publicaba una afirmación **medible‑mente falsa** sobre `ax_p_tfa`
 

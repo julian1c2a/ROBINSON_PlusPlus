@@ -1,6 +1,8 @@
 # Hoja de Ruta Fundacional — Plan Estratégico
 
 > ## ⛔⛔ ESTE DOCUMENTO ES **HISTÓRICO** DE LA LÍNEA `:33` PARA ABAJO — 2026-09-10h
+> *(✏️ 2026‑10‑14, [ADR‑134](DECISIONS.md): el banner creció y la línea 33 ya no es la que era; es histórico TODO lo
+> que sigue a este banner, y el banner mismo es registro de su fecha.)*
 >
 > La auditoría `doc/book/AUDITORIA-2026-09-10.md` §5 lo midió y lo llamó, con razón, **«el
 > documento menos fiable de los tres de estado»**: cuatro días y ~20 commits de retraso, y una
@@ -21,7 +23,8 @@
 >
 > 🏁 Y lo que este documento presenta como frentes abiertos ya no lo son: **D3 está DEMOSTRADA**
 > (2026‑09‑10g, `d3` pasó de `axiom` a teorema) y el **módulo E** de `NegVerifier` está hecho.
-> Lo que sigue abierto de `⊬¬G` son los módulos **C** y **D**.
+> Lo que sigue abierto de `⊬¬G` son los módulos **C** y **D**. *(✏️ 2026‑10‑14: ya no; `⊬¬G` es `goedel_I_neg`,
+> ADR‑121, y aquellos módulos iban sobre `⊢`, retirada con ADR‑115.)*
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
 >

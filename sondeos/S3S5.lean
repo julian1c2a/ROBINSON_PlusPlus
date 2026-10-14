@@ -39,7 +39,7 @@ def tsCodeN : List Term → Nat
   | t :: ts => consN (tCodeN t) (tsCodeN ts)
 end
 
-/-- **`codeNat φ` = valor de `formCode φ`.** Espeja `formCode` (Provability.lean:55‑63). -/
+/-- **`codeNat φ` = valor de `formCode φ`.** Espeja `formCode` (`Provability.lean`). -/
 def codeNat : Formula → Nat
   | .bottom          => consN 2 0
   | .atom p ts       => consN 3 (consN (strCodeN p) (consN (tsCodeN ts) 0))

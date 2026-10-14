@@ -5,6 +5,10 @@ import ROBINSON_PlusPlus
 
 **Fecha**: 2026‑09‑22. Se midió **antes** de escribir la capa de listas, y menos mal.
 
+(✏️ 2026‑10‑14, ADR‑134: el título vale para la codificación de entonces. ADR‑113 la cambió —`cons a b = σ (pair a b)`,
+sin basura— y, desde ADR‑119/120, ℕ ES modelo: `MNV V₀` satisface los 142 (`MN_axioms`) y `prf_sound` da la solidez
+de `Prf` en todo modelo estándar. Este sondeo mide la codificación anterior con `consOldN`.)
+
 ## La pregunta
 
 La capa aritmética del modelo está cerrada (**25 de los 34**, ADR‑087). Antes de interpretar

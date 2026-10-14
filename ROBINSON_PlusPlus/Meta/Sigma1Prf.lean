@@ -37,6 +37,11 @@ Con `pcc_imp` + las leyes object del verificador (`ax_L1`/`ax_L2`/`ax_chainOk_*`
 construyen los **combinadores de reflexión** (`pcc_in_*`, `pcc_chainOk_*`). El cierre
 inductivo final (`hI`/`hC` para testigo abstracto) necesita aún la inducción object
 sobre el código con seguimiento aritmético (`substfc`/`tcFn`) — "la bestia" (Fase 5).
+
+✏️ 2026‑10‑14 (ADR‑134): registro — ese cierre no puede existir para `hI`: es REFUTABLE (ADR‑132,
+T05: `hI_refutable` en `sondeos/D3Sigma1Vacuo.lean`, compilado el 2026‑10‑12), y con ella
+`d3_prf_of_sigma1` es VACUO. D3 se probó por otra vía, la punteada: `d3_prf_real`
+(`Meta/PremsBdAllPrf.lean`).
 -/
 
 /-! ### Demostrabilidad parametrizada por el código + transporte por igualdad de códigos

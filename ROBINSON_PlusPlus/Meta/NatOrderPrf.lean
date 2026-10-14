@@ -30,11 +30,13 @@ namespace ROBINSON_PlusPlus.Meta.NatOrderPrf
 
 Entregable **i‑a** de la ruta (1a) (`NEXT-STEPS.md`): la aritmética de orden existía entonces sólo
 a nivel `⊢`, en `Minimal/Theorems/Block3‑5` —hoy retirados (ADR‑115)—, y **no podía importarse**:
-no había puente `⊢ → Prf` (`Derives` tenía la ω‑regla; sólo existía `prf_to_derives`, también
-retirado). Se re‑prueba en `Prf`, como en su día se hizo con `Meta/ArithPrf.lean`.
+no había puente `⊢ → Prf` (`Derives` era más fuerte: su fuerza venía de `raa` e `imp_intro`, no de
+`gen`, ADR‑027; sólo existía `prf_to_derives`, también retirado; ✏️ 2026‑10‑14: decía «`Derives` tenía la
+ω‑regla», y `gen` no lo es). Se re‑prueba en `Prf`, como en su día se hizo con `Meta/ArithPrf.lean`.
 
 **Destino:** monotonía del emparejamiento de Cantor ⟹ `sub‑código < código` ⟹ inducción fuerte
-⟹ `pcc_eval_substfc` ⟹ los 7 tags de `lineWF` que faltan.
+⟹ `pcc_eval_substfc` ⟹ los 7 tags de `lineWF` que faltan. (✏️ 2026‑10‑14, ADR‑134: cerrados; C3 lo está
+desde el 2026‑09‑10, `pcc_lineWF_tracked` en `Meta/SubstTreeReflect.lean`, los 21 tags sin hipótesis.)
 
 **Recordatorios del terreno** (`Minimal/Axioms.lean`):
 * `add` recurre **por la derecha**: `a + 0 = a`, `a + σb = σ(a + b)`.
@@ -81,7 +83,8 @@ theorem PrfH_eq_congr_add2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
 era **trabajo innecesario**: `ax7_add_assoc` es un **axioma de la teoría** (está en la lista
 `axioms` de `Minimal/Axioms.lean`), igual que `ax6_add_comm`, y las leyes de `mul` (`ax8`–`ax12`).
 Lo que hay que probar por inducción es sólo lo que **no** es axioma (p. ej. `0 + n = n`, porque
-`add` recurre por la derecha). Se deja la instanciación directa. -/
+`add` recurre por la derecha). Se deja la instanciación directa.
+✏️ 2026‑10‑12 (ADR‑134): el ejemplo no vale: con `ax6_add_comm`, `0 + n = n` sale sin inducción (`ax4`). -/
 
 /-- **Asociatividad de `+`** en `Prf` — instancia de `ax7_add_assoc`. -/
 theorem prf_add_assoc (a b c : Term) :

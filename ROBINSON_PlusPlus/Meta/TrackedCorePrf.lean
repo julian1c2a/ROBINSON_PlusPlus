@@ -47,6 +47,15 @@ transporta vía `prf_tc_form`). ⇒ **No hay atajo**: hay que **re‑derivar la 
 emitiendo códigos `tcFn` nativamente** (reconstruir `proofCode'`/`runFn_track`/`chainOk_track`
 de `Representability2Prf` en la capa `tcFn`). Eso es **D1ₜ**, el port grande. Este módulo abre
 esa fase con la clausura genérica; ver `GODEL-D3-TRACKED-DESIGN.md` §4.2/§5 (Opción A).
+
+✏️ 2026‑10‑14 (ADR‑134): registro — el plan D1ₜ no se ejecutó: el enfoque `tcFn` de raíz se descartó
+en la sesión 2026‑07‑05c (`GODEL-D3-TRACKED-DESIGN.md` §11.2, commit `e08a1e2`), y ni
+`repr_pos'_prfₜ` ni `hI_tracked` llegaron a declararse; `prf_tc_form` se retiró con `ax_tc_cons`
+(ADR‑012, 2026‑08‑18). D3 se probó por la vía punteada: `d3_prf_real` (`Meta/PremsBdAllPrf.lean`).
+La infraestructura de este módulo sí se usa (`liftFormula_provFromCode_open`,
+`atom2CodeFn` y `prf_congr_atom2CodeFn`, entre otros sitios en `Meta/D3ChainDotPrf.lean`; y
+`substFormula_provFromCode_open`, en once módulos del build, entre ellos `PremsBdAllPrf`, `LiftcCodePrf` y
+las `Eval*`; grep del 2026‑10‑14). Lo que sigue describe el estado del 2026‑07‑05b.
 -/
 
 /-- **Clausura genérica de `provFromCode`**: para un código **cerrado** `c`
@@ -95,7 +104,9 @@ Todas las formas que el tracking refleja son **átomos binarios** `Formula.atom 
 el `inFormCodeFn` de `Sigma1CorePrf` (que era el caso `In`) a un **constructor object único**
 `atom2CodeFn s a b`, con su puente definicional con `formCode`, su **congruencia** Leibniz y su
 **clausura** (cerrado si los argumentos lo son). Son las piezas que D1ₜ emitirá para reflejar
-`chainOk`/`In`/`allIn` con los argumentos rastreados por `tcFn` (en vez de `termCode` meta). -/
+`chainOk`/`In`/`allIn` con los argumentos rastreados por `tcFn` (en vez de `termCode` meta).
+(✏️ 2026‑10‑14, ADR‑134: D1ₜ no llegó a existir —ver la nota de la cabecera—; `atom2CodeFn` y su
+congruencia los usa la vía punteada.) -/
 
 /-- Constructor object del código de un **átomo binario** `Formula.atom s [a, b]` a partir de los
     códigos `a`, `b` de sus argumentos: `⟨3, ⌜s⌝, [a, b]⟩`. Generaliza `inFormCodeFn` (s = `∈`). -/

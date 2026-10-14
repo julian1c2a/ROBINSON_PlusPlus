@@ -32,7 +32,8 @@ Con ADR‑113 (`cons a b = σ (pair a b)`, fusionado el 2026‑10‑02) el paso 
 atrás, `consN 0 0` sería `2` y los dos dejarían de compilar.
 
 ⚠️ Lo que este sondeo NO dice: que `Prf` sea consistente tras ADR‑113. Sólo cierra ESTA ruta. La
-consistencia es el frente del modelo de los 141.
+consistencia es el frente del modelo de los 141. (✏️ 2026‑10‑14, ADR‑134: la probó el modelo de los 142,
+`MNV V₀`: `consistencia : ConsistentH`, `Meta/Consistencia.lean`, ADR‑120.)
 -/
 
 open FOL ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert

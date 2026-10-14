@@ -9,7 +9,9 @@
 
 **Contenido:** la teoría objeto FOL⁼ (Q++) — axiomas de Robinson extendidos, esquemas del verificador
 estructural (`lineWF`, `premsOf`, tags), y los axiomas de la capa Δ₀ (`lenc`/`nthc`/`ax_lineWF_inv`/
-`ax_lineWF_cons`). **Last updated:** 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos de
+`ax_lineWF_cons`) *(✏️ 2026‑10‑12, [ADR‑134](../DECISIONS.md): es la LISTA de axiomas, sin esquema de inducción; la
+teoría de los titulares, `T_Prf`, le añade los esquemas de `Prf`, con la inducción para toda fórmula, y contiene a PA:
+[AXIOMS.md](../AXIOMS.md) §0)*. **Last updated:** 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos de
 §3.1.1 son `List Char` y se escriben `sym!"…"`. Antes, 2026-07-12 — ⚠️ revisado el 2026‑09‑11 (entonces el kernel no
 había cambiado; adjudicación del aviso `[E]` del control).
 
@@ -125,6 +127,9 @@ abbrev ex := @Formula.ex
 
 #### 3.1.5 Axiomas matemáticos (30 axiomas en la lista `axioms`: 23 aritméticos + 7 listas)
 
+> ✏️ 2026‑10‑12 (ADR‑134): son **34** (`coreAxioms`), y la tabla los lista todos; `axioms` tiene 142. La fila de
+> `ax_L0_cons_def` daba la codificación de antes de ADR‑113.
+
 | # | Nombre | Enunciado matemático |
 |---|---|---|
 | Ax 2 | `ax2_peano_succ_neq_zero` | ∀ n, σ(n) ≠ 0 |
@@ -149,7 +154,7 @@ abbrev ex := @Formula.ex
 | Ax 24 | `ax24_mod2_of_even` | ∀ n, k, n = 2k ⇒ mod2(n) = 0 |
 | Ax 25 | `ax25_pred_zero` | τ(0) = 0 |
 | Ax 26 | `ax26_pred_succ` | ∀ n, τ(σ(n)) = n |
-| Ax_L0 | `ax_L0_cons_def` | ∀ h, t, cons(h,t) = ⟨h, σ(t)⟩ (vía pair) |
+| Ax_L0 | `ax_L0_cons_def` | ∀ h, t, cons(h,t) = σ⟨h, t⟩ (vía pair; ✏️ desde ADR‑113: decía ⟨h, σ(t)⟩) |
 | Ax_L1 | `ax_L1_in_nil` | ∀ x, ¬ In(x, nil) |
 | Ax_L2 | `ax_L2_in_cons` | ∀ x, h, t, In(x, cons(h,t)) ⇔ x=h ∨ In(x,t) |
 | Ax_L3 | `ax_L3_in_concat` | ∀ x, L, M, In(x, L##M) ⇔ In(x,L) ∨ In(x,M) (requiere inducción) |

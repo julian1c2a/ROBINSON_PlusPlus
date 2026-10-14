@@ -38,7 +38,9 @@ hueco. ⇒ 🔑 **La regla de ADR-021 se afina**: lo que rompe la naturalidad no
   nivel actuante y el hueco alto hay **dos** casillas.
 * Las **ocho** obligaciones administrativas del chasis interior, sobre el triple empaquetado.
 * El ensamblaje `hbdAllPrems_of_body`, que deja **una sola** obligación abierta —
-  `DEUDA_premsBody`, el cuerpo del `∀` interior — **enunciada, no postulada**.
+  `DEUDA_premsBody`, el cuerpo del `∀` interior — **enunciada, no postulada**. (✏️ 2026‑10‑14,
+  ADR‑134: la salda este mismo módulo, `premsBody_deuda` (§8 de §9bis), y con ella cierra D3:
+  `hB_premsDotAt` y `d3_prf_real`, en el último §3, «D3, PROBADA».)
 
 **Footprint**: la base sancionada.
 -/

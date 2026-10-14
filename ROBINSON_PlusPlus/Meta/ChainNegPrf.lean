@@ -30,6 +30,9 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 > de `negVerifier_proved`, retirado junto con sus consumidores (los `cierra_*`, `rama_*` y `derives_*`):
 > ninguna se usa fuera de este módulo. Hay que borrarlo o portarlo cuando `⊬¬G` se reformule sobre
 > `Prf`, por Rosser (ADR‑115 §7); hasta entonces es guía de casos, no prueba (ADR‑115 §4).
+> (✏️ 2026‑10‑14, ADR‑134: `⊬¬G` ya está sobre `Prf` desde ADR‑121, y sin este módulo: `goedel_I_neg`
+> (`Meta/SolidezVerificador.lean`), que no lo importa. Ese disparador se cumplió; lo que queda es decidir qué
+> hereda Rosser (⬜, T01) y retirar el resto (T66 de `doc/AUDITORIA-SUELO-2026-10-12.md`).)
 -/
 
 /-!
@@ -44,6 +47,9 @@ demostrado** (ADR‑115 §4): el footprint de los tres llevaba las cuatro meta�
 `1dac85a`). Los tres eran teoremas sobre `⊢` y se **retiraron** con ADR‑115, como `NegVerifier` y
 `reflects_of_omega`; y la hipótesis que quedaba, `OmegaConsistent`, era refutable por su definición
 (L1‑4). ⇒ Hoy `NegVerifier` **no existe**, y la mitad `⊬¬G` no tiene formulación sobre `Prf`.
+(✏️ 2026‑10‑14, ADR‑134: la tiene desde ADR‑121, por otra vía y sin este módulo:
+`goedel_I_neg : ¬ Prf (neg godelCN)` (`Meta/SolidezVerificador.lean`), por la solidez del verificador en el
+modelo `MNV V₀`.)
 
 ⚠️ **ÁMBITO (M‑13)**: lo que esto cerraba era `NegVerifier`, no la ω‑consistencia.
 `reflects_of_omega` (`Meta/OmegaReflect.lean`, retirado) seguía tomando **dos** hipótesis y pasó a
@@ -107,7 +113,7 @@ adversarial, ADR-075):
 
 1. ⛔ **«Las causas son CINCO» — son SEIS.** Falta el **desajuste de TIPO** de argumento (no de
    aridad): `decodeTerm` y `decodeForm` tienen rangos de tag **disjuntos**
-   (`Meta/CodeDecode.lean:80,115`) y `StdArgs` (`Meta/OmegaReflect.lean` §1bis) sólo exige que cada
+   (`Meta/CodeDecode.lean`) y `StdArgs` (`Meta/OmegaReflect.lean` §1bis) sólo exige que cada
    argumento sea `formCode _` **o** `termCode _`, **sin decir cuál**. ⭐ Pero no es un muro: los
    tags 9/10 llevan las guardas `hasWitF`/`hasWit` **dentro** desde ADR-020, y
    `crit_isTC1_junk_refuted_open` (`Meta/CodeWitnessPrf.lean`) las refuta.
@@ -140,7 +146,10 @@ y su cadena está **escrita en positivo** en las ramas `mp`/`gen` de `prf_chainO
 (`Meta/Representability2Prf.lean`) — *el sujeto cambia, la prueba no*. Lo que de verdad queda es
 el **front-end** y el **cambio de cota**
 `boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧`, cuyos dos sentidos hacia `In` ya existen
-(`Meta/RunFnBoundedPrf.lean:225` y `:246`).
+(`prf_In_runFn_of_boundedCarcIn` y `prf_boundedCarcIn_of_In_runFn`, `Meta/RunFnBoundedPrf.lean`).
+(✏️ 2026‑10‑14, ADR‑134: las dos se resolvieron el mismo 2026‑09‑21. El front‑end es
+`decodeChainAux_none_first` (§2bis, commit `01ef473`), y el cambio de cota no hizo falta: la cota se refutó
+por inducción directa, `derives_not_boundedCarcLt` (`0651c1e`), sobre `⊢` y retirado con ADR‑115.)
 -/
 
 open FOL
@@ -183,7 +192,7 @@ ADR‑115, como §1: lo que sigue de él es REGISTRO.
 
     lineOkB c p i := land (lineWF (nthc p i)) (boundedPremsIn c p i (premsOf (nthc p i)))
 
-`prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean:78`) deriva `lineOkB nil q i` entero y termina en
+`prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean`) deriva `lineOkB nil q i` entero y termina en
 `PrfH_and_elim_left`. ⇒ **el caso (e) es la MISMA derivación con `and_elim_right`**, y su puente
 es el gemelo literal de `derives_chainOk_neg_of_line`.
 
@@ -204,10 +213,12 @@ paga.*
 alimentador. Falta producir la hipótesis `⊢ ¬ boundedPremsIn …` a partir del hecho decidible, y
 eso pide (i) el **cambio de cota** `boundedCarcLt y ⟦l⟧ k̄ → boundedCarcIn y ⟦l.take k⟧` y (ii) un
 **front-end** `decodeChainAux … = none → ∃ k` que **no existe y que necesitan las SEIS causas**,
-no sólo (e). -/
+no sólo (e). (✏️ 2026‑10‑14, ADR‑134: registro. El front‑end existe desde el mismo 2026‑09‑21,
+`decodeChainAux_none_first` (§2bis), y el cambio de cota no hizo falta: véase la nota al final de la
+cabecera.) -/
 
 /-- ⭐ **De la cadena sale la ACOTACIÓN DE PREMISAS de la línea `i`-ésima.**
-Gemelo exacto de `prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean:78`): misma derivación, y donde
+Gemelo exacto de `prf_lineWF_of_chainOk` (`Meta/D3BodyPrf.lean`): misma derivación, y donde
 aquélla toma `and_elim_left` ésta toma `and_elim_right`. -/
 theorem prf_boundedPremsIn_of_chainOk (q i : Term) :
     Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒

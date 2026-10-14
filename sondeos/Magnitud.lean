@@ -5,6 +5,9 @@ Calcula log₂(valor+1) del término `formCode φ` siguiendo las ecuaciones EXAC
   nil = zero = 0
   cons h t = pair h (σ t) = ((h+σt)(h+σt+1) + 2(σt)) / 2        [ax_L0_cons_def + cantor_func]
 Todo en espacio logarítmico para no desbordar.
+(✏️ 2026‑10‑14, ADR‑134: son las ecuaciones de ANTES de ADR‑113. Hoy `cons h t = σ (pair h t)` y
+`consN a b = triN (a + b) + b + 1` (`Minimal/Axioms.lean`); `L`, abajo, sigue la vieja, y el sondeo compila
+(`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05): lo que imprime es la magnitud con la codificación anterior.)
 -/
 import ROBINSON_PlusPlus.Meta.Provability
 

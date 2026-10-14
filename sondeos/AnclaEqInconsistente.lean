@@ -9,12 +9,15 @@ import ROBINSON_PlusPlus.Meta
 > ✏️ **2026‑10‑04 · ADR‑117 — leer antes que el resto.** Lo que este sondeo midió (abajo, sin cambios) era
 > sobre la teoría de 141 axiomas, con el ancla como HIPÓTESIS de clase. Desde ADR‑117 el ancla se postula
 > como el último de 142 axiomas —el axioma diagonal `ax_axiomsCodeT_def`, que nombra `axiomsCodeT` FUERA
-> de `In`—, y `AnclaEq` es un TEOREMA (`prf_ancla`, instancia `instAnclaEq`). El argumento de F1 ya no da `⊥`
+> de `In`—, y `AnclaEq` es un TEOREMA (`prf_ancla`, instancia `instAnclaEq`; ✏️ 2026‑10‑14, ADR‑134: ADR‑118
+> retiró la clase y su instancia, y queda el teorema `prf_ancla`). El argumento de F1 ya no da `⊥`
 > sin partir de él: si la traducción conservara el ancla, ya habría `Prf ⊥` (`f1_traduccion_refutada`, §8).
 > ⇒ §1, §3 y §4 siguen compilando (la maquinaria del reemplazo); lo que dependía de que sólo DOS axiomas
 > nombraran `axiomsCodeT` (`filtro_occ`, `occ_casos`, `hax_rr`, §5, §6, los controles 1 y 3 y §7) pasa a
 > REGISTRO, y §8 es el control de ahora. ⚠️ Nada de esto prueba que los 142 sean consistentes: no hay
-> modelo.
+> modelo. (✏️ 2026‑10‑14, ADR‑134: desde ADR‑120 lo hay —`MNV V₀` satisface los 142, `MN_axioms`— y
+> `consistencia : ConsistentH` (`Meta/Consistencia.lean`) prueba la consistencia de `Prf`, los 142 CON los
+> esquemas; este sondeo no usa el modelo y sigue sin probarla.)
 -/
 
 /-!
@@ -70,7 +73,9 @@ EXTENSIÓN. Un ancla que fija su valor no es derivable, y si se deriva, lo que s
   es consistente el ancla NO es derivable (la inferencia de la auditoría, ahora compilada), y
   además que suponerla como hipótesis junto a `ConsistentH` es contradictorio.
 * **No** dice nada de `ax_axiomsCodeT_eq` (el ancla sobre `⊢`): `Derives` está habitado por
-  `axiom`s y no admite la inducción de §3. SIN MEDIR.
+  `axiom`s y no admite la inducción de §3. SIN MEDIR. (✏️ 2026‑10‑14, ADR‑134: ese axioma se retiró con la
+  capa `⊢`, ADR‑115. Y la razón es M‑11 al revés, corregida en ADR‑133: inducir sobre un inductivo habitado
+  por `axiom`s es válido; lo que puede ser falso es el `axiom`, si contradice lo que se demuestra por inducción.)
 * **No** mide la salida. La propuesta de la auditoría (`EsAx(c) := ⋁ c = ⌜aᵢ⌝`) parece circular
   para los dos axiomas que la usarían, porque su lista tendría que contener su propio código.
   Es un argumento de tamaño, SIN COMPILAR.
@@ -636,6 +641,7 @@ end Sondeos.AnclaEqInconsistente
 
 /-! ### REGISTRO (desde ADR‑117 el ancla es una instancia, y la resolución de clases la encuentra: el error
 que el control 3 fijaba ya no sale). Y la medición de los footprints de §5 y el control de §7, también.
+(✏️ 2026‑10‑14, ADR‑134: desde ADR‑118 ni la clase `AnclaEq` ni su instancia existen.)
 
 ### Control 3 (el ancla hace falta): sin `[AnclaEq]`, `in_rr_imp` NO compila.
 open Sondeos.AnclaEqInconsistente in

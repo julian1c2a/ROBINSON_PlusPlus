@@ -738,12 +738,12 @@ theorem refl_substtc_lista_nil (v s : Term) : Prf (targetSubsttsc v s nil) := by
 
    Aquí había una copia local del reflector del átomo `=`. El agente que la escribió la
    declaró como pieza nueva; el verificador adversarial lo refutó y yo lo confirmé:
-   está en `ROBINSON_PlusPlus/Meta/Sigma1AtomPrf.lean:246`, con enunciado **idéntico**
+   está en `ROBINSON_PlusPlus/Meta/Sigma1AtomPrf.lean`, con enunciado **idéntico**
    (`Prf ((t =eq u) ⇒ provFromCode (eqCodeFn (tcFn t) (tcFn u)))`) y ya consumida en
-   `Meta/InAxiomsCodePrf.lean:220`.
+   `Meta/InAxiomsCodePrf.lean`.
 
    La copia local la **SOMBREABA** — la trampa registrada de «misma definición en dos
-   namespaces». Este fichero abre `Sigma1AtomPrf` en la línea 17, así que el uso de
+   namespaces». Este fichero abre `Sigma1AtomPrf` (el `open` de la cabecera), así que el uso de
    más abajo resuelve solo a la de producción. -/
 
 /-- Rama `v < n` (clausula `ax_substtc_var_gt`). **La UNICA que necesita `pred` dotado.** -/

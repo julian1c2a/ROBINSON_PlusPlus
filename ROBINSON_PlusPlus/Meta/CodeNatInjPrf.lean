@@ -22,7 +22,8 @@ codeNatTerm_ne {t u : Term}    (h : t ≠ u) : axioms ⊢ neg (numeral (codeNatT
 ## ⚠️ Por qué esto NO es `canon_ne`, que era FALSO
 
 `canon_ne` comparaba **términos con forma de código**, y en esta teoría un árbol `cons` **ES** un
-número (`cons nil nil = 2 = numeralM 2`), así que términos sintácticamente distintos pueden ser
+número (`cons nil nil = 2 = numeralM 2`; ✏️ 2026‑10‑14, ADR‑134: con el `cons` de ADR‑113, `cons nil nil = 1`, y la
+tesis no cambia), así que términos sintácticamente distintos pueden ser
 **provablemente iguales** — de ahí el `⊥` (`sondeos/CanonNeRefuta.lean`).
 
 Aquí se comparan **NUMERALES**, donde la distinción **sí** es provable. Es la misma corrección de
@@ -31,7 +32,9 @@ categoría que ADR‑012: lo que hay que distinguir es el **VALOR**, no la sinta
 ## El motor
 
 **`consN_inj`** es el emparejamiento de Cantor: `consN a b = triN (a+b+1) + (b+1)`, con el offset
-acotado por la diagonal. De él salen en cascada `codeNatChars_inj` → `codeNatStr_inj` →
+acotado por la diagonal (✏️ 2026‑10‑14, ADR‑134: ésa era la de antes de ADR‑113, con
+`cons a b = pair a (σ b)`; hoy `consN a b := triN (a + b) + b + 1`, en `Minimal/Axioms.lean`, como dice
+el docstring de `consN_inj`). De él salen en cascada `codeNatChars_inj` → `codeNatStr_inj` →
 `codeNatTerm_inj`/`codeNatTerms_inj` → `codeNat_inj`. ⇒ **cualquier estructura construida con
 `consN` desde hojas inyectivas queda inyectiva.**
 
@@ -51,8 +54,9 @@ los dos resultados de cabecera —`codeNat_ne` y `codeNatTerm_ne`— salen con *
      FOL.MetaRules.ex_elim, FOL.MetaRules.gen, FOL.MetaRules.imp_intro, FOL.MetaRules.raa,
      ROBINSON_PlusPlus.Full.ax_induction]
 
-Las cinco meta-reglas ω y `ax_induction` entran enteras por `Full.numeral_ne`, que tiene ese
-mismo footprint. **No hay axioma NUEVO** —que es lo que la frase quería decir— pero «cero
+Las cuatro meta-reglas y `ax_induction` entran enteras por `Full.numeral_ne`, que tiene ese
+mismo footprint. (✏️ 2026‑10‑14: decía «las cinco meta-reglas ω»: en la lista de arriba son cuatro, y
+`gen` no es la ω‑regla, ADR‑027.) **No hay axioma NUEVO** —que es lo que la frase quería decir— pero «cero
 axiomas» era falso, y es justo la clase de frase que un libro cita como garantía.
 Desbloquea los casos 3 y 4 del módulo C de `NegVerifier` (ver `PLAN-NEGVERIFIER.md`).
 🗑️ Este párrafo es REGISTRO: `codeNat_ne`, `codeNatTerm_ne` y `Full.numeral_ne` eran de `⊢` y se

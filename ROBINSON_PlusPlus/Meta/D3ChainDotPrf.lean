@@ -10,22 +10,30 @@ import ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 # `Meta/D3ChainDotPrf.lean` — el CHASIS de `hC_dot`, y el puente ÁTOMO ↔ FORMA ACOTADA
 
 **D3 está reducida a un solo lema** desde §3.19: `d3_prf_of_chainOkDot (φ) (hC)`
-(`Meta/D3InDotPrf.lean:524`) sólo pide
+(`d3_prf_of_chainOkDot`, `Meta/D3InDotPrf.lean`) sólo pide
 
     hC_dot : Prf (chainOk nil #0 ⇒ provFromCode chainOkDot)
 
 y `hI_dot`, el otro átomo punteado, ya está cerrado. Este módulo ataca `hC_dot`.
+
+✏️ 2026‑10‑14 (ADR‑134): registro — **D3 está PROBADA desde el 2026‑09‑10**: `d3_prf_real`
+(`Meta/PremsBdAllPrf.lean`) es `d3_prf_of_halves` (§13 de este módulo) con `hA_lineWFDotAt`
+(`Meta/D3BodyPrf.lean`) y `hB_premsDotAt` (`Meta/PremsBdAllPrf.lean`), y `pcc_lineWF_tracked`
+(`Meta/SubstTreeReflect.lean`, C3) no tiene hipótesis. Lo que sigue describe el estado del día en
+que se escribió cada sección (del 2026‑09‑07 al 2026‑09‑10): sus «queda», «falta» y ⬜ son registro.
 
 ## El hueco que A3 no tenía
 
 La reflexión de un `∀` acotado con argumento **abstracto** ya está resuelta y ejercitada: es
 `pcc_bdAll_intro` (`Meta/BdAllIntroPrf.lean:313`), la keystone de §3.20.7, y
 `sondeos/A3IsFCBTracked.lean:819` la aplica entera (`pcc_wfAll_tracked`) descargando sus ocho
-obligaciones administrativas.
+obligaciones administrativas. (✏️ 2026‑10‑14, ADR‑134: el sondeo es hoy registro: no compila en
+ninguna pasada medida desde la del 2026‑10‑02 —en la última (2026‑10‑05, `sondeos/pasadas/tabla_adr129.txt`),
+error en su l. 355—; lo que usa el build es `pcc_bdAll_intro` mismo.)
 
 ⚠️ **Pero aquel caso no tenía el hueco que tiene éste.** Allí `wfAll` **es** un `∀` acotado, así
 que lo que `pcc_bdAll_intro` entrega —el código de un `∀` acotado— *es* lo que se pedía. Aquí
-no: `chainOk` es un **ÁTOMO** (`Minimal/Axioms.lean:865`, `Formula.atom sym!"chainOk" [c,p]`), y su
+no: `chainOk` es un **ÁTOMO** (`chainOk`, `Minimal/Axioms.lean`, `Formula.atom sym!"chainOk" [c,p]`), y su
 forma acotada `chainOkB` es otra fórmula. `pcc_bdAll_intro` daría `Prov(⌜chainOkB nil ṗ⌝)`, y
 `hC_dot` pide `Prov(⌜chainOk nil ṗ⌝)`.
 
@@ -49,12 +57,19 @@ No prueba `DEUDA_chainOkBDot`. Aplicarle `pcc_bdAll_intro` pide, como `hbody`, l
 
 1. la reflexión del átomo `lineWF`, que es exactamente **`pcc_lineWF_tracked`** — y ése no
    existe sin condicionar: sólo `pcc_lineWF_tracked_modulo_7`
-   (`Meta/LineWFAssemblePrf.lean:104`), que pide los **7 reflectores de la rama C3**;
+   (`pcc_lineWF_tracked_modulo_7`, `Meta/LineWFAssemblePrf.lean`), que pide los **7 reflectores de la rama C3**;
 2. la reflexión de `boundedPremsIn`, que es un **segundo `∀` acotado anidado** — trabajo nuevo,
    pero de la misma forma que §1‑§2, luego otra aplicación de `pcc_bdAll_intro`.
 
 ⇒ **D3 está aguas abajo de C3 por la vía (1)**, y eso conviene tenerlo escrito: «ir a por D3»
 sin cerrar antes los 7 reflectores sólo puede producir chasis, no el teorema.
+
+(✏️ 2026‑10‑14, ADR‑134: hoy `pcc_lineWF_tracked` existe sin condicionar —C3 se cerró el
+2026‑09‑10, `Meta/SubstTreeReflect.lean`— y las dos obligaciones están pagadas: (1) en
+`hA_lineWFDotAt` y (2) en `hB_premsDotAt`. `DEUDA_chainOkBDot` no tiene teorema con nombre: la
+paga, dentro de `d3_prf_real` (vía `d3_prf_of_halves` → `d3_prf_of_hbody`), el término
+`DEUDA_chainOkBDot_of_hbody hwP_chainOkBPsi (hbody_of_halves hA_lineWFDotAt hB_premsDotAt)`, que es el cuerpo
+de `hbody_prems`.)
 -/
 
 open ROBINSON_PlusPlus.Minimal.Axioms
@@ -80,7 +95,7 @@ namespace ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 /-! ## §1 · EL PUENTE ÁTOMO ↔ FORMA ACOTADA, DENTRO DE `Prov` -/
 
 /-- El código punteado de la **forma acotada**, en el mismo molde que `chainOkDot`
-    (`Meta/D3DottedPrf.lean:87`), que es el del átomo. -/
+    (`chainOkDot`, `Meta/D3DottedPrf.lean`), que es el del átomo. -/
 abbrev chainOkBDot : Term :=
   substfc zero (tcFn (.var 0)) (formCode (chainOkB nil (.var 0)))
 
@@ -191,6 +206,9 @@ theorem chainOkBDot_computed :
 
 /-! ### §3.1 · Lo que queda, con los tamaños medidos
 
+✏️ 2026‑10‑14 (ADR‑134): registro — hoy no queda nada: la cota es §4 (`PrfH_chainOkB_bnd_bridge`),
+(a) es `hA_lineWFDotAt` y (b) `hB_premsDotAt`; lo que sigue describe el estado del 2026‑09‑09f.
+
 | pieza | estado |
 |---|---|
 | `d3_prf_of_chainOkBDot` (§2) y todo lo de aguas abajo | ✅ **probado** |
@@ -256,7 +274,8 @@ theorem PrfH_chainOkB_bnd_bridge {Γ : List Formula} (p Phic : Term)
 
     Con esto, D3 queda a **una sola** obligación con enunciado explícito: producir la reflexión
     del cuerpo `lineOkB nil p i`. Todo lo demás —el puente átomo↔acotada de §1, la apertura del
-    destino de §3, y el puente de la cota de §4— está probado. -/
+    destino de §3, y el puente de la cota de §4— está probado. (✏️ 2026‑10‑14, ADR‑134: registro
+    — hoy D3 está probada, `d3_prf_real`.) -/
 theorem DEUDA_chainOkBDot_of (Phic : Term)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
     (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
@@ -527,7 +546,9 @@ theorem pcc_premsBody_reflect (Ac y p i : Term) :
       (PrfH.hyp _ _ (List.Mem.head _))
 
 /-- La forma que el `hbody` del `pcc_bdAll_intro` de `boundedPremsIn` consumirá: el cuerpo ya
-    instanciado en el índice `j` de la lista `L`. -/
+    instanciado en el índice `j` de la lista `L`. (✏️ 2026‑10‑14, ADR‑134: no la consumió: el
+    chasis interior (`Meta/PremsBdAllPrf.lean`) va por `pcc_bdEx_carc_reflect_gen` (§5bis), y este
+    lema no tiene consumidor; grep del 2026‑10‑14.) -/
 theorem pcc_premsBody_reflect_at (Ac L j p i : Term) :
     Prf (chainOk nil p ⇒ (lt i (lenc p) ⇒
       (lor (In (nthc L j) nil) (boundedCarcLt (nthc L j) p i) ⇒
@@ -688,7 +709,8 @@ theorem hmatch_chainOkB :
 
 /-- ⭐⭐⭐ **D3 REDUCIDA A TRES OBLIGACIONES SOBRE UN `PsiF` YA FIJADO.** Comparado con
     `DEUDA_chainOkBDot_of` (§4), el cuerpo deja de ser un parámetro libre y `hmatch` desaparece:
-    lo que queda es la invariancia del cuerpo, su testigo, y el `pcc_bdAll_intro`. -/
+    lo que queda es la invariancia del cuerpo, su testigo, y el `pcc_bdAll_intro`. (✏️ 2026‑10‑14,
+    ADR‑134: registro — hoy D3 está probada, `d3_prf_real`.) -/
 theorem DEUDA_chainOkBDot_of_hbdAll
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
       =eq chainOkBPsi (tcFn (.var 0)) (.var 0)))
@@ -753,7 +775,8 @@ theorem hPinv_chainOkBPsi : ∀ u : Term,
     (hW_chainOkBPsi (.var 0)) (hL_chainOkBPsi (.var 0))
     (lineOkB nil (.var 1) (.var 0)) hfv_chainOkBPsi u
 
-/-- Y D3 baja a **DOS** obligaciones. -/
+/-- Y D3 baja a **DOS** obligaciones. (✏️ 2026‑10‑14, ADR‑134: registro — hoy D3 está probada,
+    `d3_prf_real`.) -/
 theorem DEUDA_chainOkBDot_of_two
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbdAll : Prf (chainOk nil (.var 0) ⇒
@@ -911,6 +934,10 @@ theorem d3_prf_of_body (φ : Formula)
 
 /-! ### §10.6 · Lo que queda, y por qué `hPsiId` **no** sale de §9
 
+✏️ 2026‑10‑14 (ADR‑134): registro — las dos ⬜ están pagadas: `hPsiId` en §11
+(`hPsiId_chainOkBPsiDot`) y `hbody` en `Meta/PremsBdAllPrf.lean` (`hbody_prems`); lo que sigue
+describe el estado del 2026‑09‑09i.
+
 | obligación de `pcc_bdAll_intro` | estado |
 |---|---|
 | `hCl`, `hCs`, `hbl`, `hbs` | ✅ §10.3 |
@@ -1004,6 +1031,9 @@ theorem d3_prf_of_hbody (φ : Formula)
 
 /-! ### §11.1 · Lo que queda de D3
 
+✏️ 2026‑10‑14 (ADR‑134): registro — `hwP` es `hwP_chainOkBPsi` (§12), (a) `hA_lineWFDotAt` y (b)
+`hB_premsDotAt`; lo que sigue describe el estado del 2026‑09‑10, antes de §12.
+
 | pieza | estado |
 |---|---|
 | §3–§10 y las **ocho** obligaciones administrativas del chasis | ✅ |
@@ -1060,6 +1090,10 @@ theorem d3_prf_of_body_only (φ : Formula)
   d3_prf_of_chainOkBDot φ (DEUDA_chainOkBDot_of_body_only hbody)
 
 /-! ### §12.1 · Lo que queda de D3: **`hbody`, y sólo `hbody`**
+
+✏️ 2026‑10‑14 (ADR‑134): registro — las dos mitades están probadas: (a) `hA_lineWFDotAt`, con
+`pcc_lineWF_tracked` ya sin hipótesis (`ind` y `listInd` incluidos), y (b) `hB_premsDotAt`; §13.1
+corrige además lo que aquí se dice de (b).
 
     hbody : ∀ q i, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
               provFromCode (substfc 0 (tcFn i) (chainOkBPsiDot q))))
@@ -1201,9 +1235,17 @@ instanciar»— sin haber desplegado el destino. Es exactamente el error que
 [[feedback-medir-la-forma]] viene a evitar, y el mismo que ADR‑021 documenta un nivel más arriba:
 **que las piezas estén enunciadas sobre argumentos abstractos no garantiza que el destino se deje
 instanciar con ellas.** `pcc_bdCarcLt_reflect` y `pcc_premsBody_reflect` siguen siendo correctos y
-seguirán haciendo falta; lo que no vale es la estimación de que bastaban.
+seguirán haciendo falta; lo que no vale es la estimación de que bastaban. (✏️ 2026‑10‑14, ADR‑134: no
+hicieron falta: el chasis interior (`Meta/PremsBdAllPrf.lean`) usa el genérico
+`pcc_bdEx_carc_reflect_gen` (§5bis), y `pcc_bdCarcLt_reflect` sólo lo usa
+`pcc_premsBody_reflect`, y éste sólo `pcc_premsBody_reflect_at`, que no tiene consumidor; grep del 2026‑10‑14.)
 
 ### §13.2 · Lo que queda, con la dependencia REAL
+
+✏️ 2026‑10‑14 (ADR‑134): registro — (b) también está probada, `hB_premsDotAt`, y las tres piezas
+de §13.3 existen: B1 es `pcc_eval_premsOf` (`Meta/PremsOfDotPrf.lean`), B2 `pcc_bnd_bridge`
+(`Meta/D3BodyPrf.lean`) y B3 `hbdAllPrems_of_body` con `premsBody_deuda` (`Meta/PremsBdAllPrf.lean`);
+`d3_prf_real` cierra D3. Las dos tablas describen el estado del 2026‑09‑10, con B1 aún ⬜.
 
 | pieza | estado | depende de |
 |---|---|---|
@@ -1229,7 +1271,12 @@ end ROBINSON_PlusPlus.Meta.D3ChainDotPrf
 
 El consumidor previsto es la rama **D**: quien pruebe `DEUDA_chainOkBDot` obtiene D3 aplicando
 `d3_prf_of_chainOkBDot`, sin una línea más. Nada consume todavía este módulo, y se dice en vez
-de fingir una medición de consumo (mismo criterio que `Meta/EvalSubstfcPrf.lean`). -/
+de fingir una medición de consumo (mismo criterio que `Meta/EvalSubstfcPrf.lean`).
+
+✏️ 2026‑10‑14 (ADR‑134): hoy es por CONSUMO (grep del 2026‑10‑14): lo consumen `Meta/D3BodyPrf.lean`
+(`lineWFDotAt`, `premsDotAt`) y `Meta/PremsBdAllPrf.lean` (`d3_prf_of_halves`, `hbody_of_halves`,
+`pcc_bdEx_carc_reflect_gen`, `hW_chainOkBPsi`, `hL_chainOkBPsi`, `chainOkBPsiDot`, `premsDotAt`).
+D3 se cerró por esta vía: `d3_prf_real` = `d3_prf_of_halves`, que acaba en `d3_prf_of_chainOkBDot`. -/
 export ROBINSON_PlusPlus.Meta.D3ChainDotPrf (
   chainOkBDot prf_forall_chainOkB_imp_chainOk pcc_chainOkBDot_imp_chainOkDot
   hC_dot_of_chainOkBDot DEUDA_chainOkBDot d3_prf_of_chainOkBDot

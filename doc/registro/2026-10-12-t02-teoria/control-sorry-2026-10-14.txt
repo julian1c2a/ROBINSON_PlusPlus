@@ -1,0 +1,20 @@
+=== sorry report ===
+
+✅ No sorry found.
+
+════ CENSO DE AGUJEROS DE CONFIANZA (esperado: 0 en todos) ════
+  ✓ native_decide                                0
+  ✓ decide +native                               0
+  ✓ unsafe                                       0
+  ✓ opaque                                       0
+  ✓ implemented_by                               0
+  ✓ extern                                       0
+  ✓ ofReduceBool · ofReduceNat · trustCompiler 0
+  ✓ skipKernelTC · addDeclWithoutChecking       0
+  ✓ los 8 agujeros siguen a CERO en todo lo que compila el build (RPP, FOL y TheoryFramework)
+
+════ EVALUAR EL ANCLA (ADR-117; esperado: ninguna orden) ════
+  ✓ ninguna orden `#eval`, `#reduce`, `#guard` ni `run_cmd` toca `axioms`, el ancla ni un evaluador META (el build y sondeos/)
+
+✅ NI `sorry` NI AGUJEROS DE CONFIANZA.
+rc=0 segundos=82

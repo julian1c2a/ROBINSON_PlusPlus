@@ -10,7 +10,10 @@ import ROBINSON_PlusPlus
 `ax_L0_cons_def` dice **`cons a b = pair a (σb)`**. La función `λ a b. cantor(a, b+1)` **no es
 sobreyectiva**: se deja fuera los números triangulares `T(1)=1`, `T(3)=3`… ⇒ el `1` no es ni
 `nil` ni un `cons`, el dominio ℕ tiene **basura**, y el esquema de inducción de listas —que es un
-constructor de `Prf`— resulta **falso en ℕ** (ADR‑088).
+constructor de `Prf`— resulta **falso en ℕ** (ADR‑088). (✏️ 2026‑10‑14, ADR‑134: es la codificación de
+entonces. ADR‑113 (2026‑09‑28) adoptó la corrección de este sondeo: hoy `ax_L0_cons_def` dice
+`cons a b = σ (pair a b)` y `consN a b = triN (a + b) + b + 1` (`Minimal/Axioms.lean`); la decisión de abajo
+ya está tomada.)
 
 ## La corrección, en una línea
 

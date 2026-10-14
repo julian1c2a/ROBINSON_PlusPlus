@@ -4,6 +4,11 @@
 **Status (2026-06-24):** 🟢 muy avanzado — **Gödel I real + D1 real (⊢ y finitaria `Prf`) + D2 real ⊢ COMPLETOS**; **teorema de deducción finitario** y **regla de confinamiento ∀ `qconf`** integrados; **fix de solidez FOL** (axioma De Bruijn falso → teorema). **En curso:** Gödel II finitario (`goedel_second_prf : ConsistentH → ¬ Prf Con'`) — bloqueado en el **lema de Barendregt** (composición subst–subst niveles mixtos) → inducción de listas en `Prf` (`Prf.listInd`) → `d2_prf`/`d3_prf`. 47 módulos, 60 jobs, 0 sorrys. (El plan por fases de abajo es la hoja de ruta original; ver [NEXT-STEPS.md](NEXT-STEPS.md)/[CHANGELOG.md](CHANGELOG.md) para el detalle vivo.)
 **Decisión:** Opción **A** (aritmetización real) — ver §0.
 
+> ✏️ **2026‑10‑14 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es el plan de junio de 2026, y no se ha re‑medido
+> contra el árbol. La capa `⊢` y las meta‑reglas de FOL se retiraron (ADR‑115), `gen` no es la ω‑regla (ADR‑027), los
+> puentes `prfI_to_derives` y `prf_to_derives` y `consistentH_of_omega` ya no existen, y `Prf` tiene además `ind`,
+> `qconf` y `listInd`. La teoría de los titulares y lo que se supone hoy, en [AXIOMS.md](AXIOMS.md) §0.
+
 Este documento especifica el plan para convertir las condiciones de
 demostrabilidad de Hilbert-Bernays-Löb **D1, D2, D3** de *meta-axiomas* (estado
 2026-06-13) en **teoremas**, sobre un sistema finitario nuevo.
@@ -51,7 +56,7 @@ solidez**.
 | D-1 | Sistema finitario objetivo | **Cálculo de Hilbert fresco** `⊢ᴴ` | Lo más limpio de codificar (una prueba es una lista de fórmulas); estándar en la literatura (O'Connor/Coq, Paulson/Isabelle). |
 | D-2 | Relación con el sistema existente | **Paralelo, no reemplazo** | Tocar la ω-regla destruiría Full/TFA/Gödel I-II. Nuevos módulos `Meta/Hilbert*.lean`. |
 | D-3 | Codificación de secuencias | **Listas `cons`/`nil`** (de `Meta/Godel.lean`) | Ya inyectivas y probadas; más simple que la primorial/TFA. |
-| D-4 | Fuerza del sistema | **Q (= axiomas de Minimal) para Gödel I**; **+ esquema de inducción** sólo al llegar a D3 | Q basta para Gödel I (Fases 0–3). D3 (Σ₁-completitud *provable*) necesita ~IΣ₁; la inducción se añade como **esquema finitario de axiomas** (no ω-regla) en la Fase 5. |
+| D-4 | Fuerza del sistema *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): lo construido fue la inducción para TODA fórmula, `Prf.ind`, y no «~IΣ₁»: la teoría de los titulares contiene a PA, [AXIOMS.md](AXIOMS.md) §0; y D1 la usa, §0.3. Y los axiomas de Minimal no son Q: lo contienen, con la conmutatividad, la asociatividad y el orden)* | **Q (= axiomas de Minimal) para Gödel I**; **+ esquema de inducción** sólo al llegar a D3 | Q basta para Gödel I (Fases 0–3). D3 (Σ₁-completitud *provable*) necesita ~IΣ₁; la inducción se añade como **esquema finitario de axiomas** (no ω-regla) en la Fase 5. |
 | D-5 | Forma del sistema en Fase 0 | **`Prf : Formula → Prop` inductivo** | El puente de solidez sale por inducción estructural trivial. La forma "secuencia + `IsProof` decidible" (necesaria para codificar) se introduce en Fase 1 con la equivalencia `Prf ↔ ∃ seq`. |
 
 ---

@@ -1,5 +1,11 @@
 # FUNDAMENTACIÓN DE LAS MATEMÁTICAS EN UN ENTORNO DE PEANO Y FOL=
 
+> ✏️ **2026‑10‑12 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es la especificación de junio de 2026 del sistema
+> `Minimal`, y no se ha re‑medido contra el árbol: buena parte de lo que construye —los teoremas de `Block1–8`, sobre
+> `⊢`, y Ax‑P— se retiró (ADR‑115; `ax_p_tfa`, el 2026‑09‑12). Su «sin un principio de inducción generalizado»
+> describe la LISTA de axiomas; los teoremas de Gödel van sobre `T_Prf`, que añade la inducción para toda fórmula
+> ([AXIOMS.md](AXIOMS.md) §0).
+
 > **Nota de Contexto:** Este documento es la especificación formal para el sistema axiomático "Minimal" que se desarrollará como parte del proyecto `ROBINSON_PlusPlus`.
 >
 > El objetivo de este sistema es construir tuplas, listas y funciones discretas desde una base aritmética muy débil, sin un principio de inducción generalizado. Sirve como la primera etapa en una serie de sistemas axiomáticos de fortaleza creciente.

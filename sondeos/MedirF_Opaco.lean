@@ -8,6 +8,8 @@
       sea opaco.»
 
    Este fichero MIDE esa afirmacion contra el arbol de HOY. Todo lo de abajo COMPILA.
+   (✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.
+   `Meta/AxiomListCode.lean`, el de §3, se retiró con la capa `⊢` (ADR‑115), y con él `neg_In_axiomsCodeT`.)
 
    RESUMEN DE LO MEDIDO
    --------------------

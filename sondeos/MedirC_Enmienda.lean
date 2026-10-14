@@ -3,6 +3,7 @@
 MEDICION (no construccion) — LA ENMIENDA DEL ESQUEMA `ax_lineWF_q1` Y SU COSTE.
 Angulo (C).  ⚠️ NO se toca `Minimal/Axioms.lean`: la enmienda se escribe como `def` de `Probe/`.
 Todo lo que se afirma abajo esta COMPILADO en este fichero (exit 0, `lake env lean`).
+(✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 ################################################################################
 
 RESUMEN DE LO MEDIDO (cada punto tiene su teorema o su `run_cmd` en el cuerpo):
@@ -29,6 +30,9 @@ RESUMEN DE LO MEDIDO (cada punto tiene su teorema o su `run_cmd` en el cuerpo):
  8. ¿CAMBIA `G`? **NO.** `godelCN` no depende de `axioms` ni de `ax_lineWF_q1` (medido
     sobre el `Environment`, no por grep). Lo que cambia es la TEORIA (`⊢`), no la
     SENTENCIA. Y el NUMERO de axiomas tampoco cambia: 141 antes y despues.  → §10
+    (✏️ 2026‑10‑14, ADR‑134: medido con 141 axiomas y sobre `⊢`. Hoy son 142 (ADR‑117) y el último,
+    el ancla diagonal, se construye con `axiomsBase`, que la enmienda cambiaría; la teoría es la de
+    `Prf` (la capa `⊢` se retiró, ADR‑115). La dependencia de `godelCN` no se re‑midió.)
 
 Como re-ejecutar:   lake env lean Probe\MC_enmienda.lean
 -/

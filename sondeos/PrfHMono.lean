@@ -49,6 +49,7 @@ que reconstruye la inclusión a través de `Γ.map (liftFormula 0)` con `List.me
 
 **No los mueve a producción.** Su destino es `Meta/HilbertDeduction.lean`, junto a `prfH_weaken` y
 `prf_to_prfH`, y eso cierra B6b — pero es una edición de producción y va en su propio commit.
+(✏️ 2026‑10‑14, ADR‑134: ya están en producción: `PrfH_mono` y `PrfH_w1`, en `Meta/HilbertDeduction.lean`.)
 -/
 
 open FOL

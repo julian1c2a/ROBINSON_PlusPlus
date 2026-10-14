@@ -33,6 +33,8 @@ El suministro de nombres **sí** mete `Classical.choice` en el footprint — per
 matemática: por la implementación de `String` en el núcleo (v4.31, UTF‑8 opaco). Es exactamente
 [[feedback-footprint-no-es-constructividad]]: *el footprint no distingue la no‑constructividad
 matemática de la deuda de implementación del núcleo*.
+(✏️ 2026‑10‑14, ADR‑134: era con `String`. Desde D7 (ADR‑129) los símbolos de FOL son `List Char`, y la instancia
+de nombres frescos, `FOL.Fresh0.instFreshSymListChar`, no depende de ningún axioma, medido en ADR‑129.)
 
 ⇒ Lo refutado es el **coste** («caro», «combinatoria»), no la **constructividad**.
 

@@ -29,7 +29,8 @@ Cierra el frente **S4** de `PLAN-SORTES.md`. Este módulo **descarga la hipótes
 piloto del lema diagonal (`sondeos/PilotoDiagonal.lean`) daba por supuesta, y con ella la vía
 numeral deja de ser condicional.
 
-**Por qué importa.** La inconsistencia de la teoría objeto viene de que `tcFn` tiene dos lecturas
+**Por qué importa.** (✏️ 2026‑10‑12, ADR‑134: la inconsistencia que TUVO por `tcFn` —`ax_tc_cons`, retirado en ADR‑012; hubo
+otras: `Prf ⊥` con el `cons` viejo, hasta ADR‑113—; desde ADR‑120 está DEMOSTRADO que es consistente, `consistencia`.) La inconsistencia de la teoría objeto viene de que `tcFn` tiene dos lecturas
 incompatibles (numeral y sintáctica) porque `⌈φ⌉` se representa como **árbol `cons`**, cuya sintaxis
 no se recupera del valor. Con `⌈φ⌉` escrito como **numeral** la ambigüedad desaparece: el numeral es
 canónico. Este módulo es el puente entre las dos representaciones.
@@ -119,7 +120,7 @@ theorem prf_cons_eval_of {A B : Term} {a b : Nat}
   prf_eq_trans (prf_eq_trans (prf_congr_cons_head ha) (prf_congr_cons_tail hb))
     (prf_cons_eval a b)
 
-/-! ### Los códigos, a nivel `Nat` (espejo exacto de `Provability.lean:34-63`) -/
+/-! ### Los códigos, a nivel `Nat` (espejo exacto de `charsCode`…`formCode`, `Provability.lean`) -/
 
 -- La familia `codeNatChars` · `codeNatStr` · `codeNatTerm`/`codeNatTerms` · `codeNat` vive en
 -- `Minimal/Axioms.lean` desde ADR‑117, con las mismas definiciones; este módulo la reexporta.

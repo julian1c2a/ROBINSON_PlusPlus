@@ -26,6 +26,9 @@ import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 /-!
 # `Meta/LiftcCodePrf.lean` — CONTENIDO EXACTO PROPUESTO (validado desde `Probe/`)
 
+(✏️ 2026‑10‑14, ADR‑134: ya no es una propuesta: es el módulo promovido en `21c8a6b` (2026‑09‑03; el
+párrafo de abajo dice 2026‑09‑02); `Probe/` no está versionado.)
+
 Promocion de `sondeos/ReflectorDesdeConsumidor.lean` (rama B1).
 
 **ESTE FICHERO ES EL MODULO, BYTE A BYTE** — promovido a `ROBINSON_PlusPlus/Meta/` y anadido al
@@ -39,7 +42,9 @@ el control de footprint del modulo, no andamio.
 y sus congruencias internas), y este modulo lo CONSUME. Lo que aporta no son constructores
 genericos sino la teoria a nivel de CODIGO de `liftc`/`liftsc`: su vocabulario, sus cuatro
 axiomas en imagen dotada, y las cuatro clausulas del reflector. `LiftcCodePrf` lo dice; y el
-sufijo `…Prf` es la convencion del arbol.
+sufijo `…Prf` es la convencion del arbol. (✏️ 2026‑10‑14, ADR‑134: hoy son cinco imágenes dotadas,
+aquí y en «Lo que SI se promueve»: A5, `6c07958`, añadió `pcc_liftc_var_lt_code`, la de
+`ax_liftc_var_lt`.)
 
 ## Lo que NO se promueve (ya esta en produccion, byte a byte)
 
@@ -50,14 +55,16 @@ sufijo `…Prf` es la convencion del arbol.
 | `argsInBody`         | `Minimal/Axioms.lean` (idem)                        |
 | `argsIn`             | `Minimal/Axioms.lean` (idem)                        |
 | `isTermCodeE1`       | `Minimal/Axioms.lean` (idem)                        |
-| `impT`               | `Meta/CodeWitnessPrf.lean:105` (idem)               |
-| `prf_or_elim_imp`    | `Meta/CodeWitnessPrf.lean:109` (idem)               |
-| `PrfH_eq_trans_code` | `Meta/EvalCarcNthcPrf.lean:66` (exportado a raiz)   |
-| `eqc_eq_eqCodeFn`    | `Meta/Sigma1AtomPrf.lean:122` como `eqCodeFn_eq_eqc` |
+| `impT`               | `Meta/CodeWitnessPrf.lean` (idem)                   |
+| `prf_or_elim_imp`    | `Meta/CodeWitnessPrf.lean` (idem)                   |
+| `PrfH_eq_trans_code` | `Meta/EvalCarcNthcPrf.lean` (exportado a raiz)      |
+| `eqc_eq_eqCodeFn`    | `Meta/Sigma1AtomPrf.lean` como `eqCodeFn_eq_eqc`    |
 
 Los siete primeros se CONSUMEN con un `open` SELECTIVO (abrir `SinWTs` entero colisionaria con
 `NumCodeClosedPrf.prf_congr_liftc`, que tiene otra aridad). El octavo llega solo, por el `export`
 de `EvalCarcNthcPrf`. El noveno es la orientacion contraria del mismo `rfl`: se usa `.symm`.
+(✏️ 2026‑10‑14, ADR‑134: esa colisión ya no existe: el `prf_congr_liftc` gemelo de `SinWTs` se borró
+en B8b, `c937b30`, y hoy sólo queda el de `NumCodeClosedPrf`.)
 
 ## Lo que SI se promueve: **69** declaraciones (65 de las 75 del sondeo, + 2 puentes nuevos,
 + **2 bajadas desde `sondeos/DescensoLiftc.lean`** en B2: `substF_targetLift`/`substF_targetLiftsc`)
@@ -121,10 +128,10 @@ theorem prf_hasWit_liftscT {c t : Term} (hc : Prf (hasWit c)) (ht : Prf (hasWit 
     Prf (hasWit (liftscT c t)) := prf_hasWit_funcc2 (strCode sym!"liftsc") c t hc ht
 
 /-- `varc x = cons 0 (cons x nil)` ⇒ su imagen punteada es el `unT 0` del KIT
-    (`Meta/CodeCtorKit.lean:60`). CERO simbolos nuevos: es un alias defeq. -/
+    (`Meta/CodeCtorKit.lean`). CERO simbolos nuevos: es un alias defeq. -/
 def varcT (X : Term) : Term := unT 0 X
 /-- `funcc a b = cons 1 (cons a (cons b nil))` ⇒ su imagen punteada es el `binT 1` del KIT
-    (`Meta/CodeCtorKit.lean:64`). Alias defeq. -/
+    (`Meta/CodeCtorKit.lean`). Alias defeq. -/
 def funccT (X Y : Term) : Term := binT 1 X Y
 
 theorem prf_hasWit_varcT {X : Term} (hX : Prf (hasWit X)) : Prf (hasWit (varcT X)) :=
@@ -225,7 +232,9 @@ theorem prf_substtc_funccT_at (v : Nat) (W a b : Term) :
     argumentos.
 
     ⚠️ **`sondeos/DescensoLiftc.lean` (rama B2) los redefine byte a byte**: al promover B2 hay
-    que BORRAR alli §1–§4 y consumir estas. -/
+    que BORRAR alli §1–§4 y consumir estas. (✏️ 2026‑10‑14, ADR‑134: B2 ya se promovió,
+    `Meta/EvalLiftcPrf.lean`, y consume éstas —lo miden sus puentes `rfl` de §0—; el sondeo no se
+    tocó y sigue redefiniéndolas, fuera del build.) -/
 
 /-- El objetivo sobre TERMINOS. -/
 def targetLift (s : Term) : Formula :=
@@ -610,7 +619,7 @@ theorem pcc_liftsc_cons_code (c h t : Term) :
 
 /-! ## §5 · LA GUARDA INTERNA SE DESCARGA — y las cuatro ecuaciones quedan a NIVEL `zero`
 
-    `pcc_lt_tracked` (`Meta/Delta0ReflectPrf.lean:233`, completitud‑Δ₀ provable del atomo `<`,
+    `pcc_lt_tracked` (`Meta/Delta0ReflectPrf.lean`, completitud‑Δ₀ provable del atomo `<`,
     con argumentos **ABIERTOS**) refleja `0 < σn` sin pedir clausura. La guarda de
     `ax_liftc_var_ge` **no es un obstaculo**. -/
 
@@ -652,7 +661,7 @@ theorem pcc_liftsc0_cons_code (h t : Term) :
 
 /-! ## §6 · Congruencias INTERNAS (dentro de `Prov`) para los constructores nuevos.
 
-     Patron `pcc_congr_binT_2_code` (`Meta/CodeCtorKit.lean:248`). Las dos de `consT` faltaban:
+     Patron `pcc_congr_binT_2_code` (`Meta/CodeCtorKit.lean`). Las dos de `consT` faltaban:
      el KIT solo tiene las de `unT`/`binT`, y el paso `cons` de la lista las pide sobre `consT`
      con tag `cons_sym`, que NO es un `binT`. -/
 
@@ -757,7 +766,7 @@ theorem pcc_congr_consT_arg1_code (B X Y : Term)
    `∀ W, Prf (substtc zero W (termCode zero) =eq termCode zero)`, que es EXACTAMENTE
    `ROBINSON_PlusPlus.Meta.EvalRunFnPrf.prf_substtc_termCode_nil` — porque `nil := zero`
    (`Minimal/Axioms.lean`), asi que `termCode nil` y `termCode zero` son EL MISMO termino.
-   Ya esta `export`ado a la raiz (`EvalRunFnPrf.lean:157`), luego visible sin cualificar.
+   Ya esta `export`ado a la raiz (por el `export` de `EvalRunFnPrf`), luego visible sin cualificar.
    La comparacion por NOMBRE no lo detectaba: lo caza el verificador con un `rfl` compilado. -/
 
 /-- **(1) BASE `varc` — CERRADA, sin hipotesis mas alla de la forma ecuacional.** -/
@@ -1268,7 +1277,7 @@ theorem substF_targetLiftsc (v : Nat) (u s : Term) :
     cons, nil, zero, succ, substTerm, substTerms, substTerm_termCode, substTerm_strCode]
 
 /-- El HUECO: el caso `v := 0`, `s := #0` del general. Instancia DEFEQ, sin conversion.
-    Se conserva el nombre porque lo consumen `:799`, `:802` y el `export`. -/
+    Se conserva el nombre porque lo consumen los dos usos de `PrfH_congr_targetLift` y el `export`. -/
 theorem substF_targetLift_hole (t : Term) :
     substFormula 0 t (provFromCode (eqc (liftcT (termCode zero) (tcFn (.var 0)))
         (tcFn (liftc zero (.var 0)))))
@@ -1294,7 +1303,7 @@ theorem refl_shapeUn_imp (X : Term) : Prf (Formula.impl (shapeUn X 0) (targetLif
 /-! ### El disyunto `funcc`: la HI llega tambien como hipotesis OBJETO.
 
     La transitividad interna en contexto `PrfH` es `PrfH_eq_trans_code`, que YA esta en
-    produccion (`Meta/EvalCarcNthcPrf.lean:66`, exportado a la raiz). No se redefine. -/
+    produccion (`Meta/EvalCarcNthcPrf.lean`, exportado a la raiz). No se redefine. -/
 
 /-- **(2') PASO `funcc`, en forma IMPLICACION**: la companera de la lista entra como
     hipotesis OBJETO. Es la moneda que consume una induccion objeto. -/
@@ -1424,6 +1433,8 @@ theorem refl_lista_cons_imp (h t : Term) :
 
 Espejo de §9 con el nivel abierto. ⚠️ Hay que reescribir las cadenas (no basta invocar §7bis):
 la HI llega como hipótesis **OBJETO**, y sin `PrfH_mono` (deuda B6b) una premisa `Prf` no vale.
+(✏️ 2026‑10‑14, ADR‑134: B6b está saldada desde el 2026‑09‑11: `PrfH_mono` y `PrfH_w1`, en
+`Meta/HilbertDeduction.lean`; estas cadenas se quedaron escritas en `PrfH`.)
 Por eso `refl_caso_funcc_imp_at` y `refl_lista_cons_imp_at` repiten la cadena en `PrfH`, igual
 que hacen sus originales a nivel `zero`.
 

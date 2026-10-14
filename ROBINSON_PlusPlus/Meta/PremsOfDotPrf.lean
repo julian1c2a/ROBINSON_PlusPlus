@@ -1041,7 +1041,9 @@ end ROBINSON_PlusPlus.Meta.PremsOfDotPrf
 /-! ## `export` — por CONSUMO
 
 Consumidor previsto: **B2**, el puente de la cota de `hbody`(b) dentro de `Prov`, que encadena
-`pcc_eval_nthc` → `pcc_eval_premsOf` → `pcc_eval_lenc`. -/
+`pcc_eval_nthc` → `pcc_eval_premsOf` → `pcc_eval_lenc`. (✏️ 2026‑10‑14, ADR‑134: ya lo consume:
+B2 es `pcc_bnd_bridge` (`Meta/D3BodyPrf.lean`), y `Meta/PremsBdAllPrf.lean` usa `pcc_eval_premsOf`
+en `pcc_premsOfT_bridge`; las dos usan también `premsOfT` y sus lemas de congruencia y testigo.) -/
 export ROBINSON_PlusPlus.Meta.PremsOfDotPrf (
   premsOfT premsOfT_termCode substCodeT_premsOf
   prf_hasWit_premsOfT prf_congr_premsOfT prf_substtc_premsOfT substtc_inv_premsOfT

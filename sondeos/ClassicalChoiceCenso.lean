@@ -67,9 +67,15 @@ DESCOMPONE una cadena** trae `Classical.choice`. Medido, §B de abajo: `toList`,
     Meta/Provability.lean:39   def strCode  (s : String) : Term := charsCode  s.toList
     Minimal/Axioms.lean:568    def strCodeM (s : String) : Term := charsCodeM s.toList
 
+(✏️ 2026‑10‑14, ADR‑134: esa raíz ya no existe. Desde D7 (ADR‑129) los símbolos son `List Char`, y las dos
+líneas son `def strCode (s : List Char) : Term := charsCode s` y `def strCodeM (s : List Char)`, sin `String`.)
+
 `charsCode`/`charsCodeM` (sobre `List Char`) **no dependen de ningún axioma**; `strCode`/`strCodeM`
 y, tras ellos, `termCode`/`formCode`/`termCodeM`/`formCodeM` sí. Y como toda la cadena de Gödel
-pasa por ahí, **la mayor parte de las 3 143 es esto**.
+pasa por ahí, **la mayor parte de las 3 143 es esto**. (✏️ 2026‑10‑14, ADR‑134: en los titulares, refutado.
+ADR‑122 midió que cortar `String` sólo limpiaba 48 de los 226 titulares con `choice` (`sondeos/D7Contrafactual.lean`),
+y ADR‑131, que tras D7, en 158 de las 182 filas que lo conservan, entra sólo por dos cancelaciones de lift de
+`SubstArith` (`sondeos/ChoiceFrontera.lean`). Sobre las 3 143 declaraciones no se re‑midió.)
 
 ## 3 · 🔑 La regla que sale de aquí
 
@@ -85,7 +91,8 @@ esto es una trampa de interpretación, y conviene tenerla escrita.
 constructivo, lo que hay que quitar **no es un axioma, es `String` de la firma** —
 `Term.func : String → List Term → Term` con `Nat` (o un tipo de símbolos abstracto con
 `DecidableEq`) en su lugar. Eso limpiaría también las 6 de `FOL/Enumeration.lean`, que hoy vienen
-de `String.ofList_toList`.
+de `String.ofList_toList`. (✏️ 2026‑10‑14, ADR‑134: hecho: D7, ADR‑129, puso `List Char` en la firma
+—macro `sym!`— en FOL y en RPP; las seis de `FOL/Enumeration.lean` no se re‑midieron aquí.)
 
 ⚠️ Este fichero **no entra en el build**. Reejecutar con
 `lake env lean sondeos/ClassicalChoiceCenso.lean` desde la raíz de RPP.

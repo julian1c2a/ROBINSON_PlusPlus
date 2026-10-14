@@ -14,9 +14,12 @@ familia del **lift**, y salda la deuda que `Meta/EvalLiftfcPrf.lean` §12 dejó 
 
 ```
 prf_hasWit_liftc_at   (v t) : Prf (hasWit t  ⇒ hasWit  (liftc  v t))
-prf_hasWitArgs_liftsc (v Y) : Prf (hasWitArgs Y ⇒ hasWitArgs (liftsc v Y))   -- vía la conjuntiva
+prf_hasWitArgs_liftsc_of (w v Y) : Prf (wfAll1 w ∧ argsIn w Y ⇒ hasWitArgs (liftsc v Y))   -- vía la conjuntiva
 prf_hasWitF_liftfc    (v X) : Prf (hasWitF X ⇒ hasWitF (liftfc v X))
 ```
+
+(✏️ 2026‑10‑14: la segunda línea decía `prf_hasWitArgs_liftsc (v Y) : Prf (hasWitArgs Y ⇒ …)`, que
+no existe; la mitad de lista expuesta es `prf_hasWitArgs_liftsc_of`, con el testigo `w` explícito.)
 
 ⭐ Con ellas, `ind` (18) y `listInd` (20) —los dos reflectores de sustitución que le faltaban a
 C3— dejan de estar bloqueados, y con ellos `hbody`(a) de D3 (§3.54.1).

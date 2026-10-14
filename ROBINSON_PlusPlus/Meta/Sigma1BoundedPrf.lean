@@ -40,6 +40,13 @@ Ahí es donde entran las fases 3‑4 restantes (reflexión de átomos `<`/`=eq`/
 `num`/`substfc`‑var‑equations + reflexión de cuantificadores acotados) y la fase 5 (inducción
 estructural). Este módulo **no** postula `hbI`/`hbC`: son hipótesis, exactamente como `hI`/`hC`
 lo eran en `d3_prf_of_sigma1`.
+
+⛔ ✏️ 2026‑10‑14 (ADR‑134): registro — esta reducción es VACUA (ADR‑132, T05): `hbI` es refutable
+(`hbI_refutable` en `sondeos/D3Sigma1Vacuo.lean`, compilado el 2026‑10‑12, que la lleva a
+`hI_refutable` con `prf_hI_of_reflect_boundedIn` de aquí), así que ninguna instancia de las hipótesis
+de `d3_prf_of_reflect_bounded` existe y las fases 3‑5 de esta ruta no tienen objetivo. Ningún módulo
+de producción consume este (sólo lo importa el barril `Meta.lean`). El D3 que se usa es `d3_prf_real`
+(`Meta/PremsBdAllPrf.lean`), por la vía punteada. Lo que sigue describe el plan del 2026‑07‑09.
 -/
 
 /-- **Reducción de `hI`**: la Σ₁‑completitud provable de `In` se sigue de la de su forma acotada
@@ -79,7 +86,12 @@ theorem prf_hC_of_reflect_chainOkB
 
     A partir de aquí, `hbC`/`hbI` se atacan por reflexión de los **átomos** (`<`, `=eq`, `lineWF`,
     `nthc`, `carc`) con `num`/`substfc`‑var‑equations (fase 3‑4) y por **inducción estructural**
-    sobre la forma acotada (fase 5). -/
+    sobre la forma acotada (fase 5).
+
+    ⛔ **VACUO** (✏️ 2026‑10‑14, ADR‑134; ADR‑132, T05): `hbI` es refutable —`hbI_refutable`,
+    `sondeos/D3Sigma1Vacuo.lean`—, así que este teorema no reduce D3 a nada; el D3 que se usa es
+    `d3_prf_real` (`Meta/PremsBdAllPrf.lean`; el `d3_prf` de arriba nunca fue una declaración), por
+    la vía punteada. -/
 theorem d3_prf_of_reflect_bounded (φ : Formula)
     (hbC : ∀ p : Term, Prf (chainOkB nil p ⇒ provCodeC' (chainOkB nil p)))
     (hbI : ∀ x L : Term, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L))) :

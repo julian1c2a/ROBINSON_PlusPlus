@@ -7,6 +7,9 @@ import ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 sustitución (q3 · 11, qconf · 19, ind · 18, listInd · 20), que son exactamente los que llevan
 `liftfc` (§3.47.1). Este módulo pone la **base** y deja la obligación **enunciada, no
 postulada** — idioma de `Meta/Sigma1BoundedPrf.lean` y `Meta/LineWFGuardPrf.lean`.
+(✏️ 2026‑10‑14, ADR‑134: este mismo módulo la prueba —`pcc_eval_liftfc : DEUDA_evalLiftfc`, §10,
+y su forma desplegada `pcc_eval_liftfc_wit`— y C3 está cerrado desde el 2026‑09‑10:
+`pcc_lineWF_tracked` (`Meta/SubstTreeReflect.lean`), sin hipótesis.)
 
 ## Lo que la medición encontró, y que reclasifica una tarea
 
@@ -26,7 +29,8 @@ tiene que cuantificar el nivel, y los casos `atom`/`eq` bajan a `liftsc`/`liftc`
 
 🔑 **Por tanto A5 —«generalizar más allá del nivel `zero`»— no es una mejora opcional: es
 PRERREQUISITO de `pcc_eval_liftfc`, y por tanto de los cuatro tags que faltan.** Estaba
-catalogada como generalización suelta; está en la ruta crítica.
+catalogada como generalización suelta; está en la ruta crítica. (✏️ 2026‑10‑14, ADR‑134: A5 está
+hecha —`pcc_eval_liftc_at`, `Meta/EvalLiftcPrf.lean` §7bis— y los cuatro tags, cerrados con C3.)
 
 ## Lo que sí está, medido
 
@@ -63,8 +67,8 @@ namespace ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 
 /-! ## §1 · LA IMAGEN DOTADA DE `liftfc`, Y EL OBJETIVO
 
-⛔ `liftfcT` entra como **definición**, igual que `substfcT` (`Meta/EvalArithPrf.lean:184`) y
-`liftcT` (`Meta/LiftcCodePrf.lean:111`). Nunca como axioma. -/
+⛔ `liftfcT` entra como **definición**, igual que `substfcT` (`Meta/EvalArithPrf.lean`) y
+`liftcT` (`Meta/LiftcCodePrf.lean`). Nunca como axioma. -/
 
 /-- `⌜liftfc c f⌝` como constructor de código. -/
 def liftfcT (c f : Term) : Term := funcc (strCode sym!"liftfc") (cons c (cons f nil))
@@ -490,7 +494,9 @@ nivel `σc` en vez de a `(σv, liftc 0 s)`. No hay `HasWitLift`. -/
 /-- tag 2 · `botc`. -/
 def CasoBotL : Prop := ∀ c X : Term, Prf (Formula.impl (clBot X) (targetLiftfc c X))
 
-/-- tag 3 · `atomc`. ⛔ Consume `pcc_eval_liftsc_at` (A5). No se descarga en este tramo. -/
+/-- tag 3 · `atomc`. ⛔ Consume `pcc_eval_liftsc_at` (A5). No se descarga en este tramo.
+    (✏️ 2026‑10‑14: se descarga en §9.2, `casoAtomL_thm`, con `DESCENSO_at_lista_imp`, la forma
+    implicación de `pcc_eval_liftsc_at`.) -/
 def CasoAtomL : Prop := ∀ wT c X : Term,
   Prf (Formula.impl (land (wfAll1 wT) (clAtom wT X)) (targetLiftfc c X))
 
@@ -746,7 +752,9 @@ theorem casoBotL : CasoBotL := by
 /-! ### §8.2 · `CasoBinL 5/7/8` — genérico en el tag, tres instancias -/
 
 /-- El núcleo del caso BINARIO en forma IMPLICACION: las dos HI llegan como hipótesis OBJETO.
-    ⚠️ Igual que en `substfc`, hay que escribirlo en `PrfH` (deuda B6b). -/
+    ⚠️ Igual que en `substfc`, hay que escribirlo en `PrfH` (deuda B6b).
+    (✏️ 2026‑10‑14, ADR‑134: B6b está saldada desde el 2026‑09‑11: `PrfH_mono` y `PrfH_w1`, en
+    `Meta/HilbertDeduction.lean`; este núcleo se quedó escrito con las HI como hipótesis objeto.) -/
 theorem paso_caso_bin_imp_L (k : Nat) (c a b : Term)
     (hax : Prf (provFromCode (eqCodeFn (liftfcT (tcFn c) (binT k (tcFn a) (tcFn b)))
       (binT k (liftfcT (tcFn c) (tcFn a)) (liftfcT (tcFn c) (tcFn b))))))
@@ -916,7 +924,9 @@ theorem casoUnL9 : CasoUnL 9 :=
   casoUnL_gen 9 (fun c a => pcc_liftfc_ex_code c a) (fun c a => prf_liftfc_ex c a)
 
 /-- ⭐⭐ **SEIS DE LOS OCHO, DESCARGADOS.** Lo que queda de `pcc_eval_liftfc` son
-    `CasoAtomL` y `CasoEqL`, que consumen `pcc_eval_liftsc_at` / `pcc_eval_liftc_at` (A5). -/
+    `CasoAtomL` y `CasoEqL`, que consumen `pcc_eval_liftsc_at` / `pcc_eval_liftc_at` (A5).
+    (✏️ 2026‑10‑14: los dos se descargan en §9.2 —`casoAtomL_thm`, `casoEqL_thm`— y
+    `pcc_eval_liftfc_isFC1` aplica este lema a ambos.) -/
 theorem pcc_eval_liftfc_modulo_2 (hatom : CasoAtomL) (heq : CasoEqL) :
     DEUDA_evalLiftfc_isFC1 :=
   pcc_eval_liftfc_modulo_8 casoBotL hatom heq casoBinL5 casoBinL7 casoBinL8 casoUnL6 casoUnL9
@@ -1249,7 +1259,12 @@ theorem pcc_eval_liftfc_wit (v X : Term) :
 
 /-! ## §12 · LA OTRA DEUDA DE `liftfc`: la CLAUSURA DEL TESTIGO (2026‑09‑10)
 
-`pcc_eval_liftfc` (§11) cierra la **evaluación**. Lo que sigue faltando es la **clausura del
+✏️ 2026‑10‑14 (ADR‑134): registro — la deuda está SALDADA (`deuda_hasWitF_liftfc`, en
+`Meta/LiftfcWitnessPrf.lean`; ver el docstring de abajo) y la mitad TÉRMINO a nivel arbitrario
+existe: `prf_hasWit_liftc_at`, en el mismo módulo; lo que sigue describe el estado de antes,
+medido el 2026‑09‑10.
+
+`pcc_eval_liftfc` (§10) cierra la **evaluación**. Lo que sigue faltando es la **clausura del
 TESTIGO** bajo `liftfc`, y es lo único que separa a C3 de sus dos últimos reflectores —`ind` (18)
 y `listInd` (20)— y, con ellos, a `hbody`(a) de D3.
 
@@ -1263,7 +1278,7 @@ El evaluador pide `hasWitF (liftfc 1 A)` —el testigo del **RESULTADO** de un l
 guardas de ADR‑020 sólo entrega `hasWitF A`. En `listInd`, dos veces.
 
 ⚠️ **Y NO hay atajo, medido el 2026‑09‑10.** Lo que existe en todo el árbol sobre testigos y lifts
-es: `prf_hasWit_liftc` (`Meta/SubstfcWitnessPrf.lean:1936`) —sorte **TÉRMINO** y **sólo a nivel
+es: `prf_hasWit_liftc` (`Meta/SubstfcWitnessPrf.lean`) —sorte **TÉRMINO** y **sólo a nivel
 `zero`**— y `prf_hasWit_liftcT`/`liftscT` (`LiftcCodePrf`), que son sobre el **constructor dotado**
 `liftcT`, no sobre `liftfc`. **Ni la mitad TÉRMINO a nivel arbitrario existe.**
 
@@ -1292,7 +1307,7 @@ deuda se enuncia, no se postula). No hay ningún `axiom` aquí. -/
     Cerró `ind` (18) y `listInd` (20) de C3 y, con ellos, `hbody`(a) de D3.
 
     📐 **Guarda: sólo `hasWitF X`, y el NIVEL va libre.** Se copia exactamente la forma de
-    `pcc_eval_liftfc` (§11), que evalúa `liftfc` con `v` **abstracto y sin guarda**. ⚠️ La
+    `pcc_eval_liftfc` (§10), que evalúa `liftfc` con `v` **abstracto y sin guarda**. ⚠️ La
     tentación es copiar el molde `prf_hasWitF_substfc`, que pide además `hasWit s` del
     sustituyendo — pero **aquí sería un error**: `hasWit` es el predicado de testigo de un
     **CÓDIGO**, y el nivel de un `liftfc` es un **numeral**, no un código. La guarda no sólo
@@ -1313,7 +1328,9 @@ end ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 
 El consumidor previsto es el caso `lift` de `PrfH_tc_objAt` (`Meta/SubstTreeReflect.lean`), que
 cerraría los cuatro tags que faltan. Nada lo consume todavía, y se dice en vez de fingir una
-medición de consumo. -/
+medición de consumo. (✏️ 2026‑10‑14, ADR‑134: ya lo consume: `PrfH_tc_objAt`
+(`Meta/SubstTreeReflect.lean`) usa `pcc_eval_liftfc_wit` en su caso `lift`, y C3 está cerrado:
+`pcc_lineWF_tracked`, en el mismo fichero.) -/
 export ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (
   liftfcT liftfcT_termCode evalLiftfcCode targetLiftfc
   liftTerm_evalLiftfcCode substTerm_evalLiftfcCode

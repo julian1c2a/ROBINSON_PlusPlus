@@ -8,9 +8,17 @@ import ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
 -- ⚠️ Añadido con §11 (2026‑09‑09g): de aquí sale `pcc_lineWF_tracked_modulo_7`, al que se
 --    le cablean los CINCO reflectores ya probados. Sin ciclo (`LineWFAssemblePrf` no depende
 --    de este módulo); el cierre pasa de 89 a 94.
+--    (✏️ 2026‑10‑14, ADR‑134: hoy se le cablean los SIETE, §11bis; de aquí sale también
+--    `pcc_lineWF_tracked_of_branches`, con el que §11ter prueba `pcc_lineWF_tracked`.)
 import ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 /-!
 # `Meta/SubstTreeReflect.lean` — C3: el árbol de código **con nodos `substfc`**
+
+✏️ 2026‑10‑14 (ADR‑134): registro — **C3 está CERRADO desde el 2026‑09‑10**: los 7 reflectores están
+en §8–§10bis y `pcc_lineWF_tracked` (§11ter) no tiene hipótesis. `pcc_eval_liftfc` existe
+(`Meta/EvalLiftfcPrf.lean`) y este módulo consume su forma desplegada, `pcc_eval_liftfc_wit`, en
+`PrfH_tc_objAt` (§5); `STree` tiene hoy también los nodos `lift` y `tcm`. Lo que sigue en esta
+cabecera describe el estado de antes del nodo `lift` (2026‑09‑09e).
 
 Con ADR‑020 saldado (§3.46), lo que queda de C3 son los **7 reflectores de sustitución**. Su
 condición estructural tiene exactamente la misma forma que la de los 14 tags ya cerrados
@@ -317,6 +325,9 @@ theorem prf_condD_of_stree_eq (T : STree) (t : Term) :
     (prf_congr_carcT (prf_substtc_varc0 (tcFn t)))
 
 /-! ## §4 · LOS TRES ÁRBOLES ALCANZABLES HOY, DECLARADOS Y COMPROBADOS
+
+(✏️ 2026‑10‑14, ADR‑134: «hoy» es antes del nodo `lift`; los siete árboles están declarados en este
+módulo: estos tres, `treeQ3`/`treeQconf` justo abajo y `treeInd`/`treeListInd` en §10bis.)
 
 Regla de método de §3.44: la abstracción se casa con el original por `rfl`. Si
 `Minimal/Axioms.lean` cambiara uno de estos tres esquemas, el `rfl` deja de compilar. -/
@@ -1039,7 +1050,9 @@ en §10— así que se cablean aquí y la obligación baja a **dos**.
 
 ⚠️ **Y `hbody`(a) de D3 es exactamente esto**: la reflexión del átomo `lineWF`, que el
 `pcc_bdAll_intro` de `chainOkB` consume en el cuerpo de `lineOkB`. Con `modulo_2`, esa mitad de
-D3 queda a la misma distancia que C3: `ind` (18) y `listInd` (20).
+D3 queda a la misma distancia que C3: `ind` (18) y `listInd` (20). (✏️ 2026‑10‑14, ADR‑134: los
+dos están cerrados en §10bis; `hbody`(a) de D3 es hoy `hA_lineWFDotAt` (`Meta/D3BodyPrf.lean`), que
+usa `pcc_lineWF_tracked`, §11ter.)
 
 ⚠️ `hOther` NO se descarga aquí y no es un descuido: cubre los tags `k ≥ 21`, que **no existen**
 en el verificador. Es una obligación vacua que el ensamblaje pide por exhaustividad del `match`,
@@ -1193,7 +1206,12 @@ pide un reflector por tag. Este módulo le entrega **tres de los siete**:
 `pcc_eval_liftfc`**, que no existe en ningún sitio; son exactamente los que llevan `liftfc`
 (§3.47.1). Hasta que estén los siete, `pcc_lineWF_tracked` sigue siendo condicional.
 
-Nada lo consume todavía, y se dice en vez de fingir una medición de consumo. -/
+Nada lo consume todavía, y se dice en vez de fingir una medición de consumo.
+
+✏️ 2026‑10‑14 (ADR‑134): registro — el módulo entrega hoy los **siete** (§8–§10bis) y
+`pcc_lineWF_tracked` sin hipótesis (§11ter); `pcc_eval_liftfc` existe (`Meta/EvalLiftfcPrf.lean`).
+Y hay consumo (grep del 2026‑10‑14): `Meta/D3BodyPrf.lean` (`pcc_lineWF_tracked`, en
+`hA_lineWFDotAt`) y `Meta/PremsOfDotPrf.lean` (`pcc_tag_vacuous`, en `pcc_eval_premsOf`). -/
 export ROBINSON_PlusPlus.Meta.SubstTreeReflect (
   STree substTerm_objAt substTerm_objAt_var0 code_eq_termCode prf_substtc_code
   substtc_inv_dotN substtc_inv_dotV prf_hasWit_dotN prf_hasWit_dotV

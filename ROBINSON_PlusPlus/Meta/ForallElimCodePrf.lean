@@ -38,6 +38,8 @@ abiertos, `liftFormula_provFromCode_open` (`Meta/TrackedCorePrf.lean`).
 
 `prf_lineWF_q1 (concl A t) : lineWF ⟨concl, 9, A, t⟩ ⇔ (concl =eq implc (forallc A) (substfc zero t A))`
 es **estructural** (no aparece `termCode`), igual que la línea Q2 — por eso admite `A`,`t` arbitrarios.
+(✏️ 2026‑10‑14, ADR‑134: ya no los admite arbitrarios. Desde ADR‑020 `prf_lineWF_q1` pide las
+guardas `hwA : Prf (hasWitF A)` y `hwt : Prf (hasWit t)` (`Meta/ReprPrf.lean`); sigue sin `termCode`.)
 
 **Para qué:** instanciar **axiomas codificados** (`ax4`, `ax5`, …) dentro de una prueba interna. Es
 el ladrillo que la **evaluación provable** (§18.3, núcleo de la fase 3) necesita.
@@ -79,7 +81,9 @@ theorem prf_lineOk_q1 (c Ac w : Term)
 
 /-- **`∀`‑elim a nivel de código** (reflexión de la regla Q1), con testigo‑código **abierto**:
     de la demostrabilidad del código universal `forallc Ac` sale la del código sustituido
-    `substfc zero w Ac`. Sólo pide `Ac` cerrado (`hAc`).
+    `substfc zero w Ac`. No pide `Ac` cerrado (eso es `pcc_forallElim_code'`, con `hAc`): pide las
+    guardas de ADR‑020 sobre el cuerpo y el testigo LIFTEADOS, `hwF` y `hwT`. (✏️ 2026‑10‑14: decía
+    «Sólo pide `Ac` cerrado (`hAc`)», frase heredada de la versión cerrada.)
 
     Ensamblaje `r = p ++ [q1line, mpline]`, espejo de `pcc_exIntro_code'`. -/
 theorem pcc_forallElim_code_open (Ac w : Term)

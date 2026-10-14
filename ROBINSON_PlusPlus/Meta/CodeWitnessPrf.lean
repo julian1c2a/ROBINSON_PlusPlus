@@ -38,7 +38,9 @@ necesita** el descenso, ni `Paso2`, ni la evaluación de `substtc`, ni el ensamb
 
 ⚠️ Los predicados son **DEFINICIONES**: no se postula ninguna ecuación suya como axioma objeto.
 
-Promovido de `sondeos/HasWitFRealMin.lean` (2026‑08‑31). Cero axiomas de Lean, cero `sorry`.
+Promovido de `sondeos/HasWitFRealMin.lean` (2026‑08‑31). Cero `axiom` del proyecto, cero `sorry`;
+los de Lean, sí: `SinWTs.prf_isTermCodeE1_of_In` sale `[propext, Quot.sound]` (tabla de
+`check-footprints.bash`). (✏️ 2026‑10‑14: decía «Cero axiomas de Lean».)
 -/
 
 namespace ROBINSON_PlusPlus.Meta.CodeWitnessPrf
@@ -48,10 +50,12 @@ set_option maxHeartbeats 1000000
 set_option maxRecDepth 8000
 
 /-! ############################################################################
-    COPIA LITERAL de `sondeos/SubstfcEx.lean` lineas 46-4111 (secciones S_Clausura,
-    S_Descenso y S_Paso2), que compilan net-0. Aportan `DescMutua.DESCENSO_hasWit`,
-    `SinWTs.CRIT_hasWit_lift` y todo el KIT unario `Paso2.*` que necesitan los tags
-    6 (`forallc`) y 9 (`exc`).
+    Rotulo heredado de `sondeos/HasWitFRealMin.lean` (copia de `sondeos/SubstfcEx.lean`
+    lineas 46-4111, segun aquel). Aqui hay tres secciones: `S_Clausura` (namespace `SinWTs`),
+    `S_Ens` (`ENS`) y `S_HW` (`HW`). (✏️ 2026‑10‑14: decía «secciones S_Clausura, S_Descenso y
+    S_Paso2 … Aportan `DescMutua.DESCENSO_hasWit`, `SinWTs.CRIT_hasWit_lift` y todo el KIT
+    unario `Paso2.*`»; en este fichero nunca hubo `S_Descenso`, `S_Paso2`, `DescMutua` ni
+    `Paso2`, y `CRIT_hasWit_lift` vive en `ENS`.)
     ############################################################################ -/
 section S_Clausura
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Godel
@@ -107,7 +111,7 @@ theorem prf_congr_lenc {t₁ t₂ : Term} (h : Prf (t₁ =eq t₂)) : Prf (lenc 
       ((hS t₁) ▸ prf_to_prfH (prf_refl (lenc t₁)) [])) rfl
 
 /-! ⛔ **B8b, SALDADA**: aquí hubo un `prf_congr_liftc (v : Term) (h : …)` — la MISMA
-congruencia que `Meta/NumCodeClosedPrf.lean:53`, con el nivel EXPLÍCITO en vez de implícito.
+congruencia que `prf_congr_liftc` (`Meta/NumCodeClosedPrf.lean`), con el nivel EXPLÍCITO en vez de implícito.
 Los dos módulos son INDEPENDIENTES (ninguno importa al otro), así que el duplicado no rompió
 nada: sólo hacía AMBIGUO el nombre en todo módulo que abriera los dos, y obligó a
 `Meta/LiftcCodePrf.lean` a un `open` selectivo.
@@ -1394,7 +1398,9 @@ theorem liftF_isTC1 (k : Nat) (w c : Term) :
 
 `CRIT_hasWit_lift` es además **el molde de la obligación A5**
 (`hasWitF c ⇒ hasWitF (liftc zero c)`, el análogo del sort FÓRMULA, que no existe): misma
-estructura, con **dos** binders en vez de uno. -/
+estructura, con **dos** binders en vez de uno. (✏️ 2026‑10‑14, ADR‑134: hoy existe, a nivel
+arbitrario: `prf_hasWitF_liftfc (v X) : Prf (hasWitF X ⇒ hasWitF (liftfc v X))`, en
+`Meta/LiftfcWitnessPrf.lean`.) -/
 
 /-- **La clausura en la forma que el descenso necesita.** -/
 theorem CRIT_hasWit_lift (c : Term) :
@@ -2037,7 +2043,9 @@ theorem okF : ∀ (phi : Formula) (WF WT : Term)
 
     `prf_wfAllF_of_list` es COPIA LITERAL de `Probe/ADV_novacuo.lean`
     (`PROBE_wfAllF_of_list`); `prf_wfAll1_of_list` es la generalizacion evidente de
-    `SinWTs.prf_isTC1_tcodes` a una lista cualquiera. -/
+    `SinWTs.prf_isTC1_tcodes` a una lista cualquiera. (✏️ 2026‑10‑14, ADR‑134: `Probe/` no
+    está versionado —lo ignora `.gitignore`—; la copia versionada del mismo lema está en
+    `sondeos/HasWitFRealMin.lean`.) -/
 
 theorem prf_wfAll1_of_list (L : List Term)
     (hcl : ∀ x, List.Mem x L → SinWTs.CodeClosed x)
@@ -2171,6 +2179,8 @@ end ROBINSON_PlusPlus.Meta.CodeWitnessPrf
     La propuesta inicial de la auditoria era exportar 202 — o sea ~152 nombres que no usa
     nadie, y cada uno choca con una re-declaracion en `sondeos/` (los 207 nombres del
     modulo estan re-declarados alli, y 50 de los 57 sondeos importan el barrel).
+    (✏️ 2026‑10‑14: cifras medidas al escribir este bloque, el 2026‑09‑04, `03f9523`; no se han
+    re‑medido.)
 
     Los 7 nombres que viven en `SinWTs` **y** en `ENS` salen por `SinWTs`, que es el
     canonico; las copias de `ENS` se han retirado en la misma pasada. -/

@@ -44,7 +44,9 @@ namespace ROBINSON_PlusPlus.Meta.GodelTwo
 de Gödel II sobre `⊢`: `goedel_second'` (retirado el 2026‑09‑11, ver abajo) y el teorema `d3`
 (retirado con ADR‑115). **Hoy el módulo sólo define `consistencyFormula'`.** Gödel II está en
 `Meta/GodelTwoPrf.lean`, sobre `Prf`: era ⛔ **vacuo** por `[AnclaEq]` (F1, ADR‑114) hasta ADR‑117, que
-hizo del ancla un teorema; hoy su única hipótesis es `ConsistentH`.
+hizo del ancla un teorema; hoy su única hipótesis es `ConsistentH`. (✏️ 2026‑10‑14, ADR‑134: y desde ADR‑120
+va sin hipótesis: `goedel_II : ¬ Prf consistencyFormula'`, en `Meta/Consistencia.lean`, es
+`goedel_second_prf consistencia`.)
 
 Cierre del **núcleo lógico** de Gödel II para el predicado de demostrabilidad
 estructural `provCodeC'`, con la cadena de Hilbert-Bernays-Löb:
@@ -112,7 +114,9 @@ enunciado era una implicación correcta y **no era incompletitud**.
     goedel_second_prf (hcon : ConsistentH) : ¬ Prf consistencyFormula'
 
 Hasta ADR‑117 llevaba también `[AnclaEq]`, que daba `Prf ⊥` (F1, ADR‑114): era vacuo. ⚠️ Hoy no lo es por
-F1, pero la consistencia de los 142 axiomas sigue sin probar.
+F1, pero la consistencia de los 142 axiomas sigue sin probar. (✏️ 2026‑10‑12, ADR‑134: desde ADR‑120 está
+probada —`consistencia : ConsistentH`, `Meta/Consistencia.lean`—, y es la de toda la teoría `T_Prf`, no sólo la
+de la lista: `AXIOMS.md` §0.)
 Su `prf_con_imp_godel` sustituye a `con_imp_godel'`, que sólo existía para alimentar a
 `goedel_second'`.
 

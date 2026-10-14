@@ -24,7 +24,8 @@ Hacia `d2_prf` (y toda la cadena Gödel II en `Prf`) hace falta poder **descarga
 hipótesis** (deducción) y **eliminar el ∃** dentro del cálculo finitario `Prf`. Como
 `Prf` es Hilbert puro (sin contexto), introducimos un cálculo auxiliar **con
 contexto** `PrfH Γ φ` (espejo de `Prf`: `incl0`/`p3`/`ind`/`qconf`/`mp` + `gen` de
-**contexto-lift** como en `Derives.intro_forall`, más `hyp`), probamos el **teorema
+**contexto-lift** como en `Derives.intro_forall`, más `hyp`; ✏️ 2026‑10‑14, ADR‑134: y `listInd`, desde el
+2026‑06‑24), probamos el **teorema
 de deducción** (el caso `gen` se cierra justo con el esquema de **confinamiento ∀**
 `qconf`, ya integrado en el verificador), y el puente `PrfH [] φ ↔ Prf φ`.
 
@@ -58,8 +59,8 @@ theorem prfI_id (A : Formula) : Prfᵢ (A ⇒ A) :=
 sitio (verificado por grep 2026‑08‑31)» y que «hay que PROBARLOS primero». El grep era correcto;
 falló su **alcance**. Evidencia versionada: `sondeos/PrfHMono.lean`.
 
-⚠️ Cuatro módulos pagaban su ausencia **por nombre** (`LiftcCodePrf:1426`, `EvalLiftfcPrf:749`,
-`HasWitFTrackedPrf:183`, `HasWitTrackedPrf:757`), con el rodeo de meter la ecuación como
+⚠️ Cuatro módulos pagaban su ausencia **por nombre** (`LiftcCodePrf`, `EvalLiftfcPrf`,
+`HasWitFTrackedPrf` y `HasWitTrackedPrf`, que hoy lo anotan en su sitio), con el rodeo de meter la ecuación como
 **antecedente OBJETO** para que el `or`‑elim la conservara en cada rama. Ese rodeo ya no hace falta.
 
 ⭐ Y una nota de método: `PrfH` **no tiene ningún `axiom` de Lean habitándolo** — se midió el
@@ -92,7 +93,9 @@ theorem PrfH_mono : ∀ {Γ : List Formula} {ψ : Formula}, PrfH Γ ψ →
       rcases List.mem_map.mp hm' with ⟨ψ0, hψ0, rfl⟩
       exact List.mem_map.mpr ⟨ψ0, hsub ψ0 hψ0, rfl⟩
 
-/-- **Debilitamiento por UNA hipótesis** — el caso que consumen los cuatro módulos. -/
+/-- **Debilitamiento por UNA hipótesis** — el caso que necesitaban los cuatro módulos de arriba; ninguno lo
+    consume (✏️ 2026‑10‑14: decía «el caso que consumen los cuatro módulos»; grep del 2026‑10‑14 en el árbol,
+    `sondeos/` y FOL: fuera de aquí sólo lo nombran comentarios, y `sondeos/PrfHMono.lean` tiene su propia copia). -/
 theorem PrfH_w1 {Γ : List Formula} {A ψ : Formula} (h : PrfH Γ ψ) : PrfH (A :: Γ) ψ :=
   PrfH_mono h _ (fun _ hm => List.Mem.tail _ hm)
 

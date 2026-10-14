@@ -24,6 +24,9 @@ import FOL.Semantics
 > `Prf` (`prf_ancla`) y vale en TODO modelo de los 142 —su lado derecho, `δ` incluido, lo fijan instancias
 > cerradas de las ecuaciones de codificación—. Así que la hipótesis `hne` de `ancla_underivable_prfI` no se
 > puede cumplir: ese corolario queda VACUO, y se conserva como registro. `prfI_consistent` sigue con contenido.
+> ✏️ **2026‑10‑14 (ADR‑134).** Desde ADR‑119/120 el modelo existe: `MNV V₀` satisface los 142 (`MN_axioms`,
+> `Meta/ModeloCodificacion.lean`), y `ConsistentH` es teorema (`consistencia`, `Meta/Consistencia.lean`, por
+> `prf_sound`). La sección «⬜ Lo que sigue faltando» y el ⬜ de `ancla_underivable_prfI` son registro.
 
 **Pregunta que contesta (2026‑09‑11):** *¿se puede decir algo SEMÁNTICO sobre los cálculos de este
 proyecto?* De ella dependía la única pregunta abierta sobre `prf_axiomsCodeT_eq`: no «¿es
@@ -61,7 +64,9 @@ evidencia compilada en `../../FOL/cuarentena/Inconsistencia.lean` — footprint
 🔑 **La regla que queda**: *un `axiom` que habita un tipo inductivo prohíbe demostrar nada sobre ese
 tipo por inducción.* En este árbol eso afecta a `Derives` (9 axiomas) y a `Prf` (uno,
 `prf_axiomsCodeT_eq`). **`Prfᵢ` es el único cálculo con CERO** — y por eso es el único del que se
-puede decir algo semántico.
+puede decir algo semántico. (✏️ 2026‑10‑14, ADR‑134: es M‑11 a la manera vieja; ADR‑133 la corrigió: la
+inducción sobre un inductivo es válida aunque lo habiten `axiom`s, y lo que puede ser falso es el `axiom`. A
+`Prf` no lo habita ninguno —(2) de la nota de ADR‑115—, y su solidez, `prf_sound`, es inducción sobre `Prf`.)
 
 ## Qué desbloquea (§3)
 
@@ -81,7 +86,9 @@ Con `prfI_soundness` en la mano, dos corolarios que antes no eran ni enunciables
 Sin él, «el ancla no es derivable» sigue siendo **hipótesis**, no medida. ⚠️ Y ojo: `axiomsCodeT`
 **no** es libre — aparece en dos de los 141 axiomas (`ax_vpf_thy`, `ax_lineWF_thy`), siempre como
 segundo argumento de `In`. Así que un modelo no puede reinterpretarlo a capricho: hay que
-comprobar que esos dos siguen valiendo.
+comprobar que esos dos siguen valiendo. (✏️ 2026‑10‑14, ADR‑134: desde ADR‑117 son tres de los 142: el ancla
+`ax_axiomsCodeT_def` lo nombra FUERA de `In`, como lado izquierdo de una ecuación —`axD`, `Minimal/Axioms.lean`;
+`filtro_occ'`, `sondeos/AnclaEqInconsistente.lean`—.)
 
 ## ⚠️ Lo que este sondeo NO dice
 

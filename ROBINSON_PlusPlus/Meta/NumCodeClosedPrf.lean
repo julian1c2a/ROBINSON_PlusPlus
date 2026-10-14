@@ -43,6 +43,10 @@ derivable por inducción interna** (`prf_nat_induction`):
 * **paso** `tcFn (σx) = succc (tcFn x)` (`prf_tc_succ`) — el `liftc`/`substtc` atraviesa el `funcc`
   (`prf_liftc_func`/`prf_substtc_func`) y baja a la HI.
 
+(✏️ 2026‑10‑14, ADR‑134: `ax_tc_cons` está fuera de la lista `axioms` desde ADR‑012 —daba `axioms ⊢ ⊥`—, y
+el modelo lo refuta, `control_tc_cons` en `Meta/ModeloCodificacion.lean`, ADR‑124; hoy las ecuaciones de
+`tcFn` son sólo `ax_tc_zero` y `ax_tc_succ`.)
+
 Es el hecho estándar «`num a` es un término cerrado del lenguaje codificado». Lo necesita el paso
 inductivo de la evaluación provable de `+`, donde `prf_substfc_forall` deja `liftc zero (tcFn a)`.
 -/

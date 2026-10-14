@@ -29,6 +29,11 @@ namespace ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 /-!
 ## META — NIVEL D real (B.3c): ENSAMBLAJE `or_elim` ×21 de `pcc_lineWF_tracked`
 
+⚠️ **[HISTÓRICO — C3 se cerró el 2026‑09‑10: `pcc_lineWF_tracked` es INCONDICIONAL
+(`Meta/SubstTreeReflect.lean` §11ter), `pcc_eval_substfc` existe (`Meta/EvalSubstfcPrf.lean`) y los
+7 tags están cerrados en SubstTreeReflect §8–§10bis.]** (✏️ 2026‑10‑14, ADR‑134: lo que sigue
+describe el estado de antes; el ensamblador genérico de este módulo es el que usa hoy C3.)
+
 **Propósito: verificación de encaje.** Los 7 tags que faltan (`q1` `q2` `q3` `leibniz` `ind`
 `qconf` `listInd`) están bloqueados tras una cadena larga (`pcc_eval_substfc` ⟵ inducción fuerte
 ⟵ monotonía de Cantor ⟵ aritmética de `·`). Antes de invertir en esa cadena conviene comprobar
@@ -90,7 +95,9 @@ theorem pcc_lineWF_tracked_of_branches (t : Term)
 
 Los `k` fuera de `0..20` no ocurren en `tagDisj t 20`, pero el ensamblador los pide por
 uniformidad; se cubren con la misma hipótesis genérica (`hOther`), que en la instanciación real
-será vacua. -/
+será vacua. (✏️ 2026‑10‑14, ADR‑134: la instanciación real es `pcc_lineWF_tracked`
+(`Meta/SubstTreeReflect.lean` §11ter): usa `pcc_lineWF_tracked_of_branches` directamente y paga los
+`k ≥ 21` con `pcc_tag_vacuous`, sin `hOther`.) -/
 
 /-- **`pcc_lineWF_tracked`, MÓDULO los 7 tags pendientes.**
 
@@ -100,7 +107,11 @@ será vacua. -/
     no hay ninguna otra pieza aguas abajo.
 
     Los 7 pendientes (`q1`=9, `q2`=10, `q3`=11, `leibniz`=13, `ind`=18, `qconf`=19, `listInd`=20)
-    están bloqueados tras `pcc_eval_substfc` (ver `NEXT-STEPS.md`, ruta 1a). -/
+    están bloqueados tras `pcc_eval_substfc` (ver `NEXT-STEPS.md`, ruta 1a).
+
+    (✏️ 2026‑10‑14, ADR‑134: registro — los 7 están probados (`Meta/SubstTreeReflect.lean`
+    §8–§10bis) y `pcc_eval_substfc` existe (`Meta/EvalSubstfcPrf.lean`). En el build, hoy sólo usa
+    este lema `pcc_lineWF_tracked_modulo_2` (SubstTreeReflect §11).) -/
 theorem pcc_lineWF_tracked_modulo_7 (t : Term)
     (hq1 : Prf (lineWF t ⇒ ((lineTag t =eq numeralM 9) ⇒
       provFromCode (lineWFCodeFn (tcFn t)))))

@@ -1,0 +1,2 @@
+leanchecker found a problem in ROBINSON_PlusPlus.Meta.ForallElimCodePrf
+uncaught exception: failed to read file 'E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean\ROBINSON_PlusPlus\Full\Induction.olean'

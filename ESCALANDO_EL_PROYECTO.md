@@ -3,6 +3,10 @@
 **Última actualización:** 2026-07-08
 **Autor:** Julián Calderón Almendros
 
+> ✏️ **2026‑10‑14 · aviso de vigencia ([ADR‑134](DECISIONS.md)).** Es un estudio del 2026‑07‑08, y no se ha re‑medido.
+> Hoy no hay puente de `Prf` a `⊢` (`prf_to_derives` se retiró con esa capa, ADR‑115) ni en ninguna dirección (T67), el
+> TFA objeto se retiró, y la teoría de los titulares no es la lista sin inducción: [AXIOMS.md](AXIOMS.md) §0.
+
 > Estudio del enlace entre `ROBINSON_PlusPlus` y `Lean4_vs_PureLogic` (proyecto **DeepArith**),
 > y de cómo el trabajo actual (cierre de Gödel II vía la Σ₁-completitud provable) fabrica el
 > activo común que ambos comparten a través del kernel **FOL⁼**.
@@ -47,7 +51,7 @@ directamente a DeepArith**, y viceversa.
 | | ROBINSON_PlusPlus | DeepArith (`Lean4_vs_PureLogic`) |
 |---|---|---|
 | Filosofía | **Minimalista** + metamatemática | **Maximalista** (universo $V$) |
-| Base | Robinson Q (34 axiomas, **sin inducción**) | ZFC-like + **ε-Inducción** (Fundación/Recursión) |
+| Base | Robinson Q (34 axiomas, **sin inducción**) *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): es la LISTA, que no es Q —lo contiene, con la conmutatividad, la asociatividad y el orden—; los teoremas de Gödel van sobre `T_Prf`, con la inducción para toda fórmula: [AXIOMS.md](AXIOMS.md) §0)* | ZFC-like + **ε-Inducción** (Fundación/Recursión) |
 | Datos | `cons`/`nil` (listas), pares Cantor | primitivas disjuntas `n_zero`/`n_succ`/`l_cons`/`tup` (Von Neumann) |
 | Objetivo probado | Cantor, listas, TFA sin inducción | aritmética, listas, árboles, **autómatas, Turing** |
 | Joya | **Gödel I/II REAL** (arithmetización, verificador `Prf`, Σ₁-completitud) | teoría de la **computabilidad a nivel objeto** |

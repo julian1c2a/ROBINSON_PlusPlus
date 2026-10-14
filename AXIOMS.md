@@ -44,7 +44,7 @@
 >
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 91 en `sondeos/`.**
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 92 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` y el ancla diagonal, ADR‑117).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -67,7 +67,7 @@
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
 
-**Last updated:** 2026-07-22 — **nueva §1.1: por qué la inducción de `Full/` es el mínimo teórico de Gödel II** (Q no satisface D2/D3; reparto verificado con `#print axioms`: D1 y D2 limpios, Gödel I/II usan `Full.ax_induction`+`ax_list_induction`). Sin cambios en el inventario: siguen **7**. — (previo 2026-07-20) **`prf_inAxC` → `prf_axiomsCodeT_eq`** (espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.)
+**Last updated:** 2026-07-22 — **nueva §1.1: por qué la inducción de `Full/` es el mínimo teórico de Gödel II** (Q no satisface D2/D3; reparto verificado con `#print axioms`: D1 y D2 limpios, Gödel I/II usan `Full.ax_induction`+`ax_list_induction`). Sin cambios en el inventario: siguen **7**. — (previo 2026-07-20) **`prf_inAxC` → `prf_axiomsCodeT_eq`** (espejo `Prf` del ancla de igualdad; `prf_inAxC` pasa a **teorema**, **net‑0 axiomas**; lo exige el `In`‑reflect de `axiomsCodeT`). Total **7** `axiom`, sin cambio de número. (previo 2026-07-13: `ax_inAxC` → `ax_axiomsCodeT_eq`, net‑0, desbloquea `⊬¬G`. Previo 2026-07-09: F7a, 14 → 7.) ✏️ *2026‑10‑12 ([ADR‑134](DECISIONS.md)): registro. Hoy hay 0 `axiom` de Lean, la inducción entra por los constructores `Prf.ind` y `Prf.listInd`, y D1 y D2 no están limpios (§0, §0.3).*
 **Author:** Julián Calderón Almendros
 
 Registro autoritativo de **todas** las declaraciones `axiom` de Lean que sostienen
@@ -82,8 +82,13 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 >   débil SIN inducción general (≈ Robinson Q). El esquema de inducción vive en
 >   `Full/` porque es justo lo que Full **añade**; moverlo a Minimal arrastraría
 >   toda la maquinaria de Full y borraría la frontera.
+>   ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md))**: «sin inducción general» es cierto de la LISTA, pero la lista no es
+>   «≈ Robinson Q»: contiene a Q y además la conmutatividad, la asociatividad, la distributividad y el orden. El esquema ya no vive en
+>   `Full/`, que sólo define la fórmula `inductionFormula`, sino en `Prf` (los constructores `ind` y `listInd`), y la
+>   teoría de los titulares lo tiene: §0.
 > - **Teoría objeto vs metateoría.** Los esquemas aritméticos son de la teoría
->   objeto; `d3` es metamatemático (sobre demostrabilidad). Son niveles distintos.
+>   objeto; `d3` es metamatemático (sobre demostrabilidad). Son niveles distintos. *(✏️ 2026‑10‑12: `d3` era; hoy es
+>   el teorema `d3_prf_real`.)*
 > - **Dos cálculos.** `Derives` (`⊢`) y `Prf` necesitan cada uno su ancla de
 >   codificación (`ax_axiomsCodeT_eq` / `prf_axiomsCodeT_eq`); no son un duplicado a fusionar. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 >   ✏️ **2026‑10‑04 ([ADR‑117](DECISIONS.md))**: hoy sólo queda `Prf`, y su ancla no es un `axiom` de Lean sino el
@@ -91,6 +96,103 @@ el proyecto: qué son, por qué son legítimas (o pendientes), y en qué módulo
 >
 > Este fichero es el «sitio único» **documental**: la fuente de verdad sobre el
 > inventario, aunque el código mantenga cada axioma en su capa correcta.
+
+---
+
+## 0 · La teoría de los titulares (`T_Prf`) y lo que se supone hoy
+
+> **2026‑10‑12 · [ADR‑134](DECISIONS.md)** (T02 de `doc/AUDITORIA-SUELO-2026-10-12.md`). Es la descripción
+> **canónica**: donde otro documento describa la teoría de otro modo, manda ésta. Las secciones 1 a 4 son, en buena
+> parte, registro de la capa `⊢` (retirada, ADR‑115).
+
+### 0.1 · La teoría
+
+Los titulares —Gödel I y II, Tarski, la consistencia— son teoremas sobre **`Prf`** (`Meta/Hilbert.lean`), un cálculo
+de Hilbert propio de RPP, o sobre la verdad en su modelo. **`T_Prf`** es el conjunto de las fórmulas que `Prf` deriva:
+
+| | qué es | dónde |
+|---|---|---|
+| **lenguaje** | TODAS las `Formula` de FOL (`FormulaG (List Char)`): variables de De Bruijn, `⊥`, `=`, `⇒`, `∧`, `∨`, `∀`, `∃`, y átomos y términos con cualquier símbolo y cualquier número de argumentos. El tipo no fija una signatura. Los 142 axiomas nombran **33** símbolos, cada uno con una sola aridad: 28 de función y 5 de relación (`<`, `∈`, `allIn`, `lineWF`, `chainOk`); los demás entran en los esquemas como parámetros libres | `../FOL/FOL/FOL.lean` (`TermG`, `FormulaG`) |
+| **axiomas propios** (`thy`) | las **142** sentencias de `axioms`: 34 de `coreAxioms` —entre ellos los seis axiomas de Peano de primer orden: `ax2`, `ax3`, `ax4`, `ax5`, `ax8` y `ax9`—; 107 de `codingAxioms`, las ecuaciones de la aritmetización (sustitución y desplazamiento de códigos, accesores de listas, el código del numeral, el verificador, y los 22 `ax_vpf_*` del verificador antiguo, que sólo nombra la validación del modelo: T68); y el ancla diagonal `ax_axiomsCodeT_def` (ADR‑117) | `Minimal/Axioms.lean` |
+| **esquemas lógicos** | los de `Prfᵢ` —P1, P2, C1–C3, J1–J3, EFQ, Q1–Q3, reflexividad e igualdad de Leibniz—, DNE (`p3`) y el confinamiento (`qconf`) | `Meta/Hilbert.lean` |
+| **esquemas no lógicos** | la **inducción** (`ind`, `Full.inductionFormula`: `Φ[0] ⇒ ∀x(Φ ⇒ Φ[σx]) ⇒ ∀x Φ`) y la **inducción de listas** (`listInd`: `Φ[nil] ⇒ ∀h∀t(Φ[t] ⇒ Φ[h :: t]) ⇒ ∀L Φ`), las dos para TODA fórmula, con parámetros | `Meta/Hilbert.lean`, `Full/Induction.lean` |
+| **reglas** | MP y GEN, sin restricción: `Prf` no tiene hipótesis, y su solidez es para toda valoración | `Meta/Hilbert.lean` |
+
+⇒ **`T_Prf` contiene a PA** (por lectura): los seis axiomas de Peano son axiomas de la lista, y la inducción vale para
+toda fórmula de un lenguaje que contiene el de PA; y el cálculo lógico de `Prf` es un Hilbert clásico estándar (también
+por lectura: que sea completo para la lógica de primer orden con igualdad no está demostrado, y es la dirección
+`DerivesSet₀ → Prf` del puente de abajo). **No es Q, ni «Q++ sin inducción», ni IΣ₁.** Lo que no tiene
+esquema de inducción es la LISTA `axioms`, la que define `Minimal/`, no la teoría de los titulares. (La lista sola ya
+contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sale sin inducción de `ax2`, `ax5`, `ax13` y
+`ax19`, por lectura; y además tiene `ax6`, `ax7` y `ax10`–`ax12`, que Q no demuestra. En `Prf`, Q3 es
+`prf_zero_or_succ`, y se prueba por inducción.)
+
+**Lo que NO se sabe** (nada de esto está demostrado en el árbol):
+* que `T_Prf` sea **conservativa** sobre PA. Las ecuaciones de codificación se han llamado «extensión definicional
+  conservadora» (`Minimal/Axioms.lean`): es una pretensión. La conservatividad nunca se probó —es lo esperable por el
+  argumento estándar, interpretando cada símbolo por una función definible en PA, pero no está hecho; y ADR‑054 §4 la
+  descartó como metateorema general porque `ax_tc_cons`, retirado en ADR‑012, había dado `axioms ⊢ ⊥`—. Y tampoco es
+  «definicional»: las ecuaciones de
+  `substtc`, `liftc`, `substfc`, `liftfc`, `carc`, `cdrc`, `nthc`, `premsOf` y `validProofFn`, y la de la resta, sólo fijan el símbolo
+  sobre los argumentos de la forma prevista; sobre lo demás —la «basura»— el valor queda libre (el modelo elige uno:
+  0, o el que da su análisis por la etiqueta). Es una especificación PARCIAL por ecuaciones;
+* si `listInd` se deriva de `ind` y los 142. Es lo esperable: `σ ∘ pair` es una biyección de ℕ² en los positivos
+  (ADR‑113), así que todo número es `nil` o un `::`, y `t < h :: t`, con inducción fuerte. No basta `t < h :: t`: con la
+  codificación vieja también valía, y `listInd` daba `Prf ⊥`. En el árbol, que todo `L` sea `nil` o un `::`
+  (`prf_nil_or_cons_all`) se prueba precisamente con `listInd`. No está medido;
+* una traducción de `T_Prf` al lenguaje {0, σ, +, ×} (paso posterior y opcional);
+* un **puente** entre `Prf` y las relaciones de consecuencia de FOL (`DerivesSet₀`, `model_existence_iff₀`): no hay
+  ninguno, en ninguna dirección (T67). `goedel_I` dice que ESTE cálculo no deriva `G`; con el puente sería la
+  incompletitud de la teoría de primer orden en el sentido estándar.
+
+### 0.2 · Lo que se supone hoy
+
+1. **El núcleo de Lean** (v4.31.0) **y sus tres axiomas**, `propext`, `Classical.choice` y `Quot.sound`: son, como
+   mucho, el footprint de los titulares (las filas de `check-footprints.bash`; D2 no lleva `Classical.choice`, y D1, D2 y
+   `prf_con_imp_godel` aún no tienen fila: T11b), y leanchecker re‑comprueba en la CI las declaraciones del
+   build con el núcleo (ADR‑116). **0 `axiom` de Lean** en los módulos del build, en RPP y en FOL (fuera del build, FOL guarda 15 en
+   `cuarentena/`, T57, y RPP cuatro en `sondeos/`: los dos que el piloto `PilotoDiagonal.lean` suponía, y dos en
+   `lintlab/Uso.lean`, que prueban que un linter los detecta).
+2. **Nada sobre la teoría.** Los 142 axiomas y los esquemas no se suponen: DEFINEN `Prf`, y su verdad está
+   DEMOSTRADA. Los 142, en el modelo `MNV V₀` (dominio ℕ, con 0, σ, + y · los de siempre: `MN_axioms`); los esquemas y
+   las reglas, en todo modelo `Estandar` —dominio ℕ, 0 y σ los de siempre, `::` el `consN` de ADR‑113 (σ del par de Cantor), y
+   los 142 verdaderos— (`prf_sound`: la
+   inducción, por la de ℕ; la de listas, porque todo `m + 1` es un `::` de dos menores; DNE, por
+   `Classical.byContradiction`). De ahí `consistencia : ConsistentH` (ADR‑120) y Gödel I y II sin hipótesis; y todo lo
+   que deriva `Prf` es verdadero en `MNV V₀`. No hay solidez respecto de TODO modelo de la teoría (sólo la de `Prfᵢ`, en
+   `sondeos/AnclaSoundness.lean`).
+3. **Las definiciones**: que `Prf`, `axioms`, `godelCN`, `consistencyFormula'` o `evalFormula` sean lo que dicen sus
+   nombres no lo fija ningún control (T07).
+
+### 0.3 · Dónde entra la inducción en las pruebas
+
+`#print axioms` no lo ve: `ind`, `listInd`, `p3` y `qconf` son constructores de `Prf`, no `axiom`. Medido el
+2026‑10‑12 por cierre de dependencias (`sondeos/InduccionTitulares.lean`, ≈ 20 s; re‑ejecutado el 2026‑10‑14 sobre el
+build de ese día, con el mismo resultado y las dos filas de Tarski añadidas): qué titulares construyen pasos con cada
+regla, fuera de las traducciones entre `Prf`, `PrfH` y las líneas del verificador (lo automático separa las cuatro
+traducciones; el resto de cada frontera se clasificó leyendo el fuente). `qconf` no va en la tabla: lo
+construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de varios módulos.
+
+| titular | `ind` | `listInd` | `p3` (DNE) |
+|---|---|---|---|
+| D1 · `repr_pos'_prf` | **sí**: `prf_zero_or_succ`, `prf_add_zero_left`, `prf_add_succ_left`, `prf_mul_le_mono_right` | no | no |
+| D2 · `d2_prf` | no | **sí**: `prf_runFn_concat` y otros ocho de `ChainPrf` | no |
+| D3 · `d3_prf_real` | **sí** | **sí** | no |
+| `goedel_first_prf`, `goedel_I` | **sí** (p. ej., por D1) | no | no |
+| `goedel_second_prf`, `goedel_II`, `prf_con_imp_godel` | **sí** | **sí** (p. ej., por D2) | no |
+| `prf_tarski`, `tarski`, `tarski_semantico` | **sí** (la aritmética de numerales del lema diagonal) | no | no |
+| `goedel_I_neg` | **sí** (p. ej., por el punto fijo) | sólo al decodificar las líneas que el verificador acepta en el modelo (`linea_listInd`) | ídem (`linea_p3`) |
+| `prf_sound`, `consistencia` | no (analizan `Prf`; no construyen) | no | no |
+
+⚠️ «Sí» quiere decir que el término de prueba nombra, por valores, una regla derivada que construye el paso
+(`prf_nat_induction`, `prf_list_induction`); no que el paso sea imprescindible: otra prueba podría evitarlo. «No», que
+ninguna constante de su cierre lo construye fuera de las traducciones y de `deduction_aux`, que reconstruye el paso
+que recibe. ⇒ D1 usa la inducción **en esta prueba**, y D2 la de listas: la tabla de §1.1 («D1 y D2, limpios») se midió
+sobre los `axiom` de `⊢`, y sobre `Prf` no vale. Y por lectura los CUATRO usos de D1 son evitables: `0 + n = n` y
+`σm + n = σ(m + n)` salen de `ax6` con `ax4` o `ax5`; Q3, de `ax2`, `ax5`, `ax13` y `ax19`; y la monotonía del producto,
+de `ax13`, `ax10`, `ax12`, Q3 y `ax4`. Que D1 compile sin `ind` no está comprobado. Por último, ningún titular construye
+un paso clásico salvo `goedel_I_neg`, que lo hace al decodificar con `linea_p3` las líneas que el verificador acepta en
+el modelo; en los demás, sus derivaciones sólo llevan los `p3` que traducen de otra que reciben.
 
 ---
 
@@ -182,11 +284,13 @@ obsoleta**: no se usaba.
   `Full` añade sobre el débil `Minimal`. No pueden vivir en `Minimal/` sin destruir
   la frontera de diseño (Minimal = sin inducción general). `ax_mod2_alternation` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   es un axioma-puente que permite derivar `ax21`/`ax24` como teoremas.
-  **No son andamiaje opcional: son el mínimo teórico de Gödel II — ver §1.1.**
+  **No son andamiaje opcional: son el mínimo teórico de Gödel II — ver §1.1.** *(✏️ 2026‑10‑14, ADR‑134: no lo son;
+  Gödel II vale para Q, ver la nota de §1.1.)*
 
 ### 1.1 · Por qué la inducción es IMPRESCINDIBLE (y no un lujo del formalizador)
 
-> ✏️ **2026‑10‑02 (ADR‑115).** El argumento sigue en pie —Gödel II pide inducción—, pero hoy la inducción entra
+> ✏️ **2026‑10‑02 (ADR‑115).** El argumento sigue en pie —Gödel II pide inducción— *(✏️ 2026‑10‑14, ADR‑134: no;
+> Gödel II vale para Q, ver la nota de abajo)*, pero hoy la inducción entra
 > por los constructores `Prf.ind` y `Prf.listInd`, no por un `axiom`: `ax_induction` y `ax_list_induction` (retirados)
 > se fueron con la capa `⊢`. La tabla y la «consecuencia arquitectónica» de abajo hablan de ellos: son registro.
 
@@ -201,7 +305,34 @@ IΣ₁ (o EA/IΔ₀+exp) es el mínimo habitual. Gödel **I** sí llega sobre Q 
 Gödel **II**, no. Por tanto *«Gödel II sobre Q sin inducción»* no es un objetivo
 pendiente de este proyecto: es un **enunciado falso**.
 
+> ✏️ **2026‑10‑12 · [ADR‑134](DECISIONS.md) — este párrafo, frase a frase** (por la literatura, no medido aquí;
+> revisado el 2026‑10‑14):
+> * «es un enunciado falso»: **FALSO**. `Q ⊬ Con_Q` es un teorema para la formalización canónica: ninguna teoría r.e.
+>   consistente que interprete Q demuestra su propia consistencia (P. Pudlák, «Cuts, consistency statements and
+>   interpretations», *JSL* 50 (1985) 423–441); y A. Bezboruah y J. C. Shepherdson lo probaron directamente para una
+>   formalización natural («Gödel's second incompleteness theorem for Q», *JSL* 41 (1976) 503–512). Con él cae el «No.»
+>   de la pregunta de arriba: Gödel II vale sin inducción.
+> * «no satisface las condiciones de Hilbert–Bernays–Löb … (D3)» y «para D2/D3 hace falta inducción»: INEXACTO. Para el
+>   predicado de prueba sin relativizar no se sabe probar D3 en Q; pero, relativizado a un corte definible en el que Q
+>   interpreta S¹₂, la vía de Hilbert–Bernays–Löb llega a Q (S. R. Buss, en *Handbook of Proof Theory*, 1998, §2.1.4 y
+>   §2.2.3; Pudlák 1985).
+> * «Gödel II requiere D1–D3»: INEXACTO. Son condiciones suficientes, y hay otros conjuntos suficientes, cada uno para su
+>   enunciado de consistencia (R. G. Jeroslow, *JSL* 38 (1973) 359–367: sin D2 y con D3 reforzada, para otra fórmula de
+>   consistencia).
+> * «IΣ₁ (o EA/IΔ₀+exp) es el mínimo habitual»: INEXACTO. IΣ₁ es la base habitual de los manuales (P. Hájek y P. Pudlák,
+>   *Metamathematics of First‑Order Arithmetic*, 1993, III.2.17 y III.2.22); basta EA, y con una aritmetización
+>   eficiente, S¹₂ (Buss 1998, §2.1).
+>
+> Lo de Gödel I sobre Q (Rosser) es correcto. El título de §1.1 no está justificado: la inducción no es imprescindible
+> para Gödel II, y tampoco está probado que lo sea para la vía de este proyecto, que usa el predicado sin relativizar
+> (para él, D3 sin inducción es una cuestión abierta). Numeración del proyecto: D1 necesitación, D2 distribución, D3
+> `Pr φ → Pr Pr φ` (Hájek–Pudlák y Buss numeran de otro modo).
+
 **Dónde entra exactamente, verificado con `#print axioms`** (no por conjetura):
+
+> ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md))**: se verificó sobre los `axiom` de la capa `⊢`. Sobre `Prf`,
+> `#print axioms` no ve la inducción —es un constructor—, y medida por cierre de dependencias D1 y D2 **no** están
+> limpios: D1 usa la inducción, D2 la de listas (§0.3).
 
 | resultado | ¿usa `Full.ax_induction` / `ax_list_induction`? 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)* |
 |---|---|
@@ -211,7 +342,8 @@ pendiente de este proyecto: es un **enunciado falso**.
 | `goedel_second'` | **SÍ** — 🏁 y **sin `d3`** desde el 2026‑09‑10g |
 
 El reparto encaja con la teoría: **D1 es la Σ₁‑completitud *externa*** (aplicar el
-verificador a una derivación concreta = cómputo finito, sin inducción); **D3 es la
+verificador a una derivación concreta = cómputo finito, sin inducción —✏️ 2026‑10‑12, ADR‑134: el ENUNCIADO de D1
+vale en toda extensión de Q, por la Σ₁‑completitud externa; la prueba de RPP sí usa la inducción, §0.3—); **D3 es la
 Σ₁‑completitud *provable*** — razonar dentro de la teoría sobre *todas* las líneas y
 sobre funciones recursivas de la sintaxis (`substfc`, `runFn`, …), y **eso exige
 inducción**. Es exactamente el muro con el que se topó B.3c en los tags `q1`/`q2`/`q3`/
@@ -220,7 +352,7 @@ inducción**. Es exactamente el muro con el que se topó B.3c en los tags `q1`/`
 **Consecuencia arquitectónica (importante, y no obvia).** `ax_induction` tiene la forma 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 `axioms ⊢ inductionFormula φ`: **extiende la relación de derivabilidad del objeto**. Es
 decir, la teoría cuya demostrabilidad aritmetiza `provCodeC'` **no es Q pelada, es
-Q++ + inducción** (perfil IΣ₁) siempre que la cadena cite esos axiomas. `Minimal/` sigue
+Q++ + inducción** (perfil IΣ₁ *—✏️ 2026‑10‑12, ADR‑134: no IΣ₁; `Prf.ind` vale para toda fórmula, y contiene a PA: §0—*) siempre que la cadena cite esos axiomas. `Minimal/` sigue
 siendo la *lista* de axiomas débil y la frontera de diseño se mantiene, pero el sujeto
 del teorema de incompletitud, en la cadena real, es el sistema **con** inducción.
 Esto es lo correcto y lo esperado — sólo faltaba decirlo explícitamente.
@@ -231,7 +363,7 @@ necesario** usar la inducción de `Full/`. Lo que *no* está permitido es añadi
 **derivable sin axiomas nuevos** (`ax_L0_cons_def` ancla `cons h t = succ (pair h t)` desde ADR‑113
 con `pair = cantor_func`, luego los códigos son números y vale `ax_induction`). 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 - 🗑️ ~~**Teoría objeto.** `ax_p_tfa`~~ — **retirado el 2026‑09‑12**, medido huérfano. Ver su fila.
-- **Anclas de codificación.** Extensión **conservadora** (✏️ nunca se probó, y el ancla de `Prf` daba `Prf ⊥`: F1, ADR‑114). `ax_axiomsCodeT_eq` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+- **Anclas de codificación.** Extensión **pretendidamente** conservadora (✏️ nunca se probó —§0, ADR‑134—, y el ancla de `Prf` daba `Prf ⊥`: F1, ADR‑114). `ax_axiomsCodeT_eq` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   (cálculo `⊢`) es una **igualdad**: `axiomsCodeT` ES el código de la lista de
   axiomas — da **ambas** direcciones (positiva `ax_inAxC`, ahora **teorema**; y 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
   negativa `neg_In_axiomsCodeT`, que SÓLO los axiomas están). El término gigante
@@ -308,6 +440,11 @@ teoremas (`goedel_first_unprovable`, `incompleteness`, `con_imp_goedelSentence`,
 
 ## 4 · Estado de la cadena real (auditoría 2026-07-09, `#print axioms`)
 
+> ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md)) · REGISTRO.** `goedel_first_real'` y `goedel_second'` ya no existen: el
+> primero se retiró con ADR‑012 y el segundo con ADR‑024 (iban sobre `⊢`, que se retiró con ADR‑115). Los titulares de hoy van sobre `Prf`, con footprint `[propext, Classical.choice,
+> Quot.sound]` (`check-footprints.bash`); su inducción no está en ningún footprint (§0.3). Y la mitad `⊬¬G` existe
+> desde ADR‑121: `goedel_I_neg`, por la solidez en el modelo, sin ω‑consistencia.
+
 ```text
 goedel_first_real'  : [propext, choice, Quot.sound,
                        FOL.MetaRules.{dne, gen, imp_intro},
@@ -333,6 +470,6 @@ de solidez.** Para recuperarla honestamente falta construir
 ## Véase también
 
 - `MINIMAL-AXIOMS.md` — análisis de minimalidad de los 34 axiomas de la **teoría
-  objeto** `Minimal` (distinto de las declaraciones `axiom` de Lean listadas aquí).
+  objeto** `Minimal` (✏️ 2026‑10‑12: de la LISTA `coreAxioms`; la teoría de los titulares es `T_Prf`, §0) (distinto de las declaraciones `axiom` de Lean listadas aquí).
 - `GODEL-D3-TRACKED-DESIGN.md` — plan 12‑A hacia `d3` real (retirada de F7b).
 - `CURRENT-STATUS-PROJECT.md`, `REFERENCE.md` §3.17–§3.18 — estado y proyección.

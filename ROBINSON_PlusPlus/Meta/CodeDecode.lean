@@ -112,7 +112,7 @@ theorem decodeTerms_termsCodeM (ts : List Term) : decodeTerms (termsCodeM ts) = 
       decodeTerms_termsCodeM ts]
 end
 
-/-- Inverso de `formCodeM` (los 9 tags de fórmula). Recursión estructural sobre las subfórmulas. -/
+/-- Inverso de `formCodeM` (los 8 tags de fórmula, del 2 al 9). Recursión estructural sobre las subfórmulas. -/
 def decodeForm : Term → Option Formula
   | .func cs [h, t] =>
       if cs = cons_sym then
@@ -167,7 +167,9 @@ theorem decodeForm_formCodeM (φ : Formula) : decodeForm (formCodeM φ) = some �
 
 `decodeX c = some v → c = codeX v`: si un término **decodifica**, es **exactamente** el código de lo
 decodificado. Es la pieza que hace el trabajo en `VerifierSound` (módulo E): de un testigo aceptado por
-el verificador se recupera —de forma **única**— la derivación real.
+el verificador se recupera —de forma **única**— la derivación real. (✏️ 2026‑10‑14, ADR‑134: medido,
+`VerifierSound` no lo usa —`verifier_sound` es `decodeChain_prf`, de `Meta/ChainDecode.lean`, que no pasa por
+`decodeForm_inj`—; su único consumidor en el build es `decodeLine_carc`, en `Meta/ChainNegPrf.lean`.)
 
 **Nota de implementación (kernel + De Bruijn).** `split`/`rw`/`simp` manuales sobre `h` tras desplegar
 `decodeTerm` por defeq (`dsimp only`/`simp only [decodeTerm] at h`) fabrican un cast `congrFun'` que el

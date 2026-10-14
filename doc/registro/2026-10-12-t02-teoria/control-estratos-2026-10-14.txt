@@ -1,0 +1,45 @@
+════ CENSO DE ESTRATOS ════
+  ✓ Derives                                         22 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Inconsistencia.derives_soundness
+  ✓ Derives₀                                      21 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: FOL.Metamath.Soundness0.derives0_soundness
+  ✓ Derives₁                                      20 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+  ✓ Derives₂                                      22 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+  ✓ LK₀                                           14 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+  ✓ LKc                                             15 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+  ✓ LKh                                             14 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+  ✓ ROBINSON_PlusPlus.Meta.Hilbert.Prf               7 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
+  ✓ ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ           17 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+      └ solidez en el build: ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound
+  ✓ ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH     8 ctors · 0 axiomas ⇒ ningún postulado que contrastar
+
+════ ¿algún axioma habita un estrato NO DECLARADO? ════
+  ✓ todos los axiomas habitan estratos declarados
+  ✓ el censo incluye TheoryFramework (86 constantes suyas en el entorno)
+
+════ sorry EN EL ENTORNO (constantes cuyo tipo o valor nombra sorryAx) ════
+  ✓ ninguna usa sorryAx  (de 9914 constantes de RPP, FOL y TheoryFramework)
+
+════ CONFIANZA (axiomas del core fuera de los tres de Lean) · NATIVO (implemented_by / extern) · AJENO ════
+  ✓ TRUST    ninguno
+  ✓ NATIVO   ninguno
+  ✓ AJENO    ninguno
+
+════ ESCALERA DE BINDERS ════
+  ✓ forall_            peldaño máximo 5
+  ✓ pcc_thm_inst       peldaño máximo 4
+  ✓ pcc_axiom_inst     peldaño máximo 4
+  ✓ PSI_inst           peldaño máximo 4
+  ✓ psi_lift_form      peldaño máximo 4
+  ⚠️  DESFASE DECLARADO: el uso llega a forall_5 y la maquinaria a 4.
+      Es real y conocido — hay axiomas de aridad 5 sin instanciador de código.
+      ⚠️ La maquinaria crece SUPERLINEALMENTE: medido 6 → 13 → 34 → 64 líneas
+         (pcc_thm_inst · inst2 · inst3 · inst4). El peldaño 5 NO es una tarde.
+      ⭐ El nivel de las DEFINICIONES sí está cerrado: `forallN` + los cinco puentes.
+
+✅ LOS 10 ESTRATOS CUADRAN.
+   ⚠️  Recordatorio: `#print axioms` es CIEGO a esto. El footprint de un teorema probado por
+       inducción no lleva los axiomas que habitan el inductivo, y el teorema es válido: lo que
+       puede ser falso es el AXIOMA (ADR-115). Por eso se cuentan aquí.
+rc=0 segundos=23

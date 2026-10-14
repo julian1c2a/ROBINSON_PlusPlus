@@ -46,7 +46,9 @@ theorem estandar_MN : ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar (MNV V₀) wher
   hcons := MN_cons
   haxs := MN_axioms
 
-/-- 🏁 **Los 142 son CONSISTENTES**: `Prf ⊥` no tiene prueba, porque `MNV V₀` satisface los 142 (`MN_axioms`). -/
+/-- 🏁 **`T_Prf` es CONSISTENTE** (los 142 con los esquemas de `Prf`): `Prf ⊥` no tiene prueba, porque `MNV V₀` es
+    estándar y satisface los 142 (`estandar_MN`), y `Prf` es sólido en todo modelo estándar (`prf_sound`).
+    (✏️ 2026‑10‑14: decía «Los 142 son CONSISTENTES… porque `MNV V₀` satisface los 142 (`MN_axioms`)».) -/
 theorem consistencia : ConsistentH := ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de estandar_MN
 
 /-- 🏁 **GÖDEL I, la mitad `⊬ G`, sin hipótesis** (la otra, `goedel_I_neg`, en `Meta/SolidezVerificador.lean`). -/

@@ -39,6 +39,13 @@ inducción estructural de la fase 5.
 Este módulo entrega el **átomo `=eq`** del toolkit rastreado, espejo exacto del de `In`
 (`prf_provCodeC'_In_of_tracked`, `Meta/Sigma1CorePrf.lean`): constructor object `eqCodeFn`,
 congruencia, clausura, transporte, y la reflexión rastreada `prf_provCodeC'_eq_of_tracked`.
+
+✏️ 2026‑10‑14 (ADR‑134): registro — la ruta `hbI`/`hbC` a la que servía este módulo, y con ella la
+«fase 5» que anuncian esta cabecera, `prf_provCodeC'_eq_of_tracked` y la sección de la igualdad con
+`tcFn`, es VACUA: `hbI` es refutable (ADR‑132, T05: `hbI_refutable` en `sondeos/D3Sigma1Vacuo.lean`),
+así que `d3_prf_of_reflect_bounded` no reduce D3 a nada. D3 se probó por la vía punteada
+(`d3_prf_real`, `Meta/PremsBdAllPrf.lean`). Las piezas sí se usan: `eqCodeFn` y `lineWFCodeFn` están
+en C3 (`pcc_lineWF_tracked`, `Meta/SubstTreeReflect.lean`), y `prf_lineWF_inv` lo usa `pcc_tag_vacuous`.
 -/
 
 /-- Constructor object del código de `Formula.eq a b` desde los códigos `a`, `b` de sus términos:
@@ -177,7 +184,10 @@ lineWF ⟨concl, 13, A, t₁, t₂⟩ ⇔ concl =eq implc (eqc t₁ t₂) (implc
 sin premisas y con **códigos arbitrarios** `A`, `t₁`, `t₂`. Luego el **Leibniz codificado** se
 demuestra con un testigo de **una sola línea**, exactamente como la reflexividad (§15.4). Con él y
 `pcc_mp_code` se obtiene toda la **lógica ecuacional interna** sobre códigos (transitividad,
-congruencias), sin pasar por teoremas codificados ni por `∀`‑elim triple. -/
+congruencias), sin pasar por teoremas codificados ni por `∀`‑elim triple. (✏️ 2026‑10‑14, ADR‑134:
+desde ADR‑020 los códigos ya no son arbitrarios: `prf_lineWF_leibniz` (`Meta/ReprPrf.lean`) pide las
+guardas `hwA : Prf (hasWitF A)`, `hwt1 : Prf (hasWit t1)` y `hwt2 : Prf (hasWit t2)`, y el `⇔` de
+arriba vale bajo ellas; ver la corrección del 2026‑09‑05 en `pcc_leibniz_code`.) -/
 
 /-- **Línea‑axioma LEIBNIZ** para los códigos `Ac`, `t₁`, `t₂`: `⟨concl, 13, Ac, t₁, t₂⟩`. -/
 def leibnizLine (Ac t₁ t₂ : Term) : Term :=
@@ -338,7 +348,12 @@ theorem provCodeC'_lineWF_eq (t : Term) :
     *producción*. A diferencia de `=eq` (cuya reflexividad es un axioma, ⇒ reflexión libre de muro),
     `lineWF` es un **átomo primitivo** cuyos 21 axiomas son bicondicionales indexados por etiqueta de
     regla, **sin axioma de inversión**. Por eso `Prf (lineWF t ⇒ provFromCode (lineWFCodeFn (tcFn t)))`
-    **no es derivable** para `t` abstracto: de `lineWF t` la teoría no puede extraer la etiqueta. -/
+    **no es derivable** para `t` abstracto: de `lineWF t` la teoría no puede extraer la etiqueta.
+
+    (✏️ 2026‑10‑14, ADR‑134: once minutos después, el mismo 2026‑07‑10, `ax_lineWF_inv` entró en la
+    lista —su cierre es `prf_lineWF_inv`, abajo—, y la fórmula de arriba ES hoy un teorema sin
+    hipótesis: `pcc_lineWF_tracked` (`Meta/SubstTreeReflect.lean`), C3, cerrado el 2026‑09‑10. Sigue
+    siendo cierto que este lema es el transporte, no la producción.) -/
 theorem prf_provCodeC'_lineWF_of_tracked {t tc : Term}
     (ht : Prf (tc =eq termCode t)) (h : Prf (provFromCode (lineWFCodeFn tc))) :
     Prf (provCodeC' (lineWF t)) :=

@@ -24,12 +24,16 @@
 `IsCodeShaped` (la clase de testigos de `StdChain`) **NO SEPARA**: admite a la vez `numeralM n` y
 `cons h t`, y `cons nil nil ≐ numeralM 2` es **PROVABLE**. Un `formCode φ` **es** un numeral, sólo
 que astronómico. ⇒ Refutar `In ⌜φ⌝ (runFn nil t)` contra una conclusión basura exigiría **evaluar
-el emparejamiento de Cantor** — inviable.
+el emparejamiento de Cantor** — inviable. (✏️ 2026‑10‑14, ADR‑134: con la codificación vieja. Desde ADR‑113
+`consN 0 0 = 1`, y la colisión es `cons nil nil ≐ numeralM 1`, también provable: `cons_cero_cero_en_Prf`, en
+`sondeos/PrfBotCodificacionVieja.lean`; la MEDICIÓN 2, abajo, con el 2, es registro.)
 
 ⇒ **La viabilidad de `NegVerifier` depende de ESTRECHAR la clase de testigos** hasta que todas las
 comparaciones sean **paralelas por tipo** (`formCode` contra `formCode`, `termCode` contra
 `termCode`), que es donde `formCode_ne` y compañía deciden. Eso es una decisión de diseño con
-consecuencias sobre la fuerza de `OmegaConsistent`, y va a ADR.
+consecuencias sobre la fuerza de `OmegaConsistent`, y va a ADR. (✏️ 2026‑10‑14, ADR‑134: fue ADR‑022, que
+estrechó `StdChain` a líneas estándar; después `OmegaConsistent` resultó refutable por su definición
+(`sondeos/OmegaConsistentRefutable.lean`, ADR‑114), y `NegVerifier` se retiró con la capa `⊢` (ADR‑115).)
 
 ## Las cinco mediciones de abajo
 
@@ -41,7 +45,8 @@ consecuencias sobre la fuerza de `OmegaConsistent`, y va a ADR.
 | 4 | el módulo E | ⭐ `modulo_E`, una línea |
 | 5 | la discrepancia objeto/meta | ⛔ `basura_p1_aceptada_objeto` |
 
-Todas compilan. Footprint: el del árbol.
+Todas compilan. Footprint: el del árbol. (✏️ 2026‑10‑14, ADR‑134: hoy no compila
+—`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 -/
 import ROBINSON_PlusPlus.Meta
 set_option maxRecDepth 20000

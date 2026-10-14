@@ -55,6 +55,8 @@ nunca crece — la dirección opuesta al incidente `ax_lineWF_gen`.
 ## Cómo re-ejecutarlo
 
     lake env lean sondeos/ParseWitness.lean
+
+(✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 -/
 import ROBINSON_PlusPlus.Meta
 

@@ -46,7 +46,8 @@ numérico y su aridad:
 En vez de dar constructor object, congruencia, distribución de `substtc` y ecuación `tc` **para cada
 uno** —que es lo que se hizo a mano con `eqcT` en `LineWFTrackedPrf`— se parametrizan por aridad y
 tag: `nulT` / `unT` / `binT`. Con eso, `eqcT = binT 4` pasa a ser un caso particular, y los árboles
-`E` de los 18 tags pendientes quedan cubiertos de un golpe.
+`E` de los 18 tags pendientes quedan cubiertos de un golpe. (✏️ 2026‑10‑14, ADR‑134: hoy no queda
+ningún tag pendiente: C3 está cerrado, `pcc_lineWF_tracked`, `Meta/SubstTreeReflect.lean`.)
 
 La pieza que de verdad importa es la última sección: la **congruencia dentro de `Prov`**
 (`pcc_congr_binT_{1,2}_code`, `pcc_congr_unT_code`), que generaliza el
@@ -151,8 +152,10 @@ theorem prf_substtc_binK_at (T : Term) (hT : ∀ c : Nat, liftTerm c T = T)
     (prf_congr_cons_tail (prf_congr_cons_head (prf_substtc_termCode_zero n W)))
 
 /-- Congruencia de `binT` en ambos argumentos. **Corolario de `prf_congr_binK`** desde B3:
-    `binT m a b` es `binK (termCode (numeralM m)) a b` por `rfl`. Tiene 11 call-sites reales
-    en cuatro modulos (`CodeCtorKit`, `CodeTreeReflect`, `LiftcCodePrf`, `LineWFEfqPrf`). -/
+    `binT m a b` es `binK (termCode (numeralM m)) a b` por `rfl`. Tiene 32 call-sites reales
+    en ocho modulos (grep del 2026‑10‑14: `CodeCtorKit`, `CodeTreeReflect`, `EvalLiftfcPrf`,
+    `HasWitFTrackedPrf`, `HasWitTrackedPrf`, `LiftcCodePrf`, `LineWFEfqPrf`, `SubstTreeReflect`;
+    ✏️ 2026‑10‑14: decía «11 call-sites reales en cuatro modulos»). -/
 theorem prf_congr_binT {m : Nat} {a a' b b' : Term}
     (ha : Prf (a =eq a')) (hb : Prf (b =eq b')) : Prf (binT m a b =eq binT m a' b') :=
   prf_congr_binK (H := termCode (numeralM m)) ha hb

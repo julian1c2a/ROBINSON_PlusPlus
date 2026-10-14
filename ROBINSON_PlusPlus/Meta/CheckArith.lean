@@ -27,9 +27,13 @@ namespace ROBINSON_PlusPlus.Meta.CheckArith
 /-!
 ## META — NIVEL D (real): verificador object de demostraciones  (Fase 2.4)
 
-`demFormula` (la fórmula Σ₁ de demostrabilidad) reposa sobre un verificador
+`provFormulaC` (la fórmula Σ₁ de demostrabilidad; ✏️ 2026‑10‑14: decía `demFormula`, el
+nombre del plan, que no llegó a existir; la de Gödel es `provFormulaC'`, `Meta/ProofChain.lean`)
+reposa sobre un verificador
 object-level de demostraciones-secuencia **anotadas hacia adelante**: cada línea
-lleva su etiqueta de regla (`numeralM 0..17`) y sus parámetros; el verificador
+lleva su etiqueta de regla (`numeralM 0..17`; ✏️ 2026‑10‑14, ADR‑134: hoy `0..20`, con 18 =
+`ax_vpf_ind`, 19 = `ax_vpf_qconf` y 20 = `ax_vpf_listInd`, en `Minimal/Axioms.lean`) y sus
+parámetros; el verificador
 `validProofFn` recorre la secuencia recomputando la conclusión de cada línea (los
 esquemas Q usan `substfc`/`liftfc`, ya hechos) y, para MP/Gen, comprueba la
 pertenencia de las premisas vía `In`.

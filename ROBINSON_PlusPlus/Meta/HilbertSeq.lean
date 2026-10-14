@@ -39,6 +39,10 @@ Resultados de la fase:
 * **Completitud** `prf_to_proves : Prf φ → ∃ rs, Proves rs φ`.
   Juntas: `Prf φ ↔ ∃ rs, Proves rs φ` (la demostrabilidad de Hilbert = existe
   una secuencia-demostración finita). Base para el `Dem` concreto (codificación).
+  (✏️ 2026‑10‑13, ampliada el 2026‑10‑14, ADR‑134: `Proves`, `proves_to_prf` y `prf_to_proves` no existen;
+  `checkProof` sí. Los de hoy son `Derivation rs φ` —basta que `φ` esté
+  entre las conclusiones, no que sea la última—, `derivation_to_prf` y `prf_to_derivation`; juntas,
+  `prf_iff_derivation`.)
 -/
 
 /- Igualdad decidible para términos y fórmulas (necesaria para el verificador:
@@ -154,7 +158,7 @@ def checkProof (rs : List Rule) : Option (List Formula) := checkAux rs []
 def Derivation (rs : List Rule) (φ : Formula) : Prop :=
   ∃ L, And (checkProof rs = some L) (φ ∈ L)
 
-/-! ### Solidez del verificador: `Proves rs φ → Prf φ` -/
+/-! ### Solidez del verificador: `Derivation rs φ → Prf φ` (✏️ 2026‑10‑14, ADR‑134: decía `Proves rs φ`) -/
 
 /-- Si `mpConcl fi fj = some f` entonces `fi` es la implicación `fj ⇒ f`. -/
 theorem mpConcl_eq {fi fj f : Formula} (h : mpConcl fi fj = some f) : fi = (fj ⇒ f) := by
@@ -405,7 +409,11 @@ como una lista codificada. Con eso definimos `Dem d x` **concreta** (reemplaza e
 postulado opaco): "`d` es el código de una derivación-secuencia en la que aparece
 la fórmula de código `x`". El tracking `(∃ d, Dem d ⌜φ⌝) ↔ Prf φ` sale de
 `prf_iff_derivation` + `formCode_injective`; no requiere decodificador (la forma
-Δ₀/decidible pertenece a la Fase 2, donde se construye el objeto `demFormula`). -/
+Δ₀/decidible pertenece a la Fase 2, donde se construye el objeto `demFormula`).
+(✏️ 2026‑10‑14, ADR‑134: el `Dem` postulado y `dem_iff_provable`, lo que esto «reemplaza», se retiraron en F7a
+(2026‑07‑09); y `demFormula` nunca existió con ese nombre: la fórmula Σ₁ de la Fase 2 se construyó como
+`provFormulaC` (sobre `validProofFn`, `Meta/CheckArith.lean`), y la que usa la cadena es `provFormulaC'`
+(`Meta/ProofChain.lean`).) -/
 
 /-- Código de Gödel de una regla: `⟨tag, args codificados…⟩`. -/
 def ruleCode : Rule → Term
@@ -429,9 +437,9 @@ def ruleCode : Rule → Term
   | .qconf P C => cons (numeral 19) (cons (formCode P) (cons (formCode C) nil))
   | .listInd A => cons (numeral 20) (cons (formCode A) nil)
   -- La línea `thy` TRANSPORTA el código del axioma (no el índice `k`). `thy`
-  -- recorre `coreAxioms` (la teoría matemática), no las ecuaciones de coding (ver
-  -- `ax_vpf_thy` y GODEL-D-ARITHMETIZATION §7). En una derivación válida `k` está
-  -- en rango, luego `coreAxioms.getD k ⊥ = coreAxioms[k]` = la conclusión real.
+  -- recorre `axioms`, los 142 (✏️ 2026‑10‑12, ADR‑134: decía «`coreAxioms` (la teoría matemática), no las
+  -- ecuaciones de coding», y el código usa `axioms`). En una derivación válida `k` está
+  -- en rango, luego `axioms.getD k ⊥ = axioms[k]` = la conclusión real.
   | .thy k => cons (numeral 15) (cons (formCode (axioms.getD k Formula.bottom)) nil)
   | .mp i j => cons (numeral 16) (cons (numeral i) (cons (numeral j) nil))
   | .gen i => cons (numeral 17) (cons (numeral i) nil)
@@ -443,7 +451,7 @@ def rulesCode : List Rule → Term
 
 /-- **Predicado de demostración concreto** `Dem d x`: `d` es el código de una
     derivación-secuencia válida en la que aparece la fórmula de código `x`.
-    Reemplaza el `Dem` postulado de `Meta/Provability.lean`. -/
+    Reemplaza el `Dem` postulado de `Meta/Provability.lean` (retirado en F7a, 2026‑07‑09). -/
 def Dem (d x : Term) : Prop :=
   ∃ rs : List Rule, ∃ φ : Formula,
     And (d = rulesCode rs) (And (x = formCode φ) (Derivation rs φ))
@@ -453,7 +461,7 @@ def ProvableH (x : Term) : Prop := ∃ d : Term, Dem d x
 
 /-- **Tracking (fidelidad del `Dem` concreto)**: la demostrabilidad codificada de
     `⌜φ⌝` coincide con la demostrabilidad de Hilbert `Prf φ`. Reemplaza el
-    postulado `dem_iff_provable` (restringido a `⊢ᴴ`). -/
+    postulado `dem_iff_provable` (restringido a `⊢ᴴ`; el postulado, retirado en F7a, 2026‑07‑09). -/
 theorem dem_tracks (φ : Formula) : ProvableH (formCode φ) ↔ Prf φ := by
   unfold ProvableH Dem
   rw [prf_iff_derivation]

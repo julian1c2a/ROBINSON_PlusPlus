@@ -23,6 +23,10 @@ namespace ROBINSON_PlusPlus.Meta.Provability
 /-!
 ## META — NIVEL C: DEMOSTRABILIDAD (provisional, en construcción)
 
+✏️ 2026‑10‑14 (ADR‑134): el título es del 2026‑06‑06. Hoy el módulo sólo tiene la codificación (`charsCode`,
+`strCode`, `termCode`, `termsCode`, `formCode`, sus inyectividades e `IsFormula`); la demostrabilidad es `Prf`
+(`Meta/Hilbert.lean`) y su aritmetización, `provCodeC'` (`Meta/ProofChain.lean`).
+
 Stage 1: codificación estructural de Gödel de los términos y fórmulas del
 lenguaje (FOL `Term`/`Formula`). Construye sobre `numeral`/`cons`/`nil` de
 `Meta/Godel.lean`. Cada nodo se codifica como `cons (numeral tag) payload`,
@@ -221,7 +225,9 @@ theorem isFormula_formCode (φ : Formula) : IsFormula (formCode φ) := ⟨φ, rf
 >
 > 🗑️ **ACTUALIZADO 2026‑10‑02 (ADR‑115):** esos dos también se retiraron, con la capa `⊢` sobre la
 > que estaban enunciados. Hoy Gödel I es `goedel_first_prf` y el punto fijo
-> `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), los dos sobre `Prf`.
+> `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), los dos sobre `Prf`. (✏️ 2026‑10‑14, ADR‑134: y Gödel I
+> va hoy entero y sin hipótesis: `godelCN_indecidible` —`goedel_I` y `goedel_I_neg`—, en
+> `Meta/SolidezVerificador.lean`.)
 -/
 
 end ROBINSON_PlusPlus.Meta.Provability

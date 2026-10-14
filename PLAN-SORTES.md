@@ -14,7 +14,7 @@ Orden de autoridad: **§4septies > §4sexies > §4quater > §4bis > §3**.
 
 | hecho | dónde |
 |---|---|
-| La teoría objeto es **inconsistente**: `axioms ⊢ ⊥`, footprint sancionado, sin `sorryAx` | sesión previa |
+| La teoría objeto es **inconsistente**: `axioms ⊢ ⊥`, footprint sancionado, sin `sorryAx` *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): lo ERA, por `ax_tc_cons`, retirado en ADR‑012; y después, sobre `⊢`, por `ax_list_induction` y las meta‑reglas, hasta que esa capa se retiró en ADR‑115; y `Prf ⊥` valía con el `cons` viejo, hasta ADR‑113. ADR‑120 DEMOSTRÓ la consistencia de `Prf`: `consistencia`)* | sesión previa |
 | El daño entra a Gödel I **por un solo sitio**: el **lema diagonal** (`godelC'_fixedpoint` cita exactamente `[propext, choice, Quot.sound, imp_intro, tc_cons]`) | §4sexies (S1) |
 | **D1 (`repr_pos'_prf`) está LIMPIO**, y el argumento de Gödel (`goedel_first_unprovable_real'`, `_unrefutable_real'`) también: son **modulares** | §4sexies (S1) |
 | La familia **INVARIANCIA** se re‑prueba sin la lectura sintáctica | §4ter |

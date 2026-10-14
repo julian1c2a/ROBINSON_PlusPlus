@@ -35,6 +35,13 @@ namespace ROBINSON_PlusPlus.Meta.CodeDistinct
 /-!
 ## META — NIVEL D (real): aritmética NEGATIVA de códigos  (Fase 2.6, cimientos)
 
+✏️ 2026‑10‑14 (ADR‑134): registro — la mitad `⊬¬G` es hoy `goedel_I_neg` (`Meta/SolidezVerificador.lean`,
+ADR‑121), por la solidez de `Prf` en el modelo estándar `MNV V₀` (`prf_sound`, `prf_of_prov`): sin
+ω‑consistencia y sin que la teoría refute igualdades de códigos. De este módulo quedan siete declaraciones
+(`charToNat_ne`, `formTag`, `termTag`, sus dos `_eq_cons`, `NotFC`, `NotTC`), y ninguna se usa en código
+fuera de este fichero (grep del 2026‑10‑14; `ChainNegPrf` y `ReprPrf` sólo las nombran en comentarios).
+Lo que sigue describe el plan de antes de ADR‑121.
+
 La dirección negativa (reflexión / D3 / `⊬¬G`) reposa sobre que la teoría
 **refuta** igualdades de códigos distintos: la contraparte object-level de
 `formCode_injective`. Aquí se construían los primitivos de distinción
@@ -59,7 +66,8 @@ clásica— y así se enunciaba, **explícita**, en `Meta/DiagonalTwo.lean`
 el espejo de `repr_pos'`, y sí alcanzable, a diferencia de la versión Π₁ universal.
 `formCode_ne` es la base de eso.
 🗑️ `Reflects`, `repr_pos'` y `formCode_ne` eran de `⊢`: retirados con esa capa (ADR‑115). Hoy la
-mitad `⊬¬G` no tiene enunciado sobre `Prf`.
+mitad `⊬¬G` no tiene enunciado sobre `Prf`. (✏️ 2026‑10‑14, ADR‑134: lo tiene desde ADR‑121, `goedel_I_neg`;
+sale del modelo estándar, no de la ω‑consistencia ni de ninguna declaración de este módulo.)
 -/
 
 
@@ -122,7 +130,8 @@ theorem termCode_eq_cons (t : Term) : ∃ r, termCode t = cons (numeral (termTag
 
 ⭐ `NotFC e` dice «este término **no es el código de ninguna fórmula**», por razones puramente
 **sintácticas**: o es un código de término, o lleva uno en una posición donde va un código de
-fórmula. Es un inductivo de **nueve** constructores, y `formCode_ne_notFC` lo refuta **de una
+fórmula. Es un inductivo de **nueve** constructores (✏️ 2026‑10‑14: once desde ADR‑096, con los dos
+`eqc*` de abajo), y `formCode_ne_notFC` lo refuta **de una
 vez para todos**.
 
 ⇒ el refutador de cada tag y cada ranura pasa a ser **una derivación de una línea**:

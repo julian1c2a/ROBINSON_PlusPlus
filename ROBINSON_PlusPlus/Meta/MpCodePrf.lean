@@ -302,8 +302,8 @@ theorem pcc_axiom_inst3 (φ : Formula) (hmem : forall_3 φ ∈ axioms) (w₁ w�
 /-! ### §N+1 · Cuatro testigos (promovido de `sondeos/SubstfcPlanos.lean`, 2026‑08‑31)
 
 La familia se paraba en **tres**, pero los axiomas binarios de `substfc` son `forall_4`:
-`ax_substfc_impl`/`_and`/`_or` (`Minimal/Axioms.lean:506,512,515`), y también `ax_substfc_atom`
-(`:500`) y `ax_substfc_eq` (`:503`). **Cinco consumidores** en el frente `substfc`, y dos agentes
+`ax_substfc_impl`/`_and`/`_or` (`Minimal/Axioms.lean`), y también `ax_substfc_atom` y
+`ax_substfc_eq`. **Cinco consumidores** en el frente `substfc`, y dos agentes
 independientes escribieron esta misma pieza por separado antes de que se promoviera.
 
 Extensión **mecánica** de `pcc_thm_inst3` con un binder más: el mismo baile de

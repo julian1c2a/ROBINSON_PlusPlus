@@ -17,7 +17,7 @@ sitios**, no en uno:
 
 1. el reflector Σ₁ del conjunto extra (`hasWitF` sobre código abstracto), y
 2. el **sistema de prueba interno a nivel de código** — `pcc_exIntro_code'` y
-   `pcc_forallElim_code` construyen líneas Q1/Q2 cuya carga es `tcFn a` con `a` ABSTRACTO, y bajo
+   `pcc_forallElim_code'` construyen líneas Q1/Q2 cuya carga es `tcFn a` con `a` ABSTRACTO, y bajo
    la enmienda esas líneas ya no son válidas sin la guarda.
 
 ## Por qué la ruta es única, y quedó medido antes de empezar
@@ -408,7 +408,7 @@ theorem prf_hasWit_tcFn_all : Prf (Formula.forall PHI) :=
 
     El prerrequisito que §3.32.2 identificó para la vía C y que resultó PORTANTE EN DOS SITIOS:
     el reflector Σ₁ del conjunto extra, y el sistema de prueba interno a nivel de código
-    (`pcc_exIntro_code'` / `pcc_forallElim_code`), que construye líneas Q1/Q2 con carga `tcFn a`
+    (`pcc_exIntro_code'` / `pcc_forallElim_code'`), que construye líneas Q1/Q2 con carga `tcFn a`
     para `a` ABSTRACTO. -/
 theorem prf_hasWit_tcFn (t : Term) : Prf (hasWit (tcFn t)) := by
   have h := prf_spec prf_hasWit_tcFn_all t

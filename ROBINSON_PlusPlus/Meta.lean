@@ -3,7 +3,8 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 
-Barrel file for `Meta/` — Gödelización del sistema `Minimal`.
+Barrel file for `Meta/` — Gödelización del sistema `Minimal`. (✏️ 2026‑10‑12, ADR‑134: de `T_Prf`, el cálculo
+`Prf` —con `ind`, `listInd`, `p3` y `qconf`— sobre los 142 axiomas de `Minimal`: `AXIOMS.md` §0.)
 Public API:
   · Godel          (Nivel B): G, ⌜·⌝, Teo G1 (encode_injective)
   · Provability    (Nivel C): formCode, IsFormula (núcleo real de codificación)
@@ -13,12 +14,18 @@ Public API:
     `goedel_second_prf (hcon : ConsistentH)` (Meta/GodelTwoPrf.lean).
     🏁 Desde ADR‑117, con `ConsistentH` como ÚNICA hipótesis: el ancla de `axiomsCodeT` es un teorema
     (`prf_ancla`; la clase `AnclaEq`, retirada con ADR‑118). Hasta ese día eran VACUOS: `[AnclaEq]` daba `Prf ⊥` (F1,
-    ADR‑114). 🏁 La consistencia de los 142 está probada desde ADR‑120 (`consistencia`, un modelo de los 142).
+    ADR‑114). 🏁 La consistencia de `T_Prf` —los 142 con los esquemas de `Prf`— está probada desde ADR‑120
+    (`consistencia : ConsistentH`: `MNV V₀`, un modelo estándar de los 142, y `prf_sound`; ✏️ 2026‑10‑14: decía
+    «La consistencia de los 142»).
+  · ✏️ 2026‑10‑14 (ADR‑134), sin hipótesis: `consistencia`, `goedel_I`, `goedel_II` (Meta/Consistencia.lean,
+    ADR‑120); `goedel_I_neg` y `godelCN_indecidible` (Meta/SolidezVerificador.lean, ADR‑121: Gödel I entero);
+    `tarski`, `tarski_semantico` (Meta/TarskiPrf.lean, ADR‑121).
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
   `NegVerifier` y la mitad `⊬¬G`. (`goedel_second'` se retiró el 2026‑09‑11; `godelC'_fixedpoint`
-  y `goedel_first_real'`, con la reparación de ADR‑012.)
+  y `goedel_first_real'`, con la reparación de ADR‑012.) (✏️ 2026‑10‑14, ADR‑134: la mitad `⊬¬G` volvió,
+  sobre `Prf`, con ADR‑121: `goedel_I_neg`, por la solidez del verificador en `MNV V₀`.)
 
   Nota (F7a, 2026‑07‑09): retirada la capa Gödel LEGACY postulada — el módulo
   `Meta/Incompleteness.lean` (Gödel I/II vía D2/D3 postulados) y los 7 postulados

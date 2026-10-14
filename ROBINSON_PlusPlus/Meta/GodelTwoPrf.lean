@@ -23,6 +23,8 @@ tienen UNA sola hipótesis, `ConsistentH`, y footprint `[propext, Classical.choi
 de `axiomsCodeT` es un TEOREMA (`prf_ancla`, por el axioma diagonal `ax_axiomsCodeT_def`), y la clase
 `AnclaEq` se retiró (ADR‑118). ⚠️ Lo que NO dice: que `ConsistentH` se cumpla. Eso depende de la consistencia
 de los 142 axiomas: ✏️ desde ADR‑120 hay modelo, y `consistencia` (`Meta/Consistencia.lean`) la descarga.
+(✏️ 2026‑10‑12, ADR‑134: más exactamente, `ConsistentH` es la consistencia de `T_Prf` —los 142 CON los esquemas de
+`Prf`—, y la da un modelo ESTÁNDAR, donde valen los esquemas: `AXIOMS.md` §0.)
 
 ⛔ **Hasta el 2026‑10‑04 eran VACUOS** (estado del 2026‑10‑02): su hipótesis de clase `[AnclaEq]` daba
 `Prf ⊥` (F1, ADR‑114, `sondeos/AnclaEqInconsistente.lean`, compilado), así que `[AnclaEq]` y `ConsistentH`
@@ -187,7 +189,8 @@ theorem prf_con_imp_godel (G : Formula)
 líneas.
 
 ⚠️ **Por qué importa, y no es cosmético.** [ADR‑024](../../DECISIONS.md) midió que
-`ConsistentOmega` (retirada con ADR‑115) **no era «Q++ es consistente»**: como `axioms ⊢` era
+`ConsistentOmega` (retirada con ADR‑115) **no era «Q++ es consistente»** (✏️ 2026‑10‑12, ADR‑134: hoy diríamos
+«`T_Prf` es consistente», que es `ConsistentH`; la teoría no es Q++: `AXIOMS.md` §0): como `axioms ⊢` era
 **completo**, afirmaba que una **compleción completa** de `axioms` fuera consistente — cercano a
 suponer **solidez**. (Y era refutable: `ax_list_induction` daba `axioms ⊢ ⊥`, L1‑2 de ADR‑114.)
 `ConsistentH` es la hipótesis **mínima y honesta**: *el cálculo finitario no demuestra `⊥`*. Y
@@ -196,7 +199,9 @@ suponer **solidez**. (Y era refutable: `ax_list_induction` daba `axioms ⊢ ⊥`
 
 ⭐ **Y el footprint lo confirma**: con `ConsistentH` **desaparecen las «ω‑reglas»** —así se llamaban; `gen` no
 es la ω‑regla— (`dne`, `gen`, `imp_intro`) **y los dos esquemas de inducción** (`ax_induction_prim`, `ax_list_induction`) **y el
-ancla `⊢`** (`ax_axiomsCodeT_eq`) —esos tres `axiom`, retirados de RPP con ADR‑115—. Y desde
+ancla `⊢`** (`ax_axiomsCodeT_eq`) —esos tres `axiom`, retirados de RPP con ADR‑115—. (✏️ 2026‑10‑14,
+ADR‑134: desaparecen los `axiom`, no la inducción: Gödel II construye pasos con `Prf.ind` y `Prf.listInd`,
+constructores de `Prf` que `#print axioms` no ve; `AXIOMS.md` §0.3.) Y desde
 [ADR‑026](../../DECISIONS.md) **ningún axioma del proyecto**: el ancla `Prf` fue la hipótesis `[AnclaEq]` hasta
 ADR‑117, y hoy es el teorema `prf_ancla`. Entraban todos por `goedel_first_numeral`, cuya hipótesis hablaba de `⊢`. -/
 
@@ -204,7 +209,8 @@ ADR‑117, y hoy es el teorema `prf_ancla`. Entraban todos por `goedel_first_num
     `Prf G` a `Prf (Prov'⌜G⌝)`, el punto fijo lo lleva a `Prf (¬Prov'⌜G⌝)`, y un `mp` da `Prf ⊥`.
     🏁 (ADR‑117) Su única hipótesis es `ConsistentH`: el ancla de `axiomsCodeT` es un TEOREMA
     (`prf_ancla`, por el axioma diagonal), y no una hipótesis que daba `Prf ⊥` (F1). ⚠️ Que
-    `ConsistentH` se cumpla depende de la consistencia de los 142: ✏️ probada desde ADR‑120 (`consistencia`). -/
+    `ConsistentH` se cumpla depende de la consistencia de los 142: ✏️ probada desde ADR‑120 (`consistencia`). (✏️
+    2026‑10‑12, ADR‑134: la de `T_Prf`, los 142 con los esquemas de `Prf`: `AXIOMS.md` §0.) -/
 theorem goedel_first_prf (hcon : ConsistentH) : ¬ Prf godelCN := by
   intro hG
   have h1 : Prf (provCodeC' godelCN) := repr_pos'_prf hG

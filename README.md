@@ -48,7 +48,7 @@
 >
 > **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 91 en `sondeos/`.**
+> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 92 en `sondeos/`.**
 > **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
 >
 > ### Reparada la inconsistencia conocida (ADR-012/013)
@@ -90,24 +90,33 @@ Una implementación formal de una **Aritmética Fundacional** en Lean 4, constru
 > Ver `doc/AUDITORIA-2026-09-11.md` **F‑3**.
 
 Este proyecto formaliza en Lean 4 —**sin Mathlib**, sobre una implementación propia y verificada de
-lógica de primer orden con igualdad (`FOL`)— la cadena que va de una aritmética **débil** hasta los
-**teoremas de incompletitud de Gödel**, con la disciplina de que **cada paso se demuestra desde la
+lógica de primer orden con igualdad (`FOL`)— la cadena que va de una aritmética **débil** (la lista de `Minimal/`; los teoremas van sobre `T_Prf`, que
+le añade la inducción: abajo) hasta los **teoremas de incompletitud de Gödel**, con la disciplina de que **cada paso se demuestra desde la
 base o se declara pendiente con nombre y firma**.
 
 **Las tres capas, y qué hace cada una:**
 
 | capa | qué es | tamaño |
 |---|---|---|
-| **`Minimal/`** | la teoría objeto **Q++**: aritmética de Robinson extendida, **sin esquema de inducción**. `axioms` = **142** fórmulas = **34 matemáticas** (`coreAxioms`) **+ 107 ecuaciones de codificación** (`codingAxioms`; juntas, los 141 de `axiomsBase`) **+ el ancla diagonal** de `axiomsCodeT` (`ax_axiomsCodeT_def`, la última: ADR‑117) | 1 módulo (`Axioms`; los diez `Block`, todo teoremas sobre `⊢`, se retiraron con ADR‑115) |
+| **`Minimal/`** | la LISTA de axiomas, **sin esquema de inducción**: `axioms` = **142** sentencias = **34 matemáticas** (`coreAxioms`, con los seis axiomas de Peano) **+ 107 ecuaciones de codificación** (`codingAxioms`; juntas, los 141 de `axiomsBase`) **+ el ancla diagonal** de `axiomsCodeT` (`ax_axiomsCodeT_def`, la última: ADR‑117). ⚠️ **No es la teoría de los titulares**: debajo de la tabla. *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): decía «la teoría objeto Q++: aritmética de Robinson extendida, sin esquema de inducción».)* | 2 módulos (`Axioms` y `SymLit`, la macro `sym!` de D7; los diez `Block`, todo teoremas sobre `⊢`, se retiraron con ADR‑115) |
 | **`Full/`** | lo que queda tras [ADR‑115](DECISIONS.md): `primAxioms` y las longitudes del censo, los lemas de sustitución e `inductionFormula` (`Full/Induction.lean`), `numeral` (`Full/Numerals.lean`) y la teoría de números en ℕ pura (`Full/PrimeFactor.lean`). 🗑️ El esquema de inducción sobre `⊢`, el censo certificado sobre `⊢` y el TFA objeto se retiraron con esa capa | 3 módulos |
-| **`Meta/`** | la **aritmetización de la sintaxis** y la cadena de Gödel: verificador de demostraciones interno, punto fijo, **D1, D2 y D3 demostradas**, Gödel I y Gödel II | 100 módulos |
+| **`Meta/`** | la **aritmetización de la sintaxis** y la cadena de Gödel: verificador de demostraciones interno, punto fijo, **D1, D2 y D3 demostradas**, Gödel I y Gödel II | 107 módulos |
+
+**La teoría de los titulares, `T_Prf`** ([AXIOMS.md](AXIOMS.md) §0, la descripción canónica, [ADR‑134](DECISIONS.md)):
+lo que deriva `Prf`. Son los 142 axiomas de la lista, los esquemas lógicos con DNE y el confinamiento, y la
+**inducción** y la **inducción de listas para TODA fórmula**, con MP y GEN, en el lenguaje de todas las fórmulas de
+FOL. **Contiene a PA** (por lectura): no es Q, ni «Q++ sin inducción», ni IΣ₁. La lista no tiene esquema de
+inducción; la teoría sí, y las pruebas lo usan, D1 incluida ([AXIOMS.md](AXIOMS.md) §0.3).
 
 **Lo que sostiene el resultado, dicho sin adornos:**
 
 - 🗑️ **Gödel I sobre `⊢`** (`goedel_first_numeral`) quedó retirado con esa capa (ADR‑115). El de hoy es `goedel_first_prf` (abajo), sobre `Prf`.
-  ⬜ La otra mitad (`⊬¬G`) **no está cerrada**: `NegVerifier` (ADR‑097) iba **sobre `⊢`** y con meta‑reglas refutadas en
-  su footprint —no estaba demostrado— y se retiró con esa capa; sobre `Prf` hay que rehacerla, y ⛔ la ω‑consistencia NO puede enunciarse como antes:
-  sobre `Prf` esa definición es refutable (L1‑4, `sondeos/OmegaConsistentRefutable.lean`).
+  🏁 La otra mitad (`⊬¬G`) **está cerrada desde ADR‑121**: `goedel_I_neg : ¬ Prf ¬godelCN`
+  (`Meta/SolidezVerificador.lean`), por la solidez de `Prf` y del verificador en el modelo `MNV V₀`; no por
+  ω‑consistencia ni por Rosser, que sigue sin hacer (⬜). *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): esta línea decía que
+  no estaba cerrada. Lo que contaba vale como registro: `NegVerifier` (ADR‑097) iba sobre `⊢`, con meta‑reglas
+  refutadas en su footprint, y se retiró con esa capa; y la ω‑consistencia, enunciada como antes, es refutable sobre
+  `Prf` —L1‑4, `sondeos/OmegaConsistentRefutable.lean`—.)*
 - 🏁 **Las tres condiciones de derivabilidad (D1, D2, D3) son TEOREMAS**, ninguna postulada. ⚠️ D1
   (`repr_pos'_prf`) y D3 (`d3_prf_real`) llevaban la hipótesis de clase `[AnclaEq]`; D2 (`d2_prf`) no. 🏁 Desde
   ADR‑117 el ancla es el teorema `prf_ancla`, y desde ADR‑118 la clase no existe: ninguna firma la lleva.
@@ -119,8 +128,8 @@ base o se declara pendiente con nombre y firma**.
   ```
 
   🏁 **Desde ADR‑117 (2026‑10‑04), una sola hipótesis, la mínima**: `ConsistentH := ¬ Prf ⊥`. Hasta ese día eran
-  **dos**, con la clase `[AnclaEq]`, y **no podían valer a la vez** (F1, abajo). ⚠️ Siguen siendo **CONDICIONALES**:
-  `ConsistentH` sólo vale si los 142 axiomas son consistentes (✏️ desde ADR‑120 lo es: `consistencia`, un modelo de los 142, y `goedel_I`/`goedel_II` van sin hipótesis). **Ninguna hipótesis suelta**: el
+  **dos**, con la clase `[AnclaEq]`, y **no podían valer a la vez** (F1, abajo). Hasta ADR‑120 eran **CONDICIONALES**:
+  `ConsistentH` —la consistencia de `T_Prf`, los 142 con los esquemas— no estaba probada (✏️ desde ADR‑120 lo está: `consistencia`, un modelo de los 142, y `goedel_I`/`goedel_II` van sin hipótesis). **Ninguna hipótesis suelta**: el
   punto fijo y la necesitación se descargan ahí.
   ⭐ `prf_godelCN_fixedpoint` es **net‑0 PURO**, y el footprint de los dos teoremas es
   **`[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]`** — **un solo axioma del
@@ -135,15 +144,17 @@ base o se declara pendiente con nombre y firma**.
   prueba, lo **refuta**. ⇒ **ningún resultado de incompletitud puede enunciarse sobre `⊢`** — por eso
   el `goedel_second'` de `Meta/GodelTwo.lean` **no es** el Segundo Teorema, y el que sí lo es vive
   sobre `Prf`. Detalle en `doc/AUDITORIA-2026-09-11.md` **F‑1**.
-- **0 `axiom` de Lean** en todo el árbol (los 3 que había vivían sobre `⊢` y se retiraron con esa capa, ADR-115), **0 `sorry`**.
-- ⚠️ **No es una prueba de consistencia**: se retiró una inconsistencia **conocida y localizada**
-  (ADR‑012/013), lo que no es lo mismo.
+- **0 `axiom` de Lean** en el build (los 3 que había vivían sobre `⊢` y se retiraron con esa capa, ADR-115), **0 `sorry`**. *(✏️ 2026‑10‑14, ADR‑134: decía «en todo el árbol»; fuera del build, `sondeos/` guarda cuatro: [AXIOMS.md](AXIOMS.md) §0.2.)*
+- 🏁 **Hay prueba de consistencia** desde ADR‑120: `consistencia : ConsistentH`, por un modelo de los 142 (`MNV V₀`) y la
+  solidez de `Prf` (`prf_sound`). *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): esta línea decía «No es una prueba de
+  consistencia: se retiró una inconsistencia conocida y localizada (ADR‑012/013), lo que no es lo mismo». Lo de
+  ADR‑012/013 es registro.)*
 
 **Características principales:**
 
 - **Base Lógica Sólida**: Utiliza una implementación completa y verificada de Lógica de Primer Orden (`FOL`) como dependencia.
-- **Aritmética Minimalista**: Formaliza un sistema de 34 axiomas sin un esquema de inducción general, forzando una construcción desde primeros principios.
-- **Desarrollo Progresivo**: El proyecto está estructurado para avanzar desde sistemas débiles (`Minimal`) hacia sistemas más fuertes con principios de inducción (`Intermediate`, `Full`).
+- **Aritmética Minimalista**: la LISTA `coreAxioms` —34 axiomas— no tiene esquema de inducción, y obliga a construir desde primeros principios. *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): decía «un sistema de 34 axiomas sin un esquema de inducción general»; los teoremas de Gödel no van sobre él sino sobre `T_Prf`, que tiene la inducción: arriba.)*
+- **Desarrollo Progresivo**: una lista débil, `Minimal/`, y un cálculo que la extiende con la inducción, `Prf` (los constructores `ind` y `listInd`). *(✏️ 2026‑10‑12, ADR‑134: decía «avanzar desde sistemas débiles (`Minimal`) hacia sistemas más fuertes con principios de inducción (`Intermediate`, `Full`)»; `Intermediate/` se eliminó el 2026‑06‑11, y la inducción no está en `Full/`, que sólo define la fórmula `inductionFormula`.)*
 - **Metaprogramación**: Hereda y utiliza las tácticas de automatización del proyecto `FOL` para agilizar las demostraciones.
 
 ## Modules

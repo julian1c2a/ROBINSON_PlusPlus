@@ -10,6 +10,11 @@ LA PREGUNTA: ¿es esa ecuación compatible con la lectura NUMERAL de `tcFn`?
 EL TEST. Con `prf_cons_eval` (ya demostrado) se puede AHORA enfrentar las dos lecturas sin rodeos:
 `cons 0 nil =eq numeral 2` es demostrable, luego por congruencia de `tcFn` los dos lados tienen que
 dar el mismo código. Si `prf_tc_cons` y `prf_tc_numeral` discrepan ahí, son incompatibles.
+
+(✏️ 2026‑10‑14, ADR‑134: registro. `prf_tc_cons'` y `prf_tc_cons` se retiraron al sacar `ax_tc_cons` de
+`axioms` (ADR‑012; la nota «`prf_tc_cons'` RETIRADO» de `Meta/EvalListPrf.lean`), y `pcc_eval_carc` va hoy por
+`pcc_dot_cons`, dentro de `Prov`. Y desde ADR‑113 `consN 0 0 = 1`: `cons 0 nil` vale `numeral 1`, no 2, y por
+eso este sondeo hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—.)
 -/
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 import ROBINSON_PlusPlus.Meta.TcArithPrf
@@ -25,7 +30,8 @@ open ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 namespace PilotoRastreada
 
-/-! ### 1 · El valor: `cons 0 nil = 2`, ahora DEMOSTRABLE (antes se argumentaba) -/
+/-! ### 1 · El valor: `cons 0 nil = 2`, ahora DEMOSTRABLE (antes se argumentaba)
+(✏️ 2026‑10‑14, ADR‑134: hoy es `= 1`, desde ADR‑113; ver la cabecera.) -/
 
 example : consN 0 0 = 2 := rfl
 

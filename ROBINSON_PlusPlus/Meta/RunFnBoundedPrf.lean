@@ -23,6 +23,11 @@ namespace ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 /-!
 ## META — NIVEL D real (§12‑A FASE 2, SONDEO): ¿es `runFn` Δ₀‑izable sin β‑función?
 
+✏️ 2026‑10‑14 (ADR‑134): registro — ya no es un sondeo: el módulo está en el build (lo importan
+`Meta/ChainOkBoundedPrf.lean` y `Meta/EvalRunFnPrf.lean`) y la hipótesis está PROBADA aquí mismo:
+`prf_runFn_nil_cons`, `prf_lenc_runFn`, `prf_nthc_runFn` (bajo `i < lenc p`) y la forma acotada
+`prf_In_runFn_iff`. Lo que sigue es el planteamiento del 2026‑07‑08.
+
 **Pregunta del sondeo.** El diseño (§12.3) temía que `runFn`, al ser **recursión con
 acumulador**, exigiera codificación de secuencias (β‑función) para expresarse con
 cuantificadores acotados.

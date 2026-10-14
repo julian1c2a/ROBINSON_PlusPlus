@@ -7,7 +7,8 @@
 > ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes (✏️ desde ADR‑120 lo son: `consistencia`, y `goedel_I`/`goedel_II` van sin hipótesis);
 > `f1_traduccion_refutada` bloquea el argumento de F1 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no
 > prueba la consistencia). `⊬¬G` sigue sin existir:
-> irá por Rosser, sobre `Prf`.
+> irá por Rosser, sobre `Prf`. *(✏️ 2026‑10‑14, [ADR‑134](../DECISIONS.md): registro del 2026‑10‑04. Desde ADR‑121 la
+> mitad `⊬¬G` es `goedel_I_neg`, por la solidez en el modelo, sin Rosser; y desde ADR‑120 `ConsistentH` es teorema.)*
 
 > 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` se retiró: de `Meta/` salen 9 módulos (`AxiomListCode`,
 > `DerivCond`, `Induction`, `LineWFDerives`, `ListInductionArith`, `Necessitation`, `OmegaStrength`,
@@ -120,7 +121,8 @@ Conversión de D1/D2/D3 de **postulados** a **teoremas** sobre un cálculo de Hi
 ```lean
 theorem subst_lift_same (f) (c) (s) : substFormula c s (liftFormula c f) = f
 inductive Prfᵢ : Formula → Prop   -- Hilbert intuicionista (P1/P2, C, J, efq, Q1-3, refl, leibniz, thy, mp, gen)
-inductive Prf  : Formula → Prop   -- clásico: incl (Prfᵢ) + p3 (DNE) + mp + gen
+inductive Prf  : Formula → Prop   -- clásico: incl (Prfᵢ) + p3 (DNE) + ind + qconf + listInd + mp + gen
+                                  -- (✏️ 2026‑10‑14, ADR‑134: decía «incl (Prfᵢ) + p3 (DNE) + mp + gen»; la teoría, AXIOMS.md §0)
 theorem prfI_to_derives : Prfᵢ φ → axioms ⊢ φ   -- SOLO constructores de Derives (sin dne)
 theorem prf_to_derives  : Prf φ → axioms ⊢ φ    -- + dne en un único punto (esquema p3)
 theorem consistentH_of_omega : ¬(axioms ⊢ ⊥) → ¬ Prf ⊥
@@ -268,6 +270,11 @@ theorem d3_prf_of_sigma1 (φ)
   (hI : ∀ x L, Prf (In x L ⇒ provCodeC' (In x L)))
   : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))               -- D3 reducida a la Σ₁-completitud
 -- #print axioms d3_prf_of_sigma1 = [propext, Classical.choice, Quot.sound, prf_inAxC]
+-- ✏️ 2026‑10‑14 (ADR‑134): ⛔ VACUO. `hI` es refutable (`sondeos/D3Sigma1Vacuo.lean`, ADR‑132, T05): con
+--   `x := #0` y `L := cons zero nil`, la solidez en `MNV V₀` la contradice. No reduce D3 a nada; D3 es
+--   `d3_prf_real`, por la vía punteada. El footprint de hoy no se ha medido (no tiene fila en
+--   `check-footprints.bash`): sin `axiom` en el build (ADR‑115), no pasa de `[propext, Classical.choice,
+--   Quot.sound]`; `prf_inAxC` ya no sale porque es TEOREMA desde el 2026‑07‑20 (`Meta/Representability2Prf.lean`).
 ```
 
 **`Meta/Sigma1Prf.lean`** (Fase 5, núcleo de D3) — namespace `…Meta.Sigma1Prf`: infraestructura de
@@ -424,7 +431,8 @@ theorem prf_nthc_zero (h t) : Prf (nthc (cons h t) zero =eq h)
 theorem prf_nthc_succ (h t i) : Prf (nthc (cons h t) (succ i) =eq nthc t i)
 ```
 
-**Nuevas defs/axiomas en `Minimal/Axioms.lean`** (extensión definicional conservadora, capa numérica
+**Nuevas defs/axiomas en `Minimal/Axioms.lean`** (extensión definicional conservadora —✏️ 2026‑10‑12, ADR‑134: una
+pretensión, nunca probada: [AXIOMS.md](../AXIOMS.md) §0—, capa numérica
 de listas para D3, §12‑A): `lenc l := func sym!"lenc" [l]`, `nthc l i := func sym!"nthc" [l, i]`; axiomas
 `ax_lenc_nil` (`lenc nil = 0`), `ax_lenc_cons` (`lenc (cons h t) = σ (lenc t)`), `ax_nthc_zero`
 (`nthc (cons h t) 0 = h`), `ax_nthc_succ` (`nthc (cons h t) (σ i) = nthc t i`). Añadidos a `axioms`
@@ -451,7 +459,7 @@ Fases y estado:
 | 2 | forma Δ₀ del verificador: `In · (runFn nil p)` y `chainOk c p` | ✅ |
 | 3 | `num` (numeral‑de) + evaluación provable | ⏳ |
 | 4 | Δ₀‑completitud atómica (aquí entran las ecuaciones de variable de `substfc`) | ⏳ |
-| 5 | inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` → `goedel_second_prf` | ⏳ |
+| 5 | inducción estructural `⊢ ∀p (δ → Prov ⌜δ(ṗ)⌝)` → `d3_prf` → `goedel_second_prf` | ⏳ *(✏️ 2026‑10‑14, ADR‑134: registro; D3 se probó el 2026‑09‑10 por la vía punteada, `d3_prf_real`, y no por esta tabla)* |
 
 **`Meta/NumListPrf.lean`** — ver §3.17 (ecuaciones `Prf` de `lenc`/`nthc`).
 
@@ -461,13 +469,15 @@ Fases y estado:
 de `<` en `Prf`**. Fue el descubrimiento de escala de la fase 1b: como `lt a b := ∃k. a + σk = b`
 (`ax13_lt_def`) y `add` recurre **por la derecha** (`ax4`/`ax5`), la identidad izquierda `0 + n = n`
 **no es teorema de Q** — hay que reconstruirla con `Prf.ind`. Todo lo demás cuelga de ahí.
+*(✏️ 2026‑10‑14, [ADR‑134](../DECISIONS.md): «hay que» no; con `ax6_add_comm` en la lista, `0 + n = n + 0 = n` sale sin
+inducción. Se probó con `Prf.ind` sin reparar en ello.)*
 
 ```lean
 theorem prf_nat_induction (Φ) (base : Prf (substFormula 0 zero Φ))
   (step : Prf (∀ (Φ ⇒ substFormula 0 (succ #0) (liftFormula 1 Φ)))) : Prf (Formula.forall Φ)
   -- eliminador de inducción natural (envuelve `Prf.ind` / `Full.inductionFormula`)
 theorem norm11 (s t) : substTerm 0 s (liftTerm 1 (liftTerm 0 t)) = liftTerm 0 t  -- norm De Bruijn 1 binder
-theorem prf_add_zero_left  (n)   : Prf (add zero n =eq n)            -- NO es teorema de Q: usa Prf.ind
+theorem prf_add_zero_left  (n)   : Prf (add zero n =eq n)            -- NO es teorema de Q; aquí usa Prf.ind (evitable: ax6, ax4)
 theorem prf_add_succ_left  (m n) : Prf (add (succ m) n =eq succ (add m n))
 theorem prf_lt_iff (a b) : Prf (lt a b ⇔ ∃ (add ↑a (succ #0) =eq ↑b))   -- despliegue de ax13
 theorem PrfH_lt_intro {Γ} (a b k) (h : PrfH Γ (add a (succ k) =eq b)) : PrfH Γ (lt a b)
@@ -642,6 +652,8 @@ prf_hC_of_reflect_chainOkB (hbC : ∀ p, Prf (chainOkB nil p ⇒ provCodeC' (cha
   : ∀ p, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p))
 d3_prf_of_reflect_bounded (φ) (hbC) (hbI) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))  -- = d3_prf
 -- #print axioms = [propext, Classical.choice, Quot.sound, prf_inAxC]
+-- ✏️ 2026‑10‑14 (ADR‑134): ⛔ VACUO, como `d3_prf_of_sigma1`: `hbI` cae con `hI` (ADR‑132, T05). No es D3;
+--   D3 es `d3_prf_real`. El footprint, sin re‑medir; `prf_inAxC` es teorema desde el 2026‑07‑20.
 ```
 
 **`Meta/Sigma1AtomPrf.lean`** (fase 3, núcleo) — namespace `…Meta.Sigma1AtomPrf`. Toolkit
@@ -782,7 +794,7 @@ exc (formCode (bodyF φ))` con `bodyF φ = chainOk nil #0 ∧ In ⌜φ⌝ (runFn
 def bodyF (φ) : Formula := land (chainOk nil #0) (In (formCode φ) (runFn nil #0))
 abbrev inDot (φ) : Term := substfc zero (tcFn #0) (formCode (In (formCode φ) (runFn nil #0)))    -- código punteado del átomo In
 theorem d3_prf_of_dotted_atoms (φ) (hC : Prf (chainOk nil #0 ⇒ provFromCode chainOkDot))
-  (hI : Prf (In (formCode φ) (runFn nil #0) ⇒ provFromCode (inDot φ))) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))  -- = d3_prf
+  (hI : Prf (In (formCode φ) (runFn nil #0) ⇒ provFromCode (inDot φ))) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))  -- = d3_prf (✏️ 2026‑10‑14, ADR‑134: `d3_prf_real` pasa por ella, vía `d3_prf_of_chainOkDot`; el `hI` real lleva delante `chainOk nil #0 ⇒`)
 theorem prf_line_is_cons (p i) : Prf (chainOk nil p ⇒ lt i (lenc p) ⇒                            -- vía ax_lineWF_cons (sancionado)
   (nthc p i =eq cons (carc (nthc p i)) (cdrc (nthc p i))))
 ```
@@ -915,6 +927,8 @@ boundedPremsIn c p i L = ∀j<lenc L. ( In (nthc L j) c  ∨  ∃k<i. carc (nthc
   `substCodeF`** de `chainOkB`/`lineOkB`/`boundedPremsIn` (patrón `substCodeT_closed`).
 
 Luego `d3_prf := d3_prf_of_chainOkDot φ hC_dot` → `goedel_second_prf` → **F7b retira `axiom d3` (7→6)**.
+*(✏️ 2026‑10‑14, [ADR‑134](../DECISIONS.md): registro. Se hizo el 2026‑09‑10: D3 es `d3_prf_real`
+(`Meta/PremsBdAllPrf.lean`) y el `axiom d3` se retiró.)*
 Detalle vivo en `NEXT-STEPS.md` y memoria `project-d3-evaluacion-provable`.
 
 ---
@@ -1913,8 +1927,8 @@ fichero de auditoría y compiló los testigos. Resultado: la matemática, **conf
 testigo abierto ⇒ no es un `⊥ ⇒ …`; siete controles negativos `fail_if_success`).
 
 ⛔ **Pero uno de los nueve hallazgos era FALSO**: `pcc_eq_tracked` **ya existe** en producción
-(`Meta/Sigma1AtomPrf.lean:246`), con enunciado idéntico y ya consumido en
-`Meta/InAxiomsCodePrf.lean:220`. La copia local lo **sombrea** — la trampa registrada de «misma
+(`Meta/Sigma1AtomPrf.lean`), con enunciado idéntico y ya consumido en
+`Meta/InAxiomsCodePrf.lean`. La copia local lo **sombrea** — la trampa registrada de «misma
 definición en dos namespaces». Actuar sobre el hallazgo («debería vivir al lado de
 `pcc_lt_tracked`») habría creado una **tercera** copia. **Lo correcto es borrar la local.**
 ⇒ el `PARCIAL` es exacto: no degrada la prueba, y evita mandar trabajo a la basura.
@@ -3382,7 +3396,7 @@ necesita el cuerpo **con el hueco del índice en `varc 0`**, es decir sobre **C�
 —`nthcT (tcFn w) (varc 0)`—, mientras que `pcc_isTermCodeE1_tracked` entrega la imagen sobre el
 **término objeto**, `tcFn X`.
 
-Es exactamente la distinción que `sondeos/A3IsFCBTracked.lean:205` ya tenía resuelta:
+Es exactamente la distinción que `sondeos/A3IsFCBTracked.lean` (su `PsiF`) ya tenía resuelta:
 
 ```lean
 noncomputable def PsiF (w : Term) : Term :=

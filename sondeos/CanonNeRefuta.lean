@@ -19,6 +19,10 @@ La clase de testigos —hoy `IsCodeShaped`— incluye a la vez `numeralM n` y `c
 
 Son **distintos como términos de Lean** (cabezas `::` y `σ`) y **provablemente iguales en la teoría**
 (`prf_cons_eval`, net-0). Con `canon_ne` sale `⊥` — verificado abajo, en el compilador.
+(✏️ 2026‑10‑14, ADR‑134: la cuenta es de la codificación vieja. Desde ADR‑113, `cons a b = σ (pair a b)` y
+`consN 0 0 = triN 0 + 0 + 1 = 1` (`Minimal/Axioms.lean`): hoy la igualdad demostrable es con el 1,
+`cons zero zero = succ zero` (`cons_cero_cero_en_Prf`, `sondeos/PrfBotCodificacionVieja.lean`). Este sondeo,
+escrito con el 2, hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 
 ## ⇒ Consecuencia para el frente `NegVerifier`
 
@@ -33,7 +37,8 @@ de él** y siguen en pie.
     codeNat_ne : codeNat φ ≠ codeNat ψ -> axioms |- neg (numeral (codeNat φ) =eq numeral (codeNat ψ))
 
 que además exige probar la **inyectividad de `codeNat`** (plausible: se construye con `consN`, que es
-el emparejamiento de Cantor). **Sin medir.**
+el emparejamiento de Cantor). **Sin medir.** (✏️ 2026‑10‑14, ADR‑134: medida después: `codeNat_inj` está
+probada en `Meta/CodeNatInjPrf.lean`, del build; `codeNat_ne`, que era sobre `⊢`, se retiró con esa capa, ADR‑115.)
 -/
 import ROBINSON_PlusPlus.Meta
 

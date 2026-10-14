@@ -50,6 +50,10 @@ el hueco que §18 identificó como «la bestia».
 * `prf_tc_zero` / `prf_congr_tcFn` + `prf_provCode_congr` — transporte Leibniz de códigos.
 
 El caso `σ` es gratis (`prf_tc_succ`); el paso inductivo de `+` queda para `pcc_axiom_inst2` (`ax5`).
+(✏️ 2026‑10‑14, ADR‑134: hoy el módulo no se queda en la base; más abajo están el paso,
+`pcc_eval_add_succ_imp` (sobre `pcc_ax5_computed`, que instancia `pcc_ax5_inst`, el `pcc_axiom_inst2`
+de `ax5`), la inducción interna `prf_eval_add_all` y la evaluación para `a`, `b` arbitrarios,
+`pcc_eval_add`. El título y «cierra la BASE» son los de §21.)
 -/
 
 /-! ### Constructor de código del término `x + y` -/
@@ -152,8 +156,9 @@ theorem prf_substtc_funcc2 (v W sc x y : Term) :
     del binario que ya vivia justo arriba, y no mencionan nada del frente `substfc`.
 
     🔑 **Es lo que mas paga de todo el sondeo**: `prf_substtc_funcc3` y `prf_congr_funcc3`
-    estan copiados a mano en **NUEVE** sondeos cada uno. Promoverlos una vez los quita de
-    todos ellos.
+    estan copiados a mano en **NUEVE** sondeos cada uno. Promoverlos una vez los hace
+    innecesarios en todos ellos (✏️ 2026‑10‑14: decía «los quita de todos ellos»; B3 no tocó
+    `sondeos/` y las copias siguen allí, nueve de cada uno, medido el 2026‑10‑14).
 
     ⛔ **`substfcT` es una DEFINICION y se queda en definicion.** Postular su ecuacion de
     recursion como axioma OBJETO (`ax_tc_substfc`) hace la teoria **INCONSISTENTE** —
@@ -544,8 +549,11 @@ export ROBINSON_PlusPlus.Meta.EvalArithPrf (
   evalAddCode pcc_ax4_computed pcc_eval_add_zero
   succcT prf_tc_succ' prf_congr_succcT
   prf_substtc_funcc1 prf_substtc_funcc2 prf_substtc_succcT prf_substtc_addcT prf_substtc_varc0
-  -- KIT TERNARIO, bajado en B3 (2026-09-04). Retira 74 copias a mano repartidas por
+  -- KIT TERNARIO, bajado en B3 (2026-09-04). Deja obsoletas 74 copias a mano repartidas por
   -- `sondeos/`: `substfcT` estaba en ONCE sondeos y los dos `funcc3` en NUEVE cada uno.
+  -- (✏️ 2026‑10‑14: decía «Retira»; B3 no borró ninguna: las 74 siguen en `sondeos/`, medido el
+  -- 2026‑10‑14 con el criterio del commit `178b10b`: por cada uno de los nueve nombres, los
+  -- sondeos que lo declaran.)
   prf_substtc_funcc3 prf_congr_funcc3
   substfcT substfcT_termCode prf_congr_substfcT prf_substtc_substfcT substtc_inv_substfcT
   liftTerm_substfcT substTerm_substfcT

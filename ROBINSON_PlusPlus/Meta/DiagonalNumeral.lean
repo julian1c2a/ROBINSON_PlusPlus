@@ -51,7 +51,9 @@ reparación). La reparación usa la lectura **NUMERAL**, que es consistente y ti
 árbol; y `godelPred'`, `godelBeta'`, `diagTerm` y `godel_comp'` **no mencionan la representación
 del código**, así que se reutilizan tal cual. El resultado se compone con `prf_provCode_transfer`
 para dejarlo en la forma `godelCN ⇔ ¬ provCodeC' godelCN` que consume `goedel_first_prf` (vacuo por
-`[AnclaEq]` hasta ADR‑117, F1; hoy, sólo con `ConsistentH`).
+`[AnclaEq]` hasta ADR‑117, F1; hoy, sólo con `ConsistentH`). (✏️ 2026‑10‑14, ADR‑134: y `ConsistentH` es un
+teorema desde ADR‑120: `goedel_I`, sin hipótesis, en `Meta/Consistencia.lean`; esa misma forma la consume
+`goedel_I_neg`, `Meta/SolidezVerificador.lean`.)
 -/
 
 /-! ### La sentencia de Gödel, con el código escrito como NUMERAL -/

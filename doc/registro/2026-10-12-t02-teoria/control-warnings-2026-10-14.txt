@@ -1,0 +1,16 @@
+════ MIDIENDO ════
+  · ROBINSON_PlusPlus  (lake build)
+  · FOL + TheoryFramework  (lake build FOL TheoryFramework)
+
+════ CONTRA LA TABLA DECLARADA ════
+  ✓ ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean           simp-unused  4
+  ✓ ROBINSON_PlusPlus/Meta/ChainNegPrf.lean              simp-unused  2
+  ✓ ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean        var-unref    1
+  ✓ TheoryFramework/Relations.lean                       var-unref    4
+
+════ WARNINGS NO DECLARADOS ════
+  ✓ ninguno
+
+  declarados: 11   ·   medidos: 11
+✅ LOS 11 WARNINGS CUADRAN.
+rc=0 segundos=5

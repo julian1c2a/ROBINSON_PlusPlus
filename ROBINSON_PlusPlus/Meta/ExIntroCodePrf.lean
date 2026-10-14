@@ -29,6 +29,8 @@ Hacia `pcc_exIntro_code (Ac w) : Prf (provFromCode (substfc 0 w Ac) => provFromC
 - la reflexion de la regla Q2 (`A[t] => existe A`) al nivel de CODIGO, con testigo-codigo
 arbitrario `w`. Este modulo entrega las clausuras De Bruijn (lift = identidad) que el ensamblaje
 de cadena tipo `d2_prf` necesita; el ensamblaje final queda planificado abajo.
+(✏️ 2026‑10‑14, ADR‑134: ya no es un plan: el ensamblaje está hecho abajo, en `pcc_exIntro_code'` y
+su corolario `pcc_exIntro_code`; ver la nota de la sección.)
 -/
 
 /-- `liftTerm` es identidad sobre `exc Ac` a cualquier nivel si lo es sobre `Ac` (tag cerrado). -/
@@ -70,12 +72,20 @@ theorem liftTerm_substfc_open (Ac : Term) (hAc : ∀ c, liftTerm c Ac = Ac) (w :
 que concluye `implc (substfc zero w Ac) (exc Ac)` = `⌜A[w] ⇒ ∃A⌝`, y una línea MP que de ella y
 de la premisa `Ain` (que la hipótesis ya sitúa en `runFn nil p`) concluye `Bex = exc Ac`. El
 álgebra de cadena (`prf_runFn_concat`/`prf_chainOk_concat`/`prf_chainOk_cons`/…) es la 2ª mitad
-de `d2_prf`. -/
+de `d2_prf`. (✏️ 2026‑10‑14, ADR‑134: desde el 2026‑07‑10 este ensamblaje es la prueba de
+`pcc_exIntro_code'`, con testigo abierto, y `pcc_exIntro_code` es su corolario; desde ADR‑020 los
+dos piden además las guardas `hwF`/`hwT`, así que `w` tampoco es del todo arbitrario.) -/
 
-/-- **∃‑intro a nivel de código** (reflexión de la regla Q2): para `Ac`, `w` cerrados a todo
-    nivel (`hAc`, `hw`), de la demostrabilidad del código sustituido `substfc zero w Ac` sale la
-    demostrabilidad del código del existencial `exc Ac`. Es el ladrillo que la Opción A necesita
-    para el ∃‑intro rastreado del testigo en `d3`. -/
+/-- **∃‑intro a nivel de código** (reflexión de la regla Q2): para `Ac` cerrado a todo nivel
+    (`hAc`) y testigo `w` ABIERTO, con las guardas de ADR‑020 `hwF : Prf (hasWitF Ac)` y
+    `hwT : Prf (hasWit (liftTerm 0 w))`, de la demostrabilidad del código sustituido
+    `substfc zero w Ac` sale la demostrabilidad del código del existencial `exc Ac`
+    (✏️ 2026‑10‑14: decía «para `Ac`, `w` cerrados a todo nivel (`hAc`, `hw`)», la firma de entonces
+    de `pcc_exIntro_code`, de la que esta versión heredó el docstring). Es el ladrillo que la Opción A
+    necesita para el ∃‑intro rastreado del testigo en `d3` (✏️ 2026‑10‑14, ADR‑134: `d3`, D3 sobre
+    `⊢`, se retiró con ADR‑115; D3 es hoy `d3_prf_real` (`Meta/PremsBdAllPrf.lean`), y los módulos
+    de D3 (`D3DottedPrf`, `D3InDotPrf`) usan la variante sin `hAc`, `pcc_exIntro_code_open`
+    (`Meta/Delta0ReflectPrf.lean`)). -/
 theorem pcc_exIntro_code' (Ac w : Term)
     (hAc : ∀ c, liftTerm c Ac = Ac)
     (hwF : Prf (hasWitF Ac)) (hwT : Prf (hasWit (liftTerm 0 w))) :

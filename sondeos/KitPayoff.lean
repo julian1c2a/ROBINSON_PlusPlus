@@ -17,6 +17,8 @@ lo que se conjeturaba porque `nulT`/`unT`/`binT` son todos `cons`-árboles:
 | `pcc_dot_bin` | código → **2 pasos internos anidados** → código |
 
 Los tres con el footprint sancionado `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]`.
+(✏️ 2026‑10‑14, ADR‑134: ese axioma ya no existe; desde ADR‑117 el ancla es el axioma diagonal
+`ax_axiomsCodeT_def` y `prf_ancla` es teorema.)
 
 🔑 **Hizo falta `pcc_dot_cons_symm`** (la dirección simétrica), que sale de
 `pcc_eq_symm_code_internal` — y ésa **volvió con `BdAllIntroPrf` en el paso 3**. Los pasos componen:
@@ -32,6 +34,9 @@ que es **recursión estructural sobre `CTree`** produciendo una igualdad **de C�
 sustitutos internos, esa recursión entera tiene que **moverse dentro de `Prov`**:
 
     pcc_tc_objAt (t) : ∀ T : CTree, Prf (provFromCode (eqc (T.dotV t) (tcFn (T.objAt t))))
+
+(✏️ 2026‑10‑14, ADR‑134: hecho. `pcc_tc_objAt` está en `Meta/CodeTreeReflect.lean`, con la igualdad interna en el
+otro orden, `eqc (tcFn (T.objAt t)) (T.dotV t)`; `prf_tc_objAt` ya no existe.)
 
 **Buena noticia: todas las piezas existen y están activas.**
 * transitividad interna — `pcc_eq_trans_code` (`EvalArithPrf`) ✅

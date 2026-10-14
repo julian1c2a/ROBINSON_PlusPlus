@@ -1,6 +1,6 @@
 # Registro: artefactos rescatados al árbol
 
-**Last updated:** 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
+**Last updated:** 2026-10-14 — la carpeta de T02 (ADR‑134). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
 directorio temporal de la sesión o en la carpeta de la sesión, fuera de git.
 
 **Por qué.** Varias afirmaciones de los ADR («37 de 90 sondeos compilan», «revisión adversarial aplicada», la crítica
@@ -35,6 +35,7 @@ cierto. Lo vigente está en `DECISIONS.md`, `NEXT-STEPS.md` y `doc/AUDITORIA-SUE
 | `2026-10-05-d7-exploracion/` | la exploración de D7 antes de ejecutarla: `workflow.json` (el diseño de la macro `sym!`), los inventarios `inv_*.txt` (los 24 + 28 ficheros, los 164 literales, los riesgos R1–R5), las pasadas en seco `dry_*.txt` (229, 210 y 105 líneas) y `lit_rpp.txt` | `wf_cac4ffca-a10` (2026‑10‑05) | ADR‑129 §2–§3, `Minimal/SymLit.lean` |
 | `2026-10-05-d7-revision/` | D7: la corrección de la prosa de FOL y RPP y su revisión adversarial (`resultado.json`, `workflow.json`, `revisiones.txt` con las dos revisiones, `hechos.txt` con lo que era cierto tras D7) | `wf_4c5aee66-ebf` (2026‑10‑05) | ADR‑129 («revisión adversarial aplicada»); T17 |
 | `2026-10-12-auditoria-suelo/` | esta auditoría: `candidatos.json` (los 163 candidatos de los seis barridos, con el veredicto de su verificador), `workflow-barridos.json` y `workflow-cierre.json` | `wf_1f61bc0d-738` (2026‑10‑05) y `wf_7a6e4ce2-b37` (2026‑10‑12) | `doc/AUDITORIA-SUELO-2026-10-12.md`, ADR‑132 |
+| `2026-10-12-t02-teoria/` | T02: los hechos y los censos de cómo describían la teoría los documentos (`workflow-hechos.json`, script y resultados), el workflow de revisión que murió por el límite de sesión (`workflow-revision-fallida.json`), los cinco informes del 2026‑10‑14 (`revision-*.md`, `verificacion-censo-*.md`), la salida del sondeo de la inducción y la medición de leanchecker; y en `comentarios/` el lote de comentarios de los `.lean`: los encargos (`INSTRUCCIONES.md`, `grupo-*.md`), los siete informes de corrección y las tres revisiones adversariales. El build y los controles del día (`build-…`, `control-…`) son de antes de aplicar esas tres revisiones, que sólo tocaron comentarios | `wf_54bdca87-06c` (2026‑10‑12), `wf_22f6795d-314` (2026‑10‑13) y agentes sueltos (2026‑10‑14) | ADR‑134 |
 
 Fuera de esta carpeta, rescatado en el mismo commit:
 

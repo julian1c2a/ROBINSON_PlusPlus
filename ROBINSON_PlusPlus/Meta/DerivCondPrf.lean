@@ -23,7 +23,7 @@ namespace ROBINSON_PlusPlus.Meta.DerivCondPrf
 /-!
 ## META — NIVEL D real: D2 finitaria sobre `provCodeC'` (a nivel `Prf`)
 
-Porte de `Meta/DerivCond.lean` (D2 ω-level) al cálculo finitario `Prf`. Los testigos de
+Porte de `Meta/DerivCond.lean` (D2 sobre `⊢`; retirado, ADR‑115) al cálculo finitario `Prf`. Los testigos de
 prueba `p`, `q` son ahora **variables De Bruijn** del contexto `PrfH` (eliminadas con
 `PrfH_ex_elim`, introducidas con `PrfH_ex_intro`); el ensamblaje `r = p ++ q ++ [mp]` y
 la validez de la cadena usan los lemas de cadena `Prf` (`prf_runFn_concat`, … paso 8).

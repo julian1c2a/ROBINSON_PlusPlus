@@ -27,6 +27,8 @@ Salió el par **y además el tercer predicado**, con reflector y testigo:
 | `pcc_isFCB3_fcodes` | la composición: `⊢ Prov(⌜isFCB3(terna φ, ⌜φ⌝)⌝)` | + `prf_axiomsCodeT_eq` |
 
 `prf_axiomsCodeT_eq` es la base ya sancionada; aparece sólo donde interviene `provFromCode`.
+(✏️ 2026‑10‑14, ADR‑134: ese axioma ya no existe; desde ADR‑117 el ancla es el axioma diagonal
+`ax_axiomsCodeT_def` y `prf_ancla` es teorema.)
 
 ## Los tres hallazgos estructurales
 

@@ -6,6 +6,8 @@ import FOL.Semantics
 
 **Fecha**: 2026‑09‑22. **Pregunta**: `goedel_second_prf` es condicional en `ConsistentH`, y
 **nada lo prueba**. Un modelo en Lean de los 141 axiomas lo daría. ¿Es alcanzable?
+(✏️ 2026‑10‑14, ADR‑134: `ConsistentH` es teorema desde ADR‑120, `consistencia` (`Meta/Consistencia.lean`),
+por el modelo de los 142, `MNV V₀` (`MN_axioms`).)
 
 ## Resultado
 
@@ -33,7 +35,8 @@ La parte cara de toda solidez —la semántica de sustitución y lifting— **ya
 `eval_substFormula_ext/_zero`, `eval_liftFormula_ext/_zero`, `contextSatisfies_lift_zero`,
 `shift_updateEnv_subst_comm`, y sus gemelos de término. `lkc_sound` (14 reglas) los usa, así que
 están probados en uso. ⇒ la solidez de `Prf` es **inducción sobre `Prf`** reusándolos, y M‑11 no
-la bloquea porque `Prf` está en la lista blanca.
+la bloquea porque `Prf` está en la lista blanca. (✏️ 2026‑10‑14, ADR‑134: la «lista blanca» es de la M‑11
+vieja; desde ADR‑133 la inducción es válida sin ella. La solidez se hizo así: `prf_sound`, `Meta/SolidezPrf.lean`.)
 
 ## Cómo re‑ejecutarlo
 

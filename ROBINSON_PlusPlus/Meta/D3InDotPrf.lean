@@ -53,8 +53,10 @@ Estrategia (análoga a `pcc_lt_tracked`, pero con la implicación objeto **codif
 1. `In ⌜φ⌝ (runFn nil p) ⇒ boundedCarcIn ⌜φ⌝ p` (`prf_boundedCarcIn_of_In_runFn`): pasar al `∃`
    acotado `∃i<lenc p. carc(nthc p i) = ⌜φ⌝`.
 2. Reflejar ese `∃` acotado DOTADO (`pcc_bdEx_intro_open`, testigo `tcFn i`), con la cota vía
-   `pcc_lt_tracked`+`pcc_eval_lenc` y el cuerpo vía `pcc_eq_tracked`+`pcc_eval_carc_nthc`+`prf_tc_form`
-   (aquí entra `chainOk`, que `pcc_eval_carc_nthc` necesita).
+   `pcc_lt_tracked`+`pcc_eval_lenc` y el cuerpo vía `pcc_eval_carc_nthc`+`prf_tc_form_numeral`
+   +`pcc_to_formCode_imp`, por congruencia objeto (aquí entra `chainOk`, que `pcc_eval_carc_nthc` necesita).
+   (✏️ 2026‑10‑14, ADR‑134: decía «vía `pcc_eq_tracked`+…+`prf_tc_form`»; `prf_tc_form` murió con
+   `ax_tc_cons` —«El sustituto de `prf_tc_form`», abajo— y Step B no usa `pcc_eq_tracked`.)
 3. Codificar la implicación objeto `boundedCarcIn ⌜φ⌝ p ⇒ In ⌜φ⌝ (runFn nil p)` (`pcc_thm_inst` del
    teorema generalizado) y MP interno (`pcc_mp_code_open`) para llegar a `provFromCode (inDot φ)`.
 -/
@@ -293,7 +295,7 @@ El código dotado del antecedente `boundedCarcIn` es un `∃` acotado codificado
   reducido vía `substCodeT_closed`).
 
 Establece `bddCarcDot φ =eq bdExCode bdCarcB (bdCarcPhic φ)`: `prf_substfc_arith_open` lleva la forma
-`substfc` a `substCodeF`, y `substCodeF_boundedCarcIn` (ecuación META, rfl salvo la reducción del
+`substfc` a `substCodeF`, y `substCodeF_boundedCarcIn_at` (ecuación META, rfl salvo la reducción del
 `formCode φ` cerrado) la identifica con `bdExCode`. -/
 
 /-- Cota (dotada, bajo el binder) del `∃` acotado de `boundedCarcIn`: `lencT (liftc 0 ṗ)`. -/
@@ -372,8 +374,10 @@ theorem prf_bddCarcDot_eq_at (φ : Formula) (p : Term) :
    (`PrfH_eq_symm_code`) + Leibniz con `Ac := (ı̇ < ⌜v₀⌝)` (`prf_substfc_ltCodeFn_snd`).
 3. **CUERPO** `carc (nthc ↑p i) = ⌜φ⌝` ⟶ `Prov(⌜ carcT (nthcT (liftc 0 ↑ṗ) ı̇) = ⌜φ⌝ ⌝)`: aquí NO hace
    falta simetría — `pcc_eval_carc_nthc` (que consume `chainOk`) da la evaluación, y la hipótesis del
-   `∃` es una igualdad **objeto**, así que basta congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form`
-   + cancelación del `liftc` con `prf_liftc_tcFn`) y `PrfH_provCode_congr`.
+   `∃` es una igualdad **objeto**, así que basta congruencia objeto (`PrfH_congr_tcFn` + `prf_tc_form_numeral`
+   + cancelación del `liftc` con `prf_liftc_tcFn`) y `PrfH_provCode_congr`; la forma NUMERAL pasa a la
+   `formCode` en la frontera, dentro de `Prov`, con `pcc_to_formCode_imp` (✏️ 2026‑10‑14: decía
+   «`prf_tc_form`», que murió con `ax_tc_cons`).
 4. **`PrfH_bdEx_intro_open`** (testigo `K = ı̇`) ensambla, y `prf_bddCarcDot_eq_at` transporta a la
    forma `substfc` del código dotado. -/
 

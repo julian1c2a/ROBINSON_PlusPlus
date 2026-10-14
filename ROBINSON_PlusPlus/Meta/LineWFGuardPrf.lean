@@ -201,6 +201,10 @@ theorem hcond_absorbe_cascade (t : Term) (n : Nat) (C : Formula)
 
 /-! ## §4 · LAS DOS OBLIGACIONES QUE QUEDAN
 
+✏️ 2026‑10‑14 (ADR‑134): registro — las dos están probadas (para `i < n`): `pcc_hGuardT`
+(`Meta/HasWitTrackedPrf.lean`) y `pcc_hGuardF` (`Meta/HasWitFTrackedPrf.lean`), y
+`hGuard_of_slots` cierra la cascada sin deudas; ver la cabecera.
+
 Idioma de `Meta/Sigma1BoundedPrf.lean`: la deuda **se enuncia**, no se postula. Ninguna de
 las dos es un `axiom`; son `abbrev`s de `Prop` que un consumidor tiene que probar. -/
 

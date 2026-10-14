@@ -52,6 +52,12 @@ con `formCode`, su **congruencia** en `Prf`, y el **transporte** de la
 demostrabilidad por igualdad de los códigos de los argumentos. El cierre inductivo
 final (construir el testigo con `tcFn`/`substfc`) —«la bestia»— se apoya sobre estas
 piezas.
+
+✏️ 2026‑10‑14 (ADR‑134): registro — `hI` no tiene un «obstáculo» técnico que salvar: es REFUTABLE con
+el modelo `MNV V₀` (ADR‑132, T05: `hI_refutable` en `sondeos/D3Sigma1Vacuo.lean`, compilado el
+2026‑10‑12), y ese cierre inductivo no existe. D3 se probó por la vía punteada (`d3_prf_real`,
+`Meta/PremsBdAllPrf.lean`). El constructor `inFormCodeFn` sí se usa: lo usa C3
+(`Meta/TrackedAtomsPrf.lean`, `Meta/HasWitTrackedPrf.lean`, `Meta/HasWitFTrackedPrf.lean`).
 -/
 
 /-! ### Constructor object del código de un átomo `In` -/
@@ -139,7 +145,8 @@ concreta (lo que produce `runFn` al evaluar el testigo). La reflexión de `In` s
 explícita se resuelve por **meta-inducción** en la lista, usando los combinadores object
 `pcc_in_head`/`pcc_in_tail`/`pcc_in_nil`. Sortea la obstrucción de reflexión de igualdad:
 en el caso cabeza el elemento **es** `x` (igualdad Lean, no `x =eq e` object), así que
-`pcc_in_head` aplica **incondicionalmente**. -/
+`pcc_in_head` aplica **incondicionalmente**. (✏️ 2026‑10‑14, ADR‑134: este caso vale y está probado
+abajo; la `hI` general a la que apuntaba es refutable: ver la nota de la cabecera.) -/
 
 /-! `objList` **bajó a `Minimal/Axioms.lean`** (ADR-020): era el único nombre por el que
     `CodeWitnessPrf` dependía de este módulo, y esa dependencia lo hundía por debajo de

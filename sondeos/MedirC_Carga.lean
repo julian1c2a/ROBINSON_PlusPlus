@@ -9,6 +9,7 @@ rehacerse?**
 Todo lo que sigue COMPILA (exit 0) contra PRODUCCION: `pcc_lineWF_tracked_of_schema`,
 `pcc_lineWF_tracked_modulo_7`, `d3_prf_of_chainOkDot`, `ax_lineWF_q1` y `Meta/CodeWitnessPrf.lean`.
 Cero axiomas de Lean nuevos, cero `sorry`, cero modificaciones fuera de `Probe/`.
+(✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 
     lake env lean Probe\MC_carga.lean
 -/

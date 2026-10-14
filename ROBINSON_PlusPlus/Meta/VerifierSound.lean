@@ -38,12 +38,16 @@ compila: cita lo retirado con ADR‑115). Dos resultados:
 es decir, **el decodificador es una SECCIÓN**: «si decodifica, el código era real». Y eso **ES** la
 *realidad hereditaria* que §8 pedía demostrar caso por caso —«si la conclusión es un `formCode`
 real, la ecuación estructural fuerza a que los args sean `formCode` reales»—, ya empaquetada.
+(✏️ 2026‑10‑14, ADR‑134: medido, `verifier_sound` no lo usa: es `decodeChain_prf`, que no pasa por
+`decodeForm_inj`; quien lo usa es `decodeLine_carc`, en `Meta/ChainNegPrf.lean`.)
 
 ## ⛔ Dónde está el riesgo de verdad (y el plan lo tenía al revés)
 
 Este módulo cubre la mitad **(a)**: *el decisor acepta ⟹ `Prf φ`*. `NegVerifier` necesitaba también
 la mitad **(b)**, la **completitud negativa**: *el decisor rechaza ⟹ la teoría REFUTA `chainOk`*.
-Y ahí sí hay discrepancia **medida**: los esquemas objeto cuantifican sobre códigos **cualesquiera**
+Y ahí sí hay discrepancia **medida** (✏️ 2026‑10‑14, ADR‑134: se midió sobre `⊢`, retirado con
+ADR‑115, y `sondeos/NegVerifierModE.lean` ya no compila; sobre `Prf` la discrepancia sigue: `prf_lineWF_p1`
+vale para códigos arbitrarios): los esquemas objeto cuantifican sobre códigos **cualesquiera**
 y aceptan cadenas que el decodificador rechaza —
 
     axioms ⊢ lineWF ⟨implc basura (implc basura basura), 0̄, basura, basura⟩
@@ -126,7 +130,8 @@ theorem not_mem_conclsDec_of_not_prf {φ : Formula} (hnp : ¬ Prf φ)
   fun hmem => hnp (verifier_sound_concls h hmem)
 
 /-! ## §4 · 🗑️ (Aquí se enunciaban `DEUDA_chainNeg`/`DEUDA_inNeg` y `negVerifier_of_deudas`, sobre `⊢`;
-retirados con ADR‑115. La mitad `⊬¬G` no tiene hoy formulación sobre `Prf`: ADR‑115 §7.) -/
+retirados con ADR‑115. La mitad `⊬¬G` no tiene hoy formulación sobre `Prf`: ADR‑115 §7. (✏️ 2026‑10‑14,
+ADR‑134: la tiene desde ADR‑121, `goedel_I_neg` en `Meta/SolidezVerificador.lean`, que no usa este módulo.)) -/
 
 end ROBINSON_PlusPlus.Meta.VerifierSound
 

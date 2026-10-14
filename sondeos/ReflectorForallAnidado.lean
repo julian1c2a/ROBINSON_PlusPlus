@@ -28,6 +28,7 @@ o sea: el `liftc` del sustituyendo lleva el hueco EXACTAMENTE a la forma en que 
 dentro del binder.  `hPsiId` sale, igual que en A3.
 
 ## VEREDICTO:  **NO HAY MURO**.  0 errores, 0 warnings, 0 `sorry`, 0 axiomas nuevos.
+(✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 
 Las 8 obligaciones se descargan TODAS y sale el reflector entero:
 
@@ -37,6 +38,8 @@ Las 8 obligaciones se descargan TODAS y sale el reflector entero:
                                                                               -- por la rama funcc
 
 Footprint IDENTICO al de A3 (`prf_axiomsCodeT_eq`, la base sancionada).
+(✏️ 2026‑10‑14, ADR‑134: ese axioma ya no existe; desde ADR‑117 el ancla es el axioma diagonal
+`ax_axiomsCodeT_def` y `prf_ancla` es teorema.)
 
 ### Lo que el `∀` anidado cuesta DE VERDAD (todo ruido, ningun muro)
 

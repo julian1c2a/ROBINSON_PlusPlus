@@ -43,6 +43,9 @@ legibles— y **`strCode` se convierte literalmente en `charsCode`**, que ya est
 ⚠️ **Y `String` es lo único sucio de la cadena.** Medido el 09‑13
 (`sondeos/ClassicalChoiceCenso.lean`): `strCode s := charsCode s.toList`, y `String.toList` trae
 `Classical.choice`. **La cadena de Gödel entera está a una composición de estar limpia.**
+(✏️ 2026‑10‑14, ADR‑134: refutado. D7 (ADR‑129) quitó `String` de la firma, y 182 filas de `check-footprints`
+siguen con `Classical.choice`; ADR‑131 midió que en 158 de ellas entra sólo por dos cancelaciones de lift de
+`SubstArith` (`sondeos/ChoiceFrontera.lean`).)
 
 ## ⚠️ Lo que esto NO dice
 
@@ -52,7 +55,8 @@ legibles— y **`strCode` se convierte literalmente en `charsCode`**, que ya est
 * **No decide nada.** Cambiar la firma **cambia `G`**: cambia `strCode`, y con él `formCode`,
   `axiomsCodeT`, `provCodeC'` y la sentencia de Gödel. Los teoremas son paramétricos y *deberían*
   sobrevivir, pero hay muchos puentes por `rfl` que habría que re‑verificar uno a uno.
-  🔑 *Eso es una estimación, y va etiquetada como tal.*
+  🔑 *Eso es una estimación, y va etiquetada como tal.* (✏️ 2026‑10‑14, ADR‑134: D7 se hizo, ADR‑129, y
+  según ADR‑129 ningún valor cambió —`codeNat`, `V₀`, `godelCN`, el ancla—: son los mismos caracteres.)
 -/
 
 namespace SimbolosSinString

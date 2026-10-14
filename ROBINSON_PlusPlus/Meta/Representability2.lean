@@ -43,6 +43,13 @@ Este archivo arranca con el **runFn-tracking** (la mitad `In ⌜φ⌝`): `runFn`
 `proofCode' rs acc` calcula el código de la lista de conclusiones de `checkAux rs
 acc`. Es RULE-AGNÓSTICO (solo usa `carc`), mucho más simple que el viejo `vpf_run`.
 La validez `chainOk` (la otra mitad) sigue con los `lineWF`/`premsOf` por regla.
+
+✏️ 2026‑10‑14 (ADR‑134): registro — el tracking y D1 ya no están aquí. ADR‑115 retiró sus versiones
+sobre `⊢` (`runFn_track`, `In_runFn_of_mem`, `chainOk_track`, `repr_pos'`), y las vigentes, sobre
+`Prf`, viven en `Meta/Representability2Prf.lean`: `prf_runFn_track`, `prf_In_runFn_of_mem`,
+`prf_chainOk_track` y D1, `repr_pos'_prf`. Este módulo sólo conserva el encoder (`lineJustif`,
+`lineCode'`, `proofCode'`) y las dos guardas de ADR‑020; las cuatro secciones vacías de abajo son
+su rastro.
 -/
 
 /-! ### Encoder object del nuevo formato -/
@@ -87,13 +94,19 @@ def proofCode' : List Rule → List Formula → Term
       | some f => cons (lineCode' acc f r) (proofCode' rs (acc ++ [f]))
       | none => nil
 
-/-! ### runFn-tracking (mitad `In ⌜φ⌝`) -/
+/-! ### runFn-tracking (mitad `In ⌜φ⌝`)
+
+✏️ 2026‑10‑14 (ADR‑134): vacía desde ADR‑115; hoy `prf_runFn_track`, en `Meta/Representability2Prf.lean`. -/
 
 
-/-! ### Pertenencia object de `φ` en las conclusiones -/
+/-! ### Pertenencia object de `φ` en las conclusiones
+
+✏️ 2026‑10‑14 (ADR‑134): vacía desde ADR‑115; hoy `prf_In_runFn_of_mem`, en `Meta/Representability2Prf.lean`. -/
 
 
-/-! ### chainOk-tracking (validez de la cadena) -/
+/-! ### chainOk-tracking (validez de la cadena)
+
+✏️ 2026‑10‑14 (ADR‑134): vacía desde ADR‑115; hoy `prf_chainOk_track`, en `Meta/Representability2Prf.lean`. -/
 
 
 /-! ### Pago de la guarda de los 7 esquemas enmendados (ADR-020)
@@ -112,7 +125,9 @@ theorem prf_hasWit_tc (t : Term) : Prf (hasWit (termCode t)) :=
   termCodeM_eq t ▸ CRIT_hasWit_real t
 
 
-/-! ### Representabilidad positiva (D1) con el verificador estructural -/
+/-! ### Representabilidad positiva (D1) con el verificador estructural
+
+✏️ 2026‑10‑14 (ADR‑134): vacía desde ADR‑115; hoy `repr_pos'_prf`, en `Meta/Representability2Prf.lean`. -/
 
 
 end ROBINSON_PlusPlus.Meta.Representability2

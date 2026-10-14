@@ -43,6 +43,12 @@ Porte de `Meta/Reflection.lean` (ω) al cálculo finitario `Prf`. La D3 finitari
 
 `d3_prf_of_sigma1` REDUCE `d3_prf` a esos dos lemas (hipótesis `hC`/`hI`), aislando el
 núcleo duro claramente especificado (igual que `d3_of_sigma1` en ω; sin `sorry`).
+
+⛔ ✏️ 2026‑10‑14 (ADR‑134): registro — `Meta/Reflection.lean` se borró con la capa `⊢` (ADR‑115), y
+`d3_prf` nunca fue una declaración: la D3 probada es `d3_prf_real` (`Meta/PremsBdAllPrf.lean`), por la
+vía punteada (`d3_prf_of_halves`, `Meta/D3ChainDotPrf.lean`), sin usar nada de este módulo. Y el
+«núcleo duro» no está por probar: `hI` es REFUTABLE (ADR‑132, T05: `hI_refutable` en
+`sondeos/D3Sigma1Vacuo.lean`, compilado el 2026‑10‑12), así que `d3_prf_of_sigma1` es cierto y VACUO.
 -/
 
 /-! ### Combinadores lógicos internos de la demostrabilidad (versión `PrfH`) -/
@@ -76,7 +82,11 @@ theorem PrfH_pcc_exIntro {Γ : List Formula} (A : Formula) (t : Term)
 
     Elimina el `∃` de la hipótesis (testigo `p = #0`, con `chainOk nil p` e
     `In ⌜φ⌝ (runFn nil p)`); promueve ambos hechos Δ₀ a demostrabilidad (`hC`/`hI`);
-    los combina con `PrfH_pcc_andIntro` y los `∃`-introduce con `PrfH_pcc_exIntro`. -/
+    los combina con `PrfH_pcc_andIntro` y los `∃`-introduce con `PrfH_pcc_exIntro`.
+
+    ⛔ **VACUO** (✏️ 2026‑10‑14, ADR‑134; ADR‑132, T05): `hI` es refutable —`hI_refutable`,
+    `sondeos/D3Sigma1Vacuo.lean`—, así que este teorema no reduce D3 a nada; el D3 que se usa es
+    `d3_prf_real` (`Meta/PremsBdAllPrf.lean`), por la vía punteada. -/
 theorem d3_prf_of_sigma1 (φ : Formula)
     (hC : ∀ p : Term, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p)))
     (hI : ∀ x L : Term, Prf (In x L ⇒ provCodeC' (In x L))) :

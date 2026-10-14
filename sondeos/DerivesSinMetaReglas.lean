@@ -16,6 +16,8 @@ import FOL.FOL   -- ⚠️ SIN `FOL.MetaRules`: el `inductive` PELADO, sin los c
 Los cuatro axiomas de `FOL/MetaRules.lean` —`imp_intro`, `raa`, `or_elim`, `ex_elim`— **tienen** que
 ser axiomas: su premisa `Γ ⊢ A → Γ ⊢ B` es una ocurrencia **no positiva** y el kernel rechaza el
 `inductive`. Y por habitar `Derives` prohíben la inducción sobre él (**M‑11**, ADR‑029).
+(✏️ 2026‑10‑14, ADR‑134: es M‑11 a la manera vieja; ADR‑133 la corrigió: la inducción es válida, y lo falso eran
+los axiomas. `FOL/MetaRules.lean` ya no existe: FOL lo borró al retirarse la capa `⊢`, ADR‑115.)
 
 ⇒ La pregunta del plan es: **si se declara un `Derives₀` sin ellos, ¿se pierde alguna REGLA, o sólo
 se pierde la fuerza META?**
@@ -42,7 +44,8 @@ ser trabajo ordinario.
 
 ⭐ **Y no toca a ROBINSON_PlusPlus**: `Derives₀` sería un objeto **nuevo** para la metateoría, con
 un encaje `Derives₀ Γ f → Derives Γ f`. Las 320 citas de las meta‑reglas y las 164 de los
-constructores se quedan donde están.
+constructores se quedan donde están. (✏️ 2026‑10‑14, ADR‑134: `Derives₀` ya existe, en FOL,
+`FOL/Derives0.lean`; las meta‑reglas y sus citas se borraron con la capa `⊢`, ADR‑115.)
 
 ⚠️ Este fichero **no entra en el build**. Reejecutar con
 `lake env lean sondeos/DerivesSinMetaReglas.lean` desde la raíz de RPP.

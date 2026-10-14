@@ -42,6 +42,10 @@ Esto **reduce D3** a `hbody`: la reflexión punteada del cuerpo Δ₀. Vía `prf
 `pcc_and_intro_code`, `hbody` se descompone en las reflexiones punteadas de los dos átomos
 `chainOk nil #0` e `In ⌜φ⌝ (runFn nil #0)` (los `hC_dot`/`hI_dot` — siguiente ladrillo, cuyo 2º
 argumento compuesto `runFn nil p` pide la evaluación provable de `runFn`).
+
+(✏️ 2026‑10‑14, ADR‑134: los dos están pagados: `hI_dot` (`Meta/D3InDotPrf.lean`) y `hC_dot`, que
+sale de `hC_dot_of_chainOkBDot` (`Meta/D3ChainDotPrf.lean`). `d3_prf_real` pasa por este keystone:
+`d3_prf_of_chainOkDot` → `d3_prf_of_dotted_atoms` → `d3_prf_of_dotted`.)
 -/
 
 /-- El cuerpo Δ₀ de `provCodeC' φ` con `p = #0`: `chainOk nil p ∧ In ⌜φ⌝ (runFn nil p)`. -/

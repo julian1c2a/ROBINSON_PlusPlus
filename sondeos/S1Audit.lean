@@ -2,6 +2,10 @@
 SONDEO S1 — auditoría mecánica. `ax_tc_cons` está FUERA de `axioms`, y `prf_tc_cons`/`tc_cons`
 son AXIOMAS DE LEAN. Por tanto `#print axioms` delata EXACTAMENTE quién depende de la lectura
 sintáctica de `tcFn`: aparece `prf_tc_cons` (o `tc_cons`) en su footprint.
+(✏️ 2026‑10‑14, ADR‑134: ya no: `prf_tc_cons` y `tc_cons` se retiraron (la nota «`prf_tc_cons'` RETIRADO» de
+`Meta/EvalListPrf.lean`) y el build no declara ningún `axiom` de Lean; `ax_tc_cons` sigue fuera de `axioms` (ADR‑012),
+y el modelo lo refuta (`control_tc_cons`, ADR‑124). Este sondeo hoy no compila —`sondeos/pasadas/tabla_adr129.txt`,
+2026‑10‑05—; es registro.)
 
 Footprint sano esperado: [propext, Classical.choice, Quot.sound] (+ meta-reglas ω donde toque).
 NO ES MÓDULO DE PRODUCCIÓN. NO MERGEAR.

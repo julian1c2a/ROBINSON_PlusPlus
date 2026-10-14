@@ -50,7 +50,9 @@ con el predicado de demostrabilidad **estructural** `provFormulaC'` (verificador
 > **modulares** de este módulo (`goedel_first_unprovable_real'` / `_unrefutable_real'`, que tomaban
 > el punto fijo como hipótesis) se retiraron con la capa `⊢`. El punto fijo sobre `Prf` es
 > `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), y Gödel I es `goedel_first_prf` (vacuo por
-> `[AnclaEq]` hasta ADR‑117, F1; hoy, sólo con `ConsistentH`).
+> `[AnclaEq]` hasta ADR‑117, F1; hoy, sólo con `ConsistentH`). (✏️ 2026‑10‑14, ADR‑134: hoy Gödel I va
+> entero y sin hipótesis: `goedel_I` (`Meta/Consistencia.lean`) y `goedel_I_neg`, juntos en
+> `godelCN_indecidible` (`Meta/SolidezVerificador.lean`).)
 >
 > ⟹ **`godelC'` es hoy una definición sin punto fijo.** Lo que se usa es `godelCN`. Aquí sólo
 > quedan las definiciones (`godelPred'`, `godelBeta'`, `godelC'`) y `godel_comp'`, que consume
@@ -87,13 +89,16 @@ retirado con ADR‑115.) -/
 -- [REPARACION] `goedel_first_real'` RETIRADO (descargaba el punto fijo roto).
 -- Lo sustituyó `goedel_first_numeral` (`Meta/DiagonalNumeral.lean`), retirado a su vez con
 -- ADR‑115; hoy Gödel I es `goedel_first_prf` (`Meta/GodelTwoPrf.lean`).
+-- (✏️ 2026‑10‑14, ADR‑134: y entero y sin hipótesis, `godelCN_indecidible`: ver la nota de arriba.)
 
 /-! ## La otra mitad de Gödel I (`⊬¬G`) — con la REFLEXIÓN como hipótesis EXPLÍCITA (registro)
 
 🗑️ **2026‑10‑02 (ADR‑115) — registro.** Aquí vivían `Reflects` y `goedel_first_unrefutable_real'`,
 sobre `⊢`; se retiraron con esa capa. **La mitad `⊬¬G` no tiene hoy formulación sobre `Prf`**: el
 camino elegido es **Rosser** (ADR‑115 §4 y §7). Queda la historia, y el argumento de por qué la
-reflexión no puede derivarse dentro de la teoría.
+reflexión no puede derivarse dentro de la teoría. (✏️ 2026‑10‑14, ADR‑134: la mitad `⊬¬G` sí la tiene hoy,
+`goedel_I_neg` (`Meta/SolidezVerificador.lean`, ADR‑121), por la solidez del verificador en `MNV V₀`; Rosser
+—⊬R ∧ ⊬¬R sólo con `ConsistentH`— sigue ⬜.)
 
 **Historia (leer antes de tocar esto).** Esta mitad se «cerró» el 2026‑06‑13 en la capa LEGACY
 (`Meta/Incompleteness.lean`) apoyándose en `provFormula_repr`, **postulado como bicondicional**

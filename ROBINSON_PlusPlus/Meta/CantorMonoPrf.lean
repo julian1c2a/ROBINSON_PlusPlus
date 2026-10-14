@@ -33,6 +33,9 @@ namespace ROBINSON_PlusPlus.Meta.CantorMonoPrf
 **Objetivo:** `h < cons h t` y `t < cons h t` en `Prf`, es decir **sub‑código < código**. Con eso
 la inducción fuerte sobre códigos (ii) es derivable de `ax_induction`, y con ella
 `pcc_eval_substfc` (iii) y los 7 tags de `lineWF` que faltan.
+(✏️ 2026‑10‑14, ADR‑134: `ax_induction` era el axioma de `⊢`, retirado con ADR‑115; en `Prf` la inducción es
+el constructor `Prf.ind` (`prf_nat_induction`, `Meta/NatArithPrf.lean`), y los 7 tags están cerrados desde
+el 2026‑09‑10: `pcc_lineWF_tracked`, en `Meta/SubstTreeReflect.lean`.)
 
 ⚠️ **`cons h t` NO es defeq a `σ (pair h t)`** (verificado): `cons` es `.func sym!"::"` opaco y la
 conexión con la aritmética es el **axioma objeto** `ax_L0_cons_def`. Todo el cálculo de esta
@@ -60,12 +63,15 @@ theorem prf_cons_def (h t : Term) : Prf (cons h t =eq succ (pair h t)) := by
 ⚠️ **Defecto detectado por verificación adversarial** (y confirmado con el compilador): dos lemas
 que parecían disponibles **no están en scope aquí**.
 
-* `prf_lt_succ_self` vive en `Meta/BdAllIntroPrf.lean:295`, y ese módulo importa `D3InDotPrf` +
+* `prf_lt_succ_self` vive en `Meta/BdAllIntroPrf.lean`, y ese módulo importa `D3InDotPrf` +
   `PropCodePrf` — la **cima** de la pila D3. `CantorMonoPrf` está en la **base**
   (`NatMulPrf → NatOrderPrf → NatArithPrf`). Importarlo invertiría la capa y arriesga ciclo con
-  los consumidores previstos de esta monotonía (los 7 tags de `lineWF`).
+  los consumidores previstos de esta monotonía (los 7 tags de `lineWF`; ✏️ 2026‑10‑14, ADR‑134: ya no son
+  previstos: la usan en código `EvalLiftcPrf`, `EvalSubsttcPrf`, `EvalSubstfcPrf`, `LiftfcWitnessPrf`,
+  `SubstfcWitnessPrf` y `Representability2Prf`).
 * `prf_lt_subst2` (nivel `Prf`) vive en `Meta/BoundedInPrf.lean`, también posterior.
-  (`PrfH_lt_subst2` sí está, por la copia local de `NatOrderPrf`.)
+  (`PrfH_lt_subst2` sí está, por la copia local de `NatOrderPrf`. ✏️ 2026‑10‑14: desde el dedup del
+  2026‑09‑09, `5891d06`, la única copia vive en `Meta/ChainPrf.lean`, que llega aquí por los imports.)
 
 Se hacen copias locales con sufijo `_cm`. **No se exportan con el nombre original**: `Meta.lean`
 importa ambos módulos y coincidir crearía ambigüedad en la raíz — la misma trampa que ya costó

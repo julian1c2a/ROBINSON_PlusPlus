@@ -38,6 +38,11 @@ hacer un case-split mecánico sobre `k` en vez de escribir 21 casos a mano.
   (`Meta/Sigma1AtomPrf.lean`, da los 21 disyuntos) + refutar la ecuación con la distinción de códigos.
   🗑️ Este frente era de `⊢` y quedó retirado con esa capa (ADR‑115).
 
+(✏️ 2026‑10‑14, ADR‑134: el frente D3 tampoco lo usa: D3 se cerró por `pcc_lineWF_tracked`
+(`Meta/SubstTreeReflect.lean`), que despacha los tags con su propio `match`, y ningún módulo de D3
+importa éste. Hoy lo importan `ChainNegPrf` (`tagConcl`) y `GodelTwoPrf` (`prf_imp_trans`); grep
+del 2026‑10‑14.)
+
 ### ⚠️ Los 21 esquemas NO son uniformes: `tagConcl` cubre 19, no 21
 
 Leyendo `Minimal/Axioms.lean`:

@@ -31,6 +31,10 @@ namespace MFReplan
     § 1 — BLOQUEO 2 DEL PLAN (§B, «`axiomsCodeT` es OPACO ⟹ `NegVerifier` NO es
     demostrable»): ESTA MUERTO, y no «a un paso»: la cadena ENTERA esta montada
     y COMPILADA dentro del build (`Meta/`), no en `sondeos/`.
+    (✏️ 2026‑10‑14, ADR‑134: ya no: esa cadena era sobre `⊢` y se retiró con esa capa (ADR‑115),
+    `Meta/AxiomListCode.lean` incluido, y este sondeo hoy no compila —`sondeos/pasadas/tabla_adr129.txt`,
+    2026‑10‑05—. El ancla de abajo tampoco es ya un `axiom` de Lean: desde ADR‑117 es el axioma diagonal
+    `ax_axiomsCodeT_def` de la lista `axioms`, y `prf_ancla` es teorema.)
     ############################################################################ -/
 
 /-- El ancla: `axiomsCodeT` NO es opaco. Es un `axiom` de Lean (`Minimal/Axioms.lean:1376`)

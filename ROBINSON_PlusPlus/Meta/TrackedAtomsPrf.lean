@@ -23,7 +23,7 @@ módulo pone en producción las piezas **genéricas** de esa operación, promovi
 ⭐ **`pcc_In_atom_tracked` es la pieza clave**: `In` es un **átomo** del lenguaje
 (`Minimal/Axioms.lean`), y reflejarlo con `x` y `w` **abstractos** es lo que permite que
 `isTC1 w c = wfAll1 w ∧ In c w` —la guarda de ADR‑020— se refleje por partes. La ruta es
-`prf_In_iff_boundedIn` (`Meta/BoundedInPrf.lean:391`) → `pcc_boundedIn_tracked` → transporte
+`prf_In_iff_boundedIn` (`Meta/BoundedInPrf.lean`) → `pcc_boundedIn_tracked` → transporte
 por `pcc_InBwd_computed`.
 
 ## Por qué esto vale para los dos frentes
@@ -32,7 +32,9 @@ por `pcc_InBwd_computed`.
 con `isFCB w c = wfAll w ∧ In c w`. **Esa es exactamente la forma de `isTC1`**, y `isTC1` es lo
 que hay dentro de `hasWit`. El kit de abajo es la mitad de aquel trabajo que **no depende del
 predicado de nodo** — y por eso sirve igual para `isTermCodeE1` (término, C3‑T), para
-`isFormCodeE2` (fórmula, C3‑F) y para `lineOkB` (D3).
+`isFormCodeE2` (fórmula, C3‑F) y para `lineOkB` (D3). (✏️ 2026‑10‑14, ADR‑134: el sondeo es hoy
+registro: no compila —rc 1, error en su :355— en ninguna de las cuatro tablas de `sondeos/pasadas/`,
+la última `tabla_adr129.txt`, medida el 2026‑10‑05; lo que de él sirve es este kit.)
 
 ⚠️ **Lo que NO sube y por qué.** De las 81 declaraciones del sondeo, aquí entran **21**: el
 cierre transitivo de las seis piezas genéricas, sin un solo homónimo. El resto es el predicado
@@ -188,7 +190,7 @@ theorem PrfH_bdAllCode_congr_bnd {Γ : List Formula} (B B' Phic : Term)
 
 ⭐ **Esto es lo que de verdad hacía falta para el `pcc_bdAll_intro` exterior**, y no el lema
 general de sustitución/lift. Cuando un `∀` acotado va **anidado**, lo que va dentro del binder
-hay que pre‑`liftc`‑arlo (idiom de `bdInB` en `sondeos/A3IsFCBTracked.lean:318`), y allí el
+hay que pre‑`liftc`‑arlo (idiom de `bdInB` en `sondeos/A3IsFCBTracked.lean`), y allí el
 argumento era **cerrado** (`tcFn w`), así que `prf_liftc_tcFn` lo colapsaba. Con un argumento
 que **contiene el hueco del índice** eso ya no vale… pero tampoco hace falta el lema general
 `substtc (σv) (liftc 0 t) (liftc 0 Z) =eq liftc 0 (substtc v t Z)` con `Z` **arbitrario**: los
@@ -644,7 +646,13 @@ end ROBINSON_PlusPlus.Meta.TrackedAtomsPrf
 
 Los consumidores previstos son **C3** (`DEUDA_hGuardT`/`DEUDA_hGuardF`) y **D3**
 (`DEUDA_chainOkBDot`), ninguno de los cuales existe todavía. Se exporta el kit entero porque
-todo él es genérico: no hay aquí fontanería privada de ningún frente. -/
+todo él es genérico: no hay aquí fontanería privada de ningún frente.
+
+✏️ 2026‑10‑14 (ADR‑134): hoy existen los tres y están descargados: `DEUDA_hGuardT`/`DEUDA_hGuardF`
+(`Meta/LineWFGuardPrf.lean`) por `pcc_hGuardT` y `pcc_hGuardF`, y `DEUDA_chainOkBDot`
+(`Meta/D3ChainDotPrf.lean`) dentro de `d3_prf_real` (`Meta/PremsBdAllPrf.lean`), vía
+`d3_prf_of_halves` y `DEUDA_chainOkBDot_of_hbody`. El kit lo usan `HasWitTrackedPrf` y
+`HasWitFTrackedPrf` (C3), y `D3ChainDotPrf` y `PremsBdAllPrf` (D3). -/
 export ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (
   shapeDot prf_substfc_inDot prf_substfc_shapeDot prf_substfc_shapeDot_at pcc_shape_tree
   prf_substtc_child

@@ -58,6 +58,10 @@ dos **ecuaciones codificadas** de `nthc`:
 **Este módulo entrega la ecuación `zero`.** El `succ` (`substfc` triple) y la inducción acotada quedan
 como siguiente ladrillo. Nota: `nthc` es total sobre índices en rango, así que **no** tiene la
 partialidad de `carc` (esa se resuelve con `chainOk` → la línea es `cons`).
+(✏️ 2026‑10‑14, ADR‑134: hoy el módulo entrega las dos ecuaciones y la inducción:
+`pcc_nthc_succ_code` y la evaluación acotada `pcc_eval_nthc`, que consumen diez módulos del build —la capa
+rastreada de C3 (`LineWFTrackedPrf`, `TrackedAtomsPrf`, `HasWitTrackedPrf`, `HasWitFTrackedPrf`…) y D3
+(`D3BodyPrf`, `PremsBdAllPrf`); grep del 2026‑10‑14—.)
 -/
 
 /-- Constructor de código del término `nthc x y`: `⟨1, ⌜nthc⌝, [x, y]⟩`. -/
@@ -240,7 +244,10 @@ theorem PrfH_congr_nthcT {Γ : List Formula} {x x' y y' : Term}
   exact PrfH_congr_cons_tail (PrfH_congr_cons_tail (PrfH_congr_cons_head
     (PrfH_eq_trans (PrfH_congr_cons_head hx) (PrfH_congr_cons_tail (PrfH_congr_cons_head hy)))))
 
-/-! ### El sustituto de `pcc_dot_cons` (antes `prf_tc_cons'`, retirado)` en esta capa
+/-! ### El sustituto de `prf_tc_cons'` (retirado con `ax_tc_cons`) en esta capa
+
+(✏️ 2026‑10‑14: el título decía que era el sustituto de `pcc_dot_cons`, «antes `prf_tc_cons'`»,
+resto de una sustitución mecánica: `pcc_dot_cons` es el transporte INTERNO que usa el molde.)
 
 Aquí el transporte del `cons` dotado NO tiene la forma del molde de `EvalListPrf`
 (`pcc_rw_dot_cons_un`), por tres razones:
@@ -256,7 +263,9 @@ Aquí el transporte del `cons` dotado NO tiene la forma del molde de `EvalListPr
 /-- **Molde de repatriación para la capa `nthc`.** Cambia `cons(ḣ,ṫ)` por `(cons h t)˙` **dentro de
     `Prov`**, bajo el contexto `⌜nthc(·, IDX) = RHS⌝`, y **dentro de `PrfH`**.
 
-    Sustituye al viejo transporte por `pcc_dot_cons` (antes `prf_tc_cons'`, retirado)`, que era de CÓDIGO; éste es INTERNO. -/
+    Sustituye al viejo transporte por `prf_tc_cons'` (retirado con `ax_tc_cons`), que era de
+    CÓDIGO; éste es INTERNO y se apoya en `pcc_dot_cons`. (✏️ 2026‑10‑14: decía que el transporte
+    de CÓDIGO era `pcc_dot_cons`, «antes `prf_tc_cons'`»; `pcc_dot_cons` es interno.) -/
 theorem pcc_rw_dot_cons_nthc {Γ : List Formula} (h t IDX RHS : Term)
     (hI : ∀ W : Term, Prf (substtc zero W IDX =eq IDX))
     (hR : ∀ W : Term, Prf (substtc zero W RHS =eq RHS))

@@ -1,6 +1,11 @@
 /-
 ✅ SONDEO POSITIVO (2026-08-23) — **`codeNat` ES INYECTIVA**, y el sustituto de `canon_ne` sale.
 
+(✏️ 2026‑10‑14, ADR‑134: registro. Desde ADR‑113, `consN a b = triN (a + b) + b + 1` (`Minimal/Axioms.lean`),
+no la fórmula de abajo, y este sondeo hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—. La
+promoción está hecha: `consN_inj`, `codeNat_inj` y `num_bridge` están en `Meta/CodeNatInjPrf.lean`, del build.
+`numeral_ne` y `codeNat_ne` eran sobre `⊢` y se retiraron con esa capa (ADR‑115), como `NegVerifier`.)
+
 Contexto: `sondeos/CanonNeRefuta.lean` refutó el paso 1.1 de `PLAN-NEGVERIFIER.md` — `canon_ne`
 (distinción de **términos con forma de código**) es FALSO y reintroduciría la inconsistencia. La
 salida propuesta era la misma que ADR-012: **pasar a NUMERALES**, donde la distinción SÍ es

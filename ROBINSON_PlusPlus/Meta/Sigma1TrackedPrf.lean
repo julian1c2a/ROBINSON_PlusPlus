@@ -54,6 +54,13 @@ cierre inductivo necesitaría que TODA la cadena `d3` viva en `tcFn` desde la ra
 **`hI_tracked` abstracto requiere la Opción A de raíz** (redefinir `provFormulaC'ₜ`/`provCodeC'ₜ`
 con `tcFn`/`substfc` + re‑derivar D1ₜ `repr_pos'_prfₜ`), no un lema incremental sobre lo actual.
 Ver `GODEL-D3-TRACKED-DESIGN.md` §4.2 (DECISIÓN Opción A) para el plan A‑F1…A‑F5.
+
+✏️ 2026‑10‑14 (ADR‑134): registro — la Opción A de raíz (`provFormulaC'ₜ`/D1ₜ) se descartó en la
+sesión 2026‑07‑05c (`GODEL-D3-TRACKED-DESIGN.md` §11.2, commit `e08a1e2`), y ni `hI_tracked` ni
+`repr_pos'_prfₜ` llegaron a declararse. `prf_tc_cons` ya no existe: era consecuencia de `ax_tc_cons`,
+que hacía inconsistente la teoría y se retiró con ADR‑012 (2026‑08‑18); su sustituto, dentro de
+`Prov`, es `pcc_dot_cons` (`Meta/DotConsPrf.lean`). D3 se probó por la vía punteada (`d3_prf_real`,
+`Meta/PremsBdAllPrf.lean`). Lo de abajo, el puente para testigos CERRADOS, sigue siendo correcto.
 -/
 
 /-- **Puente ∃‑intro rastreado → `provCodeC'` (testigo CERRADO)** — checkpoint RIESGO‑1.

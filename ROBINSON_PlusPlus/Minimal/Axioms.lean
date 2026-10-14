@@ -27,6 +27,11 @@ system as described in `TuplasFuncionesYListas.md`. This system is strong
 enough to develop a theory of pairs (via Cantor's pairing function) and lists,
 but it lacks a general induction principle.
 
+✏️ **2026‑10‑12 (ADR‑134).** Hoy son 142 axiomas (`axioms`: 34 de `coreAxioms`, 107 de `codingAxioms` y el ancla)
+sobre 33 símbolos (28 de función y 5 de relación; el módulo declara 35, pero `nil_sym` y `le_sym` no los nombra ningún
+axioma: `nil` es `zero`, y `le` una disyunción). «Lacks a general induction principle» es cierto de la LISTA, no
+de la teoría de los titulares: `Prf` le añade `ind` y `listInd` para TODA fórmula, y contiene a PA (`AXIOMS.md` §0).
+
 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` (`Derives`) se retiró de RPP: sus postulados eran falsos
 (`sondeos/MetaReglasRefutables.lean`). Con ella se borraron `Minimal/Theorems/Block1–8` y los
 teoremas `axioms ⊢ …` de `Full/`. Los comentarios de este fichero que remiten a un teorema de un
@@ -47,7 +52,8 @@ def mod2_sym : List Char := sym!"%₂"
 -- proj1_sym, proj2_sym ELIMINADOS 2026-06-02: proj1/proj2 ya no son símbolos
 -- opacos del lenguaje, sino defs concretas en Block4_C6_C7 (proj1 := x_of_c,
 -- proj2 := y_of_c). Con ello ax22 deja de ser necesario (proj_is_cantor lo
--- demuestra como teorema).
+-- demuestra como teorema). (✏️ 2026‑10‑14, ADR‑134: Block4_C6_C7 se retiró con la capa `⊢`, ADR‑115, y
+-- con él proj1/proj2, x_of_c, y_of_c y proj_is_cantor: hoy no existe ninguno.)
 -- El símbolo de display del predecesor es sym!"τ", pero los axiomas se nombran con el
 -- prefijo `pred_` (más legible que `tau_`). Ver ax25_pred_zero, ax26_pred_succ.
 def pred_sym : List Char := sym!"τ"
@@ -80,7 +86,8 @@ def sqrt (t : Term)   : Term := .func sqrt_sym [t]
 def div2 (t : Term)   : Term := .func div2_sym [t]
 def mod2 (t : Term)   : Term := .func mod2_sym [t]
 -- proj1, proj2 ELIMINADOS 2026-06-02: ahora son defs concretas en Block4_C6_C7
--- (proj1 := x_of_c, proj2 := y_of_c), no símbolos opacos.
+-- (proj1 := x_of_c, proj2 := y_of_c), no símbolos opacos. (✏️ 2026‑10‑14, ADR‑134: retiradas con
+-- Block4_C6_C7, ADR‑115; ver arriba.)
 def pred (t : Term)    : Term := .func pred_sym [t]
 def cons (h t : Term) : Term := .func cons_sym [h, t]
 def concat (l₁ l₂ : Term) : Term := .func concat_sym [l₁, l₂]
@@ -100,8 +107,10 @@ def eight : Term := mul two (mul two two) -- 2*4
 -- Cantor pairing function components
 /-!
 Cantor's pairing function is defined as:
-  $π₁(x,y) = \frac { \frac {(x+y)(x+y+1)} {2} + y } {2}$
-  $π₂(x,y) = \frac { \frac {(x+y)(x+y+1)} {2} + y } {2} - (π₁(x,y) * 2)$
+  $\text{pair}(x,y) = \frac {(x+y)(x+y+1)} {2} + y$
+(✏️ 2026‑10‑14: decía «$π₁(x,y) = \frac { \frac {(x+y)(x+y+1)} {2} + y } {2}$», que divide dos veces, y daba un
+«$π₂(x,y) = \frac { \frac {(x+y)(x+y+1)} {2} + y } {2} - (π₁(x,y) * 2)$» que no corresponde a nada del código:
+`pair` es `cantor_func` = `div2 (cantor_poly x y)` = $\frac {(x+y)(x+y+1) + 2y} {2}$, y $(x+y)(x+y+1)$ es par.)
 -/
 
 /-!
@@ -162,7 +171,7 @@ def forall_3 (f : Formula) : Formula := .forall (.forall (.forall f))
 
 /-- ⭐ **La escalera de binders, cerrada de una vez** (2026‑09‑16).
 
-`forall_2`, `forall_3` (aquí), `forall_4` (línea ~441) y `forall_5` (línea ~833) se fueron
+`forall_2`, `forall_3` (aquí), `forall_4` (junto a `substtc`) y `forall_5` (tras `ax_tc_cons`) se fueron
 declarando **a reculones**, cada uno cuando hizo falta y en un sitio distinto del fichero. Esto
 es el peldaño genérico: `forall_k f = forallN k f` **por `rfl`** para todo `k`, así que el
 **nivel de las definiciones** no necesita otro peldaño nunca.
@@ -328,6 +337,7 @@ def ax21_mod2_range : Formula :=
 -- ax22 era el axioma "Skolem" que ataba proj1/proj2 opacos a is_cantor.
 -- Ahora proj1/proj2 son defs concretas (= x_of_c/y_of_c) en Block4_C6_C7, y
 -- el contenido de ax22 se prueba como teorema `proj_is_cantor` allí mismo.
+-- (✏️ 2026‑10‑14, ADR‑134: Block4_C6_C7 se retiró con ADR‑115; ni esas defs ni `proj_is_cantor` existen hoy.)
 -- ax23 era cantor_uniqueness reescrito como axioma; nunca usado en código.
 
 -- land/lor: versión funcional de ∧/∨ sobre Formula (para usar fuera de notación)
@@ -337,6 +347,10 @@ def lor  (A B : Formula) : Formula := Formula.or  A B
 -- Ax 24 (mod2 of even): ∀ n, k, n = 2*k → mod2(n) = 0
 -- Teorema en sistemas con inducción (caso base + paso inductivo en k).
 -- En Minimal, se incluye como axioma. Ver `mod2_of_even` en Block5 (sorry pendiente).
+-- (✏️ 2026‑10‑14, ADR‑134: `mod2_of_even` pasó a Block4_C6_C7 el 2026‑06‑03 y, al retirarse con la capa `⊢`
+-- —ADR‑115—, no tenía `sorry`, pero era una instancia de este mismo axioma. La derivación de `ax24` por
+-- inducción fue `mod2_of_even_prim` (`Full/Mod2.lean`, sobre `⊢`), retirada con ADR‑115, y hoy no hay
+-- ninguna, tampoco sobre `Prf`: ver `primAxioms` en `Full/Induction.lean`.)
 def ax24_mod2_of_even : Formula :=
   forall_2 (
     ((.var 1) =eq (mul two (.var 0))) ⇒ (mod2 (.var 1) =eq zero)
@@ -346,6 +360,7 @@ def ax24_mod2_of_even : Formula :=
 -- `pred` usa el símbolo opaco `pred_sym = sym!"τ"`. Sin estos dos axiomas, cualquier
 -- función satisface el sistema (el símbolo no está fijado por los axiomas anteriores).
 -- Son necesarios para las pruebas de C5 (Block4_C5) que usan `spec (ax ax26_pred_succ)`.
+-- (✏️ 2026‑10‑14, ADR‑134: Block4_C5 y esas pruebas, sobre `⊢`, se retiraron con ADR‑115.)
 
 -- Ax 25: pred(0) = 0
 def ax25_pred_zero : Formula :=
@@ -395,15 +410,16 @@ def ax_L3_in_concat : Formula :=
 -- ax27_add_left_cancel ELIMINADO 2026-06-03: derivable en PA⁻ (sin inducción).
 -- Prueba (style PA⁻): si a+c=b+c, por tricotomía (ax19) a<b ∨ a=b ∨ b<a; los casos
 -- estrictos llevan a a+c < a+c vía monotonía (lt_add_const_of_le_left + add_comm)
--- y contradicen ax18 (irreflexividad). Ver `add_left_cancel` en Block4_C6_C7.
+-- y contradicen ax18 (irreflexividad). Ver `add_left_cancel` en Block4_C6_C7 (✏️ 2026‑10‑12: los `Block`
+-- se retiraron con la capa `⊢`, ADR‑115; hoy esa prueba no está en el árbol).
 -- Referencia: PA⁻ axiomatiza semirring discretamente ordenado, donde cancelación
 -- aditiva es teorema. Ver https://diagonalargument.com/2020/10/21/topics-in-nonstandard-arithmetic-6-the-axioms/.
 
 -- ELIMINADO 2026-06-02: ax28_mul_two_cancel era REDUNDANTE.
 -- La spec TuplasFuncionesYListas.md §Teo 2.11 muestra que es derivable sin inducción
 -- usando tricotomía (ax19), irreflexividad (ax18), distributividad (ax12) y monotonía
--- estricta de *2 (probada vía ax13 + teo_2_7 + ax5 + ax2). La prueba directa está
--- ahora en `teo_2_11` (Block1.lean), que ya NO delega a este axioma.
+-- estricta de *2 (probada vía ax13 + teo_2_7 + ax5 + ax2). La prueba directa estuvo
+-- en `teo_2_11` (Block1.lean, ✏️ 2026‑10‑12: retirado con la capa `⊢`, ADR‑115).
 
 -- ### Axiomas de la Potencia (Bloque VIII extendido)
 -- Definición recursiva de `pow` análoga a `*` (ax8/ax9).
@@ -449,6 +465,9 @@ def ax29_sub_witness : Formula :=
 -- `zero` / `succ zero`); `substtc`/`substtsc` son la sustitución De Bruijn sobre
 -- códigos de término / lista de términos. Sus **ecuaciones recursivas** se añaden
 -- a `axioms` (abajo) — extensión definicional conservadora, estilo `pow`/`prod_pairs`.
+-- ✏️ 2026‑10‑12 (ADR‑134): «definicional conservadora» es una PRETENSIÓN. La conservatividad nunca se
+-- probó, y estas ecuaciones fijan `substtc` sólo sobre códigos de término (`varc`, `funcc`): sobre lo que
+-- no lo es (la «basura») su valor queda libre, así que tampoco es una definición (AXIOMS.md §0).
 
 /-- Código de `Term.var n`: `⟨0, n⟩`. -/
 def varc (n : Term) : Term := cons zero (cons n nil)
@@ -567,6 +586,7 @@ def ax_liftfc_ex : Formula :=
 -- ### Verificador object de demostraciones (Fase 2.4)
 -- Numeral local (= `Meta.Godel.numeral`; usado para las etiquetas de regla 0..17)
 -- y extractores `carc`/`cdrc` (cabeza/cola de `cons`) para leer las líneas.
+-- (✏️ 2026‑10‑14, ADR‑134: hoy las etiquetas son 0..20: 18 = `ind` (`ax_vpf_ind`), 19 = `qconf`, 20 = `listInd`.)
 
 /-- Numeral De Bruijn `σⁿ(0)` (copia local en `Minimal`; coincide con `Godel.numeral`). -/
 def numeralM : Nat → Term
@@ -806,7 +826,8 @@ Hacia la **Σ₁-completitud provable** (D3 real, plan `GODEL-D3-TRACKED-DESIGN.
 verificador de listas de una **capa numérica Δ₀** (longitud e indexación acotada), sobre la que la
 membresía `In` admite la caracterización acotada `In x L ⇔ ∃ i < lenc L. nthc L i =eq x`. Son
 funciones object con recursión estructural sobre `cons`/`nil` (extensión definicional conservadora,
-como `carc`/`cdrc`). -/
+como `carc`/`cdrc`). ✏️ 2026‑10‑12 (ADR‑134): «definicional conservadora» es una pretensión —la
+conservatividad nunca se probó—, y `carc`, `cdrc` y `nthc` no fijan su valor en `nil` (AXIOMS.md §0). -/
 
 /-- Longitud (número de elementos) de una lista‑código. -/
 def lenc (l : Term) : Term := Term.func sym!"lenc" [l]
@@ -888,7 +909,11 @@ con `cons`/`succ`/`zero`). Sus 3 ecuaciones espejan la cláusula `.func` de
 Es la única pieza que falta para representar la **diagonalización** (substituir el
 código de una fórmula en sí misma necesita el código de ese código). El puente sobre la estructura de código
 (`tc_arith`, por inducción meta en `Meta/Diagonal.lean`) se retiró con `ax_tc_cons`, que era
-inconsistente (ADR‑012); hoy el puente va por NUMERALES: `prf_tc_numeral` (`Meta/TcArithPrf.lean`). -/
+inconsistente (ADR‑012); hoy el puente va por NUMERALES: `prf_tc_numeral` (`Meta/TcArithPrf.lean`).
+(✏️ 2026‑10‑14, ADR‑134: de las 3 ecuaciones, la lista `axioms` lleva 2, `ax_tc_zero` y `ax_tc_succ`: `ax_tc_cons`
+está fuera desde ADR‑012, y el modelo la refuta, `control_tc_cons`; y la diagonalización ya no falta: el punto fijo
+es `prf_godelCN_fixedpoint` (`Meta/GodelTwoPrf.lean`), y el lema diagonal general, `prf_diagonal`
+(`Meta/TarskiPrf.lean`).) -/
 def tcFn (t : Term) : Term := Term.func sym!"tcFn" [t]
 
 -- `termCode zero = ⟨1, strCode sym!"0", []⟩`  (nil = zero, termsCode [] = nil)
@@ -1037,6 +1062,8 @@ Medido con `#eval ·.length`, no contado a ojo:
 **Sigue evitando el ciclo**, que era el punto bueno del párrafo original y se conserva:
 `axiomsCodeT` es un símbolo **opaco**, así que no aparece dentro de la lista que codifica y
 **no se contiene a sí mismo**.
+(✏️ 2026‑10‑12, ADR‑134: el SÍMBOLO sí está en tres de los 142 —`ax_vpf_thy`, `ax_lineWF_thy` y el ancla— y su
+código va dentro de `listFormCodeM axioms`; lo que no aparece es su VALOR, el literal gigante.)
 
 Detectado por la auditoría de verdad de docstrings (rama G, caso #5 de
 `doc/book/DOCSTRINGS-NO-FIABLES.md`). ⚠️ Se corrige **sólo la prosa**: ni un axioma, ni una
@@ -1147,8 +1174,9 @@ def ax_vpf_thy : Formula :=
     (validProofFn (.var 2) (cons (cons (numeralM 15) (cons (.var 1) nil)) (.var 0)) =eq
       validProofFn (concat (.var 2) (cons (.var 1) nil)) (.var 0)))
 
--- Inducción (a = .var 1, código del predicado φ): **incondicional** (todo esquema
--- de inducción es axioma legítimo de la aritmética, IΣ₁). El verificador
+-- Inducción (a = .var 1, código del predicado φ): **incondicional** (toda instancia
+-- del esquema es axioma de la teoría; ✏️ 2026‑10‑12, ADR‑134: decía «IΣ₁», y `Prf.ind` vale para TODA
+-- fórmula, no sólo Σ₁: es la inducción de PA, AXIOMS.md §0). El verificador
 -- reconstruye el código de `inductionFormula φ` a partir de `⌜φ⌝` con
 -- `substfc`/`liftfc` y los códigos cerrados de `O` (`termCodeM zero`) y de `σ#0`
 -- (`termCodeM (succ #0)`). La **fidelidad** —la reconstrucción `=eq formCode (inductionFormula φ)`—
@@ -1569,7 +1597,9 @@ Gödel I (que solo usan líneas concretas), pero **impide reflejar `lineWF t` pa
 
 `ax_lineWF_inv` cierra la laguna: **si una línea es bien‑formada, su etiqueta es una de las 21**.
 Junto con los 21 bicondicionales, deja `lineWF` (y, conocida la etiqueta, `premsOf`) **totalmente
-determinado**. Es verdadero en el modelo pretendido (el verificador solo acepta las 21 reglas), y es
+determinado** (✏️ 2026‑10‑12, ADR‑134: `premsOf`, sólo sobre las líneas con la forma de su regla —etiqueta y longitud—,
+entre ellas todas las que cumplen `lineWF`, que fija la longitud; una línea con etiqueta conocida y otra longitud
+no tiene ecuación; ✏️ 2026‑10‑14: precisado). Es verdadero en el modelo pretendido (el verificador solo acepta las 21 reglas), y es
 un axioma **de la teoría objeto** (un `def ax_*` de la lista `axioms`), no un postulado gödeliano.
 Ver `GODEL-D3-TRACKED-DESIGN.md` §16. -/
 
@@ -1594,8 +1624,9 @@ def ax_lineWF_inv : Formula :=
 def ax_lineWF_cons : Formula :=
   forall_ (Formula.impl (lineWF (.var 0)) ((.var 0) =eq cons (carc (.var 0)) (cdrc (.var 0))))
 
-/-- Las ecuaciones de coding / maquinaria de verificación (NO parte de la teoría
-    matemática). `axiomsBase = coreAxioms ++ codingAxioms`, y `axioms` es la base con el ancla al
+/-- Las ecuaciones de coding / maquinaria de verificación (✏️ 2026‑10‑12, ADR‑134: no son aritmética, pero SÍ son
+    axiomas de la teoría de los titulares —`thy` los acepta y `axiomsCodeT` los codifica—; decía «NO parte de la teoría
+    matemática»). `axiomsBase = coreAxioms ++ codingAxioms`, y `axioms` es la base con el ancla al
     final (`axioms_split`, ADR‑117). -/
 def codingAxioms : List Formula := [
   ax_substtc_var_eq, ax_substtc_var_gt, ax_substtc_var_lt, ax_substtc_func,
@@ -1658,12 +1689,14 @@ def axioms : List Formula := [
   ax17_div_mod_eq,
   ax18_lt_irrefl,
   ax19_lt_trichotomy,
-  -- ax20_eq_decidable es ahora el teorema `eq_decidable` en Block1.lean
-  ax21_mod2_range,    -- teorema en sistemas con inducción; `mod2_range` en Block3 (sorry)
+  -- ax20_eq_decidable fue el teorema `eq_decidable` de Block1.lean (retirado, ADR‑115); hoy no está en el árbol
+  ax21_mod2_range,    -- PRIMITIVO (`Full/Induction.lean`, el censo 24 + 10); el `mod2_range` de Block3 se retiró (ADR‑115)
   -- ax22_cantor_proj_exists, ax23_cantor_proj_uniq ELIMINADOS 2026-06-02:
   -- proj1/proj2 ahora son defs concretas (Block4_C6_C7); ax22 se demuestra
-  -- como teorema `proj_is_cantor`. ax23 era cantor_uniqueness reescrito (nunca usado).
-  ax24_mod2_of_even,  -- teorema en sistemas con inducción; `mod2_of_even` en Block5 (sorry)
+  -- como teorema `proj_is_cantor` (retirados, ADR‑115). ax23 era cantor_uniqueness reescrito (nunca usado).
+  ax24_mod2_of_even,  -- teorema en sistemas con inducción; `mod2_of_even` en Block5 (sorry; retirado, ADR‑115;
+                      -- ✏️ 2026‑10‑14: desde el 2026‑06‑03 estaba en Block4_C6_C7, sin `sorry` pero como
+                      -- instancia de ax24; hoy no hay derivación de ax24: ver la nota de su definición)
   ax25_pred_zero,
   ax26_pred_succ,
   ax_L0_cons_def,
@@ -1674,8 +1707,8 @@ def axioms : List Formula := [
   ax_C3_concat_assoc,
   ax_L3_in_concat,
   -- ax27_add_left_cancel ELIMINADO 2026-06-03: derivable en PA⁻ vía tricotomía +
-  -- monotonía + irreflexividad. Ver `add_left_cancel` en Block4_C6_C7.
-  -- ax28_mul_two_cancel ELIMINADO 2026-06-02: derivable sin inducción, ver `teo_2_11` en Block1.
+  -- monotonía + irreflexividad. Ver `add_left_cancel` en Block4_C6_C7 (retirado, ADR‑115).
+  -- ax28_mul_two_cancel ELIMINADO 2026-06-02: derivable sin inducción, ver `teo_2_11` en Block1 (retirado, ADR‑115).
   ax29_sub_witness,     -- axioma testigo de la resta truncada (monus)
   -- Bloque VIII extendido (factorización): pow y prod_pairs.
   ax_pow_zero,          -- b^0 = 1
@@ -1683,7 +1716,8 @@ def axioms : List Formula := [
   ax_prodp_nil,         -- prod_pairs [] = 1
   ax_prodp_cons,        -- prod_pairs ((p,e)::t) = p^e * prod_pairs t
   -- Nivel D (Fase 2): ecuaciones recursivas de la sustitución aritmetizada
-  -- (extensión definicional conservadora; ver `Meta/SubstArith.lean`).
+  -- (extensión definicional conservadora —✏️ una pretensión, nunca probada: ADR‑134, AXIOMS.md §0—;
+  -- ver `Meta/SubstArith.lean`).
   ax_substtc_var_eq,
   ax_substtc_var_gt,
   ax_substtc_var_lt,

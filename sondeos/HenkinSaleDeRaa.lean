@@ -12,6 +12,10 @@ import FOL.Core
 **Fecha:** 2026‑09‑13 · **Encargo:** «vamos a medirlo» (el último axioma de
 `../FOL/cuarentena/Completeness.lean`).
 
+(✏️ 2026‑10‑14, ADR‑134: registro. La decisión de §4 se tomó el mismo día —ADR‑032, opción (A): el axioma se
+quedaba—; FOL borró `cuarentena/Completeness.lean` el 2026‑09‑23 (lo supera `FOL.Canonical0.completeness₀`, sobre
+`⊢₀`) y `FOL/MetaRules.lean`, con `raa`, el 2026‑10‑02 (ADR‑115). Desde entonces este sondeo no compila.)
+
 ## 0 · El resultado, en una línea
 
 🏁 **Sale.** `IsMaximalConsistent S → IsHenkin S` es un teorema, y con él
@@ -80,7 +84,8 @@ y tercio excluido sobre la `Prop` `Γ ⊢ A`. **M‑11 no se viola.** Las prueba
 la cifra.
 
 ⚠️ Este fichero **no entra en el build** (`sondeos/` está fuera del `lean_lib`). Para reejecutarlo,
-desde la raíz de ROBINSON_PlusPlus: `lake env lean sondeos/HenkinSaleDeRaa.lean`.
+desde la raíz de ROBINSON_PlusPlus: `lake env lean sondeos/HenkinSaleDeRaa.lean`. (✏️ 2026‑10‑14,
+ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 -/
 
 namespace HenkinSaleDeRaa

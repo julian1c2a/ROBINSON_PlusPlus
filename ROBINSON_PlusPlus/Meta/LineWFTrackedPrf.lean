@@ -411,8 +411,10 @@ theorem pcc_tagDot (t : Term) :
     `Prov`.
 
     Cadena: `pcc_eval_carc` evalúa `carc(ṫ)` (usando que la línea es un `cons`), `pcc_eval_nthc`
-    evalúa `nthc(ṫ,2̇)`, la hipótesis `=eq` reescribe el valor vía `prf_tc_eqc`, y el encaje final
-    es la congruencia diagonal `pcc_congr_eqcT_diag_code_imp` + Leibniz interno. -/
+    evalúa `nthc(ṫ,2̇)`, la hipótesis `=eq` reescribe el valor vía `PrfH_congr_tcFn` y, dentro de
+    `Prov`, `pcc_dot_eqc_symm`, y el encaje final es la congruencia diagonal
+    `pcc_congr_eqcT_diag_code_imp` + Leibniz interno. (✏️ 2026‑10‑14, ADR‑134: decía «vía
+    `prf_tc_eqc`», que se retiró el 2026‑08‑23 —«El sustituto de `prf_tc_eqc`», arriba—.) -/
 theorem pcc_eqDot (t : Term) :
     Prf (lineWF t ⇒ (lt (numeralM 2) (lenc t) ⇒
       ((carc t =eq eqc (nthc t (numeralM 2)) (nthc t (numeralM 2))) ⇒
@@ -608,7 +610,8 @@ Del accesor ESTRICTO `ax_lineWF_eqrefl` en la dirección `⇒` (`iff.mp` = `Prf�
 y el tag `nthc t 1 = 12̇`, el RHS `(lenc t = 3̇) ∧ (carc t = eqc (nthc t 2)(nthc t 2))` **se deriva
 entero**. Su primer conjunto da la longitud canónica ⇒ las cotas; el segundo, la condición
 estructural. **Ya no hay hipótesis de cota** (el plan A las cerró de raíz). Es el reflector que el
-`or_elim` ×21 invocará en el disyunto `eqrefl`. -/
+`or_elim` ×21 invocará en el disyunto `eqrefl`. (✏️ 2026‑10‑14, ADR‑134: ya lo invoca: tag 12 de
+`pcc_lineWF_tracked`, `Meta/SubstTreeReflect.lean` §11ter, y de `pcc_lineWF_tracked_modulo_7`.) -/
 
 /-- **Reflector por rama, caso `eqrefl`** (accesor estricto, dirección `⇒` descargada): asumido sólo
     el tag `nthc t 1 = 12̇` (que el `or_elim` de `prf_lineWF_inv` provee en este disyunto), `lineWF t`

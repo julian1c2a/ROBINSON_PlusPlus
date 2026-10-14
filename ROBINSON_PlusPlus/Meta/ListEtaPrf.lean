@@ -195,7 +195,8 @@ end ROBINSON_PlusPlus.Meta.ListEtaPrf
 /-! ## `export` — por CONSUMO
 
 Consumidor previsto: la evaluación de `premsOf` por tags (`hbody`(b) de D3), que necesita la
-línea reconstruida para poder instanciar `ax_premsOf_*`. -/
+línea reconstruida para poder instanciar `ax_premsOf_*`. (✏️ 2026‑10‑14, ADR‑134: ya no es previsto:
+lo consume `Meta/PremsOfTagPrf.lean`, con `etaAt`, `prf_eta_lenc` y `prf_nthc1_carc_cdrc`.) -/
 export ROBINSON_PlusPlus.Meta.ListEtaPrf (
   prf_nil_of_lenc_zero prf_eta_of_lenc_succ prf_lenc_cdrc
   cdrcN etaAt prf_eta_lenc prf_nthc1_carc_cdrc

@@ -43,6 +43,12 @@ una inducción de listas (receta §28), con la base aquí resuelta.
 
 **Este módulo entrega la BASE** (`p = nil`). El paso inductivo requiere codificar `ax_runFn_cons`
 (que arrastra `concat` y `carc`), y queda como siguiente ladrillo.
+
+(✏️ 2026‑10‑14, ADR‑134: registro — `hI_dot` es teorema (`Meta/D3InDotPrf.lean`) y no pasa por aquí:
+convierte `In ⌜φ⌝ (runFn nil p)` en el `∃` acotado `boundedCarcIn` (`prf_boundedCarcIn_of_In_runFn`)
+y refleja ése. La evaluación general, `pcc_eval_runFn`, no existe y nada la pide; de este módulo el
+build sólo consume `prf_substtc_termCode_nil` (EvalLiftcPrf, EvalNthcPrf, LiftcCodePrf; grep del
+2026‑10‑14). La recursión codificada, `pcc_runFn_cons_code`, sí está, abajo.)
 -/
 
 /-- Constructor de código del término simbólico `runFn x y`: `⟨1, ⌜runFn⌝, [x, y]⟩`. -/

@@ -26,6 +26,10 @@ verificador, **el 98‑99 % del código son los nombres de los símbolos**.
 * `Meta/CodeNumeralPrf.lean` — `prf_charsCode_numeral`, `prf_strCode_numeral`
 * `Meta/DerivCondPrf.lean` — `liftTerm_charsCode/_strCode`, `substTerm_charsCode/_strCode`
 
+(✏️ 2026‑10‑14, ADR‑134: registro. `charsCode_ne` y `strCode_ne` eran sobre `⊢` y se retiraron con esa capa
+(ADR‑115), como `NegVerifier`; los demás de la lista siguen. Y desde D7 (ADR‑129) los símbolos son `List Char`:
+`Term.func` ya no admite `String`, y `strCode s` es `charsCode s`.)
+
 ✅ **Todo lo demás trata `strCode s` como OPACO** y no se entera: los constructores de código
 (`consT`, `addcT`, `carcT`, `nthcT`, `mulcT`, `div2cT`, …) sólo lo pasan a `funcc`.
 
@@ -47,7 +51,9 @@ incompletitud de un lenguaje restringido).
 * Tiempos de build de los módulos afectados: **4‑11 s** (`CodeDecode` el peor, 11 s). Nada patológico.
 * `codeNat φ` **nunca se reduce** (medido en S3): la magnitud no afecta a la elaboración.
 * `axiomsCodeT` se mantiene **opaco a propósito** (`ax_axiomsCodeT_eq`), justo para no materializar
-  el término gigante. **El proyecto ya rodeó el problema.**
+  el término gigante. **El proyecto ya rodeó el problema.** (✏️ 2026‑10‑14, ADR‑134: ese axioma ya no
+  existe; desde ADR‑117 el ancla es el axioma diagonal `ax_axiomsCodeT_def`, cuyo lado derecho lleva el numeral
+  `nD axiomsBase`, que se mantiene PLEGADO; `prf_ancla` es teorema.)
 
 ## ⇒ RECOMENDACIÓN
 

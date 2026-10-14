@@ -282,6 +282,12 @@
 
 ## Executive Summary
 
+> 🗄️ ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md)) · REGISTRO del 2026‑09‑10: esta sección y las siguientes, hasta el final
+> (Status by Module, Recent Achievements, Pending Work, Architecture).** Las cifras de esta tabla son de esa fecha
+> (hoy: 0 `axiom` de Lean, 142 axiomas objeto, 112 módulos). La teoría de los titulares —que no es `Minimal` sin
+> inducción: `Prf` añade la inducción para toda fórmula, y contiene a PA— y lo que se supone hoy, en
+> [AXIOMS.md](AXIOMS.md) §0. El propietario decidió el 2026‑10‑14 reescribirlo (T26).
+
 | Metric | Value |
 |--------|-------|
 | Total modules | **110 activos** (Minimal/ 11 + Meta/ 88 + Full/ 11) + barrel `Meta.lean` · **+0 en `cuarentena/`** (fuera del build) · **+57 en `sondeos/`** |
@@ -400,7 +406,7 @@
   Cerrado el **único punto de diseño del plan 12‑A que no estaba verificado en código**.
   **`Meta/NatArithPrf.lean`** (NUEVO): toolkit aritmético de `<` en `Prf` — hallazgo de escala,
   `lt a b := ∃k. a+σk=b` y `add` recurre por la derecha ⇒ **`0+n=n` NO es teorema de Q** y hay que
-  reconstruirlo con `Prf.ind`. **`Meta/BoundedInPrf.lean`** (NUEVO): **`prf_In_iff_boundedIn`**
+  reconstruirlo con `Prf.ind` *(✏️ 2026‑10‑14, ADR‑134: no hacía falta; con `ax6_add_comm`, sale sin inducción)*. **`Meta/BoundedInPrf.lean`** (NUEVO): **`prf_In_iff_boundedIn`**
   (`In x L ⇔ ∃i<lenc L. nthc L i =eq x`) + `prf_zero_or_eq_succ_pred` (case-split de índice sin `∃`).
   **`Meta/RunFnBoundedPrf.lean`** (NUEVO): *corrección al diseño §12.3 —* **no hace falta β‑función**:
   `runFn nil p` no es recursión con acumulador, es el ***map* de `carc` sobre `p`**
@@ -423,7 +429,7 @@
   `tcFn L =eq termCode L` stuck para `L` abstracta). Hallazgo central: **codificar el testigo ≡
   representar el verificador** sobre números (Δ₀), pero el verificador es estructural sobre listas.
   Decidida la **Opción 12‑A (capa numérica Δ₀ del verificador)**. **Fase 1a hecha**: `lenc`/`nthc`
-  (longitud/índice de lista‑código) — defs + 4 axiomas en `Minimal/Axioms` (extensión conservadora,
+  (longitud/índice de lista‑código) — defs + 4 axiomas en `Minimal/Axioms` (extensión conservadora *—✏️ 2026‑10‑13, ADR‑134: una pretensión, nunca probada—*,
   `axioms_eq` rfl preservado, **build entero verde: verificador/D1 intactos**) + ecuaciones `Prf`
   (`Meta/NumListPrf.lean`). Además `Meta/TrackedCorePrf.lean` extendido con `atom2CodeFn` (infra de
   códigos). Diseño completo en `GODEL-D3-TRACKED-DESIGN.md` §11–§12. Build verde (**71 jobs**),

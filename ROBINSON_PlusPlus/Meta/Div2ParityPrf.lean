@@ -29,6 +29,9 @@ namespace ROBINSON_PlusPlus.Meta.Div2ParityPrf
 Frente **S4** de `PLAN-SORTES.md`: la evaluación provable del emparejamiento de Cantor sobre
 numerales, que es lo único que separa a la reparación de la inconsistencia de estar completa para
 Gödel I (ver `sondeos/README.md` y la memoria `project-reparacion-via-numeral`).
+(✏️ 2026‑10‑14, ADR‑134: registro — la cadena está cerrada: `prf_cons_eval` está probado en
+`Meta/CodeNumeralPrf.lean` con L5 (`prf_div2_numeral`), y Gödel I va entero y sin hipótesis:
+`goedel_I` (`Meta/Consistencia.lean`) y `goedel_I_neg` (`Meta/SolidezVerificador.lean`).)
 
 **La cadena completa** hacia `prf_cons_eval (a b) : Prf (cons ā b̄ =eq numeral (consN a b))`:
 
@@ -113,7 +116,8 @@ y·2 = 2·(x + σk) = 2·x + 2·σk = x·2 + (2·k + 2)   y   2·k + 2 = σ(2·k
 
 luego el testigo de `x·2 < y·2` es **`2·k + 1`**. Una sola eliminación de `∃`. -/
 
-/-- **L1** — `x < y ⟹ x·2 < y·2`. Lo consumen L2 (cancelación) y el caso `mod2 = 1` de L3. -/
+/-- **L1** — `x < y ⟹ x·2 < y·2`. Lo consume L2 (cancelación); L3 no lo usa (ver L3).
+    (✏️ 2026‑10‑14: decía «Lo consumen L2 (cancelación) y el caso `mod2 = 1` de L3».) -/
 theorem prf_mul_two_lt_mono (x y : Term) :
     Prf (lt x y ⇒ lt (mul x two) (mul y two)) := by
   have himp : Prf (Formula.ex (Formula.eq (add (liftTerm 0 x) (succ (.var 0))) (liftTerm 0 y))

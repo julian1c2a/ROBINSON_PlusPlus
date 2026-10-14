@@ -5,6 +5,9 @@ Cadena para `prf_cons_eval (a b) : Prf (cons ā b̄ =eq numeral (consN a b))`:
   (1) cons h t =eq div2 (cpOf h t)        -- prf_cons_div2      ✅ YA EXISTE
   (2) cpOf ā b̄ =eq numeral P              -- prf_numeral_add/mul ✅ YA EXISTEN
   (3) div2 (numeral P) =eq numeral (P/2)  -- ❌ NO EXISTE  <- lo que se sondea
+(✏️ 2026‑10‑14, ADR‑134: la cadena está hecha: el (3), para `P` par, es `prf_div2_numeral` (`Meta/Div2ParityPrf.lean`),
+y `prf_cons_eval` (`Meta/CodeNumeralPrf.lean`) la compone. Desde ADR‑113 el (1) es `cons h t =eq succ (div2 (cpOf h t))`
+(`prf_cons_div2`, `Meta/CantorMonoPrf.lean`).)
 
 Se ataca (3) en forma OBJETO (`x` abstracto): net-0 y sirve para todo `a,b` a la vez.
 NO ES MÓDULO DE PRODUCCIÓN.

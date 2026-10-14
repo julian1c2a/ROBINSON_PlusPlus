@@ -8,6 +8,7 @@ Sondeo de la pregunta más barata del frente `substfc`: ¿alguna parte de la maq
     lake env lean Probe/HaceFaltaClausura.lean
 
 RESPUESTA MEDIDA (todo lo de abajo compila):
+(✏️ 2026‑10‑14, ADR‑134: hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—; es registro.)
 
 * §1 — La CADENA nunca pide buena‑formación de una conclusión. Todo lo que hace con la
   conclusión de una línea anterior es MEMBRESÍA (`In`), nunca un predicado de forma.

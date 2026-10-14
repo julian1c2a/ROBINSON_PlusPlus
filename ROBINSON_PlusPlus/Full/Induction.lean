@@ -32,9 +32,10 @@ namespace ROBINSON_PlusPlus.Full
 🗑️ **2026‑10‑02 (ADR‑115) — registro.** `Full` añadía sobre `Minimal` el **esquema de inducción
 general** como axioma sobre `⊢` (`ax_induction`), y derivaba los axiomas algebraicos de `Minimal` por
 derivación sobre `⊢` —`spec`, `mp`, `gen`, `imp_intro`—. Todo eso quedó retirado con la capa `⊢`.
-Hoy la inducción de la cadena de Gödel es el constructor `Prf.ind`, que usa la `inductionFormula` de
-abajo; de este módulo quedan esa fórmula, `primAxioms`, las longitudes del censo y los lemas de
-sustitución.
+Hoy la inducción de la cadena de Gödel entra por los constructores `Prf.ind`, que usa la `inductionFormula` de
+abajo, y `Prf.listInd` (la de listas, `listInductionFormula`, en `Meta/Hilbert.lean`; ✏️ 2026‑10‑14: decía «es el
+constructor `Prf.ind`»; `AXIOMS.md` §0.3); de este módulo quedan esa fórmula, `primAxioms`, las longitudes del censo
+y los lemas de sustitución.
 
 **Codificación lift-aware**: `φ(σn)` se codifica como
 `substFormula 0 (σ#0) (liftFormula 1 φ)`, que preserva las variables-parámetro
@@ -45,6 +46,9 @@ la inducción multivariable). El lema de composición `substTerm_subst_succ_lift
 -/
 
 /-! ### §0bis · ⭐ `primAxioms` — LOS 23 PRIMITIVOS ([ADR‑023](../../DECISIONS.md), 2026‑09‑10h)
+
+✏️ 2026‑10‑14 (ADR‑134): son **24** primitivos y 10 derivables (`primAxioms_len`) desde la tarde del mismo
+2026‑09‑10, cuando `ax21` resultó primitivo (ver el docstring de `primAxioms_len`); el título es de antes.
 
 🗑️ **2026‑10‑02 (ADR‑115):** lo que sigue describe un certificado sobre `⊢` que quedó retirado —los
 `*_thm_prim`, `mod2_of_even`, `concat_assoc`/`in_concat`—. Hoy **no hay** certificado de que los 10
@@ -69,7 +73,9 @@ El censo de `coreAxioms` (`doc/REFERENCE-Full.md` §3.14.1) lo partía en **23 p
 
     Los **10 restantes** de `coreAxioms` (ax6, ax7, ax10, ax11, ax12, ax18, ax19, ax24, ax_C3,
     ax_L3) **deben** ser teoremas en `Full`, y lo eran sobre `⊢` hasta el 2026‑10‑02: esos teoremas
-    quedaron retirados con esa capa (ADR‑115) y hoy no hay certificado. -/
+    quedaron retirados con esa capa (ADR‑115) y hoy no hay certificado. (✏️ 2026‑10‑14, ADR‑134: «`Full`»,
+    la teoría `Minimal` + `ax_induction` sobre `⊢`, ya no existe; la teoría con inducción es hoy la de `Prf`,
+    `T_Prf`: `AXIOMS.md` §0.) -/
 def primAxioms : List Formula :=
   [ ax2_peano_succ_neq_zero, ax3_peano_succ_inj,
     ax4_add_zero, ax5_add_succ, ax8_mul_zero, ax9_mul_succ,
@@ -229,7 +235,9 @@ theorem step_eq_reduce (n t u : Term) :
      = Formula.impl (substFormula 0 n (Formula.eq t u)) (substFormula 0 (succ n) (Formula.eq t u))
   rw [substFormula_eq_succ_lift]
 
-/-! ### Esquema de inducción general (axioma object-level) -/
+/-! ### Esquema de inducción general (axioma object-level)
+
+✏️ 2026‑10‑14 (ADR‑134): hoy no es un axioma, sino la fórmula del constructor `Prf.ind`. -/
 
 /-- Fórmula de inducción para `φ` (variable libre `0`), lift-aware:
     `φ(0) ⇒ ((∀n. φ(n) ⇒ φ(σn)) ⇒ ∀n. φ(n))` con `φ(σn) = substFormula 0 (σ#0) (liftFormula 1 φ)`. -/

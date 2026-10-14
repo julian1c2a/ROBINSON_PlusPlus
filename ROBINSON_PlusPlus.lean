@@ -11,11 +11,15 @@ Imports all public modules so that `import ROBINSON_PlusPlus` suffices.
 import ROBINSON_PlusPlus.Minimal.Axioms
 
 -- Meta: Gödelización (Nivel B codificación + Nivel C demostrabilidad). Ver GODEL-STATUS.md
+-- (✏️ 2026‑10‑14, ADR‑134: hoy también el Nivel D sobre `Prf` —D1–D3, el modelo `MNV V₀`, `consistencia`,
+-- Gödel I entero y Gödel II sin hipótesis, Tarski—; GODEL-STATUS.md es histórico salvo su banner: el estado vivo, en
+-- NEXT-STEPS.md y AXIOMS.md §0.)
 import ROBINSON_PlusPlus.Meta
 
 -- Full: Induction (`inductionFormula`, `primAxioms`, el censo, lemas de sustitución), Numerals
 -- (`numeral`) y PrimeFactor (teoría de números META pura ℕ, sin Mathlib: IsPrimeNat, factor
--- primo, factorización). La inducción de la cadena es el constructor `Prf.ind` (Meta/Hilbert.lean).
+-- primo, factorización). La inducción de la cadena entra por los constructores `Prf.ind` y
+-- `Prf.listInd` (Meta/Hilbert.lean; ✏️ 2026‑10‑14: decía «es el constructor `Prf.ind`»; AXIOMS.md §0.3).
 import ROBINSON_PlusPlus.Full.Induction
 import ROBINSON_PlusPlus.Full.Numerals
 import ROBINSON_PlusPlus.Full.PrimeFactor

@@ -28,6 +28,9 @@ Cierre del sistema de prueba interno. Todas las líneas‑axioma proposicionales
 **estructurales** (bicondicional `lineWF` con códigos **arbitrarios** y `premsOf = nil`), igual que
 EQREFL/Q1/Q2/LEIBNIZ (§25): cada una se demuestra con un testigo de **una sola línea** (`pcc_axline`)
 y sale **libre de muro** (`[propext, choice, Quot.sound]`, sin `prf_inAxC`).
+(✏️ 2026‑10‑14, ADR‑134: desde ADR‑020 «códigos arbitrarios» vale para `p1`, `p2`, `j3`, `efq` y
+EQREFL, no para Q1/Q2/LEIBNIZ ni para `ind` (tag 18): sus `prf_lineWF_*` (`Meta/ReprPrf.lean`) piden
+las guardas `hasWitF`/`hasWit`, y `pcc_ind_code` pide `hwA`.)
 
 | Tag | Línea | Esquema |
 |:---:|:------|:--------|
@@ -121,7 +124,8 @@ La regla `ind` del verificador es **estructural** (`prf_lineWF_ind` es un bicond
 **arbitrario** y `premsOf = nil`), luego la inducción interna se demuestra con un testigo de **una
 línea**, exactamente como Leibniz (§25). Es lo que permite la INTRODUCCIÓN del `∀` acotado (`hC_dot`),
 que no se puede hacer con la disyunción finita de casos porque la cota (`lenc p`, con `p` abstracto)
-**no es un numeral concreto**. -/
+**no es un numeral concreto**. (✏️ 2026‑10‑14, ADR‑134: `a` ya no es arbitrario: desde ADR‑020,
+`prf_lineWF_ind (concl a) (hwa : Prf (hasWitF a))`; ver el ⚠️ de `pcc_ind_code`.) -/
 
 /-- Conclusión de la línea‑axioma IND para un código `Ac` **arbitrario**:
     `Ac[0] ⇒ (∀x. Ac[x] ⇒ Ac[σx]) ⇒ ∀x. Ac[x]`. -/

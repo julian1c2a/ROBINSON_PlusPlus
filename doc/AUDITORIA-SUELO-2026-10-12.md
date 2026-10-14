@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-14 — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -152,6 +152,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* La teoría descrita y lo que se supone hoy · *Verificación:* confirmado (verificador de vacuidad, P0), con correcciones
 
+*Estado el 2026‑10‑14:* ✅ **Hecho en ADR‑134**: la descripción canónica de `T_Prf` y lo que se supone hoy, en `AXIOMS.md` §0 (puntos 1 y 2); README, `Minimal/Axioms.lean` y GODEL-STATUS §1 (3); «pretendidamente conservadora» (4); §1.1 y §4 de AXIOMS, con la literatura del punto 7 (5 y 7); el aviso de TuplasFuncionesYListas (6); la frase de `⊬¬G` del README y el «Resumen al día» de GODEL-STATUS (8); y lo que encontraron los dos censos y su verificación adversarial del 2026‑10‑14, que en los `.lean` cierra T31. El punto 5 se MIDIÓ (`sondeos/InduccionTitulares.lean`): D1 usa la inducción y D2 la de listas, en esta prueba. El 9 (la traducción aritmética o la conservatividad) sigue sin hacer, y el 10 se respeta: el README no lo dice.
+
 * **Qué:** MEDIDO: README.md:101 llama a la teoría objeto «Q++ … sin esquema de inducción», y :145 habla de «34 axiomas sin un esquema de inducción general»; el README no menciona Prf.ind ni listInd. Prf, en cambio, tiene p3 (DNE), ind y listInd para TODA fórmula, y qconf (Meta/Hilbert.lean:152-156). Hay otras dos descripciones incompatibles: «IΣ₁» (Minimal/Axioms.lean:1150-1151, comentario sin marca dentro del validProofFn sin uso) y «extensión definicional conservadora» (Minimal/Axioms.lean:451, :807-808, :1686, nunca probada, AXIOMS.md:234). Ningún documento vigente enuncia T_Prf entero. INFERIDO: T = 142 axiomas + DNE + inducción e inducción de listas para toda fórmula + qconf, en el lenguaje extendido; contiene a PA, así que no es ni IΣ₁ ni Q++.
 * **Evidencia:** README.md:101, :145 (MEDIDO, sed); ROBINSON_PlusPlus/Meta/Hilbert.lean:144-158; ROBINSON_PlusPlus/Minimal/Axioms.lean:1150-1151; AXIOMS.md:204-214, :223 (en una sección que AXIOMS.md:189-191 declara registro), :309-329; GODEL-STATUS.md §1, l.82-101 (analiza Minimal como sujeto; grep: no dice literalmente «sin esquema»); TuplasFuncionesYListas.md:5 («sin un principio de inducción generalizado», 1 052 líneas, sin aviso de vigencia; MEDIDO, grep)
 * **Cómo cerrar:** 1. Un párrafo canónico «La teoría T_Prf»: los 142 axiomas, los esquemas, las reglas y el lenguaje, y que Prf es un Hilbert propio cuyo puente con DerivesSet₀ no está probado (T67).
@@ -295,7 +297,7 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* requiere medición: exagerado → P2 (verificador de vacuidad); la vacuidad sigue INFERIDA hasta compilar el sondeo
 
-*Estado el 2026‑10‑12:* 🔬 **Refutación COMPILADA el 2026‑10‑12** (`sondeos/D3Sigma1Vacuo.lean`, entre 4 y 76 s en tres ejecuciones; `[propext, Classical.choice, Quot.sound]`): `hI` y `hbI` son refutables, así que los dos teoremas son VACUOS (MEDIDO). Queda retirarlos o marcarlos.
+*Estado el 2026‑10‑12:* 🔬 **Refutación COMPILADA el 2026‑10‑12** (`sondeos/D3Sigma1Vacuo.lean`, entre 4 y 76 s en tres ejecuciones; `[propext, Classical.choice, Quot.sound]`): `hI` y `hbI` son refutables, así que los dos teoremas son VACUOS (MEDIDO). Queda retirarlos o marcarlos. *2026‑10‑14 (ADR‑134):* marcados VACUOS en sus docstrings, en las cabeceras que los presentaban como reducción (`ReflectionPrf`, `Sigma1Prf`, `Sigma1AtomPrf`, `Sigma1CorePrf`, `Sigma1BoundedPrf`) y en §3.19 de `doc/REFERENCE-Incompleteness.md`; la retirada, pendiente.
 
 * **Qué:** MEDIDO: `d3_prf_of_sigma1` toma hI : ∀ x L, Prf (In x L ⇒ provCodeC' (In x L)) (ReflectionPrf.lean:80-82), y `d3_prf_of_reflect_bounded` lo compone (Sigma1BoundedPrf.lean:83-87). Sólo el barril importa Sigma1BoundedPrf, y ninguno de los dos tiene fila de footprint (grep del sintetizador). INFERIDO por lectura, sin compilar (todas las piezas existen con la firma necesaria): hI es refutable con x := #0, L := cons zero nil y las valoraciones 0 y 1, y hbI cae con ella. No es P0: ninguno es titular ni tiene consumidor, el D3 que se usa es d3_prf_real (no vacuo), y GODEL-D3-TRACKED-DESIGN.md:21-23 ya anota desde julio que no sirven.
 * **Evidencia:** ROBINSON_PlusPlus/Meta/ReflectionPrf.lean:44-45 y :80-82; ROBINSON_PlusPlus/Meta/Sigma1BoundedPrf.lean:38-42, :76-87; ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1300-1301; doc/REFERENCE-Incompleteness.md §3.19 («-- = d3_prf», sin marca)
@@ -306,6 +308,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T10 · Sondeos que no compilan: política, SHA de los registros y citas-evidencia del build
 
 *Grupo:* Sondeos · *Verificación:* confirmado, rebajado a P2 y supeditado a T06 (verificador de controles)
+
+*Estado el 2026‑10‑14:* 🟡 En ADR‑134, las notas de procedencia: las tres citas de `A3IsFCBTracked` del build (`D3ChainDotPrf`, `HasWitTrackedPrf`, `TrackedAtomsPrf`) y las cabeceras de los diez sondeos que decían «compila» en presente llevan nota, contra `sondeos/pasadas/tabla_adr129.txt`. La política, el SHA de los registros y el control, pendientes (tras T06).
 
 * **Qué:** MEDIDO: git ls-files no contiene ninguna tabla de pasada; las de ADR-121, 127 y 129 están en el scratchpad, y sólo la del 2026-10-02 está versionada. De las 114 citas sondeos/X.lean del build, 89 apuntan a sondeos que no compilan (88 con rc 1 y 1 TIMEOUT). D3ChainDotPrf.lean:23, HasWitTrackedPrf.lean:24 y TrackedAtomsPrf.lean:31 dicen en presente que A3IsFCBTracked «probó» algo, y hoy no compila (rc 1, :355). Son notas de procedencia: lo que sostiene el build está en el build.
 * **Evidencia:** ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:23; sondeos/pasadas/tabla_adr129.txt; doc/AUDITORIA-BASE-2026-10-02.md:164; la etiqueta pre-adr115 existe
@@ -437,6 +441,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación (README:108 lo comprobó el sintetizador)
 
+*Estado el 2026‑10‑14:* 🟡 En ADR‑134 (T02): la frase de `⊬¬G`, la de la consistencia y las cifras de módulos de la tabla de capas. Lo demás, pendiente.
+
 * **Qué:** MEDIDO, fuera del banner:
   - README.md:108 dice que ⊬¬G «no está cerrada», y goedel_I_neg existe;
   - :139, «No es una prueba de consistencia»;
@@ -462,6 +468,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación (la l.209 la comprobó el sintetizador)
 
+*Estado el 2026‑10‑14:* 🟡 En ADR‑134 (T02), notas fechadas en el «Hoy» de §5 (es el del 2026‑10‑04), en la fila de `GodelTwoPrf` y en la frase de `⊬¬G`; y «Q++» fuera de la fila de `Minimal/Axioms.lean` y de la tabla de nodos. Las cifras contradictorias, los ejemplos de §0.1 y la cita de `instAnclaEq`, pendientes.
+
 * **Qué:** MEDIDO:
   - l.47 dice «90 en sondeos» y l.209, «85» (comprobado por el sintetizador);
   - l.243 y :353 dan 88 y 100 módulos de Meta (son 107);
@@ -477,6 +485,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación (la l.74 la señaló el verificador de T02 y la comprobó el sintetizador)
 
+*Estado el 2026‑10‑14:* 🟡 En ADR‑134 (T02): una nota fechada en el «Resumen al día» de la cabecera y otra en §1. El propietario decidió el 2026‑10‑14 reescribirlo (§ «Decisiones del propietario»); la reescritura, pendiente.
+
 * **Qué:** MEDIDO: l.74 declara el documento histórico, pero da un «Resumen al día: Gödel I da SÓLO ⊬G», falso desde ADR-121; y el documento está en AUTHORITATIVE (check-doc-sync.bash:184). §4 (l.261-270) declara fuera de alcance Gödel II interno, Rosser y Tarski. l.89 dice «Consistente: Asumido», y l.226-227 llama ω-regla a gen. A la vez, TEOREMAS y PLAN-PRUEBAS, que son normativos, no están en AUTHORITATIVE.
 * **Evidencia:** GODEL-STATUS.md:74 (MEDIDO, sed), :89, :226-227, :261-270; check-doc-sync.bash:184
 * **Cómo cerrar:** La l.74, ya, en la pasada de T02. Después, una de dos: un banner de una línea «histórico» y fuera de AUTHORITATIVE, o reescribir §1, §4 y §5. Reclasificar AUTHORITATIVE: entran TEOREMAS y PLAN-PRUEBAS.
@@ -486,6 +496,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T29 · doc/REFERENCE-Incompleteness.md: documentar el modelo, la solidez, W1 y Tarski
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación (:454 y §3.19 vienen de los verificadores de T04 y T05; REFERENCE-Godelization, del crítico, con grep del sintetizador)
+
+*Estado el 2026‑10‑14:* 🟡 En ADR‑134 (T02): una nota de registro en el banner, la firma de `Prf` (con `ind`, `qconf` y `listInd`), `0 + n = n` sin inducción, y §3.19: `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, y la tabla de fases y la línea de `d3_prf`, registro. Las secciones del modelo, la solidez, W1 y Tarski, y REFERENCE-Godelization, pendientes.
 
 * **Qué:** MEDIDO: tiene 0 menciones de SolidezVerificador, TarskiPrf, Consistencia.lean, ModeloCodigo o goedel_I_neg. Su banner dice «⊬¬G sigue sin existir», l.26 «90 módulos», y l.30-32 presenta goedel_first_numeral y goedel_second' como contenido. Según los verificadores de T04 y T05, :454 («→ d3_prf → goedel_second_prf», marcada en curso) es falsa hoy, y §3.19 vende d3_prf_of_sigma1 («-- = d3_prf») sin marca. MEDIDO: doc/REFERENCE-Godelization.md no menciona codeNat ni consN (0), la codificación en Nat de la que dependen el modelo y W1.
 * **Evidencia:** doc/REFERENCE-Incompleteness.md:9-10, :26, :30-32, :454; doc/REFERENCE-Godelization.md (grep = 0); AI-GUIDE.md:152-153
@@ -505,6 +517,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación (CRI-05 es del crítico y lo comprobó el sintetizador; lo de NatMulPrf, el verificador de CRI-03)
 
+*Estado el 2026‑10‑14:* ✅ **Hecho en ADR‑134**: las cinco frases de la lista y las que encontró el verificador del censo de los `.lean` —los «pendiente» de C3 y D3, los «nada lo consume», la ruta vacua `hI`/`hbI`, nombres que no existen, la deuda B6b dada por abierta y dos errores de contenido (la fórmula de Cantor y la de `consN`)—, en el build y en las cabeceras de los sondeos; sólo comentarios, con su revisión adversarial. La vigilancia futura sigue siendo la de T04b y T32.
+
 * **Qué:** MEDIDO:
   - ChainNegPrf.lean:46, DiagonalTwo.lean:94, VerifierSound.lean:129 y CodeDistinct.lean:61-62 dicen que ⊬¬G «no tiene hoy formulación sobre Prf», falso desde ADR-121;
   - Meta/GodelTwo.lean:114-115 dice que «la consistencia de los 142 axiomas sigue sin probar»; se tocó por última vez en 873299e, antes de ADR-120 (comprobado por el sintetizador);
@@ -518,6 +532,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T32 · Portar [G]/[G.2] a RPP y clasificar los marcadores de deuda del código
 
 *Grupo:* check-doc-sync y los controles de documentación · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑14:* 🟡 La prosa de `D3ChainDotPrf` (su cabecera, §3.1, §10.6, §11.1, §12.1, §13 y el `export`) lleva notas de registro: D3 está probada (ADR‑134). El port de [G]/[G.2] y la clasificación, pendientes.
 
 * **Qué:** MEDIDO: FOL tiene [G] y [G.2] (check-doc-sync.bash:611-783) y RPP no. El patrón de FOL da 137 líneas en 14 ficheros de RPP, 48 de ellas en D3ChainDotPrf.lean, que anuncia como pendiente («5 de 7 reflectores», «lo que queda de D3: hbody») lo que ya es teorema (SubstTreeReflect.lean:1014, :1024, :1157). Las DEUDA_* de RPP son abbrev, y el patrón de FOL no las vería.
 * **Evidencia:** ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:192-200, :1062-1072; ../FOL/check-doc-sync.bash:701

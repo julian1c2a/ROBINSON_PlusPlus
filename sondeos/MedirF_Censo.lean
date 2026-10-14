@@ -81,7 +81,9 @@ opaco**», porque no existiría forma de refutar `In v axiomsCodeT`.
 
 Contra-medición: la dirección negativa **no hay que transportarla, YA ESTÁ TRANSPORTADA** —
 `neg_In_axiomsCodeT` vive en `Meta/AxiomListCode.lean`, en producción, y su consumidor
-`derives_lineWF_neg_thy_of_not_prf` **también**. El caso `thy` está CERRADO de punta a punta. -/
+`derives_lineWF_neg_thy_of_not_prf` **también**. El caso `thy` está CERRADO de punta a punta.
+(✏️ 2026‑10‑14, ADR‑134: ya no: `Meta/AxiomListCode.lean`, con `neg_In_axiomsCodeT`, se retiró con la capa `⊢`
+(ADR‑115), y su consumidor, `derives_lineWF_neg_thy_of_not_prf`, salió de `Meta/LineWFCases.lean` en el mismo commit; por eso este sondeo hoy no compila —`sondeos/pasadas/tabla_adr129.txt`, 2026‑10‑05—.) -/
 
 /-- **El bloqueo 2 está MUERTO**: la refutación de `In ⌜φ⌝ axiomsCodeT` existe, en producción. -/
 theorem bloqueo2_muerto (φ : Formula) (hnp : ¬ Prf φ) :
