@@ -1,6 +1,6 @@
 # Registro: artefactos rescatados al árbol
 
-**Last updated:** 2026-10-14 — la carpeta de T02 (ADR‑134). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
+**Last updated:** 2026-10-14 — las carpetas de T02 (ADR‑134) y T09 (ADR‑135). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
 directorio temporal de la sesión o en la carpeta de la sesión, fuera de git.
 
 **Por qué.** Varias afirmaciones de los ADR («37 de 90 sondeos compilan», «revisión adversarial aplicada», la crítica
@@ -36,6 +36,7 @@ cierto. Lo vigente está en `DECISIONS.md`, `NEXT-STEPS.md` y `doc/AUDITORIA-SUE
 | `2026-10-05-d7-revision/` | D7: la corrección de la prosa de FOL y RPP y su revisión adversarial (`resultado.json`, `workflow.json`, `revisiones.txt` con las dos revisiones, `hechos.txt` con lo que era cierto tras D7) | `wf_4c5aee66-ebf` (2026‑10‑05) | ADR‑129 («revisión adversarial aplicada»); T17 |
 | `2026-10-12-auditoria-suelo/` | esta auditoría: `candidatos.json` (los 163 candidatos de los seis barridos, con el veredicto de su verificador), `workflow-barridos.json` y `workflow-cierre.json` | `wf_1f61bc0d-738` (2026‑10‑05) y `wf_7a6e4ce2-b37` (2026‑10‑12) | `doc/AUDITORIA-SUELO-2026-10-12.md`, ADR‑132 |
 | `2026-10-12-t02-teoria/` | T02: los hechos y los censos de cómo describían la teoría los documentos (`workflow-hechos.json`, script y resultados), el workflow de revisión que murió por el límite de sesión (`workflow-revision-fallida.json`), los cinco informes del 2026‑10‑14 (`revision-*.md`, `verificacion-censo-*.md`), la salida del sondeo de la inducción y la medición de leanchecker; y en `comentarios/` el lote de comentarios de los `.lean`: los encargos (`INSTRUCCIONES.md`, `grupo-*.md`), los siete informes de corrección y las tres revisiones adversariales. El build y los controles del día (`build-…`, `control-…`) son de antes de aplicar esas tres revisiones, que sólo tocaron comentarios | `wf_54bdca87-06c` (2026‑10‑12), `wf_22f6795d-314` (2026‑10‑13) y agentes sueltos (2026‑10‑14) | ADR‑134 |
+| `2026-10-14-t09-teoremas/` | T09: la salida del sondeo `sondeos/InduccionTitulares.lean` con `#modelo` (`sondeo-induccion-modelo-2026-10-14.txt`: las clases de los 18 titulares) y la prueba del control `[T]`, verde sobre el documento y rojo con el fallo puesto (`control-T-2026-10-14.txt`) | el sondeo y `check-doc-sync.bash` (2026‑10‑14) | ADR‑135 |
 
 Fuera de esta carpeta, rescatado en el mismo commit:
 

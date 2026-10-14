@@ -11,7 +11,7 @@
 #   2. Se citan como vigentes símbolos que YA NO EXISTEN en el código
 #      (`goedel_first_real'`, `prf_tc_cons'`, …).
 #
-# ✏️ 2026-10-12 (ADR-133): hoy rompen [A], [B], [C], [D], [E], [F], [H] y [M]; sólo [A2] es aviso. Lo que
+# ✏️ 2026-10-14 (ADR-135): hoy rompen [A], [B], [C], [D], [E], [F], [H], [M] y [T]; sólo [A2] es aviso. Lo que
 # sigue es la cabecera de entonces:
 # [A], [C] y [D] son OBJETIVOS y rompen el check. [B] es un AVISO que pide juicio:
 # hay menciones legítimas de símbolos inexistentes (históricas, planificadas, descartadas).
@@ -184,6 +184,8 @@ echo
 # Quedan fuera, y con razón, los de diario, diseño e historia (CHANGELOG, GODEL-*-DESIGN,
 # PLAN-*, THOUGHTS, MINIMAL-AXIOMS…): sus cifras y símbolos son históricos POR DISEÑO.
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
+# (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)
+AUTHORITATIVE="$AUTHORITATIVE TEOREMAS-E-HIPOTESIS.md"
 AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
 DOCS="$AUTHORITATIVE"
 FAIL=0
@@ -520,6 +522,8 @@ B_FAIL=0
 B_TOPE=41
 B_TOPE_ADR=""   # sólo si un ADR SUBE el tope: «ADR-123:42» (el ADR, que tiene que existir, y el tope NUEVO)
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
+# (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)
+AUTHORITATIVE="$AUTHORITATIVE TEOREMAS-E-HIPOTESIS.md"
 AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
 # Marcadores que hacen LEGÍTIMA la mención de un símbolo inexistente:
 #   (a) se declara retirado;  (b) es hipotético/propuesto/descartado;  (c) va en una
@@ -974,6 +978,103 @@ fi
 [ -n "${M_DOC:-}" ] && M_FAIL=1
 rm -f "$DECLS" "$DECLS_SOND"
 [ "$M_FAIL" = "0" ] || FAIL=1
+
+# ─── [T] TITULARES: cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md ───────────────
+echo '════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md, y cada fila es un titular (ROJO) ════'
+# ⛔ POR QUÉ EXISTE (2026-10-14, ADR-135; T09 de doc/AUDITORIA-SUELO-2026-10-12.md): la regla de ese documento
+# —«una fila AUSENTE es un fallo»— se cumplía a mano, y el documento llegó a decir que `⊬¬G` no existía con la
+# fila de `goedel_I_neg` diez líneas más arriba. El universo de titulares se DECLARA aquí, en T_UNIVERSO: la
+# tabla de check-footprints.bash no sirve, porque tiene filas que no son titulares (`consistentH_de`,
+# `V₀_eq_codigo`, `v_ancla`).
+# La FILA de un titular es una fila de tabla de §1 o de §3 con su nombre en negrita y entre comillas invertidas,
+# **`x`**, en la columna del nombre: la PRIMERA en §1 y la SEGUNDA en §3 (la primera es «D1»/«D2»/«D3»). Un nombre
+# en otra columna (la hipótesis, quién la descarga) no cuenta, ni uno tachado (~~…~~). Mira: (1) cada nombre del
+# universo está DECLARADO en el build de RPP; (2) tiene su fila; (3) ninguno tiene dos; (4) cada nombre con fila está
+# en el universo.
+# ⚠️ Lo que NO mira: que la columna «¿qué usa la prueba?» sea la medida (eso lo mide `#modelo` de
+# `sondeos/InduccionTitulares.lean`, y lo mecanizará T08 en el build), ni que un teorema NUEVO deba ser titular:
+# eso lo decide quien lo añade, y en el mismo commit lo pone aquí y le da su fila. Una fila partida en dos líneas
+# sale como «no tiene fila», sin diagnóstico propio.
+# ⭐ Con AUTOTEST de salida EXACTA (no por cuenta: un extractor que no extrae nada daba también la cuenta esperada,
+#    revisión adversarial de ADR-135): un documento sintético con un nombre en la columna de la hipótesis, uno
+#    tachado, uno tras el fin de §1, una fila de §3, una intrusa y una repetida, y un universo con un nombre sin
+#    declarar, deben dar exactamente los cinco fallos esperados; si no, el control no mide y lo dice.
+# 🔧 Para probarlo contra otra versión del documento: T_DOC=fichero bash check-doc-sync.bash. Es un MODO DE
+#    PRUEBA: dice qué fichero miró y nunca da verde.
+T_FAIL=0
+T_UNIVERSO="goedel_first_prf goedel_second_prf prf_con_imp_godel prf_godelCN_fixedpoint prf_tarski
+  goedel_I goedel_II tarski goedel_I_neg godelCN_indecidible modelo_prov_iff godelCN_verdadera con_verdadera
+  tarski_semantico consistencia repr_pos'_prf d2_prf d3_prf_real"
+t_filas() {   # stdin: el documento → un nombre por cada aparición en la columna del nombre de §1 (1.ª) o §3 (2.ª)
+  LC_ALL=C awk '
+    /^## 1 · / { s = 1; next }
+    /^## 3 · / { s = 3; next }
+    /^## /     { s = 0 }
+    s && /^\|/ {
+      n = split($0, c, "|")
+      k = (s == 1) ? 2 : 3
+      if (k > n) next
+      v = c[k]
+      gsub(/~~[^~]*~~/, "", v)
+      while (match(v, /\*\*`[^`]+`\*\*/)) { print substr(v, RSTART + 3, RLENGTH - 6); v = substr(v, RSTART + RLENGTH) }
+    }'
+}
+t_revisa() {   # $1 = universo, $2 = documento, $3 = lista de declaraciones → «nombre|motivo» por cada fallo
+  local todas filas u
+  todas=$(t_filas < "$2")
+  filas=$(printf '%s\n' "$todas" | LC_ALL=C sort -u)
+  for u in $1; do
+    LC_ALL=C grep -qxF -- "$u" "$3" || echo "$u|no está declarado en el build de RPP"
+    printf '%s\n' "$filas" | LC_ALL=C grep -qxF -- "$u" || echo "$u|no tiene fila en las tablas de §1 o §3"
+  done
+  printf '%s\n' "$todas" | LC_ALL=C sort | LC_ALL=C uniq -d | while IFS= read -r u; do
+    [ -n "$u" ] && echo "$u|tiene más de una fila"
+  done
+  printf '%s\n' "$filas" | while IFS= read -r u; do
+    [ -n "$u" ] || continue
+    case " $(printf '%s' "$1" | tr '\n' ' ') " in *" $u "*) : ;; *) echo "$u|tiene fila y no está en T_UNIVERSO" ;; esac
+  done
+}
+T_FICH="${T_DOC:-TEOREMAS-E-HIPOTESIS.md}"
+if [ -n "${T_DOC:-}" ]; then echo "  ⚠️ MODO DE PRUEBA: el documento se lee de $T_FICH (en este modo [T] nunca da verde)"; fi
+T_DECLS=$(mktemp); T_AUTODOC=$(mktemp)
+trap 'rm -f "$DECLS" "$DECLS_SOND" "$T_DECLS" "$T_AUTODOC"' EXIT
+find ROBINSON_PlusPlus/ ROBINSON_PlusPlus.lean -name '*.lean' ! -path '*/.lake/*' -print0 2>/dev/null \
+  | xargs -0 env LC_ALL=C awk -f strip-lean.awk | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" \
+  | LC_ALL=C sort -u > "$T_DECLS"
+printf '%s\n' '## 1 · prueba' '' '| teorema | hipótesis | quién |' '|---|---|---|' \
+  '| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | **`tarski`**, en la hipótesis, no cuenta | **`tarski`**, tampoco |' \
+  '| ~~**`tachado_t0`**~~ | — | — |' '| **`intruso_t0`** | — | — |' '| **`d2_prf`** | — | — |' '' \
+  '## 2 · fuera' '| **`fuera_t0`** | — | — |' '' '## 3 · D' '| | teorema | hipótesis |' '|---|---|---|' \
+  '| **D2** | **`d2_prf`** (`Meta/DerivCondPrf.lean`) | ninguna |' '' '## 4 · fin' > "$T_AUTODOC"
+T_AUTO=$(t_revisa "goedel_first_prf no_existe_jamas_t0 tarski d2_prf" "$T_AUTODOC" "$T_DECLS" | LC_ALL=C sort | tr '\n' ';')
+T_ESPERADO="d2_prf|tiene más de una fila;intruso_t0|tiene fila y no está en T_UNIVERSO;no_existe_jamas_t0|no está declarado en el build de RPP;no_existe_jamas_t0|no tiene fila en las tablas de §1 o §3;tarski|no tiene fila en las tablas de §1 o §3;"
+t_cuenta() { echo $#; }
+T_NU=$(t_cuenta $T_UNIVERSO)
+if [ "$(wc -l < "$T_DECLS" | tr -d ' ')" -lt 1000 ] || ! LC_ALL=C grep -qxF goedel_first_prf "$T_DECLS"; then
+  echo "  ❌ NO PUDE MEDIR [T]: las declaraciones del build salen vacías o sin \`goedel_first_prf\` (¿strip-lean.awk?)."
+  T_FAIL=1
+elif [ "$T_AUTO" != "$T_ESPERADO" ]; then
+  echo "  ❌ NO PUDE MEDIR [T]: el autotest no da los cinco fallos esperados; da: $T_AUTO"
+  T_FAIL=1
+elif [ "$T_NU" -lt 10 ]; then
+  echo "  ❌ NO PUDE MEDIR [T]: T_UNIVERSO tiene sólo $T_NU nombres (¿se vació?)."
+  T_FAIL=1
+elif [ ! -f "$T_FICH" ]; then
+  echo "  ❌ NO PUDE MEDIR [T]: no existe $T_FICH."
+  T_FAIL=1
+else
+  T_ROJO=$(t_revisa "$T_UNIVERSO" "$T_FICH" "$T_DECLS")
+  if [ -n "$T_ROJO" ]; then
+    printf '%s\n' "$T_ROJO" | while IFS='|' read -r n m; do echo "  ✗ \`$n\` — $m"; done
+    T_FAIL=1
+  else
+    echo "  ✓ los $T_NU titulares de T_UNIVERSO están declarados y tienen UNA fila en $T_FICH, y ninguna fila sobra"
+  fi
+fi
+rm -f "$T_DECLS" "$T_AUTODOC"
+[ -n "${T_DOC:-}" ] && T_FAIL=1
+[ "$T_FAIL" = "0" ] || FAIL=1
 
 # ─── RESUMEN ────────────────────────────────────────────────────────────────
 echo

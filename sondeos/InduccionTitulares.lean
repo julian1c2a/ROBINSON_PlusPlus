@@ -58,6 +58,18 @@ resultado y dos titulares más, `tarski` y `tarski_semantico`; el detalle, en lo
 * `prf_sound` y `consistencia`: frontera vacía para las cuatro reglas (analizan `Prf`, no construyen).
 ⚠️ «Alcanza» quiere decir que el término de prueba la nombra por valores, no que el paso sea imprescindible: otra
 prueba del mismo enunciado podría evitarlo.
+
+**`#modelo t` (2026‑10‑14, T09, ADR‑135):** la clase de un titular según lo que su prueba usa del MODELO
+(`TEOREMAS-E-HIPOTESIS.md` §1). Una constante es «de la semántica» si vive en `FOL.Metamath.Semantics` (`evalFormula`,
+`contextSatisfies`…) o en la solidez de `Prf` (`ROBINSON_PlusPlus.Meta.SolidezPrf`), el criterio de T08. Clase (i): el
+cierre no nombra ninguna; (ii): las nombra, pero no queda ninguna si no se entra en `consistencia` (sólo sirven para
+descargar `ConsistentH`); (iii): las nombra también por otro camino. **Resultado (2026‑10‑14):** (i) D1, D2, D3,
+`prf_godelCN_fixedpoint`, `prf_con_imp_godel`, `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`; (ii) `goedel_I`,
+`goedel_II` y `tarski`; (iii) `goedel_I_neg`, `godelCN_indecidible`, `godelCN_verdadera`, `con_verdadera`,
+`modelo_prov_iff` y `tarski_semantico`. A `consistencia` la clase no se le aplica: es el nodo por el que se corta (con
+ella de raíz no se cortaría nada). ⚠️ Es un criterio por ESPACIO DE NOMBRES: una prueba que usara la verdad en ℕ
+sin pasar por esos dos no la vería. La aritmética de la metateoría sobre ℕ (`ModeloCodigo`: `lineWFT`, `chainOkN`) no
+cuenta como semántica.
 -/
 
 open Lean Meta Elab Command
@@ -181,6 +193,46 @@ elab "#usuarios " t:ident x:ident : command => do
   {String.intercalate "
   " (orden.toList.map toString)}"
 
+/-- ¿Es una constante de la SEMÁNTICA, la verdad en un modelo? El criterio de T08: `FOL.Metamath.Semantics`
+    (`evalFormula`, `evalTerm`, `contextSatisfies`…) o la solidez de `Prf` (`ROBINSON_PlusPlus.Meta.SolidezPrf`). -/
+def esSemantica (n : Name) : Bool :=
+  let m := nombreUsuario n
+  (`FOL.Metamath.Semantics).isPrefixOf m || (`ROBINSON_PlusPlus.Meta.SolidezPrf).isPrefixOf m
+
+/-- El cierre de `raiz` sin entrar en `corte`: si se llega a él, no se recorren sus dependencias. -/
+partial def cierreSin (env : Environment) (raiz corte : Name) : NameSet := Id.run do
+  let mut vis : NameSet := {}
+  let mut pila := #[raiz]
+  while h : pila.size > 0 do
+    let n := pila[pila.size - 1]
+    pila := pila.pop
+    if vis.contains n then continue
+    vis := vis.insert n
+    if n == corte && n != raiz then continue
+    for d in directas env n do
+      if !vis.contains d then pila := pila.push d
+  return vis
+
+/-- La CLASE de un titular según lo que su prueba usa del modelo (T09): (i) nada de la semántica; (ii) la
+    semántica sólo a través de `consistencia`, es decir, sólo para descargar `ConsistentH`; (iii) la semántica
+    también por otro camino: la verdad en el modelo, más allá de la consistencia. -/
+elab "#modelo " id:ident : command => do
+  let env ← getEnv
+  let raiz := id.getId
+  unless env.contains raiz do throwError "no existe {raiz}"
+  let c := ``ROBINSON_PlusPlus.Meta.Consistencia.consistencia
+  let cie := cierre env raiz
+  let todo := cie.toList.filter esSemantica
+  let sinC := (cierreSin env raiz c).toList.filter esSemantica
+  -- `consistencia` es el nodo por el que se corta: con ella de raíz no se corta nada y saldría (iii) por
+  -- construcción (revisión adversarial de ADR‑135); la clase no se le aplica.
+  let clase := if raiz == c then "(—) es `consistencia`, el nodo de corte: la clase no se aplica"
+    else if todo.isEmpty then "(i) sin el modelo"
+    else if sinC.isEmpty then "(ii) el modelo, sólo por `consistencia`"
+    else "(iii) la verdad en el modelo, más allá de la consistencia"
+  let muestra := ((sinC.map nombreUsuario).take 3).map toString
+  logInfo m!"{raiz}: {clase} · semántica en el cierre: {todo.length} · sin pasar por `consistencia`: {sinC.length} {muestra} · `consistencia` en el cierre: {cie.contains c}"
+
 end InduccionTitulares
 
 #induccion ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
@@ -222,3 +274,24 @@ end InduccionTitulares
 #usuarios ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
 #camino ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
 #camino ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+
+/-! ### ¿Qué usa del MODELO cada titular? (T09: las tres clases) -/
+
+#modelo ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+#modelo ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf
+#modelo ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real
+#modelo ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint
+#modelo ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel
+#modelo ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
+#modelo ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
+#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
+#modelo ROBINSON_PlusPlus.Meta.Consistencia.consistencia
+#modelo ROBINSON_PlusPlus.Meta.Consistencia.goedel_I
+#modelo ROBINSON_PlusPlus.Meta.Consistencia.goedel_II
+#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
+#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible
+#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera
+#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera
+#modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
+#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico

@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-14 — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-14 — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -263,6 +263,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T09 · TEOREMAS-E-HIPOTESIS: corregir el registro V8 y añadir «¿qué usa la prueba?» en tres clases
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* confirmado (verificador de vacuidad, P1), con la columna corregida
+
+*Estado el 2026‑10‑14:* ✅ **Hecho en ADR‑135**: el banner, §1 con la columna «¿qué usa la prueba?» en las tres clases (MEDIDA con `#modelo`, `sondeos/InduccionTitulares.lean`: las de la lista, más `prf_godelCN_fixedpoint` y `prf_tarski`, en la (i); a `consistencia`, el nodo de corte, no se le aplica) y la fila de Rosser, §2 (`⊬¬G` existe: `goedel_I_neg`), §3 (D1–D3 sin `[AnclaEq]`), §4 y §5; el documento entra en AUTHORITATIVE, y su regla («una fila ausente es un fallo») la comprueba el control nuevo `[T]` de `check-doc-sync.bash`, con un universo declarado de 18 titulares. La columna sigue sin control en el build: es T08.
 
 * **Qué:** MEDIDO: el documento se contradice en tres sitios. §2 (l.72) dice «⊬¬G NO EXISTE sobre Prf», y la fila de goedel_I_neg está en l.55. l.61 dice que D1 y D3 llevan [AnclaEq], retirada en ADR-118; en f8aaa99 esas filas seguían a goedel_second_prf, y ADR-121 insertó seis filas encima, así que hoy cuelgan de tarski_semantico. l.119-120 dice «lo único supuesto es ConsistentH», y l.107 lo da por TEOREMA. No está en AUTHORITATIVE, [E] lo da por saldado, y PLAN-PRUEBAS.md:54 lo declara «la única defensa contra F-1», llevada a mano; su regla ya ha fallado dos veces. Todos los errores rebajan lo demostrado, ninguno sobrevende: no es P0.
 * **Evidencia:** TEOREMAS-E-HIPOTESIS.md:7, :55, :61, :72, :107, :119-120 (MEDIDO, sed); check-doc-sync.bash:184-185; PLAN-PRUEBAS.md:54

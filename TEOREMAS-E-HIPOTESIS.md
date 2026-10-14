@@ -1,29 +1,23 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑05 · `master` · **129 jobs · 112 módulos · 0 sorry · 0 `axiom` de Lean**
+> ## ESTADO REAL — 2026‑10‑14 · `master` · **129 jobs · 112 módulos · 0 sorry · 0 `axiom` de Lean**
 >
-> 🏁🏁 **Desde ADR‑120, SIN HIPÓTESIS**: `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`) son Gödel I y II con `ConsistentH` DESCARGADA en el build por `consistencia` —un
-> modelo de los 142 y la solidez de `Prf`—. Lo de abajo es el estado de ADR‑117, como registro.
+> 🏁🏁 **Gödel I entero, Gödel II y Tarski, SIN HIPÓTESIS** (ADR‑120, ADR‑121): `goedel_I : ¬ Prf godelCN`,
+> `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'` y `tarski`. Van sobre `Prf`, cuya teoría,
+> `T_Prf`, contiene a PA, por lectura ([AXIOMS.md](AXIOMS.md) §0). `ConsistentH` es un TEOREMA, `consistencia` (un modelo de los 142
+> y la solidez de `Prf`), y lo único que se supone es el núcleo de Lean y sus tres axiomas. ⬜ Rosser no existe: su
+> enunciado está por decidir (T01).
 >
-> 🏁 **En una línea**: Gödel I (`⊬G`) y Gödel II están **derivados** sobre `Prf`, su footprint son sólo los
-> tres de Lean, y su ÚNICA hipótesis es `ConsistentH` ([ADR‑117](DECISIONS.md): el ancla es el teorema
-> `prf_ancla`). ⚠️ Ya no son vacuos por F1, pero son **CONDICIONALES**: `ConsistentH` sólo vale si los 142
-> axiomas son consistentes, y no hay modelo. La mitad `⊬¬G` **no existe** sobre `Prf`. *(Hasta ADR‑117
-> llevaban además la clase `[AnclaEq]`, que daba `Prf ⊥` —F1, [ADR‑114](DECISIONS.md)—: eran VACUOS.)*
+> La columna «¿qué usa la prueba?» de §1 está MEDIDA (`sondeos/InduccionTitulares.lean`, `#modelo`, 2026‑10‑14).
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119: `ConsistentH` DEMOSTRADA en el sondeo `sondeos/ModeloNat.lean` (un modelo de los 142); en el build sigue siendo la hipótesis de Gödel I/II hasta la promoción. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; D1 y D3 ya no llevan ninguna hipótesis de clase. Antes, 2026-10-04 — ADR‑117: el ancla es un TEOREMA (`prf_ancla`) y Gödel I/II ya no llevan
-`[AnclaEq]`: su única hipótesis es `ConsistentH` (banner, §1, §4–§6); D1 y D3 sí la llevan, rellenada por la
-instancia (§3). Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)) y con ella
-toda la mitad `⊬¬G` que vivía allí; F1 está compilado (`[AnclaEq]` ⇒ `Prf ⊥`), y **D1 y D3 también
-llevan `[AnclaEq]`** — este documento decía «ninguna» desde ADR‑026 (2026‑09‑12), y era falso.
+**Last updated:** 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
 
 ---
 
 ## 0 · Por qué existe este documento
 
-La auditoría del 2026‑09‑11 encontró **F‑1**: `goedel_second'` llevaba meses anunciado como el
+La auditoría del 2026‑09‑11 encontró **F‑1**: `goedel_second'` (retirado, ADR‑024) llevaba meses anunciado como el
 Segundo Teorema, y su hipótesis `hgi` **no la podía dar ninguna pieza del árbol**. No lo vio ningún
 control, y **no podía verlo**: documentación y código **decían lo mismo**. No había desincronía —
 había un hueco.
@@ -38,87 +32,116 @@ había un hueco.
 descarga es información; dos hipótesis **incompatibles** hacen el teorema **vacuo**, con footprint
 limpio y todos los controles en verde. `#print axioms` no ve las hipótesis de clase.
 
+⭐⭐ **Y la tercera** (2026‑10‑14, T09): *¿qué usa la prueba?* Desde que `ConsistentH` es un teorema, una hipótesis
+`hcon : ConsistentH` se descarga sola, y lo que distingue «basta la consistencia» de «usa la verdad en ℕ» es lo que la
+prueba NOMBRA: la columna de §1.
+
 ⚠️ **Regla de mantenimiento**: este documento se actualiza **en el mismo commit** que añade o cambia
 un teorema cabecera. Una fila con «⬜ nadie» es información, no un fallo; una fila **ausente** sí es
-un fallo.
+un fallo. Desde ADR‑135 está en AUTHORITATIVE (lo miran `[A]`, `[A2]` y `[B]` de `check-doc-sync.bash`; `[E]` ya lo miraba), y `[T]`
+comprueba lo que antes se llevaba a mano: que cada titular de su universo, `T_UNIVERSO`, esté declarado y tenga UNA
+fila en §1 o §3 (el nombre en la columna del nombre), y que ninguna fila sobre. Un titular NUEVO se añade a `T_UNIVERSO` en el mismo commit. La columna «¿qué
+usa la prueba?» la mide `#modelo` (`sondeos/InduccionTitulares.lean`), fuera de la CI; la mecanizará T08 (un control
+de pureza del cierre, en el build).
 
 ---
 
-## 1 · Gödel I (`⊬G`) y Gödel II — sobre el cálculo finitario `Prf`
+## 1 · Los titulares — sobre el cálculo finitario `Prf`
 
-| teorema | hipótesis | ¿quién la descarga? |
-|---|---|---|
-| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁🏁 desde el 2026‑10‑05 (ADR‑120) la descarga **`consistencia`** (`Meta/Consistencia.lean`), **en el build**: un modelo de los 142 (`MN_axioms`) y la solidez de `Prf` (`prf_sound`); el corolario sin hipótesis es `goedel_I` (ADR‑119 la probó antes en el sondeo `sondeos/ModeloNat.lean`). Es la hipótesis **mínima** (`¬ Prf ⊥`) |
-| | ~~`[AnclaEq]`~~ | 🏁 **fuera de la firma desde ADR‑117** (2026‑10‑04): el ancla es el teorema `prf_ancla` (§4). Hasta ese día, ⛔⛔ **NADIE, y NO PODÍA**: `AnclaEq` ⇒ `Prf ⊥` sobre los 141 (`sondeos/AnclaEqInconsistente.lean`, hoy REGISTRO: `anclaEq_prf_bot`, y `hipotesis_goedel_insatisfacibles` — `[AnclaEq]` y `ConsistentH` **no valían a la vez**) |
-| | *(el punto fijo)* | ✅ `prf_godelCN_fixedpoint`, **net‑0 PURO** |
-| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁🏁 ídem, `consistencia`; el corolario sin hipótesis es `goedel_II` (ADR‑120) |
-| **`goedel_I_neg`** (`Meta/SolidezVerificador.lean`) | ninguna | 🏁🏁 ADR‑121: `¬ Prf ¬godelCN`, la mitad `⊬¬G`; por W1 (`verificador_solido`), el modelo y el punto fijo. Con `goedel_I`, `G` es INDECIDIBLE |
-| **`godelCN_verdadera`**, **`con_verdadera`** (`Meta/SolidezVerificador.lean`) | ninguna | 🏁 ADR‑121 (E10): `G` y `Con` son VERDADERAS en `MNV V₀` —y, por `goedel_I`/`goedel_II`, no demostrables— |
-| **`prf_tarski`**, **`tarski`** (`Meta/TarskiPrf.lean`) | ninguna | 🏁 ADR‑121: la teoría refuta `Tr(⌜L⌝) ⇔ L` en el mentiroso `L`; `tarski : ¬ Prf (Tr(⌜L⌝) ⇔ L)`, por `prf_tarski` y `consistencia` |
-| **`godelCN_indecidible`**, **`modelo_prov_iff`** (`Meta/SolidezVerificador.lean`) | ninguna | 🏁 ADR‑121: ni `G` ni `¬G`; y `MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ` |
-| **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | 🏁 ADR‑121: ninguna fórmula define la verdad en `MNV V₀` (solidez + mentiroso) |
-| | ~~`[AnclaEq]`~~ | 🏁 ídem: fuera de la firma desde ADR‑117 |
-| | *(punto fijo · necesitación · `Con' ⇒ G`)* | ✅ `prf_godelCN_fixedpoint` · `repr_pos'_prf` (D1) · `prf_con_imp_godel`, sobre `d2_prf` (D2) y `d3_prf_real` (D3) — D1 y D3 llevan todavía la ligadura `[AnclaEq]`, que rellena la instancia `instAnclaEq` (ADR‑117, §3); `prf_con_imp_godel`, ya no |
+**¿Qué usa la prueba?** Tres clases, por lo que el cierre de dependencias de su prueba nombra de la semántica
+(`FOL.Metamath.Semantics` —`evalFormula`, `contextSatisfies`…— o la solidez de `Prf`, `Meta/SolidezPrf.lean`):
+* **(i) sin el modelo**: el cierre no nombra nada de la semántica. Lo que la prueba da, lo da desde las derivaciones de
+  la teoría, la aritmética de la metateoría y, si la hay, la hipótesis `ConsistentH`. ⚠️ El criterio es por espacio de
+  nombres: la aritmética de `ModeloCodigo` sobre ℕ (`lineWFT`, `chainOkN`, la verdad del verificador en `V₀`) NO cuenta
+  como semántica, y una prueba que usara la verdad en ℕ sin pasar por esos dos espacios no se vería.
+* **(ii) el modelo, sólo para descargar `ConsistentH`**: la semántica sólo entra por `consistencia`; quitando ese nodo
+  del grafo, desaparece.
+* **(iii) la verdad en el modelo, más allá de la consistencia**: la semántica entra también por otro camino (la solidez
+  de `T_Prf` en `MNV V₀`, o un enunciado sobre el modelo).
 
-**Footprint** (medido, `check-footprints.bash`): `goedel_first_prf`, `goedel_second_prf`,
-`prf_godelCN_fixedpoint`, `d3_prf_real` y `prf_ancla` → `[propext, Classical.choice, Quot.sound]`;
-`f1_traduccion_refutada` → `[propext, Quot.sound]` (✏️ desde D7, 2026‑10‑05: su `choice` lo traía `String`). ⇒ **ningún
-axioma del proyecto**, y hasta ADR‑117, aun así, **vacuos**: lo que fallaba era la
-hipótesis de clase, que el footprint no ve. 🔑 *Un footprint limpio no dice que el teorema diga algo* — y
-tampoco dice que `ConsistentH` se cumpla (✏️ desde ADR‑120 lo dice otro teorema: `consistencia`, un modelo de los 142).
+Medido el 2026‑10‑14 con `#modelo` (`sondeos/InduccionTitulares.lean`; el sondeo entero, 19 s; la salida, en
+`doc/registro/2026-10-14-t09-teoremas/`): los 17 teoremas clasificados de §1 y §3 dan lo que dice su columna; el
+dieciocho, `consistencia`, es el nodo por el que se corta, y la clase no se le aplica.
+
+| teorema | hipótesis | ¿quién la descarga? | ¿qué usa la prueba? |
+|---|---|---|---|
+| **`goedel_first_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 **`consistencia`** (`Meta/Consistencia.lean`), en el build: un modelo de los 142 (`MN_axioms`) y la solidez de `Prf` (`prf_sound`); el corolario sin hipótesis es `goedel_I`. Es la hipótesis **mínima** (`¬ Prf ⊥`) | **(i)** |
+| **`goedel_second_prf`** (`Meta/GodelTwoPrf.lean`) | `hcon : ConsistentH` | 🏁 ídem; el corolario sin hipótesis es `goedel_II` | **(i)** |
+| **`prf_con_imp_godel`** (`Meta/GodelTwoPrf.lean`) | `fp_bwd : Prf (¬Prov⌜G⌝ ⇒ G)` y `nec1 : Prf (Prov⌜G ⇒ ¬Prov⌜G⌝⌝)` | ✅ `goedel_second_prf` las da con el punto fijo (`prf_godelCN_fixedpoint`) y D1 (`repr_pos'_prf`); usa D2 (`d2_prf`) y D3 (`d3_prf_real`) | **(i)** |
+| **`prf_godelCN_fixedpoint`** (`Meta/GodelTwoPrf.lean`) | ninguna | — (net‑0 PURO) | **(i)** |
+| **`prf_tarski`** (`Meta/TarskiPrf.lean`) | ninguna | — (la teoría refuta `Tr(⌜L⌝) ⇔ L` en el mentiroso `L`) | **(i)** |
+| **`goedel_I`**, **`goedel_II`** (`Meta/Consistencia.lean`) | ninguna | — (`goedel_first_prf` y `goedel_second_prf`, aplicados a `consistencia`) | **(ii)** |
+| **`tarski`** (`Meta/TarskiPrf.lean`) | ninguna | — (`prf_tarski` y `consistencia`: `¬ Prf (Tr(⌜L⌝) ⇔ L)`) | **(ii)** |
+| **`goedel_I_neg`** (`Meta/SolidezVerificador.lean`) | ninguna | — (ADR‑121: `¬ Prf ¬godelCN`, la mitad `⊬¬G`; con `goedel_I`, `G` es INDECIDIBLE) | **(iii)**: `prf_sound` en `MNV V₀` y W1 (`verificador_solido`) |
+| **`godelCN_indecidible`**, **`modelo_prov_iff`** (`Meta/SolidezVerificador.lean`) | ninguna | — (ni `G` ni `¬G`; y `MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ`) | **(iii)** |
+| **`godelCN_verdadera`**, **`con_verdadera`** (E10, `Meta/SolidezVerificador.lean`) | ninguna | — (`G` y `Con` son VERDADERAS en `MNV V₀`) | **(iii)** |
+| **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | — (ninguna fórmula define la verdad en `MNV V₀`) | **(iii)** |
+| **`consistencia`** (`Meta/Consistencia.lean`) | ninguna | — (es la que descarga `ConsistentH`) | — es el nodo de corte: la clase no se aplica. Usa el modelo para dar `ConsistentH` (`MN_axioms` y `prf_sound`) |
+| ⬜ **Rosser** | — | **no existe**: con `ConsistentH` teorema, la firma `rosser (hcon : ConsistentH)` no dice nada por sí sola; su contenido sería la clase (i), que comprobaría T08, o un enunciado para las extensiones T+E. Está por decidir (T01) | — |
+
+Las condiciones de derivabilidad, D1–D3, dan **(i)** las tres (§3). Lo que usan de la INDUCCIÓN —otra pregunta, que
+`#print axioms` tampoco ve— está en [AXIOMS.md](AXIOMS.md) §0.3: D1 la aritmética, D2 la de listas, ningún titular un
+paso de DNE salvo `goedel_I_neg`, al decodificar el modelo.
+
+**Footprint** (medido, `check-footprints.bash`): todos los teoremas de esta tabla salvo `prf_con_imp_godel`, y
+`d3_prf_real` → `[propext, Classical.choice, Quot.sound]`. D1, D2 y `prf_con_imp_godel` no tienen fila (T11b; medido a mano el
+2026‑10‑12: D1 y `prf_con_imp_godel`, los tres; D2, `[propext, Quot.sound]`). 🔑 *Un footprint limpio no dice que el
+teorema diga algo*: lo que lo dice es la columna de arriba.
 
 ---
 
-## 2 · Gödel I, la mitad `⊬¬G` — ⛔ NO EXISTE sobre `Prf`
+## 2 · Gödel I, la mitad `⊬¬G` — 🏁 `goedel_I_neg` (ADR‑121)
 
-Hasta el 2026‑10‑02 vivía entera sobre `⊢`: `goedel_first_undecidable_numeral`,
-`goedel_first_undecidable_omega`, `reflects_of_omega` y `NegVerifier`, con `ConsistentOmega` y
-`OmegaConsistent` como hipótesis. ⚠️ `NegVerifier` (ADR‑097) **no estaba demostrado**: la prueba de
-`negVerifier_proved` llevaba en su footprint meta‑reglas refutadas, así que era teorema de un entorno
-inconsistente. Sobre `Prf` hay que hacerla de nuevo (la de `1dac85a` sirve de guía de casos, no de prueba). **Se retiró con la capa `⊢`** (ADR‑115), y no se
-pierde nada que significara algo: las meta‑reglas de `⊢` son refutables (L1‑3). Y la definición de
-`OmegaConsistent` tiene un defecto propio (L1‑4: testigos sólo `StdChain`, `A := #0 = 1`), aunque **sobre `⊢`**
-la refutación compilada pasaba por axiomas refutados y no prueba nada.
+`goedel_I_neg : ¬ Prf (neg godelCN)` (`Meta/SolidezVerificador.lean`), sin hipótesis. La prueba es SEMÁNTICA, clase
+**(iii)**: si `Prf ¬G`, por la solidez `¬G` es verdadera en `MNV V₀` y, como el punto fijo también vale en el modelo,
+éste cree en una prueba de `G`; W1
+(`verificador_solido`: lo que el verificador acepta en el modelo es derivable) da `Prf G`, contra `goedel_I`. No usa
+ω‑consistencia ni Rosser: usa la verdad de `T_Prf` en ℕ, que es más que su consistencia. Para `G`, `⊬¬G` pide más
+que la consistencia simple (T+¬Con es consistente y demuestra `¬G`): ω‑consistencia, o la verdad en ℕ, como aquí.
+Rosser da las dos mitades desde la consistencia simple, cambiando de sentencia (⬜, T01).
 
-⛔ **Lo limpio es la misma definición trasladada a `Prf`, que SÍ es refutable**: `not_omegaConsistentPrf`
-(`sondeos/OmegaConsistentRefutable.lean`, compilado, sin nada de `⊢`). ⇒ La mitad `⊬¬G` sobre `Prf`
-**no puede** enunciarse con esa ω‑consistencia. Las dos salidas: **`OmegaConsistentProv`** (sólo el `∃`
-que se usa, `provBody`) o **Rosser** (las dos mitades desde consistencia simple, cambiando de sentencia).
+> 🗄️ **Registro (hasta ADR‑121, 2026‑10‑05).** Esta sección se titulaba «⛔ NO EXISTE sobre `Prf`». Hasta el 2026‑10‑02
+> la mitad `⊬¬G` vivía entera sobre `⊢`, y lo que sigue está retirado con esa capa (ADR‑115):
+> `goedel_first_undecidable_numeral` y `goedel_first_undecidable_omega` (retirados), `reflects_of_omega` y
+> `NegVerifier`, con `ConsistentOmega` y `OmegaConsistent` como hipótesis, también retirados. `NegVerifier` (ADR‑097) **no estaba demostrado**: su footprint llevaba meta‑reglas refutadas. Y la definición
+> de `OmegaConsistent`, trasladada a `Prf`, es refutable (`not_omegaConsistentPrf`, `sondeos/OmegaConsistentRefutable.lean`):
+> por eso las dos salidas eran `OmegaConsistentProv` o Rosser. Salió por una tercera, W1 en el modelo.
 
 ---
 
 ## 3 · Las condiciones de derivabilidad — sobre `Prf`
 
-| | teorema | hipótesis |
-|---|---|---|
-| **D1** | **`repr_pos'_prf`** (`Meta/Representability2Prf.lean`) | ninguna desde ADR‑118 (hasta entonces `[AnclaEq]`, que desde ADR‑117 descargaba el teorema `prf_ancla`) |
-| **D2** | **`d2_prf`** (`Meta/DerivCondPrf.lean`) | ninguna |
-| **D3** | **`d3_prf_real`** (`Meta/PremsBdAllPrf.lean`) | ninguna desde ADR‑118, ídem (D3 fue el `axiom` `d3` sobre `⊢` hasta el 2026‑09‑10g; `d3_prf_real` nació teorema) |
+| | teorema | hipótesis | ¿qué usa la prueba? |
+|---|---|---|---|
+| **D1** | **`repr_pos'_prf`** (`Meta/Representability2Prf.lean`) | ninguna (el antecedente `Prf φ` es el de la regla; hasta ADR‑118, también `[AnclaEq]`) | **(i)**; usa la inducción aritmética, en esta prueba (AXIOMS §0.3) |
+| **D2** | **`d2_prf`** (`Meta/DerivCondPrf.lean`) | ninguna | **(i)**; usa la inducción de listas |
+| **D3** | **`d3_prf_real`** (`Meta/PremsBdAllPrf.lean`) | ninguna (`d3_prf_real` nació teorema; sobre `⊢`, D3 fue el `axiom` `d3` hasta el 2026‑09‑10g; hasta ADR‑118, también `[AnclaEq]`) | **(i)**; usa las dos |
 
-Las versiones sobre `⊢` (`repr_pos'`, `d2`, `d3`) se retiraron con esa capa. La ligadura `[AnclaEq]` de D1 y D3,
+Las versiones sobre `⊢` (`repr_pos'`, `d2`, `d3`) están retiradas con esa capa. La ligadura `[AnclaEq]` de D1 y D3,
 y las demás del árbol (426), se retiraron con la clase el 2026‑10‑05 ([ADR‑118](DECISIONS.md)).
 
 ---
 
-## 4 · ⚠️ Las hipótesis que quedan, y qué son exactamente
+## 4 · Las hipótesis que quedan, y qué son exactamente
 
 | hipótesis | definición | qué es de verdad |
 |---|---|---|
-| **`ConsistentH`** | `¬ Prf ⊥` | la de los dos teoremas, y desde ADR‑117 la ÚNICA: consistencia del cálculo **finitario** sobre los 142 axiomas, la **mínima honesta**. 🏁🏁 **TEOREMA desde ADR‑120** (2026‑10‑05): `consistencia` (`Meta/Consistencia.lean`), por A4 (`prf_sound`, `Meta/SolidezPrf.lean`) y A5 (el modelo `MNV V₀` de los 142, `MN_axioms`) |
-| **`[AnclaEq]`** | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **Ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 142 (`prf_deltaD`: su δ es el código del propio axioma); la clase, con su instancia, se retiró el 2026‑10‑05 (ADR‑118). Control: `f1_traduccion_refutada` —si la traducción de F1 conservara el ancla —si su imagen fuera teorema—, ya habría `Prf ⊥`: el argumento de F1 no da `⊥` sin partir de él; no prueba la consistencia—. Hasta ese día era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) y no tenía instancia; y hasta ADR‑026 (2026‑09‑12) fue el `axiom prf_axiomsCodeT_eq`, que ese ADR movió del footprint a la FIRMA sin quitar el supuesto |
+| **`ConsistentH`** | `¬ Prf ⊥` | la de `goedel_first_prf` y `goedel_second_prf`: la consistencia de `T_Prf` —los 142 CON los esquemas de `Prf`—, la **mínima honesta**. 🏁🏁 **TEOREMA desde ADR‑120** (2026‑10‑05): `consistencia` (`Meta/Consistencia.lean`), por `prf_sound` (`Meta/SolidezPrf.lean`) y el modelo `MNV V₀` de los 142 (`MN_axioms`) |
+| ~~`[AnclaEq]`~~ | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 142; la clase, con su instancia, se retiró el 2026‑10‑05 (ADR‑118). Hasta ADR‑117 era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) |
 
 🗑️ **Retiradas con la capa `⊢`** (ADR‑115): `ConsistentOmega` (`¬ (axioms ⊢ ⊥)`), `OmegaConsistent`,
 `NegVerifier`, `Reflects`.
 
 ---
 
-## 5 · `axiom` de Lean — **0**
+## 5 · Lo que se supone — sólo Lean; y `axiom` de Lean, **0**
 
-Los tres que quedaban vivían sobre `⊢` y se retiraron con esa capa (ADR‑115): `ax_induction_prim`,
-`ax_list_induction` (**falso**: daba `[] ⊢ ⊥`, L1‑2) y `ax_axiomsCodeT_eq`. Registro completo en
-[`AXIOMS.md`](AXIOMS.md). ⇒ **Ningún postulado gödeliano, y ningún `axiom`**: lo único supuesto de la
-cadena es `ConsistentH` (§4; hasta ADR‑117 eran dos, con `[AnclaEq]`). Lo que ancla `axiomsCodeT` es hoy un
-axioma OBJETO de la teoría —el último de los 142, `ax_axiomsCodeT_def`—, no un `axiom` de Lean ni una hipótesis.
+Los tres `axiom` que quedaban vivían sobre `⊢` y están retirados con esa capa (ADR‑115): `ax_induction_prim`,
+`ax_list_induction` (**falso**: daba `[] ⊢ ⊥`, L1‑2) y `ax_axiomsCodeT_eq`, los tres retirados.
+⇒ **Ningún postulado gödeliano, ningún `axiom` en el build y ninguna hipótesis sin descargar**: `ConsistentH` es teorema (§4), y lo que ancla `axiomsCodeT` es
+un axioma OBJETO de la teoría, el último de los 142. Lo único que se supone es el núcleo de Lean y sus tres axiomas
+(`propext`, `Classical.choice`, `Quot.sound`); el detalle, y lo que no fija ningún control (las definiciones: T07), en
+[`AXIOMS.md`](AXIOMS.md) §0.2.
 
 ---
 
@@ -133,5 +156,5 @@ axioma OBJETO de la teoría —el último de los 142, `ax_axiomsCodeT_def`—, n
 
 ---
 
-**Véase también:** `PLAN-PRUEBAS.md` §4 (lo que ningún control garantiza), `doc/AUDITORIA-2026-09-11.md`
-F‑1, `DECISIONS.md` ADR‑022/023/024/026/114/115/117.
+**Véase también:** [`AXIOMS.md`](AXIOMS.md) §0 (la teoría y lo que se supone), `PLAN-PRUEBAS.md` §4 (lo que ningún
+control garantiza), `doc/AUDITORIA-2026-09-11.md` F‑1, `DECISIONS.md` ADR‑022/023/024/026/114/115/117/120/121/135.

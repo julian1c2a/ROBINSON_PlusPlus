@@ -17,6 +17,8 @@ find ROBINSON_PlusPlus/ ROBINSON_PlusPlus.lean cuarentena/ ../FOL/FOL/ ../FOL/Th
 find sondeos/ -name "*.lean" 2>/dev/null | sort | while IFS= read -r f; do LC_ALL=C awk -f strip-lean.awk "$f" | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" | LC_ALL=C awk -v f="$f" "{print \$0 \"|\" f}"; done | LC_ALL=C sort -u > "$DECLS_SOND"
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
+# (2026-10-14, ADR-135: check-doc-sync.bash añadió TEOREMAS-E-HIPOTESIS.md a su AUTHORITATIVE; esta réplica es la
+#  de la medición de T04, del 2026-10-12, y se deja como estaba: al repetir la medición, añadirlo aquí también.)
 # Marcadores que hacen LEGÍTIMA la mención de un símbolo inexistente:
 B_DOCS=""; for d in $AUTHORITATIVE; do [ -f "$d" ] && B_DOCS="$B_DOCS $d"; done
 MA='YA NO EXISTE|NO EXISTEN|retirad|RETIRADO|eliminad|borrad|legacy|F7a|histórico|ANTERIORES|🗑️|muert|Aquí vivía|tampoco existe|inexistente|desapareci|ya no son|se borró'

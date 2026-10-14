@@ -1,0 +1,29 @@
+# El control [T] (check-doc-sync.bash), probado el 2026-10-14 con el bloque tal como queda en el script, tras su
+# revisión adversarial (columna por sección, tachados, repeticiones, autotest de salida exacta).
+# 1) contra el documento de este commit (modo de prueba, que nunca da verde, por eso FAIL=1):
+════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md, y cada fila es un titular (ROJO) ════
+  ⚠️ MODO DE PRUEBA: el documento se lee de TEOREMAS-E-HIPOTESIS.md (en este modo [T] nunca da verde)
+  ✓ los 18 titulares de T_UNIVERSO están declarados y tienen UNA fila en TEOREMAS-E-HIPOTESIS.md, y ninguna fila sobra
+FAIL=1
+
+# 2) con el fallo puesto: sin la fila de tarski_semantico y con una fila intrusa:
+════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md, y cada fila es un titular (ROJO) ════
+  ⚠️ MODO DE PRUEBA: el documento se lee de <tmp>/scratchpad/suelo/TEOREMAS_roto.md (en este modo [T] nunca da verde)
+  ✗ `tarski_semantico` — no tiene fila en las tablas de §1 o §3
+  ✗ `intruso` — tiene fila y no está en T_UNIVERSO
+FAIL=1
+
+# 3) sin la fila de tarski_semantico y con su nombre en la columna de la hipótesis de otra fila (el verde falso de la
+#    primera versión):
+════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTESIS.md, y cada fila es un titular (ROJO) ════
+  ⚠️ MODO DE PRUEBA: el documento se lee de <tmp>/scratchpad/suelo/TEOREMAS_roto2.md (en este modo [T] nunca da verde)
+  ✗ `tarski_semantico` — no tiene fila en las tablas de §1 o §3
+FAIL=1
+
+# 4) cinco mutantes del bloque (sin extractor, sin cierre de sección, columna 3 en §1, sin quitar los tachados, sin
+#    contar repeticiones): el autotest debe decir NO PUDE MEDIR en los cinco:
+mutante 1: NO PUDE MEDIR
+mutante 2: NO PUDE MEDIR
+mutante 3: NO PUDE MEDIR
+mutante 4: NO PUDE MEDIR
+mutante 5: NO PUDE MEDIR
