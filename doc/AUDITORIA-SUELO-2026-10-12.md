@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-14 — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-14 — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -48,6 +48,15 @@
 15. T11: P2 barato. Con una prima final, el regex de [COBERTURA] daría un verde falso; hoy está latente.
 
 ## Decisiones del propietario
+
+**Decididas el 2026‑10‑14** ([ADR‑136](../DECISIONS.md)):
+* **T26 y T28:** `CURRENT-STATUS-PROJECT.md` y `GODEL-STATUS.md` se REESCRIBEN (no se retiran).
+* **T49:** el libro sigue vivo, en espera hasta que el proyecto esté más adelantado; no se toca `doc/book/` ni `PLAN-LIBRO.md`.
+* **T14 (RPP):** se protege `master` exigiendo la CI verde (hecho en ADR‑136: rama `ci/…`, CI allí y avance de `master`, sin excepción para el administrador). Un módulo de RPP se congela sólo cuando sea SEGURO que su fase está cerrada; hoy, ninguno.
+* **T01:** sin decidir; el propietario pidió más información para ver las diferencias: `doc/registro/2026-10-14-t01-rosser/informe.md`.
+* Lo demás de esta lista, abierto.
+
+**Las preguntas, tal como se entregaron el 2026‑10‑12:**
 
 * Rosser (T01). Con T fija y ConsistentH teorema, todo `rosser (hcon : ConsistentH)` es trivial en Lean, por cualquier ruta. Opciones:
   (a) Enunciarlo para extensiones T+E con ¬Prf_{T+E} ⊥. Pide T62 y elegir antes el diseño (CRI-02):
@@ -340,6 +349,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Reglas obligatorias, gobierno y registro · *Verificación:* confirmado, rebajado a P2 (verificador de controles); refutada la afirmación «el gancho no está versionado»
 
+*Estado el 2026‑10‑14:* 🟡 **La parte de RPP, hecha en ADR‑136**: `master` protegido (la comprobación «lake build» obligatoria, `strict`, `enforce_admins`), la CI en las ramas `ci/**` y `guarda_y_sube` con el flujo nuevo; la congelación de módulos de RPP, decidida: sólo con la fase cerrada, y hoy ninguno. La parte de FOL (el gancho, el CR, los renombres, el paso de CI), abierta.
+
 * **Qué:** MEDIDO: el gancho de FOL usa `--name-only` y `read -r` (pre-commit:6-13). Por eso un `git mv` de un congelado no se bloquea, y un CR en la lista impide casar el nombre (repo de prueba del verificador). Hay core.autocrlf=true y la lista no tiene atributo eol; ninguna CI mira frozen ni locked; strip-lean.awk vacía los literales. Corrección: el gancho SÍ está versionado (es el heredoc de `git-lock.bash init`, FOL/git-lock.bash:241 y siguientes); lo que no está versionado es su ACTIVACIÓN, porque no hay core.hooksPath. MEDIDO: hoy hay 0 violaciones. Esto es gobierno: que lo congelado sea correcto lo garantizan el build, los footprints y leanchecker.
 * **Evidencia:** ../FOL/.git/hooks/pre-commit:6-13; ../FOL/git-lock.bash:241; ../FOL/strip-lean.awk:27-29, :176-185; frozen_files.txt de RPP = 0 B; ningún build.yml de los dos repos nombra frozen ni locked (grep = 0)
 * **Cómo cerrar:** Activar el gancho con core.hooksPath. En la copia versionada, quitar el CR y usar --no-renames, con una autoprueba. eol=lf para las listas. Un paso de CI: «ningún commit modifica un fichero congelado en su padre sin sacarlo antes de la lista». Un modo de strip-lean que conserve los literales; volver a certificar con él los thaws de sólo prosa es una precaución, no un hallazgo.
@@ -459,6 +470,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T26 · CURRENT-STATUS-PROJECT.md: reescribir el cuerpo o retirarlo
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación (las líneas :291, :314 y :512 son del verificador de T04)
+
+*Estado el 2026‑10‑14:* 🟡 Decidido el 2026‑10‑14: se REESCRIBE. Pendiente.
 
 * **Qué:** MEDIDO: el cuerpo (desde l.278) da 110 módulos, 6 axiom, MetaRules vivas, Gödel I por goedel_first_numeral (hcon : ConsistentOmega), Block1–8 y «76 jobs». Además (verificador de T04): l.291 da por vigente FOL/MetaRules.lean, que está borrado; l.314 dice «**1** axiom de Lean», «141 axiomas objeto» y «6 meta-reglas»; y l.512 es falsa hoy. El banner lo declara registro, pero está en AUTHORITATIVE y el README lo enlaza como estado.
 * **Evidencia:** CURRENT-STATUS-PROJECT.md:278, :287-294, :314, :512; README.md:75-79
@@ -692,6 +705,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T49 · El libro y su job de CI: medir el desfase y decidir
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑14:* ⏸️ Decidido el 2026‑10‑14: vivo, en ESPERA hasta que el proyecto esté más adelantado.
 
 * **Qué:** MEDIDO: doc/book no cambia desde 428d391, sus controles salen como skipped (build.yml:240-256) y verificar_pdf no bloquea (:305). MEDIDO por emulación: 24 \ident{} no tienen declaración, 38 de los 103 fragmentos apuntan a módulos o declaraciones inexistentes, la base sancionada incluye FOL.MetaRules.*, y PLAN-LIBRO.md:781-786 obliga a decir que no hay consistencia.
 * **Evidencia:** .github/workflows/build.yml:240-256, :305; doc/book/fragmentos.json:20; PLAN-LIBRO.md:786

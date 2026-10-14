@@ -698,6 +698,17 @@ preservando los bloqueos locales.
 6. Volver a bloquear los mismos ficheros por seguridad:
    `bash git-lock.bash lock modulo_1.lean ... modulo_n.lean`
 
+> ✏️ **2026‑10‑14 · en ROBINSON_PlusPlus ([ADR‑136](DECISIONS.md), T14).** `master` está PROTEGIDO en GitHub: sólo
+> admite un commit cuya comprobación «lake build» de la CI ya salió verde, sin excepción para el administrador
+> (`enforce_admins`). El paso 5 va entonces en tres tiempos:
+> 1. `git push origin HEAD:refs/heads/ci/<nombre>` — la CI corre en esa rama (`build.yml`: `ci/**`);
+> 2. esperar el verde: `gh run watch` (o `gh run list --branch ci/<nombre>`);
+> 3. `git push origin HEAD:master` —un avance rápido hasta lo ya comprobado— y borrar la rama:
+>    `git push origin --delete ci/<nombre>`.
+>
+> Si la CI sale roja, se arregla con un commit nuevo, se sube a la misma rama y se repite; `master` no se toca. En FOL,
+> que es otro repositorio, sigue el paso 5 de siempre.
+
 ---
 
 ## Lista de Cumplimiento

@@ -2,7 +2,11 @@ name: Build
 
 on:
   push:
-    branches: [ master, main ]
+    # ⛔ 2026-10-14 (ADR-136, T14): `ci/**`. `master` está PROTEGIDO en GitHub: sólo admite un commit cuya
+    # comprobación «lake build» (el job de abajo) ya salió verde, sin excepción para el administrador. El flujo
+    # (AI-GUIDE, `guarda_y_sube`): push a una rama `ci/…`, esta CI corre allí, y con el verde `master` avanza hasta
+    # ese commit. Antes la CI corría DESPUÉS de llegar a `master`, y la roja de ADR-120 llegó.
+    branches: [ master, main, 'ci/**' ]
   pull_request:
     branches: [ master, main ]
 
@@ -196,7 +200,10 @@ jobs:
     # (otro mawk, coreutils en Rust), y un verde que no dice contra qué entorno se midió no es reproducible
     # (ADR-073). Los controles se validaron también en 26.04 (WSL); el cambio de imagen se hará a propósito.
     runs-on: ubuntu-24.04
-    if: github.event_name == 'push'
+    # ⚠️ 2026-10-14 (ADR-136): no en las ramas `ci/…`. En una rama nueva `github.event.before` es cero, y la regla
+    # «ante la duda, ejecutar» de abajo instalaría TeX y compilaría el libro en cada push; el libro está en espera
+    # (T49) y sus controles siguen corriendo en el push a `master`. Este job no es obligatorio en la protección.
+    if: github.event_name == 'push' && !startsWith(github.ref, 'refs/heads/ci/')
 
     # ⚠️ MISMO patrón de subdirectorio que el job `build`, y por la MISMA razón: los
     # controles del libro NO son autocontenidos. `doc/book/scripts/extraer.py` declara
