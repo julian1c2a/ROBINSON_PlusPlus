@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-14 — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -53,7 +53,7 @@
 * **T26 y T28:** `CURRENT-STATUS-PROJECT.md` y `GODEL-STATUS.md` se REESCRIBEN (no se retiran).
 * **T49:** el libro sigue vivo, en espera hasta que el proyecto esté más adelantado; no se toca `doc/book/` ni `PLAN-LIBRO.md`.
 * **T14 (RPP):** se protege `master` exigiendo la CI verde (hecho en ADR‑136: rama `ci/…`, CI allí y avance de `master`, sin excepción para el administrador). Un módulo de RPP se congela sólo cuando sea SEGURO que su fase está cerrada; hoy, ninguno.
-* **T01:** sin decidir; el propietario pidió más información para ver las diferencias: `doc/registro/2026-10-14-t01-rosser/informe.md`.
+* **T01:** sin decidir por la mañana; el propietario pidió más información para ver las diferencias (`doc/registro/2026-10-14-t01-rosser/informe.md`). Por la tarde, DECIDIDO ([ADR‑137](../DECISIONS.md)): **(a‑ii)**, la teoría como parámetro del verificador, con **T08** como criterio de aceptación; con ella T62 queda en su opción (ii).
 * Lo demás de esta lista, abierto.
 
 **Las preguntas, tal como se entregaron el 2026‑10‑12:**
@@ -149,6 +149,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T01 · Rosser: decidir un enunciado con contenido antes de pagarlo (no «sólo ConsistentH» sobre T fija) y versionar el plan
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* confirmado (verificador de vacuidad, P0), con su corrección. Incorpora la corrección de CRI-02 (del crítico, confirmado, P1), que se aplica dentro de la opción (a)
+
+*Estado el 2026‑10‑14:* 🟢 **DECIDIDO (ADR‑137)**: la opción (a‑ii), la teoría como parámetro del verificador (`lineWF`/`chainOk` con la teoría, `PrfL`), con T08 como criterio de aceptación. Lo siguiente: T08; la medición de alcance y el ADR de diseño de T62 (ii); el sondeo de viabilidad con sus controles.
 
 * **Qué:** MEDIDO: NEXT-STEPS.md:18 y ADR-122 §2 (DECISIONS.md:9492-9499) fijan «Rosser con sólo ConsistentH» por una ruta que «el modelo y W1 ACORTAN». Pero `consistencia : ConsistentH` ya es teorema (Meta/Consistencia.lean:50), y la Etapa 0 hecha pasa por `prf_sound` (sondeos/RosserReflexion.lean:130). INFERIDO (lógica inmediata, verificador): con T fija, TODO `rosser (hcon : ConsistentH)` equivale en Lean a su conclusión sin hipótesis, por la ruta H y también por la P. El contenido «basta la consistencia simple» sólo lo dan la familia T+E o el control de pureza sobre el cierre de la INSTANCIA (T08). Hoy nada del build es vacuo: es una puerta, antes de escribir la hereditaria general, hasWitF y la línea q1.
 * **Evidencia:** DECISIONS.md:9492-9499 (MEDIDO, sed: «Un Rosser semántico … no añadiría nada sobre godelCN_indecidible, y no se hace»); NEXT-STEPS.md:18; ROBINSON_PlusPlus/Meta/Consistencia.lean:50; sondeos/RosserReflexion.lean:130 (5 usos de prf_sound); RosserBasura §1–§4 no usa el modelo (prf_sound sólo en el control, :204-205); grep 'ruta P|W1 paramétrico|rosser_de' en DECISIONS y NEXT-STEPS = 0; el plan de siete etapas y la crítica sólo están en doc/registro/2026-10-05-adr122-d7-rosser/resultado.json y en doc/registro/2026-10-05-adr122-d7-rosser/workflow.json; Etapa 0 = 189 + 217 = 406 líneas de fichero (wc -l), aún sin la línea q1 (DECISIONS.md:9706-9708)
@@ -263,6 +265,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T08 · Control de pureza del cierre de los titulares condicionales (criterio de aceptación de Rosser)
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* confirmado (verificador de vacuidad, P1), con el criterio corregido
+
+*Estado el 2026‑10‑14:* ▶ Es lo siguiente (ADR‑137): criterio de aceptación de Rosser, y útil ya para la clase (i) de ADR‑135.
 
 * **Qué:** MEDIDO: ningún check-*.bash recorre el cierre transitivo. La garantía de que goedel_first_prf, goedel_second_prf y D1–D3 no usan el modelo es sólo estructural: los módulos del modelo los importan Consistencia, ModeloCodificacion, ModeloEstandar, SolidezVerificador, TarskiPrf y el barril, y Consistencia importa GodelTwoPrf, así que D1–D3 no pueden usar `consistencia` sin crear un ciclo. INFERIDO: si un lema de D1–D3 importara la solidez, hcon quedaría de adorno con el mismo footprint. Ahora que ConsistentH es teorema, este control es lo único que da contenido a «con sólo ConsistentH».
 * **Evidencia:** ROBINSON_PlusPlus/Meta/GodelTwoPrf.lean:6-16; ROBINSON_PlusPlus/Meta/Consistencia.lean:8; sondeos/D7Contrafactual.lean:37-60 (usedOf/propagate con allowOpaque); sondeos/ChoiceFrontera.lean:59 (`cierre`)
@@ -873,6 +877,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T62 · Parametrizar Prf por la teoría (toda extensión): primero el diseño, porque el ancla diagonal vuelve autorreferente cada extensión
 
 *Grupo:* Fundamentos y ruta matemática · *Verificación:* sin segunda verificación (P3); la corrección de diseño de CRI-02 está verificada (confirmado, P1 a través de T01)
+
+*Estado el 2026‑10‑14:* 🟢 Elegida la opción (ii), un parámetro de teoría en `lineWF`/`chainOk` (ADR‑137, con T01). Primero, la medición de alcance y el ADR de diseño.
 
 * **Qué:** MEDIDO: la lista de axiomas sólo entra en el verificador por ax_lineWF_thy («In (carc line) axiomsCodeT», Minimal/Axioms.lean:1403-1406). axiomsCodeT es una sola constante (:1064), fijada por el ancla genérica axD L (:1099-1100; hoy axD axiomsBase, :1632), y provFormulaC' llega a ella a través de chainOk (ProofChain.lean:107-108). axD y prf_deltaD ya valen para toda L, y el modelo es paramétrico en V. INFERIDO, sin compilar (CRI-02, verificado), en la familia autoanclada axiomsOf L := L ++ [axD L]: ¬Con' dice «T_E es inconsistente»; T_L no contiene a T; T_G ⊢ ⊥; y base + [Con'] + ancla también es inconsistente. En cambio, «T+¬Con_T» existe sin reanclar (Prf sobre axioms ++ [¬Con'], consistente por goedel_II + prf_deduction), pero sin un Prov propio.
 * **Evidencia:** ROBINSON_PlusPlus/Minimal/Axioms.lean:1064, :1099-1100, :1403-1406, :1632; ROBINSON_PlusPlus/Meta/ProofChain.lean:107-108; ROBINSON_PlusPlus/Meta/Representability2Prf.lean:130, :148; doc/REFERENCE-Incompleteness.md:2171-2174
