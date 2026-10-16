@@ -471,9 +471,11 @@ echo "   (deuda DECLARADA y con trinquete desde 2026-09-22: no puede crecer.)"
 # 2026-10-03 (ADR-116): 44 → 41. Al pasar [B] a nombre exacto, las líneas de 16 símbolos que pasaban
 # por un homónimo más largo se corrigieron una a una, y de paso quedaron marcadas las últimas citas
 # de `goedel_first_real`, `prf_isTsC` y `prf_tc_substfc`: el trinquete las pidió quitar.
+# 2026-10-16 (ADR-142): 41 → 23. Las 18 que salen NO se pagaron leyendo: el texto que las citaba (ADR-001…130 y los
+# bloques viejos de NEXT-STEPS) pasó TAL CUAL a doc/historia/, que por diseño queda fuera del universo de [B], como
+# CHANGELOG. Es deuda «pagada por exclusión», y ADR-142 §3 la lista nombre a nombre con el fichero donde vive.
 read -r -d '' B_DEUDA <<'EOF'
 ax_notInAxC
-ax_tc_liftfc
 ax_tc_substfc
 godelC'_fixedpoint
 goedel_first_real'
@@ -481,36 +483,19 @@ goedel_first_undecidable_real'
 goedel_second'
 pcc_axiom_inst_k
 pcc_binOk_tracked
-pcc_congr_hole_code
 pcc_eval_substfc_wit_REAL
 pcc_eval_substtc'
 pcc_eval_substtsc'
 pcc_In_tracked
-pcc_isFCB_tracked
-pcc_nodeOk_pure
 pcc_substfc_forall_dot
 pcc_thm_inst_k
-pcc_wfAll_tracked
 pcc_wfAll_tracked_lit
 prf_add_eq_zero_right
 prf_crit_In_F_rejects_open
-prf_div2_double_all
-prf_isFC_junk
-prf_isFC_nil
-prf_isFC_varc
-prf_isFCB_bottom
-prf_isFormCodeE_str
-prf_isTermCodeE_str
-prf_liftc_arith_open
-prf_tagConcl_code
-prf_tc_carc
 prf_tc_cons
 prf_tc_cons'
-prf_tc_eqc
-prf_tc_nthc
 prf_tc_nul
 prf_tc_objAt
-prf_tc_of_cons
 prf_wfAll_objList
 repr_neg
 EOF
@@ -519,7 +504,7 @@ B_FAIL=0
 # Ahora el tope es un dato y se compara con la tabla en los DOS sentidos: crece la tabla sin subir
 # el tope ⇒ rojo; se salda una deuda y no se baja ⇒ rojo. 🔑 *El tope sólo BAJA: subirlo es aceptar
 # deuda nueva, y eso pide un ADR, no un commit de documentación.*
-B_TOPE=41
+B_TOPE=23
 B_TOPE_ADR=""   # sólo si un ADR SUBE el tope: «ADR-123:42» (el ADR, que tiene que existir, y el tope NUEVO)
 AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 # (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)

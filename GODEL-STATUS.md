@@ -1,75 +1,7 @@
 # Frente Gödel — Estado y Roadmap
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
->
-> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
-> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
-> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁🏁 Y desde ADR‑121, **Gödel I ENTERO**:
-> `goedel_I_neg : ¬ Prf ¬godelCN` (`Meta/SolidezVerificador.lean`, por la solidez del verificador en el modelo), y
-> **Tarski** (`Meta/TarskiPrf.lean`); y `G` y `Con` son VERDADERAS en el modelo (E10). ⚠️ Lo que NO dice: Rosser (⬜).
->
-> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
-
-> ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md))
->
-> `axiomsCodeT` queda anclado por un axioma objeto DIAGONAL (L2‑3): `axioms` = **142** = los 141 de siempre
-> (`axiomsBase`) y `ax_axiomsCodeT_def`, el último. El ancla de antes, la hipótesis de clase `AnclaEq`, es hoy
-> el teorema `prf_ancla` (la clase se retiró con ADR‑118), y `goedel_first_prf` y `goedel_second_prf` ya no la llevan:
-> su footprint sigue siendo los tres de Lean, y **F1 ya no los hace vacuos**. ⚠️ Siguen siendo **CONDICIONALES**:
-> `ConsistentH` sólo vale si los 142 axiomas son consistentes, y no hay modelo; y `⊬¬G` sigue sin existir en
-> ningún cálculo (irá por Rosser, sobre `Prf`).
->
-> ### 2026‑10‑02 · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md)) · ⛔ **Gödel I/II sobre `Prf`: VACUOS** por `[AnclaEq]` hasta ADR‑117 (F1, [ADR‑114](DECISIONS.md))
->
-> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
-> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
-> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
-> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
-> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
-> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
-> con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arregla** *(hasta ADR‑117, 2026‑10‑04)*: `goedel_first_prf` y `goedel_second_prf` llevan la clase
-> `[AnclaEq]`, y `AnclaEq` **da `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`) ⇒ hoy
-> los dos teoremas son **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) es lo siguiente.
->
-> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
->
-> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
-> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
-> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; lo primero vuelve a serlo desde ADR‑117), y `⊢`
-> ya no está en RPP. Se conserva:
->
-> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
-> (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
-> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
-> Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
->
-> **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 92 en `sondeos/`.**
-> **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` más el ancla, ADR‑117; `axioms_len`).
->
-> ### Reparada la inconsistencia conocida (ADR-012/013)
->
-> * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
->   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
-> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
->   **numeral** `godelCN`.
-> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
->   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
-> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
->
-> ### La ESCALERA (a.2) COMPLETA — 4 de 4
->
-> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
-> Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
-> `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
-> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). ▶ **PASO 3 EJECUTADO**: `D3InDotPrf` de vuelta ⇒ **D3 reducida otra vez a UN SOLO lema**. ▶ **PASOS 4‑5 EJECUTADOS**: `LineWFTrackedPrf` y el **KIT** (`CodeCtorKit`) en producción. **LA CUARENTENA ESTÁ VACÍA.**
->
-> ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
+> **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
+> Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
 **Last updated:** 2026-07-20 — ⚠️ **DOCUMENTO HISTÓRICO/DIAGNÓSTICO.** El estado vivo está en [NEXT-STEPS.md](NEXT-STEPS.md) (bloque «🎯 LO QUE QUEDA»), [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [AXIOMS.md](AXIOMS.md) y [CHANGELOG.md](CHANGELOG.md); si algo de aquí discrepa, **mandan esos**. Resumen al día *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): es el del 2026‑07‑20, y es FALSO, en parte desde ADR‑115 (los «5 `axiom`», `goedel_second'`) y del todo desde ADR‑121 —Gödel I es ENTERO, `goedel_I_neg`, y Gödel I, Gödel II y Tarski van sin hipótesis: lo vigente, en el banner de arriba y en [AXIOMS.md](AXIOMS.md) §0—; y el bloque «LO QUE QUEDA» de NEXT‑STEPS que cita esta línea también es registro: lo vivo es su PUNTO DE REANUDACIÓN)*: **Gödel I da SÓLO `⊬G`** (hoy **`goedel_first_numeral`**, `Meta/DiagonalNumeral.lean`; ⚠️ `goedel_first_real'` **ya no existe** desde la reparación — real y sin postulado gödeliano alguno) — **la mitad `⊬¬G` NO está en la cadena real** (ver la corrección de auditoría 2026-07-13 en §N de abajo); su reducción existe (`reflects_of_omega`: `Reflects ⇐ ω‑consistencia + `NegVerifier`). 🆕 **Estado 2026‑09‑10h**: módulos **A**, **B** y **E** ✅ (`Meta/VerifierSound.lean`: `verifier_sound` **es** `decodeChain_prf`); `NegVerifier` queda reducido a **dos deudas enunciadas** —`DEUDA_chainNeg` y `DEUDA_inNeg`, los módulos **C** y **D**—, con la clase de testigos ya estrechada por [ADR‑022](DECISIONS.md). ⚠️ `PLAN-NEGVERIFIER.md` **se re‑mide, no se lee**: van tres afirmaciones falsas medidas. **D1** (`repr_pos'_prf`) y **D2** (`d2_prf`) reales sobre el cálculo finitario `Prf`. 🏁🏁🏁🏁 **Gödel II** (`goedel_second'`) **SIN NINGÚN postulado gödeliano desde el 2026‑09‑10g**: `d3` pasó de `axiom` a **teorema** (`d3_prf_real`, `Meta/PremsBdAllPrf.lean` §10) ⇒ **la cadena D1/D2/D3 no postula ninguna de las tres**. **5 `axiom` de Lean** — el ancla de codificación es hoy `ax_axiomsCodeT_eq` (⊢) / `prf_axiomsCodeT_eq` (`Prf`); **el `ax_inAxC` que se cita más abajo ya NO es axioma, es teorema**. Build **145 jobs**, **131 módulos**, 0 sorrys, Lean v4.31.0 (2026‑09‑10h). — (previo 2026-06-24) **NIVEL D REAL muy avanzado** (este documento, escrito 2026-06-06, describía el Nivel C con meta-axiomas; el proyecto ha progresado mucho — el contenido §1–§N de abajo es histórico). Estado actual: **Gödel I REAL sin postulados gödelianos** sobre el cálculo de Hilbert **finitario `Prf`** (`goedel_first_real`/`goedel_first_real'`; `#print axioms` = ω-reglas ambiente + `Full.ax_induction` + `ax_inAxC`, **sin** `diagonal_lemma`/`provFormula`/D2/D3). **D1 real** a nivel ⊢ (`repr_pos'`) **y finitario** (`repr_pos'_prf : Prf φ → Prf (provCodeC' φ)`). **D2 real ⊢** (`d2`). **Teorema de deducción finitario** (`Meta/HilbertDeduction.lean`) + **regla de confinamiento ∀ `qconf`** integrada en el verificador. **Fix de solidez FOL**: `subst_lift_cancel_formula` (axioma falso) → teorema. La vía clásica/legacy (Gödel I/II con `Dem`/`provFormula`/D2/D3 postulados) coexiste como andamiaje. **Pendiente para Gödel II 100% real** (`goedel_second_prf : ConsistentH → ¬ Prf Con'`): lema de Barendregt → inducción de listas en `Prf` → `d2_prf`/`d3_prf`. Estado vivo: [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md), [NEXT-STEPS.md](NEXT-STEPS.md), [GODEL-D-ARITHMETIZATION.md](GODEL-D-ARITHMETIZATION.md), [CHANGELOG.md](CHANGELOG.md). — (histórico, 2026-06-06) Niveles B y C implementados con meta-axiomas.
 **Author:** Julián Calderón Almendros

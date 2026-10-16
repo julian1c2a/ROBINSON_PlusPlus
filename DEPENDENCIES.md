@@ -1,71 +1,7 @@
 # Dependency Diagram — ROBINSON_PlusPlus
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
->
-> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
-> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
-> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁 Y desde ADR‑121, Gödel I ENTERO (`goedel_I_neg`),
-> E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ Lo que NO dice: Rosser (⬜).
->
-> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
-
-> ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md)) · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md))
->
-> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
-> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
-> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
-> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
-> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
-> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
-> con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arreglaba** (hasta ADR‑117, 2026‑10‑04): `goedel_first_prf` y `goedel_second_prf` llevaban la
-> clase `[AnclaEq]`, y `AnclaEq` **daba `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`)
-> ⇒ los dos teoremas eran **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) era lo siguiente.
->
-> 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
-> último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
-> la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
-> llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
-> `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
->
-> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
->
-> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
-> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
-> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; la hipótesis mínima volvió con ADR‑117, el
-> 2026‑10‑04, ya sin ningún axioma del proyecto en el footprint), y `⊢` ya no está en RPP. Se conserva:
->
-> Estado autoritativo: **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md)**
-> (⚠️ `PLAN-FRENTE-A.md` ya **no** es autoritativo: su pregunta —«¿vuelve la capa rastreada?»— está **contestada** desde el 2026‑08‑23)
-> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
-> Catálogo de módulos y proyección: **[REFERENCE.md](REFERENCE.md)** §1 →
-> [doc/REFERENCE-Incompleteness.md](doc/REFERENCE-Incompleteness.md) §3.24–§3.32.
->
-> **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/` + 92 en `sondeos/`.**
-> **0 `axiom` de Lean · 142 axiomas objeto** en `axioms` (los 141 de `axiomsBase` y el ancla diagonal, ADR‑117).
->
-> ### Reparada la inconsistencia conocida (ADR-012/013)
->
-> * `ax_tc_cons` **RETIRADO** de `axioms` (hacía la teoría **inconsistente**). El `def` sigue en
->   `Minimal/Axioms.lean:827` pero **fuera de las listas** — es una definición muerta.
-> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre la sentencia 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
->   **numeral** `godelCN`.
-> * **`cuarentena/` VACÍA** (0 módulos): D3 y Gödel II están **repatriados a la cadena activa**.
->   ⚠️ Que estén dentro del build no los hace probados — ver la fila de D3 y `NEXT-STEPS.md`.
-> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
->
-> ### La ESCALERA (a.2) COMPLETA — 4 de 4
->
-> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
-> Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
-> `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
-> **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). ▶ **PASO 3 EJECUTADO**: `D3InDotPrf` de vuelta ⇒ **D3 reducida otra vez a UN SOLO lema**. ▶ **PASOS 4‑5 EJECUTADOS**: `LineWFTrackedPrf` y el **KIT** (`CodeCtorKit`) en producción. **LA CUARENTENA ESTÁ VACÍA.**
->
-> ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
+> **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
+> Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
 **Last updated:** 2026-09-10 — ⚠️ **el grafo NO ha cambiado desde el 2026-09-04**, y se ha **verificado**: los frentes de §3.52–§3.58 no añadieron ni un módulo (121 activos) ni una arista nueva. Las piezas de `hPsiId` entraron en módulos que ya existían (`SubstCodeOpenPrf` §5, `BdAllIntroPrf`), y la referencia de `TrackedAtomsPrf` a `prf_liftc_varc_numeral` (ADR-019) es **cualificada**, no un `import` nuevo: `SubstCodeOpenPrf` ya estaba en su cierre vía `BdAllIntroPrf`. Último cambio real del grafo: 2026-09-04 (+1 módulo, `Meta/EvalLiftcPrf.lean` — el DESCENSO, 20 imports concretos; importa a `LiftcCodePrf` y a `CodeWitnessPrf`, **nunca al revés**: ver ADR-019)
 **Author**: Julián Calderón Almendros

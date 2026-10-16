@@ -1,5 +1,8 @@
 # Changelog
 
+> 🗄️ **CONGELADO** (2026‑10‑16, [ADR‑142](DECISIONS.md), T54): este registro se detiene en ADR‑113. El registro de cambios es
+> [`DECISIONS.md`](DECISIONS.md) (y `git log`); todo lo de abajo es historia, con su fecha.
+
 > ## ⚠️ ESTADO REAL — auditoría 2026-09-09 23:30
 >
 > **La REPARACIÓN de la inconsistencia (2026‑08‑18/19) invalida buena parte de lo que sigue.**

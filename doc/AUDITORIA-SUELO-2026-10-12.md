@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-16 — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-16 — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -574,7 +574,7 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación
 
-*Estado el 2026‑10‑16:* 🟡 Propuesto en ADR‑139, paso 2: la fuente única, el banner de `TEOREMAS-E-HIPOTESIS.md`. ADR‑138 tuvo que corregir el mismo titular en cuatro copias (README, AXIOMS, REFERENCE y DECISIONS).
+*Estado el 2026‑10‑16:* ✅ **Hecho en ADR‑142**: la fuente única es el banner de `TEOREMAS-E-HIPOTESIS.md`; los banners apilados de los siete documentos (720 líneas) pasaron tal cual a `doc/historia/BANNERS.md`, y en su sitio queda un puntero de dos líneas. ADR‑138 había tenido que corregir el mismo titular en cuatro copias.
 
 * **Qué:** MEDIDO: README, REFERENCE, DEPENDENCIES, GODEL-STATUS, AXIOMS, CURRENT-STATUS y DECISIONS comparten de 21 a 55 líneas de banner. ADR-130 y ADR-131 reescribieron a mano la cifra de sondeos en cinco o seis copias. Y los banners empujan los cuerpos fuera de la ventana de [A].
 * **Evidencia:** AI-GUIDE.md:392-393; README.md:36-72; REFERENCE.md:37-77
@@ -604,6 +604,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T36 · La lista vigente de NEXT-STEPS: devolver lo caído y fijar la regla de salida
 
 *Grupo:* Reglas obligatorias, gobierno y registro · *Verificación:* sin segunda verificación (la caída de la ronda 3 y de ADR-115 §5 la confirmó el verificador de T17)
+
+*Estado el 2026‑10‑16:* ✅ **Hecho en ADR‑142**: `NEXT-STEPS.md` queda en una página, con la lista «Pendiente además de Rosser» y su regla de salida; lo caído (T17, ADR‑115 §5, T48) está en ella. Los bloques viejos, tal cual, en `doc/historia/`.
 
 * **Qué:** MEDIDO: R2-5-1, la ronda 3 y la deuda de ADR-115 §5 (DEPENDENCIES.md:79-80) estaban en las listas del 2026-10-02 y de ADR-117 (NEXT-STEPS.md:114, :116, :173, :175). No están en la vigente (:16-46) y ningún ADR las cierra. Tampoco están «promover 4 de Probe/» (:1688), las deudas de lectura ni el horizonte Gentzen. ADR-131 añadió el punto 6 sin recuperar lo caído.
 * **Evidencia:** NEXT-STEPS.md:16-46 (MEDIDO, sed), :114-116, :173-175; DECISIONS.md:8639
@@ -772,6 +774,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T54 · CHANGELOG de los dos repos: decidir su papel
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑16:* ✅ **Decidido y hecho en ADR‑140/142**: CHANGELOG queda como índice congelado en ADR‑113; el registro es `DECISIONS.md`, y README y REFERENCE ya no lo presentan como vigente.
 
 * **Qué:** MEDIDO: el CHANGELOG de RPP se detiene en ADR-113, y su banner remite a PLAN-FRENTE-A. El de FOL no registra 13 commits, entre ellos el borrado de MetaRules, los thaws y ADR-128. Ningún control lo mira, por diseño.
 * **Evidencia:** CHANGELOG.md:6, :17; ../FOL/CHANGELOG.md:22-64

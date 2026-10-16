@@ -1,93 +1,11 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II sin hipótesis DENTRO de Lean** ([ADR‑120](DECISIONS.md)) · la consistencia es **RELATIVA a Lean** ([ADR‑138](DECISIONS.md))
->
-> Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
-> `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
-> dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
-> (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁 Y desde ADR‑121, Gödel I ENTERO (`goedel_I_neg`),
-> E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ Lo que NO dice: Rosser (⬜).
->
-> ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))* **Consistencia RELATIVA, no absoluta.** `consistencia` es una prueba
-> EN LEAN; lo que garantiza fuera de Lean es PRA ⊢ Con(Lean) → Con(T_Prf), si el núcleo implementa bien esa
-> teoría. No puede ser absoluta: `T_Prf` contiene a PA y, por Gödel II, ninguna teoría contenida en ella demuestra su
-> consistencia. «Sin hipótesis» quiere decir sin hipótesis dentro de Lean; la que queda, Con(Lean), Lean no la puede
-> descargar (Gödel II, aplicado a Lean). Vale igual para `goedel_I`, `goedel_II`, `goedel_I_neg` y `tarski`, que
-> implican `ConsistentH`. Los condicionales (`goedel_first_prf`, `goedel_second_prf`, clase (i)) no pasan por el
-> modelo; que para ellos baste una metateoría débil es lo esperable, y no está medido.
-> [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §4.
->
-> 🏁 **D7 ejecutada (ADR‑129, 2026‑10‑05)**: los símbolos de FOL son `List Char` (antes `String`), en FOL y en RPP; los
-> literales de varios caracteres se escriben `sym!"…"` (`Minimal/SymLit.lean`). Ningún valor cambia (`codeNat`, `V₀`,
-> `godelCN`, el ancla); 44 filas de `check-footprints` pierden `Classical.choice`, ninguna de los titulares de Gödel
-> (su `choice` es el de la solidez clásica, `prf_sound`). ✏️ *(2026‑10‑05, [ADR‑131](DECISIONS.md))*: la causa era una INFERENCIA, y es falsa: MEDIDO (`sondeos/ChoiceFrontera.lean`), 168 de las 182 filas con `Classical.choice` no pasan por `prf_sound`; 158 lo reciben sólo de dos cancelaciones de lift (`SubstArith.substTerm_liftLiftLift` y `…LiftLiftLift`), entre ellas `goedel_first_prf`, `goedel_second_prf` y `prf_tarski`.
->
-> 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
-
-> ## ESTADO REAL — 2026‑10‑04 · `master` · 🏁 **F1 reparado: Gödel I/II sobre `Prf` dependen sólo de `ConsistentH`** ([ADR‑117](DECISIONS.md)) · 🗑️ **la capa `⊢` RETIRADA** ([ADR‑115](DECISIONS.md))
->
-> RPP ya no usa `⊢` (`Derives`): **cinco de sus siete postulados son falsos** —las cuatro meta‑reglas de FOL
-> (`imp_intro`, `raa`, `or_elim`, `ex_elim`) y el `axiom` `ax_list_induction` de RPP (retirado) se **refutan sin
-> usarlos** (`sondeos/MetaReglasRefutables.lean`, compilado)—; los otros dos, también retirados (`ax_induction_prim`,
-> `ax_axiomsCodeT_eq`, retirado con ellos), no se midieron. Se borraron **27 módulos**
-> (`Minimal/Theorems/Block1–8`, ocho de `Full/`, nueve de `Meta/`) y **633 declaraciones**; la cadena
-> de Gödel sobre `Prf` no usaba ninguna (medido por cierre de dependencias) y compila igual. RPP queda
-> con **0 `axiom` de Lean**.
-> ⛔ **Lo que NO arreglaba** (hasta ADR‑117, 2026‑10‑04): `goedel_first_prf` y `goedel_second_prf` llevaban la
-> clase `[AnclaEq]`, y `AnclaEq` **daba `Prf ⊥`** (F1, [ADR‑114](DECISIONS.md), `sondeos/AnclaEqInconsistente.lean`)
-> ⇒ los dos teoremas eran **VACUOS**. Repararlo (L2‑3: anclar `axiomsCodeT` por punto fijo) era lo siguiente.
->
-> 🏁 **ADR‑117 (2026‑10‑04) · F1 reparado.** `axiomsCodeT` lo ancla un axioma DIAGONAL, `ax_axiomsCodeT_def`, el
-> último de los **142** de `axioms` (los 141 de `axiomsBase` y él); el ancla de antes es el TEOREMA `prf_ancla`, y
-> la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf`/`goedel_second_prf (hcon : ConsistentH)` ya no
-> llevan `[AnclaEq]`, y su footprint es el de los tres axiomas de Lean. ⚠️ Siguen siendo **CONDICIONALES**:
-> `ConsistentH` sólo vale si los 142 son consistentes, y no hay modelo; `⊬¬G` sigue sin existir en ningún cálculo.
->
-> ### 🗄️ Registro — el «ESTADO REAL» del 2026‑09‑11
->
-> Titulaba «CADENA DE GÖDEL FINITARIA (Gödel I y II sobre `Prf`, hipótesis mínima `ConsistentH`, un solo
-> axioma en el footprint) · `axioms ⊢` es COMPLETO». Lo de la hipótesis mínima y el solo axioma dejó de ser
-> cierto con ADR‑026 (el ancla pasó a la firma como `[AnclaEq]`; la hipótesis mínima volvió con ADR‑117, el
-> 2026‑10‑04, ya sin ningún axioma del proyecto en el footprint), y `⊢` ya no está en RPP. Se conserva:
->
-> **Build 129 jobs · 0 errores · 0 sorrys · Lean v4.31.0.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115; jobs, módulos, `axiom` y `sorry`, re‑medidos el 2026-10-04 con ADR-117, sin cambio; 129 jobs y 112 módulos desde el 2026-10-05, con `Minimal/SymLit.lean` (D7, ADR-129). En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
-> **112 módulos activos** (Minimal 2 + Meta 107 + Full 3) **+ 0 en `cuarentena/`** (fuera del build)
-> **+ 92 en `sondeos/`** (experimentos, fuera del build; no todos compilan hoy: 39 de 92, [ADR‑134](DECISIONS.md); la última pasada entera, la de D7, [ADR‑129](DECISIONS.md)).
-> **0 `axiom` de Lean** ([`AXIOMS.md`](AXIOMS.md)) · **142 axiomas objeto** en `axioms` (los 141 de `axiomsBase`
-> y el ancla diagonal, ADR‑117).
->
-> ### ✅ La inconsistencia conocida está REPARADA ([ADR‑012](DECISIONS.md))
->
-> `ax_tc_cons` **retirado** de `axioms`: obligaba a `tcFn` a recurrir a la vez sobre estructura
-> NUMERAL y sobre estructura de CÓDIGO — imposible, porque en ℕ el mismo valor es ambas cosas
-> (`cons 0 nil = 2 = σσ0`). Los códigos de Gödel se escriben ahora como **NUMERALES**.
->
-> * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO EXISTEN.**
->   Gödel I es hoy **`goedel_first_numeral`** (`Meta/DiagonalNumeral.lean`), sobre `godelCN`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-> * **21 módulos a `cuarentena/`** ([ADR‑013](DECISIONS.md)) — cifra histórica del momento de la
->   reparación; hoy la cuarentena está **VACÍA** (§1.6). Sus teoremas eran formalmente correctos pero **vacuos**.
-> * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
->
-> ### ✅ La ESCALERA (a.2) está COMPLETA — 4 de 4
->
-> `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
-> Σ₁‑completitud **internalizada** para argumentos abstractos, que es lo que repatría la cuarentena.
-> Rédito verificado en `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean` (`pcc_eval_carc` vuelve). Detalle en
-> [Incompletitud §3.24–§3.32](doc/REFERENCE-Incompleteness.md).
->
-> ### 🏁🏁 Y desde el 2026‑09‑14 hay un cálculo de FOL⁼ del que SE PUEDE HABLAR
->
-> **`Derives₀`** ([ADR‑033](DECISIONS.md)): 21 constructores, **cero habitantes‑axioma** ⇒ **la
-> inducción es legítima**. Con él: **`derives0_soundness`**, **`derives0_consistent`** (la primera
-> consistencia de un cálculo de FOL⁼ del proyecto) y **`derives0_not_complete`**. Ver §0bis.
->
-> **Punto de reanudación:** **[NEXT-STEPS.md](NEXT-STEPS.md)** → **[PLAN-FRENTE-A.md](PLAN-FRENTE-A.md)**
-> → [cuarentena/README.md](cuarentena/README.md) → [sondeos/README.md](sondeos/README.md).
+> **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
+> Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
 
 **Last updated:** 2026-09-10d · Lean v4.31.0 — 🏁 **`hbody` PARTIDO** con la composición de los dos `substfc` (§3.59), y ⛔ **corregido**: la mitad (b) **sí** depende del análisis por tags (`premsOf` va por **21 axiomas**, uno por tag). ➕ La deuda del **testigo de `liftfc`**, enunciada y medida (§3.60). Antes: 🏁🏁 **D3 EN UNA SOLA OBLIGACIÓN** (§3.58): `hwP` probado en cuatro líneas ⇒ sólo queda **`hbody`**. Antes: 🏁 **`hPsiId` PROBADO** (§3.57): la **tercera variante** de la familia, nivel actuante **por debajo** del `substCodeF` ⇒ **D3 desde DOS obligaciones**. Antes: ⛔🏁 **D3 · §10: el `PsiF` del chasis** (§3.56): `hPl` era **FALSA** para el cuerpo de §8, y con el `PsiF` **dotado** caen **siete de las nueve** obligaciones de `pcc_bdAll_intro` ⇒ **D3 desde TRES**. Antes: 🏁🏁 **`pcc_eval_liftfc` PROBADO** (§3.53) ⇒ **q3 y qconf cerrados: CINCO de los SIETE** reflectores (§3.54); **D3 a DOS obligaciones** (§3.55); **dedup ADR‑019 de seis familias** (§3.52). Antes: 🏁 **A5 CERRADA** (`pcc_eval_liftc_at`/`_liftsc_at` con el nivel cuantificado, §3.50) y **B8b saldada** (el `prf_congr_liftc` duplicado no tenía consumidores, §3.51). Antes: **B3 EN CURSO**: `SubstfcPlanos` cerrado con DOS descensos (`binK`→`CodeCtorKit`, KIT TERNARIO→`EvalArithPrf`, que retira **74 copias**) + `Meta/SubstfcCodePrf.lean`; y la escalera `psi` subida a `StrongInductionPrf` (§3.35)
 
-> **El historial detallado vive en [`CHANGELOG.md`](CHANGELOG.md)**, no aquí. Este índice describe
+> **El historial detallado vive en [`DECISIONS.md`](DECISIONS.md)** (✏️ 2026‑10‑16, ADR‑142: `CHANGELOG.md` está congelado en ADR‑113), no aquí. Este índice describe
 > el **estado actual**; la línea de "Last updated" dejó de ser un volcado acumulativo el
 > 2026-08-22 (había crecido a ~20 KB en una sola línea, ilegible y sistemáticamente desfasada).
 
