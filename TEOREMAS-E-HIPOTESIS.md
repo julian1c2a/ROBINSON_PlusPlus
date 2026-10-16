@@ -1,6 +1,6 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑14 · `master` · **129 jobs · 112 módulos · 0 sorry · 0 `axiom` de Lean**
+> ## ESTADO REAL — 2026‑10‑16 · `master` · **130 jobs · 113 módulos · 0 sorry · 0 `axiom` de Lean**
 >
 > 🏁🏁 **Gödel I entero, Gödel II y Tarski, SIN HIPÓTESIS** (ADR‑120, ADR‑121): `goedel_I : ¬ Prf godelCN`,
 > `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'` y `tarski`. Van sobre `Prf`, cuya teoría,
@@ -11,10 +11,12 @@
 > ✏️ *(2026‑10‑16, ADR‑138)* «Sin hipótesis» quiere decir DENTRO de Lean: la consistencia que da `consistencia` es
 > RELATIVA a Lean (PRA ⊢ Con(Lean) → Con(T_Prf)), y no puede ser absoluta (§4).
 >
-> La columna «¿qué usa la prueba?» de §1 está MEDIDA (`sondeos/InduccionTitulares.lean`, `#modelo`, 2026‑10‑14).
+> La columna «¿qué usa la prueba?» de §1 está MEDIDA (`sondeos/InduccionTitulares.lean`, `#modelo`, 2026‑10‑14), y la clase (i)
+> la COMPRUEBA cada build desde ADR‑143 (`Meta/PurezaTitulares.lean`, T08): si uno de sus 8 titulares nombra la semántica,
+> el build no compila.
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-16 — ADR‑140: la línea de llegada de RPP (§0) y la fila de Löb (§1). Antes, el mismo día — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
+**Last updated:** 2026-10-16 — ADR‑143: la clase (i) la comprueba cada build (`Meta/PurezaTitulares.lean`, T08); el banner, a 130 jobs y 113 módulos. Antes, el mismo día — ADR‑140: la línea de llegada de RPP (§0) y la fila de Löb (§1). Antes, el mismo día — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
 
 ---
 
@@ -47,8 +49,9 @@ un teorema cabecera. Una fila con «⬜ nadie» es información, no un fallo; un
 un fallo. Desde ADR‑135 está en AUTHORITATIVE (lo miran `[A]`, `[A2]` y `[B]` de `check-doc-sync.bash`; `[E]` ya lo miraba), y `[T]`
 comprueba lo que antes se llevaba a mano: que cada titular de su universo, `T_UNIVERSO`, esté declarado y tenga UNA
 fila en §1 o §3 (el nombre en la columna del nombre), y que ninguna fila sobre. Un titular NUEVO se añade a `T_UNIVERSO` en el mismo commit. La columna «¿qué
-usa la prueba?» la mide `#modelo` (`sondeos/InduccionTitulares.lean`), fuera de la CI; la mecanizará T08 (un control
-de pureza del cierre, en el build).
+usa la prueba?» la mide `#modelo` (`sondeos/InduccionTitulares.lean`), fuera de la CI. La clase (i) la comprueba además cada `lake build`: `Meta/PurezaTitulares.lean` (T08,
+ADR‑143) recorre el cierre de sus 8 titulares y FALLA si alguno nombra la semántica, o si `goedel_I` y `tarski`, los
+controles positivos, dejan de nombrarla. Un titular nuevo de la clase (i) entra en su lista `PUROS` en el mismo commit.
 
 ---
 

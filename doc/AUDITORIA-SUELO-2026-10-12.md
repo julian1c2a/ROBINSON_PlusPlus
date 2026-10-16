@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-16 — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-16 — ADR‑143: T08 hecho. Antes, el mismo día — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -274,6 +274,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T08 · Control de pureza del cierre de los titulares condicionales (criterio de aceptación de Rosser)
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* confirmado (verificador de vacuidad, P1), con el criterio corregido
+
+*Estado el 2026‑10‑16:* ✅ **Hecho en ADR‑143**: `Meta/PurezaTitulares.lean`, en el build. Los 8 de la clase (i), puros; `goedel_I` y `tarski`, impuros, como controles positivos; visto fallar con tres mutantes. T07 irá en el mismo módulo.
 
 *Estado el 2026‑10‑14:* ▶ Es lo siguiente (ADR‑137): criterio de aceptación de Rosser, y útil ya para la clase (i) de ADR‑135.
 

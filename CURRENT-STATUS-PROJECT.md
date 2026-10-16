@@ -12,7 +12,7 @@
 
 > 🗄️ ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md)) · REGISTRO del 2026‑09‑10: esta sección y las siguientes, hasta el final
 > (Status by Module, Recent Achievements, Pending Work, Architecture).** Las cifras de esta tabla son de esa fecha
-> (hoy: 0 `axiom` de Lean, 142 axiomas objeto, 112 módulos). La teoría de los titulares —que no es `Minimal` sin
+> (hoy: 0 `axiom` de Lean, 142 axiomas objeto, 113 módulos). La teoría de los titulares —que no es `Minimal` sin
 > inducción: `Prf` añade la inducción para toda fórmula, y contiene a PA— y lo que se supone hoy, en
 > [AXIOMS.md](AXIOMS.md) §0. El propietario decidió el 2026‑10‑14 reescribirlo (T26).
 

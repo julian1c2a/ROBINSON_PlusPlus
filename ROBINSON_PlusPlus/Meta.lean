@@ -20,6 +20,9 @@ Public API:
   · ✏️ 2026‑10‑14 (ADR‑134), sin hipótesis: `consistencia`, `goedel_I`, `goedel_II` (Meta/Consistencia.lean,
     ADR‑120); `goedel_I_neg` y `godelCN_indecidible` (Meta/SolidezVerificador.lean, ADR‑121: Gödel I entero);
     `tarski`, `tarski_semantico` (Meta/TarskiPrf.lean, ADR‑121).
+  · ✏️ 2026‑10‑16 (ADR‑143, T08): `Meta/PurezaTitulares.lean`, el CONTROL de pureza: el build FALLA si el cierre de un
+    titular de la clase (i) nombra la semántica (`FOL.Metamath.Semantics`, `Meta.SolidezPrf`), o si `goedel_I` y `tarski`
+    dejan de nombrarla.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -140,6 +143,7 @@ import ROBINSON_PlusPlus.Meta.SolidezPrf
 import ROBINSON_PlusPlus.Meta.Consistencia
 import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
+import ROBINSON_PlusPlus.Meta.PurezaTitulares
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived

@@ -132,7 +132,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**112 módulos activos** (Minimal 2 + Meta 107 + Full 3) + barrel `Meta.lean` + raíz
+**113 módulos activos** (Minimal 2 + Meta 108 + Full 3) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **85 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -232,6 +232,7 @@ Detalle en el nodo §3.15–§3.32.
 | 84v | **`Consistencia`** | 🆕 🏁🏁 **`consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN`, `goedel_II : ¬ Prf consistencyFormula'`** (ADR‑120): Gödel I y II SIN HIPÓTESIS, footprint los tres de Lean; y (ADR‑121) `V₀_eq_codigo : V₀ = codeNatList axioms` |
 | 84w | **`TarskiPrf`** | 🆕 🏁 **TARSKI** (2026‑10‑05, ADR‑121): `prf_diagonal` (el lema diagonal para un predicado ARBITRARIO, por `FOL.subst_subst_lift_gen`), `liar`, `prf_tarski` y `tarski` (sin hipótesis: `Tr` falla en su propio mentiroso, una sentencia), y `tarski_semantico` (ni en `MNV V₀`) |
 | 84x | **`SolidezVerificador`** | 🆕 🏁🏁 **W1 y GÖDEL I ENTERO** (ADR‑121): el decodificador TOTAL (`dec`, que conmuta con `substfcN`/`liftfcN` para todo número), `verificador_solido` (lo que `MNV V₀` acepta como prueba concluye, decodificado, teoremas de `Prf`), `goedel_I_neg : ¬ Prf ¬godelCN`, `godelCN_indecidible`, `modelo_prov_iff` y E10 (`godelCN_verdadera`, `con_verdadera`) |
+| 84y | **`PurezaTitulares`** | 🆕 🔒 **T08, el CONTROL de pureza del cierre** (2026‑10‑16, ADR‑143): `#pureza_titulares` recorre el cierre de los 8 titulares de la clase (i) —D1, D2, D3, `prf_godelCN_fixedpoint`, `prf_con_imp_godel`, `goedel_first_prf`, `goedel_second_prf`, `prf_tarski`— y el BUILD FALLA si alguno nombra la semántica (`FOL.Metamath.Semantics` o `Meta.SolidezPrf`, por espacio de nombres y por módulo), o si los controles positivos `goedel_I` y `tarski` dejan de nombrarla. `#pureza a … \| x …`, el mismo control sobre listas dadas. Ninguna declaración nueva de la teoría |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo (`godelPred'`, `godelBeta'`, `godelC'`) y `consistencyFormula'`. Gödel II vive en `GodelTwoPrf`; `goedel_second'` (retirado el 2026‑09‑11) y el teorema `d3` sobre `⊢` (retirado con ADR‑115) ya no están |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).
