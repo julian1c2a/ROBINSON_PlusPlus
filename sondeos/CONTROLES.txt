@@ -26,3 +26,6 @@ IteSimboloNucleo.lean
 # Rosser, Etapa 0 (ADR-123…126; se porta, ADR-137)
 RosserReflexion.lean
 RosserBasura.lean
+
+# T+E por reducción a T (ADR-144): el cálculo de una extensión finita y los controles de CRI-02
+ExtensionPorReduccion.lean

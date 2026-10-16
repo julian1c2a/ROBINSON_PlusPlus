@@ -1,0 +1,18 @@
+ALCANCE de T62 — 2026-10-16, sondeos/AlcanceT62.lean
+(usuarios DIRECTOS: declaraciones del fuente cuyo tipo o valor nombra una constante del grupo; es un RADIO, no un trabajo)
+
+grupo | constantes | declaraciones que las nombran | líneas | en el cono de los 18 | en el cono de D1 | ficheros
+G1 la lista de axiomas (axioms, axiomsBase, coreAxioms, codingAxioms) | 4 | 349 | 5269 | 272 | 126 | 50
+G2 el código de la teoría y su ancla (axiomsCodeT, axD, psiD, nD, deltaD, ax_axiomsCodeT_def) | 6 | 311 | 4162 | 263 | 129 | 46
+G3 el verificador objeto (lineWF, lineOk, chainOk, provFormulaC', provCodeC') | 5 | 400 | 5637 | 300 | 59 | 52
+G4 los axiomas del verificador que nombran lineWF o chainOk (25) | 25 | 338 | 3910 | 295 | 137 | 42
+G4b sólo ax_lineWF_thy (el único que nombra axiomsCodeT) | 1 | 277 | 3739 | 236 | 113 | 42
+G5 la regla thy de Lean (Prfᵢ.thy) | 1 | 4 | 82 | 4 | 3 | 4
+G6 las reglas que una variante quitaría (Prf.p3, Prf.ind, Prf.listInd y sus homónimas de PrfH) | 6 | 12 | 169 | 11 | 7 | 6
+G7 el verificador antiguo (ax_vpf_*, 22, y validProofFn) | 23 | 298 | 3783 | 257 | 113 | 43
+G8 el verificador en el modelo (lineWFT, lineWFN, chainOkL, chainOkN) | 4 | 59 | 222 | 57 | 0 | 4
+
+¿Contiene el cierre la lista de axiomas, su código o el ancla?
+  ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN: NO (79 constantes del proyecto en el cierre)
+  ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula': NO (72 constantes del proyecto en el cierre)
+  ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC': NO (23 constantes del proyecto en el cierre)

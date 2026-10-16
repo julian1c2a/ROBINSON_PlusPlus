@@ -1,0 +1,14 @@
+# G6 las reglas que una variante quitaría (Prf.p3, Prf.ind, Prf.listInd y sus homónimas de PrfH)
+# usuarios directos: módulo:inicio-fin (líneas) declaración [C = en el cono de los 18] [D1 = en el de D1]
+ROBINSON_PlusPlus.Meta.HilbertSeq:179-228 (50) ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf [C] [D1]
+ROBINSON_PlusPlus.Meta.ChainPrf:34-41 (8) ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction [C]
+ROBINSON_PlusPlus.Meta.NatArithPrf:52-59 (8) ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction [C] [D1]
+ROBINSON_PlusPlus.Meta.Hilbert:144-160 (17) ROBINSON_PlusPlus.Meta.Hilbert.Prf [C] [D1]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:456-457 (2) ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3 [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:464-465 (2) ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:468-469 (2) ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_listInd [C]
+ROBINSON_PlusPlus.Meta.HilbertDeduction:38-49 (12) ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH [C] [D1]
+ROBINSON_PlusPlus.Meta.HilbertDeduction:74-94 (21) ROBINSON_PlusPlus.Meta.HilbertDeduction.PrfH_mono
+ROBINSON_PlusPlus.Meta.HilbertDeduction:115-139 (25) ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux [C] [D1]
+ROBINSON_PlusPlus.Meta.HilbertDeduction:141-152 (12) ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf [C] [D1]
+ROBINSON_PlusPlus.Meta.HilbertDeduction:154-163 (10) ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH [C] [D1]

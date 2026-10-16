@@ -1,0 +1,402 @@
+# G3 el verificador objeto (lineWF, lineOk, chainOk, provFormulaC', provCodeC')
+# usuarios directos: módulo:inicio-fin (líneas) declaración [C = en el cono de los 18] [D1 = en el de D1]
+ROBINSON_PlusPlus.Meta.ChainPrf:221-227 (7) ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_chainOk_subst1 [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:229-235 (7) ROBINSON_PlusPlus.Meta.ChainPrf.PrfH_chainOk_subst2 [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:460-467 (8) ROBINSON_PlusPlus.Meta.ChainPrf.prf_lineOk_mono_imp [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:469-475 (7) ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_subst2
+ROBINSON_PlusPlus.Meta.ChainPrf:554-559 (6) ROBINSON_PlusPlus.Meta.ChainPrf.prfMonoPred [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:561-565 (5) ROBINSON_PlusPlus.Meta.ChainPrf.prfMonoPred_spec [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:567-612 (46) ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:662-671 (10) ROBINSON_PlusPlus.Meta.ChainPrf.ccIHbody [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:673-678 (6) ROBINSON_PlusPlus.Meta.ChainPrf.prfCompChainPred [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:680-684 (5) ROBINSON_PlusPlus.Meta.ChainPrf.prfCompChainPred_spec [C]
+ROBINSON_PlusPlus.Meta.ChainPrf:686-769 (84) ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat [C]
+ROBINSON_PlusPlus.Meta.DiagonalTwo:66-67 (2) ROBINSON_PlusPlus.Meta.DiagonalTwo.godelPred' [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:102-107 (6) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.prf_forall_chainOkB_imp_chainOk [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:109-124 (16) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_chainOkBDot_imp_chainOkDot [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:126-139 (14) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hC_dot_of_chainOkBDot [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:146-150 (5) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:152-158 (7) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_chainOkBDot [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:273-291 (19) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:293-301 (9) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:370-421 (52) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_bdEx_carc_reflect_gen [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:430-494 (65) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hphi_bdCarcLt
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:496-505 (10) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_bdCarcLt_reflect
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:523-546 (24) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_premsBody_reflect
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:548-556 (9) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_premsBody_reflect_at
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:684-693 (10) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.chainOkBPsi_split
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:710-722 (13) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of_hbdAll [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:724-733 (10) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_hbdAll
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:778-786 (9) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of_two [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:788-794 (7) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_two
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:869-871 (3) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hCl_chainOk [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:873-875 (3) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hCs_chainOk [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:903-910 (8) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hbdAll_of_dotted [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:912-923 (12) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hbdAllDot_of_body [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:925-933 (9) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1008-1014 (7) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hbdAllDot_of_hbody [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1016-1022 (7) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of_hbody [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1024-1030 (7) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_hbody [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1074-1079 (6) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of_body_only
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1081-1090 (10) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body_only
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1124-1126 (3) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.lineWFDotAt [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1146-1151 (6) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.substCodeF2_lineOkB_split
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1159-1179 (21) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hbody_of_halves [C]
+ROBINSON_PlusPlus.Meta.D3ChainDotPrf:1181-1188 (8) ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_halves [C]
+ROBINSON_PlusPlus.Meta.GodelTwo:91-92 (2) ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' [C]
+ROBINSON_PlusPlus.Meta.D3InDotPrf:384-497 (114) ROBINSON_PlusPlus.Meta.D3InDotPrf.pcc_bddCarcDot_reflect [C]
+ROBINSON_PlusPlus.Meta.D3InDotPrf:504-518 (15) ROBINSON_PlusPlus.Meta.D3InDotPrf.hI_dot_at [C]
+ROBINSON_PlusPlus.Meta.D3InDotPrf:520-524 (5) ROBINSON_PlusPlus.Meta.D3InDotPrf.hI_dot [C]
+ROBINSON_PlusPlus.Meta.D3InDotPrf:526-531 (6) ROBINSON_PlusPlus.Meta.D3InDotPrf.d3_prf_of_chainOkDot [C]
+ROBINSON_PlusPlus.Meta.LineWFMpPrf:77-93 (17) ROBINSON_PlusPlus.Meta.LineWFMpPrf.prf_lineWF_mp_bwd [C]
+ROBINSON_PlusPlus.Meta.LineWFMpPrf:165-197 (33) ROBINSON_PlusPlus.Meta.LineWFMpPrf.pcc_lineWF_tracked_mp_imp [C]
+ROBINSON_PlusPlus.Meta.ChainNegPrf:220-243 (24) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk
+ROBINSON_PlusPlus.Meta.ChainNegPrf:361-376 (16) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_tag_and
+ROBINSON_PlusPlus.Meta.ChainNegPrf:378-384 (7) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_tag_plain
+ROBINSON_PlusPlus.Meta.ChainNegPrf:386-391 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p1
+ROBINSON_PlusPlus.Meta.ChainNegPrf:393-398 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_mp
+ROBINSON_PlusPlus.Meta.ChainNegPrf:410-415 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p2
+ROBINSON_PlusPlus.Meta.ChainNegPrf:417-422 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_c1
+ROBINSON_PlusPlus.Meta.ChainNegPrf:424-429 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_c2
+ROBINSON_PlusPlus.Meta.ChainNegPrf:431-436 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_c3
+ROBINSON_PlusPlus.Meta.ChainNegPrf:438-443 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_j1
+ROBINSON_PlusPlus.Meta.ChainNegPrf:445-450 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_j2
+ROBINSON_PlusPlus.Meta.ChainNegPrf:452-457 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_j3
+ROBINSON_PlusPlus.Meta.ChainNegPrf:459-464 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_efq
+ROBINSON_PlusPlus.Meta.ChainNegPrf:466-471 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_q1
+ROBINSON_PlusPlus.Meta.ChainNegPrf:473-478 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_q2
+ROBINSON_PlusPlus.Meta.ChainNegPrf:480-485 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_q3
+ROBINSON_PlusPlus.Meta.ChainNegPrf:487-492 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_eqrefl
+ROBINSON_PlusPlus.Meta.ChainNegPrf:494-499 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_leibniz
+ROBINSON_PlusPlus.Meta.ChainNegPrf:501-506 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_p3
+ROBINSON_PlusPlus.Meta.ChainNegPrf:508-513 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_thy
+ROBINSON_PlusPlus.Meta.ChainNegPrf:515-520 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_gen
+ROBINSON_PlusPlus.Meta.ChainNegPrf:522-527 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_ind
+ROBINSON_PlusPlus.Meta.ChainNegPrf:529-534 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_qconf
+ROBINSON_PlusPlus.Meta.ChainNegPrf:536-541 (6) ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_listInd
+ROBINSON_PlusPlus.Meta.DiagonalNumeral:64-66 (3) ROBINSON_PlusPlus.Meta.DiagonalNumeral.provCodeN [C]
+ROBINSON_PlusPlus.Meta.ExIntroCodePrf:79-168 (90) ROBINSON_PlusPlus.Meta.ExIntroCodePrf.pcc_exIntro_code'
+ROBINSON_PlusPlus.Meta.ReprPrf:186-191 (6) ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_subst1 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:336-352 (17) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_iff_transport [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:370-384 (15) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_imp_transport
+ROBINSON_PlusPlus.Meta.ReprPrf:386-397 (12) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_iff_transport_in [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:410-413 (4) ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_nil [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:415-422 (8) ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_cons [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:465-483 (19) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_mp [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:493-504 (12) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_gen [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:512-529 (18) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_thy [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:540-561 (22) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_p1 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:569-583 (15) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_p2 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:591-604 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_c1 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:612-625 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_c2 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:633-646 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_c3 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:654-667 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_j1 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:675-688 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_j2 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:696-710 (15) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_j3 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:718-730 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_efq [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:738-756 (19) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_eqrefl [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:764-776 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_p3 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:786-799 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:807-820 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q2 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:828-841 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q3 [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:849-863 (15) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_leibniz [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:872-886 (15) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_ind [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:894-908 (15) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_listInd [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:916-929 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_qconf [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:941-953 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1_imp
+ROBINSON_PlusPlus.Meta.ReprPrf:955-967 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q2_imp
+ROBINSON_PlusPlus.Meta.ReprPrf:969-981 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q3_imp
+ROBINSON_PlusPlus.Meta.ReprPrf:983-996 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_leibniz_imp
+ROBINSON_PlusPlus.Meta.ReprPrf:1016-1027 (12) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1_hasWit
+ROBINSON_PlusPlus.Meta.ReprPrf:1029-1040 (12) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q2_hasWit
+ROBINSON_PlusPlus.Meta.ReprPrf:1042-1054 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_leibniz_hasWitF
+ROBINSON_PlusPlus.Meta.ReprPrf:1057-1070 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_ind_imp
+ROBINSON_PlusPlus.Meta.ReprPrf:1072-1084 (13) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_qconf_imp
+ROBINSON_PlusPlus.Meta.ReprPrf:1086-1099 (14) ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_listInd_imp
+ROBINSON_PlusPlus.Meta.D3DottedPrf:51-53 (3) ROBINSON_PlusPlus.Meta.D3DottedPrf.bodyF [C]
+ROBINSON_PlusPlus.Meta.D3DottedPrf:55-61 (7) ROBINSON_PlusPlus.Meta.D3DottedPrf.formCode_provCodeC'_eq [C]
+ROBINSON_PlusPlus.Meta.D3DottedPrf:63-82 (20) ROBINSON_PlusPlus.Meta.D3DottedPrf.d3_prf_of_dotted [C]
+ROBINSON_PlusPlus.Meta.D3DottedPrf:90-91 (2) ROBINSON_PlusPlus.Meta.D3DottedPrf.chainOkDot [C]
+ROBINSON_PlusPlus.Meta.D3DottedPrf:97-133 (37) ROBINSON_PlusPlus.Meta.D3DottedPrf.hbody_of_atoms [C]
+ROBINSON_PlusPlus.Meta.D3DottedPrf:135-142 (8) ROBINSON_PlusPlus.Meta.D3DottedPrf.d3_prf_of_dotted_atoms [C]
+ROBINSON_PlusPlus.Meta.Delta0ReflectPrf:66-139 (74) ROBINSON_PlusPlus.Meta.Delta0ReflectPrf.pcc_exIntro_code_open [C]
+ROBINSON_PlusPlus.Meta.Delta0ReflectPrf:141-192 (52) ROBINSON_PlusPlus.Meta.Delta0ReflectPrf.pcc_gen_code [C]
+ROBINSON_PlusPlus.Meta.Delta0ReflectPrf:237-277 (41) ROBINSON_PlusPlus.Meta.Delta0ReflectPrf.pcc_lt_tracked [C]
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf:84-85 (2) ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.lwfVar [C]
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf:98-123 (26) ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.prf_lineWF_eqrefl_bwd [C]
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf:409-521 (113) ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.pcc_eqDot [C]
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf:581-605 (25) ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.pcc_lineWF_tracked_eqrefl
+ROBINSON_PlusPlus.Meta.LineWFTrackedPrf:616-666 (51) ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.pcc_lineWF_tracked_eqrefl_imp [C]
+ROBINSON_PlusPlus.Meta.MpCodePrf:54-145 (92) ROBINSON_PlusPlus.Meta.MpCodePrf.pcc_mp_code_open [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:744-766 (23) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_of_tag [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:768-783 (16) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_tag_and [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:785-793 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_tag_plain [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:797-805 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_p1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:807-815 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_p2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:817-825 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_c1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:827-835 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_c2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:837-845 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_c3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:847-855 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_j1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:857-865 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_j2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:867-875 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_j3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:877-885 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_efq [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:887-895 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_q1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:897-905 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_q2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:907-915 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_q3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:917-925 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_eqrefl [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:927-935 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_leibniz [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:937-945 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_p3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:947-954 (8) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_thy [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:956-963 (8) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_mp [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:965-972 (8) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_gen [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:974-982 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_ind [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:984-992 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_qconf [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:994-1002 (9) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf_listInd [C]
+ROBINSON_PlusPlus.Meta.PremsOfDotPrf:1010-1037 (28) ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf [C]
+ROBINSON_PlusPlus.Meta.LineWFConsPrf:32-38 (7) ROBINSON_PlusPlus.Meta.LineWFConsPrf.prf_lineWF_cons [C]
+ROBINSON_PlusPlus.Meta.LineWFConsPrf:40-54 (15) ROBINSON_PlusPlus.Meta.LineWFConsPrf.prf_chainOk_lineWF [C]
+ROBINSON_PlusPlus.Meta.LineWFConsPrf:56-66 (11) ROBINSON_PlusPlus.Meta.LineWFConsPrf.prf_line_is_cons [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:33-37 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_p1_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:45-49 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_p2_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:55-59 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_c1_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:65-69 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_c2_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:75-79 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_c3_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:85-89 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_j1_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:95-99 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_j2_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:108-112 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_j3_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:118-122 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_p3_imp [C]
+ROBINSON_PlusPlus.Meta.LineWFPropPrf:129-133 (5) ROBINSON_PlusPlus.Meta.LineWFPropPrf.pcc_lineWF_tracked_gen_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:675-714 (40) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_condDS_of_stree [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:735-745 (11) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_of_stree [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:765-781 (17) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_q1 [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:783-790 (8) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q1_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:799-814 (16) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_q2 [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:816-824 (9) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q2_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:826-849 (24) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_leibniz [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:851-860 (10) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_leibniz_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:869-884 (16) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_q3 [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:886-894 (9) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q3_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:896-911 (16) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_qconf [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:913-927 (15) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_qconf_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:974-995 (22) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_ind [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:997-1022 (26) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_core_listInd [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:1024-1032 (9) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_ind_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:1034-1042 (9) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_listInd_imp [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:1062-1073 (12) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_2
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:1089-1094 (6) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_other
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:1157-1163 (7) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_tag_vacuous [C]
+ROBINSON_PlusPlus.Meta.SubstTreeReflect:1165-1195 (31) ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked [C]
+ROBINSON_PlusPlus.Meta.ProofChain:87-91 (5) ROBINSON_PlusPlus.Meta.ProofChain.compChainProp
+ROBINSON_PlusPlus.Meta.ProofChain:94-98 (5) ROBINSON_PlusPlus.Meta.ProofChain.monoChainProp
+ROBINSON_PlusPlus.Meta.ProofChain:103-108 (6) ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC' [C] [D1]
+ROBINSON_PlusPlus.Meta.ProofChain:110-111 (2) ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' [C] [D1]
+ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf:52-66 (15) ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf.prf_hI_of_reflect_boundedIn
+ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf:68-81 (14) ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf.prf_hC_of_reflect_chainOkB
+ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf:83-99 (17) ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf.d3_prf_of_reflect_bounded
+ROBINSON_PlusPlus.Meta.LineWFAssemblePrf:79-92 (14) ROBINSON_PlusPlus.Meta.LineWFAssemblePrf.pcc_lineWF_tracked_of_branches [C]
+ROBINSON_PlusPlus.Meta.LineWFAssemblePrf:102-156 (55) ROBINSON_PlusPlus.Meta.LineWFAssemblePrf.pcc_lineWF_tracked_modulo_7
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:77-79 (3) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.provCodeC'_In_eq
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:113-120 (8) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.prf_provCodeC'_In_of_tracked
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:122-139 (18) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.prf_provCodeC'_In_formCode_of_tracked
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:161-174 (14) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.pcc_in_objList_of_mem
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:206-217 (12) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.pcc_in_runFn_objList
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:260-270 (11) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.prf_provCodeC'_of_tracked_witness
+ROBINSON_PlusPlus.Meta.Sigma1CorePrf:287-298 (12) ROBINSON_PlusPlus.Meta.Sigma1CorePrf.prf_lineOk_q2 [C]
+ROBINSON_PlusPlus.Meta.LineWFEfqPrf:96-183 (88) ROBINSON_PlusPlus.Meta.LineWFEfqPrf.pcc_condDEfq [C]
+ROBINSON_PlusPlus.Meta.LineWFEfqPrf:187-194 (8) ROBINSON_PlusPlus.Meta.LineWFEfqPrf.pcc_lineWF_tracked_efq_imp [C]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf:149-152 (4) ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint_N [C]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf:154-155 (2) ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_provCode_transfer [C]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf:157-159 (3) ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint [C]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf:163-182 (20) ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel [C]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf:208-219 (12) ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf [C]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf:221-228 (8) ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf [C]
+ROBINSON_PlusPlus.Meta.ReflectionPrf:56-60 (5) ROBINSON_PlusPlus.Meta.ReflectionPrf.PrfH_pcc_mp
+ROBINSON_PlusPlus.Meta.ReflectionPrf:62-64 (3) ROBINSON_PlusPlus.Meta.ReflectionPrf.PrfH_pcc_prf
+ROBINSON_PlusPlus.Meta.ReflectionPrf:66-69 (4) ROBINSON_PlusPlus.Meta.ReflectionPrf.PrfH_pcc_andIntro
+ROBINSON_PlusPlus.Meta.ReflectionPrf:71-75 (5) ROBINSON_PlusPlus.Meta.ReflectionPrf.PrfH_pcc_exIntro
+ROBINSON_PlusPlus.Meta.ReflectionPrf:79-116 (38) ROBINSON_PlusPlus.Meta.ReflectionPrf.d3_prf_of_sigma1
+ROBINSON_PlusPlus.Meta.SolidezVerificador:529-537 (9) ROBINSON_PlusPlus.Meta.SolidezVerificador.ev_provCodeC' [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:539-546 (8) ROBINSON_PlusPlus.Meta.SolidezVerificador.prf_of_prov [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:548-554 (7) ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:556-569 (14) ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:581-588 (8) ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera [C]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:590-593 (4) ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera [C]
+ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf:1134-1163 (30) ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_hGuardF [C]
+ROBINSON_PlusPlus.Meta.LineWFCases:103-139 (37) ROBINSON_PlusPlus.Meta.LineWFCases.prf_lineWF_tag_imp
+ROBINSON_PlusPlus.Meta.LineWFCases:223-227 (5) ROBINSON_PlusPlus.Meta.LineWFCases.prf_lineWF_neg_of_tag
+ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf:66-87 (22) ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf.pcc_exIntro_code_bridge
+ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf:89-97 (9) ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf.pcc_exIntro_code_objList
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:64-81 (18) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_lenc_of_tag [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:87-117 (31) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_eta_of_tag [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:119-138 (20) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_of_tag [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:143-156 (14) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_tag_and [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:158-164 (7) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_tag_plain [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:171-181 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_p1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:183-193 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_p2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:195-205 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_c1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:207-217 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_c2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:219-229 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_c3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:231-241 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_j1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:243-253 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_j2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:255-265 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_j3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:267-277 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_efq [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:279-289 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_q1 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:291-301 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_q2 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:303-313 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_q3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:315-325 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_eqrefl [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:327-337 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_leibniz [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:339-349 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_p3 [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:351-361 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_thy [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:363-373 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_mp [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:375-385 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_gen [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:387-397 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_ind [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:399-409 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_qconf [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:411-421 (11) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_listInd [C]
+ROBINSON_PlusPlus.Meta.PremsOfTagPrf:432-441 (10) ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_of_premsOf_branches [C]
+ROBINSON_PlusPlus.Meta.TrackedCorePrf:160-162 (3) ROBINSON_PlusPlus.Meta.TrackedCorePrf.chainOkCodeFn_termCode
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:61-63 (3) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.provCodeC'_eq_eq
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:93-103 (11) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_provCodeC'_eq_of_tracked
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:131-143 (13) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_provFromCode_intro [C]
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:148-153 (6) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_lineOk_eqrefl [C]
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:155-158 (4) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_chainOk_eqrefl [C]
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:197-207 (11) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_lineOk_leibniz [C]
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:209-214 (6) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_chainOk_leibniz [C]
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:268-280 (13) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.pcc_eq_tracked [C]
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:282-291 (10) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.pcc_eq_of_tc_bridge
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:337-339 (3) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.lineWFCodeFn_termCode
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:341-343 (3) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.provCodeC'_lineWF_eq
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:345-360 (16) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_provCodeC'_lineWF_of_tracked
+ROBINSON_PlusPlus.Meta.Sigma1AtomPrf:368-373 (6) ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_lineWF_inv [C]
+ROBINSON_PlusPlus.Meta.D3BodyPrf:77-100 (24) ROBINSON_PlusPlus.Meta.D3BodyPrf.prf_lineWF_of_chainOk [C]
+ROBINSON_PlusPlus.Meta.D3BodyPrf:102-146 (45) ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt [C]
+ROBINSON_PlusPlus.Meta.D3BodyPrf:203-248 (46) ROBINSON_PlusPlus.Meta.D3BodyPrf.pcc_bnd_bridge [C]
+ROBINSON_PlusPlus.Meta.D3BodyPrf:278-306 (29) ROBINSON_PlusPlus.Meta.D3BodyPrf.pcc_bnd_bridge_at [C]
+ROBINSON_PlusPlus.Meta.Representability2Prf:245-440 (196) ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track [C] [D1]
+ROBINSON_PlusPlus.Meta.Representability2Prf:444-457 (14) ROBINSON_PlusPlus.Meta.Representability2Prf.provCodeC'_intro_prf [C] [D1]
+ROBINSON_PlusPlus.Meta.Representability2Prf:459-466 (8) ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf [C] [D1]
+ROBINSON_PlusPlus.Meta.OmegaReflect:84-86 (3) ROBINSON_PlusPlus.Meta.OmegaReflect.provBody
+ROBINSON_PlusPlus.Meta.OmegaReflect:91-93 (3) ROBINSON_PlusPlus.Meta.OmegaReflect.provCodeC'_eq_ex
+ROBINSON_PlusPlus.Meta.OmegaReflect:95-97 (3) ROBINSON_PlusPlus.Meta.OmegaReflect.Verifies
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf:74-109 (36) ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_extra
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf:183-186 (4) ROBINSON_PlusPlus.Meta.LineWFGuardPrf.Hcond [C]
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf:246-249 (4) ROBINSON_PlusPlus.Meta.LineWFGuardPrf.HcondCore [C]
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf:251-271 (21) ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_1 [C]
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf:273-299 (27) ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_2 [C]
+ROBINSON_PlusPlus.Meta.LineWFGuardPrf:301-337 (37) ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_3 [C]
+ROBINSON_PlusPlus.Meta.InAxiomsCodePrf:95-103 (9) ROBINSON_PlusPlus.Meta.InAxiomsCodePrf.pcc_inAxiomsCodeT_concrete
+ROBINSON_PlusPlus.Meta.InAxiomsCodePrf:225-263 (39) ROBINSON_PlusPlus.Meta.InAxiomsCodePrf.pcc_in_head_swap [C]
+ROBINSON_PlusPlus.Meta.InAxiomsCodePrf:311-342 (32) ROBINSON_PlusPlus.Meta.InAxiomsCodePrf.pcc_In_axiomsCodeT_tracked [C]
+ROBINSON_PlusPlus.Meta.HasWitTrackedPrf:1210-1240 (31) ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_hGuardT [C]
+ROBINSON_PlusPlus.Meta.EvalNthcPrf:233-237 (5) ROBINSON_PlusPlus.Meta.EvalNthcPrf.PrfH_provCode_congr [C]
+ROBINSON_PlusPlus.Meta.DerivCondPrf:102-108 (7) ROBINSON_PlusPlus.Meta.DerivCondPrf.liftFormula_provCodeC' [C]
+ROBINSON_PlusPlus.Meta.DerivCondPrf:110-194 (85) ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf [C]
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf:67-87 (21) ROBINSON_PlusPlus.Meta.EvalBoundedPrf.pcc_axline [C]
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf:89-94 (6) ROBINSON_PlusPlus.Meta.EvalBoundedPrf.pcc_c1_code [C]
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf:96-101 (6) ROBINSON_PlusPlus.Meta.EvalBoundedPrf.pcc_c2_code
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf:103-108 (6) ROBINSON_PlusPlus.Meta.EvalBoundedPrf.pcc_c3_code
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf:136-141 (6) ROBINSON_PlusPlus.Meta.EvalBoundedPrf.pcc_j1_code [C]
+ROBINSON_PlusPlus.Meta.EvalBoundedPrf:143-148 (6) ROBINSON_PlusPlus.Meta.EvalBoundedPrf.pcc_j2_code [C]
+ROBINSON_PlusPlus.Meta.PropCodePrf:55-59 (5) ROBINSON_PlusPlus.Meta.PropCodePrf.pcc_p1_code [C]
+ROBINSON_PlusPlus.Meta.PropCodePrf:61-68 (8) ROBINSON_PlusPlus.Meta.PropCodePrf.pcc_p2_code [C]
+ROBINSON_PlusPlus.Meta.PropCodePrf:70-77 (8) ROBINSON_PlusPlus.Meta.PropCodePrf.pcc_j3_code [C]
+ROBINSON_PlusPlus.Meta.PropCodePrf:79-83 (5) ROBINSON_PlusPlus.Meta.PropCodePrf.pcc_efq_code [C]
+ROBINSON_PlusPlus.Meta.PropCodePrf:137-149 (13) ROBINSON_PlusPlus.Meta.PropCodePrf.pcc_ind_code
+ROBINSON_PlusPlus.Meta.Sigma1Prf:56-57 (2) ROBINSON_PlusPlus.Meta.Sigma1Prf.provFromCode [C]
+ROBINSON_PlusPlus.Meta.Sigma1Prf:59-61 (3) ROBINSON_PlusPlus.Meta.Sigma1Prf.provCodeC'_eq_provFromCode [C]
+ROBINSON_PlusPlus.Meta.Sigma1Prf:63-68 (6) ROBINSON_PlusPlus.Meta.Sigma1Prf.prf_provCode_congr [C]
+ROBINSON_PlusPlus.Meta.Sigma1Prf:70-87 (18) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_eq_of_codeEq
+ROBINSON_PlusPlus.Meta.Sigma1Prf:91-95 (5) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_imp
+ROBINSON_PlusPlus.Meta.Sigma1Prf:97-103 (7) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_imp2
+ROBINSON_PlusPlus.Meta.Sigma1Prf:119-122 (4) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_in_head [C]
+ROBINSON_PlusPlus.Meta.Sigma1Prf:124-127 (4) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_in_tail
+ROBINSON_PlusPlus.Meta.Sigma1Prf:129-133 (5) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_in_head_eq
+ROBINSON_PlusPlus.Meta.Sigma1Prf:135-140 (6) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_in_nil
+ROBINSON_PlusPlus.Meta.Sigma1Prf:144-146 (3) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_chainOk_nil
+ROBINSON_PlusPlus.Meta.Sigma1Prf:148-156 (9) ROBINSON_PlusPlus.Meta.Sigma1Prf.prf_chainOk_cons_imp
+ROBINSON_PlusPlus.Meta.Sigma1Prf:158-163 (6) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_chainOk_cons
+ROBINSON_PlusPlus.Meta.Sigma1Prf:165-167 (3) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_allIn_nil
+ROBINSON_PlusPlus.Meta.Sigma1Prf:177-180 (4) ROBINSON_PlusPlus.Meta.Sigma1Prf.pcc_allIn_cons
+ROBINSON_PlusPlus.Meta.ForallElimCodePrf:67-80 (14) ROBINSON_PlusPlus.Meta.ForallElimCodePrf.prf_lineOk_q1 [C]
+ROBINSON_PlusPlus.Meta.ForallElimCodePrf:82-167 (86) ROBINSON_PlusPlus.Meta.ForallElimCodePrf.pcc_forallElim_code_open [C]
+ROBINSON_PlusPlus.Meta.CodeTreeReflect:341-377 (37) ROBINSON_PlusPlus.Meta.CodeTreeReflect.pcc_condD_of_tree [C]
+ROBINSON_PlusPlus.Meta.CodeTreeReflect:379-389 (11) ROBINSON_PlusPlus.Meta.CodeTreeReflect.pcc_lineWF_tracked_of_tree [C]
+ROBINSON_PlusPlus.Meta.LineWFSchemaPrf:106-107 (2) ROBINSON_PlusPlus.Meta.LineWFSchemaPrf.substFormula_lwfVar [C]
+ROBINSON_PlusPlus.Meta.LineWFSchemaPrf:197-206 (10) ROBINSON_PlusPlus.Meta.LineWFSchemaPrf.pcc_carcD_bridge [C]
+ROBINSON_PlusPlus.Meta.LineWFSchemaPrf:283-333 (51) ROBINSON_PlusPlus.Meta.LineWFSchemaPrf.pcc_lineWF_tracked_of_schema [C]
+ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf:113-150 (38) ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf.pcc_eval_carc_nthc [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:227-228 (2) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:665-691 (27) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.pcc_premsOfT_bridge [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:693-736 (44) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.pcc_nthc_premsOf_bridge [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:745-785 (41) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.prf_premsDisj_of_chainOk [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:846-925 (80) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hphi_gen [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:965-1012 (48) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBody_reflect [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:1014-1029 (16) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBody_deuda [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:1042-1043 (2) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsCF2 [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:1276-1292 (17) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hB_premsDotAt [C]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:1296-1299 (4) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbody_prems
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf:1301-1303 (3) ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real [C]
+ROBINSON_PlusPlus.Meta.LineWFThyPrf:102-123 (22) ROBINSON_PlusPlus.Meta.LineWFThyPrf.prf_lineWF_thy_bwd [C]
+ROBINSON_PlusPlus.Meta.LineWFThyPrf:235-283 (49) ROBINSON_PlusPlus.Meta.LineWFThyPrf.pcc_inDotT [C]
+ROBINSON_PlusPlus.Meta.LineWFThyPrf:287-329 (43) ROBINSON_PlusPlus.Meta.LineWFThyPrf.pcc_lineWF_tracked_thy_imp [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:501-503 (3) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.lineOkB [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:556-558 (3) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.lineOkBAt [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:614-633 (20) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_lineOkB_zero_iff [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:678-697 (20) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_lineOkB_cons_succ_iff [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:719-730 (12) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_head [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:755-804 (50) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_intro [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:806-816 (11) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_iff [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:820-823 (4) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.chainBPred [C]
+ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf:825-886 (62) ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:141-142 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_chainOk_nil [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:143-144 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_chainOk_cons [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:247-248 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_mp [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:249-250 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_gen [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:251-252 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_thy [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:253-254 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_p1 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:255-256 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_p2 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:257-258 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_c1 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:259-260 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_c2 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:261-262 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_c3 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:263-264 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_j1 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:265-266 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_j2 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:267-268 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_j3 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:269-270 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_efq [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:271-272 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_eqrefl [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:273-274 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_p3 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:275-276 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_q1 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:277-278 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_q2 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:279-280 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_q3 [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:281-282 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_leibniz [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:283-284 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_ind [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:285-286 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_qconf [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:287-288 (2) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_listInd [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:290-294 (5) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_inv [C]
+ROBINSON_PlusPlus.Meta.ModeloCodificacion:296-306 (11) ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_lineWF_cons [C]
+ROBINSON_PlusPlus.Minimal.Axioms:879-880 (2) ROBINSON_PlusPlus.Minimal.Axioms.lineWF [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:883-884 (2) ROBINSON_PlusPlus.Minimal.Axioms.lineOk [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:885-886 (2) ROBINSON_PlusPlus.Minimal.Axioms.chainOk [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:894-895 (2) ROBINSON_PlusPlus.Minimal.Axioms.ax_chainOk_nil [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:896-899 (4) ROBINSON_PlusPlus.Minimal.Axioms.ax_chainOk_cons [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1406-1408 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_mp [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1416-1418 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_gen [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1431-1434 (4) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_thy [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1451-1455 (5) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p1 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1459-1461 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p2 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1465-1467 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c1 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1471-1473 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c2 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1477-1479 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_c3 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1483-1485 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j1 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1489-1491 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j2 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1495-1497 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_j3 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1501-1503 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_efq [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1508-1511 (4) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_eqrefl [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1515-1517 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_p3 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1548-1550 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q1 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1554-1556 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q2 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1560-1562 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_q3 [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1566-1568 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_leibniz [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1572-1574 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_ind [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1578-1580 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_qconf [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1584-1586 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_listInd [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1614-1616 (3) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_inv [C] [D1]
+ROBINSON_PlusPlus.Minimal.Axioms:1618-1625 (8) ROBINSON_PlusPlus.Minimal.Axioms.ax_lineWF_cons [C] [D1]

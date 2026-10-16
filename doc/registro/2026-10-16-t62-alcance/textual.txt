@@ -1,0 +1,11 @@
+RADIO TEXTUAL de T62 — 2026-10-16, scripts/alcance_t62.bash (sobre el código despojado de comentarios y literales)
+grupo | declaraciones que lo nombran | líneas que lo nombran | ficheros
+G1 la lista de axiomas | 324 | 385 | 51
+G2 el código de la teoría y su ancla | 40 | 97 | 9
+G3 el verificador objeto | 372 | 863 | 51
+G4 los 25 axiomas del verificador | 192 | 274 | 15
+G4b sólo ax_lineWF_thy | 11 | 14 | 7
+G5 la regla thy (Prfᵢ.thy y prf_ax) | 233 | 255 | 32
+G6 las reglas ind, listInd y p3 (constructores y reglas derivadas) | 47 | 65 | 23
+G7 el verificador antiguo (ax_vpf_*, validProofFn) | 50 | 116 | 5
+G8 el verificador en el modelo | 34 | 39 | 3

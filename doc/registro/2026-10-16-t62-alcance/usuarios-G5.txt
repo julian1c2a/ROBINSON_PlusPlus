@@ -1,0 +1,6 @@
+# G5 la regla thy de Lean (Prfᵢ.thy)
+# usuarios directos: módulo:inicio-fin (líneas) declaración [C = en el cono de los 18] [D1 = en el de D1]
+ROBINSON_PlusPlus.Meta.HilbertSeq:179-228 (50) ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf [C] [D1]
+ROBINSON_PlusPlus.Meta.ReprPrf:55-56 (2) ROBINSON_PlusPlus.Meta.ReprPrf.prf_ax [C] [D1]
+ROBINSON_PlusPlus.Meta.Hilbert:89-112 (24) ROBINSON_PlusPlus.Meta.Hilbert.Prfᵢ [C] [D1]
+ROBINSON_PlusPlus.Meta.SolidezVerificador:458-463 (6) ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_thy [C]
