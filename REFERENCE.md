@@ -1,12 +1,21 @@
 # Technical Reference — ROBINSON_PlusPlus
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II sin hipótesis DENTRO de Lean** ([ADR‑120](DECISIONS.md)) · la consistencia es **RELATIVA a Lean** ([ADR‑138](DECISIONS.md))
 >
 > Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
 > `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
 > dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
 > (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁 Y desde ADR‑121, Gödel I ENTERO (`goedel_I_neg`),
 > E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ Lo que NO dice: Rosser (⬜).
+>
+> ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))* **Consistencia RELATIVA, no absoluta.** `consistencia` es una prueba
+> EN LEAN; lo que garantiza fuera de Lean es PRA ⊢ Con(Lean) → Con(T_Prf), si el núcleo implementa bien esa
+> teoría. No puede ser absoluta: `T_Prf` contiene a PA y, por Gödel II, ninguna teoría contenida en ella demuestra su
+> consistencia. «Sin hipótesis» quiere decir sin hipótesis dentro de Lean; la que queda, Con(Lean), Lean no la puede
+> descargar (Gödel II, aplicado a Lean). Vale igual para `goedel_I`, `goedel_II`, `goedel_I_neg` y `tarski`, que
+> implican `ConsistentH`. Los condicionales (`goedel_first_prf`, `goedel_second_prf`, clase (i)) no pasan por el
+> modelo; que para ellos baste una metateoría débil es lo esperable, y no está medido.
+> [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §4.
 >
 > 🏁 **D7 ejecutada (ADR‑129, 2026‑10‑05)**: los símbolos de FOL son `List Char` (antes `String`), en FOL y en RPP; los
 > literales de varios caracteres se escriben `sym!"…"` (`Minimal/SymLit.lean`). Ningún valor cambia (`codeNat`, `V₀`,

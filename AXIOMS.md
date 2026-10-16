@@ -1,12 +1,21 @@
 # Registro central de axiomas — ROBINSON_PlusPlus
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II sin hipótesis DENTRO de Lean** ([ADR‑120](DECISIONS.md)) · la consistencia es **RELATIVA a Lean** ([ADR‑138](DECISIONS.md))
 >
 > Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
 > `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
 > dan `consistencia : ConsistentH`; con ella, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
 > (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁 Y desde ADR‑121, Gödel I ENTERO (`goedel_I_neg`),
 > E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ Lo que NO dice: Rosser (⬜).
+>
+> ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))* **Consistencia RELATIVA, no absoluta.** `consistencia` es una prueba
+> EN LEAN; lo que garantiza fuera de Lean es PRA ⊢ Con(Lean) → Con(T_Prf), si el núcleo implementa bien esa
+> teoría. No puede ser absoluta: `T_Prf` contiene a PA y, por Gödel II, ninguna teoría contenida en ella demuestra su
+> consistencia. «Sin hipótesis» quiere decir sin hipótesis dentro de Lean; la que queda, Con(Lean), Lean no la puede
+> descargar (Gödel II, aplicado a Lean). Vale igual para `goedel_I`, `goedel_II`, `goedel_I_neg` y `tarski`, que
+> implican `ConsistentH`. Los condicionales (`goedel_first_prf`, `goedel_second_prf`, clase (i)) no pasan por el
+> modelo; que para ellos baste una metateoría débil es lo esperable, y no está medido. §0.2 y
+> [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §4.
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
 
@@ -153,6 +162,10 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
    build con el núcleo (ADR‑116). **0 `axiom` de Lean** en los módulos del build, en RPP y en FOL (fuera del build, FOL guarda 15 en
    `cuarentena/`, T57, y RPP cuatro en `sondeos/`: los dos que el piloto `PilotoDiagonal.lean` suponía, y dos en
    `lintlab/Uso.lean`, que prueban que un linter los detecta).
+   ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))* Con el núcleo se supone su CONSISTENCIA, que Lean no puede demostrar
+   (Gödel II, aplicado a Lean): todo lo demostrado vale relativo a ella. Para la de los titulares, PRA ⊢ Con(Lean) →
+   Con(T_Prf); y no puede ser de otro modo, porque `T_Prf` contiene a PA (§0.1) y ninguna teoría contenida en ella
+   demuestra su consistencia. El detalle, en `TEOREMAS-E-HIPOTESIS.md` §4.
 2. **Nada sobre la teoría.** Los 142 axiomas y los esquemas no se suponen: DEFINEN `Prf`, y su verdad está
    DEMOSTRADA. Los 142, en el modelo `MNV V₀` (dominio ℕ, con 0, σ, + y · los de siempre: `MN_axioms`); los esquemas y
    las reglas, en todo modelo `Estandar` —dominio ℕ, 0 y σ los de siempre, `::` el `consN` de ADR‑113 (σ del par de Cantor), y

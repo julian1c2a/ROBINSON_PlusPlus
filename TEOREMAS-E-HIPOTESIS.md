@@ -6,12 +6,15 @@
 > `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'` y `tarski`. Van sobre `Prf`, cuya teoría,
 > `T_Prf`, contiene a PA, por lectura ([AXIOMS.md](AXIOMS.md) §0). `ConsistentH` es un TEOREMA, `consistencia` (un modelo de los 142
 > y la solidez de `Prf`), y lo único que se supone es el núcleo de Lean y sus tres axiomas. ⬜ Rosser no existe: su
-> enunciado está por decidir (T01).
+> enunciado se decidió en ADR‑137 (T01: la teoría como parámetro del verificador, con T08 como criterio de aceptación).
+>
+> ✏️ *(2026‑10‑16, ADR‑138)* «Sin hipótesis» quiere decir DENTRO de Lean: la consistencia que da `consistencia` es
+> RELATIVA a Lean (PRA ⊢ Con(Lean) → Con(T_Prf)), y no puede ser absoluta (§4).
 >
 > La columna «¿qué usa la prueba?» de §1 está MEDIDA (`sondeos/InduccionTitulares.lean`, `#modelo`, 2026‑10‑14).
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
+**Last updated:** 2026-10-16 — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
 
 ---
 
@@ -77,7 +80,7 @@ dieciocho, `consistencia`, es el nodo por el que se corta, y la clase no se le a
 | **`godelCN_verdadera`**, **`con_verdadera`** (E10, `Meta/SolidezVerificador.lean`) | ninguna | — (`G` y `Con` son VERDADERAS en `MNV V₀`) | **(iii)** |
 | **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | — (ninguna fórmula define la verdad en `MNV V₀`) | **(iii)** |
 | **`consistencia`** (`Meta/Consistencia.lean`) | ninguna | — (es la que descarga `ConsistentH`) | — es el nodo de corte: la clase no se aplica. Usa el modelo para dar `ConsistentH` (`MN_axioms` y `prf_sound`) |
-| ⬜ **Rosser** | — | **no existe**: con `ConsistentH` teorema, la firma `rosser (hcon : ConsistentH)` no dice nada por sí sola; su contenido sería la clase (i), que comprobaría T08, o un enunciado para las extensiones T+E. Está por decidir (T01) | — |
+| ⬜ **Rosser** | — | **no existe**: con `ConsistentH` teorema, la firma `rosser (hcon : ConsistentH)` no dice nada por sí sola; su contenido sería la clase (i), que comprobaría T08, o un enunciado para las extensiones T+E. Decidido en ADR‑137 (T01, opción a‑ii): la sentencia de Rosser de cada T+E, con la teoría como parámetro del verificador y T08 como criterio de aceptación; por construir | — |
 
 Las condiciones de derivabilidad, D1–D3, dan **(i)** las tres (§3). Lo que usan de la INDUCCIÓN —otra pregunta, que
 `#print axioms` tampoco ve— está en [AXIOMS.md](AXIOMS.md) §0.3: D1 la aritmética, D2 la de listas, ningún titular un
@@ -132,6 +135,39 @@ y las demás del árbol (426), se retiraron con la clase el 2026‑10‑05 ([ADR
 🗑️ **Retiradas con la capa `⊢`** (ADR‑115): `ConsistentOmega` (`¬ (axioms ⊢ ⊥)`), `OmegaConsistent`,
 `NegVerifier`, `Reflects`.
 
+### `ConsistentH` es un teorema DE LEAN: consistencia RELATIVA, no absoluta (2026‑10‑16, [ADR‑138](DECISIONS.md))
+
+`consistencia` demuestra en Lean que `Prf` no deriva `⊥`. Fuera de Lean, lo que eso garantiza es una consistencia
+**relativa**: PRA ⊢ Con(Lean) → Con(T_Prf). La razón: Con(T_Prf) es una sentencia Π₁. Si `T_Prf` fuera inconsistente,
+habría una derivación concreta de `⊥`, un objeto finito; Lean construiría con ella un término de `Prf ⊥` y, con
+`consistencia`, derivaría `False`. Y todo eso vale si el núcleo (v4.31.0) implementa bien su teoría de tipos: leanchecker
+y los censos `@TRUST`/`@NATIVO` lo vigilan en parte (ADR‑116), pero un error del núcleo no lo excluye ningún control.
+
+**No puede ser absoluta.** `T_Prf` contiene a PA ([AXIOMS.md](AXIOMS.md) §0.1). Por el propio Gödel II, ninguna
+teoría contenida en `T_Prf` demuestra Con(T_Prf), salvo que `T_Prf` sea inconsistente. Así que la metateoría que
+descarga `ConsistentH` es, por fuerza, MÁS fuerte que la teoría de la que habla. La de Lean lo es con mucho: su teoría
+de tipos es equiconsistente con ZFC más infinitos cardinales inaccesibles (Carneiro, *The Type Theory of Lean*, 2019;
+de la literatura, no medido aquí). «Sin hipótesis», en los banners, quiere decir sin hipótesis DENTRO de Lean. La que
+queda, Con(Lean), Lean no la puede descargar: es Gödel II aplicado a Lean.
+
+**A qué titulares alcanza.** A `consistencia` y a los de las clases (ii) y (iii) de §1. `goedel_I`, `goedel_II`,
+`goedel_I_neg` y `tarski` dicen que `Prf` no deriva cierta fórmula, y eso implica `ConsistentH`, porque de `Prf ⊥`
+sale cualquier fórmula (EFQ): heredan la misma condición. Los demás de la clase (iii) hablan además de la verdad en
+`MNV V₀`, que la teoría ni siquiera puede definir (`tarski_semantico`). Los de la clase (i) —los condicionales
+`goedel_first_prf` y `goedel_second_prf`, D1–D3, `prf_tarski`— son otra cosa: no pasan por el modelo, y en ellos está
+el contenido gödeliano. Que para ellos baste una metateoría débil es lo esperable (Gödel lo hizo en una finitaria; el plan del
+libro dice «≈ IΣ₁»), pero **no está medido**: la columna de §1 mide qué nombra la prueba, no la fuerza de la metateoría
+que la reproduciría.
+
+**Dos sentidos de «relativa», para no mezclarlos.**
+* *Probada en S*: S ⊢ Con(T). Da PRA ⊢ Con(S) → Con(T). Es el caso de `consistencia`, con S = Lean.
+* *Equiconsistencia entre teorías objeto*: por ejemplo, PRA ⊢ Con(HA) ↔ Con(PA), por la traducción negativa de
+  Gödel–Gentzen. No afirma la consistencia de ninguna de las dos.
+
+La prueba de Gentzen, PRA + TI(ε₀) ⊢ Con(PA), es del primer tipo con una S mucho más débil que Lean: rebaja aquello
+respecto de lo que la consistencia es relativa. Para `T_Prf` haría falta, además, reducirla a PA (interpretar en PA
+los símbolos de la codificación, o probar que sus ecuaciones son conservativas), y eso no está hecho (AXIOMS §0.1).
+
 ---
 
 ## 5 · Lo que se supone — sólo Lean; y `axiom` de Lean, **0**
@@ -140,7 +176,8 @@ Los tres `axiom` que quedaban vivían sobre `⊢` y están retirados con esa cap
 `ax_list_induction` (**falso**: daba `[] ⊢ ⊥`, L1‑2) y `ax_axiomsCodeT_eq`, los tres retirados.
 ⇒ **Ningún postulado gödeliano, ningún `axiom` en el build y ninguna hipótesis sin descargar**: `ConsistentH` es teorema (§4), y lo que ancla `axiomsCodeT` es
 un axioma OBJETO de la teoría, el último de los 142. Lo único que se supone es el núcleo de Lean y sus tres axiomas
-(`propext`, `Classical.choice`, `Quot.sound`); el detalle, y lo que no fija ningún control (las definiciones: T07), en
+(`propext`, `Classical.choice`, `Quot.sound`) y, con ellos, su consistencia, que Lean no puede demostrar: lo demostrado
+vale relativo a ella (§4, ADR‑138); el detalle, y lo que no fija ningún control (las definiciones: T07), en
 [`AXIOMS.md`](AXIOMS.md) §0.2.
 
 ---

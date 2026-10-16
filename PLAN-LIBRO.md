@@ -536,8 +536,18 @@ siguientes se leen a través de ella (§2.9).
    metateoría aritmética (curso de valores + esquema de inducción ≈ IΣ₁), los **dos** usos de
    `Classical` y por qué uno es el principio de Markov, el experimento ya hecho en `Peano`
    (`#assert_constructive`, 1425 invocaciones, con su propio control positivo) y qué transferiría y
-   qué no una metateoría-Peano. Cierra la asimetría que el libro necesita decir en voz alta: **la
+   qué no una metateoría-Peano. Cierra la asimetría que el libro necesita decir en voz alta: **para los
+   teoremas CONDICIONALES** (`goedel_first_prf`, `goedel_second_prf`, con la hipótesis `hcon`) **la
    metateoría no tiene que ser más fuerte que la teoría de la que habla.**
+   ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))*: la frase se escribió el 2026‑09‑09, cuando los titulares
+   eran condicionales, y sin la acotación es FALSA para los que hoy van sin hipótesis: `consistencia`,
+   `goedel_I` y `goedel_II` implican cada uno Con(T_Prf) (de `Prf ⊥` sale cualquier fórmula), `T_Prf`
+   contiene a PA (`AXIOMS.md` §0.1), y por el propio Gödel II ninguna teoría contenida en `T_Prf`
+   demuestra Con(T_Prf), salvo que `T_Prf` sea inconsistente. La metateoría que los demuestra es, por
+   fuerza, MÁS fuerte que la teoría; la de Lean lo es con mucho. El capítulo tiene que decir las dos
+   mitades (`TEOREMAS-E-HIPOTESIS.md` §4). ⬜ La misma frase, sin la acotación, sigue en
+   `doc/book/MATERIALES.md` §1.4 y en la lección del principio de `cap-objeto-y-meta.tex`: no se tocan
+   mientras el libro esté en espera (T49, ADR‑136 §3).
    *Material:* `doc/book/MATERIALES.md` M-1 — consumido entero por este capítulo.
 7. **La teoría objeto: Robinson Q++** ✅ — el núcleo de Q, lo que Q no prueba, el precio de cada
    símbolo nuevo, qué se consigue sin inducción, la frontera con `Full/`, los otros 107, y por qué

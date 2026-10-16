@@ -1,6 +1,6 @@
 # ROBINSON_PlusPlus
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](DECISIONS.md))
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II sin hipótesis DENTRO de Lean** ([ADR‑120](DECISIONS.md)) · la consistencia es **RELATIVA a Lean** ([ADR‑138](DECISIONS.md))
 >
 > Un modelo de los **142** axiomas (`MNV V₀`: `Meta/ModeloCodigo.lean`, `Meta/ModeloEstandar.lean`,
 > `Meta/ModeloCodificacion.lean`) y la solidez de `Prf` en todo modelo estándar (`prf_sound`, `Meta/SolidezPrf.lean`)
@@ -8,6 +8,15 @@
 > (`Meta/Consistencia.lean`), con footprint los tres de Lean. 🏁🏁 Y desde ADR‑121, **Gödel I ENTERO**:
 > `goedel_I_neg : ¬ Prf ¬godelCN` (`Meta/SolidezVerificador.lean`, por la solidez del verificador en el modelo), y
 > **Tarski** (`Meta/TarskiPrf.lean`); y `G` y `Con` son VERDADERAS en el modelo (E10). ⚠️ Lo que NO dice: Rosser (⬜).
+>
+> ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))* **Consistencia RELATIVA, no absoluta.** `consistencia` es una prueba
+> EN LEAN; lo que garantiza fuera de Lean es PRA ⊢ Con(Lean) → Con(T_Prf), si el núcleo implementa bien esa
+> teoría. No puede ser absoluta: `T_Prf` contiene a PA y, por Gödel II, ninguna teoría contenida en ella demuestra su
+> consistencia. «Sin hipótesis» quiere decir sin hipótesis dentro de Lean; la que queda, Con(Lean), Lean no la puede
+> descargar (Gödel II, aplicado a Lean). Vale igual para `goedel_I`, `goedel_II`, `goedel_I_neg` y `tarski`, que
+> implican `ConsistentH`. Los condicionales (`goedel_first_prf`, `goedel_second_prf`, clase (i)) no pasan por el
+> modelo; que para ellos baste una metateoría débil es lo esperable, y no está medido.
+> [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §4.
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro: su «CONDICIONALES … no hay modelo» dejó de valer.*
 
@@ -145,10 +154,10 @@ inducción; la teoría sí, y las pruebas lo usan, D1 incluida ([AXIOMS.md](AXIO
   el `goedel_second'` de `Meta/GodelTwo.lean` **no es** el Segundo Teorema, y el que sí lo es vive
   sobre `Prf`. Detalle en `doc/AUDITORIA-2026-09-11.md` **F‑1**.
 - **0 `axiom` de Lean** en el build (los 3 que había vivían sobre `⊢` y se retiraron con esa capa, ADR-115), **0 `sorry`**. *(✏️ 2026‑10‑14, ADR‑134: decía «en todo el árbol»; fuera del build, `sondeos/` guarda cuatro: [AXIOMS.md](AXIOMS.md) §0.2.)*
-- 🏁 **Hay prueba de consistencia** desde ADR‑120: `consistencia : ConsistentH`, por un modelo de los 142 (`MNV V₀`) y la
+- 🏁 **Hay prueba de consistencia, RELATIVA a Lean,** desde ADR‑120: `consistencia : ConsistentH`, por un modelo de los 142 (`MNV V₀`) y la
   solidez de `Prf` (`prf_sound`). *(✏️ 2026‑10‑12, [ADR‑134](DECISIONS.md): esta línea decía «No es una prueba de
   consistencia: se retiró una inconsistencia conocida y localizada (ADR‑012/013), lo que no es lo mismo». Lo de
-  ADR‑012/013 es registro.)*
+  ADR‑012/013 es registro.)* *(✏️ 2026‑10‑16, [ADR‑138](DECISIONS.md): es una prueba EN LEAN, así que garantiza PRA ⊢ Con(Lean) → Con(T_Prf); absoluta no puede ser, porque `T_Prf` contiene a PA. `TEOREMAS-E-HIPOTESIS.md` §4.)*
 
 **Características principales:**
 

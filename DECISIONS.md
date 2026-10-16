@@ -1,12 +1,17 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-14 — hasta **ADR-137** (Rosser, decidido: la teoría como PARÁMETRO del verificador, opción a‑ii de T01, con T08 como criterio de aceptación; y dos frases de FOL al día). Antes, el mismo día — hasta **ADR-136** (`master` protegido: sólo entra un commit con la CI ya verde, por una rama `ci/…`; y las decisiones del propietario del 2026‑10‑14). Antes, el mismo día — hasta **ADR-135** (TEOREMAS-E-HIPOTESIS al día —`⊬¬G` existe—, con la columna «¿qué usa la prueba?» MEDIDA en tres clases, y el control `[T]`). Antes, el mismo día — hasta **ADR-134** (la teoría de los titulares, `T_Prf`, descrita: contiene a PA, no es Q ni IΣ₁; `AXIOMS.md` §0, la descripción canónica, con lo que se supone hoy; D1 usa la inducción, D2 la de listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, MEDIDO en `sondeos/InduccionTitulares.lean`; y los comentarios caducados o falsos de 113 `.lean`, al día, con su revisión adversarial). Antes, 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-16 — hasta **ADR-138** (la consistencia que da `consistencia` es RELATIVA a Lean, PRA ⊢ Con(Lean) → Con(T_Prf), y no puede ser absoluta: los banners, TEOREMAS §4, AXIOMS §0.2 y PLAN-LIBRO cap. 6). Antes, 2026-10-14 — hasta **ADR-137** (Rosser, decidido: la teoría como PARÁMETRO del verificador, opción a‑ii de T01, con T08 como criterio de aceptación; y dos frases de FOL al día). Antes, el mismo día — hasta **ADR-136** (`master` protegido: sólo entra un commit con la CI ya verde, por una rama `ci/…`; y las decisiones del propietario del 2026‑10‑14). Antes, el mismo día — hasta **ADR-135** (TEOREMAS-E-HIPOTESIS al día —`⊬¬G` existe—, con la columna «¿qué usa la prueba?» MEDIDA en tres clases, y el control `[T]`). Antes, el mismo día — hasta **ADR-134** (la teoría de los titulares, `T_Prf`, descrita: contiene a PA, no es Q ni IΣ₁; `AXIOMS.md` §0, la descripción canónica, con lo que se supone hoy; D1 usa la inducción, D2 la de listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, MEDIDO en `sondeos/InduccionTitulares.lean`; y los comentarios caducados o falsos de 113 `.lean`, al día, con su revisión adversarial). Antes, 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
-> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS** ([ADR‑120](#adr-120))
+> ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II sin hipótesis DENTRO de Lean** ([ADR‑120](#adr-120)) · la consistencia es **RELATIVA a Lean** ([ADR‑138](#adr-138))
 >
 > `consistencia : ConsistentH`, `goedel_I : ¬ Prf godelCN` y `goedel_II : ¬ Prf consistencyFormula'`
 > (`Meta/Consistencia.lean`), por un modelo de los 142 (`MNV V₀`) y la solidez de `Prf` (`prf_sound`). 🏁 Y desde
 > ADR‑121, Gödel I ENTERO (`goedel_I_neg`), E10 (`G` y `Con` verdaderas en el modelo) y Tarski. ⚠️ No dice: Rosser (⬜).
+>
+> ✏️ *(2026‑10‑16, [ADR‑138](#adr-138))* **Consistencia RELATIVA, no absoluta.** `consistencia` es una prueba EN LEAN;
+> lo que garantiza fuera de Lean es PRA ⊢ Con(Lean) → Con(T_Prf), si el núcleo implementa bien esa teoría. No
+> puede ser absoluta: `T_Prf` contiene a PA y, por Gödel II, ninguna teoría contenida en ella demuestra su
+> consistencia. «Sin hipótesis» quiere decir sin hipótesis dentro de Lean. [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) §4.
 >
 > 🗓️ *Lo que sigue es el estado del 2026‑10‑04, como registro.*
 
@@ -10473,3 +10478,73 @@ ruta P con T08 sobre `T` fija; y (c), no hacer Rosser sobre `T`.
 
 **Véase también:** ADR‑117 (F1 y el ancla), ADR‑122 §2 (Rosser re‑medido), ADR‑123…126 (la Etapa 0), ADR‑135 (las
 clases y `#modelo`), ADR‑136 (las decisiones del día); T01, T08, T62, T64 y T66 de la auditoría.
+
+## ADR-138: 🧭 La consistencia que da `consistencia` es RELATIVA a Lean —PRA ⊢ Con(Lean) → Con(T_Prf)— y no puede ser absoluta; dicho en los banners, en TEOREMAS §4 y en PLAN-LIBRO
+
+**Fecha:** 2026-10-16 · **Estado:** ✅ (este commit) · **Ámbito:** sólo documentación: los banners de `README.md`,
+`AXIOMS.md`, `REFERENCE.md` y `DECISIONS.md`, y la línea «Hay prueba de consistencia» de `README.md`;
+`TEOREMAS-E-HIPOTESIS.md` (banner, la fila de Rosser, §4 y §5); `AXIOMS.md` §0.2; `PLAN-LIBRO.md`, capítulo 6 (una
+excepción puntual a T49, pedida por el propietario); `NEXT-STEPS.md` y `doc/AUDITORIA-SUELO-2026-10-12.md` (la nota).
+
+### 1 · Por qué
+
+La pregunta del propietario (2026‑10‑16): «la consistencia para un modelo de aritmética Q será necesariamente un modelo
+de consistencia relativa […] ¿Podemos estar confundiendo consistencia con consistencia relativa?». La respuesta,
+leída en el árbol:
+
+* **En el código, no.** `consistencia : ConsistentH` es un teorema de Lean y dice lo que dice. Un teorema de Lean es,
+  por construcción, relativo a Lean.
+* **En la prosa, sí, en dos sitios.**
+  - Los banners «`ConsistentH` es un TEOREMA del build: Gödel I y II SIN HIPÓTESIS» (README, AXIOMS, REFERENCE y
+    DECISIONS) y la línea «Hay prueba de consistencia» de README se leen como consistencia absoluta.
+  - `PLAN-LIBRO.md`, capítulo 6, decía «la metateoría no tiene que ser más fuerte que la teoría de la que habla». Se
+    escribió el 2026‑09‑09, cuando los titulares eran condicionales. Para los que hoy van sin hipótesis es FALSO.
+* **Nadie lo decía.** Buscado el 2026‑10‑16 en todos los `.md` (grep de «relativ», «Con(Lean», «consistencia de
+  Lean»): ninguna mención de que la consistencia sea relativa a Lean. Lo más cercano, `TEOREMAS-E-HIPOTESIS.md` §5,
+  «lo único que se supone es el núcleo de Lean y sus tres axiomas»: correcto, pero sin decir que con el núcleo se
+  supone su consistencia.
+
+### 2 · Lo que se fija (el detalle, en `TEOREMAS-E-HIPOTESIS.md` §4)
+
+* **Qué garantiza `consistencia`, fuera de Lean:** PRA ⊢ Con(Lean) → Con(T_Prf). Con(T_Prf) es Π₁: si `T_Prf` fuera
+  inconsistente, la derivación de `⊥` sería un objeto finito, Lean construiría con ella un término de `Prf ⊥` y, con
+  `consistencia`, derivaría `False`. Y eso, si el núcleo implementa bien su teoría de tipos: un error del núcleo no lo
+  excluye ningún control.
+* **Absoluta no puede ser.** `T_Prf` contiene a PA (ADR‑134). Por Gödel II, ninguna teoría contenida en `T_Prf`
+  demuestra Con(T_Prf), salvo que `T_Prf` sea inconsistente: la metateoría que descarga `ConsistentH` es por fuerza
+  más fuerte. La de Lean lo es con mucho (equiconsistente con ZFC más infinitos inaccesibles: Carneiro, 2019; de la
+  literatura, no medido).
+* **A qué titulares alcanza.** A `consistencia` y a las clases (ii) y (iii) de ADR‑135. `goedel_I`, `goedel_II`,
+  `goedel_I_neg` y `tarski` implican `ConsistentH` (de `Prf ⊥` sale cualquier fórmula). Los demás de la clase (iii)
+  hablan de la verdad en `MNV V₀`, que la teoría no puede definir. La clase (i), con los condicionales
+  `goedel_first_prf` y `goedel_second_prf`, no pasa por el modelo. Que para ella baste una metateoría débil es lo
+  esperable, y **no está medido**.
+* **Dos sentidos de «relativa».** Probada en S (S ⊢ Con(T), que da PRA ⊢ Con(S) → Con(T): el de `consistencia`, con
+  S = Lean), y equiconsistencia entre teorías objeto (PRA ⊢ Con(HA) ↔ Con(PA), Gödel–Gentzen). Gentzen (PRA + TI(ε₀) ⊢
+  Con(PA)) es del primer tipo con una S mucho más débil que Lean. Para `T_Prf` pediría además reducirla a PA, y eso no
+  está hecho.
+
+### 3 · Lo que se cambió
+
+* **Banners** de README, AXIOMS, REFERENCE y DECISIONS: el titular dice «sin hipótesis DENTRO de Lean» y «la
+  consistencia es RELATIVA a Lean», con un párrafo debajo. La línea de README dice «RELATIVA a Lean», con su nota.
+* **`TEOREMAS-E-HIPOTESIS.md`**: §4, la sección nueva; §5, la consistencia del núcleo entre lo que se supone; el
+  banner, una línea. De paso, el banner y la fila de Rosser decían «por decidir (T01)», caducado desde ADR‑137: al día.
+  Su marca sube a hoy, y una marca responde del cuerpo entero ([E]).
+* **`AXIOMS.md` §0.2**, punto 1: con el núcleo se supone su consistencia.
+* **`PLAN-LIBRO.md`**, capítulo 6: la frase, acotada a los condicionales, y la nota de por qué.
+* **Las marcas.** README, AXIOMS, REFERENCE y PLAN-LIBRO están en la deuda de `[E]` (`E_DEUDA`), y su
+  `**Last updated:**` NO sube. El cambio toca un banner y un párrafo, no el cuerpo. Subirla certificaría un cuerpo que
+  no se ha revisado, que es justo el defecto que `[E]` existe para cazar.
+
+### 4 · Lo que NO cubre
+
+* La misma frase, sin acotar, sigue en `doc/book/MATERIALES.md` §1.4 y en la lección del principio de
+  `doc/book/capitulos/cap-objeto-y-meta.tex`. No se tocan mientras el libro esté en espera (T49, ADR‑136 §3).
+* Los demás documentos que dicen «SIN HIPÓTESIS»: `CURRENT-STATUS-PROJECT.md` y `GODEL-STATUS.md` (los reescriben T26
+  y T28), los bloques viejos de NEXT-STEPS y los `doc/REFERENCE-*`. T33, la fuente única del estado, lo resolvería de
+  una vez (ADR‑139, paso 2).
+* La fuerza de la metateoría que pide la clase (i): medirla pediría traducir las pruebas a una aritmética débil.
+
+**Véase también:** ADR‑120 (`consistencia`), ADR‑134 (`T_Prf` contiene a PA), ADR‑135 (las tres clases), ADR‑136 §3
+(T49) y ADR‑139.
