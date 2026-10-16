@@ -14,7 +14,7 @@
 > La columna «¿qué usa la prueba?» de §1 está MEDIDA (`sondeos/InduccionTitulares.lean`, `#modelo`, 2026‑10‑14).
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-16 — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
+**Last updated:** 2026-10-16 — ADR‑140: la línea de llegada de RPP (§0) y la fila de Löb (§1). Antes, el mismo día — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
 
 ---
 
@@ -38,6 +38,9 @@ limpio y todos los controles en verde. `#print axioms` no ve las hipótesis de c
 ⭐⭐ **Y la tercera** (2026‑10‑14, T09): *¿qué usa la prueba?* Desde que `ConsistentH` es un teorema, una hipótesis
 `hcon : ConsistentH` se descarga sola, y lo que distingue «basta la consistencia» de «usa la verdad en ℕ» es lo que la
 prueba NOMBRA: la columna de §1.
+
+🏁 **La línea de llegada de RPP** (2026‑10‑16, [ADR‑140](DECISIONS.md)): los 18 titulares de `T_UNIVERSO`, Rosser y
+Löb (las dos filas ⬜ de §1). Gentzen y el libro quedan fuera de este repositorio.
 
 ⚠️ **Regla de mantenimiento**: este documento se actualiza **en el mismo commit** que añade o cambia
 un teorema cabecera. Una fila con «⬜ nadie» es información, no un fallo; una fila **ausente** sí es
@@ -81,6 +84,7 @@ dieciocho, `consistencia`, es el nodo por el que se corta, y la clase no se le a
 | **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | — (ninguna fórmula define la verdad en `MNV V₀`) | **(iii)** |
 | **`consistencia`** (`Meta/Consistencia.lean`) | ninguna | — (es la que descarga `ConsistentH`) | — es el nodo de corte: la clase no se aplica. Usa el modelo para dar `ConsistentH` (`MN_axioms` y `prf_sound`) |
 | ⬜ **Rosser** | — | **no existe**: con `ConsistentH` teorema, la firma `rosser (hcon : ConsistentH)` no dice nada por sí sola; su contenido sería la clase (i), que comprobaría T08, o un enunciado para las extensiones T+E. Decidido en ADR‑137 (T01, opción a‑ii): la sentencia de Rosser de cada T+E, con la teoría como parámetro del verificador y T08 como criterio de aceptación; por construir | — |
+| ⬜ **Löb** | — | **no existe**: si `Prf (Prov⌜φ⌝ ⇒ φ)`, entonces `Prf φ`, por el diagonal de Prov(#0) ⇒ φ con D1–D3; un segundo consumidor de D1–D3 (T70; ESTIMACIÓN: 50–120 líneas). Dentro de la línea de llegada de RPP desde ADR‑140 | — |
 
 Las condiciones de derivabilidad, D1–D3, dan **(i)** las tres (§3). Lo que usan de la INDUCCIÓN —otra pregunta, que
 `#print axioms` tampoco ve— está en [AXIOMS.md](AXIOMS.md) §0.3: D1 la aritmética, D2 la de listas, ningún titular un

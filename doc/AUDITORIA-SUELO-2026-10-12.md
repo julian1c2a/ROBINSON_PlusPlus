@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-16 — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-16 — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -56,6 +56,12 @@
 * **T14 (RPP):** se protege `master` exigiendo la CI verde (hecho en ADR‑136: rama `ci/…`, CI allí y avance de `master`, sin excepción para el administrador). Un módulo de RPP se congela sólo cuando sea SEGURO que su fase está cerrada; hoy, ninguno.
 * **T01:** sin decidir por la mañana; el propietario pidió más información para ver las diferencias (`doc/registro/2026-10-14-t01-rosser/informe.md`). Por la tarde, DECIDIDO ([ADR‑137](../DECISIONS.md)): **(a‑ii)**, la teoría como parámetro del verificador, con **T08** como criterio de aceptación; con ella T62 queda en su opción (ii).
 * Lo demás de esta lista, abierto.
+
+**Decididas el 2026‑10‑16** ([ADR‑140](../DECISIONS.md)):
+* **Arquitectura** (paso 3 de ADR‑139): capas DENTRO de RPP —manifiesto módulo→capa, control de dirección de imports, contratos generados—; un repositorio aparte sólo cuando una capa se cierre. Gentzen nace en su propio repositorio.
+* **La línea de llegada de RPP:** los 18 titulares de `T_UNIVERSO`, Rosser y Löb (T70 entra). Gentzen (T69) y el libro (T49), fuera de RPP.
+* **Variantes de la teoría** (Q++ sin inducción, PA, HA sin `p3`): se miden en el ADR de diseño de T62, con el coste de parametrizar también las reglas; no se compromete ninguna.
+* **ADR‑139:** aprobados los pasos 1 (sondeos: T06 → T10 → etiqueta → archivo) y 2 (historia: el corte de DECISIONS en ADR‑130, la fuente única del estado en el banner de `TEOREMAS-E-HIPOTESIS.md`, CHANGELOG como índice congelado).
 
 **Las preguntas, tal como se entregaron el 2026‑10‑12:**
 
@@ -885,6 +891,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Fundamentos y ruta matemática · *Verificación:* sin segunda verificación (P3); la corrección de diseño de CRI-02 está verificada (confirmado, P1 a través de T01)
 
+*Estado el 2026‑10‑16:* el ADR de diseño mide además el coste de parametrizar también las REGLAS (`ind`, `listInd`, `p3`), que daría Q++, PA y HA como instancias (ADR‑140); no se compromete ninguna variante.
+
 *Estado el 2026‑10‑14:* 🟢 Elegida la opción (ii), un parámetro de teoría en `lineWF`/`chainOk` (ADR‑137, con T01). Primero, la medición de alcance y el ADR de diseño.
 
 * **Qué:** MEDIDO: la lista de axiomas sólo entra en el verificador por ax_lineWF_thy («In (carc line) axiomsCodeT», Minimal/Axioms.lean:1403-1406). axiomsCodeT es una sola constante (:1064), fijada por el ancla genérica axD L (:1099-1100; hoy axD axiomsBase, :1632), y provFormulaC' llega a ella a través de chainOk (ProofChain.lean:107-108). axD y prf_deltaD ya valen para toda L, y el modelo es paramétrico en V. INFERIDO, sin compilar (CRI-02, verificado), en la familia autoanclada axiomsOf L := L ++ [axD L]: ¬Con' dice «T_E es inconsistente»; T_L no contiene a T; T_G ⊢ ⊥; y base + [Con'] + ancla también es inconsistente. En cambio, «T+¬Con_T» existe sin reanclar (Prf sobre axioms ++ [¬Con'], consistente por goedel_II + prf_deduction), pero sin un Prov propio.
@@ -941,6 +949,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Fundamentos y ruta matemática · *Verificación:* sin segunda verificación
 
+*Estado el 2026‑10‑16:* 🟢 **FUERA de RPP** (ADR‑140): Gentzen nacerá en su propio repositorio; los primeros pasos medibles de abajo siguen valiendo para cuando empiece.
+
 * **Qué:** MEDIDO: no hay censo de la forma lógica de los 142 (hay ∃ en ax13_lt_def y guardas Σ₁ en los ax_lineWF_*), ni medida de si listInd es admisible desde ind, ni notaciones hasta ε₀ en ningún repo. El censo no puede usar #eval sobre axioms, que vigila check-sorry. INFERIDO (verificador de CRI-03): un censo de uso de los titulares no sirve para Gentzen, porque Con(T) tiene que tratar todas las reglas de T; y «sin DNE» sólo vale a nivel objeto, porque la solidez usa byContradiction en el caso p3 (SolidezPrf.lean:148).
 * **Evidencia:** NEXT-STEPS.md:176-178; ROBINSON_PlusPlus/Minimal/Axioms.lean:263-269, :1632
 * **Cómo cerrar:** Un sondeo que recorra axiomsBase sin reducir nD y clasifique cada axioma, y otro de la admisibilidad de listInd. Con eso, un documento de alcance. Devolver el horizonte a NEXT-STEPS (T36).
@@ -949,6 +959,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T70 · El teorema de Löb
 
 *Grupo:* Fundamentos y ruta matemática · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑16:* 🟢 **DENTRO del alcance** (ADR‑140): Löb entra en la línea de llegada de RPP, con una fila ⬜ en `TEOREMAS-E-HIPOTESIS.md` §1.
 
 * **Qué:** MEDIDO: no hay ninguna declaración de Löb, y existen D1, D2, D3, prf_diagonal y prf_provCode_transfer. INFERIDO: sería un segundo consumidor de D1–D3.
 * **Evidencia:** ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1300; ROBINSON_PlusPlus/Meta/TarskiPrf.lean:49; GODEL-D-ARITHMETIZATION.md:162
