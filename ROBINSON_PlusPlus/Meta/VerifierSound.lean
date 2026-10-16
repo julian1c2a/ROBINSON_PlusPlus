@@ -23,7 +23,7 @@ objeto aceptara cadenas basura que «prueban» `⌜φ⌝` sin `Prf φ`.
 
 ## ⭐⭐ El sondeo se hizo (2026‑09‑10h) y el módulo sale en DIEZ líneas
 
-`sondeos/NegVerifierModE.lean`, cinco mediciones, todas verdes entonces (hoy es registro y no
+`archivo/sondeos-2026-10:sondeos/NegVerifierModE.lean`, cinco mediciones, todas verdes entonces (hoy es registro y no
 compila: cita lo retirado con ADR‑115). Dos resultados:
 
 1. ✅ **No hay bug de solidez.**
@@ -46,7 +46,7 @@ real, la ecuación estructural fuerza a que los args sean `formCode` reales»—
 Este módulo cubre la mitad **(a)**: *el decisor acepta ⟹ `Prf φ`*. `NegVerifier` necesitaba también
 la mitad **(b)**, la **completitud negativa**: *el decisor rechaza ⟹ la teoría REFUTA `chainOk`*.
 Y ahí sí hay discrepancia **medida** (✏️ 2026‑10‑14, ADR‑134: se midió sobre `⊢`, retirado con
-ADR‑115, y `sondeos/NegVerifierModE.lean` ya no compila; sobre `Prf` la discrepancia sigue: `prf_lineWF_p1`
+ADR‑115, y `archivo/sondeos-2026-10:sondeos/NegVerifierModE.lean` ya no compila; sobre `Prf` la discrepancia sigue: `prf_lineWF_p1`
 vale para códigos arbitrarios): los esquemas objeto cuantifican sobre códigos **cualesquiera**
 y aceptan cadenas que el decodificador rechaza —
 
@@ -55,7 +55,7 @@ y aceptan cadenas que el decodificador rechaza —
 
 ⇒ El par **(C, D)** era lo que había que rediseñar, no éste; se rediseñó (ADR‑022) y se construyó en
 `Meta/ChainNegPrf.lean`, cuyo resultado, sobre `⊢`, se retiró con ADR‑115. Detalle en
-`sondeos/NegVerifierModE.lean`.
+`archivo/sondeos-2026-10:sondeos/NegVerifierModE.lean`.
 
 **Footprint**: el de `decodeChain_prf`.
 -/

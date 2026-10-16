@@ -1,0 +1,28 @@
+# Sondeos de CONTROL: la CI los compila en cada push, con `lake lean` (`bash check-sondeos.bash --controles`), y uno que
+# no compile pone la CI en ROJO. ADR-141 (T06 y T10 de doc/AUDITORIA-SUELO-2026-10-12.md).
+#
+# Entra aquí lo que vigila una afirmación de HOY: las refutaciones de lo retirado (que nada lo reintroduzca), los
+# contraejemplos de vacuidad, la solidez de `Prfᵢ` respecto de todo modelo (la cita AXIOMS §0.2), la conducta del núcleo
+# que mide IteSimboloNucleo (T77) y la Etapa 0 de Rosser, que ADR-137 porta al verificador nuevo. Un sondeo nuevo de
+# esa clase se añade en el mismo commit que lo crea.
+
+# refutaciones de lo retirado (auditoría de la base, ADR-114/115; F1, ADR-117)
+AnclaEqInconsistente.lean
+MetaReglasRefutables.lean
+ListInductionAxiomRefutable.lean
+OmegaConsistentRefutable.lean
+PrfBotCodificacionVieja.lean
+
+# vacuidad (ADR-067; T05)
+CraigEqVacuo.lean
+D3Sigma1Vacuo.lean
+
+# semántica: la solidez de Prfᵢ en todo modelo (AXIOMS §0.2)
+AnclaSoundness.lean
+
+# el núcleo (ADR-130, T77)
+IteSimboloNucleo.lean
+
+# Rosser, Etapa 0 (ADR-123…126; se porta, ADR-137)
+RosserReflexion.lean
+RosserBasura.lean

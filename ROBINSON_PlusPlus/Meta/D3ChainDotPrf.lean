@@ -198,7 +198,7 @@ theorem chainOkBDot_eq_substCodeF :
     los dos ya conocidos en el árbol:
     * `tcFn (lenc p)` ↦ `lencT ṗ` — es exactamente `pcc_eval_lenc` (`Meta/EvalListPrf.lean`),
       que **ya está probado**; es la «desviación 2» que `HasWitTrackedPrf` §9 y
-      `sondeos/ReflectorAtomoAllIn.lean` documentan.
+      `archivo/sondeos-2026-10:sondeos/ReflectorAtomoAllIn.lean` documentan.
     * el `liftc zero` de la cota, que sale del binder. -/
 theorem chainOkBDot_computed :
     ∃ Psi, substCodeF 0 (tcFn (.var 0)) (chainOkB nil (.var 0))

@@ -32,13 +32,13 @@ cada una** — la trampa registrada de «misma definición en dos namespaces». 
 
 ## Por qué es un módulo pequeño
 
-Su footprint mínimo se **midió ejecutándolo** (`sondeos/HasWitFRealMin.lean`): la no‑vacuidad **no
+Su footprint mínimo se **midió ejecutándolo** (`archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`): la no‑vacuidad **no
 necesita** el descenso, ni `Paso2`, ni la evaluación de `substtc`, ni el ensamblaje de
 `pcc_eval_substfc`. Por eso puede promoverse sola.
 
 ⚠️ Los predicados son **DEFINICIONES**: no se postula ninguna ecuación suya como axioma objeto.
 
-Promovido de `sondeos/HasWitFRealMin.lean` (2026‑08‑31). Cero `axiom` del proyecto, cero `sorry`;
+Promovido de `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean` (2026‑08‑31). Cero `axiom` del proyecto, cero `sorry`;
 los de Lean, sí: `SinWTs.prf_isTermCodeE1_of_In` sale `[propext, Quot.sound]` (tabla de
 `check-footprints.bash`). (✏️ 2026‑10‑14: decía «Cero axiomas de Lean».)
 -/
@@ -50,7 +50,7 @@ set_option maxHeartbeats 1000000
 set_option maxRecDepth 8000
 
 /-! ############################################################################
-    Rotulo heredado de `sondeos/HasWitFRealMin.lean` (copia de `sondeos/SubstfcEx.lean`
+    Rotulo heredado de `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean` (copia de `archivo/sondeos-2026-10:sondeos/SubstfcEx.lean`
     lineas 46-4111, segun aquel). Aqui hay tres secciones: `S_Clausura` (namespace `SinWTs`),
     `S_Ens` (`ENS`) y `S_HW` (`HW`). (✏️ 2026‑10‑14: decía «secciones S_Clausura, S_Descenso y
     S_Paso2 … Aportan `DescMutua.DESCENSO_hasWit`, `SinWTs.CRIT_hasWit_lift` y todo el KIT
@@ -128,7 +128,7 @@ aguas abajo y hay que **bajar el general**, no duplicar (ADR‑019). -/
 ningún otro sitio de producción. Era **código muerto liso** — cero usos en el árbol, ni
 siquiera dentro de este módulo, y **nunca exportado**; `git log -S` dice que el único commit
 que la tocó es el que la creó. Llegó **por simetría de familia** al promover
-`sondeos/HasWitFRealMin.lean`: `prf_congr_lenc` sí se usa, `prf_congr_liftc` lo usaban los
+`archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`: `prf_congr_lenc` sí se usa, `prf_congr_liftc` lo usaban los
 sondeos, y «la de listas» vino de paquete.
 
 ⚠️ Si alguna vez hace falta, el sitio es `Meta/NumCodeClosedPrf.lean`, **junto a
@@ -613,7 +613,7 @@ theorem PrfH_inst_wfAll1 {Γ : List Formula} (w i : Term) (h : PrfH Γ (wfAll1 w
 
 /-! ### `argsIn` se parte en CABEZA y COLA (posicion 0 / posiciones desplazadas)
 
-    Subidos desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
+    Subidos desde `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
     (2026-09-03). Van AQUI, junto a `PrfH_inst_argsIn`, y no en el modulo del descenso:
     son genericos —no mencionan `targetLift`— y estan copiados a mano en SEIS sondeos del
     frente (`DescensoLiftc`, `EvalSubstfcPrf`, `SubstfcEx`, ...). Desde el modulo del
@@ -850,7 +850,7 @@ theorem prf_isTC1_lift (w c : Term) :
 
     ⚠️ Sin esto la via no vale nada: el predicado podria ser vacio. Aqui se comprueba que
     `tcodes1 t` (los codigos de TERMINO de los subterminos de `t`, **sin** la lista de
-    codigos de LISTA que `sondeos/DiscriminaEcuacional.lean` necesitaba) YA es testigo. -/
+    codigos de LISTA que `archivo/sondeos-2026-10:sondeos/DiscriminaEcuacional.lean` necesitaba) YA es testigo. -/
 
 theorem prf_congr_argsIn {wT Y₁ Y₂ : Term} (h : Prf (Y₁ =eq Y₂)) (ha : Prf (argsIn wT Y₁)) :
     Prf (argsIn wT Y₂) :=
@@ -1144,7 +1144,7 @@ theorem prf_isTC1_tcodes (t : Term) : Prf (isTC1 (objList (tcodes1 t)) (termCode
 
 /-! ## 6 · LA DISCRIMINACION CON TESTIGO **ABIERTO** (sin ninguna hipotesis sobre `w`)
 
-    Es la version fuerte de `sondeos/DiscriminaEcuacional.lean` §CerrarDos, rehecha para el
+    Es la version fuerte de `archivo/sondeos-2026-10:sondeos/DiscriminaEcuacional.lean` §CerrarDos, rehecha para el
     testigo de UNA sola lista. `w` puede ser literalmente `#0`. -/
 
 theorem prf_crit_In_rejects_open1 (w c : Term) (k : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1)
@@ -1185,7 +1185,7 @@ theorem crit_closed_implc {a b : Term} (ha : CodeClosed a) (hb : CodeClosed b) :
   · simp only [implc, cons, nil, zero, succ, liftTerm, liftTerms, ha.1, hb.1]
   · simp only [implc, cons, nil, zero, succ, substTerm, substTerms, ha.2, hb.2]
 
-/-- **EL JUNK EXACTO de `sondeos/SubCodesCritica.lean`** (`implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`) sigue siendo
+/-- **EL JUNK EXACTO de `archivo/sondeos-2026-10:sondeos/SubCodesCritica.lean`** (`implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`) sigue siendo
     REFUTABLE con el testigo de UNA lista, y con testigo **ARBITRARIO**. -/
 theorem crit_junk_SubCodesCritica_open1 (w : Term)
     (hjunk : Prf (isTC1 w (implc (termCodeM (.var 0)) (termCodeM (.var 0))))) :
@@ -1359,14 +1359,14 @@ export ROBINSON_PlusPlus.Minimal.Axioms (
 
 
 /-! ############################################################################
-    ## §0 · Combinadores (copias literales de `sondeos/EvalSubsttc.lean` §D)
+    ## §0 · Combinadores (copias literales de `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` §D)
     ############################################################################ -/
 
 
 /-! ############################################################################
     ## §1 · COPIAS LITERALES del reconocedor de codigo de TERMINO sin `wTs`
-       (`sondeos/ClausuraLiftSinWTs.lean:109-145,1389`, identico al de
-        `sondeos/EvalSubsttc.lean:1116-1140`, que es lo que consume `pcc_eval_substtc'`).
+       (`archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean:109-145,1389`, identico al de
+        `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean:1116-1140`, que es lo que consume `pcc_eval_substtc'`).
     ############################################################################ -/
 
 /- ⚠️ **DEDUPLICADO 2026‑08‑31.** Aquí se redefinían **NUEVE** definiciones que `SinWTs` ya
@@ -1394,7 +1394,7 @@ theorem liftF_isTC1 (k : Nat) (w c : Term) :
 
 
 
-/-! ### Clausura y no‑vacuidad de `hasWit` (promovido de `sondeos/ClausuraLiftSinWTs.lean`, B1)
+/-! ### Clausura y no‑vacuidad de `hasWit` (promovido de `archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean`, B1)
 
 `CRIT_hasWit_lift` es además **el molde de la obligación A5**
 (`hasWitF c ⇒ hasWitF (liftc zero c)`, el análogo del sort FÓRMULA, que no existe): misma
@@ -1541,7 +1541,7 @@ theorem liftF_hasWitF (k : Nat) (c : Term) :
     Nat.zero_lt_succ, reduceIte, ← FOL.liftTerm_comm_zero]
 
 
-/-! ### El kit de DISCRIMINACIÓN (promovido de `sondeos/EvalSubstfcPrf.lean`, B8)
+/-! ### El kit de DISCRIMINACIÓN (promovido de `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean`, B8)
 
 Estas piezas se reconstruyeron **a mano** durante las mediciones de la rama C porque no estaban
 en producción — señal de que se volverán a necesitar. Son las que prueban que la guarda
@@ -2045,7 +2045,7 @@ theorem okF : ∀ (phi : Formula) (WF WT : Term)
     (`PROBE_wfAllF_of_list`); `prf_wfAll1_of_list` es la generalizacion evidente de
     `SinWTs.prf_isTC1_tcodes` a una lista cualquiera. (✏️ 2026‑10‑14, ADR‑134: `Probe/` no
     está versionado —lo ignora `.gitignore`—; la copia versionada del mismo lema está en
-    `sondeos/HasWitFRealMin.lean`.) -/
+    `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`.) -/
 
 theorem prf_wfAll1_of_list (L : List Term)
     (hcl : ∀ x, List.Mem x L → SinWTs.CodeClosed x)

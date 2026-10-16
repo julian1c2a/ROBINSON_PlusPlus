@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-16 — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-16 — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -254,7 +254,7 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Sondeos · *Verificación:* confirmado (verificador de controles, P1); corregido el ejemplo de D7; requiere medición
 
-*Estado el 2026‑10‑16:* 🟡 Es el primer paso del plan de ADR‑139 (propuesto): sin el TSV de hoy no se archiva ningún sondeo.
+*Estado el 2026‑10‑16:* ✅ **Hecho en ADR‑141**: `check-sondeos.bash` (`lake lean`), la tabla `sondeos/pasadas/tabla-2026-10-16.tsv` (39 de 93) y un paso de la CI que compila los 11 de `sondeos/CONTROLES.txt`. Lo que cambió con `lake lean`: `MDiezEnLaFirma` sólo compilaba porque `autoImplicit` hacía de `axioms` una variable.
 
 * **Qué:** MEDIDO: build.yml no nombra sondeos/ (grep -c = 0) y nunca lo hizo (git log -S/-G vacío). Según las fuentes de Lake v4.31, `lake env lean` no pasa los leanOptions y `lake lean` sí (CLI/Main.lean:1083-1096; Build/Module.lean:1376-1379). La receta y el runner usan `env lean`, así que miden con autoImplicit activado; sólo 3 de 90 sondeos lo desactivan. Hay 836 `#print axioms` que nadie compara, y 24 #guard_msgs de IteSimboloNucleo que nadie ejecuta. La regresión que sí pasó sin aviso: 53 de 85 sondeos rotos por nombres movidos y ambigüedades (doc/AUDITORIA-BASE-2026-10-02.md §3). Corrección: los 10 que rompió D7 los cazó la pasada manual, y 048dde6 los migró en el mismo commit.
 * **Evidencia:** .github/workflows/build.yml (grep -c sondeos = 0, MEDIDO); sondeos/README.md:69, :73; doc/AUDITORIA-BASE-2026-10-02.md:164-258; DECISIONS.md:9779 (la sonda negativa de ADR-128, sin cablear); MEDIDO por el sintetizador: hay 90 .lean de primer nivel y 2 más en sondeos/lintlab/ que la cifra no cuenta
@@ -333,7 +333,7 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Sondeos · *Verificación:* confirmado, rebajado a P2 y supeditado a T06 (verificador de controles)
 
-*Estado el 2026‑10‑16:* 🟡 Propuesto en ADR‑139, paso 1: las cuatro clases (CONTROL, REGISTRO, REPARAR, ARCHIVAR) y una etiqueta antes de archivar nada; decide el propietario.
+*Estado el 2026‑10‑16:* 🟢 **La política, hecha en ADR‑141**: 11 de control, 28 de registro, 1 a reparar (`A3IsFCBTracked`) y 53 archivados con la etiqueta `archivo/sondeos-2026-10`, con sus citas reescritas. Pendiente: separar las citas en procedencia y evidencia, con un control.
 
 *Estado el 2026‑10‑14:* 🟡 En ADR‑134, las notas de procedencia: las tres citas de `A3IsFCBTracked` del build (`D3ChainDotPrf`, `HasWitTrackedPrf`, `TrackedAtomsPrf`) y las cabeceras de los diez sondeos que decían «compila» en presente llevan nota, contra `sondeos/pasadas/tabla_adr129.txt`. La política, el SHA de los registros y el control, pendientes (tras T06).
 

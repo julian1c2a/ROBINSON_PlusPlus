@@ -118,7 +118,7 @@ theorem subst_provBody (φ : Formula) (t : Term) :
     ⛔⛔ **CORRECCIÓN 2026‑09‑10h (ADR‑022) — este docstring afirmaba algo FALSO.** Decía: *«las
     comparaciones de `NegVerifier` son PARALELAS POR TIPO — `formCode φ` contra `formCode ψ`, nunca
     `cons` contra `numeral` en la misma ranura»*. **No es cierto sobre esta clase**, y el
-    contraejemplo se compiló (`sondeos/MedirF_Censo.lean` §4; hoy es registro y no compila: cita lo
+    contraejemplo se compiló (`archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean` §4; hoy es registro y no compila: cita lo
     retirado con ADR‑115): `⟨formCode (⊥⇒⊥), 8̄, 3̄⟩` es `IsCodeShaped`, y refutarla obliga a
     comparar `formCode ⊥` (un `cons`) contra `numeralM 3` (un numeral) **en la misma ranura**. La
     única vía es por **VALOR** (`numTree_ne`), y el valor de un código **no es calculable**
@@ -154,7 +154,7 @@ theorem IsCodeShaped.isClosed {x : Term} (hx : IsCodeShaped x) : ∀ k, liftTerm
 ⛔ **Por qué `IsCodeShaped` no servía, medido y no argumentado.** Su propio docstring (arriba)
 afirmaba que las comparaciones de `NegVerifier` son *«PARALELAS POR TIPO — nunca `cons` contra
 `numeral` en la misma ranura»*. **Es falso sobre la clase que él mismo define**, y hubo contraejemplo
-compilado en `sondeos/MedirF_Censo.lean` §4 (hoy registro: no compila desde ADR‑115, cita lo retirado):
+compilado en `archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean` §4 (hoy registro: no compila desde ADR‑115, cita lo retirado):
 
     IsCodeShaped ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩        -- ✅ testigo `StdChain` legítimo del diseño viejo
 
@@ -284,7 +284,7 @@ theorem not_stdArgs_numeralM (n : Nat) (as : Term) : ¬ StdArgs (cons (numeralM 
     · obtain ⟨a, b, hab⟩ := termCode_is_cons u
       exact cons_ne_numeralM a b n (by rw [← hab, ← hu, hhd])
 
-/-- 🏁 **La línea basura de `sondeos/MedirF_Censo.lean` §4 queda FUERA de la clase.** Era el
+/-- 🏁 **La línea basura de `archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean` §4 queda FUERA de la clase.** Era el
     testigo `StdChain` legítimo cuya refutación exigía evaluar Cantor. -/
 theorem junk_line_not_stdLine :
     ¬ StdLine (cons (formCode (Formula.impl Formula.bottom Formula.bottom))

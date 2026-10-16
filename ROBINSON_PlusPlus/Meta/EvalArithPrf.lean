@@ -151,7 +151,7 @@ theorem prf_substtc_funcc2 (v W sc x y : Term) :
 
 /-! ### El KIT TERNARIO — `funcc3` y la imagen DOTADA de `substfc`
 
-    ⚠️ **Bajado de `sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y AQUI porque este es su
+    ⚠️ **Bajado de `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y AQUI porque este es su
     sitio mas alto posible**: `prf_substtc_funcc3`/`prf_congr_funcc3` son el escalon ternario
     del binario que ya vivia justo arriba, y no mencionan nada del frente `substfc`.
 

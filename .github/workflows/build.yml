@@ -183,6 +183,15 @@ jobs:
       - name: Check warnings
         run: bash check-warnings.bash
 
+      # ⭐ AÑADIDO el 2026-10-16 (ADR-141, T06). La CI no compilaba NINGÚN sondeo: los controles negativos (las
+      # refutaciones de lo retirado, los contraejemplos de vacuidad) y la Etapa 0 de Rosser podían romperse sin que
+      # nadie lo viera, y 53 de 85 se rompieron así antes del 2026-10-02. Compila con `lake lean`, que pasa los
+      # leanOptions; `lake env lean` no los pasa, y con él `MDiezEnLaFirma` compilaba sólo porque `autoImplicit` hacía
+      # de `axioms` una variable. La lista, en sondeos/CONTROLES.txt. Probado con el fallo puesto: un sondeo que no
+      # compila, uno ausente y uno con `sorry` dan rojo.
+      - name: Check sondeos de control
+        run: bash check-sondeos.bash --controles
+
       # ⭐ Anadido el 2026-09-11 (auditoria, F-8): los controles del LIBRO solo corrian a mano,
       # asi que lo IMPRESO podia desviarse del arbol sin que nadie lo notara.
       #

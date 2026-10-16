@@ -11,7 +11,7 @@ import ROBINSON_PlusPlus.Meta.NumListPrf
 /-!
 # `∀t. hasWit (tcFn t)` — la buena formación de los códigos PUNTEADOS
 
-Promovido de `sondeos/HasWitTcFn.lean` (2026-09-05). Es el prerrequisito que §3.32.2 identificó
+Promovido de `archivo/sondeos-2026-10:sondeos/HasWitTcFn.lean` (2026-09-05). Es el prerrequisito que §3.32.2 identificó
 para la vía C ([ADR-020](../../DECISIONS.md)) y que la propagación demostró **portante en dos
 sitios**, no en uno:
 

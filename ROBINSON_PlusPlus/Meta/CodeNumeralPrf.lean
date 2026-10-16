@@ -26,7 +26,7 @@ namespace ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 ## META — **el código de una fórmula ES un numeral**: `formCode φ =eq numeral (codeNat φ)`
 
 Cierra el frente **S4** de `PLAN-SORTES.md`. Este módulo **descarga la hipótesis `hFN`** que el
-piloto del lema diagonal (`sondeos/PilotoDiagonal.lean`) daba por supuesta, y con ella la vía
+piloto del lema diagonal (`archivo/sondeos-2026-10:sondeos/PilotoDiagonal.lean`) daba por supuesta, y con ella la vía
 numeral deja de ser condicional.
 
 **Por qué importa.** (✏️ 2026‑10‑12, ADR‑134: la inconsistencia que TUVO por `tcFn` —`ax_tc_cons`, retirado en ADR‑012; hubo
@@ -107,7 +107,7 @@ theorem prf_cons_eval (a b : Nat) :
 
 /-! ### PARTE C — `prf_formCode_numeral` por META-RECURSIÓN
 
-Descarga la `hFN` que el piloto del lema diagonal (`sondeos/PilotoDiagonal.lean`) asumía. -/
+Descarga la `hFN` que el piloto del lema diagonal (`archivo/sondeos-2026-10:sondeos/PilotoDiagonal.lean`) asumía. -/
 
 
 open ROBINSON_PlusPlus.Meta.Provability

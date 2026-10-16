@@ -13,7 +13,7 @@ import ROBINSON_PlusPlus.Meta.SubstArith
 /-!
 # La CLAUSURA de las guardas bajo la sustitución OBJETO — `substtc` y `substfc`
 
-Promovido de `sondeos/ClausuraSubsttc.lean` (2026-09-06). Es **la pieza que cerraba la vía C**
+Promovido de `archivo/sondeos-2026-10:sondeos/ClausuraSubsttc.lean` (2026-09-06). Es **la pieza que cerraba la vía C**
 ([ADR-020](../../DECISIONS.md)): §3.36.5 la identificó como *lo único que separaba el árbol del
 verde*, y §3.38 la documenta.
 
@@ -106,7 +106,7 @@ theorem substF_hasWitArgs (v : Nat) (s Y : Term) :
 
 🔑 Los tres binders van DENTRO por el gate `liftFormula 1 Φ = Φ`, y la instanciación se colapsa
 **paso a paso** (`PHIT_spec1/2/3`), no con un `simp` final: con tres sustituciones anidadas el
-`simp` grande no reduce. Es el patrón de `sondeos/EvalSubstfcPrf.lean:6357`. -/
+`simp` grande no reduce. Es el patrón de `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean:6357`. -/
 
 def BODY (w v s X : Term) : Formula :=
   land (Formula.impl (land (isTC1 w X) (hasWit s)) (hasWit (substtc v s X)))
@@ -877,7 +877,7 @@ theorem prf_hasWitArgs_substtsc_of (w v s Y : Term) :
 
 `hasWitF` lleva DOS listas testigo (`wF` de fórmulas, `wT` de términos contra la que se valida),
 así que `PHIT` tiene **cuatro** binders: `wF`(#3), `wT`(#2), `v`(#1), `s`(#0), y el código es `#4`.
-Es la misma forma que `sondeos/EvalSubstfcPrf.lean:6302`, con otra conclusión.
+Es la misma forma que `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean:6302`, con otra conclusión.
 
 A diferencia de la mitad TÉRMINO, aquí el cuerpo **no es conjuntivo**: la parte de lista ya está
 resuelta arriba (§15) y entra como lema externo. -/

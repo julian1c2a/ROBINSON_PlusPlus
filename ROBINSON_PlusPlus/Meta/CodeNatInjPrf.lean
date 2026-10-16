@@ -24,7 +24,7 @@ codeNatTerm_ne {t u : Term}    (h : t ≠ u) : axioms ⊢ neg (numeral (codeNatT
 `canon_ne` comparaba **términos con forma de código**, y en esta teoría un árbol `cons` **ES** un
 número (`cons nil nil = 2 = numeralM 2`; ✏️ 2026‑10‑14, ADR‑134: con el `cons` de ADR‑113, `cons nil nil = 1`, y la
 tesis no cambia), así que términos sintácticamente distintos pueden ser
-**provablemente iguales** — de ahí el `⊥` (`sondeos/CanonNeRefuta.lean`).
+**provablemente iguales** — de ahí el `⊥` (`archivo/sondeos-2026-10:sondeos/CanonNeRefuta.lean`).
 
 Aquí se comparan **NUMERALES**, donde la distinción **sí** es provable. Es la misma corrección de
 categoría que ADR‑012: lo que hay que distinguir es el **VALOR**, no la sintaxis.
@@ -45,7 +45,7 @@ la de `Godel`, así que hacía falta el puente **`num_bridge`**, que se prueba a
 🗑️ `numeral_ne` era de `⊢` y quedó retirado (ADR‑115): hoy ningún otro módulo de
 `ROBINSON_PlusPlus/` usa `num_bridge`.
 
-Promovido de `sondeos/CodeNatInj.lean` (2026‑09‑01). Cero `sorry`.
+Promovido de `archivo/sondeos-2026-10:sondeos/CodeNatInj.lean` (2026‑09‑01). Cero `sorry`.
 
 ⚠️ **NO «cero axiomas de Lean»**, como decía antes esta línea. Medido con `#print axioms`,
 los dos resultados de cabecera —`codeNat_ne` y `codeNatTerm_ne`— salen con **OCHO**:

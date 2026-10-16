@@ -98,7 +98,7 @@ theorem prf_congr_unT {m : Nat} {a a' : Term} (ha : Prf (a =eq a')) :
 
 /-! ### El constructor binario con ETIQUETA ABSTRACTA — y los tres `substtc` que lo alimentan
 
-    ⚠️ **Bajados de `sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y bajados AQUI y no a
+    ⚠️ **Bajados de `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` en B3 (2026‑09‑04), y bajados AQUI y no a
     `LiftcCodePrf` por el CICLO DE IMPORTS ([ADR‑019](../../DECISIONS.md))**: `LiftcCodePrf`
     IMPORTA este modulo, asi que un general que viviera alli no podria reescribir
     `prf_congr_binT` ni `prf_substtc_binT`, que son de aqui. Puestos aqui, los reescribe **los
@@ -213,7 +213,7 @@ Aquí vivían `prf_tc_nul`/`prf_tc_un`/`prf_tc_bin`, que eran **`prf_tc_cons'` c
 así que no se recuperan a nivel de código.
 
 **Salen por composición de `pcc_dot_cons`, dentro de `Prov` y sin inducción nueva** — que es lo que
-predijo la medición (`sondeos/KitPayoff.lean`), porque `nulT`/`unT`/`binT` son todos `cons`-árboles.
+predijo la medición (`archivo/sondeos-2026-10:sondeos/KitPayoff.lean`), porque `nulT`/`unT`/`binT` son todos `cons`-árboles.
 Las hojas (`prf_tc_numeral`, `prf_tc_zero`) **nunca murieron**; sólo el paso recursivo. -/
 
 /-- `tcFn ⟨m⟩ = nulT m`, **dentro de `Prov`**. Sólo reescrituras de CÓDIGO sobre `pcc_dot_cons`. -/

@@ -183,9 +183,9 @@ theorem psi_lift_eq_subst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) :
 
     Estas dos son maquinaria de la inducción fuerte, no de ningún descenso concreto: viven
     aquí, junto a sus dos padres (`psi_lift_eq_subst` y `psi_at`), y no en el módulo que las
-    consume. Se subieron desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
+    consume. Se subieron desde `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
     (2026‑09‑03), donde estaban instanciadas a `Φ := PHI` y por tanto invisibles para los otros
-    dos descensos que las necesitan palabra por palabra (`sondeos/EvalSubstfcPrf.lean`). -/
+    dos descensos que las necesitan palabra por palabra (`archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean`). -/
 
 /-- Tras el `gen` de `w`, la HI de curso de valores toma esta forma. Es `psi_lift_eq_subst`
     compuesto con `psi_at`, en dos líneas. -/
@@ -212,8 +212,8 @@ theorem PSI_inst (Φ : Formula) (hΦ : liftFormula 1 Φ = Φ) {Γ : List Formula
 
     ⚠️ **Subidos en B3 (2026‑09‑04) por la MISMA razon que `psi_lift_form`/`PSI_inst` en B2**, y
     citando el precedente que quedo escrito alli: son maquinaria GENERICA de la induccion fuerte,
-    **no** del frente que las consume. `sondeos/EvalSubsttc.lean` las tenia instanciadas a
-    `Φ := PHIsubsttc`, y `sondeos/EnsamblajeTriple.lean` y `sondeos/EnsamblajeMedida.lean` llevan
+    **no** del frente que las consume. `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` las tenia instanciadas a
+    `Φ := PHIsubsttc`, y `archivo/sondeos-2026-10:sondeos/EnsamblajeTriple.lean` y `archivo/sondeos-2026-10:sondeos/EnsamblajeMedida.lean` llevan
     el MISMO bloque caracter por caracter. Subirlas una vez sirve a **tres frentes**.
 
     🔑 Y una de ellas, `psi_substtc_l1` del sondeo, **era `psi_lift_form` instanciado** — un

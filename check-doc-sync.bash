@@ -588,11 +588,27 @@ find ROBINSON_PlusPlus/ ROBINSON_PlusPlus.lean cuarentena/ ../FOL/FOL/ ../FOL/Th
 find sondeos/ -name '*.lean' 2>/dev/null | sort | while IFS= read -r f; do
   LC_ALL=C awk -f strip-lean.awk "$f" | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" | LC_ALL=C awk -v f="$f" '{print $0 "|" f}'
 done | LC_ALL=C sort -u > "$DECLS_SOND"
+# ✏️ 2026-10-16 (ADR-141): los sondeos ARCHIVADOS (fuera del árbol, en la etiqueta `archivo/sondeos-2026-10`) siguen
+# declarando lo que declaraban, y una cita que nombra su sondeo sigue exenta. Se leen de la etiqueta; el fichero
+# queda como «archivo/sondeos-2026-10:sondeos/X.lean», que es la forma de las citas reescritas. Sin la etiqueta (un
+# clon sin etiquetas) no se puede medir, y el autotest de abajo lo dice.
+SOND_ARCH=archivo/sondeos-2026-10
+if git rev-parse -q --verify "refs/tags/$SOND_ARCH" >/dev/null 2>&1; then
+  git ls-tree -r --name-only "$SOND_ARCH" -- sondeos/ 2>/dev/null | grep '^sondeos/[^/]*\.lean$' | while IFS= read -r f; do
+    [ -e "$f" ] && continue
+    git show "$SOND_ARCH:$f" | LC_ALL=C awk -f strip-lean.awk | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" \
+      | LC_ALL=C awk -v f="$SOND_ARCH:$f" '{print $0 "|" f}'
+  done | LC_ALL=C sort -u >> "$DECLS_SOND"
+fi
 B_MEDIDO=1
+# los dos testigos de sondeos: `esAC`, de uno del árbol (AnclaEqInconsistente, CONTROL), y `prf_wfAll_objList`, de uno
+# archivado (ParseWitness): si falta el primero no se leyó sondeos/; si falta el segundo, la etiqueta.
 if [ "$(wc -l < "$DECLS" | tr -d ' ')" -lt 1000 ] || ! grep -qxF goedel_first_prf "$DECLS" \
-   || ! grep -qxF derives0_soundness "$DECLS" || ! grep -q '^prf_wfAll_objList|sondeos/' "$DECLS_SOND"; then
-  echo "  ❌ NO PUDE MEDIR [B]: las declaraciones salen vacías o sin \`goedel_first_prf\`, \`derives0_soundness\`"
-  echo "      o \`prf_wfAll_objList\` (de un sondeo), que existen seguro (¿strip-lean.awk?)."
+   || ! grep -qxF derives0_soundness "$DECLS" || ! grep -q '^esAC|sondeos/' "$DECLS_SOND" \
+   || ! grep -q "^prf_wfAll_objList|$SOND_ARCH:sondeos/" "$DECLS_SOND"; then
+  echo "  ❌ NO PUDE MEDIR [B]: las declaraciones salen vacías o sin \`goedel_first_prf\`, \`derives0_soundness\`,"
+  echo "      \`esAC\` (de un sondeo) o \`prf_wfAll_objList\` (de uno archivado, en la etiqueta $SOND_ARCH),"
+  echo "      que existen seguro (¿strip-lean.awk? ¿un clon sin etiquetas?)."
   B_FAIL=1; B_MEDIDO=0
 fi
 B_DOCS=""

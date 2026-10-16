@@ -25,7 +25,7 @@ con conclusión CONJUNTIVA sobre los dos sorts (término / lista de términos), 
 
 ## PROMOCIÓN B3.2 (2026-09-07) — qué se quedó fuera, y por qué
 
-Este módulo viene de `sondeos/EvalSubsttc.lean` (154 declaraciones). Medido contra producción:
+Este módulo viene de `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` (154 declaraciones). Medido contra producción:
 
 * **83 declaraciones BORRADAS**, no movidas. 66 eran duplicados exactos que producción ya
   tenía; el resto son instancias de genéricos que ya subieron (`psi_lift_form3`/`PSI_inst3`
@@ -843,7 +843,7 @@ theorem refl_caso_varc_at (v s n : Term)
   exact pcc_eq_trans_code _ _ _ (invA v s (varc n)) (by hw_auto) (by hw_auto) (by hw_auto) s0 hmain
 
 /-! ############################################################################
-    ## §8 · EL TESTIGO Y SU FONTANERIA — copia LITERAL de `sondeos/DescensoLiftc.lean`
+    ## §8 · EL TESTIGO Y SU FONTANERIA — copia LITERAL de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean`
        §B/§C/§D.1-§D.3 (es INDEPENDIENTE del objetivo: habla solo de codigos de TERMINO)
     ############################################################################ -/
 
@@ -1271,8 +1271,8 @@ end ROBINSON_PlusPlus.Meta.EvalSubsttcPrf
 /-! ## `export` POR CONSUMO (§17)
 
 No es una lista por existencia: los 46 nombres de abajo son los que **de hecho** referencian
-los assets aguas abajo del frente —`sondeos/EvalSubstfcPrf.lean` (B3.4) y
-`sondeos/HasWitFReal.lean`— medidos por grep sobre las 71 declaraciones del módulo. Las 25
+los assets aguas abajo del frente —`archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean` (B3.4) y
+`archivo/sondeos-2026-10:sondeos/HasWitFReal.lean`— medidos por grep sobre las 71 declaraciones del módulo. Las 25
 restantes (la fontanería de la inducción: `PHIsubsttc*`, `PSIsubsttc3`, `CONJsubsttc`, los
 `refl_substtc_*`, `br_*_at`, …) se quedan dentro del namespace hasta que alguien las pida. -/
 export ROBINSON_PlusPlus.Meta.EvalSubsttcPrf (

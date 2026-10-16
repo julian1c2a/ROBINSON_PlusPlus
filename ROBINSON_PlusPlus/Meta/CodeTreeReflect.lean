@@ -207,7 +207,7 @@ theorem prf_hasWit_dotN (t : Term) : ∀ T : CTree, Prf (hasWit (T.dotN t))
 
 /-- **El código del código del árbol**: `(E(nthc t i…))˙ = dotV`, ahora **DENTRO de `Prov`**.
 
-    ⚠️ **Éste era el coste real de repatriar el KIT** (medido en `sondeos/KitPayoff.lean`): la
+    ⚠️ **Éste era el coste real de repatriar el KIT** (medido en `archivo/sondeos-2026-10:sondeos/KitPayoff.lean`): la
     versión vieja era esta misma recursión produciendo una igualdad **de CÓDIGO**, y las ecuaciones
     `tc` del kit murieron con `ax_tc_cons`. Como sus sustitutos (`pcc_dot_*`) son **internos**, la
     recursión entera se muda dentro de `Prov`.

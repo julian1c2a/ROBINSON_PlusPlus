@@ -20,9 +20,9 @@ import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 
 /-!
-# `Meta/EvalLiftcPrf.lean` — promovido de `sondeos/DescensoLiftc.lean` (rama B2)
+# `Meta/EvalLiftcPrf.lean` — promovido de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` (rama B2)
 
-Promocion de `sondeos/DescensoLiftc.lean` (2011 lineas, 198 declaraciones) quedandose
+Promocion de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` (2011 lineas, 198 declaraciones) quedandose
 **SOLO con lo que falta**. Todo lo demas se CONSUME de produccion.
 
 ## Nombre propuesto: `EvalLiftcPrf`
@@ -93,13 +93,13 @@ Ninguno de los dos se usa ya en el residuo promovido: los unicos consumidores de
 
 ## ⚠️ EL PUNTO CRITICO: `targetLift` ya esta en produccion
 
-`sondeos/DescensoLiftc.lean:79,535` REDEFINE `targetLift`/`targetLiftsc`. Este modulo NO los
+`archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean:79,535` REDEFINE `targetLift`/`targetLiftsc`. Este modulo NO los
 redefine: consume los de `Meta/LiftcCodePrf.lean`. Los puentes `:= rfl` de §0 lo
 demuestran, y por tanto el descenso CONECTA con el vocabulario ya promovido.
 
 ## Lo que este modulo entrega rio abajo
 
-* `pcc_eval_liftc` — el `hLift` sin descargar de `sondeos/Paso2CasoForall.lean:505`.
+* `pcc_eval_liftc` — el `hLift` sin descargar de `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean:505`.
 * `DESCENSO_hasWit` — la forma CONSUMIBLE (testigo bajo un `∃`, contra `ENS.hasWit`).
 * **CUATRO lemas GENERICOS** (§2) que no mencionan `targetLift` y que el frente `substfc`
   vuelve a necesitar palabra por palabra: `nilOrCons`, `nilOrCons_at`, `prf_nil_or_cons_all`,
@@ -226,25 +226,25 @@ namespace ROBINSON_PlusPlus.Meta.EvalLiftcPrf
     y no fabrica constantes nuevas. Si alguno dejara de ser `rfl`, el descenso estaria
     hablando de otro objetivo y NO conectaria con `Meta/LiftcCodePrf.lean`. -/
 
-/-- `LiftcCodePrf.targetLift` es, byte a byte, el `targetLift` de `sondeos/DescensoLiftc.lean:79`. -/
+/-- `LiftcCodePrf.targetLift` es, byte a byte, el `targetLift` de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean:79`. -/
 theorem targetLift_es_el_del_sondeo (s : Term) :
     targetLift s = provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))) :=
   rfl
 
-/-- `LiftcCodePrf.targetLiftsc` es el `targetLiftsc` de `sondeos/DescensoLiftc.lean:535`. -/
+/-- `LiftcCodePrf.targetLiftsc` es el `targetLiftsc` de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean:535`. -/
 theorem targetLiftsc_es_el_del_sondeo (b : Term) :
     targetLiftsc b
       = provFromCode (eqc (liftscT (termCode zero) (tcFn b)) (tcFn (liftsc zero b))) :=
   rfl
 
-/-- `ENS.hasWit` es el `hasWit` de `sondeos/DescensoLiftc.lean:1386`. -/
+/-- `ENS.hasWit` es el `hasWit` de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean:1386`. -/
 theorem hasWit_es_el_del_sondeo (c : Term) :
     hasWit c = Formula.ex (isTC1 (.var 0) (liftTerm 0 c)) := rfl
 
-/-- `SinWTs.isTC1` es el `isTC1` de `sondeos/DescensoLiftc.lean:899`. -/
+/-- `SinWTs.isTC1` es el `isTC1` de `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean:899`. -/
 theorem isTC1_es_el_del_sondeo (w c : Term) : isTC1 w c = land (wfAll1 w) (In c w) := rfl
 
-/-- **El duplicado `iz_inv` (`sondeos/DescensoLiftc.lean:538`) NO se promueve**: es
+/-- **El duplicado `iz_inv` (`archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean:538`) NO se promueve**: es
     `EvalRunFnPrf.prf_substtc_termCode_nil`, porque `nil := zero` (`Minimal/Axioms.lean`)
     y por tanto `termCode nil` y `termCode zero` son EL MISMO termino.
 
@@ -531,7 +531,7 @@ theorem DESCENSO_lista (w s : Term) (hwf : Prf (wfAll1 w)) (hargs : Prf (argsIn 
     Prf (targetLiftsc s) :=
   prf_mp (DESCENSO_lista_imp w s) (prf_and_intro hwf hargs)
 
-/-- **`pcc_eval_liftc`** — el `hLift` de `sondeos/Paso2CasoForall.lean:505`, LITERAL.
+/-- **`pcc_eval_liftc`** — el `hLift` de `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean:505`, LITERAL.
     Es EL MISMO teorema que `DESCENSO`, con el objetivo desplegado. -/
 theorem pcc_eval_liftc (w s : Term) (h : Prf (isTC1 w s)) :
     Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s)))) :=
@@ -782,7 +782,7 @@ theorem DESCENSO_at_hasWit (c s : Term) :
 
 /-- **EL DESCENSO DISPARA (1)** — sort TERMINO. Para **todo** termino REAL `t`, abierto
     incluido, el antecedente `isTC1 W ⌜t⌝` es demostrable con testigo explicito, luego el
-    DESCENSO entrega el `hLift` de `paso2_caso_forall` (`sondeos/Paso2CasoForall.lean:505`;
+    DESCENSO entrega el `hLift` de `paso2_caso_forall` (`archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean:505`;
     el consumidor en produccion es `pcc_eval_liftc`).
 
     ⚠️ El ENUNCIADO no es informacion nueva (ver la cabecera de §9): lo nuevo es la RUTA. -/
@@ -851,7 +851,7 @@ end ROBINSON_PlusPlus.Meta.EvalLiftcPrf
 
     ⚠️⚠️ **EL `export` ES DELIBERADAMENTE PARCIAL, Y ESTO ES UN HALLAZGO, NO UN OLVIDO.**
 
-    `sondeos/EvalSubstfcPrf.lean` (el frente `substfc`, ya PROBADO, la promocion siguiente)
+    `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean` (el frente `substfc`, ya PROBADO, la promocion siguiente)
     monta **otros DOS descensos** con los MISMOS nombres genericos y predicados DISTINTOS:
 
     | nombre     | aqui (`liftc`)      | `EvalSubstfcPrf.lean:5618` (`substtc`) | `:6302` (`substfc`) |

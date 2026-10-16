@@ -256,7 +256,7 @@ theorem prf_div2_double (x : Term) : Prf (div2 (mul x two) =eq x) := by
 
 Instancia de L4 en `numeral m`, cruzada con `prf_gnum_mul m 2` (`numeral 2 = two` es **defeq**).
 Es la pieza de la que cuelgan `prf_cons_eval` → `prf_formCode_numeral` (= la `hFN` que el piloto
-del lema diagonal, `sondeos/PilotoDiagonal.lean`, asumía). -/
+del lema diagonal, `archivo/sondeos-2026-10:sondeos/PilotoDiagonal.lean`, asumía). -/
 
 /-- **L5** — `div2 (numeral (2m)) = numeral m`. **La pieza que faltaba de la reparación.** -/
 theorem prf_div2_numeral (m : Nat) : Prf (div2 (numeral (2 * m)) =eq numeral m) := by

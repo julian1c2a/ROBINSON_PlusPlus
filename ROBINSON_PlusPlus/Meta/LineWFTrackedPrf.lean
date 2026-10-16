@@ -263,7 +263,7 @@ Aquí vivía `prf_tc_eqc (a b) : Prf (tcFn (eqc a b) =eq eqcT (tcFn a) (tcFn b))
 **falso** bajo la lectura numeral, así que no se recupera a nivel de código.
 
 ⚠️ **`eqcT` ES la forma binaria del KIT con `m = 4`** (`consT ⌜4̄⌝ (consT a (consT b ⌜nil⌝))`), así
-que su sustituto es exactamente el `pcc_dot_bin` medido en `sondeos/KitPayoff.lean`: sale **por
+que su sustituto es exactamente el `pcc_dot_bin` medido en `archivo/sondeos-2026-10:sondeos/KitPayoff.lean`: sale **por
 composición de `pcc_dot_cons`, sin inducción nueva**. Las hojas (`prf_tc_numeral`, `prf_tc_zero`)
 nunca murieron; sólo el paso recursivo. -/
 

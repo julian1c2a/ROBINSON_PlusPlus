@@ -1,6 +1,6 @@
 # Next Steps — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-16 — ADR‑140: las decisiones del propietario (capas dentro de RPP, la línea de llegada, ADR‑139 aprobado en sus pasos 1 y 2). Antes, el mismo día — ADR‑138: la consistencia es RELATIVA a Lean; ADR‑139, PROPUESTO: el plan para acotar el proyecto, con el cono de los titulares medido. Antes, 2026-10-14 — ADR‑137: Rosser, decidido (la teoría como parámetro del verificador + T08). Antes, el mismo día — ADR‑136: `master` protegido (T14) y las decisiones del propietario del día. Antes, el mismo día — ADR‑135: T09 hecho (`TEOREMAS-E-HIPOTESIS.md` al día, con la columna «¿qué usa la prueba?» medida, y el control `[T]`). Antes, el mismo día — ADR‑134: T02 hecho (la teoría de los titulares, `T_Prf`, descrita en `AXIOMS.md` §0: contiene a PA; y dónde entra la inducción, medido: `sondeos/InduccionTitulares.lean`), con su revisión adversarial y los comentarios de los `.lean` al día (T31). Antes, 2026-10-12 — ADR‑133: T03 hecho (la tabla MANDATORIES y el control `[M]`). Antes, 2026-10-12 — ADR‑132: la auditoría del suelo, versionada (`doc/AUDITORIA-SUELO-2026-10-12.md`, 81 trabajos: es la lista de trabajo vigente; bloque nuevo, arriba) y T00 hecho. Antes, 2026-10-05 — ADR‑131: el `Classical.choice` de los titulares, medido (punto 6, nuevo); ADR‑130: las dos notas de `Meta/CodeDecode.lean`, medidas (punto 5, hecho); ADR‑129: D7 EJECUTADA (punto 2, hecho); ADR‑128: `autoImplicit` desactivado también en `lake build` (punto 4, hecho); ADR‑127: la auditoría de ADR‑124/125/126 (el punto 1, rectificado) y los 88 sondeos re‑medidos (35 compilan); ADR‑126: la refutación a profundidad 2 y el control de discriminación (`sondeos/RosserBasura.lean`, punto 1); ADR‑125: la guarda de término refutada sobre un numeral (`sondeos/RosserBasura.lean`, punto 1); ADR‑124: el control negativo del modelo, en el build (punto 3, hecho), y la auditoría de ADR‑123 (el punto 1, rectificado); ADR‑123: Rosser, Etapa 0 —la reflexión numeral, confirmada en `sondeos/RosserReflexion.lean`—; ADR‑122: D7 medida (la puerta dice NO: 48 de 226) y Rosser re‑medido; ADR‑121: Gödel I ENTERO (`⊬ ¬G`) y TARSKI, sin hipótesis (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
+**Last updated:** 2026-10-16 — ADR‑141: los sondeos (11 de control en la CI, 53 archivados). Antes, el mismo día — ADR‑140: las decisiones del propietario (capas dentro de RPP, la línea de llegada, ADR‑139 aprobado en sus pasos 1 y 2). Antes, el mismo día — ADR‑138: la consistencia es RELATIVA a Lean; ADR‑139, PROPUESTO: el plan para acotar el proyecto, con el cono de los titulares medido. Antes, 2026-10-14 — ADR‑137: Rosser, decidido (la teoría como parámetro del verificador + T08). Antes, el mismo día — ADR‑136: `master` protegido (T14) y las decisiones del propietario del día. Antes, el mismo día — ADR‑135: T09 hecho (`TEOREMAS-E-HIPOTESIS.md` al día, con la columna «¿qué usa la prueba?» medida, y el control `[T]`). Antes, el mismo día — ADR‑134: T02 hecho (la teoría de los titulares, `T_Prf`, descrita en `AXIOMS.md` §0: contiene a PA; y dónde entra la inducción, medido: `sondeos/InduccionTitulares.lean`), con su revisión adversarial y los comentarios de los `.lean` al día (T31). Antes, 2026-10-12 — ADR‑133: T03 hecho (la tabla MANDATORIES y el control `[M]`). Antes, 2026-10-12 — ADR‑132: la auditoría del suelo, versionada (`doc/AUDITORIA-SUELO-2026-10-12.md`, 81 trabajos: es la lista de trabajo vigente; bloque nuevo, arriba) y T00 hecho. Antes, 2026-10-05 — ADR‑131: el `Classical.choice` de los titulares, medido (punto 6, nuevo); ADR‑130: las dos notas de `Meta/CodeDecode.lean`, medidas (punto 5, hecho); ADR‑129: D7 EJECUTADA (punto 2, hecho); ADR‑128: `autoImplicit` desactivado también en `lake build` (punto 4, hecho); ADR‑127: la auditoría de ADR‑124/125/126 (el punto 1, rectificado) y los 88 sondeos re‑medidos (35 compilan); ADR‑126: la refutación a profundidad 2 y el control de discriminación (`sondeos/RosserBasura.lean`, punto 1); ADR‑125: la guarda de término refutada sobre un numeral (`sondeos/RosserBasura.lean`, punto 1); ADR‑124: el control negativo del modelo, en el build (punto 3, hecho), y la auditoría de ADR‑123 (el punto 1, rectificado); ADR‑123: Rosser, Etapa 0 —la reflexión numeral, confirmada en `sondeos/RosserReflexion.lean`—; ADR‑122: D7 medida (la puerta dice NO: 48 de 226) y Rosser re‑medido; ADR‑121: Gödel I ENTERO (`⊬ ¬G`) y TARSKI, sin hipótesis (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build y Gödel I/II van SIN HIPÓTESIS (bloque nuevo, arriba). Antes, 2026-10-05 — ADR‑119: el MODELO de los 142, `ConsistentH` demostrada en un sondeo (bloque nuevo, arriba); lo siguiente, su promoción al build. Antes, 2026-10-05 — ADR‑118: la clase `AnclaEq` retirada; lo siguiente, el modelo de los 142. Antes, 2026-10-04 — ADR‑117: F1 reparado, el ancla es un TEOREMA y Gödel I/II dependen sólo de `ConsistentH` (bloque nuevo, arriba); lo siguiente, retirar la clase `AnclaEq`. Antes, el mismo día — ADR‑116: los controles endurecidos, el `thaw` de FOL hecho y la etiqueta `pre-adr115` puesta (bloque nuevo, arriba); lo siguiente es F1. Antes, 2026-10-02 — FOL borró `FOL/MetaRules.lean` (ADR‑115 §8): el punto 1 de la lista, hecho; los sondeos, re‑medidos (31 de 85). Antes, el mismo día — ADR‑115: la capa `⊢` retirada de RPP (bloque de abajo, y la lista de lo que queda). Antes, 2026-09-28 — ADR‑113: la salida (5) adoptada y aplicada (bloque de abajo). Antes, 2026-09-26 — `Prf₀` → `Prfᵢ` en todo el fichero (ADR-102: el subíndice nombra un cálculo, y `₀` es el clásico); y se tachan, en el bloque del 2026-09-22, las dos menciones a la 2.ª entrega de `ModelG` (CERRADA, ADR-100 §1.1; definitiva el 2026-09-26); el resto sigue siendo el del 2026-09-22 y **no recoge ADR-098…100**. El bloque fechado más reciente manda. ⚠️ La marca que este fichero tenía decía **2026-07-08** y vivía en la **línea 3763**, donde nadie la ve ni la actualiza; lo destapó `[E]` al rearmarse (ADR-072). Esta va arriba, que es donde se lee.
 
 ---
 
@@ -33,6 +33,8 @@
 > el suyo); la línea de llegada de RPP es `T_UNIVERSO` + Rosser + Löb, y Gentzen y el libro quedan fuera; las variantes
 > Q++/PA/HA se miden en el diseño de T62. ADR‑139 aprobado en sus pasos 1 (sondeos) y 2 (historia), que se ejecutan
 > ahora; después, el orden de ADR‑137 (T08 → T62).
+> ✏️ ADR‑141 (paso 1, hecho): los sondeos, medidos con `lake lean` (39 de 93 compilan) y clasificados: 11 de control,
+> que la CI compila en cada push; 28 de registro; 1 a reparar; y 53 archivados con la etiqueta `archivo/sondeos-2026-10`.
 >
 > 🗓️ *Lo que sigue es el bloque del 2026‑10‑05, como registro: su lista la absorbe la auditoría.*
 
@@ -54,8 +56,8 @@
 >    refutada en `Prf` sobre numerales —el `0`; todo `consN k r` con `k ∉ {0, 1}`; y `[1, s, [0]]‾`, la basura en el
 >    único argumento («profundidad» 0, 1 y 2, en proyecciones)—, con un control (sobre el numeral de un código
 >    canónico, `¬ hasWit` no es demostrable: la solidez). ⬜ Lo siguiente: la versión hereditaria GENERAL (también la
->    etiqueta buena con forma mala, `[0]‾`, `[1, s]‾`), `hasWitF` (buscar antes: `sondeos/HasWitFCritica.lean` y
->    `sondeos/MedirC_Carga.lean` ya la refutaban, hoy sin compilar) y una línea `q1` basura, la tercera pieza.
+>    etiqueta buena con forma mala, `[0]‾`, `[1, s]‾`), `hasWitF` (buscar antes: `archivo/sondeos-2026-10:sondeos/HasWitFCritica.lean` y
+>    `archivo/sondeos-2026-10:sondeos/MedirC_Carga.lean` ya la refutaban, hoy sin compilar) y una línea `q1` basura, la tercera pieza.
 > 2. ✅ **D7** EJECUTADA (ADR‑129; decisión del propietario: «completar la sustitución»): los símbolos de FOL son
 >    `List Char`, en FOL y en RPP (`sym!"…"`, `Minimal/SymLit.lean`); ningún valor cambia; 44 filas de footprint pierden
 >    `Classical.choice`. ⬜ Queda PeanoRF (bloqueado), que dejará de compilar contra el FOL nuevo hasta que se adapte.
@@ -671,7 +673,7 @@
 > `Sugerencias.md` ⬜1 pedía el control adversarial: *«que la instancia para `⊢` no compile, y por
 > qué. Si compila, la idea está muerta.»*
 >
-> 🏁 **Compila.** `sondeos/MDiezEnLaFirma.lean` (compilado, cero `sorry`) construye
+> 🏁 **Compila.** `archivo/sondeos-2026-10:sondeos/MDiezEnLaFirma.lean` (compilado, cero `sorry`) construye
 > `instanciaParaDerives : EsREnumerable (fun f => Derives axioms f) code`.
 >
 > ⛔ **La raíz**: `verifier : Nat → Nat → Bool` es **DATO**, y Lean deja construir dato
@@ -1580,7 +1582,7 @@
 > | 4 | ⚠️ `check-axioms.bash` de FOL **cuenta ya la cuarentena** (`ESPERADO_CUAR=3`): la cifra estaba escrita en seis documentos y no la comprobaba nada. Probado en los dos sentidos | `../FOL/check-axioms.bash` |
 > | 5 | ⚠️⚠️ **Un sondeo perdido, rescatado**: la auditoría del 12 había COMPILADO la enumeración y dejó el fichero en un **scratchpad de sesión**; hoy la construí otra vez sin encontrarla | `sondeos/EnumFormulaPorInyeccion.lean`, [ADR‑030](DECISIONS.md) §4 |
 >
-> | 2c | 🔬 **`henkin_extension_lemma` MEDIDO** — y el juicio «el caro de verdad» **era falso**: sale. ⚠️⚠️ Pero pagándolo, el footprint de `completeness` cambia `henkin_extension_lemma` por **`raa`**. ✅ **DECIDIDO (A): se queda** | [ADR‑032](DECISIONS.md), `sondeos/HenkinSaleDeRaa.lean` |
+> | 2c | 🔬 **`henkin_extension_lemma` MEDIDO** — y el juicio «el caro de verdad» **era falso**: sale. ⚠️⚠️ Pero pagándolo, el footprint de `completeness` cambia `henkin_extension_lemma` por **`raa`**. ✅ **DECIDIDO (A): se queda** | [ADR‑032](DECISIONS.md), `archivo/sondeos-2026-10:sondeos/HenkinSaleDeRaa.lean` |
 >
 > ## 🎯 FRENTE NUEVO · `doc/PLAN-COMPLETITUD-FINITISTA.md` (2026‑09‑14)
 >
@@ -1639,7 +1641,7 @@
 > ## ⛔⛔ `henkin_extension_lemma` SE QUEDA — decisión tomada, **no es trabajo pendiente**
 >
 > **ADR‑032, opción (A), sancionada el 2026‑09‑13.** Está **medido que es demostrable**
-> (`sondeos/HenkinSaleDeRaa.lean`, compilado) y **aun así se queda**, porque no es «1 → 0»:
+> (`archivo/sondeos-2026-10:sondeos/HenkinSaleDeRaa.lean`, compilado) y **aun así se queda**, porque no es «1 → 0»:
 >
 > | | axiomas propios | footprint de `completeness` |
 > |---|---|---|
@@ -1792,7 +1794,7 @@
 > ## 1. 🏁 **MÓDULO E de `NegVerifier`, cerrado en diez líneas** (`Meta/VerifierSound.lean`)
 >
 > `PLAN-NEGVERIFIER.md` §8 lo llamaba **«el corazón»**, le ponía riesgo **ALTO** y 300–500 líneas,
-> y exigía un **sondeo previo**. El sondeo (`sondeos/NegVerifierModE.lean`, 5 mediciones) midió que
+> y exigía un **sondeo previo**. El sondeo (`archivo/sondeos-2026-10:sondeos/NegVerifierModE.lean`, 5 mediciones) midió que
 > **el corazón no había que construirlo**: el decisor que E necesita **no tiene que ser el
 > verificador OBJETO**, basta el **decodificador META**, y entonces la solidez **ya estaba probada**
 > — `verifier_sound` **es** `decodeChain_prf`. 🔑 La pieza que lo hace gratis es **`decodeForm_inj`**:
@@ -1872,7 +1874,7 @@
 > decide `formCode_ne`/`termCode_ne` **sin evaluar Cantor**.
 >
 > ⚠️⚠️ **Y en el camino apareció una CONTRADICCIÓN entre mediciones, que hubo que resolver.**
-> `sondeos/MedirF_Censo.lean` §4 —compilado, de antes— concluía lo contrario: *«¿hay que cambiar
+> `archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean` §4 —compilado, de antes— concluía lo contrario: *«¿hay que cambiar
 > `StdChain`? **NO**: `NumTree` ya la subsume»*, con `numTree_of_isCodeShaped` probado.
 >
 > 🔑🔑 **El teorema es CIERTO y la conclusión FALSA — y ésa es la regla nueva (M‑8):
@@ -2178,7 +2180,7 @@
 >              cobrar: psi_l1/l2/l3 y PSI_inst eran INSTANCIAS de psi_lift_form3 /
 >              PSI_inst3 con Phi := PHIsubsttc. Cuatro mas que no eran copias.
 >           ✅ export POR CONSUMO, medido: 46 de las 71 estan referenciadas de hecho por
->              sondeos/EvalSubstfcPrf.lean y sondeos/HasWitFReal.lean.
+>              archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean y archivo/sondeos-2026-10:sondeos/HasWitFReal.lean.
 >           📖 El metodo, para B3.3 y B3.4: memoria [[feedback-promover-un-sondeo]].
 >     B3.3 ⬜ SubstfcEx. MEDIDO: de 104 que faltan, 49 NO se promueven (47%), 47 BAJAN
 >           a modulos existentes y solo 8 plantean modulo nuevo. Recomendacion del
@@ -2294,7 +2296,7 @@
 >   C1 ✅ HECHA (2026-09-05, ADR-020): (C) LA ENMIENDA DEL ESQUEMA, en version MINIMA.
 >         11 conjuntos nuevos (7 hasWitF + 4 hasWit) en los 7 esquemas. El chasis NO
 >         hubo que rehacerlo. Ver §3.36.
->   C1b✅ LAS DOS CLAUSURAS, PROBADAS (2026-09-06, sondeos/ClausuraSubsttc.lean,
+>   C1b✅ LAS DOS CLAUSURAS, PROBADAS (2026-09-06, archivo/sondeos-2026-10:sondeos/ClausuraSubsttc.lean,
 >         1911 l., 0 sorrys, net-0 puro):
 >         · prf_hasWit_substtc   — mitad TERMINO
 >         · prf_hasWitF_substfc  — 🏁 LA PIEZA QUE FALTABA PARA EL VERDE (§3.38)
@@ -2472,7 +2474,7 @@
 > ⛔ **NO ejecutar la recomendación §0.5 del plan** (añadir `ax_notInAxC`): la dirección negativa es
 > hoy un TEOREMA, y añadiría un axioma innecesario al inventario, que sigue en **7**.
 > ⚠️⚠️ **EL CUELLO DE BOTELLA DE F NO ES `axiomsCodeT`: ES LA RAMA B.** Los casos 3 y 4 necesitan
-> `codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `sondeos/CodeNatInj.lean`**, fuera del build.
+> `codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `archivo/sondeos-2026-10:sondeos/CodeNatInj.lean`**, fuera del build.
 > ⇒ **la promoción bloquea también a F**, no sólo a C/D/E.
 >
 > ⚠️ (2026‑08‑30) Y este frente ya estaba mal descrito en otros dos puntos:
@@ -2494,9 +2496,9 @@
 > F2 ✅ módulo C, casos 1 y 2 (por ax_lineWF_cons / ax_lineWF_inv)     NO dependen de canon_ne
 > F3 ⬜ módulo C casos 3 y 4, y módulo D — REDISEÑO por numerales
 >       ⚠️ canon_ne es FALSO: en esta teoría un `cons` ES un número
->          (cons nil nil = 2 = numeralM 2), verificado en sondeos/CanonNeRefuta.lean
+>          (cons nil nil = 2 = numeralM 2), verificado en archivo/sondeos-2026-10:sondeos/CanonNeRefuta.lean
 >       ✅ el sustituto EXISTE y es net-0: consN_inj → codeNat_inj → codeNat_ne
->          (sondeos/CodeNatInj.lean)
+>          (archivo/sondeos-2026-10:sondeos/CodeNatInj.lean)
 > F4 ⬜ DECISIÓN DEL AUTOR: la representación NUMERAL de las LÍNEAS (ver abajo)
 > ```
 > ⚠️ **Quedarse intuicionista NO cuesta nada aquí**: no hace falta ningún tag 22, luego `lineWF` no
@@ -2524,8 +2526,8 @@
 > ⚠️ **Antes de empezar B1, medir qué queda**: `CodeWitnessPrf.SinWTs` ya es el núcleo de
 > `ClausuraLiftSinWTs`, así que B1 se ha reducido y no son sus 1 428 líneas.
 > Y añadir a la lista lo que las mediciones destaparon como ausente en producción:
-> `prf_isFormCodeE2_str`, `CRIT_E2_rejects_varc`, `CRIT_isFC1_rejects_varc`, `prf_congr_carc` (éste sigue sólo en sondeos, p. ej. `sondeos/MedirC_Deriva.lean`)
-> y **`codeNat_ne`/`codeNatTerm_ne`** (`sondeos/CodeNatInj.lean`, 210 l.).
+> `prf_isFormCodeE2_str`, `CRIT_E2_rejects_varc`, `CRIT_isFC1_rejects_varc`, `prf_congr_carc` (éste sigue sólo en sondeos, p. ej. `archivo/sondeos-2026-10:sondeos/MedirC_Deriva.lean`)
+> y **`codeNat_ne`/`codeNatTerm_ne`** (`archivo/sondeos-2026-10:sondeos/CodeNatInj.lean`, 210 l.).
 >
 > ---
 >
@@ -2557,7 +2559,7 @@
 > **pelada**, sin guardas.
 >
 > ▶ **El siguiente paso es B0b, y es el trozo barato de la rama B**: el footprint mínimo de la
-> no‑vacuidad está **medido ejecutándolo** (`sondeos/HasWitFRealMin.lean`, 1 819 l.) y resulta
+> no‑vacuidad está **medido ejecutándolo** (`archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`, 1 819 l.) y resulta
 > **independiente** del descenso, de `Paso2`, de `SFsubsttc`, de `DescMutua` y del ensamblaje.
 > Es un módulo pequeño, no las ~20 000 líneas del frente.
 >
@@ -2577,7 +2579,7 @@
 > el **control de no‑vacuidad**. Sin él el teorema es correcto pero podría ser vacío.
 > ✅ La **mitad difícil ya está probada** —la guarda **DISCRIMINA**, no es un colador— y hay **dos
 > precedentes exactos** para transportar: `SinWTs.prf_isTC1_tcodes` (sort término, misma forma) y
-> `ParticionTresPredicados.prf_isFCB3_fcodes` (`sondeos/ParticionTresPredicados.lean`; sort fórmula, predicado posicional de tres testigos;
+> `ParticionTresPredicados.prf_isFCB3_fcodes` (`archivo/sondeos-2026-10:sondeos/ParticionTresPredicados.lean`; sort fórmula, predicado posicional de tres testigos;
 > ~650 l., y en forma ecuacional **cada nodo cuesta menos**).
 >
 > ⚠️ **Y después, la rama B deja de ser deuda y pasa a ser el cuello de botella**: C, D y E no
@@ -2588,7 +2590,7 @@
 > ## 📓 (histórico) El ensamblaje, que era la incógnita
 >
 > ✅✅ **Los OCHO constructores están CUBIERTOS** (2026‑08‑30, §3.29): `botc` `implc` `andc` `orc`
-> (`sondeos/SubstfcPlanos.lean`) · `exc` (`SubstfcEx.lean`) · `forallc` (`Paso2Guardado.lean`) ·
+> (`archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean`) · `exc` (`SubstfcEx.lean`) · `forallc` (`Paso2Guardado.lean`) ·
 > `eqc` y `atomc` vía `pcc_eval_substtc'`/`pcc_eval_substtsc'` (`EvalSubsttc.lean`). Todos net‑0,
 > recompilados a mano.
 >
@@ -2614,7 +2616,7 @@
 >
 > El frente es la **vía (2)** del muro de `substfc` (testigo de parseo, **cero axiomas**).
 > ✅ **`pcc_eval_liftc` PROBADO** (`2f27a29`) y ✅ **`paso2_caso_forall` REHECHO en forma `PrfH Γ`**
-> (2026‑08‑30) — `sondeos/Paso2Guardado.lean`:
+> (2026‑08‑30) — `archivo/sondeos-2026-10:sondeos/Paso2Guardado.lean`:
 > ```lean
 > paso2_caso_forall_guarded (v s f) (hIH) :
 >     Prf (hasWit s ⇒ provFromCode (evalSubstfcCode v s (forallc f)))
@@ -2645,7 +2647,7 @@
 >
 > ## ① ✅✅ CERRADO (2026‑08‑28) — **la discriminación SOBREVIVE a la forma ecuacional**
 >
-> `sondeos/DiscriminaEcuacional.lean`, **todo net‑0**. Extiende `DiscriminaTestigoAbierto.lean`,
+> `archivo/sondeos-2026-10:sondeos/DiscriminaEcuacional.lean`, **todo net‑0**. Extiende `DiscriminaTestigoAbierto.lean`,
 > así que **① y ② componen** en un solo fichero.
 >
 > ### 🔑 No hacen falta 12 lemas de fortalecimiento, ni 3: basta **UNO**
@@ -2677,7 +2679,7 @@
 > tienen `lenc = 3` y no la tienen ⇒ cambiaría su **ARIDAD** y ramificaría a `premsOf` y a D1.
 >
 > ### ✅ RESULTADO: la clausura es un **ARTEFACTO DE LA RUTA DE PRUEBA**, no del enunciado
-> `sondeos/TestigoAbierto.lean`, **net‑0**: `inst_wfAllT_open (p k)`, `inst_wfAllTs_open`,
+> `archivo/sondeos-2026-10:sondeos/TestigoAbierto.lean`, **net‑0**: `inst_wfAllT_open (p k)`, `inst_wfAllTs_open`,
 > **`inst_wfAllT_var0`** (¡con `p := #0`, el testigo real!) y **`PrfH_inst_wfAllT_open`** (donde
 > vive tras el `∃`‑elim) compilan con `p` y `k` **ABSTRACTOS** y **CERO hipótesis**.
 >
@@ -2690,7 +2692,7 @@
 > NO hace falta sanción.** La opción **(a)** queda descartada y la **(b)** resulta ser gratis por
 > la vía (c).
 >
-> ### ✅✅ ② CERRADA DEL TODO (2026‑08‑27) — `sondeos/DiscriminaTestigoAbierto.lean`
+> ### ✅✅ ② CERRADA DEL TODO (2026‑08‑27) — `archivo/sondeos-2026-10:sondeos/DiscriminaTestigoAbierto.lean`
 > Los dos titulares re‑enunciados **sin `hpl`/`hps` sobre el testigo**, todo **net‑0**:
 >
 > | cara | teorema |
@@ -2716,7 +2718,7 @@
 >
 > ## ✅ ③ PASO 1 CERRADO + ⛔ CORRECCIÓN DE `d783b9f` (2026‑08‑29)
 >
-> ### ✅ PASO 1 hecho — `sondeos/CtorDotados.lean` (443 l., recompilado a mano)
+> ### ✅ PASO 1 hecho — `archivo/sondeos-2026-10:sondeos/CtorDotados.lean` (443 l., recompilado a mano)
 > Los seis constructores dotados (`substfcT`/`substtcT`/`substtscT`/`liftcT`/`liftfcT`/`liftscT`)
 > como **definiciones puras**, con kit completo, más `prf_substtc_funcc3`/`prf_liftc_funcc1‑3`
 > (que no existían) y las **congruencias INTERNAS** `pcc_congr_substfcT_arg1/2/3_code`.
@@ -2726,7 +2728,7 @@
 >
 > ### ⛔⛔ CORRECCIÓN: el commit `d783b9f` («③ REORIENTADO») estaba MAL CERRADO
 > `sondeos/SustituyendoOpaco.lean` refutó la **RAZÓN** del gate, no su **CONCLUSIÓN**.
-> **`pcc_eval_liftc` SÍ hace falta**, y está **medido**: en `sondeos/Paso2CasoForall.lean`,
+> **`pcc_eval_liftc` SÍ hace falta**, y está **medido**: en `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean`,
 > `paso2_caso_forall` cierra el caso `∀` **entero** y su ÚNICA hipótesis sin descargar es
 > ```lean
 > hLift : Prf (provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s))))
@@ -2738,7 +2740,7 @@
 > ⚠️ **Lección**: refutar el ARGUMENTO de una objeción no la refuta; hay que atacar la CONCLUSIÓN.
 > Modo de fallo concreto: **generalizar de META a OBJETO**, que es donde vive la HI.
 >
-> ### ▶ EL PASO 2, YA ESPECIFICADO (`sondeos/Paso2CasoForall.lean`)
+> ### ▶ EL PASO 2, YA ESPECIFICADO (`archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean`)
 > * **Enunciado**: `pcc_eval_substfc (p v s f) : Prf (isFCB3 p f ⇒ provFromCode (evalSubstfcCode v s f))`
 >   con `evalSubstfcCode v s f := eqCodeFn (substfcT v̇ ṡ ḟ) (tcFn (substfc v s f))`. Análogo exacto
 >   de `pcc_dot_cons`. **Mutuo** con `pcc_eval_substtc`/`pcc_eval_substtsc` (`ax_substfc_eq` recurre
@@ -2754,7 +2756,7 @@
 >
 > ### ✅✅ EL PROBLEMA DE FONDO, RESUELTO (2026‑08‑29) — **sin axiomas y sin acotar**
 >
-> `sondeos/ClausuraLiftSinWTs.lean`, recompilado a mano, **net‑0, cero símbolos nuevos**:
+> `archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean`, recompilado a mano, **net‑0, cero símbolos nuevos**:
 > ```lean
 > prf_isTC1_lift (w c : Term) : Prf (isTC1 w c ⇒ isTC1 (liftsc 0 w) (liftc 0 c))
 > CRIT_hasWit_lift (c : Term) : Prf (hasWit c ⇒ hasWit (liftc 0 c))   -- la forma real (∃-elim)
@@ -2780,7 +2782,7 @@
 >
 > ### ✅✅ EL AVISO 2 MEDIDO (2026‑08‑29): **NO HAY MURO NUEVO** — tres vías, las tres cierran
 >
-> * **`sondeos/ReflectorAtomoAllIn.lean`** — 🔑 `argsIn wT Y` **ES** `boundedAllIn wT Y` **por
+> * **`archivo/sondeos-2026-10:sondeos/ReflectorAtomoAllIn.lean`** — 🔑 `argsIn wT Y` **ES** `boundedAllIn wT Y` **por
 >   `rfl`**, y producción ya tiene `prf_allIn_iff_boundedAllIn` con `allIn` **átomo** ⇒ se dota
 >   **como átomo** (`allInFn := atom2CodeFn "allIn"`, y `allInFn (termCode c) (termCode L) =
 >   formCode (allIn c L) := rfl`). **`PsiF` no contiene ningún `forallc`** ⇒ el `bdAllCode` dentro
@@ -2788,12 +2790,12 @@
 >   `pcc_bdAll_intro`, igual que `inFormCodeFn` en A3. **Es la idea #2 del proyecto, otra vez.**
 >   ⚠️ **Coste CERO, verificado en el fuente**: `ax_allIn_nil`/`ax_allIn_cons` **ya estaban** en
 >   `axioms` (`Axioms.lean:1305‑1306`) y en `codingAxioms` (`:1341`) ⇒ **G no cambia**.
-> * **`sondeos/ReflectorForallAnidado.lean`** — el `∀` anidado **también cierra de frente** ⇒ la vía
+> * **`archivo/sondeos-2026-10:sondeos/ReflectorForallAnidado.lean`** — el `∀` anidado **también cierra de frente** ⇒ la vía
 >   del átomo es **optimización, no rescate**. Clave: **`liftc 0 ⌜v₀⌝ ≐ ⌜v₁⌝`**.
-> * **`sondeos/ReflectorDesdeConsumidor.lean`** — el `∀` anidado **nunca llega a la cara punteada**:
+> * **`archivo/sondeos-2026-10:sondeos/ReflectorDesdeConsumidor.lean`** — el `∀` anidado **nunca llega a la cara punteada**:
 >   `hLift` sólo pide **cuatro ecuaciones libres de cuantificador** a nivel plano.
 >
-> ### ✅✅ EL DESCENSO, CERRADO (2026‑08‑30) — `sondeos/DescensoLiftc.lean`
+> ### ✅✅ EL DESCENSO, CERRADO (2026‑08‑30) — `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean`
 > **3 estrategias, 3 de 3 confirmadas** (compila / abstracto / hipótesis limpias / inducción
 > correcta). Recompilado a mano.
 > ```lean
@@ -2807,7 +2809,7 @@
 > ⚠️ **No hay atajo por el consumidor**, y está probado: el `s` que ve `paso2_caso_forall` **es
 > `#0`**, luego pedir `hLift` sólo para ése **es pedirlo para todo `s`** (`sin_ahorro`).
 >
-> ### ✅ Y el RESIDUO DE ACOPLE, resuelto — `sondeos/GateGuardaEnriquecida.lean`
+> ### ✅ Y el RESIDUO DE ACOPLE, resuelto — `archivo/sondeos-2026-10:sondeos/GateGuardaEnriquecida.lean`
 > `pcc_eval_liftc` tiene **guarda** y el `PHI` del consumidor no la tenía. Se enriquece:
 > `PHI_guarded := ∀.∀. (hasWit #0 ⇒ provFromCode (evalSubstfcCode #1 #0 #2))`, y
 > **`PHI_guarded_lift` compila**: el gate de `prf_strong_induction` **pasa**. 🔑 **Sin binder
@@ -2880,7 +2882,7 @@
 >    Eso es **exactamente** lo que compraba la idea de **dotar el átomo sin desplegarlo**
 >    (`inFormCodeFn`) en A3 — y esta vía **lo pierde ahí**. Podría ser el muro nuevo.
 >    **▶ Siguiente paso: medirlo** — escribir `isTC1Dot`/`argsInDot` y `pcc_isTC1_tracked` sobre el
->    molde §5‑§9 de `sondeos/DiscriminaEcuacional.lean`, y ver si el `∀` anidado es barato.
+>    molde §5‑§9 de `archivo/sondeos-2026-10:sondeos/DiscriminaEcuacional.lean`, y ver si el `∀` anidado es barato.
 >
 > ### ⚠️ Tensión abierta, sin resolver
 > El sondeo afirma que `Inv1`/`Inv2` **son derivables** con `prf_list_induction`
@@ -2996,7 +2998,7 @@
 >
 > ## ✅ GATE DE CLAUSURA SUPERADO (2026‑08‑26) — **la vía (2) sigue siendo CERO axiomas**
 >
-> Recompilado por mí: `sondeos/ClausuraNoHaceFalta.lean` y `sondeos/ClausuraFormaEcuacional.lean`,
+> Recompilado por mí: `archivo/sondeos-2026-10:sondeos/ClausuraNoHaceFalta.lean` y `sondeos/ClausuraFormaEcuacional.lean`,
 > más `Probe/SinMap.lean` y `Probe/VerifClausuraAdv.lean`, los cuatro `EXIT=0`.
 >
 > ### ✅ La clausura que se TEMÍA — mapear el testigo HETEROGÉNEO — **NO hace falta EN NINGÚN SITIO**
@@ -3044,8 +3046,8 @@
 >
 > ## ✅✅ COMPARACIÓN (1) vs (2) RESUELTA (2026‑08‑26) — **la partición FUNCIONA y DISCRIMINA**
 >
-> Recompilado por mí: `sondeos/ParticionTresPredicados.lean` (2282 l.) y
-> `sondeos/ParticionDiscrimina.lean` (2704 l.), ambos `EXIT=0`.
+> Recompilado por mí: `archivo/sondeos-2026-10:sondeos/ParticionTresPredicados.lean` (2282 l.) y
+> `archivo/sondeos-2026-10:sondeos/ParticionDiscrimina.lean` (2704 l.), ambos `EXIT=0`.
 >
 > ### 🔑 El cuadre que lo explica todo — **el premio de R‑6**
 > | predicado | disyuntos | ecuaciones de su sustitución |
@@ -3093,7 +3095,7 @@
 >
 > ## ⛔ HITO (i) CERRADO — pero **el predicado FUSIONADO no desbloquea el muro** (2026‑08‑25)
 >
-> **Lo que SÍ está hecho** (`sondeos/SubCodesWitness.lean`, **net‑0**, 3 estrategias independientes,
+> **Lo que SÍ está hecho** (`archivo/sondeos-2026-10:sondeos/SubCodesWitness.lean`, **net‑0**, 3 estrategias independientes,
 > **3 de 3** confirmadas incluida satisfacibilidad):
 > ```lean
 > prf_isFCB_subCodes (φ) : Prf (isFCB (objList (subCodes φ)) (formCodeM φ))
@@ -3102,13 +3104,13 @@
 > Sin hipótesis. `subCodes` salió tal como se propuso, con **`subCodesTs [] = [nil]`**
 > imprescindible. La inducción **generaliza sobre un superconjunto** en vez de usar monotonía.
 > `real_mem_subCodes`: el testigo **no tiene basura** (todo miembro es `formCodeM`/`termCodeM`/
-> `termsCodeM`). Añadidos net‑0 por el crítico (`sondeos/SubCodesCritica.lean`): **gemelo de términos** (`prf_isTC`/`prf_isTsC`) y
-> **transporte** `prf_congr_isFC` (Leibniz bajo el `∃`), en el mismo `sondeos/SubCodesCritica.lean`.
+> `termsCodeM`). Añadidos net‑0 por el crítico (`archivo/sondeos-2026-10:sondeos/SubCodesCritica.lean`): **gemelo de términos** (`prf_isTC`/`prf_isTsC`) y
+> **transporte** `prf_congr_isFC` (Leibniz bajo el `∃`), en el mismo `archivo/sondeos-2026-10:sondeos/SubCodesCritica.lean`.
 >
 > ### 🚩 EL DEFECTO, y es de DISEÑO: `nodeOk` FUSIONA fórmulas y términos
 > Es **un solo** predicado de 12 disyuntos que mezcla los tags de FÓRMULA (2‑9) con los de TÉRMINO
 > (0‑1), `nil` y el `cons` genérico ⇒ **`isFC X` NO dice que `X` sea código de fórmula.**
-> Compilado net‑0 en `sondeos/SubCodesCritica.lean`:
+> Compilado net‑0 en `archivo/sondeos-2026-10:sondeos/SubCodesCritica.lean`:
 > `prf_isFC_nil` · `prf_isFC_varc` (un código de VARIABLE pasa) · **`prf_isFC_junk`**: la
 > «implicación» `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ`, cuyas dos subfórmulas son códigos de TÉRMINO, **pasa**.
 >
@@ -3152,7 +3154,7 @@
 > A1 no se tiró: es el motor. `boundedIn ⇒ In` es un teorema **objeto** que se **dota gratis**
 > (la lección de la escalera), y eso da el puente interno `bdInDot ⇒ ⌜In⌝` (`pcc_InBwd_computed`).
 >
-> ### ⛔ LA REFUTACIÓN — mató 2 de los 4 intentos (`sondeos/A3ConsOkRefuta.lean`)
+> ### ⛔ LA REFUTACIÓN — mató 2 de los 4 intentos (`archivo/sondeos-2026-10:sondeos/A3ConsOkRefuta.lean`)
 > Los cuatro necesitan saber que el nodo es un `cons` (porque `pcc_eval_carc` sólo evalúa sobre
 > `cons` EXPLÍCITO). Dos lo conjuntaron **globalmente**, y eso **mata el disyunto `X = nil`**:
 > la teoría objeto REFUTA `consOk nil` (`nil_ne_cons`, `CodeDistinct.lean:67`). Y `nil` es
@@ -3163,7 +3165,7 @@
 > 🔑 **Para el libro**: reforzar el antecedente objeto es la dirección que ABARATA el teorema, y por
 > eso es donde hay que mirar. Se detectó porque alguien lo **compiló**, no porque alguien lo leyera.
 >
-> ### ⚠️ DOS DESVIACIONES respecto a `sondeos/ParseWitness.lean`, ambas declaradas
+> ### ⚠️ DOS DESVIACIONES respecto a `archivo/sondeos-2026-10:sondeos/ParseWitness.lean`, ambas declaradas
 > 1. **`consOk X` en 11 de los 12 disyuntos** (NO en `X = nil`). **Solidez**: restringe `nodeOk` ⇒
 >    `Prov` nunca crece. **Completitud**: para un testigo real cada nodo de esos 11 **es** un `cons`,
 >    luego se descarga solo — ⚠️ **pero añade una obligación al hito (i)**: `subCodes` tendrá que
@@ -3173,7 +3175,7 @@
 >    dentro de `Prov` (`pcc_eval_lenc`), pero convertirlas cuesta **un lema entero** (segunda
 >    travesía estructural de `PsiF` a nivel 1). Diferido.
 >
-> ## ✅ (A) EJECUTADO (2026‑08‑24): **el REFLECTOR de la vía (2) EXISTE** (`sondeos/InTracked.lean`)
+> ## ✅ (A) EJECUTADO (2026‑08‑24): **el REFLECTOR de la vía (2) EXISTE** (`archivo/sondeos-2026-10:sondeos/InTracked.lean`)
 >
 > Footprint **sancionado** `[propext, choice, Quot.sound, prf_axiomsCodeT_eq]` en las tres piezas.
 >
@@ -3214,7 +3216,7 @@
 > ## ✅ DECISIÓN TOMADA (2026‑08‑24): **opción (2), vía por TESTIGO DE PARSEO** — FASE A COMPILADA
 >
 > Presentada la decisión sobre `isFormCode`, el usuario eligió **(2)**: definir la buena‑formación
-> en **vocabulario objeto EXISTENTE**, sin sancionar axiomas. `sondeos/ParseWitness.lean`,
+> en **vocabulario objeto EXISTENTE**, sin sancionar axiomas. `archivo/sondeos-2026-10:sondeos/ParseWitness.lean`,
 > **todo net‑0** (`[propext, choice, Quot.sound]`):
 >
 > | pieza | qué asegura |
@@ -3316,7 +3318,7 @@
 >
 > ### ▶▶ DÓNDE SE RETOMA: **repatriar la cuarentena** — el rédito ya está VERIFICADO
 >
-> **`sondeos/CarcPayoff.lean`: `pcc_eval_carc` YA VUELVE**, con el mismo enunciado y el mismo
+> **`archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`: `pcc_eval_carc` YA VUELVE**, con el mismo enunciado y el mismo
 > footprint. El viejo (`cuarentena/EvalListPrf.lean:130`) cerraba con `prf_tc_cons'` — el puente que
 > murió con la reparación — y la sustitución es **un único `pcc_rw` con `pcc_dot_cons`**; los pasos
 > 1‑3 (instancia de `ax_carc` + los dos `substfc` computados) quedan **intactos**.
@@ -3338,7 +3340,7 @@
 > | **1** | **`EvalListPrf`** | los 3 usos de `prf_tc_cons'` → `pcc_rw_dot_cons_un` | ✅ **HECHO 2026‑08‑23** |
 > | **2** | **`EvalNthcPrf`** → `EvalCarcNthcPrf` | necesitó **`pcc_rw_imp`** (la forma implicación de `pcc_rw`) | ✅ **HECHO 2026‑08‑23** |
 > | **3** | **`D3InDotPrf`** | familia `prf_tc_form` (el lema, retirado el 2026‑08‑18 con ADR‑012), por **conversión en la frontera** | ✅ **HECHO 2026‑08‑23** — arrastró `BdAllIntroPrf`. **D3 vuelve a estar reducida a UN SOLO lema** |
-> | **4** | **KIT**: `CodeCtorKit` (4) → `CodeTreeReflect` (2) → `LineWFEfqPrf` (1) | ✅ **MEDIDO** (`sondeos/KitPayoff.lean`): los 3 sustitutos ya están escritos y compilados. El coste está en mudar `prf_tc_objAt` dentro de `Prov` | ▶ **el siguiente** |
+> | **4** | **KIT**: `CodeCtorKit` (4) → `CodeTreeReflect` (2) → `LineWFEfqPrf` (1) | ✅ **MEDIDO** (`archivo/sondeos-2026-10:sondeos/KitPayoff.lean`): los 3 sustitutos ya están escritos y compilados. El coste está en mudar `prf_tc_objAt` dentro de `Prov` | ▶ **el siguiente** |
 > | **5** | `LineWFTrackedPrf` (8) | `prf_tc_cons'` + `prf_tc_eqc`. `prf_tc_eqc` es un `binT 4` ⇒ debería caer con el KIT | ⏳ |
 > | **6** | `InAxiomsCodePrf` (2) | medido: el más fiddly de los tres (hipótesis muerta + hueco en cabeza de `cons`) | ⏳ |
 > | **3bis** | **KIT: `pcc_dot_nul`/`_un`/`_bin`** | ⚠️ **medir primero.** Desbloquea `CodeCtorKit` (12 usos), `CodeTreeReflect`, `LineWFEfqPrf` | ⏳ **sondeo pendiente** |
@@ -3347,7 +3349,7 @@
 >
 > ### 📏 MEDICIÓN del KIT (2026‑08‑23) — **la última familia, y tampoco es un muro**
 >
-> `sondeos/KitPayoff.lean`, cuatro declaraciones compiladas. **La hipótesis era correcta**: los tres
+> `archivo/sondeos-2026-10:sondeos/KitPayoff.lean`, cuatro declaraciones compiladas. **La hipótesis era correcta**: los tres
 > sustitutos salen **por composición de `pcc_dot_cons`, sin inducción nueva**.
 >
 > | | cómo sale |
@@ -3413,7 +3415,7 @@
 >
 > ### 📏 MEDICIÓN de `prf_tc_form` (2026‑08‑23; el lema, retirado el 2026‑08‑18) — la tercera familia **no es un muro**
 >
-> `sondeos/TcFormPayoff.lean`, cuatro declaraciones compiladas. Dos hallazgos:
+> `archivo/sondeos-2026-10:sondeos/TcFormPayoff.lean`, cuatro declaraciones compiladas. Dos hallazgos:
 >
 > **1. El sustituto directo es UNA LÍNEA y net‑0.**
 >
@@ -3514,7 +3516,7 @@
 >
 > ✅ **Las TRES sub‑familias están MEDIDAS, y ninguna es un muro:** `prf_tc_cons'` (resuelta,
 > `pcc_dot_cons`), `prf_tc_form` (resuelta, conversión en la frontera; el lema, retirado el 2026‑08‑18) y el **KIT** (medido,
-> `sondeos/KitPayoff.lean` — los sustitutos ya están escritos).
+> `archivo/sondeos-2026-10:sondeos/KitPayoff.lean` — los sustitutos ya están escritos).
 
 > ### ⚠️ TRAMPAS METODOLÓGICAS — caras, no repetir
 >
@@ -3540,10 +3542,10 @@
 >
 > **`repr_neg` / `NegVerifier` para `⊬¬G`** — independiente. ⛔ **OJO: `PLAN-NEGVERIFIER.md` tiene un
 > paso FALSO.** Su paso 1.1 (`canon_ne`, base de los módulos C y D) **reintroduciría la
-> inconsistencia** — verificado en `sondeos/CanonNeRefuta.lean`. El plan es de julio, anterior al
+> inconsistencia** — verificado en `archivo/sondeos-2026-10:sondeos/CanonNeRefuta.lean`. El plan es de julio, anterior al
 > descubrimiento, y arrastra el mismo error de categoría. Módulos A y B siguen válidos; C (casos 3‑4)
 > y D hay que rediseñarlos, previsiblemente **pasando a numerales** como ADR‑012. ✅ **MEDIDO 2026‑08‑23**
-> (`sondeos/CodeNatInj.lean`): **`codeNat` ES inyectiva** y el sustituto (`codeNat_ne`) sale con la
+> (`archivo/sondeos-2026-10:sondeos/CodeNatInj.lean`): **`codeNat` ES inyectiva** y el sustituto (`codeNat_ne`) sale con la
 > base sancionada, **sin axiomas nuevos** — la mitad objeto (`numeral_ne`) ya existía. ⇒ el rediseño
 > por numerales es **viable y net‑0**. ▶ Falta **elegir la representación numeral de las LÍNEAS**
 > (`consN_inj` es el motor general) y aplicarlo a los módulos C y D.

@@ -71,7 +71,7 @@
 >
 > `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (`Meta/DotConsPrf.lean`): la
 > Σ₁‑completitud **internalizada** para argumentos ABSTRACTOS. Rédito verificado en
-> `sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
+> `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`. ▶ **PASO 1 EJECUTADO (2026-08-23)**: `EvalListPrf` repatriado, y con él
 > **6 módulos más en cascada** — cuarentena **21 → 12**. ▶ **PASO 2 EJECUTADO**: `EvalNthcPrf` + `EvalCarcNthcPrf` de vuelta (cuarentena 14 → 12). ▶ **PASO 3 EJECUTADO**: `D3InDotPrf` de vuelta ⇒ **D3 reducida otra vez a UN SOLO lema**. ▶ **PASOS 4‑5 EJECUTADOS**: `LineWFTrackedPrf` y el **KIT** (`CodeCtorKit`) en producción. **LA CUARENTENA ESTÁ VACÍA.**
 >
 > ⚠️ **`⊬¬G` sigue SIN cerrar** en la cadena real (falta `NegVerifier`); es frente independiente.
@@ -160,8 +160,9 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
    mucho, el footprint de los titulares (las filas de `check-footprints.bash`; D2 no lleva `Classical.choice`, y D1, D2 y
    `prf_con_imp_godel` aún no tienen fila: T11b), y leanchecker re‑comprueba en la CI las declaraciones del
    build con el núcleo (ADR‑116). **0 `axiom` de Lean** en los módulos del build, en RPP y en FOL (fuera del build, FOL guarda 15 en
-   `cuarentena/`, T57, y RPP cuatro en `sondeos/`: los dos que el piloto `PilotoDiagonal.lean` suponía, y dos en
-   `lintlab/Uso.lean`, que prueban que un linter los detecta).
+   `cuarentena/`, T57, y RPP dos en `sondeos/`, en
+   `lintlab/Uso.lean`, que prueban que un linter los detecta; el piloto `PilotoDiagonal.lean`, que suponía otros dos, está
+   archivado desde ADR‑141).
    ✏️ *(2026‑10‑16, [ADR‑138](DECISIONS.md))* Con el núcleo se supone su CONSISTENCIA, que Lean no puede demostrar
    (Gödel II, aplicado a Lean): todo lo demostrado vale relativo a ella. Para la de los titulares, PRA ⊢ Con(Lean) →
    Con(T_Prf); y no puede ser de otro modo, porque `T_Prf` contiene a PA (§0.1) y ninguna teoría contenida en ella

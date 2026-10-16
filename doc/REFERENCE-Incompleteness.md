@@ -1230,7 +1230,7 @@ lema de evaluación (`prf_charsCode_numeral`, `prf_strCode_numeral`, `prf_termCo
 ✏️ 2026‑10‑04 (ADR‑117): `triN`, `consN` y la familia `codeNat` se definen hoy en `Minimal/Axioms.lean` —el
 axioma diagonal lleva `numeralM (codeNat ψ)`, y `axioms` no puede importar `Meta`—; este módulo los reexporta.
 
-**Hecho de magnitud medido** (`sondeos/S3S5.lean`): Lean **nunca reduce** `codeNat φ` — se mantiene
+**Hecho de magnitud medido** (`archivo/sondeos-2026-10:sondeos/S3S5.lean`): Lean **nunca reduce** `codeNat φ` — se mantiene
 simbólico incluso con `φ` concreta. La vía es viable del lado de Lean.
 ✏️ 2026‑10‑04 (ADR‑117): «nunca» vale al ELABORAR; con `simp only` sobre las definiciones del ancla, el núcleo
 evaluaba el numeral («(kernel) deep recursion detected»), y por eso `axD_lift` va por `rw`.
@@ -1353,7 +1353,7 @@ base sancionada, **sin `tc_cons`**.
 **Qué es.** Los cuatro peldaños que llevan la evaluación aritmética **dentro de `Prov`**, para
 argumentos **ABSTRACTOS** (no `numeral a` concretos). Es lo que devuelve la cuarentena: el viejo
 `pcc_eval_carc` cerraba con `prf_tc_cons'`, el puente que la reparación mató, y `pcc_dot_cons` es su
-sustituto — verificado en `sondeos/CarcPayoff.lean`.
+sustituto — verificado en `archivo/sondeos-2026-10:sondeos/CarcPayoff.lean`.
 
 | peldaño | teorema | dónde |
 |---|---|---|
@@ -1443,7 +1443,7 @@ como `σ (div2 (cantor_poly h t))` (ADR-113), o sea `σ`, `+`, `·` y `div2`, to
 
 ##### El rédito, verificado
 
-`sondeos/CarcPayoff.lean` reconstruye **`pcc_eval_carc`** con el mismo enunciado y el mismo footprint.
+`archivo/sondeos-2026-10:sondeos/CarcPayoff.lean` reconstruye **`pcc_eval_carc`** con el mismo enunciado y el mismo footprint.
 El viejo (`cuarentena/EvalListPrf.lean:123`) cerraba con `prf_tc_cons'`; la sustitución es **un único
 `pcc_rw` con `pcc_dot_cons`**, y los pasos 1‑3 (instancia de `ax_carc` + los dos `substfc` computados)
 quedan **intactos**. ⇒ el keystone `EvalListPrf` es repatriable, y el patrón de arreglo es mecánico.
@@ -1574,13 +1574,13 @@ conservatividad** — la prueba NO vacua que `ax_lineWF_inv` sólo afirma de pal
 (12 = 8+2+2): es **partición**, no recubrimiento. ⇒ **partir no repara un defecto: es la CONDICIÓN
 para que la inducción exista.**
 Y **discrimina**: `crit_isFC_junk_REFUTED` es net‑0 — el `implc ⌜x₀⌝ₜ ⌜x₀⌝ₜ` que el predicado
-**fusionado** aceptaba, el partido lo **refuta**. (`sondeos/ParticionTresPredicados.lean`,
-`sondeos/ParticionDiscrimina.lean`.)
+**fusionado** aceptaba, el partido lo **refuta**. (`archivo/sondeos-2026-10:sondeos/ParticionTresPredicados.lean`,
+`archivo/sondeos-2026-10:sondeos/ParticionDiscrimina.lean`.)
 
 ### 3.27.3 · Los teoremas, con firma
 
 ```lean
--- A1/A2 (sondeos/InTracked.lean) · el reflector de `In` sobre lista ABSTRACTA, que no existía
+-- A1/A2 (archivo/sondeos-2026-10:sondeos/InTracked.lean) · el reflector de `In` sobre lista ABSTRACTA, que no existía
 pcc_boundedIn_tracked (x w : Term) : Prf (boundedIn x w ⇒ provFromCode (bdInDot x w))
 pcc_In_tracked        (x w : Term) : Prf (In x w ⇒ provFromCode (bdInDot x w))
 pcc_binOk_tracked (w X : Term) (k : Nat) : Prf (binOk w X k ⇒ provFromCode (binOkDot w X k))
@@ -1588,28 +1588,28 @@ pcc_binOk_tracked (w X : Term) (k : Nat) : Prf (binOk w X k ⇒ provFromCode (bi
 -- A3 (sondeos/A3IsFCBTracked.lean) · el reflector COMPLETO
 pcc_isFCB_tracked (w c : Term) : Prf (isFCB w c ⇒ provFromCode (isFCBDot w c))
 
--- hito (i) (sondeos/SubCodesWitness.lean) · todo φ tiene testigo explícito
+-- hito (i) (archivo/sondeos-2026-10:sondeos/SubCodesWitness.lean) · todo φ tiene testigo explícito
 prf_isFCB_subCodes (φ : Formula) : Prf (isFCB (objList (subCodes φ)) (formCodeM φ))
 prf_isFC (φ : Formula)           : Prf (∃w. isFCB w ⌜φ⌝)
 
--- ① (sondeos/DiscriminaEcuacional.lean) · UN solo lema cubre los 12 disyuntos
+-- ① (archivo/sondeos-2026-10:sondeos/DiscriminaEcuacional.lean) · UN solo lema cubre los 12 disyuntos
 prf_shape_strengthens (X C : Term) (k n : Nat)
     (hcarc : Prf (carc C =eq numeralM k)) (hlenc : Prf (lenc C =eq numeralM n))
     (hcons : Prf (consOk C)) :
     Prf (X ≐ C ⇒ consOk X ∧ (carc X ≐ k̄ ∧ lenc X ≐ n̄))
 
--- ② (sondeos/DiscriminaTestigoAbierto.lean) · discriminación con testigo ABIERTO
+-- ② (archivo/sondeos-2026-10:sondeos/DiscriminaTestigoAbierto.lean) · discriminación con testigo ABIERTO
 crit_junk_var0_witness         : el junk refutado con testigo LITERALMENTE `#0`
 crit_isFCB3_no_termcode_var0   : ídem en la cara de FÓRMULA
 
--- ③ paso 1 (sondeos/CtorDotados.lean) · los constructores de código dotados
+-- ③ paso 1 (archivo/sondeos-2026-10:sondeos/CtorDotados.lean) · los constructores de código dotados
 substfcT / substtcT / substtscT / liftcT / liftfcT / liftscT   -- DEFINICIONES, cero axiomas
 pcc_congr_substfcT_arg1/2/3_code    -- las congruencias INTERNAS
 
--- ③ paso 2, caso ∀ (sondeos/Paso2CasoForall.lean)
+-- ③ paso 2, caso ∀ (archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean)
 paso2_caso_forall (v s f : Term) (hIH …) (hLift …) : …   -- cierra salvo `hLift`
 
--- la clausura, SIN axiomas (sondeos/ClausuraLiftSinWTs.lean)
+-- la clausura, SIN axiomas (archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean)
 prf_isTC1_lift (w c : Term) : Prf (isTC1 w c ⇒ isTC1 (liftsc 0 w) (liftc 0 c))
 CRIT_hasWit_lift (c : Term) : Prf (hasWit c ⇒ hasWit (liftc 0 c))
 ```
@@ -1671,7 +1671,7 @@ cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29`
 
 ### 3.28.1 · Los teoremas, con firma
 
-`sondeos/DescensoLiftc.lean` (2011 l.):
+`archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` (2011 l.):
 
 ```lean
 -- :79    el objetivo, como definición
@@ -1716,7 +1716,7 @@ vez de supuesto** — que es la diferencia entre cerrar una vía y abandonarla.
 
 Los tres intentos señalaron, sin que se les preguntara, el mismo defecto de encaje: `pcc_eval_liftc`
 llega con **guarda** (`hasWit s`) y el `Φ` del consumidor (`Paso2Ind.PHI`,
-`sondeos/Paso2CasoForall.lean:689`) no la tenía. Medido en `sondeos/GateGuardaEnriquecida.lean`:
+`archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean:689`) no la tenía. Medido en `archivo/sondeos-2026-10:sondeos/GateGuardaEnriquecida.lean`:
 
 ```lean
 -- :119
@@ -1730,7 +1730,7 @@ theorem PHI_guarded_lift : liftFormula 1 PHI_guarded = PHI_guarded
 
 🔑 **Y pasa sin binder nuevo**, porque `hasWit c := ∃. isTC1 #0 ↑c` es un `∃` **interno**: el número
 de binders **exteriores** no cambia, que es lo único que mira el gate. La propagación de la guarda
-al subcódigo ya existía: `CRIT_hasWit_lift` (`sondeos/ClausuraLiftSinWTs.lean:1392`),
+al subcódigo ya existía: `CRIT_hasWit_lift` (`archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean:1392`),
 `Prf (hasWit c ⇒ hasWit (liftc zero c))`.
 
 El fichero incluye además el control negativo de que la guarda **no es decorativa**
@@ -1771,7 +1771,7 @@ pero **no es gratis** y no figuraba en ninguna estimación previa.
 
 ### 3.28.6 · ✅ `paso2_caso_forall` REHECHO en forma `PrfH Γ` — la hipótesis colgante desaparece
 
-`sondeos/Paso2Guardado.lean`, recompilado a mano (`EXIT=0`):
+`archivo/sondeos-2026-10:sondeos/Paso2Guardado.lean`, recompilado a mano (`EXIT=0`):
 
 ```lean
 theorem paso2_caso_forall_guarded (v s f : Term)
@@ -1811,7 +1811,7 @@ teorema, pero **no está resuelto**.
 
 #### Pieza genérica de propina
 
-`sondeos/EqTransCodeImp2.lean`: `pcc_eq_trans_code_imp2 (X Y Z) (hX) : Prf (⌜X=Y⌝ ⇒ ⌜Y=Z⌝ ⇒ ⌜X=Z⌝)`
+`archivo/sondeos-2026-10:sondeos/EqTransCodeImp2.lean`: `pcc_eq_trans_code_imp2 (X Y Z) (hX) : Prf (⌜X=Y⌝ ⇒ ⌜Y=Z⌝ ⇒ ⌜X=Z⌝)`
 —la transitividad interna con **ambos** eslabones como antecedentes, que no existía— y
 **`prfH_deduction`**, deducción dentro de `PrfH`, que tampoco. Resultaron **innecesarias** para el
 objetivo, pero son genéricas y reutilizables.
@@ -1854,12 +1854,12 @@ inducción que los junta. Y todo vive en `sondeos/`, con el coste de promoción 
 
 | # | constructor | estado | dónde |
 |--:|---|---|---|
-| 2 | `botc` | ✅ nulario, 4 eslabones | `sondeos/SubstfcPlanos.lean` |
-| 5,7,8 | `implc` `andc` `orc` | ✅ **una prueba, no tres** | `sondeos/SubstfcPlanos.lean` |
-| 6 | `forallc` | ✅ (2026‑08‑29/30) | `sondeos/Paso2CasoForall.lean` · `Paso2Guardado.lean` |
-| 9 | `exc` | ✅ espejo **perfecto**, factorizado | `sondeos/SubstfcEx.lean` |
-| 4 | `eqc` | ✅ vía `pcc_eval_substtc'` | `sondeos/EvalSubsttc.lean` |
-| 3 | `atomc` | ✅ vía `pcc_eval_substtsc'` | `sondeos/EvalSubsttc.lean` |
+| 2 | `botc` | ✅ nulario, 4 eslabones | `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` |
+| 5,7,8 | `implc` `andc` `orc` | ✅ **una prueba, no tres** | `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` |
+| 6 | `forallc` | ✅ (2026‑08‑29/30) | `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` · `Paso2Guardado.lean` |
+| 9 | `exc` | ✅ espejo **perfecto**, factorizado | `archivo/sondeos-2026-10:sondeos/SubstfcEx.lean` |
+| 4 | `eqc` | ✅ vía `pcc_eval_substtc'` | `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` |
+| 3 | `atomc` | ✅ vía `pcc_eval_substtsc'` | `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` |
 
 > 📍 **Dónde viven hoy** (nota de 2026‑09‑08; la columna de arriba es el registro **histórico**
 > de dónde se probó cada caso, y se deja como tal): los ocho casos están **en producción**, en
@@ -1968,7 +1968,7 @@ desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `son
 
 ### 3.30.1 · El teorema
 
-`sondeos/EvalSubstfcPrf.lean` (7 522 l.):
+`archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean` (7 522 l.):
 
 ```lean
 def hasWitF (c : Term) : Formula := ∃.∃. isFC1 #1 #0 ↑↑c
@@ -2041,7 +2041,7 @@ la guarda **DISCRIMINA** y no es un colador — `CRIT_E2_rejects_varc`, `CRIT_E2
 `CRIT_isFC1_rejects_varc`, vía `prf_isFormCodeE2_str` (la forma ecuacional **fortalece** la
 posicional y hereda su discriminación de los 8 tags).
 **Dos precedentes exactos** para transportar: `SinWTs.prf_isTC1_tcodes` (misma forma, sort término)
-y `ParticionTresPredicados.prf_isFCB3_fcodes` (`sondeos/ParticionTresPredicados.lean`; sort fórmula, predicado posicional de tres
+y `ParticionTresPredicados.prf_isFCB3_fcodes` (`archivo/sondeos-2026-10:sondeos/ParticionTresPredicados.lean`; sort fórmula, predicado posicional de tres
 testigos). **Los tres sondeos coinciden en señalar esta misma pieza como residuo**, lo que la
 confirma.
 
@@ -2051,8 +2051,8 @@ No son fracasos: son **medición fiable**, y quedan archivados por eso.
 
 | sondeo | qué aporta |
 |---|---|
-| `sondeos/EnsamblajeTriple.lean` (1 127 l.) | La ruta del `Φ` triple, que **también pasa el gate**. Su `structure CasesCtx` es el **censo Γ‑paramétrico** de los 10 casos, y `imp_of_ctx1`/`imp_of_ctx2` son la conversión mecánica de moneda. Reutilizables. |
-| `sondeos/EnsamblajeMedida.lean` (1 503 l.) | El **inventario de acoples**: los tres puentes entre familias de predicados, el censo de guardas y el inventario de lifts. Es quien primero dijo «no hacen falta tres sorts». |
+| `archivo/sondeos-2026-10:sondeos/EnsamblajeTriple.lean` (1 127 l.) | La ruta del `Φ` triple, que **también pasa el gate**. Su `structure CasesCtx` es el **censo Γ‑paramétrico** de los 10 casos, y `imp_of_ctx1`/`imp_of_ctx2` son la conversión mecánica de moneda. Reutilizables. |
+| `archivo/sondeos-2026-10:sondeos/EnsamblajeMedida.lean` (1 503 l.) | El **inventario de acoples**: los tres puentes entre familias de predicados, el censo de guardas y el inventario de lifts. Es quien primero dijo «no hacen falta tres sorts». |
 
 ⚠️ **Trampa de notación nueva, cara y no registrada**: `FOL/FOL/FOL.lean:38` declara
 `infixr:65 " ∨ " => Formula.or`, que **sombrea el `∨` de Lean** (precedencia 30). ⇒
@@ -2068,7 +2068,7 @@ Cierra el residuo que §3.30.4 declaraba como «lo único que falta». **Tres ru
 
 ### 3.31.1 · El teorema
 
-`sondeos/HasWitFReal.lean`:
+`archivo/sondeos-2026-10:sondeos/HasWitFReal.lean`:
 
 ```lean
 def fcodesF : Formula → List Term   -- subcódigos de FÓRMULA de φ
@@ -2126,7 +2126,7 @@ ensamblaje. Le bastan tres bloques:
 | el bloque **definicional** `ENS` §1‑§2 | `:5953‑6228` |
 | `def hasWitF` (+ `liftF_hasWitF`) | `:8243‑8244`, `:8320‑8324` |
 
-Verificado **ejecutándolo**: `sondeos/HasWitFRealMin.lean`, **1 819 líneas, EXIT=0, mismo net‑0**.
+Verificado **ejecutándolo**: `archivo/sondeos-2026-10:sondeos/HasWitFRealMin.lean`, **1 819 líneas, EXIT=0, mismo net‑0**.
 ⇒ **promover la no‑vacuidad a `Meta/` es un módulo pequeño e independiente**, no las ~20 000 líneas
 del frente entero. Es el primer trozo de la rama B que se puede pagar barato.
 
@@ -2191,7 +2191,7 @@ usando para descartar la enmienda es incorrecto y hay que dejar de repetirlo.**
 
 ### 3.32.2 · La rama C: las tres vías medidas, y dos REFUTADAS
 
-`sondeos/MedirC_Deriva.lean` · `MedirC_Carga.lean` · `MedirC_Enmienda.lean`.
+`archivo/sondeos-2026-10:sondeos/MedirC_Deriva.lean` · `MedirC_Carga.lean` · `MedirC_Enmienda.lean`.
 
 **(A) ¿sale la guarda del antecedente `lineWF t`? ⛔ REFUTADA** — y no «no conseguida». Se
 construyó una **línea basura** que satisface `lineWF` (usando el `prf_lineWF_q1` de **producción**),
@@ -2229,7 +2229,7 @@ o sea, exactamente una enmienda de esquema. Aquella pieza se probó para esto y 
 
 ### 3.32.3 · El frente F: su plan declara imposible algo que existe desde julio
 
-`sondeos/MedirF_Opaco.lean` · `MedirF_Censo.lean` · `MedirF_Replan.lean`.
+`archivo/sondeos-2026-10:sondeos/MedirF_Opaco.lean` · `MedirF_Censo.lean` · `MedirF_Replan.lean`.
 
 `PLAN-NEGVERIFIER.md` §B dice que **`NegVerifier` NO es demostrable** por la opacidad de
 `axiomsCodeT`. **Es falso**, y las piezas llevan compiladas **y enchufadas** desde julio:
@@ -2255,7 +2255,7 @@ cabeza de `carc` en **19/21**, y el único hueco real lo tapa un sustituto de `c
 **~45 líneas net‑0**.
 
 ⚠️ **Y el cuello de botella real de F NO es `axiomsCodeT`: es la rama B.** Los casos 3 y 4 necesitan
-`codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `sondeos/CodeNatInj.lean`**, fuera del build.
+`codeNat_ne`/`codeNatTerm_ne`, que **sólo viven en `archivo/sondeos-2026-10:sondeos/CodeNatInj.lean`**, fuera del build.
 ⇒ la promoción a `Meta/` bloquea **también** a F.
 
 ⛔ **Y una recomendación del plan que NO hay que ejecutar**: su §0.5 propone añadir un `axiom`
@@ -2273,8 +2273,8 @@ Detectadas al reconstruirlas a mano durante las mediciones: `prf_isFormCodeE2_st
 
 ## §3.34 · B2 · EL DESCENSO EN PRODUCCIÓN, y la restricción que manda: el CICLO DE IMPORTS (2026‑09‑04)
 
-`sondeos/DescensoLiftc.lean` (2011 l., 198 declaraciones) → **`Meta/EvalLiftcPrf.lean`**.
-Cierra **`pcc_eval_liftc`**, el `hLift` que `sondeos/Paso2CasoForall.lean` dejaba sin descargar.
+`archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` (2011 l., 198 declaraciones) → **`Meta/EvalLiftcPrf.lean`**.
+Cierra **`pcc_eval_liftc`**, el `hLift` que `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` dejaba sin descargar.
 Build **124 jobs**, 0 errores, 0 sorrys.
 
 ### 3.34.1 · El reparto, medido antes de construir
@@ -2331,7 +2331,7 @@ el esqueleto de prueba idéntico línea a línea — el hueco de simetría que e
 
 ### 3.34.4 · El `export` es PARCIAL a propósito
 
-`sondeos/EvalSubstfcPrf.lean` monta **otros dos descensos** con los mismos nombres y tipos
+`archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean` monta **otros dos descensos** con los mismos nombres y tipos
 distintos (`PHI` con 1 vs 3 vs 5 binders). Sacar `PHI*`/`DESCENSO*` a la raíz envenenaría la
 promoción siguiente. Se quedan cualificados; salen sólo `pcc_eval_liftc`, los transportes De
 Bruijn y los genéricos.
@@ -2425,7 +2425,7 @@ reprobado en `PrfH Γ` como **implicación**, porque dentro de la inducción la 
 
 ### 3.35.5 · 🔑 La duplicación que ningún censo por nombre puede ver
 
-`sondeos/EvalSubsttc.lean` declara `psi_substtc_l1`, y **es `psi_lift_form` instanciado a
+`archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` declara `psi_substtc_l1`, y **es `psi_lift_form` instanciado a
 `Φ := PHIsubsttc`** — el genérico que subió en B2. Es el duplicado **nº 69**, y se le escapó a
 **dos** censos independientes:
 
@@ -2508,7 +2508,7 @@ En la práctica: los constructores genéricos de línea (`prf_lineOk_q1`/`_q2`, 
   `hcond_absorbe_extra` genérico en `P`. Encajan tal cual; `pcc_lineWF_tracked_modulo_7` conserva
   sus 7 firmas exactas.
 * **D1 estaba pagado desde agosto.** `prf_hasWitF_real` y `CRIT_hasWit_real` (rama A) son
-  exactamente lo que la enmienda exige sobre líneas concretas. `sondeos/MedirC_Enmienda.lean` ya lo
+  exactamente lo que la enmienda exige sobre líneas concretas. `archivo/sondeos-2026-10:sondeos/MedirC_Enmienda.lean` ya lo
   había demostrado (`guardQ1_se_paga`) y no se sabía.
 * **La rama F se ABARATA.** `prf_lineWF_tag` (hoy `prf_lineWF_tag_imp`: el nombre viejo ya no existe) pasa de bicondicional a **implicación**: el `⇔` deja
   de ser cierto para argumentos arbitrarios (el punto de la enmienda) pero la mitad `→` sigue
@@ -2550,7 +2550,7 @@ de testigo. **No son específicas de `tcFn`**: valen para el lado `hasWitF`.
 (`EvalNthcPrf`, `EvalListPrf`, `EvalMulPrf`, `LiftcCodePrf`, `SubstfcCodePrf`…): aparecerán más
 sitios. La diferencia es que **ésos pagan**.
 
-▶ **Antes de escribir la clausura, MEDIR `sondeos/HasWitFReal.lean` y `HasWitFCritica.lean`**: ya
+▶ **Antes de escribir la clausura, MEDIR `archivo/sondeos-2026-10:sondeos/HasWitFReal.lean` y `HasWitFCritica.lean`**: ya
 tienen `prf_hasWitF_real`, `PrfH_congr_hasWitF`, `substF_hole_hasWitF` y controles negativos.
 
 ### 3.36.6 · ⚠️ Dos errores de MEDICIÓN cometidos, para no repetirlos
@@ -2583,7 +2583,7 @@ de la frase seguía siendo cierta y valiosa.
 ## §3.37 · TAREA C · LA FUSIÓN NO ERA OBSTRUCCIÓN, y la mitad TÉRMINO de la clausura está PROBADA (2026‑09‑06)
 
 Dos sondeos, los dos **net‑0 puros**: `sondeos/MergeTestigos.lean` (206 l.) y
-`sondeos/ClausuraSubsttc.lean` (953 l.). Cero sorrys.
+`archivo/sondeos-2026-10:sondeos/ClausuraSubsttc.lean` (953 l.). Cero sorrys.
 
 ### 3.37.1 · ⚠️ Correcciones al plan de §3.36.5, medidas hoy
 
@@ -2640,7 +2640,7 @@ con `w`, `v`, `s` cuantificados dentro: **tres** binders frente al único de B2.
    OBJETO» (§3.31) aplicada a los existenciales.
 2. **Los colapsos van paso a paso, no con un `simp` final.** Con tres o cuatro sustituciones
    anidadas el `simp` grande no reduce: hace falta un `PHI_specK` por binder, aplicado justo tras
-   su `PrfH_spec` (patrón de `sondeos/EvalSubstfcPrf.lean:6357`), y por eso conviene un `BODY`
+   su `PrfH_spec` (patrón de `archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean:6357`), y por eso conviene un `BODY`
    explícito. Y necesitan la escalera **completa** de lifts anidados —`substTerm_liftTerm`,
    `FOL.substTerm_liftLift`, `substTerm_liftLiftLift`, `substTerm_liftLiftLiftLift`—: los cuatro
    existen en `Meta/SubstArith.lean`, uno por profundidad.
@@ -2680,7 +2680,7 @@ compilan** — `LiftcCodePrf`, `SubstfcCodePrf` y `EvalArithPrf` importan `MpCod
 prf_hasWitF_substfc (v s X) : Prf (hasWitF X ⇒ (hasWit s ⇒ hasWitF (substfc v s X)))
 ```
 
-`sondeos/ClausuraSubsttc.lean`, ahora **1 911 líneas, 0 sorrys**, footprint
+`archivo/sondeos-2026-10:sondeos/ClausuraSubsttc.lean`, ahora **1 911 líneas, 0 sorrys**, footprint
 `[propext, Classical.choice, Quot.sound]` — **net‑0 puro**. Es literalmente la pieza que §3.36.5
 identificó como *lo único que separa el árbol del verde* bajo ADR‑020.
 
@@ -3052,7 +3052,7 @@ chasis de la única deuda que ADR‑020 dejó abierta.
 
 ### §3.41.1 · B3.2 — `pcc_eval_substtc` en producción, y la promoción como ejercicio de BORRADO
 
-`Meta/EvalSubsttcPrf.lean` (1 307 l.), promovido de `sondeos/EvalSubsttc.lean`:
+`Meta/EvalSubsttcPrf.lean` (1 307 l.), promovido de `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean`:
 
 ```
 pcc_eval_substtc        (w v s t) (h : Prf (isTC1 w t)) :
@@ -3122,7 +3122,7 @@ consumidores en el build: los tiene en `sondeos/`. Grep de las 71 supervivientes
 
 * **`hcond_absorbe_extra`** es el lema sobre el que se **aceptó** ADR‑020 (§3.36) y hasta hoy
   vivía en **cinco copias fuera del build**: `sondeos/SegundoMuro.lean`,
-  `sondeos/MedirC_Carga.lean`, `sondeos/MedirC_Enmienda.lean` y dos de `Probe/`. Entra una vez.
+  `archivo/sondeos-2026-10:sondeos/MedirC_Carga.lean`, `archivo/sondeos-2026-10:sondeos/MedirC_Enmienda.lean` y dos de `Probe/`. Entra una vez.
   Lo único con contenido es el transporte: `substfc` **distribuye sobre `andc`**, luego
   `condD P t ∧̇ condD C t` **es** `condD (P ∧ C) t`.
 * ⭐ **`hcond_absorbe_cascade`** absorbe la cascada **entera** por inducción sobre la lista de
@@ -5485,7 +5485,7 @@ El docstring de `IsCodeShaped` justificaba la clase ancha diciendo que las compa
 `NegVerifier` son *«PARALELAS POR TIPO — nunca `cons` contra `numeral` en la misma ranura»*.
 
 ⛔ **Era falso sobre su propia clase**, con contraejemplo **ya compilado** en
-`sondeos/MedirF_Censo.lean` §4:
+`archivo/sondeos-2026-10:sondeos/MedirF_Censo.lean` §4:
 
     IsCodeShaped ⟨formCode (⊥⇒⊥), 8̄, 3̄⟩        -- testigo StdChain legítimo
 

@@ -18,8 +18,8 @@ Este módulo es el chasis de esa deuda. Todo lo de aquí está compilado y es **
 * **§1 `hcond_absorbe_extra`** — el lema que ENSAMBLA: con el reflector del conjunto extra
   `P` y el de la condición de siempre `C`, sale el de `P ∧ C`, que es la `hcond` que pide
   `pcc_lineWF_tracked_of_schema`. Es la pieza sobre la que se aceptó ADR-020 y vivía en
-  **cinco copias fuera del build** (`sondeos/SegundoMuro.lean`, `sondeos/MedirC_Carga.lean`,
-  `sondeos/MedirC_Enmienda.lean` y dos de `Probe/`). Entra **una vez**.
+  **cinco copias fuera del build** (`sondeos/SegundoMuro.lean`, `archivo/sondeos-2026-10:sondeos/MedirC_Carga.lean`,
+  `archivo/sondeos-2026-10:sondeos/MedirC_Enmienda.lean` y dos de `Probe/`). Entra **una vez**.
 * **§2** la forma REAL de la enmienda: una **cascada anidada a la derecha** de guardas
   (`guardedCond`), no un par — y **verificada con `rfl` contra los siete axiomas de
   `Minimal/Axioms.lean`** (§2.1). Los siete tienen entre 1 y 3 guardas: 7 `hasWitF` + 4

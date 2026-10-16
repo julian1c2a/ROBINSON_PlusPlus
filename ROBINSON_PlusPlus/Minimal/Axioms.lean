@@ -1313,7 +1313,7 @@ Las nueve que necesita la **congruencia Leibniz** de `hasWit`/`hasWitF` aguas ar
 re‑exporta. Los `liftF_*` **no** bajan: su cadena es independiente y nadie los necesita aquí.
 
 ⚠️ `substF_hasWitF` es **nueva en producción**: no existía, sólo estaba duplicada en
-`sondeos/MedirC_Carga.lean` y `sondeos/MedirC_Enmienda.lean`. -/
+`archivo/sondeos-2026-10:sondeos/MedirC_Carga.lean` y `archivo/sondeos-2026-10:sondeos/MedirC_Enmienda.lean`. -/
 
 theorem substF_argsIn (v : Nat) (s wT Y : Term) :
     substFormula v s (argsIn wT Y) = argsIn (substTerm v s wT) (substTerm v s Y) := by

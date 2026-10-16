@@ -174,7 +174,7 @@ de D3**: cambiarlo sería cambiar el teorema, no refundar un enunciado.
 
 **La salida:** probar por dentro en forma NUMERAL, y convertir en la **frontera**, dentro de `Prov`,
 usando que D1 dota `prf_formCode_numeral`. Los enunciados públicos de este módulo quedan intactos.
-Medición completa en `sondeos/TcFormPayoff.lean`. -/
+Medición completa en `archivo/sondeos-2026-10:sondeos/TcFormPayoff.lean`. -/
 
 /-- El sustituto directo, **net‑0**: la vía numeral sobre la estructura CONCRETA de `φ`.
     ⚠️ Nótese el código estático cambiado a la derecha. -/

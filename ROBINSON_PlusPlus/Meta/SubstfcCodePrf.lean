@@ -21,7 +21,7 @@ import ROBINSON_PlusPlus.Meta.TcArithPrf
 /-!
 # `Meta/SubstfcCodePrf.lean` — el caso BINARIO y el caso BOTTOM de `substfc`
 
-Promovido de `sondeos/SubstfcPlanos.lean` (rama **B3**, 2026‑09‑04). Cierra el paso 2 para
+Promovido de `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` (rama **B3**, 2026‑09‑04). Cierra el paso 2 para
 los constructores `implc`/`andc`/`orc` y para `botc`, con la ETIQUETA abstracta — que es lo
 que permite hacerlos en UN lema en vez de tres.
 

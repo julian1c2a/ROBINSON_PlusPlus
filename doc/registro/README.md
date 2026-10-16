@@ -1,6 +1,6 @@
 # Registro: artefactos rescatados al árbol
 
-**Last updated:** 2026-10-16 — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
+**Last updated:** 2026-10-16 — ADR‑141: el runner `scripts/sondeos_todos.ps1`, sustituido y retirado. Antes, el mismo día — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
 directorio temporal de la sesión o en la carpeta de la sesión, fuera de git.
 
 **Por qué.** Varias afirmaciones de los ADR («37 de 90 sondeos compilan», «revisión adversarial aplicada», la crítica
@@ -44,7 +44,7 @@ Fuera de esta carpeta, rescatado en el mismo commit:
 
 | ruta | qué es |
 |---|---|
-| `scripts/sondeos_todos.ps1` | el runner que produjo las tablas de las pasadas de sondeos (rutas hechas relativas al repo; sigue con `lake env lean`, ver T06) |
+| `scripts/sondeos_todos.ps1` | el runner que produjo las tablas de las pasadas de sondeos hasta el 2026‑10‑14, con `lake env lean`. ✏️ 2026‑10‑16 (ADR‑141): sustituido por `check-sondeos.bash` (`lake lean`) y retirado del árbol; el fichero sigue en la etiqueta `archivo/sondeos-2026-10` |
 | `sondeos/pasadas/tabla_adr121.txt`, `tabla_adr127.txt`, `tabla_d7_antes_de_migrar.txt`, `tabla_adr129.txt` | las tablas «fichero\|exit\|segundos\|primer error» de esas pasadas (T06/T10) |
 | `scripts/pruebas/b/` | `b_medir.bash`, la réplica de `[B]` con cuatro juegos de marcadores, y sus salidas `bdeuda.txt` y `citas_prod.txt` (T04) |
 | `scripts/pruebas/leanlex.py` | el lexer de referencia, función a función el de Lean v4.31.0, con el que se validó `strip-lean.awk` (ADR‑116; las cuatro copias del temporal eran idénticas) |

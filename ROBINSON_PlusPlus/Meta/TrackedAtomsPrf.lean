@@ -344,7 +344,7 @@ theorem liftTerm_bdInDot (c : Nat) (x w : Term) :
   simp only [exc, andc, ltCodeFn, atom2CodeFn, eqCodeFn, lencT, nthcT, funcc, varc, liftc, tcFn,
     cons, nil, zero, succ, liftTerm, liftTerms, liftTerm_numeral, liftTerm_strCode]
 
-/-- **A1** (copia literal de `sondeos/InTracked.lean`). -/
+/-- **A1** (copia literal de `archivo/sondeos-2026-10:sondeos/InTracked.lean`). -/
 theorem pcc_boundedIn_tracked (x w : Term) :
     Prf (boundedIn x w ⇒ provFromCode (bdInDot x w)) := by
   refine prf_deduction ?_

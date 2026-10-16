@@ -29,7 +29,7 @@ import ROBINSON_PlusPlus.Meta.EvalRunFnPrf
 (✏️ 2026‑10‑14, ADR‑134: ya no es una propuesta: es el módulo promovido en `21c8a6b` (2026‑09‑03; el
 párrafo de abajo dice 2026‑09‑02); `Probe/` no está versionado.)
 
-Promocion de `sondeos/ReflectorDesdeConsumidor.lean` (rama B1).
+Promocion de `archivo/sondeos-2026-10:sondeos/ReflectorDesdeConsumidor.lean` (rama B1).
 
 **ESTE FICHERO ES EL MODULO, BYTE A BYTE** — promovido a `ROBINSON_PlusPlus/Meta/` y anadido al
 barrel el 2026‑09‑02. La lista de `import` de arriba es la concreta: **25** modulos de `Meta/`,
@@ -67,7 +67,7 @@ de `EvalCarcNthcPrf`. El noveno es la orientacion contraria del mismo `rfl`: se 
 en B8b, `c937b30`, y hoy sólo queda el de `NumCodeClosedPrf`.)
 
 ## Lo que SI se promueve: **69** declaraciones (65 de las 75 del sondeo, + 2 puentes nuevos,
-+ **2 bajadas desde `sondeos/DescensoLiftc.lean`** en B2: `substF_targetLift`/`substF_targetLiftsc`)
++ **2 bajadas desde `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean`** en B2: `substF_targetLift`/`substF_targetLiftsc`)
 
 Vocabulario de codigo dotado de `liftc`/`liftsc` (§1–§2), los cuatro axiomas de `liftc`/`liftsc`
 en su imagen DOTADA (§4–§5), las congruencias internas que faltaban (§6) y las cuatro clausulas
@@ -228,10 +228,10 @@ theorem prf_substtc_funccT_at (v : Nat) (W a b : Term) :
 /-! ## §3 · LOS DOS OBJETIVOS
 
     `targetLift s` es LITERALMENTE la hipotesis sin descargar de
-    `sondeos/Paso2CasoForall.lean:507`; `targetLiftsc b` es su companera sobre listas de
+    `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean:507`; `targetLiftsc b` es su companera sobre listas de
     argumentos.
 
-    ⚠️ **`sondeos/DescensoLiftc.lean` (rama B2) los redefine byte a byte**: al promover B2 hay
+    ⚠️ **`archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` (rama B2) los redefine byte a byte**: al promover B2 hay
     que BORRAR alli §1–§4 y consumir estas. (✏️ 2026‑10‑14, ADR‑134: B2 ya se promovió,
     `Meta/EvalLiftcPrf.lean`, y consume éstas —lo miden sus puentes `rfl` de §0—; el sondeo no se
     tocó y sigue redefiniéndolas, fuera del build.) -/
@@ -1255,7 +1255,7 @@ theorem substTerm_formCode (v : Nat) (u : Term) :
 
 /-- **`substFormula` atraviesa `targetLift`**, en su forma GENERAL: cae sobre el argumento.
 
-    ⚠️ Bajado desde `sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
+    ⚠️ Bajado desde `archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean` al promover `Meta/EvalLiftcPrf.lean`
     (2026‑09‑04). **Tuvo que bajar AQUI, no quedarse arriba**: `EvalLiftcPrf` importa a este
     modulo, asi que reescribir `substF_targetLift_hole` como corolario de un lema de alli
     seria un CICLO. Y el `_hole` se consume dentro de este mismo fichero —dos veces en
@@ -1640,7 +1640,7 @@ theorem refl_isTermCodeE1_imp (w X : Term) :
     `prf_cantor_mono_left/right`, ambos en produccion), combinada con `prf_list_induction`
     para recorrer la lista de argumentos —— con `refl_lista_nil` / `refl_lista_cons_imp` como
     base y paso, que YA estan cerrados aqui. Es el contenido de la rama B2
-    (`sondeos/DescensoLiftc.lean`).
+    (`archivo/sondeos-2026-10:sondeos/DescensoLiftc.lean`).
 
     ⚠️ Ese residuo es **enteramente PLANO** (`Prf` de formulas objeto). Ninguna de sus piezas
     pide la imagen PUNTEADA de `wfAll1`, de `argsIn` ni de `isTC1`. -/

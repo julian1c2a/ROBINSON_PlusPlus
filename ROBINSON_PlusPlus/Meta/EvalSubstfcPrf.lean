@@ -40,7 +40,7 @@ porque el paquete de testigos ya venía en un solo término.
 
 ## PROMOCIÓN B3.4 (2026‑09‑08) — 806 declaraciones, entran 90
 
-`sondeos/EvalSubstfcPrf.lean` (8 421 l.) es la **acreción de cinco sondeos**: cuatro
+`archivo/sondeos-2026-10:sondeos/EvalSubstfcPrf.lean` (8 421 l.) es la **acreción de cinco sondeos**: cuatro
 namespaces que copiaban trabajo ya promovido (`SinWTs` = `CodeWitnessPrf`, `DescMutua` =
 `LiftcCodePrf`+`EvalLiftcPrf`, `SFsubsttc` = **B3.2**, y la mayor parte de `Paso2`) más el
 namespace `ENS`, que es el trabajo real. Medido:
@@ -271,13 +271,13 @@ theorem mem6 : forall_3 (AXBODY 6) ∈ axioms := show ax_substfc_forall ∈ axio
 theorem mem9 : forall_3 (AXBODY 9) ∈ axioms := show ax_substfc_ex ∈ axioms by simp [axioms]
 
 /-! ############################################################################
-    ## §0 · Combinadores (copias literales de `sondeos/EvalSubsttc.lean` §D)
+    ## §0 · Combinadores (copias literales de `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean` §D)
     ############################################################################ -/
 
 /-! ############################################################################
     ## §1 · COPIAS LITERALES del reconocedor de codigo de TERMINO sin `wTs`
-       (`sondeos/ClausuraLiftSinWTs.lean:109-145,1389`, identico al de
-        `sondeos/EvalSubsttc.lean:1116-1140`, que es lo que consume `pcc_eval_substtc'`).
+       (`archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean:109-145,1389`, identico al de
+        `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean:1116-1140`, que es lo que consume `pcc_eval_substtc'`).
     ############################################################################ -/
 
 /-! ### Fontaneria De Bruijn del bloque de TERMINO (copias literales) -/
@@ -299,7 +299,7 @@ theorem mem9 : forall_3 (AXBODY 9) ∈ axioms := show ax_substfc_ex ∈ axioms b
 /-! ### Del testigo al NODO — espejo de `EvalSubsttc.prf_isTermCodeE1_of_In` -/
 
 /-! ############################################################################
-    ## §3 · EL OBJETIVO (copia literal de `sondeos/Paso2CasoForall.lean` §6)
+    ## §3 · EL OBJETIVO (copia literal de `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` §6)
     ############################################################################ -/
 
 def targetSubstfc (v s X : Term) : Formula := provFromCode (evalSubstfcCode v s X)
@@ -331,7 +331,7 @@ theorem PrfH_congr_targetSubstfc {Γ : List Formula} {v s X X' : Term} (h : PrfH
 
     CUATRO binders INTERNOS (`wF`, `wT`, `v`, `s`) y la guarda DENTRO (es un `∃`
     interno via `hasWit`, luego NO anade binder exterior — leccion de
-    `sondeos/GateGuardaEnriquecida.lean`). El codigo sobre el que se induce es `#4`.
+    `archivo/sondeos-2026-10:sondeos/GateGuardaEnriquecida.lean`). El codigo sobre el que se induce es `#4`.
     ############################################################################ -/
 
 /-- La guarda completa: el sustituyendo tiene testigo de TERMINO y el codigo tiene
@@ -443,7 +443,7 @@ theorem IH_at {Γ : List Formula} {X : Term} (hpsi : PrfH Γ (PSIat X)) (z : Ter
   PrfH.mp _ _ _ (PHIsubstfc_use z wF wT v' s' (PrfH.mp _ _ _ (PSIat_inst hpsi z) hlt)) hguard
 
 /-! ############################################################################
-    ## §5 · EL DESCENSO — copia literal de `sondeos/Paso2CasoForall.lean` §7
+    ## §5 · EL DESCENSO — copia literal de `archivo/sondeos-2026-10:sondeos/Paso2CasoForall.lean` §7
     ############################################################################ -/
 
 theorem descenso_un (X : Term) (k : Nat) : Prf (shapeUn X k ⇒ lt (nthc X (numeralM 1)) X) := by
@@ -494,7 +494,7 @@ theorem descenso_bin2 (X : Term) (k : Nat) : Prf (shapeBin X k ⇒ lt (nthc X (n
     Cada uno es exactamente la forma en que el paso inductivo los consume.
     ############################################################################ -/
 
-/-- tag 2 · `botc`. Cubierto por `sondeos/SubstfcPlanos.paso2_caso_bottom`. -/
+/-- tag 2 · `botc`. Cubierto por `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.paso2_caso_bottom`. -/
 def CasoBot : Prop := ∀ v s X : Term,
   Prf (Formula.impl (shapeNul X 2) (targetSubstfc v s X))
 
@@ -726,7 +726,7 @@ theorem pcc_eval_substfc_modulo_8
 /-! ############################################################################
     ## §9 · DESCARGA de `CasoBot` y de `CasoBin 5/7/8`.
 
-    Copia LITERAL de `sondeos/SubstfcPlanos.lean` §0-§6 (que compila net-0), mas UNA
+    Copia LITERAL de `archivo/sondeos-2026-10:sondeos/SubstfcPlanos.lean` §0-§6 (que compila net-0), mas UNA
     pieza nueva: `paso2_caso_bin_imp`, que es `paso2_caso_bin` reescrito en `PrfH Γ`
     — hace falta porque la HI de la induccion llega como HIPOTESIS del contexto, no
     como teorema `Prf` cerrado.
@@ -862,7 +862,7 @@ theorem pcc_eval_substfc_modulo_5
 
 /-! ############################################################################
     ## §10 · DESCARGA de `HasWitLift` — copia LITERAL de
-       `sondeos/ClausuraLiftSinWTs.lean` §3-§4 (`prf_lenc_liftsc`, `prf_nthc_liftsc`,
+       `archivo/sondeos-2026-10:sondeos/ClausuraLiftSinWTs.lean` §3-§4 (`prf_lenc_liftsc`, `prf_nthc_liftsc`,
        `prf_In_liftsc`, `prf_argsIn_lift`, `prf_isTermCodeE1_lift`, `prf_wfAll1_lift`,
        `prf_isTC1_lift`) mas `CRIT_hasWit_lift`.
     ############################################################################ -/
@@ -1395,7 +1395,7 @@ theorem pcc_eval_substfc_modulo_2 (h6 : CasoUn 6) (h9 : CasoUn 9)
 /-! ############################################################################
     ## §12 · DESCARGA de `CasoUn 6` (`forallc`) y `CasoUn 9` (`exc`).
 
-    `paso2_caso_un_guarded` existe (`sondeos/SubstfcEx.lean:4307`) pero pide la HI
+    `paso2_caso_un_guarded` existe (`archivo/sondeos-2026-10:sondeos/SubstfcEx.lean:4307`) pero pide la HI
     como `Prf` CERRADA (`hIH : Prf (hasWit (liftc 0 s) ⇒ ...)`), y dentro del paso
     inductivo la HI llega como HIPOTESIS del contexto. Aqui va la MISMA prueba con la HI
     ya aplicada, como CONJUNTO de la premisa: `paso2_caso_un_conj`.
@@ -1408,7 +1408,7 @@ theorem DESCENSO_hasWit_local (s : Term) :
   ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_hasWit s
 
 /-- **`paso2_caso_un_guarded` con la HI como CONJUNTO** (no como `Prf` cerrada).
-    Prueba identica a `sondeos/SubstfcEx.lean:4307`, salvo que `hIHg` se lee del contexto
+    Prueba identica a `archivo/sondeos-2026-10:sondeos/SubstfcEx.lean:4307`, salvo que `hIHg` se lee del contexto
     en vez de obtenerse por MP con `CRIT_hasWit_lift`. -/
 theorem paso2_caso_un_conj (m : Nat) (hmem : forall_3 (AXBODY m) ∈ axioms)
     (hobj : ∀ v s a : Term,
@@ -1577,7 +1577,7 @@ example (wF wT X : Term) : True := by
   trivial
 
 /-- La guarda de FORMULA lleva DENTRO la guarda de TERMINO que pide `pcc_eval_substtc`
-    — la mitad `wfAll1 wT` es LITERALMENTE la de `sondeos/EvalSubsttc.lean`. -/
+    — la mitad `wfAll1 wT` es LITERALMENTE la de `archivo/sondeos-2026-10:sondeos/EvalSubsttc.lean`. -/
 example (wF wT c : Term) :
     isFC1 wF wT c = land (land (wfAll1 wT) (wfAllF wF wT)) (In c wF) := rfl
 
