@@ -1,0 +1,112 @@
+INVENTARIO de NegNum y PosNum — 2026-10-16, sondeos/InventarioRosser.lean
+(PURO / IMPURO por el recorrido de T08; «FUERA» si ningún nombre del build casa (vive en un sondeo, o no existe); el módulo entre corchetes)
+
+## Etapa 6 · PosNum (D1 y la evaluación a numeral)
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.provCodeC'_intro_prf  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.prf_runFn_track  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.prf_In_runFn_of_mem  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval  [ROBINSON_PlusPlus.Meta.CodeNumeralPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval_of  [ROBINSON_PlusPlus.Meta.CodeNumeralPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral  [ROBINSON_PlusPlus.Meta.CodeNumeralPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_termCode_numeral  [ROBINSON_PlusPlus.Meta.CodeNumeralPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_strCode_numeral  [ROBINSON_PlusPlus.Meta.CodeNumeralPrf]
+  FUERA      prf_cons_evalM  (no está en el build: vive en un sondeo, o no existe)
+  PURO       ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_subst2  [ROBINSON_PlusPlus.Meta.ChainPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_congr_runFn_2  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_eq_subst_in  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.OmegaReflect.stdChain_proofCode'  [ROBINSON_PlusPlus.Meta.OmegaReflect]
+  PURO       ROBINSON_PlusPlus.Meta.HilbertSeq.prf_iff_derivation  [ROBINSON_PlusPlus.Meta.HilbertSeq]
+
+## W1 · el verificador es sólido (hoy con V₀)
+  IMPURO     ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido  [ROBINSON_PlusPlus.Meta.SolidezVerificador]  ⟶  ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena._f ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_buena
+  IMPURO     ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena  [ROBINSON_PlusPlus.Meta.SolidezVerificador]  ⟶  ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena._f ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_buena ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_thy
+  IMPURO     ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_buena  [ROBINSON_PlusPlus.Meta.SolidezVerificador]  ⟶  ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_thy ⟶ ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo ⟶ FOL.Metamath.Semantics.evalFormula
+  IMPURO     ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_thy  [ROBINSON_PlusPlus.Meta.SolidezVerificador]  ⟶  ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo ⟶ FOL.Metamath.Semantics.evalFormula
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_q1  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_mp  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_gen  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.memN_codeNatList  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.dec_codeNat  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.dec_substfc  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+  PURO       ROBINSON_PlusPlus.Meta.SolidezVerificador.dec_liftfc  [ROBINSON_PlusPlus.Meta.SolidezVerificador]
+
+## Etapa 1 · la capa de listas sobre numerales
+  PURO       ROBINSON_PlusPlus.Meta.ChainPrf.prf_in_cons_iff  [ROBINSON_PlusPlus.Meta.ChainPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ChainPrf.prf_not_in_nil  [ROBINSON_PlusPlus.Meta.ChainPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_in_concat_singleton_iff  [ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_num_ne  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.LineWFTrackedPrf.prf_lt_numeralM  [ROBINSON_PlusPlus.Meta.LineWFTrackedPrf]
+  PURO       ROBINSON_PlusPlus.Meta.Sigma1CorePrf.prf_objList_numeral  [ROBINSON_PlusPlus.Meta.Sigma1CorePrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_lenc_objList  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_nthc_objList  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  FUERA      prf_carc_numeral  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      prf_zero_ne_cons  (no está en el build: vive en un sondeo, o no existe)
+  PURO       ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_cons_def  [ROBINSON_PlusPlus.Meta.CantorMonoPrf]
+  PURO       ROBINSON_PlusPlus.Meta.NatArithPrf.prf_succ_ne_zero  [ROBINSON_PlusPlus.Meta.NatArithPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ArithPrf.prf_numeral_lt  [ROBINSON_PlusPlus.Meta.ArithPrf]
+
+## Etapa 2 · la evaluación de la sustitución (hoy sólo sobre códigos canónicos)
+  PURO       ROBINSON_PlusPlus.Meta.ArithPrf.prf_substTerm_arith  [ROBINSON_PlusPlus.Meta.ArithPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftTerm_arith  [ROBINSON_PlusPlus.Meta.ArithPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ArithPrf.prf_substFormula_arith  [ROBINSON_PlusPlus.Meta.ArithPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ArithPrf.prf_liftFormula_arith  [ROBINSON_PlusPlus.Meta.ArithPrf]
+  FUERA      prf_eval_substfc_num  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      prf_eval_liftfc_num  (no está en el build: vive en un sondeo, o no existe)
+
+## Etapa 3 · GuardNeg (las guardas hasWit/hasWitF)
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_crit_In_rejects_open1  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isTC1_junk_refuted_open  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_isFC1_rejects_varc  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_E2_rejects_varc  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isFormCodeB2_rejects  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.crit_isTermCodeE1_rejects  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.prf_isFormCodeE2_of_In  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.PrfH_inst_argsIn  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_ex_elim_imp  [ROBINSON_PlusPlus.Meta.HilbertDeduction]
+  FUERA      prf_neg_hasWit_zero  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      prf_neg_hasWit_tag  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      prf_neg_hasWit_num  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      prf_neg_hasWit_prof2  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      control_codigo_no_refutable  (no está en el build: vive en un sondeo, o no existe)
+
+## Etapa 4 · NegLineWF (por etiqueta, thy y las proyecciones a las guardas)
+  PURO       ROBINSON_PlusPlus.Meta.Sigma1AtomPrf.prf_lineWF_inv  [ROBINSON_PlusPlus.Meta.Sigma1AtomPrf]
+  PURO       ROBINSON_PlusPlus.Meta.LineWFAssemblePrf.prf_of_tagDisj  [ROBINSON_PlusPlus.Meta.LineWFAssemblePrf]
+  PURO       ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_tag_vacuous  [ROBINSON_PlusPlus.Meta.SubstTreeReflect]
+  PURO       ROBINSON_PlusPlus.Meta.LineWFConsPrf.prf_lineWF_cons  [ROBINSON_PlusPlus.Meta.LineWFConsPrf]
+  PURO       ROBINSON_PlusPlus.Meta.LineWFCases.prf_lineWF_neg_of_tag  [ROBINSON_PlusPlus.Meta.LineWFCases]
+  PURO       ROBINSON_PlusPlus.Meta.LineWFCases.prf_lineWF_tag_imp  [ROBINSON_PlusPlus.Meta.LineWFCases]
+  PURO       ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_lenc_of_tag  [ROBINSON_PlusPlus.Meta.PremsOfTagPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_thy  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.Representability2Prf.prf_inAxC  [ROBINSON_PlusPlus.Meta.Representability2Prf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q1_hasWit  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_q2_hasWit  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_lineWF_leibniz_hasWitF  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_q1  [ROBINSON_PlusPlus.Meta.ChainNegPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_lenc_thy  [ROBINSON_PlusPlus.Meta.ChainNegPrf]
+
+## Etapa 5 · NegChain y NegNum
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_chainOk_cons  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ReprPrf.prf_allIn_cons  [ROBINSON_PlusPlus.Meta.ReprPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB  [ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf]
+  PURO       ROBINSON_PlusPlus.Meta.D3BodyPrf.prf_lineWF_of_chainOk  [ROBINSON_PlusPlus.Meta.D3BodyPrf]
+  PURO       ROBINSON_PlusPlus.Meta.ChainNegPrf.prf_boundedPremsIn_of_chainOk  [ROBINSON_PlusPlus.Meta.ChainNegPrf]
+  PURO       ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.prf_In_runFn_iff  [ROBINSON_PlusPlus.Meta.RunFnBoundedPrf]
+  PURO       ROBINSON_PlusPlus.Meta.Sigma1CorePrf.prf_runFn_nil_objList  [ROBINSON_PlusPlus.Meta.Sigma1CorePrf]
+
+## Etapa 7 · Rosser (y la reducción a T de ADR‑144)
+  PURO       ROBINSON_PlusPlus.Meta.TarskiPrf.prf_diagonal  [ROBINSON_PlusPlus.Meta.TarskiPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_of_bound  [ROBINSON_PlusPlus.Meta.CodeWitnessPrf]
+  PURO       ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_trichotomy  [ROBINSON_PlusPlus.Meta.NatMulPrf]
+  PURO       ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_split  [ROBINSON_PlusPlus.Meta.BoundedInPrf]
+  PURO       ROBINSON_PlusPlus.Meta.NatArithPrf.prf_not_lt_zero  [ROBINSON_PlusPlus.Meta.NatArithPrf]
+  PURO       ROBINSON_PlusPlus.Meta.TarskiPrf.liar_isSentence  [ROBINSON_PlusPlus.Meta.TarskiPrf]
+  FUERA      prfH_iff_prf_impChain  (no está en el build: vive en un sondeo, o no existe)
+  FUERA      formCode_impChain  (no está en el build: vive en un sondeo, o no existe)
+
+PUROS 76 · IMPUROS 4 · FUERA DEL BUILD 12

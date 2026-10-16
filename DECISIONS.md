@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-16 — hasta **ADR-145** (las decisiones del propietario sobre ADR-144: Rosser por REDUCCIÓN; V-B si hace falta un verificador con parámetro; las variantes de reglas, aplazadas; T62, cerrado). Antes, el mismo día — hasta **ADR-144** (🟡 PROPUESTO, el diseño de T62: una extensión finita T+E por REDUCCIÓN a T —su cálculo es `PrfH E`, su predicado de prueba el de T delante de `impChain`—, sin tocar el verificador, los 142 ni el modelo; la medición de alcance y la viabilidad, compiladas). Antes, el mismo día — hasta **ADR-143** (T08: el control de pureza del cierre, en el BUILD, `Meta/PurezaTitulares.lean`: los 8 titulares de la clase (i) no nombran la semántica, y si la nombran el build no compila; visto fallar con mutantes). Antes, el mismo día — hasta **ADR-142** (la historia, a `doc/historia/` por traslado PURO: ADR-001…130 —aquí queda su índice—, los bloques viejos de NEXT-STEPS y los banners apilados de siete documentos; la fuente única del estado es el banner de TEOREMAS-E-HIPOTESIS.md; CHANGELOG, congelado; 18 entradas de `B_DEUDA` salen por exclusión, tope 23). Antes, el mismo día — hasta **ADR-141** (los sondeos, medidos con `lake lean` —39 de 93 compilan— y clasificados: 11 de control en la CI con `check-sondeos.bash --controles`, 28 de registro, 1 a reparar y 53 archivados con la etiqueta `archivo/sondeos-2026-10`). Antes, el mismo día — hasta **ADR-140** (las decisiones del propietario: capas DENTRO de RPP, la línea de llegada —`T_UNIVERSO` + Rosser + Löb—, las variantes Q++/PA/HA medidas en el diseño de T62, y ADR-139 aprobado en sus pasos 1 y 2). Antes, el mismo día — hasta **ADR-139** (🟡 PROPUESTO: acotar el proyecto en tres pasos —archivar los sondeos, congelar la historia, contratos de capa—, con el cono de los titulares MEDIDO por declaración, `sondeos/ConoTitulares.lean`). Antes, el mismo día — hasta **ADR-138** (la consistencia que da `consistencia` es RELATIVA a Lean, PRA ⊢ Con(Lean) → Con(T_Prf), y no puede ser absoluta: los banners, TEOREMAS §4, AXIOMS §0.2 y PLAN-LIBRO cap. 6). Antes, 2026-10-14 — hasta **ADR-137** (Rosser, decidido: la teoría como PARÁMETRO del verificador, opción a‑ii de T01, con T08 como criterio de aceptación; y dos frases de FOL al día). Antes, el mismo día — hasta **ADR-136** (`master` protegido: sólo entra un commit con la CI ya verde, por una rama `ci/…`; y las decisiones del propietario del 2026‑10‑14). Antes, el mismo día — hasta **ADR-135** (TEOREMAS-E-HIPOTESIS al día —`⊬¬G` existe—, con la columna «¿qué usa la prueba?» MEDIDA en tres clases, y el control `[T]`). Antes, el mismo día — hasta **ADR-134** (la teoría de los titulares, `T_Prf`, descrita: contiene a PA, no es Q ni IΣ₁; `AXIOMS.md` §0, la descripción canónica, con lo que se supone hoy; D1 usa la inducción, D2 la de listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, MEDIDO en `sondeos/InduccionTitulares.lean`; y los comentarios caducados o falsos de 113 `.lean`, al día, con su revisión adversarial). Antes, 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-16 — hasta **ADR-146** (🟡 PROPUESTO, el diseño de NegNum y PosNum de T por la ruta sintáctica: de las 80 piezas del build que el plan reutiliza, 76 son PURAS y las 4 impuras lo son por `linea_thy`; W1 con `codeNatList axioms`, PosNum por D1 y un lema, y el orden con el riesgo primero). Antes, el mismo día — hasta **ADR-145** (las decisiones del propietario sobre ADR-144: Rosser por REDUCCIÓN; V-B si hace falta un verificador con parámetro; las variantes de reglas, aplazadas; T62, cerrado). Antes, el mismo día — hasta **ADR-144** (🟡 PROPUESTO, el diseño de T62: una extensión finita T+E por REDUCCIÓN a T —su cálculo es `PrfH E`, su predicado de prueba el de T delante de `impChain`—, sin tocar el verificador, los 142 ni el modelo; la medición de alcance y la viabilidad, compiladas). Antes, el mismo día — hasta **ADR-143** (T08: el control de pureza del cierre, en el BUILD, `Meta/PurezaTitulares.lean`: los 8 titulares de la clase (i) no nombran la semántica, y si la nombran el build no compila; visto fallar con mutantes). Antes, el mismo día — hasta **ADR-142** (la historia, a `doc/historia/` por traslado PURO: ADR-001…130 —aquí queda su índice—, los bloques viejos de NEXT-STEPS y los banners apilados de siete documentos; la fuente única del estado es el banner de TEOREMAS-E-HIPOTESIS.md; CHANGELOG, congelado; 18 entradas de `B_DEUDA` salen por exclusión, tope 23). Antes, el mismo día — hasta **ADR-141** (los sondeos, medidos con `lake lean` —39 de 93 compilan— y clasificados: 11 de control en la CI con `check-sondeos.bash --controles`, 28 de registro, 1 a reparar y 53 archivados con la etiqueta `archivo/sondeos-2026-10`). Antes, el mismo día — hasta **ADR-140** (las decisiones del propietario: capas DENTRO de RPP, la línea de llegada —`T_UNIVERSO` + Rosser + Löb—, las variantes Q++/PA/HA medidas en el diseño de T62, y ADR-139 aprobado en sus pasos 1 y 2). Antes, el mismo día — hasta **ADR-139** (🟡 PROPUESTO: acotar el proyecto en tres pasos —archivar los sondeos, congelar la historia, contratos de capa—, con el cono de los titulares MEDIDO por declaración, `sondeos/ConoTitulares.lean`). Antes, el mismo día — hasta **ADR-138** (la consistencia que da `consistencia` es RELATIVA a Lean, PRA ⊢ Con(Lean) → Con(T_Prf), y no puede ser absoluta: los banners, TEOREMAS §4, AXIOMS §0.2 y PLAN-LIBRO cap. 6). Antes, 2026-10-14 — hasta **ADR-137** (Rosser, decidido: la teoría como PARÁMETRO del verificador, opción a‑ii de T01, con T08 como criterio de aceptación; y dos frases de FOL al día). Antes, el mismo día — hasta **ADR-136** (`master` protegido: sólo entra un commit con la CI ya verde, por una rama `ci/…`; y las decisiones del propietario del 2026‑10‑14). Antes, el mismo día — hasta **ADR-135** (TEOREMAS-E-HIPOTESIS al día —`⊬¬G` existe—, con la columna «¿qué usa la prueba?» MEDIDA en tres clases, y el control `[T]`). Antes, el mismo día — hasta **ADR-134** (la teoría de los titulares, `T_Prf`, descrita: contiene a PA, no es Q ni IΣ₁; `AXIOMS.md` §0, la descripción canónica, con lo que se supone hoy; D1 usa la inducción, D2 la de listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, MEDIDO en `sondeos/InduccionTitulares.lean`; y los comentarios caducados o falsos de 113 `.lean`, al día, con su revisión adversarial). Antes, 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33, [ADR‑142](DECISIONS.md)).
 > Los banners que se apilaban aquí están, tal cual, en [doc/historia/BANNERS.md](doc/historia/BANNERS.md).
@@ -1339,3 +1339,138 @@ T62); `NEXT-STEPS.md`.
 * **La base del paso 2** ya está en el árbol: `sondeos/ExtensionPorReduccion.lean`, un sondeo de CONTROL.
 
 **Véase también:** ADR‑137, ADR‑143 y ADR‑144; T01, T62 y T64 de la auditoría.
+
+## ADR-146: 🧭 El diseño de NegNum y PosNum de T, la pieza grande de Rosser: qué existe (76 de 80 piezas del build, PURAS), qué falta, y en qué orden, por la ruta SINTÁCTICA
+
+**Fecha:** 2026-10-16 · **Estado:** 🟡 PROPUESTO; decide el propietario (§7) · **Ámbito:** `sondeos/InventarioRosser.lean`
+(la medición de pureza, de REGISTRO), `doc/registro/2026-10-16-negnum-posnum/` (la salida y los tres inventarios),
+`sondeos/README.md`, `doc/registro/README.md`, `doc/AUDITORIA-SUELO-2026-10-12.md` (T01, T64, T66, T75),
+`NEXT-STEPS.md` y la fila de Rosser de `TEOREMAS-E-HIPOTESIS.md`. Es el plan versionado que pedía T01: el de
+`resultado.json` (ADR‑122) sólo vivía en un registro.
+
+### 1 · Lo que Rosser necesita, enunciado
+
+Con la reducción de ADR‑144/145, todo lo de T+E sale de T. De T hacen falta tres cosas, además del lema diagonal, que
+ya existe:
+
+```lean
+def PfF (y x : Term) : Formula := land (chainOk nil y) (In x (runFn nil y))      -- el predicado de prueba de T
+def ProofN (m y : Nat) : Prop :=                                                 -- su espejo en ℕ
+  chainOkN (codeNatList axioms) 0 m ∧ memN y (runFnN 0 m)
+theorem posNum {φ} (h : Prf φ) : ∃ m : Nat, Prf (PfF (numeralM m) (formCode φ))
+theorem negNum (m y : Nat) (h : ¬ ProofN m y) : Prf (neg (PfF (numeralM m) (numeralM y)))
+theorem w1Ax {m y : Nat} (h : ProofN m y) : Prf (dec y)                          -- W1, sin el modelo
+```
+
+* **El espejo se escribe con `codeNatList axioms`, no con `V₀`.** `V₀ = codeNatList axioms` sólo se demuestra por la
+  solidez (`V₀_eq_codigo`), y T08 lo rechazaría. `ModeloCodigo` es aritmética sobre `Nat` y T08 lo admite.
+* **Por qué hace falta W1.** La mitad ⊬R de Rosser usa que NINGÚN numeral es prueba de ¬R, y eso sólo sale de ¬Prf
+  ¬R por la contrapositiva de W1: `ProofN m ⌜¬R⌝ → Prf ¬R`. Por eso NegNum' (¬Prf φ ⇒ ∀m, Prf ¬PfF(m̄, ⌜φ⌝)) es
+  `negNum ∘ w1Ax`. La otra mitad, igual.
+* **PosNum no necesita el espejo:** basta con que el código de prueba sea un numeral.
+
+### 2 · La medición: qué existe y si es PURO (MEDIDO, `sondeos/InventarioRosser.lean`, 23 s)
+
+Las 92 piezas que nombran el plan de Rosser y los tres inventarios del día, clasificadas por el recorrido de T08 (la
+salida, en `doc/registro/2026-10-16-negnum-posnum/pureza.txt`):
+
+| | piezas | qué son |
+|---|---|---|
+| **PURAS** | 76 | todo lo del build que el plan reutiliza: D1 y su seguimiento de cadenas, la evaluación de códigos canónicos a numeral, los refutadores de `CodeWitnessPrf`, las proyecciones a las guardas, `prf_ancla`, `prf_diagonal`, `prf_bdAll_numeral`, `prf_lt_trichotomy`, y de W1 todas las líneas salvo una |
+| **IMPURAS** | 4 | `verificador_solido` (W1), `cadena_buena`, `linea_buena` y `linea_thy`. Las cuatro, por UN camino: `linea_thy ⟶ V₀_eq_codigo ⟶ evalFormula` |
+| **FUERA del build** | 12 | las de los sondeos: `RosserBasura` §1–§4 (sin el modelo, por lectura), `RosserReflexion` (con el modelo) y `ExtensionPorReduccion` (PURA, por su `#pureza`) |
+
+⇒ **La ruta sintáctica no tiene que reescribir nada de lo que hay.** Todo lo reutilizable del build es puro, y lo único
+impuro, W1, lo es por un solo lema, que se sustituye enunciándolo con `codeNatList axioms`. Los tres inventarios, con
+fichero:línea, están en la misma carpeta.
+
+### 3 · Qué existe y qué falta, por etapa (las del plan de ADR‑122, adaptadas a la ruta P y a la reducción)
+
+| etapa | qué da | qué existe (puro) | qué falta |
+|---|---|---|---|
+| **W1(ax)** | `w1Ax` | todas las líneas de W1 salvo `linea_thy`; `memN_codeNatList`, `dec_codeNat` | `linea_thy` con `codeNatList axioms` y la cadena con V como parámetro |
+| **6 · PosNum** | `posNum` | `repr_pos'_prf`, que construye un TÉRMINO de prueba explícito (`proofCode' rs []`) y prueba sus dos mitades; `prf_formCode_numeral`, `prf_cons_eval` y `prf_cons_eval_of`; los transportes `prf_chainOk_subst2`, `prf_congr_runFn_2`, `prf_eq_subst_in` | UN lema: `Prf (proofCode' rs acc =eq numeral N)`, con un espejo `codeNatProof` de `proofCode'`; y el ensamblaje |
+| **1 · la capa de listas sobre numerales** | descomponer, acceder, decidir `In` | `prf_cons_eval`, `prf_in_cons_iff`, `prf_not_in_nil`, `prf_in_concat_singleton_iff`, `crit_num_ne`, `prf_lt_numeralM`, `prf_objList_numeral`, `prf_lenc_objList`, `prf_nthc_objList` | `numeralM m = cons (carN m)‾ (cdrN m)‾`; los accesores y los constructores de código sobre numerales; `¬memN → Prf ¬In`; la pertenencia en `runFnN` |
+| **2 · NumEval, la sustitución sobre numerales** | evaluar `substfc`/`liftfc`/`substtc`/`liftc` con guardas verdaderas | `prf_substTerm_arith`, `prf_liftTerm_arith`, `prf_substFormula_arith` y `prf_liftFormula_arith`, sólo sobre códigos CANÓNICOS | todo lo de numerales: el análogo de `ArithPrf.lean:181-473` sobre códigos de `Nat`, con la clausura de las guardas en ℕ |
+| **3 · GuardNeg** | `¬hasWitN c → Prf ¬hasWit c̄`, y lo mismo para `hasWitF` | los refutadores de profundidad 1 de `CodeWitnessPrf` y las herramientas del paso hereditario (`prf_isTermCodeE1_of_In`, `prf_isFormCodeE2_of_In`, `PrfH_inst_argsIn`); `RosserBasura` §1–§4, de profundidad 2 y sólo para `hasWit` | la caracterización en ℕ (construir el testigo), la hereditaria GENERAL (inducción en el numeral) para `hasWit`, y TODO `hasWitF` (∃∃, ocho cláusulas, recursión mutua) |
+| **4 · NegLineWF** | `¬lineWFT Vax K x → Prf ¬lineWF x̄`, por etiqueta | `prf_lineWF_inv`, `prf_of_tagDisj`, `pcc_tag_vacuous`, `prf_lineWF_neg_of_tag` (19 etiquetas estructurales, sobre líneas explícitas), las 21 `prf_lenc_<tag>` de `ChainNegPrf`, `prf_lineWF_thy`, `prf_ancla`; 3 de las 11 proyecciones a las guardas | pasar de líneas explícitas a numerales (etapa 1); las 7 etiquetas de sustitución (etapa 2); las 8 proyecciones que faltan; `thy`: la contraria de `memN_codeNatList` y `¬In` sobre `listFormCodeM` |
+| **5 · NegChain y NegNum** | `negNum`, y NegNum' con W1(ax) | `prf_chainOk_cons`, `prf_allIn_cons`, `prf_chainOk_iff_chainOkB`, `prf_lineWF_of_chainOk`, `prf_boundedPremsIn_of_chainOk`, `prf_In_runFn_iff` | la «primera línea mala» en ℕ, las premisas (`¬allInN`), el ensamblaje |
+| **7 · Rosser, por la reducción** | `rosser_ext` | `prf_diagonal`, `prf_bdAll_numeral`, `prf_lt_trichotomy`, `prf_lt_succ_split`, `liar_isSentence`; `prfH_iff_prf_impChain` y `formCode_impChain` (sondeo) | el caso `z ≤ n̄`; Pf_E y su transporte; la sentencia R y `IsSentence R`; el argumento |
+
+### 4 · El diseño
+
+1. **Un espejo, dos sentidos.** Cada símbolo del verificador tiene su espejo en ℕ en `ModeloCodigo` (`memN`, `allInN`,
+   `premsOfN`, `runFnN`, `lineWFT`, `chainOkL`, `hasWitN`, `hasWitFN`, `substfcN`…). NegNum se construye de abajo
+   arriba como «T decide el espejo sobre numerales». Cada nivel da el sentido positivo (evaluar) y el negativo
+   (refutar lo falso): listas → sustitución → guardas → líneas → cadenas → `PfF`. Es la organización del plan de
+   ADR‑122, dicha como un solo juicio por símbolo.
+2. **PosNum, por D1.** No por el espejo: el término que D1 ya construye es un árbol de numerales, y basta probar que es
+   igual a un numeral. Es la etapa más barata, y la única que no depende de las demás.
+3. **W1(ax) primero.** Es un lema, y desbloquea NegNum'.
+4. **La guarda de fórmulas, pronto.** GuardNeg es lo de más riesgo («medio‑alto»: ∃∃, ocho disyuntos, recursión
+   mutua término/fórmula), y de `hasWitF` no hay nada. Un sondeo de `hasWitF` a profundidad 1–2 va justo después de
+   la etapa 1, antes de invertir en las etapas 2 y 4.
+5. **En el build, con T08 en cada módulo.** Los módulos van en el build (`Meta/RosserW1.lean`,
+   `Meta/RosserPosNum.lean`, `Meta/RosserNumerales.lean`, `Meta/RosserNumEval.lean`, `Meta/RosserGuardNeg.lean`,
+   `Meta/RosserNegLinea.lean`, partido si hace falta, `Meta/RosserNegNum.lean` y `Meta/Rosser.lean`). Cada uno acaba
+   con un `#pureza` de sus resultados, así que un paso por el modelo rompe el build en el módulo que lo da. Al final,
+   la instancia de `rosser_ext` entra en `PUROS` y en `T_UNIVERSO`.
+6. **Se promueve lo que sirve.**
+   - `RosserBasura` §1–§4 pasa a las etapas 1 y 3. El sondeo se queda con §5, su control con el modelo.
+   - `ExtensionPorReduccion` pasa a `Meta/Rosser.lean`.
+   - `RosserReflexion` se queda como mutante de T08.
+   - De `ChainNegPrf` se usan en su sitio las 21 `prf_lenc_<tag>`, `prf_lineTag_cons` y
+     `prf_boundedPremsIn_of_chainOk`. Lo demás se decide al final (T66), midiendo con el cono qué usó NegNum.
+7. **Las reglas del núcleo, desde el primer día:** lemas ∀ y `rw`; nunca `simp`, `rfl` ni `decide` sobre un código
+   cerrado, el ancla o ⌜R⌝; `unfold` e inducción funcional en las recursiones mutuas (ADR‑130); el despacho por
+   etiqueta, partido en módulos por la memoria.
+
+**Controles de cada etapa:**
+* el `#pureza` del módulo;
+* que la hipótesis de `negNum` pueda fallar: para el código de una prueba de un axioma, `ProofN` vale;
+* y que pueda valer: `¬ ProofN 0 y`, la cadena vacía.
+
+### 5 · Las cifras (ESTIMACIÓN, del plan; ninguna medida mía)
+
+| etapa | ESTIMACIÓN | fuente |
+|---|---|---|
+| W1(ax) | 15–30 | `resultado.json` (crítica), T75 |
+| 6 · PosNum | 70–120 (40–80 según la crítica) | `resultado.json:270`; informe de T01 |
+| 1 · listas | 150–250 | `resultado.json:238-241` |
+| 2 · NumEval, ruta P | 350–600 | `resultado.json:244-247` |
+| 3 · GuardNeg | 350–550, y 60–150 más por la caracterización en ℕ | `resultado.json:250-253`; crítica §ROSSER 1.4 |
+| 4 · NegLineWF | 450–650 (las proyecciones, unas 96) | `resultado.json:256-259` |
+| 5 · NegChain y NegNum | 150–250 | `resultado.json:262-265` |
+| 7 · Rosser, con la reducción | 200–400 | ADR‑144 |
+| **suma** (mía) | **≈ 1 800–3 000** | la suma de las filas; el informe de T01 daba ≈ 1 710–2 850 sin la reducción ni W1 |
+
+**La calibración, MEDIDA:**
+* W1 se estimó en 600–1 500 líneas y salieron unas 490.
+* La Etapa 0 se estimó en 120–200 y lleva 406 líneas de fichero (194 de declaraciones) con dos de sus tres piezas.
+
+Las cifras del plan valen, por tanto, a un factor 2 en cada sentido. **La unidad,** que el plan no fijaba: las líneas no
+vacías tras `strip-lean.awk`, medidas al cerrar cada etapa contra su estimación.
+
+### 6 · Los riesgos (del plan y de los inventarios)
+
+1. **GuardNeg** (§4.4). Que sea inevitable lo argumenta un razonamiento de modelo no compilado: los 142 axiomas no
+   fijan `substfc` en una ranura basura. T75(d) propone un segundo modelo como prueba.
+2. **Los numerales astronómicos** (⌜R⌝, el ancla, `tcFnN 0` ≈ 2,4·10¹¹; la trampa de ADR‑124, más de 14 GB con un
+   `simp … at h` sobre códigos cerrados) y **el núcleo con las mutuas** (ADR‑130).
+3. **Los precedentes, rotos o con el signo cambiado:** los refutadores de `hasWitF` están archivados y no compilan, y
+   los de q1 son de antes de las guardas.
+4. **T08 mira por espacio de nombres**, y se aplica a la INSTANCIA, no a un enunciado con hipótesis (`rosser_de`).
+5. **Las estimaciones** (§5).
+
+### 7 · Lo que decide el propietario
+
+1. **¿El orden de §4?** W1(ax) → PosNum → las listas → un sondeo de `hasWitF` (riesgo primero) → NumEval → GuardNeg →
+   NegLineWF → NegNum → Rosser por la reducción. Recomendado.
+2. **¿En el build, con un `#pureza` por módulo, o en sondeos que se promueven al final?** Recomendado: en el build.
+3. **¿T66 (retirar lo que sobre de `ChainNegPrf` y del subárbol sin consumidor) se decide al final, midiendo qué usó
+   NegNum?** Recomendado.
+
+**Lo que NO cubre:** el código. Ninguna etapa está empezada aquí, y las cifras son las del plan.
+
+**Véase también:** ADR‑122 §2 (el plan), ADR‑123…127 (la Etapa 0), ADR‑130 (el núcleo), ADR‑143 (T08), ADR‑144 y
+ADR‑145 (la reducción); T01, T64, T66 y T75 de la auditoría.

@@ -1,6 +1,6 @@
 # Registro: artefactos rescatados al árbol
 
-**Last updated:** 2026-10-16 — ADR‑144: la carpeta del alcance de T62. Antes, el mismo día — ADR‑141: el runner `scripts/sondeos_todos.ps1`, sustituido y retirado. Antes, el mismo día — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
+**Last updated:** 2026-10-16 — ADR‑146: la carpeta del inventario de NegNum y PosNum. Antes, el mismo día — ADR‑144: la carpeta del alcance de T62. Antes, el mismo día — ADR‑141: el runner `scripts/sondeos_todos.ps1`, sustituido y retirado. Antes, el mismo día — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
 directorio temporal de la sesión o en la carpeta de la sesión, fuera de git.
 
 **Por qué.** Varias afirmaciones de los ADR («37 de 90 sondeos compilan», «revisión adversarial aplicada», la crítica
@@ -40,6 +40,7 @@ cierto. Lo vigente está en `DECISIONS.md`, `NEXT-STEPS.md` y `doc/AUDITORIA-SUE
 | `2026-10-14-t01-rosser/` | `informe.md`: para decidir T01 (Rosser), las opciones (a‑i), (a‑ii), (b) y (c) con su enunciado aproximado, lo que demuestra cada una y lo que no, lo que hay que construir y lo que existe, el coste (ESTIMACIONES con su fuente; las cifras de radio, MEDIDAS con grep) y los riesgos | un agente de sólo lectura (2026‑10‑14) | ADR‑136; T01 |
 | `2026-10-16-cono/` | la salida de `sondeos/ConoTitulares.lean`: `resumen.txt` (por capa, por titular, la clase (i) frente al total, y los controles), `por-modulo.csv` y `fuera-del-cono.txt` (las 921 declaraciones fuera del cono, 776 de RPP y 145 de FOL, con su rango de líneas) | el sondeo (2026‑10‑16) | ADR‑139 |
 | `2026-10-16-t62-alcance/` | la medición de alcance de T62: `resumen.txt` y `usuarios-G*.txt` (del término elaborado, `sondeos/AlcanceT62.lean`) y `textual.txt` (del fuente, `scripts/alcance_t62.bash`) | el sondeo y el guion (2026‑10‑16) | ADR‑144 |
+| `2026-10-16-negnum-posnum/` | el inventario de NegNum y PosNum: `pureza.txt` (las piezas, PURAS o IMPURAS por T08, de `sondeos/InventarioRosser.lean`) y tres inventarios de agentes de sólo lectura, condensados (`inventario-plan.md`, `inventario-posnum.md`, `inventario-negnum.md`), con su `README.md` | el sondeo y tres agentes (2026‑10‑16) | ADR‑146 |
 
 Fuera de esta carpeta, rescatado en el mismo commit:
 
