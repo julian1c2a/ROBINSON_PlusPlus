@@ -1,6 +1,6 @@
 # Registro: artefactos rescatados al árbol
 
-**Last updated:** 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
+**Last updated:** 2026-10-16 — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
 directorio temporal de la sesión o en la carpeta de la sesión, fuera de git.
 
 **Por qué.** Varias afirmaciones de los ADR («37 de 90 sondeos compilan», «revisión adversarial aplicada», la crítica
@@ -38,6 +38,7 @@ cierto. Lo vigente está en `DECISIONS.md`, `NEXT-STEPS.md` y `doc/AUDITORIA-SUE
 | `2026-10-12-t02-teoria/` | T02: los hechos y los censos de cómo describían la teoría los documentos (`workflow-hechos.json`, script y resultados), el workflow de revisión que murió por el límite de sesión (`workflow-revision-fallida.json`), los cinco informes del 2026‑10‑14 (`revision-*.md`, `verificacion-censo-*.md`), la salida del sondeo de la inducción y la medición de leanchecker; y en `comentarios/` el lote de comentarios de los `.lean`: los encargos (`INSTRUCCIONES.md`, `grupo-*.md`), los siete informes de corrección y las tres revisiones adversariales. El build y los controles del día (`build-…`, `control-…`) son de antes de aplicar esas tres revisiones, que sólo tocaron comentarios | `wf_54bdca87-06c` (2026‑10‑12), `wf_22f6795d-314` (2026‑10‑13) y agentes sueltos (2026‑10‑14) | ADR‑134 |
 | `2026-10-14-t09-teoremas/` | T09: la salida del sondeo `sondeos/InduccionTitulares.lean` con `#modelo` (`sondeo-induccion-modelo-2026-10-14.txt`: las clases de los 18 titulares) y la prueba del control `[T]`, verde sobre el documento y rojo con el fallo puesto (`control-T-2026-10-14.txt`) | el sondeo y `check-doc-sync.bash` (2026‑10‑14) | ADR‑135 |
 | `2026-10-14-t01-rosser/` | `informe.md`: para decidir T01 (Rosser), las opciones (a‑i), (a‑ii), (b) y (c) con su enunciado aproximado, lo que demuestra cada una y lo que no, lo que hay que construir y lo que existe, el coste (ESTIMACIONES con su fuente; las cifras de radio, MEDIDAS con grep) y los riesgos | un agente de sólo lectura (2026‑10‑14) | ADR‑136; T01 |
+| `2026-10-16-cono/` | la salida de `sondeos/ConoTitulares.lean`: `resumen.txt` (por capa, por titular, la clase (i) frente al total, y los controles), `por-modulo.csv` y `fuera-del-cono.txt` (las 921 declaraciones fuera del cono, 776 de RPP y 145 de FOL, con su rango de líneas) | el sondeo (2026‑10‑16) | ADR‑139 |
 
 Fuera de esta carpeta, rescatado en el mismo commit:
 

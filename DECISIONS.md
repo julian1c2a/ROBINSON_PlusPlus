@@ -1,6 +1,6 @@
 # Decisiones de Diseño — ROBINSON_PlusPlus
 
-**Last updated:** 2026-10-16 — hasta **ADR-138** (la consistencia que da `consistencia` es RELATIVA a Lean, PRA ⊢ Con(Lean) → Con(T_Prf), y no puede ser absoluta: los banners, TEOREMAS §4, AXIOMS §0.2 y PLAN-LIBRO cap. 6). Antes, 2026-10-14 — hasta **ADR-137** (Rosser, decidido: la teoría como PARÁMETRO del verificador, opción a‑ii de T01, con T08 como criterio de aceptación; y dos frases de FOL al día). Antes, el mismo día — hasta **ADR-136** (`master` protegido: sólo entra un commit con la CI ya verde, por una rama `ci/…`; y las decisiones del propietario del 2026‑10‑14). Antes, el mismo día — hasta **ADR-135** (TEOREMAS-E-HIPOTESIS al día —`⊬¬G` existe—, con la columna «¿qué usa la prueba?» MEDIDA en tres clases, y el control `[T]`). Antes, el mismo día — hasta **ADR-134** (la teoría de los titulares, `T_Prf`, descrita: contiene a PA, no es Q ni IΣ₁; `AXIOMS.md` §0, la descripción canónica, con lo que se supone hoy; D1 usa la inducción, D2 la de listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, MEDIDO en `sondeos/InduccionTitulares.lean`; y los comentarios caducados o falsos de 113 `.lean`, al día, con su revisión adversarial). Antes, 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
+**Last updated:** 2026-10-16 — hasta **ADR-139** (🟡 PROPUESTO: acotar el proyecto en tres pasos —archivar los sondeos, congelar la historia, contratos de capa—, con el cono de los titulares MEDIDO por declaración, `sondeos/ConoTitulares.lean`). Antes, el mismo día — hasta **ADR-138** (la consistencia que da `consistencia` es RELATIVA a Lean, PRA ⊢ Con(Lean) → Con(T_Prf), y no puede ser absoluta: los banners, TEOREMAS §4, AXIOMS §0.2 y PLAN-LIBRO cap. 6). Antes, 2026-10-14 — hasta **ADR-137** (Rosser, decidido: la teoría como PARÁMETRO del verificador, opción a‑ii de T01, con T08 como criterio de aceptación; y dos frases de FOL al día). Antes, el mismo día — hasta **ADR-136** (`master` protegido: sólo entra un commit con la CI ya verde, por una rama `ci/…`; y las decisiones del propietario del 2026‑10‑14). Antes, el mismo día — hasta **ADR-135** (TEOREMAS-E-HIPOTESIS al día —`⊬¬G` existe—, con la columna «¿qué usa la prueba?» MEDIDA en tres clases, y el control `[T]`). Antes, el mismo día — hasta **ADR-134** (la teoría de los titulares, `T_Prf`, descrita: contiene a PA, no es Q ni IΣ₁; `AXIOMS.md` §0, la descripción canónica, con lo que se supone hoy; D1 usa la inducción, D2 la de listas, y ningún titular construye un paso DNE salvo `goedel_I_neg`, MEDIDO en `sondeos/InduccionTitulares.lean`; y los comentarios caducados o falsos de 113 `.lean`, al día, con su revisión adversarial). Antes, 2026-10-12 — hasta **ADR-133** (MANDATORIES: M‑11 al derecho, M‑10 y M‑6 corregidas, M‑1, M‑7 y M‑13 al día; el control `[M]` de check-doc-sync, nuevo). Antes, 2026-10-12 — hasta **ADR-132** (la auditoría del suelo, versionada: 81 trabajos, 4 P0, 7 P1, en `doc/AUDITORIA-SUELO-2026-10-12.md`; T00, los artefactos fuera de git rescatados a `doc/registro/`; `d3_prf_of_sigma1` y `d3_prf_of_reflect_bounded`, VACUOS, medido). Antes, 2026-10-05 — hasta **ADR-131** (de dónde viene el `Classical.choice` de los titulares, MEDIDO: no de `p3`; dos cancelaciones de lift lo traen a 158 de 182 filas; fe de erratas de ADR‑129). Antes, 2026-10-05 — hasta **ADR-130** (las dos notas de `Meta/CodeDecode.lean`, MEDIDAS: lo que el núcleo rechaza es desplegar por defeq la mutua `decodeTerm`, no el `if`/`==`/`String`; `sondeos/IteSimboloNucleo.lean`). Antes, 2026-10-05 — hasta **ADR-129** (D7 EJECUTADA: los símbolos de FOL son `List Char`, en FOL y en RPP; 44 filas de footprint pierden `Classical.choice`; ningún valor cambia). Antes, 2026-10-05 — hasta **ADR-128** (`autoImplicit` desactivado también en `lake build`, en RPP y en FOL, con `leanOptions`: coste medido, ninguno). Antes, 2026-10-05 — hasta **ADR-127** (la auditoría de ADR-124/125/126: «por primera vez» era sólo «sobre un numeral», el control no mide el método, dos lemas re‑derivados; y los 88 sondeos, re‑medidos). Antes, 2026-10-05 — hasta **ADR-126** (la refutación HEREDITARIA a profundidad 2 y el control de discriminación, en `sondeos/RosserBasura.lean`). Antes, 2026-10-05 — hasta **ADR-125** (Rosser, Etapa 0, segunda pieza: la guarda de término refutada en `Prf` sobre un numeral, en un sondeo). Antes, 2026-10-05 — hasta **ADR-124** (el CONTROL NEGATIVO del modelo, en el build: `MNV V` refuta `ax_tc_cons`; y la auditoría de ADR-123, que rectifica tres afirmaciones). Antes, 2026-10-05 — hasta **ADR-123** (Rosser, Etapa 0: la reflexión numeral de `substfc`/`liftfc`, CONFIRMADA en un sondeo). Antes, 2026-10-05 — hasta **ADR-122** (D7 MEDIDA: sólo 48 de 226 footprints perderían `Classical.choice` sin `String`; Rosser re‑medido tras el modelo). Antes, 2026-10-05 — hasta **ADR-121** (Gödel I ENTERO: `⊬ ¬G` por la solidez del verificador en el modelo, `goedel_I_neg`; y TARSKI sin hipótesis, sintáctico y en ℕ). Antes, 2026-10-05 — hasta **ADR-120** (`ConsistentH` es un TEOREMA del build, `consistencia`, y Gödel I/II van SIN HIPÓTESIS: `goedel_I`, `goedel_II`, en `Meta/Consistencia.lean`). Antes, 2026-10-05 — hasta **ADR-119** (el MODELO de los 142: `ConsistentH` demostrada en `sondeos/ModeloNat.lean`, y Gödel I/II sin hipótesis allí; la promoción al build, después). Antes, 2026-10-05 — hasta **ADR-118** (la clase `AnclaEq` retirada: 426 ligaduras fuera, en un commit mecánico; el ancla es el teorema `prf_ancla`). Antes, 2026-10-04 — hasta **ADR-117** (F1 reparado: `axiomsCodeT` anclado por un axioma DIAGONAL, `axioms` = 142 = 141 de la base + el ancla; `AnclaEq` pasa a ser un TEOREMA, `prf_ancla`, con su instancia, y Gödel I/II dependen sólo de `ConsistentH`, todavía condicionales: los 142 no tienen un modelo construido; todo computable, y un control nuevo impide EJECUTAR `axioms` o el ancla). Antes, el mismo día — hasta **ADR-116** (los controles que daban verde sin comprobar: `[B]` casaba por prefijo, `check-axioms` de FOL era un grep, `check-estratos` no veía `TheoryFramework` ni los `private axiom`; y cuatro revisiones adversariales de los arreglos: en la segunda, el conteo de `axiom` de `[A]` estaba a 0 fijo; en la cuarta, los censos no veían la confianza en el compilador ni lo que el kernel no comprobó, y el autotest de `check-sorry` contaba en vez de comparar; `strip-lean.awk` v5; `@TRUST`, `@NATIVO` y `@AJENO` en los censos por entorno; `leanchecker` en las dos CI; el `thaw` de los cinco congelados de FOL; la etiqueta `pre-adr115`). Antes, 2026-10-02 — hasta **ADR-115** (la capa `⊢` RETIRADA de RPP: 27 módulos y 633 declaraciones, 0 `axiom` de Lean, la cadena sobre `Prf` intacta; las meta‑reglas de FOL, refutadas, retiradas también de FOL el mismo día, §8). Antes, el mismo día — hasta **ADR-114** (la auditoría de la base, ronda 1: `Prf ⊥` en el `master` viejo, la capa `⊢` refutable, `OmegaConsistent` refutable; ADR-113 fusionado como REPARACIÓN; la capa `⊢` y las meta-reglas, a retirar). Antes, 2026-09-28 — hasta **ADR-113** (la salida (5) adoptada: `cons a b = σ (pair a b)`; seis módulos adaptados, 145 jobs, 517 footprints sin cambios). Antes, 2026-09-27 — hasta **ADR-112** (FOL: el segundo y el tercer lote congelados, 23 módulos; N5, auxiliares; N7, el enunciado de `herbrand_of_skolemNF₀` reforzado). Antes, ADR-111 (la tercera criba de congelación de FOL, tras D1‑D8: 10 congelables propuestos, decisiones N5 y N7).
 
 > ## 🏁🏁 ESTADO REAL — 2026‑10‑05 · `master` · **`ConsistentH` es un TEOREMA del build: Gödel I y II sin hipótesis DENTRO de Lean** ([ADR‑120](#adr-120)) · la consistencia es **RELATIVA a Lean** ([ADR‑138](#adr-138))
 >
@@ -10548,3 +10548,124 @@ leída en el árbol:
 
 **Véase también:** ADR‑120 (`consistencia`), ADR‑134 (`T_Prf` contiene a PA), ADR‑135 (las tres clases), ADR‑136 §3
 (T49) y ADR‑139.
+
+## ADR-139: 🟡 PROPUESTO — acotar el proyecto en tres pasos (archivar los sondeos, congelar la historia, contratos de capa), con el cono de los titulares MEDIDO por declaración
+
+**Fecha:** 2026-10-16 · **Estado:** 🟡 PROPUESTO; decide el propietario (§4). Lo único hecho es la medición (§2) ·
+**Ámbito:** `sondeos/ConoTitulares.lean` (nuevo), `doc/registro/2026-10-16-cono/` (su salida), `sondeos/README.md` y
+`doc/registro/README.md`. El plan, si se aprueba, toca `sondeos/`, `DECISIONS.md`, `NEXT-STEPS.md`, `CHANGELOG.md`,
+los banners y los `import` de las capas.
+
+### 1 · Por qué
+
+La pregunta del propietario (2026‑10‑16): el proyecto es grande, se desarrolla con Claude y una ventana de contexto de
+1 M de tokens. ¿Habrá pérdida de información? ¿Qué se puede hacer para acotarlo, y con él el contexto que hace falta?
+
+Medido ese día (`git ls-files`, `master` = `377c44b`, antes de este ADR):
+
+| | ficheros | líneas | bytes |
+|---|---|---|---|
+| Lean del build (`ROBINSON_PlusPlus/`) | 113 | 52 442 | 2,9 MB |
+| Lean de `sondeos/` (92 en la raíz y 2 en `lintlab/`) | 94 | 77 287 | 4,2 MB |
+| Markdown | 72 | 46 004 | 3,55 MB |
+| Lean de FOL | 163 | 30 937 | 1,45 MB |
+
+ESTIMACIÓN, no medida (de 3 a 4 bytes por token para este texto): la prosa sola ocupa de 0,9 a 1,2 M tokens, y el Lean
+de RPP de 1,8 a 2,4 M. El repositorio no cabe en una ventana, ni tiene que caber: Claude lee bajo demanda. La pérdida
+se da en tres sitios: el resumen automático dentro de una sesión, que pierde detalle (lo primero, si una cifra se midió
+o se infirió); entre sesiones, donde sólo queda el repositorio y la memoria; y la prosa caducada que se lee como vigente.
+Lo que el build vuelve a comprobar no se pierde. Por eso el plan saca del camino lo que no comprueba nadie.
+
+### 2 · La medición: el cono de los titulares, por declaración
+
+`sondeos/ConoTitulares.lean` (80 s, `lake env lean`). Es el cierre de dependencias de los 18 titulares de `T_UNIVERSO`
+por tipos, valores y proyecciones, asignado a las declaraciones del fuente. **Ámbito:** es el cono del NÚCLEO, lo que
+el kernel necesita para comprobar los titulares; fuera del cono no quiere decir «se puede borrar», porque una táctica,
+una notación o un lema de `simp` que no quedó en el término hacen falta para elaborar. Los controles del sondeo
+pasan (la clase (i) no nombra `SolidezPrf` y `consistencia` sí, como mide `#modelo`; nada de `VerifierSound` dentro;
+cada titular dentro; y sin dueño quedan 3 auxiliares de Lean). Salida entera: `doc/registro/2026-10-16-cono/`.
+
+| capa | ficheros importados | con algo en el cono | líneas | fuera de toda declaración | declaraciones | en el cono | líneas en el cono |
+|---|---|---|---|---|---|---|---|
+| RPP (los 112 módulos y los dos barriles) | 114 | 101 | 52 634 | 18 012 | 3 623 | 2 847 (79 %) | 28 578 |
+| FOL (de sus 163) | 12 | 4 | 2 840 | 1 008 | 193 | 48 (25 %) | 481 |
+
+* **El build ya es estrecho.** Fuera del cono quedan 776 declaraciones con 6 044 líneas; la lista, declaración a
+  declaración, en `fuera-del-cono.txt`. Hay además 18 012 líneas fuera de toda declaración: comentarios, docstrings
+  de módulo, `example`, `#print` y líneas en blanco.
+* **D3 es el 92 % del cono.** `d3_prf_real` arrastra 2 444 declaraciones y 26 880 líneas. `goedel_first_prf`, 720 y
+  5 164. La clase (i) entera, 2 478 y 27 158. Lo que sólo piden `consistencia` y las clases (ii) y (iii), 417 y 1 901.
+* **21 ficheros importados no aportan nada al cono.**
+  - El subárbol de T66, CONFIRMADO: `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`.
+  - `Sigma1BoundedPrf` (T05) y `Full/PrimeFactor`.
+  - Tres que la medición por módulo no veía: `CodeDistinct`, `ReflectionPrf` y `Sigma1TrackedPrf`. Se importan, y el
+    núcleo no usa nada suyo.
+  - `Minimal/SymLit`, la macro `sym!`: es elaboración pura y hace falta.
+  - Los dos barriles.
+  - Ocho de FOL: `Deduction`, `Derives0`, `Eigenvariable`, `Lift0`, `Tactics`, `Theorems.Derived`, `Theorems.Impl` y
+    `Theorems.Neg`. Es la capa `Derives` y sus vecinos, la de T74.
+
+⇒ El volumen que sobra NO está en el build. Está en `sondeos/` (77 669 líneas con `ConoTitulares`) y en la prosa:
+`DECISIONS.md` tiene 10 480 líneas, y ADR‑001…ADR‑130 ocupan las líneas 1–9 952; `NEXT-STEPS.md` tiene 4 600, y su
+sección «PUNTO DE REANUDACIÓN» va de la línea 7 a la 4 118, y lo que sigue son las secciones de junio y julio.
+
+### 3 · El plan (PROPUESTO)
+
+**Paso 1 · Archivar los sondeos** (T06 y luego T10).
+1. Primero T06: el runner con `lake lean`, con un TSV de hoy. La cifra «35 de 88 compilan» es de ADR‑127
+   (2026‑10‑05) y no se ha vuelto a medir.
+2. Cada sondeo, en una de cuatro clases, como pide T10: CONTROL (a la CI con T06, bloqueante), REGISTRO (compila y se
+   cita como evidencia), REPARAR o ARCHIVAR.
+3. Antes de quitar nada, la etiqueta `archivo/sondeos-2026-10`. `sondeos/README.md` conserva una tabla de archivados
+   en otro formato de fila, para que `[H]` no pida el fichero, con el nombre, la etiqueta y lo que midió; el resultado
+   vive en su ADR.
+* **Efecto:** sin medir hasta T06. La cota superior son las 77 669 líneas menos lo que se quede.
+* **Riesgo:** perder un control negativo (`AnclaEqInconsistente`, `MetaReglasRefutables`…). Por eso T06 los hace
+  bloqueantes en la CI ANTES de archivar nada.
+
+**Paso 2 · Congelar la historia** (T33, T36, T54 y T55).
+1. `DECISIONS.md`: ADR‑001…ADR‑130 (líneas 1–9 952) pasan tal cual a `doc/historia/DECISIONS-001-130.md`, y
+   `DECISIONS.md` guarda una línea por ADR (número, título, estado, enlace) y los ADR vivos. Coste de los enlaces,
+   medido: ningún enlace del árbol a `DECISIONS.md` lleva ancla (`DECISIONS.md#adr-`: 0), así que siguen valiendo (llegan al índice); hay 5 anclas
+   internas que arreglar.
+   ⚠️ Los controles: el fichero histórico sale de AUTHORITATIVE por diseño, como CHANGELOG. La deuda de `[B]` y de
+   `[A2]` que viva en esos ADR quedaría «pagada por exclusión», y eso es un control que deja de comprobar. El traslado
+   tiene que ser PURO, sin editar una línea, comprobado por comparación de bytes, y el ADR que lo ejecute lista qué
+   deuda sale del universo y por qué.
+2. `NEXT-STEPS.md`: se queda el bloque vigente; los anteriores y las secciones viejas de debajo (de la línea 26 al final, unas 4 575) van a
+   `doc/historia/`.
+3. Los banners (T33): una sola fuente del estado y un puntero de dos líneas en los demás documentos; los banners
+   históricos apilados se van con la historia. La fuente propuesta es el banner de `TEOREMAS-E-HIPOTESIS.md`, que ya
+   es AUTHORITATIVE y tiene `[T]`.
+4. `CHANGELOG.md` (T54): un índice congelado que remite a DECISIONS.
+* **Efecto, medido:** salen del camino activo unas 14 500 líneas (9 952 de DECISIONS y unas 4 575 de NEXT-STEPS), más
+  los banners (T33: de 21 a 55 líneas en cada uno de siete documentos).
+
+**Paso 3 · Contratos de capa** (T66 y T74, dentro de la política de congelación de ADR‑136).
+1. **FOL:** un fichero de contrato GENERADO por el sondeo, no escrito a mano. Lista las 48 declaraciones de FOL que
+   el núcleo de RPP usa y lo de elaboración que RPP necesita (tácticas, notaciones). En una sesión se lee el contrato,
+   no FOL.
+2. **Los imports muertos** (T74): los ocho ficheros de FOL sin nada en el cono salen de los `import` de RPP, si el
+   build pasa sin ellos. Es la medida que falta: la elaboración puede necesitarlos.
+3. **T66**, como está escrito: después de que Rosser decida qué hereda. ADR‑137 decidió la ruta, no la herencia.
+4. **Opcional:** las cifras del cono, como INFORME de la CI (no como control) junto al runner de T06.
+* No se congela nada: ADR‑136 lo permite sólo con la fase cerrada.
+
+### 4 · Lo que decide el propietario
+
+1. Paso 1: ¿el orden T06 → T10 → etiqueta y archivo, o se reparan los que no compilan?
+2. Paso 2: ¿se corta `DECISIONS.md` en ADR‑130? ¿La fuente única del estado es el banner de `TEOREMAS-E-HIPOTESIS.md`
+   o un `ESTADO.md` nuevo?
+3. ¿`CHANGELOG.md` queda como índice congelado (T54)?
+4. Paso 3: ¿el contrato de FOL, generado, y los imports muertos fuera? Lo segundo depende de T74, que pide además
+   decidir si la capa `Derives` de FOL se retira, queda como legado o se reduce a un `abbrev`.
+
+### 5 · Lo que NO cubre
+
+* No se ejecuta nada salvo la medición: ningún fichero se quita.
+* La memoria de los chats está fuera del repositorio (T22).
+* Las 18 012 líneas de comentarios del build: no se propone quitarlas. Son las notas de procedencia del proyecto, y
+  T31 las puso al día.
+
+**Véase también:** ADR‑127 (los sondeos, re‑medidos), ADR‑132 (la auditoría), ADR‑135 (las clases y `#modelo`),
+ADR‑136 §3, ADR‑138; T05, T06, T10, T22, T33, T36, T54, T55, T66 y T74 de la auditoría.

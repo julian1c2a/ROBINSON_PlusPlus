@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-16 — ADR‑138 (la excepción de T49). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-16 — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -248,6 +248,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Sondeos · *Verificación:* confirmado (verificador de controles, P1); corregido el ejemplo de D7; requiere medición
 
+*Estado el 2026‑10‑16:* 🟡 Es el primer paso del plan de ADR‑139 (propuesto): sin el TSV de hoy no se archiva ningún sondeo.
+
 * **Qué:** MEDIDO: build.yml no nombra sondeos/ (grep -c = 0) y nunca lo hizo (git log -S/-G vacío). Según las fuentes de Lake v4.31, `lake env lean` no pasa los leanOptions y `lake lean` sí (CLI/Main.lean:1083-1096; Build/Module.lean:1376-1379). La receta y el runner usan `env lean`, así que miden con autoImplicit activado; sólo 3 de 90 sondeos lo desactivan. Hay 836 `#print axioms` que nadie compara, y 24 #guard_msgs de IteSimboloNucleo que nadie ejecuta. La regresión que sí pasó sin aviso: 53 de 85 sondeos rotos por nombres movidos y ambigüedades (doc/AUDITORIA-BASE-2026-10-02.md §3). Corrección: los 10 que rompió D7 los cazó la pasada manual, y 048dde6 los migró en el mismo commit.
 * **Evidencia:** .github/workflows/build.yml (grep -c sondeos = 0, MEDIDO); sondeos/README.md:69, :73; doc/AUDITORIA-BASE-2026-10-02.md:164-258; DECISIONS.md:9779 (la sonda negativa de ADR-128, sin cablear); MEDIDO por el sintetizador: hay 90 .lean de primer nivel y 2 más en sondeos/lintlab/ que la cifra no cuenta
 * **Cómo cerrar:** Versionar un check-sondeos.bash (promoviendo sondeos_todos.ps1, T00) que use `lake lean`, con tiempo límite y un TSV versionado. En la CI, la lista DECLARADA de los que compilan, rota en los dos sentidos; bloqueante para los controles negativos (AnclaEqInconsistente, MetaReglasRefutables…) y para los sondeos que sostienen Rosser. Comparar los footprints de los sondeos que sirven de evidencia y ejecutar los #guard_msgs. La sonda negativa de autoImplicit, sola, es P2–P3: protege una higiene, no la solidez.
@@ -324,6 +326,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T10 · Sondeos que no compilan: política, SHA de los registros y citas-evidencia del build
 
 *Grupo:* Sondeos · *Verificación:* confirmado, rebajado a P2 y supeditado a T06 (verificador de controles)
+
+*Estado el 2026‑10‑16:* 🟡 Propuesto en ADR‑139, paso 1: las cuatro clases (CONTROL, REGISTRO, REPARAR, ARCHIVAR) y una etiqueta antes de archivar nada; decide el propietario.
 
 *Estado el 2026‑10‑14:* 🟡 En ADR‑134, las notas de procedencia: las tres citas de `A3IsFCBTracked` del build (`D3ChainDotPrf`, `HasWitTrackedPrf`, `TrackedAtomsPrf`) y las cabeceras de los diez sondeos que decían «compila» en presente llevan nota, contra `sondeos/pasadas/tabla_adr129.txt`. La política, el SHA de los registros y el control, pendientes (tras T06).
 
@@ -563,6 +567,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T33 · Banners de «estado real» apilados en siete documentos: una fuente única
 
 *Grupo:* Documentos de estado y memoria · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑16:* 🟡 Propuesto en ADR‑139, paso 2: la fuente única, el banner de `TEOREMAS-E-HIPOTESIS.md`. ADR‑138 tuvo que corregir el mismo titular en cuatro copias (README, AXIOMS, REFERENCE y DECISIONS).
 
 * **Qué:** MEDIDO: README, REFERENCE, DEPENDENCIES, GODEL-STATUS, AXIOMS, CURRENT-STATUS y DECISIONS comparten de 21 a 55 líneas de banner. ADR-130 y ADR-131 reescribieron a mano la cifra de sondeos en cinco o seis copias. Y los banners empujan los cuerpos fuera de la ventana de [A].
 * **Evidencia:** AI-GUIDE.md:392-393; README.md:36-72; REFERENCE.md:37-77
@@ -904,6 +910,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Fundamentos y ruta matemática · *Verificación:* sin segunda verificación
 
+*Estado el 2026‑10‑16:* 📏 CONFIRMADO por declaración (ADR‑139): ninguna declaración de `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` ni `CodeDecode` está en el cono de los titulares; tampoco de `Sigma1BoundedPrf` ni de `Full/PrimeFactor`, ni de tres que se importan sin usarse (`CodeDistinct`, `ReflectionPrf` y `Sigma1TrackedPrf`). La lista, en `doc/registro/2026-10-16-cono/fuera-del-cono.txt`.
+
 * **Qué:** MEDIDO: ChainNegPrf, VerifierSound, OmegaReflect, ChainDecode y CodeDecode suman 2 930 líneas sin ningún consumidor fuera del barril (y de IteSimboloNucleo), y el disparador de su cabecera ya se cumplió. También son hojas sin consumidor Sigma1BoundedPrf (T05) y Full/PrimeFactor.
 * **Evidencia:** ROBINSON_PlusPlus/Meta/ChainNegPrf.lean:29-32, :46
 * **Cómo cerrar:** Tras la Etapa 5 de Rosser (T01, T64): mover lo que Rosser consuma y retirar el resto en un commit mecánico con ADR, conservando las medidas de IteSimboloNucleo. De paso, decidir entre dec y decodeForm (T76).
@@ -979,6 +987,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T74 · La capa Derives de FOL: decidir su papel, y los imports muertos de RPP
 
 *Grupo:* FOL · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑16:* 📏 MEDIDO por declaración (ADR‑139, `sondeos/ConoTitulares.lean`): de los 12 ficheros de FOL que RPP importa, ocho no aportan nada al cono del núcleo de los titulares (`Deduction`, `Derives0`, `Eigenvariable`, `Lift0`, `Tactics`, `Theorems.Derived`, `Theorems.Impl` y `Theorems.Neg`); los otros cuatro aportan 48 declaraciones. Quitar esos `import` es el paso 3 de ADR‑139 (propuesto), si el build pasa sin ellos.
 
 * **Qué:** MEDIDO: Derives es Derives₀ más una regla admisible. RPP no usa Derives (0 apariciones), pero importa la capa 14 veces y sólo usa 8 lemas sintácticos de Theorems/Eq y Quantifiers. No hay riesgo de solidez: Derives es sólido y no tiene axiomas.
 * **Evidencia:** ../FOL/FOL/Inconsistencia.lean:71; REFERENCE.md:102

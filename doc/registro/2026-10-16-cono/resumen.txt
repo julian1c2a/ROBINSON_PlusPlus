@@ -1,0 +1,43 @@
+CONO DEL NÚCLEO de los 18 titulares de T_UNIVERSO, por DECLARACIÓN — 2026-10-16, sondeos/ConoTitulares.lean
+(ámbito: lo que el kernel necesita para comprobar los titulares; ver la cabecera del sondeo)
+constantes del proyecto en el cono: 4006
+
+capa | módulos importados | con algo en el cono | líneas de los ficheros | líneas fuera de toda declaración | declaraciones | de elaboración | en el cono | líneas en declaraciones | líneas en el cono
+RPP/Minimal | 2 | 1 | 1909 | 774 | 329 | 6 | 290 (88 %) | 1135 | 1030 (54 % de las del fichero)
+RPP/Full | 3 | 2 | 542 | 220 | 35 | 0 | 2 (6 %) | 322 | 11 (2 % de las del fichero)
+RPP/Meta | 108 | 98 | 50141 | 16976 | 3259 | 9 | 2555 (78 %) | 33165 | 27537 (55 % de las del fichero)
+RPP/raíz | 1 | 0 | 42 | 42 | 0 | 0 | 0 (—) | 0 | 0 (0 % de las del fichero)
+FOL | 12 | 4 | 2840 | 1008 | 193 | 19 | 48 (25 %) | 1832 | 481 (17 % de las del fichero)
+
+módulos importados SIN NADA en el cono (21): [FOL.Deduction, FOL.Derives0, FOL.Eigenvariable, FOL.Lift0, FOL.Tactics, FOL.Theorems.Derived, FOL.Theorems.Impl, FOL.Theorems.Neg, ROBINSON_PlusPlus, ROBINSON_PlusPlus.Full.PrimeFactor, ROBINSON_PlusPlus.Meta, ROBINSON_PlusPlus.Meta.ChainDecode, ROBINSON_PlusPlus.Meta.ChainNegPrf, ROBINSON_PlusPlus.Meta.CodeDecode, ROBINSON_PlusPlus.Meta.CodeDistinct, ROBINSON_PlusPlus.Meta.OmegaReflect, ROBINSON_PlusPlus.Meta.ReflectionPrf, ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf, ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf, ROBINSON_PlusPlus.Meta.VerifierSound, ROBINSON_PlusPlus.Minimal.SymLit]
+
+titular | clase | declaraciones en su cono | líneas
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf | i | 701 | 5070
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf | i | 395 | 2114
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real | i | 2444 | 26880
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint | i | 473 | 2572
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel | i | 2447 | 26987
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf | i | 720 | 5164
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf | i | 2467 | 27089
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski | i | 472 | 2600
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia | — | 620 | 2422
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I | ii | 1055 | 6576
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II | ii | 2802 | 28501
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski | ii | 810 | 4023
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg | iii | 1130 | 7019
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible | iii | 1131 | 7023
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera | iii | 1130 | 7013
+ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera | iii | 891 | 4496
+ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff | iii | 1108 | 6908
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico | iii | 805 | 4010
+
+clase (i), los 8 juntos: 2478 declaraciones, 27158 líneas
+los 18: 2895 declaraciones, 29059 líneas
+lo que sólo piden (ii), (iii) y consistencia: 417 declaraciones, 1901 líneas
+
+controles:
+  (1a) la clase (i) no nombra SolidezPrf: true
+  (1b) consistencia sí la nombra: true
+  (2) nada de Meta/VerifierSound en el cono (6 declaraciones allí): true
+  (3) cada titular está en el cono, en su declaración: true
+  (4) constantes del cono sin declaración a la que asignarlas: 3 [_private.ROBINSON_PlusPlus.Meta.SolidezVerificador.0.PSum.casesOn._arg_pusher, _private.ROBINSON_PlusPlus.Meta.ModeloCodigo.0.PSum.casesOn._arg_pusher, _private.ROBINSON_PlusPlus.Meta.ModeloCodigo.0.PSigma.casesOn._arg_pusher]
