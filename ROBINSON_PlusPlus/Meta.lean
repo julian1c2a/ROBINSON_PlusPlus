@@ -25,6 +25,8 @@ Public API:
     dejan de nombrarla.
   · ✏️ 2026‑10‑17 (ADR‑148): `Meta/RosserW1.lean`, la primera etapa de Rosser (ADR‑146/147): `w1Ax`, W1 con el código
     de los 142 en lugar de `V₀`, sin el modelo, con su `#pureza`.
+  · ✏️ 2026‑10‑17 (ADR‑149): `Meta/RosserPosNum.lean`, la etapa 6 de Rosser: `posNum`, D1 con el testigo en forma de
+    NUMERAL (`prf_proofCode'_numeral`), con su `#pureza`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -147,6 +149,7 @@ import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 import ROBINSON_PlusPlus.Meta.RosserW1
+import ROBINSON_PlusPlus.Meta.RosserPosNum
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived

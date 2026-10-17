@@ -17,7 +17,8 @@ del grafo de imports. Este módulo lo COMPRUEBA en cada `lake build`: si falla, 
 **Qué comprueba.** Para cada titular de la clase (i) de `TEOREMAS-E-HIPOTESIS.md` §1 (`PUROS`), su cierre de
 dependencias no contiene ninguna constante de la SEMÁNTICA. El cierre se recorre por tipos y valores (`allowOpaque`),
 con los constructores de cada inductivo y el inductivo de cada constructor, y sólo por constantes del proyecto: lo de
-Lean no puede nombrar nada de RPP ni de FOL. «De la semántica» se decide por ESPACIO DE NOMBRES y por MÓDULO, no por
+Lean no puede nombrar nada de RPP ni de FOL. Las del fichero en curso cuentan como del proyecto (ADR‑149): sin ellas,
+un `#pureza` al final de un módulo no veía los lemas del propio módulo. «De la semántica» se decide por ESPACIO DE NOMBRES y por MÓDULO, no por
 una lista de nombres: `FOL.Metamath.Semantics` (`FOL/Semantics.lean`: `evalFormula`, `evalTerm`,
 `contextSatisfies`…) y `ROBINSON_PlusPlus.Meta.SolidezPrf` (la solidez de `Prf`). Cuenta también una proyección
 (`Expr.proj`) sobre una estructura de esos dos, que `getUsedConstants` no ve.
@@ -65,10 +66,13 @@ def moduloDe (env : Environment) (n : Name) : Option Name := do
 def esModuloDelProyecto (m : Name) : Bool :=
   (`ROBINSON_PlusPlus).isPrefixOf m || (`FOL).isPrefixOf m || (`TheoryFramework).isPrefixOf m
 
+/-- ¿Es del proyecto? Por el módulo que la define. Las constantes del fichero que se está compilando no tienen módulo
+    de importación (`getModuleIdxFor?` da `none`) y TAMBIÉN cuentan: hasta ADR‑149 se descartaban, y un `#pureza` al
+    final de un módulo no recorría los lemas del propio módulo (medido con un mutante: salía PURO). -/
 def delProyecto (env : Environment) (n : Name) : Bool :=
   match moduloDe env n with
   | some m => esModuloDelProyecto m
-  | none => false
+  | none => env.contains n
 
 /-- ¿Es de la SEMÁNTICA? Por espacio de nombres o por módulo. -/
 def esSemantica (env : Environment) (n : Name) : Bool :=
@@ -170,6 +174,20 @@ syntax (name := purezaDe) "#pureza " ident* " | " ident* : command
   let puros ← stx[1].getArgs.toList.mapM resolver
   let impuros ← stx[3].getArgs.toList.mapM resolver
   comprobar puros impuros
+
+/-! ### El recorrido DENTRO de un módulo, vigilado (ADR‑149)
+
+`#pureza` se usa al final de los módulos de Rosser sobre teoremas del MISMO fichero (ADR‑147). Este par es su control
+positivo: `mutanteLocal` sólo nombra un lema de este fichero, y ese lema llama a `consistencia`, que usa el modelo.
+Si el recorrido dejara de seguir las constantes del fichero en curso, `mutanteLocal` saldría puro y el build no
+compilaría. Visto fallar: antes del arreglo de `delProyecto`, el mismo mutante salía PURO. -/
+
+theorem auxLocalSemantico : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH :=
+  ROBINSON_PlusPlus.Meta.Consistencia.consistencia
+
+theorem mutanteLocal : ROBINSON_PlusPlus.Meta.Hilbert.ConsistentH := auxLocalSemantico
+
+#pureza | mutanteLocal
 
 end ROBINSON_PlusPlus.Meta.PurezaTitulares
 

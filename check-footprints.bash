@@ -277,6 +277,8 @@ ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera|Classical.choice,Quot.so
 ROBINSON_PlusPlus.Meta.RosserW1.w1Ax|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserW1.proofN_axioma|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserW1.not_proofN_zero|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserPosNum.posNum|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-
