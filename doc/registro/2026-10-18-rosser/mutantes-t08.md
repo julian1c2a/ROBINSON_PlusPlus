@@ -1,5 +1,8 @@
 # T08 visto fallar con Rosser: tres mutantes (2026-10-18, ADR-157)
 
+**Last updated:** 2026-10-18 — registro (ADR‑157): la salida de los tres mutantes, tal cual. Lo que dice del árbol es
+de esa fecha; no se actualiza.
+
 **Qué.** `rosser_ext` entra en `PUROS` y `rosser` en `IMPUROS` (`Meta/PurezaTitulares.lean`). Un control reutilizado se
 vuelve a ver fallar: estos tres mutantes TIENEN que hacer fallar a `#pureza`, y lo hacen.
 
