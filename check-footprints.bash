@@ -279,6 +279,12 @@ ROBINSON_PlusPlus.Meta.RosserW1.proofN_axioma|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserW1.not_proofN_zero|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserPosNum.posNum|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_numeral_cons|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_lenc_numeral|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_nthc_numeral|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_numeral|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_runFn_numeral|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_runFn|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-

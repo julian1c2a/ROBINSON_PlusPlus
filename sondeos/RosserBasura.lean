@@ -33,7 +33,8 @@ y el caso del argumento.
 (`prf_crit_In_rejects_open1`) y la forma de pertenencia de `wfAll1` (`prf_isTermCodeE1_of_In`)— más el `∃`‑elim
 (`prf_ex_elim_imp`), el puente `∈ → índice` (`prf_boundedIn_of_In`), y, para el numeral, `carc ⟨k, r⟩‾ = k̄` por
 `prf_cons_eval`. Lo nuevo: `0 ≠ cons a b` en `Prf` (por los axiomas de lista L1/L2) y la congruencia de `carc` en
-`Prf` (la de `PrfH` ya estaba: `PrfH_eq_congr_carc`). A
+`Prf` (la de `PrfH` ya estaba: `PrfH_eq_congr_carc`; ✏️ desde ADR‑150, con la etiqueta de `⟨k, r⟩‾` y
+`prf_cons_evalM`, en el build: `Meta/RosserNumerales.lean`). A
 profundidad 2 (§4): la forma `B1` (`prf_isTermCodeE1_str`); su rama de variable cae por la etiqueta
 (`crit_cOk2_absurd`); la de función da `argsIn`, instanciado en `0` (`PrfH_inst_argsIn`), con `nthc`/`lenc`
 evaluados sobre el numeral (`prf_nthc_c2`, `prf_lenc_c1`, `prf_nthc_zero`), y el `0` cae por §1.
@@ -64,6 +65,7 @@ open ROBINSON_PlusPlus.Meta.BoundedInPrf
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 open ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs
+open ROBINSON_PlusPlus.Meta.RosserNumerales
 
 namespace RosserBasura
 
@@ -102,26 +104,16 @@ theorem prf_neg_hasWit_tag (c : Term) (k : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1)
   exact PrfH.mp _ _ _ (PrfH.mp _ _ _
     (prf_to_prfH (prf_crit_In_rejects_open1 (.var 0) c k hk0 hk1 hcl hck) _) hb) (PrfH_and_elim_left hh)
 
-/-! ## §3 · Sobre un NUMERAL: `⟨k, r⟩‾`, sin hipótesis -/
+/-! ## §3 · Sobre un NUMERAL: `⟨k, r⟩‾`, sin hipótesis
 
-theorem prf_congr_carc {x y : Term} (h : Prf (x =eq y)) : Prf (carc x =eq carc y) := by
-  let f : Formula := Formula.eq (carc (liftTerm 0 x)) (carc (.var 0))
-  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (carc x) (carc s) := by
-    intro s; simp only [f, substFormula, carc, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
-  exact (hS y) ▸ prf_leibniz_subst (A := f) h ((hS x) ▸ prf_refl (carc x))
-
-/-- La etiqueta de un numeral `⟨k, r⟩‾`, en `Prf`: `prf_cons_eval` lo parte en `cons k̄ r̄`. -/
-theorem prf_carc_numeral (k r : Nat) : Prf (carc (numeralM (consN k r)) =eq numeralM k) := by
-  have h1 := ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval k r
-  rw [← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq, ← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq,
-    ← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq] at h1
-  exact prf_eq_trans (prf_congr_carc (prf_eq_symm h1)) (prf_carc_cons _ _)
+✏️ 2026‑10‑17 (ADR‑150): `prf_congr_carc` y la etiqueta de `⟨k, r⟩‾` (aquí se llamaba `prf_carc_numeral`; en el build,
+`prf_carc_consN`) pasaron a `Meta/RosserNumerales.lean`, la etapa 1 de Rosser, y se usan desde allí. -/
 
 /-- 🏁 **Un numeral basura, refutado**: para TODO `k ∉ {0, 1}` y todo `r`, `Prf (¬ hasWit ⟨k, r⟩‾)`. -/
 theorem prf_neg_hasWit_num (k r : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1) :
     Prf (neg (hasWit (numeralM (consN k r)))) :=
   prf_neg_hasWit_tag _ k hk0 hk1 (fun n => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM n _)
-    (prf_carc_numeral k r)
+    (prf_carc_consN k r)
 
 /-! ## §4 · Profundidad 2 (en proyecciones), un caso HEREDITARIO: la basura en la lista de argumentos
 
@@ -132,12 +124,7 @@ etiqueta; la de función da `argsIn w (nthc X 2̄)`, que en el índice `0` pone 
 -- `prf_congr_lenc` y `prf_lt_subst2` son los del árbol (`SinWTs.prf_congr_lenc` en `Meta/CodeWitnessPrf.lean`,
 -- `prf_lt_subst2` en `Meta/BoundedInPrf.lean`), abiertos arriba: la primera redacción los re‑derivaba.
 
-/-- `cons ā b̄ = (consN a b)‾`, con `numeralM`. -/
-theorem prf_cons_evalM (a b : Nat) : Prf (cons (numeralM a) (numeralM b) =eq numeralM (consN a b)) := by
-  have h1 := ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval a b
-  rw [← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq, ← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq,
-    ← ROBINSON_PlusPlus.Meta.CheckArith.numeralM_eq] at h1
-  exact h1
+-- `prf_cons_evalM` (`cons ā b̄ = (consN a b)‾`) está en el build desde ADR‑150: `Meta/RosserNumerales.lean`.
 
 /-- El numeral de `[1, s, [0]]`, partido: `cons 1̄ (cons s̄ (cons A (0̄)))`, con `A = (consN 0 0)‾ = [0]‾`. -/
 theorem prf_parte (s : Nat) :
@@ -173,7 +160,7 @@ theorem prf_neg_hasWit_prof2 (s : Nat) : Prf (neg (hasWit (numeralM (consN 1 (co
     (PrfH_and_elim_right hh)) (PrfH_and_elim_left hh)
   have hB1 := PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_str (.var 0) _) _) hE1
   refine PrfH_or_elim hB1 ?_ ?_
-  · exact PrfH.mp _ _ _ (prf_to_prfH (crit_cOk2_absurd _ 1 0 (by decide) (prf_carc_numeral 1 _) _) _)
+  · exact PrfH.mp _ _ _ (prf_to_prfH (crit_cOk2_absurd _ 1 0 (by decide) (prf_carc_consN 1 _) _) _)
       (PrfH.hyp _ _ (List.Mem.head _))
   · have h2 : PrfH (cOk (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))
         (funcOkT1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))) ::
