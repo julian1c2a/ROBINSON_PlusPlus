@@ -31,6 +31,8 @@ Public API:
     (descomponer, `carc`/`cdrc`/`lenc`/`nthc`, los constructores de código, `In` y `runFn` decididos), con su `#pureza`.
   · ✏️ 2026‑10‑17 (ADR‑152): `Meta/RosserNumEval.lean`, la etapa 2 de Rosser: `substtc`/`liftc`/`substfc`/`liftfc`
     evaluados sobre numerales con las guardas verdaderas (`prf_substfc_guarda`), con su `#pureza`.
+  · ✏️ 2026‑10‑17 (ADR‑153): `Meta/RosserGuardNeg.lean`, la etapa 3 de Rosser: la guarda FALSA se refuta
+    (`prf_neg_hasWit`, `prf_neg_hasWitF`), y decidida (`hasWit_decide`), con su `#pureza`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -156,6 +158,7 @@ import ROBINSON_PlusPlus.Meta.RosserW1
 import ROBINSON_PlusPlus.Meta.RosserPosNum
 import ROBINSON_PlusPlus.Meta.RosserNumerales
 import ROBINSON_PlusPlus.Meta.RosserNumEval
+import ROBINSON_PlusPlus.Meta.RosserGuardNeg
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived

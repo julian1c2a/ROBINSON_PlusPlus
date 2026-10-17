@@ -291,6 +291,12 @@ ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_numeral|Classical.choice,Quot.s
 ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftfc_numeral|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumEval.codF_of_hasWitFN|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_guarda|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_of_codT|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitFN_of_codF|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserGuardNeg.codT_or_rejT|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserGuardNeg.codF_or_rejF|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserGuardNeg.prf_neg_hasWit|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserGuardNeg.prf_neg_hasWitF|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-
