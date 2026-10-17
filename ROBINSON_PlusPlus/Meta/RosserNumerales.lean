@@ -249,7 +249,12 @@ theorem prf_not_In_runFn {y p : Nat} (hl : ∀ x, memN x p → x ≠ 0) (h : ¬ 
 
 /-! ## §6 · Control: la capa DECIDE `In` sobre numerales -/
 
-/-- ✅ Para todo par de numerales, `Prf` prueba la pertenencia o la refuta. -/
+/-- La pertenencia en ℕ es decidible, sin lógica clásica. Sin esta instancia, `by_cases` sobre `memN` no encuentra una
+    (`memN` no es reducible) y cae en `Classical.propDecidable`: así dependía `prf_In_decide` de `Classical.choice`,
+    medido en ADR‑154 y arreglado en ADR‑155. -/
+instance decMemN (y l : Nat) : Decidable (memN y l) := List.instDecidableMemOfLawfulBEq y (decodeL l)
+
+/-- ✅ Para todo par de numerales, `Prf` prueba la pertenencia o la refuta (sin lógica clásica). -/
 theorem prf_In_decide (y l : Nat) :
     Or (Prf (In (numeralM y) (numeralM l))) (Prf (neg (In (numeralM y) (numeralM l)))) := by
   by_cases h : memN y l
@@ -264,6 +269,7 @@ end ROBINSON_PlusPlus.Meta.RosserNumerales
 #print axioms ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_numeral
 #print axioms ROBINSON_PlusPlus.Meta.RosserNumerales.prf_runFn_numeral
 #print axioms ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_runFn
+#print axioms ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_decide
 
 /-! T08 en el módulo (ADR‑147, con el recorrido de ADR‑149): lo de esta etapa no nombra la semántica; `ev_numeralM`, el
     valor de un numeral en el modelo, sí. -/

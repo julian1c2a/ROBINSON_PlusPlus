@@ -285,6 +285,7 @@ ROBINSON_PlusPlus.Meta.RosserNumerales.prf_nthc_numeral|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_numeral|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumerales.prf_runFn_numeral|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_runFn|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_decide|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substtc_numeral|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftc_numeral|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_numeral|Classical.choice,Quot.sound,propext

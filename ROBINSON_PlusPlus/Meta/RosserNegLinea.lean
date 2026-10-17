@@ -262,9 +262,6 @@ theorem prf_not_In_axiomsCodeT {y : Nat} (h : ¬ memN y Vax) :
   exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_In_numeral h) _)
     (PrfH_eq_subst_in (prf_to_prfH hA _) (prfH_hyp_self _))
 
-/-- La pertenencia en ℕ es decidible (sin lógica clásica). -/
-instance decMemN (y l : Nat) : Decidable (memN y l) := List.instDecidableMemOfLawfulBEq y (decodeL l)
-
 /-- La conclusión de una línea, comparada en ℕ con la reconstrucción evaluada. -/
 theorem dec_concl {x : Nat} (hx : x ≠ 0) {R : Term} {r : Nat} (hR : Prf (R =eq numeralM r)) :
     Or (carN x = r) (Prf ((carc (numeralM x) =eq R) ⇒ Formula.bottom)) := by
