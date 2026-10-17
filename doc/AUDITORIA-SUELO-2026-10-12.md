@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-16 — ADR‑146: el plan de NegNum y PosNum, versionado (T01, T64, T66, T75). Antes, el mismo día — ADR‑145: las decisiones sobre ADR‑144 (T01, T62 cerrado). Antes, el mismo día — ADR‑144: T62, el ADR de diseño (propuesto). Antes, el mismo día — ADR‑143: T08 hecho. Antes, el mismo día — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-17 — ADR‑147: las decisiones sobre ADR‑146 (T01, T64, T66, T75). Antes, 2026-10-16 — ADR‑146: el plan de NegNum y PosNum, versionado (T01, T64, T66, T75). Antes, el mismo día — ADR‑145: las decisiones sobre ADR‑144 (T01, T62 cerrado). Antes, el mismo día — ADR‑144: T62, el ADR de diseño (propuesto). Antes, el mismo día — ADR‑143: T08 hecho. Antes, el mismo día — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -67,6 +67,11 @@
 * **T01 y T62:** Rosser por REDUCCIÓN (R): el cálculo de T+E es `PrfH E` y su predicado de prueba, el de T delante de `impChain`. Sustituye al verificador parametrizado de ADR‑137 §1; el enunciado sigue. T62 se cierra.
 * **Si alguna vez hace falta un verificador con parámetro:** V‑B, el aditivo, no V‑A.
 * **Las variantes de reglas** (Q++, PA, HA): aplazadas.
+
+**Decididas el 2026‑10‑16, por la noche** ([ADR‑147](../DECISIONS.md), sobre ADR‑146; registradas el 2026‑10‑17):
+* **T01:** el orden de ADR‑146 §4, con el sondeo de `hasWitF` justo después de la capa de listas (T64).
+* **Dónde vive el código:** en el build, un módulo por etapa, con un `#pureza` de sus resultados al final.
+* **T66:** se decide al final de NegNum, midiendo con el cono qué usó.
 
 **Las preguntas, tal como se entregaron el 2026‑10‑12:**
 
@@ -161,6 +166,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T01 · Rosser: decidir un enunciado con contenido antes de pagarlo (no «sólo ConsistentH» sobre T fija) y versionar el plan
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* confirmado (verificador de vacuidad, P0), con su corrección. Incorpora la corrección de CRI-02 (del crítico, confirmado, P1), que se aplica dentro de la opción (a)
+
+*Estado el 2026‑10‑17:* 🟢 **El plan, decidido (ADR‑147):** el orden de ADR‑146 §4, en el build con un `#pureza` por módulo. Lo siguiente, W1(ax).
 
 *Estado el 2026‑10‑16 (noche):* 🟡 **El plan, versionado: ADR‑146** (el diseño de NegNum y PosNum por la ruta sintáctica, con su medición de pureza y el orden); era lo que pedía «versionar el plan». Decide el propietario el orden y dónde vive el código.
 
@@ -928,6 +935,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* sin segunda verificación
 
+*Estado el 2026‑10‑17:* 🟢 Decidido en ADR‑147: el sondeo de `hasWitF` va justo después de la capa de listas, antes de NumEval y NegLineWF.
+
 *Estado el 2026‑10‑16:* 🟡 En ADR‑146: la Etapa 0 que queda se absorbe en las etapas 1 y 3 (la hereditaria general de `hasWit`, todo `hasWitF`, la línea q1 basura), con un sondeo de `hasWitF` justo después de la capa de listas, por el riesgo.
 
 * **Qué:** MEDIDO: faltan la refutación hereditaria general ([0]‾, [1, s]‾), hasWitF sobre numerales y una línea q1 basura (NEXT-STEPS.md:26-28). Sus precedentes no compilan, y los de q1, anteriores a las guardas, tienen el signo contrario. MEDIDO: los numerales son unarios y los códigos astronómicos; EV_TOK vigila por nombres, así que una sentencia R con nombre propio quedaría fuera.
@@ -938,6 +947,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T66 · Retirar el subárbol sin consumidor (CodeDecode→…→ChainNegPrf) cuando Rosser decida qué hereda
 
 *Grupo:* Fundamentos y ruta matemática · *Verificación:* sin segunda verificación
+
+*Estado el 2026‑10‑17:* 🟢 Decidido en ADR‑147: al final de NegNum, midiendo con el cono qué usó.
 
 *Estado el 2026‑10‑16:* ADR‑146 propone decidirlo al FINAL de NegNum, midiendo con el cono qué usó; las 21 `prf_lenc_<tag>`, `prf_lineTag_cons` y `prf_boundedPremsIn_of_chainOk` de `ChainNegPrf` se reutilizan en su sitio.
 
@@ -1034,6 +1045,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T75 · Los resultados semánticos para todo `Estandar M`: control `control_ancla`, W1 paramétrico en V y un segundo modelo estándar
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* del crítico (CRI-01), verificado: exagerado → P3, fundido con RUT-03 (antes T63), RUT-18 (antes T65) y RUT-20
+
+*Estado el 2026‑10‑17:* 🟢 W1(ax), la primera etapa del plan, decidida en ADR‑147.
 
 *Estado el 2026‑10‑16:* (c) W1(V), en ADR‑146: medido que W1 sólo es impuro por `linea_thy ⟶ V₀_eq_codigo`; su versión con `codeNatList axioms` es la primera etapa del plan.
 
