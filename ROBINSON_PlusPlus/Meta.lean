@@ -23,6 +23,8 @@ Public API:
   · ✏️ 2026‑10‑16 (ADR‑143, T08): `Meta/PurezaTitulares.lean`, el CONTROL de pureza: el build FALLA si el cierre de un
     titular de la clase (i) nombra la semántica (`FOL.Metamath.Semantics`, `Meta.SolidezPrf`), o si `goedel_I` y `tarski`
     dejan de nombrarla.
+  · ✏️ 2026‑10‑17 (ADR‑148): `Meta/RosserW1.lean`, la primera etapa de Rosser (ADR‑146/147): `w1Ax`, W1 con el código
+    de los 142 en lugar de `V₀`, sin el modelo, con su `#pureza`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -144,6 +146,7 @@ import ROBINSON_PlusPlus.Meta.Consistencia
 import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
+import ROBINSON_PlusPlus.Meta.RosserW1
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived

@@ -1,6 +1,6 @@
 # Auditoría del suelo — 2026‑10‑12
 
-**Last updated:** 2026-10-17 — ADR‑147: las decisiones sobre ADR‑146 (T01, T64, T66, T75). Antes, 2026-10-16 — ADR‑146: el plan de NegNum y PosNum, versionado (T01, T64, T66, T75). Antes, el mismo día — ADR‑145: las decisiones sobre ADR‑144 (T01, T62 cerrado). Antes, el mismo día — ADR‑144: T62, el ADR de diseño (propuesto). Antes, el mismo día — ADR‑143: T08 hecho. Antes, el mismo día — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
+**Last updated:** 2026-10-17 — ADR‑148: W1(ax) hecho (T01, T75). Antes, el mismo día — ADR‑147: las decisiones sobre ADR‑146 (T01, T64, T66, T75). Antes, 2026-10-16 — ADR‑146: el plan de NegNum y PosNum, versionado (T01, T64, T66, T75). Antes, el mismo día — ADR‑145: las decisiones sobre ADR‑144 (T01, T62 cerrado). Antes, el mismo día — ADR‑144: T62, el ADR de diseño (propuesto). Antes, el mismo día — ADR‑143: T08 hecho. Antes, el mismo día — ADR‑142: T33, T36 y T54 hechos (la historia, a doc/historia/). Antes, el mismo día — ADR‑141: T06 hecho y T10 en su política (los sondeos). Antes, el mismo día — ADR‑140: las decisiones del día (arquitectura, línea de llegada, variantes; ADR‑139 aprobado en sus pasos 1 y 2; T62, T69 y T70). Antes, el mismo día — ADR‑138 (la excepción de T49) y ADR‑139 (propuesto: T06, T10, T33, T66 y T74, con el cono medido). Antes, 2026-10-14 — T01 decidido: (a‑ii) + T08 (ADR‑137). Antes, el mismo día — las decisiones del propietario del día y T14 en RPP (ADR‑136). Antes, el mismo día — T09 hecho (ADR‑135). Antes, el mismo día — T02 hecho (ADR‑134), con su revisión adversarial y los comentarios de los `.lean` al día: T31 hecho; y lo que tocó de T05, T10, T25, T27, T28, T29 y T32, en sus entradas. Antes, 2026-10-12 — la lista completa de la auditoría «suelo firme»: 81 trabajos (4 P0, 7 P1, 51 P2, 19 P3), con su evidencia y cómo cerrar cada uno (ADR‑132).
 
 > **La pregunta del propietario** (2026‑10‑05): *«¿Qué trabajos nos quedan a partir de aquí? Con la misma filosofía de no dejar pasar cuestiones de medida, de fundamentos, tareas 'underground' etc. aunque no sean inmediatas, pero que dejen un suelo muy firme»*.
 
@@ -166,6 +166,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T01 · Rosser: decidir un enunciado con contenido antes de pagarlo (no «sólo ConsistentH» sobre T fija) y versionar el plan
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* confirmado (verificador de vacuidad, P0), con su corrección. Incorpora la corrección de CRI-02 (del crítico, confirmado, P1), que se aplica dentro de la opción (a)
+
+*Estado el 2026‑10‑17 (tarde):* 🟢 **W1(ax), la primera etapa, hecha (ADR‑148):** `w1Ax` en `Meta/RosserW1.lean`, puro por su `#pureza`. Lo siguiente, PosNum.
 
 *Estado el 2026‑10‑17:* 🟢 **El plan, decidido (ADR‑147):** el orden de ADR‑146 §4, en el build con un `#pureza` por módulo. Lo siguiente, W1(ax).
 
@@ -1045,6 +1047,8 @@ Lo que hay que medir antes de decidir algo. Ningún agente lo compiló; lo compi
 #### T75 · Los resultados semánticos para todo `Estandar M`: control `control_ancla`, W1 paramétrico en V y un segundo modelo estándar
 
 *Grupo:* Rosser y la vacuidad de los enunciados · *Verificación:* del crítico (CRI-01), verificado: exagerado → P3, fundido con RUT-03 (antes T63), RUT-18 (antes T65) y RUT-20
+
+*Estado el 2026‑10‑17 (tarde):* ✅ (c) **W1 paramétrico en V, HECHO (ADR‑148):** la cadena de W1 vale para todo `V` con la hipótesis sobre `memN` (`Bueno V`); `verificador_solido` es la instancia en `V₀`, y `w1Ax` la del código de los 142, cuyo cierre no contiene `prf_sound` (T08, su `#pureza`). Quedan (a) `tarski_semantico` para todo `Estandar M`, (b) `control_ancla`, (d) el segundo modelo y (e), opcional.
 
 *Estado el 2026‑10‑17:* 🟢 W1(ax), la primera etapa del plan, decidida en ADR‑147.
 

@@ -24,8 +24,10 @@ solidez de `Prf` en el modelo estándar (aplicada también a fórmulas que no so
 * **§3 · La sustitución y el lift CONMUTAN con él, para TODO número** (`dec_substfc`, `dec_liftfc`, y los de
   término), por inducción fuerte sobre el número.
 * **§4 · W1**: cada una de las 21 reglas, decodificada, es una instancia de un constructor de `Prf` (`linea_*`); la
-  regla `thy` pide `V₀_eq_codigo` (en el modelo, `axiomsCodeT` es el código de los 142), y `mp`/`gen` el invariante
-  de la cadena (`Bueno`: todo lo acumulado es teorema).
+  regla `thy` pide que lo que haya en `V` sea teorema (`Bueno V`), y `mp`/`gen` el invariante de la cadena (`Bueno`:
+  todo lo acumulado es teorema). La cadena es PARAMÉTRICA en `V` (ADR‑148): `bueno_codeNatList` da `Bueno` para el
+  código de los 142 sin el modelo —lo usa `w1Ax`, `Meta/RosserW1.lean`—, y `bueno_V₀` para `V₀`, por `V₀_eq_codigo`,
+  que es la solidez.
 * **§5 · `⊬ ¬G`**, y `modelo_prov_iff`: `MNV V₀ ⊨ Prov(⌜φ⌝) ↔ Prf φ` —la ida es W1, la vuelta D1 y la solidez—,
   que es también el control de vacuidad de W1.
 * **§6 · E10**: `godelCN_verdadera` y `con_verdadera` — `G` y `Con` son VERDADERAS en `MNV V₀` (y no demostrables).
@@ -423,49 +425,46 @@ theorem decT_TCONS : decT TCONS = cons (Term.var 1) (Term.var 0) := decT_codeNat
 local macro "decodifica" : tactic => `(tactic| simp only [dec_impl, dec_and, dec_or, dec_bot, dec_eq,
     dec_forall, dec_ex, dec_substfc, dec_liftfc, decT_TC0, decT_TCS, decT_TNIL, decT_TCONS])
 
-variable {x : Nat}
+variable {V x : Nat}
 
-theorem linea_p1 (hT : lineWFT V₀ 0 x) : Prf (dec (carN x)) := by
+theorem linea_p1 (hT : lineWFT V 0 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.p1 _ _)
-theorem linea_p2 (hT : lineWFT V₀ 1 x) : Prf (dec (carN x)) := by
+theorem linea_p2 (hT : lineWFT V 1 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.p2 _ _ _)
-theorem linea_c1 (hT : lineWFT V₀ 2 x) : Prf (dec (carN x)) := by
+theorem linea_c1 (hT : lineWFT V 2 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.c1 _ _)
-theorem linea_c2 (hT : lineWFT V₀ 3 x) : Prf (dec (carN x)) := by
+theorem linea_c2 (hT : lineWFT V 3 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.c2 _ _)
-theorem linea_c3 (hT : lineWFT V₀ 4 x) : Prf (dec (carN x)) := by
+theorem linea_c3 (hT : lineWFT V 4 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.c3 _ _)
-theorem linea_j1 (hT : lineWFT V₀ 5 x) : Prf (dec (carN x)) := by
+theorem linea_j1 (hT : lineWFT V 5 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.j1 _ _)
-theorem linea_j2 (hT : lineWFT V₀ 6 x) : Prf (dec (carN x)) := by
+theorem linea_j2 (hT : lineWFT V 6 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.j2 _ _)
-theorem linea_j3 (hT : lineWFT V₀ 7 x) : Prf (dec (carN x)) := by
+theorem linea_j3 (hT : lineWFT V 7 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.j3 _ _ _)
-theorem linea_efq (hT : lineWFT V₀ 8 x) : Prf (dec (carN x)) := by
+theorem linea_efq (hT : lineWFT V 8 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.efq _)
-theorem linea_q1 (hT : lineWFT V₀ 9 x) : Prf (dec (carN x)) := by
+theorem linea_q1 (hT : lineWFT V 9 x) : Prf (dec (carN x)) := by
   rw [hT.2.2.2]; decodifica; exact Prf.incl (Prfᵢ.q1 _ _)
-theorem linea_q2 (hT : lineWFT V₀ 10 x) : Prf (dec (carN x)) := by
+theorem linea_q2 (hT : lineWFT V 10 x) : Prf (dec (carN x)) := by
   rw [hT.2.2.2]; decodifica; exact Prf.incl (Prfᵢ.q2 _ _)
-theorem linea_q3 (hT : lineWFT V₀ 11 x) : Prf (dec (carN x)) := by
+theorem linea_q3 (hT : lineWFT V 11 x) : Prf (dec (carN x)) := by
   rw [hT.2.2]; decodifica; exact Prf.incl (Prfᵢ.q3 _ _)
-theorem linea_eqrefl (hT : lineWFT V₀ 12 x) : Prf (dec (carN x)) := by
+theorem linea_eqrefl (hT : lineWFT V 12 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.incl (Prfᵢ.eqrefl _)
-theorem linea_leibniz (hT : lineWFT V₀ 13 x) : Prf (dec (carN x)) := by
+theorem linea_leibniz (hT : lineWFT V 13 x) : Prf (dec (carN x)) := by
   rw [hT.2.2.2.2]; decodifica; exact Prf.incl (Prfᵢ.leibniz _ _ _)
-theorem linea_p3 (hT : lineWFT V₀ 14 x) : Prf (dec (carN x)) := by
+theorem linea_p3 (hT : lineWFT V 14 x) : Prf (dec (carN x)) := by
   rw [hT.2]; decodifica; exact Prf.p3 _
-theorem linea_thy (hT : lineWFT V₀ 15 x) : Prf (dec (carN x)) := by
-  have hm : memN (carN x) V₀ := hT.2
-  rw [ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo] at hm
-  obtain ⟨a, ha, e⟩ := memN_codeNatList axioms (carN x) hm
-  rw [e, dec_codeNat]
-  exact Prf.incl (Prfᵢ.thy a ha)
-theorem linea_ind (hT : lineWFT V₀ 18 x) : Prf (dec (carN x)) := by
+/-- La regla `thy`: la línea cita un miembro de `V`; si todo `V` es teorema (`Bueno V`), lo es. (Hasta ADR‑148 sólo
+    valía para `V₀`, y pasaba por `V₀_eq_codigo`, que es la solidez: ahora eso lo hace `bueno_V₀`.) -/
+theorem linea_thy (hV : Bueno V) (hT : lineWFT V 15 x) : Prf (dec (carN x)) := hV _ hT.2
+theorem linea_ind (hT : lineWFT V 18 x) : Prf (dec (carN x)) := by
   rw [hT.2.2]; decodifica; exact Prf.ind _
-theorem linea_qconf (hT : lineWFT V₀ 19 x) : Prf (dec (carN x)) := by
+theorem linea_qconf (hT : lineWFT V 19 x) : Prf (dec (carN x)) := by
   rw [hT.2.2]; decodifica; exact Prf.qconf _ _
-theorem linea_listInd (hT : lineWFT V₀ 20 x) : Prf (dec (carN x)) := by
+theorem linea_listInd (hT : lineWFT V 20 x) : Prf (dec (carN x)) := by
   rw [hT.2.2]; decodifica; exact Prf.listInd _
 
 theorem linea_mp {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nthN x 1 = 16) :
@@ -481,7 +480,7 @@ theorem linea_mp {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nth
   exact Prf.mp _ _ hAB hA
 
 theorem linea_gen {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nthN x 1 = 17)
-    (hT : lineWFT V₀ 17 x) : Prf (dec (carN x)) := by
+    (hT : lineWFT V 17 x) : Prf (dec (carN x)) := by
   have e : premsOfN x = consN (nthN x 2) 0 := by
     rw [premsOfN, if_neg (by rw [hk]; decide), if_pos hk]
   rw [e] at hp
@@ -489,8 +488,8 @@ theorem linea_gen {c : Nat} (hc : Bueno c) (hp : allInN c (premsOfN x)) (hk : nt
   rw [hT.2, dec_forall]
   exact Prf.gen _ hA
 
-theorem linea_buena (c : Nat) (hc : Bueno c) (hp : allInN c (premsOfN x)) :
-    ∀ K, nthN x 1 = K → K < 21 → lineWFT V₀ K x → Prf (dec (carN x))
+theorem linea_buena (hV : Bueno V) (c : Nat) (hc : Bueno c) (hp : allInN c (premsOfN x)) :
+    ∀ K, nthN x 1 = K → K < 21 → lineWFT V K x → Prf (dec (carN x))
   | 0, _, _, hT => linea_p1 hT
   | 1, _, _, hT => linea_p2 hT
   | 2, _, _, hT => linea_c1 hT
@@ -506,7 +505,7 @@ theorem linea_buena (c : Nat) (hc : Bueno c) (hp : allInN c (premsOfN x)) :
   | 12, _, _, hT => linea_eqrefl hT
   | 13, _, _, hT => linea_leibniz hT
   | 14, _, _, hT => linea_p3 hT
-  | 15, _, _, hT => linea_thy hT
+  | 15, _, _, hT => linea_thy hV hT
   | 16, hk, _, _ => linea_mp hc hp hk
   | 17, hk, _, hT => linea_gen hc hp hk hT
   | 18, _, _, hT => linea_ind hT
@@ -514,15 +513,28 @@ theorem linea_buena (c : Nat) (hc : Bueno c) (hp : allInN c (premsOfN x)) :
   | 20, _, _, hT => linea_listInd hT
   | n + 21, _, hlt, _ => absurd hlt (by omega)
 
-theorem cadena_buena : ∀ (l : List Nat) (c : Nat), Bueno c → chainOkL V₀ c l → Bueno (runFnL c l)
+theorem cadena_buena (hV : Bueno V) : ∀ (l : List Nat) (c : Nat), Bueno c → chainOkL V c l → Bueno (runFnL c l)
   | [], _, hc, _ => hc
   | x :: r, c, hc, h =>
-    cadena_buena r _ (bueno_snoc hc (linea_buena c hc h.1.2 (nthN x 1) rfl h.1.1.1 h.1.1.2)) h.2
+    cadena_buena hV r _ (bueno_snoc hc (linea_buena hV c hc h.1.2 (nthN x 1) rfl h.1.1.1 h.1.1.2)) h.2
+
+/-- El código de los 142 es `Bueno`: cada miembro, decodificado, es un axioma. Sin el modelo. -/
+theorem bueno_codeNatList : Bueno (codeNatList axioms) := by
+  intro y hy
+  obtain ⟨a, ha, e⟩ := memN_codeNatList axioms y hy
+  rw [e, dec_codeNat]
+  exact Prf.incl (Prfᵢ.thy a ha)
+
+/-- `V₀`, el valor de `axiomsCodeT` en el modelo, es `Bueno`: es el código de los 142 por `V₀_eq_codigo`, que se
+    prueba con la solidez. Es el ÚNICO paso de W1 por el modelo. -/
+theorem bueno_V₀ : Bueno V₀ := by
+  rw [ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo]
+  exact bueno_codeNatList
 
 /-- 🏁 **W1**: si `MNV V₀` cree que la cadena `p` es una prueba, todo lo que concluye, decodificado, es teorema
     de `Prf`. -/
 theorem verificador_solido {p y : Nat} (h : chainOkN V₀ 0 p) (hy : memN y (runFnN 0 p)) : Prf (dec y) :=
-  cadena_buena (decodeL p) 0 bueno_zero h y hy
+  cadena_buena bueno_V₀ (decodeL p) 0 bueno_zero h y hy
 
 /-! ## §5 · ⊬ ¬G: Gödel I, la otra mitad, por la solidez del verificador en el modelo -/
 
