@@ -35,6 +35,8 @@ Public API:
     (`prf_neg_hasWit`, `prf_neg_hasWitF`), y decidida (`hasWit_decide`), con su `#pureza`.
   · ✏️ 2026‑10‑17 (ADR‑154): `Meta/RosserNegLinea.lean`, la etapa 4 de Rosser: la línea mala se refuta
     (`prf_neg_lineWF`), y la buena formación de una línea queda decidida (`lineWF_decide`), con su `#pureza`.
+  · ✏️ 2026‑10‑17 (ADR‑156): `Meta/RosserNegNum.lean`, la etapa 5 de Rosser: el predicado de prueba de T, decidido
+    sobre numerales (`proofN_decide`, `negNum`), y NegNum′ con W1(ax) (`negNum'`, `negNum_formCode`), con su `#pureza`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -162,6 +164,7 @@ import ROBINSON_PlusPlus.Meta.RosserNumerales
 import ROBINSON_PlusPlus.Meta.RosserNumEval
 import ROBINSON_PlusPlus.Meta.RosserGuardNeg
 import ROBINSON_PlusPlus.Meta.RosserNegLinea
+import ROBINSON_PlusPlus.Meta.RosserNegNum
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived
