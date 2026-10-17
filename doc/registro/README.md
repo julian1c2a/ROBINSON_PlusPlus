@@ -1,6 +1,6 @@
 # Registro: artefactos rescatados al árbol
 
-**Last updated:** 2026-10-16 — ADR‑146: la carpeta del inventario de NegNum y PosNum. Antes, el mismo día — ADR‑144: la carpeta del alcance de T62. Antes, el mismo día — ADR‑141: el runner `scripts/sondeos_todos.ps1`, sustituido y retirado. Antes, el mismo día — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
+**Last updated:** 2026-10-18 — ADR‑157: la carpeta de Rosser (los mutantes de T08 y la salida de `sondeos/InduccionTitulares.lean` con los dos titulares nuevos). Antes, 2026-10-16 — ADR‑146: la carpeta del inventario de NegNum y PosNum. Antes, el mismo día — ADR‑144: la carpeta del alcance de T62. Antes, el mismo día — ADR‑141: el runner `scripts/sondeos_todos.ps1`, sustituido y retirado. Antes, el mismo día — la carpeta del cono de los titulares (ADR‑139). Antes, 2026-10-14 — las carpetas de T02 (ADR‑134), T09 (ADR‑135) y el informe de T01 (ADR‑136). Antes, 2026-10-12 — creado con ADR‑132 (T00 de `doc/AUDITORIA-SUELO-2026-10-12.md`): lo que sólo vivía en el
 directorio temporal de la sesión o en la carpeta de la sesión, fuera de git.
 
 **Por qué.** Varias afirmaciones de los ADR («37 de 90 sondeos compilan», «revisión adversarial aplicada», la crítica
@@ -41,6 +41,7 @@ cierto. Lo vigente está en `DECISIONS.md`, `NEXT-STEPS.md` y `doc/AUDITORIA-SUE
 | `2026-10-16-cono/` | la salida de `sondeos/ConoTitulares.lean`: `resumen.txt` (por capa, por titular, la clase (i) frente al total, y los controles), `por-modulo.csv` y `fuera-del-cono.txt` (las 921 declaraciones fuera del cono, 776 de RPP y 145 de FOL, con su rango de líneas) | el sondeo (2026‑10‑16) | ADR‑139 |
 | `2026-10-16-t62-alcance/` | la medición de alcance de T62: `resumen.txt` y `usuarios-G*.txt` (del término elaborado, `sondeos/AlcanceT62.lean`) y `textual.txt` (del fuente, `scripts/alcance_t62.bash`) | el sondeo y el guion (2026‑10‑16) | ADR‑144 |
 | `2026-10-16-negnum-posnum/` | el inventario de NegNum y PosNum: `pureza.txt` (las piezas, PURAS o IMPURAS por T08, de `sondeos/InventarioRosser.lean`) y tres inventarios de agentes de sólo lectura, condensados (`inventario-plan.md`, `inventario-posnum.md`, `inventario-negnum.md`), con su `README.md` | el sondeo y tres agentes (2026‑10‑16) | ADR‑146 |
+| `2026-10-18-rosser/` | Rosser (ADR‑157): `mutantes-t08.md` y `MutanteRosser.lean.txt` (tres mutantes que hacen fallar a T08, uno que nombra `prf_sound`, la raíz de la ruta de `RosserReflexion`; y el primer intento, que no compilaba y salía PURO), y `sondeo-induccion-modelo-2026-10-18.txt` (la salida de `sondeos/InduccionTitulares.lean` con `rosser_ext` y `rosser`: `#induccion`, `#modelo` y tres `#camino`) | esta sesión (2026‑10‑18) | ADR‑157 §3 y §4; `TEOREMAS-E-HIPOTESIS.md` §1; `AXIOMS.md` §0.3 |
 
 Fuera de esta carpeta, rescatado en el mismo commit:
 

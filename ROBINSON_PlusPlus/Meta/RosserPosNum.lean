@@ -5,7 +5,7 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Representability2Prf
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
-import ROBINSON_PlusPlus.Meta.PurezaTitulares
+import ROBINSON_PlusPlus.Meta.PurezaComando
 
 /-!
 # `Meta/RosserPosNum.lean` — Rosser, etapa 6: PosNum (ADR‑146, ADR‑147, ADR‑149)

@@ -309,6 +309,14 @@ ROBINSON_PlusPlus.Meta.RosserNegNum.proofN_decide|Classical.choice,Quot.sound,pr
 ROBINSON_PlusPlus.Meta.RosserNegNum.negNum|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RosserNegNum.prf_neg_lineOk_prem|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Rosser.prfH_iff_prf_impChain|propext
+ROBINSON_PlusPlus.Meta.Rosser.formCode_impChain|-
+ROBINSON_PlusPlus.Meta.Rosser.posNumE|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Rosser.negNumE|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Rosser.R_isSentence|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Rosser.rosser_red|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Rosser.rosser|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-

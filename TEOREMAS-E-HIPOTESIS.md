@@ -1,23 +1,23 @@
 # TEOREMAS CABECERA — y **quién descarga cada hipótesis** (P‑2)
 
-> ## ESTADO REAL — 2026‑10‑17 · `master` · **137 jobs · 120 módulos · 0 sorry · 0 `axiom` de Lean**
+> ## ESTADO REAL — 2026‑10‑18 · `master` · **139 jobs · 122 módulos · 0 sorry · 0 `axiom` de Lean**
 >
-> 🏁🏁 **Gödel I entero, Gödel II y Tarski, SIN HIPÓTESIS** (ADR‑120, ADR‑121): `goedel_I : ¬ Prf godelCN`,
-> `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'` y `tarski`. Van sobre `Prf`, cuya teoría,
-> `T_Prf`, contiene a PA, por lectura ([AXIOMS.md](AXIOMS.md) §0). `ConsistentH` es un TEOREMA, `consistencia` (un modelo de los 142
-> y la solidez de `Prf`), y lo único que se supone es el núcleo de Lean y sus tres axiomas. ⬜ Rosser no existe: su
-> enunciado se decidió en ADR‑137 (T01) y su construcción en ADR‑145: por REDUCCIÓN, T+E es `PrfH E` (ADR‑144), con T08
-> como criterio de aceptación.
+> 🏁🏁 **Gödel I entero, Gödel II, Tarski y Rosser, SIN HIPÓTESIS** (ADR‑120, ADR‑121, ADR‑157): `goedel_I : ¬ Prf
+> godelCN`, `goedel_I_neg : ¬ Prf ¬godelCN`, `goedel_II : ¬ Prf consistencyFormula'`, `tarski` y `rosser : ¬ Prf R ∧
+> ¬ Prf ¬R`. Van sobre `Prf`, cuya teoría, `T_Prf`, contiene a PA, por lectura ([AXIOMS.md](AXIOMS.md) §0). `ConsistentH`
+> es un TEOREMA, `consistencia` (un modelo de los 142 y la solidez de `Prf`), y lo único que se supone es el núcleo de
+> Lean y sus tres axiomas. 🏁 Rosser vale además para toda extensión finita T+E consistente (`rosser_ext`, ADR‑157), por
+> REDUCCIÓN a T (ADR‑144/145: T+E es `PrfH E`), y es de la clase (i): su prueba no usa el modelo, y T08 lo comprueba.
 >
 > ✏️ *(2026‑10‑16, ADR‑138)* «Sin hipótesis» quiere decir DENTRO de Lean: la consistencia que da `consistencia` es
 > RELATIVA a Lean (PRA ⊢ Con(Lean) → Con(T_Prf)), y no puede ser absoluta (§4).
 >
 > La columna «¿qué usa la prueba?» de §1 está MEDIDA (`sondeos/InduccionTitulares.lean`, `#modelo`, 2026‑10‑14), y la clase (i)
-> la COMPRUEBA cada build desde ADR‑143 (`Meta/PurezaTitulares.lean`, T08): si uno de sus 8 titulares nombra la semántica,
+> la COMPRUEBA cada build desde ADR‑143 (`Meta/PurezaTitulares.lean`, T08): si uno de sus 9 titulares nombra la semántica,
 > el build no compila.
 
 **Creado:** 2026‑09‑11 · **Autor:** Julián Calderón Almendros
-**Last updated:** 2026-10-17 — ADR‑156: el banner, a 137 jobs y 120 módulos (`Meta/RosserNegNum.lean`); la fila de Rosser, con NegNum hecho. Antes, el mismo día — ADR‑154: el banner, a 136 jobs y 119 módulos (`Meta/RosserNegLinea.lean`); la fila de Rosser, con NegLineWF hecho. Antes, el mismo día — ADR‑153: el banner, a 135 jobs y 118 módulos (`Meta/RosserGuardNeg.lean`); la fila de Rosser, con GuardNeg hecho. Antes, el mismo día — ADR‑152: el banner, a 134 jobs y 117 módulos (`Meta/RosserNumEval.lean`); la fila de Rosser, con NumEval hecho. Antes, el mismo día — ADR‑151: la fila de Rosser, con el sondeo de `hasWitF` en verde. Antes, el mismo día — ADR‑150: el banner, a 133 jobs y 116 módulos (`Meta/RosserNumerales.lean`); la fila de Rosser, con la etapa 1 hecha. Antes, el mismo día — ADR‑149: el banner, a 132 jobs y 115 módulos (`Meta/RosserPosNum.lean`); la fila de Rosser, con PosNum hecho; §0, el control del recorrido dentro de un módulo (`mutanteLocal`). Antes, el mismo día — ADR‑148: el banner, a 131 jobs y 114 módulos (`Meta/RosserW1.lean`); la fila de Rosser, con W1(ax) hecha. Antes, el mismo día — ADR‑147: la fila de Rosser, con el diseño aceptado. Antes, 2026-10-16 — ADR‑146: la fila de Rosser remite al diseño de NegNum y PosNum. Antes, el mismo día — ADR‑145: Rosser, por REDUCCIÓN (el banner y su fila). Antes, el mismo día — ADR‑143: la clase (i) la comprueba cada build (`Meta/PurezaTitulares.lean`, T08); el banner, a 130 jobs y 113 módulos. Antes, el mismo día — ADR‑140: la línea de llegada de RPP (§0) y la fila de Löb (§1). Antes, el mismo día — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
+**Last updated:** 2026-10-18 — ADR‑157: 🏁 Rosser: el banner, a 139 jobs y 122 módulos (`Meta/Rosser.lean`, `Meta/PurezaComando.lean`), con Rosser; §0, la línea de llegada y T08 con 9 titulares; §1, las filas de `rosser_ext` (i) y `rosser` (ii) en lugar de la ⬜; §2 y §4, Rosser. Antes, 2026-10-17 — ADR‑156: el banner, a 137 jobs y 120 módulos (`Meta/RosserNegNum.lean`); la fila de Rosser, con NegNum hecho. Antes, el mismo día — ADR‑154: el banner, a 136 jobs y 119 módulos (`Meta/RosserNegLinea.lean`); la fila de Rosser, con NegLineWF hecho. Antes, el mismo día — ADR‑153: el banner, a 135 jobs y 118 módulos (`Meta/RosserGuardNeg.lean`); la fila de Rosser, con GuardNeg hecho. Antes, el mismo día — ADR‑152: el banner, a 134 jobs y 117 módulos (`Meta/RosserNumEval.lean`); la fila de Rosser, con NumEval hecho. Antes, el mismo día — ADR‑151: la fila de Rosser, con el sondeo de `hasWitF` en verde. Antes, el mismo día — ADR‑150: el banner, a 133 jobs y 116 módulos (`Meta/RosserNumerales.lean`); la fila de Rosser, con la etapa 1 hecha. Antes, el mismo día — ADR‑149: el banner, a 132 jobs y 115 módulos (`Meta/RosserPosNum.lean`); la fila de Rosser, con PosNum hecho; §0, el control del recorrido dentro de un módulo (`mutanteLocal`). Antes, el mismo día — ADR‑148: el banner, a 131 jobs y 114 módulos (`Meta/RosserW1.lean`); la fila de Rosser, con W1(ax) hecha. Antes, el mismo día — ADR‑147: la fila de Rosser, con el diseño aceptado. Antes, 2026-10-16 — ADR‑146: la fila de Rosser remite al diseño de NegNum y PosNum. Antes, el mismo día — ADR‑145: Rosser, por REDUCCIÓN (el banner y su fila). Antes, el mismo día — ADR‑143: la clase (i) la comprueba cada build (`Meta/PurezaTitulares.lean`, T08); el banner, a 130 jobs y 113 módulos. Antes, el mismo día — ADR‑140: la línea de llegada de RPP (§0) y la fila de Löb (§1). Antes, el mismo día — ADR‑138: §4 dice que `ConsistentH` es un teorema DE LEAN, una consistencia RELATIVA (PRA ⊢ Con(Lean) → Con(T_Prf)) que no puede ser absoluta, a qué titulares alcanza y los dos sentidos de «relativa»; §5 lo nombra entre lo que se supone. Antes, 2026-10-14 — ADR‑135 (T09 de `doc/AUDITORIA-SUELO-2026-10-12.md`): reescritos el banner, §1 (con la columna «¿qué usa la prueba?», medida, y la fila de Rosser), §2 (`⊬¬G` existe), §3, §4 y §5; y el documento entra en AUTHORITATIVE. Antes, 2026-10-05 — ADR‑129: D7 ejecutada (los símbolos, `List Char`; las cifras del build, 129 jobs y 112 módulos). Antes, 2026-10-05 — ADR‑121: Gödel I ENTERO (`goedel_I_neg : ¬ Prf ¬G`, por W1) y Tarski (`prf_tarski`, `tarski`, `tarski_semantico`), sin hipótesis. Antes, 2026-10-05 — ADR‑120: `ConsistentH` es un TEOREMA del build (`consistencia`, `Meta/Consistencia.lean`), y Gödel I/II tienen versión SIN HIPÓTESIS (`goedel_I`, `goedel_II`). Antes, 2026-10-05 — ADR‑119, ADR‑118, y 2026-10-04 — ADR‑117: el modelo en un sondeo, la clase `AnclaEq` retirada y el ancla, un teorema. Antes, 2026-10-02 — reescrito entero: la capa `⊢` se retiró ([ADR‑115](DECISIONS.md)).
 
 ---
 
@@ -43,7 +43,9 @@ limpio y todos los controles en verde. `#print axioms` no ve las hipótesis de c
 prueba NOMBRA: la columna de §1.
 
 🏁 **La línea de llegada de RPP** (2026‑10‑16, [ADR‑140](DECISIONS.md)): los 18 titulares de `T_UNIVERSO`, Rosser y
-Löb (las dos filas ⬜ de §1). Gentzen y el libro quedan fuera de este repositorio.
+Löb (las dos filas ⬜ de §1). Gentzen y el libro quedan fuera de este repositorio. ✏️ 2026‑10‑18
+([ADR‑157](DECISIONS.md)): Rosser, hecho: `rosser_ext` y `rosser` entran en `T_UNIVERSO`, que tiene 20. Queda Löb, la
+única fila ⬜.
 
 ⚠️ **Regla de mantenimiento**: este documento se actualiza **en el mismo commit** que añade o cambia
 un teorema cabecera. Una fila con «⬜ nadie» es información, no un fallo; una fila **ausente** sí es
@@ -51,8 +53,9 @@ un fallo. Desde ADR‑135 está en AUTHORITATIVE (lo miran `[A]`, `[A2]` y `[B]`
 comprueba lo que antes se llevaba a mano: que cada titular de su universo, `T_UNIVERSO`, esté declarado y tenga UNA
 fila en §1 o §3 (el nombre en la columna del nombre), y que ninguna fila sobre. Un titular NUEVO se añade a `T_UNIVERSO` en el mismo commit. La columna «¿qué
 usa la prueba?» la mide `#modelo` (`sondeos/InduccionTitulares.lean`), fuera de la CI. La clase (i) la comprueba además cada `lake build`: `Meta/PurezaTitulares.lean` (T08,
-ADR‑143) recorre el cierre de sus 8 titulares y FALLA si alguno nombra la semántica, o si `goedel_I` y `tarski`, los
-controles positivos, dejan de nombrarla. Desde ADR‑149 el recorrido sigue también las constantes del fichero en curso,
+ADR‑143) recorre el cierre de sus 9 titulares y FALLA si alguno nombra la semántica, o si `goedel_I`, `tarski` y
+`rosser`, los controles positivos, dejan de nombrarla (✏️ 2026‑10‑18, ADR‑157: el recorrido y el comando `#pureza`
+están en `Meta/PurezaComando.lean`; la lista, en `PurezaTitulares`, que importa Rosser). Desde ADR‑149 el recorrido sigue también las constantes del fichero en curso,
 que es lo que necesita el `#pureza` al final de cada módulo de Rosser, y `mutanteLocal` lo vigila en cada build. Un titular nuevo de la clase (i) entra en su lista `PUROS` en el mismo commit.
 
 ---
@@ -72,7 +75,8 @@ que es lo que necesita el `#pureza` al final de cada módulo de Rosser, y `mutan
 
 Medido el 2026‑10‑14 con `#modelo` (`sondeos/InduccionTitulares.lean`; el sondeo entero, 19 s; la salida, en
 `doc/registro/2026-10-14-t09-teoremas/`): los 17 teoremas clasificados de §1 y §3 dan lo que dice su columna; el
-dieciocho, `consistencia`, es el nodo por el que se corta, y la clase no se le aplica.
+dieciocho, `consistencia`, es el nodo por el que se corta, y la clase no se le aplica. ✏️ 2026‑10‑18 (ADR‑157): los dos
+de Rosser, medidos igual (`doc/registro/2026-10-18-rosser/`): `rosser_ext`, (i); `rosser`, (ii).
 
 | teorema | hipótesis | ¿quién la descarga? | ¿qué usa la prueba? |
 |---|---|---|---|
@@ -88,12 +92,14 @@ dieciocho, `consistencia`, es el nodo por el que se corta, y la clase no se le a
 | **`godelCN_verdadera`**, **`con_verdadera`** (E10, `Meta/SolidezVerificador.lean`) | ninguna | — (`G` y `Con` son VERDADERAS en `MNV V₀`) | **(iii)** |
 | **`tarski_semantico`** (`Meta/TarskiPrf.lean`) | ninguna | — (ninguna fórmula define la verdad en `MNV V₀`) | **(iii)** |
 | **`consistencia`** (`Meta/Consistencia.lean`) | ninguna | — (es la que descarga `ConsistentH`) | — es el nodo de corte: la clase no se aplica. Usa el modelo para dar `ConsistentH` (`MN_axioms` y `prf_sound`) |
-| ⬜ **Rosser** | — | **no existe**: con `ConsistentH` teorema, la firma `rosser (hcon : ConsistentH)` no dice nada por sí sola; su contenido sería la clase (i), que comprobaría T08, o un enunciado para las extensiones T+E. Decidido en ADR‑137 (T01) y ADR‑145: la sentencia de Rosser de cada T+E, por REDUCCIÓN a T (ADR‑144: el cálculo de T+E es `PrfH E` y su predicado de prueba, el de T delante de `impChain`), con T08 como criterio de aceptación; por construir: falta NegNum y PosNum de T, cuyo diseño es ADR‑146, aceptado en ADR‑147. Primera etapa hecha (ADR‑148): `w1Ax`, W1 con el código de los 142 y sin el modelo (`Meta/RosserW1.lean`, puro por su `#pureza`). Y PosNum (ADR‑149): `posNum`, D1 con el testigo en forma de numeral (`Meta/RosserPosNum.lean`, puro). Y la etapa 1 (ADR‑150): la capa de listas sobre numerales, con `In` y `runFn` decididos (`Meta/RosserNumerales.lean`, pura). Y el sondeo de `hasWitF` (ADR‑151, la puerta del riesgo): la guarda de fórmula se refuta sobre numerales basura a profundidad 1 y 2, sin el modelo. Y la etapa 2, NumEval (ADR‑152): `substtc`/`liftc`/`substfc`/`liftfc` evaluados sobre numerales con las guardas verdaderas, `prf_substfc_guarda` (`Meta/RosserNumEval.lean`, puro). Y la etapa 3, GuardNeg (ADR‑153): la guarda falsa se refuta, `prf_neg_hasWit` y `prf_neg_hasWitF`, y queda decidida, `hasWit_decide` (`Meta/RosserGuardNeg.lean`, puro). Y la etapa 4, NegLineWF (ADR‑154): la línea mala se refuta, `prf_neg_lineWF`, y la buena formación de una línea queda decidida, `lineWF_decide` (`Meta/RosserNegLinea.lean`, puro). Y la etapa 5, NegNum (ADR‑156): el predicado de prueba de T, decidido sobre numerales, `proofN_decide` y `negNum`; y con W1(ax), `negNum'`: si φ no es teorema, T refuta cada candidata a prueba de φ (`Meta/RosserNegNum.lean`, puro). Falta la etapa 7, Rosser por la reducción | — |
+| **`rosser_ext`** (`Meta/Rosser.lean`) | `hcon : ¬ PrfH E ⊥` (T+E es consistente) y `_hE` (E son sentencias: lo que hace de `PrfH E` la teoría T+E; la prueba no la usa, y `rosser_red` es la forma sin ella) | — es la hipótesis del enunciado, una propiedad de E: puede FALLAR (E = [⊥], y entonces T+[⊥] demuestra su sentencia: `control_bottom`) y puede VALER en un miembro NO sólido (T+¬Con, por Gödel II: `control_neg_con`); con E = [] la descarga `consistencia` (`rosser`). 🏁 ADR‑157: la sentencia de Rosser de T+E, `R E`, es indecidible en T+E; por REDUCCIÓN a T (ADR‑144/145: T+E es `PrfH E`, y su predicado de prueba, el de T delante de `impChain`), con PosNum y NegNum de T (ADR‑148…156, `Meta/RosserW1.lean` … `Meta/RosserNegNum.lean`) | **(i)**; en `PUROS` de T08 |
+| **`rosser`** (`Meta/Rosser.lean`) | ninguna | — (`rosser_ext` con E = [], y `consistencia`: ni `R []` ni `¬R []` son teoremas) | **(ii)** |
 | ⬜ **Löb** | — | **no existe**: si `Prf (Prov⌜φ⌝ ⇒ φ)`, entonces `Prf φ`, por el diagonal de Prov(#0) ⇒ φ con D1–D3; un segundo consumidor de D1–D3 (T70; ESTIMACIÓN: 50–120 líneas). Dentro de la línea de llegada de RPP desde ADR‑140 | — |
 
 Las condiciones de derivabilidad, D1–D3, dan **(i)** las tres (§3). Lo que usan de la INDUCCIÓN —otra pregunta, que
 `#print axioms` tampoco ve— está en [AXIOMS.md](AXIOMS.md) §0.3: D1 la aritmética, D2 la de listas, ningún titular un
-paso de DNE salvo `goedel_I_neg`, al decodificar el modelo.
+paso de DNE salvo `goedel_I_neg`, al decodificar el modelo, y los dos de Rosser, al decodificar con W1(ax) (✏️ 2026‑10‑18,
+ADR‑157).
 
 **Footprint** (medido, `check-footprints.bash`): todos los teoremas de esta tabla salvo `prf_con_imp_godel`, y
 `d3_prf_real` → `[propext, Classical.choice, Quot.sound]`. D1, D2 y `prf_con_imp_godel` no tienen fila (T11b; medido a mano el
@@ -110,7 +116,7 @@ teorema diga algo*: lo que lo dice es la columna de arriba.
 (`verificador_solido`: lo que el verificador acepta en el modelo es derivable) da `Prf G`, contra `goedel_I`. No usa
 ω‑consistencia ni Rosser: usa la verdad de `T_Prf` en ℕ, que es más que su consistencia. Para `G`, `⊬¬G` pide más
 que la consistencia simple (T+¬Con es consistente y demuestra `¬G`): ω‑consistencia, o la verdad en ℕ, como aquí.
-Rosser da las dos mitades desde la consistencia simple, cambiando de sentencia (⬜, T01).
+Rosser da las dos mitades desde la consistencia simple, cambiando de sentencia (🏁 ADR‑157: `rosser`, y para las extensiones finitas, `rosser_ext`).
 
 > 🗄️ **Registro (hasta ADR‑121, 2026‑10‑05).** Esta sección se titulaba «⛔ NO EXISTE sobre `Prf`». Hasta el 2026‑10‑02
 > la mitad `⊬¬G` vivía entera sobre `⊢`, y lo que sigue está retirado con esa capa (ADR‑115):
@@ -139,6 +145,7 @@ y las demás del árbol (426), se retiraron con la clase el 2026‑10‑05 ([ADR
 | hipótesis | definición | qué es de verdad |
 |---|---|---|
 | **`ConsistentH`** | `¬ Prf ⊥` | la de `goedel_first_prf` y `goedel_second_prf`: la consistencia de `T_Prf` —los 142 CON los esquemas de `Prf`—, la **mínima honesta**. 🏁🏁 **TEOREMA desde ADR‑120** (2026‑10‑05): `consistencia` (`Meta/Consistencia.lean`), por `prf_sound` (`Meta/SolidezPrf.lean`) y el modelo `MNV V₀` de los 142 (`MN_axioms`) |
+| **`¬ PrfH E ⊥`** (de `rosser_ext`, ADR‑157) | T+E no deriva `⊥` | la consistencia de la EXTENSIÓN T+E: un parámetro del enunciado, no un supuesto global. Puede fallar (E = [⊥]) y valer sin solidez (T+¬Con, por Gödel II); con E = [] es `ConsistentH`, y la descarga `consistencia` (`rosser`) |
 | ~~`[AnclaEq]`~~ | `Prf (axiomsCodeT =eq listFormCodeM axioms)` | 🏁 **ya no es un supuesto: es TEOREMA** desde ADR‑117 (2026‑10‑04), `prf_ancla` (`Meta/Representability2Prf.lean`), por el axioma objeto DIAGONAL `ax_axiomsCodeT_def`, el último de los 142; la clase, con su instancia, se retiró el 2026‑10‑05 (ADR‑118). Hasta ADR‑117 era ⛔⛔ **INCONSISTENTE** (F1: daba `Prf ⊥` sobre los 141) |
 
 🗑️ **Retiradas con la capa `⊢`** (ADR‑115): `ConsistentOmega` (`¬ (axioms ⊢ ⊥)`), `OmegaConsistent`,
@@ -160,10 +167,10 @@ de la literatura, no medido aquí). «Sin hipótesis», en los banners, quiere d
 queda, Con(Lean), Lean no la puede descargar: es Gödel II aplicado a Lean.
 
 **A qué titulares alcanza.** A `consistencia` y a los de las clases (ii) y (iii) de §1. `goedel_I`, `goedel_II`,
-`goedel_I_neg` y `tarski` dicen que `Prf` no deriva cierta fórmula, y eso implica `ConsistentH`, porque de `Prf ⊥`
+`goedel_I_neg`, `tarski` y `rosser` dicen que `Prf` no deriva cierta fórmula, y eso implica `ConsistentH`, porque de `Prf ⊥`
 sale cualquier fórmula (EFQ): heredan la misma condición. Los demás de la clase (iii) hablan además de la verdad en
 `MNV V₀`, que la teoría ni siquiera puede definir (`tarski_semantico`). Los de la clase (i) —los condicionales
-`goedel_first_prf` y `goedel_second_prf`, D1–D3, `prf_tarski`— son otra cosa: no pasan por el modelo, y en ellos está
+`goedel_first_prf` y `goedel_second_prf`, D1–D3, `prf_tarski`, `rosser_ext`— son otra cosa: no pasan por el modelo, y en ellos está
 el contenido gödeliano. Que para ellos baste una metateoría débil es lo esperable (Gödel lo hizo en una finitaria; el plan del
 libro dice «≈ IΣ₁»), pero **no está medido**: la columna de §1 mide qué nombra la prueba, no la fuerza de la metateoría
 que la reproduciría.

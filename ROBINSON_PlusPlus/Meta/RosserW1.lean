@@ -4,7 +4,7 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
-import ROBINSON_PlusPlus.Meta.PurezaTitulares
+import ROBINSON_PlusPlus.Meta.PurezaComando
 
 /-!
 # `Meta/RosserW1.lean` — Rosser, etapa W1(ax): W1 SIN el modelo (ADR‑146, ADR‑147, ADR‑148)

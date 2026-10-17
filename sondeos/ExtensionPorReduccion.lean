@@ -26,6 +26,9 @@ enunciado de Rosser necesita de una extensión finita T+E sale ya del árbol, si
 `goedel_II`, que pasa por el modelo; es un CONTROL del enunciado, no un titular, y T08 no se le aplica.
 
 **Resultado de la ejecución del 2026‑10‑16:** en ADR‑144 §3.
+
+✏️ **2026‑10‑18 (ADR‑157):** todo, promovido a `Meta/Rosser.lean` (§1, §2 y §6), donde ya hay Rosser y el predicado
+Pf_E (`PfE`). Este sondeo sigue de CONTROL, con sus copias en su propio espacio de nombres; qué se hace con él es T66.
 -/
 
 set_option autoImplicit false

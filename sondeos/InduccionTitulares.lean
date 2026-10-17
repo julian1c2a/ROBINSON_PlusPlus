@@ -70,6 +70,14 @@ descargar `ConsistentH`); (iii): las nombra también por otro camino. **Resultad
 ella de raíz no se cortaría nada). ⚠️ Es un criterio por ESPACIO DE NOMBRES: una prueba que usara la verdad en ℕ
 sin pasar por esos dos no la vería. La aritmética de la metateoría sobre ℕ (`ModeloCodigo`: `lineWFT`, `chainOkN`) no
 cuenta como semántica.
+
+**✏️ Re‑ejecutado el 2026‑10‑18 (ADR‑157), 24 s**, con los dos titulares de Rosser y tres `#camino` (la salida, en
+`doc/registro/2026-10-18-rosser/`): los 18 de antes dan lo mismo (el cierre de `goedel_I_neg`, 3 531 constantes en vez
+de 3 529: W1 es paramétrico desde ADR‑148). `rosser_ext`: clase (i), sin la semántica en el cierre; `rosser`: clase (ii),
+90 constantes de la semántica y ninguna sin pasar por `consistencia`. Los dos alcanzan `ind` (por el ∀ acotado:
+`prf_bdAll_numeral ⟶ … ⟶ prf_zero_or_succ`), `listInd` (por NegNum: `chainOk_decide ⟶ … ⟶ prf_list_induction`) y
+`p3` sólo al decodificar con `linea_p3` las líneas de una prueba con el código de los 142 (W1(ax): `negNum' ⟶ w1Ax ⟶
+cadena_buena ⟶ linea_buena ⟶ linea_p3`), como `goedel_I_neg` las del modelo.
 -/
 
 open Lean Meta Elab Command
@@ -249,6 +257,9 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
 #induccion ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
 #induccion ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+-- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
+#induccion ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
+#induccion ROBINSON_PlusPlus.Meta.Rosser.rosser
 
 /-! ### Por dónde: un camino por VALORES del titular a cada constante de su frontera -/
 
@@ -264,6 +275,10 @@ end InduccionTitulares
 #camino ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
 #camino ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
 #camino ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind
+-- ✏️ 2026‑10‑18 (ADR‑157): por dónde llegan los de Rosser a `ind`, a `listInd` y a la decodificación de `p3`.
+#camino ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+#camino ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+#camino ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3
 
 /-! ### Quién usa las dos reglas derivadas de inducción, dentro de cada cierre -/
 
@@ -295,3 +310,6 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera
 #modelo ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff
 #modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+-- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
+#modelo ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
+#modelo ROBINSON_PlusPlus.Meta.Rosser.rosser

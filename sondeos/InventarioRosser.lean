@@ -14,7 +14,8 @@ import ROBINSON_PlusPlus
 **Qué hace.** Para cada pieza que el plan de Rosser (`doc/registro/2026-10-05-adr122-d7-rosser/resultado.json`, Etapas
 0–7) y los tres inventarios del 2026‑10‑16 nombran como reutilizable, busca la constante por su ÚLTIMO componente
 (así no hay que adivinar el espacio de nombres: `SinWTs`, `ENS`…) y la clasifica con el recorrido de T08
-(`Meta/PurezaTitulares.lean`, `recorrer`): PURO, o IMPURO con el camino hasta la semántica. Si un nombre casa con
+(`Meta/PurezaTitulares.lean`, `recorrer`; ✏️ 2026‑10‑18, ADR‑157: hoy en `Meta/PurezaComando.lean`): PURO, o IMPURO
+con el camino hasta la semántica. Si un nombre casa con
 varias constantes, salen todas; si con ninguna del build, sale «FUERA»: las de los sondeos (`RosserBasura`,
 `RosserReflexion`, `ExtensionPorReduccion`) no se pueden importar, y su pureza se lee en su fuente o la mide su propio
 `#pureza`. También dice el MÓDULO.
@@ -25,7 +26,7 @@ varias constantes, salen todas; si con ninguna del build, sale «FUERA»: las de
 **Resultado de la ejecución del 2026‑10‑16:** en ADR‑146 §2.
 -/
 
-open Lean Elab Command ROBINSON_PlusPlus.Meta.PurezaTitulares
+open Lean Elab Command ROBINSON_PlusPlus.Meta.PurezaComando
 
 namespace InventarioRosser
 

@@ -109,7 +109,8 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
 
 `#print axioms` no lo ve: `ind`, `listInd`, `p3` y `qconf` son constructores de `Prf`, no `axiom`. Medido el
 2026‑10‑12 por cierre de dependencias (`sondeos/InduccionTitulares.lean`, ≈ 20 s; re‑ejecutado el 2026‑10‑14 sobre el
-build de ese día, con el mismo resultado y las dos filas de Tarski añadidas): qué titulares construyen pasos con cada
+build de ese día, con el mismo resultado y las dos filas de Tarski añadidas; ✏️ 2026‑10‑18, ADR‑157: y la de Rosser,
+`doc/registro/2026-10-18-rosser/`): qué titulares construyen pasos con cada
 regla, fuera de las traducciones entre `Prf`, `PrfH` y las líneas del verificador (lo automático separa las cuatro
 traducciones; el resto de cada frontera se clasificó leyendo el fuente). `qconf` no va en la tabla: lo
 construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de varios módulos.
@@ -124,6 +125,7 @@ construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de var
 | `prf_tarski`, `tarski`, `tarski_semantico` | **sí** (la aritmética de numerales del lema diagonal) | no | no |
 | `goedel_I_neg` | **sí** (p. ej., por el punto fijo) | sólo al decodificar las líneas que el verificador acepta en el modelo (`linea_listInd`) | ídem (`linea_p3`) |
 | `prf_sound`, `consistencia` | no (analizan `Prf`; no construyen) | no | no |
+| `rosser_ext`, `rosser` (ADR‑157) | **sí** (por el ∀ acotado: `prf_bdAll_numeral` ⟶ … ⟶ `prf_zero_or_succ`) | **sí** (por NegNum: `chainOk_decide` ⟶ … ⟶ `prf_list_induction`) | sólo al decodificar con `linea_p3` las líneas de una prueba con el código de los 142 (W1(ax), `w1Ax`), en el caso que NegNum′ descarta |
 
 ⚠️ «Sí» quiere decir que el término de prueba nombra, por valores, una regla derivada que construye el paso
 (`prf_nat_induction`, `prf_list_induction`); no que el paso sea imprescindible: otra prueba podría evitarlo. «No», que
@@ -132,8 +134,9 @@ que recibe. ⇒ D1 usa la inducción **en esta prueba**, y D2 la de listas: la t
 sobre los `axiom` de `⊢`, y sobre `Prf` no vale. Y por lectura los CUATRO usos de D1 son evitables: `0 + n = n` y
 `σm + n = σ(m + n)` salen de `ax6` con `ax4` o `ax5`; Q3, de `ax2`, `ax5`, `ax13` y `ax19`; y la monotonía del producto,
 de `ax13`, `ax10`, `ax12`, Q3 y `ax4`. Que D1 compile sin `ind` no está comprobado. Por último, ningún titular construye
-un paso clásico salvo `goedel_I_neg`, que lo hace al decodificar con `linea_p3` las líneas que el verificador acepta en
-el modelo; en los demás, sus derivaciones sólo llevan los `p3` que traducen de otra que reciben.
+un paso clásico salvo `goedel_I_neg` y, desde ADR‑157 (2026‑10‑18), `rosser_ext` y `rosser`, que lo hacen al decodificar
+con `linea_p3`: `goedel_I_neg`, las líneas que el verificador acepta en el modelo; los de Rosser, las de una prueba con el
+código de los 142 (W1(ax)). En los demás, sus derivaciones sólo llevan los `p3` que traducen de otra que reciben.
 
 ---
 

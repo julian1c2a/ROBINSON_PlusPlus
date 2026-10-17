@@ -7,7 +7,7 @@ import ROBINSON_PlusPlus.Meta.CodeWitnessPrf
 import ROBINSON_PlusPlus.Meta.NumListPrf
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 import ROBINSON_PlusPlus.Meta.ModeloEstandar
-import ROBINSON_PlusPlus.Meta.PurezaTitulares
+import ROBINSON_PlusPlus.Meta.PurezaComando
 
 /-!
 # `Meta/RosserNumerales.lean` — Rosser, etapa 1: la capa de listas sobre numerales (ADR‑146, ADR‑147, ADR‑150)

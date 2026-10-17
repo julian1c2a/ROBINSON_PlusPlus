@@ -1,0 +1,358 @@
+# Salida de `lake env lean sondeos/InduccionTitulares.lean`, desde la raíz de RPP, el 2026-10-18 (sobre 919f795 con los
+# cambios de ADR-157 en el árbol; build de 139 jobs), 24 s. Respecto de la del 2026-10-14 (doc/registro/2026-10-14-t09-teoremas/):
+# las filas de los 18 titulares de entonces dan lo mismo, salvo el tamaño del cierre de goedel_I_neg (3529 → 3531
+# constantes: la cadena de W1 es paramétrica en V desde ADR-148); y se añaden las de rosser_ext y rosser
+# (#induccion, #modelo y tres #camino).
+
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf: cierre de 2697 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf: cierre de 2036 constantes
+  ind: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  listInd: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  p3: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  qconf: 5 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real: cierre de 4906 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 33 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_cons_succ_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_zero_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_intro, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.nthLiftPred_step, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_lift, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_tail, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_wfAll1_lift, ROBINSON_PlusPlus.Meta.EvalNthcPrf.nthcEvalPred_step, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_mono, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_singleton, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_wfAll1_cons, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.nthRunPred_step, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_cons_intro, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_mono_of, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAll1_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_cons, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_mono_wT] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel: cierre de 4909 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 33 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_cons_succ_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_zero_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_intro, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.nthLiftPred_step, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_lift, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_tail, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_wfAll1_lift, ROBINSON_PlusPlus.Meta.EvalNthcPrf.nthcEvalPred_step, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_mono, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_singleton, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_wfAll1_cons, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.nthRunPred_step, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_cons_intro, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_mono_of, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAll1_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_cons, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_mono_wT] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf: cierre de 2723 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf: cierre de 4936 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 33 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_cons_succ_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_zero_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_intro, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.nthLiftPred_step, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_lift, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_tail, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_wfAll1_lift, ROBINSON_PlusPlus.Meta.EvalNthcPrf.nthcEvalPred_step, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_mono, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_singleton, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_wfAll1_cons, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.nthRunPred_step, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_cons_intro, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_mono_of, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAll1_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_cons, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_mono_wT] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound: cierre de 1974 constantes
+  ind: 0 fuera de las traducciones [] · traducciones: []
+  listInd: 0 fuera de las traducciones [] · traducciones: []
+  p3: 0 fuera de las traducciones [] · traducciones: []
+  qconf: 0 fuera de las traducciones [] · traducciones: []
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia: cierre de 2621 constantes
+  ind: 0 fuera de las traducciones [] · traducciones: []
+  listInd: 0 fuera de las traducciones [] · traducciones: []
+  p3: 0 fuera de las traducciones [] · traducciones: []
+  qconf: 0 fuera de las traducciones [] · traducciones: []
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I: cierre de 3407 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II: cierre de 5614 constantes
+  ind: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 7 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 33 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_cons_succ_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedPremsIn_zero_iff, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_intro, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOkB_cons_tail, ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat, ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.nthLiftPred_step, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_lift, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_argsIn_tail, ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_wfAll1_lift, ROBINSON_PlusPlus.Meta.EvalNthcPrf.nthcEvalPred_step, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_mono, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_singleton, ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_wfAll1_cons, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.nthRunPred_step, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_cons_intro, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_argsIn_mono_of, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAll1_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_concat, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_cons, ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_wfAllF_mono_wT] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg: cierre de 3531 constantes
+  ind: 9 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_listInd] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 8 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_qconf] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski: cierre de 2186 constantes
+  ind: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  listInd: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  p3: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  qconf: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski: cierre de 2922 constantes
+  ind: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  listInd: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  p3: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  qconf: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico: cierre de 2917 constantes
+  ind: 2 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  listInd: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  p3: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+  qconf: 1 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH]
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext: cierre de 3620 constantes
+  ind: 11 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 11 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_listInd] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 10 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 10 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_qconf] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.Rosser.rosser: cierre de 4072 constantes
+  ind: 11 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  listInd: 11 fuera de las traducciones [ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction, ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_listInd] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  p3: 10 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+  qconf: 10 fuera de las traducciones [ROBINSON_PlusPlus.Meta.HilbertDeduction.deduction_aux, ROBINSON_PlusPlus.Meta.HilbertSeq.Rule.casesOn, ROBINSON_PlusPlus.Meta.HilbertSeq.shiftRule._sparseCasesOn_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl.match_1, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_shift, ROBINSON_PlusPlus.Meta.Representability2.lineJustif.match_1, ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track, ROBINSON_PlusPlus.Meta.RosserPosNum.codeNatJustif.match_1, ROBINSON_PlusPlus.Meta.RosserPosNum.prf_lineJustif_numeral.match_1_1, ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_qconf] · traducciones: [ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf, ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_to_prfH, ROBINSON_PlusPlus.Meta.HilbertSeq.prf_to_derivation, ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf]
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction: 12 aristas de valor
+  ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2.prf_hasWit_tc
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_real
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTC1_tcodes
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_of_bound
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral._f
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_split
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_helper
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_zero_or_eq_succ_pred
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf: 5 aristas de valor
+  ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2.prf_hasWit_tc
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_real
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTC1_tcodes
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf ⟶ ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf: 4 aristas de valor
+  ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertSeq.prf_iff_derivation
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertSeq.derivation_to_prf
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertSeq.checkAux_mem_prf
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertSeq.stepConcl_prf
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction: 2 aristas de valor
+  ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf
+  ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat
+  ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf: 3 aristas de valor
+  ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_ex_elim_imp
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_deduction
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction: 4 aristas de valor
+  ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real
+  ⟶ ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt
+  ⟶ ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn
+  ⟶ ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn_all
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction: 3 aristas de valor
+  ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real
+  ⟶ ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt
+  ⟶ ROBINSON_PlusPlus.Meta.EvalNthcPrf.pcc_eval_nthc
+  ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction: 13 aristas de valor
+  ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2.prf_hasWit_tc
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.CRIT_hasWit_real
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTC1_tcodes
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_of_bound
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral._f
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_split
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_helper
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_zero_or_eq_succ_pred
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf: 4 aristas de valor
+  ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_neg_congr_iff
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prf_deduction
+  ⟶ ROBINSON_PlusPlus.Meta.HilbertDeduction.prfH_nil_to_prf
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction: 4 aristas de valor
+  ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel
+  ⟶ ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf
+  ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat
+  ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction: 13 aristas de valor
+  ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
+  ⟶ ROBINSON_PlusPlus.Meta.TarskiPrf.prf_liar
+  ⟶ ROBINSON_PlusPlus.Meta.TarskiPrf.prf_diagonal
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_diag_arith_num
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral._f
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval_of
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_double
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_mod2_double
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_of_mul_lt_mul_right
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_le_mono_right
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind: 6 aristas de valor
+  ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.prf_of_prov
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena._f
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_buena
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_ind
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction: 10 aristas de valor
+  ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.rosser_red
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.rosser_no_R
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.prfH_bot_of
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_bdAll_numeral._f
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_split
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_lt_succ_helper
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_zero_or_eq_succ_pred
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction: 22 aristas de valor
+  ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.rosser_red
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.rosser_no_R
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.negNumE
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formula
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum'
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.proofN_decide
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.chainOkN_decide
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.chainOk_decide
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.chainOk_decide._f
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegLinea.lineWF_decide
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegLinea.refT
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegLinea.refT_q1
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegLinea.dec_hasWitF
+  ⟶ ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitF_decide
+  ⟶ ROBINSON_PlusPlus.Meta.RosserGuardNeg.codF_or_rejF
+  ⟶ ROBINSON_PlusPlus.Meta.RosserGuardNeg.rejF_atom
+  ⟶ ROBINSON_PlusPlus.Meta.RosserGuardNeg.rejF_via
+  ⟶ ROBINSON_PlusPlus.Meta.CodeWitnessPrf.ENS.prf_isFormCodeE2_of_In
+  ⟶ ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_boundedIn_of_In
+  ⟶ ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3: 11 aristas de valor
+  ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.rosser_red
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.rosser_no_R
+  ⟶ ROBINSON_PlusPlus.Meta.Rosser.negNumE
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formula
+  ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.negNum'
+  ⟶ ROBINSON_PlusPlus.Meta.RosserW1.w1Ax
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.cadena_buena._f
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_buena
+  ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.linea_p3
+usuarios de ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction en el cierre de ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf: 4
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_succ_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_le_mono_right
+usuarios de ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction en el cierre de ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf: 9
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono_right_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_allIn_mono_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_concat_assoc
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_concat_nil_right
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken
+usuarios de ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction en el cierre de ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real: 14
+  ROBINSON_PlusPlus.Meta.BdAllIntroPrf.pcc_bdAll_intro
+  ROBINSON_PlusPlus.Meta.CantorMonoPrf.prf_le_self_mul_self_all
+  ROBINSON_PlusPlus.Meta.EvalArithPrf.prf_eval_add_all
+  ROBINSON_PlusPlus.Meta.EvalLtPrf.prf_substtc_tcFn_all_at
+  ROBINSON_PlusPlus.Meta.EvalMulPrf.prf_eval_mul_all
+  ROBINSON_PlusPlus.Meta.EvalPredPrf.prf_eval_pred_all
+  ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn_all
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_succ_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_le_mono_right
+  ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_liftc_tcFn_all
+  ROBINSON_PlusPlus.Meta.NumCodeClosedPrf.prf_substtc_tcFn_all
+  ROBINSON_PlusPlus.Meta.StrongInductionPrf.prf_strong_induction
+usuarios de ROBINSON_PlusPlus.Meta.ChainPrf.prf_list_induction en el cierre de ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real: 21
+  ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_In_of_boundedIn
+  ROBINSON_PlusPlus.Meta.BoundedInPrf.prf_boundedIn_of_In
+  ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_allIn_of_boundedAllIn
+  ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_boundedAllIn_of_allIn
+  ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf.prf_chainOk_iff_chainOkB
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_In_mono_right_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_allIn_mono_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_concat
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_chainOk_mono_imp
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_concat_assoc
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_concat_nil_right
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_concat
+  ROBINSON_PlusPlus.Meta.ChainPrf.prf_runFn_weaken
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_lenc_liftsc_all
+  ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_nthc_liftsc
+  ROBINSON_PlusPlus.Meta.EvalListPrf.prf_eval_lenc_all
+  ROBINSON_PlusPlus.Meta.EvalNthcPrf.pcc_eval_nthc
+  ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.prf_lenc_runFn
+  ROBINSON_PlusPlus.Meta.RunFnBoundedPrf.prf_nthc_runFn
+  ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons_all
+usuarios de ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction en el cierre de ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski: 4
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_succ_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
+  ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_or_succ
+  ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_le_mono_right
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left: 18 aristas de valor
+  ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_chainOk_track
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_inAxiomsCodeT
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_inAxC
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.ancla_de_diagonal
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_deltaD
+  ⟶ ROBINSON_PlusPlus.Meta.Representability2Prf.prf_diag_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral._f
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval_of
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_double
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_mod2_double
+  ⟶ ROBINSON_PlusPlus.Meta.StrongInductionPrf.prf_le_of_lt_succ
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_le_self_add
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_le_add_self
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_add_zero_left
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction: 13 aristas de valor
+  ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint_N
+  ⟶ ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_diag_arith_num
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_formCode_numeral._f
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval_of
+  ⟶ ROBINSON_PlusPlus.Meta.CodeNumeralPrf.prf_cons_eval
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_numeral
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_div2_double
+  ⟶ ROBINSON_PlusPlus.Meta.Div2ParityPrf.prf_mod2_double
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_lt_of_mul_lt_mul_right
+  ⟶ ROBINSON_PlusPlus.Meta.NatMulPrf.prf_mul_le_mono_right
+  ⟶ ROBINSON_PlusPlus.Meta.NatArithPrf.prf_nat_induction
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia: (—) es `consistencia`, el nodo de corte: la clase no se aplica · semántica en el cierre: 90 · sin pasar por `consistencia`: 90 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I: (ii) el modelo, sólo por `consistencia` · semántica en el cierre: 90 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II: (ii) el modelo, sólo por `consistencia` · semántica en el cierre: 90 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski: (ii) el modelo, sólo por `consistencia` · semántica en el cierre: 90 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 90 · sin pasar por `consistencia`: 89 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 90 · sin pasar por `consistencia`: 89 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 90 · sin pasar por `consistencia`: 89 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 90 · sin pasar por `consistencia`: 89 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: true
+ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 89 · sin pasar por `consistencia`: 89 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico: (iii) la verdad en el modelo, más allá de la consistencia · semántica en el cierre: 89 · sin pasar por `consistencia`: 89 [ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.hzero,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.wN_le._f,
+ ROBINSON_PlusPlus.Meta.SolidezPrf.fuerte._proof_1_1] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext: (i) sin el modelo · semántica en el cierre: 0 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: false
+ROBINSON_PlusPlus.Meta.Rosser.rosser: (ii) el modelo, sólo por `consistencia` · semántica en el cierre: 90 · sin pasar por `consistencia`: 0 [] · `consistencia` en el cierre: true

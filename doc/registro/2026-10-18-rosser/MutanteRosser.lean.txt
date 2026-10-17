@@ -1,0 +1,22 @@
+import ROBINSON_PlusPlus.Meta.PurezaTitulares
+
+/-! Mutantes de T08 para Rosser (ADR‑157). Los tres TIENEN que fallar. -/
+
+open FOL ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.Rosser
+
+-- M1: `rosser` (descarga la hipótesis con `consistencia`) declarado PURO.
+#pureza ROBINSON_PlusPlus.Meta.Rosser.rosser |
+
+-- M2: `rosser_ext` declarado control positivo: no nombra la semántica, así que el control tiene que decir «CIEGO».
+#pureza | ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
+
+-- M3: el enunciado de `rosser_ext`, con una prueba que pasa por la SOLIDEZ, la ruta de `sondeos/RosserReflexion.lean`
+-- (`prf_sound` en el modelo estándar), declarada PURA.
+theorem mutanteReflexion (E : List Formula)
+    (hE : ∀ φ, List.Mem φ E → ROBINSON_PlusPlus.Meta.TarskiPrf.IsSentence φ) (hcon : ¬ PrfH E Formula.bottom) :
+    And (¬ PrfH E (R E)) (¬ PrfH E (neg (R E))) :=
+  have _hs : Prf Formula.bottom → False := fun h =>
+    ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN h (fun _ => 0)
+  rosser_ext E hE hcon
+
+#pureza mutanteReflexion |

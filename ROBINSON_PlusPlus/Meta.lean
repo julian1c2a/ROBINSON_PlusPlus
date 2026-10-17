@@ -37,6 +37,10 @@ Public API:
     (`prf_neg_lineWF`), y la buena formación de una línea queda decidida (`lineWF_decide`), con su `#pureza`.
   · ✏️ 2026‑10‑17 (ADR‑156): `Meta/RosserNegNum.lean`, la etapa 5 de Rosser: el predicado de prueba de T, decidido
     sobre numerales (`proofN_decide`, `negNum`), y NegNum′ con W1(ax) (`negNum'`, `negNum_formCode`), con su `#pureza`.
+  · ✏️ 2026‑10‑18 (ADR‑157): 🏁 `Meta/Rosser.lean`, ROSSER por la reducción: `rosser_ext` (si T+E es consistente, su
+    sentencia de Rosser es indecidible en T+E), `rosser_red` (toda lista E) y `rosser` (T, sin hipótesis), con su
+    `#pureza`. `rosser_ext` entra en `PUROS` y `rosser` en `IMPUROS`; para eso, el recorrido y `#pureza` pasan a
+    `Meta/PurezaComando.lean`, y `Meta/PurezaTitulares.lean`, la lista, importa Rosser.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -157,7 +161,7 @@ import ROBINSON_PlusPlus.Meta.SolidezPrf
 import ROBINSON_PlusPlus.Meta.Consistencia
 import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.SolidezVerificador
-import ROBINSON_PlusPlus.Meta.PurezaTitulares
+import ROBINSON_PlusPlus.Meta.PurezaComando
 import ROBINSON_PlusPlus.Meta.RosserW1
 import ROBINSON_PlusPlus.Meta.RosserPosNum
 import ROBINSON_PlusPlus.Meta.RosserNumerales
@@ -165,6 +169,8 @@ import ROBINSON_PlusPlus.Meta.RosserNumEval
 import ROBINSON_PlusPlus.Meta.RosserGuardNeg
 import ROBINSON_PlusPlus.Meta.RosserNegLinea
 import ROBINSON_PlusPlus.Meta.RosserNegNum
+import ROBINSON_PlusPlus.Meta.Rosser
+import ROBINSON_PlusPlus.Meta.PurezaTitulares
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived
