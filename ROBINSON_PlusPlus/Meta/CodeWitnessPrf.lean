@@ -133,7 +133,9 @@ sondeos, y «la de listas» vino de paquete.
 
 ⚠️ Si alguna vez hace falta, el sitio es `Meta/NumCodeClosedPrf.lean`, **junto a
 `prf_congr_liftc` y con el nivel IMPLÍCITO**: es la firma que usan los tres consumidores reales
-que quedan en `sondeos/AcotarEsLaMismaObligacion.lean`. -/
+que quedan en `sondeos/AcotarEsLaMismaObligacion.lean`.
+(✏️ 2026‑10‑17, ADR‑152: ya hace falta. Está allí, con esa firma, y su primer consumidor del build es
+`Meta/RosserNumEval.lean`.) -/
 
 theorem prf_congr_nthc_lst {w₁ w₂ : Term} (i : Term) (h : Prf (w₁ =eq w₂)) :
     Prf (nthc w₁ i =eq nthc w₂ i) := by

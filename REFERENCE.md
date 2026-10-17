@@ -132,8 +132,8 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**116 módulos activos** (Minimal 2 + Meta 111 + Full 3) + barrel `Meta.lean` + raíz
-`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **85 en `sondeos/`**
+**117 módulos activos** (Minimal 2 + Meta 112 + Full 3) + barrel `Meta.lean` + raíz
+`ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **44 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
 ### 1.1 Núcleo → [`doc/REFERENCE-Kernel.md`](doc/REFERENCE-Kernel.md)
@@ -236,6 +236,7 @@ Detalle en el nodo §3.15–§3.32.
 | 84z | **`RosserW1`** | 🆕 **Rosser, etapa W1(ax)** (2026‑10‑17, ADR‑148; el plan, ADR‑146/147): `ProofN m y`, el espejo en ℕ del predicado de prueba de T con el CÓDIGO de los 142 (`codeNatList axioms`, no `V₀`), y `w1Ax : ProofN m y → Prf (dec y)`, W1 SIN el modelo: PURO por T08 (su `#pureza`, con `verificador_solido` como control positivo). Los controles: `proofN_axioma` (la hipótesis puede valer: una línea `thy`), `w1Ax_axioma` y `not_proofN_zero` (puede fallar: la cadena vacía) |
 | 84za | **`RosserPosNum`** | 🆕 **Rosser, etapa 6: PosNum** (2026‑10‑17, ADR‑149): el espejo en ℕ del codificador de pruebas (`codeNatJustif`, `codeNatLine`, `codeNatProof`); `prf_proofCode'_numeral`, el término de prueba de D1 es el numeral de su valor; `PfF y x`, el predicado de prueba de T con términos, y `posNum : Prf φ → ∃ m, Prf (PfF m̄ ⌜φ⌝)`, con el testigo explícito en `posNum_de`. PURO por T08 (su `#pureza`, con `modelo_prov_iff` como control positivo). Los controles: `prov_of_pfF` y `repr_pos_num` (D1 otra vez, por un numeral) |
 | 84zb | **`RosserNumerales`** | 🆕 **Rosser, etapa 1: la capa de listas sobre numerales** (2026‑10‑17, ADR‑150): `prf_cons_evalM` y `prf_numeral_cons` (un numeral no nulo es un `cons`); los accesores `prf_carc_numeral`, `prf_cdrc_numeral`, `prf_lenc_numeral`, `prf_nthc_numeral` (dentro de rango); los siete constructores de código de fórmula sobre numerales (`prf_implc_numeral`…); `In` decidido (`prf_In_numeral`, `prf_not_In_numeral`, el control `prf_In_decide`); `concat` y `runFn` evaluados (`prf_concat_numeral`, `prf_runFn_numeral`) y la pertenencia a las conclusiones de una cadena, decidida (`prf_In_runFn`, `prf_not_In_runFn`, `memN_runFnN_zero`). PURO por T08 (su `#pureza`, con `ev_numeralM` como control positivo). Tres lemas vienen de `sondeos/RosserBasura.lean` |
+| 84zc | **`RosserNumEval`** | 🆕 **Rosser, etapa 2: NumEval, la sustitución sobre numerales** (2026‑10‑17, ADR‑152): los códigos buenos en ℕ (`CodT`/`CodTs`, mutuos, y `CodF`) y su clausura por `liftcN`/`substtcN`/`liftfcN`/`substfcN`; las guardas dan árboles (`codT_of_hasWitN`, `codF_of_hasWitFN`); `prf_substtc_numeral`, `prf_liftc_numeral` (y sus listas), `prf_liftfc_numeral` y `prf_substfc_numeral`, y con las guardas de las líneas, `prf_substfc_guarda` y las otras tres. Los controles: `codF_codeNat`, `prf_substfc_codeNat`, `not_hasWitFN_zero`, `guardas_satisfacibles`. PURO por T08 (su `#pureza`, con `ev_numeralM` como control positivo). Las dos congruencias de listas que usa, `prf_congr_liftsc` y `prf_congr_substtsc3`, bajaron a `NumCodeClosedPrf` |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo (`godelPred'`, `godelBeta'`, `godelC'`) y `consistencyFormula'`. Gödel II vive en `GodelTwoPrf`; `goedel_second'` (retirado el 2026‑09‑11) y el teorema `d3` sobre `⊢` (retirado con ADR‑115) ya no están |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).

@@ -62,6 +62,17 @@ theorem prf_congr_liftc {c a b : Term} (h : Prf (a =eq b)) :
     simp only [f, liftc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
   exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftc c a))
 
+/-- Congruencia de `liftsc` en la lista, la gemela de `prf_congr_liftc`, con el nivel implícito. Llega con
+    `Meta/RosserNumEval.lean` (ADR‑152), su primer consumidor del build: es el sitio que pedía la nota de
+    `Meta/CodeWitnessPrf.lean`. -/
+theorem prf_congr_liftsc {c a b : Term} (h : Prf (a =eq b)) :
+    Prf (liftsc c a =eq liftsc c b) := by
+  let f : Formula := Formula.eq (liftsc (liftTerm 0 c) (liftTerm 0 a)) (liftsc (liftTerm 0 c) (.var 0))
+  have hS : ∀ s : Term, substFormula 0 s f = Formula.eq (liftsc c a) (liftsc c s) := by
+    intro s
+    simp only [f, liftsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (liftsc c a))
+
 /-! ⛔ **`PrfH_congr_liftc` bajó a `Meta/ChainPrf.lean`** (2026‑09‑09d): estaba también en
 `Meta/CodeWitnessPrf.lean` (`SinWTs`), con el nivel explícito, y los dos llegaban a la raíz.
 Ver la nota allí. El enunciado que sobrevive es **éste** (nivel implícito); sólo cambió de
@@ -81,6 +92,17 @@ theorem PrfH_congr_substtc3 {Γ : List Formula} {v s a b : Term} (h : PrfH Γ (a
 theorem prf_congr_substtc3 {v s a b : Term} (h : Prf (a =eq b)) :
     Prf (substtc v s a =eq substtc v s b) :=
   prfH_nil_to_prf (PrfH_congr_substtc3 (Γ := []) (prf_to_prfH h [])) rfl
+
+/-- Congruencia de `substtsc` en la lista (3er argumento), la gemela de `prf_congr_substtc3`. Llega con
+    `Meta/RosserNumEval.lean` (ADR‑152). -/
+theorem prf_congr_substtsc3 {v s a b : Term} (h : Prf (a =eq b)) :
+    Prf (substtsc v s a =eq substtsc v s b) := by
+  let f : Formula := Formula.eq (substtsc (liftTerm 0 v) (liftTerm 0 s) (liftTerm 0 a))
+                                (substtsc (liftTerm 0 v) (liftTerm 0 s) (.var 0))
+  have hS : ∀ u : Term, substFormula 0 u f = Formula.eq (substtsc v s a) (substtsc v s u) := by
+    intro u
+    simp only [f, substtsc, substFormula, substTerm, substTerms, FOL.substTerm_liftTerm, if_true]
+  exact (hS b) ▸ prf_leibniz_subst (A := f) h ((hS a) ▸ prf_refl (substtsc v s a))
 
 /-- Congruencia de `substfc` en el código (3er argumento), en `PrfH` (espejo exacto de
     `PrfH_congr_substtc3`).

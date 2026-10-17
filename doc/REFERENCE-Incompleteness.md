@@ -38,7 +38,7 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 133 jobs · 116 módulos activos** (Minimal 2 + Meta 111 + Full 3) **+ 0 en `cuarentena/`
+> **Build 134 jobs · 117 módulos activos** (Minimal 2 + Meta 112 + Full 3) **+ 0 en `cuarentena/`
 > + 40 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
@@ -46,6 +46,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Y el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de Rosser.)*
 > *(Y el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de Rosser.)*
 > *(Y el 2026-10-17, con ADR-150: 133 jobs y 116 módulos, por `Meta/RosserNumerales.lean`, la etapa 1 de Rosser.)*
+> *(Y el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de Rosser.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >

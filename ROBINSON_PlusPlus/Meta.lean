@@ -29,6 +29,8 @@ Public API:
     NUMERAL (`prf_proofCode'_numeral`), con su `#pureza`.
   · ✏️ 2026‑10‑17 (ADR‑150): `Meta/RosserNumerales.lean`, la etapa 1 de Rosser: la capa de listas sobre numerales
     (descomponer, `carc`/`cdrc`/`lenc`/`nthc`, los constructores de código, `In` y `runFn` decididos), con su `#pureza`.
+  · ✏️ 2026‑10‑17 (ADR‑152): `Meta/RosserNumEval.lean`, la etapa 2 de Rosser: `substtc`/`liftc`/`substfc`/`liftfc`
+    evaluados sobre numerales con las guardas verdaderas (`prf_substfc_guarda`), con su `#pureza`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -153,6 +155,7 @@ import ROBINSON_PlusPlus.Meta.PurezaTitulares
 import ROBINSON_PlusPlus.Meta.RosserW1
 import ROBINSON_PlusPlus.Meta.RosserPosNum
 import ROBINSON_PlusPlus.Meta.RosserNumerales
+import ROBINSON_PlusPlus.Meta.RosserNumEval
 import FOL.Deduction
 import FOL.FOL
 import FOL.Theorems.Derived
