@@ -29,3 +29,6 @@ RosserBasura.lean
 
 # T+E por reducción a T (ADR-144): el cálculo de una extensión finita y los controles de CRI-02
 ExtensionPorReduccion.lean
+
+# Rosser, el sondeo de hasWitF (ADR-151): la puerta del riesgo de GuardNeg, a profundidad 1 y 2 sobre numerales
+RosserHasWitF.lean
