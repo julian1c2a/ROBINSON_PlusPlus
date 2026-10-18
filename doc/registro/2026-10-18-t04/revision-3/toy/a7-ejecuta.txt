@@ -1,0 +1,12 @@
+── (0) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (K3) una ejecución normal, dos commits después (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 3 versiones desde 020645f, 2 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+      testigo: 2 línea(s) escritas por el núcleo de K1 en esta ejecución
+── (K5) una ejecución normal, con un límite de 60 s:
+            salida de timeout: 124 (124 = colgado)

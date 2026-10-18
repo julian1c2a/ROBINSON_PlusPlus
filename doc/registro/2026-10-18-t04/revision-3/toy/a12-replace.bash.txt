@@ -1,0 +1,16 @@
+#!/bin/bash
+# A12 — `git replace` (local): sustituir el commit que BAJÓ la tabla por uno que no la baja; el replay lee la historia
+# falsa (git log respeta refs/replace). En la CI no (no se clonan los refs/replace): verde falso LOCAL.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+cd "$B/r-a10" || exit 2
+DOCS_LISTA=doc.md
+paso "(C3) antes: la tabla subida a mano" 0
+C2=$(git log --format=%H --grep='^C2$' -1); C1=$(git rev-parse "$C2^")
+# un C2' con el árbol de C1 en la tabla (3) y el mismo padre y mensaje
+git read-tree "$C2"; git show "$C1:doc/control/b-deuda.tsv" > ../tabla-c1.tsv
+H=$(git hash-object -w ../tabla-c1.tsv); git update-index --cacheinfo 100644 "$H" doc/control/b-deuda.tsv
+T=$(git write-tree); C2F=$(git commit-tree "$T" -p "$C1" -m C2); git read-tree HEAD
+git replace "$C2" "$C2F"
+paso "(C3) con «git replace» del commit que bajaba la tabla" 0
+git replace -d "$C2" >/dev/null

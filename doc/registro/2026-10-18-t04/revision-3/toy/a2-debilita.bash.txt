@@ -1,0 +1,23 @@
+#!/bin/bash
+# A2 — DEBILITAR y RESTAURAR el núcleo: un commit intermedio (que la CI no ve) con un núcleo que no ve nada pero lee
+# ARGV[6] y sale con 0; el siguiente lo restaura (byte a byte el original) y sube la tabla con citas muertas NUEVAS:
+# «lo que el núcleo nuevo ve de más que el viejo» es TODO.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a2"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0a) la tabla inicial" 2; commit inicial
+paso "(0b) cuadra" 0
+cp b-citas.awk /tmp/nucleo-bueno.awk 2>/dev/null || cp b-citas.awk ../nucleo-bueno-a2.awk
+# K1: el núcleo absuelve todo (una línea), y nada más cambia: ni la tabla ni los documentos
+sed -i 's/^  if (ventana ~ MARK) return$/  if (1) return/' b-citas.awk
+grep -c '^  if (1) return$' b-citas.awk
+commit "K1: (intermedio, la CI no lo ve)"
+# K2: el núcleo vuelve a ser el bueno, byte a byte; diez citas muertas nuevas; --b-deuda-rehacer
+cp ../nucleo-bueno-a2.awk b-citas.awk 2>/dev/null || cp /tmp/nucleo-bueno.awk b-citas.awk
+cmp b-citas.awk "$RAIZ/b-citas.awk" && echo "(el núcleo de K2 es el de RPP, byte a byte)"
+for i in 1 2 3 4 5 6 7 8 9 10; do printf 'Nueva: `muerto_nuevo_%s`.\n' $i >> doc.md; done
+paso "(K2, árbol) núcleo restaurado + diez citas muertas NUEVAS: --b-deuda-rehacer" 3
+commit "K2"
+paso "(K2, en git: lo que ve la CI en la rama ci/…)" 0
+grep -vc '^#' doc/control/b-deuda.tsv

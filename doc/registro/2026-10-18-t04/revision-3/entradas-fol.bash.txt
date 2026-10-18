@@ -1,0 +1,45 @@
+#!/bin/bash
+# Replica (sólo lectura) las entradas del bloque [B] de FOL/check-doc-sync.bash en $OUT. Sin lake: el ENV es el volcado dado.
+export PATH="/usr/bin:/bin:$PATH"
+F=/e/Dropbox/GitHub/lean4/FOL
+S=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad
+OUT=$S/revision-b3/fol
+cd "$F" || exit 2
+CIERRE=$(bash cierre-imports.bash 2>/dev/null)
+SIBLING="${RPP_DIR:-../ROBINSON_PlusPlus}"
+SCOPE="FOL/ TheoryFramework/ FOL.lean cuarentena/ $SIBLING/ROBINSON_PlusPlus/ $SIBLING/ROBINSON_PlusPlus.lean $SIBLING/cuarentena/"
+DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class) +[^[:space:]:({[]+"
+NOMBRES='{n = $NF; sub(/[.]$/, "", n); if (n == "") next; print n; k = n; sub(/.*[.]/, "", k); if (k != n && k != "") print k}'
+find $SCOPE -name '*.lean' ! -path '*/.lake/*' ! -path '*/librerias-retiradas/*' -print0 2>/dev/null \
+  | xargs -0 env LC_ALL=C awk -f strip-lean.awk | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" | LC_ALL=C sort -u > "$OUT/decls"
+find "$SIBLING/sondeos/" -name '*.lean' 2>/dev/null | sort | while IFS= read -r f; do
+  LC_ALL=C awk -f strip-lean.awk "$f" | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" \
+    | LC_ALL=C awk -v f="sondeos/${f##*/}" '{print $0 "|" f}'
+done | LC_ALL=C sort -u > "$OUT/sond"
+{ printf '%s\n' "$CIERRE"
+  bash "$SIBLING/cierre-imports.bash" 2>/dev/null; git -C "$SIBLING" ls-files 'sondeos/*.lean' 'scripts/*.lean'
+} | grep . | sed 's/[.]lean$//; s|/|.|g' \
+  | LC_ALL=C awk '{ n = split($0, z, "."); for (i = 1; i <= n; i++) { s = z[i]; print s; for (j = i + 1; j <= n; j++) { s = s "." z[j]; print s } } }' \
+  | LC_ALL=C sort -u > "$OUT/mod"
+{ git ls-files; git ls-files | sed 's|^|FOL/|'; git tag
+  for t in $(git tag); do git ls-tree -r --name-only "$t" | sed "s|^|$t:|"; done
+  git -C "$SIBLING" ls-files; git -C "$SIBLING" ls-files | sed 's|^|ROBINSON_PlusPlus/|'; git -C "$SIBLING" tag
+  for t in $(git -C "$SIBLING" tag); do git -C "$SIBLING" ls-tree -r --name-only "$t" | sed "s|^|$t:|"; done
+} | sed -E 's#^((FOL/|ROBINSON_PlusPlus/)?cuarentena/librerias-retiradas/)#=\1#' \
+  | LC_ALL=C awk '{ print } /^=/ { p = substr($0, 2); while (sub(/\/[^\/]*$/, "", p)) print "=" p }' | LC_ALL=C sort -u > "$OUT/rut"
+cp "$S/env-fol.tsv" "$OUT/env"
+B_DECL_LINEA='^[+-][[:space:]]*(@\[[^]]*\][[:space:]]*)*((private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[[:space:]]+)*(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class)[[:space:]]+[^[:space:]:({[]'
+B_PROPIO=1
+for g in . "$SIBLING"; do
+  { git -C "$g" log HEAD --tags -p --format= -- '*.lean'
+    if [ "$B_PROPIO" = "1" ]; then
+      git -C "$g" diff HEAD -- '*.lean'
+      git -C "$g" ls-files -o --exclude-standard -- '*.lean' | while IFS= read -r f; do sed 's/^/+/' "$g/$f"; done
+    fi; } 2>/dev/null | LC_ALL=C grep -E "$B_DECL_LINEA" | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES"
+  { git -C "$g" log HEAD --tags --name-only --format= -- '*.lean'
+    if [ "$B_PROPIO" = "1" ]; then git -C "$g" ls-files -co --exclude-standard -- '*.lean'; fi; } 2>/dev/null \
+    | sed 's|.*/||; s|[.]lean$||'
+  B_PROPIO=0
+done | grep . | LC_ALL=C sort -u > "$OUT/hist"
+echo "REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md NEXT-STEPS.md AI-GUIDE.md cuarentena/README.md" > "$OUT/docs"
+wc -l "$OUT"/*

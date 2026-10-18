@@ -1,0 +1,22 @@
+── (0) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+línea del cierre de valla: 149
+  return (RLENGTH >= vlen) }
+Nueva: `muerto_valla_18`.
+Nueva: `muerto_valla_19`.
+Nueva: `muerto_valla_20`.
+— el núcleo VIEJO sobre este documento:
+      B|muerto_dos
+      V|doc.md:2
+── (árbol) valla cerrada con texto detrás + veinte citas muertas NUEVAS: --b-deuda-rehacer (modo 3)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 21 entradas
+        historia de la tabla: 1 versiones desde fc5444c, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 21 citas muertas en 21 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 21
+── (en git: lo que ve la CI) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 2 versiones desde fc5444c, 1 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 21 citas muertas en 21 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 21

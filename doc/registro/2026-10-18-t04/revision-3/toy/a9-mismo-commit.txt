@@ -1,0 +1,16 @@
+── (0) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (a, árbol) sin «propuest» + tres citas NUEVAS junto a «propuesto»: --b-deuda-rehacer (modo 3)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 4 entradas
+        historia de la tabla: 1 versiones desde 8f03b22, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 4 citas muertas en 4 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 4
+── (a, en git) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 2 versiones desde 8f03b22, 1 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 4 citas muertas en 4 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 4
+149:  return (RLENGTH >= vlen && substr(z, RLENGTH + 1) ~ /^[ \t]*$/) }
+/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy/a9-mismo-commit.bash: line 24: unexpected EOF while looking for matching ``'

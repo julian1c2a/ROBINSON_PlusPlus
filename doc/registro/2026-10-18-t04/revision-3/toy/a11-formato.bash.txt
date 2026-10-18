@@ -1,0 +1,14 @@
+#!/bin/bash
+# A11 — formatos de la tabla en el árbol: CRLF, «01», columna de más, clave con espacio, «+1», tabulador final.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a11"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0) la tabla inicial" 2; commit inicial
+cp doc/control/b-deuda.tsv ../tabla-a11.tsv
+sed -i 's/$/\r/' doc/control/b-deuda.tsv; paso "(CRLF) la misma tabla con CRLF" 0; cp ../tabla-a11.tsv doc/control/b-deuda.tsv
+sed -i 's/\tmuerto_dos\tdoc.md\t1$/\tmuerto_dos\tdoc.md\t01/' doc/control/b-deuda.tsv; paso "(01)" 0; cp ../tabla-a11.tsv doc/control/b-deuda.tsv
+sed -i 's/\tmuerto_dos\tdoc.md\t1$/\tmuerto_dos\tdoc.md\t1\tx/' doc/control/b-deuda.tsv; paso "(columna de más)" 0; cp ../tabla-a11.tsv doc/control/b-deuda.tsv
+sed -i 's/\tmuerto_dos\tdoc.md\t1$/\tmuerto_dos \tdoc.md\t1/' doc/control/b-deuda.tsv; paso "(clave con espacio)" 0; cp ../tabla-a11.tsv doc/control/b-deuda.tsv
+printf 'B\tmuerto_dos\tdoc.md\t1\n' >> doc/control/b-deuda.tsv; paso "(repetida)" 0; cp ../tabla-a11.tsv doc/control/b-deuda.tsv
+printf '\n\n' >> doc/control/b-deuda.tsv; paso "(líneas en blanco al final)" 0; cp ../tabla-a11.tsv doc/control/b-deuda.tsv

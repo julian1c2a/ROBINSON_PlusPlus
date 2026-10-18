@@ -1,0 +1,13 @@
+#!/bin/bash
+# A3b — la forma más corta de A3: «git checkout -b x C1 && git merge -s ours master». El árbol vuelve a C1 (tabla en 3
+# y las tres citas), la fusión es TREESAME a su primer padre (no la lista git log -- tabla) y es un avance rápido de master.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a3b"
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: `muerto_dos`.' 'Tres: `muerto_dos`.' > doc.md
+paso "(C1) tabla inicial: 3" 2; commit C1; C1=$(git rev-parse HEAD)
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: arreglado.' 'Tres: arreglado.' > doc.md
+paso "(C2) --b-deuda: 1" 1; commit C2; C2=$(git rev-parse HEAD)
+git checkout -q -b x "$C1" && git merge -q -s ours -m "M: merge -s ours" master
+paso "(M) git merge -s ours desde C1" 0
+git merge-base --is-ancestor "$C2" HEAD && echo "      (M desciende de C2: avance rápido)"

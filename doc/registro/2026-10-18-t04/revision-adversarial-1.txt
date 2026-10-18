@@ -1,0 +1,40 @@
+# T04 (ADR-166): la PRIMERA revisión adversarial del núcleo nuevo de [B] (b-citas.awk y los dos [B]), por un agente,
+# el 2026-10-18, sobre la primera versión (la que FOL subió en 4d81a12). Su banco de pruebas quedó en el scratchpad de
+# la sesión; los seis casos sintéticos (f1–f6) están reproducidos en el autotest de b-control.bash. Resumen fiel del
+# informe; las once vías se arreglaron en la segunda versión (ADR-166 §3).
+
+ONCE VÍAS DE VERDE FALSO O DE DEBILIDAD DEL TRINQUETE (tres ya activas en los documentos de ese día)
+
+1. [ALTA · verde falso] Marcadores que eran verbos corrientes y casaban por subcadena: «`muerto_1` vive en …;
+   `muerto_2` lo necesita» salía absuelto («necesita»); también «abierta», «impide» (pide), «borrador» (borrad),
+   «exige», un «falta» dentro de un comentario HTML. Caso real: DEPENDENCIES.md:276 («`mod2_of_even` vive en
+   `Block4_C6_C7` … lo necesita»), cinco citas muertas. Unas 68 de 540 absoluciones reales venían de necesita, pide,
+   abiert, exige, construir, medir o «si se ». → Arreglo: sólo palabras de ESTADO, enteras, y sin comentarios HTML.
+2. [ALTA · verde falso] Homónimos: `imp_intro` (el axioma borrado con FOL/MetaRules.lean) vivía porque Lean tiene un
+   `imp_intro`; `decodeTerm.match_1` y `decodeTerm.eq_1` vivían por su último componente (cualquier `match_1` del
+   proyecto). → Arreglo: una cita con punto necesita el nombre entero, un sufijo de 2–3 componentes, un espacio de
+   nombres o un módulo; una de Lean en snake_case no absuelve.
+3. [MEDIA-ALTA · verde falso] Las comillas se emparejaban línea a línea: una cita que seguía en la línea siguiente
+   descolocaba las demás (`T_Prf`, `ax_list_induction`, `tc_cons`, `liftT_`, `substT_` no se veían). → Arreglo: un
+   escáner de CommonMark (tiras de n comillas) y la cita de una comilla que sigue en la línea siguiente del párrafo.
+4. [MEDIA · verde falso] Exenciones por forma: unos 220 nombres declarados tienen forma exenta (105 en minúsculas,
+   48 en MAYÚSCULAS, 63 con forma de hipótesis, 7 axiomas `ax_C…`); `raa`, `flcodes` y `PUENTE_*` ya habían muerto y
+   sus citas no saltaban. → Arreglo: la lista FORMAS (todo nombre declarado alguna vez con esa forma, de la historia
+   de git), que anula la exención; y `ax_[A-Z]` reducido al patrón `ax_UpperCamel`.
+5. [MEDIA · verde falso] Rutas no reconocidas: con rango U+2011, `etiqueta:ruta`, con `*`, o empezando por `.`.
+6. [MEDIA · verde falso] Vallas: una línea ```código``` (código EN LÍNEA en CommonMark) o un bloque de cuatro comillas
+   con uno de tres dentro ocultaban el resto del documento; `~~~` y las vallas dentro de `>` no se veían.
+7. [MEDIA · trinquete] La tabla podía volver a subir a mano hasta su primera versión. → Arreglo: el techo es el MÍNIMO
+   en git desde el último cambio del núcleo.
+8. [MEDIA-BAJA · trinquete] `NR == FNR` con el primer fichero vacío.
+9. [MEDIA-BAJA] `--b-deuda` aceptaba cualquier bajada: un documento renombrado salía del universo en silencio.
+10. [BAJA · verde falso] Módulos: todo `.lean` versionado, también las librerías retiradas de cuarentena/.
+11. [BAJA] La comparación de las dos copias (`grep -v '^#'`) se podía engañar, y MARK, W, el autotest y la tabla
+    vivían en los dos .bash sin comparar. → Arreglo: b-citas.awk y b-control.bash, idénticos byte a byte.
+
+FALSOS ROJOS: sondeos/README.md cita `X.lean` sin `sondeos/`; los bloques `~~~` y los citados con `>` se miraban como
+prosa; `Init.Classical` y `CoreM` salían muertas.
+
+LO QUE COMPROBÓ Y ESTABA BIEN: gawk y mawk dan la misma salida en los 16 documentos de RPP; la comparación numérica
+de la tabla; los CRLF; las posiciones de la ventana, el corte por celda, que un nombre no se absuelve a sí mismo y que
+la fecha no absuelve; ENV o SONDEOS vacíos; `fetch-depth: 0` en las dos CI; una tabla con espacios da rojo.

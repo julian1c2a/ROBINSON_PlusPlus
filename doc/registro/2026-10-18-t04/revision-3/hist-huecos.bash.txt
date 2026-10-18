@@ -1,0 +1,21 @@
+#!/bin/bash
+# Los nombres declarados en la historia que HIST (anclado) NO recoge: líneas de diff con una declaración que no
+# empieza la línea (tras atributos y modificadores). Sólo lectura de los dos repos.
+export PATH="/usr/bin:/bin:$PATH"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3
+cd /e/Dropbox/GitHub/lean4/ROBINSON_PlusPlus || exit 2
+B_DECL_LINEA='^[+-][[:space:]]*(@\[[^]]*\][[:space:]]*)*((private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[[:space:]]+)*(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class)[[:space:]]+[^[:space:]:({[]'
+DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class) +[^[:space:]:({[]+"
+for g in . ../FOL; do git -C "$g" log HEAD --tags -p --format= -- '*.lean'; done 2>/dev/null | LC_ALL=C grep -E '^[+-]' > "$B/casos/diff-lineas.txt"
+wc -l < "$B/casos/diff-lineas.txt"
+# (1) open … in / set_option … in / attribute … in + declaración en la MISMA línea
+LC_ALL=C grep -E '^[+-][[:space:]]*(open|set_option|attribute|variable|omit|include)[^`]* in[[:space:]]+(@\[[^]]*\][[:space:]]*)*((private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[[:space:]]+)*(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class)[[:space:]]' "$B/casos/diff-lineas.txt" > "$B/casos/hueco-in.txt"
+# (2) docstring de una línea + declaración
+LC_ALL=C grep -E '^[+-][[:space:]]*/--.*-/[[:space:]]*(@\[[^]]*\][[:space:]]*)*((private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[[:space:]]+)*(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class)[[:space:]]' "$B/casos/diff-lineas.txt" > "$B/casos/hueco-doc.txt"
+# (3) instance (priority := …) nombre
+LC_ALL=C grep -E '^[+-][[:space:]]*(@\[[^]]*\][[:space:]]*)*((private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[[:space:]]+)*instance[[:space:]]+\([^)]*\)[[:space:]]+[A-Za-z_]' "$B/casos/diff-lineas.txt" > "$B/casos/hueco-prio.txt"
+# (4) atributos con corchetes anidados
+LC_ALL=C grep -E '^[+-][[:space:]]*@\[[^]]*\[[^]]*\][^]]*\][[:space:]]*((private|protected|noncomputable|partial|unsafe|nonrec|scoped|local)[[:space:]]+)*(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class)[[:space:]]' "$B/casos/diff-lineas.txt" > "$B/casos/hueco-attr.txt"
+# (5) constructores de inductive (líneas «| nombre» con «:» o sin nada) y campos de structure no se recogen por diseño
+wc -l "$B"/casos/hueco-*.txt
+for f in in doc prio attr; do echo "== $f"; head -5 "$B/casos/hueco-$f.txt"; done

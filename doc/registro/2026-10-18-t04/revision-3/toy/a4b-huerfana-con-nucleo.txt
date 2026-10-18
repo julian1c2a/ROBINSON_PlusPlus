@@ -1,0 +1,23 @@
+── (C1) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (C1) cuadra (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde 2cabc8f, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+b-citas.awk
+doc
+salida.txt
+merge rc=1
+Auto-merging doc/control/b-deuda.tsv
+CONFLICT (add/add): Merge conflict in doc/control/b-deuda.tsv
+Automatic merge failed; fix conflicts and then commit the result.
+2
+── (M) cien citas muertas nuevas, sin ADR (lo que ve la CI en la rama ci/…) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde 94d8908, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 101 citas muertas en 101 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 101
+      (M desciende de C1: «git push origin HEAD:master» es un avance rápido)
+      primer padre: 94d8908 R: raíz huérfana

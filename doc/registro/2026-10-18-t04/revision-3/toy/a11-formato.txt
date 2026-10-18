@@ -1,0 +1,7 @@
+── (0) la tabla inicial (modo 2)	      FAIL=0 MEDIDO=1
+── (CRLF) la misma tabla con CRLF (modo 0)	      FAIL=0 MEDIDO=1
+── (01) (modo 0)	      FAIL=1 MEDIDO=1
+── (columna de más) (modo 0)	      FAIL=1 MEDIDO=1
+── (clave con espacio) (modo 0)	      FAIL=1 MEDIDO=1
+── (repetida) (modo 0)	      FAIL=1 MEDIDO=1
+── (líneas en blanco al final) (modo 0)	      FAIL=0 MEDIDO=1

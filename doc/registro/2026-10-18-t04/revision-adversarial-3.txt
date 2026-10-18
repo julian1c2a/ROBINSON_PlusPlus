@@ -1,0 +1,89 @@
+# T04 (ADR-166): la TERCERA revisión adversarial del núcleo de [B] (b-citas.awk y b-control.bash, idénticos en RPP y
+# FOL), por un agente, el 2026-10-18, sobre la versión que sube con ADR-166 (el techo que rehace la historia de la
+# tabla, las órdenes, los alias, HIST anclado). Reconstruyó las entradas sin lake y reprodujo exactamente las dos tablas
+# (RPP 1145 entradas y 1791 citas; FOL 331 y 648); su copia de b_trinquete.bash da 22/22: lo que encontró queda fuera de
+# esos 22 pasos. Sus guiones y salidas, en revision-3/ (los guiones, con «.txt» detrás: son registro, no se ejecutan).
+# Resumen fiel del informe. ⛔ NO SE ARREGLÓ NADA EN ADR-166: el propietario pidió subir lo hecho ese día, y los
+# hallazgos son el trabajo pendiente de T04 (ADR-166 §4; NEXT-STEPS).
+
+ALTA — VÍAS PARA SUBIR LA TABLA CON LA CI EN VERDE (medidas en repos de juguete)
+
+H1 · «otra interfaz, se toma tal cual» es una llave maestra. Basta un commit K1 que cambie `FILENAME == ARGV[6]` por
+   `FILENAME == ARGV[3+3]` (hace lo mismo, pasa el autotest, verde); en K2, diez citas muertas nuevas, un comentario en
+   el núcleo y --b-deuda-rehacer: FAIL=0, la deuda de 1 a 11; el único rastro, una línea informativa. Igual borrando
+   b-citas.awk en K1 y restaurándolo idéntico en K2 (el diff neto del núcleo en el push, vacío).
+   (toy/a1-argv6, toy/a1b-borra-nucleo)
+   → Arreglo propuesto: «otra interfaz» = «no sube nada», como un fallo; la migración única (FOL 4d81a12), fijada con
+     un sha por repo y su ADR.
+
+H2 · Debilitar el núcleo y restaurarlo, sin ningún aviso. K1 cambia `if (ventana ~ MARK) return` por `if (1) return`
+   (sigue leyendo ARGV[6] y sale con 0); K2 lo restaura byte a byte y añade diez citas muertas: FAIL=0, sin ⚠️. El
+   replay suma cada «de más» y nunca descuenta el «de menos» de K1, ni pasa el autotest a los núcleos de la historia.
+   La CI de `ci/…` sólo mira la punta; un núcleo roto que sale con 0 por accidente abre la misma ventana. (toy/a2-debilita)
+   → Arreglo propuesto: comparar con la última base VERIFICADA (origin/master; en FOL, github.event.before): techo =
+     tabla de la base + máx(0, núcleo de HEAD − núcleo de la base), medido sobre los documentos DE LA BASE.
+
+H3 · --first-parent no ve lo que entra por el segundo padre. Una rama que sale de C1 (tabla en 3) y se fusiona con
+   master (C2 la bajó a 1) quedándose con su tabla: FAIL=0; igual con `git merge -s ours master` (avance rápido). Una
+   raíz huérfana con 101 entradas, fusionada como primer padre: 100 citas nuevas y FAIL=0 (y sin aviso si lleva el núcleo
+   de master). (toy/a3-fusion, a3b-ours, a4-huerfana, a4b-huerfana-con-nucleo)
+   → Arreglo propuesto: el techo de una fusión, el mínimo sobre todos sus padres, y una raíz que no sea la fijada cuenta
+     como tabla vacía; o la base verificada de H2 con --is-ancestor.
+
+MEDIA
+
+H4 · El «de más» se mide sobre los documentos del MISMO commit (quitar «propuest» de MARK y añadir en ese commit tres
+   citas junto a «propuesto»: verde), y una V del núcleo viejo cuenta como medida (un núcleo nuevo que acepta
+   «``` texto» como cierre de valla: el viejo da V, el replay la ignora, y entran 20 citas de cualquier clave).
+   (toy/a9-mismo-commit, a9b-valla) → medir sobre los documentos de la base; una V es «no medido».
+H5 · El replay EJECUTA cada b-citas.awk de la historia: un núcleo intermedio con system(), arreglado después, sigue
+   escribiendo su fichero testigo; un while(1) intermedio cuelga para siempre cada ejecución futura. (toy/a7-ejecuta)
+   → no ejecutar historia (H2); si se mantiene, timeout y sin system().
+H6 · Verde falso REAL: el marcador absuelve toda cita a 100 bytes aunque hable de otra. CURRENT-STATUS-PROJECT.md:28
+   (fila «Gödel»): `goedel_first_undecidable_numeral` y `Reflects`, muertos (ADR-160/161), los absuelve el «falta» que va
+   con `NegVerifier`. La coletilla «🗑️ (lo que esta línea cita de ⊢ quedó retirado…, ADR-115)» está en 59 líneas:
+   quitándola salen 83 citas muertas más (1791 → 1874), una amnistía de línea. Absuelve también una negación («no está
+   retirado») y «retiradas» dentro de una URL. Cota (INFERIDA): 207 de 497 absoluciones en RPP y 94 de 235 en FOL
+   tienen otra cita entre la absuelta y el marcador. (casos/absueltas-por-coletilla.txt, nucleo-casos)
+H7 · Verde falso REAL: un glob sin directorio (`X_*`) no se examina nunca. doc/REFERENCE-Arithmetic.md:41: en la misma
+   celda `teo_1_11` y `teo_1_12` están en la tabla y `teo_1_13_*` no; REFERENCE.md:227 da por vigentes `decodeRuleTag_*`
+   y `stdArgs_*`, sin ningún miembro vivo. 103 citas así en RPP y 26 en FOL; al menos 7 familias muertas.
+   (casos/globs-vida.txt)
+H8 · Verde falso REAL: una abreviatura con `/` (`a_b/c_d`) no se examina. CURRENT-STATUS-PROJECT.md:210, «`axiom
+   imp_intro/gen/raa/or_elim/ex_elim`»: `imp_intro`, `raa` y `ex_elim`, muertos, ni salen ni están en la tabla (`raa` es
+   el ejemplo de la cabecera de [B]). 11 citas así en RPP y 4 en FOL.
+H9 · Sacar un documento de B_DOCS_LISTA se lleva su deuda: sigue en disco y en git, --b-deuda dice «salen del todo 4»
+   y verde. (toy/a5-lista) → un documento con entradas en la tabla legítima no puede salir de la lista.
+
+BAJA
+
+H10 · B_SUBE_ADR casa la clave por subcadena, sin documento ni cuenta: un ADR que nombra `muerto_uno_largo` deja subir
+      `muerto_uno`, y cualquier ADR viejo vale (ADR-160 «nombra» 35 claves de la tabla de RPP). (toy/a6-adr, casos/adr-nombra.txt)
+H11 · Un clon superficial da verde en el juguete; en los repos reales el testigo `raa` sale de la unión de las dos
+      historias y no detectaría un RPP superficial (inferido) → --is-shallow-repository en cada repo. (toy/a10-superficial)
+H12 · `git replace` en local da verde falso (la CI no) → GIT_NO_REPLACE_OBJECTS=1. (toy/a12-replace)
+H13 · La prima final se recorta en las piezas: `consistencyFormula'` (vivo) se mira como `consistencyFormula` y deja 3
+      entradas falsas en la tabla de RPP (rojo falso medido; el verde falso, sólo en un caso sintético).
+H14 · CommonMark (0 casos reales): `\`` dentro de una cita esconde la siguiente; un `<!--` a media línea oculta hasta el
+      siguiente `-->` sin V; rojos falsos con vallas en ítems de lista a 4 espacios y bloques sangrados.
+H15 · Un nombre calificado con prefijo exento (`ENS.x`, `goedel.x`) no se mira; hoy los 47 casos viven por su último tramo.
+H16 · Alias: el volcado refleja también inductivos de Lean, y p1 se mira antes que HIST: un futuro `abbrev N := Nat`
+      reviviría 29 nombres retirados (medido con un ENV modificado; que el volcado lo emita, inferido). (casos/alias-riesgo.txt)
+H17 · HIST no tiene directorios: `Intermediate` (eliminado) vive por `Std.Iter.Intermediate`, `Block` por
+      `Lean.Doc.Block` (hoy los salva además un marcador).
+H18 · Un .lean que no compila, dejado en cuarentena/, da nombres «vivos».
+H19 · FOL no compara b-citas.awk ni b-control.bash con RPP: sólo lo hace RPP.
+H20 · Coste: unos 6 s por cada commit que cambia el núcleo (dos medidas, 6,0 s); crece linealmente (estimación).
+H21 · El anclaje de HIST no recoge `/-- -/ theorem`, `instance (priority…)`, `open … in theorem`, atributos con
+      corchetes anidados ni el nombre en la línea siguiente; `class inductive` mete la palabra `inductive`. 0 casos de
+      esas formas en las 320 251 líneas de diff de los dos repos. (casos/hist-formas.txt)
+H22 · HIST local ≠ CI (.lean sin seguimiento, HEAD del repo hermano): sólo rojos falsos en un lado.
+
+SÓLIDO (comprobado por el revisor): el formato de la tabla (CRLF y líneas en blanco, verde; `01`, una columna de más,
+una clave con espacio o repetida, rojo); las rutas con «=» (de 44 ficheros retirados, el sufijo de dos tramos sale muerto
+en 32; los 12 vivos son homónimos legítimos de FOL/Theorems/*; sin vía por etiqueta, directorio ni prefijo); la clase T
+sólo absuelve el token exacto; las 29 citas con punto que dependen sólo de Lean son nombres reales de Lean; añadir los
+constructores históricos a HIST no cambia la salida de hoy.
+
+QUÉ QUEDA (ADR-166 §4, para la sesión siguiente): rehacer el techo sobre una BASE VERIFICADA (H1–H5, H9), los verdes
+falsos de H6–H8 en el núcleo (con su deuda), y los menores que se decidan; con su revisión adversarial.

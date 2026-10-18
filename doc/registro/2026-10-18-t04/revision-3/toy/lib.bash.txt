@@ -1,0 +1,29 @@
+# lib.bash — banco de juguete para atacar el trinquete de [B] (revisión 3). Copia b-citas.awk y b-control.bash del árbol
+# de RPP (sólo lectura) a un repo de git nuevo en $1, con las entradas mínimas de b_trinquete.bash.
+export PATH="/usr/bin:/bin:$PATH"
+RAIZ=/e/Dropbox/GitHub/lean4/ROBINSON_PlusPlus
+nuevo_repo() {   # $1 = directorio (se borra y se crea)
+  rm -rf "$1"; mkdir -p "$1"; cd "$1" || exit 2
+  git init -q . && git config user.email t@t && git config user.name t && git config core.autocrlf false
+  git checkout -q -b master 2>/dev/null || true
+  cp "$RAIZ/b-citas.awk" "$RAIZ/b-control.bash" .
+  printf '%s\n' vivo_ok > vivos; : > env; : > sond; : > mod; : > rut
+  { echo 'theorem raa : True := trivial'; for i in $(seq 1000 2000); do echo "theorem nombre_$i : True := trivial"; done; } > X.lean
+  printf '## ADR-900: sube `muerto_uno_largo` a propósito\n\n## ADR-901: otra cosa\n' > DECISIONS.md
+  DOCS_LISTA="doc.md"; printf "salida.txt
+" > .gitignore
+}
+corre() {   # $1 = modo  $2 = B_SUBE_ADR   → «FAIL=… MEDIDO=…» y las líneas de [B] con ❌/✓/⚠️/historia
+  ( B_DECLS=vivos B_ENV=env B_SOND=sond B_MOD=mod B_RUT=rut B_GITS=. B_DOCS_LISTA=$DOCS_LISTA
+    B_DEUDA_MODO=$1 B_SUBE_ADR=$2
+    DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class) +[^[:space:]:({[]+"
+    NOMBRES='{n = $NF; sub(/[.]$/, "", n); if (n == "") next; print n; k = n; sub(/.*[.]/, "", k); if (k != n && k != "") print k}'
+    b_adr_existe() { grep -qE "^## $1:" DECISIONS.md; }
+    b_adr_texto() { awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en' DECISIONS.md; }
+    source ./b-control.bash > salida.txt 2>&1; echo "FAIL=$B_FAIL MEDIDO=$B_MEDIDO"
+    grep -E '❌|✓|⚠️|historia|deuda declarada' salida.txt | head -8 )
+}
+paso() {   # $1 = descripción  $2 = modo  [$3 = B_SUBE_ADR]
+  echo "── $1 (modo $2${3:+, B_SUBE_ADR=$3})"; corre "$2" "${3:-}" | sed 's/^/      /'
+}
+commit() { git add -A && git commit -qm "$1"; }

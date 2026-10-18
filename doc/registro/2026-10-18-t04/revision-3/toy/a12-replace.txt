@@ -1,0 +1,9 @@
+── (C3) antes: la tabla subida a mano (modo 0)
+      FAIL=1 MEDIDO=1
+        historia de la tabla: 3 versiones desde 0ec7740, 0 con otro núcleo; 1 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+        deuda declarada: 3 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+── (C3) con «git replace» del commit que bajaba la tabla (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde 0ec7740, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 3 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3

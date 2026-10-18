@@ -1,0 +1,21 @@
+── (0a) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (0b) cuadra (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde b537c6f, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+1
+(el núcleo de K2 es el de RPP, byte a byte)
+── (K2, árbol) núcleo restaurado + diez citas muertas NUEVAS: --b-deuda-rehacer (modo 3)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 11 entradas
+        historia de la tabla: 2 versiones desde b537c6f, 1 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 11 citas muertas en 11 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 11
+── (K2, en git: lo que ve la CI en la rama ci/…) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 3 versiones desde b537c6f, 2 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 11 citas muertas en 11 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 11
+11

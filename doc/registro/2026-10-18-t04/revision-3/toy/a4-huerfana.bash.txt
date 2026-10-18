@@ -1,0 +1,28 @@
+#!/bin/bash
+# A4 — una raíz HUÉRFANA con una tabla cualquiera, fusionada con master (--allow-unrelated-histories) siendo ella el
+# primer padre: la historia de la tabla «empieza» en la huérfana, y la fusión es un avance rápido de master.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a4"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(C1) la tabla inicial" 2; commit C1
+paso "(C1) cuadra" 0
+C1=$(git rev-parse HEAD)
+git show "$C1:doc/control/b-deuda.tsv" | grep '^#' > ../cab-a4.txt
+# R: una raíz huérfana con SOLO la tabla que se quiere (cien entradas nuevas, declaradas de antemano)
+git checkout -q --orphan huerfana
+git rm -rqf . ; rm -rf doc doc.md vivos env sond mod rut X.lean DECISIONS.md b-citas.awk b-control.bash
+mkdir -p doc/control
+{ cat ../cab-a4.txt; printf 'B\tmuerto_dos\tdoc.md\t1\n'; for i in $(seq 1 100); do printf 'B\tmuerto_nuevo_%s\tdoc.md\t1\n' $i; done; } > doc/control/b-deuda.tsv
+printf 'salida.txt\n' > .gitignore
+git add -A && git commit -qm "R: raíz huérfana"
+ls
+# M: fusión con master, primer padre R; el árbol es el de master, con cien citas muertas nuevas y la tabla de R
+git merge --allow-unrelated-histories --no-commit master > ../merge-a4.txt 2>&1; echo "merge rc=$?"; cat ../merge-a4.txt
+git show huerfana:doc/control/b-deuda.tsv > doc/control/b-deuda.tsv
+for i in $(seq 1 100); do printf 'Nueva: `muerto_nuevo_%s`.\n' $i >> doc.md; done
+git add -A && git commit -qm "M: fusiona master"
+git cat-file -p HEAD | grep -c '^parent'
+paso "(M) cien citas muertas nuevas, sin ADR (lo que ve la CI en la rama ci/…)" 0
+git merge-base --is-ancestor "$C1" HEAD && echo "      (M desciende de C1: «git push origin HEAD:master» es un avance rápido)"
+git log --first-parent --format='%h %s' -- doc/control/b-deuda.tsv b-citas.awk | sed 's/^/      primer padre: /'

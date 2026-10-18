@@ -11,6 +11,8 @@
 #   2. Se citan como vigentes símbolos que YA NO EXISTEN en el código
 #      (`goedel_first_real'`, `prf_tc_cons'`, …).
 #
+# ✏️ 2026-10-18 (ADR-166, T04): [B] es otro: toda cita con forma de identificador o de ruta (b-citas.awk), absuelta
+# sólo por un marcador a 100 bytes (no por una fecha), con la deuda POR CITA en doc/control/b-deuda.tsv.
 # ✏️ 2026-10-18 (ADR-163, T15): y [L], el universo de los módulos (el cierre de imports del barril = el disco = git).
 # ✏️ 2026-10-14 (ADR-135): hoy rompen [A], [B], [C], [D], [E], [F], [H], [M] y [T]; sólo [A2] es aviso. Lo que
 # sigue es la cabecera de entonces:
@@ -21,6 +23,10 @@
 #   bash check-doc-sync.bash            # comprobación completa
 #   bash check-doc-sync.bash --quick    # sin `lake build` (usa el conteo de módulos)
 #   bash check-doc-sync.bash --fix-hint # además, sugiere el sed de cada corrección
+#   bash check-doc-sync.bash --b-deuda  # además, baja doc/control/b-deuda.tsv a la deuda de hoy, si nada sube (ADR-166)
+#   bash check-doc-sync.bash --b-deuda-inicial  # crea esa tabla, sólo si no existe (se hizo una vez, ADR-166)
+#   bash check-doc-sync.bash --b-deuda-rehacer  # la rehace, sólo en el commit que cambia el núcleo de [B] (y sube, como
+#                                               # mucho, lo que el núcleo nuevo ve de más que el viejo)
 #
 # Salida: 0 si todo cuadra, 1 si hay desincronización.
 
@@ -41,10 +47,14 @@ cd "$(dirname "$0")"
 
 QUICK=0
 HINT=0
+B_DEUDA_MODO=0
 for a in "$@"; do
   case "$a" in
     --quick)     QUICK=1 ;;
     --fix-hint)  HINT=1 ;;
+    --b-deuda)   B_DEUDA_MODO=1 ;;
+    --b-deuda-inicial) B_DEUDA_MODO=2 ;;
+    --b-deuda-rehacer) B_DEUDA_MODO=3 ;;
     -h|--help)   awk 'NR > 1 && /^#/ { print; next } NR > 1 { exit }' "$0"; exit 0 ;;
     *) echo "opción desconocida: $a" >&2; exit 2 ;;
   esac
@@ -520,132 +530,70 @@ fi
 #     absolvía a todo nombre que empezara como uno vivo. Hoy se casa el nombre EXACTO, y una
 #     familia se cita con `_` final (`ax_C3_`): ver (2) más abajo.
 echo
-echo "════ [B] SÍMBOLOS MUERTOS — ROJO, con trinquete ════"
-echo "   (deuda DECLARADA y con trinquete desde 2026-09-22: no puede crecer.)"
-# ⛔⛔ ADJUDICADO EL 2026-09-22 (ADR-084): `[B]` deja de ser AVISO y pasa a ser CONTROL.
-#
-# Nacía como aviso porque «hay menciones legítimas en secciones de diseño e historia», y eso
-# es cierto — pero un aviso que nadie adjudica es una lista que crece sola. Los `DEAD_MARKER`
-# de arriba ya absuelven las menciones históricas bien marcadas; lo que queda **no está
-# marcado**, y por tanto o se marca o se arregla.
-#
-# ⚠️ LA CIFRA: el banner del proyecto hablaba de «los 223 nombres». Medido hoy son **44**.
-# No es que se hayan adjudicado 179: es que 223 era el conteo de CANDIDATOS antes de aplicar
-# los marcadores. 🔑 *Una cifra de deuda sin decir en qué punto del filtro se tomó no es
-# comparable consigo misma.*
-#
-# ⬜ La deuda REAL que queda, y es de LECTURA, no de script: cada uno de los 44 pide mirar su
-# línea y decidir si es historia (⇒ marcarla) o una afirmación de estado caducada (⇒ arreglar
-# el doc). Mientras tanto el trinquete garantiza que **no puede crecer**.
-# 2026-10-03 (ADR-116): 44 → 41. Al pasar [B] a nombre exacto, las líneas de 16 símbolos que pasaban
-# por un homónimo más largo se corrigieron una a una, y de paso quedaron marcadas las últimas citas
-# de `goedel_first_real`, `prf_isTsC` y `prf_tc_substfc`: el trinquete las pidió quitar.
-# 2026-10-16 (ADR-142): 41 → 23. Las 18 que salen NO se pagaron leyendo: el texto que las citaba (ADR-001…130 y los
-# bloques viejos de NEXT-STEPS) pasó TAL CUAL a doc/historia/, que por diseño queda fuera del universo de [B], como
-# CHANGELOG. Es deuda «pagada por exclusión», y ADR-142 §3 la lista nombre a nombre con el fichero donde vive.
-read -r -d '' B_DEUDA <<'EOF'
-ax_notInAxC
-ax_tc_substfc
-godelC'_fixedpoint
-goedel_first_real'
-goedel_first_undecidable_real'
-goedel_second'
-pcc_axiom_inst_k
-pcc_binOk_tracked
-pcc_eval_substfc_wit_REAL
-pcc_eval_substtc'
-pcc_eval_substtsc'
-pcc_In_tracked
-pcc_substfc_forall_dot
-pcc_thm_inst_k
-pcc_wfAll_tracked_lit
-prf_add_eq_zero_right
-prf_crit_In_F_rejects_open
-prf_tc_cons
-prf_tc_cons'
-prf_tc_nul
-prf_tc_objAt
-prf_wfAll_objList
-repr_neg
-EOF
-B_FAIL=0
-# ⛔ 2026-10-04 (ADR-116, segunda revisión): el «de 41» del final era un literal que nada comparaba.
-# Ahora el tope es un dato y se compara con la tabla en los DOS sentidos: crece la tabla sin subir
-# el tope ⇒ rojo; se salda una deuda y no se baja ⇒ rojo. 🔑 *El tope sólo BAJA: subirlo es aceptar
-# deuda nueva, y eso pide un ADR, no un commit de documentación.*
-B_TOPE=23
-B_TOPE_ADR=""   # sólo si un ADR SUBE el tope: «ADR-123:42» (el ADR, que tiene que existir, y el tope NUEVO)
-AUTHORITATIVE="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
+echo "════ [B] CITAS MUERTAS — ROJO, con trinquete POR CITA (T04, ADR-166) ════"
+# ⛔⛔ REHECHO EL 2026-10-18 (T04, ADR-166). Lo que había (ADR-084, ADR-116, ADR-142) tenía tres agujeros, medidos por
+# la auditoría y re-medidos (`scripts/pruebas/b/b_medir_t04.bash`, doc/registro/2026-10-18-t04/):
+#   (1) el MARCADOR contaba en cualquier punto de la línea: el «falta» de «faltaban» absolvía cinco citas muertas de
+#       la fila M-11, y una fecha ISO en cualquier sitio absolvía la línea entera;
+#   (2) el UNIVERSO eran siete prefijos (`prf_`, `pcc_`, `goedel_`, `godel`, `d1_…d3_`, `repr_`, `ax_`): un módulo
+#       retirado, un teorema con otro nombre o un fichero borrado no los miraba nadie;
+#   (3) las RUTAS no las miraba nadie: `FOL/MetaRules.lean` se citaba como vigente con el fichero borrado.
+# Ahora el núcleo es `b-citas.awk` y la lógica `b-control.bash`, los dos IDÉNTICOS en FOL (se comparan aquí, byte a
+# byte): toda cita con forma de identificador o de ruta; viva si existe; absuelta sólo por un marcador de ESTADO a 100
+# bytes o menos, sin cruzar una celda de tabla; la FECHA ya no absuelve, ni un verbo corriente. Los detalles, en la
+# cabecera de los dos. Dos revisiones adversariales (ADR-166 §3) encontraron dieciocho vías de verde falso o de trinquete
+# débil en las dos primeras versiones, arregladas.
+# 🔑 La deuda es POR CITA (`doc/control/b-deuda.tsv`), con TECHO: el que sale de rehacer en git la historia de la tabla
+# desde que se creó; sólo baja, salvo lo que un cambio del núcleo vea de más (b-control.bash lo explica).
+# ⛔ ABIERTO (ADR-166 §4): la TERCERA revisión encontró tres vías para subir la tabla con la CI en verde (un núcleo con
+# «otra interfaz» o debilitado en un commit intermedio, y las fusiones) y verdes falsos en el núcleo. El arreglo previsto:
+# el techo sobre la última base VERIFICADA (master), no sobre la historia.
+B_GITS=". ../FOL"   # la historia de los nombres: la de RPP (con lo que aún no está en git) y la de FOL
+B_SUBE_ADR=""   # sólo si un ADR deja que la tabla CREZCA sin cambiar el núcleo: «ADR-NNN» (tiene que existir y nombrarlas)
+b_adr_existe() { grep -qE "^## $1:" DECISIONS.md; }
+b_adr_texto() { awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en' DECISIONS.md; }
+B_DOCS_LISTA="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 # (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)
-AUTHORITATIVE="$AUTHORITATIVE TEOREMAS-E-HIPOTESIS.md"
-AUTHORITATIVE="$AUTHORITATIVE $(ls doc/REFERENCE-*.md 2>/dev/null) cuarentena/README.md sondeos/README.md"
-# Marcadores que hacen LEGÍTIMA la mención de un símbolo inexistente:
-#   (a) se declara retirado;  (b) es hipotético/propuesto/descartado;  (c) va en una
-#   entrada fechada (histórico por diseño).
-# ⚠️⚠️ MEDIDO EL 2026-10-02 (ADR-115): en msys (GNU grep 3.0, locale es_ES.UTF-8) la alternativa
-# `🗑️` de abajo NO CASA NUNCA — grep no maneja en UTF-8 un carácter fuera del BMP (`⏳` y `✏` sí casan;
-# `🗑` no, con o sin U+FE0F; con LC_ALL=C sí). En la CI (Linux) casa. ⇒ el MISMO documento podía dar
-# verde en CI y rojo en local. Regla: una marca de retirada lleva SIEMPRE una palabra (`retirad…`),
-# no sólo el emoji. 🔑 *Un patrón que no casa en el entorno donde se ejecuta no es un patrón.*
-# ⭐ 2026-10-04: desde la segunda revisión los marcadores se aplican por BYTES (awk con LC_ALL=C), así
-# que casan igual en msys y en Linux — `🗑️` incluido. Por eso un acento va con `(e|é)` y no con `[eé]`
-# (en modo byte un corchete casa UN byte, y `é` son dos), y la fecha sin `{2}` (no todo awk lo lee).
-DEAD_MARKER='YA NO EXISTE|NO EXISTEN|retirad|RETIRADO|eliminad|borrad|legacy|F7a|histórico|ANTERIORES|🗑️|muert|Aquí vivía|tampoco existe|inexistente|desapareci|ya no son|se borró'
-DEAD_MARKER="$DEAD_MARKER"'|propuest|candidat|hipot(e|é)tic|har(i|í)a falta|si se |habr(i|í)a que|añadir |descartad|no existe|NO EXISTE|sin materializar|20[0-9][0-9]-[0-9][0-9]-[0-9][0-9]'
-#   (d) es un OBJETIVO declarado, no una afirmación de que ya está.
-DEAD_MARKER="$DEAD_MARKER"'|falta|FALTA|construir|objetivo|medir|sin medir|pendiente|⏳|abiert|necesita|exige|pide|TAREA|hace falta|no hay ni habrá|sub‑familia|sub-familia|buscaba|buscó|usan la'
-#   (e) 2026-10-03 (ADR-116): vive en `sondeos/`, FUERA del árbol activo, y la línea lo dice. No es un
-#       marcador de texto (eximía líneas que nombran `sondeos/` por otra razón): se exime la línea que
-#       nombra el FICHERO que lo declara (`sondeos/Foo.lean`, o `sondeos/Foo`) — desde la segunda
-#       revisión, ese fichero y no otro sondeo cualquiera.
-# El árbol de declaraciones incluye `cuarentena/`: esos símbolos EXISTEN (están fuera
-# del build, no borrados), y los docs los discuten con razón.
-# ⛔⛔ 2026-10-03 (ADR-116 de RPP): dos defectos de este bloque, medidos. (1) Las declaraciones se
-# sacaban del texto ENTERO, comentarios incluidos: un nombre que sólo aparece en prosa (p. ej. el
-# «axiom ax_list_induction» de un docstring de RPP) pasaba por VIVO. Ahora salen del código SIN
-# comentarios ni cadenas (`strip-lean.awk`), y con todas las palabras clave de declaración.
-# (2) Se casaba por PREFIJO («la prosa abrevia»): `ax_list_induction` pasaba por vivo porque existe
-# `ax_list_induction_refutable`, y `d3_prf` porque existe `d3_prf_real`. Ahora se casa el nombre
-# EXACTO; la abreviatura de una FAMILIA se escribe con `_` final (`prf_tc_`), y sólo ésa casa por
-# prefijo. 🔑 *Un control que casa por prefijo absuelve a todo nombre que empiece igual que uno vivo.*
-# (3) 2026-10-03, v2 (revisión adversarial): el NOMBRE se toma entero (`prf_foo₀`, `Prf.prf_bar`: antes
-# se cortaba en el primer carácter no ASCII o en el primer `.`) y se guarda también su último
-# componente; el ALCANCE es explícito (antes entraban `auditoria/`, las librerías muertas y, en local,
-# `Probe/`, que la CI no tiene); y si la lista sale vacía o sin un nombre que existe seguro, NO se mide.
-# (4) 2026-10-04, segunda revisión: (a) las CITAS se leen enteras también: calificadas
-# (`GodelTwo.goedel_second'`, que vale por su último componente) y con caracteres no ASCII
-# (`prf_zz₀`); antes el patrón se paraba en el `.` o en el subíndice y esas citas no las miraba nadie;
-# (b) `def prf_univ.{u}` declara `prf_univ` (antes, `prf_univ.` y un nombre vacío); (c) la pasada es
-# UNA sola de awk sobre los documentos —antes, un grep por símbolo y documento: ~90 s en msys—;
-# (d) si falta la copia de FOL del despojador, rojo (antes se saltaba la comparación en silencio).
-# ⚠️ Lo que NO ve: los constructores y los campos de estructura no son declaraciones de primer nivel,
-# así que citar uno sale como MUERTO — falso rojo, nunca falso verde; se arregla citando el tipo.
-if [ ! -f ../FOL/strip-lean.awk ]; then
-  echo "  ❌ falta ../FOL/strip-lean.awk: no puedo comprobar que las dos copias del despojador sean la misma."
-  B_FAIL=1
-elif ! cmp -s <(grep -v '^#' strip-lean.awk | tr -d '\r') <(grep -v '^#' ../FOL/strip-lean.awk | tr -d '\r'); then
-  # (sin los `\r`: FOL no fuerza LF y, con core.autocrlf, su copia sale con CRLF tras un checkout en Windows)
-  echo "  ❌ strip-lean.awk y ../FOL/strip-lean.awk ya no tienen el mismo código: unifícalos."
-  B_FAIL=1
-fi
+B_DOCS_LISTA="$B_DOCS_LISTA TEOREMAS-E-HIPOTESIS.md"
+# (la lista es EXPLÍCITA: un documento que desaparece es rojo, no sale del universo con su deuda; y un REFERENCE nuevo
+# tiene que entrar en ella)
+B_DOCS_LISTA="$B_DOCS_LISTA doc/REFERENCE-Arithmetic.md doc/REFERENCE-Full.md doc/REFERENCE-Godelization.md"
+B_DOCS_LISTA="$B_DOCS_LISTA doc/REFERENCE-Incompleteness.md doc/REFERENCE-Kernel.md cuarentena/README.md sondeos/README.md"
+B_FAIL=0
+for d in doc/REFERENCE-*.md; do
+  [ -f "$d" ] || continue
+  case " $B_DOCS_LISTA " in *" $d "*) ;; *) echo "  ❌ $d no está en la lista de [B] (B_DOCS_LISTA): un REFERENCE nuevo entra en ella."; B_FAIL=1 ;; esac
+done
+# el núcleo, igual en los dos repos
+for f in strip-lean.awk b-citas.awk b-control.bash; do
+  if [ ! -f "../FOL/$f" ]; then
+    echo "  ❌ falta ../FOL/$f: no puedo comprobar que las dos copias sean la misma."
+    B_FAIL=1
+  elif [ "$f" = strip-lean.awk ]; then
+    # (strip-lean.awk tiene una cabecera propia en cada repo: se comparan sus líneas de código)
+    cmp -s <(grep -v '^#' "$f" | tr -d '\r') <(grep -v '^#' "../FOL/$f" | tr -d '\r') \
+      || { echo "  ❌ $f y ../FOL/$f ya no tienen el mismo código: unifícalos."; B_FAIL=1; }
+  else
+    cmp -s <(tr -d '\r' < "$f") <(tr -d '\r' < "../FOL/$f") \
+      || { echo "  ❌ $f y ../FOL/$f ya no son el mismo fichero, byte a byte: unifícalos."; B_FAIL=1; }
+  fi
+done
 DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class) +[^[:space:]:({[]+"
 # el nombre entero y su último componente; `prf_univ.{u}` → `prf_univ`
 NOMBRES='{n = $NF; sub(/[.]$/, "", n); if (n == "") next; print n; k = n; sub(/.*[.]/, "", k); if (k != n && k != "") print k}'
-DECLS=$(mktemp); DECLS_SOND=$(mktemp); B_SALIDA=$(mktemp); B_VISTOS=$(mktemp)
-# (las borra [M]; si el script se corta antes, este trap)
-trap 'rm -f "$DECLS" "$DECLS_SOND"' EXIT
-# (todo el tramo en modo byte, LC_ALL=C: con el locale de msys, `grep -o` cortaba un carácter fuera del
-#  BMP y `sort -u` fundía nombres canónicamente equivalentes —tercera revisión—)
+DECLS=$(mktemp); DECLS_SOND=$(mktemp); B_ENV=$(mktemp); B_MOD=$(mktemp); B_RUT=$(mktemp)
+# (DECLS y DECLS_SOND las usan también [M] y [T]: se borran allí; si el script se corta antes, este trap)
+trap 'rm -rf "$DECLS" "$DECLS_SOND" "$B_ENV" "$B_MOD" "$B_RUT"' EXIT
+# las declaraciones (ADR-116: del código SIN comentarios ni cadenas, con el nombre entero y su último componente),
+# también las de cuarentena/ —existen, aunque fuera del build— y las de FOL
 find ROBINSON_PlusPlus/ ROBINSON_PlusPlus.lean cuarentena/ ../FOL/FOL/ ../FOL/TheoryFramework/ ../FOL/FOL.lean -name '*.lean' ! -path '*/.lake/*' -print0 2>/dev/null \
   | xargs -0 env LC_ALL=C awk -f strip-lean.awk | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" | LC_ALL=C sort -u > "$DECLS"
-# (e): «nombre|fichero» de cada declaración de un sondeo
+# «nombre|fichero» de cada declaración de un sondeo; una cita que nombra su sondeo queda exenta
 find sondeos/ -name '*.lean' 2>/dev/null | sort | while IFS= read -r f; do
   LC_ALL=C awk -f strip-lean.awk "$f" | LC_ALL=C grep -oE "$DECL_RE" | LC_ALL=C awk "$NOMBRES" | LC_ALL=C awk -v f="$f" '{print $0 "|" f}'
 done | LC_ALL=C sort -u > "$DECLS_SOND"
-# ✏️ 2026-10-16 (ADR-141): los sondeos ARCHIVADOS (fuera del árbol, en la etiqueta `archivo/sondeos-2026-10`) siguen
-# declarando lo que declaraban, y una cita que nombra su sondeo sigue exenta. Se leen de la etiqueta; el fichero
-# queda como «archivo/sondeos-2026-10:sondeos/X.lean», que es la forma de las citas reescritas. Sin la etiqueta (un
-# clon sin etiquetas) no se puede medir, y el autotest de abajo lo dice.
+# ✏️ 2026-10-16 (ADR-141): los sondeos ARCHIVADOS (en la etiqueta `archivo/sondeos-2026-10`) siguen declarando lo que
+# declaraban, y una cita que nombra su sondeo sigue exenta. Sin la etiqueta no se puede medir, y lo dice abajo.
 SOND_ARCH=archivo/sondeos-2026-10
 if git rev-parse -q --verify "refs/tags/$SOND_ARCH" >/dev/null 2>&1; then
   git ls-tree -r --name-only "$SOND_ARCH" -- sondeos/ 2>/dev/null | grep '^sondeos/[^/]*\.lean$' | while IFS= read -r f; do
@@ -654,118 +602,53 @@ if git rev-parse -q --verify "refs/tags/$SOND_ARCH" >/dev/null 2>&1; then
       | LC_ALL=C awk -v f="$SOND_ARCH:$f" '{print $0 "|" f}'
   done | LC_ALL=C sort -u >> "$DECLS_SOND"
 fi
+# los MÓDULOS (cada tramo de su nombre con puntos): el cierre de las librerías de RPP y de FOL —no todo `.lean`
+# versionado: una librería retirada en cuarentena no es un módulo—, los sondeos y los scripts
+{ printf '%s\n' "$CIERRE"; bash ../FOL/cierre-imports.bash 2>/dev/null; git ls-files 'sondeos/*.lean' 'scripts/*.lean'; } \
+  | grep . | sed 's/[.]lean$//; s|/|.|g' \
+  | LC_ALL=C awk '{ n = split($0, z, "."); for (i = 1; i <= n; i++) { s = z[i]; print s; for (j = i + 1; j <= n; j++) { s = s "." z[j]; print s } } }' \
+  | LC_ALL=C sort -u > "$B_MOD"
+# las RUTAS: lo versionado en RPP y en FOL (FOL también con `FOL/` delante, que es como lo cita RPP), las etiquetas y,
+# de cada etiqueta, «etiqueta:ruta». Las librerías RETIRADAS (`cuarentena/librerias-retiradas/`) entran sólo con su
+# ruta entera (y la de sus directorios), con «=»: `FOLPure/Soundness.lean` a secas ya no es un fichero vivo
+{ git ls-files; git -C ../FOL ls-files; git -C ../FOL ls-files | sed 's|^|FOL/|'; git tag; git -C ../FOL tag
+  for t in $(git tag); do git ls-tree -r --name-only "$t" | sed "s|^|$t:|"; done
+  for t in $(git -C ../FOL tag); do git -C ../FOL ls-tree -r --name-only "$t" | sed "s|^|$t:|"; done
+} | sed -E 's#^((FOL/)?cuarentena/librerias-retiradas/)#=\1#' \
+  | LC_ALL=C awk '{ print } /^=/ { p = substr($0, 2); while (sub(/\/[^\/]*$/, "", p)) print "=" p }' | LC_ALL=C sort -u > "$B_RUT"
 B_MEDIDO=1
-# los dos testigos de sondeos: `esAC`, de uno del árbol (AnclaEqInconsistente, CONTROL), y `prf_wfAll_objList`, de uno
-# archivado (ParseWitness): si falta el primero no se leyó sondeos/; si falta el segundo, la etiqueta.
+# los testigos: `goedel_first_prf` y `derives0_soundness` (las declaraciones), `esAC` (un sondeo del árbol),
+# `prf_wfAll_objList` (uno archivado, en la etiqueta)
 if [ "$(wc -l < "$DECLS" | tr -d ' ')" -lt 1000 ] || ! grep -qxF goedel_first_prf "$DECLS" \
    || ! grep -qxF derives0_soundness "$DECLS" || ! grep -q '^esAC|sondeos/' "$DECLS_SOND" \
    || ! grep -q "^prf_wfAll_objList|$SOND_ARCH:sondeos/" "$DECLS_SOND"; then
   echo "  ❌ NO PUDE MEDIR [B]: las declaraciones salen vacías o sin \`goedel_first_prf\`, \`derives0_soundness\`,"
-  echo "      \`esAC\` (de un sondeo) o \`prf_wfAll_objList\` (de uno archivado, en la etiqueta $SOND_ARCH),"
-  echo "      que existen seguro (¿strip-lean.awk? ¿un clon sin etiquetas?)."
+  echo "      \`esAC\` (de un sondeo) o \`prf_wfAll_objList\` (de uno archivado, en la etiqueta $SOND_ARCH)."
   B_FAIL=1; B_MEDIDO=0
 fi
-B_DOCS=""
-for d in $AUTHORITATIVE; do [ -f "$d" ] && B_DOCS="$B_DOCS $d"; done
+B_DECLS_OK=$B_MEDIDO   # [M] sólo necesita las listas de declaraciones
+# el entorno de Lean (constantes, con «P» las del proyecto; opciones; módulos de Lean): lo vuelca
+# scripts/VolcarEntorno.lean sobre el build hecho. Sin `lake` en el PATH no se puede medir: desde PowerShell.
 if [ "$B_MEDIDO" = "1" ]; then
-  # UNA pasada: cada cita `…` con la forma de un símbolo; viva si su nombre entero o su último
-  # componente está declarado (una familia, con `_` final, por prefijo); si no, la línea se exime
-  # por un marcador o por nombrar el sondeo que lo declara; lo que queda sale como «clave|cita|línea».
-  LC_ALL=C awk -v MARK="$DEAD_MARKER" '
-    BEGIN { CAND = "`([A-Z][A-Za-z0-9_]*[.])*(prf_|pcc_|goedel_|godel|d[123]_|repr_|ax_)([A-Za-z0-9_'"'"'!?]|[\303-\337][\200-\277]|\342(\202|\204|\205|\261)[\200-\277]|\341[\265-\277][\200-\277]|\360\235[\200-\277][\200-\277])+`" }
-    FILENAME == ARGV[1] { vivo[$0] = 1; next }
-    FILENAME == ARGV[2] { p = index($0, "|"); k = substr($0, 1, p - 1); sond[k] = sond[k] "|" substr($0, p + 1); next }
-    {
-      s = $0
-      # un carácter de nombre: ASCII, o en UTF-8 una letra (2 bytes), un subíndice, un letterlike, ⱼ,
-      # el griego extendido o el alfabeto matemático — NO la puntuación general (`1‑3`, `a–b`, `…`)
-      while (match(s, CAND)) {
-        t = substr(s, RSTART + 1, RLENGTH - 2); s = substr(s, RSTART + RLENGTH)
-        k = t; sub(/^([A-Z][A-Za-z0-9_]*[.])*/, "", k)
-        # los axiomas objeto son snake_case: `ax_UpperCamel` es un PLACEHOLDER de convención
-        # de nombres (`ax_TagDescriptor`), no un símbolo
-        if (k ~ /^ax_[A-Z]/) continue
-        if ((t in vivo) || (k in vivo)) continue
-        if (k ~ /_$/) {
-          if (!(k in fam)) { fam[k] = 0; for (v in vivo) if (index(v, k) == 1) { fam[k] = 1; break } }
-          if (fam[k]) continue
-        }
-        # el marcador se mira en la línea con las CITAS en blanco: un nombre muerto que contenga un
-        # marcador (`prf_x_muerto`, `ax_medir`) no puede eximirse a sí mismo (tercera revisión)
-        l = $0; gsub(CAND, "``", l)
-        if (l ~ MARK) continue
-        if (k in sond) {
-          nf = split(substr(sond[k], 2), fs, "|"); ex = 0
-          for (q = 1; q <= nf; q++) { b = fs[q]; sub(/[.]lean$/, "", b); if (match($0, b "([^A-Za-z0-9_]|$)")) ex = 1 }
-          if (ex) continue
-        }
-        print k "|" t "|" FILENAME ":" FNR ":" $0
-      }
-    }' "$DECLS" "$DECLS_SOND" $B_DOCS > "$B_SALIDA"
-  cut -d'|' -f1 "$B_SALIDA" | LC_ALL=C sort -u | while IFS= read -r k; do
-    if printf '%s\n' "$B_DEUDA" | grep -qxF "$k"; then
-      echo "$k" >> "$B_VISTOS"
-    else
-      echo "  ❌ \`$k\` no existe en el árbol activo, se cita sin marcar como retirado,"
-      echo "      y NO está en la tabla B_DEUDA de este script:"
-      awk -F'|' -v k="$k" '$1 == k' "$B_SALIDA" | head -2 | cut -d'|' -f3- | sed 's/^/      /' | cut -c1-140
-      echo x >> "$B_SALIDA.rojo"
-    fi
-  done
-  [ -s "$B_SALIDA.rojo" ] && B_FAIL=1
-  # ⛔⛔ EL AGUJERO QUE ESTO TAPA (2026-09-22, cazado por su propia prueba de rotura):
-  # el bucle de arriba recorre los símbolos **CITADOS**. Una entrada de `B_DEUDA` cuyo documento
-  # se arregle deja de estar citada ⇒ **no vuelve a entrar en el bucle nunca**, y la tabla se
-  # quedaría con fantasmas para siempre. La comprobación de «deuda saldada» tiene que hacerse
-  # DESPUÉS del bucle, contra la tabla, no dentro.
-  # 🔑 *Un trinquete que sólo mira lo que entra en el bucle no es un trinquete: es media
-  #    cuenta.* La versión de `[E]` no tenía el agujero porque recorre los DOCUMENTOS, que
-  #    siempre existen; ésta recorre las CITAS, que desaparecen.
-  while IFS= read -r t; do
-    [ -n "$t" ] || continue
-    case "$t" in '#'*) continue ;; esac
-    if ! grep -qxF "$t" "$B_VISTOS" 2>/dev/null; then
-      echo "  ❌ \`$t\`: declarado en B_DEUDA pero YA NO se cita como vigente — quítalo de la tabla."
-      B_FAIL=1
-    fi
-  done <<< "$B_DEUDA"
-fi
-B_NT=$(printf '%s\n' "$B_DEUDA" | grep -v '^#' | grep -c . || true)
-if [ "$B_NT" != "$B_TOPE" ]; then
-  echo "  ❌ la tabla B_DEUDA tiene $B_NT entradas y su tope (B_TOPE) es $B_TOPE: tabla y tope cambian juntos,"
-  echo "      y el tope sólo baja."
-  B_FAIL=1
-fi
-# ⛔ 2026-10-04 (tercera y cuarta revisión): «el tope sólo baja» no lo comprobaba nada (subir tabla y tope
-# en la misma edición daba verde), y la primera comparación —con el commit padre— tampoco: tras el commit
-# que lo subía, cualquier otro encima ya lo traía subido. Ahora la referencia es FIJA: el MÍNIMO de B_TOPE
-# en toda la historia de este fichero. Subirlo exige `B_TOPE_ADR="ADR-NNN:valor"`, con el ADR existente y
-# el valor igual al tope de ahora. Sin historia (un clon superficial) no se compara, y `[E]` ya da rojo.
-B_TOPE_MIN=""
-for c in $(git log --format=%H -- check-doc-sync.bash 2>/dev/null); do
-  v=$(git show "$c:check-doc-sync.bash" 2>/dev/null | grep -oE '^B_TOPE=[0-9]+' | head -1 | cut -d= -f2)
-  [ -n "$v" ] || continue
-  if [ -z "$B_TOPE_MIN" ] || [ "$v" -lt "$B_TOPE_MIN" ]; then B_TOPE_MIN=$v; fi
-done
-if [ -n "$B_TOPE_MIN" ] && [ "$B_TOPE" -gt "$B_TOPE_MIN" ]; then
-  B_ADR_ID="${B_TOPE_ADR%%:*}"; B_ADR_VAL="${B_TOPE_ADR#*:}"
-  if [ -n "$B_TOPE_ADR" ] && [ "$B_ADR_VAL" = "$B_TOPE" ] && grep -qE "^## $B_ADR_ID:" DECISIONS.md; then
-    echo "  ⚠️  el tope está por encima de su mínimo histórico ($B_TOPE_MIN): $B_TOPE, con $B_ADR_ID."
-  else
-    echo "  ❌ el tope de B_DEUDA ($B_TOPE) está por encima de su mínimo histórico ($B_TOPE_MIN) sin un ADR"
-    echo "      que lo suba a ESE valor (B_TOPE_ADR=\"ADR-NNN:$B_TOPE\"): la deuda no puede crecer."
-    B_FAIL=1
+  if ! command -v lake >/dev/null 2>&1; then
+    echo "  ❌ NO PUDE MEDIR [B]: 'lake' no está en el PATH (el entorno de Lean lo vuelca scripts/VolcarEntorno.lean)."
+    B_FAIL=1; B_MEDIDO=0
+  elif ! VOLCADO="$(cygpath -m "$B_ENV" 2>/dev/null || printf '%s' "$B_ENV")" lake env lean scripts/VolcarEntorno.lean > /dev/null 2>&1 \
+       || [ "$(wc -l < "$B_ENV" | tr -d ' ')" -lt 100000 ] || ! grep -q '^ROBINSON_PlusPlus\.Meta\.Hilbert\.Prf\.listInd	P$' "$B_ENV" \
+       || ! grep -q '^Init\.Classical	M$' "$B_ENV"; then
+    echo "  ❌ NO PUDE MEDIR [B]: el volcado del entorno de Lean salió corto o sin \`Prf.listInd\` (¿el build no está hecho?)."
+    B_FAIL=1; B_MEDIDO=0
   fi
 fi
-B_DECL=$(sort -u "$B_VISTOS" | grep -c . || true)
-# (las listas $DECLS y $DECLS_SOND las usa también [M]: se borran allí)
-rm -f "$B_SALIDA" "$B_SALIDA.rojo" "$B_VISTOS"
 if [ "$B_MEDIDO" = "1" ]; then
-  echo "  deuda declarada: $B_DECL de $B_NT (tope $B_TOPE) · sin declarar y sin saldar: rompen arriba"
-else
-  echo "  deuda declarada: SIN MEDIR"
+  B_DECLS=$DECLS; B_SOND=$DECLS_SOND
+  B_FAIL_PREVIO=$B_FAIL
+  source ./b-control.bash
+  [ "$B_FAIL_PREVIO" = "1" ] && B_FAIL=1
 fi
-[ "$B_FAIL" = "0" ] && echo "  ✓ ningún símbolo muerto citado como vigente" || FAIL=1
+rm -f "$B_ENV" "$B_MOD" "$B_RUT"
+# (las listas $DECLS y $DECLS_SOND las usa también [M]: se borran allí)
+[ "$B_FAIL" = "0" ] && [ "$B_MEDIDO" = "1" ] && echo "  ✓ ninguna cita muerta nueva, y la deuda por cita cuadra con la tabla" || FAIL=1
 
 # ─── 4. PROYECCIÓN: ¿está cada módulo en el catálogo? ────────────────────────
 echo
@@ -1025,7 +908,7 @@ m_revisa() {   # stdin: líneas de la tabla → stdout: «fila|cita|motivo» por
 }
 M_FICH="${M_DOC:-DECISIONS.md}"
 if [ -n "${M_DOC:-}" ]; then echo "  ⚠️ MODO DE PRUEBA: la tabla se lee de $M_FICH (en este modo [M] nunca da verde)"; fi
-if [ "$B_MEDIDO" != "1" ]; then
+if [ "$B_DECLS_OK" != "1" ]; then
   echo "  ❌ NO PUDE MEDIR [M]: sin las listas de declaraciones de [B]."
   M_FAIL=1
 elif [ ! -f "$M_FICH" ]; then

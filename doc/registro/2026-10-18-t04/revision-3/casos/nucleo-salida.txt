@@ -1,0 +1,5 @@
+B|muerto_c05b_|casos.md:13
+B|muerto_c10|casos.md:27
+B|muerto_c11|casos.md:32
+B|muerto_c12|casos.md:34
+B|otra_orden|casos.md:34

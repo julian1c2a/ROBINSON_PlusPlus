@@ -1,0 +1,67 @@
+# T04 (ADR-166): la SEGUNDA revisión adversarial del núcleo de [B] (b-citas.awk y los dos [B]), por un agente, el
+# 2026-10-18, sobre la segunda versión (la que arreglaba las once vías de la primera). Reconstruyó los volcados con
+# `lean` y LEAN_PATH, sin lake; con las entradas reales su tabla de FOL salió idéntica, y la de RPP también salvo 7
+# entradas de documentos que se editaban mientras medía. gawk 5.4.1 y mawk 1.3.4 (WSL) dan la misma salida. Su banco de
+# pruebas quedó en el scratchpad de la sesión; sus casos (fix1, fix1b, r1–r8, r10) se volvieron a pasar con la tercera
+# versión. Resumen fiel del informe, y lo que se hizo con cada hallazgo (→).
+
+SIETE HALLAZGOS
+
+1. [ALTA · verde falso] La «regla de la cabeza» escondía los nombres muertos que no iban primero en la cita:
+   `theorem muerto_firma (h : P) : Q`, `[propext, muerto_ax]`, `#print axioms muerto_print`, `exact muerto_exact h` no
+   daban nada. En los documentos de ese día, 72 identificadores muertos en esa posición en RPP y 21 en FOL; p. ej.
+   `[propext, Classical.choice, Quot.sound, prf_axiomsCodeT_eq]` (retirado con ADR-026) en README.md, REFERENCE.md,
+   CURRENT-STATUS-PROJECT.md y otros cinco sitios, y `[propext, FOL.MetaRules.raa]` en AXIOMS.md y NEXT-STEPS.md de FOL.
+   → Cada PIEZA de una cita se mira (la cita entera si es un identificador o una ruta; si no, cada palabra con forma de
+     declaración), con la misma regla de vida y la misma ventana. En el autotest: `muerto_o`, `muerto_p`, `muerto_l/m`.
+
+2. [ALTA · verde falso] El techo olvidaba que «ausente = 0»: (a) una versión con la tabla vacía (la deuda saldada) no
+   contaba, y la línea añadida a mano después pasaba; (b) se contaban líneas y no versiones, y un commit intermedio con
+   la línea duplicada pasaba.
+   → En la tercera versión, centinelas por versión; en la que sube, el techo se REHACE versión a versión (ver abajo), y
+     una entrada repetida es rojo por sí misma (b_trinquete, pasos (6a) y (6b)).
+
+3. [MEDIA · verde falso] Dos llaves maestras del trinquete: (a) un comentario en b-control.bash rehacía la tabla sin
+   techo (en la CI el techo salía trivial); (b) B_SUBE_ADR aceptaba cualquier ADR que existiera y eximía todas las
+   entradas, para siempre.
+   → (a) El núcleo es sólo b-citas.awk, y un cambio suyo sólo deja subir lo que el núcleo nuevo ve de más que el viejo;
+     y en la versión que sube, eso se comprueba en CADA versión de la historia, no sólo en la última (un comentario o un
+     commit intermedio ya no blanquean: pasos (5b), (5c), (7b) y (9)). (b) El ADR tiene que NOMBRAR cada clave que sube
+     (pasos (8a)–(8c)). Queda: exime las claves que nombra mientras B_SUBE_ADR siga puesto (ADR-166 §4).
+
+4. [MEDIA · verde falso] La regla `k` (vivir por el último componente) y los homónimos de Lean: `Borrado.vivo_ok` no daba
+   nada (20 citas reales con punto inexistentes, entre ellas `SinWTs.prf_congr_liftsc`, borrada); `Bounded` vivía por
+   `Std.Time.Internal.Bounded` (doc/REFERENCE-Full.md:32; `Full/Bounded.lean` se borró con ADR-115); 17 declaraciones y 3
+   módulos históricos del proyecto son homónimos de Lean.
+   → Un nombre con punto vive sólo si es el nombre entero de una constante, un sufijo de 2–3 componentes, un espacio de
+     nombres o un módulo (o un campo sobre un término vivo); un nombre que el proyecto declaró alguna vez (HIST) sólo lo
+     absuelve el proyecto. En el autotest: `Borrado.vivo_ok`, `SinWTs.prf_borrado`, `Bounded`, `imp_intro`.
+
+5. [MEDIA · verde falso] «falta» absolvía «hace falta» (23 de las 36 absoluciones por «falta» en RPP).
+   → «hace/hacía/hizo/haciendo… falta» se borra de la ventana antes de buscar el marcador. Autotest: `muerto_k`.
+
+6. [MEDIA · verde falso, latente] Divergencias con CommonMark: una cita abierta cruzaba ítems de lista; `\`` contaba;
+   un `<!--` sin cerrar dentro de una cita ocultaba el resto del documento sin línea V; `` `` x `` `` y `` ` x` `` no se
+   recortaban; el contenido de las citas de varias líneas no se miraba.
+   → Las cinco, arregladas (autotest: `muerto_q`, `muerto_s`, `muerto_r`, la valla abierta del final da V).
+
+7. [Menores] FORMAS con nombres de 1–2 letras (62 citas de variables como deuda) → un identificador de menos de 3
+   caracteres nunca cuenta. Los doc/REFERENCE-*.md salían de un `ls` → lista explícita, y todo REFERENCE tiene que estar
+   en ella. `--b-deuda` reescribía la tabla aunque faltara un documento → se niega. Las rutas vivían por sufijo de las
+   copias de cuarentena/librerias-retiradas/ → entran sólo enteras («=»). Un glob vive por su directorio → queda (ADR-166
+   §4). FORMAS no seguía los renombres → ya no hay FORMAS: HIST sale de los diffs de la historia. `nombra_sondeo` miraba
+   los comentarios HTML → mira la línea sin ellos. Nadie comprobaba la salida de awk → se comprueba.
+
+VERIFICADO COMO SÓLIDO (por el revisor): el autotest en gawk y mawk; la misma salida en gawk de MSYS, gawk de Linux y
+mawk (1681 líneas en RPP), 2,5 s con gawk de MSYS y 0,75 s con mawk sobre las 133 716 líneas del entorno; los arreglos de
+la primera revisión («faltaban», «borrador», la fecha, «pide/exige», «medirá/abierta», el marcador de otra celda; rangos
+con U+2011, `etiqueta:ruta`, `~~~`, vallas dentro de `>`, ```x``` en línea, la valla abierta da V; FILENAME == ARGV[k]
+con ficheros vacíos; la comparación byte a byte; los CRLF son inocuos; las dos CI con fetch-depth 0; las claves no
+pueden llevar tabuladores ni `|`).
+
+LO QUE ENCONTRÓ DESPUÉS EL PROPIO TRABAJO (no el revisor): con la tercera versión, el guion del trinquete
+(scripts/pruebas/b/b_trinquete.bash) enseñó que el techo «tabla anterior + lo que el núcleo nuevo ve de más» se
+blanqueaba con un commit intermedio (la subida a mano en un commit que la CI no ve, y un comentario en el núcleo en el
+siguiente) y con un núcleo roto en un commit intermedio; y que una entrada repetida pasaba. De ahí el techo por
+REPETICIÓN de la historia (ADR-166 §2.3). El mismo guion contra la versión anterior: siete pasos no dan lo esperado
+(doc/registro/2026-10-18-t04/trinquete.txt).

@@ -1,0 +1,16 @@
+── (C1) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+## ADR-900: sube `muerto_uno_largo` a propósito
+── (C2) una cita muerta NUEVA, muerto_uno, sin ADR (modo 0)
+      FAIL=1 MEDIDO=1
+        ❌ B `muerto_uno` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        historia de la tabla: 1 versiones desde 378dd16, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 2
+── (C2) la misma, con la tabla subida a mano y B_SUBE_ADR=ADR-900 (que nombra muerto_uno_largo, no muerto_uno) (modo 0, B_SUBE_ADR=ADR-900)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde 378dd16, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        ⚠️  1 entradas sobre su techo, y ADR-900 las nombra todas.
+        deuda declarada: 2 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 2

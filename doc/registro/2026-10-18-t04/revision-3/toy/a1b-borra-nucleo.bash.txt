@@ -1,0 +1,16 @@
+#!/bin/bash
+# A1b — la misma llave con un gesto «natural»: un commit intermedio BORRA b-citas.awk (git show de un fichero que no
+# existe da vacío: no nombra ARGV[6]) y el siguiente lo RESTAURA idéntico con la tabla subida: «otra interfaz, tal cual».
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a1b"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0) la tabla inicial" 2; commit inicial
+cp b-citas.awk ../nucleo-bueno-a1b.awk
+git rm -q b-citas.awk && git commit -qm "K1: borra el núcleo (intermedio)"
+cp ../nucleo-bueno-a1b.awk b-citas.awk
+for i in 1 2 3 4 5; do printf 'Nueva: `muerto_nuevo_%s`.\n' $i >> doc.md; done
+paso "(K2, árbol) el núcleo restaurado (idéntico) + cinco citas muertas NUEVAS: --b-deuda-rehacer" 3
+commit "K2: restaura el núcleo"
+paso "(K2, en git)" 0
+git diff --stat HEAD~2 HEAD -- b-citas.awk | tail -1; echo "      (diff neto del núcleo en el push: vacío)"

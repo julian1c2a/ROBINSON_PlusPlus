@@ -1,0 +1,31 @@
++theorem f01_plano : True := trivial
++  theorem f02_en_mutual : True := trivial
++private theorem f03_privado : True := trivial
++/-- doc -/ theorem f04_docstring_misma_linea : True := trivial
++@[simp] theorem f05_simp : True := trivial
++@[simp]
++theorem f06_simp_partido : True := trivial
++instance f07_instancia : Inhabited Nat := ⟨0⟩
++instance (priority := low) f08_prioridad : Inhabited Nat := ⟨0⟩
++structure F09Estructura where
++  campo_f09 : Nat
++inductive F10Ind where
++  | ctor_f10 : F10Ind
++open Nat in theorem f11_open_in : True := trivial
++set_option maxHeartbeats 400000 in theorem f12_set_option_in : True := trivial
++@[simp, aesop safe (rule_sets := [x])] theorem f13_atributo_anidado : True := trivial
++noncomputable def f14_nc : Nat := 0
++protected def F15.prot : Nat := 0
++theorem
++  f16_nombre_en_otra_linea : True := trivial
++class inductive F17Clase where
++  | a
++theorem f18_universo.{u} : True := trivial
++def «f19 guillemets» : Nat := 0
++  where f20_where : Nat := 0
++nonrec theorem f21_nonrec : True := trivial
++@[reducible] private noncomputable abbrev f22_combo : Nat := 0
++  | f23_alt_match => 0
++example : True := trivial
++opaque f24_opaco : Nat
++lemma f25_lemma : True := trivial

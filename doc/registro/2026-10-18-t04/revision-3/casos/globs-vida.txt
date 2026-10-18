@@ -1,0 +1,74 @@
+MUERTO **ninguno**
+MUERTO *.bash
+MUERTO *_thm_prim
+MUERTO *Ext.lean
+MUERTO bridge_*
+MUERTO ByteArray.utf8*
+MUERTO Classical.*
+MUERTO decodeRuleTag_*
+MUERTO derives_lineWF_neg_*
+MUERTO fix-*.ps1
+MUERTO fix_*.py
+MUERTO in_cons_*
+MUERTO liftc_inv_fn*T
+MUERTO premsOf_*
+MUERTO scratch*.lean
+MUERTO stdArgs_*
+MUERTO String.*
+MUERTO temp_*.lean
+MUERTO teo_1_13_*
+VIVO *  (p.ej. Lean)
+VIVO **es**  (p.ej. Derives₁.elim_impl)
+VIVO *_sym  (p.ej. ROBINSON_PlusPlus.Minimal.Axioms.concat_sym)
+VIVO *_termCode  (p.ej. ROBINSON_PlusPlus.Meta.CodeTreeReflect.code_eq_termCode)
+VIVO *_thm  (p.ej. ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoAtomL_thm)
+VIVO *substfc  (p.ej. dec_substfc)
+VIVO ax_lenc_*  (p.ej. ax_lenc_nil)
+VIVO ax_liftfc_*  (p.ej. ax_liftfc_bottom)
+VIVO ax_lineWF_*  (p.ej. ax_lineWF_leibniz)
+VIVO ax_nthc_*  (p.ej. ax_nthc_zero)
+VIVO ax_premsOf_*  (p.ej. ax_premsOf_c1)
+VIVO ax_substfc_*  (p.ej. ax_substfc_and)
+VIVO ax_substtc_*  (p.ej. ax_substtc_func)
+VIVO ax_substtsc_*  (p.ej. ax_substtsc_cons)
+VIVO ax_vpf_*  (p.ej. ax_vpf_thy)
+VIVO Caso*  (p.ej. CasoAtom)
+VIVO caso*  (p.ej. casoUn6)
+VIVO concat_*  (p.ej. concat_sym)
+VIVO CRIT_*  (p.ej. CRIT_targetLift_real)
+VIVO CRIT_*_real  (p.ej. CRIT_targetLift_real)
+VIVO crit_isFormCodeB2_rejects*  (p.ej. crit_isFormCodeB2_rejects_funcc)
+VIVO CTX*  (p.ej. CTXfc)
+VIVO d3_prf_of_*  (p.ej. d3_prf_of_body_only)
+VIVO Derives.*  (p.ej. Derives.dne_schema)
+VIVO DESCENSO*  (p.ej. DESCENSO_substtc_imp)
+VIVO ev_*  (p.ej. ev_strCodeM)
+VIVO FOL*  (p.ej. FOL.SequentSound0.lkc_sound)
+VIVO FOL.*  (p.ej. FOL.SequentSound0.lkc_sound)
+VIVO FOL.Inconsistencia.*  (p.ej. FOL.Inconsistencia.derives_to_derives0)
+VIVO FOL.Theorems.*  (p.ej. FOL.Theorems.Impl.k_impl)
+VIVO linea_*  (p.ej. linea_eqrefl)
+VIVO lineWF_*  (p.ej. lineWF_decide)
+VIVO max_cons_*  (p.ej. max_cons_bot)
+VIVO paso6_backbone*  (p.ej. paso6_backbone_mp)
+VIVO pcc_*_inst*  (p.ej. pcc_axL0_inst)
+VIVO pcc_axiom_inst*  (p.ej. pcc_axiom_inst)
+VIVO pcc_congr_*  (p.ej. pcc_congr_substtcT_arg3_code)
+VIVO pcc_congr_binT_*_code  (p.ej. pcc_congr_binT_2_code)
+VIVO pcc_forallElim_code*  (p.ej. pcc_forallElim_code_open)
+VIVO pcc_liftc0_*  (p.ej. pcc_liftc0_func_code)
+VIVO PHI*  (p.ej. PHILF_step)
+VIVO prf_*  (p.ej. prf_tc_zero)
+VIVO prf_add_le_mono_*  (p.ej. prf_add_le_mono_left)
+VIVO prf_lenc_*  (p.ej. prf_lenc_cons)
+VIVO prf_liftfc_*  (p.ej. prf_liftfc_bottom)
+VIVO prf_lineWF_*  (p.ej. prf_lineWF_iff_transport_in)
+VIVO prf_substtc_termCode_*  (p.ej. prf_substtc_termCode_zero)
+VIVO PrfH_*  (p.ej. PrfH_congr_argsIn)
+VIVO PrfH_lt_subst*  (p.ej. PrfH_lt_subst1)
+VIVO psi_lift_form*  (p.ej. psi_lift_form2)
+VIVO sub_*  (p.ej. sub_catL)
+VIVO substF_*  (p.ej. substF_hasWit)
+VIVO substfc_inv_*  (p.ej. substfc_inv_substCodeF2)
+VIVO substtc_inv_termCode_*  (p.ej. substtc_inv_termCode_of_tc)
+VIVO TheoryFramework*  (p.ej. TheoryFramework)

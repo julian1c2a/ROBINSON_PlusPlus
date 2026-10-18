@@ -1,0 +1,39 @@
+── (0a) la tabla inicial (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (0b) cuadra (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde a51157a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+0
+── (K1, árbol) un núcleo igual, sin la cadena ARGV[6] (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde a51157a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (K1, en git) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 2 versiones desde a51157a, 1 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (K2, árbol) diez citas muertas NUEVAS + comentario en el núcleo: --b-deuda-rehacer (modo 3)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 11 entradas
+        ⚠️  el núcleo de 1fd0ec4 lee otras entradas que el del árbol: la tabla se rehace sin comparar (lo tiene que decir su ADR).
+        historia de la tabla: 2 versiones desde a51157a, 1 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 11 citas muertas en 11 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 11
+── (K2, en git: lo que ve la CI en la rama ci/…) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 3 versiones desde a51157a, 2 con otro núcleo (la de b26fecf, con otra interfaz, se toma tal cual); 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 11 citas muertas en 11 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 11
+B	muerto_dos	doc.md	1
+B	muerto_nuevo_1	doc.md	1
+B	muerto_nuevo_10	doc.md	1
+B	muerto_nuevo_2	doc.md	1
+B	muerto_nuevo_3	doc.md	1
+B	muerto_nuevo_4	doc.md	1
+B	muerto_nuevo_5	doc.md	1
+B	muerto_nuevo_6	doc.md	1
+B	muerto_nuevo_7	doc.md	1
+B	muerto_nuevo_8	doc.md	1
+B	muerto_nuevo_9	doc.md	1

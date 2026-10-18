@@ -1,0 +1,22 @@
+#!/bin/bash
+# A1 — la llave «ARGV[6]»: un commit que sólo reescribe `ARGV[6]` como `ARGV[3+3]` (misma conducta, mismo autotest) y,
+# después, CUALQUIER cambio del núcleo rehace la tabla sin techo (la versión «con otra interfaz se toma tal cual»).
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a1"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0a) la tabla inicial" 2; commit inicial
+paso "(0b) cuadra" 0
+# K1: el núcleo deja de nombrar la sexta entrada con la cadena literal, sin cambiar nada más
+sed -i 's/FILENAME == ARGV\[6\]/FILENAME == ARGV[3+3]/' b-citas.awk
+grep -c 'ARGV\[6\]' b-citas.awk
+paso "(K1, árbol) un núcleo igual, sin la cadena ARGV[6]" 0
+commit "K1: refactor"
+paso "(K1, en git)" 0
+# K2: diez citas muertas nuevas, un comentario en el núcleo y --b-deuda-rehacer
+for i in 1 2 3 4 5 6 7 8 9 10; do printf 'Nueva: `muerto_nuevo_%s`.\n' $i >> doc.md; done
+printf '# K2\n' >> b-citas.awk
+paso "(K2, árbol) diez citas muertas NUEVAS + comentario en el núcleo: --b-deuda-rehacer" 3
+commit "K2"
+paso "(K2, en git: lo que ve la CI en la rama ci/…)" 0
+cat doc/control/b-deuda.tsv | grep -v '^#'

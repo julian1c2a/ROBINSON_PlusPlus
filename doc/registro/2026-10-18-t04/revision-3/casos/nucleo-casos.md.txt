@@ -1,0 +1,34 @@
+C01 La ruta `C:\dir\` y luego `muerto_c01` en la misma línea.
+
+C02 Un texto con <!-- un comentario que no se cierra en este párrafo.
+
+C02 `muerto_c02` está en otro párrafo.
+
+C02 Y aquí una flecha A --> B en la prosa.
+
+C03 Abreviatura de dos nombres: `muerto_c03a/muerto_c03b`.
+
+C04 Calificado con prefijo exento: `ENS.muerto_c04` y `goedel.muerto_c04b`.
+
+C05 Familia con asterisco `muerto_c05_*`, y la misma sin él: `muerto_c05b_`.
+
+C06 La firma `exact muerto_prima' h` (vive `muerto_prima`, no la prima).
+
+C07 `muerto_c07a` usa `vivo_ok`; para cerrarlo falta `muerto_c07b`.
+
+C08 `muerto_c08` no está retirado: es el teorema principal.
+
+C09 Ver [el libro](cuarentena/librerias-retiradas/Y.lean) y `muerto_c09`.
+
+C10 Una lista:
+
+1. ítem
+    ```
+    `muerto_c10` es código de la valla del ítem
+    ```
+
+C11 Un bloque sangrado:
+
+    `muerto_c11` es código sangrado
+
+C12 La orden `#mi_orden muerto_c12` y `#otra_orden`.

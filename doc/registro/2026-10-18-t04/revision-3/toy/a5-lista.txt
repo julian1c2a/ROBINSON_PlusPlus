@@ -1,0 +1,25 @@
+── (C1) la tabla inicial, dos documentos (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 5 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 5 citas muertas en 5 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 5
+── (C1) cuadra (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde 66dd388, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 5 citas muertas en 5 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 5
+── (C2) doc2.md sale de la lista (sigue en el disco y en git): sin --b-deuda (modo 0)
+      FAIL=1 MEDIDO=1
+        ❌ 4 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        historia de la tabla: 1 versiones desde 66dd388, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 5 citas muertas en 5 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (C2) --b-deuda (modo 1)
+      FAIL=0 MEDIDO=1
+        ✓ --b-deuda: la tabla baja a 1 entradas; salen del todo 4:
+        historia de la tabla: 1 versiones desde 66dd388, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (C2, en git) (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 2 versiones desde 66dd388, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+doc2.md
+B	muerto_dos	doc.md	1

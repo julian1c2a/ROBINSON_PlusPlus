@@ -1,0 +1,16 @@
+#!/bin/bash
+# A5 — sacar un documento de B_DOCS_LISTA (sin borrarlo): --b-deuda se lleva su deuda en silencio, y verde.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a5"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+printf '%s\n' 'Mucha deuda: `muerto_a`, `muerto_b`, `muerto_c`, `muerto_d`.' > doc2.md
+DOCS_LISTA="doc.md doc2.md"
+paso "(C1) la tabla inicial, dos documentos" 2; commit C1
+paso "(C1) cuadra" 0
+DOCS_LISTA="doc.md"
+paso "(C2) doc2.md sale de la lista (sigue en el disco y en git): sin --b-deuda" 0
+paso "(C2) --b-deuda" 1
+commit C2
+paso "(C2, en git)" 0
+ls doc2.md && grep -v '^#' doc/control/b-deuda.tsv

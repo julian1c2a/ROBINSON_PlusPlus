@@ -1,0 +1,25 @@
+#!/bin/bash
+# A3 — la FUSIÓN cuyo primer padre es una rama vieja: master baja la tabla (C2); una rama que salió de antes (C1) se
+# fusiona con master quedándose con SU tabla y SU documento. El primer padre de la fusión es la rama: --first-parent no
+# ve C2, y la fusión no toca la tabla respecto a su primer padre. Y la fusión es un AVANCE RÁPIDO de master.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a3"
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: `muerto_dos`.' 'Tres: `muerto_dos`.' > doc.md
+paso "(C1) la tabla inicial: muerto_dos 3" 2; commit C1
+C1=$(git rev-parse HEAD)
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: arreglado.' 'Tres: arreglado.' > doc.md
+paso "(C2) se arreglan dos citas y --b-deuda baja la tabla a 1" 1; commit C2
+C2=$(git rev-parse HEAD)
+paso "(C2) cuadra" 0
+# la rama, desde C1 (la tabla en 3)
+git checkout -q -b rama "$C1"
+printf 'otra cosa\n' > otro.txt; commit D1
+# fusión con master (C2): primer padre = la rama; se queda con la tabla y el documento de la rama
+git merge -q --no-ff --no-commit master 2>/dev/null
+git checkout D1 -- doc.md doc/control/b-deuda.tsv 2>/dev/null || git checkout HEAD -- doc.md doc/control/b-deuda.tsv
+git commit -qm "M: fusiona master"
+paso "(M) la fusión: la tabla vuelve a 3 sin ADR (lo que ve la CI en la rama ci/…)" 0
+git merge-base --is-ancestor "$C2" HEAD && echo "      (M desciende de C2: «git push origin HEAD:master» es un avance rápido)"
+grep -v '^#' doc/control/b-deuda.tsv
+git log --first-parent --format='%h %s' -- doc/control/b-deuda.tsv b-citas.awk | sed 's/^/      primer padre: /'

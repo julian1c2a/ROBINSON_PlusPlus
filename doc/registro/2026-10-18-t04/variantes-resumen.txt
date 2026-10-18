@@ -1,0 +1,8 @@
+RESUMEN cand|full|0: citas 2100 · vivas en el proyecto 1778 · vivas en Lean 0 · constructor o campo 0 · módulo 0 · absueltas por marcador 258 · por su sondeo 11 · NO absueltas 53 (24 claves)
+RESUMEN cand|full|100: citas 2100 · vivas en el proyecto 1778 · vivas en Lean 0 · constructor o campo 0 · módulo 0 · absueltas por marcador 134 · por su sondeo 11 · NO absueltas 177 (65 claves)
+RESUMEN cand|nofecha|100: citas 2100 · vivas en el proyecto 1778 · vivas en Lean 0 · constructor o campo 0 · módulo 0 · absueltas por marcador 122 · por su sondeo 11 · NO absueltas 189 (67 claves)
+RESUMEN todo|full|0: citas 9763 · vivas en el proyecto 5285 · vivas en Lean 296 · constructor o campo 0 · módulo 0 · absueltas por marcador 1536 · por su sondeo 19 · NO absueltas 2627 (821 claves)
+RESUMEN todo|full|100: citas 9763 · vivas en el proyecto 5285 · vivas en Lean 296 · constructor o campo 0 · módulo 0 · absueltas por marcador 598 · por su sondeo 34 · NO absueltas 3550 (1039 claves)
+RESUMEN decl|full|0: citas 7618 · vivas en el proyecto 4316 · vivas en Lean 196 · constructor o campo 84 · módulo 765 · absueltas por marcador 1038 · por su sondeo 19 · NO absueltas 1200 (498 claves)
+RESUMEN decl|full|100: citas 7618 · vivas en el proyecto 4316 · vivas en Lean 196 · constructor o campo 84 · módulo 765 · absueltas por marcador 409 · por su sondeo 34 · NO absueltas 1814 (686 claves)
+RESUMEN decl|nofecha|100: citas 7618 · vivas en el proyecto 4316 · vivas en Lean 196 · constructor o campo 84 · módulo 765 · absueltas por marcador 339 · por su sondeo 35 · NO absueltas 1883 (696 claves)

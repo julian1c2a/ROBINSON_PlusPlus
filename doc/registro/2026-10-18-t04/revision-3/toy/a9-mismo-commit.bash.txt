@@ -1,0 +1,26 @@
+#!/bin/bash
+# A9 — el «de más» se mide sobre los documentos del MISMO commit que cambia el núcleo: (a) quitar «propuest» de MARK y,
+# en el mismo commit, añadir citas muertas NUEVAS con «propuesto» al lado; (b) el truco de la VALLA: el núcleo nuevo
+# cierra una valla que el viejo no cierra (V: el viejo no mira el resto del documento, y en la historia una V no es
+# «no medido»), y detrás de la valla, citas muertas NUEVAS de cualquier clave.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a9"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0) la tabla inicial" 2; commit inicial
+BASE=$(git rev-parse HEAD)
+# (a)
+sed -i 's/|propuest|/|/' b-citas.awk
+for i in 1 2 3; do printf 'Nueva: `muerto_prop_%s`, propuesto.\n' $i >> doc.md; done
+paso "(a, árbol) sin «propuest» + tres citas NUEVAS junto a «propuesto»: --b-deuda-rehacer" 3
+commit "a"
+paso "(a, en git)" 0
+# (b)
+git reset -q --hard "$BASE"
+# el núcleo nuevo acepta como cierre de valla una línea «``` texto» (CommonMark no: es contenido); el autotest pasa
+sed -i 's|  return (RLENGTH >= vlen \&\& substr(z, RLENGTH + 1) ~ /^\[ \t\]\*\$/) }|  return (RLENGTH >= vlen) }|' b-citas.awk
+grep -n 'return (RLENGTH >= vlen' b-citas.awk
+{ printf '%s\n' '```' 'código' '``` fin del bloque'; for i in $(seq 1 20); do printf 'Nueva: `muerto_valla_%s`.\n' $i; done; } >> doc.md
+paso "(b, árbol) valla «``` texto» + veinte citas muertas NUEVAS detrás: --b-deuda-rehacer" 3
+commit "b"
+paso "(b, en git: lo que ve la CI)" 0

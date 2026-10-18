@@ -1,0 +1,15 @@
+── (C1) tabla inicial: 3 (modo 2)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 1 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+        deuda declarada: 3 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+── (C2) --b-deuda: 1 (modo 1)
+      FAIL=0 MEDIDO=1
+        ✓ --b-deuda: la tabla baja a 1 entradas; salen del todo 0:
+        historia de la tabla: 1 versiones desde 309070c, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 1 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 1
+── (M) git merge -s ours desde C1 (modo 0)
+      FAIL=0 MEDIDO=1
+        historia de la tabla: 1 versiones desde 309070c, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+        deuda declarada: 3 citas muertas en 1 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+      (M desciende de C2: avance rápido)

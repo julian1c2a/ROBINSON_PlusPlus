@@ -31,7 +31,7 @@ comprueba.*
 | **V1** | `lake build` | **todo el árbol activo typechequea** en el kernel de Lean. Es la única prueba *fuerte* que hay: una demostración que compila **es** una demostración | nada sobre si el **enunciado** es el que se quería *(✏️ 2026‑10‑18: el de los 24 titulares lo fija V10)* |
 | **V2** | `bash check-sorry.bash` | **cero `sorry`/`admit`/`native_decide`** reales, despojando comentarios y literales | que no haya `axiom`s haciendo el papel de `sorry` — eso lo mira V3 |
 | **V3** | `#print axioms` por frente | el **footprint exacto**: qué postulados sostienen cada teorema | que el postulado sea *razonable*. Eso lo decide un ADR |
-| **V4** | `bash check-doc-sync.bash` | `[A]` cifras de cabecera · `[A2]` cifras del cuerpo (aviso) · `[B]` símbolos muertos (aviso) · `[C]` proyección · `[D]` marcas de tiempo · `[E]` frescura del titular (aviso) *(✏️ 2026‑10‑18: hoy rompen todos salvo `[A2]`, y hay más: `[F]`, `[H]`, `[M]`, `[T]` y `[L]`, la librería = el cierre de imports, ADR‑163)* | **la verdad de las frases**. Ver §4 |
+| **V4** | `bash check-doc-sync.bash` | `[A]` cifras de cabecera · `[A2]` cifras del cuerpo (aviso) · `[B]` citas muertas (rompe desde ADR‑166, con trinquete por cita) · `[C]` proyección · `[D]` marcas de tiempo · `[E]` frescura del titular (aviso) *(✏️ 2026‑10‑18: hoy rompen todos salvo `[A2]`, y hay más: `[F]`, `[H]`, `[M]`, `[T]` y `[L]`, la librería = el cierre de imports, ADR‑163)* | **la verdad de las frases**. Ver §4 |
 | **V5** | `sondeos/*.lean` | resultados **compilados** de preguntas cerradas antes de tocar producción | que la pregunta fuese la correcta |
 | **V6** | `doc/book/scripts/*.py` | que todo `\ident{}` del libro **exista** en el repo, que el vocabulario se introduzca antes de usarse, y que el código **impreso** sea el del repo | que lo impreso sea *verdad* — sólo que **cite bien** |
 | **V7** | CI (`.github/workflows/build.yml`) | **job `build`**: ⛔ **BLOQUEAN V1 (`lake build`) y V4 (`check-doc-sync`)**; 🔶 **V2 (`check-sorry`) es AVISO** — lleva `continue-on-error: true`. **job `libro`**: V6 entero **sólo cuando el push toca `doc/book/`** — el libro y el código son **dos tareas con commits separados** (PLAN‑LIBRO §0) | ⚠️ que un cambio en `.lean` rompa una cita del libro **no se ve hasta el siguiente push del libro**: el precio de las dos tareas, medido el 2026‑09‑11 al retirar `goedel_second'` |
@@ -93,7 +93,7 @@ conclusión falsa** (regla **M‑8**). Lo que hay que preguntarle a un sondeo no
 |---|---|
 | durante el trabajo | `lake build` sobre el módulo (`lake env lean <fichero>`) |
 | antes de commitear código | **V1 + V2**, y **V3** en el frente tocado |
-| antes de cerrar una pasada de documentación | **V4 en verde** (M‑6), con `[A2]`, `[B]` y `[E]` **adjudicados uno a uno** |
+| antes de cerrar una pasada de documentación | **V4 en verde** (M‑6), con `[A2]`, `[B]` y `[E]` **adjudicados uno a uno** *(✏️ ADR‑166: `[B]` rompe; adjudicarlo es arreglar o marcar)* |
 | antes de commitear el libro | **V6** + `doc/book/scripts/ambito.py` |
 | en cada push | **V7** |
 

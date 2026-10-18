@@ -11,11 +11,13 @@ Ejecuta el control de sincronía documentación ↔ código y **deja el reposito
    **Corrígelos.** ⚠️ Al corregir una cifra, **no basta con el banner**: recorre también las
    tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría antiguas. Ése es
    exactamente el fallo que este control existe para atrapar.
-3. **[B] símbolos muertos** — es un **aviso** que pide juicio. Por cada símbolo reportado, decide:
-   * ¿el texto afirma que **ya está**? → corrígelo (apunta al símbolo vivo que lo sustituye).
-   * ¿es una mención **histórica, planificada o descartada**? → añade un marcador que lo deje
-     claro («retirado», «falta», «propuesto», una fecha ISO), y así deja de reportarse.
-4. Vuelve a ejecutar hasta que [A]/[C]/[D] estén en verde y los avisos de [B] estén adjudicados.
+3. **[B] citas muertas** — ✏️ desde ADR‑166 (2026‑10‑18) **rompe**. Por cada cita reportada, decide:
+   * ¿el texto afirma que **ya está**? → corrígelo (apunta a lo vivo que lo sustituye).
+   * ¿es una mención **histórica, planificada o descartada**? → pon un marcador **a 100 bytes o menos de la
+     cita, en su misma celda** («retirado», «archivado», «propuesto», «falta»). ⛔ Una fecha NO es un marcador:
+     no dice que lo citado esté retirado, y fechar una línea para que deje de reportarse es esquivar el control.
+   * Si desaparece una cita muerta vieja, `bash check-doc-sync.bash --b-deuda` baja la tabla de la deuda.
+4. Vuelve a ejecutar hasta que todo esté en verde.
 5. Informa en el chat, distinguiendo **hallazgos reales** de ruido descartado.
 
 ## Contexto
@@ -46,7 +48,8 @@ $ARGUMENTS
 obsoleta; `[E]` avisa de que un banner puede estar **al día en sus cifras y mintiendo en su frase**
 — que es como seis documentos autoritativos llegaron a llevar el mismo titular falso.
 
-⚠️ **Y `[B]` hay que ADJUDICARLO uno a uno**, que es lo que M‑6 pide: al hacerlo por primera vez
+⚠️ **Y `[B]` hay que ADJUDICARLO uno a uno** (desde ADR‑166 rompe: adjudicar es arreglar o marcar), que es lo que
+M‑6 pide: al hacerlo por primera vez
 (2026‑09‑10h) salieron cuatro símbolos muertos leyéndose como **frentes vivos**.
 
 Detalle en `AI-GUIDE.md` §27.2 y §27.3.

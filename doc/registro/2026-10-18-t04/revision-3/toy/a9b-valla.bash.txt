@@ -1,0 +1,19 @@
+#!/bin/bash
+# A9b — el truco de la VALLA: el núcleo nuevo cierra una valla que el viejo no cierra (para el viejo queda ABIERTA: V,
+# no mira el resto del documento; y en el replay una V no es «no medido», cuenta como medida). Detrás de la valla, en el
+# MISMO commit, citas muertas NUEVAS de cualquier clave: «lo que el núcleo nuevo ve de más» es todo eso.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a9b"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0) la tabla inicial" 2; commit inicial
+N=$(grep -n 'return (RLENGTH >= vlen' b-citas.awk | cut -d: -f1); echo "línea del cierre de valla: $N"
+sed -i "${N}s/.*/  return (RLENGTH >= vlen) }/" b-citas.awk
+sed -n "${N}p" b-citas.awk
+F=$(printf '\140\140\140')
+{ printf '%s\n' "$F" 'código' "$F fin del bloque"; for i in $(seq 1 20); do printf 'Nueva: \140muerto_valla_%s\140.\n' $i; done; } >> doc.md
+tail -3 doc.md
+echo "— el núcleo VIEJO sobre este documento:"; LC_ALL=C awk -f "$RAIZ/b-citas.awk" vivos env sond mod rut /dev/null doc.md | cut -d'|' -f1,2 | sed 's/^/      /'
+paso "(árbol) valla cerrada con texto detrás + veinte citas muertas NUEVAS: --b-deuda-rehacer" 3
+commit "b"
+paso "(en git: lo que ve la CI)" 0

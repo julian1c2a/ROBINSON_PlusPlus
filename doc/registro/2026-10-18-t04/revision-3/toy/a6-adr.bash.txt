@@ -1,0 +1,12 @@
+#!/bin/bash
+# A6 — B_SUBE_ADR «nombra» por SUBCADENA: un ADR que cita `muerto_uno_largo` deja subir la clave `muerto_uno`.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a6"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(C1) la tabla inicial" 2; commit C1
+printf '%s\n' 'Nueva: `muerto_uno`.' >> doc.md
+sed -n 1p DECISIONS.md
+paso "(C2) una cita muerta NUEVA, muerto_uno, sin ADR" 0
+printf 'B\tmuerto_uno\tdoc.md\t1\n' >> doc/control/b-deuda.tsv
+paso "(C2) la misma, con la tabla subida a mano y B_SUBE_ADR=ADR-900 (que nombra muerto_uno_largo, no muerto_uno)" 0 ADR-900

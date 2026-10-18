@@ -273,7 +273,7 @@ Mapping 1:1 entre rutas de archivo y namespaces (ADR-005).
 
 ## Notable cross-module facts
 
-* **`mod2_of_even` vive en `Block4_C6_C7`** (no en `Block5`) desde 2026-06-03: `proj_is_cantor` (en C6_C7) lo necesita, y `Block5` importa C6_C7 — moverlo evita la dependencia circular.
+* 🗑️ Retirado con ADR‑115, con todos los bloques (✏️ 2026‑10‑18): `mod2_of_even` vivía en `Block4_C6_C7` (no en `Block5`) desde 2026-06-03: `proj_is_cantor` (en C6_C7, borrado) lo necesitaba, y `Block5` importaba C6_C7 — moverlo evitaba la dependencia circular.
 * **`proj1`/`proj2`** son defs concretas (`x_of_c`/`y_of_c`) en `Block4_C6_C7`, no símbolos opacos en `Axioms`. Sustituyen al eliminado `ax22`.
 * **`add_left_cancel`** en `Block4_C6_C7` reemplaza al eliminado `ax27`. La prueba PA⁻ usa `lt_add_const_of_le_left` (de `Block4_C5`) + `add_comm'` (también `Block4_C5`) + `ax18`/`ax19`.
 * **`succ_le_of_lt`** en `Block2` se refactorizó para no usar ax27 (vía `ax5+ax3 → a+(σkp+k)=a; ax13` con testigo → `lt a a` → contradice `ax18`).

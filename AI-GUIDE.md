@@ -364,16 +364,18 @@ make docsync                        # equivalente
 |---|---|---|
 | **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean y `sorry` — contra el estado REAL. Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
 | **[A2]** | 🆕 **las mismas cifras en el CUERPO** (de la línea 101 al final), con los mismos filtros de historicidad — §27.2 | ⚠️ aviso |
-| **[B]** | **símbolos muertos** citados como vigentes en los docs autoritativos | ⚠️ aviso |
+| **[B]** | **citas muertas** en los docs autoritativos: toda cita entre comillas invertidas con forma de identificador o de ruta tiene que existir, o llevar un marcador a 100 bytes o menos, o estar en la deuda por cita (`doc/control/b-deuda.tsv`). ✏️ ADR‑166 | ✅ sí, con trinquete por cita |
 | **[E]** | 🆕 **frescura del TITULAR**: la fecha del banner de cada doc autoritativo contra la entrada más reciente del `CHANGELOG` — §27.3 | ⚠️ aviso |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
 | **[D]** | **marcas de tiempo** (§22) presentes en los docs técnicos | ✅ sí |
 
-**[B] es un AVISO y no un error, deliberadamente.** Hay menciones legítimas de símbolos que no
-existen: históricas, planificadas, descartadas. Marcarlas como error convertiría el control en ruido,
-y un control que grita lobo se acaba ignorando — que es exactamente el fallo que viene a evitar.
-**[B] pide juicio**: por cada símbolo, decidir si el texto afirma que *ya está* (→ corregir) o lo
-menciona como historia/objetivo (→ añadir un marcador: «retirado», «falta», «propuesto», una fecha).
+✏️ **2026‑10‑18 (ADR‑166, T04): [B] rompe**, con trinquete por cita. Hasta entonces era un aviso, «deliberadamente»,
+y su universo eran siete prefijos: un módulo retirado o un fichero borrado no los miraba nadie, y un marcador en
+cualquier punto de la línea, o una fecha, absolvía todas sus citas. Hoy, por cada cita reportada, se decide si el
+texto afirma que *ya está* (→ corregir) o la menciona como historia u objetivo (→ un marcador **a 100 bytes o menos
+de la cita y en su misma celda**: «retirado», «archivado», «propuesto», «falta»…). ⛔ **Una fecha no es un
+marcador**: una línea fechada no dice que lo que cita esté retirado. Lo que ya estaba muerto el 2026‑10‑18 está en
+`doc/control/b-deuda.tsv`, que sólo baja (`bash check-doc-sync.bash --b-deuda`).
 
 ⚠️ **Y la regla de oro que ningún script sustituye: NO basta con arreglar el banner.** Al corregir,
 recorrer también las tablas resumen, las secciones de «Próximos pasos» y las notas de auditoría
@@ -680,7 +682,7 @@ detectar y eliminar "elementos fantasma" (declaraciones borradas, renombradas o 
 `private` en el código que siguen documentadas como vigentes) → asegurar coherencia de
 fechas, jerarquía de dependencias y enlaces de navegación fuerte → actualizar el
 índice raíz → **`bash check-doc-sync.bash` (§27)**, cuyo control [B] es exactamente el
-detector de fantasmas mecanizado; adjudicar uno a uno sus avisos.
+detector de fantasmas mecanizado; desde ADR‑166 rompe: arreglar o marcar cada cita muerta.
 
 ### `guarda_y_sube`
 
@@ -720,7 +722,7 @@ Antes de dar por completa y al día la documentación de una sesión, verificar 
 `REFERENCE.md` (+ nodos), los ficheros `.lean` y el resto de documentación cumplen:
 
 - [ ] Puntos (0)–(27) de esta guía.
-- [ ] `bash check-doc-sync.bash` en verde (§27), y los avisos de [B] adjudicados.
+- [ ] `bash check-doc-sync.bash` en verde (§27): desde ADR‑166, [B] rompe, así que sus citas muertas están arregladas o marcadas.
 - [ ] Reglas de exportación (§17 «Bloques de exportación», §18 «Barrels»).
 - [ ] `NAMING-CONVENTIONS.md` (diccionario de símbolos, REGLA 1–12 de formación de
       nombres, y §5–§8 de estructura de archivos/namespaces/variables/typeclasses).

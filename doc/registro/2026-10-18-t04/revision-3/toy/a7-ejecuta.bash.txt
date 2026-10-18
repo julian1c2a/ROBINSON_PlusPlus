@@ -1,0 +1,24 @@
+#!/bin/bash
+# A7 — el replay EJECUTA cada b-citas.awk de la historia: un núcleo de un commit intermedio (arreglado en el siguiente)
+# corre en CADA ejecución futura de check-doc-sync, con `system()`. Aquí escribe un fichero testigo (en el scratchpad).
+# A8 — y un núcleo intermedio que no termina cuelga [B] para siempre (cada ejecución lo vuelve a correr).
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+TESTIGO="$B/testigo-a7.txt"; rm -f "$TESTIGO"
+nuevo_repo "$B/r-a7"
+printf '%s\n' 'Texto: `vivo_ok` y `muerto_dos`.' > doc.md
+paso "(0) la tabla inicial" 2; commit inicial
+cp b-citas.awk ../nucleo-bueno-a7.awk
+{ printf 'BEGIN { system("date >> %s") }\n' "$TESTIGO"; cat ../nucleo-bueno-a7.awk; } > b-citas.awk
+commit "K1: núcleo con system() (intermedio)"
+cp ../nucleo-bueno-a7.awk b-citas.awk; commit "K2: arreglado"
+printf 'Más texto.\n' >> doc.md; commit "K3"
+rm -f "$TESTIGO"
+paso "(K3) una ejecución normal, dos commits después" 0
+echo "      testigo: $(cat "$TESTIGO" 2>/dev/null | wc -l) línea(s) escritas por el núcleo de K1 en esta ejecución"
+# A8
+{ printf 'BEGIN { while (1) {} }\n'; cat ../nucleo-bueno-a7.awk; } > b-citas.awk
+commit "K4: núcleo que no termina (intermedio)"
+cp ../nucleo-bueno-a7.awk b-citas.awk; commit "K5: arreglado"
+echo "── (K5) una ejecución normal, con un límite de 60 s:"
+( timeout 60 bash -c ". $B/lib.bash; DOCS_LISTA=doc.md; corre 0 ''" ; echo "      salida de timeout: $? (124 = colgado)" ) | sed 's/^/      /'

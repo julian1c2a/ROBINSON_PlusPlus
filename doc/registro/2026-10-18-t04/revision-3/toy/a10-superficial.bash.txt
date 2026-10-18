@@ -1,0 +1,18 @@
+#!/bin/bash
+# A10 — un clon SUPERFICIAL: el testigo de HIST (mil nombres y `raa`) lo pasa si el árbol de hoy los declara (el diff
+# del commit frontera los da todos como «+»), y el replay empieza en la frontera: la tabla se toma tal cual.
+. "$(dirname "$0")/lib.bash"
+B=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PLUSPLUS/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b3/toy
+nuevo_repo "$B/r-a10"
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: `muerto_dos`.' 'Tres: `muerto_dos`.' > doc.md
+paso "(C1) tabla inicial: 3" 2; commit C1
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: arreglado.' 'Tres: arreglado.' > doc.md
+paso "(C2) --b-deuda: 1" 1; commit C2
+printf '%s\n' 'Uno: `muerto_dos`.' 'Dos: `muerto_dos`.' 'Tres: `muerto_dos`.' > doc.md
+sed -i 's/\tmuerto_dos\tdoc.md\t1$/\tmuerto_dos\tdoc.md\t3/' doc/control/b-deuda.tsv
+commit C3
+paso "(C3, clon entero) la tabla subida a mano" 0
+rm -rf "$B/r-a10-sup"; git clone -q --depth 1 "file://$B/r-a10" "$B/r-a10-sup"; cd "$B/r-a10-sup" || exit 2
+git config user.email t@t; git config user.name t; printf 'salida.txt\n' > .git/info/exclude
+echo "      superficial: $(git rev-parse --is-shallow-repository)"
+paso "(C3, clon SUPERFICIAL, --depth 1)" 0

@@ -1,0 +1,102 @@
+# T04 (ADR-166): salida de `bash scripts/pruebas/b/b_trinquete.bash` el 2026-10-18, con el núcleo de [B] del árbol
+# (b-citas.awk y b-control.bash, la versión que sube): el trinquete por cita, visto fallar en un repo de git de juguete.
+# Al final, el MISMO guion contra la versión anterior de b-control.bash (la de la segunda revisión, con el techo «mínimo
+# desde el último cambio del núcleo» y «tabla anterior + lo que el núcleo nuevo ve de más»), con los dos ajustes que esa
+# versión necesita (la ruta de la tabla por variable, y los nombres del .lean ya en git antes del primer paso): siete
+# pasos no dan lo esperado; un comentario en el núcleo, un commit intermedio o un núcleo roto blanqueaban la tabla, y
+# no veía una entrada repetida ((8b) y (8c) pasan porque (7b) ya la había blanqueado).
+
+✓ (1a) la tabla inicial se crea (FAIL=0)
+        ✓ la tabla, escrita de nuevo: 2 entradas
+        ⚠️  doc/control/b-deuda.tsv no está en git: es la tabla que se crea, y no se compara con nada.
+✓ (1b) y cuadra (FAIL=0)
+        historia de la tabla: 1 versiones desde 9181a5a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+✓ (2a) una cita muerta NUEVA es rojo (FAIL=1)
+        ❌ B `muerto_tres` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        historia de la tabla: 1 versiones desde 9181a5a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+✓ (2b) y --b-deuda se niega a subir la tabla (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_tres` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        historia de la tabla: 1 versiones desde 9181a5a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+✓ (3a) una cita muerta MENOS es rojo (FAIL=1)
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        historia de la tabla: 1 versiones desde 9181a5a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+✓ (3b) --b-deuda baja la tabla (FAIL=0)
+        ✓ --b-deuda: la tabla baja a 2 entradas; salen del todo 0:
+        historia de la tabla: 1 versiones desde 9181a5a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+✓ (3c) y cuadra (FAIL=0)
+        historia de la tabla: 2 versiones desde 9181a5a, 0 con otro núcleo; 0 entradas subieron sin cabida y no cuentan
+✓ (4) la tabla subida a mano, ya en git, es rojo (FAIL=1)
+        historia de la tabla: 3 versiones desde 9181a5a, 0 con otro núcleo; 1 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (5a) sin cambiar el núcleo, --b-deuda-rehacer se niega (FAIL=1)
+        ❌ --b-deuda-rehacer: b-citas.awk no cambia en este árbol; la tabla sólo baja.
+        historia de la tabla: 3 versiones desde 9181a5a, 0 con otro núcleo; 1 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (5b) un comentario en el núcleo: rehace la tabla, y sigue rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 2 entradas
+        historia de la tabla: 3 versiones desde 9181a5a, 0 con otro núcleo; 1 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (5c) y tapado con otro commit, sigue rojo (FAIL=1)
+        historia de la tabla: 4 versiones desde 9181a5a, 1 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (5d) arreglado el documento, --b-deuda baja la tabla (FAIL=0)
+        ✓ --b-deuda: la tabla baja a 2 entradas; salen del todo 0:
+        historia de la tabla: 4 versiones desde 9181a5a, 1 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+✓ (5e) un núcleo que VE MÁS (sin «propuesto»): sube justo eso (FAIL=0)
+        ✓ la tabla, escrita de nuevo: 3 entradas
+        historia de la tabla: 5 versiones desde 9181a5a, 1 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+✓ (5f) y ya en git, sigue verde (FAIL=0)
+        historia de la tabla: 6 versiones desde 9181a5a, 2 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+✓ (6a) borrar la tabla y crearla de nuevo es rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 3 entradas
+        historia de la tabla: 7 versiones desde 9181a5a, 2 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (6b) una entrada repetida es rojo (FAIL=1)
+        ❌ doc/control/b-deuda.tsv tiene entradas repetidas o mal formadas (cuatro campos; las citas, un entero positivo):
+        historia de la tabla: 6 versiones desde 9181a5a, 2 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+✓ (7a) una subida en el commit que cambia el núcleo es rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 3 entradas
+        historia de la tabla: 6 versiones desde 9181a5a, 2 con otro núcleo; 2 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (7b) y tapada con otro commit, sigue rojo (FAIL=1)
+        historia de la tabla: 7 versiones desde 9181a5a, 3 con otro núcleo; 3 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (8a) con un ADR que la nombra (ADR-900), pasa (FAIL=0)
+        historia de la tabla: 7 versiones desde 9181a5a, 3 con otro núcleo; 3 entradas subieron sin cabida y no cuentan
+        ⚠️  1 entradas sobre su techo, y ADR-900 las nombra todas.
+✓ (8b) con un ADR que no la nombra (ADR-901), no (FAIL=1)
+        historia de la tabla: 7 versiones desde 9181a5a, 3 con otro núcleo; 3 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (8c) con un ADR que no existe, no (FAIL=1)
+        historia de la tabla: 7 versiones desde 9181a5a, 3 con otro núcleo; 3 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✓ (9) una subida tras un núcleo ROTO en un commit intermedio, roja (FAIL=1)
+        historia de la tabla: 8 versiones desde 9181a5a, 4 con otro núcleo; en 2 falla un núcleo, y no sube nada; 4 entradas subieron sin cabida y no cuentan
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR que las nombre):
+✅ el trinquete se comporta como se espera
+
+# ── el mismo guion contra la versión anterior de b-control.bash (sólo los veredictos) ──
+✓ (1a) la tabla inicial se crea (FAIL=0)
+✓ (1b) y cuadra (FAIL=0)
+✓ (2a) una cita muerta NUEVA es rojo (FAIL=1)
+✓ (2b) y --b-deuda se niega a subir la tabla (FAIL=1)
+✓ (3a) una cita muerta MENOS es rojo (FAIL=1)
+✓ (3b) --b-deuda baja la tabla (FAIL=0)
+✓ (3c) y cuadra (FAIL=0)
+✓ (4) la tabla subida a mano, ya en git, es rojo (FAIL=1)
+✓ (5a) sin cambiar el núcleo, --b-deuda-rehacer se niega (FAIL=1)
+✗ (5b) un comentario en el núcleo: rehace la tabla, y sigue rojo: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+✗ (5c) y tapado con otro commit, sigue rojo: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+✓ (5d) arreglado el documento, --b-deuda baja la tabla (FAIL=0)
+✓ (5e) un núcleo que VE MÁS (sin «propuesto»): sube justo eso (FAIL=0)
+✓ (5f) y ya en git, sigue verde (FAIL=0)
+✓ (6a) borrar la tabla y crearla de nuevo es rojo (FAIL=1)
+✗ (6b) una entrada repetida es rojo: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+✓ (7a) una subida en el commit que cambia el núcleo es rojo (FAIL=1)
+✗ (7b) y tapada con otro commit, sigue rojo: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+✓ (8a) con un ADR que la nombra (ADR-900), pasa (FAIL=0)
+✗ (8b) con un ADR que no la nombra (ADR-901), no: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+✗ (8c) con un ADR que no existe, no: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+✗ (9) una subida tras un núcleo ROTO en un commit intermedio, roja: FAIL=0 MEDIDO=1, se esperaba FAIL=1 medido
+❌ algún paso no es el esperado
