@@ -5,7 +5,19 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
-import ROBINSON_PlusPlus.Meta.CodeDistinct
+-- ✏️ 2026‑10‑18 (ADR‑161): aquí iba `import ROBINSON_PlusPlus.Meta.CodeDistinct`, retirado (nada suyo se usa); van sus
+-- imports, para que el entorno no cambie.
+import ROBINSON_PlusPlus.Meta.CodeArith
+import ROBINSON_PlusPlus.Meta.Provability
+import FOL.FOL
+import FOL.Theorems.Eq
+import FOL.Theorems.Neg
+import FOL.Theorems.Derived
+import FOL.Deduction
+import FOL.Tactics
+import FOL.Theorems.Impl
+import FOL.Theorems.Quantifiers
+import ROBINSON_PlusPlus.Minimal.Axioms
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo

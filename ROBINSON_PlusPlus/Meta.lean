@@ -46,6 +46,9 @@ Public API:
   · ✏️ 2026‑10‑18 (ADR‑160, T66): fuera del build el subárbol sin consumidor —`ChainNegPrf`, `VerifierSound`,
     `OmegaReflect`, `ChainDecode` y `CodeDecode`—, sin ninguna declaración en el cono de los 21 titulares; se recupera
     de la etiqueta `archivo/t66-2026-10-18`.
+  · ✏️ 2026‑10‑18 (ADR‑161): y, aprobado el paso 3 de ADR‑139, `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf` y
+    `Sigma1BoundedPrf` (con los dos teoremas vacuos de T05), sin nada en el cono; etiqueta
+    `archivo/fuera-del-cono-2026-10-18`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -70,7 +73,6 @@ import ROBINSON_PlusPlus.Meta.SubstArith
 import ROBINSON_PlusPlus.Meta.CheckArith
 import ROBINSON_PlusPlus.Meta.Representability
 import ROBINSON_PlusPlus.Meta.Diagonal
-import ROBINSON_PlusPlus.Meta.CodeDistinct
 import ROBINSON_PlusPlus.Meta.ProofChain
 import ROBINSON_PlusPlus.Meta.Representability2
 import ROBINSON_PlusPlus.Meta.ReprPrf
@@ -78,7 +80,6 @@ import ROBINSON_PlusPlus.Meta.ArithPrf
 import ROBINSON_PlusPlus.Meta.Representability2Prf
 import ROBINSON_PlusPlus.Meta.ChainPrf
 import ROBINSON_PlusPlus.Meta.DerivCondPrf
-import ROBINSON_PlusPlus.Meta.ReflectionPrf
 import ROBINSON_PlusPlus.Meta.Sigma1Prf
 import ROBINSON_PlusPlus.Meta.TcArithPrf
 import ROBINSON_PlusPlus.Meta.NumListPrf
@@ -97,13 +98,11 @@ import ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 import ROBINSON_PlusPlus.Meta.LineWFCases
 import ROBINSON_PlusPlus.Meta.MpCodePrf
 import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
-import ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf
 import ROBINSON_PlusPlus.Meta.TrackedCorePrf
 import ROBINSON_PlusPlus.Meta.StrongInductionPrf
 import ROBINSON_PlusPlus.Meta.BoundedInPrf
 import ROBINSON_PlusPlus.Meta.RunFnBoundedPrf
 import ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf
-import ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf
 import ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf
 import ROBINSON_PlusPlus.Meta.NumCodeClosedPrf
 import ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf

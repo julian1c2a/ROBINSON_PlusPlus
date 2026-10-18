@@ -3,7 +3,9 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.ReflectionPrf
+-- ✏️ 2026‑10‑18 (ADR‑161): aquí iba `import ROBINSON_PlusPlus.Meta.ReflectionPrf`, retirado (nada suyo se usa); va su
+-- import.
+import ROBINSON_PlusPlus.Meta.DerivCondPrf
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
@@ -15,7 +17,6 @@ open ROBINSON_PlusPlus.Meta.HilbertDeduction
 open ROBINSON_PlusPlus.Meta.ChainPrf
 open ROBINSON_PlusPlus.Meta.Representability2Prf
 open ROBINSON_PlusPlus.Meta.DerivCondPrf
-open ROBINSON_PlusPlus.Meta.ReflectionPrf
 
 set_option linter.unusedSimpArgs false
 set_option maxHeartbeats 1000000

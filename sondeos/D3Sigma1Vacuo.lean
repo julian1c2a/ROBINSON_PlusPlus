@@ -27,7 +27,35 @@ consumidor fuera del par (✏️ 2026‑10‑14: decía «Ninguno tiene consumid
 
 **Resultado (2026‑10‑12):** compila (entre 4 y 76 s en tres ejecuciones, según la caché); `#print axioms` de los dos: `[propext, Classical.choice, Quot.sound]`.
 Lo que queda de T05: retirar o marcar los dos teoremas (y `Meta/Sigma1BoundedPrf.lean`, que sólo importa el barril).
+
+✏️ **2026‑10‑18 (ADR‑161):** retirados. `Meta/ReflectionPrf.lean` y `Meta/Sigma1BoundedPrf.lean`, con los dos teoremas,
+salieron del build (el paso 3 de ADR‑139: nada suyo estaba en el cono de los titulares; se recuperan de la etiqueta
+`archivo/fuera-del-cono-2026-10-18`). Este sondeo pasa de CONTROL a REGISTRO: lo que vigilaba ya no existe. Para que
+siga compilando, lleva copiado `prf_hI_of_reflect_boundedIn`, en el mismo espacio de nombres.
 -/
+
+namespace ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf
+
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.ReprPrf
+open ROBINSON_PlusPlus.Meta.HilbertDeduction ROBINSON_PlusPlus.Meta.Sigma1Prf ROBINSON_PlusPlus.Meta.BoundedInPrf
+open ROBINSON_PlusPlus.Meta.ProofChain
+
+/-- **Reducción de `hI`** (copiada de `Meta/Sigma1BoundedPrf.lean`, retirado): la Σ₁‑completitud provable de `In` se
+    sigue de la de su forma acotada `boundedIn`. -/
+theorem prf_hI_of_reflect_boundedIn
+    (hbI : ∀ x L : Term, Prf (boundedIn x L ⇒ provCodeC' (boundedIn x L))) :
+    ∀ x L : Term, Prf (In x L ⇒ provCodeC' (In x L)) := by
+  intro x L
+  refine prf_deduction ?_
+  have hbnd : PrfH [In x L] (boundedIn x L) :=
+    PrfH.mp _ _ _ (prf_to_prfH (prf_and_elim_left (prf_In_iff_boundedIn x L)) _)
+      (prfH_hyp_self _)
+  have hpc : PrfH [In x L] (provCodeC' (boundedIn x L)) :=
+    PrfH.mp _ _ _ (prf_to_prfH (hbI x L) _) hbnd
+  exact PrfH.mp _ _ _
+    (prf_to_prfH (pcc_imp (prf_and_elim_right (prf_In_iff_boundedIn x L))) _) hpc
+
+end ROBINSON_PlusPlus.Meta.Sigma1BoundedPrf
 
 open FOL FOL.Metamath.Semantics
 open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.Hilbert

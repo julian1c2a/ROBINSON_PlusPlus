@@ -16,13 +16,12 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 -- NEXT-STEPS.md y AXIOMS.md §0.)
 import ROBINSON_PlusPlus.Meta
 
--- Full: Induction (`inductionFormula`, `primAxioms`, el censo, lemas de sustitución), Numerals
--- (`numeral`) y PrimeFactor (teoría de números META pura ℕ, sin Mathlib: IsPrimeNat, factor
--- primo, factorización). La inducción de la cadena entra por los constructores `Prf.ind` y
+-- Full: Induction (`inductionFormula`, `primAxioms`, el censo, lemas de sustitución) y Numerals
+-- (`numeral`). (✏️ 2026‑10‑18, ADR‑161: PrimeFactor, la teoría de números META pura sobre ℕ, salió del build: nada
+-- suyo estaba en el cono de los titulares.) La inducción de la cadena entra por los constructores `Prf.ind` y
 -- `Prf.listInd` (Meta/Hilbert.lean; ✏️ 2026‑10‑14: decía «es el constructor `Prf.ind`»; AXIOMS.md §0.3).
 import ROBINSON_PlusPlus.Full.Induction
 import ROBINSON_PlusPlus.Full.Numerals
-import ROBINSON_PlusPlus.Full.PrimeFactor
 -- FOL: los ocho módulos de FOL que importaban los módulos retirados con ADR‑115.
 import FOL.Deduction
 import FOL.FOL

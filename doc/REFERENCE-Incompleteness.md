@@ -38,7 +38,7 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 135 jobs · 118 módulos activos** (Minimal 2 + Meta 113 + Full 3) **+ 0 en `cuarentena/`
+> **Build 130 jobs · 113 módulos activos** (Minimal 2 + Meta 109 + Full 2) **+ 0 en `cuarentena/`
 > + 43 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
@@ -53,6 +53,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Y el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la herramienta de T08.)*
 > *(Y el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
 > *(Y el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
+> *(Y el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -454,7 +455,7 @@ y `codingAxioms` (`axioms_eq` rfl preservado; verificador/`prf_iff_derivation`/D
 ### 3.18 Σ₁‑completitud provable — capa numérica Δ₀ del verificador (plan 12‑A)
 
 **Por qué existe esta capa.** El núcleo duro de D3 es la Σ₁‑completitud *provable* del verificador
-(`hC`/`hI` de `d3_prf_of_sigma1`). La construcción estándar exige que el cuerpo `δ` del predicado
+(`hC`/`hI` de `d3_prf_of_sigma1` (retirado en ADR‑161)). La construcción estándar exige que el cuerpo `δ` del predicado
 Σ₁ sea **Δ₀ sobre números** (cuantificadores acotados por términos). Pero el verificador de este
 proyecto es **estructural sobre listas** (`carc`/`cdrc`, sin `len`/`nth`) — de ahí el hallazgo
 central de §12.1 de `GODEL-D3-TRACKED-DESIGN.md`: **codificar el testigo ≡ representar el
@@ -648,7 +649,7 @@ línea anterior*. La demostración generaliza el acumulador como `∀c` **intern
 
 ### 3.19 Fase 3 — D3 reducida a la forma acotada + reflexión atómica rastreada
 
-Con la fase 2 completa (§3.18), la Σ₁‑completitud provable (`hI`/`hC` de `d3_prf_of_sigma1`) se
+Con la fase 2 completa (§3.18), la Σ₁‑completitud provable (`hI`/`hC` de `d3_prf_of_sigma1` (retirado en ADR‑161)) se
 ataca sobre la forma **Δ₀ acotada** y por reflexión de sus **átomos**.
 
 **`Meta/Sigma1BoundedPrf.lean`** (fase 3, puente) — namespace `…Meta.Sigma1BoundedPrf`. Como la
@@ -662,7 +663,7 @@ prf_hC_of_reflect_chainOkB (hbC : ∀ p, Prf (chainOkB nil p ⇒ provCodeC' (cha
   : ∀ p, Prf (chainOk nil p ⇒ provCodeC' (chainOk nil p))
 d3_prf_of_reflect_bounded (φ) (hbC) (hbI) : Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ))  -- = d3_prf
 -- #print axioms = [propext, Classical.choice, Quot.sound, prf_inAxC]
--- ✏️ 2026‑10‑14 (ADR‑134): ⛔ VACUO, como `d3_prf_of_sigma1`: `hbI` cae con `hI` (ADR‑132, T05). No es D3;
+-- ✏️ 2026‑10‑14 (ADR‑134): ⛔ VACUO, como `d3_prf_of_sigma1` (retirado en ADR‑161): `hbI` cae con `hI` (ADR‑132, T05). No es D3;
 --   D3 es `d3_prf_real`. El footprint, sin re‑medir; `prf_inAxC` es teorema desde el 2026‑07‑20.
 ```
 

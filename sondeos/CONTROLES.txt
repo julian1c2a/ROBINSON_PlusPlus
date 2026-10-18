@@ -13,9 +13,9 @@ ListInductionAxiomRefutable.lean
 OmegaConsistentRefutable.lean
 PrfBotCodificacionVieja.lean
 
-# vacuidad (ADR-067; T05)
+# vacuidad (ADR-067; T05). 2026-10-18 (ADR-161): D3Sigma1Vacuo pasa a REGISTRO: los dos teoremas vacuos que vigilaba
+# salieron del build con ReflectionPrf y Sigma1BoundedPrf.
 CraigEqVacuo.lean
-D3Sigma1Vacuo.lean
 
 # semántica: la solidez de Prfᵢ en todo modelo (AXIOMS §0.2)
 AnclaSoundness.lean

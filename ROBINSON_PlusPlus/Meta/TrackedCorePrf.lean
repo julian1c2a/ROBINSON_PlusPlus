@@ -3,7 +3,10 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf
+-- ✏️ 2026‑10‑18 (ADR‑161): aquí iba `import ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf`, retirado (nada suyo se usa); van
+-- sus imports.
+import ROBINSON_PlusPlus.Meta.ExIntroCodePrf
+import ROBINSON_PlusPlus.Meta.HasWitTcFnPrf
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo

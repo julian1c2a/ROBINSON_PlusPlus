@@ -12,7 +12,7 @@
 
 > 🗄️ ✏️ **2026‑10‑12 ([ADR‑134](DECISIONS.md)) · REGISTRO del 2026‑09‑10: esta sección y las siguientes, hasta el final
 > (Status by Module, Recent Achievements, Pending Work, Architecture).** Las cifras de esta tabla son de esa fecha
-> (hoy: 0 `axiom` de Lean, 142 axiomas objeto, 118 módulos). La teoría de los titulares —que no es `Minimal` sin
+> (hoy: 0 `axiom` de Lean, 142 axiomas objeto, 113 módulos). La teoría de los titulares —que no es `Minimal` sin
 > inducción: `Prf` añade la inducción para toda fórmula, y contiene a PA— y lo que se supone hoy, en
 > [AXIOMS.md](AXIOMS.md) §0. El propietario decidió el 2026‑10‑14 reescribirlo (T26).
 
@@ -109,7 +109,7 @@
   ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
 
 - **2026-07-09c — 12‑A fase 3: puente D3→forma acotada + átomo `=eq` rastreado**:
-  **`Meta/Sigma1BoundedPrf.lean`** (NUEVO): **`d3_prf_of_reflect_bounded`** — como la fase 1/2 dio los
+  **`Meta/Sigma1BoundedPrf.lean`** (NUEVO; 🗑️ retirado el 2026‑10‑18, ADR‑161): **`d3_prf_of_reflect_bounded`** — como la fase 1/2 dio los
   `⇔` (`prf_In_iff_boundedIn`, `prf_chainOk_iff_chainOkB`) y `pcc_imp` sube implicaciones a
   `provCodeC'`, D3 se reduce a reflejar la forma **Δ₀ acotada** `boundedIn`/`chainOkB`.
   **`Meta/Sigma1AtomPrf.lean`** (NUEVO): toolkit RASTREADO del átomo `=eq` (`eqCodeFn` + congruencia +
@@ -166,7 +166,7 @@
 - **2026-07-05b — Gödel II / Opción A: A‑F3 `pcc_exIntro_code` + verificación concreta RIESGO‑1**:
   `Meta/ExIntroCodePrf.lean` cierra la **A‑F3** (∃‑intro de la regla Q2 al nivel de código con
   testigo‑código arbitrario cerrado; `#print axioms` = estándar). `Meta/Sigma1TrackedPrf.lean`
-  (NUEVO) verifica el ∃‑intro rastreado para testigos **concretos** (`pcc_exIntro_code_bridge`/
+  (NUEVO; retirado el 2026‑10‑18, ADR‑161) verifica el ∃‑intro rastreado para testigos **concretos** (`pcc_exIntro_code_bridge`/
   `_objList`). **Hallazgo:** el testigo **abstracto** no lo cubre esta pieza — `tcFn #0` no es
   cerrado y todo combinador base produce `termCode` meta (transporte a `tcFn` stuck para lista
   abstracta) → `hI_tracked` abstracto requiere la **Opción A de raíz** (`provFormulaC'ₜ`/D1ₜ).
@@ -240,7 +240,7 @@ construcción por el plan **12‑A** (`GODEL-D3-TRACKED-DESIGN.md` §12–§14):
 | 1a | `lenc`/`nthc` + ecuaciones `Prf` | ✅ |
 | 1b | toolkit `<` en `Prf` → `prf_In_iff_boundedIn` | ✅ |
 | 2 | `prf_In_runFn_iff` + `prf_chainOk_iff_chainOkB` (verificador Δ₀, sin acumulador) | ✅ |
-| 3 puente | `d3_prf_of_reflect_bounded` (D3 ⇐ reflejar `boundedIn`/`chainOkB`) | ✅ |
+| 3 puente | `d3_prf_of_reflect_bounded` (D3 ⇐ reflejar `boundedIn`/`chainOkB`; vacuo, retirado el 2026‑10‑18) | 🗑️ |
 | 3 átomo `=eq` | `Sigma1AtomPrf`: `eqCodeFn` + `prf_provCodeC'_eq_of_tracked` (rastreado) | ✅ |
 | 3‑4 resto | reflexividad libre de muro, átomos `<`/`lineWF`, cuantificadores acotados | ⏳ |
 | 5 | inducción estructural sobre `boundedIn`/`chainOkB` → `d3_prf` → `goedel_second_prf` | ⏳ |

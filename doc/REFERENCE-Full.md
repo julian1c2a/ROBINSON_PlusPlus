@@ -132,6 +132,9 @@ theorem isPrime_numeral (p) (hp2 : 2 ≤ p) (hpd : ∀ a, a∣p → a=1∨a=p) :
 
 #### `Full/PrimeFactor.lean` — teoría de números META (ℕ pura, sin Mathlib) + TFA
 
+> 🗑️ **2026‑10‑18 (ADR‑161): retirado del build.** Nada suyo estaba en el cono de los titulares (el paso 3 de ADR‑139,
+> aprobado); se recupera de la etiqueta `archivo/fuera-del-cono-2026-10-18`. Lo de abajo es REGISTRO.
+
 ```lean
 def IsPrimeNat (p) : Prop := 2 ≤ p ∧ ∀ a, a∣p → a=1 ∨ a=p
 def natProd : List Nat → Nat

@@ -32,7 +32,7 @@ tácticas) se cuentan aparte, y las líneas fuera de toda declaración (comentar
 **Controles** (dentro de `#cono`, antes de escribir nada; si uno falla, no se escribe): (1) el cono de la clase (i) de
 ADR‑135 no nombra `SolidezPrf` y el de `consistencia` sí, como mide `#modelo` (`sondeos/InduccionTitulares.lean`);
 (2) ninguna declaración de un módulo fuera del cono de imports (`Meta/VerifierSound.lean`; ✏️ desde ADR‑160, que lo
-retiró, `Full/PrimeFactor.lean`) queda dentro; (3) cada
+retiró, `Full/PrimeFactor.lean`; y desde ADR‑161, `Meta/PurezaTitulares.lean`) queda dentro; (3) cada
 titular cae en su propia declaración, y dentro; (4) las constantes del cono sin declaración a la que asignarlas se
 cuentan y se listan. La primera versión asignaba un auxiliar a una línea de SU módulo, y un auxiliar puede generarse
 en otro (las ecuaciones de `ModeloCodigo.stepT.match_1` viven en `ModeloCodificacion`): dejaba 39 sin dueño y podía
@@ -324,8 +324,9 @@ def controles (md : Medida) : CommandElabM (Bool × String) := do
   let c1a := !(ci.toList.any (fun n => sol.isPrefixOf (nombreUsuario n)))
   let c1b := cc.toList.any (fun n => sol.isPrefixOf (nombreUsuario n))
   -- (2) nada de un módulo fuera del cono de imports, dentro del cono. Hasta ADR‑160 era `Meta/VerifierSound.lean`,
-  -- retirado allí (T66); desde entonces, `Full/PrimeFactor.lean`, que sólo importa la raíz.
-  let vs := `ROBINSON_PlusPlus.Full.PrimeFactor
+  -- retirado allí (T66); después, `Full/PrimeFactor.lean`, retirado en ADR‑161; desde entonces,
+  -- `Meta/PurezaTitulares.lean`, la lista de T08, que ningún módulo de un titular importa.
+  let vs := `ROBINSON_PlusPlus.Meta.PurezaTitulares
   let mk := md.enCono.getD vs #[]
   let c2 := mk.size > 0 && !(mk.any id)
   -- (3) cada titular, dentro del cono y en su propia declaración
