@@ -336,7 +336,8 @@ EV_ALCANCE="ROBINSON_PlusPlus.lean ROBINSON_PlusPlus sondeos"
 # no casan). Las clases son de BYTES: `R₀` o `(fun R => R)` casarían, que es el lado seguro (rojo de más), y `«R»`
 # se escaparía (rebuscado). Visto fallar: con la línea de `R` en el autotest y sin el token, el autotest daba «SIN
 # MEDIR».
-EV_TOK="(^|[^A-Za-z0-9_'«])(axioms|ax_axiomsCodeT_def|axD|nD|deltaD|psiD|stepConcl|checkAux|checkProof|ruleCode|rulesCode|proofCode'?|decodeRuleTag|decodeRule|decodeLine|decodeChainAux|decodeChain|V₀|codeNatList|selfAppN|godelCN|liar|R)([^A-Za-z0-9_'!?»]|\$)"
+# ⭐ 2026-10-18 (ADR-159): y la sentencia de Löb, `lobSent` (`Meta/Lob.lean`), por lo mismo. Visto fallar igual.
+EV_TOK="(^|[^A-Za-z0-9_'«])(axioms|ax_axiomsCodeT_def|axD|nD|deltaD|psiD|stepConcl|checkAux|checkProof|ruleCode|rulesCode|proofCode'?|decodeRuleTag|decodeRule|decodeLine|decodeChainAux|decodeChain|V₀|codeNatList|selfAppN|godelCN|liar|R|lobSent)([^A-Za-z0-9_'!?»]|\$)"
 ev_ordenes () {   # stdin: código despojado → «línea:orden» de cada orden que evalúa, entera
   # Una orden abierta sigue en las líneas sangradas; NO se cierra en una línea en blanco (un comentario
   # despojado lo es); se cierra en una línea sin sangría o en otra orden o declaración. Si tras la palabra
@@ -402,11 +403,12 @@ theorem u : axioms.length = 142 := rfl
 #reduce ROBINSON_PlusPlus.Meta.Rosser.R []
 #eval rhoE []
 #eval Rosser.prf_R_fix
+#reduce ROBINSON_PlusPlus.Meta.Lob.lobSent ⊥
 EOF
 EV_AUTO=$(ev_recoge "$EV_FIX" | sed "s|^$EV_FIX/Evalua.lean:||" | cut -d: -f1 | tr '\n' ' ')
 rm -rf "$EV_FIX"
-if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 23 24 25 26 27 28 " ]; then
-  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 23 24 25 26 27 28 »)."
+if [ "$EV_AUTO" != "1 2 3 7 8 9 10 12 13 23 24 25 26 27 28 31 " ]; then
+  echo "  ⚠️  SIN MEDIR — el autotest del censo da las líneas «$EV_AUTO» (esperadas «1 2 3 7 8 9 10 12 13 23 24 25 26 27 28 31 »)."
   exit 2
 fi
 EV_FAIL=0

@@ -78,6 +78,9 @@ de 3 529: W1 es paramétrico desde ADR‑148). `rosser_ext`: clase (i), sin la s
 `prf_bdAll_numeral ⟶ … ⟶ prf_zero_or_succ`), `listInd` (por NegNum: `chainOk_decide ⟶ … ⟶ prf_list_induction`) y
 `p3` sólo al decodificar con `linea_p3` las líneas de una prueba con el código de los 142 (W1(ax): `negNum' ⟶ w1Ax ⟶
 cadena_buena ⟶ linea_buena ⟶ linea_p3`), como `goedel_I_neg` las del modelo.
+
+**✏️ Y el mismo día, con `lob` (ADR‑159), 22 s:** clase (i), sin la semántica en el cierre (4 935 constantes, con las de Lean); `ind`
+y `listInd`, sí; `p3`, no, como `goedel_second_prf` (la salida, en `doc/registro/2026-10-18-lob/`).
 -/
 
 open Lean Meta Elab Command
@@ -260,6 +263,8 @@ end InduccionTitulares
 -- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
 #induccion ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
 #induccion ROBINSON_PlusPlus.Meta.Rosser.rosser
+-- ✏️ 2026‑10‑18 (ADR‑159): Löb.
+#induccion ROBINSON_PlusPlus.Meta.Lob.lob
 
 /-! ### Por dónde: un camino por VALORES del titular a cada constante de su frontera -/
 
@@ -313,3 +318,5 @@ end InduccionTitulares
 -- ✏️ 2026‑10‑18 (ADR‑157): los dos titulares de Rosser.
 #modelo ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
 #modelo ROBINSON_PlusPlus.Meta.Rosser.rosser
+-- ✏️ 2026‑10‑18 (ADR‑159): Löb.
+#modelo ROBINSON_PlusPlus.Meta.Lob.lob

@@ -7,6 +7,7 @@ import ROBINSON_PlusPlus.Meta.PurezaComando
 import ROBINSON_PlusPlus.Meta.Consistencia
 import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.Rosser
+import ROBINSON_PlusPlus.Meta.Lob
 
 /-!
 # `Meta/PurezaTitulares.lean` — T08: el CONTROL DE PUREZA del cierre de los titulares de la clase (i) (ADR‑143)
@@ -28,7 +29,8 @@ un mutante (ADR‑143).
 **Lo que NO comprueba**: el de `Meta/PurezaComando.lean`. Y no fija el ENUNCIADO de los titulares ni el valor de sus
 definiciones: eso es T07, que irá en este mismo módulo.
 
-Era el criterio de aceptación de Rosser (ADR‑137). ✏️ 2026‑10‑18 (ADR‑157): `rosser_ext` está en `PUROS`.
+Era el criterio de aceptación de Rosser (ADR‑137). ✏️ 2026‑10‑18 (ADR‑157): `rosser_ext` está en `PUROS`; y desde
+ADR‑159, `lob`.
 -/
 
 set_option autoImplicit false
@@ -48,7 +50,8 @@ def PUROS : List Name := [
   ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf,
   ``ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf,
   ``ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski,
-  ``ROBINSON_PlusPlus.Meta.Rosser.rosser_ext]
+  ``ROBINSON_PlusPlus.Meta.Rosser.rosser_ext,
+  ``ROBINSON_PlusPlus.Meta.Lob.lob]
 
 /-- Los controles positivos: llaman a `consistencia`, así que su cierre TIENE que nombrar la semántica. -/
 def IMPUROS : List Name := [

@@ -317,6 +317,10 @@ ROBINSON_PlusPlus.Meta.Rosser.R_isSentence|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Rosser.rosser_red|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Rosser.rosser_ext|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Rosser.rosser|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Lob.prf_lob_fix|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Lob.lob|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Lob.lob_iff|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Lob.goedel_second_de_lob|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-

@@ -41,6 +41,8 @@ Public API:
     sentencia de Rosser es indecidible en T+E), `rosser_red` (toda lista E) y `rosser` (T, sin hipótesis), con su
     `#pureza`. `rosser_ext` entra en `PUROS` y `rosser` en `IMPUROS`; para eso, el recorrido y `#pureza` pasan a
     `Meta/PurezaComando.lean`, y `Meta/PurezaTitulares.lean`, la lista, importa Rosser.
+  · ✏️ 2026‑10‑18 (ADR‑159): 🏁 `Meta/Lob.lean`, LÖB: `lob : Prf (Prov⌜φ⌝ ⇒ φ) → Prf φ` y `lob_iff`, por el punto
+    fijo de `Prov(#0) ⇒ φ` y D1–D3; Gödel II, de corolario (`goedel_second_de_lob`). `lob` entra en `PUROS`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -170,6 +172,7 @@ import ROBINSON_PlusPlus.Meta.RosserGuardNeg
 import ROBINSON_PlusPlus.Meta.RosserNegLinea
 import ROBINSON_PlusPlus.Meta.RosserNegNum
 import ROBINSON_PlusPlus.Meta.Rosser
+import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 import FOL.Deduction
 import FOL.FOL

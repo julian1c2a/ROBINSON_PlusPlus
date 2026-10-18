@@ -1,0 +1,19 @@
+import ROBINSON_PlusPlus.Meta.PurezaTitulares
+
+/-! Mutantes de T08 para Löb (ADR‑159). Los tres TIENEN que fallar, y el fichero no puede tener otros errores. -/
+
+open FOL ROBINSON_PlusPlus.Meta.Hilbert ROBINSON_PlusPlus.Meta.ProofChain ROBINSON_PlusPlus.Meta.Lob
+
+-- M1: `control_reflexion_bot` (descarga la consistencia con `consistencia`) declarado PURO.
+#pureza ROBINSON_PlusPlus.Meta.Lob.control_reflexion_bot |
+
+-- M2: `lob` declarado control positivo: no nombra la semántica, así que el control tiene que decir «CIEGO».
+#pureza | ROBINSON_PlusPlus.Meta.Lob.lob
+
+-- M3: el enunciado de `lob`, con una prueba que NOMBRA `prf_sound` en el modelo estándar, declarado PURO.
+theorem mutanteSolidez (φ : Formula) (h : Prf (provCodeC' φ ⇒ φ)) : Prf φ :=
+  have _hs : Prf Formula.bottom → False := fun hb =>
+    ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN hb (fun _ => 0)
+  lob φ h
+
+#pureza mutanteSolidez |

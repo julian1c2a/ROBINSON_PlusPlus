@@ -109,8 +109,8 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
 
 `#print axioms` no lo ve: `ind`, `listInd`, `p3` y `qconf` son constructores de `Prf`, no `axiom`. Medido el
 2026‑10‑12 por cierre de dependencias (`sondeos/InduccionTitulares.lean`, ≈ 20 s; re‑ejecutado el 2026‑10‑14 sobre el
-build de ese día, con el mismo resultado y las dos filas de Tarski añadidas; ✏️ 2026‑10‑18, ADR‑157: y la de Rosser,
-`doc/registro/2026-10-18-rosser/`): qué titulares construyen pasos con cada
+build de ese día, con el mismo resultado y las dos filas de Tarski añadidas; ✏️ 2026‑10‑18, ADR‑157 y ADR‑159: y las
+de Rosser y Löb, `doc/registro/2026-10-18-rosser/` y `doc/registro/2026-10-18-lob/`): qué titulares construyen pasos con cada
 regla, fuera de las traducciones entre `Prf`, `PrfH` y las líneas del verificador (lo automático separa las cuatro
 traducciones; el resto de cada frontera se clasificó leyendo el fuente). `qconf` no va en la tabla: lo
 construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de varios módulos.
@@ -125,6 +125,7 @@ construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de var
 | `prf_tarski`, `tarski`, `tarski_semantico` | **sí** (la aritmética de numerales del lema diagonal) | no | no |
 | `goedel_I_neg` | **sí** (p. ej., por el punto fijo) | sólo al decodificar las líneas que el verificador acepta en el modelo (`linea_listInd`) | ídem (`linea_p3`) |
 | `prf_sound`, `consistencia` | no (analizan `Prf`; no construyen) | no | no |
+| `lob`, `lob_iff` (ADR‑159) | **sí** (por D1) | **sí** (por D2) | no |
 | `rosser_ext`, `rosser` (ADR‑157) | **sí** (por el ∀ acotado: `prf_bdAll_numeral` ⟶ … ⟶ `prf_zero_or_succ`) | **sí** (por NegNum: `chainOk_decide` ⟶ … ⟶ `prf_list_induction`) | sólo al decodificar con `linea_p3` las líneas de una prueba con el código de los 142 (W1(ax), `w1Ax`), en el caso que NegNum′ descarta |
 
 ⚠️ «Sí» quiere decir que el término de prueba nombra, por valores, una regla derivada que construye el paso
