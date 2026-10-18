@@ -81,6 +81,11 @@ cadena_buena ⟶ linea_buena ⟶ linea_p3`), como `goedel_I_neg` las del modelo.
 
 **✏️ Y el mismo día, con `lob` (ADR‑159), 22 s:** clase (i), sin la semántica en el cierre (4 935 constantes, con las de Lean); `ind`
 y `listInd`, sí; `p3`, no, como `goedel_second_prf` (la salida, en `doc/registro/2026-10-18-lob/`).
+
+**✏️ Y con los corolarios de T78 (ADR‑162), 28 s:** `prf_godel_iff_con` y `goedel_second_formalizado`, clase (i), como
+`goedel_second_prf` en `#induccion`; `con_indecidible`, clase (iii) (90 constantes de la semántica, 89 sin pasar por
+`consistencia`), y construye `p3` sólo al decodificar el modelo con `linea_p3` (la salida, en
+`doc/registro/2026-10-18-t78/`).
 -/
 
 open Lean Meta Elab Command
@@ -265,6 +270,10 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.Rosser.rosser
 -- ✏️ 2026‑10‑18 (ADR‑159): Löb.
 #induccion ROBINSON_PlusPlus.Meta.Lob.lob
+-- ✏️ 2026‑10‑18 (ADR‑162): los corolarios de T78.
+#induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
+#induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
+#induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
 
 /-! ### Por dónde: un camino por VALORES del titular a cada constante de su frontera -/
 
@@ -320,3 +329,7 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.Rosser.rosser
 -- ✏️ 2026‑10‑18 (ADR‑159): Löb.
 #modelo ROBINSON_PlusPlus.Meta.Lob.lob
+-- ✏️ 2026‑10‑18 (ADR‑162): los corolarios de T78.
+#modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
+#modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
+#modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible

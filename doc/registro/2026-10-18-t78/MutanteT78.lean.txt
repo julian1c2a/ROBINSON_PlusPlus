@@ -1,0 +1,9 @@
+import ROBINSON_PlusPlus.Meta.PurezaTitulares
+
+/-! Mutantes de T08 para los corolarios de T78 (ADR‑162). Los dos TIENEN que fallar, sin otros errores. -/
+
+-- M1: `con_indecidible` (usa la verdad en el modelo) declarado PURO.
+#pureza ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible |
+
+-- M2: `prf_godel_iff_con` declarado control positivo: no nombra la semántica, así que tiene que decir «CIEGO».
+#pureza | ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
