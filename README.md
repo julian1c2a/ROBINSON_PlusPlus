@@ -129,9 +129,10 @@ lake build
 # Initialize lock system (first time only)
 bash git-lock.bash init
 
-# Create a new module (supports subdirectories)
-bash new-module.bash ModuleName
-bash new-module.bash Topic/SubModule
+# A new module: create ROBINSON_PlusPlus/<Layer>/Name.lean and import it from its barrel
+# (ROBINSON_PlusPlus/Meta.lean or ROBINSON_PlusPlus.lean, both curated by hand). The lakefile's
+# globs compile every file under ROBINSON_PlusPlus/; check-doc-sync.bash ([L]) fails if one is
+# not imported or not in git (2026-10-18, ADR-163: new-module.bash and gen-root.bash retired).
 
 # Build
 make build
@@ -142,8 +143,8 @@ make sorry
 # Show locked files and sorry status
 make status
 
-# Regenerate root import file
-bash gen-root.bash
+# Documentation and module universe in sync (AI-GUIDE §27)
+make docsync
 ```
 
 > See [WORKFLOW.md](WORKFLOW.md) for the complete development workflow.

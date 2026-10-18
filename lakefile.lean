@@ -27,3 +27,8 @@ require FOL from "../FOL"
 
 @[default_target]
 lean_lib «ROBINSON_PlusPlus» where
+  -- ⚠️ `globs` EXPLÍCITO (2026‑10‑18, T15, ADR‑163): sin él la `lean_lib` sólo compila lo que el barril
+  -- `ROBINSON_PlusPlus.lean` alcanza, y un fichero que nadie importa no lo compila nadie (FOL lo vivió con
+  -- `TheoryFramework/Instances/FOL.lean`, roto meses). Con `.andSubmodules` entran el barril y TODO el directorio;
+  -- `[L]` de `check-doc-sync.bash` dice si algo de ahí no está en el cierre de imports del barril.
+  globs := #[.andSubmodules `ROBINSON_PlusPlus]

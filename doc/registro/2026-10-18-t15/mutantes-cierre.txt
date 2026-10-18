@@ -1,0 +1,13 @@
+# T15 (ADR-163): el autotest de cierre-imports.bash, visto fallar. Cada mutante es una copia del script con un sed;
+# se ejecuta `--autotest` (el árbol de prueba de la función autotest). El 2026-10-18, en Git Bash (msys).
+
+[sin despojar comentarios] sed s|LC_ALL=C awk -f "$STRIP" "$1" \||cat "$1" \||
+  --autotest sale con 1:   autotest: el cierre de Lib es «Lib.lean» 
+[la cabecera no acaba en la primera orden] sed s|"meta") exit|"meta") next|
+  --autotest sale con 1:   autotest: el cierre de Lib es «Lib.lean Lib/A.lean Lib/Sub/B.lean Lib/Tarde.lean» 
+[el prefijo casa por subcadena] sed s|"\$p"\.\*) cola|"$p"*) cola|
+  --autotest sale con 1:   autotest: el cierre de Lib devuelve 2 (¿sigue a Library.X?) 
+[un fichero que falta no devuelve 2] sed s|      falta=2|      falta=0|
+  --autotest sale con 1:   autotest: un import a un fichero que no existe NO devuelve 2 
+[sin mutar (el control)] sed s|^$||
+  --autotest sale con 0:  

@@ -118,20 +118,16 @@ bash update-toolchain.bash v4.x.x
 
 ## Parte 5 — Mantenimiento
 
-### Regenerar el barrel root
+### Añadir un módulo
 
-```bash
-bash gen-root.bash    # escanea ROBINSON_PlusPlus/ y reescribe ROBINSON_PlusPlus.lean
-```
+Se crea a mano en su capa (`ROBINSON_PlusPlus/Meta/Nombre.lean`, …) y se importa desde su barril
+(`ROBINSON_PlusPlus/Meta.lean`, o la raíz `ROBINSON_PlusPlus.lean`). Los dos barriles se curan a mano: sus
+comentarios dicen por qué entró o salió cada módulo. Los `globs := #[.andSubmodules …]` del lakefile compilan todo
+`ROBINSON_PlusPlus/`, se importe o no, y `[L]` de `check-doc-sync.bash` es rojo si un fichero no está en el cierre
+de imports del barril o no está en git.
 
-Si añades un módulo manualmente (sin `new-module.bash`), corre esto para sincronizar el import.
-
-### Crear nuevo módulo desde plantilla
-
-```bash
-bash new-module.bash ModuleName          # crea ROBINSON_PlusPlus/ModuleName.lean
-bash new-module.bash Topic/SubModule     # crea ROBINSON_PlusPlus/Topic/SubModule.lean
-```
+✏️ 2026‑10‑18 (T15, ADR‑163): aquí estaban `gen-root.bash` y `new-module.bash`, retirados. El primero reescribía el
+barril y borraba sus comentarios; el segundo pedía una plantilla, `_template.lean`, que ya no existía.
 
 ### Verificar estado
 

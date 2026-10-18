@@ -1,0 +1,49 @@
+# T15 (ADR-163): la prueba de rotura, el 2026-10-18, sobre bbed4f2+f18350b con los cambios de T15 en el árbol (RPP y FOL).
+# Script: un fichero suelto (ROBINSON_PlusPlus/Meta/SueltoT15.lean, FOL/SueltoT15.lean, TheoryFramework/SueltoT15.lean),
+# roto o válido, importado o no; después se borró, con sus artefactos de .lake, y el build volvió a 131 y 59 jobs.
+# (Se quitan de la salida las líneas de [A2] que el filtro casaba por «Build completed».)
+
+== (1) RPP: un fichero suelto ROTO en ROBINSON_PlusPlus/Meta/ — ¿lo compila lake build?
+lake build EXIT=1
+✖ [131/132] Building ROBINSON_PlusPlus.Meta.SueltoT15 (736ms)
+trace: .> LEAN_PATH=E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.31.0\bin\lean.exe E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\ROBINSON_PlusPlus\Meta\SueltoT15.lean -o E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean\ROBINSON_PlusPlus\Meta\SueltoT15.olean -i E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean\ROBINSON_PlusPlus\Meta\SueltoT15.ilean -c E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\ir\ROBINSON_PlusPlus\Meta\SueltoT15.c --setup E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\ir\ROBINSON_PlusPlus\Meta\SueltoT15.setup.json --json
+error: ROBINSON_PlusPlus/Meta/SueltoT15.lean:1:0: Not a definitional equality: the left-hand side
+error: ROBINSON_PlusPlus/Meta/SueltoT15.lean:1:24: Type mismatch
+error: Lean exited with code 1
+- ROBINSON_PlusPlus.Meta.SueltoT15
+== (2) RPP: el mismo fichero, válido y sin importar — [L]
+check-doc-sync EXIT=1
+  módulos activos : 114  (Minimal 2 + Meta 110 + Full 2)
+════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✗ ROBINSON_PlusPlus/Meta/SueltoT15.lean está en el disco o en git y NO en el cierre de imports del barril: los globs lo compilan, pero
+      ningún `import` lo alcanza. Impórtalo desde su barril, o sácalo de ROBINSON_PlusPlus/ (¿sondeos/?).
+== (3) RPP: importado desde Meta.lean, sin git add — [L]
+check-doc-sync EXIT=1
+  módulos activos : 115  (Minimal 2 + Meta 111 + Full 2)
+════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✗ ROBINSON_PlusPlus/Meta/SueltoT15.lean está en el cierre y NO en git: aquí compila, y la CI no lo tiene (git add).
+  ✗ SueltoT15 NO aparece en el catálogo REFERENCE.md §1
+== limpieza (RPP)
+lake build EXIT=0 Build completed successfully (131 jobs).
+git status: 
+== (4) FOL: un fichero suelto ROTO en FOL/ — ¿lo compila lake build @FOL/FOL (desde RPP, M-3)?
+lake build @FOL/FOL EXIT=1
+✖ [51/52] Building FOL.SueltoT15 (736ms)
+trace: .> LEAN_PATH=E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.31.0\bin\lean.exe E:\Dropbox\GitHub\lean4\FOL\FOL\SueltoT15.lean -o E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean\FOL\SueltoT15.olean -i E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean\FOL\SueltoT15.ilean -c E:\Dropbox\GitHub\lean4\FOL\.lake\build\ir\FOL\SueltoT15.c --setup E:\Dropbox\GitHub\lean4\FOL\.lake\build\ir\FOL\SueltoT15.setup.json --json
+error: FOL/SueltoT15.lean:1:0: Not a definitional equality: the left-hand side
+error: FOL/SueltoT15.lean:1:24: Type mismatch
+error: Lean exited with code 1
+- FOL.SueltoT15
+== (5) FOL: un fichero suelto válido en TheoryFramework/ — [L] de FOL
+check-doc-sync (FOL) EXIT=1
+  módulos activos : 54  (FOL/ 43 + FOL/Theorems/ 5 + TheoryFramework/ 6)
+════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════
+  ✗ TheoryFramework/SueltoT15.lean está en el disco o en git y NO en el cierre de imports de las raíces: los globs lo compilan,
+== limpieza (FOL)
+lake build FOL EXIT=0 Build completed successfully (59 jobs).
+git status FOL:  M check-doc-sync.bash |  M lakefile.lean | ?? cierre-imports.bash
+
+== (6) RPP: el control del control — SIN la línea de globs en lakefile.lean, el mismo fichero suelto ROTO
+lake build EXIT=0
+Build completed successfully (131 jobs).
+   ⇒ sin globs, un fichero que nadie importa no lo compila nadie (lo que medía T15). Restaurado el lakefile: 131 jobs.

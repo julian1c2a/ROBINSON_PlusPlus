@@ -11,6 +11,7 @@
 #   2. Se citan como vigentes símbolos que YA NO EXISTEN en el código
 #      (`goedel_first_real'`, `prf_tc_cons'`, …).
 #
+# ✏️ 2026-10-18 (ADR-163, T15): y [L], el universo de los módulos (el cierre de imports del barril = el disco = git).
 # ✏️ 2026-10-14 (ADR-135): hoy rompen [A], [B], [C], [D], [E], [F], [H], [M] y [T]; sólo [A2] es aviso. Lo que
 # sigue es la cabecera de entonces:
 # [A], [C] y [D] son OBJETIVOS y rompen el check. [B] es un AVISO que pide juicio:
@@ -50,10 +51,17 @@ for a in "$@"; do
 done
 
 # ─── 1. VERDAD DEL CÓDIGO ────────────────────────────────────────────────────
-MIN=$(ls ROBINSON_PlusPlus/Minimal/*.lean ROBINSON_PlusPlus/Minimal/**/*.lean 2>/dev/null | sort -u | wc -l)
-META=$(ls ROBINSON_PlusPlus/Meta/*.lean 2>/dev/null | wc -l)
-FULL=$(ls ROBINSON_PlusPlus/Full/*.lean 2>/dev/null | wc -l)
-ACTIVE=$((MIN + META + FULL))
+# ✏️ 2026-10-18 (T15, ADR-163): los módulos se cuentan sobre el CIERRE de imports del barril (`cierre-imports.bash`),
+# el mismo conjunto que [L] compara con el disco y con git. Antes eran `ls` por capas, y `Minimal/**/*.lean` sin
+# `globstar` es UN nivel: un subdirectorio nuevo no lo contaba nadie. Un módulo es un fichero de una capa
+# (`ROBINSON_PlusPlus/<capa>/…`); los dos barriles (`ROBINSON_PlusPlus.lean` y `ROBINSON_PlusPlus/Meta.lean`) no.
+CIERRE=$(bash cierre-imports.bash 2>/dev/null)
+CIERRE_RC=$?
+cuenta_cierre() { printf '%s\n' "$CIERRE" | grep -cE "$1" || true; }
+MIN=$(cuenta_cierre '^ROBINSON_PlusPlus/Minimal/')
+META=$(cuenta_cierre '^ROBINSON_PlusPlus/Meta/')
+FULL=$(cuenta_cierre '^ROBINSON_PlusPlus/Full/')
+ACTIVE=$(cuenta_cierre '^ROBINSON_PlusPlus/[^/]*/')
 QUAR=$(ls cuarentena/*.lean 2>/dev/null | wc -l)
 SOND=$(ls sondeos/*.lean 2>/dev/null | wc -l)
 # ⚠️ Sin `bc`: no está instalado en Git Bash ni, por defecto, en el runner de CI, y
@@ -205,6 +213,67 @@ fi
 # comparar el «0 sorry» de los documentos con un 0 por defecto, y daba verde.)
 [ "$AXIOMS_MISSING" != "0" ] && FAIL=1
 [ "$SORRY_MISSING" != "0" ] && FAIL=1
+
+# ─── [L] LIBRERÍA = CIERRE DE IMPORTS ────────────────────────────────────────
+# ⭐ AÑADIDO el 2026-10-18 (T15, ADR-163). Con `globs := #[.andSubmodules `ROBINSON_PlusPlus]` (lakefile.lean),
+# Lake compila TODO `.lean` de `ROBINSON_PlusPlus/` y el barril, lo importe alguien o no. Tres conjuntos tienen que
+# ser EL MISMO: (1) el cierre de imports del barril (`cierre-imports.bash`), que es lo que cuentan [A] y recorre [C];
+# (2) lo que compilan los globs (el disco); (3) lo que ve la CI (`git ls-files`). Rompe en LOS DOS SENTIDOS: un
+# fichero fuera del cierre (suelto: compila, pero no lo cuenta nadie) es rojo, y uno del cierre sin `git add`
+# también (aquí compila y en la CI no existe). Y un módulo fuera de las tres capas, que [A] no contaría.
+# 🔑 Probado con el fallo puesto: el autotest de `cierre-imports.bash` (cuatro mutantes lo rompen) y un fichero
+# suelto de verdad en `ROBINSON_PlusPlus/Meta/` (ADR-163 §2).
+echo "════ [L] LIBRERÍA = CIERRE DE IMPORTS — ROJO, y rompe en LOS DOS SENTIDOS ════"
+L_FAIL=0
+sin_vacias() { grep -v '^$' || true; }
+if ! bash cierre-imports.bash --autotest; then
+  echo "  ❌ SIN MEDIR: el autotest de cierre-imports.bash falla (¿strip-lean.awk? ¿LC_ALL? ¿bash?)."
+  L_FAIL=1
+elif [ "$CIERRE_RC" != "0" ] || [ -z "$CIERRE" ]; then
+  echo "  ❌ el cierre de imports no sale (código $CIERRE_RC): bash cierre-imports.bash"
+  L_FAIL=1
+elif ! git rev-parse --git-dir > /dev/null 2>&1; then
+  echo "  ❌ SIN MEDIR: esto no es un repositorio de git, y sin \`git ls-files\` no sé qué ve la CI."
+  L_FAIL=1
+else
+  L_GIT=$(git ls-files -- 'ROBINSON_PlusPlus.lean' 'ROBINSON_PlusPlus/*.lean' | sin_vacias | LC_ALL=C sort -u)
+  L_DISCO=$( { [ -f ROBINSON_PlusPlus.lean ] && echo ROBINSON_PlusPlus.lean; find ROBINSON_PlusPlus -name '*.lean'; } \
+    | sin_vacias | LC_ALL=C sort -u)
+  L_SUELTOS=$(printf '%s\n%s\n' "$L_GIT" "$L_DISCO" | sin_vacias | LC_ALL=C sort -u \
+    | LC_ALL=C comm -23 - <(printf '%s\n' "$CIERRE"))
+  L_SINGIT=$(printf '%s\n' "$CIERRE" | LC_ALL=C comm -23 - <(printf '%s\n' "$L_GIT"))
+  L_CAPAS=$((MIN + META + FULL))
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    echo "  ✗ $f está en el disco o en git y NO en el cierre de imports del barril: los globs lo compilan, pero"
+    echo "      ningún \`import\` lo alcanza. Impórtalo desde su barril, o sácalo de ROBINSON_PlusPlus/ (¿sondeos/?)."
+    L_FAIL=1
+  done <<< "$L_SUELTOS"
+  while IFS= read -r f; do
+    [ -n "$f" ] || continue
+    echo "  ✗ $f está en el cierre y NO en git: aquí compila, y la CI no lo tiene (git add)."
+    L_FAIL=1
+  done <<< "$L_SINGIT"
+  if [ "$L_CAPAS" != "$ACTIVE" ]; then
+    echo "  ✗ hay módulos del cierre fuera de Minimal/, Meta/ y Full/ ($ACTIVE en capas, $L_CAPAS en las tres): [A] no"
+    echo "      los contaría por capa. Añade la capa a la cuenta de arriba."
+    L_FAIL=1
+  fi
+  # El código de `cierre-imports.bash` es el de FOL salvo sus raíces (`RAICES`, `PREFIJOS`): si se separan, rojo.
+  if [ ! -f ../FOL/cierre-imports.bash ]; then
+    echo "  ❌ falta ../FOL/cierre-imports.bash: no puedo comprobar que las dos copias tengan el mismo código."
+    L_FAIL=1
+  elif ! cmp -s <(grep -vE '^#|^(RAICES|PREFIJOS)=' cierre-imports.bash | tr -d '\r') \
+                <(grep -vE '^#|^(RAICES|PREFIJOS)=' ../FOL/cierre-imports.bash | tr -d '\r'); then
+    echo "  ❌ cierre-imports.bash y ../FOL/cierre-imports.bash ya no tienen el mismo código: unifícalos."
+    L_FAIL=1
+  fi
+  L_TOTAL=$(printf '%s\n' "$CIERRE" | grep -c .)
+  [ "$L_FAIL" = "0" ] && echo "  ✓ los $L_TOTAL ficheros del cierre de imports del barril son los del disco y los de git" \
+    "($((L_TOTAL - ACTIVE)) barriles y $ACTIVE módulos); el autotest del cierre pasa"
+fi
+[ "$L_FAIL" = "0" ] || FAIL=1
+echo
 
 # ─── 2. CIFRAS OBSOLETAS ─────────────────────────────────────────────────────
 # CHANGELOG.md se excluye: es un diario, sus cifras son históricas por diseño.
@@ -702,8 +771,8 @@ fi
 echo
 echo "════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════"
 C_FAIL=0
-for f in ROBINSON_PlusPlus/Meta/*.lean ROBINSON_PlusPlus/Minimal/*.lean \
-         ROBINSON_PlusPlus/Minimal/**/*.lean ROBINSON_PlusPlus/Full/*.lean; do
+# ✏️ 2026-10-18 (T15, ADR-163): el dominio es el cierre de imports (los módulos de las capas), no cuatro `ls`.
+for f in $(printf '%s\n' "$CIERRE" | grep '^ROBINSON_PlusPlus/[^/]*/'); do
   [ -e "$f" ] || continue
   m=$(basename "$f" .lean)
   if ! grep -q "$m" REFERENCE.md 2>/dev/null; then
@@ -716,12 +785,22 @@ done
 # veintiseis modulos llevaban dias sin proyectar en FOL/REFERENCE.md §6 sin que saltara
 # nada. Y se comprueba contra §6 (Exports), que es lo que AI-GUIDE §14 exige de verdad
 # -- no basta con que el nombre aparezca en la tabla de modulos.
-if [ -f ../FOL/REFERENCE.md ]; then
+# ✏️ 2026-10-18 (T15, ADR-163): el dominio es el cierre de imports de FOL (`../FOL/cierre-imports.bash`), sus
+# ficheros de `FOL/`, a cualquier profundidad. Antes eran `FOL/*.lean` y `FOL/Theorems/*.lean`, y un `continue`
+# pensado para el barril dejaba fuera `FOL/FOL.lean`, el módulo `FOL.FOL`: el barril está en la raíz de FOL.
+FOLCIERRE=""
+if [ -f ../FOL/REFERENCE.md ] && [ ! -f ../FOL/cierre-imports.bash ]; then
+  echo "  ❌ falta ../FOL/cierre-imports.bash: no sé qué módulos tiene FOL (alcance REDUCIDO)."
+  C_FAIL=1
+elif [ -f ../FOL/REFERENCE.md ]; then
+  FOLCIERRE=$(bash ../FOL/cierre-imports.bash 2>/dev/null) \
+    || { echo "  ❌ el cierre de imports de FOL no sale: bash ../FOL/cierre-imports.bash"; C_FAIL=1; }
+fi
+if [ -n "$FOLCIERRE" ]; then
   FOLEXP=$(sed -n '/^## 6\. Exports/,/^## 7\./p' ../FOL/REFERENCE.md)
-  for f in ../FOL/FOL/*.lean ../FOL/FOL/Theorems/*.lean; do
+  for f in $(printf '%s\n' "$FOLCIERRE" | grep '^FOL/' | sed 's|^|../FOL/|'); do
     [ -e "$f" ] || continue
     m=${f#../FOL/FOL/}; m=${m%.lean}
-    [ "$m" = "FOL" ] && continue
     # ⚠ Frontera de palabra OBLIGATORIA, y la RUTA y no el basename:
     #   • con `grep -F "Eq.lean"` el modulo `Theorems/Eq.lean` daba VERDE porque
     #     "Eq.lean" es subcadena de "DecEq.lean";

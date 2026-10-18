@@ -35,7 +35,7 @@ cd "$(dirname "$0")"
 
 CURRENT=$(cat lean-toolchain)
 
-# ── Detectar la librería (misma lógica que gen-root.bash) ───────────────────
+# ── Detectar la librería (la lógica de gen-root.bash, retirado en ADR‑163) ──
 LIB=$(grep -E 'lean_lib\s+«([^»]+)»' lakefile.lean 2>/dev/null | sed 's/.*«\(.*\)».*/\1/' | head -1)
 [ -z "$LIB" ] && LIB=$(grep -E '^lean_lib\s+"([^"]+)"' lakefile.lean 2>/dev/null | sed 's/.*"\(.*\)".*/\1/' | head -1)
 [ -z "$LIB" ] && LIB=$(grep -E 'package\s+«([^»]+)»' lakefile.lean 2>/dev/null | sed 's/.*«\(.*\)».*/\1/' | head -1)

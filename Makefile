@@ -2,7 +2,7 @@
 # Usage: make <target>
 # Requires: bash, lake, git
 
-.PHONY: footprints estratos warnings build clean rebuild sorry status lock unlock list init new help
+.PHONY: footprints estratos warnings build clean rebuild sorry status lock unlock list init help
 
 ## Build the project
 build:
@@ -69,14 +69,8 @@ list:
 init:
 	@bash git-lock.bash init
 
-## Create a new module: make new NAME=Algebra/Ring
-new:
-	@[ -n "$(NAME)" ] || (echo "Usage: make new NAME=ModuleName" && exit 1)
-	@bash new-module.bash $(NAME)
-
-## Regenerate root module file
-root:
-	@bash gen-root.bash
+# (2026-10-18, T15, ADR-163: `make new` y `make root` se retiraron con new-module.bash y gen-root.bash. Un modulo
+#  nuevo se crea a mano y se importa desde su barril; `make docsync` ([L]) dice si un fichero no esta importado.)
 
 ## Update Lean toolchain: make update-toolchain [VERSION=v4.31.0]
 update-toolchain:
