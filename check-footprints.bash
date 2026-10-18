@@ -2,6 +2,13 @@
 # check-footprints.bash — comprueba que los teoremas TITULARES tienen EXACTAMENTE el footprint
 # que la documentación publica. ROMPE si alguno no cuadra.
 #
+# ⚠️ LO QUE NO COMPRUEBA (✏️ 2026-10-18, T07 y ADR-165): el ENUNCIADO de un titular, ni el valor de las
+# definiciones de las que depende. Un enunciado debilitado con el mismo footprint pasa: el mutante M4 de
+# ADR-165 debilita `con_indecidible` y su fila de aquí sigue cuadrando. Eso lo fija el contrato de los
+# enunciados, `#contrato_titulares` (`Meta/PurezaTitulares.lean`), sobre los 24 titulares de `T_UNIVERSO`.
+# Los «titulares» de este script son otra cosa, más amplia: toda declaración cuyo `#print axioms` imprime el
+# árbol (abajo).
+#
 # ⭐⭐ QUÉ ES UN «TITULAR» — LA DEFINICIÓN OPERATIVA (2026-09-18, ADR-073, encargo A2)
 #
 # *Un TITULAR es toda declaración cuyo `#print axioms` **EL ÁRBOL IMPRIME**.*

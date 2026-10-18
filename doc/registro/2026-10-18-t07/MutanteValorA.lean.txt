@@ -1,0 +1,16 @@
+import ROBINSON_PlusPlus.Meta.ContratoTitulares
+
+/-! T07 (ADR‑165), M5 (1 de 2): la tabla de un titular de juguete cuyo enunciado nombra `miDef := 1`. -/
+
+open Lean Elab Command
+
+namespace Juguete
+def miDef : Nat := 1
+theorem miTitular : miDef = miDef := rfl
+end Juguete
+
+elab "#tablaA" : command => do
+  let (cal, _) := ROBINSON_PlusPlus.Meta.ContratoTitulares.calcular (← getEnv) [``Juguete.miTitular]
+  logInfo m!"TABLA\n{"\n".intercalate (cal.toList.map ROBINSON_PlusPlus.Meta.ContratoTitulares.lineaDe)}\nFIN"
+
+#tablaA

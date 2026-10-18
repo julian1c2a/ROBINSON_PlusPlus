@@ -1,0 +1,44 @@
+# T07 (ADR-165): dos mutantes del FUENTE de GodelCorolarios.lean.
+#   M6: la PRUEBA de con_indecidible cambia y el enunciado no  ⇒ el contrato tiene que PASAR (sin falsos positivos).
+#   M4: el ENUNCIADO de con_indecidible se debilita (sólo ¬Prf ¬Con') ⇒ el contrato tiene que FALLAR; y su footprint
+#       sigue siendo el de la fila de check-footprints, así que ese control no lo habría visto.
+$ErrorActionPreference = 'Continue'
+Set-Location 'E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus'
+$f = 'ROBINSON_PlusPlus\Meta\GodelCorolarios.lean'
+$orig = [System.IO.File]::ReadAllText("$PWD\$f")
+$out = New-Object System.Collections.Generic.List[string]
+function Log($s) { $out.Add($s); Write-Output $s }
+$utf8 = New-Object System.Text.UTF8Encoding($false)
+
+$prueba = "  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN h`n    (fun _ => 0)`n  exact hs (ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera (fun _ => 0))"
+if (-not $orig.Replace("`r`n", "`n").Contains($prueba)) { Log "NO ENCUENTRO LA PRUEBA: aborto"; exit 1 }
+$base = $orig.Replace("`r`n", "`n")
+
+Log "== M6: la prueba de con_indecidible con la valoración (fun _ => 1) en vez de (fun _ => 0)"
+$m6 = $base.Replace($prueba, $prueba.Replace("(fun _ => 0)", "(fun _ => 1)"))
+[System.IO.File]::WriteAllText("$PWD\$f", $m6, $utf8)
+$b = lake build 2>&1 | Out-String
+Log "lake build EXIT=$LASTEXITCODE"
+Log (($b -split "`n" | Select-String -Pattern 'error|T07|Build completed') -join "`n")
+
+Log "== M4: el enunciado de con_indecidible, debilitado a ¬ Prf (neg Con')"
+$enun = "theorem con_indecidible : And (¬ Prf consistencyFormula') (¬ Prf (neg consistencyFormula')) := by`n  refine ⟨ROBINSON_PlusPlus.Meta.Consistencia.goedel_II, fun h => ?_⟩`n"
+if (-not $base.Contains($enun)) { Log "NO ENCUENTRO EL ENUNCIADO: aborto"; [System.IO.File]::WriteAllText("$PWD\$f", $orig, $utf8); exit 1 }
+$m4 = $base.Replace($enun, "theorem con_indecidible : ¬ Prf (neg consistencyFormula') := by`n  intro h`n")
+[System.IO.File]::WriteAllText("$PWD\$f", $m4, $utf8)
+$b = lake build 2>&1 | Out-String
+Log "lake build EXIT=$LASTEXITCODE"
+Log (($b -split "`n" | Select-String -Pattern 'error|T07|CAMBIA|NUEVA|YA NO|Build completed|build failed' | Select-Object -First 12) -join "`n")
+$tmp = 'C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PLUSPLUS\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\FootprintM4.lean'
+[System.IO.File]::WriteAllText($tmp, "import ROBINSON_PlusPlus.Meta.GodelCorolarios`n#print axioms ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible`n#check @ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible`n", $utf8)
+$p = lake env lean $tmp 2>&1 | Out-String
+Log "footprint del mutante (la fila de check-footprints dice Classical.choice,Quot.sound,propext):"
+Log $p.Trim()
+
+Log "== restaurado"
+[System.IO.File]::WriteAllText("$PWD\$f", $orig, $utf8)
+$b = lake build 2>&1 | Out-String
+Log "lake build EXIT=$LASTEXITCODE"
+Log (($b -split "`n" | Select-String -Pattern 'error|T07|Build completed') -join "`n")
+Log ("git status: " + ((git status --short ROBINSON_PlusPlus/Meta/GodelCorolarios.lean) -join ' '))
+[System.IO.File]::WriteAllLines('C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PLUSPLUS\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\t07_mutantes_fuente.txt', $out, $utf8)

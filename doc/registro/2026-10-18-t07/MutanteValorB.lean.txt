@@ -1,0 +1,21 @@
+import ROBINSON_PlusPlus.Meta.ContratoTitulares
+
+/-! T07 (ADR‑165), M5 (2 de 2): el MISMO titular de juguete, con `miDef := 2`, contra la tabla de M5 (1 de 2). Tiene
+que dar ERROR: cambia el VALOR de una definición del cierre, no el enunciado. -/
+
+open Lean Elab Command
+
+namespace Juguete
+def miDef : Nat := 2
+theorem miTitular : miDef = miDef := rfl
+end Juguete
+
+def tablaA : String := "
+def 17101530479978464024 Juguete.miDef
+thm 1208686649 Juguete.miTitular
+"
+
+elab "#tablaB" : command =>
+  ROBINSON_PlusPlus.Meta.ContratoTitulares.comprobar [`Juguete.miTitular] tablaA [] []
+
+#tablaB

@@ -1,0 +1,13 @@
+# T07 (ADR-165): salida de `lake env lean` desde la raíz de RPP, el 2026-10-18, con el build de T07 (133 jobs).
+# MutantesT07.lean.txt: M0 (la tabla de verdad, pasa) y M1-M3 (tres tablas mutadas, ERROR cada una). Sale con 1.
+
+T07 · contrato de los enunciados (ADR‑165): 24 titulares; 536 constantes del proyecto en el cierre de sus tipos (447 def, 6 ind, 43 ctor, 3 rec, 37 thm), todas con la huella de la tabla
+MutantesT07.lean:29:0: error: ⛔ T07 · el contrato de los enunciados FALLA (ADR‑165): 1 diferencias con la tabla
+  CAMBIA: def ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN: la tabla dice def 0, hoy es 10320374025702066230 (la alcanzan: goedel_first_prf, prf_godelCN_fixedpoint, goedel_I, goedel_I_neg, godelCN_indecidible, godelCN_verdadera, prf_godel_iff_con)
+  Si el cambio es querido: su ADR, y `lake env lean scripts/ContratoGenerar.lean` regenera Meta/ContratoTabla.lean.
+MutantesT07.lean:30:0: error: ⛔ T07 · el contrato de los enunciados FALLA (ADR‑165): 1 diferencias con la tabla
+  NUEVA en el cierre: def ROBINSON_PlusPlus.Minimal.Axioms.axioms (la alcanzan: goedel_first_prf, goedel_second_prf, prf_con_imp_godel, prf_godelCN_fixedpoint, prf_tarski, goedel_I, goedel_II, tarski, goedel_I_neg, godelCN_indecidible, modelo_prov_iff, consistencia, repr_pos'_prf, d2_prf, d3_prf_real, rosser_ext, rosser, lob, prf_godel_iff_con, goedel_second_formalizado, con_indecidible)
+  Si el cambio es querido: su ADR, y `lake env lean scripts/ContratoGenerar.lean` regenera Meta/ContratoTabla.lean.
+MutantesT07.lean:31:0: error: ⛔ T07 · el contrato de los enunciados FALLA (ADR‑165): 1 diferencias con la tabla
+  YA NO ESTÁ en el cierre: def ROBINSON_PlusPlus.Meta.Fantasma.noExiste
+  Si el cambio es querido: su ADR, y `lake env lean scripts/ContratoGenerar.lean` regenera Meta/ContratoTabla.lean.

@@ -327,6 +327,7 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 | `bash git-lock.bash freeze/thaw <file>` | Congelado permanente / deshielo de emergencia |
 | `bash git-lock.bash list` | Lista de bloqueados y congelados |
 | `bash git-lock.bash init` | Instala/reinstala el hook pre-commit |
+| `lake env lean scripts/ContratoGenerar.lean` | Regenera `Meta/ContratoTabla.lean`, la tabla del contrato de los enunciados de los titulares (T07, ADR‑165). ⛔ Sólo tras el ADR que diga qué enunciado o qué definición cambió |
 | `bash cierre-imports.bash` | El cierre de imports de las raíces: el universo de los módulos (`[L]`, `[A]` y `[C]` de `check-doc-sync.bash`; T15 y ADR‑163 de RPP). `--autotest` lo comprueba. (✏️ 2026‑10‑18: aquí estaban `new-module.bash` y `gen-root.bash`, retirados) |
 | `bash check-sorry.bash` | Localiza todos los `sorry` (excluyendo comentarios) |
 | `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |

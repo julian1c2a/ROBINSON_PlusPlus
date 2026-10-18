@@ -1,0 +1,13 @@
+# T07 (ADR-165): salida de `lake env lean` desde la raíz de RPP, el 2026-10-18, con el build de T07 (133 jobs).
+# M5: MutanteValorA.lean.txt (miDef := 1) da la tabla; MutanteValorB.lean.txt (miDef := 2) la compara: ERROR, porque cambia el VALOR de una definición del cierre.
+
+== A
+TABLA
+def 17101530479978464024 Juguete.miDef
+thm 1208686649 Juguete.miTitular
+FIN
+
+== B (sale con 1)
+MutanteValorB.lean:21:0: error: ⛔ T07 · el contrato de los enunciados FALLA (ADR‑165): 1 diferencias con la tabla
+  CAMBIA: def Juguete.miDef: la tabla dice def 17101530479978464024, hoy es 11239342436784068239 (la alcanzan: miTitular)
+  Si el cambio es querido: su ADR, y `lake env lean scripts/ContratoGenerar.lean` regenera Meta/ContratoTabla.lean.

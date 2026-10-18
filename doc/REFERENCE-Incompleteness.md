@@ -38,7 +38,7 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 131 jobs · 114 módulos activos** (Minimal 2 + Meta 110 + Full 2) **+ 0 en `cuarentena/`
+> **Build 133 jobs · 116 módulos activos** (Minimal 2 + Meta 112 + Full 2) **+ 0 en `cuarentena/`
 > + 43 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
@@ -55,6 +55,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Y el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
 > *(Y el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
 > *(Y el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
+> *(Y el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >

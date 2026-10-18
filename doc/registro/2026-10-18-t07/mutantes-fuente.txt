@@ -1,0 +1,21 @@
+# T07 (ADR-165): salida de `lake env lean` desde la raíz de RPP, el 2026-10-18, con el build de T07 (133 jobs).
+# M6 (la prueba de con_indecidible cambia: el contrato PASA) y M4 (su enunciado se debilita: el contrato FALLA, y su footprint sigue siendo el de la fila de check-footprints). Script: mutantes-fuente.ps1.txt; el fichero se restauró.
+
+== M6: la prueba de con_indecidible con la valoración (fun _ => 1) en vez de (fun _ => 0)
+lake build EXIT=0
+info: ROBINSON_PlusPlus/Meta/PurezaTitulares.lean:85:0: T07 · contrato de los enunciados (ADR‑165): 24 titulares; 536 constantes del proyecto en el cierre de sus tipos (447 def, 6 ind, 43 ctor, 3 rec, 37 thm), todas con la huella de la tabla
+Build completed successfully (133 jobs).
+== M4: el enunciado de con_indecidible, debilitado a ¬ Prf (neg Con')
+lake build EXIT=1
+error: ROBINSON_PlusPlus/Meta/PurezaTitulares.lean:85:0: ⛔ T07 · el contrato de los enunciados FALLA (ADR‑165): 1 diferencias con la tabla
+error: build failed
+  CAMBIA: thm ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible: la tabla dice thm 388799909, hoy es 2375863507 (la alcanzan: con_indecidible)
+error: Lean exited with code 1
+footprint del mutante (la fila de check-footprints dice Classical.choice,Quot.sound,propext):
+'ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible' depends on axioms: [propext, Classical.choice, Quot.sound]
+ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible : ¬Prf (¬ consistencyFormula')
+== restaurado
+lake build EXIT=0
+info: ROBINSON_PlusPlus/Meta/PurezaTitulares.lean:85:0: T07 · contrato de los enunciados (ADR‑165): 24 titulares; 536 constantes del proyecto en el cierre de sus tipos (447 def, 6 ind, 43 ctor, 3 rec, 37 thm), todas con la huella de la tabla
+Build completed successfully (133 jobs).
+git status: 

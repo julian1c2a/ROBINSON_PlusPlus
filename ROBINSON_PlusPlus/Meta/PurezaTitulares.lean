@@ -9,6 +9,8 @@ import ROBINSON_PlusPlus.Meta.TarskiPrf
 import ROBINSON_PlusPlus.Meta.Rosser
 import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
+import ROBINSON_PlusPlus.Meta.ContratoTitulares
+import ROBINSON_PlusPlus.Meta.ContratoTabla
 
 /-!
 # `Meta/PurezaTitulares.lean` — T08: el CONTROL DE PUREZA del cierre de los titulares de la clase (i) (ADR‑143)
@@ -28,7 +30,13 @@ dependencias no contiene ninguna constante de la SEMÁNTICA. El recorrido y el c
 un mutante (ADR‑143).
 
 **Lo que NO comprueba**: el de `Meta/PurezaComando.lean`. Y no fija el ENUNCIADO de los titulares ni el valor de sus
-definiciones: eso es T07, que irá en este mismo módulo.
+definiciones: eso es T07, abajo.
+
+**T07 · el contrato de los enunciados** (✏️ 2026‑10‑18, ADR‑165): `#contrato_titulares` calcula el cierre de los
+tipos de los 24 titulares de `TITULARES` (`Meta/ContratoTitulares.lean`) y lo compara con la tabla de
+`Meta/ContratoTabla.lean`, constante a constante y en los dos sentidos. Si un enunciado, o el valor de una definición
+de la que depende, cambia, el build no compila hasta que un ADR regenere la tabla. Comprueba también que `PUROS` e
+`IMPUROS` son titulares. Visto fallar con mutantes (ADR‑165).
 
 Era el criterio de aceptación de Rosser (ADR‑137). ✏️ 2026‑10‑18 (ADR‑157): `rosser_ext` está en `PUROS`; y desde
 ADR‑159, `lob`; y desde ADR‑162, los dos corolarios de la clase (i) de T78.
@@ -65,6 +73,13 @@ def IMPUROS : List Name := [
 /-- `#pureza_titulares`: el control, sobre `PUROS` e `IMPUROS`. -/
 elab "#pureza_titulares" : command => ROBINSON_PlusPlus.Meta.PurezaComando.comprobar PUROS IMPUROS
 
+/-- `#contrato_titulares`: T07, el contrato de los enunciados de `TITULARES`, contra la tabla. -/
+elab "#contrato_titulares" : command =>
+  ROBINSON_PlusPlus.Meta.ContratoTitulares.comprobar ROBINSON_PlusPlus.Meta.ContratoTitulares.TITULARES
+    ROBINSON_PlusPlus.Meta.ContratoTabla.tabla PUROS IMPUROS
+
 end ROBINSON_PlusPlus.Meta.PurezaTitulares
 
 #pureza_titulares
+
+#contrato_titulares

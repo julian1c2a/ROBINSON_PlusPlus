@@ -1,0 +1,12 @@
+# T07 (ADR-165): el apartado (5) de [T] en check-doc-sync.bash —T_UNIVERSO es la lista TITULARES de
+# Meta/ContratoTitulares.lean—, aislado en un script con el mismo código (sed del bloque), el 2026-10-18.
+
+== tal cual
+  ✓ y son los 24 de TITULARES (ROBINSON_PlusPlus/Meta/ContratoTitulares.lean), los que fija el contrato de los enunciados (T07)
+T_FAIL=0
+
+== con T_UNIVERSO mutado: sin `lob` y con `intruso_t5`
+  ✗ T_UNIVERSO y TITULARES (ROBINSON_PlusPlus/Meta/ContratoTitulares.lean, el contrato de T07) no son la misma lista:
+    sólo en T_UNIVERSO: intruso_t5
+    sólo en TITULARES: lob
+T_FAIL=1

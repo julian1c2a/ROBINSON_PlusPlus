@@ -28,10 +28,10 @@ comprueba.*
 
 | # | control | qué garantiza | qué **NO** garantiza |
 |---|---|---|---|
-| **V1** | `lake build` | **todo el árbol activo typechequea** en el kernel de Lean. Es la única prueba *fuerte* que hay: una demostración que compila **es** una demostración | nada sobre si el **enunciado** es el que se quería |
+| **V1** | `lake build` | **todo el árbol activo typechequea** en el kernel de Lean. Es la única prueba *fuerte* que hay: una demostración que compila **es** una demostración | nada sobre si el **enunciado** es el que se quería *(✏️ 2026‑10‑18: el de los 24 titulares lo fija V10)* |
 | **V2** | `bash check-sorry.bash` | **cero `sorry`/`admit`/`native_decide`** reales, despojando comentarios y literales | que no haya `axiom`s haciendo el papel de `sorry` — eso lo mira V3 |
 | **V3** | `#print axioms` por frente | el **footprint exacto**: qué postulados sostienen cada teorema | que el postulado sea *razonable*. Eso lo decide un ADR |
-| **V4** | `bash check-doc-sync.bash` | `[A]` cifras de cabecera · `[A2]` cifras del cuerpo (aviso) · `[B]` símbolos muertos (aviso) · `[C]` proyección · `[D]` marcas de tiempo · `[E]` frescura del titular (aviso) | **la verdad de las frases**. Ver §4 |
+| **V4** | `bash check-doc-sync.bash` | `[A]` cifras de cabecera · `[A2]` cifras del cuerpo (aviso) · `[B]` símbolos muertos (aviso) · `[C]` proyección · `[D]` marcas de tiempo · `[E]` frescura del titular (aviso) *(✏️ 2026‑10‑18: hoy rompen todos salvo `[A2]`, y hay más: `[F]`, `[H]`, `[M]`, `[T]` y `[L]`, la librería = el cierre de imports, ADR‑163)* | **la verdad de las frases**. Ver §4 |
 | **V5** | `sondeos/*.lean` | resultados **compilados** de preguntas cerradas antes de tocar producción | que la pregunta fuese la correcta |
 | **V6** | `doc/book/scripts/*.py` | que todo `\ident{}` del libro **exista** en el repo, que el vocabulario se introduzca antes de usarse, y que el código **impreso** sea el del repo | que lo impreso sea *verdad* — sólo que **cite bien** |
 | **V7** | CI (`.github/workflows/build.yml`) | **job `build`**: ⛔ **BLOQUEAN V1 (`lake build`) y V4 (`check-doc-sync`)**; 🔶 **V2 (`check-sorry`) es AVISO** — lleva `continue-on-error: true`. **job `libro`**: V6 entero **sólo cuando el push toca `doc/book/`** — el libro y el código son **dos tareas con commits separados** (PLAN‑LIBRO §0) | ⚠️ que un cambio en `.lean` rompa una cita del libro **no se ve hasta el siguiente push del libro**: el precio de las dos tareas, medido el 2026‑09‑11 al retirar `goedel_second'` |
@@ -52,6 +52,8 @@ comprueba.*
 > `[A]`**, aunque V2 no bloquee. Verificado metiendo un `sorry` real: `[A]` imprime
 > `✗ sorry: dice 0, real 1`. ⇒ **V2 se queda como aviso; lo que se corrige es el documento.**
 | **V8** | 🆕 **`TEOREMAS-E-HIPOTESIS.md`** | por cada teorema cabecera, **quién descarga cada hipótesis**. Es la única defensa contra **F‑1** | es **a mano**: ningún script lo comprueba *(✏️ 2026‑10‑14, [ADR‑135](DECISIONS.md), T09: ya no del todo. Está en AUTHORITATIVE, y `[T]` de `check-doc-sync.bash` comprueba que cada titular de su universo declarado tenga fila y que ninguna fila sobre. Lo que sigue a mano es «quién descarga» y «qué usa la prueba»; la segunda la mide `#modelo`, `sondeos/InduccionTitulares.lean`, y la mecanizará T08)* |
+| **V9** | 🆕 `#pureza_titulares` (`Meta/PurezaTitulares.lean`, ADR‑143, T08) | que el cierre de los 12 titulares de la clase (i) no nombra la semántica, con tres controles positivos que tienen que nombrarla | una prueba que use la verdad en ℕ sin pasar por `FOL.Metamath.Semantics` ni `SolidezPrf`; y el enunciado |
+| **V10** | 🆕 `#contrato_titulares` (`Meta/PurezaTitulares.lean`, ADR‑165, T07) | el ENUNCIADO de los 24 titulares de `T_UNIVERSO` y el valor de las definiciones de las que depende: el cierre de sus tipos, una huella por constante, contra `Meta/ContratoTabla.lean`, en los dos sentidos | las pruebas; lo de Lean; que el enunciado fijado sea el que se quería (F1 habría quedado fijado) |
 
 ---
 

@@ -1,0 +1,31 @@
+import ROBINSON_PlusPlus.Meta.PurezaTitulares
+
+/-! T07 (ADR‑165): el contrato, visto fallar contra tres tablas mutadas. Cada `#mN` tiene que dar ERROR. -/
+
+open Lean Elab Command
+open ROBINSON_PlusPlus.Meta.ContratoTitulares (TITULARES comprobar)
+
+def lineas : List String := ROBINSON_PlusPlus.Meta.ContratoTabla.tabla.splitOn "\n"
+
+/-- M1: la huella de `godelCN` cambiada (como si su valor hubiera cambiado). -/
+def tablaM1 : String := "\n".intercalate (lineas.map fun l =>
+  if l.endsWith " ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN" then
+    "def 0 ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN" else l)
+
+/-- M2: falta la línea de `axioms` (como si una constante nueva hubiera entrado en el cierre). -/
+def tablaM2 : String := "\n".intercalate (lineas.filter fun l =>
+  !l.endsWith " ROBINSON_PlusPlus.Minimal.Axioms.axioms")
+
+/-- M3: una línea de más (como si una constante hubiera salido del cierre). -/
+def tablaM3 : String := ROBINSON_PlusPlus.Meta.ContratoTabla.tabla ++ "def 1 ROBINSON_PlusPlus.Meta.Fantasma.noExiste\n"
+
+elab "#m1" : command => comprobar TITULARES tablaM1 [] []
+elab "#m2" : command => comprobar TITULARES tablaM2 [] []
+elab "#m3" : command => comprobar TITULARES tablaM3 [] []
+/-- M0, el control: la tabla de verdad pasa. -/
+elab "#m0" : command => comprobar TITULARES ROBINSON_PlusPlus.Meta.ContratoTabla.tabla [] []
+
+#m0
+#m1
+#m2
+#m3

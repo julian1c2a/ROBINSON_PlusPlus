@@ -1070,7 +1070,9 @@ echo '════ [T] TITULARES — cada uno tiene su fila en TEOREMAS-E-HIPOTE
 # **`x`**, en la columna del nombre: la PRIMERA en §1 y la SEGUNDA en §3 (la primera es «D1»/«D2»/«D3»). Un nombre
 # en otra columna (la hipótesis, quién la descarga) no cuenta, ni uno tachado (~~…~~). Mira: (1) cada nombre del
 # universo está DECLARADO en el build de RPP; (2) tiene su fila; (3) ninguno tiene dos; (4) cada nombre con fila está
-# en el universo.
+# en el universo. ✏️ 2026-10-18 (T07, ADR-165): y (5) T_UNIVERSO es EXACTAMENTE la lista `TITULARES` de
+# `Meta/ContratoTitulares.lean`, la que fija el contrato de los enunciados: si se separan, un titular nuevo se quedaría
+# sin contrato, o el contrato vigilaría a uno que ya no lo es.
 # ⚠️ Lo que NO mira: que la columna «¿qué usa la prueba?» sea la medida (eso lo mide `#modelo` de
 # `sondeos/InduccionTitulares.lean`, y lo mecanizará T08 en el build), ni que un teorema NUEVO deba ser titular:
 # eso lo decide quien lo añade, y en el mismo commit lo pone aquí y le da su fila. Una fila partida en dos líneas
@@ -1152,6 +1154,22 @@ else
   else
     echo "  ✓ los $T_NU titulares de T_UNIVERSO están declarados y tienen UNA fila en $T_FICH, y ninguna fila sobra"
   fi
+fi
+# (5) T_UNIVERSO = `TITULARES` (T07). Los nombres de la lista son ``A.B.c``; se compara el último componente.
+T_LEAN=ROBINSON_PlusPlus/Meta/ContratoTitulares.lean
+T_LISTA=$(awk '/^def TITULARES : List Name := \[/{f=1} f{print} f && /\]$/{exit}' "$T_LEAN" 2>/dev/null \
+  | grep -oE '``[A-Za-z0-9_.'"'"']+' | sed 's/^``//; s/.*\.//' | LC_ALL=C sort || true)
+T_UNI_ORD=$(printf '%s\n' $T_UNIVERSO | LC_ALL=C sort)
+if [ -z "$T_LISTA" ]; then
+  echo "  ❌ NO PUDE MEDIR [T](5): no encuentro la lista TITULARES en $T_LEAN."
+  T_FAIL=1
+elif [ "$T_LISTA" != "$T_UNI_ORD" ]; then
+  echo "  ✗ T_UNIVERSO y TITULARES ($T_LEAN, el contrato de T07) no son la misma lista:"
+  diff <(printf '%s\n' "$T_UNI_ORD") <(printf '%s\n' "$T_LISTA") | grep '^[<>]' \
+    | sed 's/^< /    sólo en T_UNIVERSO: /; s/^> /    sólo en TITULARES: /'
+  T_FAIL=1
+else
+  echo "  ✓ y son los $T_NU de TITULARES ($T_LEAN), los que fija el contrato de los enunciados (T07)"
 fi
 rm -f "$T_DECLS" "$T_AUTODOC"
 [ -n "${T_DOC:-}" ] && T_FAIL=1
