@@ -34,7 +34,6 @@ cd "$(dirname "$0")" || exit 2
 #   var-unref    →  "Variable name `x` is not explicitly referenced"
 DECLARED=$(cat <<'TABLA'
 ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean|simp-unused|4
-ROBINSON_PlusPlus/Meta/ChainNegPrf.lean|simp-unused|2
 ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean|var-unref|1
 TheoryFramework/Relations.lean|var-unref|4
 TABLA

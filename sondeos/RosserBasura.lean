@@ -3,6 +3,9 @@ import ROBINSON_PlusPlus
 /-!
 # Rosser, Etapa 0: la mitad BASURA — refutar en `Prf` la guarda de TÉRMINO sobre un numeral (ADR‑125/126)
 
+✏️ **2026‑10‑18 (ADR‑160, T66): queda sólo §5**, el control con el modelo; §1–§4, que lo de abajo describe, se
+retiraron (ver su lugar en el fichero). El resto de esta cabecera es el REGISTRO de lo que medía el 2026‑10‑05.
+
 **Fecha**: 2026‑10‑05. Es la segunda pieza de la Etapa 0 del plan de Rosser (ADR‑122 §2; la primera, la reflexión,
 en `sondeos/RosserReflexion.lean`): donde la guarda es FALSA, la reflexión no da nada y hay que REFUTARLA en `Prf`.
 
@@ -69,116 +72,13 @@ open ROBINSON_PlusPlus.Meta.RosserNumerales
 
 namespace RosserBasura
 
-/-! ## §1 · Profundidad 0: el `0` (= `nil`) no es código de término -/
+/-! ## §1–§4 · ✏️ RETIRADOS el 2026‑10‑18 (ADR‑160, T66)
 
-/-- `0 ≠ cons a b` en `Prf`, por los axiomas de lista: `a ∈ cons a b`, y nada está en `nil = 0`. -/
-theorem prf_zero_ne_cons (a b : Term) : Prf (Formula.impl (Formula.eq zero (cons a b)) Formula.bottom) := by
-  refine prf_deduction ?_
-  have hin : PrfH [Formula.eq zero (cons a b)] (In a zero) :=
-    PrfH_eq_subst_in (PrfH_eq_symm (prfH_hyp_self _)) (PrfH_in_cons_head a b)
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_not_in_nil a) _) hin
-
-theorem prf_isTermCodeE1_zero_absurd (w : Term) :
-    Prf (Formula.impl (isTermCodeE1 w zero) Formula.bottom) :=
-  prf_or_elim_imp (prf_zero_ne_cons _ _) (impT (Prf.incl (Prfᵢ.c2 _ _)) (prf_zero_ne_cons _ _))
-
-/-- 🏁 **`¬ hasWit 0̄`**: la guarda ENTERA, con su `∃` eliminado, para CUALQUIER testigo. -/
-theorem prf_neg_hasWit_zero : Prf (neg (hasWit (numeralM 0))) := by
-  refine prf_ex_elim_imp ?_
-  show PrfH [isTC1 (.var 0) zero] Formula.bottom
-  have hh := prfH_hyp_self (isTC1 (.var 0) zero)
-  have hc := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_of_In (.var 0) zero) _)
-    (PrfH_and_elim_right hh)) (PrfH_and_elim_left hh)
-  exact PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_zero_absurd (.var 0)) _) hc
-
-/-! ## §2 · Profundidad 1: una etiqueta que no es de término (∉ {0, 1}) -/
-
-/-- La guarda entera, sobre un `c` cerrado de etiqueta `k ∉ {0, 1}`: el `∃`‑elim sobre `prf_crit_In_rejects_open1`. -/
-theorem prf_neg_hasWit_tag (c : Term) (k : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1)
-    (hcl : ∀ n : Nat, liftTerm n c = c) (hck : Prf (carc c =eq numeralM k)) : Prf (neg (hasWit c)) := by
-  refine prf_ex_elim_imp ?_
-  rw [hcl 0]
-  show PrfH [isTC1 (.var 0) c] Formula.bottom
-  have hh := prfH_hyp_self (isTC1 (.var 0) c)
-  have hb := PrfH.mp _ _ _ (prf_to_prfH (prf_boundedIn_of_In c (.var 0)) _) (PrfH_and_elim_right hh)
-  exact PrfH.mp _ _ _ (PrfH.mp _ _ _
-    (prf_to_prfH (prf_crit_In_rejects_open1 (.var 0) c k hk0 hk1 hcl hck) _) hb) (PrfH_and_elim_left hh)
-
-/-! ## §3 · Sobre un NUMERAL: `⟨k, r⟩‾`, sin hipótesis
-
-✏️ 2026‑10‑17 (ADR‑150): `prf_congr_carc` y la etiqueta de `⟨k, r⟩‾` (aquí se llamaba `prf_carc_numeral`; en el build,
-`prf_carc_consN`) pasaron a `Meta/RosserNumerales.lean`, la etapa 1 de Rosser, y se usan desde allí. -/
-
-/-- 🏁 **Un numeral basura, refutado**: para TODO `k ∉ {0, 1}` y todo `r`, `Prf (¬ hasWit ⟨k, r⟩‾)`. -/
-theorem prf_neg_hasWit_num (k r : Nat) (hk0 : k ≠ 0) (hk1 : k ≠ 1) :
-    Prf (neg (hasWit (numeralM (consN k r)))) :=
-  prf_neg_hasWit_tag _ k hk0 hk1 (fun n => ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM n _)
-    (prf_carc_consN k r)
-
-/-! ## §4 · Profundidad 2 (en proyecciones), un caso HEREDITARIO: la basura en la lista de argumentos
-
-`[1, s, [0]]` tiene la etiqueta de un término (`1`) y una lista de UN argumento, el `0`, que no es código de nada.
-Refutarlo pide bajar: de `X ∈ w` y `wfAll1 w`, la forma `B1` (`prf_isTermCodeE1_str`); su rama de variable cae por la
-etiqueta; la de función da `argsIn w (nthc X 2̄)`, que en el índice `0` pone el `0` en `w`, y §1 lo refuta. -/
-
--- `prf_congr_lenc` y `prf_lt_subst2` son los del árbol (`SinWTs.prf_congr_lenc` en `Meta/CodeWitnessPrf.lean`,
--- `prf_lt_subst2` en `Meta/BoundedInPrf.lean`), abiertos arriba: la primera redacción los re‑derivaba.
-
--- `prf_cons_evalM` (`cons ā b̄ = (consN a b)‾`) está en el build desde ADR‑150: `Meta/RosserNumerales.lean`.
-
-/-- El numeral de `[1, s, [0]]`, partido: `cons 1̄ (cons s̄ (cons A (0̄)))`, con `A = (consN 0 0)‾ = [0]‾`. -/
-theorem prf_parte (s : Nat) :
-    Prf (numeralM (consN 1 (consN s (consN (consN 0 0) 0))) =eq
-      cons (numeralM 1) (cons (numeralM s) (cons (numeralM (consN 0 0)) (numeralM 0)))) :=
-  prf_eq_trans (prf_eq_symm (prf_cons_evalM 1 _))
-    (prf_congr_cons_tail (prf_eq_trans (prf_eq_symm (prf_cons_evalM s _))
-      (prf_congr_cons_tail (prf_eq_symm (prf_cons_evalM (consN 0 0) 0)))))
-
-/-- La lista de argumentos de `[1, s, [0]]`, evaluada: `nthc X̄ 2̄ = cons 0̄ nil`. -/
-theorem prf_args (s : Nat) :
-    Prf (nthc (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))) (numeralM 2) =eq cons (numeralM 0) nil) :=
-  prf_eq_trans (prf_congr_nthc_lst _ (prf_parte s))
-    (prf_eq_trans (prf_nthc_c2 _ _ _ _) (prf_eq_symm (prf_cons_evalM 0 0)))
-
-theorem prf_lt_args (s : Nat) :
-    Prf (lt (numeralM 0) (lenc (nthc (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))) (numeralM 2)))) :=
-  prf_lt_subst2 (prf_eq_symm (prf_eq_trans (prf_congr_lenc (prf_args s)) (prf_lenc_c1 _)))
-    (ROBINSON_PlusPlus.Meta.NatArithPrf.prf_zero_lt_succ zero)
-
-theorem prf_nth0_args (s : Nat) :
-    Prf (nthc (nthc (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))) (numeralM 2)) (numeralM 0)
-      =eq numeralM 0) :=
-  prf_eq_trans (prf_congr_nthc_lst _ (prf_args s)) (ROBINSON_PlusPlus.Meta.NumListPrf.prf_nthc_zero _ _)
-
-/-- 🏁 **La basura en el argumento**: `Prf (¬ hasWit [1, s, [0]]‾)` para TODO `s`. -/
-theorem prf_neg_hasWit_prof2 (s : Nat) : Prf (neg (hasWit (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))))) := by
-  refine prf_ex_elim_imp ?_
-  rw [ROBINSON_PlusPlus.Minimal.Axioms.liftTerm_numeralM]
-  show PrfH [isTC1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))] Formula.bottom
-  have hh := prfH_hyp_self (isTC1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))))
-  have hE1 := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_of_In (.var 0) _) _)
-    (PrfH_and_elim_right hh)) (PrfH_and_elim_left hh)
-  have hB1 := PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_str (.var 0) _) _) hE1
-  refine PrfH_or_elim hB1 ?_ ?_
-  · exact PrfH.mp _ _ _ (prf_to_prfH (crit_cOk2_absurd _ 1 0 (by decide) (prf_carc_consN 1 _) _) _)
-      (PrfH.hyp _ _ (List.Mem.head _))
-  · have h2 : PrfH (cOk (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))
-        (funcOkT1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))) ::
-        [isTC1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))])
-        (cOk (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))
-          (funcOkT1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))))) :=
-      PrfH.hyp _ _ (List.Mem.head _)
-    have hf := PrfH_and_elim_right h2
-    have hargs := PrfH_and_elim_right hf
-    have hin := PrfH.mp _ _ _ (PrfH_inst_argsIn _ _ (numeralM 0) hargs) (prf_to_prfH (prf_lt_args s) _)
-    have hin0 := PrfH_congr_In_left (prf_to_prfH (prf_nth0_args s) _) hin
-    have hwf : PrfH (cOk (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))
-        (funcOkT1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))) ::
-        [isTC1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0))))]) (wfAll1 (.var 0)) :=
-      PrfH_and_elim_left (PrfH.hyp _ (isTC1 (.var 0) (numeralM (consN 1 (consN s (consN (consN 0 0) 0)))))
-        (List.Mem.tail _ (List.Mem.head _)))
-    have hz := PrfH.mp _ _ _ (PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_of_In (.var 0) zero) _) hin0) hwf
-    exact PrfH.mp _ _ _ (prf_to_prfH (prf_isTermCodeE1_zero_absurd (.var 0)) _) hz
+Las refutaciones a profundidad 0, 1 y 2 (`prf_neg_hasWit_zero`, `prf_neg_hasWit_tag`, `prf_neg_hasWit_num`,
+`prf_neg_hasWit_prof2` y sus lemas) se retiraron: sus tres lemas de lista pasaron al build en ADR‑150
+(`Meta/RosserNumerales.lean`), y la refutación de la guarda, GENERAL, en ADR‑153 (`Meta/RosserGuardNeg.lean`:
+`prf_neg_hasWit`, para todo numeral cuya guarda es falsa en ℕ). Era el plan de ADR‑146 §4.6: «el sondeo se queda con
+§5, su control con el modelo». La versión entera, en la etiqueta `archivo/t66-2026-10-18`. -/
 
 /-! ## §5 · Control: sobre un código CANÓNICO, `¬ hasWit` no es demostrable
 
@@ -198,7 +98,4 @@ theorem control_codigo_no_refutable (t : Term) : ¬ Prf (neg (hasWit (numeralM (
 
 end RosserBasura
 
-#print axioms RosserBasura.prf_neg_hasWit_zero
-#print axioms RosserBasura.prf_neg_hasWit_num
-#print axioms RosserBasura.prf_neg_hasWit_prof2
 #print axioms RosserBasura.control_codigo_no_refutable

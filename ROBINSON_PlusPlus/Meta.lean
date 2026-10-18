@@ -43,6 +43,9 @@ Public API:
     `Meta/PurezaComando.lean`, y `Meta/PurezaTitulares.lean`, la lista, importa Rosser.
   · ✏️ 2026‑10‑18 (ADR‑159): 🏁 `Meta/Lob.lean`, LÖB: `lob : Prf (Prov⌜φ⌝ ⇒ φ) → Prf φ` y `lob_iff`, por el punto
     fijo de `Prov(#0) ⇒ φ` y D1–D3; Gödel II, de corolario (`goedel_second_de_lob`). `lob` entra en `PUROS`.
+  · ✏️ 2026‑10‑18 (ADR‑160, T66): fuera del build el subárbol sin consumidor —`ChainNegPrf`, `VerifierSound`,
+    `OmegaReflect`, `ChainDecode` y `CodeDecode`—, sin ninguna declaración en el cono de los 21 titulares; se recupera
+    de la etiqueta `archivo/t66-2026-10-18`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -93,7 +96,6 @@ import ROBINSON_PlusPlus.Meta.ExIntroCodePrf
 import ROBINSON_PlusPlus.Meta.ForallElimCodePrf
 import ROBINSON_PlusPlus.Meta.LineWFCases
 import ROBINSON_PlusPlus.Meta.MpCodePrf
-import ROBINSON_PlusPlus.Meta.OmegaReflect
 import ROBINSON_PlusPlus.Meta.Sigma1AtomPrf
 import ROBINSON_PlusPlus.Meta.Sigma1TrackedPrf
 import ROBINSON_PlusPlus.Meta.TrackedCorePrf
@@ -137,8 +139,6 @@ import ROBINSON_PlusPlus.Meta.InAxiomsCodePrf
 import ROBINSON_PlusPlus.Meta.LineWFThyPrf
 import ROBINSON_PlusPlus.Meta.LineWFAssemblePrf
 import ROBINSON_PlusPlus.Meta.LineWFConsPrf
-import ROBINSON_PlusPlus.Meta.CodeDecode
-import ROBINSON_PlusPlus.Meta.ChainDecode
 import ROBINSON_PlusPlus.Meta.DiagonalTwo
 import ROBINSON_PlusPlus.Meta.GodelTwo
 import ROBINSON_PlusPlus.Meta.EvalSubsttcPrf
@@ -153,8 +153,6 @@ import ROBINSON_PlusPlus.Meta.EvalLiftfcPrf
 import ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf
 import ROBINSON_PlusPlus.Meta.D3BodyPrf
 import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
-import ROBINSON_PlusPlus.Meta.VerifierSound
-import ROBINSON_PlusPlus.Meta.ChainNegPrf
 import ROBINSON_PlusPlus.Meta.GodelTwoPrf
 import ROBINSON_PlusPlus.Meta.ModeloCodigo
 import ROBINSON_PlusPlus.Meta.ModeloEstandar

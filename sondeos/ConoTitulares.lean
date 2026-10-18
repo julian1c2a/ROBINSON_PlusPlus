@@ -31,7 +31,8 @@ tácticas) se cuentan aparte, y las líneas fuera de toda declaración (comentar
 
 **Controles** (dentro de `#cono`, antes de escribir nada; si uno falla, no se escribe): (1) el cono de la clase (i) de
 ADR‑135 no nombra `SolidezPrf` y el de `consistencia` sí, como mide `#modelo` (`sondeos/InduccionTitulares.lean`);
-(2) ninguna declaración de un módulo fuera del cono de imports (`Meta/VerifierSound.lean`) queda dentro; (3) cada
+(2) ninguna declaración de un módulo fuera del cono de imports (`Meta/VerifierSound.lean`; ✏️ desde ADR‑160, que lo
+retiró, `Full/PrimeFactor.lean`) queda dentro; (3) cada
 titular cae en su propia declaración, y dentro; (4) las constantes del cono sin declaración a la que asignarlas se
 cuentan y se listan. La primera versión asignaba un auxiliar a una línea de SU módulo, y un auxiliar puede generarse
 en otro (las ecuaciones de `ModeloCodigo.stepT.match_1` viven en `ModeloCodificacion`): dejaba 39 sin dueño y podía
@@ -52,6 +53,13 @@ controles pasan; sin dueño quedan 3 auxiliares `_arg_pusher` de `PSum`/`PSigma`
 * Por titular: D3 (`d3_prf_real`) arrastra 2.444 declaraciones y 26.880 líneas, el 92 % del cono; Gödel I condicional
   (`goedel_first_prf`), 720 y 5.164; la clase (i) entera, 2.478 y 27.158; lo que sólo piden `consistencia` y las
   clases (ii) y (iii), 417 y 1.901.
+
+**✏️ Re‑ejecutado el 2026‑10‑18 (ADR‑160, T66), 83 s**, con los 21 titulares de hoy (los 18, `rosser_ext`, `rosser` y
+`lob`) y la salida en `doc/registro/2026-10-18-cono/` (`fecha` y `carpeta`, ahora datos). Los controles pasan. El cono:
+4 416 constantes del proyecto, 3 209 declaraciones y 31 103 líneas. Sin nada en el cono, 23 módulos importados: los 21
+del 2026‑10‑16, y `PurezaComando` y `PurezaTitulares` (de elaboración). De ellos, el subárbol de T66 —`ChainNegPrf`,
+`VerifierSound`, `OmegaReflect`, `ChainDecode`, `CodeDecode`: 181 declaraciones, 2 953 líneas— se retiró con ADR‑160.
+Re‑ejecutado después (`resumen-tras-T66.txt`), el cono sale idéntico, con 18 módulos sin nada en él.
 -/
 
 open Lean Meta Elab Command
@@ -120,7 +128,12 @@ partial def cierre (env : Environment) (raices : List Name) : NameSet := Id.run 
       if !vis.contains d && delProyecto env d then pila := pila.push d
   return vis
 
-/-- Los 18 de `T_UNIVERSO`, con la clase de ADR‑135 (`TEOREMAS-E-HIPOTESIS.md` §1; «—» para `consistencia`). -/
+/-- La fecha y la carpeta de la ejecución (✏️ 2026‑10‑18, ADR‑160: la primera, del 2026‑10‑16, escribía en
+    `doc/registro/2026-10-16-cono/`; ésa queda como registro). -/
+def fecha : String := "2026-10-18"
+def carpeta : String := "doc/registro/2026-10-18-cono"
+
+/-- Los de `T_UNIVERSO` (18 hasta ADR‑157; 21 desde ADR‑159), con la clase de ADR‑135 (`TEOREMAS-E-HIPOTESIS.md` §1; «—» para `consistencia`). -/
 def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf, "i"),
   (``ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf, "i"),
@@ -139,7 +152,11 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera, "iii"),
   (``ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera, "iii"),
   (``ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff, "iii"),
-  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico, "iii")]
+  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico, "iii"),
+  -- ✏️ 2026‑10‑18 (ADR‑160): los tres titulares nuevos de ADR‑157 y ADR‑159.
+  (``ROBINSON_PlusPlus.Meta.Rosser.rosser_ext, "i"),
+  (``ROBINSON_PlusPlus.Meta.Rosser.rosser, "ii"),
+  (``ROBINSON_PlusPlus.Meta.Lob.lob, "i")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,
     tácticas, elaboradores. -/
@@ -306,8 +323,9 @@ def controles (md : Medida) : CommandElabM (Bool × String) := do
   let cc := cierre env [``ROBINSON_PlusPlus.Meta.Consistencia.consistencia]
   let c1a := !(ci.toList.any (fun n => sol.isPrefixOf (nombreUsuario n)))
   let c1b := cc.toList.any (fun n => sol.isPrefixOf (nombreUsuario n))
-  -- (2) nada de `Meta/VerifierSound.lean`, fuera del cono de imports, dentro del cono
-  let vs := `ROBINSON_PlusPlus.Meta.VerifierSound
+  -- (2) nada de un módulo fuera del cono de imports, dentro del cono. Hasta ADR‑160 era `Meta/VerifierSound.lean`,
+  -- retirado allí (T66); desde entonces, `Full/PrimeFactor.lean`, que sólo importa la raíz.
+  let vs := `ROBINSON_PlusPlus.Full.PrimeFactor
   let mk := md.enCono.getD vs #[]
   let c2 := mk.size > 0 && !(mk.any id)
   -- (3) cada titular, dentro del cono y en su propia declaración
@@ -321,7 +339,7 @@ def controles (md : Medida) : CommandElabM (Bool × String) := do
   let txt := s!"controles:
   (1a) la clase (i) no nombra SolidezPrf: {c1a}
   (1b) consistencia sí la nombra: {c1b}
-  (2) nada de Meta/VerifierSound en el cono ({mk.size} declaraciones allí): {c2}
+  (2) nada de {vs} en el cono ({mk.size} declaraciones allí): {c2}
   (3) cada titular está en el cono, en su declaración: {c3}
   (4) constantes del cono sin declaración a la que asignarlas: {md.sinDueno.size} {md.sinDueno.toList.map toString}
 "
@@ -331,7 +349,7 @@ elab "#cono" : command => do
   let md ← medir
   let (ok, txtC) ← controles md
   unless ok do throwError "un control del cono FALLA: la medida no vale\n{txtC}"
-  let dir : System.FilePath := "doc/registro/2026-10-16-cono"
+  let dir : System.FilePath := carpeta
   IO.FS.createDirAll dir
   let mods := md.decls.toList.map (·.1) |>.toArray.qsort (fun a b => a.toString < b.toString) |>.toList
   -- por módulo
@@ -341,7 +359,7 @@ elab "#cono" : command => do
     csv := csv ++ s!"{m},{capa m},{md.lineasFich.getD m 0},{n},{nm},{nc},{l},{lc}\n"
   IO.FS.writeFile (dir / "por-modulo.csv") csv
   -- fuera del cono, declaración a declaración
-  let mut fuera := "# Declaraciones FUERA del cono del núcleo de los 18 titulares (2026-10-16, sondeos/ConoTitulares.lean).\n# módulo:inicio-fin (líneas) nombre [E = de elaboración]\n"
+  let mut fuera := s!"# Declaraciones FUERA del cono del núcleo de los {titulares.length} titulares ({fecha}, sondeos/ConoTitulares.lean).\n# módulo:inicio-fin (líneas) nombre [E = de elaboración]\n"
   for m in mods do
     let ds := md.decls.getD m #[]
     let mk := md.enCono.getD m #[]
@@ -352,7 +370,7 @@ elab "#cono" : command => do
   IO.FS.writeFile (dir / "fuera-del-cono.txt") fuera
   -- resumen por capa
   let capas := ["RPP/Minimal", "RPP/Full", "RPP/Meta", "RPP/raíz", "FOL", "TheoryFramework"]
-  let mut res := "CONO DEL NÚCLEO de los 18 titulares de T_UNIVERSO, por DECLARACIÓN — 2026-10-16, sondeos/ConoTitulares.lean\n"
+  let mut res := s!"CONO DEL NÚCLEO de los {titulares.length} titulares de T_UNIVERSO, por DECLARACIÓN — {fecha}, sondeos/ConoTitulares.lean\n"
   res := res ++ "(ámbito: lo que el kernel necesita para comprobar los titulares; ver la cabecera del sondeo)\n"
   res := res ++ s!"constantes del proyecto en el cono: {md.conoTotal.size}\n\n"
   res := res ++ "capa | módulos importados | con algo en el cono | líneas de los ficheros | líneas fuera de toda declaración | declaraciones | de elaboración | en el cono | líneas en declaraciones | líneas en el cono\n"
@@ -372,7 +390,8 @@ elab "#cono" : command => do
     res := res ++ s!"{t} | {c} | {n} | {l}\n"
   let (ni, li) ← tamCono md (titulares.filter (·.2 == "i") |>.map (·.1))
   let (nt, lt) ← tamCono md (titulares.map (·.1))
-  res := res ++ s!"\nclase (i), los 8 juntos: {ni} declaraciones, {li} líneas\nlos 18: {nt} declaraciones, {lt} líneas\nlo que sólo piden (ii), (iii) y consistencia: {nt - ni} declaraciones, {lt - li} líneas\n\n"
+  let nI := (titulares.filter (·.2 == "i")).length
+  res := res ++ s!"\nclase (i), los {nI} juntos: {ni} declaraciones, {li} líneas\nlos {titulares.length}: {nt} declaraciones, {lt} líneas\nlo que sólo piden (ii), (iii) y consistencia: {nt - ni} declaraciones, {lt - li} líneas\n\n"
   res := res ++ txtC
   IO.FS.writeFile (dir / "resumen.txt") res
   logInfo m!"{res}"

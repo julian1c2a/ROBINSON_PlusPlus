@@ -3,7 +3,7 @@ Copyright (c) 2026. All rights reserved.
 Author: Julián Calderón Almendros
 License: MIT
 -/
-import ROBINSON_PlusPlus.Meta.CodeDecode
+import ROBINSON_PlusPlus.Minimal.Axioms
 
 /-!
 # SONDEO · ¿qué rechaza el NÚCLEO al razonar a mano sobre `decodeTerm`?
@@ -14,6 +14,13 @@ limpio») frente a la nota de la §B («el `if s == sym` sobre `DecidableEq Stri
 `split`/`rw`/`simp` manuales; se sortea con inducción funcional y `unfold`»). Nacieron en el mismo commit
 (`9b178ae`, 2026‑07‑14) y se contradicen. Lean v4.31.0. Cada mensaje de error está FIJADO con `#guard_msgs`:
 el sondeo compila, y deja de compilar si una versión de Lean cambia lo medido.
+
+✏️ **2026‑10‑18 (ADR‑160, T66):** `Meta/CodeDecode.lean` salió del build. El decodificador real va copiado TAL CUAL
+en §0, en el mismo espacio de nombres (`ROBINSON_PlusPlus.Meta.CodeDecode`). Los rechazos y las aceptaciones son los
+mismos, teorema a teorema. Pero en cinco de los 23 bloques el núcleo ya no puede imprimir los tipos que nombran
+`decodeTerm.match_1` («Unknown constant», con `pp.rawOnError`): el `match` se compila ahora en este mismo fichero. Esos
+cinco mensajes fijados dicen «failed to pretty print expression» donde antes iba el término; los de antes están en la
+etiqueta `archivo/t66-2026-10-18`.
 
 ## Veredicto (MEDIDO: 59 teoremas; 24 mensajes fijados en 23 bloques `#guard_msgs`)
 
@@ -61,6 +68,113 @@ set_option autoImplicit false
 
 open FOL
 open ROBINSON_PlusPlus.Minimal.Axioms
+
+/-! ## 0 · El decodificador REAL, copiado tal cual de `Meta/CodeDecode.lean` (✏️ 2026‑10‑18, ADR‑160)
+
+`Meta/CodeDecode.lean` salió del build con T66 (ADR‑160; se recupera de la etiqueta `archivo/t66-2026-10-18`). Lo que
+este sondeo mide sobre «el decodificador real» (§4) se mide sobre esta copia literal de sus seis definiciones, en el
+MISMO espacio de nombres, para que los nombres y los mensajes fijados no cambien. Sin sus lemas: el sondeo no los usa. -/
+
+namespace ROBINSON_PlusPlus.Meta.CodeDecode
+
+/-- Inverso de `numeralM`/`numeral`: `σⁿ0 ↦ n`. -/
+def decodeNat : Term → Option Nat
+  | .func s []  => if s = zero_sym then some 0 else none
+  | .func s [t] => if s = succ_sym then (decodeNat t).map (· + 1) else none
+  | _           => none
+
+/-- Inverso de `charsCodeM` (lista de códigos de char). El guard `(Char.ofNat code).toNat == code`
+    rechaza códigos que `Char.ofNat` **clamparía** (fuera del rango Unicode) — así el decodificador es
+    genuinamente **inyectivo** (necesario para `decodeChars_inj`). El round‑trip lo cumple porque
+    `Char.ofNat c.toNat = c`, luego `(Char.ofNat c.toNat).toNat = c.toNat`. -/
+def decodeChars : Term → Option (List Char)
+  | .func s []     => if s = zero_sym then some [] else none
+  | .func s [h, t] => if s = cons_sym then
+                        (decodeNat h).bind (fun code =>
+                          if (Char.ofNat code).toNat == code then
+                            (decodeChars t).map (fun cs => Char.ofNat code :: cs)
+                          else none)
+                      else none
+  | _ => none
+
+/-- Inverso de `strCodeM`: código de símbolo `↦` símbolo (`List Char`, D7; antes `String`). -/
+def decodeStr (c : Term) : Option (List Char) := decodeChars c
+
+/- Inverso de `termCodeM`/`termsCodeM` (mutuo). -/
+mutual
+/-- Inverso de `termCodeM` (los dos tags de término: `var`/`func`).
+
+    ⚠️ **No desplegar por defeq**: `dsimp only [decodeTerm] at h` o `simp only [decodeTerm] at h`, y luego
+    usar `h`, deja un término que el **núcleo RECHAZA** (`(kernel) application type mismatch`), aunque el
+    elaborador lo acepte. Con `unfold decodeTerm at h` (reescribe con `decodeTerm.eq_def`, una prueba) es
+    limpio: así lo hacen `decodeTerm_inj`/`decodeTerms_inj`, por `decodeTerm.induct`. MEDIDO en `sondeos/IteSimboloNucleo.lean` (2026‑10‑05): el rechazo
+    aparece con las recursiones MUTUAS que llaman a un subtérmino que sólo sale tras un `match` interior
+    (aquí, `decodeTerms hts` bajo el `match` sobre `t`), y no depende del `if`, de `==` frente a `=` ni de
+    `String` frente a `List Char`. ✏️ Hasta el 2026‑10‑05 esta nota decía que `if (s = sym)` era el frágil y
+    `==` el limpio, y que la inyectividad se probaba con `split`/`rw` sobre los `if`: no se había medido, y
+    era falso. (Esta función compara con `==`; `decodeNat`, `decodeChars` y el primer `if` de `decodeForm`,
+    con `=`.) -/
+def decodeTerm : Term → Option Term
+  | .func cs [h, t] =>
+      if cs == cons_sym then
+        match decodeNat h, t with
+        | some 0, .func c2 [hn, .func c3 []] =>                          -- var n
+            if (c2 == cons_sym) && (c3 == zero_sym) then (decodeNat hn).map Term.var else none
+        | some 1, .func c2 [hs, .func c3 [hts, .func c4 []]] =>          -- func s ts
+            if (c2 == cons_sym) && (c3 == cons_sym) && (c4 == zero_sym) then
+              (decodeStr hs).bind (fun s => (decodeTerms hts).map (Term.func s))
+            else none
+        | _, _ => none
+      else none
+  | _ => none
+def decodeTerms : Term → Option (List Term)
+  | .func s []     => if s == zero_sym then some [] else none
+  | .func s [h, t] => if s == cons_sym then
+                        (decodeTerm h).bind (fun x => (decodeTerms t).map (x :: ·))
+                      else none
+  | _ => none
+end
+
+/-- Inverso de `formCodeM` (los 8 tags de fórmula, del 2 al 9). Recursión estructural sobre las subfórmulas. -/
+def decodeForm : Term → Option Formula
+  | .func cs [h, t] =>
+      if cs = cons_sym then
+        match decodeNat h, t with
+        | some 2, .func c3 [] =>                                         -- ⊥
+            if c3 == zero_sym then some .bottom else none
+        | some 3, .func c2 [hp, .func c3 [hts, .func c4 []]] =>          -- atom p ts
+            if (c2 == cons_sym) && (c3 == cons_sym) && (c4 == zero_sym) then
+              (decodeStr hp).bind (fun p => (decodeTerms hts).map (Formula.atom p))
+            else none
+        | some 4, .func c2 [ha, .func c3 [hb, .func c4 []]] =>           -- t = u
+            if (c2 == cons_sym) && (c3 == cons_sym) && (c4 == zero_sym) then
+              (decodeTerm ha).bind (fun a => (decodeTerm hb).map (Formula.eq a))
+            else none
+        | some 5, .func c2 [ha, .func c3 [hb, .func c4 []]] =>           -- a ⇒ b
+            if (c2 == cons_sym) && (c3 == cons_sym) && (c4 == zero_sym) then
+              match decodeForm ha, decodeForm hb with
+              | some a, some b => some (Formula.impl a b) | _, _ => none
+            else none
+        | some 6, .func c2 [ha, .func c3 []] =>                          -- ∀ a
+            if (c2 == cons_sym) && (c3 == zero_sym) then (decodeForm ha).map Formula.forall else none
+        | some 7, .func c2 [ha, .func c3 [hb, .func c4 []]] =>           -- a ∧ b
+            if (c2 == cons_sym) && (c3 == cons_sym) && (c4 == zero_sym) then
+              match decodeForm ha, decodeForm hb with
+              | some a, some b => some (Formula.and a b) | _, _ => none
+            else none
+        | some 8, .func c2 [ha, .func c3 [hb, .func c4 []]] =>           -- a ∨ b
+            if (c2 == cons_sym) && (c3 == cons_sym) && (c4 == zero_sym) then
+              match decodeForm ha, decodeForm hb with
+              | some a, some b => some (Formula.or a b) | _, _ => none
+            else none
+        | some 9, .func c2 [ha, .func c3 []] =>                          -- ∃ a
+            if (c2 == cons_sym) && (c3 == zero_sym) then (decodeForm ha).map Formula.ex else none
+        | _, _ => none
+      else none
+  | _ => none
+
+end ROBINSON_PlusPlus.Meta.CodeDecode
+
 open ROBINSON_PlusPlus.Meta.CodeDecode
 
 namespace IteSimboloNucleo
@@ -643,18 +757,7 @@ error: (kernel) application type mismatch
 argument has type
   decodeTerm (TermG.func cs [hd, tl]) = some x
 but function has type
-  (if (cs == cons_sym) = true then
-        match decodeNat hd, tl with
-        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-          else none
-        | x, x_1 => none
-      else none) =
-      some x →
-    none = some x
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 -/
 #guard_msgs in
 theorem real_dsimp_split (cs : List Char) (hd tl : Term) (x : Term)
@@ -670,18 +773,7 @@ error: (kernel) application type mismatch
 argument has type
   decodeTerm (TermG.func cs [hd, tl]) = some x
 but function has type
-  (if (cs == cons_sym) = true then
-        match decodeNat hd, tl with
-        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-          else none
-        | x, x_1 => none
-      else none) =
-      some x →
-    none = some x
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 -/
 #guard_msgs in
 theorem real_dsimp_rw (cs : List Char) (hd tl : Term) (x : Term)
@@ -711,18 +803,7 @@ error: (kernel) application type mismatch
 argument has type
   decodeTerm (TermG.func cs [hd, tl]) = some x
 but function has type
-  (if (cs == cons_sym) = true then
-        match decodeNat hd, tl with
-        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-          else none
-        | x, x_1 => none
-      else none) =
-      some x →
-    none = some x
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 -/
 #guard_msgs in
 theorem real_simp_split (cs : List Char) (hd tl : Term) (x : Term)
@@ -824,44 +905,9 @@ theorem real_rfl (cs : List Char) (hd tl : Term) :
 
 /--
 error: (kernel) application type mismatch
-  congrArg Eq
-    (ite_congr (Eq.refl ((cs == cons_sym) = true))
-      (fun a =>
-        Eq.trans
-          (congrArg
-            (fun x =>
-              match x, TermG.func c2 [hn, TermG.func c3 []] with
-              | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-                if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-              | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-                if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-                  (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-                else none
-              | x, x_1 => none)
-            hnat)
-          (@decodeTerm.match_1.eq_1 (fun x t => Option Term) c2 hn c3
-            (fun c2 hn c3 =>
-              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none)
-            (fun c2 hs c3 hts c4 =>
-              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-              else none)
-            fun x x_1 => none))
-      fun a => Eq.refl none)
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 argument has type
-  (if (cs == cons_sym) = true then
-      match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
-      | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-      | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-        if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-          (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-        else none
-      | x, x_1 => none
-    else none) =
-    if (cs == cons_sym) = true then
-      if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-    else none
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 but function has type
   (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) =
       if (cs == cons_sym) = true then
@@ -883,47 +929,11 @@ theorem real_simp_concreto (cs c2 c3 : List Char) (hd hn : Term) (x : Term) (hna
 
 /--
 error: (kernel) application type mismatch
-  Eq.mp
-    (congrArg
-      (fun _a =>
-        (if (cs == cons_sym) = true then
-            match _a, TermG.func c2 [hn, TermG.func c3 []] with
-            | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-            | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-              else none
-            | x, x_1 => none
-          else none) =
-          some x)
-      hnat)
-    h
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 argument has type
   decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) = some x
 but function has type
-  (if (cs == cons_sym) = true then
-        match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
-        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-          else none
-        | x, x_1 => none
-      else none) =
-      some x →
-    (if (cs == cons_sym) = true then
-        match some 0, TermG.func c2 [hn, TermG.func c3 []] with
-        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
-          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
-        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
-          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
-            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
-          else none
-        | x, x_1 => none
-      else none) =
-      some x
+  failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
 -/
 #guard_msgs in
 theorem real_dsimp_concreto (cs c2 c3 : List Char) (hd hn : Term) (x : Term) (hnat : decodeNat hd = some 0)

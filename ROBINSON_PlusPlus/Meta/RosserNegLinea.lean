@@ -33,7 +33,8 @@ con `Vax = codeNatList axioms`, el valor de `axiomsCodeT` (el ancla, `prf_ancla`
 
 **De dónde.** La inversión es `prf_lineWF_inv` (`Meta/Sigma1AtomPrf.lean`); las guardas, GuardNeg (ADR‑153); la
 evaluación de la sustitución, NumEval (ADR‑152); el espejo en ℕ, `lineWFT` de `ModeloCodigo`. Los envoltorios de
-`Meta/LineWFCases.lean` y `Meta/ChainNegPrf.lean` trabajan sobre líneas EXPLÍCITAS; aquí la línea es un numeral, y las
+`Meta/LineWFCases.lean` y `Meta/ChainNegPrf.lean` (retirado en ADR‑160) trabajan sobre líneas EXPLÍCITAS; aquí la
+línea es un numeral, y las
 RHS con accesores (`lenc`, `carc`, `nthc`) se evalúan sobre él.
 
 **Controles.** `control_neg_lineWF_zero`: el `0` no es una línea. Y `control_exacta` (con la solidez en `MNV V₀`):

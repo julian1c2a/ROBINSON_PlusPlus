@@ -3,6 +3,10 @@ import ROBINSON_PlusPlus
 /-!
 # Rosser, el SONDEO de `hasWitF`: la puerta del riesgo (ADR‑147; ADR‑151)
 
+✏️ **2026‑10‑18 (ADR‑160, T66):** pasa de CONTROL a REGISTRO. Lo que mide lo dice ya el build, en general:
+`prf_neg_hasWitF` (`Meta/RosserGuardNeg.lean`, ADR‑153) refuta la guarda de fórmula sobre todo numeral cuya guarda es
+falsa en ℕ, con su `#pureza`.
+
 **La pregunta** (ADR‑146 §4.4 y §6.1). GuardNeg es la etapa de más riesgo: la guarda de FÓRMULA es `∃∃`, tiene ocho
 cláusulas y cruza la de términos, y de refutarla en `Prf` no había nada que compilara (los precedentes,
 `CRIT_hasWitF_rejects_tag` y `CRIT_hasWitF_rejects_varc`, están archivados y rotos). ¿Se refuta sobre NUMERALES basura,

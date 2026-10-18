@@ -23,12 +23,10 @@ AnclaSoundness.lean
 # el núcleo (ADR-130, T77)
 IteSimboloNucleo.lean
 
-# Rosser, Etapa 0 (ADR-123…126; se porta, ADR-137)
+# Rosser, Etapa 0 (ADR-123…126; se porta, ADR-137): RosserReflexion, el mutante de T08 que pasa por el modelo; de
+# RosserBasura queda §5, su control con el modelo (ADR-146 §4.6, hecho en ADR-160)
 RosserReflexion.lean
 RosserBasura.lean
 
-# T+E por reducción a T (ADR-144): el cálculo de una extensión finita y los controles de CRI-02
-ExtensionPorReduccion.lean
-
-# Rosser, el sondeo de hasWitF (ADR-151): la puerta del riesgo de GuardNeg, a profundidad 1 y 2 sobre numerales
-RosserHasWitF.lean
+# 2026-10-18 (ADR-160, T66): ExtensionPorReduccion (ADR-144) y RosserHasWitF (ADR-151) pasan a REGISTRO: lo que
+# vigilaban lo dice ya el build (Meta/Rosser.lean; Meta/RosserGuardNeg.lean, prf_neg_hasWitF), con su #pureza.

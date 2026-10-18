@@ -38,8 +38,8 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 140 jobs · 123 módulos activos** (Minimal 2 + Meta 118 + Full 3) **+ 0 en `cuarentena/`
-> + 44 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
+> **Build 135 jobs · 118 módulos activos** (Minimal 2 + Meta 113 + Full 3) **+ 0 en `cuarentena/`
+> + 43 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
 > *(Y el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
@@ -52,6 +52,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Y el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de Rosser.)*
 > *(Y el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la herramienta de T08.)*
 > *(Y el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
+> *(Y el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >

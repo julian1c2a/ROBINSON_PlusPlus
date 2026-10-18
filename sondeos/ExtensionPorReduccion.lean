@@ -29,6 +29,7 @@ enunciado de Rosser necesita de una extensión finita T+E sale ya del árbol, si
 
 ✏️ **2026‑10‑18 (ADR‑157):** todo, promovido a `Meta/Rosser.lean` (§1, §2 y §6), donde ya hay Rosser y el predicado
 Pf_E (`PfE`). Este sondeo sigue de CONTROL, con sus copias en su propio espacio de nombres; qué se hace con él es T66.
+✏️ **El mismo día (ADR‑160, T66):** pasa a REGISTRO: lo que vigilaba lo dice el build, con su `#pureza`.
 -/
 
 set_option autoImplicit false

@@ -89,7 +89,8 @@ theorem charToNat_ne {c c' : Char} (h : c ≠ c') : c.toNat ≠ c'.toNat := by
 
 /-! ### 🏁 Códigos de FÓRMULA contra códigos de TÉRMINO — la causa (f) de `DEUDA_chainNeg`
 
-⭐⭐ `StdArgs` (`Meta/OmegaReflect.lean`) sólo exige que cada argumento sea `formCode _`
+⭐⭐ `StdArgs` (`Meta/OmegaReflect.lean`; ✏️ 2026‑10‑18, ADR‑160: módulo retirado del build, con copia en
+`sondeos/OmegaConsistentRefutable.lean`) sólo exige que cada argumento sea `formCode _`
 **o** `termCode _`, **sin decir cuál**. Por eso una línea estándar puede llevar un código de
 término donde el tag espera uno de fórmula, y entonces `decodeForm` falla: ésa es la **sexta**
 causa de rechazo del decodificador (ADR‑075).
