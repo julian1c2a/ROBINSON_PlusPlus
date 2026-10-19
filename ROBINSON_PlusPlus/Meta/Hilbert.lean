@@ -7,13 +7,8 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 import ROBINSON_PlusPlus.Full.Induction
 
 import FOL.FOL
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
-import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
 import FOL.Theorems.Eq
-import FOL.Deduction
-import FOL.Tactics
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 

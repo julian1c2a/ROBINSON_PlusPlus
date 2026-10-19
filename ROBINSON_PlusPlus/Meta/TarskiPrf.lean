@@ -5,6 +5,9 @@ License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.GodelTwoPrf
 import ROBINSON_PlusPlus.Meta.Consistencia
+-- (2026‑10‑19, T74: el único `import` de los módulos de FOL sin nada en el cono que se queda. Lo piden
+-- `diagBeta_lift1`, `liar_isSentence` y, en `Meta/Rosser.lean`, `R_isSentence`, que reescriben con
+-- `FOL.Lift0.liftFormula_subst` y `FOL.Lift0.liftFormula_lift`; las tres están FUERA del cono de los titulares.)
 import FOL.Lift0
 
 /-!

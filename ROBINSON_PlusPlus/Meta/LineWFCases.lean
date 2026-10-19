@@ -11,11 +11,6 @@ import ROBINSON_PlusPlus.Meta.CodeArith
 import ROBINSON_PlusPlus.Meta.Provability
 import FOL.FOL
 import FOL.Theorems.Eq
-import FOL.Theorems.Neg
-import FOL.Theorems.Derived
-import FOL.Deduction
-import FOL.Tactics
-import FOL.Theorems.Impl
 import FOL.Theorems.Quantifiers
 import ROBINSON_PlusPlus.Minimal.Axioms
 

@@ -38,7 +38,7 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 133 jobs · 116 módulos activos** (Minimal 2 + Meta 112 + Full 2) **+ 0 en `cuarentena/`
+> **Build 132 jobs · 116 módulos activos** (Minimal 2 + Meta 112 + Full 2) **+ 0 en `cuarentena/`
 > + 43 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO contaba como registro y `[A]` la eximía. ✏️ Desde ADR‑169 la fecha ya no exime: las líneas de abajo llevan «Entonces:».)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
@@ -56,6 +56,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Entonces: el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
 > *(Entonces: el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
 > *(Entonces: el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
+> *(Entonces: el 2026-10-19, con ADR-170: 132 jobs y 116 módulos, porque `FOL.Deduction`, sin nada en el cono, salió del build, T74.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >

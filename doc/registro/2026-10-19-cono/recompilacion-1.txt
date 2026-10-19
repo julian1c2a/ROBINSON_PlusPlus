@@ -1,0 +1,551 @@
+# T74 (ADR-170): la primera recompilación sin los 58 import (lake build, 316 s): sólo falla Meta/TarskiPrf.lean (FOL.Lift0).
+
+ℹ [2/129] Replayed ROBINSON_PlusPlus.Minimal.SymLit
+info: ROBINSON_PlusPlus/Minimal/SymLit.lean:81:0: 'ROBINSON_PlusPlus.Minimal.SymLit.symProbe' does not depend on any axioms
+✔ [14/129] Built ROBINSON_PlusPlus.Meta.Godel (5.3s)
+✔ [15/129] Built ROBINSON_PlusPlus.Full.Induction (5.5s)
+✔ [16/129] Built ROBINSON_PlusPlus.Meta.Provability (3.4s)
+✔ [17/129] Built ROBINSON_PlusPlus.Full.Numerals (4.9s)
+✔ [18/129] Built ROBINSON_PlusPlus.Meta.Hilbert (5.1s)
+✔ [19/129] Built ROBINSON_PlusPlus.Meta.CodeArith (2.7s)
+✔ [20/129] Built ROBINSON_PlusPlus.Meta.HilbertDeduction (3.6s)
+✔ [21/129] Built ROBINSON_PlusPlus.Meta.HilbertSeq (3.8s)
+✔ [22/129] Built ROBINSON_PlusPlus.Meta.SubstArith (2.7s)
+✔ [23/129] Built ROBINSON_PlusPlus.Meta.CheckArith (2.2s)
+✔ [24/129] Built ROBINSON_PlusPlus.Meta.ProofChain (2.2s)
+✔ [25/129] Built ROBINSON_PlusPlus.Meta.Representability (2.5s)
+✔ [26/129] Built ROBINSON_PlusPlus.Meta.Diagonal (6.7s)
+✔ [27/129] Built ROBINSON_PlusPlus.Meta.ReprPrf (6.9s)
+✔ [28/129] Built ROBINSON_PlusPlus.Meta.NumListPrf (4.8s)
+✔ [29/129] Built ROBINSON_PlusPlus.Meta.ChainPrf (4.8s)
+✔ [30/129] Built ROBINSON_PlusPlus.Meta.ArithPrf (4.9s)
+✔ [31/129] Built ROBINSON_PlusPlus.Meta.NatArithPrf (3.8s)
+✔ [32/129] Built ROBINSON_PlusPlus.Meta.TcArithPrf (3.8s)
+✔ [33/129] Built ROBINSON_PlusPlus.Meta.SubstCodeOpenPrf (3.9s)
+✔ [34/129] Built ROBINSON_PlusPlus.Meta.NatOrderPrf (3.2s)
+✔ [35/129] Built ROBINSON_PlusPlus.Meta.NumCodeClosedPrf (3.0s)
+✔ [36/129] Built ROBINSON_PlusPlus.Meta.BoundedInPrf (3.4s)
+✔ [37/129] Built ROBINSON_PlusPlus.Meta.NatMulPrf (3.4s)
+✔ [38/129] Built ROBINSON_PlusPlus.Meta.RunFnBoundedPrf (4.7s)
+⚠ [39/129] Built ROBINSON_PlusPlus.Meta.CodeWitnessPrf (4.9s)
+warning: ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1395:57: This simp argument is unused:
+  liftTerm
+
+Hint: Omit it from the simp argument list.
+  simp only [isTC1, land, In, liftFormula, liftF_wfAll1, liftTerm,̵ ̵l̵i̵f̵t̵T̵e̵r̵m̵s]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1473:43: This simp argument is unused:
+  reduceIte
+
+Hint: Omit it from the simp argument list.
+  simp only [wfAllF, wfAllFBody, liftFormula, liftF_isFormCodeE2, lt, lenc, nthc,
+  ̵  ̵ ̵ ̵liftTerm,
+  ̲  ̲ ̲ ̲liftTerms, Nat.zero_lt_succ, r̵e̵d̵u̵c̵e̵I̵t̵e̵,̵ ̵if_true, ← FOL.liftTerm_comm_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1479:71: This simp argument is unused:
+  liftTerm
+
+Hint: Omit it from the simp argument list.
+  simp only [isFC1, land, In, liftFormula, liftF_wfAll1, liftF_wfAllF, liftTerm,̵ ̵l̵i̵f̵t̵T̵e̵r̵m̵s]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+warning: ROBINSON_PlusPlus/Meta/CodeWitnessPrf.lean:1543:22: This simp argument is unused:
+  reduceIte
+
+Hint: Omit it from the simp argument list.
+  simp only [hasWitF, liftFormula, liftF_isFC1, liftTerm, Nat.reduceAdd, h1, if_true,
+      Nat.zero_lt_succ, r̵e̵d̵u̵c̵e̵I̵t̵e̵,̵ ̵← FOL.liftTerm_comm_zero]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+✔ [40/129] Built ROBINSON_PlusPlus.Meta.CantorMonoPrf (3.2s)
+✔ [41/129] Built ROBINSON_PlusPlus.Meta.Representability2 (3.0s)
+✔ [42/129] Built ROBINSON_PlusPlus.Meta.ChainOkBoundedPrf (3.7s)
+✔ [43/129] Built ROBINSON_PlusPlus.Meta.StrongInductionPrf (3.2s)
+✔ [44/129] Built ROBINSON_PlusPlus.Meta.DiagonalTwo (2.8s)
+✔ [45/129] Built ROBINSON_PlusPlus.Meta.LineWFConsPrf (2.0s)
+✔ [46/129] Built ROBINSON_PlusPlus.Meta.Div2ParityPrf (2.9s)
+✔ [47/129] Built ROBINSON_PlusPlus.Meta.CodeNumeralPrf (2.5s)
+✔ [48/129] Built ROBINSON_PlusPlus.Meta.DiagonalNumeral (3.7s)
+✔ [49/129] Built ROBINSON_PlusPlus.Meta.CodeNatInjPrf (3.7s)
+ℹ [50/129] Built ROBINSON_PlusPlus.Meta.SolidezPrf (3.7s)
+info: ROBINSON_PlusPlus/Meta/SolidezPrf.lean:199:0: 'ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SolidezPrf.lean:200:0: 'ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [51/129] Built ROBINSON_PlusPlus.Meta.Representability2Prf (3.9s)
+info: ROBINSON_PlusPlus/Meta/Representability2Prf.lean:488:0: 'ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/Representability2Prf.lean:489:0: 'ROBINSON_PlusPlus.Meta.Representability2Prf.f1_traduccion_refutada' depends on axioms: [propext, Quot.sound]
+✔ [52/129] Built ROBINSON_PlusPlus.Meta.DerivCondPrf (2.9s)
+✔ [53/129] Built ROBINSON_PlusPlus.Meta.ModeloCodigo (3.8s)
+✔ [54/129] Built ROBINSON_PlusPlus.Meta.Sigma1Prf (2.7s)
+✔ [55/129] Built ROBINSON_PlusPlus.Meta.Sigma1CorePrf (3.9s)
+ℹ [56/129] Built ROBINSON_PlusPlus.Meta.HasWitTcFnPrf (4.0s)
+info: ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean:427:0: 'ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_hasWit_tcFn' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean:428:0: 'ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_argsIn_mono' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTcFnPrf.lean:429:0: 'ROBINSON_PlusPlus.Meta.HasWitTcFnPrf.prf_wfAll1_cons' depends on axioms: [propext, Quot.sound]
+ℹ [57/129] Built ROBINSON_PlusPlus.Meta.ModeloEstandar (7.5s)
+info: ROBINSON_PlusPlus/Meta/ModeloEstandar.lean:486:0: 'ROBINSON_PlusPlus.Meta.ModeloEstandar.MN_coreAxioms' depends on axioms: [propext, Classical.choice, Quot.sound]
+⚠ [58/129] Built ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf (6.1s)
+warning: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2048:9: Variable name `p` is not explicitly referenced.
+
+The binding can be removed (if unused) or named `_` (if used implicitly).
+
+Note: This linter can be disabled with `set_option linter.unusedVariables false`
+info: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2091:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWit_substtc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2092:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWitF_substfc' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2093:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWitF_bin' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2094:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2095:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWit_funcc2' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstfcWitnessPrf.lean:2096:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_hasWitF_implc' depends on axioms: [propext, Quot.sound]
+ℹ [59/129] Built ROBINSON_PlusPlus.Meta.ListEtaPrf (3.3s)
+info: ROBINSON_PlusPlus/Meta/ListEtaPrf.lean:207:0: 'ROBINSON_PlusPlus.Meta.ListEtaPrf.prf_eta_lenc' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/ListEtaPrf.lean:208:0: 'ROBINSON_PlusPlus.Meta.ListEtaPrf.prf_nthc1_carc_cdrc' depends on axioms: [propext, Quot.sound]
+✔ [60/129] Built ROBINSON_PlusPlus.Meta.ExIntroCodePrf (10s)
+✔ [61/129] Built ROBINSON_PlusPlus.Meta.LineWFCases (10s)
+✔ [62/129] Built ROBINSON_PlusPlus.Meta.TrackedCorePrf (2.6s)
+✔ [63/129] Built ROBINSON_PlusPlus.Meta.ForallElimCodePrf (2.9s)
+✔ [64/129] Built ROBINSON_PlusPlus.Meta.Sigma1AtomPrf (3.1s)
+✔ [65/129] Built ROBINSON_PlusPlus.Meta.MpCodePrf (2.0s)
+✔ [66/129] Built ROBINSON_PlusPlus.Meta.EvalArithPrf (2.8s)
+✔ [67/129] Built ROBINSON_PlusPlus.Meta.EvalMulPrf (2.7s)
+✔ [68/129] Built ROBINSON_PlusPlus.Meta.DotConsPrf (2.8s)
+✔ [69/129] Built ROBINSON_PlusPlus.Meta.EvalListPrf (2.9s)
+✔ [70/129] Built ROBINSON_PlusPlus.Meta.EvalRunFnPrf (2.0s)
+✔ [71/129] Built ROBINSON_PlusPlus.Meta.EvalLtPrf (2.0s)
+✔ [72/129] Built ROBINSON_PlusPlus.Meta.EvalBoundedPrf (3.7s)
+✔ [73/129] Built ROBINSON_PlusPlus.Meta.EvalNthcPrf (3.8s)
+✔ [74/129] Built ROBINSON_PlusPlus.Meta.EvalCarcNthcPrf (2.0s)
+✔ [75/129] Built ROBINSON_PlusPlus.Meta.PropCodePrf (3.8s)
+✔ [76/129] Built ROBINSON_PlusPlus.Meta.Delta0ReflectPrf (3.9s)
+✔ [77/129] Built ROBINSON_PlusPlus.Meta.D3DottedPrf (2.0s)
+✔ [78/129] Built ROBINSON_PlusPlus.Meta.D3InDotPrf (3.4s)
+✔ [79/129] Built ROBINSON_PlusPlus.Meta.InAxiomsCodePrf (3.3s)
+✔ [80/129] Built ROBINSON_PlusPlus.Meta.BdAllIntroPrf (3.4s)
+ℹ [81/129] Built ROBINSON_PlusPlus.Meta.ModeloCodificacion (50s)
+info: ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean:403:0: 'ROBINSON_PlusPlus.Meta.ModeloCodificacion.MN_codingAxioms' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean:404:0: 'ROBINSON_PlusPlus.Meta.ModeloCodificacion.v_ancla' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/ModeloCodificacion.lean:405:0: 'ROBINSON_PlusPlus.Meta.ModeloCodificacion.MN_axioms' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [82/129] Built ROBINSON_PlusPlus.Meta.LineWFTrackedPrf (2.8s)
+✔ [83/129] Built ROBINSON_PlusPlus.Meta.LineWFSchemaPrf (3.0s)
+✔ [84/129] Built ROBINSON_PlusPlus.Meta.LineWFMpPrf (3.1s)
+✔ [85/129] Built ROBINSON_PlusPlus.Meta.LineWFThyPrf (3.2s)
+✔ [86/129] Built ROBINSON_PlusPlus.Meta.CodeCtorKit (2.8s)
+ℹ [87/129] Built ROBINSON_PlusPlus.Meta.LineWFGuardPrf (2.0s)
+info: ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean:347:0: 'ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_extra' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean:348:0: 'ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hcond_absorbe_cascade' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LineWFGuardPrf.lean:349:0: 'ROBINSON_PlusPlus.Meta.LineWFGuardPrf.hGuard_of_deudas' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [88/129] Built ROBINSON_PlusPlus.Meta.CodeTreeReflect (29s)
+✔ [89/129] Built ROBINSON_PlusPlus.Meta.LineWFEfqPrf (29s)
+✔ [90/129] Built ROBINSON_PlusPlus.Meta.EvalPredPrf (29s)
+ℹ [91/129] Built ROBINSON_PlusPlus.Meta.LiftcCodePrf (29s)
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1690:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_isTermCodeE1_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1691:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1692:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeBin_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1693:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1694:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeUn_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1695:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_termCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1696:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_termsCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1697:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_varc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1698:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1699:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_nil' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1700:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1701:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc_func_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1702:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc_var_ge_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1703:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftsc_nil_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1704:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftsc_cons_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1705:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc0_var_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1706:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc0_func_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1707:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftsc0_nil_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1708:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftsc0_cons_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1709:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_zero_lt_succ_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1710:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_substfc_atom2CodeFn' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1711:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.substF_targetLift_hole' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1712:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.PrfH_congr_targetLift' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1713:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.prf_liftc_varc_cases' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1714:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.pcc_liftc_var_lt_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1715:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_varc_lift_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1716:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_caso_funcc_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1717:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_nil_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1718:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1719:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_termCode_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1720:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeUn_imp_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1721:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_shapeBin_imp_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1722:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.refl_lista_cons_imp_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1723:0: 'ROBINSON_PlusPlus.Meta.LiftcCodePrf.substTerm_termCode' depends on axioms: [propext]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1726:0: 'ROBINSON_PlusPlus.Meta.EvalNthcPrf.pcc_nthc_zero_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1727:0: 'ROBINSON_PlusPlus.Meta.DotConsPrf.pcc_dot_cons' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftcCodePrf.lean:1728:0: 'ROBINSON_PlusPlus.Meta.Delta0ReflectPrf.pcc_lt_tracked' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [92/129] Built ROBINSON_PlusPlus.Meta.LineWFPropPrf (3.5s)
+✔ [93/129] Built ROBINSON_PlusPlus.Meta.LineWFAssemblePrf (3.2s)
+ℹ [94/129] Built ROBINSON_PlusPlus.Meta.TrackedAtomsPrf (7.2s)
+info: ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:673:0: 'ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.pcc_In_atom_tracked' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:674:0: 'ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.pcc_boundedIn_tracked' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:675:0: 'ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.pcc_shape_tracked' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/TrackedAtomsPrf.lean:676:0: 'ROBINSON_PlusPlus.Meta.TrackedAtomsPrf.pcc_child_tracked' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [95/129] Built ROBINSON_PlusPlus.Meta.EvalLiftcPrf (7.2s)
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:930:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:931:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:932:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_lista' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:933:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_lista_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:934:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_hasWit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:935:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:936:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:937:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHI_all' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:938:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHIat_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:939:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.PHIat_all' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:940:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_at_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:941:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_at_lista_imp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:942:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_at_hasWit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:943:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftc_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:944:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.pcc_eval_liftsc_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:945:0: 'ROBINSON_PlusPlus.Meta.SubstfcWitnessPrf.prf_nil_or_cons' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:946:0: 'ROBINSON_PlusPlus.Meta.CodeWitnessPrf.SinWTs.prf_isTermCodeE1_of_In' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:947:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLift_real' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:948:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_targetLiftsc_real' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:949:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.CRIT_hasWit_descenso' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:952:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.targetLift_es_el_del_sondeo' does not depend on any axioms
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:953:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.targetLiftsc_es_el_del_sondeo' does not depend on any axioms
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:954:0: 'ROBINSON_PlusPlus.Meta.EvalLiftcPrf.iz_inv_es_prf_substtc_termCode_nil' does not depend on any axioms
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:958:0: ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO : ∀ (w s : Term), (⊢ᴴ isTC1 w s) → ⊢ᴴ targetLift s
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:959:0: ROBINSON_PlusPlus.Meta.EvalLiftcPrf.DESCENSO_hasWit : ∀ (s : Term), ⊢ᴴ hasWit s ⇒ targetLift s
+info: ROBINSON_PlusPlus/Meta/EvalLiftcPrf.lean:960:0: pcc_eval_liftc : ∀ (w s : Term),
+  (⊢ᴴ isTC1 w s) → ⊢ᴴ provFromCode (eqc (liftcT (termCode zero) (tcFn s)) (tcFn (liftc zero s)))
+✔ [96/129] Built ROBINSON_PlusPlus.Meta.SubstfcCodePrf (7.3s)
+ℹ [97/129] Built ROBINSON_PlusPlus.Meta.PremsOfTagPrf (5.9s)
+info: ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean:462:0: 'ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_of_tag' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean:463:0: 'ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_mp' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean:464:0: 'ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_premsOf_thy' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsOfTagPrf.lean:465:0: 'ROBINSON_PlusPlus.Meta.PremsOfTagPrf.prf_of_premsOf_branches' depends on axioms: [propext]
+ℹ [98/129] Built ROBINSON_PlusPlus.Meta.HasWitTrackedPrf (15s)
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1303:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_wfAll1_trackedC' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1304:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_hasWit_exc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1305:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_hGuardT' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1306:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.hGuard_of_deudaF' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1307:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTC1_tracked_of' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1308:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_argsIn_pair_tracked' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitTrackedPrf.lean:1309:0: 'ROBINSON_PlusPlus.Meta.HasWitTrackedPrf.pcc_isTermCodeE1_tracked' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [99/129] Built ROBINSON_PlusPlus.Meta.EvalSubsttcPrf (18s)
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1299:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_eval_substtc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1300:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_eval_substtsc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1301:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_eval_substtc_hasWit' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1302:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.prf_pred_dot_guarded' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1303:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.PHIsubsttc_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1304:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_substtc_func_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubsttcPrf.lean:1305:0: 'ROBINSON_PlusPlus.Meta.EvalSubsttcPrf.pcc_substtc_var_lt_code' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [100/129] Built ROBINSON_PlusPlus.Meta.D3ChainDotPrf (18s)
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1309:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_chainOkBDot_imp_chainOkDot' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1310:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hC_dot_of_chainOkBDot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1311:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_chainOkBDot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1312:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.PrfH_chainOkB_bnd_bridge' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1313:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.DEUDA_chainOkBDot_of' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1314:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1315:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_bdCarcLt_reflect' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1316:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.pcc_premsBody_reflect' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1317:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hPinv_chainOkBPsi' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1318:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_two' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1319:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.chainOkBPsiDot_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1320:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hwPsi_chainOkBPsiDot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1321:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1322:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hPsiId_chainOkBPsiDot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1323:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_hbody' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1324:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.hwP_chainOkBPsi' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1325:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_body_only' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1326:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.substfc_chainOkBPsiDot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3ChainDotPrf.lean:1327:0: 'ROBINSON_PlusPlus.Meta.D3ChainDotPrf.d3_prf_of_halves' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [101/129] Built ROBINSON_PlusPlus.Meta.EvalSubstfcPrf (22s)
+info: ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1630:0: 'ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.pcc_eval_substfc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1631:0: 'ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.pcc_eval_substfc_wit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1632:0: 'ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.DESCENSO_substfc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1633:0: 'ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.pcc_substfc_un_dot' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalSubstfcPrf.lean:1634:0: 'ROBINSON_PlusPlus.Meta.EvalSubstfcPrf.pcc_congr_substfcT_arg2_code' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [102/129] Built ROBINSON_PlusPlus.Meta.EvalLiftfcPrf (27s)
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1367:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.liftfcT_termCode' does not depend on any axioms
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1368:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.deuda_of_isFC1' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1369:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_bottom_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1370:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_impl_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1371:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_forall_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1372:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_ex_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1373:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.PHIliftfc_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1374:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_modulo_8' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1375:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoBotL' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1376:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoBinL5' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1377:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoUnL6' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1378:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoUnL9' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1379:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_modulo_2' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1380:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_atom_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1381:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_liftfc_eq_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1382:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoAtomL_thm' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1383:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.casoEqL_thm' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1384:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1385:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.pcc_eval_liftfc_wit' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/EvalLiftfcPrf.lean:1386:0: 'ROBINSON_PlusPlus.Meta.EvalLiftfcPrf.hasWitF_liftfc_of_deuda' does not depend on any axioms
+ℹ [103/129] Built ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf (3.0s)
+info: ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean:679:0: 'ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf.prf_hasWit_liftc_at' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean:680:0: 'ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf.prf_hasWitArgs_liftsc_of' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean:681:0: 'ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf.prf_hasWitF_liftfc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/LiftfcWitnessPrf.lean:682:0: 'ROBINSON_PlusPlus.Meta.LiftfcWitnessPrf.deuda_hasWitF_liftfc' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+ℹ [104/129] Built ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf (62s)
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1238:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_shapeNul_fc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1239:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_isFormCodeE2_trackedC' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1240:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_wfAllF_trackedC' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1241:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_isFC1_trackedC' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1242:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_hasWitF_exc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1243:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.pcc_hGuardF' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/HasWitFTrackedPrf.lean:1244:0: 'ROBINSON_PlusPlus.Meta.HasWitFTrackedPrf.hGuard_of_slots' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [105/129] Built ROBINSON_PlusPlus.Meta.SubstTreeReflect (3.4s)
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1235:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.prf_substtc_code' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1236:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.prf_condD_of_stree_eq' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1237:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.PrfH_tc_objAt' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1238:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q1_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1239:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q2_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1240:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_leibniz_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1241:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_q3_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1242:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_qconf_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1243:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_2' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1244:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_ind_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1245:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_listInd_imp' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1246:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked_modulo_other' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SubstTreeReflect.lean:1247:0: 'ROBINSON_PlusPlus.Meta.SubstTreeReflect.pcc_lineWF_tracked' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [106/129] Built ROBINSON_PlusPlus.Meta.PremsOfDotPrf (4.1s)
+info: ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean:1064:0: 'ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_rw_dot_consN' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean:1065:0: 'ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_premsOf_dot_mp' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsOfDotPrf.lean:1066:0: 'ROBINSON_PlusPlus.Meta.PremsOfDotPrf.pcc_eval_premsOf' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [107/129] Built ROBINSON_PlusPlus.Meta.D3BodyPrf (2.4s)
+info: ROBINSON_PlusPlus/Meta/D3BodyPrf.lean:328:0: 'ROBINSON_PlusPlus.Meta.D3BodyPrf.hA_lineWFDotAt' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/D3BodyPrf.lean:329:0: 'ROBINSON_PlusPlus.Meta.D3BodyPrf.pcc_bnd_bridge_at' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [108/129] Built ROBINSON_PlusPlus.Meta.PremsBdAllPrf (4.1s)
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1335:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.substfc_id_substCodeF2' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1336:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hPsiId_premsPsi' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1337:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hwPsi_premsPsi' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1338:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbdAllPrems_of_body' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1339:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.premsBody_deuda' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1340:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hbdAllPrems_unpacked' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1341:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.hB_premsDotAt' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:1342:0: 'ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real' depends on axioms: [propext, Classical.choice, Quot.sound]
+✔ [109/129] Built ROBINSON_PlusPlus.Meta.GodelTwo (2.2s)
+ℹ [110/129] Built ROBINSON_PlusPlus.Meta.GodelTwoPrf (2.4s)
+info: ROBINSON_PlusPlus/Meta/GodelTwoPrf.lean:248:0: 'ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/GodelTwoPrf.lean:249:0: 'ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/GodelTwoPrf.lean:250:0: 'ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [111/129] Built ROBINSON_PlusPlus.Meta.Consistencia (2.3s)
+info: ROBINSON_PlusPlus/Meta/Consistencia.lean:80:0: 'ROBINSON_PlusPlus.Meta.Consistencia.consistencia' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/Consistencia.lean:81:0: 'ROBINSON_PlusPlus.Meta.Consistencia.goedel_I' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/Consistencia.lean:82:0: 'ROBINSON_PlusPlus.Meta.Consistencia.goedel_II' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/Consistencia.lean:83:0: 'ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo' depends on axioms: [propext, Classical.choice, Quot.sound]
+✖ [112/129] Building ROBINSON_PlusPlus.Meta.TarskiPrf (3.9s)
+trace: .> LEAN_PATH=E:\Dropbox\GitHub\lean4\FOL\.lake\build\lib\lean;E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean c:\Users\julia\.elan\toolchains\leanprover--lean4---v4.31.0\bin\lean.exe E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\ROBINSON_PlusPlus\Meta\TarskiPrf.lean -o E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean\ROBINSON_PlusPlus\Meta\TarskiPrf.olean -i E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\lib\lean\ROBINSON_PlusPlus\Meta\TarskiPrf.ilean -c E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\ir\ROBINSON_PlusPlus\Meta\TarskiPrf.c --setup E:\Dropbox\GitHub\lean4\ROBINSON_PlusPlus\.lake\build\ir\ROBINSON_PlusPlus\Meta\TarskiPrf.setup.json --json
+error: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:106:16: Unknown identifier `FOL.Lift0.liftFormula_subst`
+error: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:105:47: unsolved goals
+P : Formula
+hP : liftFormula 1 P = P
+⊢ liftFormula 1 (substFormula 0 diagTerm (liftFormula 1 P)) = substFormula 0 diagTerm (liftFormula 1 P)
+error: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:115:6: Unknown identifier `FOL.Lift0.liftFormula_subst`
+error: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:110:95: unsolved goals
+Tr : Formula
+hTr : liftFormula 1 Tr = Tr
+hβ : liftFormula (0 + 1) (diagBeta (¬ Tr)) = diagBeta (¬ Tr)
+⊢ liftFormula 0 (substFormula 0 (numeral (codeNat (diagBeta (¬ Tr)))) (diagBeta (¬ Tr))) =
+    substFormula 0 (numeral (codeNat (diagBeta (¬ Tr)))) (diagBeta (¬ Tr))
+info: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:147:0: 'ROBINSON_PlusPlus.Meta.TarskiPrf.prf_diagonal' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:148:0: 'ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:149:0: 'ROBINSON_PlusPlus.Meta.TarskiPrf.tarski' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/TarskiPrf.lean:150:0: 'ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico' depends on axioms: [propext, Classical.choice, Quot.sound]
+error: Lean exited with code 1
+ℹ [113/129] Built ROBINSON_PlusPlus.Meta.PurezaComando (3.9s)
+info: ROBINSON_PlusPlus/Meta/PurezaComando.lean:168:0: T08 · pureza del cierre (ADR‑143): 0 puros y 1 controles positivos
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.PurezaComando.mutanteLocal, como se espera: ROBINSON_PlusPlus.Meta.PurezaComando.mutanteLocal ⟶ ROBINSON_PlusPlus.Meta.PurezaComando.auxLocalSemantico ⟶ ROBINSON_PlusPlus.Meta.Consistencia.consistencia ⟶ ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de
+ℹ [115/129] Built ROBINSON_PlusPlus.Meta.SolidezVerificador (4.0s)
+info: ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:610:0: 'ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:611:0: 'ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:612:0: 'ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:613:0: 'ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:614:0: 'ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/SolidezVerificador.lean:615:0: 'ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff' depends on axioms: [propext, Classical.choice, Quot.sound]
+ℹ [116/129] Built ROBINSON_PlusPlus.Meta.RosserNumerales (9.4s)
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:266:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_numeral_cons' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:267:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_lenc_numeral' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:268:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_nthc_numeral' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:269:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_numeral' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:270:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_runFn_numeral' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:271:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_runFn' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:272:0: 'ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_decide' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumerales.lean:276:0: T08 · pureza del cierre (ADR‑143): 13 puros y 1 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_numeral_cons (540 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_carc_numeral (543 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_cdrc_numeral (543 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_lenc_numeral (559 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_nthc_numeral (581 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_implc_numeral (526 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_numeral (560 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_numeral (567 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_concat_numeral (562 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_runFn_numeral (585 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_runFn (594 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_not_In_runFn (601 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumerales.prf_In_decide (575 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM, como se espera: ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM ⟶ FOL.Metamath.Semantics.evalTerm
+ℹ [117/129] Built ROBINSON_PlusPlus.Meta.RosserW1 (16s)
+info: ROBINSON_PlusPlus/Meta/RosserW1.lean:91:0: 'ROBINSON_PlusPlus.Meta.RosserW1.w1Ax' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserW1.lean:92:0: 'ROBINSON_PlusPlus.Meta.RosserW1.proofN_axioma' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserW1.lean:93:0: 'ROBINSON_PlusPlus.Meta.RosserW1.not_proofN_zero' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserW1.lean:97:0: T08 · pureza del cierre (ADR‑143): 4 puros y 1 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserW1.w1Ax (636 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserW1.proofN_axioma (479 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserW1.w1Ax_axioma (655 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserW1.not_proofN_zero (433 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido, como se espera: ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido ⟶ ROBINSON_PlusPlus.Meta.SolidezVerificador.bueno_V₀ ⟶ ROBINSON_PlusPlus.Meta.Consistencia.V₀_eq_codigo ⟶ FOL.Metamath.Semantics.evalFormula
+ℹ [118/129] Built ROBINSON_PlusPlus.Meta.RosserPosNum (16s)
+info: ROBINSON_PlusPlus/Meta/RosserPosNum.lean:183:0: 'ROBINSON_PlusPlus.Meta.RosserPosNum.posNum' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserPosNum.lean:184:0: 'ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserPosNum.lean:188:0: T08 · pureza del cierre (ADR‑143): 3 puros y 1 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserPosNum.prf_proofCode'_numeral (636 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserPosNum.posNum (1063 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserPosNum.repr_pos_num (1068 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff, como se espera: ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff ⟶ FOL.Metamath.Semantics.evalFormula
+ℹ [119/129] Built ROBINSON_PlusPlus.Meta.GodelCorolarios (16s)
+info: ROBINSON_PlusPlus/Meta/GodelCorolarios.lean:87:0: 'ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_imp_con' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/GodelCorolarios.lean:88:0: 'ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/GodelCorolarios.lean:89:0: 'ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/GodelCorolarios.lean:90:0: 'ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/GodelCorolarios.lean:94:0: T08 · pureza del cierre (ADR‑143): 4 puros y 1 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_imp_con (1149 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con (3268 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado (3269 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_de_formalizado (3271 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible, como se espera: ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible ⟶ FOL.Metamath.Semantics.evalFormula
+ℹ [120/129] Built ROBINSON_PlusPlus.Meta.RosserNumEval (7.0s)
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:516:0: 'ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substtc_numeral' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:517:0: 'ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftc_numeral' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:518:0: 'ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_numeral' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:519:0: 'ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftfc_numeral' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:520:0: 'ROBINSON_PlusPlus.Meta.RosserNumEval.codF_of_hasWitFN' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:521:0: 'ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_guarda' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNumEval.lean:525:0: T08 · pureza del cierre (ADR‑143): 13 puros y 1 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.codT_liftcN (102 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.codF_liftfcN (141 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.codF_substfcN (157 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.codT_of_hasWitN (105 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.codF_of_hasWitFN (122 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substtc_numeral (650 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftc_numeral (637 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftfc_numeral (703 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_numeral (741 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_guarda (786 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_liftfc_guarda (746 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.prf_substfc_codeNat (751 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNumEval.guardas_satisfacibles (83 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM, como se espera: ROBINSON_PlusPlus.Meta.ModeloEstandar.ev_numeralM ⟶ FOL.Metamath.Semantics.evalTerm
+ℹ [121/129] Built ROBINSON_PlusPlus.Meta.RosserGuardNeg (7.7s)
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:678:0: 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_of_codT' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:679:0: 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitFN_of_codF' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:680:0: 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.codT_or_rejT' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:681:0: 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.codF_or_rejF' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:682:0: 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.prf_neg_hasWit' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:683:0: 'ROBINSON_PlusPlus.Meta.RosserGuardNeg.prf_neg_hasWitF' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserGuardNeg.lean:687:0: T08 · pureza del cierre (ADR‑143): 12 puros y 2 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_of_codT (125 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitFN_of_codF (155 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitN_iff (152 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitFN_iff (183 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.codT_or_rejT (749 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.codF_or_rejF (801 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.prf_neg_hasWit (800 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.prf_neg_hasWitF (873 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWit_decide (800 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.hasWitF_decide (873 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_neg_hasWit_zero (808 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_neg_hasWitF_zero (882 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exacta, como se espera: ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exacta ⟶ FOL.Metamath.Semantics.evalFormula
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exactaF, como se espera: ROBINSON_PlusPlus.Meta.RosserGuardNeg.control_exactaF ⟶ FOL.Metamath.Semantics.evalFormula
+ℹ [122/129] Built ROBINSON_PlusPlus.Meta.RosserNegLinea (9.6s)
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:581:0: 'ROBINSON_PlusPlus.Meta.RosserNegLinea.lineWF_decide' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:582:0: 'ROBINSON_PlusPlus.Meta.RosserNegLinea.prf_neg_lineWF' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:583:0: 'ROBINSON_PlusPlus.Meta.RosserNegLinea.prf_not_In_axiomsCodeT' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:584:0: 'ROBINSON_PlusPlus.Meta.RosserNegLinea.refT_q1' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:585:0: 'ROBINSON_PlusPlus.Meta.RosserNegLinea.refT_thy' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:586:0: 'ROBINSON_PlusPlus.Meta.RosserNegLinea.refT_ind' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegLinea.lean:590:0: T08 · pureza del cierre (ADR‑143): 6 puros y 1 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegLinea.lineWF_decide (1278 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegLinea.prf_neg_lineWF (1279 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegLinea.prf_not_In_axiomsCodeT (722 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegLinea.refT (1265 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegLinea.mism (634 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegLinea.control_neg_lineWF_zero (1281 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.RosserNegLinea.control_exacta, como se espera: ROBINSON_PlusPlus.Meta.RosserNegLinea.control_exacta ⟶ FOL.Metamath.Semantics.evalFormula
+ℹ [123/129] Built ROBINSON_PlusPlus.Meta.RosserNegNum (10s)
+info: ROBINSON_PlusPlus/Meta/RosserNegNum.lean:267:0: 'ROBINSON_PlusPlus.Meta.RosserNegNum.chainOkN_decide' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegNum.lean:268:0: 'ROBINSON_PlusPlus.Meta.RosserNegNum.proofN_decide' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegNum.lean:269:0: 'ROBINSON_PlusPlus.Meta.RosserNegNum.negNum' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegNum.lean:270:0: 'ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegNum.lean:271:0: 'ROBINSON_PlusPlus.Meta.RosserNegNum.prf_neg_lineOk_prem' depends on axioms: [propext, Quot.sound]
+info: ROBINSON_PlusPlus/Meta/RosserNegNum.lean:275:0: T08 · pureza del cierre (ADR‑143): 7 puros y 2 controles positivos
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.chainOkN_decide (1353 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.proofN_decide (1373 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.negNum (1374 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.negNum' (1486 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formula (1487 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.negNum_formCode (1488 constantes del proyecto en el cierre)
+  ✓ PURO    ROBINSON_PlusPlus.Meta.RosserNegNum.control_negNum_vacia (1378 constantes del proyecto en el cierre)
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.RosserNegNum.control_exacta, como se espera: ROBINSON_PlusPlus.Meta.RosserNegNum.control_exacta ⟶ FOL.Metamath.Semantics.evalFormula
+  ✓ IMPURO  ROBINSON_PlusPlus.Meta.RosserNegNum.control_falla, como se espera: ROBINSON_PlusPlus.Meta.RosserNegNum.control_falla ⟶ ROBINSON_PlusPlus.Meta.RosserNegNum.control_exacta ⟶ FOL.Metamath.Semantics.evalFormula
+Some required targets logged failures:
+- ROBINSON_PlusPlus.Meta.TarskiPrf
+error: build failed

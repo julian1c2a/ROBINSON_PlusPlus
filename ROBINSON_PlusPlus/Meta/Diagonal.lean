@@ -7,10 +7,6 @@ import ROBINSON_PlusPlus.Meta.Representability
 
 import FOL.FOL
 import FOL.Theorems.Eq
-import FOL.Deduction
-import FOL.Theorems.Derived
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
 import ROBINSON_PlusPlus.Meta.Hilbert
 
 /-!

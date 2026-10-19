@@ -174,11 +174,8 @@ import ROBINSON_PlusPlus.Meta.Rosser
 import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
-import FOL.Deduction
+-- (✏️ 2026‑10‑19, ADR‑170, T74: `FOL.Deduction`, `FOL.Theorems.Derived`, `Impl` y `Neg`, sin nada en el cono, fuera.)
 import FOL.FOL
-import FOL.Theorems.Derived
 import FOL.Theorems.Eq
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
 import FOL.Theorems.Quantifiers
 import ROBINSON_PlusPlus.Full.Induction

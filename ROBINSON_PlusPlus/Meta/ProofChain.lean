@@ -7,11 +7,6 @@ import ROBINSON_PlusPlus.Meta.CheckArith
 
 import FOL.FOL
 import FOL.Theorems.Eq
-import FOL.Deduction
-import FOL.Tactics
-import FOL.Theorems.Derived
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
 import FOL.Theorems.Quantifiers
 import ROBINSON_PlusPlus.Full.Induction
 import ROBINSON_PlusPlus.Minimal.Axioms

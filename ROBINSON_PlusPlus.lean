@@ -22,14 +22,13 @@ import ROBINSON_PlusPlus.Meta
 -- `Prf.listInd` (Meta/Hilbert.lean; ✏️ 2026‑10‑14: decía «es el constructor `Prf.ind`»; AXIOMS.md §0.3).
 import ROBINSON_PlusPlus.Full.Induction
 import ROBINSON_PlusPlus.Full.Numerals
--- FOL: los ocho módulos de FOL que importaban los módulos retirados con ADR‑115.
-import FOL.Deduction
+-- FOL: los tres módulos de FOL con algo en el cono de los titulares que la librería nombra. (✏️ 2026‑10‑19,
+-- ADR‑170, T74: eran ocho, los que importaban los módulos retirados con ADR‑115; `FOL.Deduction`, `FOL.Tactics` y
+-- `FOL.Theorems.Derived`, `Impl` y `Neg` no tenían nada en el cono, y salieron de aquí y de los módulos que los
+-- importaban. `FOL.Semantics` y `FOL.Lift0` entran por los módulos que los usan; `FOL.Tactics` y los tres
+-- `Theorems.*`, por `FOL.Theorems.Quantifiers`.)
 import FOL.FOL
-import FOL.Tactics
-import FOL.Theorems.Derived
 import FOL.Theorems.Eq
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
 import FOL.Theorems.Quantifiers
 
 -- 🗑️ Registro (ADR‑115, 2026‑10‑02): con la capa `⊢` se retiraron, y salieron de este barril,

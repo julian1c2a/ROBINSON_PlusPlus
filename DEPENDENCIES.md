@@ -124,6 +124,11 @@ ROBINSON_PlusPlus/                  # raíz del proyecto Lean
 
 ## Dependency Graph (Mermaid)
 
+> ✏️ 2026‑10‑19 ([ADR‑170](DECISIONS.md), T74): este grafo es anterior a ADR‑115 (los bloques de `⊢` ya no existen; el
+> núcleo de hoy, en REFERENCE.md §2). De FOL, RPP ya no importa `FOL.Deduction`: no tenía nada en el cono de los
+> titulares y salió del build; `FOL.Tactics`, `FOL.Theorems.Impl`, `FOL.Theorems.Neg` y `FOL.Theorems.Derived` sólo
+> entran a través de `FOL.Theorems.Quantifiers`.
+
 ```mermaid
 graph TD
     subgraph FOL ["Project: FOL (../FOL)"]

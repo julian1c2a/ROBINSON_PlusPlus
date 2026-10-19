@@ -8,7 +8,6 @@ import ROBINSON_PlusPlus.Meta.CodeArith
 
 import FOL.FOL
 import FOL.Theorems.Eq
-import FOL.Deduction
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo

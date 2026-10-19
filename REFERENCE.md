@@ -282,7 +282,7 @@ graph TD
         direction LR
         FOL_FOL["FOL.FOL"]
         FOL_Eq["FOL.Theorems.Eq"]
-        FOL_Th["FOL.Theorems.* · FOL.Tactics · FOL.Deduction"]
+        FOL_Th["FOL.Theorems.Quantifiers (con Impl, Neg, Derived y Tactics) · FOL.Semantics · FOL.Lift0"]
     end
 
     subgraph RPP ["Project: ROBINSON_PlusPlus"]
@@ -301,6 +301,11 @@ graph TD
     Induction --> Meta
     Axioms --> Meta
 ```
+
+> ✏️ 2026‑10‑19 ([ADR‑170](DECISIONS.md), T74): de FOL, RPP importa hoy `FOL.FOL`, `FOL.Theorems.Eq`, `FOL.Theorems.Quantifiers`,
+> `FOL.Semantics` y `FOL.Lift0` (éste sólo para tres declaraciones fuera del cono, en `Meta/TarskiPrf.lean` y
+> `Meta/Rosser.lean`). `FOL.Deduction` salió del build; `FOL.Tactics`, `FOL.Theorems.Derived`, `FOL.Theorems.Impl` y
+> `FOL.Theorems.Neg` entran sólo a través de `FOL.Theorems.Quantifiers`.
 
 ---
 

@@ -15,13 +15,8 @@ import ROBINSON_PlusPlus.Meta.ProofChain
 import ROBINSON_PlusPlus.Meta.HilbertSeq
 
 import FOL.FOL
-import FOL.Tactics
 import FOL.Theorems.Eq
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
-import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
-import FOL.Deduction
 import ROBINSON_PlusPlus.Full.Induction
 import ROBINSON_PlusPlus.Meta.Hilbert
 import ROBINSON_PlusPlus.Meta.SubstArith

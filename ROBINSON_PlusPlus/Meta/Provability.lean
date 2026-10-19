@@ -7,11 +7,7 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 import ROBINSON_PlusPlus.Meta.Godel
 
 import FOL.FOL
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
-import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
-import FOL.Deduction
 
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel

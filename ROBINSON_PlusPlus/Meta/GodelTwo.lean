@@ -8,10 +8,6 @@ License: MIT
 import ROBINSON_PlusPlus.Meta.PremsBdAllPrf
 
 import FOL.FOL
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
-import FOL.Deduction
-import FOL.Theorems.Derived
 import FOL.Theorems.Eq
 import FOL.Theorems.Quantifiers
 import ROBINSON_PlusPlus.Meta.ProofChain

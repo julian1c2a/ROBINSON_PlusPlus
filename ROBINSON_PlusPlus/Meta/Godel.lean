@@ -6,12 +6,7 @@ License: MIT
 import ROBINSON_PlusPlus.Minimal.Axioms
 
 import FOL.FOL
-import FOL.Tactics
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
-import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
-import FOL.Deduction
 import FOL.Theorems.Eq
 
 open ROBINSON_PlusPlus.Minimal.Axioms

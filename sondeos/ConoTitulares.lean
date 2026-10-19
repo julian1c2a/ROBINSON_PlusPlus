@@ -60,6 +60,13 @@ controles pasan; sin dueño quedan 3 auxiliares `_arg_pusher` de `PSum`/`PSigma`
 del 2026‑10‑16, y `PurezaComando` y `PurezaTitulares` (de elaboración). De ellos, el subárbol de T66 —`ChainNegPrf`,
 `VerifierSound`, `OmegaReflect`, `ChainDecode`, `CodeDecode`: 181 declaraciones, 2 953 líneas— se retiró con ADR‑160.
 Re‑ejecutado después (`resumen-tras-T66.txt`), el cono sale idéntico, con 18 módulos sin nada en él.
+
+**✏️ Re‑ejecutado el 2026‑10‑19 (T74, ADR‑170), 113 s**, con los 24 titulares de hoy (los tres corolarios de T78) y la
+salida en `doc/registro/2026-10-19-cono/`. Los controles pasan. El cono: 4 420 constantes del proyecto, 3 213
+declaraciones y 31 143 líneas; los corolarios no traen nada de FOL. Sin nada en el cono, 15 módulos importados, ocho de
+FOL (los mismos del 2026‑10‑16). Retirados sus `import` (T74; el de `FOL.Lift0` en `Meta/TarskiPrf.lean` se queda: lo
+piden tres declaraciones fuera del cono), re‑ejecutado (`resumen-tras-T74.txt`): el cono, idéntico, y de FOL se
+importan 11 ficheros (sale `FOL.Deduction`; los otros siguen entrando por `FOL.Theorems.Quantifiers` y `FOL.Lift0`).
 -/
 
 open Lean Meta Elab Command
@@ -130,8 +137,8 @@ partial def cierre (env : Environment) (raices : List Name) : NameSet := Id.run 
 
 /-- La fecha y la carpeta de la ejecución (✏️ 2026‑10‑18, ADR‑160: la primera, del 2026‑10‑16, escribía en
     `doc/registro/2026-10-16-cono/`; ésa queda como registro). -/
-def fecha : String := "2026-10-18"
-def carpeta : String := "doc/registro/2026-10-18-cono"
+def fecha : String := "2026-10-19"
+def carpeta : String := "doc/registro/2026-10-19-cono"
 
 /-- Los de `T_UNIVERSO` (18 hasta ADR‑157; 21 desde ADR‑159), con la clase de ADR‑135 (`TEOREMAS-E-HIPOTESIS.md` §1; «—» para `consistencia`). -/
 def titulares : List (Name × String) := [
@@ -156,7 +163,11 @@ def titulares : List (Name × String) := [
   -- ✏️ 2026‑10‑18 (ADR‑160): los tres titulares nuevos de ADR‑157 y ADR‑159.
   (``ROBINSON_PlusPlus.Meta.Rosser.rosser_ext, "i"),
   (``ROBINSON_PlusPlus.Meta.Rosser.rosser, "ii"),
-  (``ROBINSON_PlusPlus.Meta.Lob.lob, "i")]
+  (``ROBINSON_PlusPlus.Meta.Lob.lob, "i"),
+  -- ✏️ 2026‑10‑19 (T74): los tres corolarios de T78, titulares desde ADR‑164.
+  (``ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con, "i"),
+  (``ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado, "i"),
+  (``ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible, "iii")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,
     tácticas, elaboradores. -/

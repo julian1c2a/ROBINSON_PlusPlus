@@ -7,12 +7,7 @@ import ROBINSON_PlusPlus.Minimal.Axioms
 import ROBINSON_PlusPlus.Full.Induction
 
 import FOL.FOL
-import FOL.Tactics
-import FOL.Theorems.Impl
-import FOL.Theorems.Neg
-import FOL.Theorems.Derived
 import FOL.Theorems.Quantifiers
-import FOL.Deduction
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
