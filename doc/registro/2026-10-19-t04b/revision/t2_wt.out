@@ -1,0 +1,36 @@
+######## región H
+jobs	97	 [entonces]		198:CURRENT-STATUS-PROJECT.md:  footprint, sustituyendo `prf_tc_cons'` por un único `pcc_rw`. Build **97 jobs** entonces.
+jobs	145	 [HISTÓRICO] [previo] [→] [ya no] [«5]		606:GODEL-STATUS.md:**Last updated:** 2026-07-20 — ⚠️ **DOCUMENTO HISTÓRICO/DIAGNÓSTICO.** El estado vivo está en [NEXT-STEPS.md](NEXT-STEPS.md) (bloque «🎯 L
+jobs	131	 [Entonces]		754:NEXT-STEPS.md:> Entonces, 131 jobs y 114 módulos. Lo siguiente: **PosNum** (ADR‑146 §3, etapa 6).
+jobs	132	 [Entonces]		757:NEXT-STEPS.md:> propio módulo (medido con un mutante); arreglado, y `mutanteLocal` lo vigila en cada build. Entonces, 132 jobs y
+jobs	134	 [Entonces]		768:NEXT-STEPS.md:> buenos: `prf_substfc_guarda`. Pura. Entonces, 134 jobs y 117 módulos. Lo siguiente: **GuardNeg** (la caracterización
+jobs	136	 [Entonces]		776:NEXT-STEPS.md:> NumEval y `thy` por el ancla. Pura. Entonces, 136 jobs y 119 módulos. Lo siguiente: **NegNum** (la cadena y las
+jobs	137	 [Entonces]		782:NEXT-STEPS.md:> φ no es teorema, T refuta cada candidata a prueba de φ. Pura. Entonces, 137 jobs y 120 módulos. Lo siguiente:
+jobs	139	 [antes] [Entonces]	mutantes,	789:NEXT-STEPS.md:> y `#pureza` pasan a `Meta/PurezaComando.lean`. Visto fallar en los dos sentidos con tres mutantes. Entonces, 139 jobs
+jobs	140	 [Entonces]		795:NEXT-STEPS.md:> él, **la línea de llegada de RPP (ADR‑140) está completa en sus teoremas**. Entonces, 140 jobs y 123 módulos. Lo
+jobs	129	 [Entonces]		1245:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
+jobs	131	 [Entonces]		1246:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de Rosser.)*
+jobs	132	 [Entonces]		1247:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de Rosser.)*
+jobs	134	 [Entonces]		1249:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de Rosser.)*
+jobs	135	 [Entonces]		1250:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de Rosser.)*
+jobs	136	 [Entonces]		1251:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de Rosser.)*
+jobs	137	 [Entonces]		1252:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de Rosser.)*
+jobs	139	 [Entonces]		1253:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la he
+jobs	140	 [Entonces]		1254:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
+jobs	135	 [Entonces]		1255:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflec
+jobs	130	 [Entonces]		1256:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sig
+jobs	131	 [Entonces]		1257:doc/REFERENCE-Incompleteness.md:> *(Entonces: el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
+módulos activos	131	 [entonces]		258:DEPENDENCIES.md:reales el **2026‑09‑10h** (entonces `131 módulos activos`, Meta 109):
+axiom	1	 [era ]	fuera ,	148:CURRENT-STATUS-PROJECT.md:| `Minimal/Axioms.lean` | 0 | ✅ Complete — lenguaje + **141 axiomas objeto** + esquemas del verificador + capa Δ₀. Contiene **1** `ax
+axiom	5	 [era ] [→] [retirad]	era ,	180:CURRENT-STATUS-PROJECT.md:| `Full/Mod2.lean` | 0 | ✅ 🆕 **2026‑09‑10h: `ax_mod2_alternation` DEMOSTRADO** (era `axiom`) ⇒ **6 → 5** `axiom` de Lean. ⚠�
+axiom	5	 [HISTÓRICO] [previo] [→] [ya no] [«5]		606:GODEL-STATUS.md:**Last updated:** 2026-07-20 — ⚠️ **DOCUMENTO HISTÓRICO/DIAGNÓSTICO.** El estado vivo está en [NEXT-STEPS.md](NEXT-STEPS.md) (bloque «🎯 L
+######## región B
+jobs	29	 [→]		404:CURRENT-STATUS-PROJECT.md:- **2026-06-11 — `Full/Lists.lean`: ax_C3 y ax_L3 derivados (inducción estructural)**: nuevo módulo (330 líneas) con **meta-axioma `ax_
+jobs	28	 [era ]	era ,	406:CURRENT-STATUS-PROJECT.md:- **2026-06-11 — `Intermediate/` ELIMINADO + `Full/Mod2.lean` (Opción C.2)**: borrado el módulo prototipo `Intermediate/Induction.lean` 
+jobs	28	 [→]		408:CURRENT-STATUS-PROJECT.md:- **2026-06-07 — `Full/Induction.lean`: ax19 (tricotomía del orden) derivado**: `lt_trichotomy_ax`/`lt_trichotomy_thm : axioms ⊢ ax19_l
+jobs	76	 [→]		529:CURRENT-STATUS-PROJECT.md:*Last updated: 2026-07-09c — Build ✅ (76 jobs), 0 errores, 0 sorrys, 0 warnings, 62 módulos, Lean v4.31.0. F7a: 14 → 7 axiomas (AXIOM
+jobs	135	 [Entonces]		1330:NEXT-STEPS.md:> archivado. Entonces, 135 jobs y 118 módulos. Lo siguiente: los P0/P1 abiertos de la auditoría y T78.
+jobs	130	 [Entonces]		1333:NEXT-STEPS.md:> `archivo/fuera-del-cono-2026-10-18`), y con ellos los dos teoremas vacuos de T05. Entonces, 130 jobs y 113 módulos.
+jobs	131	 [Entonces]		1336:NEXT-STEPS.md:> en `PUROS`; y `Con'` indecidible, de la (iii). Los tres, titulares (`T_UNIVERSO`, 24). Entonces, 131 jobs y 114
+axiom	3	 [retirad]		161:REFERENCE.md:> esta nota: **3 `axiom` de Lean** (tras F7a, [ADR‑026](DECISIONS.md) y la retirada de Ax‑P): 2 esquemas de inducción (`Full/`)
+axiom	5	 [retirad]		290:REFERENCE.md:**5** `axiom` de Lean (`d3` retirado el 2026‑09‑10g).

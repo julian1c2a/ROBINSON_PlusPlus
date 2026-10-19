@@ -1,0 +1,15 @@
+S6 tabla en CRLF (y la base también en CRLF):
+     ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla FAIL=0 
+
+S7 tabla con BOM al principio:
+     ❌ 1 entradas de doc/control/a2-deuda.tsv tienen MENOS líneas que las que dice la tabla: bájala con --a2-deuda   ❌ doc/control/a2-deuda.tsv tiene entradas por ENCIMA de la de la base verificada (sólo baja): FAIL=1 
+
+S8 una entrada sale de la base (se arregla Y.md y la base avanza) y luego VUELVE:
+     ❌ doc/control/a2-deuda.tsv tiene entradas por ENCIMA de la de la base verificada (sólo baja): FAIL=1 
+
+S9 traslado: se arregla una línea de X.md y aparece una en Y.md (el total no sube):
+     ❌ doc/control/a2-deuda.tsv tiene entradas por ENCIMA de la de la base verificada (sólo baja): FAIL=1 
+
+S10 traslado de CIFRA: se arregla un «99 jobs» de X.md y aparece un «98 jobs» en X.md:
+     ❌ doc/control/a2-deuda.tsv tiene entradas por ENCIMA de la de la base verificada (sólo baja): FAIL=1 
+

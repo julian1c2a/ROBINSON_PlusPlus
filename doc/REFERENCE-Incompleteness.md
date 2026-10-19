@@ -40,22 +40,22 @@ los literales de símbolo, hoy `sym!"…"`.
 >
 > **Build 133 jobs · 116 módulos activos** (Minimal 2 + Meta 112 + Full 2) **+ 0 en `cuarentena/`
 > + 43 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO cuenta como registro y `[A]` la exime.)*
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO contaba como registro y `[A]` la eximía. ✏️ Desde ADR‑169 la fecha ya no exime: las líneas de abajo llevan «Entonces:».)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
-> *(Y el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
-> *(Y el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de Rosser.)*
-> *(Y el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de Rosser.)*
-> *(Y el 2026-10-17, con ADR-150: 133 jobs y 116 módulos, por `Meta/RosserNumerales.lean`, la etapa 1 de Rosser.)*
-> *(Y el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de Rosser.)*
-> *(Y el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de Rosser.)*
-> *(Y el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de Rosser.)*
-> *(Y el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de Rosser.)*
-> *(Y el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la herramienta de T08.)*
-> *(Y el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
-> *(Y el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
-> *(Y el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
-> *(Y el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
-> *(Y el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
+> *(Entonces: el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
+> *(Entonces: el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-150: 133 jobs y 116 módulos, por `Meta/RosserNumerales.lean`, la etapa 1 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de Rosser.)*
+> *(Entonces: el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la herramienta de T08.)*
+> *(Entonces: el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
+> *(Entonces: el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
+> *(Entonces: el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
+> *(Entonces: el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
+> *(Entonces: el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -1326,7 +1326,7 @@ ax_axiomsCodeT_eq]` — la base sancionada de siempre, **menos `tc_cons`**.
 
 ⚠️ `goedel_first_undecidable_numeral` toma `Reflects` como **hipótesis META explícita**. La reducción 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 a ω‑consistencia (`reflects_of_omega`, §3.21) sigue vigente, pero **`NegVerifier` sigue abierto**:
-`⊬¬G` **no** está cerrado en la cadena real. Ver `PLAN-NEGVERIFIER.md`.
+`⊬¬G` **no** está cerrado en la cadena real. Ver `PLAN-NEGVERIFIER.md`. *(✏️ 2026‑10‑19, ADR‑169: así estaba entonces; desde ADR‑121 la demuestra `goedel_I_neg`. Lo cazó `[I]`.)*
 
 #### 3.24.6 `Meta/StrongInductionPrf.lean` — inducción fuerte en `Prf`
 

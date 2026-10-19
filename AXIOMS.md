@@ -407,7 +407,8 @@ goedel_second'      : [propext, choice, Quot.sound,
 real).
 
 **Gödel I — precisión (auditoría 2026-07-13):** la mitad **`⊬G`** (`goedel_first_real'`) es **real y
-sin postulado gödeliano alguno** ✅. La mitad **`⊬¬G`** (indecidibilidad) **NO está en la cadena real**:
+sin postulado gödeliano alguno** ✅. *(✏️ 2026‑10‑19, ADR‑169: registro de aquella auditoría; lo vigente, en §0.)*
+✏️ La mitad **`⊬¬G`** (indecidibilidad) **NO estaba** entonces en la cadena real (desde ADR‑121 la demuestra `goedel_I_neg`):
 se probó en la capa LEGACY (`Meta/Incompleteness.lean`) apoyándose en `provFormula_repr` —postulado
 **bicondicional** cuya dirección `.mp` (representabilidad **negativa**) **no se sigue de la
 consistencia simple**—, y se retiró en **F7a** junto con el módulo. **No revertir F7a: fue un arreglo

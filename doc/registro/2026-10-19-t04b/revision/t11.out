@@ -1,0 +1,4 @@
+  doc/REFERENCE-Kernel.md:         dice 99 FAIL=1 
+  doc/REFERENCE-Constantes.md:     FAIL=0 
+  doc/REFERENCE-Variantes.md:      FAIL=0 
+  doc/REFERENCE-Ejemplos.md:       FAIL=0 

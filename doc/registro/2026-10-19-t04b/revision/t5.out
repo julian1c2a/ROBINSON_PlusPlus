@@ -1,0 +1,57 @@
+===== S0: base SIN tabla y 2 líneas viejas; --a2-deuda-inicial (la creación)
+  ✓ la tabla, creada: 1 entradas
+  ⚠️  la base verificada no tiene doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 2 líneas en 1 entradas; hoy, 2
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+jobs	X.md	99	2
+===== S1: con la base que ya tiene la tabla, 3 líneas en vez de 2 (debe ser ROJO)
+  ❌ jobs: «99» en X.md, 3 línea(s), y la tabla dice 2 — una cifra vieja NUEVA en el cuerpo:
+  deuda declarada: 2 líneas en 1 entradas; hoy, 3
+FAIL=1
+===== S2 (vía b): la deuda llega a 0 y se BORRA la tabla vacía; luego, 5 líneas viejas NUEVAS con una tabla nueva
+  ✓ --a2-deuda: la tabla baja a 0 entradas
+  deuda declarada: 0 líneas en 0 entradas; hoy, 0
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+0
+   -- el commit que borra la tabla, contra la base BASE1:
+  deuda declarada: 0 líneas en 0 entradas; hoy, 0
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+   -- el commit con 5 cifras viejas NUEVAS, contra la base BASE2 (master tras el borrado):
+  ⚠️  la base verificada no tiene doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 5 líneas en 1 entradas; hoy, 5
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+===== S3 (vía b): en el commit de CREACIÓN (base sin tabla), una entrada DUPLICADA con «+inf» que el sort deja delante
+  ⚠️  la base verificada no tiene doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: +inf líneas en 2 entradas; hoy, 2
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+   -- después, 40 líneas viejas (la tabla dice 40, a mano), contra la base BASE3:
+  deuda declarada: 40 líneas en 1 entradas; hoy, 40
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+   -- lo mismo con «10» en vez de «+inf» (sort: «10» < «2»; el orden del fichero deja el 10 al final):
+  ⚠️  la base verificada no tiene doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 12 líneas en 2 entradas; hoy, 2
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+  deuda declarada: 10 líneas en 1 entradas; hoy, 10
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+===== S4 (a): el CAMBIO dentro de una clave: se arregla una línea vieja y se añade OTRA nueva con la misma cifra
+  deuda declarada: 2 líneas en 1 entradas; hoy, 2
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+===== S5 (c): --quick (JOBS vacío) con deuda de jobs en la tabla
+  ❌ 1 entradas de doc/control/a2-deuda.tsv tienen MENOS líneas que las que dice la tabla: bájala con --a2-deuda
+  deuda declarada: 2 líneas en 1 entradas; hoy, 0
+FAIL=1
+   -- y --a2-deuda con JOBS vacío BAJA la tabla, quitando la deuda de jobs:
+  ✓ --a2-deuda: la tabla baja a 0 entradas
+  deuda declarada: 0 líneas en 0 entradas; hoy, 0
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+FAIL=0
+0

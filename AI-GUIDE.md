@@ -362,8 +362,9 @@ make docsync                        # equivalente
 
 | | control | ¿rompe? |
 |---|---|---|
-| **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean y `sorry` — contra el estado REAL. Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
-| **[A2]** | 🆕 **las mismas cifras en el CUERPO** (de la línea 101 al final), con los mismos filtros de historicidad — §27.2 | ⚠️ aviso |
+| **[A]** | **cifras** en la **CABECERA** (primeras 100 líneas): jobs, módulos activos, conteo por capa, cuarentena, `axiom` de Lean, `sorry` y sondeos, también en negrita — contra el estado REAL. Exime un marcador de historia, no una fecha (ADR‑169). Un patrón sin ninguna aparición avisa **`control VACÍO`** (§27.1) | ✅ sí |
+| **[A2]** | **las mismas cifras en el CUERPO** (de la línea 101 al final, sin DECISIONS.md), con los mismos filtros — §27.2. Las viejas de hoy, en `doc/control/a2-deuda.tsv`, que sólo baja (`bash check-doc-sync.bash --a2-deuda`). ✏️ ADR‑169 | ✅ sí, con trinquete por línea |
+| **[I]** | **frases que un teorema vivo desmiente** («⊬¬G no existe» con `goedel_I_neg` declarado; Rosser o Löb «pendiente»), en los documentos y en los `.lean` de la librería, fuera de registro, citas y vallas. ADR‑169 | ✅ sí |
 | **[B]** | **citas muertas** en los docs autoritativos: toda cita entre comillas invertidas con forma de identificador o de ruta tiene que existir, o llevar un marcador a 100 bytes o menos, o estar en la deuda por cita (`doc/control/b-deuda.tsv`). ✏️ ADR‑166 | ✅ sí, con trinquete por cita |
 | **[E]** | 🆕 **frescura del TITULAR**: la fecha del banner de cada doc autoritativo contra la entrada más reciente del `CHANGELOG` — §27.3 | ⚠️ aviso |
 | **[C]** | **proyección**: todo módulo aparece en su catálogo (§1/§14) | ✅ sí |
@@ -425,6 +426,9 @@ exactamente el fallo de §27.1 por la otra puerta.
 ⇒ **La reparación no es quitar el límite: es añadir un pase que AVISE.** El bloque **`[A2]`**
 recorre el fichero entero desde la línea 101 con los mismos filtros de historicidad, y **no rompe**.
 Lo que rompe sigue siendo la cabecera.
+✏️ **2026‑10‑19 (ADR‑169, T04b): `[A2]` rompe**, con trinquete por línea: las cifras viejas del cuerpo de ese día
+están en `doc/control/a2-deuda.tsv`, y una línea nueva es rojo. Y ⛔ **una fecha ya no es un marcador**: la fecha
+eximía toda la línea, y no dice que la cifra sea de ese día. Se marca con «histórico», «previo», «entonces»…
 
 **Resultado de la primera ejecución**: 52 líneas. Ocho eran afirmaciones de estado **actual** y
 falsas —incluida una **doble falsedad** en la fila autoritativa de Gödel de

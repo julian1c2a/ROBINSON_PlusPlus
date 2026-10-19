@@ -1,0 +1,4 @@
+  B_DECLS_OK=0:                                              NO PUDE MEDIR FAIL=1 
+  sin goedel_I_neg en DECLS:                                 NO PUDE MEDIR FAIL=1 
+  todo vivo:                                                 doc.md:2 doc.md:3 doc.md:4 FAIL=1 
+  rosser y lob RENOMBRADOS (rosser_teorema, lob_teorema):    doc.md:4 FAIL=1 

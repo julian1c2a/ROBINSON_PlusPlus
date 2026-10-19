@@ -1,0 +1,360 @@
+REVISIÓN ADVERSARIAL DE T04b (ADR-169): [A], [A2] e [I] de check-doc-sync.bash (RPP, sin commitear) y FOL 2897e1b
+=====================================================================================================================
+Fecha: 2026-10-19. Revisor: subagente (sólo lectura en los dos repos; todo en este directorio).
+Objeto: `git -C RPP diff check-doc-sync.bash` (copia literal: rpp-check.bash; comprobé al final que el fichero del
+árbol NO cambió durante la revisión) y `git -C FOL show 2897e1b -- check-doc-sync.bash` (fol-check.bash).
+
+MÉTODO
+- harness.bash corre VERBATIM los bloques [A], [A2] e [I] de rpp-check.bash (los extrae por sus líneas de inicio y de
+  fin) en un directorio de juguete, con las cifras inyectadas (JOBS=133, ACTIVE=116, META=112, QUAR=0, AXIOMS=0,
+  SORRY=0, SOND=43: las de hoy, medidas con cierre-imports.bash y `ls sondeos/*.lean`). harness_fol.bash, lo mismo
+  para [A]/[A2] de FOL (ACTIVE=54, QUAR=0, AXIOMS=0, SORRY=0).
+  (t10 le añadió `SCRIPT=${MUT:-…}` para correr mutantes; por omisión es la copia sin mutar.)
+- wt/ = copia de los documentos del árbol de trabajo (re-copiados cuando vi que el proceso de mutantes había
+  insertado una línea en NEXT-STEPS.md); head/ = `git show HEAD:`; fol/ = `git show HEAD:` de FOL.
+- Repositorios de juguete (t5_repo, t5b_repo, t13_repo) para el techo de [A2] sobre la base.
+- mawk: WSL, mawk 1.3.4 20260129 (la CI tiene 20240123; no la tengo). grep de la CI: WSL tiene GNU grep 3.12;
+  en local, GNU grep 3.0 (msys).
+- MEDIDO = reproducido aquí con el guion que se cita. INFERIDO = deducido leyendo el código, sin reproducir.
+
+RESUMEN POR GRAVEDAD
+  #   clase  qué                                                                          estado
+  1   (a)    EXC_A exime por SUBCADENA: «era » en «fuera/primera/manera», «antes» en       MEDIDO en el árbol REAL
+             «constantes/variantes»: CURRENT-STATUS-PROJECT.md:48 dice «**1** `axiom` de
+             Lean» (hoy 0) y [A] da verde por «fuera de las listas»
+  2   (a)    «→», «->», «~», «…»-con-dígito y rango eximen la línea ENTERA, estén donde     MEDIDO (sintético +
+             estén respecto de la cifra (13 % de las líneas de los documentos, eximidas)    medición de cobertura)
+  3   (b)    [A2]: con la deuda a 0, borrar la tabla vacía deja a la base sin tabla, y el   MEDIDO (juguete)
+             commit siguiente sube la deuda SIN techo y en verde
+  4   (b)    [A2]: clave DUPLICADA en el commit de creación (base sin tabla): el sort deja  MEDIDO (juguete,
+             la cifra real al final y el orden del fichero la inflada → techo inflado       gawk y mawk)
+  5   (a)    Un byte no UTF-8 en la línea la esconde de [A]/[A2] (en UTF-8, que es lo de     MEDIDO (local y WSL)
+             local y lo de la CI); un NUL en un documento ciega todo lo que va detrás
+  6   (a)    EXC_A se aplica también a la RUTA («N:doc/…:texto»): un REFERENCE-Constantes   MEDIDO (sintético)
+             o REFERENCE-Ejemplos (entran solos por `ls doc/REFERENCE-*.md`) queda exento
+  7   (a)    [I]: evasiones (mayúsculas acentuadas, NBSP/dos espacios, «.» en la ventana,   MEDIDO (sintético)
+             frase partida, símbolo entre «…», sección «registro» falsa, «DOCUMENTO
+             HISTÓRICO» en cualquier frase de las 10 primeras líneas, marcadores por subcadena)
+  8   (a)    [I]: el autotest deja VIVOS mutantes que callan reglas (Rosser roto;            MEDIDO (mutantes)
+             hist_doc ampliado)
+  9   (a)    [I]: si `rosser` o `lob` cambian de nombre, sus reglas se apagan en silencio   MEDIDO
+  10  (a)    [I]: un fichero de entrada que falta mata awk (fatal, stderr tirado, estado    MEDIDO (gawk y mawk);
+             no mirado) y todo lo que va detrás queda sin mirar → ✓                          hoy lo tapa [B] (INFERIDO)
+  11  (a)    [I]: la valla no distingue ``` de ~~~: un «~~~» dentro de ``` descompensa y     MEDIDO (sintético); los
+             el resto del documento queda exento                                            documentos de hoy, sanos
+  12  (a)    [A2]: el cambio DENTRO de una clave (se arregla una línea vieja y entra otra    MEDIDO (juguete)
+             con la misma cifra en el mismo documento) es verde
+  13  (a)    [A2] no mira «Meta (N +» ni «N en `cuarentena/`»; [A] y [A2] sólo la PRIMERA   MEDIDO (juguete)
+             cifra de cada línea (previo a T04b)
+  14  (a)    Patrones estrechos: FOL REFERENCE.md:31 (cabecera) dice «**4 `axiom`** en el   MEDIDO en FOL HEAD
+             build» (hoy 0) y no casa (falta «de Lean»); «N `sorry`» con comillas tampoco
+  15  (c)    `--quick` (JOBS vacío): las 16 entradas «jobs» de la tabla salen como «menos     MEDIDO (juguete)
+             líneas» → rojo siempre; y `--a2-deuda --quick` BAJA la tabla quitándolas
+  16  (c)    [I]: frases CIERTAS marcadas (la ventana cruza «;» y «,»)                      MEDIDO (sintético); hoy 0
+  17  (c)    [A2]: renombrar un documento con deuda es rojo hasta saldarla (sin el «-M» de [B]) INFERIDO de S9/S10
+  18  (d)    C frente a UTF-8: «[^»]» y «HISTÓRICO» se portan distinto; en los documentos    MEDIDO (sintético y real)
+             de HOY [A] y [A2] dan lo mismo en C y en es_ES.UTF-8
+  19  (d)    El número de línea que imprimen [A]/[A2] es el de la región concatenada         MEDIDO
+  20  (d)    BOM en la tabla: rojo con mensaje engañoso (CRLF va bien)                       MEDIDO
+  21  (d)    I_LEAN deja fuera el barril raíz ROBINSON_PlusPlus.lean (24 líneas de comentario) MEDIDO
+  22  (d)    [A2] cuenta como deuda líneas de una sección «🗄️ Registro» que [I] exime          MEDIDO
+  23  (d)    `cut -d: -f2` con «:» en la ruta; mawk+CRLF en la regla «no est(a|á)[^a-z]»;    no reproducible en la
+             `{0,60}` en awk contra la regla de portabilidad del proyecto                    práctica / INFERIDO
+Lo que se intentó y NO es una vía (MEDIDO): tabla en CRLF; una entrada que sale de la base y vuelve; trasladar
+deuda a otro documento o a otra cifra; subir una cuenta; la guarda B_DECLS_OK/goedel_I_neg; el autotest de [I] bajo
+mawk; I_LEAN = los 117 .lean del cierre (menos el barril raíz); en el árbol real [I] no marca nada y lo que exime hoy
+es legítimo (secciones de registro, ✏️, GODEL-STATUS.md declarado histórico). Detalle al final.
+
+---------------------------------------------------------------------------------------------------------------------
+1. (a) EXC_A EXIME POR SUBCADENA — verde falso EN EL ÁRBOL REAL                                              MEDIDO
+---------------------------------------------------------------------------------------------------------------------
+EXC_A = 'hist(o|ó)rico|previo|antes|era |fueron|→|->|…' se aplica con `grep -viE` a la línea entera, sin límites de
+palabra. «era » casa dentro de «fuera », «primera », «manera », «tercera », «cualquiera », «entera », «frontera »; «antes»
+dentro de «constantes», «variantes», «mutantes», «restantes», «importantes».
+- Caso real (cabecera, donde [A] tiene que dar rojo): CURRENT-STATUS-PROJECT.md:48 (igual en HEAD, en el índice y
+  en el árbol):
+    | `Minimal/Axioms.lean` | 0 | ✅ Complete — … Contiene **1** `axiom` de Lean (`ax_axiomsCodeT_eq`); … ⚠️
+    `ax_tc_cons` sigue como `def` en `:827` pero **fuera de las listas** — definición muerta |
+  `ax_axiomsCodeT_eq` se retiró con ADR-115 (Minimal/Axioms.lean:1088 lo dice) y AXIOMS = 0. El patrón nuevo con
+  negrita SÍ casa «1** `axiom` de Lean» (es justo el caso que el comentario de ADR-169 dice arreglar), pero la línea
+  queda eximida SÓLO por «fuera ». Reproducción: `bash harness.bash wt A` → «✓ sin cifras obsoletas»; con «fuera de»
+  cambiado a «no en» (directorio t3/) → «✗ axiom de Lean: dice 1, real 0» (t3 se hizo con sed sobre la copia).
+- Cobertura (t4_cobertura_exc.bash wt): de 9636 líneas no vacías de los 16 documentos, EXC_A exime 1293 (13 %);
+  «era » está en 460 líneas y en 311 apariciones va DENTRO de otra palabra (fuera 90, primera 38, tercera 31,
+  escalera 23, entera 22, frontera 15); «antes», 239 líneas, 102 dentro de palabra (constantes 46, variantes 20,
+  mutantes 12, restantes 8).
+- Lo mismo en [I]: su lista de marcadores de línea (/✏️|hist(o|ó)ric|registro|era |falso|ya no |antes|previo|
+  correcci|inexact/) es por subcadena. t7_I_evasiones.bash: «La primera mitad, ⊬¬G, no existe», «Las constantes de
+  ⊬¬G no existen», «⊬¬G está pendiente, fuera de toda duda», «Rosser está por hacer; las variantes, también»,
+  «⊬¬G no existe; los falsos positivos, aparte», «⊬¬G: sin cerrar (véase el registro)», «Ya no hay excusa: ⊬¬G
+  sigue abierta» y (t7c) «⊬¬G no existe (lo confirma el histórico de commits)»: NINGUNA se marca.
+ARREGLO MÍNIMO: límites de palabra. En grep (UTF-8):
+  '(^|[^[:alnum:]_])(hist(o|ó)ric[oa]s?|previo|antes|era|fueron|entonces|ya no|ejemplo|umbral)([^[:alnum:]_]|$)'
+y, si se quiere modo byte (C), tratar los bytes ≥ 0x80 como letras: '(^|[^A-Za-z0-9_'$'\x80''-'$'\xff'']) (era|…)…'.
+En el awk de [I] (LC_ALL=C), lo mismo: antes de probar los marcadores, `m = " " l " "; gsub(/[^a-z0-9_\200-\377]/,
+" ", m)` y probar `m ~ / (era|antes|falso|registro|previo|ya no|…) /` (comprobar que mawk acepta \200-\377; si no,
+gsub de la puntuación ASCII a espacio). Y un caso de autotest por marcador «dentro de palabra» que NO debe eximir.
+
+---------------------------------------------------------------------------------------------------------------------
+2. (a) «→», «->», «~», «…»-con-dígito y rango eximen la línea ENTERA                       MEDIDO (sintético + cobertura)
+---------------------------------------------------------------------------------------------------------------------
+t1_exc_a.bash (18 líneas «El build tiene 99 jobs …», JOBS=133): en UTF-8 [A] sólo ve 2; eximen, entre otras,
+«(ver «ADR-121»)», «| T04 → T05 |», «`A -> B` compila», «~~viejo~~ nuevo», «como dice «la tabla 3»», «(líneas
+22-38 de AI-GUIDE)». Ninguna de esas exenciones dice nada de la cifra: dicen que en la línea hay una flecha, una cita
+con un número, un tachado o un rango.
+- Cobertura (t4): «→» 358 líneas, «->» 50, «~» 75, «[^»]*[0-9]» 61, rango 18.
+- Real: CURRENT-STATUS-PROJECT.md (cuerpo) «- **2026-06-11 — `Full/Lists.lean` … Build verde (29 jobs)» y otras dos
+  entradas de diario quedan exentas SÓLO por el «→» de un tipo de Lean (`φ : Term → Formula`, `a<b → σa<b`)
+  (t2_medir_exenciones.bash wt, columnas «[→]»). Son historia, pero las exime la flecha de una fórmula, no un
+  marcador: con la fecha fuera, la flecha hace de fecha.
+ARREGLO MÍNIMO: (i) la flecha sólo como transición numérica: '[0-9](\*\*)? ?(→|->) ?(\*\*)?[0-9]'; (ii) «~» sólo
+como '~ ?[0-9]' o '~~'; (iii) «…»: QUITAR los tramos «…» (y ~~…~~) de la línea ANTES de buscar el patrón, en vez de
+eximir la línea (es lo que ya hace [I] con index/substr; vale en C y en mawk); (iv) el rango, pegado a la cifra:
+'[0-9]{1,3}-[0-9]+(\*\*)? jobs' (o probar el rango sobre lo que casó con el patrón, no sobre la línea).
+
+---------------------------------------------------------------------------------------------------------------------
+3. (b) [A2]: BORRAR LA TABLA VACÍA quita el techo                                                MEDIDO (t5, S2)
+---------------------------------------------------------------------------------------------------------------------
+t5_a2_trinquete.bash, S2 (repositorio de juguete): la deuda baja a 0 (`--a2-deuda` deja sólo la cabecera); un commit
+BORRA doc/control/a2-deuda.tsv (limpieza natural de un fichero «vacío»): contra la base que tenía la tabla sale VERDE
+(A2_SOBRE recorre las líneas de la tabla de hoy, que no hay). Con ese commit como base, el siguiente añade 5 líneas
+viejas NUEVAS y crea la tabla con `--a2-deuda-inicial`: «⚠️ la base verificada no tiene … es la que se crea» y VERDE.
+Es la misma vía que la ventana de arranque de hoy: mientras origin/master no tenga la tabla (161ad34 no la tiene),
+cualquier push a ci/… es «el que se crea» y no tiene techo.
+ARREGLO MÍNIMO: (1) que la tabla del árbol tenga que existir (con 0 entradas, sólo la cabecera): si falta, rojo;
+(2) «la base no tiene la tabla» sólo exime si la base es ANTERIOR al trinquete: p. ej.
+  `git show "$A2_BASE:check-doc-sync.bash" | grep -q 'a2-deuda.tsv'` → si la base ya conocía la tabla, su ausencia
+  es una tabla VACÍA (techo 0), no «la que se crea»; o fijar el único commit sin tabla admitido (161ad34).
+
+---------------------------------------------------------------------------------------------------------------------
+4. (b) [A2]: CLAVE DUPLICADA en el commit de creación → techo inflado                          MEDIDO (t5, S3)
+---------------------------------------------------------------------------------------------------------------------
+A2_DIF lee la tabla ORDENADA (LC_ALL=C sort) y se queda con la ÚLTIMA aparición de cada clave; A2_SOBRE lee la tabla de
+la base CRUDA (`git show`) y se queda también con la última, pero en el ORDEN DEL FICHERO. Con dos líneas de la misma
+clave, «jobs X.md 99 2» y «jobs X.md 99 10» (en ese orden en el fichero), el sort pone «10» delante de «2»: hoy (2)
+cuadra con la tabla y el commit es verde; en la base queda 10. Después, 10 líneas viejas con la tabla a mano a 10:
+VERDE. Con «+inf» en vez de «10», lo mismo con gawk (local) hasta 40 líneas; con mawk 20260129 «+inf» vale 0 y esa
+variante falla, pero la de «10» pasa con los dos (t7_t5_mawk.out).
+Sólo se puede colar en un commit cuya base no tenga la tabla (el de creación —el de T04b— o el de la vía 3).
+ARREGLO MÍNIMO: validar la tabla del árbol Y la de la base: cada línea no comentario con exactamente 4 campos, el
+4.º '^[1-9][0-9]*$', la 3.ª '^[0-9]+$', y ninguna clave repetida; si no, rojo («tabla mal formada»). (Y el resumen
+«deuda declarada: +inf líneas» deja de ser posible.)
+
+---------------------------------------------------------------------------------------------------------------------
+5. (a) Byte no UTF-8 o NUL en un documento: [A]/[A2] no lo ven                                 MEDIDO (t9, local y WSL)
+---------------------------------------------------------------------------------------------------------------------
+[A] y [A2] usan `grep -nE … 2>/dev/null` sin -a y en la configuración regional del entorno. En UTF-8 (local
+es_ES.UTF-8; WSL C.UTF-8 con grep 3.12, como la CI) una línea con un byte inválido (0xFF) se SUPRIME de la salida y el
+aviso va a stderr, que se tira: «Estado: el build tiene 99 jobs. \xff» no sale (en C sí). Un NUL en cualquier documento
+hace que grep suprima TODO lo que sigue en la región concatenada, en C y en UTF-8: con A.md (NUL) delante de B.md (cifra
+vieja), [A] da FAIL=0. Ningún otro control del repo valida la codificación (busqué iconv/binary/grep -a: nada).
+ARREGLO MÍNIMO: `grep -a` en [A]/[A2] (y en warn_num/check_num) y una comprobación previa: todo documento de $DOCS es
+UTF-8 válido y sin NUL (p. ej. `LC_ALL=C.UTF-8 grep -naxv '.*' "$d"` lista las líneas inválidas; `tr -d '\0' < "$d" |
+cmp -s - "$d"` detecta NUL) → si no, «NO PUEDO MEDIR [A]» y rojo.
+
+---------------------------------------------------------------------------------------------------------------------
+6. (a, latente) La RUTA del documento también exime                                             MEDIDO (t11)
+---------------------------------------------------------------------------------------------------------------------
+Las regiones se construyen con `sed "s|^|$d:|"` y `grep -n`, y EXC_A se prueba sobre «N:doc/REFERENCE-X.md:texto».
+Un documento cuya ruta contenga «antes», «previo», «ejemplo», «entonces», «fueron», «umbral», «histórico» o «~» queda
+exento ENTERO. RPP añade los REFERENCE solo (`ls doc/REFERENCE-*.md`): doc/REFERENCE-Constantes.md, -Variantes.md y
+-Ejemplos.md con «el build tiene 99 jobs» dan FAIL=0; doc/REFERENCE-Kernel.md, FAIL=1. Hoy ninguna ruta lo hace.
+ARREGLO MÍNIMO: probar la exención sobre el TEXTO: `grep -nE "$pat" "$REG" | while …; txt=${line#*:}; txt=${txt#*:};
+printf '%s' "$txt" | grep -qiE "$EXC" && continue` (o filtrar con awk sobre el campo 3 en adelante).
+
+---------------------------------------------------------------------------------------------------------------------
+7. (a) [I]: evasiones                                                       MEDIDO (t7, t7b, t7c, t7d; gawk y mawk)
+---------------------------------------------------------------------------------------------------------------------
+Con goedel_I_neg, rosser y lob vivos, NO se marcan (además de los marcadores por subcadena del n.º 1):
+- mayúsculas acentuadas: «⊬¬G NO ESTÁ cerrada», «LÖB está pendiente» (tolower en C sólo pliega ASCII); sí se marcan
+  «NO EXISTE» y «PENDIENTE»;
+- entre ⊬ y ¬G: un NBSP, dos espacios, «(¬G)»; otras negaciones: «⊬∼G», «⊬ ~G», «$\nvdash \neg G$», «⊬ neg G»,
+  «⊬¬𝐺»; «⊢¬G no es derivable y sigue abierta»;
+- un «.» en la ventana de 60 bytes: «⊬¬G (cf. ADR-121) no existe», «véase el apartado 3.2, no existe»; o más de 60
+  bytes («⊬¬G —la que importa…— no existe»);
+- la frase partida en dos líneas (párrafo con salto: «Lo que todavía falta es la mitad / ⊬¬G»);
+- el SÍMBOLO entre comillas latinas, uso corriente para un término: «La mitad «⊬¬G» no existe», «El teorema de
+  «Rosser» está pendiente», ««Löb» está por hacer» — la quita de «…» se come el símbolo (t7d). Hoy hay 0 usos así;
+- una sección «registro» falsa: «## Estado actual (sin registro aparte)» exime todo lo que cuelga de ella;
+- «DOCUMENTO HISTÓRICO» en CUALQUIER frase de las 10 primeras líneas («Esto no es un DOCUMENTO HISTÓRICO: es el
+  estado.») exime el documento entero;
+- vocabulario: la regla de Löb no tiene «abiert» («Löb sigue abierto»), la de Rosser no tiene «falta».
+Las más realistas: las del n.º 1, la mayúscula acentuada y la frase partida. El resto son adversariales.
+ARREGLO MÍNIMO: normalizar la línea antes de las reglas: plegar Á/É/Í/Ó/Ú/Ö/Ñ (gsub de "\303\201"→"\303\241", etc.),
+NBSP y espacios repetidos → un espacio; no quitar un tramo «…» que contenga un SÍMBOLO de las reglas (o quitar sólo
+los «…» con un espacio dentro, que son frases citadas, no términos); hist_doc sólo con el marcador en la línea de
+`**Last updated:**`/banner o a principio de línea; ampliar el vocabulario de rosser/lob («abiert», «falta», «sin
+cerrar»); unir las líneas de un párrafo markdown (hasta la línea en blanco) antes de probar.
+
+---------------------------------------------------------------------------------------------------------------------
+8. (a, latente) El autotest de [I] no mata los mutantes que lo callan                           MEDIDO (t10)
+---------------------------------------------------------------------------------------------------------------------
+t10_I_mutantes.bash corre [I] verbatim con una copia mutada del script y el autotest de salida exacta («2;3;5;15;»):
+  M1 regla de Rosser rota (rosser→rosserX): VIVO — «Rosser está pendiente.» deja de marcarse (el autotest sólo
+     prueba Rosser NO vivo; la regla nunca se ejerce en positivo).
+  M2 hist_doc con /HIST(O|Ó)RICO/ sin «DOCUMENTO»: VIVO — un documento con «HISTÓRICO» en las 10 primeras líneas
+     deja de mirarse entero.
+  M4 la sección de registro también con un título de nivel 1: VIVO (sin efecto en estos documentos).
+  M5 sin «falta» en la regla 1 y M6 un marcador que lo exime todo: MUERTOS.
+ARREGLO MÍNIMO: en el autotest, Rosser vivo con una línea positiva y el «no vivo» con una regla de juguete; una línea
+«HISTÓRICO» (sin «DOCUMENTO») en la cabecera que NO exima; un «# Registro» de nivel 1 que NO exima; una entrada .lean;
+y una línea por cada marcador «dentro de palabra» que NO exima (n.º 1).
+
+---------------------------------------------------------------------------------------------------------------------
+9. (a, latente) Las reglas de rosser y lob se apagan si el símbolo cambia de nombre               MEDIDO (t12)
+---------------------------------------------------------------------------------------------------------------------
+La guarda sólo pide goedel_I_neg en $DECLS (funciona: B_DECLS_OK=0 o sin goedel_I_neg → «NO PUDE MEDIR», rojo). Con
+`rosser`/`lob` renombrados (rosser_teorema, lob_teorema) [I] sólo marca la línea de ⊬¬G y calla «Rosser está
+pendiente» y «Löb está pendiente».
+ARREGLO MÍNIMO: para cada regla, si su SÍMBOLO no está en $DECLS, «NO PUDE MEDIR [I]: la regla de X no tiene símbolo»
+(rojo), en vez de apagarla.
+
+---------------------------------------------------------------------------------------------------------------------
+10. (a, latente) Un fichero que falta ciega a [I] desde ahí                     MEDIDO (t7, gawk 5.4 y mawk 20260129)
+---------------------------------------------------------------------------------------------------------------------
+`I_HITS=$(LC_ALL=C awk "$I_AWK" … $DOCS $I_LEAN 2>/dev/null)`: con un fichero que no existe, gawk y mawk terminan
+(«fatal: cannot open file», salida 2) y lo que va detrás no se mira; el stderr se tira y el estado no se mira →
+«✓ ninguna frase…». (t7: DOCS="noexiste.md doc2.md doc.md" → ✓ con frases falsas en doc.md y en X.lean.) [A]/[A2]
+tienen `[ -e "$d" ] || continue`; [I] no. Hoy lo tapa [B]: B_DOCS_LISTA es la misma lista y b-control.bash:41 da
+rojo si falta un documento (INFERIDO leyendo el código; no lo corrí con lake). Pero [I] imprime ✓.
+ARREGLO MÍNIMO: filtrar `[ -e ]` como [A] y mirar el estado: `I_HITS=$(…) || { echo "❌ NO PUDE MEDIR [I]"; I_FAIL=1; }`
+(sin 2>/dev/null, o guardando stderr).
+
+---------------------------------------------------------------------------------------------------------------------
+11. (a) Valla descompensada                                                                      MEDIDO (t7, L33–L37)
+---------------------------------------------------------------------------------------------------------------------
+`/^ {0,3}(```|~~~)/ { valla = !valla }` no recuerda con qué se abrió: un «~~~» dentro de un bloque ``` lo «cierra» (la
+línea siguiente, dentro del bloque, se marca: rojo falso) y el ``` de cierre lo «abre»: TODO lo que sigue queda exento
+(L37 «⊬¬G no existe» no se marca). En los 16 documentos de hoy todas las vallas van por pares y ninguna es ~~~
+(medido): latente.
+ARREGLO MÍNIMO: guardar la valla de apertura (carácter y longitud) y cerrar sólo con una igual o más larga del mismo
+carácter (CommonMark).
+
+---------------------------------------------------------------------------------------------------------------------
+12. (a) [A2]: cambio dentro de la misma clave                                                    MEDIDO (t5, S4)
+---------------------------------------------------------------------------------------------------------------------
+La clave es (etiqueta, documento, cifra) y el valor un recuento: si en X.md se arregla una línea «99 jobs» y se añade
+otra afirmación NUEVA y falsa «hoy el build tiene 99 jobs», el recuento no cambia: VERDE. Es propio de un trinquete por
+recuento ([B] tiene lo mismo por cita).
+ARREGLO (opcional, con coste): huella por línea (hash del texto normalizado) en vez de recuento; entonces tocar una
+línea con deuda obliga a arreglar su cifra. Si no se adopta, decirlo en el ADR como límite conocido.
+
+---------------------------------------------------------------------------------------------------------------------
+13. (a) Lo que [A2] no mira                                                                      MEDIDO (t13)
+---------------------------------------------------------------------------------------------------------------------
+warn_num se llama para jobs, módulos activos, axiom, sorry y sondeos; NO para «Meta (N +» ni para «N en
+`cuarentena/`», que [A] sí mira en la cabecera: «Hoy: 7 módulos en `cuarentena/` y Meta (99 + 3 barriles).» en el
+cuerpo → verde (QUAR=0, META=112). Y, como en [A] (previo a T04b), sólo la PRIMERA cifra de cada línea (`grep -oE … |
+head -1`): «133 jobs; …; README: 120 jobs.» → verde.
+ARREGLO MÍNIMO: añadir los dos warn_num; recorrer todas las apariciones (`grep -oE "$pat"` línea a línea, sin head -1).
+
+---------------------------------------------------------------------------------------------------------------------
+14. (a) Patrones estrechos (previo a T04b; la negrita no lo cubre)                       MEDIDO (t6, FOL HEAD 2897e1b)
+---------------------------------------------------------------------------------------------------------------------
+FOL REFERENCE.md:31, en la cabecera, columna «lo medido»: «**2 `lean_lib`** … · **4 `axiom`** en el build (+1 en
+`cuarentena/Completeness.lean`) · **0 sorry**» — FOL tiene hoy 0 `axiom` (su CURRENT-STATUS:28 y la misma fila en
+CURRENT-STATUS:114, ya corregida a «0 `axiom`»). El patrón exige «de Lean» y no la ve. Y el de sorry, '[0-9]+(\*\*)?
+sorrys?', no ve «**0 `sorry`**» (con comillas invertidas): 1 línea en la cabecera de RPP y 2 en la de FOL, 4 en todo
+RPP; hoy todas dicen 0 (latente).
+ARREGLO MÍNIMO: axiom '[0-9]+(\*\*)? `?axiom`?s?(\*\*)? (de Lean|en el build)'; sorry '[0-9]+(\*\*)? `?sorrys?`?'.
+
+---------------------------------------------------------------------------------------------------------------------
+15. (c) `--quick`: rojo siempre, y `--a2-deuda --quick` borra la deuda de jobs                    MEDIDO (t5, S5)
+---------------------------------------------------------------------------------------------------------------------
+Con JOBS vacío (--quick, o lake fuera del PATH), `[ -n "$JOBS" ] && warn_num … jobs` no corre: las entradas «jobs» de
+la tabla (16 de las 23 de hoy) salen en el END de A2_DIF como «MENOS líneas» → rojo. Y `--a2-deuda` con JOBS vacío no
+ve nada que suba y REESCRIBE la tabla SIN las entradas de jobs; subida así, la CI (que mide jobs) daría rojo con todas
+como «nuevas». No es verde falso, pero hace inservible --quick en local y es una trampa.
+ARREGLO MÍNIMO: comparar sólo las etiquetas MEDIDAS (filtrar de A2_TAB las de una cifra vacía y decir «jobs: SIN
+MEDIR»), y negarse a `--a2-deuda` si falta alguna cifra.
+
+---------------------------------------------------------------------------------------------------------------------
+16. (c) [I]: frases ciertas marcadas                                                         MEDIDO (t7b); hoy 0 casos
+---------------------------------------------------------------------------------------------------------------------
+«la mitad ⊬¬G está demostrada (goedel_I_neg); lo que falta es Con'», «⊬¬G se cerró en ADR-121, y la pregunta abierta
+es otra», «Löb (ADR-159) cerrado; Rosser sin la hipótesis E, pendiente de pulir»: las tres se marcan (la ventana
+[^.|]{0,60} cruza «;» y «,»). En el árbol real, [I] no marca nada (t8), así que es latente.
+ARREGLO MÍNIMO: cortar la ventana también en «;» y «:» y acortarla ([^.|;:]{0,25}); o exigir que el verbo negativo
+siga al símbolo sin otro verbo en medio.
+
+---------------------------------------------------------------------------------------------------------------------
+17. (c) Renombrar un documento con deuda                                                 INFERIDO (de t5b, S9 y S10)
+---------------------------------------------------------------------------------------------------------------------
+Las claves llevan la ruta: un `git mv` deja todas sus entradas como nuevas («por ENCIMA de la base», rojo) hasta
+saldarlas. b-control.bash sigue los renombrados (`git diff -M`); [A2] no. Lo de S9/S10 (trasladar deuda a otro
+documento o a otra cifra, rojo) es lo que se quiere; esto es su coste.
+ARREGLO (si se quiere): el mismo mapa de movidos que [B].
+
+---------------------------------------------------------------------------------------------------------------------
+18. (d) C frente a UTF-8                                                           MEDIDO (t1 sintético; real con harness)
+---------------------------------------------------------------------------------------------------------------------
+El grep de EXC_A corre en la configuración del entorno. En C, «[^»]» es una clase de BYTES (excluye 0xC2 y 0xBB): un
+«·» (C2 B7), «¬» (C2 AC), «§», un NBSP… entre «« y el dígito impide la exención; «HISTÓRICO» en mayúsculas sólo exime
+en UTF-8 (-i no pliega Ó en C); y la línea mal codificada sólo se suprime en UTF-8 (n.º 5). t1: en C se ven las líneas
+9, 15, 16, 17, 18; en UTF-8 (local y WSL) sólo 16 y 17. La nota del propio script sobre `hist[oó]rico` vale igual para
+«[^»]». En los documentos de HOY no hay diferencia: [A] verde y [A2] «46 líneas en 23 entradas; hoy, 46» en C y en
+es_ES.UTF-8 (medido). La CI corre con LANG=C.UTF-8 (INFERIDO: es lo que traen los runners de Ubuntu; no lo pude ver),
+igual que en local: no hay divergencia local/CI salvo que alguien lo lance con LC_ALL=C (más estricto: rojos).
+ARREGLO MÍNIMO: o fijar LC_ALL a una UTF-8 en esos grep, o (mejor, n.º 2) quitar los «…» con el bucle de index de [I].
+
+---------------------------------------------------------------------------------------------------------------------
+19–23. (d) Cosméticos y no reproducibles
+---------------------------------------------------------------------------------------------------------------------
+19 (MEDIDO) [A]/[A2] imprimen el número de línea de la REGIÓN concatenada: la línea 48 de CURRENT-STATUS-PROJECT.md
+   sale como «148:CURRENT-STATUS-PROJECT.md:…». Arreglo: construir la región con
+   `awk '{ print FILENAME ":" FNR ":" $0 }'` (y entonces sin `grep -n`).
+20 (MEDIDO, t5b S7) Una BOM al principio de la tabla: su primera línea deja de empezar por «#», entra como entrada y
+   da dos rojos con mensajes engañosos. CRLF va bien (S6). Arreglo: quitar la BOM o validar (n.º 4).
+21 (MEDIDO) I_LEAN = `grep '^ROBINSON_PlusPlus/.*[.]lean$'` sobre $CIERRE: los 117 módulos del cierre (que [L] iguala
+   con el disco y con git), pero no el barril raíz ROBINSON_PlusPlus.lean, que tiene un bloque de comentario de 24
+   líneas. Arreglo: '^ROBINSON_PlusPlus(/.*)?[.]lean$'. (En los .lean no hay vallas ni secciones: un «## Registro»
+   dentro de un docstring no exime; hoy no hay casos.)
+22 (MEDIDO) [A2] cuenta como deuda REFERENCE.md:389 («**Estado 2026‑09‑10h.** Build **145 jobs** … **61
+   `sondeos/`**»), que cuelga de «### 🗄️ Registro del 2026‑09‑10h»: la misma línea es historia para [I] y deuda para
+   [A2]. Inofensivo (sentido seguro); decidir uno.
+23 (no reproducible / INFERIDO) `cut -d: -f2` para sacar el documento: rompe con «:» en la ruta, que NTFS no admite
+   y que la lista de documentos no tiene. — Con mawk sobre un checkout CRLF (WSL), la regla «no est(a|á)[^a-z]» casa
+   a final de línea gracias al \r (t14: CRLF rojo, LF verde); el gawk de msys quita el \r (los dos verdes) y la CI es
+   LF: sin divergencia práctica. — [I] usa intervalos en awk ({0,60}, {0,30}, {0,3}, {1,6}) contra la regla de
+   portabilidad del proyecto («sin {n} en las regex», memoria reference_wsl_portabilidad); con mawk 20260129 (WSL)
+   funciona y el autotest pasa; con el 20240123 de la CI no lo pude probar. Si no los admitiera, el autotest fallaría
+   («NO PUDE MEDIR [I]», rojo visible), no un verde. — `git merge-base --is-ancestor` corre sin
+   GIT_NO_REPLACE_OBJECTS (sólo se exporta después, en [B]): un `git replace` local podría fingir la ascendencia; en
+   la CI no hay refs/replace.
+
+---------------------------------------------------------------------------------------------------------------------
+LO QUE SE PROBÓ Y AGUANTA (MEDIDO)
+---------------------------------------------------------------------------------------------------------------------
+- t5 S0/S1: creación con la base sin tabla (aviso), y una línea de más con la base que ya tiene la tabla: rojo.
+- t5b S6: tabla y base en CRLF: verde correcto. S8: una entrada que sale de la base (la base avanza sin ella) y
+  vuelve: rojo. S9: trasladar una línea de X.md a Y.md sin subir el total: rojo. S10: cambiar la cifra (99→98) en el
+  mismo documento: rojo. (Entradas con 4.ª columna vacía o cifra no numérica: rojo, por lectura del awk: t[k]+0 = 0.)
+- La guarda de [I] (t12): B_DECLS_OK≠1 o sin goedel_I_neg → «NO PUDE MEDIR», rojo.
+- [I] y [A2] dan lo mismo con mawk 20260129 que con gawk 5.4 en todos los juguetes (t7_t5_mawk.out), salvo «+inf».
+- [I] en el árbol real (t8_I_real.bash): 0 marcas en los documentos de wt/ y en los 117 .lean; en HEAD marca las dos
+  frases que ADR-169 dice haber medido (CURRENT-STATUS-PROJECT.md:28 y AXIOMS.md:410), que el árbol de trabajo
+  corrige. Lo que exime hoy es legítimo: GODEL-STATUS.md entero (se declara «DOCUMENTO HISTÓRICO/DIAGNÓSTICO» en su
+  línea 6), REFERENCE.md:265 (✏️ + «registro»), :382 y :424 (secciones «🗄️ Registro …» y «… registro del
+  2026‑09‑10h»).
+- FOL 2897e1b: [A] y [A2] verdes sobre sus documentos (harness_fol.bash), coherente con «cero líneas en el cuerpo».
+  Lo de los n.º 1, 2, 5, 6, 13, 14 y 18 vale igual en FOL (mismo EXC_A); el n.º 14 es un caso real de FOL.
+
+FICHEROS (todos en C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\rev-t04b\)
+  rpp.diff, fol.diff, rpp-check.bash (copia del árbol), fol-check.bash (FOL 2897e1b), rpp-check-head.bash
+  harness.bash, harness_fol.bash                      — corren los bloques verbatim
+  t1_exc_a.bash                                       — n.º 2 y 18 (EXC_A en C y UTF-8)
+  t2_medir_exenciones.bash (+ t2_wt.out, t2_head.out) — n.º 1 y 2 en los documentos reales, con el porqué
+  t3/                                                 — n.º 1: la copia con «fuera» quitado (rojo)
+  t4_cobertura_exc.bash                               — n.º 1 y 2: cobertura de cada exención
+  t5_a2_trinquete.bash (+ t5.out)                     — n.º 3, 4, 12, 15
+  t5b_a2_formatos.bash (+ t5b.out)                    — n.º 17, 20 y lo que aguanta
+  t6_fol_medir.bash (+ t6_fol.out)                    — n.º 14 (FOL)
+  t7_I_evasiones.bash (+ t7.out), t7b_I_mas.bash, t7c_I_negacion.bash, t7d_I_comillas.bash — n.º 1, 7, 10, 11, 16
+  t7_t5_mawk.out                                      — t7 y t5 con mawk 20260129 (WSL)
+  t8_I_real.bash, t8b.bash (+ t8.out)                 — [I] en el árbol real y en HEAD
+  t9_binario.bash                                     — n.º 5
+  t10_I_mutantes.bash (+ t10.out)                     — n.º 8
+  t11_ruta_exime.bash (+ t11.out)                     — n.º 6
+  t12_I_guarda.bash (+ t12.out)                       — n.º 9
+  t13_a2_patrones.bash (+ t13.out)                    — n.º 13
+  t14_I_crlf.bash (+ t14.out)                         — n.º 23

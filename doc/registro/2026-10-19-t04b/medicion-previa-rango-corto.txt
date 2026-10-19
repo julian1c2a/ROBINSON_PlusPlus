@@ -1,0 +1,164 @@
+# La misma medición con la exención de rangos de ADR-169 (números cortos: (^|[^0-9-])[0-9]{1,3}-[0-9]{1,3}([^0-9-]|$)),
+# sobre los documentos de la base verificada 161ad34. Sólo «jobs» y «sondeos», y el cuerpo incluye DECISIONS.md.
+
+== cab · exención con fecha · patrones plano
+  total: 0
+== cab · exención sin fecha · patrones plano
+  jobs: dice 145, real 133 :: 129:CURRENT-STATUS-PROJECT.md:| Build status | ✅ Passing (**145 jobs**, **131 módulos**, 0 errores, **0 warnings**, **0 sorry** — verificado
+  jobs: dice 129, real 133 :: 1245:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/
+  jobs: dice 131, real 133 :: 1246:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de 
+  jobs: dice 132, real 133 :: 1247:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de R
+  jobs: dice 134, real 133 :: 1249:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de 
+  jobs: dice 135, real 133 :: 1250:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de
+  jobs: dice 136, real 133 :: 1251:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de
+  jobs: dice 137, real 133 :: 1252:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de R
+  jobs: dice 139, real 133 :: 1253:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/Purez
+  jobs: dice 140, real 133 :: 1254:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
+  jobs: dice 135, real 133 :: 1255:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `Verifier
+  jobs: dice 130, real 133 :: 1256:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `
+  jobs: dice 131, real 133 :: 1257:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolari
+  total: 13
+== cab · exención sin fecha · patrones negrita
+  jobs: dice 145, real 133 :: 129:CURRENT-STATUS-PROJECT.md:| Build status | ✅ Passing (**145 jobs**, **131 módulos**, 0 errores, **0 warnings**, **0 sorry** — verificado
+  jobs: dice 129, real 133 :: 1245:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/
+  jobs: dice 131, real 133 :: 1246:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de 
+  jobs: dice 132, real 133 :: 1247:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de R
+  jobs: dice 134, real 133 :: 1249:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de 
+  jobs: dice 135, real 133 :: 1250:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de
+  jobs: dice 136, real 133 :: 1251:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de
+  jobs: dice 137, real 133 :: 1252:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de R
+  jobs: dice 139, real 133 :: 1253:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/Purez
+  jobs: dice 140, real 133 :: 1254:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
+  jobs: dice 135, real 133 :: 1255:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `Verifier
+  jobs: dice 130, real 133 :: 1256:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `
+  jobs: dice 131, real 133 :: 1257:doc/REFERENCE-Incompleteness.md:> *(Y el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolari
+  total: 13
+== cuerpo · exención con fecha · patrones plano
+  jobs: dice 145, real 133 :: 289:REFERENCE.md:**Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+  jobs: dice 76, real 133 :: 348:CURRENT-STATUS-PROJECT.md:  restante en `GODEL-D3-TRACKED-DESIGN.md` §15.4. Build **76 jobs**, 0 sorrys, v4.31.0.
+  jobs: dice 74, real 133 :: 359:CURRENT-STATUS-PROJECT.md:  hasta D3 real. Build verde (**74 jobs**), 0 sorrys, v4.31.0.
+  jobs: dice 75, real 133 :: 377:CURRENT-STATUS-PROJECT.md:  DeepArith sobre el kernel FOL⁼ común). Build verde (**75 jobs**), 0 sorrys, v4.31.0.
+  jobs: dice 71, real 133 :: 391:CURRENT-STATUS-PROJECT.md:  códigos). Diseño completo en `GODEL-D3-TRACKED-DESIGN.md` §11–§12. Build verde (**71 jobs**),
+  jobs: dice 69, real 133 :: 402:CURRENT-STATUS-PROJECT.md:  Build verde (**69 jobs**), 0 sorrys, Lean v4.31.0.
+  jobs: dice 58, real 133 :: 1377:DECISIONS.md:* Sólo comentarios: el build de FOL (58 jobs), `check-doc-sync`, `check-sorry` y `check-axioms` de FOL salieron verdes.
+  jobs: dice 131, real 133 :: 3129:DECISIONS.md:* **Los builds.** RPP: 131 jobs, sin cambio. FOL, con `lake build "@FOL/FOL" "@FOL/TheoryFramework"` desde la raíz de
+  jobs: dice 59, real 133 :: 3130:DECISIONS.md:  RPP: 59 jobs, y entre ellos «Built TheoryFramework».
+  jobs: dice 131, real 133 :: 3137:DECISIONS.md:  * El control del control: SIN la línea de globs, el suelto roto de RPP da el build en verde (131 jobs).
+  jobs: dice 59, real 133 :: 3138:DECISIONS.md:  * Después se borraron los sueltos y sus artefactos, y los builds volvieron a 131 y 59 jobs.
+  jobs: dice 131, real 133 :: 3236:DECISIONS.md:  `[A2]` sube de 39 a 41: son las dos líneas de ADR‑163 que dan 131 jobs, la cifra de ese día (la clase de T04b).
+  jobs: dice 91, real 133 :: 5426:doc/REFERENCE-Incompleteness.md:§19–§38. **Estado 2026‑07‑12 (HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
+  jobs: dice 118, real 133 :: 6375:doc/REFERENCE-Incompleteness.md:cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29` y `c8f100f`.
+  jobs: dice 118, real 133 :: 6552:doc/REFERENCE-Incompleteness.md:build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
+  jobs: dice 118, real 133 :: 6672:doc/REFERENCE-Incompleteness.md:desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+  jobs: dice 124, real 133 :: 6983:doc/REFERENCE-Incompleteness.md:Build **124 jobs**, 0 errores, 0 sorrys.
+  jobs: dice 132, real 133 :: 7580:doc/REFERENCE-Incompleteness.md:Build completed successfully (132 jobs)
+  jobs: dice 132, real 133 :: 7751:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+  jobs: dice 132, real 133 :: 7897:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+  jobs: dice 132, real 133 :: 8010:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)` · **118 módulos**. `Meta/TrackedAtomsPrf.lean` (21
+  jobs: dice 132, real 133 :: 8345:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
+  jobs: dice 135, real 133 :: 8517:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+  jobs: dice 135, real 133 :: 8603:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+  jobs: dice 135, real 133 :: 8677:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+  jobs: dice 135, real 133 :: 8758:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
+  jobs: dice 135, real 133 :: 8839:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (nuevo).
+  jobs: dice 135, real 133 :: 8909:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
+  jobs: dice 135, real 133 :: 9037:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)` — reconstrucción completa aguas abajo.
+  jobs: dice 135, real 133 :: 9076:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. 22 ficheros. Footprint sin cambios.
+  jobs: dice 135, real 133 :: 9126:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
+  jobs: dice 135, real 133 :: 9192:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean`.
+  jobs: dice 135, real 133 :: 9234:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` (720 l.),
+  jobs: dice 135, real 133 :: 9373:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §10 (888 l.),
+  jobs: dice 135, real 133 :: 9483:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §5,
+  jobs: dice 135, real 133 :: 9579:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §12.
+  jobs: dice 135, real 133 :: 9655:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §6,
+  jobs: dice 139, real 133 :: 9765:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
+  jobs: dice 139, real 133 :: 9811:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
+  jobs: dice 139, real 133 :: 9898:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
+  jobs: dice 141, real 133 :: 9969:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
+  jobs: dice 141, real 133 :: 10103:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +
+  sondeos: dice 88, real 43 :: 844:DECISIONS.md:| ADR-127 | 🔎 La auditoría de ADR‑124/125/126 —y los 88 sondeos, re‑medidos | ✅ (este commit)  |
+  sondeos: dice 91, real 43 :: 909:DECISIONS.md:`.gitignore`, banners (91 sondeos). Ninguna línea del build cambia.
+  sondeos: dice 13, real 43 :: 2407:DECISIONS.md:* **El sondeo es de CONTROL:** la CI lo compila en cada push (13 sondeos de control).
+  sondeos: dice 13, real 43 :: 2471:DECISIONS.md:  importa. Los 13 sondeos de control compilan, y los avisos son los 11 de la tabla de `check-warnings`: ninguno nuevo.
+  sondeos: dice 13, real 43 :: 2642:DECISIONS.md:  de 493. Los 13 sondeos de control compilan, y los avisos son los 11 de la tabla de `check-warnings`.
+  sondeos: dice 11, real 43 :: 2962:DECISIONS.md:  `check-warnings`: 9 avisos. Los 11 sondeos de control compilan. De los de REGISTRO, los cuatro que el grep de nombres
+  sondeos: dice 10, real 43 :: 3019:DECISIONS.md:  `check-warnings` (9) y `check-estratos` (10) cuadran. Los 10 sondeos de control compilan, y `D3Sigma1Vacuo` también.
+  sondeos: dice 6, real 43 :: 7029:doc/REFERENCE-Incompleteness.md:| `prf_argsIn_head`, `prf_argsIn_tail` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+  sondeos: dice 6, real 43 :: 7030:doc/REFERENCE-Incompleteness.md:| `prf_isTermCodeE1_of_boundedIn`, `_of_In` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+  sondeos: dice 58, real 43 :: 7301:doc/REFERENCE-Incompleteness.md:2. **`hasWitF (substfc …)` no se enuncia en NINGÚN sitio** — ni producción ni los 58 sondeos.
+  total: 52
+== cuerpo · exención sin fecha · patrones negrita
+  jobs: dice 145, real 133 :: 289:REFERENCE.md:**Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+  jobs: dice 76, real 133 :: 348:CURRENT-STATUS-PROJECT.md:  restante en `GODEL-D3-TRACKED-DESIGN.md` §15.4. Build **76 jobs**, 0 sorrys, v4.31.0.
+  jobs: dice 74, real 133 :: 359:CURRENT-STATUS-PROJECT.md:  hasta D3 real. Build verde (**74 jobs**), 0 sorrys, v4.31.0.
+  jobs: dice 75, real 133 :: 377:CURRENT-STATUS-PROJECT.md:  DeepArith sobre el kernel FOL⁼ común). Build verde (**75 jobs**), 0 sorrys, v4.31.0.
+  jobs: dice 71, real 133 :: 391:CURRENT-STATUS-PROJECT.md:  códigos). Diseño completo en `GODEL-D3-TRACKED-DESIGN.md` §11–§12. Build verde (**71 jobs**),
+  jobs: dice 69, real 133 :: 402:CURRENT-STATUS-PROJECT.md:  Build verde (**69 jobs**), 0 sorrys, Lean v4.31.0.
+  jobs: dice 28, real 133 :: 410:CURRENT-STATUS-PROJECT.md:- **2026-06-07 — `Full/Induction.lean`: inducción general object-level + axiomas derivados**: inducción genera
+  jobs: dice 123, real 133 :: 751:DEPENDENCIES.md:lake build                              # build completo (123 jobs a 2026-09-04)
+  jobs: dice 58, real 133 :: 1377:DECISIONS.md:* Sólo comentarios: el build de FOL (58 jobs), `check-doc-sync`, `check-sorry` y `check-axioms` de FOL salieron verdes.
+  jobs: dice 130, real 133 :: 1826:DECISIONS.md:de 129 a 130 jobs (113 módulos activos) el 2026-10-16.
+  jobs: dice 132, real 133 :: 2292:DECISIONS.md:* **El build**, el 2026-10-17: 132 jobs y 115 módulos; `RosserPosNum` compila en 3,5 s; los 12 sondeos de control compilan
+  jobs: dice 134, real 133 :: 2470:DECISIONS.md:* **El build**, el 2026-10-17: 134 jobs y 117 módulos, en 295 s, porque tocar `NumCodeClosedPrf` rehace todo lo que lo
+  jobs: dice 135, real 133 :: 2533:DECISIONS.md:* **El build**, el 2026-10-17: 135 jobs y 118 módulos. Los 13 sondeos de control compilan, y los avisos son los 11 de la
+  jobs: dice 136, real 133 :: 2604:DECISIONS.md:* **El build**, el 2026-10-17: 136 jobs y 119 módulos. Los 13 sondeos de control compilan, y los avisos son los 11 de la
+  jobs: dice 136, real 133 :: 2641:DECISIONS.md:* El build, el 2026-10-17: 136 jobs y 119 módulos, sin cambios. `check-footprints`: los 522 cuadran; [COBERTURA], 493
+  jobs: dice 137, real 133 :: 2691:DECISIONS.md:* **El build**, el 2026-10-17: 137 jobs y 120 módulos. Los 13 sondeos de control compilan, y los avisos son los 11 de la
+  jobs: dice 139, real 133 :: 2802:DECISIONS.md:* **El build**, el 2026-10-18: 139 jobs y 122 módulos (Meta 117). Los avisos son los 11 de la tabla de `check-warnings`.
+  jobs: dice 140, real 133 :: 2892:DECISIONS.md:* **El build**, el 2026-10-18: 140 jobs y 123 módulos (Meta 118).
+  jobs: dice 135, real 133 :: 2961:DECISIONS.md:* **El build**, el 2026-10-18: 135 jobs y 118 módulos (Meta 113). `check-footprints`: 513 filas, todas cuadran.
+  jobs: dice 130, real 133 :: 3018:DECISIONS.md:* **El build**, el 2026-10-18: 130 jobs y 113 módulos (Minimal 2, Meta 109 y Full 2). `check-footprints` (513),
+  jobs: dice 131, real 133 :: 3080:DECISIONS.md:* **El build**, el 2026-10-18: 131 jobs y 114 módulos (Meta 110). `check-footprints`: 517.
+  jobs: dice 131, real 133 :: 3129:DECISIONS.md:* **Los builds.** RPP: 131 jobs, sin cambio. FOL, con `lake build "@FOL/FOL" "@FOL/TheoryFramework"` desde la raíz de
+  jobs: dice 59, real 133 :: 3130:DECISIONS.md:  RPP: 59 jobs, y entre ellos «Built TheoryFramework».
+  jobs: dice 131, real 133 :: 3137:DECISIONS.md:  * El control del control: SIN la línea de globs, el suelto roto de RPP da el build en verde (131 jobs).
+  jobs: dice 59, real 133 :: 3138:DECISIONS.md:  * Después se borraron los sueltos y sus artefactos, y los builds volvieron a 131 y 59 jobs.
+  jobs: dice 131, real 133 :: 3236:DECISIONS.md:  `[A2]` sube de 39 a 41: son las dos líneas de ADR‑163 que dan 131 jobs, la cifra de ese día (la clase de T04b).
+  jobs: dice 145, real 133 :: 3613:README.md:*Last updated: 2026-09-10 — Build ✅ **145 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorr
+  jobs: dice 91, real 133 :: 5426:doc/REFERENCE-Incompleteness.md:§19–§38. **Estado 2026‑07‑12 (HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
+  jobs: dice 118, real 133 :: 6375:doc/REFERENCE-Incompleteness.md:cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29` y `c8f100f`.
+  jobs: dice 118, real 133 :: 6552:doc/REFERENCE-Incompleteness.md:build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
+  jobs: dice 118, real 133 :: 6672:doc/REFERENCE-Incompleteness.md:desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+  jobs: dice 124, real 133 :: 6983:doc/REFERENCE-Incompleteness.md:Build **124 jobs**, 0 errores, 0 sorrys.
+  jobs: dice 132, real 133 :: 7580:doc/REFERENCE-Incompleteness.md:Build completed successfully (132 jobs)
+  jobs: dice 132, real 133 :: 7751:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+  jobs: dice 132, real 133 :: 7897:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+  jobs: dice 132, real 133 :: 8010:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)` · **118 módulos**. `Meta/TrackedAtomsPrf.lean` (21
+  jobs: dice 132, real 133 :: 8345:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
+  jobs: dice 135, real 133 :: 8517:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+  jobs: dice 135, real 133 :: 8603:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+  jobs: dice 135, real 133 :: 8677:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+  jobs: dice 135, real 133 :: 8758:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (728 l.).
+  jobs: dice 135, real 133 :: 8839:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (nuevo).
+  jobs: dice 135, real 133 :: 8909:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/LiftcCodePrf.lean` (§7bis, §9bis),
+  jobs: dice 135, real 133 :: 9037:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)` — reconstrucción completa aguas abajo.
+  jobs: dice 135, real 133 :: 9076:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. 22 ficheros. Footprint sin cambios.
+  jobs: dice 135, real 133 :: 9126:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/EvalLiftfcPrf.lean` (1 307 l.).
+  jobs: dice 135, real 133 :: 9192:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean`.
+  jobs: dice 135, real 133 :: 9234:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` (720 l.),
+  jobs: dice 135, real 133 :: 9373:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §10 (888 l.),
+  jobs: dice 135, real 133 :: 9483:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §5,
+  jobs: dice 135, real 133 :: 9579:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/D3ChainDotPrf.lean` §12.
+  jobs: dice 135, real 133 :: 9655:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (135 jobs)`. `Meta/SubstCodeOpenPrf.lean` §6,
+  jobs: dice 139, real 133 :: 9765:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
+  jobs: dice 139, real 133 :: 9811:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
+  jobs: dice 139, real 133 :: 9898:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
+  jobs: dice 141, real 133 :: 9969:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
+  jobs: dice 141, real 133 :: 10103:doc/REFERENCE-Incompleteness.md:> `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +
+  sondeos: dice 88, real 43 :: 844:DECISIONS.md:| ADR-127 | 🔎 La auditoría de ADR‑124/125/126 —y los 88 sondeos, re‑medidos | ✅ (este commit)  |
+  sondeos: dice 91, real 43 :: 909:DECISIONS.md:`.gitignore`, banners (91 sondeos). Ninguna línea del build cambia.
+  sondeos: dice 12, real 43 :: 2292:DECISIONS.md:* **El build**, el 2026-10-17: 132 jobs y 115 módulos; `RosserPosNum` compila en 3,5 s; los 12 sondeos de control compilan
+  sondeos: dice 12, real 43 :: 2343:DECISIONS.md:* **El build**, el 2026-10-17: 133 jobs y 116 módulos; `RosserNumerales` compila en 11 s, a la primera; los 12 sondeos de 
+  sondeos: dice 13, real 43 :: 2407:DECISIONS.md:* **El sondeo es de CONTROL:** la CI lo compila en cada push (13 sondeos de control).
+  sondeos: dice 13, real 43 :: 2471:DECISIONS.md:  importa. Los 13 sondeos de control compilan, y los avisos son los 11 de la tabla de `check-warnings`: ninguno nuevo.
+  sondeos: dice 13, real 43 :: 2533:DECISIONS.md:* **El build**, el 2026-10-17: 135 jobs y 118 módulos. Los 13 sondeos de control compilan, y los avisos son los 11 de la
+  sondeos: dice 13, real 43 :: 2604:DECISIONS.md:* **El build**, el 2026-10-17: 136 jobs y 119 módulos. Los 13 sondeos de control compilan, y los avisos son los 11 de la
+  sondeos: dice 13, real 43 :: 2642:DECISIONS.md:  de 493. Los 13 sondeos de control compilan, y los avisos son los 11 de la tabla de `check-warnings`.
+  sondeos: dice 13, real 43 :: 2691:DECISIONS.md:* **El build**, el 2026-10-17: 137 jobs y 120 módulos. Los 13 sondeos de control compilan, y los avisos son los 11 de la
+  sondeos: dice 11, real 43 :: 2962:DECISIONS.md:  `check-warnings`: 9 avisos. Los 11 sondeos de control compilan. De los de REGISTRO, los cuatro que el grep de nombres
+  sondeos: dice 10, real 43 :: 3019:DECISIONS.md:  `check-warnings` (9) y `check-estratos` (10) cuadran. Los 10 sondeos de control compilan, y `D3Sigma1Vacuo` también.
+  sondeos: dice 7, real 43 :: 7028:doc/REFERENCE-Incompleteness.md:| `psi_lift_form`, `PSI_inst` (genéricos en `Φ`) | `Meta/StrongInductionPrf.lean` | 4 y **7** sondeos |
+  sondeos: dice 6, real 43 :: 7029:doc/REFERENCE-Incompleteness.md:| `prf_argsIn_head`, `prf_argsIn_tail` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+  sondeos: dice 6, real 43 :: 7030:doc/REFERENCE-Incompleteness.md:| `prf_isTermCodeE1_of_boundedIn`, `_of_In` | `Meta/CodeWitnessPrf.lean` (`SinWTs`) | 6 sondeos |
+  sondeos: dice 58, real 43 :: 7301:doc/REFERENCE-Incompleteness.md:2. **`hasWitF (substfc …)` no se enuncia en NINGÚN sitio** — ni producción ni los 58 sondeos.
+  total: 73

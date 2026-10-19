@@ -1,0 +1,255 @@
+# a_mutantes_t04b.bash, 2026-10-19T19:09Z, HEAD 161ad34 (más el árbol de trabajo)
+
+== A-cabecera-fecha-negrita (salida 1): la cabecera dice «**120** jobs» con una fecha (antes la fecha la eximía, y la negrita la cegaba)
+════ [A] CIFRAS ════
+  ✗ jobs: dice 120, real 133
+      CURRENT-STATUS-PROJECT.md:6: Estado 2026-10-19: **120** jobs en el build.
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A-cabecera-sondeos (salida 1): la cabecera dice 44 sondeos (SOND se calculaba y no se comparaba)
+════ [A] CIFRAS ════
+  ✗ sondeos: dice 44, real 43
+      CURRENT-STATUS-PROJECT.md:6: Hoy hay **44** `sondeos/`.
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-cuerpo-cifra-nueva (salida 1): una cifra vieja NUEVA en el cuerpo, con fecha
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ❌ jobs: «122» en NEXT-STEPS.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      NEXT-STEPS.md:151: Build 2026-10-19: 122 jobs.
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 52
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-control-historico (salida 0): CONTROL: la misma línea con un marcador de historia (debe salir verde)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-tabla-por-encima-de-hoy (salida 1): la tabla dice una línea más de las que hay (una cifra arreglada sin bajar la tabla)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ❌ 1 entradas de doc/control/a2-deuda.tsv tienen MENOS líneas que las que dice la tabla: bájala con --a2-deuda
+      axiom de Lean · README.md · 5: 1 (tabla 2)
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 52 líneas en 25 entradas; hoy, 51
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-sin-base (salida 1): no hay base verificada (B_BASE_REF a una rama que no existe)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ❌ no hay BASE VERIFICADA (refs/heads/no-existe-t04b): sin ella la tabla no tiene techo (¿falta un git fetch?).
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-base-no-antepasada (salida 1): la base no es antepasada de HEAD (un commit suelto)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ❌ HEAD no desciende de la base verificada (bc0be016078ce943f2efcb838a218f9f0b93399e, bc0be01): rebase sobre ella.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== I-documento (salida 1): dos frases que goedel_I_neg y rosser desmienten, en el cuerpo de NEXT-STEPS.md
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ❌ NEXT-STEPS.md:151: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)
+      MUTANTE: la mitad ⊬¬G no existe todavía; Rosser está pendiente.
+
+== I-control-cita (salida 0): CONTROL: la frase citada entre «…» (debe salir verde)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== I-comentario-lean (salida 1): la frase en un comentario de un .lean de la librería (T31)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ❌ ROBINSON_PlusPlus/Meta/Lob.lean:40: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)
+      -- MUTANTE: la mitad ⊬¬G sigue abierta.
+
+== A-cabecera-palabra-dentro (salida 1): el marcador «era» dentro de «fuera» ya no exime (era CURRENT-STATUS-PROJECT.md:48)
+════ [A] CIFRAS ════
+  ✗ axiom de Lean: dice 1, real 0
+      CURRENT-STATUS-PROJECT.md:6: Fuera de las listas: **1** `axiom` de Lean.
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A-cabecera-cita-con-digito (salida 1): una cita «…» con un dígito en otra parte de la línea ya no la exime
+════ [A] CIFRAS ════
+  ✗ jobs: dice 120, real 133
+      CURRENT-STATUS-PROJECT.md:6: Son 120 jobs (ver «ADR-121»).
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-tabla-borrada (salida 1): la tabla, borrada (tiene que existir siempre)
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ❌ doc/control/a2-deuda.tsv no existe: tiene que estar siempre (sin deuda, sólo con la cabecera).
+  ❌ axiom de Lean: «5» en README.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      README.md:208: *Last updated: 2026-09-10 — Build ✅ **145 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI�
+  ❌ axiom de Lean: «7» en doc/REFERENCE-Incompleteness.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:2889: 112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
+  ❌ conteo de Meta: «90» en doc/REFERENCE-Incompleteness.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:2807: `[propext, Classical.choice, Quot.sound]`. El árbol pasa a **112 módulos** (Meta 90).
+  ❌ conteo de Meta: «99» en doc/REFERENCE-Incompleteness.md, 2 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:3059: > `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+      doc/REFERENCE-Incompleteness.md:3205: > `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+  ❌ jobs: «28» en CURRENT-STATUS-PROJECT.md, 2 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:180: - **2026-06-07 — `Full/Induction.lean`: ax19 (tricotomía del orden) derivado**: `lt_trichotomy_ax`/`lt_trichotomy_thm : axioms ⊢ ax19_lt_trichoto
+      CURRENT-STATUS-PROJECT.md:182: - **2026-06-07 — `Full/Induction.lean`: inducción general object-level + axiomas derivados**: inducción general como **axioma object-level** (`ax_
+  ❌ jobs: «29» en CURRENT-STATUS-PROJECT.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:176: - **2026-06-11 — `Full/Lists.lean`: ax_C3 y ax_L3 derivados (inducción estructural)**: nuevo módulo (330 líneas) con **meta-axioma `ax_list_induc
+  ❌ jobs: «69» en CURRENT-STATUS-PROJECT.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:174:   Build verde (**69 jobs**), 0 sorrys, Lean v4.31.0.
+  ❌ jobs: «71» en CURRENT-STATUS-PROJECT.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:163:   códigos). Diseño completo en `GODEL-D3-TRACKED-DESIGN.md` §11–§12. Build verde (**71 jobs**),
+  ❌ jobs: «74» en CURRENT-STATUS-PROJECT.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:131:   hasta D3 real. Build verde (**74 jobs**), 0 sorrys, v4.31.0.
+  ❌ jobs: «75» en CURRENT-STATUS-PROJECT.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:149:   DeepArith sobre el kernel FOL⁼ común). Build verde (**75 jobs**), 0 sorrys, v4.31.0.
+  ❌ jobs: «76» en CURRENT-STATUS-PROJECT.md, 2 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      CURRENT-STATUS-PROJECT.md:120:   restante en `GODEL-D3-TRACKED-DESIGN.md` §15.4. Build **76 jobs**, 0 sorrys, v4.31.0.
+      CURRENT-STATUS-PROJECT.md:301: *Last updated: 2026-07-09c — Build ✅ (76 jobs), 0 errores, 0 sorrys, 0 warnings, 62 módulos, Lean v4.31.0. F7a: 14 → 7 axiomas (AXIOMS.md). 12�
+  ❌ jobs: «123» en DEPENDENCIES.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      DEPENDENCIES.md:320: lake build                              # build completo (123 jobs a 2026-09-04)
+  ❌ jobs: «145» en README.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      README.md:208: *Last updated: 2026-09-10 — Build ✅ **145 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI�
+  ❌ jobs: «145» en REFERENCE.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      REFERENCE.md:389: **Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+  ❌ jobs: «118» en doc/REFERENCE-Incompleteness.md, 3 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:1683: cero `sorry`**, recompilado a mano (`EXIT=0`, build 118 jobs). Commits `2f27a29` y `c8f100f`.
+      doc/REFERENCE-Incompleteness.md:1860: build de producción intacto en 118 jobs. **3 CONFIRMADOS + 1 PARCIAL**, y el `PARCIAL` no es por la
+      doc/REFERENCE-Incompleteness.md:1980: desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+  ❌ jobs: «124» en doc/REFERENCE-Incompleteness.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:2291: Build **124 jobs**, 0 errores, 0 sorrys.
+  ❌ jobs: «132» en doc/REFERENCE-Incompleteness.md, 5 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:2888: Build completed successfully (132 jobs)
+      doc/REFERENCE-Incompleteness.md:3059: > `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+      doc/REFERENCE-Incompleteness.md:3205: > `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+  ❌ jobs: «135» en doc/REFERENCE-Incompleteness.md, 15 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:3825: > `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+      doc/REFERENCE-Incompleteness.md:3911: > `Build completed successfully (135 jobs)`. Footprint = la base sancionada. **Net‑0 puro.**
+      doc/REFERENCE-Incompleteness.md:3985: > `Build completed successfully (135 jobs)`. `Meta/SubstTreeReflect.lean` (nuevo).
+  ❌ jobs: «139» en doc/REFERENCE-Incompleteness.md, 3 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:5073: > `Build completed successfully (139 jobs)`. `Meta/LiftfcWitnessPrf.lean` (nuevo, 657 l.).
+      doc/REFERENCE-Incompleteness.md:5119: > `Build completed successfully (139 jobs)`. `Meta/SubstTreeReflect.lean` §10bis + §11ter.
+      doc/REFERENCE-Incompleteness.md:5206: > `Build completed successfully (139 jobs)`. `Meta/ListEtaPrf.lean` + `Meta/PremsOfTagPrf.lean`
+  ❌ jobs: «141» en doc/REFERENCE-Incompleteness.md, 2 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:5277: > `Build completed successfully (141 jobs)`. `Meta/PremsOfDotPrf.lean` (nuevo, 1 059 l.).
+      doc/REFERENCE-Incompleteness.md:5411: > `Build completed successfully (141 jobs)`. `Meta/PremsBdAllPrf.lean` §9bis–§10 +
+  ❌ jobs: «91» en doc/REFERENCE-Incompleteness.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:734: §19–§38. **Estado 2026‑07‑12 (HEAD `05fe7c3`, 91 jobs, 0 sorrys).**
+  ❌ módulos activos: «131» en README.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      README.md:208: *Last updated: 2026-09-10 — Build ✅ **145 jobs**, **0 errores**, **0 warnings**, **0 `sorry`** (verificado con el `check-sorry.bash` reparado, AI�
+  ❌ módulos activos: «131» en REFERENCE.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      REFERENCE.md:389: **Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+  ❌ sondeos: «61» en REFERENCE.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      REFERENCE.md:389: **Estado 2026‑09‑10h.** Build **145 jobs**, **131 módulos activos**, **61 `sondeos/`**, 0 sorrys,
+  ❌ sondeos: «57» en doc/REFERENCE-Incompleteness.md, 1 línea(s), y la tabla dice 0 — una cifra vieja NUEVA en el cuerpo:
+      doc/REFERENCE-Incompleteness.md:1980: desde su ubicación final. Build de producción intacto, **118 jobs**, **57 `sondeos/`**.
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 0 líneas en 0 entradas; hoy, 51
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-clave-repetida (salida 1): una clave repetida en la tabla
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ❌ doc/control/a2-deuda.tsv no tiene la forma de la tabla:
+      repetida: axiom de Lean	README.md	5	1
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 52 líneas en 26 entradas; hoy, 51
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== A2-control-quick (salida 0): CONTROL: con --quick (los jobs sin medir), [A2] no da rojo ni toca la tabla
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  sin medir «jobs»: sus entradas de la tabla no se comparan.
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 9
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+
+== I-mayusculas-espacio-duro (salida 1): mayúsculas (también «Á») y un espacio duro entre «⊬» y «¬G»
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ❌ NEXT-STEPS.md:151: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)
+      LA MITAD ⊬ ¬G NO ESTÁ CERRADA.
+
+== I-partida (salida 1): la frase partida en dos líneas
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ❌ NEXT-STEPS.md:151: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)
+      La mitad ⊬¬G
+
+== I-negrita (salida 1): la negrita entre el símbolo y la frase
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  la base verificada no conoce doc/control/a2-deuda.tsv: es la que se crea, y no se compara con nada.
+  deuda declarada: 51 líneas en 25 entradas; hoy, 51
+  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ❌ NEXT-STEPS.md:151: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)
+      `⊬¬G` **no** está cerrado.
+

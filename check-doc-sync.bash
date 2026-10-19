@@ -27,6 +27,9 @@
 #   bash check-doc-sync.bash --b-deuda-inicial  # crea esa tabla, sólo si no existe (se hizo una vez, ADR-166)
 #   bash check-doc-sync.bash --b-deuda-rehacer  # la rehace, sólo en el commit que cambia el núcleo de [B] (y sube, como
 #                                               # mucho, lo que el núcleo nuevo ve de más que el viejo)
+#   bash check-doc-sync.bash --a2-deuda  # además, baja doc/control/a2-deuda.tsv (las cifras viejas del cuerpo, [A2];
+#                                        # ADR-169), si nada sube
+#   bash check-doc-sync.bash --a2-deuda-inicial  # crea esa tabla, sólo si no existe (se hizo una vez, ADR-169)
 #
 # Salida: 0 si todo cuadra, 1 si hay desincronización.
 
@@ -48,6 +51,7 @@ cd "$(dirname "$0")"
 QUICK=0
 HINT=0
 B_DEUDA_MODO=0
+A2_DEUDA_MODO=0
 for a in "$@"; do
   case "$a" in
     --quick)     QUICK=1 ;;
@@ -55,6 +59,8 @@ for a in "$@"; do
     --b-deuda)   B_DEUDA_MODO=1 ;;
     --b-deuda-inicial) B_DEUDA_MODO=2 ;;
     --b-deuda-rehacer) B_DEUDA_MODO=3 ;;
+    --a2-deuda)  A2_DEUDA_MODO=1 ;;
+    --a2-deuda-inicial) A2_DEUDA_MODO=2 ;;
     -h|--help)   awk 'NR > 1 && /^#/ { print; next } NR > 1 { exit }' "$0"; exit 0 ;;
     *) echo "opción desconocida: $a" >&2; exit 2 ;;
   esac
@@ -287,50 +293,105 @@ echo
 
 # ─── 2. CIFRAS OBSOLETAS ─────────────────────────────────────────────────────
 # CHANGELOG.md se excluye: es un diario, sus cifras son históricas por diseño.
-# Las líneas marcadas como históricas también (fecha ISO al principio, o marcador).
+# ⛔ 2026-10-19 (T04b, ADR-169): REHECHO. Lo que había (un `grep -v` sobre la línea entera) tenía tres agujeros
+# medidos: la FECHA eximía la línea (y una fecha no dice que la cifra sea de ese día); la NEGRITA cegaba los patrones
+# («**1** axiom de Lean» no casaba con nada); y la cifra de los SONDEOS se calculaba y no se comparaba. La revisión
+# adversarial de ADR-169 encontró más: los marcadores casaban DENTRO de una palabra («era » en «fuera», «antes» en
+# «constantes»: un 13 % de las líneas, exentas, y entre ellas CURRENT-STATUS-PROJECT.md:48, «**1** `axiom` de Lean»
+# con 0), y «→», «~», un rango o una cita «…» con un dígito eximían la línea entera, estuvieran donde estuvieran.
+# Ahora lo hace un awk (A_AWK, el mismo en FOL), en la configuración regional C, línea a línea:
+#   · lo citado entre «…» y lo tachado (~~…~~) se quita: lo dice otro, o está retirado; el resto de la línea cuenta;
+#   · un MARCADOR de historia, como PALABRA entera, exime la línea: histórico, previo, antes, era, fueron, entonces,
+#     «ya no», «en su momento», ejemplo, «p. ej», umbral (y en [A2], retirado);
+#   · cada aparición de cada patrón se mira por separado; la exime sólo lo que la toca: «~» justo delante (una
+#     aproximación), un rango corto que acaba en ella («40-50»), o una flecha justo detrás (es la cifra VIEJA de un
+#     «131 jobs → 133 jobs»);
+#   · los patrones admiten la negrita, y el número es el primero de lo que casa.
+# Los documentos tienen que ser UTF-8 válido y sin NUL: un byte malo escondía la línea a grep, y un NUL el resto.
 echo "════ [A] CIFRAS ════"
 A_FAIL=0
-# ALCANCE: sólo la REGIÓN DE CABECERA (primeras 100 líneas) de cada doc autoritativo.
-# Ahí viven el banner y las tablas resumen — lo que AFIRMA el estado actual. Más abajo
-# están los registros de logros, donde «93 jobs» es historia correcta, no un error.
-# Esta acotación es la que hace utilizable el control: sin ella, los diarios de
-# `NEXT-STEPS.md` disparan una docena de falsos positivos y nadie vuelve a mirarlo.
-HEADREGION=$(mktemp)
-: > "$HEADREGION"
+A_DIR=$(mktemp -d)
+A_DOCS=""
+A_MAL=""; A_SAL=""; A2_SAL=""
 for d in $DOCS; do
   [ -e "$d" ] || continue
-  head -100 "$d" | sed "s|^|$d:|" >> "$HEADREGION"
+  A_DOCS="$A_DOCS $d"
+  if ! iconv -f UTF-8 -t UTF-8 "$d" > /dev/null 2>&1 || ! tr -d '\000' < "$d" | cmp -s - "$d"; then A_MAL="$A_MAL $d"; fi
 done
-
-# ⚠️ Los patrones se pasan SIEMPRE entre comillas SIMPLES: un backtick dentro de
-#    comillas dobles lo ejecuta bash como sustitución de comando y el patrón queda roto.
-check_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = etiqueta
-  local pat="$1" good="$2" label="$3" hits
-  # Se descartan: menciones históricas, aproximaciones (~40), rangos (40-50) y ejemplos.
-  hits=$(grep -nE "$pat" "$HEADREGION" 2>/dev/null          | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|en su momento|entonces|ya no|20[0-9]{2}-[0-9]{2}-[0-9]{2}|~|p\. ej|ejemplo|umbral|[0-9]+-[0-9]+" || true)
-  while IFS= read -r line; do
-    [ -z "$line" ] && continue
-    local n; n=$(echo "$line" | grep -oE "$pat" | grep -oE "[0-9]+" | head -1)
-    if [ -n "$n" ] && [ "$n" != "$good" ]; then
-      echo "  ✗ $label: dice $n, real $good"
-      echo "      ${line:0:150}"
-      A_FAIL=1
-    fi
-  done <<< "$hits"
-  # ⚠️ Un patrón sin ninguna aparición NO está comprobando nada, y da verde. Es el peor
-  # resultado posible para un control cuyo cometido es que no te fibres de los docs: por eso
-  # se avisa en vez de callar. Si sale este aviso, o el fraseo del doc cambió, o el patrón
-  # está mal — en los dos casos hay que tocar algo.
-  [ -z "$hits" ] && echo "  ⚠️  $label: la frase no aparece en ningún doc autoritativo — control VACÍO"
-  return 0
+# las cifras: etiqueta<TAB>patrón (ERE en minúsculas; la cifra es el primer número de lo que casa)<TAB>valor de hoy
+# (vacío: no se midió, y la etiqueta no se compara)
+NB='([*][*])?'   # la negrita que puede cerrar la cifra: `**133** jobs`
+{
+  printf 'jobs\t%s\t%s\n' "[0-9]+$NB jobs" "$JOBS"
+  printf 'módulos activos\t%s\t%s\n' "[0-9]+$NB módulos activos" "$ACTIVE"
+  printf 'conteo de Meta\t%s\t%s\n' "meta $NB([0-9]+$NB [+]|[0-9]+$NB[)])" "$META"
+  printf 'cuarentena\t%s\t%s\n' "[0-9]+$NB (módulos )?en \`cuarentena/\`" "$QUAR"
+  printf 'axiom de Lean\t%s\t%s\n' "[0-9]+$NB \`?axiom\`?$NB (de lean|en el build)" "$AXIOMS"
+  printf 'sorry\t%s\t%s\n' "[0-9]+$NB \`?sorrys?" "$SORRY"
+  printf 'sondeos\t%s\t%s\n' "[0-9]+$NB \`sondeos/\`" "$SOND"
+} > "$A_DIR/patrones"
+# los marcadores (palabra entera; la línea va en minúsculas y con un espacio a cada lado)
+A_MARC='[^a-z0-9_](hist(o|ó)ric(o|a|os|as)|previ(o|a|os|as)|antes|era|eran|fueron|entonces|ya no|en su momento|ejemplos?|p[.] ej|umbral)[^a-z0-9_]'
+A_MARC2='[^a-z0-9_](hist(o|ó)ric(o|a|os|as)|previ(o|a|os|as)|antes|era|eran|fueron|entonces|ya no|en su momento|ejemplos?|p[.] ej|umbral|retirad(o|a|os|as))[^a-z0-9_]'
+# (sin intervalos `{m,n}` ni `^` dentro de una alternativa: la CI usa mawk)
+A_AWK='
+function bajar(s) { s = tolower(s); gsub(/Á/, "á", s); gsub(/É/, "é", s); gsub(/Í/, "í", s); gsub(/Ó/, "ó", s)
+  gsub(/Ú/, "ú", s); gsub(/Ñ/, "ñ", s); gsub(/Ö/, "ö", s); return s }
+function fuera(s, a, b,   p, r, q) {
+  while ((p = index(s, a)) > 0) { r = substr(s, p + length(a)); q = index(r, b); if (!q) break
+    s = substr(s, 1, p - 1) " " substr(r, q + length(b)) }
+  return s }
+BEGIN { marc = ENVIRON["A_MARC_USO"] }
+FILENAME == ARGV[1] { split($0, z, "\t"); np++; ETQ[np] = z[1]; PAT[np] = z[2]; BUENO[np] = z[3]; next }
+FNR < desde || FNR > hasta { next }
+{ t = " " bajar(fuera(fuera($0, "«", "»"), "~~", "~~")) " "
+  if (t ~ marc) next
+  for (i = 1; i <= np; i++) {
+    if (BUENO[i] == "") continue
+    r = t
+    while (match(r, PAT[i])) {
+      m = RSTART; L = RLENGTH; seg = substr(r, m, L)
+      match(seg, /[0-9]+/); num = substr(seg, RSTART, RLENGTH); p0 = m + RSTART - 1
+      antes = " " substr(r, 1, p0 - 1); despues = substr(r, m + L)
+      exento = (antes ~ /~ *$/) || (despues ~ /^ *(→|->)/) || (length(num) <= 3 && antes ~ /[^0-9-][0-9][0-9]?[0-9]?-$/)
+      if (!exento) { visto[ETQ[i]] = 1; if (num + 0 != BUENO[i] + 0) print ETQ[i] "\t" FILENAME "\t" FNR "\t" num "\t" substr($0, 1, 150) }
+      r = substr(r, m + L)
+    }
+  }
 }
-[ -n "$JOBS" ] && check_num "[0-9]+ jobs" "$JOBS" "jobs"
-check_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
-check_num "Meta ([0-9]+ \+|[0-9]+\))" "$META" "conteo de Meta"
-check_num "[0-9]+ (módulos )?en \`cuarentena/\`" "$QUAR" "cuarentena"
-[ -n "$AXIOMS" ] && check_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
-check_num '[0-9]+ sorrys?' "$SORRY" "sorry"
-rm -f "$HEADREGION"
+END { for (e in visto) print e > VISTO }'
+# autotest: cada exención y cada vía de las revisiones, con salida exacta
+printf 'jobs\t%s\t133\nconteo de Meta\t%s\t112\n' "[0-9]+$NB jobs" "meta $NB([0-9]+$NB [+]|[0-9]+$NB[)])" > "$A_DIR/pat-auto"
+printf '%s\n' 'Hay **120** jobs.' 'Fuera de esto, 121 jobs.' 'Histórico: 122 jobs.' 'Unos ~123 jobs.' 'De 40-124 jobs.' \
+  'El 2026-10-19: 125 jobs.' 'Pasó de 126 jobs → 133 jobs.' 'Se dijo «127 jobs».' '~~128 jobs~~ y 133 jobs.' \
+  'Antes, 129 jobs.' 'En la primera pasada, 130 jobs.' 'Constantes: 131 jobs.' 'HISTÓRICO: 132 jobs.' 'Meta **5** + 2.' \
+  'Son 134 jobs (ver «ADR-121»).' > "$A_DIR/doc-auto.md"
+A_AUTO=$(cd "$A_DIR" && LC_ALL=C A_MARC_USO="$A_MARC" awk -v desde=1 -v hasta=100 -v VISTO=/dev/null "$A_AWK" pat-auto doc-auto.md \
+  | LC_ALL=C awk -F'\t' '{ printf "%s:%s:%s;", $1, $3, $4 }')
+A_AUTO_OK='jobs:1:120;jobs:2:121;jobs:6:125;jobs:11:130;jobs:12:131;conteo de Meta:14:5;jobs:15:134;'
+if [ -n "$A_MAL" ]; then
+  echo "  ❌ NO PUDE MEDIR [A] ni [A2]: no son UTF-8 válido o llevan NUL:$A_MAL"; A_FAIL=1
+elif [ "$A_AUTO" != "$A_AUTO_OK" ]; then
+  echo "  ❌ NO PUDE MEDIR [A] ni [A2]: el autotest no da lo esperado ($A_AUTO_OK), da: $A_AUTO"; A_FAIL=1
+else
+  # ALCANCE: la REGIÓN DE CABECERA (las primeras 100 líneas) de cada documento autoritativo: el banner y las tablas
+  # resumen, lo que AFIRMA el estado actual. (✏️ ADR-169: los banners apilados se fueron a doc/historia/BANNERS.md con
+  # ADR-142, T33: la cabecera ya no se los come.) El cuerpo lo mira [A2].
+  if ! A_SAL=$(LC_ALL=C A_MARC_USO="$A_MARC" awk -v desde=1 -v hasta=100 -v VISTO="$A_DIR/visto" "$A_AWK" "$A_DIR/patrones" $A_DOCS); then
+    echo "  ❌ NO PUDE MEDIR [A]: el awk falló."; A_FAIL=1
+  fi
+  printf '%s\n' "$A_SAL" | while IFS=$'\t' read -r e d l n texto; do
+    [ -n "$e" ] || continue
+    echo "  ✗ $e: dice $n, real $(LC_ALL=C awk -F'\t' -v e="$e" '$1 == e { print $3 }' "$A_DIR/patrones")"
+    echo "      $d:$l: $texto"
+  done
+  [ -n "$A_SAL" ] && A_FAIL=1
+  # ⚠️ Un patrón sin ninguna aparición NO está comprobando nada, y da verde: se avisa en vez de callar. Si sale, o el
+  # fraseo del documento cambió, o el patrón está mal: en los dos casos hay que tocar algo.
+  LC_ALL=C awk -F'\t' '$3 != "" { print $1 }' "$A_DIR/patrones" | while IFS= read -r e; do
+    grep -qxF "$e" "$A_DIR/visto" 2>/dev/null || echo "  ⚠️  $e: la frase no aparece en ningún doc autoritativo — control VACÍO"
+  done
+fi
 [ "$A_FAIL" = "0" ] && echo "  ✓ sin cifras obsoletas" || FAIL=1
 
 # ─── 2bis. CIFRAS EN EL **CUERPO** ───────────────────────────────────────────
@@ -343,45 +404,126 @@ rm -f "$HEADREGION"
 #      control mira sólo el banner, y el banner es justamente la parte que sí se actualiza.
 #      Auditar el banner es auditar lo que ya está bien.»
 #
-# ⚠️ Y la acotación NO era un descuido: sin ella, los diarios de `NEXT-STEPS.md` disparan una
-# docena de falsos positivos y el control deja de usarse. Así que el cuerpo entra como **AVISO**,
-# igual que [B]: se ve, pide juicio, y no rompe. Lo que rompe sigue siendo la cabecera.
+# ⛔ 2026-10-19 (T04b, ADR-169): deja de ser un AVISO. Las cifras viejas del cuerpo de hoy se congelan en una tabla,
+# `doc/control/a2-deuda.tsv` («etiqueta<TAB>documento<TAB>cifra<TAB>líneas»), como la deuda de [B]: una línea de más es
+# rojo; una de menos, también, hasta `bash check-doc-sync.bash --a2-deuda`; y la tabla no sube sobre la de la base
+# verificada (la misma que la de [B]). La tabla tiene que EXISTIR siempre (sin deuda, sólo con su cabecera): si la base
+# verificada ya la conocía (su check-doc-sync.bash la nombra) y no la tiene, el techo es CERO. La tabla se valida: cuatro
+# campos, la cifra y las líneas numéricas, ninguna clave repetida. Una etiqueta que no se midió (los jobs con --quick)
+# no se compara, y entonces la tabla no se puede bajar. El mismo awk que [A], sobre las líneas 101 en adelante.
+# DECISIONS.md no entra: un ADR dice las cifras de su día, y su fecha es su ámbito (M-13), como en CHANGELOG.
+# ⚠️ Lo que NO ve, por diseño (ADR-169 §8): cambiar una línea vieja por otra con la misma etiqueta, documento y cifra
+# deja el recuento igual; y un documento renombrado con deuda es rojo hasta que se edite la tabla a mano.
+# 🔑 Cuando una cifra cambia (el build pasa de 133 a 134 jobs), las líneas del cuerpo que la decían se corrigen o se
+# marcan como historia: eso es lo que este control pide.
 echo ""
-echo "════ [A2] CIFRAS EN EL CUERPO — AVISO, requiere juicio ════"
-BODYREGION=$(mktemp)
-: > "$BODYREGION"
-for d in $DOCS; do
-  [ -e "$d" ] || continue
-  tail -n +101 "$d" | sed "s|^|$d:|" >> "$BODYREGION"
-done
-
-A2_HITS=0
-warn_num () {   # $1 = regex con grupo numérico   $2 = valor correcto   $3 = etiqueta
-  local pat="$1" good="$2" label="$3" hits
-  hits=$(grep -nE "$pat" "$BODYREGION" 2>/dev/null          | grep -viE "hist[oó]rico|previo|antes|era |fueron|→|->|en su momento|entonces|ya no|retirad|20[0-9]{2}-[0-9]{2}-[0-9]{2}|20[0-9]{2}‑[0-9]{2}‑[0-9]{2}|~|p\. ej|ejemplo|umbral|[0-9]+-[0-9]+" || true)
-  while IFS= read -r line; do
-    [ -z "$line" ] && continue
-    local n; n=$(echo "$line" | grep -oE "$pat" | grep -oE "[0-9]+" | head -1)
-    if [ -n "$n" ] && [ "$n" != "$good" ]; then
-      echo "  ⚠️  $label: dice $n, real $good"
-      echo "      ${line:0:150}"
-      A2_HITS=$((A2_HITS+1))
-    fi
-  done <<< "$hits"
-  return 0
-}
-[ -n "$JOBS" ] && warn_num "[0-9]+ jobs" "$JOBS" "jobs"
-warn_num "[0-9]+ módulos activos" "$ACTIVE" "módulos activos"
-[ -n "$AXIOMS" ] && warn_num '[0-9]+ `?axiom`? de Lean' "$AXIOMS" "axiom de Lean"
-warn_num '[0-9]+ sorrys?' "$SORRY" "sorry"
-rm -f "$BODYREGION"
-if [ "$A2_HITS" = "0" ]; then
-  echo "  ✓ el cuerpo tampoco tiene cifras obsoletas"
+echo "════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════"
+A2_TABLA=doc/control/a2-deuda.tsv
+A2_FAIL=0
+A2_DOCS=""
+for d in $A_DOCS; do [ "$d" = DECISIONS.md ] || A2_DOCS="$A2_DOCS $d"; done
+# las etiquetas medidas hoy (las otras no se comparan)
+A2_MED=$(LC_ALL=C awk -F'\t' '$3 != "" { print $1 }' "$A_DIR/patrones")
+A2_NOMED=$(LC_ALL=C awk -F'\t' '$3 == "" { printf "%s«%s»", s, $1; s = ", " }' "$A_DIR/patrones")
+a2_medidas() { LC_ALL=C awk -F'\t' 'FILENAME == ARGV[1] { m[$0] = 1; next } ($1 in m)' <(printf '%s\n' "$A2_MED") -; }
+# una tabla, normalizada (sin BOM, sin CR, sin comentarios ni líneas vacías, ordenada) y sus errores de forma
+a2_norm() { sed '1s/^\xEF\xBB\xBF//' | tr -d '\r' | grep -v '^#' | grep . | LC_ALL=C sort; }
+a2_valida() { LC_ALL=C awk -F'\t' 'NF != 4 || $3 !~ /^[0-9]+$/ || $4 !~ /^[1-9][0-9]*$/ { print "      mal formada: " $0; next }
+  ($1 "\t" $2 "\t" $3) in v { print "      repetida: " $0; next } { v[$1 "\t" $2 "\t" $3] = 1 }'; }
+A2_HOY=""
+if [ -z "$A_MAL" ] && [ "$A_AUTO" = "$A_AUTO_OK" ]; then
+  if ! A2_SAL=$(LC_ALL=C A_MARC_USO="$A_MARC2" awk -v desde=101 -v hasta=999999999 -v VISTO=/dev/null "$A_AWK" "$A_DIR/patrones" $A2_DOCS); then
+    echo "  ❌ NO PUDE MEDIR [A2]: el awk falló."; A2_FAIL=1
+  fi
+  A2_HOY=$(printf '%s\n' "$A2_SAL" | LC_ALL=C awk -F'\t' 'NF >= 4 { print $1 "\t" $2 "\t" $4 }' | LC_ALL=C sort | uniq -c \
+    | LC_ALL=C awk '{ n = $1; sub(/^ *[0-9]+ /, ""); print $0 "\t" n }' | LC_ALL=C sort)
 else
-  echo "  ⚠️  $A2_HITS línea(s) en el CUERPO con cifras que no cuadran."
-  echo "      ¿es una afirmación de estado ACTUAL (⇒ corregir) o un registro histórico"
-  echo "      sin marcar (⇒ marcarlo: fecha ISO, «previo», «era», «histórico»)?"
+  echo "  ❌ NO PUDE MEDIR [A2]: ver [A]."; A2_FAIL=1
 fi
+A2_CAB="# $A2_TABLA — las cifras VIEJAS del cuerpo de los documentos autoritativos ([A2] de check-doc-sync.bash; ADR-169).
+# Una línea por (etiqueta, documento, cifra que dice): cuántas líneas la dicen. Una de más es rojo; una de menos,
+# también, hasta bajar la tabla: bash check-doc-sync.bash --a2-deuda. El techo es esta tabla en la base verificada.
+# Se arregla en el DOCUMENTO: la cifra, o un marcador de historia («histórico», «previo», «entonces»…) en su línea.
+# La tabla tiene que existir siempre: sin deuda, sólo con esta cabecera.
+# etiqueta	documento	cifra	líneas"
+if [ "$A2_DEUDA_MODO" != "0" ] && [ -n "$A2_NOMED" ]; then
+  echo "  ❌ --a2-deuda: sin medir $A2_NOMED (¿--quick?): la tabla no se toca."; A2_FAIL=1; A2_DEUDA_MODO=0
+fi
+if [ "$A2_DEUDA_MODO" = "2" ] && [ "$A2_FAIL" = "0" ]; then
+  if [ -e "$A2_TABLA" ]; then echo "  ❌ --a2-deuda-inicial: $A2_TABLA ya existe; la tabla sólo baja (--a2-deuda)."; A2_FAIL=1
+  else { printf '%s\n' "$A2_CAB"; printf '%s\n' "$A2_HOY" | grep .; } > "$A2_TABLA"; echo "  ✓ la tabla, creada: $(grep -vc '^#' "$A2_TABLA") entradas"; fi
+fi
+A2_TAB=""
+if [ ! -e "$A2_TABLA" ]; then
+  echo "  ❌ $A2_TABLA no existe: tiene que estar siempre (sin deuda, sólo con la cabecera)."; A2_FAIL=1
+else
+  A2_TAB=$(a2_norm < "$A2_TABLA")
+  A2_MALF=$(printf '%s\n' "$A2_TAB" | grep . | a2_valida)
+  if [ -n "$A2_MALF" ]; then echo "  ❌ $A2_TABLA no tiene la forma de la tabla:"; printf '%s\n' "$A2_MALF" | head -5; A2_FAIL=1; fi
+fi
+if [ "$A2_DEUDA_MODO" = "1" ] && [ "$A2_FAIL" = "0" ]; then
+  A2_SUBEN=$(LC_ALL=C awk -F'\t' 'FILENAME == ARGV[1] { t[$1 "\t" $2 "\t" $3] = $4; next }
+    $0 != "" { k = $1 "\t" $2 "\t" $3; if (!(k in t) || $4 + 0 > t[k] + 0) print }' <(printf '%s\n' "$A2_TAB") <(printf '%s\n' "$A2_HOY"))
+  if [ -n "$A2_SUBEN" ]; then
+    echo "  ❌ --a2-deuda NO baja la tabla: estas entradas suben o son nuevas (corrige la cifra o márcala como historia):"
+    printf '%s\n' "$A2_SUBEN" | head -10 | sed 's/^/      /'; A2_FAIL=1
+  else
+    { printf '%s\n' "$A2_CAB"; printf '%s\n' "$A2_HOY" | grep .; } > "$A2_TABLA"
+    A2_TAB=$(a2_norm < "$A2_TABLA")
+    echo "  ✓ --a2-deuda: la tabla baja a $(printf '%s\n' "$A2_TAB" | grep -c .) entradas"
+  fi
+fi
+# hoy frente a la tabla, sólo en las etiquetas medidas
+A2_DIF=$(LC_ALL=C awk -F'\t' 'FILENAME == ARGV[1] { if ($0 != "") t[$1 "\t" $2 "\t" $3] = $4; next }
+    $0 != "" { k = $1 "\t" $2 "\t" $3; h[k] = 1; if (!(k in t) || $4 + 0 > t[k] + 0) print "S\t" $0 "\t" (t[k] + 0)
+      else if ($4 + 0 < t[k] + 0) print "B\t" $0 "\t" t[k] }
+    END { for (k in t) if (!(k in h)) print "B\t" k "\t0\t" t[k] }' <(printf '%s\n' "$A2_TAB" | a2_medidas) <(printf '%s\n' "$A2_HOY"))
+printf '%s\n' "$A2_DIF" | LC_ALL=C awk -F'\t' '$1 == "S"' | while IFS=$'\t' read -r tipo e d c n m; do
+  echo "  ❌ $e: «$c» en $d, $n línea(s), y la tabla dice $m — una cifra vieja NUEVA en el cuerpo:"
+  printf '%s\n' "$A2_SAL" | LC_ALL=C awk -F'\t' -v e="$e" -v d="$d" -v c="$c" '$1 == e && $2 == d && $4 == c { print "      " $2 ":" $3 ": " $5 }' | head -3
+done
+printf '%s\n' "$A2_DIF" | LC_ALL=C awk -F'\t' '$1 == "S" { s = 1 } END { exit !s }' && A2_FAIL=1
+A2_NB=$(printf '%s\n' "$A2_DIF" | LC_ALL=C awk -F'\t' '$1 == "B"' | grep -c . || true)
+if [ "$A2_NB" -gt 0 ]; then
+  echo "  ❌ $A2_NB entradas de $A2_TABLA tienen MENOS líneas que las que dice la tabla: bájala con --a2-deuda"
+  printf '%s\n' "$A2_DIF" | LC_ALL=C awk -F'\t' '$1 == "B" { print "      " $2 " · " $3 " · " $4 ": " $5 " (tabla " $6 ")" }' | head -5
+  A2_FAIL=1
+fi
+[ -n "$A2_NOMED" ] && echo "  ⚠️  sin medir $A2_NOMED: sus entradas de la tabla no se comparan."
+# el techo: la tabla de la base verificada, LA MISMA que la de [B] (B_BASE_REF; por omisión el master protegido, con su
+# nombre entero), que tiene que ser antepasado de HEAD; sin ella, rojo
+A2_BASE_REF="${B_BASE_REF:-refs/remotes/origin/master}"
+case "$A2_BASE_REF" in 0000000*) A2_BASE_REF=refs/remotes/origin/master ;; esac
+A2_BASE=$(GIT_NO_REPLACE_OBJECTS=1 git rev-parse -q --verify "$A2_BASE_REF^{commit}" 2>/dev/null)
+A2_TECHO=""; A2_TXT_TECHO=""
+if [ -z "$A2_BASE" ]; then
+  echo "  ❌ no hay BASE VERIFICADA ($A2_BASE_REF): sin ella la tabla no tiene techo (¿falta un git fetch?)."; A2_FAIL=1
+elif ! git merge-base --is-ancestor "$A2_BASE" HEAD 2>/dev/null; then
+  echo "  ❌ HEAD no desciende de la base verificada ($A2_BASE_REF, $(git rev-parse --short "$A2_BASE")): rebase sobre ella."; A2_FAIL=1
+elif GIT_NO_REPLACE_OBJECTS=1 git cat-file -e "$A2_BASE:$A2_TABLA" 2>/dev/null; then
+  A2_TECHO=$(GIT_NO_REPLACE_OBJECTS=1 git show "$A2_BASE:$A2_TABLA" | a2_norm)
+  A2_MALB=$(printf '%s\n' "$A2_TECHO" | grep . | a2_valida)
+  if [ -n "$A2_MALB" ]; then echo "  ❌ la tabla de la base verificada no tiene la forma de la tabla:"; printf '%s\n' "$A2_MALB" | head -3; A2_FAIL=1; fi
+  A2_TXT_TECHO="la tabla de la base verificada, $(git rev-parse --short "$A2_BASE")"
+elif GIT_NO_REPLACE_OBJECTS=1 git show "$A2_BASE:check-doc-sync.bash" 2>/dev/null | grep -q 'a2-deuda[.]tsv'; then
+  # (la base ya la conocía y no la tiene: alguien la borró; el techo es cero)
+  A2_TXT_TECHO="CERO: la base verificada, $(git rev-parse --short "$A2_BASE"), conoce la tabla y no la tiene"
+else
+  echo "  ⚠️  la base verificada no conoce $A2_TABLA: es la que se crea, y no se compara con nada."
+fi
+if [ -n "$A2_TXT_TECHO" ]; then
+  A2_SOBRE=$(LC_ALL=C awk -F'\t' 'FILENAME == ARGV[1] { if (NF >= 4) t[$1 "\t" $2 "\t" $3] = $4; next }
+      $0 != "" { k = $1 "\t" $2 "\t" $3; if (!(k in t) || $4 + 0 > t[k] + 0) print }' \
+      <(printf '%s\n' "$A2_TECHO") <(printf '%s\n' "$A2_TAB"))
+  echo "  techo: $A2_TXT_TECHO ($A2_BASE_REF)"
+  if [ -n "$A2_SOBRE" ]; then
+    echo "  ❌ $A2_TABLA tiene entradas por ENCIMA del techo (sólo baja):"
+    printf '%s\n' "$A2_SOBRE" | head -5 | sed 's/^/      /'; A2_FAIL=1
+  fi
+fi
+rm -rf "$A_DIR"
+echo "  deuda declarada: $(printf '%s\n' "$A2_TAB" | LC_ALL=C awk -F'\t' 'NF >= 4 { s += $4 } END { print s + 0 }') líneas en $(printf '%s\n' "$A2_TAB" | grep -c . || true) entradas; hoy, $(printf '%s\n' "$A2_HOY" | LC_ALL=C awk -F'\t' 'NF >= 4 { s += $4 } END { print s + 0 }')"
+[ "$A2_FAIL" = "0" ] && echo "  ✓ ninguna cifra vieja nueva en el cuerpo, y la deuda cuadra con la tabla" || FAIL=1
 
 echo ""
 echo "════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════"
@@ -654,6 +796,127 @@ fi
 rm -f "$B_ENV" "$B_MOD" "$B_RUT"
 # (las listas $DECLS y $DECLS_SOND las usa también [M]: se borran allí)
 [ "$B_FAIL" = "0" ] && [ "$B_MEDIDO" = "1" ] && echo "  ✓ ninguna cita muerta nueva, y la deuda por cita cuadra con la tabla" || FAIL=1
+
+# ─── 2ter. [I] FRASES QUE UN TEOREMA VIVO DESMIENTE ─────────────────────────
+# ⭐ 2026-10-19 (T04b, ADR-169). [A] y [A2] miran cifras; nadie miraba la PROSA que afirma que algo no existe o sigue
+# abierto cuando el build lo tiene. Medido ese día: «la mitad `⊬¬G` NO está cerrada» (CURRENT-STATUS-PROJECT.md),
+# «NO está en la cadena real» (AXIOMS.md), con `goedel_I_neg` vivo desde ADR-121.
+# Cada regla: un SÍMBOLO, una frase prohibida (ERE sobre la línea normalizada) y qué la desmiente. Todos los símbolos de
+# las reglas tienen que estar declarados en el árbol (si uno cambia de nombre, rojo: la regla no se apaga en silencio).
+# Se miran los documentos autoritativos y los `.lean` de la librería, el barril incluido (T31).
+# La línea se NORMALIZA: minúsculas (también Á…Ö), espacios duros, negrita y comillas invertidas fuera, «∼», «~»,
+# `\neg` y `\nvdash` a «¬» y «⊬», y lo que haya entre «⊬» y «¬G» (espacios, un paréntesis), fuera. Lo citado entre «…»
+# sale, salvo que NOMBRE el símbolo de una regla sin contener la frase: entonces se quitan las comillas y su contenido
+# cuenta (un «⊬¬G» entre comillas no esconde nada; un «pendiente» suelto es una etiqueta, y la frase citada la dice otro).
+# Lo tachado (~~…~~), fuera. La ventana de una regla no cruza el fin de una frase («. », «;», «|»; «cf.» y «p. ej.» no
+# lo son), y se mira también cada PAR de líneas seguidas (una frase partida en dos).
+# No cuentan: el código de las vallas (CommonMark: la que cierra, del mismo carácter y al menos igual de larga); una
+# sección de registro (su título, de nivel 2 o más y que no sea un ADR, dice como PALABRA registro, histórico, legacy o
+# superado, o lleva 🗄️ o 🗑️); un documento que se declara «**DOCUMENTO HISTÓRICO**» (en negrita) en sus diez primeras
+# líneas; y una línea con un marcador como PALABRA (histórico, registro, era, falso, «ya no», antes, previo,
+# corrección, corregido, inexacto) o con ✏️. Autotest de salida exacta, con cada evasión de la revisión adversarial.
+echo ""
+echo "════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════"
+I_REGLAS=$(mktemp); I_AUTO=$(mktemp -d)
+# (cada regla: símbolo, cómo se escribe en el texto, lo de DELANTE, cuántos bytes como mucho entre los dos, lo de
+# DETRÁS, y qué la desmiente)
+printf '%s\n' \
+  'goedel_I_neg	⊬¬g	⊬¬g	60	(no existe|no est(a|á)[^a-z]|sigue abiert|abiert[oa]|falta|pendiente|sin cerrar)	«⊬¬G» está demostrada: goedel_I_neg (ADR-121)' \
+  'goedel_I_neg	⊬¬g	(no existe|sigue abiert|abiert[oa]|falta|pendiente)	60	⊬¬g	«⊬¬G» está demostrada: goedel_I_neg (ADR-121)' \
+  'rosser	[^a-z0-9_]rosser	[^a-z0-9_]rosser	30	(pendiente|por hacer|por construir|no est(a|á) (hecho|demostrad|cerrad))	Rosser está demostrado: rosser y rosser_ext (ADR-157)' \
+  'lob	[^a-z0-9_]l(ö|o)b[^a-z0-9]	[^a-z0-9_]l(ö|o)b[^a-z0-9]	30	(pendiente|por hacer|por construir|no est(a|á) (hecho|demostrad|cerrad))	Löb está demostrado: lob (ADR-159)' \
+  > "$I_REGLAS"
+# (la ventana se mira a mano, no con un intervalo `{0,60}` ni con «[^TAB]?» repetido: mawk, el awk de la CI, retrocede
+# y con una expresión así no acaba; el fin de frase se vuelve un TAB, y la ventana no lo cruza)
+I_AWK='
+function bajar(s) { s = tolower(s); gsub(/Á/, "á", s); gsub(/É/, "é", s); gsub(/Í/, "í", s); gsub(/Ó/, "ó", s)
+  gsub(/Ú/, "ú", s); gsub(/Ñ/, "ñ", s); gsub(/Ö/, "ö", s); return s }
+function ventana(s, P, n, Q,   r, a, b, resto, t) {
+  r = s
+  while (match(r, P)) { a = RSTART; b = RSTART + RLENGTH; resto = substr(r, b); t = index(resto, "\t")
+    if (t) resto = substr(resto, 1, t - 1)
+    if (match(resto, Q) && RSTART - 1 <= n) return 1
+    r = substr(r, a + 1) }
+  return 0 }
+function choca(s,   i) { s = " " s " "; for (i = 1; i <= nr; i++) if ((SIM[i] in vivo) && ventana(s, DEL[i], N[i], DET[i])) return i; return 0 }
+function nombra(s,   i) { s = " " s " "; for (i = 1; i <= nr; i++) if ((SIM[i] in vivo) && s ~ SRE[i]) return 1; return 0 }
+function norm(s,   p, r, q, c) {
+  s = bajar(s); gsub(/\t/, " ", s); gsub(NBSP, " ", s); gsub(NNBSP, " ", s)
+  gsub(/~~[^~]*~~/, " ", s); gsub(/[*][*]/, "", s); gsub(/`/, "", s)
+  gsub(/∼/, "¬", s); gsub(/\\neg/, "¬", s); gsub(/\\nvdash/, "⊬", s)
+  gsub(/⊬[ (]*(¬|~)[ ]*/, "⊬¬", s); gsub(/  +/, " ", s)
+  while ((p = index(s, "«")) > 0) { r = substr(s, p + 2); q = index(r, "»"); if (!q) break
+    c = substr(r, 1, q - 1); s = substr(s, 1, p - 1) (!choca(c) && nombra(c) ? c : " ") substr(r, q + 2) }
+  return s }
+function frases(s) { gsub(/cf[.] /, "cf ", s); gsub(/p[.] ej[.]?/, "p ej", s); gsub(/[.] /, "\t", s); gsub(/[.] *$/, "\t", s)
+  gsub(/[;|]/, "\t", s); return s }
+BEGIN { NBSP = sprintf("%c%c", 194, 160); NNBSP = sprintf("%c%c%c", 226, 128, 175)
+  MARC = "[^a-z0-9_](hist(o|ó)ric(o|a|os|as)|registros?|era|eran|fals(o|a|os|as)|ya no|antes|previ(o|a|os|as)|correcci(o|ó)n(es)?|corregid(o|a|os|as)|inexact(o|a|os|as))[^a-z0-9_]"
+  REGH = "[^a-z0-9_](registros?|hist(o|ó)ric(o|a|os|as)|legacy|superad(o|a|os|as))[^a-z0-9_]|🗄|🗑" }
+FILENAME == ARGV[1] { split($0, z, "\t"); nr++; SIM[nr] = z[1]; SRE[nr] = z[2]; DEL[nr] = z[3]; N[nr] = z[4] + 0; DET[nr] = z[5]
+  POR[nr] = z[6]; next }
+FILENAME == ARGV[2] { vivo[$0] = 1; next }
+FNR == 1 { valla = 0; reg = 0; lean = (FILENAME ~ /[.]lean$/); hist_doc = 0; prev = "" }
+FNR <= 10 && /[*][*]DOCUMENTO HIST(O|Ó)RICO/ { hist_doc = 1 }
+hist_doc { next }
+!lean { f = $0; sub(/^ ? ? ?/, "", f)
+  if (valla) {
+    if (substr(f, 1, 1) == vc) { if (vc == "`") match(f, /^`+/); else match(f, /^~+/)
+      if (RLENGTH >= vn && substr(f, RLENGTH + 1) ~ /^[ \t]*$/) valla = 0 }
+    prev = ""; next }
+  if (f ~ /^```/ || f ~ /^~~~/) { vc = substr(f, 1, 1); if (vc == "`") match(f, /^`+/); else match(f, /^~+/)
+    vn = RLENGTH; valla = 1; prev = ""; next } }
+!lean && /^##?#?#?#?#? / { match($0, /^#+/); lv = RLENGTH
+  if (reg && lv <= reg) reg = 0
+  if (!reg && lv >= 2 && $0 !~ /^## ADR-/ && (" " bajar($0) " ") ~ REGH) reg = lv
+  prev = ""; next }
+reg { next }
+/^[ \t]*$/ { prev = ""; next }
+{ s = norm($0); ex = (index($0, "✏") > 0) || ((" " s " ") ~ MARC); s = frases(s)
+  hit = ex ? 0 : choca(s)
+  if (hit) print FILENAME ":" FNR ": " POR[hit] "\t" substr($0, 1, 140)
+  else if (!ex && prev != "" && !prevhit && (i = choca(prev " " s))) print FILENAME ":" prevn ": " POR[i] "\t" substr(prevraw, 1, 140)
+  if (ex) prev = ""; else { prev = s; prevn = FNR; prevraw = $0; prevhit = hit } }'
+# autotest: cada frase que tiene que salir, cada exención, y las evasiones de la revisión adversarial de ADR-169
+printf '%s\n' goedel_I_neg lob rosser > "$I_AUTO/vivos3"
+printf '%s\n' goedel_I_neg > "$I_AUTO/vivos1"
+printf '%s\n' '# Doc' 'La mitad ⊬¬G no existe todavía.' 'Lo que sigue abierto es ⊬¬G.' 'Rosser está pendiente.' \
+  'LÖB ESTÁ PENDIENTE.' 'Se dijo «la mitad ⊬¬G no existe».' 'La mitad «⊬¬G» no existe.' '~~⊬¬G no existe~~ ya no.' \
+  '✏️ ⊬¬G falta (corrección).' 'Fuera de duda: ⊬ (¬G) sigue abierta.' $'La mitad \xe2\x8a\xac\xc2\xa0\xc2\xacG, cf. el §3.2, no existe.' \
+  'La mitad ⊬¬G está demostrada; lo que falta es Con.' 'La mitad ⊬¬G' 'no existe aún.' '```' '~~~' '⊬¬G no existe' '```' \
+  '## Notas y registro' '⊬¬G no existe aquí.' '## Hoy' '⊬¬G falta otra vez.' 'Un global pendiente.' \
+  'Rosser_ext no está demostrado.' 'El control «`⊬¬G` (Rosser)» y la marca «pendiente», hecho.' \
+  '`⊬¬G` **no** está cerrado.' > "$I_AUTO/doc.md"
+printf '%s\n' 'Rosser está pendiente.' 'La mitad ⊬¬G no existe.' > "$I_AUTO/doc2.md"
+printf '%s\n' '> ⚠️ **DOCUMENTO HISTÓRICO.**' '⊬¬G no existe.' > "$I_AUTO/doc3.md"
+printf '%s\n' 'Este no es un documento histórico.' '⊬¬G no existe.' > "$I_AUTO/doc4.md"
+I_AUTO_SAL=$( (cd "$I_AUTO" && LC_ALL=C awk "$I_AWK" "$I_REGLAS" vivos3 doc.md doc3.md doc4.md && LC_ALL=C awk "$I_AWK" "$I_REGLAS" vivos1 doc2.md) \
+  | cut -d: -f1,2 | tr '\n' ';')
+I_AUTO_OK='doc.md:2;doc.md:3;doc.md:4;doc.md:5;doc.md:7;doc.md:10;doc.md:11;doc.md:13;doc.md:22;doc.md:24;doc.md:26;doc4.md:2;doc2.md:2;'
+I_FAIL=0
+I_FALTAN=$(cut -f1 "$I_REGLAS" | LC_ALL=C sort -u | while IFS= read -r s; do grep -qxF "$s" "$DECLS" 2>/dev/null || printf ' %s' "$s"; done)
+I_LEAN=$(printf '%s\n' "$CIERRE" | grep -E '^ROBINSON_PlusPlus(/.*)?[.]lean$')
+I_FICH=""
+for f in $DOCS $I_LEAN; do [ -e "$f" ] && I_FICH="$I_FICH $f"; done
+if [ "$I_AUTO_SAL" != "$I_AUTO_OK" ]; then
+  echo "  ❌ NO PUDE MEDIR [I]: el autotest no da lo esperado ($I_AUTO_OK), da: $I_AUTO_SAL"
+  I_FAIL=1
+elif [ "${B_DECLS_OK:-0}" != "1" ] || [ -n "$I_FALTAN" ]; then
+  # (sin las declaraciones, o sin el símbolo de una regla, la regla no valdría y saldría verde sin mirar nada)
+  echo "  ❌ NO PUDE MEDIR [I]: las declaraciones de [B] no están, o no tienen el símbolo de una regla:${I_FALTAN:- (sin declaraciones)}."
+  I_FAIL=1
+elif [ -n "${A_MAL:-}" ]; then
+  echo "  ❌ NO PUDE MEDIR [I]: documentos que no son UTF-8 válido o llevan NUL (ver [A])."
+  I_FAIL=1
+elif ! I_HITS=$(LC_ALL=C awk "$I_AWK" "$I_REGLAS" "$DECLS" $I_FICH); then
+  echo "  ❌ NO PUDE MEDIR [I]: el awk falló."
+  I_FAIL=1
+elif [ -n "$I_HITS" ]; then
+  printf '%s\n' "$I_HITS" | sed 's/^/  ❌ /; s/\t/\n      /'
+  I_FAIL=1
+fi
+rm -rf "$I_REGLAS" "$I_AUTO"
+[ "$I_FAIL" = "0" ] && echo "  ✓ ninguna frase que un teorema vivo desmienta ($(printf '%s\n' "$I_LEAN" | grep -c .) .lean y los documentos)" || FAIL=1
 
 # ─── 4. PROYECCIÓN: ¿está cada módulo en el catálogo? ────────────────────────
 echo

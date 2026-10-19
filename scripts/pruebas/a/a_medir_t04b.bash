@@ -1,5 +1,5 @@
 #!/bin/bash
-# a_medir_t04b.bash JOBS SOND — la medición previa de T04b (doc/AUDITORIA-SUELO-2026-10-12.md; ADR‑167): réplica de [A] y
+# a_medir_t04b.bash JOBS SOND — la medición previa de T04b (doc/AUDITORIA-SUELO-2026-10-12.md; ADR‑169): réplica de [A] y
 # [A2] de check-doc-sync.bash con cada cambio por separado: (1) sin la FECHA como exención; (2) patrones que admiten la
 # negrita (`**131** jobs`); (3) la cifra de sondeos (SOND, que se calculaba y no se comparaba). Imprime, por variante,
 # las líneas de la cabecera (las 100 primeras) y del cuerpo cuya cifra no cuadra. JOBS y SOND: las cifras de hoy.

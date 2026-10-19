@@ -1,0 +1,12 @@
+######## región H
+axiom	4	 [histórico] [«4]		549:AXIOMS.md:> ## 🗄️ Registro histórico — el «ESTADO REAL» del 2026‑09‑23: «4 `axiom` de Lean», y «NI UNO MÁS EN NINGUNA PARTE»
+axiom	4	 [histórico] [«4]		571:AXIOMS.md:> ## 🗄️ Registro histórico — ESTADO del 2026‑09‑13 · «4 `axiom` de Lean» en el build · 0 `sorry` · Lean v4.31.0
+sorry	1	 [«1]		29:REFERENCE.md:> | «Completitud» ✅ / «1 sorry» | ⚠️ **0 `sorry`, pero UN SOLO `axiom`**: el `sorry` se sustituyó por CINCO postulados en un commit titulado «100 % sorry‑free»; el 2026‑09‑13 cayeron CU
+sorry	1	 [~] [«4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0] [retirad]		31:REFERENCE.md:> | «4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0» | **2 `lean_lib`** (`FOL`, `TheoryFramework`) · **4 `axiom`** en el build (+1 en `cuarentena/Completeness.lean`) · **0 sorry** · **v4.31.0**. `FOLPu
+sorry	1	 [era ] [→] [ya no] [«1]	era ,	113:CURRENT-STATUS-PROJECT.md:> | «Completitud» ✅ / «1 sorry» | 🏁 `completeness₀ : Γ ⊨ f → Γ ⊢₀ f` (`FOL/Canonical0.lean`, 2026-09-16), con **cero axiomas del proyecto**: `[propext, Classical.choice,
+sorry	1	 [~] [«4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0] [retirad]		114:CURRENT-STATUS-PROJECT.md:> | «4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0» | **2 `lean_lib`** (`FOL`, `TheoryFramework`) · **0 `axiom`**: los cuatro de `FOL/MetaRules.lean` (`imp_intro`, `raa`, `or_elim`, `ex_el
+sorry	1	 [era ] [→] [ya no] [«1]	era ,	413:README.md:> | «Completitud» ✅ / «1 sorry» | 🏁 `completeness₀ : Γ ⊨ f → Γ ⊢₀ f` (`FOL/Canonical0.lean`, 2026-09-16), con **cero axiomas del proyecto**: `[propext, Classical.choice, Quot.sound]`. E
+sorry	1	 [~] [«4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0] [retirad]		414:README.md:> | «4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0» | **2 `lean_lib`** (`FOL`, `TheoryFramework`) · **0 `axiom`**: los cuatro de `FOL/MetaRules.lean` (`imp_intro`, `raa`, `or_elim`, `ex_elim`), refutables
+sorry	1	 [era ] [→] [ya no] [«1]	era ,	613:NEXT-STEPS.md:> | «Completitud» ✅ / «1 sorry» | 🏁 `completeness₀ : Γ ⊨ f → Γ ⊢₀ f` (`FOL/Canonical0.lean`, 2026-09-16), con **cero axiomas del proyecto**: `[propext, Classical.choice, Quot.sound]
+sorry	1	 [~] [«4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0] [retirad]		614:NEXT-STEPS.md:> | «4 `lean_lib`, ~43 módulos, 1 sorry, v4.28.0» | **2 `lean_lib`** (`FOL`, `TheoryFramework`) · **0 `axiom`**: los cuatro de `FOL/MetaRules.lean` (`imp_intro`, `raa`, `or_elim`, `ex_elim`), refuta
+######## región B

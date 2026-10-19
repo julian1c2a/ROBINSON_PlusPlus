@@ -1,0 +1,8 @@
+== sin mutar (lo que debe marcar: real.md:2, real.md:3, real.md:5 y real2.md:3):
+  original: el sed NO cambió nada (mutante nulo)
+  M1 regla de Rosser rota: VIVO — [I] marca: real.md:3 real.md:5 real2.md:3 
+  M2 «DOCUMENTO» fuera de hist_doc: VIVO — [I] marca: real.md:2 real.md:3 real.md:5 
+  M3 hist_doc en todo el fichero: VIVO — [I] marca: real.md:2 real.md:3 real.md:5 real2.md:3 
+  M4 sección de registro también de nivel 1: VIVO — [I] marca: real.md:2 real.md:3 real.md:5 real2.md:3 
+  M5 sin «falta» en la regla 1: MUERTO (el autotest falla)
+  M6 marcador «s» (todo exime): MUERTO (el autotest falla)

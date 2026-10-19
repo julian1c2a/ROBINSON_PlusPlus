@@ -1,0 +1,38 @@
+mawk 1.3.4 20260129
+== [I] sobre doc.md y X.lean (lo marcado):
+doc.md:2 doc.md:3 doc.md:13 doc.md:18 doc.md:20 doc.md:21 doc.md:22 doc.md:24 doc.md:26 doc.md:27 doc.md:31 doc.md:35 X.lean:1 X.lean:2 FAIL=1 
+== un documento que dice «no es un DOCUMENTO HISTÓRICO» en su cabecera:
+✓ ninguna frase que un teorema vivo desmienta (0 .lean y los documentos) FAIL=0 
+== un documento que NO existe en DOCS, delante de los demás (¿se pierde el resto?):
+✓ ninguna frase que un teorema vivo desmienta (1 .lean y los documentos) FAIL=0 
+
+===== S0: base SIN tabla y 2 líneas viejas; --a2-deuda-inicial (la creación)
+  deuda declarada: 2 líneas en 1 entradas; hoy, 2
+FAIL=0
+===== S1: con la base que ya tiene la tabla, 3 líneas en vez de 2 (debe ser ROJO)
+  deuda declarada: 2 líneas en 1 entradas; hoy, 3
+FAIL=1
+===== S2 (vía b): la deuda llega a 0 y se BORRA la tabla vacía; luego, 5 líneas viejas NUEVAS con una tabla nueva
+  deuda declarada: 0 líneas en 0 entradas; hoy, 0
+FAIL=0
+  deuda declarada: 0 líneas en 0 entradas; hoy, 0
+FAIL=0
+  deuda declarada: 5 líneas en 1 entradas; hoy, 5
+FAIL=0
+===== S3 (vía b): en el commit de CREACIÓN (base sin tabla), una entrada DUPLICADA con «+inf» que el sort deja delante
+  deuda declarada: 2 líneas en 2 entradas; hoy, 2
+FAIL=0
+  deuda declarada: 40 líneas en 1 entradas; hoy, 40
+FAIL=1
+  deuda declarada: 12 líneas en 2 entradas; hoy, 2
+FAIL=0
+  deuda declarada: 10 líneas en 1 entradas; hoy, 10
+FAIL=0
+===== S4 (a): el CAMBIO dentro de una clave: se arregla una línea vieja y se añade OTRA nueva con la misma cifra
+  deuda declarada: 2 líneas en 1 entradas; hoy, 2
+FAIL=0
+===== S5 (c): --quick (JOBS vacío) con deuda de jobs en la tabla
+  deuda declarada: 2 líneas en 1 entradas; hoy, 0
+FAIL=1
+  deuda declarada: 0 líneas en 0 entradas; hoy, 0
+FAIL=0

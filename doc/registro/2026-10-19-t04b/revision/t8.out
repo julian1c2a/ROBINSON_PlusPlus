@@ -1,0 +1,11 @@
+== VERBATIM, documentos (wt):
+== VERBATIM, .lean del cierre (117):
+== EXENTAS (documentos):
+GODEL-STATUS.md:122: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	- ⚠️ **CORRECCIÓN DE AUDITORÍA (2026-07-13, `repasa_y_proyecta`): la mitad `⊬¬G` NO está en la
+GODEL-STATUS.md:145: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	  re‑derivar `⊬¬G` **con la hipótesis honesta** falta la **representabilidad NEGATIVA**, que **no
+GODEL-STATUS.md:6: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	**Last updated:** 2026-07-20 — ⚠️ **DOCUMENTO HISTÓRICO/DIAGNÓSTICO.** El estado vivo está en [NEXT-STEPS.md](NEXT-STEPS.md) (bloqu
+GODEL-STATUS.md:89: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	| **D** | Teoremas de incompletitud | **cadena REAL** (`Meta/DiagonalTwo.lean`, `Meta/GodelTwo.lean`) | 🔶 **Gödel I: sólo `⊬G`** (`go
+REFERENCE.md:265: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	> ⚠️ **La mitad `⊬¬G` de Gödel I sigue SIN cerrar** *(✏️ 2026‑10‑14, ADR‑134: registro; desde ADR‑121 la cierra `goedel_
+REFERENCE.md:382: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	`[AnclaEq]`; D2 (`d2_prf`) no. La mitad `⊬¬G` **no existe en ningún cálculo** desde que se retiró la capa
+REFERENCE.md:424: «⊬¬G» está demostrada: goedel_I_neg (ADR-121)	Lo único que sigue abierto de Gödel I es la mitad **`⊬¬G`** (frente 2).
+== EXENTAS (.lean):

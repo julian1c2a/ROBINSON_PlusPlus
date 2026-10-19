@@ -1,0 +1,45 @@
+# a_mutantes_t04b_fol.bash, 2026-10-19T19:17Z, FOL HEAD 2897e1b (más el árbol de trabajo)
+
+== cabecera-fecha-negrita (salida 1): Estado 2026-10-19: **3** sorry en el build.
+════ [A] CIFRAS ════
+  ✗ sorry: dice 3, real 0
+      CURRENT-STATUS-PROJECT.md:6: Estado 2026-10-19: **3** sorry en el build.
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✓ el cuerpo tampoco tiene cifras obsoletas
+
+== cabecera-palabra-dentro (salida 1): Fuera de las listas: **2** `axiom` de Lean.
+════ [A] CIFRAS ════
+  ✗ axiom de Lean: dice 2, real 0
+      CURRENT-STATUS-PROJECT.md:6: Fuera de las listas: **2** `axiom` de Lean.
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✓ el cuerpo tampoco tiene cifras obsoletas
+
+== cabecera-axiom-en-el-build (salida 1): Hay **4 `axiom`** en el build.
+════ [A] CIFRAS ════
+  ✗ axiom de Lean: dice 4, real 0
+      CURRENT-STATUS-PROJECT.md:6: Hay **4 `axiom`** en el build.
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✓ el cuerpo tampoco tiene cifras obsoletas
+
+== cabecera-cita-con-digito (salida 1): Hay 5 sorry (ver «ADR-121»).
+════ [A] CIFRAS ════
+  ✗ sorry: dice 5, real 0
+      CURRENT-STATUS-PROJECT.md:6: Hay 5 sorry (ver «ADR-121»).
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✓ el cuerpo tampoco tiene cifras obsoletas
+
+== cuerpo-fecha (salida 1): Estado 2026-10-19: 7 sorry en el build.
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✗ sorry: dice 7, real 0
+      NEXT-STEPS.md:151: Estado 2026-10-19: 7 sorry en el build.
+  ✗ 1 línea(s) en el CUERPO con cifras que no cuadran: ¿una afirmación de estado ACTUAL
+      (⇒ corregir) o un registro sin marcar (⇒ «previo», «era», «histórico»; la fecha no basta)?
+
+== cuerpo-control-historico (salida 0): Histórico: 7 sorry en el build.
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO (T04b, ADR-169 de RPP) ════
+  ✓ el cuerpo tampoco tiene cifras obsoletas
+

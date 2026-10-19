@@ -88,7 +88,6 @@ B	Con_Q	AXIOMS.md	1
 B	Con_Q	DECISIONS.md	1
 B	Consistent	GODEL-STATUS.md	1
 B	ConsistentOmega	AXIOMS.md	1
-B	ConsistentOmega	CURRENT-STATUS-PROJECT.md	1
 B	ConsistentOmega	DECISIONS.md	2
 B	ConsistentOmega	GODEL-STATUS.md	2
 B	ConsistentOmega	REFERENCE.md	1
@@ -277,7 +276,6 @@ B	ReflectionPrf	NEXT-STEPS.md	1
 B	ReflectionPrf	REFERENCE.md	1
 B	ReflectionPrf	doc/REFERENCE-Incompleteness.md	1
 B	ReflectorDesdeConsumidor	doc/REFERENCE-Incompleteness.md	1
-B	Reflects	CURRENT-STATUS-PROJECT.md	1
 B	Reflects	REFERENCE.md	2
 B	Reflects	TEOREMAS-E-HIPOTESIS.md	1
 B	Reflects	doc/REFERENCE-Incompleteness.md	1
@@ -461,7 +459,7 @@ B	axNN_descriptor	REFERENCE.md	1
 B	ax_L1	doc/REFERENCE-Incompleteness.md	1
 B	ax_L2	doc/REFERENCE-Incompleteness.md	1
 B	ax_axiomsCodeT_eq	AXIOMS.md	4
-B	ax_axiomsCodeT_eq	CURRENT-STATUS-PROJECT.md	2
+B	ax_axiomsCodeT_eq	CURRENT-STATUS-PROJECT.md	1
 B	ax_axiomsCodeT_eq	REFERENCE.md	2
 B	ax_axiomsCodeT_eq	doc/REFERENCE-Incompleteness.md	3
 B	ax_inAxC	AXIOMS.md	3
@@ -659,7 +657,7 @@ B	gnum_lt	REFERENCE.md	1
 B	godelC'_fixedpoint	AXIOMS.md	1
 B	godelC'_fixedpoint	doc/REFERENCE-Incompleteness.md	1
 B	godelCN_fixedpoint	AXIOMS.md	1
-B	godelCN_fixedpoint	CURRENT-STATUS-PROJECT.md	2
+B	godelCN_fixedpoint	CURRENT-STATUS-PROJECT.md	1
 B	godelCN_fixedpoint	GODEL-STATUS.md	1
 B	godelCN_fixedpoint	REFERENCE.md	1
 B	godelCN_fixedpoint	doc/REFERENCE-Incompleteness.md	1
@@ -672,7 +670,7 @@ B	goedelSentence_fixedpoint	CURRENT-STATUS-PROJECT.md	2
 B	goedelSentence_fixedpoint	GODEL-STATUS.md	1
 B	goedelSentence_fixedpoint	doc/REFERENCE-Incompleteness.md	1
 B	goedel_first_numeral	AXIOMS.md	2
-B	goedel_first_numeral	CURRENT-STATUS-PROJECT.md	3
+B	goedel_first_numeral	CURRENT-STATUS-PROJECT.md	2
 B	goedel_first_numeral	GODEL-STATUS.md	1
 B	goedel_first_numeral	REFERENCE.md	2
 B	goedel_first_numeral	TEOREMAS-E-HIPOTESIS.md	1
@@ -683,7 +681,6 @@ B	goedel_first_real'	GODEL-STATUS.md	2
 B	goedel_first_real'	doc/REFERENCE-Incompleteness.md	3
 B	goedel_first_undecidable	GODEL-STATUS.md	1
 B	goedel_first_undecidable	doc/REFERENCE-Incompleteness.md	1
-B	goedel_first_undecidable_numeral	CURRENT-STATUS-PROJECT.md	1
 B	goedel_first_undecidable_numeral	TEOREMAS-E-HIPOTESIS.md	1
 B	goedel_first_undecidable_numeral	doc/REFERENCE-Incompleteness.md	2
 B	goedel_first_undecidable_omega	TEOREMAS-E-HIPOTESIS.md	1
@@ -692,7 +689,7 @@ B	goedel_first_unrefutable	GODEL-STATUS.md	1
 B	goedel_first_unrefutable	doc/REFERENCE-Incompleteness.md	1
 B	goedel_second	GODEL-STATUS.md	1
 B	goedel_second'	AXIOMS.md	3
-B	goedel_second'	CURRENT-STATUS-PROJECT.md	2
+B	goedel_second'	CURRENT-STATUS-PROJECT.md	1
 B	goedel_second'	GODEL-STATUS.md	2
 B	goedel_second'	README.md	1
 B	goedel_second'	REFERENCE.md	2
@@ -985,7 +982,6 @@ B	succ_loc	doc/REFERENCE-Incompleteness.md	1
 B	sym!	DECISIONS.md	2
 B	sym!	README.md	1
 B	tc_arith	doc/REFERENCE-Incompleteness.md	1
-B	tc_cons	CURRENT-STATUS-PROJECT.md	1
 B	tc_cons	REFERENCE.md	1
 B	tc_cons	doc/REFERENCE-Incompleteness.md	2
 B	tc_cons	sondeos/README.md	3
@@ -1116,7 +1112,7 @@ B2	EvalPredDot.lean	doc/REFERENCE-Incompleteness.md	1
 B2	EvalSubsttc.lean	doc/REFERENCE-Incompleteness.md	1
 B2	EvalSubsttc.lean	sondeos/README.md	1
 B2	FOL/MetaRules.lean	AXIOMS.md	3
-B2	FOL/MetaRules.lean	CURRENT-STATUS-PROJECT.md	2
+B2	FOL/MetaRules.lean	CURRENT-STATUS-PROJECT.md	1
 B2	FOL/MetaRules.lean	DEPENDENCIES.md	1
 B2	FOL/MetaRules.lean	GODEL-STATUS.md	2
 B2	FOL/MetaRules.lean	NEXT-STEPS.md	1
