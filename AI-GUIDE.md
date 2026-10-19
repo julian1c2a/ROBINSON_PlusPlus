@@ -711,8 +711,9 @@ preservando los bloqueos locales.
 > 3. `git push origin HEAD:master` —un avance rápido hasta lo ya comprobado— y borrar la rama:
 >    `git push origin --delete ci/<nombre>`.
 >
-> Si la CI sale roja, se arregla con un commit nuevo, se sube a la misma rama y se repite; `master` no se toca. En FOL,
-> que es otro repositorio, sigue el paso 5 de siempre.
+> Si la CI sale roja, se arregla con un commit nuevo, se sube a la misma rama y se repite; `master` no se toca.
+> ✏️ 2026‑10‑19 ([ADR‑168](DECISIONS.md)): **en FOL, igual.** Su `master` tiene la misma protección y su CI corre en las
+> ramas «ci/…»; M‑12 sigue (FOL antes que RPP).
 
 ---
 
