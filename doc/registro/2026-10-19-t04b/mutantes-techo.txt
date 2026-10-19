@@ -1,0 +1,13 @@
+# a_mutantes_t04b.bash, 2026-10-19T20:02Z, HEAD fc42e3f (más el árbol de trabajo)
+
+== A2-techo (salida 1): la tabla sube con una línea que la cuadra: sólo el techo de la base verificada lo ve
+════ [A] CIFRAS ════
+  ✓ sin cifras obsoletas
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  techo: la tabla de la base verificada, fc42e3f (fc42e3f68db390d4dd97faca72ae0fa458dfaab7)
+  ❌ doc/control/a2-deuda.tsv tiene entradas por ENCIMA del techo (sólo baja):
+      jobs	NEXT-STEPS.md	0	1
+  deuda declarada: 52 líneas en 26 entradas; hoy, 52
+════ [I] FRASES QUE UN TEOREMA VIVO DESMIENTE — ROJO (T04b, ADR-169) ════
+  ✓ ninguna frase que un teorema vivo desmienta (118 .lean y los documentos)
+

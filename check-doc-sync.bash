@@ -505,8 +505,10 @@ elif GIT_NO_REPLACE_OBJECTS=1 git cat-file -e "$A2_BASE:$A2_TABLA" 2>/dev/null; 
   A2_MALB=$(printf '%s\n' "$A2_TECHO" | grep . | a2_valida)
   if [ -n "$A2_MALB" ]; then echo "  ❌ la tabla de la base verificada no tiene la forma de la tabla:"; printf '%s\n' "$A2_MALB" | head -3; A2_FAIL=1; fi
   A2_TXT_TECHO="la tabla de la base verificada, $(git rev-parse --short "$A2_BASE")"
-elif GIT_NO_REPLACE_OBJECTS=1 git show "$A2_BASE:check-doc-sync.bash" 2>/dev/null | grep -q 'a2-deuda[.]tsv'; then
+elif case "$(GIT_NO_REPLACE_OBJECTS=1 git show "$A2_BASE:check-doc-sync.bash" 2>/dev/null)" in *a2-deuda.tsv*) true ;; *) false ;; esac; then
   # (la base ya la conocía y no la tiene: alguien la borró; el techo es cero)
+  # ⚠️ Sin tubería a `grep -q`: con `pipefail`, grep sale al primer acierto, `git show` muere de SIGPIPE y la tubería
+  # da FALSO; así salía «no la conoce» con una base que sí (lo cazó el juguete de ADR-169 §8).
   A2_TXT_TECHO="CERO: la base verificada, $(git rev-parse --short "$A2_BASE"), conoce la tabla y no la tiene"
 else
   echo "  ⚠️  la base verificada no conoce $A2_TABLA: es la que se crea, y no se compara con nada."

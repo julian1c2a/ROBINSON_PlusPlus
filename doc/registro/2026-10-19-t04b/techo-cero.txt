@@ -1,0 +1,12 @@
+# a_techo_cero_t04b.bash, 2026-10-19T20:09Z: base = el commit que borra la tabla (e197bbd), HEAD = el que la devuelve
+
+════ [A2] CIFRAS EN EL CUERPO — ROJO, con trinquete por línea (T04b, ADR-169) ════
+  ⚠️  sin medir «jobs»: sus entradas de la tabla no se comparan.
+  techo: CERO: la base verificada, e197bbd, conoce la tabla y no la tiene (e197bbd4ff299e861acd44ea48e65e73915f923b)
+  ❌ doc/control/a2-deuda.tsv tiene entradas por ENCIMA del techo (sólo baja):
+      axiom de Lean	README.md	5	1
+      axiom de Lean	doc/REFERENCE-Incompleteness.md	7	1
+      conteo de Meta	doc/REFERENCE-Incompleteness.md	90	1
+      conteo de Meta	doc/REFERENCE-Incompleteness.md	99	2
+      jobs	CURRENT-STATUS-PROJECT.md	28	2
+  deuda declarada: 51 líneas en 25 entradas; hoy, 9

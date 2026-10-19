@@ -2938,7 +2938,12 @@ propietario (ADR‑164), tras cerrar T04 (ADR‑167) y proteger el master de FOL
    comentario de `Meta/Lob.lean`, mayúsculas con un espacio duro, la frase partida en dos líneas y la negrita. Verdes,
    como deben: la cifra con «(histórico)», la frase citada entre «…» y `[A2]` con `--quick`. En FOL,
    `scripts/pruebas/a/a_mutantes_t04b_fol.bash`: rojos con fecha y negrita, «fuera», «en el build», una cita con
-   dígito y una cifra con fecha en el cuerpo; verde con «Histórico:».
+   dígito y una cifra con fecha en el cuerpo; verde con «Histórico:». Y el techo CERO, en un juguete
+   (`scripts/pruebas/a/a_techo_cero_t04b.bash`: en una copia de trabajo aparte, un commit borra la tabla y el siguiente
+   la devuelve, con la base en el primero): rojo. Ese juguete cazó un verde falso del propio arreglo, corregido en el
+   commit que trae las dos últimas salidas: la comprobación de que la base conoce la tabla iba por una tubería a
+   «grep -q», y con «pipefail» daba falso (grep sale al primer acierto y git muere de SIGPIPE), así que salía «no la
+   conoce». Las salidas del techo y del techo cero, en `mutantes-techo.txt` y `techo-cero.txt` de esa carpeta.
 9. **Lo que no hace.** `[I]` mira sus cuatro reglas: no es un detector de prosa falsa, y una frase falsa dicha con otras
    palabras pasa; la lista crece cuando un teorema de la línea de llegada cambie lo que es verdad. Un título que se
    declare de registro exime lo que tiene debajo. `[A2]` cuenta líneas: cambiar una línea vieja por otra con la misma
