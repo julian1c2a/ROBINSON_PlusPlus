@@ -1,0 +1,73 @@
+# T04, cierre (ADR-167): la CUARTA revisión adversarial de [B], por un agente, el 2026-10-19, sobre la primera versión
+# del techo sobre la base verificada (la que arreglaba H1–H22 de la tercera). Reconstruyó las entradas sin lake y
+# reprodujo exactamente las dos tablas de aquel momento (RPP 1223 entradas y 2007 citas; FOL 356 y 717); su copia del
+# trinquete (34 pasos) salía 34/34, y le añadió 20 pasos, todos en rojo esperado y todos en verde: 20 agujeros
+# reproducidos. Sus guiones y salidas, en revision-4/ (los guiones con «.txt» detrás: son registro); el antes y el
+# después de sus casos del núcleo, en revision-4/nucleo/casos-antes.txt y casos-despues.txt. Resumen fiel, y lo que
+# se hizo (→).
+
+ALTA
+
+A1 · Una ETIQUETA llamada `origin/master` le gana a la rama remota al resolver la base por omisión (git resuelve
+     refs/tags antes que refs/remotes, y el aviso de ambigüedad se perdía en 2>/dev/null): con ella en un commit sin
+     tabla, sin techo; en un master viejo, el techo de entonces. → La base por omisión es `refs/remotes/origin/master`,
+     con su nombre entero; y si la base tiene el núcleo y no la tabla, rojo (falla en cerrado). Trinquete (18a)–(18b).
+A2 · En FOL la base no está verificada: el push va directo a master, un push rojo queda en master y es la base del
+     siguiente; sin `before` (ejecución manual), la base es HEAD. → FOL adopta el flujo de RPP (la CI en una rama
+     `ci/…`, master después; el workflow ya corre en `ci/**`, con la base `origin/master`), y en un push a master sigue
+     la base `before`. ⚠️ Mientras su master no esté PROTEGIDO, la verificación de FOL es tan fuerte como su disciplina:
+     PROPUESTA al propietario, protegerlo como el de RPP (ADR-167 §4). Una ejecución manual con la base = HEAD lo dice
+     («ℹ️ la base verificada es HEAD»).
+A3 · Tres desincronías con CommonMark esconden prosa (latentes: 0 casos hoy): D1 una valla en la línea de un ítem de
+     lista (su cierre sangrado abría otra); D2 un `<!--` a media línea, cerrado párrafos después; D3 una barra al final
+     de una cita (el escape se comía el cierre). → D1 la valla de un ítem se abre y se cierra con su sangría; D2 un
+     comentario sin cerrar sólo sigue si la línea empieza por él; D3 el escape sólo vale al buscar la comilla que abre.
+     Autotest y trinquete (22)–(24); con el núcleo anterior, el autotest se desincroniza a la mitad.
+
+MEDIA
+
+A4 · En el commit que cambia el núcleo el techo era máx(base, nuevo): lo que el núcleo nuevo deja de ver no lo bajaba
+     (37 citas de holgura medidas en RPP). → Delta CON SIGNO: techo = máx(0, base + nuevo − viejo). Medido: RPP, 213
+     entradas y 274 citas de más, 33 y 36 de menos; la tabla, igual al techo, sin holgura.
+A5 · El núcleo del árbol era juez y parte de su crédito (podía distinguir la medición en el directorio aparte). → Las
+     dos mediciones van en el MISMO directorio aparte, con copias de los documentos; y un cambio del núcleo va SOLO: con
+     él, los documentos de la lista no pueden cambiar respecto de la base. Trinquete (20)–(21).
+A6 · «La base no tiene la tabla» fallaba en abierto, y la ruta de la tabla vive en el árbol. → Si la base tiene el
+     núcleo y no la tabla, rojo. Trinquete (19).
+A7 · Un documento con deuda RENOMBRADO (git mv) fuera de la lista se llevaba su deuda; dentro, daba rojo falso. →
+     `git diff -M` desde la base: renombrado dentro de la lista, su deuda va con él; fuera, rojo. Trinquete (15c)–(15d).
+A8 · B_SUBE_ADR ataba la subida a la CLAVE (cualquier documento, cualquier cuenta); en FOL valía un ADR viejo. → El ADR
+     nombra cada entrada entera, «`clave` · documento · citas»; en FOL no hay subida por ADR. Trinquete (8f)–(8g).
+A9 · Marcadores que absuelven citas ajenas: negaciones sin verbo («no retirado», «no se ha retirado», «no es código
+     muerto», «ya no falta»), sustantivos («la propuesta», «por falta de», «el histórico», «los 17 candidatos»), la
+     oración anterior, un paréntesis que unía grupos, un empate. Casos reales: `IsPrime`, `concat_assoc`, `bridge_*`
+     (RPP); `invOf` (FOL). → NEGADO con hasta dos palabras en medio; NOMBRE (artículo + marcador) en blanco; la ventana no
+     cruza un fin de oración (y una cita de otra oración no compite por el marcador); un paréntesis y un punto y coma
+     separan grupos; en empate, de ninguna; y la excepción de los dos puntos («retirados con esa capa: `a`, `b`»). De los
+     26 casos de su bloque M, hoy salen 22 (los 4 que quedan, abajo).
+A10 · Una ruta inexistente con `_` se tomaba por abreviatura y la absolvía un homónimo de Lean
+      (`ROBINSON_PlusPlus/Full/Order`). → Si existe su directorio, es una ruta muerta; y una abreviatura sólo la absuelve
+      el proyecto. Trinquete (28).
+A11 · Globs con punto (`Muerto.cosa.*`) sin mirar, y globs de ficheros vivos por su directorio (`Meta/Borrado*.lean`).
+      → Un glob con punto exige un espacio de nombres, un módulo o una constante; uno de ficheros, casar con algún fichero.
+      Trinquete (27a)–(27b).
+
+BAJA
+
+B1 · Las abreviaturas miraban cada tramo, no su expansión (verde falso `foo_left/right`; 12 citas de deuda falsa:
+     `_and`/`_or` de `ax_substfc_impl/_and/_or`, `bin2`, `a3_loc`, `succ_loc`, `liftLift`, `_max`, `_closed`). → Un tramo
+     que empieza por `_`, o una palabra que el proyecto no declaró, sustituye el último tramo del primero.
+B2 · `vivo.cualquier_campo_en_minúscula` vive por la regla del campo. → Sin cambio (ADR-167 §4).
+B3 · Declaraciones que no compilan (cuarentena/, ficheros sin seguimiento) cuentan como vivas. → Sin cambio (§4).
+B4 · GIT_NO_REPLACE_OBJECTS llegaba tarde. → Se exporta en el [B] de los dos check-doc-sync, antes de las entradas.
+B5 · El núcleo es cuadrático en líneas larguísimas, y la medición principal no tenía límite. → Diez minutos, también
+     en la principal.
+
+LO QUE SIGUE ABSUELTO de sus casos de marcadores (aceptado, §4): «Las citas muertas las mide `X`» (un adjetivo de otro
+sustantivo), «Pendiente de revisar: `X` está demostrado» (los dos puntos), «`X` (sin medir aún el tiempo)» y «🗑️ `X`
+sigue en uso».
+
+SÓLIDO (por el revisor): los 34 pasos de entonces; las entradas reconstruidas reproducen las tablas; b-control en modo
+0 sobre los repos reales, verde (18 s RPP, 15 s FOL); el núcleo viejo con las entradas de hoy coincidía con la tabla de
+la base (sin doble cuenta); un SHA completo como base no se deja secuestrar; `librerias-retiradas/`, las URL, el `|`,
+«hace falta», la cita más cercana y la lista «`a`, `b` y `c`, retirados» funcionan; primas, alias y directorios; CRLF.

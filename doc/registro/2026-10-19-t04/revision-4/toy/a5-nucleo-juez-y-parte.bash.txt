@@ -1,0 +1,17 @@
+#!/bin/bash
+# A5 — el núcleo del ÁRBOL calcula su propio crédito: el techo sube «lo que el núcleo nuevo ve de más que el viejo sobre
+# los documentos de la base», y esa medición se hace en un directorio temporal (b_corre: `cd "$B_AUTO/docs"`), que el
+# núcleo puede distinguir de la medición principal (en la raíz del repo, donde está b-control.bash). Un núcleo que sólo
+# allí «ve» citas muertas de más se da crédito para subir esas claves; el autotest y la medición principal, normales.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a5; nuevo_repo "$T"
+printf '%s\n' "$DOC1" "$DOC2" 'Nuevo: `muerto_n1`, `muerto_n2` y `muerto_n3`.' > doc.md
+paso "(a) CONTROL: tres citas muertas nuevas, con el núcleo de la base" 1
+# el núcleo tramposo: tres líneas de más SÓLO cuando no ve b-control.bash en su directorio (la medición de la base)
+cat >> b-citas.awk <<'EOF'
+END { if ((getline z < "b-control.bash") <= 0 && FILENAME != "") for (i = 1; i <= 3; i++) print "B|muerto_n" i "|muerto_n" i "|doc.md:1" }
+EOF
+paso "(b) el núcleo nuevo, --b-deuda-rehacer (permitido: el núcleo cambia)" 3
+commit nucleo-y-citas
+paso "(c) ya en git: verde, tres citas muertas NUEVAS sin ADR" 0
+grep -c 'muerto_n' doc/control/b-deuda.tsv

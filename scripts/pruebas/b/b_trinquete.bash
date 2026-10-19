@@ -1,50 +1,61 @@
 #!/bin/bash
-# b_trinquete.bash — el TRINQUETE de [B] (T04, ADR-166), visto fallar en un repo de git de juguete: con el
+# b_trinquete.bash — el TRINQUETE de [B] (T04: ADR-166 y ADR-167), visto fallar en un repo de git de juguete: con el
 # b-citas.awk y el b-control.bash del árbol, un documento con citas muertas, y la tabla de la deuda en cada paso.
-#   (1) la tabla inicial cuadra;
-#   (2) una cita muerta NUEVA es rojo, y --b-deuda se niega a subir la tabla;
-#   (3) quitar una cita muerta es rojo hasta que --b-deuda baja la tabla;
-#   (4) subir la tabla a mano, ya bajada y en git, es rojo;
-#   (5) sin cambiar el núcleo, --b-deuda-rehacer se niega; con un COMENTARIO en el núcleo, rehace la tabla pero la subida
-#       de (4) sigue en rojo; y en rojo sigue si ese commit se tapa con otro (el blanqueo por un commit intermedio);
-#       arreglada, un cambio del núcleo que VE MÁS sube la tabla justo eso, y sigue verde ya en git;
-#   (6) borrar la tabla y crearla de nuevo es rojo; una entrada repetida, también;
-#   (7) una subida dentro de un commit que cambia el núcleo, tapada con otro commit, es rojo;
-#   (8) una subida que nombra un ADR (B_SUBE_ADR) pasa; si el ADR no la nombra, no;
-#   (9) una subida en el commit que arregla un núcleo ROTO en el commit anterior (que nadie vio) es rojo.
+# La BASE VERIFICADA es la rama `verificado` (hace de master: avanza sólo cuando «la CI aprueba»).
+#   (1) la tabla inicial cuadra;   (2) una cita muerta NUEVA es rojo, y --b-deuda se niega a subir la tabla;
+#   (3) quitar una cita muerta es rojo hasta que --b-deuda baja la tabla;   (4) subir la tabla a mano es rojo;
+#   (5) un comentario en el núcleo no la sube, ni tapado con otro commit; un núcleo que VE MÁS la sube justo eso;
+#   (6) borrarla y crearla con una cita nueva, o una entrada repetida, es rojo;
+#   (7) una subida en el commit que cambia el núcleo, tapada o no, es rojo;
+#   (8) un ADR NUEVO que nombra la clave entre comillas invertidas la deja subir; uno viejo, uno que no la nombra o uno
+#       que nombra otra que empieza igual, no;
+#   (9)–(14) las vías de la tercera revisión (ADR-166 §4): un núcleo roto, con «otra interfaz», borrado o debilitado en
+#       un commit intermedio; una fusión con una rama vieja; una raíz huérfana fusionada; quitar un marcador en el mismo
+#       commit que añade citas a su lado;
+#   (15) un documento con deuda no sale de la lista;  (16) el núcleo de un commit intermedio no se ejecuta;
+#   (17) un clon superficial no se mide.
 # Uso: bash scripts/pruebas/b/b_trinquete.bash   (imprime cada paso y su veredicto; sale con 1 si alguno no es el esperado)
 export PATH="/usr/bin:/bin:$PATH"
 RAIZ=$(cd "$(dirname "$0")/../../.." && pwd)
 D=$(mktemp -d); cd "$D" || exit 2
 git init -q . && git config user.email t@t && git config user.name t && git config core.autocrlf false
+git checkout -q -b master 2>/dev/null
 cp "$RAIZ/b-citas.awk" "$RAIZ/b-control.bash" .
 printf '%s\n' vivo_ok > vivos; : > env; : > sond; : > mod; : > rut
 # la historia de los nombres tiene que dar los de siempre (mil o más, y `raa`): un .lean que los declara
 { echo 'theorem raa : True := trivial'; for i in $(seq 1000 2000); do echo "theorem nombre_$i : True := trivial"; done; } > X.lean
-printf '## ADR-900: sube `muerto_uno` a propósito\n\n## ADR-901: otra cosa\n' > DECISIONS.md
+printf '## ADR-900: sube `muerto_uno` (un ADR viejo)\n\n## ADR-901: otra cosa\n' > DECISIONS.md
 DOC1='Texto: `vivo_ok`, `muerto_uno`, `muerto_dos` y otra vez `muerto_dos`.'
 DOC2='El `muerto_cuatro`, propuesto.'
 printf '%s\n' "$DOC1" "$DOC2" > doc.md
 DECL_RE="(^|[^A-Za-z0-9_'.])(theorem|lemma|def|abbrev|axiom|opaque|instance|structure|inductive|class) +[^[:space:]:({[]+"
 NOMBRES='{n = $NF; sub(/[.]$/, "", n); if (n == "") next; print n; k = n; sub(/.*[.]/, "", k); if (k != n && k != "") print k}'
-corre() {   # $1 = modo  $2 = B_SUBE_ADR   → imprime «FAIL=… MEDIDO=…» y las líneas de [B] que empiezan por ❌/✓/⚠️
-  ( B_DECLS=vivos B_ENV=env B_SOND=sond B_MOD=mod B_RUT=rut B_GITS=. B_DOCS_LISTA=doc.md
+DOCS="doc.md"
+BASE_REF=verificado   # «-»: la base por omisión de b-control.bash (refs/remotes/origin/master)
+SIN_ADR=0             # 1: como en FOL, sin subida por ADR
+corre() {   # $1 = modo  $2 = B_SUBE_ADR   → imprime «FAIL=… MEDIDO=…» y las líneas de [B] que empiezan por ❌/✓/⚠️/techo
+  ( B_DECLS=vivos B_ENV=env B_SOND=sond B_MOD=mod B_RUT=rut B_GITS=. B_DOCS_LISTA=$DOCS B_BASE_REF=$BASE_REF
+    [ "$BASE_REF" = "-" ] && unset B_BASE_REF
     B_DEUDA_MODO=$1 B_SUBE_ADR=$2
-    b_adr_existe() { grep -qE "^## $1:" DECISIONS.md; }
-    b_adr_texto() { awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en' DECISIONS.md; }
+    b_adr_texto() { [ "$SIN_ADR" = "1" ] || awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en' DECISIONS.md; }
+    b_adr_texto_base() { git show "$B_BASE:DECISIONS.md" 2>/dev/null | awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en'; }
     source ./b-control.bash > salida.txt 2>&1; echo "FAIL=$B_FAIL MEDIDO=$B_MEDIDO"
-    grep -E '❌|✓|⚠️|historia' salida.txt | head -5 )
+    grep -E '❌|✓|⚠️|techo:' salida.txt | head -5 )
 }
 MAL=0
-espera() {   # $1 = descripción  $2 = FAIL esperado  $3 = modo  [$4 = B_SUBE_ADR]
+espera() {   # $1 = descripción  $2 = FAIL esperado  $3 = modo  [$4 = B_SUBE_ADR]  [$5 = MEDIDO esperado, 1]
   r=$(corre "$3" "${4:-}"); f=$(printf '%s\n' "$r" | head -1 | sed 's/^FAIL=\([01]\).*/\1/')
   m=$(printf '%s\n' "$r" | head -1 | sed 's/.*MEDIDO=\([01]\).*/\1/')
-  if [ "$f" = "$2" ] && [ "$m" = "1" ]; then echo "✓ $1 (FAIL=$f)"; else echo "✗ $1: FAIL=$f MEDIDO=$m, se esperaba FAIL=$2 medido"; MAL=1; fi
+  if [ "$f" = "$2" ] && [ "$m" = "${5:-1}" ]; then echo "✓ $1 (FAIL=$f)"
+  else echo "✗ $1: FAIL=$f MEDIDO=$m, se esperaba FAIL=$2 MEDIDO=${5:-1}"; MAL=1; fi
   printf '%s\n' "$r" | tail -n +2 | sed 's/^/      /'
 }
 commit() { git add -A && git commit -qm "$1"; }
-espera "(1a) la tabla inicial se crea"                                   0 2
-commit inicial
+verifica() { git branch -f verificado HEAD; }   # la CI aprueba: master avanza hasta aquí
+vuelve() { git checkout -q -f master && git reset -q --hard verificado && git clean -qfd; DOCS="doc.md"; }
+git add -A && git reset -q b-citas.awk && git commit -qm base; verifica   # (la base, sin núcleo ni tabla: la tabla se crea)
+espera "(1a) la tabla inicial se crea (la base no la tiene)"            0 2
+commit inicial; verifica; INICIAL=$(git rev-parse HEAD)
 espera "(1b) y cuadra"                                                   0 0
 printf '%s\n' 'Más: `muerto_tres`.' >> doc.md
 espera "(2a) una cita muerta NUEVA es rojo"                              1 0
@@ -53,7 +64,7 @@ git checkout -q doc.md
 printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno` y `muerto_dos`.' "$DOC2" > doc.md
 espera "(3a) una cita muerta MENOS es rojo"                              1 0
 espera "(3b) --b-deuda baja la tabla"                                    0 1
-commit baja
+commit baja; verifica
 espera "(3c) y cuadra"                                                   0 0
 printf '%s\n' "$DOC1" "$DOC2" > doc.md
 sed -i 's/\tmuerto_dos\tdoc.md\t1$/\tmuerto_dos\tdoc.md\t2/' doc/control/b-deuda.tsv
@@ -62,43 +73,150 @@ espera "(4) la tabla subida a mano, ya en git, es rojo"                  1 0
 espera "(5a) sin cambiar el núcleo, --b-deuda-rehacer se niega"          1 3
 printf '# un comentario\n' >> b-citas.awk
 espera "(5b) un comentario en el núcleo: rehace la tabla, y sigue rojo"  1 3
-commit blanqueo
-printf '%s\n' 'Nada más.' >> doc.md
-commit otro
+commit blanqueo; printf '%s\n' 'Nada más.' >> doc.md; commit otro
 espera "(5c) y tapado con otro commit, sigue rojo"                       1 0
-printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno` y `muerto_dos`.' "$DOC2" 'Nada más.' > doc.md
-espera "(5d) arreglado el documento, --b-deuda baja la tabla"            0 1
-commit arreglo
+vuelve
 sed -i 's/|propuest|/|/' b-citas.awk
-grep -q '|propuest|' b-citas.awk && { echo "✗ (5e) no pude quitar «propuest» del núcleo"; MAL=1; }
-espera "(5e) un núcleo que VE MÁS (sin «propuesto»): sube justo eso"     0 3
-grep -q 'muerto_cuatro' doc/control/b-deuda.tsv || { echo "✗ (5e) la tabla no tiene muerto_cuatro"; MAL=1; }
+grep -q '|propuest|' b-citas.awk && { echo "✗ (5d) no pude quitar «propuest» del núcleo"; MAL=1; }
+espera "(5d) un núcleo que VE MÁS (sin «propuesto»): sube justo eso"     0 3
+grep -q 'muerto_cuatro' doc/control/b-deuda.tsv || { echo "✗ (5d) la tabla no tiene muerto_cuatro"; MAL=1; }
 commit nucleo-ve-mas
-espera "(5f) y ya en git, sigue verde"                                   0 0
-BUENO=$(git rev-parse HEAD)
-git rm -q doc/control/b-deuda.tsv && git commit -qm borra
-espera "(6a) borrar la tabla y crearla de nuevo es rojo"                 1 2
-git reset -q --hard "$BUENO"
+espera "(5e) ya en git y sin verificar, sigue verde"                     0 0
+verifica
+espera "(5f) y verificado, también"                                      0 0
+git rm -q doc/control/b-deuda.tsv && commit borra
+printf '%s\n' 'Otra: `muerto_seis`.' >> doc.md
+espera "(6a) borrar la tabla y crearla con una cita nueva es rojo"       1 2
+vuelve
 tail -1 doc/control/b-deuda.tsv >> doc/control/b-deuda.tsv
 espera "(6b) una entrada repetida es rojo"                               1 0
-git reset -q --hard "$BUENO"
-printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno`, `muerto_dos` y `muerto_uno`.' "$DOC2" 'Nada más.' > doc.md
+vuelve
+printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno`, `muerto_dos` y `muerto_uno`.' "$DOC2" > doc.md
 printf '# otro comentario\n' >> b-citas.awk
 espera "(7a) una subida en el commit que cambia el núcleo es rojo"       1 3
-commit sube-con-nucleo
-printf '%s\n' 'Fin.' >> doc.md
-commit otro2
+commit sube-con-nucleo; printf '%s\n' 'Fin.' >> doc.md; commit otro2
 espera "(7b) y tapada con otro commit, sigue rojo"                       1 0
-espera "(8a) con un ADR que la nombra (ADR-900), pasa"                   0 0 ADR-900
+vuelve
+printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno`, `muerto_dos` y `muerto_uno`.' "$DOC2" > doc.md
+sed -i 's/\tmuerto_uno\tdoc.md\t1$/\tmuerto_uno\tdoc.md\t2/' doc/control/b-deuda.tsv
+printf '\n## ADR-902: sube `muerto_uno` · doc.md · 2 a propósito\n\n## ADR-903: sube `muerto_uno_largo` · doc.md · 2\n\n## ADR-904: sube `muerto_uno` · doc.md · 1, UNA cita\n' >> DECISIONS.md
+espera "(8a) con un ADR NUEVO que nombra la entrada entera (ADR-902), pasa" 0 0 ADR-902
+espera "(8f) con un ADR que la nombra con OTRA cuenta (ADR-904), no"     1 0 ADR-904
+SIN_ADR=1
+espera "(8g) en FOL (sin subida por ADR), ni con ADR-902"                1 0 ADR-902
+SIN_ADR=0
 espera "(8b) con un ADR que no la nombra (ADR-901), no"                  1 0 ADR-901
 espera "(8c) con un ADR que no existe, no"                               1 0 ADR-999
-git reset -q --hard "$BUENO"
-printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno`, `muerto_dos` y `muerto_uno`.' "$DOC2" 'Nada más.' > doc.md
+espera "(8d) con un ADR VIEJO que la nombra (ADR-900), no"               1 0 ADR-900
+espera "(8e) con un ADR que nombra otra que empieza igual, no"           1 0 ADR-903
+vuelve
+printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno`, `muerto_dos` y `muerto_uno`.' "$DOC2" > doc.md
 sed -i 's/\tmuerto_uno\tdoc.md\t1$/\tmuerto_uno\tdoc.md\t2/' doc/control/b-deuda.tsv
 printf 'BEGIN {\n' >> b-citas.awk
-commit rompe-el-nucleo
-sed -i '$d' b-citas.awk
-commit lo-arregla
-espera "(9) una subida tras un núcleo ROTO en un commit intermedio, roja" 1 0
+commit rompe-el-nucleo; sed -i '$d' b-citas.awk; commit lo-arregla
+espera "(9) una subida tras un núcleo ROTO en un commit intermedio"      1 0
+vuelve
+sed -i 's/FILENAME == ARGV\[6\]/FILENAME == ARGV[3+3]/' b-citas.awk
+grep -q 'ARGV\[3+3\]' b-citas.awk || { echo "✗ (10) no pude cambiar la interfaz del núcleo"; MAL=1; }
+commit otra-interfaz
+printf '# y un comentario\n' >> b-citas.awk
+for i in 1 2 3 4 5; do printf 'Nueva: `muerto_n%s`.\n' "$i" >> doc.md; done
+espera "(10) «otra interfaz» en un commit intermedio, y cinco citas nuevas" 1 3
+vuelve
+git rm -q b-citas.awk && commit borra-el-nucleo
+git show verificado:b-citas.awk > b-citas.awk
+for i in 1 2 3; do printf 'Nueva: `muerto_b%s`.\n' "$i" >> doc.md; done
+rm doc/control/b-deuda.tsv; corre 2 "" > /dev/null; commit lo-restaura
+espera "(11) el núcleo borrado y restaurado, con la tabla rehecha"       1 0
+vuelve
+sed -i 's/if (marcado()) return/if (1) return/' b-citas.awk
+grep -q 'if (1) return' b-citas.awk || { echo "✗ (12) no pude debilitar el núcleo"; MAL=1; }
+commit debilita
+git show verificado:b-citas.awk > b-citas.awk
+for i in 1 2 3; do printf 'Nueva: `muerto_d%s`.\n' "$i" >> doc.md; done
+rm doc/control/b-deuda.tsv; corre 2 "" > /dev/null; commit restaura
+espera "(12) el núcleo debilitado y restaurado, con citas nuevas"        1 0
+vuelve
+git checkout -q -b rama "$INICIAL" && git merge -q -s ours -m fusion verificado
+espera "(13) una rama vieja (tabla más alta) fusionada con master"       1 0
+vuelve
+for i in 1 2 3; do printf 'Nueva: `muerto_h%s`.\n' "$i" >> doc.md; done
+rm doc/control/b-deuda.tsv; corre 2 "" > /dev/null
+mkdir -p "$D.h" && cp doc.md "$D.h/doc.md" && cp doc/control/b-deuda.tsv "$D.h/tabla"
+git checkout -q -f --orphan huerfana && cp "$D.h/doc.md" doc.md && cp "$D.h/tabla" doc/control/b-deuda.tsv
+commit raiz-huerfana; rm -rf "$D.h"
+git merge -q --allow-unrelated-histories -s ours -m fusion verificado
+espera "(14a) una raíz huérfana con citas nuevas, fusionada"             1 0
+vuelve
+sed -i 's/|candidat|/|/' b-citas.awk
+grep -q '|candidat|' b-citas.awk && { echo "✗ (14b) no pude quitar «candidat» del núcleo"; MAL=1; }
+printf '%s\n' 'El `muerto_p1`, candidato; el `muerto_p2`, candidato.' >> doc.md
+espera "(14b) quitar «candidat» y añadir citas a su lado, en un commit"  1 3
+vuelve; ANTES15=$(git rev-parse verificado)
+printf '%s\n' 'Otro: `muerto_otro`.' > doc2.md; DOCS="doc.md doc2.md"
+rm doc/control/b-deuda.tsv; corre 2 "" > /dev/null; commit doc2; verifica
+espera "(15a) un segundo documento con deuda, en la base"                0 0
+DOCS="doc.md"
+espera "(15b) sacarlo de la lista con su deuda (sigue en git) es rojo"   1 1
+vuelve
+mkdir -p notas; git mv doc2.md notas/doc2.md; printf '%s\n' 'Nuevo: `muerto_n1`.' >> notas/doc2.md
+corre 1 "" > /dev/null; commit renombra
+espera "(15c) renombrarlo FUERA de la lista, con su deuda, es rojo"      1 0
+vuelve; DOCS="doc.md doc3.md"
+git mv doc2.md doc3.md; sed -i 's/\tdoc2.md\t/\tdoc3.md\t/' doc/control/b-deuda.tsv
+espera "(15d) renombrarlo DENTRO de la lista: su deuda va con él"        0 0
+git branch -f verificado "$ANTES15"; vuelve
+cp b-citas.awk nucleo-bueno.awk
+sed -i "s|^BEGIN {|BEGIN { system(\"touch $D/testigo\")|" b-citas.awk
+commit nucleo-que-ejecuta; cp nucleo-bueno.awk b-citas.awk; rm nucleo-bueno.awk; commit arreglado
+corre 0 "" > /dev/null
+if [ -e "$D/testigo" ]; then echo "✗ (16) el núcleo de un commit intermedio se ejecutó"; MAL=1
+else echo "✓ (16) el núcleo de un commit intermedio no se ejecuta"; fi
+vuelve
+# ═══ las vías de la CUARTA revisión (2026-10-19), cada una en rojo ═══
+NUEVAS='Nuevo: `muerto_n1`, `muerto_n2` y `muerto_n3`.'
+git update-ref refs/remotes/origin/master verificado
+printf '%s\n' "$NUEVAS" >> doc.md; rm doc/control/b-deuda.tsv; corre 2 "" > /dev/null; commit sube-n
+BASE_REF=- espera "(18a) con la base por omisión (refs/remotes/origin/master), tres citas nuevas" 1 0
+git tag origin/master "$(git rev-list --max-parents=0 HEAD)"
+BASE_REF=- espera "(18b) y con una ETIQUETA \`origin/master\` en un commit sin tabla" 1 0
+git tag -d origin/master > /dev/null; git update-ref -d refs/remotes/origin/master
+vuelve
+sed -i 's|^B_TABLA=doc/control/b-deuda.tsv$|B_TABLA=doc/control/deuda-b.tsv|' b-control.bash
+git rm -q doc/control/b-deuda.tsv; printf '%s\n' "$NUEVAS" >> doc.md; corre 2 "" > /dev/null; commit tabla-movida
+espera "(19) la tabla movida de sitio (B_TABLA) y rehecha con tres citas nuevas" 1 0
+vuelve
+printf '%s\n' "$NUEVAS" >> doc.md
+printf '%s\n' 'END { if ((getline z < "b-control.bash") <= 0 && FILENAME != "") for (i = 1; i <= 3; i++) print "B|muerto_n" i "|muerto_n" i "|doc.md:1" }' >> b-citas.awk
+corre 3 "" > /dev/null; commit nucleo-tramposo
+espera "(20) un núcleo que se da crédito en la medición aparte, con citas nuevas" 1 0
+vuelve
+printf '# un comentario\n' >> b-citas.awk; printf '%s\n' 'Otra: `muerto_n4`.' >> doc.md
+espera "(21) un cambio del núcleo y de un documento en el mismo commit"  1 3
+nuc() {   # $1 = descripción  $2… = líneas que se AÑADEN a doc.md, con citas muertas nuevas: --b-deuda tiene que negarse
+  local t=$1; shift; vuelve; printf '%s\n' "$@" >> doc.md; espera "$t" 1 1
+}
+nuc "(22) una valla en la línea de un ítem de lista no esconde la prosa de después" \
+  '- ```lean' '  example : True := trivial' '  ```' '' 'Prosa: `muerto_v1` y `muerto_v2`.' '' '```bash' 'echo' '```'
+nuc "(23) un \`<!--\` suelto a media línea no esconde los párrafos siguientes" \
+  'Un <!-- suelto aquí.' '' 'Prosa: `muerto_c1` y `muerto_c2`.' '' 'Fin -->.'
+nuc "(24) una barra al final de una cita no se come las siguientes" 'En Windows `C:\msys64\` con `muerto_b1` y `muerto_b2`.'
+nuc "(25a) «no se ha retirado» no marca"            '`muerto_m1` no se ha retirado.'
+nuc "(25b) «no es código muerto» no marca"          'Un `muerto_m2` sin consumidores no es código muerto.'
+nuc "(25c) «la propuesta» (sustantivo) no marca"    'La propuesta usa `muerto_m3`.'
+nuc "(25d) un marcador de la oración anterior no marca" 'Retirado: nada. `muerto_m4` vive.'
+nuc "(26) el marcador del paréntesis es de su cita, no de la de fuera" 'Usa `muerto_g1` (`muerto_g0`, renombrado).'
+nuc "(27a) un glob con punto que no casa: \`Muerto.cosa.*\`" 'Ver `Muerto.cosa.*`.'
+nuc "(27b) un glob de ficheros que no casa: \`Viejo*.lean\`" 'Ver `Viejo*.lean`.'
+vuelve; printf 'Mathlib.Order.Basic\tL\n' >> env; printf '%s\n' ROBINSON_PlusPlus/Full/X.lean >> rut
+printf '%s\n' 'Ver `ROBINSON_PlusPlus/Full/Order`.' >> doc.md
+espera "(28) una ruta que no existe en un directorio que sí, con un homónimo de Lean" 1 1
+vuelve
+git clone -q --depth 1 "file://$D" "$D/superficial" 2>/dev/null
+( cd "$D/superficial" && cp "$D/vivos" "$D/env" "$D/sond" "$D/mod" "$D/rut" . && git branch -f verificado HEAD
+  B_DECLS=vivos B_ENV=env B_SOND=sond B_MOD=mod B_RUT=rut B_GITS=. B_DOCS_LISTA=doc.md B_BASE_REF=verificado B_DEUDA_MODO=0 B_SUBE_ADR=""
+  source ./b-control.bash > salida.txt 2>&1; echo "$B_MEDIDO" ) > "$D/medido-superficial"
+if [ "$(cat "$D/medido-superficial")" = "0" ]; then echo "✓ (29) un clon superficial no se mide (MEDIDO=0)"
+else echo "✗ (29) un clon superficial se midió"; MAL=1; fi
 cd /; rm -rf "$D"
 [ "$MAL" = "0" ] && echo "✅ el trinquete se comporta como se espera" || { echo "❌ algún paso no es el esperado"; exit 1; }

@@ -1,0 +1,20 @@
+── (a) CONTROL: tres citas muertas nuevas, con la tabla en su sitio (modo 1, B_BASE_REF=verificado)
+      FAIL=1 MEDIDO=1
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_n1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n3` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 6b804a2 (verificado)
+        deuda declarada: 3 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 6
+── (b) --b-deuda-inicial no vale (la tabla existe)... (modo 2, B_BASE_REF=verificado)
+      FAIL=1 MEDIDO=1
+        ❌ --b-deuda-inicial: doc/control/deuda-b.tsv ya existe; la tabla sólo baja (--b-deuda), o se rehace con el núcleo.
+        ❌ B `muerto_n1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n3` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ⚠️  la base verificada (6b804a2) no tiene la tabla: es la que se crea, y no se compara con nada.
+        deuda declarada: 3 citas muertas en 2 entradas (clase, clave, documento) de doc/control/deuda-b.tsv; hoy, 6
+── (c) la tabla MOVIDA y rehecha con las tres citas nuevas, ya en git: verde (modo 0, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        ⚠️  la base verificada (6b804a2) no tiene la tabla: es la que se crea, y no se compara con nada.
+        deuda declarada: 6 citas muertas en 5 entradas (clase, clave, documento) de doc/control/deuda-b.tsv; hoy, 6

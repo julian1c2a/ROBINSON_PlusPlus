@@ -1,0 +1,14 @@
+#!/bin/bash
+# A8 — `git replace` sigue engañando a las ENTRADAS: GIT_NO_REPLACE_OBJECTS=1 lo exporta b-control.bash, pero
+# check-doc-sync.bash construye antes RUTAS («etiqueta:ruta», `git ls-tree -r <etiqueta>`) y SONDEOS (los archivados,
+# `git show <etiqueta>:<f>`). Sólo en local: la CI no trae refs/replace.
+export PATH="/usr/bin:/bin:$PATH"
+S=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b4
+T=$S/tmp/replace; rm -rf "$T"; mkdir -p "$T"; cd "$T" || exit 2
+git init -q . && git config user.email t@t && git config user.name t && git config core.autocrlf false
+mkdir sondeos; echo 'theorem viejo : True := trivial' > sondeos/A.lean; git add -A; git commit -qm a; git tag archivo/x
+C=$(git rev-parse HEAD); git checkout -q --orphan falsa
+echo 'theorem inventado_por_replace : True := trivial' > sondeos/Falso.lean; git add -A; git commit -qm falsa
+F=$(git rev-parse HEAD); git checkout -q master; git replace "$C" "$F"
+echo "sin GIT_NO_REPLACE_OBJECTS (como check-doc-sync al construir RUTAS y SONDEOS):"; git ls-tree -r --name-only archivo/x | sed 's/^/   /'
+echo "con GIT_NO_REPLACE_OBJECTS=1 (como b-control.bash):"; GIT_NO_REPLACE_OBJECTS=1 git ls-tree -r --name-only archivo/x | sed 's/^/   /'

@@ -1,0 +1,22 @@
+   (origin/master resuelve a 18b88f5; refs/remotes/origin/master = 18b88f5)
+── (a) CONTROL, sin etiqueta: la subida es roja (modo 0)
+      FAIL=1 MEDIDO=1
+        techo: la tabla de la base verificada, 18b88f5 (origin/master)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+        deuda declarada: 6 citas muertas en 5 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 6
+   (origin/master resuelve a 99f5131; refs/remotes/origin/master = 18b88f5)
+── (b) con la etiqueta `origin/master` en un commit ANTERIOR a la tabla: sin techo (modo 0)
+      FAIL=0 MEDIDO=1
+        ⚠️  la base verificada (99f5131) no tiene la tabla: es la que se crea, y no se compara con nada.
+        deuda declarada: 6 citas muertas en 5 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 6
+   (origin/master resuelve a 18b88f5; refs/remotes/origin/master = 18b88f5)
+── (c1) CONTROL, sin etiqueta: volver a subir `muerto_dos` es rojo (modo 0)
+      FAIL=1 MEDIDO=1
+        techo: la tabla de la base verificada, 18b88f5 (origin/master)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+        deuda declarada: 3 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+   (origin/master resuelve a d3afcda; refs/remotes/origin/master = 18b88f5)
+── (c2) con la etiqueta en el commit VIEJO de master (tabla más alta): verde (modo 0)
+      FAIL=0 MEDIDO=1
+        techo: la tabla de la base verificada, d3afcda (origin/master)
+        deuda declarada: 3 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3

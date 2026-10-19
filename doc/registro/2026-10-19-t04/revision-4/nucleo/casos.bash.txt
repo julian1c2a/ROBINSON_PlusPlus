@@ -1,0 +1,64 @@
+#!/bin/bash
+# casos.bash — los casos del NÚCLEO (b-citas.awk, copia de revision-b4/orig) de la cuarta revisión. Cada bloque imprime
+# la salida de b-citas.awk (clase|clave|línea): lo que NO sale es lo que el núcleo da por vivo o absuelto.
+export PATH="/usr/bin:/bin:$PATH"
+D=/c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/revision-b4
+N="bash $D/nucleo/n.bash"; R="bash $D/real.bash"
+echo "═══ M — marcadores (entradas de juguete; todas las claves muerto_* están muertas) ═══"
+$N \
+'1 `muerto_a`, `muerto_b` y `muerto_c`, retirados.' \
+'2 Usa `muerto_nuevo` (`muerto_viejo`, renombrado).' \
+'3 `muerto_d` — retirado — `muerto_e`.' \
+'4 `muerto_f` no se ha retirado.' \
+'5 `muerto_g` nunca retirado.' \
+'6 `muerto_h` no retirado.' \
+'7 Ya no falta `muerto_i`.' \
+'8 La propuesta usa `muerto_j` como base.' \
+'9 Las citas muertas las mide `muerto_k`.' \
+'10 Un `muerto_l` sin consumidores no es código muerto.' \
+'11 Por falta de tiempo, `muerto_m` queda así.' \
+'12 `muerto_n` está en la rama legacy-free.' \
+'13 Hoy `muerto_o` sigue vivo (no está archivado ni retirado).' \
+'14 `muerto_p` no está todavía retirado.' \
+'15 `muerto_q` todavía no ha sido retirado.' \
+'16 El histórico `muerto_r` es el teorema central.' \
+'17 Pendiente de revisar: `muerto_s` está demostrado.' \
+'18 `muerto_t` (sin medir aún el tiempo) cierra la prueba.' \
+'19 `muerto_u`; `muerto_v` retirado.' \
+'20 La candidata ganadora es `muerto_w`.' \
+'21 Retirado: nada. `muerto_j1` vive.' \
+'22 El candidato a sustituir, `muerto_l1`, sigue vigente.' \
+'23 🗑️ `muerto_e2` sigue en uso y está demostrado.' \
+'24 | `muerto_c1` | ⏳ |' \
+'25 Se retiró `muerto_h1`. Hoy `muerto_h2` es el central.' \
+'26 `muerto_i1` está demostrado (antes, `muerto_i2` retirado).'
+echo "  (salen sólo: 12, 15, 24, 25 —h2— y 26 —i1—; todo lo demás queda absuelto)"
+echo
+echo "═══ D — desincronías con CommonMark (prosa que el núcleo no mira) ═══"
+$N '- ```lean' '  example : True := trivial' '  ```' '' 'Prosa: `muerto_oculto_1` y `muerto_oculto_2`.' '' '```bash' 'echo hola' '```' 'Después: `muerto_visible`.'
+echo "  (D1: CommonMark ve muerto_oculto_1/2 como código en línea de un párrafo; el núcleo sólo ve muerto_visible)"
+$N 'Un párrafo con un <!-- suelto que no se cierra aquí.' '' 'Otro párrafo: `muerto_html_1` y `muerto_html_2`.' '' '| tabla | `muerto_html_3` |' '' 'Y al final --> se cierra.' 'Control: `muerto_html_4`.'
+echo "  (D2: un <!-- en línea no abre un bloque HTML ni cruza párrafos; el núcleo esconde muerto_html_1..3)"
+$N 'Texto `ruta\` y `muerto_r1` y `muerto_r2`.' '' 'En Windows `C:\msys64\` va con `muerto_r3`, `muerto_r4` y `muerto_r5`.' '' 'Control: `muerto_r6`.'
+echo "  (D3: en CommonMark la barra no escapa dentro de una cita: \`C:\\msys64\\\` es una cita entera; el núcleo esconde muerto_r1..5)"
+echo
+echo "═══ G — globs y abreviaturas (entradas de juguete) ═══"
+$N \
+'1 `ModuloMuerto.*` y `Muerto.cosa_*`.' \
+'2 `Viejo*.lean` y `muerto_xyz*.lean`.' \
+'3 `NoExiste/*.lean`.' \
+'7 `muerto_ab/vivo_ok` y `vivo_ok/muerto_cd`.' \
+'11 `vivo_ok.muerto_campo` y `vivo_ok.Muerto`.'
+printf '%s\n' vivo_ok foo_left foo_x1 > $D/nucleo/vivos2
+( cd $D/nucleo && printf '%s\n' '`foo_left/right` y `foo_x1/x2` y `foo_left/_right`.' > doc2.md && LC_ALL=C awk -f ../orig/b-citas.awk vivos2 env sond mod rut hist doc2.md | cut -d'|' -f1,2,4 )
+echo "  (con VIVOS = foo_left, foo_x1: \`foo_left/right\` y \`foo_x1/x2\` pasan aunque foo_right y foo_x2 no existan)"
+echo
+echo "═══ R — con las entradas REALES reconstruidas de RPP (revision-b4/rpp) ═══"
+$R rpp \
+'1 `ROBINSON_PlusPlus/Full/Order`, `ROBINSON_PlusPlus/Meta/Syntax`, `ROBINSON_PlusPlus/Minimal/Basic/`, `ROBINSON_PlusPlus/Meta/Tactic`.' \
+'2 `ROBINSON_PlusPlus/Meta/GodelViejo*.lean`, `Meta/Borrado*.lean`, `ROBINSON_PlusPlus/Full/*.olean`.' \
+'3 `GodelViejo*.lean`, `Meta.Borrado.*`, `FOLPure.*`, `prf_inventado_xyz.*`.' \
+'5 `goedel_first_prf.lema_inventado`, `derives0_soundness.otro_inventado`.' \
+'6 `ROBINSON_PlusPlus/Meta/Inventado`, `ROBINSON_PlusPlus/Inventado/X`.' \
+'9 `prf_congr_bin1/bin2/un/bin` `prf_congr_bin1` `prf_congr_bin2` `prf_congr_un` `prf_congr_bin`'
+echo "  (ninguna de las rutas de 1–2 existe; sale Basic —está en HIST— y los Inventado; en 9 sale \`bin2\`, y prf_congr_bin2 existe)"

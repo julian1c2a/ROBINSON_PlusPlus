@@ -1,0 +1,203 @@
+# T04, cierre (ADR-167): salida de `bash scripts/pruebas/b/b_trinquete.bash` el 2026-10-19, con el núcleo de [B] que sube.
+# La base es la rama `verificado` del repo de juguete (hace de master: avanza sólo cuando «la CI aprueba»). Los pasos
+# (9)–(16) son las vías de la tercera revisión adversarial (ADR-166 §4); (15c), (15d), (18)–(29) y (8f), (8g), las de la
+# cuarta (revision-adversarial-4.txt).
+
+✓ (1a) la tabla inicial se crea (la base no la tiene) (FAIL=0)
+        ✓ la tabla, escrita de nuevo: 2 entradas
+        ⚠️  la base verificada (adc9e86) no tiene ni la tabla ni el núcleo: es la que se crea, y no se compara con nada.
+✓ (1b) y cuadra (FAIL=0)
+        techo: la tabla de la base verificada, 7a3c6ec (verificado)
+✓ (2a) una cita muerta NUEVA es rojo (FAIL=1)
+        ❌ B `muerto_tres` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 7a3c6ec (verificado)
+✓ (2b) y --b-deuda se niega a subir la tabla (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_tres` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 7a3c6ec (verificado)
+✓ (3a) una cita muerta MENOS es rojo (FAIL=1)
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 7a3c6ec (verificado)
+✓ (3b) --b-deuda baja la tabla (FAIL=0)
+        ✓ --b-deuda: la tabla baja a 2 entradas; salen del todo 0:
+        techo: la tabla de la base verificada, 7a3c6ec (verificado)
+✓ (3c) y cuadra (FAIL=0)
+        techo: la tabla de la base verificada, ead9010 (verificado)
+✓ (4) la tabla subida a mano, ya en git, es rojo (FAIL=1)
+        techo: la tabla de la base verificada, ead9010 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (5a) sin cambiar el núcleo, --b-deuda-rehacer se niega (FAIL=1)
+        ❌ --b-deuda-rehacer: b-citas.awk es el de la base verificada; la tabla sólo baja.
+        techo: la tabla de la base verificada, ead9010 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (5b) un comentario en el núcleo: rehace la tabla, y sigue rojo (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ no reescribo la tabla con [B] en rojo (¿falta un documento?).
+        techo: la tabla de la base verificada, ead9010 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 0 entradas y 0 citas de más, 0 entradas y 0 citas de menos
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (5c) y tapado con otro commit, sigue rojo (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        techo: la tabla de la base verificada, ead9010 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 0 entradas y 0 citas de más, 0 entradas y 0 citas de menos
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (5d) un núcleo que VE MÁS (sin «propuesto»): sube justo eso (FAIL=0)
+        ✓ la tabla, escrita de nuevo: 3 entradas
+        techo: la tabla de la base verificada, ead9010 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 1 entradas y 1 citas de más, 0 entradas y 0 citas de menos
+✓ (5e) ya en git y sin verificar, sigue verde (FAIL=0)
+        techo: la tabla de la base verificada, ead9010 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 1 entradas y 1 citas de más, 0 entradas y 0 citas de menos
+✓ (5f) y verificado, también (FAIL=0)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (6a) borrar la tabla y crearla con una cita nueva es rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 4 entradas
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (6b) una entrada repetida es rojo (FAIL=1)
+        ❌ doc/control/b-deuda.tsv tiene entradas repetidas o mal formadas (cuatro campos; las citas, un entero positivo):
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (7a) una subida en el commit que cambia el núcleo es rojo (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ no reescribo la tabla con [B] en rojo (¿falta un documento?).
+        ❌ B `muerto_uno`: 2 citas muertas en doc.md, y la tabla dice 1 — una de más:
+        techo: la tabla de la base verificada, 888f500 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 0 entradas y 0 citas de más, 0 entradas y 0 citas de menos
+✓ (7b) y tapada con otro commit, sigue rojo (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ B `muerto_uno`: 2 citas muertas en doc.md, y la tabla dice 1 — una de más:
+        techo: la tabla de la base verificada, 888f500 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 0 entradas y 0 citas de más, 0 entradas y 0 citas de menos
+✓ (8a) con un ADR NUEVO que nombra la entrada entera (ADR-902), pasa (FAIL=0)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ⚠️  1 entradas sobre su techo, y ADR-902, nuevo, nombra cada una.
+✓ (8f) con un ADR que la nombra con OTRA cuenta (ADR-904), no (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (8g) en FOL (sin subida por ADR), ni con ADR-902 (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ B_SUBE_ADR=ADR-902: ese ADR no existe.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (8b) con un ADR que no la nombra (ADR-901), no (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ B_SUBE_ADR=ADR-901 ya está en la base verificada: un ADR deja subir la tabla UNA vez, en el commit que lo trae.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (8c) con un ADR que no existe, no (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ B_SUBE_ADR=ADR-999: ese ADR no existe.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (8d) con un ADR VIEJO que la nombra (ADR-900), no (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ B_SUBE_ADR=ADR-900 ya está en la base verificada: un ADR deja subir la tabla UNA vez, en el commit que lo trae.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (8e) con un ADR que nombra otra que empieza igual, no (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (9) una subida tras un núcleo ROTO en un commit intermedio (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (10) «otra interfaz» en un commit intermedio, y cinco citas nuevas (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ no reescribo la tabla con [B] en rojo (¿falta un documento?).
+        ❌ B `muerto_n1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n3` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+✓ (11) el núcleo borrado y restaurado, con la tabla rehecha (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (12) el núcleo debilitado y restaurado, con citas nuevas (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (13) una rama vieja (tabla más alta) fusionada con master (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        techo: la tabla de la base verificada, 888f500 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 0 entradas y 0 citas de más, 1 entradas y 1 citas de menos
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (14a) una raíz huérfana con citas nuevas, fusionada (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (14b) quitar «candidat» y añadir citas a su lado, en un commit (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ no reescribo la tabla con [B] en rojo (¿falta un documento?).
+        ❌ B `muerto_p1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_p2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 2 entradas y 2 citas de más, 0 entradas y 0 citas de menos
+✓ (15a) un segundo documento con deuda, en la base (FAIL=0)
+        techo: la tabla de la base verificada, 0c8aa4c (verificado)
+✓ (15b) sacarlo de la lista con su deuda (sigue en git) es rojo (FAIL=1)
+        ❌ documentos con deuda en la base salen de la lista (con su deuda, en silencio):
+        ❌ --b-deuda: no bajo la tabla con [B] en rojo (¿falta un documento?).
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 0c8aa4c (verificado)
+✓ (15c) renombrarlo FUERA de la lista, con su deuda, es rojo (FAIL=1)
+        ❌ documentos con deuda en la base salen de la lista (con su deuda, en silencio):
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 0c8aa4c (verificado)
+✓ (15d) renombrarlo DENTRO de la lista: su deuda va con él (FAIL=0)
+        techo: la tabla de la base verificada, 0c8aa4c (verificado)
+✓ (16) el núcleo de un commit intermedio no se ejecuta
+✓ (18a) con la base por omisión (refs/remotes/origin/master), tres citas nuevas (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (refs/remotes/origin/master)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (18b) y con una ETIQUETA `origin/master` en un commit sin tabla (FAIL=1)
+        techo: la tabla de la base verificada, 888f500 (refs/remotes/origin/master)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada una: «`clave` · documento · citas»):
+✓ (19) la tabla movida de sitio (B_TABLA) y rehecha con tres citas nuevas (FAIL=1)
+        ❌ la base verificada tiene b-citas.awk y no tiene doc/control/deuda-b.tsv: la tabla no puede cambiar de sitio ni nacer otra vez.
+        ❌ B `muerto_cuatro` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_dos` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_n2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+✓ (20) un núcleo que se da crédito en la medición aparte, con citas nuevas (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ B `muerto_n1` no existe y se cita sin marcar, en doc.md (2) — cita muerta NUEVA:
+        ❌ B `muerto_n2` no existe y se cita sin marcar, en doc.md (2) — cita muerta NUEVA:
+        ❌ B `muerto_n3` no existe y se cita sin marcar, en doc.md (2) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 3 entradas y 3 citas de más, 0 entradas y 0 citas de menos
+✓ (21) un cambio del núcleo y de un documento en el mismo commit (FAIL=1)
+        ❌ b-citas.awk cambia respecto de la base, y también estos documentos de la lista (un cambio del núcleo va solo):
+        ❌ no reescribo la tabla con [B] en rojo (¿falta un documento?).
+        ❌ B `muerto_n4` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado), más lo que el núcleo del árbol ve de más o de menos que el suyo: 0 entradas y 0 citas de más, 0 entradas y 0 citas de menos
+✓ (22) una valla en la línea de un ítem de lista no esconde la prosa de después (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_v1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_v2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (23) un `<!--` suelto a media línea no esconde los párrafos siguientes (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_c1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_c2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (24) una barra al final de una cita no se come las siguientes (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_b1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        ❌ B `muerto_b2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (25a) «no se ha retirado» no marca (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_m1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (25b) «no es código muerto» no marca (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_m2` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (25c) «la propuesta» (sustantivo) no marca (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_m3` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (25d) un marcador de la oración anterior no marca (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_m4` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (26) el marcador del paréntesis es de su cita, no de la de fuera (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_g1` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (27a) un glob con punto que no casa: `Muerto.cosa.*` (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `Muerto.cosa.*` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (27b) un glob de ficheros que no casa: `Viejo*.lean` (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B2 `Viejo*.lean` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (28) una ruta que no existe en un directorio que sí, con un homónimo de Lean (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B2 `ROBINSON_PlusPlus/Full/Order` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 888f500 (verificado)
+✓ (29) un clon superficial no se mide (MEDIDO=0)
+✅ el trinquete se comporta como se espera

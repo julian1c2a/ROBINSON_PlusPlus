@@ -1,0 +1,17 @@
+   la tabla de la base (núcleo de la base):
+      B	muerto_g03	doc.md	1
+      B	muerto_g04	doc.md	1
+      B	muerto_w1	doc.md	1
+      B	muerto_w2	doc.md	1
+── (a) núcleo nuevo + dos citas muertas nuevas, --b-deuda-rehacer (modo 3, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        ✓ la tabla, escrita de nuevo: 2 entradas
+        techo: la tabla de la base verificada, 623572e (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        deuda declarada: 2 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 2
+── (b) ya en git: verde (las dos citas nuevas, sin marcar y sin ADR) (modo 0, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        techo: la tabla de la base verificada, 623572e (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        deuda declarada: 2 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 2
+   la tabla de hoy:
+      B	muerto_w1	doc.md	1
+      B	muerto_w2	doc.md	1

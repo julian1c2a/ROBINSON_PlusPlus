@@ -1,0 +1,5 @@
+sin GIT_NO_REPLACE_OBJECTS (como check-doc-sync al construir RUTAS y SONDEOS):
+   sondeos/A.lean
+   sondeos/Falso.lean
+con GIT_NO_REPLACE_OBJECTS=1 (como b-control.bash):
+   sondeos/A.lean

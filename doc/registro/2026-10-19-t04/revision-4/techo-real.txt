@@ -1,0 +1,8 @@
+rpp: tabla de la base 1145 entradas; viejo(hoy) difiere de ella en 0 líneas
+rpp: crédito 192 entradas, 253 citas
+rpp: tabla del árbol por encima del techo: 0 entradas
+rpp: HOLGURA (techo − tabla): 37 citas en 34 entradas; de clase B: 15
+fol: tabla de la base 331 entradas; viejo(hoy) difiere de ella en 0 líneas
+fol: crédito 55 entradas, 69 citas
+fol: tabla del árbol por encima del techo: 0 entradas
+fol: HOLGURA (techo − tabla): 0 citas en 0 entradas; de clase B: 0

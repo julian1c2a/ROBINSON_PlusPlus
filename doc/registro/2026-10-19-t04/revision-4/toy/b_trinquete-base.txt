@@ -1,0 +1,106 @@
+✓ (1a) la tabla inicial se crea (la base no la tiene) (FAIL=0)
+        ✓ la tabla, escrita de nuevo: 2 entradas
+        ⚠️  la base verificada (9855748) no tiene la tabla: es la que se crea, y no se compara con nada.
+✓ (1b) y cuadra (FAIL=0)
+        techo: la tabla de la base verificada, 11097eb (verificado)
+✓ (2a) una cita muerta NUEVA es rojo (FAIL=1)
+        ❌ B `muerto_tres` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 11097eb (verificado)
+✓ (2b) y --b-deuda se niega a subir la tabla (FAIL=1)
+        ❌ --b-deuda NO baja la tabla: estas entradas suben o son nuevas (arréglalas en el documento o márcalas):
+        ❌ B `muerto_tres` no existe y se cita sin marcar, en doc.md (1) — cita muerta NUEVA:
+        techo: la tabla de la base verificada, 11097eb (verificado)
+✓ (3a) una cita muerta MENOS es rojo (FAIL=1)
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 11097eb (verificado)
+✓ (3b) --b-deuda baja la tabla (FAIL=0)
+        ✓ --b-deuda: la tabla baja a 2 entradas; salen del todo 0:
+        techo: la tabla de la base verificada, 11097eb (verificado)
+✓ (3c) y cuadra (FAIL=0)
+        techo: la tabla de la base verificada, 1f50e2a (verificado)
+✓ (4) la tabla subida a mano, ya en git, es rojo (FAIL=1)
+        techo: la tabla de la base verificada, 1f50e2a (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (5a) sin cambiar el núcleo, --b-deuda-rehacer se niega (FAIL=1)
+        ❌ --b-deuda-rehacer: b-citas.awk es el de la base verificada; la tabla sólo baja.
+        techo: la tabla de la base verificada, 1f50e2a (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (5b) un comentario en el núcleo: rehace la tabla, y sigue rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 2 entradas
+        techo: la tabla de la base verificada, 1f50e2a (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (5c) y tapado con otro commit, sigue rojo (FAIL=1)
+        techo: la tabla de la base verificada, 1f50e2a (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (5d) un núcleo que VE MÁS (sin «propuesto»): sube justo eso (FAIL=0)
+        ✓ la tabla, escrita de nuevo: 3 entradas
+        techo: la tabla de la base verificada, 1f50e2a (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 1 entradas, 1 citas
+✓ (5e) ya en git y sin verificar, sigue verde (FAIL=0)
+        techo: la tabla de la base verificada, 1f50e2a (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 1 entradas, 1 citas
+✓ (5f) y verificado, también (FAIL=0)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+✓ (6a) borrar la tabla y crearla con una cita nueva es rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 4 entradas
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (6b) una entrada repetida es rojo (FAIL=1)
+        ❌ doc/control/b-deuda.tsv tiene entradas repetidas o mal formadas (cuatro campos; las citas, un entero positivo):
+        techo: la tabla de la base verificada, 27f862b (verificado)
+✓ (7a) una subida en el commit que cambia el núcleo es rojo (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 3 entradas
+        techo: la tabla de la base verificada, 27f862b (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (7b) y tapada con otro commit, sigue rojo (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (8a) con un ADR NUEVO que la nombra (ADR-902), pasa (FAIL=0)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ⚠️  1 entradas sobre su techo, y ADR-902, nuevo, nombra cada clave.
+✓ (8b) con un ADR que no la nombra (ADR-901), no (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ B_SUBE_ADR=ADR-901 ya está en la base verificada: un ADR deja subir la tabla UNA vez, en el commit que lo trae.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (8c) con un ADR que no existe, no (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ B_SUBE_ADR=ADR-999: ese ADR no existe.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (8d) con un ADR VIEJO que la nombra (ADR-900), no (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ B_SUBE_ADR=ADR-900 ya está en la base verificada: un ADR deja subir la tabla UNA vez, en el commit que lo trae.
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (8e) con un ADR que nombra otra que empieza igual, no (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (9) una subida tras un núcleo ROTO en un commit intermedio (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (10) «otra interfaz» en un commit intermedio, y cinco citas nuevas (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 8 entradas
+        techo: la tabla de la base verificada, 27f862b (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (11) el núcleo borrado y restaurado, con la tabla rehecha (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (12) el núcleo debilitado y restaurado, con citas nuevas (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (13) una rama vieja (tabla más alta) fusionada con master (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (14a) una raíz huérfana con citas nuevas, fusionada (FAIL=1)
+        techo: la tabla de la base verificada, 27f862b (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (14b) quitar «candidat» y añadir citas a su lado, en un commit (FAIL=1)
+        ✓ la tabla, escrita de nuevo: 5 entradas
+        techo: la tabla de la base verificada, 27f862b (verificado), más lo que el núcleo del árbol ve de más que el suyo sobre sus documentos: 0 entradas, 0 citas
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+✓ (15a) un segundo documento con deuda, en la base (FAIL=0)
+        techo: la tabla de la base verificada, 3531937 (verificado)
+✓ (15b) sacarlo de la lista con su deuda (sigue en git) es rojo (FAIL=1)
+        ❌ documentos con deuda en la base salen de la lista y siguen en git (con su deuda, en silencio):
+        ❌ --b-deuda: no bajo la tabla con [B] en rojo (¿falta un documento?).
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 3531937 (verificado)
+✓ (16) el núcleo de un commit intermedio no se ejecuta
+✓ (17) un clon superficial no se mide (MEDIDO=0)
+✅ el trinquete se comporta como se espera

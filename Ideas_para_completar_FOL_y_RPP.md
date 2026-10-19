@@ -1,3 +1,7 @@
+# Ideas para completar FOL y RPP
+
+**Last updated:** 2026-10-19 — notas del propietario, tal cual (la cabecera, añadida porque `[E]` pide una marca de tiempo en todo `.md` del repo).
+
 Hemos completado en ROBINSON_PlusPlus el Primer y Segundo Teorema de Incompletitud de Gödel (Godel.lean, GodelTwo.lean), el Teorema de Rosser (Rosser.lean), el Teorema de Löb (Lob.lean) y la Indefinibilidad de Tarski (TarskiPrf.lean), y además haber construido en FOL toda la maquinaria sintáctica y semántica de FOL= (Deducción Natural, Cálculo de Secuentes LK, Eliminación de Corte / Hauptsatz, Completitud de Henkin, Compacidad, Herbrand, Skolemización e Interpolación de Craig) con una auditoría estricta de axiomas constructivos vs. clásicos (Classical.choice) y cero sorrys, supera con creces un proyecto de aprendizaje personal.  
 
 A continuación, divido mi análisis en dos partes: 1) Qué más puedes hacer para enriquecer tu repositorio de FOL= y 2) Cómo enfocar una contribución real y exitosa a Mathlib.

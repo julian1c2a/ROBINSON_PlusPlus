@@ -543,15 +543,20 @@ echo "════ [B] CITAS MUERTAS — ROJO, con trinquete POR CITA (T04, ADR-
 # bytes o menos, sin cruzar una celda de tabla; la FECHA ya no absuelve, ni un verbo corriente. Los detalles, en la
 # cabecera de los dos. Dos revisiones adversariales (ADR-166 §3) encontraron dieciocho vías de verde falso o de trinquete
 # débil en las dos primeras versiones, arregladas.
-# 🔑 La deuda es POR CITA (`doc/control/b-deuda.tsv`), con TECHO: el que sale de rehacer en git la historia de la tabla
-# desde que se creó; sólo baja, salvo lo que un cambio del núcleo vea de más (b-control.bash lo explica).
-# ⛔ ABIERTO (ADR-166 §4): la TERCERA revisión encontró tres vías para subir la tabla con la CI en verde (un núcleo con
-# «otra interfaz» o debilitado en un commit intermedio, y las fusiones) y verdes falsos en el núcleo. El arreglo previsto:
-# el techo sobre la última base VERIFICADA (master), no sobre la historia.
+# 🔑 La deuda es POR CITA (`doc/control/b-deuda.tsv`), con TECHO: la tabla de la BASE VERIFICADA (el master protegido),
+# que tiene que ser antepasado de HEAD; sólo baja, salvo lo que un cambio del núcleo vea de más sobre los documentos de
+# la base (b-control.bash lo explica). ✏️ ADR-167: antes el techo rehacía la historia de la tabla, y la tercera revisión
+# adversarial lo subió con la CI en verde con commits intermedios y fusiones; con la base verificada no cuentan.
 B_GITS=". ../FOL"   # la historia de los nombres: la de RPP (con lo que aún no está en git) y la de FOL
-B_SUBE_ADR=""   # sólo si un ADR deja que la tabla CREZCA sin cambiar el núcleo: «ADR-NNN» (tiene que existir y nombrarlas)
-b_adr_existe() { grep -qE "^## $1:" DECISIONS.md; }
+# la BASE VERIFICADA del techo: el master protegido (ADR-136), lo último que la CI aprobó (ADR-167), con su nombre
+# ENTERO (una etiqueta `origin/master` le ganaría a la forma corta)
+B_BASE_REF="${B_BASE_REF:-refs/remotes/origin/master}"
+# (un objeto reemplazado con `git replace` no engaña a las entradas de [B], que salen de git: ni a las rutas ni a los
+# sondeos archivados)
+export GIT_NO_REPLACE_OBJECTS=1
+B_SUBE_ADR=""   # sólo si un ADR NUEVO (que no está en la base) deja subir la tabla: «ADR-NNN», con «`clave` · documento · citas»
 b_adr_texto() { awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en' DECISIONS.md; }
+b_adr_texto_base() { git show "$B_BASE:DECISIONS.md" 2>/dev/null | awk -v a="## $1:" '/^## / { en = (index($0, a) == 1) } en'; }
 B_DOCS_LISTA="REFERENCE.md CURRENT-STATUS-PROJECT.md DEPENDENCIES.md DECISIONS.md README.md AXIOMS.md GODEL-STATUS.md NEXT-STEPS.md"
 # (2026-10-14, ADR-135; T09: TEOREMAS-E-HIPOTESIS.md entra en el universo: es normativo y nadie lo miraba)
 B_DOCS_LISTA="$B_DOCS_LISTA TEOREMAS-E-HIPOTESIS.md"

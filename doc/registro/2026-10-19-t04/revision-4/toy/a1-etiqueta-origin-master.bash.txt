@@ -1,0 +1,37 @@
+#!/bin/bash
+# A1 — una ETIQUETA llamada `origin/master` gana a refs/remotes/origin/master al resolver B_BASE_REF (la omisión de RPP,
+# y la de FOL cuando la CI no pasa `before`). Se reproduce el flujo de la CI de RPP: push a `ci/x`, clon con todas las
+# ramas y etiquetas (lo que hace actions/checkout con fetch-depth 0) y check-doc-sync sin B_BASE_REF.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a1; rm -rf "$T"; mkdir -p "$T"
+nuevo_repo "$T/dev"
+# la deuda BAJA y la CI lo aprueba: master (protegido) avanza
+printf '%s\n' 'Texto: `vivo_ok`, `muerto_uno` y `muerto_dos`.' "$DOC2" > doc.md
+corre 1 "" > /dev/null; commit baja; git branch -f verificado HEAD
+git clone -q --bare . "$T/remoto.git"
+git remote add origin "$T/remoto.git"; git fetch -q origin
+# el ataque: la tabla SUBE (tres citas muertas nuevas) en ci/x
+printf '%s\n' "$DOC1" "$DOC2" 'Nuevo: `muerto_n1`, `muerto_n2` y `muerto_n3`.' > doc.md
+rm doc/control/b-deuda.tsv; BASE=$PRE_TABLA corre 2 "" > /dev/null; commit sube
+git push -q origin HEAD:refs/heads/ci/x
+ci() {   # $1 = descripción  [$2 = rama, ci/x]: el clon de la CI (todas las ramas y etiquetas), B_BASE_REF sin poner
+  rm -rf "$T/ci"; git clone -q --no-checkout "$T/remoto.git" "$T/ci"; cd "$T/ci"
+  git fetch -q origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+  git checkout -q --detach "refs/remotes/origin/${2:-ci/x}"
+  cp "$T/dev/vivos" "$T/dev/env" "$T/dev/sond" "$T/dev/mod" "$T/dev/rut" .
+  echo "   (origin/master resuelve a $(git rev-parse --short origin/master 2>/dev/null); refs/remotes/origin/master = $(git rev-parse --short refs/remotes/origin/master))"
+  BASE="" paso "$1" 0
+  cd "$T/dev"
+}
+ci "(a) CONTROL, sin etiqueta: la subida es roja"
+git tag origin/master "$PRE_TABLA" && git push -q origin refs/tags/origin/master
+ci "(b) con la etiqueta \`origin/master\` en un commit ANTERIOR a la tabla: sin techo"
+git push -q origin :refs/tags/origin/master; git tag -d origin/master > /dev/null
+# (c') sólo la vuelta de `muerto_dos` a 2 (lo que «baja» había bajado), en ci/y
+git checkout -q -f verificado 2>/dev/null; git checkout -q -B y verificado
+printf '%s\n' "$DOC1" "$DOC2" > doc.md
+sed -i 's/\tmuerto_dos\tdoc.md\t1$/\tmuerto_dos\tdoc.md\t2/' doc/control/b-deuda.tsv; commit resube
+git push -q origin HEAD:refs/heads/ci/y
+ci "(c1) CONTROL, sin etiqueta: volver a subir \`muerto_dos\` es rojo" ci/y
+git tag origin/master "$INICIAL" && git push -q origin refs/tags/origin/master
+ci "(c2) con la etiqueta en el commit VIEJO de master (tabla más alta): verde" ci/y

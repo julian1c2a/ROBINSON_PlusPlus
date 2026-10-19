@@ -1,0 +1,15 @@
+#!/bin/bash
+# A7 — B_SUBE_ADR ata la subida a la CLAVE, no a (clase, clave, documento) ni a una cantidad: un ADR nuevo que nombra
+# `muerto_uno` deja que suba en CUALQUIER documento y CUANTO quiera. Y en FOL (b_adr_texto_base vacía) vale un ADR viejo.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a7; nuevo_repo "$T"
+printf '%s\n' 'Nada.' > doc2.md; DOCS="doc.md doc2.md"
+rm doc/control/b-deuda.tsv; BASE=$PRE_TABLA corre 2 "" > /dev/null; commit doc2; git branch -f verificado HEAD
+printf '\n## ADR-902: sube `muerto_uno` en doc.md, UNA cita más\n' >> DECISIONS.md
+{ printf '%s\n' "$DOC1" "$DOC2"; for i in $(seq 1 10); do echo "Otra vez \`muerto_uno\` ($i)."; done; } > doc.md
+for i in $(seq 1 5); do echo "Y aquí \`muerto_uno\` ($i)."; done >> doc2.md
+rm doc/control/b-deuda.tsv; BASE=$PRE_TABLA corre 2 "" > /dev/null
+echo "   la tabla subida:"; grep -v '^#' doc/control/b-deuda.tsv | sed 's/^/      /'
+paso "(a) ADR-902 nombra \`muerto_uno\` («una cita más en doc.md»): suben 10 en doc.md y 5 en doc2.md" 0 ADR-902
+
+ADR_BASE_FN=b_adr_base_fol paso "(b) en FOL (b_adr_texto_base vacía) el ADR VIEJO ADR-900, que nombra \`muerto_uno\`, también vale" 0 ADR-900

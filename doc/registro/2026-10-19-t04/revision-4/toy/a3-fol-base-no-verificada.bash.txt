@@ -1,0 +1,25 @@
+#!/bin/bash
+# A3 — FOL: la «base verificada» de su CI es `github.event.before` (el commit de ANTES del push) o, sin él, la base del
+# PR, o `origin/master`. En FOL el push va directo a master (sin protección): un push ROJO llega igual a master, y el
+# push SIGUIENTE lo toma como base. Se reproduce lo que vería la CI de FOL en cada evento, con un remoto de juguete.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a3; rm -rf "$T"; mkdir -p "$T"
+nuevo_repo "$T/dev"
+git clone -q --bare . "$T/remoto.git"; git remote add origin "$T/remoto.git"; git push -q origin master
+ci() {   # $1 = descripción  $2 = B_BASE_REF tal como lo pone el workflow (vacío = sin poner)  → la CI sobre origin/master
+  rm -rf "$T/ci"; git clone -q "$T/remoto.git" "$T/ci"; cd "$T/ci"
+  git fetch -q origin '+refs/heads/*:refs/remotes/origin/*' '+refs/tags/*:refs/tags/*'
+  cp "$T/dev/vivos" "$T/dev/env" "$T/dev/sond" "$T/dev/mod" "$T/dev/rut" .
+  BASE="$2" paso "$1" 0
+  cd "$T/dev"
+}
+V=$(git rev-parse HEAD)
+# push 1: tres citas muertas nuevas y la tabla subida a mano
+printf '%s\n' "$DOC1" "$DOC2" 'Nuevo: `muerto_n1`, `muerto_n2` y `muerto_n3`.' > doc.md
+rm doc/control/b-deuda.tsv; BASE=$PRE_TABLA corre 2 "" > /dev/null; commit sube; git push -q origin master
+P1=$(git rev-parse HEAD)
+ci "(a) push 1 (before = el verde anterior): ROJO, pero en FOL ya está en master" "$V"
+# push 2: cualquier cosa
+printf '%s\n' 'Una línea sin citas.' >> doc.md; commit otra-cosa; git push -q origin master
+ci "(b) push 2 (before = push 1, el ROJO): verde, con la tabla subida" "$P1"
+ci "(c) workflow_dispatch sobre el master de hoy (sin before ni PR: B_BASE_REF vacío ⇒ origin/master = HEAD): verde" ""

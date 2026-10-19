@@ -1,0 +1,14 @@
+#!/bin/bash
+# A2 — la tabla CAMBIA DE RUTA (B_TABLA, en b-control.bash del árbol) en el mismo commit que la sube: la base no tiene
+# «la tabla» (la de la ruta nueva), b-control.bash dice «es la que se crea» y no hay techo. Y el núcleo NO cambia:
+# lo único que se ejecuta es el núcleo de la base, idéntico al del árbol.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a2; nuevo_repo "$T"
+printf '%s\n' "$DOC1" "$DOC2" 'Nuevo: `muerto_n1`, `muerto_n2` y `muerto_n3`.' > doc.md
+paso "(a) CONTROL: tres citas muertas nuevas, con la tabla en su sitio" 1
+sed -i 's|^B_TABLA=doc/control/b-deuda.tsv$|B_TABLA=doc/control/deuda-b.tsv|' b-control.bash
+grep -q '^B_TABLA=doc/control/deuda-b.tsv$' b-control.bash || { echo "no pude cambiar B_TABLA"; exit 1; }
+git mv doc/control/b-deuda.tsv doc/control/deuda-b.tsv
+paso "(b) --b-deuda-inicial no vale (la tabla existe)..." 2
+rm doc/control/deuda-b.tsv; corre 2 "" > /dev/null; commit tabla-movida
+paso "(c) la tabla MOVIDA y rehecha con las tres citas nuevas, ya en git: verde" 0

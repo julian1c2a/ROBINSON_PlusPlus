@@ -1,0 +1,12 @@
+# Absoluciones por un marcador AJENO en los documentos REALES (núcleo instrumentado revision-b4/instr.awk: «M|clave|marcador|fichero:línea»)
+# (la clave está MUERTA —vive() falló— y la absuelve el marcador citado, que habla de otra cosa)
+[rpp] M|IsPrime| pendientes |CURRENT-STATUS-PROJECT.md:196
+      «…- **2026-06-03 — Block8 (BLOQUE VIII Fase 17 parcial — Primos) AÑADIDO**: `Dvd` (divisibilidad), `IsPrime` (Def 25), lemas básicos. Pendientes documentados en header: Def 26 `IsFactorization` (necesita `pow`/`prod_list`), Ax-P (TFA), Fases 18-19 (Gödelización → módulo `Meta/` futuro). Bui…»
+[rpp] M|concat_assoc| pendientes |CURRENT-STATUS-PROJECT.md:210
+      «…- **2026-05-27 — 🎉 PROYECTO A 0 SORRYS REALES**: Cerrados los 2 últimos pendientes (`concat_assoc` e `in_concat_iff`) postulando `ax_C3_concat_assoc` y `ax_L3_in_concat` en Axioms.lean. Ambos son teoremas en sistemas con inducción; en Minimal se postulan (mismo patrón que ax21/ax24/ax27/ax28…»
+[rpp] M|EvalSubsttc| muertas)|CURRENT-STATUS-PROJECT.md:30
+      «…l KIT TERNARIO a `EvalArithPrf`, que retira **74 copias a mano** de `sondeos/`— y el módulo **`SubstfcCodePrf`** (17 de 39; 4 retiradas por MUERTAS). Quedan `EvalSubsttc`, `SubstfcEx` y `EvalSubstfcPrf`. 🆕 **B2 (2026‑09‑04)**: `Meta/EvalLiftcPrf.lean` — **el DESCENSO**, que pone **`pcc_e…»
+[rpp] M|bridge_*| muerto:|doc/REFERENCE-Incompleteness.md:3288
+      «…> 🔑 Un `bridge_* := rfl` sin consumidores no es código muerto: es **la factura de vivir en…»
+[fol] M|invOf| candidatos,|NEXT-STEPS.md:23
+      «…→ 84 constantes; Lindenbaum y Henkin sin él; la tesis del WKL, rectificada; la instancia de `TheoryFramework`, declarada; `Rename` descongelado para retirar `invOf`); los 17 candidatos, sólo bloqueados. Antes, el mismo día: N1‑N4 resueltas y aplicadas (13 renombres, dos duplicados retirados; …»

@@ -1,0 +1,31 @@
+#!/bin/bash
+# A6 — en el commit que cambia el núcleo, el techo de cada entrada es máx(tabla de la base, tabla + nuevo − viejo): lo
+# que el núcleo NUEVO deja de ver (lo absuelve por el grupo, la familia…) NO baja el techo, y ese hueco se rellena con
+# citas muertas NUEVAS de la misma clave, en el mismo commit, sin ADR. Con el núcleo REAL de la base (el de
+# origin/master de RPP, 5dac599) y el del árbol de hoy: es el commit que subirá esta ronda.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a6; rm -rf "$T"; mkdir -p "$T"; cd "$T" || exit 2
+git init -q . && git config user.email t@t && git config user.name t && git config core.autocrlf false
+git checkout -q -b master 2>/dev/null
+cp "$ORIG/b-citas-HEAD.awk" b-citas.awk; cp "$ORIG/b-control.bash" .
+printf '%s\n' vivo_ok > vivos; : > env; : > sond; : > mod; : > rut
+{ echo 'theorem raa : True := trivial'; for i in $(seq 1000 2000); do echo "theorem nombre_$i : True := trivial"; done; } > X.lean
+printf '## ADR-900: x\n' > DECISIONS.md; printf 'salida.txt\n' > .gitignore
+# (un grupo largo con el marcador al final: el núcleo de la base sólo lo aplica a 100 bytes de CADA cita; el nuevo, al grupo)
+printf '%s\n' 'Fuera del build `muerto_w1`, `muerto_w2`, `muerto_g03`, `muerto_g04`, `muerto_g05`, `muerto_g06`, `muerto_g07`, `muerto_g08` y `muerto_g09`, sin nada en el cono; retirados.' > doc.md
+# la tabla de la base, con el núcleo de la base (b-control.bash de hoy no lo deja medir: su autotest es el nuevo)
+HISTB=$(mktemp); { echo raa; for i in $(seq 1000 2000); do echo nombre_$i; done; } | LC_ALL=C sort > "$HISTB"
+mkdir -p doc/control
+{ printf '# tabla\n# clase\tclave\tdocumento\tcitas\n'
+  LC_ALL=C awk -f b-citas.awk vivos env sond mod rut "$HISTB" doc.md | LC_ALL=C awk -F'|' '$1 == "B" || $1 == "B2" { d = $4; sub(/:[0-9]+$/, "", d); n[$1 "\t" $2 "\t" d]++ } END { for (k in n) print k "\t" n[k] }' | LC_ALL=C sort
+} > doc/control/b-deuda.tsv
+echo "   la tabla de la base (núcleo de la base):"; grep -v '^#' doc/control/b-deuda.tsv | sed 's/^/      /'
+git add -A && git commit -qm base && git branch -f verificado HEAD
+DOCS="doc.md"; BASE=verificado
+# el commit de la ronda: el núcleo nuevo, y DOS citas muertas NUEVAS, sin marcar, de las claves que el nuevo absuelve
+cp "$ORIG/b-citas.awk" b-citas.awk
+printf '%s\n' 'Además, hoy se usan `muerto_w1` y `muerto_w2` en la prueba.' >> doc.md
+paso "(a) núcleo nuevo + dos citas muertas nuevas, --b-deuda-rehacer" 3
+commit ronda
+paso "(b) ya en git: verde (las dos citas nuevas, sin marcar y sin ADR)" 0
+echo "   la tabla de hoy:"; grep -v '^#' doc/control/b-deuda.tsv | sed 's/^/      /'

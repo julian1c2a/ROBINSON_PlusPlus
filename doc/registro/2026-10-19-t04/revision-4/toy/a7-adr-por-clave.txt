@@ -1,0 +1,14 @@
+   la tabla subida:
+      B	muerto_dos	doc.md	2
+      B	muerto_uno	doc.md	11
+      B	muerto_uno	doc2.md	5
+── (a) ADR-902 nombra `muerto_uno` («una cita más en doc.md»): suben 10 en doc.md y 5 en doc2.md (modo 0, B_SUBE_ADR=ADR-902, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        techo: la tabla de la base verificada, d4ee627 (verificado)
+        ⚠️  2 entradas sobre su techo, y ADR-902, nuevo, nombra cada clave.
+        deuda declarada: 18 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 18
+── (b) en FOL (b_adr_texto_base vacía) el ADR VIEJO ADR-900, que nombra `muerto_uno`, también vale (modo 0, B_SUBE_ADR=ADR-900, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        techo: la tabla de la base verificada, d4ee627 (verificado)
+        ⚠️  2 entradas sobre su techo, y ADR-900, nuevo, nombra cada clave.
+        deuda declarada: 18 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 18

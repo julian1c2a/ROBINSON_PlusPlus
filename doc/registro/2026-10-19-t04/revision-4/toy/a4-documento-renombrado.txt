@@ -1,0 +1,30 @@
+── (0) dos documentos con deuda, verificados (modo 0, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        techo: la tabla de la base verificada, 9e048de (verificado)
+        deuda declarada: 4 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 4
+── (a1) CONTROL: sacar doc2.md de la lista SIN renombrarlo es rojo (modo 0, B_BASE_REF=verificado)
+      FAIL=1 MEDIDO=1
+        ❌ documentos con deuda en la base salen de la lista y siguen en git (con su deuda, en silencio):
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 9e048de (verificado)
+        deuda declarada: 4 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+── (a2) renombrado a notas/doc2.md y fuera de la lista: rojo sólo por la deuda saldada (modo 0, B_BASE_REF=verificado)
+      FAIL=1 MEDIDO=1
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 9e048de (verificado)
+        deuda declarada: 4 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+── (a3) tras --b-deuda, en git: verde, y notas/doc2.md (con tres citas muertas nuevas) no lo mide nadie (modo 0, B_BASE_REF=verificado)
+      FAIL=0 MEDIDO=1
+        techo: la tabla de la base verificada, 9e048de (verificado)
+        deuda declarada: 3 citas muertas en 2 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 3
+── (b) renombrado y en la lista, con su MISMA deuda: rojo (entradas nuevas sobre el techo) (modo 0, B_BASE_REF=verificado)
+      FAIL=1 MEDIDO=1
+        ❌ B `muerto_otro` no existe y se cita sin marcar, en doc-dos.md (1) — cita muerta NUEVA:
+        ❌ 1 entradas de doc/control/b-deuda.tsv tienen MENOS citas muertas que las que dice la tabla (deuda saldada):
+        techo: la tabla de la base verificada, 9e048de (verificado)
+        deuda declarada: 4 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 4
+── (b2) y con la tabla movida a mano a la ruta nueva (la misma deuda): sigue rojo, por encima del techo (modo 0, B_BASE_REF=verificado)
+      FAIL=1 MEDIDO=1
+        techo: la tabla de la base verificada, 9e048de (verificado)
+        ❌ la tabla tiene entradas por ENCIMA de su techo (sólo baja; subirla pide un ADR nuevo que nombre cada clave):
+        deuda declarada: 4 citas muertas en 3 entradas (clase, clave, documento) de doc/control/b-deuda.tsv; hoy, 4

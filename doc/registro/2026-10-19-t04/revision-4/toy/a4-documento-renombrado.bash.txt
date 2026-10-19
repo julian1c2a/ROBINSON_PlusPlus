@@ -1,0 +1,25 @@
+#!/bin/bash
+# A4 — un documento con deuda RENOMBRADO (git mv). La regla «un documento con deuda en la base no sale de la lista si
+# sigue en git» mira la RUTA vieja con `git ls-files`: renombrado, la ruta vieja ya no está en git.
+. "$(dirname "$0")/lib4.bash"
+T=$R4/tmp/a4; nuevo_repo "$T"
+printf '%s\n' 'Otro: `muerto_otro`.' > doc2.md; DOCS="doc.md doc2.md"
+rm doc/control/b-deuda.tsv; BASE=$PRE_TABLA corre 2 "" > /dev/null; commit doc2; git branch -f verificado HEAD
+paso "(0) dos documentos con deuda, verificados" 0
+# (a) renombrado FUERA de la lista: su deuda se va, y el documento sigue en git sin medir (con citas muertas nuevas)
+git mv doc2.md notas/doc2.md 2>/dev/null || { mkdir -p notas; git mv doc2.md notas/doc2.md; }
+printf '%s\n' 'Más: `muerto_n1`, `muerto_n2`, `muerto_n3`.' >> notas/doc2.md
+DOCS="doc.md"
+paso "(a1) CONTROL: sacar doc2.md de la lista SIN renombrarlo es rojo" 0 > /dev/null
+git mv notas/doc2.md doc2.md; DOCS="doc.md"; paso "(a1) CONTROL: sacar doc2.md de la lista SIN renombrarlo es rojo" 0
+git mv doc2.md notas/doc2.md
+paso "(a2) renombrado a notas/doc2.md y fuera de la lista: rojo sólo por la deuda saldada" 0
+corre 1 "" > /dev/null; commit renombra
+paso "(a3) tras --b-deuda, en git: verde, y notas/doc2.md (con tres citas muertas nuevas) no lo mide nadie" 0
+# (b) renombrado DENTRO de la lista (la misma deuda, otra ruta): rojo, y no hay forma de subirla sin un ADR por clave
+git checkout -q -f verificado 2>/dev/null; git checkout -q -B b verificado
+git mv doc2.md doc-dos.md; DOCS="doc.md doc-dos.md"
+corre 1 "" > /dev/null
+paso "(b) renombrado y en la lista, con su MISMA deuda: rojo (entradas nuevas sobre el techo)" 0
+sed -i 's/\tdoc2[.]md\t/\tdoc-dos.md\t/' doc/control/b-deuda.tsv
+paso "(b2) y con la tabla movida a mano a la ruta nueva (la misma deuda): sigue rojo, por encima del techo" 0

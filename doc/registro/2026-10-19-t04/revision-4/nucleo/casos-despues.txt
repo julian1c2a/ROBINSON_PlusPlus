@@ -1,0 +1,70 @@
+═══ M — marcadores (entradas de juguete; todas las claves muerto_* están muertas) ═══
+B|muerto_nuevo|doc.md:2
+B|muerto_d|doc.md:3
+B|muerto_e|doc.md:3
+B|muerto_f|doc.md:4
+B|muerto_g|doc.md:5
+B|muerto_h|doc.md:6
+B|muerto_i|doc.md:7
+B|muerto_j|doc.md:8
+B|muerto_l|doc.md:10
+B|muerto_m|doc.md:11
+B|muerto_n|doc.md:12
+B|muerto_o|doc.md:13
+B|muerto_p|doc.md:14
+B|muerto_q|doc.md:15
+B|muerto_r|doc.md:16
+B|muerto_u|doc.md:19
+B|muerto_w|doc.md:20
+B|muerto_j1|doc.md:21
+B|muerto_l1|doc.md:22
+B|muerto_c1|doc.md:24
+B|muerto_h2|doc.md:25
+B|muerto_i1|doc.md:26
+  (salen sólo: 12, 15, 24, 25 —h2— y 26 —i1—; todo lo demás queda absuelto)
+
+═══ D — desincronías con CommonMark (prosa que el núcleo no mira) ═══
+B|muerto_oculto_1|doc.md:5
+B|muerto_oculto_2|doc.md:5
+B|muerto_visible|doc.md:10
+  (D1: CommonMark ve muerto_oculto_1/2 como código en línea de un párrafo; el núcleo sólo ve muerto_visible)
+B|muerto_html_1|doc.md:3
+B|muerto_html_2|doc.md:3
+B|muerto_html_3|doc.md:5
+B|muerto_html_4|doc.md:8
+  (D2: un <!-- en línea no abre un bloque HTML ni cruza párrafos; el núcleo esconde muerto_html_1..3)
+B|muerto_r1|doc.md:1
+B|muerto_r2|doc.md:1
+B|muerto_r3|doc.md:3
+B|muerto_r4|doc.md:3
+B|muerto_r5|doc.md:3
+B|muerto_r6|doc.md:5
+  (D3: en CommonMark la barra no escapa dentro de una cita: `C:\msys64\` es una cita entera; el núcleo esconde muerto_r1..5)
+
+═══ G — globs y abreviaturas (entradas de juguete) ═══
+B|ModuloMuerto.*|doc.md:1
+B2|Muerto.cosa_*|doc.md:1
+B2|Viejo*.lean|doc.md:2
+B2|muerto_xyz*.lean|doc.md:2
+B2|NoExiste/*.lean|doc.md:3
+B|muerto_ab|doc.md:4
+B|muerto_cd|doc.md:4
+B|vivo_ok.Muerto|doc.md:5
+B|_right|doc2.md:1
+  (con VIVOS = foo_left, foo_x1: `foo_left/right` y `foo_x1/x2` pasan aunque foo_right y foo_x2 no existan)
+
+═══ R — con las entradas REALES reconstruidas de RPP (revision-b4/rpp) ═══
+B2|ROBINSON_PlusPlus/Full/Order|prueba.md:1
+B2|ROBINSON_PlusPlus/Meta/Syntax|prueba.md:1
+B2|ROBINSON_PlusPlus/Minimal/Basic/|prueba.md:1
+B2|ROBINSON_PlusPlus/Meta/Tactic|prueba.md:1
+B2|ROBINSON_PlusPlus/Meta/GodelViejo*.lean|prueba.md:2
+B2|Meta/Borrado*.lean|prueba.md:2
+B2|ROBINSON_PlusPlus/Full/*.olean|prueba.md:2
+B2|GodelViejo*.lean|prueba.md:3
+B|Meta.Borrado.*|prueba.md:3
+B|FOLPure.*|prueba.md:3
+B|prf_inventado_xyz.*|prueba.md:3
+B2|ROBINSON_PlusPlus/Meta/Inventado|prueba.md:5
+B|ROBINSON_Inventado|prueba.md:5
+  (ninguna de las rutas de 1–2 existe; sale Basic —está en HIST— y los Inventado; en 9 sale `bin2`, y prf_congr_bin2 existe)
