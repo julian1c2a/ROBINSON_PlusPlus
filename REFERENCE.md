@@ -132,7 +132,7 @@ This project adopts [Mathlib](https://leanprover-community.github.io/contribute/
 temáticos `doc/REFERENCE-*.md`.** Esta tabla es el catálogo raíz; cada grupo enlaza a su nodo (árbol
 REFERENCE, `AI-GUIDE.md` §0.5).
 
-**116 módulos activos** (Minimal 2 + Meta 112 + Full 2) + barrel `Meta.lean` + raíz
+**117 módulos activos** (Minimal 2 + Meta 113 + Full 2) + barrel `Meta.lean` + raíz
 `ROBINSON_PlusPlus.lean`. Fuera del build: **0 en `cuarentena/`** (§1.6) y **43 en `sondeos/`**
 (experimentos compilados a mano; catálogo en [`sondeos/README.md`](sondeos/README.md)).
 
@@ -246,6 +246,7 @@ Detalle en el nodo §3.15–§3.32.
 | 84zj | **`GodelCorolarios`** | 🆕 🏁 **los corolarios de libro de Gödel II** (2026‑10‑18, ADR‑162, T78): `prf_godel_imp_con` y `prf_godel_iff_con : Prf (G ⇔ Con')` (D1, D2 y el punto fijo; la otra mitad es `prf_con_imp_godel`); `goedel_second_formalizado : Prf (Con' ⇒ ¬Prov⌜Con'⌝)`, con su control `goedel_second_de_formalizado` (con D1 da `goedel_second_prf`); y `con_indecidible` (ni `Con'` ni `¬Con'`: la segunda, por `con_verdadera` y la solidez, clase (iii)). PURO por T08 en lo sintáctico; los dos de la clase (i), en `PUROS` |
 | 84zk | **`ContratoTitulares`** | 🆕 🔒 **T07, el contrato de los enunciados** (2026‑10‑18, ADR‑165): `TITULARES` (los 24 de `T_UNIVERSO`, que `[T]` compara con esta lista), `cierreTipo` (el cierre del TIPO de un titular por constantes del proyecto: tipos, valores de las definiciones, constructores; no las pruebas), `huella` (`Expr.hash`), `comprobar` (el control, en los dos sentidos) y `#contrato_generar` (escribe la tabla; lo llama `scripts/ContratoGenerar.lean`). No importa la tabla |
 | 84zl | **`ContratoTabla`** | 🆕 🔒 **T07, la tabla del contrato** (2026‑10‑18, ADR‑165): `tabla`, una línea por constante del cierre (clase, huella, nombre): 536. GENERADA, no se edita a mano; sólo cambia con un ADR. La lee `#contrato_titulares` (`PurezaTitulares`) |
+| 84zm | **`RigidezEstandar`** | 🆕 🏁 **W1 y E10 en TODO modelo estándar** (2026‑10‑20, ADR‑173, T75e): en un `M` con `Estandar M`, los símbolos que miran las guardas valen lo de `MNV` (`M_lt`, `M_mem`, `M_lenc`, `M_nthc` en rango), las guardas significan lo mismo (`M_hasWit`, `M_hasWitF`), la sustitución y el lift sobre códigos buenos también (`M_substfc`, `M_liftfc`), el ancla vale el código de los 142 (`M_axiomsCodeT`), y lo que `M` cree una prueba lo es (`M_lineWF`, `M_cadena`). De ahí `prf_of_prov_de`, `modelo_prov_iff_de`, `godelCN_verdadera_de` y `con_verdadera_de`; `control_instancia`, la de `MNV V₀`. Sobre la basura `M` es libre, y no importa |
 | 85–86 | `DiagonalTwo` · `GodelTwo` | infraestructura del punto fijo (`godelPred'`, `godelBeta'`, `godelC'`) y `consistencyFormula'`. Gödel II vive en `GodelTwoPrf`; `goedel_second'` (retirado el 2026‑09‑11) y el teorema `d3` sobre `⊢` (retirado con ADR‑115) ya no están |
 
 🔁 = repatriado de `cuarentena/` el 2026‑08‑23 (§3.26).

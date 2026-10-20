@@ -38,7 +38,7 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 132 jobs · 116 módulos activos** (Minimal 2 + Meta 112 + Full 2) **+ 0 en `cuarentena/`
+> **Build 133 jobs · 117 módulos activos** (Minimal 2 + Meta 113 + Full 2) **+ 0 en `cuarentena/`
 > + 44 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO contaba como registro y `[A]` la eximía. ✏️ Desde ADR‑169 la fecha ya no exime: las líneas de abajo llevan «Entonces:».)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
@@ -57,6 +57,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Entonces: el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
 > *(Entonces: el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
 > *(Entonces: el 2026-10-19, con ADR-170: 132 jobs y 116 módulos, porque `FOL.Deduction`, sin nada en el cono, salió del build, T74.)*
+> *(Entonces: el 2026-10-20, con ADR-173: 133 jobs y 117 módulos, por `Meta/RigidezEstandar.lean`, T75e.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >
@@ -2886,7 +2887,7 @@ sitios de la familia `pcc_*_inst*`. El censo completo da **6**, y son un frente 
 ## §3.40 · 🏁 ③ TERMINADO — EL ÁRBOL VUELVE A VERDE y la vía C queda CERRADA (2026‑09‑06d)
 
 ```
-Build completed successfully (132 jobs)
+Build completed successfully (132 jobs)        # entonces (2026‑09‑06d)
 112 módulos · 0 sorrys · 7 `axiom` de Lean — el inventario NO se mueve
 ```
 
@@ -3057,7 +3058,7 @@ editar un fichero que otro agente audita le invalida los números de línea.
 
 ## §3.41 · B3.2 CERRADO y el CHASIS de `hGuard` puesto (2026‑09‑07)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+> *(entonces)* `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
 > Dos módulos nuevos, los dos **net‑0**: `Meta/EvalSubsttcPrf.lean` y `Meta/LineWFGuardPrf.lean`.
 
 Con la vía C integrada en `master`, el cuello de botella pasó a **B3.4** (el ensamblaje de
@@ -3203,7 +3204,7 @@ la hace útil y a la vez lo que encarece las líneas abiertas de `prf_lineOk_q1`
 
 ## §3.42 · B3.4 CERRADO — `pcc_eval_substfc` en producción (2026‑09‑08)
 
-> `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
+> *(entonces)* `Build completed successfully (132 jobs)` · **118 módulos** (Minimal 11 + Meta 99 + Full 11).
 > `Meta/EvalSubstfcPrf.lean` (1 620 l.). Footprint = la base sancionada; **ni un axioma nuevo**.
 
 ⭐ **El muro de `substfc` estaba roto desde 2026‑08‑31 (§3.30), pero vivía fuera del build.**
@@ -3316,7 +3317,7 @@ no dicen nada, y se van enteros.
 
 ## §3.43 · C3 · El `∀` acotado ANIDADO, reflejado — y el axioma que no hubo que tocar (2026‑09‑08)
 
-> `Build completed successfully (132 jobs)` · **118 módulos**. `Meta/TrackedAtomsPrf.lean` (21
+> *(entonces)* `Build completed successfully (132 jobs)` · **118 módulos**. `Meta/TrackedAtomsPrf.lean` (21
 > declaraciones promovidas) y `Meta/HasWitTrackedPrf.lean`. Footprint = la base sancionada.
 
 §3.42 dejó C3 en dos deudas genéricas; §3.41.5 midió qué hacía falta. Al bajar `DEUDA_hGuardT`
@@ -3651,7 +3652,7 @@ en el antecedente, el `or`‑elim la conserva en su rama.
 
 ## §3.44 · 🏁 C3‑T CERRADO — `DEUDA_hGuardT` PROBADA, y media cascada de ADR‑020 descargada (2026‑09‑08c)
 
-> `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
+> *(entonces)* `Build completed successfully (132 jobs)`. Footprint de `pcc_hGuardT` = la base sancionada
 > (`prf_axiomsCodeT_eq` —`axiom` retirado el 2026‑09‑12 con ADR‑026: el ancla pasó a la firma como `[AnclaEq]`— + los tres de Lean). **Net‑0 puro**, ni un axioma nuevo.
 
 ```

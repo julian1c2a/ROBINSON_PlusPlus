@@ -51,6 +51,8 @@ Public API:
     `archivo/fuera-del-cono-2026-10-18`.
   · ✏️ 2026‑10‑18 (ADR‑162, T78): `Meta/GodelCorolarios.lean`, los corolarios de libro de Gödel II:
     `prf_godel_iff_con : Prf (G ⇔ Con')`, `goedel_second_formalizado : Prf (Con' ⇒ ¬Prov⌜Con'⌝)` y `con_indecidible`.
+  · ✏️ 2026‑10‑20 (ADR‑173, T75e): `Meta/RigidezEstandar.lean`, W1 y E10 en TODO modelo estándar:
+    `prf_of_prov_de`, `modelo_prov_iff_de`, `godelCN_verdadera_de` y `con_verdadera_de`.
 
   🗑️ 2026‑10‑02 (ADR‑115): la capa `⊢` quedó retirada, y con ella lo que este barril anunciaba
   sobre ella — `Provable`, `godelCN_fixedpoint`, `goedel_first_numeral`, `d3` (D3 sobre `⊢`),
@@ -173,6 +175,7 @@ import ROBINSON_PlusPlus.Meta.RosserNegNum
 import ROBINSON_PlusPlus.Meta.Rosser
 import ROBINSON_PlusPlus.Meta.Lob
 import ROBINSON_PlusPlus.Meta.GodelCorolarios
+import ROBINSON_PlusPlus.Meta.RigidezEstandar
 import ROBINSON_PlusPlus.Meta.PurezaTitulares
 -- (✏️ 2026‑10‑19, ADR‑170, T74: `FOL.Deduction`, `FOL.Theorems.Derived`, `Impl` y `Neg`, sin nada en el cono, fuera.)
 import FOL.FOL

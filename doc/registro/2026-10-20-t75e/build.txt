@@ -1,0 +1,17 @@
+# T75e (ADR-173): Meta/RigidezEstandar.lean en el build (lake build, 2026-10-20): 10 s, y sus #print axioms; el build, 133 jobs.
+
+523:ℹ [130/133] Built ROBINSON_PlusPlus.Meta.RigidezEstandar (10s)
+524:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1011:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.M_hasWitF' depends on axioms: [propext, Quot.sound]
+525:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1012:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.M_substfc' depends on axioms: [propext, Quot.sound]
+526:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1013:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.M_lineWF' depends on axioms: [propext, Quot.sound]
+527:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1014:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.M_cadena' depends on axioms: [propext, Quot.sound]
+528:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1015:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de' depends on axioms: [propext, Classical.choice, Quot.sound]
+529:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1016:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de' depends on axioms: [propext, Classical.choice, Quot.sound]
+530:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1017:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de' depends on axioms: [propext, Classical.choice, Quot.sound]
+531:info: ROBINSON_PlusPlus/Meta/RigidezEstandar.lean:1018:0: 'ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de' depends on axioms: [propext, Classical.choice, Quot.sound]
+534:Build completed successfully (133 jobs).
+
+# check-footprints:
+  ✓ los 497 titulares que el árbol imprime están TODOS declarados
+
+✅ LOS 525 FOOTPRINTS CUADRAN.

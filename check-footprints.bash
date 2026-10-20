@@ -332,6 +332,14 @@ ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_imp_con|Classical.choice,Quot.s
 ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.M_hasWitF|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.M_substfc|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.M_lineWF|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.M_cadena|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-
