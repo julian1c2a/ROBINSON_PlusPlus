@@ -625,7 +625,13 @@ for d in $(printf '%s\n' $E_UNIVERSO | sort -u); do
   # ROJO en la CI del commit (medido: ADR-120, `doc/REFERENCE-Godelization.md`). Si el documento tiene cambios sin
   # commitear, la fecha que cuenta es la de HOY: la que va a tener el commit.
   if [ -n "$(git status --porcelain -- "$d" 2>/dev/null)" ]; then GIT_DATE=$(date +%F); fi
-  LU=$(grep -m1 -iE "^\*\*Last updated" "$d" 2>/dev/null \
+  # ✏️ 2026-10-20 (T04c, ADR-177): el sello de CABECERA, que es el primero del documento aunque vaya a mitad de línea, y
+  # la fecha que le sigue (no la primera fecha de la línea). Antes se leía el primer `**Last updated` a PRINCIPIO de
+  # línea, y en doc/REFERENCE-Arithmetic.md, -Full.md y -Kernel.md, cuya cabecera lo lleva a mitad de línea, eso era
+  # el sello de una SECCIÓN (de junio): una deuda que no se podía saldar subiendo la cabecera. Medido: sólo esos tres
+  # documentos cambian de fecha. Uno citado entre comillas invertidas («`**Last updated:**`») no es un sello.
+  LU=$(grep -m1 -iE '(^|[^`])\*\*Last updated' "$d" 2>/dev/null \
+       | grep -oiE '(^|[^`])\*\*Last updated[^0-9]{0,12}20[0-9]{2}[-‑][0-9]{2}[-‑][0-9]{2}' | head -1 \
        | grep -ohE "20[0-9]{2}[-‑][0-9]{2}[-‑][0-9]{2}" | sed "s/‑/-/g" | head -1)
   EN_TABLA=0
   while IFS= read -r t; do
@@ -925,13 +931,23 @@ echo
 echo "════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════"
 C_FAIL=0
 # ✏️ 2026-10-18 (T15, ADR-163): el dominio es el cierre de imports (los módulos de las capas), no cuatro `ls`.
+# ✏️ 2026-10-20 (T04c, ADR-177): por PALABRA y DENTRO de §1, el catálogo. Antes `grep -q "$m" REFERENCE.md` casaba por
+# subcadena y en todo el documento: `Rosser` quedaba absuelto por `RosserW1`, y `Godel` por cualquier frase que lo
+# nombrara. Medido: los 118 están hoy en §1 como palabra. Sin §1, rojo: un dominio vacío no absuelve a nadie.
+C_CATALOGO=$(sed -n '/^## 1 · Catálogo de módulos/,/^## 2 /p' REFERENCE.md 2>/dev/null)
+if [ -z "$C_CATALOGO" ]; then
+  echo "  ❌ REFERENCE.md no tiene la sección «## 1 · Catálogo de módulos»: [C] no puede comprobar nada."
+  C_FAIL=1
+fi
 for f in $(printf '%s\n' "$CIERRE" | grep '^ROBINSON_PlusPlus/[^/]*/'); do
   [ -e "$f" ] || continue
   m=$(basename "$f" .lean)
-  if ! grep -q "$m" REFERENCE.md 2>/dev/null; then
-    echo "  ✗ $m NO aparece en el catálogo REFERENCE.md §1"
-    C_FAIL=1
-  fi
+  case "$C_CATALOGO" in
+    # (sin tubería a `grep -q`: con `pipefail`, el productor muere de SIGPIPE y daría un «no» falso, como en [A2], ADR‑169)
+    *"$m"*) grep -qE "(^|[^A-Za-z0-9_])$m([^A-Za-z0-9_]|\$)" <<< "$C_CATALOGO" && continue ;;
+  esac
+  echo "  ✗ $m NO aparece en el catálogo REFERENCE.md §1"
+  C_FAIL=1
 done
 # ⛔⛔ AÑADIDO el 2026-09-17. Hasta hoy este control SOLO miraba los modulos de
 # ROBINSON_PlusPlus contra SU REFERENCE.md: los de FOL no los miraba NADIE, y por eso

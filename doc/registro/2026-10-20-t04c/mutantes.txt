@@ -1,0 +1,72 @@
+# ec_mutantes_t04c.bash, 2026-10-20T19:51Z, HEAD 9460030 (más el árbol de trabajo)
+
+== control: CONTROL: el árbol tal cual (los dos, verdes)
+-- check-doc-sync.bash (salida 0)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+-- check-doc-sync.viejo.bash (salida 0)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+== E-cabecera-al-dia: la CABECERA de doc/REFERENCE-Kernel.md (a mitad de línea), al día: el de hoy dice «deuda saldada»; el viejo leía la de una sección y no lo veía
+-- check-doc-sync.bash (salida 1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  ❌ doc/REFERENCE-Kernel.md: la deuda ESTÁ SALDADA — quítalo de la tabla E_DEUDA de este script.
+  deuda declarada: 33   ·   sin declarar: 0   ·   saldadas sin quitar: 1
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+-- check-doc-sync.viejo.bash (salida 0)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+== E-seccion-al-dia: sólo el sello de una SECCIÓN, al día: el de hoy sigue leyendo la cabecera (deuda declarada, verde); el viejo daba «deuda saldada»
+-- check-doc-sync.bash (salida 0)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+-- check-doc-sync.viejo.bash (salida 1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  ❌ doc/REFERENCE-Kernel.md: la deuda ESTÁ SALDADA — quítalo de la tabla E_DEUDA de este script.
+  deuda declarada: 33   ·   sin declarar: 0   ·   saldadas sin quitar: 1
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+== C-subcadena: «Diagonal» sale de §1 y sólo queda como subcadena de «DiagonalNumeral»: el viejo lo absolvía
+-- check-doc-sync.bash (salida 1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✗ Diagonal NO aparece en el catálogo REFERENCE.md §1
+-- check-doc-sync.viejo.bash (salida 1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+
+== C-fuera-de-catalogo: «SegundoModelo» sale de §1 y sólo se cita al final del documento: el viejo lo absolvía
+-- check-doc-sync.bash (salida 1)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✗ SegundoModelo NO aparece en el catálogo REFERENCE.md §1
+-- check-doc-sync.viejo.bash (salida 0)
+════ [E] FRESCURA DEL TITULAR — ROJO (objetivo: lo decide git) ════
+  deuda declarada: 34   ·   sin declarar: 0   ·   saldadas sin quitar: 0
+  ✓ ninguna marca de tiempo miente fuera de la deuda declarada
+════ [C] PROYECCIÓN (AI-GUIDE §1/§14) ════
+  ✓ todo módulo aparece en su catálogo
+

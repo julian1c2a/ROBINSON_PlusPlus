@@ -1,0 +1,13 @@
+T04c (ADR-177): los mutantes de [E] y [C], con el check-doc-sync.bash de hoy y con el de HEAD (9460030), lado a lado.
+`bash scripts/pruebas/e/ec_mutantes_t04c.bash doc/registro/2026-10-20-t04c/mutantes.txt` desde la raíz de RPP
+(desde PowerShell); cada mutante cambia UNA cosa, corre los dos y lo deshace. 2026-10-20, ~25 min.
+
+control              — el árbol tal cual: los dos, verdes.
+E-cabecera-al-dia    — la cabecera de doc/REFERENCE-Kernel.md (sello a mitad de línea) con la fecha de hoy: el de hoy
+                       dice «deuda saldada» (rojo, hay que quitarlo de E_DEUDA); el viejo leía el sello de una sección
+                       (de junio) y no lo veía. Era la deuda que no se podía saldar.
+E-seccion-al-dia     — sólo el sello de una SECCIÓN, al día: el de hoy sigue leyendo la cabecera (deuda declarada,
+                       verde); el viejo daba «deuda saldada».
+C-subcadena          — «Diagonal» sale de §1 y queda sólo como subcadena de «DiagonalNumeral»: el de hoy, rojo; el
+                       viejo lo absolvía (✓).
+C-fuera-de-catalogo  — «SegundoModelo» sale de §1 y sólo se cita al final del documento: el de hoy, rojo; el viejo, ✓.
