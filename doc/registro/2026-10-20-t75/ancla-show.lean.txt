@@ -1,0 +1,24 @@
+-- ADR‑175 (T75d): el ancla en `MNB V₀` con un `show` que escribe la evaluación entera: el NÚCLEO recursa hasta
+-- agotarse, y la declaración queda como AXIOMA en el `#print axioms` de lo que la usa. `vB_ancla` (en el build) va
+-- por `rw` con lemas ∀, como `v_ancla`.
+import ROBINSON_PlusPlus.Meta.SegundoModelo
+open FOL FOL.Metamath.Semantics
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.ModeloCodigo ROBINSON_PlusPlus.Meta.ModeloEstandar
+open ROBINSON_PlusPlus.Meta.ModeloCodificacion ROBINSON_PlusPlus.Meta.RosserNumEval
+open ROBINSON_PlusPlus.Meta.SegundoModelo
+
+theorem ancla_show : ∀ v : Nat → Nat, evalFormula (MNB V₀) v ax_axiomsCodeT_def := by
+  intro v
+  rw [ax_axiomsCodeT_def, axD]
+  show evalTerm (MNB V₀) v axiomsCodeT =
+    evalTerm (MNB V₀) v (concat (listFormCodeM axiomsBase) (cons (deltaD axiomsBase) nil))
+  show (MNB V₀).func sym!"axiomsCodeT" [] = (MNB V₀).func sym!"##" [evalTerm (MNB V₀) v (listFormCodeM axiomsBase),
+    (MNB V₀).func sym!"::" [(MNB V₀).func sym!"substfc" [(MNB V₀).func sym!"0" [],
+      (MNB V₀).func sym!"tcFn" [evalTerm (MNB V₀) v (nD axiomsBase)], evalTerm (MNB V₀) v (nD axiomsBase)],
+      (MNB V₀).func sym!"0" []]]
+  rw [MB_axiomsCodeT, MB_concat, MB_cons, MB_zero, MB_substfc, MB_tcFn, evB_listFormCodeM, nD, evB_numeralM,
+    substfcB_codF (codF_codeNat _)]
+  exact V₀_def
+
+theorem usa_ancla_show (v : Nat → Nat) : evalFormula (MNB V₀) v ax_axiomsCodeT_def := ancla_show v
+#print axioms usa_ancla_show

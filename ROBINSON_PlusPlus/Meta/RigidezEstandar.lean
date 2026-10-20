@@ -31,10 +31,15 @@ que en `MNV`.
 * **§11 · 🏁** `prf_of_prov_de`, `modelo_prov_iff_de`, `godelCN_verdadera_de` y `con_verdadera_de`: lo que `M` cree
   demostrable lo es; `Prov` es fiel en `M`; `G` y `Con` son VERDADERAS en `M`. Las de `SolidezVerificador` son la
   instancia en `MNV V₀` (`estandar_MN`), que también es el control de que la hipótesis no es vacía.
+* **§12 · ⛔ El control del ANCLA** (`control_ancla`, T75b, ADR‑175): sin el ancla, `Prov` puede mentir. `MNV V⊥`, con
+  `V⊥` la lista del código de `⊥` sola, satisface los 141 de la base y cree demostrable `⊥` (una cadena de una línea
+  `thy`), así que `Con` es FALSA en él; y el ancla falla, sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar
+  y `con_verdadera_de` haría verdadera `Con`.
 
 ⚠️ Lo que NO dice: que `M` sea `MNV V₀`. Sobre la basura (un código sin forma, `nthc` fuera de rango, `carc` de `0`)
 `M` puede ser otro: lo que se demuestra es que no importa, porque ni las guardas ni las cadenas que `M` cree pruebas la
-miran.
+miran. Que de verdad puede ser otro lo enseña `Meta/SegundoModelo.lean` (T75d, ADR‑175): un modelo estándar que
+difiere de `MNV V₀` en `substfc` sobre la basura.
 -/
 
 set_option autoImplicit false
@@ -1006,6 +1011,78 @@ theorem control_instancia (φ : Formula) (v : Nat → Nat) :
       (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) → Prf φ :=
   prf_of_prov_de ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN φ v
 
+/-! ## §12 · ⛔ El control del ANCLA: sin él, `Prov` puede mentir (T75b, ADR‑175)
+
+`Estandar M` pide los 142, ancla incluida. Sin el ancla no basta: `MNV V` satisface los 141 de la base para TODO `V`
+(`MN_coreAxioms`, `MN_codingAxioms`), y en `MNV V` la regla `thy` acepta lo que haya en `V`. Con `V⊥` —la lista del
+código de `⊥` sola— la cadena de UNA línea `⟨⌜⊥⌝, 15⟩` es una prueba de `⊥`, y `Con` es FALSA. El ancla falla en
+`MNV V⊥`, y no hace falta evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` haría
+verdadera `Con`. -/
+
+section ControlAncla
+open ROBINSON_PlusPlus.Meta.ModeloEstandar
+
+/-- En `MNV V`, `Prov(⌜φ⌝)` es la existencia de una cadena que `chainOkN V` acepta y que concluye `φ`. -/
+theorem MN_provCodeC'_iff {V : Nat} (φ : Formula) (v : Nat → Nat) :
+    evalFormula (MNV V) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔
+      ∃ p, And (chainOkN V 0 p) (memN (codeNat φ) (runFnN 0 p)) := by
+  rw [ROBINSON_PlusPlus.Meta.ProofChain.provCodeC', eval_substFormula_zero,
+    ← ROBINSON_PlusPlus.Meta.Representability.formCodeM_eq, ev_formCodeM]
+  simp only [ROBINSON_PlusPlus.Meta.ProofChain.provFormulaC', land, chainOk, In, runFn, nil, zero,
+    in_sym, zero_sym, evalFormula, evalTerm, evalTerms, shiftEnv, MN_chainOk, MN_mem, MN_runFn, MN_zero]
+
+/-- La línea `thy` que concluye `a`: `⟨a, 15⟩`. -/
+def lineaThy (a : Nat) : Nat := consN a (consN 15 0)
+
+theorem chain_thy {V a : Nat} (h : memN a V) : chainOkN V 0 (consN (lineaThy a) 0) := by
+  rw [chainOkN_consN]
+  have h1 : nthN (lineaThy a) 1 = 15 := by rw [lineaThy, nthN_cs, nthN_cz]
+  refine ⟨⟨(lineWFN_of_tag h1 (by decide)).2 ⟨?_, ?_⟩, ?_⟩, chainOkN_zero _ _⟩
+  · rw [lineaThy, lenN_consN, lenN_consN, lenN_zero]
+  · rw [lineaThy, carN_consN]; exact h
+  · rw [premsOfN, if_neg (by rw [h1]; decide), if_neg (by rw [h1]; decide)]
+    exact allInN_zero 0
+
+theorem run_thy (a : Nat) : memN a (runFnN 0 (consN (lineaThy a) 0)) := by
+  rw [runFnN_consN, runFnN_zero, concatN_zero, lineaThy, carN_consN, memN_consN]
+  exact Or.inl rfl
+
+/-- `MNV V` cree demostrable todo lo que está en `V`, para TODO `V`: una cadena de una línea `thy`. -/
+theorem prov_de_mem {V : Nat} (φ : Formula) (h : memN (codeNat φ) V) (v : Nat → Nat) :
+    evalFormula (MNV V) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) :=
+  (MN_provCodeC'_iff φ v).2 ⟨_, chain_thy h, run_thy _⟩
+
+/-- `V⊥`: la lista de UN código, el de `⊥`. -/
+def Vbot : Nat := consN (codeNat Formula.bottom) 0
+
+theorem MNbot_base (v : Nat → Nat) : contextSatisfies (MNV Vbot) v axiomsBase := by
+  intro φ hφ
+  cases List.mem_append.mp hφ with
+  | inl h => exact MN_coreAxioms v φ h
+  | inr h => exact ROBINSON_PlusPlus.Meta.ModeloCodificacion.MN_codingAxioms v φ h
+
+theorem MNbot_no_con (v : Nat → Nat) :
+    ¬ evalFormula (MNV Vbot) v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula' :=
+  fun hc => hc (prov_de_mem Formula.bottom ((memN_consN _ _ _).2 (Or.inl rfl)) v)
+
+/-- ⛔ **El control del ancla**: `MNV V⊥` satisface los 141 de la base, `Con` es FALSA en él (cree demostrable `⊥`),
+    y el ancla FALLA —sin evaluar su numeral: si valiera, `MNV V⊥` sería estándar y `con_verdadera_de` lo
+    impediría—. Es el ancla la que fija el sentido de `Prov`; hermano de `control_tc_cons`. -/
+theorem control_ancla : And (∀ v, contextSatisfies (MNV Vbot) v axiomsBase)
+    (And (∀ v, ¬ evalFormula (MNV Vbot) v ROBINSON_PlusPlus.Meta.GodelTwo.consistencyFormula')
+      (¬ ∀ v, evalFormula (MNV Vbot) v ax_axiomsCodeT_def)) := by
+  refine ⟨MNbot_base, MNbot_no_con, fun ha => ?_⟩
+  have hM : Estandar (MNV Vbot) :=
+    { hzero := MN_zero, hsucc := MN_succ, hcons := MN_cons,
+      haxs := fun v φ hφ => by
+        rw [axioms_split] at hφ
+        cases List.mem_append.mp hφ with
+        | inl h => exact MNbot_base v φ h
+        | inr h => rw [List.mem_singleton.mp h]; exact ha v }
+  exact MNbot_no_con (fun _ => 0) (con_verdadera_de hM _)
+
+end ControlAncla
+
 end ROBINSON_PlusPlus.Meta.RigidezEstandar
 
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.M_hasWitF
@@ -1016,3 +1093,4 @@ end ROBINSON_PlusPlus.Meta.RigidezEstandar
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
 #print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+#print axioms ROBINSON_PlusPlus.Meta.RigidezEstandar.control_ancla

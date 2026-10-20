@@ -1,0 +1,8 @@
+-- ADR‑175 (T75d): el `decide` del ELABORADOR sobre `libreF ax_tc_succ` agota su recursión (el numeral 963 de `σ`);
+-- `decide +kernel`, no. Se ejecuta con `lake env lean` desde la raíz de RPP, con el build hecho.
+import ROBINSON_PlusPlus.Meta.SegundoModelo
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.SegundoModelo
+
+theorem con_elaborador : libreF ax_tc_succ = true := by decide
+theorem con_nucleo : libreF ax_tc_succ = true := by decide +kernel
+#print axioms con_nucleo

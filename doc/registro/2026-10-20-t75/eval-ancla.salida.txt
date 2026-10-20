@@ -1,0 +1,12 @@
+libc++abi: terminating due to uncaught exception of type lean::throwable: deep recursion was detected at 'interpreter' (potential solution: increase elaboration stack size using the `lean --tstack` flag). This flag can be set in the `weakLeanArgs` field of the Lake configuration. Further details are available in the Lean reference manual at https://lean-lang.org/doc/reference/4.31.0/find/?domain=Verso.Genre.Manual.section&name=lake-config-toml
+interpreter stacktrace:
+#1 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#2 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#3 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#4 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#5 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#6 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#7 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#8 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#9 ROBINSON_PlusPlus.Minimal.Axioms.triN
+#10 ROBINSON_PlusPlus.Minimal.Axioms.triN

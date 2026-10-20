@@ -38,7 +38,7 @@ los literales de símbolo, hoy `sym!"…"`.
 
 > ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
 >
-> **Build 133 jobs · 117 módulos activos** (Minimal 2 + Meta 113 + Full 2) **+ 0 en `cuarentena/`
+> **Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 114 + Full 2) **+ 0 en `cuarentena/`
 > + 44 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
 > *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO contaba como registro y `[A]` la eximía. ✏️ Desde ADR‑169 la fecha ya no exime: las líneas de abajo llevan «Entonces:».)*
 > *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
@@ -58,6 +58,7 @@ los literales de símbolo, hoy `sym!"…"`.
 > *(Entonces: el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
 > *(Entonces: el 2026-10-19, con ADR-170: 132 jobs y 116 módulos, porque `FOL.Deduction`, sin nada en el cono, salió del build, T74.)*
 > *(Entonces: el 2026-10-20, con ADR-173: 133 jobs y 117 módulos, por `Meta/RigidezEstandar.lean`, T75e.)*
+> *(Entonces: el 2026-10-20, con ADR-175: 134 jobs y 118 módulos, por `Meta/SegundoModelo.lean`, T75d.)*
 >
 > ### Dos cambios estructurales que este nodo documenta a partir de §3.24
 >

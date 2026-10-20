@@ -24,13 +24,15 @@ import FOL.Lift0
   verdad en la teoría, y falla en su propio mentiroso, que es una sentencia (`liar_isSentence`) del lenguaje de
   `Tr` y de la aritmética. ⚠️ No se enuncia la forma «para toda `φ`»: una fórmula abierta o un símbolo ajeno la
   refutan sin mentiroso (§4).
-* `tarski_semantico (Tr) (v)` — **Tarski en ℕ**: tampoco en el modelo estándar `MNV V₀`.
+* `tarski_semantico_de (hM) (Tr) (v)` — **Tarski semántico**: tampoco en un modelo estándar CUALQUIERA (`Estandar M`,
+  T75a, ADR‑175); `tarski_semantico (Tr) (v)` es su instancia en `MNV V₀`, **Tarski en ℕ**.
 
 Las pruebas que tocan el numeral `numeral (codeNat …)` van por `Eq.mpr` con motivo explícito y lemas universales:
 ninguna le pide a una táctica ni al núcleo evaluar el numeral (ADR‑117 §3).
 
 `prf_diagonal` y `prf_tarski` no usan el predicado de demostrabilidad, ni D1–D3, ni el ancla; `tarski` y
-`tarski_semantico` sí usan el modelo (por `consistencia` y la solidez), y con él el ancla.
+`tarski_semantico` sí usan el modelo (por `consistencia` y la solidez), y con él el ancla; `tarski_semantico_de`, la
+solidez de un `M` estándar cualquiera.
 -/
 
 set_option autoImplicit false
@@ -125,30 +127,38 @@ example (hbot : Prf Formula.bottom) (Tr : Formula) :
     Prf (substFormula 0 (numeral (codeNat (liar Tr))) Tr ⇔ liar Tr) :=
   prf_mp (Prf.incl (Prfᵢ.efq _)) hbot
 
-/-! ## §7 · TARSKI SEMÁNTICO: tampoco en el modelo estándar `MNV V₀`
+/-! ## §7 · TARSKI SEMÁNTICO: en TODO modelo estándar, y en `MNV V₀`
 
 Por la solidez (`prf_sound`) aplicada al mentiroso: si `Tr(⌜L⌝)` y `L` valieran a la vez en el modelo, como el modelo
-satisface `L ⇔ ¬Tr(⌜L⌝)`, `Tr(⌜L⌝)` valdría y no valdría. -/
+satisface `L ⇔ ¬Tr(⌜L⌝)`, `Tr(⌜L⌝)` valdría y no valdría. La prueba sólo pide la solidez, así que vale en todo `M`
+con `Estandar M` (T75a, ADR‑175); `tarski_semantico` es la instancia en `MNV V₀` (`estandar_MN`), que es también el
+control de que la hipótesis no es vacía. -/
 open FOL.Metamath.Semantics in
-/-- 🏁 Ninguna `Tr` define la verdad en `MNV V₀`: falla en su mentiroso, para toda asignación. -/
+/-- 🏁 Ninguna `Tr` define la verdad en un modelo estándar CUALQUIERA: falla en su mentiroso, para toda asignación. -/
+theorem tarski_semantico_de {M : Model Nat} (hM : ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar M) (Tr : Formula)
+    (v : Nat → Nat) :
+    ¬ (evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔ evalFormula M v (liar Tr)) := by
+  intro h1
+  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound hM (prf_liar Tr) v
+  -- `hs : (L → ¬T) ∧ (¬T → L)`, con `T := Tr(⌜L⌝)`; `h1 : T ↔ L`
+  have hLnT := hs.1
+  have hnTL := hs.2
+  have hnT : ¬ evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := fun hT => hLnT (h1.mp hT) hT
+  exact hnT (h1.mpr (hnTL hnT))
+
+open FOL.Metamath.Semantics in
+/-- 🏁 Ninguna `Tr` define la verdad en `MNV V₀`: la instancia de `tarski_semantico_de` en `estandar_MN`. -/
 theorem tarski_semantico (Tr : Formula) (v : Nat → Nat) :
     ¬ (evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
           (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔
         evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
-          (liar Tr)) := by
-  intro h1
-  have hs := ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN
-    (prf_liar Tr) v
-  -- `hs : (L → ¬T) ∧ (¬T → L)`, con `T := Tr(⌜L⌝)`; `h1 : T ↔ L`
-  have hLnT := hs.1
-  have hnTL := hs.2
-  have hnT : ¬ evalFormula (ROBINSON_PlusPlus.Meta.ModeloEstandar.MNV ROBINSON_PlusPlus.Meta.ModeloCodigo.V₀) v
-      (substFormula 0 (numeral (codeNat (liar Tr))) Tr) := fun hT => hLnT (h1.mp hT) hT
-  exact hnT (h1.mpr (hnTL hnT))
+          (liar Tr)) :=
+  tarski_semantico_de ROBINSON_PlusPlus.Meta.Consistencia.estandar_MN Tr v
 
 end ROBINSON_PlusPlus.Meta.TarskiPrf
 
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.prf_diagonal
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
+#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico

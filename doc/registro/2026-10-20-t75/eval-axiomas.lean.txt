@@ -1,0 +1,8 @@
+-- ADR‑175 (T75d): EVALUAR `libreF` sobre los 107 de codificación SÍ termina (5 s): `&&` corta en el primer
+-- `substfc`/`validProofFn`, antes de los numerales de `TC0`…`TCONS`. (En el sondeo, el desbordamiento en `triN` era
+-- del ANCLA: `eval-ancla.lean.txt`.) Los 106 libres se comprueban uno a uno con `decide +kernel`, en el build.
+-- ⚠️ `check-sorry` prohíbe `#eval` sobre `axioms` en el build y en `sondeos/`; esto evalúa `codingAxioms`, en el registro.
+import ROBINSON_PlusPlus.Meta.SegundoModelo
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.SegundoModelo
+
+#eval codingAxioms.map libreF

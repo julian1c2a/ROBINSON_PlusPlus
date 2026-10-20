@@ -9,12 +9,12 @@ import ROBINSON_PlusPlus.Meta.Representability
 /-!
 # `Meta/SolidezVerificador.lean` — 🏁🏁 W1, y Gödel I ENTERO: `⊬ G` y `⊬ ¬G`, sin hipótesis (ADR‑121)
 
-**W1** (`verificador_solido`): si el modelo estándar `MNV V₀` cree que una cadena `p` es una prueba —`chainOkN V₀ 0
-p`—, todo lo que esa cadena concluye, DECODIFICADO, es teorema de `Prf`. Con él, **`goedel_I_neg : ¬ Prf ¬G`**: con
-`Prf ¬G`, la solidez y el punto fijo harían creer al modelo que `G` es demostrable, W1 daría `Prf G`, y `goedel_I`
-lo impide. Es la mitad de Gödel I que faltaba desde ADR‑115, y `godelCN_indecidible` junta las dos. Sale de la
-solidez de `Prf` en el modelo estándar (aplicada también a fórmulas que no son Σ₁) y de `goedel_I`: no de la
-ω‑consistencia ni de Rosser.
+**W1** (`verificador_solido`): si `MNV V₀`, el modelo estándar construido, cree que una cadena `p` es una prueba
+—`chainOkN V₀ 0 p`—, todo lo que esa cadena concluye, DECODIFICADO, es teorema de `Prf`. Con él,
+**`goedel_I_neg : ¬ Prf ¬G`**: con `Prf ¬G`, la solidez y el punto fijo harían creer al modelo que `G` es demostrable,
+W1 daría `Prf G`, y `goedel_I` lo impide. Es la mitad de Gödel I que faltaba desde ADR‑115, y `godelCN_indecidible`
+junta las dos. Sale de la solidez de `Prf` en `MNV V₀` (aplicada también a fórmulas que no son Σ₁) y de `goedel_I`:
+no de la ω‑consistencia ni de Rosser.
 
 * **§1 · El decodificador TOTAL** (`decS`, `decT`/`decTs`, `dec`): todo número se DECODIFICA a un término y a una
   fórmula —las ramas por defecto (`dflt`, `⊥`) lo hacen total—, y `dec` espeja EXACTAMENTE el análisis de casos de `substtcN`/`substfcN` —la etiqueta `nthN c 0`
@@ -32,8 +32,10 @@ solidez de `Prf` en el modelo estándar (aplicada también a fórmulas que no so
   que es también el control de vacuidad de W1.
 * **§6 · E10**: `godelCN_verdadera` y `con_verdadera` — `G` y `Con` son VERDADERAS en `MNV V₀` (y no demostrables).
 
-⚠️ Lo que NO dice: nada de Rosser (`⊬R ∧ ⊬¬R` sólo con `ConsistentH`, ⬜): aquí la hipótesis es más fuerte —el
-modelo estándar, que es un TEOREMA (ADR‑120)—, y la sentencia es la de Gödel.
+⚠️ Lo que NO dice: nada de Rosser (ese es `Meta/Rosser.lean`, ADR‑157): aquí lo que se usa es más fuerte —el
+modelo `MNV V₀`, que es un TEOREMA (ADR‑120)—, y la sentencia es la de Gödel.
+(✏️ 2026‑10‑20, ADR‑175: decía «`⊬R ∧ ⊬¬R` sólo con `ConsistentH`, ⬜» —Rosser está hecho desde ADR‑157— y «el modelo
+estándar», que ya no es uno solo: `Meta/SegundoModelo.lean`.)
 -/
 
 set_option autoImplicit false
@@ -557,8 +559,8 @@ theorem prf_of_prov (φ : Formula) (v : Nat → Nat) :
   rw [dec_codeNat] at h
   exact h
 
-/-- 🏁 **`Prov` es FIEL en el modelo estándar**: `MNV V₀ ⊨ Prov(⌜φ⌝)` exactamente cuando `φ` es teorema. La ida es
-    W1; la vuelta, D1 (`repr_pos'_prf`) y la solidez. Es también el control de vacuidad de W1: su hipótesis se
+/-- 🏁 **`Prov` es FIEL en `MNV V₀`**, el modelo estándar construido: `MNV V₀ ⊨ Prov(⌜φ⌝)` exactamente cuando `φ` es
+    teorema (en TODO modelo estándar: `modelo_prov_iff_de`, `Meta/RigidezEstandar.lean`, ADR‑173). La ida es W1; la vuelta, D1 (`repr_pos'_prf`) y la solidez. Es también el control de vacuidad de W1: su hipótesis se
     cumple para cada teorema. -/
 theorem modelo_prov_iff (φ : Formula) (v : Nat → Nat) :
     evalFormula (MNV V₀) v (ROBINSON_PlusPlus.Meta.ProofChain.provCodeC' φ) ↔ Prf φ :=
@@ -585,7 +587,8 @@ theorem godelCN_indecidible : And (¬ Prf ROBINSON_PlusPlus.Meta.DiagonalNumeral
     (¬ Prf (neg ROBINSON_PlusPlus.Meta.DiagonalNumeral.godelCN)) :=
   ⟨ROBINSON_PlusPlus.Meta.Consistencia.goedel_I, goedel_I_neg⟩
 
-/-! ## §6 · E10: `G` y `Con` son VERDADERAS en el modelo estándar
+/-! ## §6 · E10: `G` y `Con` son VERDADERAS en `MNV V₀`, el modelo estándar construido (y en todo modelo estándar:
+`Meta/RigidezEstandar.lean`, ADR‑173; los modelos estándar no son uno solo, `Meta/SegundoModelo.lean`, ADR‑175)
 
 Lo que dicen —«no soy demostrable», «`⊥` no es demostrable»— es cierto en `MNV V₀`: si el modelo creyera lo
 contrario, `prf_of_prov` daría `Prf G` o `Prf ⊥`, y `goedel_I`/`consistencia` lo impiden. -/

@@ -1,0 +1,7 @@
+-- ADR‑175 (T75d): EVALUAR `libreF` sobre el ANCLA: antes de llegar a `substfc` (en `deltaD`) recorre
+-- `listFormCodeM axiomsBase`, el código de los 141 como término, con los numerales de `TC0`…`TCONS` dentro (ADR‑117).
+-- ⚠️ `check-sorry` prohíbe esto en el build y en `sondeos/`; vive en el registro, y se ejecuta a mano.
+import ROBINSON_PlusPlus.Meta.SegundoModelo
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.SegundoModelo
+
+#eval libreF ax_axiomsCodeT_def

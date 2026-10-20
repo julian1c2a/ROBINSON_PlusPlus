@@ -1,0 +1,4 @@
+doc\registro\2026-10-20-t75\decide-elaborador.lean.txt:6:56: error: maximum recursion depth has been reached
+use `set_option maxRecDepth <num>` to increase limit
+use `set_option diagnostics true` to get diagnostic information
+'con_nucleo' does not depend on any axioms

@@ -340,6 +340,14 @@ ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de|Classical.choice,Quot.soun
 ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.RigidezEstandar.control_ancla|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SegundoModelo.substfcB_codF|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SegundoModelo.agreeF|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SegundoModelo.vB_ancla|Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SegundoModelo.estandar_MB|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SegundoModelo.segundo_modelo|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SegundoModelo.modelo_prov_iff_MB|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Provability.charsCode|-
 ROBINSON_PlusPlus.Meta.Provability.strCode|-
 ROBINSON_PlusPlus.Minimal.Axioms.strCodeM|-

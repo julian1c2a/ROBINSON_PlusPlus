@@ -1,0 +1,2 @@
+doc\registro\2026-10-20-t75\ancla-show.lean.txt:10:8: error: (kernel) deep recursion detected
+'usa_ancla_show' depends on axioms: [ancla_show, propext, Quot.sound]

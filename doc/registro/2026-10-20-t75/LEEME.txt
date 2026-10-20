@@ -1,0 +1,18 @@
+ADR-175 (T75d, Meta/SegundoModelo.lean): las mediciones, reproducibles. Cada `X.lean.txt` se ejecuta con
+`lake env lean doc/registro/2026-10-20-t75/X.lean.txt` desde la raíz de RPP, con el build hecho (desde PowerShell);
+su salida, en `X.salida.txt`, y los segundos, en `tiempos.txt` (medidos el 2026-10-20, Lean v4.31.0).
+
+1. decide-elaborador: `libreF ax_tc_succ = true` por el `decide` del ELABORADOR agota su recursión («maximum recursion
+   depth has been reached»: el numeral 963 del carácter σ); por `decide +kernel` cierra y `#print axioms` no da
+   ninguno. Por eso los 106 libres van por `decide +kernel` en el build.
+2. eval-core y eval-axiomas: el `libreF` de los 34 de la teoría (todos `true`) y de los 107 de codificación (`false`
+   en los 35 que nombran `substfc` o `validProofFn`) se EVALÚA en 5 s: `&&` corta antes de los numerales grandes.
+3. eval-ancla: el `libreF` del ANCLA desborda la pila del intérprete en `triN` (16 s): recorre `listFormCodeM
+   axiomsBase`, con los numerales de `TC0`…`TCONS` dentro, antes de llegar a `substfc` (ADR-117). En el sondeo, 2 y 3
+   iban en un fichero y el desbordamiento se atribuyó a los 107: medidos por separado, era el ancla.
+4. ancla-show: el ancla en `MNB V₀` con un `show` que escribe la evaluación entera: «(kernel) deep recursion detected»
+   a los 136 s, y la declaración queda como AXIOMA en el `#print axioms` de lo que la usa (`usa_ancla_show` depende de
+   `ancla_show`). `vB_ancla`, en el build, va por `rw` con lemas ∀, como `v_ancla`.
+
+⚠️ 2 y 3 evalúan listas de axiomas: `check-sorry` lo prohíbe en el build y en `sondeos/` (ADR-117); aquí, en el
+registro, se ejecutan a mano.

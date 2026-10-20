@@ -1,0 +1,5 @@
+decide-elaborador 4.3949399
+eval-axiomas 5.0481719
+ancla-show 136.3730948
+eval-core 4.6776575
+eval-ancla 16.6505264

@@ -1,0 +1,5 @@
+-- ADR‑175 (T75d): EVALUAR `libreF` sobre los 34 de la teoría (los `coreAxioms`).
+import ROBINSON_PlusPlus.Meta.SegundoModelo
+open ROBINSON_PlusPlus.Minimal.Axioms ROBINSON_PlusPlus.Meta.SegundoModelo
+
+#eval coreAxioms.map libreF
