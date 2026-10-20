@@ -33,7 +33,7 @@ un mutante (ADR‑143).
 definiciones: eso es T07, abajo.
 
 **T07 · el contrato de los enunciados** (✏️ 2026‑10‑18, ADR‑165): `#contrato_titulares` calcula el cierre de los
-tipos de los 28 titulares de `TITULARES` (`Meta/ContratoTitulares.lean`) y lo compara con la tabla de
+tipos de los 29 titulares de `TITULARES` (`Meta/ContratoTitulares.lean`) y lo compara con la tabla de
 `Meta/ContratoTabla.lean`, constante a constante y en los dos sentidos. Si un enunciado, o el valor de una definición
 de la que depende, cambia, el build no compila hasta que un ADR regenere la tabla. Comprueba también que `PUROS` e
 `IMPUROS` son titulares. Visto fallar con mutantes (ADR‑165).

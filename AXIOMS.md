@@ -123,7 +123,7 @@ construyen el teorema de deducción (`deduction_aux`, caso `gen`) y lemas de var
 | D3 · `d3_prf_real` | **sí** | **sí** | no |
 | `goedel_first_prf`, `goedel_I` | **sí** (p. ej., por D1) | no | no |
 | `goedel_second_prf`, `goedel_II`, `prf_con_imp_godel` | **sí** | **sí** (p. ej., por D2) | no |
-| `prf_tarski`, `tarski`, `tarski_semantico` | **sí** (la aritmética de numerales del lema diagonal) | no | no |
+| `prf_tarski`, `tarski`, `tarski_semantico`; `tarski_semantico_de` (ADR‑178) | **sí** (la aritmética de numerales del lema diagonal) | no | no |
 | `goedel_I_neg` | **sí** (p. ej., por el punto fijo) | sólo al decodificar las líneas que el verificador acepta en el modelo (`linea_listInd`) | ídem (`linea_p3`) |
 | `prf_sound`, `consistencia` | no (analizan `Prf`; no construyen) | no | no |
 | `lob`, `lob_iff` (ADR‑159) | **sí** (por D1) | **sí** (por D2) | no |

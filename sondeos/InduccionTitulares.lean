@@ -91,6 +91,12 @@ y `listInd`, sí; `p3`, no, como `goedel_second_prf` (la salida, en `doc/registr
 `con_verdadera_de`, clase (iii) los cuatro (87, 87, 90 y 90 constantes de la semántica; 87 sin pasar por
 `consistencia`); como los de `MNV V₀`, alcanzan `ind`, `listInd`, `p3` y `qconf` al decodificar con W1 (`linea_*`). La
 salida, en `doc/registro/2026-10-20-titulares/`.
+
+**✏️ Y con `tarski_semantico_de` (ADR‑178), 37 s:** clase (iii) (82 constantes de la semántica en el cierre, las 82 sin
+pasar por `consistencia`: la estructura `Estandar` y la evaluación, no el modelo `MNV V₀`; su cierre, 2 309 constantes,
+frente a las 2 918 de `tarski_semantico`, que sí lo trae). Construye `ind` fuera de las traducciones
+(`prf_nat_induction`, la aritmética de numerales del lema diagonal); `listInd`, `p3` y `qconf`, sólo dentro de ellas.
+La salida, en `doc/registro/2026-10-21-titulares/`.
 -/
 
 open Lean Meta Elab Command
@@ -284,6 +290,8 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
 #induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+-- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
+#induccion ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
 
 /-! ### Por dónde: un camino por VALORES del titular a cada constante de su frontera -/
 
@@ -348,3 +356,5 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
 #modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+-- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
+#modelo ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de

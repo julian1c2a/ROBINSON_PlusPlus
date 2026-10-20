@@ -1,0 +1,54 @@
+CONO DEL NÚCLEO de los 29 titulares de T_UNIVERSO, por DECLARACIÓN — 2026-10-21, sondeos/ConoTitulares.lean
+(ámbito: lo que el kernel necesita para comprobar los titulares; ver la cabecera del sondeo)
+constantes del proyecto en el cono: 4604
+
+capa | módulos importados | con algo en el cono | líneas de los ficheros | líneas fuera de toda declaración | declaraciones | de elaboración | en el cono | líneas en declaraciones | líneas en el cono
+RPP/Minimal | 2 | 1 | 1909 | 774 | 329 | 6 | 290 (88 %) | 1135 | 1030 (54 % de las del fichero)
+RPP/Full | 2 | 2 | 319 | 166 | 22 | 0 | 2 (9 %) | 153 | 11 (3 % de las del fichero)
+RPP/Meta | 115 | 109 | 52801 | 17040 | 3667 | 26 | 2951 (80 %) | 35761 | 30397 (58 % de las del fichero)
+RPP/raíz | 1 | 0 | 40 | 40 | 0 | 0 | 0 (—) | 0 | 0 (0 % de las del fichero)
+FOL | 11 | 4 | 2810 | 981 | 192 | 19 | 48 (25 %) | 1829 | 481 (17 % de las del fichero)
+
+módulos importados SIN NADA en el cono (15): [FOL.Derives0, FOL.Eigenvariable, FOL.Lift0, FOL.Tactics, FOL.Theorems.Derived, FOL.Theorems.Impl, FOL.Theorems.Neg, ROBINSON_PlusPlus, ROBINSON_PlusPlus.Meta, ROBINSON_PlusPlus.Meta.ContratoTabla, ROBINSON_PlusPlus.Meta.ContratoTitulares, ROBINSON_PlusPlus.Meta.PurezaComando, ROBINSON_PlusPlus.Meta.PurezaTitulares, ROBINSON_PlusPlus.Meta.SegundoModelo, ROBINSON_PlusPlus.Minimal.SymLit]
+
+titular | clase | declaraciones en su cono | líneas
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf | i | 701 | 5070
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf | i | 395 | 2114
+ROBINSON_PlusPlus.Meta.PremsBdAllPrf.d3_prf_real | i | 2444 | 26892
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint | i | 473 | 2572
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel | i | 2447 | 26999
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf | i | 720 | 5164
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf | i | 2467 | 27101
+ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski | i | 472 | 2600
+ROBINSON_PlusPlus.Meta.Consistencia.consistencia | — | 620 | 2426
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_I | ii | 1055 | 6580
+ROBINSON_PlusPlus.Meta.Consistencia.goedel_II | ii | 2802 | 28517
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski | ii | 810 | 4027
+ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg | iii | 1132 | 7031
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible | iii | 1133 | 7035
+ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera | iii | 1132 | 7025
+ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera | iii | 893 | 4508
+ROBINSON_PlusPlus.Meta.SolidezVerificador.modelo_prov_iff | iii | 1110 | 6916
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico | iii | 806 | 4013
+ROBINSON_PlusPlus.Meta.Rosser.rosser_ext | i | 1290 | 8706
+ROBINSON_PlusPlus.Meta.Rosser.rosser | ii | 1516 | 9739
+ROBINSON_PlusPlus.Meta.Lob.lob | i | 2466 | 27106
+ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con | i | 2466 | 27097
+ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado | i | 2467 | 27112
+ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible | iii | 2880 | 28965
+ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de | iii | 790 | 4669
+ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de | iii | 1012 | 7093
+ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de | iii | 1219 | 7867
+ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de | iii | 980 | 5351
+ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de | iii | 502 | 2938
+
+clase (i), los 12 juntos: 2973 declaraciones, 30019 líneas
+los 29: 3291 declaraciones, 31919 líneas
+lo que sólo piden (ii), (iii) y consistencia: 318 declaraciones, 1900 líneas
+
+controles:
+  (1a) la clase (i) no nombra SolidezPrf: true
+  (1b) consistencia sí la nombra: true
+  (2) nada de ROBINSON_PlusPlus.Meta.PurezaTitulares en el cono (4 declaraciones allí): true
+  (3) cada titular está en el cono, en su declaración: true
+  (4) constantes del cono sin declaración a la que asignarlas: 3 [_private.ROBINSON_PlusPlus.Meta.SolidezVerificador.0.PSum.casesOn._arg_pusher, _private.ROBINSON_PlusPlus.Meta.ModeloCodigo.0.PSum.casesOn._arg_pusher, _private.ROBINSON_PlusPlus.Meta.ModeloCodigo.0.PSigma.casesOn._arg_pusher]

@@ -14,7 +14,7 @@ clase, su huella y su nombre. La comprueba `#contrato_titulares`, en `Meta/Purez
 
 namespace ROBINSON_PlusPlus.Meta.ContratoTabla
 
-/-- 543 constantes del cierre de los tipos de 28 titulares. -/
+/-- 544 constantes del cierre de los tipos de 29 titulares. -/
 def tabla : String := "
 def 3606628684449333096 FOL.Metamath.Semantics.Model
 ind 887465114820704127 FOL.Metamath.Semantics.ModelG
@@ -246,6 +246,7 @@ def 3339635936232344110 ROBINSON_PlusPlus.Meta.TarskiPrf.liar
 thm 18827076 ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski
 thm 2694326871 ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
 thm 3981374799 ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+thm 1151539870 ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
 def 13808477228211543305 ROBINSON_PlusPlus.Minimal.Axioms.In
 def 1236067603902363037 ROBINSON_PlusPlus.Minimal.Axioms.add
 def 10190787669968083375 ROBINSON_PlusPlus.Minimal.Axioms.add_sym

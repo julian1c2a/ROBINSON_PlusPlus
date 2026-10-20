@@ -72,6 +72,11 @@ importan 11 ficheros (sale `FOL.Deduction`; los otros siguen entrando por `FOL.T
 y la salida en `doc/registro/2026-10-20-cono/`. Los controles pasan. El cono: 4 603 constantes del proyecto, 3 290
 declaraciones y 31 916 líneas (lo nuevo es lo de `RigidezEstandar`); los cuatro no traen nada de FOL, y los módulos sin
 nada en el cono son los mismos 14.
+
+**✏️ Re‑ejecutado el 2026‑10‑21 (ADR‑178), 139 s**, con los 29 titulares (`tarski_semantico_de`) y la salida en
+`doc/registro/2026-10-21-cono/`. Los controles pasan. El cono: 4 604 constantes, 3 291 declaraciones y 31 919 líneas
+(una constante y una declaración más: la del titular); los módulos sin nada en el cono, 15: los 14 de antes y
+`Meta/SegundoModelo.lean` (ADR‑175), que nada del cono usa.
 -/
 
 open Lean Meta Elab Command
@@ -142,8 +147,8 @@ partial def cierre (env : Environment) (raices : List Name) : NameSet := Id.run 
 
 /-- La fecha y la carpeta de la ejecución (✏️ 2026‑10‑18, ADR‑160: la primera, del 2026‑10‑16, escribía en
     `doc/registro/2026-10-16-cono/`; ésa queda como registro). -/
-def fecha : String := "2026-10-20"
-def carpeta : String := "doc/registro/2026-10-20-cono"
+def fecha : String := "2026-10-21"
+def carpeta : String := "doc/registro/2026-10-21-cono"
 
 /-- Los de `T_UNIVERSO` (18 hasta ADR‑157; 21 desde ADR‑159), con la clase de ADR‑135 (`TEOREMAS-E-HIPOTESIS.md` §1; «—» para `consistencia`). -/
 def titulares : List (Name × String) := [
@@ -177,7 +182,9 @@ def titulares : List (Name × String) := [
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de, "iii"),
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de, "iii"),
   (``ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de, "iii"),
-  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de, "iii")]
+  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de, "iii"),
+  -- ✏️ 2026‑10‑21 (ADR‑178): `tarski_semantico_de`.
+  (``ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de, "iii")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,
     tácticas, elaboradores. -/
