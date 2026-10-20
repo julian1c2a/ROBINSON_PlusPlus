@@ -16,6 +16,8 @@ PrfBotCodificacionVieja.lean
 # vacuidad (ADR-067; T05). 2026-10-18 (ADR-161): D3Sigma1Vacuo pasa a REGISTRO: los dos teoremas vacuos que vigilaba
 # salieron del build con ReflectionPrf y Sigma1BoundedPrf.
 CraigEqVacuo.lean
+# 2026-10-20 (ADR-171, T05): las once reducciones de D3 que quedan, NO vacuas (sus hipótesis, probadas)
+D3ReduccionesNoVacuas.lean
 
 # semántica: la solidez de Prfᵢ en todo modelo (AXIOMS §0.2)
 AnclaSoundness.lean

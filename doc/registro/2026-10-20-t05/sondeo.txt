@@ -1,0 +1,5 @@
+
+'D3ReduccionesNoVacuas.testigo_d3_prf_of' depends on axioms: [propext, Classical.choice, Quot.sound]
+'D3ReduccionesNoVacuas.testigo_d3_prf_of_body_only' depends on axioms: [propext, Classical.choice, Quot.sound]
+'D3ReduccionesNoVacuas.testigo_d3_prf_of_chainOkDot' depends on axioms: [propext, Classical.choice, Quot.sound]
+

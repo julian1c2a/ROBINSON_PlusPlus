@@ -153,6 +153,8 @@ abbrev DEUDA_chainOkBDot : Prop :=
 
     `d3_prf_of_chainOkDot` reducía D3 a `hC_dot`; §1 reduce `hC_dot` a la forma **acotada**.
     Componiendo: D3 sale de `DEUDA_chainOkBDot` y nada más. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- EN el cono de los titulares: `d3_prf_real` pasa por ella.)
 theorem d3_prf_of_chainOkBDot (φ : Formula) (hB : DEUDA_chainOkBDot) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
   d3_prf_of_chainOkDot φ (hC_dot_of_chainOkBDot hB)
@@ -291,6 +293,8 @@ theorem DEUDA_chainOkBDot_of (Phic : Term)
     (PrfH_chainOkB_bnd_bridge (.var 0) Phic hPinv hwP h)
 
 /-- Y **D3 entera**, a partir de lo mismo. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- FUERA del cono de los titulares: es un paso de la reducción por el que `d3_prf_real` no pasa.)
 theorem d3_prf_of (φ : Formula) (Phic : Term)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u Phic =eq Phic))
     (hwP : Prf (hasWitF (bdAllBndCtx Phic)))
@@ -722,6 +726,8 @@ theorem DEUDA_chainOkBDot_of_hbdAll
   DEUDA_chainOkBDot_of _ hPinv hwP hmatch_chainOkB hbdAll
 
 /-- Y **D3 entera** desde las mismas tres. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- FUERA del cono de los titulares: es un paso de la reducción por el que `d3_prf_real` no pasa.)
 theorem d3_prf_of_hbdAll (φ : Formula)
     (hPinv : ∀ u : Term, Prf (substfc (succ zero) u (chainOkBPsi (tcFn (.var 0)) (.var 0))
       =eq chainOkBPsi (tcFn (.var 0)) (.var 0)))
@@ -785,6 +791,8 @@ theorem DEUDA_chainOkBDot_of_two
     DEUDA_chainOkBDot :=
   DEUDA_chainOkBDot_of_hbdAll hPinv_chainOkBPsi hwP hbdAll
 
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- FUERA del cono de los titulares: es un paso de la reducción por el que `d3_prf_real` no pasa.)
 theorem d3_prf_of_two (φ : Formula)
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbdAll : Prf (chainOk nil (.var 0) ⇒
@@ -923,6 +931,8 @@ theorem hbdAllDot_of_body
     liftT_chainOkBPsiDot substT_chainOkBPsiDot hPsiId hwPsi_chainOkBPsiDot hbody
 
 /-- ⭐⭐⭐ **D3 DESDE TRES OBLIGACIONES**, y las tres sobre el `PsiF` DOTADO. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- FUERA del cono de los titulares: es un paso de la reducción por el que `d3_prf_real` no pasa.)
 theorem d3_prf_of_body (φ : Formula)
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hPsiId : ∀ q : Term,
@@ -1022,6 +1032,8 @@ theorem DEUDA_chainOkBDot_of_hbody
   DEUDA_chainOkBDot_of_two hwP (hbdAll_of_dotted (hbdAllDot_of_hbody hbody))
 
 /-- Y **D3 entera** desde esas dos. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- EN el cono de los titulares: `d3_prf_real` pasa por ella.)
 theorem d3_prf_of_hbody (φ : Formula)
     (hwP : Prf (hasWitF (bdAllBndCtx (chainOkBPsi (tcFn (.var 0)) (.var 0)))))
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
@@ -1083,6 +1095,8 @@ theorem DEUDA_chainOkBDot_of_body_only
     Todo lo demás —el puente átomo↔forma acotada, la cota, el `∃` acotado, el cuerpo del `∀`, el
     empaquetado, los dos `PsiF`, `hmatch`, `hPinv`, `hPsiId` y `hwP`— está **probado**, y con
     footprint igual a la base sancionada. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- FUERA del cono de los titulares: es un paso de la reducción por el que `d3_prf_real` no pasa.)
 theorem d3_prf_of_body_only (φ : Formula)
     (hbody : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (substfc zero (tcFn i) (chainOkBPsiDot q))))) :
@@ -1179,6 +1193,8 @@ theorem hbody_of_halves
     (PrfH_and_intro_code _ _ ha hb)
 
 /-- ⭐⭐⭐ **D3 DESDE LAS DOS MITADES DEL CUERPO, y nada más.** -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- EN el cono de los titulares: `d3_prf_real` pasa por ella.)
 theorem d3_prf_of_halves (φ : Formula)
     (hA : ∀ q i : Term, Prf (chainOk nil q ⇒ (lt i (lenc q) ⇒
       provFromCode (lineWFDotAt q i))))

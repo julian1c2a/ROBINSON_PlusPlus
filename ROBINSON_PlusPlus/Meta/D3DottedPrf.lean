@@ -67,6 +67,8 @@ theorem formCode_provCodeC'_eq (φ : Formula) :
 
     `∃`‑elim de la hipótesis (testigo `p = #0`) + `pcc_exIntro_code_open` (testigo‑código `tcFn #0`)
     sobre `formCode (bodyF φ)`, cuyo `exc` es `formCode (provCodeC' φ)` por el keystone. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- EN el cono de los titulares: `d3_prf_real` pasa por ella.)
 theorem d3_prf_of_dotted (φ : Formula)
     (hbody : Prf (bodyF φ ⇒ provFromCode (substfc zero (tcFn (.var 0)) (formCode (bodyF φ))))) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) := by
@@ -134,6 +136,8 @@ theorem hbody_of_atoms (φ : Formula)
 
 /-- **D3 reducida a las reflexiones punteadas de los DOS átomos** (`chainOk`, `In`): composición de
     `hbody_of_atoms` con `d3_prf_of_dotted`. Es el interfaz que `hC_dot`/`hI_dot` deben cumplir. -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- EN el cono de los titulares: `d3_prf_real` pasa por ella.)
 theorem d3_prf_of_dotted_atoms (φ : Formula)
     (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot))
     (hI : Prf (chainOk nil (.var 0) ⇒

@@ -525,6 +525,8 @@ theorem hI_dot (φ : Formula) :
 
 /-- **PAYOFF (§38): D3 queda reducida a `hC_dot` SOLO** — la reflexión punteada de `chainOk`.
     El átomo `In` ya está cerrado (`hI_dot`). -/
+-- (T05, ADR‑171: NO vacua: sus hipótesis son teoremas del build, `sondeos/D3ReduccionesNoVacuas.lean`.
+-- EN el cono de los titulares: `d3_prf_real` pasa por ella.)
 theorem d3_prf_of_chainOkDot (φ : Formula)
     (hC : Prf (chainOk nil (.var 0) ⇒ provFromCode chainOkDot)) :
     Prf (provCodeC' φ ⇒ provCodeC' (provCodeC' φ)) :=
