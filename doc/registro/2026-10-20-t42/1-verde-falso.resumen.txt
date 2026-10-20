@@ -1,0 +1,16 @@
+# La PRIMERA prueba de v4.35.0 (2026-10-20, 19:08 UTC): un VERDE FALSO. El script lanzaba el `lake` del PATH,
+# donde el bin de v4.31.0 va antes que los proxies de elan: compiló y pasó los controles CON v4.31.0 (ADR-176 §2).
+
+Prueba del toolchain leanprover/lean4:v4.35.0 (el par estaba en leanprover/lean4:v4.31.0) — 2026-10-20 19:08 UTC
+RPP @ ac5f170 · FOL @ 663f5d5
+Árboles: /c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/tcprueba.quTTr8 (worktrees aparte)
+
+✓ build de FOL (@FOL/FOL @FOL/TheoryFramework) (30 s)
+✓ build de RPP (472 s)
+✓ check-footprints.bash (199 s)
+✓ check-warnings.bash (4 s)
+✓ check-estratos.bash (21 s)
+✓ check-sorry.bash (53 s)
+✓ check-sondeos.bash --controles (34 s)
+
+✅ leanprover/lean4:v4.35.0: el par compila y los controles pasan. El bump, si se decide, va por un ADR.

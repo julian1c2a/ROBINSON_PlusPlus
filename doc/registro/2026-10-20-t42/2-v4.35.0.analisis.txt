@@ -1,0 +1,48 @@
+# v4.35.0, el build de RPP (de build-rpp.log de la prueba 2): lo que falla y los avisos.
+
+## Los módulos que fallan (✖)
+✖ [111/134] Building ROBINSON_PlusPlus.Meta.PremsBdAllPrf (4.6s)
+
+## Los errores
+error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:96:21: Unknown identifier `h1`
+warning: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:99:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:99:21: Unknown identifier `h1`
+warning: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:100:12: `if_pos` has been deprecated: Use `ite_eq_left` instead
+
+Hint: Replace the deprecated name:
+error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:100:19: Unknown identifier `h1`
+warning: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:155:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:155:21: Unknown identifier `h1`
+warning: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:158:14: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:158:21: Unknown identifier `h1`
+warning: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:159:12: `if_pos` has been deprecated: Use `ite_eq_left` instead
+
+Hint: Replace the deprecated name:
+error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:159:19: Unknown identifier `h1`
+warning: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:277:31: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+error: build failed
+
+## Hasta dónde llegó: módulos compilados (✔) antes de parar
+39
+
+## Avisos de deprecación (los 111 primeros módulos; la tabla de check-warnings declara 9 avisos)
+    319 `if_true` has been deprecated
+     57 `if_neg` has been deprecated
+     21 `if_pos` has been deprecated
+     14 `if_false` has been deprecated
+      6 `dif_neg` has been deprecated
+      2 `dif_pos` has been deprecated
+
+## FOL (build-fol.log): compila, 59 jobs; sus avisos de deprecación
+Build completed successfully (59 jobs).
+     12 `if_pos` has been deprecated
+     12 `if_neg` has been deprecated
+      1 `dif_pos` has been deprecated

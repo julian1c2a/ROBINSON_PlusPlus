@@ -332,7 +332,7 @@ Transición: 🔄 → 🔶 → ✅ → 🧊 (el estado 🧊 es final).
 | `bash check-sorry.bash` | Localiza todos los `sorry` (excluyendo comentarios) |
 | `bash check-doc-sync.bash` | **Comprueba que la documentación cuadra con el código** (§27). `--quick` omite el build |
 | **`PLAN-PRUEBAS.md`** | 🆕 **qué garantiza cada control y qué NO garantiza ninguno** (auditoría F‑4). Léelo antes de fiarte de un verde |
-| `bash update-toolchain.bash vX.Y.Z` | Actualiza el toolchain de Lean con verificación de build |
+| `bash update-toolchain.bash [vX.Y.Z]` | PRUEBA el par (RPP, FOL) con otra versión de Lean —por defecto, la última estable— en worktrees aparte, SIN commit: builds, `leanchecker` y los controles, con la versión que corre comprobada (T42, ADR‑176). `--check`, sólo si hay otra; `--en-sitio`, en la CI. La vigilancia semanal, `.github/workflows/toolchain.yml` contra `doc/control/toolchain-vigilado.txt`. El bump, si se decide, por un ADR y a mano |
 | `make help` | Lista los targets del Makefile |
 
 ---

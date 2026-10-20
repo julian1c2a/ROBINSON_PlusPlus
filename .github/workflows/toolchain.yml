@@ -1,0 +1,89 @@
+name: Toolchain
+
+# ⭐ 2026-10-20 (T42, ADR-176): VIGILAR los cambios de toolchain. Cada lunes mira la última estable de Lean
+# (GitHub releases/latest) y la compara con la última PROBADA, que está en doc/control/toolchain-vigilado.txt. Si es
+# la misma, verde y fuera. Si hay una nueva, prueba el par con ella en este runner (`update-toolchain.bash
+# --en-sitio`: sin commit, nada sale del runner salvo el resumen y el artefacto) y el job sale ROJO: hay una versión
+# nueva sin probar. Rojo no quiere decir que rompa: el resumen lo dice. Se apaga registrando la prueba en un ADR y
+# subiendo la tabla a mano.
+# A mano («Run workflow»), con una versión, prueba ésa y sale rojo sólo si algo rompe.
+# ⚠️ No toca `master` ni su protección: el check obligatorio es «lake build» del workflow Build, y este job se llama
+# de otra manera.
+on:
+  schedule:
+    - cron: '17 5 * * 1'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Versión de Lean (p. ej. v4.36.0 o nightly-2026-10-20); vacío = la última estable'
+        required: false
+        default: ''
+
+jobs:
+  probar:
+    name: probar el toolchain
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: ROBINSON_PlusPlus
+    steps:
+      # Los dos checkouts, hermanos, como en build.yml (`require FOL from "../FOL"`).
+      - name: Checkout ROBINSON_PlusPlus
+        uses: actions/checkout@v4
+        with:
+          path: ROBINSON_PlusPlus
+          fetch-depth: 0
+      - name: Checkout FOL (dependencia local hermana)
+        uses: actions/checkout@v4
+        with:
+          repository: julian1c2a/FOL
+          ref: master
+          path: FOL
+          fetch-depth: 0
+
+      - name: Install elan (Lean version manager)
+        run: |
+          curl https://raw.githubusercontent.com/leanprover/elan/master/elan-init.sh -sSf | sh -s -- -y --no-modify-path --default-toolchain none
+          echo "$HOME/.elan/bin" >> $GITHUB_PATH
+
+      - name: ¿Hay una versión nueva sin probar?
+        id: vigilar
+        env:
+          VERSION: ${{ github.event.inputs.version }}
+        run: |
+          if [ -n "$VERSION" ]; then
+            echo "objetivo=$VERSION" >> "$GITHUB_OUTPUT"; echo "a_mano=1" >> "$GITHUB_OUTPUT"; exit 0
+          fi
+          ULTIMA=$(curl -fsSL https://api.github.com/repos/leanprover/lean4/releases/latest \
+            | sed -n 's/.*"tag_name": *"\([^"]*\)".*/\1/p' | head -1)
+          PROBADA=$(grep -v '^#' doc/control/toolchain-vigilado.txt | tr -d '\r' | awk -F'\t' 'NF { v = $1 } END { print v }')
+          echo "La última estable: ${ULTIMA:-?} · la última probada: ${PROBADA:-?}"
+          if [ -z "$ULTIMA" ]; then echo "❌ no se pudo leer la última estable"; exit 2; fi
+          if [ "$ULTIMA" = "$PROBADA" ]; then
+            echo "✅ nada nuevo: $ULTIMA ya se probó (doc/control/toolchain-vigilado.txt)" >> "$GITHUB_STEP_SUMMARY"
+            echo "objetivo=" >> "$GITHUB_OUTPUT"
+          else
+            echo "objetivo=$ULTIMA" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Probar el par
+        if: steps.vigilar.outputs.objetivo != ''
+        run: bash update-toolchain.bash "${{ steps.vigilar.outputs.objetivo }}" --en-sitio --salida registro-toolchain
+
+      - name: El resumen
+        if: always() && steps.vigilar.outputs.objetivo != ''
+        run: cat registro-toolchain/resumen.txt >> "$GITHUB_STEP_SUMMARY" || true
+
+      - name: Los registros
+        if: always() && steps.vigilar.outputs.objetivo != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: registro-toolchain
+          path: ROBINSON_PlusPlus/registro-toolchain
+
+      # Una versión nueva y sin probar es ROJO aunque compile: lo que se vigila es que alguien la mire y la registre.
+      - name: Versión nueva sin registrar
+        if: steps.vigilar.outputs.objetivo != '' && steps.vigilar.outputs.a_mano != '1'
+        run: |
+          echo "🔔 ${{ steps.vigilar.outputs.objetivo }} es nueva y no está en doc/control/toolchain-vigilado.txt: registrarla con un ADR." >> "$GITHUB_STEP_SUMMARY"
+          exit 1

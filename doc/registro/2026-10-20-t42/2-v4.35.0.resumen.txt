@@ -1,0 +1,19 @@
+# La prueba de verdad de v4.35.0 (2026-10-20, 19:26 UTC), con los proxies de elan y la versión COMPROBADA.
+
+Prueba del toolchain leanprover/lean4:v4.35.0 (el par estaba en leanprover/lean4:v4.31.0) — 2026-10-20 19:26 UTC
+RPP @ ac5f170 · FOL @ 663f5d5
+Árboles: /c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/tcprueba.a6FnW9 (worktrees aparte)
+
+Lean que corre: Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+✓ build de FOL (@FOL/FOL @FOL/TheoryFramework) (81 s)
+✗ build de RPP (294 s) — build-rpp.log
+    error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:96:21: Unknown identifier `h1`
+    error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:99:21: Unknown identifier `h1`
+    error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:100:19: Unknown identifier `h1`
+    error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:155:21: Unknown identifier `h1`
+    error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:158:21: Unknown identifier `h1`
+    error: ROBINSON_PlusPlus/Meta/PremsBdAllPrf.lean:159:19: Unknown identifier `h1`
+    error: build failed
+— los controles no se pasan: el build no compila
+
+❌ leanprover/lean4:v4.35.0: 1 paso(s) fallan. Registros en /c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/tc2-v4.35.0.

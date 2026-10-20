@@ -1,0 +1,593 @@
+# sondeos/IteSimboloNucleo.lean con v4.35.0 de VERDAD (lake de elan, `lake env lean --version` = 4.35.0), compilado contra
+# Minimal.Axioms en un worktree, 2026-10-20. Rompen sus #guard_msgs: el núcleo SIGUE rechazando (el defecto de
+# leanprover/lean4#15822 no está arreglado), pero el mensaje imprime el tipo esperado y el término dice
+# `ite_eq_right` donde decía `if_neg` (deprecado).
+ℹ [4/7] Replayed ROBINSON_PlusPlus.Minimal.SymLit
+info: ROBINSON_PlusPlus/Minimal/SymLit.lean:81:0: 'ROBINSON_PlusPlus.Minimal.SymLit.symProbe' does not depend on any axioms
+⚠ [6/7] Replayed ROBINSON_PlusPlus.Minimal.Axioms
+warning: ROBINSON_PlusPlus/Minimal/Axioms.lean:1323:34: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+warning: ROBINSON_PlusPlus/Minimal/Axioms.lean:1336:57: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+warning: ROBINSON_PlusPlus/Minimal/Axioms.lean:1347:69: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+warning: ROBINSON_PlusPlus/Minimal/Axioms.lean:1362:57: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+warning: ROBINSON_PlusPlus/Minimal/Axioms.lean:1385:78: `if_false` has been deprecated: Use `ite_false` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵f̵a̵l̵s̵e̵i̲t̲e̲_̲f̲a̲l̲s̲e̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:244:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:251:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:258:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:265:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:273:19: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:280:19: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:287:19: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:294:19: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:648:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhS (TermG.func cs [a, t]) = some n
+but function has type
+  (if (cs == consS) = true then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsS u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:647:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
++   Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhS (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == consS) = true then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsS u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:662:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhL (TermG.func cs [a, t]) = some n
+but function has type
+  (if (cs == cons_sym) = true then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsL u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:661:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
++   Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhL (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsL u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:710:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhPS (TermG.func cs [a, t]) = some n
+but function has type
+  (if cs = consS then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPS u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:709:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
++   Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhPS (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if cs = consS then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPS u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:724:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+argument has type
+  mhPL (TermG.func cs [a, t]) = some n
+but function has type
+  (if cs = cons_sym then
+        match t with
+        | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPL u)
+        | x => none
+      else none) =
+      some n →
+    none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:723:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some n)) h
++   Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some n)) h
+  argument has type
+    mhPL (TermG.func cs [a, t]) = some n
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if cs = cons_sym then
++         match t with
++         | TermG.func a [u] => Option.map (fun x => x + 1) (mhsPL u)
++         | x => none
++       else none) =
++       some n →
++     none = some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:738:8: error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNS_dsimp' has type
+  ∀ (cs : String) (a t : TS) (n : Nat), mhNS (TermG.func cs [a, t]) = some n → mhNS (TermG.func cs [a, t]) = some n
+but it is expected to have type
+  ∀ (cs : String) (a t : TS) (n : Nat),
+    mhNS (TermG.func cs [a, t]) = some n →
+      id
+          (match t with
+          | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNS u)
+          | x => none) =
+        some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:736:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNS_dsimp' has type
+    ∀ (cs : String) (a t : TS) (n : Nat), mhNS (TermG.func cs [a, t]) = some n → mhNS (TermG.func cs [a, t]) = some n
+  but it is expected to have type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   ∀ (cs : String) (a t : TS) (n : Nat),
++     mhNS (TermG.func cs [a, t]) = some n →
++       id
++           (match t with
++           | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNS u)
++           | x => none) =
++         some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:749:8: error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNL_dsimp' has type
+  ∀ (cs : List Char) (a t : Term) (n : Nat), mhNL (TermG.func cs [a, t]) = some n → mhNL (TermG.func cs [a, t]) = some n
+but it is expected to have type
+  ∀ (cs : List Char) (a t : Term) (n : Nat),
+    mhNL (TermG.func cs [a, t]) = some n →
+      id
+          (match t with
+          | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNL u)
+          | x => none) =
+        some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:748:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) declaration type mismatch, 'IteSimboloNucleo.mhNL_dsimp' has type
+    ∀ (cs : List Char) (a t : Term) (n : Nat), mhNL (TermG.func cs [a, t]) = some n → mhNL (TermG.func cs [a, t]) = some n
+  but it is expected to have type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   ∀ (cs : List Char) (a t : Term) (n : Nat),
++     mhNL (TermG.func cs [a, t]) = some n →
++       id
++           (match t with
++           | TermG.func a [u] => Option.map (fun x => x + 1) (mhsNL u)
++           | x => none) =
++         some n
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:769:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+argument has type
+  decodeTerm (TermG.func cs [hd, tl]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:768:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some x)) h
++   Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+  argument has type
+    decodeTerm (TermG.func cs [hd, tl]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     none = some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:790:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:785:8: error: (kernel) application type mismatch
+  Eq.mp (congrArg (fun _a => _a = some x) (if_neg hc)) h
+argument has type
+  decodeTerm (TermG.func cs [hd, tl]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:784:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
++ warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
++
++ Hint: Replace the deprecated name:
++   i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
++ ---
+  error: (kernel) application type mismatch
+    Eq.mp (congrArg (fun _a => _a = some x) (if_neg hc)) h
+  argument has type
+    decodeTerm (TermG.func cs [hd, tl]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     none = some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:804:8: warning: `if_neg` has been deprecated: Use `ite_eq_right` instead
+
+Hint: Replace the deprecated name:
+  i̵f̵_̵n̵e̵g̵i̲t̲e̲_̲e̲q̲_̲r̲i̲g̲h̲t̲
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:815:8: error: (kernel) application type mismatch
+  Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+argument has type
+  decodeTerm (TermG.func cs [hd, tl]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    none = some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:814:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   Eq.mp (congrFun' (congrArg Eq (if_neg h✝)) (some x)) h
++   Eq.mp (congrFun' (congrArg Eq (ite_eq_right h✝)) (some x)) h
+  argument has type
+    decodeTerm (TermG.func cs [hd, tl]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     none = some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:897:0: error: Not a definitional equality: the left-hand side
+  decodeTerm (TermG.func cs [hd, tl])
+is not definitionally equal to the right-hand side
+  if (cs == cons_sym) = true then
+    match decodeNat hd, tl with
+    | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+      if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+    | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+      if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+        (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+      else none
+    | x, x_1 => none
+  else none
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:897:8: error: (kernel) declaration type mismatch, 'IteSimboloNucleo.real_rfl' has type
+  ∀ (cs : List Char) (hd tl : Term), decodeTerm (TermG.func cs [hd, tl]) = decodeTerm (TermG.func cs [hd, tl])
+but it is expected to have type
+  ∀ (cs : List Char) (hd tl : Term),
+    decodeTerm (TermG.func cs [hd, tl]) =
+      if (cs == cons_sym) = true then
+        match decodeNat hd, tl with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:896:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: Not a definitional equality: the left-hand side
+    decodeTerm (TermG.func cs [hd, tl])
+  is not definitionally equal to the right-hand side
+    if (cs == cons_sym) = true then
+      match decodeNat hd, tl with
+      | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+        if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+          (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+        else none
+      | x, x_1 => none
+    else none
+  ---
+  error: (kernel) declaration type mismatch, 'IteSimboloNucleo.real_rfl' has type
+    ∀ (cs : List Char) (hd tl : Term), decodeTerm (TermG.func cs [hd, tl]) = decodeTerm (TermG.func cs [hd, tl])
+  but it is expected to have type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   ∀ (cs : List Char) (hd tl : Term),
++     decodeTerm (TermG.func cs [hd, tl]) =
++       if (cs == cons_sym) = true then
++         match decodeNat hd, tl with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:929:8: error: (kernel) application type mismatch
+  congrArg Eq
+    (ite_congr (Eq.refl ((cs == cons_sym) = true))
+      (fun a =>
+        Eq.trans
+          (congrArg
+            (fun x =>
+              match x, TermG.func c2 [hn, TermG.func c3 []] with
+              | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+                if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+              | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+                if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                  (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+                else none
+              | x, x_1 => none)
+            hnat)
+          (decodeTerm.match_1.eq_1 (fun x t => Option Term) c2 hn c3
+            (fun c2 hn c3 =>
+              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none)
+            (fun c2 hs c3 hts c4 =>
+              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+              else none)
+            fun x x_1 => none))
+      fun a => Eq.refl none)
+argument has type
+  (if (cs == cons_sym) = true then
+      match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
+      | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+        if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+          (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+        else none
+      | x, x_1 => none
+    else none) =
+    if (cs == cons_sym) = true then
+      if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+    else none
+but function has type
+  (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) =
+      if (cs == cons_sym) = true then
+        if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+      else none) →
+    Eq (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]])) =
+      Eq
+        (if (cs == cons_sym) = true then
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        else none)
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:928:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   congrArg Eq
++     (ite_congr (Eq.refl ((cs == cons_sym) = true))
++       (fun a =>
++         Eq.trans
++           (congrArg
++             (fun x =>
++               match x, TermG.func c2 [hn, TermG.func c3 []] with
++               | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++                 if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++               | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++                 if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++                   (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++                 else none
++               | x, x_1 => none)
++             hnat)
++           (decodeTerm.match_1.eq_1 (fun x t => Option Term) c2 hn c3
++             (fun c2 hn c3 =>
++               if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none)
++             (fun c2 hs c3 hts c4 =>
++               if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++                 (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++               else none)
++             fun x x_1 => none))
++       fun a => Eq.refl none)
+  argument has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++       match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
++       | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++         if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++       | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++         if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++           (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++         else none
++       | x, x_1 => none
++     else none) =
++     if (cs == cons_sym) = true then
++       if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++     else none
+  but function has type
+    (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) =
+        if (cs == cons_sym) = true then
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        else none) →
+      Eq (decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]])) =
+        Eq
+          (if (cs == cons_sym) = true then
+            if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+          else none)
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:945:8: error: (kernel) application type mismatch
+  Eq.mp
+    (congrArg
+      (fun _a =>
+        (if (cs == cons_sym) = true then
+            match _a, TermG.func c2 [hn, TermG.func c3 []] with
+            | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+              if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+            | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+              if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+                (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+              else none
+            | x, x_1 => none
+          else none) =
+          some x)
+      hnat)
+    h
+argument has type
+  decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) = some x
+but function has type
+  (if (cs == cons_sym) = true then
+        match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x →
+    (if (cs == cons_sym) = true then
+        match some 0, TermG.func c2 [hn, TermG.func c3 []] with
+        | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
+          if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
+        | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
+          if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
+            (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
+          else none
+        | x, x_1 => none
+      else none) =
+      some x
+C:\msys64\tmp\claude\e--dropbox-github-lean4-ROBINSON-PlusPlus\a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e\scratchpad\tcv\ROBINSON_PlusPlus\sondeos\IteSimboloNucleo.lean:944:0: error: ❌️ Docstring on `#guard_msgs` does not match generated message:
+
+  error: (kernel) application type mismatch
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   Eq.mp
++     (congrArg
++       (fun _a =>
++         (if (cs == cons_sym) = true then
++             match _a, TermG.func c2 [hn, TermG.func c3 []] with
++             | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++               if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++             | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++               if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++                 (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++               else none
++             | x, x_1 => none
++           else none) =
++           some x)
++       hnat)
++     h
+  argument has type
+    decodeTerm (TermG.func cs [hd, TermG.func c2 [hn, TermG.func c3 []]]) = some x
+  but function has type
+-   failed to pretty print expression (use 'set_option pp.rawOnError true' for raw representation)
++   (if (cs == cons_sym) = true then
++         match decodeNat hd, TermG.func c2 [hn, TermG.func c3 []] with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x →
++     (if (cs == cons_sym) = true then
++         match some 0, TermG.func c2 [hn, TermG.func c3 []] with
++         | some 0, TermG.func c2 [hn, TermG.func c3 []] =>
++           if (c2 == cons_sym && c3 == zero_sym) = true then Option.map TermG.var (decodeNat hn) else none
++         | some 1, TermG.func c2 [hs, TermG.func c3 [hts, TermG.func c4 []]] =>
++           if (c2 == cons_sym && c3 == cons_sym && c4 == zero_sym) = true then
++             (decodeStr hs).bind fun s => Option.map (TermG.func s) (decodeTerms hts)
++           else none
++         | x, x_1 => none
++       else none) =
++       some x

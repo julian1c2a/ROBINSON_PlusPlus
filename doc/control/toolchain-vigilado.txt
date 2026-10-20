@@ -1,0 +1,6 @@
+# doc/control/toolchain-vigilado.txt — la ÚLTIMA versión de Lean probada con el par (T42, ADR-176).
+# La lee .github/workflows/toolchain.yml cada lunes: si la última estable publicada es otra, prueba el par con ella
+# (update-toolchain.bash --en-sitio, sin commit) y el job sale ROJO: hay una versión nueva sin probar. Se apaga
+# registrando la prueba en un ADR y añadiendo aquí su línea, a mano. La última línea es la que cuenta.
+# versión	fecha	veredicto	ADR
+v4.35.0	2026-10-20	rompe: Meta/PremsBdAllPrf.lean (rcases), IteSimboloNucleo (#guard_msgs), 419 avisos de deprecación	ADR-176

@@ -72,7 +72,7 @@ init:
 # (2026-10-18, T15, ADR-163: `make new` y `make root` se retiraron con new-module.bash y gen-root.bash. Un modulo
 #  nuevo se crea a mano y se importa desde su barril; `make docsync` ([L]) dice si un fichero no esta importado.)
 
-## Update Lean toolchain: make update-toolchain [VERSION=v4.31.0]
+## Probar el par con otra versión de Lean, sin commit (T42, ADR-176): make update-toolchain [VERSION=v4.35.0]
 update-toolchain:
 	@bash update-toolchain.bash $(VERSION)
 

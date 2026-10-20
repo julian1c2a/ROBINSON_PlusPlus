@@ -110,8 +110,11 @@ Módulos completos pueden marcarse como permanentemente inmutables (`bash git-lo
 ## Parte 4 — Toolchain
 
 ```bash
-# Actualizar Lean (verifica build + commit automático al éxito)
-bash update-toolchain.bash v4.x.x
+# PROBAR el par con otra versión de Lean (por defecto, la última estable), en worktrees aparte y SIN commit
+# (T42, ADR‑176): builds de FOL y RPP, leanchecker y los controles, con la versión que corre comprobada.
+bash update-toolchain.bash [v4.x.x]        # o: --check, sólo dice si hay otra
+# El bump, si se decide, va por un ADR y a mano, en los dos repos (M‑12: FOL primero). La vigilancia semanal:
+# .github/workflows/toolchain.yml, contra doc/control/toolchain-vigilado.txt (la última versión probada).
 ```
 
 ---

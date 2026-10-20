@@ -1,0 +1,19 @@
+T42 (ADR-176): las pruebas de toolchain del 2026-10-20, con `update-toolchain.bash` (reescrito: prueba el par en
+worktrees aparte, sin commit). RPP @ ac5f170, FOL @ 663f5d5; el par, en v4.31.0.
+
+1-verde-falso.resumen.txt — la PRIMERA prueba de v4.35.0: todo verde (build de FOL 30 s, de RPP 472 s, footprints,
+   warnings, estratos, sorry y los 11 sondeos de control). FALSO: el script lanzaba el `lake` del PATH, y en esta
+   máquina el `bin` de v4.31.0 va ANTES que los proxies de elan (`~/.elan/bin`). Lo cazó una comprobación a mano:
+   `lake env lean --version` en el árbol de prueba decía 4.31.0, y `elan show`, 4.35.0.
+2-v4.35.0.resumen.txt y 2-v4.35.0.analisis.txt — la prueba de verdad (proxies delante; la versión que corre,
+   impresa y comprobada): FOL compila (59 jobs); RPP se para en `Meta/PremsBdAllPrf.lean` (seis «Unknown identifier
+   `h1`» tras `rcases Nat.decEq … with h1 | h1`), y lo que depende de él no se compila (111 de 134). 419 avisos de
+   deprecación en RPP (`if_true`, `if_neg`, `if_pos`, `if_false`, `dif_neg`, `dif_pos`) y 25 en FOL: la tabla de
+   `check-warnings` (9) no cuadraría. El coste entero del bump sigue SIN MEDIR: lo de detrás de PremsBdAllPrf no se
+   ha compilado.
+3-mutante-guarda.resumen.txt — la guarda, vista fallar: el script sin la línea que antepone los proxies sale con 2
+   («corre OTRA versión»), sin compilar nada.
+4-IteSimboloNucleo-v4.35.0.salida.txt — el sondeo de control de T77, con v4.35.0 de verdad (contra Minimal.Axioms,
+   en un worktree): sus `#guard_msgs` ROMPEN. El núcleo sigue rechazando (leanprover/lean4#15822, sin arreglar),
+   pero el mensaje imprime el tipo esperado y el término nombra `ite_eq_right` donde decía `if_neg`. Lo que predijo
+   ADR-172 §5, ahora medido.

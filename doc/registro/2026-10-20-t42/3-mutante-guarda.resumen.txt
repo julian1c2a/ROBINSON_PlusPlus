@@ -1,0 +1,8 @@
+# El mutante (sin la línea que antepone los proxies de elan): la guarda de versión lo para con 2.
+
+Prueba del toolchain leanprover/lean4:v4.35.0 (el par estaba en leanprover/lean4:v4.31.0) — 2026-10-20 19:33 UTC
+RPP @ ac5f170 · FOL @ 663f5d5
+Árboles: /c/msys64/tmp/claude/e--dropbox-github-lean4-ROBINSON-PlusPlus/a8ec29ce-df3a-4c41-9e7a-c91f87db9b4e/scratchpad/tcprueba.AyAo01 (worktrees aparte)
+
+Lean que corre: Lean (version 4.31.0, x86_64-w64-windows-gnu, commit 68218e876d2a38b1985b8590fff244a83c321783, Release)
+❌ corre OTRA versión (se pedía v4.35.0): la prueba no mediría nada.
