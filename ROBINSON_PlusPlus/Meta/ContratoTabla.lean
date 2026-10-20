@@ -14,13 +14,14 @@ clase, su huella y su nombre. La comprueba `#contrato_titulares`, en `Meta/Purez
 
 namespace ROBINSON_PlusPlus.Meta.ContratoTabla
 
-/-- 536 constantes del cierre de los tipos de 24 titulares. -/
+/-- 543 constantes del cierre de los tipos de 28 titulares. -/
 def tabla : String := "
 def 3606628684449333096 FOL.Metamath.Semantics.Model
 ind 887465114820704127 FOL.Metamath.Semantics.ModelG
 def 15527263524663539472 FOL.Metamath.Semantics.ModelG.func
 ctor 1456052847 FOL.Metamath.Semantics.ModelG.mk
 def 18011272812508355536 FOL.Metamath.Semantics.ModelG.rel
+def 8110132598096365108 FOL.Metamath.Semantics.contextSatisfies
 def 17010123154614122102 FOL.Metamath.Semantics.evalFormula
 def 17645532686417233608 FOL.Metamath.Semantics.evalFormula._f
 def 2823144865505142597 FOL.Metamath.Semantics.evalFormula.match_1
@@ -219,6 +220,10 @@ def 11195034101090334962 ROBINSON_PlusPlus.Meta.Provability.termsCode
 def 14821870038638067166 ROBINSON_PlusPlus.Meta.Provability.termsCode._f
 def 14401384849228394516 ROBINSON_PlusPlus.Meta.Provability.termsCode.match_1
 thm 3002450326 ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf
+thm 2318897476 ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
+thm 3520485007 ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
+thm 3502709949 ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
+thm 3683108006 ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
 def 980607854081651445 ROBINSON_PlusPlus.Meta.Rosser.PfE
 def 7301497347206160524 ROBINSON_PlusPlus.Meta.Rosser.R
 def 12794642486004346288 ROBINSON_PlusPlus.Meta.Rosser.impChainC
@@ -228,6 +233,8 @@ def 13036801403196303972 ROBINSON_PlusPlus.Meta.Rosser.rhoE
 thm 4021181631 ROBINSON_PlusPlus.Meta.Rosser.rosser
 thm 4261306966 ROBINSON_PlusPlus.Meta.Rosser.rosser_ext
 def 12586863729160058411 ROBINSON_PlusPlus.Meta.RosserPosNum.PfF
+ind 14291639044945996277 ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar
+ctor 1572665316 ROBINSON_PlusPlus.Meta.SolidezPrf.Estandar.mk
 thm 3601859669 ROBINSON_PlusPlus.Meta.SolidezVerificador.con_verdadera
 thm 1247671773 ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible
 thm 2932167677 ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_verdadera

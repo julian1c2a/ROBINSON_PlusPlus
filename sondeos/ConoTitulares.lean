@@ -67,6 +67,11 @@ declaraciones y 31 143 líneas; los corolarios no traen nada de FOL. Sin nada en
 FOL (los mismos del 2026‑10‑16). Retirados sus `import` (T74; el de `FOL.Lift0` en `Meta/TarskiPrf.lean` se queda: lo
 piden tres declaraciones fuera del cono), re‑ejecutado (`resumen-tras-T74.txt`): el cono, idéntico, y de FOL se
 importan 11 ficheros (sale `FOL.Deduction`; los otros siguen entrando por `FOL.Theorems.Quantifiers` y `FOL.Lift0`).
+
+**✏️ Re‑ejecutado el 2026‑10‑20 (ADR‑174), 121 s**, con los 28 titulares (los cuatro de T75e, `Meta/RigidezEstandar.lean`)
+y la salida en `doc/registro/2026-10-20-cono/`. Los controles pasan. El cono: 4 603 constantes del proyecto, 3 290
+declaraciones y 31 916 líneas (lo nuevo es lo de `RigidezEstandar`); los cuatro no traen nada de FOL, y los módulos sin
+nada en el cono son los mismos 14.
 -/
 
 open Lean Meta Elab Command
@@ -137,8 +142,8 @@ partial def cierre (env : Environment) (raices : List Name) : NameSet := Id.run 
 
 /-- La fecha y la carpeta de la ejecución (✏️ 2026‑10‑18, ADR‑160: la primera, del 2026‑10‑16, escribía en
     `doc/registro/2026-10-16-cono/`; ésa queda como registro). -/
-def fecha : String := "2026-10-19"
-def carpeta : String := "doc/registro/2026-10-19-cono"
+def fecha : String := "2026-10-20"
+def carpeta : String := "doc/registro/2026-10-20-cono"
 
 /-- Los de `T_UNIVERSO` (18 hasta ADR‑157; 21 desde ADR‑159), con la clase de ADR‑135 (`TEOREMAS-E-HIPOTESIS.md` §1; «—» para `consistencia`). -/
 def titulares : List (Name × String) := [
@@ -167,7 +172,12 @@ def titulares : List (Name × String) := [
   -- ✏️ 2026‑10‑19 (T74): los tres corolarios de T78, titulares desde ADR‑164.
   (``ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con, "i"),
   (``ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado, "i"),
-  (``ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible, "iii")]
+  (``ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible, "iii"),
+  -- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
+  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de, "iii"),
+  (``ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de, "iii")]
 
 /-- ¿Es de ELABORACIÓN? Su tipo, quitados los `∀`, tiene la cabeza en `Lean.*` o en `IO`: sintaxis, macros,
     tácticas, elaboradores. -/

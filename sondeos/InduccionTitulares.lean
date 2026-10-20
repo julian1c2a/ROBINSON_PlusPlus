@@ -86,6 +86,11 @@ y `listInd`, sí; `p3`, no, como `goedel_second_prf` (la salida, en `doc/registr
 `goedel_second_prf` en `#induccion`; `con_indecidible`, clase (iii) (90 constantes de la semántica, 89 sin pasar por
 `consistencia`), y construye `p3` sólo al decodificar el modelo con `linea_p3` (la salida, en
 `doc/registro/2026-10-18-t78/`).
+
+**✏️ Y con los cuatro de T75e (ADR‑174), 35 s:** `prf_of_prov_de`, `modelo_prov_iff_de`, `godelCN_verdadera_de` y
+`con_verdadera_de`, clase (iii) los cuatro (87, 87, 90 y 90 constantes de la semántica; 87 sin pasar por
+`consistencia`); como los de `MNV V₀`, alcanzan `ind`, `listInd`, `p3` y `qconf` al decodificar con W1 (`linea_*`). La
+salida, en `doc/registro/2026-10-20-titulares/`.
 -/
 
 open Lean Meta Elab Command
@@ -274,6 +279,11 @@ end InduccionTitulares
 #induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
 #induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
 #induccion ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
+-- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
+#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
+#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
+#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
+#induccion ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de
 
 /-! ### Por dónde: un camino por VALORES del titular a cada constante de su frontera -/
 
@@ -333,3 +343,8 @@ end InduccionTitulares
 #modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.prf_godel_iff_con
 #modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.goedel_second_formalizado
 #modelo ROBINSON_PlusPlus.Meta.GodelCorolarios.con_indecidible
+-- ✏️ 2026‑10‑20 (ADR‑174): los cuatro de T75e.
+#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.prf_of_prov_de
+#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.modelo_prov_iff_de
+#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.godelCN_verdadera_de
+#modelo ROBINSON_PlusPlus.Meta.RigidezEstandar.con_verdadera_de

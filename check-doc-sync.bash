@@ -1240,7 +1240,8 @@ T_FAIL=0
 T_UNIVERSO="goedel_first_prf goedel_second_prf prf_con_imp_godel prf_godelCN_fixedpoint prf_tarski
   goedel_I goedel_II tarski goedel_I_neg godelCN_indecidible modelo_prov_iff godelCN_verdadera con_verdadera
   tarski_semantico consistencia repr_pos'_prf d2_prf d3_prf_real rosser_ext rosser lob
-  prf_godel_iff_con goedel_second_formalizado con_indecidible"
+  prf_godel_iff_con goedel_second_formalizado con_indecidible
+  prf_of_prov_de modelo_prov_iff_de godelCN_verdadera_de con_verdadera_de"
 t_filas() {   # stdin: el documento → un nombre por cada aparición en la columna del nombre de §1 (1.ª) o §3 (2.ª)
   LC_ALL=C awk '
     /^## 1 · / { s = 1; next }
