@@ -49,6 +49,12 @@ etiqueta `archivo/t66-2026-10-18`.
    igual. INFERIDO (sin medir): el despliegue que usa `dsimp` para una recursión estructural mutua no
    coincide, bajo un `match` atascado, con lo que compila `TermG.brecOn` (`#print decodeTerm`); parece un
    defecto de Lean, y `mhNL_dsimp` es una reproducción mínima sin símbolos.
+   ✏️ 2026‑10‑20 (T77, ADR‑172): **comunicado aguas arriba**, https://github.com/leanprover/lean4/issues/15822, con una
+   reproducción sin `import` aún más corta (`T := leaf | node (List T)`, sin `id`; `doc/registro/2026-10-20-t77/`).
+   Se reproduce en 4.29.0, 4.31.0, 4.33.0, 4.35.0, 4.36.0-rc1 y la nightly del 2026‑10‑20. Si un toolchain nuevo lo
+   arregla, los `#guard_msgs` de §3 y §4 de este sondeo, que es de control, romperán: entonces la receta «`unfold`, no
+   `dsimp`» deja de ser obligatoria. ⚠️ Romperán también si sólo cambia el MENSAJE: desde 4.35.0 el tipo esperado se
+   imprime en vez de «failed to pretty print expression»; al subir de toolchain hay que distinguir los dos casos.
 
 ⇒ Con `decodeTerm` (mutua, llamada a `decodeTerms hts` bajo el `match` interior), `dsimp`/`simp only` sobre la
 función, NUNCA: 5 de 5 formas rechazadas; `unfold`, sí. (`decodeTerms`, su pareja, llama a subtérminos directos y

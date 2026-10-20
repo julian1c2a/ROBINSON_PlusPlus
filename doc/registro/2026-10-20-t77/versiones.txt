@@ -1,0 +1,77 @@
+# T77 (ADR-172): las reproducciones, con plain «lean» de cada toolchain (sin imports), 2026-10-20.
+# Mwe.lean.txt (la de IteSimboloNucleo, con id) en 4.29.0, 4.31.0, 4.33.0, 4.35.0 y 4.36.0-rc1; Mini.lean.txt (la de la issue) en 4.31.0, 4.35.0, 4.36.0-rc1 y nightly.
+
+== Mwe en v4.35.0 y v4.36.0-rc1
+== v4.35.0
+Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+Mwe.lean:20:8: error: (kernel) declaration type mismatch, 'f_dsimp' has type
+  ∀ (c : Nat) (a t : T) (n : Nat), f (T.func c [a, t]) = some n → f (T.func c [a, t]) = some n
+but it is expected to have type
+  ∀ (c : Nat) (a t : T) (n : Nat),
+    f (T.func c [a, t]) = some n →
+      id
+          (match t with
+          | T.func a [u] => Option.map (fun x => x + 1) (g u)
+          | x => none) =
+        some n
+
+exit 1
+== v4.36.0-rc1
+Lean (version 4.36.0-rc1, x86_64-w64-windows-gnu, commit c9afcddf514a6772bd4d649f7cfc04eff0b9f15e, Release)
+Mwe.lean:20:8: error: (kernel) declaration type mismatch, 'f_dsimp' has type
+  ∀ (c : Nat) (a t : T) (n : Nat), f (T.func c [a, t]) = some n → f (T.func c [a, t]) = some n
+but it is expected to have type
+  ∀ (c : Nat) (a t : T) (n : Nat),
+    f (T.func c [a, t]) = some n →
+      id
+          (match t with
+          | T.func a [u] => Option.map (fun x => x + 1) (g u)
+          | x => none) =
+        some n
+
+exit 1
+
+[exited with code 1]
+
+== Mini en v4.35.0, v4.36.0-rc1 y nightly
+== v4.35.0
+Lean (version 4.35.0, x86_64-w64-windows-gnu, commit eb6cafb7290e8bd5f2937522d8d804f58f02bafc, Release)
+Mini.lean:17:8: error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+        | T.node [u] => g u
+        | x => 0) =
+        0
+
+exit 1
+== v4.36.0-rc1
+Lean (version 4.36.0-rc1, x86_64-w64-windows-gnu, commit c9afcddf514a6772bd4d649f7cfc04eff0b9f15e, Release)
+Mini.lean:17:8: error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+        | T.node [u] => g u
+        | x => 0) =
+        0
+
+exit 1
+== nightly
+Lean (version 4.37.0-nightly-2026-10-20, x86_64-w64-windows-gnu, commit c260aee449e6bda694d253413ba713249803b4cb, Release)
+Mini.lean:17:8: error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+        | T.node [u] => g u
+        | x => 0) =
+        0
+
+exit 1
+
+[exited with code 1]

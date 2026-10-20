@@ -1,0 +1,25 @@
+inductive T where
+  | leaf : T
+  | node : List T → T
+
+mutual
+def f : T → Nat
+  | .node [_, t] =>
+      match t with
+      | .node [u] => g u
+      | _ => 0
+  | _ => 0
+def g : T → Nat
+  | .node [t] => f t
+  | _ => 0
+end
+
+theorem bad (a t : T) (h : f (.node [a, t]) = 0) :
+    (match (generalizing := false) t with | .node [u] => g u | _ => 0) = 0 := by
+  dsimp only [f] at h
+  exact h
+
+theorem good (a t : T) (h : f (.node [a, t]) = 0) :
+    (match (generalizing := false) t with | .node [u] => g u | _ => 0) = 0 := by
+  unfold f at h
+  exact h

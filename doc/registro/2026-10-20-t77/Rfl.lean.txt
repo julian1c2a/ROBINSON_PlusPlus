@@ -1,0 +1,22 @@
+inductive T where
+  | leaf : T
+  | node : List T → T
+
+mutual
+def f : T → Nat
+  | .node [_, t] =>
+      match t with
+      | .node [u] => g u
+      | _ => 0
+  | _ => 0
+def g : T → Nat
+  | .node [t] => f t
+  | _ => 0
+end
+
+-- is the unfolding a definitional equality?
+theorem unfold_rfl (a t : T) :
+    f (.node [a, t]) = (match (generalizing := false) t with | .node [u] => g u | _ => 0) := rfl
+
+#check @f.eq_1
+#print axioms f.eq_1

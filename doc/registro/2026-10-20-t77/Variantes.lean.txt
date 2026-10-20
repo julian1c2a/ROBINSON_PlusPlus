@@ -1,0 +1,63 @@
+inductive T where
+  | var : Nat → T
+  | func : Nat → List T → T
+
+-- (1) sin `id`
+mutual
+def f1 : T → Option Nat
+  | .func _ [_, t] =>
+      match t with
+      | .func _ [u] => (g1 u).map (· + 1)
+      | _ => none
+  | _ => none
+def g1 : T → Option Nat
+  | .func _ [h, t] => (f1 h).bind (fun x => (g1 t).map (x + ·))
+  | _ => some 0
+end
+
+theorem v1_dsimp (c : Nat) (a t : T) (n : Nat) (h : f1 (.func c [a, t]) = some n) :
+    (match (generalizing := false) t with | .func _ [u] => (g1 u).map (· + 1) | _ => none) = some n := by
+  dsimp only [f1] at h
+  exact h
+
+-- (2) con `id`, y `simp only` en vez de `dsimp only`
+mutual
+def f2 : T → Option Nat
+  | .func _ [_, t] =>
+      id (
+        match t with
+        | .func _ [u] => (g2 u).map (· + 1)
+        | _ => none
+      )
+  | _ => none
+def g2 : T → Option Nat
+  | .func _ [h, t] => (f2 h).bind (fun x => (g2 t).map (x + ·))
+  | _ => some 0
+end
+
+theorem v2_simp (c : Nat) (a t : T) (n : Nat) (h : f2 (.func c [a, t]) = some n) :
+    id (match (generalizing := false) t with | .func _ [u] => (g2 u).map (· + 1) | _ => none) = some n := by
+  simp only [f2] at h
+  exact h
+
+-- (3) dsimp en la meta, no en una hipótesis
+theorem v3_goal (c : Nat) (a t : T) (n : Nat)
+    (h : id (match (generalizing := false) t with | .func _ [u] => (g2 u).map (· + 1) | _ => none) = some n) :
+    f2 (.func c [a, t]) = some n := by
+  dsimp only [f2]
+  exact h
+
+-- (4) sin recursión mutua: la llamada bajo el match es a la misma función
+def f4 : T → Option Nat
+  | .func _ [_, t] =>
+      id (
+        match t with
+        | .func _ [u] => (f4 u).map (· + 1)
+        | _ => none
+      )
+  | _ => none
+
+theorem v4_dsimp (c : Nat) (a t : T) (n : Nat) (h : f4 (.func c [a, t]) = some n) :
+    id (match (generalizing := false) t with | .func _ [u] => (f4 u).map (· + 1) | _ => none) = some n := by
+  dsimp only [f4] at h
+  exact h

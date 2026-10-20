@@ -1,0 +1,29 @@
+inductive T where
+  | var : Nat → T
+  | func : Nat → List T → T
+
+mutual
+def f : T → Option Nat
+  | .func _ [_, t] =>
+      id (
+        match t with
+        | .func _ [u] => (g u).map (· + 1)
+        | _ => none
+      )
+  | _ => none
+def g : T → Option Nat
+  | .func _ [h, t] => (f h).bind (fun x => (g t).map (x + ·))
+  | _ => some 0
+end
+
+-- Accepted by the elaborator, rejected by the kernel:
+theorem f_dsimp (c : Nat) (a t : T) (n : Nat) (h : f (.func c [a, t]) = some n) :
+    id (match (generalizing := false) t with | .func _ [u] => (g u).map (· + 1) | _ => none) = some n := by
+  dsimp only [f] at h
+  exact h
+
+-- The same goal with `unfold` is accepted by the kernel:
+theorem f_unfold (c : Nat) (a t : T) (n : Nat) (h : f (.func c [a, t]) = some n) :
+    id (match (generalizing := false) t with | .func _ [u] => (g u).map (· + 1) | _ => none) = some n := by
+  unfold f at h
+  exact h

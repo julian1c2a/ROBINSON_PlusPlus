@@ -1,0 +1,103 @@
+# T77 (ADR-172): el texto de la issue pública https://github.com/leanprover/lean4/issues/15822, abierta el 2026-10-20.
+
+### Prerequisites
+
+* [x] Check that your issue is not already filed:
+      https://github.com/leanprover/lean4/issues
+* [x] Reduce the issue to a minimal, self-contained, reproducible test case.
+      Avoid dependencies to Mathlib or Batteries.
+* [x] Test your test case against the latest nightly release, for example on
+      https://live.lean-lang.org/#project=lean-nightly
+      (You can also use the settings there to switch to “Lean nightly”)
+* [ ] When reporting a perceived soundness bug: Does it affect `lake check --paranoid`?
+      If in doubt, please reach out on security@lean-fro.org for responsible disclosure.
+      (Not a soundness bug: the kernel rejects the term.)
+
+### Description
+
+`dsimp only [f] at h` unfolds a function `f` defined by mutual structural recursion over a nested inductive, and the
+elaborator accepts the resulting proof, but the kernel rejects it. It happens when the recursive call in the unfolded
+branch is to a subterm that only appears after an inner `match` on a variable. `unfold f at h` on the same goal is
+accepted.
+
+The step that `dsimp` takes is not a definitional equality for the elaborator either: `rfl` on the same equation
+fails with "Not a definitional equality" (see Additional Information).
+
+### Context
+
+Found while proving injectivity of a decoder over first-order terms (`var : Nat → T`, `func : S → List T → T`) in a
+formalization project. The workaround is `unfold` (or functional induction) instead of `dsimp`/`simp only [f]`. The
+reproduction below has no imports.
+
+### Steps to Reproduce
+
+```lean
+inductive T where
+  | leaf : T
+  | node : List T → T
+
+mutual
+def f : T → Nat
+  | .node [_, t] =>
+      match t with
+      | .node [u] => g u
+      | _ => 0
+  | _ => 0
+def g : T → Nat
+  | .node [t] => f t
+  | _ => 0
+end
+
+theorem bad (a t : T) (h : f (.node [a, t]) = 0) :
+    (match (generalizing := false) t with | .node [u] => g u | _ => 0) = 0 := by
+  dsimp only [f] at h
+  exact h
+
+theorem good (a t : T) (h : f (.node [a, t]) = 0) :
+    (match (generalizing := false) t with | .node [u] => g u | _ => 0) = 0 := by
+  unfold f at h
+  exact h
+```
+
+**Expected behavior:** either `dsimp only [f] at h` produces a proof that the kernel accepts, or it does not unfold
+`f` here (as when `f` is not mutual: then it reports "`dsimp` made no progress").
+
+**Actual behavior:** `good` is accepted; `bad` is accepted by the elaborator and rejected by the kernel:
+
+```
+error: (kernel) declaration type mismatch, 'bad' has type
+  ∀ (a t : T), f (T.node [a, t]) = 0 → f (T.node [a, t]) = 0
+but it is expected to have type
+  ∀ (a t : T),
+    f (T.node [a, t]) = 0 →
+      (match t with
+        | T.node [u] => g u
+        | x => 0) =
+        0
+```
+
+### Versions
+
+Lean (version 4.37.0-nightly-2026-10-20, x86_64-w64-windows-gnu, commit c260aee449e6bda694d253413ba713249803b4cb, Release)
+
+Also reproduced with 4.29.0, 4.31.0, 4.33.0, 4.35.0 and 4.36.0-rc1 (on the older ones the expected type is printed as
+"failed to pretty print expression"). Windows 11.
+
+### Additional Information
+
+* The same happens with `simp only [f] at h`, and with `dsimp only [f]` on the goal (then the kernel reports an
+  `application type mismatch` on `id h`).
+* With a non-mutual `f` whose recursive call under the inner `match` is to `f` itself, `dsimp only [f] at h` makes no
+  progress.
+* The unfolding is not definitional for the elaborator:
+  ```lean
+  theorem unfold_rfl (a t : T) :
+      f (.node [a, t]) = (match (generalizing := false) t with | .node [u] => g u | _ => 0) := rfl
+  ```
+  gives "Not a definitional equality: the left-hand side `f (T.node [a, t])` is not definitionally equal to the
+  right-hand side `match t with | T.node [u] => g u | x => 0`", and `f.eq_1 : ∀ (head u : T), f (T.node [head,
+  T.node [u]]) = g u` depends on `propext`.
+
+### Impact
+
+Add :+1: to [issues you consider important](https://github.com/leanprover/lean4/issues?q=is%3Aissue+is%3Aopen+sort%3Areactions-%2B1-desc). If others are impacted by this issue, please ask them to add :+1: to it.
