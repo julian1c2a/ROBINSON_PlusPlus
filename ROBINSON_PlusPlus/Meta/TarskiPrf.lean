@@ -24,6 +24,8 @@ import FOL.Lift0
   verdad en la teoría, y falla en su propio mentiroso, que es una sentencia (`liar_isSentence`) del lenguaje de
   `Tr` y de la aritmética. ⚠️ No se enuncia la forma «para toda `φ`»: una fórmula abierta o un símbolo ajeno la
   refutan sin mentiroso (§4).
+* `godelCN_isSentence` — la sentencia de Gödel también es una sentencia, por la misma vía que `liar_isSentence` (T12,
+  ADR‑187).
 * `tarski_semantico_de (hM) (Tr) (v)` — **Tarski semántico**: tampoco en un modelo estándar CUALQUIERA (`Estandar M`,
   T75a, ADR‑175); `tarski_semantico (Tr) (v)` es su instancia en `MNV V₀`, **Tarski en ℕ**.
 
@@ -121,6 +123,22 @@ theorem liar_isSentence {Tr : Formula} (hTr : liftFormula 1 Tr = Tr) : IsSentenc
   rw [FOL.Lift0.liftFormula_subst _ 0 0 (Nat.le_refl 0),
     ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_numeral, hβ]
 
+/-- `godelPred' = ¬ provFormulaC'` tiene a lo sumo `#0` libre. -/
+theorem godelPred'_lift2 : liftFormula 2 godelPred' = godelPred' := by
+  simp only [godelPred', neg, provFormulaC', liftFormula, liftTerm, liftTerms, land, chainOk, In, runFn, nil, zero,
+    Nat.reduceAdd, Nat.reduceLT, reduceIte]
+
+theorem godelBeta'_lift1 : liftFormula (0 + 1) godelBeta' = godelBeta' := by
+  unfold godelBeta'
+  rw [FOL.Lift0.liftFormula_subst _ 0 1 (Nat.zero_le 1), liftTerm_one_diagTerm, godelPred'_lift2]
+
+/-- 🏁 **La sentencia de Gödel es una SENTENCIA** (T12, ADR‑187): la gemela de `liar_isSentence` para `godelCN`. Por
+    `unfold` y `rw` con lemas universales: el numeral `numeral (codeNat godelBeta')` no se evalúa nunca. -/
+theorem godelCN_isSentence : IsSentence godelCN := by
+  unfold IsSentence godelCN selfAppN
+  rw [FOL.Lift0.liftFormula_subst _ 0 0 (Nat.le_refl 0),
+    ROBINSON_PlusPlus.Meta.DerivCondPrf.liftTerm_numeral, godelBeta'_lift1]
+
 /-! ## §6 · Control negativo: con `Prf ⊥`, el bicondicional del mentiroso SÍ sería teorema (la consistencia no
 sobra) -/
 example (hbot : Prf Formula.bottom) (Tr : Formula) :
@@ -162,3 +180,4 @@ end ROBINSON_PlusPlus.Meta.TarskiPrf
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico_de
 #print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico
+#print axioms ROBINSON_PlusPlus.Meta.TarskiPrf.godelCN_isSentence

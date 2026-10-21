@@ -5629,6 +5629,7 @@ theorem tarski_semantico_de {M} (hM : Estandar M) (Tr) (v) :
   ¬ (evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔ evalFormula M v (liar Tr))
 theorem tarski_semantico (Tr) (v) : …                       -- la instancia en MNV V₀ (estandar_MN)
 theorem liar_isSentence {Tr} (hTr : liftFormula 1 Tr = Tr) : IsSentence (liar Tr)
+theorem godelCN_isSentence : IsSentence godelCN          -- la gemela, para la sentencia de Gödel (T12, ADR‑187)
 ```
 
 ## §3.77 · `Meta/RigidezEstandar.lean` y `Meta/SegundoModelo.lean` — en TODO modelo estándar, y no hay uno solo (ADR‑173, ADR‑175)

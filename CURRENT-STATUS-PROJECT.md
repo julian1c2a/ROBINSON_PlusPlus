@@ -26,7 +26,7 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 | `axiom` de Lean | 0 `axiom` de Lean en el build, en RPP y en FOL | `check-sorry.bash`, `check-estratos.bash` y `../FOL/check-axioms.bash`, por entorno y con señuelo (T13) |
 | Axiomas objeto | **142**: 34 matemáticos (`coreAxioms`) + 107 de codificación (`codingAxioms`) + el ancla diagonal | `axioms_len` y `axiomsBase_len` (`Full/Induction.lean`), por `rfl`, en cada build |
 | Titulares | **29**, cada uno con su fila en [TEOREMAS](TEOREMAS-E-HIPOTESIS.md) §1 o §3 | `[T]` (`T_UNIVERSO`); el contrato de sus enunciados (T07, `Meta/ContratoTitulares.lean`: 544 constantes en el cierre de sus tipos) y la pureza de la clase (i) (T08, `Meta/PurezaTitulares.lean`), en cada build |
-| Footprints | **533** filas | `check-footprints.bash` |
+| Footprints | **534** filas | `check-footprints.bash` |
 | Avisos | **28** declarados: los 9 de siempre y 19 nombres obsoletos en seis módulos congelados de FOL | `check-warnings.bash` |
 | Estratos | **10** nociones de derivabilidad, ninguna habitada por un `axiom` | `check-estratos.bash` |
 | Núcleo | `leanchecker` re‑comprueba en la CI cada declaración de RPP, FOL y TheoryFramework | `.github/workflows/build.yml` |

@@ -275,6 +275,7 @@ ROBINSON_PlusPlus.Meta.TarskiPrf.prf_diagonal|Classical.choice,Quot.sound,propex
 ROBINSON_PlusPlus.Meta.TarskiPrf.prf_tarski|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.TarskiPrf.tarski|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.TarskiPrf.tarski_semantico|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.TarskiPrf.godelCN_isSentence|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezVerificador.verificador_solido|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezVerificador.goedel_I_neg|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezVerificador.godelCN_indecidible|Classical.choice,Quot.sound,propext
