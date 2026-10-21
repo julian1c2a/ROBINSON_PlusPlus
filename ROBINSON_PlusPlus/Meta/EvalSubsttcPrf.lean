@@ -201,9 +201,9 @@ theorem pcc_substtc_func_code (v s p b : Term) :
   have g2v2 : Prf (substtc (numeral 2) W2 (varc (numeral 2)) =eq tcFn s) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 2) W2 (numeral 2)) (prf_refl _)) hA2
   have g2v1 : Prf (substtc (numeral 2) W2 (varc (numeral 1)) =eq varc (numeral 1)) :=
-    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 1)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 1)) (prf_numeral_lt (by omega))
   have g2v0 : Prf (substtc (numeral 2) W2 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 0)) (prf_numeral_lt (by omega))
   have g2tv : Prf (substtc (numeral 2) W2 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 2 W2 v
   have hL2 : Prf (substfc (numeral 2) W2 (eqCodeFn
         (substtcT (tcFn v) (varc (numeral 2)) (funccT (varc (numeral 1)) (varc (numeral 0))))
@@ -225,7 +225,7 @@ theorem pcc_substtc_func_code (v s p b : Term) :
   have g1v1 : Prf (substtc (numeral 1) W1 (varc (numeral 1)) =eq tcFn p) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) hA1
   have g1v0 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_numeral_lt (by omega))
   have g1tv : Prf (substtc (numeral 1) W1 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 1 W1 v
   have g1ts : Prf (substtc (numeral 1) W1 (tcFn s) =eq tcFn s) := prf_substtc_tcFn_at 1 W1 s
   have hL1 : Prf (substfc (numeral 1) W1 (eqCodeFn
@@ -317,9 +317,9 @@ theorem pcc_substtsc_cons_code (v s h t : Term) :
   have g2v2 : Prf (substtc (numeral 2) W2 (varc (numeral 2)) =eq tcFn s) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 2) W2 (numeral 2)) (prf_refl _)) hA2
   have g2v1 : Prf (substtc (numeral 2) W2 (varc (numeral 1)) =eq varc (numeral 1)) :=
-    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 1)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 1)) (prf_numeral_lt (by omega))
   have g2v0 : Prf (substtc (numeral 2) W2 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 0)) (prf_numeral_lt (by omega))
   have g2tv : Prf (substtc (numeral 2) W2 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 2 W2 v
   have hL2 : Prf (substfc (numeral 2) W2 (eqCodeFn
         (substtscT (tcFn v) (varc (numeral 2)) (consT (varc (numeral 1)) (varc (numeral 0))))
@@ -344,7 +344,7 @@ theorem pcc_substtsc_cons_code (v s h t : Term) :
   have g1v1 : Prf (substtc (numeral 1) W1 (varc (numeral 1)) =eq tcFn h) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) hA1
   have g1v0 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_numeral_lt (by omega))
   have g1tv : Prf (substtc (numeral 1) W1 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 1 W1 v
   have g1ts : Prf (substtc (numeral 1) W1 (tcFn s) =eq tcFn s) := prf_substtc_tcFn_at 1 W1 s
   have hL1 : Prf (substfc (numeral 1) W1 (eqCodeFn
@@ -444,7 +444,7 @@ theorem pcc_substtc_var_eq_code (v s n : Term) :
   have g1v1 : Prf (substtc (numeral 1) W1 (varc (numeral 1)) =eq tcFn s) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) hA1
   have g1v0 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_numeral_lt (by omega))
   have g1tv : Prf (substtc (numeral 1) W1 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 1 W1 v
   have hL1 : Prf (substfc (numeral 1) W1
         (implc (eqCodeFn (tcFn v) (varc (numeral 0)))
@@ -511,7 +511,7 @@ theorem pcc_substtc_var_gt_code (v s n : Term) :
   have g1v1 : Prf (substtc (numeral 1) W1 (varc (numeral 1)) =eq tcFn s) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) hA1
   have g1v0 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_numeral_lt (by omega))
   have g1tv : Prf (substtc (numeral 1) W1 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 1 W1 v
   have hL1 : Prf (substfc (numeral 1) W1
         (implc (ltCodeFn (tcFn v) (varc (numeral 0)))
@@ -588,7 +588,7 @@ theorem pcc_substtc_var_lt_code (v s n : Term) :
   have g1v1 : Prf (substtc (numeral 1) W1 (varc (numeral 1)) =eq tcFn s) :=
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) hA1
   have g1v0 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_gnum_lt (by omega))
+    prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0)) (prf_numeral_lt (by omega))
   have g1tv : Prf (substtc (numeral 1) W1 (tcFn v) =eq tcFn v) := prf_substtc_tcFn_at 1 W1 v
   have hL1 : Prf (substfc (numeral 1) W1
         (implc (ltCodeFn (varc (numeral 0)) (tcFn v))

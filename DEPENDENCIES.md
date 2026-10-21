@@ -43,7 +43,7 @@ Extraída **por máquina** de los `import` reales de los módulos activos de `Me
 
 | nivel | subsistema | módulos |
 |---|---|---|
-| L0–L2 | **cálculo finitario + Nivel B/C** | `Hilbert`, `Godel`, `CodeDecode` · `HilbertDeduction`, `Provability`, `CodeArith` · `HilbertSeq`, `SubstArith`, `CodeDistinct` |
+| L0–L2 | **cálculo finitario + Nivel B/C** | `Hilbert`, `Godel`, `CodeDecode` · `HilbertDeduction`, `Provability`, «CodeArith» (retirado, ADR‑190) · `HilbertSeq`, `SubstArith`, `CodeDistinct` |
 | L3–L5 | **aritmetización del verificador** | `StepArith` · `CheckArith`, `Induction` · `ProofChain`, `ListInductionArith` |
 | L6–L8 | **representabilidad + capa ω** | `Representability` · `Necessitation`, **`ReprPrf`** · `ArithPrf`, `ChainPrf`, `Diagonal`, `NumListPrf`, `LineWFDerives`, `AxiomListCode` |
 | L9–L12 | **D1/D2 sobre `Prf` + aritmética en `Prf`** | `Representability2`, `DerivCond`, `TcArithPrf`, `SubstCodeOpenPrf`, `NatArithPrf` · `Representability2Prf`, `NumCodeClosedPrf`, `Reflection`, `BoundedInPrf`, `ChainDecode`, `DiagonalTwo`, `NatOrderPrf` · `DerivCondPrf`, `GodelTwo`, `NatMulPrf`, `RunFnBoundedPrf` · `ReflectionPrf`, `ChainOkBoundedPrf`, `CantorMonoPrf` |

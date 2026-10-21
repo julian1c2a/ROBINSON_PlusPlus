@@ -1017,10 +1017,10 @@ theorem pcc_substfc_ter_dot (T : Term) (nm : List Char) (hT : ∀ c : Nat, liftT
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 2) W2 (numeral 2)) (prf_refl _)) hs2
   have k21 : Prf (substtc (numeral 2) W2 (varc (numeral 1)) =eq varc (numeral 1)) :=
     prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 1))
-      (prf_gnum_lt (show (1 : Nat) < 2 by omega))
+      (prf_numeral_lt (show (1 : Nat) < 2 by omega))
   have k20 : Prf (substtc (numeral 2) W2 (varc (numeral 0)) =eq varc (numeral 0)) :=
     prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 0))
-      (prf_gnum_lt (show (0 : Nat) < 2 by omega))
+      (prf_numeral_lt (show (0 : Nat) < 2 by omega))
   have hmid2 : Prf (substfc (numeral 2) W2 (eqCodeFn
         (substfcT (tcFn v) (varc (numeral 2))
           (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
@@ -1047,7 +1047,7 @@ theorem pcc_substfc_ter_dot (T : Term) (nm : List Char) (hT : ∀ c : Nat, liftT
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) ha1
   have k10 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
     prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0))
-      (prf_gnum_lt (show (0 : Nat) < 1 by omega))
+      (prf_numeral_lt (show (0 : Nat) < 1 by omega))
   have hmid1 : Prf (substfc (numeral 1) W1 (eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (gT nm (tcFn v) (tcFn s) (varc (numeral 1)))
@@ -1156,10 +1156,10 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 2) W2 (numeral 2)) (prf_refl _)) hs2
   have k21 : Prf (substtc (numeral 2) W2 (varc (numeral 1)) =eq varc (numeral 1)) :=
     prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 1))
-      (prf_gnum_lt (show (1 : Nat) < 2 by omega))
+      (prf_numeral_lt (show (1 : Nat) < 2 by omega))
   have k20 : Prf (substtc (numeral 2) W2 (varc (numeral 0)) =eq varc (numeral 0)) :=
     prf_mp (prf_substtc_var_lt (numeral 2) W2 (numeral 0))
-      (prf_gnum_lt (show (0 : Nat) < 2 by omega))
+      (prf_numeral_lt (show (0 : Nat) < 2 by omega))
   have hmid2 : Prf (substfc (numeral 2) W2 (eqCodeFn
         (substfcT (tcFn v) (varc (numeral 2))
           (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
@@ -1184,7 +1184,7 @@ theorem pcc_substfc_atom_dot (v s a b : Term) :
     prf_eq_trans (prf_mp (prf_substtc_var_eq (numeral 1) W1 (numeral 1)) (prf_refl _)) ha1
   have k10 : Prf (substtc (numeral 1) W1 (varc (numeral 0)) =eq varc (numeral 0)) :=
     prf_mp (prf_substtc_var_lt (numeral 1) W1 (numeral 0))
-      (prf_gnum_lt (show (0 : Nat) < 1 by omega))
+      (prf_numeral_lt (show (0 : Nat) < 1 by omega))
   have hmid1 : Prf (substfc (numeral 1) W1 (eqCodeFn
         (substfcT (tcFn v) (tcFn s) (binK (termCode T) (varc (numeral 1)) (varc (numeral 0))))
         (binK (termCode T) (varc (numeral 1))

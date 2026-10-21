@@ -1,0 +1,55 @@
+# T76 (ADR-190): el censo de las definiciones duplicadas de la codificación y el numeral, comparando sus cuerpos,
+# el 2026-10-21, sobre master edbefcc (antes del cambio). Las líneas son las de ese commit. Lo de «después», medido con
+# el build del commit de ADR-190 (lake build, Lean v4.35.0).
+
+== 1 · LAS DEFINICIONES DUPLICADAS (cuerpo contra cuerpo)
+
+numeral : Nat → Term   (0 ↦ zero · n+1 ↦ succ (numeral n)), TRES copias de cuerpo idéntico:
+  ROBINSON_PlusPlus.Meta.Godel.numeral        Meta/Godel.lean:73
+  ROBINSON_PlusPlus.Full.numeral              Full/Numerals.lean:46   (el módulo: la def y 4 lemas rfl @[simp]
+                                                                       —numeral_zero/succ/one/two— que nadie usaba:
+                                                                       ningún fichero abría ROBINSON_PlusPlus.Full)
+  ROBINSON_PlusPlus.Minimal.Axioms.numeralM   Minimal/Axioms.lean:592
+
+la codificación, DOS copias (la de Minimal escrita con numeralM, la de Meta con numeral; por lo demás, idénticas):
+  charsCodeM / strCodeM / termCodeM, termsCodeM / formCodeM / listFormCodeM     Minimal/Axioms.lean:605-637
+  charsCode  / strCode  / termCode,  termsCode  / formCode  / listFormCode      Meta/Provability.lean:34-55,
+                                                                                Meta/Representability.lean:80
+
+diagTermM  = substfc zero        (tcFn (.var 0)) (.var 0)     Minimal/Axioms.lean:1112
+diagTerm   = substfc (numeral 0) (tcFn (Term.var 0)) (Term.var 0)   Meta/Diagonal.lean:64
+  iguales por definición (numeral 0 ≡ zero); ningún puente, y ninguno hace falta: diagTermM sólo vive dentro del
+  axioma diagonal (psiD), y nadie necesita la ecuación.
+
+dec / decodeForm: decidido en T66 (ADR-160): queda dec; decodeForm salió del build con CodeDecode.
+
+== 2 · LOS PUENTES Y LAS PRUEBAS ESPEJO (antes)
+
+numeralM_eq    : numeralM n = Godel.numeral n         Meta/CheckArith.lean:55     usado en 10 módulos
+numeral_bridge : Godel.numeral n = Full.numeral n     Meta/CodeArith.lean:51      (el módulo entero era esto)
+num_bridge     : Full.numeral n = Godel.numeral n     Meta/CodeNatInjPrf.lean:192 SIN consumidor: el mismo puente, dos veces
+charsCodeM_eq, strCodeM_eq, termCodeM_eq, termsCodeM_eq, formCodeM_eq, listFormCodeM_eq
+                                                      Meta/Representability.lean:92-117 (uno por par, sobre numeralM_eq)
+
+espejos por numeral_bridge (la prueba de verdad, sobre Full.numeral; el espejo, sobre Godel.numeral por rw):
+  prf_numeral_add (Meta/ArithPrf.lean)      → prf_gnum_add (Meta/CodeNumeralPrf.lean:75)
+  prf_numeral_lt  (Meta/ArithPrf.lean)      → prf_gnum_lt  (Meta/ArithPrf.lean:130)   usado en 10 módulos y 1 sondeo
+  prf_numeral_mul (Meta/Div2ParityPrf.lean) → prf_gnum_mul (Meta/Div2ParityPrf.lean:104)
+
+== 3 · LO HECHO (ADR-190)
+
+fuera: Full/Numerals.lean (Full.numeral y sus 4 lemas), Meta/CodeArith.lean (numeral_bridge), num_bridge,
+       prf_gnum_add, prf_gnum_lt, prf_gnum_mul.
+prf_numeral_add, prf_numeral_lt y prf_numeral_mul, sobre el único numeral (Meta.Godel.numeral); sus usos, renombrados
+(13 módulos y sondeos/A3IsFCBTracked.lean). El `open` de CodeArith, fuera de ArithPrf, SubstArith y sondeos/TagConclCoste.lean.
+
+se queda: numeralM y la codificación …M, porque Minimal no puede importar Meta (Minimal/Axioms.lean las necesita para
+enunciar el axioma diagonal del ancla), con UN puente, numeralM_eq, y los seis de la codificación encima de él, uno por par.
+El build los vigila: cada puente se prueba por inducción sobre los dos cuerpos, y si una copia cambia sin la otra deja de
+compilar (y numeralM_eq está en el cono: lo usan 10 módulos).
+
+== 4 · VISTO DE PASO, FUERA DE T76 (duplicados de LEMA, no de definición)
+
+liftTerm_numeralM               Minimal/Axioms.lean:692 y Meta/PremsOfDotPrf.lean:284 (mismo enunciado, otro namespace)
+prf_tc_numeralM                 Meta/LineWFSchemaPrf.lean:80 y prf_tc_numeralM' en Meta/LineWFTrackedPrf.lean:271
+substtc_inv_termCode_numeralM   Meta/LineWFSchemaPrf.lean y substtc_inv_termCode_numeralM' en Meta/LineWFTrackedPrf.lean

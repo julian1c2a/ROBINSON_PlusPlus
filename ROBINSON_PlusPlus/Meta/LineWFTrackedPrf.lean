@@ -550,9 +550,9 @@ theorem pcc_lencDot (t : Term) :
   exact PrfH.mp _ _ _
     (prf_to_prfH (prf_provCode_congr (prf_eq_symm (prf_lencDot_eq t))) _) hev2
 
-/-- Orden estricto entre numerales `numeralM` (vía `numeralM_eq` + `prf_gnum_lt`). -/
+/-- Orden estricto entre numerales `numeralM` (vía `numeralM_eq` + `prf_numeral_lt`). -/
 theorem prf_lt_numeralM {a b : Nat} (h : a < b) : Prf (lt (numeralM a) (numeralM b)) := by
-  rw [numeralM_eq, numeralM_eq]; exact prf_gnum_lt h
+  rw [numeralM_eq, numeralM_eq]; exact prf_numeral_lt h
 
 /-! ### Paso 6e — `lwfDot t` es el código que pide la reflexión punteada
 

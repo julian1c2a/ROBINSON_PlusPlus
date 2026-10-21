@@ -400,7 +400,7 @@ theorem substtc_inv_tcFn_at1 (w : Term) : ∀ V, Prf (substtc (succ zero) V (tcF
 
 theorem prf_substtc_varc0_at1 (V : Term) :
     Prf (substtc (succ zero) V (varc (numeral 0)) =eq varc (numeral 0)) :=
-  prf_mp (prf_substtc_var_lt (succ zero) V (numeral 0)) (prf_gnum_lt (by omega : 0 < 1))
+  prf_mp (prf_substtc_var_lt (succ zero) V (numeral 0)) (prf_numeral_lt (by omega : 0 < 1))
 
 /-- **EL PUENTE**: `⊢ Prov(⌜ (∃i<lenc(ẇ). nthc(ẇ,i)=ẋ) ⇒ ẋ ∈ ẇ ⌝)`, `x`, `w` ABSTRACTOS. -/
 theorem pcc_InBwd_computed (x w : Term) :

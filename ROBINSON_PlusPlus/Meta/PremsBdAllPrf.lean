@@ -287,7 +287,7 @@ theorem substtc_id_substCodeT2 (v : Nat) (u0 W : Term)
           rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         rcases Nat.lt_or_ge n v with hlt2 | hge2
-        · exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+        · exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_numeral_lt (by omega))
         · have hnv : n = v := by omega
           subst hnv
           exact prf_eq_trans
@@ -1122,7 +1122,7 @@ theorem substtc_inv_substCodeT2 (v : Nat) (u0 W : Term)
           rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
         exact prf_mp (prf_substtc_var_lt (numeral (v + 1)) u (numeral n))
-          (prf_gnum_lt (by omega))
+          (prf_numeral_lt (by omega))
       · rcases Nat.lt_or_ge n (v + 2) with hlt3 | hge3
         · have hnv : n = v + 1 := by omega
           subst hnv

@@ -304,7 +304,7 @@ theorem prf_substtc_varc_eq (v : Nat) (s : Term) :
 /-- `varc j̄` sobrevive cuando `j < v`. -/
 theorem prf_substtc_varc_lt {j v : Nat} (h : j < v) (s : Term) :
     Prf (substtc (numeral v) s (varc (numeral j)) =eq varc (numeral j)) :=
-  prf_mp (prf_substtc_var_lt (numeral v) s (numeral j)) (prf_gnum_lt h)
+  prf_mp (prf_substtc_var_lt (numeral v) s (numeral j)) (prf_numeral_lt h)
 
 /-! ## §7 · PLANTILLA aridad 3, RHS `nil` -/
 

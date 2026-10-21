@@ -49,7 +49,7 @@ no añade nada.
 
 **Además este módulo cubre dos huecos que no estaban registrados**: `ax12_mul_distrib` y el
 homomorfismo `numeral a · numeral b = numeral (a·b)` **no existían a nivel `Prf`**: sólo la versión
-ω, en `Full/Numerals.lean`, de la capa `Derives`, que no servía aquí y quedó retirada (ADR‑115).
+ω, en el «Full/Numerals.lean» de entonces, de la capa `Derives`, que no servía aquí y quedó retirada (ADR‑115).
 -/
 
 /-! ### Piezas que faltaban del producto -/
@@ -78,33 +78,27 @@ theorem PrfH_eq_congr_mul2 {Γ : List Formula} {t₁ t₂ : Term} (c : Term)
 Espejo exacto de `prf_numeral_add` (`Meta/ArithPrf.lean`). Inducción **meta** en `b`: para `b`
 simbólico queda una aplicación, Lean no la despliega (medido en el sondeo S3). -/
 
-/-- `numeral a · numeral b = numeral (a·b)` sobre `Full.numeral`. -/
+/-- `numeral a · numeral b = numeral (a·b)`. -/
 theorem prf_numeral_mul (a b : Nat) :
-    Prf (mul (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral b)
-      =eq ROBINSON_PlusPlus.Full.numeral (a * b)) := by
+    Prf (mul (numeral a) (numeral b)
+      =eq numeral (a * b)) := by
   induction b with
   | zero =>
-      show Prf (mul (ROBINSON_PlusPlus.Full.numeral a) zero =eq zero)
+      show Prf (mul (numeral a) zero =eq zero)
       exact prf_mul_zero _
   | succ k ih =>
-      show Prf (mul (ROBINSON_PlusPlus.Full.numeral a)
-        (succ (ROBINSON_PlusPlus.Full.numeral k)) =eq ROBINSON_PlusPlus.Full.numeral (a * (k+1)))
-      have h1 := prf_mul_succ (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral k)
-      have h2 : Prf (add (mul (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral k))
-                       (ROBINSON_PlusPlus.Full.numeral a)
-                  =eq add (ROBINSON_PlusPlus.Full.numeral (a*k))
-                          (ROBINSON_PlusPlus.Full.numeral a)) :=
+      show Prf (mul (numeral a)
+        (succ (numeral k)) =eq numeral (a * (k+1)))
+      have h1 := prf_mul_succ (numeral a) (numeral k)
+      have h2 : Prf (add (mul (numeral a) (numeral k))
+                       (numeral a)
+                  =eq add (numeral (a*k))
+                          (numeral a)) :=
         prf_eq_congr_add1 _ ih
       have h3 := prf_numeral_add (a*k) a
       have hn : a * (k+1) = a*k + a := Nat.mul_succ a k
       rw [hn]
       exact prf_eq_trans h1 (prf_eq_trans h2 h3)
-
-/-- Igual, sobre `Godel.numeral` — la que usan `formCode`/`termCode`. -/
-theorem prf_gnum_mul (a b : Nat) :
-    Prf (mul (numeral a) (numeral b) =eq numeral (a * b)) := by
-  rw [numeral_bridge, numeral_bridge, numeral_bridge]
-  exact prf_numeral_mul a b
 
 /-! ### L1 — monotonía ESTRICTA del doble
 
@@ -254,14 +248,14 @@ theorem prf_div2_double (x : Term) : Prf (div2 (mul x two) =eq x) := by
 
 /-! ### L5 — la forma NUMERAL: **el hito del frente S4**
 
-Instancia de L4 en `numeral m`, cruzada con `prf_gnum_mul m 2` (`numeral 2 = two` es **defeq**).
+Instancia de L4 en `numeral m`, cruzada con `prf_numeral_mul m 2` (`numeral 2 = two` es **defeq**).
 Es la pieza de la que cuelgan `prf_cons_eval` → `prf_formCode_numeral` (= la `hFN` que el piloto
 del lema diagonal, `archivo/sondeos-2026-10:sondeos/PilotoDiagonal.lean`, asumía). -/
 
 /-- **L5** — `div2 (numeral (2m)) = numeral m`. **La pieza que faltaba de la reparación.** -/
 theorem prf_div2_numeral (m : Nat) : Prf (div2 (numeral (2 * m)) =eq numeral m) := by
   have hmul : Prf (mul (numeral m) two =eq numeral (2 * m)) := by
-    have h := prf_gnum_mul m 2
+    have h := prf_numeral_mul m 2
     rw [Nat.mul_comm m 2] at h
     exact h
   exact prf_eq_trans (prf_eq_congr_div2 (prf_eq_symm hmul)) (prf_div2_double (numeral m))
@@ -407,7 +401,7 @@ end ROBINSON_PlusPlus.Meta.Div2ParityPrf
 
 export ROBINSON_PlusPlus.Meta.Div2ParityPrf (
   prf_mul_distrib PrfH_eq_congr_mul2
-  prf_numeral_mul prf_gnum_mul
+  prf_numeral_mul
   prf_mul_two_lt_mono
   prf_mul_two_cancel prf_mod2_double
   prf_eq_congr_div2 prf_div2_double prf_div2_numeral

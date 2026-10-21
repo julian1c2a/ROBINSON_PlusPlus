@@ -20,7 +20,6 @@ import ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
-open ROBINSON_PlusPlus.Meta.CodeArith
 open ROBINSON_PlusPlus.Meta.SubstArith
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
@@ -97,39 +96,34 @@ theorem prf_add_succ_t (a b : Term) : Prf (add a (succ b) =eq succ (add a b)) :=
 
 /-- Homomorfismo aditivo en `Prf` (inducción meta en `b`). -/
 theorem prf_numeral_add (a b : Nat) :
-    Prf (add (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral b)
-      =eq ROBINSON_PlusPlus.Full.numeral (a + b)) := by
+    Prf (add (numeral a) (numeral b)
+      =eq numeral (a + b)) := by
   induction b with
-  | zero => exact prf_add_zero_t (ROBINSON_PlusPlus.Full.numeral a)
+  | zero => exact prf_add_zero_t (numeral a)
   | succ k ih =>
-    show Prf (add (ROBINSON_PlusPlus.Full.numeral a) (succ (ROBINSON_PlusPlus.Full.numeral k))
-      =eq succ (ROBINSON_PlusPlus.Full.numeral (a + k)))
-    exact prf_eq_trans (prf_add_succ_t (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral k))
+    show Prf (add (numeral a) (succ (numeral k))
+      =eq succ (numeral (a + k)))
+    exact prf_eq_trans (prf_add_succ_t (numeral a) (numeral k))
       (prf_eq_congr_succ ih)
 
-/-- Orden estricto en `Prf` (sobre `Full.numeral`; espejo de `numeral_lt`). -/
+/-- Orden estricto en `Prf` sobre numerales (espejo del «numeral_lt» de la capa `⊢`, retirada con ADR‑115). -/
 theorem prf_numeral_lt {a b : Nat} (h : a < b) :
-    Prf (lt (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral b)) := by
+    Prf (lt (numeral a) (numeral b)) := by
   obtain ⟨k, hk⟩ : ∃ k : Nat, b = a + (k + 1) := ⟨b - a - 1, by omega⟩
   subst hk
   have h13 := prf_ax (show ax13_lt_def ∈ axioms by simp [axioms])
-  have hiff := prf_spec (prf_spec h13 (ROBINSON_PlusPlus.Full.numeral a))
-    (ROBINSON_PlusPlus.Full.numeral (a + (k + 1)))
+  have hiff := prf_spec (prf_spec h13 (numeral a))
+    (numeral (a + (k + 1)))
   simp [substFormula, substTerm, substTerms, lt, succ, iff, liftTerm, liftTerms,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift] at hiff
   apply prf_iff_mpr hiff
-  apply prf_ex_intro (ROBINSON_PlusPlus.Full.numeral k)
+  apply prf_ex_intro (numeral k)
   simp [substFormula, substTerm, substTerms, add, succ,
         FOL.substTerm_liftTerm, FOL.substTerm_liftLift]
-  show Prf (add (ROBINSON_PlusPlus.Full.numeral a) (succ (ROBINSON_PlusPlus.Full.numeral k))
-    =eq succ (ROBINSON_PlusPlus.Full.numeral (a + k)))
-  exact prf_eq_trans (prf_add_succ_t (ROBINSON_PlusPlus.Full.numeral a) (ROBINSON_PlusPlus.Full.numeral k))
+  show Prf (add (numeral a) (succ (numeral k))
+    =eq succ (numeral (a + k)))
+  exact prf_eq_trans (prf_add_succ_t (numeral a) (numeral k))
     (prf_eq_congr_succ (prf_numeral_add a k))
-
-/-- Orden estricto para códigos numéricos (`Godel.numeral`), vía `numeral_bridge`. -/
-theorem prf_gnum_lt {a b : Nat} (h : a < b) : Prf (lt (numeral a) (numeral b)) := by
-  rw [numeral_bridge, numeral_bridge]
-  exact prf_numeral_lt h
 
 /-! ### Ecuaciones recursivas de la sustitución (nivel término) en `Prf` -/
 
@@ -187,7 +181,7 @@ theorem prf_substTerm_arith (v : Nat) (s : Term) : ∀ (t : Term),
       · have hsub : (substTerm v s (.var n) : Term) = .var n := by
           simp only [substTerm]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
-        exact prf_mp (prf_substtc_var_lt (numeral v) (termCode s) (numeral n)) (prf_gnum_lt hlt)
+        exact prf_mp (prf_substtc_var_lt (numeral v) (termCode s) (numeral n)) (prf_numeral_lt hlt)
       · subst heq
         have hsub : substTerm n s (.var n) = s := by simp [substTerm]
         rw [hsub]
@@ -195,7 +189,7 @@ theorem prf_substTerm_arith (v : Nat) (s : Term) : ∀ (t : Term),
       · have hsub : (substTerm v s (.var n) : Term) = .var (n - 1) := by
           simp only [substTerm]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
         rw [hsub]
-        have hax := prf_mp (prf_substtc_var_gt (numeral v) (termCode s) (numeral n)) (prf_gnum_lt hgt)
+        have hax := prf_mp (prf_substtc_var_gt (numeral v) (termCode s) (numeral n)) (prf_numeral_lt hgt)
         have hpred : Prf (varc (pred (numeral n)) =eq varc (numeral (n - 1))) := by
           apply prf_congr_cons_tail; apply prf_congr_cons_head
           obtain ⟨k, hk⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
@@ -271,10 +265,10 @@ theorem prf_liftTerm_arith (c : Nat) : ∀ (t : Term),
       by_cases hlt : n < c
       · have hsub : (liftTerm c (.var n) : Term) = .var n := by simp [liftTerm, hlt]
         rw [hsub]
-        exact prf_mp (prf_liftc_var_lt (numeral c) (numeral n)) (prf_gnum_lt hlt)
+        exact prf_mp (prf_liftc_var_lt (numeral c) (numeral n)) (prf_numeral_lt hlt)
       · have hsub : (liftTerm c (.var n) : Term) = .var (n + 1) := by simp [liftTerm, hlt]
         rw [hsub]
-        exact prf_mp (prf_liftc_var_ge (numeral c) (numeral n)) (prf_gnum_lt (by omega : c < n + 1))
+        exact prf_mp (prf_liftc_var_ge (numeral c) (numeral n)) (prf_numeral_lt (by omega : c < n + 1))
   | .func sym ts => by
       show Prf (liftc (numeral c) (funcc (strCode sym) (termsCode ts))
         =eq termCode (liftTerm c (.func sym ts)))
@@ -555,7 +549,8 @@ export ROBINSON_PlusPlus.Meta.ArithPrf (
   prf_eq_congr_succ
   prf_congr_substfc_arg2
   prf_congr_substfc_arg3
-  prf_gnum_lt
+  prf_numeral_add
+  prf_numeral_lt
   prf_substTerm_arith
   prf_substTerms_arith
   prf_liftTerm_arith

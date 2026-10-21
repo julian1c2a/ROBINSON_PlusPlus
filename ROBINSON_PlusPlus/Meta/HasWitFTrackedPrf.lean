@@ -885,10 +885,10 @@ theorem prf_substfc_wfAllFDotAtC_gen (v : Nat) (s WF WT WF' WT' RF RT RF' RT' : 
       =eq wfAllFDotAtC RF RT RF' RT') := by
   have hi1 : Prf (substtc (numeral (v + 1)) (liftc zero s) (varc (numeral 0))
       =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_gnum_lt (by omega : 0 < v + 1))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_numeral_lt (by omega : 0 < v + 1))
   have hj2 : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s)) (varc (numeral 1))
       =eq varc (numeral 1)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_gnum_lt (by omega : 1 < v + 2))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_numeral_lt (by omega : 1 < v + 2))
   have hnode : Prf (substtc (numeral (v + 1)) (liftc zero s) (nthcT WF (varc (numeral 0)))
       =eq nthcT RF (varc (numeral 0))) :=
     prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hF hi1)
@@ -943,10 +943,10 @@ theorem prf_substfc_hasWitFAc_wF (T I UF : Term)
       (prf_refl _)) hUF3
   have k12 : Prf (substtc (numeral 2) (liftc zero (liftc zero UF)) (varc (numeral 1))
       =eq varc (numeral 1)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_gnum_lt (by omega : 1 < 2))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_numeral_lt (by omega : 1 < 2))
   have k23 : Prf (substtc (numeral 3) (liftc zero (liftc zero (liftc zero UF)))
       (varc (numeral 2)) =eq varc (numeral 2)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 2)) (prf_gnum_lt (by omega : 2 < 3))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 2)) (prf_numeral_lt (by omega : 2 < 3))
   have hUFslot : Prf (substtc (numeral 1) (liftc zero UF) (varc (numeral 1)) =eq UF) :=
     prf_eq_trans
       (prf_mp (prf_substtc_var_eq (numeral 1) (liftc zero UF) (numeral 1)) (prf_refl _)) hUF1

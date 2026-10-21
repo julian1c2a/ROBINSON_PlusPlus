@@ -13,7 +13,7 @@
 > **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
 > módulos, en la línea de cifras de abajo).
 
-**Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 114 + Full 2) **+ 0 en `cuarentena/` + 44 `sondeos/`
+**Build 132 jobs · 116 módulos activos** (Minimal 2 + Meta 113 + Full 1) **+ 0 en `cuarentena/` + 44 `sondeos/`
 · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
 
 **Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
@@ -111,7 +111,9 @@ def ProvableH (x : Term) : Prop := ∃ d, Dem d x
 theorem dem_tracks (φ) : ProvableH (formCode φ) ↔ Prf φ         -- reemplaza dem_iff_provable
 ```
 
-**`Meta/CodeArith.lean`** (Fase 2.1) — namespace `…Meta.CodeArith`:
+**«Meta/CodeArith.lean»** (Fase 2.1) — 🗑️ **retirado el 2026‑10‑21** ([ADR‑190](../DECISIONS.md), T76): le quedaba sólo
+el puente entre los dos `numeral`, y hoy hay uno, `Meta.Godel.numeral`. Lo de abajo es registro (los «gnum_*», sobre `⊢`,
+habían salido con ADR‑115):
 
 ```lean
 theorem numeral_bridge (n) : Meta.Godel.numeral n = Full.numeral n
@@ -1186,7 +1188,7 @@ La pieza clave del diseño: `consN` se define con **números triangulares**, de 
 | `2·triN n = n(n+1)` | `theorem two_mul_triN : ∀ n : Nat, 2 * triN n = n * (n + 1)` |
 | `consN a b = triN(a+b+1) + (b+1)` | `def consN (a b : Nat) : Nat := triN (a + (b + 1)) + (b + 1)` |
 | `2·consN a b = (a+b+1)(a+b+2) + 2(b+1)` | `theorem two_mul_consN (a b : Nat) : …` |
-| `⊢ ā + b̄ = (a+b)‾` | `theorem prf_gnum_add (a b : Nat) : Prf (add (numeral a) (numeral b) =eq numeral (a+b))` |
+| `⊢ ā + b̄ = (a+b)‾` | `theorem prf_numeral_add (a b : Nat) : Prf (add (numeral a) (numeral b) =eq numeral (a+b))` (en `Meta/ArithPrf.lean`; hasta ADR‑190, su espejo «prf_gnum_add» vivía aquí) |
 | `⊢ cons(ā, b̄) = consN a b‾` | `theorem prf_cons_eval (a b : Nat) : Prf (cons (numeral a) (numeral b) =eq numeral (consN a b))` |
 | ídem, con premisas | `theorem prf_cons_eval_of {A B : Term} {a b : Nat} (ha …) (hb …) : Prf (cons A B =eq numeral (consN a b))` |
 | `codeNat φ ∈ ℕ` (espejo meta de `formCode`) | `def codeNat : Formula → Nat` |
@@ -1224,7 +1226,7 @@ Todo en forma **OBJETO** (argumentos abstractos ⇒ vale para todo numeral) y **
 
 Álgebra auxiliar portada aquí porque **eran axiomas objeto, no teoremas**: `prf_mul_distrib` (ax12),
 `prf_mul_assoc` (ax11), `prf_mul_distrib_right`, `prf_swap_mul2`, más los homomorfismos
-`prf_numeral_mul`/`prf_gnum_mul` (el de `·` sólo existía en la capa ω) y las congruencias
+`prf_numeral_mul` (el de `·` sólo existía en la capa ω; su espejo «prf_gnum_mul», sobre la otra copia de `numeral`, salió con ADR‑190) y las congruencias
 `prf_eq_congr_div2`/`prf_eq_congr_mod2`.
 
 ⚠️ `prf_pair_double` es **el puente** de la fase C de `pcc_dot_cons` (§3.25.3): es un teorema OBJETO,
@@ -3907,10 +3909,12 @@ segundo obliga a reescribirla entera. Abrirla desde el principio es gratis.
 
 ### §3.46.3 · Dos trampas de homónimo, las dos destapadas por el compilador
 
-* ⚠️ **`prf_numeral_lt` es de `Full.numeral`.** El de `Godel.numeral` —el que usan `varc` y los
-  niveles de `substtc`— es **`prf_gnum_lt`** (`Meta/ArithPrf.lean:124`). Es la familia de
-  trampas ya registrada (`numeralM` vs `numeral` vs `Full.numeral`): tres numerales distintos,
+* ⚠️ **`prf_numeral_lt` era de «Full.numeral».** El de `Godel.numeral` —el que usan `varc` y los
+  niveles de `substtc`— era **«prf_gnum_lt»**. Es la familia de
+  trampas ya registrada (`numeralM` vs `numeral` vs «Full.numeral»): tres numerales distintos,
   nombres casi iguales, y el error que producen habla de un tipo, no del homónimo.
+  ✏️ *2026‑10‑21 (ADR‑190, T76)*: esta trampa ya no existe: fuera de `Minimal` hay un solo `numeral`, el de
+  `Godel`, y `prf_numeral_lt` es de él; el espejo salió. Queda `numeralM`, con su único puente, `numeralM_eq`.
 * ⚠️ **No existe `and`‑elim a nivel de CÓDIGO** (sólo `PrfH_and_intro_code`). Se intentó
   «reflejar `isFC1` entero y luego partirlo para transportar la casilla»; la cura fue no
   partirlo: **ensamblar las tres mitades ya transportadas**, que además sale más corto.
@@ -4341,7 +4345,7 @@ porque `[B]` sólo detecta símbolos inexistentes.
 B8b (§3.51) dejó apuntado un duplicado colateral. En vez de mirar sólo ése se hizo **barrido
 sistemático** de nombres declarados más de una vez en producción: **28 candidatos, SEIS
 duplicados reales**. El resto son homónimos legítimos —`CTree` vs `STree`, los tres descensos
-`PHI`, `Godel.numeral` vs `Full.numeral`— ya documentados como tales.
+`PHI`, `Godel.numeral` vs «Full.numeral» (éste, unificado con ADR‑190)— ya documentados como tales.
 
 ### §3.52.1 · Los seis, y por qué cada uno se resolvió como se resolvió
 

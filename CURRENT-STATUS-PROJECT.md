@@ -4,7 +4,8 @@
 > Este documento da las CIFRAS del árbol, cada una con el control que la mide, y la arquitectura por capas. Lo que se
 > hizo y cuándo está en [DECISIONS.md](DECISIONS.md); lo que queda, en [NEXT-STEPS.md](NEXT-STEPS.md) («Lo que queda»).
 
-**Last updated:** 2026-10-21 — [ADR‑182](DECISIONS.md) (T26): reescrito entero. El cuerpo anterior —las tablas del
+**Last updated:** 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): las cifras del build, 132 jobs y 116 módulos («Full/Numerals.lean»
+y «Meta/CodeArith.lean», fuera: un solo `numeral` fuera de `Minimal`). Antes, el mismo día — [ADR‑182](DECISIONS.md) (T26): reescrito entero. El cuerpo anterior —las tablas del
 2026‑09‑10, con sus notas, y el diario de mayo a agosto— está, tal cual, en
 [doc/historia/CURRENT-STATUS-hasta-2026-10-21.md](doc/historia/CURRENT-STATUS-hasta-2026-10-21.md).
 **Author**: Julián Calderón Almendros
@@ -19,8 +20,8 @@ que tienen forma de frase fija (los jobs, los módulos, `sorry`, `axiom`, `cuare
 
 | cifra | hoy | la mide |
 |---|---|---|
-| Build | **134** jobs, 0 errores | `lake build` (la CI, en cada push) |
-| Módulos | **118** módulos activos: Minimal 2 + Meta 114 + Full 2, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
+| Build | **132** jobs, 0 errores | `lake build` (la CI, en cada push) |
+| Módulos | **116** módulos activos: Minimal 2 + Meta 113 + Full 1, más el barrel `Meta.lean` y la raíz `ROBINSON_PlusPlus.lean` | `check-doc-sync.bash` `[A]` y `[L]` (la librería es el cierre de imports, y todo `.lean` del árbol está en ella) |
 | Fuera del build | 0 en `cuarentena/` · **44** `sondeos/`, 11 de control | `check-sondeos.bash --controles` (los 11, en la CI); `sondeos/README.md` |
 | `sorry` | 0 `sorry` | `check-sorry.bash` (el texto) y `check-estratos.bash` (el entorno) |
 | `axiom` de Lean | 0 `axiom` de Lean en el build, en RPP y en FOL | `check-sorry.bash`, `check-estratos.bash` y `../FOL/check-axioms.bash`, por entorno y con señuelo (T13) |
@@ -59,13 +60,13 @@ módulo del árbol esté en él); las dependencias, [DEPENDENCIES.md](DEPENDENCI
 | capa | qué hay | módulos |
 |---|---|---|
 | `Minimal/` | el lenguaje y la LISTA de axiomas (`Axioms.lean`: los 142, sin esquema de inducción) y la macro de los literales de símbolo (`SymLit.lean`) | 2 |
-| `Full/` | `primAxioms` y las longitudes del censo, los lemas de sustitución y la fórmula `inductionFormula` (`Induction.lean`), y `numeral` (`Numerals.lean`) | 2 |
-| `Meta/` | todo lo demás, en siete familias (abajo) | 114 |
+| `Full/` | `primAxioms` y las longitudes del censo, los lemas de sustitución y la fórmula `inductionFormula` (`Induction.lean`); el `numeral`, uno solo, en `Meta/Godel.lean` (ADR‑190) | 1 |
+| `Meta/` | todo lo demás, en siete familias (abajo) | 113 |
 
 Las familias de `Meta/` (los nombres, en REFERENCE §1.5):
 
 * **La codificación y el cálculo**: `Godel`, `Provability`, `Hilbert` (`Prfᵢ`, `Prf` y `ConsistentH`),
-  `HilbertDeduction` (`PrfH`), `HilbertSeq`, la aritmética de códigos y el verificador (`CodeArith`, `SubstArith`,
+  `HilbertDeduction` (`PrfH`), `HilbertSeq`, la aritmética de códigos y el verificador (`SubstArith`,
   `CheckArith`, `ProofChain`).
 * **La aritmética dentro de `Prf`**: el orden, el producto, Cantor, la paridad, la inducción fuerte y las listas
   (`NatArithPrf`, `NatOrderPrf`, `NatMulPrf`, `CantorMonoPrf`, `Div2ParityPrf`, `StrongInductionPrf`, `NumListPrf`…).

@@ -1022,13 +1022,13 @@ theorem prf_substfc_wfAll1DotAtC_gen (v : Nat) (s WD WD' RD RD' : Term)
     Prf (substfc (numeral v) s (wfAll1DotAtC WD WD') =eq wfAll1DotAtC RD RD') := by
   have hi1 : Prf (substtc (numeral (v + 1)) (liftc zero s) (varc (numeral 0))
       =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_gnum_lt (by omega : 0 < v + 1))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_numeral_lt (by omega : 0 < v + 1))
   have hi2 : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s)) (varc (numeral 0))
       =eq varc (numeral 0)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_gnum_lt (by omega : 0 < v + 2))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 0)) (prf_numeral_lt (by omega : 0 < v + 2))
   have hj2 : Prf (substtc (numeral (v + 2)) (liftc zero (liftc zero s)) (varc (numeral 1))
       =eq varc (numeral 1)) :=
-    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_gnum_lt (by omega : 1 < v + 2))
+    prf_mp (prf_substtc_var_lt _ _ (numeral 1)) (prf_numeral_lt (by omega : 1 < v + 2))
   have hnode : Prf (substtc (numeral (v + 1)) (liftc zero s) (nthcT WD (varc (numeral 0)))
       =eq nthcT RD (varc (numeral 0))) :=
     prf_eq_trans (prf_substtc_nthcT _ _ _ _) (prf_congr_nthcT hD hi1)

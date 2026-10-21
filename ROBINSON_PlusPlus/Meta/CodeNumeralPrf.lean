@@ -71,29 +71,24 @@ theorem two_mul_pairN (a b : Nat) :
 
 /-! ### PARTE B — evaluación provable -/
 
-/-- Homomorfismo de `+` sobre `Godel.numeral` (no existía; espejo de `prf_gnum_mul`). -/
-theorem prf_gnum_add (a b : Nat) : Prf (add (numeral a) (numeral b) =eq numeral (a + b)) := by
-  rw [numeral_bridge, numeral_bridge, numeral_bridge]
-  exact prf_numeral_add a b
-
 /-- El polinomio de Cantor sobre numerales se evalúa a `numeral (2 · pairN a b)`. -/
 theorem prf_cpOf_eval (a b : Nat) :
     Prf (cpOf (numeral a) (numeral b) =eq numeral (2 * pairN a b)) := by
   have hS : Prf (add (numeral a) (numeral b) =eq numeral (a + b)) :=
-    prf_gnum_add a b
+    prf_numeral_add a b
   have hSs : Prf (succ (add (numeral a) (numeral b)) =eq numeral (a + b + 1)) :=
     prf_eq_congr_succ hS
   have h1 : Prf (mul (add (numeral a) (numeral b))
                      (succ (add (numeral a) (numeral b)))
               =eq numeral ((a + b) * ((a + b) + 1))) :=
     prf_eq_trans (prf_eq_congr_mul1 _ hS)
-      (prf_eq_trans (prf_eq_congr_mul2 _ hSs) (prf_gnum_mul (a + b) (a + b + 1)))
+      (prf_eq_trans (prf_eq_congr_mul2 _ hSs) (prf_numeral_mul (a + b) (a + b + 1)))
   have h2 : Prf (mul two (numeral b) =eq numeral (2 * b)) :=
-    prf_gnum_mul 2 b
+    prf_numeral_mul 2 b
   have hsum : Prf (cpOf (numeral a) (numeral b)
       =eq numeral ((a + b) * ((a + b) + 1) + 2 * b)) :=
     prf_eq_trans (prf_eq_congr_add1 _ h1)
-      (prf_eq_trans (prf_eq_congr_add2 _ h2) (prf_gnum_add _ _))
+      (prf_eq_trans (prf_eq_congr_add2 _ h2) (prf_numeral_add _ _))
   rw [two_mul_pairN]
   exact hsum
 
@@ -196,7 +191,7 @@ end ROBINSON_PlusPlus.Meta.CodeNumeralPrf
 
 export ROBINSON_PlusPlus.Meta.CodeNumeralPrf (
   two_mul_triN two_mul_pairN
-  pairN prf_gnum_add prf_cpOf_eval prf_cons_eval prf_cons_eval_of
+  pairN prf_cpOf_eval prf_cons_eval prf_cons_eval_of
   prf_charsCode_numeral prf_strCode_numeral
   prf_termCode_numeral prf_termsCode_numeral prf_formCode_numeral
 )

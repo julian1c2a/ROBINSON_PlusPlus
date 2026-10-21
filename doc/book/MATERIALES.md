@@ -235,8 +235,8 @@ parser, no los documentos. **Volver a medir con `#eval axioms.length` antes de i
 
 **Destino:** capítulo 6 («Códigos de términos y fórmulas»), como nota; o apéndice C (trampas).
 
-El proyecto tiene tres funciones `numeral : Nat → Term`: `Meta.Godel.numeral`
-(`Meta/Godel.lean:77`), `Full.numeral` (`Full/Numerals.lean:49`) y `Minimal.Axioms.numeralM`
+El proyecto tenía tres funciones `numeral : Nat → Term` (✏️ 2026‑10‑21, ADR‑190: hoy dos; la de `Full`, fuera): `Meta.Godel.numeral`
+(`Meta/Godel.lean:77`), «Full.numeral» («Full/Numerals.lean:49») y `Minimal.Axioms.numeralM`
 (`Minimal/Axioms.lean:550`), esta última con un docstring que dice que «coincide con
 `Godel.numeral`». **[medido]**
 

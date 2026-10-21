@@ -75,7 +75,6 @@ import ROBINSON_PlusPlus.Meta.HasWitTcFnPrf
 import ROBINSON_PlusPlus.Meta.Hilbert
 import ROBINSON_PlusPlus.Meta.HilbertDeduction
 import ROBINSON_PlusPlus.Meta.HilbertSeq
-import ROBINSON_PlusPlus.Meta.CodeArith
 import ROBINSON_PlusPlus.Meta.SubstArith
 import ROBINSON_PlusPlus.Meta.CheckArith
 import ROBINSON_PlusPlus.Meta.Representability

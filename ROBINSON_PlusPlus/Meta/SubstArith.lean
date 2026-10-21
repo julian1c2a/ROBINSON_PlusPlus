@@ -4,7 +4,6 @@ Author: Julián Calderón Almendros
 License: MIT
 -/
 import ROBINSON_PlusPlus.Meta.Provability
-import ROBINSON_PlusPlus.Meta.CodeArith
 
 import FOL.FOL
 import FOL.Theorems.Eq
@@ -22,7 +21,6 @@ import FOL.Theorems.Eq
 open ROBINSON_PlusPlus.Minimal.Axioms
 open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Provability
-open ROBINSON_PlusPlus.Meta.CodeArith
 
 set_option linter.unusedSimpArgs false
 

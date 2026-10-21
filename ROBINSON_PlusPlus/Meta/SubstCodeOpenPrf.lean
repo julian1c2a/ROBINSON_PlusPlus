@@ -88,7 +88,7 @@ theorem prf_substtc_arith_open (v : Nat) (w : Term) : ∀ (t : Term),
       · have hsub : substCodeT v w (.var n) = varc (numeral n) := by
           simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
-        exact prf_mp (prf_substtc_var_lt (numeral v) w (numeral n)) (prf_gnum_lt hlt)
+        exact prf_mp (prf_substtc_var_lt (numeral v) w (numeral n)) (prf_numeral_lt hlt)
       · subst heq
         have hsub : substCodeT n w (.var n) = w := by simp [substCodeT]
         rw [hsub]
@@ -96,7 +96,7 @@ theorem prf_substtc_arith_open (v : Nat) (w : Term) : ∀ (t : Term),
       · have hsub : substCodeT v w (.var n) = varc (numeral (n - 1)) := by
           simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_left (by omega)]
         rw [hsub]
-        have hax := prf_mp (prf_substtc_var_gt (numeral v) w (numeral n)) (prf_gnum_lt hgt)
+        have hax := prf_mp (prf_substtc_var_gt (numeral v) w (numeral n)) (prf_numeral_lt hgt)
         have hpred : Prf (varc (pred (numeral n)) =eq varc (numeral (n - 1))) := by
           apply prf_congr_cons_tail; apply prf_congr_cons_head
           obtain ⟨k, hk⟩ : ∃ k, n = k + 1 := ⟨n - 1, by omega⟩
@@ -277,7 +277,7 @@ theorem substtc_inv_substCodeT (v : Nat) (W : Term)
       · have hsub : substCodeT v W (.var n) = varc (numeral n) := by
           simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
-        exact prf_mp (prf_substtc_var_lt (numeral (v+1)) u (numeral n)) (prf_gnum_lt (by omega))
+        exact prf_mp (prf_substtc_var_lt (numeral (v+1)) u (numeral n)) (prf_numeral_lt (by omega))
       · subst heq
         have hsub : substCodeT n W (.var n) = W := by simp [substCodeT]
         rw [hsub]; exact hW u
@@ -287,7 +287,7 @@ theorem substtc_inv_substCodeT (v : Nat) (W : Term)
         have hnv : n = v + 1 := Nat.le_antisymm hn hgt
         subst hnv
         exact prf_mp (prf_substtc_var_lt (numeral (v+1)) u (numeral (v+1-1)))
-          (prf_gnum_lt (by omega))
+          (prf_numeral_lt (by omega))
   | .func sym ts, hfv, u => by
       have hall := hfv
       simp only [liftTerm, Term.func.injEq, true_and] at hall
@@ -356,7 +356,7 @@ theorem substtc_inv_substCodeT_at (v : Nat) (W : Term)
       · have hsub : substCodeT v W (.var n) = varc (numeral n) := by
           simp only [substCodeT]; rw [ite_eq_right (by omega), ite_eq_right (by omega)]
         rw [hsub]
-        exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+        exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_numeral_lt (by omega))
       · have hnv : n = v := Nat.le_antisymm hn hge
         subst hnv
         have hsub : substCodeT n W (.var n) = W := by simp [substCodeT]
@@ -420,7 +420,7 @@ familia no admite un salto arbitrario: es exactamente «uno por debajo». -/
     `v := 0` (ADR‑019: se baja el general, no se sube el corolario). -/
 theorem prf_liftc_varc_numeral (v : Nat) :
     Prf (liftc zero (varc (numeral v)) =eq varc (numeral (v + 1))) :=
-  prf_mp (prf_liftc_var_ge zero (numeral v)) (prf_gnum_lt (Nat.zero_lt_succ v))
+  prf_mp (prf_liftc_var_ge zero (numeral v)) (prf_numeral_lt (Nat.zero_lt_succ v))
 
 mutual
 
@@ -447,7 +447,7 @@ theorem substtc_id_substCodeT (v : Nat) (W : Term)
         rw [hsub]
         rcases Nat.lt_or_ge n v with hlt2 | hge2
         · -- n < v : `substtc` no la toca
-          exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+          exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_numeral_lt (by omega))
         · -- ⚠️ n = v : `substtc` la sustituye POR EL TESTIGO — aquí es donde `hu` paga
           have hnv : n = v := by omega
           subst hnv
@@ -555,7 +555,7 @@ theorem substtc_comp_substCodeT (v : Nat) (u W : Term)
             simp only [substCodeT2]
             rw [ite_eq_right (by omega), ite_eq_right (by omega), ite_eq_right (by omega)]
           rw [h2]
-          exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_gnum_lt (by omega))
+          exact prf_mp (prf_substtc_var_lt (numeral v) u (numeral n)) (prf_numeral_lt (by omega))
         · have hnv : n = v := by omega
           subst hnv
           have h2 : substCodeT2 n u W (.var n) = u := by

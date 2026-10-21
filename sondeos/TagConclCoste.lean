@@ -43,7 +43,6 @@ open ROBINSON_PlusPlus.Meta.Godel
 open ROBINSON_PlusPlus.Meta.Hilbert
 open ROBINSON_PlusPlus.Meta.ReprPrf
 open ROBINSON_PlusPlus.Meta.Representability
-open ROBINSON_PlusPlus.Meta.CodeArith
 open ROBINSON_PlusPlus.Meta.ArithPrf
 open ROBINSON_PlusPlus.Meta.LineWFCases
 open ROBINSON_PlusPlus.Meta.HilbertSeq

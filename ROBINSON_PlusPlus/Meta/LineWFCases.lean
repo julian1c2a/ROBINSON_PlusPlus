@@ -7,7 +7,6 @@ import ROBINSON_PlusPlus.Meta.ReprPrf
 import ROBINSON_PlusPlus.Meta.Sigma1CorePrf
 -- ✏️ 2026‑10‑18 (ADR‑161): aquí iba `import ROBINSON_PlusPlus.Meta.CodeDistinct`, retirado (nada suyo se usa); van sus
 -- imports, para que el entorno no cambie.
-import ROBINSON_PlusPlus.Meta.CodeArith
 import ROBINSON_PlusPlus.Meta.Provability
 import FOL.FOL
 import FOL.Theorems.Eq

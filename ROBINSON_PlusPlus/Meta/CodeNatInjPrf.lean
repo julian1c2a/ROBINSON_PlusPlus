@@ -1,5 +1,4 @@
 import ROBINSON_PlusPlus.Meta.CodeNumeralPrf
-import ROBINSON_PlusPlus.Full.Numerals
 
 /-!
 > 🗑️ **2026‑10‑02 · ADR‑115 — leer antes que el resto.** La capa `⊢` se retiró de RPP, y con ella todo lo
@@ -38,12 +37,11 @@ el docstring de `consN_inj`). De él salen en cascada `codeNatChars_inj` → `co
 `codeNatTerm_inj`/`codeNatTerms_inj` → `codeNat_inj`. ⇒ **cualquier estructura construida con
 `consN` desde hojas inyectivas queda inyectiva.**
 
-⚠️ **Deuda que este módulo hace visible**: hay **DOS `numeral`** —`Full.numeral`
-(`Full/Numerals.lean`) y `Meta.Godel.numeral` (`Meta/Godel.lean`)—, definiciones idénticas en
-namespaces distintos que Lean **no** identifica. `numeral_ne` usaba la de `Full` y los códigos usan
-la de `Godel`, así que hacía falta el puente **`num_bridge`**, que se prueba aquí por inducción.
-🗑️ `numeral_ne` era de `⊢` y quedó retirado (ADR‑115): hoy ningún otro módulo de
-`ROBINSON_PlusPlus/` usa `num_bridge`.
+✏️ *(2026‑10‑21, ADR‑190, T76)*: aquí vivía el puente «num_bridge» entre los DOS `numeral` de
+entonces —«Full.numeral», de «Full/Numerals.lean», y `Meta.Godel.numeral`—, definiciones idénticas en
+namespaces distintos que Lean no identificaba. Hoy hay uno solo, `Meta.Godel.numeral`: la copia de
+`Full` y sus dos puentes salieron del árbol. Queda la de `Minimal`, `numeralM`, con su único puente,
+`numeralM_eq` (`Meta/CheckArith.lean`).
 
 Promovido de `archivo/sondeos-2026-10:sondeos/CodeNatInj.lean` (2026‑09‑01). Cero `sorry`.
 
@@ -170,34 +168,7 @@ theorem codeNat_inj : ∀ {φ ψ : Formula}, codeNat φ = codeNat ψ → φ = ψ
            | rw [codeNat_inj h2.1])
 
 
-/-! ### El puente, y el sustituto de `canon_ne`
-
-⚠️ Estas dos necesitan `Minimal.Axioms` abierto, pero **NO se puede abrir arriba del fichero**:
-con él, `≤` y `<` resuelven al orden **OBJETO** (sobre `Term`) y `triN_mono` deja de tipar con un
-error **opaco** que no menciona `≤`. Es la trampa de notación registrada del proyecto
-(`feedback-lean-notation-traps` §1), y mordió exactamente así al promover. Por eso el `open` va
-**confinado a esta sección**.
-
-🗑️ El sustituto (`codeNat_ne`/`codeNatTerm_ne`) era de `⊢` y se retiró con esa capa (ADR‑115):
-aquí queda sólo el puente. -/
-
-section CanonNeSustituto
-open ROBINSON_PlusPlus.Minimal.Axioms
-
-/-- ⚠️ **HALLAZGO LATERAL: hay DOS `numeral` duplicados** en el proyecto —
-    `ROBINSON_PlusPlus.Full.numeral` (`Full/Numerals.lean`) y
-    `ROBINSON_PlusPlus.Meta.Godel.numeral` (`Meta/Godel.lean`). Definiciones idénticas en
-    namespaces distintos, así que Lean **no** las identifica: el puente hay que probarlo.
-    `numeral_ne` (retirado con `⊢`, ADR‑115) usaba la de `Full`; los códigos usan la de `Godel`. -/
-theorem num_bridge : ∀ n : Nat,
-    ROBINSON_PlusPlus.Full.numeral n = ROBINSON_PlusPlus.Meta.Godel.numeral n
-  | 0 => rfl
-  | n + 1 => by
-      show succ (ROBINSON_PlusPlus.Full.numeral n) = succ (ROBINSON_PlusPlus.Meta.Godel.numeral n)
-      rw [num_bridge n]
-
-
-end CanonNeSustituto
+/-! (✏️ 2026‑10‑21, ADR‑190, T76: aquí vivía el puente «num_bridge» entre los dos `numeral`; con uno solo, sobra.) -/
 
 end ROBINSON_PlusPlus.Meta.CodeNatInjPrf
 
@@ -212,5 +183,4 @@ export ROBINSON_PlusPlus.Meta.CodeNatInjPrf (
   codeNatTerm_inj
   codeNatTerms_inj
   codeNat_inj
-  num_bridge
 )

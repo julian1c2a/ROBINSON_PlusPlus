@@ -7,7 +7,7 @@
 [![Build](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml/badge.svg)](https://github.com/julian1c2a/ROBINSON_PlusPlus/actions/workflows/build.yml)
 [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
-**Last updated:** 2026-10-21 — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
+**Last updated:** 2026-10-21 — [ADR‑190](DECISIONS.md) (T76): 116 módulos activos. Antes, el mismo día — [ADR‑183](DECISIONS.md) (T25): reescrito contra el árbol (qué es, lo demostrado, las
 capas, la instalación con el hermano FOL y el toolchain exacto, los controles, los documentos). Lo de antes, en la
 historia de git.
 
@@ -42,13 +42,13 @@ Con(Lean) → Con(T_Prf)); absoluta no puede ser ([TEOREMAS-E-HIPOTESIS.md](TEOR
 
 ## Las capas
 
-**118** módulos activos (Minimal 2 + Meta 114 + Full 2); el catálogo, módulo a módulo, en [REFERENCE.md](REFERENCE.md)
+**116** módulos activos (Minimal 2 + Meta 113 + Full 1); el catálogo, módulo a módulo, en [REFERENCE.md](REFERENCE.md)
 §1, y las cifras de hoy, cada una con su control, en [CURRENT-STATUS-PROJECT.md](CURRENT-STATUS-PROJECT.md).
 
 | capa | qué hay |
 |---|---|
 | `Minimal/` | el lenguaje y la LISTA de axiomas, sin esquema de inducción: 142 sentencias, 34 matemáticas (`coreAxioms`) + 107 de codificación (`codingAxioms`) + el ancla diagonal |
-| `Full/` | `primAxioms`, los lemas de sustitución y la fórmula de inducción (`Induction.lean`), y `numeral` (`Numerals.lean`) |
+| `Full/` | `primAxioms`, los lemas de sustitución y la fórmula de inducción (`Induction.lean`) |
 | `Meta/` | la aritmetización de la sintaxis, el verificador de pruebas interno, D1–D3, el punto fijo, el modelo estándar y la solidez, y los titulares |
 
 ## Instalación

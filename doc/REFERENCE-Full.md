@@ -2,10 +2,12 @@
 
 > 🗑️🗑️ **2026‑10‑02 · CASI TODO LO QUE DESCRIBE ESTE NODO SE RETIRÓ** ([ADR‑115](../DECISIONS.md)).
 > De los 11 módulos de `Full/` quedan **3**: `Induction` (sin sus teoremas sobre `⊢`: queda `primAxioms`,
-> las longitudes del censo, los lemas de sustitución e `inductionFormula`), `Numerals` (la definición de
+> las longitudes del censo, los lemas de sustitución e `inductionFormula`), «Numerals» (la definición de
 > `numeral`) y `PrimeFactor` (ℕ pura, intacto). Los otros ocho, el `axiom ax_induction_prim`,
 > `ax_list_induction` y el TFA objeto (`tfa_numeral`), hoy retirados, eran teoremas o postulados **sobre `⊢`**, y la capa
 > se retiró porque sus postulados eran falsos. Lo que sigue es **registro**.
+> ✏️ *2026‑10‑21 ([ADR‑190](../DECISIONS.md), T76)*: hoy queda **uno**, `Induction`. «PrimeFactor» salió del build con
+> ADR‑161 y «Numerals», cuyo `numeral` era una copia de `Meta.Godel.numeral` (hoy el único fuera de `Minimal`), con ADR‑190.
 
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5).
 > Índice raíz: [REFERENCE.md](../REFERENCE.md).
@@ -29,7 +31,7 @@ derivada, puente `numeral` + homomorfismo, acotados, divisibilidad/división, pr
 **@importance**: `high`
 **@axiom_system**: `Full` (inducción general como axioma object-level + meta-axiomas)
 **Last updated**: 2026-06-12
-**Módulos** (11): `Induction`, `Mod2`, `Lists`, `StrongInduction`, `Numerals`, `Bounded`, `Divisibility`, `Division`, `PrimeFactor`, `Primality`, `Factorization`.
+**Módulos** (11): `Induction`, `Mod2`, `Lists`, `StrongInduction`, «Numerals», `Bounded`, `Divisibility`, `Division`, `PrimeFactor`, `Primality`, `Factorization`.
 
 > **Nota histórica**: `Intermediate/Induction.lean` (prototipo de inducción meta, Eje 3) fue **eliminado 2026-06-11**: el sistema con Φ finito es el caso particular de Full con inducción general, sin valor técnico añadido. Toda la inducción vive en `Full/`.
 
