@@ -9,7 +9,6 @@ B	A3ConsOkRefuta	sondeos/README.md	1
 B	AnclaEq	AXIOMS.md	6
 B	AnclaEq	DECISIONS.md	5
 B	AnclaEq	NEXT-STEPS.md	1
-B	AnclaEq	README.md	4
 B	AnclaEq	REFERENCE.md	7
 B	AnclaEq	TEOREMAS-E-HIPOTESIS.md	6
 B	AnclaEq	doc/REFERENCE-Godelization.md	1
@@ -132,17 +131,14 @@ B	HasWitTcFn	sondeos/README.md	1
 B	HenkinSaleDeRaa	sondeos/README.md	4
 B	InAxiomsCodePrf.substtc_inv_termCode_of_tc	doc/REFERENCE-Incompleteness.md	1
 B	InTracked	sondeos/README.md	1
-B	Intermediate	README.md	1
 B	IsCodeShaped	REFERENCE.md	2
 B	IsCodeShaped	doc/REFERENCE-Incompleteness.md	2
 B	IsCodeShaped	sondeos/README.md	2
 B	IsFactorization	AXIOMS.md	1
 B	IsFactorization	doc/REFERENCE-Arithmetic.md	2
-B	IsFun	README.md	1
 B	IsFunction	REFERENCE.md	1
 B	IsFunction	doc/REFERENCE-Arithmetic.md	1
 B	IsPrime	doc/REFERENCE-Arithmetic.md	3
-B	IsSet	README.md	1
 B	KitPayoff	cuarentena/README.md	1
 B	LWF_dot	doc/REFERENCE-Incompleteness.md	1
 B	LiftLiftLift	DECISIONS.md	1
@@ -156,7 +152,6 @@ B	Lists	doc/REFERENCE-Full.md	1
 B	L̇	doc/REFERENCE-Incompleteness.md	2
 B	MDiezEnLaFirma	DECISIONS.md	1
 B	MDiezEnLaFirma	sondeos/README.md	1
-B	MK_Pair	README.md	1
 B	MedirC_Carga	sondeos/README.md	1
 B	MedirC_Deriva	sondeos/README.md	1
 B	MedirC_Enmienda	sondeos/README.md	3
@@ -178,7 +173,6 @@ B	Necessitation	doc/REFERENCE-Incompleteness.md	1
 B	NegVerifier	DECISIONS.md	1
 B	NegVerifier	DEPENDENCIES.md	1
 B	NegVerifier	GODEL-STATUS.md	2
-B	NegVerifier	README.md	1
 B	NegVerifier	REFERENCE.md	11
 B	NegVerifier	TEOREMAS-E-HIPOTESIS.md	3
 B	NegVerifier	doc/REFERENCE-Incompleteness.md	14
@@ -234,7 +228,6 @@ B	Prf₀	NEXT-STEPS.md	1
 B	Prf₀	sondeos/README.md	1
 B	Primality	doc/REFERENCE-Full.md	1
 B	PrimeFactor	doc/REFERENCE-Full.md	2
-B	ProjectName.Topic	README.md	1
 B	Prov	DECISIONS.md	2
 B	Prov	GODEL-STATUS.md	1
 B	Prov	REFERENCE.md	8
@@ -299,13 +292,11 @@ B	SubstfcEx	doc/REFERENCE-Incompleteness.md	1
 B	SubstfcEx	sondeos/README.md	1
 B	SubstfcPlanos	REFERENCE.md	1
 B	SubstfcPlanos	doc/REFERENCE-Incompleteness.md	1
-B	TAG_ShortName	README.md	1
 B	TAG_dot	doc/REFERENCE-Incompleteness.md	1
 B	T_Prf	AXIOMS.md	7
 B	T_Prf	DECISIONS.md	16
 B	T_Prf	GODEL-STATUS.md	2
 B	T_Prf	NEXT-STEPS.md	2
-B	T_Prf	README.md	5
 B	T_Prf	REFERENCE.md	1
 B	T_Prf	TEOREMAS-E-HIPOTESIS.md	9
 B	T_Prf	doc/REFERENCE-Kernel.md	1
@@ -323,7 +314,6 @@ B	Verifies	REFERENCE.md	1
 B	Via3UnPiso	sondeos/README.md	1
 B	WD'	doc/REFERENCE-Incompleteness.md	1
 B	WTs	doc/REFERENCE-Incompleteness.md	1
-B	ZF_Ext	README.md	1
 B	_2_code	doc/REFERENCE-Incompleteness.md	1
 B	_Ts	REFERENCE.md	2
 B	_Ts	doc/REFERENCE-Incompleteness.md	1
@@ -604,7 +594,6 @@ B	goedel_first_unrefutable	doc/REFERENCE-Incompleteness.md	1
 B	goedel_second	GODEL-STATUS.md	1
 B	goedel_second'	AXIOMS.md	3
 B	goedel_second'	GODEL-STATUS.md	2
-B	goedel_second'	README.md	1
 B	goedel_second'	REFERENCE.md	2
 B	goedel_second'	TEOREMAS-E-HIPOTESIS.md	1
 B	goedel_second'	doc/REFERENCE-Incompleteness.md	3
@@ -625,7 +614,6 @@ B	if_neg	sondeos/README.md	1
 B	imp_intro	AXIOMS.md	3
 B	imp_intro	DEPENDENCIES.md	1
 B	imp_intro	GODEL-STATUS.md	1
-B	imp_intro	README.md	1
 B	imp_intro	REFERENCE.md	2
 B	imp_intro	doc/REFERENCE-Arithmetic.md	1
 B	imp_intro	doc/REFERENCE-Incompleteness.md	3
@@ -674,7 +662,6 @@ B	lt_trichotomy_thm	doc/REFERENCE-Full.md	1
 B	maehara_eq	DECISIONS.md	1
 B	maehara_eq	sondeos/README.md	1
 B	medicionFiable	doc/REFERENCE-Incompleteness.md	1
-B	mem_pair_iff	README.md	1
 B	mhNL_dsimp	DECISIONS.md	1
 B	mhNL_dsimp	NEXT-STEPS.md	2
 B	miDef	DECISIONS.md	3
@@ -745,7 +732,6 @@ B	premsOf_*	doc/REFERENCE-Incompleteness.md	1
 B	prf0_soundness	DECISIONS.md	1
 B	prfH_deduction	doc/REFERENCE-Incompleteness.md	1
 B	prf_axiomsCodeT_eq	AXIOMS.md	4
-B	prf_axiomsCodeT_eq	README.md	1
 B	prf_axiomsCodeT_eq	REFERENCE.md	4
 B	prf_axiomsCodeT_eq	cuarentena/README.md	1
 B	prf_axiomsCodeT_eq	doc/REFERENCE-Incompleteness.md	8
@@ -808,7 +794,6 @@ B	pᵢ	GODEL-STATUS.md	2
 B	q̇'	REFERENCE.md	1
 B	raa	AXIOMS.md	2
 B	raa	DEPENDENCIES.md	1
-B	raa	README.md	1
 B	raa	REFERENCE.md	2
 B	raa	sondeos/README.md	3
 B	raizMutante	DECISIONS.md	1
@@ -831,14 +816,12 @@ B	stdChain_proofCode'	DECISIONS.md	1
 B	stdChain_proofCode'	doc/REFERENCE-Incompleteness.md	2
 B	stdLine_lineCode'	doc/REFERENCE-Incompleteness.md	1
 B	strCode_ne	REFERENCE.md	1
-B	subject_predicate	README.md	1
 B	substF_hole_hasWitF	doc/REFERENCE-Incompleteness.md	2
 B	substFormula_arith	doc/REFERENCE-Incompleteness.md	1
 B	subst_eq_iff	doc/REFERENCE-Incompleteness.md	1
 B	succ_le_of_lt	DEPENDENCIES.md	1
 B	succ_loc	doc/REFERENCE-Incompleteness.md	1
 B	sym!	DECISIONS.md	2
-B	sym!	README.md	1
 B	tc_arith	doc/REFERENCE-Incompleteness.md	1
 B	tc_cons	REFERENCE.md	1
 B	tc_cons	doc/REFERENCE-Incompleteness.md	2
@@ -942,7 +925,6 @@ B2	ClausuraLiftSinWTs.lean	doc/REFERENCE-Incompleteness.md	2
 B2	ClausuraLiftSinWTs.lean	sondeos/README.md	1
 B2	CodeDistinct.lean	sondeos/README.md	1
 B2	Completeness.lean	sondeos/README.md	1
-B2	CoreAxioms.lean	README.md	1
 B2	D1/D2/D3	GODEL-STATUS.md	1
 B2	DerivCond.lean	REFERENCE.md	1
 B2	DescensoLiftc.lean	doc/REFERENCE-Incompleteness.md	2
@@ -971,7 +953,6 @@ B2	Full/PrimeFactor	DECISIONS.md	5
 B2	Full/PrimeFactor	NEXT-STEPS.md	1
 B2	Full/PrimeFactor	doc/REFERENCE-Incompleteness.md	1
 B2	Full/PrimeFactor.lean	DECISIONS.md	1
-B2	Full/PrimeFactor.lean	README.md	1
 B2	Full/PrimeFactor.lean	REFERENCE.md	1
 B2	Full/PrimeFactor.lean	doc/REFERENCE-Full.md	1
 B2	Full/StrongInduction.lean	doc/REFERENCE-Incompleteness.md	2
@@ -1004,7 +985,6 @@ B2	Meta/LineWFDerives.lean	doc/REFERENCE-Incompleteness.md	2
 B2	Meta/OmegaReflect.lean	doc/REFERENCE-Incompleteness.md	1
 B2	Meta/OmegaReflect.lean	sondeos/README.md	1
 B2	Meta/OmegaStrength.lean	DECISIONS.md	1
-B2	Meta/OmegaStrength.lean	README.md	1
 B2	Meta/ReflectionPrf.lean	doc/REFERENCE-Incompleteness.md	1
 B2	Meta/Sigma1BoundedPrf.lean	doc/REFERENCE-Incompleteness.md	2
 B2	Meta/Sigma1TrackedPrf.lean	doc/REFERENCE-Incompleteness.md	1
@@ -1015,7 +995,6 @@ B2	Minimal/**/*.lean	DECISIONS.md	1
 B2	Minimal/Theorems/Block1-8	DEPENDENCIES.md	1
 B2	Minimal/Theorems/Block1-8	REFERENCE.md	1
 B2	Minimal/Theorems/Block1-8	doc/REFERENCE-Arithmetic.md	2
-B2	Minimal/Theorems/Block1-8.lean	README.md	1
 B2	Minimal/Theorems/Block8.lean	AXIOMS.md	1
 B2	Necessitation.lean	REFERENCE.md	1
 B2	ParticionDiscrimina.lean	sondeos/README.md	1

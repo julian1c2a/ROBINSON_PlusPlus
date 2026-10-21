@@ -555,7 +555,7 @@ read -r -d '' E_DEUDA <<'EOF'
 REFERENCE.md
 # CURRENT-STATUS-PROJECT.md — SALDADA el 2026-10-21 (ADR-182, T26): reescrito entero, con su marca.
 DEPENDENCIES.md
-README.md
+# README.md — SALDADA el 2026-10-21 (ADR-183, T25): reescrito contra el árbol, con su marca.
 AXIOMS.md
 GODEL-STATUS.md
 doc/REFERENCE-Arithmetic.md
