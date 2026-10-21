@@ -1,6 +1,6 @@
 # Banners de «estado real» retirados (histórico)
 
-**Last updated:** 2026-10-16 — los banners apilados de siete documentos, trasladados TAL CUAL ([ADR‑142](../../DECISIONS.md), T33). La fuente única del estado es el banner de `TEOREMAS-E-HIPOTESIS.md`. Las anclas `(#adr-…)` y los enlaces relativos de dentro son los de su documento de origen, en la raíz.
+**Last updated:** 2026-10-21 — ✏️ [ADR‑186](../../DECISIONS.md) (T29): los de `doc/REFERENCE-Incompleteness.md`, al final. Antes, 2026-10-16 — los banners apilados de siete documentos, trasladados TAL CUAL ([ADR‑142](../../DECISIONS.md), T33). La fuente única del estado es el banner de `TEOREMAS-E-HIPOTESIS.md`. Las anclas `(#adr-…)` y los enlaces relativos de dentro son los de su documento de origen, en la raíz.
 
 ## `README.md` — sus líneas 3–81, retiradas el 2026-10-16
 
@@ -747,3 +747,72 @@
 ## `DECISIONS.md` — su línea 8, la marca vieja que seguía debajo del banner, retirada el 2026-10-16
 
 **Última actualización:** 2026-09-10h — **ADR-022**: la clase de testigos de la ω‑consistencia se ESTRECHA a líneas estándar; el precio (una `OmegaConsistent` más fuerte) va escrito, y la garantía que lo hace admisible (`stdChain_proofCode'`) probada. — (previo 2026-09-05) **ADR-019 confirmado en vivo por B3**: el general mal colocado dejaba un corolario inalcanzable, y la duplicación por INSTANCIA que ningún censo ve. ADR-018 en producción.
+
+## `doc/REFERENCE-Incompleteness.md` — sus banners de cabecera, retirados el 2026-10-21
+
+*(Los enlaces relativos de dentro son los de su documento de origen, en `doc/`.)*
+
+> 🏁 **2026‑10‑04 · ADR‑117 — F1 reparado.** `axioms` tiene 142 fórmulas: los 141 de `axiomsBase` y, la última, el
+> axioma DIAGONAL `ax_axiomsCodeT_def`. El ancla `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
+> `Meta/Representability2Prf.lean`) y la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf` y
+> `goedel_second_prf` toman sólo `(hcon : ConsistentH)`, con los tres axiomas de Lean: F1 ya no los hace vacuos.
+> ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes (✏️ desde ADR‑120 lo son: `consistencia`, y `goedel_I`/`goedel_II` van sin hipótesis);
+> `f1_traduccion_refutada` bloquea el argumento de F1 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no
+> prueba la consistencia). `⊬¬G` sigue sin existir:
+> irá por Rosser, sobre `Prf`. *(✏️ 2026‑10‑14, [ADR‑134](../DECISIONS.md): registro del 2026‑10‑04. Desde ADR‑121 la
+> mitad `⊬¬G` es `goedel_I_neg`, por la solidez en el modelo, sin Rosser; y desde ADR‑120 `ConsistentH` es teorema.)*
+
+> 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` se retiró: de `Meta/` salen 9 módulos (`AxiomListCode`,
+> `DerivCond`, `Induction`, `LineWFDerives`, `ListInductionArith`, `Necessitation`, `OmegaStrength`,
+> `Reflection`, `StepArith`) y todo lo enunciado sobre `⊢` en los demás, retirado también — `goedel_first_numeral`,
+> `goedel_second'`, `NegVerifier` y la mitad `⊬¬G`. La cadena sobre `Prf` (D1 `repr_pos'_prf`, D2
+> `d2_prf`, D3 `d3_prf_real`, `goedel_first_prf`, `goedel_second_prf`) **sigue entera**, y ⛔ **sigue
+> vacua** por `[AnclaEq]` (F1, ADR‑114; hasta ADR‑117, 2026‑10‑04: ver arriba). Las secciones de abajo que
+> hablan de `⊢` son registro.
+
+**Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
+`Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+(`goedel_second'`) — 🏁 **D3 DEMOSTRADA** el 2026‑09‑10g (`d3_prf_real`), con lo que la cadena
+D1/D2/D3 **no postula ninguna de las tres**.
+
+> ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
+>
+> **Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 114 + Full 2) **+ 0 en `cuarentena/`
+> + 44 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
+> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO contaba como registro y `[A]` la eximía. ✏️ Desde ADR‑169 la fecha ya no exime: las líneas de abajo llevan «Entonces:».)*
+> *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
+> *(Entonces: el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
+> *(Entonces: el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-150: 133 jobs y 116 módulos, por `Meta/RosserNumerales.lean`, la etapa 1 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de Rosser.)*
+> *(Entonces: el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de Rosser.)*
+> *(Entonces: el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la herramienta de T08.)*
+> *(Entonces: el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
+> *(Entonces: el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
+> *(Entonces: el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
+> *(Entonces: el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
+> *(Entonces: el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
+> *(Entonces: el 2026-10-19, con ADR-170: 132 jobs y 116 módulos, porque `FOL.Deduction`, sin nada en el cono, salió del build, T74.)*
+> *(Entonces: el 2026-10-20, con ADR-173: 133 jobs y 117 módulos, por `Meta/RigidezEstandar.lean`, T75e.)*
+> *(Entonces: el 2026-10-20, con ADR-175: 134 jobs y 118 módulos, por `Meta/SegundoModelo.lean`, T75d.)*
+>
+> ### Dos cambios estructurales que este nodo documenta a partir de §3.24
+>
+> 1. **La REPARACIÓN (2026‑08‑18/19, [ADR‑012](../DECISIONS.md)).** `ax_tc_cons` **retirado** de
+>    `axioms`: hacía la teoría objeto **inconsistente**. Los códigos de Gödel pasan a escribirse como
+>    **NUMERALES** (`numeral (codeNat φ)`), no como árboles `cons`. En consecuencia:
+>    * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO
+>      EXISTEN.** Gödel I es hoy **`goedel_first_numeral`** (§3.24.2), sobre la sentencia `godelCN`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
+>    * 21 módulos a **cuarentena** ([ADR‑013](../DECISIONS.md)) — sus teoremas eran formalmente
+>      correctos pero **vacuos**, probados sobre una teoría que probaba ⊥.
+>    * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
+> 2. **La ESCALERA (a.2, 2026‑08‑19/22).** La Σ₁‑completitud **internalizada** que devuelve la
+>    cuarentena: `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (§3.25). **Completa.**
+>
+> **Secciones §3.15–§3.23 son ANTERIORES a la reparación.** Lo que describen sobre la capa rastreada
+> (los 21 tags, `hI_dot`, el chasis, el KIT) sigue siendo una descripción fiel del **código en
+> `cuarentena/`**, pero **ese código no está en el build** y sus enunciados cambiarán al repatriarse
+> (los códigos estáticos pasan de `termCode (formCode φ)` a `termCode (numeral (codeNat φ))`).

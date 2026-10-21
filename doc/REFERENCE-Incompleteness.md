@@ -1,22 +1,8 @@
 # REFERENCE — Incompletitud Nivel D · Gödel I/II, D1–D3, Σ₁-completitud provable · ROBINSON_PlusPlus
 
-> 🏁 **2026‑10‑04 · ADR‑117 — F1 reparado.** `axioms` tiene 142 fórmulas: los 141 de `axiomsBase` y, la última, el
-> axioma DIAGONAL `ax_axiomsCodeT_def`. El ancla `axiomsCodeT =eq listFormCodeM axioms` es un TEOREMA (`prf_ancla`,
-> `Meta/Representability2Prf.lean`) y la clase `AnclaEq` se retiró (ADR‑118). `goedel_first_prf` y
-> `goedel_second_prf` toman sólo `(hcon : ConsistentH)`, con los tres axiomas de Lean: F1 ya no los hace vacuos.
-> ⚠️ Siguen CONDICIONALES: `ConsistentH` vale sólo si los 142 son consistentes (✏️ desde ADR‑120 lo son: `consistencia`, y `goedel_I`/`goedel_II` van sin hipótesis);
-> `f1_traduccion_refutada` bloquea el argumento de F1 (si la traducción conservara el ancla, ya habría `Prf ⊥`; no
-> prueba la consistencia). `⊬¬G` sigue sin existir:
-> irá por Rosser, sobre `Prf`. *(✏️ 2026‑10‑14, [ADR‑134](../DECISIONS.md): registro del 2026‑10‑04. Desde ADR‑121 la
-> mitad `⊬¬G` es `goedel_I_neg`, por la solidez en el modelo, sin Rosser; y desde ADR‑120 `ConsistentH` es teorema.)*
-
-> 🗑️ **2026‑10‑02 · ADR‑115.** La capa `⊢` se retiró: de `Meta/` salen 9 módulos (`AxiomListCode`,
-> `DerivCond`, `Induction`, `LineWFDerives`, `ListInductionArith`, `Necessitation`, `OmegaStrength`,
-> `Reflection`, `StepArith`) y todo lo enunciado sobre `⊢` en los demás, retirado también — `goedel_first_numeral`,
-> `goedel_second'`, `NegVerifier` y la mitad `⊬¬G`. La cadena sobre `Prf` (D1 `repr_pos'_prf`, D2
-> `d2_prf`, D3 `d3_prf_real`, `goedel_first_prf`, `goedel_second_prf`) **sigue entera**, y ⛔ **sigue
-> vacua** por `[AnclaEq]` (F1, ADR‑114; hasta ADR‑117, 2026‑10‑04: ver arriba). Las secciones de abajo que
-> hablan de `⊢` son registro.
+> **Estado actual:** el banner de [TEOREMAS-E-HIPOTESIS.md](../TEOREMAS-E-HIPOTESIS.md) es la fuente única (T33,
+> [ADR‑142](../DECISIONS.md)). Los banners que se apilaban aquí —los de ADR‑117 y ADR‑115 y el «ESTADO REAL» del
+> 2026‑08‑23 con sus notas—, tal cual, en [historia/BANNERS.md](historia/BANNERS.md) (✏️ 2026‑10‑21, ADR‑186, T29).
 
 > **Nodo temático** del sistema REFERENCE (árbol; ver `AI-GUIDE.md` §0.5). Es el subsistema **activo**
 > del proyecto. Índice raíz: [REFERENCE.md](../REFERENCE.md).
@@ -24,59 +10,24 @@
 > todo Nivel D), [Núcleo](REFERENCE-Kernel.md) (esquemas del verificador `lineWF`/`premsOf`, axiomas
 > `lenc`/`nthc`/`ax_lineWF_inv`/`ax_lineWF_cons`), [Full](REFERENCE-Full.md) (`ax_induction`/`numeral` 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
 > → reglas `ind`/`listInd`).
-> **Ficheros `.lean`:** la cadena `Meta/` (90 módulos en el build, barrel
-> [Meta.lean](../ROBINSON_PlusPlus/Meta.lean)) más los **0 módulos en `cuarentena/`**, que **NO están
-> en el build** (ver [cuarentena/README.md](../cuarentena/README.md)).
+> **Ficheros `.lean`:** la cadena `Meta/` (barrel [Meta.lean](../ROBINSON_PlusPlus/Meta.lean); cuántos
+> módulos, en la línea de cifras de abajo).
 
-**Contenido:** la aritmetización real de las condiciones de Hilbert-Bernays sobre el cálculo finitario
-`Prf` — Gödel I (`goedel_first_numeral`), D1 (`repr_pos'_prf`), D2 (`d2_prf`), Gödel II núcleo 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
-(`goedel_second'`) — 🏁 **D3 DEMOSTRADA** el 2026‑09‑10g (`d3_prf_real`), con lo que la cadena
-D1/D2/D3 **no postula ninguna de las tres**.
+**Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 114 + Full 2) **+ 0 en `cuarentena/` + 44 `sondeos/`
+· 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.** *(La línea de cifras del nodo: la compara `[A]`.)*
+
+**Contenido:** la cadena de Gödel sobre el cálculo finitario `Prf`. La aritmetización de las condiciones de
+Hilbert‑Bernays, las tres DEMOSTRADAS —D1 (`repr_pos'_prf`), D2 (`d2_prf`) y D3 (`d3_prf_real`)—; Gödel I y II con
+su hipótesis (`goedel_first_prf`, `goedel_second_prf`) y, por el modelo y la solidez, sin ella (`goedel_I`,
+`goedel_II`); la mitad `⊬¬G` (`goedel_I_neg`), Tarski, y W1 y E10 en todo modelo estándar. **Cómo leerlo:** §3.15–§3.23
+son anteriores a la reparación (registro); §3.24–§3.68, la construcción —la reparación, la escalera, la repatriación,
+el frente `substfc`, D3 y su ensamblaje—, cada una con su fecha; §3.69–§3.77, el lado semántico (ADR‑120 en
+adelante). Rosser, Löb y los corolarios de Gödel II, en las cabeceras de sus módulos y en TEOREMAS §1.
+
 **Last updated:** 2026-09-10c (§3.59–§3.60 · `hbody` partido y las dos deudas medidas) · Lean v4.31.0. ✏️ 2026‑10‑05,
 D7 ejecutada (ADR‑129 de RPP): las cifras del ESTADO REAL de abajo, §3.22 (`decodeStr` da `Option (List Char)`) y
 los literales de símbolo, hoy `sym!"…"`.
 
-> ## ⚠️ ESTADO REAL — 2026-08-23 · repatriación paso 1 hecha
->
-> **Build 134 jobs · 118 módulos activos** (Minimal 2 + Meta 114 + Full 2) **+ 0 en `cuarentena/`
-> + 44 `sondeos/` · 0 `axiom` de Lean · 142 axiomas objeto · 0 errores / 0 sorrys.**
-> *(Cifras medidas el 2026-10-02, tras retirar la capa `⊢`: ADR-115. En línea aparte para que `[A]` las compruebe: una línea con fecha ISO contaba como registro y `[A]` la eximía. ✏️ Desde ADR‑169 la fecha ya no exime: las líneas de abajo llevan «Entonces:».)*
-> *(Re‑medidas el 2026-10-04 tras ADR-117: de estas cifras sólo cambian los axiomas objeto, de 141 a 142 —la base y el ancla diagonal—.)*
-> *(Entonces: el 2026-10-05, con D7 (ADR-129): 129 jobs y 112 módulos, por `Minimal/SymLit.lean`; los `sondeos/` son hoy 88.)*
-> *(Entonces: el 2026-10-17, con ADR-148: 131 jobs y 114 módulos, por `Meta/RosserW1.lean`, la etapa W1(ax) de Rosser.)*
-> *(Entonces: el 2026-10-17, con ADR-149: 132 jobs y 115 módulos, por `Meta/RosserPosNum.lean`, la etapa 6 de Rosser.)*
-> *(Entonces: el 2026-10-17, con ADR-150: 133 jobs y 116 módulos, por `Meta/RosserNumerales.lean`, la etapa 1 de Rosser.)*
-> *(Entonces: el 2026-10-17, con ADR-152: 134 jobs y 117 módulos, por `Meta/RosserNumEval.lean`, la etapa 2 de Rosser.)*
-> *(Entonces: el 2026-10-17, con ADR-153: 135 jobs y 118 módulos, por `Meta/RosserGuardNeg.lean`, la etapa 3 de Rosser.)*
-> *(Entonces: el 2026-10-17, con ADR-154: 136 jobs y 119 módulos, por `Meta/RosserNegLinea.lean`, la etapa 4 de Rosser.)*
-> *(Entonces: el 2026-10-17, con ADR-156: 137 jobs y 120 módulos, por `Meta/RosserNegNum.lean`, la etapa 5 de Rosser.)*
-> *(Entonces: el 2026-10-18, con ADR-157: 139 jobs y 122 módulos, por `Meta/Rosser.lean`, Rosser, y `Meta/PurezaComando.lean`, la herramienta de T08.)*
-> *(Entonces: el 2026-10-18, con ADR-159: 140 jobs y 123 módulos, por `Meta/Lob.lean`, Löb.)*
-> *(Entonces: el 2026-10-18, con ADR-160: 135 jobs y 118 módulos: T66 retiró del build `ChainNegPrf`, `VerifierSound`, `OmegaReflect`, `ChainDecode` y `CodeDecode`, sin consumidor; los sondeos, 43.)*
-> *(Entonces: el 2026-10-18, con ADR-161: 130 jobs y 113 módulos: el paso 3 de ADR-139 retiró `CodeDistinct`, `ReflectionPrf`, `Sigma1TrackedPrf`, `Sigma1BoundedPrf` y `Full/PrimeFactor`, sin nada en el cono.)*
-> *(Entonces: el 2026-10-18, con ADR-162: 131 jobs y 114 módulos, por `Meta/GodelCorolarios.lean`, los corolarios de T78.)*
-> *(Entonces: el 2026-10-18, con ADR-165: 133 jobs y 116 módulos, por `Meta/ContratoTitulares.lean` y `Meta/ContratoTabla.lean`, T07.)*
-> *(Entonces: el 2026-10-19, con ADR-170: 132 jobs y 116 módulos, porque `FOL.Deduction`, sin nada en el cono, salió del build, T74.)*
-> *(Entonces: el 2026-10-20, con ADR-173: 133 jobs y 117 módulos, por `Meta/RigidezEstandar.lean`, T75e.)*
-> *(Entonces: el 2026-10-20, con ADR-175: 134 jobs y 118 módulos, por `Meta/SegundoModelo.lean`, T75d.)*
->
-> ### Dos cambios estructurales que este nodo documenta a partir de §3.24
->
-> 1. **La REPARACIÓN (2026‑08‑18/19, [ADR‑012](../DECISIONS.md)).** `ax_tc_cons` **retirado** de
->    `axioms`: hacía la teoría objeto **inconsistente**. Los códigos de Gödel pasan a escribirse como
->    **NUMERALES** (`numeral (codeNat φ)`), no como árboles `cons`. En consecuencia:
->    * **`goedel_first_real'`, `godelC'_fixedpoint` y `goedel_first_undecidable_real'` YA NO
->      EXISTEN.** Gödel I es hoy **`goedel_first_numeral`** (§3.24.2), sobre la sentencia `godelCN`. 🗑️ *(lo que esta línea cita de `⊢` quedó retirado con esa capa, ADR-115)*
->    * 21 módulos a **cuarentena** ([ADR‑013](../DECISIONS.md)) — sus teoremas eran formalmente
->      correctos pero **vacuos**, probados sobre una teoría que probaba ⊥.
->    * ⚠️ **NO es una prueba de consistencia**: se retiró la inconsistencia **conocida y localizada**.
-> 2. **La ESCALERA (a.2, 2026‑08‑19/22).** La Σ₁‑completitud **internalizada** que devuelve la
->    cuarentena: `pcc_eval_add` → `pcc_eval_mul` → `div2` → **`pcc_dot_cons`** (§3.25). **Completa.**
->
-> **Secciones §3.15–§3.23 son ANTERIORES a la reparación.** Lo que describen sobre la capa rastreada
-> (los 21 tags, `hI_dot`, el chasis, el KIT) sigue siendo una descripción fiel del **código en
-> `cuarentena/`**, pero **ese código no está en el build** y sus enunciados cambiarán al repatriarse
-> (los códigos estáticos pasan de `termCode (formCode φ)` a `termCode (numeral (codeNat φ))`).
 
 ---
 
@@ -408,6 +359,7 @@ theorem pcc_exIntro_code_objList (A lines) (hclosed) (h) : Prf (provCodeC' (Form
 --   termCode meta (transporte a tcFn stuck para lista abstracta) → hI_tracked abstracto exige la
 --   Opción A DE RAÍZ (provFormulaC'ₜ/provCodeC'ₜ con tcFn + D1ₜ). Ver GODEL-D3-TRACKED-DESIGN.md §4.2.
 --   Limpieza F7 BLOQUEADA hasta goedel_second_prf real (GodelTwo.goedel_second' aún usa axiom d3).
+--   (✏️ 2026-10-21, ADR-186: registro de julio; D3 es d3_prf_real desde el 2026-09-10g, y F7b se hizo.)
 ```
 
 > **NOTA (2026‑07‑05c/d):** el enfoque `tcFn` (§3.17 arriba, Opción A §10 del diseño) quedó
@@ -5553,3 +5505,160 @@ y `OmegaConsistent` **falsa**.
 
 ⇒ Con esto, **C** y **D** (la completitud negativa) quedan desbloqueados: son el trabajo que sigue.
 
+---
+
+## §3.69 · 🏁 El LADO SEMÁNTICO: el modelo, la solidez, la consistencia, W1 y Tarski (2026‑10‑05 en adelante)
+
+> ✏️ **2026‑10‑21 · [ADR‑186](../DECISIONS.md) (T29).** Las secciones §3.69–§3.77 documentan lo que este nodo no tenía:
+> los módulos de ADR‑120 en adelante. El orden es el de las dependencias: el modelo a nivel `Nat` (§3.70), el modelo de
+> FOL (§3.71), los 142 en él (§3.72), la solidez (§3.73), la consistencia (§3.74), W1 y la mitad `⊬¬G` (§3.75),
+> Tarski (§3.76), y W1 y E10 en todo modelo estándar, con el segundo modelo (§3.77). Firmas abreviadas; las exactas,
+> en los ficheros. Qué usa cada titular (las clases (i)–(iii)), en [TEOREMAS-E-HIPOTESIS.md](../TEOREMAS-E-HIPOTESIS.md) §1.
+
+```text
+ModeloCodigo ─► ModeloEstandar ─► ModeloCodificacion ─► Consistencia ─► SolidezVerificador ─► RigidezEstandar
+                                                            ▲   │                                  │
+                         SolidezPrf ─────────────────────────┘   └─► TarskiPrf          SegundoModelo ┘
+```
+
+## §3.70 · `Meta/ModeloCodigo.lean` — el modelo a nivel `Nat` (ADR‑120)
+
+Las listas por Cantor y la codificación entera, en ℕ: lo que los símbolos de código valdrán en el modelo.
+
+```lean
+def unpairN : Nat → Nat × Nat              -- la inversa de pairN (Cantor); pairN_unpairN, unpairN_pairN, pairN_inj
+def decodeL : Nat → List Nat               -- consN a b = pairN a b + 1, 0 = []: decodeL_consN, decodeL_encodeL
+def encodeL : List Nat → Nat
+def carN, cdrN : Nat → Nat                 -- carN_consN, cdrN_consN; carN_lt y cdrN_lt (no nulo)
+def nthN (l : Nat) : Nat → Nat             -- nthN_cz, nthN_cs; nthN_lt
+def lenN (l : Nat) : Nat                   -- lenN_zero, lenN_consN
+def memN (x l : Nat) : Prop                -- x ∈ decodeL l
+def substtcN, liftcN, substfcN, liftfcN …  -- la sustitución y el lift sobre códigos, con sus ecuaciones por constructor
+def vpfN (c r : Nat) : Nat                 -- el validProofFn en ℕ
+def lineWFT (V : Nat) : Nat → Nat → Prop   -- las 21 cláusulas de lineWF, una por etiqueta (traducción de ax_lineWF_*)
+def lineWFN (V x : Nat) : Prop             -- nthN x 1 < 21 ∧ lineWFT V (nthN x 1) x
+def chainOkN (V c p : Nat) : Prop          -- el chainOk en ℕ, paramétrico en V (el valor de axiomsCodeT)
+def codeNatList : List Formula → Nat
+def V₀ : Nat                               -- el valor de axiomsCodeT: los 141 de axiomsBase y el diagonal
+```
+
+`lineWFT` es la traducción mecánica de los `ax_lineWF_*`, cláusula a cláusula: lo comprueba
+`scripts/lineWFT_generar.py` (ADR‑180), y el núcleo con los `Iff.rfl` de `ModeloCodificacion`.
+
+## §3.71 · `Meta/ModeloEstandar.lean` — `MNV V`, el modelo de FOL (ADR‑120)
+
+```lean
+def MNV (V : Nat) : Model Nat              -- dominio ℕ; cada símbolo, su función de §3.70; axiomsCodeT ↦ V
+theorem MN_zero … MN_chainOk               -- un lema por símbolo, por rfl, con V VARIABLE (ninguno contra V₀)
+theorem ev_numeralM, ev_formCodeM, ev_listFormCodeM   -- los códigos cerrados evalúan a su codeNat
+theorem ev_hasWit, ev_hasWitF               -- las guardas de ADR‑020, en ℕ
+theorem v_ax2 … v_ax12 …                    -- cada axioma matemático, verdadero en MNV V
+theorem MN_coreAxioms (v) : ∀ φ, List.Mem φ coreAxioms → evalFormula (MNV V) v φ
+```
+
+⚠️ Los lemas son para `V` variable a propósito: contra `V₀` concreto, la altura de definición los hace caros.
+
+## §3.72 · `Meta/ModeloCodificacion.lean` — los 107 de codificación, el ancla y los 142 (ADR‑120)
+
+```lean
+theorem v_substtc_var_eq … v_vpf_thy        -- cada axioma de codificación, verdadero en MNV V
+theorem v_lineWF_*                         -- por Iff.rfl entre el axioma abierto y su cláusula de lineWFT
+theorem MN_codingAxioms (v) : ∀ φ, List.Mem φ codingAxioms → evalFormula (MNV V) v φ
+theorem v_ancla : ∀ v, evalFormula (MNV V₀) v ax_axiomsCodeT_def   -- por rw con lemas ∀, sin lema diagonal semántico
+theorem MN_axioms (v) : contextSatisfies (MNV V₀) v axioms          -- los 142
+```
+
+## §3.73 · `Meta/SolidezPrf.lean` — la solidez de `Prf` (ADR‑120)
+
+```lean
+structure Estandar (M : Model Nat) : Prop where
+  hzero : M.func zero_sym [] = 0
+  hsucc : ∀ a, M.func succ_sym [a] = a + 1
+  hcons : ∀ a b, M.func cons_sym [a, b] = consN a b
+  haxs  : ∀ v, contextSatisfies M v axioms
+theorem prfI_sound (hM : Estandar M) {φ} (h : Prfᵢ φ) : ∀ v, evalFormula M v φ
+theorem prf_sound  (hM : Estandar M) {φ} (h : Prf φ)  : ∀ v, evalFormula M v φ   -- los 7 constructores de Prf
+theorem consistentH_de (hM : Estandar M) : ConsistentH
+```
+
+La inducción de `Prf` (`ind`, `listInd`) es sólida porque el dominio es ℕ de verdad: `0`, `σ` y `::` son los de
+verdad (`hzero`, `hsucc`, `hcons`), y toda lista es `nil` o un `cons` (ADR‑113; la inducción fuerte, `fuerte`).
+
+## §3.74 · `Meta/Consistencia.lean` — la consistencia, y Gödel I y II sin hipótesis (ADR‑120)
+
+```lean
+theorem estandar_MN : Estandar (MNV V₀)
+theorem consistencia : ConsistentH                         -- consistentH_de estandar_MN
+theorem goedel_I  : ¬ Prf godelCN                          -- goedel_first_prf consistencia
+theorem goedel_II : ¬ Prf consistencyFormula'              -- goedel_second_prf consistencia
+theorem V₀_eq_codigo : V₀ = codeNatList axioms             -- por la solidez: el ancla es teorema (prf_ancla)
+```
+
+`consistencia` es RELATIVA a Lean: PRA ⊢ Con(Lean) → Con(T_Prf) (TEOREMAS §4, ADR‑138).
+
+## §3.75 · `Meta/SolidezVerificador.lean` — el decodificador, W1 y Gödel I entero (ADR‑121)
+
+```lean
+def dec (f : Nat) : Formula                -- el decodificador TOTAL (con decT, decTs, decS; la basura ↦ ⊥ o dflt)
+theorem dec_codeNat : ∀ φ, dec (codeNat φ) = φ
+theorem dec_substfc (f v t) : dec (substfcN v t f) = substFormula v (decT t) (dec f)
+theorem dec_liftfc  (f c)   : dec (liftfcN c f) = liftFormula c (dec f)
+def Bueno (c : Nat) : Prop                 -- todo lo que c contiene decodifica a un teorema de Prf
+theorem bueno_V₀ : Bueno V₀                -- por V₀_eq_codigo: el único paso de W1 por el modelo
+theorem verificador_solido {p y} (h : chainOkN V₀ 0 p) (hy : memN y (runFnN 0 p)) : Prf (dec y)   -- W1
+theorem prf_of_prov (φ v) : evalFormula (MNV V₀) v (provCodeC' φ) → Prf φ
+theorem modelo_prov_iff (φ v) : evalFormula (MNV V₀) v (provCodeC' φ) ↔ Prf φ
+theorem goedel_I_neg : ¬ Prf (neg godelCN)                                  -- ⊬¬G
+theorem godelCN_indecidible : And (¬ Prf godelCN) (¬ Prf (neg godelCN))
+theorem godelCN_verdadera (v) : evalFormula (MNV V₀) v godelCN              -- E10
+theorem con_verdadera     (v) : evalFormula (MNV V₀) v consistencyFormula'  -- E10
+```
+
+W1 se prueba etiqueta por etiqueta (las 21 líneas de `lineWFT`: `linea_p1`…), por inducción sobre la cadena. La mitad
+`⊬¬G` no usa ω‑consistencia ni Rosser: usa la verdad de T_Prf en ℕ, que es más que su consistencia.
+
+## §3.76 · `Meta/TarskiPrf.lean` — Tarski (ADR‑121; el semántico en todo modelo estándar, ADR‑175)
+
+```lean
+theorem prf_diagonal (P : Formula) :                        -- el lema diagonal para un predicado ARBITRARIO
+  Prf (selfAppN (diagBeta P) ⇔ substFormula 0 (numeral (codeNat (selfAppN (diagBeta P)))) P)
+noncomputable def liar (Tr : Formula) : Formula             -- el mentiroso de Tr
+theorem prf_tarski (Tr) : Prf (neg (substFormula 0 (numeral (codeNat (liar Tr))) Tr ⇔ liar Tr))
+theorem tarski (Tr) : ¬ Prf (substFormula 0 (numeral (codeNat (liar Tr))) Tr ⇔ liar Tr)   -- con consistencia
+theorem tarski_semantico_de {M} (hM : Estandar M) (Tr) (v) :
+  ¬ (evalFormula M v (substFormula 0 (numeral (codeNat (liar Tr))) Tr) ↔ evalFormula M v (liar Tr))
+theorem tarski_semantico (Tr) (v) : …                       -- la instancia en MNV V₀ (estandar_MN)
+theorem liar_isSentence {Tr} (hTr : liftFormula 1 Tr = Tr) : IsSentence (liar Tr)
+```
+
+## §3.77 · `Meta/RigidezEstandar.lean` y `Meta/SegundoModelo.lean` — en TODO modelo estándar, y no hay uno solo (ADR‑173, ADR‑175)
+
+`RigidezEstandar` lleva W1 y E10 de `MNV V₀` a todo `M` con `Estandar M`. No es inmediato: sobre la basura, `M` es
+libre; lo salvan las guardas de ADR‑020, que significan en `M` lo mismo que en `MNV` (`M_hasWit`, `M_hasWitF`), y el
+ancla, que fija `axiomsCodeT` en `M`.
+
+```lean
+theorem M_lt  (hM : Estandar M) (a b) : M.rel lt_sym [a, b] ↔ a < b        -- y M_mem, M_lenc, M_nthc (en rango)…
+theorem prf_of_prov_de     (hM : Estandar M) (φ v) : evalFormula M v (provCodeC' φ) → Prf φ
+theorem modelo_prov_iff_de (hM : Estandar M) (φ v) : evalFormula M v (provCodeC' φ) ↔ Prf φ
+theorem godelCN_verdadera_de (hM : Estandar M) (v) : evalFormula M v godelCN
+theorem con_verdadera_de     (hM : Estandar M) (v) : evalFormula M v consistencyFormula'
+theorem control_instancia (φ v) : …          -- la hipótesis no es vacía: la cumple MNV V₀ (estandar_MN)
+```
+
+Y su control del ancla (§12 del fichero, ADR‑175): sin el ancla, Prov puede mentir —`MNV Vbot` satisface los 141 de
+la base y cree demostrable `⊥` (`control_ancla`)—.
+
+`SegundoModelo` construye `MNB V₀`: `MNV V₀` con otra `substfc` sobre la basura (`substfcB`) y el verificador
+recalculado con ella.
+
+```lean
+theorem MB_axioms (v) : contextSatisfies (MNB V₀) v axioms
+theorem estandar_MB : Estandar (MNB V₀)
+theorem MNB_ne_MNV : MNB V₀ ≠ MNV V₀
+theorem segundo_modelo : And (Estandar (MNB V₀)) (MNB V₀ ≠ MNV V₀)
+theorem modelo_prov_iff_MB (φ v) : …           -- Prov, fiel también en el segundo
+```
+
+Ningún axioma fija la basura, y las guardas no se abaratan: por eso los titulares semánticos se enuncian para todo
+`Estandar M` y no para un modelo (TEOREMAS §1).

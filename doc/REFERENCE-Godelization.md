@@ -11,7 +11,7 @@
 **Contenido:** Nivel B (codificación `⌜·⌝`, `G`, Teorema G1 como **meta‑inyectividad**) y Nivel C
 (`formCode`, `IsFormula` — núcleo real de codificación). La capa legacy postulada se retiró en F7a; lo
 que había sobre `⊢` (`Provable`, la versión objeto de G1), con [ADR‑115](../DECISIONS.md).
-**Last updated:** 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos son `List Char` y
+**Last updated:** 2026-10-21 · Lean v4.35.0 — §3.13bis ([ADR‑186](../DECISIONS.md), T29): la codificación en ℕ (`triN`, `consN`, `codeNat`, `codeNatList`, `V₀`) y su inversa, `dec`, de las que dependen el modelo y W1. Antes, 2026-10-05 · Lean v4.31.0 — D7 ejecutada (ADR‑129 de RPP): los símbolos son `List Char` y
 `strCode` es `charsCode` (§3.12, §3.13). Antes, 2026-10-05 — Gödel I/II SIN HIPÓTESIS (ADR‑120: `ConsistentH` es teorema, un
 modelo de los 142) y Gödel I ENTERO (ADR‑121: `⊬ ¬G`). Antes, 2026-10-04 — Gödel I/II, ya no vacuos por F1 y
 condicionales a `ConsistentH` (ADR‑117). Antes, 2026-10-02 — revisado entero tras retirar la capa `⊢` (ADR‑115):
@@ -124,6 +124,37 @@ representabilidad y el punto fijo viven hoy como teoremas sobre `Prf` en el Nive
 ([Incompletitud](REFERENCE-Incompleteness.md)), donde Gödel I/II son `goedel_first_prf`/
 `goedel_second_prf` — ⛔ vacuos por `[AnclaEq]` (F1, ADR‑114) hasta ADR‑117 (2026‑10‑04); hoy su única
 hipótesis es `ConsistentH` (el ancla es el teorema `prf_ancla`); ✏️ desde ADR‑120 (2026‑10‑05) la descarga `consistencia`, un modelo de los 142, y `goedel_I`/`goedel_II` van sin hipótesis.
+
+---
+
+### 3.13bis La codificación en ℕ — `codeNat`, `consN` y el decodificador `dec` (✏️ 2026‑10‑21, ADR‑186)
+
+Los códigos de Gödel del proyecto son NÚMEROS (la reparación, ADR‑012/013): `formCodeM φ` se evalúa en `Prf` al numeral
+`numeralM (codeNat φ)` (`prf_formCode_numeral`, `Meta/CodeNumeralPrf.lean`), y el modelo estándar
+([Incompletitud](REFERENCE-Incompleteness.md) §3.70–§3.72) da a cada símbolo de código su valor sobre ℕ. Las
+definiciones viven en `Minimal/Axioms.lean` —el axioma diagonal `ax_axiomsCodeT_def` lleva `numeralM (codeNat ψ)`, y
+`axioms` no puede importar `Meta`—; `Meta/CodeNumeralPrf.lean` las reexporta.
+
+```lean
+def triN : Nat → Nat                       -- los triangulares, por recursión (sin división)
+def consN (a b : Nat) : Nat := triN (a + b) + b + 1   -- el valor de cons a b = σ (pair a b) (ADR‑113): pairN a b + 1
+def codeNatChars : List Char → Nat         -- una cadena: la lista de sus puntos de código
+def codeNatStr (s : List Char) : Nat
+def codeNatTerm : Term → Nat               -- var n ↦ ⟨0, n⟩; func s ts ↦ ⟨1, s, ts⟩ (mutua con codeNatTerms)
+def codeNat : Formula → Nat                -- etiquetas 2–9: ⊥, átomo, =, ⇒, ∀, ∧, ∨, ∃; espejo exacto de formCodeM
+def codeNatList : List Formula → Nat       -- (Meta/ModeloCodigo.lean)
+def V₀ : Nat                               -- el código de los 142: los 141 de axiomsBase y el diagonal (ídem)
+```
+
+Las propiedades: la inyectividad (`consN_inj`, `codeNat_inj`, `codeNatTerm_inj`, `Meta/CodeNatInjPrf.lean`); las
+listas por Cantor en ℕ (`decodeL`, `encodeL`, `decodeL_consN`, `Meta/ModeloCodigo.lean`); y
+`V₀_eq_codigo : V₀ = codeNatList axioms` (`Meta/Consistencia.lean`), que se prueba con la solidez.
+
+**La inversa, `dec`** (`Meta/SolidezVerificador.lean`, ADR‑121): un decodificador TOTAL —todo número decodifica a una
+fórmula; la basura, a `⊥`, y un término basura, a `dflt`—, con `dec_codeNat : dec (codeNat φ) = φ`, y que conmuta con
+la sustitución y el lift sobre códigos (`dec_substfc`, `dec_liftfc`). Es lo que deja leer en `Prf` lo que el
+verificador acepta en el modelo: W1, `verificador_solido` ([Incompletitud](REFERENCE-Incompleteness.md) §3.75).
+
 
 ---
 
