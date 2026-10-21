@@ -487,3 +487,4 @@ export ROBINSON_PlusPlus.Meta.Representability2Prf (
 /-! ## FOOTPRINT (ADR‑117) -/
 #print axioms ROBINSON_PlusPlus.Meta.Representability2Prf.prf_ancla
 #print axioms ROBINSON_PlusPlus.Meta.Representability2Prf.f1_traduccion_refutada
+#print axioms ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf

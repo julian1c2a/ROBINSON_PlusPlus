@@ -261,7 +261,11 @@ TheoryFramework.Instances.fol0Complete|Classical.choice,Quot.sound,propext
 TheoryFramework.Instances.fol0_proves_iff_models|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.Representability2Prf.repr_pos'_prf|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound|Classical.choice,Quot.sound,propext
+ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound|Quot.sound,propext
 ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.consistencia|Classical.choice,Quot.sound,propext
 ROBINSON_PlusPlus.Meta.Consistencia.goedel_I|Classical.choice,Quot.sound,propext
@@ -651,10 +655,13 @@ rm -rf "$TMP"
 echo ""
 echo "════ [COBERTURA] titulares impresos por el árbol y NO declarados ════"
 COBTMP=$(mktemp)
+# ✏️ 2026-10-21 (T11b, ADR-188): el nombre se extraía con «'[^']+'», y un nombre con PRIMA (`repr_pos'_prf`) salía
+# partido —«_prf», un titular inexistente—. El nombre no lleva espacios: «'[^ ]+'» lo toma entero, primas incluidas. Y
+# sin retro‑referencias (PLAN-PRUEBAS §4): se quitan la cola y la comilla de cabeza por separado.
 ( lake build FOL TheoryFramework 2>&1; lake build 2>&1 ) \
   | tr '\n' ' ' | tr -s ' ' \
-  | grep -oE "'[^']+' (depends on axioms|does not depend)" \
-  | sed -E "s/^'([^']*)'.*/\1/" | sort -u > "$COBTMP"
+  | grep -oE "'[^ ]+' (depends on axioms|does not depend)" \
+  | sed -E "s/' (depends on axioms|does not depend)$//" | sed -E "s/^'//" | sort -u > "$COBTMP"
 COB_IMPRESOS=$(wc -l < "$COBTMP" | tr -d ' ')
 COBDECL=$(mktemp)
 printf '%s' "$TABLA" | sed -E 's/\|.*//' | sed '/^$/d' | sort -u > "$COBDECL"

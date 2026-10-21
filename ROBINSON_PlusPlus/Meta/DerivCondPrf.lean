@@ -194,3 +194,6 @@ theorem d2_prf (A B : Formula) :
   exact PrfH_and_intro hChainR hInB
 
 end ROBINSON_PlusPlus.Meta.DerivCondPrf
+
+-- (T11b, ADR-188: D2, con su fila en check-footprints.bash)
+#print axioms ROBINSON_PlusPlus.Meta.DerivCondPrf.d2_prf

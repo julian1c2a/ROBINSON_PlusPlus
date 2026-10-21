@@ -84,8 +84,8 @@ contiene a Q: el Q3 de Robinson, `x = 0 ∨ ∃y x = σy`, que no es axioma, sal
 ### 0.2 · Lo que se supone hoy
 
 1. **El núcleo de Lean** (v4.35.0, desde ADR‑181) **y sus tres axiomas**, `propext`, `Classical.choice` y `Quot.sound`: son, como
-   mucho, el footprint de los titulares (las filas de `check-footprints.bash`; D2 no lleva `Classical.choice`, y D1, D2 y
-   `prf_con_imp_godel` aún no tienen fila: T11b), y leanchecker re‑comprueba en la CI las declaraciones del
+   mucho, el footprint de los titulares (las filas de `check-footprints.bash`; D2 no lleva `Classical.choice`; D1, D2 y
+   `prf_con_imp_godel` tienen fila desde ADR‑188, T11b), y leanchecker re‑comprueba en la CI las declaraciones del
    build con el núcleo (ADR‑116). **0 `axiom` de Lean** en los módulos del build, en RPP y en FOL (fuera del build, FOL guarda 15 en
    `cuarentena/`, T57, y RPP dos en `sondeos/`, en
    `lintlab/Uso.lean`, que prueban que un linter los detecta; el piloto `PilotoDiagonal.lean`, que suponía otros dos, está

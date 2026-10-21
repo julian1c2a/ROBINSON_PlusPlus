@@ -198,3 +198,4 @@ end Modelo
 
 #print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prf_sound
 #print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.consistentH_de
+#print axioms ROBINSON_PlusPlus.Meta.SolidezPrf.prfI_sound

@@ -248,3 +248,4 @@ export ROBINSON_PlusPlus.Meta.GodelTwoPrf (
 #print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_godelCN_fixedpoint
 #print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_first_prf
 #print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.goedel_second_prf
+#print axioms ROBINSON_PlusPlus.Meta.GodelTwoPrf.prf_con_imp_godel
