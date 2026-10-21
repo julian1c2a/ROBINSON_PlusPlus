@@ -1,0 +1,17 @@
+T13 (ADR-179): los mutantes del censo por entorno, con el SEÑUELO. `bash scripts/pruebas/t13/t13_mutantes.bash
+doc/registro/2026-10-21-t13/mutantes.txt` desde PowerShell (`lake` en el PATH), en la raíz de RPP: cada mutante rompe
+UNA cosa de `check-estratos.bash` (RPP) o de `check-axioms.bash` (FOL) en una copia, la corre y la borra. 2026-10-21,
+Lean v4.31.0, ~3 min.
+
+Lo que enseñan: en TODOS los mutantes, el censo mutado sigue diciendo «✓ TRUST ninguno», «✓ NATIVO ninguno»… (está
+ciego, y sin el señuelo daría verde); el señuelo da rojo y dice qué marca falta. Los dos de control, verdes.
+
+RPP: nativo-ciego (sin implemented_by/extern), trust-como-antes (sin el auxiliar de native_decide), trust-ajeno-ciego
+(sin los axiomas ajenos, Lean.ofReduceBool), partial-ciego, sorry-ciego.  FOL: nativo-ciego, trust-como-antes,
+trust-ajeno-ciego.
+
+La medición que lo motivó (en el scratchpad de la sesión, reproducible con el señuelo mismo): en v4.31.0,
+`native_decide` ya no nombra `Lean.ofReduceBool`: fabrica un axioma auxiliar `….conNativo._native.native_decide.ax_1_1`
+en el módulo que lo usa, y el @TRUST de antes lo absolvía por ser «nuestro». No había un agujero (por cómo está escrito el
+censo, no medido con un mutante del build): ese axioma lo veían
+@HAB (habita `Eq`, fuera de la tabla) y el recuento de axiomas de FOL; pero la clase @TRUST estaba ciega.

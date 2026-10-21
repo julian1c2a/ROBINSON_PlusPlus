@@ -66,6 +66,23 @@ LEANFILE="$TMP/Estratos.lean"
 
 open Lean
 
+/-! ⭐ 2026-10-21 (T13, ADR-179): EL SEÑUELO PERMANENTE. Un censo que no ve nada imprime «✓ ninguno», igual que uno
+que ya no sabe mirar (un toolchain que cambia la API, una errata). Aquí, en el propio fichero del censo, una constante
+de cada clase que el censo busca; como no tienen módulo, `esNuestro` las descarta, y las mira `esSenuelo`. El script
+exige EXACTAMENTE sus marcas (`SENUELOS`, abajo): si una falta, o sale otra, el censo no está midiendo lo que dice. -/
+namespace Senuelo
+inductive I : Type where
+  | c : I
+axiom habita : I
+def conSorry : Nat := sorry
+theorem conNativo : (2 + 2 : Nat) = 4 := by native_decide
+theorem conOfReduceBool : ∀ (a b : Bool), Lean.reduceBool a = b → a = b := Lean.ofReduceBool
+def implReal (n : Nat) : Nat := n
+@[implemented_by implReal] def conImplementedBy (n : Nat) : Nat := n
+@[extern "senuelo_c"] opaque conExtern : Nat → Nat
+partial def conPartial (n : Nat) : Nat := if n = 0 then 0 else conPartial (n - 1)
+end Senuelo
+
 def esNuestro (env : Environment) (n : Name) : Bool :=
   match env.getModuleIdxFor? n with
   | none => false
@@ -75,11 +92,27 @@ def esNuestro (env : Environment) (n : Name) : Bool :=
       || (`ROBINSON_PlusPlus).isPrefixOf m || m == `ROBINSON_PlusPlus
       || (`TheoryFramework).isPrefixOf m || m == `TheoryFramework
 
+/-- Las del señuelo de este fichero: sin módulo, y bajo `Senuelo`. -/
+def esSenuelo (env : Environment) (n : Name) : Bool :=
+  (env.getModuleIdxFor? n).isNone && (`Senuelo).isPrefixOf n
+
 /-- La cabeza de la CONCLUSIÓN del tipo: el inductivo que el axioma HABITA. -/
 def cabeza (e : Expr) : Name :=
   match e.getForallBody.getAppFn with
   | .const c _ => c
   | _ => `desconocida
+
+/-- ¿Un axioma de CONFIANZA? Uno ajeno que no sea de los tres de Lean ni `sorryAx` (`Lean.ofReduceBool`,
+    `Lean.trustCompiler`…), y —aunque sea del propio módulo— el auxiliar que fabrica `native_decide`
+    (`…._native.native_decide.ax_…`): en v4.31 `native_decide` ya no nombra `Lean.ofReduceBool`, sino un axioma
+    NUEVO en el módulo que lo usa, que `esNuestro` absolvía (lo destapó el señuelo, 2026-10-21, ADR-179). Las del
+    señuelo cuentan aquí como nuestras: así `conNativo` prueba la segunda cláusula, y `conOfReduceBool`, la primera. -/
+def esConfianza (env : Environment) (estandar : NameSet) (u : Name) : Bool :=
+  match env.find? u with
+  | some (.axiomInfo _) =>
+    !estandar.contains u && u != ``sorryAx
+      && ((!(esNuestro env u) && !(esSenuelo env u)) || u.components.contains `_native)
+  | _ => false
 
 run_cmd do
   let env ← Lean.getEnv
@@ -89,21 +122,26 @@ run_cmd do
   -- nuestra (`Lean.ofReduceBool`, `Lean.ofReduceNat`, `Lean.trustCompiler`, …) es @TRUST
   let estandar : NameSet := ((({} : NameSet).insert ``propext).insert ``Classical.choice).insert ``Quot.sound
   for (n, ci) in env.constants.toList do
-    if !(esNuestro env n) then continue
-    nuestras := nuestras + 1
-    if let some idx := env.getModuleIdxFor? n then
-      if (`TheoryFramework).isPrefixOf env.header.moduleNames[idx.toNat]! then tf := tf + 1
+    let sen := esSenuelo env n
+    if !(esNuestro env n) && !sen then continue
+    -- (las marcas del señuelo llevan «@SENUELO » delante: no se mezclan con las del censo)
+    let p := if sen then "@SENUELO " else "@"
+    if !sen then
+      nuestras := nuestras + 1
+      if let some idx := env.getModuleIdxFor? n then
+        if (`TheoryFramework).isPrefixOf env.header.moduleNames[idx.toNat]! then tf := tf + 1
     match ci with
-    | .axiomInfo ax => logInfo m!"@HAB {cabeza ax.type} {n}"
-    | .inductInfo ind => if !n.isInternal then logInfo m!"@CTORS {n} {ind.ctors.length}"
+    | .axiomInfo ax => logInfo m!"{p}HAB {cabeza ax.type} {n}"
+    | .inductInfo ind => if !n.isInternal then logInfo m!"{p}CTORS {n} {ind.ctors.length}"
+    -- (un `partial def` es un `opaque` con su `…._unsafe_rec` al lado; T13, ADR-179)
+    | .opaqueInfo _ => if env.contains (n ++ `_unsafe_rec) then logInfo m!"{p}PARCIAL {n}"
     | _ => pure ()
     -- tipo y valor, también el de un teorema (`getUsedConstantsAsSet` lee con `allowOpaque`)
     let usadas := ci.getUsedConstantsAsSet
-    if usadas.contains ``sorryAx then logInfo m!"@SORRY {n}"
+    if usadas.contains ``sorryAx then logInfo m!"{p}SORRY {n}"
     for u in usadas do
-      if let some (.axiomInfo _) := env.find? u then
-        if !estandar.contains u && u != ``sorryAx && !(esNuestro env u) then logInfo m!"@TRUST {n} {u}"
-    if (Lean.Compiler.getImplementedBy? env n).isSome || Lean.isExtern env n then logInfo m!"@NATIVO {n}"
+      if esConfianza env estandar u then logInfo m!"{p}TRUST {n} {u}"
+    if (Lean.Compiler.getImplementedBy? env n).isSome || Lean.isExtern env n then logInfo m!"{p}NATIVO {n}"
   logInfo m!"@TF {tf}"
   logInfo m!"@NUESTRAS {nuestras}"
   -- ¿alguna librería cargada que ningún censo mira? (una nueva, importada por FOL o por RPP, quedaría fuera)
@@ -245,6 +283,61 @@ for par in "TRUST|constante(s) usan un axioma de confianza" "NATIVO|constante(s)
     FAIL=1
   fi
 done
+
+# ── 2quater · `partial`, con IGUALDAD (T13, ADR-179) ───────────────────────────────────────────
+# Un `partial def` es opaco para el núcleo: no es un agujero por sí solo (no entra en ningún término de prueba
+# mientras nadie lo use en una), pero la cifra se vigila con igualdad, como las demás: uno nuevo es rojo, y uno que
+# desaparece también, para que la tabla baje. MEDIDOS en el entorno (2026-10-21), cinco: el `termToString` de RPP, los
+# dos ayudantes de táctica de FOL (`FOL/Tactics.lean`) y, que el grep no veía, los `Repr` y `BEq` DERIVADOS de
+# `TermG` (`FOL/FOL.lean`: un inductivo anidado, y su `deriving` los hace `partial`). La auditoría contaba 1 y 2 por texto.
+read -r -d '' PARCIALES <<'EOF'
+ROBINSON_PlusPlus.Minimal.Axioms.termToString
+getAllPositions
+tryMem
+instBEqTermG.beq
+instReprTermG.repr
+EOF
+echo
+echo "════ partial (opacos para el núcleo; con igualdad) ════"
+PARC=$(printf '%s' "$PLANA" | grep -oE '@PARCIAL [^ ]+' | sed 's/@PARCIAL //' | LC_ALL=C sort -u)
+PARC_ESP=$(printf '%s\n' "$PARCIALES" | sed '/^$/d' | LC_ALL=C sort -u)
+if [ "$PARC" = "$PARC_ESP" ]; then
+  echo "  ✓ los $(printf '%s\n' "$PARC" | sed '/^$/d' | wc -l | tr -d ' ') declarados, y ninguno más: $(printf '%s ' $PARC)"
+else
+  echo "  ✗ los \`partial\` del entorno no son los declarados:"
+  diff <(printf '%s\n' "$PARC_ESP" | sed '/^$/d') <(printf '%s\n' "$PARC" | sed '/^$/d') | grep -E '^[<>]' \
+    | sed 's/^</      · falta/; s/^>/      · sobra/'
+  FAIL=1
+fi
+
+# ── 2quinquies · EL SEÑUELO: el censo se ve a sí mismo (T13, ADR-179) ────────────────────────────
+# Las marcas que el señuelo del fichero (namespace `Senuelo`) TIENE que dar, una por clase de las que el censo busca.
+# Si falta una, el censo ya no sabe ver esa clase (y daría «✓ ninguno» sin mirar); si sale otra, algo cambió en
+# cómo Lean fabrica lo que el señuelo usa: se mira y se actualiza esta tabla, con su ADR. MEDIDAS con v4.31.0
+# (2026-10-21). ⚠️ El nombre del auxiliar de `native_decide` y su cabeza son de Lean, no nuestros.
+read -r -d '' SENUELOS <<'EOF'
+@SENUELO CTORS Senuelo.I 1
+@SENUELO HAB Senuelo.I Senuelo.habita
+@SENUELO HAB Eq Senuelo.conNativo._native.native_decide.ax_1_1
+@SENUELO PARCIAL Senuelo.conPartial
+@SENUELO SORRY Senuelo.conSorry
+@SENUELO TRUST Senuelo.conNativo Senuelo.conNativo._native.native_decide.ax_1_1
+@SENUELO TRUST Senuelo.conOfReduceBool Lean.ofReduceBool
+@SENUELO NATIVO Senuelo.conImplementedBy
+@SENUELO NATIVO Senuelo.conExtern
+EOF
+echo
+echo "════ SEÑUELO (el censo tiene que verse a sí mismo: una constante de cada clase) ════"
+SEN=$(printf '%s\n' "$SALIDA" | grep -oE '@SENUELO .*' | sed 's/[[:space:]]*$//' | LC_ALL=C sort -u)
+SEN_ESP=$(printf '%s\n' "$SENUELOS" | sed '/^$/d' | LC_ALL=C sort -u)
+if [ -n "$SEN" ] && [ "$SEN" = "$SEN_ESP" ]; then
+  echo "  ✓ las $(printf '%s\n' "$SEN" | wc -l | tr -d ' ') marcas del señuelo, exactas: el censo ve axiomas, constructores, partial, sorry, confianza y nativo"
+else
+  echo "  ✗ el señuelo no da sus marcas: el censo NO está midiendo lo que dice"
+  diff <(printf '%s\n' "$SEN_ESP" | sed '/^$/d') <(printf '%s\n' "$SEN" | sed '/^$/d') | grep -E '^[<>]' \
+    | sed 's/^</      · falta/; s/^>/      · sobra/'
+  FAIL=1
+fi
 
 # ── 3 · LA ESCALERA DE BINDERS ────────────────────────────────────────────────────────────
 # La otra estratificación del proyecto: por NÚMERO DE CUANTIFICADORES. Existe de facto

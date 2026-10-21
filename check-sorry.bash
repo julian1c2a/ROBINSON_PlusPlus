@@ -203,10 +203,11 @@ fi
 # 🔑 *Un agujero que hoy vale cero y que nadie vigila es un agujero abierto, no un agujero
 #    cerrado.* Es la misma doctrina que `check-warnings`: igualdad EXACTA, nunca cota.
 #
-# ⚠️ Lo que NO entra, y por qué: `partial def` sale 1 en RPP y 3 en FOL, y los cuatro son
-# inocuos —`termToString` (pretty-printing) y tres ayudantes de táctica en `MetaM`—: no
-# aparecen en ningún término de prueba. Si algún día un `partial def` entra en una prueba,
-# eso sí es un agujero; hoy la cifra no discrimina, así que se deja fuera y se dice.
+# ⚠️ Lo que NO entra aquí: `partial def`. Un `partial` es opaco para el núcleo: no es un agujero por sí solo, y
+# hoy no aparece en ningún término de prueba. ✏️ 2026-10-21 (T13, ADR-179): decía «1 en RPP y 3 en FOL»; por texto
+# son 1 y 2 (`termToString`; `getAllPositions` y `tryMem`), y en el ENTORNO son 5: el `deriving Repr, BEq` de
+# `TermG`, un inductivo anidado, fabrica dos más que ningún grep ve. Se censan allí, con igualdad:
+# `check-estratos.bash` (@PARCIAL, los 5) y `check-axioms.bash` de FOL (los 4 suyos).
 echo ""
 echo "════ CENSO DE AGUJEROS DE CONFIANZA (esperado: 0 en todos) ════"
 # ⛔⛔ 2026-10-04 (cuarta revisión de ADR-116): era un grep CRUDO y ANCLADO (`^unsafe `, `^opaque `,
